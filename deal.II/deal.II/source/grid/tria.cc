@@ -28,9 +28,9 @@
 #include <map>
 #include <cmath>
 #include <iostream>
+#include <boost/array.hpp>
 
 DEAL_II_NAMESPACE_OPEN
-
 
 // initialize the @p{straight_boundary} pointer of the triangulation
 // class. for the reasons why it is done like this, see the
@@ -958,24 +958,20 @@ Triangulation<3>::create_triangulation (const std::vector<Point<3> >    &v,
 	    cells[cell].vertices[GeometryInfo<dim>::line_to_cell_vertices(line, 0)],
 	    cells[cell].vertices[GeometryInfo<dim>::line_to_cell_vertices(line, 1)]);
 	  
-					   // assert that the line was
-					   // not already inserted in
-					   // reverse order
-	  if (! (needed_lines.find(std::make_pair(line_vertices.second,
+					   // if that line was already inserted
+					   // in reverse order do nothing, else
+					   // insert the line
+	  if ( (needed_lines.find(std::make_pair(line_vertices.second,
 						  line_vertices.first))
 		 ==
 		 needed_lines.end()))
 	    {
-	      clear_despite_subscriptions();
-
-	      AssertThrow (false, ExcGridHasInvalidCell(cell));
+					       // insert line, with
+					       // invalid iterator. if line
+					       // already exists, then
+					       // nothing bad happens here
+	      needed_lines[line_vertices] = end_line();
 	    }
-		  
-					   // insert line, with
-					   // invalid iterator if line
-					   // already exists, then
-					   // nothing bad happens here
-	  needed_lines[line_vertices] = end_line();
 	}
     }
 
@@ -1049,10 +1045,13 @@ Triangulation<3>::create_triangulation (const std::vector<Point<3> >    &v,
 				   // first, we only collect the data
 				   // now
 
+				   // the bool array stores, wether the lines
+				   // are in the standard orientation or not
+
 				   // note that QuadComparator is a
 				   // class declared and defined in
 				   // this file
-  std::map<internal::Triangulation::Quad,quad_iterator,QuadComparator>
+  std::map<internal::Triangulation::Quad,std::pair<quad_iterator,boost::array<bool,GeometryInfo<dim>::lines_per_face> >,QuadComparator>
     needed_quads;
   for (unsigned int cell=0; cell<cells.size(); ++cell) 
     {
@@ -1079,28 +1078,52 @@ Triangulation<3>::create_triangulation (const std::vector<Point<3> >    &v,
 				       // indices) in place, but
 				       // before they are really
 				       // needed.
-      std::pair<int,int> line_list[GeometryInfo<dim>::lines_per_cell];
+      std::pair<int,int> line_list[GeometryInfo<dim>::lines_per_cell],
+	inverse_line_list[GeometryInfo<dim>::lines_per_cell];
+      unsigned int face_line_list[GeometryInfo<dim>::lines_per_face];
+      boost::array<bool,GeometryInfo<dim>::lines_per_face> orientation;
+      
       for (unsigned int line=0; line<GeometryInfo<dim>::lines_per_cell; ++line)
-	line_list[line]=std::pair<int,int> (
-	  cells[cell].vertices[GeometryInfo<dim>::line_to_cell_vertices(line, 0)],
-	  cells[cell].vertices[GeometryInfo<dim>::line_to_cell_vertices(line, 1)]);
-
+	{
+	  line_list[line]=std::pair<int,int> (
+	    cells[cell].vertices[GeometryInfo<dim>::line_to_cell_vertices(line, 0)],
+	    cells[cell].vertices[GeometryInfo<dim>::line_to_cell_vertices(line, 1)]);
+	  inverse_line_list[line]=std::pair<int,int> (
+	    cells[cell].vertices[GeometryInfo<dim>::line_to_cell_vertices(line, 1)],
+	    cells[cell].vertices[GeometryInfo<dim>::line_to_cell_vertices(line, 0)]);
+	}
+      
       for (unsigned int face=0; face<GeometryInfo<dim>::faces_per_cell; ++face)
         {
-				       // given a face line number
-				       // (0-3) on a specific face we
-				       // get the cell line number
-				       // (0-11) through the
-				       // face_to_cell_lines function
+					   // set up a list of the lines to be
+					   // used for this face. check the
+					   // direction for each line
+					   //
+					   // given a face line number (0-3) on
+					   // a specific face we get the cell
+					   // line number (0-11) through the
+					   // face_to_cell_lines function
+	  for (unsigned int l=0; l<GeometryInfo<dim>::lines_per_face; ++l)
+	    if (needed_lines.find (inverse_line_list[GeometryInfo<dim>::
+						     face_to_cell_lines(face,l)]) == needed_lines.end())
+	      {
+		face_line_list[l]=needed_lines[line_list[GeometryInfo<dim>::
+							 face_to_cell_lines(face,l)]]->index();
+		orientation[l]=true;
+	      }
+	    else
+	      {
+		face_line_list[l]=needed_lines[inverse_line_list[GeometryInfo<dim>::
+								 face_to_cell_lines(face,l)]]->index();
+		orientation[l]=false;
+	      }
+	    
+	  
 	  internal::Triangulation::Quad
-            quad(needed_lines[line_list[GeometryInfo<dim>::
-                                        face_to_cell_lines(face,0)]]->index(),
-                 needed_lines[line_list[GeometryInfo<dim>::
-                                        face_to_cell_lines(face,1)]]->index(),
-                 needed_lines[line_list[GeometryInfo<dim>::
-                                        face_to_cell_lines(face,2)]]->index(),
-                 needed_lines[line_list[GeometryInfo<dim>::
-                                        face_to_cell_lines(face,3)]]->index());
+            quad(face_line_list[0],
+		 face_line_list[1],
+		 face_line_list[2],
+		 face_line_list[3]);
 	  
                                            // insert quad, with
                                            // invalid iterator
@@ -1141,10 +1164,28 @@ Triangulation<3>::create_triangulation (const std::vector<Point<3> >    &v,
                                            // later set the
                                            // face_orientation flag
           const internal::Triangulation::Quad
-            test_quad (quad.line(2), quad.line(3),
-                       quad.line(0), quad.line(1));
-          if (needed_quads.find (test_quad) == needed_quads.end())
-            needed_quads[quad] = end_quad();
+	    test_quad_1(quad.line(2), quad.line(3),
+			quad.line(0), quad.line(1)),//face_orientation=false, face_flip=false, face_rotation=false
+	    test_quad_2(quad.line(0), quad.line(1),
+			quad.line(3), quad.line(2)),//face_orientation=false, face_flip=false, face_rotation=true
+	    test_quad_3(quad.line(3), quad.line(2),
+			quad.line(1), quad.line(0)),//face_orientation=false, face_flip=true,  face_rotation=false
+	    test_quad_4(quad.line(1), quad.line(0),
+			quad.line(2), quad.line(3)),//face_orientation=false, face_flip=true,  face_rotation=true
+	    test_quad_5(quad.line(2), quad.line(3),
+			quad.line(1), quad.line(0)),//face_orientation=true,  face_flip=false, face_rotation=true
+	    test_quad_6(quad.line(1), quad.line(0),
+			quad.line(3), quad.line(2)),//face_orientation=true,  face_flip=true,  face_rotation=false
+	    test_quad_7(quad.line(3), quad.line(2),
+			quad.line(0), quad.line(1));//face_orientation=true,  face_flip=true,  face_rotation=true
+          if (needed_quads.find (test_quad_1) == needed_quads.end() &&
+	      needed_quads.find (test_quad_2) == needed_quads.end() &&
+	      needed_quads.find (test_quad_3) == needed_quads.end() &&
+	      needed_quads.find (test_quad_4) == needed_quads.end() &&
+	      needed_quads.find (test_quad_5) == needed_quads.end() &&
+	      needed_quads.find (test_quad_6) == needed_quads.end() &&
+	      needed_quads.find (test_quad_7) == needed_quads.end())
+            needed_quads[quad] = std::make_pair(end_quad(),orientation);
         }
     }
 
@@ -1159,7 +1200,7 @@ Triangulation<3>::create_triangulation (const std::vector<Point<3> >    &v,
   if (true) 
     {
       raw_quad_iterator quad = begin_raw_quad();
-      std::map<internal::Triangulation::Quad,quad_iterator,QuadComparator>
+      std::map<internal::Triangulation::Quad,std::pair<quad_iterator,boost::array<bool,GeometryInfo<dim>::lines_per_face> >,QuadComparator>
         ::iterator q;
       for (q = needed_quads.begin(); quad!=end_quad(); ++quad, ++q)
 	{
@@ -1167,10 +1208,16 @@ Triangulation<3>::create_triangulation (const std::vector<Point<3> >    &v,
 	  quad->set_used_flag ();
 	  quad->clear_user_flag ();
 	  quad->clear_user_pointer ();
+					   // set the line orientation
+	  quad->set_line_orientation(0,q->second.second[0]);
+	  quad->set_line_orientation(1,q->second.second[1]);
+	  quad->set_line_orientation(2,q->second.second[2]);
+	  quad->set_line_orientation(3,q->second.second[3]);
+	  
 
 					   // now set the iterator for
 					   // this quad
-	  q->second = quad;
+	  q->second.first = quad;
 	}
     }
 
@@ -1199,11 +1246,18 @@ Triangulation<3>::create_triangulation (const std::vector<Point<3> >    &v,
 					   // bounded by these lines;
 					   // these are then the faces
 					   // of the present cell
-	  std::pair<int,int> line_list[GeometryInfo<dim>::lines_per_cell];
+	  std::pair<int,int> line_list[GeometryInfo<dim>::lines_per_cell],
+	    inverse_line_list[GeometryInfo<dim>::lines_per_cell];
+	  unsigned int face_line_list[4];
 	  for (unsigned int line=0; line<GeometryInfo<dim>::lines_per_cell; ++line)
-	    line_list[line]=std::make_pair(
-	      cells[c].vertices[GeometryInfo<dim>::line_to_cell_vertices(line, 0)],
-	      cells[c].vertices[GeometryInfo<dim>::line_to_cell_vertices(line, 1)]);
+	    {
+	      line_list[line]=std::make_pair(
+		cells[c].vertices[GeometryInfo<dim>::line_to_cell_vertices(line, 0)],
+		cells[c].vertices[GeometryInfo<dim>::line_to_cell_vertices(line, 1)]);
+	      inverse_line_list[line]=std::pair<int,int> (
+		cells[c].vertices[GeometryInfo<dim>::line_to_cell_vertices(line, 1)],
+		cells[c].vertices[GeometryInfo<dim>::line_to_cell_vertices(line, 0)]);
+	    }
 	  
 					   // get the iterators
 					   // corresponding to the
@@ -1212,37 +1266,122 @@ Triangulation<3>::create_triangulation (const std::vector<Point<3> >    &v,
 					   // reversed or not
 	  quad_iterator face_iterator[GeometryInfo<dim>::faces_per_cell];
           bool face_orientation[GeometryInfo<dim>::faces_per_cell];
+          bool face_flip[GeometryInfo<dim>::faces_per_cell];
+          bool face_rotation[GeometryInfo<dim>::faces_per_cell];
           for (unsigned int face=0; face<GeometryInfo<dim>::faces_per_cell; ++face)
 	    {
+	      for (unsigned int l=0; l<GeometryInfo<dim>::lines_per_face; ++l)
+		if (needed_lines.find (inverse_line_list[GeometryInfo<dim>::
+							 face_to_cell_lines(face,l)]) == needed_lines.end())
+		  face_line_list[l]=needed_lines[line_list[GeometryInfo<dim>::
+							   face_to_cell_lines(face,l)]]->index();
+		else
+		  face_line_list[l]=needed_lines[inverse_line_list[GeometryInfo<dim>::
+								   face_to_cell_lines(face,l)]]->index();
+	      
 	      internal::Triangulation::Quad
-                quad(needed_lines[line_list[GeometryInfo<dim>::
-                                            face_to_cell_lines(face,0)]]->index(),
-                     needed_lines[line_list[GeometryInfo<dim>::
-                                            face_to_cell_lines(face,1)]]->index(),
-                     needed_lines[line_list[GeometryInfo<dim>::
-                                            face_to_cell_lines(face,2)]]->index(),
-                     needed_lines[line_list[GeometryInfo<dim>::
-                                            face_to_cell_lines(face,3)]]->index());
+		quad(face_line_list[0],
+		     face_line_list[1],
+		     face_line_list[2],
+		     face_line_list[3]);
 	      
 	      if (needed_quads.find (quad) != needed_quads.end())
 		{
-		  face_iterator[face] = needed_quads[quad];
+						   // face is in standard
+						   // orientation (and not
+						   // flipped or rotated). this
+						   // must be true for at least
+						   // one of the two cells
+						   // containing this face
+						   // (i.e. for the cell which
+						   // originally inserted the
+						   // face)
+		  face_iterator[face] = needed_quads[quad].first;
 		  face_orientation[face] = true;
+		  face_flip[face]=false;
+		  face_rotation[face]=false;
 		}
 	      else
 		{
-						   // face must be
-						   // available in
-						   // reverse order then
+						   // face must be available in
+						   // reverse order
+						   // then. construct all
+						   // possibilities and check
+						   // them one after the other
 		  const internal::Triangulation::Quad
-                    test_quad (quad.line(2), quad.line(3),
-                               quad.line(0), quad.line(1));
-		  Assert (needed_quads.find (test_quad) != needed_quads.end(),
-			  ExcInternalError());
-		  face_iterator[face] = needed_quads[test_quad];
-		  face_orientation[face] = false;
+		    test_quad_1(quad.line(2), quad.line(3),
+				quad.line(0), quad.line(1)),//face_orientation=false, face_flip=false, face_rotation=false
+		    test_quad_2(quad.line(0), quad.line(1),
+				quad.line(3), quad.line(2)),//face_orientation=false, face_flip=false, face_rotation=true
+		    test_quad_3(quad.line(3), quad.line(2),
+				quad.line(1), quad.line(0)),//face_orientation=false, face_flip=true,  face_rotation=false
+		    test_quad_4(quad.line(1), quad.line(0),
+				quad.line(2), quad.line(3)),//face_orientation=false, face_flip=true,  face_rotation=true
+		    test_quad_5(quad.line(2), quad.line(3),
+				quad.line(1), quad.line(0)),//face_orientation=true,  face_flip=false, face_rotation=true
+		    test_quad_6(quad.line(1), quad.line(0),
+				quad.line(3), quad.line(2)),//face_orientation=true,  face_flip=true,  face_rotation=false
+		    test_quad_7(quad.line(3), quad.line(2),
+				quad.line(0), quad.line(1));//face_orientation=true,  face_flip=true,  face_rotation=true
+		  if (needed_quads.find (test_quad_1) != needed_quads.end())
+		    {
+		      face_iterator[face] = needed_quads[test_quad_1].first;
+		      face_orientation[face] = false;
+		      face_flip[face]=false;
+		      face_rotation[face]=false;
+		    }
+		  else if (needed_quads.find (test_quad_2) != needed_quads.end())
+		    {
+		      face_iterator[face] = needed_quads[test_quad_2].first;
+		      face_orientation[face] = false;
+		      face_flip[face]=false;
+		      face_rotation[face]=true;
+		    }
+		  else if (needed_quads.find (test_quad_3) != needed_quads.end())
+		    {
+		      face_iterator[face] = needed_quads[test_quad_3].first;
+		      face_orientation[face] = false;
+		      face_flip[face]=true;
+		      face_rotation[face]=false;
+		    }
+		  else if (needed_quads.find (test_quad_4) != needed_quads.end())
+		    {
+		      face_iterator[face] = needed_quads[test_quad_4].first;
+		      face_orientation[face] = false;
+		      face_flip[face]=true;
+		      face_rotation[face]=true;
+		    }
+		  else if (needed_quads.find (test_quad_5) != needed_quads.end())
+		    {
+		      face_iterator[face] = needed_quads[test_quad_5].first;
+		      face_orientation[face] = true;
+		      face_flip[face]=false;
+		      face_rotation[face]=true;
+		    }
+		  else if (needed_quads.find (test_quad_6) != needed_quads.end())
+		    {
+		      face_iterator[face] = needed_quads[test_quad_6].first;
+		      face_orientation[face] = true;
+		      face_flip[face]=true;
+		      face_rotation[face]=false;
+		    }
+		  else if (needed_quads.find (test_quad_7) != needed_quads.end())
+		    {
+		      face_iterator[face] = needed_quads[test_quad_7].first;
+		      face_orientation[face] = true;
+		      face_flip[face]=true;
+		      face_rotation[face]=true;
+		    }
+
+		  else
+						       // we didn't find the
+						       // face in any direction,
+						       // so something went
+						       // wrong above
+		    Assert(false,ExcInternalError());
+		  
 		}
-	    }
+	    }// for all faces
 	  
 					   // make the cell out of
 					   // these iterators
@@ -1263,7 +1402,12 @@ Triangulation<3>::create_triangulation (const std::vector<Point<3> >    &v,
                                            // set orientation flag for
                                            // each of the faces
 	  for (unsigned int quad=0; quad<GeometryInfo<dim>::faces_per_cell; ++quad)
-            cell->set_face_orientation (quad, face_orientation[quad]);
+	    {
+	      cell->set_face_orientation (quad, face_orientation[quad]);
+	      cell->set_face_flip (quad, face_flip[quad]);
+	      cell->set_face_rotation (quad, face_rotation[quad]);
+	    }
+	  
           
 					   // note that this cell is
 					   // adjacent to the six
@@ -1274,9 +1418,7 @@ Triangulation<3>::create_triangulation (const std::vector<Point<3> >    &v,
 #ifdef DEBUG          
 					   // make some checks on the
 					   // lines and their
-					   // ordering; if the lines
-					   // are right, so are the
-					   // vertices
+					   // ordering
 
 					   // first map all cell lines
 					   // to the two face lines
@@ -1314,15 +1456,17 @@ Triangulation<3>::create_triangulation (const std::vector<Point<3> >    &v,
 					       // of lines really
 					       // coincide. Take care
 					       // about the face
-					       // orientation; note,
-					       // that line_no in
-					       // standard face
-					       // orientation is
-					       // (line_no+2)%4 in
-					       // non-standard face
-					       // orientation
-	      Assert (face_iterator[face1]->line(face_orientation[face1] ? line1 : (line1+2)%4) ==
-		      face_iterator[face2]->line(face_orientation[face2] ? line2 : (line2+2)%4),
+					       // orientation;
+	      Assert (face_iterator[face1]->line(GeometryInfo<dim>::standard_to_real_face_line(
+						   line1,
+						   face_orientation[face1],
+						   face_flip[face1],
+						   face_rotation[face1])) ==
+		      face_iterator[face2]->line(GeometryInfo<dim>::standard_to_real_face_line(
+						   line2,
+						   face_orientation[face2],
+						   face_flip[face2],
+						   face_rotation[face2])),
 		      ExcInternalErrorOnCell(c));
 	    }
 #endif
@@ -1396,7 +1540,7 @@ Triangulation<3>::create_triangulation (const std::vector<Point<3> >    &v,
 				   // negative measures here
   for (active_cell_iterator cell=begin_active(); cell!=end(); ++cell)
     Assert(cell->measure()>0, ExcInternalError());
-
+      
 				   ///////////////////////////////////////
 				   // now set boundary indicators
 				   // where given
@@ -1583,9 +1727,9 @@ Triangulation<3>::create_triangulation (const std::vector<Point<3> >    &v,
 				       // therefore assign the quad
 				       // appropriately
       if (not_found_quad_1)
-	quad = needed_quads[quad_compare_2];
+	quad = needed_quads[quad_compare_2].first;
       else
-	quad = needed_quads[quad_compare_1];
+	quad = needed_quads[quad_compare_1].first;
 
 				       // check whether this face is
 				       // really an exterior one
@@ -5988,15 +6132,28 @@ Triangulation<3>::execute_refinement ()
 					     //   .-10.11-.
 					     //   0   8   2
 					     //   .-4-.-5-.
+
+					     // child 0 and 1 of a line are
+					     // switched if the line orientation
+					     // is false. set up a miniature
+					     // table, indicating which child to
+					     // take for line orientations false
+					     // and true. first index: child
+					     // index in standard orientation,
+					     // second index: line orientation
+	    unsigned int index[2][2]=
+	      {{1,0},   // child 0, line_orientation=false and true
+	       {0,1}};  // child 1, line_orientation=false and true
+		    
 	    const unsigned int line_indices[12]
-	      = { quad->line(0)->child(0)->index(),
-		  quad->line(0)->child(1)->index(),
-		  quad->line(1)->child(0)->index(),
-		  quad->line(1)->child(1)->index(),
-		  quad->line(2)->child(0)->index(),
-		  quad->line(2)->child(1)->index(),
-		  quad->line(3)->child(0)->index(),
-		  quad->line(3)->child(1)->index(),
+	      = { quad->line(0)->child(index[0][quad->line_orientation(0)])->index(),
+		  quad->line(0)->child(index[1][quad->line_orientation(0)])->index(),
+		  quad->line(1)->child(index[0][quad->line_orientation(1)])->index(),
+		  quad->line(1)->child(index[1][quad->line_orientation(1)])->index(),
+		  quad->line(2)->child(index[0][quad->line_orientation(2)])->index(),
+		  quad->line(2)->child(index[1][quad->line_orientation(2)])->index(),
+		  quad->line(3)->child(index[0][quad->line_orientation(3)])->index(),
+		  quad->line(3)->child(index[1][quad->line_orientation(3)])->index(),
 		  new_lines[0]->index(),
 		  new_lines[1]->index(),
 		  new_lines[2]->index(),
@@ -6062,7 +6219,29 @@ Triangulation<3>::execute_refinement ()
 		new_quads[i]->clear_user_pointer();
 		new_quads[i]->clear_children();
 		new_quads[i]->set_boundary_indicator (quad->boundary_indicator());
-	      }  
+						 // set all line orientations to
+						 // true, change this after the
+						 // loop, as we have to consider
+						 // different lines for each
+						 // child
+		for (unsigned int j=0; j<GeometryInfo<dim>::lines_per_face; ++j)
+		  new_quads[i]->set_line_orientation(j,true);
+	      }
+					     // now set the line orientation of
+					     // children of outer lines
+					     // correctly, the lines in the
+					     // interior of the refined quad are
+					     // automatically oriented
+					     // conforming to the standard
+	    new_quads[0]->set_line_orientation(0,quad->line_orientation(0));
+	    new_quads[0]->set_line_orientation(2,quad->line_orientation(2));
+	    new_quads[1]->set_line_orientation(1,quad->line_orientation(1));
+	    new_quads[1]->set_line_orientation(2,quad->line_orientation(2));
+	    new_quads[2]->set_line_orientation(0,quad->line_orientation(0));
+	    new_quads[2]->set_line_orientation(3,quad->line_orientation(3));
+	    new_quads[3]->set_line_orientation(1,quad->line_orientation(1));
+	    new_quads[3]->set_line_orientation(3,quad->line_orientation(3));
+				       
 	    
 					     // finally clear flag
 					     // indicating the need
@@ -6152,10 +6331,10 @@ Triangulation<3>::execute_refinement ()
 					      7./192.;
 					     // finally add centers of
 					     // faces. note that
-					     // vertex 3 is an
+					     // vertex 3 of child 0 is an
 					     // invariant with respect
 					     // to the face
-					     // orientation
+					     // orientation, flip and rotation
 	    for (unsigned int face=0;
 		 face<GeometryInfo<dim>::faces_per_cell; ++face)
 	      vertices[next_unused_vertex] += hex->face(face)->child(0)->vertex(3) *
@@ -6203,13 +6382,12 @@ Triangulation<3>::execute_refinement ()
 					     //  /  0  /      |  4  |
 					     // *--*--*       *--*--*
                                              //
-                                             // note that both asking
-                                             // for child 0 and for
-                                             // vertex 3 within that
-                                             // is invariant with
-                                             // respect to the face
-                                             // orientation, so we do
-                                             // not have to ask here
+                                             // note that asking for child 0 and
+                                             // vertex 3 within that is
+                                             // invariant with respect to the
+                                             // face orientation, rotation and
+                                             // flip, so we do not have to ask
+                                             // here
 	    const unsigned int vertex_indices[7]
 	      = { hex->face(0)->child(0)->vertex_index(3),
 		  hex->face(1)->child(0)->vertex_index(3),
@@ -6321,7 +6499,9 @@ Triangulation<3>::execute_refinement ()
                                              // store that up front
 
 					     // TODO: shorten this
-            const bool face_orientation[6]
+	    
+					     // face_orientation
+            const bool f_or[6]
               = { hex->face_orientation (0),
                   hex->face_orientation (1),
                   hex->face_orientation (2),
@@ -6329,74 +6509,132 @@ Triangulation<3>::execute_refinement ()
                   hex->face_orientation (4),
                   hex->face_orientation (5) };
                     
-	    const unsigned int line_indices[30]
+					     // face_flip
+            const bool f_fl[6]
+              = { hex->face_flip (0),
+                  hex->face_flip (1),
+                  hex->face_flip (2),
+                  hex->face_flip (3),
+                  hex->face_flip (4),
+                  hex->face_flip (5) };
+                    
+					     // face_rotation
+            const bool f_ro[6]
+              = { hex->face_rotation (0),
+                  hex->face_rotation (1),
+                  hex->face_rotation (2),
+                  hex->face_rotation (3),
+                  hex->face_rotation (4),
+                  hex->face_rotation (5) };
+
+					     // set up a list of line iterators
+					     // first. from this, construct
+					     // lists of line_indices and
+					     // line orientations later on
+	    const raw_line_iterator lines[30]
 	      = {
-						     // ask for
-						     // children 0 and
-						     // 3 as they are
-						     // invariant
-						     // wrt. face_orientation
-		    hex->face(0)->child(0)
-                    ->line_index(face_orientation[0] ? 1 : 3),   //0
-		    hex->face(0)->child(3)
-                    ->line_index(face_orientation[0] ? 0 : 2),   //1
-		    hex->face(0)->child(0)
-                    ->line_index(face_orientation[0] ? 3 : 1),   //2
-		    hex->face(0)->child(3)
-                    ->line_index(face_orientation[0] ? 2 : 0),   //3
+		    hex->face(0)->child(GeometryInfo<dim>::standard_to_real_face_vertex(0,f_or[0],f_fl[0],f_ro[0]))
+                    ->line(GeometryInfo<dim>::standard_to_real_face_line(1,f_or[0],f_fl[0],f_ro[0])),        //0
+		    hex->face(0)->child(GeometryInfo<dim>::standard_to_real_face_vertex(3,f_or[0],f_fl[0],f_ro[0]))
+                    ->line(GeometryInfo<dim>::standard_to_real_face_line(0,f_or[0],f_fl[0],f_ro[0])),        //1
+		    hex->face(0)->child(GeometryInfo<dim>::standard_to_real_face_vertex(0,f_or[0],f_fl[0],f_ro[0]))
+                    ->line(GeometryInfo<dim>::standard_to_real_face_line(3,f_or[0],f_fl[0],f_ro[0])),        //2
+		    hex->face(0)->child(GeometryInfo<dim>::standard_to_real_face_vertex(3,f_or[0],f_fl[0],f_ro[0]))
+                    ->line(GeometryInfo<dim>::standard_to_real_face_line(2,f_or[0],f_fl[0],f_ro[0])),        //3
 
-		    hex->face(1)->child(0)
-                    ->line_index(face_orientation[1] ? 1 : 3),   //4
-		    hex->face(1)->child(3)
-                    ->line_index(face_orientation[1] ? 0 : 2),   //5
-		    hex->face(1)->child(0)
-                    ->line_index(face_orientation[1] ? 3 : 1),   //6
-		    hex->face(1)->child(3)
-                    ->line_index(face_orientation[1] ? 2 : 0),   //7
+		    hex->face(1)->child(GeometryInfo<dim>::standard_to_real_face_vertex(0,f_or[1],f_fl[1],f_ro[1]))
+                    ->line(GeometryInfo<dim>::standard_to_real_face_line(1,f_or[1],f_fl[1],f_ro[1])),        //4
+		    hex->face(1)->child(GeometryInfo<dim>::standard_to_real_face_vertex(3,f_or[1],f_fl[1],f_ro[1]))
+                    ->line(GeometryInfo<dim>::standard_to_real_face_line(0,f_or[1],f_fl[1],f_ro[1])),        //5
+		    hex->face(1)->child(GeometryInfo<dim>::standard_to_real_face_vertex(0,f_or[1],f_fl[1],f_ro[1]))
+                    ->line(GeometryInfo<dim>::standard_to_real_face_line(3,f_or[1],f_fl[1],f_ro[1])),        //6
+		    hex->face(1)->child(GeometryInfo<dim>::standard_to_real_face_vertex(3,f_or[1],f_fl[1],f_ro[1]))
+                    ->line(GeometryInfo<dim>::standard_to_real_face_line(2,f_or[1],f_fl[1],f_ro[1])),        //7
 
-		    hex->face(2)->child(0)
-                    ->line_index(face_orientation[2] ? 1 : 3),   //8
-		    hex->face(2)->child(3)
-                    ->line_index(face_orientation[2] ? 0 : 2),   //9
-		    hex->face(2)->child(0)
-                    ->line_index(face_orientation[2] ? 3 : 1),   //10
-		    hex->face(2)->child(3)
-                    ->line_index(face_orientation[2] ? 2 : 0),   //11
+		    hex->face(2)->child(GeometryInfo<dim>::standard_to_real_face_vertex(0,f_or[2],f_fl[2],f_ro[2]))
+                    ->line(GeometryInfo<dim>::standard_to_real_face_line(1,f_or[2],f_fl[2],f_ro[2])),        //8
+		    hex->face(2)->child(GeometryInfo<dim>::standard_to_real_face_vertex(3,f_or[2],f_fl[2],f_ro[2]))
+                    ->line(GeometryInfo<dim>::standard_to_real_face_line(0,f_or[2],f_fl[2],f_ro[2])),        //9
+		    hex->face(2)->child(GeometryInfo<dim>::standard_to_real_face_vertex(0,f_or[2],f_fl[2],f_ro[2]))
+                    ->line(GeometryInfo<dim>::standard_to_real_face_line(3,f_or[2],f_fl[2],f_ro[2])),        //10
+		    hex->face(2)->child(GeometryInfo<dim>::standard_to_real_face_vertex(3,f_or[2],f_fl[2],f_ro[2]))
+                    ->line(GeometryInfo<dim>::standard_to_real_face_line(2,f_or[2],f_fl[2],f_ro[2])),        //11
 
-		    hex->face(3)->child(0)
-                    ->line_index(face_orientation[3] ? 1 : 3),   //12
-		    hex->face(3)->child(3)
-                    ->line_index(face_orientation[3] ? 0 : 2),   //13
-		    hex->face(3)->child(0)
-                    ->line_index(face_orientation[3] ? 3 : 1),   //14
-		    hex->face(3)->child(3)
-                    ->line_index(face_orientation[3] ? 2 : 0),   //15
+		    hex->face(3)->child(GeometryInfo<dim>::standard_to_real_face_vertex(0,f_or[3],f_fl[3],f_ro[3]))
+                    ->line(GeometryInfo<dim>::standard_to_real_face_line(1,f_or[3],f_fl[3],f_ro[3])),        //12
+		    hex->face(3)->child(GeometryInfo<dim>::standard_to_real_face_vertex(3,f_or[3],f_fl[3],f_ro[3]))
+                    ->line(GeometryInfo<dim>::standard_to_real_face_line(0,f_or[3],f_fl[3],f_ro[3])),        //13
+		    hex->face(3)->child(GeometryInfo<dim>::standard_to_real_face_vertex(0,f_or[3],f_fl[3],f_ro[3]))
+                    ->line(GeometryInfo<dim>::standard_to_real_face_line(3,f_or[3],f_fl[3],f_ro[3])),        //14
+		    hex->face(3)->child(GeometryInfo<dim>::standard_to_real_face_vertex(3,f_or[3],f_fl[3],f_ro[3]))
+                    ->line(GeometryInfo<dim>::standard_to_real_face_line(2,f_or[3],f_fl[3],f_ro[3])),        //15
 
-		    hex->face(4)->child(0)
-                    ->line_index(face_orientation[4] ? 1 : 3),   //16
-		    hex->face(4)->child(3)
-                    ->line_index(face_orientation[4] ? 0 : 2),   //17
-		    hex->face(4)->child(0)
-                    ->line_index(face_orientation[4] ? 3 : 1),   //18
-		    hex->face(4)->child(3)
-                    ->line_index(face_orientation[4] ? 2 : 0),   //19
+		    hex->face(4)->child(GeometryInfo<dim>::standard_to_real_face_vertex(0,f_or[4],f_fl[4],f_ro[4]))
+                    ->line(GeometryInfo<dim>::standard_to_real_face_line(1,f_or[4],f_fl[4],f_ro[4])),        //16
+		    hex->face(4)->child(GeometryInfo<dim>::standard_to_real_face_vertex(3,f_or[4],f_fl[4],f_ro[4]))
+                    ->line(GeometryInfo<dim>::standard_to_real_face_line(0,f_or[4],f_fl[4],f_ro[4])),        //17
+		    hex->face(4)->child(GeometryInfo<dim>::standard_to_real_face_vertex(0,f_or[4],f_fl[4],f_ro[4]))
+                    ->line(GeometryInfo<dim>::standard_to_real_face_line(3,f_or[4],f_fl[4],f_ro[4])),        //18
+		    hex->face(4)->child(GeometryInfo<dim>::standard_to_real_face_vertex(3,f_or[4],f_fl[4],f_ro[4]))
+                    ->line(GeometryInfo<dim>::standard_to_real_face_line(2,f_or[4],f_fl[4],f_ro[4])),        //19
 
-		    hex->face(5)->child(0)
-                    ->line_index(face_orientation[5] ? 1 : 3),   //20
-		    hex->face(5)->child(3)
-                    ->line_index(face_orientation[5] ? 0 : 2),   //21
-		    hex->face(5)->child(0)
-                    ->line_index(face_orientation[5] ? 3 : 1),   //22
-		    hex->face(5)->child(3)
-                    ->line_index(face_orientation[5] ? 2 : 0),   //23
+		    hex->face(5)->child(GeometryInfo<dim>::standard_to_real_face_vertex(0,f_or[5],f_fl[5],f_ro[5]))
+                    ->line(GeometryInfo<dim>::standard_to_real_face_line(1,f_or[5],f_fl[5],f_ro[5])),        //20
+		    hex->face(5)->child(GeometryInfo<dim>::standard_to_real_face_vertex(3,f_or[5],f_fl[5],f_ro[5]))
+                    ->line(GeometryInfo<dim>::standard_to_real_face_line(0,f_or[5],f_fl[5],f_ro[5])),        //21
+		    hex->face(5)->child(GeometryInfo<dim>::standard_to_real_face_vertex(0,f_or[5],f_fl[5],f_ro[5]))
+                    ->line(GeometryInfo<dim>::standard_to_real_face_line(3,f_or[5],f_fl[5],f_ro[5])),        //22
+		    hex->face(5)->child(GeometryInfo<dim>::standard_to_real_face_vertex(3,f_or[5],f_fl[5],f_ro[5]))
+                    ->line(GeometryInfo<dim>::standard_to_real_face_line(2,f_or[5],f_fl[5],f_ro[5])),        //23
 
-		    new_lines[0]->index(),                       //24
-		    new_lines[1]->index(),                       //25
-		    new_lines[2]->index(),                       //26
-		    new_lines[3]->index(),                       //27
-		    new_lines[4]->index(),                       //28
-		    new_lines[5]->index()                        //29
+		    new_lines[0],                       //24
+		    new_lines[1],                       //25
+		    new_lines[2],                       //26
+		    new_lines[3],                       //27
+		    new_lines[4],                       //28
+		    new_lines[5]                        //29
 	      };
+
+	    unsigned int line_indices[30];
+	    for (unsigned int i=0; i<30; ++i)
+	      line_indices[i]=lines[i]->index();
+	    
+					     // the orientation of lines for the
+					     // inner quads is quite tricky. as
+					     // these lines are newly created
+					     // ones and thus have no parents,
+					     // they cannot inherit this
+					     // property. set up an array and
+					     // fill it with the respective
+					     // values
+	    bool line_orientation[30];
+					     // note: for the first 24 lines
+					     // (inner lines of the outer quads)
+					     // the following holds: the second
+					     // vertex of the even lines in
+					     // standard orientation is the
+					     // vertex in the middle of the
+					     // quad, whereas for odd lines the
+					     // first vertex is the same middle
+					     // vertex.
+	    for (unsigned int i=0; i<24; ++i)
+	      if (lines[i]->vertex_index((i+1)%2)==static_cast<int>(vertex_indices[i/4]))
+		line_orientation[i]=true;
+	      else
+		{
+						   // it must be the other way
+						   // round then
+		  Assert(lines[i]->vertex_index(i%2)==static_cast<int>(vertex_indices[i/4]),
+			 ExcInternalError());
+		  line_orientation[i]=false;
+		}
+					     // for the last 6 lines the line
+					     // orientation is always true,
+					     // since they were just constructed
+					     // that way
+	    for (unsigned int i=24; i<30; ++i)
+	      line_orientation[i]=true;
+
 	    
 					     // find some space for
 					     // the 12 newly to be
@@ -6444,7 +6682,8 @@ Triangulation<3>::execute_refinement ()
 					     //     / 10 / 11 /      3   25    7
 					     //    *----*----*      *-26-*-27-*
 					     //   / 8  / 9  /      2   24    6
-					     //  *----*----*x     *--8-*--9-* 
+					     //  *----*----*x     *--8-*--9-*
+	    
 	    new_quads[0]->set (internal::Triangulation
                                ::Quad(line_indices[10],
                                       line_indices[28],
@@ -6505,6 +6744,8 @@ Triangulation<3>::execute_refinement ()
                                        line_indices[7],
                                        line_indices[27],
                                        line_indices[13]));
+
+					     // set flags
 	    for (unsigned int i=0; i<12; ++i)
 	      {
 		new_quads[i]->set_used_flag();
@@ -6513,7 +6754,51 @@ Triangulation<3>::execute_refinement ()
 		new_quads[i]->clear_children();
 						 // interior quad
 		new_quads[i]->set_boundary_indicator (255);
+						 // set all line orientation
+						 // flags to true, chnage this
+						 // afterwards, if necessary
+		for (unsigned int j=0; j<GeometryInfo<dim>::lines_per_face; ++j)
+		  new_quads[i]->set_line_orientation(j,true);
 	      }  
+					     // now reset the line_orientation
+					     // flags of outer lines as they
+					     // cannot be set in a loop (at
+					     // least not easily)
+	    new_quads[0]->set_line_orientation(0,line_orientation[10]);
+	    new_quads[0]->set_line_orientation(2,line_orientation[16]);
+
+	    new_quads[1]->set_line_orientation(1,line_orientation[14]);
+	    new_quads[1]->set_line_orientation(2,line_orientation[17]);
+
+	    new_quads[2]->set_line_orientation(0,line_orientation[11]);
+	    new_quads[2]->set_line_orientation(3,line_orientation[20]);
+
+	    new_quads[3]->set_line_orientation(1,line_orientation[15]);
+	    new_quads[3]->set_line_orientation(3,line_orientation[21]);
+
+	    new_quads[4]->set_line_orientation(0,line_orientation[18]);
+	    new_quads[4]->set_line_orientation(2,line_orientation[0]);
+
+	    new_quads[5]->set_line_orientation(1,line_orientation[22]);
+	    new_quads[5]->set_line_orientation(2,line_orientation[1]);
+
+	    new_quads[6]->set_line_orientation(0,line_orientation[19]);
+	    new_quads[6]->set_line_orientation(3,line_orientation[4]);
+
+	    new_quads[7]->set_line_orientation(1,line_orientation[23]);
+	    new_quads[7]->set_line_orientation(3,line_orientation[5]);
+
+	    new_quads[8]->set_line_orientation(0,line_orientation[2]);
+	    new_quads[8]->set_line_orientation(2,line_orientation[8]);
+
+	    new_quads[9]->set_line_orientation(1,line_orientation[6]);
+	    new_quads[9]->set_line_orientation(2,line_orientation[9]);
+
+	    new_quads[10]->set_line_orientation(0,line_orientation[3]);
+	    new_quads[10]->set_line_orientation(3,line_orientation[12]);
+
+	    new_quads[11]->set_line_orientation(1,line_orientation[7]);
+	    new_quads[11]->set_line_orientation(3,line_orientation[13]);
 
 
 					     /////////////////////////////////
@@ -6556,13 +6841,7 @@ Triangulation<3>::execute_refinement ()
                                              // note that we have to
                                              // take care of the
                                              // orientation of
-                                             // faces. as an
-                                             // optimization: asking
-                                             // for child 0 or 3 of a
-                                             // face is invariant
-                                             // under the orientation,
-                                             // so we don't have to
-                                             // ask for it then
+                                             // faces.
 					     //
 					     // TODO: simplify this
 	    const unsigned int quad_indices[36]
@@ -6580,35 +6859,35 @@ Triangulation<3>::execute_refinement ()
 		    new_quads[10]->index(),
 		    new_quads[11]->index(),    //11
 
-		    hex->face(0)->child_index(0),  //12
-		    hex->face(0)->child_index(face_orientation[0] ? 1 : 2),
-		    hex->face(0)->child_index(face_orientation[0] ? 2 : 1),
-		    hex->face(0)->child_index(3),
+		    hex->face(0)->child_index(GeometryInfo<dim>::standard_to_real_face_vertex(0,f_or[0],f_fl[0],f_ro[0])),  //12
+		    hex->face(0)->child_index(GeometryInfo<dim>::standard_to_real_face_vertex(1,f_or[0],f_fl[0],f_ro[0])),
+		    hex->face(0)->child_index(GeometryInfo<dim>::standard_to_real_face_vertex(2,f_or[0],f_fl[0],f_ro[0])),
+		    hex->face(0)->child_index(GeometryInfo<dim>::standard_to_real_face_vertex(3,f_or[0],f_fl[0],f_ro[0])),
 
-		    hex->face(1)->child_index(0),  //16
-		    hex->face(1)->child_index(face_orientation[1] ? 1 : 2),
-		    hex->face(1)->child_index(face_orientation[1] ? 2 : 1),
-		    hex->face(1)->child_index(3),
+		    hex->face(1)->child_index(GeometryInfo<dim>::standard_to_real_face_vertex(0,f_or[1],f_fl[1],f_ro[1])),  //16
+		    hex->face(1)->child_index(GeometryInfo<dim>::standard_to_real_face_vertex(1,f_or[1],f_fl[1],f_ro[1])),
+		    hex->face(1)->child_index(GeometryInfo<dim>::standard_to_real_face_vertex(2,f_or[1],f_fl[1],f_ro[1])),
+		    hex->face(1)->child_index(GeometryInfo<dim>::standard_to_real_face_vertex(3,f_or[1],f_fl[1],f_ro[1])),
 
-		    hex->face(2)->child_index(0),  //20
-		    hex->face(2)->child_index(face_orientation[2] ? 1 : 2),
-		    hex->face(2)->child_index(face_orientation[2] ? 2 : 1),
-		    hex->face(2)->child_index(3),
+		    hex->face(2)->child_index(GeometryInfo<dim>::standard_to_real_face_vertex(0,f_or[2],f_fl[2],f_ro[2])),  //20
+		    hex->face(2)->child_index(GeometryInfo<dim>::standard_to_real_face_vertex(1,f_or[2],f_fl[2],f_ro[2])),
+		    hex->face(2)->child_index(GeometryInfo<dim>::standard_to_real_face_vertex(2,f_or[2],f_fl[2],f_ro[2])),
+		    hex->face(2)->child_index(GeometryInfo<dim>::standard_to_real_face_vertex(3,f_or[2],f_fl[2],f_ro[2])),
 
-		    hex->face(3)->child_index(0),  //24
-		    hex->face(3)->child_index(face_orientation[3] ? 1 : 2),
-		    hex->face(3)->child_index(face_orientation[3] ? 2 : 1),
-		    hex->face(3)->child_index(3),
+		    hex->face(3)->child_index(GeometryInfo<dim>::standard_to_real_face_vertex(0,f_or[3],f_fl[3],f_ro[3])),  //24
+		    hex->face(3)->child_index(GeometryInfo<dim>::standard_to_real_face_vertex(1,f_or[3],f_fl[3],f_ro[3])),
+		    hex->face(3)->child_index(GeometryInfo<dim>::standard_to_real_face_vertex(2,f_or[3],f_fl[3],f_ro[3])),
+		    hex->face(3)->child_index(GeometryInfo<dim>::standard_to_real_face_vertex(3,f_or[3],f_fl[3],f_ro[3])),
 
-		    hex->face(4)->child_index(0),  //28
-		    hex->face(4)->child_index(face_orientation[4] ? 1 : 2),
-		    hex->face(4)->child_index(face_orientation[4] ? 2 : 1),
-		    hex->face(4)->child_index(3),
+		    hex->face(4)->child_index(GeometryInfo<dim>::standard_to_real_face_vertex(0,f_or[4],f_fl[4],f_ro[4])),  //28
+		    hex->face(4)->child_index(GeometryInfo<dim>::standard_to_real_face_vertex(1,f_or[4],f_fl[4],f_ro[4])),
+		    hex->face(4)->child_index(GeometryInfo<dim>::standard_to_real_face_vertex(2,f_or[4],f_fl[4],f_ro[4])),
+		    hex->face(4)->child_index(GeometryInfo<dim>::standard_to_real_face_vertex(3,f_or[4],f_fl[4],f_ro[4])),
 
-		    hex->face(5)->child_index(0),  //32
-		    hex->face(5)->child_index(face_orientation[5] ? 1 : 2),
-		    hex->face(5)->child_index(face_orientation[5] ? 2 : 1),
-		    hex->face(5)->child_index(3)
+		    hex->face(5)->child_index(GeometryInfo<dim>::standard_to_real_face_vertex(0,f_or[5],f_fl[5],f_ro[5])),  //32
+		    hex->face(5)->child_index(GeometryInfo<dim>::standard_to_real_face_vertex(1,f_or[5],f_fl[5],f_ro[5])),
+		    hex->face(5)->child_index(GeometryInfo<dim>::standard_to_real_face_vertex(2,f_or[5],f_fl[5],f_ro[5])),
+		    hex->face(5)->child_index(GeometryInfo<dim>::standard_to_real_face_vertex(3,f_or[5],f_fl[5],f_ro[5]))
 	      };
 
 
@@ -6729,13 +7008,30 @@ Triangulation<3>::execute_refinement ()
                                              // reset faces that are
                                              // at the boundary of the
                                              // mother cube
+					     //
+					     // the same is true for the
+					     // face_flip and face_rotation
+					     // flags. however, the latter two
+					     // are set to false by default as
+					     // this is the standard value
 	    for (unsigned int i=0; i<8; ++i)
               for (unsigned int f=0; f<GeometryInfo<dim>::faces_per_cell; ++f)
-                new_hexes[i]->set_face_orientation(f, true);
+		{
+		  new_hexes[i]->set_face_orientation(f, true);
+		  new_hexes[i]->set_face_flip(f, false);
+		  new_hexes[i]->set_face_rotation(f, false);
+		}
+	    
             for (unsigned int f=0; f<GeometryInfo<dim>::faces_per_cell; ++f)
               for (unsigned int s=0; s<GeometryInfo<dim>::subfaces_per_face; ++s)
-                new_hexes[GeometryInfo<dim>::child_cell_on_face(f,s)]
-                  ->set_face_orientation(f, hex->face_orientation(f));
+                {
+		  new_hexes[GeometryInfo<dim>::child_cell_on_face(f,s)]
+		    ->set_face_orientation(f, hex->face_orientation(f));
+		  new_hexes[GeometryInfo<dim>::child_cell_on_face(f,s)]
+		    ->set_face_flip(f, hex->face_flip(f));
+		  new_hexes[GeometryInfo<dim>::child_cell_on_face(f,s)]
+		    ->set_face_rotation(f, hex->face_rotation(f));
+		}
             
 #ifdef DEBUG
 					     // check consistency
@@ -6745,7 +7041,7 @@ Triangulation<3>::execute_refinement ()
 	      for (unsigned int s=0; s<GeometryInfo<dim>::subfaces_per_face; ++s) 
 		Assert(hex->face(f)->child(s)==hex->child(
 		  GeometryInfo<dim>::child_cell_on_face(
-		    f, s, hex->face_orientation(f)))->face(f), ExcInternalError());
+		    f, s, hex->face_orientation(f), hex->face_flip(f), hex->face_rotation(f)))->face(f), ExcInternalError());
 #endif
 
 					     /////////////////////////////////
@@ -6853,11 +7149,11 @@ Triangulation<3>::execute_refinement ()
 							 // function
 							 // of
 							 // GeometryInfo. however,
-							 // if the
-							 // neighbors
+							 // if our face or the
+							 // neighbor's
 							 // face has
-							 // the wrong
-							 // orientation,
+							 // non-standard
+							 // orientation, flip or rotation,
 							 // then we
 							 // run into
 							 // trouble
@@ -6866,35 +7162,36 @@ Triangulation<3>::execute_refinement ()
 							 // subfaces
 							 // to account
 							 // for
-							 // that. the
-							 // same
-							 // happens if
-							 // our own
-							 // face is
-							 // swapped
+							 // that.
                                                          //
-                                                         // We have to ask both cells for
-                                                         // the face orientation, as the
-                                                         // relevant check is, wether they
-                                                         // disagree or not. However, we
-                                                         // should never run into a face
-                                                         // which has non-standard
-                                                         // orientation in both adjacent
-                                                         // cells, therefore it is enough to
-                                                         // ask, whether the
-                                                         // face-orientation is non-standard
-                                                         // in one of the cases.
-			const bool orient
-                          = (neighbor->face_orientation(nb_nb)
-                             &&
-                             hex->face_orientation(face));
-                        
+							 // it is quite
+							 // difficult to find
+							 // out, which neighbors
+							 // child is adjacent to
+							 // a given child of our
+							 // current cell. it is
+							 // easier to determine
+							 // the children
+							 // adjacent to a given
+							 // subface in both
+							 // cases. here, we
+							 // consider that for
+							 // the neighbor, when
+							 // we set the neighbors
+							 // of our children we
+							 // will consider it for
+							 // the children of our
+							 // current cell.
+
 			for (unsigned int c=0;
 			     c<GeometryInfo<dim>::subfaces_per_face; ++c)
 			  {
 			    neighbor_cells[face][c]
 			      = neighbor->child(GeometryInfo<dim>::
-						child_cell_on_face(nb_nb, c, orient));
+						child_cell_on_face(nb_nb, c,
+								   neighbor->face_orientation(nb_nb),
+								   neighbor->face_flip(nb_nb),
+								   neighbor->face_rotation(nb_nb)));
 			    
 			    Assert (neighbor_cells[face][c].state() ==
 				    IteratorState::valid,
@@ -6938,82 +7235,76 @@ Triangulation<3>::execute_refinement ()
 					     //    *---*---*
 					     //   / 0 / 1 /
 					     //  *---*---*x
-	    new_hexes[0]->set_neighbor (0, neighbor_cells[0][0]);
+
+					     // Step 1: set all 'outer neighbors'
+	    for (unsigned int face=0; face<GeometryInfo<dim>::faces_per_cell; ++face)
+	      for (unsigned int sub=0; sub<GeometryInfo<dim>::subfaces_per_face; ++sub)
+		new_hexes[GeometryInfo<dim>::
+			  child_cell_on_face(face,sub,
+					     hex->face_orientation(face),
+					     hex->face_flip(face),
+					     hex->face_rotation(face))]
+		  ->set_neighbor(face,neighbor_cells[face][sub]);
+					     // Step 2: set all 'inner
+					     // neighbors', i.e. neighbors that
+					     // are itself children of our
+					     // current cell
+
+					     // TODO: do we really want to test
+					     // (assert) this static information
+					     // for each cell?
 	    new_hexes[0]->set_neighbor (1, new_hexes[1]);
-	    new_hexes[0]->set_neighbor (2, neighbor_cells[2][0]);
 	    new_hexes[0]->set_neighbor (3, new_hexes[2]);
-	    new_hexes[0]->set_neighbor (4, neighbor_cells[4][0]);
 	    new_hexes[0]->set_neighbor (5, new_hexes[4]);
 	    Assert(GeometryInfo<dim>::child_cell_on_face(0,0)==0, ExcInternalError());
 	    Assert(GeometryInfo<dim>::child_cell_on_face(2,0)==0, ExcInternalError());
 	    Assert(GeometryInfo<dim>::child_cell_on_face(4,0)==0, ExcInternalError());
 
 	    new_hexes[1]->set_neighbor (0, new_hexes[0]);
-	    new_hexes[1]->set_neighbor (1, neighbor_cells[1][0]);
-	    new_hexes[1]->set_neighbor (2, neighbor_cells[2][2]);
 	    new_hexes[1]->set_neighbor (3, new_hexes[3]);
-	    new_hexes[1]->set_neighbor (4, neighbor_cells[4][1]);
 	    new_hexes[1]->set_neighbor (5, new_hexes[5]);
 	    Assert(GeometryInfo<dim>::child_cell_on_face(1,0)==1, ExcInternalError());
 	    Assert(GeometryInfo<dim>::child_cell_on_face(2,2)==1, ExcInternalError());
 	    Assert(GeometryInfo<dim>::child_cell_on_face(4,1)==1, ExcInternalError());
 
-	    new_hexes[2]->set_neighbor (0, neighbor_cells[0][1]);
 	    new_hexes[2]->set_neighbor (1, new_hexes[3]);
 	    new_hexes[2]->set_neighbor (2, new_hexes[0]);
-	    new_hexes[2]->set_neighbor (3, neighbor_cells[3][0]);
-	    new_hexes[2]->set_neighbor (4, neighbor_cells[4][2]);
 	    new_hexes[2]->set_neighbor (5, new_hexes[6]);
 	    Assert(GeometryInfo<dim>::child_cell_on_face(0,1)==2, ExcInternalError());
 	    Assert(GeometryInfo<dim>::child_cell_on_face(3,0)==2, ExcInternalError());
 	    Assert(GeometryInfo<dim>::child_cell_on_face(4,2)==2, ExcInternalError());
 
 	    new_hexes[3]->set_neighbor (0, new_hexes[2]);
-	    new_hexes[3]->set_neighbor (1, neighbor_cells[1][1]);
 	    new_hexes[3]->set_neighbor (2, new_hexes[1]);
-	    new_hexes[3]->set_neighbor (3, neighbor_cells[3][2]);
-	    new_hexes[3]->set_neighbor (4, neighbor_cells[4][3]);
 	    new_hexes[3]->set_neighbor (5, new_hexes[7]);
 	    Assert(GeometryInfo<dim>::child_cell_on_face(1,1)==3, ExcInternalError());
 	    Assert(GeometryInfo<dim>::child_cell_on_face(3,2)==3, ExcInternalError());
 	    Assert(GeometryInfo<dim>::child_cell_on_face(4,3)==3, ExcInternalError());
 
-	    new_hexes[4]->set_neighbor (0, neighbor_cells[0][2]);
 	    new_hexes[4]->set_neighbor (1, new_hexes[5]);
-	    new_hexes[4]->set_neighbor (2, neighbor_cells[2][1]);
 	    new_hexes[4]->set_neighbor (3, new_hexes[6]);
 	    new_hexes[4]->set_neighbor (4, new_hexes[0]);
-	    new_hexes[4]->set_neighbor (5, neighbor_cells[5][0]);
 	    Assert(GeometryInfo<dim>::child_cell_on_face(0,2)==4, ExcInternalError());
 	    Assert(GeometryInfo<dim>::child_cell_on_face(2,1)==4, ExcInternalError());
 	    Assert(GeometryInfo<dim>::child_cell_on_face(5,0)==4, ExcInternalError());
 
 	    new_hexes[5]->set_neighbor (0, new_hexes[4]);
-	    new_hexes[5]->set_neighbor (1, neighbor_cells[1][2]);
-	    new_hexes[5]->set_neighbor (2, neighbor_cells[2][3]);
 	    new_hexes[5]->set_neighbor (3, new_hexes[7]);
 	    new_hexes[5]->set_neighbor (4, new_hexes[1]);
-	    new_hexes[5]->set_neighbor (5, neighbor_cells[5][1]);
 	    Assert(GeometryInfo<dim>::child_cell_on_face(1,2)==5, ExcInternalError());
 	    Assert(GeometryInfo<dim>::child_cell_on_face(2,3)==5, ExcInternalError());
 	    Assert(GeometryInfo<dim>::child_cell_on_face(5,1)==5, ExcInternalError());
 
-	    new_hexes[6]->set_neighbor (0, neighbor_cells[0][3]);
 	    new_hexes[6]->set_neighbor (1, new_hexes[7]);
 	    new_hexes[6]->set_neighbor (2, new_hexes[4]);
-	    new_hexes[6]->set_neighbor (3, neighbor_cells[3][1]);
 	    new_hexes[6]->set_neighbor (4, new_hexes[2]);
-	    new_hexes[6]->set_neighbor (5, neighbor_cells[5][2]);
 	    Assert(GeometryInfo<dim>::child_cell_on_face(0,3)==6, ExcInternalError());
 	    Assert(GeometryInfo<dim>::child_cell_on_face(3,1)==6, ExcInternalError());
 	    Assert(GeometryInfo<dim>::child_cell_on_face(5,2)==6, ExcInternalError());
 
 	    new_hexes[7]->set_neighbor (0, new_hexes[6]);
-	    new_hexes[7]->set_neighbor (1, neighbor_cells[1][3]);
 	    new_hexes[7]->set_neighbor (2, new_hexes[5]);
-	    new_hexes[7]->set_neighbor (3, neighbor_cells[3][3]);
 	    new_hexes[7]->set_neighbor (4, new_hexes[3]);
-	    new_hexes[7]->set_neighbor (5, neighbor_cells[5][3]);
 	    Assert(GeometryInfo<dim>::child_cell_on_face(1,3)==7, ExcInternalError());
 	    Assert(GeometryInfo<dim>::child_cell_on_face(3,3)==7, ExcInternalError());
 	    Assert(GeometryInfo<dim>::child_cell_on_face(5,3)==7, ExcInternalError());
@@ -7060,16 +7351,30 @@ Triangulation<3>::execute_refinement ()
 
 		    Assert (face<GeometryInfo<dim>::faces_per_cell,
 			    ExcInternalError());
+						     // check, that the face we
+						     // found is consistent with
+						     // the information obtained
+						     // by the
+						     // neighbor_of_neighbor()
+						     // function
+		    Assert (face==hex->neighbor_of_neighbor(nb),
+			    ExcInternalError());
 
                                                      // then figure out which of the new
                                                      // cells points to this neighbor.
 						     //
-                                                     // As we have considered
-                                                     // face-orientation issues already in
+                                                     // We have considered
+                                                     // face-orientation, -flip
+                                                     // and -rotation issues in
                                                      // the construction of the
-                                                     // neighbor_cells array, this can easily
-                                                     // be achieved here.
-		    int c = GeometryInfo<dim>::child_cell_on_face(nb,subface,true);
+                                                     // neighbor_cells array,
+                                                     // now we have to consider
+                                                     // it for this cell as
+                                                     // well.
+		    int c = GeometryInfo<dim>::child_cell_on_face(nb,subface,
+								  hex->face_orientation(nb),
+								  hex->face_flip(nb),
+								  hex->face_rotation(nb));
 		    neighbor->set_neighbor(face,new_hexes[c]);
 		  }
 
@@ -8832,7 +9137,14 @@ void Triangulation<3>::delete_children (cell_iterator &cell)
       cell->child(child)->clear_user_flag();
 
       for (unsigned int f=0; f<GeometryInfo<dim>::faces_per_cell; ++f)
-        cell->child(child)->set_face_orientation (f, false);
+	{
+					   // set flags denoting deviations from
+					   // standard orientation of faces back
+					   // to initialization values
+	  cell->child(child)->set_face_orientation (f, true);
+	  cell->child(child)->set_face_flip(f,false);
+	  cell->child(child)->set_face_rotation(f,false);
+	}
       
       cell->child(child)->clear_used_flag();
     }
