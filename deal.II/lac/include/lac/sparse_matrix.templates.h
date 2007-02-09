@@ -2,7 +2,7 @@
 //    $Id$
 //    Version: $Name$
 //
-//    Copyright (C) 1999, 2000, 2001, 2002, 2003, 2004, 2005, 2006 by the deal.II authors
+//    Copyright (C) 1999, 2000, 2001, 2002, 2003, 2004, 2005, 2006, 2007 by the deal.II authors
 //
 //    This file is subject to QPL and may not be  distributed
 //    without copyright and license information. Please refer
@@ -47,7 +47,7 @@ DEAL_II_NAMESPACE_OPEN
 template <typename number>
 SparseMatrix<number>::SparseMatrix ()
                 :
-		cols(0),
+		cols(0, "SparseMatrix"),
 		val(0),
 		max_len(0)
 {}
@@ -58,7 +58,7 @@ template <typename number>
 SparseMatrix<number>::SparseMatrix (const SparseMatrix &m)
                 :
 		Subscriptor (m),
-		cols(0),
+		cols(0, "SparseMatrix"),
 		val(0),
 		max_len(0)
 {
@@ -85,7 +85,7 @@ SparseMatrix<number>::operator = (const SparseMatrix<number> &m)
 template <typename number>
 SparseMatrix<number>::SparseMatrix (const SparsityPattern &c)
                 :
-		cols(0),
+		cols(0, "SparseMatrix"),
 		val(0),
 		max_len(0)
 {
@@ -98,7 +98,7 @@ template <typename number>
 SparseMatrix<number>::SparseMatrix (const SparsityPattern &c,
 				    const IdentityMatrix  &id)
                 :
-		cols(0),
+		cols(0, "SparseMatrix"),
 		val(0),
 		max_len(0)
 {
