@@ -103,7 +103,9 @@ unsigned int
 FiniteElementData<dim>::
 face_to_cell_index (const unsigned int face_index,
 		    const unsigned int face,
-		    const bool orientation) const
+		    const bool face_orientation,
+		    const bool face_flip,
+		    const bool face_rotation) const
 {
   Assert (face_index < this->dofs_per_face,
 	  ExcIndexRange(face_index, 0, this->dofs_per_face));
@@ -116,7 +118,10 @@ face_to_cell_index (const unsigned int face_index,
 				       // Vertex number on the face
       const unsigned int face_vertex = face_index / this->dofs_per_vertex;
       return face_index % this->dofs_per_vertex
-	+ GeometryInfo<dim>::face_to_cell_vertices(face, face_vertex, orientation)
+	+ GeometryInfo<dim>::face_to_cell_vertices(face, face_vertex,
+						   face_orientation,
+						   face_flip,
+						   face_rotation)
 	* this->dofs_per_vertex;
     }
 				   // Else, DoF on a line?
@@ -127,7 +132,10 @@ face_to_cell_index (const unsigned int face_index,
 				       // Line number on the face
       const unsigned int face_line = index / this->dofs_per_line;
       return this->first_line_index + index % this->dofs_per_line
-	+ GeometryInfo<dim>::face_to_cell_lines(face, face_line, orientation)
+	+ GeometryInfo<dim>::face_to_cell_lines(face, face_line,
+						face_orientation,
+						face_flip,
+						face_rotation)
 	* this->dofs_per_line;
     }
 				   // Else, DoF is on a quad

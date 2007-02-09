@@ -115,8 +115,10 @@ FiniteElement<dim>::FiniteElement (
 		FiniteElementData<dim> (fe_data),
 		cached_primitivity(false),
 		adjust_quad_dof_index_for_face_orientation_table (dim == 3 ?
-								  this->dofs_per_quad : 0,
-								  0),
+								  this->dofs_per_quad : 0 ,
+								  dim==3 ? 8 : 0),
+		adjust_line_dof_index_for_line_orientation_table (dim == 3 ?
+								  this->dofs_per_line : 0),
                 system_to_base_table(this->dofs_per_cell),
                 face_system_to_base_table(this->dofs_per_face),		
                 component_to_base_table (this->components,
@@ -206,6 +208,7 @@ FiniteElement<dim>::FiniteElement (
 				   // changed by constructor of
 				   // derived class.
   first_block_of_base_table.resize(1,0);
+  adjust_quad_dof_index_for_face_orientation_table.fill(0);
 }
 
 
@@ -338,21 +341,27 @@ FiniteElement<dim>::component_to_block_index (const unsigned int index) const
 
 template <int dim>
 unsigned int
-FiniteElement<dim>::adjust_quad_dof_index_for_face_orientation (const unsigned int) const
+FiniteElement<dim>::adjust_quad_dof_index_for_face_orientation (const unsigned int index,
+								const bool,
+								const bool,
+								const bool) const
 {
 				   // general template for 1D and 2D: not
 				   // implemented. in fact, the function
 				   // shouldn't even be called unless we are
 				   // in 3d, so throw an internal error
   Assert (false, ExcInternalError());
-  return deal_II_numbers::invalid_unsigned_int;
+  return index;
 }
 
 #if deal_II_dimension == 3
 
 template <>
 unsigned int
-FiniteElement<3>::adjust_quad_dof_index_for_face_orientation (const unsigned int index) const
+FiniteElement<3>::adjust_quad_dof_index_for_face_orientation (const unsigned int index,
+							      const bool face_orientation,
+							      const bool face_flip,
+							      const bool face_rotation) const
 {
 				   // adjust dofs on 3d faces if the face is
 				   // flipped. note that we query a table that
@@ -364,9 +373,41 @@ FiniteElement<3>::adjust_quad_dof_index_for_face_orientation (const unsigned int
 				   // the function should also not have been
 				   // called
   Assert (index<this->dofs_per_quad, ExcIndexRange(index,0,this->dofs_per_quad));
-  Assert (adjust_quad_dof_index_for_face_orientation_table.size()==this->dofs_per_quad,
+  Assert (adjust_quad_dof_index_for_face_orientation_table.n_elements()==8*this->dofs_per_quad,
 	  ExcInternalError());
-  return index+adjust_quad_dof_index_for_face_orientation_table[index];
+  return index+adjust_quad_dof_index_for_face_orientation_table(index,4*face_orientation+2*face_flip+face_rotation);
+}
+
+#endif
+
+
+
+template <int dim>
+unsigned int
+FiniteElement<dim>::adjust_line_dof_index_for_line_orientation (const unsigned int index,
+								const bool) const
+{
+				   // general template for 1D and 2D: do
+				   // nothing. Do not throw an Assertion,
+				   // however, in order to allow to call this
+				   // function in 2D as well
+  return index;
+}
+
+#if deal_II_dimension == 3
+
+template <>
+unsigned int
+FiniteElement<3>::adjust_line_dof_index_for_line_orientation (const unsigned int index,
+							      const bool line_orientation) const
+{
+  Assert (index<this->dofs_per_line, ExcIndexRange(index,0,this->dofs_per_line));
+  Assert (adjust_line_dof_index_for_line_orientation_table.size()==this->dofs_per_line,
+	  ExcInternalError());
+  if (line_orientation)
+    return index;
+  else
+    return index+adjust_line_dof_index_for_line_orientation_table[index];
 }
 
 #endif

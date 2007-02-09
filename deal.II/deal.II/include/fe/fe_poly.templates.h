@@ -294,7 +294,10 @@ FE_Poly<POLY,dim>::fill_fe_face_values (const Mapping<dim>                   &ma
   
   const typename QProjector<dim>::DataSetDescriptor dsd;
   const typename QProjector<dim>::DataSetDescriptor offset
-    = dsd.face (face, cell->face_orientation(face),
+    = dsd.face (face,
+		cell->face_orientation(face),
+		cell->face_flip(face),
+		cell->face_rotation(face),
 		quadrature.n_quadrature_points);
   
   const UpdateFlags flags(fe_data.update_once | fe_data.update_each);
@@ -345,8 +348,11 @@ FE_Poly<POLY,dim>::fill_fe_subface_values (const Mapping<dim>                   
 
   const typename QProjector<dim>::DataSetDescriptor dsd;
   const typename QProjector<dim>::DataSetDescriptor offset
-    = dsd.subface (face, subface, cell->face_orientation(face),
-		    quadrature.n_quadrature_points);
+    = dsd.subface (face, subface,
+		   cell->face_orientation(face),
+		   cell->face_flip(face),
+		   cell->face_rotation(face),
+		   quadrature.n_quadrature_points);
 
   const UpdateFlags flags(fe_data.update_once | fe_data.update_each);
 

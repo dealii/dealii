@@ -24,6 +24,8 @@
 
 #include <sstream>
 
+//TODO: implement the adjust_line_dof_index_for_line_orientation_table field,
+//and write a test similar to bits/face_orientation_and_fe_q_02
 
 DEAL_II_NAMESPACE_OPEN
 
@@ -1130,7 +1132,10 @@ FE_Nedelec<dim>::fill_fe_face_values (const Mapping<dim>                   &mapp
 				   // faces are stored contiguously)
   const typename QProjector<dim>::DataSetDescriptor offset
     = (QProjector<dim>::DataSetDescriptor::
-       face (face, cell->face_orientation(face),
+       face (face,
+	     cell->face_orientation(face),
+	     cell->face_flip(face),
+	     cell->face_rotation(face),
              quadrature.n_quadrature_points));
 
   				   // get the flags indicating the
@@ -1157,7 +1162,7 @@ FE_Nedelec<dim>::fill_fe_face_values (const Mapping<dim>                   &mapp
                                        // ways
       Assert (fe_data.shape_values[0].size() ==
               GeometryInfo<dim>::faces_per_cell * n_q_points *
-              (dim == 3 ? 2 : 1),
+              (dim == 3 ? 8 : 1),
               ExcInternalError());
       
       std::vector<Tensor<1,dim> > shape_values (n_q_points);
@@ -1190,7 +1195,7 @@ FE_Nedelec<dim>::fill_fe_face_values (const Mapping<dim>                   &mapp
                                        // ways
       Assert (fe_data.shape_gradients[0].size() ==
               GeometryInfo<dim>::faces_per_cell * n_q_points *
-              (dim == 3 ? 2 : 1),
+              (dim == 3 ? 8 : 1),
               ExcInternalError());
 
       std::vector<Tensor<2,dim> > shape_grads1 (n_q_points);
@@ -1276,8 +1281,11 @@ FE_Nedelec<dim>::fill_fe_subface_values (const Mapping<dim>                   &m
 				   // faces are stored contiguously)
   const typename QProjector<dim>::DataSetDescriptor offset
     = (QProjector<dim>::DataSetDescriptor::
-       subface (face, subface, cell->face_orientation(face),
-                 quadrature.n_quadrature_points));
+       subface (face, subface,
+		cell->face_orientation(face),
+		cell->face_flip(face),
+		cell->face_rotation(face),
+		quadrature.n_quadrature_points));
 
   				   // get the flags indicating the
 				   // fields that have to be filled

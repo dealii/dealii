@@ -1201,14 +1201,33 @@ class FiniteElement : public Subscriptor,
 				      * faces (quads) have to be permuted in
 				      * order to be combined with the correct
 				      * shape functions. Given a local dof @p
-				      * index on a quad, return the local
-				      * index, if the face has non-standard
-				      * face_orientation. In 2D and 1D there
-				      * is no need for permutation and
-				      * consequently, and exception is thrown.
+				      * index on a quad, return the local index,
+				      * if the face has non-standard
+				      * face_orientation, face_flip or
+				      * face_rotation. In 2D and 1D there is no
+				      * need for permutation and consequently
+				      * an exception is thrown.
 				      */
-    unsigned int adjust_quad_dof_index_for_face_orientation (const unsigned int index) const;
+    unsigned int adjust_quad_dof_index_for_face_orientation (const unsigned int index,
+							     const bool face_orientation,
+							     const bool face_flip,
+							     const bool face_rotation) const;
 
+				     /**
+				      * For lines with non-standard
+				      * line_orientation in 3D, the dofs on
+				      * lines have to be permuted in order to be
+				      * combined with the correct shape
+				      * functions. Given a local dof @p index on
+				      * a line, return the local index, if the
+				      * line has non-standard
+				      * line_orientation. In 2D and 1D there is
+				      * no need for permutation, so the given
+				      * index is simply returned.
+				      */
+    unsigned int adjust_line_dof_index_for_line_orientation (const unsigned int index,
+							     const bool line_orientation) const;
+    
 				     /**
 				      * Return in which of the vector
 				      * components of this finite
@@ -2079,8 +2098,35 @@ class FiniteElement : public Subscriptor,
 				      * i.e. <code>old_index + shift =
 				      * new_index</code>. In 2D and 1D there is
 				      * no need for permutation so the vector is
+				      * empty. In 3D it has the size of <code>
+				      * dofs_per_quad * 8 </code>, where 8 is
+				      * the number of orientations, a face can
+				      * be in (all comibinations of the three
+				      * bool flags face_orientation, face_flip
+				      * and face_rotation).
+				      *
+				      * The standard implementation fills this
+				      * with zeros, i.e. no permuatation at
+				      * all. Derived finite element classes have
+				      * to fill this Table with the correct
+				      * values.
+				      */
+    Table<2,int> adjust_quad_dof_index_for_face_orientation_table;
+
+				     /**
+				      * For lines with non-standard
+				      * line_orientation in 3D, the dofs on
+				      * lines have to be permuted in
+				      * order to be combined with the correct
+				      * shape functions. Given a local dof @p
+				      * index on a line, return the shift in the
+				      * local index, if the line has
+				      * non-standard line_orientation,
+				      * i.e. <code>old_index + shift =
+				      * new_index</code>. In 2D and 1D there is
+				      * no need for permutation so the vector is
 				      * empty. In 3D it has the size of @p
-				      * dofs_per_quad.
+				      * dofs_per_line.
 				      *
 				      * The standard implementation fills this
 				      * with zeros, i.e. no permuatation at
@@ -2088,7 +2134,7 @@ class FiniteElement : public Subscriptor,
 				      * to fill this vector with the correct
 				      * values.
 				      */
-    std::vector<int> adjust_quad_dof_index_for_face_orientation_table;
+    std::vector<int> adjust_line_dof_index_for_line_orientation_table;
 
   private:
 				     /**

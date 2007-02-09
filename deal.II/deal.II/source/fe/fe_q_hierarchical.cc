@@ -16,8 +16,9 @@
 #include <cmath>
 #include <sstream>
 
-//TODO: implement the adjust_quad_dof_index_for_face_orientation_table field,
-//and write a test similar to bits/face_orientation_and_fe_q_01
+//TODO: implement the adjust_quad_dof_index_for_face_orientation_table and
+//adjust_line_dof_index_for_line_orientation_table fields, and write tests
+//similar to bits/face_orientation_and_fe_q_*
 
 
 DEAL_II_NAMESPACE_OPEN

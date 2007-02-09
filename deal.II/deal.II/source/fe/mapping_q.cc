@@ -383,7 +383,10 @@ MappingQ<dim>::fill_fe_face_values (const typename Triangulation<dim>::cell_iter
   this->compute_fill_face (cell, face_no, false,
                            n_q_points,
                            QProjector<dim>::DataSetDescriptor::
-                           face (face_no, cell->face_orientation(face_no),
+                           face (face_no,
+				 cell->face_orientation(face_no),
+				 cell->face_flip(face_no),
+				 cell->face_rotation(face_no),
                                  n_q_points),
                            q.get_weights(),
                            *p_data,
@@ -446,6 +449,8 @@ MappingQ<dim>::fill_fe_subface_values (const typename Triangulation<dim>::cell_i
                            QProjector<dim>::DataSetDescriptor::
                            subface (face_no, sub_no,
                                      cell->face_orientation(face_no),
+                                     cell->face_flip(face_no),
+                                     cell->face_rotation(face_no),
                                      n_q_points),
                            q.get_weights(),
                            *p_data,
@@ -1023,12 +1028,17 @@ add_quad_support_points(const Triangulation<3>::cell_iterator &cell,
 
                                        // select the correct mappings
                                        // for the present face
-      const bool face_orientation = cell->face_orientation(face_no);
+      const bool face_orientation = cell->face_orientation(face_no),
+		 face_flip        = cell->face_flip       (face_no),
+		 face_rotation    = cell->face_rotation   (face_no);
 
                                        // some sanity checks up front
       for (unsigned int i=0; i<vertices_per_face; ++i)
         Assert(face->vertex_index(i)==cell->vertex_index(
-	  GeometryInfo<3>::face_to_cell_vertices(face_no, i, face_orientation)),
+	  GeometryInfo<3>::face_to_cell_vertices(face_no, i,
+						 face_orientation,
+						 face_flip,
+						 face_rotation)),
 	  ExcInternalError());
 
 				       // indices of the lines that
@@ -1037,7 +1047,8 @@ add_quad_support_points(const Triangulation<3>::cell_iterator &cell,
 				       // face_to_cell_lines
       for (unsigned int i=0; i<lines_per_face; ++i)
         Assert(face->line(i)==cell->line(GeometryInfo<3>::face_to_cell_lines(
-	  face_no, i, face_orientation)), ExcInternalError());
+	  face_no, i, face_orientation, face_flip, face_rotation)),
+	       ExcInternalError());
       
 				       // if face at boundary, then
 				       // ask boundary object to
@@ -1088,13 +1099,16 @@ add_quad_support_points(const Triangulation<3>::cell_iterator &cell,
 	      
 					       // sort the points into b
               for (unsigned int i=0; i<vertices_per_face; ++i)
-                b[i]=a[GeometryInfo<3>::face_to_cell_vertices(face_no, i, face_orientation)];
+                b[i]=a[GeometryInfo<3>::face_to_cell_vertices(face_no, i,
+							      face_orientation,
+							      face_flip,
+							      face_rotation)];
 		      
               for (unsigned int i=0; i<lines_per_face; ++i)
                 for (unsigned int j=0; j<degree-1; ++j)
                   b[vertices_per_face+i*(degree-1)+j]=
                     a[vertices_per_cell + GeometryInfo<3>::face_to_cell_lines(
-		      face_no, i, face_orientation)*(degree-1)+j];
+		      face_no, i, face_orientation, face_flip, face_rotation)*(degree-1)+j];
 
 					       // Now b includes the
 					       // right order of

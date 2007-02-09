@@ -27,8 +27,9 @@
 #include <sstream>
 #include <iostream>
 
-//TODO: implement the adjust_quad_dof_index_for_face_orientation_table field,
-//and write a test similar to bits/face_orientation_and_fe_q_01
+//TODO: implement the adjust_quad_dof_index_for_face_orientation_table and
+//adjust_line_dof_index_for_line_orientation_table fields, and write tests
+//similar to bits/face_orientation_and_fe_q_*
 
 
 DEAL_II_NAMESPACE_OPEN
@@ -213,7 +214,7 @@ FE_RaviartThomas<dim>::initialize_support_points (const unsigned int deg)
 	{
 					   // Enter the support point
 					   // into the vector
-	  this->generalized_support_points[current] = faces.point(current);
+	  this->generalized_support_points[current] = faces.point(current+QProjector<dim>::DataSetDescriptor::face(0,true,false,false,n_face_points));
 	}
     }
   

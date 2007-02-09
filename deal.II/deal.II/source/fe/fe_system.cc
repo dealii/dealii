@@ -1866,24 +1866,44 @@ FESystem<3>::initialize_quad_dof_index_permutation ()
 {
 				   // the array into which we want to write
 				   // should have the correct size already.
-  Assert (adjust_quad_dof_index_for_face_orientation_table.size()==this->dofs_per_quad,
+  Assert (adjust_quad_dof_index_for_face_orientation_table.n_elements()==8*this->dofs_per_quad,
 	  ExcInternalError());
 				   // to obtain the shifts for this composed
-				   // element, concatenate the shift vectors of
+				   // element, copy the shift information of
 				   // the base elements
   unsigned int index = 0;
   for (unsigned int b=0; b<n_base_elements();++b)
     {
-      const std::vector<int> &temp
+      const Table<2,int> &temp
 	= this->base_element(b).adjust_quad_dof_index_for_face_orientation_table;
       for (unsigned int c=0; c<element_multiplicity(b); ++c)
 	{
-	  std::copy (temp.begin(), temp.end(),
-		     adjust_quad_dof_index_for_face_orientation_table.begin() + index);
-	  index += temp.size();
+	  for (unsigned int i=0; i<temp.size(0); ++i)
+	    for (unsigned int j=0; j<8; ++j)
+	      adjust_quad_dof_index_for_face_orientation_table(index+i,j)=temp(i,j);
+	  index += temp.size(0);
 	}
     }
   Assert (index == this->dofs_per_quad,
+	  ExcInternalError());
+
+				   // aditionally compose the permutation
+				   // information for lines
+  Assert (adjust_line_dof_index_for_line_orientation_table.size()==this->dofs_per_line,
+	  ExcInternalError());
+  index = 0;
+  for (unsigned int b=0; b<n_base_elements();++b)
+    {
+      const std::vector<int> &temp2
+	= this->base_element(b).adjust_line_dof_index_for_line_orientation_table;
+      for (unsigned int c=0; c<element_multiplicity(b); ++c)
+	{
+	  std::copy(temp2.begin(), temp2.end(),
+		    adjust_line_dof_index_for_line_orientation_table.begin()+index);
+	  index += temp2.size();
+	}
+    }
+  Assert (index == this->dofs_per_line,
 	  ExcInternalError());
 }
 

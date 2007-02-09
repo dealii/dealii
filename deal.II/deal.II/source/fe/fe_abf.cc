@@ -32,8 +32,9 @@
 
 #include <iostream>
 
-//TODO: implement the adjust_quad_dof_index_for_face_orientation_table field,
-//and write a test similar to bits/face_orientation_and_fe_q_01
+//TODO: implement the adjust_quad_dof_index_for_face_orientation_table and
+//adjust_line_dof_index_for_line_orientation_table fields, and write tests
+//similar to bits/face_orientation_and_fe_q_*
 
 
 DEAL_II_NAMESPACE_OPEN
@@ -686,8 +687,8 @@ FE_ABF<dim>::interpolate(
       double n_orient = (double) GeometryInfo<dim>::unit_normal_orientation[face];
       for (unsigned int fp=0; fp < n_face_points; ++fp)
 	{
-	  // TODO: Check what the face_orientation has to be in 3D
-	  unsigned int k = QProjector<dim>::DataSetDescriptor::face (face, false, n_face_points);
+	  // TODO: Check what the face_orientation, face_flip and face_rotation  have to be in 3D
+	  unsigned int k = QProjector<dim>::DataSetDescriptor::face (face, false, false, false, n_face_points);
 	  for (unsigned int i=0; i<boundary_weights_abf.size(1); ++i)
 	    local_dofs[start_abf_dofs+i] += n_orient * boundary_weights_abf(k + fp, i) 
 	      * values[k + fp](GeometryInfo<dim>::unit_normal_direction[face]+offset);
@@ -746,8 +747,8 @@ FE_ABF<dim>::interpolate(
       double n_orient = (double) GeometryInfo<dim>::unit_normal_orientation[face];
       for (unsigned int fp=0; fp < n_face_points; ++fp)
 	{
-	  // TODO: Check what the face_orientation has to be in 3D
-	  unsigned int k = QProjector<dim>::DataSetDescriptor::face (face, false, n_face_points);
+	  // TODO: Check what the face_orientation, face_flip and face_rotation have to be in 3D
+	  unsigned int k = QProjector<dim>::DataSetDescriptor::face (face, false, false, false, n_face_points);
 	  for (unsigned int i=0; i<boundary_weights_abf.size(1); ++i)
 	    local_dofs[start_abf_dofs+i] += n_orient * boundary_weights_abf(k + fp, i) 
 	      * values[GeometryInfo<dim>::unit_normal_direction[face]][k + fp];

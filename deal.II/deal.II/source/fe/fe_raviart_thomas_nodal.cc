@@ -25,8 +25,9 @@
 
 #include <sstream>
 
-//TODO: implement the adjust_quad_dof_index_for_face_orientation_table field,
-//and write a test similar to bits/face_orientation_and_fe_q_01
+//TODO: implement the adjust_quad_dof_index_for_face_orientation_table and
+//adjust_line_dof_index_for_line_orientation_table fields, and write tests
+//similar to bits/face_orientation_and_fe_q_*
 
 
 DEAL_II_NAMESPACE_OPEN
@@ -328,7 +329,12 @@ FE_RaviartThomasNodal<dim>::initialize_support_points (const unsigned int deg)
       for (unsigned int k=0;
 	   k<this->dofs_per_face*GeometryInfo<dim>::faces_per_cell;
 	   ++k)
-	this->generalized_support_points[k] = faces.point(k);
+	this->generalized_support_points[k] = faces.point(k+QProjector<dim>
+																	  ::DataSetDescriptor::face(0,
+																										 true,
+																										 false,
+																										 false,
+																										 this->dofs_per_face));
 
       current = this->dofs_per_face*GeometryInfo<dim>::faces_per_cell;
     }

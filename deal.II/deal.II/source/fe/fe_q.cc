@@ -810,18 +810,66 @@ template <>
 void
 FE_Q<3>::initialize_quad_dof_index_permutation ()
 {
-  Assert (adjust_quad_dof_index_for_face_orientation_table.size()==this->dofs_per_quad,
+  Assert (adjust_quad_dof_index_for_face_orientation_table.n_elements()==8*this->dofs_per_quad,
 	  ExcInternalError());
 
-  const unsigned int points = this->degree-1;
-  Assert(points*points==this->dofs_per_quad, ExcInternalError());
-		
+  const unsigned int n=this->degree-1;
+  Assert(n*n==this->dofs_per_quad, ExcInternalError());
+
+				   // alias for the table to fill
+  Table<2,int> &data=this->adjust_quad_dof_index_for_face_orientation_table;
+  
+				   // the dofs on a face are connected to a n x
+				   // n matrix. for example, for degree==4 we
+				   // have the following dofs on a quad
+
+				   //  ___________
+				   // |           |
+				   // |  6  7  8  |
+				   // |           |
+				   // |  3  4  5  |
+				   // |           |
+				   // |  0  1  2  |
+				   // |___________|
+				   //
+				   // we have dof_no=i+n*j with index i in
+				   // x-direction and index j in y-direction
+				   // running from 0 to n-1.  to extract i and j
+				   // we can use i=dof_no%n and j=dof_no/n. i
+				   // and j can then be used to construct the
+				   // rotated and mirrored numbers.
+
+
   for (unsigned int local=0; local<this->dofs_per_quad; ++local)
 				     // face support points are in lexicographic
 				     // ordering with x running fastest. invert
 				     // that (y running fastest)
-    this->adjust_quad_dof_index_for_face_orientation_table[local]
-      = (local%points)*points + local/points - local;
+    {
+      unsigned int i=local%n,
+		   j=local/n;
+      
+				       // face_orientation=false, face_flip=false, face_rotation=false
+      data(local,0)=j       + i      *n - local;
+				       // face_orientation=false, face_flip=false, face_rotation=true
+      data(local,1)=(n-1-i) + j      *n - local;
+				       // face_orientation=false, face_flip=true,  face_rotation=false
+      data(local,2)=(n-1-j) + (n-1-i)*n - local;
+				       // face_orientation=false, face_flip=true,  face_rotation=true
+      data(local,3)=i       + (n-1-j)*n - local;
+				       // face_orientation=true,  face_flip=false, face_rotation=false
+      data(local,4)=0;
+				       // face_orientation=true,  face_flip=false, face_rotation=true
+      data(local,5)=j       + (n-1-i)*n - local;
+				       // face_orientation=true,  face_flip=true,  face_rotation=false
+      data(local,6)=(n-1-i) + (n-1-j)*n - local;
+				       // face_orientation=true,  face_flip=true,  face_rotation=true
+      data(local,7)=(n-1-j) + i      *n - local;
+    }
+
+				   // aditionally initialize reordering of line
+				   // dofs
+  for (unsigned int i=0; i<this->dofs_per_line; ++i)
+    this->adjust_line_dof_index_for_line_orientation_table[i]=this->dofs_per_line-1-i - i;
 }
 
 #endif

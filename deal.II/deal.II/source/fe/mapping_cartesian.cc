@@ -205,11 +205,15 @@ MappingCartesian<dim>::compute_fill (const typename Triangulation<dim>::cell_ite
 					     // called from FEFaceValues
 	    QProjector<dim>::DataSetDescriptor::face (face_no,
 						      cell->face_orientation(face_no),
+						      cell->face_flip(face_no),
+						      cell->face_rotation(face_no),
 						      quadrature_points.size())
 	    :
 					     // called from FESubfaceValues
 	    QProjector<dim>::DataSetDescriptor::subface (face_no, sub_no,
 							  cell->face_orientation(face_no),
+							  cell->face_flip(face_no),
+							  cell->face_rotation(face_no),
 							  quadrature_points.size())
 	   ));
 

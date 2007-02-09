@@ -557,7 +557,9 @@ class FiniteElementData
 				      */
     unsigned int face_to_cell_index (const unsigned int face_index,
 				     const unsigned int face,
-				     const bool orientation = true) const;
+				     const bool face_orientation = true,
+				     const bool face_flip        = false,
+				     const bool face_rotation    = false) const;
     
 				     /**
 				      * @deprecated This function is

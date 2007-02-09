@@ -249,29 +249,42 @@ DoFCellAccessor<DoFHandler<3> >::update_cell_dof_indices_cache () const
   for (unsigned int vertex=0; vertex<8; ++vertex)
     for (unsigned int d=0; d<dofs_per_vertex; ++d)
       *next++ = vertex_dof_index(vertex,d);
+				   // now copy dof numbers from the line. for
+				   // lines with the wrong orientation, we have
+				   // already made sure that we're ok by picking
+				   // the correct vertices (this happens
+				   // automatically in the vertex()
+				   // function). however, if the line is in
+				   // wrong orientation, we look at it in
+				   // flipped orientation and we will have to
+				   // adjust the shape function indices that we
+				   // see to correspond to the correct
+				   // (cell-local) ordering.
   for (unsigned int line=0; line<12; ++line)
     for (unsigned int d=0; d<dofs_per_line; ++d)
-      *next++ = this->line(line)->dof_index(d);
-
+      *next++ = this->line(line)->dof_index(this->dof_handler->get_fe().
+					    adjust_line_dof_index_for_line_orientation(d,
+										       this->line_orientation(line)));
 				   // now copy dof numbers from the face. for
 				   // faces with the wrong orientation, we
 				   // have already made sure that we're ok by
 				   // picking the correct lines and vertices
 				   // (this happens automatically in the
-				   // line() and vertex() functions. however,
+				   // line() and vertex() functions). however,
 				   // if the face is in wrong orientation, we
 				   // look at it in flipped orientation and we
 				   // will have to adjust the shape function
 				   // indices that we see to correspond to the
-				   // correct (cell-local) ordering.
+				   // correct (cell-local) ordering. The same
+				   // applies, if the face_rotation or
+				   // face_orientation is non-standard
   for (unsigned int quad=0; quad<6; ++quad)
-    if (this->face_orientation(quad))
-      for (unsigned int d=0; d<dofs_per_quad; ++d)
-	*next++ = this->quad(quad)->dof_index(d);
-    else
-      for (unsigned int d=0; d<dofs_per_quad; ++d)
-	*next++ = this->quad(quad)->dof_index(this->dof_handler->get_fe().
-					      adjust_quad_dof_index_for_face_orientation(d));
+    for (unsigned int d=0; d<dofs_per_quad; ++d)
+      *next++ = this->quad(quad)->dof_index(this->dof_handler->get_fe().
+					    adjust_quad_dof_index_for_face_orientation(d,
+										       this->face_orientation(quad),
+										       this->face_flip(quad),
+										       this->face_rotation(quad)));
   for (unsigned int d=0; d<dofs_per_hex; ++d)
     *next++ = dof_index(d);
 }
