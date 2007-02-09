@@ -1,4 +1,4 @@
-//----------------------------  create_mass_matrix_01.cc  ---------------------------
+//----------------------------  create_mass_matrix_04.cc  ---------------------------
 //    $Id$
 //    Version: $Name$ 
 //
@@ -9,7 +9,7 @@
 //    to the file deal.II/doc/license.html for the  text  and
 //    further information on this license.
 //
-//----------------------------  create_mass_matrix_01.cc  ---------------------------
+//----------------------------  create_mass_matrix_04.cc  ---------------------------
 
 
 // The MatrixCreator::create_mass_matrix function overload that also assembles
@@ -44,8 +44,6 @@
 #include <fstream>
 
 
-
-
 template <int dim>
 void
 check ()
@@ -63,7 +61,8 @@ check ()
 
 				   // create a system element composed
 				   // of one Q1 and one Q2 element
-  FE_Q<dim> element(2);
+  FESystem<dim> element(FE_Q<dim>(1), 1,
+			FE_Q<dim>(2), 1);
   DoFHandler<dim> dof(tr);
   dof.distribute_dofs(element);
 
@@ -78,7 +77,9 @@ check ()
 				   // that different components should
 				   // not couple, so use pattern
   SparsityPattern sparsity (dof.n_dofs(), dof.n_dofs());
-  DoFTools::make_sparsity_pattern (dof, sparsity);
+  std::vector<std::vector<bool> > mask (2, std::vector<bool>(2, false));
+  mask[0][0] = mask[1][1] = true;
+  DoFTools::make_sparsity_pattern (dof, mask, sparsity);
   ConstraintMatrix constraints;
   DoFTools::make_hanging_node_constraints (dof, constraints);
   constraints.close ();
@@ -95,7 +96,8 @@ check ()
   MatrixTools::
     create_mass_matrix (mapping, dof,
 			quadrature, matrix,
-			coefficient, rhs);
+			coefficient, rhs,
+			&coefficient);
 
 				   // since we only generate
 				   // output with two digits after
@@ -118,7 +120,7 @@ check ()
 
 int main ()
 {
-  std::ofstream logfile ("create_mass_matrix_01/output");
+  std::ofstream logfile ("create_mass_matrix_04/output");
   logfile.precision (2);
   logfile.setf(std::ios::fixed);  
   deallog.attach(logfile);

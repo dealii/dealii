@@ -1,4 +1,4 @@
-//----------------------------  create_mass_matrix_01.cc  ---------------------------
+//----------------------------  create_mass_matrix_03.cc  ---------------------------
 //    $Id$
 //    Version: $Name$ 
 //
@@ -9,7 +9,7 @@
 //    to the file deal.II/doc/license.html for the  text  and
 //    further information on this license.
 //
-//----------------------------  create_mass_matrix_01.cc  ---------------------------
+//----------------------------  create_mass_matrix_03.cc  ---------------------------
 
 
 // The MatrixCreator::create_mass_matrix function overload that also assembles
@@ -42,7 +42,6 @@
 #include <numerics/matrices.h>
 
 #include <fstream>
-
 
 
 
@@ -95,7 +94,8 @@ check ()
   MatrixTools::
     create_mass_matrix (mapping, dof,
 			quadrature, matrix,
-			coefficient, rhs);
+			coefficient, rhs,
+			&coefficient);
 
 				   // since we only generate
 				   // output with two digits after
@@ -118,7 +118,7 @@ check ()
 
 int main ()
 {
-  std::ofstream logfile ("create_mass_matrix_01/output");
+  std::ofstream logfile ("create_mass_matrix_03/output");
   logfile.precision (2);
   logfile.setf(std::ios::fixed);  
   deallog.attach(logfile);
