@@ -664,6 +664,24 @@ class GridGenerator
 
 
 				     /**
+				      * Produce a ring of cells in 3D that is
+				      * cut open, twisted and glued together
+				      * again. This results in a kind of
+				      * moebius-loop.
+				      *
+				      * @param tria        The triangulation to be worked on.
+				      * @param n_cells     The number of cells in the loop. Must be greater than 4.
+				      * @param n_rotations The number of rotations (Pi/2 each) to be performed before glueing the loop together.
+				      * @param R           The radius of the circle, which forms the middle line of the torus containing the loop of cells. Must be greater than @p r.
+				      * @param r           The radius of the cylinder bend together as loop.
+				      */
+    static void moebius (Triangulation<3>&  tria,
+			 const unsigned int   n_cells,
+			 const unsigned int   n_rotations,
+			 const double         R,
+			 const double         r);
+    
+				     /**
 				      * This function transformes the
 				      * @p Triangulation @p tria
 				      * smoothly to a domain that is

@@ -150,6 +150,64 @@ void GridGenerator::hyper_cube (Triangulation<dim> &tria,
 }
 
 
+#if deal_II_dimension == 3
+
+void
+GridGenerator::moebius (
+  Triangulation<3>&  tria,
+  const unsigned int   n_cells,
+  const unsigned int   n_rotations,
+  const double         R,
+  const double         r)
+{
+  const unsigned int dim=3;
+  Assert (n_cells>4, ExcMessage("More than 4 cells are needed to create a moebius grid."));
+  Assert (r>0 && R>0, ExcMessage("Outer and inner radius must be positive."));
+  Assert (R>r, ExcMessage("Outer radius must be greater than inner radius."));
+    
+  
+  std::vector<Point<dim> > vertices (4*n_cells);
+  double beta_step=n_rotations*deal_II_numbers::PI/2.0/n_cells;
+  double alpha_step=2.0*deal_II_numbers::PI/n_cells;
+  
+  for (unsigned int i=0; i<n_cells; ++i)
+    for (unsigned int j=0; j<4; ++j)
+      {
+	vertices[4*i+j][0]=R*std::cos(i*alpha_step)+r*std::cos(i*beta_step+j*deal_II_numbers::PI/2.0)*std::cos(i*alpha_step);
+	vertices[4*i+j][1]=R*std::sin(i*alpha_step)+r*std::cos(i*beta_step+j*deal_II_numbers::PI/2.0)*std::sin(i*alpha_step);
+	vertices[4*i+j][2]=r*std::sin(i*beta_step+j*deal_II_numbers::PI/2.0);
+      }
+
+  unsigned int offset=0;
+  
+  std::vector<CellData<dim> > cells (n_cells);
+  for (unsigned int i=0; i<n_cells; ++i)
+    {
+      for (unsigned int j=0; j<2; ++j)
+	{
+	  cells[i].vertices[0+4*j]=offset+0+4*j;
+	  cells[i].vertices[1+4*j]=offset+3+4*j;
+	  cells[i].vertices[2+4*j]=offset+2+4*j;
+	  cells[i].vertices[3+4*j]=offset+1+4*j;
+	}
+      offset+=4;
+      cells[i].material_id=0;
+    }
+  
+				   // now correct the last four vertices
+  cells[n_cells-1].vertices[4]=(0+n_rotations)%4;
+  cells[n_cells-1].vertices[5]=(3+n_rotations)%4;
+  cells[n_cells-1].vertices[6]=(2+n_rotations)%4;
+  cells[n_cells-1].vertices[7]=(1+n_rotations)%4;
+
+  GridReordering<dim>::invert_all_cells_of_negative_grid(vertices,cells);
+  tria.create_triangulation_compatibility (vertices, cells, SubCellData());
+}
+
+#endif
+
+
+
 // Implementation for 2D only
 template<int dim>
 void
