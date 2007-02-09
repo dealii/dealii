@@ -788,13 +788,13 @@ class TriaObjectAccessor :  public TriaAccessor<dim>
                                       * (@p false). Which is the
                                       * standard direction is
                                       * documented with the
-                                      * Triangulation class. In
+                                      * GeometryInfo class. In
                                       * 1d and 2d, this is always
                                       * @p true, but in 3d it may be
                                       * different, see the respective
                                       * discussion in the
                                       * documentation of the
-                                      * Triangulation class.
+                                      * GeometryInfo class.
                                       *
                                       * This function is really only
                                       * for internal use in the
@@ -802,7 +802,124 @@ class TriaObjectAccessor :  public TriaAccessor<dim>
                                       * know what this is all about.
                                       */
     bool face_orientation (const unsigned int face) const;
+
+                                     /**
+                                      * Return whether the face with index @p
+                                      * face is rotated by 180 degrees (@p true)
+                                      * or or not (@p false). In 1d and 2d, this
+                                      * is always @p false, but in 3d it may be
+                                      * different, see the respective discussion
+                                      * in the documentation of the
+                                      * GeometryInfo class.
+                                      *
+                                      * This function is really only
+                                      * for internal use in the
+                                      * library unless you absolutely
+                                      * know what this is all about.
+                                      */
+    bool face_flip (const unsigned int face) const;
+
+                                     /**
+                                      * Return whether the face with index @p
+                                      * face is rotated by 90 degrees (@p true)
+                                      * or or not (@p false). In 1d and 2d, this
+                                      * is always @p false, but in 3d it may be
+                                      * different, see the respective discussion
+                                      * in the documentation of the
+                                      * GeometryInfo class.
+                                      *
+                                      * This function is really only
+                                      * for internal use in the
+                                      * library unless you absolutely
+                                      * know what this is all about.
+                                      */
+    bool face_rotation (const unsigned int face) const;
     
+                                     /**
+                                      * Return whether the line with index @p
+                                      * line is oriented in standard
+                                      * direction. @p true indicates, that the
+                                      * line is oriented from vertex 0 to vertex
+                                      * 1, whereas it is the other way around
+                                      * otherwise. In 1d and 2d, this is always
+                                      * @p true, but in 3d it may be different,
+                                      * see the respective discussion in the
+                                      * documentation of the 
+                                      * GeometryInfo classe.
+                                      *
+                                      * This function is really only
+                                      * for internal use in the
+                                      * library unless you absolutely
+                                      * know what this is all about.
+                                      */
+    bool line_orientation (const unsigned int line) const;
+    
+                                     /**
+                                      * Set whether the quad with
+                                      * index @p face has its normal
+                                      * pointing in the standard
+                                      * direction (@p true) or
+                                      * whether it is the opposite
+                                      * (@p false). Which is the
+                                      * standard direction is
+                                      * documented with the
+                                      * GeometryInfo class.
+                                      *
+                                      * This function is only for
+                                      * internal use in the
+                                      * library. Setting this flag to
+                                      * any other value than the one
+                                      * that the triangulation has
+                                      * already set is bound to bring
+                                      * you desaster.
+				      *
+				      * It is only possible to set the
+				      * face_orientation of cells in 3d
+				      * (i.e. <code>celldim==3 &&
+				      * dim==3</code>).
+                                      */
+    void set_face_orientation (const unsigned int face,
+                               const bool         orientation) const;
+
+				     /**
+                                      * Set the flag indicating, what
+                                      * <code>face_flip()</code> will
+                                      * return.
+				      *
+				      * It is only possible to set the
+				      * face_flip of cells in 3d
+				      * (i.e. <code>celldim==3 &&
+				      * dim==3</code>).
+                                      */
+    void set_face_flip (const unsigned int face,
+			const bool         flip) const;
+
+				     /**
+                                      * Set the flag indicating, what
+                                      * <code>face_rotation()</code> will
+                                      * return.
+				      *
+				      * It is only possible to set the
+				      * face_rotation of cells in 3d
+				      * (i.e. <code>celldim==3 &&
+				      * dim==3</code>).
+                                      */
+    void set_face_rotation (const unsigned int face,
+			    const bool         rotation) const;
+
+                                     /**
+                                      * Set the flag indicating, what
+                                      * <code>line_orientation()</code> will
+                                      * return.
+				      *
+				      * It is only possible to set the
+				      * line_orientation of faces in 3d
+				      * (i.e. <code>celldim==2 &&
+				      * dim==3</code>).
+                                      */
+    void set_line_orientation (const unsigned int line,
+                               const bool         orientation) const;
+
   private:
     				     /**
 				      *  Copy operator. This is normally
@@ -1307,13 +1424,13 @@ class TriaObjectAccessor<1, dim> :  public TriaAccessor<dim>
                                       * (@p false). Which is the
                                       * standard direction is
                                       * documented with the
-                                      * Triangulation class. In
+                                      * GeometryInfo class. In
                                       * 1d and 2d, this is always
                                       * @p true, but in 3d it may be
                                       * different, see the respective
                                       * discussion in the
                                       * documentation of the
-                                      * Triangulation class.
+                                      * GeometryInfo class.
                                       *
                                       * This function is really only
                                       * for internal use in the
@@ -1322,6 +1439,70 @@ class TriaObjectAccessor<1, dim> :  public TriaAccessor<dim>
                                       */
     bool face_orientation (const unsigned int face) const;
 
+                                     /**
+                                      * Return whether the face with index @p
+                                      * face is rotated by 180 degrees (@p true)
+                                      * or or not (@p false). In 1d and 2d, this
+                                      * is always @p false, but in 3d it may be
+                                      * different, see the respective discussion
+                                      * in the documentation of the
+                                      * GeometryInfo class.
+                                      *
+                                      * This function is really only
+                                      * for internal use in the
+                                      * library unless you absolutely
+                                      * know what this is all about.
+                                      */
+    bool face_flip (const unsigned int face) const;
+
+                                     /**
+                                      * Return whether the face with index @p
+                                      * face is rotated by 90 degrees (@p true)
+                                      * or or not (@p false). In 1d and 2d, this
+                                      * is always @p false, but in 3d it may be
+                                      * different, see the respective discussion
+                                      * in the documentation of the
+                                      * GeometryInfo class.
+                                      *
+                                      * This function is really only
+                                      * for internal use in the
+                                      * library unless you absolutely
+                                      * know what this is all about.
+                                      */
+    bool face_rotation (const unsigned int face) const;
+    
+                                     /**
+                                      * Return whether the line with index @p
+                                      * line is oriented in standard
+                                      * direction. @p true indicates, that the
+                                      * line is oriented from vertex 0 to vertex
+                                      * 1, whereas it is the other way around
+                                      * otherwise. In 1d and 2d, this is always
+                                      * @p true, but in 3d it may be different,
+                                      * see the respective discussion in the
+                                      * documentation of the 
+                                      * GeometryInfo class.
+                                      *
+                                      * This function is really only
+                                      * for internal use in the
+                                      * library unless you absolutely
+                                      * know what this is all about.
+                                      */
+    bool line_orientation (const unsigned int line) const;
+    
+                                     /**
+                                      * Set the flag indicating, what
+                                      * <code>line_orientation()</code> will
+                                      * return.
+				      *
+				      * It is only possible to set the
+				      * line_orientation of faces in 3d
+				      * (i.e. <code>celldim==2 &&
+				      * dim==3</code>).
+                                      */
+    void set_line_orientation (const unsigned int line,
+                               const bool         orientation) const;
+    
   private:
     				     /**
 				      *  Copy operator. This is normally
@@ -1857,13 +2038,13 @@ class TriaObjectAccessor<2, dim> :  public TriaAccessor<dim>
                                       * (@p false). Which is the
                                       * standard direction is
                                       * documented with the
-                                      * Triangulation class. In
+                                      * GeometryInfo class. In
                                       * 1d and 2d, this is always
                                       * @p true, but in 3d it may be
                                       * different, see the respective
                                       * discussion in the
                                       * documentation of the
-                                      * Triangulation class.
+                                      * GeometryInfo class.
                                       *
                                       * This function is really only
                                       * for internal use in the
@@ -1871,6 +2052,70 @@ class TriaObjectAccessor<2, dim> :  public TriaAccessor<dim>
                                       * know what this is all about.
                                       */
     bool face_orientation (const unsigned int face) const;
+
+                                     /**
+                                      * Return whether the face with index @p
+                                      * face is rotated by 180 degrees (@p true)
+                                      * or or not (@p false). In 1d and 2d, this
+                                      * is always @p false, but in 3d it may be
+                                      * different, see the respective discussion
+                                      * in the documentation of the
+                                      * GeometryInfo class.
+                                      *
+                                      * This function is really only
+                                      * for internal use in the
+                                      * library unless you absolutely
+                                      * know what this is all about.
+                                      */
+    bool face_flip (const unsigned int face) const;
+
+                                     /**
+                                      * Return whether the face with index @p
+                                      * face is rotated by 90 degrees (@p true)
+                                      * or or not (@p false). In 1d and 2d, this
+                                      * is always @p false, but in 3d it may be
+                                      * different, see the respective discussion
+                                      * in the documentation of the
+                                      * GeometryInfo class.
+                                      *
+                                      * This function is really only
+                                      * for internal use in the
+                                      * library unless you absolutely
+                                      * know what this is all about.
+                                      */
+    bool face_rotation (const unsigned int face) const;
+    
+                                     /**
+                                      * Return whether the line with index @p
+                                      * line is oriented in standard
+                                      * direction. @p true indicates, that the
+                                      * line is oriented from vertex 0 to vertex
+                                      * 1, whereas it is the other way around
+                                      * otherwise. In 1d and 2d, this is always
+                                      * @p true, but in 3d it may be different,
+                                      * see the respective discussion in the
+                                      * documentation of the 
+                                      * GeometryInfo class.
+                                      *
+                                      * This function is really only
+                                      * for internal use in the
+                                      * library unless you absolutely
+                                      * know what this is all about.
+                                      */
+    bool line_orientation (const unsigned int line) const;
+    
+                                     /**
+                                      * Set the flag indicating, what
+                                      * <code>line_orientation()</code> will
+                                      * return.
+				      *
+				      * It is only possible to set the
+				      * line_orientation of faces in 3d
+				      * (i.e. <code>celldim==2 &&
+				      * dim==3</code>).
+                                      */
+    void set_line_orientation (const unsigned int line,
+                               const bool         orientation) const;
 
   private:
     				     /**
@@ -2394,13 +2639,13 @@ class TriaObjectAccessor<3, dim> :  public TriaAccessor<dim>
                                       * (@p false). Which is the
                                       * standard direction is
                                       * documented with the
-                                      * Triangulation class.  In
+                                      * GeometryInfo class.  In
                                       * 1d and 2d, this is always
                                       * @p true, but in 3d it may be
                                       * different, see the respective
                                       * discussion in the
                                       * documentation of the
-                                      * Triangulation class.
+                                      * GeometryInfo class.
                                       *
                                       * This function is really only
                                       * for internal use in the
@@ -2408,7 +2653,57 @@ class TriaObjectAccessor<3, dim> :  public TriaAccessor<dim>
                                       * know what this is all about.
                                       */
     bool face_orientation (const unsigned int face) const;
+                                     /**
+                                      * Return whether the face with index @p
+                                      * face is rotated by 180 degrees (@p true)
+                                      * or or not (@p false). In 1d and 2d, this
+                                      * is always @p false, but in 3d it may be
+                                      * different, see the respective discussion
+                                      * in the documentation of the
+                                      * GeometryInfo class.
+                                      *
+                                      * This function is really only
+                                      * for internal use in the
+                                      * library unless you absolutely
+                                      * know what this is all about.
+                                      */
+    bool face_flip (const unsigned int face) const;
 
+                                     /**
+                                      * Return whether the face with index @p
+                                      * face is rotated by 90 degrees (@p true)
+                                      * or or not (@p false). In 1d and 2d, this
+                                      * is always @p false, but in 3d it may be
+                                      * different, see the respective discussion
+                                      * in the documentation of the
+                                      * GeometryInfo class.
+                                      *
+                                      * This function is really only
+                                      * for internal use in the
+                                      * library unless you absolutely
+                                      * know what this is all about.
+                                      */
+    bool face_rotation (const unsigned int face) const;
+    
+                                     /**
+                                      * Return whether the line with index @p
+                                      * line is oriented in standard
+                                      * direction. @p true indicates, that the
+                                      * line is oriented from vertex 0 to vertex
+                                      * 1, whereas it is the other way around
+                                      * otherwise. In 1d and 2d, this is always
+                                      * @p true, but in 3d it may be different,
+                                      * see the respective discussion in the
+                                      * documentation of the 
+                                      * GeometryInfo class.
+                                      *
+                                      * This function is really only
+                                      * for internal use in the
+                                      * library unless you absolutely
+                                      * know what this is all about.
+                                      */
+    bool line_orientation (const unsigned int line) const;
+    
                                      /**
                                       * Set whether the quad with
                                       * index @p face has its normal
@@ -2418,7 +2713,7 @@ class TriaObjectAccessor<3, dim> :  public TriaAccessor<dim>
                                       * (@p false). Which is the
                                       * standard direction is
                                       * documented with the
-                                      * Triangulation class.
+                                      * GeometryInfo class.
                                       *
                                       * This function is only for
                                       * internal use in the
@@ -2430,6 +2725,32 @@ class TriaObjectAccessor<3, dim> :  public TriaAccessor<dim>
                                       */
     void set_face_orientation (const unsigned int face,
                                const bool         orientation) const;
+
+				     /**
+                                      * Set the flag indicating, what
+                                      * <code>face_flip()</code> will
+                                      * return.
+				      *
+				      * It is only possible to set the
+				      * face_orientation of cells in 3d
+				      * (i.e. <code>celldim==3 &&
+				      * dim==3</code>).
+                                      */
+    void set_face_flip (const unsigned int face,
+			const bool         flip) const;
+
+				     /**
+                                      * Set the flag indicating, what
+                                      * <code>face_rotation()</code> will
+                                      * return.
+				      *
+				      * It is only possible to set the
+				      * face_orientation of cells in 3d
+				      * (i.e. <code>celldim==3 &&
+				      * dim==3</code>).
+                                      */
+    void set_face_rotation (const unsigned int face,
+			    const bool         rotation) const;
     
   private:
     				     /**
@@ -2747,15 +3068,13 @@ class CellAccessor :  public TriaObjectAccessor<dim,dim>
                                       * for the index of the
                                       * child.
                                       *
-                                      * However, the function
-                                      * is more complicated in 3d,
-                                      * since there faces may have
-                                      * more than one orientation, and
-                                      * we have to use
-                                      * @p face_orientation for both
-                                      * this and the neighbor cell to
-                                      * figure out which cell we want
-                                      * to have.
+                                      * However, the function is more
+                                      * complicated in 3d, since there faces may
+                                      * have more than one orientation, and we
+                                      * have to use @p face_orientation, @p
+                                      * face_flip and @p face_rotation for both
+                                      * this and the neighbor cell to figure out
+                                      * which cell we want to have.
                                       *
                                       * This can lead to surprising
                                       * results: if we are sitting on
@@ -2787,6 +3106,12 @@ class CellAccessor :  public TriaObjectAccessor<dim,dim>
                                       * orderings are only identical
                                       * if the face orientation is @p
                                       * true, and reversed otherwise.
+				      *
+				      * Similarly, effects of
+				      * <tt>face_flip()==true</tt> and
+				      * <tt>face_rotation()==true()</tt>, both
+				      * of which indicate a non-standard face
+				      * have to be considered.
                                       *
                                       * Fortunately, this is only very rarely
                                       * of concern, since one is usually only

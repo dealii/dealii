@@ -162,9 +162,40 @@ namespace internal
 				    new_size * GeometryInfo<3>::faces_per_cell
 				    - face_orientations.size(),
 				    true);
+          face_flips.reserve (new_size * GeometryInfo<3>::faces_per_cell);
+          face_flips.insert (face_flips.end(),
+				    new_size * GeometryInfo<3>::faces_per_cell
+				    - face_flips.size(),
+				    false);
+          face_rotations.reserve (new_size * GeometryInfo<3>::faces_per_cell);
+          face_rotations.insert (face_rotations.end(),
+				    new_size * GeometryInfo<3>::faces_per_cell
+				    - face_rotations.size(),
+				    false);
         };
     }
 
+
+    void
+    TriaObjectsQuad3D::reserve_space (const unsigned int new_quads)
+    {
+      const unsigned int new_size = new_quads +
+                                    std::count_if (used.begin(),
+                                                   used.end(),
+                                                   std::bind2nd (std::equal_to<bool>(), true));
+
+                                       // see above...
+      if (new_size>cells.size())
+        {
+          TriaObjects<Quad>::reserve_space(new_quads);
+          line_orientations.reserve (new_size * GeometryInfo<2>::lines_per_cell);
+          line_orientations.insert (line_orientations.end(),
+				    new_size * GeometryInfo<2>::lines_per_cell
+				    - line_orientations.size(),
+				    true);
+        };
+    }
+    
 
     template<>
     void
@@ -286,6 +317,33 @@ namespace internal
               == face_orientations.size(),
               ExcMemoryInexact (cells.size() * GeometryInfo<3>::faces_per_cell,
                                 face_orientations.size()));
+      Assert (cells.size() * GeometryInfo<3>::faces_per_cell
+              == face_flips.size(),
+              ExcMemoryInexact (cells.size() * GeometryInfo<3>::faces_per_cell,
+                                face_flips.size()));
+      Assert (cells.size() * GeometryInfo<3>::faces_per_cell
+              == face_rotations.size(),
+              ExcMemoryInexact (cells.size() * GeometryInfo<3>::faces_per_cell,
+                                face_rotations.size()));
+    }
+
+
+    void
+    TriaObjectsQuad3D::monitor_memory (const unsigned int) const
+    {
+                                       // check that we have not allocated
+                                       // too much memory. note that bool
+                                       // vectors allocate their memory in
+                                       // chunks of whole integers, so
+                                       // they may over-allocate by up to
+                                       // as many elements as an integer
+                                       // has bits
+      Assert (cells.size() * GeometryInfo<2>::lines_per_cell
+              == line_orientations.size(),
+              ExcMemoryInexact (cells.size() * GeometryInfo<2>::lines_per_cell,
+                                line_orientations.size()));
+      TriaObjects<Quad>::monitor_memory (3);
+      
     }
 
 
@@ -307,6 +365,16 @@ namespace internal
     {
       TriaObjects<Hexahedron>::clear();
       face_orientations.clear();
+      face_flips.clear();
+      face_rotations.clear();
+    }
+
+
+    void
+    TriaObjectsQuad3D::clear()
+    {
+      TriaObjects<Quad>::clear();
+      line_orientations.clear();
     }
     
     
@@ -327,7 +395,17 @@ namespace internal
     TriaObjectsHex::memory_consumption () const
     {
       return (MemoryConsumption::memory_consumption (face_orientations) +
-	      this->TriaObjects<Hexahedron>::memory_consumption() );
+	      MemoryConsumption::memory_consumption (face_flips) +
+	      MemoryConsumption::memory_consumption (face_rotations) +
+	      TriaObjects<Hexahedron>::memory_consumption() );
+    }
+
+
+    unsigned int
+    TriaObjectsQuad3D::memory_consumption () const
+    {
+      return (MemoryConsumption::memory_consumption (line_orientations) +
+	      this->TriaObjects<Quad>::memory_consumption() );
     }
 
 				     // explicit instantiations

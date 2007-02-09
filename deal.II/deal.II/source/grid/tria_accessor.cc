@@ -282,7 +282,18 @@ int TriaObjectAccessor<2, dim>::vertex_index (const unsigned int corner) const
 {
   Assert (corner<4, ExcIndexRange(corner,0,4));
 
-  return line(corner%2)->vertex_index(corner/2);
+				   // table used to switch the vertices, if the
+				   // line orientation is wrong,
+				   //
+				   // first index: line orientation 0: false or
+				   // 1: true=standard
+				   //
+				   // second index: vertex index to be switched
+				   // (or not)
+  
+  static const unsigned int switch_table[2][2]={{1,0},{0,1}};
+  
+  return line(corner%2)->vertex_index(switch_table[line_orientation(corner%2)][corner/2]);
 }
 
 
@@ -677,6 +688,41 @@ unsigned int TriaObjectAccessor<2, dim>::number_of_children () const
 }
 
 
+template <int dim>
+void
+TriaObjectAccessor<2, dim>::
+set_line_orientation (const unsigned int ,
+                      const bool         ) const
+{
+  Assert(false,
+	 ExcMessage("The line orientation of Quads can only be set in 3D. In 2D the lines are alway in standard orientation."));}
+
+
+
+#if deal_II_dimension == 3
+
+template <>
+void
+TriaObjectAccessor<2, 3>::
+set_line_orientation (const unsigned int line,
+                      const bool         orientation) const
+{
+  const int dim=3;
+  Assert (used(), TriaAccessor<dim>::ExcCellNotUsed());
+  Assert (line<GeometryInfo<dim>::lines_per_face,
+          ExcIndexRange (line, 0, GeometryInfo<3>::lines_per_face));
+  Assert (this->present_index * GeometryInfo<dim>::lines_per_face + line
+          < this->tria->faces->quads.line_orientations.size(),
+          ExcInternalError());
+          
+  this->tria->faces
+    ->quads.line_orientations[this->present_index *
+                              GeometryInfo<dim>::lines_per_face
+                              +
+                              line]  = orientation;
+}
+
+#endif
 
 
 /*------------------------ Functions: TriaObjectAccessor ---------------------------*/
@@ -704,30 +750,21 @@ int TriaObjectAccessor<3, dim>::vertex_index (const unsigned int corner) const
 {
   Assert (corner<8, ExcIndexRange(corner,0,8));
 
-				   // get the corner indices by asking
-				   // either the bottom or the top
-				   // face for its vertices. make sure
-				   // we take into account that the
-				   // face might have non-standard
-				   // orientation; if this is not the
-				   // case, transpose vertices 1 and 2
-				   // of this face
-  static const unsigned int vertex_translation[4] = 
-    { 0, 2, 1, 3 };
-  if (corner<4)
-    {
-      if (face_orientation(4) == true)
-        return quad(4)->vertex_index(corner);
-      else
-        return quad(4)->vertex_index(vertex_translation[corner]);
-    }
-  else
-    {
-      if (face_orientation(5) == true)
-        return quad(5)->vertex_index(corner-4);
-      else
-        return quad(5)->vertex_index(vertex_translation[corner-4]);
-    }
+				   // get the corner indices by asking either
+				   // the bottom or the top face for its
+				   // vertices. handle non-standard faces by
+				   // calling the vertex reordering function
+				   // from GeometryInfo
+
+  				   // bottom face (4) for first four vertices,
+				   // top face (5) for the rest
+  const unsigned int face_index=4+corner/4;
+
+  return quad(face_index)->vertex_index(GeometryInfo<dim>
+					::standard_to_real_face_vertex(corner%4,
+								       face_orientation(face_index),
+								       face_flip(face_index),
+								       face_rotation(face_index)));
 }
 
 
@@ -1649,6 +1686,52 @@ set_face_orientation (const unsigned int face,
                               face]  = orientation;
 }
 
+
+template <>
+void
+TriaObjectAccessor<3, 3>::
+set_face_flip (const unsigned int face,
+	       const bool         flip) const
+{
+  const int dim=3;
+  Assert (used(), TriaAccessor<dim>::ExcCellNotUsed());
+  Assert (face<GeometryInfo<3>::faces_per_cell,
+          ExcIndexRange (face, 0, GeometryInfo<3>::faces_per_cell));
+  Assert (this->present_index * GeometryInfo<3>::faces_per_cell + face
+          < this->tria->levels[this->present_level]
+          ->hexes.face_flips.size(),
+          ExcInternalError());
+          
+  this->tria->levels[this->present_level]
+    ->hexes.face_flips[this->present_index *
+		       GeometryInfo<3>::faces_per_cell
+		       +
+		       face]  = flip;
+}
+
+
+template <>
+void
+TriaObjectAccessor<3, 3>::
+set_face_rotation (const unsigned int face,
+		   const bool         rotation) const
+{
+  const int dim=3;
+  Assert (used(), TriaAccessor<dim>::ExcCellNotUsed());
+  Assert (face<GeometryInfo<3>::faces_per_cell,
+          ExcIndexRange (face, 0, GeometryInfo<3>::faces_per_cell));
+  Assert (this->present_index * GeometryInfo<3>::faces_per_cell + face
+          < this->tria->levels[this->present_level]
+          ->hexes.face_rotations.size(),
+          ExcInternalError());
+          
+  this->tria->levels[this->present_level]
+    ->hexes.face_rotations[this->present_index *
+			   GeometryInfo<3>::faces_per_cell
+			   +
+			   face]  = rotation;
+}
+
 #endif
 // Remark: The following explicit instantiations needed to be moved to
 // this place here to work around a problem with gcc3.3 on Apple MacOSX.
@@ -2183,62 +2266,51 @@ neighbor_child_on_subface (const unsigned int face,
           ExcMessage ("The neighbor must be on the same level as this cell!"));
   Assert (this->neighbor(face)->has_children() == true,
           ExcMessage ("The neighbor must have children!"));
-  
-  static const unsigned int subface_translation[4]
-    = { 0, 2, 1, 3 };
-                                   // see whether face and
-                                   // the neighbor's
-                                   // counterface share the
-                                   // same indexing of
-                                   // children. if not so,
-                                   // translate child
-                                   // indices
+				   // this function returns they neighbor's
+				   // child on a given face and
+				   // subface. However, irrespective of the
+				   // actual face orientation, flip and rotation
+				   // of the cells face it returns that child,
+				   // which is neighboring the subface which
+				   // would be subface number @p subface, if the
+				   // face was in standard orientation. thus,
+				   // our first task is to extract the
+				   // information, which real_subface_no
+				   // corresponds to that for the actual face,
+				   // which might have non-standard orientation,
+				   // flip and rotation.
+
+				   // to this end: the subfaces are numbered
+				   // according to the vertices of the
+				   // face. thus we can use the
+				   // standard_to_real_face_vertex function in
+				   // GeometryInfo<dim> to translate the given
+				   // subface to the real_subface_no
+  unsigned int real_subface_no=GeometryInfo<3>::
+			       standard_to_real_face_vertex(subface,
+							    this->face_orientation(face),
+							    this->face_flip(face),
+							    this->face_rotation(face));
+				   // get the neighbor's number for the given
+				   // face and the neighbor
   const unsigned int neighbor_neighbor
     = this->neighbor_of_neighbor (face);
-  const bool face_orientations_match
-    = (this->neighbor(face)->face_orientation(neighbor_neighbor) ==
-       this->face_orientation(face));
+  const TriaIterator<3,CellAccessor<3> > neighbor=this->neighbor(face);
+  
+				   // now use the info provided by GeometryInfo
+				   // to extract the neighbors child number
   const unsigned int neighbor_child_index
-    = GeometryInfo<3>::child_cell_on_face(neighbor_neighbor, subface,
-					  face_orientations_match);
+    = GeometryInfo<3>::child_cell_on_face(neighbor_neighbor, real_subface_no,
+					  neighbor->face_orientation(neighbor_neighbor),
+					  neighbor->face_flip(neighbor_neighbor),
+					  neighbor->face_rotation(neighbor_neighbor));
   const TriaIterator<3,CellAccessor<3> > neighbor_child=
-    this->neighbor(face)->child(neighbor_child_index);
+    neighbor->child(neighbor_child_index);
 
-                                   // if the face on the side of the present
-                                   // cell is in the correct order, then make
-                                   // sure that the neighbor child cell we
+				   // make sure that the neighbor child cell we
                                    // have found shares the desired subface.
-                                   //
-                                   // otherwise: if the face is turned
-                                   // inside out when viewed from the
-                                   // present cell, then the subface we are
-                                   // interested in is not
-                                   // this->face(face)->child(subface), but
-                                   // instead
-                                   // this->face(face)->child(subface'),
-                                   // where subface' is the translated
-                                   // subface number. this is so because we
-                                   // only store the face only once, so its
-                                   // children are defined in terms of its
-                                   // own (circular) orientation, not in
-                                   // terms of face_orientation as viewed
-                                   // from one of the adjacent cells. in
-                                   // that case, cell->face(f)->subface(sf)
-                                   // may yield unexpected results; in that
-                                   // case, a caller may need to adjust
-                                   // according to the face_orientation
-                                   // flag, though one in general only wants
-                                   // to loop over all subfaces, and not
-                                   // pick a particular one
-  Assert(((this->face_orientation(face) == true)
-          &&
-          (this->face(face)->child(subface) ==
-           neighbor_child->face(neighbor_neighbor)))
-         ||
-         ((this->face_orientation(face) == false)
-          &&
-          (this->face(face)->child(subface_translation[subface]) ==
-           neighbor_child->face(neighbor_neighbor))),
+  Assert((this->face(face)->child(real_subface_no) ==
+	  neighbor_child->face(neighbor_neighbor)),
          ExcInternalError());
 
   return neighbor_child;

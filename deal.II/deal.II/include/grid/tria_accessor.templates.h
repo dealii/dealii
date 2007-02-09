@@ -302,6 +302,33 @@ TriaObjectAccessor<1,dim>::face_orientation (const unsigned int) const
 }
 
 
+template <int dim>
+inline
+bool
+TriaObjectAccessor<1,dim>::face_flip (const unsigned int) const
+{
+  return false;
+}
+
+
+template <int dim>
+inline
+bool
+TriaObjectAccessor<1,dim>::face_rotation (const unsigned int) const
+{
+  return false;
+}
+
+
+template <int dim>
+inline
+bool
+TriaObjectAccessor<1,dim>::line_orientation (const unsigned int) const
+{
+  return true;
+}
+
+
 
 template <int dim>
 inline
@@ -594,6 +621,53 @@ TriaObjectAccessor<2,dim>::face_orientation (const unsigned int) const
 }
 
 
+template <int dim>
+inline
+bool
+TriaObjectAccessor<2,dim>::face_flip (const unsigned int) const
+{
+  return false;
+}
+
+
+template <int dim>
+inline
+bool
+TriaObjectAccessor<2,dim>::face_rotation (const unsigned int) const
+{
+  return false;
+}
+
+
+template <>
+inline
+bool
+TriaObjectAccessor<2,3>::line_orientation (const unsigned int line) const
+{
+				   // we cannot usae the quads() function here,
+				   // since it returns a reference to
+				   // TriaObjects<Quad>, but we need a
+				   // (reference to) TriaObjectsQuad3D
+  const int dim=3;
+  Assert (used(), TriaAccessor<dim>::ExcCellNotUsed());
+  Assert (line<GeometryInfo<2>::lines_per_cell,
+          ExcIndexRange (line, 0, GeometryInfo<2>::lines_per_cell));
+      Assert (this->present_index * GeometryInfo<2>::lines_per_cell + line
+	      < this->tria->faces->quads.line_orientations.size(),
+	      ExcInternalError());
+  return this->tria->faces->quads.
+    line_orientations[this->present_index * GeometryInfo<2>::lines_per_cell + line];
+}
+
+
+template <int dim>
+inline
+bool
+TriaObjectAccessor<2,dim>::line_orientation (const unsigned int) const
+{
+  return true;
+}
+
 
 template <int dim>
 inline
@@ -785,35 +859,43 @@ TriaObjectAccessor<3,dim>::line_index (const unsigned int i) const
   Assert (i<12, ExcIndexRange(i,0,12));
 
                                    // get the line index by asking the
-                                   // quads. make sure we handle
-                                   // reverted faces correctly
+                                   // quads. first assume standard orientation
                                    //
-                                   // so set up a table that for each
+                                   // set up a table that for each
                                    // line describes a) from which
                                    // quad to take it, b) which line
                                    // therein it is if the face is
-                                   // oriented correctly, and c) if in
-                                   // the opposite direction
-  static const unsigned int lookup_table[12][3] =
-    { { 4, 0, 2 }, // take first four lines from bottom face
-      { 4, 1, 3 },
-      { 4, 2, 0 },
-      { 4, 3, 1 },
+                                   // oriented correctly
+  static const unsigned int lookup_table[12][2] =
+    { { 4, 0 }, // take first four lines from bottom face
+      { 4, 1 },
+      { 4, 2 },
+      { 4, 3 },
 
-      { 5, 0, 2 }, // second four lines from top face
-      { 5, 1, 3 },
-      { 5, 2, 0 },
-      { 5, 3, 1 },
+      { 5, 0 }, // second four lines from top face
+      { 5, 1 },
+      { 5, 2 },
+      { 5, 3 },
 
-      { 0, 0, 2 }, // the rest randomly
-      { 1, 0, 2 },
-      { 0, 1, 3 },
-      { 1, 1, 3 }};
+      { 0, 0 }, // the rest randomly
+      { 1, 0 },
+      { 0, 1 },
+      { 1, 1 }};
 
-  return (this->quad(lookup_table[i][0])
-          ->line_index(face_orientation(lookup_table[i][0]) ?
-                       lookup_table[i][1] :
-                       lookup_table[i][2]));
+				   // respect non-standard faces by calling the
+				   // reordering function from GeometryInfo
+
+  const unsigned int quad_index=lookup_table[i][0];
+  const unsigned int std_line_index=lookup_table[i][1];
+  
+  const unsigned int line_index=GeometryInfo<dim>::standard_to_real_face_line(
+    std_line_index,
+    face_orientation(quad_index),
+    face_flip(quad_index),
+    face_rotation(quad_index));
+
+  return (this->quad(quad_index)
+          ->line_index(line_index));
 }
 
 
@@ -916,15 +998,147 @@ face_orientation (const unsigned int face) const
   Assert (used(), TriaAccessor<dim>::ExcCellNotUsed());
   Assert (face<GeometryInfo<3>::faces_per_cell,
           ExcIndexRange (face, 0, GeometryInfo<3>::faces_per_cell));
-      Assert (this->present_index * GeometryInfo<3>::faces_per_cell + face
-	      < this->tria->levels[this->present_level]
-	      ->hexes.face_orientations.size(),
-	      ExcInternalError());
+  Assert (this->present_index * GeometryInfo<3>::faces_per_cell + face
+	  < this->tria->levels[this->present_level]
+	  ->hexes.face_orientations.size(),
+	  ExcInternalError());
+  
+  return (this->tria->levels[this->present_level]
+	  ->hexes.face_orientations[this->present_index *
+				    GeometryInfo<3>::faces_per_cell
+				    + face]);
+}
+
+
+template <>
+inline
+bool
+TriaObjectAccessor<3, 3>::
+face_flip (const unsigned int face) const
+{
+  const int dim=3;
+  Assert (used(), TriaAccessor<dim>::ExcCellNotUsed());
+  Assert (face<GeometryInfo<3>::faces_per_cell,
+          ExcIndexRange (face, 0, GeometryInfo<3>::faces_per_cell));
+  Assert (this->present_index * GeometryInfo<3>::faces_per_cell + face
+	  < this->tria->levels[this->present_level]
+	  ->hexes.face_flips.size(),
+	  ExcInternalError());
+  
+  return (this->tria->levels[this->present_level]
+	  ->hexes.face_flips[this->present_index *
+			     GeometryInfo<3>::faces_per_cell
+			     + face]);
+}
+
+
+template <>
+inline
+bool
+TriaObjectAccessor<3, 3>::
+face_rotation (const unsigned int face) const
+{
+  const int dim=3;
+  Assert (used(), TriaAccessor<dim>::ExcCellNotUsed());
+  Assert (face<GeometryInfo<3>::faces_per_cell,
+          ExcIndexRange (face, 0, GeometryInfo<3>::faces_per_cell));
+  Assert (this->present_index * GeometryInfo<3>::faces_per_cell + face
+	  < this->tria->levels[this->present_level]
+	  ->hexes.face_rotations.size(),
+	  ExcInternalError());
       
-      return (this->tria->levels[this->present_level]
-	      ->hexes.face_orientations[this->present_index *
-					GeometryInfo<3>::faces_per_cell
-					+ face]);
+  return (this->tria->levels[this->present_level]
+	  ->hexes.face_rotations[this->present_index *
+				 GeometryInfo<3>::faces_per_cell
+				 + face]);
+}
+
+
+template <>
+inline
+bool
+TriaObjectAccessor<3, 3>::
+line_orientation (const unsigned int line) const
+{
+  const int dim=3;
+  Assert (used(), TriaAccessor<dim>::ExcCellNotUsed());
+  Assert (line<GeometryInfo<3>::lines_per_cell,
+          ExcIndexRange (line, 0, GeometryInfo<3>::lines_per_cell));
+
+                                   // get the line index by asking the
+                                   // quads. first assume standard orientation
+                                   //
+                                   // set up a table that for each
+                                   // line describes a) from which
+                                   // quad to take it, b) which line
+                                   // therein it is if the face is
+                                   // oriented correctly
+  static const unsigned int lookup_table[12][2] =
+    { { 4, 0 }, // take first four lines from bottom face
+      { 4, 1 },
+      { 4, 2 },
+      { 4, 3 },
+
+      { 5, 0 }, // second four lines from top face
+      { 5, 1 },
+      { 5, 2 },
+      { 5, 3 },
+
+      { 0, 0 }, // the rest randomly
+      { 1, 0 },
+      { 0, 1 },
+      { 1, 1 }};
+
+  const unsigned int quad_index=lookup_table[line][0];
+  const unsigned int std_line_index=lookup_table[line][1];
+  
+  const unsigned int line_index=GeometryInfo<dim>::standard_to_real_face_line(
+    std_line_index,
+    face_orientation(quad_index),
+    face_flip(quad_index),
+    face_rotation(quad_index));
+  
+				   // now we got to the correct line and ask
+				   // the quad for its line_orientation. however, if
+				   // the face is rotated, it might be possible,
+				   // that a standard orientation of the line
+				   // with respect to the face corrsponds to a
+				   // non-standard orientation for the line with
+				   // respect to the cell.
+				   //
+				   // set up a table indicating if the two
+				   // standard orientations coincide
+				   //
+				   // first index: two pairs of lines 0(lines
+				   // 0/1) and 1(lines 2/3)
+				   //
+				   // second index: face_orientation; 0:
+				   // opposite normal, 1: standard
+				   //
+				   // third index: face_flip; 0: standard, 1:
+				   // face rotated by 180 degrees
+				   //
+				   // forth index: face_rotation: 0: standard,
+				   // 1: face rotated by 90 degrees
+
+  static const bool bool_table[2][2][2][2] =
+    { { { { true, false },   // lines 0/1, face_orientation=false, face_flip=false, face_rotation=false and true
+	  { false, true }},  // lines 0/1, face_orientation=false, face_flip=true, face_rotation=false and true
+	{ { true, true },    // lines 0/1, face_orientation=true, face_flip=false, face_rotation=false and true
+	  { false, false }}},// linea 0/1, face_orientation=true, face_flip=true, face_rotation=false and true
+
+      { { { true, true },    // lines 2/3 ...
+	  { false, false }},
+	{ { true, false },
+	  { false, true }}}};
+  
+  
+  return (this->quad(quad_index)
+          ->line_orientation(line_index)
+	  == bool_table[std_line_index/2]
+	  [face_orientation(quad_index)]
+	  [face_flip(quad_index)]
+	  [face_rotation(quad_index)]);
 }
 
 

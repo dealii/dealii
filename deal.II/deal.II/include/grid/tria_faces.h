@@ -110,7 +110,7 @@ namespace internal
 					  *  The TriaObject containing the data of quads.
 					  */
 
-	TriaObjects<Quad> quads;
+	TriaObjectsQuad3D quads;
 
 					 /**
 					  *  The TriaObject containing the data of lines.

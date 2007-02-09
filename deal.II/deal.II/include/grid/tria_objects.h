@@ -23,6 +23,14 @@
 
 DEAL_II_NAMESPACE_OPEN
 
+// TODO: See if we can unify the class hierarchy a bit using partial
+// specialization of classes here, e.g. declare a general class
+// TriaObjects<dim,G>.
+// To consider for this: in that case we would have to duplicate quite a few
+// things, e.g. TriaObjectsHex is derived from TriaObjects<Hexahedron> and
+// declares mainly additional data. This would have to be changed in case of a
+// partial specialization.
+
 namespace internal
 {
   namespace Triangulation
@@ -236,6 +244,14 @@ namespace internal
 					  * has.
 					  */
 	std::vector<bool> face_orientations;
+					 /**
+					  * flip = rotation by 180 degrees
+					  */
+	std::vector<bool> face_flips;
+					 /**
+					  * rotation by 90 degrees
+					  */
+	std::vector<bool> face_rotations;
 
                                          /**
                                           *  Assert that enough space is
@@ -270,6 +286,63 @@ namespace internal
                                           */
         unsigned int memory_consumption () const;	    
     };
+
+
+/**
+ * For quadrilaterals in 3D the data of TriaObjects needs to be extended, as we
+ * can obtain faces (quads) with lines in non-standard-orientation, therefore we
+ * declare a class TriaObjectsQuad3D, which additionaly contains a bool-vector
+ * of the line-orientations.
+ * @ingroup grid
+ */
+    
+    class TriaObjectsQuad3D: public TriaObjects<Quad>
+    {
+      public:
+
+					 /**
+					  * In effect, this field has
+					  * <tt>4*n_quads</tt> elements,
+					  * being the number of quads
+					  * times the four lines each
+					  * has.
+					  */
+	std::vector<bool> line_orientations;
+
+                                         /**
+                                          *  Assert that enough space is
+                                          *  allocated to accomodate
+                                          *  <tt>new_objs</tt> new objects.
+                                          *  This function does not only call
+                                          *  <tt>vector::reserve()</tt>, but
+                                          *  does really append the needed
+                                          *  elements.
+                                          */
+        void reserve_space (const unsigned int new_objs);
+
+					 /**
+					  *  Clear all the data contained in this object.
+					  */
+	void clear();
+	
+                                         /**
+                                          *  Check the memory consistency of the
+                                          *  different containers. Should only be
+                                          *  called with the prepro flag @p DEBUG
+                                          *  set. The function should be called from
+                                          *  the functions of the higher
+                                          *  TriaLevel classes.
+                                          */
+        void monitor_memory (const unsigned int true_dimension) const;
+
+                                         /**
+                                          * Determine an estimate for the
+                                          * memory consumption (in bytes)
+                                          * of this object.
+                                          */
+        unsigned int memory_consumption () const;	    
+    };
+    
   }
 }
 
