@@ -434,6 +434,20 @@ struct GeometryInfo<0>
  * result is always @p true. More information on the topic can be found in the
  * @ref GlossFaceOrientation "glossary" article on this topic.
  *
+ * In order to allow all kinds of meshes in 3d, including
+ * <em>Moebius</em>-loops, for example, a face might even be rotated looking
+ * from one cell, whereas it is according to the standard looking at it from the
+ * neighboring cell sharing that particular face. In order to cope with this,
+ * two flags <tt>face_flip</tt> and <tt>face_rotation</tt> are available, to
+ * represent rotations by 90 and 180 degree, respectively. Setting both flags
+ * accumulates to a rotation of 270 degrees (all counterclockwise). You can ask
+ * the cell for these flags like for the <tt>face_orientation</tt>. In order to
+ * enable rotated faces, even lines can deviate from their standard direction in
+ * 3d. This information is available as the <tt>line_orientation</tt> flag for
+ * cells and faces in 3d. Again, this is something that should be internal to
+ * the library and application program will probably never have to bother about
+ * it.
+ *
  *
  * <h4>Children</h4>
  *
@@ -526,7 +540,7 @@ struct GeometryInfo<0>
  * Instantiations in the manual).
  *
  * @ingroup grid geomprimitives
- * @author Wolfgang Bangerth, 1998, Ralf Hartmann, 2005
+ * @author Wolfgang Bangerth, 1998, Ralf Hartmann, 2005, Tobias Leicht, 2007
  */
 template <int dim>
 struct GeometryInfo
@@ -708,24 +722,30 @@ struct GeometryInfo
 				      * 2, on face 3 they are 2 and 3,
 				      * etc.
 				      *
-				      * For three spatial dimensions, the
-				      * exact order of the children is laid
-				      * down in the general documentation of
-				      * this class. Through the
-				      * <tt>face_orientation</tt> argument
-				      * this function handles faces oriented
-				      * in both, the standard and non-standard
-				      * orientation.
+				      * For three spatial dimensions, the exact
+				      * order of the children is laid down in
+				      * the general documentation of this
+				      * class.
+				      *
+				      * Through the <tt>face_orientation</tt>,
+				      * <tt>face_flip</tt> and
+				      * <tt>face_rotation</tt> arguments this
+				      * function handles faces oriented in the
+				      * standard and non-standard orientation.
 				      * <tt>face_orientation</tt> defaults to
-				      * <tt>true</tt> (standard orientation)
-				      * and has no effect in 2d. The concept
-				      * of face orientations is explained in
-				      * this @ref GlossFaceOrientation "glossary"
+				      * <tt>true</tt>, <tt>face_flip</tt> and
+				      * <tt>face_rotation</tt> default to
+				      * <tt>false</tt> (standard orientation)
+				      * and has no effect in 2d. The concept of
+				      * face orientations is explained in this
+				      * @ref GlossFaceOrientation "glossary"
 				      * entry.
 				      */
     static unsigned int child_cell_on_face (const unsigned int face,
 					    const unsigned int subface,
-					    const bool face_orientation = true);
+					    const bool face_orientation = true,
+					    const bool face_flip        = false,
+					    const bool face_rotation    = false);
     
 				     /**
 				      * Map line vertex number to cell
@@ -759,16 +779,16 @@ struct GeometryInfo
 				      * face <tt>face</tt>, e.g.
 				      * <tt>GeometryInfo<2>::face_to_cell_vertices(3,0)=2</tt>.
 				      *
-				      * Through the
-				      * <tt>face_orientation</tt>
-				      * argument this function handles
-				      * faces oriented in both, the
-				      * standard and non-standard
-				      * orientation.
-				      * <tt>face_orientation</tt>
-				      * defaults to <tt>true</tt>
-				      * (standard orientation) and has
-				      * no effect in 2d.
+				      * Through the <tt>face_orientation</tt>,
+				      * <tt>face_flip</tt> and
+				      * <tt>face_rotation</tt> arguments this
+				      * function handles faces oriented in the
+				      * standard and non-standard orientation.
+				      * <tt>face_orientation</tt> defaults to
+				      * <tt>true</tt>, <tt>face_flip</tt> and
+				      * <tt>face_rotation</tt> default to
+				      * <tt>false</tt> (standard orientation)
+				      * and has no effect in 2d.
 				      *
 				      * As the children of a cell are
 				      * ordered according to the
@@ -782,7 +802,9 @@ struct GeometryInfo
 				      */
     static unsigned int face_to_cell_vertices (const unsigned int face,
 					       const unsigned int vertex,
-					       const bool face_orientation = true);
+					       const bool face_orientation = true,
+					       const bool face_flip        = false,
+					       const bool face_rotation    = false);
 
 				     /**
 				      * Map face line number to cell
@@ -792,20 +814,94 @@ struct GeometryInfo
 				      * <tt>face</tt>, e.g.
 				      * <tt>GeometryInfo<3>::face_to_cell_lines(5,0)=4</tt>.
 				      *
-				      * Through the
-				      * <tt>face_orientation</tt>
-				      * argument this function handles
-				      * faces oriented in both, the
-				      * standard and non-standard
-				      * orientation.
-				      * <tt>face_orientation</tt>
-				      * defaults to <tt>true</tt>
-				      * (standard orientation) and has
-				      * no effect in 2d.
+				      * Through the <tt>face_orientation</tt>,
+				      * <tt>face_flip</tt> and
+				      * <tt>face_rotation</tt> arguments this
+				      * function handles faces oriented in the
+				      * standard and non-standard orientation.
+				      * <tt>face_orientation</tt> defaults to
+				      * <tt>true</tt>, <tt>face_flip</tt> and
+				      * <tt>face_rotation</tt> default to
+				      * <tt>false</tt> (standard orientation)
+				      * and has no effect in 2d.
 				      */
     static unsigned int face_to_cell_lines (const unsigned int face,
 					    const unsigned int line,
-					    const bool face_orientation = true);
+					    const bool face_orientation = true,
+					    const bool face_flip        = false,
+					    const bool face_rotation    = false);
+
+				     /**
+				      * Map the vertex index @p vertex of a face
+				      * in standard orientation to one of a face
+				      * with arbitrary @p face_orientation, @p
+				      * face_flip and @p face_rotation. The
+				      * values of these three flags default to
+				      * <tt>true</tt>, <tt>false</tt> and
+				      * <tt>false</tt>, respectively. this
+				      * combination describes a face in standard
+				      * orientation.
+				      *
+				      * This function is only implemented in 3D.
+				      */
+    static unsigned int standard_to_real_face_vertex (const unsigned int vertex,
+						      const bool face_orientation = true,
+						      const bool face_flip        = false,
+						      const bool face_rotation    = false);
+    
+				     /**
+				      * Map the vertex index @p vertex of a face
+				      * with arbitrary @p face_orientation, @p
+				      * face_flip and @p face_rotation to a face
+				      * in standard orientation. The values of
+				      * these three flags default to
+				      * <tt>true</tt>, <tt>false</tt> and
+				      * <tt>false</tt>, respectively. this
+				      * combination describes a face in standard
+				      * orientation.
+				      *
+				      * This function is only implemented in 3D.
+				      */
+    static unsigned int real_to_standard_face_vertex (const unsigned int vertex,
+						      const bool face_orientation = true,
+						      const bool face_flip        = false,
+						      const bool face_rotation    = false);
+    
+				     /**
+				      * Map the line index @p line of a face
+				      * in standard orientation to one of a face
+				      * with arbitrary @p face_orientation, @p
+				      * face_flip and @p face_rotation. The
+				      * values of these three flags default to
+				      * <tt>true</tt>, <tt>false</tt> and
+				      * <tt>false</tt>, respectively. this
+				      * combination describes a face in standard
+				      * orientation.
+				      *
+				      * This function is only implemented in 3D.
+				      */
+    static unsigned int standard_to_real_face_line (const unsigned int line,
+						    const bool face_orientation = true,
+						    const bool face_flip        = false,
+						    const bool face_rotation    = false);
+    
+				     /**
+				      * Map the line index @p line of a face
+				      * with arbitrary @p face_orientation, @p
+				      * face_flip and @p face_rotation to a face
+				      * in standard orientation. The values of
+				      * these three flags default to
+				      * <tt>true</tt>, <tt>false</tt> and
+				      * <tt>false</tt>, respectively. this
+				      * combination describes a face in standard
+				      * orientation.
+				      *
+				      * This function is only implemented in 3D.
+				      */
+    static unsigned int real_to_standard_face_line (const unsigned int line,
+						    const bool face_orientation = true,
+						    const bool face_flip        = false,
+						    const bool face_rotation    = false);
     
 				     /**
 				      * Return the position of the @p ith

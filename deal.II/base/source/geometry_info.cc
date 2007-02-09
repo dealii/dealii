@@ -225,11 +225,282 @@ const unsigned int GeometryInfo<4>::vertex_to_face
     { invalid_unsigned_int, invalid_unsigned_int, invalid_unsigned_int, invalid_unsigned_int },
     { invalid_unsigned_int, invalid_unsigned_int, invalid_unsigned_int, invalid_unsigned_int }};
 
+
+template <>
+unsigned int
+GeometryInfo<3>::standard_to_real_face_vertex(const unsigned int vertex,
+					      const bool face_orientation,
+					      const bool face_flip,
+					      const bool face_rotation)
+{
+  Assert(vertex<GeometryInfo<3>::vertices_per_face,
+	 ExcIndexRange(vertex,0,GeometryInfo<3>::vertices_per_face));
+
+				   // set up a table to make sure that
+				   // we handle non-standard faces correctly
+                                   //
+                                   // so set up a table that for each vertex (of
+                                   // a quad in standard position) describes
+                                   // which vertex to take
+				   //
+				   // first index: four vertices 0...3
+				   //
+				   // second index: face_orientation; 0:
+				   // opposite normal, 1: standard
+				   //
+				   // third index: face_flip; 0: standard, 1:
+				   // face rotated by 180 degrees
+				   //
+				   // forth index: face_rotation: 0: standard,
+				   // 1: face rotated by 90 degrees
+  
+  static const unsigned int vertex_translation[4][2][2][2] =
+    { { { { 0, 2 },  // vertex 0, face_orientation=false, face_flip=false, face_rotation=false and true
+	  { 3, 1 }}, // vertex 0, face_orientation=false, face_flip=true, face_rotation=false and true
+	{ { 0, 2 },  // vertex 0, face_orientation=true, face_flip=false, face_rotation=false and true
+	  { 3, 1 }}},// vertex 0, face_orientation=true, face_flip=true, face_rotation=false and true
+
+      { { { 2, 3 },  // vertex 1 ...
+	  { 1, 0 }},
+	{ { 1, 0 },
+	  { 2, 3 }}},
+
+      { { { 1, 0 },  // vertex 2 ...
+	  { 2, 3 }},
+	{ { 2, 3 },
+	  { 1, 0 }}},
+
+      { { { 3, 1 },  // vertex 3 ...
+	  { 0, 2 }},
+	{ { 3, 1 },
+	  { 0, 2 }}}};
+
+  return vertex_translation[vertex][face_orientation][face_flip][face_rotation];
+}
+
+
+
+template <int dim>
+unsigned int
+GeometryInfo<dim>::standard_to_real_face_vertex(const unsigned int vertex,
+						const bool,
+						const bool,
+						const bool)
+{
+  Assert(false, ExcNotImplemented());
+  return vertex;
+  
+}
+
+
+
+template <>
+unsigned int
+GeometryInfo<3>::real_to_standard_face_vertex(const unsigned int vertex,
+					      const bool face_orientation,
+					      const bool face_flip,
+					      const bool face_rotation)
+{
+  Assert(vertex<GeometryInfo<3>::vertices_per_face,
+	 ExcIndexRange(vertex,0,GeometryInfo<3>::vertices_per_face));
+
+				   // set up a table to make sure that
+				   // we handle non-standard faces correctly
+                                   //
+                                   // so set up a table that for each vertex (of
+                                   // a quad in standard position) describes
+                                   // which vertex to take
+				   //
+				   // first index: four vertices 0...3
+				   //
+				   // second index: face_orientation; 0:
+				   // opposite normal, 1: standard
+				   //
+				   // third index: face_flip; 0: standard, 1:
+				   // face rotated by 180 degrees
+				   //
+				   // forth index: face_rotation: 0: standard,
+				   // 1: face rotated by 90 degrees
+  
+  static const unsigned int vertex_translation[4][2][2][2] =
+    { { { { 0, 2 },  // vertex 0, face_orientation=false, face_flip=false, face_rotation=false and true
+	  { 3, 1 }}, // vertex 0, face_orientation=false, face_flip=true, face_rotation=false and true
+	{ { 0, 1 },  // vertex 0, face_orientation=true, face_flip=false, face_rotation=false and true
+	  { 3, 2 }}},// vertex 0, face_orientation=true, face_flip=true, face_rotation=false and true
+
+      { { { 2, 3 },  // vertex 1 ...
+	  { 1, 0 }},
+	{ { 1, 3 },
+	  { 2, 0 }}},
+
+      { { { 1, 0 },  // vertex 2 ...
+	  { 2, 3 }},
+	{ { 2, 0 },
+	  { 1, 3 }}},
+
+      { { { 3, 1 },  // vertex 3 ...
+	  { 0, 2 }},
+	{ { 3, 2 },
+	  { 0, 1 }}}};
+
+  return vertex_translation[vertex][face_orientation][face_flip][face_rotation];
+}
+
+
+
+template <int dim>
+unsigned int
+GeometryInfo<dim>::real_to_standard_face_vertex(const unsigned int vertex,
+						const bool,
+						const bool,
+						const bool)
+{
+  Assert(false, ExcNotImplemented());
+  return vertex;
+  
+}
+
+
+
+template <>
+unsigned int
+GeometryInfo<3>::standard_to_real_face_line(const unsigned int line,
+					    const bool face_orientation,
+					    const bool face_flip,
+					    const bool face_rotation)
+{
+  Assert(line<GeometryInfo<3>::lines_per_face,
+	 ExcIndexRange(line,0,GeometryInfo<3>::lines_per_face));
+
+  
+				   // make sure we handle
+                                   // non-standard faces correctly
+                                   //
+                                   // so set up a table that for each line (of a
+                                   // quad) describes which line to take
+				   //
+				   // first index: four lines 0...3
+				   //
+				   // second index: face_orientation; 0:
+				   // opposite normal, 1: standard
+				   //
+				   // third index: face_flip; 0: standard, 1:
+				   // face rotated by 180 degrees
+				   //
+				   // forth index: face_rotation: 0: standard,
+				   // 1: face rotated by 90 degrees
+  
+  static const unsigned int line_translation[4][2][2][2] =
+    { { { { 2, 0 },  // line 0, face_orientation=false, face_flip=false, face_rotation=false and true
+	  { 3, 1 }}, // line 0, face_orientation=false, face_flip=true, face_rotation=false and true
+	{ { 0, 3 },  // line 0, face_orientation=true, face_flip=false, face_rotation=false and true
+	  { 1, 2 }}},// line 0, face_orientation=true, face_flip=true, face_rotation=false and true
+
+      { { { 3, 1 },  // line 1 ...
+	  { 2, 0 }},
+	{ { 1, 2 },
+	  { 0, 3 }}},
+
+      { { { 0, 3 },  // line 2 ...
+	  { 1, 2 }},
+	{ { 2, 0 },
+	  { 3, 1 }}},
+
+      { { { 1, 2 },  // line 3 ...
+	  { 0, 3 }},
+	{ { 3, 1 },
+	  { 2, 0 }}}};
+
+  return line_translation[line][face_orientation][face_flip][face_rotation];
+}
+
+
+
+template <int dim>
+unsigned int
+GeometryInfo<dim>::standard_to_real_face_line(const unsigned int line,
+					      const bool,
+					      const bool,
+					      const bool)
+{
+  Assert(false, ExcNotImplemented());
+  return line;
+}
+
+
+
+template <>
+unsigned int
+GeometryInfo<3>::real_to_standard_face_line(const unsigned int line,
+					    const bool face_orientation,
+					    const bool face_flip,
+					    const bool face_rotation)
+{
+  Assert(line<GeometryInfo<3>::lines_per_face,
+	 ExcIndexRange(line,0,GeometryInfo<3>::lines_per_face));
+
+  
+				   // make sure we handle
+                                   // non-standard faces correctly
+                                   //
+                                   // so set up a table that for each line (of a
+                                   // quad) describes which line to take
+				   //
+				   // first index: four lines 0...3
+				   //
+				   // second index: face_orientation; 0:
+				   // opposite normal, 1: standard
+				   //
+				   // third index: face_flip; 0: standard, 1:
+				   // face rotated by 180 degrees
+				   //
+				   // forth index: face_rotation: 0: standard,
+				   // 1: face rotated by 90 degrees
+  
+  static const unsigned int line_translation[4][2][2][2] =
+    { { { { 2, 0 },  // line 0, face_orientation=false, face_flip=false, face_rotation=false and true
+	  { 3, 1 }}, // line 0, face_orientation=false, face_flip=true, face_rotation=false and true
+	{ { 0, 2 },  // line 0, face_orientation=true, face_flip=false, face_rotation=false and true
+	  { 1, 3 }}},// line 0, face_orientation=true, face_flip=true, face_rotation=false and true
+
+      { { { 3, 1 },  // line 1 ...
+	  { 2, 0 }},
+	{ { 1, 3 },
+	  { 0, 2 }}},
+
+      { { { 0, 3 },  // line 2 ...
+	  { 1, 2 }},
+	{ { 2, 1 },
+	  { 3, 0 }}},
+
+      { { { 1, 2 },  // line 3 ...
+	  { 0, 3 }},
+	{ { 3, 0 },
+	  { 2, 1 }}}};
+
+  return line_translation[line][face_orientation][face_flip][face_rotation];
+}
+
+
+
+template <int dim>
+unsigned int
+GeometryInfo<dim>::real_to_standard_face_line(const unsigned int line,
+					      const bool,
+					      const bool,
+					      const bool)
+{
+  Assert(false, ExcNotImplemented());
+  return line;
+}
+
+
+
 template <>
 unsigned int
 GeometryInfo<1>::child_cell_on_face (const unsigned int face,
                                      const unsigned int subface,
-				     const bool)
+				     const bool, const bool, const bool)
 {
   Assert (face<faces_per_cell, ExcIndexRange(face, 0, faces_per_cell));
   Assert (subface<subfaces_per_face,
@@ -244,7 +515,7 @@ template <>
 unsigned int
 GeometryInfo<2>::child_cell_on_face (const unsigned int face,
                                      const unsigned int subface,
-				     const bool)
+				     const bool, const bool, const bool)
 {
   Assert (face<faces_per_cell, ExcIndexRange(face, 0, faces_per_cell));
   Assert (subface<subfaces_per_face, ExcIndexRange(subface, 0, subfaces_per_face));
@@ -264,12 +535,12 @@ template <>
 unsigned int
 GeometryInfo<3>::child_cell_on_face (const unsigned int face,
 				     const unsigned int subface,
-				     const bool face_orientation)
+				     const bool face_orientation,
+				     const bool face_flip,
+				     const bool face_rotation)
 {
   Assert (face<faces_per_cell, ExcIndexRange(face, 0, faces_per_cell));
   Assert (subface<subfaces_per_face, ExcIndexRange(subface, 0, subfaces_per_face));
-
-  static const unsigned int flip[subfaces_per_face] = { 0, 2, 1, 3 };
 
   static const unsigned
     subcells[faces_per_cell][subfaces_per_face] = {{0, 2, 4, 6},
@@ -278,7 +549,10 @@ GeometryInfo<3>::child_cell_on_face (const unsigned int face,
                                                    {2, 6, 3, 7},
                                                    {0, 1, 2, 3},
                                                    {4, 5, 6, 7}};
-  return face_orientation ? subcells[face][subface] : subcells[face][flip[subface]];
+  return subcells[face][real_to_standard_face_vertex(subface,
+						     face_orientation,
+						     face_flip,
+						     face_rotation)];
 }
 
 
@@ -286,8 +560,8 @@ GeometryInfo<3>::child_cell_on_face (const unsigned int face,
 template <>
 unsigned int
 GeometryInfo<4>::child_cell_on_face (const unsigned int,
-                                   const unsigned int,
-                                   const bool)
+				     const unsigned int,
+				     const bool, const bool, const bool)
 {
   Assert(false, ExcNotImplemented());
   return invalid_unsigned_int;
@@ -356,7 +630,7 @@ template <>
 unsigned int
 GeometryInfo<1>::face_to_cell_lines (const unsigned int face,
 				     const unsigned int line,
-				     const bool)
+				     const bool, const bool, const bool)
 {
   Assert (face+1<faces_per_cell+1, ExcIndexRange(face, 0, faces_per_cell));
   Assert (line+1<lines_per_face+1, ExcIndexRange(line, 0, lines_per_face));
@@ -372,7 +646,7 @@ template <>
 unsigned int
 GeometryInfo<2>::face_to_cell_lines (const unsigned int face,
 				     const unsigned int line,
-				     const bool)
+				     const bool, const bool, const bool)
 {
   Assert (face<faces_per_cell, ExcIndexRange(face, 0, faces_per_cell));
   Assert (line<lines_per_face, ExcIndexRange(line, 0, lines_per_face));
@@ -387,13 +661,12 @@ template <>
 unsigned int
 GeometryInfo<3>::face_to_cell_lines (const unsigned int face,
 				     const unsigned int line,
-				     const bool face_orientation)
+				     const bool face_orientation,
+				     const bool face_flip,
+				     const bool face_rotation)
 {
   Assert (face<faces_per_cell, ExcIndexRange(face, 0, faces_per_cell));
   Assert (line<lines_per_face, ExcIndexRange(line, 0, lines_per_face));
-
-				   // also represented by (line+2)%4
-  static const unsigned int flip[lines_per_face] = { 2, 3, 0, 1 };
 
   static const unsigned
     lines[faces_per_cell][lines_per_face] = {{8,10, 0, 4}, // left face
@@ -402,7 +675,10 @@ GeometryInfo<3>::face_to_cell_lines (const unsigned int face,
 					     {3, 7,10,11}, // back face
 					     {0, 1, 2, 3}, // bottom face
 					     {4, 5, 6, 7}};// top face
-  return face_orientation ? lines[face][line] : lines[face][flip[line]];
+  return lines[face][real_to_standard_face_line(line,
+						face_orientation,
+						face_flip,
+						face_rotation)];
 }
 
 
@@ -411,7 +687,7 @@ template<int dim>
 unsigned int
 GeometryInfo<dim>::face_to_cell_lines (const unsigned int,
 				       const unsigned int,
-				       const bool)
+				       const bool, const bool, const bool)
 {
   Assert(false, ExcNotImplemented());
   return invalid_unsigned_int;
@@ -423,9 +699,12 @@ template <int dim>
 unsigned int
 GeometryInfo<dim>::face_to_cell_vertices (const unsigned int face,
 					  const unsigned int vertex,
-					  const bool face_orientation)
+					  const bool face_orientation,
+					  const bool face_flip,
+					  const bool face_rotation)
 {
-  return child_cell_on_face(face, vertex, face_orientation);
+  return child_cell_on_face(face, vertex,
+			    face_orientation, face_flip, face_rotation);
 }
 
 
