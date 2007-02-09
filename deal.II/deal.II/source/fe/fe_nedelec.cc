@@ -31,7 +31,7 @@
 DEAL_II_NAMESPACE_OPEN
 
 
-//TODO: Remove doubled degrees
+//TODO: Remove doubled member variable 'degree'
 template <int dim>
 FE_Nedelec<dim>::FE_Nedelec (const unsigned int degree)
 		:
