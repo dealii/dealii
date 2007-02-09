@@ -72,7 +72,7 @@ FE_Nedelec<dim>::FE_Nedelec (const unsigned int degree)
     {
       Assert (this->dofs_per_quad == 0,
 	      ExcInternalError());
-      Assert (adjust_quad_dof_index_for_face_orientation_table.size()==
+      Assert (this->adjust_quad_dof_index_for_face_orientation_table.size(0)==
 	      this->dofs_per_quad,
 	      ExcInternalError());
     }
