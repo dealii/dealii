@@ -557,11 +557,11 @@ namespace internal
  *
  *        It is your duty to guarantee that cells have the correct orientation.
  *        To guarantee this, in the input vector keeping the cell list, the
- *        vertex indices for each cell have to be in a defined order. In one
- *        dimension, the first vertex index must refer to that vertex with the
- *        lower coordinate value. In two dimensions, the four vertices must be
- *        given in an order representing a counterclockwise sense. This
- *        condition is not easy to verify and no full attempt to do so is made.
+ *        vertex indices for each cell have to be in a defined order, see the
+ *        documentation of GeometryInfo<dim>. In one dimension, the first vertex
+ *        index must refer to that vertex with the lower coordinate value. In 2d
+ *        and 3D, the correspondoing conditions are not easy to verify and no
+ *        full attempt to do so is made.
  *        If you violate this condition, you may end up with matrix entries
  *        having the wrong sign (clockwise vertex numbering, which results in
  *        a negative area element) of with wrong matrix elements (twisted
