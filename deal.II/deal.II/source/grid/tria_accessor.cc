@@ -2,7 +2,7 @@
 //    $Id$
 //    Version: $Name$
 //
-//    Copyright (C) 1998, 1999, 2000, 2001, 2002, 2003, 2004, 2005, 2006 by the deal.II authors
+//    Copyright (C) 1998, 1999, 2000, 2001, 2002, 2003, 2004, 2005, 2006, 2007 by the deal.II authors
 //
 //    This file is subject to QPL and may not be  distributed
 //    without copyright and license information. Please refer
@@ -1636,7 +1636,7 @@ Point<3> TriaObjectAccessor<3, 3>::barycenter () const
 template <>
 double TriaObjectAccessor<3, 3>::measure () const
 {
-  static unsigned int vertex_indices[GeometryInfo<3>::vertices_per_cell];
+  unsigned int vertex_indices[GeometryInfo<3>::vertices_per_cell];
   for (unsigned int i=0; i<GeometryInfo<3>::vertices_per_cell; ++i)
     vertex_indices[i]=vertex_index(i);
 
