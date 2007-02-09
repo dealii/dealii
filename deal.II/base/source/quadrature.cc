@@ -402,6 +402,46 @@ QProjector<dim>::reflect (const Quadrature<2> &q)
 }
 
 
+template <int dim>
+Quadrature<2>
+QProjector<dim>::rotate (const Quadrature<2> &q,
+			 const unsigned int   n_times) 
+{
+  std::vector<Point<2> > q_points (q.n_quadrature_points);
+  std::vector<double>    weights (q.n_quadrature_points);
+  for (unsigned int i=0; i<q.n_quadrature_points; ++i)
+    {
+      switch (n_times%4)
+	{
+	  case 0:
+						 // 0 degree
+		q_points[i][0] = q.point(i)[0];
+		q_points[i][1] = q.point(i)[1];
+		break;
+	  case 1:
+						 // 90 degree counterclockwise
+		q_points[i][0] = 1.0 - q.point(i)[1];
+		q_points[i][1] = q.point(i)[0];
+		break;
+	  case 2:
+						 // 180 degree counterclockwise
+		q_points[i][0] = 1.0 - q.point(i)[0];
+		q_points[i][1] = 1.0 - q.point(i)[1];
+		break;
+	  case 3:
+						 // 270 degree counterclockwise
+		q_points[i][0] = q.point(i)[1];
+		q_points[i][1] = 1.0 - q.point(i)[0];
+		break;
+	}
+      
+      weights[i] = q.weight(i);
+    }
+
+  return Quadrature<2> (q_points, weights);
+}
+
+
 template <>
 void
 QProjector<1>::project_to_face (const Quadrature<0> &,
@@ -805,49 +845,56 @@ QProjector<3>::project_to_all_faces (const SubQuadrature &quadrature)
 {
   const unsigned int dim = 3;
   
-  const SubQuadrature q_reflected = reflect (quadrature);
+  SubQuadrature q_reflected=reflect (quadrature);
+  SubQuadrature q[8]=
+    {quadrature,
+     rotate (quadrature,1),
+     rotate (quadrature,2),
+     rotate (quadrature,3),
+     q_reflected,           
+     rotate (q_reflected,3),
+     rotate (q_reflected,2),
+     rotate (q_reflected,1)};
+  
+  
   
   const unsigned int n_points = quadrature.n_quadrature_points,
 		     n_faces  = GeometryInfo<dim>::faces_per_cell;
 
 				   // first fix quadrature points
   std::vector<Point<dim> > q_points;
-  q_points.reserve(n_points * n_faces * 2);
+  q_points.reserve(n_points * n_faces * 8);
   std::vector <Point<dim> > help(n_points);
   
-				   // project to each face and append
-				   // results
-  for (unsigned int face=0; face<n_faces; ++face)
-    {
-      project_to_face(quadrature, face, help);
-      std::copy (help.begin(), help.end(),
-                 std::back_inserter (q_points));
-    }
-
-				   // next copy over weights
   std::vector<double> weights;
-  weights.reserve (n_points * n_faces * 2);
-  for (unsigned int face=0; face<n_faces; ++face)
-    std::copy (quadrature.get_weights().begin(),
-               quadrature.get_weights().end(),
-               std::back_inserter (weights));
+  weights.reserve (n_points * n_faces * 8);
 
-                                   // then do same for other
-                                   // orientation of faces
-  for (unsigned int face=0; face<n_faces; ++face)
+				   // do the following for all possible
+				   // mutations of a face (mutation==0
+				   // corresponds to a face with standard
+				   // orientation, no flip and no rotation)
+  for (unsigned int mutation=0; mutation<8; ++mutation)
     {
-      project_to_face(q_reflected, face, help);
-      std::copy (help.begin(), help.end(),
-                 std::back_inserter (q_points));
-    }
-  for (unsigned int face=0; face<n_faces; ++face)
-    std::copy (q_reflected.get_weights().begin(),
-               q_reflected.get_weights().end(),
-               std::back_inserter (weights));
+				       // project to each face and append
+				       // results
+      for (unsigned int face=0; face<n_faces; ++face)
+	{
+	  project_to_face(q[mutation], face, help);
+	  std::copy (help.begin(), help.end(),
+		     std::back_inserter (q_points));
+	}
 
-  Assert (q_points.size() == n_points * n_faces * 2,
+				       // next copy over weights
+      for (unsigned int face=0; face<n_faces; ++face)
+	std::copy (q[mutation].get_weights().begin(),
+		   q[mutation].get_weights().end(),
+		   std::back_inserter (weights));
+    }
+  
+
+  Assert (q_points.size() == n_points * n_faces * 8,
           ExcInternalError());
-  Assert (weights.size() == n_points * n_faces * 2,
+  Assert (weights.size() == n_points * n_faces * 8,
           ExcInternalError());  
   
   return Quadrature<dim>(q_points, weights);
@@ -915,7 +962,16 @@ QProjector<3>::project_to_all_subfaces (const SubQuadrature &quadrature)
 {
   const unsigned int dim = 3;
   
-  const SubQuadrature q_reflected = reflect (quadrature);
+  SubQuadrature q_reflected=reflect (quadrature);
+  SubQuadrature q[8]=
+    {quadrature,
+     rotate (quadrature,1),
+     rotate (quadrature,2),
+     rotate (quadrature,3),
+     q_reflected,
+     rotate (q_reflected,3),
+     rotate (q_reflected,2),
+     rotate (q_reflected,1)};
 
   const unsigned int n_points          = quadrature.n_quadrature_points,
 		     n_faces           = GeometryInfo<dim>::faces_per_cell,
@@ -923,46 +979,39 @@ QProjector<3>::project_to_all_subfaces (const SubQuadrature &quadrature)
   
 				   // first fix quadrature points
   std::vector<Point<dim> > q_points;
-  q_points.reserve (n_points * n_faces * subfaces_per_face * 2);
+  q_points.reserve (n_points * n_faces * subfaces_per_face * 8);
   std::vector <Point<dim> > help(n_points);
   
-				   // project to each face and copy
-				   // results
-  for (unsigned int face=0; face<n_faces; ++face)
-    for (unsigned int subface=0; subface<subfaces_per_face; ++subface)
-      {
-	project_to_subface(quadrature, face, subface, help);
-	std::copy (help.begin(), help.end(),
-                   std::back_inserter (q_points));
-      }
-
-				   // next copy over weights
   std::vector<double> weights;
-  weights.reserve (n_points * n_faces * subfaces_per_face * 2);
-  for (unsigned int face=0; face<n_faces; ++face)
-    for (unsigned int subface=0; subface<subfaces_per_face; ++subface)
-      std::copy (quadrature.get_weights().begin(),
-                 quadrature.get_weights().end(),
-                 std::back_inserter (weights));
+  weights.reserve (n_points * n_faces * subfaces_per_face * 8);
 
-                                   // do same with other orientation
-                                   // of faces
-  for (unsigned int face=0; face<n_faces; ++face)
-    for (unsigned int subface=0; subface<subfaces_per_face; ++subface)
-      {
-	project_to_subface(q_reflected, face, subface, help);
-	std::copy (help.begin(), help.end(),
-                   std::back_inserter (q_points));
-      };
-  for (unsigned int face=0; face<n_faces; ++face)
-    for (unsigned int subface=0; subface<subfaces_per_face; ++subface)
-      std::copy (q_reflected.get_weights().begin(),
-                 q_reflected.get_weights().end(),
-                 std::back_inserter (weights));
+				   // do the following for all possible
+				   // mutations of a face (mutation==0
+				   // corresponds to a face with standard
+				   // orientation, no flip and no rotation)
+  for (unsigned int mutation=0; mutation<8; ++mutation)
+    {
+				       // project to each face and copy
+				       // results
+      for (unsigned int face=0; face<n_faces; ++face)
+	for (unsigned int subface=0; subface<subfaces_per_face; ++subface)
+	  {
+	    project_to_subface(q[mutation], face, subface, help);
+	    std::copy (help.begin(), help.end(),
+		       std::back_inserter (q_points));
+	  }
 
-  Assert (q_points.size() == n_points * n_faces * subfaces_per_face * 2,
+				       // next copy over weights
+      for (unsigned int face=0; face<n_faces; ++face)
+	for (unsigned int subface=0; subface<subfaces_per_face; ++subface)
+	  std::copy (q[mutation].get_weights().begin(),
+		     q[mutation].get_weights().end(),
+		     std::back_inserter (weights));
+    }
+  
+  Assert (q_points.size() == n_points * n_faces * subfaces_per_face * 8,
           ExcInternalError());
-  Assert (weights.size() == n_points * n_faces * subfaces_per_face * 2,
+  Assert (weights.size() == n_points * n_faces * subfaces_per_face * 8,
           ExcInternalError());  
   
   return Quadrature<dim>(q_points, weights);
@@ -1033,30 +1082,51 @@ typename QProjector<dim>::DataSetDescriptor
 QProjector<dim>::DataSetDescriptor::
 face (const unsigned int face_no,
       const bool         face_orientation,
+      const bool         face_flip,
+      const bool         face_rotation,
       const unsigned int n_quadrature_points)
 {
   Assert (dim != 1, ExcInternalError());
   Assert (face_no < GeometryInfo<dim>::faces_per_cell,
           ExcInternalError());
   
+				   // in 3d, we have to account for faces that
+				   // have non-standard face orientation, flip
+				   // and rotation. thus, we have to store
+				   // _eight_ data sets per face or subface
+
+				   // set up a table with the according offsets
+				   // for non-standard orientation, first index:
+				   // face_orientation (standard true=1), second
+				   // index: face_flip (standard false=0), third
+				   // index: face_rotation (standard false=0)
+				   //
+				   // note, that normally we should use the
+				   // obvious offsets 0,1,2,3,4,5,6,7. However,
+				   // prior to the changes enabling flipped and
+				   // rotated faces, in many places of the
+				   // library the convention was used, that the
+				   // first dataset with offset 0 corresponds to
+				   // a face in standard orientation. therefore
+				   // we use the offsets 4,5,6,7,0,1,2,3 here to
+				   // stick to that (implicit) convention
+  static const unsigned int offset[2][2][2]=
+    {{{4*GeometryInfo<dim>::faces_per_cell, 5*GeometryInfo<dim>::faces_per_cell},    // face_orientation=false; face_flip=false; face_rotation=false and true
+      {6*GeometryInfo<dim>::faces_per_cell, 7*GeometryInfo<dim>::faces_per_cell}},   // face_orientation=false; face_flip=true;  face_rotation=false and true
+     {{0*GeometryInfo<dim>::faces_per_cell, 1*GeometryInfo<dim>::faces_per_cell},    // face_orientation=true;  face_flip=false; face_rotation=false and true
+      {2*GeometryInfo<dim>::faces_per_cell, 3*GeometryInfo<dim>::faces_per_cell}}};  // face_orientation=true;  face_flip=true;  face_rotation=false and true
+
   switch (dim)
     {
       case 1:
       case 2:
             return face_no * n_quadrature_points;
 
-                                             // in 3d, we have to
-                                             // account for faces
-                                             // that have reverse
-                                             // orientation. thus,
-                                             // we have to store
-                                             // _two_ data sets per
-                                             // face or subface
+	    
       case 3:
-            return ((face_no +
-                     (face_orientation == true ?
-                      0 : GeometryInfo<dim>::faces_per_cell))
-                    * n_quadrature_points);
+            return ((face_no
+		     + offset[face_orientation][face_flip][face_rotation])
+		    * n_quadrature_points);
 
       default:
             Assert (false, ExcInternalError());
@@ -1072,15 +1142,53 @@ QProjector<dim>::DataSetDescriptor::
 subface (const unsigned int face_no,
          const unsigned int subface_no,
          const bool         face_orientation,
+         const bool         face_flip,
+         const bool         face_rotation,
          const unsigned int n_quadrature_points)
 {
   Assert (dim != 1, ExcInternalError());
   Assert (face_no < GeometryInfo<dim>::faces_per_cell,
           ExcInternalError());
-                                   // the trick with +1 prevents
-                                   // that we get a warning in 1d
+                                   // the trick with +1 prevents that we get a
+                                   // warning in 1d
   Assert (subface_no+1 < GeometryInfo<dim>::subfaces_per_face+1,
           ExcInternalError());
+  
+				   // in 3d, we have to account for faces that
+				   // have non-standard face orientation, flip
+				   // and rotation. thus, we have to store
+				   // _eight_ data sets per face or subface
+  
+				   // set up a table with the according offsets
+				   // for non-standard orientation, first index:
+				   // face_orientation (standard true=1), second
+				   // index: face_flip (standard false=0), third
+				   // index: face_rotation (standard false=0)
+				   //
+				   // note, that normally we should use the
+				   // obvious offsets 0,1,2,3,4,5,6,7. However,
+				   // prior to the changes enabling flipped and
+				   // rotated faces, in many places of the
+				   // library the convention was used, that the
+				   // first dataset with offset 0 corresponds to
+				   // a face in standard orientation. therefore
+				   // we use the offsets 4,5,6,7,0,1,2,3 here to
+				   // stick to that (implicit) convention
+  static const unsigned int offset[2][2][2]=
+    {{
+					   // face_orientation=false; face_flip=false; face_rotation=false and true
+	  {4*GeometryInfo<dim>::faces_per_cell*GeometryInfo<dim>::subfaces_per_face,
+	   5*GeometryInfo<dim>::faces_per_cell*GeometryInfo<dim>::subfaces_per_face},
+					   // face_orientation=false; face_flip=true;  face_rotation=false and true
+	  {6*GeometryInfo<dim>::faces_per_cell*GeometryInfo<dim>::subfaces_per_face,
+	   7*GeometryInfo<dim>::faces_per_cell*GeometryInfo<dim>::subfaces_per_face}},   
+     {
+					    // face_orientation=true;  face_flip=false; face_rotation=false and true
+	   {0*GeometryInfo<dim>::faces_per_cell*GeometryInfo<dim>::subfaces_per_face,
+	    1*GeometryInfo<dim>::faces_per_cell*GeometryInfo<dim>::subfaces_per_face},
+					    // face_orientation=true;  face_flip=true;  face_rotation=false and true
+	   {2*GeometryInfo<dim>::faces_per_cell*GeometryInfo<dim>::subfaces_per_face,
+	    3*GeometryInfo<dim>::faces_per_cell*GeometryInfo<dim>::subfaces_per_face}}};
   
   switch (dim)
     {
@@ -1089,15 +1197,10 @@ subface (const unsigned int face_no,
             return ((face_no * GeometryInfo<dim>::subfaces_per_face +
                      subface_no)
                     * n_quadrature_points);
-
-                                             // for 3d, same as above:
       case 3:
             return (((face_no * GeometryInfo<dim>::subfaces_per_face +
                       subface_no)
-                     + (face_orientation == true ?
-                        0 :
-                        GeometryInfo<dim>::faces_per_cell *
-                        GeometryInfo<dim>::subfaces_per_face)
+                     + offset[face_orientation][face_flip][face_rotation]
                      )
                     * n_quadrature_points);
       default:

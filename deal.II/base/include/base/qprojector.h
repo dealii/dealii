@@ -169,7 +169,7 @@ class QProjector
 				      * later.
 				      *
 				      * @note In 3D, this function
-				      * produces two sets of
+				      * produces eight sets of
 				      * quadrature points for each
 				      * face, in order to cope
 				      * possibly different
@@ -279,16 +279,15 @@ class QProjector
         static DataSetDescriptor cell ();
       
                                          /**
-                                          * Static function to
-                                          * generate an offset object
-                                          * for a given face of a cell
-                                          * with the given face
-                                          * orientation. This function
-                                          * of course is only allowed
-                                          * if <tt>dim>=2</tt>, and the
-                                          * face orientation is
-                                          * ignored if the space
-                                          * dimension equals 2.
+                                          * Static function to generate an
+                                          * offset object for a given face of a
+                                          * cell with the given face
+                                          * orientation, flip and rotation. This
+                                          * function of course is only allowed
+                                          * if <tt>dim>=2</tt>, and the face
+                                          * orientation, flip and rotation are
+                                          * ignored if the space dimension
+                                          * equals 2.
                                           *
                                           * The last argument denotes
                                           * the number of quadrature
@@ -303,19 +302,20 @@ class QProjector
         DataSetDescriptor
         face (const unsigned int face_no,
               const bool         face_orientation,
+              const bool         face_flip,
+              const bool         face_rotation,
               const unsigned int n_quadrature_points);
 
                                          /**
-                                          * Static function to
-                                          * generate an offset object
-                                          * for a given subface of a
-                                          * cell with the given face
-                                          * orientation. This function
-                                          * of course is only allowed
-                                          * if <tt>dim>=2</tt>, and the
-                                          * face orientation is
-                                          * ignored if the space
-                                          * dimension equals 2.
+                                          * Static function to generate an
+                                          * offset object for a given subface of
+                                          * a cell with the given face
+                                          * orientation, flip and rotation. This
+                                          * function of course is only allowed
+                                          * if <tt>dim>=2</tt>, and the face
+                                          * orientation, flip and rotation are
+                                          * ignored if the space dimension
+                                          * equals 2.
                                           *
                                           * The last argument denotes
                                           * the number of quadrature
@@ -331,6 +331,8 @@ class QProjector
         subface (const unsigned int face_no,
                  const unsigned int subface_no,
                  const bool         face_orientation,
+                 const bool         face_flip,
+                 const bool         face_rotation,
                  const unsigned int n_quadrature_points);
 
                                          /**
@@ -382,6 +384,25 @@ class QProjector
                                       * orientations.
                                       */
     static Quadrature<2> reflect (const Quadrature<2> &q);
+
+                                     /**
+                                      * Given a quadrature object in
+                                      * 2d, rotate all quadrature
+                                      * points by @p n_times * 90 degrees
+				      * counterclockwise
+                                      * and return them with their
+                                      * original weights.
+                                      *
+                                      * This function is necessary for
+                                      * projecting a 2d quadrature
+                                      * rule onto the faces of a 3d
+                                      * cube, since there we need all
+				      * rotations to account for
+				      * face_flip and face_rotation
+                                      * of non-standard faces.
+                                      */
+    static Quadrature<2> rotate (const Quadrature<2> &q,
+				 const unsigned int n_times);
 };
 
 /*@}*/
