@@ -59,7 +59,8 @@ tests_x = block_matrices \
 	project_*[0-9] \
 	minimal_cell_diameter \
 	maximal_cell_diameter \
-	union_triangulation
+	union_triangulation \
+	create_*
 
 # from above list of regular expressions, generate the real set of
 # tests
