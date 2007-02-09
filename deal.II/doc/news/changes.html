@@ -212,6 +212,36 @@ inconvenience this causes.
 
 <ol>
   <li> <p>
+       Extended: Up to now, in 3D only 'orientable' meshes could be used in
+       deal.II, i.e. all lines are in standard orientation and the faces can be
+       either in standard orientation or with a reversed normal. In order to
+       enable the treatment of all purely hexahedral meshes, this interface
+       (only the boolean flag <tt>face_orientation</tt> so far) has
+       been extended by new flags <tt>face_flip</tt> and <tt>face_rotation</tt>,
+       denoting a face which is rotated against the 'standard face' by 180 and 90
+       degrees, respectively. Furthermore, there is a new flag
+       <tt>line_orientation</tt> with obvious meaning. 
+		 <br> These flags have to be respected during creation and refinement of a
+		 triangulation, when projecting quadrature points to faces or when the dof
+		 indices on a cell are extracted. Furthermore, asking for vertices and
+		 lines of cells is in some cases a bit more complicated. The same applies,
+       for example, 
+		 to the extraction of the information, which child of a neighbor is behind
+		 a given subface. However, this infomation is supplied by various
+		 functions in <code class="class">GeometryInfo</code>. As a rule-of-thumb:
+		 if you want to use non-standard meshes, all occurances of
+		 <tt>face_orientation</tt> have to be supplemented by <tt>face_flip</tt>
+		 and <tt>face_rotation</tt>.
+       <br> In order to reduce the impact of possible bugs, the grid is still given to
+       <code class="class">GridReordering</code>, which now returns the original
+       connectivity if the reordering was not possible.
+       <br> A more detailed document concerning these topics will be available
+       in the future.
+		 <br>
+       (Tobias Leicht 2007/02/09)
+       </p>
+
+  <li> <p>
        New: a program <tt>reconfigure</tt> has been added to the
        deal.II main directory, which reruns <tt>configure</tt> with
        the sam command line arguments as last time.
