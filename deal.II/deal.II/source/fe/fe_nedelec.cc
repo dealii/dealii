@@ -24,9 +24,6 @@
 
 #include <sstream>
 
-//TODO: implement the adjust_quad_dof_index_for_face_orientation_table field,
-//and write a test similar to bits/face_orientation_and_fe_q_01
-
 
 DEAL_II_NAMESPACE_OPEN
 
@@ -61,6 +58,22 @@ FE_Nedelec<dim>::FE_Nedelec (const unsigned int degree)
 				   // on cell and face
   initialize_unit_support_points ();
   initialize_unit_face_support_points ();
+
+				   // finite element classes need to
+				   // initialize the
+				   // adjust_quad_dof_index... table. however,
+				   // for the current element, there are no
+				   // dofs on quads in 3d (i.e. in the
+				   // interior of a face), so there is nothing
+				   // to do
+  if (dim == 3)
+    {
+      Assert (this->dofs_per_quad == 0,
+	      ExcInternalError());
+      Assert (adjust_quad_dof_index_for_face_orientation_table.size()==
+	      this->dofs_per_quad,
+	      ExcInternalError());
+    }
 }
 
 
