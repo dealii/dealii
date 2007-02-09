@@ -710,9 +710,13 @@ namespace internal
                                           * single entry point to the
                                           * functionality of this
                                           * class.
+					  *
+					  * Returns, whether a consistent
+					  * orientation of lines was possible
+					  * for the given mesh.
                                           */
         static
-        void
+        bool
         orient_mesh (std::vector<CellData<3> > &incubes);
 
       private:
@@ -781,8 +785,11 @@ namespace internal
                                          /**
                                           * Orient all the edges of a
                                           * mesh.
+					  *
+					  * Returns, whether this action was
+					  * carried out successfully.
                                           */
-        void orient_edges ();
+        bool orient_edges ();
 
                                          /**
                                           * Given oriented edges,

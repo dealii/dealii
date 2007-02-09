@@ -1004,7 +1004,7 @@ namespace internal
 
 
     
-    void Orienter::orient_mesh (std::vector<CellData<3> > &incubes)
+    bool Orienter::orient_mesh (std::vector<CellData<3> > &incubes)
     {
       Orienter orienter (incubes);
       
@@ -1013,7 +1013,11 @@ namespace internal
       orienter.mesh.sanity_check ();
 
                                        // Orient the mesh
-      orienter.orient_edges ();
+
+				       // if not successful, break here, else go
+				       // on
+      if (!orienter.orient_edges ())
+	return false;
 
                                        // Now we have a bunch of oriented
                                        // edges int the structure we only
@@ -1025,6 +1029,8 @@ namespace internal
                                        // internal structure back into
                                        // their original location.
       orienter.mesh.export_to_deal_format (incubes);
+				       // reordering was successful
+      return true;
     }
 
 				     /**
@@ -1033,7 +1039,7 @@ namespace internal
 				      * cube is a rotated Deal.II
 				      * cube.
 				      */
-    void Orienter::orient_edges ()
+    bool Orienter::orient_edges ()
     {
 				       // While there are still cubes
 				       // to orient
@@ -1059,9 +1065,9 @@ namespace internal
                                                  // Cube doesn't
                                                  // have a
                                                  // contradiction
-                AssertThrow(cell_is_consistent(cur_posn),
-                            ExcGridOrientError("Mesh is Unorientable"));
-
+                if (!cell_is_consistent(cur_posn))
+		  return false;
+		
                                                  // If we needed to
                                                  // orient any edges
                                                  // in the current
@@ -1076,7 +1082,8 @@ namespace internal
                                              // (equivalence class
                                              // of edges)
             ++cur_edge_group;
-          }	
+          }
+      return true;
     }
 
 
@@ -1474,9 +1481,21 @@ GridReordering<3>::reorder_cells (std::vector<CellData<3> > &incubes)
 
   Assert (incubes.size() != 0,
 	  ExcMessage("List of elements to orient was of zero length"));
+
+				   // create a backup to use if GridReordering
+				   // was not successful
+  std::vector<CellData<3> > backup=incubes;
   
 				   // This does the real work
-  internal::GridReordering3d::Orienter::orient_mesh (incubes);
+  bool success=
+    internal::GridReordering3d::Orienter::orient_mesh (incubes);
+
+				   // if reordering was not successful use
+				   // original connectivity, otherwiese do
+				   // nothing (i.e. use the reordered
+				   // connectivity)
+  if (!success)
+    incubes=backup;
 }
 
 

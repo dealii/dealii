@@ -24,10 +24,11 @@ DEAL_II_NAMESPACE_OPEN
 
 
 /**
- * This class reorders the vertices of cells such that they meet the
- * requirements of the Triangulation class when creating
- * grids. This class is mainly used when reading in grids from files
- * and converting them to deal.II triangulations.
+ * This class reorders the vertices of cells such that they meet the standard
+ * requirements of the Triangulation class when creating grids, i.e. all lines
+ * have a unique orientation with respect to all neighboring cells. This class
+ * is mainly used when reading in grids from files and converting them to
+ * deal.II triangulations.
  *
  * Note: In contrast to the rest of the deal.II library this class
  * uses the old deal.II numbering scheme, which was used up to deal.II
@@ -169,8 +170,13 @@ DEAL_II_NAMESPACE_OPEN
  * clockwise, and axially upward. However, if before joining the two
  * ends of the string of cells, the string is twisted by 180 degrees,
  * then no such orientation is possible any more, as can easily be
- * checked. In effect, some meshes cannot be used in deal.II,
- * unfortunately.
+ * checked. In effect, some meshes could not be used in deal.II.
+ * In order to overcome this problem, the <code>face_rotation</code>, 
+ * <code>face_flip</code> and <code>line_orientation</code> flags have
+ * been introduced. With these, it is possible to treat all purely hexahedral
+ * meshes. However, in order to reduce the effect of possible bugs, it should
+ * still be tried to reorder a grid. Only if this procedure fails, the original
+ * connectivity information should be used.
  *
  *
  * <h3>Examples of problems</h3>
@@ -648,6 +654,10 @@ class GridReordering
 				      *  the general documentation of
 				      *  this class for dim=2 and 3
 				      *  and doing nothing for dim=1.
+				      *
+				      *  If a consistent reordering is not
+				      *  possible in dim=3, the original
+				      *  connectivity data is restored.
 				      */
     static void reorder_cells (std::vector<CellData<dim> > &original_cells);
 
@@ -658,12 +668,12 @@ class GridReordering
 				      * the inverse of the orientation
 				      * required by deal.II.
 				      *
-				      * In 3d this function checks
+				      * In 2d and 3d this function checks
 				      * whether all cells have
 				      * negative or positiv
 				      * measure/volume. In the former
 				      * case, all cells are inverted.
-				      * It does nothing in 1 and 2d.
+				      * It does nothing in 1d.
 				      *
 				      * The invertion of cells might
 				      * also work when only a subset
