@@ -106,7 +106,10 @@ void EvaluateNormal2 (DoFHandler<2> *dof_handler,
 	    {
 		const QProjector<2>::DataSetDescriptor offset
 		    = (QProjector<2>::DataSetDescriptor::
-		       face (f, cell->face_orientation(f),
+		       face (f,
+			     cell->face_orientation(f),
+			     cell->face_flip(f),
+			     cell->face_rotation(f),
 			     quad.n_quadrature_points));
 		fe_v_face.reinit (cell, f);
 		
@@ -116,7 +119,10 @@ void EvaluateNormal2 (DoFHandler<2> *dof_handler,
 
 		const QProjector<2>::DataSetDescriptor offset_n
 		    = (QProjector<2>::DataSetDescriptor::
-		       face (neighbor, cell_n->face_orientation(neighbor),
+		       face (neighbor,
+			     cell_n->face_orientation(neighbor),
+			     cell_n->face_flip(neighbor),
+			     cell_n->face_rotation(neighbor),
 			     quad.n_quadrature_points));
 
 		// Get values from solution vector (For Trap.Rule)
