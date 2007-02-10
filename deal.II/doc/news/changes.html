@@ -735,6 +735,17 @@ inconvenience this causes.
 <h3>lac</h3>
 
 <ol>
+  <li> <p>Fixed: The <code class="member">SparseDirectMA27</code> class allows
+       to run the sparse direct solver as a separate program (the
+       <code>detached_ma27</code> program) rather than as part of the current
+       program in order to be able to run several instances of it in parallel
+       during multithreaded computations. However, the destructor of the <code
+       class="member">SparseDirectMA27</code> class had a bug that when using
+       this detached mode led to a segmentation fault. This is now fixed.
+       <br>
+       (WB 2007/02/09)
+       </p>
+
   <li> <p>Improved: A simple <code class="member">print_formatted</code> 
        function has been added to <code class="class">SparseMatrixEZ</code>.
        <br>

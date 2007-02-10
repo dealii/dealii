@@ -2,7 +2,7 @@
 //    $Id$
 //    Version: $Name$
 //
-//    Copyright (C) 2001, 2002, 2003, 2004, 2005, 2006 by the deal.II authors
+//    Copyright (C) 2001, 2002, 2003, 2004, 2005, 2006, 2007 by the deal.II authors
 //
 //    This file is subject to QPL and may not be  distributed
 //    without copyright and license information. Please refer
@@ -362,10 +362,24 @@ namespace CommunicationsLog
   void remove_history (const pid_t &child_pid) 
   {
     Threads::ThreadMutex::ScopedLock lock (list_access_lock);
-    for (std::list<Record>::iterator i=communication_log.begin();
-         i!=communication_log.end(); ++i)
-      if (i->child_pid == child_pid)
-        communication_log.erase (i);
+
+				     // go through the list of records and
+				     // delete those that correspond to the
+				     // current pid. note that list::erase
+				     // invalidates iterators, so we have to
+				     // re-initialize them each time we move
+				     // from one to the next
+    unsigned int index=0;
+    while (index < communication_log.size())
+      {
+	std::list<Record>::iterator i = communication_log.begin();
+	std::advance (i, index);
+
+	if (i->child_pid == child_pid)
+	  communication_log.erase (i);
+	else
+	  ++index;
+      }
   }
 }
 
@@ -548,11 +562,11 @@ SparseDirectMA27::~SparseDirectMA27()
                                          // next close down client
         Threads::ThreadMutex::ScopedLock lock (detached_mode_data->mutex);
         write (detached_mode_data->server_client_pipe[1], "7", 1);
-        
+
                                          // then also delete data
         delete detached_mode_data;
         detached_mode_data = 0;
-      };
+      }
 }
 
 
