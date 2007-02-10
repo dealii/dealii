@@ -244,146 +244,6 @@ namespace HSL
 
 
 
-/**
- * Namespace implementing a number of functions that are used to
- * record the communication between master and detached
- * processes. This is mainly for debugging purposes.
- */
-namespace CommunicationsLog
-{
-                                   /**
-                                    * Type denoting the direction of a
-                                    * recorder communication.
-                                    */
-  enum Direction { put, get };
-
-                                   /**
-                                    * One record of a recorded
-                                    * communication.
-                                    */
-  struct Record 
-  {
-      pid_t                 child_pid;
-      Direction             direction;
-      const std::type_info* type;
-      unsigned int          count;
-      unsigned int          scheduled_bytes;
-      unsigned int          completed_bytes;
-      std::string           description;
-
-                                       /**
-                                        * Constructor
-                                        */
-      Record (const pid_t           child_pid,
-              const Direction       direction,
-              const std::type_info *type,
-              const unsigned int    count,
-              const  unsigned int   scheduled_bytes,
-              const unsigned int    completed_bytes,
-              const std::string    &description)
-                      :
-                      child_pid (child_pid),
-                      direction (direction),
-                      type (type),
-                      count (count),
-                      scheduled_bytes (scheduled_bytes),
-                      completed_bytes (completed_bytes),
-                      description (description)
-        {}
-  };
-
-                                   /**
-                                    * The object in which we store the
-                                    * recorded communication, and the
-                                    * lock that is used to access it,
-                                    * since accesses may happen from
-                                    * more than one thread at the same
-                                    * time.
-                                    */
-  std::list<Record> communication_log;
-  Threads::ThreadMutex list_access_lock;
-
-
-                                   /**
-                                    * Record a sent or received
-                                    * message
-                                    */
-  template <typename T>
-  void record_communication (const pid_t        child_pid,
-			     const Direction    direction,
-                             const unsigned int count,
-                             const unsigned int completed_bytes,
-                             const std::string &descr)
-  {
-    const Record record(child_pid, direction, &typeid(T), count,
-			sizeof(T)*count, completed_bytes, descr);
-    Threads::ThreadMutex::ScopedLock lock (list_access_lock);
-    communication_log.push_back (record);
-  }
-
-
-                                   /**
-                                    * List all the communication that
-                                    * has happened with presently
-                                    * active detached programs.
-                                    */
-  void list_communication (const pid_t /*child_pid*/)
-  {
-    Threads::ThreadMutex::ScopedLock lock (list_access_lock);
-    
-    std::cerr << "++++++++++++++++++++++++++++++" << std::endl
-              << "Communication log history:" << std::endl;
-    
-    for (std::list<Record>::const_iterator i=communication_log.begin();
-         i!=communication_log.end(); ++i)
-      std::cerr << "++ " << i->child_pid << ' '
-                << (i->direction == put ? "put" : "get")
-                << " "
-                << i->count << " objects of type "
-                << i->type->name()
-                << ", " << i->completed_bytes
-                << " of " << i->scheduled_bytes
-                << " bytes completed, description="
-                << i->description
-                << std::endl;
-    std::cerr << "++++++++++++++++++++++++++++++" << std::endl;
-  }
-
-
-                                   /**
-                                    * If all transactions with a
-                                    * detached slave have been
-                                    * finished successfully, remove
-                                    * these communications from the
-                                    * logs, using this function, to
-                                    * make log transcripts simpler
-                                    * readable.
-                                    */
-  void remove_history (const pid_t &child_pid) 
-  {
-    Threads::ThreadMutex::ScopedLock lock (list_access_lock);
-
-				     // go through the list of records and
-				     // delete those that correspond to the
-				     // current pid. note that list::erase
-				     // invalidates iterators, so we have to
-				     // re-initialize them each time we move
-				     // from one to the next
-    unsigned int index=0;
-    while (index < communication_log.size())
-      {
-	std::list<Record>::iterator i = communication_log.begin();
-	std::advance (i, index);
-
-	if (i->child_pid == child_pid)
-	  communication_log.erase (i);
-	else
-	  ++index;
-      }
-  }
-}
-
-
 
 namespace 
 {
@@ -395,7 +255,6 @@ namespace
   {
     std::cerr << "+++++ detached_ma27 driver(" << child << "): " << text
               << std::endl;
-    CommunicationsLog::list_communication (child);
     std::abort ();
   }
 
@@ -413,7 +272,6 @@ namespace
     std::cerr << "+++++ detached_ma27 driver(" << child << "): " << text
               << " code1=" << t1 << ", code2=" << t2
               << std::endl;
-    CommunicationsLog::list_communication (child);
     std::abort ();
   }
 }
@@ -459,7 +317,7 @@ struct SparseDirectMA27::DetachedModeData
     template <typename T>
     void put (const T *t,
               const size_t N,
-              const char *debug_info) const
+	      const char * /*debug_info*/) const
       {
         unsigned int count = 0;
         while (count < sizeof(T)*N)
@@ -480,10 +338,6 @@ struct SparseDirectMA27::DetachedModeData
           };
         
         std::fflush (NULL);
-        CommunicationsLog::
-          record_communication<T> (child_pid,
-                                   CommunicationsLog::put,
-                                   N, count, debug_info);
       }
 
     
@@ -495,7 +349,9 @@ struct SparseDirectMA27::DetachedModeData
                                       * communication
                                       */
     template <typename T>
-    void get (T *t, const size_t N, const char *debug_info) const
+    void get (T *t,
+	      const size_t N,
+	      const char * /*debug_info*/) const
       {
         unsigned int count = 0;
         while (count < sizeof(T)*N)
@@ -511,12 +367,7 @@ struct SparseDirectMA27::DetachedModeData
               die ("error on client side in 'get'", ret, errno, child_pid);
 
             count += ret;
-          };
-        
-        CommunicationsLog::
-          record_communication<T> (child_pid,
-                                   CommunicationsLog::get,
-                                   N, count, debug_info);
+          }
       }
 };
 
@@ -551,15 +402,7 @@ SparseDirectMA27::~SparseDirectMA27()
   if (detached_mode)
     if (detached_mode_data != 0)
       {
-                                         // since everything went fine
-                                         // with this client, remove
-                                         // the communication it
-                                         // performed from the list of
-                                         // communications we have
-                                         // stored
-        CommunicationsLog::remove_history (detached_mode_data->child_pid);
-
-                                         // next close down client
+                                         // close down client
         Threads::ThreadMutex::ScopedLock lock (detached_mode_data->mutex);
         write (detached_mode_data->server_client_pipe[1], "7", 1);
 
