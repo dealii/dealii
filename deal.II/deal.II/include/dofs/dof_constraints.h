@@ -2,7 +2,7 @@
 //    $Id$
 //    Version: $Name$
 //
-//    Copyright (C) 1998, 1999, 2000, 2001, 2002, 2003, 2004, 2005, 2006 by the deal.II authors
+//    Copyright (C) 1998, 1999, 2000, 2001, 2002, 2003, 2004, 2005, 2006, 2007 by the deal.II authors
 //
 //    This file is subject to QPL and may not be  distributed
 //    without copyright and license information. Please refer
@@ -1041,9 +1041,8 @@ ConstraintMatrix::add_line (const unsigned int line)
 
   
   
-				   // check whether line already
-				   // exists; it may, but then we need
-				   // can just quit
+				   // check whether line already exists; it
+				   // may, in which case we can just quit
   if ((line < constraint_line_exists.size())
       &&
       (constraint_line_exists[line] == true))
