@@ -5,7 +5,7 @@
   <link href="../screen.css" rel="StyleSheet">
   <title>The deal.II news page</title>
   <meta name="author" content="the deal.II authors <authors@dealii.org>">
-  <meta name="copyright" content="Copyright (C) 2000, 2001, 2002, 2003, 2004, 2005, 2006 by the deal.II authors">
+  <meta name="copyright" content="Copyright (C) 2000, 2001, 2002, 2003, 2004, 2005, 2006, 2007 by the deal.II authors">
   <meta name="date" content="$Date$">
   <meta name="keywords" content="deal.II">
   <meta name="svn_id" content="$Id$">
@@ -32,6 +32,17 @@
     <a href="changes.html">here.</a></p>
 
     <dl>
+      <dt>
+          <strong>2007/02/09: Support for previously unorientable meshes</strong>
+      </dt>
+      <dd>
+          Up to now, in 3D only 'orientable' meshes could be used in
+          deal.II, where all lines are in standard orientation and the
+          faces can be either in standard orientation or with a
+          reversed normal. This has been generalized such that now all
+          hexahedral meshes can be used.
+      </dd>
+
       <dt>
           <strong>2006/10/30: step-21 is finished</strong>
       </dt>
