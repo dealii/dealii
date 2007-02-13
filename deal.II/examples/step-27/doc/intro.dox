@@ -1,2 +1,48 @@
 <a name="Intro"></a>
 <h1>Introduction</h1>
+
+<h3>A simple indicator for smoothness</h3>
+
+One of the central pieces of the adaptive finite element method is that we
+inspect the computed solution (a posteriori) with an indicator that tells us
+which are the cells where the error is largest, and then refine them. In many
+of the other tutorial programs, we use the KellyErrorEstimator class to get an
+indication of the size of the error on a cell, although we also discuss more
+complicated strategies in some programs, most importantly in @ref step_14
+"step-14". 
+
+In any case, as long as the decision is only "refine this cell" or "do not
+refine this cell", the actual refinement step is not particularly
+challenging. However, here we have a code that is capable of hp refinement,
+i.e. we suddenly have two choices whenever we detect that the error on a
+certain cell is too large for our liking: we can refine the cell by splitting
+it into several smaller ones, or we can increase the polynomial degree of the
+shape functions used on it. How do we know which is the more promising
+strategy? 
+
+In short, the question does not appear to be settled in the literature at this
+time. There are a number of more or less complicated schemes that address it,
+but there is nothing like the KellyErrorEstimator that is universally accepted
+as a good indicator of the error. Most proposals use the fact that it is
+beneficial to increase the polynomial degree whenever the solution is locally
+smooth whereas it is better to refine the mesh wherever it is rough. However,
+the questions of how to determine the local smoothness of the solution as well
+as the decision when a solution is smooth enough to allow for an increase in
+$p$ are certainly big and important ones.
+
+We do not intend to enter a sophisticated proposal into the fray about answer
+to the general question. However, to demonstrate our approach to hp finite
+elements, we need a simple indicator that does generate some useful
+information. Our approach here is simple: for a function $u(x)$ to be in the
+Sobolev space $H^s(K)$ on a cell $K$, it has to satisfy the condition
+@f[
+	\int_K |\nabla^s u(x)|^2 \; dx < \infty.
+@f]
+Assuming that the cell $K$ is not degenerate, i.e. that the mapping from the
+unit cell to cell $K$ is sufficiently regular, above condition is of course
+equivalent to
+@f[
+	\int_{\hat K} |\nabla^s \hat u(\hat x)|^2 \; dx < \infty
+@f]
+where $\hat u(\hat x)$ is the function $u(x)$ mapped back onto the unit cell
+$\hat K$.
