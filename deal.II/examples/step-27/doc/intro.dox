@@ -30,7 +30,10 @@ the questions of how to determine the local smoothness of the solution as well
 as the decision when a solution is smooth enough to allow for an increase in
 $p$ are certainly big and important ones.
 
-We do not intend to enter a sophisticated proposal into the fray about answer
+
+<h4>The idea</h4>
+
+We do not intend to enter a sophisticated proposal into the fray about answers
 to the general question. However, to demonstrate our approach to hp finite
 elements, we need a simple indicator that does generate some useful
 information. Our approach here is simple: for a function $u(x)$ to be in the
@@ -45,4 +48,180 @@ equivalent to
 	\int_{\hat K} |\nabla^s \hat u(\hat x)|^2 \; dx < \infty
 @f]
 where $\hat u(\hat x)$ is the function $u(x)$ mapped back onto the unit cell
-$\hat K$.
+$\hat K$. From here, we can do the following: first, let us define the
+Fourier series of $\hat u$ as
+@f[
+	\hat U_{\vec k}
+	= \frac 1{(2\pi)^{d/2}} \int_{\hat K} e^{i\vec k \cdot \vec x} \hat u(\hat x) dx
+@f]
+with Fourier vectors $\vec k=(k_x,k_y)$ in 2d, $\vec k=(k_x,k_y,k_z)$
+in 3d, etc, and $k_x,k_y,k_z=0,\pi,2\pi,3\pi,\ldots$. If we re-compose $\hat u$
+from $\hat U$ using the formula
+@f[
+	\hat u(\vec x) 
+	= \frac 1{(2\pi)^{d/2}} \sum_{\vec k} e^{-i\vec k \cdot \vec x} \hat U_{\hat k} dx,
+@f]
+then it becomes clear that we can write the $H^s$ norm of $\hat u$ as
+@f[
+	\int_K |\nabla^s u(x)|^2 \; dx
+	=
+	\frac 1{(2\pi)^d}
+	\int_K 
+	\left|
+	  \sum_{\vec k} |\vec k|^s e^{-i\vec k \cdot \vec x} \hat U_{\hat k}
+        \right|^2 \; dx
+	=
+	\sum_{\vec k} 
+	  |\vec k|^{2s}
+	  |\hat U_{\hat k}|^2.
+@f]
+In other words, if this norm is to be finite (i.e. for $\hat u(\vec
+x)$ to be in $H^s(\hat K)$), we need that
+@f[
+	|\hat U_{\hat k}| = {\cal O}\left(|\vec k|^{-\left(s+1/2+\frac{d-1}{2}+\epsilon\right)}\right).
+@f]
+Put differently: the higher regularity $s$ we want, the faster the
+Fourier coefficients have to go to zero. (If you wonder where the
+additional exponent $\frac{d-1}2$ comes from: we would like to make
+use of the fact that $\sum_l a_l < \infty$ if the sequence $a_l =
+{\cal O}(l^{-1-\epsilon})$ for any $\epsilon>0$. The problem is that we
+here have a summation not only over a single variable, but over all
+the integer multiples of $\pi$ that are located inside the
+$d$-dimensional sphere, because we have vector components $k_x, k_y,
+\ldots$. In the same way as we prove that the sequence $a_l$ above
+converges by replacing the sum by an integral over the entire line, we
+can replace our $d$-dimensional sum by an integral over
+$d$-dimensional space. Now we have to note that between distance $|k|$
+and $|k|+d|k|$, there are, up to a constant, $|k|^{d-1}$ modes, in
+much the same way as we can transform the volume element $dx\;dy$ into
+$2\pi r\; dr$. Consequently, it is no longer $|\vec k|^{2s}|\hat
+U_{\hat k}|^2$ that has to decay as ${\cal O}(k^{-1-\epsilon})$, but
+it is in fact $|\vec k|^{2s}|\hat U_{\hat k}|^2 |k|^{d-1}$. A
+comparison of exponents yields the result.) 
+
+We can turn this around: Assume we are given a function $\hat u$ of unknown
+smoothness. Let us compute its Fourier coefficients $\hat U_{\vec k}$
+and see how fast they decay. If they decay as
+@f[
+	|\hat U_{\hat k}| = {\cal O}(|\vec k|^{-\mu-\epsilon}),
+@f]
+then consequently the function we had here was in $H^{\mu-d/2}$.
+
+
+<h4>What we have to do</h4>
+
+So what do we have to do to estimate the local smoothness of $u(x)$ on
+a cell $K$? Clearly, the first step is to compute the Fourier series
+of our solution. Fourier series being infinite series, we simplify our
+task by only computing the first few terms of the series, such that
+$|\vec k|\le N$ with a cut-off $N$. Computing this series is not
+particularly hard: from the definition
+@f[
+	\hat U_{\vec k}
+	= \frac 1{(2\pi)^{d/2}} \int_{\hat K} e^{i\vec k \cdot \vec x} \hat u(\hat x) dx
+@f]
+we see that we can compute the coefficient $\hat U_{\vec k}$ as
+@f[
+	\hat U_{\vec k}
+	= \frac 1{(2\pi)^{d/2}} 
+          \sum_{i=0}^{\textrm{dofs per cell}}
+          \left[\int_{\hat K} e^{i\vec k \cdot \vec x} \hat \varphi_i(\hat x)
+	  dx \right] u_i,
+@f]
+where $u_i$ is the value of the $i$th degree of freedom on this
+cell. In other words, we can write it as a matrix-vector product
+@f[
+	\hat U_{\vec k}
+	= {\cal F}_{\vec k,i} u_i,
+@f]
+with the matrix
+@f[
+	{\cal F}_{\vec k,i}
+	= \frac 1{(2\pi)^{d/2}} 
+	\int_{\hat K} e^{i\vec k \cdot \vec x} \hat \varphi_i(\hat x) dx.
+@f]
+This matrix is easily computed for a given number of shape functions
+$\varphi_i$ and Fourier modes $N$. Consequently, finding the
+coefficients $\hat U_{\vec k}$ is a rather trivial job.
+
+The next task is that we have to estimate how fast these coefficients
+decay with $|\vec k|$. The problem is that, of course, we have only
+finitely many of these coefficients in the first place. In other
+words, the best we can do is to fit a function $\alpha |\vec
+k|^{-\mu}$ to our data points $\hat U_{\vec k}$, for example by
+determining $\alpha,\mu$ via a least-squares procedure:
+@f[
+	\min_{\alpha,\mu}
+	\frac 12 \sum_{\vec k, |\vec k|\le N}
+	\left( |\hat U_{\vec k}| - \alpha |\vec k|^{-\mu}\right)^2
+@f]
+However, the problem with this is that it leads to a nonlinear
+problem, a fact that we would like to avoid. On the other hand, we can
+transform the problem into a simpler one if we try to fit the
+logarithm of our coefficients to the logarithm of $\alpha |\vec
+k|^{-\mu}$, like this:
+@f[
+	\min_{\alpha,\mu}
+	Q(\alpha,\mu) = 
+	\frac 12 \sum_{\vec k, |\vec k|\le N}
+	\left( \ln |\hat U_{\vec k}| - \ln (\alpha |\vec k|^{-\mu})\right)^2.
+@f]
+Using the usual facts about logarithms, we see that this yields the
+problem 
+@f[
+	\min_{\beta,\mu}
+	Q(\beta,\mu) = 
+	\frac 12 \sum_{\vec k, |\vec k|\le N}
+	\left( \ln |\hat U_{\vec k}| - \beta + \mu |\vec k|\right)^2,
+@f]
+where $\beta=\ln \alpha$. This is now a problem for which the
+optimality conditions $\frac{\partial Q}{\partial\beta}=0,
+\frac{\partial Q}{\partial\mu}=0$, are linear in $\beta,\mu$. We can
+write these conditions as follows:
+@f[
+	\begin{array}{cc}
+	\sum_{\vec k, |\vec k|\le N} 1 &
+	\sum_{\vec k, |\vec k|\le N} \ln |\vec k| 
+	\\
+	\sum_{\vec k, |\vec k|\le N} \ln |\vec k| &
+	\sum_{\vec k, |\vec k|\le N} (\ln |\vec k|)^2 
+	\end{array}
+	\begin{array}{c}
+	\beta \\ -\mu
+	\end{array}
+	=
+	\begin{array}{c}
+	\sum_{\vec k, |\vec k|\le N} \ln |\hat U_{\vec k}|
+	\\
+	\sum_{\vec k, |\vec k|\le N} \ln |\hat U_{\vec k}| \ln |\vec k| 
+	\end{array}
+@f]
+This linear system is readily inverted to yield
+@f[
+	\beta = 
+	\frac 1{\left(\sum_{\vec k, |\vec k|\le N} 1\right)
+                \left(\sum_{\vec k, |\vec k|\le N} (\ln |\vec k|)^2\right)
+		-\left(\sum_{\vec k, |\vec k|\le N} \ln |\vec k|\right)^2}
+	\left[
+	  \left(\sum_{\vec k, |\vec k|\le N} (\ln |\vec k|)^2\right)
+	  \left(\sum_{\vec k, |\vec k|\le N} \ln |\hat U_{\vec k}|\right)
+	  -
+	  \left(\sum_{\vec k, |\vec k|\le N} \ln |\vec k|\right)
+	  \left(\sum_{\vec k, |\vec k|\le N} \ln |\hat U_{\vec k}| \ln |\vec k| \right)
+	\right]
+@f]
+and
+@f[
+	\mu = 
+	\frac 1{\left(\sum_{\vec k, |\vec k|\le N} 1\right)
+                \left(\sum_{\vec k, |\vec k|\le N} (\ln |\vec k|)^2\right)
+		-\left(\sum_{\vec k, |\vec k|\le N} \ln |\vec k|\right)^2}
+	\left[
+	  -
+	  \left(\sum_{\vec k, |\vec k|\le N} \ln |\vec k|\right)
+	  \left(\sum_{\vec k, |\vec k|\le N} \ln |\hat U_{\vec k}|\right)
+	  +
+	  \left(\sum_{\vec k, |\vec k|\le N} 1\right)
+	  \left(\sum_{\vec k, |\vec k|\le N} \ln |\hat U_{\vec k}| \ln |\vec k| \right)
+	\right].
+@f]
