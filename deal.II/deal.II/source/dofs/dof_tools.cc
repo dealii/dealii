@@ -2582,6 +2582,22 @@ void DoFTools::distribute_cell_to_dof_vector (
 				   // for this at every single place
 				   // equally well
   const bool consider_components = (n_components(dof_handler) != 1);
+
+				   // zero out the components that we
+				   // will touch
+  if (consider_components == false)
+    dof_data = 0;
+  else
+    {
+      std::vector<bool> component_dofs (dof_handler.n_dofs());
+      std::vector<bool> component_mask (dof_handler.get_fe().n_components(),
+					false);
+      component_mask[component] = true;
+      DoFTools::extract_dofs (dof_handler, component_mask, component_dofs);
+
+      for (unsigned int i=0; i<dof_data.size(); ++i)
+	dof_data(i) = 0;
+    }
   
 				   // count how often we have added a value
 				   // in the sum for each dof
@@ -2612,8 +2628,8 @@ void DoFTools::distribute_cell_to_dof_vector (
 					     // note that we added another
 					     // summand
 	    ++touch_count[dof_indices[i]];
-	  };
-    };
+	  }
+    }
   
 				   // compute the mean value on all the
 				   // dofs by dividing with the number
@@ -2628,7 +2644,7 @@ void DoFTools::distribute_cell_to_dof_vector (
 	      ExcInternalError());
       if (touch_count[i] != 0)
 	dof_data(i) /=  touch_count[i];
-    };
+    }
 }
 
 
@@ -2744,6 +2760,124 @@ DoFTools::extract_dofs (
         selected_dofs[indices[i]] = local_selected_dofs[i];
     }
 }
+
+
+
+template <int dim>
+void
+DoFTools::extract_dofs (
+  const hp::DoFHandler<dim>   &/*dof*/,
+  const std::vector<bool> &/*component_select*/,
+  std::vector<bool>       &/*selected_dofs*/,
+  const bool               /*count_by_blocks*/)
+{
+  Assert (false, ExcNotImplemented());
+/*  
+  const FiniteElement<dim> &fe = dof.get_fe();
+  
+  if (count_by_blocks == true)
+    {
+      Assert(component_select.size() == fe.n_blocks(),
+	     ExcDimensionMismatch(component_select.size(), fe.n_blocks()));
+    }
+  else
+    {
+      Assert(component_select.size() == n_components(dof),
+	     ExcDimensionMismatch(component_select.size(), n_components(dof)));
+    }
+  
+  Assert(selected_dofs.size() == dof.n_dofs(),
+	 ExcDimensionMismatch(selected_dofs.size(), dof.n_dofs()));
+
+                                   // two special cases: no component
+                                   // is selected, and all components
+                                   // are selected; both rather
+                                   // stupid, but easy to catch
+  if (std::count (component_select.begin(), component_select.end(), true)
+      == 0)
+    {
+      std::fill_n (selected_dofs.begin(), dof.n_dofs(), false);
+      return;
+    };
+  if (std::count (component_select.begin(), component_select.end(), true)
+      == static_cast<signed int>(component_select.size()))
+    {
+      std::fill_n (selected_dofs.begin(), dof.n_dofs(), true);
+      return;
+    };
+  
+
+				   // preset all values by false
+  std::fill_n (selected_dofs.begin(), dof.n_dofs(), false);
+
+                                   // next set up a table for the
+                                   // degrees of freedom on each of
+                                   // the cells whether it is
+                                   // something interesting or not
+  std::vector<bool> local_selected_dofs (fe.dofs_per_cell, false);
+  for (unsigned int i=0; i<fe.dofs_per_cell; ++i)
+    if (count_by_blocks == true)
+      local_selected_dofs[i]
+        = component_select[fe.system_to_block_index(i).first];
+    else
+      if (fe.is_primitive(i))
+	local_selected_dofs[i]
+	  = component_select[fe.system_to_component_index(i).first];
+      else
+					 // if this shape function is
+					 // not primitive, then we have
+					 // to work harder. we have to
+					 // find out whether _any_ of
+					 // the vector components of
+					 // this element is selected or
+					 // not
+					 //
+					 // to do so, get the first and
+					 // last vector components of
+					 // the base element to which
+					 // the local dof with index i
+					 // belongs
+	{
+	  unsigned int first_comp = 0;
+	  const unsigned int this_base = fe.system_to_base_index(i).first.first;
+	  const unsigned int this_multiplicity
+	    = fe.system_to_base_index(i).first.second;
+	  
+	  for (unsigned int b=0; b<this_base; ++b)
+	    first_comp += fe.base_element(b).n_components() *
+			  fe.element_multiplicity(b);
+	  for (unsigned int m=0; m<this_multiplicity; ++m)
+	    first_comp += fe.base_element(this_base).n_components();
+	  const unsigned int end_comp = first_comp +
+					fe.base_element(this_base).n_components();
+	  
+	  Assert (first_comp < fe.n_components(), ExcInternalError());
+	  Assert (end_comp <= fe.n_components(),  ExcInternalError());
+	  
+					   // now check whether any of
+					   // the components in between
+					   // is set
+	  for (unsigned int c=first_comp; c<end_comp; ++c)
+	    if (component_select[c] == true)
+	      {
+		local_selected_dofs[i] = true;
+		break;
+	      }
+	}
+  
+                                   // then loop over all cells and do
+                                   // the work
+  std::vector<unsigned int> indices(fe.dofs_per_cell);
+  typename DoFHandler<dim>::active_cell_iterator c;
+  for (c=dof.begin_active(); c!=dof.end(); ++ c)
+    {
+      c->get_dof_indices(indices);
+      for (unsigned int i=0; i<fe.dofs_per_cell; ++i)
+        selected_dofs[indices[i]] = local_selected_dofs[i];
+    }
+*/  
+}
+
 
 
 template<int dim>
@@ -4940,6 +5074,10 @@ DoFTools::distribute_cell_to_dof_vector<hp::DoFHandler<deal_II_dimension> >
 
 template void DoFTools::extract_dofs<deal_II_dimension>
 (const DoFHandler<deal_II_dimension>&,
+ const std::vector<bool>&, std::vector<bool>&, bool);
+
+template void DoFTools::extract_dofs<deal_II_dimension>
+(const hp::DoFHandler<deal_II_dimension>&,
  const std::vector<bool>&, std::vector<bool>&, bool);
 
 template void DoFTools::extract_level_dofs<deal_II_dimension>

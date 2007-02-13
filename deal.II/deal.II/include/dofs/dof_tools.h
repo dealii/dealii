@@ -690,22 +690,22 @@ class DoFTools
 				      * It is assumed that the number
 				      * of elements in @p cell_data
 				      * equals the number of active
-				      * cells. The size of
-				      * @p dof_data is adjusted to
-				      * the right size.
+				      * cells and that the number of
+				      * elements in @p dof_data equals
+				      * <tt>dof_handler.n_dofs()</tt>.
 				      *
 				      * Note that the input vector may
 				      * be a vector of any data type
 				      * as long as it is convertible
 				      * to @p double.  The output
 				      * vector, being a data vector on
-				      * the grid, always consists of
+				      * a DoF handler, always consists of
 				      * elements of type @p double.
 				      *
 				      * In case the finite element
 				      * used by this DoFHandler
 				      * consists of more than one
-				      * component, you should give
+				      * component, you need to specify
 				      * which component in the output
 				      * vector should be used to store
 				      * the finite element field in;
@@ -716,11 +716,6 @@ class DoFTools
 				      * components of the vector
 				      * remain untouched, i.e. their
 				      * contents are not changed.
-				      *
-				      * It is assumed that the output
-				      * vector @p dof_data already
-				      * has the right size,
-				      * i.e. n_dofs() elements.
 				      *
 				      * This function cannot be used
 				      * if the finite element in use
@@ -795,6 +790,17 @@ class DoFTools
 		  std::vector<bool>       &selected_dofs,
 		  const bool               blocks = false);
 
+				     /**
+				      * The same function as above,
+				      * but for a hp::DoFHandler.
+				      */
+    template <int dim>
+    static void
+    extract_dofs (const hp::DoFHandler<dim>   &dof_handler,
+		  const std::vector<bool> &select,
+		  std::vector<bool>       &selected_dofs,
+		  const bool               blocks = false);
+    
 				     /**
 				      * Do the same thing as
 				      * extract_dofs() for one level

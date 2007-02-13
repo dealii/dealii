@@ -1016,6 +1016,14 @@ inconvenience this causes.
 <h3>deal.II</h3>
 
 <ol>
+   <li> <p>Fixed: The function <code class="class">DoFTools</code>::<code 
+       class="member">distribute_cell_to_dof_vector</code> produced
+       wrong results if the vector into which the result is to be
+       stored contained nonzero values. This is now fixed.
+       <br>
+       (Rohallah Tavakoli, WB 2007/02/13)
+       </p>
+
    <li> <p>Fixed: A local variable in
        <code>TriaAccessor&lt;3,3&gt;::measure</code> and <code
        class="member"> erroneously marked as static could lead to
