@@ -2771,6 +2771,7 @@ DoFTools::extract_dofs (
   std::vector<bool>       &/*selected_dofs*/,
   const bool               /*count_by_blocks*/)
 {
+//TODO[WB]: implement this function  
   Assert (false, ExcNotImplemented());
 /*  
   const FiniteElement<dim> &fe = dof.get_fe();
