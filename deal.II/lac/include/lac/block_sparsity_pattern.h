@@ -152,7 +152,7 @@ class BlockSparsityPatternBase : public Subscriptor
 				      */
     void reinit (const unsigned int n_block_rows,
 		 const unsigned int n_block_columns);
-    
+
 				     /**
 				      * Copy operator. For this the
 				      * same holds as for the copy
@@ -534,7 +534,7 @@ class BlockSparsityPattern : public BlockSparsityPatternBase<SparsityPattern>
  *
  * @until copy
  *
- * @author Wolfgang Bangerth, 2000, 2001, example by Guido Kanschat, 2006
+ * @author Wolfgang Bangerth, 2000, 2001, Guido Kanschat, 2006, 2007
  */
 class CompressedBlockSparsityPattern : public BlockSparsityPatternBase<CompressedSparsityPattern>
 {
@@ -577,6 +577,30 @@ class CompressedBlockSparsityPattern : public BlockSparsityPatternBase<Compresse
     CompressedBlockSparsityPattern (const std::vector<unsigned int>& row_block_sizes,
 				    const std::vector<unsigned int>& col_block_sizes);
     
+				     /**
+				      * Resize the matrix to a tensor
+				      * product of matrices with
+				      * dimensions defined by the
+				      * arguments.
+				      *
+				      * The matrix will have as many
+				      * block rows and columns as
+				      * there are entries in the two
+				      * arguments. The block at
+				      * position (<i>i,j</i>) will
+				      * have the dimensions
+				      * <tt>row_block_sizes[i]</tt>
+				      * times <tt>col_block_sizes[j]</tt>.
+				      */
+    void reinit (const std::vector< unsigned int > &row_block_sizes,
+		 const std::vector< unsigned int > &col_block_sizes);
+
+				     /**
+				      * Allow the use of the reinit
+				      * functions of the base class as
+				      * well.
+				      */
+    BlockSparsityPatternBase<CompressedSparsityPattern>::reinit;
 };
 
 
