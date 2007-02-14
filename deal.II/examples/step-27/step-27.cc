@@ -4,7 +4,7 @@
 /*    $Id$       */
 /*    Version: $Name$                                          */
 /*                                                                */
-/*    Copyright (C) 2000, 2001, 2002, 2003, 2004, 2006 by the deal.II authors */
+/*    Copyright (C) 2000, 2001, 2002, 2003, 2004, 2006, 2007 by the deal.II authors */
 /*                                                                */
 /*    This file is subject to QPL and may not be  distributed     */
 /*    without copyright and license information. Please refer     */
@@ -261,26 +261,25 @@ void
 LaplaceProblem<dim>::
 estimate_smoothness (Vector<float> &smoothness_indicators) const
 {
-  const unsigned int N = 5;
+  const unsigned int N = 7;
 
+				   // form all the Fourier vectors
+				   // that we want to
+				   // consider. exclude k=0 to avoid
+				   // problems with |k|^{-mu} and also
+				   // logarithms of |k|
   std::vector<Tensor<1,dim> > k_vectors;
-  std::vector<unsigned int>   abs_k_square;
-  
   switch (dim)
     {
       case 2:
       {
 	for (unsigned int i=0; i<N; ++i)
 	  for (unsigned int j=0; j<N; ++j)
-	    {
-	      const unsigned int k_times_k = i*i + j*j;
-	      if (k_times_k < N*N)
-		{
-		  k_vectors.push_back (Point<2>(deal_II_numbers::PI * i,
-						deal_II_numbers::PI * j));
-		  abs_k_square.push_back (k_times_k);
-		}
-	    }
+	    if (!((i==0) && (j==0))
+		&&
+		(i*i + j*j < N*N))
+	      k_vectors.push_back (Point<2>(deal_II_numbers::PI * i,
+					    deal_II_numbers::PI * j));
 	    
 	break;
       }
@@ -290,16 +289,26 @@ estimate_smoothness (Vector<float> &smoothness_indicators) const
     }
 
   const unsigned n_fourier_modes = k_vectors.size();
+  std::vector<double> ln_k (n_fourier_modes);
+  for (unsigned int i=0; i<n_fourier_modes; ++i)
+    ln_k[i] = std::log (k_vectors[i].norm());
   
+
+				   // assemble the matrices that do
+				   // the Fourier transforms for each
+				   // of the finite elements we deal
+				   // with. note that these matrices
+				   // are complex-valued, so we can't
+				   // use FullMatrix
   QGauss<1>      base_quadrature (2);
   QIterated<dim> quadrature (base_quadrature, N);
   
   std::vector<Table<2,std::complex<double> > >
-    fourier_transforms (fe_collection.size());
+    fourier_transform_matrices (fe_collection.size());
   for (unsigned int fe=0; fe<fe_collection.size(); ++fe)
     {
-      fourier_transforms[fe].reinit (n_fourier_modes,
-				     fe_collection[fe].dofs_per_cell);
+      fourier_transform_matrices[fe].reinit (n_fourier_modes,
+					     fe_collection[fe].dofs_per_cell);
 
       for (unsigned int k=0; k<n_fourier_modes; ++k)
 	for (unsigned int i=0; i<fe_collection[fe].dofs_per_cell; ++i)
@@ -313,68 +322,61 @@ estimate_smoothness (Vector<float> &smoothness_indicators) const
 		       fe_collection[fe].shape_value(i,x_q) *
 		       quadrature.weight(q);
 	      }
-	    fourier_transforms[fe](k,i) = sum;
+	    fourier_transform_matrices[fe](k,i)
+	      = sum / std::pow(2*deal_II_numbers::PI, 1.*dim/2);
 	  }
     }
 
+				   // the next thing is to loop over
+				   // all cells and do our work there,
+				   // i.e. to locally do the Fourier
+				   // transform and estimate the decay
+				   // coefficient
+  std::vector<std::complex<double> > fourier_coefficients (n_fourier_modes);
+  Vector<double>                     local_dof_values;
+  
   typename hp::DoFHandler<dim>::active_cell_iterator
     cell = dof_handler.begin_active(),
     endc = dof_handler.end();
-  std::vector<std::complex<double> > transformed_values (n_fourier_modes);
   for (unsigned int index=0; cell!=endc; ++cell, ++index)
     {
-      Vector<double> dof_values (cell->get_fe().dofs_per_cell);
-      cell->get_dof_values (solution, dof_values);
+      local_dof_values.reinit (cell->get_fe().dofs_per_cell);
+      cell->get_dof_values (solution, local_dof_values);
 
+				       // first compute the Fourier
+				       // transform of the local
+				       // solution
+      std::fill (fourier_coefficients.begin(), fourier_coefficients.end(), 0);
+      for (unsigned int f=0; f<n_fourier_modes; ++f)
+	for (unsigned int i=0; i<cell->get_fe().dofs_per_cell; ++i)
+	  fourier_coefficients[f] += 
+	    fourier_transform_matrices[cell->active_fe_index()](f,i)
+	    *
+	    local_dof_values(i);
+
+				       // now we have to calculate the
+				       // various contributions to the
+				       // formula for mu
+      double            sum_1 = 0,
+	             sum_ln_k = 0,
+	      sum_ln_k_square = 0,
+	      sum_ln_U        = 0,
+	      sum_ln_U_ln_k   = 0;
       for (unsigned int f=0; f<n_fourier_modes; ++f)
 	{
-	  transformed_values[f] = 0;
-	  for (unsigned int i=0; i<cell->get_fe().dofs_per_cell; ++i)
-	    transformed_values[f] +=
-	      fourier_transforms[cell->active_fe_index()](f,i)
-	      *
-	      dof_values(i);
+	  sum_1 += 1;
+	  sum_ln_k += ln_k[f];
+	  sum_ln_k_square += ln_k[f]*ln_k[f];
+	  sum_ln_U += std::log (std::abs (fourier_coefficients[f]));
+	  sum_ln_U_ln_k += std::log (std::abs (fourier_coefficients[f])) * ln_k[f];
 	}
 
-				       // for each abs_k value we have, find
-				       // the largest fourier coefficient
-      std::vector<double>
-	max_fourier_coefficient (*max_element(abs_k_square.begin(),
-					      abs_k_square.end()) + 1,
-				 0.);
-      for (unsigned int f=0; f<n_fourier_modes; ++f)
-	max_fourier_coefficient[abs_k_square[f]]
-	  = std::max (max_fourier_coefficient[abs_k_square[f]],
-		      std::abs (transformed_values[f]));
+      const double mu
+	= (1./(sum_1*sum_ln_k_square - sum_ln_k*sum_ln_k)
+	   *
+	   (sum_ln_k*sum_ln_U - sum_1*sum_ln_U_ln_k));
       
-				       // now try to fit a curve C|k|^{-s} to
-				       // the maximal fourier coefficients of
-				       // the solution on this cell
-      double A[2][2] = { { 0,0 }, { 0,0 }};
-      double F[2]    = { 0,0 };
-
-      for (unsigned int f=0; f<max_fourier_coefficient.size(); ++f)
-	if (max_fourier_coefficient[f] > 0)
-	  {
-	    const double k_abs = std::sqrt(1.*f);
-
-	    if (k_abs == 0)
-	      continue;
-	  
-	    A[0][0] += 1;
-	    A[1][0] += std::log (k_abs);
-	    A[1][1] += std::pow (std::log (k_abs), 2.);
-
-	    F[0] += std::log (std::abs (max_fourier_coefficient[f]));
-	    F[1] += std::log (std::abs (max_fourier_coefficient[f])) *
-		    std::log (k_abs);
-	}
-      A[0][1] = A[1][0];
-      
-      const double det = A[0][0] * A[1][1] - A[0][1] * A[0][1];
-      const double s = (A[0][0]*F[1] - A[1][1]*F[0]) / det;
-      
-      smoothness_indicators(index) = s;
+      smoothness_indicators(index) = mu - 1.*dim/2;
     }
 }
 
@@ -453,6 +455,10 @@ void LaplaceProblem<dim>::output_results (const unsigned int cycle) const
     Vector<float> smoothness_indicators (triangulation.n_active_cells());
     estimate_smoothness (smoothness_indicators);
 
+    Vector<double> smoothness_field (dof_handler.n_dofs());
+    DoFTools::distribute_cell_to_dof_vector (dof_handler,
+					     smoothness_indicators,
+					     smoothness_field);
 
     Vector<float> fe_indices (triangulation.n_active_cells());
     {
@@ -474,7 +480,8 @@ void LaplaceProblem<dim>::output_results (const unsigned int cycle) const
 
     data_out.attach_dof_handler (dof_handler);
     data_out.add_data_vector (solution, "solution");
-    data_out.add_data_vector (smoothness_indicators, "smoothness");
+    data_out.add_data_vector (smoothness_indicators, "smoothness1");
+    data_out.add_data_vector (smoothness_field, "smoothness2");
     data_out.add_data_vector (fe_indices, "fe_index");
     data_out.build_patches ();
   

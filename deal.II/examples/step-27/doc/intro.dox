@@ -114,8 +114,16 @@ So what do we have to do to estimate the local smoothness of $u(x)$ on
 a cell $K$? Clearly, the first step is to compute the Fourier series
 of our solution. Fourier series being infinite series, we simplify our
 task by only computing the first few terms of the series, such that
-$|\vec k|\le N$ with a cut-off $N$. Computing this series is not
-particularly hard: from the definition
+$|\vec k|\le N$ with a cut-off $N$. (Let us parenthetically remark
+that we want to choose $N$ large enough so that we capture at least
+the variation of those shape functions that vary the most. On the
+other hand, we should not choose $N$ too large: clearly, a finite
+element function, being a polynomial, is in $C^\infty$ on any given
+cell, so the coefficients will have to decay exponentially at one
+point; since we want to estimate the smoothness of the function this
+polynomial approximates, not of the polynomial itself, we need to
+choose a reasonable cutoff for $N$.) Either way, computing this series
+is not particularly hard: from the definition
 @f[
 	\hat U_{\vec k}
 	= \frac 1{(2\pi)^{d/2}} \int_{\hat K} e^{i\vec k \cdot \vec x} \hat u(\hat x) dx
@@ -172,29 +180,29 @@ problem
 	\min_{\beta,\mu}
 	Q(\beta,\mu) = 
 	\frac 12 \sum_{\vec k, |\vec k|\le N}
-	\left( \ln |\hat U_{\vec k}| - \beta + \mu |\vec k|\right)^2,
+	\left( \ln |\hat U_{\vec k}| - \beta + \mu \ln |\vec k|\right)^2,
 @f]
 where $\beta=\ln \alpha$. This is now a problem for which the
 optimality conditions $\frac{\partial Q}{\partial\beta}=0,
 \frac{\partial Q}{\partial\mu}=0$, are linear in $\beta,\mu$. We can
 write these conditions as follows:
 @f[
-	\begin{array}{cc}
+	\left(\begin{array}{cc}
 	\sum_{\vec k, |\vec k|\le N} 1 &
 	\sum_{\vec k, |\vec k|\le N} \ln |\vec k| 
 	\\
 	\sum_{\vec k, |\vec k|\le N} \ln |\vec k| &
 	\sum_{\vec k, |\vec k|\le N} (\ln |\vec k|)^2 
-	\end{array}
-	\begin{array}{c}
+	\end{array}\right)
+	\left(\begin{array}{c}
 	\beta \\ -\mu
-	\end{array}
+	\end{array}\right)
 	=
-	\begin{array}{c}
+	\left(\begin{array}{c}
 	\sum_{\vec k, |\vec k|\le N} \ln |\hat U_{\vec k}|
 	\\
 	\sum_{\vec k, |\vec k|\le N} \ln |\hat U_{\vec k}| \ln |\vec k| 
-	\end{array}
+	\end{array}\right)
 @f]
 This linear system is readily inverted to yield
 @f[
@@ -217,11 +225,16 @@ and
                 \left(\sum_{\vec k, |\vec k|\le N} (\ln |\vec k|)^2\right)
 		-\left(\sum_{\vec k, |\vec k|\le N} \ln |\vec k|\right)^2}
 	\left[
-	  -
 	  \left(\sum_{\vec k, |\vec k|\le N} \ln |\vec k|\right)
 	  \left(\sum_{\vec k, |\vec k|\le N} \ln |\hat U_{\vec k}|\right)
-	  +
+	  -
 	  \left(\sum_{\vec k, |\vec k|\le N} 1\right)
 	  \left(\sum_{\vec k, |\vec k|\le N} \ln |\hat U_{\vec k}| \ln |\vec k| \right)
 	\right].
 @f]
+
+While we are not particularly interested in the actual value of
+$\beta$, the formula above gives us a mean to calculate the value of
+the exponent $\mu$ that we can then use to determine that $\hat u(\hat
+x)$ is in $H^s(\hat K)$ with $s=\mu-\frac d2$.
+
