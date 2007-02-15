@@ -2245,6 +2245,207 @@ void GridGenerator::laplace_transformation (Triangulation<dim> &tria,
 #endif
 
 
+#if deal_II_dimension == 1
+
+template<int dim>
+void GridGenerator::hyper_cube_with_cylindrical_hole (Triangulation<dim> &,
+				   const double,
+				   const double,
+				   const double,
+				   const unsigned int,
+				   bool){
+  Assert(false, ExcNotImplemented());
+}
+
+#endif
+
+
+#if deal_II_dimension == 2
+
+template<int dim>
+void GridGenerator::hyper_cube_with_cylindrical_hole (Triangulation<dim> &triangulation, 
+				   const double inner_radius,
+				   const double outer_radius,
+				   const double, // width,
+				   const unsigned int, // width_repetition,
+				   bool colorize)
+{
+  Assert(inner_radius < outer_radius,
+	 ExcMessage("outer_radius has to be bigger than inner_radius."));
+
+  Point<dim> center;
+  // We create an hyper_shell in two dimensions, and then we modify it.
+  GridGenerator::hyper_shell (triangulation,
+			      center, inner_radius, outer_radius,
+                              8);
+  typename Triangulation<dim>::active_cell_iterator
+    cell = triangulation.begin_active(),
+    endc = triangulation.end();
+  std::vector<bool> treated_vertices(triangulation.n_vertices(), false);
+  for(; cell != endc; ++cell) {
+    for(unsigned int f=0; f<GeometryInfo<dim>::faces_per_cell; ++f)
+      if(cell->face(f)->at_boundary()) {
+	for(unsigned int v=0; v < GeometryInfo<dim>::vertices_per_face; ++v) {
+	  unsigned int vv = cell->face(f)->vertex_index(v);
+	  if(treated_vertices[vv] == false) {
+	    treated_vertices[vv] = true;
+	    switch(vv) {
+	    case 1:
+	      cell->face(f)->vertex(v) = center+Point<dim>(outer_radius,outer_radius);
+	      break;
+	    case 3:
+	      cell->face(f)->vertex(v) = center+Point<dim>(-outer_radius,outer_radius);
+	      break;
+	    case 5:
+	      cell->face(f)->vertex(v) = center+Point<dim>(-outer_radius,-outer_radius);
+	      break;
+	    case 7:
+	      cell->face(f)->vertex(v) = center+Point<dim>(outer_radius,-outer_radius);
+	    default:
+	      break;
+	    }
+	  }
+	}
+      } 
+  }
+  double eps = 1e-3 * outer_radius;
+  cell = triangulation.begin_active();
+   for(; cell != endc; ++cell) {
+    for(unsigned int f=0; f<GeometryInfo<dim>::faces_per_cell; ++f)
+      if(cell->face(f)->at_boundary()) {
+	double dx = cell->face(f)->center()(0) - center(0);
+	double dy = cell->face(f)->center()(1) - center(1);
+	if(colorize) {
+	  if(std::abs(dx + outer_radius) < eps)
+	    cell->face(f)->set_boundary_indicator(0);
+	  else if(std::abs(dx - outer_radius) < eps)
+	    cell->face(f)->set_boundary_indicator(1);
+	  else if(std::abs(dy + outer_radius) < eps)
+	    cell->face(f)->set_boundary_indicator(2);
+	  else if(std::abs(dy - outer_radius) < eps)
+	    cell->face(f)->set_boundary_indicator(3);
+	  else 
+	    cell->face(f)->set_boundary_indicator(4);
+	} else {
+	  double d = (cell->face(f)->center() - center).norm();
+	  if(d-inner_radius < 0)
+	    cell->face(f)->set_boundary_indicator(1);
+	  else
+	    cell->face(f)->set_boundary_indicator(0);
+	}
+      }
+   }	
+}
+
+#endif
+
+#if deal_II_dimension == 3
+
+template<int dim>
+void GridGenerator::hyper_cube_with_cylindrical_hole(Triangulation<dim> &triangulation, 
+						 const double inner_radius,
+						 const double outer_radius,
+						 const double L,
+						 const unsigned int Nz,
+						 bool colorize)
+{
+  Assert(inner_radius < outer_radius,
+	 ExcMessage("outer_radius has to be bigger than inner_radius."));
+  Assert(L > 0, 
+	 ExcMessage("Must give positive extension L"));
+  Assert(Nz >= 1, ExcLowerRange(1, Nz));
+  
+  GridGenerator::cylinder_shell (triangulation,
+				 L, inner_radius, outer_radius,
+				 8,
+				 Nz);
+  
+  typename Triangulation<dim>::active_cell_iterator
+    cell = triangulation.begin_active(),
+    endc = triangulation.end();
+  std::vector<bool> treated_vertices(triangulation.n_vertices(), false);
+  for(; cell != endc; ++cell) {
+    for(unsigned int f=0; f<GeometryInfo<dim>::faces_per_cell; ++f)
+      if(cell->face(f)->at_boundary()) {
+	for(unsigned int v=0; v < GeometryInfo<dim>::vertices_per_face; ++v) {
+	  unsigned int vv = cell->face(f)->vertex_index(v);
+	  if(treated_vertices[vv] == false) {
+	    treated_vertices[vv] = true;
+	    for(unsigned int i=0; i<=Nz; ++i) {
+	      double d = ((double) i)*L/((double) Nz);
+	      switch(vv-i*16) {
+	      case 1:
+		cell->face(f)->vertex(v) = Point<dim>(outer_radius,outer_radius,d);
+		break;
+	      case 3:
+		cell->face(f)->vertex(v) = Point<dim>(-outer_radius,outer_radius,d);
+		break;
+	      case 5:
+		cell->face(f)->vertex(v) = Point<dim>(-outer_radius,-outer_radius,d);
+		break;
+	      case 7:
+		cell->face(f)->vertex(v) = Point<dim>(outer_radius,-outer_radius,d);
+		break;
+	      default:
+		break;
+	      }
+	    }
+	  }
+	}
+      } 
+  }
+  double eps = 1e-3 * outer_radius;
+  cell = triangulation.begin_active();
+   for(; cell != endc; ++cell) {
+    for(unsigned int f=0; f<GeometryInfo<dim>::faces_per_cell; ++f)
+      if(cell->face(f)->at_boundary()) {
+	double dx = cell->face(f)->center()(0);
+	double dy = cell->face(f)->center()(1);
+	double dz = cell->face(f)->center()(2);
+	
+	if(colorize) {
+	  if(std::abs(dx + outer_radius) < eps)
+	    cell->face(f)->set_boundary_indicator(0);
+	  
+	  else if(std::abs(dx - outer_radius) < eps)
+	    cell->face(f)->set_boundary_indicator(1);
+	  
+	  else if(std::abs(dy + outer_radius) < eps)
+	    cell->face(f)->set_boundary_indicator(2);
+	  
+	  else if(std::abs(dy - outer_radius) < eps)
+	    cell->face(f)->set_boundary_indicator(3);
+	  
+	  else if(std::abs(dz) < eps)
+	    cell->face(f)->set_boundary_indicator(4);
+
+	  else if(std::abs(dz - L) < eps)
+	    cell->face(f)->set_boundary_indicator(5);
+	  
+	  else {
+	    cell->face(f)->set_boundary_indicator(6);
+	    for(unsigned int l=0; l<GeometryInfo<dim>::lines_per_face; ++l)
+	      cell->face(f)->line(l)->set_boundary_indicator(6);
+	  }
+
+	} else {
+	  Point<dim> c = cell->face(f)->center();
+	  c(2) = 0;
+	  double d = c.norm();
+	  if(d-inner_radius < 0) {
+	    cell->face(f)->set_boundary_indicator(1);
+	    for(unsigned int l=0; l<GeometryInfo<dim>::lines_per_face; ++l)
+	      cell->face(f)->line(l)->set_boundary_indicator(1);
+	  } else
+	    cell->face(f)->set_boundary_indicator(0);
+	}
+      }
+   }	
+}
+
+#endif
+
+
 // explicit instantiations
 template void
 GridGenerator::hyper_cube<deal_II_dimension> (
@@ -2323,6 +2524,11 @@ GridGenerator::half_hyper_shell (
   Triangulation<deal_II_dimension>&,
   const Point<deal_II_dimension>&, double, double, unsigned int);
 
+
+template void 
+GridGenerator::hyper_cube_with_cylindrical_hole (
+  Triangulation<deal_II_dimension> &,
+  const double, const double, const double, const unsigned int, bool);
 
 
 template void

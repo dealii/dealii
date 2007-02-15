@@ -743,10 +743,13 @@ void GridOut::write_msh_faces (const Triangulation<dim> &tria,
 		  Assert (false, ExcNotImplemented());
 	  };
 	out << static_cast<unsigned int>(face->boundary_indicator()) 
-	    << " 1 " << GeometryInfo<dim>::vertices_per_face;
+	    << " " 
+	    << static_cast<unsigned int>(face->boundary_indicator()) 
+	    << " " << GeometryInfo<dim>::vertices_per_face;
 					 // note: vertex numbers are 1-base
 	for (unsigned int vertex=0; vertex<GeometryInfo<dim>::vertices_per_face; ++vertex)
-	  out << ' ' << face->vertex_index(GeometryInfo<dim-1>::ucd_to_deal[vertex])+1;
+	  out << ' ' 
+	      << face->vertex_index(GeometryInfo<dim-1>::ucd_to_deal[vertex])+1;
 	out << '\n';
 
 	++index;

@@ -1016,6 +1016,25 @@ inconvenience this causes.
 <h3>deal.II</h3>
 
 <ol>
+   <li> <p>New: Added function <code class="class">GridGenerator</code>::<code 
+       class="member">hyper_cube_with_cylindrical_hole</code> that produces 
+	   a square with a circular hole in the middle in 2d, and extrudes it along
+	   the z-direction between 0 and L. 
+       <br>
+       (Luca Heltai 2007/02/15)
+       </p>
+
+   <li> <p>WorkAround: The class <code class="class">GridOut</code>::<code 
+       class="member">write_msh</code> produces a mesh which can be visualized in 
+	   the Gmsh reader. A bug in Gmsh prevented the boundary indicator to be 
+	   properly visualized. The boundary indicator was added to the material flag of the
+   	   faces (which is ignored when reading back the mesh) in order for the Gmsh reader
+	   to be able to display the boundary indicator in a proper way.
+       <br>
+       (Luca Heltai 2007/02/15)
+       </p>
+
+
    <li> <p>Fixed: The function <code class="class">DoFTools</code>::<code 
        class="member">distribute_cell_to_dof_vector</code> produced
        wrong results if the vector into which the result is to be

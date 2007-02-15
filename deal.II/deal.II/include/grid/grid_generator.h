@@ -109,12 +109,24 @@ template <typename number> class SparseMatrix;
  *      modeled by a 2d half shell.
  *
  *    <li> Slit domain: The slit domain is a variant of the hyper cube
- *      domain. In two spatial dimensions, it is a square into which a slit
- *      is sawed; if the initial square is though to be composed of four
- *      smaller squares, then two of them are not connected even though
- *      they are neighboring each other. Analogously, into the cube in
- *      three spatial dimensions, a half-plane is sawed, disconnecting four
- *      of the eight child-cubes from one of their neighbors.
+ *      domain. In two spatial dimensions, it is a square into which a
+ *      slit is sawed; if the initial square is though to be composed
+ *      of four smaller squares, then two of them are not connected
+ *      even though they are neighboring each other. Analogously, into
+ *      the cube in three spatial dimensions, a half-plane is sawed,
+ *      disconnecting four of the eight child-cubes from one of their
+ *      neighbors.  
+ * 
+ *    <li> Hyper cube with cylindrical hole: This domain is a square on
+ *      the xy plane times the interval [0,L] with a cylindrical hole
+ *      in the middle. The parameters that can be set are the internal
+ *      radius, the external radius (inteded as the radius of the
+ *      biggest enclosed cylinder), the depth of the structure (used
+ *      only in three dimensions), and the number of repetitions along
+ *      the z direction.
+ *
+ *	 @image html cubes_hole.png
+ *	 
  * </ul>
  *
  * Some of these functions receive a flag @p colorize. If this is
@@ -661,7 +673,39 @@ class GridGenerator
 				  const double        inner_radius,
 				  const double        outer_radius,
 				  const unsigned int  n_cells = 0);
-
+    
+				     /** 
+				      * This class produces a square
+				      * on the @p xy-plane with a
+				      * circular hole in the middle,
+				      * times the interval @p [0.L]
+				      * (only in 3d). It is
+				      * implemented in 2d and 3d, and
+				      * takes the following arguments:
+				      * 
+				      * - @p inner_radius: size of the
+                                      *    internal hole 
+				      * - @p  outer_radius: size of the
+                                      *    biggest enclosed cylinder
+				      * - @p L: extension on the @p z-direction
+				      * - @p repetitions: number of subdivisions
+				      *      along the @z-direction
+				      * - @p colorize: wether to assign different 
+				      *     boundary indicators to different faces.
+				      *    The colors are given in lexycografical 
+				      *    ordering for the flat faces (0 to 3 in 2d, 
+				      *    0 to 5 in 3d) plus the curved hole 
+				      *    (4 in 2d, and 6 in 3d).
+				      *    If @colorize is set to false, then flat faces 
+				      *    get the number 0 and the hole gets number 1.
+				      */
+    template<int dim>
+    static void hyper_cube_with_cylindrical_hole (Triangulation<dim> &triangulation, 
+						const double inner_radius = .25,
+						const double outer_radius = .5,
+						const double L = .5,
+						const unsigned int repetition = 1,
+						const bool colorize = false);
 
 				     /**
 				      * Produce a ring of cells in 3D that is
