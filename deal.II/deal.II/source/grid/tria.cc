@@ -241,6 +241,9 @@ void Triangulation<dim>::copy_triangulation (const Triangulation<dim> &old_tria)
   vertices      = old_tria.vertices;
   vertices_used = old_tria.vertices_used;
   smooth_grid   = old_tria.smooth_grid;
+				   // do a shallow copy of the list of
+				   // RefinementListeners
+  refinement_listeners = old_tria.refinement_listeners;
   
   faces         = new internal::Triangulation::TriaFaces<dim>(*old_tria.faces);
 
