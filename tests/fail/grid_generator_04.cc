@@ -1,8 +1,8 @@
 //---------------------------------------------------------------------------
-//    $Id: grid_generator_02.cc 14204 2006-11-17 03:49:08Z bangerth $
+//    $Id: grid_generator_05.cc 14204 2006-11-17 03:49:08Z bangerth $
 //    Version: $Name$ 
 //
-//    Copyright (C) 2005, 2006 by the deal.II authors
+//    Copyright (C) 2005, 2006, 2007 by the deal.II authors
 //
 //    This file is subject to QPL and may not be  distributed
 //    without copyright and license information. Please refer
@@ -96,7 +96,7 @@ void test(std::ostream& out)
 
 int main()
 {
-  std::ofstream logfile("grid_generator_04/output");
+  std::ofstream logfile("grid_generator_05/output");
   deallog.attach(logfile);
   deallog.depth_console(0);
   deallog.threshold_double(1.e-10);
