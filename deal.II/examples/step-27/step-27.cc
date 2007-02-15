@@ -269,6 +269,7 @@ estimate_smoothness (Vector<float> &smoothness_indicators) const
 				   // problems with |k|^{-mu} and also
 				   // logarithms of |k|
   std::vector<Tensor<1,dim> > k_vectors;
+  std::vector<unsigned int>   k_vectors_magnitude;
   switch (dim)
     {
       case 2:
@@ -278,9 +279,12 @@ estimate_smoothness (Vector<float> &smoothness_indicators) const
 	    if (!((i==0) && (j==0))
 		&&
 		(i*i + j*j < N*N))
-	      k_vectors.push_back (Point<2>(deal_II_numbers::PI * i,
-					    deal_II_numbers::PI * j));
-	    
+	      {
+		k_vectors.push_back (Point<2>(deal_II_numbers::PI * i,
+					      deal_II_numbers::PI * j));
+		k_vectors_magnitude.push_back (i*i+j*j);
+	      }
+	
 	break;
       }
       
@@ -354,22 +358,44 @@ estimate_smoothness (Vector<float> &smoothness_indicators) const
 	    *
 	    local_dof_values(i);
 
+				       // enter the Fourier
+				       // coefficients into a map with
+				       // the k-magnitudes, to make
+				       // sure that we get only the
+				       // largest magnitude for each
+				       // value of |k|
+      std::map<unsigned int, double> k_to_max_U_map;
+      for (unsigned int f=0; f<n_fourier_modes; ++f)
+	if ((k_to_max_U_map.find (k_vectors_magnitude[f]) ==
+	     k_to_max_U_map.end())
+	    ||
+	    (k_to_max_U_map[k_vectors_magnitude[f]] <
+	     std::abs (fourier_coefficients[f])))
+	  k_to_max_U_map[k_vectors_magnitude[f]]
+	    = std::abs (fourier_coefficients[f]);
+      
 				       // now we have to calculate the
 				       // various contributions to the
-				       // formula for mu
-      double            sum_1 = 0,
-	             sum_ln_k = 0,
+				       // formula for mu. we'll only
+				       // take those fourier
+				       // coefficients with the
+				       // largest value for a given
+				       // |k|
+      double  sum_1           = 0,
+	      sum_ln_k        = 0,
 	      sum_ln_k_square = 0,
 	      sum_ln_U        = 0,
 	      sum_ln_U_ln_k   = 0;
       for (unsigned int f=0; f<n_fourier_modes; ++f)
-	{
-	  sum_1 += 1;
-	  sum_ln_k += ln_k[f];
-	  sum_ln_k_square += ln_k[f]*ln_k[f];
-	  sum_ln_U += std::log (std::abs (fourier_coefficients[f]));
-	  sum_ln_U_ln_k += std::log (std::abs (fourier_coefficients[f])) * ln_k[f];
-	}
+	if (k_to_max_U_map[k_vectors_magnitude[f]] ==
+	    std::abs (fourier_coefficients[f]))
+	  {
+	    sum_1 += 1;
+	    sum_ln_k += ln_k[f];
+	    sum_ln_k_square += ln_k[f]*ln_k[f];
+	    sum_ln_U += std::log (std::abs (fourier_coefficients[f]));
+	    sum_ln_U_ln_k += std::log (std::abs (fourier_coefficients[f])) * ln_k[f];
+	  }
 
       const double mu
 	= (1./(sum_1*sum_ln_k_square - sum_ln_k*sum_ln_k)
