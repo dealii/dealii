@@ -689,14 +689,14 @@ class GridGenerator
                                       *    biggest enclosed cylinder
 				      * - @p L: extension on the @p z-direction
 				      * - @p repetitions: number of subdivisions
-				      *      along the @z-direction
+				      *      along the @p z-direction
 				      * - @p colorize: wether to assign different 
 				      *     boundary indicators to different faces.
 				      *    The colors are given in lexycografical 
 				      *    ordering for the flat faces (0 to 3 in 2d, 
 				      *    0 to 5 in 3d) plus the curved hole 
 				      *    (4 in 2d, and 6 in 3d).
-				      *    If @colorize is set to false, then flat faces 
+				      *    If @p colorize is set to false, then flat faces 
 				      *    get the number 0 and the hole gets number 1.
 				      */
     template<int dim>
