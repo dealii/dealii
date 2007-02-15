@@ -1,0 +1,46 @@
+
+DEAL::face_rotation=1, face_flip=1
+DEAL::n_dofs=639
+DEAL::FE_Q<3>(3), P_0, rel. error=0
+DEAL::FE_Q<3>(3), P_1, rel. error=0
+DEAL::FE_Q<3>(3), P_2, rel. error=0
+DEAL::FE_Q<3>(3), P_3, rel. error=0
+DEAL::FE_Q<3>(3), P_4, rel. error=2.53e-05
+DEAL::FE_Q<3>(3), P_5, rel. error=4.19e-05
+DEAL::n_dofs=639
+DEAL::FE_Q<3>(3), P_0, rel. error=0
+DEAL::FE_Q<3>(3), P_1, rel. error=0
+DEAL::FE_Q<3>(3), P_2, rel. error=0
+DEAL::FE_Q<3>(3), P_3, rel. error=0
+DEAL::FE_Q<3>(3), P_4, rel. error=2.93e-05
+DEAL::FE_Q<3>(3), P_5, rel. error=5.91e-05
+DEAL::face_rotation=0, face_flip=1
+DEAL::n_dofs=639
+DEAL::FE_Q<3>(3), P_0, rel. error=0
+DEAL::FE_Q<3>(3), P_1, rel. error=0
+DEAL::FE_Q<3>(3), P_2, rel. error=0
+DEAL::FE_Q<3>(3), P_3, rel. error=0
+DEAL::FE_Q<3>(3), P_4, rel. error=2.50e-05
+DEAL::FE_Q<3>(3), P_5, rel. error=4.14e-05
+DEAL::n_dofs=639
+DEAL::FE_Q<3>(3), P_0, rel. error=0
+DEAL::FE_Q<3>(3), P_1, rel. error=0
+DEAL::FE_Q<3>(3), P_2, rel. error=0
+DEAL::FE_Q<3>(3), P_3, rel. error=0
+DEAL::FE_Q<3>(3), P_4, rel. error=2.89e-05
+DEAL::FE_Q<3>(3), P_5, rel. error=5.85e-05
+DEAL::face_rotation=1, face_flip=0
+DEAL::n_dofs=639
+DEAL::FE_Q<3>(3), P_0, rel. error=0
+DEAL::FE_Q<3>(3), P_1, rel. error=0
+DEAL::FE_Q<3>(3), P_2, rel. error=0
+DEAL::FE_Q<3>(3), P_3, rel. error=0
+DEAL::FE_Q<3>(3), P_4, rel. error=2.43e-05
+DEAL::FE_Q<3>(3), P_5, rel. error=4.07e-05
+DEAL::n_dofs=639
+DEAL::FE_Q<3>(3), P_0, rel. error=0
+DEAL::FE_Q<3>(3), P_1, rel. error=0
+DEAL::FE_Q<3>(3), P_2, rel. error=0
+DEAL::FE_Q<3>(3), P_3, rel. error=0
+DEAL::FE_Q<3>(3), P_4, rel. error=2.81e-05
+DEAL::FE_Q<3>(3), P_5, rel. error=5.76e-05
