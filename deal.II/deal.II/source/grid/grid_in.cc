@@ -770,7 +770,7 @@ void GridIn<2>::read_netcdf (const std::string &filename)
   AssertThrow(false, ExcNeedsNetCDF());
 #else
   const unsigned int dim=2;
-  const bool output=false;
+  const bool output=true;
   Assert (tria != 0, ExcNoTriangulationSelected());
 				   // this function assumes the TAU
 				   // grid format.
@@ -969,42 +969,59 @@ void GridIn<2>::read_netcdf (const std::string &filename)
       vertices[i](1)=point_values[y2d][i];
     }
 
-				   // Run over all boundary quads
-				   // until we find a quad in the
-				   // point[coord]=0 plane
-  unsigned int quad0=0;
-  for (;quad0<n_bquads; ++quad0)
+				   // For all boundary quads in the
+				   // point[coord]=0 plane add the
+				   // bmarker to zero_plane_markers
+  std::map<int, bool> zero_plane_markers;
+  for (unsigned int quad=0; quad<n_bquads; ++quad)
     {
-      bool in_plane=true;
+      bool zero_plane=true;
       for (unsigned int i=0; i<vertices_per_quad; ++i)
-	if (point_values[coord][vertex_indices[quad0*vertices_per_quad+i]]!=0)
+	if (point_values[coord][vertex_indices[quad*vertices_per_quad+i]]!=0)
 	  {
-	    in_plane=false;
+	    zero_plane=false;
 	    break;
 	  }
       
-      if (in_plane)
-	break;
+      if (zero_plane)
+	zero_plane_markers[bmarker[quad]]=true;
     }
-  const int bmarker0=bmarker[quad0];
-  if (output)
-    std::cout << "bmarker0=" << bmarker0 << std::endl;
-  AssertThrow(n_bquads_per_bmarker[bmarker0]==n_cells, ExcIO());
+  unsigned int sum_of_zero_plane_cells=0;
+  for (std::map<int, bool>::const_iterator iter=zero_plane_markers.begin();
+       iter != zero_plane_markers.end(); ++iter)
+    {
+      sum_of_zero_plane_cells+=n_bquads_per_bmarker[iter->first];
+      if (output)
+	std::cout << "bmarker=" << iter->first << std::endl;
+    }
+  AssertThrow(sum_of_zero_plane_cells==n_cells, ExcIO());
 
-				   // fill cells with all quad
-				   // associated with bmarker0
+				   // fill cells with all quads
+				   // associated with
+				   // zero_plane_markers
   std::vector<CellData<dim> > cells(n_cells);
   for (unsigned int quad=0, cell=0; quad<n_bquads; ++quad)
-    if (bmarker[quad]==bmarker0)
-      {
-	for (unsigned int i=0; i<vertices_per_quad; ++i)
+    {
+      bool zero_plane=false;
+      for (std::map<int, bool>::const_iterator iter=zero_plane_markers.begin();
+	   iter != zero_plane_markers.end(); ++iter)
+	if (bmarker[quad]==iter->first)
 	  {
-	    Assert(point_values[coord][vertex_indices[
-	      quad*vertices_per_quad+i]]==0, ExcNotImplemented());
-	    cells[cell].vertices[i]=vertex_indices[quad*vertices_per_quad+i];
+	    zero_plane=true;
+	    break;
 	  }
-	++cell;
-      }
+      
+      if (zero_plane)
+	{
+	  for (unsigned int i=0; i<vertices_per_quad; ++i)
+	    {
+	      Assert(point_values[coord][vertex_indices[
+					   quad*vertices_per_quad+i]]==0, ExcNotImplemented());
+	      cells[cell].vertices[i]=vertex_indices[quad*vertices_per_quad+i];
+	    }
+	  ++cell;
+	}
+    }
 
   SubCellData subcelldata;
   GridTools::delete_unused_vertices(vertices, cells, subcelldata);
