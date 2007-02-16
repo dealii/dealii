@@ -2,7 +2,7 @@
 //    $Id$
 //    Version: $Name$
 //
-//    Copyright (C) 1999, 2000, 2001, 2002, 2003, 2004, 2005, 2006 by the deal.II authors
+//    Copyright (C) 1999, 2000, 2001, 2002, 2003, 2004, 2005, 2006, 2007 by the deal.II authors
 //
 //    This file is subject to QPL and may not be  distributed
 //    without copyright and license information. Please refer
@@ -692,7 +692,7 @@ class GridGenerator
 				      *      along the @p z-direction
 				      * - @p colorize: wether to assign different 
 				      *     boundary indicators to different faces.
-				      *    The colors are given in lexycografical 
+				      *    The colors are given in lexicografic 
 				      *    ordering for the flat faces (0 to 3 in 2d, 
 				      *    0 to 5 in 3d) plus the curved hole 
 				      *    (4 in 2d, and 6 in 3d).
