@@ -2,7 +2,7 @@
 //    $Id$
 //    Version: $Name$
 //
-//    Copyright (C) 1999, 2000, 2001, 2002, 2003, 2004, 2005, 2006 by the deal.II authors
+//    Copyright (C) 1999, 2000, 2001, 2002, 2003, 2004, 2005, 2006, 2007 by the deal.II authors
 //
 //    This file is subject to QPL and may not be  distributed
 //    without copyright and license information. Please refer
@@ -489,7 +489,7 @@ void GridOut::write_ucd (const Triangulation<dim> &tria,
     {
       out << cell_index << ' '
 	  << static_cast<unsigned int>(cell->material_id())
-	  << " ";
+	  << ' ';
       switch (dim) 
 	{
 	  case 1:  out << "line    "; break;
@@ -734,7 +734,7 @@ void GridOut::write_msh_faces (const Triangulation<dim> &tria,
     if (face->at_boundary() &&
 	(face->boundary_indicator() != 0)) 
       {
-	out << index << " ";
+	out << index << ' ';
 	switch (dim) 
 	  {
 	    case 2: out << 1 << ' ';  break;
@@ -743,9 +743,9 @@ void GridOut::write_msh_faces (const Triangulation<dim> &tria,
 		  Assert (false, ExcNotImplemented());
 	  };
 	out << static_cast<unsigned int>(face->boundary_indicator()) 
-	    << " " 
+	    << ' ' 
 	    << static_cast<unsigned int>(face->boundary_indicator()) 
-	    << " " << GeometryInfo<dim>::vertices_per_face;
+	    << ' ' << GeometryInfo<dim>::vertices_per_face;
 					 // note: vertex numbers are 1-base
 	for (unsigned int vertex=0; vertex<GeometryInfo<dim>::vertices_per_face; ++vertex)
 	  out << ' ' 
