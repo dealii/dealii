@@ -2,7 +2,7 @@
 //    $Id$
 //    Version: $Name$
 //
-//    Copyright (C) 1999, 2000, 2001, 2002, 2003, 2004, 2005, 2006 by the deal.II authors
+//    Copyright (C) 1999, 2000, 2001, 2002, 2003, 2004, 2005, 2006, 2007 by the deal.II authors
 //
 //    This file is subject to QPL and may not be  distributed
 //    without copyright and license information. Please refer
@@ -145,6 +145,25 @@ namespace Functions
   
   
   template<int dim>
+  void
+  Q1WedgeFunction<dim>::vector_value_list (
+    const std::vector<Point<dim> >& points,
+    std::vector<Vector<double> >& values) const
+  {
+    Assert (dim>=2, ExcInternalError());
+    Assert (values.size() == points.size(),
+	    ExcDimensionMismatch(values.size(), points.size()));
+    Assert(values[0].size() == 1, ExcDimensionMismatch(values[0].size(), 1));
+    
+    for (unsigned int i=0;i<points.size();++i)
+      {
+	const Point<dim>& p = points[i];
+	values[i](0) = p(0)*p(1);
+      }
+  }
+  
+  
+  template<int dim>
   double
   Q1WedgeFunction<dim>::laplacian (const Point<dim>   &,
 				   const unsigned int) const
@@ -198,6 +217,26 @@ namespace Functions
       {
 	gradients[i][0] = points[i](1);
 	gradients[i][1] = points[i](0);
+      }
+  }
+  
+  
+  template<int dim>
+  void
+  Q1WedgeFunction<dim>::vector_gradient_list (
+    const std::vector<Point<dim> >& points,
+    std::vector<std::vector<Tensor<1,dim> > >& gradients) const
+  {
+    Assert (dim>=2, ExcInternalError());
+    Assert (gradients.size() == points.size(),
+	    ExcDimensionMismatch(gradients.size(), points.size()));
+    Assert(gradients[0].size() == 1,
+	   ExcDimensionMismatch(gradients[0].size(), 1));
+    
+    for (unsigned int i=0; i<points.size(); ++i)
+      {
+	gradients[i][0][0] = points[i](1);
+	gradients[i][0][1] = points[i](0);
       }
   }
   
@@ -920,6 +959,30 @@ namespace Functions
       }
   }
   
+  
+  void
+  LSingularityFunction::vector_gradient_list (
+    const std::vector<Point<2> >& points,
+    std::vector<std::vector<Tensor<1,2> > >& gradients) const
+  {
+    Assert (gradients.size() == points.size(),
+	    ExcDimensionMismatch(gradients.size(), points.size()));
+    
+    for (unsigned int i=0;i<points.size();++i)
+      {
+	Assert(gradients[i].size() == 1,
+	       ExcDimensionMismatch(gradients[i].size(), 1));
+	const Point<2>& p = points[i];
+	double x = p(0);
+	double y = p(1);
+	double phi = std::atan2(y,-x)+M_PI;
+	double r43 = std::pow(x*x+y*y,2./3.);
+	
+	gradients[i][0][0] = 2./3.*(std::sin(2./3.*phi)*x + std::cos(2./3.*phi)*y)/r43;
+	gradients[i][0][1] = 2./3.*(std::sin(2./3.*phi)*y - std::cos(2./3.*phi)*x)/r43;
+      }
+  }
+  
 //////////////////////////////////////////////////////////////////////
   
   template <int dim>
@@ -957,6 +1020,31 @@ namespace Functions
 	double r2 = x*x+y*y;
 	
 	values[i] = std::pow(r2,.25) * std::sin(.5*phi);
+      }
+  }
+  
+  
+  template <int dim>
+  void
+  SlitSingularityFunction<dim>::vector_value_list (
+    const std::vector<Point<dim> >& points,
+    std::vector<Vector<double> >& values) const
+  {
+    Assert (values.size() == points.size(),
+	    ExcDimensionMismatch(values.size(), points.size()));
+    
+    for (unsigned int i=0;i<points.size();++i)
+      {
+	Assert (values[i].size() == 1,
+		ExcDimensionMismatch(values[i].size(), 1));
+	
+	double x = points[i](0);
+	double y = points[i](1);
+	
+	double phi = std::atan2(x,y)+M_PI;
+	double r2 = x*x+y*y;
+	
+	values[i](0) = std::pow(r2,.25) * std::sin(.5*phi);
       }
   }
   
@@ -1026,6 +1114,33 @@ namespace Functions
       }
   }
   
+  template <int dim>
+  void
+  SlitSingularityFunction<dim>::vector_gradient_list (
+    const std::vector<Point<dim> >& points,
+    std::vector<std::vector<Tensor<1,dim> > >& gradients) const
+  {
+    Assert (gradients.size() == points.size(),
+	    ExcDimensionMismatch(gradients.size(), points.size()));
+    
+    for (unsigned int i=0;i<points.size();++i)
+      {
+	Assert(gradients[i].size() == 1,
+	       ExcDimensionMismatch(gradients[i].size(), 1));
+	
+	const Point<dim>& p = points[i];
+	double x = p(0);
+	double y = p(1);
+	double phi = std::atan2(x,y)+M_PI;
+	double r64 = std::pow(x*x+y*y,3./4.);
+	
+	gradients[i][0][0] = 1./2.*(std::sin(1./2.*phi)*x + std::cos(1./2.*phi)*y)/r64;
+	gradients[i][0][1] = 1./2.*(std::sin(1./2.*phi)*y - std::cos(1./2.*phi)*x)/r64;
+	for (unsigned int d=2;d<dim;++d)
+	  gradients[i][0][d] = 0.;
+      }
+  }
+  
 //////////////////////////////////////////////////////////////////////
   
   
@@ -1061,6 +1176,30 @@ namespace Functions
 	double r2 = x*x+y*y;
 	
 	values[i] = std::pow(r2,.125) * std::sin(.25*phi);
+      }
+  }
+  
+  
+  void
+  SlitHyperSingularityFunction::vector_value_list (
+    const std::vector<Point<2> >& points,
+    std::vector<Vector<double> >& values) const
+  {
+    Assert (values.size() == points.size(),
+	    ExcDimensionMismatch(values.size(), points.size()));
+    
+    for (unsigned int i=0;i<points.size();++i)
+      {
+	Assert(values[i].size() == 1,
+	       ExcDimensionMismatch(values[i].size(), 1));
+	
+	double x = points[i](0);
+	double y = points[i](1);
+	
+	double phi = std::atan2(x,y)+M_PI;
+	double r2 = x*x+y*y;
+	
+	values[i](0) = std::pow(r2,.125) * std::sin(.25*phi);
       }
   }
   
@@ -1125,6 +1264,31 @@ namespace Functions
 	
 	gradients[i][0] = 1./4.*(std::sin(1./4.*phi)*x + std::cos(1./4.*phi)*y)/r78;
 	gradients[i][1] = 1./4.*(std::sin(1./4.*phi)*y - std::cos(1./4.*phi)*x)/r78;
+      }
+  }
+  
+  
+  void
+  SlitHyperSingularityFunction::vector_gradient_list (
+    const std::vector<Point<2> > &points,
+    std::vector<std::vector<Tensor<1,2> > >& gradients) const
+  {
+    Assert (gradients.size() == points.size(),
+	    ExcDimensionMismatch(gradients.size(), points.size()));
+    
+    for (unsigned int i=0;i<points.size();++i)
+      {
+	Assert(gradients[i].size() == 1,
+	       ExcDimensionMismatch(gradients[i].size(), 1));
+	
+	const Point<2>& p = points[i];
+	double x = p(0);
+	double y = p(1);
+	double phi = std::atan2(x,y)+M_PI;
+	double r78 = std::pow(x*x+y*y,7./8.);
+	
+	gradients[i][0][0] = 1./4.*(std::sin(1./4.*phi)*x + std::cos(1./4.*phi)*y)/r78;
+	gradients[i][0][1] = 1./4.*(std::sin(1./4.*phi)*y - std::cos(1./4.*phi)*x)/r78;
       }
   }
   
