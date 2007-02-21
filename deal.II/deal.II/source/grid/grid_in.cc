@@ -1314,28 +1314,20 @@ void GridIn<dim>::parse_tecplot_header(std::string &header,
 		tecplot2deal[0]=n_vars;
 	      else if (entries[i]=="\"Y\"")
 		{
-		  AssertThrow(dim>1,
-			      ExcMessage("Tecplot file contains Y data, which is not possible for 1d plot"));
+						   // we assume, that y contains
+						   // zero data in 1d, so do
+						   // nothing
+		if (dim>1)
 		  tecplot2deal[1]=n_vars;
 		}
 	      else if (entries[i]=="\"Z\"")
-		switch (dim)
-		  {
-		    case 1:
-			  AssertThrow(false,
-				      ExcMessage("Tecplot file contains Y data, which is not possible for 1d plot"));
-			  break;
-		    case 2:
-							   // we assume, that z
-							   // contains the data
-							   // which is intended
-							   // as y in deal
-			  tecplot2deal[1]=n_vars;
-			  break;
-		    case 3:
-			  tecplot2deal[2]=n_vars;
-			  break;
-		  }
+		{
+						   // we assume, that z contains
+						   // zero data in 1d and 2d, so
+						   // do nothing
+		  if (dim>2)
+		    tecplot2deal[2]=n_vars;
+		}
 	      ++n_vars;
 	      ++i;
 	    }
