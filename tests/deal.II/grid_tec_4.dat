@@ -1,4 +1,4 @@
-# coordinates to use: x and z
+# coordinates to use: x and y
 # old format of keys
 # unstructured data, block format
 TITLE = "quad Mesh File"
@@ -8,9 +8,9 @@ ZONE T="Zone-4" N=		8 E=4 C=BLACK F=FEBlock
 DT=(SINGLE SINGLE SINGLE )
 1 0 -1 0 
 2 0 -2 0 
-0 0 0 0 0 0 0 0
-0 1 0 -1
-0 2 0 -2
+0 1 0 -1 0 2 0 -2
+0 0 0
+0 0 0 0 0
 
 1 5 6 2
 2 6 7 3

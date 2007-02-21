@@ -1,7 +1,6 @@
 # coordinates x and y
 # new format of keys
 # structured data (duplicated vertices), block format
-
 TITLE = "quad Mesh File"
 VARIABLES = "X", "Y"
 ZONE T="Zone-4" I=5 J=2 C=BLACK DATAPACKING=BLOCK ZONETYPE=ORDERED
