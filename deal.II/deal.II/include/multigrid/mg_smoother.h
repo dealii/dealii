@@ -2,7 +2,7 @@
 //    $Id$
 //    Version: $Name$
 //
-//    Copyright (C) 1999, 2000, 2001, 2002, 2003, 2004, 2005, 2006 by the deal.II authors
+//    Copyright (C) 1999, 2000, 2001, 2002, 2003, 2004, 2005, 2006, 2007 by the deal.II authors
 //
 //    This file is subject to QPL and may not be  distributed
 //    without copyright and license information. Please refer
@@ -186,13 +186,9 @@ class MGSmootherContinuous : public MGSmootherBase<VECTOR>
  * The option @p symmetric switches on alternating between the
  * smoother and its transpose in each step as proposed by Bramble.
  *
- * @p transpose and @p reverse are similar in the effect that
- * instead of the smoother the transposed is used. Typically, this is
- * off for pre-smoothing and on for post-smoothing. While
- * @p transpose is the true transposed smoothing operation,
- * @p reverse just uses the transposed of the smoother, but the
- * non-transposed matrix-vector multiplication; this can be used to
- * invert the direction of the Gauss-Seidel method.
+ * @p transpose uses the transposed smoothing operation using
+ * <tt>Tvmult</tt> instead of the regular <tt>vmult</tt> of the
+ * relaxation scheme.
  *
  * If you are using block matrices, the second @p initialize function
  * offers the possibility to extract a single block for smoothing. In
@@ -218,8 +214,7 @@ class MGSmootherRelaxation : public MGSmootherBase<VECTOR>
 			 const unsigned int steps = 1,
 			 const bool variable = false,
 			 const bool symmetric = false,
-			 const bool transpose = false,
-			 const bool reverse = false);
+			 const bool transpose = false);
 
 				     /**
 				      * Initialize for matrices. The
@@ -302,19 +297,20 @@ class MGSmootherRelaxation : public MGSmootherBase<VECTOR>
     void set_symmetric (const bool);
 
 				     /**
-				      * Switch on/off transposed. This
-				      * is mutually exclusive with
-				      * reverse().
+				      * Switch on/off transposed
+				      * smoothing. The effect is
+				      * overriden by set_symmetric().
 				      */
-    void set_transpose (const bool);
-    
-				     /**
-				      * Switch on/off reversed. This
-				      * is mutually exclusive with
-				      * transpose().
-				      */
-    void set_reverse (const bool);
+    void set_transpose (const bool);    
 
+				     /**
+				      * Set #debug to a nonzero value
+				      * to get debug information
+				      * logged to #deallog. Increase
+				      * to get more information
+				      */
+    void set_debug (const unsigned int level);
+    
 				     /**
 				      * The actual smoothing method.
 				      */
@@ -341,30 +337,45 @@ class MGSmootherRelaxation : public MGSmootherBase<VECTOR>
     MGLevelObject<PointerMatrix<MATRIX, VECTOR> > matrices;
 
 				     /**
-				      * Number of smoothing steps.
+				      * Number of smoothing steps on
+				      * the finest level. If no
+				      * #variable smoothing is chosen,
+				      * this is the number of steps on
+				      * all levels.
 				      */
     unsigned int steps;
 
 				     /**
-				      * Variable smoothing?
+				      * Variable smoothing: double the
+				      * number of smoothing steps
+				      * whenever going to the next
+				      * coarser level
 				      */
     bool variable;
 
 				     /**
-				      * Symmetric smoothing?
+				      * Symmetric smoothing: in the
+				      * smoothing iteration, alternate
+				      * between the relaxation method
+				      * and its transpose.
 				      */
     bool symmetric;
 
 				     /*
-				      * Transposed?
+				      * Use the transpose of the
+				      * relaxation method instead of
+				      * the method itself. This has no
+				      * effect if #symmetric smoothing
+				      * is chosen.
 				      */
     bool transpose;
-
+    
 				     /**
-				      * Reverse?
+				      * Output debugging information
+				      * to #deallog if this is
+				      * nonzero.
 				      */
-    bool reverse;
-
+    unsigned int debug;
 				     /**
 				      * Memory for auxiliary vectors.
 				      */
@@ -411,14 +422,13 @@ MGSmootherRelaxation<MATRIX, RELAX, VECTOR>::MGSmootherRelaxation(
   const unsigned int steps,
   const bool variable,
   const bool symmetric,
-  const bool transpose,
-  const bool reverse)
+  const bool transpose)
 		:
 		steps(steps),
 		variable(variable),
 		symmetric(symmetric),
 		transpose(transpose),
-		reverse(reverse),
+		debug(0),
 		mem(mem)
 {}
 
@@ -482,8 +492,7 @@ MGSmootherRelaxation<MATRIX, RELAX, VECTOR>::initialize (
 
 template <class MATRIX, class RELAX, class VECTOR>
 inline void
-MGSmootherRelaxation<MATRIX, RELAX, VECTOR>::
-set_steps (const unsigned int s)
+MGSmootherRelaxation<MATRIX, RELAX, VECTOR>::set_steps (const unsigned int s)
 {
   steps = s;
 }
@@ -491,8 +500,15 @@ set_steps (const unsigned int s)
 
 template <class MATRIX, class RELAX, class VECTOR>
 inline void
-MGSmootherRelaxation<MATRIX, RELAX, VECTOR>::
-set_variable (const bool flag)
+MGSmootherRelaxation<MATRIX, RELAX, VECTOR>::set_debug (const unsigned int s)
+{
+  debug = s;
+}
+
+
+template <class MATRIX, class RELAX, class VECTOR>
+inline void
+MGSmootherRelaxation<MATRIX, RELAX, VECTOR>::set_variable (const bool flag)
 {
   variable = flag;
 }
@@ -500,8 +516,7 @@ set_variable (const bool flag)
 
 template <class MATRIX, class RELAX, class VECTOR>
 inline void
-MGSmootherRelaxation<MATRIX, RELAX, VECTOR>::
-set_symmetric (const bool flag)
+MGSmootherRelaxation<MATRIX, RELAX, VECTOR>::set_symmetric (const bool flag)
 {
   symmetric = flag;
 }
@@ -509,19 +524,9 @@ set_symmetric (const bool flag)
 
 template <class MATRIX, class RELAX, class VECTOR>
 inline void
-MGSmootherRelaxation<MATRIX, RELAX, VECTOR>::
-set_transpose (const bool flag)
+MGSmootherRelaxation<MATRIX, RELAX, VECTOR>::set_transpose (const bool flag)
 {
   transpose = flag;
-}
-
-
-template <class MATRIX, class RELAX, class VECTOR>
-inline void
-MGSmootherRelaxation<MATRIX, RELAX, VECTOR>::
-set_reverse (const bool flag)
-{
-  reverse = flag;
 }
 
 
@@ -546,29 +551,40 @@ MGSmootherRelaxation<MATRIX, RELAX, VECTOR>::smooth(
   bool T = transpose;
   if (symmetric && (steps2 % 2 == 0))
     T = false;
-//  cerr << 'S' << level;
-//  cerr << '(' << matrices[level]->m() << ',' << matrices[level]->n() << ')';
+  if (debug > 0)
+    deallog << 'S' << level << ' ';
   
   for (unsigned int i=0; i<steps2; ++i)
     {
       if (T)
 	{
-//	  cerr << 'T';
+	  if (debug > 0)
+	    deallog << 'T';
 	  matrices[level].vmult(*r,u);
 	  r->sadd(-1.,1.,rhs);
+	  if (debug > 2)
+	    deallog << ' ' << r->l2_norm() << ' ';
 	  smoothers[level].Tvmult(*d, *r);
+	  if (debug > 1)
+	    deallog << ' ' << d->l2_norm() << ' ';
 	} else {
-//	  cerr << 'N';
+	  if (debug > 0)
+	    deallog << 'N';
 	  matrices[level].vmult(*r,u);
 	  r->sadd(-1.,1.,rhs);
+	  if (debug > 2)
+	    deallog << ' ' << r->l2_norm() << ' ';
 	  smoothers[level].vmult(*d, *r);
+	  if (debug > 1)
+	    deallog << ' ' << d->l2_norm() << ' ';
 	}
-//      cerr << '{' << r->l2_norm() << '}';
       u += *d;
       if (symmetric)
 	T = !T;
- }
-
+    }
+  if (debug > 0)
+    deallog << std::endl;
+  
   mem.free(r);
   mem.free(d);
 }
