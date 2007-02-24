@@ -2,7 +2,7 @@
 //    $Id$
 //    Version: $Name$
 //
-//    Copyright (C) 1998, 1999, 2000, 2001, 2002, 2003, 2004, 2005, 2006 by the deal.II authors
+//    Copyright (C) 1998, 1999, 2000, 2001, 2002, 2003, 2004, 2005, 2006, 2007 by the deal.II authors
 //
 //    This file is subject to QPL and may not be  distributed
 //    without copyright and license information. Please refer
@@ -17,6 +17,9 @@
 #include <base/config.h>
 #include <base/exceptions.h>
 #include <grid/tria_iterator_base.h>
+
+
+//TODO[WB]: since line and face iterators do not have levels, we can save a bit of memory by splitting TriaAccessor into a class for cells and one for everything else, and getting rid of the present_level field for the latter
 
 namespace std
 {
