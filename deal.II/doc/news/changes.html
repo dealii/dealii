@@ -1016,23 +1016,35 @@ inconvenience this causes.
 <h3>deal.II</h3>
 
 <ol>
-   <li> <p>New: Added function <code class="class">GridGenerator</code>::<code 
-       class="member">hyper_cube_with_cylindrical_hole</code> that produces 
-	   a square with a circular hole in the middle in 2d, and extrudes it along
-	   the z-direction between 0 and L. 
+   <li> <p>Improved: The
+       <code>GridRefinement::refine_and_coarsen_fixed_number</code> and
+       <code>GridRefinement::refine_and_coarsen_fixed_fraction</code> functions
+       have gained an additional last argument that can be used to specify a
+       maximal number of cells that we would like to use in a
+       triangulation. Its default value is set to indicate that no limit is
+       desired, as is the previous behavior.
        <br>
-       (Luca Heltai 2007/02/15)
+       (WB 2007/02/20)
        </p>
 
-   <li> <p>WorkAround: The class <code class="class">GridOut</code>::<code 
-       class="member">write_msh</code> produces a mesh which can be visualized in 
-	   the Gmsh reader. A bug in Gmsh prevented the boundary indicator to be 
-	   properly visualized. The boundary indicator was added to the material flag of the
-   	   faces (which is ignored when reading back the mesh) in order for the Gmsh reader
-	   to be able to display the boundary indicator in a proper way.
-       <br>
-       (Luca Heltai 2007/02/15)
-       </p>
+   <li> <p>New: Added function <code class="class">GridGenerator</code>::<code 
+        class="member">hyper_cube_with_cylindrical_hole</code> that produces 
+	a square with a circular hole in the middle in 2d, and extrudes it
+	along the z-direction between 0 and L. 
+        <br>
+        (Luca Heltai 2007/02/15)
+        </p>
+
+   <li> <p>Workaround: The class <code class="class">GridOut</code>::<code 
+        class="member">write_msh</code> produces a mesh which can be visualized
+	in the Gmsh reader. A bug in Gmsh prevented the boundary indicator to
+	be properly visualized. The boundary indicator was added to the
+	material flag of the faces (which is ignored when reading back the
+	mesh) in order for the Gmsh reader to be able to display the boundary
+	indicator in a proper way. 
+        <br>
+        (Luca Heltai 2007/02/15)
+        </p>
 
 
    <li> <p>Fixed: The function <code class="class">DoFTools</code>::<code 
@@ -1044,9 +1056,9 @@ inconvenience this causes.
        </p>
 
    <li> <p>Fixed: A local variable in
-       <code>TriaAccessor&lt;3,3&gt;::measure</code> and 
-	   erroneously marked as static could lead to
-       wrong results and crashes in multithread mode. This is now fixed.
+       <code>TriaAccessor&lt;3,3&gt;::measure</code> was
+       erroneously marked as static could lead to
+       wrong results and crashes in multithreaded mode. This is now fixed.
        <br>
        (WB 2007/02/09)
        </p>

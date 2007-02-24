@@ -2,7 +2,7 @@
 //    $Id$
 //    Version: $Name$
 //
-//    Copyright (C) 2000, 2001, 2002, 2003, 2004, 2005, 2006 by the deal.II authors
+//    Copyright (C) 2000, 2001, 2002, 2003, 2004, 2005, 2006, 2007 by the deal.II authors
 //
 //    This file is subject to QPL and may not be  distributed
 //    without copyright and license information. Please refer
@@ -67,6 +67,14 @@ template <class T> class Vector;
  *     want to chose a smaller value to avoid overrefinement in regions which
  *     do not contribute much to the error.
  *
+ *     The function takes an additional last argument that can be used to
+ *     specify a maximal number of cells. If this number is going to be
+ *     exceeded upon refinement, then refinement and coarsening fractions are
+ *     going to be adjusted in an attempt to reach the maximum number of
+ *     cells. In practice, it is complicated to reach this number exactly, so
+ *     the argument is only an indication. The default value of this argument
+ *     is to impose no limit on the number of cells.
+ *
  *   <li> @p refine_and_coarsen_fixed_fraction: this function computes the
  *     threshold such that the number of cells getting flagged for refinement
  *     makes up for a certain fraction of the total error. If this fraction is 50
@@ -89,6 +97,10 @@ template <class T> class Vector;
  *     This strategy is more suited for singular functions and error
  *     functionals, but may lead to very slow convergence of the grid
  *     if only few cells are refined in each step.
+ *
+ *     The function takes an additional parameter indicating the maximum
+ *     number of cells we want, just as the previous function. See there for
+ *     more information.
  *
  *     From the point of view of implementation, this time we really need to
  *     sort the array of criteria.
@@ -193,6 +205,19 @@ class GridRefinement
 				      * @p fraction_of_cells shall be
 				      * a value between zero and one.
 				      *
+				      * The last argument can be used to
+				      * specify a maximal number of cells. If
+				      * this number is going to be exceeded
+				      * upon refinement, then refinement and
+				      * coarsening fractions are going to be
+				      * adjusted in an attempt to reach the
+				      * maximum number of cells. In practice,
+				      * it is complicated to reach this number
+				      * exactly, so the argument is only an
+				      * indication. The default value of this
+				      * argument is to impose no limit on the
+				      * number of cells.
+				      *
 				      * Refer to the general doc of
 				      * this class for more
 				      * information.
@@ -203,7 +228,8 @@ class GridRefinement
     refine_and_coarsen_fixed_number (Triangulation<dim> &tria,
                                      const Vector       &criteria,
                                      const double        top_fraction_of_cells,
-                                     const double        bottom_fraction_of_cells);
+                                     const double        bottom_fraction_of_cells,
+				     const unsigned int  max_n_cells = std::numeric_limits<unsigned int>::max());
     
 				     /**
 				      * Refine the triangulation by
@@ -220,6 +246,19 @@ class GridRefinement
 				      * <tt>*_fraction</tt> shall be a
 				      * values between zero and one.
 				      *
+				      * The last argument can be used to
+				      * specify a maximal number of cells. If
+				      * this number is going to be exceeded
+				      * upon refinement, then refinement and
+				      * coarsening fractions are going to be
+				      * adjusted in an attempt to reach the
+				      * maximum number of cells. In practice,
+				      * it is complicated to reach this number
+				      * exactly, so the argument is only an
+				      * indication. The default value of this
+				      * argument is to impose no limit on the
+				      * number of cells.
+				      *
 				      * Refer to the general doc of
 				      * this class for more
 				      * information.
@@ -230,7 +269,8 @@ class GridRefinement
     refine_and_coarsen_fixed_fraction (Triangulation<dim> &tria,
                                        const Vector       &criteria,
                                        const double        top_fraction,
-                                       const double        bottom_fraction);
+                                       const double        bottom_fraction,
+				       const unsigned int  max_n_cells = std::numeric_limits<unsigned int>::max());
 
 
 

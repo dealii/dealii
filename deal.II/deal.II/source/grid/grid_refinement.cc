@@ -2,7 +2,7 @@
 //    $Id$
 //    Version: $Name$
 //
-//    Copyright (C) 2000, 2001, 2002, 2003, 2004, 2005, 2006 by the deal.II authors
+//    Copyright (C) 2000, 2001, 2002, 2003, 2004, 2005, 2006, 2007 by the deal.II authors
 //
 //    This file is subject to QPL and may not be  distributed
 //    without copyright and license information. Please refer
@@ -183,7 +183,8 @@ void
 GridRefinement::refine_and_coarsen_fixed_number (Triangulation<dim> &tria,
 						 const Vector       &criteria,
 						 const double        top_fraction,
-						 const double        bottom_fraction)
+						 const double        bottom_fraction,
+						 const unsigned int  max_n_cells)
 {
 				   // correct number of cells is
 				   // checked in @p{refine}
@@ -192,9 +193,62 @@ GridRefinement::refine_and_coarsen_fixed_number (Triangulation<dim> &tria,
   Assert (top_fraction+bottom_fraction <= 1, ExcInvalidParameterValue());
   Assert (criteria.is_non_negative (), ExcInvalidParameterValue());
 
-  const int refine_cells=static_cast<int>(top_fraction*criteria.size());
-  const int coarsen_cells=static_cast<int>(bottom_fraction*criteria.size());
+  int refine_cells  = static_cast<int>(top_fraction*criteria.size());
+  int coarsen_cells = static_cast<int>(bottom_fraction*criteria.size());
 
+				   // first we have to see whether we
+				   // currently already exceed the target
+				   // number of cells
+  if (tria.n_active_cells() >= max_n_cells)
+    {
+				       // if yes, then we need to stop
+				       // refining cells and instead try to
+				       // only coarsen as many as it would
+				       // take to get to the target
+      refine_cells  = 0;
+      coarsen_cells = (tria.n_active_cells() - max_n_cells) *
+		      GeometryInfo<dim>::children_per_cell /
+		      (GeometryInfo<dim>::children_per_cell - 1);
+    }
+				   // otherwise, see if we would exceed the
+				   // maximum desired number of cells with the
+				   // number of cells that are likely going to
+				   // result from refinement. here, each cell
+				   // to be refined is replaced by
+				   // C=GeometryInfo<dim>::children_per_cell
+				   // new cells, i.e. there will be C-1 more
+				   // cells than before. similarly, C cells
+				   // will be replaced by 1
+  else if (static_cast<unsigned int>
+	   (tria.n_active_cells()
+	    + refine_cells * (GeometryInfo<dim>::children_per_cell - 1)
+	    - (coarsen_cells *
+	       (GeometryInfo<dim>::children_per_cell - 1) /
+	       GeometryInfo<dim>::children_per_cell))
+	   >
+	   max_n_cells)
+    {
+				       // we have to adjust the
+				       // fractions. assume we want
+				       // alpha*refine_fraction and
+				       // alpha*coarsen_fraction as new
+				       // fractions and the resulting number
+				       // of cells to be equal to
+				       // max_n_cells. this leads to the
+				       // following equation for lambda
+      const double alpha
+	=
+	1. *
+	(max_n_cells - tria.n_active_cells())
+	/
+	(refine_cells * (GeometryInfo<dim>::children_per_cell - 1)
+	 - (coarsen_cells *
+	    (GeometryInfo<dim>::children_per_cell - 1) /
+	    GeometryInfo<dim>::children_per_cell));
+      refine_cells  = static_cast<int> (refine_cells * alpha);
+      coarsen_cells = static_cast<int> (coarsen_cells * alpha);
+    }
+  
   if (refine_cells || coarsen_cells)
     {
       dealii::Vector<typename Vector::value_type> tmp(criteria);
@@ -204,16 +258,17 @@ GridRefinement::refine_and_coarsen_fixed_number (Triangulation<dim> &tria,
 			    tmp.end(),
 			    std::greater<double>());
 	  refine (tria, criteria, *(tmp.begin() + refine_cells));
-	};
+	}
 
       if (coarsen_cells)
 	{
 	  std::nth_element (tmp.begin(), tmp.begin()+tmp.size()-coarsen_cells,
 			    tmp.end(),
 			    std::greater<double>());
-	  coarsen (tria, criteria, *(tmp.begin() + tmp.size() - coarsen_cells));
-	};
-    };
+	  coarsen (tria, criteria,
+		   *(tmp.begin() + tmp.size() - coarsen_cells));
+	}
+    }
 }
 
 
@@ -223,7 +278,8 @@ void
 GridRefinement::refine_and_coarsen_fixed_fraction (Triangulation<dim> &tria,
 						   const Vector       &criteria,
 						   const double        top_fraction,
-						   const double        bottom_fraction)
+						   const double        bottom_fraction,
+						   const unsigned int  max_n_cells)
 {
 				   // correct number of cells is
 				   // checked in @p{refine}
@@ -231,7 +287,7 @@ GridRefinement::refine_and_coarsen_fixed_fraction (Triangulation<dim> &tria,
   Assert ((bottom_fraction>=0) && (bottom_fraction<=1), ExcInvalidParameterValue());
   Assert (top_fraction+bottom_fraction <= 1, ExcInvalidParameterValue());
   Assert (criteria.is_non_negative (), ExcInvalidParameterValue());
-
+  
 				   // let tmp be the cellwise square of the
 				   // error, which is what we have to sum
 				   // up and compare with
@@ -244,18 +300,53 @@ GridRefinement::refine_and_coarsen_fixed_fraction (Triangulation<dim> &tria,
   std::sort (tmp.begin(), tmp.end(), std::greater<double>());
 
 				   // compute thresholds
-  typename dealii::Vector<typename Vector::value_type>::const_iterator pp=tmp.begin();
-  for (double sum=0; (sum<top_fraction*total_error) && (pp!=(tmp.end()-1)); ++pp)
+  typename dealii::Vector<typename Vector::value_type>::const_iterator
+    pp=tmp.begin();
+  for (double sum=0;
+       (sum<top_fraction*total_error) && (pp!=(tmp.end()-1));
+       ++pp)
     sum += *pp;
   double top_threshold = ( pp != tmp.begin () ?
 			   (*pp+*(pp-1))/2 :
 			   *pp );
-  typename dealii::Vector<typename Vector::value_type>::const_iterator qq=(tmp.end()-1);
-  for (double sum=0; (sum<bottom_fraction*total_error) && (qq!=tmp.begin()); --qq)
+  typename dealii::Vector<typename Vector::value_type>::const_iterator
+    qq=(tmp.end()-1);
+  for (double sum=0;
+       (sum<bottom_fraction*total_error) && (qq!=tmp.begin());
+       --qq)
     sum += *qq;
   double bottom_threshold = ( qq != (tmp.end()-1) ?
 			      (*qq + *(qq+1))/2 :
 			      0);
+
+				   // we now have an idea how many cells we
+				   // are going to refine and coarsen. we use
+				   // this information to see whether we are
+				   // over the limit and if so use a function
+				   // that knows how to deal with this
+				   // situation
+  {
+    const unsigned int refine_cells  = pp - tmp.begin(),
+		       coarsen_cells = tmp.end() - qq;
+
+    if (static_cast<unsigned int>
+	(tria.n_active_cells()
+	 + refine_cells * (GeometryInfo<dim>::children_per_cell - 1)
+	 - (coarsen_cells *
+	    (GeometryInfo<dim>::children_per_cell - 1) /
+	    GeometryInfo<dim>::children_per_cell))
+	>
+	max_n_cells)
+      {
+	refine_and_coarsen_fixed_number (tria,
+					 criteria,
+					 1.*refine_cells/criteria.size(),
+					 1.*coarsen_cells/criteria.size(),
+					 max_n_cells);
+	return;
+      }
+  }
+  
 
 				   // in some rare cases it may happen that
 				   // both thresholds are the same (e.g. if
@@ -393,7 +484,8 @@ GridRefinement::
 refine_and_coarsen_fixed_number (Triangulation<deal_II_dimension> &,
                                  const Vector<double> &,
                                  const double,
-                                 const double);
+                                 const double,
+				 const unsigned int);
 
 template
 void
@@ -401,7 +493,8 @@ GridRefinement::
 refine_and_coarsen_fixed_number (Triangulation<deal_II_dimension> &,
                                  const Vector<float> &,
                                  const double,
-                                 const double);
+                                 const double,
+				 const unsigned int);
 
 template
 void
@@ -409,7 +502,8 @@ GridRefinement::
 refine_and_coarsen_fixed_fraction (Triangulation<deal_II_dimension> &,
                                    const Vector<double> &,
                                    const double,
-                                   const double);
+                                   const double,
+				   const unsigned int);
 
 template
 void
@@ -417,7 +511,8 @@ GridRefinement::
 refine_and_coarsen_fixed_fraction (Triangulation<deal_II_dimension> &,
                                    const Vector<float> &,
                                    const double,
-                                   const double);
+                                   const double,
+				   const unsigned int);
 
 template
 void
