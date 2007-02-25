@@ -3318,7 +3318,7 @@ DoFTools::extract_hanging_node_dofs (const DoFHandler<2> &dof_handler,
   Assert(selected_dofs.size() == dof_handler.n_dofs(),
 	 ExcDimensionMismatch(selected_dofs.size(), dof_handler.n_dofs()));
 				   // preset all values by false
-  fill_n (selected_dofs.begin(), dof_handler.n_dofs(), false);
+  std::fill_n (selected_dofs.begin(), dof_handler.n_dofs(), false);
 
   const FiniteElement<dim> &fe   = dof_handler.get_fe();
 
