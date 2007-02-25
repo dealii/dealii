@@ -2,7 +2,7 @@
 //    $Id$
 //    Version: $Name$
 //
-//    Copyright (C) 2003, 2004, 2006 by the deal.II authors
+//    Copyright (C) 2003, 2004, 2006, 2007 by the deal.II authors
 //
 //    This file is subject to QPL and may not be  distributed
 //    without copyright and license information. Please refer
@@ -2346,61 +2346,186 @@ namespace hp
                                      // for quads only in 4d and
                                      // higher, so this isn't a
                                      // particularly frequent case
+				     //
+				     // there is one case, however, that we
+				     // would like to handle (see, for
+				     // example, the hp/crash_15 testcase): if
+				     // we have FESystem(FE_Q(2),FE_DGQ(i))
+				     // elements for a bunch of values 'i',
+				     // then we should be able to handle this
+				     // because we can simply unify *all*
+				     // dofs, not only a some. so what we do
+				     // is to first treat all pairs of finite
+				     // elements that have *identical* dofs,
+				     // and then only deal with those that are
+				     // not identical of which we can handle
+				     // at most 2
     Table<2,boost::shared_ptr<internal::hp::DoFIdentities> >
       line_dof_identities (finite_elements->size(),
 			   finite_elements->size());
 	
     for (line_iterator line=begin_line(); line!=end_line(); ++line)
-      if (line->n_active_fe_indices() == 2)
-	{
-                                           // find out which is the
-                                           // most dominating finite
-                                           // element of the ones that
-                                           // are used on this line
-          const unsigned int most_dominating_fe_index
-            = internal::hp::get_most_dominating_fe_index<dim> (line);
+      {
+	unsigned int unique_sets_of_dofs
+	  = line->n_active_fe_indices();
 
-	  const unsigned int n_active_fe_indices
-	    = line->n_active_fe_indices ();
+					 // do a first loop over all sets of
+					 // dofs and do identity
+					 // uniquification
+	for (unsigned int f=0; f<line->n_active_fe_indices(); ++f)
+	  for (unsigned int g=f+1; g<line->n_active_fe_indices(); ++g)
+	    {
+	      const unsigned int fe_index_1 = line->nth_active_fe_index (f),
+				 fe_index_2 = line->nth_active_fe_index (g);
+	      
+	      if ((*finite_elements)[fe_index_1].dofs_per_line
+		  ==
+		  (*finite_elements)[fe_index_2].dofs_per_line)
+		{
+		  internal::hp::ensure_existence_of_dof_identities<dim,1>
+		    ((*finite_elements)[fe_index_1],
+		     (*finite_elements)[fe_index_2],
+		     line_dof_identities[fe_index_1][fe_index_2]);
+						   // see if these sets of dofs
+						   // are identical. the first
+						   // condition for this is that
+						   // indeed there are n
+						   // identities
+		  if (line_dof_identities[fe_index_1][fe_index_2]->size()
+		      == 
+		      (*finite_elements)[fe_index_1].dofs_per_line)
+		    {
+		      unsigned int i=0;
+		      for (; i<(*finite_elements)[fe_index_1].dofs_per_line; ++i)
+			if (((*(line_dof_identities[fe_index_1][fe_index_2]))[i].first != i)
+			    &&
+			    ((*(line_dof_identities[fe_index_1][fe_index_2]))[i].second != i))
+							   // not an identity
+			  break;
 
-                                           // loop over the indices of
-                                           // all the finite elements
-                                           // that are not dominating,
-                                           // and identify their dofs
-                                           // to the most dominating
-                                           // one
-          for (unsigned int f=0; f<n_active_fe_indices; ++f)
-            if (line->nth_active_fe_index (f) !=
-                most_dominating_fe_index)
-              {
-                const unsigned int
-                  other_fe_index = line->nth_active_fe_index (f);
+		      if (i == (*finite_elements)[fe_index_1].dofs_per_line)
+			{
+							   // the dofs of these
+							   // two finite
+							   // elements are
+							   // identical. as a
+							   // safety check,
+							   // ensure that none
+							   // of the two FEs is
+							   // trying to dominate
+							   // the other, which
+							   // wouldn't make any
+							   // sense in this case
+			  Assert ((*finite_elements)[fe_index_1].compare_for_face_domination
+				  ((*finite_elements)[fe_index_2])
+				  ==
+				  FiniteElementDomination::either_element_can_dominate,
+				  ExcInternalError());
+			
+			  --unique_sets_of_dofs;
 
-                internal::hp::ensure_existence_of_dof_identities<dim,1>
-                  ((*finite_elements)[most_dominating_fe_index],
-                   (*finite_elements)[other_fe_index],
-                   line_dof_identities[most_dominating_fe_index][other_fe_index]);
+			  for (unsigned int j=0; j<(*finite_elements)[fe_index_1].dofs_per_line; ++j)
+			    {
+			      const unsigned int master_dof_index
+				= line->dof_index (j, fe_index_1);
+			      const unsigned int slave_dof_index
+				= line->dof_index (j, fe_index_2);
 
-                internal::hp::DoFIdentities &identities
-                  = *line_dof_identities[most_dominating_fe_index][other_fe_index];
-                for (unsigned int i=0; i<identities.size(); ++i)
-                  {
-                    const unsigned int master_dof_index
-                      = line->dof_index (identities[i].first, most_dominating_fe_index);
-                    const unsigned int slave_dof_index
-                      = line->dof_index (identities[i].second, other_fe_index);
-
-                    Assert ((new_dof_indices[master_dof_index] ==
-                             deal_II_numbers::invalid_unsigned_int)
-                            ||
-                            (new_dof_indices[slave_dof_index] ==
-                             master_dof_index),
-                            ExcInternalError());
-		      
-                    new_dof_indices[slave_dof_index] = master_dof_index;
+							       // if master dof
+							       // was already
+							       // constrained,
+							       // constrain to
+							       // that one,
+							       // otherwise
+							       // constrain
+							       // slave to
+							       // master
+			      if (new_dof_indices[master_dof_index] !=
+				  deal_II_numbers::invalid_unsigned_int)
+				{
+				  Assert (new_dof_indices[new_dof_indices[master_dof_index]] ==
+					  deal_II_numbers::invalid_unsigned_int,
+					  ExcInternalError());
+				
+				  new_dof_indices[slave_dof_index]
+				    = new_dof_indices[master_dof_index];
+				}
+			      else
+				{
+				  Assert ((new_dof_indices[master_dof_index] ==
+					   deal_II_numbers::invalid_unsigned_int)
+					  ||
+					  (new_dof_indices[slave_dof_index] ==
+					   master_dof_index),
+					  ExcInternalError());
+				
+				  new_dof_indices[slave_dof_index] = master_dof_index;
+				}
+			    } 
+			}
+		    }
 		}
 	    }
-	}
+	
+					 // if at this point, there is only
+					 // one unique set of dofs left, then
+					 // we have taken care of everything
+					 // above. if there are two, then we
+					 // need to deal with them here. if
+					 // there are more, then we punt, as
+					 // described in the paper (and
+					 // mentioned above)
+	if (unique_sets_of_dofs == 2)
+	  {
+					     // find out which is the
+					     // most dominating finite
+					     // element of the ones that
+					     // are used on this line
+	    const unsigned int most_dominating_fe_index
+	      = internal::hp::get_most_dominating_fe_index<dim> (line);
+
+	    const unsigned int n_active_fe_indices
+	      = line->n_active_fe_indices ();
+
+					     // loop over the indices of
+					     // all the finite elements
+					     // that are not dominating,
+					     // and identify their dofs
+					     // to the most dominating
+					     // one
+	    for (unsigned int f=0; f<n_active_fe_indices; ++f)
+	      if (line->nth_active_fe_index (f) !=
+		  most_dominating_fe_index)
+		{
+		  const unsigned int
+		    other_fe_index = line->nth_active_fe_index (f);
+
+		  internal::hp::ensure_existence_of_dof_identities<dim,1>
+		    ((*finite_elements)[most_dominating_fe_index],
+		     (*finite_elements)[other_fe_index],
+		     line_dof_identities[most_dominating_fe_index][other_fe_index]);
+
+		  internal::hp::DoFIdentities &identities
+		    = *line_dof_identities[most_dominating_fe_index][other_fe_index];
+		  for (unsigned int i=0; i<identities.size(); ++i)
+		    {
+		      const unsigned int master_dof_index
+			= line->dof_index (identities[i].first, most_dominating_fe_index);
+		      const unsigned int slave_dof_index
+			= line->dof_index (identities[i].second, other_fe_index);
+
+		      Assert ((new_dof_indices[master_dof_index] ==
+			       deal_II_numbers::invalid_unsigned_int)
+			      ||
+			      (new_dof_indices[slave_dof_index] ==
+			       master_dof_index),
+			      ExcInternalError());
+		      
+		      new_dof_indices[slave_dof_index] = master_dof_index;
+		    }
+		}
+	  }
+      }
   }
 
 #if deal_II_dimension == 1

@@ -2,7 +2,7 @@
 //    $Id: hp_constraints_common.cc 12732 2006-03-28 23:15:45Z wolf $
 //    Version: $Name$ 
 //
-//    Copyright (C) 2006 by the deal.II authors
+//    Copyright (C) 2006, 2007 by the deal.II authors
 //
 //    This file is subject to QPL and may not be  distributed
 //    without copyright and license information. Please refer
@@ -57,7 +57,7 @@ void test ();
 template <int dim>
 void do_check (const Triangulation<dim> &triangulation,
 	       const hp::FECollection<dim> &fe)
-{  
+{
   hp::DoFHandler<dim>        dof_handler(triangulation);
 
 				   // distribute fe_indices randomly
