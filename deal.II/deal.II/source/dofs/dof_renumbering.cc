@@ -852,9 +852,9 @@ DoFRenumbering::compute_sort_selected_dofs_back (
   Assert (new_indices.size() == n_dofs,
 	  ExcDimensionMismatch(new_indices.size(), n_dofs));
   
-  const unsigned int   n_selected_dofs = count (selected_dofs.begin(),
-						selected_dofs.end(),
-						false);
+  const unsigned int   n_selected_dofs = std::count (selected_dofs.begin(),
+						     selected_dofs.end(),
+						     false);
   
   unsigned int next_unselected = 0;
   unsigned int next_selected   = n_selected_dofs;
