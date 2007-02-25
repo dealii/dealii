@@ -154,6 +154,9 @@ include-path-petsc           = $(DEAL_II_PETSC_DIR)/include
 include-path-petsc-bmake     = $(DEAL_II_PETSC_DIR)/bmake/$(DEAL_II_PETSC_ARCH)
 include-path-metis           = $(DEAL_II_METIS_DIR)/Lib
 
+# include paths as command line flags. while compilers allow a space between
+# the '-I' and the actual path, we also send these flags to the 
+# make_dependencies program that doesn't support the extra space.
 INCLUDE = -I$D/base/include -I$D/lac/include -I$D/deal.II/include \
 	  @CPPFLAGS@ @TECPLOT_INCLUDE_DIR@ \
           @UMFPACK_INCLUDE_DIR@ @HSL_INCLUDE_DIR@ \
