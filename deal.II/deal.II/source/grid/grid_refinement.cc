@@ -548,7 +548,8 @@ GridRefinement::
 refine_and_coarsen_fixed_number (Triangulation<deal_II_dimension> &,
                                  const PETScWrappers::Vector &,
                                  const double,
-                                 const double);
+                                 const double,
+				 const unsigned int);
 
 template
 void
@@ -556,7 +557,8 @@ GridRefinement::
 refine_and_coarsen_fixed_fraction (Triangulation<deal_II_dimension> &,
                                    const PETScWrappers::Vector &,
                                    const double,
-                                   const double);
+                                   const double,
+				   const unsigned int);
 
 template
 void
