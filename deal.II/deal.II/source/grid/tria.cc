@@ -28,6 +28,8 @@
 #include <map>
 #include <cmath>
 #include <iostream>
+#include <functional>
+
 #include <boost/array.hpp>
 
 DEAL_II_NAMESPACE_OPEN
