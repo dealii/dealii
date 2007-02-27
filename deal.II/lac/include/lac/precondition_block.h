@@ -2,7 +2,7 @@
 //    $Id$
 //    Version: $Name$
 //
-//    Copyright (C) 1999, 2000, 2001, 2002, 2003, 2004, 2005, 2006 by the deal.II authors
+//    Copyright (C) 1999, 2000, 2001, 2002, 2003, 2004, 2005, 2006, 2007 by the deal.II authors
 //
 //    This file is subject to QPL and may not be  distributed
 //    without copyright and license information. Please refer
@@ -153,8 +153,8 @@ class PreconditionBlock : public virtual Subscriptor
 				      */
     void initialize (const MATRIX& A,
 		     const AdditionalData parameters);
-
-
+//TODO:[GK] No idea what these are for. Remove if nobody complains
+  protected:
 				     /**
 				      * Initialize matrix and block
 				      * size for permuted
@@ -190,7 +190,7 @@ class PreconditionBlock : public virtual Subscriptor
     void invert_permuted_diagblocks(
       const std::vector<unsigned int>& permutation,
       const std::vector<unsigned int>& inverse_permutation);
-
+  public:
 				     /**
 				      * Deletes the inverse diagonal
 				      * block matrices if existent,
@@ -696,6 +696,18 @@ class PreconditionBlockJacobi : public virtual Subscriptor,
  *
  * See PreconditionBlock for requirements on the matrix.
  * 
+ * Optionally, the entries of the source vector can be treated in the
+ * order of the indices in the permutation vector set by
+ * #set_permutation (or the opposite order for Tvmult()). The inverse
+ * permutation is used for storing elements back into this
+ * vector. This functionality is automatically enabled after a call to
+ * set_permutation() with vectors of nonzero size.
+ *
+ * @note The diagonal blocks, like the matrix, are not permuted!
+ * Therefore, the permutation vector can only swap whole blocks. It
+ * may not change the order inside blocks or swap single indices
+ * between blocks.
+ *
  * @note Instantiations for this template are provided for <tt>@<float@> and
  * @<double@></tt>; others can be generated in application programs (see the
  * section on @ref Instantiations in the manual).
@@ -707,6 +719,15 @@ class PreconditionBlockSOR : public virtual Subscriptor,
 			     protected PreconditionBlock<MATRIX, inverse_type>
 {
   public:
+				     /**
+				      * Set the permutation and its
+				      * inverse. These vectors are
+				      * copied into private data, so
+				      * they can be reused or deleted
+				      * after a call to this function.
+				      */
+    void set_permutation(const std::vector<unsigned int>& permutation,
+			 const std::vector<unsigned int>& inverse_permutation);
 				     /**
 				      * Define number type of matrix.
 				      */
@@ -821,8 +842,19 @@ class PreconditionBlockSOR : public virtual Subscriptor,
 
   private:
 				     /**
+				      * The permutation vector
+				      */
+    std::vector<unsigned int> permutation;
+    
+				     /**
+				      * The inverse permutation vector
+				      */
+    std::vector<unsigned int> inverse_permutation;
+    
+				     /**
 				      * Actual implementation of the
-				      * preconditioning algorithm.
+				      * preconditioning algorithm
+				      * called by vmult() and vmult_add().
 				      *
 				      * The parameter @p adding does
 				      * not have any function, yet.
@@ -834,7 +866,9 @@ class PreconditionBlockSOR : public virtual Subscriptor,
 
 				     /**
 				      * Actual implementation of the
-				      * preconditioning algorithm.
+				      * preconditioning algorithm
+				      * called by Tvmult() and
+				      * Tvmult_add().
 				      *
 				      * The parameter @p adding does
 				      * not have any function, yet.
@@ -843,6 +877,36 @@ class PreconditionBlockSOR : public virtual Subscriptor,
     void do_Tvmult (Vector<number2>&,
 		    const Vector<number2>&,
 		    const bool adding) const;
+
+				     /**
+				      * Actual implementation of the
+				      * preconditioning algorithm
+				      * called by vmult() and
+				      * vmult_add() if #permutation
+				      * vectors are not empty.
+				      *
+				      * The parameter @p adding does
+				      * not have any function, yet.
+				      */
+    template <typename number2>
+    void do_permuted_vmult (Vector<number2>&,
+			    const Vector<number2>&,
+			    const bool adding) const;
+
+				     /**
+				      * Actual implementation of the
+				      * preconditioning algorithm
+				      * called by Tvmult() and
+				      * Tvmult_add() if #permutation
+				      * vectors are not empty.
+				      *
+				      * The parameter @p adding does
+				      * not have any function, yet.
+				      */
+    template <typename number2>
+    void do_permuted_Tvmult (Vector<number2>&,
+			     const Vector<number2>&,
+			     const bool adding) const;
 
 };
 

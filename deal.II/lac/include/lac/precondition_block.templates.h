@@ -2,7 +2,7 @@
 //    $Id$
 //    Version: $Name$
 //
-//    Copyright (C) 1999, 2000, 2001, 2002, 2003, 2004, 2005, 2006 by the deal.II authors
+//    Copyright (C) 1999, 2000, 2001, 2002, 2003, 2004, 2005, 2006, 2007 by the deal.II authors
 //
 //    This file is subject to QPL and may not be  distributed
 //    without copyright and license information. Please refer
@@ -527,6 +527,23 @@ void PreconditionBlockJacobi<MATRIX,inverse_type>
 
 /*--------------------- PreconditionBlockSOR -----------------------*/
 
+
+template <class MATRIX, typename inverse_type>
+void PreconditionBlockSOR<MATRIX,inverse_type>::set_permutation (
+  const std::vector<unsigned int>& p,
+  const std::vector<unsigned int>& i)
+{
+  Assert (p.size() == i.size(), ExcDimensionMismatch(p.size(), i.size()));
+  permutation.resize(p.size());
+  inverse_permutation.resize(p.size());
+  for (unsigned int k=0;k<p.size();++k)
+    {
+      permutation[k] = p[k];
+      inverse_permutation[k] = i[k];
+    }
+}
+
+
 template <class MATRIX, typename inverse_type>
 template <typename number2>
 void PreconditionBlockSOR<MATRIX,inverse_type>::do_vmult (
@@ -683,7 +700,7 @@ void PreconditionBlockSOR<MATRIX,inverse_type>::do_Tvmult (
       FullMatrix<number> M_cell(this->blocksize);
       for (int icell=this->nblocks-1; icell>=0 ; --icell)
 	{
-	  unsigned int cell = (unsigned int) icell;
+//	  unsigned int cell = (unsigned int) icell;
 					   // Collect upper triangle
 	  for (row = block_start, row_cell = 0;
 	       row_cell<this->blocksize;
@@ -708,14 +725,16 @@ void PreconditionBlockSOR<MATRIX,inverse_type>::do_Tvmult (
 	    }
 	  M_cell.householder(b_cell);
 	  M_cell.backward(x_cell,b_cell);
+	  
+	  block_end   -= this->blocksize;
+	  block_start += this->blocksize;
+
 					   // distribute x_cell to dst
-	  for (row=cell*this->blocksize, row_cell=0;
+	  for (row=block_end, row_cell=0;
 	       row_cell<this->blocksize;
 	       ++row_cell, ++row)
 	    dst(row)=this->relaxation*x_cell(row_cell);
 	  
-	  block_end   -= this->blocksize;
-	  block_start += this->blocksize;
 	}
     }
   else
@@ -739,16 +758,244 @@ void PreconditionBlockSOR<MATRIX,inverse_type>::do_Tvmult (
 	    b_cell(row_cell)=b_cell_row;
 	  }
 	this->inverse(cell).vmult(x_cell, b_cell);
+
+	block_end   -= this->blocksize;
+	block_start += this->blocksize;
+	
 					 // distribute x_cell to dst
-	for (row=cell*this->blocksize, row_cell=0;
+	for (row=block_end, row_cell=0;
+	     row_cell<this->blocksize;
+	     ++row_cell, ++row)
+	  dst(row)=this->relaxation*x_cell(row_cell);	
+      }
+}
+
+
+template <class MATRIX, typename inverse_type>
+template <typename number2>
+void PreconditionBlockSOR<MATRIX,inverse_type>::do_permuted_vmult (
+  Vector<number2>       &dst,
+  const Vector<number2> &src,
+  const bool) const
+{
+				   // introduce the following typedef
+				   // since in the use of exceptions,
+				   // strict C++ requires us to
+				   // specify them fully as they are
+				   // from a template dependent base
+				   // class. thus, we'd have to write
+				   // PreconditionBlock<number,inverse_type>::ExcNoMatrixGivenToUse,
+				   // which is lengthy, but also poses
+				   // some problems to the
+				   // preprocessor due to the comma in
+				   // the template arg list. we could
+				   // then wrap the whole thing into
+				   // parentheses, but that creates a
+				   // parse error for gcc for the
+				   // exceptions that do not take
+				   // args...
+  typedef PreconditionBlock<MATRIX,inverse_type> BaseClass;
+
+  Assert (this->A!=0, ExcNotInitialized());
+  
+  const MATRIX &M=*this->A;
+  Assert (permutation.size() == M.m(), ExcDimensionMismatch(permutation.size(), M.m()));
+  
+  Vector<number2> b_cell(this->blocksize), x_cell(this->blocksize);
+
+				       // cell_row, cell_column are the
+				       // numbering of the blocks (cells).
+				       // row_cell, column_cell are the local
+				       // numbering of the unknowns in the
+				       // blocks.
+				       // row, column are the global numbering
+				       // of the unkowns.
+  unsigned int row, row_cell, block_start=0;
+  number2 b_cell_row;
+
+  if (!this->inverses_ready())
+    {
+      FullMatrix<number> M_cell(this->blocksize);
+      for (unsigned int cell=0; cell < this->nblocks; ++cell)
+	{
+	  for (row = permutation[block_start], row_cell = 0;
+	       row_cell < this->blocksize;
+	       ++row_cell, ++row)
+	    {
+	      const typename MATRIX::const_iterator row_end = M.end(row);
+	      typename MATRIX::const_iterator entry = M.begin(row);
+	      
+	      b_cell_row=src(row);
+	      for (; entry != row_end; ++entry)
+		{
+		  const unsigned int column = entry->column();
+		  if (inverse_permutation[column] < block_start)
+		    b_cell_row -= entry->value() * dst(column);
+		  else if (column < block_start + this->blocksize)
+		    {
+		      const unsigned int column_cell = column - block_start;
+		      M_cell(row_cell, column_cell) = entry->value();
+		    }
+		}
+	      b_cell(row_cell)=b_cell_row;
+	    }
+	  M_cell.householder(b_cell);
+	  M_cell.backward(x_cell,b_cell);
+					   // distribute x_cell to dst
+	  for (row=permutation[block_start], row_cell=0;
+	       row_cell<this->blocksize;
+	       ++row_cell, ++row)
+	    dst(row)=this->relaxation*x_cell(row_cell);
+	  
+	  block_start+=this->blocksize;
+	}
+    }
+  else
+    for (unsigned int cell=0; cell < this->nblocks; ++cell)
+      {
+	for (row = permutation[block_start], row_cell = 0;
+	     row_cell<this->blocksize;
+	     ++row_cell, ++row)
+	  {
+	    const typename MATRIX::const_iterator row_end = M.end(row);
+	    typename MATRIX::const_iterator entry = M.begin(row);
+	    
+	    b_cell_row=src(row);
+	    for (; entry != row_end; ++entry)
+	      {
+		const unsigned int column = entry->column();
+		if (inverse_permutation[column] < block_start)
+		  b_cell_row -= entry->value() * dst(column);
+	      }		      
+	    b_cell(row_cell)=b_cell_row;
+	  }
+	this->inverse(permutation[block_start]/this->blocksize).vmult(x_cell, b_cell);
+					 // distribute x_cell to dst
+	for (row=permutation[block_start], row_cell=0;
 	     row_cell<this->blocksize;
 	     ++row_cell, ++row)
 	  dst(row)=this->relaxation*x_cell(row_cell);
 	
-	block_end   -= this->blocksize;
-	block_start += this->blocksize;
+	block_start+=this->blocksize;
       }
 }
+
+
+template <class MATRIX, typename inverse_type>
+template <typename number2>
+void PreconditionBlockSOR<MATRIX,inverse_type>::do_permuted_Tvmult (
+  Vector<number2>       &dst,
+  const Vector<number2> &src,
+  const bool) const
+{
+				   // introduce the following typedef
+				   // since in the use of exceptions,
+				   // strict C++ requires us to
+				   // specify them fully as they are
+				   // from a template dependent base
+				   // class. thus, we'd have to write
+				   // PreconditionBlock<number,inverse_type>::ExcNoMatrixGivenToUse,
+				   // which is lengthy, but also poses
+				   // some problems to the
+				   // preprocessor due to the comma in
+				   // the template arg list. we could
+				   // then wrap the whole thing into
+				   // parentheses, but that creates a
+				   // parse error for gcc for the
+				   // exceptions that do not take
+				   // args...
+  typedef PreconditionBlock<MATRIX,inverse_type> BaseClass;
+
+  Assert (this->A!=0, ExcNotInitialized());
+  
+  const MATRIX &M=*this->A;
+  Assert (permutation.size() == M.m(), ExcDimensionMismatch(permutation.size(), M.m()));
+
+  Vector<number2> b_cell(this->blocksize), x_cell(this->blocksize);
+
+				       // cell_row, cell_column are the
+				       // numbering of the blocks (cells).
+				       // row_cell, column_cell are the local
+				       // numbering of the unknowns in the
+				       // blocks.
+				       // row, column are the global numbering
+				       // of the unkowns.
+  unsigned int row, row_cell;
+  unsigned int block_end=this->blocksize * this->nblocks;
+  number2 b_cell_row;
+
+  if (!this->inverses_ready())
+    {
+      FullMatrix<number> M_cell(this->blocksize);
+      for (int icell=this->nblocks-1; icell>=0 ; --icell)
+	{
+	  const unsigned int block_start = block_end-this->blocksize;
+					   // Collect upper triangle
+	  for (row = permutation[block_start], row_cell = 0;
+	       row_cell<this->blocksize;
+	       ++row_cell, ++row)
+	    {
+	    const typename MATRIX::const_iterator row_end = M.end(row);
+	    typename MATRIX::const_iterator entry = M.begin(row);
+	    
+	      b_cell_row=src(row);
+	      for (; entry != row_end; ++entry)
+		{
+		  const unsigned int column = entry->column();
+		  if (inverse_permutation[column] >= block_end)
+		    b_cell_row -= entry->value() * dst(column);
+		  else if (column >= block_start)
+		    {
+		      const unsigned int column_cell = column - block_start;
+		      M_cell(row_cell, column_cell) = entry->value();
+		    }
+		}
+	      b_cell(row_cell)=b_cell_row;
+	    }
+	  M_cell.householder(b_cell);
+	  M_cell.backward(x_cell,b_cell);
+	  
+					   // distribute x_cell to dst
+	  for (row=permutation[block_start], row_cell=0;
+	       row_cell<this->blocksize;
+	       ++row_cell, ++row)
+	    dst(row)=this->relaxation*x_cell(row_cell);
+	  
+	  block_end = block_start;
+	}
+    }
+  else
+    for (int icell = this->nblocks-1; icell >= 0 ; --icell)
+      {
+	const unsigned int block_start = block_end-this->blocksize;
+	for (row=permutation[block_start], row_cell=0;
+	     row_cell<this->blocksize;
+	     ++row_cell, ++row)
+	  {
+	    const typename MATRIX::const_iterator row_end = M.end(row);
+	    typename MATRIX::const_iterator entry = M.begin(row);
+	    
+	    b_cell_row=src(row);
+	    for (; entry != row_end; ++entry)
+	      {
+		const unsigned int column = entry->column();
+		if (inverse_permutation[column] >= block_end)
+		  b_cell_row -= entry->value() * dst(column);
+	      }		      
+	    b_cell(row_cell)=b_cell_row;
+	  }
+	this->inverse(block_start/this->blocksize).vmult(x_cell, b_cell);
+	
+					 // distribute x_cell to dst
+	for (row=permutation[block_start], row_cell=0;
+	     row_cell<this->blocksize;
+	     ++row_cell, ++row)
+	  dst(row)=this->relaxation*x_cell(row_cell);
+	
+	block_end = block_start;
+      }
+}
+
 
 template <class MATRIX, typename inverse_type>
 template <typename number2>
@@ -756,7 +1003,10 @@ void PreconditionBlockSOR<MATRIX,inverse_type>
 ::vmult (Vector<number2>       &dst,
 	 const Vector<number2> &src) const
 {
-  do_vmult(dst, src, false);
+  if (permutation.size() == 0)
+    do_vmult(dst, src, false);
+  else
+    do_permuted_vmult(dst, src, false);
 }
 
 
@@ -766,7 +1016,10 @@ void PreconditionBlockSOR<MATRIX,inverse_type>
 ::vmult_add (Vector<number2>       &dst,
 	     const Vector<number2> &src) const
 {
-  do_vmult(dst, src, true);
+  if (permutation.size() == 0)
+    do_vmult(dst, src, true);
+  else
+    do_permuted_vmult(dst, src, true);
 }
 
 
@@ -776,7 +1029,10 @@ void PreconditionBlockSOR<MATRIX,inverse_type>
 ::Tvmult (Vector<number2>       &dst,
 	 const Vector<number2> &src) const
 {
-  do_Tvmult(dst, src, false);
+  if (permutation.size() == 0)
+    do_Tvmult(dst, src, false);
+  else
+    do_permuted_Tvmult(dst, src, false);
 }
 
 
@@ -786,7 +1042,10 @@ void PreconditionBlockSOR<MATRIX,inverse_type>
 ::Tvmult_add (Vector<number2>       &dst,
 	     const Vector<number2> &src) const
 {
-  do_Tvmult(dst, src, true);
+  if (permutation.size() == 0)
+    do_Tvmult(dst, src, true);
+  else
+    do_permuted_Tvmult(dst, src, true);
 }
 
 
