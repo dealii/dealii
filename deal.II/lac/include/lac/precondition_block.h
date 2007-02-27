@@ -840,6 +840,45 @@ class PreconditionBlockSOR : public virtual Subscriptor,
     template <typename number2>
     void Tvmult_add (Vector<number2>&, const Vector<number2>&) const;
 
+  protected:
+				     /**
+				      * Implementation of the forward
+				      * substitution loop called by
+				      * vmult() and vmult_add().
+				      *
+				      * If a #permutation is set by
+				      * set_permutation(), it will
+				      * automatically be honored by
+				      * this function.
+				      *
+				      * The parameter @p adding does
+				      * not have any function, yet.
+				      */
+    template <typename number2>
+    void forward (Vector<number2>&,
+		  const Vector<number2>&,
+		  const bool transpose_diagonal,
+		  const bool adding) const;
+
+				     /**
+				      * Implementation of the backward
+				      * substitution loop called by
+				      * Tvmult() and Tvmult_add().
+				      *
+				      * If a #permutation is set by
+				      * set_permutation(), it will
+				      * automatically be honored by
+				      * this function.
+				      *
+				      * The parameter @p adding does
+				      * not have any function, yet.
+				      */
+    template <typename number2>
+    void backward (Vector<number2>&,
+		   const Vector<number2>&,
+		   const bool transpose_diagonal,
+		   const bool adding) const;
+
   private:
 				     /**
 				      * The permutation vector
@@ -851,63 +890,6 @@ class PreconditionBlockSOR : public virtual Subscriptor,
 				      */
     std::vector<unsigned int> inverse_permutation;
     
-				     /**
-				      * Actual implementation of the
-				      * preconditioning algorithm
-				      * called by vmult() and vmult_add().
-				      *
-				      * The parameter @p adding does
-				      * not have any function, yet.
-				      */
-    template <typename number2>
-    void do_vmult (Vector<number2>&,
-		   const Vector<number2>&,
-		   const bool adding) const;
-
-				     /**
-				      * Actual implementation of the
-				      * preconditioning algorithm
-				      * called by Tvmult() and
-				      * Tvmult_add().
-				      *
-				      * The parameter @p adding does
-				      * not have any function, yet.
-				      */
-    template <typename number2>
-    void do_Tvmult (Vector<number2>&,
-		    const Vector<number2>&,
-		    const bool adding) const;
-
-				     /**
-				      * Actual implementation of the
-				      * preconditioning algorithm
-				      * called by vmult() and
-				      * vmult_add() if #permutation
-				      * vectors are not empty.
-				      *
-				      * The parameter @p adding does
-				      * not have any function, yet.
-				      */
-    template <typename number2>
-    void do_permuted_vmult (Vector<number2>&,
-			    const Vector<number2>&,
-			    const bool adding) const;
-
-				     /**
-				      * Actual implementation of the
-				      * preconditioning algorithm
-				      * called by Tvmult() and
-				      * Tvmult_add() if #permutation
-				      * vectors are not empty.
-				      *
-				      * The parameter @p adding does
-				      * not have any function, yet.
-				      */
-    template <typename number2>
-    void do_permuted_Tvmult (Vector<number2>&,
-			     const Vector<number2>&,
-			     const bool adding) const;
-
 };
 
 
