@@ -2,7 +2,7 @@
 //    $Id$
 //    Version: $Name$
 //
-//    Copyright (C) 2003, 2004, 2005, 2006 by the deal.II authors
+//    Copyright (C) 2003, 2004, 2005, 2006, 2007 by the deal.II authors
 //
 //    This file is subject to QPL and may not be  distributed
 //    without copyright and license information. Please refer
@@ -417,7 +417,8 @@ class DoFRenumbering
 				      */
     template <class DH>
     static void
-    compute_cell_wise_dg (std::vector<unsigned int> &new_dof_indices,
+    compute_cell_wise_dg (std::vector<unsigned int>& renumbering,
+			  std::vector<unsigned int>& inverse_renumbering,
 			  const DH &dof_handler,
 			  const std::vector<typename DH::cell_iterator> &cell_order);
 
@@ -433,6 +434,23 @@ class DoFRenumbering
 		  const unsigned int   level,
 		  const std::vector<typename MGDoFHandler<dim>::cell_iterator> &cell_order);
     
+				     /**
+				      * Computes the renumbering
+				      * vector needed by the
+				      * cell_wise_dg() level renumbering function. Does
+				      * not perform the renumbering on
+				      * the MGDoFHandler dofs but
+				      * returns the renumbering
+				      * vector.
+				      */
+    template <int dim>
+    static void
+    compute_cell_wise_dg (std::vector<unsigned int>& renumbering,
+			  std::vector<unsigned int>& inverse_renumbering,
+			  const MGDoFHandler<dim>&   dof_handler,
+			  const unsigned int         level,
+			  const std::vector<typename MGDoFHandler<dim>::cell_iterator>& cell_order);
+
 
 				     /**
 				      * Cell-wise downstream numbering
@@ -480,6 +498,13 @@ class DoFRenumbering
 		   const Point<dim> &direction);
 
     				     /**
+				      * @deprecated The new function
+				      * of this name computes the
+				      * renumbering and its inverse at
+				      * the same time. So, at least if
+				      * you need both, you should use
+				      * the other one.
+				      *
 				      * Computes the renumbering
 				      * vector needed by the
 				      * downstream_dg() function. Does
@@ -492,6 +517,39 @@ class DoFRenumbering
     static void
     compute_downstream_dg (std::vector<unsigned int>& new_dof_indices,
 			   const DH&                  dof_handler,
+			   const Point<dim>&          direction);
+
+    				     /**
+				      * Computes the renumbering
+				      * vector needed by the
+				      * downstream_dg() function. Does
+				      * not perform the renumbering on
+				      * the DoFHandler dofs but
+				      * returns the renumbering
+				      * vector.
+				      */
+    template <class DH, int dim>
+    static void
+    compute_downstream_dg (std::vector<unsigned int>& new_dof_indices,
+			   std::vector<unsigned int>& reverse,
+			   const DH&                  dof_handler,
+			   const Point<dim>&          direction);
+
+    				     /**
+				      * Computes the renumbering
+				      * vector needed by the
+				      * downstream_dg() function. Does
+				      * not perform the renumbering on
+				      * the MGDoFHandler dofs but
+				      * returns the renumbering
+				      * vector.
+				      */
+    template <int dim>
+    static void
+    compute_downstream_dg (std::vector<unsigned int>& new_dof_indices,
+			   std::vector<unsigned int>& reverse,
+			   const MGDoFHandler<dim>&   dof_handler,
+			   const unsigned int         level,
 			   const Point<dim>&          direction);
 
 //TODO:[GK] Documentation!    
