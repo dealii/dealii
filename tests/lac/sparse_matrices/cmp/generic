@@ -75,7 +75,7 @@ DEAL:5-SparseMatrix<double>:sor:Richardson::Failure step 10 value 0.00188
 DEAL:5-SparseMatrix<double>:block_jacobi:Richardson::Starting value 4.00
 DEAL:5-SparseMatrix<double>:block_jacobi:Richardson::Failure step 10 value 0.00594
 DEAL:5-SparseMatrix<double>:block_ssor:Richardson::Starting value 4.00
-DEAL:5-SparseMatrix<double>:block_ssor:Richardson::Failure step 10 value 0.371
+DEAL:5-SparseMatrix<double>:block_ssor:Richardson::Failure step 10 value 3.24e-07
 DEAL:5-SparseMatrix<double>:block_sor:Richardson::Starting value 4.00
 DEAL:5-SparseMatrix<double>:block_sor:Richardson::Failure step 10 value 1.07e-06
 DEAL:5-SparseMatrix<double>:block_psor:Richardson::Starting value 4.00
@@ -92,11 +92,11 @@ DEAL:5-SparseMatrix<double>:sor:RichardsonT::Failure step 10 value 0.230
 DEAL:5-SparseMatrix<double>:block_jacobi:RichardsonT::Starting value 4.00
 DEAL:5-SparseMatrix<double>:block_jacobi:RichardsonT::Failure step 10 value 0.00341
 DEAL:5-SparseMatrix<double>:block_ssor:RichardsonT::Starting value 4.00
-DEAL:5-SparseMatrix<double>:block_ssor:RichardsonT::Failure step 10 value 7.92
+DEAL:5-SparseMatrix<double>:block_ssor:RichardsonT::Failure step 10 value 3.24e-07
 DEAL:5-SparseMatrix<double>:block_sor:RichardsonT::Starting value 4.00
-DEAL:5-SparseMatrix<double>:block_sor:RichardsonT::Failure step 10 value 0.0445
+DEAL:5-SparseMatrix<double>:block_sor:RichardsonT::Failure step 10 value 1.07e-06
 DEAL:5-SparseMatrix<double>:block_psor:RichardsonT::Starting value 4.00
-DEAL:5-SparseMatrix<double>:block_psor:RichardsonT::Failure step 10 value 0.0472
+DEAL:5-SparseMatrix<double>:block_psor:RichardsonT::Failure step 10 value 8.62e-07
 DEAL::GrowingVectorMemory:Overall allocated vectors: 32
 DEAL::GrowingVectorMemory:Maximum allocated vectors: 2
 DEAL::	0	0	5.00
@@ -266,7 +266,7 @@ DEAL:5-SparseMatrixEZ<double>:sor:Richardson::Failure step 10 value 0.00188
 DEAL:5-SparseMatrixEZ<double>:block_jacobi:Richardson::Starting value 4.00
 DEAL:5-SparseMatrixEZ<double>:block_jacobi:Richardson::Failure step 10 value 0.00594
 DEAL:5-SparseMatrixEZ<double>:block_ssor:Richardson::Starting value 4.00
-DEAL:5-SparseMatrixEZ<double>:block_ssor:Richardson::Failure step 10 value 0.371
+DEAL:5-SparseMatrixEZ<double>:block_ssor:Richardson::Failure step 10 value 3.24e-07
 DEAL:5-SparseMatrixEZ<double>:block_sor:Richardson::Starting value 4.00
 DEAL:5-SparseMatrixEZ<double>:block_sor:Richardson::Failure step 10 value 1.07e-06
 DEAL:5-SparseMatrixEZ<double>:block_psor:Richardson::Starting value 4.00
@@ -283,11 +283,11 @@ DEAL:5-SparseMatrixEZ<double>:sor:RichardsonT::Failure step 10 value 0.230
 DEAL:5-SparseMatrixEZ<double>:block_jacobi:RichardsonT::Starting value 4.00
 DEAL:5-SparseMatrixEZ<double>:block_jacobi:RichardsonT::Failure step 10 value 0.00341
 DEAL:5-SparseMatrixEZ<double>:block_ssor:RichardsonT::Starting value 4.00
-DEAL:5-SparseMatrixEZ<double>:block_ssor:RichardsonT::Failure step 10 value 7.92
+DEAL:5-SparseMatrixEZ<double>:block_ssor:RichardsonT::Failure step 10 value 3.24e-07
 DEAL:5-SparseMatrixEZ<double>:block_sor:RichardsonT::Starting value 4.00
-DEAL:5-SparseMatrixEZ<double>:block_sor:RichardsonT::Failure step 10 value 0.0445
+DEAL:5-SparseMatrixEZ<double>:block_sor:RichardsonT::Failure step 10 value 1.07e-06
 DEAL:5-SparseMatrixEZ<double>:block_psor:RichardsonT::Starting value 4.00
-DEAL:5-SparseMatrixEZ<double>:block_psor:RichardsonT::Failure step 10 value 0.0472
+DEAL:5-SparseMatrixEZ<double>:block_psor:RichardsonT::Failure step 10 value 8.62e-07
 DEAL::GrowingVectorMemory:Overall allocated vectors: 32
 DEAL::GrowingVectorMemory:Maximum allocated vectors: 2
 DEAL::	0	0	5.00
@@ -379,7 +379,7 @@ DEAL:9-SparseMatrix<double>:sor:Richardson::Failure step 10 value 0.00112
 DEAL:9-SparseMatrix<double>:block_jacobi:Richardson::Starting value 4.00
 DEAL:9-SparseMatrix<double>:block_jacobi:Richardson::Failure step 10 value 0.0255
 DEAL:9-SparseMatrix<double>:block_ssor:Richardson::Starting value 4.00
-DEAL:9-SparseMatrix<double>:block_ssor:Richardson::Failure step 10 value 0.362
+DEAL:9-SparseMatrix<double>:block_ssor:Richardson::Failure step 10 value 9.12e-06
 DEAL:9-SparseMatrix<double>:block_sor:Richardson::Starting value 4.00
 DEAL:9-SparseMatrix<double>:block_sor:Richardson::Failure step 10 value 2.94e-06
 DEAL:9-SparseMatrix<double>:block_psor:Richardson::Starting value 4.00
@@ -396,7 +396,7 @@ DEAL:9-SparseMatrix<double>:sor:RichardsonT::Failure step 10 value 0.00112
 DEAL:9-SparseMatrix<double>:block_jacobi:RichardsonT::Starting value 4.00
 DEAL:9-SparseMatrix<double>:block_jacobi:RichardsonT::Failure step 10 value 0.0255
 DEAL:9-SparseMatrix<double>:block_ssor:RichardsonT::Starting value 4.00
-DEAL:9-SparseMatrix<double>:block_ssor:RichardsonT::Failure step 10 value 0.362
+DEAL:9-SparseMatrix<double>:block_ssor:RichardsonT::Failure step 10 value 9.12e-06
 DEAL:9-SparseMatrix<double>:block_sor:RichardsonT::Starting value 4.00
 DEAL:9-SparseMatrix<double>:block_sor:RichardsonT::Failure step 10 value 2.94e-06
 DEAL:9-SparseMatrix<double>:block_psor:RichardsonT::Starting value 4.00
@@ -415,7 +415,7 @@ DEAL:9-SparseMatrixEZ<double>:sor:Richardson::Failure step 10 value 0.00112
 DEAL:9-SparseMatrixEZ<double>:block_jacobi:Richardson::Starting value 4.00
 DEAL:9-SparseMatrixEZ<double>:block_jacobi:Richardson::Failure step 10 value 0.0255
 DEAL:9-SparseMatrixEZ<double>:block_ssor:Richardson::Starting value 4.00
-DEAL:9-SparseMatrixEZ<double>:block_ssor:Richardson::Failure step 10 value 0.362
+DEAL:9-SparseMatrixEZ<double>:block_ssor:Richardson::Failure step 10 value 9.12e-06
 DEAL:9-SparseMatrixEZ<double>:block_sor:Richardson::Starting value 4.00
 DEAL:9-SparseMatrixEZ<double>:block_sor:Richardson::Failure step 10 value 2.94e-06
 DEAL:9-SparseMatrixEZ<double>:block_psor:Richardson::Starting value 4.00
@@ -432,7 +432,7 @@ DEAL:9-SparseMatrixEZ<double>:sor:RichardsonT::Failure step 10 value 0.00112
 DEAL:9-SparseMatrixEZ<double>:block_jacobi:RichardsonT::Starting value 4.00
 DEAL:9-SparseMatrixEZ<double>:block_jacobi:RichardsonT::Failure step 10 value 0.0255
 DEAL:9-SparseMatrixEZ<double>:block_ssor:RichardsonT::Starting value 4.00
-DEAL:9-SparseMatrixEZ<double>:block_ssor:RichardsonT::Failure step 10 value 0.362
+DEAL:9-SparseMatrixEZ<double>:block_ssor:RichardsonT::Failure step 10 value 9.12e-06
 DEAL:9-SparseMatrixEZ<double>:block_sor:RichardsonT::Starting value 4.00
 DEAL:9-SparseMatrixEZ<double>:block_sor:RichardsonT::Failure step 10 value 2.94e-06
 DEAL:9-SparseMatrixEZ<double>:block_psor:RichardsonT::Starting value 4.00
