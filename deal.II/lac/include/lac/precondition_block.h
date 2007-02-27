@@ -936,6 +936,11 @@ class PreconditionBlockSSOR : public virtual Subscriptor,
 				     /**
 				      * Make function of base class public again.
 				      */
+    PreconditionBlockSOR<MATRIX,inverse_type>::set_permutation;
+
+				     /**
+				      * Make function of base class public again.
+				      */
     PreconditionBlockSOR<MATRIX, inverse_type>::empty;
 
 				     /**
