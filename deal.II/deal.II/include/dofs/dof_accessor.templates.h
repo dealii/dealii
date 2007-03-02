@@ -147,7 +147,7 @@ DoFAccessor<structdim,DH>::child (const unsigned int i) const
   Assert ((q.state() == IteratorState::past_the_end)
 	  ||
 	  q->used(),
-	  typename TriaAccessor<DH::dimension>::ExcUnusedCellAsChild());
+	  TriaAccessorExceptions::ExcUnusedCellAsChild());
 
   return q;
 }
@@ -668,7 +668,7 @@ DoFCellAccessor<DH>::neighbor (const unsigned int i) const
   
 #ifdef DEBUG
   if (q.state() != IteratorState::past_the_end)
-    Assert (q->used(), typename TriaAccessor<dim>::ExcUnusedCellAsNeighbor());
+    Assert (q->used(), TriaAccessorExceptions::ExcUnusedCellAsNeighbor());
 #endif
   return q;
 }
@@ -686,7 +686,7 @@ DoFCellAccessor<DH>::child (const unsigned int i) const
   
 #ifdef DEBUG
   if (q.state() != IteratorState::past_the_end)
-    Assert (q->used(), typename TriaAccessor<dim>::ExcUnusedCellAsChild());
+    Assert (q->used(), TriaAccessorExceptions::ExcUnusedCellAsChild());
 #endif
   return q;
 }

@@ -61,6 +61,69 @@ template <int dim>              class TriaObjectAccessor<3, dim>;
 
 
 /**
+ * A namespace that contains exception classes used by the accessor classes.
+ */
+namespace TriaAccessorExceptions
+{
+				   /**
+				    * @ingroup Exceptions
+				    */
+  DeclException0 (ExcCellNotUsed);
+				   /**
+				    * @ingroup Exceptions
+				    */
+  DeclException1 (ExcInvalidNeighbor,
+		  int,
+		  << "Neighbor indices must be between 0 and 2^dim-1, but "
+		  << "yours was " << arg1);
+				   /**
+				    * @ingroup Exceptions
+				    */
+  DeclException0 (ExcCellHasNoChildren);
+				   /**
+				    * @ingroup Exceptions
+				    */
+  DeclException0 (ExcUnusedCellAsChild);
+				   /**
+				    * @ingroup Exceptions
+				    */
+  DeclException1 (ExcCantSetChildren,
+		  int,
+		  << "You can only set the child index if the cell has no "
+		  << "children, or clear it. The given "
+		  << "index was " << arg1 << " (-1 means: clear children)");
+				   /**
+				    * @ingroup Exceptions
+				    */
+  DeclException0 (ExcUnusedCellAsNeighbor);
+				   /**
+				    * @ingroup Exceptions
+				    */
+  DeclException0 (ExcUncaughtCase);
+				   /**
+				    * @ingroup Exceptions
+				    */
+  DeclException0 (ExcDereferenceInvalidObject);
+				   /**
+				    * @ingroup Exceptions
+				    */
+  DeclException0 (ExcCantCompareIterators);
+				   /**
+				    * @ingroup Exceptions
+				    */
+  DeclException0 (ExcNeighborIsCoarser);
+				   /**
+				    * @ingroup Exceptions
+				    */
+  DeclException0 (ExcNeighborIsNotCoarser);
+				   /**
+				    * @ingroup Exceptions
+				    */
+  DeclException0 (ExcFacesHaveNoLevel);
+}
+
+
+/**
  * Implements the accessor class used by TriaRawIterator and derived
  * classes.
  *
@@ -242,67 +305,6 @@ class TriaAccessor
     const Triangulation<dim> & get_triangulation () const;
     
 				     /*@}*/
-
-				     /**@name Exceptions for derived classes
-				      */
-				     /*@{*/
-				     /**
-				      * @ingroup Exceptions
-				      */
-    DeclException0 (ExcCellNotUsed);
-				     /**
-				      * @ingroup Exceptions
-				      */
-    DeclException1 (ExcInvalidNeighbor,
-		    int,
-		    << "Neighbor indices must be between 0 and 2^dim-1, but "
-		    << "yours was " << arg1);
-				     /**
-				      * @ingroup Exceptions
-				      */
-    DeclException0 (ExcCellHasNoChildren);
-				     /**
-				      * @ingroup Exceptions
-				      */
-    DeclException0 (ExcUnusedCellAsChild);
-				     /**
-				      * @ingroup Exceptions
-				      */
-    DeclException1 (ExcCantSetChildren,
-		    int,
-		    << "You can only set the child index if the cell has no "
-		    << "children, or clear it. The given "
-		    << "index was " << arg1 << " (-1 means: clear children)");
-				     /**
-				      * @ingroup Exceptions
-				      */
-    DeclException0 (ExcUnusedCellAsNeighbor);
-				     /**
-				      * @ingroup Exceptions
-				      */
-    DeclException0 (ExcUncaughtCase);
-				     /**
-				      * @ingroup Exceptions
-				      */
-    DeclException0 (ExcDereferenceInvalidObject);
-				     /**
-				      * @ingroup Exceptions
-				      */
-    DeclException0 (ExcCantCompareIterators);
-				     /**
-				      * @ingroup Exceptions
-				      */
-    DeclException0 (ExcNeighborIsCoarser);
-				     /**
-				      * @ingroup Exceptions
-				      */
-    DeclException0 (ExcNeighborIsNotCoarser);
-				     /**
-				      * @ingroup Exceptions
-				      */
-    DeclException0 (ExcFacesHaveNoLevel);
-				     /*@}*/
-	
   protected:
 				     /**
 				      *  Used to store the level

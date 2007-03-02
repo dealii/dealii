@@ -176,7 +176,7 @@ MGDoFAccessor<structdim, dim>::child (const unsigned int i) const
   Assert ((q.state() == IteratorState::past_the_end)
 	  ||
 	  q->used(),
-	  typename TriaAccessor<dim>::ExcUnusedCellAsChild());
+	  TriaAccessorExceptions::ExcUnusedCellAsChild());
 
   return q;
 }
@@ -550,7 +550,7 @@ MGDoFCellAccessor<dim>::neighbor (const unsigned int i) const
   
 #ifdef DEBUG
   if (q.state() != IteratorState::past_the_end)
-    Assert (q->used(), typename TriaAccessor<dim>::ExcUnusedCellAsNeighbor());
+    Assert (q->used(), TriaAccessorExceptions::ExcUnusedCellAsNeighbor());
 #endif
   return q;
 }
@@ -567,7 +567,7 @@ MGDoFCellAccessor<dim>::child (const unsigned int i) const
   
 #ifdef DEBUG
   if (q.state() != IteratorState::past_the_end)
-    Assert (q->used(), typename TriaAccessor<dim>::ExcUnusedCellAsChild());
+    Assert (q->used(), TriaAccessorExceptions::ExcUnusedCellAsChild());
 #endif
   return q;
 }
