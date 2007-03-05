@@ -191,11 +191,18 @@ objects is the same for all iterators in the following snippet:
 
 Iterators are like pointers: they can be incremented and decremented, but they
 are really rather dumb. Their magic only lies in the fact that they point to
-some useful object, in this case the Accessor. Accessing data that
-characterizes a cell is always done through the Accessor, i.e. the expression
-<tt>i-&gt;</tt> grants access to <b>all</b> attributes of this Accessor.
+some useful object, in this case the Accessor. For pointers, they point to an
+actual object that stores some data. On the other hand, the deal.II iterators,
+when dereferenced, do not return a reference to an actual object, but return
+an object that knows how to get at the data that represents cells. In general, this
+object doesn't store itself where the vertices of a cell are or what its neighbors
+are. However, it knows how to tease this sort of information from out of the
+arrays and tables and lists that the Triangulation class sets up to describe a
+mesh.
 
-Examples of properties you can query from an iterator are
+Accessing data that characterizes a cell is always done through the Accessor,
+i.e. the expression <tt>i-&gt;</tt> grants access to <b>all</b> attributes of
+this Accessor. Examples of properties you can query from an iterator are
 @code
   cell->vertex(1);
   line->child(0);
@@ -354,6 +361,65 @@ a hexehedron in 3d), there are corresponding types and calls like
 <code>begin_active_quad()</code> or <code>end_quad()</code> that act on the
 dimension independent geometric objects line, quad, and hex. These calls,
 just as the ones above, exist in active and non-active forms.
+
+
+@section IteratorAccessorInternals Iterator and accessor internals
+
+Iterators, being like pointer, act as if they pointed to an actual
+object, but in reality all they do is to return an accessor when
+dereferenced. The accessor object contains the state, i.e. it knows
+which object it represents, by storing for example which Triangulation
+it belongs to, and the level and index within this level of a cell. It
+is therefore able to access the data that corresponds to the cell (or
+face, or edge) it represents
+
+There is a representation of past-the-end-pointers, denoted by special
+values of the member variables #present_level and #present_index in
+the TriaAccessor class: If #present_level>=0 and #present_index>=0,
+then the object is valid (there is no check whether the triangulation
+really has that many levels or that many cells on the present level
+when we investigate the state of an iterator; however, in many places
+where an iterator is dereferenced we make this check); if
+#present_level==-1 and #present_index==-1, then the iterator points
+past the end; in all other cases, the iterator is considered invalid.
+You can check this by calling the state() function.
+
+An iterator is also invalid, if the pointer pointing to the
+Triangulation object is invalid or zero.
+
+Finally, an iterator is invalid, if the element pointed to by
+#present_level and #present_index is not used, i.e. if the
+<tt>used</tt> flag is set to false.
+
+The last two checks are not made in state() since both cases should
+only occur upon unitialized construction through <tt>memcpy</tt>
+and the like (the parent triangulation can only be set upon
+construction). If an iterator is constructed empty through the
+empty constructor, it sets #present_level==-2 and
+#present_index==-2. Thus, the iterator is invalid anyway,
+regardless of the state of the triangulation pointer and the state
+of the element pointed to.
+
+Past-the-end iterators may also be used to compare an iterator with
+the before-the-start value, when running backwards. There is no
+distiction between the iterators pointing past the two ends of a
+vector.
+
+Defining only one value to be past-the-end and making all other
+values invalid provides a second track of security: if we should
+have forgotten a check in the library when an iterator is
+incremented or decremented, we automatically convert the iterator
+from the allowed state "past-the-end" to the disallowed state
+"invalid" which increases the chance that somehwen earlier than for
+past-the-end iterators an exception is raised.
+
+Cells are stored based on a hierachical structure of levels, therefore
+the above mentioned structure is useful. Faces however are not organized
+in levels, therefore the #present_level variable is ignored in that
+cases and is set to 0 for all faces. Several Accessor- and Iterator-
+functions check for that value, if the object accessed is not a cell
+but a face in the current triangulation.
+
 
 @ingroup grid
 */

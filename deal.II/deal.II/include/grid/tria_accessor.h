@@ -19,8 +19,6 @@
 #include <grid/tria_iterator_base.h>
 
 
-//TODO[WB]: since line and face iterators do not have levels, we can save a bit of memory by splitting TriaAccessor into a class for cells and one for everything else, and getting rid of the present_level field for the latter
-
 namespace std
 {
   template<class T1, class T2>
@@ -124,62 +122,23 @@ namespace TriaAccessorExceptions
 
 
 /**
- * Implements the accessor class used by TriaRawIterator and derived
- * classes.
+ * A base class for the accessor classes used by TriaRawIterator and
+ * derived classes.
  *
- * This class offers only the basic functionality erquired by the
+ * This class offers only the basic functionality required by the
  * iterators (stores the necessary data members, offers comparison
  * operators and the like), but has no functionality to actually
  * dereference data. This is done in the derived classes.
  *
- * <h3>Internals</h3>
- *   
- * There is a representation of past-the-end-pointers, denoted by
- * special values of the member variables #present_level and
- * #present_index: If #present_level>=0 and #present_index>=0, then
- * the object is valid (there is no check whether the triangulation
- * really has that many levels or that many cells on the present level
- * when we investigate the state of an iterator; however, in many
- * places where an iterator is dereferenced we make this check); if
- * #present_level==-1 and #present_index==-1, then the iterator points
- * past the end; in all other cases, the iterator is considered
- * invalid.  You can check this by calling the state() function.
+ * This template is used for faces and edges, which have no level in
+ * the triangulation hierarchy associated with them. There exists a
+ * partial specialization of the current class template where
+ * <tt>structdim</tt> (the dimensionality of the object represented,
+ * for example 1 for a line) equals <tt>dim</tt> (the dimensionality
+ * of the space the object lives in, for example 3 if we solve
+ * three-dimensional problems).
  *
- * An iterator is also invalid, if the pointer pointing to the
- * Triangulation object is invalid or zero.
- *
- * Finally, an iterator is invalid, if the element pointed to by
- * #present_level and #present_index is not used, i.e. if the
- * <tt>used</tt> flag is set to false.
- *
- * The last two checks are not made in state() since both cases should
- * only occur upon unitialized construction through <tt>memcpy</tt>
- * and the like (the parent triangulation can only be set upon
- * construction). If an iterator is constructed empty through the
- * empty constructor, it sets #present_level==-2 and
- * #present_index==-2. Thus, the iterator is invalid anyway,
- * regardless of the state of the triangulation pointer and the state
- * of the element pointed to.
- *
- * Past-the-end iterators may also be used to compare an iterator with
- * the before-the-start value, when running backwards. There is no
- * distiction between the iterators pointing past the two ends of a
- * vector.
- *   
- * Defining only one value to be past-the-end and making all other
- * values invalid provides a second track of security: if we should
- * have forgotten a check in the library when an iterator is
- * incremented or decremented, we automatically convert the iterator
- * from the allowed state "past-the-end" to the disallowed state
- * "invalid" which increases the chance that somehwen earlier than for
- * past-the-end iterators an exception is raised.
- *
- * Cells are stored based on a hierachical structure of levels, therefore
- * the above mentioned structure is useful. Faces however are not organized
- * in levels, therefore the #present_level variable is ignored in that
- * cases and is set to 0 for all faces. Several Accessor- and Iterator-
- * functions check for that value, if the object accessed is not a cell
- * but a face in the current triangulation.
+ * Some internals of this class are discussed in @ref IteratorAccessorInternals .
  *
  * @ingroup grid
  * @ingroup Accessors
@@ -335,6 +294,30 @@ class TriaAccessor
 
 
 
+/**
+ * A base class for the accessor classes used by TriaRawIterator and
+ * derived classes.
+ *
+ * This class offers only the basic functionality required by the
+ * iterators (stores the necessary data members, offers comparison
+ * operators and the like), but has no functionality to actually
+ * dereference data. This is done in the derived classes.
+ *
+ * This template is a partial specialization of the general template
+ * used for cells only, i.e. for the case where <tt>structdim</tt>
+ * (the dimensionality of the object represented, for example 1 for a
+ * line) equals <tt>dim</tt> (the dimensionality of the space the
+ * object lives in, for example 3 if we solve three-dimensional
+ * problems). The difference is that cells have a level in the
+ * triangulation hierarchy associated with them, whereas faces and
+ * edges do not.
+ *
+ * Some internals of this class are discussed in @ref IteratorAccessorInternals .
+ *
+ * @ingroup grid
+ * @ingroup Accessors
+ * @author Wolfgang Bangerth, 1998
+ */
 template <int dim>
 class TriaAccessor<dim,dim>
 {

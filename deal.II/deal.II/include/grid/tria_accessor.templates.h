@@ -32,13 +32,22 @@ DEAL_II_NAMESPACE_OPEN
 template <int structdim, int dim>
 inline
 TriaAccessor<structdim,dim>::TriaAccessor (const Triangulation<dim> *parent,
-					   const int                 /*level*/,
+					   const int                 level,
 					   const int                 index,
 					   const AccessorData       *)
                 :
                 present_index (index),
                 tria (parent)
-{}
+{
+
+				   // non-cells have no level, so a 0
+				   // should have been passed, or a -1
+				   // for an end-iterator, or -2 for
+				   // an invalid (default constructed)
+				   // iterator
+  Assert ((level == 0) || (level == -1) || (level == -2),
+	  ExcInternalError());
+}
 
 
 
