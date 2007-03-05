@@ -21,6 +21,7 @@
 #include <base/function.h>
 #include <base/logstream.h>
 #include <base/utilities.h>
+#include <base/timer.h>
 #include <lac/vector.h>
 #include <lac/full_matrix.h>
 #include <lac/sparse_matrix.h>
@@ -86,6 +87,8 @@ class LaplaceProblem
 
     Vector<double>       solution;
     Vector<double>       system_rhs;
+
+    Timer distr, condense, hang;
 };
 
 
@@ -137,23 +140,33 @@ LaplaceProblem<dim>::~LaplaceProblem ()
 template <int dim>
 void LaplaceProblem<dim>::setup_system ()
 {
+  distr.reset();
+  distr.start();
   dof_handler.distribute_dofs (fe_collection);
-
+  distr.stop();
+  
   sparsity_pattern.reinit (dof_handler.n_dofs(),
 			   dof_handler.n_dofs(),
 			   dof_handler.max_couplings_between_dofs());
   DoFTools::make_sparsity_pattern (dof_handler, sparsity_pattern);
-
+  hang.stop();
+  
   solution.reinit (dof_handler.n_dofs());
   system_rhs.reinit (dof_handler.n_dofs());
 
   hanging_node_constraints.clear ();
+  hang.reset();
+  hang.start();
   DoFTools::make_hanging_node_constraints (dof_handler,
 					   hanging_node_constraints);
 
   hanging_node_constraints.close ();
-
+  hang.stop();
+  
+  condense.reset();
+  condense.start();
   hanging_node_constraints.condense (sparsity_pattern);
+  condense.stop();
   sparsity_pattern.compress();
 
   system_matrix.reinit (sparsity_pattern);
@@ -216,8 +229,10 @@ void LaplaceProblem<dim>::assemble_system ()
 	}
     }
 
+  condense.start();
   hanging_node_constraints.condense (system_matrix);
   hanging_node_constraints.condense (system_rhs);
+  condense.stop();
   std::map<unsigned int,double> boundary_values;
   VectorTools::interpolate_boundary_values (dof_handler,
 					    0,
@@ -606,6 +621,8 @@ void LaplaceProblem<dim>::run ()
 		<< triangulation.n_active_cells()
 		<< std::endl;
 
+      Timer all;
+      all.start();
       setup_system ();
 
       std::cout << "   Number of degrees of freedom: "
@@ -617,6 +634,14 @@ void LaplaceProblem<dim>::run ()
       
       assemble_system ();
       solve ();
+      all.stop();
+
+      std::cout << "   All: " << all()
+		<< ", distr: " << distr()
+		<< ", hang: " << hang()
+		<< ", condense: " << condense()
+		<< std::endl;
+      
       output_results (cycle);
     }
 }
