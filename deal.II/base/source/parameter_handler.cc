@@ -555,10 +555,8 @@ bool ParameterHandler::read_input (const std::string &filename,
     {
       std::string openname = search.find(filename);
       std::ifstream input (openname.c_str());
-      if (!input) 
-	{
-	  AssertThrow(false, ExcInternalError());
-	}
+      AssertThrow(input, ExcIO());
+
       return read_input (input);
     }
   catch (...)
