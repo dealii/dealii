@@ -1921,6 +1921,7 @@ TableBase<N,T>::~TableBase ()
 
 
 template <int N, typename T>
+inline
 TableBase<N,T>&
 TableBase<N,T>::operator = (const TableBase<N,T>& m)
 {
@@ -1935,6 +1936,7 @@ TableBase<N,T>::operator = (const TableBase<N,T>& m)
 
 template <int N, typename T>
 template <typename T2>
+inline
 TableBase<N,T>&
 TableBase<N,T>::operator = (const TableBase<N,T2>& m)
 {
@@ -1971,6 +1973,7 @@ TableBase<N,T>::fill (const T& value)
 
 
 template <int N, typename T>
+inline
 void
 TableBase<N,T>::reinit (const TableIndices<N> &new_sizes)
 {
@@ -2029,6 +2032,7 @@ TableBase<N,T>::reinit (const TableIndices<N> &new_sizes)
 
 
 template <int N, typename T>
+inline
 const TableIndices<N> &
 TableBase<N,T>::size () const
 {
@@ -2038,8 +2042,9 @@ TableBase<N,T>::size () const
 
 
 template <int N, typename T>
+inline
 unsigned int
-TableBase<N,T>::size (unsigned int i) const
+TableBase<N,T>::size (const unsigned int i) const
 {
   Assert (i<N, ExcIndexRange(i,0,N));
   return table_size[i];
@@ -2048,6 +2053,7 @@ TableBase<N,T>::size (unsigned int i) const
 
 
 template <int N, typename T>
+inline
 unsigned int
 TableBase<N,T>::n_elements () const
 {
@@ -2060,6 +2066,7 @@ TableBase<N,T>::n_elements () const
 
 
 template <int N, typename T>
+inline
 bool
 TableBase<N,T>::empty () const
 {
@@ -2083,6 +2090,7 @@ TableBase<N,T>::fill (const T2* entries)
 
 
 template <int N, typename T>
+inline
 unsigned int
 TableBase<N,T>::memory_consumption () const
 {
@@ -2123,7 +2131,8 @@ TableBase<N,T>::position (const TableIndices<N> &indices) const
 
 
 template <int N, typename T>
-inline const T &
+inline
+const T &
 TableBase<N,T>::operator() (const TableIndices<N> &indices) const
 {
   for (unsigned int n=0; n<N; ++n)
@@ -2135,7 +2144,8 @@ TableBase<N,T>::operator() (const TableIndices<N> &indices) const
 
 
 template <int N, typename T>
-inline T &
+inline
+T &
 TableBase<N,T>::operator() (const TableIndices<N> &indices)
 {
   for (unsigned int n=0; n<N; ++n)
@@ -2147,7 +2157,8 @@ TableBase<N,T>::operator() (const TableIndices<N> &indices)
 
 
 template <int N, typename T>
-inline const T &
+inline
+const T &
 TableBase<N,T>::el (const TableIndices<N> &indices) const
 {  
   return val[position(indices)];
@@ -2156,7 +2167,8 @@ TableBase<N,T>::el (const TableIndices<N> &indices) const
 
 
 template <int N, typename T>
-inline T &
+inline
+T &
 TableBase<N,T>::el (const TableIndices<N> &indices)
 {
   return val[position(indices)];
@@ -2176,12 +2188,14 @@ TableBase<N,T>::data () const
 
 
 template <typename T>
+inline
 Table<1,T>::Table ()
 {}
 
 
 
 template <typename T>
+inline
 Table<1,T>::Table (const unsigned int size)
                 :
                 TableBase<1,T> (TableIndices<1> (size))
@@ -2190,6 +2204,7 @@ Table<1,T>::Table (const unsigned int size)
 
 
 template <typename T>
+inline
 const T &
 Table<1,T>::operator [] (const unsigned int i) const
 {
@@ -2201,6 +2216,7 @@ Table<1,T>::operator [] (const unsigned int i) const
 
 
 template <typename T>
+inline
 T &
 Table<1,T>::operator [] (const unsigned int i)
 {
@@ -2257,12 +2273,14 @@ Table<1,T>::operator () (const TableIndices<1> &indices)
 //---------------------------------------------------------------------------
 
 template <typename T>
+inline
 Table<2,T>::Table ()
 {}
 
 
 
 template <typename T>
+inline
 Table<2,T>::Table (const unsigned int size1,
                    const unsigned int size2)
                 :
@@ -2272,6 +2290,7 @@ Table<2,T>::Table (const unsigned int size1,
 
 
 template <typename T>
+inline
 void
 Table<2,T>::reinit (const unsigned int size1,
                     const unsigned int size2)
@@ -2402,12 +2421,14 @@ Table<2,T>::n_cols () const
 //---------------------------------------------------------------------------
 
 template <typename T>
+inline
 TransposeTable<T>::TransposeTable ()
 {}
 
 
 
 template <typename T>
+inline
 TransposeTable<T>::TransposeTable (const unsigned int size1,
 				   const unsigned int size2)
                 :
@@ -2417,6 +2438,7 @@ TransposeTable<T>::TransposeTable (const unsigned int size1,
 
 
 template <typename T>
+inline
 void
 TransposeTable<T>::reinit (const unsigned int size1,
 			   const unsigned int size2)
@@ -2502,12 +2524,14 @@ TransposeTable<T>::n_cols () const
 
 
 template <typename T>
+inline
 Table<3,T>::Table ()
 {}
 
 
 
 template <typename T>
+inline
 Table<3,T>::Table (const unsigned int size1,
                    const unsigned int size2,
                    const unsigned int size3)
@@ -2608,12 +2632,14 @@ Table<3,T>::operator () (const TableIndices<3> &indices)
 
 
 template <typename T>
+inline
 Table<4,T>::Table ()
 {}
 
 
 
 template <typename T>
+inline
 Table<4,T>::Table (const unsigned int size1,
                    const unsigned int size2,
                    const unsigned int size3,
@@ -2726,12 +2752,14 @@ Table<4,T>::operator () (const TableIndices<4> &indices)
 
 
 template <typename T>
+inline
 Table<5,T>::Table ()
 {}
 
 
 
 template <typename T>
+inline
 Table<5,T>::Table (const unsigned int size1,
                    const unsigned int size2,
                    const unsigned int size3,
@@ -2854,12 +2882,14 @@ Table<5,T>::operator () (const TableIndices<5> &indices)
 
 
 template <typename T>
+inline
 Table<6,T>::Table ()
 {}
 
 
 
 template <typename T>
+inline
 Table<6,T>::Table (const unsigned int size1,
                    const unsigned int size2,
                    const unsigned int size3,
@@ -2993,12 +3023,14 @@ Table<6,T>::operator () (const TableIndices<6> &indices)
 
 
 template <typename T>
+inline
 Table<7,T>::Table ()
 {}
 
 
 
 template <typename T>
+inline
 Table<7,T>::Table (const unsigned int size1,
                    const unsigned int size2,
                    const unsigned int size3,
