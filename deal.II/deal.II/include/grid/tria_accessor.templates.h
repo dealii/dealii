@@ -2,7 +2,7 @@
 //    $Id$
 //    Version: $Name$
 //
-//    Copyright (C) 1999, 2000, 2001, 2002, 2003, 2004, 2005, 2006 by the deal.II authors
+//    Copyright (C) 1999, 2000, 2001, 2002, 2003, 2004, 2005, 2006, 2007 by the deal.II authors
 //
 //    This file is subject to QPL and may not be  distributed
 //    without copyright and license information. Please refer
@@ -29,12 +29,106 @@ DEAL_II_NAMESPACE_OPEN
 
 /*------------------------ Functions: TriaAccessor ---------------------------*/
 
+template <int structdim, int dim>
+inline
+TriaAccessor<structdim,dim>::TriaAccessor (const Triangulation<dim> *parent,
+					   const int                 /*level*/,
+					   const int                 index,
+					   const AccessorData       *)
+                :
+                present_index (index),
+                tria (parent)
+{}
+
+
+
+template <int structdim, int dim>
+inline
+void
+TriaAccessor<structdim,dim>::copy_from (const TriaAccessor<structdim,dim> &a)
+{
+  present_index = a.present_index;
+  tria = a.tria;
+}
+
+
+
+template <int structdim, int dim>
+inline
+bool
+TriaAccessor<structdim,dim>::operator == (const TriaAccessor<structdim,dim> &a) const
+{
+  Assert (tria == a.tria, TriaAccessorExceptions::ExcCantCompareIterators());
+  return (present_index == a.present_index);
+}
+
+
+
+template <int structdim, int dim>
+inline
+bool
+TriaAccessor<structdim,dim>::operator != (const TriaAccessor<structdim,dim> &a) const
+{
+  Assert (tria == a.tria, TriaAccessorExceptions::ExcCantCompareIterators());
+  return (present_index != a.present_index);
+}
+
+
+
+template <int structdim, int dim>
+inline
+int
+TriaAccessor<structdim,dim>::level ()
+{
+  return 0;
+}
+
+
+
+template <int structdim, int dim>
+inline
+int
+TriaAccessor<structdim,dim>::index () const
+{
+  return present_index;
+}
+
+
+
+template <int structdim, int dim>
+inline
+IteratorState::IteratorStates
+TriaAccessor<structdim,dim>::state () const
+{
+  if (present_index>=0)
+    return IteratorState::valid;
+  else
+    if (present_index==-1)
+      return IteratorState::past_the_end;
+    else
+      return IteratorState::invalid;
+}
+
+
+
+template <int structdim, int dim>
+inline
+const Triangulation<dim> &
+TriaAccessor<structdim,dim>::get_triangulation () const
+{
+  return *tria;
+}
+
+
+
+/*------------------------ Functions: TriaAccessor<dim,dim> ---------------------------*/
+
 template <int dim>
 inline
-TriaAccessor<dim>::TriaAccessor (const Triangulation<dim> *parent,
-                                 const int                 level,
-                                 const int                 index,
-                                 const AccessorData       *)
+TriaAccessor<dim,dim>::TriaAccessor (const Triangulation<dim> *parent,
+				     const int                 level,
+				     const int                 index,
+				     const AccessorData       *)
                 :
                 present_level (level),
                 present_index (index),
@@ -46,7 +140,7 @@ TriaAccessor<dim>::TriaAccessor (const Triangulation<dim> *parent,
 template <int dim>
 inline
 void
-TriaAccessor<dim>::copy_from (const TriaAccessor<dim> &a)
+TriaAccessor<dim,dim>::copy_from (const TriaAccessor<dim,dim> &a)
 {
   present_level = a.present_level;
   present_index = a.present_index;
@@ -58,7 +152,7 @@ TriaAccessor<dim>::copy_from (const TriaAccessor<dim> &a)
 template <int dim>
 inline
 bool
-TriaAccessor<dim>::operator == (const TriaAccessor<dim> &a) const
+TriaAccessor<dim,dim>::operator == (const TriaAccessor<dim,dim> &a) const
 {
   Assert (tria == a.tria, TriaAccessorExceptions::ExcCantCompareIterators());
   return ((present_index == a.present_index) &&
@@ -70,7 +164,7 @@ TriaAccessor<dim>::operator == (const TriaAccessor<dim> &a) const
 template <int dim>
 inline
 bool
-TriaAccessor<dim>::operator != (const TriaAccessor<dim> &a) const
+TriaAccessor<dim,dim>::operator != (const TriaAccessor<dim,dim> &a) const
 {
   Assert (tria == a.tria, TriaAccessorExceptions::ExcCantCompareIterators());
   return ((present_index != a.present_index) ||
@@ -82,7 +176,7 @@ TriaAccessor<dim>::operator != (const TriaAccessor<dim> &a) const
 template <int dim>
 inline
 int
-TriaAccessor<dim>::level () const
+TriaAccessor<dim,dim>::level () const
 {
   return present_level;
 }
@@ -92,7 +186,7 @@ TriaAccessor<dim>::level () const
 template <int dim>
 inline
 int
-TriaAccessor<dim>::index () const
+TriaAccessor<dim,dim>::index () const
 {
   return present_index;
 }
@@ -102,7 +196,7 @@ TriaAccessor<dim>::index () const
 template <int dim>
 inline
 IteratorState::IteratorStates
-TriaAccessor<dim>::state () const
+TriaAccessor<dim,dim>::state () const
 {
   if ((present_level>=0) && (present_index>=0))
     return IteratorState::valid;
@@ -118,7 +212,7 @@ TriaAccessor<dim>::state () const
 template <int dim>
 inline
 const Triangulation<dim> &
-TriaAccessor<dim>::get_triangulation () const
+TriaAccessor<dim,dim>::get_triangulation () const
 {
   return *tria;
 }
@@ -135,7 +229,7 @@ TriaObjectAccessor (const Triangulation<dim> *parent,
                     const int                 index,
                     const AccessorData       *local_data)
                 :
-                TriaAccessor<dim> (parent, level, index, local_data)
+                TriaAccessor<1,dim> (parent, level, index, local_data)
 {
   if (dim!=1)
     Assert(level <= 0, ExcInternalError());
@@ -160,17 +254,6 @@ internal::Triangulation::TriaObjects<internal::Triangulation::Line> &
 TriaObjectAccessor<1,dim>::lines() const
 {
   return this->tria->faces->lines;
-}
-
-
-
-template <int dim>
-inline
-int
-TriaObjectAccessor<1,dim>::level () const
-{
-  Assert(dim==1, TriaAccessorExceptions::ExcFacesHaveNoLevel());
-  return TriaAccessor<dim>::level();
 }
 
 
@@ -250,14 +333,11 @@ TriaIterator<dim,TriaObjectAccessor<1,dim> >
 TriaObjectAccessor<1,dim>::child (const unsigned int i) const
 {
   Assert (i<2, ExcIndexRange(i,0,2));
-  int next_level;
-  if (dim==1)
-    next_level = this->present_level+1;
-  else
-    next_level = 0;
-  
+
   TriaIterator<dim,TriaObjectAccessor<1,dim> >
-    q (this->tria, next_level, child_index (i));
+    q (this->tria,
+       (dim == 1 ? this->level() + 1 : 0),
+       child_index (i));
 
   Assert ((q.state() == IteratorState::past_the_end) || q->used(),
 	  TriaAccessorExceptions::ExcUnusedCellAsChild());
@@ -337,11 +417,14 @@ TriaObjectAccessor<1,dim>::operator ++ ()
 {
   ++this->present_index;
 				   // is index still in the range of
-				   // the vector?
+				   // the vector? (note that we don't
+				   // have to set the level, since
+				   // dim!=1 and the object therefore
+				   // has no level)
   if (this->present_index
       >=
       static_cast<int>(this->tria->faces->lines.cells.size()))
-    this->present_level = this->present_index = -1;
+    this->present_index = -1;
 }
 
 
@@ -381,9 +464,12 @@ TriaObjectAccessor<1,dim>::operator -- ()
 {
   --this->present_index;
 				   // is index still in the range of
-				   // the vector?
-  if (this->present_index <0 ) 
-    this->present_level = this->present_index = -1;
+				   // the vector? (note that we don't
+				   // have to set the level, since
+				   // dim!=1 and the object therefore
+				   // has no level)
+  if (this->present_index < 0) 
+    this->present_index = -1;
   return;
 }
 
@@ -424,7 +510,7 @@ TriaObjectAccessor (const Triangulation<dim> *parent,
                     const int                 index,
                     const AccessorData       *local_data)
                 :
-                TriaAccessor<dim> (parent, level, index, local_data)
+                TriaAccessor<2,dim> (parent, level, index, local_data)
 {
   if (dim!=2)
     Assert(level <= 0, ExcInternalError());
@@ -450,17 +536,6 @@ internal::Triangulation::TriaObjects<internal::Triangulation::Quad> &
 TriaObjectAccessor<2,dim>::quads() const
 {
   return this->tria->faces->quads;
-}
-
-
-
-template <int dim>
-inline
-int
-TriaObjectAccessor<2,dim>::level () const
-{
-  Assert(dim==2, TriaAccessorExceptions::ExcFacesHaveNoLevel());
-  return TriaAccessor<dim>::level();
 }
 
 
@@ -566,14 +641,11 @@ TriaIterator<dim,TriaObjectAccessor<2,dim> >
 TriaObjectAccessor<2,dim>::child (const unsigned int i) const
 {
   Assert (i<4, ExcIndexRange(i,0,4));
-  int next_level;
-  if (dim==2)
-    next_level = this->present_level+1;
-  else
-    next_level = 0;
   
   TriaIterator<dim,TriaObjectAccessor<2,dim> >
-    q (this->tria, next_level, child_index (i));
+    q (this->tria,
+       (dim == 2 ? this->level() + 1 : 0),
+       child_index (i));
   
   Assert ((q.state() == IteratorState::past_the_end) || q->used(),
 	  TriaAccessorExceptions::ExcUnusedCellAsChild());
@@ -675,11 +747,14 @@ TriaObjectAccessor<2,dim>::operator ++ ()
 {
   ++this->present_index;
 				   // is index still in the range of
-				   // the vector?
+				   // the vector? (note that we don't
+				   // have to set the level, since
+				   // dim!=1 and the object therefore
+				   // has no level)
   if (this->present_index
       >=
       static_cast<int>(quads().cells.size()))
-    this->present_level = this->present_index = -1;
+    this->present_index = -1;
 }
 
 
@@ -718,9 +793,12 @@ TriaObjectAccessor<2,dim>::operator -- ()
 {
   --this->present_index;
 				   // is index still in the range of
-				   // the vector?
-  if (this->present_index<0)
-    this->present_level = this->present_index = -1;
+				   // the vector? (note that we don't
+				   // have to set the level, since
+				   // dim!=1 and the object therefore
+				   // has no level)
+  if (this->present_index < 0)
+    this->present_index = -1;
 }
 
 
@@ -760,7 +838,7 @@ TriaObjectAccessor (const Triangulation<dim> *parent,
                     const int                 index,
                     const AccessorData       *local_data)
                 :
-                TriaAccessor<dim> (parent, level, index, local_data)
+                TriaAccessor<3,dim> (parent, level, index, local_data)
 {
   if (dim!=3)
     Assert(level <= 0, ExcInternalError());
@@ -937,7 +1015,8 @@ TriaObjectAccessor<3,3>::child (const unsigned int i) const
   const int dim=3;
   Assert (i<8, ExcIndexRange(i,0,8));
   
-  TriaIterator<dim,TriaObjectAccessor<3,dim> > q (this->tria, this->present_level+1, child_index (i));
+  TriaIterator<dim,TriaObjectAccessor<3,dim> >
+    q (this->tria, this->present_level+1, child_index (i));
   
   Assert ((q.state() == IteratorState::past_the_end) || q->used(),
 	  TriaAccessorExceptions::ExcUnusedCellAsChild());

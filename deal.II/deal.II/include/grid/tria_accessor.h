@@ -185,8 +185,158 @@ namespace TriaAccessorExceptions
  * @ingroup Accessors
  * @author Wolfgang Bangerth, 1998
  */
-template <int dim>
+template <int structdim, int dim>
 class TriaAccessor
+{
+  protected:
+				     /**
+				      * Declare the data type that
+				      * this accessor class expects to
+				      * get passed from the iterator
+				      * classes. Since the pure
+				      * triangulation iterators need
+				      * no additional data, this data
+				      * type is @p void.
+				      */
+    typedef void AccessorData;
+
+				     /**
+				      *  Constructor. Protected, thus
+				      *  only callable from friend
+				      *  classes.
+				      */
+    TriaAccessor (const Triangulation<dim> *parent =  0,
+		  const int                 level  = -1,
+		  const int                 index  = -1,
+		  const AccessorData       *       =  0);
+
+				     /**
+				      *  Copy operator. Since this is
+				      *  only called from iterators,
+				      *  do not return anything, since
+				      *  the iterator will return
+				      *  itself.
+				      *
+				      *  This method is protected,
+				      *  since it is only to be called
+				      *  from the iterator class.
+				      */
+    void copy_from (const TriaAccessor &);
+
+				     /**
+				      *  Copy operator. This is normally
+				      *  used in a context like
+				      *  <tt>iterator a,b;  *a=*b;</tt>. Since
+				      *  the meaning is to copy the object
+				      *  pointed to by @p b to the object
+				      *  pointed to by @p a and since
+				      *  accessors are not real but
+				      *  virtual objects, this operation
+				      *  is not useful for iterators on
+				      *  triangulations. We declare this
+				      *  function here private, thus it may
+				      *  not be used from outside.
+				      *  Furthermore it is not implemented
+				      *  and will give a linker error if
+				      *  used anyway.
+				      */
+    void operator = (const TriaAccessor *);
+    
+				     /**
+				      *  Same as above.
+				      */
+    TriaAccessor & operator = (const TriaAccessor &);
+
+  protected:
+    
+				     /**
+				      *  Compare for equality.            
+				      */
+    bool operator == (const TriaAccessor &) const;
+	
+				     /**
+				      * Compare for inequality.
+				      */
+    bool operator != (const TriaAccessor &) const;
+    
+  public:
+				     /**
+				      * Data type to be used for passing
+				      * parameters from iterators to the
+				      * accessor classes in a unified
+				      * way, no matter what the type of
+				      * number of these parameters is.
+				      */
+    typedef void * LocalData;
+    
+				     /**@ name Iterator address and state
+				      */
+				     /*@{*/
+				     /**
+				      *  Return the level the element
+				      *  pointed to belongs to.
+				      *  This is only valid for cells.
+				      */
+    static int level ();
+    
+				     /**
+				      *  Return the index of the
+				      *  element presently pointed to
+				      *  on the present level.
+				      */
+    int index () const;
+    
+				     /**
+				      *  Return the state of the
+				      *  iterator.  For the different
+				      *  states an accessor can be in,
+				      *  refer to the
+				      *  TriaRawIterator
+				      *  documentation.
+				      */
+    IteratorState::IteratorStates state () const;
+
+				     /**
+				      * Return a pointer to the
+				      * triangulation which the object
+				      * pointed to by this class
+				      * belongs to.
+				      */
+    const Triangulation<dim> & get_triangulation () const;
+    
+				     /*@}*/
+  protected:
+				     /**
+				      *  Used to store the index of
+				      *  the element presently pointed
+				      *  to on the level presentl
+				      *  used.
+				      */
+    int present_index;
+    
+				     /**
+				      *  Pointer to the triangulation
+				      *  which we act on.
+				      */
+    const Triangulation<dim> *tria;
+
+  private:
+    
+				     /**
+				      * Dimension of the TriaObject
+				      * this accessor gives access to.
+				      */
+    static const unsigned int objectdim = dim;
+
+    template <int anydim, typename Accessor> friend class TriaRawIterator;
+    template <int anydim, typename Accessor> friend class TriaIterator;
+    template <int anydim, typename Accessor> friend class TriaActiveIterator;
+};
+
+
+
+template <int dim>
+class TriaAccessor<dim,dim>
 {
   protected:
 				     /**
@@ -343,6 +493,7 @@ class TriaAccessor
 
 
 
+
 /**
  * Common template for line, quad, hex accessors.  According to
  * @p celldim, objects of this class represent lines, quadrilaterals,
@@ -356,14 +507,14 @@ class TriaAccessor
  * @author Wolfgang Bangerth, Guido Kanschat, 1999
  */
 template <int celldim, int dim>
-class TriaObjectAccessor :  public TriaAccessor<dim>
+class TriaObjectAccessor :  public TriaAccessor<celldim,dim>
 {
   public:
 				     /**
 				      * Propagate typedef from
 				      * base class to this class.
 				      */
-    typedef typename TriaAccessor<dim>::AccessorData AccessorData;
+    typedef typename TriaAccessor<celldim,dim>::AccessorData AccessorData;
 
 				     /**
 				      * Constructor.
@@ -397,13 +548,6 @@ class TriaObjectAccessor :  public TriaAccessor<dim>
 				      */
     void set (const internal::Triangulation::Hexahedron&) const;
 
-				     /**
-				      *  Return the level the element
-				      *  pointed to belongs to.
-				      *  This is only valid for cells.
-				      */
-    int level () const;
-    
 				     /**
 				      *  Index of vertex. The convention
 				      *  regarding the numbering of vertices
@@ -1001,14 +1145,14 @@ class TriaObjectAccessor :  public TriaAccessor<dim>
  * @ingroup grid
  */
 template<int dim>
-class TriaObjectAccessor<0, dim> : public TriaAccessor<dim>
+class TriaObjectAccessor<0, dim> : public TriaAccessor<0,dim>
 {
   public:
 				     /**
 				      * Propagate typedef from
 				      * base class to this class.
 				      */
-    typedef typename TriaAccessor<dim>::AccessorData AccessorData;
+    typedef typename TriaAccessor<0,dim>::AccessorData AccessorData;
 
 				     /**
 				      * Constructor. Should never be
@@ -1020,7 +1164,7 @@ class TriaObjectAccessor<0, dim> : public TriaAccessor<dim>
 			const int                 index      = -1,
 			const AccessorData       *local_data =  0)
                     :
-		    TriaAccessor<dim> (parent, level, index, local_data)
+		    TriaAccessor<0,dim> (parent, level, index, local_data)
       {
 	Assert (false, ExcInternalError());
       };
@@ -1039,14 +1183,14 @@ class TriaObjectAccessor<0, dim> : public TriaAccessor<dim>
  *   @author Wolfgang Bangerth, 1998
  */
 template <int dim>
-class TriaObjectAccessor<1, dim> :  public TriaAccessor<dim>
+class TriaObjectAccessor<1, dim> :  public TriaAccessor<1,dim>
 {
   public:
 				     /**
 				      * Propagate typedef from
 				      * base class to this class.
 				      */
-    typedef typename TriaAccessor<dim>::AccessorData AccessorData;
+    typedef typename TriaAccessor<1,dim>::AccessorData AccessorData;
 
 				     /**
 				      *  Constructor.
@@ -1061,13 +1205,6 @@ class TriaObjectAccessor<1, dim> :  public TriaAccessor<dim>
 				      *  line.
 				      */
     void set (const internal::Triangulation::Line &l) const;
-
-				     /**
-				      *  Return the level the element
-				      *  pointed to belongs to.
-				      *  This is only valid for cells.
-				      */
-    int level () const;
 
 				     /**
 				      *  Return the index of vertex
@@ -1604,14 +1741,14 @@ class TriaObjectAccessor<1, dim> :  public TriaAccessor<dim>
  *   @author Wolfgang Bangerth, 1998
  */
 template <int dim>
-class TriaObjectAccessor<2, dim> :  public TriaAccessor<dim>
+class TriaObjectAccessor<2, dim> :  public TriaAccessor<2,dim>
 {
   public:
 				     /**
 				      * Propagate typedef from base
 				      * class to this class.
 				      */
-    typedef typename TriaAccessor<dim>::AccessorData AccessorData;
+    typedef typename TriaAccessor<2,dim>::AccessorData AccessorData;
 
 				     /**
 				      *  Constructor.
@@ -1626,13 +1763,6 @@ class TriaObjectAccessor<2, dim> :  public TriaAccessor<dim>
 				      */
     void set (const internal::Triangulation::Quad &q) const;
 
-				     /**
-				      *  Return the level the element
-				      *  pointed to belongs to.
-				      *  This is only valid for cells.
-				      */
-    int level () const;
-    
 				     /**
 				      * Return index of a vertex of a
 				      * quad in the internal data
@@ -2218,14 +2348,14 @@ class TriaObjectAccessor<2, dim> :  public TriaAccessor<dim>
  *   @author Wolfgang Bangerth, 1998
  */
 template <int dim>
-class TriaObjectAccessor<3, dim> :  public TriaAccessor<dim>
+class TriaObjectAccessor<3, dim> :  public TriaAccessor<3,dim>
 {
   public:
 				     /**
 				      * Propagate typedef from base
 				      * class to this class.
 				      */
-    typedef typename TriaAccessor<dim>::AccessorData AccessorData;
+    typedef typename TriaAccessor<3,dim>::AccessorData AccessorData;
 
 				     /**
 				      *  Constructor.

@@ -27,8 +27,8 @@
 DEAL_II_NAMESPACE_OPEN
 
 
-template <int dim>
-const unsigned int TriaAccessor<dim>::objectdim;
+template <int structdim,int dim>
+const unsigned int TriaAccessor<structdim,dim>::objectdim;
 
 
 /*------------------------ Functions: LineAccessor ---------------------------*/
@@ -2316,7 +2316,14 @@ neighbor_child_on_subface (const unsigned int face,
 // For more information, see http://gcc.gnu.org/bugzilla/show_bug.cgi?id=24331
 
 // explicit instantiations
-template class TriaAccessor<deal_II_dimension>;
+template class TriaAccessor<1,deal_II_dimension>;
+#if deal_II_dimension >= 2
+template class TriaAccessor<2,deal_II_dimension>;
+#endif
+#if deal_II_dimension >= 3
+template class TriaAccessor<3,deal_II_dimension>;
+#endif
+
 template class CellAccessor<deal_II_dimension>;
 template class TriaRawIterator<deal_II_dimension,TriaObjectAccessor<1, deal_II_dimension> >;
 template class TriaRawIterator<deal_II_dimension,CellAccessor<deal_II_dimension> >;

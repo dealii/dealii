@@ -2,7 +2,7 @@
 //    $Id$
 //    Version: $Name$
 //
-//    Copyright (C) 1998, 1999, 2000, 2001, 2002, 2003, 2004, 2005, 2006 by the deal.II authors
+//    Copyright (C) 1998, 1999, 2000, 2001, 2002, 2003, 2004, 2005, 2006, 2007 by the deal.II authors
 //
 //    This file is subject to QPL and may not be  distributed
 //    without copyright and license information. Please refer
@@ -159,16 +159,13 @@ template <int structdim, int dim>
 TriaIterator<dim,MGDoFObjectAccessor<structdim, dim> >
 MGDoFAccessor<structdim, dim>::child (const unsigned int i) const
 {
-  int next_level;
-  if (structdim==dim)
-    next_level=this->present_level+1;
-  else
-    next_level=0;
-  
-  TriaIterator<dim,MGDoFObjectAccessor<structdim, dim> > q (this->tria,
-							    next_level,
-							    this->child_index (i),
-							    this->mg_dof_handler);
+  const TriaIterator<dim,MGDoFObjectAccessor<structdim, dim> >
+    q (this->tria,
+       (structdim == dim ?
+	this->level() + 1 :
+	0),
+       this->child_index (i),
+       this->mg_dof_handler);
   
 				   // make sure that we either created
 				   // a past-the-end iterator or one

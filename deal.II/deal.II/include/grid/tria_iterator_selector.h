@@ -2,7 +2,7 @@
 //    $Id$
 //    Version: $Name$
 //
-//    Copyright (C) 2003, 2004, 2005, 2006 by the deal.II authors
+//    Copyright (C) 2003, 2004, 2005, 2006, 2007 by the deal.II authors
 //
 //    This file is subject to QPL and may not be  distributed
 //    without copyright and license information. Please refer
@@ -19,7 +19,8 @@
 DEAL_II_NAMESPACE_OPEN
 
 template <int dim> class CellAccessor;
-template <int dim> class TriaAccessor;
+template <int, int> class TriaAccessor;
+template <int dim> class TriaAccessor<dim,dim>;
 template <int, int> class TriaObjectAccessor;
 template <int dim>  class TriaObjectAccessor<0, dim>;
 template <int dim>  class TriaObjectAccessor<1, dim>;
