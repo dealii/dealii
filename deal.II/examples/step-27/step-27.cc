@@ -122,7 +122,7 @@ template <int dim>
 LaplaceProblem<dim>::LaplaceProblem () :
 		dof_handler (triangulation)
 {
-  for (unsigned int degree=2; degree<7; ++degree)
+  for (unsigned int degree=2; degree<8; ++degree)
     {
       fe_collection.push_back (FE_Q<dim>(degree));
       quadrature_collection.push_back (QGauss<dim>(degree+2));
@@ -247,7 +247,8 @@ void LaplaceProblem<dim>::assemble_system ()
 template <int dim>
 void LaplaceProblem<dim>::solve () 
 {
-  SolverControl           solver_control (1000, 1e-12);
+  SolverControl           solver_control (system_rhs.size(),
+					  1e-8*system_rhs.l2_norm());
   SolverCG<>              cg (solver_control);
 
   PreconditionSSOR<> preconditioner;
@@ -464,7 +465,9 @@ void LaplaceProblem<dim>::refine_grid ()
     for (unsigned int index=0; cell!=endc; ++cell, ++index)
       if (cell->refine_flag_set()
 	  &&
-	  (smoothness_indicators(index) > cutoff_smoothness))
+	  (smoothness_indicators(index) > cutoff_smoothness)
+	  &&
+	  !(cell->active_fe_index() == fe_collection.size() - 1))
 	{
 	  cell->clear_refine_flag();
 	  cell->set_active_fe_index (std::min (cell->active_fe_index() + 1,
@@ -607,7 +610,7 @@ void LaplaceProblem<2>::create_coarse_grid ()
 template <int dim>
 void LaplaceProblem<dim>::run () 
 {
-  for (unsigned int cycle=0; cycle<8; ++cycle)
+  for (unsigned int cycle=0; cycle<30; ++cycle)
     {
       std::cout << "Cycle " << cycle << ':' << std::endl;
 
