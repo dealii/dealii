@@ -1244,14 +1244,16 @@ void GridIn<3>::read_netcdf (const std::string &filename)
 
 template <int dim>
 void GridIn<dim>::parse_tecplot_header(std::string &header,
-				       unsigned int (&tecplot2deal)[dim],
+				       std::vector<unsigned int> &tecplot2deal,
 				       unsigned int &n_vars,
 				       unsigned int &n_vertices,
 				       unsigned int &n_cells,
-				       unsigned int (&IJK)[dim],
+				       std::vector<unsigned int> &IJK,
 				       bool &structured,
 				       bool &blocked)
 {
+  Assert(tecplot2deal.size()==dim, ExcInternalError());
+  Assert(IJK.size()==dim, ExcInternalError());
 				   // initialize the output variables
   n_vars=0;
   n_vertices=0;
@@ -1431,7 +1433,7 @@ void GridIn<dim>::parse_tecplot_header(std::string &header,
 					 // tecplot itself accepts entries like
 					 // 'J=20' instead of 'E=20'. therefore,
 					 // take the max of IJK
-	n_cells=*std::max_element(IJK,IJK+dim);
+	n_cells=*std::max_element(IJK.begin(),IJK.end());
       AssertThrow(n_cells>0,
 		  ExcMessage("Tecplot file does not contain a complete and consistent set of parameters"));
     }
@@ -1471,11 +1473,11 @@ void GridIn<2>::read_tecplot (std::istream &in)
 				   // now create some variables holding
 				   // important information on the mesh, get
 				   // this information from the header string
-  unsigned int tecplot2deal[dim],
-    n_vars,
+  std::vector<unsigned int> tecplot2deal(dim);
+  std::vector<unsigned int> IJK(dim);
+  unsigned int n_vars,
     n_vertices,
-    n_cells,
-    IJK[dim];
+    n_cells;
   bool structured,
     blocked;
 

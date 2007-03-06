@@ -2,7 +2,7 @@
 //    $Id$
 //    Version: $Name$
 //
-//    Copyright (C) 1999, 2000, 2001, 2002, 2003, 2004, 2005, 2006 by the deal.II authors
+//    Copyright (C) 1999, 2000, 2001, 2002, 2003, 2004, 2005, 2006, 2007 by the deal.II authors
 //
 //    This file is subject to QPL and may not be  distributed
 //    without copyright and license information. Please refer
@@ -409,11 +409,11 @@ class GridIn
 				      * influence on the function execution..
 				      */
     static void parse_tecplot_header(std::string   &header,
-				     unsigned int (&tecplot2deal)[dim],
+				     std::vector<unsigned int> &tecplot2deal,
 				     unsigned int  &n_vars,
 				     unsigned int  &n_vertices,
 				     unsigned int  &n_cells,
-				     unsigned int (&IJK)[dim],
+				     std::vector<unsigned int> &IJK,
 				     bool          &structured,
 				     bool          &blocked);
     
