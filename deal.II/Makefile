@@ -110,7 +110,7 @@ contrib: $(subst no,,$(subst yes,base,$(USE_CONTRIB_HSL))) \
 contrib-functionparser:
 	@cd $D/contrib && $(MAKE) functionparser
 
-online-doc:
+online-doc doc:
 	cd $D/doc && $(MAKE)
 	@echo
 	@echo
@@ -253,7 +253,7 @@ build-test-do:
 
 
 .PHONY: base baseg lac lacg 1d 2d 3d 1dg 2dg 3dg all \
-        online-doc printable-doc tex-doc contrib \
+        online-doc doc printable-doc tex-doc contrib \
         clean clean-contrib clean-base clean-lac clean-dealII \
 	clean-doc clean-examples clean-lib clean-tests clean-common-scripts \
 	distclean \
