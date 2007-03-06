@@ -118,7 +118,7 @@ template <int dim>
 FiniteElement<dim> *
 FE_RaviartThomasNodal<dim>::clone() const
 {
-  return new FE_RaviartThomasNodal<dim>(this->degree-1);
+  return new FE_RaviartThomasNodal<dim>(*this);
 }
 
 

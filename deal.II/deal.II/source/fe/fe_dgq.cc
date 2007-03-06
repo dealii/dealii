@@ -2,7 +2,7 @@
 //    $Id$
 //    Version: $Name$
 //
-//    Copyright (C) 2001, 2002, 2003, 2004, 2005, 2006 by the deal.II authors
+//    Copyright (C) 2001, 2002, 2003, 2004, 2005, 2006, 2007 by the deal.II authors
 //
 //    This file is subject to QPL and may not be  distributed
 //    without copyright and license information. Please refer
@@ -219,6 +219,8 @@ FE_DGQ<dim>::FE_DGQ (const Quadrature<1>& points)
   this->unit_support_points = support_quadrature.get_points();
 }
 
+
+
 template <int dim>
 std::string
 FE_DGQ<dim>::get_name () const
@@ -242,7 +244,7 @@ template <int dim>
 FiniteElement<dim> *
 FE_DGQ<dim>::clone() const
 {
-  return new FE_DGQ<dim>(this->degree);
+  return new FE_DGQ<dim>(*this);
 }
 
 

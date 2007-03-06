@@ -103,7 +103,7 @@ template <int dim>
 FiniteElement<dim> *
 FE_Nedelec<dim>::clone() const
 {
-  return new FE_Nedelec<dim>(degree);
+  return new FE_Nedelec<dim>(*this);
 }
 
 

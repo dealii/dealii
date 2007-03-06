@@ -116,7 +116,7 @@ template <int dim>
 FiniteElement<dim> *
 FE_Q_Hierarchical<dim>::clone() const
 {
-  return new FE_Q_Hierarchical<dim>(this->degree);
+  return new FE_Q_Hierarchical<dim>(*this);
 }
 
 

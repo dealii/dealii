@@ -119,7 +119,7 @@ template <int dim>
 FiniteElement<dim> *
 FE_RaviartThomas<dim>::clone() const
 {
-  return new FE_RaviartThomas<dim>(rt_order);
+  return new FE_RaviartThomas<dim>(*this);
 }
 
 
