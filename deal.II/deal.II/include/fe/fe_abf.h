@@ -2,7 +2,7 @@
 //    $Id$
 //    Version: $Name$
 //
-//    Copyright (C) 2003, 2004, 2005, 2006 by the deal.II authors
+//    Copyright (C) 2003, 2004, 2005, 2006, 2007 by the deal.II authors
 //
 //    This file is subject to QPL and may not be  distributed
 //    without copyright and license information. Please refer
@@ -92,9 +92,7 @@ template <int dim> class MappingQ;
  * by Guido Kanschat and Wolfgang Bangerth
  */
 template <int dim>
-class FE_ABF
-  :
-  public FE_PolyTensor<PolynomialsABF<dim>, dim>
+class FE_ABF : public FE_PolyTensor<PolynomialsABF<dim>, dim>
 {
   public:
 				     /**
