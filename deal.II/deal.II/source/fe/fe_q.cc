@@ -239,7 +239,7 @@ template <int dim>
 FiniteElement<dim> *
 FE_Q<dim>::clone() const
 {
-  return new FE_Q<dim>(this->degree);
+  return new FE_Q<dim>(*this);
 }
 
 
