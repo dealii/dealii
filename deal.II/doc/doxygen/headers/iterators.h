@@ -374,13 +374,13 @@ is therefore able to access the data that corresponds to the cell (or
 face, or edge) it represents
 
 There is a representation of past-the-end-pointers, denoted by special
-values of the member variables #present_level and #present_index in
-the TriaAccessor class: If #present_level>=0 and #present_index>=0,
+values of the member variables <code>present_level</code> and <code>present_index</code> in
+the TriaAccessor class: If <code>present_level</code> &ge;=0 and <code>present_index</code> &ge;=0,
 then the object is valid (there is no check whether the triangulation
 really has that many levels or that many cells on the present level
 when we investigate the state of an iterator; however, in many places
 where an iterator is dereferenced we make this check); if
-#present_level==-1 and #present_index==-1, then the iterator points
+<code>present_level</code>==-1 and <code>present_index</code>==-1, then the iterator points
 past the end; in all other cases, the iterator is considered invalid.
 You can check this by calling the state() function.
 
@@ -388,15 +388,15 @@ An iterator is also invalid, if the pointer pointing to the
 Triangulation object is invalid or zero.
 
 Finally, an iterator is invalid, if the element pointed to by
-#present_level and #present_index is not used, i.e. if the
+<code>present_level</code> and <code>present_index</code> is not used, i.e. if the
 <tt>used</tt> flag is set to false.
 
 The last two checks are not made in state() since both cases should
 only occur upon unitialized construction through <tt>memcpy</tt>
 and the like (the parent triangulation can only be set upon
 construction). If an iterator is constructed empty through the
-empty constructor, it sets #present_level==-2 and
-#present_index==-2. Thus, the iterator is invalid anyway,
+empty constructor, it sets <code>present_level</code>==-2 and
+<code>present_index</code>==-2. Thus, the iterator is invalid anyway,
 regardless of the state of the triangulation pointer and the state
 of the element pointed to.
 
@@ -415,7 +415,7 @@ past-the-end iterators an exception is raised.
 
 Cells are stored based on a hierachical structure of levels, therefore
 the above mentioned structure is useful. Faces however are not organized
-in levels, therefore the #present_level variable is ignored in that
+in levels, therefore the <code>present_level</code> variable is ignored in that
 cases and is set to 0 for all faces. Several Accessor- and Iterator-
 functions check for that value, if the object accessed is not a cell
 but a face in the current triangulation.
