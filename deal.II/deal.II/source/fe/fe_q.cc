@@ -317,7 +317,7 @@ get_interpolation_matrix (const FiniteElement<dim> &x_source_fe,
       for (unsigned int j=0; j<source_fe.dofs_per_cell; ++j)
         sum += interpolation_matrix(i,j);
 
-      Assert (std::fabs(sum-1) < 2e-14*this->degree*dim,
+      Assert (std::fabs(sum-1) < 2e-13*this->degree*dim,
               ExcInternalError());
     }
 }
@@ -409,7 +409,7 @@ get_face_interpolation_matrix (const FiniteElement<dim> &x_source_fe,
 				   // given polynomial degree.
 				   // This value is used to cut
 				   // off values close to zero.
-  double eps = 2e-14*this->degree*(dim-1);
+  double eps = 2e-13*this->degree*(dim-1);
   
 				   // compute the interpolation
 				   // matrix by simply taking the
@@ -452,7 +452,7 @@ get_face_interpolation_matrix (const FiniteElement<dim> &x_source_fe,
       for (unsigned int i=0; i<this->dofs_per_face; ++i)
         sum += interpolation_matrix(j,i);
 
-      Assert (std::fabs(sum-1) < 2e-14*this->degree*(dim-1),
+      Assert (std::fabs(sum-1) < 2e-13*this->degree*(dim-1),
               ExcInternalError());
     }
 }
@@ -511,7 +511,7 @@ get_subface_interpolation_matrix (const FiniteElement<dim> &x_source_fe,
 				   // given polynomial degree.
 				   // This value is used to cut
 				   // off values close to zero.
-  double eps = 2e-14*this->degree*(dim-1);
+  double eps = 2e-13*this->degree*(dim-1);
 
 				   // compute the interpolation
 				   // matrix by simply taking the
@@ -554,7 +554,7 @@ get_subface_interpolation_matrix (const FiniteElement<dim> &x_source_fe,
       for (unsigned int i=0; i<this->dofs_per_face; ++i)
         sum += interpolation_matrix(j,i);
 
-      Assert (std::fabs(sum-1) < 2e-14*this->degree*(dim-1),
+      Assert (std::fabs(sum-1) < 2e-13*this->degree*(dim-1),
               ExcInternalError());
     }
 }
@@ -1332,15 +1332,15 @@ FE_Q<dim>::initialize_embedding ()
                                                // growth in
                                                // degree*dim, times a
                                                // small constant.
-	      if (std::fabs(cell_value) < 2e-14*this->degree*dim)
+	      if (std::fabs(cell_value) < 2e-13*this->degree*this->degree*dim)
 		cell_interpolation(j, i) = 0.;
 	      else
 		cell_interpolation(j, i) = cell_value;
 
-	      if (std::fabs(subcell_value) < 2e-14*this->degree*dim)
+	      if (std::fabs(subcell_value) < 2e-13*this->degree*this->degree*dim)
 		subcell_interpolation(j, i) = 0.;
 	      else
-		if (std::fabs(subcell_value-1) < 2e-14*this->degree*dim)
+		if (std::fabs(subcell_value-1) < 2e-13*this->degree*this->degree*dim)
 		  subcell_interpolation(j, i) = 1.;
 		else			
 						   // we have put our
@@ -1380,7 +1380,7 @@ FE_Q<dim>::initialize_embedding ()
 					 // here
       for (unsigned int i=0; i<this->dofs_per_cell; ++i)
 	for (unsigned int j=0; j<this->dofs_per_cell; ++j)
-	  if (std::fabs(this->prolongation[child](i,j)) < 2e-14*this->degree*dim)
+	  if (std::fabs(this->prolongation[child](i,j)) < 2e-13*this->degree*dim)
 	    this->prolongation[child](i,j) = 0.;
 
 				       // and make sure that the row
@@ -1392,7 +1392,7 @@ FE_Q<dim>::initialize_embedding ()
 	  double sum = 0;
 	  for (unsigned int col=0; col<this->dofs_per_cell; ++col)
 	    sum += this->prolongation[child](row,col);
-	  Assert (std::fabs(sum-1.) < 2e-14*this->degree*dim,
+	  Assert (std::fabs(sum-1.) < 2e-13*this->degree*this->degree*dim,
 		  ExcInternalError());
 	}
     }
@@ -1461,7 +1461,7 @@ FE_Q<dim>::initialize_restriction ()
         {
           const double val
             = this->poly_space.compute_value(mother_dof, p_cell);
-          if (std::fabs (val-1.) < 2e-14*this->degree*dim)
+          if (std::fabs (val-1.) < 2e-13*this->degree*this->degree*dim)
                                              // ok, this is the right
                                              // dof
             break;
@@ -1469,14 +1469,14 @@ FE_Q<dim>::initialize_restriction ()
                                              // make sure that all
                                              // other shape functions
                                              // are zero there
-            Assert (std::fabs(val) < 2e-14*this->degree*dim,
+            Assert (std::fabs(val) < 2e-13*this->degree*this->degree*dim,
                     ExcInternalError());
         }
                                        // check also the shape
                                        // functions after tat
       for (unsigned int j=mother_dof+1; j<this->dofs_per_cell; ++j)
         Assert (std::fabs (this->poly_space.compute_value(j, p_cell))
-                < 2e-14*this->degree*dim,
+                < 2e-13*this->degree*this->degree*dim,
                 ExcInternalError());
 
                                        // then find the children on
@@ -1508,15 +1508,15 @@ FE_Q<dim>::initialize_restriction ()
                 {
                   const double val
                     = this->poly_space.compute_value(child_dof, p_subcell);
-                  if (std::fabs (val-1.) < 2e-14*this->degree*dim)
+                  if (std::fabs (val-1.) < 2e-13*this->degree*this->degree*dim)
                     break;
                   else
-                    Assert (std::fabs(val) < 2e-14*this->degree*dim,
+                    Assert (std::fabs(val) < 2e-13*this->degree*this->degree*dim,
                             ExcInternalError());
                 }
               for (unsigned int j=child_dof+1; j<this->dofs_per_cell; ++j)
                 Assert (std::fabs (this->poly_space.compute_value(j, p_subcell))
-                        < 2e-14*this->degree*dim,
+                        < 2e-13*this->degree*this->degree*dim,
                         ExcInternalError());
 
                                                // so now that we have
