@@ -2,7 +2,7 @@
 //    $Id$
 //    Version: $Name$
 //
-//    Copyright (C) 2003, 2005, 2006 by the deal.II authors
+//    Copyright (C) 2003, 2005, 2006, 2007 by the deal.II authors
 //
 //    This file is subject to QPL and may not be  distributed
 //    without copyright and license information. Please refer
@@ -21,7 +21,7 @@
  * levels. In addition to cells, the geometric objects that make up a
  * triangulation are the faces of cells (and in 3d the edges of cells)
  * as well as the vertices of the cells. Note that we abuse the word
- * <it>triangulation</it> somewhat, since deal.II only implements
+ * <i>triangulation</i> somewhat, since deal.II only implements
  * triangulations made up of linear, quadrilateral, and hexahedral
  * cells; triangles and tetrahedra are not supported.
  *
