@@ -1682,6 +1682,7 @@ class FiniteElement : public Subscriptor,
     get_generalized_support_points () const;    
 
 				     /**
+//TODO[GK]: comment this function
 				      *
 				      */
     bool has_generalized_support_points () const;
