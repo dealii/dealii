@@ -398,7 +398,7 @@ class FiniteElement : public Subscriptor,
 				      * Constructor
 				      */
     FiniteElement (const FiniteElementData<dim> &fe_data,
-		   const std::vector<bool> &restriction_is_additive_flags,
+		   const std::vector<bool>      &restriction_is_additive_flags,
 		   const std::vector<std::vector<bool> > &nonzero_components);
 
 				     /**
@@ -1856,7 +1856,31 @@ class FiniteElement : public Subscriptor,
                                       */
     DeclException0 (ExcInterpolationNotImplemented);
     
-  protected:  
+				     /**
+				      * Exception
+				      *
+				      * @ingroup Exceptions
+				      */
+    DeclException0 (ExcBoundaryFaceUsed);
+				     /**
+				      * Exception
+				      *
+				      * @ingroup Exceptions
+				      */
+    DeclException0 (ExcJacobiDeterminantHasWrongSign);
+    
+  protected:
+				     /**
+				      * Store whether all shape
+				      * functions are primitive. Since
+				      * finding this out is a very
+				      * common operation, we cache the
+				      * result, i.e. compute the value
+				      * in the constructor for simpler
+				      * access.
+				      */
+    const bool cached_primitivity;
+
  				     /**
 				      * Array of projection
 				      * matrices. See
@@ -1898,149 +1922,6 @@ class FiniteElement : public Subscriptor,
 				      */
     FullMatrix<double> interface_constraints;
 
-                                     /**
-                                      * Return the size of interface
-                                      * constraint matrices. Since
-                                      * this is needed in every
-                                      * derived finite element class
-                                      * when initializing their size,
-                                      * it is placed into this
-                                      * function, to avoid having to
-                                      * recompute the
-                                      * dimension-dependent size of
-                                      * these matrices each time.
-                                      *
-                                      * Note that some elements do not
-                                      * implement the interface
-                                      * constraints for certain
-                                      * polynomial degrees. In this
-                                      * case, this function still
-                                      * returns the size these
-                                      * matrices should have when
-                                      * implemented, but the actual
-                                      * matrices are empty.
-                                      */
-    TableIndices<2>
-    interface_constraints_size () const;
-    
-				     /**
-				      * Store whether all shape
-				      * functions are primitive. Since
-				      * finding this out is a very
-				      * common operation, we cache the
-				      * result, i.e. compute the value
-				      * in the constructor for simpler
-				      * access.
-				      */
-    const bool cached_primitivity;
-
-                                     /**
-				      * Compute second derivatives by
-				      * finite differences of
-				      * gradients.
-				      */
-    void compute_2nd (const Mapping<dim>                      &mapping,
-		      const typename Triangulation<dim>::cell_iterator    &cell,
-		      const unsigned int                       offset,
-		      typename Mapping<dim>::InternalDataBase &mapping_internal,
-		      InternalDataBase                        &fe_internal,
-		      FEValuesData<dim>                       &data) const;
-
-				     /**
-				      * Given the pattern of nonzero
-				      * components for each shape
-				      * function, compute for each
-				      * entry how many components are
-				      * non-zero for each shape
-				      * function. This function is
-				      * used in the constructor of
-				      * this class.
-				      */
-    static
-    std::vector<unsigned int>
-    compute_n_nonzero_components (const std::vector<std::vector<bool> > &nonzero_components);
-    
-				     /**
-				      * Exception
-				      *
-				      * @ingroup Exceptions
-				      */
-    DeclException0 (ExcBoundaryFaceUsed);
-				     /**
-				      * Exception
-				      *
-				      * @ingroup Exceptions
-				      */
-    DeclException0 (ExcJacobiDeterminantHasWrongSign);
-
-				     /**
-				      * Determine the values a finite
-				      * element should compute on
-				      * initialization of data for
-				      * @p FEValues.
-				      *
-				      * Given a set of flags
-				      * indicating what quantities are
-				      * requested from a @p FEValues
-				      * object, @p update_once and
-				      * @p update_each compute which
-				      * values must really be
-				      * computed. Then, the
-				      * <tt>fill_*_values</tt> functions
-				      * are called with the result of
-				      * these.
-				      *
-				      * Furthermore, values must be
-				      * computed either on the unit
-				      * cell or on the physical
-				      * cell. For instance, the
-				      * function values of @p FE_Q do
-				      * only depend on the quadrature
-				      * points on the unit
-				      * cell. Therefore, this flags
-				      * will be returned by
-				      * @p update_once. The gradients
-				      * require computation of the
-				      * covariant transformation
-				      * matrix. Therefore,
-				      * @p update_covariant_transformation
-				      * and @p update_gradients will
-				      * be returned by
-				      * @p update_each.
-				      *
-				      * For an example see the same
-				      * function in the derived class
-				      * @p FE_Q.
-				      */
-    virtual UpdateFlags update_once (const UpdateFlags flags) const = 0;
-  
-				     /**
-				      * Complementary function for
-				      * @p update_once.
-				      *
-				      * While @p update_once returns
-				      * the values to be computed on
-				      * the unit cell for yielding the
-				      * required data, this function
-				      * determines the values that
-				      * must be recomputed on each
-				      * cell.
-				      *
-				      * Refer to @p update_once for
-				      * more details.
-				      */
-    virtual UpdateFlags update_each (const UpdateFlags flags) const = 0;
-  
-				     /**
-				      * @p clone function instead of
-				      * a copy constructor.
-				      *
-				      * This function is needed by the
-				      * constructors of FESystem as well
-				      * as by the hp::FECollection class.
-				      */
-    virtual FiniteElement<dim> *clone() const = 0;
-    
 				     /**
 				      * List of support points on the
 				      * unit cell, in case the finite
@@ -2136,6 +2017,125 @@ class FiniteElement : public Subscriptor,
 				      */
     std::vector<int> adjust_line_dof_index_for_line_orientation_table;
 
+                                     /**
+                                      * Return the size of interface
+                                      * constraint matrices. Since
+                                      * this is needed in every
+                                      * derived finite element class
+                                      * when initializing their size,
+                                      * it is placed into this
+                                      * function, to avoid having to
+                                      * recompute the
+                                      * dimension-dependent size of
+                                      * these matrices each time.
+                                      *
+                                      * Note that some elements do not
+                                      * implement the interface
+                                      * constraints for certain
+                                      * polynomial degrees. In this
+                                      * case, this function still
+                                      * returns the size these
+                                      * matrices should have when
+                                      * implemented, but the actual
+                                      * matrices are empty.
+                                      */
+    TableIndices<2>
+    interface_constraints_size () const;
+
+                                     /**
+				      * Compute second derivatives by
+				      * finite differences of
+				      * gradients.
+				      */
+    void compute_2nd (const Mapping<dim>                      &mapping,
+		      const typename Triangulation<dim>::cell_iterator    &cell,
+		      const unsigned int                       offset,
+		      typename Mapping<dim>::InternalDataBase &mapping_internal,
+		      InternalDataBase                        &fe_internal,
+		      FEValuesData<dim>                       &data) const;
+
+				     /**
+				      * Given the pattern of nonzero
+				      * components for each shape
+				      * function, compute for each
+				      * entry how many components are
+				      * non-zero for each shape
+				      * function. This function is
+				      * used in the constructor of
+				      * this class.
+				      */
+    static
+    std::vector<unsigned int>
+    compute_n_nonzero_components (const std::vector<std::vector<bool> > &nonzero_components);
+
+				     /**
+				      * Determine the values a finite
+				      * element should compute on
+				      * initialization of data for
+				      * @p FEValues.
+				      *
+				      * Given a set of flags
+				      * indicating what quantities are
+				      * requested from a @p FEValues
+				      * object, @p update_once and
+				      * @p update_each compute which
+				      * values must really be
+				      * computed. Then, the
+				      * <tt>fill_*_values</tt> functions
+				      * are called with the result of
+				      * these.
+				      *
+				      * Furthermore, values must be
+				      * computed either on the unit
+				      * cell or on the physical
+				      * cell. For instance, the
+				      * function values of @p FE_Q do
+				      * only depend on the quadrature
+				      * points on the unit
+				      * cell. Therefore, this flags
+				      * will be returned by
+				      * @p update_once. The gradients
+				      * require computation of the
+				      * covariant transformation
+				      * matrix. Therefore,
+				      * @p update_covariant_transformation
+				      * and @p update_gradients will
+				      * be returned by
+				      * @p update_each.
+				      *
+				      * For an example see the same
+				      * function in the derived class
+				      * @p FE_Q.
+				      */
+    virtual UpdateFlags update_once (const UpdateFlags flags) const = 0;
+  
+				     /**
+				      * Complementary function for
+				      * @p update_once.
+				      *
+				      * While @p update_once returns
+				      * the values to be computed on
+				      * the unit cell for yielding the
+				      * required data, this function
+				      * determines the values that
+				      * must be recomputed on each
+				      * cell.
+				      *
+				      * Refer to @p update_once for
+				      * more details.
+				      */
+    virtual UpdateFlags update_each (const UpdateFlags flags) const = 0;
+  
+				     /**
+				      * @p clone function instead of
+				      * a copy constructor.
+				      *
+				      * This function is needed by the
+				      * constructors of FESystem as well
+				      * as by the hp::FECollection class.
+				      */
+    virtual FiniteElement<dim> *clone() const = 0;    
+    
   private:
 				     /**
 				      * Store what
