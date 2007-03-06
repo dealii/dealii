@@ -378,22 +378,6 @@ class FiniteElement : public Subscriptor,
     };
 
   public:
-                                     /**
-                                      * Copy constructor. This one is declared
-                                      * as a public constructor to avoid
-                                      * certain compiler errors when a copy
-                                      * constructor is required even if it is
-                                      * not executed (for example when binding
-                                      * a temporary object to a constant
-                                      * reference). However, if you try to
-                                      * actually call it, it will throw an
-                                      * exception, since copying finite
-                                      * element objects is not really
-                                      * supported. If you want to copy such an
-                                      * object, use the @p clone function.
-                                      */
-    FiniteElement (const FiniteElement &);
-    
 				     /**
 				      * Constructor
 				      */
@@ -2128,12 +2112,15 @@ class FiniteElement : public Subscriptor,
     virtual UpdateFlags update_each (const UpdateFlags flags) const = 0;
   
 				     /**
-				      * @p clone function instead of
-				      * a copy constructor.
-				      *
-				      * This function is needed by the
-				      * constructors of FESystem as well
-				      * as by the hp::FECollection class.
+				      * A sort of virtual copy
+				      * constructor. Some places in
+				      * the library, for example the
+				      * constructors of FESystem as
+				      * well as the hp::FECollection
+				      * class, need to make copied of
+				      * finite elements without
+				      * knowing their exact type. They
+				      * do so through this function.
 				      */
     virtual FiniteElement<dim> *clone() const = 0;    
     

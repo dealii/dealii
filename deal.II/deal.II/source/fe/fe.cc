@@ -212,21 +212,6 @@ FiniteElement<dim>::FiniteElement (
 }
 
 
-template <int dim>
-FiniteElement<dim>::FiniteElement (const FiniteElement<dim> &)
-		:
-		Subscriptor(),
-		FiniteElementData<dim>(),
-                cached_primitivity (false)
-{
-  Assert (false,
-          ExcMessage ("Finite element objects don't support copying "
-                      "semantics through the copy constructor. If "
-                      "you want to copy a finite element, use the "
-                      "clone() function."));
-}
-
-
 
 template <int dim>
 FiniteElement<dim>::~FiniteElement ()
