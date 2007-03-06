@@ -2,7 +2,7 @@
 //    $Id$
 //    Version: $Name$
 //
-//    Copyright (C) 2000, 2001, 2002, 2003, 2004, 2005, 2006 by the deal.II authors
+//    Copyright (C) 2000, 2001, 2002, 2003, 2004, 2005, 2006, 2007 by the deal.II authors
 //
 //    This file is subject to QPL and may not be  distributed
 //    without copyright and license information. Please refer
@@ -162,12 +162,6 @@ namespace FiniteElementDomination
  * class FiniteElement class for information on its use. All
  * its data are available to the implementation in a concrete finite
  * element class.
- *
- * Remark on a change in implementation: it is now wrong to cast a
- * pointer to FiniteElement to a pointer to FiniteElementData and
- * delete it. The virtual destructor has been moved up. In a later
- * version, FiniteElementData and FiniteElement should be private
- * base classes of FiniteElement.
  *
  * @ingroup febase
  * @author Wolfgang Bangerth, Guido Kanschat, 1998, 1999, 2000, 2001, 2003, 2005
