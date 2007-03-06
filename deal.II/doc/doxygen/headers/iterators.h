@@ -375,7 +375,7 @@ face, or edge) it represents
 
 There is a representation of past-the-end-pointers, denoted by special
 values of the member variables <code>present_level</code> and <code>present_index</code> in
-the TriaAccessor class: If <code>present_level</code> &ge;=0 and <code>present_index</code> &ge;=0,
+the TriaAccessor class: If <code>present_level</code> @> =0 and <code>present_index</code> @> =0,
 then the object is valid (there is no check whether the triangulation
 really has that many levels or that many cells on the present level
 when we investigate the state of an iterator; however, in many places
