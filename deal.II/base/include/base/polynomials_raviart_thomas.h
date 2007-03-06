@@ -2,7 +2,7 @@
 //    $Id$
 //    Version: $Name$
 //
-//    Copyright (C) 2004, 2005, 2006 by the deal.II authors
+//    Copyright (C) 2004, 2005, 2006, 2007 by the deal.II authors
 //
 //    This file is subject to QPL and may not be  distributed
 //    without copyright and license information. Please refer
@@ -62,11 +62,6 @@ class PolynomialsRaviartThomas
 				      * <i>Q<sub>k</sub></i> contained.
 				      */
     PolynomialsRaviartThomas (const unsigned int k);
-
-				     /**
-				      * Destructor deleting the polynomials.
-				      */
-    ~PolynomialsRaviartThomas ();
     
 				     /**
 				      * Computes the value and the
@@ -134,7 +129,7 @@ class PolynomialsRaviartThomas
 				      * rotating the coordinates of
 				      * the evaluation point.
 				      */
-    AnisotropicPolynomials<dim>* polynomial_space;
+    const AnisotropicPolynomials<dim> polynomial_space;
 
 				     /**
 				      * Number of Raviart-Thomas
@@ -156,6 +151,17 @@ class PolynomialsRaviartThomas
 				      * Auxiliary memory.
 				      */
     mutable std::vector<Tensor<2,dim> > p_grad_grads;
+
+				     /**
+				      * A static member function that
+				      * creates the polynomial space
+				      * we use to initialize the
+				      * #polynomial_space member
+				      * variable.
+				      */
+    static
+    std::vector<std::vector< Polynomials::Polynomial< double > > >
+    create_polynomials (const unsigned int k);
 };
 
 /** @} */

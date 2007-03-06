@@ -25,7 +25,15 @@ template <int dim>
 PolynomialsRaviartThomas<dim>::PolynomialsRaviartThomas (const unsigned int k)
 		:
 		my_degree(k),
+		polynomial_space (create_polynomials (k)),
 		n_pols(compute_n_pols(k))
+{}
+
+
+
+template <int dim>
+std::vector<std::vector< Polynomials::Polynomial< double > > >
+PolynomialsRaviartThomas<dim>::create_polynomials (const unsigned int k)
 {
   std::vector<std::vector< Polynomials::Polynomial< double > > > pols(dim);
   pols[0] = Polynomials::LagrangeEquidistant::generate_complete_basis(k+1);
@@ -35,14 +43,8 @@ PolynomialsRaviartThomas<dim>::PolynomialsRaviartThomas (const unsigned int k)
   else
     for (unsigned int d=1;d<dim;++d)
       pols[d] = Polynomials::LagrangeEquidistant::generate_complete_basis(k);
-  polynomial_space = new AnisotropicPolynomials<dim>(pols);
-}
 
-
-template <int dim>
-PolynomialsRaviartThomas<dim>::~PolynomialsRaviartThomas ()
-{
-  delete polynomial_space;
+  return pols;
 }
 
 
@@ -60,7 +62,7 @@ PolynomialsRaviartThomas<dim>::compute (const Point<dim>            &unit_point,
   Assert(grad_grads.size()==n_pols|| grad_grads.size()==0,
 	 ExcDimensionMismatch(grad_grads.size(), n_pols));
 
-  const unsigned int n_sub = polynomial_space->n();
+  const unsigned int n_sub = polynomial_space.n();
   p_values.resize((values.size() == 0) ? 0 : n_sub);
   p_grads.resize((grads.size() == 0) ? 0 : n_sub);
   p_grad_grads.resize((grad_grads.size() == 0) ? 0 : n_sub);
@@ -82,7 +84,7 @@ PolynomialsRaviartThomas<dim>::compute (const Point<dim>            &unit_point,
       for (unsigned int c=0;c<dim;++c)
 	p(c) = unit_point((c+d)%dim);
       
-      polynomial_space->compute (p, p_values, p_grads, p_grad_grads);
+      polynomial_space.compute (p, p_values, p_grads, p_grad_grads);
       
       for (unsigned int i=0;i<p_values.size();++i)
 	  values[i+d*n_sub][d] = p_values[i];
