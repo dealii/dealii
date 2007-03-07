@@ -735,6 +735,13 @@ inconvenience this causes.
 <h3>lac</h3>
 
 <ol>
+  <li> <p>Fixed: The <code class="class">SolverBicgstab</code> class
+       did not handle hitting on the solution early very
+       gracefully (it threw an exception). This is now fixed.
+       <br>
+       (Roger Young 2007/03/07)
+       </p>
+
   <li> <p>Fixed: The <code class="member">SparseDirectMA27</code> class allows
        to run the sparse direct solver as a separate program (the
        <code>detached_ma27</code> program) rather than as part of the current

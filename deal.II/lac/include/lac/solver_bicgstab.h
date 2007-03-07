@@ -2,7 +2,7 @@
 //    $Id$
 //    Version: $Name$
 //
-//    Copyright (C) 1998, 1999, 2000, 2001, 2002, 2003, 2004, 2005, 2006 by the deal.II authors
+//    Copyright (C) 1998, 1999, 2000, 2001, 2002, 2003, 2004, 2005, 2006, 2007 by the deal.II authors
 //
 //    This file is subject to QPL and may not be  distributed
 //    without copyright and license information. Please refer
@@ -352,6 +352,19 @@ SolverBicgstab<VECTOR>::iterate(const MATRIX& A,
 	return true;
       
       s.equ(1., r, -alpha, v);
+
+				       // check for early success, see
+				       // the lac/bicgstab_early
+				       // testcase as to why this is
+				       // necessary
+      if (this->control().check(step, s.l2_norm()/Vb->l2_norm())
+	  == SolverControl::success)
+	{
+	  Vx->add(alpha, y);
+	  print_vectors(step, *Vx, r, y);
+	  return false;
+	}
+
       precondition.vmult(z,s);
       A.vmult(t,z);
       rhobar = t*s;

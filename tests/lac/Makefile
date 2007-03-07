@@ -30,7 +30,8 @@ tests_x = vector-vector \
 	solver eigen \
 	sparse_ilu sparse_ilu_t lapack_fill block_minres \
 	identity_matrix* trace \
-	print_formatted_*
+	print_formatted_* \
+	bicgstab_early
 
 
 # from above list of regular expressions, generate the real set of
