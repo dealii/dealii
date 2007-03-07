@@ -88,7 +88,7 @@ class LaplaceProblem
     Vector<double>       solution;
     Vector<double>       system_rhs;
 
-    Timer distr, condense, hang;
+    Timer distr, condense, hang, assemble, solver;
 };
 
 
@@ -634,15 +634,26 @@ void LaplaceProblem<dim>::run ()
       std::cout << "   Number of constraints       : "
 		<< hanging_node_constraints.n_constraints()
 		<< std::endl;
-      
+
+      assemble.reset ();
+      assemble.start ();
       assemble_system ();
+      assemble.stop();
+      
+
+      solver.reset();
+      solver.start();
       solve ();
+      solver.stop();
+      
       all.stop();
 
       std::cout << "   All: " << all()
 		<< ", distr: " << distr()
 		<< ", hang: " << hang()
 		<< ", condense: " << condense()
+		<< ", assemble: " << assemble()
+		<< ", solver: " << solver()
 		<< std::endl;
       
       output_results (cycle);
