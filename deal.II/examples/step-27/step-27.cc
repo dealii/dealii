@@ -25,6 +25,7 @@
 #include <lac/vector.h>
 #include <lac/full_matrix.h>
 #include <lac/sparse_matrix.h>
+#include <lac/compressed_sparsity_pattern.h>
 #include <lac/solver_cg.h>
 #include <lac/precondition.h>
 #include <grid/tria.h>
@@ -122,7 +123,7 @@ template <int dim>
 LaplaceProblem<dim>::LaplaceProblem () :
 		dof_handler (triangulation)
 {
-  for (unsigned int degree=2; degree<8; ++degree)
+  for (unsigned int degree=2; degree<(dim == 2 ? 8 : 5); ++degree)
     {
       fe_collection.push_back (FE_Q<dim>(degree));
       quadrature_collection.push_back (QGauss<dim>(degree+2));
@@ -144,13 +145,7 @@ void LaplaceProblem<dim>::setup_system ()
   distr.start();
   dof_handler.distribute_dofs (fe_collection);
   distr.stop();
-  
-  sparsity_pattern.reinit (dof_handler.n_dofs(),
-			   dof_handler.n_dofs(),
-			   dof_handler.max_couplings_between_dofs());
-  DoFTools::make_sparsity_pattern (dof_handler, sparsity_pattern);
-  hang.stop();
-  
+
   solution.reinit (dof_handler.n_dofs());
   system_rhs.reinit (dof_handler.n_dofs());
 
@@ -162,12 +157,33 @@ void LaplaceProblem<dim>::setup_system ()
 
   hanging_node_constraints.close ();
   hang.stop();
-  
-  condense.reset();
-  condense.start();
-  hanging_node_constraints.condense (sparsity_pattern);
-  condense.stop();
-  sparsity_pattern.compress();
+
+  if (dim < 3)
+    {
+      sparsity_pattern.reinit (dof_handler.n_dofs(),
+			       dof_handler.n_dofs(),
+			       dof_handler.max_couplings_between_dofs());
+      DoFTools::make_sparsity_pattern (dof_handler, sparsity_pattern);
+
+      condense.reset();
+      condense.start();
+      hanging_node_constraints.condense (sparsity_pattern);
+      condense.stop();
+      sparsity_pattern.compress();      
+    }
+  else
+    {
+      CompressedSparsityPattern csp (dof_handler.n_dofs(),
+				     dof_handler.n_dofs());
+      DoFTools::make_sparsity_pattern (dof_handler, csp);
+
+      condense.reset();
+      condense.start();
+      hanging_node_constraints.condense (csp);
+      condense.stop();
+      
+      sparsity_pattern.copy_from (csp);
+    }  
 
   system_matrix.reinit (sparsity_pattern);
 }
@@ -277,7 +293,7 @@ void
 LaplaceProblem<dim>::
 estimate_smoothness (Vector<float> &smoothness_indicators) const
 {
-  const unsigned int N = 7;
+  const unsigned int N = (dim == 2 ? 7 : 4);
 
 				   // form all the Fourier vectors
 				   // that we want to
@@ -296,9 +312,27 @@ estimate_smoothness (Vector<float> &smoothness_indicators) const
 		&&
 		(i*i + j*j < N*N))
 	      {
-		k_vectors.push_back (Point<2>(deal_II_numbers::PI * i,
-					      deal_II_numbers::PI * j));
+		k_vectors.push_back (Point<dim>(deal_II_numbers::PI * i,
+						deal_II_numbers::PI * j));
 		k_vectors_magnitude.push_back (i*i+j*j);
+	      }
+	
+	break;
+      }
+
+      case 3:
+      {
+	for (unsigned int i=0; i<N; ++i)
+	  for (unsigned int j=0; j<N; ++j)
+	    for (unsigned int k=0; k<N; ++k)
+	      if (!((i==0) && (j==0) && (k==0))
+		  &&
+		  (i*i + j*j + k*k < N*N))
+		{
+		  k_vectors.push_back (Point<dim>(deal_II_numbers::PI * i,
+						  deal_II_numbers::PI * j,
+						  deal_II_numbers::PI * k));
+		  k_vectors_magnitude.push_back (i*i+j*j+k*k);
 	      }
 	
 	break;
@@ -607,6 +641,15 @@ void LaplaceProblem<2>::create_coarse_grid ()
 
 
 
+template <>
+void LaplaceProblem<3>::create_coarse_grid ()
+{
+  GridGenerator::hyper_cube (triangulation);
+  triangulation.refine_global (1);
+}
+
+
+
 template <int dim>
 void LaplaceProblem<dim>::run () 
 {
@@ -666,8 +709,8 @@ int main ()
     {
       deallog.depth_console (0);
 
-      LaplaceProblem<2> laplace_problem_2d;
-      laplace_problem_2d.run ();
+      LaplaceProblem<2> laplace_problem;
+      laplace_problem.run ();
     }
   catch (std::exception &exc)
     {
