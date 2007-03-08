@@ -212,5 +212,5 @@ int main ()
 template <int dim>
 void test ()
 {
-  test_with_wrong_face_orientation (FE_Q<dim>(3), 3);
+  test_with_wrong_face_orientation (FE_Q<dim>(5), 5);
 }

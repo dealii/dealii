@@ -43,7 +43,9 @@ tests_x = grid_generator_?? \
 	  sparse_lu_decomposition_1 \
 	  block_sparse_matrix_* \
 	  block_vector_* \
-	  hyper_ball_3d cylinder coarsening_3d \
+	  hyper_ball_3d \
+	  cylinder* \
+	  coarsening_3d \
 	  mesh_3d_* \
 	  normals_* \
 	  q_point_sum_* \
