@@ -157,7 +157,7 @@ void LaplaceProblem<dim>::setup_system ()
   hang.start();
   DoFTools::make_hanging_node_constraints (dof_handler,
 					   hanging_node_constraints);
-
+  hanging_node_constraints.write_dot (deallog.get_file_stream());
   hanging_node_constraints.close ();
   hang.stop();
 
