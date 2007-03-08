@@ -33,6 +33,7 @@
 #include <fe/fe_q.h>
 #include <numerics/matrices.h>
 
+#include <iostream>
 #include <cmath>
 #include <limits>
 
@@ -1831,6 +1832,8 @@ GridGenerator::cylinder (Triangulation<dim> &tria,
 			 const double radius,
 			 const double half_length)
 {
+  Assert (dim <= 3, ExcNotImplemented());
+  
 				   // Copy the base from hyper_ball<dim>
 				   // and transform it to yz
   const double d = radius/std::sqrt(2.0);
@@ -1894,23 +1897,46 @@ GridGenerator::cylinder (Triangulation<dim> &tria,
     cells,
     SubCellData());       // no boundary information
 
+				   // set boundary indicators for the
+				   // faces at the ends to 1 and 2,
+				   // respectively. note that we also
+				   // have to deal with those lines
+				   // that are purely in the interior
+				   // of the ends. we determine wether
+				   // an edge is purely in the
+				   // interior if one of its vertices
+				   // is at coordinates '+-a' as set
+				   // above
   typename Triangulation<dim>::cell_iterator cell = tria.begin();
   typename Triangulation<dim>::cell_iterator end = tria.end();
   
-  while (cell != end)
-    {
-      for (unsigned int i=0;i<GeometryInfo<dim>::faces_per_cell;++i)
+  for (; cell != end; ++cell)
+    for (unsigned int i=0; i<GeometryInfo<dim>::faces_per_cell; ++i)
+      if (cell->at_boundary(i))
 	{
-	  if (cell->face(i)->boundary_indicator() == 255)
-	    continue;
-	  
 	  if (cell->face(i)->center()(0) > half_length-1.e-5)
-	    cell->face(i)->set_boundary_indicator(2);
+	    {
+	      cell->face(i)->set_boundary_indicator(2);
+
+	      for (unsigned int e=0; e<GeometryInfo<dim>::lines_per_face; ++e)
+		if ((std::fabs(cell->face(i)->line(e)->vertex(0)[1]) == a) ||
+		    (std::fabs(cell->face(i)->line(e)->vertex(0)[2]) == a) ||
+		    (std::fabs(cell->face(i)->line(e)->vertex(1)[1]) == a) ||
+		    (std::fabs(cell->face(i)->line(e)->vertex(1)[2]) == a))
+		  cell->face(i)->line(e)->set_boundary_indicator(2);
+	    }
 	  else if (cell->face(i)->center()(0) < -half_length+1.e-5)
-	    cell->face(i)->set_boundary_indicator(1);
+	    {
+	      cell->face(i)->set_boundary_indicator(1);
+
+	      for (unsigned int e=0; e<GeometryInfo<dim>::lines_per_face; ++e)
+		if ((std::fabs(cell->face(i)->line(e)->vertex(0)[1]) == a) ||
+		    (std::fabs(cell->face(i)->line(e)->vertex(0)[2]) == a) ||
+		    (std::fabs(cell->face(i)->line(e)->vertex(1)[1]) == a) ||
+		    (std::fabs(cell->face(i)->line(e)->vertex(1)[2]) == a))
+		  cell->face(i)->line(e)->set_boundary_indicator(1);
+	    }
 	}
-      ++cell;
-    }
 }
 
 
