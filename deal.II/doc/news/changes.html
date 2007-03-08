@@ -1023,6 +1023,16 @@ inconvenience this causes.
 <h3>deal.II</h3>
 
 <ol>
+   <li> <p>New: The
+       <code>ConstraintMatrix::write_dot</code> function can be used
+       to produce a graphical representation of the graph of
+       constraints stored in the constraint matrix. The output can be
+       sent through the "dot" program to produce a number of graphical
+       formats, such as postscript, png, or xfig.
+       <br>
+       (WB 2007/03/08)
+       </p>
+
    <li> <p>Fixed: The
        <code>GridGenerator::cylinder</code> function in 3d properly
        set the boundary indicators of the end faces of the generated

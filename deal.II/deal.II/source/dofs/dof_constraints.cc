@@ -2,7 +2,7 @@
 //    $Id$
 //    Version: $Name$
 //
-//    Copyright (C) 1998, 1999, 2000, 2001, 2002, 2003, 2004, 2005, 2006 by the deal.II authors
+//    Copyright (C) 1998, 1999, 2000, 2001, 2002, 2003, 2004, 2005, 2006, 2007 by the deal.II authors
 //
 //    This file is subject to QPL and may not be  distributed
 //    without copyright and license information. Please refer
@@ -1379,6 +1379,24 @@ void ConstraintMatrix::print (std::ostream &out) const
 	  << ":  " << lines[i].entries[j].second << std::endl;
 
   AssertThrow (out, ExcIO());
+}
+
+
+
+void
+ConstraintMatrix::write_dot (std::ostream &out) const
+{
+  out << "digraph constraints {"
+      << std::endl;
+  for (unsigned int i=0; i!=lines.size(); ++i)
+    {
+      out << "  n" << i << " label=\"" << i << "\";"
+	  << std::endl;
+      for (unsigned int j=0; j!=lines[i].entries.size(); ++j)
+	out << "  n" << i << "->n" << lines[i].entries[j].first << ";"
+	    << std::endl;
+    }
+  out << "}" << std::endl;
 }
 
 

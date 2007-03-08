@@ -807,6 +807,30 @@ class ConstraintMatrix : public Subscriptor
     void print (std::ostream &) const;
 
 				     /**
+				      * Write the graph of constraints
+				      * in 'dot' format. 'dot' is a
+				      * program that can take a list
+				      * of nodes and produce a
+				      * graphical representation of
+				      * the graph of constrained
+				      * degrees of freedom and the
+				      * degrees of freedom they are
+				      * constrained to.
+				      *
+				      * The output of this function
+				      * can be used as input to the
+				      * 'dot' program that can convert
+				      * the graph into a graphical
+				      * representation in postscript,
+				      * png, xfig, and a number of
+				      * other formats.
+				      *
+				      * This function exists mostly
+				      * for debugging purposes.
+				      */
+    void write_dot (std::ostream &) const;
+
+				     /**
 				      * Determine an estimate for the
 				      * memory consumption (in bytes)
 				      * of this object.
