@@ -2,7 +2,7 @@
 //    $Id$
 //    Version: $Name$
 //
-//    Copyright (C) 1999, 2000, 2001, 2002, 2003, 2004, 2005, 2006 by the deal.II authors
+//    Copyright (C) 1999, 2000, 2001, 2002, 2003, 2004, 2005, 2006, 2007 by the deal.II authors
 //
 //    This file is subject to QPL and may not be  distributed
 //    without copyright and license information. Please refer
@@ -22,10 +22,13 @@ DEAL_II_NAMESPACE_OPEN
 /**
  * Boundary object for the hull of a cylinder.  In three dimensions,
  * points are projected on a circular tube along the <tt>x-</tt>,
- * <tt>y-</tt> or <tt>z</tt>-axis. The radius of the tube can be
- * set. Similar to HyperBallBoundary, new points are projected by
- * dividing the straight line between the old two points and adjusting
- * the radius in the @p yz-plane (xz-plane or xy-plane, respectively).
+ * <tt>y-</tt> or <tt>z</tt>-axis (when using the first constructor of
+ * this class), or an arbitrarily oriented cylinder described by the
+ * direction of its axis and a point located on the axis. The radius
+ * of the tube can be given independently. Similar to
+ * HyperBallBoundary, new points are projected by dividing the
+ * straight line between the old two points and adjusting the radius
+ * from the axis.
  *
  * This class was developed to be used in conjunction with the
  * @p cylinder function of GridGenerator. It should be used for
@@ -37,7 +40,7 @@ DEAL_II_NAMESPACE_OPEN
  *
  * @ingroup boundary
  *
- * @author Guido Kanschat, 2001
+ * @author Guido Kanschat, 2001, Wolfgang Bangerth, 2007
  */
 template <int dim>
 class CylinderBoundary : public StraightBoundary<dim>
@@ -52,8 +55,24 @@ class CylinderBoundary : public StraightBoundary<dim>
 				      * along the y- or z-axis,
 				      * respectively.
 				      */
-    CylinderBoundary (const double       radius = 1.0,
-		      const unsigned int axis   = 0);
+    CylinderBoundary (const double radius = 1.0,
+		      const unsigned int axis = 0);
+
+				     /**
+				      * Constructor. If constructed
+				      * with this constructor, the
+				      * boundary described is a
+				      * cylinder with an axis that
+				      * points in direction #direction
+				      * and goes through the given
+				      * #point_on_axis. The direction
+				      * may be arbitrarily scaled, and
+				      * the given point may be any
+				      * point on the axis.
+				      */
+    CylinderBoundary (const double       radius,
+		      const Point<dim>   direction,
+		      const Point<dim>   point_on_axis);
 
 				     /**
 				      * Refer to the general documentation of
@@ -132,16 +151,14 @@ class CylinderBoundary : public StraightBoundary<dim>
     const double radius;
 
 				     /**
-				      * Denotes the axis of the
-				      * circular
-				      * tube. <tt>axis=0</tt>,
-				      * <tt>axis=1</tt> and
-				      * <tt>axis=2</tt> denote the
-				      * <tt>x-axis</tt>,
-				      * <tt>y-axis</tt> and
-				      * <tt>z-axis</tt>, respectively.
+				      * The direction vector of the axis.
 				      */
-    const unsigned int axis;
+    const Point<dim> direction;
+
+				     /**
+				      * An arbitrary point on the axis.
+				      */
+    const Point<dim> point_on_axis;
 
   private:
 
@@ -158,7 +175,14 @@ class CylinderBoundary : public StraightBoundary<dim>
 				      * base class.
 				      */
     void get_intermediate_points_between_points (const Point<dim> &p0, const Point<dim> &p1,
-						 std::vector<Point<dim> > &points) const;    
+						 std::vector<Point<dim> > &points) const;
+
+				     /**
+				      * Given a number for the axis,
+				      * return a vector that denotes
+				      * this direction.
+				      */
+    static Point<dim> get_axis_vector (const unsigned int axis);
 };
 
 

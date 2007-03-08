@@ -2,7 +2,7 @@
 //    $Id$
 //    Version: $Name$
 //
-//    Copyright (C) 1999, 2000, 2001, 2002, 2003, 2004, 2005, 2006 by the deal.II authors
+//    Copyright (C) 1999, 2000, 2001, 2002, 2003, 2004, 2005, 2006, 2007 by the deal.II authors
 //
 //    This file is subject to QPL and may not be  distributed
 //    without copyright and license information. Please refer
@@ -22,31 +22,69 @@
 DEAL_II_NAMESPACE_OPEN
 
 
+
+
+
 template <int dim>
 CylinderBoundary<dim>::CylinderBoundary (const double radius,
-					 const unsigned int axis) :
+					 const unsigned int axis)
+		:
 		radius(radius),
-		axis(axis)
+		direction (get_axis_vector (axis)),
+		point_on_axis (Point<dim>())
 {}
+
+
+template <int dim>
+CylinderBoundary<dim>::CylinderBoundary (const double     radius,
+					 const Point<dim> direction,
+					 const Point<dim> point_on_axis)
+		:
+		radius(radius),
+		direction (direction / direction.norm()),
+		point_on_axis (point_on_axis)
+{}
+
+
+template <int dim>
+Point<dim>
+CylinderBoundary<dim>::get_axis_vector (const unsigned int axis)
+{
+  Assert (axis < dim, ExcIndexRange (axis, 0, dim));
+
+  Point<dim> axis_vector;
+  axis_vector[axis] = 1;
+  return axis_vector;
+}
 
 
 
 template <int dim>
 Point<dim>
-CylinderBoundary<dim>::get_new_point_on_line (const typename Triangulation<dim>::line_iterator &line) const
+CylinderBoundary<dim>::
+get_new_point_on_line (const typename Triangulation<dim>::line_iterator &line) const
 {
-  Point<dim> middle = StraightBoundary<dim>::get_new_point_on_line (line);
-				   // project to boundary
-  if (dim>=3
-      && line->vertex(0).square()-line->vertex(0)(axis)*line->vertex(0)(axis) >= radius*radius-1.e-10
-      && line->vertex(1).square()-line->vertex(1)(axis)*line->vertex(1)(axis) >= radius*radius-1.e-10)
-    {
-      const double f = radius / std::sqrt(middle.square()-middle(axis)*middle(axis));
-      for (unsigned int i=0; i<dim; ++i)
-	if (i!=axis)
-	  middle(i) *= f;
-    }
-  return middle;
+				   // compute a proposed new point
+  const Point<dim> middle = StraightBoundary<dim>::get_new_point_on_line (line);
+
+				   // we then have to project this
+				   // point out to the given radius
+				   // from the axis. to this end, we
+				   // have to take into account the
+				   // offset point_on_axis and the
+				   // direction of the axis
+  const Point<dim> vector_from_axis = (middle-point_on_axis) -
+				      ((middle-point_on_axis) * direction) * direction;
+				   // scale it to the desired length
+				   // and put everything back
+				   // together, unless we have a point
+				   // on the axis
+  if (vector_from_axis.norm() <= 1e-10 * middle.norm())
+    return middle;
+  else
+    return (vector_from_axis / vector_from_axis.norm() * radius +
+	    ((middle-point_on_axis) * direction) * direction +
+	    point_on_axis);
 }
 
 
@@ -57,21 +95,18 @@ Point<3>
 CylinderBoundary<3>::
 get_new_point_on_quad (const Triangulation<3>::quad_iterator &quad) const
 {
-  Point<3> middle = StraightBoundary<3>::get_new_point_on_quad (quad);
+  const Point<3> middle = StraightBoundary<3>::get_new_point_on_quad (quad);
   
-				   // project to boundary
-  if (quad->vertex(0).square()-quad->vertex(0)(axis)*quad->vertex(0)(axis) >= radius*radius-1.e-10
-      && quad->vertex(1).square()-quad->vertex(1)(axis)*quad->vertex(1)(axis) >= radius*radius-1.e-10
-      && quad->vertex(2).square()-quad->vertex(2)(axis)*quad->vertex(2)(axis) >= radius*radius-1.e-10
-      && quad->vertex(3).square()-quad->vertex(3)(axis)*quad->vertex(3)(axis) >= radius*radius-1.e-10)
-    
-    {
-      const double f = radius / std::sqrt(middle.square()-middle(axis)*middle(axis));
-      for (unsigned int i=0; i<3; ++i)
-	if (i!=axis)
-	  middle(i) *= f;
-    }
-  return middle;
+				   // same algorithm as above
+  const unsigned int dim = 3;
+  const Point<dim> vector_from_axis = (middle-point_on_axis) -
+				      ((middle-point_on_axis) * direction) * direction;
+  if (vector_from_axis.norm() <= 1e-10 * middle.norm())
+    return middle;
+  else
+    return (vector_from_axis / vector_from_axis.norm() * radius +
+	    ((middle-point_on_axis) * direction) * direction +
+	    point_on_axis);
 }
 
 #endif
@@ -104,37 +139,30 @@ CylinderBoundary<dim>::get_intermediate_points_on_line (
 template <int dim>
 void
 CylinderBoundary<dim>::get_intermediate_points_between_points (
-  const Point<dim> &v0, const Point<dim> &v1,
+  const Point<dim> &v0,
+  const Point<dim> &v1,
   std::vector<Point<dim> > &points) const
 {
   const unsigned int n=points.size();
   Assert(n>0, ExcInternalError());
-				   // Do a simple linear interpolation
-				   // followed by projection. If this
-				   // is not sufficient, try to
-				   // understand the sophisticated
-				   // code in HyperBall later.
-  Point<dim> ds = v1-v0;
-  ds /= n+1;
 
-  bool scale = (dim>=3
-		&& v0.square()-v0(axis)*v0(axis) >= radius*radius-1.e-10
-		&& v1.square()-v1(axis)*v1(axis) >= radius*radius-1.e-10);
-  
+				   // Do a simple linear interpolation
+				   // followed by projection, using
+				   // the same algorithm as above
+  const Point<dim> ds = (v1-v0) / (n+1);
+
   for (unsigned int i=0; i<n; ++i)
     {
-      if (i==0)
-	points[i] = v0+ds;
-      else
-	points[i] = points[i-1]+ds;
+      const Point<dim> middle = v0 + (i+1)*ds;
 
-      if (scale)
-	{
-	  const double f = radius / std::sqrt(points[i].square()-points[i](axis)*points[i](axis));
-	  for (unsigned int d=0; d<dim; ++d)
-	    if (i!=axis)
-	      points[i](d) *= f;
-	}
+      const Point<dim> vector_from_axis = (middle-point_on_axis) -
+					  ((middle-point_on_axis) * direction) * direction;
+      if (vector_from_axis.norm() <= 1e-10 * middle.norm())
+	points[i] = middle;
+      else
+	points[i] = (vector_from_axis / vector_from_axis.norm() * radius +
+		     ((middle-point_on_axis) * direction) * direction +
+		     point_on_axis);
     }
 }
 
@@ -205,10 +233,14 @@ CylinderBoundary<dim>::
 get_normals_at_vertices (const typename Triangulation<dim>::face_iterator &face,
 			 typename Boundary<dim>::FaceVertexNormals &face_vertex_normals) const
 {
-  for (unsigned int vertex=0; vertex<GeometryInfo<dim>::vertices_per_face; ++vertex)
+  for (unsigned int v=0; v<GeometryInfo<dim>::vertices_per_face; ++v)
     {
-      face_vertex_normals[vertex] = face->vertex(vertex);
-      face_vertex_normals[vertex][axis] = 0.;
+      const Point<dim> vertex = face->vertex(v);
+
+      const Point<dim> vector_from_axis = (vertex-point_on_axis) -
+					  ((vertex-point_on_axis) * direction) * direction;
+      
+      face_vertex_normals[v] = (vector_from_axis / vector_from_axis.norm());
     }
 }
 
