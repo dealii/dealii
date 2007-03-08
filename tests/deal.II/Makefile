@@ -23,6 +23,7 @@ default: run-tests
 
 tests_x = block_matrices \
 	constraints \
+	constraint_graph \
 	data_out \
 	derivative_* \
 	derivatives \
