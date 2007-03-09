@@ -450,6 +450,7 @@ void ConstraintMatrix::merge (const ConstraintMatrix &other_constraints)
 				   // constraints in the two objects
 				   // are for different degrees of
 				   // freedom
+#ifdef DEBUG  
   if (true)
     {
 				       // first insert all dofs in
@@ -461,8 +462,10 @@ void ConstraintMatrix::merge (const ConstraintMatrix &other_constraints)
 
 				       // ...then check whether it
 				       // appears in the other object
-				       // as well. note that we have
-				       // to do this in a somewhat
+				       // as well (in which case we
+				       // would need to issue an
+				       // error). note that we have to
+				       // do this in a somewhat
 				       // complicated style since the
 				       // two objects may not be
 				       // sorted
@@ -491,6 +494,7 @@ void ConstraintMatrix::merge (const ConstraintMatrix &other_constraints)
 	  AssertThrow (this_dofs.find (e->first) == this_dofs.end(),
 		       ExcDoFIsConstrainedToConstrainedDoF (e->first));
     }
+#endif
 
 				   // store the previous state with
 				   // respect to sorting
@@ -1393,9 +1397,8 @@ ConstraintMatrix::write_dot (std::ostream &out) const
       << std::endl;
   for (unsigned int i=0; i!=lines.size(); ++i)
     {
-      out << "  " << i << ";\n";
       for (unsigned int j=0; j!=lines[i].entries.size(); ++j)
-	out << "  " << i << "->" << lines[i].entries[j].first
+	out << "  " << lines[i].line << "->" << lines[i].entries[j].first
 	    << "; // weight: "
 	    << lines[i].entries[j].second
 	    << "\n";
