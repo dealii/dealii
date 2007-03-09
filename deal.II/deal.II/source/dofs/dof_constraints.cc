@@ -1390,11 +1390,12 @@ ConstraintMatrix::write_dot (std::ostream &out) const
       << std::endl;
   for (unsigned int i=0; i!=lines.size(); ++i)
     {
-      out << "  n" << i << " label=\"" << i << "\";"
-	  << std::endl;
+      out << "  " << i << ";\n";
       for (unsigned int j=0; j!=lines[i].entries.size(); ++j)
-	out << "  n" << i << "->n" << lines[i].entries[j].first << ";"
-	    << std::endl;
+	out << "  " << i << "->" << lines[i].entries[j].first
+	    << "; // weight: "
+	    << lines[i].entries[j].second
+	    << "\n";
     }
   out << "}" << std::endl;
 }
