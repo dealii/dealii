@@ -120,6 +120,9 @@ ConstraintMatrix::add_entries (const unsigned int                        line,
          col_val_pair = col_val_pairs.begin();
        col_val_pair!=col_val_pairs.end(); ++col_val_pair)
     {
+      Assert (line != col_val_pair->first,
+	      ExcMessage ("Can't constrain a degree of freedom to itself"));
+      
       for (std::vector<std::pair<unsigned int,double> >::const_iterator
              p=line_ptr->entries.begin();
 	   p != line_ptr->entries.end(); ++p)
@@ -131,10 +134,10 @@ ConstraintMatrix::add_entries (const unsigned int                        line,
 		    ExcEntryAlreadyExists(line, col_val_pair->first,
 					  p->second, col_val_pair->second));
 	    break;
-	  };
+	  }
       
       line_ptr->entries.push_back (*col_val_pair);
-    };
+    }
 }
 
 
