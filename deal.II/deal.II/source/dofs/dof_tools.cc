@@ -222,7 +222,7 @@ DoFTools::make_sparsity_pattern (
         {
           const std::vector<typename DH::active_cell_iterator >
 	    child_cells = GridTools::get_active_child_cells<DH> (cell_row);
-          for (unsigned int i; i<child_cells.size(); i++)
+          for (unsigned int i=0; i<child_cells.size(); i++)
             {
 	      const typename DH::active_cell_iterator
 		cell_row_child = child_cells[i];
@@ -246,7 +246,7 @@ DoFTools::make_sparsity_pattern (
         {
           std::vector<typename DH::active_cell_iterator>
 	    child_cells = GridTools::get_active_child_cells<DH> (cell_col);
-          for (unsigned int i; i<child_cells.size(); i++)
+          for (unsigned int i=0; i<child_cells.size(); i++)
             {
 	      const typename DH::active_cell_iterator
 		cell_col_child = child_cells[i];
