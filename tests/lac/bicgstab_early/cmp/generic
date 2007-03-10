@@ -1,2 +1,10 @@
 
-DEAL::OK
+DEAL:Bicgstab::Starting value 0.1379
+DEAL:Bicgstab::Convergence step 1 value 0
+DEAL::0
+DEAL::0.009242
+DEAL::0
+DEAL::0.009242
+DEAL::residual=0
+DEAL::GrowingVectorMemory:Overall allocated vectors: 8
+DEAL::GrowingVectorMemory:Maximum allocated vectors: 8
