@@ -1023,6 +1023,23 @@ inconvenience this causes.
 <h3>deal.II</h3>
 
 <ol>
+   <li> <p>New: There is a new variant of
+       <code>DoFTools::make_sparsity_pattern</code> that can be used to
+       construct sparsity patterns corresponding to problems where one would
+       like to test shape functions defined on one mesh with shape functions
+       defined on a different mesh (or on the same mesh but using a different
+       DoFHandler that may use a different finite element, for example).
+       <br>
+       (Yaqi Wang 2007/03/09)
+       </p>
+
+   <li> <p>New: The
+       <code>GridTools::get_active_child_cells</code> function determines all
+       active children of a cell.
+       <br>
+       (Yaqi Wang 2007/03/09)
+       </p>
+
    <li> <p>New: The
        <code>ConstraintMatrix::write_dot</code> function can be used
        to produce a graphical representation of the graph of

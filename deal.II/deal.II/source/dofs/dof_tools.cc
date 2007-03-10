@@ -20,6 +20,7 @@
 #include <grid/tria.h>
 #include <grid/tria_iterator.h>
 #include <grid/intergrid_map.h>
+#include <grid/grid_tools.h>
 #include <dofs/dof_handler.h>
 #include <dofs/dof_accessor.h>
 #include <dofs/dof_constraints.h>
@@ -163,6 +164,108 @@ DoFTools::make_sparsity_pattern (
 	  if (dof_mask[fe_index][i][j] == true)
 	    sparsity.add (dofs_on_this_cell[i],
 			  dofs_on_this_cell[j]);
+    }
+}
+
+
+
+template <class DH, class SparsityPattern>
+void
+DoFTools::make_sparsity_pattern (
+  const DH        &dof_row,
+  const DH        &dof_col,
+  SparsityPattern &sparsity)
+{
+  const unsigned int n_dofs_row = dof_row.n_dofs();
+  const unsigned int n_dofs_col = dof_col.n_dofs();
+
+  Assert (sparsity.n_rows() == n_dofs_row,
+          ExcDimensionMismatch (sparsity.n_rows(), n_dofs_row));
+  Assert (sparsity.n_cols() == n_dofs_col,
+          ExcDimensionMismatch (sparsity.n_cols(), n_dofs_col));
+
+
+  const std::list<std::pair<typename DH::cell_iterator,
+                            typename DH::cell_iterator> >
+    cell_list
+    = GridTools::get_finest_common_cells (dof_row, dof_col);
+
+
+  typename std::list<std::pair<typename DH::cell_iterator,
+                               typename DH::cell_iterator> >
+    ::const_iterator
+    cell_iter = cell_list.begin();
+
+  for (; cell_iter!=cell_list.end(); ++cell_iter)
+    {
+      const typename DH::cell_iterator cell_row = cell_iter->first;
+      const typename DH::cell_iterator cell_col = cell_iter->second;
+
+      if (!cell_row->has_children() && !cell_col->has_children())
+        {
+          const unsigned int dofs_per_cell_row =
+	    cell_row->get_fe().dofs_per_cell;
+          const unsigned int dofs_per_cell_col =
+	    cell_col->get_fe().dofs_per_cell;
+          std::vector<unsigned int>
+	    local_dof_indices_row(dofs_per_cell_row);
+          std::vector<unsigned int>
+	    local_dof_indices_col(dofs_per_cell_col);
+          cell_row->get_dof_indices (local_dof_indices_row);
+          cell_col->get_dof_indices (local_dof_indices_col);
+          for (unsigned int i=0; i<dofs_per_cell_row; ++i)
+            for (unsigned int j=0; j<dofs_per_cell_col; ++j)
+              sparsity.add (local_dof_indices_row[i],
+                            local_dof_indices_col[j]);
+        }
+      else if (cell_row->has_children())
+        {
+          const std::vector<typename DH::active_cell_iterator >
+	    child_cells = GridTools::get_active_child_cells<DH> (cell_row);
+          for (unsigned int i; i<child_cells.size(); i++)
+            {
+	      const typename DH::active_cell_iterator
+		cell_row_child = child_cells[i];
+              const unsigned int dofs_per_cell_row =
+		cell_row_child->get_fe().dofs_per_cell;
+              const unsigned int dofs_per_cell_col =
+		cell_col->get_fe().dofs_per_cell;
+              std::vector<unsigned int>
+		local_dof_indices_row(dofs_per_cell_row);
+              std::vector<unsigned int>
+		local_dof_indices_col(dofs_per_cell_col);
+              cell_row_child->get_dof_indices (local_dof_indices_row);
+              cell_col->get_dof_indices (local_dof_indices_col);
+              for (unsigned int i=0; i<dofs_per_cell_row; ++i)
+                for (unsigned int j=0; j<dofs_per_cell_col; ++j)
+                  sparsity.add (local_dof_indices_row[i],
+                                local_dof_indices_col[j]);
+            }
+        }
+      else
+        {
+          std::vector<typename DH::active_cell_iterator>
+	    child_cells = GridTools::get_active_child_cells<DH> (cell_col);
+          for (unsigned int i; i<child_cells.size(); i++)
+            {
+	      const typename DH::active_cell_iterator
+		cell_col_child = child_cells[i];
+              const unsigned int dofs_per_cell_row =
+		cell_row->get_fe().dofs_per_cell;
+              const unsigned int dofs_per_cell_col =
+		cell_col_child->get_fe().dofs_per_cell;
+              std::vector<unsigned int>
+		local_dof_indices_row(dofs_per_cell_row);
+              std::vector<unsigned int>
+		local_dof_indices_col(dofs_per_cell_col);
+              cell_row->get_dof_indices (local_dof_indices_row);
+              cell_col_child->get_dof_indices (local_dof_indices_col);
+              for (unsigned int i=0; i<dofs_per_cell_row; ++i)
+                for (unsigned int j=0; j<dofs_per_cell_col; ++j)
+                  sparsity.add (local_dof_indices_row[i],
+                                local_dof_indices_col[j]);
+            }
+        }
     }
 }
 
@@ -4911,6 +5014,58 @@ DoFTools::make_sparsity_pattern<hp::DoFHandler<deal_II_dimension>,
 (const hp::DoFHandler<deal_II_dimension>&,
  const Table<2,Coupling>&,
  CompressedBlockSparsityPattern&);
+
+
+template void
+DoFTools::make_sparsity_pattern<DoFHandler<deal_II_dimension>,
+				SparsityPattern>
+(const DoFHandler<deal_II_dimension> &dof_row,
+ const DoFHandler<deal_II_dimension> &dof_col,
+ SparsityPattern    &sparsity);
+template void
+DoFTools::make_sparsity_pattern<DoFHandler<deal_II_dimension>,
+				CompressedSparsityPattern>
+(const DoFHandler<deal_II_dimension> &dof_row,
+ const DoFHandler<deal_II_dimension> &dof_col,
+ CompressedSparsityPattern    &sparsity);
+template void
+DoFTools::make_sparsity_pattern<DoFHandler<deal_II_dimension>,
+				BlockSparsityPattern>
+(const DoFHandler<deal_II_dimension> &dof_row,
+ const DoFHandler<deal_II_dimension> &dof_col,
+ BlockSparsityPattern                &sparsity);
+template void
+DoFTools::make_sparsity_pattern<DoFHandler<deal_II_dimension>,
+				CompressedBlockSparsityPattern>
+(const DoFHandler<deal_II_dimension> &dof_row,
+ const DoFHandler<deal_II_dimension> &dof_col,
+ CompressedBlockSparsityPattern      &sparsity);
+
+template void
+DoFTools::make_sparsity_pattern<hp::DoFHandler<deal_II_dimension>,
+				SparsityPattern>
+(const hp::DoFHandler<deal_II_dimension> &dof_row,
+ const hp::DoFHandler<deal_II_dimension> &dof_col,
+ SparsityPattern    &sparsity);
+template void
+DoFTools::make_sparsity_pattern<hp::DoFHandler<deal_II_dimension>,
+				CompressedSparsityPattern>
+(const hp::DoFHandler<deal_II_dimension> &dof_row,
+ const hp::DoFHandler<deal_II_dimension> &dof_col,
+ CompressedSparsityPattern    &sparsity);
+template void
+DoFTools::make_sparsity_pattern<hp::DoFHandler<deal_II_dimension>,
+				BlockSparsityPattern>
+(const hp::DoFHandler<deal_II_dimension> &dof_row,
+ const hp::DoFHandler<deal_II_dimension> &dof_col,
+ BlockSparsityPattern                &sparsity);
+template void
+DoFTools::make_sparsity_pattern<hp::DoFHandler<deal_II_dimension>,
+				CompressedBlockSparsityPattern>
+(const hp::DoFHandler<deal_II_dimension> &dof_row,
+ const hp::DoFHandler<deal_II_dimension> &dof_col,
+ CompressedBlockSparsityPattern      &sparsity);
+
 
 // #if deal_II_dimension > 1
 template void

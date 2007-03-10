@@ -45,7 +45,7 @@ tests_x = block_matrices \
 	support_point_map \
 	filtered_matrix \
 	boundaries \
-	sparsity_pattern \
+	sparsity_pattern* \
 	grid_tools \
 	subdomain_ids \
 	filtered_iterator \

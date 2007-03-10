@@ -398,6 +398,35 @@ class GridTools
     find_active_cell_around_point (const hp::MappingCollection<dim>   &mapping,
                                    const hp::DoFHandler<dim> &container,
                                    const Point<dim>     &p);
+
+				     /**
+				      * Return a list of all descendents of
+				      * the given cell that are active. For
+				      * example, if the current cell is once
+				      * refined but none of its children are
+				      * any further refined, then the returned
+				      * list will contain all its children.
+				      *
+				      * If the current cell is already active,
+				      * then the returned list is empty
+				      * (because the cell has no children that
+				      * may be active).
+				      *
+				      * Since in C++ the type of the Container
+				      * template argument (which can be
+				      * Triangulation, DoFHandler,
+				      * MGDoFHandler, or hp::DoFHandler) can
+				      * not be deduced from a function call,
+				      * you will have to specify it after the
+				      * function name, as for example in
+				      * <code>GridTools::get_active_child_cells@<DoFHandler@<dim@>
+				      * @> (cell)</code>.
+				      */
+    template <class Container>
+    static
+    std::vector<typename Container::active_cell_iterator>
+    get_active_child_cells (const typename Container::cell_iterator &cell);
+    
     
                                      /**
                                       * Use the METIS partitioner to generate
@@ -693,6 +722,36 @@ void GridTools::transform (const Predicate    &predicate,
 	  treated_vertices[cell->vertex_index(v)] = true;
 	};
 }
+
+
+
+template <class DH>
+std::vector<typename DH::active_cell_iterator>
+GridTools::get_active_child_cells (const typename DH::cell_iterator& cell)
+{
+  std::vector<typename DH::active_cell_iterator> child_cells;
+  
+  if (cell->has_children())
+    {
+      for (unsigned int child=0;
+	   child<GeometryInfo<DH::dimension>::children_per_cell; ++child)
+	if (cell->child (child)->has_children())
+	  {
+	    const std::vector<typename DH::active_cell_iterator>
+	      children = get_active_child_cells<DH> (cell->child(child));
+	    child_cells.insert (child_cells.end(),
+				children.begin(), children.end());
+	  }
+	else
+	  child_cells.push_back (cell->child(child));
+    }
+
+  return child_cells;
+}
+
+
+
+
 
 
 DEAL_II_NAMESPACE_CLOSE
