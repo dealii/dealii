@@ -1037,8 +1037,8 @@ AC_DEFUN(DEAL_II_DETERMINE_CC_BRAND, dnl
 	dnl line (the previous one ends with the string "applications"),
 	dnl so join this one to the previous one with a little bit of
 	dnl perl.
-        is_intel_icc1="`($CC -V 2>&1) | grep 'Intel(R) C++ Compiler'`"
-        is_intel_icc2="`($CC -help 2>&1) | grep 'Intel(R) C++ Compiler'`"
+        is_intel_icc1="`($CC -V 2>&1) | grep 'Intel'`"
+        is_intel_icc2="`($CC -help 2>&1) | grep 'Intel'`"
         is_intel_ecc="`($CC -V 2>&1) | perl -pi -e 's/applications\n/\1/g;' | grep 'Intel(R) C++ Itanium(TM) Compiler'`"
 	is_intel_icc="$is_intel_icc1$is_intel_icc2$is_intel_ecc"
         if test "x$is_intel_icc" != "x" ; then
