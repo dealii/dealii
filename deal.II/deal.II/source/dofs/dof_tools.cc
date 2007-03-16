@@ -1483,12 +1483,20 @@ namespace internal
 
       
                                        /**
-                                        * This method removes zero
+                                       * Copy constraints into a constraint
+                                       * matrix object.
+                                       *
+                                        * This function removes zero
                                         * constraints and those, which
                                         * constrain a DoF which was
                                         * already eliminated in one of
                                         * the previous steps of the hp
                                         * hanging node procedure.
+                                       *
+                                       * It also suppresses very small
+                                       * entries in the constraint matrix to
+                                       * avoid making the sparsity pattern
+                                       * fuller than necessary.
                                         */
 #ifdef DEAL_II_ANON_NAMESPACE_BUG
       static
@@ -1528,10 +1536,36 @@ namespace internal
                     }
 
               if (constraint_already_satisfied == false)
-                { 
+                {
+                                                  // add up the absolute
+                                                  // values of all
+                                                  // constraints in this line
+                                                  // to get a measure of
+                                                  // their absolute size
+                 double abs_sum = 0;
+                 for (unsigned int i=0; i<n_master_dofs; ++i)
+                   abs_sum += std::abs (face_constraints(row,i));
+                 
+                                                  // then enter those
+                                                  // constraints that are
+                                                  // larger than
+                                                  // 1e-14*abs_sum. everything
+                                                  // else probably originated
+                                                  // from inexact inversion
+                                                  // of matrices and similar
+                                                  // effects. having those
+                                                  // constraints in here will
+                                                  // only lead to problems
+                                                  // because it makes
+                                                  // sparsity patterns fuller
+                                                  // than necessary without
+                                                  // producing any
+                                                  // significant effect
                   constraints.add_line (slave_dofs[row]);
                   for (unsigned int i=0; i<n_master_dofs; ++i)
-                    if (face_constraints(row,i) != 0)
+                    if ((face_constraints(row,i) != 0)
+                       &&
+                       (std::fabs(face_constraints(row,i)) >= 1e-14*abs_sum))
                       {
 #ifdef WOLFGANG
                         std::cout << "   " << slave_dofs[row]
