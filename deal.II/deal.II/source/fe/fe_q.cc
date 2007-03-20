@@ -554,7 +554,7 @@ get_subface_interpolation_matrix (const FiniteElement<dim> &x_source_fe,
       for (unsigned int i=0; i<this->dofs_per_face; ++i)
         sum += interpolation_matrix(j,i);
 
-      Assert (std::fabs(sum-1) < 2e-13*this->degree*(dim-1),
+      Assert (std::fabs(sum-1) < 2e-13*this->degree*this->degree*dim,
               ExcInternalError());
     }
 }
