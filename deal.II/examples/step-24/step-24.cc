@@ -1,7 +1,7 @@
 /* $Id$ */
 /*    Version: $Name:  $                                          */
 /*                                                                */
-/*    Copyright (C) 2006 by the deal.II authors */
+/*    Copyright (C) 2006, 2007 by the deal.II authors */
 /*    Author: Xing Jin, Wolfgang Bangerth, Texas A&M University, 2006 */
 /*                                                                */
 /*    This file is subject to QPL and may not be  distributed     */
@@ -118,22 +118,28 @@ class TATForwardProblem
 
 				 // @sect3{Equation data}
 
-				 // As usual, we have to define our initial
-				 // values, boundary conditions, and right
-				 // hand side functions. Except things are a
-				 // bit simpler this time: we are to consider
-				 // a problem that is driven by initial
-				 // conditions, so there is no right hand side
-				 // function (though you could look up in
+				 // As usual, we have to define our
+				 // initial values, boundary
+				 // conditions, and right hand side
+				 // functions. Except things are a bit
+				 // simpler this time: we are to
+				 // consider a problem that is driven
+				 // by initial conditions, so there is
+				 // no right hand side function
+				 // (though you could look up in
 				 // step-23 to see how this can be
-				 // done. Secondly, there are no boundary
-				 // conditions: the entire boundary of the
-				 // domain consists of absorbing boundary
-				 // conditions. That only leaves initial
-				 // conditions, and there things are simple
-				 // too since the application only needs
-				 // initial conditions for the pressure, not
-				 // for the velocity.
+				 // done. Secondly, there are no
+				 // boundary conditions: the entire
+				 // boundary of the domain consists of
+				 // absorbing boundary
+				 // conditions. That only leaves
+				 // initial conditions, and there
+				 // things are simple too since for
+				 // this particular application only
+				 // nonzero initial conditions for the
+				 // pressure are prescribed, not for
+				 // the velocity (which is zero at the
+				 // initial time).
 				 //
 				 // So this is all we need: a class that
 				 // specifies initial conditions for the
@@ -199,7 +205,7 @@ double InitialValuesP<dim>::value (const Point<dim> &p,
 				 // in. The Crank-Nicolson scheme is used
 				 // again, i.e. theta is set to 0.5. The time
 				 // step is later selected to satisfy $k =
-				 // \frac h/c$
+				 // \frac hc$
 template <int dim>
 TATForwardProblem<dim>::TATForwardProblem ()
 		:
@@ -368,7 +374,7 @@ void TATForwardProblem<dim>::setup_system ()
 				   // object, so that costs memory. Secondly,
 				   // the matrix attached to this sparsity
 				   // pattern is going to be smaller and
-				   // therefore requires less memore; it would
+				   // therefore requires less memory; it would
 				   // also be faster to perform matrix-vector
 				   // multiplications with it. The final
 				   // argument, however, is the one that tips
@@ -391,7 +397,7 @@ void TATForwardProblem<dim>::setup_system ()
 				   // after the sparsity pattern has been
 				   // created, so we simply require that the
 				   // two matrices have the same sparsity
-				   // pattern.
+				   // pattern).
 				   //
 				   // So let's go with that:
   boundary_matrix.reinit (sparsity_pattern);
