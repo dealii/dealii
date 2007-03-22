@@ -45,27 +45,38 @@ pressure by accelleration:
 \rho \frac{\partial^2}{\partial t^2}u(t,\mathbf r) = 
 -\nabla p(t,\mathbf r).
 @f]
-Furthermore, it expands based on changes in temperature:
+Furthermore, it contracts due to excess pressure and expands based on changes in temperature:
 @f[
-\nabla \cdot u(t,\mathbf r) = -\frac{p(t,\mathbf r)}{\rho c_0^2}+\beta T(t,\mathbf r) 
+\nabla \cdot u(t,\mathbf r) = -\frac{p(t,\mathbf r)}{\rho c_0^2}+\beta T(t,\mathbf r) .
 @f]
+Here, $\beta$ is a thermoexpansion coefficient.
 
-If we combine these equations and assume that heating only happens on a time
+Let us now make the assumption that heating only happens on a time
 scale much shorter than wave propagation through tissue (i.e. the temporal
 length of the microwave pulse that heats the tissue is much shorter than the
-time it takes a wave to cross the domain), then we can rewrite the above
-equations as follows:
+time it takes a wave to cross the domain). In that case, the heating
+rate $H(t,\mathbf r)$ can be written as $H(t,\mathbf r) = a(\mathbf
+r)\delta(t)$ (where $a(\mathbf r)$ is a map of absorption strengths for
+microwave energy), which together with the first equation above will yield
+an instantaneous jump in the temperature $T(\mathbf r)$ at time $t=0$.
+Using this assumption, and taking all equations together, we can
+rewrite and combine the above as follows:
 @f[
-\Delta p-\frac{1}{c_0^2} \frac{\partial^2 p}{\partial^2 t} = \lambda \delta(t)a(\mathbf r)
+\Delta p-\frac{1}{c_0^2} \frac{\partial^2 p}{\partial^2 t} = \lambda
+a(\mathbf r)\frac{d\delta(t)}{dt}
 @f]
 where $\lambda = - \frac{\beta}{C_p}$. This corresponds to a wave equation
 with initial conditions as follows:
 @f{eqnarray*} 
 \Delta \bar{p}- \frac{1}{c_0^2} \frac{\partial^2 \bar{p}}{\partial^2 t} & = &
 f(t,\mathbf r) \\ 
-\bar{p}(0,\mathbf r) &=&\lambda a(\mathbf r) = b(\mathbf r) 
+\bar{p}(0,\mathbf r) &=&\lambda a(\mathbf r) = b(\mathbf r)  \\ 
+\frac{\partial\bar{p}(0,\mathbf r)}{\partial t} &=& 0.
 @f}
-In the inverse problem, it is this right hand side $\lambda a(\mathbf r)$ that
+(With $f=0$, though we usually keep it around to derive formulas that
+are valid even for the case that $f$ was non-zero.)
+
+In the inverse problem, it is the initial condition $b(\mathbf r) = \lambda a(\mathbf r)$ that
 one would like to recover, since it is a map of absorption strengths for
 microwave energy, and therefore presumably an indicator to discern healthy
 from diseased tissue.
@@ -112,7 +123,7 @@ two seperate equations:
 with initial conditions:
 @f{eqnarray*}
 \bar{p}(0,\mathbf r) & = & b(r) \\
-v(0,\mathbf r)=\bar{p}_t(0,\mathbf r) & = & 1 
+v(0,\mathbf r)=\bar{p}_t(0,\mathbf r) & = & 0
 @f}
 
 The semi-discretized, weak version of this model, using the general $\theta$ scheme
@@ -123,21 +134,21 @@ introduced in @ref step_23 "step-23" is then:
 -\left(\nabla((\theta\bar{p}^n+(1-\theta)\bar{p}^{n-1})),\nabla\phi\right)_\Omega-
 \frac{1}{c_0}\left(\frac{\bar{p}^n-\bar{p}^{n-1}}{k},\phi\right)_{\partial\Omega} - 
 \frac{1}{c_0^2}\left(\frac{v^n-v^{n-1}}{k},\phi\right)_\Omega & = 
-& \theta f^{n}+(1-\theta)f^{n-1},
+& \left(\theta f^{n}+(1-\theta)f^{n-1}, \phi\right)_\Omega,
 @f}
 where $\phi$ is an arbitrary test function, and where we have used the
 absorbing boundary condition to integrate by parts:
-absoring boundary conditions are incorporated into the weak form by using 
+absorbing boundary conditions are incorporated into the weak form by using 
 @f[ 
 \int_\Omega\varphi \, \Delta p\; dx =
 -\int_\Omega\nabla \varphi \cdot \nabla p dx + 
-\int_{\partial\Omega}\varphi \frac{\partial p}{\partial t}ds.
+\int_{\partial\Omega}\varphi \frac{\partial p}{\partial {\mathbf n}}ds.
 @f]
 
 From this we obtain the discrete model by introducing a finite number of shape
 functions, and get
 @f{eqnarray*}
-M\bar{p}^{n}-k \theta M v^{n-1} & = & M\bar{p}^{n-1}+k (1-\theta)Mv^{n-1},\\
+M\bar{p}^{n}-k \theta M v^n & = & M\bar{p}^{n-1}+k (1-\theta)Mv^{n-1},\\
 
 (-c_0^2k \theta A-c_0 B)\bar{p}^n-Mv^{n} & = & 
 (c_0^2k(1-\theta)A-c_0B)\bar{p}^{n-1}-Mv^{n-1}+c_0^2k(\theta F^{n}+(1-\theta)F^{n-1}).
