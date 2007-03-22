@@ -2,7 +2,7 @@
 //    $Id$
 //    Version: $Name$
 //
-//    Copyright (C) 2005, 2006 by the deal.II authors
+//    Copyright (C) 2005, 2006, 2007 by the deal.II authors
 //
 //    This file is subject to QPL and may not be  distributed
 //    without copyright and license information. Please refer
@@ -54,9 +54,9 @@ FunctionParser<dim>::~FunctionParser()
 #ifndef DEAL_II_DISABLE_PARSER
 
 template <int dim>
-void FunctionParser<dim>::initialize (const std::string variables,
-				      const std::vector<std::string> expressions,
-				      const std::map<std::string, double> constants,
+void FunctionParser<dim>::initialize (const std::string                   &variables,
+				      const std::vector<std::string>      &expressions,
+				      const std::map<std::string, double> &constants,
 				      const bool time_dependent,
 				      const bool use_degrees)
 {
@@ -126,9 +126,9 @@ void FunctionParser<dim>::initialize (const std::string variables,
 
 
 template <int dim>
-void FunctionParser<dim>::initialize (const std::string variables,
-				      const std::string expression,
-				      const std::map<std::string, double> constants,
+void FunctionParser<dim>::initialize (const std::string &variables,
+				      const std::string &expression,
+				      const std::map<std::string, double> &constants,
 				      const bool time_dependent,
 				      const bool use_degrees)
 {

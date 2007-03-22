@@ -2,7 +2,7 @@
 //    $Id$
 //    Version: $Name$
 //
-//    Copyright (C) 2005, 2006 by the deal.II authors
+//    Copyright (C) 2005, 2006, 2007 by the deal.II authors
 //
 //    This file is subject to QPL and may not be  distributed
 //    without copyright and license information. Please refer
@@ -360,9 +360,9 @@ class FunctionParser : public Function<dim>
                                       * default for this parameter is false,
                                       * i.e. use radians and not degrees.
                                       */
-    void initialize (const std::string vars,
-                     const std::vector<std::string> expressions,
-                     const ConstMap constants,
+    void initialize (const std::string              &vars,
+                     const std::vector<std::string> &expressions,
+                     const ConstMap                 &constants,
                      const bool time_dependent = false,
                      const bool use_degrees = false);
   
@@ -378,9 +378,9 @@ class FunctionParser : public Function<dim>
                                       * parsed does not match the number of
                                       * components of the base function.
                                       */
-    void initialize (const std::string vars,
-                     const std::string expression,
-                     const ConstMap constants,
+    void initialize (const std::string &vars,
+                     const std::string &expression,
+                     const ConstMap    &constants,
                      const bool time_dependent = false,
                      const bool use_degrees = false);
   
