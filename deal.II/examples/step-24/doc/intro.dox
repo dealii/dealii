@@ -73,13 +73,13 @@ on the right hand side can be rewritten as an initial value problem as follows:
 @f{eqnarray*} 
 \Delta \bar{p}- \frac{1}{c_0^2} \frac{\partial^2 \bar{p}}{\partial t^2} & = &
 0 \\ 
-\bar{p}(0,\mathbf r) &=&\lambda a(\mathbf r) = b(\mathbf r)  \\ 
+\bar{p}(0,\mathbf r) &=& c_0^2 \lambda a(\mathbf r) = b(\mathbf r)  \\ 
 \frac{\partial\bar{p}(0,\mathbf r)}{\partial t} &=& 0.
 @f}
 (A derivation of this transformation into an initial value problem is given at
 the end of this introduction as an appendix.)
 
-In the inverse problem, it is the initial condition $b(\mathbf r) = \lambda a(\mathbf r)$ that
+In the inverse problem, it is the initial condition $b(\mathbf r) = c_0^2 \lambda a(\mathbf r)$ that
 one would like to recover, since it is a map of absorption strengths for
 microwave energy, and therefore presumably an indicator to discern healthy
 from diseased tissue.
