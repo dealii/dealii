@@ -57,24 +57,27 @@ length of the microwave pulse that heats the tissue is much shorter than the
 time it takes a wave to cross the domain). In that case, the heating
 rate $H(t,\mathbf r)$ can be written as $H(t,\mathbf r) = a(\mathbf
 r)\delta(t)$ (where $a(\mathbf r)$ is a map of absorption strengths for
-microwave energy), which together with the first equation above will yield
+microwave energy and $\delta(t)$ is the Dirac delta function), which together
+with the first equation above will yield 
 an instantaneous jump in the temperature $T(\mathbf r)$ at time $t=0$.
 Using this assumption, and taking all equations together, we can
 rewrite and combine the above as follows:
 @f[
-\Delta p-\frac{1}{c_0^2} \frac{\partial^2 p}{\partial^2 t} = \lambda
+\Delta p-\frac{1}{c_0^2} \frac{\partial^2 p}{\partial t^2} = \lambda
 a(\mathbf r)\frac{d\delta(t)}{dt}
 @f]
-where $\lambda = - \frac{\beta}{C_p}$. This corresponds to a wave equation
-with initial conditions as follows:
+where $\lambda = - \frac{\beta}{C_p}$. 
+
+This somewhat strange equation with the derivative of a Dirac delta function
+on the right hand side can be rewritten as an initial value problem as follows:
 @f{eqnarray*} 
-\Delta \bar{p}- \frac{1}{c_0^2} \frac{\partial^2 \bar{p}}{\partial^2 t} & = &
-f(t,\mathbf r) \\ 
+\Delta \bar{p}- \frac{1}{c_0^2} \frac{\partial^2 \bar{p}}{\partial t^2} & = &
+0 \\ 
 \bar{p}(0,\mathbf r) &=&\lambda a(\mathbf r) = b(\mathbf r)  \\ 
 \frac{\partial\bar{p}(0,\mathbf r)}{\partial t} &=& 0.
 @f}
-(With $f=0$, though we usually keep it around to derive formulas that
-are valid even for the case that $f$ was non-zero.)
+(A derivation of this transformation into an initial value problem is given at
+the end of this introduction as an appendix.)
 
 In the inverse problem, it is the initial condition $b(\mathbf r) = \lambda a(\mathbf r)$ that
 one would like to recover, since it is a map of absorption strengths for
@@ -123,8 +126,11 @@ two seperate equations:
 with initial conditions:
 @f{eqnarray*}
 \bar{p}(0,\mathbf r) & = & b(r) \\
-v(0,\mathbf r)=\bar{p}_t(0,\mathbf r) & = & 0
+v(0,\mathbf r)=\bar{p}_t(0,\mathbf r) & = & 0.
 @f}
+Note that we have introduced a right hand side $f(t,\mathbf r)$ here to show
+how to derive these formulas in the general case, although in the application
+to the thermoacoustic problem $f=0$.
 
 The semi-discretized, weak version of this model, using the general $\theta$ scheme
 introduced in @ref step_23 "step-23" is then:
@@ -207,3 +213,111 @@ from actual experimental measurements. To this end, we need to evaluate the
 solution at points at which the experiment also evaluates a real pressure
 field. We will see how to do that using the VectorTools::point_value function
 further down below.
+
+
+
+<h3>Appendix: PDEs with Dirac delta functions as right hand side and their
+transformation to an initial value problem</h3>
+
+In the derivation of the initial value problem for the wave equation, we
+initially found that the equation had the derivative of a Dirac delta function
+as a right hand side:
+@f[
+\Delta p-\frac{1}{c_0^2} \frac{\partial^2 p}{\partial t^2} = \lambda
+a(\mathbf r)\frac{d\delta(t)}{dt}.
+@f]
+In order to see how to transform this single equation into the usual statement
+of a PDE with initial conditions, let us make the assumption that the
+physically quite reasonable medium is at rest initially, i.e. $p(t,\mathbf
+r)=\frac{\partial p(t,\mathbf r)}{\partial t}=0$ for $t<0$. Next, let us form
+the indefinite integral with respect to time of both sides:
+@f[
+\int^t \Delta p\; dt -\int^t \frac{1}{c_0^2} \frac{\partial^2 p}{\partial t^2}
+\; dt
+= 
+\int^t \lambda a(\mathbf r)\frac{d\delta(t)}{dt} \;dt.
+@f]
+This immediately leads to the statement
+@f[
+P(t,\mathbf r) - \frac{1}{c_0^2} \frac{\partial p}{\partial t}
+\; dt
+= 
+\lambda a(\mathbf r) \delta(t),
+@f]
+where $P(t,\mathbf r)$ is such that $\frac{dP(t,\mathbf r)}{dt}=\Delta
+p$. Next, we form the (definite) integral over time from $t=-\epsilon$ to
+$t=+\epsilon$ to find 
+@f[
+\int_{-\epsilon}^{\epsilon} P(t,\mathbf r)\; dt 
+- \frac{1}{c_0^2} \left[ p(\epsilon,\mathbf r) - p(-\epsilon,\mathbf r) \right]
+= 
+\int_{-\epsilon}^{\epsilon} \lambda a(\mathbf r) \delta(t) \; dt.
+@f]
+If we use the property of the delta function that $\int_{-\epsilon}^{\epsilon}
+\delta(t)\; dt = 1$, and assume that $P$ is a smooth function in time, we find
+as we let $\epsilon$ go to zero that
+@f[
+- \frac{1}{c_0^2} \left[ p(\epsilon,\mathbf r) - p(-\epsilon,\mathbf r) \right]
+= 
+\lambda a(\mathbf r).
+@f]
+In other words, using that $p(-\epsilon,\mathbf r)=0$, we retrieve the initial
+condition 
+@f[
+  \frac{1}{c_0^2} p(0,\mathbf r)  
+  =
+  \lambda a(\mathbf r).
+@f]
+At the same time, we know that for every $t>0$ the delta function is zero, so
+for $0<t<T$ we get the equation
+@f[
+\Delta p-\frac{1}{c_0^2} \frac{\partial^2 p}{\partial t^2} = 0.
+@f]
+Consequently, we have obtained a representation of the wave equation and one
+initial condition from the original somewhat strange equation.
+
+Finally, because we here have an equation with two time derivatives, we still
+need a second initial condition. To this end, let us go back to the equation
+@f[
+\Delta p-\frac{1}{c_0^2} \frac{\partial^2 p}{\partial t^2} = \lambda
+a(\mathbf r)\frac{d\delta(t)}{dt}.
+@f]
+and integrate it in time from $t=-\epsilon$ to $t=+\epsilon$. This leads to
+@f[
+P(\epsilon)-P(-\epsilon)
+-\frac{1}{c_0^2} \left[\frac{\partial p(\epsilon)}{\partial t} -
+                       \frac{\partial p(-\epsilon)}{\partial t}\right]
+ = \lambda a(\mathbf r) \int_{-\epsilon}^{\epsilon}\frac{d\delta(t)}{dt} \; dt.
+@f]
+Using integration by parts of the form
+@f[
+  \int_{-\epsilon}^{\epsilon}\varphi(t)\frac{d\delta(t)}{dt} \; dt
+  =
+  -\int_{-\epsilon}^{\epsilon}\frac{d\varphi(t)}{dt} \delta(t)\; dt
+@f]
+where we use that $\delta(\pm \epsilon)=0$ and inserting $\varphi(t)=1$, we
+see that in fact
+@f[
+  \int_{-\epsilon}^{\epsilon}\frac{d\delta(t)}{dt} \; dt
+  =
+  0.
+@f]
+
+Now, let $\epsilon\rightarrow 0$. Assuming that $P$ is a smooth function in
+time, we see that 
+@f[
+  P(\epsilon)-P(-\epsilon) \rightarrow 0,
+@f]
+and consequently
+@f[
+  \frac{\partial p(\epsilon)}{\partial t} -
+                       \frac{\partial p(-\epsilon)}{\partial t}
+		       \rightarrow 0.
+@f]
+However, we have assumed that $\frac{\partial p(-\epsilon)}{\partial t}=0$.
+Consequently, we obtain as the second initial condition that
+@f[
+  \frac{\partial p(0)}{\partial t} = 0,
+@f]
+completing the system of equations.
+
