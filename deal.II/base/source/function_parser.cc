@@ -213,18 +213,24 @@ void FunctionParser<dim>::vector_value (const Point<dim> &p,
 
 
 template <int dim>
-void FunctionParser<dim>::initialize(
-  const std::string, const std::vector<std::string>,
-  std::map<std::string, double>, bool, bool)
+void
+FunctionParser<dim>::initialize(const std::string &,
+				const std::vector<std::string> &,
+				const std::map<std::string, double> &,
+				const bool,
+				const bool)
 {
   Assert(false, ExcDisabled("parser"));
 }
 
 
 template <int dim>
-void FunctionParser<dim>::initialize(
-  const std::string, const std::string,
-  std::map<std::string, double>, bool, bool)
+void
+FunctionParser<dim>::initialize(const std::string &,
+				const std::string &,
+				const std::map<std::string, double> &,
+				const bool,
+				const bool)
 {
   Assert(false, ExcDisabled("parser"));
 }
