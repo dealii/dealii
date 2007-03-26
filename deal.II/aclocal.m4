@@ -3995,7 +3995,8 @@ dnl
 dnl Annoyingly, the Portland Group compiler compiles code with
 dnl __builtin_expect just fine, but then doesn't want to link it,
 dnl saying it doesn't know this function. So simply not test for
-dnl __builtin_expect with that compiler.
+dnl __builtin_expect with that compiler, and to be extrasure make 
+dnl sure we're doing the right thing also link .
 dnl
 dnl Usage: DEAL_II_HAVE_BUILTIN_EXPECT
 dnl
@@ -4006,9 +4007,9 @@ AC_DEFUN(DEAL_II_HAVE_BUILTIN_EXPECT, dnl
     AC_MSG_CHECKING(for __builtin_expect)
     AC_LANG(C++)
     CXXFLAGS="$CXXFLAGSG"
-    AC_TRY_COMPILE(
+    AC_TRY_LINK(
       [
-	  bool f();
+	  bool f() {}
       ],
       [
 	  if (__builtin_expect(f(),false));
