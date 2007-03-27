@@ -7679,9 +7679,9 @@ void Triangulation<3>::prepare_refinement_dim_dependent ()
 						     // level to find neighbors of
 						     // this cell and edge
 		    for (cell_iterator edge_neighbor=begin(cell->level());
-			 ((edge_neighbor != end(cell->level()))
+			 ((cant_be_coarsened == false)
 			  &&
-			  (cant_be_coarsened == false));
+			  (edge_neighbor != end(cell->level())));
 			 ++edge_neighbor)
 		      if (edge_neighbor != cell)
 			for (unsigned int e=0; e<GeometryInfo<dim>::lines_per_cell; ++e)
