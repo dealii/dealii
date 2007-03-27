@@ -240,7 +240,6 @@ the indefinite integral with respect to time of both sides:
 This immediately leads to the statement
 @f[
 P(t,\mathbf r) - \frac{1}{c_0^2} \frac{\partial p}{\partial t}
-\; dt
 = 
 \lambda a(\mathbf r) \delta(t),
 @f]
@@ -254,10 +253,10 @@ $t=+\epsilon$ to find
 \int_{-\epsilon}^{\epsilon} \lambda a(\mathbf r) \delta(t) \; dt.
 @f]
 If we use the property of the delta function that $\int_{-\epsilon}^{\epsilon}
-\delta(t)\; dt = 1$, and assume that $P$ is a smooth function in time, we find
+\delta(t)\; dt = 1$, and assume that $P$ is a continuous function in time, we find
 as we let $\epsilon$ go to zero that
 @f[
-- \frac{1}{c_0^2} \left[ p(\epsilon,\mathbf r) - p(-\epsilon,\mathbf r) \right]
+- \lim_{\epsilon\rightarrow 0}\frac{1}{c_0^2} \left[ p(\epsilon,\mathbf r) - p(-\epsilon,\mathbf r) \right]
 = 
 \lambda a(\mathbf r).
 @f]
@@ -303,7 +302,7 @@ see that in fact
   0.
 @f]
 
-Now, let $\epsilon\rightarrow 0$. Assuming that $P$ is a smooth function in
+Now, let $\epsilon\rightarrow 0$. Assuming that $P$ is a continuous function in
 time, we see that 
 @f[
   P(\epsilon)-P(-\epsilon) \rightarrow 0,
