@@ -22,7 +22,6 @@
 # of ./configure
 
 D                    = @prefix@
-CC                   = @CC@
 CXX                  = @CXX@
 GXX-VERSION          = @GXX_VERSION@
 GXX-VERSION-DETAILED = @GXX_VERSION_DETAILED@
