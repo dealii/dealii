@@ -2,7 +2,7 @@
 //    $Id$
 //    Version: $Name$
 //
-//    Copyright (C) 2000, 2001, 2002, 2003, 2004, 2005, 2006 by the deal.II authors
+//    Copyright (C) 2000, 2001, 2002, 2003, 2004, 2005, 2006, 2007 by the deal.II authors
 //
 //    This file is subject to QPL and may not be  distributed
 //    without copyright and license information. Please refer
@@ -718,9 +718,10 @@ SparsityPattern::operator () (const unsigned int i,
   const unsigned int * const sorted_region_start = (diagonal_optimized ?
 						    &colnums[rowstart[i]+1] :
 						    &colnums[rowstart[i]]);
-  const unsigned int * const p = optimized_lower_bound (sorted_region_start,
-							&colnums[rowstart[i+1]],
-							j);
+  const unsigned int * const p
+    = internals::SparsityPatternTools::optimized_lower_bound (sorted_region_start,
+							      &colnums[rowstart[i+1]],
+							      j);
   if ((p != &colnums[rowstart[i+1]])  &&  (*p == j))
     return (p - &colnums[0]);
   else

@@ -2,7 +2,7 @@
 //    $Id$
 //    Version: $Name$
 //
-//    Copyright (C) 2000, 2001, 2002, 2003, 2004, 2005, 2006 by the deal.II authors
+//    Copyright (C) 2000, 2001, 2002, 2003, 2004, 2005, 2006, 2007 by the deal.II authors
 //
 //    This file is subject to QPL and may not be  distributed
 //    without copyright and license information. Please refer
@@ -38,6 +38,120 @@ class CompressedSparsityPattern;
 
 namespace internals
 {
+  namespace SparsityPatternTools
+  {
+				     /**
+				      * Optimized replacement for
+				      * <tt>std::lower_bound</tt> for
+				      * searching within the range of
+				      * column indices. Slashes
+				      * execution time by
+				      * approximately one half for the
+				      * present application, partly
+				      * because we have eliminated
+				      * templates and the compiler
+				      * seems to be able to optimize
+				      * better, and partly because the
+				      * binary search is replaced by a
+				      * linear search for small loop
+				      * lengths.
+				      */
+    static
+    inline
+    const unsigned int *
+    optimized_lower_bound (const unsigned int *first,
+			   const unsigned int *last,
+			   const unsigned int &val)
+    {
+				       // this function is mostly copied
+				       // over from the STL __lower_bound
+				       // function, but with template args
+				       // replaced by the actual data
+				       // types needed here, and above all
+				       // with a rolled out search on the
+				       // last four elements
+      unsigned int len = last-first;
+
+      if (len==0)
+	return first;
+  
+      while (true)
+	{
+					   // if length equals 8 or less,
+					   // then do a rolled out
+					   // search. use a switch without
+					   // breaks for that and roll-out
+					   // the loop somehow
+	  if (len < 8)
+	    {
+	      switch (len)
+		{
+		  case 7:
+			if (*first >= val)
+			  return first;
+			++first;
+		  case 6:
+			if (*first >= val)
+			  return first;
+			++first;
+		  case 5:
+			if (*first >= val)
+			  return first;
+			++first;
+		  case 4:
+			if (*first >= val)
+			  return first;
+			++first;
+		  case 3:
+			if (*first >= val)
+			  return first;
+			++first;
+		  case 2:
+			if (*first >= val)
+			  return first;
+			++first;
+		  case 1:
+			if (*first >= val)
+			  return first;
+			return first+1;
+		  default:
+							 // indices seem
+							 // to not be
+							 // sorted
+							 // correctly!? or
+							 // did len
+							 // become==0
+							 // somehow? that
+							 // shouln't have
+							 // happened
+			Assert (false, ExcInternalError());
+		}
+	    }
+      
+      
+      
+	  const unsigned int         half   = len >> 1;
+	  const unsigned int * const middle = first + half;
+      
+					   // if the value is larger than
+					   // that pointed to by the
+					   // middle pointer, then the
+					   // insertion point must be
+					   // right of it
+	  if (*middle < val)
+	    {
+	      first = middle + 1;
+	      len  -= half + 1;
+	    }
+	  else
+	    len = half;
+	}
+    }
+    
+  }
+  
+
+    
   namespace SparsityPatternIterators
   {
                                      // forward declaration
@@ -1506,28 +1620,6 @@ class SparsityPattern : public Subscriptor
     bool diagonal_optimized;
     
 				     /**
-				      * Optimized replacement for
-				      * <tt>std::lower_bound</tt> for
-				      * searching within the range of
-				      * column indices. Slashes
-				      * execution time by
-				      * approximately one half for the
-				      * present application, partly
-				      * because we have eliminated
-				      * templates and the compiler
-				      * seems to be able to optimize
-				      * better, and partly because the
-				      * binary search is replaced by a
-				      * linear search for small loop
-				      * lengths.
-				      */
-    static
-    const unsigned int *
-    optimized_lower_bound (const unsigned int *first,
-			   const unsigned int *last,
-			   const unsigned int &val);
-
-				     /**
 				      * Helper function to get the
 				      * column index from a
 				      * dereferenced iterator in the
@@ -1831,99 +1923,6 @@ SparsityPattern::end (const unsigned int r) const
                                    // if there is no such line, then take the
                                    // end iterator of the matrix
   return end();
-}
-
-
-
-inline
-const unsigned int *
-SparsityPattern::optimized_lower_bound (const unsigned int *first,
-					const unsigned int *last,
-					const unsigned int &val)
-{
-				   // this function is mostly copied
-				   // over from the STL __lower_bound
-				   // function, but with template args
-				   // replaced by the actual data
-				   // types needed here, and above all
-				   // with a rolled out search on the
-				   // last four elements
-  unsigned int len = last-first;
-
-  if (len==0)
-    return first;
-  
-  while (true)
-    {
-				       // if length equals 8 or less,
-				       // then do a rolled out
-				       // search. use a switch without
-				       // breaks for that and roll-out
-				       // the loop somehow
-      if (len < 8)
-	{
-	  switch (len)
-	    {
-	      case 7:
-		    if (*first >= val)
-		      return first;
-		    ++first;
-	      case 6:
-		    if (*first >= val)
-		      return first;
-		    ++first;
-	      case 5:
-		    if (*first >= val)
-		      return first;
-		    ++first;
-	      case 4:
-		    if (*first >= val)
-		      return first;
-		    ++first;
-	      case 3:
-		    if (*first >= val)
-		      return first;
-		    ++first;
-	      case 2:
-		    if (*first >= val)
-		      return first;
-		    ++first;
-	      case 1:
-		    if (*first >= val)
-		      return first;
-		    return first+1;
-	      default:
-						     // indices seem
-						     // to not be
-						     // sorted
-						     // correctly!? or
-						     // did len
-						     // become==0
-						     // somehow? that
-						     // shouln't have
-						     // happened
-		    Assert (false, ExcInternalError());
-	    };
-	};
-      
-      
-      
-      const unsigned int         half   = len >> 1;
-      const unsigned int * const middle = first + half;
-      
-				       // if the value is larger than
-				       // that pointed to by the
-				       // middle pointer, then the
-				       // insertion point must be
-				       // right of it
-      if (*middle < val)
-	{
-	  first = middle + 1;
-	  len  -= half + 1;
-	}
-      else
-	len = half;
-    }
 }
 
 
