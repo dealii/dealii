@@ -61,6 +61,12 @@ template<typename number>
 class FullMatrix : public Table<2,number>
 {
   public:
+				     /**
+				      * Type of matrix entries. In analogy to
+				      * the STL container classes.
+				      */
+    typedef number value_type;
+    
     class const_iterator;
     
 				     /**
