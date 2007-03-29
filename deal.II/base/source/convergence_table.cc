@@ -2,7 +2,7 @@
 //    $Id$
 //    Version: $Name$
 //
-//    Copyright (C) 1999, 2000, 2001, 2002, 2003, 2005, 2006 by the deal.II authors
+//    Copyright (C) 1999, 2000, 2001, 2002, 2003, 2005, 2006, 2007 by the deal.II authors
 //
 //    This file is subject to QPL and may not be  distributed
 //    without copyright and license information. Please refer
@@ -127,7 +127,7 @@ ConvergenceTable::evaluate_convergence_rates(const std::string &data_column_key,
 					     // first row
 	    add_value(rate_key, std::string("-"));
 	    for (unsigned int i=1; i<n; ++i)
-	      add_value(rate_key, std::log(values[i-1]/values[i])/std::log(2.0));
+	      add_value(rate_key, std::log(std::fabs(values[i-1]/values[i]))/std::log(2.0));
 	    break;
 
       default:
