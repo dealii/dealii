@@ -2,7 +2,7 @@
 //    $Id$
 //    Version: $Name$
 //
-//    Copyright (C) 2004, 2005, 2006 by the deal.II authors
+//    Copyright (C) 2004, 2005, 2006, 2007 by the deal.II authors
 //
 //    This file is subject to QPL and may not be  distributed
 //    without copyright and license information. Please refer
@@ -38,8 +38,13 @@ namespace PETScWrappers
  * classes in this hierarchy don't do a whole lot, except for providing a
  * function that sets the preconditioner and certain parameters on the
  * preconditioning context of the solver. These classes are basically here
- * only to allow a similar interface than already used for the deal.II solver
+ * only to allow a similar interface as already used for the deal.II solver
  * and preconditioner classes.
+ *
+ * Note that the classes here only provide interfaces to the relevant
+ * functionality of PETSc. PETSc does not implement all preconditioners for
+ * all matrix types. In particular, some preconditioners are not going to work
+ * for parallel jobs, such as for example the ILU preconditioner.
  *
  * @ingroup PETScWrappers
  * @author Wolfgang Bangerth, 2004
