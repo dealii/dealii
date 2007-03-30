@@ -41,7 +41,7 @@ namespace PETScWrappers
  * only to allow a similar interface as already used for the deal.II solver
  * and preconditioner classes.
  *
- * Note that the classes here only provide interfaces to the relevant
+ * Note that derived classes only provide interfaces to the relevant
  * functionality of PETSc. PETSc does not implement all preconditioners for
  * all matrix types. In particular, some preconditioners are not going to work
  * for parallel jobs, such as for example the ILU preconditioner.
@@ -105,6 +105,9 @@ namespace PETScWrappers
  * A class that implements the interface to use the PETSc Jacobi
  * preconditioner.
  *
+ * See the comment in the base class @ref PreconditionerBase for when this
+ * preconditioner may or may not work.
+ *
  * @ingroup PETScWrappers
  * @author Wolfgang Bangerth, 2004
  */
@@ -158,6 +161,9 @@ namespace PETScWrappers
  * the matrix for preconditioning. This can be changed, as is explained in the
  * relevant section of the PETSc manual, but is not implemented here.
  *
+ * See the comment in the base class @ref PreconditionerBase for when this
+ * preconditioner may or may not work.
+ *
  * @ingroup PETScWrappers
  * @author Wolfgang Bangerth, 2004
  */
@@ -203,6 +209,9 @@ namespace PETScWrappers
 /**
  * A class that implements the interface to use the PETSc SOR
  * preconditioner.
+ *
+ * See the comment in the base class @ref PreconditionerBase for when this
+ * preconditioner may or may not work.
  *
  * @ingroup PETScWrappers
  * @author Wolfgang Bangerth, 2004
@@ -267,6 +276,9 @@ namespace PETScWrappers
  * A class that implements the interface to use the PETSc SSOR
  * preconditioner.
  *
+ * See the comment in the base class @ref PreconditionerBase for when this
+ * preconditioner may or may not work.
+ *
  * @ingroup PETScWrappers
  * @author Wolfgang Bangerth, 2004
  */
@@ -329,6 +341,9 @@ namespace PETScWrappers
 /**
  * A class that implements the interface to use the PETSc Eisenstat
  * preconditioner.
+ *
+ * See the comment in the base class @ref PreconditionerBase for when this
+ * preconditioner may or may not work.
  *
  * @ingroup PETScWrappers
  * @author Wolfgang Bangerth, 2004
@@ -393,6 +408,9 @@ namespace PETScWrappers
  * A class that implements the interface to use the PETSc Incomplete Cholesky
  * preconditioner.
  *
+ * See the comment in the base class @ref PreconditionerBase for when this
+ * preconditioner may or may not work.
+ *
  * @ingroup PETScWrappers
  * @author Wolfgang Bangerth, 2004
  */
@@ -455,6 +473,9 @@ namespace PETScWrappers
 /**
  * A class that implements the interface to use the PETSc ILU
  * preconditioner.
+ *
+ * See the comment in the base class @ref PreconditionerBase for when this
+ * preconditioner may or may not work.
  *
  * @ingroup PETScWrappers
  * @author Wolfgang Bangerth, 2004
@@ -520,6 +541,9 @@ namespace PETScWrappers
  * preconditioner. The LU decomposition is only implemented for single
  * processor machines. It should provide a convenient interface to
  * another direct solver.
+ *
+ * See the comment in the base class @ref PreconditionerBase for when this
+ * preconditioner may or may not work.
  *
  * @ingroup PETScWrappers
  * @author Oliver Kayser-Herold, 2004
