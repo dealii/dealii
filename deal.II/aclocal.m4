@@ -5200,7 +5200,7 @@ AC_DEFUN(DEAL_II_WITH_BLAS, dnl
                  ,
                  $F77LIBS)
   else
-    AC_CHECK_LIB(blas, daxpy_,,[ABORT_BLAS_ON_ERROR($1)],$F77LIBS)
+    AC_CHECK_LIB(blas, daxpy_,,[ABORT_BLAS_ON_ERROR([blas])],$F77LIBS)
   fi
   AC_SUBST(NEEDS_F77LIBS, "yes")
 ])
