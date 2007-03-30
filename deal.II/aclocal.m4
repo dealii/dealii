@@ -5169,6 +5169,23 @@ dnl    fi
 ])
 
 dnl --------------------------------------------------
+dnl Print error in BLAS detection
+dnl --------------------------------------------------
+AC_DEFUN(ABORT_BLAS_ON_ERROR, dnl
+[
+  AC_MSG_ERROR([[Configuring BLAS library failed although it was requested.
+  Most common is one of the following reasons:
+    1. A library with name lib$1.a or lib$1.so is not in your library path.
+    2. Neither -lgfortran nor -lg2c is in <$F77LIBS>.
+    3. BLAS requires -lg2c, but only -lgfortran was configured.
+    4. BLAS requires -lgfortran, but only -lg2c was configured.
+
+  In cases 2-4, your GNU FORTRAN installation is faulty or BLAS has to be
+  recompiled.
+]])
+])
+
+dnl --------------------------------------------------
 dnl Include the BLAS library
 dnl --------------------------------------------------
 AC_DEFUN(DEAL_II_WITH_BLAS, dnl
@@ -5179,11 +5196,11 @@ AC_DEFUN(DEAL_II_WITH_BLAS, dnl
                  [ 
                    LIBS="-l$1 $LIBS"
                    AC_DEFINE(HAVE_LIBBLAS)
-                 ],
+                 ], [ABORT_BLAS_ON_ERROR($1)]
                  ,
                  $F77LIBS)
   else
-    AC_CHECK_LIB(blas, daxpy_,,,$F77LIBS)
+    AC_CHECK_LIB(blas, daxpy_,,[ABORT_BLAS_ON_ERROR($1)],$F77LIBS)
   fi
   AC_SUBST(NEEDS_F77LIBS, "yes")
 ])
