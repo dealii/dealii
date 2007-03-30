@@ -5180,8 +5180,9 @@ AC_DEFUN(ABORT_BLAS_ON_ERROR, dnl
     3. BLAS requires -lg2c, but only -lgfortran was found.
     4. BLAS requires -lgfortran, but only -lg2c was found.
 
-  In cases 2-4, your GNU FORTRAN installation is faulty or BLAS has to be
-  recompiled.
+  In cases 2-4, you may not have the right version of GNU FORTRAN installed
+  (<g2c> is the GNU F77 support library, <gfortran> the library for the
+  GNU Fortran95 compiler shipped since gcc 4.0) or BLAS has to be recompiled.
 ]])
 ])
 
