@@ -68,7 +68,9 @@ include Makefile.dep
 all: $(TESTS)
 
 
-# create a report, where we get exactly one line per test
+# create a report, where we get exactly one line per test. unfortunately, this
+# is currently only sequential, even with -jN. we'd need something like the
+# status files in the other directories...
 report:
 	@for test in $(TESTS) ; do \
 		testname=all-headers/`echo $$test | perl -pi -e 's/.*include.//g; s/\//-/g;'` ; \
