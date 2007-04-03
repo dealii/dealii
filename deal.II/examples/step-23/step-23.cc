@@ -4,7 +4,7 @@
 /*    $Id$       */
 /*    Version: $Name:  $                                          */
 /*                                                                */
-/*    Copyright (C) 2006 by the deal.II authors */
+/*    Copyright (C) 2006, 2007 by the deal.II authors */
 /*                                                                */
 /*    This file is subject to QPL and may not be  distributed     */
 /*    without copyright and license information. Please refer     */
@@ -458,7 +458,7 @@ void WaveEquation<dim>::setup_system ()
 				   // on a uniformly refined mesh, no
 				   // constraints exist or have been computed
 				   // (i.e. there was no need to call
-				   // DoFTools::make_hanging_nod_constraints
+				   // DoFTools::make_hanging_node_constraints
 				   // as in other programs), but we need a
 				   // constraints object in one place further
 				   // down below anyway.
