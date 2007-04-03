@@ -457,11 +457,11 @@ void FullMatrix<number>::fill (const FullMatrix<number2> &src,
 {
 				   // Compute maximal size of copied block
   const unsigned int rows = (m() - dst_offset_i >= src.m() - src_offset_i)
-			    ? src.m()
-			    : m();
+			    ? src.m() - src_offset_i
+			    : m() - dst_offset_i;
   const unsigned int cols = (n() - dst_offset_j >= src.n() - src_offset_j)
-			    ? src.n()
-			    : n();
+			    ? src.n() - src_offset_j
+			    : n() - dst_offset_j;
   
   for (unsigned int i=0; i<rows ; ++i)
     for (unsigned int j=0; j<cols ; ++j)
