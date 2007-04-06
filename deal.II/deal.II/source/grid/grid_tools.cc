@@ -452,11 +452,11 @@ GridTools::delete_duplicated_vertices (std::vector<Point<dim> >    &vertices,
       ShiftPoint (const Point<dim> &shift)
 		      :
 		      shift(shift)
-	{};
+	{}
       Point<dim> operator() (const Point<dim> p) const
 	{
 	  return p+shift;
-	};
+	}
     private:
       const Point<dim> shift;
   };
@@ -472,12 +472,12 @@ GridTools::delete_duplicated_vertices (std::vector<Point<dim> >    &vertices,
       Rotate2d (const double angle)
 		      :
 		      angle(angle)
-	{};
+	{}
       Point<2> operator() (const Point<2> p) const
 	{
 	  return Point<2> (std::cos(angle)*p(0) - std::sin(angle) * p(1),
 			   std::sin(angle)*p(0) + std::cos(angle) * p(1));
-	};
+	}
     private:
       const double angle;
   };
@@ -491,11 +491,11 @@ GridTools::delete_duplicated_vertices (std::vector<Point<dim> >    &vertices,
       ScalePoint (const double factor)
 		      :
 		      factor(factor)
-	{};
+	{}
       Point<dim> operator() (const Point<dim> p) const
 	{
 	  return p*factor;
-	};
+	}
     private:
       const double factor;
   };

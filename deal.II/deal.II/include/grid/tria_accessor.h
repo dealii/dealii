@@ -1150,7 +1150,7 @@ class TriaObjectAccessor<0, dim> : public TriaAccessor<0,dim>
 		    TriaAccessor<0,dim> (parent, level, index, local_data)
       {
 	Assert (false, ExcInternalError());
-      };
+      }
 };
 
 

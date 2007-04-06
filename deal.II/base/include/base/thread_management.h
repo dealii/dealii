@@ -2,7 +2,7 @@
 //    $Id$
 //    Version: $Name$
 //
-//    Copyright (C) 2000, 2001, 2002, 2003, 2004, 2005, 2006 by the deal.II authors
+//    Copyright (C) 2000, 2001, 2002, 2003, 2004, 2005, 2006, 2007 by the deal.II authors
 //
 //    This file is subject to QPL and may not be  distributed
 //    without copyright and license information. Please refer
@@ -103,7 +103,7 @@ namespace Threads
                                             * dummy mutex class, this
                                             * of course does nothing.
                                             */
-          ScopedLock (DummyThreadMutex &) {};
+          ScopedLock (DummyThreadMutex &) {}
 
                                            /**
                                             * Destructor. Unlock the
@@ -111,7 +111,7 @@ namespace Threads
                                             * dummy mutex class, this
                                             * of course does nothing.
                                             */
-          ~ScopedLock () {};
+          ~ScopedLock () {}
       };
       
 				       /**
@@ -121,7 +121,7 @@ namespace Threads
 					* function does nothing as
 					* well.
 					*/
-      inline void acquire () const {};
+      inline void acquire () const {}
 
 				       /**
 					* Simulate release of the
@@ -130,7 +130,7 @@ namespace Threads
 					* function does nothing as
 					* well.
 					*/
-      inline void release () const {};
+      inline void release () const {}
   };
 
 
@@ -165,7 +165,7 @@ namespace Threads
 					* this function of course does
 					* nothing.
 					*/
-      inline void signal () {};
+      inline void signal () {}
 
 				       /**
 					* Signal to multiple listener
@@ -176,7 +176,7 @@ namespace Threads
 					* this function of course does
 					* nothing.
 					*/
-      inline void broadcast () {};
+      inline void broadcast () {}
 
 				       /**
 					* Wait for the condition to be
@@ -192,7 +192,7 @@ namespace Threads
 					* of course does nothing, but
 					* returns immediately.
 					*/
-      inline void wait (DummyThreadMutex &) {};
+      inline void wait (DummyThreadMutex &) {}
   };
 
 
@@ -237,13 +237,13 @@ namespace Threads
 					* i.e. this function is a
 					* no-op.
 					*/
-      int wait () { return 0; };
+      int wait () { return 0; }
 
 				       /**
 					* Dump the state of this
 					* object. Here: do nothing.
 					*/
-      void dump () {};
+      void dump () {}
 
       				     /** @addtogroup Exceptions
 				      * @{ */
@@ -312,7 +312,7 @@ namespace Threads
                                             * Constructor. Lock the
                                             * mutex.
                                             */
-          ScopedLock (PosixThreadMutex &m) : mutex(m) { mutex.acquire(); };
+          ScopedLock (PosixThreadMutex &m) : mutex(m) { mutex.acquire(); }
 
                                            /**
                                             * Destructor. Unlock the
@@ -320,7 +320,7 @@ namespace Threads
                                             * dummy mutex class, this
                                             * of course does nothing.
                                             */
-          ~ScopedLock () { mutex.release (); };
+          ~ScopedLock () { mutex.release (); }
           
         private:
                                            /**
@@ -346,12 +346,12 @@ namespace Threads
 				       /**
 					* Acquire a mutex.
 					*/
-      inline void acquire () { pthread_mutex_lock(&mutex); };
+      inline void acquire () { pthread_mutex_lock(&mutex); }
 
 				       /**
 					* Release the mutex again.
 					*/
-      inline void release () { pthread_mutex_unlock(&mutex); };
+      inline void release () { pthread_mutex_unlock(&mutex); }
 
     private:
 				       /**
@@ -405,7 +405,7 @@ namespace Threads
 					* met, i.e. that some data
 					* will now be available.
 					*/
-      inline void signal () { pthread_cond_signal(&cond); };
+      inline void signal () { pthread_cond_signal(&cond); }
 
 				       /**
 					* Signal to multiple listener
@@ -413,7 +413,7 @@ namespace Threads
 					* met, i.e. that some data
 					* will now be available.
 					*/
-      inline void broadcast () { pthread_cond_broadcast(&cond); };
+      inline void broadcast () { pthread_cond_broadcast(&cond); }
 
 				       /**
 					* Wait for the condition to be
@@ -427,7 +427,7 @@ namespace Threads
 					* mechanisms.
 					*/
       inline void wait (PosixThreadMutex &mutex)
-        { pthread_cond_wait(&cond, &mutex.mutex); };
+        { pthread_cond_wait(&cond, &mutex.mutex); }
 
     private:
 				       /**
@@ -2898,7 +2898,7 @@ namespace Threads
                                          /**
                                           * Constructor.
                                           */
-        thread_description_base () : was_joined (false) {};
+        thread_description_base () : was_joined (false) {}
 
                                          /**
                                           * Destructor.
@@ -3007,7 +3007,7 @@ namespace Threads
     public:
 #endif
       Thread (const boost::shared_ptr<internal::thread_description<RT> > &td)
-                      : thread_descriptor (td) {};
+                      : thread_descriptor (td) {}
 
     public:
       
@@ -3020,7 +3020,7 @@ namespace Threads
                                         * data created by the
                                         * <tt>spawn</tt> functions.
                                         */
-      Thread () {};
+      Thread () {}
 
                                        /**
                                         * Join the thread represented
@@ -3035,7 +3035,7 @@ namespace Threads
       void join () const {
         AssertThrow (thread_descriptor, ExcNoThread());
         thread_descriptor->join ();
-      };
+      }
 
                                        /**
                                         * Get the return value of the
@@ -3048,7 +3048,7 @@ namespace Threads
       RT return_value () {
         join ();
         return thread_descriptor->ret_val.get();
-      };
+      }
 
 
                                        /**
@@ -3062,7 +3062,7 @@ namespace Threads
                                         */
       bool operator == (const Thread &t) {
         return thread_descriptor == t.thread_descriptor;
-      };
+      }
 
       				     /** @addtogroup Exceptions
 				      * @{ */
@@ -3218,7 +3218,7 @@ namespace Threads
         fun_wrapper (FunPtr               fun_ptr,
                      const ArgReferences &args)
                         : fun_ptr (fun_ptr),
-                          args (args)  {};
+                          args (args)  {}
       private:
                                          /**
                                           * Default constructor. Made
@@ -3309,7 +3309,7 @@ namespace Threads
             internal::deregister_thread ();
           
             return 0;
-          };
+          }
 
 
 					 /**
@@ -3373,7 +3373,7 @@ namespace Threads
                         :
 			c (c),
 			mem_fun_ptr (mem_fun_ptr),
-			args (args)  {};
+			args (args)  {}
       private:
                                          /**
                                           * Default constructor. Made
@@ -3467,7 +3467,7 @@ namespace Threads
             internal::deregister_thread ();
           
             return 0;
-          };
+          }
 
 					 /**
 					  * Make the base class a
@@ -3556,14 +3556,14 @@ namespace Threads
 
       public:
         inline mem_fun_encapsulator (C &c, MemFunPtr mem_fun_ptr)
-                        : c (c), mem_fun_ptr(mem_fun_ptr) {};
+                        : c (c), mem_fun_ptr(mem_fun_ptr) {}
 
         inline
         Thread<RT>
         operator() () {
           return mem_fun_wrapper<RT,C,ArgList> (mem_fun_ptr, c,
                                                 ArgList()).fire_up ();
-        };
+        }
     
       private:
         C         &c;
@@ -3615,14 +3615,14 @@ namespace Threads
 
       public:
         inline mem_fun_encapsulator (C &c, MemFunPtr mem_fun_ptr)
-                        : c (c), mem_fun_ptr(mem_fun_ptr) {};
+                        : c (c), mem_fun_ptr(mem_fun_ptr) {}
 
         inline
         Thread<RT>
         operator() (typename boost::tuples::element<0,ArgList>::type arg1) {
           return mem_fun_wrapper<RT,C,ArgList> (mem_fun_ptr, c,
                                                 boost::tie(arg1)).fire_up ();
-        };
+        }
     
       private:
         C         &c;
@@ -3675,7 +3675,7 @@ namespace Threads
 
       public:
         inline mem_fun_encapsulator (C &c, MemFunPtr mem_fun_ptr)
-                        : c (c), mem_fun_ptr(mem_fun_ptr) {};
+                        : c (c), mem_fun_ptr(mem_fun_ptr) {}
 
         inline
         Thread<RT>
@@ -3684,7 +3684,7 @@ namespace Threads
           return mem_fun_wrapper<RT,C,ArgList> (mem_fun_ptr, c,
                                                 boost::tie(arg1,
                                                            arg2)).fire_up ();
-        };
+        }
     
       private:
         C         &c;
@@ -3735,7 +3735,7 @@ namespace Threads
 
       public:
         inline mem_fun_encapsulator (C &c, MemFunPtr mem_fun_ptr)
-                        : c (c), mem_fun_ptr(mem_fun_ptr) {};
+                        : c (c), mem_fun_ptr(mem_fun_ptr) {}
 
         inline
         Thread<RT>
@@ -3746,7 +3746,7 @@ namespace Threads
                                                 boost::tie(arg1,
                                                            arg2,
                                                            arg3)).fire_up ();
-        };
+        }
     
       private:
         C         &c;
@@ -3802,7 +3802,7 @@ namespace Threads
 
       public:
         inline mem_fun_encapsulator (C &c, MemFunPtr mem_fun_ptr)
-                        : c (c), mem_fun_ptr(mem_fun_ptr) {};
+                        : c (c), mem_fun_ptr(mem_fun_ptr) {}
 
         inline
         Thread<RT>
@@ -3813,7 +3813,7 @@ namespace Threads
           return mem_fun_wrapper<RT,C,ArgList> (mem_fun_ptr, c,
                                                 boost::tie(arg1,arg2,
                                                            arg3,arg4)).fire_up ();
-        };
+        }
     
       private:
         C         &c;
@@ -3869,7 +3869,7 @@ namespace Threads
 
       public:
         inline mem_fun_encapsulator (C &c, MemFunPtr mem_fun_ptr)
-                        : c (c), mem_fun_ptr(mem_fun_ptr) {};
+                        : c (c), mem_fun_ptr(mem_fun_ptr) {}
 
         inline
         Thread<RT>
@@ -3882,7 +3882,7 @@ namespace Threads
                                                 boost::tie(arg1,arg2,
                                                            arg3,arg4,
                                                            arg5)).fire_up ();
-        };
+        }
     
       private:
         C         &c;
@@ -3940,7 +3940,7 @@ namespace Threads
 
       public:
         inline mem_fun_encapsulator (C &c, MemFunPtr mem_fun_ptr)
-                        : c (c), mem_fun_ptr(mem_fun_ptr) {};
+                        : c (c), mem_fun_ptr(mem_fun_ptr) {}
 
         inline
         Thread<RT>
@@ -3954,7 +3954,7 @@ namespace Threads
                                                 boost::tie(arg1,arg2,
                                                            arg3,arg4,
                                                            arg5,arg6)).fire_up ();
-        };
+        }
     
       private:
         C         &c;
@@ -4013,7 +4013,7 @@ namespace Threads
 
       public:
         inline mem_fun_encapsulator (C &c, MemFunPtr mem_fun_ptr)
-                        : c (c), mem_fun_ptr(mem_fun_ptr) {};
+                        : c (c), mem_fun_ptr(mem_fun_ptr) {}
 
         inline
         Thread<RT>
@@ -4029,7 +4029,7 @@ namespace Threads
                                                            arg3,arg4,
                                                            arg5,arg6,
                                                            arg7)).fire_up ();
-        };
+        }
     
       private:
         C         &c;
@@ -4094,7 +4094,7 @@ namespace Threads
 
       public:
         inline mem_fun_encapsulator (C &c, MemFunPtr mem_fun_ptr)
-                        : c (c), mem_fun_ptr(mem_fun_ptr) {};
+                        : c (c), mem_fun_ptr(mem_fun_ptr) {}
 
         inline
         Thread<RT>
@@ -4111,7 +4111,7 @@ namespace Threads
                                                            arg3,arg4,
                                                            arg5,arg6,
                                                            arg7,arg8)).fire_up ();
-        };
+        }
     
       private:
         C         &c;
@@ -4180,7 +4180,7 @@ namespace Threads
 
       public:
         inline mem_fun_encapsulator (C &c, MemFunPtr mem_fun_ptr)
-                        : c (c), mem_fun_ptr(mem_fun_ptr) {};
+                        : c (c), mem_fun_ptr(mem_fun_ptr) {}
 
         inline
         Thread<RT>
@@ -4199,7 +4199,7 @@ namespace Threads
                                                            arg5,arg6,
                                                            arg7,arg8,
                                                            arg9)).fire_up ();
-        };
+        }
     
       private:
         C         &c;
@@ -4268,7 +4268,7 @@ namespace Threads
 
       public:
         inline mem_fun_encapsulator (C &c, MemFunPtr mem_fun_ptr)
-                        : c (c), mem_fun_ptr(mem_fun_ptr) {};
+                        : c (c), mem_fun_ptr(mem_fun_ptr) {}
 
         inline
         Thread<RT>
@@ -4288,7 +4288,7 @@ namespace Threads
                                                            arg5,arg6,
                                                            arg7,arg8,
                                                            arg9, arg10)).fire_up ();
-        };
+        }
     
       private:
         C         &c;
@@ -4362,14 +4362,14 @@ namespace Threads
 
       public:
         inline fun_encapsulator (FunPtr fun_ptr)
-                        : fun_ptr(fun_ptr) {};
+                        : fun_ptr(fun_ptr) {}
 
         inline
         Thread<RT>
         operator() () {
           return fun_wrapper<RT,ArgList> (fun_ptr,
                                           ArgList()).fire_up ();
-        };
+        }
     
       private:
         FunPtr  fun_ptr;
@@ -4408,14 +4408,14 @@ namespace Threads
 
       public:
         inline fun_encapsulator (FunPtr fun_ptr)
-                        : fun_ptr(fun_ptr) {};
+                        : fun_ptr(fun_ptr) {}
 
         inline
         Thread<RT>
         operator() (typename boost::tuples::element<0,ArgList>::type arg1) {
           return fun_wrapper<RT,ArgList> (fun_ptr,
                                           boost::tie(arg1)).fire_up ();
-        };
+        }
     
       private:
         FunPtr  fun_ptr;
@@ -4453,7 +4453,7 @@ namespace Threads
 
       public:
         inline fun_encapsulator (FunPtr fun_ptr)
-                        : fun_ptr(fun_ptr) {};
+                        : fun_ptr(fun_ptr) {}
 
         inline
         Thread<RT>
@@ -4462,7 +4462,7 @@ namespace Threads
           return fun_wrapper<RT,ArgList> (fun_ptr,
                                           boost::tie(arg1,
                                                      arg2)).fire_up ();
-        };
+        }
     
       private:
         FunPtr  fun_ptr;
@@ -4499,7 +4499,7 @@ namespace Threads
 
       public:
         inline fun_encapsulator (FunPtr fun_ptr)
-                        : fun_ptr(fun_ptr) {};
+                        : fun_ptr(fun_ptr) {}
 
         inline
         Thread<RT>
@@ -4510,7 +4510,7 @@ namespace Threads
                                           boost::tie(arg1,
                                                      arg2,
                                                      arg3)).fire_up ();
-        };
+        }
     
       private:
         FunPtr  fun_ptr;
@@ -4550,7 +4550,7 @@ namespace Threads
 
       public:
         inline fun_encapsulator (FunPtr fun_ptr)
-                        : fun_ptr(fun_ptr) {};
+                        : fun_ptr(fun_ptr) {}
 
         inline
         Thread<RT>
@@ -4561,7 +4561,7 @@ namespace Threads
           return fun_wrapper<RT,ArgList> (fun_ptr,
                                           boost::tie(arg1,arg2,
                                                      arg3,arg4)).fire_up ();
-        };
+        }
     
       private:
         FunPtr  fun_ptr;
@@ -4601,7 +4601,7 @@ namespace Threads
 
       public:
         inline fun_encapsulator (FunPtr fun_ptr)
-                        : fun_ptr(fun_ptr) {};
+                        : fun_ptr(fun_ptr) {}
 
         inline
         Thread<RT>
@@ -4614,7 +4614,7 @@ namespace Threads
                                           boost::tie(arg1,arg2,
                                                      arg3,arg4,
                                                      arg5)).fire_up ();
-        };
+        }
     
       private:
         FunPtr  fun_ptr;
@@ -4654,7 +4654,7 @@ namespace Threads
 
       public:
         inline fun_encapsulator (FunPtr fun_ptr)
-                        : fun_ptr(fun_ptr) {};
+                        : fun_ptr(fun_ptr) {}
 
         inline
         Thread<RT>
@@ -4668,7 +4668,7 @@ namespace Threads
                                           boost::tie(arg1,arg2,
                                                      arg3,arg4,
                                                      arg5,arg6)).fire_up ();
-        };
+        }
     
       private:
         FunPtr  fun_ptr;
@@ -4708,7 +4708,7 @@ namespace Threads
 
       public:
         inline fun_encapsulator (FunPtr fun_ptr)
-                        : fun_ptr(fun_ptr) {};
+                        : fun_ptr(fun_ptr) {}
 
         inline
         Thread<RT>
@@ -4724,7 +4724,7 @@ namespace Threads
                                                      arg3,arg4,
                                                      arg5,arg6,
                                                      arg7)).fire_up ();
-        };
+        }
     
       private:
         FunPtr  fun_ptr;
@@ -4767,7 +4767,7 @@ namespace Threads
 
       public:
         inline fun_encapsulator (FunPtr fun_ptr)
-                        : fun_ptr(fun_ptr) {};
+                        : fun_ptr(fun_ptr) {}
 
         inline
         Thread<RT>
@@ -4784,7 +4784,7 @@ namespace Threads
                                                      arg3,arg4,
                                                      arg5,arg6,
                                                      arg7,arg8)).fire_up ();
-        };
+        }
     
       private:
         FunPtr  fun_ptr;
@@ -4829,7 +4829,7 @@ namespace Threads
 
       public:
         inline fun_encapsulator (FunPtr fun_ptr)
-                        : fun_ptr(fun_ptr) {};
+                        : fun_ptr(fun_ptr) {}
 
         inline
         Thread<RT>
@@ -4848,7 +4848,7 @@ namespace Threads
                                                      arg5,arg6,
                                                      arg7,arg8,
                                                      arg9)).fire_up ();
-        };
+        }
     
       private:
         FunPtr  fun_ptr;
@@ -4893,7 +4893,7 @@ namespace Threads
 
       public:
         inline fun_encapsulator (FunPtr fun_ptr)
-                        : fun_ptr(fun_ptr) {};
+                        : fun_ptr(fun_ptr) {}
 
         inline
         Thread<RT>
@@ -4913,7 +4913,7 @@ namespace Threads
                                                      arg5,arg6,
                                                      arg7,arg8,
                                                      arg9, arg10)).fire_up ();
-        };
+        }
     
       private:
         FunPtr  fun_ptr;
@@ -4953,7 +4953,7 @@ namespace Threads
                                        /**
                                         * Default constructor.
                                         */
-      Thread ()  {};
+      Thread ()  {}
 
                                        /**
                                         * Initialize the return value
@@ -5092,7 +5092,7 @@ namespace Threads
 
       public:
         inline mem_fun_forwarder (C &c, MemFunPtr mem_fun_ptr)
-                        : c (c), mem_fun_ptr(mem_fun_ptr) {};
+                        : c (c), mem_fun_ptr(mem_fun_ptr) {}
 
         inline
         Thread<RT>
@@ -5159,14 +5159,14 @@ namespace Threads
 
       public:
         inline mem_fun_forwarder (C &c, MemFunPtr mem_fun_ptr)
-                        : c (c), mem_fun_ptr(mem_fun_ptr) {};
+                        : c (c), mem_fun_ptr(mem_fun_ptr) {}
 
         inline
         Thread<RT>
         operator() (typename boost::tuples::element<0,ArgList>::type arg1) {
           return Thread<RT> (mem_fun_ptr, c,
                              boost::tie(arg1));
-        };
+        }
     
       private:
         C         &c;
@@ -5227,7 +5227,7 @@ namespace Threads
 
       public:
         inline mem_fun_forwarder (C &c, MemFunPtr mem_fun_ptr)
-                        : c (c), mem_fun_ptr(mem_fun_ptr) {};
+                        : c (c), mem_fun_ptr(mem_fun_ptr) {}
 
         inline
         Thread<RT>
@@ -5236,7 +5236,7 @@ namespace Threads
           return Thread<RT> (mem_fun_ptr, c,
                              boost::tie(arg1,
                                         arg2));
-        };
+        }
     
       private:
         C         &c;
@@ -5296,7 +5296,7 @@ namespace Threads
 
       public:
         inline mem_fun_forwarder (C &c, MemFunPtr mem_fun_ptr)
-                        : c (c), mem_fun_ptr(mem_fun_ptr) {};
+                        : c (c), mem_fun_ptr(mem_fun_ptr) {}
 
         inline
         Thread<RT>
@@ -5307,7 +5307,7 @@ namespace Threads
                              boost::tie(arg1,
                                         arg2,
                                         arg3));
-        };
+        }
     
       private:
         C         &c;
@@ -5372,7 +5372,7 @@ namespace Threads
 
       public:
         inline mem_fun_forwarder (C &c, MemFunPtr mem_fun_ptr)
-                        : c (c), mem_fun_ptr(mem_fun_ptr) {};
+                        : c (c), mem_fun_ptr(mem_fun_ptr) {}
 
         inline
         Thread<RT>
@@ -5383,7 +5383,7 @@ namespace Threads
           return Thread<RT> (mem_fun_ptr, c,
                              boost::tie(arg1,arg2,
                                         arg3,arg4));
-        };
+        }
     
       private:
         C         &c;
@@ -5448,7 +5448,7 @@ namespace Threads
 
       public:
         inline mem_fun_forwarder (C &c, MemFunPtr mem_fun_ptr)
-                        : c (c), mem_fun_ptr(mem_fun_ptr) {};
+                        : c (c), mem_fun_ptr(mem_fun_ptr) {}
 
         inline
         Thread<RT>
@@ -5461,7 +5461,7 @@ namespace Threads
                              boost::tie(arg1,arg2,
                                         arg3,arg4,
                                         arg5));
-        };
+        }
     
       private:
         C         &c;
@@ -5528,7 +5528,7 @@ namespace Threads
 
       public:
         inline mem_fun_forwarder (C &c, MemFunPtr mem_fun_ptr)
-                        : c (c), mem_fun_ptr(mem_fun_ptr) {};
+                        : c (c), mem_fun_ptr(mem_fun_ptr) {}
 
         inline
         Thread<RT>
@@ -5542,7 +5542,7 @@ namespace Threads
                              boost::tie(arg1,arg2,
                                         arg3,arg4,
                                         arg5,arg6));
-        };
+        }
     
       private:
         C         &c;
@@ -5610,7 +5610,7 @@ namespace Threads
 
       public:
         inline mem_fun_forwarder (C &c, MemFunPtr mem_fun_ptr)
-                        : c (c), mem_fun_ptr(mem_fun_ptr) {};
+                        : c (c), mem_fun_ptr(mem_fun_ptr) {}
 
         inline
         Thread<RT>
@@ -5626,7 +5626,7 @@ namespace Threads
                                         arg3,arg4,
                                         arg5,arg6,
                                         arg7));
-        };
+        }
     
       private:
         C         &c;
@@ -5700,7 +5700,7 @@ namespace Threads
 
       public:
         inline mem_fun_forwarder (C &c, MemFunPtr mem_fun_ptr)
-                        : c (c), mem_fun_ptr(mem_fun_ptr) {};
+                        : c (c), mem_fun_ptr(mem_fun_ptr) {}
 
         inline
         Thread<RT>
@@ -5717,7 +5717,7 @@ namespace Threads
                                         arg3,arg4,
                                         arg5,arg6,
                                         arg7,arg8));
-        };
+        }
     
       private:
         C         &c;
@@ -5795,7 +5795,7 @@ namespace Threads
 
       public:
         inline mem_fun_forwarder (C &c, MemFunPtr mem_fun_ptr)
-                        : c (c), mem_fun_ptr(mem_fun_ptr) {};
+                        : c (c), mem_fun_ptr(mem_fun_ptr) {}
 
         inline
         Thread<RT>
@@ -5814,7 +5814,7 @@ namespace Threads
                                         arg5,arg6,
                                         arg7,arg8,
                                         arg9));
-        };
+        }
     
       private:
         C         &c;
@@ -5892,7 +5892,7 @@ namespace Threads
 
       public:
         inline mem_fun_forwarder (C &c, MemFunPtr mem_fun_ptr)
-                        : c (c), mem_fun_ptr(mem_fun_ptr) {};
+                        : c (c), mem_fun_ptr(mem_fun_ptr) {}
 
         inline
         Thread<RT>
@@ -5912,7 +5912,7 @@ namespace Threads
                                         arg5,arg6,
                                         arg7,arg8,
                                         arg9, arg10));
-        };
+        }
     
       private:
         C         &c;
@@ -5994,14 +5994,14 @@ namespace Threads
 
       public:
         inline fun_forwarder (FunPtr fun_ptr)
-                        : fun_ptr(fun_ptr) {};
+                        : fun_ptr(fun_ptr) {}
 
         inline
         Thread<RT>
         operator() () {
           return Thread<RT> (fun_ptr,
                              ArgList());
-        };
+        }
     
       private:
         FunPtr  fun_ptr;
@@ -6046,14 +6046,14 @@ namespace Threads
 
       public:
         inline fun_forwarder (FunPtr fun_ptr)
-                        : fun_ptr(fun_ptr) {};
+                        : fun_ptr(fun_ptr) {}
 
         inline
         Thread<RT>
         operator() (typename boost::tuples::element<0,ArgList>::type arg1) {
           return Thread<RT> (fun_ptr,
                              boost::tie(arg1));
-        };
+        }
     
       private:
         FunPtr  fun_ptr;
@@ -6096,7 +6096,7 @@ namespace Threads
 
       public:
         inline fun_forwarder (FunPtr fun_ptr)
-                        : fun_ptr(fun_ptr) {};
+                        : fun_ptr(fun_ptr) {}
 
         inline
         Thread<RT>
@@ -6105,7 +6105,7 @@ namespace Threads
           return Thread<RT> (fun_ptr,
                              boost::tie(arg1,
                                         arg2));
-        };
+        }
     
       private:
         FunPtr  fun_ptr;
@@ -6147,7 +6147,7 @@ namespace Threads
 
       public:
         inline fun_forwarder (FunPtr fun_ptr)
-                        : fun_ptr(fun_ptr) {};
+                        : fun_ptr(fun_ptr) {}
 
         inline
         Thread<RT>
@@ -6158,7 +6158,7 @@ namespace Threads
                              boost::tie(arg1,
                                         arg2,
                                         arg3));
-        };
+        }
     
       private:
         FunPtr  fun_ptr;
@@ -6203,7 +6203,7 @@ namespace Threads
 
       public:
         inline fun_forwarder (FunPtr fun_ptr)
-                        : fun_ptr(fun_ptr) {};
+                        : fun_ptr(fun_ptr) {}
 
         inline
         Thread<RT>
@@ -6214,7 +6214,7 @@ namespace Threads
           return Thread<RT> (fun_ptr,
                              boost::tie(arg1,arg2,
                                         arg3,arg4));
-        };
+        }
     
       private:
         FunPtr  fun_ptr;
@@ -6259,7 +6259,7 @@ namespace Threads
 
       public:
         inline fun_forwarder (FunPtr fun_ptr)
-                        : fun_ptr(fun_ptr) {};
+                        : fun_ptr(fun_ptr) {}
 
         inline
         Thread<RT>
@@ -6272,7 +6272,7 @@ namespace Threads
                              boost::tie(arg1,arg2,
                                         arg3,arg4,
                                         arg5));
-        };
+        }
     
       private:
         FunPtr  fun_ptr;
@@ -6317,7 +6317,7 @@ namespace Threads
 
       public:
         inline fun_forwarder (FunPtr fun_ptr)
-                        : fun_ptr(fun_ptr) {};
+                        : fun_ptr(fun_ptr) {}
 
         inline
         Thread<RT>
@@ -6331,7 +6331,7 @@ namespace Threads
                              boost::tie(arg1,arg2,
                                         arg3,arg4,
                                         arg5,arg6));
-        };
+        }
     
       private:
         FunPtr  fun_ptr;
@@ -6376,7 +6376,7 @@ namespace Threads
 
       public:
         inline fun_forwarder (FunPtr fun_ptr)
-                        : fun_ptr(fun_ptr) {};
+                        : fun_ptr(fun_ptr) {}
 
         inline
         Thread<RT>
@@ -6392,7 +6392,7 @@ namespace Threads
                                         arg3,arg4,
                                         arg5,arg6,
                                         arg7));
-        };
+        }
     
       private:
         FunPtr  fun_ptr;
@@ -6440,7 +6440,7 @@ namespace Threads
 
       public:
         inline fun_forwarder (FunPtr fun_ptr)
-                        : fun_ptr(fun_ptr) {};
+                        : fun_ptr(fun_ptr) {}
 
         inline
         Thread<RT>
@@ -6457,7 +6457,7 @@ namespace Threads
                                         arg3,arg4,
                                         arg5,arg6,
                                         arg7,arg8));
-        };
+        }
     
       private:
         FunPtr  fun_ptr;
@@ -6507,7 +6507,7 @@ namespace Threads
 
       public:
         inline fun_forwarder (FunPtr fun_ptr)
-                        : fun_ptr(fun_ptr) {};
+                        : fun_ptr(fun_ptr) {}
 
         inline
         Thread<RT>
@@ -6526,7 +6526,7 @@ namespace Threads
                                         arg5,arg6,
                                         arg7,arg8,
                                         arg9));
-        };
+        }
     
       private:
         FunPtr  fun_ptr;
@@ -6576,7 +6576,7 @@ namespace Threads
 
       public:
         inline fun_forwarder (FunPtr fun_ptr)
-                        : fun_ptr(fun_ptr) {};
+                        : fun_ptr(fun_ptr) {}
 
         inline
         Thread<RT>
@@ -6596,7 +6596,7 @@ namespace Threads
                                         arg5,arg6,
                                         arg7,arg8,
                                         arg9, arg10));
-        };
+        }
     
       private:
         FunPtr  fun_ptr;
@@ -6659,7 +6659,7 @@ namespace Threads
       ThreadGroup & operator += (const Thread<RT> &t) {
         threads.push_back (t);
         return *this;
-      };
+      }
 
                                        /**
                                         * Wait for all threads in the
@@ -6677,7 +6677,7 @@ namespace Threads
         for (typename std::list<Thread<RT> >::const_iterator
                t=threads.begin(); t!=threads.end(); ++t)
           t->join ();
-      };
+      }
     
     private:
                                        /**

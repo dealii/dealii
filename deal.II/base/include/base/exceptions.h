@@ -2,7 +2,7 @@
 //    $Id$
 //    Version: $Name$
 //
-//    Copyright (C) 1998, 1999, 2000, 2001, 2002, 2003, 2004, 2005, 2006 by the deal.II authors
+//    Copyright (C) 1998, 1999, 2000, 2001, 2002, 2003, 2004, 2005, 2006, 2007 by the deal.II authors
 //
 //    This file is subject to QPL and may not be  distributed
 //    without copyright and license information. Please refer
@@ -442,11 +442,11 @@ class Exception0 :  public dealii::ExceptionBase {}
 #define DeclException1(Exception1, type1, outsequence)                \
 class Exception1 : public dealii::ExceptionBase {                             \
   public:                                                             \
-      Exception1 (const type1 a1) : arg1 (a1) {};                     \
-      virtual ~Exception1 () throw () {};                             \
+      Exception1 (const type1 a1) : arg1 (a1) {}                      \
+      virtual ~Exception1 () throw () {}                              \
       virtual void print_info (std::ostream &out) const {              \
         out outsequence << std::endl;                                 \
-      };                                                              \
+      }                                                               \
   private:                                                            \
       const type1 arg1;                                               \
 }
@@ -462,11 +462,11 @@ class Exception1 : public dealii::ExceptionBase {                             \
 class Exception2 : public dealii::ExceptionBase {                             \
   public:                                                             \
       Exception2 (const type1 a1, const type2 a2) :          \
-	      arg1 (a1), arg2(a2) {};                                 \
-      virtual ~Exception2 () throw () {};                             \
+	      arg1 (a1), arg2(a2) {}                                  \
+      virtual ~Exception2 () throw () {}                              \
       virtual void print_info (std::ostream &out) const {              \
         out outsequence << std::endl;                                 \
-      };                                                              \
+      }                                                               \
   private:                                                            \
       const type1 arg1;                                               \
       const type2 arg2;                                               \
@@ -483,11 +483,11 @@ class Exception2 : public dealii::ExceptionBase {                             \
 class Exception3 : public dealii::ExceptionBase {                             \
   public:                                                             \
       Exception3 (const type1 a1, const type2 a2, const type3 a3) : \
-	      arg1 (a1), arg2(a2), arg3(a3) {};                       \
-      virtual ~Exception3 () throw () {};                             \
+	      arg1 (a1), arg2(a2), arg3(a3) {}                        \
+      virtual ~Exception3 () throw () {}                              \
       virtual void print_info (std::ostream &out) const {              \
         out outsequence << std::endl;                                 \
-      };                                                              \
+      }                                                               \
   private:                                                            \
       const type1 arg1;                                               \
       const type2 arg2;                                               \
@@ -506,11 +506,11 @@ class Exception4 : public dealii::ExceptionBase {                             \
   public:                                                             \
       Exception4 (const type1 a1, const type2 a2,                     \
 	    const type3 a3, const type4 a4) :                \
-	      arg1 (a1), arg2(a2), arg3(a3), arg4(a4) {};             \
-      virtual ~Exception4 () throw () {};                             \
+	      arg1 (a1), arg2(a2), arg3(a3), arg4(a4) {}              \
+      virtual ~Exception4 () throw () {}                              \
       virtual void print_info (std::ostream &out) const {              \
         out outsequence << std::endl;                                 \
-      };                                                              \
+      }                                                               \
   private:                                                            \
       const type1 arg1;                                               \
       const type2 arg2;                                               \
@@ -530,11 +530,11 @@ class Exception5 : public dealii::ExceptionBase {                             \
   public:                                                             \
       Exception5 (const type1 a1, const type2 a2, const type3 a3,     \
 	    const type4 a4, const type5 a5) :                \
-	      arg1 (a1), arg2(a2), arg3(a3), arg4(a4), arg5(a5) {};   \
-      virtual ~Exception5 () throw () {};                             \
+	      arg1 (a1), arg2(a2), arg3(a3), arg4(a4), arg5(a5) {}    \
+      virtual ~Exception5 () throw () {}                              \
       virtual void print_info (std::ostream &out) const {              \
         out outsequence << std::endl;                                 \
-      };                                                              \
+      }                                                               \
   private:                                                            \
       const type1 arg1;                                               \
       const type2 arg2;                                               \

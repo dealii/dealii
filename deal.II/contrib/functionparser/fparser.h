@@ -68,7 +68,7 @@ public:
     // Added by Luca Heltai. For consistency checking.
     unsigned int NVars() {
       return data->varAmount;
-    };
+    }
     
 
 //========================================================================
