@@ -4,7 +4,7 @@
 /*    $Id$       */
 /*    Version: $Name$                                          */
 /*                                                                */
-/*    Copyright (C) 2005, 2006 by the deal.II authors */
+/*    Copyright (C) 2005, 2006, 2007 by the deal.II authors */
 /*                                                                */
 /*    This file is subject to QPL and may not be  distributed     */
 /*    without copyright and license information. Please refer     */
@@ -154,7 +154,7 @@ template <int dim>
 class RightHandSide : public Function<dim> 
 {
   public:
-    RightHandSide () : Function<dim>(1) {};
+    RightHandSide () : Function<dim>(1) {}
     
     virtual double value (const Point<dim>   &p,
 			  const unsigned int  component = 0) const;
@@ -166,7 +166,7 @@ template <int dim>
 class PressureBoundaryValues : public Function<dim> 
 {
   public:
-    PressureBoundaryValues () : Function<dim>(1) {};
+    PressureBoundaryValues () : Function<dim>(1) {}
     
     virtual double value (const Point<dim>   &p,
 			  const unsigned int  component = 0) const;
@@ -177,7 +177,7 @@ template <int dim>
 class ExactSolution : public Function<dim> 
 {
   public:
-    ExactSolution () : Function<dim>(dim+1) {};
+    ExactSolution () : Function<dim>(dim+1) {}
     
     virtual void vector_value (const Point<dim> &p, 
 			       Vector<double>   &value) const;

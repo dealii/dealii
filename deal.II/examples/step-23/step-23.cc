@@ -206,7 +206,7 @@ template <int dim>
 class InitialValuesU : public Function<dim> 
 {
   public:
-    InitialValuesU () : Function<dim>() {};
+    InitialValuesU () : Function<dim>() {}
     
     virtual double value (const Point<dim>   &p,
 			  const unsigned int  component = 0) const;
@@ -217,7 +217,7 @@ template <int dim>
 class InitialValuesV : public Function<dim> 
 {
   public:
-    InitialValuesV () : Function<dim>() {};
+    InitialValuesV () : Function<dim>() {}
     
     virtual double value (const Point<dim>   &p,
 			  const unsigned int  component = 0) const;
@@ -252,7 +252,7 @@ template <int dim>
 class RightHandSide : public Function<dim> 
 {
   public:
-    RightHandSide () : Function<dim>() {};
+    RightHandSide () : Function<dim>() {}
     
     virtual double value (const Point<dim>   &p,
 			  const unsigned int  component = 0) const;
@@ -278,7 +278,7 @@ template <int dim>
 class BoundaryValuesU : public Function<dim> 
 {
   public:
-    BoundaryValuesU () : Function<dim>() {};
+    BoundaryValuesU () : Function<dim>() {}
     
     virtual double value (const Point<dim>   &p,
 			  const unsigned int  component = 0) const;
@@ -291,7 +291,7 @@ template <int dim>
 class BoundaryValuesV : public Function<dim> 
 {
   public:
-    BoundaryValuesV () : Function<dim>() {};
+    BoundaryValuesV () : Function<dim>() {}
     
     virtual double value (const Point<dim>   &p,
 			  const unsigned int  component = 0) const;

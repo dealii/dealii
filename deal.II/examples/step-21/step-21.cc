@@ -4,7 +4,7 @@
 /*    $Id$       */
 /*    Version: $Name$                                          */
 /*                                                                */
-/*    Copyright (C) 2006 by the deal.II authors */
+/*    Copyright (C) 2006, 2007 by the deal.II authors */
 /*                                                                */
 /*    This file is subject to QPL and may not be  distributed     */
 /*    without copyright and license information. Please refer     */
@@ -150,7 +150,7 @@ template <int dim>
 class PressureRightHandSide : public Function<dim> 
 {
   public:
-    PressureRightHandSide () : Function<dim>(1) {};
+    PressureRightHandSide () : Function<dim>(1) {}
     
     virtual double value (const Point<dim>   &p,
                           const unsigned int  component = 0) const;
@@ -175,7 +175,7 @@ template <int dim>
 class PressureBoundaryValues : public Function<dim> 
 {
   public:
-    PressureBoundaryValues () : Function<dim>(1) {};
+    PressureBoundaryValues () : Function<dim>(1) {}
     
     virtual double value (const Point<dim>   &p,
                           const unsigned int  component = 0) const;
@@ -205,7 +205,7 @@ template <int dim>
 class SaturationBoundaryValues : public Function<dim> 
 {
   public:
-    SaturationBoundaryValues () : Function<dim>(1) {};
+    SaturationBoundaryValues () : Function<dim>(1) {}
     
     virtual double value (const Point<dim>   &p,
                           const unsigned int  component = 0) const;
@@ -249,7 +249,7 @@ template <int dim>
 class InitialValues : public Function<dim> 
 {
   public:
-    InitialValues () : Function<dim>(dim+2) {};
+    InitialValues () : Function<dim>(dim+2) {}
     
     virtual double value (const Point<dim>   &p,
                           const unsigned int  component = 0) const;

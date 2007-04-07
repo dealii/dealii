@@ -159,7 +159,7 @@ template <int dim>
 class InitialValuesP : public Function<dim> 
 {
   public:
-    InitialValuesP () : Function<dim>() {};
+    InitialValuesP () : Function<dim>() {}
     
     virtual double value (const Point<dim> &p,
 			  const unsigned int  component = 0) const;

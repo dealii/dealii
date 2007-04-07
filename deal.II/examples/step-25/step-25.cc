@@ -1,5 +1,5 @@
 /* $Id$ */
-/*    Copyright (C) 2006 by the deal.II authors */
+/*    Copyright (C) 2006, 2007 by the deal.II authors */
 /*    Author: Ivan Christov, Wolfgang Bangerth, Texas A&M University, 2006 */
 /*                                                                */
 /*    This file is subject to QPL and may not be  distributed     */
@@ -185,7 +185,7 @@ class ExactSolution : public Function<dim>
 {
   public:
     ExactSolution (const unsigned int n_components = 1,
-		   const double time = 0.) : Function<dim>(n_components, time) {};
+		   const double time = 0.) : Function<dim>(n_components, time) {}
     virtual double value (const Point<dim> &p,
 			  const unsigned int component = 0) const;
 };

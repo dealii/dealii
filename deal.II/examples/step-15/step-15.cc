@@ -4,7 +4,7 @@
 /*    $Id$       */
 /*    Version: $Name$                                          */
 /*                                                                */
-/*    Copyright (C) 2002, 2003, 2004, 2006 by the deal.II authors                   */
+/*    Copyright (C) 2002, 2003, 2004, 2006, 2007 by the deal.II authors                   */
 /*                                                                */
 /*    This file is subject to QPL and may not be  distributed     */
 /*    without copyright and license information. Please refer     */
@@ -123,7 +123,7 @@ double gradient_power (const Tensor<1,dim> &v,
 class InitializationValues : public Function<1> 
 {
   public:
-    InitializationValues () : Function<1>() {};
+    InitializationValues () : Function<1>() {}
     
     virtual double value (const Point<1>     &p,
 			  const unsigned int  component = 0) const;
