@@ -90,6 +90,8 @@ class LaplaceProblem
     Vector<double>       system_rhs;
 
     Timer distr, condense, hang, assemble, solver;
+
+    const unsigned int max_degree;
 };
 
 
@@ -121,9 +123,10 @@ RightHandSide<dim>::value (const Point<dim>   &p,
 
 template <int dim>
 LaplaceProblem<dim>::LaplaceProblem () :
-		dof_handler (triangulation)
+  dof_handler (triangulation),
+  max_degree (dim == 2 ? 7 : 4)
 {
-  for (unsigned int degree=2; degree<(dim == 2 ? 8 : 5); ++degree)
+  for (unsigned int degree=2; degree<=max_degree; ++degree)
     {
       fe_collection.push_back (FE_Q<dim>(degree));
       quadrature_collection.push_back (QGauss<dim>(degree+2));
@@ -180,10 +183,9 @@ void LaplaceProblem<dim>::setup_system ()
       condense.reset();
       condense.start();
       hanging_node_constraints.condense (csp);
-      condense.stop();
-      
+      condense.stop();      
       sparsity_pattern.copy_from (csp);
-    }  
+    }
 
   system_matrix.reinit (sparsity_pattern);
 }
@@ -293,7 +295,7 @@ void
 LaplaceProblem<dim>::
 estimate_smoothness (Vector<float> &smoothness_indicators) const
 {
-  const unsigned int N = (dim == 2 ? 7 : 4);
+  const unsigned int N = max_degree;
 
 				   // form all the Fourier vectors
 				   // that we want to
@@ -644,8 +646,96 @@ void LaplaceProblem<2>::create_coarse_grid ()
 template <>
 void LaplaceProblem<3>::create_coarse_grid ()
 {
-  GridGenerator::hyper_cube (triangulation);
-  triangulation.refine_global (1);
+  const unsigned int dim = 3;
+
+  //  GridGenerator::hyper_cube (triangulation);
+  //  triangulation.refine_global (1);
+
+  // Create a hollow cube, in analogy to the 2D example.
+  // The grid generation is done in two steps. First the
+  // cell data is created on a uniform grid. In the
+  // second step, the unused vertices are removed.
+  const unsigned char hollow [4][4] = {{1,1,1,1},
+				       {1,0,0,1},
+				       {1,0,0,1},
+				       {1,1,1,1}};
+  const unsigned char solid [4][4] = {{1,1,1,1},
+				      {1,1,1,1},
+				      {1,1,1,1},
+				      {1,1,1,1}};
+  const unsigned char (*layers[4])[4][4] = {&solid, &hollow, &hollow, &solid};
+
+  std::vector<CellData<dim> > cells;
+  std::vector<bool> vertex_used (5*5*5, false);
+
+  for (unsigned int zc = 0; zc < 4; ++zc)
+    for (unsigned int yc = 0; yc < 4; ++yc)
+      for (unsigned int xc = 0; xc < 4; ++xc)
+	{
+	  // Check if we have to create a cell
+	  if ((*layers[zc])[xc][yc] == 1)
+	    {
+	      const unsigned int z_vert = 25;
+	      const unsigned int y_vert = 5;
+	      unsigned int zoffs = zc * z_vert;
+	      unsigned int yoffs = yc * y_vert;
+	      unsigned int base_vert = zoffs + yoffs + xc;
+
+	      CellData<dim> cell;
+	      cell.vertices[0] = base_vert;
+	      cell.vertices[1] = cell.vertices[0] + 1;
+	      cell.vertices[2] = cell.vertices[0] + y_vert;
+	      cell.vertices[3] = cell.vertices[1] + y_vert;
+	      cell.vertices[4] = cell.vertices[0] + z_vert;
+	      cell.vertices[5] = cell.vertices[1] + z_vert;
+	      cell.vertices[6] = cell.vertices[2] + z_vert;
+	      cell.vertices[7] = cell.vertices[3] + z_vert;
+	      cell.material_id = 0;
+	      cells.push_back (cell);
+
+	      // Now add entries to the list of used
+	      // vertices.
+	      for (unsigned int i = 0; i < 8; ++i)
+		vertex_used[cell.vertices[i]] = true;
+	    }
+	}
+
+  // Now create vertices and renumber stuff;
+  std::vector<Point<dim> > vertices;
+  std::vector<unsigned int> vert_renumber (5*5*5, 0);
+  const double scale = 0.5;
+  unsigned int v_indx = 0;
+
+  for (int zv = 0; zv < 5; ++zv)
+    for (int yv = 0; yv < 5; ++yv)
+      for (int xv = 0; xv < 5; ++xv)
+	{
+	  Point<dim> p_new ((double)(xv-2) * scale,
+			    (double)(yv-2) * scale,
+			    (double)(zv-2) * scale);
+
+	  if (vertex_used[v_indx])
+	    {
+	      vert_renumber[v_indx] = vertices.size ();
+	      vertices.push_back (p_new);
+	    }
+	  v_indx++;
+	}
+
+  // Finally renumber the vertex indices in the cells
+  std::vector<CellData<dim> >::iterator cell_iterator;
+  for (cell_iterator = cells.begin (); cell_iterator != cells.end ();
+       ++cell_iterator)
+    {
+      for (unsigned int i = 0; i < 8; ++i)
+	cell_iterator->vertices[i] = 
+	  vert_renumber[cell_iterator->vertices[i]];
+    }
+
+  // Now create triangulation
+  triangulation.create_triangulation (vertices,
+				      cells,
+				      SubCellData());
 }
 
 
