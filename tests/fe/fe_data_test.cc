@@ -143,7 +143,13 @@ void test_fe_datas()
       deallog << "dofs_per_cell=" << fe_data->dofs_per_cell << std::endl;
       deallog << "components=" << fe_data->components << std::endl
 	      << "degree=" << fe_data->tensor_degree() << std::endl
-	      << "conformity=" << fe_data->conforming_space << std::endl;
+	      << "conformity=";
+      if (fe_data->conforms(FiniteElementData<dim>::L2)) deallog << " L2";
+      if (fe_data->conforms(FiniteElementData<dim>::Hcurl)) deallog << " Hcurl";
+      if (fe_data->conforms(FiniteElementData<dim>::Hdiv)) deallog << " Hdiv";
+      if (fe_data->conforms(FiniteElementData<dim>::H1)) deallog << " H1";
+      if (fe_data->conforms(FiniteElementData<dim>::H2)) deallog << " H2";
+      deallog << std::endl;
       deallog << "unit_support_points=" << fe_data->get_unit_support_points().size()
 	      << std::endl;
       deallog << "unit_face_support_points=" << fe_data->get_unit_face_support_points().size()
