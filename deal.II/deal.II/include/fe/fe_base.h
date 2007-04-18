@@ -774,7 +774,7 @@ inline
 bool
 FiniteElementData<dim>::conforms (Conformity space) const
 {
-  return ((space & conforming_space) != 0);
+  return ((space & conforming_space) == space);
 }
 
 
