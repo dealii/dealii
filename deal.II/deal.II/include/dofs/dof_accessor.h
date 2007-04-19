@@ -1149,43 +1149,15 @@ class DoFCellAccessor :  public DoFObjectAccessor<DH::dimension,DH>
 				      *
 				      * It is assumed that both
 				      * vectors already have the right
-				      * size beforehand. This function
-				      * assumes the existence of an
-				      * interpolation from child cells
-				      * to the mother cell, denoted by
-				      * the restriction matrices of
-				      * the finite element class.
-				      * Futhermore, this interpolation
-				      * should be possible for each
-				      * child alone, i.e.  it should
-				      * be possible to compute the
-				      * restriction by writing values
-			              * obtained from each child
-				      * directly into the output
-				      * vector, without, for example,
-				      * computing an average over all
-				      * children.  These properties,
-				      * however, do not exist for all
-				      * elements; an example is the
-				      * DG(0) element, which
-				      * represents piecewise constant
-				      * elements: for these the
-				      * restriction to mother cell
-				      * could be the average of the
-				      * values of the children, maybe
-				      * weighted by the measure of
-				      * each child. It is not yet
-				      * decided what the this function
-				      * does in these cases.
+				      * size beforehand.
 				      *
 				      * Unlike the get_dof_values()
-				      * function, this function is
-				      * associated to cells rather
-				      * than to lines, quads, and
-				      * hexes, since interpolation is
-				      * presently only provided for
-				      * cells by the finite element
-				      * objects.
+				      * function, this function works
+				      * on cells rather than to lines,
+				      * quads, and hexes, since
+				      * interpolation is presently
+				      * only provided for cells by the
+				      * finite element classes.
 				      */
     template <class InputVector, typename number>
     void get_interpolated_dof_values (const InputVector &values,
