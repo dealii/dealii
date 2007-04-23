@@ -77,7 +77,7 @@ class Householder : private FullMatrix<number>
 				      */
     template<typename number2>
     double least_squares (Vector<number2> &dst,
-			  Vector<number2> &src);
+			  Vector<number2> &src) const;
 
   private:
 				     /**
@@ -153,7 +153,7 @@ template <typename number>
 template <typename number2>
 double
 Householder<number>::least_squares (Vector<number2>& dst,
-				    Vector<number2>& src)
+				    Vector<number2>& src) const
 {
 //  Assert (!this->empty(), ExcEmptyMatrix());
   
