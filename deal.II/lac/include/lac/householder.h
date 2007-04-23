@@ -2,7 +2,7 @@
 //    $Id$
 //    Version: $Name$
 //
-//    Copyright (C) 2005, 2006 by the deal.II authors
+//    Copyright (C) 2005, 2006, 2007 by the deal.II authors
 //
 //    This file is subject to QPL and may not be  distributed
 //    without copyright and license information. Please refer
@@ -72,7 +72,7 @@ class Householder : private FullMatrix<number>
 				      * @arg @c src contains the right
 				      * hand side <i>b</i> of the
 				      * least squares problem. It will
-				      * be changed uring the algorithm
+				      * be changed during the algorithm
 				      * and is unusable on return.
 				      */
     template<typename number2>
