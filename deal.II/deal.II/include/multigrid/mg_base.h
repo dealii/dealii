@@ -2,7 +2,7 @@
 //    $Id$
 //    Version: $Name$
 //
-//    Copyright (C) 1999, 2000, 2001, 2002, 2003, 2004, 2005, 2006 by the deal.II authors
+//    Copyright (C) 1999, 2000, 2001, 2002, 2003, 2004, 2005, 2006, 2007 by the deal.II authors
 //
 //    This file is subject to QPL and may not be  distributed
 //    without copyright and license information. Please refer
@@ -120,11 +120,25 @@ class MGCoarseGridBase : public Subscriptor
  * types and numbering of the fine-grid discretization and of the
  * multi-level implementation are independent.
  *
- * If you use multigrid for your complete system of equations, you
+ * If you use multigrid for a single PDF or for your complete system
+ * of equations, you
  * will use MGTransferPrebuilt together with Multigrid. The vector
  * types used on the fine grid as well as for the multilevel
  * operations may be Vector or BlockVector. In both cases,
  * MGTransferPrebuilt will operate on all components of the solution.
+ *
+ * @note For the following, it is important to realize the difference
+ * between a solution @ref GlossComponent "component" and a solution
+ * @ref GlossBlock "block". The distinction only applies if vector valued
+ * elements are used, but is quite important then. This is reflected
+ * in the fact that it is not possible right now to use transfer
+ * classes based on MGTransferComponentBase for genuine vector valued
+ * elements, but descendants of MGTransferBlockBase would have to be
+ * applied. In the following text, we will use the term
+ * <em>block</em>, but remark that it might refer to components as well.
+ *
+ * @todo update the following documentation, since it does not reflect
+ * the latest changes in structure.
  *
  * For mixed systems, it may be required to do multigrid only for a
  * single component or for some components. The classes
@@ -141,7 +155,7 @@ class MGCoarseGridBase : public Subscriptor
  * whether this case is really useful. Therefore, a tested
  * implementation of this case will be supplied when needed.
  *
- * @author Wolfgang Bangerth, Guido Kanschat, 1999, 2002
+ * @author Wolfgang Bangerth, Guido Kanschat, 1999, 2002, 2007
  */
  template <class VECTOR>
  class MGTransferBase : public Subscriptor

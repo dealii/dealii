@@ -2,7 +2,7 @@
 //    $Id$
 //    Version: $Name$
 //
-//    Copyright (C) 2005, 2006 by the deal.II authors
+//    Copyright (C) 2005, 2006, 2007 by the deal.II authors
 //
 //    This file is subject to QPL and may not be  distributed
 //    without copyright and license information. Please refer
@@ -53,7 +53,7 @@
  * "blocks", but since the introduction of non-@ref GlossPrimitive
  * "primitive" elements, they have to be distinguished. See
  * FiniteElementData::n_components() and the documentation of
- * FimiteElement</dd>
+ * FiniteElement</dd>
  *
  * <dt class="glossary">@anchor GlossFaceOrientation Face orientation</dt>
  * <dd>In a triangulation, the normal vector to a face
@@ -189,7 +189,7 @@
  * function FiniteElementBase::has_support_points() returns
  * <tt>true</tt>. Naturally, these support points are on the
  * @ref GlossReferenceCell "reference cell".  Then, FEValues can be used
- * (in conjuncton with a Mapping) to access support points on the
+ * (in conjunction with a Mapping) to access support points on the
  * actual grid cells.
  *
  * @note The concept of @ref GlossSupport "support points" is
