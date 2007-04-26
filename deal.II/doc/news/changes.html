@@ -44,6 +44,16 @@ inconvenience this causes.
 
 
 <ol>
+
+  <li> <p>Changed: When new multigrid transfer classes were introduced,
+  the existing class <code class="class">MGTransferSelect</code> was
+  moved to the new header file
+  <code>multigrid/mg_transfer_component</code>. It also received a new
+  base class <code class="class">MGTransferComponent</code>.
+  <br>
+  (GK 2007/04/26)
+  </p>
+
   <li> <p>
        Changed: Everything that is part of the deal.II library has
        been moved into a namespace <code>dealii</code>. To allow your
@@ -1023,6 +1033,15 @@ inconvenience this causes.
 <h3>deal.II</h3>
 
 <ol>
+
+  <li> <p>New: The classes <code
+  class="class">MGTransferBlockSelect</code> and <code
+  class="class">MGTransferBlock</code> allow for transfer of multigrid
+  vectors for single blocks of a system and for several blocks.
+  <br>
+  (GK 2007/04/26)
+  </p>
+
    <li> <p>New: There is a new variant of
        <code>DoFTools::make_sparsity_pattern</code> that can be used to
        construct sparsity patterns corresponding to problems where one would
