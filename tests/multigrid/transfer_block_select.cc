@@ -38,15 +38,10 @@
 using namespace std;
 
 template <int dim>
-void check_block(const FiniteElement<dim>& fe,
-		 const vector<bool>& selected,
-		 const vector<double>& factors)
+void check_select(const FiniteElement<dim>& fe, unsigned int selected)
 {
-  deallog << fe.get_name() << std::endl << "selected ";
-  for (unsigned int i=0;i<selected.size();++i)
-    if (selected[i])
-      deallog << ' ' << i;
-  deallog << std::endl;
+  deallog << fe.get_name()
+	  << " select " << selected << std::endl;
   
   Triangulation<dim> tr;
   GridGenerator::hyper_cube(tr);
@@ -55,7 +50,7 @@ void check_block(const FiniteElement<dim>& fe,
   MGDoFHandler<dim> mgdof(tr);
   DoFHandler<dim>& dof=mgdof;
   mgdof.distribute_dofs(fe);
-  DoFRenumbering::component_wise(mgdof);
+  DoFRenumbering::component_wise(static_cast<DoFHandler<dim>&>(mgdof));
   vector<unsigned int> ndofs(fe.n_blocks());
   DoFTools::count_dofs_per_block(mgdof, ndofs);
   
@@ -76,58 +71,45 @@ void check_block(const FiniteElement<dim>& fe,
       deallog << std::endl;
     }  
   
-  PrimitiveVectorMemory<Vector<double> > mem;
-  MGTransferBlock<double> transfer;
+  MGTransferBlockSelect<double> transfer;
   transfer.build_matrices(dof, mgdof, selected);
-  if (factors.size()>0)
-    transfer.initialize(factors, mem);
 
-  BlockVector<double> u2(mg_ndofs[2]);
-  BlockVector<double> u1(mg_ndofs[1]);
-  BlockVector<double> u0(mg_ndofs[0]);
+				   // First, prolongate the constant
+				   // function from the coarsest mesh
+				   // to the finer ones. Since this is
+				   // the embedding, we obtain the
+				   // constant one and the l2-norm is
+				   // the number of degrees of freedom.
+  Vector<double> u2(mg_ndofs[2][selected]);
+  Vector<double> u1(mg_ndofs[1][selected]);
+  Vector<double> u0(mg_ndofs[0][selected]);
 
-				   // Prolongate a constant function
-				   // twice
   u0 = 1;
   transfer.prolongate(1,u1,u0);
   transfer.prolongate(2,u2,u1);
-				   // These outputs are just the
-				   // number of dofs on each level
-  deallog << "u0";
-  for (unsigned int b=0;b<u0.n_blocks();++b)
-    deallog << '\t' << (int) (u0.block(b)*u0.block(b)+.4);
-  deallog << std::endl << "u1";
-  for (unsigned int b=0;b<u1.n_blocks();++b)
-    deallog << '\t' << (int) (u1.block(b)*u1.block(b)+.4);
-  deallog << std::endl << "u2";
-  for (unsigned int b=0;b<u2.n_blocks();++b)
-    deallog << '\t' << (int) (u2.block(b)*u2.block(b)+.4);
-  deallog << std::endl;
-  
+  deallog << "u0\t" << (int) (u0*u0+.5) << std::endl
+	  << "u1\t" << (int) (u1*u1+.5) << std::endl
+	  << "u2\t" << (int) (u2*u2+.5) << std::endl;
+				   // Now restrict the same vectors.
   u1 = 0.;
   u0 = 0.;
   transfer.restrict_and_add(2,u1,u2);
   transfer.restrict_and_add(1,u0,u1);
-				   // After adding the restrictions,
-				   // things get bigger.
-  deallog << "u1";
-  for (unsigned int b=0;b<u1.n_blocks();++b)
-    deallog << '\t' << (int) (u1.block(b)*u1.block(b)+.5);
-  deallog << std::endl << "u0";
-  for (unsigned int b=0;b<u0.n_blocks();++b)
-    deallog << '\t' << (int) (u0.block(b)*u0.block(b)+.5);
-  deallog << std::endl;
-  				   // Check copy to mg and back
+  deallog << "u1\t" << (int) (u1*u1+.5) << std::endl
+	  << "u0\t" << (int) (u0*u0+.5) << std::endl;
+
+				   // Fill a global vector by counting
+				   // from one up
   BlockVector<double> u;
   u.reinit (ndofs);
   for (unsigned int i=0;i<u.size();++i)
     u(i) = i+1;
 
-  std::vector<std::vector<unsigned int> > cached_sizes;
-  MGLevelObject<BlockVector<double> > v;
-  v.resize(0, tr.n_levels()-1);
-  MGTools::reinit_vector_by_blocks(mgdof, v, selected, cached_sizes);
-  
+				   // See what part gets copied to mg
+  MGLevelObject<Vector<double> > v;
+  v.resize(2,2);
+  v[2].reinit(mg_ndofs[2][selected]);
+
   transfer.copy_to_mg(mgdof, v, u);
   for (unsigned int i=0; i<v[2].size();++i)
     deallog << ' ' << (int) v[2](i);
@@ -149,14 +131,12 @@ void check_block(const FiniteElement<dim>& fe,
 
 int main()
 {
-  std::ofstream logfile("transfer_block/output");
+  std::ofstream logfile("transfer_block_select/output");
   logfile.precision(3);
   deallog.attach(logfile);
   deallog.depth_console(0);
   deallog.threshold_double(1.e-10);
   
-  std::vector<double> factors;
-
   FE_DGQ<2> q0(0);
   FE_DGQ<2> q1(1);
   FE_RaviartThomasNodal<2> rt0(0);
@@ -165,21 +145,11 @@ int main()
   FESystem<2> fe0(rt1, 1, q1, 1);
   FESystem<2> fe1(rt0, 2, q0, 2);
   
-  vector<bool> s1(2, true);
-  deallog << "All" << std::endl;
-  check_block(fe0, s1, factors);
- 
-  s1[1] = false;
-  deallog << "Velocity" << std::endl;
-  check_block(fe0, s1, factors);
+  check_select(fe0, 0);
+  check_select(fe0, 1);
   
-  s1[1] = true;
-  s1[0] = false;
-  deallog << "Pressure" << std::endl;
-  check_block(fe0, s1, factors);
-
-  s1.resize(4,true);
-  s1[0] = false;
-  s1[2] = false;
-  check_block(fe1, s1, factors);
+  check_select(fe1, 0);
+  check_select(fe1, 1);
+  check_select(fe1, 2);
+  check_select(fe1, 3);
 }

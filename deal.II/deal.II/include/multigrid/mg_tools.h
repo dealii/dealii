@@ -2,7 +2,7 @@
 //    $Id$
 //    Version: $Name$
 //
-//    Copyright (C) 2005, 2006 by the deal.II authors
+//    Copyright (C) 2005, 2006, 2007 by the deal.II authors
 //
 //    This file is subject to QPL and may not be  distributed
 //    without copyright and license information. Please refer
@@ -268,6 +268,48 @@ class MGTools
 		     MGLevelObject<Vector<number> > &vector);
 
 				     /**
+				      * Ajust vectors on all levels to
+				      * correct size.  Here, we just
+				      * count the numbers of degrees
+				      * of freedom on each level and
+				      * @p reinit each level vector
+				      * to this length.
+				      */
+    template <int dim, typename number>
+      static void
+      reinit_vector (const MGDoFHandler<dim> &mg_dof,
+		     MGLevelObject<BlockVector<number> > &vector);
+
+
+				     /**
+				      * Adjust block vectors on all
+				      * levels to correct size. The
+				      * degrees of freedom on each
+				      * level are counted by block.
+				      */
+    template <int dim, typename number>
+    static void
+    reinit_vector_by_blocks (
+      const MGDoFHandler<dim> &mg_dof,
+      MGLevelObject<Vector<number> > &v,
+      const std::vector<bool> &selected,
+      std::vector<std::vector<unsigned int> >& cached_sizes);
+    
+				     /**
+				      * Adjust block vectors on all
+				      * levels to correct size. The
+				      * degrees of freedom on each
+				      * level are counted by block.
+				      */
+    template <int dim, typename number>
+    static void
+    reinit_vector_by_blocks (
+      const MGDoFHandler<dim> &mg_dof,
+      MGLevelObject<BlockVector<number> > &v,
+      const std::vector<bool> &selected,
+      std::vector<std::vector<unsigned int> >& cached_sizes);
+    
+				     /**
 				      * Adjust block-vectors on all
 				      * levels to correct size.  Count
 				      * the numbers of degrees of
@@ -303,11 +345,11 @@ class MGTools
 				      */
     template <int dim, typename number>
       static void
-      reinit_vector (const MGDoFHandler<dim>& mg_dof,
-		     MGLevelObject<BlockVector<number> >& v,
-		     const std::vector<bool>& selected = std::vector<bool>(),
-		     const std::vector<unsigned int>& target_component
-		     = std::vector<unsigned int>());
+      reinit_vector_by_components (const MGDoFHandler<dim>& mg_dof,
+				   MGLevelObject<BlockVector<number> >& v,
+				   const std::vector<bool>& selected,
+				   const std::vector<unsigned int>& target_component,
+				   std::vector<std::vector<unsigned int> >& cached_sizes);
 				     /**
 				      * Adjust vectors on all levels
 				      * to correct size.  Count the
@@ -336,11 +378,12 @@ class MGTools
 				      */
     template <int dim, typename number>
       static void
-      reinit_vector (const MGDoFHandler<dim> &mg_dof,
-		     MGLevelObject<Vector<number> > &v,
-		     const std::vector<bool> &selected,
-		     const std::vector<unsigned int> &target_component,
-		     std::vector<std::vector<unsigned int> >& cached_sizes);
+      reinit_vector_by_components (
+	const MGDoFHandler<dim> &mg_dof,
+	MGLevelObject<Vector<number> > &v,
+	const std::vector<bool> &selected,
+	const std::vector<unsigned int> &target_component,
+	std::vector<std::vector<unsigned int> >& cached_sizes);
 };
 
 /*@}*/

@@ -2,7 +2,7 @@
 //    $Id$
 //    Version: $Name$
 //
-//    Copyright (C) 2000, 2001, 2002, 2003, 2004, 2005, 2006 by the deal.II authors
+//    Copyright (C) 2000, 2001, 2002, 2003, 2004, 2005, 2006, 2007 by the deal.II authors
 //
 //    This file is subject to QPL and may not be  distributed
 //    without copyright and license information. Please refer
@@ -17,8 +17,12 @@
 #include <lac/sparse_matrix.h>
 #include <lac/block_sparse_matrix.h>
 #include <multigrid/mg_transfer.h>
+#include <multigrid/mg_transfer_block.h>
+#include <multigrid/mg_transfer_component.h>
 #include <multigrid/mg_smoother.h>
 #include <multigrid/mg_transfer.templates.h>
+#include <multigrid/mg_transfer_block.templates.h>
+#include <multigrid/mg_transfer_component.templates.h>
 #include <multigrid/multigrid.templates.h>
 
 DEAL_II_NAMESPACE_OPEN
@@ -165,14 +169,16 @@ void MGTransferBlock<number>::prolongate (
 {
   Assert ((to_level >= 1) && (to_level<=prolongation_matrices.size()),
 	  ExcIndexRange (to_level, 1, prolongation_matrices.size()+1));
-
-  unsigned int k=0;
+  Assert (src.n_blocks() == prolongation_matrices[to_level-1]->n_block_cols(),
+	  ExcDimensionMismatch(src.n_blocks(),
+			       prolongation_matrices[to_level-1]->n_block_cols()));
+  Assert (dst.n_blocks() == prolongation_matrices[to_level-1]->n_block_rows(),
+	  ExcDimensionMismatch(dst.n_blocks(),
+			       prolongation_matrices[to_level-1]->n_block_rows()));
+  
   for (unsigned int b=0; b<src.n_blocks();++b)
     {
-      if (!selected[k])
-	++k;
-      prolongation_matrices[to_level-1]->block(k,k).vmult (dst.block(b), src.block(b));
-      ++k;
+      prolongation_matrices[to_level-1]->block(b,b).vmult (dst.block(b), src.block(b));
     }
 }
 
@@ -185,30 +191,46 @@ void MGTransferBlock<number>::restrict_and_add (
 {
   Assert ((from_level >= 1) && (from_level<=prolongation_matrices.size()),
 	  ExcIndexRange (from_level, 1, prolongation_matrices.size()+1));
+  Assert (src.n_blocks() == prolongation_matrices[from_level-1]->n_block_rows(),
+	  ExcDimensionMismatch(src.n_blocks(),
+			       prolongation_matrices[from_level-1]->n_block_rows()));
+  Assert (dst.n_blocks() == prolongation_matrices[from_level-1]->n_block_cols(),
+	  ExcDimensionMismatch(dst.n_blocks(),
+			       prolongation_matrices[from_level-1]->n_block_cols()));
 
-  unsigned int k=0;
   for (unsigned int b=0; b<src.n_blocks();++b)
     {
-      while (!selected[k]) ++k;
       if (factors.size() != 0)
 	{
 	  Assert (memory != 0, ExcNotInitialized());
 	  Vector<number>* aux = memory->alloc();
 	  aux->reinit(dst.block(b));
-	  prolongation_matrices[from_level-1]->block(k,k).Tvmult (*aux, src.block(b));
+	  prolongation_matrices[from_level-1]->block(b,b).Tvmult (*aux, src.block(b));
 	  
-	  dst.block(b).add(factors[k], *aux);
+	  dst.block(b).add(factors[b], *aux);
 	  memory->free(aux);
 	}
       else
 	{
-	prolongation_matrices[from_level-1]->block(k,k).Tvmult_add (dst.block(b),
+	prolongation_matrices[from_level-1]->block(b,b).Tvmult_add (dst.block(b),
 								    src.block(b));
 	}
-      ++k;
     }
 }
 
+
+
+//TODO:[GK] Add all those little vectors.
+unsigned int
+MGTransferComponentBase::memory_consumption () const
+{
+  unsigned int result = sizeof(*this);
+  result += sizeof(unsigned int) * sizes.size();
+  for (unsigned int i=0;i<prolongation_matrices.size();++i)
+    result += prolongation_matrices[i]->memory_consumption()
+	      + prolongation_sparsities[i]->memory_consumption();
+  return result;
+}
 
 
 //TODO:[GK] Add all those little vectors.
@@ -276,6 +298,44 @@ MGSmootherContinuous<VECTOR>::set_zero_interior_boundary (
 }
 
 
+//----------------------------------------------------------------------//
+
+template <typename number>
+MGTransferBlockSelect<number>::~MGTransferBlockSelect () 
+{}
+
+
+template <typename number>
+void MGTransferBlockSelect<number>::prolongate (
+  const unsigned int   to_level,
+  Vector<number>       &dst,
+  const Vector<number> &src) const 
+{
+  Assert ((to_level >= 1) && (to_level<=prolongation_matrices.size()),
+	  ExcIndexRange (to_level, 1, prolongation_matrices.size()+1));
+
+      prolongation_matrices[to_level-1]->block(selected_block,
+					       selected_block)
+	.vmult (dst, src);
+}
+
+
+template <typename number>
+void MGTransferBlockSelect<number>::restrict_and_add (
+  const unsigned int   from_level,
+  Vector<number>       &dst,
+  const Vector<number> &src) const
+{
+  Assert ((from_level >= 1) && (from_level<=prolongation_matrices.size()),
+	  ExcIndexRange (from_level, 1, prolongation_matrices.size()+1));
+
+  prolongation_matrices[from_level-1]->block(selected_block,
+					     selected_block)
+    .Tvmult_add (dst, src);
+}
+
+
+
 // Explicit instantiations
 
 template class Multigrid<Vector<float> >;
@@ -291,6 +351,8 @@ template class MGTransferBlock<float>;
 template class MGTransferBlock<double>;
 template class MGTransferSelect<float>;
 template class MGTransferSelect<double>;
+template class MGTransferBlockSelect<float>;
+template class MGTransferBlockSelect<double>;
 
 template
 void MGSmootherContinuous<Vector<double> >::set_zero_interior_boundary (

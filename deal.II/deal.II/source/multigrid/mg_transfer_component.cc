@@ -23,82 +23,116 @@
 #include <fe/fe.h>
 #include <multigrid/mg_dof_handler.h>
 #include <multigrid/mg_dof_accessor.h>
-#include <multigrid/mg_transfer_block.h>
-#include <multigrid/mg_transfer_block.templates.h>
+#include <multigrid/mg_transfer_component.h>
+#include <multigrid/mg_transfer_component.templates.h>
 #include <multigrid/mg_tools.h>
 
 #include <algorithm>
-#include <iostream>
 
 DEAL_II_NAMESPACE_OPEN
 
 
 
 template <int dim>
-void MGTransferBlockBase::build_matrices (
+void MGTransferComponentBase::build_matrices (
   const DoFHandler<dim>&,
   const MGDoFHandler<dim>& mg_dof)
 {
-  const FiniteElement<dim>& fe = mg_dof.get_fe();
-  const unsigned int n_blocks  = fe.n_blocks();
-  const unsigned int dofs_per_cell = fe.dofs_per_cell;
-  const unsigned int n_levels      = mg_dof.get_tria().n_levels();
-  
-  Assert (selected.size() == n_blocks,
-	  ExcDimensionMismatch(selected.size(), n_blocks));
-  
-				   // Compute the mapping between real
-				   // blocks and blocks used for
-				   // multigrid computations.
-  mg_block.resize(n_blocks);
-  if (true)
+				   // Fill target component with
+				   // standard values (identity) if it
+				   // is empty
+  if (target_component.size() == 0)
     {
-      unsigned int k=0;
-      for (unsigned int i=0;i<n_blocks;++i)
-	if (selected[i])
-	  mg_block[i] = k++;
-	else
-	  mg_block[i] = deal_II_numbers::invalid_unsigned_int;
-    }
-				   // Compute the lengths of all blocks
-  sizes.resize(n_levels);
-  MGTools::count_dofs_per_block(mg_dof, sizes);
-  
-				   // Fill some index vectors
-				   // for later use.
-  mg_block_start = sizes;
-				   // Compute start indices from sizes
-  for (unsigned int l=0;l<mg_block_start.size();++l)
-    {
-      unsigned int k=0;
-      for (unsigned int i=0;i<mg_block_start[l].size();++i)
+      target_component.resize(mg_dof.get_fe().n_components());
+      for (unsigned int i=0;i<target_component.size();++i)
+	target_component[i] = i;
+    } else {
+				       // otherwise, check it for consistency
+      Assert (target_component.size() == mg_dof.get_fe().n_components(),
+	      ExcDimensionMismatch(target_component.size(),
+				   mg_dof.get_fe().n_components()));
+      
+      for (unsigned int i=0;i<target_component.size();++i)
 	{
-	  const unsigned int t=mg_block_start[l][i];
-	  mg_block_start[l][i] = k;
-	  k += t;
+	  Assert(i<target_component.size(),
+		 ExcIndexRange(i,0,target_component.size()));
+	}
+    }
+				   // Do the same for the multilevel
+				   // components. These may be
+				   // different.
+  if (mg_target_component.size() == 0)
+    {
+      mg_target_component.resize(mg_dof.get_fe().n_components());
+      for (unsigned int i=0;i<mg_target_component.size();++i)
+	mg_target_component[i] = target_component[i];
+    } else {
+      Assert (mg_target_component.size() == mg_dof.get_fe().n_components(),
+	      ExcDimensionMismatch(mg_target_component.size(),
+				   mg_dof.get_fe().n_components()));
+      
+      for (unsigned int i=0;i<mg_target_component.size();++i)
+	{
+	  Assert(i<mg_target_component.size(),
+		 ExcIndexRange(i,0,mg_target_component.size()));
 	}
     }
   
-  block_start.resize(n_blocks);
-  DoFTools::count_dofs_per_block (static_cast<const DoFHandler<dim>&>(mg_dof), block_start);
+  const FiniteElement<dim>& fe = mg_dof.get_fe();
+
+				   // Effective number of components
+				   // is the maximum entry in
+				   // mg_target_component. This
+				   // assumes that the values in that
+				   // vector don't have holes.
+  const unsigned int n_components  =
+    *std::max_element(mg_target_component.begin(), mg_target_component.end()) + 1;
+  const unsigned int dofs_per_cell = fe.dofs_per_cell;
+  const unsigned int n_levels      = mg_dof.get_tria().n_levels();
+  
+  Assert (mg_selected.size() == fe.n_components(),
+	  ExcDimensionMismatch(mg_selected.size(), fe.n_components()));
+  
+				   // Compute the lengths of all blocks
+  sizes.resize(n_levels);
+  MGTools::count_dofs_per_component(mg_dof, sizes, true, mg_target_component);
+
+				   // Fill some index vectors
+				   // for later use.
+  mg_component_start = sizes;
+				   // Compute start indices from sizes
+  for (unsigned int l=0;l<mg_component_start.size();++l)
+    {
+      unsigned int k=0;
+      for (unsigned int i=0;i<mg_component_start[l].size();++i)
+	{
+	  const unsigned int t=mg_component_start[l][i];
+	  mg_component_start[l][i] = k;
+	  k += t;
+	}
+    }
+
+  component_start.resize(target_component.size());
+  DoFTools::
+    count_dofs_per_component (static_cast<const DoFHandler<dim>&>(mg_dof),
+                              component_start, true, target_component);
 
   unsigned int k=0;
-  for (unsigned int i=0;i<block_start.size();++i)
+  for (unsigned int i=0;i<component_start.size();++i)
     {
-      const unsigned int t=block_start[i];
-      block_start[i] = k;
+      const unsigned int t=component_start[i];
+      component_start[i] = k;
       k += t;
     }
+
 				   // Build index vectors for
 				   // copy_to_mg and
 				   // copy_from_mg. These vectors must
 				   // be prebuilt, since the
 				   // get_dof_indices functions are
 				   // too slow
-  copy_indices.resize(n_blocks);
-  for (unsigned int block=0;block<n_blocks;++block)
-    if (selected[block])
-      copy_indices[block].resize(n_levels);
+
+  copy_to_and_from_indices.resize(n_levels);
   
 // Building the prolongation matrices starts here!
   
@@ -146,9 +180,9 @@ void MGTransferBlockBase::build_matrices (
 				       // is necessary. this, is the
 				       // number of degrees of freedom
 				       // per cell
-      prolongation_sparsities[level]->reinit (n_blocks, n_blocks);
-      for (unsigned int i=0; i<n_blocks; ++i)
-	for (unsigned int j=0; j<n_blocks; ++j)
+      prolongation_sparsities[level]->reinit (n_components, n_components);
+      for (unsigned int i=0; i<n_components; ++i)
+	for (unsigned int j=0; j<n_components; ++j)
 	  if (i==j)
 	    prolongation_sparsities[level]->block(i,j)
 	      .reinit(sizes[level+1][i],
@@ -186,10 +220,10 @@ void MGTransferBlockBase::build_matrices (
 		    if (prolongation(i,j) != 0)
 		      {
 			const unsigned int icomp
-			  = fe.system_to_block_index(i).first;
+			  = fe.system_to_component_index(i).first;
 			const unsigned int jcomp
-			  = fe.system_to_block_index(j).first;
-			if ((icomp==jcomp) && selected[icomp])
+			  = fe.system_to_component_index(j).first;
+			if ((icomp==jcomp) && mg_selected[mg_target_component[icomp]])
 			  prolongation_sparsities[level]->add(dof_indices_child[i],
 							      dof_indices_parent[j]);
 		      };
@@ -221,9 +255,9 @@ void MGTransferBlockBase::build_matrices (
 		  for (unsigned int j=0; j<dofs_per_cell; ++j)
 		    if (prolongation(i,j) != 0)
 		      {
-			const unsigned int icomp = fe.system_to_block_index(i).first;
-			const unsigned int jcomp = fe.system_to_block_index(j).first;
-			if ((icomp==jcomp) && selected[icomp])
+			const unsigned int icomp = fe.system_to_component_index(i).first;
+			const unsigned int jcomp = fe.system_to_component_index(j).first;
+			if ((icomp==jcomp) && mg_selected[mg_target_component[icomp]])
 			  prolongation_matrices[level]->set(dof_indices_child[i],
 							    dof_indices_parent[j],
 							    prolongation(i,j));
@@ -234,79 +268,50 @@ void MGTransferBlockBase::build_matrices (
 }
 
 
-
 template <typename number>
 template <int dim>
-void MGTransferBlockSelect<number>::build_matrices (
+void MGTransferSelect<number>::build_matrices (
   const DoFHandler<dim> &dof,
   const MGDoFHandler<dim> &mg_dof,
-  unsigned int select)
+  unsigned int select,
+  unsigned int mg_select,
+  const std::vector<unsigned int>& t_component,
+  const std::vector<unsigned int>& mg_t_component)
 {
   const FiniteElement<dim>& fe = mg_dof.get_fe();
-  unsigned int n_blocks = mg_dof.get_fe().n_blocks();
+  unsigned int ncomp = mg_dof.get_fe().n_components();
   
-  selected_block = select;
-  selected.resize(n_blocks, false);
+  target_component = t_component;
+  mg_target_component = mg_t_component;
+  
+  selected_component = select;
+  mg_selected_component = mg_select;
+  selected.resize(ncomp, false);
   selected[select] = true;
-  
-  MGTransferBlockBase::build_matrices (dof, mg_dof);
-  
-  std::vector<unsigned int> global_dof_indices (fe.dofs_per_cell);
-  std::vector<unsigned int> level_dof_indices  (fe.dofs_per_cell);
-  for (int level=dof.get_tria().n_levels()-1; level>=0; --level)
+  mg_selected.resize(ncomp, false);
+  mg_selected[mg_select] = true;
+				   // If components are renumbered,
+				   // find the first original
+				   // component corresponding to the
+				   // target component.
+  for (unsigned int i=0;i<target_component.size();++i)
     {
-      typename MGDoFHandler<dim>::active_cell_iterator
-	level_cell = mg_dof.begin_active(level);
-      const typename MGDoFHandler<dim>::active_cell_iterator
-	level_end  = mg_dof.end_active(level);
-      
-				       // Compute coarse level right hand side
-				       // by restricting from fine level.
-      for (; level_cell!=level_end; ++level_cell)
+      if (target_component[i] == select)
 	{
-	  DoFObjectAccessor<dim, DoFHandler<dim> >& global_cell = *level_cell;
-					   // get the dof numbers of
-					   // this cell for the global
-					   // and the level-wise
-					   // numbering
-	  global_cell.get_dof_indices(global_dof_indices);
-	  level_cell->get_mg_dof_indices (level_dof_indices);
-	  
-	  for (unsigned int i=0; i<fe.dofs_per_cell; ++i)
-	    {
-	      const unsigned int block = fe.system_to_block_index(i).first;
-	      if (selected[block])
-		copy_indices[block][level].insert(
-		  std::make_pair(global_dof_indices[i] - block_start[block],
-				 level_dof_indices[i] - mg_block_start[level][block]));
-	    }
+	  selected_component = i;
+	  break;
 	}
     }
-}
-
-
-
-
-template <typename number>
-template <int dim>
-void MGTransferBlock<number>::build_matrices (
-  const DoFHandler<dim> &dof,
-  const MGDoFHandler<dim> &mg_dof,
-  const std::vector<bool>& sel)
-{
-  const FiniteElement<dim>& fe = mg_dof.get_fe();
-  unsigned int n_blocks = mg_dof.get_fe().n_blocks();
-  
-  if (sel.size() != 0)
+    
+  for (unsigned int i=0;i<mg_target_component.size();++i)
     {
-      Assert(sel.size() == n_blocks,
-	     ExcDimensionMismatch(sel.size(), n_blocks));
-      selected = sel;
-    }  
-  if (selected.size() == 0)
-    selected = std::vector<bool> (n_blocks, true);
-
-  MGTransferBlockBase::build_matrices (dof, mg_dof);
+      if (mg_target_component[i] == mg_select)
+	{
+	  mg_selected_component = i;
+	  break;
+	}
+    }    
+  MGTransferComponentBase::build_matrices (dof, mg_dof);
   
   std::vector<unsigned int> global_dof_indices (fe.dofs_per_cell);
   std::vector<unsigned int> level_dof_indices  (fe.dofs_per_cell);
@@ -331,11 +336,17 @@ void MGTransferBlock<number>::build_matrices (
 	  
 	  for (unsigned int i=0; i<fe.dofs_per_cell; ++i)
 	    {
-	      const unsigned int block = fe.system_to_block_index(i).first;
-	      if (selected[block])
-		copy_indices[block][level].insert(
-		  std::make_pair(global_dof_indices[i] - block_start[block],
-				 level_dof_indices[i] - mg_block_start[level][block]));
+	      const unsigned int component
+		= mg_target_component[fe.system_to_component_index(i).first];
+	      if (mg_selected[component])
+		{
+		  const unsigned int level_start
+		    = mg_component_start[level][component];
+		  copy_to_and_from_indices[level].insert(
+		    std::make_pair(global_dof_indices[i]
+				   - component_start[selected_component],
+				   level_dof_indices[i]-level_start));
+		}
 	    }
 	}
     }
@@ -346,115 +357,79 @@ void MGTransferBlock<number>::build_matrices (
 // explicit instantiations
 
 template
-void MGTransferBlock<float>::build_matrices<deal_II_dimension>
-(const DoFHandler<deal_II_dimension>&, const MGDoFHandler<deal_II_dimension>&,
- const std::vector<bool>&);
+void MGTransferSelect<float>::build_matrices<deal_II_dimension>
+(const DoFHandler<deal_II_dimension> &d,
+ const MGDoFHandler<deal_II_dimension> &,
+ unsigned int, unsigned int,
+ const std::vector<unsigned int>&,
+ const std::vector<unsigned int>&);
 
 template
-void MGTransferBlock<double>::build_matrices<deal_II_dimension>
-(const DoFHandler<deal_II_dimension>&, const MGDoFHandler<deal_II_dimension>&,
- const std::vector<bool>&);
-
-template
-void MGTransferBlockSelect<float>::build_matrices<deal_II_dimension>
-(const DoFHandler<deal_II_dimension>&, const MGDoFHandler<deal_II_dimension>&,
- const unsigned int);
-
-template
-void MGTransferBlockSelect<double>::build_matrices<deal_II_dimension>
-(const DoFHandler<deal_II_dimension>&, const MGDoFHandler<deal_II_dimension>&,
- const unsigned int);
+void MGTransferSelect<double>::build_matrices<deal_II_dimension>
+(const DoFHandler<deal_II_dimension> &d,
+ const MGDoFHandler<deal_II_dimension> &,
+ unsigned int, unsigned int,
+ const std::vector<unsigned int>&,
+ const std::vector<unsigned int>&);
 
 template void
-MGTransferBlock<float>::copy_to_mg (
-  const MGDoFHandler<deal_II_dimension>&,
-  MGLevelObject<BlockVector<float> >&,
-  const BlockVector<double>&) const;
-template void
-MGTransferBlock<float>::copy_from_mg (
-  const MGDoFHandler<deal_II_dimension>&,
-  BlockVector<double>&,
-  const MGLevelObject<BlockVector<float> >&) const;
-template void
-MGTransferBlock<float>::copy_from_mg_add (
-  const MGDoFHandler<deal_II_dimension>&,
-  BlockVector<double>&,
-  const MGLevelObject<BlockVector<float> >&) const;
-
-template void
-MGTransferBlock<double>::copy_to_mg (
-  const MGDoFHandler<deal_II_dimension>&,
-  MGLevelObject<BlockVector<double> >&,
-  const BlockVector<double>&) const;
-template void
-MGTransferBlock<double>::copy_from_mg (
-  const MGDoFHandler<deal_II_dimension>&,
-  BlockVector<double>&,
-  const MGLevelObject<BlockVector<double> >&) const;
-template void
-MGTransferBlock<double>::copy_from_mg_add (
-  const MGDoFHandler<deal_II_dimension>&,
-  BlockVector<double>&,
-  const MGLevelObject<BlockVector<double> >&) const;
-
-template void
-MGTransferBlockSelect<float>::copy_to_mg (
+MGTransferSelect<float>::copy_to_mg (
   const MGDoFHandler<deal_II_dimension>&,
   MGLevelObject<Vector<float> >&,
   const Vector<double>&) const;
 template void
-MGTransferBlockSelect<float>::copy_to_mg (
+MGTransferSelect<float>::copy_to_mg (
   const MGDoFHandler<deal_II_dimension>&,
   MGLevelObject<Vector<float> >&,
   const BlockVector<double>&) const;
 template void
-MGTransferBlockSelect<float>::copy_from_mg (
+MGTransferSelect<float>::copy_from_mg (
   const MGDoFHandler<deal_II_dimension>&,
   Vector<double>&,
   const MGLevelObject<Vector<float> >&) const;
 template void
-MGTransferBlockSelect<float>::copy_from_mg (
+MGTransferSelect<float>::copy_from_mg (
   const MGDoFHandler<deal_II_dimension>&,
   BlockVector<double>&,
   const MGLevelObject<Vector<float> >&) const;
 template void
-MGTransferBlockSelect<float>::copy_from_mg_add (
+MGTransferSelect<float>::copy_from_mg_add (
   const MGDoFHandler<deal_II_dimension>&,
   Vector<double>&,
   const MGLevelObject<Vector<float> >&) const;
 template void
-MGTransferBlockSelect<float>::copy_from_mg_add (
+MGTransferSelect<float>::copy_from_mg_add (
   const MGDoFHandler<deal_II_dimension>&,
   BlockVector<double>&,
   const MGLevelObject<Vector<float> >&) const;
 
 template void
-MGTransferBlockSelect<double>::copy_to_mg (
+MGTransferSelect<double>::copy_to_mg (
   const MGDoFHandler<deal_II_dimension>&,
   MGLevelObject<Vector<double> >&,
   const Vector<double>&) const;
 template void
-MGTransferBlockSelect<double>::copy_to_mg (
+MGTransferSelect<double>::copy_to_mg (
   const MGDoFHandler<deal_II_dimension>&,
   MGLevelObject<Vector<double> >&,
   const BlockVector<double>&) const;
 template void
-MGTransferBlockSelect<double>::copy_from_mg (
+MGTransferSelect<double>::copy_from_mg (
   const MGDoFHandler<deal_II_dimension>&,
   Vector<double>&,
   const MGLevelObject<Vector<double> >&) const;
 template void
-MGTransferBlockSelect<double>::copy_from_mg (
+MGTransferSelect<double>::copy_from_mg (
   const MGDoFHandler<deal_II_dimension>&,
   BlockVector<double>&,
   const MGLevelObject<Vector<double> >&) const;
 template void
-MGTransferBlockSelect<double>::copy_from_mg_add (
+MGTransferSelect<double>::copy_from_mg_add (
   const MGDoFHandler<deal_II_dimension>&,
   Vector<double>&,
   const MGLevelObject<Vector<double> >&) const;
 template void
-MGTransferBlockSelect<double>::copy_from_mg_add (
+MGTransferSelect<double>::copy_from_mg_add (
   const MGDoFHandler<deal_II_dimension>&,
   BlockVector<double>&,
   const MGLevelObject<Vector<double> >&) const;

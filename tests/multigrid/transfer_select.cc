@@ -2,7 +2,7 @@
 //    $Id$
 //    Version: $Name$
 //
-//    Copyright (C) 2000 - 2006 by the deal.II authors
+//    Copyright (C) 2000 - 2007 by the deal.II authors
 //
 //    This file is subject to QPL and may not be  distributed
 //    without copyright and license information. Please refer
@@ -25,7 +25,7 @@
 #include <fe/fe_q.h>
 #include <fe/fe_system.h>
 #include <multigrid/mg_dof_handler.h>
-#include <multigrid/mg_transfer.h>
+#include <multigrid/mg_transfer_component.h>
 #include <multigrid/mg_tools.h>
 #include <multigrid/mg_level_object.h>
 

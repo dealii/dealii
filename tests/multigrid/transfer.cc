@@ -2,7 +2,7 @@
 //    transfer.cc,v 1.13 2005/12/30 16:07:03 guido Exp
 //    Version: 
 //
-//    Copyright (C) 2000 - 2006 by the deal.II authors
+//    Copyright (C) 2000 - 2007 by the deal.II authors
 //
 //    This file is subject to QPL and may not be  distributed
 //    without copyright and license information. Please refer
@@ -90,7 +90,7 @@ void check_simple(const FiniteElement<dim>& fe)
   transfer.restrict_and_add(2,u1,u2);
   transfer.restrict_and_add(1,u0,u1);
   deallog << "u1\t" <<  (u1*u1+.5) << std::endl
-	  << "u0\t" <<  (u0*u0+.5) << std::endl;  
+	  << "u0\t" <<  (u0*u0+.5) << std::endl;
 }
 
 
@@ -111,7 +111,7 @@ int main()
   check_simple (FESystem<2>(FE_DGQ<2>(1), 2));
   check_simple (FESystem<2>(FE_DGP<2>(1), 2, FE_DGQ<2>(1), 3));
 
-//  check_simple (FE_RaviartThomas<2>(2));
+  check_simple (FE_RaviartThomasNodal<2>(1));
 //  check_simple (FESystem<2>(FE_RaviartThomas<2>(1),1,FE_DGQ<2>(0),2));
   
   check_simple (FE_DGQ<3>(1));

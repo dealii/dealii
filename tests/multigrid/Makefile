@@ -1,6 +1,6 @@
 ############################################################
 # $Id$
-# Copyright (C) 2000, 2001, 2002, 2003, 2005, 2006 by the deal.II authors
+# Copyright (C) 2000, 2001, 2002, 2003, 2005, 2006, 2007 by the deal.II authors
 ############################################################
 
 ############################################################
@@ -22,7 +22,7 @@ default: run-tests
 ############################################################
 
 tests_x = cycles dof_* count_* boundary_* renumbering_* \
-	transfer transfer_select transfer_block \
+	transfer transfer_select transfer_block_select transfer_block \
 	smoother_block
 
 # from above list of regular expressions, generate the real set of
