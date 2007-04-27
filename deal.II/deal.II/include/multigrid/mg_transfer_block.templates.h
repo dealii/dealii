@@ -42,6 +42,7 @@ MGTransferBlockSelect<number>::copy_to_mg (
   MGLevelObject<Vector<number> > &dst,
   const BlockVector<number2>     &src) const
 {
+  MGTools::reinit_vector_by_blocks(mg_dof_handler, dst, selected, sizes);
 				   // For MGTransferBlockSelect, the
 				   // multilevel block is always the
 				   // first, since only one block is selected.
@@ -60,6 +61,7 @@ MGTransferBlockSelect<number>::copy_to_mg (
   MGLevelObject<Vector<number> > &dst,
   const Vector<number2>          &src) const
 {
+  MGTools::reinit_vector_by_blocks(mg_dof_handler, dst, selected, sizes);
 				   // For MGTransferBlockSelect, the
 				   // multilevel block is always the
 				   // first, since only one block is selected.
@@ -155,6 +157,7 @@ MGTransferBlock<number>::copy_to_mg (
   MGLevelObject<BlockVector<number> >& dst,
   const BlockVector<number2>& src) const
 {
+  MGTools::reinit_vector_by_blocks(mg_dof_handler, dst, selected, sizes);
   for (unsigned int block=0;block<selected.size();++block)
     if (selected[block])
       for (unsigned int level=0;level<mg_dof_handler.get_tria().n_levels();++level)
