@@ -171,20 +171,25 @@ DEAL_II_NAMESPACE_OPEN
  * block.
  *
  *
- * <h3>Cell-wise numbering for Discontinuous Galerkin FEM</h3>
+ * <h3>Cell-wise numbering</h3>
  *
- * One advantage of DGFEM is the fact, that it yields invertible
- * blocks on the diagonal of the global matrix. these blocks are in
- * fact the cell matrices and matrix elements outside these blocks are
- * due to fluxes.
+ * Given an ordered vector of cells, the function cell_wise()
+ * sorts the degrees of freedom such that degrees on earlier cells of
+ * this vector will occur before degrees on later cells.
  *
- * Still, it may be necessary to apply a downstream numbering of the
- * degrees of freedom. This renumbering may only exchange whole blocks
- * and must not destroy the block structure.
+ * This rule produces a well-defined ordering for discontinuous Galerkin
+ * methods (FE_DGP, FE_DGQ). For continuous methods, we use the
+ * additional rule that each degree of freedom is ordered according to
+ * the first cell in the ordered vector it belongs to.
  *
- * Given an ordered vector of cells, the function cell_wise_dg()
- * accomplishes this. Inside the cells, the previous ordering will be
- * preserved, so it may be useful to apply component_wise() first.
+ * Applications of this scheme are downstream() and
+ * clock_wise_dg(). The first orders the cells according to a
+ * downstream direction and then applies cell_wise().
+ *
+ * @note For DG elements, the internal numbering in each cell remains
+ * unaffected. This cannot be guaranteed for continuous elements
+ * anymore, since degrees of freedom shared with an earlier cell will
+ * be accounted for by the other cell.
  *
  *
  * <h3>Random renumbering</h3>
@@ -203,7 +208,7 @@ DEAL_II_NAMESPACE_OPEN
  * information on this.
  *
  * @ingroup dofs
- * @author Wolfgang Bangerth, Guido Kanschat, 1998, 1999, 2000, 2004
+ * @author Wolfgang Bangerth, Guido Kanschat, 1998, 1999, 2000, 2004, 2007
  */
 class DoFRenumbering 
 {
@@ -403,6 +408,16 @@ class DoFRenumbering
 				      */
     template <class DH>
     static void
+    cell_wise (DH &dof_handler,
+	       const std::vector<typename DH::cell_iterator> &cell_order);
+
+				     /**
+				      * @deprecated Use cell_wise() instead.
+				      *
+				      * Cell-wise numbering only for DG.
+				      */
+    template <class DH>
+    static void
     cell_wise_dg (DH &dof_handler,
 		  const std::vector<typename DH::cell_iterator> &cell_order);
 
@@ -423,6 +438,35 @@ class DoFRenumbering
 			  const std::vector<typename DH::cell_iterator> &cell_order);
 
 				     /**
+				      * Computes the renumbering
+				      * vector needed by the
+				      * cell_wise() function. Does
+				      * not perform the renumbering on
+				      * the DoFHandler dofs but
+				      * returns the renumbering
+				      * vector.
+				      */
+    template <class DH>
+    static void
+    compute_cell_wise (std::vector<unsigned int>& renumbering,
+		       std::vector<unsigned int>& inverse_renumbering,
+		       const DH &dof_handler,
+		       const std::vector<typename DH::cell_iterator> &cell_order);
+
+				     /**
+				      * Cell-wise renumbering on one
+				      * level. See the other function
+				      * with the same name.
+				      */
+    template <int dim>
+    static void
+    cell_wise (MGDoFHandler<dim>   &dof_handler,
+	       const unsigned int   level,
+	       const std::vector<typename MGDoFHandler<dim>::cell_iterator> &cell_order);
+    
+				     /**
+				      * @deprecated Use cell_wise() instead.
+				      *
 				      * Cell-wise renumbering on one
 				      * level for DG elements. See the
 				      * other function with the same
@@ -450,6 +494,24 @@ class DoFRenumbering
 			  const MGDoFHandler<dim>&   dof_handler,
 			  const unsigned int         level,
 			  const std::vector<typename MGDoFHandler<dim>::cell_iterator>& cell_order);
+
+
+				     /**
+				      * Computes the renumbering
+				      * vector needed by the
+				      * cell_wise() level renumbering function. Does
+				      * not perform the renumbering on
+				      * the MGDoFHandler dofs but
+				      * returns the renumbering
+				      * vector.
+				      */
+    template <int dim>
+    static void
+    compute_cell_wise (std::vector<unsigned int>& renumbering,
+		       std::vector<unsigned int>& inverse_renumbering,
+		       const MGDoFHandler<dim>&   dof_handler,
+		       const unsigned int         level,
+		       const std::vector<typename MGDoFHandler<dim>::cell_iterator>& cell_order);
 
 
 				     /**
@@ -481,6 +543,14 @@ class DoFRenumbering
 				      */
     template <class DH, int dim>
     static void
+    downstream (DH&               dof_handler,
+		const Point<dim>& direction);
+
+				     /**
+				      * @deprecated Use downstream() instead.
+				      */
+    template <class DH, int dim>
+    static void
     downstream_dg (DH&               dof_handler,
 		   const Point<dim>& direction);
 
@@ -490,6 +560,15 @@ class DoFRenumbering
 				      * flow direction on one
 				      * level. See the other function
 				      * with the same name.
+				      */
+    template <int dim>
+    static void
+    downstream (MGDoFHandler<dim>  &dof_handler,
+		const unsigned int level,
+		const Point<dim> &direction);
+				     /**
+				      * @deprecated Use downstream()
+				      * instead.
 				      */
     template <int dim>
     static void
@@ -530,6 +609,17 @@ class DoFRenumbering
 				      */
     template <class DH, int dim>
     static void
+    compute_downstream (std::vector<unsigned int>& new_dof_indices,
+			std::vector<unsigned int>& reverse,
+			const DH&                  dof_handler,
+			const Point<dim>&          direction);
+    
+				     /**
+				      * @deprecated Use
+				      * compute_downstream() instead
+				      */
+    template <class DH, int dim>
+    static void
     compute_downstream_dg (std::vector<unsigned int>& new_dof_indices,
 			   std::vector<unsigned int>& reverse,
 			   const DH&                  dof_handler,
@@ -543,6 +633,18 @@ class DoFRenumbering
 				      * the MGDoFHandler dofs but
 				      * returns the renumbering
 				      * vector.
+				      */
+    template <int dim>
+    static void
+    compute_downstream (std::vector<unsigned int>& new_dof_indices,
+			std::vector<unsigned int>& reverse,
+			const MGDoFHandler<dim>&   dof_handler,
+			const unsigned int         level,
+			const Point<dim>&          direction);
+    
+				     /**
+				      * @deprecated Use
+				      * compute_downstream() instead
 				      */
     template <int dim>
     static void

@@ -889,7 +889,21 @@ DoFRenumbering::cell_wise_dg (
 }
 
 
+template <class DH>
+void
+DoFRenumbering::cell_wise (
+  DH& dof,
+  const std::vector<typename DH::cell_iterator>& cells)
+{
+  std::vector<unsigned int> renumbering(dof.n_dofs());
+  std::vector<unsigned int> reverse(dof.n_dofs());
+  compute_cell_wise(renumbering, reverse, dof, cells);
+  
+  dof.renumber_dofs(renumbering);
+}
 
+
+//TODO: Discuss if we cannot replace this function by the next
 template <class DH>
 void
 DoFRenumbering::compute_cell_wise_dg (
@@ -948,6 +962,71 @@ DoFRenumbering::compute_cell_wise_dg (
 }
 
 
+template <class DH>
+void
+DoFRenumbering::compute_cell_wise (
+  std::vector<unsigned int>& new_indices,
+  std::vector<unsigned int>& reverse,
+  const DH& dof,
+  const typename std::vector<typename DH::cell_iterator>& cells)
+{
+  Assert(cells.size() == dof.get_tria().n_active_cells(),
+	 ExcDimensionMismatch(cells.size(),
+			      dof.get_tria().n_active_cells()));
+
+  unsigned int n_global_dofs = dof.n_dofs();
+  
+  // Actually, we compute the inverse of the reordering vector, called reverse here.
+  // Later, irs inverse is computed into new_indices, which is the return argument.
+  
+  Assert(new_indices.size() == n_global_dofs,
+	 ExcDimensionMismatch(new_indices.size(), n_global_dofs));
+  Assert(reverse.size() == n_global_dofs,
+	 ExcDimensionMismatch(reverse.size(), n_global_dofs));
+
+				   // For continuous elements, we must
+				   // make sure, that each dof is
+				   // reordered only once.
+  std::vector<bool> already_sorted(n_global_dofs, false);
+  std::vector<unsigned int> cell_dofs;
+
+  unsigned int global_index = 0;
+  
+  typename std::vector<typename DH::cell_iterator>::const_iterator cell;
+
+  for(cell = cells.begin(); cell != cells.end(); ++cell)
+    {
+				       // Determine the number of dofs
+				       // on this cell and reinit the
+				       // vector storing these
+				       // numbers.
+      unsigned int n_cell_dofs = (*cell)->get_fe().n_dofs_per_cell();
+      cell_dofs.resize(n_cell_dofs);
+      
+      (*cell)->get_dof_indices(cell_dofs);
+
+				       // Sort here to make sure that
+				       // degrees of freedom inside a
+				       // single cell are in the same
+				       // order after renumbering.
+      std::sort(cell_dofs.begin(), cell_dofs.end());
+
+      for (unsigned int i=0;i<n_cell_dofs;++i)
+	{
+	  if (!already_sorted[cell_dofs[i]])
+	    {
+	      already_sorted[cell_dofs[i]] = true;
+	      reverse[global_index++] = cell_dofs[i];
+	    }
+	}
+    }
+  Assert(global_index == n_global_dofs, ExcRenumberingIncomplete());
+
+  for (unsigned int i=0;i<reverse.size(); ++i)
+    new_indices[reverse[i]] = i;
+}
+
+
 template <int dim>
 void DoFRenumbering::cell_wise_dg (
   MGDoFHandler<dim>& dof,
@@ -958,7 +1037,21 @@ void DoFRenumbering::cell_wise_dg (
   std::vector<unsigned int> reverse(dof.n_dofs(level));
   
   compute_cell_wise_dg(renumbering, reverse, dof, level, cells);
-  dof.renumber_dofs(level, reverse);
+  dof.renumber_dofs(level, renumbering);
+}
+
+
+template <int dim>
+void DoFRenumbering::cell_wise (
+  MGDoFHandler<dim>& dof,
+  const unsigned int level,
+  const typename std::vector<typename MGDoFHandler<dim>::cell_iterator>& cells)
+{
+  std::vector<unsigned int> renumbering(dof.n_dofs(level));
+  std::vector<unsigned int> reverse(dof.n_dofs(level));
+  
+  compute_cell_wise(renumbering, reverse, dof, level, cells);
+  dof.renumber_dofs(level, renumbering);
 }
 
 
@@ -1009,13 +1102,63 @@ void DoFRenumbering::compute_cell_wise_dg (
 
       for (unsigned int i=0;i<n_cell_dofs;++i)
 	{
-	  new_order[global_index++] = cell_dofs[i];
+	  reverse[global_index++] = cell_dofs[i];
 	}
     }
   Assert(global_index == n_global_dofs, ExcRenumberingIncomplete());
 
   for (unsigned int i=0;i<new_order.size(); ++i)
-    reverse[new_order[i]] = i;  
+    new_order[reverse[i]] = i;  
+}
+
+
+
+template <int dim>
+void DoFRenumbering::compute_cell_wise (
+  std::vector<unsigned int>& new_order,
+  std::vector<unsigned int>& reverse,
+  const MGDoFHandler<dim>& dof,
+  const unsigned int level,
+  const typename std::vector<typename MGDoFHandler<dim>::cell_iterator>& cells)
+{
+  Assert(cells.size() == dof.get_tria().n_cells(level),
+	 ExcDimensionMismatch(cells.size(),
+			      dof.get_tria().n_cells(level)));
+  Assert (new_order.size() == dof.n_dofs(level),
+	  ExcDimensionMismatch(new_order.size(), dof.n_dofs(level)));
+  Assert (reverse.size() == dof.n_dofs(level),
+	  ExcDimensionMismatch(reverse.size(), dof.n_dofs(level)));
+  
+  unsigned int n_global_dofs = dof.n_dofs(level);
+  unsigned int n_cell_dofs = dof.get_fe().n_dofs_per_cell();
+  
+  std::vector<bool> already_sorted(n_global_dofs, false);
+  std::vector<unsigned int> cell_dofs(n_cell_dofs);
+  
+  unsigned int global_index = 0;
+  
+  typename std::vector<typename MGDoFHandler<dim>::cell_iterator>::const_iterator cell;
+
+  for(cell = cells.begin(); cell != cells.end(); ++cell)
+    {
+      Assert ((*cell)->level() == (int) level, ExcInternalError());
+
+      (*cell)->get_mg_dof_indices(cell_dofs);
+      std::sort(cell_dofs.begin(), cell_dofs.end());
+      
+      for (unsigned int i=0;i<n_cell_dofs;++i)
+	{
+	  if (!already_sorted[cell_dofs[i]])
+	    {
+	      already_sorted[cell_dofs[i]] = true;
+	      reverse[global_index++] = cell_dofs[i];
+	    }
+	}
+    }
+  Assert(global_index == n_global_dofs, ExcRenumberingIncomplete());
+
+  for (unsigned int i=0;i<new_order.size(); ++i)
+    new_order[reverse[i]] = i;  
 }
 
 
@@ -1026,6 +1169,19 @@ DoFRenumbering::downstream_dg (DH& dof, const Point<dim>& direction)
 {
   std::vector<unsigned int> renumbering(dof.n_dofs());
   compute_downstream_dg(renumbering, dof, direction);
+
+  dof.renumber_dofs(renumbering);
+}
+
+
+
+template <class DH, int dim>
+void
+DoFRenumbering::downstream (DH& dof, const Point<dim>& direction)
+{
+  std::vector<unsigned int> renumbering(dof.n_dofs());
+  std::vector<unsigned int> reverse(dof.n_dofs());
+  compute_downstream(renumbering, reverse, dof, direction);
 
   dof.renumber_dofs(renumbering);
 }
@@ -1076,22 +1232,51 @@ DoFRenumbering::compute_downstream_dg (
 }
 
 
+template <class DH, int dim>
+void
+DoFRenumbering::compute_downstream (
+  std::vector<unsigned int>& new_indices,
+  std::vector<unsigned int>& reverse,
+  const DH& dof,
+  const Point<dim>& direction)
+{
+  std::vector<typename DH::cell_iterator>
+    ordered_cells(dof.get_tria().n_active_cells());
+  const CompareDownstream<dim> comparator(direction);
+  
+  typename DH::active_cell_iterator begin = dof.begin_active();
+  typename DH::active_cell_iterator end = dof.end();
+  
+  copy (begin, end, ordered_cells.begin());
+  sort (ordered_cells.begin(), ordered_cells.end(), comparator);
+  
+  compute_cell_wise(new_indices, reverse, dof, ordered_cells);
+}
+
+
 template <int dim>
 void DoFRenumbering::downstream_dg (MGDoFHandler<dim>& dof,
 				    const unsigned int level,
 				    const Point<dim>& direction)
 {
-  std::vector<typename MGDoFHandler<dim>::cell_iterator>
-    ordered_cells(dof.get_tria().n_cells(level));
-  const CompareDownstream<dim> comparator(direction);
+  std::vector<unsigned int> renumbering(dof.n_dofs(level));
+  std::vector<unsigned int> reverse(dof.n_dofs(level));
+  compute_downstream_dg(renumbering, reverse, dof, level, direction);
   
-  typename MGDoFHandler<dim>::cell_iterator begin = dof.begin(level);
-  typename MGDoFHandler<dim>::cell_iterator end = dof.end(level);
-  
-  std::copy (begin, end, ordered_cells.begin());
-  std::sort (ordered_cells.begin(), ordered_cells.end(), comparator);
+  dof.renumber_dofs(level, renumbering);
+}
 
-  cell_wise_dg (dof, level, ordered_cells);
+
+template <int dim>
+void DoFRenumbering::downstream (MGDoFHandler<dim>& dof,
+				 const unsigned int level,
+				 const Point<dim>& direction)
+{
+  std::vector<unsigned int> renumbering(dof.n_dofs(level));
+  std::vector<unsigned int> reverse(dof.n_dofs(level));
+  compute_downstream(renumbering, reverse, dof, level, direction);
+  
+  dof.renumber_dofs(level, renumbering);
 }
 
 
@@ -1115,6 +1300,29 @@ DoFRenumbering::compute_downstream_dg (
   sort (ordered_cells.begin(), ordered_cells.end(), comparator);
   
   compute_cell_wise_dg(new_indices, reverse, dof, level, ordered_cells);
+}
+
+
+template <int dim>
+void
+DoFRenumbering::compute_downstream (
+  std::vector<unsigned int>& new_indices,
+  std::vector<unsigned int>& reverse,
+  const MGDoFHandler<dim>& dof,
+  const unsigned int level,
+  const Point<dim>& direction)
+{
+  std::vector<typename MGDoFHandler<dim>::cell_iterator>
+    ordered_cells(dof.get_tria().n_cells(level));
+  const CompareDownstream<dim> comparator(direction);
+  
+  typename MGDoFHandler<dim>::cell_iterator begin = dof.begin(level);
+  typename MGDoFHandler<dim>::cell_iterator end = dof.end(level);
+  
+  copy (begin, end, ordered_cells.begin());
+  sort (ordered_cells.begin(), ordered_cells.end(), comparator);
+  
+  compute_cell_wise(new_indices, reverse, dof, level, ordered_cells);
 }
 
 
@@ -1403,43 +1611,67 @@ DoFRenumbering::compute_downstream_dg<DoFHandler<deal_II_dimension> >
  const DoFHandler<deal_II_dimension>&,
  const Point<deal_II_dimension>&);
 
+template void
+DoFRenumbering::cell_wise<DoFHandler<deal_II_dimension> >
+(DoFHandler<deal_II_dimension>&,
+ const std::vector<DoFHandler<deal_II_dimension>::cell_iterator>&);
+
+template void
+DoFRenumbering::compute_cell_wise<DoFHandler<deal_II_dimension> >
+(std::vector<unsigned int>&, std::vector<unsigned int>&,
+ const DoFHandler<deal_II_dimension>&,
+ const std::vector<DoFHandler<deal_II_dimension>::cell_iterator>&);
+
+template void
+DoFRenumbering::downstream<DoFHandler<deal_II_dimension> >
+(DoFHandler<deal_II_dimension>&, const Point<deal_II_dimension>&);
+
+template void
+DoFRenumbering::compute_downstream<DoFHandler<deal_II_dimension> >
+(std::vector<unsigned int>&,std::vector<unsigned int>&,
+ const DoFHandler<deal_II_dimension>&, const Point<deal_II_dimension>&);
+
 template
 void
 DoFRenumbering::clockwise_dg<DoFHandler<deal_II_dimension> >
-(DoFHandler<deal_II_dimension>&,
- const Point<deal_II_dimension>&, bool);
+(DoFHandler<deal_II_dimension>&, const Point<deal_II_dimension>&, bool);
 
 template
 void
 DoFRenumbering::compute_clockwise_dg<DoFHandler<deal_II_dimension> >
-(std::vector<unsigned int>&,
- const DoFHandler<deal_II_dimension>&,
- const Point<deal_II_dimension>&,
- const bool);
+(std::vector<unsigned int>&, const DoFHandler<deal_II_dimension>&,
+ const Point<deal_II_dimension>&, const bool);
 
-// DG renumbering for hp::DoFHandler
+// Renumbering for hp::DoFHandler
 
-template
-void
+template void
 DoFRenumbering::cell_wise_dg<hp::DoFHandler<deal_II_dimension> >
 (hp::DoFHandler<deal_II_dimension>&,
  const std::vector<hp::DoFHandler<deal_II_dimension>::cell_iterator>&);
 
-template
-void
+template void
 DoFRenumbering::compute_cell_wise_dg<hp::DoFHandler<deal_II_dimension> >
 (std::vector<unsigned int>&, std::vector<unsigned int>&,
  const hp::DoFHandler<deal_II_dimension>&,
  const std::vector<hp::DoFHandler<deal_II_dimension>::cell_iterator>&);
 
-template
-void
+template void
+DoFRenumbering::cell_wise<hp::DoFHandler<deal_II_dimension> >
+(hp::DoFHandler<deal_II_dimension>&,
+ const std::vector<hp::DoFHandler<deal_II_dimension>::cell_iterator>&);
+
+template void
+DoFRenumbering::compute_cell_wise<hp::DoFHandler<deal_II_dimension> >
+(std::vector<unsigned int>&, std::vector<unsigned int>&,
+ const hp::DoFHandler<deal_II_dimension>&,
+ const std::vector<hp::DoFHandler<deal_II_dimension>::cell_iterator>&);
+
+template void
 DoFRenumbering::downstream_dg<hp::DoFHandler<deal_II_dimension> >
 (hp::DoFHandler<deal_II_dimension>&,
  const Point<deal_II_dimension>&);
 
-template
-void
+template void
 DoFRenumbering::compute_downstream_dg<hp::DoFHandler<deal_II_dimension> >
 (std::vector<unsigned int>&,std::vector<unsigned int>&,
  const hp::DoFHandler<deal_II_dimension>&,
@@ -1448,6 +1680,17 @@ template
 void
 DoFRenumbering::compute_downstream_dg<hp::DoFHandler<deal_II_dimension> >
 (std::vector<unsigned int>&,
+ const hp::DoFHandler<deal_II_dimension>&,
+ const Point<deal_II_dimension>&);
+
+template void
+DoFRenumbering::downstream<hp::DoFHandler<deal_II_dimension> >
+(hp::DoFHandler<deal_II_dimension>&,
+ const Point<deal_II_dimension>&);
+
+template void
+DoFRenumbering::compute_downstream<hp::DoFHandler<deal_II_dimension> >
+(std::vector<unsigned int>&,std::vector<unsigned int>&,
  const hp::DoFHandler<deal_II_dimension>&,
  const Point<deal_II_dimension>&);
 
@@ -1469,8 +1712,12 @@ DoFRenumbering::compute_clockwise_dg<hp::DoFHandler<deal_II_dimension> >
 
 template
 void DoFRenumbering::downstream_dg<deal_II_dimension>
-(MGDoFHandler<deal_II_dimension>&,
- const unsigned int,
+(MGDoFHandler<deal_II_dimension>&, const unsigned int,
+ const Point<deal_II_dimension>&);
+
+template
+void DoFRenumbering::downstream<deal_II_dimension>
+(MGDoFHandler<deal_II_dimension>&, const unsigned int,
  const Point<deal_II_dimension>&);
 
 template
