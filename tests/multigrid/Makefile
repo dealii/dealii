@@ -22,7 +22,7 @@ default: run-tests
 ############################################################
 
 tests_x = cycles dof_* count_* boundary_* renumbering_* \
-	transfer transfer_select transfer_block_select transfer_block \
+	transfer* \
 	smoother_block
 
 # from above list of regular expressions, generate the real set of
