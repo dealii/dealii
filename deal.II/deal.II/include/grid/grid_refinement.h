@@ -18,6 +18,7 @@
 #include <base/exceptions.h>
 
 #include <vector>
+#include <limits>
 
 DEAL_II_NAMESPACE_OPEN
 
