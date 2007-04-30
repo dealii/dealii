@@ -29,6 +29,7 @@ tests_x = block_matrices \
 	derivatives \
 	dof_test \
 	dof_renumbering \
+	dof_renumbering_* \
 	error_estimator \
 	grid_invert \
 	grid_out \
