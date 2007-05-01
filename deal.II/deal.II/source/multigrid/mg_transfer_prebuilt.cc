@@ -2,7 +2,7 @@
 //    $Id$
 //    Version: $Name$
 //
-//    Copyright (C) 2003, 2004, 2005, 2006 by the deal.II authors
+//    Copyright (C) 2003, 2004, 2005, 2006, 2007 by the deal.II authors
 //
 //    This file is subject to QPL and may not be  distributed
 //    without copyright and license information. Please refer
@@ -149,9 +149,39 @@ void MGTransferPrebuilt<number>::build_matrices (
 		      prolongation_matrices[level]->set (dof_indices_child[i],
 							 dof_indices_parent[j],
 							 prolongation(i,j));
-	      };
-	  };
-    };
+	      }
+	  }
+    }
+
+  copy_indices.resize(mg_dof.get_tria().n_levels());
+  std::vector<unsigned int> global_dof_indices (dofs_per_cell);
+  std::vector<unsigned int> level_dof_indices  (dofs_per_cell);
+  for (int level=mg_dof.get_tria().n_levels()-1; level>=0; --level)
+    {
+      typename MGDoFHandler<dim>::active_cell_iterator
+	level_cell = mg_dof.begin_active(level);
+      const typename MGDoFHandler<dim>::active_cell_iterator
+	level_end  = mg_dof.end_active(level);
+      
+				       // Compute coarse level right hand side
+				       // by restricting from fine level.
+      for (; level_cell!=level_end; ++level_cell)
+	{
+	  DoFObjectAccessor<dim, DoFHandler<dim> >& global_cell = *level_cell;
+					   // get the dof numbers of
+					   // this cell for the global
+					   // and the level-wise
+					   // numbering
+	  global_cell.get_dof_indices(global_dof_indices);
+	  level_cell->get_mg_dof_indices (level_dof_indices);
+	  
+	  for (unsigned int i=0; i<dofs_per_cell; ++i)
+	    {
+	      copy_indices[level].insert(
+		std::make_pair(global_dof_indices[i], level_dof_indices[i]));
+	    }
+	}
+    }
 }
 
 

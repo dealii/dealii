@@ -167,6 +167,15 @@ class MGTransferPrebuilt : public MGTransferBase<VECTOR>
 				      * child cell, i.e. the fine level.
 				      */
     std::vector<boost::shared_ptr<SparseMatrix<double> > > prolongation_matrices;    
+    
+				     /**
+				      * Mapping for the
+				      * <tt>copy_to/from_mg</tt>-functions.
+				      * The data is first the global
+				      * index, then the level index.
+				     */
+    std::vector<std::map<unsigned int, unsigned int> >
+    copy_indices;
 };
 
 
