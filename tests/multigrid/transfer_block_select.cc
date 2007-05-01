@@ -50,7 +50,7 @@ void check_select(const FiniteElement<dim>& fe, unsigned int selected)
   MGDoFHandler<dim> mgdof(tr);
   DoFHandler<dim>& dof=mgdof;
   mgdof.distribute_dofs(fe);
-  DoFRenumbering::component_wise(static_cast<DoFHandler<dim>&>(mgdof));
+  DoFRenumbering::component_wise(mgdof);
   vector<unsigned int> ndofs(fe.n_blocks());
   DoFTools::count_dofs_per_block(mgdof, ndofs);
   
@@ -80,52 +80,54 @@ void check_select(const FiniteElement<dim>& fe, unsigned int selected)
 				   // the embedding, we obtain the
 				   // constant one and the l2-norm is
 				   // the number of degrees of freedom.
-  Vector<double> u2(mg_ndofs[2][selected]);
-  Vector<double> u1(mg_ndofs[1][selected]);
-  Vector<double> u0(mg_ndofs[0][selected]);
+  MGLevelObject< Vector<double> > u(0, tr.n_levels()-1);
+  
+  MGTools::reinit_vector_by_blocks(mgdof, u, selected, mg_ndofs);
 
-  u0 = 1;
-  transfer.prolongate(1,u1,u0);
-  transfer.prolongate(2,u2,u1);
-  deallog << "u0\t" << (int) (u0*u0+.5) << std::endl
-	  << "u1\t" << (int) (u1*u1+.5) << std::endl
-	  << "u2\t" << (int) (u2*u2+.5) << std::endl;
+  u[0] = 1;
+  transfer.prolongate(1,u[1],u[0]);
+  transfer.prolongate(2,u[2],u[1]);
+  deallog << "u0\t" << (int) (u[0]*u[0]+.4) << std::endl
+	  << "u1\t" << (int) (u[1]*u[1]+.4) << std::endl
+	  << "u2\t" << (int) (u[2]*u[2]+.4) << std::endl;
 				   // Now restrict the same vectors.
-  u1 = 0.;
-  u0 = 0.;
-  transfer.restrict_and_add(2,u1,u2);
-  transfer.restrict_and_add(1,u0,u1);
-  deallog << "u1\t" << (int) (u1*u1+.5) << std::endl
-	  << "u0\t" << (int) (u0*u0+.5) << std::endl;
-
+  u[1] = 0.;
+  u[0] = 0.;
+  transfer.restrict_and_add(2,u[1],u[2]);
+  transfer.restrict_and_add(1,u[0],u[1]);
+  deallog << "u1\t" << (int) (u[1]*u[1]+.5) << std::endl
+	  << "u0\t" << (int) (u[0]*u[0]+.5) << std::endl;
+  
+				   // Check copy to mg and back
 				   // Fill a global vector by counting
 				   // from one up
-  BlockVector<double> u;
-  u.reinit (ndofs);
-  for (unsigned int i=0;i<u.size();++i)
-    u(i) = i+1;
-
-				   // See what part gets copied to mg
-  MGLevelObject<Vector<double> > v;
-  v.resize(0,tr.n_levels()-1);
-  MGTools::reinit_vector_by_blocks(mgdof, v, selected, mg_ndofs);
+  BlockVector<double> v;
+  v.reinit (ndofs);
+  for (unsigned int i=0;i<v.size();++i)
+    v(i) = i+1;
   
-  transfer.copy_to_mg(mgdof, v, u);
-  for (unsigned int i=0; i<v[2].size();++i)
-    deallog << ' ' << (int) v[2](i);
+				   // See what part gets copied to mg
+  u.resize(0, tr.n_levels()-1);
+  MGTools::reinit_vector_by_blocks(mgdof, u, selected, mg_ndofs);
+  
+  transfer.copy_to_mg(mgdof, u, v);
+  for (unsigned int i=0; i<u[2].size();++i)
+    deallog << ' ' << (int) u[2](i);
   deallog << std::endl;
 
 				   // Now do the opposite: fill a
 				   // multigrid vector counting the
 				   // dofs and see where the numbers go
-  u = 0.;
-  for (unsigned int i=0;i<v[2].size();++i)
-    v[2](i) = i+1;
-  transfer.copy_from_mg_add(mgdof, u, v);
-  for (unsigned int i=0; i<u.size();++i)
-    deallog << ' ' << (int) u(i);
+  for (unsigned int i=0;i<u[2].size();++i)
+    u[2](i) = i+1;
+  v = 0.;
+  transfer.copy_from_mg(mgdof, v, u);
+  for (unsigned int i=0; i<v.size();++i)
+    deallog << ' ' << (int) v(i);
   deallog << std::endl;
-  
+  v.equ(-1., v);
+  transfer.copy_from_mg_add(mgdof, v, u);
+  deallog << "diff " << v.l2_norm() << std::endl;
 }
 
 

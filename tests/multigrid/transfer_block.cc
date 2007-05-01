@@ -117,12 +117,16 @@ void check_block(const FiniteElement<dim>& fe,
   for (unsigned int b=0;b<u[0].n_blocks();++b)
     deallog << '\t' << (int) (u[0].block(b)*u[0].block(b)+.5);
   deallog << std::endl;
-  				   // Check copy to mg and back
+  
+				   // Check copy to mg and back
+				   // Fill a global vector by counting
+				   // from one up
   BlockVector<double> v;
   v.reinit (ndofs);
   for (unsigned int i=0;i<v.size();++i)
     v(i) = i+1;
   
+				   // See what part gets copied to mg
   u.resize(0, tr.n_levels()-1);
   MGTools::reinit_vector_by_blocks(mgdof, u, selected, mg_ndofs);
   
