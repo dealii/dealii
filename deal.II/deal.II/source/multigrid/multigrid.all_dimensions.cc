@@ -169,16 +169,19 @@ void MGTransferBlock<number>::prolongate (
 {
   Assert ((to_level >= 1) && (to_level<=prolongation_matrices.size()),
 	  ExcIndexRange (to_level, 1, prolongation_matrices.size()+1));
-  Assert (src.n_blocks() == prolongation_matrices[to_level-1]->n_block_cols(),
-	  ExcDimensionMismatch(src.n_blocks(),
-			       prolongation_matrices[to_level-1]->n_block_cols()));
-  Assert (dst.n_blocks() == prolongation_matrices[to_level-1]->n_block_rows(),
-	  ExcDimensionMismatch(dst.n_blocks(),
-			       prolongation_matrices[to_level-1]->n_block_rows()));
-  
-  for (unsigned int b=0; b<src.n_blocks();++b)
+  Assert (src.n_blocks() == this->n_mg_blocks,
+	  ExcDimensionMismatch(src.n_blocks(), this->n_mg_blocks));
+  Assert (dst.n_blocks() == this->n_mg_blocks,
+	  ExcDimensionMismatch(dst.n_blocks(), this->n_mg_blocks));
+
+				   // Multiplicate with prolongation
+				   // matrix, but only those blocks
+				   // selected.
+  for (unsigned int b=0; b<this->mg_block.size();++b)
     {
-      prolongation_matrices[to_level-1]->block(b,b).vmult (dst.block(b), src.block(b));
+      if (this->selected[b])
+	prolongation_matrices[to_level-1]->block(b,b).vmult (
+	  dst.block(this->mg_block[b]), src.block(this->mg_block[b]));
     }
 }
 
@@ -191,29 +194,31 @@ void MGTransferBlock<number>::restrict_and_add (
 {
   Assert ((from_level >= 1) && (from_level<=prolongation_matrices.size()),
 	  ExcIndexRange (from_level, 1, prolongation_matrices.size()+1));
-  Assert (src.n_blocks() == prolongation_matrices[from_level-1]->n_block_rows(),
-	  ExcDimensionMismatch(src.n_blocks(),
-			       prolongation_matrices[from_level-1]->n_block_rows()));
-  Assert (dst.n_blocks() == prolongation_matrices[from_level-1]->n_block_cols(),
-	  ExcDimensionMismatch(dst.n_blocks(),
-			       prolongation_matrices[from_level-1]->n_block_cols()));
-
-  for (unsigned int b=0; b<src.n_blocks();++b)
+  Assert (src.n_blocks() == this->n_mg_blocks,
+	  ExcDimensionMismatch(src.n_blocks(), this->n_mg_blocks));
+  Assert (dst.n_blocks() == this->n_mg_blocks,
+	  ExcDimensionMismatch(dst.n_blocks(), this->n_mg_blocks));
+  
+  for (unsigned int b=0; b<this->mg_block.size();++b)
     {
-      if (factors.size() != 0)
+      if (this->selected[b])
 	{
-	  Assert (memory != 0, ExcNotInitialized());
-	  Vector<number>* aux = memory->alloc();
-	  aux->reinit(dst.block(b));
-	  prolongation_matrices[from_level-1]->block(b,b).Tvmult (*aux, src.block(b));
-	  
-	  dst.block(b).add(factors[b], *aux);
-	  memory->free(aux);
-	}
-      else
-	{
-	prolongation_matrices[from_level-1]->block(b,b).Tvmult_add (dst.block(b),
-								    src.block(b));
+	  if (factors.size() != 0)
+	    {
+	      Assert (memory != 0, ExcNotInitialized());
+	      Vector<number>* aux = memory->alloc();
+	      aux->reinit(dst.block(this->mg_block[b]));
+	      prolongation_matrices[from_level-1]->block(b,b).Tvmult (
+		*aux, src.block(this->mg_block[b]));
+	      
+	      dst.block(this->mg_block[b]).add(factors[b], *aux);
+	      memory->free(aux);
+	    }
+	  else
+	    {
+	      prolongation_matrices[from_level-1]->block(b,b).Tvmult_add (
+		dst.block(this->mg_block[b]), src.block(this->mg_block[b]));
+	    }
 	}
     }
 }
