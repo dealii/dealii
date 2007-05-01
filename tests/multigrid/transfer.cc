@@ -91,6 +91,34 @@ void check_simple(const FiniteElement<dim>& fe)
   transfer.restrict_and_add(1,u0,u1);
   deallog << "u1\t" <<  (u1*u1+.5) << std::endl
 	  << "u0\t" <<  (u0*u0+.5) << std::endl;
+
+				   // Fill a global vector by counting
+				   // from one up
+  Vector<double> u;
+  u.reinit (mgdof.n_dofs());
+  for (unsigned int i=0;i<u.size();++i)
+    u(i) = i+1;
+
+				   // See what part gets copied to mg
+  MGLevelObject<Vector<double> > v;
+  v.resize(2,2);
+  v[2].reinit(mgdof.n_dofs(2));
+
+  transfer.copy_to_mg(mgdof, v, u);
+  for (unsigned int i=0; i<v[2].size();++i)
+    deallog << ' ' << (int) v[2](i);
+  deallog << std::endl;
+
+				   // Now do the opposite: fill a
+				   // multigrid vector counting the
+				   // dofs and see where the numbers go
+  u = 0.;
+  for (unsigned int i=0;i<v[2].size();++i)
+    v[2](i) = i+1;
+  transfer.copy_from_mg(mgdof, u, v);
+  for (unsigned int i=0; i<u.size();++i)
+    deallog << ' ' << (int) u(i);
+  deallog << std::endl;  
 }
 
 

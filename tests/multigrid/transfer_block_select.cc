@@ -107,9 +107,9 @@ void check_select(const FiniteElement<dim>& fe, unsigned int selected)
 
 				   // See what part gets copied to mg
   MGLevelObject<Vector<double> > v;
-  v.resize(2,2);
-  v[2].reinit(mg_ndofs[2][selected]);
-
+  v.resize(0,tr.n_levels()-1);
+  MGTools::reinit_vector_by_blocks(mgdof, v, selected, mg_ndofs);
+  
   transfer.copy_to_mg(mgdof, v, u);
   for (unsigned int i=0; i<v[2].size();++i)
     deallog << ' ' << (int) v[2](i);

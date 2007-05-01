@@ -149,20 +149,26 @@ void check_block(const FiniteElement<dim>& fe)
 
   std::vector<std::vector<unsigned int> > cached_sizes;
   MGLevelObject<BlockVector<double> > v;
-  MGLevelObject<BlockVector<double> > w;
+  MGLevelObject<BlockVector<double> > wb;
+  MGLevelObject<Vector<double> > ws;
   v.resize(0, tr.n_levels()-1);
-  w.resize(0, tr.n_levels()-1);
+  wb.resize(0, tr.n_levels()-1);
+  ws.resize(0, tr.n_levels()-1);
   MGTools::reinit_vector_by_blocks(mgdof, v, selected, cached_sizes);
-  MGTools::reinit_vector_by_blocks(mgdof, w, selected, cached_sizes);
+  MGTools::reinit_vector_by_blocks(mgdof, wb, selected, cached_sizes);
+  MGTools::reinit_vector_by_blocks(mgdof, ws, 0, cached_sizes);
 
   deallog << "copy to mg";
   transfer.copy_to_mg(mgdof, v, u);
-  transfer_block.copy_to_mg(mgdof, w, u);
-
+  transfer_block.copy_to_mg(mgdof, wb, u);
+  transfer_select.copy_to_mg(mgdof, ws, u);
+  
   for (unsigned int l=0; l<tr.n_levels();++l)
     {
-      w[l].add(-1., v[l]);
-      deallog << ' ' << w[l].l2_norm();
+      wb[l].add(-1., v[l]);
+      ws[l].add(-1., v[l].block(0));
+      deallog << ' ' << wb[l].l2_norm();
+      deallog << ' ' << ws[l].l2_norm();
     }
   deallog << std::endl << "copy from mg ";
 				   // Now do the opposite: fill a
@@ -172,15 +178,14 @@ void check_block(const FiniteElement<dim>& fe)
   for (unsigned int i=0;i<v[2].size();++i)
     {
       v[2](i) = i+1;
-      w[2](i) = i+1;
+      wb[2](i) = i+1;
     }
-  
+  for (unsigned int i=0;i<ws[2].size();++i)
+    ws[2](i) = i+1;
   BlockVector<double> uu;
   uu.reinit(u);
   transfer.copy_from_mg_add(mgdof, u, v);
   transfer_block.copy_from_mg_add(mgdof, uu, v);
-  u.print(std::cout, 0, false);
-  uu.print(std::cout, 0, false);
   u.add(-1., uu);
   deallog << u.l2_norm() << std::endl;
   
