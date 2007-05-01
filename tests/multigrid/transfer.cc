@@ -53,72 +53,68 @@ void check_simple(const FiniteElement<dim>& fe)
   MGTransferPrebuilt<Vector<double> > transfer;
   transfer.build_matrices(mgdof);
 
-  Vector<double> u2(mgdof.n_dofs(2));
-  Vector<double> u1(mgdof.n_dofs(1));
-  Vector<double> u0(mgdof.n_dofs(0));
-
+  MGLevelObject<Vector<double> > u(0, tr.n_levels()-1);
+  MGTools::reinit_vector(mgdof, u);
 				   // First prolongate the constant
 				   // vector.  For Lagrange elements,
 				   // the values are just the number
 				   // of degrees of freedom.
-  u0 = 1;
-  transfer.prolongate(1,u1,u0);
-  transfer.prolongate(2,u2,u1);
-  deallog << "u0\t" <<  (u0*u0+.5) << std::endl
-	  << "u1\t" <<  (u1*u1+.5) << std::endl
-	  << "u2\t" <<  (u2*u2+.5) << std::endl;
+  u[0] = 1;
+  transfer.prolongate(1,u[1],u[0]);
+  transfer.prolongate(2,u[2],u[1]);
+  deallog << "u0\t" <<  (u[0]*u[0]+.5) << std::endl
+	  << "u1\t" <<  (u[1]*u[1]+.5) << std::endl
+	  << "u2\t" <<  (u[2]*u[2]+.5) << std::endl;
 				   // Now restrict the same vectors.
-  u1 = 0.;
-  u0 = 0.;
-  transfer.restrict_and_add(2,u1,u2);
-  transfer.restrict_and_add(1,u0,u1);
-  deallog << "u1\t" <<  (u1*u1+.5) << std::endl
-	  << "u0\t" <<  (u0*u0+.5) << std::endl;
+  u[1] = 0.;
+  u[0] = 0.;
+  transfer.restrict_and_add(2,u[1],u[2]);
+  transfer.restrict_and_add(1,u[0],u[1]);
+  deallog << "u1\t" <<  (u[1]*u[1]+.5) << std::endl
+	  << "u0\t" <<  (u[0]*u[0]+.5) << std::endl;
   
 				   // Now the same for a non-constant
 				   // vector
-  for (unsigned int i=0;i<u0.size();++i)
-    u0(i) = i;
-  transfer.prolongate(1,u1,u0);
-  transfer.prolongate(2,u2,u1);
-  deallog << "u0\t" <<  (u0*u0+.5) << std::endl
-	  << "u1\t" <<  (u1*u1+.5) << std::endl
-	  << "u2\t" <<  (u2*u2+.5) << std::endl;
+  for (unsigned int i=0;i<u[0].size();++i)
+    u[0](i) = i;
+  transfer.prolongate(1,u[1],u[0]);
+  transfer.prolongate(2,u[2],u[1]);
+  deallog << "u0\t" <<  (u[0]*u[0]+.5) << std::endl
+	  << "u1\t" <<  (u[1]*u[1]+.5) << std::endl
+	  << "u2\t" <<  (u[2]*u[2]+.5) << std::endl;
 				   // Now restrict the same vectors.
-  u1 = 0.;
-  u0 = 0.;
-  transfer.restrict_and_add(2,u1,u2);
-  transfer.restrict_and_add(1,u0,u1);
-  deallog << "u1\t" <<  (u1*u1+.5) << std::endl
-	  << "u0\t" <<  (u0*u0+.5) << std::endl;
+  u[1] = 0.;
+  u[0] = 0.;
+  transfer.restrict_and_add(2,u[1],u[2]);
+  transfer.restrict_and_add(1,u[0],u[1]);
+  deallog << "u1\t" <<  (u[1]*u[1]+.5) << std::endl
+	  << "u0\t" <<  (u[0]*u[0]+.5) << std::endl;
 
 				   // Fill a global vector by counting
 				   // from one up
-  Vector<double> u;
-  u.reinit (mgdof.n_dofs());
-  for (unsigned int i=0;i<u.size();++i)
-    u(i) = i+1;
-
-				   // See what part gets copied to mg
-  MGLevelObject<Vector<double> > v;
-  v.resize(2,2);
-  v[2].reinit(mgdof.n_dofs(2));
-
-  transfer.copy_to_mg(mgdof, v, u);
-  for (unsigned int i=0; i<v[2].size();++i)
-    deallog << ' ' << (int) v[2](i);
+  Vector<double> v;
+  v.reinit (mgdof.n_dofs());
+  for (unsigned int i=0;i<v.size();++i)
+    v(i) = i+1;
+  
+  transfer.copy_to_mg(mgdof, u, v);
+  for (unsigned int i=0; i<u[2].size();++i)
+    deallog << ' ' << (int) u[2](i);
   deallog << std::endl;
 
 				   // Now do the opposite: fill a
 				   // multigrid vector counting the
 				   // dofs and see where the numbers go
-  u = 0.;
-  for (unsigned int i=0;i<v[2].size();++i)
-    v[2](i) = i+1;
-  transfer.copy_from_mg(mgdof, u, v);
-  for (unsigned int i=0; i<u.size();++i)
-    deallog << ' ' << (int) u(i);
+  v = 0.;
+  for (unsigned int i=0;i<u[2].size();++i)
+    u[2](i) = i+1;
+  transfer.copy_from_mg(mgdof, v, u);
+  for (unsigned int i=0; i<v.size();++i)
+    deallog << ' ' << (int) v(i);
   deallog << std::endl;  
+  v.equ(-1., v);
+  transfer.copy_from_mg_add(mgdof, v, u);
+  deallog << "diff " << v.l2_norm() << std::endl;  
 }
 
 
