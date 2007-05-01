@@ -51,15 +51,13 @@ void MGTransferBlockBase::build_matrices (
 				   // blocks and blocks used for
 				   // multigrid computations.
   mg_block.resize(n_blocks);
-  if (true)
-    {
-      unsigned int k=0;
-      for (unsigned int i=0;i<n_blocks;++i)
-	if (selected[i])
-	  mg_block[i] = k++;
-	else
-	  mg_block[i] = deal_II_numbers::invalid_unsigned_int;
-    }
+  n_mg_blocks = 0;
+  for (unsigned int i=0;i<n_blocks;++i)
+    if (selected[i])
+      mg_block[i] = n_mg_blocks++;
+    else
+      mg_block[i] = deal_II_numbers::invalid_unsigned_int;
+  
 				   // Compute the lengths of all blocks
   sizes.resize(n_levels);
   MGTools::count_dofs_per_block(mg_dof, sizes);

@@ -24,6 +24,7 @@
 #  include <lac/block_sparsity_pattern.h>
 #endif
 #include <lac/vector_memory.h>
+#include <lac/block_matrix_array.h>
 
 #include <multigrid/mg_base.h>
 #include <multigrid/mg_level_object.h>
@@ -90,6 +91,12 @@ class MGTransferBlockBase
 				    */
     std::vector<bool> selected;
 
+				     /**
+				      * Number of blocks of multigrid
+				      * vector.
+				      */
+    unsigned int n_mg_blocks;
+    
 				     /**
 				      * For each block of the whole
 				      * block vector, list to what
