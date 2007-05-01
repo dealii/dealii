@@ -282,17 +282,18 @@ class MGTools
 
 
 				     /**
-				      * Adjust block vectors on all
-				      * levels to correct size. The
-				      * degrees of freedom on each
-				      * level are counted by block.
+				      * Adjust vectors on all levels
+				      * to correct size. The degrees
+				      * of freedom on each level are
+				      * counted by block and only the
+				      * block selected is used.
 				      */
     template <int dim, typename number>
     static void
     reinit_vector_by_blocks (
       const MGDoFHandler<dim> &mg_dof,
       MGLevelObject<Vector<number> > &v,
-      const std::vector<bool> &selected,
+      const unsigned int selected,
       std::vector<std::vector<unsigned int> >& cached_sizes);
     
 				     /**

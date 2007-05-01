@@ -1490,22 +1490,15 @@ void
 MGTools::reinit_vector_by_blocks (
   const MGDoFHandler<dim> &mg_dof,
   MGLevelObject<Vector<number> > &v,
-  const std::vector<bool> &selected,
+  const unsigned int selected_block,
   std::vector<std::vector<unsigned int> >& ndofs)
 {
-				   // Compute the number of blocks needed
-#ifdef DEBUG
-  const unsigned int n_selected
-    = std::accumulate(selected.begin(),
-		      selected.end(),
-		      0U);
-  Assert(n_selected == 1, ExcDimensionMismatch(n_selected, 1));
-#endif
+  const unsigned int n_blocks = mg_dof.get_fe().n_blocks();
+  Assert(selected_block < n_blocks, ExcIndexRange(selected_block, 0, n_blocks));
   
-  unsigned int selected_block = 0;
-  while (!selected[selected_block])
-    ++selected_block;
-
+  std::vector<bool> selected(n_blocks, false);
+  selected[selected_block] = true;
+  
   if (ndofs.size() == 0)
     {
       std::vector<std::vector<unsigned int> >
@@ -1588,53 +1581,36 @@ template void MGTools::reinit_vector_by_components<deal_II_dimension> (
   std::vector<std::vector<unsigned int> >&);
 
 template void MGTools::reinit_vector_by_components<deal_II_dimension> (
-  const MGDoFHandler<deal_II_dimension>&,
-  MGLevelObject<Vector<double> >&,
-  const std::vector<bool>&,
-  const std::vector<unsigned int>&,
+  const MGDoFHandler<deal_II_dimension>&, MGLevelObject<Vector<double> >&,
+  const std::vector<bool>&, const std::vector<unsigned int>&,
   std::vector<std::vector<unsigned int> >&);
 template void MGTools::reinit_vector_by_components<deal_II_dimension> (
-  const MGDoFHandler<deal_II_dimension>&,
-  MGLevelObject<Vector<float> >&,
-  const std::vector<bool>&,
-  const std::vector<unsigned int>&,
+  const MGDoFHandler<deal_II_dimension>&, MGLevelObject<Vector<float> >&,
+  const std::vector<bool>&, const std::vector<unsigned int>&,
   std::vector<std::vector<unsigned int> >&);
 
 template void MGTools::reinit_vector_by_blocks<deal_II_dimension> (
-  const MGDoFHandler<deal_II_dimension>&,
-  MGLevelObject<BlockVector<double> >&,
-  const std::vector<bool> &,
-  std::vector<std::vector<unsigned int> >&);
+  const MGDoFHandler<deal_II_dimension>&, MGLevelObject<BlockVector<double> >&,
+  const std::vector<bool> &, std::vector<std::vector<unsigned int> >&);
 template void MGTools::reinit_vector_by_blocks<deal_II_dimension> (
-  const MGDoFHandler<deal_II_dimension>&,
-  MGLevelObject<BlockVector<float> >&,
-  const std::vector<bool> &,
-  std::vector<std::vector<unsigned int> >&);
+  const MGDoFHandler<deal_II_dimension>&, MGLevelObject<BlockVector<float> >&,
+  const std::vector<bool> &, std::vector<std::vector<unsigned int> >&);
 
 template void MGTools::reinit_vector_by_blocks<deal_II_dimension> (
-  const MGDoFHandler<deal_II_dimension>&,
-  MGLevelObject<Vector<double> >&,
-  const std::vector<bool>&,
-  std::vector<std::vector<unsigned int> >&);
+  const MGDoFHandler<deal_II_dimension>&, MGLevelObject<Vector<double> >&,
+  unsigned int, std::vector<std::vector<unsigned int> >&);
 template void MGTools::reinit_vector_by_blocks<deal_II_dimension> (
-  const MGDoFHandler<deal_II_dimension>&,
-  MGLevelObject<Vector<float> >&,
-  const std::vector<bool>&,
-  std::vector<std::vector<unsigned int> >&);
-
+  const MGDoFHandler<deal_II_dimension>&, MGLevelObject<Vector<float> >&,
+  unsigned int, std::vector<std::vector<unsigned int> >&);
 
 template void MGTools::count_dofs_per_component<deal_II_dimension> (
-  const MGDoFHandler<deal_II_dimension>&,
-  std::vector<std::vector<unsigned int> >&,
-  bool,
-  std::vector<unsigned int>);
+  const MGDoFHandler<deal_II_dimension>&, std::vector<std::vector<unsigned int> >&,
+  bool, std::vector<unsigned int>);
 template void MGTools::count_dofs_per_component<deal_II_dimension> (
-  const MGDoFHandler<deal_II_dimension>&,
-  std::vector<std::vector<unsigned int> >&,
+  const MGDoFHandler<deal_II_dimension>&, std::vector<std::vector<unsigned int> >&,
   std::vector<unsigned int>);
 template void MGTools::count_dofs_per_block<deal_II_dimension> (
-  const MGDoFHandler<deal_II_dimension>&,
-  std::vector<std::vector<unsigned int> >&,
+  const MGDoFHandler<deal_II_dimension>&, std::vector<std::vector<unsigned int> >&,
   std::vector<unsigned int>);
 
 template void MGTools::make_boundary_list(
