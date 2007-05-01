@@ -132,7 +132,7 @@ MGTransferBlockSelect<number>::copy_from_mg_add (
   for (unsigned int level=0;level<mg_dof_handler.get_tria().n_levels();++level)
     for (IT i= copy_indices[selected_block][level].begin();
 	 i != copy_indices[selected_block][level].end();++i)
-      dst.block(selected_block)(i->first) = src[level](i->second);
+      dst.block(selected_block)(i->first) += src[level](i->second);
 }
 
 
