@@ -372,7 +372,7 @@ int main()
   E.print_statistics(deallog, true);
 
   for (unsigned int i=0;i<E_res.size();++i)
-    if (std::fabs(A_res[i] - E_res[i]) > 1.e-14)
+    if (std::fabs(A_res[i] - E_res[i]) > 1.e-13)
       deallog << "SparseMatrix and SparseMatrixEZ differ!!!"
 	      << std::endl;
                                    // dump A into a file, and re-read
