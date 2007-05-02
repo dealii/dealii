@@ -2126,10 +2126,8 @@ void Triangulation<dim>::load_coarsen_flags (const std::vector<bool> &v)
 template <>
 void Triangulation<1>::clear_user_pointers ()
 {
-  cell_iterator cell = begin(),
-		endc = end();
-  for (; cell!=endc; ++cell)
-    cell->clear_user_pointer ();
+  for (unsigned int level=0;level<levels.size();++level)
+    levels[level]->lines.clear_user_data();
 }
 
 
@@ -2160,15 +2158,9 @@ void Triangulation<1>::clear_user_flags_hex ()
 template <>
 void Triangulation<2>::clear_user_pointers ()
 {
-  line_iterator line = begin_line(),
-		endl = end_line();
-  for (; line!=endl; ++line)
-    line->clear_user_pointer ();
-
-  cell_iterator cell = begin(),
-		endc = end();
-  for (; cell!=endc; ++cell)
-    cell->clear_user_pointer ();
+  for (unsigned int level=0;level<levels.size();++level)
+    levels[level]->quads.clear_user_data();
+  faces->lines.clear_user_data();
 }
 
 
@@ -2195,20 +2187,10 @@ void Triangulation<2>::clear_user_flags_hex ()
 template <>
 void Triangulation<3>::clear_user_pointers ()
 {
-  line_iterator line = begin_line(),
-		endl = end_line();
-  for (; line!=endl; ++line)
-    line->clear_user_pointer ();
-
-  quad_iterator quad = begin_quad(),
-		endq = end_quad();
-  for (; quad!=endq; ++quad)
-    quad->clear_user_pointer ();
-
-  cell_iterator cell = begin(),
-		endc = end();
-  for (; cell!=endc; ++cell)
-    cell->clear_user_pointer ();
+  for (unsigned int level=0;level<levels.size();++level)
+    levels[level]->hexes.clear_user_data();
+  faces->quads.clear_user_data();
+  faces->lines.clear_user_data();
 }
 
 

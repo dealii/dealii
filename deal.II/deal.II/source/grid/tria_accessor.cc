@@ -112,7 +112,7 @@ template <int dim>
 void TriaObjectAccessor<1, dim>::set_user_pointer (void *p) const
 {
   Assert (used(), TriaAccessorExceptions::ExcCellNotUsed());
-  lines().user_pointers[this->present_index] = p;
+  lines().user_pointer(this->present_index) = p;
 }
 
 
@@ -121,7 +121,7 @@ template <int dim>
 void TriaObjectAccessor<1, dim>::clear_user_pointer () const
 {
   Assert (used(), TriaAccessorExceptions::ExcCellNotUsed());
-  lines().user_pointers[this->present_index] = 0;
+  lines().user_pointer(this->present_index) = 0;
 }
 
 
@@ -130,7 +130,7 @@ template <int dim>
 void * TriaObjectAccessor<1, dim>::user_pointer () const
 {
   Assert (used(), TriaAccessorExceptions::ExcCellNotUsed());
-  return lines().user_pointers[this->present_index];
+  return lines().user_pointer(this->present_index);
 }
 
 
@@ -356,7 +356,7 @@ template <int dim>
 void TriaObjectAccessor<2, dim>::set_user_pointer (void *p) const
 {
   Assert (used(), TriaAccessorExceptions::ExcCellNotUsed());
-  quads().user_pointers[this->present_index] = p;
+  quads().user_pointer(this->present_index) = p;
 }
 
 
@@ -365,7 +365,7 @@ template <int dim>
 void TriaObjectAccessor<2, dim>::clear_user_pointer () const
 {
   Assert (used(), TriaAccessorExceptions::ExcCellNotUsed());
-  quads().user_pointers[this->present_index] = 0;
+  quads().user_pointer(this->present_index) = 0;
 }
 
 
@@ -374,7 +374,7 @@ template <int dim>
 void * TriaObjectAccessor<2, dim>::user_pointer () const
 {
   Assert (used(), TriaAccessorExceptions::ExcCellNotUsed());
-  return quads().user_pointers[this->present_index];
+  return quads().user_pointer(this->present_index);
 }
 
 
@@ -828,7 +828,7 @@ template <>
 void TriaObjectAccessor<3, 3>::set_user_pointer (void *p) const
 {
   Assert (used(), TriaAccessorExceptions::ExcCellNotUsed());
-  this->tria->levels[this->present_level]->hexes.user_pointers[this->present_index] = p;
+  this->tria->levels[this->present_level]->hexes.user_pointer(this->present_index) = p;
 }
 
 
@@ -836,7 +836,7 @@ template <>
 void TriaObjectAccessor<3, 3>::clear_user_pointer () const
 {
   Assert (used(), TriaAccessorExceptions::ExcCellNotUsed());
-  this->tria->levels[this->present_level]->hexes.user_pointers[this->present_index] = 0;
+  this->tria->levels[this->present_level]->hexes.user_pointer(this->present_index) = 0;
 }
 
 
@@ -844,7 +844,7 @@ template <>
 void * TriaObjectAccessor<3, 3>::user_pointer () const
 {
   Assert (used(), TriaAccessorExceptions::ExcCellNotUsed());
-  return this->tria->levels[this->present_level]->hexes.user_pointers[this->present_index];
+  return this->tria->levels[this->present_level]->hexes.user_pointer(this->present_index);
 }
 
 #endif

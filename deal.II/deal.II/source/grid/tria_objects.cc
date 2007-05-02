@@ -2,7 +2,7 @@
 //    $Id$
 //    Version: $Name$
 //
-//    Copyright (C) 2006 by the deal.II authors
+//    Copyright (C) 2006, 2007 by the deal.II authors
 //
 //    This file is subject to QPL and may not be  distributed
 //    without copyright and license information. Please refer
@@ -18,14 +18,14 @@
 #include <algorithm>
 #include <functional>
 
-DEAL_II_NAMESPACE_OPEN
+    
 
+DEAL_II_NAMESPACE_OPEN
 
 namespace internal
 {
   namespace Triangulation
-  {
-    
+  {    
     template<>
     void
     TriaObjects<Line>::reserve_space (const unsigned int new_lines)
@@ -63,10 +63,10 @@ namespace internal
 			      new_size-material_id.size(),
 			      255);
 
-          user_pointers.reserve (new_size);
-          user_pointers.insert (user_pointers.end(),
-				new_size-user_pointers.size(),
-				0);
+          user_data.reserve (new_size);
+          user_data.insert (user_data.end(),
+			    new_size-user_data.size(),
+			    UserData());
         };
     }
 
@@ -108,10 +108,10 @@ namespace internal
 			      new_size-material_id.size(),
 			      255);
 
-          user_pointers.reserve (new_size);
-          user_pointers.insert (user_pointers.end(),
-				new_size-user_pointers.size(),
-				0);
+          user_data.reserve (new_size);
+          user_data.insert (user_data.end(),
+			    new_size-user_data.size(),
+			    UserData());
         };
     }
 
@@ -152,10 +152,10 @@ namespace internal
 			      new_size-material_id.size(),
 			      255);
 
-          user_pointers.reserve (new_size);
-          user_pointers.insert (user_pointers.end(),
-				new_size-user_pointers.size(),
-				0);
+          user_data.reserve (new_size);
+          user_data.insert (user_data.end(),
+			    new_size-user_data.size(),
+			    UserData());
 
           face_orientations.reserve (new_size * GeometryInfo<3>::faces_per_cell);
           face_orientations.insert (face_orientations.end(),
@@ -232,8 +232,8 @@ namespace internal
               ExcMemoryInexact (cells.size(), children.size()));
       Assert (cells.size() == material_id.size(),
               ExcMemoryInexact (cells.size(), material_id.size()));
-      Assert (cells.size() == user_pointers.size(),
-              ExcMemoryInexact (cells.size(), user_pointers.size()));
+      Assert (cells.size() == user_data.size(),
+              ExcMemoryInexact (cells.size(), user_data.size()));
     }
 
 
@@ -272,8 +272,8 @@ namespace internal
               ExcMemoryInexact (cells.size(), children.size()));
       Assert (cells.size() == material_id.size(),
               ExcMemoryInexact (cells.size(), material_id.size()));
-      Assert (cells.size() == user_pointers.size(),
-              ExcMemoryInexact (cells.size(), user_pointers.size()));
+      Assert (cells.size() == user_data.size(),
+              ExcMemoryInexact (cells.size(), user_data.size()));
     }
 
 
@@ -311,8 +311,8 @@ namespace internal
               ExcMemoryInexact (cells.size(), children.size()));
       Assert (cells.size() == material_id.size(),
               ExcMemoryInexact (cells.size(), material_id.size()));
-      Assert (cells.size() == user_pointers.size(),
-              ExcMemoryInexact (cells.size(), user_pointers.size()));
+      Assert (cells.size() == user_data.size(),
+              ExcMemoryInexact (cells.size(), user_data.size()));
       Assert (cells.size() * GeometryInfo<3>::faces_per_cell
               == face_orientations.size(),
               ExcMemoryInexact (cells.size() * GeometryInfo<3>::faces_per_cell,
@@ -356,7 +356,8 @@ namespace internal
       used.clear();
       user_flags.clear();
       material_id.clear();
-      user_pointers.clear();
+      user_data.clear();
+      user_data_type = data_unknown;
     }
     
 
@@ -387,7 +388,7 @@ namespace internal
               MemoryConsumption::memory_consumption (used) +
               MemoryConsumption::memory_consumption (user_flags) +
               MemoryConsumption::memory_consumption (material_id) +
-              MemoryConsumption::memory_consumption (user_pointers));
+	      user_data.capacity() * sizeof(UserData) + sizeof(user_data));
     }
   
 

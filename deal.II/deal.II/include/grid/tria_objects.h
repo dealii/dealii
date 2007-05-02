@@ -2,7 +2,7 @@
 //    $Id$
 //    Version: $Name$
 //
-//    Copyright (C) 2006 by the deal.II authors
+//    Copyright (C) 2006, 2007 by the deal.II authors
 //
 //    This file is subject to QPL and may not be  distributed
 //    without copyright and license information. Please refer
@@ -46,13 +46,18 @@ namespace internal
  * classes.
  *
  * @ingroup grid
- * @author Tobias Leicht, 2006
+ * @author Tobias Leicht, Guido Kanschat, 2006, 2007
  */
     
     template <typename G>
     class TriaObjects
     {
       public:
+					 /**
+					  * Constructor resetting some data.
+					  */
+	TriaObjects();
+	
 					 /**
 					  *  Vector of the objects belonging to
 					  *  this level. The index of the object
@@ -127,15 +132,7 @@ namespace internal
 					  * which cell it belongs to.
 					  */
 	std::vector<unsigned char> material_id;
-
-					 /**
-					  * Pointer which is not used by the
-					  * library but may be accessed and set
-					  * by the user to handle data local to
-					  * a line/quad/etc.
-					  */
-	std::vector<void*> user_pointers;
-
+	
                                          /**
                                           *  Assert that enough space is
                                           *  allocated to accomodate
@@ -151,6 +148,34 @@ namespace internal
 					  *  Clear all the data contained in this object.
 					  */
 	void clear();
+
+					 /**
+					  * Access to user pointers.
+					  */
+	void*& user_pointer(const unsigned int i);
+	
+					 /**
+					  * Read-only access to user pointers.
+					  */
+	const void* user_pointer(const unsigned int i) const;
+	
+					 /**
+					  * Access to user indices.
+					  */
+	unsigned int& user_index(const unsigned int i);
+	
+					 /**
+					  * Read-only access to user pointers.
+					  */
+	unsigned int user_index(const unsigned int i) const;
+
+					 /**
+					  * Clear all user pointers or
+					  * indices and reset their
+					  * type, such that the next
+					  * access may be aither or.
+					  */
+	void clear_user_data();
 	
                                          /**
                                           *  Check the memory consistency of the
@@ -179,12 +204,78 @@ namespace internal
                         << arg3 << ".");
                                          /**
                                           *  Exception
+					  * @ingroup Exceptions
                                           */
         DeclException2 (ExcMemoryInexact,
                         int, int,
                         << "The containers have sizes " << arg1 << " and "
                         << arg2 << ", which is not as expected.");
+
+					 /**
+					  * Triangulation objacts can
+					  * either access a user
+					  * pointer or a user
+					  * index. What you tried to
+					  * do is trying to access one
+					  * of those after using the
+					  * other.
+					  *
+					  * @ingroup Exceptions
+					  */
+	DeclException0 (ExcPointerIndexClash);
 	
+      protected:
+					 /**
+					  * The data type storing user
+					  * pointers or user indices.
+					  */
+	union UserData
+	{
+					     /// The entry used as user pointer.
+	    void* p;
+					     /// The entry used as user index.
+	    unsigned int i;
+					     /// Default constructor
+	    UserData()
+	      {
+		p = 0;
+	      }
+	};
+
+					 /**
+					  * Enum descibing the
+					  * possible types of
+					  * userdata.
+					  */
+	enum UserDataType
+	{
+					       /// No userdata used yet.
+	      data_unknown,
+					       /// UserData contains pointers.
+	      data_pointer,
+					       /// UserData contains indices.
+	      data_index
+	};
+	
+	
+					 /**
+					  * Pointer which is not used by the
+					  * library but may be accessed and set
+					  * by the user to handle data local to
+					  * a line/quad/etc.
+					  */
+	std::vector<UserData> user_data;
+					 /**
+					  * In order to avoid
+					  * confusion between user
+					  * pointers and indices, this
+					  * enum is set by the first
+					  * function accessing either
+					  * and subsequent access will
+					  * not be allowed to change
+					  * the type of data accessed.
+					  */
+	mutable UserDataType user_data_type;	
     };
 
 /**
@@ -342,9 +433,76 @@ namespace internal
                                           */
         unsigned int memory_consumption () const;	    
     };
+
+    template<typename G>
+    void*& TriaObjects<G>::user_pointer (const unsigned int i)
+    {
+#ifdef DEBUG
+      Assert(user_data_type == data_unknown || user_data_type == data_pointer,
+	     ExcPointerIndexClash());
+      user_data_type = data_pointer;
+#endif
+      Assert(i<user_data.size(), ExcIndexRange(i,0,user_data.size()));
+      return user_data[i].p;
+    }
+    
+
+    template<typename G>
+    const void* TriaObjects<G>::user_pointer (const unsigned int i) const
+    {
+#ifdef DEBUG
+      Assert(user_data_type == data_unknown || user_data_type == data_pointer,
+	     ExcPointerIndexClash());
+      user_data_type = data_pointer;
+#endif
+      Assert(i<user_data.size(), ExcIndexRange(i,0,user_data.size()));
+      return user_data[i].p;
+    }
+    
+
+    template<typename G>
+    unsigned int& TriaObjects<G>::user_index (const unsigned int i)
+    {
+#ifdef DEBUG
+      Assert(user_data_type == data_unknown || user_data_type == data_index,
+	     ExcPointerIndexClash());
+      user_data_type = data_index;
+#endif
+      Assert(i<user_data.size(), ExcIndexRange(i,0,user_data.size()));
+      return user_data[i].i;
+    }
+    
+    template <typename G>
+    TriaObjects<G>::TriaObjects()
+		    :
+		    user_data_type(data_unknown)
+    {}    
+
+    template<typename G>
+    unsigned int TriaObjects<G>::user_index (const unsigned int i) const
+    {
+#ifdef DEBUG
+      Assert(user_data_type == data_unknown || user_data_type == data_index,
+	     ExcPointerIndexClash());
+      user_data_type = data_index;
+#endif
+      Assert(i<user_data.size(), ExcIndexRange(i,0,user_data.size()));
+      return user_data[i].i;
+    }
+    
+    
+    template<typename G>
+    void TriaObjects<G>::clear_user_data ()
+    {
+      user_data_type = data_unknown;
+      for (unsigned int i=0;i<user_data.size();++i)
+	user_data[i].p = 0;
+    }
     
   }
 }
+
+
 
 DEAL_II_NAMESPACE_CLOSE
 
