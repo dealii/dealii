@@ -1,20 +1,18 @@
-//----------------------------  interpolate_boundary_values_01.cc  ---------------------------
+//----------------------------------------------------------------------
 //    $Id$
 //    Version: $Name$ 
 //
-//    Copyright (C) 2006 by the deal.II authors
+//    Copyright (C) 2006, 2007 by the deal.II authors
 //
 //    This file is subject to QPL and may not be  distributed
 //    without copyright and license information. Please refer
 //    to the file deal.II/doc/license.html for the  text  and
 //    further information on this license.
 //
-//----------------------------  interpolate_boundary_values_01.cc  ---------------------------
+//----------------------------------------------------------------------
 
 
-// somewhat like anna_4, except that we try to get boundary values for
-// the continuous component a RT x Q1 element. this presently gives an
-// exception, but shouldn't
+// Interpolate the dofs of the Q1 part of an RT0/Q1 element
 
 #include "../tests.h"
 #include <base/function.h>
@@ -35,7 +33,7 @@
                                  // We need a FESystem
 #include <fe/fe_system.h>
 
-                                 // we need DG-elements
+                                 // we need RT-elements
                                  // and Q1-elements
 #include <fe/fe_q.h>
 #include <fe/fe_raviart_thomas.h>
@@ -66,8 +64,9 @@ void VectorBoundaryValues<dim>::vector_value (const Point<dim> &,
 {
   Assert (values.size() == dim+1,
           ExcDimensionMismatch (values.size(), dim+1));
-
-  values = 13;
+  
+  for (unsigned int d=0;d<dim+1;++d)
+    values(d) = 13.;//+d;
 }
 
 
