@@ -158,6 +158,7 @@ void MGTransferPrebuilt<number>::build_matrices (
   std::vector<unsigned int> level_dof_indices  (dofs_per_cell);
   for (int level=mg_dof.get_tria().n_levels()-1; level>=0; --level)
     {
+      copy_indices[level].clear();
       typename MGDoFHandler<dim>::active_cell_iterator
 	level_cell = mg_dof.begin_active(level);
       const typename MGDoFHandler<dim>::active_cell_iterator
