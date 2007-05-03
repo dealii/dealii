@@ -499,6 +499,17 @@ class ConstraintMatrix : public Subscriptor
 				      * The constraint matrix object
 				      * must be closed to call this
 				      * function.
+				      *
+				      * @note The hanging nodes are
+				      * completely eliminated from the
+				      * linear system refering to
+				      * <tt>condensed</tt>. Therefore,
+				      * the dimension of
+				      * <tt>condensed</tt> is the
+				      * dimension of
+				      * <tt>uncondensed</tt> minus the
+				      * number of constraint degrees
+				      * of freedom.
 				      */
     void condense (const SparsityPattern &uncondensed,
 		   SparsityPattern       &condensed) const;
