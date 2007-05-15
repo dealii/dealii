@@ -1378,7 +1378,10 @@ namespace internal
 
       
                                        /**
-                                        * This method removes zero
+					* Copy constraints into a constraint
+					* matrix object.
+					*
+                                        * This function removes zero
                                         * constraints and those, which
                                         * constrain a DoF which was
                                         * already eliminated in one of
