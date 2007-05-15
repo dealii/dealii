@@ -667,7 +667,25 @@ GridTools::find_cells_adjacent_to_vertex(const Container<dim> &container,
 				     break;
 				   }
 			       if (!found)
-                                 adjacent_cells.push_back(nb);
+							  // The
+							  // coarser
+							  // cell
+							  // needs to
+							  // be added
+							  // only
+							  // once. In
+							  // order to
+							  // do so, we
+							  // add it
+							  // only if
+							  // the
+							  // current
+							  // cell face
+							  // is child
+							  // zero of
+							  // its face.
+				 if(cell->neighbor_of_coarser_neighbor(face).second == 0)
+				   adjacent_cells.push_back(nb);
 			     }
 		       }
                   }
