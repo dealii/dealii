@@ -20,6 +20,7 @@
 #include <grid/tria.h>
 #include <grid/tria_iterator.h>
 #include <grid/intergrid_map.h>
+#include <grid/grid_tools.h>
 #include <dofs/dof_handler.h>
 #include <dofs/dof_accessor.h>
 #include <dofs/dof_constraints.h>
@@ -163,6 +164,108 @@ DoFTools::make_sparsity_pattern (
 	  if (dof_mask[fe_index][i][j] == true)
 	    sparsity.add (dofs_on_this_cell[i],
 			  dofs_on_this_cell[j]);
+    }
+}
+
+
+
+template <class DH, class SparsityPattern>
+void
+DoFTools::make_sparsity_pattern (
+  const DH        &dof_row,
+  const DH        &dof_col,
+  SparsityPattern &sparsity)
+{
+  const unsigned int n_dofs_row = dof_row.n_dofs();
+  const unsigned int n_dofs_col = dof_col.n_dofs();
+
+  Assert (sparsity.n_rows() == n_dofs_row,
+          ExcDimensionMismatch (sparsity.n_rows(), n_dofs_row));
+  Assert (sparsity.n_cols() == n_dofs_col,
+          ExcDimensionMismatch (sparsity.n_cols(), n_dofs_col));
+
+
+  const std::list<std::pair<typename DH::cell_iterator,
+                            typename DH::cell_iterator> >
+    cell_list
+    = GridTools::get_finest_common_cells (dof_row, dof_col);
+
+
+  typename std::list<std::pair<typename DH::cell_iterator,
+                               typename DH::cell_iterator> >
+    ::const_iterator
+    cell_iter = cell_list.begin();
+
+  for (; cell_iter!=cell_list.end(); ++cell_iter)
+    {
+      const typename DH::cell_iterator cell_row = cell_iter->first;
+      const typename DH::cell_iterator cell_col = cell_iter->second;
+
+      if (!cell_row->has_children() && !cell_col->has_children())
+        {
+          const unsigned int dofs_per_cell_row =
+	    cell_row->get_fe().dofs_per_cell;
+          const unsigned int dofs_per_cell_col =
+	    cell_col->get_fe().dofs_per_cell;
+          std::vector<unsigned int>
+	    local_dof_indices_row(dofs_per_cell_row);
+          std::vector<unsigned int>
+	    local_dof_indices_col(dofs_per_cell_col);
+          cell_row->get_dof_indices (local_dof_indices_row);
+          cell_col->get_dof_indices (local_dof_indices_col);
+          for (unsigned int i=0; i<dofs_per_cell_row; ++i)
+            for (unsigned int j=0; j<dofs_per_cell_col; ++j)
+              sparsity.add (local_dof_indices_row[i],
+                            local_dof_indices_col[j]);
+        }
+      else if (cell_row->has_children())
+        {
+          const std::vector<typename DH::active_cell_iterator >
+	    child_cells = GridTools::get_active_child_cells<DH> (cell_row);
+          for (unsigned int i=0; i<child_cells.size(); i++)
+            {
+	      const typename DH::active_cell_iterator
+		cell_row_child = child_cells[i];
+              const unsigned int dofs_per_cell_row =
+		cell_row_child->get_fe().dofs_per_cell;
+              const unsigned int dofs_per_cell_col =
+		cell_col->get_fe().dofs_per_cell;
+              std::vector<unsigned int>
+		local_dof_indices_row(dofs_per_cell_row);
+              std::vector<unsigned int>
+		local_dof_indices_col(dofs_per_cell_col);
+              cell_row_child->get_dof_indices (local_dof_indices_row);
+              cell_col->get_dof_indices (local_dof_indices_col);
+              for (unsigned int i=0; i<dofs_per_cell_row; ++i)
+                for (unsigned int j=0; j<dofs_per_cell_col; ++j)
+                  sparsity.add (local_dof_indices_row[i],
+                                local_dof_indices_col[j]);
+            }
+        }
+      else
+        {
+          std::vector<typename DH::active_cell_iterator>
+	    child_cells = GridTools::get_active_child_cells<DH> (cell_col);
+          for (unsigned int i=0; i<child_cells.size(); i++)
+            {
+	      const typename DH::active_cell_iterator
+		cell_col_child = child_cells[i];
+              const unsigned int dofs_per_cell_row =
+		cell_row->get_fe().dofs_per_cell;
+              const unsigned int dofs_per_cell_col =
+		cell_col_child->get_fe().dofs_per_cell;
+              std::vector<unsigned int>
+		local_dof_indices_row(dofs_per_cell_row);
+              std::vector<unsigned int>
+		local_dof_indices_col(dofs_per_cell_col);
+              cell_row->get_dof_indices (local_dof_indices_row);
+              cell_col_child->get_dof_indices (local_dof_indices_col);
+              for (unsigned int i=0; i<dofs_per_cell_row; ++i)
+                for (unsigned int j=0; j<dofs_per_cell_col; ++j)
+                  sparsity.add (local_dof_indices_row[i],
+                                local_dof_indices_col[j]);
+            }
+        }
     }
 }
 
@@ -964,7 +1067,9 @@ namespace internal
 		ExcInternalError());
 	Assert (fe2.dofs_per_line <= fe1.dofs_per_line,
 		ExcInternalError());
-	Assert (fe2.dofs_per_quad <= fe1.dofs_per_quad,
+	Assert ((dim < 3)
+		||
+		(fe2.dofs_per_quad <= fe1.dofs_per_quad),
 		ExcInternalError());
 
 					 // the idea here is to designate as
@@ -1387,6 +1492,11 @@ namespace internal
                                         * already eliminated in one of
                                         * the previous steps of the hp
                                         * hanging node procedure.
+                                       *
+                                       * It also suppresses very small
+                                       * entries in the constraint matrix to
+                                       * avoid making the sparsity pattern
+                                       * fuller than necessary.
                                         */
 #ifdef DEAL_II_ANON_NAMESPACE_BUG
       static
@@ -1426,10 +1536,36 @@ namespace internal
                     }
 
               if (constraint_already_satisfied == false)
-                { 
+                {
+                                                  // add up the absolute
+                                                  // values of all
+                                                  // constraints in this line
+                                                  // to get a measure of
+                                                  // their absolute size
+                 double abs_sum = 0;
+                 for (unsigned int i=0; i<n_master_dofs; ++i)
+                   abs_sum += std::abs (face_constraints(row,i));
+                 
+                                                  // then enter those
+                                                  // constraints that are
+                                                  // larger than
+                                                  // 1e-14*abs_sum. everything
+                                                  // else probably originated
+                                                  // from inexact inversion
+                                                  // of matrices and similar
+                                                  // effects. having those
+                                                  // constraints in here will
+                                                  // only lead to problems
+                                                  // because it makes
+                                                  // sparsity patterns fuller
+                                                  // than necessary without
+                                                  // producing any
+                                                  // significant effect
                   constraints.add_line (slave_dofs[row]);
                   for (unsigned int i=0; i<n_master_dofs; ++i)
-                    if (face_constraints(row,i) != 0)
+                    if ((face_constraints(row,i) != 0)
+                       &&
+                       (std::fabs(face_constraints(row,i)) >= 1e-14*abs_sum))
                       {
 #ifdef WOLFGANG
                         std::cout << "   " << slave_dofs[row]
@@ -2489,17 +2625,58 @@ namespace internal
 						       // (this is what
 						       // happens in
 						       // hp/hp_hanging_nodes_01
-						       // for example); check
-						       // the latter somewhat
-						       // crudely by comparing
-						       // fe names
-		      if (cell->get_fe().get_name() !=
-			  cell->neighbor(face)->get_fe().get_name())
+						       // for example).
+						       //
+						       // another possibility
+						       // is what happens in
+						       // crash_13. there, we
+						       // have
+						       // FESystem(FE_Q(1),FE_DGQ(0))
+						       // vs. FESystem(FE_Q(1),FE_DGQ(1)).
+						       // neither of them
+						       // dominates the
+						       // other. the point is
+						       // that it doesn't
+						       // matter, since
+						       // hopefully for this
+						       // case, both sides'
+						       // dofs should have
+						       // been unified.
+						       //
+						       // make sure this is
+						       // actually true. this
+						       // actually only
+						       // matters, of course,
+						       // if either of the two
+						       // finite elements
+						       // actually do have
+						       // dofs on the face
+		      if ((cell->get_fe().dofs_per_face != 0)
+			  ||
+			  (cell->neighbor(face)->get_fe().dofs_per_face != 0))
 			{
-			  Assert (cell->get_fe().dofs_per_face == 0,
+			  Assert (cell->get_fe().dofs_per_face
+				  ==
+				  cell->neighbor(face)->get_fe().dofs_per_face,
 				  ExcNotImplemented());
-			  Assert (cell->neighbor(face)->get_fe().dofs_per_face == 0,
-				  ExcNotImplemented());
+
+							   // (ab)use the master
+							   // and slave dofs
+							   // arrays for a
+							   // moment here
+			  master_dofs.resize (cell->get_fe().dofs_per_face);
+			  cell->face(face)
+			    ->get_dof_indices (master_dofs,
+					       cell->active_fe_index ());
+
+			  slave_dofs.resize (cell->neighbor(face)->get_fe().dofs_per_face);
+			  cell->face(face)
+			    ->get_dof_indices (slave_dofs,
+					       cell->neighbor(face)->active_fe_index ());
+
+			  for (unsigned int i=0; i<cell->get_fe().dofs_per_face; ++i)
+			    Assert (master_dofs[i] == slave_dofs[i],
+				    ExcInternalError());
 			}
 		      
 		      break;
@@ -3278,7 +3455,7 @@ DoFTools::extract_hanging_node_dofs (const DoFHandler<2> &dof_handler,
   Assert(selected_dofs.size() == dof_handler.n_dofs(),
 	 ExcDimensionMismatch(selected_dofs.size(), dof_handler.n_dofs()));
 				   // preset all values by false
-  fill_n (selected_dofs.begin(), dof_handler.n_dofs(), false);
+  std::fill_n (selected_dofs.begin(), dof_handler.n_dofs(), false);
 
   const FiniteElement<dim> &fe   = dof_handler.get_fe();
 
@@ -4894,6 +5071,58 @@ DoFTools::make_sparsity_pattern<hp::DoFHandler<deal_II_dimension>,
 (const hp::DoFHandler<deal_II_dimension>&,
  const Table<2,Coupling>&,
  CompressedBlockSparsityPattern&);
+
+
+template void
+DoFTools::make_sparsity_pattern<DoFHandler<deal_II_dimension>,
+				SparsityPattern>
+(const DoFHandler<deal_II_dimension> &dof_row,
+ const DoFHandler<deal_II_dimension> &dof_col,
+ SparsityPattern    &sparsity);
+template void
+DoFTools::make_sparsity_pattern<DoFHandler<deal_II_dimension>,
+				CompressedSparsityPattern>
+(const DoFHandler<deal_II_dimension> &dof_row,
+ const DoFHandler<deal_II_dimension> &dof_col,
+ CompressedSparsityPattern    &sparsity);
+template void
+DoFTools::make_sparsity_pattern<DoFHandler<deal_II_dimension>,
+				BlockSparsityPattern>
+(const DoFHandler<deal_II_dimension> &dof_row,
+ const DoFHandler<deal_II_dimension> &dof_col,
+ BlockSparsityPattern                &sparsity);
+template void
+DoFTools::make_sparsity_pattern<DoFHandler<deal_II_dimension>,
+				CompressedBlockSparsityPattern>
+(const DoFHandler<deal_II_dimension> &dof_row,
+ const DoFHandler<deal_II_dimension> &dof_col,
+ CompressedBlockSparsityPattern      &sparsity);
+
+template void
+DoFTools::make_sparsity_pattern<hp::DoFHandler<deal_II_dimension>,
+				SparsityPattern>
+(const hp::DoFHandler<deal_II_dimension> &dof_row,
+ const hp::DoFHandler<deal_II_dimension> &dof_col,
+ SparsityPattern    &sparsity);
+template void
+DoFTools::make_sparsity_pattern<hp::DoFHandler<deal_II_dimension>,
+				CompressedSparsityPattern>
+(const hp::DoFHandler<deal_II_dimension> &dof_row,
+ const hp::DoFHandler<deal_II_dimension> &dof_col,
+ CompressedSparsityPattern    &sparsity);
+template void
+DoFTools::make_sparsity_pattern<hp::DoFHandler<deal_II_dimension>,
+				BlockSparsityPattern>
+(const hp::DoFHandler<deal_II_dimension> &dof_row,
+ const hp::DoFHandler<deal_II_dimension> &dof_col,
+ BlockSparsityPattern                &sparsity);
+template void
+DoFTools::make_sparsity_pattern<hp::DoFHandler<deal_II_dimension>,
+				CompressedBlockSparsityPattern>
+(const hp::DoFHandler<deal_II_dimension> &dof_row,
+ const hp::DoFHandler<deal_II_dimension> &dof_col,
+ CompressedBlockSparsityPattern      &sparsity);
+
 
 // #if deal_II_dimension > 1
 template void
