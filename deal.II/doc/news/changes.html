@@ -1033,6 +1033,23 @@ inconvenience this causes.
 <h3>deal.II</h3>
 
 <ol>
+   <li> <p>Fixed: the function
+       <code>GridTools::find_cells_adjacent_to_vertex</code> 
+       was not detecting properly the coarse cells adjacent to
+       refined cells.
+       <br>
+       (Luca Heltai 2007/05/15)
+       </p>
+
+   <li> <p>Fixed: the two tools
+       <code>DoFTools::count_dofs_per_component</code> and
+       <code>DoFTools::count_dofs_per_block</code> where changing the
+       size of the destination vector. Consistently with (most of) the 
+       rest of the library, now the vectors are expected to be the 
+       right size before calling these functions. 
+       <br>
+       (Luca Heltai 2007/05/15)
+       </p>
 
   <li> <p>New: The classes <code
   class="class">MGTransferBlockSelect</code> and <code

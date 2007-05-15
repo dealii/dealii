@@ -481,46 +481,6 @@ class DoFTools
     make_sparsity_pattern (const DH                              &dof,
 			   const std::vector<std::vector<bool> > &mask,
 			   SparsityPattern                       &sparsity_pattern);
-
-				     /**
-				      * Construct a sparsity pattern that
-				      * allows coupling degrees of freedom on
-				      * two different but related meshes.
-				      *
-				      * The idea is that if the two given
-				      * DoFHandler objects correspond to two
-				      * different meshes (and potentially to
-				      * different finite elements used on
-				      * these cells), but that if the two
-				      * triangulations they are based on are
-				      * derived from the same coarse mesh
-				      * through hierarchical refinement, then
-				      * one may set up a problem where one
-				      * would like to test shape functions
-				      * from one mesh against the shape
-				      * functions from another mesh. In
-				      * particular, this means that shape
-				      * functions from a cell on the first
-				      * mesh are tested against those on the
-				      * second cell that are located on the
-				      * corresponding cell; this
-				      * correspondence is something that the
-				      * IntergridMap class can determine.
-				      *
-				      * This function then constructs a
-				      * sparsity pattern for which the degrees
-				      * of freedom that represent the rows
-				      * come from the first given DoFHandler,
-				      * whereas the ones that correspond to
-				      * columns come from the second
-				      * DoFHandler.
-				      */
-    template <class DH, class SparsityPattern>
-    static
-    void
-    make_sparsity_pattern (const DH        &dof_row,
-			   const DH        &dof_col,
-			   SparsityPattern &sparsity);
     
     				     /**
 				      * Create the sparsity pattern for
@@ -1103,8 +1063,17 @@ class DoFTools
 				      * velocities into one block, and
 				      * the pressure into another).
 				      *
-				      * The result is returned in
-				      * @p dofs_per_component.
+				      * The result is returned in @p
+				      * dofs_per_component. Note that
+				      * the size of @p
+				      * dofs_per_component needs to be
+				      * enough to hold all the indices
+				      * specified in @p
+				      * target_component. If this is
+				      * not the case, an assertion is
+				      * thrown. The indices not
+				      * targetted by target_components
+				      * are left untouched.
 				      */
     template <int dim>
     static void
@@ -1123,7 +1092,11 @@ class DoFTools
 				      * counting is done by
 				      * blocks. See @ref GlossBlock
 				      * "blocks" in the glossary for
-				      * details.
+				      * details. Again the vectors are
+				      * assumed to have the correct
+				      * size before calling this
+				      * function. If this is not the
+				      * case, an assertion is thrown.
 				      */
     template <int dim>
     static void
@@ -1150,7 +1123,7 @@ class DoFTools
 				      * This function can be used when
 				      * different variables shall be
 				      * discretized on different
-				      * grids, where one grid is
+	 			      * grids, where one grid is
 				      * coarser than the other. This
 				      * idea might seem nonsensical at
 				      * first, but has reasonable

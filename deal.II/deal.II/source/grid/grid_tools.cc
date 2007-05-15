@@ -625,7 +625,7 @@ GridTools::find_cells_adjacent_to_vertex(const Container<dim> &container,
                                    // all faces to which this vertex
                                    // belongs, check the level of
                                    // the neighbor, and if it is coarser,
-                                   // then check whether the vortex is
+                                   // then check whether the vertex is
                                    // part of that neighbor or not.
                for (unsigned vface = 0; vface < dim; vface++)
                   {
@@ -661,7 +661,7 @@ GridTools::find_cells_adjacent_to_vertex(const Container<dim> &container,
 			     {
 			       bool found = false;
 			       for (unsigned v=0; v<GeometryInfo<dim>::vertices_per_cell; v++)
-                                 if (cell->vertex_index(v) == (int)vertex)
+                                 if (nb->vertex_index(v) == (int)vertex)
 				   {
 				     found = true;
 				     break;
