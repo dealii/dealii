@@ -622,7 +622,7 @@ void TATForwardProblem<dim>::run ()
       
 
       detector_data << time;
-      for (unsigned i=0 ; i<=detector_locations.size(); ++i)
+      for (unsigned int i=0 ; i<detector_locations.size(); ++i)
 	detector_data << " "
 		      << VectorTools::point_value (dof_handler,
 						   solution_p, 
