@@ -1483,9 +1483,9 @@ namespace internal
 
       
                                        /**
-					* Copy constraints into a constraint
-					* matrix object.
-					*
+                                       * Copy constraints into a constraint
+                                       * matrix object.
+                                       *
                                         * This function removes zero
                                         * constraints and those, which
                                         * constrain a DoF which was
@@ -3676,6 +3676,9 @@ DoFTools::count_dofs_per_component (
 {
   const FiniteElement<dim>& fe = dof_handler.get_fe();
   const unsigned int n_components = fe.n_components();
+  dofs_per_component.resize (n_components);
+  std::fill (dofs_per_component.begin(), dofs_per_component.end(), 0U);
+  
 				   // If the empty vector was given as
 				   // default argument, set up this
 				   // vector as identity.
@@ -3688,21 +3691,6 @@ DoFTools::count_dofs_per_component (
   
   Assert(target_component.size()==n_components,
 	 ExcDimensionMismatch(target_component.size(),n_components));
-  
-
-				   // Check that target components
-				   // contains sensible information
-				   // and reset the counters for
-				   // dofs_per_component
-  unsigned int size_dst = dofs_per_component.size();
-  for(unsigned int i=0; i<n_components; ++i) {
-    Assert(target_component[i] < size_dst,
-	   ExcIndexRange(target_component[i],
-			 0,
-			 size_dst));
-    dofs_per_component[target_component[i]] = 0;
-  }
-
 
 				   // special case for only one
 				   // component. treat this first
@@ -3710,11 +3698,11 @@ DoFTools::count_dofs_per_component (
 				   // computations
   if (n_components == 1)
     {
-      dofs_per_component[target_component[0]] = dof_handler.n_dofs();
+      dofs_per_component[0] = dof_handler.n_dofs();
       return;
     }
 
-  
+      
 				   // otherwise determine the number
 				   // of dofs in each component
 				   // separately. do so in parallel
@@ -3737,8 +3725,7 @@ DoFTools::count_dofs_per_component (
                                           dofs_in_component[i], false);
     };
   threads.join_all ();
-  
-  unsigned int total_count = 0;
+
 				   // next count what we got
   unsigned int component = 0;
   for (unsigned int b=0;b<fe.n_base_elements();++b)
@@ -3751,15 +3738,11 @@ DoFTools::count_dofs_per_component (
 	{
 	  for (unsigned int dd=0;dd<d;++dd)
 	    {
-	      if (base.is_primitive() || (!only_once || dd==0)) {
-		unsigned int this_count = 
-		  std::count(dofs_in_component[component].begin(),
-			     dofs_in_component[component].end(),
-			     true);
-		dofs_per_component[target_component[component]]
-		  += this_count;
-		total_count += this_count;
-	      }
+	      if (base.is_primitive() || (!only_once || dd==0))
+	      dofs_per_component[target_component[component]]
+		+= std::count(dofs_in_component[component].begin(),
+			      dofs_in_component[component].end(),
+			      true);
 	      ++component;
 	    }
 	}
@@ -3769,11 +3752,12 @@ DoFTools::count_dofs_per_component (
 				   // only valid if the finite element
 				   // is actually primitive, so
 				   // exclude other elements from this
-
   Assert (!dof_handler.get_fe().is_primitive()
           ||
-          (total_count == dof_handler.n_dofs()),
-	  ExcDimensionMismatch(total_count, dof_handler.n_dofs()));
+          (std::accumulate (dofs_per_component.begin(),
+                            dofs_per_component.end(), 0U)
+           == dof_handler.n_dofs()),
+	  ExcInternalError());
 }
 
 
@@ -3786,7 +3770,8 @@ DoFTools::count_dofs_per_block (
 {
   const FiniteElement<dim>& fe = dof_handler.get_fe();
   const unsigned int n_blocks = fe.n_blocks();
-  unsigned int size_dst = dofs_per_block.size();
+  dofs_per_block.resize (n_blocks);
+  std::fill (dofs_per_block.begin(), dofs_per_block.end(), 0U);
   
 				   // If the empty vector was given as
 				   // default argument, set up this
@@ -3800,22 +3785,14 @@ DoFTools::count_dofs_per_block (
   
   Assert(target_block.size()==n_blocks,
 	 ExcDimensionMismatch(target_block.size(),n_blocks));
-  
-				   // Check constistency and reset
-				   // counters
-  for(unsigned int i=0; i<n_blocks; ++i) {
-    Assert(target_block[i] < size_dst,
-	   ExcIndexRange(target_block[i], 0, size_dst));
-    dofs_per_block[target_block[i]] = 0;
-  }
-  
+
 				   // special case for only one
 				   // block. treat this first
 				   // since it does not require any
 				   // computations
   if (n_blocks == 1)
     {
-      dofs_per_block[target_block[0]] = dof_handler.n_dofs();
+      dofs_per_block[0] = dof_handler.n_dofs();
       return;
     } 
 				   // otherwise determine the number
