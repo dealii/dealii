@@ -87,7 +87,8 @@ tests_x = grid_generator_?? \
 	  refine_and_coarsen_* \
 	  tria_crash_* \
 	  face_orientation_* \
-	  max_n_cells_*
+	  max_n_cells_* \
+	  joa_*
 
 # tests for the hp branch:
 #	  fe_collection_*
