@@ -127,7 +127,15 @@ class SubCellData;
  * <li> <tt>Tecplot</tt> format: this format is used by @p TECPLOT and often
  * serves as a basis for data exchange between different applications. Note,
  * that currently only the ASCII format is supported, binary data cannot be
- * read.  </ul>
+ * read.
+ *
+ * <li> <tt>Cubit</tt> format: deal.II doesn't directly support importing from
+ * Cubit at this time. However, Cubit can export in UCD format using a simple
+ * plugin, and the resulting UCD file can then be read by this class. The
+ * plugin script can be found on the deal.II wiki page,
+ * http://www-dimat.unipv.it/heltai/wikideal/index.php/Main_Page, in the
+ * section on external tools.
+ * </ul>
  *
  *
  * <h3>Structure of input grid data. The GridReordering class</h3>
