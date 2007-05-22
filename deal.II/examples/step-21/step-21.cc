@@ -12,7 +12,7 @@
 /*    further information on this license.                        */
 
                                  // This program is an adaptation of step-20
-                                 // and includes some technique of DG method
+                                 // and includes some technique of DG methods
                                  // from step-12. A good part of the program
                                  // is therefore very similar to step-20 and
                                  // we will not comment again on these
