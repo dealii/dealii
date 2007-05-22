@@ -290,6 +290,22 @@ namespace PETScWrappers
                                      // honor the initial guess in the
                                      // solution vector. do so here as well:
     KSPSetInitialGuessNonzero (ksp, PETSC_TRUE);
+
+				     // Hand over the absolute
+				     // tolerance and the maximum
+				     // iteration number to the PETSc
+				     // convergence criterion. The
+				     // custom deal.II SolverControl
+				     // object is ignored by the PETSc
+				     // Richardson method (when no
+				     // PETSc monitoring is present),
+				     // since in this case PETSc
+				     // uses a faster version of
+				     // the Richardson iteration,
+				     // where no residual is
+				     // available.
+    KSPSetTolerances(ksp, PETSC_DEFAULT, this->solver_control.tolerance(),
+		     PETSC_DEFAULT, this->solver_control.max_steps());
   }
   
 
