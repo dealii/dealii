@@ -954,10 +954,9 @@ void TwoPhaseFlowProblem<dim>::assemble_system ()
       for (unsigned int i=0; i<dofs_per_cell; ++i)
       
         for (unsigned int j=0; j<dofs_per_cell; ++j)
-          {    system_matrix.add (local_dof_indices[i],
-                                  local_dof_indices[j],
-                                  local_matrix(i,j));
-          }
+	  system_matrix.add (local_dof_indices[i],
+			     local_dof_indices[j],
+			     local_matrix(i,j));
       
       for (unsigned int i=0; i<dofs_per_cell; ++i)
         system_rhs(local_dof_indices[i]) += local_rhs(i);
