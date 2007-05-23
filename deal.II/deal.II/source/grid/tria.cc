@@ -2124,10 +2124,18 @@ void Triangulation<dim>::load_coarsen_flags (const std::vector<bool> &v)
 #if deal_II_dimension == 1
 
 template <>
-void Triangulation<1>::clear_user_pointers ()
+void Triangulation<1>::clear_user_data ()
 {
   for (unsigned int level=0;level<levels.size();++level)
     levels[level]->lines.clear_user_data();
+}
+
+
+
+template <>
+void Triangulation<1>::clear_user_pointers ()
+{
+  clear_user_data
 }
 
 
@@ -2156,11 +2164,19 @@ void Triangulation<1>::clear_user_flags_hex ()
 #if deal_II_dimension == 2
 
 template <>
-void Triangulation<2>::clear_user_pointers ()
+void Triangulation<2>::clear_user_data ()
 {
   for (unsigned int level=0;level<levels.size();++level)
     levels[level]->quads.clear_user_data();
   faces->lines.clear_user_data();
+}
+
+
+
+template <>
+void Triangulation<2>::clear_user_pointers ()
+{
+  clear_user_data();
 }
 
 
@@ -2185,12 +2201,20 @@ void Triangulation<2>::clear_user_flags_hex ()
 #if deal_II_dimension == 3
 
 template <>
-void Triangulation<3>::clear_user_pointers ()
+void Triangulation<3>::clear_user_data ()
 {
   for (unsigned int level=0;level<levels.size();++level)
     levels[level]->hexes.clear_user_data();
   faces->quads.clear_user_data();
   faces->lines.clear_user_data();
+}
+
+
+
+template <>
+void Triangulation<3>::clear_user_pointers ()
+{
+  clear_user_data();
 }
 
 
@@ -2596,6 +2620,209 @@ void Triangulation<dim>::load_user_flags_hex (const std::vector<bool> &v)
 }
 
 
+
+template <int dim>
+void Triangulation<dim>::save_user_indices (std::vector<unsigned int> &v) const
+{
+				   // clear vector and append all the
+				   // stuff later on
+  v.clear ();
+
+  std::vector<unsigned int> tmp;
+
+  save_user_indices_line (tmp);
+  v.insert (v.end(), tmp.begin(), tmp.end());
+
+  if (dim >= 2)
+    {
+      save_user_indices_quad (tmp);
+      v.insert (v.end(), tmp.begin(), tmp.end());
+    }
+  
+  if (dim >= 3)
+    {
+      save_user_indices_hex (tmp);
+      v.insert (v.end(), tmp.begin(), tmp.end());
+    }      
+
+  if (dim >= 4)
+    Assert (false, ExcNotImplemented());
+}
+
+
+
+template <int dim>
+void Triangulation<dim>::load_user_indices (const std::vector<unsigned int> &v)
+{
+  Assert (v.size() == n_lines()+n_quads()+n_hexs(), ExcInternalError());
+  std::vector<unsigned int> tmp;
+
+				   // first extract the indices
+				   // belonging to lines
+  tmp.insert (tmp.end(),
+	      v.begin(), v.begin()+n_lines());
+				   // and set the lines
+  load_user_indices_line (tmp);
+
+  if (dim >= 2)
+    {
+      tmp.clear ();
+      tmp.insert (tmp.end(),
+		  v.begin()+n_lines(), v.begin()+n_lines()+n_quads());
+      load_user_indices_quad (tmp);
+    }
+  
+  if (dim >= 3)
+    {
+      tmp.clear ();
+      tmp.insert (tmp.end(),
+		  v.begin()+n_lines()+n_quads(), v.begin()+n_lines()+n_quads()+n_hexs());
+      load_user_indices_hex (tmp);
+    }      
+
+  if (dim >= 4)
+    Assert (false, ExcNotImplemented());
+}
+
+
+
+template <int dim>
+void Triangulation<dim>::save_user_indices_line (std::vector<unsigned int> &v) const
+{
+  v.resize (n_lines(), 0);
+  std::vector<unsigned int>::iterator  i = v.begin();
+  line_iterator line = begin_line(),
+		endl = end_line();
+  for (; line!=endl; ++line, ++i)
+    *i = line->user_index();
+}
+
+
+
+template <int dim>
+void Triangulation<dim>::load_user_indices_line (const std::vector<unsigned int> &v)
+{
+  Assert (v.size() == n_lines(), ExcGridReadError());
+  
+  line_iterator line = begin_line(),
+		endl = end_line();
+  std::vector<unsigned int>::const_iterator i = v.begin();
+  for (; line!=endl; ++line, ++i)
+    line->set_user_index(*i);
+}
+
+#if deal_II_dimension == 1
+
+
+template <>
+void Triangulation<1>::save_user_indices_quad (std::vector<unsigned int> &) const
+{
+  Assert (false, ExcImpossibleInDim(1));
+}
+
+
+
+template <>
+void Triangulation<1>::load_user_indices_quad (const std::vector<unsigned int> &)
+{
+  Assert (false, ExcImpossibleInDim(1));
+}
+
+
+
+template <>
+void Triangulation<1>::save_user_indices_hex (std::vector<unsigned int> &) const
+{
+  Assert (false, ExcImpossibleInDim(1));
+}
+
+
+
+template <>
+void Triangulation<1>::load_user_indices_hex (const std::vector<unsigned int> &)
+{
+  Assert (false, ExcImpossibleInDim(1));
+}
+
+#endif
+
+
+template <int dim>
+void Triangulation<dim>::save_user_indices_quad (std::vector<unsigned int> &v) const
+{
+  v.resize (n_quads(), 0);
+  std::vector<unsigned int>::iterator  i = v.begin();
+  quad_iterator quad = begin_quad(),
+		endq = end_quad();
+  for (; quad!=endq; ++quad, ++i)
+    *i = quad->user_index();
+}
+
+
+
+template <int dim>
+void Triangulation<dim>::load_user_indices_quad (const std::vector<unsigned int> &v)
+{
+  Assert (v.size() == n_quads(), ExcGridReadError());
+  
+  quad_iterator quad = begin_quad(),
+		endq = end_quad();
+  std::vector<unsigned int>::const_iterator i = v.begin();
+  for (; quad!=endq; ++quad, ++i)
+    quad->set_user_index(*i);
+}
+
+
+#if deal_II_dimension == 2
+
+
+
+template <>
+void Triangulation<2>::save_user_indices_hex (std::vector<unsigned int> &) const
+{
+  Assert (false, ExcImpossibleInDim(2));
+}
+
+
+
+template <>
+void Triangulation<2>::load_user_indices_hex (const std::vector<unsigned int> &)
+{
+  Assert (false, ExcImpossibleInDim(2));
+}
+
+
+#endif
+
+
+template <int dim>
+void Triangulation<dim>::save_user_indices_hex (std::vector<unsigned int> &v) const
+{
+  v.resize (n_hexs(), 0);
+  std::vector<unsigned int>::iterator  i = v.begin();
+  hex_iterator hex = begin_hex(),
+	      endh = end_hex();
+  for (; hex!=endh; ++hex, ++i)
+    *i = hex->user_index();
+}
+
+
+
+template <int dim>
+void Triangulation<dim>::load_user_indices_hex (const std::vector<unsigned int> &v)
+{
+  Assert (v.size() == n_hexs(), ExcGridReadError());
+  
+  hex_iterator hex = begin_hex(),
+	      endh = end_hex();
+  std::vector<unsigned int>::const_iterator i = v.begin();
+  for (; hex!=endh; ++hex, ++i)
+    hex->set_user_index(*i);
+}
+
+
+
+//----------------------------------------------------------------------//
 
 template <int dim>
 void Triangulation<dim>::save_user_pointers (std::vector<void *> &v) const

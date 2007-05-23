@@ -606,6 +606,10 @@ class TriaObjectAccessor :  public TriaAccessor<celldim,dim>
     bool used () const;
 
 				     /**
+				      * @name User data
+				      */
+				     /*@{*/
+				     /**
 				      *  Set the @p used flag. You
 				      *  should know quite exactly
 				      *  what you are doing of you
@@ -706,7 +710,7 @@ class TriaObjectAccessor :  public TriaAccessor<celldim,dim>
 				      * the triangulation.
 				      */
     void recursively_set_user_pointer (void *p) const;
-
+    
 				     /**
 				      * Clear the user pointer of this
 				      * object and all of its
@@ -716,7 +720,55 @@ class TriaObjectAccessor :  public TriaAccessor<celldim,dim>
 				      * function.
 				      */
     void recursively_clear_user_pointer () const;
+    
+				     /**
+				      * Set the user index
+				      * to @p p.
+				      */
+    void set_user_index (unsigned int p) const;
+    
+				     /**
+				      * Reset the user index to 0.
+				      */
+    void clear_user_index () const;
+    
+				     /**
+				      * Access the value of the user
+				      * index.
+				      */
+    unsigned int user_index () const;
 
+				     /**
+				      * Set the user index of this
+				      * object and all its children.
+				      *
+				      * Note that the user index is
+				      * not inherited under mesh
+				      * refinement, so after mesh
+				      * refinement there might be
+				      * cells or faces that don't have
+				      * the expected user indices. In
+				      * this case, simply loop over
+				      * all the elements of the
+				      * coarsest level that has this
+				      * information, and use this
+				      * function to recursively set
+				      * the user index of all finer
+				      * levels of the triangulation.
+				      */
+    void recursively_set_user_index (unsigned int p) const;
+
+				     /**
+				      * Clear the user index of this
+				      * object and all of its
+				      * descendants. The same holds as
+				      * said for the
+				      * recursively_set_user_index()
+				      * function.
+				      */
+    void recursively_clear_user_index () const;
+				     /*@}*/
+    
 				     /**
 				      *  Pointer to the @p ith
 				      *  child.
@@ -1336,6 +1388,53 @@ class TriaObjectAccessor<1, dim> :  public TriaAccessor<1,dim>
     void * user_pointer () const;
     
 				     /**
+				      * Set the user index
+				      * to @p p.
+				      */
+    void set_user_index (unsigned int p) const;
+    
+				     /**
+				      * Reset the user index to 0.
+				      */
+    void clear_user_index () const;
+    
+				     /**
+				      * Access the value of the user
+				      * index.
+				      */
+    unsigned int user_index () const;
+
+				     /**
+				      * Set the user index of this
+				      * object and all its children.
+				      *
+				      * Note that the user index is
+				      * not inherited under mesh
+				      * refinement, so after mesh
+				      * refinement there might be
+				      * cells or faces that don't have
+				      * the expected user indices. In
+				      * this case, simply loop over
+				      * all the elements of the
+				      * coarsest level that has this
+				      * information, and use this
+				      * function to recursively set
+				      * the user index of all finer
+				      * levels of the triangulation.
+				      */
+    void recursively_set_user_index (unsigned int p) const;
+
+				     /**
+				      * Clear the user index of this
+				      * object and all of its
+				      * descendants. The same holds as
+				      * said for the
+				      * recursively_set_user_index()
+				      * function.
+				      */
+    void recursively_clear_user_index () const;
+
+				     /**
 				      *  Return a pointer to the
 				      *  @p ith child.
 				      */
@@ -1920,6 +2019,52 @@ class TriaObjectAccessor<2, dim> :  public TriaAccessor<2,dim>
 				      */
     void recursively_clear_user_pointer () const;
 
+				     /**
+				      * Set the user index
+				      * to @p p.
+				      */
+    void set_user_index (unsigned int p) const;
+    
+				     /**
+				      * Reset the user index to 0.
+				      */
+    void clear_user_index () const;
+    
+				     /**
+				      * Access the value of the user
+				      * index.
+				      */
+    unsigned int user_index () const;
+
+				     /**
+				      * Set the user index of this
+				      * object and all its children.
+				      *
+				      * Note that the user index is
+				      * not inherited under mesh
+				      * refinement, so after mesh
+				      * refinement there might be
+				      * cells or faces that don't have
+				      * the expected user indices. In
+				      * this case, simply loop over
+				      * all the elements of the
+				      * coarsest level that has this
+				      * information, and use this
+				      * function to recursively set
+				      * the user index of all finer
+				      * levels of the triangulation.
+				      */
+    void recursively_set_user_index (unsigned int p) const;
+
+				     /**
+				      * Clear the user index of this
+				      * object and all of its
+				      * descendants. The same holds as
+				      * said for the
+				      * recursively_set_user_index()
+				      * function.
+				      */
+    void recursively_clear_user_index () const;
 				     /**
 				      *  Return a pointer to the @p ith
 				      *  child.
@@ -2541,6 +2686,53 @@ class TriaObjectAccessor<3, dim> :  public TriaAccessor<3,dim>
 				      */
     void recursively_clear_user_pointer () const;
 
+				     /**
+				      * Set the user index
+				      * to @p p.
+				      */
+    void set_user_index (unsigned int p) const;
+    
+				     /**
+				      * Reset the user index to 0.
+				      */
+    void clear_user_index () const;
+    
+				     /**
+				      * Access the value of the user
+				      * index.
+				      */
+    unsigned int user_index () const;
+
+				     /**
+				      * Set the user index of this
+				      * object and all its children.
+				      *
+				      * Note that the user index is
+				      * not inherited under mesh
+				      * refinement, so after mesh
+				      * refinement there might be
+				      * cells or faces that don't have
+				      * the expected user indices. In
+				      * this case, simply loop over
+				      * all the elements of the
+				      * coarsest level that has this
+				      * information, and use this
+				      * function to recursively set
+				      * the user index of all finer
+				      * levels of the triangulation.
+				      */
+    void recursively_set_user_index (unsigned int p) const;
+
+				     /**
+				      * Clear the user index of this
+				      * object and all of its
+				      * descendants. The same holds as
+				      * said for the
+				      * recursively_set_user_index()
+				      * function.
+				      */
+    void recursively_clear_user_index () const;
+    
 				     /**
 				      *  Return a pointer to the
 				      *  @p ith child.

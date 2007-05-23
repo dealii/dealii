@@ -162,6 +162,59 @@ TriaObjectAccessor<1, dim>::recursively_clear_user_pointer () const
 
 
 template <int dim>
+void TriaObjectAccessor<1, dim>::set_user_index (unsigned int p) const
+{
+  Assert (used(), TriaAccessorExceptions::ExcCellNotUsed());
+  lines().user_index(this->present_index) = p;
+}
+
+
+
+template <int dim>
+void TriaObjectAccessor<1, dim>::clear_user_index () const
+{
+  Assert (used(), TriaAccessorExceptions::ExcCellNotUsed());
+  lines().user_index(this->present_index) = 0;
+}
+
+
+
+template <int dim>
+unsigned int TriaObjectAccessor<1, dim>::user_index () const
+{
+  Assert (used(), TriaAccessorExceptions::ExcCellNotUsed());
+  return lines().user_index(this->present_index);
+}
+
+
+
+template <int dim>
+void
+TriaObjectAccessor<1, dim>::recursively_set_user_index (unsigned int p) const
+{
+  set_user_index (p);
+
+  if (has_children())
+    for (unsigned int c=0; c<2; ++c)
+      child(c)->recursively_set_user_index (p);
+}
+
+
+
+template <int dim>
+void
+TriaObjectAccessor<1, dim>::recursively_clear_user_index () const
+{
+  clear_user_index ();
+
+  if (has_children())
+    for (unsigned int c=0; c<2; ++c)
+      child(c)->recursively_clear_user_index ();
+}
+
+
+
+template <int dim>
 void TriaObjectAccessor<1, dim>::set_children (const int index) const
 {
   Assert (used(), TriaAccessorExceptions::ExcCellNotUsed());
@@ -401,6 +454,59 @@ TriaObjectAccessor<2, dim>::recursively_clear_user_pointer () const
   if (has_children())
     for (unsigned int c=0; c<n_children(); ++c)
       child(c)->recursively_clear_user_pointer ();
+}
+
+
+
+template <int dim>
+void TriaObjectAccessor<2, dim>::set_user_index (unsigned int p) const
+{
+  Assert (used(), TriaAccessorExceptions::ExcCellNotUsed());
+  quads().user_index(this->present_index) = p;
+}
+
+
+
+template <int dim>
+void TriaObjectAccessor<2, dim>::clear_user_index () const
+{
+  Assert (used(), TriaAccessorExceptions::ExcCellNotUsed());
+  quads().user_index(this->present_index) = 0;
+}
+
+
+
+template <int dim>
+unsigned int  TriaObjectAccessor<2, dim>::user_index () const
+{
+  Assert (used(), TriaAccessorExceptions::ExcCellNotUsed());
+  return quads().user_index(this->present_index);
+}
+
+
+
+template <int dim>
+void
+TriaObjectAccessor<2, dim>::recursively_set_user_index (unsigned int p) const
+{
+  set_user_index (p);
+
+  if (has_children())
+    for (unsigned int c=0; c<n_children(); ++c)
+      child(c)->recursively_set_user_index (p);
+}
+
+
+
+template <int dim>
+void
+TriaObjectAccessor<2, dim>::recursively_clear_user_index () const
+{
+  clear_user_index ();
+
+  if (has_children())
+    for (unsigned int c=0; c<n_children(); ++c)
+      child(c)->recursively_clear_user_index ();
 }
 
 
@@ -847,6 +953,30 @@ void * TriaObjectAccessor<3, 3>::user_pointer () const
   return this->tria->levels[this->present_level]->hexes.user_pointer(this->present_index);
 }
 
+
+template <>
+void TriaObjectAccessor<3, 3>::set_user_index (unsigned int p) const
+{
+  Assert (used(), TriaAccessorExceptions::ExcCellNotUsed());
+  this->tria->levels[this->present_level]->hexes.user_index(this->present_index) = p;
+}
+
+
+template <>
+void TriaObjectAccessor<3, 3>::clear_user_index () const
+{
+  Assert (used(), TriaAccessorExceptions::ExcCellNotUsed());
+  this->tria->levels[this->present_level]->hexes.user_index(this->present_index) = 0;
+}
+
+
+template <>
+unsigned int  TriaObjectAccessor<3, 3>::user_index () const
+{
+  Assert (used(), TriaAccessorExceptions::ExcCellNotUsed());
+  return this->tria->levels[this->present_level]->hexes.user_index(this->present_index);
+}
+
 #endif
 
 
@@ -872,6 +1002,31 @@ TriaObjectAccessor<3, dim>::recursively_clear_user_pointer () const
   if (has_children())
     for (unsigned int c=0; c<n_children(); ++c)
       child(c)->recursively_clear_user_pointer ();
+}
+
+
+template <int dim>
+void
+TriaObjectAccessor<3, dim>::recursively_set_user_index (unsigned int p) const
+{
+  set_user_index (p);
+
+  if (has_children())
+    for (unsigned int c=0; c<n_children(); ++c)
+      child(c)->recursively_set_user_index (p);
+}
+
+
+
+template <int dim>
+void
+TriaObjectAccessor<3, dim>::recursively_clear_user_index () const
+{
+  clear_user_index ();
+
+  if (has_children())
+    for (unsigned int c=0; c<n_children(); ++c)
+      child(c)->recursively_clear_user_index ();
 }
 
 

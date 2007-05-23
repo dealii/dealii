@@ -978,17 +978,17 @@ namespace internal
  *   execute_coarsening_and_refinement() function uses the face user
  *   flags.
  *
- *   There is another set of user data, namely a <tt>void *</tt>, for
- *   each line, quad, etc. You can access these user pointers through
- *   the functions <tt>user_pointer()</tt>,
- *   <tt>clear_user_pointer()</tt> and <tt>set_user_pointer(p)</tt> in
+ *   There is another set of user data, which can be either an
+ *   <tt>unsigned int</tt> or a <tt>void *</tt>, for
+ *   each line, quad, etc. You can access these through
+ *   the functions listed under <tt>User data</tt> in
  *   the accessor classes. These pointers are not used nor changed in
  *   many places of the library, and those classes and functions that
  *   do use them should document this clearly; the most prominent user
  *   of these pointers is the SolutionTransfer class which uses the
  *   cell->user_pointers.
  *
- *   The value of these user pointers is @p NULL by default. Note that
+ *   The value of these user indices or pointers is @p NULL by default. Note that
  *   the pointers are not inherited to children upon
  *   refinement. Still, after a remeshing they are available on all
  *   cells, where they were set on the previous mesh (unless, of
@@ -1745,7 +1745,7 @@ class Triangulation : public Subscriptor
 
 
 				     /**
-				      *  @name User flag handling
+				      *  @name User data
 				      */
 				     /*@{*/
     				     /**
@@ -1866,12 +1866,34 @@ class Triangulation : public Subscriptor
 				      * Load the user flags located on hexs.
 				      */
     void load_user_flags_hex (const std::vector<bool> &v);
-				     /*@}*/
 
 				     /**
+				      * Clear all user pointers and
+				      * indices and allow the use of
+				      * both for next access.
+				      */
+    void clear_user_data ();
+    
+				     /**
+				      * @deprecated User
+				      * clear_user_data() instead.
+				      *
 				      *  Clear all user pointers.
 				      */
     void clear_user_pointers ();
+    
+				     /**
+				      * Save all user indices. The
+				      * output vector is resized if
+				      * necessary.
+				      */
+    void save_user_indices (std::vector<unsigned int> &v) const;
+
+    				     /**
+				      * Read the information stored by
+				      * save_user_indices().
+				      */
+    void load_user_indices (const std::vector<unsigned int> &v);
 
 				     /**
 				      * Save all user pointers. The
@@ -1882,12 +1904,50 @@ class Triangulation : public Subscriptor
 
     				     /**
 				      * Read the information stored by
-				      * @p save_user_pointers.
+				      * save_user_pointers().
 				      */
     void load_user_pointers (const std::vector<void *> &v);
 
 				     /**
-				      * Save the user pointers on
+				      * Save the user indices on
+				      * lines. The output vector is
+				      * resized if necessary.
+				      */
+    void save_user_indices_line (std::vector<unsigned int> &v) const;
+
+    				     /**
+				      * Load the user indices located
+				      * on lines.
+				      */
+    void load_user_indices_line (const std::vector<unsigned int> &v);
+
+				     /**
+				      * Save the user indices on
+				      * quads. The output vector is
+				      * resized if necessary.
+				      */
+    void save_user_indices_quad (std::vector<unsigned int> &v) const;
+
+				     /**
+				      * Load the user indices located
+				      * on quads.
+				      */
+    void load_user_indices_quad (const std::vector<unsigned int> &v);
+
+				     /**
+				      * Save the user indices on
+				      * hexes. The output vector is
+				      * resized if necessary.
+				      */
+    void save_user_indices_hex (std::vector<unsigned int> &v) const;
+
+				     /**
+				      * Load the user indices located
+				      * on hexs.
+				      */
+    void load_user_indices_hex (const std::vector<unsigned int> &v);
+				     /**
+				      * Save the user indices on
 				      * lines. The output vector is
 				      * resized if necessary.
 				      */
@@ -1924,7 +1984,8 @@ class Triangulation : public Subscriptor
 				      * on hexs.
 				      */
     void load_user_pointers_hex (const std::vector<void *> &v);
-				     /* ------------------------------------ */
+				     /*@}*/
+    
     
 				     /**
 				      *  @name Cell iterator functions
@@ -1936,8 +1997,8 @@ class Triangulation : public Subscriptor
 				      *  has no cells, a past-the-end iterator
 				      *  is returned.
 				      *
-				      *  This function calls @p begin_raw_line
-				      *  in 1D and @p begin_raw_quad in 2D.
+				      *  This function calls begin_raw_line()
+				      *  in 1D and begin_raw_quad() in 2D.
 				      */
     raw_cell_iterator    begin_raw   (const unsigned int level = 0) const;
 
