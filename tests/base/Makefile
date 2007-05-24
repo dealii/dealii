@@ -1,6 +1,6 @@
 ############################################################
 # $Id$
-# Copyright (C) 2000, 2001, 2002, 2003, 2004, 2005, 2006 by the deal.II authors
+# Copyright (C) 2000, 2001, 2002, 2003, 2004, 2005, 2006, 2007 by the deal.II authors
 ############################################################
 
 ############################################################
@@ -47,6 +47,7 @@ tests_x =  geometry_info_* \
 	   data_out_base_povray \
 	   data_out_base_tecplot \
 	   data_out_base_vtk \
+           functions_* \
 	   function_parser \
 	   utilities_* \
 	   is_finite
