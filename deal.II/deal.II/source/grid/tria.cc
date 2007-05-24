@@ -2135,7 +2135,7 @@ void Triangulation<1>::clear_user_data ()
 template <>
 void Triangulation<1>::clear_user_pointers ()
 {
-  clear_user_data
+  clear_user_data ();
 }
 
 
