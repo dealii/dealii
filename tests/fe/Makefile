@@ -39,7 +39,7 @@ tests_x=fe_data_test traits fe_tools fe_tools_* mapping \
         nedelec* \
 	up_and_down \
 	check_derivatives \
-	injection_*
+	injection_* copy_*
 
 # from above list of regular expressions, generate the real set of
 # tests
