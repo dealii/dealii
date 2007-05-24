@@ -13,7 +13,7 @@
 
 
 #include <base/memory_consumption.h>
-#include <dofs/hp_dof_objects.h>
+#include <hp/dof_objects.h>
 
 DEAL_II_NAMESPACE_OPEN
 

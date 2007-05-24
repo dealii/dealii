@@ -28,13 +28,9 @@ cc-files     = $(shell echo source/*/*.cc)
 h-files      = $(sort $(shell echo include/*/*.h))
 
 
-# strip subdirectories from cc file names, preprend a "lib/[g]o"
-# and change the suffix. We place the object files with or without
-# debug info in different directories, since we want to use the
-# -frepo switch to gcc; this, however, creates a .rpo file which
-# would be the same for both debug and non-debug versions, if we
-# don't care about different directories
-tmp1        = $(notdir $(cc-files))
+# replace subdirectories in cc file names by a prefix, preprend a "lib/[g]o"
+# and change the suffix
+tmp1        = $(shell cd source ; echo */*cc | $(PERL) -pi -e 's,/,_,g;')
 o-files-1d  = $(addprefix $(LIBDIR)/1d/, $(tmp1:.cc=_1d.$(OBJEXT)) )
 go-files-1d = $(addprefix $(LIBDIR)/1d/, $(tmp1:.cc=_1d.g.$(OBJEXT)))
 o-files-2d  = $(addprefix $(LIBDIR)/2d/, $(tmp1:.cc=_2d.$(OBJEXT)) )
@@ -162,11 +158,12 @@ $(LIBDIR)/libdeal_II_3d$(shared-lib-suffix): $(o-files-3d)
 # If the command fails, then remove Makefile.dep again and fail
 Makefile.dep: $(cc-files) $(h-files) Makefile $D/common/Make.global_options
 	@echo "============================ Remaking deal.II/Makefile"
-	@$D/common/scripts/make_dependencies $(INCLUDE) "-B\$$(LIBDIR)" $(cc-files) \
+	@(for dir in dofs fe grid hp multigrid numerics ; do $D/common/scripts/make_dependencies $(INCLUDE) "-B\$$(LIBDIR)" `echo source/$$dir/*cc` \
 		| $(PERL) -p -e 's!LIBDIR\)/(.*):!LIBDIR)/DIM_PLACEHOLDER/$$1:!g;' \
 		| $(PERL) -pe 's!((\.g)?.$(OBJEXT)):!_DIM_PLACEHOLDER$$1:!g;' \
-	        | $(PERL) -pe 's!^(.*)/DIM_PLACEHOLDER/(.*)_DIM_PLACEHOLDER(\..*):!$$1/1d/$$2_1d$$3 $$1/2d/$$2_2d$$3 $$1/3d/$$2_3d$$3:!g;'\
-		> $@ \
+	        | $(PERL) -pe 's!^(.*)/DIM_PLACEHOLDER/(.*)_DIM_PLACEHOLDER(\..*):!$$1/1d/DIRPLACEHOLDER_$$2_1d$$3 $$1/2d/DIRPLACEHOLDER_$$2_2d$$3 $$1/3d/DIRPLACEHOLDER_$$2_3d$$3:!g;'\
+		| $(PERL) -pe "s/DIRPLACEHOLDER/$$dir/g;" \
+		; done ) > $@ \
 	 || (rm -f $@ ; false)
 
 

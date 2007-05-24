@@ -25,7 +25,7 @@
 #include <grid/tria_iterator.h>
 #include <grid/tria.h>
 #include <dofs/dof_handler.h>
-#include <dofs/hp_dof_handler.h>
+#include <hp/dof_handler.h>
 #include <dofs/dof_constraints.h>
 #include <dofs/dof_tools.h>
 #include <fe/fe.h>

@@ -17,7 +17,7 @@
 #include <base/config.h>
 #include <grid/tria_accessor.h>
 #include <dofs/dof_handler.h>
-#include <dofs/hp_dof_handler.h>
+#include <hp/dof_handler.h>
 
 #include <vector>
 

@@ -16,7 +16,7 @@
 
 #include <base/config.h>
 #include <dofs/dof_levels.h>
-#include <dofs/hp_dof_objects.h>
+#include <hp/dof_objects.h>
 #include <fe/fe_collection.h>
 
 #include <vector>

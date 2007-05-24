@@ -26,7 +26,7 @@
 #include <base/quadrature.h>
 #include <fe/fe.h>
 #include <fe/fe_values.h>
-#include <fe/hp_fe_values.h>
+#include <hp/fe_values.h>
 #include <fe/mapping_collection.h>
 #include <numerics/matrices.h>
 #include <lac/vector.h>

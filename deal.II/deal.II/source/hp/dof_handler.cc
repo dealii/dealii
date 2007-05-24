@@ -13,10 +13,10 @@
 
 
 #include <base/memory_consumption.h>
-#include <dofs/hp_dof_handler.h>
-#include <dofs/hp_dof_objects.h>
-#include <dofs/hp_dof_levels.h>
-#include <dofs/hp_dof_faces.h>
+#include <hp/dof_handler.h>
+#include <hp/dof_objects.h>
+#include <hp/dof_levels.h>
+#include <hp/dof_faces.h>
 #include <dofs/dof_accessor.h>
 #include <grid/tria_accessor.h>
 #include <grid/tria_iterator.h>

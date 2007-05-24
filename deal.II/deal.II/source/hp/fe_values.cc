@@ -12,7 +12,7 @@
 //----------------------------  hp_fe_values.cc  ---------------------------
 
 
-#include <fe/hp_fe_values.h>
+#include <hp/fe_values.h>
 #include <fe/mapping_q1.h>
 
 DEAL_II_NAMESPACE_OPEN

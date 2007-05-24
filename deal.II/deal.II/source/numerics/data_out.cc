@@ -23,11 +23,11 @@
 #include <grid/tria.h>
 #include <dofs/dof_handler.h>
 #include <dofs/dof_accessor.h>
-#include <dofs/hp_dof_handler.h>
+#include <hp/dof_handler.h>
 #include <grid/tria_iterator.h>
 #include <fe/fe.h>
 #include <fe/fe_values.h>
-#include <fe/hp_fe_values.h>
+#include <hp/fe_values.h>
 #include <fe/mapping_q1.h>
 
 #include <sstream>

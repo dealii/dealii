@@ -15,7 +15,7 @@
 
 
 #include <base/config.h>
-#include <dofs/hp_dof_objects.h>
+#include <hp/dof_objects.h>
 
 #include <vector>
 
