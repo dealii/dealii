@@ -37,12 +37,12 @@ std::ofstream logfile("step-14/output");
 #include <grid/tria_accessor.h>
 #include <grid/tria_iterator.h>
 #include <grid/grid_refinement.h>
-#include <dofs/hp_dof_handler.h>
+#include <hp/dof_handler.h>
 #include <dofs/dof_constraints.h>
 #include <dofs/dof_accessor.h>
 #include <dofs/dof_tools.h>
 #include <fe/fe_q.h>
-#include <fe/hp_fe_values.h>
+#include <hp/fe_values.h>
 #include <fe/fe_tools.h>
 #include <numerics/vectors.h>
 #include <numerics/matrices.h>

@@ -27,7 +27,7 @@
 #include <grid/tria_iterator.h>
 #include <grid/tria_accessor.h>
 #include <grid/grid_generator.h>
-#include <dofs/hp_dof_handler.h>
+#include <hp/dof_handler.h>
 #include <dofs/dof_tools.h>
 #include <dofs/dof_constraints.h>
 #include <fe/fe_raviart_thomas.h>

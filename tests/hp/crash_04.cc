@@ -21,7 +21,7 @@
 #include <grid/tria.h>
 #include <grid/grid_generator.h>
 #include <grid/tria_accessor.h>
-#include <dofs/hp_dof_handler.h>
+#include <hp/dof_handler.h>
 #include <fe/fe_dgq.h>
 #include <numerics/derivative_approximation.h>
 

@@ -40,7 +40,7 @@ std::ofstream logfile("step-15/output");
 #include <dofs/dof_constraints.h>
 #include <dofs/dof_tools.h>
 #include <fe/fe_q.h>
-#include <fe/hp_fe_values.h>
+#include <hp/fe_values.h>
 #include <fe/q_collection.h>
 #include <numerics/vectors.h>
 #include <numerics/matrices.h>

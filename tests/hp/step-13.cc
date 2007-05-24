@@ -41,7 +41,7 @@ std::ofstream logfile("step-13/output");
 #include <dofs/dof_accessor.h>
 #include <dofs/dof_tools.h>
 #include <fe/fe_q.h>
-#include <fe/hp_fe_values.h>
+#include <hp/fe_values.h>
 #include <numerics/vectors.h>
 #include <numerics/matrices.h>
 #include <numerics/data_out.h>

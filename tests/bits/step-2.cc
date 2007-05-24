@@ -22,7 +22,7 @@
 #include <grid/grid_generator.h>
 #include <grid/tria_boundary_lib.h>
 
-#include <dofs/hp_dof_handler.h>
+#include <hp/dof_handler.h>
 
 #include <fe/fe_q.h>
 #include <dofs/dof_tools.h>

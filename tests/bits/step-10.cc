@@ -29,10 +29,10 @@ std::ofstream logfile("step-10/output");
 #include <grid/tria_boundary_lib.h>
 #include <grid/tria.h>
 #include <grid/grid_out.h>
-#include <dofs/hp_dof_handler.h>
+#include <hp/dof_handler.h>
 #include <dofs/dof_accessor.h>
 #include <fe/fe_q.h>
-#include <fe/hp_fe_values.h>
+#include <hp/fe_values.h>
 
 #include <fe/mapping_q.h>
 

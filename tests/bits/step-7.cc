@@ -36,7 +36,7 @@ std::ofstream logfile("step-7/output");
 #include <grid/tria_accessor.h>
 #include <grid/tria_iterator.h>
 #include <grid/tria_boundary_lib.h>
-#include <dofs/hp_dof_handler.h>
+#include <hp/dof_handler.h>
 #include <dofs/dof_constraints.h>
 #include <dofs/dof_accessor.h>
 #include <dofs/dof_tools.h>
@@ -49,7 +49,7 @@ std::ofstream logfile("step-7/output");
 #include <base/smartpointer.h>
 #include <numerics/vectors.h>
 #include <base/convergence_table.h>
-#include <fe/hp_fe_values.h>
+#include <hp/fe_values.h>
 
 #include <typeinfo>
 #include <fstream>

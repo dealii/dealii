@@ -22,7 +22,7 @@
 #include <grid/grid_generator.h>
 #include <grid/grid_tools.h>
 #include <dofs/dof_handler.h>
-#include <dofs/hp_dof_handler.h>
+#include <hp/dof_handler.h>
 #include <dofs/dof_constraints.h>
 #include <fe/fe_q.h>
 #include <numerics/vectors.h>

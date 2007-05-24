@@ -12,7 +12,7 @@
 #include "../tests.h"
 #include <grid/tria.h>
 #include <dofs/dof_handler.h>
-#include <dofs/hp_dof_handler.h>
+#include <hp/dof_handler.h>
 #include <grid/grid_generator.h>
 #include <grid/grid_out.h>
 

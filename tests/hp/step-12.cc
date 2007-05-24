@@ -30,7 +30,7 @@ std::ofstream logfile("step-12/output");
 #include <grid/grid_refinement.h>
 #include <grid/tria_accessor.h>
 #include <grid/tria_iterator.h>
-#include <fe/hp_fe_values.h>
+#include <hp/fe_values.h>
 #include <dofs/dof_handler.h>
 #include <dofs/dof_accessor.h>
 #include <dofs/dof_tools.h>

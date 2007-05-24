@@ -22,7 +22,7 @@
 #include <lac/vector.h>
 
 #include <grid/tria.h>
-#include <dofs/hp_dof_handler.h>
+#include <hp/dof_handler.h>
 #include <dofs/dof_constraints.h>
 #include <grid/grid_generator.h>
 #include <grid/grid_refinement.h>

@@ -35,11 +35,11 @@ std::ofstream logfile("step-9/output");
 #include <grid/tria_accessor.h>
 #include <grid/tria_iterator.h>
 #include <grid/tria_boundary_lib.h>
-#include <dofs/hp_dof_handler.h>
+#include <hp/dof_handler.h>
 #include <dofs/dof_accessor.h>
 #include <dofs/dof_tools.h>
 #include <dofs/dof_constraints.h>
-#include <fe/hp_fe_values.h>
+#include <hp/fe_values.h>
 #include <numerics/vectors.h>
 #include <numerics/matrices.h>
 #include <numerics/data_out.h>

@@ -22,7 +22,7 @@
 #include <grid/tria_accessor.h>
 #include <grid/grid_out.h>
 #include <fe/fe_dgq.h>
-#include <dofs/hp_dof_handler.h>
+#include <hp/dof_handler.h>
 
 #include <fstream>
 

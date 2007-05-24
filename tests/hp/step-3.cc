@@ -29,7 +29,7 @@
 
 #include <dofs/dof_tools.h>
 
-#include <fe/hp_fe_values.h>
+#include <hp/fe_values.h>
 #include <base/quadrature_lib.h>
 
 #include <base/function.h>

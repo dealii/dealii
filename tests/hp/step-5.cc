@@ -30,13 +30,13 @@ std::ofstream logfile("step-5/output");
 #include <lac/solver_cg.h>
 #include <lac/precondition.h>
 #include <grid/tria.h>
-#include <dofs/hp_dof_handler.h>
+#include <hp/dof_handler.h>
 #include <grid/tria_accessor.h>
 #include <grid/tria_iterator.h>
 #include <dofs/dof_accessor.h>
 #include <dofs/dof_tools.h>
 #include <fe/fe_q.h>
-#include <fe/hp_fe_values.h>
+#include <hp/fe_values.h>
 #include <numerics/vectors.h>
 #include <numerics/matrices.h>
 #include <numerics/data_out.h>

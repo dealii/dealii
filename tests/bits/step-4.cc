@@ -22,14 +22,14 @@ std::ofstream logfile("step-4/output");
 
 
 #include <grid/tria.h>
-#include <dofs/hp_dof_handler.h>
+#include <hp/dof_handler.h>
 #include <grid/grid_generator.h>
 #include <grid/tria_accessor.h>
 #include <grid/tria_iterator.h>
 #include <dofs/dof_accessor.h>
 #include <fe/fe_q.h>
 #include <dofs/dof_tools.h>
-#include <fe/hp_fe_values.h>
+#include <hp/fe_values.h>
 #include <base/quadrature_lib.h>
 #include <base/function.h>
 #include <numerics/vectors.h>
