@@ -132,8 +132,8 @@ user_pointers(Triangulation<dim>& tr)
 				   // Check if they are still the same
   check_user_pointers(tr);
 				   // Create two pointer index clashes here
-  deallog << tr.begin()->user_index() << std::endl;
-  deallog << tr.begin()->user_pointer() << std::endl;
+  tr.begin()->user_index();
+  tr.begin()->user_pointer();
   
   
 				   // Check if save and load work
@@ -172,8 +172,8 @@ user_indices(Triangulation<dim>& tr)
 				   // Check if they are still the same
   check_user_indices(tr);
 				   // Create two pointer index clashes here
-  deallog << tr.begin()->user_pointer() << std::endl;
-  deallog << tr.begin()->user_index() << std::endl;
+  tr.begin()->user_pointer();
+  tr.begin()->user_index();
   
   
 				   // Check if save and load work
@@ -205,7 +205,7 @@ int main()
   deal_II_exceptions::disable_abort_on_exception();
   std::ofstream logfile("user_data_01/output");
   deallog.attach(logfile);
-  deallog.depth_console(10);
+  deallog.depth_console(0);
   deallog.threshold_double(1.e-10);
 
   check<2>();
