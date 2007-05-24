@@ -1076,32 +1076,6 @@ void LaplaceProblem<dim>::run ()
       Point<2> p(x,y);
       VectorTools::point_value(dof_handler,solution,p);
     }
-  
-  
-				   // After we have finished computing
-				   // the solution on the finesh mesh,
-				   // and writing all the grids to
-				   // disk, we want to also write the
-				   // actual solution on this final
-				   // mesh to a file. As already done
-				   // in one of the previous examples,
-				   // we use the EPS format for
-				   // output, and to obtain a
-				   // reasonable view on the solution,
-				   // we rescale the z-axis by a
-				   // factor of four.
-  DataOutBase::EpsFlags eps_flags;
-  eps_flags.z_scaling = 4;
-  
-  DataOut<dim> data_out;
-  data_out.set_flags (eps_flags);
-
-  data_out.attach_dof_handler (dof_handler);
-  data_out.add_data_vector (solution, "solution");
-  data_out.build_patches ();
-  
-  std::ofstream output ("final-solution.eps");
-  data_out.write_eps (output);
 }
 
 
