@@ -22,6 +22,7 @@ default: run-tests
 ############################################################
 
 tests_x = block_matrices \
+	user_data_* \
 	constraints \
 	constraint_graph \
 	data_out \
