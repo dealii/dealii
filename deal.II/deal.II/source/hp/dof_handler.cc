@@ -2475,7 +2475,10 @@ namespace hp
 					 // there are more, then we punt, as
 					 // described in the paper (and
 					 // mentioned above)
-	if (unique_sets_of_dofs == 2)
+	//TODO: The check for 'dim==2' was inserted by intuition. It fixes
+	// the previous problems with step-27 in 3D. But an explanation
+	// for this is still required!.
+	if ((unique_sets_of_dofs == 2) && (dim == 2))
 	  {
 					     // find out which is the
 					     // most dominating finite
