@@ -11,6 +11,8 @@
 //
 //----------------------------------------------------------------------
 
+#include <iomanip>
+
 #include <base/logstream.h>
 #include <grid/tria.h>
 #include <grid/grid_generator.h>
@@ -30,9 +32,10 @@ void check ()
   GridGenerator::hyper_cube(tr);
   tr.refine_global(18/dim);
 
-  deallog << "Cells " << tr.n_cells()
-	  << " active " << tr.n_active_cells()
-	  << " memory " << tr.memory_consumption()
+  deallog << "Cells " << std::setw(12)  << tr.n_cells()
+	  << " active " << std::setw(12)  << tr.n_active_cells()
+	  << " memory " << std::setw(12)  << tr.memory_consumption()
+	  << " quotient " << (1./tr.n_cells()*tr.memory_consumption())
 	  << std::endl;
 
   FE_Q<dim> q1(1);
@@ -42,23 +45,27 @@ void check ()
   DoFHandler<dim> dof(tr);
   
   dof.distribute_dofs(q1);
-  deallog << "Dofs Q1 " << dof.n_dofs()
-	  << " memory " << dof.memory_consumption()
+  deallog << "Dofs Q1   " << std::setw(12) << dof.n_dofs()
+	  << " memory " << std::setw(12) << dof.memory_consumption()
+	  << " quotient " << (1./dof.n_dofs()*dof.memory_consumption())
 	  << std::endl;
   
   dof.distribute_dofs(q3);
-  deallog << "Dofs Q3 " << dof.n_dofs()
-	  << " memory " << dof.memory_consumption()
+  deallog << "Dofs Q3   " << std::setw(12) << dof.n_dofs()
+	  << " memory " << std::setw(12) << dof.memory_consumption()
+	  << " quotient " << (1./dof.n_dofs()*dof.memory_consumption())
 	  << std::endl;
   
   dof.distribute_dofs(sys1);
-  deallog << "Dofs Sys1 " << dof.n_dofs()
-	  << " memory " << dof.memory_consumption()
+  deallog << "Dofs Sys1 " << std::setw(12) << dof.n_dofs()
+	  << " memory " << std::setw(12) << dof.memory_consumption()
+	  << " quotient " << (1./dof.n_dofs()*dof.memory_consumption())
 	  << std::endl;  
   
   dof.distribute_dofs(sys2);
-  deallog << "Dofs Sys2 " << dof.n_dofs()
-	  << " memory " << dof.memory_consumption()
+  deallog << "Dofs Sys2 " << std::setw(12) << dof.n_dofs()
+	  << " memory " << std::setw(12) << dof.memory_consumption()
+	  << " quotient " << (1./dof.n_dofs()*dof.memory_consumption())
 	  << std::endl;  
 }
 
