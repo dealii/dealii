@@ -11,7 +11,7 @@ D=../../deal.II
 include $D/common/Make.global_options
 debug-mode = on
 
-libraries += $(lib-deal2-2d.g) $(lib-deal2-3d.g) $(lib-lac) $(lib-base)
+libraries += $(lib-deal2-2d) $(lib-deal2-3d) $(lib-lac) $(lib-base)
 
 default: run-tests 
 
