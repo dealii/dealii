@@ -1,0 +1,26 @@
+set term png
+set logsc xy
+set da sty lp
+
+set ylabel "Error"
+
+set output "error-vs-dofs.png"
+set xlabel "Degrees of freedom"
+
+pl "data-q1" us 2:(abs($3-0.906834721360716)) title "Q1 elements", \
+   "data-q2" us 2:(abs($3-0.906834721360716)) title "Q2 elements", \
+   "data-q3" us 2:(abs($3-0.906834721360716)) title "Q3 elements", \
+   "data-q4" us 2:(abs($3-0.906834721360716)) title "Q4 elements", \
+   "data-q5" us 2:(abs($3-0.906834721360716)) title "Q5 elements", \
+   "data-q6" us 2:(abs($3-0.906834721360716)) title "Q6 elements"
+
+
+set output "error-vs-time.png"
+set xlabel "Time in seconds"
+
+pl "data-q1" us 4:(abs($3-0.906834721360716)) title "Q1 elements", \
+   "data-q2" us 4:(abs($3-0.906834721360716)) title "Q2 elements", \
+   "data-q3" us 4:(abs($3-0.906834721360716)) title "Q3 elements", \
+   "data-q4" us 4:(abs($3-0.906834721360716)) title "Q4 elements", \
+   "data-q5" us 4:(abs($3-0.906834721360716)) title "Q5 elements", \
+   "data-q6" us 4:(abs($3-0.906834721360716)) title "Q6 elements"

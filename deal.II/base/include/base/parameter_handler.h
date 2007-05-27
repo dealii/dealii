@@ -772,7 +772,7 @@ namespace Patterns
  *
  *   The ParameterHandler class is discussed in detail in the @ref
  *   step_19 "step-19" example program, and is used in more realistic
- *   situation in @ref step_22 "step-22".
+ *   situation in @ref step_28 "step-28".
  *   
  *   <h3>Declaring entries</h3>
  *   

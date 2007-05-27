@@ -268,7 +268,7 @@ class GridGenerator
 				      *
 				      * @note For an example of the
 				      * use of this function see the
-				      * @ref step_22 "step-22"
+				      * @ref step_28 "step-28"
 				      * tutorial program.
 				      */
     template <int dim>

@@ -849,7 +849,7 @@ namespace internal
  *   This material_id may be set upon construction of a
  *   triangulation (through the CellData data structure), or later
  *   through use of cell iterators. For a typical use of this
- *   functionality, see the @ref step_22 "step-22" tutorial
+ *   functionality, see the @ref step_28 "step-28" tutorial
  *   program. The functions of the GridGenerator namespace typically
  *   set the material ID of all cells to zero. When reading a
  *   triangulation, the material id must be specified in the input

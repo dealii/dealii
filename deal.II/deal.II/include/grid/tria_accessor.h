@@ -3439,8 +3439,8 @@ class CellAccessor :  public TriaObjectAccessor<dim,dim>
 				      * cell.
 				      *
 				      * For a typical use of this
-				      * function, see the @ref step_22
-				      * "step-22" tutorial program.
+				      * function, see the @ref step_28
+				      * "step-28" tutorial program.
 				      */
     unsigned char material_id () const;
 
@@ -3449,8 +3449,8 @@ class CellAccessor :  public TriaObjectAccessor<dim,dim>
 				      * cell.
 				      *
 				      * For a typical use of this
-				      * function, see the @ref step_22
-				      * "step-22" tutorial program.
+				      * function, see the @ref step_28
+				      * "step-28" tutorial program.
 				      */
     void set_material_id (const unsigned char new_material_id) const;
 
