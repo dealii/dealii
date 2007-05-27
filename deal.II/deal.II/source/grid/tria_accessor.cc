@@ -50,7 +50,7 @@ template <int dim>
 int TriaObjectAccessor<1, dim>::vertex_index (const unsigned int i) const
 {
   Assert (i<2, ExcIndexRange(i,0,2));
-  return lines().cells[this->present_index].vertex (i);
+  return lines().cells[this->present_index].face (i);
 }
 
 

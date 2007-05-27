@@ -16,9 +16,7 @@
 #include <base/config.h>
 #include <base/exceptions.h>
 #include <base/geometry_info.h>
-#include <grid/tria_line.h>
-#include <grid/tria_quad.h>
-#include <grid/tria_hex.h>
+#include <grid/tria_object.h>
 #include <vector>
 
 DEAL_II_NAMESPACE_OPEN

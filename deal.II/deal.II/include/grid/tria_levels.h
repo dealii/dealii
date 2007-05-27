@@ -2,7 +2,7 @@
 //    $Id$
 //    Version: $Name$
 //
-//    Copyright (C) 1998, 1999, 2000, 2001, 2002, 2003, 2004, 2005, 2006 by the deal.II authors
+//    Copyright (C) 1998, 1999, 2000, 2001, 2002, 2003, 2004, 2005, 2006, 2007 by the deal.II authors
 //
 //    This file is subject to QPL and may not be  distributed
 //    without copyright and license information. Please refer
@@ -16,9 +16,7 @@
 
 #include <base/config.h>
 #include <vector>
-#include <grid/tria_line.h>
-#include <grid/tria_quad.h>
-#include <grid/tria_hex.h>
+#include <grid/tria_object.h>
 #include <base/point.h>
 #include <grid/tria_objects.h>
 

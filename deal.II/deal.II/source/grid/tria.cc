@@ -778,16 +778,16 @@ struct QuadComparator
 					 // the repeated equality test
 					 // of the previous lines, but
 					 // I don't care at present
-	if ((q1.line(0) < q2.line(0))          ||
-	    ((q1.line(0) == q2.line(0)) &&
-	     (q1.line(1) <  q2.line(1)))       ||
-	    ((q1.line(0) == q2.line(0)) &&
-	     (q1.line(1) == q2.line(1)) &&
-	     (q1.line(2) <  q2.line(2)))       ||
-	    ((q1.line(0) == q2.line(0)) &&
-	     (q1.line(1) == q2.line(1)) &&
-	     (q1.line(2) == q2.line(2)) &&
-	     (q1.line(3) <  q2.line(3))))
+	if ((q1.face(0) < q2.face(0))          ||
+	    ((q1.face(0) == q2.face(0)) &&
+	     (q1.face(1) <  q2.face(1)))       ||
+	    ((q1.face(0) == q2.face(0)) &&
+	     (q1.face(1) == q2.face(1)) &&
+	     (q1.face(2) <  q2.face(2)))       ||
+	    ((q1.face(0) == q2.face(0)) &&
+	     (q1.face(1) == q2.face(1)) &&
+	     (q1.face(2) == q2.face(2)) &&
+	     (q1.face(3) <  q2.face(3))))
 	  return true;
 	else
 	  return false;
@@ -1168,21 +1168,21 @@ Triangulation<3>::create_triangulation (const std::vector<Point<3> >    &v,
                                            // new one and instead
                                            // later set the
                                            // face_orientation flag
-          const internal::Triangulation::Quad
-	    test_quad_1(quad.line(2), quad.line(3),
-			quad.line(0), quad.line(1)),//face_orientation=false, face_flip=false, face_rotation=false
-	    test_quad_2(quad.line(0), quad.line(1),
-			quad.line(3), quad.line(2)),//face_orientation=false, face_flip=false, face_rotation=true
-	    test_quad_3(quad.line(3), quad.line(2),
-			quad.line(1), quad.line(0)),//face_orientation=false, face_flip=true,  face_rotation=false
-	    test_quad_4(quad.line(1), quad.line(0),
-			quad.line(2), quad.line(3)),//face_orientation=false, face_flip=true,  face_rotation=true
-	    test_quad_5(quad.line(2), quad.line(3),
-			quad.line(1), quad.line(0)),//face_orientation=true,  face_flip=false, face_rotation=true
-	    test_quad_6(quad.line(1), quad.line(0),
-			quad.line(3), quad.line(2)),//face_orientation=true,  face_flip=true,  face_rotation=false
-	    test_quad_7(quad.line(3), quad.line(2),
-			quad.line(0), quad.line(1));//face_orientation=true,  face_flip=true,  face_rotation=true
+          const internal::Triangulation::TriaObject<2>
+	    test_quad_1(quad.face(2), quad.face(3),
+			quad.face(0), quad.face(1)),//face_orientation=false, face_flip=false, face_rotation=false
+	    test_quad_2(quad.face(0), quad.face(1),
+			quad.face(3), quad.face(2)),//face_orientation=false, face_flip=false, face_rotation=true
+	    test_quad_3(quad.face(3), quad.face(2),
+			quad.face(1), quad.face(0)),//face_orientation=false, face_flip=true,  face_rotation=false
+	    test_quad_4(quad.face(1), quad.face(0),
+			quad.face(2), quad.face(3)),//face_orientation=false, face_flip=true,  face_rotation=true
+	    test_quad_5(quad.face(2), quad.face(3),
+			quad.face(1), quad.face(0)),//face_orientation=true,  face_flip=false, face_rotation=true
+	    test_quad_6(quad.face(1), quad.face(0),
+			quad.face(3), quad.face(2)),//face_orientation=true,  face_flip=true,  face_rotation=false
+	    test_quad_7(quad.face(3), quad.face(2),
+			quad.face(0), quad.face(1));//face_orientation=true,  face_flip=true,  face_rotation=true
           if (needed_quads.find (test_quad_1) == needed_quads.end() &&
 	      needed_quads.find (test_quad_2) == needed_quads.end() &&
 	      needed_quads.find (test_quad_3) == needed_quads.end() &&
@@ -1313,21 +1313,21 @@ Triangulation<3>::create_triangulation (const std::vector<Point<3> >    &v,
 						   // then. construct all
 						   // possibilities and check
 						   // them one after the other
-		  const internal::Triangulation::Quad
-		    test_quad_1(quad.line(2), quad.line(3),
-				quad.line(0), quad.line(1)),//face_orientation=false, face_flip=false, face_rotation=false
-		    test_quad_2(quad.line(0), quad.line(1),
-				quad.line(3), quad.line(2)),//face_orientation=false, face_flip=false, face_rotation=true
-		    test_quad_3(quad.line(3), quad.line(2),
-				quad.line(1), quad.line(0)),//face_orientation=false, face_flip=true,  face_rotation=false
-		    test_quad_4(quad.line(1), quad.line(0),
-				quad.line(2), quad.line(3)),//face_orientation=false, face_flip=true,  face_rotation=true
-		    test_quad_5(quad.line(2), quad.line(3),
-				quad.line(1), quad.line(0)),//face_orientation=true,  face_flip=false, face_rotation=true
-		    test_quad_6(quad.line(1), quad.line(0),
-				quad.line(3), quad.line(2)),//face_orientation=true,  face_flip=true,  face_rotation=false
-		    test_quad_7(quad.line(3), quad.line(2),
-				quad.line(0), quad.line(1));//face_orientation=true,  face_flip=true,  face_rotation=true
+		  const internal::Triangulation::TriaObject<2>
+		    test_quad_1(quad.face(2), quad.face(3),
+				quad.face(0), quad.face(1)),//face_orientation=false, face_flip=false, face_rotation=false
+		    test_quad_2(quad.face(0), quad.face(1),
+				quad.face(3), quad.face(2)),//face_orientation=false, face_flip=false, face_rotation=true
+		    test_quad_3(quad.face(3), quad.face(2),
+				quad.face(1), quad.face(0)),//face_orientation=false, face_flip=true,  face_rotation=false
+		    test_quad_4(quad.face(1), quad.face(0),
+				quad.face(2), quad.face(3)),//face_orientation=false, face_flip=true,  face_rotation=true
+		    test_quad_5(quad.face(2), quad.face(3),
+				quad.face(1), quad.face(0)),//face_orientation=true,  face_flip=false, face_rotation=true
+		    test_quad_6(quad.face(1), quad.face(0),
+				quad.face(3), quad.face(2)),//face_orientation=true,  face_flip=true,  face_rotation=false
+		    test_quad_7(quad.face(3), quad.face(2),
+				quad.face(0), quad.face(1));//face_orientation=true,  face_flip=true,  face_rotation=true
 		  if (needed_quads.find (test_quad_1) != needed_quads.end())
 		    {
 		      face_iterator[face] = needed_quads[test_quad_1].first;
@@ -1711,8 +1711,8 @@ Triangulation<3>::create_triangulation (const std::vector<Point<3> >    &v,
 					   // lexicographic ordering)
 	  for (unsigned int i=0; i<4; ++i)
 	    {
-	      quad_compare_1.set_line(i,       line_counterclock[lex2cclock[i]]->index());
-	      quad_compare_2.set_line((i+2)%4, line_counterclock[lex2cclock[i]]->index());
+	      quad_compare_1.set_face(i,       line_counterclock[lex2cclock[i]]->index());
+	      quad_compare_2.set_face((i+2)%4, line_counterclock[lex2cclock[i]]->index());
 	    }
  	      
  	  ++n_rotations;

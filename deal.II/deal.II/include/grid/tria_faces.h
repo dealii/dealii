@@ -2,7 +2,7 @@
 //    $Id$
 //    Version: $Name$
 //
-//    Copyright (C) 2006 by the deal.II authors
+//    Copyright (C) 2006, 2007 by the deal.II authors
 //
 //    This file is subject to QPL and may not be  distributed
 //    without copyright and license information. Please refer
@@ -14,9 +14,7 @@
 #define __deal2__tria_faces_h
 
 #include <base/config.h>
-#include <grid/tria_line.h>
-#include <grid/tria_quad.h>
-#include <grid/tria_hex.h>
+#include <grid/tria_object.h>
 #include <grid/tria_objects.h>
 
 DEAL_II_NAMESPACE_OPEN

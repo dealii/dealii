@@ -1,0 +1,202 @@
+//---------------------------------------------------------------------------
+//    $Id$
+//    Version: $Name$
+//
+//    Copyright (C) 1998, 1999, 2000, 2001, 2002, 2003, 2004, 2005, 2006, 2007 by the deal.II authors
+//
+//    This file is subject to QPL and may not be  distributed
+//    without copyright and license information. Please refer
+//    to the file deal.II/doc/license.html for the  text  and
+//    further information on this license.
+//
+//---------------------------------------------------------------------------
+#ifndef __deal2__tria_object_h
+#define __deal2__tria_object_h
+
+
+#include <base/config.h>
+#include <base/exceptions.h>
+#include <base/geometry_info.h>
+
+DEAL_II_NAMESPACE_OPEN
+
+namespace internal
+{
+  namespace Triangulation
+  {
+    
+/**
+ * Class template for the <tt>dim</tt>-dimensional cells constituting
+ * a Triangulation of dimension <tt>dim</tt> or lower dimensional
+ * objects of higher dimensions.  They are characterized by the
+ * (global) indices of their faces, which are cells of dimension
+ * <tt>dim-1</tt> or vertices if <tt>dim=1</tt>.
+ *
+ * @author Guido Kanschat, 2007
+ */
+    template <int dim>
+    class TriaObject
+    {
+      public:
+					 /**
+					  * Default constructor,
+					  * setting all face indices
+					  * to invalid values.
+					  */				  
+	TriaObject ();
+	
+					 /**
+					  * Constructor for a line
+					  * object with the numbers of
+					  * its two end points.
+					  *
+					  * Throws an exception if
+					  * dimension is not one.
+					  */
+	TriaObject (const int i0, const int i1);
+
+					 /**
+					  * Constructor for a quadrilateral
+					  * object with the numbers of
+					  * its four lines.
+					  *
+					  * Throws an exception if
+					  * dimension is not two.
+					  */
+	TriaObject (const int i0, const int i1,
+		    const int i2, const int i3);
+
+					 /**
+					  * Constructor for a hexahedron
+					  * object with the numbers of
+					  * its six quadrilaterals.
+					  *
+					  * Throws an exception if
+					  * dimension is not two.
+					  */
+	TriaObject (const int i0, const int i1,
+                    const int i2, const int i3,
+                    const int i4, const int i5);
+    
+
+					 /**
+					  * Return the index of the
+					  * ith face object.
+					  */
+	int face (const unsigned int i) const;
+
+					 /**
+					  * Set the index of the ith
+					  * face object.
+					  */
+	void set_face (const unsigned int i, const int index);
+
+					 /**
+                                          * Determine an estimate for the
+                                          * memory consumption (in bytes)
+                                          * of this object.
+                                          */
+        static unsigned int memory_consumption ();
+	
+      protected:
+                                         /**
+                                          *  Global indices of the two end points.
+                                          */
+        int faces[GeometryInfo<dim>::faces_per_cell];
+    };
+
+				     /// Legacy typedef
+    typedef TriaObject<1> Line;
+
+				     /// Legacy typedef
+    typedef TriaObject<2> Quad;
+
+				     /// Legacy typedef
+    typedef TriaObject<3> Hexahedron;
+
+//----------------------------------------------------------------------//
+
+    template <int dim>
+    inline
+    TriaObject<dim>::TriaObject ()
+    {
+      for (unsigned int i=0;i<GeometryInfo<dim>::faces_per_cell;++i)
+	faces[i] = -1;
+    }
+
+
+    template <int dim>
+    inline
+    TriaObject<dim>::TriaObject (const int i0, const int i1)
+    {
+      Assert (dim==1, ExcImpossibleInDim(dim));
+      faces[0] = i0;
+      faces[1] = i1;
+    }
+
+
+    template <int dim>
+    inline
+    TriaObject<dim>::TriaObject (const int i0, const int i1, const int i2, const int i3)
+    {
+      Assert (dim==2, ExcImpossibleInDim(dim));
+      faces[0] = i0;
+      faces[1] = i1;
+      faces[2] = i2;
+      faces[3] = i3;
+    }
+
+
+    template <int dim>
+    inline
+    TriaObject<dim>::TriaObject (const int i0, const int i1, const int i2,
+				 const int i3, const int i4, const int i5)
+    {
+      Assert (dim==3, ExcImpossibleInDim(dim));
+      faces[0] = i0;
+      faces[1] = i1;
+      faces[2] = i2;
+      faces[3] = i3;
+      faces[4] = i4;
+      faces[5] = i5;
+    }
+
+
+    template <int dim>
+    inline
+    int TriaObject<dim>::face (const unsigned int i) const
+    {
+      Assert (i<GeometryInfo<dim>::faces_per_cell,
+              ExcIndexRange(i,0,GeometryInfo<dim>::faces_per_cell));
+      return faces[i];
+    }
+    
+    
+    
+    template <int dim>
+    inline
+    void TriaObject<dim>::set_face (const unsigned int i, const int index)
+    {
+      Assert (i<GeometryInfo<dim>::faces_per_cell,
+              ExcIndexRange(i,0,GeometryInfo<dim>::faces_per_cell));
+      faces[i] = index;
+    }
+    
+    
+    
+    template <int dim>
+    inline
+    unsigned int
+    TriaObject<dim>::memory_consumption ()
+    {
+      return sizeof(TriaObject<dim>);
+    }
+    
+    
+  }
+}
+
+
+DEAL_II_NAMESPACE_CLOSE
+
+#endif

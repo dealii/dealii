@@ -616,7 +616,7 @@ unsigned int
 TriaObjectAccessor<2,dim>::line_index (const unsigned int i) const
 {
   Assert (i<4, ExcIndexRange(i,0,4));
-  return quads().cells[this->present_index].line(i);
+  return quads().cells[this->present_index].face(i);
 }
 
 
@@ -989,7 +989,7 @@ TriaObjectAccessor<3,3>::quad_index (const unsigned int i) const
 {
   Assert (i<6, ExcIndexRange(i,0,6));
 
-  return this->tria->levels[this->present_level]->hexes.cells[this->present_index].quad(i);
+  return this->tria->levels[this->present_level]->hexes.cells[this->present_index].face(i);
 }
 
 

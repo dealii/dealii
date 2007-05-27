@@ -39,9 +39,7 @@ namespace internal
 {
   namespace Triangulation
   {
-    class Line;
-    class Quad;
-    class Hexahedron;
+    template <int dim> class TriaObject;
     template <typename G> class TriaObjects;
   }
 }
@@ -515,21 +513,21 @@ class TriaObjectAccessor :  public TriaAccessor<celldim,dim>
 				      * <tt>celldim==1</tt>.
 				      */
 
-    void set (const internal::Triangulation::Line&) const;
+    void set (const internal::Triangulation::TriaObject<1>&) const;
     
 				     /**
 				      * Copy the data of the given
 				      * quad. Only implemented for
 				      * <tt>celldim==2</tt>.
 				      */
-    void set (const internal::Triangulation::Quad&) const;
+    void set (const internal::Triangulation::TriaObject<2>&) const;
     
 				     /**
 				      * Copy the data of the given
 				      * hex. Only implemented for
 				      * <tt>celldim==3</tt>.
 				      */
-    void set (const internal::Triangulation::Hexahedron&) const;
+    void set (const internal::Triangulation::TriaObject<3>&) const;
 
 				     /**
 				      *  Index of vertex. The convention
@@ -1239,7 +1237,7 @@ class TriaObjectAccessor<1, dim> :  public TriaAccessor<1,dim>
 				      *  Copy the data of the given
 				      *  line.
 				      */
-    void set (const internal::Triangulation::Line &l) const;
+    void set (const internal::Triangulation::TriaObject<1> &l) const;
 
 				     /**
 				      *  Return the index of vertex
@@ -1792,7 +1790,7 @@ class TriaObjectAccessor<1, dim> :  public TriaAccessor<1,dim>
 				      * for all dim without
 				      * specialization.
 				      */
-    internal::Triangulation::TriaObjects<internal::Triangulation::Line> & lines() const;
+    internal::Triangulation::TriaObjects<internal::Triangulation::TriaObject<1> > & lines() const;
 
   private:
     
@@ -1843,7 +1841,7 @@ class TriaObjectAccessor<2, dim> :  public TriaAccessor<2,dim>
 				     /**
 				      *  Copy the data of the given quad.
 				      */
-    void set (const internal::Triangulation::Quad &q) const;
+    void set (const internal::Triangulation::TriaObject<2> &q) const;
 
 				     /**
 				      * Return index of a vertex of a
@@ -2446,7 +2444,7 @@ class TriaObjectAccessor<2, dim> :  public TriaAccessor<2,dim>
 				      * implemented for all dimensions
 				      * without specialization.
 				      */
-    internal::Triangulation::TriaObjects<internal::Triangulation::Quad> & quads() const;
+    internal::Triangulation::TriaObjects<internal::Triangulation::TriaObject<2> > & quads() const;
 
   private:
     
@@ -2497,7 +2495,7 @@ class TriaObjectAccessor<3, dim> :  public TriaAccessor<3,dim>
 				      *  Copy the data of the given
 				      *  hex.
 				      */
-    void set (const internal::Triangulation::Hexahedron &h) const;
+    void set (const internal::Triangulation::TriaObject<3> &h) const;
     
 				     /**
 				      *  Return index of a vertex of a hex in the internal structures of Triangulation.
@@ -3549,8 +3547,8 @@ class CellAccessor :  public TriaObjectAccessor<dim,dim>
 template <> Point<2> TriaObjectAccessor<2, 2>::barycenter () const;
 template <> Point<3> TriaObjectAccessor<2, 3>::barycenter () const;
 template <> Point<3> TriaObjectAccessor<3, 3>::barycenter () const;
-template <> internal::Triangulation::TriaObjects<internal::Triangulation::Line> &TriaObjectAccessor<1, 1>::lines() const;
-template <> internal::Triangulation::TriaObjects<internal::Triangulation::Quad> &TriaObjectAccessor<2, 2>::quads() const;
+template <> internal::Triangulation::TriaObjects<internal::Triangulation::TriaObject<1> > &TriaObjectAccessor<1, 1>::lines() const;
+template <> internal::Triangulation::TriaObjects<internal::Triangulation::TriaObject<2> > &TriaObjectAccessor<2, 2>::quads() const;
 template <> bool CellAccessor<1>::at_boundary () const;
 template <> unsigned char CellAccessor<1>::material_id () const;
 template <> void CellAccessor<1>::set_material_id (const unsigned char mat_id) const;
