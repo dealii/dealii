@@ -136,8 +136,7 @@ TAGS:
 	$D/base/include/*/*.h $D/lac/include/*/*.h $D/deal.II/include/*/*.h \
 	$D/base/source/*.cc $D/lac/source/*.cc \
 	$D/deal.II/source/*/*.cc $D/deal.II/source/*/*.h \
-	$D/examples/*/*.cc \
-	$D/tests/*/*.h $D/tests/*/*.cc ; \
+	$D/examples/*/*.cc ; \
 	perl -pi -e 's/ \* .*//g; s&[\t]*/\*.*&&g; s&[\t]*\*/.*&&g;' TAGS
 
 
