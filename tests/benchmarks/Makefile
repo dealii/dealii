@@ -75,6 +75,12 @@ Makefile.tests: Makefile $(shell echo *.cc)
 	 done \
 		> $@
 
+Makefile.depend: $(shell echo *.cc)
+	@echo =====Dependencies== $@
+	@$D/common/scripts/make_dependencies $(INCLUDE) $^ > $@ \
+		|| (rm -f $@ ; false)
+	@$(PERL) -pi -e 's#\.((g\.)?$(OBJEXT):)#/obj.\1#g;' $@
+
 
 
 
