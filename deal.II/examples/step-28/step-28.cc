@@ -4,7 +4,7 @@
 /*    $Id: step-6.cc,v 1.43 2006/02/09 02:54:11 wolf Exp $       */
 /*    Version: $Name:  $                                          */
 /*                                                                */
-/*    Copyright (C) 2006 by the deal.II authors and Yaqi Wang     */
+/*    Copyright (C) 2006, 2007 by the deal.II authors and Yaqi Wang     */
 /*                                                                */
 /*    This file is subject to QPL and may not be  distributed     */
 /*    without copyright and license information. Please refer     */
@@ -1580,7 +1580,7 @@ EnergyGroup<dim>::output_results (const unsigned int cycle) const
                                  // <code>declare_parameters</code>
                                  // that described to the
                                  // ParameterHandler class already
-                                 // used in @ref step_19 "step-19"
+                                 // used in step-19
                                  // what parameters are accepted in
                                  // the input file, and a function
                                  // <code>get_parameters</code> that
