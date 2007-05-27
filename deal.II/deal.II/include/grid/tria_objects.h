@@ -283,7 +283,7 @@ namespace internal
  * @ingroup grid
  */
     
-    class TriaObjectsHex: public TriaObjects<Hexahedron>
+    class TriaObjectsHex: public TriaObjects<TriaObject<3> >
     {
       public:
 

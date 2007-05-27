@@ -252,7 +252,7 @@ inline
 internal::Triangulation::TriaObjects<internal::Triangulation::Line> &
 TriaObjectAccessor<1,1>::lines() const
 {
-  return this->tria->levels[this->present_level]->lines;
+  return this->tria->levels[this->present_level]->cells;
 }
 
 
@@ -448,7 +448,7 @@ TriaObjectAccessor<1,1>::operator ++ ()
 				   // the vector?
   while (this->present_index
 	 >=
-	 static_cast<int>(this->tria->levels[this->present_level]->lines.cells.size()))
+	 static_cast<int>(this->tria->levels[this->present_level]->cells.cells.size()))
     {
 				       // no -> go one level up until we find
 				       // one with more than zero cells
@@ -503,7 +503,7 @@ TriaObjectAccessor<1,1>::operator -- ()
 	  return;
 	}
 					 // else
-      this->present_index = this->tria->levels[this->present_level]->lines.cells.size()-1;
+      this->present_index = this->tria->levels[this->present_level]->cells.cells.size()-1;
     }
 }
 
@@ -534,7 +534,7 @@ inline
 internal::Triangulation::TriaObjects<internal::Triangulation::Quad> &
 TriaObjectAccessor<2,2>::quads() const
 {
-  return this->tria->levels[this->present_level]->quads;
+  return this->tria->levels[this->present_level]->cells;
 }
 
 
@@ -862,7 +862,7 @@ TriaObjectAccessor<3,3>::used () const
 {
   Assert (this->state() == IteratorState::valid,
 	  TriaAccessorExceptions::ExcDereferenceInvalidObject());
-   return this->tria->levels[this->present_level]->hexes.used[this->present_index];
+   return this->tria->levels[this->present_level]->cells.used[this->present_index];
 }
 
 
@@ -873,7 +873,7 @@ bool
 TriaObjectAccessor<3,3>::user_flag_set () const
 {
   Assert (this->used(), TriaAccessorExceptions::ExcCellNotUsed());
-  return this->tria->levels[this->present_level]->hexes.user_flags[this->present_index];
+  return this->tria->levels[this->present_level]->cells.user_flags[this->present_index];
 }
 
 
@@ -884,7 +884,7 @@ void
 TriaObjectAccessor<3,3>::set_user_flag () const
 {
   Assert (this->used(), TriaAccessorExceptions::ExcCellNotUsed());
-  this->tria->levels[this->present_level]->hexes.user_flags[this->present_index] = true;
+  this->tria->levels[this->present_level]->cells.user_flags[this->present_index] = true;
 }
 
 
@@ -894,7 +894,7 @@ inline
 void TriaObjectAccessor<3,3>::clear_user_flag () const
 {
   Assert (this->used(), TriaAccessorExceptions::ExcCellNotUsed());
-  this->tria->levels[this->present_level]->hexes.user_flags[this->present_index] = false;
+  this->tria->levels[this->present_level]->cells.user_flags[this->present_index] = false;
 }
 
 
@@ -989,7 +989,7 @@ TriaObjectAccessor<3,3>::quad_index (const unsigned int i) const
 {
   Assert (i<6, ExcIndexRange(i,0,6));
 
-  return this->tria->levels[this->present_level]->hexes.cells[this->present_index].face(i);
+  return this->tria->levels[this->present_level]->cells.cells[this->present_index].face(i);
 }
 
 
@@ -1001,7 +1001,7 @@ TriaObjectAccessor<3,3>::has_children () const
 {
   Assert (this->state() == IteratorState::valid,
 	  TriaAccessorExceptions::ExcDereferenceInvalidObject());
-    return (this->tria->levels[this->present_level]->hexes.children[this->present_index] != -1);
+    return (this->tria->levels[this->present_level]->cells.children[this->present_index] != -1);
 }
 
 
@@ -1011,7 +1011,7 @@ int TriaObjectAccessor<3,3>::child_index (const unsigned int i) const
 {
   Assert (i<8, ExcIndexRange(i,0,8));
   Assert (has_children(), TriaAccessorExceptions::ExcCellHasNoChildren());
-    return this->tria->levels[this->present_level]->hexes.children[this->present_index]+i;
+    return this->tria->levels[this->present_level]->cells.children[this->present_index]+i;
 }
 
 
@@ -1080,11 +1080,11 @@ face_orientation (const unsigned int face) const
           ExcIndexRange (face, 0, GeometryInfo<3>::faces_per_cell));
   Assert (this->present_index * GeometryInfo<3>::faces_per_cell + face
 	  < this->tria->levels[this->present_level]
-	  ->hexes.face_orientations.size(),
+	  ->cells.face_orientations.size(),
 	  ExcInternalError());
   
   return (this->tria->levels[this->present_level]
-	  ->hexes.face_orientations[this->present_index *
+	  ->cells.face_orientations[this->present_index *
 				    GeometryInfo<3>::faces_per_cell
 				    + face]);
 }
@@ -1101,11 +1101,11 @@ face_flip (const unsigned int face) const
           ExcIndexRange (face, 0, GeometryInfo<3>::faces_per_cell));
   Assert (this->present_index * GeometryInfo<3>::faces_per_cell + face
 	  < this->tria->levels[this->present_level]
-	  ->hexes.face_flips.size(),
+	  ->cells.face_flips.size(),
 	  ExcInternalError());
   
   return (this->tria->levels[this->present_level]
-	  ->hexes.face_flips[this->present_index *
+	  ->cells.face_flips[this->present_index *
 			     GeometryInfo<3>::faces_per_cell
 			     + face]);
 }
@@ -1122,11 +1122,11 @@ face_rotation (const unsigned int face) const
           ExcIndexRange (face, 0, GeometryInfo<3>::faces_per_cell));
   Assert (this->present_index * GeometryInfo<3>::faces_per_cell + face
 	  < this->tria->levels[this->present_level]
-	  ->hexes.face_rotations.size(),
+	  ->cells.face_rotations.size(),
 	  ExcInternalError());
       
   return (this->tria->levels[this->present_level]
-	  ->hexes.face_rotations[this->present_index *
+	  ->cells.face_rotations[this->present_index *
 				 GeometryInfo<3>::faces_per_cell
 				 + face]);
 }
@@ -1231,7 +1231,7 @@ TriaObjectAccessor<3,3>::operator ++ ()
 				   // the vector?
     while (this->present_index
 	   >=
-	   static_cast<int>(this->tria->levels[this->present_level]->hexes.cells.size()))
+	   static_cast<int>(this->tria->levels[this->present_level]->cells.cells.size()))
       {
 					 // no -> go one level up
 	++this->present_level;
@@ -1268,7 +1268,7 @@ TriaObjectAccessor<3,3>::operator -- ()
 	    return;
 	  }
 					 // else
-	this->present_index = this->tria->levels[this->present_level]->hexes.cells.size()-1;
+	this->present_index = this->tria->levels[this->present_level]->cells.cells.size()-1;
       }
 }
 

@@ -845,7 +845,7 @@ void
 TriaObjectAccessor<3, 3>::set (const internal::Triangulation::Hexahedron &hex) const
 {
   this->tria->levels[this->present_level]
-    ->hexes.cells[this->present_index] = hex;
+    ->cells.cells[this->present_index] = hex;
 }
 
 #endif
@@ -890,7 +890,7 @@ void TriaObjectAccessor<3, 3>::set_used_flag () const
 {
   Assert (this->state() == IteratorState::valid,
 	  TriaAccessorExceptions::ExcDereferenceInvalidObject());
-  this->tria->levels[this->present_level]->hexes.used[this->present_index] = true;
+  this->tria->levels[this->present_level]->cells.used[this->present_index] = true;
 }
 
 
@@ -899,7 +899,7 @@ void TriaObjectAccessor<3, 3>::clear_used_flag () const
 {
   Assert (this->state() == IteratorState::valid,
 	  TriaAccessorExceptions::ExcDereferenceInvalidObject());
-  this->tria->levels[this->present_level]->hexes.used[this->present_index] = false;
+  this->tria->levels[this->present_level]->cells.used[this->present_index] = false;
 }
 
 #endif
@@ -934,7 +934,7 @@ template <>
 void TriaObjectAccessor<3, 3>::set_user_pointer (void *p) const
 {
   Assert (used(), TriaAccessorExceptions::ExcCellNotUsed());
-  this->tria->levels[this->present_level]->hexes.user_pointer(this->present_index) = p;
+  this->tria->levels[this->present_level]->cells.user_pointer(this->present_index) = p;
 }
 
 
@@ -942,7 +942,7 @@ template <>
 void TriaObjectAccessor<3, 3>::clear_user_pointer () const
 {
   Assert (used(), TriaAccessorExceptions::ExcCellNotUsed());
-  this->tria->levels[this->present_level]->hexes.user_pointer(this->present_index) = 0;
+  this->tria->levels[this->present_level]->cells.user_pointer(this->present_index) = 0;
 }
 
 
@@ -950,7 +950,7 @@ template <>
 void * TriaObjectAccessor<3, 3>::user_pointer () const
 {
   Assert (used(), TriaAccessorExceptions::ExcCellNotUsed());
-  return this->tria->levels[this->present_level]->hexes.user_pointer(this->present_index);
+  return this->tria->levels[this->present_level]->cells.user_pointer(this->present_index);
 }
 
 
@@ -958,7 +958,7 @@ template <>
 void TriaObjectAccessor<3, 3>::set_user_index (unsigned int p) const
 {
   Assert (used(), TriaAccessorExceptions::ExcCellNotUsed());
-  this->tria->levels[this->present_level]->hexes.user_index(this->present_index) = p;
+  this->tria->levels[this->present_level]->cells.user_index(this->present_index) = p;
 }
 
 
@@ -966,7 +966,7 @@ template <>
 void TriaObjectAccessor<3, 3>::clear_user_index () const
 {
   Assert (used(), TriaAccessorExceptions::ExcCellNotUsed());
-  this->tria->levels[this->present_level]->hexes.user_index(this->present_index) = 0;
+  this->tria->levels[this->present_level]->cells.user_index(this->present_index) = 0;
 }
 
 
@@ -974,7 +974,7 @@ template <>
 unsigned int  TriaObjectAccessor<3, 3>::user_index () const
 {
   Assert (used(), TriaAccessorExceptions::ExcCellNotUsed());
-  return this->tria->levels[this->present_level]->hexes.user_index(this->present_index);
+  return this->tria->levels[this->present_level]->cells.user_index(this->present_index);
 }
 
 #endif
@@ -1040,7 +1040,7 @@ void TriaObjectAccessor<3, 3>::set_children (const int index) const
 	  (!has_children() && (index>=0)),
 	  TriaAccessorExceptions::ExcCantSetChildren(index));
 
-  this->tria->levels[this->present_level]->hexes.children[this->present_index] = index;
+  this->tria->levels[this->present_level]->cells.children[this->present_index] = index;
 }
 
 #endif
@@ -1824,11 +1824,11 @@ set_face_orientation (const unsigned int face,
           ExcIndexRange (face, 0, GeometryInfo<3>::faces_per_cell));
   Assert (this->present_index * GeometryInfo<3>::faces_per_cell + face
           < this->tria->levels[this->present_level]
-          ->hexes.face_orientations.size(),
+          ->cells.face_orientations.size(),
           ExcInternalError());
           
   this->tria->levels[this->present_level]
-    ->hexes.face_orientations[this->present_index *
+    ->cells.face_orientations[this->present_index *
                               GeometryInfo<3>::faces_per_cell
                               +
                               face]  = orientation;
@@ -1846,11 +1846,11 @@ set_face_flip (const unsigned int face,
           ExcIndexRange (face, 0, GeometryInfo<3>::faces_per_cell));
   Assert (this->present_index * GeometryInfo<3>::faces_per_cell + face
           < this->tria->levels[this->present_level]
-          ->hexes.face_flips.size(),
+          ->cells.face_flips.size(),
           ExcInternalError());
           
   this->tria->levels[this->present_level]
-    ->hexes.face_flips[this->present_index *
+    ->cells.face_flips[this->present_index *
 		       GeometryInfo<3>::faces_per_cell
 		       +
 		       face]  = flip;
@@ -1868,11 +1868,11 @@ set_face_rotation (const unsigned int face,
           ExcIndexRange (face, 0, GeometryInfo<3>::faces_per_cell));
   Assert (this->present_index * GeometryInfo<3>::faces_per_cell + face
           < this->tria->levels[this->present_level]
-          ->hexes.face_rotations.size(),
+          ->cells.face_rotations.size(),
           ExcInternalError());
           
   this->tria->levels[this->present_level]
-    ->hexes.face_rotations[this->present_index *
+    ->cells.face_rotations[this->present_index *
 			   GeometryInfo<3>::faces_per_cell
 			   +
 			   face]  = rotation;
@@ -2087,14 +2087,14 @@ template <>
 unsigned char CellAccessor<3>::material_id () const
 {
   Assert (this->used(), TriaAccessorExceptions::ExcCellNotUsed());
-  return this->tria->levels[this->present_level]->hexes.material_id[this->present_index];
+  return this->tria->levels[this->present_level]->cells.material_id[this->present_index];
 }
 
 template <>
 void CellAccessor<3>::set_material_id (const unsigned char mat_id) const
 {
   Assert (this->used(), TriaAccessorExceptions::ExcCellNotUsed());
-  this->tria->levels[this->present_level]->hexes.material_id[this->present_index]
+  this->tria->levels[this->present_level]->cells.material_id[this->present_index]
     = mat_id;						 
 }
 

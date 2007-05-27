@@ -26,34 +26,16 @@ namespace internal
 {
   namespace Triangulation
   {
-
-/**
- * General template for information belonging to one level of a multilevel
- * hierarchy of a triangulation. However, only the cells are really
- * level-based data if anisotropic rfeinement is allowed. Therefore, only the
- * information concerning cells is considered here, the information concerning
- * cell-faces can be found in the <tt>TriaFaces</tt> classes.
- *
- * This template is only declared to allow
- * specializations for different dimensions.
- *
- * @ingroup grid
- */
-    template <int dim>
-    class TriaLevel
-    {
-    };
-
-
 /**
  * Store all information which belongs to one level of the multilevel
  * hierarchy.
  *
- * In TriaLevel<0> all data is stored which is not dependent on the
+ * In TriaLevel, all cell data is stored which is not dependent on the
  * dimension, e.g. a field to store the refinement flag for the cells
- * (what a cell actually is is declared elsewhere), etc. Actually, it
- * is only cell-based data, like neighborship info or refinement
- * flags. There is another field, which may fit in here, namely the
+ * (what a cell actually is is declared elsewhere), etc. See also
+ * TriaObjects for non leveloriented data.
+ *
+ * There is another field, which may fit in here, namely the
  * material data (for cells) or the boundary indicators (for faces),
  * but since we need for a line or quad either boundary information or
  * material data, we store them with the lines and quads rather than
@@ -63,10 +45,10 @@ namespace internal
  * material data for cells.
  *
  * @ingroup grid
- * @author Wolfgang Bangerth, 1998
+ * @author Wolfgang Bangerth, Guido Kanschat, 1998, 2007
  */
-    template <>
-    class TriaLevel<0>
+    template <int dim>
+    class TriaLevel
     {
       public:
                                          /**
@@ -186,6 +168,13 @@ namespace internal
                                           * of this object.
                                           */
         unsigned int memory_consumption () const;
+	
+					 /**
+					  * The object containing the data on lines and
+					  * related functions
+					  */
+	TriaObjects<TriaObject<dim> > cells;
+
 
                                          /**
                                           *  Exception
@@ -203,96 +192,51 @@ namespace internal
                         << "The containers have sizes " << arg1 << " and "
                         << arg2 << ", which is not as expected.");
     };
-
-
-
+    
+//TODO: Replace TriaObjectsHex to avoid this specialization
+    
 /**
- *  Store all information which belongs to one level of the multilevel hierarchy.
- *  
- *  In one dimension, this contains the lines on this level.
- *
- * @ingroup grid
- *  @author Wolfgang Bangerth, 1998
+ * Specialization of TriaLevels for 3D. Since we need TriaObjectsHex
+ * instead of TriaObjects. Refer to the documentation of the template
+ * for details.
  */
-    template <>
-    class TriaLevel<1> : public TriaLevel<0>
-			 
+    template<>
+    class TriaLevel<3>
     {
       public:
-					 /**
-					  * The object containing the data on lines and
-					  * related functions
-					  */
-	TriaObjects<Line> lines;
-
-      public:
-					 /**
-                                          * Determine an estimate for the
-                                          * memory consumption (in bytes)
-                                          * of this object.
-                                          */
+        std::vector<bool> refine_flags;
+        std::vector<bool> coarsen_flags;
+        std::vector<std::pair<int,int> > neighbors;
+        std::vector<unsigned int> subdomain_ids;
+        void reserve_space (const unsigned int total_cells,
+                            const unsigned int dimension);
+        void monitor_memory (const unsigned int true_dimension) const;
         unsigned int memory_consumption () const;
-    };
+	TriaObjectsHex cells;
 
 
-
-/**
- *  Store all information which belongs to one level of the multilevel hierarchy.
- *
- *  In 2D this is a vector ocontains the quads on this level.
- *
- * @ingroup grid
- *  @author Wolfgang Bangerth, 1998
- */
-    template <>
-    class TriaLevel<2> : public TriaLevel<0>
-    {
-      public:
-					 /**
-					  * The object containing the data on quads and
-					  * related functions
-					  */
-	TriaObjects<Quad> quads;
-
-      public:
-					 /**
-                                          * Determine an estimate for the
-                                          * memory consumption (in bytes)
-                                          * of this object.
+                                         /**
+                                          *  Exception
                                           */
-        unsigned int memory_consumption () const;
-    };
-
-
-
-/**
- *  Store all information which belongs to one level of the multilevel hierarchy.
- *
- *  In 3D this contains the hexahedra on this levels, 
- *
-  * @ingroup grid
- *  @author Wolfgang Bangerth, 1998, 2003
- */
-    template <>
-    class TriaLevel<3> :  public TriaLevel<0>
-    {
-      public:
-					 /**
-					  * The object containing the data on hexes and
-					  * related functions
-					  */
-	TriaObjectsHex hexes;
-
-      public:
-					 /**
-                                          * Determine an estimate for the
-                                          * memory consumption (in bytes)
-                                          * of this object.
+        DeclException3 (ExcMemoryWasted,
+                        char*, int, int,
+                        << "The container " << arg1 << " contains "
+                        << arg2 << " elements, but it`s capacity is "
+                        << arg3 << ".");
+                                         /**
+                                          *  Exception
                                           */
-        unsigned int memory_consumption () const;
+        DeclException2 (ExcMemoryInexact,
+                        int, int,
+                        << "The containers have sizes " << arg1 << " and "
+                        << arg2 << ", which is not as expected.");
     };
+    
+    
   }
 }
+
+
 
 DEAL_II_NAMESPACE_CLOSE
 

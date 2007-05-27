@@ -4345,8 +4345,8 @@ namespace hp
           new std::vector<bool> (lines_on_level);
 
                                          // Check for each cell, if it has children.
-	transform (tria.levels[i]->lines.children.begin (),
-		   tria.levels[i]->lines.children.end (),
+	transform (tria.levels[i]->cells.children.begin (),
+		   tria.levels[i]->cells.children.end (),
 		   has_children_level->begin (),
 		   std::bind2nd (std::not_equal_to<int>(), -1));
 
@@ -4374,8 +4374,8 @@ namespace hp
           new std::vector<bool> (quads_on_level);
 
                                          // Check for each cell, if it has children.
-	std::transform (tria.levels[i]->quads.children.begin (),
-                        tria.levels[i]->quads.children.end (),
+	std::transform (tria.levels[i]->cells.children.begin (),
+                        tria.levels[i]->cells.children.end (),
                         has_children_level->begin (),
                         std::bind2nd (std::not_equal_to<int>(), -1));
 
@@ -4403,8 +4403,8 @@ namespace hp
 
                                          // Check for each cell, if it
                                          // has children.
-	transform (tria.levels[i]->hexes.children.begin (),
-		   tria.levels[i]->hexes.children.end (),
+	transform (tria.levels[i]->cells.children.begin (),
+		   tria.levels[i]->cells.children.end (),
 		   has_children_level->begin (),
 		   std::bind2nd (std::not_equal_to<int>(), -1));
 
