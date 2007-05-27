@@ -74,7 +74,7 @@ class MGTransferBlockBase
 				      * This function is only called
 				      * by derived classes. These can
 				      * also set the member variables
-				      * #selected and #mg_selected to
+				      * #selected and others to
 				      * restrict the transfer matrices
 				      * to certain blocks.
 				      */
