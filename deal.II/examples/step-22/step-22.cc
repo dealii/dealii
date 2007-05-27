@@ -1,7 +1,7 @@
-/* $Id: step-22.cc 14685 2007-05-22 06:06:41Z bangerth $ */
+/* $Id$ */
 /* Author: Wolfgang Bangerth, Texas A&M University, 2007 */
 
-/*    $Id: step-21.cc 14685 2007-05-22 06:06:41Z bangerth $       */
+/*    $Id$       */
 /*    Version: $Name$                                          */
 /*                                                                */
 /*    Copyright (C) 2007 by the deal.II authors */
