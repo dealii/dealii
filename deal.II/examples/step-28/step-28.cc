@@ -1,7 +1,7 @@
 //TODO: remove direct (non-eigenvalue) problem possibility (remove
 //         ExtraneousSource and some stuff in run(), see isour)
 
-/*    $Id: step-6.cc,v 1.43 2006/02/09 02:54:11 wolf Exp $       */
+/*    $Id$       */
 /*    Version: $Name:  $                                          */
 /*                                                                */
 /*    Copyright (C) 2006, 2007 by the deal.II authors and Yaqi Wang     */
