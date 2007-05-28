@@ -84,12 +84,22 @@ void check ()
       deallog << "Dofs " << dof.n_dofs() << std::endl;
       indices(dof);
       deallog << "Index" << std::endl;
+      fevalues(dof,  update_q_points);
+      deallog << "qpoints" << std::endl;
+      fevalues(dof, update_JxW_values);
+      deallog << "JxW" << std::endl;
       fevalues(dof,  update_q_points | update_JxW_values);
       deallog << "qpoints|JxW" << std::endl;
+      fevalues(dof,  update_values);
+      deallog << "values" << std::endl;
       fevalues(dof,  update_values | update_JxW_values);
       deallog << "values|JxW" << std::endl;
-      fevalues(dof,  update_values | update_gradients | update_JxW_values);
-      deallog << "values|gradients|JxW" << std::endl;
+      fevalues(dof,  update_values | update_gradients
+	       | update_q_points | update_JxW_values);
+      deallog << "values|gradients|qpoints|JxW" << std::endl;
+      fevalues(dof,  update_values | update_gradients | update_second_derivatives
+	       | update_q_points | update_JxW_values);
+      deallog << "values|gradients|2nds|qpoints|JxW" << std::endl;
       deallog.pop();
     }
 }
