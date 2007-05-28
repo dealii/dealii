@@ -11,13 +11,14 @@ D=../../deal.II
 include $D/common/Make.global_options
 debug-mode = on
 
-libraries += $(lib-deal2-2d.o) $(lib-deal2-3d.o) $(lib-lac.o) $(lib-base.o)
+libraries = $(lib-deal2-2d.o) $(lib-deal2-3d.o) $(lib-lac.o) $(lib-base.o)
+libraries.g = $(lib-deal2-2d.g) $(lib-deal2-3d.g) $(lib-lac.g) $(lib-base.g)
 
 default: run-tests 
 
 ############################################################
 
-tests_x =  dof_handler_size
+tests_x =  dof_handler_*
 
 # from above list of regular expressions, generate the real set of
 # tests
@@ -47,10 +48,12 @@ endif
 	@echo Compiling > $*/status
 	@$(CXX) $(CXXFLAGS.o) -c $< -o $@
 
-######################################################################
-# Don't put $(libraries) into this line since it is already in $^
-######################################################################
-%/exe : %/obj.$(OBJEXT)
+%/exe : %/obj.$(OBJEXT) $(libraries)
+	@echo =====linking======= $@
+	@echo Linking > $*/status
+	@$(CXX) $(LDFLAGS) -o $@ $^ $(LIBS)
+
+%/g.exe : %/obj.g.$(OBJEXT) $(libraries.g)
 	@echo =====linking======= $@
 	@echo Linking > $*/status
 	@$(CXX) $(LDFLAGS) -o $@ $^ $(LIBS)
@@ -68,13 +71,6 @@ build: $(tests:%=%/exe)
 refs: $(tests:%=%/ref)
 
 
-Makefile.tests: Makefile $(shell echo *.cc)
-	@echo =====Targets======= $@
-	@for i in $(tests) ; do \
-		echo "$$i/exe : $$i/obj.\$$(OBJEXT) \$$(libraries)"; \
-	 done \
-		> $@
-
 Makefile.depend: $(shell echo *.cc)
 	@echo =====Dependencies== $@
 	@$D/common/scripts/make_dependencies $(INCLUDE) $^ > $@ \
@@ -82,7 +78,4 @@ Makefile.depend: $(shell echo *.cc)
 	@$(PERL) -pi -e 's#\.((g\.)?$(OBJEXT):)#/obj.\1#g;' $@
 
 
-
-
 include Makefile.depend
-include Makefile.tests
