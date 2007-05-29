@@ -250,7 +250,7 @@ TriaObjectAccessor (const Triangulation<dim> *parent,
 template <>
 inline
 internal::Triangulation::TriaObjects<internal::Triangulation::Line> &
-TriaObjectAccessor<1,1>::lines() const
+TriaObjectAccessor<1,1>::objects() const
 {
   return this->tria->levels[this->present_level]->cells;
 }
@@ -260,7 +260,7 @@ TriaObjectAccessor<1,1>::lines() const
 template <int dim>
 inline
 internal::Triangulation::TriaObjects<internal::Triangulation::Line> &
-TriaObjectAccessor<1,dim>::lines() const
+TriaObjectAccessor<1,dim>::objects() const
 {
   return this->tria->faces->lines;
 }
@@ -274,7 +274,7 @@ TriaObjectAccessor<1,dim>::used () const
 {
   Assert (this->state() == IteratorState::valid,
 	  TriaAccessorExceptions::ExcDereferenceInvalidObject());
-  return lines().used[this->present_index];
+  return objects().used[this->present_index];
 }
 
 
@@ -285,7 +285,7 @@ bool
 TriaObjectAccessor<1,dim>::user_flag_set () const
 {
   Assert (this->used(), TriaAccessorExceptions::ExcCellNotUsed());
-  return lines().user_flags[this->present_index];
+  return objects().user_flags[this->present_index];
 }
 
 
@@ -296,7 +296,7 @@ void
 TriaObjectAccessor<1,dim>::set_user_flag () const 
 {
   Assert (this->used(), TriaAccessorExceptions::ExcCellNotUsed());
-  lines().user_flags[this->present_index] = true;
+  objects().user_flags[this->present_index] = true;
 }
 
 
@@ -307,7 +307,7 @@ void
 TriaObjectAccessor<1,dim>::clear_user_flag () const
 {
   Assert (this->used(), TriaAccessorExceptions::ExcCellNotUsed());
-  lines().user_flags[this->present_index] = false;
+  objects().user_flags[this->present_index] = false;
 }
 
 
@@ -319,7 +319,7 @@ TriaObjectAccessor<1,dim>::has_children () const
 {
   Assert (this->state() == IteratorState::valid,
 	  TriaAccessorExceptions::ExcDereferenceInvalidObject());
-  return (lines().children[this->present_index] != -1);
+  return (objects().children[this->present_index] != -1);
 }
 
 
@@ -331,7 +331,7 @@ TriaObjectAccessor<1,dim>::child_index (unsigned const int i) const
 {
   Assert (i<2, ExcIndexRange(i,0,2));
   Assert (has_children(), TriaAccessorExceptions::ExcCellHasNoChildren());
-  return lines().children[this->present_index]+i;
+  return objects().children[this->present_index]+i;
 }
 
 
@@ -532,7 +532,7 @@ TriaObjectAccessor (const Triangulation<dim> *parent,
 template <>
 inline
 internal::Triangulation::TriaObjects<internal::Triangulation::Quad> &
-TriaObjectAccessor<2,2>::quads() const
+TriaObjectAccessor<2,2>::objects() const
 {
   return this->tria->levels[this->present_level]->cells;
 }
@@ -542,7 +542,7 @@ TriaObjectAccessor<2,2>::quads() const
 template <int dim>
 inline
 internal::Triangulation::TriaObjects<internal::Triangulation::Quad> &
-TriaObjectAccessor<2,dim>::quads() const
+TriaObjectAccessor<2,dim>::objects() const
 {
   return this->tria->faces->quads;
 }
@@ -556,7 +556,7 @@ TriaObjectAccessor<2,dim>::used () const
 {
   Assert (this->state() == IteratorState::valid,
 	  TriaAccessorExceptions::ExcDereferenceInvalidObject());
-  return quads().used[this->present_index];
+  return objects().used[this->present_index];
 }
 
 
@@ -567,7 +567,7 @@ bool
 TriaObjectAccessor<2,dim>::user_flag_set () const
 {
   Assert (this->used(), TriaAccessorExceptions::ExcCellNotUsed());
-  return quads().user_flags[this->present_index];
+  return objects().user_flags[this->present_index];
 }
 
 
@@ -578,7 +578,7 @@ void
 TriaObjectAccessor<2,dim>::set_user_flag () const
 {
   Assert (this->used(), TriaAccessorExceptions::ExcCellNotUsed());
-  quads().user_flags[this->present_index] = true;
+  objects().user_flags[this->present_index] = true;
 }
 
 
@@ -589,7 +589,7 @@ void
 TriaObjectAccessor<2,dim>::clear_user_flag () const
 {
   Assert (this->used(), TriaAccessorExceptions::ExcCellNotUsed());
-  quads().user_flags[this->present_index] = false;
+  objects().user_flags[this->present_index] = false;
 }
 
 
@@ -616,7 +616,7 @@ unsigned int
 TriaObjectAccessor<2,dim>::line_index (const unsigned int i) const
 {
   Assert (i<4, ExcIndexRange(i,0,4));
-  return quads().cells[this->present_index].face(i);
+  return objects().cells[this->present_index].face(i);
 }
 
 
@@ -628,7 +628,7 @@ TriaObjectAccessor<2,dim>::has_children () const
 {
   Assert (this->state() == IteratorState::valid,
 	  TriaAccessorExceptions::ExcDereferenceInvalidObject());
-  return (quads().children[this->present_index] != -1);
+  return (objects().children[this->present_index] != -1);
 }
 
 
@@ -639,7 +639,7 @@ int TriaObjectAccessor<2,dim>::child_index (const unsigned int i) const
 {
   Assert (i<4, ExcIndexRange(i,0,4));
   Assert (has_children(), TriaAccessorExceptions::ExcCellHasNoChildren());
-  return quads().children[this->present_index]+i;
+  return objects().children[this->present_index]+i;
 }
 
 
@@ -725,7 +725,7 @@ inline
 bool
 TriaObjectAccessor<2,3>::line_orientation (const unsigned int line) const
 {
-				   // we cannot use the quads() function here,
+				   // we cannot use the objects() function here,
 				   // since it returns a reference to
 				   // TriaObjects<Quad>, but we need a
 				   // (reference to) TriaObjectsQuad3D
@@ -762,7 +762,7 @@ TriaObjectAccessor<2,dim>::operator ++ ()
 				   // has no level)
   if (this->present_index
       >=
-      static_cast<int>(quads().cells.size()))
+      static_cast<int>(objects().cells.size()))
     this->present_index = -1;
 }
 
@@ -778,7 +778,7 @@ TriaObjectAccessor<2,2>::operator ++ ()
 				   // the vector?
   while (this->present_index
 	 >=
-	 static_cast<int>(quads().cells.size()))
+	 static_cast<int>(objects().cells.size()))
     {
 				       // no -> go one level up
       ++this->present_level;
@@ -831,7 +831,7 @@ TriaObjectAccessor<2,2>::operator -- ()
 	  return;
 	}
 				       // else
-      this->present_index = quads().cells.size()-1;
+      this->present_index = objects().cells.size()-1;
     }
 }
 

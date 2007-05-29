@@ -41,7 +41,7 @@ template <int dim>
 void
 TriaObjectAccessor<1, dim>::set (const internal::Triangulation::Line &line) const
 {
-  lines().cells[this->present_index] = line;
+  objects().cells[this->present_index] = line;
 }
 
 
@@ -50,7 +50,7 @@ template <int dim>
 int TriaObjectAccessor<1, dim>::vertex_index (const unsigned int i) const
 {
   Assert (i<2, ExcIndexRange(i,0,2));
-  return lines().cells[this->present_index].face (i);
+  return objects().cells[this->present_index].face (i);
 }
 
 
@@ -69,7 +69,7 @@ void TriaObjectAccessor<1, dim>::set_used_flag () const
 {
   Assert (this->state() == IteratorState::valid,
 	  TriaAccessorExceptions::ExcDereferenceInvalidObject());
-  lines().used[this->present_index] = true;
+  objects().used[this->present_index] = true;
 }
 
 
@@ -79,7 +79,7 @@ void TriaObjectAccessor<1, dim>::clear_used_flag () const
 {
   Assert (this->state() == IteratorState::valid,
 	  TriaAccessorExceptions::ExcDereferenceInvalidObject());
-  lines().used[this->present_index] = false;
+  objects().used[this->present_index] = false;
 }
 
 
@@ -112,7 +112,7 @@ template <int dim>
 void TriaObjectAccessor<1, dim>::set_user_pointer (void *p) const
 {
   Assert (used(), TriaAccessorExceptions::ExcCellNotUsed());
-  lines().user_pointer(this->present_index) = p;
+  objects().user_pointer(this->present_index) = p;
 }
 
 
@@ -121,7 +121,7 @@ template <int dim>
 void TriaObjectAccessor<1, dim>::clear_user_pointer () const
 {
   Assert (used(), TriaAccessorExceptions::ExcCellNotUsed());
-  lines().user_pointer(this->present_index) = 0;
+  objects().user_pointer(this->present_index) = 0;
 }
 
 
@@ -130,7 +130,7 @@ template <int dim>
 void * TriaObjectAccessor<1, dim>::user_pointer () const
 {
   Assert (used(), TriaAccessorExceptions::ExcCellNotUsed());
-  return lines().user_pointer(this->present_index);
+  return objects().user_pointer(this->present_index);
 }
 
 
@@ -165,7 +165,7 @@ template <int dim>
 void TriaObjectAccessor<1, dim>::set_user_index (unsigned int p) const
 {
   Assert (used(), TriaAccessorExceptions::ExcCellNotUsed());
-  lines().user_index(this->present_index) = p;
+  objects().user_index(this->present_index) = p;
 }
 
 
@@ -174,7 +174,7 @@ template <int dim>
 void TriaObjectAccessor<1, dim>::clear_user_index () const
 {
   Assert (used(), TriaAccessorExceptions::ExcCellNotUsed());
-  lines().user_index(this->present_index) = 0;
+  objects().user_index(this->present_index) = 0;
 }
 
 
@@ -183,7 +183,7 @@ template <int dim>
 unsigned int TriaObjectAccessor<1, dim>::user_index () const
 {
   Assert (used(), TriaAccessorExceptions::ExcCellNotUsed());
-  return lines().user_index(this->present_index);
+  return objects().user_index(this->present_index);
 }
 
 
@@ -222,7 +222,7 @@ void TriaObjectAccessor<1, dim>::set_children (const int index) const
 	  (!has_children() && (index>=0)),
 	  TriaAccessorExceptions::ExcCantSetChildren(index));
   
-  lines().children[this->present_index] = index;
+  objects().children[this->present_index] = index;
 }
 
 
@@ -241,7 +241,7 @@ unsigned char TriaObjectAccessor<1, dim>::boundary_indicator () const
   Assert (dim>=2, ExcImpossibleInDim(dim));
   Assert (used(), TriaAccessorExceptions::ExcCellNotUsed());
 
-  return lines().material_id[this->present_index];
+  return objects().material_id[this->present_index];
 }
 
 
@@ -252,7 +252,7 @@ void TriaObjectAccessor<1, dim>::set_boundary_indicator (const unsigned char bou
   Assert (dim>=2, ExcImpossibleInDim(dim));
   Assert (used(), TriaAccessorExceptions::ExcCellNotUsed());
 
-  lines().material_id[this->present_index] = boundary_ind;
+  objects().material_id[this->present_index] = boundary_ind;
 }
 
 
@@ -325,7 +325,7 @@ template <int dim>
 void
 TriaObjectAccessor<2, dim>::set (const internal::Triangulation::Quad &quad) const
 {
-  quads().cells[this->present_index] = quad;
+  objects().cells[this->present_index] = quad;
 }
 
 
@@ -366,7 +366,7 @@ TriaObjectAccessor<2, dim>::set_used_flag () const
 {
   Assert (this->state() == IteratorState::valid,
 	  TriaAccessorExceptions::ExcDereferenceInvalidObject());
-  quads().used[this->present_index] = true;
+  objects().used[this->present_index] = true;
 }
 
 
@@ -376,7 +376,7 @@ void TriaObjectAccessor<2, dim>::clear_used_flag () const
 {
   Assert (this->state() == IteratorState::valid,
 	  TriaAccessorExceptions::ExcDereferenceInvalidObject());
-  quads().used[this->present_index] = false;
+  objects().used[this->present_index] = false;
 }
 
 
@@ -409,7 +409,7 @@ template <int dim>
 void TriaObjectAccessor<2, dim>::set_user_pointer (void *p) const
 {
   Assert (used(), TriaAccessorExceptions::ExcCellNotUsed());
-  quads().user_pointer(this->present_index) = p;
+  objects().user_pointer(this->present_index) = p;
 }
 
 
@@ -418,7 +418,7 @@ template <int dim>
 void TriaObjectAccessor<2, dim>::clear_user_pointer () const
 {
   Assert (used(), TriaAccessorExceptions::ExcCellNotUsed());
-  quads().user_pointer(this->present_index) = 0;
+  objects().user_pointer(this->present_index) = 0;
 }
 
 
@@ -427,7 +427,7 @@ template <int dim>
 void * TriaObjectAccessor<2, dim>::user_pointer () const
 {
   Assert (used(), TriaAccessorExceptions::ExcCellNotUsed());
-  return quads().user_pointer(this->present_index);
+  return objects().user_pointer(this->present_index);
 }
 
 
@@ -462,7 +462,7 @@ template <int dim>
 void TriaObjectAccessor<2, dim>::set_user_index (unsigned int p) const
 {
   Assert (used(), TriaAccessorExceptions::ExcCellNotUsed());
-  quads().user_index(this->present_index) = p;
+  objects().user_index(this->present_index) = p;
 }
 
 
@@ -471,7 +471,7 @@ template <int dim>
 void TriaObjectAccessor<2, dim>::clear_user_index () const
 {
   Assert (used(), TriaAccessorExceptions::ExcCellNotUsed());
-  quads().user_index(this->present_index) = 0;
+  objects().user_index(this->present_index) = 0;
 }
 
 
@@ -480,7 +480,7 @@ template <int dim>
 unsigned int  TriaObjectAccessor<2, dim>::user_index () const
 {
   Assert (used(), TriaAccessorExceptions::ExcCellNotUsed());
-  return quads().user_index(this->present_index);
+  return objects().user_index(this->present_index);
 }
 
 
@@ -520,7 +520,7 @@ void TriaObjectAccessor<2, dim>::set_children (const int index) const
 	  (!has_children() && (index>=0)),
 	  TriaAccessorExceptions::ExcCantSetChildren(index));
 
-  quads().children[this->present_index] = index;
+  objects().children[this->present_index] = index;
 }
 
 
@@ -539,7 +539,7 @@ unsigned char TriaObjectAccessor<2, dim>::boundary_indicator () const
   Assert (dim>2, ExcImpossibleInDim(dim));
   Assert (used(), TriaAccessorExceptions::ExcCellNotUsed());
 
-  return quads().material_id[this->present_index];
+  return objects().material_id[this->present_index];
 }
 
 
@@ -550,7 +550,7 @@ void TriaObjectAccessor<2, dim>::set_boundary_indicator (const unsigned char bou
   Assert (dim>2, ExcImpossibleInDim(dim));
   Assert (used(), TriaAccessorExceptions::ExcCellNotUsed());
 
-  quads().material_id[this->present_index] = boundary_ind;
+  objects().material_id[this->present_index] = boundary_ind;
 }
 
 
@@ -1917,36 +1917,6 @@ bool CellAccessor<1>::at_boundary () const
 
 
 template <>
-unsigned char CellAccessor<1>::material_id () const
-{
-  Assert (this->used(), TriaAccessorExceptions::ExcCellNotUsed());
-  return lines().material_id[this->present_index];
-}
-
-
-
-template <>
-void CellAccessor<1>::set_material_id (const unsigned char mat_id) const
-{
-  Assert (this->used(), TriaAccessorExceptions::ExcCellNotUsed());
-  lines().material_id[this->present_index] = mat_id;
-}
-
-
-
-template <>
-void CellAccessor<1>::recursively_set_material_id (const unsigned char mat_id) const
-{
-  set_material_id (mat_id);
-
-  if (this->has_children())
-    for (unsigned int c=0; c<2; ++c)
-      child(c)->recursively_set_material_id (mat_id);
-}
-
-
-
-template <>
 bool CellAccessor<1>::point_inside (const Point<1> &p) const
 {
   return (this->vertex(0)[0] <= p[0]) && (p[0] <= this->vertex(1)[0]);
@@ -1976,36 +1946,6 @@ template <>
 bool CellAccessor<2>::at_boundary () const
 {
   return at_boundary(0) || at_boundary(1) || at_boundary(2) || at_boundary(3);
-}
-
-
-
-template <>
-unsigned char CellAccessor<2>::material_id () const
-{
-  Assert (this->used(), TriaAccessorExceptions::ExcCellNotUsed());
-  return quads().material_id[this->present_index];
-}
-
-
-
-template <>
-void CellAccessor<2>::set_material_id (const unsigned char mat_id) const
-{
-  Assert (this->used(), TriaAccessorExceptions::ExcCellNotUsed());
-  quads().material_id[this->present_index] = mat_id;						 
-}
-
-
-
-template <>
-void CellAccessor<2>::recursively_set_material_id (const unsigned char mat_id) const
-{
-  set_material_id (mat_id);
-
-  if (this->has_children())
-    for (unsigned int c=0; c<n_children(); ++c)
-      child(c)->recursively_set_material_id (mat_id);
 }
 
 
@@ -2084,34 +2024,6 @@ bool CellAccessor<3>::at_boundary () const
 
 
 template <>
-unsigned char CellAccessor<3>::material_id () const
-{
-  Assert (this->used(), TriaAccessorExceptions::ExcCellNotUsed());
-  return this->tria->levels[this->present_level]->cells.material_id[this->present_index];
-}
-
-template <>
-void CellAccessor<3>::set_material_id (const unsigned char mat_id) const
-{
-  Assert (this->used(), TriaAccessorExceptions::ExcCellNotUsed());
-  this->tria->levels[this->present_level]->cells.material_id[this->present_index]
-    = mat_id;						 
-}
-
-
-template <>
-void CellAccessor<3>::recursively_set_material_id (const unsigned char mat_id) const
-{
-  set_material_id (mat_id);
-
-  if (this->has_children())
-    for (unsigned int c=0; c<n_children(); ++c)
-      child(c)->recursively_set_material_id (mat_id);
-}
-
-
-
-template <>
 bool CellAccessor<3>::point_inside (const Point<3> &p) const
 {
 				   // original implementation by Joerg
@@ -2153,6 +2065,36 @@ bool CellAccessor<3>::point_inside (const Point<3> &p) const
 
 
 /*------------------------ Functions: CellAccessor<dim> -----------------------*/
+
+
+template <int dim>
+unsigned char CellAccessor<dim>::material_id () const
+{
+  Assert (this->used(), TriaAccessorExceptions::ExcCellNotUsed());
+  return this->tria->levels[this->present_level]->cells.material_id[this->present_index];
+}
+
+
+
+template <int dim>
+void CellAccessor<dim>::set_material_id (const unsigned char mat_id) const
+{
+  Assert (this->used(), TriaAccessorExceptions::ExcCellNotUsed());
+  this->tria->levels[this->present_level]->cells.material_id[this->present_index] = mat_id;
+}
+
+
+
+template <int dim>
+void CellAccessor<dim>::recursively_set_material_id (const unsigned char mat_id) const
+{
+  set_material_id (mat_id);
+
+  if (this->has_children())
+    for (unsigned int c=0; c<2; ++c)
+      child(c)->recursively_set_material_id (mat_id);
+}
+
 
 
 template <int dim>
