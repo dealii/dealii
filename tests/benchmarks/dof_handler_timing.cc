@@ -37,14 +37,14 @@
 using namespace dealii;
 
 template <int dim>
-void indices (const DoFHandler<dim>& dof)
+void indices (const DoFHandler<dim>& dof, unsigned int repeat)
 {
   typedef typename DoFHandler<dim>::active_cell_iterator I;
   
   std::vector<unsigned int> dofs(dof.get_fe().dofs_per_cell);
   const I end = dof.end();
 
-  for (unsigned int k=0;k<10;++k)
+  for (unsigned int k=0;k<repeat;++k)
     for (I i=dof.begin_active(); i!=end;++i)
       i->get_dof_indices(dofs);
 }
@@ -67,7 +67,37 @@ void fevalues (const DoFHandler<dim>& dof,
 
 
 template <int dim>
-void check ()
+void check_mapping (const DoFHandler<dim>& dof)
+{
+  fevalues(dof,  update_q_points);
+  deallog << "qpoints" << std::endl;
+  fevalues(dof, update_JxW_values);
+  deallog << "JxW" << std::endl;
+  fevalues(dof,  update_q_points | update_JxW_values);
+  deallog << "qpoints|JxW" << std::endl;  
+}
+
+
+template <int dim>
+void check_values (const DoFHandler<dim>& dof)
+{
+  indices(dof, 100);
+  deallog << "Index*100" << std::endl;
+  fevalues(dof,  update_values);
+  deallog << "values" << std::endl;
+  fevalues(dof,  update_values | update_JxW_values);
+  deallog << "values|JxW" << std::endl;
+  fevalues(dof,  update_values | update_gradients
+	   | update_q_points | update_JxW_values);
+  deallog << "values|gradients|qpoints|JxW" << std::endl;
+  fevalues(dof,  update_values | update_gradients | update_second_derivatives
+	   | update_q_points | update_JxW_values);
+  deallog << "values|gradients|2nds|qpoints|JxW" << std::endl;
+}
+
+
+template <int dim>
+void check_q ()
 {
   deallog << "Mesh" << std::endl;
   Triangulation<dim> tr;
@@ -82,24 +112,37 @@ void check ()
       DoFHandler<dim> dof(tr);
       dof.distribute_dofs(q);
       deallog << "Dofs " << dof.n_dofs() << std::endl;
-      indices(dof);
-      deallog << "Index" << std::endl;
-      fevalues(dof,  update_q_points);
-      deallog << "qpoints" << std::endl;
-      fevalues(dof, update_JxW_values);
-      deallog << "JxW" << std::endl;
-      fevalues(dof,  update_q_points | update_JxW_values);
-      deallog << "qpoints|JxW" << std::endl;
-      fevalues(dof,  update_values);
-      deallog << "values" << std::endl;
-      fevalues(dof,  update_values | update_JxW_values);
-      deallog << "values|JxW" << std::endl;
-      fevalues(dof,  update_values | update_gradients
-	       | update_q_points | update_JxW_values);
-      deallog << "values|gradients|qpoints|JxW" << std::endl;
-      fevalues(dof,  update_values | update_gradients | update_second_derivatives
-	       | update_q_points | update_JxW_values);
-      deallog << "values|gradients|2nds|qpoints|JxW" << std::endl;
+      
+      if (i==1)
+	check_mapping(dof);
+      check_values(dof);
+      deallog.pop();
+    }
+}
+
+
+template <int dim>
+void check_sys ()
+{
+  deallog << "Mesh" << std::endl;
+  Triangulation<dim> tr;
+  GridGenerator::hyper_cube(tr);
+  tr.refine_global(REF/dim);
+
+  FE_Q<dim> q(1);
+
+  for (unsigned int i=1;i<5;++i)
+    {
+      FESystem<dim> fe(q,1<<i);
+      deallog.push(fe.get_name());
+      deallog << "Dofs per cell " << fe.dofs_per_cell << std::endl;
+      DoFHandler<dim> dof(tr);
+      dof.distribute_dofs(fe);
+      deallog << "Dofs " << dof.n_dofs() << std::endl;
+      
+      if (i==1)
+	check_mapping(dof);
+      check_values(dof);
       deallog.pop();
     }
 }
@@ -109,7 +152,9 @@ int main()
 {
   deallog.log_execution_time(true);
   deallog.log_time_differences(true);
-  check<2>();
-  check<3>();
+  check_q<2>();
+  check_sys<2>();
+  check_q<3>();
+  check_sys<3>();
 }
 
