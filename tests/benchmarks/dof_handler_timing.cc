@@ -20,7 +20,7 @@
 #define REF 21
 #endif
 
-#include <iomanip>
+#include <fstream>
 
 #include <base/logstream.h>
 #include <base/quadrature_lib.h>
@@ -150,6 +150,8 @@ void check_sys ()
 
 int main()
 {
+  std::ofstream out("dof_handler_timing/output");
+  deallog.attach(out);
   deallog.log_execution_time(true);
   deallog.log_time_differences(true);
   check_q<2>();
