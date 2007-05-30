@@ -26,6 +26,8 @@
 #include <lac/full_matrix.h>
 #include <lac/sparse_matrix.h>
 #include <lac/compressed_sparsity_pattern.h>
+#include <lac/hash_sparsity_pattern.h>
+
 #include <lac/solver_cg.h>
 #include <lac/precondition.h>
 #include <grid/tria.h>
@@ -53,6 +55,7 @@
 
 #include <complex>
 
+
 				 // Finally, this is as in previous
 				 // programs:
 using namespace dealii;
@@ -61,7 +64,7 @@ template <int dim>
 class LaplaceProblem 
 {
   public:
-    LaplaceProblem ();
+    LaplaceProblem (const bool condense_glob = true);
     ~LaplaceProblem ();
 
     void run ();
@@ -93,6 +96,7 @@ class LaplaceProblem
     Timer distr, condense, hang, assemble, solver;
 
     const unsigned int max_degree;
+    const bool condense_global;
 };
 
 
@@ -136,9 +140,10 @@ RightHandSide<dim>::value (const Point<dim>   &p,
 
 
 template <int dim>
-LaplaceProblem<dim>::LaplaceProblem () :
+LaplaceProblem<dim>::LaplaceProblem (bool condense_glob) :
   dof_handler (triangulation),
-  max_degree (dim == 2 ? 7 : 5)
+  max_degree (dim == 2 ? 7 : 5),
+  condense_global (condense_glob)
 {
   for (unsigned int degree=2; degree<=max_degree; ++degree)
     {
@@ -197,7 +202,8 @@ void LaplaceProblem<dim>::setup_system ()
       condense.reset();
       condense.start();
       hanging_node_constraints.condense (csp);
-      condense.stop();      
+      condense.stop();
+
       sparsity_pattern.copy_from (csp);
     }
 
@@ -250,21 +256,41 @@ void LaplaceProblem<dim>::assemble_system ()
 	  }
 
       cell->get_dof_indices (local_dof_indices);
-      for (unsigned int i=0; i<dofs_per_cell; ++i)
+
+      if (condense_global)
 	{
-	  for (unsigned int j=0; j<dofs_per_cell; ++j)
-	    system_matrix.add (local_dof_indices[i],
-			       local_dof_indices[j],
-			       cell_matrix(i,j));
+	  for (unsigned int i=0; i<dofs_per_cell; ++i)
+	    {
+	      for (unsigned int j=0; j<dofs_per_cell; ++j)
+		system_matrix.add (local_dof_indices[i],
+				   local_dof_indices[j],
+				   cell_matrix(i,j));
+	      
+	      system_rhs(local_dof_indices[i]) += cell_rhs(i);
+	    }
+	}
+      else
+	{
+	  hanging_node_constraints
+	    .distribute_local_to_global (cell_matrix,
+					 local_dof_indices,
+					 system_matrix);
 	  
-	  system_rhs(local_dof_indices[i]) += cell_rhs(i);
+	  hanging_node_constraints
+	    .distribute_local_to_global (cell_rhs,
+					 local_dof_indices,
+					 system_rhs);
 	}
     }
 
-  condense.start();
-  hanging_node_constraints.condense (system_matrix);
-  hanging_node_constraints.condense (system_rhs);
-  condense.stop();
+  if (condense_global)
+    {
+      condense.start();
+      hanging_node_constraints.condense (system_matrix);
+      hanging_node_constraints.condense (system_rhs);
+      condense.stop();
+    }
+
   std::map<unsigned int,double> boundary_values;
   VectorTools::interpolate_boundary_values (dof_handler,
 					    0,
@@ -1298,7 +1324,7 @@ int main ()
     {
       deallog.depth_console (0);
 
-      LaplaceProblem<3> laplace_problem;
+      LaplaceProblem<3> laplace_problem (true);
       laplace_problem.run ();
     }
   catch (std::exception &exc)
