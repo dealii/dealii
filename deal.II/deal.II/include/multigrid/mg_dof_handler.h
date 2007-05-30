@@ -2,7 +2,7 @@
 //    $Id$
 //    Version: $Name$
 //
-//    Copyright (C) 1998, 1999, 2000, 2001, 2002, 2003, 2004, 2005, 2006 by the deal.II authors
+//    Copyright (C) 1998, 1999, 2000, 2001, 2002, 2003, 2004, 2005, 2006, 2007 by the deal.II authors
 //
 //    This file is subject to QPL and may not be  distributed
 //    without copyright and license information. Please refer
@@ -711,6 +711,21 @@ class MGDoFHandler : public DoFHandler<dim>
 				      */
     unsigned int n_dofs () const;
     
+    				     /**
+				      * Determine an estimate for the
+				      * memory consumption (in bytes)
+				      * of this object.
+				      *
+				      * This function is made virtual,
+				      * since a dof handler object
+				      * might be accessed through a
+				      * pointers to thisr base class,
+				      * although the actual object
+				      * might be a derived class.
+				      */
+    virtual unsigned int memory_consumption () const;
+
+
 				     /**
 				      * Exception.
 				      */

@@ -2,7 +2,7 @@
 //    $Id$
 //    Version: $Name$
 //
-//    Copyright (C) 1998, 1999, 2000, 2001, 2002, 2003, 2004, 2005, 2006 by the deal.II authors
+//    Copyright (C) 1998, 1999, 2000, 2001, 2002, 2003, 2004, 2005, 2006, 2007 by the deal.II authors
 //
 //    This file is subject to QPL and may not be  distributed
 //    without copyright and license information. Please refer
@@ -11,7 +11,7 @@
 //
 //---------------------------------------------------------------------------
 
-
+#include <base/memory_consumption.h>
 #include <dofs/dof_levels.h>
 #include <dofs/dof_faces.h>
 #include <dofs/dof_constraints.h>
@@ -33,6 +33,7 @@ DEAL_II_NAMESPACE_OPEN
 
 
 /* ------------------------ MGVertexDoFs ----------------------------------- */
+//TODO: This seems horrible memory fragmentation!
 
 template <int dim>
 MGDoFHandler<dim>::MGVertexDoFs::MGVertexDoFs ()
@@ -121,6 +122,25 @@ template <int dim>
 MGDoFHandler<dim>::~MGDoFHandler ()
 {
   clear ();
+}
+
+
+template <int dim>
+unsigned int
+MGDoFHandler<dim>::memory_consumption() const
+{
+  unsigned int mem = DoFHandler<dim>::memory_consumption();
+  for (unsigned int l=0;l<mg_levels.size();++l)
+    mem += mg_levels[l]->memory_consumption();
+  
+  mem += MemoryConsumption::memory_consumption(*mg_faces);
+  
+  for (unsigned int l=0;l<mg_vertex_dofs.size();++l)
+    mem += sizeof(MGVertexDoFs)
+	   + (1+mg_vertex_dofs[l].get_finest_level()-mg_vertex_dofs[l].get_coarsest_level())
+	   * sizeof(unsigned int);
+  mem += MemoryConsumption::memory_consumption(mg_used_dofs);
+  return mem;
 }
 
 
