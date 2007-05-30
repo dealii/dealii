@@ -90,9 +90,9 @@ void check_values (const DoFHandler<dim>& dof)
   fevalues(dof,  update_values | update_gradients
 	   | update_q_points | update_JxW_values);
   deallog << "values|gradients|qpoints|JxW" << std::endl;
-  fevalues(dof,  update_values | update_gradients | update_second_derivatives
-	   | update_q_points | update_JxW_values);
-  deallog << "values|gradients|2nds|qpoints|JxW" << std::endl;
+//  fevalues(dof,  update_values | update_gradients | update_second_derivatives
+//	   | update_q_points | update_JxW_values);
+//  deallog << "values|gradients|2nds|qpoints|JxW" << std::endl;
 }
 
 
