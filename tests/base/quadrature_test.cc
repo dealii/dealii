@@ -133,7 +133,7 @@ check_faces (const std::vector<Quadrature<dim-1>*>& quadratures, const bool sub)
       deallog << "Quadrature no." << n;
 
       unsigned int i=0;
-      double quadrature_int=0;
+      long double quadrature_int=0;
       double exact_int=0;
       double err = 0;
 
@@ -147,15 +147,15 @@ check_faces (const std::vector<Quadrature<dim-1>*>& quadratures, const bool sub)
 
 	  for (unsigned int x=0; x<quadrature.n_quadrature_points; ++x)
 	    {
-	      double f=1.;
+	      long double f=1.;
 	      switch (dim)
 		{
 		case 3:
-		  f *= std::pow(points[x](2), i*1.0);
+		  f *= std::pow((long double) points[x](2), i*1.0L);
 		case 2:
-		  f *= std::pow(points[x](1), i*1.0);
+		  f *= std::pow((long double) points[x](1), i*1.0L);
 		case 1:
-		  f *= std::pow(points[x](0), i*1.0);
+		  f *= std::pow((long double) points[x](0), i*1.0L);
 		}
 	      quadrature_int+=f*weights[x];
 	    }
