@@ -1,0 +1,91 @@
+Index: deal.II/source/multigrid/mg_dof_handler.cc
+===================================================================
+--- deal.II/source/multigrid/mg_dof_handler.cc	(revision 14714)
++++ deal.II/source/multigrid/mg_dof_handler.cc	(working copy)
+@@ -2,7 +2,7 @@
+ //    $Id$
+ //    Version: $Name$
+ //
+-//    Copyright (C) 1998, 1999, 2000, 2001, 2002, 2003, 2004, 2005, 2006 by the deal.II authors
++//    Copyright (C) 1998, 1999, 2000, 2001, 2002, 2003, 2004, 2005, 2006, 2007 by the deal.II authors
+ //
+ //    This file is subject to QPL and may not be  distributed
+ //    without copyright and license information. Please refer
+@@ -11,7 +11,7 @@
+ //
+ //---------------------------------------------------------------------------
+ 
+-
++#include <base/memory_consumption.h>
+ #include <dofs/dof_levels.h>
+ #include <dofs/dof_faces.h>
+ #include <dofs/dof_constraints.h>
+@@ -33,6 +33,7 @@
+ 
+ 
+ /* ------------------------ MGVertexDoFs ----------------------------------- */
++//TODO: This seems horrible memory fragmentation!
+ 
+ template <int dim>
+ MGDoFHandler<dim>::MGVertexDoFs::MGVertexDoFs ()
+@@ -124,6 +125,25 @@
+ }
+ 
+ 
++template <int dim>
++unsigned int
++MGDoFHandler<dim>::memory_consumption() const
++{
++  unsigned int mem = DoFHandler<dim>::memory_consumption();
++  for (unsigned int l=0;l<mg_levels.size();++l)
++    mem += mg_levels[l]->memory_consumption();
++  
++  mem += MemoryConsumption::memory_consumption(*mg_faces);
++  
++  for (unsigned int l=0;l<mg_vertex_dofs.size();++l)
++    mem += sizeof(MGVertexDoFs)
++	   + (1+mg_vertex_dofs[l].get_finest_level()-mg_vertex_dofs[l].get_coarsest_level())
++	   * sizeof(unsigned int);
++  mem += MemoryConsumption::memory_consumption(mg_used_dofs);
++  return mem;
++}
++
++
+ #if deal_II_dimension == 1
+ 
+ template <>
+Index: deal.II/include/multigrid/mg_dof_handler.h
+===================================================================
+--- deal.II/include/multigrid/mg_dof_handler.h	(revision 14714)
++++ deal.II/include/multigrid/mg_dof_handler.h	(working copy)
+@@ -2,7 +2,7 @@
+ //    $Id$
+ //    Version: $Name$
+ //
+-//    Copyright (C) 1998, 1999, 2000, 2001, 2002, 2003, 2004, 2005, 2006 by the deal.II authors
++//    Copyright (C) 1998, 1999, 2000, 2001, 2002, 2003, 2004, 2005, 2006, 2007 by the deal.II authors
+ //
+ //    This file is subject to QPL and may not be  distributed
+ //    without copyright and license information. Please refer
+@@ -711,6 +711,21 @@
+ 				      */
+     unsigned int n_dofs () const;
+     
++    				     /**
++				      * Determine an estimate for the
++				      * memory consumption (in bytes)
++				      * of this object.
++				      *
++				      * This function is made virtual,
++				      * since a dof handler object
++				      * might be accessed through a
++				      * pointers to thisr base class,
++				      * although the actual object
++				      * might be a derived class.
++				      */
++    virtual unsigned int memory_consumption () const;
++
++
+ 				     /**
+ 				      * Exception.
+ 				      */
