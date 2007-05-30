@@ -26,8 +26,6 @@
 #include <lac/full_matrix.h>
 #include <lac/sparse_matrix.h>
 #include <lac/compressed_sparsity_pattern.h>
-#include <lac/hash_sparsity_pattern.h>
-
 #include <lac/solver_cg.h>
 #include <lac/precondition.h>
 #include <grid/tria.h>
@@ -855,7 +853,6 @@ namespace BreastPhantom
       bottom_cylinder_boundary_id  = 10,
       middle_cylinder_boundary_id  = 11,
       spherical_boundary_id = 12,
-      all_other_boundary_id = 13,
       straight_nondirichlet_boundary = 14;
         
         
