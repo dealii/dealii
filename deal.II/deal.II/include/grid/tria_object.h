@@ -26,15 +26,15 @@ namespace internal
   {
     
 /**
- * Class template for the <tt>dim</tt>-dimensional cells constituting
- * a Triangulation of dimension <tt>dim</tt> or lower dimensional
+ * Class template for the <tt>structdim</tt>-dimensional cells constituting
+ * a Triangulation of dimension <tt>structdim</tt> or lower dimensional
  * objects of higher dimensions.  They are characterized by the
  * (global) indices of their faces, which are cells of dimension
- * <tt>dim-1</tt> or vertices if <tt>dim=1</tt>.
+ * <tt>structdim-1</tt> or vertices if <tt>structdim=1</tt>.
  *
  * @author Guido Kanschat, 2007
  */
-    template <int dim>
+    template <int structdim>
     class TriaObject
     {
       public:
@@ -102,7 +102,7 @@ namespace internal
                                          /**
                                           *  Global indices of the two end points.
                                           */
-        int faces[GeometryInfo<dim>::faces_per_cell];
+        int faces[GeometryInfo<structdim>::faces_per_cell];
     };
 
 				     /// Legacy typedef
@@ -116,30 +116,30 @@ namespace internal
 
 //----------------------------------------------------------------------//
 
-    template <int dim>
+    template <int structdim>
     inline
-    TriaObject<dim>::TriaObject ()
+    TriaObject<structdim>::TriaObject ()
     {
-      for (unsigned int i=0;i<GeometryInfo<dim>::faces_per_cell;++i)
+      for (unsigned int i=0;i<GeometryInfo<structdim>::faces_per_cell;++i)
 	faces[i] = -1;
     }
 
 
-    template <int dim>
+    template <int structdim>
     inline
-    TriaObject<dim>::TriaObject (const int i0, const int i1)
+    TriaObject<structdim>::TriaObject (const int i0, const int i1)
     {
-      Assert (dim==1, ExcImpossibleInDim(dim));
+      Assert (structdim==1, ExcImpossibleInDim(structdim));
       faces[0] = i0;
       faces[1] = i1;
     }
 
 
-    template <int dim>
+    template <int structdim>
     inline
-    TriaObject<dim>::TriaObject (const int i0, const int i1, const int i2, const int i3)
+    TriaObject<structdim>::TriaObject (const int i0, const int i1, const int i2, const int i3)
     {
-      Assert (dim==2, ExcImpossibleInDim(dim));
+      Assert (structdim==2, ExcImpossibleInDim(structdim));
       faces[0] = i0;
       faces[1] = i1;
       faces[2] = i2;
@@ -147,12 +147,12 @@ namespace internal
     }
 
 
-    template <int dim>
+    template <int structdim>
     inline
-    TriaObject<dim>::TriaObject (const int i0, const int i1, const int i2,
-				 const int i3, const int i4, const int i5)
+    TriaObject<structdim>::TriaObject (const int i0, const int i1, const int i2,
+				       const int i3, const int i4, const int i5)
     {
-      Assert (dim==3, ExcImpossibleInDim(dim));
+      Assert (structdim==3, ExcImpossibleInDim(structdim));
       faces[0] = i0;
       faces[1] = i1;
       faces[2] = i2;
@@ -162,34 +162,34 @@ namespace internal
     }
 
 
-    template <int dim>
+    template <int structdim>
     inline
-    int TriaObject<dim>::face (const unsigned int i) const
+    int TriaObject<structdim>::face (const unsigned int i) const
     {
-      Assert (i<GeometryInfo<dim>::faces_per_cell,
-              ExcIndexRange(i,0,GeometryInfo<dim>::faces_per_cell));
+      Assert (i<GeometryInfo<structdim>::faces_per_cell,
+              ExcIndexRange(i,0,GeometryInfo<structdim>::faces_per_cell));
       return faces[i];
     }
     
     
     
-    template <int dim>
+    template <int structdim>
     inline
-    void TriaObject<dim>::set_face (const unsigned int i, const int index)
+    void TriaObject<structdim>::set_face (const unsigned int i, const int index)
     {
-      Assert (i<GeometryInfo<dim>::faces_per_cell,
-              ExcIndexRange(i,0,GeometryInfo<dim>::faces_per_cell));
+      Assert (i<GeometryInfo<structdim>::faces_per_cell,
+              ExcIndexRange(i,0,GeometryInfo<structdim>::faces_per_cell));
       faces[i] = index;
     }
     
     
     
-    template <int dim>
+    template <int structdim>
     inline
     unsigned int
-    TriaObject<dim>::memory_consumption ()
+    TriaObject<structdim>::memory_consumption ()
     {
-      return sizeof(TriaObject<dim>);
+      return sizeof(TriaObject<structdim>);
     }
     
     
