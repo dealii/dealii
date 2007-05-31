@@ -211,6 +211,9 @@ void LaplaceProblem<dim>::setup_system ()
 template <int dim>
 void LaplaceProblem<dim>::assemble_system () 
 {
+  assemble.reset ();
+  assemble.start ();
+  
   hp::FEValues<dim> hp_fe_values (fe_collection,
 				  quadrature_collection, 
 				  update_values    |  update_gradients |
@@ -281,6 +284,8 @@ void LaplaceProblem<dim>::assemble_system ()
 	}
     }
 
+  assemble.stop();
+  
   if (condense_global)
     {
       condense.start();
@@ -1290,10 +1295,7 @@ void LaplaceProblem<dim>::run ()
 		<< hanging_node_constraints.n_constraints()
 		<< std::endl;
 
-      assemble.reset ();
-      assemble.start ();
       assemble_system ();
-      assemble.stop();
       
 
       solver.reset();
