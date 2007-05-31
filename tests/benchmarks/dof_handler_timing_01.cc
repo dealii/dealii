@@ -59,7 +59,7 @@ void check_dofs(DOF& dof, unsigned int repeat)
 template <int dim>
 void check (bool local)
 {
-  deallog << "Dimension " << dim << std::endl;
+  deallog << "Start mesh"  << std::endl;
   Triangulation<dim> tr(Triangulation<dim>::maximum_smoothing);
   GridGenerator::hyper_cube(tr);
 
@@ -74,7 +74,7 @@ void check (bool local)
   
   deallog << "Levels " << tr.n_levels() << " Cells "<< tr.n_cells()
 	  << std::endl
-	  << " active " << tr.n_active_cells()
+	  << "active " << tr.n_active_cells()
 	  << " memory " << tr.memory_consumption()/1.e6
 	  << std::endl;
   
@@ -95,12 +95,20 @@ int main()
   deallog.log_time_differences(true);
   deallog.attach(out);
   deallog.push("local");
+  deallog.push("2d");
   check<2>(true);
+  deallog.pop();
+  deallog.push("3d");
   check<3>(true);
   deallog.pop();
+  deallog.pop();
   deallog.push("global");  
+  deallog.push("2d");
   check<2>(false);
+  deallog.pop();
+  deallog.push("3d");
   check<3>(false);
+  deallog.pop();
   deallog.pop();
 }
 
