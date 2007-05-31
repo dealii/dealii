@@ -58,6 +58,9 @@ endif
 	@echo Linking > $*/status
 	@$(CXX) $(LDFLAGS) -o $@ $^ $(LIBS)
 
+%/output : %/exe
+	@echo =====running======= $<
+	@$<
 
 ############################################################
 # After all these general rules, here is the target to be

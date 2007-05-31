@@ -40,7 +40,7 @@ void check_dofs(DOF& dof, unsigned int repeat)
       FE_Q<DOF::dimension> fe(i);
       for (unsigned int i=0;i<repeat;++i)
 	dof.distribute_dofs(fe);
-      deallog << dof.get_fe().get_name()
+      deallog << dof.get_fe().get_name() << '*' << repeat
 	      << " memory " << dof.memory_consumption()/1.e6 << std::endl;
     }
   
@@ -80,11 +80,11 @@ void check (bool local)
   
   deallog.push("DoF");
   DoFHandler<dim> dof(tr);
-  check_dofs(dof, (local ? 10 : 1));
+  check_dofs(dof, (local ? 100 : 10));
   deallog.pop();
   deallog.push("MGDoF");
   MGDoFHandler<dim> mgdof(tr);
-  check_dofs(mgdof, (local ? 10 : 1));
+  check_dofs(mgdof, (local ? 100 : 10));
   deallog.pop();
 }
 
@@ -102,7 +102,7 @@ int main()
   check<3>(true);
   deallog.pop();
   deallog.pop();
-  deallog.push("global");  
+  deallog.push("global");
   deallog.push("2d");
   check<2>(false);
   deallog.pop();
