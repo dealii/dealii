@@ -193,10 +193,10 @@ resultname:
 	@echo $(TARGET)+$(GXX-VERSION)
 
 clean: clean-base clean-lac clean-deal.II clean-fe clean-bits clean-hp clean-fail \
-	clean-umfpack clean-lapack clean-petsc
+	clean-umfpack clean-lapack clean-petsc clean-multigrid
 
 distclean: distclean-base distclean-lac distclean-deal.II distclean-fe distclean-bits distclean-hp distclean-fail \
-	distclean-umfpack distclean-lapack distclean-petsc
+	distclean-umfpack distclean-lapack distclean-petsc distclean-multigrid
 
 clean-base:
 	cd base ; $(MAKE) clean
