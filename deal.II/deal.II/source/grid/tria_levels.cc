@@ -190,8 +190,9 @@ namespace internal
   }
 }
 
-
+#if deal_II_dimension != 3
 template class internal::Triangulation::TriaLevel<deal_II_dimension>;
+#endif
 
 
 DEAL_II_NAMESPACE_CLOSE
