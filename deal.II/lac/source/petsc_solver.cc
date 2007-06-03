@@ -305,7 +305,7 @@ namespace PETScWrappers
 				     // where no residual is
 				     // available.
     KSPSetTolerances(ksp, PETSC_DEFAULT, this->solver_control.tolerance(),
-		     PETSC_DEFAULT, this->solver_control.max_steps());
+		     PETSC_DEFAULT, this->solver_control.max_steps()+1);
   }
   
 
