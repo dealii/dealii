@@ -1033,6 +1033,26 @@ inconvenience this causes.
 <h3>deal.II</h3>
 
 <ol>
+   <li> <p>New: the function
+       <code>DoFTools::make_sparsity_pattern</code> 
+       now takes an optional constraint matrix argument that can be used to
+       avoid the subsequent call to condense the sparsity pattern. In effect,
+       the sparsity pattern is generated condensed right away. For problems in
+       3d and with many constraints, this is many times faster than separate
+       creation and condensation.
+       <br>
+       (WB 2007/06/03)
+       </p>
+
+   <li> <p>New: the new function
+       <code>ConstraintMatrix::add_entries_local_to_global</code> 
+       can be used to add entries to a matrix where entries that will appear if
+       the current entry corresponds to a constrained degree of freedom are
+       also added.
+       <br>
+       (WB 2007/06/03)
+       </p>
+
    <li> <p>Fixed: the function
        <code>GridTools::find_cells_adjacent_to_vertex</code> 
        was not detecting properly the coarse cells adjacent to

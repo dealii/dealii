@@ -79,13 +79,6 @@ ConstraintMatrix::ConstraintLine::memory_consumption () const
 
 
 
-ConstraintMatrix::ConstraintMatrix ()
-		:
-		lines (),
-		sorted (false)
-{}
-
-
 void
 ConstraintMatrix::add_entries (const unsigned int                        line,
                                const std::vector<std::pair<unsigned int,double> > &col_val_pairs)
@@ -1501,5 +1494,23 @@ MATRIX_FUNCTIONS(PETScWrappers::BlockSparseMatrix);
 MATRIX_FUNCTIONS(PETScWrappers::MPI::SparseMatrix);
 MATRIX_FUNCTIONS(PETScWrappers::MPI::BlockSparseMatrix);
 #endif
+
+template void ConstraintMatrix::
+add_entries_local_to_global<SparsityPattern> (const std::vector<unsigned int> &,
+					      SparsityPattern                 &,
+					      const bool) const;
+template void ConstraintMatrix::
+add_entries_local_to_global<CompressedSparsityPattern> (const std::vector<unsigned int> &,
+					      CompressedSparsityPattern       &,
+					      const bool) const;
+template void ConstraintMatrix::
+add_entries_local_to_global<BlockSparsityPattern> (const std::vector<unsigned int> &,
+					      BlockSparsityPattern       &,
+					      const bool) const;
+template void ConstraintMatrix::
+add_entries_local_to_global<CompressedBlockSparsityPattern> (const std::vector<unsigned int> &,
+					      CompressedBlockSparsityPattern       &,
+					      const bool) const;
+
 
 DEAL_II_NAMESPACE_CLOSE

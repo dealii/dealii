@@ -46,9 +46,9 @@ DEAL_II_NAMESPACE_OPEN
 
 template <class DH, class SparsityPattern>
 void
-DoFTools::make_sparsity_pattern (
-  const DH        &dof,
-  SparsityPattern &sparsity)
+DoFTools::make_sparsity_pattern (const DH        &dof,
+				 SparsityPattern &sparsity,
+				 const ConstraintMatrix &constraints)
 {
   const unsigned int n_dofs = dof.n_dofs();
 
@@ -66,11 +66,13 @@ DoFTools::make_sparsity_pattern (
       const unsigned int dofs_per_cell = cell->get_fe().dofs_per_cell;
       dofs_on_this_cell.resize (dofs_per_cell);
       cell->get_dof_indices (dofs_on_this_cell);
-				       // make sparsity pattern for this cell
-      for (unsigned int i=0; i<dofs_per_cell; ++i)
-	for (unsigned int j=0; j<dofs_per_cell; ++j)
-	  sparsity.add (dofs_on_this_cell[i],
-			dofs_on_this_cell[j]);
+
+				       // make sparsity pattern for this
+				       // cell. if no constraints pattern was
+				       // given, then the following call acts
+				       // as if simply no constraints existed
+      constraints.add_entries_local_to_global (dofs_on_this_cell,
+					       sparsity);
     }
 }
 
@@ -1017,7 +1019,7 @@ namespace internal
 					* degrees of freedom of fe1 to the
 					* space described by fe2 (for example
 					* for the complex case described in
-					* the hp paper), we have to select
+					* the @ref hp_paper "hp paper"), we have to select
 					* fe2.dofs_per_face out of the
 					* fe1.dofs_per_face face DoFs as the
 					* master DoFs, and the rest become
@@ -1300,7 +1302,7 @@ namespace internal
 					* split it into its master and
 					* slave parts and invert the
 					* master part as explained in
-					* the hp paper.
+					* the @ref hp_paper "hp paper".
 					*/
 #ifdef DEAL_II_ANON_NAMESPACE_BUG
       static
@@ -2085,7 +2087,7 @@ namespace internal
 				       // inverted. these two matrices
 				       // are derived from the face
 				       // interpolation matrix as
-				       // described in the hp paper
+				       // described in the @ref hp_paper "hp paper"
       Table<2,boost::shared_ptr<std::pair<FullMatrix<double>,FullMatrix<double> > > >
         split_face_interpolation_matrices (n_finite_elements (dof_handler),
 					   n_finite_elements (dof_handler));
@@ -4959,43 +4961,51 @@ template void
 DoFTools::make_sparsity_pattern<DoFHandler<deal_II_dimension>,
 				SparsityPattern>
 (const DoFHandler<deal_II_dimension> &dof,
- SparsityPattern    &sparsity);
+ SparsityPattern    &sparsity,
+ const ConstraintMatrix &);
 template void
 DoFTools::make_sparsity_pattern<DoFHandler<deal_II_dimension>,
 				CompressedSparsityPattern>
 (const DoFHandler<deal_II_dimension> &dof,
- CompressedSparsityPattern    &sparsity);
+ CompressedSparsityPattern    &sparsity,
+ const ConstraintMatrix &);
 template void
 DoFTools::make_sparsity_pattern<DoFHandler<deal_II_dimension>,
 				BlockSparsityPattern>
 (const DoFHandler<deal_II_dimension> &dof,
- BlockSparsityPattern                &sparsity);
+ BlockSparsityPattern                &sparsity,
+ const ConstraintMatrix &);
 template void
 DoFTools::make_sparsity_pattern<DoFHandler<deal_II_dimension>,
 				CompressedBlockSparsityPattern>
 (const DoFHandler<deal_II_dimension> &dof,
- CompressedBlockSparsityPattern      &sparsity);
+ CompressedBlockSparsityPattern      &sparsity,
+ const ConstraintMatrix &);
 
 template void
 DoFTools::make_sparsity_pattern<hp::DoFHandler<deal_II_dimension>,
 				SparsityPattern>
 (const hp::DoFHandler<deal_II_dimension> &dof,
- SparsityPattern    &sparsity);
+ SparsityPattern    &sparsity,
+ const ConstraintMatrix &);
 template void
 DoFTools::make_sparsity_pattern<hp::DoFHandler<deal_II_dimension>,
 				CompressedSparsityPattern>
 (const hp::DoFHandler<deal_II_dimension> &dof,
- CompressedSparsityPattern    &sparsity);
+ CompressedSparsityPattern    &sparsity,
+ const ConstraintMatrix &);
 template void
 DoFTools::make_sparsity_pattern<hp::DoFHandler<deal_II_dimension>,
 				BlockSparsityPattern>
 (const hp::DoFHandler<deal_II_dimension> &dof,
- BlockSparsityPattern                &sparsity);
+ BlockSparsityPattern                &sparsity,
+ const ConstraintMatrix &);
 template void
 DoFTools::make_sparsity_pattern<hp::DoFHandler<deal_II_dimension>,
 				CompressedBlockSparsityPattern>
 (const hp::DoFHandler<deal_II_dimension> &dof,
- CompressedBlockSparsityPattern      &sparsity);
+ CompressedBlockSparsityPattern      &sparsity,
+ const ConstraintMatrix &);
 
 
 template void 
