@@ -18,6 +18,7 @@
 #include <base/exceptions.h>
 #include <base/table.h>
 #include <dofs/function_map.h>
+#include <dofs/dof_constraints.h>
 
 #include <vector>
 #include <set>
@@ -205,24 +206,25 @@ class DoFTools
 				      */
 				     /**
 				      * Maximal number of degrees of
-				      * freedom on a cell. This is
-				      * just
-				      * FiniteElementData::dofs_per_cell,
-				      * but allows for a common
-				      * interface with hp::DoFHandler.
+				      * freedom on a cell.
 				      */
     template <int dim>
     static unsigned int
     max_dofs_per_cell (const DoFHandler<dim> &dh);
     
+    template <int dim>
+    static unsigned int
+    max_dofs_per_cell (const hp::DoFHandler<dim> &dh);
+    
     
 				     /**
 				      * Maximal number of degrees of
-				      * freedom on a face. This is
-				      * just
-				      * FiniteElementData::dofs_per_face,
-				      * but allows for a common
-				      * interface with hp::DoFHandler.
+				      * freedom on a face.
+				      *
+				      * This function exists for both non-hp
+				      * and hp DoFHandlers, to allow for a
+				      * uniform interface to query this
+				      * property.
 				      */
     template <int dim>
     static unsigned int
@@ -230,69 +232,94 @@ class DoFTools
 
 				     /**
 				      * Maximal number of degrees of
-				      * freedom on a vertex. This is
-				      * just
-				      * FiniteElementData::dofs_per_vertex,
-				      * but allows for a common
-				      * interface with hp::DoFHandler.
-				      */
-    template <int dim>
-    static unsigned int
-    max_dofs_per_vertex (const DoFHandler<dim> &dh);
-    
-				     /**
-				      * Number of components in an
-				      * hp-conforming way.
-				      */
-    template <int dim>
-    static unsigned int
-    n_components (const DoFHandler<dim> &dh);
-    
-				     /**
-				      * Find out if a FiniteElement is
-				      * primitive in an hp-conforming
-				      * way.
-				      */
-    template <int dim>
-    static unsigned int
-    fe_is_primitive (const DoFHandler<dim> &dh);
-    
-				     /**
-				      * Maximal number of degrees of
-				      * freedom on a cell in an hp hierarchy.
-				      */
-    template <int dim>
-    static unsigned int
-    max_dofs_per_cell (const hp::DoFHandler<dim> &dh);
-    
-				     /**
-				      * Maximal number of degrees of
-				      * freedom on a face in an hp hierarchy.
+				      * freedom on a face.
+				      *
+				      * This function exists for both non-hp
+				      * and hp DoFHandlers, to allow for a
+				      * uniform interface to query this
+				      * property.
 				      */
     template <int dim>
     static unsigned int
     max_dofs_per_face (const hp::DoFHandler<dim> &dh);
     
 				     /**
-				      *Maximal number of degrees of
-				      * freedom on a vertex in an hp hierarchy.
+				      * Maximal number of degrees of
+				      * freedom on a vertex.
+				      *
+				      * This function exists for both non-hp
+				      * and hp DoFHandlers, to allow for a
+				      * uniform interface to query this
+				      * property.
+				      */
+    template <int dim>
+    static unsigned int
+    max_dofs_per_vertex (const DoFHandler<dim> &dh);
+    
+				     /**
+				      * Maximal number of degrees of
+				      * freedom on a vertex.
+				      *
+				      * This function exists for both non-hp
+				      * and hp DoFHandlers, to allow for a
+				      * uniform interface to query this
+				      * property.
 				      */
     template <int dim>
     static unsigned int
     max_dofs_per_vertex (const hp::DoFHandler<dim> &dh);
     
 				     /**
-				      * Number of components in an
-				      * hp-conforming way.
+				      * Number of vector components in the
+				      * finite element object used by this
+				      * DoFHandler.
+				      *
+				      * This function exists for both non-hp
+				      * and hp DoFHandlers, to allow for a
+				      * uniform interface to query this
+				      * property.
+				      */
+    template <int dim>
+    static unsigned int
+    n_components (const DoFHandler<dim> &dh);
+    
+				     /**
+				      * Number of vector components in the
+				      * finite element object used by this
+				      * DoFHandler.
+				      *
+				      * This function exists for both non-hp
+				      * and hp DoFHandlers, to allow for a
+				      * uniform interface to query this
+				      * property.
 				      */
     template <int dim>
     static unsigned int
     n_components (const hp::DoFHandler<dim> &dh);
     
 				     /**
-				      * Find out if an hp::FECollection is
-				      * primitive in an hp-conforming
-				      * way.
+				      * Find out whether the FiniteElement
+				      * used by this DoFHandler is primitive
+				      * or not.
+				      *
+				      * This function exists for both non-hp
+				      * and hp DoFHandlers, to allow for a
+				      * uniform interface to query this
+				      * property.
+				      */
+    template <int dim>
+    static unsigned int
+    fe_is_primitive (const DoFHandler<dim> &dh);
+    
+				     /**
+				      * Find out whether the FiniteElement
+				      * used by this DoFHandler is primitive
+				      * or not.
+				      *
+				      * This function exists for both non-hp
+				      * and hp DoFHandlers, to allow for a
+				      * uniform interface to query this
+				      * property.
 				      */
     template <int dim>
     static unsigned int
@@ -376,7 +403,8 @@ class DoFTools
     static
     void
     make_sparsity_pattern (const DH        &dof,
-			   SparsityPattern &sparsity_pattern);
+			   SparsityPattern &sparsity_pattern,
+			   const ConstraintMatrix &constraints = ConstraintMatrix());
 
 				     /**
 				      * Locate non-zero entries for

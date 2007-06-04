@@ -2,7 +2,7 @@
 //    $Id$
 //    Version: $Name$
 //
-//    Copyright (C) 1999, 2000, 2001, 2002, 2003, 2004, 2005, 2006 by the deal.II authors
+//    Copyright (C) 1999, 2000, 2001, 2002, 2003, 2004, 2005, 2006, 2007 by the deal.II authors
 //
 //    This file is subject to QPL and may not be  distributed
 //    without copyright and license information. Please refer
@@ -806,6 +806,114 @@ distribute_local_to_global (const FullMatrix<double>        &local_matrix,
                     global_matrix.add (local_dof_indices[i],
                                        local_dof_indices[i],
                                        local_matrix(i,i));
+                }
+              else
+                Assert (false, ExcInternalError());
+            }
+        }
+    }
+}
+
+
+
+template <typename SparsityType>
+void
+ConstraintMatrix::
+add_entries_local_to_global (const std::vector<unsigned int> &local_dof_indices,
+			     SparsityType                    &sparsity_pattern,
+			     const bool                       keep_constrained_entries) const
+{
+				   // similar to the function for distributing
+				   // matrix entries; see there for comments.
+  const unsigned int n_local_dofs = local_dof_indices.size();
+  
+  if (lines.size() == 0)
+    {
+      for (unsigned int i=0; i<n_local_dofs; ++i)
+        for (unsigned int j=0; j<n_local_dofs; ++j)
+          sparsity_pattern.add(local_dof_indices[i],
+			       local_dof_indices[j]);
+    }
+  else
+    {
+				       // if there are constraints, then they
+				       // need to be sorted to allow for
+				       // faster sorting (it doesn't matter
+				       // whether the constraint matrix is
+				       // closed or not if there are no
+				       // constraints, as above)
+      Assert (sorted == true, ExcMatrixNotClosed());
+
+      std::vector<const ConstraintLine *>
+        constraint_lines (n_local_dofs,
+                          static_cast<const ConstraintLine *>(0));
+      for (unsigned int i=0; i<n_local_dofs; ++i)
+        {
+          ConstraintLine index_comparison;
+          index_comparison.line = local_dof_indices[i];
+
+          const std::vector<ConstraintLine>::const_iterator
+            position = std::lower_bound (lines.begin(),
+                                         lines.end(),
+                                         index_comparison);
+
+          if ((position != lines.end()) &&
+              (position->line == local_dof_indices[i]))
+            constraint_lines[i] = &*position;
+        }
+
+
+      for (unsigned int i=0; i<n_local_dofs; ++i)
+        {
+          const ConstraintLine *position_i = constraint_lines[i];
+          const bool is_constrained_i = (position_i != 0);
+          
+          for (unsigned int j=0; j<n_local_dofs; ++j)
+            {
+              const ConstraintLine *position_j = constraint_lines[j];
+              const bool is_constrained_j = (position_j != 0);
+
+					       // if so requested, add the
+					       // entry unconditionally, even
+					       // if it is going to be
+					       // constrained away
+	      if (keep_constrained_entries == true)
+		sparsity_pattern.add (local_dof_indices[i],
+				      local_dof_indices[j]);
+
+	      
+              if ((is_constrained_i == false) &&
+                  (is_constrained_j == false) &&
+		  (keep_constrained_entries == false))
+                {
+                  sparsity_pattern.add (local_dof_indices[i],
+					local_dof_indices[j]);
+                }
+              else if ((is_constrained_i == true) &&
+                       (is_constrained_j == false))
+                {
+                  for (unsigned int q=0; q<position_i->entries.size(); ++q)
+                    sparsity_pattern.add (position_i->entries[q].first,
+					  local_dof_indices[j]);
+                }
+              else if ((is_constrained_i == false) &&
+                       (is_constrained_j == true))
+                {
+                  for (unsigned int q=0; q<position_j->entries.size(); ++q)
+                    sparsity_pattern.add (local_dof_indices[i],
+					  position_j->entries[q].first);
+                }
+              else if ((is_constrained_i == true) &&
+                       (is_constrained_j == true))
+                {
+                  for (unsigned int p=0; p<position_i->entries.size(); ++p)
+                    for (unsigned int q=0; q<position_j->entries.size(); ++q)
+                      sparsity_pattern.add (position_i->entries[p].first,
+					    position_j->entries[q].first);
+
+                  if (i == j)
+                    sparsity_pattern.add (local_dof_indices[i],
+					  local_dof_indices[i]);
                 }
               else
                 Assert (false, ExcInternalError());

@@ -15,11 +15,12 @@
 
 
 #include <base/config.h>
+#include <base/exceptions.h>
+#include <base/subscriptor.h>
+
 #include <vector>
 #include <map>
 #include <utility>
-#include <base/exceptions.h>
-#include <base/subscriptor.h>
 
 DEAL_II_NAMESPACE_OPEN
 
@@ -35,20 +36,42 @@ class BlockIndices;
 
 
 /**
- * This class implements linear homogeneous constraints on degrees of
- * freedom. In particular, it handles constraints of the form $x_{i_1} =
- * \sum_{j=2}^M a_{i_j} x_{i_j}$. Each "line" in objects of this class
- * corresponds to one such constraint, with the number of the line being $i1$,
- * and the entries in this line being pairs $(i_j,a_{i_j})$. Note that the
- * constraints are linear in the $x_i$, and that there is not constant
- * (non-homogeneous) term in the constraint. However, this is exactly the form
- * we need for hanging node and certain other constraints, where we need to
- * constrain one degree of freedom in terms of others. The name of the class
- * stems from the fact that these constraints can be represented in matrix
- * form as $X x = 0$, and this object then describes the matrix $X$. The most
- * frequent way to create/fill objects of this type is using the
- * DoFTools::make_hanging_node_constraints() function. The use of these
- * objects is first explained in @ref step_6 "step-6".
+ * This class implements dealing with linear homogeneous constraints on
+ * degrees of freedom. In particular, it handles constraints of the form
+ * $x_{i_1} = \sum_{j=2}^M a_{i_j} x_{i_j}$. In the context of adaptive finite
+ * elements, such constraints appear most frequently as "hanging nodes". For
+ * example, when using Q1 and Q2 elements (i.e. using
+ * FE_Q%<dim%>(1) and FE_Q%<dim%>(2)) on the two
+ * marked cells of the mesh
+ *
+ * @image html hp-refinement-simple.png
+ *
+ * there are three constraints: first $x_2=\frac 12 x_0 + \frac 12 x_1$, then
+ * $x_4=\frac 14 x_0 + \frac 34 x_1$, and finally the identity $x_3=x_1$. All
+ * three constraints fit the form given above. Similar constraints occur as
+ * hanging nodes even if all used finite elements are identical. While they
+ * are most frequent for hanging nodes, constraints of the given form appear
+ * also in other contexts, see for example the application the @ref step_11
+ * "step-11" tutorial program.
+ *
+ * The algorithms used in the implementation of this class are described in
+ * some detail in the @ref hp_paper "hp paper".
+ *
+ *
+ * <h3>Description of constraints</h3>
+ *
+ * Each "line" in objects of this class corresponds to one constrained degree
+ * of freedom, with the number of the line being $i_1$, and the entries in
+ * this line being pairs $(i_j,a_{i_j})$. Note that the constraints are linear
+ * in the $x_i$, and that there is no constant (non-homogeneous) term in the
+ * constraint. However, this is exactly the form we need for hanging node and
+ * certain other constraints, where we need to constrain one degree of freedom
+ * in terms of others. The name of the class stems from the fact that these
+ * constraints can be represented in matrix form as $X x = 0$, and this object
+ * then describes the matrix $X$. The most frequent way to create/fill objects
+ * of this type is using the DoFTools::make_hanging_node_constraints()
+ * function. The use of these objects is first explained in @ref step_6
+ * "step-6".
  *
  * Matrices of the present type are organized in lines (rows), but only those
  * lines are stored where constraints are present. New constraints are added
@@ -58,81 +81,92 @@ class BlockIndices;
  * need to call close(), which compresses the storage format and sorts the
  * entries.
  *
+ * <h3>Eliminating constraints</h3>
+ *
  * Constraint matrices are used to handle hanging nodes and other constrained
  * degrees of freedom. When building the global system matrix and the right
- * hand sides, you normally build them without taking care of the constraints,
+ * hand sides, one can build them without taking care of the constraints,
  * purely on a topological base, i.e. by a loop over cells. In order to do
  * actual calculations, you have to 'condense' the linear system: eliminate
  * constrained degrees of freedom and distribute the appropriate values to the
  * unconstrained dofs. This changes the sparsity pattern of the sparse
  * matrices used in finite element calculations und is thus a quite expensive
- * operation. The general scheme of things is that you build your system, you
- * eliminate (condense) away constrained nodes using the condense() functions
- * of this class, then you solve the remaining system, and finally you compute
- * the values of constrained nodes from the values of the unconstrained ones
- * using the distribute() function. Note that the condense() function is
- * applied to matrix and right hand side of the linear system, while the
- * distribute() function is applied to the solution vector. Note also that the
- * distribute_local_to_global() functions discussed below are equivalent to
- * condense() functions, and are thus to be applied to matrices and right hand
- * side vectors, and are not to be confused with the distribute() function
- * which has to applied to the solution vector.
+ * operation. The general scheme of things is then that you build your system,
+ * you eliminate (condense) away constrained nodes using the condense()
+ * functions of this class, then you solve the remaining system, and finally
+ * you compute the values of constrained nodes from the values of the
+ * unconstrained ones using the distribute() function. Note that the
+ * condense() function is applied to matrix and right hand side of the linear
+ * system, while the distribute() function is applied to the solution
+ * vector.
+ *
+ * This scheme of first building a linear system and then eliminating
+ * constrained degrees of freedom is inefficient, and a bottleneck if there
+ * are many constraints and matrices are full, i.e. especially for 3d and/or
+ * higher order or hp finite elements. We therefore offer a second way of
+ * building linear systems, using the add_entried_local_to_global() and
+ * distribute_local_to_global() functions discussed below. The resulting
+ * linear systems are equivalent to what one gets after calling the condense()
+ * functions.
  *
  *
- * <h3>Condensing matrices and sparsity patterns</h3>
- * 
+ * <h4>Condensing matrices and sparsity patterns</h4>
+ *
+ * As mentioned above, the first way of using constraints is to build linear
+ * systems without regards to constraints and then "condensing" them away.
  * Condensation of a matrix is done in four steps: first one builds the
- * sparsity pattern (e.g. using
- * DoFHandler::create_sparsity_pattern); then the sparsity pattern
- * of the condensed matrix is made out of the original sparsity pattern and
- * the constraints; third, the global matrix is assembled; and fourth, the
- * matrix is finally condensed. To do these steps, you have (at least) two
- * possibilities:
+ * sparsity pattern (e.g. using DoFTools::create_sparsity_pattern()); then the
+ * sparsity pattern of the condensed matrix is made out of the original
+ * sparsity pattern and the constraints; third, the global matrix is
+ * assembled; and fourth, the matrix is finally condensed. To do these steps,
+ * you have (at least) two possibilities:
  * 
  * <ul>
  * <li> Use two different sparsity patterns and two different matrices: you
- *   may eliminate the lines and rows connected with a constraint and create
- *   a totally new sparsity pattern and a new system matrix. This has the
- *   advantage that the resulting system of equations is smaller and free from
- *   artifacts of the condensation process and is therefore faster in the solution
- *   process since no unnecessary multiplications occur (see below). However, there are
- *   two major drawbacks: keeping two matrices at the same time can be quite
- *   unacceptable if you're short of memory. Secondly, the condensation process is 
- *   expensive, since <em>all</em> entries of the matrix have to be copied, not only
- *   those which are subject to constraints.
+ * may eliminate the lines and rows connected with a constraint and create a
+ * totally new sparsity pattern and a new system matrix. This has the
+ * advantage that the resulting system of equations is smaller and free from
+ * artifacts of the condensation process and is therefore faster in the
+ * solution process since no unnecessary multiplications occur (see
+ * below). However, there are two major drawbacks: keeping two matrices at the
+ * same time can be quite unacceptable if you're short of memory. Secondly,
+ * the condensation process is expensive, since <em>all</em> entries of the
+ * matrix have to be copied, not only those which are subject to constraints.
+ *
+ * This procedure is therefore not advocated and not discussed in the @ref
+ * Tutorial.
  *
  * <li> Use only one sparsity pattern and one matrix: doing it this way, the
- *   condense functions add nonzero entries to the sparsity pattern of the large
- *   matrix (with constrained nodes in it) where the condensation process of the
- *   matrix will create additional nonzero elements. In the condensation process
- *   itself, lines and rows subject to constraints are distributed to the lines
- *   and rows of unconstrained nodes. The constrained lines remain in place,
- *   however, unlike in the first possibility described above. In order not to
- *   disturb the solution process, these lines and rows are filled with zeros
- *   and an appropriate positive value on the main diagonal (we choose an
- *   average of the magnitudes of the other diagonal elements, so as to make
- *   sure that the new diagonal entry has the same order of magnitude as the
- *   other entries; this preserves the scaling properties of the matrix). The
- *   appropriate value in the right hand sides is set to zero. This way, the
- *   constrained node will always get the value zero upon solution of the
- *   equation system and will not couple to other nodes any more.
+ * condense functions add nonzero entries to the sparsity pattern of the large
+ * matrix (with constrained nodes in it) where the condensation process of the
+ * matrix will create additional nonzero elements. In the condensation process
+ * itself, lines and rows subject to constraints are distributed to the lines
+ * and rows of unconstrained nodes. The constrained lines remain in place,
+ * however, unlike in the first possibility described above. In order not to
+ * disturb the solution process, these lines and rows are filled with zeros
+ * and an appropriate positive value on the main diagonal (we choose an
+ * average of the magnitudes of the other diagonal elements, so as to make
+ * sure that the new diagonal entry has the same order of magnitude as the
+ * other entries; this preserves the scaling properties of the matrix). The
+ * appropriate value in the right hand sides is set to zero. This way, the
+ * constrained node will always get the value zero upon solution of the
+ * equation system and will not couple to other nodes any more.
  *
- *   This method has the advantage that only one matrix and sparsity pattern is
- *   needed thus using less memory. Additionally, the condensation process is
- *   less expensive, since not all but only constrained values in the matrix
- *   have to be copied. On the other hand, the solution process will take a bit
- *   longer, since matrix vector multiplications will incur multiplications
- *   with zeroes in the lines subject to constraints. Additionally, the vector
- *   size is larger than in the first possibility, resulting in more memory
- *   consumption for those iterative solution methods using a larger number of
- *   auxiliary vectors (e.g. methods using explicit orthogonalization
- *   procedures).
+ * This method has the advantage that only one matrix and sparsity pattern is
+ * needed thus using less memory. Additionally, the condensation process is
+ * less expensive, since not all but only constrained values in the matrix
+ * have to be copied. On the other hand, the solution process will take a bit
+ * longer, since matrix vector multiplications will incur multiplications with
+ * zeroes in the lines subject to constraints. Additionally, the vector size
+ * is larger than in the first possibility, resulting in more memory
+ * consumption for those iterative solution methods using a larger number of
+ * auxiliary vectors (e.g. methods using explicit orthogonalization
+ * procedures).
+ *
+ * Nevertheless, this process is overall more efficient due to its lower
+ * memory consumption and the one among the two discussed here that is
+ * exclusively discussed in the @ref Tutorial.
  * </ul>
- *
- * Usually, the second way is chosen since memory consumption upon
- * construction of a second matrix rules out the first
- * possibility. Furthermore, all example programs use this method, and we
- * recommend that you use it instead of the first way.
  *
  * This class provides two sets of @p condense functions: those taking two
  * arguments refer to the first possibility above, those taking only one do
@@ -140,18 +174,18 @@ class BlockIndices;
  *
  * The condensation functions exist for different argument types. The in-place
  * functions (i.e. those following the second way) exist for arguments of type
- * SparsityPattern, SparseMatrix and BlockSparseMatrix. Note
- * that there are no versions for arguments of type
- * PETScWrappers::SparseMatrix() or any of the other PETSc matrix wrapper
- * classes. This is due to the fact that it is relatively hard to get a
- * representation of the sparsity structure of PETSc matrices, and to modify
- * them; this holds in particular, if the matrix is actually distributed
- * across a cluster of computers. If you want to use PETSc matrices, you can
- * either copy an already condensed deal.II matrix, or build the PETSc matrix
- * in the already condensed form.
+ * SparsityPattern, SparseMatrix and BlockSparseMatrix. Note that there are no
+ * versions for arguments of type PETScWrappers::SparseMatrix() or any of the
+ * other PETSc matrix wrapper classes. This is due to the fact that it is
+ * relatively hard to get a representation of the sparsity structure of PETSc
+ * matrices, and to modify them; this holds in particular, if the matrix is
+ * actually distributed across a cluster of computers. If you want to use
+ * PETSc matrices, you can either copy an already condensed deal.II matrix, or
+ * build the PETSc matrix in the already condensed form, see the discussion
+ * below.
  * 
  * 
- * <h3>Condensing vectors</h3>
+ * <h5>Condensing vectors</h5>
  * 
  * Condensing vectors works exactly as described above for matrices. Note that
  * condensation is an idempotent operation, i.e. doing it more than once on a
@@ -167,16 +201,39 @@ class BlockIndices;
  * 
  * <h3>Avoiding explicit condensation</h3>
  *
- * Sometimes, one wants to avoid condensation at all. This may be the case
- * since condensation is an expensive operation, or because no condense()
- * function is defined for the matrix you use (this is, for example, the case
+ * Sometimes, one wants to avoid explicit condensation of a linear system
+ * after it has been built at all. There are two main reasons for wanting to
+ * do so:
+ *
+ * <ul>
+ * <li>Condensation is an expensive operation, in particular if there are
+ * many constraints and/or if the matrix has many nonzero entries. Both is
+ * typically the case for 3d, or high polynomial degree computations, as well
+ * as for hp finite element methods, see for example the @ref hp_paper "hp
+ * paper". This is the case discussed in the hp tutorial program,
+ * @ref step_27 "step-27".
+ *
+ * <li>There may not be a condense()
+ * function for the matrix you use (this is, for example, the case
  * for the PETSc wrapper classes, where we have no access to the underlying
  * representation of the matrix, and therefore cannot efficiently implement
- * the condense() operation). In this case, one possibility is to distribute
- * local entries to the final destinations right at the moment of transferring
- * them into the global matrices and vectors. For this, one can use the
- * distribute_local_to_global() functions of this class, which make a
- * subsequent call to condense() unnecessary.
+ * the condense() operation). This is the case discussed in
+ * @ref step_17 "step-17" and @ref step_18 "step-18".
+ * </ul>
+ *
+ * In this case, one possibility is to distribute local entries to the final
+ * destinations right at the moment of transferring them into the global
+ * matrices and vectors, and similarly build a sparsity pattern in the
+ * condensed form at the time it is set up originally.
+ *
+ * This class offers support for these operations as well. For example, the
+ * add_entries_local_to_global() function adds nonzero entries to a sparsity
+ * pattern object. It not only adds a given entry, but also all entries that
+ * we will have to write to if the current entry corresponds to a constrained
+ * degree of freedom that will later be eliminated. Similarly, one can use the
+ * distribute_local_to_global() functions to directly distributed entries in
+ * vectors and matrices when copying local contributions into a global matrix
+ * or vector. These calls make a subsequent call to condense() unnecessary.
  *
  * Note that, despite their name which describes what the function really
  * does, the distribute_local_to_global() functions has to be applied to
@@ -209,6 +266,10 @@ class ConstraintMatrix : public Subscriptor
 				      */
     ConstraintMatrix ();
 
+				     /**
+				      * @name Adding constraints
+				      * @{
+				      */
 
 				     /**
 				      * Add a new line to the
@@ -419,6 +480,16 @@ class ConstraintMatrix : public Subscriptor
     void clear ();
 
 				     /**
+				      * @}
+				      */
+
+
+				     /**
+				      * @name Querying constraints
+				      * @{
+				      */
+    
+				     /**
 				      * Return number of constraints stored in
 				      * this matrix.
 				      */
@@ -486,6 +557,62 @@ class ConstraintMatrix : public Subscriptor
 				      * constrained to.
 				      */
     unsigned int max_constraint_indirections () const;
+
+    
+    
+				     /**
+				      * Print the constraint lines. Mainly for
+				      * debugging purposes.
+				      *
+				      * This function writes out all entries
+				      * in the constraint matrix lines with
+				      * their value in the form
+				      * <tt>row col : value</tt>. Unconstrained lines
+				      * containing only one identity entry are
+				      * not stored in this object and are not
+				      * printed.
+				      */
+    void print (std::ostream &) const;
+
+				     /**
+				      * Write the graph of constraints
+				      * in 'dot' format. 'dot' is a
+				      * program that can take a list
+				      * of nodes and produce a
+				      * graphical representation of
+				      * the graph of constrained
+				      * degrees of freedom and the
+				      * degrees of freedom they are
+				      * constrained to.
+				      *
+				      * The output of this function
+				      * can be used as input to the
+				      * 'dot' program that can convert
+				      * the graph into a graphical
+				      * representation in postscript,
+				      * png, xfig, and a number of
+				      * other formats.
+				      *
+				      * This function exists mostly
+				      * for debugging purposes.
+				      */
+    void write_dot (std::ostream &) const;
+
+				     /**
+				      * Determine an estimate for the
+				      * memory consumption (in bytes)
+				      * of this object.
+				      */
+    unsigned int memory_consumption () const;
+
+				     /**
+				      * @}
+				      */
+    
+				     /**
+				      * @name Eliminating constraints from linear systems after their creation
+				      * @{
+				      */
 
 				     /**
 				      * Condense a given sparsity
@@ -624,55 +751,14 @@ class ConstraintMatrix : public Subscriptor
     void condense (VectorType &vec) const;
 
 				     /**
-				      * Re-distribute the elements of
-				      * the vector @p condensed to
-				      * @p uncondensed. It is the
-				      * user's responsibility to
-				      * guarantee that all entries of
-				      * @p uncondensed be zero!
-				      *
-				      * This function undoes the
-				      * action of @p condense somehow,
-				      * but it should be noted that it
-				      * is not the inverse of
-				      * @p condense.
-				      *
-				      * The @p VectorType may be a
-				      * Vector<float>,
-				      * Vector<double>,
-				      * BlockVector<tt><...></tt>, a PETSc
-				      * vector wrapper class, or any other
-				      * type having the same interface.
+				      * @}
 				      */
-    template <class VectorType>
-    void distribute (const VectorType &condensed,
-		     VectorType       &uncondensed) const;
 
 				     /**
-				      * Re-distribute the elements of the
-				      * vector in-place. The @p VectorType
-				      * may be a Vector<float>,
-				      * Vector<double>,
-				      * BlockVector<tt><...></tt>, a PETSc
-				      * vector wrapper class, or any other
-				      * type having the same interface.
+				      * @name Eliminating constraints from linear systems during their creation
+				      * @{
 				      */
-    template <class VectorType>
-    void distribute (VectorType &vec) const;
     
-				     /**
-				      * Delete hanging nodes in a vector.
-				      * Sets all hanging node values to
-				      * zero. The @p VectorType may be a
-				      * Vector<float>,
-				      * Vector<double>,
-				      * BlockVector<tt><...></tt>, a PETSc
-				      * vector wrapper class, or any other
-				      * type having the same interface.
-				      */
-    template <class VectorType>
-    void set_zero (VectorType &vec) const;
-
                                      /**
                                       * This function takes a vector of local
                                       * contributions (@p local_vector)
@@ -802,52 +888,134 @@ class ConstraintMatrix : public Subscriptor
     distribute_local_to_global (const FullMatrix<double>        &local_matrix,
                                 const std::vector<unsigned int> &local_dof_indices,
                                 MatrixType                      &global_matrix) const;
+
+				     /**
+				      * Do a similar operation as the
+				      * distribute_local_to_global() function
+				      * that distributed writing entries into
+				      * a matrix for constrained degrees of
+				      * freedom, except that here we don't
+				      * write into a matrix but only allocate
+				      * sparsity pattern entries.
+				      *
+				      * As explained in the @ref hp_paper "hp
+				      * paper" and in @ref step_27 "step-27",
+				      * first allocating a sparsity pattern
+				      * and later coming back and allocating
+				      * additional entries for those matrix
+				      * entries that will be written to due to
+				      * the elimination of constrained degrees
+				      * of freedom (using
+				      * ConstraintMatrix::condense() ), can be
+				      * a very expensive procedure. It is
+				      * cheaper to allocate these entries
+				      * right away without having to do a
+				      * second pass over the sparsity pattern
+				      * object. This function does exactly
+				      * that.
+				      *
+				      * Because the function only allocates
+				      * entries in a sparsity pattern, all it
+				      * needs to know are the degrees of
+				      * freedom that couple to each
+				      * other. Unlike the previous function,
+				      * no actual values are written, so the
+				      * second input argument is not necessary
+				      * here.
+				      *
+				      * The last argument to this function,
+				      * keep_constrained_entries determines
+				      * whether the function shall allocate
+				      * entries in the sparsity pattern at all
+				      * for entries that will later be set to
+				      * zero upon condensation of the
+				      * matrix. These entries are necessary if
+				      * the matrix is built unconstrained, and
+				      * only later condensed. They are not
+				      * necessary if the matrix is built using
+				      * the distribute_local_to_global()
+				      * function of this class which
+				      * distributes entries right away when
+				      * copying a local matrix into a global
+				      * object. The default of this argument
+				      * is true, meaning to allocate the few
+				      * entries that may later be set to zero.
+				      *
+				      * This function is not typically called
+				      * from user code, but is used in the
+				      * DoFTools::make_sparsity_pattern()
+				      * function when passed a constraint
+				      * matrix object.
+				      */
+    template <typename SparsityType>
+    void
+    add_entries_local_to_global (const std::vector<unsigned int> &local_dof_indices,
+				 SparsityType                    &sparsity_pattern,
+				 const bool                       keep_constrained_entries = true) const;
+
+				     /**
+				      * Delete hanging nodes in a vector.
+				      * Sets all hanging node values to
+				      * zero. The @p VectorType may be a
+				      * Vector<float>,
+				      * Vector<double>,
+				      * BlockVector<tt><...></tt>, a PETSc
+				      * vector wrapper class, or any other
+				      * type having the same interface.
+				      */
+    template <class VectorType>
+    void set_zero (VectorType &vec) const;
+
     
 				     /**
-				      * Print the constraint lines. Mainly for
-				      * debugging purposes.
-				      *
-				      * This function writes out all entries
-				      * in the constraint matrix lines with
-				      * their value in the form
-				      * <tt>row col : value</tt>. Unconstrained lines
-				      * containing only one identity entry are
-				      * not stored in this object and are not
-				      * printed.
+				      * @}
 				      */
-    void print (std::ostream &) const;
 
 				     /**
-				      * Write the graph of constraints
-				      * in 'dot' format. 'dot' is a
-				      * program that can take a list
-				      * of nodes and produce a
-				      * graphical representation of
-				      * the graph of constrained
-				      * degrees of freedom and the
-				      * degrees of freedom they are
-				      * constrained to.
-				      *
-				      * The output of this function
-				      * can be used as input to the
-				      * 'dot' program that can convert
-				      * the graph into a graphical
-				      * representation in postscript,
-				      * png, xfig, and a number of
-				      * other formats.
-				      *
-				      * This function exists mostly
-				      * for debugging purposes.
+				      * @name Dealing with constraints after solving a linear system
+				      * @{
 				      */
-    void write_dot (std::ostream &) const;
+    
+				     /**
+				      * Re-distribute the elements of
+				      * the vector @p condensed to
+				      * @p uncondensed. It is the
+				      * user's responsibility to
+				      * guarantee that all entries of
+				      * @p uncondensed be zero!
+				      *
+				      * This function undoes the
+				      * action of @p condense somehow,
+				      * but it should be noted that it
+				      * is not the inverse of
+				      * @p condense.
+				      *
+				      * The @p VectorType may be a
+				      * Vector<float>,
+				      * Vector<double>,
+				      * BlockVector<tt><...></tt>, a PETSc
+				      * vector wrapper class, or any other
+				      * type having the same interface.
+				      */
+    template <class VectorType>
+    void distribute (const VectorType &condensed,
+		     VectorType       &uncondensed) const;
 
 				     /**
-				      * Determine an estimate for the
-				      * memory consumption (in bytes)
-				      * of this object.
+				      * Re-distribute the elements of the
+				      * vector in-place. The @p VectorType
+				      * may be a Vector<float>,
+				      * Vector<double>,
+				      * BlockVector<tt><...></tt>, a PETSc
+				      * vector wrapper class, or any other
+				      * type having the same interface.
 				      */
-    unsigned int memory_consumption () const;
+    template <class VectorType>
+    void distribute (VectorType &vec) const;
 
+				     /**
+				      * @}
+				      */
 
 				     /**
 				      * Exception
@@ -1067,6 +1235,14 @@ class ConstraintMatrix : public Subscriptor
 
 
 /* ---------------- template and inline functions ----------------- */
+
+inline
+ConstraintMatrix::ConstraintMatrix ()
+		:
+		lines (),
+		sorted (false)
+{}
+
 
 inline
 void
