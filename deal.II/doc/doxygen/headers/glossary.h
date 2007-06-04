@@ -112,6 +112,19 @@
  * </dd>
  *
  *
+ * <dt class="glossary">@anchor hp_paper hp paper</dt>
+ * <dd>The "hp paper" is a paper by W. Bangerth and O. Kayser-Herold, titled
+ * "Data Structures and Requirements for hp Finite Element Software", that
+ * describes many of the algorithms and data structures used in the implementation
+ * of the hp framework of deal.II. In particular, it summarizes many of the
+ * tricky points that have to be considered for hp finite elements using continuous
+ * elements.
+ *
+ * The paper will appear in the ACM Transactions on Mathematical Software (TOMS)
+ * but is also available from http://www.math.tamu.edu/~bangerth/publications.html .
+ * </dd>
+ *
+ *
  * <dt class="glossary">@anchor GlossInterpolation Interpolation with finite elements</dt>
  * <dd>The purpose of interpolation with finite elements is computing
  * a vector of coefficients representing a finite element function,
