@@ -183,25 +183,37 @@ void LaplaceProblem<dim>::setup_system ()
       sparsity_pattern.reinit (dof_handler.n_dofs(),
 			       dof_handler.n_dofs(),
 			       dof_handler.max_couplings_between_dofs());
-      DoFTools::make_sparsity_pattern (dof_handler, sparsity_pattern);
-
       condense.reset();
-      condense.start();
-      hanging_node_constraints.condense (sparsity_pattern);
-      condense.stop();
+      if (condense_global)
+	{
+	  DoFTools::make_sparsity_pattern (dof_handler, sparsity_pattern);
+	  condense.start();
+	  hanging_node_constraints.condense (sparsity_pattern);
+	  condense.stop();
+	}
+      else
+	DoFTools::make_sparsity_pattern (dof_handler, sparsity_pattern,
+					 hanging_node_constraints);
+
       sparsity_pattern.compress();      
     }
   else
     {
       CompressedSparsityPattern csp (dof_handler.n_dofs(),
 				     dof_handler.n_dofs());
-      DoFTools::make_sparsity_pattern (dof_handler, csp);
-
       condense.reset();
-      condense.start();
-      hanging_node_constraints.condense (csp);
-      condense.stop();
+      if (condense_global)
+	{
+	  DoFTools::make_sparsity_pattern (dof_handler, csp);
 
+	  condense.start();
+	  hanging_node_constraints.condense (csp);
+	  condense.stop();
+	}
+      else
+	DoFTools::make_sparsity_pattern (dof_handler, csp,
+					 hanging_node_constraints);
+	
       sparsity_pattern.copy_from (csp);
     }
 
@@ -1285,6 +1297,7 @@ void LaplaceProblem<dim>::run ()
 		<< std::endl;
 
       Timer all;
+      all.reset();
       all.start();
       setup_system ();
 
@@ -1323,7 +1336,7 @@ int main ()
     {
       deallog.depth_console (0);
 
-      LaplaceProblem<3> laplace_problem (true);
+      LaplaceProblem<3> laplace_problem (false);
       laplace_problem.run ();
     }
   catch (std::exception &exc)
