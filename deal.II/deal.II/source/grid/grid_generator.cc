@@ -29,6 +29,7 @@
 #include <dofs/dof_handler.h>
 #include <dofs/dof_accessor.h>
 #include <dofs/dof_tools.h>
+#include <dofs/dof_constraints.h>
 #include <fe/mapping_q1.h>
 #include <fe/fe_q.h>
 #include <numerics/matrices.h>
@@ -2200,7 +2201,7 @@ void GridGenerator::laplace_transformation (Triangulation<dim> &tria,
   dof_handler.distribute_dofs(q1);
   SparsityPattern sparsity_pattern (dof_handler.n_dofs (), dof_handler.n_dofs (),
 				    dof_handler.max_couplings_between_dofs());
-  DoFTools::make_sparsity_pattern(dof_handler, sparsity_pattern);
+  DoFTools::make_sparsity_pattern (dof_handler, sparsity_pattern);
   sparsity_pattern.compress ();
   
   SparseMatrix<double> S(sparsity_pattern);
