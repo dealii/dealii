@@ -62,7 +62,7 @@ namespace FiniteElementDomination
 				    * of hp finite element methods when
 				    * determining what to do at faces where
 				    * two different finite elements meet
-				    * (see the hp paper for a more detailed
+				    * (see the @ref hp_paper "hp paper" for a more detailed
 				    * description of the following). In that
 				    * case, the degrees of freedom of one
 				    * side need to be constrained to those
@@ -81,7 +81,7 @@ namespace FiniteElementDomination
 				    * function.
 				    *
 				    * Note that there are situations where
-				    * neither side dominates. The hp paper
+				    * neither side dominates. The @ref hp_paper "hp paper"
 				    * lists two case, with the simpler one
 				    * being that a $Q_2\times Q_1$
 				    * vector-valued element (i.e. a
@@ -113,7 +113,7 @@ namespace FiniteElementDomination
 				    * second base element.
 				    *
 				    * More details on domination can be found
-				    * in the hp paper.
+				    * in the @ref hp_paper "hp paper".
 				    */
   enum Domination
   {

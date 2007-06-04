@@ -274,7 +274,7 @@ class FE_DGQ : public FE_Poly<TensorProductPolynomials<dim>,dim>
 				      *
 				      * For a definition of domination, see
 				      * FiniteElementBase::Domination and in
-				      * particular the hp paper.
+				      * particular the @ref hp_paper "hp paper".
 				      */
     virtual
     FiniteElementDomination::Domination
