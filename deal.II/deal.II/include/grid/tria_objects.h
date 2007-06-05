@@ -154,13 +154,26 @@ namespace internal
 					  * <tt>cell</tt>. The return
 					  * value is <tt>true</tt>, if
 					  * the normal vector points
-					  * the usual way and
-					  * <tt>false</tt> else.
+					  * the usual way
+					  * (GeometryInfo::unit_normal_orientation)
+					  * and <tt>false</tt> else.
 					  *
 					  * The result is always
 					  * <tt>true</tt> in this
-					  * class, but derived vlasses
+					  * class, but derived classes
 					  * will reimplement this.
+					  *
+					  * @warning There is a bug in
+					  * the class hierarchy right
+					  * now. Avoid ever calling
+					  * this function through a
+					  * reference, since you might
+					  * end up with the base class
+					  * function instead of the
+					  * derived class. Still, we
+					  * do not want to make it
+					  * virtual for efficiency
+					  * reasons.
 					  */
 	bool face_orientation(const unsigned int cell, const unsigned int face) const;
 	
@@ -304,6 +317,21 @@ namespace internal
     class TriaObjectsHex: public TriaObjects<TriaObject<3> >
     {
       public:
+					 /**
+					  * The orientation of the
+					  * face number <tt>face</tt>
+					  * of the cell with number
+					  * <tt>cell</tt>. The return
+					  * value is <tt>true</tt>, if
+					  * the normal vector points
+					  * the usual way
+					  * (GeometryInfo::unit_normal_orientation)
+					  * and <tt>false</tt> if they
+					  * point in opposite
+					  * direction.
+					  */
+	bool face_orientation(const unsigned int cell, const unsigned int face) const;
+	
 
 					 /**
 					  * For edges, we enforce a
@@ -406,6 +434,21 @@ namespace internal
     class TriaObjectsQuad3D: public TriaObjects<Quad>
     {
       public:
+					 /**
+					  * The orientation of the
+					  * face number <tt>face</tt>
+					  * of the cell with number
+					  * <tt>cell</tt>. The return
+					  * value is <tt>true</tt>, if
+					  * the normal vector points
+					  * the usual way
+					  * (GeometryInfo::unit_normal_orientation)
+					  * and <tt>false</tt> if they
+					  * point in opposite
+					  * direction.
+					  */
+	bool face_orientation(const unsigned int cell, const unsigned int face) const;
+	
 
 					 /**
 					  * In effect, this field has
@@ -450,16 +493,21 @@ namespace internal
         unsigned int memory_consumption () const;	    
     };
     
-
+//----------------------------------------------------------------------//
+    
     template<typename G>
-    bool TriaObjects<G>::face_orientation(const unsigned int, const unsigned int) const
+    inline
+    bool
+    TriaObjects<G>::face_orientation(const unsigned int, const unsigned int) const
     {
       return true;
     }
     
     
     template<typename G>
-    void*& TriaObjects<G>::user_pointer (const unsigned int i)
+    inline
+    void*&
+    TriaObjects<G>::user_pointer (const unsigned int i)
     {
 #ifdef DEBUG
       Assert(user_data_type == data_unknown || user_data_type == data_pointer,
@@ -472,7 +520,9 @@ namespace internal
     
 
     template<typename G>
-    const void* TriaObjects<G>::user_pointer (const unsigned int i) const
+    inline
+    const void*
+    TriaObjects<G>::user_pointer (const unsigned int i) const
     {
 #ifdef DEBUG
       Assert(user_data_type == data_unknown || user_data_type == data_pointer,
@@ -485,7 +535,9 @@ namespace internal
     
 
     template<typename G>
-    unsigned int& TriaObjects<G>::user_index (const unsigned int i)
+    inline
+    unsigned int&
+    TriaObjects<G>::user_index (const unsigned int i)
     {
 #ifdef DEBUG
       Assert(user_data_type == data_unknown || user_data_type == data_index,
@@ -496,13 +548,17 @@ namespace internal
       return user_data[i].i;
     }
     
+    
     template <typename G>
+    inline
     TriaObjects<G>::TriaObjects()
 		    :
 		    user_data_type(data_unknown)
     {}    
-
+    
+    
     template<typename G>
+    inline
     unsigned int TriaObjects<G>::user_index (const unsigned int i) const
     {
 #ifdef DEBUG
@@ -516,13 +572,40 @@ namespace internal
     
     
     template<typename G>
+    inline
     void TriaObjects<G>::clear_user_data ()
     {
       user_data_type = data_unknown;
       for (unsigned int i=0;i<user_data.size();++i)
 	user_data[i].p = 0;
     }
-    
+
+//----------------------------------------------------------------------//
+
+    inline
+    bool
+    TriaObjectsHex::face_orientation(const unsigned int cell, const unsigned int face) const
+    {
+      Assert (cell < face_orientations.size() / GeometryInfo<3>::faces_per_cell,
+	      ExcIndexRange(0, cell, face_orientations.size() / GeometryInfo<3>::faces_per_cell));
+      Assert (face < GeometryInfo<3>::faces_per_cell,
+	      ExcIndexRange(0, face, GeometryInfo<3>::faces_per_cell));
+      
+      return face_orientations[cell * GeometryInfo<3>::faces_per_cell
+			       + face];
+    }
+
+//----------------------------------------------------------------------//
+
+    inline
+    bool
+    TriaObjectsQuad3D::face_orientation(const unsigned int cell, const unsigned int face) const
+    {
+      return line_orientations[cell * GeometryInfo<2>::faces_per_cell
+			       + face];
+    }
+
+
   }
 }
 

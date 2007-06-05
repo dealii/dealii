@@ -232,11 +232,11 @@ TriaAccessor<dim,dim>::get_triangulation () const
 
 template <int dim>
 inline
-TriaObjectAccessor<1,dim>::
-TriaObjectAccessor (const Triangulation<dim> *parent,
-                    const int                 level,
-                    const int                 index,
-                    const AccessorData       *local_data)
+TriaObjectAccessor<1,dim>::TriaObjectAccessor (
+  const Triangulation<dim> *parent,
+  const int                 level,
+  const int                 index,
+  const AccessorData       *local_data)
                 :
                 TriaAccessor<1,dim> (parent, level, index, local_data)
 {
@@ -513,11 +513,11 @@ TriaObjectAccessor<1,1>::operator -- ()
 
 template <int dim>
 inline
-TriaObjectAccessor<2,dim>::
-TriaObjectAccessor (const Triangulation<dim> *parent,
-                    const int                 level,
-                    const int                 index,
-                    const AccessorData       *local_data)
+TriaObjectAccessor<2,dim>::TriaObjectAccessor (
+  const Triangulation<dim> *parent,
+  const int                 level,
+  const int                 index,
+  const AccessorData       *local_data)
                 :
                 TriaAccessor<2,dim> (parent, level, index, local_data)
 {
@@ -725,18 +725,12 @@ inline
 bool
 TriaObjectAccessor<2,3>::line_orientation (const unsigned int line) const
 {
-				   // we cannot use the objects() function here,
+ 				   // we cannot use the objects() function here,
 				   // since it returns a reference to
 				   // TriaObjects<Quad>, but we need a
 				   // (reference to) TriaObjectsQuad3D
   Assert (used(), TriaAccessorExceptions::ExcCellNotUsed());
-  Assert (line<GeometryInfo<2>::lines_per_cell,
-          ExcIndexRange (line, 0, GeometryInfo<2>::lines_per_cell));
-      Assert (this->present_index * GeometryInfo<2>::lines_per_cell + line
-	      < this->tria->faces->quads.line_orientations.size(),
-	      ExcInternalError());
-  return this->tria->faces->quads.
-    line_orientations[this->present_index * GeometryInfo<2>::lines_per_cell + line];
+  return this->tria->faces->quads.face_orientation(this->present_index, line);
 }
 
 
@@ -841,11 +835,11 @@ TriaObjectAccessor<2,2>::operator -- ()
 
 template <int dim>
 inline
-TriaObjectAccessor<3,dim>::
-TriaObjectAccessor (const Triangulation<dim> *parent,
-                    const int                 level,
-                    const int                 index,
-                    const AccessorData       *local_data)
+TriaObjectAccessor<3,dim>::TriaObjectAccessor (
+  const Triangulation<dim> *parent,
+  const int                 level,
+  const int                 index,
+  const AccessorData       *local_data)
                 :
                 TriaAccessor<3,dim> (parent, level, index, local_data)
 {
@@ -1072,29 +1066,18 @@ TriaObjectAccessor<3,dim>::max_refinement_depth () const
 template <>
 inline
 bool
-TriaObjectAccessor<3, 3>::
-face_orientation (const unsigned int face) const
+TriaObjectAccessor<3, 3>::face_orientation (const unsigned int face) const
 {
-  Assert (used(), TriaAccessorExceptions::ExcCellNotUsed());
-  Assert (face<GeometryInfo<3>::faces_per_cell,
-          ExcIndexRange (face, 0, GeometryInfo<3>::faces_per_cell));
-  Assert (this->present_index * GeometryInfo<3>::faces_per_cell + face
-	  < this->tria->levels[this->present_level]
-	  ->cells.face_orientations.size(),
-	  ExcInternalError());
-  
+  Assert (used(), TriaAccessorExceptions::ExcCellNotUsed());  
   return (this->tria->levels[this->present_level]
-	  ->cells.face_orientations[this->present_index *
-				    GeometryInfo<3>::faces_per_cell
-				    + face]);
+	  ->cells.face_orientation(this->present_index, face));
 }
 
 
 template <>
 inline
 bool
-TriaObjectAccessor<3, 3>::
-face_flip (const unsigned int face) const
+TriaObjectAccessor<3, 3>::face_flip (const unsigned int face) const
 {
   Assert (used(), TriaAccessorExceptions::ExcCellNotUsed());
   Assert (face<GeometryInfo<3>::faces_per_cell,
@@ -1114,8 +1097,7 @@ face_flip (const unsigned int face) const
 template <>
 inline
 bool
-TriaObjectAccessor<3, 3>::
-face_rotation (const unsigned int face) const
+TriaObjectAccessor<3, 3>::face_rotation (const unsigned int face) const
 {
   Assert (used(), TriaAccessorExceptions::ExcCellNotUsed());
   Assert (face<GeometryInfo<3>::faces_per_cell,
@@ -1135,8 +1117,7 @@ face_rotation (const unsigned int face) const
 template <>
 inline
 bool
-TriaObjectAccessor<3, 3>::
-line_orientation (const unsigned int line) const
+TriaObjectAccessor<3, 3>::line_orientation (const unsigned int line) const
 {
   const int dim=3;
   Assert (used(), TriaAccessorExceptions::ExcCellNotUsed());
@@ -1278,11 +1259,11 @@ TriaObjectAccessor<3,3>::operator -- ()
 
 template <int dim>
 inline
-CellAccessor<dim>::
-CellAccessor (const Triangulation<dim> *parent,
-              const int                 level,
-              const int                 index,
-              const AccessorData       *local_data)
+CellAccessor<dim>::CellAccessor (
+  const Triangulation<dim> *parent,
+  const int                 level,
+  const int                 index,
+  const AccessorData       *local_data)
                 :
                 TriaObjectAccessor<dim,dim> (parent, level, index, local_data)
 {}
