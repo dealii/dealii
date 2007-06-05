@@ -146,7 +146,25 @@ namespace internal
 					  *  Clear all the data contained in this object.
 					  */
 	void clear();
-
+	
+					 /**
+					  * The orientation of the
+					  * face number <tt>face</tt>
+					  * of the cell with number
+					  * <tt>cell</tt>. The return
+					  * value is <tt>true</tt>, if
+					  * the normal vector points
+					  * the usual way and
+					  * <tt>false</tt> else.
+					  *
+					  * The result is always
+					  * <tt>true</tt> in this
+					  * class, but derived vlasses
+					  * will reimplement this.
+					  */
+	bool face_orientation(const unsigned int cell, const unsigned int face) const;
+	
+	
 					 /**
 					  * Access to user pointers.
 					  */
@@ -431,7 +449,15 @@ namespace internal
                                           */
         unsigned int memory_consumption () const;	    
     };
+    
 
+    template<typename G>
+    bool TriaObjects<G>::face_orientation(const unsigned int, const unsigned int) const
+    {
+      return true;
+    }
+    
+    
     template<typename G>
     void*& TriaObjects<G>::user_pointer (const unsigned int i)
     {
