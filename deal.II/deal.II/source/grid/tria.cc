@@ -243,9 +243,6 @@ void Triangulation<dim>::copy_triangulation (const Triangulation<dim> &old_tria)
   vertices      = old_tria.vertices;
   vertices_used = old_tria.vertices_used;
   smooth_grid   = old_tria.smooth_grid;
-				   // do a shallow copy of the list of
-				   // RefinementListeners
-  refinement_listeners = old_tria.refinement_listeners;
   
   faces         = new internal::Triangulation::TriaFaces<dim>(*old_tria.faces);
 
@@ -257,6 +254,14 @@ void Triangulation<dim>::copy_triangulation (const Triangulation<dim> &old_tria)
     levels.push_back (new internal::Triangulation::TriaLevel<dim>(*old_tria.levels[level]));
 
   number_cache = old_tria.number_cache;
+  
+				   // inform RefinementListeners of old_tria of
+				   // the copy operation
+  typename std::list<RefinementListener *>::iterator ref_listener =
+    old_tria.refinement_listeners.begin (),
+    end_listener = old_tria.refinement_listeners.end ();
+  for (; ref_listener != end_listener; ++ref_listener)
+    (*ref_listener)->copy_notification (old_tria, *this);
   
 				   // note that we need not copy the
 				   // subscriptor!
@@ -9916,6 +9921,14 @@ RefinementListener::pre_refinement_notification (const Triangulation<dim> &)
 template<int dim>
 void Triangulation<dim>::
 RefinementListener::post_refinement_notification (const Triangulation<dim> &)
+{}
+
+
+
+template<int dim>
+void Triangulation<dim>::
+RefinementListener::copy_notification (const Triangulation<dim> &,
+				       const Triangulation<dim> &)
 {}
 
 

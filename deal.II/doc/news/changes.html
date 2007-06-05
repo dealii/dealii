@@ -1033,6 +1033,18 @@ inconvenience this causes.
 <h3>deal.II</h3>
 
 <ol>
+   <li> <p>Extended: the function
+       <code>Triangulation::copy_triangulation</code> 
+       copies all members of a triangulation except for the list of
+       <code>RefinementListener</code>s. In most cases this is exactly the
+       intended behavior. However, if a RefinementListener should be copied to
+       the new triangulation, e.g. if a Persistent Triangulation is created from
+       an ordinary one, it can do so now through implementing the new
+       function <code>RefinementListener::copy_notification</code>.
+       <br>
+       (Tobias Leicht 2007/06/05)
+       </p>
+
    <li> <p>New: the function
        <code>DoFTools::make_sparsity_pattern</code> 
        now takes an optional constraint matrix argument that can be used to

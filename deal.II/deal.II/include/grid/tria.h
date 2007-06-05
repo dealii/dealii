@@ -1291,6 +1291,25 @@ class Triangulation : public Subscriptor
         virtual
         void
         post_refinement_notification (const Triangulation<dim> &tria);
+
+                                         /**
+                                          * At the end of a call to
+                                          * copy_triangulation() the
+                                          * Triangulation class calls this
+                                          * method on all objects derived from
+                                          * this class and registered with the
+                                          * original Triangulation @p old_tria
+                                          * so that they might subscribe to the
+                                          * copied one @p new_tria as well, if
+                                          * that is desired. By default this
+                                          * method does nothing, a different
+                                          * behavior has to be implemented in
+                                          * derived classes.
+                                          */
+        virtual
+        void
+        copy_notification (const Triangulation<dim> &old_tria,
+			   const Triangulation<dim> &new_tria);
     };
     
 				     /**
@@ -1470,6 +1489,16 @@ class Triangulation : public Subscriptor
 				      *  disable or extend the
 				      *  functionality of this
 				      *  function.
+				      *
+				      *  Note, that the list of
+				      *  RefinementListeners is not
+				      *  copied. However, each
+				      *  RefinementListener is notified of the
+				      *  copy operation through the
+				      *  RefinementListener::copy_notification()
+				      *  function, so it might subscribe to the
+				      *  new Triangulation as well, if that is
+				      *  desired.
 				      */
     virtual void copy_triangulation (const Triangulation<dim> &old_tria);
 
