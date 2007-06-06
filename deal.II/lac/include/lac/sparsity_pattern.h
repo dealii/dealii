@@ -29,6 +29,7 @@ template <typename number> class SparseMatrix;
 template <class VECTOR> class VectorSlice;
 
 class CompressedSparsityPattern;
+class CompressedSetSparsityPattern;
 
 
 
@@ -967,6 +968,20 @@ class SparsityPattern : public Subscriptor
 				      */
     void copy_from (const CompressedSparsityPattern &csp,
 		    const bool optimize_diagonal = true);
+
+
+				     /**
+				      * Copy data from an object of
+				      * type
+				      * CompressedSetSparsityPattern.
+				      * Previous content of this
+				      * object is lost, and the
+				      * sparsity pattern is in
+				      * compressed mode afterwards.
+				      */
+    void copy_from (const CompressedSetSparsityPattern &csp,
+		    const bool optimize_diagonal = true);
+
 
 				     /**
 				      * Take a full matrix and use its
