@@ -916,7 +916,13 @@ add_entries_local_to_global (const std::vector<unsigned int> &local_dof_indices,
 					  local_dof_indices[i]);
                 }
               else
-                Assert (false, ExcInternalError());
+						 // the only case that can
+						 // happen here is one that we
+						 // have already taken care of
+                Assert ((is_constrained_i == false) &&
+			(is_constrained_j == false) &&
+			(keep_constrained_entries == true),
+			ExcInternalError());
             }
         }
     }
