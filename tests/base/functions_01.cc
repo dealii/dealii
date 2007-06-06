@@ -101,6 +101,11 @@ int main()
 
   if (true)
     {
+      Functions::StokesLSingularity f;
+      check_function(f, 4, logfile);
+    }
+  if (true)
+    {
       Functions::PoisseuilleFlow<2> f(.8, 10.);
       check_function(f, 4, logfile);
     }
