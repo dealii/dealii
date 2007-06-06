@@ -226,6 +226,111 @@ namespace Functions
 	values[d][k] = 0.;
   }
   
+//----------------------------------------------------------------------//
+
+  const double StokesLSingularity::lambda = 0.54448373678246;
+  
+  StokesLSingularity::StokesLSingularity()
+		  :
+		  omega (3./2.*deal_II_numbers::PI),
+		  coslo (std::cos(lambda*omega))
+  {}
+  
+  
+  inline
+  double
+  StokesLSingularity::Psi(double phi) const
+  {
+    return std::sin((1.+lambda) * phi) * coslo / (1.+lambda) - std::cos((1.+lambda) * phi)
+      - std::sin((1.-lambda) * phi) * coslo / (1.-lambda) + std::cos((1.-lambda) * phi);
+  }
+  
+  
+  inline
+  double
+  StokesLSingularity::Psi_1(double phi) const
+  {
+    return std::cos((1.+lambda) * phi) * coslo + (1.+lambda) * std::sin((1.+lambda) * phi)
+      - std::cos((1.-lambda) * phi) * coslo - (1.-lambda) * std::sin((1.-lambda) * phi);
+  }
+  
+  
+  inline
+  double
+  StokesLSingularity::Psi_3(double phi) const
+  {
+    return - (1.+lambda) * (1.+lambda)
+      * (std::cos((1.+lambda) * phi) * coslo + (1.+lambda) * std::sin((1.+lambda) * phi))
+      - (1.-lambda) * (1.-lambda) *
+      (- std::cos((1.-lambda) * phi) * coslo - (1.-lambda) * std::sin((1.-lambda) * phi));
+  }
+  
+  
+  void StokesLSingularity::vector_values (
+    const std::vector<Point<2> >& points,
+    std::vector<std::vector<double> >& values) const
+  {
+    unsigned int n = points.size();
+    
+    Assert(values.size() == 2+1, ExcDimensionMismatch(values.size(), 2+1));
+    for (unsigned int d=0;d<2+1;++d)
+      Assert(values[d].size() == n, ExcDimensionMismatch(values[d].size(), n));
+    
+    for (unsigned int k=0;k<n;++k)
+      {
+	const Point<2>& p = points[k];
+	const double x = p(0);
+	const double y = p(1);
+
+	if ((x<0) || (y<0))
+	  {
+	    const double phi = std::atan2(y,-x)+M_PI;
+	    const double r2 = x*x+y*y;
+	    values[0][k] = std::pow(r2,lambda/2.)
+			   * ((1.+lambda) * std::sin(phi) * Psi(phi)
+			      + std::cos(phi) * Psi_1(phi));
+	    values[1][k] = std::pow(r2,lambda/2.)
+			   * (std::sin(phi) * Psi_1(phi)
+			      -(1.+lambda) * std::cos(phi) * Psi(phi));
+	    values[2][k] = -std::pow(r2,lambda/2.-.5)
+			   * ((1.+lambda) * (1.+lambda) * Psi_1(phi) + Psi_3(phi))
+			   / (1.-lambda);
+	  }
+	else
+	  {
+	    for (unsigned int d=0;d<3;++d)
+	      values[d][k] = 0.;
+	  }
+      }
+  }
+  
+
+  
+  void StokesLSingularity::vector_gradients (
+    const std::vector<Point<2> >&,
+    std::vector<std::vector<Tensor<1,2> > >&) const
+  {
+    Assert(false, ExcNotImplemented());
+  }
+  
+
+  
+  void StokesLSingularity::vector_laplacians (
+    const std::vector<Point<2> >& points,
+    std::vector<std::vector<double> >& values) const
+  {
+    unsigned int n = points.size();
+    Assert(values.size() == 2+1, ExcDimensionMismatch(values.size(), 2+1));
+    for (unsigned int d=0;d<2+1;++d)
+      Assert(values[d].size() == n, ExcDimensionMismatch(values[d].size(), n));
+    
+    for (unsigned int d=0;d<values.size();++d)
+      for (unsigned int k=0;k<values[d].size();++k)
+	values[d][k] = 0.;
+  }
+  
+  
+  
   template class FlowFunction<2>;
   template class FlowFunction<3>;
   template class PoisseuilleFlow<2>;

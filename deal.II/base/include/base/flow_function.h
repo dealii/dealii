@@ -163,7 +163,41 @@ namespace Functions
       const double Reynolds;
   };
   
+/**
+ * The solution to Stokes' equations on an L-shaped domain.
+ *
+ * Taken from Houston, Sch&ouml;tzau, Wihler, proceeding ENUMATH 2003.
+ *
+ * @author Guido Kanschat, 2007
+ */
+  class StokesLSingularity : public FlowFunction<2>
+  {
+    public:
+				       /// Constructor setting upsome data.
+      StokesLSingularity();
       
+      virtual void vector_values (const std::vector<Point<2> >& points,
+				  std::vector<std::vector<double> >& values) const;
+      virtual void vector_gradients (const std::vector<Point<2> >& points,
+				     std::vector<std::vector<Tensor<1,2> > >& gradients) const;
+      virtual void vector_laplacians (const std::vector<Point<2> > &points,
+				      std::vector<std::vector<double> >   &values) const;
+
+    private:
+				       /// The auxiliary function Psi.
+      double Psi(double phi) const;
+				       /// The derivative of #Psi
+      double Psi_1(double phi) const;
+				       /// The 3rd derivative of #Psi
+      double Psi_3(double phi) const;
+				       /// The angle of the reentrant corner
+      const double omega;
+				       /// The exponent of the radius
+      static const double lambda;
+				       /// Cosine of #lambda times #omega
+      const double coslo;
+  };
+  
 }
 
 DEAL_II_NAMESPACE_CLOSE
