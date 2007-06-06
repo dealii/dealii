@@ -38,6 +38,7 @@ tests_x = block_matrices \
 	grid_test \
 	grid_transform \
 	grid_transform_3d \
+	grid_hyper_* \
 	measure_et_al \
 	normals_at_vertices \
 	intergrid_constraints \
