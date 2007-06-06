@@ -28,6 +28,7 @@ template <typename> class Vector;
 template <typename> class FullMatrix;
 class SparsityPattern;
 class CompressedSparsityPattern;
+class CompressedSetSparsityPattern;
 class BlockSparsityPattern;
 class CompressedBlockSparsityPattern;
 template <typename number> class SparseMatrix;
@@ -682,10 +683,21 @@ class ConstraintMatrix : public Subscriptor
 
 				     /**
 				      * Same function as above, but
+				      * condenses compressed
+				      * sparsity patterns, which are
+				      * based on the std::set container.
+				      */
+    void condense (CompressedSetSparsityPattern &sparsity) const;
+
+    void condense_fast (CompressedSparsityPattern &sparsity) const;
+
+				     /**
+				      * Same function as above, but
 				      * condenses square compressed
 				      * sparsity patterns.
 				      */
     void condense (CompressedBlockSparsityPattern &sparsity) const;
+
     
 				     /**
 				      * Condense a given matrix. The associated

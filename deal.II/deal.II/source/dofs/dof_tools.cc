@@ -30,6 +30,7 @@
 #include <dofs/dof_tools.h>
 #include <lac/sparsity_pattern.h>
 #include <lac/compressed_sparsity_pattern.h>
+#include <lac/compressed_set_sparsity_pattern.h>
 #include <lac/block_sparsity_pattern.h>
 #include <lac/vector.h>
 
@@ -4957,6 +4958,7 @@ DoFTools::convert_couplings_to_blocks (
 
 
 // explicit instantiations
+// TODO: Add missing instantiations for CompressedSetSparsityPattern
 template void
 DoFTools::make_sparsity_pattern<DoFHandler<deal_II_dimension>,
 				SparsityPattern>
@@ -4988,12 +4990,23 @@ DoFTools::make_sparsity_pattern<hp::DoFHandler<deal_II_dimension>,
 (const hp::DoFHandler<deal_II_dimension> &dof,
  SparsityPattern    &sparsity,
  const ConstraintMatrix &);
+
+
 template void
 DoFTools::make_sparsity_pattern<hp::DoFHandler<deal_II_dimension>,
 				CompressedSparsityPattern>
 (const hp::DoFHandler<deal_II_dimension> &dof,
  CompressedSparsityPattern    &sparsity,
  const ConstraintMatrix &);
+
+template void
+DoFTools::make_sparsity_pattern<hp::DoFHandler<deal_II_dimension>,
+				CompressedSetSparsityPattern>
+(const hp::DoFHandler<deal_II_dimension> &dof,
+ CompressedSetSparsityPattern    &sparsity,
+ const ConstraintMatrix &);
+
+
 template void
 DoFTools::make_sparsity_pattern<hp::DoFHandler<deal_II_dimension>,
 				BlockSparsityPattern>
