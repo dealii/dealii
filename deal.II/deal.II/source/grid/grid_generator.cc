@@ -42,6 +42,39 @@ DEAL_II_NAMESPACE_OPEN
 
 
 
+namespace
+{
+#if deal_II_dimension == 3
+
+				   // Corner points of the cube [-1,1]^3
+  const Point<3> hexagon[8] =
+  {
+	Point<3>(-1,-1,-1),
+	Point<3>(+1,-1,-1),
+	Point<3>(-1,+1,-1),
+	Point<3>(+1,+1,-1),
+	Point<3>(-1,-1,+1),
+	Point<3>(+1,-1,+1),
+	Point<3>(-1,+1,+1),
+	Point<3>(+1,+1,+1)
+  };
+
+				   // Octahedron inscribed in the cube
+				   // [-1,1]^3
+  const Point<3> octahedron[6] =
+  {
+	Point<3>(-1, 0, 0),
+	Point<3>( 1, 0, 0),
+	Point<3>( 0,-1, 0),
+	Point<3>( 0, 1, 0),
+	Point<3>( 0, 0,-1),
+	Point<3>( 0, 0, 1)
+  };
+  
+#endif
+}
+
+
 template <int dim>
 void
 GridGenerator::hyper_rectangle (Triangulation<dim> &tria,
@@ -2039,13 +2072,54 @@ GridGenerator::half_hyper_ball (Triangulation<dim>& tria,
 
 // Implementation for 3D only
 template <int dim>
-void GridGenerator::hyper_shell (Triangulation<dim>&,
-				 const Point<dim>&,
-				 const double,
-				 const double,
-				 const unsigned int)
+void GridGenerator::hyper_shell (Triangulation<dim>& tria,
+				 const Point<dim>& p,
+				 const double inner_radius,
+				 const double outer_radius,
+				 const unsigned int n)
 {
-  Assert (false, ExcNotImplemented());
+  Assert ((inner_radius > 0) && (inner_radius < outer_radius),
+	  ExcInvalidRadii ());
+
+  const double irad = inner_radius/std::sqrt(3.0);
+  const double orad = outer_radius/std::sqrt(3.0);
+  std::vector<Point<dim> > vertices;
+  std::vector<CellData<dim> > cells;
+  
+				   // Start with the shell bounded by
+				   // two nested cubes
+  if (n <= 6)
+    {
+      for (unsigned int i=0;i<8;++i)
+	vertices.push_back(p+hexagon[i]*irad);
+      for (unsigned int i=0;i<8;++i)
+	vertices.push_back(p+hexagon[i]*orad);
+				       // one needs to draw the seven cubes to
+				       // understand what's going on here
+      const unsigned int n_cells = 6;
+      const int cell_vertices[n_cells][8] = {{8, 9, 10, 11, 0, 1, 2, 3}, // bottom
+					     {9, 11, 1, 3, 13, 15, 5, 7}, // right
+					     {12, 13, 4, 5, 14, 15, 6, 7}, // top
+					     {8, 0, 10, 2, 12, 4, 14, 6}, // left
+					     {8, 9, 0, 1, 12, 13, 4, 5}, // front
+					     {10, 2, 11, 3, 14, 6, 15, 7}}; // back
+      
+      cells.resize(n_cells, CellData<dim>());
+      
+      for (unsigned int i=0; i<n_cells; ++i) 
+	{
+	  for (unsigned int j=0; j<GeometryInfo<dim>::vertices_per_cell; ++j)
+	    cells[i].vertices[j] = cell_vertices[i][j];
+	  cells[i].material_id = 0;
+	}
+    }
+  else
+    {
+      Assert(false, ExcIndexRange(n, 1, 7));
+    }
+  
+  tria.create_triangulation (vertices, cells,
+			     SubCellData());       // no boundary information
 }
 
 
