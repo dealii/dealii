@@ -47,7 +47,7 @@ namespace
 #if deal_II_dimension == 3
 
 				   // Corner points of the cube [-1,1]^3
-  const Point<3> hexagon[8] =
+  const Point<3> hexahedron[8] =
   {
 	Point<3>(-1,-1,-1),
 	Point<3>(+1,-1,-1),
@@ -2091,18 +2091,18 @@ void GridGenerator::hyper_shell (Triangulation<dim>& tria,
   if (n <= 6)
     {
       for (unsigned int i=0;i<8;++i)
-	vertices.push_back(p+hexagon[i]*irad);
+	vertices.push_back(p+hexahedron[i]*irad);
       for (unsigned int i=0;i<8;++i)
-	vertices.push_back(p+hexagon[i]*orad);
-				       // one needs to draw the seven cubes to
-				       // understand what's going on here
+	vertices.push_back(p+hexahedron[i]*orad);
+      
       const unsigned int n_cells = 6;
-      const int cell_vertices[n_cells][8] = {{8, 9, 10, 11, 0, 1, 2, 3}, // bottom
-					     {9, 11, 1, 3, 13, 15, 5, 7}, // right
-					     {12, 13, 4, 5, 14, 15, 6, 7}, // top
-					     {8, 0, 10, 2, 12, 4, 14, 6}, // left
-					     {8, 9, 0, 1, 12, 13, 4, 5}, // front
-					     {10, 2, 11, 3, 14, 6, 15, 7}}; // back
+      const int cell_vertices[n_cells][8] =
+	{{8, 9, 10, 11, 0, 1, 2, 3}, // bottom
+	 {9, 11, 1, 3, 13, 15, 5, 7}, // right
+	 {12, 13, 4, 5, 14, 15, 6, 7}, // top
+	 {8, 0, 10, 2, 12, 4, 14, 6}, // left
+	 {8, 9, 0, 1, 12, 13, 4, 5}, // front
+	 {10, 2, 11, 3, 14, 6, 15, 7}}; // back
       
       cells.resize(n_cells, CellData<dim>());
       
@@ -2110,6 +2110,47 @@ void GridGenerator::hyper_shell (Triangulation<dim>& tria,
 	{
 	  for (unsigned int j=0; j<GeometryInfo<dim>::vertices_per_cell; ++j)
 	    cells[i].vertices[j] = cell_vertices[i][j];
+	  cells[i].material_id = 0;
+	}
+    }
+				   // A more regular subdivision can
+				   // be obtained by two nested
+				   // rhombic dodecahedra
+  else if (n <= 12)
+    {
+      for (unsigned int i=0;i<8;++i)
+	vertices.push_back(p+hexahedron[i]*irad);
+      for (unsigned int i=0;i<6;++i)
+	vertices.push_back(p+octahedron[i]*inner_radius);
+      for (unsigned int i=0;i<8;++i)
+	vertices.push_back(p+hexahedron[i]*orad);
+      for (unsigned int i=0;i<6;++i)
+	vertices.push_back(p+octahedron[i]*outer_radius);
+
+      const unsigned int n_cells = 12;
+      const unsigned int rhombi[n_cells][4] =
+	{{ 10,  4,  0,  8},
+	 {  4, 13,  8,  6},
+	 { 10,  5,  4, 13},
+	 {  1,  9, 10,  5},
+	 {  9,  7,  5, 13},
+	 {  7, 11, 13,  6},
+	 {  9,  3,  7, 11},
+	 {  1, 12,  9,  3},
+	 { 12,  2,  3, 11},
+	 {  2,  8, 11,  6},
+	 { 12,  0,  2,  8},
+	 {  1, 10, 12,  0}};
+      
+      cells.resize(n_cells, CellData<dim>());
+      
+      for (unsigned int i=0; i<n_cells; ++i) 
+	{
+	  for (unsigned int j=0; j<4; ++j)
+	    {
+	      cells[i].vertices[j  ] = rhombi[i][j];
+	      cells[i].vertices[j+4] = rhombi[i][j] + 14;
+	    }
 	  cells[i].material_id = 0;
 	}
     }
