@@ -781,12 +781,6 @@ class GridGenerator
     static void colorize_hyper_rectangle (Triangulation<dim> &tria);
 
 				     /**
-				      * Declaration of the above
-				      * function for 1d.
-				      */
-    static void colorize_hyper_rectangle (Triangulation<1> &tria);
-    
-				     /**
 				      * Perform the action specified
 				      * by the @p colorize flag of
 				      * the
@@ -805,16 +799,18 @@ class GridGenerator
 					 const double        epsilon);
 
 				     /**
-				      * Declaration of the above
-				      * function for 1d.
+				      * Assign boundary number zero to
+				      * the inner shell boundary and 1
+				      * to the outer.
 				      */
+    template<int dim>
     static
     void
-    colorize_subdivided_hyper_rectangle (Triangulation<1> &tria,
-					 const Point<1>   &p1,
-					 const Point<1>   &p2,
-					 const double      epsilon);
-
+    colorize_hyper_shell (Triangulation<dim>& tria,
+			  const Point<dim>& center,
+			  const double inner_radius,
+			  const double outer_radius);
+    
 				     /**
 				      * Solve the Laplace equation for
 				      * @p laplace_transformation

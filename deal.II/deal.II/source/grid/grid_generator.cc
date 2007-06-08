@@ -142,8 +142,9 @@ GridGenerator::hyper_rectangle (Triangulation<dim> &tria,
 #if deal_II_dimension == 1
 
 // Implementation for 1D only
+template <int dim>
 void
-GridGenerator::colorize_hyper_rectangle (Triangulation<1> &)
+GridGenerator::colorize_hyper_rectangle (Triangulation<dim> &)
 {
 				   // nothing to do in 1d
 }
@@ -1017,10 +1018,11 @@ subdivided_hyper_rectangle (Triangulation<3>&                           tria,
 #if deal_II_dimension == 1
 
 // Implementation for 1D only
+template <int dim>
 void
-GridGenerator::colorize_subdivided_hyper_rectangle (Triangulation<1> &,
-						    const Point<1>   &,
-						    const Point<1>   &,
+GridGenerator::colorize_subdivided_hyper_rectangle (Triangulation<dim> &,
+						    const Point<dim>   &,
+						    const Point<dim>   &,
 						    const double      )
 {
 				   // nothing to do in 1d
@@ -1148,6 +1150,16 @@ void GridGenerator::hyper_shell (Triangulation<dim> &,
 				 const double,
 				 const double,
 				 const unsigned int)
+{
+  Assert (false, ExcNotImplemented());
+}
+
+// Implementation for 1D only
+template <int dim>
+void GridGenerator::colorize_hyper_shell (Triangulation<dim> &,
+					  const Point<dim> &,
+					  const double,
+					  const double)
 {
   Assert (false, ExcNotImplemented());
 }
@@ -2588,6 +2600,38 @@ void GridGenerator::hyper_cube_with_cylindrical_hole(Triangulation<dim> &triangu
 #endif
 
 
+#if deal_II_dimension != 1
+
+// Empty implementation for 1d is above
+template <int dim>
+void
+GridGenerator::colorize_hyper_shell(
+  Triangulation<dim>& tria,
+  const Point<dim>& center,
+  const double inner_radius,
+  const double outer_radius)
+{
+  double divide = .5*(inner_radius+outer_radius);
+  divide *= divide;
+  
+  for (typename Triangulation<dim>::cell_iterator it = tria.begin();
+       it != tria.end(); ++it)
+    for (unsigned int f=0;f<GeometryInfo<dim>::faces_per_cell;++f)
+      if (it->at_boundary(f))
+	{
+					   // Take first vertex of
+					   // boundary face
+	  Point<dim> p = it->face(f)->vertex(0);
+	  p -= center;
+	  if (p.square() > divide)
+	    it->face(f)->set_boundary_indicator(1);
+	}
+}
+
+
+#endif
+
+
 // explicit instantiations
 template void
 GridGenerator::hyper_cube<deal_II_dimension> (
@@ -2672,6 +2716,11 @@ GridGenerator::hyper_cube_with_cylindrical_hole (
   Triangulation<deal_II_dimension> &,
   const double, const double, const double, const unsigned int, bool);
 
+template void
+GridGenerator::colorize_hyper_shell(
+  Triangulation<deal_II_dimension>& tria,
+  const Point<deal_II_dimension>& center,
+  const double inner_radius, const double outer_radius);
 
 template void
 GridGenerator::
