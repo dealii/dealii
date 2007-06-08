@@ -19,7 +19,7 @@
 
 #include "../tests.h"
 #include <base/logstream.h>
-#include <fe/mapping_collection.h>
+#include <hp/mapping_collection.h>
 #include <fe/mapping_q.h>
 #include <fe/mapping_q1.h>
 

@@ -28,8 +28,8 @@
 #include <grid/tria_iterator.h>
 #include <hp/dof_handler.h>
 #include <dofs/dof_accessor.h>
-#include <fe/fe_collection.h>
-#include <fe/q_collection.h>
+#include <hp/fe_collection.h>
+#include <hp/q_collection.h>
 #include <fe/fe_q.h>
 #include <numerics/vectors.h>
 

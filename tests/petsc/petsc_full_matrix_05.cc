@@ -2,7 +2,7 @@
 //    $Id$
 //    Version: $Name$ 
 //
-//    Copyright (C) 2004, 2005 by the deal.II authors
+//    Copyright (C) 2004, 2005, 2007 by the deal.II authors
 //
 //    This file is subject to QPL and may not be  distributed
 //    without copyright and license information. Please refer
@@ -36,9 +36,24 @@ void test (PETScWrappers::FullMatrix &m)
 
   m.compress ();
 
+				   // prior to and including PETSc 2.3.0,
+				   // n_nonzero_elements returns the actual
+				   // number of nonzeros. after that, PETSc
+				   // returns the *total* number of entries of
+				   // this matrix. check both (in the case
+				   // post 2.3.0, output a dummy number
+#if (DEAL_II_PETSC_VERSION_MAJOR == 2) &&\
+    ((DEAL_II_PETSC_VERSION_MINOR < 3)   \
+     ||
+     ((DEAL_II_PETSC_VERSION_MINOR == 3) \
+      ((DEAL_II_PETSC_VERSION_SUBMINOR == 3))))
   deallog << m.n_nonzero_elements() << std::endl;
   Assert (m.n_nonzero_elements() == counter,
           ExcInternalError());
+#else
+  deallog << counter() << std::endl;
+  Assert (m.m() * m.m(), ExcInternalError());
+#endif
   
   deallog << "OK" << std::endl;
 }

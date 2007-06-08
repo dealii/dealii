@@ -26,7 +26,7 @@
 #include <dofs/dof_constraints.h>
 
 #include <fe/fe_values.h>
-#include <fe/fe_collection.h>
+#include <hp/fe_collection.h>
 #include <base/quadrature_lib.h>
 
 #include <base/function.h>

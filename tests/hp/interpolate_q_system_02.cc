@@ -35,7 +35,7 @@
 #include <numerics/vectors.h>
 #include <fe/fe_q.h>
 #include <fe/fe_system.h>
-#include <fe/q_collection.h>
+#include <hp/q_collection.h>
 
 
 #include <fstream>

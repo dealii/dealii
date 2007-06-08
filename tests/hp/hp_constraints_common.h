@@ -42,7 +42,7 @@
 #include <fe/fe_q_hierarchical.h>
 #include <fe/fe_raviart_thomas.h>
 #include <fe/fe_system.h>
-#include <fe/q_collection.h>
+#include <hp/q_collection.h>
 
 #include <fstream>
 #include <vector>

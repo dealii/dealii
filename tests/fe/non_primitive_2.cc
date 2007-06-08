@@ -2,7 +2,7 @@
 //    non_primitive_2.cc,v 1.5 2003/04/21 07:31:15 guido Exp
 //    Version: 
 //
-//    Copyright (C) 2001, 2002, 2003, 2005 by the deal.II authors
+//    Copyright (C) 2001, 2002, 2003, 2005, 2007 by the deal.II authors
 //
 //    This file is subject to QPL and may not be  distributed
 //    without copyright and license information. Please refer
@@ -29,6 +29,7 @@
 #include <dofs/dof_handler.h>
 #include <dofs/dof_accessor.h>
 #include <dofs/dof_tools.h>
+#include <dofs/dof_constraints.h>
 #include <fe/fe_q.h>
 #include <fe/fe_nedelec.h>
 #include <fe/fe_system.h>

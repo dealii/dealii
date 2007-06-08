@@ -21,7 +21,7 @@
 #include <grid/grid_generator.h>
 #include <dofs/dof_accessor.h>
 #include <dofs/dof_handler.h>
-#include <fe/fe_collection.h>
+#include <hp/fe_collection.h>
 #include <fe/fe_q.h>
 
 #include <fstream>

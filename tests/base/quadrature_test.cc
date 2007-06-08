@@ -90,7 +90,7 @@ check_cells (std::vector<Quadrature<dim>*>& quadratures)
 	  exact_int=1./std::pow(static_cast<double>(i+1),dim);	  
 	  err = std::fabs(quadrature_int-exact_int);
 	}
-      while (err<1e-15);
+      while (err<1e-14);
 				       // Uncomment here for testing
 //      deallog << " (Int " << quadrature_int << ',' << exact_int << ")";
       deallog << " is exact for polynomials of degree " << i-1 << std::endl;

@@ -32,10 +32,10 @@
 #include <dofs/dof_constraints.h>
 #include <fe/fe_q.h>
 #include <fe/fe_system.h>
-#include <fe/fe_collection.h>
-#include <fe/q_collection.h>
+#include <hp/fe_collection.h>
+#include <hp/q_collection.h>
 #include <fe/mapping_q.h>
-#include <fe/mapping_collection.h>
+#include <hp/mapping_collection.h>
 #include <numerics/vectors.h>
 
 #include <fstream>

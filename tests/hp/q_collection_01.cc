@@ -20,7 +20,7 @@
 #include "../tests.h"
 #include <base/logstream.h>
 #include <base/quadrature_lib.h>
-#include <fe/q_collection.h>
+#include <hp/q_collection.h>
 
 #include <fstream>
 
