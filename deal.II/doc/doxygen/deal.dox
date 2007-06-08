@@ -6,6 +6,7 @@ INPUT    = headers/ \
 	../../base/include/base \
 	../../lac/include/lac \
 	../../deal.II/include/dofs \
+	../../deal.II/include/hp \
 	../../deal.II/include/fe \
 	../../deal.II/include/grid \
 	../../deal.II/include/multigrid \
