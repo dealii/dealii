@@ -2,7 +2,7 @@
 //    $Id$
 //    Version: $Name$
 //
-//    Copyright (C) 2005, 2006 by the deal.II authors
+//    Copyright (C) 2005, 2006, 2007 by the deal.II authors
 //
 //    This file is subject to QPL and may not be  distributed
 //    without copyright and license information. Please refer
@@ -21,7 +21,7 @@
 #include <base/smartpointer.h>
 #include <dofs/function_map.h>
 #include <dofs/dof_iterator_selector.h>
-#include <fe/fe_collection.h>
+#include <hp/fe_collection.h>
 
 #include <vector>
 #include <map>
@@ -41,12 +41,6 @@ namespace internal
 
     
 
-/**
- * A namespace that holds all the classes that have to do with hp finite
- * elements.
- * 
- * @ingroup hp
- */
 namespace hp
 {
 

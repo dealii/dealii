@@ -12,7 +12,7 @@
 //-----------------------  mapping_collection.cc  ---------------------------
 
 #include <base/memory_consumption.h>
-#include <fe/mapping_collection.h>
+#include <hp/mapping_collection.h>
 
 DEAL_II_NAMESPACE_OPEN
 

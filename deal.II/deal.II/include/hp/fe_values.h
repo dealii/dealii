@@ -15,9 +15,9 @@
 
 #include <base/config.h>
 #include <fe/fe.h>
-#include <fe/fe_collection.h>
-#include <fe/q_collection.h>
-#include <fe/mapping_collection.h>
+#include <hp/fe_collection.h>
+#include <hp/q_collection.h>
+#include <hp/mapping_collection.h>
 #include <fe/fe_values.h>
 
 #include <map>

@@ -28,8 +28,8 @@
 #include <hp/fe_values.h>
 #include <fe/fe_update_flags.h>
 #include <fe/mapping_q1.h>
-#include <fe/q_collection.h>
-#include <fe/mapping_collection.h>
+#include <hp/q_collection.h>
+#include <hp/mapping_collection.h>
 #include <numerics/error_estimator.h>
 
 #include <numeric>

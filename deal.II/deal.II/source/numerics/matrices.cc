@@ -27,7 +27,7 @@
 #include <fe/fe.h>
 #include <fe/fe_values.h>
 #include <hp/fe_values.h>
-#include <fe/mapping_collection.h>
+#include <hp/mapping_collection.h>
 #include <numerics/matrices.h>
 #include <lac/vector.h>
 #include <lac/block_vector.h>

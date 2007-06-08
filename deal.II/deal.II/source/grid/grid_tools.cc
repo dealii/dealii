@@ -25,7 +25,7 @@
 #include <dofs/dof_tools.h>
 #include <fe/fe_dgq.h>
 #include <fe/mapping_q1.h>
-#include <fe/mapping_collection.h>
+#include <hp/mapping_collection.h>
 #include <multigrid/mg_dof_handler.h>
 #include <multigrid/mg_dof_accessor.h>
 

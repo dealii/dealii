@@ -31,8 +31,8 @@
 #include <fe/fe.h>
 #include <hp/fe_values.h>
 #include <fe/mapping_q1.h>
-#include <fe/mapping_collection.h>
-#include <fe/q_collection.h>
+#include <hp/mapping_collection.h>
+#include <hp/q_collection.h>
 #include <numerics/vectors.h>
 #include <numerics/matrices.h>
 

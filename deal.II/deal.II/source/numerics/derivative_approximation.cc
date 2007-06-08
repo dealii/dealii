@@ -26,9 +26,9 @@
 #include <fe/fe_values.h>
 #include <hp/fe_values.h>
 #include <fe/mapping_q1.h>
-#include <fe/q_collection.h>
-#include <fe/fe_collection.h>
-#include <fe/mapping_collection.h>
+#include <hp/q_collection.h>
+#include <hp/fe_collection.h>
+#include <hp/mapping_collection.h>
 #include <numerics/derivative_approximation.h>
 
 #include <cmath>

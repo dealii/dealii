@@ -12,7 +12,7 @@
 //----------------------------  fe_collection.cc  ---------------------------
 
 #include <base/memory_consumption.h>
-#include <fe/fe_collection.h>
+#include <hp/fe_collection.h>
 
 DEAL_II_NAMESPACE_OPEN
 

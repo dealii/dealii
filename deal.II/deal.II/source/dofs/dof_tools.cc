@@ -26,7 +26,7 @@
 #include <dofs/dof_constraints.h>
 #include <fe/fe.h>
 #include <fe/fe_values.h>
-#include <fe/fe_collection.h>
+#include <hp/fe_collection.h>
 #include <dofs/dof_tools.h>
 #include <lac/sparsity_pattern.h>
 #include <lac/compressed_sparsity_pattern.h>
