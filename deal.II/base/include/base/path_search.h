@@ -2,7 +2,7 @@
 //    $Id$
 //    Version: $Name$
 //
-//    Copyright (C) 2005, 2006 by the deal.II authors
+//    Copyright (C) 2005, 2006, 2007 by the deal.II authors
 //
 //    This file is subject to QPL and may not be  distributed
 //    without copyright and license information. Please refer
@@ -14,14 +14,15 @@
 #define __deal2__path_search_h
 
 
+#include <base/config.h>
+#include <base/exceptions.h>
+
 #include <string>
 #include <fstream>
 #include <map>
 #include <vector>
 #include <memory>
 
-#include <base/config.h>
-#include <base/exceptions.h>
 
 DEAL_II_NAMESPACE_OPEN
 
