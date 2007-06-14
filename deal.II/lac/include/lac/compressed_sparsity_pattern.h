@@ -2,7 +2,7 @@
 //    $Id$
 //    Version: $Name$
 //
-//    Copyright (C) 2001, 2002, 2003, 2004, 2005, 2006 by the deal.II authors
+//    Copyright (C) 2001, 2002, 2003, 2004, 2005, 2006, 2007 by the deal.II authors
 //
 //    This file is subject to QPL and may not be  distributed
 //    without copyright and license information. Please refer
@@ -388,6 +388,13 @@ class CompressedSparsityPattern : public Subscriptor
                                       */
     struct Line
     {
+      private:
+                                         /**
+                                          * Size of the cache.
+                                          */
+        static const unsigned int cache_size = 8;        
+
+      public:
                                          /**
                                           * Storage for the column indices of
                                           * this row, unless they are still in
@@ -396,11 +403,6 @@ class CompressedSparsityPattern : public Subscriptor
                                           */
         mutable std::vector<unsigned int> entries;
 
-                                         /**
-                                          * Size of the cache.
-                                          */
-        static const unsigned int cache_size = 8;
-        
                                          /**
                                           * Cache of entries that have not yet
                                           * been written to #entries;
