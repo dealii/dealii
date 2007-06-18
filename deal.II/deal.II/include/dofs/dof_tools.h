@@ -383,7 +383,8 @@ class DoFTools
 				      * SparsityPattern,
 				      * CompressedSparsityPattern,
 				      * BlockSparsityPattern,
-				      * CompressedBlockSparsityPattern,
+				      * BlockCompressedSparsityPattern,
+				      * BlockCompressedSetSparsityPattern,
 				      * or any other class that
 				      * satisfies similar
 				      * requirements. It is assumed
@@ -468,7 +469,8 @@ class DoFTools
 				      * SparsityPattern,
 				      * CompressedSparsityPattern,
 				      * BlockSparsityPattern,
-				      * CompressedBlockSparsityPattern,
+				      * BlockCompressedSparsityPattern,
+				      * BlockCompressedSetSparsityPattern,
 				      * or any other class that
 				      * satisfies similar
 				      * requirements.
@@ -560,8 +562,9 @@ class DoFTools
 				      * pattern may be SparsityPattern,
 				      * CompressedSparsityPattern,
 				      * BlockSparsityPattern,
-				      * CompressedBlockSparsityPattern, or any
-				      * other class that satisfies similar
+				      * BlockCompressedSparsityPattern,
+				      * BlockCompressedSetSparsityPattern, or
+				      * any other class that satisfies similar
 				      * requirements. It is assumed that the
 				      * size of the sparsity pattern is
 				      * already correct.

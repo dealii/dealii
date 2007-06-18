@@ -1532,11 +1532,19 @@ DEAL_II_NAMESPACE_CLOSE
 #include "mg_tools.pattern.in.h"
 #undef PATTERN
 
+#define PATTERN CompressedSetSparsityPattern
+#include "mg_tools.pattern.in.h"
+#undef PATTERN
+
 #define PATTERN BlockSparsityPattern
 #include "mg_tools.pattern.in.h"
 #undef PATTERN
 
-#define PATTERN CompressedBlockSparsityPattern
+#define PATTERN BlockCompressedSparsityPattern
+#include "mg_tools.pattern.in.h"
+#undef PATTERN
+
+#define PATTERN BlockCompressedSetSparsityPattern
 #include "mg_tools.pattern.in.h"
 #undef PATTERN
 

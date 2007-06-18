@@ -2,7 +2,7 @@
 //    $Id$
 //    Version: $Name$
 //
-//    Copyright (C) 2004, 2005, 2006 by the deal.II authors
+//    Copyright (C) 2004, 2005, 2006, 2007 by the deal.II authors
 //
 //    This file is subject to QPL and may not be  distributed
 //    without copyright and license information. Please refer
@@ -55,6 +55,7 @@ namespace PETScWrappers
  * matrices. For this, one has to call the collect_sizes() function, for much
  * the same reason as is documented with the BlockSparsityPattern class.
  *
+ * @ingroup Matrix1
  * @author Wolfgang Bangerth, 2004
  */
   class BlockSparseMatrix : public BlockMatrixBase<PETScWrappers::SparseMatrix>

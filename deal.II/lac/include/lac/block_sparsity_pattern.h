@@ -21,6 +21,7 @@
 #include <base/smartpointer.h>
 #include <lac/sparsity_pattern.h>
 #include <lac/compressed_sparsity_pattern.h>
+#include <lac/compressed_set_sparsity_pattern.h>
 #include <lac/block_indices.h>
 
 DEAL_II_NAMESPACE_OPEN
@@ -28,22 +29,22 @@ DEAL_II_NAMESPACE_OPEN
 
 template <typename number> class BlockSparseMatrix;
 class BlockSparsityPattern;
-class CompressedBlockSparsityPattern;
+class BlockCompressedSparsityPattern;
+class BlockCompressedSetSparsityPattern;
 
-/*! @addtogroup Matrix1
+/*! @addtogroup Sparsity
  *@{
  */
 
 
 /**
- * This is the base class for block versions of the sparsity pattern
- * and compressed sparsity pattern classes. It has not much
- * functionality, but only administrates an array of sparsity pattern
- * objects and delegates work to them. It has mostly the same
- * interface as has the SparsityPattern and
- * CompressedSparsityPattern classes, and simply transforms
- * calls to its member functions to calls to the respective member
- * functions of the member sparsity patterns.
+ * This is the base class for block versions of the sparsity pattern and
+ * compressed sparsity pattern classes. It has not much functionality, but
+ * only administrates an array of sparsity pattern objects and delegates work
+ * to them. It has mostly the same interface as has the SparsityPattern,
+ * CompressedSparsityPattern, and CompressedSetSparsityPattern classes, and
+ * simply transforms calls to its member functions to calls to the respective
+ * member functions of the member sparsity patterns.
  *
  * The largest difference between the SparsityPattern and
  * CompressedSparsityPattern classes and this class is that
@@ -418,6 +419,8 @@ class BlockSparsityPatternBase : public Subscriptor
  * adds a few additional member functions, but the main interface
  * stems from the base class, see there for more information.
  *
+ * This class is an example of the "static" type of @ref Sparsity.
+ *
  * @author Wolfgang Bangerth, 2000, 2001
  */
 class BlockSparsityPattern : public BlockSparsityPatternBase<SparsityPattern>
@@ -485,7 +488,7 @@ class BlockSparsityPattern : public BlockSparsityPatternBase<SparsityPattern>
 				     /**
 				      * Copy data from an object of
 				      * type
-				      * CompressedBlockSparsityPattern,
+				      * BlockCompressedSparsityPattern,
 				      * i.e. resize this object to the
 				      * size of the given argument,
 				      * and copy over the contents of
@@ -493,19 +496,39 @@ class BlockSparsityPattern : public BlockSparsityPatternBase<SparsityPattern>
 				      * subobjects. Previous content
 				      * of this object is lost.
 				      */
-    void copy_from (const CompressedBlockSparsityPattern &csp);
+    void copy_from (const BlockCompressedSparsityPattern &csp);
+
+				     /**
+				      * Copy data from an object of
+				      * type
+				      * BlockCompressedSetSparsityPattern,
+				      * i.e. resize this object to the
+				      * size of the given argument,
+				      * and copy over the contents of
+				      * each of the
+				      * subobjects. Previous content
+				      * of this object is lost.
+				      */
+    void copy_from (const BlockCompressedSetSparsityPattern &csp);
 };
 
 
 
 /**
- * This class extends the base class to implement an array of
- * compressed sparsity patterns that can be used to initialize objects
- * of type BlockSparsityPattern. It does not add additional
- * member functions, but rather acts as a @p typedef to introduce the
- * name of this class, without requiring the user to specify the
- * templated name of the base class. For information on the interface
- * of this class refer to the base class.
+ * This class extends the base class to implement an array of compressed
+ * sparsity patterns that can be used to initialize objects of type
+ * BlockSparsityPattern. It does not add additional member functions, but
+ * rather acts as a @p typedef to introduce the name of this class, without
+ * requiring the user to specify the templated name of the base class. For
+ * information on the interface of this class refer to the base class. The
+ * individual blocks are based on the CompressedSparistyPattern class.
+ *
+ * This class is an example of the "dynamic" type of @ref Sparsity.
+ *
+ * <b>Note:</b> This class used to be called
+ * CompressedBlockSparsityPattern. However, since it's a block wrapper around
+ * the CompressedSparsityPattern class, this is a misnomer and the class has
+ * been renamed.
  *
  * <h3>Example</h3>
  * Usage of this class is very similar to CompressedSparsityPattern,
@@ -521,7 +544,7 @@ class BlockSparsityPattern : public BlockSparsityPatternBase<SparsityPattern>
  * @skipline dofs_per_block
  * @until count
  *
- * Now, we are ready to set up the CompressedBlockSparsityPattern.
+ * Now, we are ready to set up the BlockCompressedSparsityPattern.
  *
  * @until collect
  *
@@ -536,7 +559,7 @@ class BlockSparsityPattern : public BlockSparsityPatternBase<SparsityPattern>
  *
  * @author Wolfgang Bangerth, 2000, 2001, Guido Kanschat, 2006, 2007
  */
-class CompressedBlockSparsityPattern : public BlockSparsityPatternBase<CompressedSparsityPattern>
+class BlockCompressedSparsityPattern : public BlockSparsityPatternBase<CompressedSparsityPattern>
 {
   public:
     
@@ -550,7 +573,7 @@ class CompressedBlockSparsityPattern : public BlockSparsityPatternBase<Compresse
 				      * structure usable by calling
 				      * the reinit() function.
 				      */
-    CompressedBlockSparsityPattern ();
+    BlockCompressedSparsityPattern ();
 
 				     /**
 				      * Initialize the matrix with the
@@ -560,7 +583,7 @@ class CompressedBlockSparsityPattern : public BlockSparsityPatternBase<Compresse
 				      * to call collect_sizes() after
 				      * you assign them sizes.
 				      */
-    CompressedBlockSparsityPattern (const unsigned int n_rows,
+    BlockCompressedSparsityPattern (const unsigned int n_rows,
 				    const unsigned int n_columns);
 
     				     /**
@@ -574,7 +597,7 @@ class CompressedBlockSparsityPattern : public BlockSparsityPatternBase<Compresse
 				      * and then entering the index
 				      * values.
 				      */
-    CompressedBlockSparsityPattern (const std::vector<unsigned int>& row_block_sizes,
+    BlockCompressedSparsityPattern (const std::vector<unsigned int>& row_block_sizes,
 				    const std::vector<unsigned int>& col_block_sizes);
     
 				     /**
@@ -601,6 +624,120 @@ class CompressedBlockSparsityPattern : public BlockSparsityPatternBase<Compresse
 				      * well.
 				      */
     BlockSparsityPatternBase<CompressedSparsityPattern>::reinit;
+};
+
+
+
+/**
+ * This class extends the base class to implement an array of compressed
+ * sparsity patterns that can be used to initialize objects of type
+ * BlockSparsityPattern. It does not add additional member functions, but
+ * rather acts as a @p typedef to introduce the name of this class, without
+ * requiring the user to specify the templated name of the base class. For
+ * information on the interface of this class refer to the base class. The
+ * individual blocks are based on the CompressedSparistyPattern class.
+ *
+ * This class is an example of the "dynamic" type of @ref Sparsity.
+ *
+ * <b>Note:</b> This class used to be called
+ * CompressedBlockSparsityPattern. However, since it's a block wrapper around
+ * the CompressedSetSparsityPattern class, this is a misnomer and the class has
+ * been renamed.
+ *
+ * <h3>Example</h3>
+ * Usage of this class is very similar to CompressedSetSparsityPattern,
+ * but since the use of block indices causes some additional
+ * complications, we give a short example.
+ *
+ * @dontinclude compressed_block_sparsity_pattern.cc
+ *
+ * After the the DoFHandler <tt>dof</tt> and the ConstraintMatrix
+ * <tt>constraints</tt> have been set up with a system element, we
+ * must count the degrees of freedom in each matrix block:
+ *
+ * @skipline dofs_per_block
+ * @until count
+ *
+ * Now, we are ready to set up the BlockCompressedSetSparsityPattern.
+ *
+ * @until collect
+ *
+ * It is filled as if it were a normal pattern
+ *
+ * @until condense
+ *
+ * In the end, it is copied to a normal BlockSparsityPattern for later
+ * use.
+ *
+ * @until copy
+ *
+ * @author Wolfgang Bangerth, 2000, 2001, Guido Kanschat, 2006, 2007
+ */
+class BlockCompressedSetSparsityPattern : public BlockSparsityPatternBase<CompressedSetSparsityPattern>
+{
+  public:
+    
+				     /**
+				      * Initialize the matrix empty,
+				      * that is with no memory
+				      * allocated. This is useful if
+				      * you want such objects as
+				      * member variables in other
+				      * classes. You can make the
+				      * structure usable by calling
+				      * the reinit() function.
+				      */
+    BlockCompressedSetSparsityPattern ();
+
+				     /**
+				      * Initialize the matrix with the
+				      * given number of block rows and
+				      * columns. The blocks themselves
+				      * are still empty, and you have
+				      * to call collect_sizes() after
+				      * you assign them sizes.
+				      */
+    BlockCompressedSetSparsityPattern (const unsigned int n_rows,
+				    const unsigned int n_columns);
+
+    				     /**
+				      * Initialize the pattern with
+				      * two BlockIndices for the block
+				      * structures of matrix rows and
+				      * columns. This function is
+				      * equivalent to calling the
+				      * previous constructor with the
+				      * length of the two index vector
+				      * and then entering the index
+				      * values.
+				      */
+    BlockCompressedSetSparsityPattern (const std::vector<unsigned int>& row_block_sizes,
+				    const std::vector<unsigned int>& col_block_sizes);
+    
+				     /**
+				      * Resize the matrix to a tensor
+				      * product of matrices with
+				      * dimensions defined by the
+				      * arguments.
+				      *
+				      * The matrix will have as many
+				      * block rows and columns as
+				      * there are entries in the two
+				      * arguments. The block at
+				      * position (<i>i,j</i>) will
+				      * have the dimensions
+				      * <tt>row_block_sizes[i]</tt>
+				      * times <tt>col_block_sizes[j]</tt>.
+				      */
+    void reinit (const std::vector< unsigned int > &row_block_sizes,
+		 const std::vector< unsigned int > &col_block_sizes);
+
+				     /**
+				      * Allow the use of the reinit
+				      * functions of the base class as
+				      * well.
+				      */
+    BlockSparsityPatternBase<CompressedSetSparsityPattern>::reinit;
 };
 
 

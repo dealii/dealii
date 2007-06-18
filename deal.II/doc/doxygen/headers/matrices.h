@@ -2,7 +2,7 @@
 //    $Id$
 //    Version: $Name$
 //
-//    Copyright (C) 2003, 2004, 2006 by the deal.II authors
+//    Copyright (C) 2003, 2004, 2006, 2007 by the deal.II authors
 //
 //    This file is subject to QPL and may not be  distributed
 //    without copyright and license information. Please refer
@@ -15,18 +15,24 @@
 /**
  * @defgroup Matrices Matrix classes
  *
- * All matrices in this library have a common minimal interface, defined
- * through MATRIX (see Solver documentation). This interface consists of
- * functions for multiplication with appropriate vectors.
+ * deal.II comes with a number of different matrix classes, tailored to the
+ * various purposes for which matrices are used. For example, there are full
+ * matrices, sparse matrices using different storage schemes, matrices
+ * composed of individual blocks, and matrices implemented as interfaces to
+ * other linear algebra classes. As far as possible, all these implementations
+ * share a common interface that contains at least the operations necessary to
+ * write iterative linear solvers (see @ref Solvers), but also element-wise
+ * access to read from and write to a matrix.
  *
- * We split this module into several parts. Basic matrices are all the matrix
- * classes actually storing their entries. Derived matrices use basic
- * matrices, but change the meaning of the matrix-vector multiplication.
+ * This module is split into different parts. @ref Matrix1 "Basic matrices"
+ * contains all the matrix classes actually storing entries. @ref Matrix2
+ * "Derived matrices", on the other hand, only use basic matrices, but
+ * implement certain operations on them. For example, TransposeMatrix provides
+ * a matrix-vector multiplication that acts as if the underlying matrix had
+ * been transposed, without actually ever storing a transposed matrix.
  *
- * Preconditioners are matrix classes as well, since they perform linear
+ * @ref Preconditioners are matrix classes as well, since they perform linear
  * operations on vectors.
- *
- * @author Guido Kanschat, 2003
  *
  * @ingroup LAC
  */
@@ -36,9 +42,16 @@
  *
  * These are the actual matrix classes provided by deal.II. It is possible to
  * store values in them and retrieve them. Furthermore, they provide the full
- * interface required by linear solvers (see Solver).
+ * interface required by linear solvers (see @ref Solvers).
  *
- * @author Guido Kanschat, 2003
+ * Among the matrices in this group are full matrices, different sparse
+ * matrices, and block matrices. In addition, some of the classes in the
+ * interfaces to other linear algebra libraries (for example the
+ * PETScWrappers) are matrices.
+ *
+ * Most of the deal.II sparse matrix classes are separated from their sparsity
+ * patterns, to make storing several matrices with the same sparsity pattern
+ * more efficient. See @ref Sparsity for more information.
  *
  * @ingroup Matrices
  */
@@ -48,9 +61,105 @@
  * @defgroup Matrix2 Derived matrices
  *
  * These matrices are built on top of the basic matrices. They perform special
- * operations using the interface defined in Solver.
+ * operations using the interface defined in @ref Solvers.
  *
- * @author Guido Kanschat, 2003
+ * @ingroup Matrices
+ */
+
+/**
+ * @defgroup Sparsity Sparsity patterns
+ *
+ * In deal.II, sparsity patterns are typically separated from the actual
+ * sparse matrices (with the exception of the SparseMatrixEZ class and some
+ * classes from interfaces to external libraries such as PETSc). The reason is
+ * that one often has several matrices that share the same sparsity pattern;
+ * examples include the stiffness and mass matrices necessary for time
+ * stepping schemes, or the left and right hand side matrix of generalized
+ * eigenvalue problems. It would therefore be wasteful if each of them had to
+ * store their sparsity pattern separately.
+ *
+ * Consequently, deal.II has sparsity pattern classes that matrix classes
+ * build on. There are two main groups of sparsity pattern classes, as
+ * discussed below:
+ *
+ *
+ * <h4>"Static" sparsity patterns</h4>
+ *
+ * The main sparse matrix class in deal.II, SparseMatrix, only stores a value
+ * for each matrix entry, but not where these entries are located. For this,
+ * it relies on the information it gets from a sparsity pattern object
+ * associated with this matrix. This sparsity pattern object must be of type
+ * SparsityPattern.
+ *
+ * Because matrices are large objects and because it is comparatively
+ * expensive to change them, SparsityPattern objects are built in two phases:
+ * first, in a "dynamic" phase, one allocates positions where one expects
+ * matrices built on it to have nonzero entries; in a second "static" phase,
+ * the representation of these nonzero locations is "compressed" into the
+ * usual Compressed Row Storage (CSR) format. After this, no new nonzero
+ * locations can be added any more. Only after compression can a sparsity
+ * pattern be associated to a matrix, since the latter requires the efficient
+ * compressed data format of the former. Building a sparsity pattern during
+ * the dynamic phase often happens with the DoFTools:make_sparsity_pattern()
+ * function. Although this may appear a restriction, it is typically not a
+ * significant problem to first build a sparsity pattern and then to write
+ * into the matrix only in the previously allocated locations, since in finite
+ * element codes it is normally quite clear which elements of a matrix can
+ * possibly be nonzero and which are definitely zero.
+ *
+ * The advantage of this two-phase generation of a sparsity pattern is that
+ * when it is actually used with a matrix, a very efficient format is
+ * available. In particular, the locations of entries are stored in a linear
+ * array that allows for rapid access friendly to modern CPU types with deep
+ * hierarchies of caches. Consequently, the static SparsityPattern class is
+ * the only one on which deal.II's main SparseMatrix class can work.
+ *
+ * The main drawback of static sparsity patterns is that their efficient
+ * construction requires a reasonably good guess how many entries each of the
+ * rows may maximally have. During the actual construction, for example in the
+ * DoFTools:make_sparsity_pattern() function, only at most as many entries can
+ * be allocated as previously stated. This is a problem because it is often
+ * difficult to estimate the maximal number of entries per row. Consequently,
+ * a common strategy is to first build and intermediate sparsity pattern that
+ * uses a less efficient storage scheme during construction of the sparsity
+ * pattern and later copy it directly into the static, compressed form (see,
+ * for example the @ref step_11 "step-11", @ref step_18 "step-18", and @ref
+ * step_27 "step-27" tutorial programs).
+ *
+ *
+ * <h4>"Dynamic" or "compressed" sparsity patterns</h4>
+ *
+ * As explained above, it is often complicated to obtain good estimates for
+ * the maximal number of entries in each row of a sparsity
+ * pattern. Consequently, any attempts to allocate a regular SparsityPattern
+ * with bad estimates requires huge amounts of memory, almost all of which
+ * will not be used and be de-allocated upon compression.
+ *
+ * To avoid this, deal.II contains a number of "dynamic" or "compressed"
+ * sparsity patterns that only allocate as much memory as necessary to hold
+ * the currently added entries. While this saves much memory compared to the
+ * worst-case behavior mentioned above, it requires the use of less efficient
+ * storage schemes for insertion of elements, and the frequent allocation of
+ * memory often also takes significant compute time. The tradeoff to avoid
+ * excessive memory allocation cannot be avoided, however.
+ *
+ * In deal.II, the CompressedSparsityPattern and CompressedSetSparsityPattern
+ * classes implement this "dynamic" memory scheme. They use different storage
+ * schemes and appear to both have use cases where they are better than the
+ * respective other. In either case, these classes are typically used in the
+ * following way:
+ * @verbatim
+ * CompressedSparsityPattern compressed_pattern (dof_handler.n_dofs());
+ * DoFTools::make_sparsity_pattern (dof_handler,
+ *                                  compressed_pattern);
+ * constraints.condense (compressed_pattern);
+ *
+ * SparsityPattern finaly_sparsity_pattern;
+ * final_sparsity_pattern.copy_from (compressed_pattern);
+ * @endverbatim
+ *
+ * The intermediate, compressed sparsity pattern is directly copied into the
+ * "compressed" form of the final static pattern.
  *
  * @ingroup Matrices
  */

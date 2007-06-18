@@ -67,7 +67,7 @@ void test ()
   block_sizes[0] = dof_handler.n_dofs()/3;
   block_sizes[1] = dof_handler.n_dofs() - block_sizes[0];
 
-  CompressedBlockSparsityPattern sparsity(2,2);
+  BlockCompressedSparsityPattern sparsity(2,2);
   for (unsigned int i=0; i<2; ++i)
     for (unsigned int j=0; j<2; ++j)
       sparsity.block(i,j).reinit (block_sizes[i], block_sizes[j]);

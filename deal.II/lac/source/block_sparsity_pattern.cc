@@ -282,6 +282,7 @@ BlockSparsityPatternBase<SparsityPatternBase>::print(std::ostream& out) const
 
 template class BlockSparsityPatternBase<SparsityPattern>;
 template class BlockSparsityPatternBase<CompressedSparsityPattern>;
+template class BlockSparsityPatternBase<CompressedSetSparsityPattern>;
 
 
 
@@ -354,7 +355,7 @@ BlockSparsityPattern::memory_consumption () const
 
 
 void
-BlockSparsityPattern::copy_from  (const CompressedBlockSparsityPattern &csp)
+BlockSparsityPattern::copy_from  (const BlockCompressedSparsityPattern &csp)
 {
 				   // delete old content, set block
 				   // sizes anew
@@ -372,13 +373,32 @@ BlockSparsityPattern::copy_from  (const CompressedBlockSparsityPattern &csp)
 
 
 
-CompressedBlockSparsityPattern::CompressedBlockSparsityPattern ()
+void
+BlockSparsityPattern::copy_from  (const BlockCompressedSetSparsityPattern &csp)
+{
+				   // delete old content, set block
+				   // sizes anew
+  reinit (csp.n_block_rows(), csp.n_block_cols());
+
+				   // copy over blocks
+  for (unsigned int i=0; i<rows; ++i)
+    for (unsigned int j=0; j<rows; ++j)
+      block(i,j).copy_from (csp.block(i,j));
+
+				   // and finally enquire their new
+				   // sizes
+  collect_sizes();
+}
+
+
+
+BlockCompressedSparsityPattern::BlockCompressedSparsityPattern ()
 {}
 
 
 
-CompressedBlockSparsityPattern::
-CompressedBlockSparsityPattern (const unsigned int n_rows,
+BlockCompressedSparsityPattern::
+BlockCompressedSparsityPattern (const unsigned int n_rows,
 				const unsigned int n_columns)
 		:
 		BlockSparsityPatternBase<CompressedSparsityPattern>(n_rows,
@@ -386,8 +406,8 @@ CompressedBlockSparsityPattern (const unsigned int n_rows,
 {}
 
 
-CompressedBlockSparsityPattern::
-CompressedBlockSparsityPattern (const std::vector<unsigned int>& row_indices,
+BlockCompressedSparsityPattern::
+BlockCompressedSparsityPattern (const std::vector<unsigned int>& row_indices,
 				const std::vector<unsigned int>& col_indices)
 		:
 		BlockSparsityPatternBase<CompressedSparsityPattern>(row_indices.size(),
@@ -401,7 +421,49 @@ CompressedBlockSparsityPattern (const std::vector<unsigned int>& row_indices,
 
 
 void
-CompressedBlockSparsityPattern::reinit (
+BlockCompressedSparsityPattern::reinit (
+  const std::vector< unsigned int > &row_block_sizes,
+  const std::vector< unsigned int > &col_block_sizes)
+{
+  this->reinit(row_block_sizes.size(), col_block_sizes.size());
+  for (unsigned int i=0;i<row_block_sizes.size();++i)
+    for (unsigned int j=0;j<col_block_sizes.size();++j)
+      this->block(i,j).reinit(row_block_sizes[i],col_block_sizes[j]);
+  this->collect_sizes();  
+}
+
+
+
+BlockCompressedSetSparsityPattern::BlockCompressedSetSparsityPattern ()
+{}
+
+
+
+BlockCompressedSetSparsityPattern::
+BlockCompressedSetSparsityPattern (const unsigned int n_rows,
+				const unsigned int n_columns)
+		:
+		BlockSparsityPatternBase<CompressedSetSparsityPattern>(n_rows,
+								    n_columns)
+{}
+
+
+BlockCompressedSetSparsityPattern::
+BlockCompressedSetSparsityPattern (const std::vector<unsigned int>& row_indices,
+				const std::vector<unsigned int>& col_indices)
+		:
+		BlockSparsityPatternBase<CompressedSetSparsityPattern>(row_indices.size(),
+								    col_indices.size())
+{
+  for (unsigned int i=0;i<row_indices.size();++i)
+    for (unsigned int j=0;j<col_indices.size();++j)
+      this->block(i,j).reinit(row_indices[i],col_indices[j]);
+  this->collect_sizes();
+}
+
+
+void
+BlockCompressedSetSparsityPattern::reinit (
   const std::vector< unsigned int > &row_block_sizes,
   const std::vector< unsigned int > &col_block_sizes)
 {

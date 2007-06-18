@@ -195,7 +195,7 @@ check ()
   sparsity_3.compress ();
 
   BlockSparsityPattern sparsity_4;
-  CompressedBlockSparsityPattern csp_4(2,2);
+  BlockCompressedSparsityPattern csp_4(2,2);
   csp_4.block(0,0).reinit (n1,n1);
   csp_4.block(1,0).reinit (n2,n1);
   csp_4.block(0,1).reinit (n1,n2);

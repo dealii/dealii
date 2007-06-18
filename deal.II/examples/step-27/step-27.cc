@@ -1282,7 +1282,7 @@ void LaplaceProblem<3>::create_coarse_grid ()
 template <int dim>
 void LaplaceProblem<dim>::run () 
 {
-  for (unsigned int cycle=0; cycle<30; ++cycle)
+  for (unsigned int cycle=0; cycle<3; ++cycle)
     {
       std::cout << "Cycle " << cycle << ':' << std::endl;
 

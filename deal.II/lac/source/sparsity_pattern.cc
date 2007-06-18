@@ -628,7 +628,7 @@ SparsityPattern::copy_from (const CompressedSetSparsityPattern &csp,
   for (unsigned int row = 0; row<csp.n_rows(); ++row)
     {
       unsigned int *cols = &colnums[rowstart[row]] + (is_square ? 1 : 0);
-      CompressedSetSparsityPattern::CSSPIterator col_num = csp.row_begin (row);
+      CompressedSetSparsityPattern::row_iterator col_num = csp.row_begin (row);
 
       for (; col_num != csp.row_end (row); ++col_num)
 	{

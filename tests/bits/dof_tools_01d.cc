@@ -18,7 +18,7 @@
 // check
 //   DoFTools::
 //   make_sparsity_pattern (const DoFHandler<dim> &,
-//	                    CompressedBlockSparsityPattern  &);
+//	                    BlockCompressedSparsityPattern  &);
 
 std::string output_file_name = "dof_tools_01d/output";
 
@@ -38,7 +38,7 @@ check_this (const DoFHandler<dim> &dof_handler)
   
                                    // create sparsity pattern
   const unsigned int n_components = dof_handler.get_fe().n_components();
-  CompressedBlockSparsityPattern sp (n_components,
+  BlockCompressedSparsityPattern sp (n_components,
                                      n_components);
   std::vector<unsigned int> dofs_per_component(n_components);
   DoFTools::count_dofs_per_component (dof_handler,

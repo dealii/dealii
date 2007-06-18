@@ -221,11 +221,13 @@ namespace hp
                                         * The number holds for the constrained
                                         * matrix also.
                                         *
-                                        * The determination of the number of
-                                        * couplings can be done by simple
-                                        * picture drawing. An example can be
-                                        * found in the implementation of this
-                                        * function.
+                                        * As for
+                                        * DoFHandler::max_couplings_between_dofs(),
+                                        * the result of this function is often
+                                        * not very accurate for 3d and/or high
+                                        * polynomial degrees. The consequences
+                                        * are discussed in the documentation
+                                        * of the module on @ref Sparsity.
                                         */
       unsigned int max_couplings_between_dofs () const;
 

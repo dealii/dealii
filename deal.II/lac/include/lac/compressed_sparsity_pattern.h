@@ -26,7 +26,7 @@ DEAL_II_NAMESPACE_OPEN
 template <typename number> class SparseMatrix;
 
 
-/*! @addtogroup Matrix1
+/*! @addtogroup Sparsity
  *@{
  */
 
@@ -45,44 +45,12 @@ template <typename number> class SparseMatrix;
  * copy the data of this object over to an object of type
  * SparsityPattern before using it in actual matrices.
  *
- * Another viewpoint is that this class does not need up front
- * allocation of a certain amount of memory, but grows as necessary.
+ * Another viewpoint is that this class does not need up front allocation of a
+ * certain amount of memory, but grows as necessary.  An extensive description
+ * of sparsity patterns can be found in the documentation of the @ref Sparsity
+ * module.
  *
- *
- * <h3>Rationale</h3>
- *
- * When constructing the sparsity pattern of a matrix, you usually
- * first have to provide an empty sparsity pattern object with a fixed
- * maximal number of entries per row. To find out about this maximal
- * row length, one usually calls the function
- * DoFHandler::max_couplings_between_dofs() which returns an estimate for
- * that quantity or DoFTools::compute_row_length_vector(), which gives
- * a better estimate for each row. While this estimate is usually
- * quite good in 2d and exact in 1d, it is often significantly too
- * large in 3d and especially for higher order elements. Furthermore,
- * normally only a small fraction of the rows of a matrix will end up
- * having the maximal number of nonzero entries per row (usually those
- * nodes adjacent to hanging nodes), most have much less. In effect,
- * the empty SparsityPattern object has allocated much too much
- * memory. Although this unnecessarily allocated memory is later freed
- * when SparsityPattern::compress() is called, this overallocation
- * has, with higher order elements and in 3d, sometimes been so large
- * that the program aborted due to lack of memory.
- *
- * This class therefore provides an alternative representation of a
- * sparsity pattern: we don't specify a maximal row length initially,
- * but store a set of column indices indicating possible nonzero
- * entries in the sparsity pattern for each row. This is very much
- * like the final "compressed" format used in the
- * SparsityPattern object after compression, but uses a less
- * compact memory storage format, since the exact number of entries
- * per row is only known a posteriori and since it may change (for the
- * SparsityPattern class, no more changes are allowed after
- * compressing it). We can therefore not store all the column indices
- * in a big array, but have to use a vector of sets. This can later be
- * used to actually initialize a SparsityPattern object with the
- * then final set of necessary indices.
- *
+ * This class is an example of the "dynamic" type of @ref Sparsity.
  *
  * <h3>Interface</h3>
  *
@@ -106,6 +74,15 @@ template <typename number> class SparseMatrix;
  * sp.copy_from (compressed_pattern);
  * @endverbatim
  *
+ * See also @ref step_11 "step-11" and @ref step_18 "step-18" for usage
+ * patterns.
+ *
+ * <h3>Notes</h3>
+ *
+ * A variation of this class is the CompressedSetSparsityPattern class that
+ * appears to be more efficient in some situations, in particular when using
+ * hp finite elements. See for example the @ref step_27 "step-27" tutorial
+ * program.
  *
  * @author Wolfgang Bangerth, 2001
  */
@@ -139,18 +116,6 @@ class CompressedSparsityPattern : public Subscriptor
 				      * (CompressedSparsityPattern());</tt>,
 				      * with @p v a vector of @p
 				      * CompressedSparsityPattern objects.
-				      *
-				      * Usually, it is sufficient to
-				      * use the explicit keyword to
-				      * disallow unwanted temporaries,
-				      * but for the STL vectors, this
-				      * does not work. Since copying a
-				      * structure like this is not
-				      * useful anyway because multiple
-				      * matrices can use the same
-				      * sparsity structure, copies are
-				      * only allowed for empty
-				      * objects, as described above.
 				      */
     CompressedSparsityPattern (const CompressedSparsityPattern &);
 
@@ -309,16 +274,7 @@ class CompressedSparsityPattern : public Subscriptor
 
 				     /**
 				      * Return the number of nonzero elements
-				      * of this matrix. Actually, it returns
-				      * the number of entries in the sparsity
-				      * pattern; if any of the entries should
-				      * happen to be zero, it is counted
-				      * anyway.
-				      *
-				      * This function may only be called if
-				      * the matrix struct is compressed. It
-				      * does not make too much sense otherwise
-				      * anyway.
+				      * allocated through this sparsity pattern.
 				      */
     unsigned int n_nonzero_elements () const;
 
@@ -357,7 +313,13 @@ class CompressedSparsityPattern : public Subscriptor
                                       * versions up to 5.0), we used to store
                                       * the column indices inside a std::set,
                                       * but this would allocate 20 bytes each
-                                      * time we added an entry. Using the
+                                      * time we added an entry. (A std::set
+                                      * based class has later been revived in
+                                      * form of the
+                                      * CompressedSetSparsityPattern class, as
+                                      * this turned out to be more efficient
+                                      * for hp finite element programs such as
+                                      * @ref step_27 "step-27"). Using the
                                       * present scheme, we only need to
                                       * allocate memory once for every 8 added
                                       * entries, and we waste a lot less

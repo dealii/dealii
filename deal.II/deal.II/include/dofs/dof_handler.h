@@ -2,7 +2,7 @@
 //    $Id$
 //    Version: $Name$
 //
-//    Copyright (C) 1998, 1999, 2000, 2001, 2002, 2003, 2004, 2005, 2006 by the deal.II authors
+//    Copyright (C) 1998, 1999, 2000, 2001, 2002, 2003, 2004, 2005, 2006, 2007 by the deal.II authors
 //
 //    This file is subject to QPL and may not be  distributed
 //    without copyright and license information. Please refer
@@ -282,7 +282,7 @@ class DoFHandler  :  public Subscriptor
 				      * on the finite element and the maximum
 				      * number of cells meeting at a vertex.
 				      * The number holds for the constrained
-				      * matrix also.
+				      * matrix as well.
 				      *
 				      * The determination of the number of
 				      * couplings can be done by simple
@@ -290,31 +290,27 @@ class DoFHandler  :  public Subscriptor
 				      * found in the implementation of this
 				      * function.
 				      *
-				      * Note that this function is
-				      * most often used to determine
-				      * the maximal row length for
-				      * sparsity
-				      * patterns. Unfortunately, the
-				      * while the estimates returned
-				      * by this function are rather
-				      * accurate in 1d and 2d, they
-				      * are often significantly too
-				      * high in 3d, leading the
-				      * SparsityPattern class to
-				      * allocate much too much memory
-				      * in some cases. Unless someone
-				      * comes around to improving the
-				      * present function for 3d, there
-				      * is not very much one can do
-				      * about these cases. The typical
-				      * way to work around this
-				      * problem is to use an
-				      * intermediate compressed
-				      * sparsity pattern that only
-				      * allocates memory on
-				      * demand. Refer to the @ref
-				      * step_11 "step-11" example
-				      * program on how to do this.
+				      * Note that this function is most often
+				      * used to determine the maximal row
+				      * length for sparsity
+				      * patterns. Unfortunately, while the
+				      * estimates returned by this function
+				      * are rather accurate in 1d and 2d, they
+				      * are often significantly too high in
+				      * 3d, leading the SparsityPattern class
+				      * to allocate much too much memory in
+				      * some cases. Unless someone comes
+				      * around to improving the present
+				      * function for 3d, there is not very
+				      * much one can do about these cases. The
+				      * typical way to work around this
+				      * problem is to use an intermediate
+				      * compressed sparsity pattern that only
+				      * allocates memory on demand. Refer to
+				      * the @ref step_11 "step-11" example
+				      * program on how to do this. The problem
+				      * is also discussed in the documentation
+				      * of the module on @ref Sparsity.
 				      */
     unsigned int max_couplings_between_dofs () const;
 

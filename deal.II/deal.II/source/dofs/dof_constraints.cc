@@ -1044,104 +1044,6 @@ void ConstraintMatrix::condense (CompressedSparsityPattern &sparsity) const
 }
 
 
-
-void ConstraintMatrix::condense_fast (CompressedSparsityPattern &sparsity) const
-{
-  /*
-  Assert (sorted == true, ExcMatrixNotClosed());
-  Assert (sparsity.n_rows() == sparsity.n_cols(),
-	  ExcNotQuadratic());
-  
-				   // store for each index whether it must be
-				   // distributed or not. If entry is
-				   // deal_II_numbers::invalid_unsigned_int,
-				   // no distribution is necessary.
-				   // otherwise, the number states which line
-				   // in the constraint matrix handles this
-				   // index
-  std::vector<unsigned int> distribute(sparsity.n_rows(),
-                                       deal_II_numbers::invalid_unsigned_int);
-  
-  for (unsigned int c=0; c<lines.size(); ++c)
-    distribute[lines[c].line] = c;
-
-  const unsigned int n_rows = sparsity.n_rows();
-  for (unsigned int row=0; row<n_rows; ++row)
-    {
-      // First copy entries to local cache data structure;
-      std::set<unsigned int> row_cache;
-      for (unsigned int j=0; j<sparsity.row_length(row); ++j)
-	row_cache.insert (sparsity.column_number(row,j));
-
-      if (distribute[row] == deal_II_numbers::invalid_unsigned_int)
-	{
-	  // regular line. loop over
-	  // cols. note that as we
-	  // proceed to distribute
-	  // cols, the loop may get
-					 // longer
-	  std::set<unsigned int>::iterator col_num = row_cache.begin ();
-	  
-	  for (; col_num != row_cache.end (); ++col_num)
-	    {
-	      const unsigned int column = *col_num;
-	      
-	      if (distribute[column] != deal_II_numbers::invalid_unsigned_int)
-		{
-		  // row
-		  for (unsigned int q=0;
-		       q!=lines[distribute[column]].entries.size();
-		       ++q) 
-		    {
-		      const unsigned int
-			new_col = lines[distribute[column]].entries[q].first;
-		      
-		      sparsity.add (row, new_col);
-		    };
-		};
-	    }
-	}
-      else
-	// row must be distributed
-	{
-	  std::set<unsigned int>::iterator col_num = row_cache.begin ();
-	  
-	  for (; col_num != row_cache.end (); ++col_num)
-	    {
-	      const unsigned int column = *col_num;
-	      
-	      if (distribute[column] == deal_II_numbers::invalid_unsigned_int)
-		// distribute entry at irregular
-		// row @p{row} and regular column
-		// sparsity.colnums[j]
-		for (unsigned int q=0;
-		     q!=lines[distribute[row]].entries.size(); ++q) 
-		  sparsity.add (lines[distribute[row]].entries[q].first,
-				column);
-	      else
-		// distribute entry at irregular
-		// row @p{row} and irregular column
-		// sparsity.get_column_numbers()[j]
-		for (unsigned int p=0; p!=lines[distribute[row]].entries.size(); ++p)
-		  for (unsigned int q=0;
-		       q!=lines[distribute[column]]
-			 .entries.size(); ++q)
-		    sparsity.add (lines[distribute[row]].entries[p].first,
-				  lines[distribute[column]]
-				  .entries[q].first);
-	    };
-	}
-
-      // Now copy stuff back to sparsity pattern
-      std::set<unsigned int>::iterator col_num = row_cache.begin ();	  
-      for (; col_num != row_cache.end (); ++col_num)
-	{
-	}
-    };
-  */
-}
-
-
 void ConstraintMatrix::condense (CompressedSetSparsityPattern &sparsity) const
 {
   Assert (sorted == true, ExcMatrixNotClosed());
@@ -1166,12 +1068,11 @@ void ConstraintMatrix::condense (CompressedSetSparsityPattern &sparsity) const
     {
       if (distribute[row] == deal_II_numbers::invalid_unsigned_int)
 	{
-	  // regular line. loop over
-	  // cols. note that as we
-	  // proceed to distribute
-	  // cols, the loop may get
-					 // longer
-	  CompressedSetSparsityPattern::CSSPIterator col_num = sparsity.row_begin (row);
+					   // regular line. loop over
+					   // cols. note that as we proceed to
+					   // distribute cols, the loop may
+					   // get longer
+	  CompressedSetSparsityPattern::row_iterator col_num = sparsity.row_begin (row);
 	  
 	  for (; col_num != sparsity.row_end (row); ++col_num)
 	    {
@@ -1201,7 +1102,7 @@ void ConstraintMatrix::condense (CompressedSetSparsityPattern &sparsity) const
       else
 	// row must be distributed
 	{
-	  CompressedSetSparsityPattern::CSSPIterator col_num = sparsity.row_begin (row);
+	  CompressedSetSparsityPattern::row_iterator col_num = sparsity.row_begin (row);
 	  
 	  for (; col_num != sparsity.row_end (row); ++col_num)
 	    {
@@ -1360,7 +1261,7 @@ void ConstraintMatrix::condense (BlockSparsityPattern &sparsity) const
 
 
 
-void ConstraintMatrix::condense (CompressedBlockSparsityPattern &sparsity) const
+void ConstraintMatrix::condense (BlockCompressedSparsityPattern &sparsity) const
 {
   Assert (sorted == true, ExcMatrixNotClosed());
   Assert (sparsity.n_rows() == sparsity.n_cols(),
@@ -1702,8 +1603,12 @@ add_entries_local_to_global<BlockSparsityPattern> (const std::vector<unsigned in
 					      BlockSparsityPattern       &,
 					      const bool) const;
 template void ConstraintMatrix::
-add_entries_local_to_global<CompressedBlockSparsityPattern> (const std::vector<unsigned int> &,
-					      CompressedBlockSparsityPattern       &,
+add_entries_local_to_global<BlockCompressedSparsityPattern> (const std::vector<unsigned int> &,
+					      BlockCompressedSparsityPattern       &,
+					      const bool) const;
+template void ConstraintMatrix::
+add_entries_local_to_global<BlockCompressedSetSparsityPattern> (const std::vector<unsigned int> &,
+					      BlockCompressedSetSparsityPattern       &,
 					      const bool) const;
 
 

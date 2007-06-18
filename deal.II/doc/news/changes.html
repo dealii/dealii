@@ -745,6 +745,27 @@ inconvenience this causes.
 <h3>lac</h3>
 
 <ol>
+  <li> <p>Changed: The <code
+       class="class">CompressedBlockSparsityPattern</code> has been renamed to
+       <code class="class">BlockCompressedSparsityPattern</code> to be
+       consistent, since the "block" part builds on the "compressed sparsity
+       pattern", not the other way around.
+       <br>
+       (WB 2007/06/17)
+       </p>
+
+  <li> <p>New: The <code class="class">CompressedSetSparsityPattern</code>
+       class is an alternative to the <code
+       class="class">CompressedSparsityPattern</code> class that appears to be
+       better suited for problems that have many entries per row. There is also
+       a block version, <code
+       class="class">BlockCompressedSetSparsityPattern</code>. The two new
+       classes can used in all places where a regular compressed sparsity
+       pattern can also be used.
+       <br>
+       (Oliver Kayser-Herold, WB 2007/06/03)
+       </p>
+
   <li> <p>Fixed: The <code class="class">SolverBicgstab</code> class
        did not handle hitting on the solution early very
        gracefully (it threw an exception). This is now fixed.

@@ -30,7 +30,8 @@ class SparsityPattern;
 class CompressedSparsityPattern;
 class CompressedSetSparsityPattern;
 class BlockSparsityPattern;
-class CompressedBlockSparsityPattern;
+class BlockCompressedSparsityPattern;
+class BlockCompressedSetSparsityPattern;
 template <typename number> class SparseMatrix;
 template <typename number> class BlockSparseMatrix;
 class BlockIndices;
@@ -689,15 +690,20 @@ class ConstraintMatrix : public Subscriptor
 				      */
     void condense (CompressedSetSparsityPattern &sparsity) const;
 
-    void condense_fast (CompressedSparsityPattern &sparsity) const;
+				     /**
+				      * Same function as above, but
+				      * condenses square compressed
+				      * sparsity patterns.
+				      */
+    void condense (BlockCompressedSparsityPattern &sparsity) const;
 
 				     /**
 				      * Same function as above, but
 				      * condenses square compressed
 				      * sparsity patterns.
 				      */
-    void condense (CompressedBlockSparsityPattern &sparsity) const;
-
+    void condense (BlockCompressedSetSparsityPattern &sparsity) const;
+    
     
 				     /**
 				      * Condense a given matrix. The associated

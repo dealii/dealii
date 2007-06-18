@@ -2,7 +2,7 @@
 //    $Id$
 //    Version: $Name$
 //
-//    Copyright (C) 2004, 2005, 2006 by the deal.II authors
+//    Copyright (C) 2004, 2005, 2006, 2007 by the deal.II authors
 //
 //    This file is subject to QPL and may not be  distributed
 //    without copyright and license information. Please refer
@@ -49,7 +49,8 @@ namespace PETScWrappers
  * constructors and reinit() functions, one therefore not only has to specify
  * the sizes of the individual blocks, but also the number of elements of each
  * of these blocks to be stored on the local process.
- * 
+ *
+ * @ingroup Vectors
  * @author Wolfgang Bangerth, 2004
  */
     class BlockVector : public BlockVectorBase<Vector>

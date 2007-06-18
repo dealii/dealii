@@ -33,7 +33,7 @@ class CompressedSetSparsityPattern;
 
 
 
-/*! @addtogroup Matrix1
+/*! @addtogroup Sparsity
  *@{
  */
 
@@ -382,80 +382,10 @@ namespace internals
 
 /**
  * Structure representing the sparsity pattern of a sparse matrix.
- * 
- * The following picture will illustrate the relation between the
- * SparsityPattern an the SparseMatrix.
  *
- * @verbatim
- *  SparsityPattern:                               \
- *                                                 |
- *              _________________________          |
- *  rowstart   |0 | 4| 8|11|13|....                |
- *             |__|__|__|__|__|__________          | 
- *              |   \  \                           |
- *              |    \  \__                        | 
- *              |     \    \                       |
- *              |      \    \__                    |
- *             \ /      \      \                   |
- *              |        \      \__                |     
- *              |         \        \               |
- *              |          \        \__            |   
- *              |           \	       \	   |            
- *              0___________4___________8____       \ Position         
- *  colnums    |3 | 2| 9|17| 1| 4| 6| 8| 4|..       /         
- *             /__|/_|__|__|__|__|__|__|__|__      |         
- *            /   /                                |        
- *           / \______  _____/ \_____  _____/      |         
- *          /         \/             \/            |                 
- *         /   /  row = 0        row = 1           |    
- *        /   /                                    |
- *       /   /                                     |
- *      /   /                                      | 
- *     /   /___colnums[1]                          |  
- *    /                                            |
- *   /_________colnums[0]                          |
- *                                                 |                    
- *                                                /                    
- * @endverbatim
+ * This class is an example of the "static" type of @ref Sparsity.
  *
- * @verbatim
- * For row = 0
- *   
- * there are: (0| 3) = colnums[0]
- *            (0| 2) = colnums[1]
- *            (0| 9) = colnums[2]
- *            (0|17) = colnums[3]
- *
- * For row = 1
- *   
- * there are: (1| 1) = colnums[4]
- *            (1| 4) = colnums[5]
- * ....
- *
- * @endverbatim
- *
- * @verbatim
- * SparseMatrix:                                  \
- *                                                 |
- *              _____________________________      |
- *  val        |  |  |  |  |  |  |  |  | 3|..       \ Value
- *             |__|__|__|__|__|__|__|__|__|__       /
- *                                                 |
- *                                                 |
- *                                                /
- * @endverbatim
- *
- * If you want to get the <tt>3</tt> you need to get its position in
- * the table above and its value by returning the value of the element
- * on which the pointer shows, using <tt>*val</tt>. For example
- * <tt>val[8]=3</tt>. Its position is <tt>colnums[8]</tt> so
- * <tt>row=2</tt>. In other words, if you want to get the element
- * <i>a<sub>24</sub></i> you know that <tt>row=2</tt>. To get the
- * element, a search of <tt>4</tt> form <tt>colnums[rowstart[2]]</tt>
- * to <tt>colnums[rowstart[3]]</tt> is needed. Then
- * <i>a<sub>24</sub></i>=<tt>val[number of the found element] =
- * 3</tt>.
- *
+ * It uses the compressed row storage (CSR) format to store data.
  *
  * @author Wolfgang Bangerth, Guido Kanschat and others
  */

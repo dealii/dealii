@@ -2,7 +2,7 @@
 //    $Id$
 //    Version: $Name$
 //
-//    Copyright (C) 2003, 2004, 2006 by the deal.II authors
+//    Copyright (C) 2003, 2004, 2006, 2007 by the deal.II authors
 //
 //    This file is subject to QPL and may not be  distributed
 //    without copyright and license information. Please refer
@@ -14,17 +14,16 @@
  * @defgroup Solvers Linear solver classes
  *
  * This module groups iterative and direct solvers, eigenvalue solvers, and
- * some control classes. All iterative solvers inherit from the class template
- * Solver, which provides some basic maintenance methods.
+ * some control classes. All these classes operate on objects of the
+ * @ref Matrices "matrix" and @ref Vectors "vector classes" defined in deal.II.
  *
- * The number of iteration steps of iterative solvers is controlled by
- * objects of class SolverControl or its derived class
- * ReductionControl.
- *
- * All solvers receive the matrix and vector classes as template
- * arguments. Therefore, any objects defining the interface described in the
- * documentation of Solver are admissible. These requirements are listed in
- * the documentation page of the Solver class.
+ * In order to work properly, solvers that take matrix and vector classes as
+ * template arguments require that these classes satisfy a certain minimal
+ * interface that can be used from inside the solver. For iterative solvers,
+ * this interface is defined in the Solver class. In addition, solvers are
+ * controlled using objects of classes that are derived from the SolverControl
+ * class (for example its derived class ReductionControl), in order to
+ * determine the maximal number of iterations or a desired tolerance.
  *
  * If detected during configuration (see the ReadMe file), some sparse direct
  * solvers are also supported.

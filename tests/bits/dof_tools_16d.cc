@@ -20,7 +20,7 @@
 //   make_boundary_sparsity_pattern (const DoFHandler<dim> &,
 //                                   const typename FunctionMap<dim>::type &
 //                                   const std::vector<unsigned int> &
-//	                             CompressedBlockSparsityPattern  &);
+//	                             BlockCompressedSparsityPattern  &);
 
 std::string output_file_name = "dof_tools_16d/output";
 
@@ -44,7 +44,7 @@ check_this (const DoFHandler<dim> &dof_handler)
   const unsigned int n_boundary_dofs = dof_handler.n_boundary_dofs(boundary_ids);
   const unsigned int n_blocks = std::min (dof_handler.get_fe().n_components(),
                                           n_boundary_dofs);
-  CompressedBlockSparsityPattern sp (n_blocks,
+  BlockCompressedSparsityPattern sp (n_blocks,
                                      n_blocks);
                                    // split dofs almost arbitrarily to
                                    // blocks
