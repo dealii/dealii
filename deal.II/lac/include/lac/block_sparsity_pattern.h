@@ -627,6 +627,17 @@ class BlockCompressedSparsityPattern : public BlockSparsityPatternBase<Compresse
 };
 
 
+/**
+ * A typdef to preserve the old name CompressedBlockSparsityPattern even after
+ * we changed the naming of the class to BlockCompressedSparsityPattern. The
+ * old name is now deprecated and user codes should use the name
+ * BlockCompressedSparsityPattern instead.
+ *
+ * @deprecated
+ */
+typedef BlockCompressedSparsityPattern CompressedBlockSparsityPattern;
+
+
 
 /**
  * This class extends the base class to implement an array of compressed

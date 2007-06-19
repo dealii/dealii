@@ -273,11 +273,16 @@ class CompressedSetSparsityPattern : public Subscriptor
     unsigned int row_length (const unsigned int row) const;
 
 				     /**
-				      * Access to column number field.
-				      * Return the column number of
-				      * the @p indexth entry in @p row.
+				      * Return an iterator that can loop over
+				      * all entries in the given
+				      * row. Dereferencing the iterator yields
+				      * a column index.
 				      */
     row_iterator row_begin (const unsigned int row) const;
+
+				     /**
+				      * End iterator for the given row.
+				      */
     row_iterator row_end (const unsigned int row) const;
 
 
