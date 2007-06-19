@@ -68,6 +68,7 @@ tests_x = grid_generator_?? \
 	  error_estimator_* \
 	  cylinder_shell_* \
 	  compressed_sparsity_pattern_* \
+	  compressed_set_sparsity_pattern_* \
 	  point_difference_* \
 	  point_value_* \
 	  fe_q_3d* \

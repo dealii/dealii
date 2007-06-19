@@ -1,0 +1,101 @@
+
+DEAL::0 xxx x x  x  x   x     x  xx     x   x     x   x xxx x   x     x x x     x   x    xx   x     x   x x 
+DEAL::1 xx x x     x         x   x  x  x   xx   x       x   xx       x   x      xx xxx                   x  
+DEAL::2 x       x  x    x   x              x               x   xx                          x                
+DEAL::3  x         x   x   x  x   x    x       x       x   x       x           x       x                 x  
+DEAL::4 x   x   x               x   xx          x   x    xx   x   x          x        x           x   x     
+DEAL::5  x      x   x   xx x x       x xxx xxx  xx         xx   xx x x   x      x   xx   x   x   x  x   xx  
+DEAL::6 x          x   x       x                        x      x    x               x              x    x   
+DEAL::7            x                       x               x   x       x       x   x               x   x    
+DEAL::8   x xx   x      x    x  x                     x     x   x    x                  x        x      x   
+DEAL::9 x       xx   x           x       x     x         x         xx   x                   xx  xx         x
+DEAL::10            x    x  xx   x      x                           x    x                              xx   
+DEAL::11  xxx  xx  xx   x x     x x x   x   x x     x  x    x   x  x  x   x x  xx x x  x   xx   x   x x x    
+DEAL::12 x    x              xx              x                               x       x    x   x       x      
+DEAL::13          x      x  x x       x  x        x   x     x     x                       x         x   x   x
+DEAL::14                         x              x                   x    x                   x              x
+DEAL::15    x  x    x       x      x    x       x     xx    x x x          x   xx      xx      x    x   x   x
+DEAL::16 x x  x  x x  x       x          x   x x  x    x   x x   x x x    x          x     x   x x       x   
+DEAL::17      x     x           x                 x                             x x x     x   x         x    
+DEAL::18                                x   xx       x               x   x           x  x           x       x
+DEAL::19    x x    x  x x   x   x     x     x       x          xx       x x   xx       xx             xxx  xx
+DEAL::20   x       x x         x x    x  x     x xxx         x       xxx  x   x  x   x     x x   x   x   x   
+DEAL::21  x   x  x   xx  x               xx x x  xx               x   x   x     x   xx   xx x    x  x        
+DEAL::22 x  x                x       x      x               x   xx                                  x    x   
+DEAL::23       x    x     x x           x       x  x        x       x       x   x   x     x         x       x
+DEAL::24     x   x x   x     x   x         x   x     x    x    x   x x   x     x   x         x   x     x     
+DEAL::25 xx       x x             x             x        xx                       x x   x x         x        
+DEAL::26 x  x           x            x       x              x   xx   x          x                            
+DEAL::27            x                   x   x               x   x                   x       x       x   x    
+DEAL::28  x  x                 x   x             x               x    x   x   x  x   x       x    x      x   
+DEAL::29     xx       x     xx        x              xx   x                  xx         xx       x    x     x
+DEAL::30                                    x   x    x           x   x          x    x  x    x      x        
+DEAL::31  x x x    xx   x  x    x   x     x x  x  xxx  xx  xx x x      xx x x   x   x x     x  xx   x     x  
+DEAL::32 x    x       x  x   xx                                       x              x        x  x           
+DEAL::33      x   x           x         x                    x  x     x               x x         x x    x  x
+DEAL::34                         x              x                   x    x                   x              x
+DEAL::35  xx  x x   x      xx xx    x  xx       x xxx   x   x   x   x xx    x   x         xx    x   x x x   x
+DEAL::36 xx   x      x   x x       x         x   x x     x x         x x  x  x       x    x    x   x xx    x 
+DEAL::37      x     x         x                     x       x                       x     x   x       x x    
+DEAL::38                 x   x   x      x            x              x           x    x  x               x    
+DEAL::39    x     x    xx       x x    x   xx   x   x           x  xx             x x  x    x x   xx  x     x
+DEAL::40  x  xx              xx      x       x       x    x      x             x       x x        x          
+DEAL::41      x       x  xx  xx         x   x     x   x  x  x    x      x x  x   xx x    xx          xx   x  
+DEAL::42 x                   x  x       x   xx           x      x                                   x    x   
+DEAL::43            x       x           x   x x x           x         xx                x      xx   x       x
+DEAL::44     x             x     x    xx       x x   x    x    x             xx          x       x x   x     
+DEAL::45              x x             x           x         x       xxx   x   x x             x  x          x
+DEAL::46 x       x  x   xx              x                       x    x                      x            x   
+DEAL::47    x                           x   x               x   x               x   x               x   x    
+DEAL::48 xx    x                  x          x    xx      x      x       x    x              x       x   x   
+DEAL::49 x   x    x              xx   x          x   x   xx              xx  xx   x          x    x   x     x
+DEAL::50 x   x           x              x    x              x       x    x          x                       x
+DEAL::51   xx x x   x x x      xx  xx   x   x x   x x x x  xx   x x     x       x   x  x  x    xx  xx x x  x 
+DEAL::52 xx   x  x       x   x            x                      x    x                       x              
+DEAL::53  x             x               x                           x x   x   x xx   x  x         x       x  
+DEAL::54     x              x    x                   x                                  x                   x
+DEAL::55   x   xx   x   x   x  x   xx   x x x   x  x   xx   x      xx  x  xxx   x       x  xx  xx  xx        
+DEAL::56 x x  x  x       x     x   x x x         xx      x   x     x xx   xx     xx  x x x         x     x   
+DEAL::57      x       x       x                             x         x x           x         x     x   x    
+DEAL::58     x      x    x       x              x               xx  x           x        x                   
+DEAL::59    x x   xx   x        x          xx  xx     x    x  x x  xx   x         x x       x     x     x   x
+DEAL::60       x  x      x x x   x x   x     x        xx         x    x  x x xx      x   xx    x         x   
+DEAL::61  x   x  x  x        xx      x   xx x       x x      xx  xx  x    x         x x   x   x     x x  x   
+DEAL::62 x                   x          x   xx      x           x            x  x    x                       
+DEAL::63        x           x           x         x         x     x x      x    x       x  x        x   x   x
+DEAL::64 x        xx   x   x     x         x             xxx         x   x   x               x    x        x 
+DEAL::65  x   x     x    x  xxx      x  x    x    x   x   x   x xx    x              x  x x       x      x   
+DEAL::66 x              x                                       xx   x  x       x    x           x  x        
+DEAL::67            x           x       x   x                   x               x   x               x   x    
+DEAL::68             x                x      x    x  x    x          x x x           x    x   xx             
+DEAL::69     x              xx       xx              xx  xx   x      x        x   x     x     x             x
+DEAL::70            x   x   x    x               x                                   x  x    x      x    x   
+DEAL::71    x   x   x   x x   x x  x   xx   x  x      x x   x x x  x   xx  xx   x x x     xxx x x  xx   x x  
+DEAL::72 xx   x              x       x            x           x  x                            x          x   
+DEAL::73  x         x     x       x             x x       x      x  x         x x   x     x          x       
+DEAL::74                         x                                                                          x
+DEAL::75  x     x   x     x   x x x x   x     x x x     x  xx     x x x     x   x x x x x x     x   x     xxx
+DEAL::76 xx   xx     x   x x xx      x x x   x x              x  x   x x  xx x x         x x     x           
+DEAL::77  x   x                         x x                           x             x       x x     x   x    
+DEAL::78     x      x   x   x                   xx          x    x                           x           x   
+DEAL::79    x           x  xx     x   xx  x    x    x         xxx       x x   xx    x   x   x          xx   x
+DEAL::80         x            x       x          xx  x           x x x               x       xx   xx         
+DEAL::81 x    x      xx   x   x x x         xxx   x         x        xx   x  x  x x x         x  x   xx  x   
+DEAL::82 x          x    x   x              x                   x       x       x    x           x           
+DEAL::83   x        x         x     x   x       x      x        x   x           x     x x           x       x
+DEAL::84          x    x     x   x   x x   x             xx              x     x       x x   x    x        x 
+DEAL::85      x   x  x    x              x    x x     x      x    x   x      xx xx    x  xx         xxx x x x
+DEAL::86 x              xx              x    x      x       x   x    x       x                               
+DEAL::87            x                   x   x       x       x   x               x   x                   x    
+DEAL::88          x      x   xx  x    x  x           xx                    x         x    xx                 
+DEAL::89      x  xx                  x    x     xx        x   x     x    xx              x   x    x         x
+DEAL::90     x                               x  x    x      x   xx              x        x                  x
+DEAL::91       xx   x x x  x  xxx x x  xx x x      xx   x   x   x x   x x  xx  xx   x x     x x     x   x  x 
+DEAL::92 x    x              x               x    x      x                        x       x   x          x   
+DEAL::93            xx      x         x     xxx x x       x x         x                   x   x              
+DEAL::94     x              x    x                   x                                  x                   x
+DEAL::95        x  xx x x x x       x       x xx        x   x     x x   x   x   x     x x     x x   x     x x
+DEAL::96 x    xx x x     x   x x     x    x        x   x x       x   xx   x    x x     x  x          x   x x 
+DEAL::97  x x x                         x         x           x                 x   x         x         x    
+DEAL::98 x                  x                x              x            x          x        x      x    x  x
+DEAL::99          x   xxx  xx   x     x   xxx   x   x x   xx   x    x   x     x    xx   x   x x   xx   xx  xx
