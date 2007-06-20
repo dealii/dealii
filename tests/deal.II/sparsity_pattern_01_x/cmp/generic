@@ -1,0 +1,10 @@
+
+DEAL:1d::Check 1: -- ok
+DEAL:1d::Check 2: -- ok
+DEAL:1d::Check boundary -- ok
+DEAL:2d::Check 1: -- ok
+DEAL:2d::Check 2: -- ok
+DEAL:2d::Check boundary -- ok
+DEAL:3d::Check 1: -- ok
+DEAL:3d::Check 2: -- ok
+DEAL:3d::Check boundary -- ok
