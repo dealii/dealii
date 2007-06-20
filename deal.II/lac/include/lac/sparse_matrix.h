@@ -2,7 +2,7 @@
 //    $Id$
 //    Version: $Name:  $
 //
-//    Copyright (C) 1999, 2000, 2001, 2002, 2003, 2004, 2005, 2006 by the deal.II authors
+//    Copyright (C) 1999, 2000, 2001, 2002, 2003, 2004, 2005, 2006, 2007 by the deal.II authors
 //
 //    This file is subject to QPL and may not be  distributed
 //    without copyright and license information. Please refer
@@ -1657,10 +1657,6 @@ class SparseMatrix : public virtual Subscriptor
     				     /** @addtogroup Exceptions
 				      * @{ */
 
-				     /**
-				      * Exception
-				      */
-    DeclException0 (ExcNotCompressed);
 				     /**
 				      * Exception
 				      */

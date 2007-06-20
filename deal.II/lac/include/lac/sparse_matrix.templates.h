@@ -130,7 +130,7 @@ SparseMatrix<number>::operator = (const double d)
   Assert (d==0, ExcScalarAssignmentOnlyForZeroValue());
   
   Assert (cols != 0, ExcNotInitialized());
-  Assert (cols->compressed || cols->empty(), ExcNotCompressed());
+  Assert (cols->compressed || cols->empty(), SparsityPattern::ExcNotCompressed());
 
   if (val)
     std::fill_n (&val[0], cols->n_nonzero_elements(), 0.);
