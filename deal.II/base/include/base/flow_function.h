@@ -38,6 +38,7 @@ namespace Functions
  * values. Therefore, every thread should obtain its own object of
  * derived classes.
  *
+ * @ingroup functions
  * @author Guido Kanschat, 2007
  */
   template <int dim>
@@ -135,6 +136,7 @@ namespace Functions
  * #Reynolds number is used to scale the pressure properly for a
  * Navier-Stokes problem.
  *
+ * @ingroup functions
  * @author Guido Kanschat, 2007
  */
   template <int dim>
@@ -168,6 +170,7 @@ namespace Functions
  *
  * Taken from Houston, Sch&ouml;tzau, Wihler, proceeding ENUMATH 2003.
  *
+ * @ingroup functions
  * @author Guido Kanschat, 2007
  */
   class StokesLSingularity : public FlowFunction<2>

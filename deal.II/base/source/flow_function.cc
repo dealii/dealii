@@ -289,7 +289,7 @@ namespace Functions
 	    values[0][k] = std::pow(r2,lambda/2.)
 			   * ((1.+lambda) * std::sin(phi) * Psi(phi)
 			      + std::cos(phi) * Psi_1(phi));
-	    values[1][k] = std::pow(r2,lambda/2.)
+	    values[1][k] = -std::pow(r2,lambda/2.)
 			   * (std::sin(phi) * Psi_1(phi)
 			      -(1.+lambda) * std::cos(phi) * Psi(phi));
 	    values[2][k] = -std::pow(r2,lambda/2.-.5)
