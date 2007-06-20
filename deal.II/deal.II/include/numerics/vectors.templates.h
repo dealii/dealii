@@ -29,6 +29,7 @@
 #include <dofs/dof_constraints.h>
 #include <dofs/dof_tools.h>
 #include <fe/fe.h>
+#include <fe/fe_tools.h>
 #include <hp/fe_values.h>
 #include <fe/mapping_q1.h>
 #include <hp/mapping_collection.h>
@@ -52,7 +53,8 @@ void VectorTools::interpolate (const Mapping<dim>    &mapping,
 			       VECTOR                &vec)
 {
   Assert (dof.get_fe().n_components() == function.n_components,
-	  ExcComponentMismatch());
+	  ExcDimensionMismatch(dof.get_fe().n_components(),
+			       function.n_components));
   
   const hp::FECollection<dim> fe (dof.get_fe());
   const unsigned int          n_components = fe.n_components();
@@ -395,7 +397,8 @@ void VectorTools::project (const Mapping<dim>       &mapping,
 			   const bool                project_to_boundary_first)
 {
   Assert (dof.get_fe().n_components() == function.n_components,
-	  ExcInvalidFE());
+	  ExcDimensionMismatch(dof.get_fe().n_components(),
+			       function.n_components));
 
   Assert (vec_result.size() == dof.n_dofs(),
           ExcDimensionMismatch (vec_result.size(), dof.n_dofs()));
@@ -507,7 +510,7 @@ void VectorTools::create_right_hand_side (const Mapping<dim>    &mapping,
 {
   const FiniteElement<dim> &fe  = dof_handler.get_fe();
   Assert (fe.n_components() == rhs_function.n_components,
-	  ExcComponentMismatch());
+	  ExcDimensionMismatch(fe.n_components(), rhs_function.n_components));
   Assert (rhs_vector.size() == dof_handler.n_dofs(),
 	  ExcDimensionMismatch(rhs_vector.size(), dof_handler.n_dofs()));
   rhs_vector = 0;
@@ -632,7 +635,7 @@ void VectorTools::create_right_hand_side (const hp::MappingCollection<dim>    &m
 {
   const hp::FECollection<dim> &fe  = dof_handler.get_fe();
   Assert (fe.n_components() == rhs_function.n_components,
-	  ExcComponentMismatch());
+	  ExcDimensionMismatch(fe.n_components(), rhs_function.n_components));
   Assert (rhs_vector.size() == dof_handler.n_dofs(),
 	  ExcDimensionMismatch(rhs_vector.size(), dof_handler.n_dofs()));
   rhs_vector = 0;
@@ -867,7 +870,7 @@ VectorTools::create_boundary_right_hand_side (const Mapping<dim>      &mapping,
 {
   const FiniteElement<dim> &fe  = dof_handler.get_fe();
   Assert (fe.n_components() == rhs_function.n_components,
-	  ExcComponentMismatch());
+	  ExcDimensionMismatch(fe.n_components(), rhs_function.n_components));
   Assert (rhs_vector.size() == dof_handler.n_dofs(),
 	  ExcDimensionMismatch(rhs_vector.size(), dof_handler.n_dofs()));
   
@@ -1021,7 +1024,7 @@ VectorTools::create_boundary_right_hand_side (const hp::MappingCollection<dim>  
 {
   const hp::FECollection<dim> &fe  = dof_handler.get_fe();
   Assert (fe.n_components() == rhs_function.n_components,
-	  ExcComponentMismatch());
+	  ExcDimensionMismatch(fe.n_components(), rhs_function.n_components));
   Assert (rhs_vector.size() == dof_handler.n_dofs(),
 	  ExcDimensionMismatch(rhs_vector.size(), dof_handler.n_dofs()));
   
@@ -1215,7 +1218,7 @@ VectorTools::interpolate_boundary_values (const Mapping<1>         &,
                                    // cell
   const FiniteElement<1> &fe = outermost_cell->get_fe();
   Assert (fe.n_components() == boundary_function.n_components,
-	  ExcComponentMismatch());
+	  ExcDimensionMismatch(fe.n_components(), boundary_function.n_components));
 
 				   // set the component mask to either
 				   // the original value or a vector
@@ -1224,7 +1227,7 @@ VectorTools::interpolate_boundary_values (const Mapping<1>         &,
 					  std::vector<bool> (fe.n_components(), true) :
 					  component_mask_);
   Assert (std::count(component_mask.begin(), component_mask.end(), true) > 0,
-	  ExcComponentMismatch());
+	  ExcNoComponentSelected());
 
 				   // now set the value of the
 				   // outermost degree of
@@ -1311,7 +1314,7 @@ interpolate_boundary_values (const Mapping<dim>            &mapping,
   for (typename FunctionMap<dim>::type::const_iterator i=function_map.begin();
        i!=function_map.end(); ++i)
     Assert (n_components == i->second->n_components,
-	    ExcInvalidFE());
+	    ExcDimensionMismatch(n_components, i->second->n_components));
 
 				   // set the component mask to either
 				   // the original value or a vector
@@ -1320,7 +1323,7 @@ interpolate_boundary_values (const Mapping<dim>            &mapping,
 					  std::vector<bool> (n_components, true) :
 					  component_mask_);
   Assert (std::count(component_mask.begin(), component_mask.end(), true) > 0,
-	  ExcComponentMismatch());
+	  ExcNoComponentSelected());
 
 				   // field to store the indices
   std::vector<unsigned int> face_dofs;
@@ -1537,7 +1540,7 @@ interpolate_boundary_values (const Mapping<dim>            &mapping,
                           for (unsigned int c=0; c<n_components; ++c)
                             if (fe.get_nonzero_components(cell_i)[c])
                               Assert (component_mask[c] == false,
-                                      ExcFENotPrimitive());
+                                      FETools::ExcFENotPrimitive());
 
                                                          // let's pick
                                                          // the first
@@ -1681,7 +1684,8 @@ VectorTools::project_boundary_values (const Mapping<dim>       &mapping,
 //    acceptable for higher dimensions. Fix this.
 
   Assert (dof.get_fe().n_components() == boundary_functions.begin()->second->n_components,
-	  ExcComponentMismatch());
+	  ExcDimensionMismatch(dof.get_fe().n_components(),
+			       boundary_functions.begin()->second->n_components));
   
   std::vector<unsigned int> dof_to_boundary_mapping;
   std::set<unsigned char> selected_boundary_components;

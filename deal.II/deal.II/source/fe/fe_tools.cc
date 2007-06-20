@@ -2,7 +2,7 @@
 //    $Id$
 //    Version: $Name$
 //
-//    Copyright (C) 2000, 2001, 2002, 2003, 2004, 2005, 2006 by the deal.II authors
+//    Copyright (C) 2000, 2001, 2002, 2003, 2004, 2005, 2006, 2007 by the deal.II authors
 //
 //    This file is subject to QPL and may not be  distributed
 //    without copyright and license information. Please refer
@@ -375,8 +375,8 @@ void FETools::get_interpolation_matrix (const FiniteElement<dim> &fe1,
 				   // way. note that this will only
 				   // work if the element is
 				   // primitive, so check this first
-  Assert (fe1.is_primitive() == true, ExcFEMustBePrimitive());
-  Assert (fe2.is_primitive() == true, ExcFEMustBePrimitive());
+  Assert (fe1.is_primitive() == true, ExcFENotPrimitive());
+  Assert (fe2.is_primitive() == true, ExcFENotPrimitive());
 
 				   // Initialize FEValues for fe1 at
 				   // the unit support points of the
