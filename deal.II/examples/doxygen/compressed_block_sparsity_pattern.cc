@@ -2,7 +2,7 @@
 //    $Id$
 //    Version: $Name$ 
 //
-//    Copyright (C) 2006 by the deal.II authors
+//    Copyright (C) 2006, 2007 by the deal.II authors
 //
 //    This file is subject to QPL and may not be  distributed
 //    without copyright and license information. Please refer
@@ -11,7 +11,7 @@
 //
 //---------------------------------------------------------------------------
 
-// See documentation of CompressedBlockSparsityPattern for documentation of this example
+// See documentation of BlockCompressedSparsityPattern for documentation of this example
 
 #include <lac/block_sparsity_pattern.h>
 #include <grid/tria.h>
@@ -52,7 +52,7 @@ int main()
   std::vector<unsigned int> dofs_per_block(fe.n_blocks());
   DoFTools::count_dofs_per_block(dof, dofs_per_block);
   
-  CompressedBlockSparsityPattern c_sparsity(fe.n_blocks(), fe.n_blocks());
+  BlockCompressedSparsityPattern c_sparsity(fe.n_blocks(), fe.n_blocks());
   for (unsigned int i=0;i<fe.n_blocks();++i)
     for (unsigned int j=0;j<fe.n_blocks();++j)
       c_sparsity.block(i,j).reinit(dofs_per_block[i],dofs_per_block[j]);
