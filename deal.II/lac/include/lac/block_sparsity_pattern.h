@@ -642,47 +642,14 @@ typedef BlockCompressedSparsityPattern CompressedBlockSparsityPattern;
 /**
  * This class extends the base class to implement an array of compressed
  * sparsity patterns that can be used to initialize objects of type
- * BlockSparsityPattern. It does not add additional member functions, but
- * rather acts as a @p typedef to introduce the name of this class, without
- * requiring the user to specify the templated name of the base class. For
- * information on the interface of this class refer to the base class. The
- * individual blocks are based on the CompressedSparistyPattern class.
+ * BlockSparsityPattern. It is used in the same way as the
+ * BlockCompressedSparsityPattern except that it builds upon the
+ * CompressedSetSparsityPattern instead of the CompressedSparsityPattern. See
+ * the documentation of the BlockCompressedSparsityPattern for examples.
  *
  * This class is an example of the "dynamic" type of @ref Sparsity.
  *
- * <b>Note:</b> This class used to be called
- * CompressedBlockSparsityPattern. However, since it's a block wrapper around
- * the CompressedSetSparsityPattern class, this is a misnomer and the class has
- * been renamed.
- *
- * <h3>Example</h3>
- * Usage of this class is very similar to CompressedSetSparsityPattern,
- * but since the use of block indices causes some additional
- * complications, we give a short example.
- *
- * @dontinclude compressed_block_sparsity_pattern.cc
- *
- * After the the DoFHandler <tt>dof</tt> and the ConstraintMatrix
- * <tt>constraints</tt> have been set up with a system element, we
- * must count the degrees of freedom in each matrix block:
- *
- * @skipline dofs_per_block
- * @until count
- *
- * Now, we are ready to set up the BlockCompressedSetSparsityPattern.
- *
- * @until collect
- *
- * It is filled as if it were a normal pattern
- *
- * @until condense
- *
- * In the end, it is copied to a normal BlockSparsityPattern for later
- * use.
- *
- * @until copy
- *
- * @author Wolfgang Bangerth, 2000, 2001, Guido Kanschat, 2006, 2007
+ * @author Wolfgang Bangerth, 2007
  */
 class BlockCompressedSetSparsityPattern : public BlockSparsityPatternBase<CompressedSetSparsityPattern>
 {
