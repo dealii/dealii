@@ -41,7 +41,7 @@ ConstraintMatrix::condense (const SparseMatrix<number> &uncondensed,
   Assert (condensed.n() == condensed.m(),
 	  ExcNotQuadratic());
   Assert (condensed.n()+n_constraints() == uncondensed.n(),
-	  ExcWrongDimension());
+	  ExcDimensionMismatch(condensed.n()+n_constraints(), uncondensed.n()));
 
 				   // store for each line of the matrix
 				   // its new line number
@@ -454,7 +454,8 @@ ConstraintMatrix::condense (const VectorType &uncondensed,
 {
   Assert (sorted == true, ExcMatrixNotClosed());
   Assert (condensed.size()+n_constraints() == uncondensed.size(),
-	  ExcWrongDimension());
+	  ExcDimensionMismatch(condensed.size()+n_constraints(),
+			       uncondensed.size()));
   
 				   // store for each line of the
 				   // vector its new line number after
@@ -562,7 +563,7 @@ distribute_local_to_global (const Vector<double>            &local_vector,
                             VectorType                      &global_vector) const
 {
   Assert (local_vector.size() == local_dof_indices.size(),
-          ExcWrongDimension());
+          ExcDimensionMismatch(local_vector.size(), local_dof_indices.size()));
   Assert (sorted == true, ExcMatrixNotClosed());
 
   const unsigned int n_local_dofs = local_vector.size();
@@ -640,9 +641,9 @@ distribute_local_to_global (const FullMatrix<double>        &local_matrix,
                             MatrixType                      &global_matrix) const
 {
   Assert (local_matrix.n() == local_dof_indices.size(),
-          ExcWrongDimension());
+          ExcDimensionMismatch(local_matrix.n(), local_dof_indices.size()));
   Assert (local_matrix.m() == local_dof_indices.size(),
-          ExcWrongDimension());
+          ExcDimensionMismatch(local_matrix.m(), local_dof_indices.size()));
   Assert (sorted == true, ExcMatrixNotClosed());
 
   const unsigned int n_local_dofs = local_dof_indices.size();
@@ -937,7 +938,8 @@ ConstraintMatrix::distribute (const VectorType &condensed,
 {
   Assert (sorted == true, ExcMatrixNotClosed());
   Assert (condensed.size()+n_constraints() == uncondensed.size(),
-	  ExcWrongDimension());
+	  ExcDimensionMismatch(condensed.size()+n_constraints(),
+			       uncondensed.size()));
 
 				   // store for each line of the new vector
 				   // its old line number before

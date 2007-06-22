@@ -43,7 +43,7 @@ class BlockIndices;
  * $x_{i_1} = \sum_{j=2}^M a_{i_j} x_{i_j}$. In the context of adaptive finite
  * elements, such constraints appear most frequently as "hanging nodes". For
  * example, when using Q1 and Q2 elements (i.e. using
- * FE_Q%<dim%>(1) and FE_Q%<dim%>(2)) on the two
+ * FE_Q&lt;dim&gt;(1) and FE_Q&lt;dim&gt;(2)) on the two
  * marked cells of the mesh
  *
  * @image html hp-refinement-simple.png
@@ -106,7 +106,7 @@ class BlockIndices;
  * constrained degrees of freedom is inefficient, and a bottleneck if there
  * are many constraints and matrices are full, i.e. especially for 3d and/or
  * higher order or hp finite elements. We therefore offer a second way of
- * building linear systems, using the add_entried_local_to_global() and
+ * building linear systems, using the add_entries_local_to_global() and
  * distribute_local_to_global() functions discussed below. The resulting
  * linear systems are equivalent to what one gets after calling the condense()
  * functions.
@@ -233,7 +233,7 @@ class BlockIndices;
  * pattern object. It not only adds a given entry, but also all entries that
  * we will have to write to if the current entry corresponds to a constrained
  * degree of freedom that will later be eliminated. Similarly, one can use the
- * distribute_local_to_global() functions to directly distributed entries in
+ * distribute_local_to_global() functions to directly distribute entries in
  * vectors and matrices when copying local contributions into a global matrix
  * or vector. These calls make a subsequent call to condense() unnecessary.
  *
@@ -247,7 +247,7 @@ class BlockIndices;
  * <h3>Distributing constraints</h3>
  * 
  * After solving the condensed system of equations, the solution vector has to
- * be redistributed. This is done by the two @p distribute function, one
+ * be redistributed. This is done by the two distribute() functions, one
  * working with two vectors, one working in-place. The operation of
  * distribution undoes the condensation process in some sense, but it should
  * be noted that it is not the inverse operation. Basically, distribution sets
@@ -637,7 +637,7 @@ class ConstraintMatrix : public Subscriptor
 				      * <tt>condensed</tt> is the
 				      * dimension of
 				      * <tt>uncondensed</tt> minus the
-				      * number of constraint degrees
+				      * number of constrained degrees
 				      * of freedom.
 				      */
     void condense (const SparsityPattern &uncondensed,
@@ -1056,12 +1056,6 @@ class ConstraintMatrix : public Subscriptor
 		    unsigned int,
 		    << "The specified line " << arg1
 		    << " does not exist.");
-				     /**
-				      * Exception
-				      *
-				      * @ingroup Exceptions
-				      */
-    DeclException0 (ExcWrongDimension);
 				     /**
 				      * Exception
 				      *
