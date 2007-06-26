@@ -120,14 +120,15 @@ namespace internal
     inline
     TriaObject<structdim>::TriaObject ()
     {
-      for (unsigned int i=0;i<GeometryInfo<structdim>::faces_per_cell;++i)
+      for (unsigned int i=0; i<GeometryInfo<structdim>::faces_per_cell; ++i)
 	faces[i] = -1;
     }
 
 
     template <int structdim>
     inline
-    TriaObject<structdim>::TriaObject (const int i0, const int i1)
+    TriaObject<structdim>::TriaObject (const int i0,
+				       const int i1)
     {
       Assert (structdim==1, ExcImpossibleInDim(structdim));
       faces[0] = i0;
@@ -137,7 +138,10 @@ namespace internal
 
     template <int structdim>
     inline
-    TriaObject<structdim>::TriaObject (const int i0, const int i1, const int i2, const int i3)
+    TriaObject<structdim>::TriaObject (const int i0,
+				       const int i1,
+				       const int i2,
+				       const int i3)
     {
       Assert (structdim==2, ExcImpossibleInDim(structdim));
       faces[0] = i0;
@@ -149,8 +153,12 @@ namespace internal
 
     template <int structdim>
     inline
-    TriaObject<structdim>::TriaObject (const int i0, const int i1, const int i2,
-				       const int i3, const int i4, const int i5)
+    TriaObject<structdim>::TriaObject (const int i0,
+				       const int i1,
+				       const int i2,
+				       const int i3,
+				       const int i4,
+				       const int i5)
     {
       Assert (structdim==3, ExcImpossibleInDim(structdim));
       faces[0] = i0;
