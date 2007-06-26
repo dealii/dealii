@@ -30,6 +30,7 @@
 
 
 #include <base/data_out_base.h>
+#include <base/utilities.h>
 #include <base/parameter_handler.h>
 #include <base/thread_management.h>
 #include <base/memory_consumption.h>
@@ -45,52 +46,54 @@
 
 DEAL_II_NAMESPACE_OPEN
 
-//TODO: Is it reasonable to have undocumented exceptions?
 
-DeclException2 (ExcUnexpectedInput,
-                std::string, std::string,
-                << "Unexpected input: expected line\n  <"
-                << arg1
-                << ">\nbut got\n  <"
-                << arg2 << ">");
+// we need the following exception from a global function, so can't declare it
+// in the usual way inside a class
+namespace
+{
+  DeclException2 (ExcUnexpectedInput,
+		  std::string, std::string,
+		  << "Unexpected input: expected line\n  <"
+		  << arg1
+		  << ">\nbut got\n  <"
+		  << arg2 << ">");
+}
 
-DeclException4 (ExcIncompatibleDimensions,
-                int, int, int, int,
-                << "Either the dimensions <" << arg1 << "> and <"
-                << arg2 << "> or the space dimensions <"
-                << arg3 << "> and <" << arg4
-                << "> do not match!");
 
 
 //----------------------------------------------------------------------//
 //Auxiliary data
 //----------------------------------------------------------------------//
-static const char* gmv_cell_type[4] =
-{
-      "", "line 2", "quad 4", "hex 8"
-};
 
-static const char* ucd_cell_type[4] =
+namespace
 {
-      "", "line", "quad", "hex"
-};
+  
+  static const char* gmv_cell_type[4] =
+  {
+	"", "line 2", "quad 4", "hex 8"
+  };
 
-static const char* tecplot_cell_type[4] =
-{
-      "", "", "quadrilateral", "brick"
-};
+  static const char* ucd_cell_type[4] =
+  {
+	"", "line", "quad", "hex"
+  };
+
+  static const char* tecplot_cell_type[4] =
+  {
+	"", "", "quadrilateral", "brick"
+  };
 
 #ifdef DEAL_II_HAVE_TECPLOT
-static unsigned int tecplot_binary_cell_type[4] =
-{
-      0, 0, 1, 3
-};
+  static unsigned int tecplot_binary_cell_type[4] =
+  {
+	0, 0, 1, 3
+  };
 #endif
 
-static unsigned int vtk_cell_type[4] =
-{
-      0, 3, 9, 12
-};
+  static unsigned int vtk_cell_type[4] =
+  {
+	0, 3, 9, 12
+  };
 
 //----------------------------------------------------------------------//
 //Auxiliary functions
@@ -99,104 +102,80 @@ static unsigned int vtk_cell_type[4] =
 //linearly at the point (xstep, ystep, zstep)*1./n_subdivisions.
 //If the popints are saved in the patch->data member, return the
 //saved point instead
-template <int dim, int spacedim>
-inline
-void
-compute_node(
-  Point<spacedim>& node,
-  const DataOutBase::Patch<dim,spacedim>* patch,
-  const unsigned int xstep,
-  const unsigned int ystep,
-  const unsigned int zstep,
-  const unsigned int n_subdivisions)
-{
-  if (patch->points_are_available)
-    {
-      unsigned int point_no=0;
-				       // note: switch without break !
-      switch (dim)
-	{
-	  case 3:
-		Assert (zstep<n_subdivisions+1, ExcIndexRange(zstep,0,n_subdivisions+1));
-		point_no+=(n_subdivisions+1)*(n_subdivisions+1)*zstep;
-	  case 2:
-		Assert (ystep<n_subdivisions+1, ExcIndexRange(ystep,0,n_subdivisions+1));
-		point_no+=(n_subdivisions+1)*ystep;
-	  case 1:
-		Assert (xstep<n_subdivisions+1, ExcIndexRange(xstep,0,n_subdivisions+1));
-		point_no+=xstep;
-	}
-      for (unsigned int d=0; d<spacedim; ++d)
-	node[d]=patch->data(patch->data.size(0)-spacedim+d,point_no);
-    }
-  else
-    {
-				       // perform a dim-linear interpolation
-      const double stepsize=1./n_subdivisions,
-		      xfrac=xstep*stepsize;
+  template <int dim, int spacedim>
+  inline
+  void
+  compute_node(
+    Point<spacedim>& node,
+    const DataOutBase::Patch<dim,spacedim>* patch,
+    const unsigned int xstep,
+    const unsigned int ystep,
+    const unsigned int zstep,
+    const unsigned int n_subdivisions)
+  {
+    if (patch->points_are_available)
+      {
+	unsigned int point_no=0;
+					 // note: switch without break !
+	switch (dim)
+	  {
+	    case 3:
+		  Assert (zstep<n_subdivisions+1, ExcIndexRange(zstep,0,n_subdivisions+1));
+		  point_no+=(n_subdivisions+1)*(n_subdivisions+1)*zstep;
+	    case 2:
+		  Assert (ystep<n_subdivisions+1, ExcIndexRange(ystep,0,n_subdivisions+1));
+		  point_no+=(n_subdivisions+1)*ystep;
+	    case 1:
+		  Assert (xstep<n_subdivisions+1, ExcIndexRange(xstep,0,n_subdivisions+1));
+		  point_no+=xstep;
+	  }
+	for (unsigned int d=0; d<spacedim; ++d)
+	  node[d]=patch->data(patch->data.size(0)-spacedim+d,point_no);
+      }
+    else
+      {
+					 // perform a dim-linear interpolation
+	const double stepsize=1./n_subdivisions,
+			xfrac=xstep*stepsize;
 
-      node = (patch->vertices[1] * xfrac) + (patch->vertices[0] * (1-xfrac));
-      if (dim>1)
-	{
-	  const double yfrac=ystep*stepsize;
-	  node*= 1-yfrac;
-	  node += ((patch->vertices[3] * xfrac) + (patch->vertices[2] * (1-xfrac))) * yfrac;
-	  if (dim>2)
-	    {
-	      const double zfrac=zstep*stepsize;
-	      node *= (1-zfrac);
-	      node += (((patch->vertices[5] * xfrac) + (patch->vertices[4] * (1-xfrac)))
-		       * (1-yfrac) +
-		       ((patch->vertices[7] * xfrac) + (patch->vertices[6] * (1-xfrac)))
-		       * yfrac) * zfrac;
-	    }
-	}
-    }
-}
-
-
-//TODO: Should this go to the utilities namespace?
-
-// Compute n^dim, where dim is a template parameter
-template <int dim>
-inline
-unsigned int template_power (const unsigned int n)
-{
-  Assert (dim>0, ExcNotImplemented());
-  switch (dim)
-    {
-      case 1:
-	    return n;
-      case 2:
-	    return n*n;
-      case 3:
-	    return n*n*n;
-      case 4:
-	    return n*n*n*n;
-      default:
-	    unsigned int result = n;  
-	    for (unsigned int d=1;d<dim;++d)
-	      result *= n;
-	    return result;
-    }
-}
+	node = (patch->vertices[1] * xfrac) + (patch->vertices[0] * (1-xfrac));
+	if (dim>1)
+	  {
+	    const double yfrac=ystep*stepsize;
+	    node*= 1-yfrac;
+	    node += ((patch->vertices[3] * xfrac) + (patch->vertices[2] * (1-xfrac))) * yfrac;
+	    if (dim>2)
+	      {
+		const double zfrac=zstep*stepsize;
+		node *= (1-zfrac);
+		node += (((patch->vertices[5] * xfrac) + (patch->vertices[4] * (1-xfrac)))
+			 * (1-yfrac) +
+			 ((patch->vertices[7] * xfrac) + (patch->vertices[6] * (1-xfrac)))
+			 * yfrac) * zfrac;
+	      }
+	  }
+      }
+  }
 
 
-template<int dim, int spacedim>
-static
-void
-compute_sizes(const std::vector<DataOutBase::Patch<dim, spacedim> >& patches,
-	      unsigned int& n_nodes,
-	      unsigned int& n_cells)
-{
-  n_nodes = 0;
-  n_cells = 0;
-  for (typename std::vector<DataOutBase::Patch<dim,spacedim> >::const_iterator patch=patches.begin();
-       patch!=patches.end(); ++patch)
-    {
-      n_nodes += template_power<dim>(patch->n_subdivisions+1);
-      n_cells += template_power<dim>(patch->n_subdivisions);
-    }
+
+  template<int dim, int spacedim>
+  static
+  void
+  compute_sizes(const std::vector<DataOutBase::Patch<dim, spacedim> >& patches,
+		unsigned int& n_nodes,
+		unsigned int& n_cells)
+  {
+    n_nodes = 0;
+    n_cells = 0;
+    for (typename std::vector<DataOutBase::Patch<dim,spacedim> >::const_iterator patch=patches.begin();
+	 patch!=patches.end(); ++patch)
+      {
+	n_nodes += Utilities::fixed_power<dim>(patch->n_subdivisions+1);
+	n_cells += Utilities::fixed_power<dim>(patch->n_subdivisions);
+      }
+  }
+  
 }
 
   
@@ -1305,7 +1284,7 @@ void DataOutBase::write_cells(
 	    }
 				       // finally update the number
 				       // of the first vertex of this patch
-      first_vertex_of_patch += template_power<dim>(n_subdivisions+1);
+      first_vertex_of_patch += Utilities::fixed_power<dim>(n_subdivisions+1);
     }
 }
 
@@ -1331,7 +1310,7 @@ DataOutBase::write_data (
       Assert ((patch->data.n_rows() == n_data_sets && !patch->points_are_available) ||
 	      (patch->data.n_rows() == n_data_sets+spacedim && patch->points_are_available),
 	      ExcDimensionMismatch (patch->points_are_available ? (patch->data.n_rows() + spacedim) : patch->data.n_rows(), n_data_sets));
-      Assert (patch->data.n_cols() == template_power<dim>(n),
+      Assert (patch->data.n_cols() == Utilities::fixed_power<dim>(n),
 	      ExcInvalidDatasetSize (patch->data.n_cols(), n));
       
       std::vector<float>  floats(n_data_sets);
@@ -1339,7 +1318,7 @@ DataOutBase::write_data (
 
 				       // Data is already in
 				       // lexicographic ordering
-      for (unsigned int i=0; i<template_power<dim>(n); ++i)
+      for (unsigned int i=0; i<Utilities::fixed_power<dim>(n); ++i)
 	if (double_precision)
 	  {
 	    for (unsigned int data_set=0; data_set<n_data_sets; ++data_set)
@@ -1523,7 +1502,7 @@ void DataOutBase::write_dx (const std::vector<Patch<dim,spacedim> > &patches,
 	  const unsigned int n1 = (dim>0) ? n : 1;
 	  const unsigned int n2 = (dim>1) ? n : 1;
 	  const unsigned int n3 = (dim>2) ? n : 1;
-	  unsigned int cells_per_patch = template_power<dim>(n);
+	  unsigned int cells_per_patch = Utilities::fixed_power<dim>(n);
 	  unsigned int dx = 1;
 	  unsigned int dy = n;
 	  unsigned int dz = n*n;
@@ -1775,7 +1754,7 @@ void DataOutBase::write_gnuplot (const std::vector<Patch<dim,spacedim> > &patche
       Assert ((patch->data.n_rows() == n_data_sets && !patch->points_are_available) ||
 	      (patch->data.n_rows() == n_data_sets+spacedim && patch->points_are_available),
 	      ExcDimensionMismatch (patch->points_are_available ? (patch->data.n_rows() + spacedim) : patch->data.n_rows(), n_data_sets));
-      Assert (patch->data.n_cols() == template_power<dim>(n),
+      Assert (patch->data.n_cols() == Utilities::fixed_power<dim>(n),
 	      ExcInvalidDatasetSize (patch->data.n_cols(), n_subdivisions+1));
 
       Point<spacedim> this_point;
@@ -1993,7 +1972,7 @@ void DataOutBase::write_povray (const std::vector<Patch<dim,spacedim> > &patches
       Assert ((patch->data.n_rows() == n_data_sets && !patch->points_are_available) ||
 	      (patch->data.n_rows() == n_data_sets+spacedim && patch->points_are_available),
 	      ExcDimensionMismatch (patch->points_are_available ? (patch->data.n_rows() + spacedim) : patch->data.n_rows(), n_data_sets));
-      Assert (patch->data.n_cols() == template_power<dim>(n_subdivisions+1),
+      Assert (patch->data.n_cols() == Utilities::fixed_power<dim>(n_subdivisions+1),
 	      ExcInvalidDatasetSize (patch->data.n_cols(), n_subdivisions+1));
       
       for (unsigned int i=0; i<n_subdivisions+1; ++i)
@@ -2043,7 +2022,7 @@ void DataOutBase::write_povray (const std::vector<Patch<dim,spacedim> > &patches
       Assert ((patch->data.n_rows() == n_data_sets && !patch->points_are_available) ||
 	      (patch->data.n_rows() == n_data_sets+spacedim && patch->points_are_available),
 	      ExcDimensionMismatch (patch->points_are_available ? (patch->data.n_rows() + spacedim) : patch->data.n_rows(), n_data_sets));
-      Assert (patch->data.n_cols() == template_power<dim>(n),
+      Assert (patch->data.n_cols() == Utilities::fixed_power<dim>(n),
 	      ExcInvalidDatasetSize (patch->data.n_cols(), n_subdivisions+1));
 
 
@@ -3240,7 +3219,7 @@ void DataOutBase::write_tecplot_binary (const std::vector<Patch<dim,spacedim> > 
 
 					// finally update the number
 					// of the first vertex of this patch
-       first_vertex_of_patch += template_power<dim>(n);
+       first_vertex_of_patch += Utilities::fixed_power<dim>(n);
      }
 
 
@@ -3522,7 +3501,7 @@ DataOutBase::write_gmv_reorder_data_vectors (const std::vector<Patch<dim,spacedi
       Assert ((patch->data.n_rows() == n_data_sets && !patch->points_are_available) ||
 	      (patch->data.n_rows() == n_data_sets+spacedim && patch->points_are_available),
 	      ExcDimensionMismatch (patch->points_are_available ? (patch->data.n_rows() + spacedim) : patch->data.n_rows(), n_data_sets));
-      Assert (patch->data.n_cols() == template_power<dim>(n_subdivisions+1),
+      Assert (patch->data.n_cols() == Utilities::fixed_power<dim>(n_subdivisions+1),
 	      ExcInvalidDatasetSize (patch->data.n_cols(), n_subdivisions+1));
       
       for (unsigned int i=0;i<patch->data.n_cols();++i, ++next_value)

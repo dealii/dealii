@@ -2,7 +2,7 @@
 //    $Id$
 //    Version: $Name$
 //
-//    Copyright (C) 2005, 2006 by the deal.II authors
+//    Copyright (C) 2005, 2006, 2007 by the deal.II authors
 //
 //    This file is subject to QPL and may not be  distributed
 //    without copyright and license information. Please refer
@@ -14,6 +14,7 @@
 #define __deal2__utilities_h
 
 #include <base/config.h>
+#include <base/exceptions.h>
 
 #include <vector>
 #include <utility>
@@ -141,6 +142,22 @@ namespace Utilities
 				 const double sigma);
 
 
+				   /**
+				    * Calculate a fixed power, provided as a
+				    * template argument, of a number.
+				    *
+				    * This function provides an efficient way
+				    * to calculate things like
+				    * <code>t^N</code> where <code>N</code> is
+				    * a known number at compile time.
+				    *
+				    * Use this function as in
+				    * <code>fixed_power@<dim@> (n)</code>.
+				    */
+  template <int N, typename T>
+  T
+  fixed_power (const T t);
+  
                                    /**
                                     * A namespace for utility functions that
                                     * probe system properties.
@@ -207,6 +224,37 @@ namespace Utilities
     unsigned int get_this_mpi_process (const MPI_Comm &mpi_communicator);
   }
 }
+
+
+// --------------------- inline functions
+
+namespace Utilities
+{
+  template <int N, typename T>
+  inline
+  T fixed_power (const T n)
+  {
+    Assert (N>0, ExcNotImplemented());
+    switch (N)
+      {
+	case 1:
+	      return n;
+	case 2:
+	      return n*n;
+	case 3:
+	      return n*n*n;
+	case 4:
+	      return n*n*n*n;
+	default:
+	      T result = n;  
+	      for (unsigned int d=1;d<N;++d)
+		result *= n;
+	      return result;
+      }
+  }
+  
+}
+
 
 DEAL_II_NAMESPACE_CLOSE
 

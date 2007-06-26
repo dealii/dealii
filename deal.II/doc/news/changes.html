@@ -437,6 +437,15 @@ inconvenience this causes.
 <h3>base</h3>
 
 <ol>
+  <li> <p> New: The function <code>Utilities::fixed_power&lt;n&gt;(q)</code>
+       calculates <code>q</code> to the power of <code>n</code> where
+       <code>n</code> is a constant known at compile time. It allows to
+       calculate powers efficiently at compile time, most often things like a
+       number to the power <code>dim</code>.
+       <br> 
+       (WB 2007/06/23)
+       </p>
+
   <li> <p> New: The deal.II intermediate format has been
        changed. Since files in this format are only meant to be
        processed by exactly the same version of deal.II, this should
