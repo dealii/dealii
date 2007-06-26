@@ -27,8 +27,6 @@ template <typename number> class FullMatrix;
 template <typename number> class SparseMatrix;
 template <typename number> class Vector;
 
-//TODO: Find a way to avoid the forward declarations and get rid of dof_handler include files.
-
 template <int celldim, class DH> class DoFObjectAccessor;
 template <class DH> class DoFObjectAccessor<0,DH>;
 template <class DH> class DoFObjectAccessor<1,DH>;
