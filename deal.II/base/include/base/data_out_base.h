@@ -2963,7 +2963,16 @@ class DataOutReader : public DataOutInterface<dim,spacedim>
                                       * Exception
                                       */
     DeclException0 (ExcIncompatiblePatchLists);
-
+				     /**
+				      * Exception
+				      */
+    DeclException4 (ExcIncompatibleDimensions,
+		    int, int, int, int,
+		    << "Either the dimensions <" << arg1 << "> and <"
+		    << arg2 << "> or the space dimensions <"
+		    << arg3 << "> and <" << arg4
+		    << "> do not match!");
+    
   protected:
 				     /**
 				      * This is the function
