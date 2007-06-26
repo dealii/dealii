@@ -4958,7 +4958,6 @@ DoFTools::convert_couplings_to_blocks (
 
 
 // explicit instantiations
-// TODO: Add missing instantiations for CompressedSetSparsityPattern
 template void
 DoFTools::make_sparsity_pattern<DoFHandler<deal_II_dimension>,
 				SparsityPattern>
