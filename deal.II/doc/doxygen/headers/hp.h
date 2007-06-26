@@ -14,8 +14,9 @@
 /**
  * @defgroup hp hp finite element support
  *
- * Classes and functions that have to do with hp finite elements. See the
- * step-27 tutorial program for an example of how to use these classes.
+ * Classes and functions that have to do with hp finite elements. The
+ * @ref step_27 "step-27" tutorial program gives an overview of how to
+ * use the classes in this namespace.
  *
  * The hp namespace implements the algorithms and data structures used for
  * the hp framework in deal.II. An overview over the details of how these
