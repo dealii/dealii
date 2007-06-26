@@ -654,7 +654,6 @@ class DoFRenumbering
 			   const unsigned int         level,
 			   const Point<dim>&          direction);
 
-//TODO:[GK] Documentation!    
 				     /**
 				      * Cell-wise clockwise numbering.
 				      *
