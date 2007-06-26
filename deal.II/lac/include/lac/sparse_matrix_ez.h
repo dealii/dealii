@@ -21,8 +21,6 @@
 
 #include <vector>
 
-//TODO: Implement or remove the commented out functions
-
 DEAL_II_NAMESPACE_OPEN
 
 template<typename number> class Vector;
@@ -116,26 +114,19 @@ class SparseMatrixEZ : public Subscriptor
 					  * Constructor. Fills column
 					  * and value.
 					  */
-	Entry(unsigned int column,
-	      const number& value);
+	Entry (const unsigned int column,
+	       const number& value);
 	
 					 /**
 					  * The column number.
 					  */
 	unsigned int column;
+
 					 /**
 					  * The value there.
 					  */
 	number value;
-					 /**
-					  * Comparison operator for finding.
-					  */
-//	bool operator==(const Entry&) const;
 
-					 /**
-					  * Less than operator for sorting.
-					  */
-//	bool operator < (const Entry&) const;
 					 /**
 					  * Non-existent column number.
 					  */
@@ -483,34 +474,6 @@ class SparseMatrixEZ : public Subscriptor
 				      */
     void add (const unsigned int i, const unsigned int j,
 	      const number value);
-
-				     /**
-				      * Symmetrize the matrix by
-				      * forming the mean value between
-				      * the existing matrix and its
-				      * transpose, $A = \frac 12(A+A^T)$.
-				      *
-				      * This operation assumes that
-				      * the underlying sparsity
-				      * pattern represents a symmetric
-				      * object. If this is not the
-				      * case, then the result of this
-				      * operation will not be a
-				      * symmetric matrix, since it
-				      * only explicitly symmetrizes
-				      * by looping over the lower left
-				      * triangular part for efficiency
-				      * reasons; if there are entries
-				      * in the upper right triangle,
-				      * then these elements are missed
-				      * in the
-				      * symmetrization. Symmetrization
-				      * of the sparsity pattern can be
-				      * obtain by the
-				      * SparsityPattern@p ::symmetrize
-				      * function.
-				      */
-//    void symmetrize ();
     
 				     /**
 				      * Copy the given matrix to this
@@ -541,55 +504,6 @@ class SparseMatrixEZ : public Subscriptor
     template <class MATRIX>
     SparseMatrixEZ<number> &
     copy_from (const MATRIX &source);
-
-				     /**
-				      * This function is complete
-				      * analogous to the
-				      * SparsityPattern@p ::copy_from
-				      * function in that it allows to
-				      * initialize a whole matrix in
-				      * one step. See there for more
-				      * information on argument types
-				      * and their meaning. You can
-				      * also find a small example on
-				      * how to use this function
-				      * there.
-				      *
-				      * The only difference to the
-				      * cited function is that the
-				      * objects which the inner
-				      * iterator points to need to be
-				      * of type <tt>std::pair<unsigned int, value</tt>,
-				      * where @p value
-				      * needs to be convertible to the
-				      * element type of this class, as
-				      * specified by the @p number
-				      * template argument.
-				      *
-				      * Previous content of the matrix
-				      * is overwritten. Note that the
-				      * entries specified by the input
-				      * parameters need not
-				      * necessarily cover all elements
-				      * of the matrix. Elements not
-				      * covered remain untouched.
-				      */
-//    template <typename ForwardIterator>
-//    void copy_from (const ForwardIterator begin,
-//		    const ForwardIterator end);    
-
-				     /**
-				      * Copy the nonzero entries of a
-				      * full matrix into this
-				      * object. Previous content is
-				      * deleted. Note that the
-				      * underlying sparsity pattern
-				      * must be appropriate to hold
-				      * the nonzero entries of the
-				      * full matrix.
-				      */
-//    template <typename somenumber>
-//    void copy_from (const FullMatrix<somenumber> &matrix);
     
 				     /**
 				      * Add @p matrix scaled by
@@ -652,29 +566,6 @@ class SparseMatrixEZ : public Subscriptor
 	       const unsigned int j) const;
 
 				     /**
-				      * Return the main diagonal element in
-				      * the @p ith row. This function throws an
-				      * error if the matrix is not square.
-				      *
-				      * This function is considerably
-				      * faster than the <tt>operator()</tt>,
-				      * since for square matrices, the
-				      * diagonal entry is always the
-				      * first to be stored in each row
-				      * and access therefore does not
-				      * involve searching for the
-				      * right column number.
-				      */
-//    number diag_element (const unsigned int i) const;
-
-				     /**
-				      * Same as above, but return a
-				      * writeable reference. You're
-				      * sure you know what you do?
-				      */
-//    number & diag_element (const unsigned int i);
-    
-				     /**
 				      * Matrix-vector multiplication:
 				      * let $dst = M*src$ with $M$
 				      * being this matrix.
@@ -718,65 +609,9 @@ class SparseMatrixEZ : public Subscriptor
 		     const Vector<somenumber> &src) const;
   
 				     /**
-				      * Return the square of the norm
-				      * of the vector $v$ with respect
-				      * to the norm induced by this
-				      * matrix,
-				      * i.e. $\left(v,Mv\right)$. This
-				      * is useful, e.g. in the finite
-				      * element context, where the
-				      * $L_2$ norm of a function
-				      * equals the matrix norm with
-				      * respect to the mass matrix of
-				      * the vector representing the
-				      * nodal values of the finite
-				      * element function.
-				      *
-				      * Obviously, the matrix needs to
-				      * be square for this operation.
-				      */
-//    template <typename somenumber>
-//    somenumber matrix_norm_square (const Vector<somenumber> &v) const;
-
-				     /**
-				      * Compute the matrix scalar
-				      * product $\left(u,Mv\right)$.
-				      */
-//    template <typename somenumber>
-//    somenumber matrix_scalar_product (const Vector<somenumber> &u,
-//				      const Vector<somenumber> &v) const;
-
-				     /**
 				      * Frobenius-norm of the matrix.
 				      */
     number l2_norm () const;
-    
-    				     /**
-				      * Return the l1-norm of the matrix, that is
-				      * $|M|_1=max_{all columns j}\sum_{all 
-				      * rows i} |M_ij|$,
-				      * (max. sum of columns).
-				      * This is the
-				      * natural matrix norm that is compatible
-				      * to the l1-norm for vectors, i.e.
-				      * $|Mv|_1\leq |M|_1 |v|_1$.
-				      * (cf. Haemmerlin-Hoffmann : Numerische Mathematik)
-				      */
-//    number l1_norm () const;
-
-    				     /**
-				      * Return the linfty-norm of the
-				      * matrix, that is
-				      * $|M|_infty=max_{all rows i}\sum_{all 
-				      * columns j} |M_ij|$,
-				      * (max. sum of rows).
-				      * This is the
-				      * natural matrix norm that is compatible
-				      * to the linfty-norm of vectors, i.e.
-				      * $|Mv|_infty \leq |M|_infty |v|_infty$.
-				      * (cf. Haemmerlin-Hoffmann : Numerische Mathematik)
-				      */
-//    number linfty_norm () const;
 
 				     /**
 				      * Apply the Jacobi
@@ -867,20 +702,6 @@ class SparseMatrixEZ : public Subscriptor
 				      * different from <tt>end()</tt>!
 				      */
     const_iterator end (const unsigned int r) const;
-    
-				     /**
-				      * Return the number of nonzero
-				      * elements of this
-				      * matrix.
-				      */
-//    unsigned int n_nonzero_elements () const;
-
-				     /**
-				      * Return the number of actually
-				      * nonzero elements of this
-				      * matrix.
-				      */
-//    unsigned int n_actually_nonzero_elements () const;
     
 				     /**
 				      * Print the matrix to the given
@@ -1145,7 +966,7 @@ SparseMatrixEZ<number>::Entry::Entry(unsigned int column,
 				     const number& value)
 		:
 		column(column),
-  value(value)
+		value(value)
 {}
 
 
@@ -1155,7 +976,7 @@ inline
 SparseMatrixEZ<number>::Entry::Entry()
 		:
 		column(invalid),
-  value(0)
+		value(0)
 {}
 
 
@@ -1163,7 +984,9 @@ template <typename number>
 inline
 SparseMatrixEZ<number>::RowInfo::RowInfo(unsigned int start)
 		:
-		start(start), length(0), diagonal(invalid_diagonal)
+		start(start),
+		length(0),
+		diagonal(invalid_diagonal)
 {}
 
 
@@ -1431,7 +1254,9 @@ SparseMatrixEZ<number>::allocate (const unsigned int row,
 	  for (unsigned int rn=row+1;rn<row_info.size();++rn)
 	    row_info[rn].start += increment;
 	}
-    } else {
+    }
+  else
+    {
       if (end >= data.size())
 	{
 					   // Here, appending a block
@@ -1440,6 +1265,7 @@ SparseMatrixEZ<number>::allocate (const unsigned int row,
 	  data.push_back(Entry());
 	}
     }
+
   Entry* entry = &data[i];
 				   // Save original entry
   Entry temp = *entry;
@@ -1453,7 +1279,8 @@ SparseMatrixEZ<number>::allocate (const unsigned int row,
   ++r.length;
   if (col == row)
     r.diagonal = i - r.start;
-  else if (col<row && r.diagonal!= RowInfo::invalid_diagonal)
+  else
+    if (col<row && r.diagonal!= RowInfo::invalid_diagonal)
     ++r.diagonal;
 
   if (i == end)
@@ -1466,11 +1293,12 @@ SparseMatrixEZ<number>::allocate (const unsigned int row,
 				       // There should be no invalid
 				       // entry below end
       Assert (data[j].column != Entry::invalid, ExcInternalError());
-      Entry temp2 = data[j];
-      data[j] = temp;
-      temp = temp2;
+
+//TODO[GK]: This could be done more efficiently by moving starting at the top rather than swapping starting at the bottom
+      std::swap (data[j], temp);
     }
   Assert (data[end].column == Entry::invalid, ExcInternalError());
+
   data[end] = temp;
 
   return entry;
@@ -1495,9 +1323,7 @@ void SparseMatrixEZ<number>::set (const unsigned int i,
     {
       Entry* entry = locate(i,j);
       if (entry != 0)
-	{
-	  entry->value = 0.;
-	}
+	entry->value = 0.;
     }
   else
     {
