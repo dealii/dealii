@@ -2,7 +2,7 @@
 //    $Id$
 //    Version: $Name$
 //
-//    Copyright (C) 2003, 2004, 2006 by the deal.II authors
+//    Copyright (C) 2003, 2004, 2006, 2007 by the deal.II authors
 //
 //    This file is subject to QPL and may not be  distributed
 //    without copyright and license information. Please refer
@@ -29,8 +29,6 @@ template <int dim> class MappingQ1;
 template <int dim> class FiniteElement;
 
 
-//TODO[WB]: Document these classes
-
 
 namespace internal
 {
@@ -41,7 +39,7 @@ namespace internal
  * that is common to them. The main task of this class is to provide a
  * table where for every combination of finite element, mapping, and
  * quadrature object from their corresponding collection objects there
- * is a matching dealii::FEValues, dealii::FEFaceValues, or dealii::FESubfaceValues
+ * is a matching ::FEValues, ::FEFaceValues, or ::FESubfaceValues
  * object. To make things more efficient, however, these FE*Values
  * objects are only created once requested (lazy allocation).
  *
@@ -85,16 +83,14 @@ namespace internal
                       const UpdateFlags         update_flags);
         
                                          /**
-                                          * Return a reference to the
-                                          * @p FEValues object
-                                          * selected by the last call
-                                          * to
+                                          * Return a reference to the @p
+                                          * FEValues object selected by the
+                                          * last call to
                                           * select_fe_values(). select_fe_values()
-                                          * in turn is called when you
-                                          * called the @p reinit
-                                          * function of the
-                                          * <tt>hp::FE*Values</tt>
-                                          * class the last time.
+                                          * in turn is called when you called
+                                          * the @p reinit function of the
+                                          * <tt>hp::FE*Values</tt> class the
+                                          * last time.
                                           */
         const FEValues & get_present_fe_values () const;
 
@@ -194,8 +190,47 @@ namespace hp
 {
   
 /**
- * 
- * @ingroup hp
+ * An hp equivalent of the ::FEValues class. See the @ref step_27 "step-27"
+ * tutorial program for examples of use.
+ *
+ * The idea of this class is as follows: when one assembled matrices in the hp
+ * finite element method, there may be different finite elements on different
+ * cells, and consequently one may also want to use different quadrature
+ * formulas for different cells. On the other hand, the ::FEValues efficiently
+ * handles pre-evaluating whatever information is necessary for a single
+ * finite element and quadrature object. This class brings these concepts
+ * together: it provides a "collection" of ::FEValues objects.
+ *
+ * Upon construction, one passes not one finite element and quadrature object
+ * (and possible a mapping), but a whole collection of type hp::FECollection
+ * and hp::QCollection. Later on, when one sits on a concrete cell, one would
+ * call the reinit() function for this particular cell, just as one does for a
+ * regular ::FEValues object. The difference is that this time, the reinit()
+ * function looks up the active_fe_index of that cell, if necessary creates a
+ * ::FEValues object that matches the finite element and quadrature formulas
+ * with that particular index in their collections, and then re-initializes it
+ * for the current cell. The ::FEValues object that then fits the finite
+ * element and quadrature formula for the current cell can then be accessed
+ * using the get_present_fe_values() function, and one would work with it just
+ * like with any ::FEValues object for non-hp DoF handler objects.
+ *
+ * The reinit() functions have additional arguments with default values. If
+ * not specified, the function takes the index into the hp::FECollection,
+ * hp::QCollection, and hp::MappingCollection objects from the active_fe_index
+ * of the cell, as explained above. However, one can also select different
+ * indices for a current cell. For example, by specifying a different index
+ * into the hp::QCollection class, one does not need to sort the quadrature
+ * objects in the quadrature collection so that they match one-to-one the
+ * order of finite element objects in the FE collection (even though choosing
+ * such an order is certainly convenient).
+ *
+ * Note that ::FEValues objects are created on the fly, i.e. only as they are
+ * needed. This ensures that we do not create objects for every combination of
+ * finite element, quadrature formula and mapping, but only those that will
+ * actually be needed.
+ *
+ * @ingroup hp hpcollection
+ * @author Wolfgang Bangerth, 2003
  */  
   template <int dim>
   class FEValues : public internal::hp::FEValuesBase<dim,dim,dealii::FEValues<dim> >
@@ -469,8 +504,27 @@ namespace hp
 
 
 /**
- * 
- * @ingroup hp
+ * This is the equivalent of the hp::FEValues class but for face integrations,
+ * i.e. it is to hp::FEValues what ::FEFaceValues is to ::FEValues.
+ *
+ * The same comments apply as in the documentation of the hp::FEValues
+ * class. However, it is important to note that it is here more common that
+ * one would want to explicitly specify an index to a particular quadrature
+ * formula in the reinit() functions. This is because the default index
+ * corresponds to the finite element index on the current function. On the
+ * other hand, integration on faces will typically have to happen with a
+ * quadrature formula that is adjusted to the finite elements used on both
+ * sides of a face. If one sorts the elements of the hp::FECollection with
+ * ascending polynomial degree, and matches these finite elements with
+ * corresponding quadrature formulas in the hp::QCollection passed to the
+ * constructor, then the quadrature index passed to the reinit() function
+ * should typically be something like <code>std::max
+ * (cell-@>active_fe_index(), neighbor-@>active_fe_index()</code> to ensure
+ * that a quadrature formula is chosen that is sufficiently accurate for
+ * <em>both</em> finite elements.
+ *
+ * @ingroup hp hpcollection
+ * @author Wolfgang Bangerth, 2003
  */  
   template <int dim>
   class FEFaceValues : public internal::hp::FEValuesBase<dim,dim-1,dealii::FEFaceValues<dim> >
@@ -747,8 +801,11 @@ namespace hp
 
 
 /**
- * 
- * @ingroup hp
+ * This class implements for subfaces what hp::FEFaceValues does for
+ * faces. See there for further documentation.
+ *
+ * @ingroup hp hpcollection
+ * @author Wolfgang Bangerth, 2003
  */  
   template <int dim>
   class FESubfaceValues : public internal::hp::FEValuesBase<dim,dim-1,dealii::FESubfaceValues<dim> >
