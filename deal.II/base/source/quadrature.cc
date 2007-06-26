@@ -1333,7 +1333,7 @@ QIterated<1>::QIterated (const Quadrature<1> &base_quadrature,
 	  };
 				       // scale the weight correctly
       double_point_weight /= n_copies;
-//TODO:[WB] The following assertion looks strange. InternalError???
+
 				       // make sure the base quadrature formula
 				       // has only one quadrature point
 				       // per end point
