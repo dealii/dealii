@@ -2,7 +2,7 @@
 //    $Id$
 //    Version: $Name$
 //
-//    Copyright (C) 2001, 2002, 2003, 2004, 2005, 2006 by the deal.II authors
+//    Copyright (C) 2001, 2002, 2003, 2004, 2005, 2006, 2007 by the deal.II authors
 //
 //    This file is subject to QPL and may not be  distributed
 //    without copyright and license information. Please refer
@@ -11,8 +11,8 @@
 //
 //---------------------------------------------------------------------------
 
-#include <fe/mapping_q.h>
-#include <fe/fe_q.h>
+
+#include <base/utilities.h>
 #include <base/polynomial.h>
 #include <base/quadrature.h>
 #include <base/quadrature_lib.h>
@@ -23,6 +23,8 @@
 #include <grid/tria_boundary.h>
 #include <dofs/dof_accessor.h>
 #include <fe/fe_tools.h>
+#include <fe/mapping_q.h>
+#include <fe/fe_q.h>
 
 #include <numeric>
 #include <memory>
@@ -93,34 +95,15 @@ MappingQ<1>::~MappingQ ()
 
 
 
-template<typename number>
-number power(const number x, const unsigned int y)
-{
-				   // since the power to which x is
-				   // raised is usually the space
-				   // dimension, and since this is
-				   // rarely larger than three, the
-				   // following code is optimal and
-				   // cannot be further optimized by
-				   // grouping of operands to reduce
-				   // the number of multiplications
-				   // from O(x) to O(log x)
-  number value=1;
-  for (unsigned int i=0; i<y; ++i)
-    value *= x;
-  return value;
-}
-
-
 template<int dim>
 MappingQ<dim>::MappingQ (const unsigned int p)
                 :
 		degree(p),
-		n_inner(power(degree-1, dim)),
+		n_inner(Utilities::fixed_power<dim>(degree-1)),
 		n_outer((dim==2) ? 4+4*(degree-1)
 			:8+12*(degree-1)+6*(degree-1)*(degree-1)),
 		tensor_pols(0),
-		n_shape_functions(power(degree+1,dim)),
+		n_shape_functions(Utilities::fixed_power<dim>(degree+1)),
 		renumber(0)
 {
 				   // Construct the tensor product

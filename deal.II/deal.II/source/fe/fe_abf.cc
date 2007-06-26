@@ -11,6 +11,7 @@
 //
 //---------------------------------------------------------------------------
 
+#include <base/utilities.h>
 #include <base/quadrature.h>
 #include <base/quadrature_lib.h>
 #include <base/qprojector.h>
@@ -413,7 +414,7 @@ FE_ABF<dim>::initialize_restriction()
 						   // have to do it here.
 		  this->restriction[child](face*this->dofs_per_face+i_face,
 				     i_child)
-		    += std::pow(.5, dim-1.) * q_sub.weight(k)
+		    += Utilities::fixed_power<dim-1>(.5) * q_sub.weight(k)
 		    * cached_values(i_child, k)
 		    * this->shape_value_component(face*this->dofs_per_face+i_face,
 						  q_sub.point(k),
