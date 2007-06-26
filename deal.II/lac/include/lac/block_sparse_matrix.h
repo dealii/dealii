@@ -2,7 +2,7 @@
 //    $Id$
 //    Version: $Name$
 //
-//    Copyright (C) 2000, 2001, 2002, 2003, 2004, 2005, 2006 by the deal.II authors
+//    Copyright (C) 2000, 2001, 2002, 2003, 2004, 2005, 2006, 2007 by the deal.II authors
 //
 //    This file is subject to QPL and may not be  distributed
 //    without copyright and license information. Please refer
@@ -327,7 +327,7 @@ class BlockSparseMatrix : public BlockMatrixBase<SparseMatrix<number> >
 				      *
 				      * The matrix must be a single
 				      * square block for this.
-				    */
+				      */
     template <typename number2>
     void precondition_Jacobi (Vector<number2>       &dst,
 			      const Vector<number2> &src,
@@ -560,7 +560,16 @@ precondition_Jacobi (Vector<number2>       &dst,
 		     const Vector<number2> &src,
 		     const number           omega) const
 {
-//TODO: Insert assertions
+				   // check number of blocks. the sizes of the
+				   // single block is checked in the function
+				   // we call
+  Assert (this->n_block_cols() == 1,
+	  ExcMessage ("This function only works if the matrix has "
+		      "a single block"));
+  Assert (this->n_block_rows() == 1,
+	  ExcMessage ("This function only works if the matrix has "
+		      "a single block"));
+
                                    // do a diagonal preconditioning. uses only
                                    // the diagonal blocks of the matrix
   this->block(0,0).precondition_Jacobi (dst, src, omega);
