@@ -1426,10 +1426,15 @@ template <int dim>
 template <int structdim>
 inline
 unsigned int
-DoFHandler<dim>::n_active_fe_indices (const unsigned int,
-				      const unsigned int) const
+DoFHandler<dim>::n_active_fe_indices (const unsigned int obj_level,
+				      const unsigned int obj_index) const
 {
-//TODO[WB]: this isn't true -- the function should return zero if the object is inactive  
+  Assert (raw_cell_iterator (tria,
+			     obj_level,
+			     obj_index,
+			     this)->used() == true,
+	  ExcMessage ("This cell is not active and therefore can't be "
+		      "queried for the number of active FE indices"));
   return 1;
 }
 
@@ -1439,11 +1444,16 @@ template <int dim>
 template <int structdim>
 inline
 unsigned int
-DoFHandler<dim>::nth_active_fe_index (const unsigned int,
-				      const unsigned int,
+DoFHandler<dim>::nth_active_fe_index (const unsigned int obj_level,
+				      const unsigned int obj_index,
 				      const unsigned int n) const
 {
-//TODO[WB]: this isn't true -- we should error out unconditionally if the object is inactive  
+  Assert (raw_cell_iterator (tria,
+			     obj_level,
+			     obj_index,
+			     this)->used() == true,
+	  ExcMessage ("This cell is not active and therefore can't be "
+		      "queried for its active FE indices"));
   Assert (n == 0, ExcIndexRange (n, 0, 1));
   
   return default_fe_index;
