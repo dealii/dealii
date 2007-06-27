@@ -1429,10 +1429,32 @@ unsigned int
 DoFHandler<dim>::n_active_fe_indices (const unsigned int obj_level,
 				      const unsigned int obj_index) const
 {
-  Assert (raw_cell_iterator (tria,
-			     obj_level,
-			     obj_index,
-			     this)->used() == true,
+				   // check that the object we look at is in
+				   // fact active. the problem is that we have
+				   // templatized on the dimensionality of the
+				   // object, so it may be a cell, a face, or
+				   // a line. we have a bit of trouble doing
+				   // this all in the generic case, so only
+				   // check if it is either a cell or a
+				   // line. the only case this leaves out is
+				   // faces in 3d -- let's hope that this
+				   // never is a problem
+  Assert ((dim==structdim
+	   ?
+	   raw_cell_iterator (tria,
+			      obj_level,
+			      obj_index,
+			      this)->used()
+	   :
+	   (structdim==1
+	    ?
+	    raw_line_iterator (tria,
+			       obj_level,
+			       obj_index,
+			       this)->used()
+	    :
+	    true))
+	  == true,
 	  ExcMessage ("This cell is not active and therefore can't be "
 		      "queried for the number of active FE indices"));
   return 1;
@@ -1448,10 +1470,32 @@ DoFHandler<dim>::nth_active_fe_index (const unsigned int obj_level,
 				      const unsigned int obj_index,
 				      const unsigned int n) const
 {
-  Assert (raw_cell_iterator (tria,
-			     obj_level,
-			     obj_index,
-			     this)->used() == true,
+				   // check that the object we look at is in
+				   // fact active. the problem is that we have
+				   // templatized on the dimensionality of the
+				   // object, so it may be a cell, a face, or
+				   // a line. we have a bit of trouble doing
+				   // this all in the generic case, so only
+				   // check if it is either a cell or a
+				   // line. the only case this leaves out is
+				   // faces in 3d -- let's hope that this
+				   // never is a problem
+  Assert ((dim==structdim
+	   ?
+	   raw_cell_iterator (tria,
+			      obj_level,
+			      obj_index,
+			      this)->used()
+	   :
+	   (structdim==1
+	    ?
+	    raw_line_iterator (tria,
+			       obj_level,
+			       obj_index,
+			       this)->used()
+	    :
+	    true))
+	  == true,
 	  ExcMessage ("This cell is not active and therefore can't be "
 		      "queried for its active FE indices"));
   Assert (n == 0, ExcIndexRange (n, 0, 1));
