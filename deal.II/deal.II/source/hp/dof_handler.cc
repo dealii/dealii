@@ -2475,9 +2475,10 @@ namespace hp
 					 // there are more, then we punt, as
 					 // described in the paper (and
 					 // mentioned above)
-	//TODO: The check for 'dim==2' was inserted by intuition. It fixes
-	// the previous problems with step-27 in 3D. But an explanation
-	// for this is still required!.
+//TODO: The check for 'dim==2' was inserted by intuition. It fixes
+// the previous problems with step-27 in 3D. But an explanation
+// for this is still required, and what we do here is not what we
+// describe in the paper!.
 	if ((unique_sets_of_dofs == 2) && (dim == 2))
 	  {
 					     // find out which is the
