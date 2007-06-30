@@ -4187,10 +4187,24 @@ rm -f core conftest.err conftest.$ac_objext conftest.$ac_ext
           ;;
 
       intel_icc*)
-                    	  	                                                                                            	  	  	  	  	            CXXFLAGSG="$CXXFLAGS -Kc++eh -Krtti -w1 -wd175 -wd525 -wd327 -wd424 -wd11 -wd734 -wd858 -DDEBUG -inline_debug_info"
-          CXXFLAGSO="$CXXFLAGS -Kc++eh -Krtti -O2 -unroll -w0 -wd424 -wd11"
-          CXXFLAGSPIC="-KPIC"
-          LDFLAGSPIC="-KPIC"
+                    	  	      	  case "$GXX_VERSION" in
+	    intel_icc56789)
+	      CXXFLAGSG="$CXXFLAGS -Kc++eh -Krtti -DDEBUG -inline_debug_info"
+              CXXFLAGSO="$CXXFLAGS -Kc++eh -Krtti -O2 -unroll"
+              CXXFLAGSPIC="-KPIC"
+              LDFLAGSPIC="-KPIC"
+              ;;
+
+	    intel_icc*)
+	      CXXFLAGSG="$CXXFLAGS -DDEBUG -inline_debug_info"
+              CXXFLAGSO="$CXXFLAGS -O2 -unroll"
+              CXXFLAGSPIC="-fPIC"
+              LDFLAGSPIC="-fPIC"
+              ;;
+          esac
+
+                    	  	                                                                                            	  	  	  	  	            CXXFLAGSG="$CXXFLAGSG -w1 -wd175 -wd525 -wd327 -wd424 -wd11 -wd734 -wd858"
+          CXXFLAGSO="$CXXFLAGSO -w0 -wd424 -wd11"
 
                               if test "x$GXX_VERSION" != "xintel_icc5" ; then
             CXXFLAGSO="$CXXFLAGSO -opt_report_levelmin"

@@ -592,6 +592,26 @@ AC_DEFUN(DEAL_II_SET_CXX_FLAGS, dnl
           ;;
   
       intel_icc*)
+          dnl Earlier icc versions used -Kxxx for flags. Later versions use
+          dnl the gcc convention -fxxx
+	  dnl
+	  dnl Exception handling is also standard in later versions, as is rtti
+    	  case "$GXX_VERSION" in
+	    intel_icc[56789])
+	      CXXFLAGSG="$CXXFLAGS -Kc++eh -Krtti -DDEBUG -inline_debug_info"
+              CXXFLAGSO="$CXXFLAGS -Kc++eh -Krtti -O2 -unroll"
+              CXXFLAGSPIC="-KPIC"
+              LDFLAGSPIC="-KPIC"
+              ;;
+
+	    intel_icc*)
+	      CXXFLAGSG="$CXXFLAGS -DDEBUG -inline_debug_info"
+              CXXFLAGSO="$CXXFLAGS -O2 -unroll"
+              CXXFLAGSPIC="-fPIC"
+              LDFLAGSPIC="-fPIC"
+              ;;
+          esac
+
           dnl Disable some compiler warnings, as they often are wrong on
           dnl our code:
 	  dnl  #11: ` unrecognized preprocessing directive" (we use
@@ -610,10 +630,8 @@ AC_DEFUN(DEAL_II_SET_CXX_FLAGS, dnl
 	  dnl       (valid, but annoying and sometimes hard to work around)
 	  dnl #858: `type qualifier on return type is meaningless'
 	  dnl       (on conversion operators to types that are already const)
-          CXXFLAGSG="$CXXFLAGS -Kc++eh -Krtti -w1 -wd175 -wd525 -wd327 -wd424 -wd11 -wd734 -wd858 -DDEBUG -inline_debug_info"
-          CXXFLAGSO="$CXXFLAGS -Kc++eh -Krtti -O2 -unroll -w0 -wd424 -wd11"
-          CXXFLAGSPIC="-KPIC"
-          LDFLAGSPIC="-KPIC"
+          CXXFLAGSG="$CXXFLAGSG -w1 -wd175 -wd525 -wd327 -wd424 -wd11 -wd734 -wd858"
+          CXXFLAGSO="$CXXFLAGSO -w0 -wd424 -wd11"
 
           dnl To reduce output, use -opt_report_levelmin where possible,
           dnl i.e. post icc5
