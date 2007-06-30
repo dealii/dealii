@@ -264,7 +264,7 @@ AC_DEFUN(DEAL_II_DETERMINE_CXX_BRAND, dnl
           else
             AC_MSG_RESULT(C++ compiler is icc)
             GXX_VERSION=intel_icc
-          fi fi fi fi fi
+          fi fi fi fi fi fi
           GXX_VERSION_DETAILED=$GXX_VERSION
         else
   
@@ -1073,7 +1073,7 @@ AC_DEFUN(DEAL_II_DETERMINE_CC_BRAND, dnl
           else
             AC_MSG_RESULT(C compiler is icc)
             CC_VERSION=intel_icc
-          fi fi fi fi fi
+          fi fi fi fi fi fi
         else
   
           dnl Or DEC's cxx compiler?

@@ -3764,7 +3764,7 @@ echo "${ECHO_T}C++ compiler is icc-10" >&6; }
             { echo "$as_me:$LINENO: result: C++ compiler is icc" >&5
 echo "${ECHO_T}C++ compiler is icc" >&6; }
             GXX_VERSION=intel_icc
-          fi fi fi fi fi
+          fi fi fi fi fi fi
           GXX_VERSION_DETAILED=$GXX_VERSION
         else
 
@@ -4809,7 +4809,7 @@ echo "${ECHO_T}C compiler is icc-10" >&6; }
             { echo "$as_me:$LINENO: result: C compiler is icc" >&5
 echo "${ECHO_T}C compiler is icc" >&6; }
             CC_VERSION=intel_icc
-          fi fi fi fi fi
+          fi fi fi fi fi fi
         else
 
                     is_dec_cxx="`($CC -V 2>&1) | grep 'Compaq C'`"
