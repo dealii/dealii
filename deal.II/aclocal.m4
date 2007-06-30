@@ -672,14 +672,24 @@ AC_DEFUN(DEAL_II_SET_CXX_FLAGS, dnl
           fi fi
 	
 	  dnl If we are on an x86 platform, add -tpp6 to optimization
-	  dnl flags
+	  dnl flags (for version <10), or the equivalent for later
+	  dnl processors
 	  case "$target" in
             *x86_64*)
 	        LDFLAGS="$LDFLAGS -lpthread"
 	        ;;
 
 	    *86*)
-		CXXFLAGSO="$CXXFLAGSO -tpp6"
+    	        case "$GXX_VERSION" in
+	          intel_icc5)
+                    ;;
+	          intel_icc[6789])
+                    CXXFLAGSO="$CXXFLAGSO -tpp6"
+                    ;;
+	          *)
+                    CXXFLAGSO="$CXXFLAGSO -mcpu=pentium4"
+	            ;;
+                esac
 		;;
 	  esac
           ;;
