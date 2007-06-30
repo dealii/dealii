@@ -634,10 +634,18 @@ AC_DEFUN(DEAL_II_SET_CXX_FLAGS, dnl
           CXXFLAGSO="$CXXFLAGSO -w0 -wd424 -wd11"
 
           dnl To reduce output, use -opt_report_levelmin where possible,
-          dnl i.e. post icc5
-          if test "x$GXX_VERSION" != "xintel_icc5" ; then
-            CXXFLAGSO="$CXXFLAGSO -opt_report_levelmin"
-          fi
+          dnl i.e. post icc5. from icc10 onwards, this flag is called 
+	  dnl -opt-report
+    	  case "$GXX_VERSION" in
+	    intel_icc5)
+              ;;
+	    intel_icc[6789])
+              CXXFLAGSO="$CXXFLAGSO -opt_report_levelmin"
+              ;;
+	    *)
+              CXXFLAGSO="$CXXFLAGSO -opt-report 0"
+	      ;;
+          esac
 
 	  dnl Some versions of icc on some platforms issue a lot of warnings
 	  dnl about the unreliability of floating point comparisons. Check 
