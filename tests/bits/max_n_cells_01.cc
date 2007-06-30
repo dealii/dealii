@@ -46,7 +46,7 @@ void test ()
 
       GridRefinement::refine_and_coarsen_fixed_number (tria,
 						       criteria,
-						       0.3, 0.03,
+						       1./4, 1./64,
 						       10000);
       tria.execute_coarsening_and_refinement();
     }
