@@ -4199,6 +4199,7 @@ rm -f core conftest.err conftest.$ac_objext conftest.$ac_ext
 	      CXXFLAGSG="$CXXFLAGS -DDEBUG -inline_debug_info"
               CXXFLAGSO="$CXXFLAGS -O2 -unroll"
               CXXFLAGSPIC="-fPIC"
+	      LDFLAGS="$LDFLAGS -lstdc++"
               LDFLAGSPIC="-fPIC"
               ;;
           esac
