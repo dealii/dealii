@@ -597,7 +597,7 @@ AC_DEFUN(DEAL_II_SET_CXX_FLAGS, dnl
 	  dnl
 	  dnl Exception handling is also standard in later versions, as is rtti
     	  case "$GXX_VERSION" in
-	    intel_icc[56789])
+	    intel_icc5 | intel_icc6 | intel_icc7 | intel_icc8 | intel_icc9)
 	      CXXFLAGSG="$CXXFLAGS -Kc++eh -Krtti -DDEBUG -inline_debug_info"
               CXXFLAGSO="$CXXFLAGS -Kc++eh -Krtti -O2 -unroll"
               CXXFLAGSPIC="-KPIC"
@@ -640,7 +640,7 @@ AC_DEFUN(DEAL_II_SET_CXX_FLAGS, dnl
     	  case "$GXX_VERSION" in
 	    intel_icc5)
               ;;
-	    intel_icc[6789])
+	    intel_icc6 | intel_icc7 | intel_icc8 | intel_icc9)
               CXXFLAGSO="$CXXFLAGSO -opt_report_levelmin"
               ;;
 	    *)
@@ -684,7 +684,7 @@ AC_DEFUN(DEAL_II_SET_CXX_FLAGS, dnl
     	        case "$GXX_VERSION" in
 	          intel_icc5)
                     ;;
-	          intel_icc[6789])
+	          intel_icc6 | intel_icc7 | intel_icc8 | intel_icc9)
                     CXXFLAGSO="$CXXFLAGSO -tpp6"
                     ;;
 	          *)
