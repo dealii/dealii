@@ -374,7 +374,7 @@ LOOKUP_TABLE default
 
 2 2
 [deal.II intermediate format graphics data]
-[written by deal.II 5.3.pre]
+[written by deal.II 6.0.pre]
 [Version: 2]
 2
 node_data
@@ -930,7 +930,7 @@ LOOKUP_TABLE default
 
 2 2
 [deal.II intermediate format graphics data]
-[written by deal.II 5.3.pre]
+[written by deal.II 6.0.pre]
 [Version: 2]
 2
 node_data
@@ -1486,7 +1486,7 @@ LOOKUP_TABLE default
 
 2 2
 [deal.II intermediate format graphics data]
-[written by deal.II 5.3.pre]
+[written by deal.II 6.0.pre]
 [Version: 2]
 2
 node_data
@@ -2042,7 +2042,7 @@ LOOKUP_TABLE default
 
 2 2
 [deal.II intermediate format graphics data]
-[written by deal.II 5.3.pre]
+[written by deal.II 6.0.pre]
 [Version: 2]
 2
 node_data
@@ -2598,7 +2598,7 @@ LOOKUP_TABLE default
 
 2 2
 [deal.II intermediate format graphics data]
-[written by deal.II 5.3.pre]
+[written by deal.II 6.0.pre]
 [Version: 2]
 2
 node_data
@@ -3154,7 +3154,7 @@ LOOKUP_TABLE default
 
 2 2
 [deal.II intermediate format graphics data]
-[written by deal.II 5.3.pre]
+[written by deal.II 6.0.pre]
 [Version: 2]
 2
 node_data
