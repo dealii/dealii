@@ -636,7 +636,10 @@ AC_DEFUN(DEAL_II_SET_CXX_FLAGS, dnl
 
           dnl To reduce output, use -opt_report_levelmin where possible,
           dnl i.e. post icc5. from icc10 onwards, this flag is called 
-	  dnl -opt-report
+	  dnl -opt-report, and -vec-report controls output of the
+          dnl autovectorizer (to make things simpler, one of the two options
+          dnl wants a space between option and level, whereas the other does
+          dnl not)
     	  case "$GXX_VERSION" in
 	    intel_icc5)
               ;;
@@ -644,7 +647,7 @@ AC_DEFUN(DEAL_II_SET_CXX_FLAGS, dnl
               CXXFLAGSO="$CXXFLAGSO -opt_report_levelmin"
               ;;
 	    *)
-              CXXFLAGSO="$CXXFLAGSO -opt-report 0"
+              CXXFLAGSO="$CXXFLAGSO -opt-report 0 -vec-report0"
 	      ;;
           esac
 
