@@ -49,6 +49,13 @@ Quadrature<0>::Quadrature (const unsigned int)
 
 
 template <>
+Quadrature<0>::Quadrature (const Quadrature<0> &)
+              : n_quadrature_points(0)
+{}
+
+
+
+template <>
 Quadrature<0>::~Quadrature ()
 {}
 
