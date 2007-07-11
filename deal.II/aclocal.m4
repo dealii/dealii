@@ -1772,7 +1772,7 @@ AC_DEFUN(DEAL_II_SET_MULTITHREADING_FLAGS, dnl
 
         intel_icc*)
             CXXFLAGSG="$CXXFLAGSG"  
-            CXXFLAGSO="$CXXFLAGSO -parallel"
+            CXXFLAGSO="$CXXFLAGSO"
 	    LDFLAGS="$LDFLAGS -lpthread"
 	    ;;
 
