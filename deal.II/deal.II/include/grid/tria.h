@@ -975,8 +975,8 @@ namespace internal
  *
  *   It is recommended that a functions using the flags states so in
  *   its documentation. For example, the
- *   execute_coarsening_and_refinement() function uses the face user
- *   flags.
+ *   execute_coarsening_and_refinement() function uses some of the user
+ *   flags and will therefore destroy any content stored in them.
  *
  *   There is another set of user data, which can be either an
  *   <tt>unsigned int</tt> or a <tt>void *</tt>, for
@@ -1618,13 +1618,11 @@ class Triangulation : public Subscriptor
 				      * coarsening of the
 				      * triangulation.
 				      *
-				      * The function resets all
-				      * refinement and coarsening
-				      * flags to false. It uses the
-				      * <tt>line->user_flags</tt> for
-				      * <tt>dim=2,3</tt> and the
-				      * <tt>quad->user_flags</tt> for
-				      * <tt>dim=3</tt>.
+				      * The function resets all refinement and
+				      * coarsening flags to false. It uses the
+				      * user flags for internal purposes. They
+				      * will therefore be overwritten by
+				      * undefined content.
 				      *
                                       * See the general docs for more
                                       * information.
