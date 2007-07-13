@@ -370,9 +370,12 @@ namespace PETScWrappers
                                         * are stated in the first argument,
                                         * the corresponding values in the
                                         * second.
+					* If the flag @p add_values is true,
+					* the values are added to the vector.
                                         */
       void set (const std::vector<unsigned int> &indices,
-                const std::vector<PetscScalar>  &values);
+                const std::vector<PetscScalar>  &values,
+		const bool add_values = false);
       
                                        /**
                                         * Return the scalar product of two

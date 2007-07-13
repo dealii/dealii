@@ -216,7 +216,8 @@ namespace PETScWrappers
 
   void
   VectorBase::set (const std::vector<unsigned int> &indices,
-                   const std::vector<PetscScalar>  &values)
+                   const std::vector<PetscScalar>  &values,
+		   const bool add_values)
   {
     Assert (indices.size() == values.size(),
             ExcMessage ("Function called with arguments of different sizes"));
@@ -248,11 +249,14 @@ namespace PETScWrappers
 	const std::vector<PetscInt> petsc_indices (indices.begin(),
 						   indices.end());
 #endif
-    
+
+	InsertMode mode = INSERT_VALUES;
+	if (add_values)
+	  mode = ADD_VALUES;
 	const int ierr
 	  = VecSetValues (vector, indices.size(),
 			  &petsc_indices[0], &values[0],
-			  INSERT_VALUES);
+			  mode);
 	AssertThrow (ierr == 0, ExcPETScError(ierr));
       }
 
