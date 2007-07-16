@@ -3082,12 +3082,30 @@ class Triangulation : public Subscriptor
 
 				     /**
 				      * Actually delete a cell, or rather all
-				      * it children, which is the
-				      * main step for the coarsening process.
-				      * This is the dimension dependent part
-				      * of @p execute_coarsening.
+				      * its children, which is the main step for
+				      * the coarsening process.  This is the
+				      * dimension dependent part of @p
+				      * execute_coarsening. The second argument
+				      * is a vector which gives for each line
+				      * index the number of cells containing
+				      * this line. This information is needed to
+				      * decide whether a refined line may be
+				      * coarsened or not in 3D. In 1D and 2D
+				      * this argument is not needed and thus
+				      * ignored.
 				      */
-    void delete_children (cell_iterator &cell);
+    void delete_children (cell_iterator &cell,
+			  std::vector<unsigned int> &cell_count);
+
+				     /**
+				      * Fill the vector @p cell_count needed by
+				      * @p delete_children with the number of
+				      * cells containing a given line. As this
+				      * is only needed in 3D, it is only
+				      * implemented there and throws an
+				      * exception otherwise.
+				      */
+    void count_cells_at_line (std::vector<unsigned int> &cell_count);
 
 				     /**
 				      * Some dimension dependent stuff for
@@ -3404,9 +3422,10 @@ template <> void Triangulation<1>::execute_refinement ();
 template <> void Triangulation<2>::execute_refinement ();
 template <> void Triangulation<3>::execute_refinement ();
 template <> void Triangulation<3>::prepare_refinement_dim_dependent ();
-template <> void Triangulation<1>::delete_children (cell_iterator &cell);
-template <> void Triangulation<2>::delete_children (cell_iterator &cell);
-template <> void Triangulation<3>::delete_children (cell_iterator &cell);
+template <> void Triangulation<1>::delete_children (cell_iterator &cell, std::vector<unsigned int> &);
+template <> void Triangulation<2>::delete_children (cell_iterator &cell, std::vector<unsigned int> &);
+template <> void Triangulation<3>::delete_children (cell_iterator &cell, std::vector<unsigned int> &cell_count);
+template <> void Triangulation<3>::count_cells_at_line (std::vector<unsigned int> &cell_count);
 template <> void Triangulation<1>::update_number_cache_quads ();
 template <> void Triangulation<1>::update_number_cache_hexes ();
 template <> void Triangulation<2>::update_number_cache_hexes ();

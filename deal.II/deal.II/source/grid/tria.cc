@@ -7634,9 +7634,19 @@ Triangulation<3>::execute_refinement ()
 #endif
 
 
+
 template <int dim>
 void Triangulation<dim>::execute_coarsening ()
 {
+				   // create a vector counting for each line how
+				   // many cells contain this line. in 3D, this
+				   // is used later on to decide which lines can
+				   // be deleted after coarsening a cell. in
+				   // other dimensions it will be ignored
+  std::vector<unsigned int> cell_count(0);
+  if (dim==3)
+    count_cells_at_line(cell_count);
+  
   				   // loop over all cells. Flag all
   				   // cells of which all children are
   				   // flagged for
@@ -7693,7 +7703,7 @@ void Triangulation<dim>::execute_coarsening ()
 					 // use a separate function,
 					 // since this is dimension
 					 // specific
-	delete_children (cell);
+	delete_children (cell, cell_count);
 
   				   // re-compute number of lines and
   				   // quads
@@ -8938,10 +8948,39 @@ bool Triangulation<dim>::prepare_coarsening_and_refinement ()
 }
 
 
+
+#if deal_II_dimension == 3
+
+template <>
+void Triangulation<3>::count_cells_at_line (std::vector<unsigned int> &cell_count)
+{
+  cell_count.clear();
+  cell_count.resize(n_raw_lines(),0);
+  cell_iterator cell=begin(),
+		endc=end();
+  for (; cell!=endc; ++cell)
+    for (unsigned int l=0; l<GeometryInfo<3>::lines_per_cell; ++l)
+      ++cell_count[cell->line_index(l)];
+}
+
+#else
+
+template <int dim>
+void Triangulation<dim>::count_cells_at_line (std::vector<unsigned int> &cell_count)
+{
+  Assert(false, ExcNotImplemented());
+  cell_count.clear();
+}
+
+#endif
+
+
+
 #if deal_II_dimension == 1
 
 template <>
-void Triangulation<1>::delete_children (cell_iterator &cell)
+void Triangulation<1>::delete_children (cell_iterator &cell,
+					std::vector<unsigned int> &)
 {
   const unsigned int dim=1;
 				   // first we need to reset the
@@ -9041,7 +9080,8 @@ void Triangulation<1>::delete_children (cell_iterator &cell)
 #if deal_II_dimension == 2
 
 template <>
-void Triangulation<2>::delete_children (cell_iterator &cell)
+void Triangulation<2>::delete_children (cell_iterator &cell,
+					std::vector<unsigned int> &)
 {
   const unsigned int dim=2;
 				   // first we need to reset the
@@ -9176,9 +9216,12 @@ void Triangulation<2>::delete_children (cell_iterator &cell)
 
 
 template <>
-void Triangulation<3>::delete_children (cell_iterator &cell)
+void Triangulation<3>::delete_children (cell_iterator &cell,
+					std::vector<unsigned int> &cell_count)
 {
   const unsigned int dim=3;
+  Assert(cell_count.size()==n_raw_lines(), ExcInternalError());
+  
 				   // first we need to reset the
 				   // neighbor pointers of the
 				   // neighbors of this cell's
@@ -9363,50 +9406,12 @@ void Triangulation<3>::delete_children (cell_iterator &cell)
   cell->clear_children ();
   cell->clear_user_flag();
 
-				   // now there still are the 12 lines
-				   // of this hex which are refined
-				   // and which may need
-				   // coarsening. however, it is not
-				   // so easy to decide whether they
-				   // are still needed, since it does
-				   // not suffice to ask the
-				   // neighbors. we also need to ask
-				   // those cells, which are "around
-				   // the corner".
-				   //
-				   // to do so: first set up a list of
-				   // 12 pairs of line_iterators and
-				   // flags which denote whether the
-				   // line's children are still needed
-				   //
-				   // we default to: "is not needed"
-				   // because in this case, if we make
-				   // an error in the code below, some
-				   // lines will be deleted that in
-				   // fact are needed. this will
-				   // eventually be caught somewhen,
-				   // because there are many checks
-				   // whether an iterator points to
-				   // something used. the opposite
-				   // case, that we do not delete
-				   // lines that are no more used, is
-				   // more severe and causes a memory
-				   // leak which is probably
-				   // impossible to find.
-  const std::pair<line_iterator,bool> line_is_needed_pairs[12]
-    = {   std::make_pair(cell->line(0), false),
-	  std::make_pair(cell->line(1), false),
-	  std::make_pair(cell->line(2), false),
-	  std::make_pair(cell->line(3), false),
-	  std::make_pair(cell->line(4), false),
-	  std::make_pair(cell->line(5), false),
-	  std::make_pair(cell->line(6), false),
-	  std::make_pair(cell->line(7), false),
-	  std::make_pair(cell->line(8), false),
-	  std::make_pair(cell->line(9), false),
-	  std::make_pair(cell->line(10), false),
-	  std::make_pair(cell->line(11), false)  };
-  
+				   // now there still are the 12 lines of this
+				   // hex which are refined and which may need
+				   // coarsening. As we got the number of cells
+				   // containing this line, we can simply use
+				   // that information here.
+
 				   // if in debug mode: make sure that
 				   // none of the lines of this cell
 				   // is twice refined; else, deleting
@@ -9417,125 +9422,45 @@ void Triangulation<3>::delete_children (cell_iterator &cell)
 				   // children in fact has children
 				   // (the bits/coarsening_3d test
 				   // tripped over this initially)
-  for (unsigned int line=0; line<12; ++line)
+  for (unsigned int line_no=0; line_no<12; ++line_no)
     {
-      Assert (cell->line(line)->has_children(),
+      line_iterator line=cell->line(line_no);
+      
+      Assert (line->has_children(),
               ExcInternalError());
       for (unsigned int c=0; c<2; ++c)
-	Assert (!cell->line(line)->child(c)->has_children(),
-		ExcInternalError());
-    }
-  
-
-				   // next make a map out of this for
-				   // simpler access to the flag
-				   // associated with a line
-  std::map<line_iterator,bool> line_is_needed (&line_is_needed_pairs[0],
-					       &line_is_needed_pairs[12]);
-  
-				   // then ask each neighbor and their
-				   // neighbors
-  for (unsigned int nb=0; nb<GeometryInfo<dim>::faces_per_cell; ++nb) 
-    {
-      const cell_iterator neighbor = cell->neighbor(nb);
-				       // do nothing if at boundary
-      if (neighbor.state() != IteratorState::valid)
-	continue;
-
-      Assert (neighbor->level() == cell->level(),
-	      ExcInternalError());
-
-				       // if the neighbor itself has
-				       // children, then the four
-				       // lines of the common face are
-				       // definitely needed
-      if (neighbor->has_children())
 	{
-	  for (unsigned int i=0; i<4; ++i)
-	    {
-	      Assert (line_is_needed.find(cell->face(nb)->line(i))
-		      != line_is_needed.end(),
-		      ExcInternalError());
-	      
-	      line_is_needed[cell->face(nb)->line(i)] = true;
-	    }
-					   // ok for this neighbor
-	  continue;
-	}
-
-				       // if the neighbor is not
-				       // refined, then it may still
-				       // be that one of his neighbors
-				       // may need one of our
-				       // lines. the present cell is
-				       // also one of his neighbors,
-				       // but this one is not any more
-				       // refined
-      for (unsigned int nb_nb=0; nb_nb<GeometryInfo<dim>::faces_per_cell;
-	   ++nb_nb)
-	{
-	  const cell_iterator neighbor_neighbor = neighbor->neighbor(nb_nb);
-					   // do nothing if at
-					   // boundary
-	  if (neighbor_neighbor.state() != IteratorState::valid)
-	    continue;
-
-	  Assert ((neighbor_neighbor->level() == cell->level()) ||
-		  (neighbor_neighbor->level() == cell->level()-1),
+	  Assert (!line->child(c)->has_children(),
 		  ExcInternalError());
-	  
-					   // also do nothing if the
-					   // neighbor is at a lower
-					   // level (but then it
-					   // should not be refined)
-	  if (neighbor_neighbor->level() == cell->level()-1)
+					   // decrease the number of cells
+					   // referencing this line by one, as
+					   // one of those was one of our former
+					   // children
+	  --cell_count[line->child_index(c)];
+	}
+				       // the cell counters for both
+				       // line_children have to be the same
+      Assert(cell_count[line->child_index(0)] ==
+	     cell_count[line->child_index(1)],
+	     ExcInternalError());
+      
+      if (cell_count[line->child_index(0)]==0)
+	{
+					   // we may delete the line's children
+					   // and the middle vertex as no cell
+					   // references them anymore
+	  vertices_used[line->child(0)->vertex_index(1)] = false;
+		
+	  for (unsigned int child=0; child<2; ++child)
 	    {
-	      Assert (!neighbor_neighbor->has_children(),
-		      ExcInternalError());
-	      continue;
+	      line->child(child)->clear_user_pointer();
+	      line->child(child)->clear_user_flag();
+	      line->child(child)->clear_used_flag();
 	    }
-
-					   // neighbor's neighbor is
-					   // on same level. if it has
-					   // children, then look
-					   // closer
-	  if (neighbor_neighbor->has_children())
-					     // if any of those cell's
-					     // lines is one of those
-					     // that we are interested
-					     // in, then flag it
-	    for (unsigned int l=0; l<GeometryInfo<dim>::lines_per_cell; ++l)
-	      {
-		line_iterator line = neighbor_neighbor->line(l);
-
-		if (line_is_needed.find(line) != line_is_needed.end())
-		  line_is_needed[line] = true;
-	      }
+		
+	  line->clear_children();
 	}
     }
-
-
-				   // now, if the lines are not marked
-				   // as needed, we may delete their
-				   // children and the midpoint
-  std::map<line_iterator,bool>::iterator line_and_flag;
-  for (line_and_flag=line_is_needed.begin();
-       line_and_flag!=line_is_needed.end(); ++line_and_flag)
-    if  (line_and_flag->second == false)
-      {
-	line_iterator line = line_and_flag->first;
-
-	vertices_used[line->child(0)->vertex_index(1)] = false;
-
-	for (unsigned int child=0; child<2; ++child)
-	  {
-	    line->child(child)->clear_user_pointer();
-	    line->child(child)->clear_user_flag();
-	    line->child(child)->clear_used_flag();
-	  }
-
-	line->clear_children();
-      }
 }
 
 #endif
