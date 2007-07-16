@@ -370,12 +370,18 @@ namespace PETScWrappers
                                         * are stated in the first argument,
                                         * the corresponding values in the
                                         * second.
-					* If the flag @p add_values is true,
-					* the values are added to the vector.
                                         */
       void set (const std::vector<unsigned int> &indices,
-                const std::vector<PetscScalar>  &values,
-		const bool add_values = false);
+                const std::vector<PetscScalar>  &values);
+
+				       /**
+                                        * A collective add operation: This
+					* function adds a whole set of values
+					* stored in @p values to the vector
+					* components specified by @p indices.
+                                        */
+      void add (const std::vector<unsigned int> &indices,
+                const std::vector<PetscScalar>  &values);
       
                                        /**
                                         * Return the scalar product of two
@@ -677,6 +683,18 @@ namespace PETScWrappers
                                         * Make the reference class a friend.
                                         */
       friend class internal::VectorReference;
+
+				       /**
+                                        * Collective set or add
+                                        * operation: This function is
+                                        * invoked by the collective @p
+                                        * set and @p add with the
+                                        * @add_values flag set to the
+                                        * corresponding value.
+                                        */
+      void do_set_add_operation (const std::vector<unsigned int> &indices,
+				 const std::vector<PetscScalar>  &values,
+				 const bool add_values);
   };
 
 

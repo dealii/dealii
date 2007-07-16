@@ -216,51 +216,18 @@ namespace PETScWrappers
 
   void
   VectorBase::set (const std::vector<unsigned int> &indices,
-                   const std::vector<PetscScalar>  &values,
-		   const bool add_values)
+                   const std::vector<PetscScalar>  &values)
   {
-    Assert (indices.size() == values.size(),
-            ExcMessage ("Function called with arguments of different sizes"));
+    do_set_add_operation(indices, values, false);
+  }
 
-    if (last_action != VectorBase::LastAction::insert)
-      {
-        int ierr;
-        ierr = VecAssemblyBegin (vector);
-        AssertThrow (ierr == 0, ExcPETScError(ierr));
 
-        ierr = VecAssemblyEnd (vector);
-        AssertThrow (ierr == 0, ExcPETScError(ierr));
-      }
 
-				     // VecSetValues complains if we
-				     // come with an empty
-				     // vector. however, it is not a
-				     // collective operation, so we
-				     // can skip the call if necessary
-				     // (unlike the above calls)
-    if (indices.size() != 0)
-      {
-#if (PETSC_VERSION_MAJOR <= 2) && \
-    ((PETSC_VERSION_MINOR < 2) ||  \
-     ((PETSC_VERSION_MINOR == 2) && (PETSC_VERSION_SUBMINOR == 0)))
-	const std::vector<int> petsc_indices (indices.begin(),
-					      indices.end());
-#else
-	const std::vector<PetscInt> petsc_indices (indices.begin(),
-						   indices.end());
-#endif
-
-	InsertMode mode = INSERT_VALUES;
-	if (add_values)
-	  mode = ADD_VALUES;
-	const int ierr
-	  = VecSetValues (vector, indices.size(),
-			  &petsc_indices[0], &values[0],
-			  mode);
-	AssertThrow (ierr == 0, ExcPETScError(ierr));
-      }
-
-    last_action = LastAction::insert;
+  void
+  VectorBase::add (const std::vector<unsigned int> &indices,
+                   const std::vector<PetscScalar>  &values)
+  {
+    do_set_add_operation(indices, values, true);
   }
   
 
@@ -878,6 +845,57 @@ namespace PETScWrappers
   VectorBase::operator const Vec & () const
   {
     return vector;
+  }
+
+
+
+  void
+  VectorBase::do_set_add_operation (const std::vector<unsigned int> &indices,
+				    const std::vector<PetscScalar>  &values,
+				    const bool add_values)
+  {
+    Assert (indices.size() == values.size(),
+            ExcMessage ("Function called with arguments of different sizes"));
+
+    if (last_action != VectorBase::LastAction::insert)
+      {
+        int ierr;
+        ierr = VecAssemblyBegin (vector);
+        AssertThrow (ierr == 0, ExcPETScError(ierr));
+
+        ierr = VecAssemblyEnd (vector);
+        AssertThrow (ierr == 0, ExcPETScError(ierr));
+      }
+
+				     // VecSetValues complains if we
+				     // come with an empty
+				     // vector. however, it is not a
+				     // collective operation, so we
+				     // can skip the call if necessary
+				     // (unlike the above calls)
+    if (indices.size() != 0)
+      {
+#if (PETSC_VERSION_MAJOR <= 2) && \
+    ((PETSC_VERSION_MINOR < 2) ||  \
+     ((PETSC_VERSION_MINOR == 2) && (PETSC_VERSION_SUBMINOR == 0)))
+	const std::vector<int> petsc_indices (indices.begin(),
+					      indices.end());
+#else
+	const std::vector<PetscInt> petsc_indices (indices.begin(),
+						   indices.end());
+#endif
+
+	InsertMode mode = INSERT_VALUES;
+	if (add_values)
+	  mode = ADD_VALUES;
+	const int ierr
+	  = VecSetValues (vector, indices.size(),
+			  &petsc_indices[0], &values[0],
+			  mode);
+	AssertThrow (ierr == 0, ExcPETScError(ierr));
+      }
+
+    last_action = LastAction::insert;
   }
   
 }
