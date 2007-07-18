@@ -64,7 +64,8 @@ tests_x = block_matrices \
 	minimal_cell_diameter \
 	maximal_cell_diameter \
 	union_triangulation \
-	create_*
+	create_* \
+	line_coarsening_3d
 
 # from above list of regular expressions, generate the real set of
 # tests
