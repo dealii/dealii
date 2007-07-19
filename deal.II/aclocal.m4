@@ -608,7 +608,7 @@ AC_DEFUN(DEAL_II_SET_CXX_FLAGS, dnl
 	      CXXFLAGSG="$CXXFLAGS -DDEBUG -inline_debug_info"
               CXXFLAGSO="$CXXFLAGS -O2 -unroll"
               CXXFLAGSPIC="-fPIC"
-	      LDFLAGS="$LDFLAGS -lstdc++"
+	      LDFLAGS="$LDFLAGS -lstdc++ -lpthread"
               LDFLAGSPIC="-fPIC"
               ;;
           esac
