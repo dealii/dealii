@@ -95,6 +95,8 @@ namespace Functions
       virtual void vector_laplacians (const std::vector<Point<dim> > &points,
 				      std::vector<std::vector<double> >   &values) const = 0;
 
+      virtual void vector_value (const Point<dim>& points, Vector<double>& value) const;
+      virtual double value (const Point<dim>& points, const unsigned int component) const;
       virtual void vector_value_list (const std::vector<Point<dim> > &points,
 				      std::vector<Vector<double> >   &values) const;
       virtual void vector_gradient_list (const std::vector<Point<dim> >            &points,
@@ -165,6 +167,39 @@ namespace Functions
       const double Reynolds;
   };
   
+  
+/**
+ * Artificial divergence free function with homogeneous boundary
+ * conditions on the cube [-1,1]<sup>dim</sup>.
+ *
+ * @ingroup functions
+ * @author Guido Kanschat, 2007
+ */
+  template <int dim>
+  class StokesCosine :
+      public FlowFunction<dim>
+  {
+    public:
+				       /**
+					* Constructor setting the
+					* Reynolds number required for
+					* pressure computation.
+					*/
+      StokesCosine (const double Reynolds);
+      virtual ~StokesCosine();
+      
+      virtual void vector_values (const std::vector<Point<dim> >& points,
+				  std::vector<std::vector<double> >& values) const;
+      virtual void vector_gradients (const std::vector<Point<dim> >& points,
+				     std::vector<std::vector<Tensor<1,dim> > >& gradients) const;
+      virtual void vector_laplacians (const std::vector<Point<dim> > &points,
+				      std::vector<std::vector<double> >   &values) const;
+      
+    private:
+      const double Reynolds;
+  };
+  
+  
 /**
  * The solution to Stokes' equations on an L-shaped domain.
  *
@@ -199,6 +234,49 @@ namespace Functions
       static const double lambda;
 				       /// Cosine of #lambda times #omega
       const double coslo;
+  };
+  
+/**
+ * Flow solution in 2D by Kovasznay (1947).
+ *
+ * This function is valid on the half plane right of the line
+ * <i>x=1/2</i>.
+ *
+ * @ingroup functions
+ * @author Guido Kanschat, 2007
+ */
+  class Kovasznay : public FlowFunction<2>
+  {
+    public:
+				       /**
+					* Construct an object for the
+					* give Reynolds number
+					* <tt>Re</tt>. If the
+					* parameter <tt>Stokes</tt> is
+					* true, the right hand side of
+					* the momentum equation
+					* returned by
+					* vector_laplacians() contains
+					* the nonlinearity, such that
+					* the Kovasznay solution can
+					* be obtained as the solution
+					* to a Stokes problem.
+					*/
+      Kovasznay (const double Re, bool Stokes = false);
+      virtual ~Kovasznay();
+      
+      virtual void vector_values (const std::vector<Point<2> >& points,
+				  std::vector<std::vector<double> >& values) const;
+      virtual void vector_gradients (const std::vector<Point<2> >& points,
+				     std::vector<std::vector<Tensor<1,2> > >& gradients) const;
+      virtual void vector_laplacians (const std::vector<Point<2> > &points,
+				      std::vector<std::vector<double> >   &values) const;
+
+    private:
+      const double Reynolds;
+      double lambda;
+      double p_average;
+      const bool stokes;
   };
   
 }
