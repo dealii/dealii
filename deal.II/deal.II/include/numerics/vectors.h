@@ -620,32 +620,9 @@ class VectorTools
                                  const std::vector<bool>       &component_mask = std::vector<bool>());
 
 				     /**
-				      * Declaration of specialization
-				      * of the previous function for
-				      * 1d and a DoFHandler.
-				      */
-    static
-    void
-    interpolate_boundary_values (const Mapping<1>              &mapping,
-                                 const DoFHandler<1>           &dof,
-                                 const FunctionMap<1>::type    &function_map,
-                                 std::map<unsigned int,double> &boundary_values,
-                                 const std::vector<bool>       &component_mask = std::vector<bool>());
-
-				     /**
-				      * Declaration of specialization
-				      * of the previous function for
-				      * 1d and a hp::DoFHandler().
-				      */
-    static
-    void
-    interpolate_boundary_values (const Mapping<1>              &mapping,
-                                 const hp::DoFHandler<1>         &dof,
-                                 const FunctionMap<1>::type    &function_map,
-                                 std::map<unsigned int,double> &boundary_values,
-                                 const std::vector<bool>       &component_mask = std::vector<bool>());
-
-				     /**
+				      * @deprecated This function is there mainly
+				      * for backward compatibility.
+				      *
 				      * Same function as above, but
 				      * taking only one pair of
 				      * boundary indicator and
@@ -654,8 +631,6 @@ class VectorTools
 				      * function with remapped
 				      * arguments.
 				      *
-				      * This function is there mainly
-				      * for backward compatibility.
 				      */
     template <int dim, template <int> class DH>
     static
@@ -667,22 +642,6 @@ class VectorTools
                                  std::map<unsigned int,double> &boundary_values,
                                  const std::vector<bool>       &component_mask = std::vector<bool>());
 
-				     /**
-				      * Declaration of specialization
-				      * of the previous function for
-				      * 1d.
-				      */
-    template <template <int> class DH>
-    static
-    void
-    interpolate_boundary_values (const Mapping<1>              &mapping,
-                                 const DH<1>                   &dof,
-                                 const unsigned char            boundary_component,
-                                 const Function<1>             &boundary_function,
-                                 std::map<unsigned int,double> &boundary_values,
-                                 const std::vector<bool>       &component_mask = std::vector<bool>());
-
-    
 				     /**
 				      * Calls the other
 				      * @p interpolate_boundary_values
@@ -730,6 +689,11 @@ class VectorTools
 				      * matches that of the finite
 				      * element used by @p dof.
 				      *
+				      * In 1d, projection equals
+				      * interpolation. Therefore,
+				      * interpolate_boundary_values is
+				      * called.
+				      *
 				      * See the general documentation of this
 				      * class for further information.
 				      */
@@ -738,20 +702,6 @@ class VectorTools
 					 const DoFHandler<dim>    &dof,
 					 const typename FunctionMap<dim>::type &boundary_functions,
 					 const Quadrature<dim-1>  &q,
-					 std::map<unsigned int,double> &boundary_values);
-
-				     /**
-				      * Declaration of specialization
-				      * of the previous function for
-				      * 1d. Since in 1d projection
-				      * equals interpolation, the
-				      * interpolation function is
-				      * called.
-				      */
-    static void project_boundary_values (const Mapping<1>           &mapping,
-					 const DoFHandler<1>        &dof,
-					 const FunctionMap<1>::type &boundary_functions,
-					 const Quadrature<0>        &q,
 					 std::map<unsigned int,double> &boundary_values);
 
 				     /**
@@ -889,20 +839,6 @@ class VectorTools
 						 const std::set<unsigned char> &boundary_indicators = std::set<unsigned char>());
 
 				     /**
-				      * Specialization of above
-				      * function for 1d. Since the
-				      * computation is not useful in
-				      * 1d, this function simply
-				      * throws an exception.
-				      */
-    static void create_boundary_right_hand_side (const Mapping<1>    &mapping,
-						 const DoFHandler<1> &dof,
-						 const Quadrature<0> &q,
-						 const Function<1>   &rhs,
-						 Vector<double>      &rhs_vector,
-						 const std::set<unsigned char> &boundary_indicators = std::set<unsigned char>());
-
-				     /**
 				      * Calls the
 				      * @p create_boundary_right_hand_side
 				      * function, see above, with
@@ -925,20 +861,6 @@ class VectorTools
 						 const hp::QCollection<dim-1> &q,
 						 const Function<dim>     &rhs,
 						 Vector<double>          &rhs_vector,
-						 const std::set<unsigned char> &boundary_indicators = std::set<unsigned char>());
-
-				     /**
-				      * Specialization of above
-				      * function for 1d. Since the
-				      * computation is not useful in
-				      * 1d, this function simply
-				      * throws an exception.
-				      */
-    static void create_boundary_right_hand_side (const hp::MappingCollection<1>    &mapping,
-						 const hp::DoFHandler<1> &dof,
-						 const hp::QCollection<0> &q,
-						 const Function<1>   &rhs,
-						 Vector<double>      &rhs_vector,
 						 const std::set<unsigned char> &boundary_indicators = std::set<unsigned char>());
 
 				     /**

@@ -980,15 +980,17 @@ VectorTools::create_boundary_right_hand_side (const Mapping<dim>      &mapping,
 
 #else
 
+// Implementation for 1D
+template <int dim>
 void
-VectorTools::create_boundary_right_hand_side (const Mapping<1>    &,
-					      const DoFHandler<1> &,
-					      const Quadrature<0> &,
-					      const Function<1>   &,
+VectorTools::create_boundary_right_hand_side (const Mapping<dim>    &,
+					      const DoFHandler<dim> &,
+					      const Quadrature<dim-1> &,
+					      const Function<dim>   &,
 					      Vector<double>      &,
 					      const std::set<unsigned char> &)
 {
-  Assert (false, ExcImpossibleInDim(1));
+  Assert (false, ExcImpossibleInDim(dim));
 }
 
 #endif
@@ -1145,11 +1147,13 @@ VectorTools::create_boundary_right_hand_side (const hp::MappingCollection<dim>  
 
 #else
 
+// Implementation for 1D
+template <int dim>
 void
-VectorTools::create_boundary_right_hand_side (const hp::MappingCollection<1>    &,
-					      const hp::DoFHandler<1> &,
-					      const hp::QCollection<0> &,
-					      const Function<1>   &,
+VectorTools::create_boundary_right_hand_side (const hp::MappingCollection<dim>    &,
+					      const hp::DoFHandler<dim> &,
+					      const hp::QCollection<dim-1> &,
+					      const Function<dim>   &,
 					      Vector<double>      &,
 					      const std::set<unsigned char> &)
 {
@@ -1180,12 +1184,12 @@ VectorTools::create_boundary_right_hand_side (const hp::DoFHandler<dim>   &dof_h
 
 //TODO[?] Actually the Mapping object should be a MappingCollection object for the
 // hp::DoFHandler.
-template <template <int> class DH>
+template <int dim, template <int> class DH>
 void
-VectorTools::interpolate_boundary_values (const Mapping<1>         &,
-					  const DH<1>              &dof,
+VectorTools::interpolate_boundary_values (const Mapping<dim>         &,
+					  const DH<dim>              &dof,
 					  const unsigned char       boundary_component,
-					  const Function<1>        &boundary_function,
+					  const Function<dim>        &boundary_function,
 					  std::map<unsigned int,double> &boundary_values,
 					  const std::vector<bool>       &component_mask_)
 {
@@ -1207,7 +1211,7 @@ VectorTools::interpolate_boundary_values (const Mapping<1>         &,
 				   // cell by first traversing the coarse
 				   // grid to its end and then going
 				   // to the children
-  typename DH<1>::cell_iterator outermost_cell = dof.begin(0);
+  typename DH<dim>::cell_iterator outermost_cell = dof.begin(0);
   while (outermost_cell->neighbor(direction).state() == IteratorState::valid)
     outermost_cell = outermost_cell->neighbor(direction);
   
@@ -1216,7 +1220,7 @@ VectorTools::interpolate_boundary_values (const Mapping<1>         &,
 
                                    // get the FE corresponding to this
                                    // cell
-  const FiniteElement<1> &fe = outermost_cell->get_fe();
+  const FiniteElement<dim> &fe = outermost_cell->get_fe();
   Assert (fe.n_components() == boundary_function.n_components,
 	  ExcDimensionMismatch(fe.n_components(), boundary_function.n_components));
 
@@ -1257,14 +1261,17 @@ VectorTools::interpolate_boundary_values (const Mapping<1>         &,
 
 //TODO[?] Actually the Mapping object should be a MappingCollection object for the
 // hp::DoFHandler.
+
+// Implementation for 1D
+template <int dim, template <int> class DH>
 void
-VectorTools::interpolate_boundary_values (const Mapping<1>              &mapping,
-					  const DoFHandler<1>           &dof,
-					  const FunctionMap<1>::type    &function_map,
+VectorTools::interpolate_boundary_values (const Mapping<dim>              &mapping,
+					  const DH<dim>           &dof,
+					  const typename FunctionMap<dim>::type    &function_map,
 					  std::map<unsigned int,double> &boundary_values,
 					  const std::vector<bool>       &component_mask)
 {
-  for (FunctionMap<1>::type::const_iterator i=function_map.begin();
+  for (typename FunctionMap<dim>::type::const_iterator i=function_map.begin();
        i!=function_map.end(); ++i)
     interpolate_boundary_values (mapping, dof, i->first, *i->second,
 				 boundary_values, component_mask);
@@ -1273,21 +1280,9 @@ VectorTools::interpolate_boundary_values (const Mapping<1>              &mapping
 
 //TODO[?] Actually the Mapping object should be a MappingCollection object for the
 // hp::DoFHandler.
-void
-VectorTools::interpolate_boundary_values (const Mapping<1>              &mapping,
-					  const hp::DoFHandler<1>           &dof,
-					  const FunctionMap<1>::type    &function_map,
-					  std::map<unsigned int,double> &boundary_values,
-					  const std::vector<bool>       &component_mask)
-{
-  for (FunctionMap<1>::type::const_iterator i=function_map.begin();
-       i!=function_map.end(); ++i)
-    interpolate_boundary_values (mapping, dof, i->first, *i->second,
-				 boundary_values, component_mask);
-}
 
 
-#endif
+#else
 
 
 template <int dim, template <int> class DH>
@@ -1615,7 +1610,7 @@ VectorTools::interpolate_boundary_values (const Mapping<dim>            &mapping
 			       component_mask);
 }
 
-
+#endif
   
 //TODO[?] Change for real hp::DoFHandler
 // This function might not work anymore if the real hp::DoFHandler is available.
@@ -1653,11 +1648,13 @@ VectorTools::interpolate_boundary_values (const DH<dim>                 &dof,
 
 #if deal_II_dimension == 1
 
+// Implementation for 1D
+template <int dim>
 void
-VectorTools::project_boundary_values (const Mapping<1>       &mapping,
-				      const DoFHandler<1>    &dof,
-				      const FunctionMap<1>::type &boundary_functions,
-				      const Quadrature<0>  &,
+VectorTools::project_boundary_values (const Mapping<dim>       &mapping,
+				      const DoFHandler<dim>    &dof,
+				      const typename FunctionMap<dim>::type &boundary_functions,
+				      const Quadrature<dim-1>  &,
 				      std::map<unsigned int,double> &boundary_values)
 {
 				   // projection in 1d is equivalent
@@ -1666,7 +1663,7 @@ VectorTools::project_boundary_values (const Mapping<1>       &mapping,
 			       boundary_values, std::vector<bool>());
 }
 
-#endif
+#else
 
 
 template <int dim>
@@ -1768,6 +1765,7 @@ VectorTools::project_boundary_values (const Mapping<dim>       &mapping,
       boundary_values[i] = boundary_projection(dof_to_boundary_mapping[i]);
 }
 
+#endif
 
 template <int dim>
 void

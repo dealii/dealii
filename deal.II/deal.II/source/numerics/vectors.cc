@@ -89,7 +89,6 @@ void VectorTools::create_point_source_vector<deal_II_dimension>
  const Point<deal_II_dimension>      &,
  Vector<double>                      &);
 
-#if deal_II_dimension != 1
 template
 void
 VectorTools::create_boundary_right_hand_side<deal_II_dimension>
@@ -99,7 +98,6 @@ VectorTools::create_boundary_right_hand_side<deal_II_dimension>
  const Function<deal_II_dimension>   &,
  Vector<double>                      &,
  const std::set<unsigned char> &);
-#endif
 
 template
 void
@@ -110,7 +108,6 @@ VectorTools::create_boundary_right_hand_side<deal_II_dimension>
  Vector<double>                      &,
  const std::set<unsigned char> &);
 
-#if deal_II_dimension != 1
 template
 void
 VectorTools::create_boundary_right_hand_side<deal_II_dimension>
@@ -120,7 +117,6 @@ VectorTools::create_boundary_right_hand_side<deal_II_dimension>
  const Function<deal_II_dimension>   &,
  Vector<double>                      &,
  const std::set<unsigned char> &);
-#endif
 
 template
 void
@@ -155,7 +151,6 @@ void VectorTools::interpolate_boundary_values<deal_II_dimension> (
   std::map<unsigned int,double>       &,
   const std::vector<bool>    &);
 
-#if deal_II_dimension != 1
 template
 void VectorTools::project_boundary_values<deal_II_dimension>
 (const Mapping<deal_II_dimension>     &,
@@ -163,7 +158,6 @@ void VectorTools::project_boundary_values<deal_II_dimension>
  const FunctionMap<deal_II_dimension>::type &,
  const Quadrature<deal_II_dimension-1>&,
  std::map<unsigned int,double>        &);
-#endif
 
 template
 void VectorTools::project_boundary_values<deal_II_dimension>
@@ -174,22 +168,22 @@ void VectorTools::project_boundary_values<deal_II_dimension>
 
 
 
-// Due to introducing the DoFHandler as a template parameter,
-// the following instantiations are required in 1d
-#if deal_II_dimension == 1
-template
-void VectorTools::interpolate_boundary_values<deal_II_dimension> 
-(const Mapping<1>         &,
- const DoFHandler<1>      &,
- const unsigned char,
- const Function<1>        &,
- std::map<unsigned int,double> &,
- const std::vector<bool>       &);
-#endif
+// // Due to introducing the DoFHandler as a template parameter,
+// // the following instantiations are required in 1d
+// #if deal_II_dimension == 1
+// template
+// void VectorTools::interpolate_boundary_values<deal_II_dimension> 
+// (const Mapping<1>         &,
+//  const DoFHandler<1>      &,
+//  const unsigned char,
+//  const Function<1>        &,
+//  std::map<unsigned int,double> &,
+//  const std::vector<bool>       &);
+// #endif
 
 // the following two functions are not derived from a template in 1d
 // and thus need no explicit instantiation
-#if deal_II_dimension > 1
+//#if deal_II_dimension > 1
 template
 void VectorTools::interpolate_boundary_values<deal_II_dimension>
 (const Mapping<deal_II_dimension>    &,
@@ -207,7 +201,7 @@ void VectorTools::interpolate_boundary_values<deal_II_dimension>
  std::map<unsigned int,double>       &,
  const std::vector<bool>    &);
 
-#endif
+//#endif
 
 
 template
