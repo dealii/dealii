@@ -23,6 +23,7 @@
 #include <algorithm>
 #include <list>
 #include <sstream>
+#include <cctype>
 
 #ifdef HAVE_STD_NUMERIC_LIMITS
 # include <limits>
@@ -315,10 +316,10 @@ namespace Patterns
 	  tmp = "";
       
 	while ((name.length() != 0) &&
-	       (name[0] == ' '))
+	       (std::isspace (name[0])))
 	  name.erase (0,1);
 
-	while (name[name.length()-1] == ' ')
+	while (std::isspace (name[name.length()-1]))
 	  name.erase (name.length()-1, 1);
 
 	split_list.push_back (name);
@@ -402,9 +403,9 @@ namespace Patterns
 	  tmp = "";
       
 	while ((name.length() != 0) &&
-	       (name[0] == ' '))
+	       (std::isspace (name[0])))
 	  name.erase (0,1);
-	while (name[name.length()-1] == ' ')
+	while (std::isspace (name[name.length()-1]))
 	  name.erase (name.length()-1, 1);
 
 	split_list.push_back (name);
@@ -1253,11 +1254,11 @@ ParameterHandler::scan_line (std::string        line,
   				   // now every existing whitespace
 				   // should be exactly one ' ';
 				   // if at end or beginning: delete
-  if ((line.length() != 0) && (line[0] == ' '))  line.erase (0, 1);
+  if ((line.length() != 0) && (std::isspace (line[0])))  line.erase (0, 1);
 				   // if line is now empty: leave
   if (line.length() == 0) return true;
 
-  if (line[line.length()-1] == ' ')
+  if (std::isspace (line[line.length()-1]))
     line.erase (line.size()-1, 1);
 
 				   // enter subsection
@@ -1780,8 +1781,8 @@ void MultipleParameterLoop::Entry::split_different_values ()
     multiple.erase (multiple.size()-1, 1);
 				   // erase leading and trailing spaces
 				   // in multiple
-  while (multiple[0] == ' ') multiple.erase (0,1);
-  while (multiple[multiple.size()-1] == ' ') multiple.erase (multiple.size()-1,1);
+  while (std::isspace (multiple[0])) multiple.erase (0,1);
+  while (std::isspace (multiple[multiple.size()-1])) multiple.erase (multiple.size()-1,1);
   
 				   // delete spaces around '|'
   while (multiple.find(" |") != std::string::npos)
