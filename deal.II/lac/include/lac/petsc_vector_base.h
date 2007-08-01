@@ -689,7 +689,7 @@ namespace PETScWrappers
                                         * operation: This function is
                                         * invoked by the collective @p
                                         * set and @p add with the
-                                        * @add_values flag set to the
+                                        * @p add_values flag set to the
                                         * corresponding value.
                                         */
       void do_set_add_operation (const std::vector<unsigned int> &indices,
