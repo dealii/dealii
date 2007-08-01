@@ -72,9 +72,8 @@ class LaplaceProblem
     void assemble_system ();
     void solve ();
     void create_coarse_grid ();
-    void refine_grid ();
     void estimate_smoothness (Vector<float> &smoothness_indicators) const;
-    void output_results (const unsigned int cycle) const;
+    void postprocess (const unsigned int cycle);
 
     Triangulation<dim>   triangulation;
 
@@ -178,6 +177,8 @@ void LaplaceProblem<dim>::setup_system ()
   system_matrix.reinit (sparsity_pattern);
 }
 
+
+
 template <int dim>
 void LaplaceProblem<dim>::assemble_system () 
 {
@@ -263,16 +264,6 @@ void LaplaceProblem<dim>::solve ()
   hanging_node_constraints.distribute (solution);
 }
 
-
-unsigned int
-int_pow (const unsigned int x,
-	 const unsigned int n)
-{
-  unsigned int p=1;
-  for (unsigned int i=0; i<n; ++i)
-    p *= x;
-  return p;
-}
 
 
 template <int dim>
@@ -445,10 +436,11 @@ estimate_smoothness (Vector<float> &smoothness_indicators) const
 
 
 
-  
 template <int dim>
-void LaplaceProblem<dim>::refine_grid ()
+void LaplaceProblem<dim>::postprocess (const unsigned int cycle)
 {
+  Assert (cycle < 10, ExcNotImplemented());
+  
   Vector<float> estimated_error_per_cell (triangulation.n_active_cells());
   KellyErrorEstimator<dim>::estimate (dof_handler,
 				      face_quadrature_collection,
@@ -459,67 +451,7 @@ void LaplaceProblem<dim>::refine_grid ()
   Vector<float> smoothness_indicators (triangulation.n_active_cells());
   estimate_smoothness (smoothness_indicators);
   
-  GridRefinement::refine_and_coarsen_fixed_number (triangulation,
-						   estimated_error_per_cell,
-						   0.3, 0.03);
-
-  float max_smoothness = 0,
-	 min_smoothness = smoothness_indicators.linfty_norm();
   {
-    typename hp::DoFHandler<dim>::active_cell_iterator
-      cell = dof_handler.begin_active(),
-      endc = dof_handler.end();
-    for (unsigned int index=0; cell!=endc; ++cell, ++index)
-      if (cell->refine_flag_set())
-	{
-	  max_smoothness = std::max (max_smoothness,
-				     smoothness_indicators(index));
-	  min_smoothness = std::min (min_smoothness,
-				     smoothness_indicators(index));
-	}
-  }
-  const float cutoff_smoothness = (max_smoothness + min_smoothness) / 2;
-  {
-    typename hp::DoFHandler<dim>::active_cell_iterator
-      cell = dof_handler.begin_active(),
-      endc = dof_handler.end();
-    for (unsigned int index=0; cell!=endc; ++cell, ++index)
-      if (cell->refine_flag_set()
-	  &&
-	  (smoothness_indicators(index) > cutoff_smoothness)
-	  &&
-	  !(cell->active_fe_index() == fe_collection.size() - 1))
-	{
-	  cell->clear_refine_flag();
-	  cell->set_active_fe_index (std::min (cell->active_fe_index() + 1,
-					       fe_collection.size() - 1));
-	}
-  } 
-  
-  triangulation.execute_coarsening_and_refinement ();
-}
-
-
-
-template <int dim>
-void LaplaceProblem<dim>::output_results (const unsigned int cycle) const
-{
-  Assert (cycle < 10, ExcNotImplemented());
-  
-  {
-    const std::string filename = "grid-" +
-				 Utilities::int_to_string (cycle, 2) +
-				 ".eps";
-    std::ofstream output (filename.c_str());
-    
-    GridOut grid_out;
-    grid_out.write_eps (triangulation, output);
-  }
-  
-  {
-    Vector<float> smoothness_indicators (triangulation.n_active_cells());
-    estimate_smoothness (smoothness_indicators);
-
     Vector<float> fe_indices (triangulation.n_active_cells());
     {
       typename hp::DoFHandler<dim>::active_cell_iterator
@@ -542,6 +474,48 @@ void LaplaceProblem<dim>::output_results (const unsigned int cycle) const
   
     std::ofstream output (filename.c_str());
     data_out.write_gmv (output);
+  }
+  
+  {
+    GridRefinement::refine_and_coarsen_fixed_number (triangulation,
+						     estimated_error_per_cell,
+						     0.3, 0.03);
+
+    float max_smoothness = 0,
+	  min_smoothness = smoothness_indicators.linfty_norm();
+    {
+      typename hp::DoFHandler<dim>::active_cell_iterator
+	cell = dof_handler.begin_active(),
+	endc = dof_handler.end();
+      for (unsigned int index=0; cell!=endc; ++cell, ++index)
+	if (cell->refine_flag_set())
+	  {
+	    max_smoothness = std::max (max_smoothness,
+				       smoothness_indicators(index));
+	    min_smoothness = std::min (min_smoothness,
+				       smoothness_indicators(index));
+	  }
+    }
+
+    const float cutoff_smoothness = (max_smoothness + min_smoothness) / 2;
+    {
+      typename hp::DoFHandler<dim>::active_cell_iterator
+	cell = dof_handler.begin_active(),
+	endc = dof_handler.end();
+      for (unsigned int index=0; cell!=endc; ++cell, ++index)
+	if (cell->refine_flag_set()
+	    &&
+	    (smoothness_indicators(index) > cutoff_smoothness)
+	    &&
+	    !(cell->active_fe_index() == fe_collection.size() - 1))
+	  {
+	    cell->clear_refine_flag();
+	    cell->set_active_fe_index (std::min (cell->active_fe_index() + 1,
+						 fe_collection.size() - 1));
+	  }
+    } 
+  
+    triangulation.execute_coarsening_and_refinement ();
   }
 }
 
@@ -622,15 +596,12 @@ void LaplaceProblem<2>::create_coarse_grid ()
 template <int dim>
 void LaplaceProblem<dim>::run () 
 {
-  for (unsigned int cycle=0; cycle<3; ++cycle)
+  for (unsigned int cycle=0; cycle<5; ++cycle)
     {
       std::cout << "Cycle " << cycle << ':' << std::endl;
 
       if (cycle == 0)
 	create_coarse_grid ();
-      else
-	refine_grid ();
-      
 
       std::cout << "   Number of active cells:       "
 		<< triangulation.n_active_cells()
@@ -650,7 +621,7 @@ void LaplaceProblem<dim>::run ()
 
       solve ();
       
-      output_results (cycle);
+      postprocess (cycle);
     }
 }
 
