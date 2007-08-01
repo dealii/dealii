@@ -1,6 +1,13 @@
 <a name="Intro"></a>
 <h1>Introduction</h1>
 
+This tutorial program attempts to show how to use $hp$ finite element methods
+with deal.II. It solves the Laplace equation and so builds only on the first
+few tutorial programs, in particular on @ref step_4 "step-4" for dimension
+independent programming and @ref step_6 "step-6" for adaptive mesh
+refinement. 
+
+
 <h3>A simple indicator for smoothness</h3>
 
 One of the central pieces of the adaptive finite element method is that we
@@ -8,8 +15,7 @@ inspect the computed solution (a posteriori) with an indicator that tells us
 which are the cells where the error is largest, and then refine them. In many
 of the other tutorial programs, we use the KellyErrorEstimator class to get an
 indication of the size of the error on a cell, although we also discuss more
-complicated strategies in some programs, most importantly in @ref step_14
-"step-14". 
+complicated strategies in some programs, most importantly in @ref step_14 "step-14". 
 
 In any case, as long as the decision is only "refine this cell" or "do not
 refine this cell", the actual refinement step is not particularly
