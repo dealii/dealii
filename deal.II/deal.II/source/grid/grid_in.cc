@@ -251,7 +251,8 @@ void GridIn<dim>::read_dbmesh (std::istream &in)
 				   // knowledge to parse and interpret
 				   // the other fields in between as
 				   // well...
-  while (getline(in,line), line.find("# END")==std::string::npos);
+  while (getline(in,line), line.find("# END")==std::string::npos)
+    ;
   skip_empty_lines (in);
 
 
@@ -356,7 +357,8 @@ void GridIn<dim>::read_dbmesh (std::istream &in)
 				   // clue what they mean. skip them
 				   // all and leave the interpretation
 				   // to other implementors...
-  while (getline(in,line), ((line.find("End")==std::string::npos) && (in)));
+  while (getline(in,line), ((line.find("End")==std::string::npos) && (in)))
+    ;
 				   // ok, so we are not at the end of
 				   // the file, that's it, mostly
 
@@ -1719,7 +1721,9 @@ void GridIn<dim>::skip_comment_lines (std::istream &in,
   while ((c=in.get()) == comment_start)
 				     // loop over the characters after
 				     // the comment starter
-    while (in.get() != '\n');
+    while (in.get() != '\n')
+      ;
+  
   
 				   // put back first character of
 				   // first non-comment line

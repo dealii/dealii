@@ -2,7 +2,7 @@
 //    $Id$
 //    Version: $Name$
 //
-//    Copyright (C) 1998, 1999, 2000, 2001, 2002, 2003, 2004, 2005, 2006 by the deal.II authors
+//    Copyright (C) 1998, 1999, 2000, 2001, 2002, 2003, 2004, 2005, 2006, 2007 by the deal.II authors
 //
 //    This file is subject to QPL and may not be  distributed
 //    without copyright and license information. Please refer
@@ -61,7 +61,8 @@ void advance_by_n (CellIterator &cell,
 				   // dereferencing cell-> triggers an
 				   // assertion)
   const CellIterator endc = cell->get_dof_handler().end();
-  for (unsigned int t=0; ((t<n) && (cell!=endc)); ++t, ++cell);
+  for (unsigned int t=0; ((t<n) && (cell!=endc)); ++t, ++cell)
+    ;
 }
 
 
@@ -712,7 +713,9 @@ estimate_some (const hp::MappingCollection<dim>                  &mapping,
 				   // `hard' cells to the different
 				   // threads.
   for (unsigned int t=0; (t<this_thread.first) && (cell!=dof_handler.end());
-       ++t, ++cell);
+       ++t, ++cell)
+    ;
+  
 
   
 				   // loop over all cells for this thread
