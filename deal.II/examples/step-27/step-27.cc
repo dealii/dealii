@@ -510,6 +510,7 @@ void LaplaceProblem<dim>::postprocess (const unsigned int cycle)
 	    !(cell->active_fe_index() == fe_collection.size() - 1))
 	  {
 	    cell->clear_refine_flag();
+					     // REMOVE redundant std::min
 	    cell->set_active_fe_index (std::min (cell->active_fe_index() + 1,
 						 fe_collection.size() - 1));
 	  }

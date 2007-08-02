@@ -41,13 +41,153 @@ we will have to discuss the following aspects:
   <li>Degrees of freedom will then have to be allocated on each cell depending
   on what finite element is associated with this particular cell. Constraints
   will have to generated in the same way as for hanging nodes, but now also
-  including the case where two neighboring cells 
+  including the case where two neighboring cells.
 
-  <li>We will need to 
+  <li>We will need to be able to assemble cell and face contributions
+  to global matrices and right hand side vectors.
+
+  <li>After solving the resulting linear system, we will want to
+  analyze the solution. In particular, we will want to compute error
+  indicators that tell us whether a given cell should be refined
+  and/or whether the polynomial degree of the shape functions used on
+  it should be increased.
 </ul>
 
+We will discuss all these aspects in the following subsections of this
+introduction. It will not come as a big surprise that most of these
+tasks are already well supported by functionality provided by the
+deal.II libraries, and that we will only have to provide the logic of
+what the program should do, not exactly how all this is going to
+happen. 
 
-<h3>A simple indicator for smoothness</h3>
+In deal.II, the $hp$ functionality is largely packaged into
+the @ref hp namespace. This namespace provides classes that handle
+$hp$ discretizations, assembling matrices and vectors, and other
+tasks. We will get to know many of them further down below. In
+addition, many of the functions in the DoFTools, and VectorTools
+classes accept $hp$ objects in addition to the non-$hp$ ones.
+
+It may be worth giving a slightly larger perspective at the end of
+this first part of the introduction. $hp$ functionality has been
+implemented in a number of different finite element packages (see, for
+example, the list of references cited in the @ref hp_paper "hp paper"). 
+However, by and large, most of these packages have implemented it only
+for the (i) the 2d case, and/or (ii) the discontinuous Galerkin
+method. The latter is a significant simplification because
+discontinuous finite elements by definition do not require continuity
+across faces between cells and therefore do not require the special
+treatment otherwise necessary whenever finite elements of different
+polynomial degree meet at a common face. In contrast, deal.II
+implements the most general case, i.e. it allows for continuous and
+discontinuous elements in 1d, 2d, and 3d, and automatically handles
+the resulting complexity. In particular, it handles computing the
+constraints (similar to hanging node constraints) of elements of
+different degree meeting at a face or edge. The many algorithmic and
+data structure techniques necessary for this are described in the 
+@ref hp_paper "hp paper" for those interested in such detail.
+
+We hope that providing such a general implementation will help explore
+the potential of $hp$ methods further.
+
+
+<h3>Finite element collections</h3>
+
+Now on again to the details of how to use the $hp$ functionality in
+deal.II. The first aspect we have to deal with is that now we do not
+have only a single finite element any more that is used on all cells,
+but a number of different elements that cells can choose to use. For
+this, deal.II introduces the concept of a <i>finite element
+collection</i>, implemented in the class hp::FECollection. In essence,
+such a collection acts like an object of type
+<code>std::vector@<FiniteElement@></code>, but with a few more bells
+and whistles and a memory management better suited to the task at
+hand. As we will later see, we will also use similar quadrature
+collections, and &mdash; although we don't use them here &mdash; there
+is also the concept of mapping collections. All of these classes are
+described in the @ref hpcollection overview.
+
+In this tutorial program, we will use continuous Lagrange elements of
+orders 2 through 7 (in 2d) or 2 through 5 (in 3d). The collection of
+used elements can then be created as follows:
+<code>
+<pre>
+  hp::FECollection<dim> fe_collection;
+  for (unsigned int degree=2; degree<=max_degree; ++degree)
+    fe_collection.push_back (FE_Q<dim>(degree));
+</pre>
+</code>
+
+
+
+<h3>The hp::DoFHandler class, associating cells with finite
+elements, and constraints</h3>
+
+The next task we have to consider is what to do with the list of
+finite element objects we want to use. In previous tutorial programs,
+starting with @ref step_2 "step-2", we have seen that the DoFHandler
+class is responsible for making the connection between a mesh
+(described by a Triangulation object) and a finite element, by
+allocating the correct number of degrees of freedom for each vertex,
+face, edge, and cell of the mesh.
+
+The situation here is a bit more complicated since we do not just have
+a single finite element object, but rather may want to use different
+elements on different cells. We therefore need two things: (i) a
+version of the DoFHandler class that can deal with this situation, and
+(ii) a way to tell the DoF handler which element to use on which cell.
+
+The first of these two things is implemented in the hp::DoFHandler
+class: rather than associating it with a triangulation and a single
+finite element object, it is associated with a triangulation and a
+finite element collection. The second part is achieved by a loop over
+all cells of this hp::DoFHandler and for each cell setting the index
+of the finite element within the collection that shall be used on this
+cell. We call the index of the finite element object within the
+collection that shall be used on a cell the cell's <i>active FE
+index</i> to indicate that this is the finite element that is active
+on this cell, whereas all the other elements of the collection are
+inactive on it. The general outline of this reads like this:
+
+<code>
+<pre>
+  hp::DoFHandler<dim> dof_handler (triangulation);
+  for (typename hp::DoFHandler<dim>::active_cell_iterator
+         cell = dof_handler.begin_active();
+       cell != dof_handler.end(); ++cell)
+    cell->set_active_fe_index (...);
+  dof_handler.distribute_dofs (fe_collection);
+</pre>
+</code>
+
+Dots in the call to <code>set_active_fe_index()</code> indicate that
+we will have to have some sort of strategy later on to decide which
+element to use on which cell; we will come back to this later. The
+main point here is that the first and last line of this code snippet
+is pretty much exactly the same as for the non-$hp$ case.
+
+Another complication arises from the fact that this time we do not
+simply have hanging nodes from local mesh refinement, but we also have
+to deal with the case that if there are two cells with different
+active finite element indices meeting at a face (for example a Q2 and
+a Q3 element) then we have to compute additional constraints on the
+finite element field to ensure that it is continuous. This is
+conceptually very similar to how we compute hanging node constraints,
+and in fact the code looks exactly the same:
+<code>
+<pre>
+  ConstraintMatrix constraints;
+  DoFTools::make_hanging_node_constraints (dof_handler,
+					   constraints);
+</pre>
+</code>
+In other words, the DoFTools::make_hanging_node_constraints deals not
+only with hanging node constraints, but also with $hp$ constraints at
+the same time.
+
+
+<h3>Assembling matrices and vectors with $hp$ objects</h3>
+
+<h3>A simple indicator for $hp$ refinement and estimating smoothness</h3>
 
 One of the central pieces of the adaptive finite element method is that we
 inspect the computed solution (a posteriori) with an indicator that tells us
