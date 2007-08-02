@@ -47,6 +47,7 @@ tests_x =  geometry_info_* \
 	   data_out_base_povray \
 	   data_out_base_tecplot \
 	   data_out_base_vtk \
+	   function_* \
            functions_* \
 	   function_parser \
 	   utilities_* \
