@@ -2,7 +2,7 @@
 //    $Id$
 //    Version: $Name$ 
 //
-//    Copyright (C) 2000, 2001, 2002, 2003, 2004, 2005 by the deal.II authors
+//    Copyright (C) 2000, 2001, 2002, 2003, 2004, 2005, 2007 by the deal.II authors
 //
 //    This file is subject to QPL and may not be  distributed
 //    without copyright and license information. Please refer
@@ -32,7 +32,7 @@ class AutoSinExp: public AutoDerivativeFunction<dim>
 {
   public:
     AutoSinExp();
-    virtual ~AutoSinExp() {};
+    virtual ~AutoSinExp() {}
     
     virtual double value (const Point<dim>   &p,
 			  const unsigned int  component = 0) const;
@@ -79,8 +79,8 @@ template <int dim>
 class ExactSinExp: public AutoSinExp<dim>
 {
   public:
-    ExactSinExp() {};
-    ~ExactSinExp() {};
+    ExactSinExp() {}
+    ~ExactSinExp() {}
     
     virtual Tensor<1,dim> gradient (const Point<dim>   &p,
 				    const unsigned int  component = 0) const;    

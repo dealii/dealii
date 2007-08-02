@@ -2,7 +2,7 @@
 #    $Id$
 #    Version: $Name$
 #
-#    Copyright (C) 2003, 2004, 2005 by the deal.II authors
+#    Copyright (C) 2003, 2004, 2005, 2007 by the deal.II authors
 #
 #    This file is subject to QPL and may not be  distributed
 #    without copyright and license information. Please refer
@@ -47,7 +47,7 @@ sub print_args {
     print ")${end} { \n";
     print "    deallog << __PRETTY_FUNCTION__ << std::endl;\n";
     print "    static X<0> x; return x;\n";
-    print "  };\n";
+    print "  }\n";
 }
 
 for ($i=0; $i<=$N; ++$i) {
