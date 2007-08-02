@@ -7,6 +7,45 @@ few tutorial programs, in particular on @ref step_4 "step-4" for dimension
 independent programming and @ref step_6 "step-6" for adaptive mesh
 refinement. 
 
+The $hp$ finite element method was proposed in the early 1980s by
+Babuska and Guo as an alternative to either
+(i) mesh refinement (i.e. decreasing the mesh parameter $h$ in a finite
+element computation) or (ii) increasing the polynomial degree $p$ used for
+shape functions. It is based on the observation that increasing the polynomial
+degree of the shape functions reduces the approximation error if the solution
+is sufficiently smooth.  On the other hand, it is well known
+that even for the generally well-behaved class of elliptic problems, higher
+degrees of regularity can not be guaranteed in the vicinity of boundaries,
+corners, or where coefficients are discontinuous; consequently, the
+approximation can not be improved in these areas by increasing the polynomial
+degree $p$ but only by refining the mesh, i.e. by reducing the mesh size
+$h$. These differing means to reduce the 
+error have led to the notion of $hp$ finite elements, where the approximating
+finite element spaces are adapted to have a high polynomial degree $p$
+wherever the solution is sufficiently smooth, while the mesh width $h$ is
+reduced at places wherever the solution lacks regularity. It was
+already realized in the first papers on this method that $hp$ finite elements
+can be a powerful tool that can guarantee that the error is reduced not only
+with some negative power of the number of degrees of freedom, but in fact
+exponentially.
+
+In order to implement this method, we need several things above and beyond
+what a usual finite element program needs, and in particular above what we
+have introduced in the tutorial programs leading up to step-6. In particular,
+we will have to discuss the following aspects:
+<ul>
+  <li>Instead of using the same finite element on all cells, we now will want
+  a collection of finite element objects, and associate each cell with one
+  of these objects in this collection.
+
+  <li>Degrees of freedom will then have to be allocated on each cell depending
+  on what finite element is associated with this particular cell. Constraints
+  will have to generated in the same way as for hanging nodes, but now also
+  including the case where two neighboring cells 
+
+  <li>We will need to 
+</ul>
+
 
 <h3>A simple indicator for smoothness</h3>
 
