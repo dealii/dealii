@@ -2,7 +2,7 @@
 //    $Id$
 //    Version: $Name$
 //
-//    Copyright (C) 2000, 2001, 2002, 2003, 2004, 2005, 2006 by the deal.II authors
+//    Copyright (C) 2000, 2001, 2002, 2003, 2004, 2005, 2006, 2007 by the deal.II authors
 //
 //    This file is subject to QPL and may not be  distributed
 //    without copyright and license information. Please refer
@@ -16,6 +16,7 @@
 #include <base/config.h>
 #include <base/exceptions.h>
 #include <base/function.h>
+#include <base/auto_derivative_function.h>
 
 DEAL_II_NAMESPACE_OPEN
 
@@ -37,20 +38,9 @@ DEAL_II_NAMESPACE_OPEN
  * @author Guido Kanschat, 2000
  */
 template <int dim>
-class FunctionDerivative : public Function<dim>
+class FunctionDerivative : public AutoDerivativeFunction<dim>
 {
   public:
-				     /**
-				      * Names of difference formulas.
-				      */
-    enum DifferenceFormula
-    {
-	  Euler,
-	  UpwindEuler,
-	  FourthOrder
-    };
-
-
 				     /**
 				      * Constructor. Provided are the
 				      * functions to compute
@@ -100,18 +90,20 @@ class FunctionDerivative : public Function<dim>
 				      * fourth order formula
 				      * (<tt>FourthOrder</tt>).
 				      */
-    void set_formula (DifferenceFormula formula = Euler);
-    
+    void set_formula (typename AutoDerivativeFunction<dim>::DifferenceFormula formula
+		      = AutoDerivativeFunction<dim>::Euler);
 				     /**
-				      * Function value at one point.
+				      * Change the base step size of
+				      * the difference formula
 				      */
-    virtual double value (const Point<dim>   &p,
-			  const unsigned int  component = 0) const;
+    void set_h (const double h);
     
-				     /**
-				      * Function values at multiple
-				      * points.
-				      */
+    virtual double value (const Point<dim>& p,
+			  const unsigned int component = 0) const;
+    
+    virtual void vector_value(const Point<dim>& p,
+			      Vector<double>& value) const;
+    
     virtual void value_list (const std::vector<Point<dim> > &points,
 			     std::vector<double>            &values,
 			     const unsigned int              component = 0) const;    
@@ -157,7 +149,7 @@ class FunctionDerivative : public Function<dim>
 				     /**
 				      * Difference formula.
 				      */
-    DifferenceFormula formula;
+    typename AutoDerivativeFunction<dim>::DifferenceFormula formula;
     
 				     /**
 				      * Helper object. Contains the

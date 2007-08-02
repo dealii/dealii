@@ -2,7 +2,7 @@
 //    $Id$
 //    Version: $Name$
 //
-//    Copyright (C) 2001, 2002, 2003, 2004, 2005, 2006 by the deal.II authors
+//    Copyright (C) 2001, 2002, 2003, 2004, 2005, 2006, 2007 by the deal.II authors
 //
 //    This file is subject to QPL and may not be  distributed
 //    without copyright and license information. Please refer
@@ -82,15 +82,32 @@ class AutoDerivativeFunction : public Function<dim>
     enum DifferenceFormula
     {
 					   /**
-					    * Symmetric Euler scheme
+					    * The symmetric Euler
+					    * formula of second order:
+					    * @f[
+					    * u'(t) \approx
+					    * \frac{u(t+h) -
+					    * u(t-h)}{2h}.
+					    * @f]
 					    */
 	  Euler,
 					   /**
-					    * Upwind Euler scheme
+					    * The upwind Euler
+					    * formula of first order:
+					    * @f[
+					    * u'(t) \approx
+					    * \frac{u(t) -
+					    * u(t-h)}{h}.
+					    * @f]
 					    */
 	  UpwindEuler,
 					   /**
-					    * Difference formula of 4th order.
+					    * The fourth order scheme
+					    * @f[
+					    * u'(t) \approx
+					    * \frac{u(t-2h) - 8u(t-h)
+					    * +  8u(t+h) - u(t+2h)}{12h}.
+					    * @f]
 					    */
 	  FourthOrder
     };

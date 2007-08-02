@@ -2,7 +2,7 @@
 //    $Id$
 //    Version: $Name$
 //
-//    Copyright (C) 2000, 2001, 2002, 2003, 2005, 2006 by the deal.II authors
+//    Copyright (C) 2000, 2001, 2002, 2003, 2005, 2006, 2007 by the deal.II authors
 //
 //    This file is subject to QPL and may not be  distributed
 //    without copyright and license information. Please refer
@@ -14,6 +14,7 @@
 
 #include <base/point.h>
 #include <base/function_derivative.h>
+#include <lac/vector.h>
 
 #include <cmath>
 
@@ -24,7 +25,7 @@ FunctionDerivative<dim>::FunctionDerivative (const Function<dim> &f,
 					     const Point<dim>    &dir,
 					     const double         h)
 		:
-		Function<dim> (f.n_components, f.get_time()),
+		AutoDerivativeFunction<dim> (h, f.n_components, f.get_time()),
                 f(f),
                 h(h),
                 incr(1, h*dir)
@@ -39,7 +40,7 @@ FunctionDerivative<dim>::FunctionDerivative (const Function<dim>& f,
 					     const std::vector<Point<dim> >& dir,
 					     const double h)
 		:
-		Function<dim> (f.n_components, f.get_time()),
+		AutoDerivativeFunction<dim> (h, f.n_components, f.get_time()),
   f(f),
   h(h),
   incr(dir.size())
@@ -53,9 +54,20 @@ FunctionDerivative<dim>::FunctionDerivative (const Function<dim>& f,
 
 template <int dim>
 void
-FunctionDerivative<dim>::set_formula (DifferenceFormula form)
+FunctionDerivative<dim>::set_formula (typename AutoDerivativeFunction<dim>::DifferenceFormula form)
 {
   formula = form;
+}
+
+
+
+template <int dim>
+void
+FunctionDerivative<dim>::set_h (const double new_h)
+{
+  for (unsigned int i=0;i<incr.size ();++i)
+    incr[i] *= new_h/h;
+  h = new_h;
 }
 
 
@@ -66,21 +78,63 @@ FunctionDerivative<dim>::value (const Point<dim>   &p,
 				const unsigned int  component) const
 {
   Assert (incr.size() == 1,
-	  ExcMessage ("FunctionDerivative was not initialized for constant direection"));
+	  ExcMessage ("FunctionDerivative was not initialized for constant direction"));
 
   switch (formula)
     {
-      case Euler:
+      case AutoDerivativeFunction<dim>::Euler:
 	    return (f.value(p+incr[0], component)-f.value(p-incr[0], component))/(2*h);
-      case UpwindEuler:
+      case AutoDerivativeFunction<dim>::UpwindEuler:
 	    return (f.value(p, component)-f.value(p-incr[0], component))/h;
-      case FourthOrder:
+      case AutoDerivativeFunction<dim>::FourthOrder:
 	    return (-f.value(p+2*incr[0], component) + 8*f.value(p+incr[0], component)
 		    -8*f.value(p-incr[0], component) + f.value(p-2*incr[0], component))/(12*h);
       default:
 	    Assert(false, ExcInvalidFormula());
     }
   return 0.;
+}
+
+
+
+template <int dim>
+void
+FunctionDerivative<dim>::vector_value (
+  const Point<dim>   &p,
+  Vector<double>& result) const
+{
+  Assert (incr.size() == 1,
+	  ExcMessage ("FunctionDerivative was not initialized for constant direction"));
+  Vector<double> aux(result.size());
+
+				   // Formulas are the same as in
+				   // value, but here we have to use
+				   // Vector arithmetic
+  switch (formula)
+    {
+      case AutoDerivativeFunction<dim>::Euler:
+	    f.vector_value(p+incr[0], result);
+	    f.vector_value(p-incr[0], aux);
+	    result.sadd(1./(2*h), -1./(2*h), aux);
+	    return;
+      case AutoDerivativeFunction<dim>::UpwindEuler:
+	    f.vector_value(p, result);
+	    f.vector_value(p-incr[0], aux);
+	    result.sadd(1./h, -1./h, aux);
+	    return;
+      case AutoDerivativeFunction<dim>::FourthOrder:
+	    f.vector_value(p-2*incr[0], result);
+	    f.vector_value(p+2*incr[0], aux);
+	    result.add(-1., aux);
+	    f.vector_value(p-incr[0], aux);
+	    result.add(-8., aux);
+	    f.vector_value(p+incr[0], aux);
+	    result.add(8., aux);
+	    result.scale(1./(12*h));
+	    return;
+      default:
+	    Assert(false, ExcInvalidFormula());
+    }
 }
 
 
@@ -97,95 +151,53 @@ FunctionDerivative<dim>::value_list (const std::vector<Point<dim> > &points,
     Assert (incr.size() == points.size(),
 	    ExcDimensionMismatch(incr.size(), points.size()));
 
+				   // Vector of auxiliary values
+  std::vector<double> aux(n);
+				   // Vector of auxiliary points
+  std::vector<Point<dim> > paux(n);
+				   // Use the same formulas as in
+				   // value, but with vector
+				   // arithmetic
   switch (formula)
     {
-      case Euler:
-      {
-					 // let p1 and p2 be arrays of
-					 // evaluation points shifted
-					 // a little in direction j
-	std::vector<Point<dim> > p1 = points;
-	std::vector<Point<dim> > p2 = points;
-
-	for (unsigned int i=0; i<n; ++i)
-	  {
-	    const unsigned int j = (variable_direction) ? i:0;
-	    p1[i] += incr[j];
-	    p2[i] -= incr[j];
-	  }	
-
-					 // next get values of
-					 // functions at these points
-	std::vector<double> values2(n);
-	f.value_list(p1, values,  component);
-	f.value_list(p2, values2, component);
-
-					 // finally compute finite
-					 // differences
-	for (unsigned int i=0; i<n; ++i)
-	  values[i] = (values[i]-values2[i])/(2*h);
-	  
-	break;
-      }
-       
-      case UpwindEuler:
-      {
-					 // compute upwind points
-	std::vector<Point<dim> > p2 = points;
-	for (unsigned int i=0; i<n; ++i)
-	  {
-	    const unsigned int j = (variable_direction) ? i:0;
-	    p2[i] -= incr[j];
-	  }
-
-					 // get values at points
-	std::vector<double> values2(n);
-	f.value_list(points, values,  component);
-	f.value_list(p2,     values2, component);
-
-					 // compute finite differences
-	for (unsigned int i=0; i<n; ++i)
-	  values[i] = (values[i]-values2[i])/h;
-	break;
-      }
-       
-      case FourthOrder:
-      {
-					 // first compute evaluation
-					 // points
-	std::vector<Point<dim> > p_p = points;
-	std::vector<Point<dim> > p_pp(n);
-	std::vector<Point<dim> > p_m = points;
-	std::vector<Point<dim> > p_mm(n);
-	for (unsigned int i=0;i<n;++i)
-	  {
-	    const unsigned int j = (variable_direction) ? i:0;
-	    p_p[i] += incr[j];
-	    p_pp[i] = p_p[i]+incr[j];
-	    p_m[i] -= incr[j];
-	    p_mm[i] = p_m[i]-incr[j];
-	  }
-
-					 // next compute values of
-					 // function at these
-					 // points. use @p{values} for
-					 // @p{e_mm}
-	std::vector<double> e_p(n);
-	std::vector<double> e_pp(n);
-	std::vector<double> e_m(n);
-
-	f.value_list(p_mm, values, component);
-	f.value_list(p_pp, e_pp,   component);
-	f.value_list(p_p,  e_p,    component);
-	f.value_list(p_m,  e_m,    component);
-
-					 // compute finite differences
-	for (unsigned int i=0; i<n; ++i)
-	  values[i] = (values[i]-e_pp[i]+8*(e_p[i]-e_m[i]))/(12*h);
-	  
-	break;
-      }    
-
+      case AutoDerivativeFunction<dim>::Euler:
+	    for (unsigned int i=0; i<n; ++i)
+	      paux[i] = points[i]+incr[(variable_direction) ? i : 0U];
+	    f.value_list(paux, values, component);
+	    for (unsigned int i=0; i<n; ++i)
+	      paux[i] = points[i]-incr[(variable_direction) ? i : 0U];
+	    f.value_list(paux, aux, component);
+	    for (unsigned int i=0; i<n; ++i)
+	      values[i] = (values[i]-aux[i])/(2*h);
+	    return;
+      case AutoDerivativeFunction<dim>::UpwindEuler:
+	    f.value_list(points, values, component);
+	    for (unsigned int i=0; i<n; ++i)
+	      paux[i] = points[i]-incr[(variable_direction) ? i : 0U];
+	    f.value_list(paux, aux, component);
+	    for (unsigned int i=0; i<n; ++i)
+	      values[i] = (values[i]-aux[i])/h;
+	    return;
+      case AutoDerivativeFunction<dim>::FourthOrder:
+	    for (unsigned int i=0; i<n; ++i)
+	      paux[i] = points[i]-2*incr[(variable_direction) ? i : 0U];
+	    f.value_list(paux, values, component);
+	    for (unsigned int i=0; i<n; ++i)
+	      paux[i] = points[i]+2*incr[(variable_direction) ? i : 0U];
+	    f.value_list(paux, aux, component);
+	    for (unsigned int i=0; i<n; ++i)
+	      values[i] -= aux[i];
+	    for (unsigned int i=0; i<n; ++i)
+	      paux[i] = points[i]+incr[(variable_direction) ? i : 0U];
+	    f.value_list(paux, aux, component);
+	    for (unsigned int i=0; i<n; ++i)
+	      values[i] += 8.*aux[i];
+	    for (unsigned int i=0; i<n; ++i)
+	      paux[i] = points[i]-incr[(variable_direction) ? i : 0U];
+	    f.value_list(paux, aux, component);
+	    for (unsigned int i=0; i<n; ++i)
+	      values[i] = (values[i] - 8.*aux[i])/(12*h);
+	    return;
       default:
 	    Assert(false, ExcInvalidFormula());
     }
