@@ -217,8 +217,7 @@ further down below.
 
 
 
-<h3>Appendix: PDEs with Dirac delta functions as right hand side and their
-transformation to an initial value problem</h3>
+<h3>Appendix: PDEs with Dirac delta functions as right hand side and their transformation to an initial value problem</h3>
 
 In the derivation of the initial value problem for the wave equation, we
 initially found that the equation had the derivative of a Dirac delta function

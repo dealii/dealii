@@ -121,8 +121,7 @@ used elements can then be created as follows:
 
 
 
-<h3>The hp::DoFHandler class, associating cells with finite
-elements, and constraints</h3>
+<h3>The hp::DoFHandler class, associating cells with finite elements, and constraints</h3>
 
 The next task we have to consider is what to do with the list of
 finite element objects we want to use. In previous tutorial programs,
