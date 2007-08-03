@@ -3107,7 +3107,8 @@ namespace LaplaceSolver
     active_cell_iterator cell=dual_solver.dof_handler.begin_active();
     for (unsigned int t=0;
 	 (t<this_thread) && (cell!=dual_solver.dof_handler.end());
-	 ++t, ++cell);
+	 ++t, ++cell)
+      ;
 
 				     // If there are no cells for this
 				     // thread (for example if there
@@ -3246,7 +3247,7 @@ namespace LaplaceSolver
 					     dual_weights,
 					     face_data,
 					     face_integrals);
-	  };
+	  }
 
 					 // After computing the cell
 					 // contributions and looping
@@ -3260,10 +3261,12 @@ namespace LaplaceSolver
 					 // of the loop.
 	for (unsigned int t=0;
 	     ((t<n_threads) && (cell!=dual_solver.dof_handler.end()));
-	     ++t, ++cell, ++cell_index);
+	     ++t, ++cell, ++cell_index)
+	  ;
+	
 	if (cell == dual_solver.dof_handler.end())
 	  break;
-      };
+      }
   }
 
 

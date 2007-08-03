@@ -149,7 +149,7 @@ class PressureBoundaryValues : public Function<dim>
 
 template <int dim>
 double
-PressureBoundaryValues<dim>::value (const Point<dim>  &p,
+PressureBoundaryValues<dim>::value (const Point<dim>  &/*p*/,
                                     const unsigned int /*component*/) const 
 {
   return 0;
