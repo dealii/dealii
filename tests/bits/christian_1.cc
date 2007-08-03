@@ -2,7 +2,7 @@
 //    $Id$
 //    Version: $Name$ 
 //
-//    Copyright (C) 2005, 2006 by the deal.II authors and Christian Kamm
+//    Copyright (C) 2005, 2006, 2007 by the deal.II authors and Christian Kamm
 //
 //    This file is subject to QPL and may not be  distributed
 //    without copyright and license information. Please refer
@@ -87,10 +87,10 @@ DoFToolsEx::transfer(const DoFHandler<dim>& source_dof, const InVector& source_v
 class TestFunction : public Function<2>
 {
   public:
-    TestFunction() : Function<2>() {};
+    TestFunction() : Function<2>() {}
     virtual double value(const Point<2> &p,
     	    const unsigned int) const
-    { return std::sin(3.14159*p(0))*std::sin(3.14159*p(1)); };
+    { return std::sin(3.14159*p(0))*std::sin(3.14159*p(1)); }
 };
 
 int main()
@@ -119,7 +119,8 @@ int main()
   Triangulation<2>::active_cell_iterator it = both_tria.begin_active();
   it->set_refine_flag();
   (++it)->set_refine_flag();
-  for(int i = 1; i < 8; ++i, ++it);
+  for(int i = 1; i < 8; ++i, ++it)
+    ;
   it->set_coarsen_flag();
   (++it)->set_coarsen_flag();
   (++it)->set_coarsen_flag();

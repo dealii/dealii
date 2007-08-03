@@ -2,7 +2,7 @@
 //    $Id$
 //    Version: $Name$ 
 //
-//    Copyright (C) 2004, 2006 by the deal.II authors
+//    Copyright (C) 2004, 2006, 2007 by the deal.II authors
 //
 //    This file is subject to QPL and may not be  distributed
 //    without copyright and license information. Please refer
@@ -38,16 +38,16 @@ template<int dim>
 class MySquareFunction : public Function<dim>
 {
   public:
-    MySquareFunction () : Function<dim>(2) {};
+    MySquareFunction () : Function<dim>(2) {}
     
     virtual double value (const Point<dim>   &p,
 			  const unsigned int  component) const
-      {	return (component+1)*p.square(); };
+      {	return (component+1)*p.square(); }
     
     virtual void   vector_value (const Point<dim>   &p,
 				 Vector<double>     &values) const
       { values(0) = value(p,0);
-	values(1) = value(p,1); };
+	values(1) = value(p,1); }
 };
 
 

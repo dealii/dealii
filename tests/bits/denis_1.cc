@@ -2,7 +2,7 @@
 //    $Id$
 //    Version: $Name$ 
 //
-//    Copyright (C) 2003, 2004, 2005 by the deal.II authors
+//    Copyright (C) 2003, 2004, 2005, 2007 by the deal.II authors
 //
 //    This file is subject to QPL and may not be  distributed
 //    without copyright and license information. Please refer
@@ -49,7 +49,7 @@ class F : public Function<2>
         r = std::sqrt( x*x + y*y );
         return 0.5 * ( 1 - std::tanh( ( r - 0.5 )
                                  /( 2*M_SQRT2 * delta ) ) ) ;
-      };
+      }
 };
 
 

@@ -4,7 +4,7 @@
 /*    fe_tools_test.cc,v 1.6 2003/04/09 15:49:54 wolf Exp       */
 /*    Version:                                           */
 /*                                                                */
-/*    Copyright (C) 1999, 2000, 2001, 2002, 2003, 2005 by the deal.II authors */
+/*    Copyright (C) 1999, 2000, 2001, 2002, 2003, 2005, 2007 by the deal.II authors */
 /*                                                                */
 /*    This file is subject to QPL and may not be  distributed     */
 /*    without copyright and license information. Please refer     */
@@ -41,8 +41,8 @@ const double pi=std::acos(-1.);
 class TestFunction: public Function<2>
 {
   public:
-    TestFunction() {};
-    virtual ~TestFunction() {};
+    TestFunction() {}
+    virtual ~TestFunction() {}
     
     virtual double value(const Point<2> &p,
 			 const unsigned int component) const;

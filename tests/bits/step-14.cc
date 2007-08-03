@@ -2,7 +2,7 @@
 //    $Id$
 //    Version: $Name$ 
 //
-//    Copyright (C) 2005, 2006 by the deal.II authors
+//    Copyright (C) 2005, 2006, 2007 by the deal.II authors
 //
 //    This file is subject to QPL and may not be  distributed
 //    without copyright and license information. Please refer
@@ -881,7 +881,7 @@ namespace Data
   template <class Traits, int dim>
   struct SetUp : public SetUpBase<dim>
   {
-      SetUp () {};
+      SetUp () {}
 
       virtual
       const Function<dim> &  get_boundary_values () const;
@@ -935,7 +935,7 @@ namespace Data
       class BoundaryValues : public Function<dim>
       {
 	public:
-	  BoundaryValues () : Function<dim> () {};
+	  BoundaryValues () : Function<dim> () {}
 	  
 	  virtual double value (const Point<dim>   &p,
 				const unsigned int  component) const;
@@ -945,7 +945,7 @@ namespace Data
       class RightHandSide : public Function<dim>
       {
 	public:
-	  RightHandSide () : Function<dim> () {};
+	  RightHandSide () : Function<dim> () {}
 	  
 	  virtual double value (const Point<dim>   &p,
 				const unsigned int  component) const;
@@ -1017,7 +1017,7 @@ namespace Data
       class RightHandSide : public ConstantFunction<dim>
       {
 	public:
-	  RightHandSide () : ConstantFunction<dim> (1.) {};
+	  RightHandSide () : ConstantFunction<dim> (1.) {}
       };
       
       static

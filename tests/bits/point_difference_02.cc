@@ -2,7 +2,7 @@
 //    $Id$
 //    Version: $Name$ 
 //
-//    Copyright (C) 2004 by the deal.II authors
+//    Copyright (C) 2004, 2007 by the deal.II authors
 //
 //    This file is subject to QPL and may not be  distributed
 //    without copyright and license information. Please refer
@@ -44,11 +44,11 @@ class MySquareFunction : public Function<dim>
   public:
     virtual double value (const Point<dim>   &p,
 			  const unsigned int  component) const
-      {	return (component+1)*p.square()+1; };
+      {	return (component+1)*p.square()+1; }
     
     virtual void   vector_value (const Point<dim>   &p,
 				 Vector<double>     &values) const
-      { values(0) = value(p,0); };
+      { values(0) = value(p,0); }
 };
 
 
@@ -58,11 +58,11 @@ class MyExpFunction : public Function<dim>
   public:
     virtual double value (const Point<dim>   &p,
 			  const unsigned int  component) const
-      {	return std::exp (p(0)); };
+      {	return std::exp (p(0)); }
     
     virtual void   vector_value (const Point<dim>   &p,
 				 Vector<double>     &values) const
-      { values(0) = value(p,0); };
+      { values(0) = value(p,0); }
 };
 
 

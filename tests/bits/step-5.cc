@@ -2,7 +2,7 @@
 //    $Id$
 //    Version: $Name$ 
 //
-//    Copyright (C) 2005, 2006 by the deal.II authors
+//    Copyright (C) 2005, 2006, 2007 by the deal.II authors
 //
 //    This file is subject to QPL and may not be  distributed
 //    without copyright and license information. Please refer
@@ -81,7 +81,7 @@ template <int dim>
 class Coefficient : public Function<dim> 
 {
   public:
-    Coefficient ()  : Function<dim>() {};
+    Coefficient ()  : Function<dim>() {}
     
     virtual double value (const Point<dim>   &p,
 			  const unsigned int  component = 0) const;

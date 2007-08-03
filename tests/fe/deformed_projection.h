@@ -2,7 +2,7 @@
 //    deformed_projection.h,v 1.3 2003/06/09 16:00:38 wolf Exp
 //    Version: 
 //
-//    Copyright (C) 2003, 2005, 2006 by the deal.II authors
+//    Copyright (C) 2003, 2005, 2006, 2007 by the deal.II authors
 //
 //    This file is subject to QPL and may not be  distributed
 //    without copyright and license information. Please refer
@@ -66,9 +66,9 @@ class TestMap1 : public Function<dim>
   public:
     TestMap1 (const unsigned int n_components) :
 		    Function<dim> (n_components)
-      {};
+      {}
   
-    virtual ~TestMap1 () {};
+    virtual ~TestMap1 () {}
   
     virtual double value (const Point<dim>   &p,
 			  const unsigned int  component = 0) const;
