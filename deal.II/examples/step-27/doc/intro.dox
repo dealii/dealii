@@ -190,7 +190,82 @@ the same time.
 
 <h3>Assembling matrices and vectors with $hp$ objects</h3>
 
+Following this, we have to set up matrices and vectors for the linear system
+of the correct size and assemble them. Setting them up works in exactly the
+same way as for the non-$hp$ case. Assembling requires a bit more thought.
 
+The main idea is of course unchanged: we have to loop over all cells, assemble
+local contributions, and then copy them into the global objects. As discussed
+in some detail first in @ref step_3 "step-3", deal.II has the FEValues class
+that pulls finite element description, mapping, and quadrature formula
+together and aids in evaluating values and gradients of shape functions as
+well as other information on each of the quadrature points mapped to the real
+location of a cell. Every time we move on to a new cell we re-initialize this
+FEValues object, thereby asking it to re-compute that part of the information
+that changes from cell to cell. It can then be used to sum up local
+contributions to bilinear form and right hand side.
+
+In the context of $hp$ finite element methods, we have to deal with the fact
+that we do not use the same finite element object on each cell. In fact, we
+should not even use the same quadrature object for all cells, but rather
+higher order quadrature formulas for cells where we use higher order finite
+elements. Similarly, we may want to use higher order mappings on such cells as
+well. 
+
+To facilitate these considerations, deal.II has a class hp::FEValues that does
+what we need in the current context. The difference is that instead of a
+single finite element, quadrature formula, and mapping, it takes collections
+of these objects. It's use is very much like the regular FEValues class,
+i.e. the interesting part of the loop over all cells would look like this:
+
+<code>
+<pre>
+  hp::FEValues<dim> hp_fe_values (mapping_collection,
+                                  fe_collection,
+				  quadrature_collection, 
+				  update_values    |  update_gradients |
+				  update_q_points  |  update_JxW_values);
+
+  typename hp::DoFHandler<dim>::active_cell_iterator
+    cell = dof_handler.begin_active(),
+    endc = dof_handler.end();
+  for (; cell!=endc; ++cell)
+    {
+      hp_fe_values.reinit (cell,
+                           cell->active_fe_index(),
+                           cell->active_fe_index(),
+                           cell->active_fe_index());
+      
+      const FEValues<dim> &fe_values = hp_fe_values.get_present_fe_values ();
+
+      ...  // assemble local contributions and copy them into global object
+   }
+</pre>
+</code>
+
+In this tutorial program, we will always use a Q1 mapping, so the mapping
+collection argument to the hp::FEValues construction will be omitted. Inside
+the loop, we first initialize the hp::FEValues object for the current
+cell. The second, third and fourth arguments denote the index within their
+respective collections of the quadrature, mapping, and finite element objects
+we wish to use on this cell. These arguments can be omitted (and are in the
+program below), in which case <code>cell-@>active_fe_index()</code> is used
+for this index. The order of these arguments is chosen in this way because one
+may sometimes want to pick a different quadrature or mapping object from their
+respective collections, but hardly ever a different finite element than the
+one in use on this cell, i.e. one with an index different from
+<code>cell-@>active_fe_index()</code>. The finite element collection index is
+therefore the last default argument so that it can be conveniently omitted.
+
+What this <code>reinit</code> call does is the following: the
+hp::FEValues class checks whether it has previously already allocated a
+non-$hp$ FEValues object for this combination of finite element, quadrature,
+and mapping objects. If not, it allocates one. It then re-initializes this
+object for the current cell, after which there is now a FEValues object for
+the selected finite element, quadrature and mapping usable on the current
+cell. A reference to this object is then obtained using the call
+<code>hp_fe_values.get_present_fe_values()</code>, and will be used in the
+usual fashion to assemble local contributions.
 
 
 
@@ -210,7 +285,8 @@ i.e. we suddenly have two choices whenever we detect that the error on a
 certain cell is too large for our liking: we can refine the cell by splitting
 it into several smaller ones, or we can increase the polynomial degree of the
 shape functions used on it. How do we know which is the more promising
-strategy? 
+strategy? Answering this question is the central problem in $hp$ finite
+element research at the time of this writing.
 
 In short, the question does not appear to be settled in the literature at this
 time. There are a number of more or less complicated schemes that address it,
