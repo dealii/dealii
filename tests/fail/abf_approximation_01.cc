@@ -2,7 +2,7 @@
 //    abf_approximation_01.cc,v 1.3 2003/06/09 16:00:38 wolf Exp
 //    Version: 
 //
-//    Copyright (C) 2003, 2005, 2006 by the deal.II authors
+//    Copyright (C) 2003, 2005, 2006, 2007 by the deal.II authors
 //
 //    This file is subject to QPL and may not be  distributed
 //    without copyright and license information. Please refer
@@ -73,9 +73,9 @@ class TestMap1 : public Function<dim>
   public:
     TestMap1 (const unsigned int n_components) :
 		    Function<dim> (n_components)
-      {};
+      {}
   
-    virtual ~TestMap1 () {};
+    virtual ~TestMap1 () {}
   
     virtual double value (const Point<dim>   &p,
 			  const unsigned int  component = 0) const;
@@ -129,9 +129,9 @@ class TestDef1 : public Function<dim>
     TestDef1 (const unsigned int n_components, const double ph) :
 		    Function<dim> (n_components),
 		    phi (ph)
-      {};
+      {}
     
-    virtual ~TestDef1 () {};
+    virtual ~TestDef1 () {}
     
     virtual double value (const Point<dim>   &p,
 			  const unsigned int  component = 0) const;
@@ -184,9 +184,9 @@ class TestDef2 : public Function<dim>
     TestDef2 (const unsigned int n_components, const double sc) :
 		    Function<dim> (n_components),
 		    scale (sc)
-      {};
+      {}
     
-    virtual ~TestDef2 () {};
+    virtual ~TestDef2 () {}
     
     virtual double value (const Point<dim>   &p,
 			  const unsigned int  component = 0) const;
@@ -236,9 +236,9 @@ class TestDef3 : public Function<dim>
     TestDef3 (const unsigned int n_components, const double sc) :
 		    Function<dim> (n_components),
 		    scale (sc)
-      {};
+      {}
     
-    virtual ~TestDef3 () {};
+    virtual ~TestDef3 () {}
     
     virtual double value (const Point<dim>   &p,
 			  const unsigned int  component = 0) const;
@@ -294,9 +294,9 @@ class TestPoly : public Function<dim>
 	      }
 	    polys.push_back (Polynomials::Polynomial<double> (coeff));
 	  }
-      };
+      }
     
-    virtual ~TestPoly () {};
+    virtual ~TestPoly () {}
     
     virtual double value (const Point<dim>   &p,
 			  const unsigned int  component = 0) const;

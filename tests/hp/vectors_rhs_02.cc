@@ -45,18 +45,18 @@ template<int dim>
 class MySquareFunction : public Function<dim>
 {
   public:
-    MySquareFunction () : Function<dim>(dim) {};
+    MySquareFunction () : Function<dim>(dim) {}
     
     virtual double value (const Point<dim>   &p,
 			  const unsigned int  component) const
-      {	return (component+1)*p.square(); };
+      {	return (component+1)*p.square(); }
     
     virtual void   vector_value (const Point<dim>   &p,
 				 Vector<double>     &values) const
       {
 	for (unsigned int d=0; d<dim; ++d)
 	  values(d) = value(p,d);
-      };
+      }
 };
 
 
