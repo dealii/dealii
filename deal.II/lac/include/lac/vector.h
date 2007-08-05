@@ -2,7 +2,7 @@
 //    $Id$
 //    Version: $Name$
 //
-//    Copyright (C) 1999, 2000, 2001, 2002, 2003, 2004, 2005, 2006 by the deal.II authors
+//    Copyright (C) 1999, 2000, 2001, 2002, 2003, 2004, 2005, 2006, 2007 by the deal.II authors
 //
 //    This file is subject to QPL and may not be  distributed
 //    without copyright and license information. Please refer
@@ -951,7 +951,8 @@ Vector<Number> & Vector<Number>::operator *= (const Number factor)
 
 template <typename Number>
 inline
-Vector<Number> & Vector<Number>::operator /= (const Number factor)
+Vector<Number> &
+Vector<Number>::operator /= (const Number factor)
 {
   Assert (deal_II_numbers::is_finite(factor), 
           ExcMessage("The given value is not finite but either infinite or Not A Number (NaN)"));
@@ -959,6 +960,68 @@ Vector<Number> & Vector<Number>::operator /= (const Number factor)
 
   *this *= (1./factor);
   return *this;
+}
+
+
+
+template <typename Number>
+inline
+void
+Vector<Number>::scale (const Number factor)
+{
+  Assert (deal_II_numbers::is_finite(factor), 
+          ExcMessage("The given value is not finite but either infinite or Not A Number (NaN)"));
+
+  Assert (vec_size!=0, ExcEmptyObject());
+
+  iterator             ptr  = begin();
+  const const_iterator eptr = end();
+  while (ptr!=eptr)
+    *ptr++ *= factor;
+}
+
+
+
+template <typename Number>
+inline
+void
+Vector<Number>::add (const Number a,
+		     const Vector<Number>& v)
+{
+  Assert (deal_II_numbers::is_finite(a), 
+          ExcMessage("The given value is not finite but either infinite or Not A Number (NaN)"));
+
+  Assert (vec_size!=0, ExcEmptyObject());
+  Assert (vec_size == v.vec_size, ExcDimensionMismatch(vec_size, v.vec_size));
+
+  iterator i_ptr = begin(),
+	   i_end = end();
+  const_iterator v_ptr = v.begin();
+  while (i_ptr!=i_end)
+    *i_ptr++ += a * *v_ptr++;
+}
+
+
+
+template <typename Number>
+inline
+void
+Vector<Number>::sadd (const Number x,
+		      const Number a,
+		      const Vector<Number>& v)
+{
+  Assert (deal_II_numbers::is_finite(x), 
+          ExcMessage("The given value is not finite but either infinite or Not A Number (NaN)"));
+  Assert (deal_II_numbers::is_finite(a), 
+          ExcMessage("The given value is not finite but either infinite or Not A Number (NaN)"));
+
+  Assert (vec_size!=0, ExcEmptyObject());
+  Assert (vec_size == v.vec_size, ExcDimensionMismatch(vec_size, v.vec_size));
+  iterator i_ptr = begin(),
+	   i_end = end();
+  const_iterator v_ptr = v.begin();
+  for (; i_ptr!=i_end; ++i_ptr)
+    *i_ptr = x * *i_ptr  +  a * *v_ptr++;
 }
 
 

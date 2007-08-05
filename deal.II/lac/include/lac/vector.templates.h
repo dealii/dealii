@@ -440,23 +440,6 @@ void Vector<Number>::add (const Vector<Number>& v)
 
 
 template <typename Number>
-void Vector<Number>::add (const Number a, const Vector<Number>& v)
-{
-  Assert (deal_II_numbers::is_finite(a), 
-          ExcMessage("The given value is not finite but either infinite or Not A Number (NaN)"));
-
-  Assert (vec_size!=0, ExcEmptyObject());
-  Assert (vec_size == v.vec_size, ExcDimensionMismatch(vec_size, v.vec_size));
-
-  iterator i_ptr = begin(),
-	   i_end = end();
-  const_iterator v_ptr = v.begin();
-  while (i_ptr!=i_end)
-    *i_ptr++ += a * *v_ptr++;
-}
-
-
-template <typename Number>
 void Vector<Number>::add (const Number a, const Vector<Number>& v,
 			  const Number b, const Vector<Number>& w)
 {
@@ -492,24 +475,6 @@ void Vector<Number>::sadd (const Number x, const Vector<Number>& v)
     *i_ptr = x * *i_ptr  + *v_ptr++;
 }
 
-
-template <typename Number>
-void Vector<Number>::sadd (const Number x, const Number a,
-                           const Vector<Number>& v)
-{
-  Assert (deal_II_numbers::is_finite(x), 
-          ExcMessage("The given value is not finite but either infinite or Not A Number (NaN)"));
-  Assert (deal_II_numbers::is_finite(a), 
-          ExcMessage("The given value is not finite but either infinite or Not A Number (NaN)"));
-
-  Assert (vec_size!=0, ExcEmptyObject());
-  Assert (vec_size == v.vec_size, ExcDimensionMismatch(vec_size, v.vec_size));
-  iterator i_ptr = begin(),
-	   i_end = end();
-  const_iterator v_ptr = v.begin();
-  for (; i_ptr!=i_end; ++i_ptr)
-    *i_ptr = x * *i_ptr  +  a * *v_ptr++;
-}
 
 
 template <typename Number>
@@ -563,22 +528,6 @@ void Vector<Number>::sadd (const Number x, const Number a,
   
   for (; i_ptr!=i_end; ++i_ptr)
     *i_ptr = (x * *i_ptr)  +  (a * *v_ptr++)  +  (b * *w_ptr++)  + (c * *y_ptr++);
-}
-
-
-
-template <typename Number>
-void Vector<Number>::scale (const Number factor)
-{
-  Assert (deal_II_numbers::is_finite(factor), 
-          ExcMessage("The given value is not finite but either infinite or Not A Number (NaN)"));
-
-  Assert (vec_size!=0, ExcEmptyObject());
-
-  iterator             ptr  = begin();
-  const const_iterator eptr = end();
-  while (ptr!=eptr)
-    *ptr++ *= factor;
 }
 
 
