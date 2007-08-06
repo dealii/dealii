@@ -75,7 +75,8 @@ template <typename number> class SparseMatrix;
  * @endverbatim
  *
  * See also @ref step_11 "step-11" and @ref step_18 "step-18" for usage
- * patterns.
+ * patterns of the related CompressedSparsityPattern class, and
+ * @ref step_27 "step-27" of the current class.
  *
  * <h3>Notes</h3>
  *
