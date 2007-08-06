@@ -406,7 +406,8 @@ class DoFTools
 				      * as the last argument to the current
 				      * function. No call to
 				      * ConstraintMatrix::condense() is then
-				      * necessary.
+				      * necessary. This process is explained
+				      * in @ref step_27 "step-27".
 				      */
     template <class DH, class SparsityPattern>
     static
