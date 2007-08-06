@@ -16,6 +16,8 @@ gen-example-names = $(addprefix generated/, $(example-names))
 # and commented and plain versions of the program as well as a combined one
 example-toc-prog   = $(addsuffix _toc.prog,$(gen-example-names))
 example-toc-plain  = $(addsuffix _toc.plain,$(gen-example-names))
+example-toc-intro  = $(addsuffix _toc.intro,$(gen-example-names))
+example-toc-results= $(addsuffix _toc.results,$(gen-example-names))
 example-toc        = $(addsuffix _toc.combined,$(gen-example-names))
 
 # same for intermediate files for doxygen output
@@ -52,14 +54,32 @@ $(example-toc-plain):
 	  > $@
 
 
+$(example-toc-intro):
+	@echo ================== Making $@
+	@cat $D/examples/$(call get_basename, $@)/doc/intro.dox \
+	  | egrep -i "<h[3456]>.*</h[3456]>" \
+	  | $(PERL) ./intro2toc \
+	  > $@
+
+
+$(example-toc-results):
+	@echo ================== Making $@
+	@cat $D/examples/$(call get_basename, $@)/doc/results.dox \
+	  | egrep -i "<h[3456]>.*</h[3456]>" \
+	  | $(PERL) ./intro2toc \
+	  > $@
+
+
 $(example-toc):
 	@echo ================== Making $@
 	@echo "<table class=\"tutorial\">  <tr>    <td>" > $@
 	@echo "<ol>" >> $@
 	@echo "  <li> <a href=\"#Intro\" class=bold>Introduction</a>" >> $@
+	@cat generated/$(call get_basename, $@)_toc.intro >> $@
 	@echo "  <li> <a href=\"#CommProg\" class=bold>The commented program</a>" >> $@
 	@cat generated/$(call get_basename, $@)_toc.prog >> $@
 	@echo "  <li> <a href=\"#Results\" class=bold>Results</a>" >> $@
+	@cat generated/$(call get_basename, $@)_toc.results >> $@
 	@echo "  <li> <a href=\"#PlainProg\" class=bold>The plain program</a>" >> $@
 	@cat generated/$(call get_basename, $@)_toc.plain >> $@
 	@echo "</ol> </td> </tr> </table>" >> $@
@@ -96,9 +116,11 @@ $(example-doxygen):
 	@echo "@htmlonly" >> $@
 	@cat generated/$(call get_basename, $@)_toc.combined >> $@
 	@echo "@endhtmlonly" >> $@
-	@cat $D/examples/$(call get_basename, $@)/doc/intro.dox >> $@
+	@cat $D/examples/$(call get_basename, $@)/doc/intro.dox \
+		| $(PERL) create_anchors >> $@
 	@cat generated/$(call get_basename, $@)_prog.dox >> $@
-	@cat $D/examples/$(call get_basename, $@)/doc/results.dox >> $@
+	@cat $D/examples/$(call get_basename, $@)/doc/results.dox \
+		| $(PERL) create_anchors >> $@
 	@cat generated/$(call get_basename, $@)_plain.dox >> $@
 	@echo " */" >> $@
 
@@ -111,7 +133,8 @@ validate-xrefs:
 
 clean:
 	-rm -f $(example-toc) \
-		$(example-toc-prog)  $(example-toc-plain) \
+		$(example-toc-prog) $(example-toc-plain) \
+		$(example-toc-intro) $(example-toc-results) \
 		$(example-dox-prog) $(example-dox-plain) $(example-doxygen)
 	-rm -f Makefile.dep
 
@@ -128,12 +151,21 @@ Makefile.dep: $(shell echo $D/examples/*/*.cc) Makefile
 			`echo $D/examples/$${i}/*.cc` ; \
 		echo generated/$${i}_toc.plain : generated/$${i}_toc.prog ; \
 		echo generated/$${i}_toc.combined : \
-			generated/$${i}_toc.prog generated/$${i}_toc.plain ; \
+			generated/$${i}_toc.intro \
+			generated/$${i}_toc.results \
+			generated/$${i}_toc.prog \
+			generated/$${i}_toc.plain ; \
 		echo doxygen/$$i.h : generated/$${i}_prog.dox generated/$${i}_plain.dox \
 				generated/$${i}_toc.combined \
 				$D/examples/$$i/doc/intro.dox \
 				$D/examples/$$i/doc/results.dox \
- ; \
+			 ; \
+		echo generated/$${i}_toc.intro : \
+				$D/examples/$$i/doc/intro.dox \
+			 ; \
+		echo generated/$${i}_toc.results : \
+				$D/examples/$$i/doc/results.dox \
+			 ; \
 	 done \
 	> $@
 

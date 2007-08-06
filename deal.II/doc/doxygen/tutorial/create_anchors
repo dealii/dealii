@@ -1,0 +1,29 @@
+#---------------------------------------------------------------------------
+#    $Id: create_anchors 14782 2007-06-15 16:37:12Z kanschat $
+#    Version: $Name$
+#
+#    Copyright (C) 2007 by the deal.II authors
+#
+#    This file is subject to QPL and may not be  distributed
+#    without copyright and license information. Please refer
+#    to the file deal.II/doc/license.html for the  text  and
+#    further information on this license.
+#
+#---------------------------------------------------------------------------
+
+
+# If we find a a heading in a .dox file, create an HTML anchor for it.
+
+while (<>) {
+    if ( /<h.>(.*)<\/h.>\s*/ ) {
+	$reftext = $1;
+
+	# for the anchor, use the name of the section but discard
+	# everything except for letters, numbers, and underscores
+	$reftext =~ s/[^a-zA-Z0-9_]//g;
+
+	print "<a name=\"$reftext\"></a>$_\n";
+    } else {
+        print;
+    }
+}
