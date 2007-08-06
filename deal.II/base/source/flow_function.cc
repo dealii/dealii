@@ -341,19 +341,21 @@ namespace Functions
 	const Point<dim>& p = points[k];
 	const double x = deal_II_numbers::PI * p(0);
 	const double y = deal_II_numbers::PI * p(1);
-	const double cx = std::cos(x);
-	const double cy = std::cos(y);
-	const double sx = std::sin(x);
-	const double sy = std::sin(y);
+	const double c2x = std::cos(2*x);
+	const double c2y = std::cos(2*y);
+	const double s2x = std::sin(2*x);
+	const double s2y = std::sin(2*y);
+	const double cx2 = .5+.5*c2x;               // cos^2 x
+	const double cy2 = .5+.5*c2y;               // cos^2 y
 	
 	if (dim==2)
 	  {
-	    values[0][k][0] = -2.*deal_II_numbers::PI * cx*sx*cy*sy;
-	    values[0][k][1] = deal_II_numbers::PI * cx*cx*(cy*cy-sy*sy);
-	    values[1][k][0] = deal_II_numbers::PI * (sx*sx-cx*cx)*cy*cy;
-	    values[1][k][1] = 2.*deal_II_numbers::PI * cx*sx*cy*sy;
-	    values[2][k][0] = deal_II_numbers::PI * (cx*cx-sx*sx)*cy*sy;
-	    values[2][k][1] = deal_II_numbers::PI * cx*sx*(cy*cy-sy*sy);
+	    values[0][k][0] = -.5*deal_II_numbers::PI * s2x*s2y;
+	    values[0][k][1] =     deal_II_numbers::PI * cx2*c2y;
+	    values[1][k][0] = -   deal_II_numbers::PI * c2x*cy2;
+	    values[1][k][1] = .5* deal_II_numbers::PI * s2x*s2y;
+	    values[2][k][0] = .5* deal_II_numbers::PI * c2x*s2y;
+	    values[2][k][1] = .5* deal_II_numbers::PI * s2x*c2y;
 	  }
 	else if (dim==3)
 	  {
@@ -361,9 +363,9 @@ namespace Functions
 	    const double cz = std::cos(z);
 	    const double sz = std::sin(z);
 	    
-	    values[0][k][0] = -2.*deal_II_numbers::PI * cx*cx*cy*sy*cz*sz;
-	    values[1][k][0] = -2.*deal_II_numbers::PI * cx*sx*cy*cy*cz*sz;
-	    values[2][k][0] = -2.*deal_II_numbers::PI * -2.*cx*sx*cy*sy*cz*cz;
+// 	    values[0][k][0] = -2.*deal_II_numbers::PI * cx*cx*cy*sy*cz*sz;
+// 	    values[1][k][0] = -2.*deal_II_numbers::PI * cx*sx*cy*cy*cz*sz;
+// 	    values[2][k][0] = -2.*deal_II_numbers::PI * -2.*cx*sx*cy*sy*cz*cz;
 	    values[3][k][0] = 0.;
 	  }
 	else
@@ -395,14 +397,20 @@ namespace Functions
 	const double cy = std::cos(y);
 	const double sx = std::sin(x);
 	const double sy = std::sin(y);
-	const double prefix = 2. * deal_II_numbers::PI * deal_II_numbers::PI;
+	const double c2x = std::cos(2*x);
+	const double c2y = std::cos(2*y);
+	const double s2x = std::sin(2*x);
+	const double s2y = std::sin(2*y);
+	const double cx2 = .5+.5*c2x;               // cos^2 x
+	const double cy2 = .5+.5*c2y;               // cos^2 y
+	const double pi2 = deal_II_numbers::PI * deal_II_numbers::PI;
 	
 	if (dim==2)
 	  {
-	    values[0][k] = prefix * (cx*cx-sx*sx)*cy*sy
-			   + deal_II_numbers::PI * (cx*cx-sx*sx)*cy*sy;
-	    values[1][k] = - prefix * (cy*cy-sy*sy)*cx*sx
-			   + deal_II_numbers::PI * (cy*cy-sy*sy)*cx*sx;
+	    values[0][k] = pi2 * c2x * s2y
+			   + deal_II_numbers::PI * c2x*s2y;
+	    values[1][k] = - pi2 * s2x * c2y
+			   + deal_II_numbers::PI * s2x*c2y;
 	    values[2][k] = 0.;
 	  }
 	else if (dim==3)
@@ -411,9 +419,9 @@ namespace Functions
 	    const double cz = std::cos(z);
 	    const double sz = std::sin(z);
 	    
-	    values[0][k] = cx*cx*cy*sy*cz*sz;
-	    values[1][k] = cx*sx*cy*cy*cz*sz;
-	    values[2][k] = -2.*cx*sx*cy*sy*cz*cz;
+// 	    values[0][k] = cx*cx*cy*sy*cz*sz;
+// 	    values[1][k] = cx*sx*cy*cy*cz*sz;
+// 	    values[2][k] = -2.*cx*sx*cy*sy*cz*cz;
 	    values[3][k] = 0.;
 	  }
 	else
