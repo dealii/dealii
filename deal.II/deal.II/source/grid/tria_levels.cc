@@ -78,12 +78,12 @@ namespace internal
               coarsen_flags.size()<DEAL_II_MIN_BOOL_VECTOR_CAPACITY,
               ExcMemoryWasted ("coarsen_flags",
                                coarsen_flags.size(), coarsen_flags.capacity()));
-      Assert (neighbors.size() ==  neighbors.capacity() ||
-              neighbors.size()<DEAL_II_MIN_VECTOR_CAPACITY,
+      Assert (neighbors.size() <=
+	      neighbors.capacity() + DEAL_II_MIN_VECTOR_CAPACITY,
               ExcMemoryWasted ("neighbors",
                                neighbors.size(), neighbors.capacity()));
-      Assert (subdomain_ids.size() ==  subdomain_ids.capacity() ||
-              subdomain_ids.size()<DEAL_II_MIN_VECTOR_CAPACITY,
+      Assert (subdomain_ids.size() <=
+	      subdomain_ids.capacity() + DEAL_II_MIN_VECTOR_CAPACITY,
               ExcMemoryWasted ("subdomain_ids",
                                subdomain_ids.size(), subdomain_ids.capacity()));
       Assert (2*true_dimension*refine_flags.size() == neighbors.size(),
@@ -161,12 +161,12 @@ namespace internal
               coarsen_flags.size()<DEAL_II_MIN_BOOL_VECTOR_CAPACITY,
               ExcMemoryWasted ("coarsen_flags",
                                coarsen_flags.size(), coarsen_flags.capacity()));
-      Assert (neighbors.size() ==  neighbors.capacity() ||
-              neighbors.size()<DEAL_II_MIN_VECTOR_CAPACITY,
+      Assert (neighbors.size() <=
+	      neighbors.capacity() + DEAL_II_MIN_VECTOR_CAPACITY,
               ExcMemoryWasted ("neighbors",
                                neighbors.size(), neighbors.capacity()));
-      Assert (subdomain_ids.size() ==  subdomain_ids.capacity() ||
-              subdomain_ids.size()<DEAL_II_MIN_VECTOR_CAPACITY,
+      Assert (subdomain_ids.size () <=
+	      subdomain_ids.capacity() + DEAL_II_MIN_VECTOR_CAPACITY,
               ExcMemoryWasted ("subdomain_ids",
                                subdomain_ids.size(), subdomain_ids.capacity()));
       Assert (2*true_dimension*refine_flags.size() == neighbors.size(),

@@ -208,12 +208,12 @@ namespace internal
                                        // they may over-allocate by up to
                                        // as many elements as an integer
                                        // has bits
-      Assert (cells.size() == cells.capacity() ||
-              cells.size()<DEAL_II_MIN_VECTOR_CAPACITY,
+      Assert (cells.size() <=
+	      cells.capacity() + DEAL_II_MIN_VECTOR_CAPACITY,
               ExcMemoryWasted ("lines",
                                cells.size(), cells.capacity()));
-      Assert (children.size() == children.capacity() ||
-              children.size()<DEAL_II_MIN_VECTOR_CAPACITY,
+      Assert (children.size() <=
+	      children.capacity() + DEAL_II_MIN_VECTOR_CAPACITY,
               ExcMemoryWasted ("children",
                                children.size(), children.capacity()));
       Assert (used.size() <= used.capacity() + sizeof(int)*8 ||
@@ -248,12 +248,12 @@ namespace internal
                                        // they may over-allocate by up to
                                        // as many elements as an integer
                                        // has bits
-      Assert (cells.size() == cells.capacity() ||
-              cells.size()<DEAL_II_MIN_VECTOR_CAPACITY,
+      Assert (cells.size() <=
+	      cells.capacity() + DEAL_II_MIN_VECTOR_CAPACITY,
               ExcMemoryWasted ("quads",
                                cells.size(), cells.capacity()));
-      Assert (children.size() == children.capacity() ||
-              children.size()<DEAL_II_MIN_VECTOR_CAPACITY,
+      Assert (children.size() <=
+	      children.capacity() + DEAL_II_MIN_VECTOR_CAPACITY,
               ExcMemoryWasted ("children",
                                children.size(), children.capacity()));
       Assert (used.size() <= used.capacity() + sizeof(int)*8 ||
@@ -287,12 +287,12 @@ namespace internal
                                        // they may over-allocate by up to
                                        // as many elements as an integer
                                        // has bits
-      Assert (cells.size() == cells.capacity() ||
-              cells.size()<DEAL_II_MIN_VECTOR_CAPACITY,
+      Assert (cells.size() <=
+	      cells.capacity() + DEAL_II_MIN_VECTOR_CAPACITY,
               ExcMemoryWasted ("hexes",
                                cells.size(), cells.capacity()));
-      Assert (children.size() == children.capacity() ||
-              children.size()<DEAL_II_MIN_VECTOR_CAPACITY,
+      Assert (children.size() <=
+	      children.capacity() + DEAL_II_MIN_VECTOR_CAPACITY,
               ExcMemoryWasted ("children",
                                children.size(), children.capacity()));
       Assert (used.size() <= used.capacity() + sizeof(int)*8 ||
