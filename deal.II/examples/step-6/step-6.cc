@@ -228,7 +228,8 @@ void Coefficient<dim>::value_list (const std::vector<Point<dim> > &points,
 				 // the desired polynomial degree
 				 // (here <code>2</code>):
 template <int dim>
-LaplaceProblem<dim>::LaplaceProblem () :
+LaplaceProblem<dim>::LaplaceProblem ()
+		:
 		dof_handler (triangulation),
                 fe (2)
 {}
