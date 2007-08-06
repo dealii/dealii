@@ -50,7 +50,8 @@ template <typename number> class SparseMatrix;
  * of sparsity patterns can be found in the documentation of the @ref Sparsity
  * module.
  *
- * This class is an example of the "dynamic" type of @ref Sparsity.
+ * This class is an example of the "dynamic" type of @ref Sparsity. It is
+ * discussed in the @ref step_27 "step-27" tutorial program.
  *
  * <h3>Interface</h3>
  *
