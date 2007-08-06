@@ -364,16 +364,6 @@ class DoFTools
 				      * resulting sparsity pattern is
 				      * symmetric.
 				      *
-				      * Since this process is purely
-				      * local, the sparsity pattern
-				      * does not provide for entries
-				      * introduced by the elimination
-				      * of hanging nodes.  They have
-				      * to be taken care of by a call
-				      * to
-				      * ConstraintMatrix::condense()
-				      * afterwards.
-				      *
 				      * Remember using
 				      * SparsityPattern::compress()
 				      * after generating the pattern.
@@ -399,6 +389,24 @@ class DoFTools
 				      * content of the object, that is
 				      * previously added entries are
 				      * not deleted.
+				      *
+				      * Since this process is purely local,
+				      * the sparsity pattern does not provide
+				      * for entries introduced by the
+				      * elimination of hanging nodes. They
+				      * have to be taken care of by a call to
+				      * ConstraintMatrix::condense()
+				      * afterwards.
+				      *
+				      * Alternatively, the constraints on
+				      * degrees of freedom can already be
+				      * taken into account at the time of
+				      * creating the sparsity pattern. For
+				      * this, pass the ConstraintMatrix object
+				      * as the last argument to the current
+				      * function. No call to
+				      * ConstraintMatrix::condense() is then
+				      * necessary.
 				      */
     template <class DH, class SparsityPattern>
     static
