@@ -66,6 +66,35 @@
 				 // programs:
 using namespace dealii;
 
+
+				 // @sect3{The main class}
+
+				 // The main class of this program looks very
+				 // much like the one already used in the
+				 // first few tutorial programs, for example
+				 // the one in step-6. The main difference is
+				 // that we have merged the refine_grid and
+				 // output_results functions into one since we
+				 // will also want to output some of the
+				 // quantities used in deciding how to refine
+				 // the mesh (in particular the estimated
+				 // smoothness of the solution). There is also
+				 // a function that computes this estimated
+				 // smoothness, as discussed in the
+				 // introduction.
+				 //
+				 // As far as member variables are concerned,
+				 // we use the same structure as already used
+				 // in step-6, but instead of a regular
+				 // DoFHandler we use an object of type
+				 // hp::DoFHandler, and we need collections
+				 // instead of individual finite element,
+				 // quadrature, and face quadrature
+				 // objects. We will fill these collections in
+				 // the constructor of the class. The last
+				 // variable, <code>max_degree</code>,
+				 // indicates the maximal polynomial degree of
+				 // shape functions used.
 template <int dim>
 class LaplaceProblem 
 {
@@ -103,6 +132,11 @@ class LaplaceProblem
 
 
 
+				 // @sect3{Equation data}
+				 //
+				 // Next, let us define the right hand side
+				 // function for this problem. It is $x+1$ in
+				 // 1d, $(x+1)(y+1)$ in 2d, and so on.
 template <int dim>
 class RightHandSide : public Function<dim>
 {
@@ -119,49 +153,79 @@ double
 RightHandSide<dim>::value (const Point<dim>   &p,
 			   const unsigned int  /*component*/) const
 {
-  switch (dim)
-    {
-      case 2:
-      {
-	double product = 1;
-	for (unsigned int d=0; d<dim; ++d)
-	  product *= (p[d]+1);
-	return product;
-      }
-      
-      case 3:
-	    return (p[0]>std::fabs(p[1]) ? 1 : 0);
-	    
-      default:
-	    Assert (false, ExcNotImplemented());
-    }
-  return 0.;
+  double product = 1;
+  for (unsigned int d=0; d<dim; ++d)
+    product *= (p[d]+1);
+  return product;
 }
 
 
 
 
+				 // @sect3{Implementation of the main class}
+
+				 // @sect4{LaplaceProblem::LaplaceProblem}
+
+				 // The constructor of this class is fairly
+				 // straightforward. It associates the
+				 // hp::DoFHandler object with the
+				 // triangulation, and then sets the maximal
+				 // polynomial degree to 7 (in 1d and 2d) or 5
+				 // (in 3d and higher). We do so because using
+				 // higher order polynomial degrees becomes
+				 // prohibitively expensive, especially in
+				 // higher space dimensions.
+				 //
+				 // Following this, we fill the collections of
+				 // finite element, and cell and face
+				 // quadrature objects. We start with
+				 // quadratic elements, and each quadrature
+				 // formula is chosen so that it is
+				 // appropriate for the matching finite
+				 // element in the hp::FECollection object.
 template <int dim>
 LaplaceProblem<dim>::LaplaceProblem ()
 		:
 		dof_handler (triangulation),
-		max_degree (dim == 2 ? 7 : 5)
+		max_degree (dim <= 2 ? 7 : 5)
 {
   for (unsigned int degree=2; degree<=max_degree; ++degree)
     {
       fe_collection.push_back (FE_Q<dim>(degree));
-      quadrature_collection.push_back (QGauss<dim>(degree+2));
-      face_quadrature_collection.push_back (QGauss<dim-1>(degree+2));
+      quadrature_collection.push_back (QGauss<dim>(degree+1));
+      face_quadrature_collection.push_back (QGauss<dim-1>(degree+1));
     }
 }
 
 
+				 // @sect4{LaplaceProblem::~LaplaceProblem}
+
+				 // The destructor is unchanged from what we
+				 // already did in step-6:
 template <int dim>
 LaplaceProblem<dim>::~LaplaceProblem () 
 {
   dof_handler.clear ();
 }
 
+
+				 // @sect4{LaplaceProblem::setup_system}
+				 //
+				 // This function is again an almost verbatim
+				 // copy of what we already did in step-6,
+				 // with the main difference that we don't
+				 // directly build the sparsity pattern, but
+				 // first create an intermediate object that
+				 // we later copy into the right data
+				 // structure. This is as explained in the
+				 // introduction of this program.
+				 //
+				 // The second change, maybe hidden in plain
+				 // sight, is that the dof_handler variable
+				 // here is an hp object -- nevertheless all
+				 // the function calls we had before still
+				 // work in exactly the same way as they
+				 // always did.
 template <int dim>
 void LaplaceProblem<dim>::setup_system ()
 {
@@ -173,7 +237,6 @@ void LaplaceProblem<dim>::setup_system ()
   hanging_node_constraints.clear ();
   DoFTools::make_hanging_node_constraints (dof_handler,
 					   hanging_node_constraints);
-
   hanging_node_constraints.close ();
 
   CompressedSetSparsityPattern csp (dof_handler.n_dofs(),
@@ -187,6 +250,7 @@ void LaplaceProblem<dim>::setup_system ()
 
 
 
+				 // @sect4{LaplaceProblem::assemble_system}
 template <int dim>
 void LaplaceProblem<dim>::assemble_system () 
 {
@@ -219,7 +283,9 @@ void LaplaceProblem<dim>::assemble_system ()
       rhs_function.value_list (fe_values.get_quadrature_points(),
 			       rhs_values);
       
-      for (unsigned int q_point=0; q_point<fe_values.n_quadrature_points; ++q_point)
+      for (unsigned int q_point=0;
+	   q_point<fe_values.n_quadrature_points;
+	   ++q_point)
 	for (unsigned int i=0; i<dofs_per_cell; ++i)
 	  {
 	    for (unsigned int j=0; j<dofs_per_cell; ++j)
