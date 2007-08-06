@@ -21,36 +21,44 @@
 #include <base/function.h>
 #include <base/logstream.h>
 #include <base/utilities.h>
-#include <base/timer.h>
 #include <lac/vector.h>
 #include <lac/full_matrix.h>
 #include <lac/sparse_matrix.h>
-#include <lac/compressed_set_sparsity_pattern.h>
 #include <lac/solver_cg.h>
 #include <lac/precondition.h>
 #include <grid/tria.h>
-#include <hp/dof_handler.h>
 #include <grid/grid_generator.h>
 #include <grid/tria_accessor.h>
 #include <grid/tria_iterator.h>
-#include <grid/tria_boundary_lib.h>
-#include <grid/grid_reordering.h>
+#include <grid/grid_refinement.h>
 #include <dofs/dof_accessor.h>
 #include <dofs/dof_tools.h>
-#include <hp/fe_values.h>
+#include <dofs/dof_constraints.h>
+#include <fe/fe_q.h>
 #include <numerics/vectors.h>
 #include <numerics/matrices.h>
 #include <numerics/data_out.h>
-
-#include <fe/fe_q.h>
-#include <grid/grid_out.h>
-#include <dofs/dof_constraints.h>
-#include <grid/grid_refinement.h>
 #include <numerics/error_estimator.h>
 
+				 // These are the new files we need. The first
+				 // one provides an alternative to the usual
+				 // SparsityPattern class and the
+				 // CompressedSparsityPattern class already
+				 // discussed in step-11 and step-18. The last
+				 // two provide $hp$ versions of the
+				 // DoFHandler and FEValues classes as
+				 // described in the introduction of this
+				 // program.
+#include <lac/compressed_set_sparsity_pattern.h>
+#include <hp/dof_handler.h>
+#include <hp/fe_values.h>
+
+				 // The last set of include files are standard
+				 // C++ headers. We need support for complex
+				 // numbers when we compute the Fourier
+				 // transform.
 #include <fstream>
 #include <iostream>
-
 #include <complex>
 
 
