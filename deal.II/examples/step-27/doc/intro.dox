@@ -238,7 +238,7 @@ i.e. the interesting part of the loop over all cells would look like this:
       const FEValues<dim> &fe_values = hp_fe_values.get_present_fe_values ();
 
       ...  // assemble local contributions and copy them into global object
-   }
+    }
 </pre>
 </code>
 
@@ -509,6 +509,8 @@ x)$ is in $H^s(\hat K)$ with $s=\mu-\frac d2$.
 
 <h3>Complications with linear systems for hp discretizations</h3>
 
+<h4>Creating the sparsity pattern</h4>
+
 One of the problems with $hp$ methods is that the high polynomial degree of
 shape functions together with the large number of constrained degrees of
 freedom leads to matrices with large numbers of nonzero entries in some
@@ -568,3 +570,113 @@ class has a slight advantage for lower order elements in 3d), but for high
 order and $hp$ elements in 3d, the CompressedSetSparsityPattern has a definite
 edge. We will therefore use it later when we build the sparsity pattern in
 this tutorial program.
+
+
+<h4>Eliminating constrained degrees of freedom</h4>
+
+A second problem particular to $hp$ methods arises because we have so many
+constrained degrees of freedom: typically up to about one third of all degrees
+of freedom (in 3d) are constrained because they either belong to cells with
+hanging nodes or because they are on cells adjacent to cells with a higher or
+lower polynomial degree. This is much more than the fraction of constrained
+degrees of freedom in non-$hp$ mode.
+
+In previous programs, for example in step-6, we have dealt with eliminating
+these constrained degrees of freedom by first building an object of type
+ConstraintMatrix that stores the constraints, and then "condensing" away these
+degrees of freedom first from the sparsity pattern. The same scheme is used
+for the matrix and right hand side, which are also both first built then
+condensed. 
+
+Dealing with sparsity patterns and matrices in this way turns out to be
+inefficient because the effort necessary is at least ${\cal O}(N \log N)$ in
+the number of unknowns, whereas an ideal finite element program would of
+course only have algorithms that are linear in the number of unknowns. The
+solution to this problem is to use the ConstraintMatrix object already at the
+time of creating the sparsity pattern, or while copying local contributions
+into the global matrix object (or global vector).
+
+So, instead of the code snippet (taken from @ref step_6 "step-6")
+<code>
+<pre>
+  DoFTools::make_hanging_node_constraints (dof_handler,
+					   hanging_node_constraints);
+  hanging_node_constraints.close ();
+
+  DoFTools::make_sparsity_pattern (dof_handler, sparsity_pattern);
+  hanging_node_constraints.condense (sparsity_pattern);
+</pre>
+</code>
+we now use the following:
+<code>
+<pre>
+  DoFTools::make_hanging_node_constraints (dof_handler,
+					   hanging_node_constraints);
+  hanging_node_constraints.close ();
+
+  DoFTools::make_sparsity_pattern (dof_handler, sparsity_pattern,
+                                   hanging_node_constraints);
+</pre>
+</code>
+
+In a similar vein, we have to slightly modify the way we copy local
+contributions into global matrices and vectors. In previous tutorial programs,
+we have always used a process like this:
+<code>
+<pre>
+  typename hp::DoFHandler<dim>::active_cell_iterator
+    cell = dof_handler.begin_active(),
+    endc = dof_handler.end();
+  for (; cell!=endc; ++cell)
+    {
+      ...  // assemble local contributions them into global object
+
+      cell->get_dof_indices (local_dof_indices);
+      for (unsigned int i=0; i<dofs_per_cell; ++i)
+	{
+	  for (unsigned int j=0; j<dofs_per_cell; ++j)
+	    system_matrix.add (local_dof_indices[i],
+			       local_dof_indices[j],
+			       cell_matrix(i,j));	  
+	  system_rhs(local_dof_indices[i]) += cell_rhs(i);
+	}
+    }
+
+  hanging_node_constraints.condense (system_matrix);
+  hanging_node_constraints.condense (system_rhs);
+</pre>
+</code>
+We now replace copying and later condensing into one step, as already shown in
+@ref step_17 "step-17" and @ref step_18 "step-18":
+<code>
+<pre>
+  typename hp::DoFHandler<dim>::active_cell_iterator
+    cell = dof_handler.begin_active(),
+    endc = dof_handler.end();
+  for (; cell!=endc; ++cell)
+    {
+      ...  // assemble local contributions them into global object
+
+      cell->get_dof_indices (local_dof_indices);
+
+      hanging_node_constraints
+	.distribute_local_to_global (cell_matrix,
+				     local_dof_indices,
+				     system_matrix);
+	  
+      hanging_node_constraints
+	.distribute_local_to_global (cell_rhs,
+				     local_dof_indices,
+				     system_rhs);
+    }
+</pre>
+</code>
+Essentially, what the
+<code>hanging_node_constraints.distribute_local_to_global</code> calls do is
+to implement the same loop as before, but whenever we hit a constrained degree
+of freedom, the function does the right thing and already condenses it away.
+
+Using this technique of eliminating constrained nodes already when
+transferring local contributions into the global objects, we avoid the problem
+of having to go back later and change these objects. Timing these operations
+shows that this makes the overall algorithms faster.

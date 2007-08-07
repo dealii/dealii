@@ -217,8 +217,14 @@ LaplaceProblem<dim>::~LaplaceProblem ()
 				 // directly build the sparsity pattern, but
 				 // first create an intermediate object that
 				 // we later copy into the right data
-				 // structure. This is as explained in the
-				 // introduction of this program.
+				 // structure. In another slight deviation, we
+				 // do not first build the sparsity pattern
+				 // then condense away constrained degrees of
+				 // freedom, but pass the constraint matrix
+				 // object directly to the function that
+				 // builds the sparsity pattern. Both of these
+				 // steps are explained in the introduction of
+				 // this program.
 				 //
 				 // The second change, maybe hidden in plain
 				 // sight, is that the dof_handler variable
@@ -251,6 +257,23 @@ void LaplaceProblem<dim>::setup_system ()
 
 
 				 // @sect4{LaplaceProblem::assemble_system}
+
+				 // This is the function that assembles the
+				 // global matrix and right hand side vector
+				 // from the local contributions of each
+				 // cell. Its main working is as has been
+				 // described in many of the tutorial programs
+				 // before. The significant deviations are the
+				 // ones necessary for $hp$ finite element
+				 // methods. In particular, that we need to
+				 // use a collection of FEValues object
+				 // (implemented through the hp::FEValues
+				 // class), and that we have to eliminate
+				 // constrained degrees of freedom already
+				 // when copying local contributions into
+				 // global objects. Both of these are
+				 // explained in detail in the introduction of
+				 // this program.
 template <int dim>
 void LaplaceProblem<dim>::assemble_system () 
 {
@@ -311,6 +334,11 @@ void LaplaceProblem<dim>::assemble_system ()
 				     system_rhs);
     }
 
+				   // After the steps already discussed above,
+				   // all we still have to do is to treat
+				   // Dirichlet boundary values
+				   // correctly. This works in exactly the
+				   // same way as for non-$hp$ objects:
   std::map<unsigned int,double> boundary_values;
   VectorTools::interpolate_boundary_values (dof_handler,
 					    0,
@@ -322,6 +350,16 @@ void LaplaceProblem<dim>::assemble_system ()
 				      system_rhs);
 }
 
+
+
+				 // @sect4{LaplaceProblem::solve}
+
+				 // The function solving the linear system is
+				 // entirely unchanged from previous
+				 // examples. We simply try to reduce the
+				 // initial residual (which equals the $l_2$
+				 // norm of the right hand side) by a certain
+				 // factor:
 template <int dim>
 void LaplaceProblem<dim>::solve () 
 {
@@ -336,6 +374,202 @@ void LaplaceProblem<dim>::solve ()
 	    preconditioner);
 
   hanging_node_constraints.distribute (solution);
+}
+
+
+
+				 // @sect4{LaplaceProblem::postprocess}
+
+template <int dim>
+void LaplaceProblem<dim>::postprocess (const unsigned int cycle)
+{
+  Assert (cycle < 10, ExcNotImplemented());
+  
+  Vector<float> estimated_error_per_cell (triangulation.n_active_cells());
+  KellyErrorEstimator<dim>::estimate (dof_handler,
+				      face_quadrature_collection,
+				      typename FunctionMap<dim>::type(),
+				      solution,
+				      estimated_error_per_cell);
+
+  Vector<float> smoothness_indicators (triangulation.n_active_cells());
+  estimate_smoothness (smoothness_indicators);
+  
+  {
+    Vector<float> fe_indices (triangulation.n_active_cells());
+    {
+      typename hp::DoFHandler<dim>::active_cell_iterator
+	cell = dof_handler.begin_active(),
+	endc = dof_handler.end();
+      for (unsigned int index=0; cell!=endc; ++cell, ++index)
+	fe_indices(index) = cell->active_fe_index();
+    }
+    
+    const std::string filename = "solution-" +
+				 Utilities::int_to_string (cycle, 2) +
+				 ".gmv";
+    DataOut<dim,hp::DoFHandler<dim> > data_out;
+
+    data_out.attach_dof_handler (dof_handler);
+    data_out.add_data_vector (solution, "solution");
+    data_out.add_data_vector (smoothness_indicators, "smoothness");
+    data_out.add_data_vector (fe_indices, "fe_index");
+    data_out.build_patches ();
+  
+    std::ofstream output (filename.c_str());
+    data_out.write_gmv (output);
+  }
+  
+  {
+    GridRefinement::refine_and_coarsen_fixed_number (triangulation,
+						     estimated_error_per_cell,
+						     0.3, 0.03);
+
+    float max_smoothness = 0,
+	  min_smoothness = smoothness_indicators.linfty_norm();
+    {
+      typename hp::DoFHandler<dim>::active_cell_iterator
+	cell = dof_handler.begin_active(),
+	endc = dof_handler.end();
+      for (unsigned int index=0; cell!=endc; ++cell, ++index)
+	if (cell->refine_flag_set())
+	  {
+	    max_smoothness = std::max (max_smoothness,
+				       smoothness_indicators(index));
+	    min_smoothness = std::min (min_smoothness,
+				       smoothness_indicators(index));
+	  }
+    }
+
+    const float cutoff_smoothness = (max_smoothness + min_smoothness) / 2;
+    {
+      typename hp::DoFHandler<dim>::active_cell_iterator
+	cell = dof_handler.begin_active(),
+	endc = dof_handler.end();
+      for (unsigned int index=0; cell!=endc; ++cell, ++index)
+	if (cell->refine_flag_set()
+	    &&
+	    (smoothness_indicators(index) > cutoff_smoothness)
+	    &&
+	    !(cell->active_fe_index() == fe_collection.size() - 1))
+	  {
+	    cell->clear_refine_flag();
+					     // REMOVE redundant std::min
+	    cell->set_active_fe_index (std::min (cell->active_fe_index() + 1,
+						 fe_collection.size() - 1));
+	  }
+    } 
+  
+    triangulation.execute_coarsening_and_refinement ();
+  }
+}
+
+
+				 // @sect4{LaplaceProblem::create_coarse_grid}
+template <>
+void LaplaceProblem<2>::create_coarse_grid ()
+{
+  const unsigned int dim = 2;
+  
+  static const Point<2> vertices_1[]
+    = {  Point<2> (-1.,   -1.),
+         Point<2> (-1./2, -1.),
+         Point<2> (0.,    -1.),
+         Point<2> (+1./2, -1.),
+         Point<2> (+1,    -1.),
+	     
+         Point<2> (-1.,   -1./2.),
+         Point<2> (-1./2, -1./2.),
+         Point<2> (0.,    -1./2.),
+         Point<2> (+1./2, -1./2.),
+         Point<2> (+1,    -1./2.),
+	     
+         Point<2> (-1.,   0.),
+         Point<2> (-1./2, 0.),
+         Point<2> (+1./2, 0.),
+         Point<2> (+1,    0.),
+	     
+         Point<2> (-1.,   1./2.),
+         Point<2> (-1./2, 1./2.),
+         Point<2> (0.,    1./2.),
+         Point<2> (+1./2, 1./2.),
+         Point<2> (+1,    1./2.),
+	     
+         Point<2> (-1.,   1.),
+         Point<2> (-1./2, 1.),
+         Point<2> (0.,    1.),			  
+         Point<2> (+1./2, 1.),
+         Point<2> (+1,    1.)    };
+  const unsigned int
+    n_vertices = sizeof(vertices_1) / sizeof(vertices_1[0]);
+  const std::vector<Point<dim> > vertices (&vertices_1[0],
+                                           &vertices_1[n_vertices]);
+  static const int cell_vertices[][GeometryInfo<dim>::vertices_per_cell]
+    = {{0, 1, 5, 6},
+       {1, 2, 6, 7},
+       {2, 3, 7, 8},
+       {3, 4, 8, 9},
+       {5, 6, 10, 11},
+       {8, 9, 12, 13},
+       {10, 11, 14, 15},
+       {12, 13, 17, 18},
+       {14, 15, 19, 20},
+       {15, 16, 20, 21},
+       {16, 17, 21, 22},
+       {17, 18, 22, 23}};
+  const unsigned int
+    n_cells = sizeof(cell_vertices) / sizeof(cell_vertices[0]);
+
+  std::vector<CellData<dim> > cells (n_cells, CellData<dim>());
+  for (unsigned int i=0; i<n_cells; ++i) 
+    {
+      for (unsigned int j=0;
+           j<GeometryInfo<dim>::vertices_per_cell;
+           ++j)
+        cells[i].vertices[j] = cell_vertices[i][j];
+      cells[i].material_id = 0;
+    }
+
+  triangulation.create_triangulation (vertices,
+                                    cells,
+                                    SubCellData());
+  triangulation.refine_global (3);
+}
+
+
+
+
+				 // @sect4{LaplaceProblem::run}
+template <int dim>
+void LaplaceProblem<dim>::run () 
+{
+  for (unsigned int cycle=0; cycle<5; ++cycle)
+    {
+      std::cout << "Cycle " << cycle << ':' << std::endl;
+
+      if (cycle == 0)
+	create_coarse_grid ();
+
+      std::cout << "   Number of active cells:       "
+		<< triangulation.n_active_cells()
+		<< std::endl;
+
+      setup_system ();
+
+      std::cout << "   Number of degrees of freedom: "
+		<< dof_handler.n_dofs()
+		<< std::endl;
+      std::cout << "   Number of constraints       : "
+		<< hanging_node_constraints.n_constraints()
+		<< std::endl;
+
+      assemble_system ();
+      
+
+      solve ();
+      
+      postprocess (cycle);
+    }
 }
 
 
@@ -509,197 +743,15 @@ estimate_smoothness (Vector<float> &smoothness_indicators) const
 }
 
 
+				 // @sect3{The main function}
 
-template <int dim>
-void LaplaceProblem<dim>::postprocess (const unsigned int cycle)
-{
-  Assert (cycle < 10, ExcNotImplemented());
-  
-  Vector<float> estimated_error_per_cell (triangulation.n_active_cells());
-  KellyErrorEstimator<dim>::estimate (dof_handler,
-				      face_quadrature_collection,
-				      typename FunctionMap<dim>::type(),
-				      solution,
-				      estimated_error_per_cell);
-
-  Vector<float> smoothness_indicators (triangulation.n_active_cells());
-  estimate_smoothness (smoothness_indicators);
-  
-  {
-    Vector<float> fe_indices (triangulation.n_active_cells());
-    {
-      typename hp::DoFHandler<dim>::active_cell_iterator
-	cell = dof_handler.begin_active(),
-	endc = dof_handler.end();
-      for (unsigned int index=0; cell!=endc; ++cell, ++index)
-	fe_indices(index) = cell->active_fe_index();
-    }
-    
-    const std::string filename = "solution-" +
-				 Utilities::int_to_string (cycle, 2) +
-				 ".gmv";
-    DataOut<dim,hp::DoFHandler<dim> > data_out;
-
-    data_out.attach_dof_handler (dof_handler);
-    data_out.add_data_vector (solution, "solution");
-    data_out.add_data_vector (smoothness_indicators, "smoothness");
-    data_out.add_data_vector (fe_indices, "fe_index");
-    data_out.build_patches ();
-  
-    std::ofstream output (filename.c_str());
-    data_out.write_gmv (output);
-  }
-  
-  {
-    GridRefinement::refine_and_coarsen_fixed_number (triangulation,
-						     estimated_error_per_cell,
-						     0.3, 0.03);
-
-    float max_smoothness = 0,
-	  min_smoothness = smoothness_indicators.linfty_norm();
-    {
-      typename hp::DoFHandler<dim>::active_cell_iterator
-	cell = dof_handler.begin_active(),
-	endc = dof_handler.end();
-      for (unsigned int index=0; cell!=endc; ++cell, ++index)
-	if (cell->refine_flag_set())
-	  {
-	    max_smoothness = std::max (max_smoothness,
-				       smoothness_indicators(index));
-	    min_smoothness = std::min (min_smoothness,
-				       smoothness_indicators(index));
-	  }
-    }
-
-    const float cutoff_smoothness = (max_smoothness + min_smoothness) / 2;
-    {
-      typename hp::DoFHandler<dim>::active_cell_iterator
-	cell = dof_handler.begin_active(),
-	endc = dof_handler.end();
-      for (unsigned int index=0; cell!=endc; ++cell, ++index)
-	if (cell->refine_flag_set()
-	    &&
-	    (smoothness_indicators(index) > cutoff_smoothness)
-	    &&
-	    !(cell->active_fe_index() == fe_collection.size() - 1))
-	  {
-	    cell->clear_refine_flag();
-					     // REMOVE redundant std::min
-	    cell->set_active_fe_index (std::min (cell->active_fe_index() + 1,
-						 fe_collection.size() - 1));
-	  }
-    } 
-  
-    triangulation.execute_coarsening_and_refinement ();
-  }
-}
-
-
-template <>
-void LaplaceProblem<2>::create_coarse_grid ()
-{
-  const unsigned int dim = 2;
-  
-  static const Point<2> vertices_1[]
-    = {  Point<2> (-1.,   -1.),
-         Point<2> (-1./2, -1.),
-         Point<2> (0.,    -1.),
-         Point<2> (+1./2, -1.),
-         Point<2> (+1,    -1.),
-	     
-         Point<2> (-1.,   -1./2.),
-         Point<2> (-1./2, -1./2.),
-         Point<2> (0.,    -1./2.),
-         Point<2> (+1./2, -1./2.),
-         Point<2> (+1,    -1./2.),
-	     
-         Point<2> (-1.,   0.),
-         Point<2> (-1./2, 0.),
-         Point<2> (+1./2, 0.),
-         Point<2> (+1,    0.),
-	     
-         Point<2> (-1.,   1./2.),
-         Point<2> (-1./2, 1./2.),
-         Point<2> (0.,    1./2.),
-         Point<2> (+1./2, 1./2.),
-         Point<2> (+1,    1./2.),
-	     
-         Point<2> (-1.,   1.),
-         Point<2> (-1./2, 1.),
-         Point<2> (0.,    1.),			  
-         Point<2> (+1./2, 1.),
-         Point<2> (+1,    1.)    };
-  const unsigned int
-    n_vertices = sizeof(vertices_1) / sizeof(vertices_1[0]);
-  const std::vector<Point<dim> > vertices (&vertices_1[0],
-                                           &vertices_1[n_vertices]);
-  static const int cell_vertices[][GeometryInfo<dim>::vertices_per_cell]
-    = {{0, 1, 5, 6},
-       {1, 2, 6, 7},
-       {2, 3, 7, 8},
-       {3, 4, 8, 9},
-       {5, 6, 10, 11},
-       {8, 9, 12, 13},
-       {10, 11, 14, 15},
-       {12, 13, 17, 18},
-       {14, 15, 19, 20},
-       {15, 16, 20, 21},
-       {16, 17, 21, 22},
-       {17, 18, 22, 23}};
-  const unsigned int
-    n_cells = sizeof(cell_vertices) / sizeof(cell_vertices[0]);
-
-  std::vector<CellData<dim> > cells (n_cells, CellData<dim>());
-  for (unsigned int i=0; i<n_cells; ++i) 
-    {
-      for (unsigned int j=0;
-           j<GeometryInfo<dim>::vertices_per_cell;
-           ++j)
-        cells[i].vertices[j] = cell_vertices[i][j];
-      cells[i].material_id = 0;
-    }
-
-  triangulation.create_triangulation (vertices,
-                                    cells,
-                                    SubCellData());
-  triangulation.refine_global (3);
-}
-
-
-
-
-template <int dim>
-void LaplaceProblem<dim>::run () 
-{
-  for (unsigned int cycle=0; cycle<5; ++cycle)
-    {
-      std::cout << "Cycle " << cycle << ':' << std::endl;
-
-      if (cycle == 0)
-	create_coarse_grid ();
-
-      std::cout << "   Number of active cells:       "
-		<< triangulation.n_active_cells()
-		<< std::endl;
-
-      setup_system ();
-
-      std::cout << "   Number of degrees of freedom: "
-		<< dof_handler.n_dofs()
-		<< std::endl;
-      std::cout << "   Number of constraints       : "
-		<< hanging_node_constraints.n_constraints()
-		<< std::endl;
-
-      assemble_system ();
-      
-
-      solve ();
-      
-      postprocess (cycle);
-    }
-}
-
+				 // The main function is again verbatim what
+				 // we had before: wrap creating and running
+				 // an object of the main class into a
+				 // <code>try</code> block and catch whatever
+				 // exceptions are thrown, thereby producing
+				 // meaningful output if anything should go
+				 // wrong:
 int main () 
 {
   try
