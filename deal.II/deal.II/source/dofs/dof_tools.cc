@@ -3587,6 +3587,25 @@ DoFTools::extract_subdomain_dofs (const DH           &dof_handler,
 
 
 
+    
+template <class DH>
+void
+DoFTools::get_active_fe_indices (const DH                  &dof_handler,
+				 std::vector<unsigned int> &active_fe_indices)
+{
+  Assert (active_fe_indices.size() == dof_handler.get_tria().n_active_cells(),
+	  ExcWrongSize (active_fe_indices.size(),
+			dof_handler.get_tria().n_active_cells()));
+  
+  typename DH::active_cell_iterator
+    cell = dof_handler.begin_active(),
+    endc = dof_handler.end();
+  for (unsigned int index=0; cell!=endc; ++cell, ++index)
+    active_fe_indices[index] = cell->active_fe_index();
+}
+
+
+
 template <class DH>
 void
 DoFTools::get_subdomain_association (const DH                  &dof_handler,
@@ -5504,6 +5523,18 @@ DoFTools::extract_subdomain_dofs<hp::DoFHandler<deal_II_dimension> >
 (const hp::DoFHandler<deal_II_dimension> &dof_handler,
  const unsigned int     subdomain_id,
  std::vector<bool>     &selected_dofs);
+
+template
+void
+DoFTools::get_active_fe_indices<DoFHandler<deal_II_dimension> >
+(const DoFHandler<deal_II_dimension> &dof_handler,
+ std::vector<unsigned int> &active_fe_indices);
+
+template
+void
+DoFTools::get_active_fe_indices<hp::DoFHandler<deal_II_dimension> >
+(const hp::DoFHandler<deal_II_dimension> &dof_handler,
+ std::vector<unsigned int> &active_fe_indices);
 
 template
 void

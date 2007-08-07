@@ -1007,6 +1007,26 @@ class DoFTools
     extract_subdomain_dofs (const DH           &dof_handler,
 			    const unsigned int  subdomain_id,
 			    std::vector<bool>  &selected_dofs);
+
+				     /**
+				      * For each active cell of a DoFHandler
+				      * or hp::DoFHandler, extract the active
+				      * finite element index and fill the
+				      * vector given as second argument. This
+				      * vector is assumed to have as many
+				      * entries as there are active cells.
+				      *
+				      * For non-hp DoFHandler objects given as
+				      * first argument, the returned vector
+				      * will consist of only zeros, indicating
+				      * that all cells use the same finite
+				      * element. For a hp::DoFHandler, the
+				      * values may be different, though.
+				      */
+    template <class DH>
+    static void
+    get_active_fe_indices (const DH                  &dof_handler,
+			   std::vector<unsigned int> &active_fe_indices);
     
                                      /**
                                       * For each DoF, return in the output

@@ -37,7 +37,8 @@ tests_x = hp_dof_handler \
 	  interpolate_* \
 	  hp_constraints_* \
 	  matrices* \
-	  vectors*
+	  vectors* \
+	  get_active_fe_indices
 
 # from above list of regular expressions, generate the real set of
 # tests
