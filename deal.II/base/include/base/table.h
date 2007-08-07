@@ -2,7 +2,7 @@
 //    $Id$
 //    Version: $Name$
 //
-//    Copyright (C) 2002, 2003, 2004, 2005, 2006 by the deal.II authors
+//    Copyright (C) 2002, 2003, 2004, 2005, 2006, 2007 by the deal.II authors
 //
 //    This file is subject to QPL and may not be  distributed
 //    without copyright and license information. Please refer
@@ -556,7 +556,7 @@ class TableBase : public Subscriptor
 				      * Size of the table in direction
 				      * <tt>i</tt>.
 				      */
-    unsigned int size (unsigned int i) const;
+    unsigned int size (const unsigned int i) const;
     
                                      /**
                                       * Return the sizes of this
@@ -1820,7 +1820,7 @@ namespace internal
             subobject_size *= table.size()[N-p];
           const pointer new_data = data + i*subobject_size;
           return Accessor<N,T,C,P-1> (table, new_data);
-        };
+        }
     }
 
 
@@ -2124,8 +2124,8 @@ TableBase<N,T>::position (const TableIndices<N> &indices) const
         for (unsigned int n=1; n<N; ++n)
           s = s*table_size[n] + indices[n];
         return s;
-      };
-    };
+      }
+    }
 }
 
 
