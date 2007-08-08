@@ -504,14 +504,16 @@ void LaplaceProblem<dim>::postprocess (const unsigned int cycle)
     data_out.add_data_vector (fe_degrees, "fe_degree");
     data_out.build_patches ();
 
-				     // The final step in generating output is
-				     // to determine a file name, open the
-				     // file, and write the data into it:
+				     // The final step in generating
+				     // output is to determine a file
+				     // name, open the file, and write
+				     // the data into it (here, we use
+				     // VTK format):
     const std::string filename = "solution-" +
 				 Utilities::int_to_string (cycle, 2) +
-				 ".gmv";
+				 ".vtk";
     std::ofstream output (filename.c_str());
-    data_out.write_gmv (output);
+    data_out.write_vtk (output);
   }
 
 				   // After this, we would like to actually
