@@ -680,3 +680,25 @@ Using this technique of eliminating constrained nodes already when
 transferring local contributions into the global objects, we avoid the problem
 of having to go back later and change these objects. Timing these operations
 shows that this makes the overall algorithms faster.
+
+
+<h3>The test case</h3>
+
+The test case we will solve with this program is a re-take of the one we
+already look at in @ref step_14 "step-14": we solve the Laplace equation
+@[
+	-\Delta u = f
+@]
+in 2d, with $f=(x+1)(y+1)$, and with zero Dirichlet boundary values for
+$u$. We do so on the domain $[-1,1]^2\backslash[-\frac 12,\frac 12]^2$, i.e. a
+square with a square hole in the middle.
+
+The difference to @ref step_14 "step-14" is of course that we use $hp$ finite
+elements for the solution. The testcase is of interest because it has
+re-entrant corners in the corners of the hole, at which the solution has
+singularities. We therefore expect that the solution will be smooth in the
+interior of the domain, and rough in the vicinity of the singularities. The
+hope is that our refinement and smoothness indicators will be able to see this
+behavior and refine the mesh close to the singularities, while the polynomial
+degree is increased away from it. As we will see in the results section, this
+is indeed the case.

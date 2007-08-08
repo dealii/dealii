@@ -274,6 +274,33 @@ void LaplaceProblem<dim>::setup_system ()
 				 // global objects. Both of these are
 				 // explained in detail in the introduction of
 				 // this program.
+				 //
+				 // One other slight complication is the fact
+				 // that because we use different polynomial
+				 // degrees on different cells, the matrices
+				 // and vectors holding local contributions do
+				 // not have the same size on all cells. At
+				 // the beginning of the loop over all cells,
+				 // we therefore each time have to resize them
+				 // to the correct size (given by
+				 // <code>dofs_per_cell</code>). Because these
+				 // classes are implement in such a way that
+				 // reducing the size of a matrix or vector
+				 // does not release the currently allocated
+				 // memory (unless the new size is zero), the
+				 // process of resizing at the beginning of
+				 // the loop will only require re-allocation
+				 // of memory during the first few
+				 // iterations. Once we have found in a cell
+				 // with the maximal finite element degree, no
+				 // more re-allocations will happen because
+				 // all subsequent <code>reinit</code> calls
+				 // will only set the size to something that
+				 // fits the currently allocated memory. This
+				 // is important since allocating memory is
+				 // expensive, and doing so every time we
+				 // visit a new cell would take significant
+				 // compute time.
 template <int dim>
 void LaplaceProblem<dim>::assemble_system () 
 {
@@ -284,18 +311,22 @@ void LaplaceProblem<dim>::assemble_system ()
 
   const RightHandSide<dim> rhs_function;
   
+  FullMatrix<double>   cell_matrix;
+  Vector<double>       cell_rhs;
+
+  std::vector<unsigned int> local_dof_indices;
+  
   typename hp::DoFHandler<dim>::active_cell_iterator
     cell = dof_handler.begin_active(),
     endc = dof_handler.end();
   for (; cell!=endc; ++cell)
     {
       const unsigned int   dofs_per_cell = cell->get_fe().dofs_per_cell;
-      FullMatrix<double>   cell_matrix (dofs_per_cell, dofs_per_cell);
-      Vector<double>       cell_rhs (dofs_per_cell);
 
-      std::vector<unsigned int> local_dof_indices (dofs_per_cell);
-
+      cell_matrix.reinit (dofs_per_cell, dofs_per_cell);
       cell_matrix = 0;
+
+      cell_rhs.reinit (dofs_per_cell);
       cell_rhs = 0;
 
       hp_fe_values.reinit (cell);
@@ -321,6 +352,7 @@ void LaplaceProblem<dim>::assemble_system ()
 			    fe_values.JxW(q_point));
 	  }
 
+      local_dof_indices.resize (dofs_per_cell);
       cell->get_dof_indices (local_dof_indices);
 
       hanging_node_constraints
@@ -380,11 +412,32 @@ void LaplaceProblem<dim>::solve ()
 
 				 // @sect4{LaplaceProblem::postprocess}
 
+				 // After solving the linear system, we will
+				 // want to postprocess the solution. Here,
+				 // all we do is to estimate the error,
+				 // estimate the local smoothness of the
+				 // solution as described in the introduction,
+				 // then write graphical output, and finally
+				 // refine the mesh in both $h$ and $p$
+				 // according to the indicators computed
+				 // before. We do all this in the same
+				 // function because we want the estimated
+				 // error and smoothness indicators not only
+				 // for refinement, but also include them in
+				 // the graphical output.
 template <int dim>
 void LaplaceProblem<dim>::postprocess (const unsigned int cycle)
 {
-  Assert (cycle < 10, ExcNotImplemented());
-  
+				   // Let us start with computing estimated
+				   // error and smoothness indicators, which
+				   // each are one number for each active cell
+				   // of our triangulation. For the error
+				   // indicator, we use the
+				   // KellyErrorEstimator class as
+				   // always. Estimating the smoothness is
+				   // done in the respective function of this
+				   // class; that function is discussed
+				   // further down below:
   Vector<float> estimated_error_per_cell (triangulation.n_active_cells());
   KellyErrorEstimator<dim>::estimate (dof_handler,
 				      face_quadrature_collection,
@@ -394,39 +447,115 @@ void LaplaceProblem<dim>::postprocess (const unsigned int cycle)
 
   Vector<float> smoothness_indicators (triangulation.n_active_cells());
   estimate_smoothness (smoothness_indicators);
-  
+
+				   // Next we want to generate graphical
+				   // output. In addition to the two estimated
+				   // quantities derived above, we would also
+				   // like to output the polynomial degree of
+				   // the finite elements used on each of the
+				   // elements on the mesh.
+				   //
+				   // The way to do that requires that we loop
+				   // over all cells and poll the active
+				   // finite element index of them using
+				   // <code>cell-@>active_fe_index()</code>. We
+				   // then use the result of this operation
+				   // and query the finite element collection
+				   // for the finite element with that index,
+				   // and finally determine the polynomial
+				   // degree of that element. The result we
+				   // put into a vector with one element per
+				   // cell. The DataOut class requires this to
+				   // be a vector of <code>float</code> or
+				   // <code>double</code>, even though our
+				   // values are all integers, so that it what
+				   // we use:
   {
-    Vector<float> fe_indices (triangulation.n_active_cells());
+    Vector<float> fe_degrees (triangulation.n_active_cells());
     {
       typename hp::DoFHandler<dim>::active_cell_iterator
 	cell = dof_handler.begin_active(),
 	endc = dof_handler.end();
       for (unsigned int index=0; cell!=endc; ++cell, ++index)
-	fe_indices(index) = cell->active_fe_index();
+	fe_degrees(index)
+	  = fe_collection[cell->active_fe_index()].degree;
     }
-    
-    const std::string filename = "solution-" +
-				 Utilities::int_to_string (cycle, 2) +
-				 ".gmv";
+
+				     // With now all data vectors available --
+				     // solution, estimated errors and
+				     // smoothness indicators, and finite
+				     // element degrees --, we create a
+				     // DataOut object for graphical output
+				     // and attach all data. Note that the
+				     // DataOut class has a second template
+				     // argument (which defaults to
+				     // DoFHandler@<dim@>, which is why we
+				     // have never seen it in previous
+				     // tutorial programs) that indicates the
+				     // type of DoF handler to be used. Here,
+				     // we have to use the hp::DoFHandler
+				     // class:
     DataOut<dim,hp::DoFHandler<dim> > data_out;
 
     data_out.attach_dof_handler (dof_handler);
     data_out.add_data_vector (solution, "solution");
+    data_out.add_data_vector (estimated_error_per_cell, "error");
     data_out.add_data_vector (smoothness_indicators, "smoothness");
-    data_out.add_data_vector (fe_indices, "fe_index");
+    data_out.add_data_vector (fe_degrees, "fe_degree");
     data_out.build_patches ();
-  
+
+				     // The final step in generating output is
+				     // to determine a file name, open the
+				     // file, and write the data into it:
+    const std::string filename = "solution-" +
+				 Utilities::int_to_string (cycle, 2) +
+				 ".gmv";
     std::ofstream output (filename.c_str());
     data_out.write_gmv (output);
   }
-  
+
+				   // After this, we would like to actually
+				   // refine the mesh, in both $h$ and
+				   // $p$. The way we are going to do this is
+				   // as follows: first, we use the estimated
+				   // error to flag those cells for refinement
+				   // that have the largest error. This is
+				   // what we have always done:
   {
     GridRefinement::refine_and_coarsen_fixed_number (triangulation,
 						     estimated_error_per_cell,
 						     0.3, 0.03);
 
-    float max_smoothness = 0,
-	  min_smoothness = smoothness_indicators.linfty_norm();
+				     // Next we would like to figure out which
+				     // of the cells that have been flagged
+				     // for refinement should actually have
+				     // $p$ increased instead of $h$
+				     // decreased. The strategy we choose here
+				     // is that we look at the smoothness
+				     // indicators of those cells that are
+				     // flagged for refinement, and increase
+				     // $p$ for those with a smoothness larger
+				     // than a certain threshold. For this, we
+				     // first have to determine the maximal
+				     // and minimal values of the smoothness
+				     // indicators of all flagged cells, which
+				     // we do using a loop over all cells and
+				     // comparing current minimal and maximal
+				     // values. (We start with the minimal and
+				     // maximal values of <i>all</i> cells, a
+				     // range within which the minimal and
+				     // maximal values on cells flagged for
+				     // refinement must surely lie.) Absent
+				     // any better strategies, we will then
+				     // set the threshold above which will
+				     // increase $p$ instead of reducing $h$
+				     // as the mean value between minimal and
+				     // maximal smoothness indicators on cells
+				     // flagged for refinement:
+    float max_smoothness = *std::min_element (smoothness_indicators.begin(),
+					      smoothness_indicators.end()),
+	  min_smoothness = *std::max_element (smoothness_indicators.begin(),
+					      smoothness_indicators.end());
     {
       typename hp::DoFHandler<dim>::active_cell_iterator
 	cell = dof_handler.begin_active(),
@@ -440,8 +569,22 @@ void LaplaceProblem<dim>::postprocess (const unsigned int cycle)
 				       smoothness_indicators(index));
 	  }
     }
+    const float threshold_smoothness = (max_smoothness + min_smoothness) / 2;
 
-    const float cutoff_smoothness = (max_smoothness + min_smoothness) / 2;
+				     // With this, we can go back, loop over
+				     // all cells again, and for those cells
+				     // for which (i) the refinement flag is
+				     // set, (ii) the smoothness indicator is
+				     // larger than the threshold, and (iii)
+				     // we still have a finite element with a
+				     // polynomial degree higher than the
+				     // current one in the finite element
+				     // collection, we then increase the
+				     // polynomial degree and in return remove
+				     // the flag indicating that the cell
+				     // should undergo bisection. For all
+				     // other cells, the refinement flags
+				     // remain untouched:
     {
       typename hp::DoFHandler<dim>::active_cell_iterator
 	cell = dof_handler.begin_active(),
@@ -449,23 +592,39 @@ void LaplaceProblem<dim>::postprocess (const unsigned int cycle)
       for (unsigned int index=0; cell!=endc; ++cell, ++index)
 	if (cell->refine_flag_set()
 	    &&
-	    (smoothness_indicators(index) > cutoff_smoothness)
+	    (smoothness_indicators(index) > threshold_smoothness)
 	    &&
-	    !(cell->active_fe_index() == fe_collection.size() - 1))
+	    (cell->active_fe_index()+1 < fe_collection.size()))
 	  {
 	    cell->clear_refine_flag();
-					     // REMOVE redundant std::min
-	    cell->set_active_fe_index (std::min (cell->active_fe_index() + 1,
-						 fe_collection.size() - 1));
+	    cell->set_active_fe_index (cell->active_fe_index() + 1);
 	  }
     } 
-  
+
+				     // At the end of this procedure, we then
+				     // refine the mesh. During this process,
+				     // children of cells undergoing bisection
+				     // inherit their mother cell's finite
+				     // element index:
     triangulation.execute_coarsening_and_refinement ();
   }
 }
 
 
 				 // @sect4{LaplaceProblem::create_coarse_grid}
+
+				 // The following function is used when
+				 // creating the initial grid. It is a
+				 // specialization for the 2d case, i.e. a
+				 // corresponding function needs to be
+				 // implemented if the program is run in
+				 // anything other then 2d. The function is
+				 // actually stolen from step-14 and generates
+				 // the same mesh used already there, i.e. the
+				 // square domain with the square hole in the
+				 // middle. The meaning of the different parts
+				 // of this function are explained in the
+				 // documentation of step-14:
 template <>
 void LaplaceProblem<2>::create_coarse_grid ()
 {
@@ -540,34 +699,45 @@ void LaplaceProblem<2>::create_coarse_grid ()
 
 
 				 // @sect4{LaplaceProblem::run}
+
+				 // This function implements the logic of the
+				 // program, as did the respective function in
+				 // most of the previous programs already, see
+				 // for example step-6.
+				 //
+				 // Basically, it contains the adaptive loop:
+				 // in the first iteration create a coarse
+				 // grid, and then set up the linear system,
+				 // assemble it, solve, and postprocess the
+				 // solution including mesh refinement. Then
+				 // start over again. In the meantime, also
+				 // output some information for those staring
+				 // at the screen trying to figure out what
+				 // the program does:
 template <int dim>
 void LaplaceProblem<dim>::run () 
 {
-  for (unsigned int cycle=0; cycle<5; ++cycle)
+  for (unsigned int cycle=0; cycle<6; ++cycle)
     {
       std::cout << "Cycle " << cycle << ':' << std::endl;
 
       if (cycle == 0)
 	create_coarse_grid ();
 
-      std::cout << "   Number of active cells:       "
-		<< triangulation.n_active_cells()
-		<< std::endl;
-
       setup_system ();
 
-      std::cout << "   Number of degrees of freedom: "
+      std::cout << "   Number of active cells:       "
+		<< triangulation.n_active_cells()
+		<< std::endl
+		<< "   Number of degrees of freedom: "
 		<< dof_handler.n_dofs()
-		<< std::endl;
-      std::cout << "   Number of constraints       : "
+		<< std::endl
+		<< "   Number of constraints       : "
 		<< hanging_node_constraints.n_constraints()
 		<< std::endl;
 
       assemble_system ();
-      
-
       solve ();
-      
       postprocess (cycle);
     }
 }
