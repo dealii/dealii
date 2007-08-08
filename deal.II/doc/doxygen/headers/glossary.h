@@ -125,6 +125,12 @@
  * <a href="http://www.isc.tamu.edu/publications-reports/technical_reports">Institute
  * for Scientific Computation, Texas A&amp;M University</a>, and also
  * from http://www.math.tamu.edu/~bangerth/publications.html .
+ *
+ * The numerical examples shown in that paper are generated with a slightly
+ * modified version of @ref step_27 "step-27". The main difference to that
+ * tutorial program is that various operations in the program were timed for
+ * the paper to compare different options and show that $hp$ methods are
+ * really not all that expensive.
  * </dd>
  *
  *
