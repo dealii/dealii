@@ -686,9 +686,9 @@ shows that this makes the overall algorithms faster.
 
 The test case we will solve with this program is a re-take of the one we
 already look at in @ref step_14 "step-14": we solve the Laplace equation
-@[
+@f[
 	-\Delta u = f
-@]
+@f]
 in 2d, with $f=(x+1)(y+1)$, and with zero Dirichlet boundary values for
 $u$. We do so on the domain $[-1,1]^2\backslash[-\frac 12,\frac 12]^2$, i.e. a
 square with a square hole in the middle.
