@@ -1,6 +1,13 @@
 <a name="Results"></a>
 <h1>Results</h1>
 
+In this section, we discuss a few results produced from running the
+current tutorial program. More results, in particular the extension to
+3d calculations and determining how much compute time the individual
+components of the program take, are given in the @ref hp_paper .
+
+When run, this is what the program produces:
+
 <code>
 <pre>
 examples/step-27> make run
@@ -31,3 +38,15 @@ Cycle 5:
    Number of constraints       : 6196
 </pre>
 </code>
+
+The first thing we learn from this is that the number of constrained
+degrees of freedom is on the order of 20-25% of the total number of
+degrees of freedom, at least on the later grids when we have elements
+of relatively high order. This is, in fact, on the same order of
+magnitude as for non-$hp$ discretizations. For example, in the last
+step of the @ref step_6 "step-6" program, we have 18401 degrees of
+freedom, 4104 of which are constrained. The difference is that in the
+latter program, each constrained hanging node is constrained against
+only the two adjacent degrees of freedom, whereas in the $hp$ case,
+constrained nodes are constrained against many more degrees of
+freedom. 

@@ -574,12 +574,15 @@ this tutorial program.
 
 <h4>Eliminating constrained degrees of freedom</h4>
 
-A second problem particular to $hp$ methods arises because we have so many
-constrained degrees of freedom: typically up to about one third of all degrees
-of freedom (in 3d) are constrained because they either belong to cells with
-hanging nodes or because they are on cells adjacent to cells with a higher or
-lower polynomial degree. This is much more than the fraction of constrained
-degrees of freedom in non-$hp$ mode.
+A second problem particular to $hp$ methods arises because we have so
+many constrained degrees of freedom: typically up to about one third
+of all degrees of freedom (in 3d) are constrained because they either
+belong to cells with hanging nodes or because they are on cells
+adjacent to cells with a higher or lower polynomial degree. This is,
+in fact, not much more than the fraction of constrained degrees of
+freedom in non-$hp$ mode, but the difference is that each constrained
+hanging node is constrained not only against the two adjacent degrees
+of freedom, but is constrained against many more degrees of freedom.
 
 In previous programs, for example in step-6, we have dealt with eliminating
 these constrained degrees of freedom by first building an object of type
