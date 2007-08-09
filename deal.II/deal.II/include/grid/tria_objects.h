@@ -606,6 +606,21 @@ namespace internal
     }
 
 
+
+// declaration of explicit specializations
+
+    template<>
+    void
+    TriaObjects<Line>::reserve_space (const unsigned int new_lines);
+
+    template<>
+    void
+    TriaObjects<Quad>::reserve_space (const unsigned int new_quads);
+
+    template<>
+    void
+    TriaObjects<Quad>::monitor_memory (const unsigned int) const;
+    
   }
 }
 

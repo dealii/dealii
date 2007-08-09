@@ -750,6 +750,12 @@ GridTools::get_active_child_cells (const typename DH::cell_iterator& cell)
 }
 
 
+// declaration of explicit specializations
+template <>
+double
+GridTools::cell_measure(const std::vector<Point<2> > &all_vertices,
+			const unsigned int (&vertex_indices) [GeometryInfo<2>::vertices_per_cell]);
+
 
 
 

@@ -2,7 +2,7 @@
 //    $Id$
 //    Version: $Name$
 //
-//    Copyright (C) 2000, 2001, 2002, 2003, 2004, 2005, 2006 by the deal.II authors
+//    Copyright (C) 2000, 2001, 2002, 2003, 2004, 2005, 2006, 2007 by the deal.II authors
 //
 //    This file is subject to QPL and may not be  distributed
 //    without copyright and license information. Please refer
@@ -695,6 +695,24 @@ class GridReordering
       const std::vector<Point<dim> > &all_vertices,
       std::vector<CellData<dim> > &original_cells);    
 };
+
+
+// declaration of explicit specializations
+template<>
+void
+GridReordering<2>::reorder_cells (std::vector<CellData<2> > &original_cells);
+
+template<>
+void
+GridReordering<2>::invert_all_cells_of_negative_grid(const std::vector<Point<2> > &all_vertices,
+						     std::vector<CellData<2> >    &cells);
+
+template <>
+void
+Triangulation<2>::create_triangulation_compatibility (const std::vector<Point<2> >    &v,
+						      const std::vector<CellData<2> > &c,
+						      const SubCellData               &subcelldata);
+
 
 
 DEAL_II_NAMESPACE_CLOSE
