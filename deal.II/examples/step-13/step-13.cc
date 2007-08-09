@@ -77,7 +77,7 @@ using namespace dealii;
 				 // From an abstract point of view, we
 				 // declare a pure base class
 				 // that provides an evaluation
-				 // operator <code>operator()</code> which will
+				 // operator() which will
 				 // do the evaluation of the solution
 				 // (whatever derived classes might
 				 // consider an <code>evaluation</code>). Since
