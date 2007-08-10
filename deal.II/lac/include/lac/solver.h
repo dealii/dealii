@@ -1,8 +1,7 @@
 //---------------------------------------------------------------------------
 //    $Id$
-//    Version: $Name$
 //
-//    Copyright (C) 1998, 1999, 2000, 2001, 2002, 2003, 2004, 2005, 2006 by the deal.II authors
+//    Copyright (C) 1998, 1999, 2000, 2001, 2002, 2003, 2004, 2005, 2006, 2007 by the deal.II authors
 //
 //    This file is subject to QPL and may not be  distributed
 //    without copyright and license information. Please refer
@@ -22,9 +21,6 @@ DEAL_II_NAMESPACE_OPEN
 template <typename number> class Vector;
 class SolverControl;
 
-/*!@addtogroup Solvers */
-/*@{*/
-
 /**
  * This class defines possible return states of linear solvers and
  * provides interfaces to a memory pool and the control object.
@@ -43,9 +39,10 @@ class SolverControl;
  * classes are not any concrete class, they are rather intended to
  * form a `signature' which a concrete class has to conform to. Note
  * that the matrix and vector classes within this library of course
- * conform to this interface.
+ * conform to this interface; therefore, SparseMatrix and Vector are
+ * good examples for these classes.
  *
- * @verbatim
+ * @code
  * class Matrix
  * {
  *   public:
@@ -74,19 +71,18 @@ class SolverControl;
  *     double operator * (const VECTOR &v) const;
  *
  *                        // addition of vectors
- *                        // $y = y + x$.
  *     void add (const VECTOR &x);
  *
- *                        // $y = y + ax$.
+ *                        // scaled addition of vectors
  *     void add (const double  a,
  *               const VECTOR &x);
  *
- *                        // $y = ay + bx$.
+ *                        // scaled addition of vectors
  *     void sadd (const double  a,
  *                const double  b,
  *                const VECTOR &x);
  * 
- *                        // $y = ax$.
+ *                        // scaled assignment of a vector
  *     void equ (const double  a,
  *               const VECTOR &x);
  *
@@ -97,7 +93,7 @@ class SolverControl;
  *                        // return the l2 norm of the vector
  *     double l2_norm () const;
  * };
- * @endverbatim
+ * @endcode
  *
  * In addition, for some solvers there has to be a global function
  * <tt>swap(VECTOR &a, VECTOR &b)</tt> that exchanges the values of the two vectors.
@@ -119,7 +115,7 @@ class SolverControl;
  * structure as an argument as a default @p AdditionalData is set by default.
  *
  * Now the generating of a solver looks like
- * @verbatim
+ * @code
  *                               // GMRES with 50 tmp vectors
  * SolverGMRES solver_gmres (solver_control, vector_memory,
  *                           SolverGMRES::AdditionalData(50));
@@ -130,7 +126,7 @@ class SolverControl;
  *
  *                               // CG with default AdditionalData
  * SolverCG solver_cg (solver_control, vector_memory);
- * @endverbatim
+ * @endcode
  *
  * Using a unified constructor parameter list for all solvers was introduced
  * when the @p SolverSelector class was written; the unified interface
@@ -139,6 +135,7 @@ class SolverControl;
  * way to give these additional data to the @p SolverSelector object for each
  * solver which it may use.
  *
+ * @ingroup Solvers
  * @author Wolfgang Bangerth, Guido Kanschat, Ralf Hartmann, 1997-2001, 2005
  */
 template <class VECTOR = Vector<double> >
@@ -208,7 +205,6 @@ class Solver : public Subscriptor
     VectorMemory<VECTOR> &memory;
 };
 
-/*@}*/
 /*-------------------------------- Inline functions ------------------------*/
 
 template<class VECTOR>

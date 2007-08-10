@@ -549,6 +549,7 @@ AC_MSG_RESULT(---------------- configuring other programs -----------------)
 
 DEAL_II_CHECK_DOXYGEN
 AC_SUBST(DOXYGEN)
+AC_SUBST(DOXYGEN_OPTIONS)
 AC_SUBST(DEAL_II_HAVE_DOT)
 
 AC_PATH_PROG(PERL, perl)
@@ -653,6 +654,7 @@ process_files="common/Make.global_options
                doc/Makefile 
 	       doc/doxygen/Makefile
                doc/doxygen/options.dox
+               doc/doxygen/options.136
 	       doc/doxygen/header.html
                doc/doxygen/header.tex"
 AC_OUTPUT($process_files)

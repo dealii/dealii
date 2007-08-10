@@ -29,7 +29,7 @@ deal.II deal.tag: tutorial \
 	  $(addprefix tutorial/doxygen/, $(shell ls tutorial/doxygen/))
 	@echo "=== Generating reference documentation. " \
               "This can take several minutes..."
-	@DOXYGEN@ deal.dox > doxygen.log
+	cat @DOXYGEN_OPTIONS@ deal.dox | @DOXYGEN@ - > doxygen.log
 
 
 tutorial:

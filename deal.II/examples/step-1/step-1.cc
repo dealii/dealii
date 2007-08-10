@@ -1,7 +1,6 @@
 /* $Id$
- * Version: $Name$
  *
- * Copyright (C) 1999, 2000, 2001, 2002, 2003, 2005, 2006 by the deal.II authors
+ * Copyright (C) 1999, 2000, 2001, 2002, 2003, 2005, 2006, 2007 by the deal.II authors
  *
  * This file is subject to QPL and may not be  distributed
  * without copyright and license information. Please refer
@@ -12,7 +11,7 @@
 				 // @sect3{Include files}
 
                                  // The most fundamental class in the
-                                 // library is the <code>Triangulation</code>
+                                 // library is the Triangulation
                                  // class, which is declared here:
 #include <grid/tria.h>
                                  // We need the following two includes
@@ -96,7 +95,7 @@ void first_grid ()
 
                                    // Now we want to write a graphical
                                    // representation of the mesh to an
-                                   // output file. The <code>GridOut</code>
+                                   // output file. The GridOut
                                    // class of deal.II can do that in
                                    // a number of different output
                                    // formats; here, we choose
@@ -230,13 +229,13 @@ void second_grid ()
                                          // by which we find out about
                                          // the number of vertices of
                                          // a cell. Using the
-                                         // <code>GeometryInfo</code> class, we
+                                         // GeometryInfo class, we
                                          // will later have an easier
                                          // time getting the program
                                          // to also run in 3d: we only
                                          // have to change all
-                                         // occurrences of <code>@<2@></code> to
-                                         // <code>@<3@></code>, and do not have
+                                         // occurrences of <code>&lt;2&gt;</code> to
+                                         // <code>&lt;3&gt;</code>, and do not have
                                          // to audit our code for the
                                          // hidden appearance of magic
                                          // numbers like a 4 that

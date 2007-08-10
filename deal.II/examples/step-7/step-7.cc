@@ -42,7 +42,7 @@
 
 				 // In this example, we will not use the
 				 // numeration scheme which is used per
-				 // default by the <code>DoFHandler</code> class, but
+				 // default by the DoFHandler class, but
 				 // will renumber them using the Cuthill-McKee
 				 // algorithm. As has already been explained
 				 // in step-2, the necessary functions are
@@ -52,23 +52,23 @@
 				 // how we can make sure that objects
 				 // are not deleted while they are
 				 // still in use. For this purpose,
-				 // deal.II has the <code>SmartPointer</code>
+				 // deal.II has the SmartPointer
 				 // helper class, which is declared in
 				 // this file:
 #include <base/smartpointer.h>
-				 // Next, we will want to use the
-				 // <code>integrate_difference</code> function
+				 // Next, we will want to use the function
+				 // VectorTools::integrate_difference()
 				 // mentioned in the introduction, and we are
-				 // going to use a <code>ConvergenceTable</code> that
+				 // going to use a ConvergenceTable that
 				 // collects all important data during a run
 				 // and prints it at the end as a table. These
 				 // comes from the following two files:
 #include <numerics/vectors.h>
 #include <base/convergence_table.h>
 				 // And finally, we need to use the
-				 // <code>FEFaceValues</code> class, which is
+				 // FEFaceValues class, which is
 				 // declared in the same file as the
-				 // <code>FEValues</code> class:
+				 // FEValues class:
 #include <fe/fe_values.h>
 
 				 // We need one more include from standard
@@ -144,7 +144,7 @@ class SolutionBase
 				 // First we assign values to the centers for
 				 // the 1d case, where we place the centers
 				 // equidistantly at -1/3, 0, and 1/3. The
-				 // <code>template @<@></code> header for this definition
+				 // <code>template &lt;&gt;</code> header for this definition
 				 // indicates an explicit specialization. This
 				 // means, that the variable belongs to a
 				 // template, but that instead of providing
@@ -196,10 +196,10 @@ const double SolutionBase<dim>::width = 1./3.;
 				 // the classes representing these
 				 // two. They both represent
 				 // continuous functions, so they are
-				 // derived from the <code>Function@<dim@></code>
+				 // derived from the Function&lt;dim&gt;
 				 // base class, and they also inherit
 				 // the characteristics defined in the
-				 // <code>SolutionBase</code> class.
+				 // SolutionBase class.
 				 //
 				 // The actual classes are declared in the
 				 // following. Note that in order to compute
@@ -210,11 +210,11 @@ const double SolutionBase<dim>::width = 1./3.;
 				 // more than we have done in previous
 				 // examples, where all we provided was the
 				 // value at one or a list of
-				 // points. Fortunately, the <code>Function</code>
+				 // points. Fortunately, the Function
 				 // class also has virtual functions for the
 				 // gradient, so we can simply overload the
 				 // respective virtual member functions in the
-				 // <code>Function</code> base class. Note that the
+				 // Function base class. Note that the
 				 // gradient of a function in <code>dim</code> space
 				 // dimensions is a vector of size <code>dim</code>,
 				 // i.e. a tensor of rank 1 and dimension
@@ -252,10 +252,10 @@ class Solution : public Function<dim>,
 				 // elements of a base class that is
 				 // template dependent (in this case
 				 // the elements of
-				 // <code>SolutionBase@<dim@></code>), then the
+				 // SolutionBase&lt;dim&gt;), then the
 				 // C++ language forces us to write
-				 // <code>this-@>n_source_centers</code> (for
-				 // example). Note that the <code>this-@></code>
+				 // <code>this-&gt;n_source_centers</code> (for
+				 // example). Note that the <code>this-&gt;</code>
 				 // qualification is not necessary if
 				 // the base class is not template
 				 // dependent, and also that the gcc
@@ -296,13 +296,13 @@ double Solution<dim>::value (const Point<dim>   &p,
                                  // initialization.
                                  //
                                  // Note that we could as well have taken the
-                                 // type of the object to be <code>Point@<dim@></code>
-                                 // instead of <code>Tensor@<1,dim@></code>. Tensors of
+                                 // type of the object to be Point&lt;dim&gt;
+                                 // instead of Tensor&lt;1,dim&gt;. Tensors of
                                  // rank 1 and points are almost exchangeable,
                                  // and have only very slightly different
                                  // mathematical meanings. In fact, the
-                                 // <code>Point@<dim@></code> class is derived from the
-                                 // <code>Tensor@<1,dim@></code> class, which makes up
+                                 // Point&lt;dim&gt; class is derived from the
+                                 // Tensor&lt;1,dim&gt; class, which makes up
                                  // for their mutual exchange ability. Their
                                  // main difference is in what they logically
                                  // mean: points are points in space, such as
@@ -479,7 +479,7 @@ class HelmholtzProblem
 				     // a triangulation object, and we
 				     // have a finite element object,
 				     // and we also have an object of
-				     // type <code>DoFHandler</code> that uses
+				     // type DoFHandler that uses
 				     // both of the first two. These
 				     // three objects all have a
 				     // lifetime that is rather long
@@ -490,10 +490,10 @@ class HelmholtzProblem
 				     // they are destroyed at the very
 				     // end. The question is: can we
 				     // guarantee that the two objects
-				     // which the <code>DoFHandler</code> uses,
+				     // which the DoFHandler uses,
 				     // live at least as long as they
 				     // are in use? This means that
-				     // the <code>DoFHandler</code> must have some
+				     // the DoFHandler must have some
 				     // kind of lock on the
 				     // destruction of the other
 				     // objects, and it can only
@@ -521,12 +521,12 @@ class HelmholtzProblem
 				     // to such potentially dangerous
 				     // pointers are derived from a
 				     // class called
-				     // <code>Subscriptor</code>. For example,
-				     // the <code>Triangulation</code>,
-				     // <code>DoFHandler</code>, and a base
-				     // class of the <code>FiniteElement</code>
+				     // Subscriptor. For example,
+				     // the Triangulation,
+				     // DoFHandler, and a base
+				     // class of the FiniteElement
 				     // class are derived from
-				     // <code>Subscriptor</code>. This latter
+				     // Subscriptor. This latter
 				     // class does not offer much
 				     // functionality, but it has a
 				     // built-in counter which we can
@@ -544,9 +544,9 @@ class HelmholtzProblem
 				     //
 				     // On the other hand, if an object of a
 				     // class that is derived from the
-				     // <code>Subscriptor</code> class is destroyed, it
+				     // Subscriptor class is destroyed, it
 				     // also has to call the destructor of the
-				     // <code>Subscriptor</code> class. In this
+				     // Subscriptor class. In this
 				     // destructor, there
 				     // will then be a check whether the
 				     // counter is really zero. If
@@ -611,32 +611,32 @@ class HelmholtzProblem
 				     // for the programmer to do so
 				     // herself. The class that
 				     // actually does all this is
-				     // called <code>SmartPointer</code> and
+				     // called SmartPointer and
 				     // takes as template parameter
 				     // the data type of the object
 				     // which it shall point to. The
 				     // latter type may be any class,
 				     // as long as it is derived from
-				     // the <code>Subscriptor</code> class.
+				     // the Subscriptor class.
 				     //
 				     // In the present example program, we
 				     // want to protect the finite element
 				     // object from the situation that for
 				     // some reason the finite element pointed
 				     // to is destroyed while still in use. We
-				     // therefore use a <code>SmartPointer</code> to
+				     // therefore use a SmartPointer to
 				     // the finite element object; since the
 				     // finite element object is actually
 				     // never changed in our computations, we
-				     // pass a <code>const FiniteElement@<dim@></code> as
+				     // pass a const FiniteElement&lt;dim&gt; as
 				     // template argument to the
-				     // <code>SmartPointer</code> class. Note that the
+				     // SmartPointer class. Note that the
 				     // pointer so declared is assigned at
 				     // construction time of the solve object,
 				     // and destroyed upon destruction, so the
 				     // lock on the destruction of the finite
 				     // element object extends throughout the
-				     // lifetime of this <code>HelmholtzProblem</code>
+				     // lifetime of this HelmholtzProblem
 				     // object.
     Triangulation<dim>                      triangulation;
     DoFHandler<dim>                         dof_handler;
@@ -668,20 +668,20 @@ class HelmholtzProblem
 				     // (like the number of cells, or the L2
 				     // error of the numerical solution) will
 				     // be generated and later printed. The
-				     // <code>TableHandler</code> can be used to
+				     // TableHandler can be used to
 				     // collect all this data and to output it
 				     // at the end of the run as a table in a
 				     // simple text or in LaTeX
 				     // format. Here we don't only use the
-				     // <code>TableHandler</code> but we use the
-				     // derived class <code>ConvergenceTable</code>
+				     // TableHandler but we use the
+				     // derived class ConvergenceTable
 				     // that additionally evaluates rates of
 				     // convergence:
     ConvergenceTable                        convergence_table;
 };
 
 
-                                 // @sect3{The <code>HelmholtzProblem</code> class implementation}
+                                 // @sect3{The HelmholtzProblem class implementation}
 
                                  // @sect4{HelmholtzProblem::HelmholtzProblem}
 
@@ -853,7 +853,7 @@ void HelmholtzProblem<dim>::assemble_system ()
 				   // cell) to evaluate the right hand
 				   // side function. The object we use
 				   // to get at this information is
-				   // the <code>FEValues</code> class discussed
+				   // the FEValues class discussed
 				   // previously.
                                    //
 				   // For the face integrals, we only
@@ -866,7 +866,7 @@ void HelmholtzProblem<dim>::assemble_system ()
 				   // from the exact solution object
 				   // (see below). The class that gives
 				   // us this information is called
-				   // <code>FEFaceValues</code>:
+				   // FEFaceValues:
   FEValues<dim>  fe_values (*fe, quadrature_formula, 
 			    update_values   | update_gradients |
                             update_q_points | update_JxW_values);
@@ -993,7 +993,7 @@ void HelmholtzProblem<dim>::assemble_system ()
 					     // is done using the
 					     // <code>reinit</code> function
 					     // which we already know
-					     // from the <code>FEValue</code>
+					     // from the FEValue
 					     // class:
 	    fe_face_values.reinit (cell, face);
 
@@ -1220,7 +1220,7 @@ void HelmholtzProblem<dim>::process_solution (const unsigned int cycle)
 				   // the difference between computed
 				   // numerical solution and the
 				   // continuous solution (described
-				   // by the <code>Solution</code> class
+				   // by the Solution class
 				   // defined at the top of this
 				   // file), we first need a vector
 				   // that will hold the norm of the
@@ -1295,7 +1295,7 @@ void HelmholtzProblem<dim>::process_solution (const unsigned int cycle)
 				   // by iterating the trapezoidal
 				   // rule five times in each space
 				   // direction. Note that the
-				   // constructor of the <code>QIterated</code>
+				   // constructor of the QIterated
 				   // class takes a one-dimensional
 				   // quadrature rule and a number
 				   // that tells it how often it shall
@@ -1311,7 +1311,7 @@ void HelmholtzProblem<dim>::process_solution (const unsigned int cycle)
 				   // maximum value over all cell-wise
 				   // entries, an operation that is
 				   // conveniently done using the
-				   // <code>Vector@<float@>::linfty</code> function:
+				   // Vector::linfty() function:
   const QTrapez<1>     q_trapez;
   const QIterated<dim> q_iterated (q_trapez, 5);
   VectorTools::integrate_difference (dof_handler,
@@ -1326,7 +1326,7 @@ void HelmholtzProblem<dim>::process_solution (const unsigned int cycle)
 				   // computed, we finally write some
 				   // output. In addition, we add the
 				   // important data to the
-				   // <code>TableHandler</code> by specifying
+				   // TableHandler by specifying
 				   // the key of the column and the value.
 				   // Note that it is not necessary to
 				   // define column keys beforehand -- it is
@@ -1731,9 +1731,9 @@ void HelmholtzProblem<dim>::run ()
 				   // output the convergence
 				   // rates. This may be done by the
 				   // functionality the
-				   // <code>ConvergenceTable</code> offers over
+				   // ConvergenceTable offers over
 				   // the regular
-				   // <code>TableHandler</code>. However, we do
+				   // TableHandler. However, we do
 				   // it only for global refinement,
 				   // since for adaptive refinement
 				   // the determination of something
@@ -1776,14 +1776,14 @@ void HelmholtzProblem<dim>::run ()
       convergence_table.set_column_order (new_order);
 
 				       // For everything that happened
-				       // to the <code>ConvergenceTable</code>
+				       // to the ConvergenceTable
 				       // until this point, it would
 				       // have been sufficient to use
 				       // a simple
-				       // <code>TableHandler</code>. Indeed, the
-				       // <code>ConvergenceTable</code> is
+				       // TableHandler. Indeed, the
+				       // ConvergenceTable is
 				       // derived from the
-				       // <code>TableHandler</code> but it offers
+				       // TableHandler but it offers
 				       // the additional functionality
 				       // of automatically evaluating
 				       // convergence rates. For
@@ -1882,7 +1882,7 @@ int main ()
 				       // order to destroy the
 				       // respective objects (i.e. the
 				       // finite element and the
-				       // <code>HelmholtzProblem</code> object)
+				       // HelmholtzProblem object)
 				       // at the end of the block and
 				       // before we go to the next
 				       // run. This avoids conflicts

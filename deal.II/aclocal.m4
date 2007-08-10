@@ -4735,6 +4735,17 @@ AC_DEFUN(DEAL_II_CHECK_DOXYGEN, dnl
     AC_PATH_PROG(DOXYGEN,doxygen)
     if test "x$DOXYGEN" = "x" ; then
       doxygen_not_found=yes;
+    else
+      DOXYGEN_VERSION_STRING=`($DOXYGEN -v 2>&1) | grep "oxygen version"`
+      AC_MSG_NOTICE($DOXYGEN_VERSION_STRING)
+      case "$DOXYGEN_VERSION_STRING" in
+	*2.3.* | *2.4.*)
+          DOXYGEN_OPTIONS="options.136"
+	  ;;
+	*)
+	  DOXYGEN_OPTIONS="options.dox"
+	  ;;
+      esac
     fi
   fi
 
