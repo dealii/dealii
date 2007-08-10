@@ -22,6 +22,7 @@ while (<>) {
 	s/&/&amp;/g; 
 	s/</&lt;/g;	 
 	s/>/&gt;/g;
+	s/\$/\\$/g;
 	s/\t/        /g;
 
 	print "  $_";
