@@ -42,7 +42,8 @@ Cycle 5:
 The first thing we learn from this is that the number of constrained
 degrees of freedom is on the order of 20-25% of the total number of
 degrees of freedom, at least on the later grids when we have elements
-of relatively high order. This is, in fact, on the same order of
+of relatively high order (in 3d, the fraction of constrained degrees of
+freedom can be up to 30%). This is, in fact, on the same order of
 magnitude as for non-$hp$ discretizations. For example, in the last
 step of the @ref step_6 "step-6" program, we have 18401 degrees of
 freedom, 4104 of which are constrained. The difference is that in the
@@ -50,3 +51,130 @@ latter program, each constrained hanging node is constrained against
 only the two adjacent degrees of freedom, whereas in the $hp$ case,
 constrained nodes are constrained against many more degrees of
 freedom. 
+
+Of maybe more interest is to look at the graphical output. First, here is the
+solution of the problem:
+
+@image html step-27.solution.png
+
+Secondly, let us look at the sequence of meshes generated:
+
+<table align="center" border="1" cellspacing="3" cellpadding="3">
+  <tr>
+    <td>
+      @image html step-27.mesh-0.png
+    </td>
+    <td>
+      @image html step-27.mesh-1.png
+    </td>
+    <td>
+      @image html step-27.mesh-2.png
+    </td>
+  </tr>
+
+  <tr>
+    <td>
+      @image html step-27.mesh-3.png
+    </td>
+    <td>
+      @image html step-27.mesh-4.png
+    </td>
+    <td>
+      @image html step-27.mesh-5.png
+    </td>
+  </tr>
+</table>
+It is clearly visible how the mesh is refined near the corner singularities,
+as one would expect it. More interestingly, we should be curious to see the
+distribution of finite element polynomial degrees to these mesh cells:
+<table align="center" border="1" cellspacing="3" cellpadding="3">
+  <tr>
+    <td>
+      @image html step-27.fe_degree-0.png
+    </td>
+    <td>
+      @image html step-27.fe_degree-1.png
+    </td>
+    <td>
+      @image html step-27.fe_degree-2.png
+    </td>
+  </tr>
+
+  <tr>
+    <td>
+      @image html step-27.fe_degree-3.png
+    </td>
+    <td>
+      @image html step-27.fe_degree-4.png
+    </td>
+    <td>
+      @image html step-27.fe_degree-5.png
+    </td>
+  </tr>
+</table>
+
+While this is certainly not a perfect arrangement, it does make some sense: we
+use low order elements close to boundaries and corners where regularity is
+low. On the other hand, higher order elements are used where (i) the error was
+at one point fairly large, i.e. mainly in the general area around the corner
+singularities and in the top right corner where the solution is large, and
+(ii) where the solution is smooth, i.e. far away from the boundary.
+
+This arrangement of polynomial degrees of course follows from our smoothness
+estimator. Here is the estimated smoothness of the solution, with blue colors
+indicating least smoothness and red indicating the smoothest areas:
+
+<table align="center" border="1" cellspacing="3" cellpadding="3">
+  <tr>
+    <td>
+      @image html step-27.smoothness-0.png
+    </td>
+    <td>
+      @image html step-27.smoothness-1.png
+    </td>
+    <td>
+      @image html step-27.smoothness-2.png
+    </td>
+  </tr>
+
+  <tr>
+    <td>
+      @image html step-27.smoothness-3.png
+    </td>
+    <td>
+      @image html step-27.smoothness-4.png
+    </td>
+    <td>
+      @image html step-27.smoothness-5.png
+    </td>
+  </tr>
+</table>
+
+The first conclusion one can draw from these images is that apparently the
+estimated smoothness is a fairly stable quantity under mesh refinement: what
+we get on the coarsest mesh is pretty close to what we get on the finest mesh.
+It is also obvious that the smoothness estimates are independent of the actual
+size of the solution (see the picture of the solution above), as it should be.
+A point of larger concern, however, is that one realizes on closer inspection
+that the estimator we have overestimates the smoothness of the solution on
+cells with hanging nodes. This in turn leads to higher polynomial degrees in
+these areas, skewing the allocation of finite elements onto cells.
+
+We have no good explanation for this effect at the moment. One theory is that
+the numerical solution on cells with hanging nodes is, of course, constrained
+and therefore not entirely free to explore the function space to get close to
+the exact solution. This lack of degrees of freedom may manifest itself by
+yielding numerical solutions on these cells with suppressed oscillation,
+meaning a higher degree of smoothness. The estimator picks this signal up and
+the estimated smoothness overestimates the actual value. However, a definite
+answer to what is going on currently eludes the authors of this program.
+
+The bigger question is, of course, how to avoid this problem. Possibilities
+include estimating the smoothness not on single cells, but cell assemblies or
+patches surrounding each cell. It may also be possible to find simple
+correction factors for each cell depending on the number of constrained
+degrees of freedom it has. In either case, there are ample opportunities for
+further research on finding good $hp$ refinement criteria. On the other hand,
+the main point of the current program was to demonstrate using the $hp$
+technology in deal.II, which is unaffected by our use of a possible
+sub-optimal refinement criterion.

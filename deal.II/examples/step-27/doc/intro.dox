@@ -290,20 +290,28 @@ element research at the time of this writing.
 In short, the question does not appear to be settled in the literature at this
 time. There are a number of more or less complicated schemes that address it,
 but there is nothing like the KellyErrorEstimator that is universally accepted
-as a good indicator of the error. Most proposals use the fact that it is
-beneficial to increase the polynomial degree whenever the solution is locally
-smooth whereas it is better to refine the mesh wherever it is rough. However,
-the questions of how to determine the local smoothness of the solution as well
-as the decision when a solution is smooth enough to allow for an increase in
-$p$ are certainly big and important ones.
+as a good, even if not optimal, indicator of the error. Most proposals use the
+fact that it is beneficial to increase the polynomial degree whenever the
+solution is locally smooth whereas it is better to refine the mesh wherever it
+is rough. However, the questions of how to determine the local smoothness of
+the solution as well as the decision when a solution is smooth enough to allow
+for an increase in $p$ are certainly big and important ones.
+
+In the following, we propose a simple estimator of the local smoothness of a
+solution. As we will see in the results section, this estimator has flaws, in
+particular as far as cells with local hanging nodes are concerned. We
+therefore do not intend to present the following ideas as a complete solution
+to the problem. Rather, it is intended as an idea to approach it that merits
+further research and investigation. In other words, we do not intend to enter
+a sophisticated proposal into the fray about answers to the general
+question. However, to demonstrate our approach to $hp$ finite elements, we
+need a simple indicator that does generate some useful information that is
+able to drive the simple calculations this tutorial program will perform.
 
 
 <h4>The idea</h4>
 
-We do not intend to enter a sophisticated proposal into the fray about answers
-to the general question. However, to demonstrate our approach to hp finite
-elements, we need a simple indicator that does generate some useful
-information. Our approach here is simple: for a function $u(x)$ to be in the
+Our approach here is simple: for a function $u(x)$ to be in the
 Sobolev space $H^s(K)$ on a cell $K$, it has to satisfy the condition
 @f[
 	\int_K |\nabla^s u(x)|^2 \; dx < \infty.
@@ -407,16 +415,16 @@ where $u_i$ is the value of the $i$th degree of freedom on this
 cell. In other words, we can write it as a matrix-vector product
 @f[
 	\hat U_{\vec k}
-	= {\cal F}_{\vec k,i} u_i,
+	= {\cal F}_{\vec k,j} u_j,
 @f]
 with the matrix
 @f[
-	{\cal F}_{\vec k,i}
+	{\cal F}_{\vec k,j}
 	= \frac 1{(2\pi)^{d/2}} 
-	\int_{\hat K} e^{i\vec k \cdot \vec x} \hat \varphi_i(\hat x) dx.
+	\int_{\hat K} e^{i\vec k \cdot \vec x} \hat \varphi_j(\hat x) dx.
 @f]
 This matrix is easily computed for a given number of shape functions
-$\varphi_i$ and Fourier modes $N$. Consequently, finding the
+$\varphi_j$ and Fourier modes $N$. Consequently, finding the
 coefficients $\hat U_{\vec k}$ is a rather trivial job.
 
 The next task is that we have to estimate how fast these coefficients
@@ -504,6 +512,102 @@ While we are not particularly interested in the actual value of
 $\beta$, the formula above gives us a mean to calculate the value of
 the exponent $\mu$ that we can then use to determine that $\hat u(\hat
 x)$ is in $H^s(\hat K)$ with $s=\mu-\frac d2$.
+
+
+<h4>Compensating for anisotropy</h4>
+
+In the formulas above, we have derived the Fourier coefficients $\hat U_{\vec
+k}$. Because $\vec k$ is a vector, we will get a number of Fourier
+coefficients $\hat U_{\vec k}$ for the same absolute value $|\vec k|$,
+corresponding to the Fourier transform in different directions. If we now
+consider a function like $|x|y^2$ then we will find lots of large Fourier
+coefficients in $x$-direction because the function is non-smooth in this
+direction, but fast-decaying Fourier coefficients in $y$-direction because the
+function is smooth there. The question that arises is this: if we simply fit
+our polynomial decay $\alpha |\vec k|^\mu$ to <i>all</i> Fourier coefficients,
+we will fit it to a smoothness <i>averaged in all spatial directions</i>. Is
+this what we want? Or would it be better to only consider the largest
+coefficient $\hat U_{\vec k}$ for all $\vec k$ with the same magnitude,
+essentially trying to determine the smoothness of the solution in that spatial
+direction in which the solution appears to be roughest?
+
+One can probably argue for either case. The issue would be of more interest if
+deal.II had the ability to use anisotropic finite elements, i.e. ones that use
+different polynomial degrees in different spatial directions, as they would be
+able to exploit the directionally variable smoothness much better. Alas, this
+capability does not exist at the time of writing this tutorial program.
+
+Either way, because we only have isotopic finite element classes, we adopt the
+viewpoint that we should tailor the polynomial degree to the lowest amount of
+regularity, in order to keep numerical efforts low. Consequently, instead of
+using the formula
+@f[
+	\mu = 
+	\frac 1{\left(\sum_{\vec k, |\vec k|\le N} 1\right)
+                \left(\sum_{\vec k, |\vec k|\le N} (\ln |\vec k|)^2\right)
+		-\left(\sum_{\vec k, |\vec k|\le N} \ln |\vec k|\right)^2}
+	\left[
+	  \left(\sum_{\vec k, |\vec k|\le N} \ln |\vec k|\right)
+	  \left(\sum_{\vec k, |\vec k|\le N} \ln |\hat U_{\vec k}|\right)
+	  -
+	  \left(\sum_{\vec k, |\vec k|\le N} 1\right)
+	  \left(\sum_{\vec k, |\vec k|\le N} \ln |\hat U_{\vec k}| \ln |\vec k| \right)
+	\right].
+@f]
+to calculate $\mu$ as shown above, we have to slightly modify all sums:
+instead of summing over all Fourier modes, we only sum over those for which
+the Fourier coefficient is the largest one among all $\hat U_{\vec k}$ with
+the same magnitude $|\vec k|$, i.e. all sums above have to replaced by the
+following sums:
+@f[
+  \sum_{\vec k, |\vec k|\le N}
+  \longrightarrow
+  \sum_{{\vec k, |\vec k|\le N} \atop {|\hat U_{\vec k}| \ge |\hat U_{\vec k'}|
+  \ \textrm{for all}\ \vec k'\ \textrm{with}\ |\vec k'|=|\vec k|}}
+@f]
+This is the form we will implement in the program.
+
+
+<h4>Questions about cell sizes</h4>
+
+One may ask whether it is a problem that we only compute the Fourier transform
+on the <i>reference cell</i> (rather than the real cell) of the
+solution. After all, we stretch the solution by a factor $\frac 1h$ during the
+transformation, thereby shifting the Fourier frequencies by a factor of
+$h$. This is of particular concern since we may have neighboring cells with
+mesh sizes $h$ that differ by a factor of 2 if one of them is more refined
+than the other. The concern is also motivated by the fact that, as we will see
+in the results section below, the estimated smoothness of the solution should
+be a more or less continuous function, but exhibits jumps at locations where
+the mesh size jumps. It therefore seems natural to ask whether we have to
+compensate for the transformation.
+
+The short answer is "no". In the process outlined above, we attempt to find
+coefficients $\beta,\mu$ that minimize the sum of squares of the terms
+@f[
+	\ln |\hat U_{\vec k}| - \beta + \mu \ln |\vec k|.
+@f]
+To compensate for the transformation means not attempting to fit a decay
+$|\vec k|^\mu$ with respect to the Fourier frequencies $\vec k$ <i>on the unit
+cell</i>, but to fit the coefficients $\hat U_{\vec k}$ computed on the
+reference cell <i>to the Fourier frequencies on the real cell $|\vec
+k|h$</i>, where $h$ is the norm of the transformation operator (i.e. something
+like the diameter of the cell). In other words, we would have to minimize the
+sum of squares of the terms 
+@f[
+	\ln |\hat U_{\vec k}| - \beta + \mu \ln (|\vec k|h).
+@f]
+instead. However, using fundamental properties of the logarithm, this is
+simply equivalent to minimizing 
+@f[
+	\ln |\hat U_{\vec k}| - (\beta - \mu \ln h) + \mu \ln (|\vec k|).
+@f]
+In other words, this and the original least squares problem will produce the
+same best-fit exponent $\mu$, though the offset will in one case be $\beta$
+and in the other $\beta-\mu \ln h$. However, since we are not interested in
+the offset at all but only in the exponent, it doesn't matter whether we scale
+Fourier frequencies in order to account for mesh size effects or not, the
+estimated smoothness exponent will be the same in either case.
 
 
 

@@ -511,9 +511,9 @@ void LaplaceProblem<dim>::postprocess (const unsigned int cycle)
 				     // VTK format):
     const std::string filename = "solution-" +
 				 Utilities::int_to_string (cycle, 2) +
-				 ".vtk";
+				 ".gmv";
     std::ofstream output (filename.c_str());
-    data_out.write_vtk (output);
+    data_out.write_gmv (output);
   }
 
 				   // After this, we would like to actually
@@ -745,19 +745,52 @@ void LaplaceProblem<dim>::run ()
 }
 
 
+				 // @sect4{LaplaceProblem::estimate_smoothness}
 
+				 // This last function of significance
+				 // implements the algorithm to estimate the
+				 // smoothness exponent using the algorithms
+				 // explained in detail in the
+				 // introduction. We will therefore only
+				 // comment on those points that are of
+				 // implementational importance.
 template <int dim>
 void
 LaplaceProblem<dim>::
 estimate_smoothness (Vector<float> &smoothness_indicators) const
 {
+				   // The first thing we need to do is to
+				   // define the Fourier vectors $\vec k$ for
+				   // which we want to compute Fourier
+				   // coefficients of the solution on each
+				   // cell. In 2d, we pick those vectors $\vec
+				   // k=(\pi i, \pi j)^T$ for which
+				   // $\sqrt{i^2+j^2}\le N$, with $i,j$
+				   // integers and $N$ being the maximal
+				   // polynomial degree we use for the finite
+				   // elements in this program. The 3d case is
+				   // handled analogously. 1d and dimensions
+				   // higher than 3 are not implemented, and
+				   // we guard our implementation by making
+				   // sure that we receive an exception in
+				   // case someone tries to compile the
+				   // program for any of these dimensions.
+				   //
+				   // We exclude $\vec k=0$ to avoid problems
+				   // computing $|\vec k|^{-mu}$ and $\ln
+				   // |\vec k|$. The other vectors are stored
+				   // in the field <code>k_vectors</code>. In
+				   // addition, we store the square of the
+				   // magnitude of each of these vectors (up
+				   // to a factor $\pi^2$) in the
+				   // <code>k_vectors_magnitude</code> array
+				   // -- we will need that when we attempt to
+				   // find out which of those Fourier
+				   // coefficients corresponding to Fourier
+				   // vectors of the same magnitude is the
+				   // largest:
   const unsigned int N = max_degree;
 
-				   // form all the Fourier vectors
-				   // that we want to
-				   // consider. exclude k=0 to avoid
-				   // problems with |k|^{-mu} and also
-				   // logarithms of |k|
   std::vector<Tensor<1,dim> > k_vectors;
   std::vector<unsigned int>   k_vectors_magnitude;
   switch (dim)
@@ -800,30 +833,67 @@ estimate_smoothness (Vector<float> &smoothness_indicators) const
 	    Assert (false, ExcNotImplemented());
     }
 
+				   // After we have set up the Fourier
+				   // vectors, we also store their total
+				   // number for simplicity, and compute the
+				   // logarithm of the magnitude of each of
+				   // these vectors since we will need it many
+				   // times over further down below:
   const unsigned n_fourier_modes = k_vectors.size();
   std::vector<double> ln_k (n_fourier_modes);
   for (unsigned int i=0; i<n_fourier_modes; ++i)
     ln_k[i] = std::log (k_vectors[i].norm());
   
 
-				   // assemble the matrices that do
-				   // the Fourier transforms for each
-				   // of the finite elements we deal
-				   // with. note that these matrices
-				   // are complex-valued, so we can't
-				   // use FullMatrix
-  QGauss<1>      base_quadrature (2);
-  QIterated<dim> quadrature (base_quadrature, N);
-  
+				   // Next, we need to assemble the matrices
+				   // that do the Fourier transforms for each
+				   // of the finite elements we deal with,
+				   // i.e. the matrices ${\cal F}_{\vec k,j}$
+				   // defined in the introduction. We have to
+				   // do that for each of the finite elements
+				   // in use. Note that these matrices are
+				   // complex-valued, so we can't use the
+				   // FullMatrix class. Instead, we use the
+				   // Table class template.
   std::vector<Table<2,std::complex<double> > >
     fourier_transform_matrices (fe_collection.size());
+
+				   // In order to compute them, we of course
+				   // can't perform the Fourier transform
+				   // analytically, but have to approximate it
+				   // using quadrature. To this end, we use a
+				   // quadrature formula that is obtained by
+				   // iterating a 2-point Gauss formula as
+				   // many times as the maximal exponent we
+				   // use for the term $e^{i\vec k\cdot \vec
+				   // x}$:
+  QGauss<1>      base_quadrature (2);
+  QIterated<dim> quadrature (base_quadrature, N);
+
+				   // With this, we then loop over all finite
+				   // elements in use, reinitialize the
+				   // respective matrix ${\cal F}$ to the
+				   // right size, and integrate each entry of
+				   // the matrix numerically as ${\cal
+				   // F}_{\vec k,j}=\sum_q e^{i\vec k\cdot\vec
+				   // x}\varphi_j(\vec x_q) w_q$, where $x_q$
+				   // are the quadrature points and $w_q$ are
+				   // the quadrature weights. Note that the
+				   // imaginary unit $i=\sqrt{-1}$ is obtained
+				   // from the standard C++ classes using
+				   // <code>std::complex@<double@>(0,1)</code>.
+
+				   // Because we work on the unit cell, we can
+				   // do all this work without a mapping from
+				   // reference to real cell and consequently
+				   // do not need the FEValues class.
   for (unsigned int fe=0; fe<fe_collection.size(); ++fe)
     {
       fourier_transform_matrices[fe].reinit (n_fourier_modes,
 					     fe_collection[fe].dofs_per_cell);
 
       for (unsigned int k=0; k<n_fourier_modes; ++k)
-	for (unsigned int i=0; i<fe_collection[fe].dofs_per_cell; ++i)
+	for (unsigned int j=0; j<fe_collection[fe].dofs_per_cell; ++j)
 	  {
 	    std::complex<double> sum = 0;
 	    for (unsigned int q=0; q<quadrature.n_quadrature_points; ++q)
@@ -831,47 +901,72 @@ estimate_smoothness (Vector<float> &smoothness_indicators) const
 		const Point<dim> x_q = quadrature.point(q);
 		sum += std::exp(std::complex<double>(0,1) *
 				(k_vectors[k] * x_q)) *
-		       fe_collection[fe].shape_value(i,x_q) *
+		       fe_collection[fe].shape_value(j,x_q) *
 		       quadrature.weight(q);
 	      }
-	    fourier_transform_matrices[fe](k,i)
+	    fourier_transform_matrices[fe](k,j)
 	      = sum / std::pow(2*deal_II_numbers::PI, 1.*dim/2);
 	  }
     }
 
-				   // the next thing is to loop over
-				   // all cells and do our work there,
-				   // i.e. to locally do the Fourier
-				   // transform and estimate the decay
-				   // coefficient
+				   // The next thing is to loop over all cells
+				   // and do our work there, i.e. to locally
+				   // do the Fourier transform and estimate
+				   // the decay coefficient. We will use the
+				   // following two arrays as scratch arrays
+				   // in the loop and allocate them here to
+				   // avoid repeated memory allocations:
   std::vector<std::complex<double> > fourier_coefficients (n_fourier_modes);
   Vector<double>                     local_dof_values;
-  
+
+				   // Then here is the loop:
   typename hp::DoFHandler<dim>::active_cell_iterator
     cell = dof_handler.begin_active(),
     endc = dof_handler.end();
   for (unsigned int index=0; cell!=endc; ++cell, ++index)
     {
+				       // Inside the loop, we first need to
+				       // get the values of the local degrees
+				       // of freedom (which we put into the
+				       // <code>local_dof_values</code> array
+				       // after setting it to the right size)
+				       // and then need to compute the Fourier
+				       // transform by multiplying this vector
+				       // with the matrix ${\cal F}$
+				       // corresponding to this finite
+				       // element. We need to write out the
+				       // multiplication by hand because the
+				       // objects holding the data do not have
+				       // <code>vmult</code>-like functions
+				       // declared:
       local_dof_values.reinit (cell->get_fe().dofs_per_cell);
       cell->get_dof_values (solution, local_dof_values);
 
-				       // first compute the Fourier
-				       // transform of the local
-				       // solution
-      std::fill (fourier_coefficients.begin(), fourier_coefficients.end(), 0);
       for (unsigned int f=0; f<n_fourier_modes; ++f)
-	for (unsigned int i=0; i<cell->get_fe().dofs_per_cell; ++i)
-	  fourier_coefficients[f] += 
-	    fourier_transform_matrices[cell->active_fe_index()](f,i)
-	    *
-	    local_dof_values(i);
+	{
+	  fourier_coefficients[f] = 0;
+	  
+	  for (unsigned int i=0; i<cell->get_fe().dofs_per_cell; ++i)
+	    fourier_coefficients[f] += 
+	      fourier_transform_matrices[cell->active_fe_index()](f,i)
+	      *
+	      local_dof_values(i);
+	}
 
-				       // enter the Fourier
-				       // coefficients into a map with
-				       // the k-magnitudes, to make
-				       // sure that we get only the
-				       // largest magnitude for each
-				       // value of |k|
+				       // The next thing, as explained in the
+				       // introduction, is that we wanted to
+				       // only fit our exponential decay of
+				       // Fourier coefficients to the largest
+				       // coefficients for each possible value
+				       // of $|\vec k|$. To this end, we
+				       // create a map that for each magnitude
+				       // $|\vec k|$ stores the largest $|\hat
+				       // U_{\vec k}|$ found so far, i.e. we
+				       // overwrite the existing value (or add
+				       // it to the map) if no value for the
+				       // current $|\vec k|$ exists yet, or if
+				       // the current value is larger than the
+				       // previously stored one:
       std::map<unsigned int, double> k_to_max_U_map;
       for (unsigned int f=0; f<n_fourier_modes; ++f)
 	if ((k_to_max_U_map.find (k_vectors_magnitude[f]) ==
@@ -881,14 +976,20 @@ estimate_smoothness (Vector<float> &smoothness_indicators) const
 	     std::abs (fourier_coefficients[f])))
 	  k_to_max_U_map[k_vectors_magnitude[f]]
 	    = std::abs (fourier_coefficients[f]);
-      
-				       // now we have to calculate the
-				       // various contributions to the
-				       // formula for mu. we'll only
-				       // take those fourier
-				       // coefficients with the
-				       // largest value for a given
-				       // |k|
+				       // Note that it comes in handy here
+				       // that we have stored the magnitudes
+				       // of vectors as integers, since this
+				       // way we do not have to deal with
+				       // round-off-sized differences between
+				       // different values of $|\vec k|$.
+
+				       // As the final task, we have to
+				       // calculate the various contributions
+				       // to the formula for $\mu$. We'll only
+				       // take those Fourier coefficients with
+				       // the largest magnitude for a given
+				       // value of $|\vec k|$ as explained
+				       // above:
       double  sum_1           = 0,
 	      sum_ln_k        = 0,
 	      sum_ln_k_square = 0,
@@ -902,14 +1003,22 @@ estimate_smoothness (Vector<float> &smoothness_indicators) const
 	    sum_ln_k += ln_k[f];
 	    sum_ln_k_square += ln_k[f]*ln_k[f];
 	    sum_ln_U += std::log (std::abs (fourier_coefficients[f]));
-	    sum_ln_U_ln_k += std::log (std::abs (fourier_coefficients[f])) * ln_k[f];
+	    sum_ln_U_ln_k += std::log (std::abs (fourier_coefficients[f])) *
+			     ln_k[f];
 	  }
 
+				       // With these so-computed sums, we can
+				       // now evaluate the formula for $\mu$
+				       // derived in the introduction:
       const double mu
 	= (1./(sum_1*sum_ln_k_square - sum_ln_k*sum_ln_k)
 	   *
 	   (sum_ln_k*sum_ln_U - sum_1*sum_ln_U_ln_k));
-      
+
+				       // The final step is to compute the
+				       // Sobolev index $s=\mu-\frac d2$ and
+				       // store it in the vector of estimated
+				       // values for each cell:
       smoothness_indicators(index) = mu - 1.*dim/2;
     }
 }
