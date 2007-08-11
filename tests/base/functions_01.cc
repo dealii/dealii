@@ -143,8 +143,8 @@ check_function(const Functions::FlowFunction<dim>& f,
 					     // bit generous
 	    if (d2.norm() < 12.* d1.norm())
 	      {
-		deallog << "Gradient error " << k << " " << i
-			<< " " << d1.norm() << " " << d2.norm()
+		deallog << "Gradient error: point " << k << " comp " << i
+			<< " norms " << d1.norm() << " " << d2.norm()
 			<< std::endl;
 //		for (unsigned int i=0;i<f.n_components;++i)
 		  for (unsigned int d=0;d<dim;++d)
@@ -209,7 +209,14 @@ int main()
     {
       deallog << " Functions::StokesCosine<2>" << std::endl;
       Functions::StokesCosine<2> f(1.);
-      check_function(f, 10, logfile);
+      check_function(f, 4, logfile);
+    }
+
+  if (true)
+    {
+      deallog << " Functions::StokesCosine<3>" << std::endl;
+      Functions::StokesCosine<3> f(1.);
+      check_function(f, 4, logfile);
     }
 
   if (false)
