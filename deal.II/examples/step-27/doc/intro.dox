@@ -311,49 +311,48 @@ able to drive the simple calculations this tutorial program will perform.
 
 <h4>The idea</h4>
 
-Our approach here is simple: for a function $u(x)$ to be in the
+Our approach here is simple: for a function $u({\bf x})$ to be in the
 Sobolev space $H^s(K)$ on a cell $K$, it has to satisfy the condition
 @f[
-	\int_K |\nabla^s u(x)|^2 \; dx < \infty.
+	\int_K |\nabla^s u({\bf x})|^2 \; d{\bf x} < \infty.
 @f]
 Assuming that the cell $K$ is not degenerate, i.e. that the mapping from the
 unit cell to cell $K$ is sufficiently regular, above condition is of course
 equivalent to
 @f[
-	\int_{\hat K} |\nabla^s \hat u(\hat x)|^2 \; dx < \infty
+	\int_{\hat K} |\nabla^s \hat u(\hat{\bf x})|^2 \; d\hat{\bf x} < \infty
 @f]
-where $\hat u(\hat x)$ is the function $u(x)$ mapped back onto the unit cell
+where $\hat u(\hat{\bf x})$ is the function $u({\bf x})$ mapped back onto the unit cell
 $\hat K$. From here, we can do the following: first, let us define the
 Fourier series of $\hat u$ as
 @f[
-	\hat U_{\vec k}
-	= \frac 1{(2\pi)^{d/2}} \int_{\hat K} e^{i\vec k \cdot \vec x} \hat u(\hat x) dx
+	\hat U_{\bf k}
+	= \frac 1{(2\pi)^{d/2}} \int_{\hat K} e^{i {\bf k}\cdot \hat{\bf x}} \hat u(\hat{\bf x}) d\hat{\bf x}
 @f]
-with Fourier vectors $\vec k=(k_x,k_y)$ in 2d, $\vec k=(k_x,k_y,k_z)$
+with Fourier vectors ${\bf k}=(k_x,k_y)$ in 2d, ${\bf k}=(k_x,k_y,k_z)$
 in 3d, etc, and $k_x,k_y,k_z=0,\pi,2\pi,3\pi,\ldots$. If we re-compose $\hat u$
 from $\hat U$ using the formula
 @f[
-	\hat u(\vec x) 
-	= \frac 1{(2\pi)^{d/2}} \sum_{\vec k} e^{-i\vec k \cdot \vec x} \hat U_{\hat k} dx,
+	\hat u(\hat{\bf x}) 
+	= \frac 1{(2\pi)^{d/2}} \sum_{\bf k} e^{-i {\bf k}\cdot \hat{\bf x}} \hat U_{\bf k},
 @f]
 then it becomes clear that we can write the $H^s$ norm of $\hat u$ as
 @f[
-	\int_K |\nabla^s u(x)|^2 \; dx
+	\int_{\hat K} |\nabla^s \hat u(\hat{\bf x})|^2 \; d\hat{\bf x}
 	=
 	\frac 1{(2\pi)^d}
-	\int_K 
+	\int_{\hat K}
 	\left|
-	  \sum_{\vec k} |\vec k|^s e^{-i\vec k \cdot \vec x} \hat U_{\hat k}
-        \right|^2 \; dx
+	  \sum_{\bf k} |{\bf k}|^s e^{-i{\bf k}\cdot \hat{\bf x}} \hat U_{\bf k}
+        \right|^2 \; d\hat{\bf x}
 	=
-	\sum_{\vec k} 
-	  |\vec k|^{2s}
-	  |\hat U_{\hat k}|^2.
+	\sum_{\bf k} 
+	  |{\bf k}|^{2s}
+	  |\hat U_{\bf k}|^2.
 @f]
-In other words, if this norm is to be finite (i.e. for $\hat u(\vec
-x)$ to be in $H^s(\hat K)$), we need that
+In other words, if this norm is to be finite (i.e. for $\hat u(\hat{\bf x})$ to be in $H^s(\hat K)$), we need that
 @f[
-	|\hat U_{\hat k}| = {\cal O}\left(|\vec k|^{-\left(s+1/2+\frac{d-1}{2}+\epsilon\right)}\right).
+	|\hat U_{\bf k}| = {\cal O}\left(|{\bf k}|^{-\left(s+1/2+\frac{d-1}{2}+\epsilon\right)}\right).
 @f]
 Put differently: the higher regularity $s$ we want, the faster the
 Fourier coefficients have to go to zero. (If you wonder where the
@@ -366,30 +365,30 @@ $d$-dimensional sphere, because we have vector components $k_x, k_y,
 \ldots$. In the same way as we prove that the sequence $a_l$ above
 converges by replacing the sum by an integral over the entire line, we
 can replace our $d$-dimensional sum by an integral over
-$d$-dimensional space. Now we have to note that between distance $|k|$
-and $|k|+d|k|$, there are, up to a constant, $|k|^{d-1}$ modes, in
+$d$-dimensional space. Now we have to note that between distance $|{\bf k}|$
+and $|{\bf k}|+d|{\bf k}|$, there are, up to a constant, $|{\bf k}|^{d-1}$ modes, in
 much the same way as we can transform the volume element $dx\;dy$ into
-$2\pi r\; dr$. Consequently, it is no longer $|\vec k|^{2s}|\hat
-U_{\hat k}|^2$ that has to decay as ${\cal O}(k^{-1-\epsilon})$, but
-it is in fact $|\vec k|^{2s}|\hat U_{\hat k}|^2 |k|^{d-1}$. A
+$2\pi r\; dr$. Consequently, it is no longer $|{\bf k}|^{2s}|\hat
+U_{\bf k}|^2$ that has to decay as ${\cal O}(|{\bf k}|^{-1-\epsilon})$, but
+it is in fact $|{\bf k}|^{2s}|\hat U_{\bf k}|^2 |{\bf k}|^{d-1}$. A
 comparison of exponents yields the result.) 
 
 We can turn this around: Assume we are given a function $\hat u$ of unknown
-smoothness. Let us compute its Fourier coefficients $\hat U_{\vec k}$
+smoothness. Let us compute its Fourier coefficients $\hat U_{\bf k}$
 and see how fast they decay. If they decay as
 @f[
-	|\hat U_{\hat k}| = {\cal O}(|\vec k|^{-\mu-\epsilon}),
+	|\hat U_{\bf k}| = {\cal O}(|{\bf k}|^{-\mu-\epsilon}),
 @f]
 then consequently the function we had here was in $H^{\mu-d/2}$.
 
 
 <h4>What we have to do</h4>
 
-So what do we have to do to estimate the local smoothness of $u(x)$ on
+So what do we have to do to estimate the local smoothness of $u({\bf x})$ on
 a cell $K$? Clearly, the first step is to compute the Fourier series
 of our solution. Fourier series being infinite series, we simplify our
 task by only computing the first few terms of the series, such that
-$|\vec k|\le N$ with a cut-off $N$. (Let us parenthetically remark
+$|{\bf k}|\le N$ with a cut-off $N$. (Let us parenthetically remark
 that we want to choose $N$ large enough so that we capture at least
 the variation of those shape functions that vary the most. On the
 other hand, we should not choose $N$ too large: clearly, a finite
@@ -400,62 +399,62 @@ polynomial approximates, not of the polynomial itself, we need to
 choose a reasonable cutoff for $N$.) Either way, computing this series
 is not particularly hard: from the definition
 @f[
-	\hat U_{\vec k}
-	= \frac 1{(2\pi)^{d/2}} \int_{\hat K} e^{i\vec k \cdot \vec x} \hat u(\hat x) dx
+	\hat U_{\bf k}
+	= \frac 1{(2\pi)^{d/2}} \int_{\hat K} e^{i {\bf k}\cdot \hat{\bf x}} \hat u(\hat{\bf x}) d\hat{\bf x}
 @f]
-we see that we can compute the coefficient $\hat U_{\vec k}$ as
+we see that we can compute the coefficient $\hat U_{\bf k}$ as
 @f[
-	\hat U_{\vec k}
+	\hat U_{\bf k}
 	= \frac 1{(2\pi)^{d/2}} 
-          \sum_{i=0}^{\textrm{dofs per cell}}
-          \left[\int_{\hat K} e^{i\vec k \cdot \vec x} \hat \varphi_i(\hat x)
-	  dx \right] u_i,
+          \sum_{i=0}^{\textrm{\tiny dofs per cell}}
+          \left[\int_{\hat K} e^{i {\bf k}\cdot \hat{\bf x}} \hat \varphi_i(\hat{\bf x})
+	  d\hat{\bf x} \right] u_i,
 @f]
 where $u_i$ is the value of the $i$th degree of freedom on this
 cell. In other words, we can write it as a matrix-vector product
 @f[
-	\hat U_{\vec k}
-	= {\cal F}_{\vec k,j} u_j,
+	\hat U_{\bf k}
+	= {\cal F}_{{\bf k},j} u_j,
 @f]
 with the matrix
 @f[
-	{\cal F}_{\vec k,j}
+	{\cal F}_{{\bf k},j}
 	= \frac 1{(2\pi)^{d/2}} 
-	\int_{\hat K} e^{i\vec k \cdot \vec x} \hat \varphi_j(\hat x) dx.
+	\int_{\hat K} e^{i {\bf k}\cdot \hat{\bf x}} \hat \varphi_j(\hat{\bf x}) d\hat{\bf x}.
 @f]
 This matrix is easily computed for a given number of shape functions
 $\varphi_j$ and Fourier modes $N$. Consequently, finding the
-coefficients $\hat U_{\vec k}$ is a rather trivial job.
+coefficients $\hat U_{\bf k}$ is a rather trivial job.
 
 The next task is that we have to estimate how fast these coefficients
-decay with $|\vec k|$. The problem is that, of course, we have only
+decay with $|{\bf k}|$. The problem is that, of course, we have only
 finitely many of these coefficients in the first place. In other
-words, the best we can do is to fit a function $\alpha |\vec
-k|^{-\mu}$ to our data points $\hat U_{\vec k}$, for example by
+words, the best we can do is to fit a function $\alpha |{\bf k}|^{-\mu}$
+to our data points $\hat U_{\bf k}$, for example by
 determining $\alpha,\mu$ via a least-squares procedure:
 @f[
 	\min_{\alpha,\mu}
-	\frac 12 \sum_{\vec k, |\vec k|\le N}
-	\left( |\hat U_{\vec k}| - \alpha |\vec k|^{-\mu}\right)^2
+	\frac 12 \sum_{{\bf k}, |{\bf k}|\le N}
+	\left( |\hat U_{\bf k}| - \alpha |{\bf k}|^{-\mu}\right)^2
 @f]
 However, the problem with this is that it leads to a nonlinear
 problem, a fact that we would like to avoid. On the other hand, we can
 transform the problem into a simpler one if we try to fit the
-logarithm of our coefficients to the logarithm of $\alpha |\vec
-k|^{-\mu}$, like this:
+logarithm of our coefficients to the logarithm of $\alpha |{\bf k}|^{-\mu}$,
+like this:
 @f[
 	\min_{\alpha,\mu}
 	Q(\alpha,\mu) = 
-	\frac 12 \sum_{\vec k, |\vec k|\le N}
-	\left( \ln |\hat U_{\vec k}| - \ln (\alpha |\vec k|^{-\mu})\right)^2.
+	\frac 12 \sum_{{\bf k}, |{\bf k}|\le N}
+	\left( \ln |\hat U_{\bf k}| - \ln (\alpha |{\bf k}|^{-\mu})\right)^2.
 @f]
 Using the usual facts about logarithms, we see that this yields the
 problem 
 @f[
 	\min_{\beta,\mu}
 	Q(\beta,\mu) = 
-	\frac 12 \sum_{\vec k, |\vec k|\le N}
-	\left( \ln |\hat U_{\vec k}| - \beta + \mu \ln |\vec k|\right)^2,
+	\frac 12 \sum_{{\bf k}, |{\bf k}|\le N}
+	\left( \ln |\hat U_{\bf k}| - \beta + \mu \ln |{\bf k}|\right)^2,
 @f]
 where $\beta=\ln \alpha$. This is now a problem for which the
 optimality conditions $\frac{\partial Q}{\partial\beta}=0,
@@ -463,48 +462,48 @@ optimality conditions $\frac{\partial Q}{\partial\beta}=0,
 write these conditions as follows:
 @f[
 	\left(\begin{array}{cc}
-	\sum_{\vec k, |\vec k|\le N} 1 &
-	\sum_{\vec k, |\vec k|\le N} \ln |\vec k| 
+	\sum_{{\bf k}, |{\bf k}|\le N} 1 &
+	\sum_{{\bf k}, |{\bf k}|\le N} \ln |{\bf k}| 
 	\\
-	\sum_{\vec k, |\vec k|\le N} \ln |\vec k| &
-	\sum_{\vec k, |\vec k|\le N} (\ln |\vec k|)^2 
+	\sum_{{\bf k}, |{\bf k}|\le N} \ln |{\bf k}| &
+	\sum_{{\bf k}, |{\bf k}|\le N} (\ln |{\bf k}|)^2 
 	\end{array}\right)
 	\left(\begin{array}{c}
 	\beta \\ -\mu
 	\end{array}\right)
 	=
 	\left(\begin{array}{c}
-	\sum_{\vec k, |\vec k|\le N} \ln |\hat U_{\vec k}|
+	\sum_{{\bf k}, |{\bf k}|\le N} \ln |\hat U_{{\bf k}}|
 	\\
-	\sum_{\vec k, |\vec k|\le N} \ln |\hat U_{\vec k}| \ln |\vec k| 
+	\sum_{{\bf k}, |{\bf k}|\le N} \ln |\hat U_{{\bf k}}| \ln |{\bf k}| 
 	\end{array}\right)
 @f]
 This linear system is readily inverted to yield
 @f[
 	\beta = 
-	\frac 1{\left(\sum_{\vec k, |\vec k|\le N} 1\right)
-                \left(\sum_{\vec k, |\vec k|\le N} (\ln |\vec k|)^2\right)
-		-\left(\sum_{\vec k, |\vec k|\le N} \ln |\vec k|\right)^2}
+	\frac 1{\left(\sum_{{\bf k}, |{\bf k}|\le N} 1\right)
+                \left(\sum_{{\bf k}, |{\bf k}|\le N} (\ln |{\bf k}|)^2\right)
+		-\left(\sum_{{\bf k}, |{\bf k}|\le N} \ln |{\bf k}|\right)^2}
 	\left[
-	  \left(\sum_{\vec k, |\vec k|\le N} (\ln |\vec k|)^2\right)
-	  \left(\sum_{\vec k, |\vec k|\le N} \ln |\hat U_{\vec k}|\right)
+	  \left(\sum_{{\bf k}, |{\bf k}|\le N} (\ln |{\bf k}|)^2\right)
+	  \left(\sum_{{\bf k}, |{\bf k}|\le N} \ln |\hat U_{{\bf k}}|\right)
 	  -
-	  \left(\sum_{\vec k, |\vec k|\le N} \ln |\vec k|\right)
-	  \left(\sum_{\vec k, |\vec k|\le N} \ln |\hat U_{\vec k}| \ln |\vec k| \right)
+	  \left(\sum_{{\bf k}, |{\bf k}|\le N} \ln |{\bf k}|\right)
+	  \left(\sum_{{\bf k}, |{\bf k}|\le N} \ln |\hat U_{{\bf k}}| \ln |{\bf k}| \right)
 	\right]
 @f]
 and
 @f[
 	\mu = 
-	\frac 1{\left(\sum_{\vec k, |\vec k|\le N} 1\right)
-                \left(\sum_{\vec k, |\vec k|\le N} (\ln |\vec k|)^2\right)
-		-\left(\sum_{\vec k, |\vec k|\le N} \ln |\vec k|\right)^2}
+	\frac 1{\left(\sum_{{\bf k}, |{\bf k}|\le N} 1\right)
+                \left(\sum_{{\bf k}, |{\bf k}|\le N} (\ln |{\bf k}|)^2\right)
+		-\left(\sum_{{\bf k}, |{\bf k}|\le N} \ln |{\bf k}|\right)^2}
 	\left[
-	  \left(\sum_{\vec k, |\vec k|\le N} \ln |\vec k|\right)
-	  \left(\sum_{\vec k, |\vec k|\le N} \ln |\hat U_{\vec k}|\right)
+	  \left(\sum_{{\bf k}, |{\bf k}|\le N} \ln |{\bf k}|\right)
+	  \left(\sum_{{\bf k}, |{\bf k}|\le N} \ln |\hat U_{{\bf k}}|\right)
 	  -
-	  \left(\sum_{\vec k, |\vec k|\le N} 1\right)
-	  \left(\sum_{\vec k, |\vec k|\le N} \ln |\hat U_{\vec k}| \ln |\vec k| \right)
+	  \left(\sum_{{\bf k}, |{\bf k}|\le N} 1\right)
+	  \left(\sum_{{\bf k}, |{\bf k}|\le N} \ln |\hat U_{{\bf k}}| \ln |{\bf k}| \right)
 	\right].
 @f]
 
@@ -517,17 +516,17 @@ x)$ is in $H^s(\hat K)$ with $s=\mu-\frac d2$.
 <h4>Compensating for anisotropy</h4>
 
 In the formulas above, we have derived the Fourier coefficients $\hat U_{\vec
-k}$. Because $\vec k$ is a vector, we will get a number of Fourier
-coefficients $\hat U_{\vec k}$ for the same absolute value $|\vec k|$,
+k}$. Because ${\bf k}$ is a vector, we will get a number of Fourier
+coefficients $\hat U_{{\bf k}}$ for the same absolute value $|{\bf k}|$,
 corresponding to the Fourier transform in different directions. If we now
 consider a function like $|x|y^2$ then we will find lots of large Fourier
 coefficients in $x$-direction because the function is non-smooth in this
 direction, but fast-decaying Fourier coefficients in $y$-direction because the
 function is smooth there. The question that arises is this: if we simply fit
-our polynomial decay $\alpha |\vec k|^\mu$ to <i>all</i> Fourier coefficients,
+our polynomial decay $\alpha |{\bf k}|^\mu$ to <i>all</i> Fourier coefficients,
 we will fit it to a smoothness <i>averaged in all spatial directions</i>. Is
 this what we want? Or would it be better to only consider the largest
-coefficient $\hat U_{\vec k}$ for all $\vec k$ with the same magnitude,
+coefficient $\hat U_{{\bf k}}$ for all ${\bf k}$ with the same magnitude,
 essentially trying to determine the smoothness of the solution in that spatial
 direction in which the solution appears to be roughest?
 
@@ -543,27 +542,27 @@ regularity, in order to keep numerical efforts low. Consequently, instead of
 using the formula
 @f[
 	\mu = 
-	\frac 1{\left(\sum_{\vec k, |\vec k|\le N} 1\right)
-                \left(\sum_{\vec k, |\vec k|\le N} (\ln |\vec k|)^2\right)
-		-\left(\sum_{\vec k, |\vec k|\le N} \ln |\vec k|\right)^2}
+	\frac 1{\left(\sum_{{\bf k}, |{\bf k}|\le N} 1\right)
+                \left(\sum_{{\bf k}, |{\bf k}|\le N} (\ln |{\bf k}|)^2\right)
+		-\left(\sum_{{\bf k}, |{\bf k}|\le N} \ln |{\bf k}|\right)^2}
 	\left[
-	  \left(\sum_{\vec k, |\vec k|\le N} \ln |\vec k|\right)
-	  \left(\sum_{\vec k, |\vec k|\le N} \ln |\hat U_{\vec k}|\right)
+	  \left(\sum_{{\bf k}, |{\bf k}|\le N} \ln |{\bf k}|\right)
+	  \left(\sum_{{\bf k}, |{\bf k}|\le N} \ln |\hat U_{{\bf k}}|\right)
 	  -
-	  \left(\sum_{\vec k, |\vec k|\le N} 1\right)
-	  \left(\sum_{\vec k, |\vec k|\le N} \ln |\hat U_{\vec k}| \ln |\vec k| \right)
+	  \left(\sum_{{\bf k}, |{\bf k}|\le N} 1\right)
+	  \left(\sum_{{\bf k}, |{\bf k}|\le N} \ln |\hat U_{{\bf k}}| \ln |{\bf k}| \right)
 	\right].
 @f]
 to calculate $\mu$ as shown above, we have to slightly modify all sums:
 instead of summing over all Fourier modes, we only sum over those for which
-the Fourier coefficient is the largest one among all $\hat U_{\vec k}$ with
-the same magnitude $|\vec k|$, i.e. all sums above have to replaced by the
+the Fourier coefficient is the largest one among all $\hat U_{{\bf k}}$ with
+the same magnitude $|{\bf k}|$, i.e. all sums above have to replaced by the
 following sums:
 @f[
-  \sum_{\vec k, |\vec k|\le N}
+  \sum_{{\bf k}, |{\bf k}|\le N}
   \longrightarrow
-  \sum_{{\vec k, |\vec k|\le N} \atop {|\hat U_{\vec k}| \ge |\hat U_{\vec k'}|
-  \ \textrm{for all}\ \vec k'\ \textrm{with}\ |\vec k'|=|\vec k|}}
+  \sum_{{{\bf k}, |{\bf k}|\le N} \atop {|\hat U_{{\bf k}}| \ge |\hat U_{{\bf k}'}|
+  \ \textrm{for all}\ {\bf k}'\ \textrm{with}\ |{\bf k}'|=|{\bf k}|}}
 @f]
 This is the form we will implement in the program.
 
@@ -585,22 +584,22 @@ compensate for the transformation.
 The short answer is "no". In the process outlined above, we attempt to find
 coefficients $\beta,\mu$ that minimize the sum of squares of the terms
 @f[
-	\ln |\hat U_{\vec k}| - \beta + \mu \ln |\vec k|.
+	\ln |\hat U_{{\bf k}}| - \beta + \mu \ln |{\bf k}|.
 @f]
 To compensate for the transformation means not attempting to fit a decay
-$|\vec k|^\mu$ with respect to the Fourier frequencies $\vec k$ <i>on the unit
-cell</i>, but to fit the coefficients $\hat U_{\vec k}$ computed on the
+$|{\bf k}|^\mu$ with respect to the Fourier frequencies ${\bf k}$ <i>on the unit
+cell</i>, but to fit the coefficients $\hat U_{{\bf k}}$ computed on the
 reference cell <i>to the Fourier frequencies on the real cell $|\vec
 k|h$</i>, where $h$ is the norm of the transformation operator (i.e. something
 like the diameter of the cell). In other words, we would have to minimize the
 sum of squares of the terms 
 @f[
-	\ln |\hat U_{\vec k}| - \beta + \mu \ln (|\vec k|h).
+	\ln |\hat U_{{\bf k}}| - \beta + \mu \ln (|{\bf k}|h).
 @f]
 instead. However, using fundamental properties of the logarithm, this is
 simply equivalent to minimizing 
 @f[
-	\ln |\hat U_{\vec k}| - (\beta - \mu \ln h) + \mu \ln (|\vec k|).
+	\ln |\hat U_{{\bf k}}| - (\beta - \mu \ln h) + \mu \ln (|{\bf k}|).
 @f]
 In other words, this and the original least squares problem will produce the
 same best-fit exponent $\mu$, though the offset will in one case be $\beta$
