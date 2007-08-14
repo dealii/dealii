@@ -28,18 +28,18 @@ this example's purpose is to illustrate some implementational issues
 of the DG discretization only, here we simply consider the linear
 transport equation
 <a name="step-12.transport-equation">@f[
-  \nabla\cdot \left\{{\mathbf \beta} u\right\}=f  \qquad\mbox{in }\Omega,
+  \nabla\cdot \left({\mathbf \beta} u\right)=f  \qquad\mbox{in }\Omega,
 \qquad\qquad\qquad\mathrm{[transport-equation]}@f]</a>
 subject to the boundary conditions
 @f[
 u=g\quad\mbox{on }\Gamma_-,
 @f]
 on the inflow part $\Gamma_-$ of the boundary $\Gamma=\partial\Omega$
-of the domain.  Here, ${\mathbf \beta}={\mathbf \beta}(x)$ denotes a
+of the domain.  Here, ${\mathbf \beta}={\mathbf \beta}({\bf x})$ denotes a
 vector field, $f$ a source function, $u$ the (scalar) solution
 function, $g$ a boundary value function,
 @f[
-\Gamma_-:=\{x\in\Gamma, {\mathbf \beta}(x)\cdot{\bf n}(x)<0\}
+\Gamma_-:=\{{\bf x}\in\Gamma, {\mathbf \beta}({\bf x})\cdot{\bf n}({\bf x})<0\}
 @f]
 the inflow part of the boundary of the domain and ${\bf n}$ denotes
 the unit outward normal to the boundary $\Gamma$. Equation
@@ -49,7 +49,7 @@ transport equation already considered in step 9 of this tutorial.
 In particular, we consider problem <a href="#step-12.transport-equation">[transport-equation]</a> on
 $\Omega=[0,1]^2$ with ${\mathbf \beta}=\frac{1}{|x|}(-x_2, x_1)$
 representing a circular counterclockwise flow field, $f=0$ and $g=1$
-on $x\in\Gamma_-^1:=[0,0.5]\times\{0\}$ and $g=0$ on $x\in
+on ${\bf x}\in\Gamma_-^1:=[0,0.5]\times\{0\}$ and $g=0$ on ${\bf x}\in
 \Gamma_-\setminus \Gamma_-^1$.
 
 
@@ -92,39 +92,39 @@ consistent, i.e.
 {\mathcal H}(u,u,{\bf n})={\mathcal F}(u)\cdot{\bf n},
 @f]
 and conservative, i.e.
-<a name="step-12.conservative">@f[
+<a name="step-12.conservativity">@f[
 {\mathcal H}(v,w,{\bf n})=-{\mathcal H}(w,v,-{\bf n}).
 \qquad\qquad\qquad\mathrm{[conservative]}@f]</a>
 This yields the following <em>discontinuous Galerkin
   discretization</em>: find $u_h\in V_h$ such that
-<a name="step-12.dg-scheme">@f[
+<a name="step-12.dg-general1">@f[
   \sum_\kappa\left\{-({\mathcal F}(u_h),\nabla v_h)_\kappa+({\mathcal H}(u_h^+,u_h^-,{\bf n}), v_h)_{\partial\kappa}\right\}=(f,v_h)_\Omega, \quad\forall v_h\in V_h.
-\qquad\qquad\qquad\mathrm{[dg-scheme]}@f]</a>
+\qquad\qquad\qquad\mathrm{[dg-general1]}@f]</a>
 %Boundary conditions are realized by replacing $u_h^-$ on the inflow boundary $\Gamma_-$ by the boundary function $g$.
 In the special case of the transport equation
 <a href="#step-12.transport-equation">[transport-equation]</a> the numerical flux in its simplest form
 is given by
-<a name="step-12.flux-transport-equation">@f[
-  {\mathcal H}(u_h^+,u_h^-,{\bf n})(x)=\left\{\begin{array}{ll}
-      ({\mathbf \beta}\cdot{\bf n}\, u_h^-)(x),&\mbox{for } {\mathbf \beta}(x)\cdot{\bf n}(x)<0,\\
-      ({\mathbf \beta}\cdot{\bf n}\, u_h^+)(x),&\mbox{for } {\mathbf \beta}(x)\cdot{\bf n}(x)\geq 0,
+<a name="step-12.upwind-flux">@f[
+  {\mathcal H}(u_h^+,u_h^-,{\bf n})({\bf x})=\left\{\begin{array}{ll}
+      ({\mathbf \beta}\cdot{\bf n}\, u_h^-)({\bf x}),&\mbox{for } {\mathbf \beta}({\bf x})\cdot{\bf n}({\bf x})<0,\\
+      ({\mathbf \beta}\cdot{\bf n}\, u_h^+)({\bf x}),&\mbox{for } {\mathbf \beta}({\bf x})\cdot{\bf n}({\bf x})\geq 0,
 \end{array}
 \right.
-\qquad\qquad\qquad\mathrm{[flux-transport-equation]}@f]</a>
+\qquad\qquad\qquad\mathrm{[upwind-flux]}@f]</a>
 where on the inflow part of the cell the value is taken from the
 neighboring cell, $u_h^-$, and on the outflow part the value is
 taken from the current cell, $u_h^+$.  Hence, the discontinuous Galerkin
 scheme for the transport equation <a href="#step-12.transport-equation">[transport-equation]</a> is given
 by: find $u_h\in V_h$ such that for all $v_h\in V_h$ following
 equation holds:
-<a name="step-12.dg-transport">@f[
+<a name="step-12.dg-transport1">@f[
   \sum_\kappa\left\{-(u_h,{\mathbf \beta}\cdot\nabla v_h)_\kappa
   +({\mathbf \beta}\cdot{\bf n}\, u_h, v_h)_{\partial\kappa_+}
   +({\mathbf \beta}\cdot{\bf n}\, u_h^-, v_h)_{\partial\kappa_-\setminus\Gamma}\right\}
   =(f,v_h)_\Omega-({\mathbf \beta}\cdot{\bf n}\, g, v_h)_{\Gamma_-},
-\qquad\qquad\qquad\mathrm{[dg-transport]}@f]</a>
-where $\partial\kappa_-:=\{x\in\partial\kappa,
-{\mathbf \beta}(x)\cdot{\bf n}(x)<0\}$ denotes the inflow boundary
+\qquad\qquad\qquad\mathrm{[dg-transport1]}@f]</a>
+where $\partial\kappa_-:=\{{\bf x}\in\partial\kappa,
+{\mathbf \beta}({\bf x})\cdot{\bf n}({\bf x})<0\}$ denotes the inflow boundary
 and $\partial\kappa_+=\partial\kappa\setminus \partial \kappa_-$ the
 outflow part of cell $\kappa$. Below, this equation will be referred
 to as <em>first version</em> of the DG method. We note that after a
@@ -139,34 +139,34 @@ between two neighboring cells and is defined to be $[u_h]=u_h^+-g$ on
 the boundary of the domain. This is the discontinuous Galerkin scheme
 for the transport equation given in its original notation.
 Nevertheless, we will base the implementation of the scheme on the
-form given by <a href="#step-12.dg-scheme">[dg-scheme]</a> and <a href="#step-12.flux-transport-equation">[flux-transport-equation]</a>,
-or <a href="#step-12.dg-transport">[dg-transport]</a>, respectively.
+form given by <a href="#step-12.dg-general1">[dg-general1]</a> and <a href="#step-12.upwind-flux">[upwind-flux]</a>,
+or <a href="#step-12.dg-transport1">[dg-transport1]</a>, respectively.
 
-Finally, we rewrite <a href="#step-12.dg-scheme">[dg-scheme]</a> in terms of a summation over all
+Finally, we rewrite <a href="#step-12.dg-general1">[dg-general1]</a> in terms of a summation over all
 faces where each face $e=\partial \kappa\cap\partial \kappa'$
 between two neighboring cells $\kappa$ and $\kappa'$ occurs twice:
 Find $u_h\in V_h$ such that
-<a name="step-12.dg-scheme-faces-long">@f[
+<a name="step-12.dg-general2">@f[
   -\sum_\kappa({\mathcal F}(u_h),\nabla v_h)_\kappa+\sum_e\left\{({\mathcal H}(u_h^+,u_h^-,{\bf n}), v_h)_e+({\mathcal H}(u_h^-, u_h^+,-{\bf n}), v_h^-)_{e\setminus\Gamma}\right\}=(f,v_h)_\Omega \quad\forall v_h\in V_h,
-\qquad\qquad\qquad\mathrm{[dg-scheme-faces-long]}@f]</a>
-By employing conservativity <a href="#step-12.conservative">[conservative]</a> of the numerical flux
+\qquad\qquad\qquad\mathrm{[dg-general2]}@f]</a>
+By employing <a href="#step-12.conservativity">[conservativity]</a> of the numerical flux
 this equation simplifies to: find $u_h\in V_h$ such that
-<a name="step-12.dg-scheme-faces">@f[
+<a name="step-12.dg-general3">@f[
   -\sum_\kappa({\mathcal F}(u_h),\nabla v_h)_\kappa+\sum_e({\mathcal H}(u_h^+,u_h^-,{\bf n}), [v_h])_{e\setminus\Gamma}+({\mathcal H}(u_h,g,{\bf n}), v_h)_{\Gamma}=(f,v_h)_\Omega \quad\forall v_h\in V_h.
-\qquad\qquad\qquad\mathrm{[dg-scheme-faces]}@f]</a>
+\qquad\qquad\qquad\mathrm{[dg-general3]}@f]</a>
 Whereas the outer unit normal ${\bf n}|_{\partial\kappa}$ is uniquely
 defined this is not so for ${\bf n}_e$ as the latter might be the
 normal from either side of the face. Hence, we need to fix the normal
 ${\bf n}$ on the face to be one of the two normals and denote the
 other normal by $-{\bf n}$.  This way we get $-{\bf n}$ in the second
-face term in <a href="#step-12.dg-scheme-faces-long">[dg-scheme-faces-long]</a> that finally produces the
-minus sign in the jump $[v_h]$ in equation <a href="#step-12.dg-scheme-faces">[dg-scheme-faces]</a>.
+face term in <a href="#step-12.dg-general2">[dg-general2]</a> that finally produces the
+minus sign in the jump $[v_h]$ in equation <a href="#step-12.dg-general3">[dg-general3]</a>.
 
 For the linear transport equation <a href="#step-12.transport-equation">[transport-equation]</a>
-equation <a href="#step-12.dg-scheme-faces">[dg-scheme-faces]</a> simplifies to
-<a name="step-12.dg-transport-gamma">@f[
+equation <a href="#step-12.dg-general3">[dg-general3]</a> simplifies to
+<a name="step-12.dg-transport2">@f[
   -\sum_\kappa(u_h,{\mathbf \beta}\cdot\nabla v_h)_\kappa+\sum_e\left\{({\mathbf \beta}\cdot{\bf n}\, u_h, [v_h])_{e_+\setminus\Gamma}+({\mathbf \beta}\cdot{\bf n}\, u_h^-, [v_h])_{e_-\setminus\Gamma}\right\}=(f,v_h)_\Omega-({\mathbf \beta}\cdot{\bf n}\, g, v_h)_{\Gamma_-},
-\qquad\qquad\qquad\mathrm{[dg-transport-gamma]}@f]</a>
+\qquad\qquad\qquad\mathrm{[dg-transport2]}@f]</a>
 which will be refered to as <em>second version</em> of the DG method.
 
 
@@ -175,7 +175,7 @@ which will be refered to as <em>second version</em> of the DG method.
 
 As already mentioned at the beginning of this example we will
 implement assembling the system matrix in two different ways.
-The first one will be based on the first version <a href="#step-12.dg-transport">[dg-transport]</a>
+The first one will be based on the first version <a href="#step-12.dg-transport1">[dg-transport1]</a>
 of the DG method that includes a sum of integrals over all cell
 boundaries $\partial\kappa$. This is realized by a loop over all cells and
 a nested loop over all faces of each cell.  Thereby each inner face
@@ -186,7 +186,7 @@ values at quadrature points on faces need to be computed twice.
 
 To overcome this overhead and for comparison, we implement
 assembling of matrix also in a second and different way. This will
-be based on the second version <a href="#step-12.dg-transport-gamma">[dg-transport-gamma]</a> that
+be based on the second version <a href="#step-12.dg-transport2">[dg-transport2]</a> that
 includes a sum of integrals over all faces $e$. Here, several
 difficulties occurs.
 <ol>
