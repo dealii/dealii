@@ -94,14 +94,14 @@ consistent, i.e.
 and conservative, i.e.
 <a name="step-12.conservativity">@f[
 {\mathcal H}(v,w,{\bf n})=-{\mathcal H}(w,v,-{\bf n}).
-\qquad\qquad\qquad\mathrm{[conservative]}@f]</a>
+\qquad\qquad\qquad\mathrm{[conservativity]}@f]</a>
 This yields the following <em>discontinuous Galerkin
   discretization</em>: find $u_h\in V_h$ such that
 <a name="step-12.dg-general1">@f[
   \sum_\kappa\left\{-({\mathcal F}(u_h),\nabla v_h)_\kappa+({\mathcal H}(u_h^+,u_h^-,{\bf n}), v_h)_{\partial\kappa}\right\}=(f,v_h)_\Omega, \quad\forall v_h\in V_h.
 \qquad\qquad\qquad\mathrm{[dg-general1]}@f]</a>
 %Boundary conditions are realized by replacing $u_h^-$ on the inflow boundary $\Gamma_-$ by the boundary function $g$.
-In the special case of the transport equation
+In the special case of the
 <a href="#step-12.transport-equation">[transport-equation]</a> the numerical flux in its simplest form
 is given by
 <a name="step-12.upwind-flux">@f[
@@ -114,7 +114,7 @@ is given by
 where on the inflow part of the cell the value is taken from the
 neighboring cell, $u_h^-$, and on the outflow part the value is
 taken from the current cell, $u_h^+$.  Hence, the discontinuous Galerkin
-scheme for the transport equation <a href="#step-12.transport-equation">[transport-equation]</a> is given
+scheme for the <a href="#step-12.transport-equation">[transport-equation]</a> is given
 by: find $u_h\in V_h$ such that for all $v_h\in V_h$ following
 equation holds:
 <a name="step-12.dg-transport1">@f[
@@ -162,7 +162,7 @@ other normal by $-{\bf n}$.  This way we get $-{\bf n}$ in the second
 face term in <a href="#step-12.dg-general2">[dg-general2]</a> that finally produces the
 minus sign in the jump $[v_h]$ in equation <a href="#step-12.dg-general3">[dg-general3]</a>.
 
-For the linear transport equation <a href="#step-12.transport-equation">[transport-equation]</a>
+For the linear <a href="#step-12.transport-equation">[transport-equation]</a>
 equation <a href="#step-12.dg-general3">[dg-general3]</a> simplifies to
 <a name="step-12.dg-transport2">@f[
   -\sum_\kappa(u_h,{\mathbf \beta}\cdot\nabla v_h)_\kappa+\sum_e\left\{({\mathbf \beta}\cdot{\bf n}\, u_h, [v_h])_{e_+\setminus\Gamma}+({\mathbf \beta}\cdot{\bf n}\, u_h^-, [v_h])_{e_-\setminus\Gamma}\right\}=(f,v_h)_\Omega-({\mathbf \beta}\cdot{\bf n}\, g, v_h)_{\Gamma_-},
