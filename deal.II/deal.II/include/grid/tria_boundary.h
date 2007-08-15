@@ -2,7 +2,7 @@
 //    $Id$
 //    Version: $Name$
 //
-//    Copyright (C) 1998, 1999, 2000, 2001, 2002, 2003, 2004, 2005, 2006 by the deal.II authors
+//    Copyright (C) 1998, 1999, 2000, 2001, 2002, 2003, 2004, 2005, 2006, 2007 by the deal.II authors
 //
 //    This file is subject to QPL and may not be  distributed
 //    without copyright and license information. Please refer
@@ -313,8 +313,8 @@ class StraightBoundary : public Boundary<dim>
 				     /**
 				      * Gives <tt>n=points.size()</tt>
 				      * points that splits the
-				      * p{StraightBoundary} line into
-				      * p{n+1} partitions of equal
+				      * StraightBoundary line into
+				      * $n+1$ partitions of equal
 				      * lengths.
 				      *
 				      * Refer to the general
@@ -329,8 +329,8 @@ class StraightBoundary : public Boundary<dim>
 				     /**
 				      * Gives <tt>n=points.size()=m*m</tt>
 				      * points that splits the
-				      * p{StraightBoundary} quad into
-				      * <tt>(m+1)(m+1)</tt> subquads of equal
+				      * StraightBoundary quad into
+				      * $(m+1)(m+1)$ subquads of equal
 				      * size.
 				      *
 				      * Refer to the general

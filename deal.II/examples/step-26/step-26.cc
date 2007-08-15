@@ -101,8 +101,8 @@ class PointCloudSurface : public StraightBoundary<3>
 				     /**
 				      * Gives <tt>n=points.size()</tt>
 				      * points that splits the
-				      * p{StraightBoundary} line into
-				      * p{n+1} partitions of equal
+				      * StraightBoundary line into
+				      * $n+1$ partitions of equal
 				      * lengths.
 				      *
 				      * Refer to the general
@@ -131,13 +131,13 @@ class PointCloudSurface : public StraightBoundary<3>
 				     std::vector<Point<3> > &points) const;
 
 				     /**
-				      * A function that, given a point @p p,
-				      * returns the closest point on the
-				      * surface defined by the input file. For
-				      * the time being, we simply return the
-				      * closest point in the point cloud,
-				      * rather than doing any sort of
-				      * interpolation.
+				      * A function that, given a point
+				      * <code>p</code>, returns the closest
+				      * point on the surface defined by the
+				      * input file. For the time being, we
+				      * simply return the closest point in the
+				      * point cloud, rather than doing any
+				      * sort of interpolation.
 				      */
     Point<3> closest_point (const Point<3> &p) const;    
   private:

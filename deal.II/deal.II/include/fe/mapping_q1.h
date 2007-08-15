@@ -2,7 +2,7 @@
 //    $Id$
 //    Version: $Name$
 //
-//    Copyright (C) 2000, 2001, 2002, 2003, 2004, 2005, 2006 by the deal.II authors
+//    Copyright (C) 2000, 2001, 2002, 2003, 2004, 2005, 2006, 2007 by the deal.II authors
 //
 //    This file is subject to QPL and may not be  distributed
 //    without copyright and license information. Please refer
@@ -34,12 +34,12 @@ DEAL_II_NAMESPACE_OPEN
  * functions.
  *
  * This function maps the unit cell to a general grid cell with
- * straight lines in @p d dimensions (remark that in 3D the surfaces
+ * straight lines in $d$ dimensions (remark that in 3D the surfaces
  * may be curved, even if the edges are not). This is the well-known
  * mapping for polyhedral domains.
  *
  * Shape function for this mapping are the same as for the finite
- * element @p FE_Q of order 1. Therefore, coupling these two yields
+ * element FE_Q of order 1. Therefore, coupling these two yields
  * an isoparametric element.
  *
  * @author Guido Kanschat, 2000, 2001; Ralf Hartmann, 2000, 2001, 2005
@@ -54,10 +54,10 @@ class MappingQ1 : public Mapping<dim>
     MappingQ1 ();
     
 				     /**
-				      * Transforms the point @p p on
-				      * the unit cell to the point
-				      * @p p_real on the real cell
-				      * @p cell and returns @p p_real.
+				      * Transforms the point p on the unit
+				      * cell to the point p_real on the real
+				      * cell <code>cell</code> and returns
+				      * p_real.
 				      */
     virtual Point<dim>
     transform_unit_to_real_cell (
@@ -156,37 +156,37 @@ class MappingQ1 : public Mapping<dim>
 				      * Description of effects if
 				      * @p flags contains:
 				      * <ul>
-				      * <li> p{update_q_points} is
+				      * <li> <code>update_q_points</code> is
 				      * copied to the output to
 				      * compute the quadrature points
 				      * on the real cell.
-				      * <li> p{update_JxW_values} is
+				      * <li> <code>update_JxW_values</code> is
 				      * copied and requires
 				      * @p update_boundary_forms on
 				      * faces. The latter, because the
 				      * surface element is just the
 				      * norm of the boundary form.
-				      * <li> p{update_normal_vectors}
+				      * <li> <code>update_normal_vectors</code>
 				      * is copied and requires
 				      * @p update_boundary_forms. The
 				      * latter, because the normal
 				      * vector is the normalized
 				      * boundary form.
 				      * <li>
-				      * p{update_covariant_transformation}
+				      * <code>update_covariant_transformation</code>
 				      * is copied and requires
 				      * @p update_contravariant_transformation,
 				      * since it is computed as the
 				      * inverse of the latter.
-				      * <li> p{update_JxW_values} is
+				      * <li> <code>update_JxW_values</code> is
 				      * copied and requires
-				      * @p update_contravariant_transformation,
+				      * <code>update_contravariant_transformation</code>,
 				      * since it is computed as one
 				      * over determinant of the
 				      * latter.
-				      * <li> p{update_boundary_forms}
+				      * <li> <code>update_boundary_forms</code>
 				      * is copied and requires
-				      * @p update_contravariant_transformation,
+				      * <code>update_contravariant_transformation</code>,
 				      * since the boundary form is
 				      * computed as the contravariant
 				      * image of the normal vector to
