@@ -90,14 +90,14 @@ void VectorTools::interpolate (const Mapping<dim>    &mapping,
 				   // Find the support points 
 				   // on a cell that
 				   // are multiply mentioned in 
-				   // @p{unit_support_points}.
+				   // unit_support_points.
 				   // Mark the first representative
 				   // of each multiply mentioned
 				   // support point by appending its
-				   // dof index to @p{dofs_of_rep_points}.
+				   // dof index to dofs_of_rep_points.
 				   // Each multiple point gets to know
 				   // the dof index of its representative
-				   // point by the @p{dof_to_rep_dof_table}.
+				   // point by the dof_to_rep_dof_table.
 
 				   // the following vector collects all dofs i,
 				   // 0<=i<fe.dofs_per_cell, for that
@@ -423,7 +423,7 @@ void VectorTools::project (const Mapping<dim>       &mapping,
 					 // functions for the
 					 // different boundary
 					 // parts. We want the
-					 // @p{function} to hold on
+					 // function to hold on
 					 // all parts of the boundary
 	typename FunctionMap<dim>::type boundary_functions;
 	for (unsigned char c=0; c<255; ++c)
@@ -1199,7 +1199,7 @@ VectorTools::interpolate_boundary_values (const Mapping<dim>         &,
 				   // check whether boundary values at
 				   // the left or right boundary of
 				   // the line are
-				   // requested. @p{direction} denotes
+				   // requested. direction denotes
 				   // the neighboring direction in
 				   // which we seek the boundary,
 				   // i.e. 0 is left boundary and 1 is
@@ -1226,7 +1226,7 @@ VectorTools::interpolate_boundary_values (const Mapping<dim>         &,
 
 				   // set the component mask to either
 				   // the original value or a vector
-				   // of @p{true}s
+				   // of trues
   const std::vector<bool> component_mask ((component_mask_.size() == 0) ?
 					  std::vector<bool> (fe.n_components(), true) :
 					  component_mask_);
@@ -1313,7 +1313,7 @@ interpolate_boundary_values (const Mapping<dim>            &mapping,
 
 				   // set the component mask to either
 				   // the original value or a vector
-				   // of @p{true}s
+				   // of trues
   const std::vector<bool> component_mask ((component_mask_.size() == 0) ?
 					  std::vector<bool> (n_components, true) :
 					  component_mask_);
@@ -1707,7 +1707,7 @@ VectorTools::project_boundary_values (const Mapping<dim>       &mapping,
 				   // to be condensed and the solution is to
 				   // be distributed afterwards, which is not
 				   // yet implemented. The reason for this is
-				   // that we cannot simply use the @p{condense}
+				   // that we cannot simply use the condense
 				   // family of functions, since the matrices
 				   // and vectors do not use the global
 				   // numbering but rather the boundary
@@ -1758,8 +1758,8 @@ VectorTools::project_boundary_values (const Mapping<dim>       &mapping,
 				       // this dof is on one of the
 				       // interesting boundary parts
 				       //
-				       // remember: @p{i} is the global dof
-				       // number, @p{dof_to_boundary_mapping[i]}
+				       // remember: i is the global dof
+				       // number, dof_to_boundary_mapping[i]
 				       // is the number on the boundary and
 				       // thus in the solution vector
       boundary_values[i] = boundary_projection(dof_to_boundary_mapping[i]);
@@ -1966,7 +1966,7 @@ namespace internal
                                                // try to be a little clever
                                                // to avoid recursive virtual
                                                // function calls when calling
-                                               // @p{gradient_list} for functions
+                                               // gradient_list for functions
                                                // that are really scalar
                                                // functions
               if (fe_is_system)
