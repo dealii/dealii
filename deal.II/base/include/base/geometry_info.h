@@ -2,7 +2,7 @@
 //    $Id$
 //    Version: $Name$
 //
-//    Copyright (C) 1998, 1999, 2000, 2001, 2002, 2003, 2004, 2005, 2006 by the deal.II authors
+//    Copyright (C) 1998, 1999, 2000, 2001, 2002, 2003, 2004, 2005, 2006, 2007 by the deal.II authors
 //
 //    This file is subject to QPL and may not be  distributed
 //    without copyright and license information. Please refer
@@ -637,10 +637,10 @@ struct GeometryInfo
 				      * and arrange the vertices, such
 				      * that UCD understands them.
 				      *
-				      * \begin{verbatim}
+				      * @code
 				      * for (i=0; i< n_vertices; ++i)
 				      *   out << cell->vertex(ucd_to_deal[i]);
-				      * \end{verbatim}
+				      * @endcode
 				      *
 				      * As the vertex numbering in
 				      * deal.II versions <= 5.1
@@ -665,10 +665,10 @@ struct GeometryInfo
 				      * and arrange the vertices, such
 				      * that OpenDX understands them.
 				      *
-				      * \begin{verbatim}
+				      * @code
 				      * for (i=0; i< n_vertices; ++i)
 				      *   out << cell->vertex(dx_to_deal[i]);
-				      * \end{verbatim}
+				      * @endcode
 				      */
     static const unsigned int dx_to_deal[vertices_per_cell];
 

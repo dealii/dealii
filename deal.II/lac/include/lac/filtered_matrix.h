@@ -2,7 +2,7 @@
 //    $Id$
 //    Version: $Name$
 //
-//    Copyright (C) 2001, 2002, 2003, 2004, 2005, 2006 by the deal.II authors
+//    Copyright (C) 2001, 2002, 2003, 2004, 2005, 2006, 2007 by the deal.II authors
 //
 //    This file is subject to QPL and may not be  distributed
 //    without copyright and license information. Please refer
@@ -54,10 +54,10 @@ template <typename number> class Vector;
  * Lagrangian $L=1/2 x^T A x - x^T b + l^T B_D x$, where $l$
  * is a Lagrange multiplier for the constraints. The stationarity
  * condition then reads
- * \begin{verbatim}
+ * @code
  * [ A   B_D^T ] [x] = [b  ]
  * [ B_D 0     ] [l] = [g_D]
- * \end{verbatim}
+ * @endcode
  *
  * The first equation then reads $B_D^T l = b-Ax$. On the other hand,
  * if we left-multiply the first equation by $B_D^T B_D$, we obtain
