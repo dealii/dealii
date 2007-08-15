@@ -7,14 +7,14 @@
 This example is devoted to the <em>discontinuous Galerkin method</em>, or
 in short: DG method. It includes the following topics.
 <ol>
-<li> Discretization of the linear transport equation with the DG method
-<li> Two different assembling routines for the system matrix based on
-  face terms given as a sum of integrals that
-\begin{enumerate}
-<li> loops over all cell and all their faces, or that
-<li> loops over all faces, whereas each face is treated only once.
-\end{enumerate}
-<li> Time comparison of the two assembling routines.
+  <li> Discretization of the linear transport equation with the DG method
+  <li> Two different assembling routines for the system matrix based on
+    face terms given as a sum of integrals that
+  <ol>
+    <li> loops over all cell and all their faces, or that
+    <li> loops over all faces, whereas each face is treated only once.
+  </ol>
+  <li> Time comparison of the two assembling routines.
 </ol>
 
 
