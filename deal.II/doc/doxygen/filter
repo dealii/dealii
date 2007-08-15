@@ -1,28 +1,7 @@
 #!/usr/bin/perl -p
-s/\\p\{([^}]+)\}/$1/g;
-s/\@p\{([^}]+)\}/$1/g;
-s/\\ref\{([^}]+)\}/$1/g;
-s/\@ref\{([^}]+)\}/$1/g;
+
+# make sure we can just write $...$ for formulas.
 s/\$/\@f\$/g;
-
-s/\@sect(\d)\{([^}]+)\}/<h$1>$2<\/h$1>/g;
-s/\\begin\{verbatim\}/\@verbatim/g;
-s/\\end\{verbatim\}/\@endverbatim/g;
-s/\@begin\{verbatim\}/\@verbatim/g;
-s/\@end\{verbatim\}/\@endverbatim/g;
-
-s/\@item/<li>/g;
-
-s/\\begin\{itemize\}/<UL>/g;
-s/\\end\{itemize\}/<\/UL>/g;
-s/\@begin\{itemize\}/<UL>/g;
-s/\@end\{itemize\}/<\/UL>/g;
-
-s/\\begin\{enumerate\}/<OL>/g;
-s/\\end\{enumerate\}/<\/OL>/g;
-s/\@begin\{enumerate\}/<OL>/g;
-s/\@end\{enumerate\}/<\/OL>/g;
-
 
 # we don't let doxygen put everything into a namespace
 # dealii. consequently, doxygen can't link references that contain an
