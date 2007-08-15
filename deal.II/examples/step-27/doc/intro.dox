@@ -509,8 +509,8 @@ and
 
 While we are not particularly interested in the actual value of
 $\beta$, the formula above gives us a mean to calculate the value of
-the exponent $\mu$ that we can then use to determine that $\hat u(\hat
-x)$ is in $H^s(\hat K)$ with $s=\mu-\frac d2$.
+the exponent $\mu$ that we can then use to determine that
+$\hat u(\hat{\bf x})$ is in $H^s(\hat K)$ with $s=\mu-\frac d2$.
 
 
 <h4>Compensating for anisotropy</h4>

@@ -759,26 +759,30 @@ void
 LaplaceProblem<dim>::
 estimate_smoothness (Vector<float> &smoothness_indicators) const
 {
-				   // The first thing we need to do is to
-				   // define the Fourier vectors $\vec k$ for
-				   // which we want to compute Fourier
-				   // coefficients of the solution on each
-				   // cell. In 2d, we pick those vectors $\vec
-				   // k=(\pi i, \pi j)^T$ for which
-				   // $\sqrt{i^2+j^2}\le N$, with $i,j$
-				   // integers and $N$ being the maximal
-				   // polynomial degree we use for the finite
-				   // elements in this program. The 3d case is
-				   // handled analogously. 1d and dimensions
-				   // higher than 3 are not implemented, and
-				   // we guard our implementation by making
-				   // sure that we receive an exception in
-				   // case someone tries to compile the
-				   // program for any of these dimensions.
+				   // The first thing we need to do is
+				   // to define the Fourier vectors
+				   // ${\bf k}$ for which we want to
+				   // compute Fourier coefficients of
+				   // the solution on each cell. In
+				   // 2d, we pick those vectors ${\bf
+				   // k}=(\pi i, \pi j)^T$ for which
+				   // $\sqrt{i^2+j^2}\le N$, with
+				   // $i,j$ integers and $N$ being the
+				   // maximal polynomial degree we use
+				   // for the finite elements in this
+				   // program. The 3d case is handled
+				   // analogously. 1d and dimensions
+				   // higher than 3 are not
+				   // implemented, and we guard our
+				   // implementation by making sure
+				   // that we receive an exception in
+				   // case someone tries to compile
+				   // the program for any of these
+				   // dimensions.
 				   //
-				   // We exclude $\vec k=0$ to avoid problems
-				   // computing $|\vec k|^{-mu}$ and $\ln
-				   // |\vec k|$. The other vectors are stored
+				   // We exclude ${\bf k}=0$ to avoid problems
+				   // computing $|{\bf k}|^{-mu}$ and $\ln
+				   // |{\bf k}|$. The other vectors are stored
 				   // in the field <code>k_vectors</code>. In
 				   // addition, we store the square of the
 				   // magnitude of each of these vectors (up
@@ -848,7 +852,7 @@ estimate_smoothness (Vector<float> &smoothness_indicators) const
 				   // Next, we need to assemble the matrices
 				   // that do the Fourier transforms for each
 				   // of the finite elements we deal with,
-				   // i.e. the matrices ${\cal F}_{\vec k,j}$
+				   // i.e. the matrices ${\cal F}_{{\bf k},j}$
 				   // defined in the introduction. We have to
 				   // do that for each of the finite elements
 				   // in use. Note that these matrices are
@@ -858,14 +862,16 @@ estimate_smoothness (Vector<float> &smoothness_indicators) const
   std::vector<Table<2,std::complex<double> > >
     fourier_transform_matrices (fe_collection.size());
 
-				   // In order to compute them, we of course
-				   // can't perform the Fourier transform
-				   // analytically, but have to approximate it
-				   // using quadrature. To this end, we use a
-				   // quadrature formula that is obtained by
-				   // iterating a 2-point Gauss formula as
-				   // many times as the maximal exponent we
-				   // use for the term $e^{i\vec k\cdot \vec
+				   // In order to compute them, we of
+				   // course can't perform the Fourier
+				   // transform analytically, but have
+				   // to approximate it using
+				   // quadrature. To this end, we use
+				   // a quadrature formula that is
+				   // obtained by iterating a 2-point
+				   // Gauss formula as many times as
+				   // the maximal exponent we use for
+				   // the term $e^{i{\bf k}\cdot{\bf
 				   // x}$:
   QGauss<1>      base_quadrature (2);
   QIterated<dim> quadrature (base_quadrature, N);
@@ -875,8 +881,9 @@ estimate_smoothness (Vector<float> &smoothness_indicators) const
 				   // respective matrix ${\cal F}$ to the
 				   // right size, and integrate each entry of
 				   // the matrix numerically as ${\cal
-				   // F}_{\vec k,j}=\sum_q e^{i\vec k\cdot\vec
-				   // x}\varphi_j(\vec x_q) w_q$, where $x_q$
+				   // F}_{{\bf k},j}=\sum_q e^{i{\bf k}\cdot
+				   // {\bf x}\varphi_j({\bf x}_q)
+				   // w_q$, where $x_q$  
 				   // are the quadrature points and $w_q$ are
 				   // the quadrature weights. Note that the
 				   // imaginary unit $i=\sqrt{-1}$ is obtained
@@ -958,13 +965,13 @@ estimate_smoothness (Vector<float> &smoothness_indicators) const
 				       // only fit our exponential decay of
 				       // Fourier coefficients to the largest
 				       // coefficients for each possible value
-				       // of $|\vec k|$. To this end, we
+				       // of $|{\bf k}|$. To this end, we
 				       // create a map that for each magnitude
-				       // $|\vec k|$ stores the largest $|\hat
-				       // U_{\vec k}|$ found so far, i.e. we
+				       // $|{\bf k}|$ stores the largest $|\hat
+				       // U_{{\bf k}}|$ found so far, i.e. we
 				       // overwrite the existing value (or add
 				       // it to the map) if no value for the
-				       // current $|\vec k|$ exists yet, or if
+				       // current $|{\bf k}|$ exists yet, or if
 				       // the current value is larger than the
 				       // previously stored one:
       std::map<unsigned int, double> k_to_max_U_map;
@@ -981,14 +988,14 @@ estimate_smoothness (Vector<float> &smoothness_indicators) const
 				       // of vectors as integers, since this
 				       // way we do not have to deal with
 				       // round-off-sized differences between
-				       // different values of $|\vec k|$.
+				       // different values of $|{\bf k}|$.
 
 				       // As the final task, we have to
 				       // calculate the various contributions
 				       // to the formula for $\mu$. We'll only
 				       // take those Fourier coefficients with
 				       // the largest magnitude for a given
-				       // value of $|\vec k|$ as explained
+				       // value of $|{\bf k}|$ as explained
 				       // above:
       double  sum_1           = 0,
 	      sum_ln_k        = 0,
