@@ -3348,6 +3348,18 @@ class CellAccessor :  public TriaObjectAccessor<dim,dim>
     TriaIterator<dim,TriaObjectAccessor<dim-1, dim> >
     face (const unsigned int i) const;
 
+				     /**
+				      * Return the (global) index of the
+				      * @p ith face of this cell.
+				      *
+				      * This function is not
+				      * implemented in 1D, and maps to
+				      * line_index in 2D and quad_index
+				      * in 3D.
+				      */
+    unsigned int
+    face_index (const unsigned int i) const;
+
                                      /**
                                       * Return an iterator to that
                                       * cell that neighbors the

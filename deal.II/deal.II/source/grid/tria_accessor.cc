@@ -2156,6 +2156,9 @@ unsigned int CellAccessor<dim>::neighbor_of_neighbor (const unsigned int neighbo
   Assert (neighbor < GeometryInfo<dim>::faces_per_cell,
 	  TriaAccessorExceptions::ExcInvalidNeighbor(neighbor));
 
+  if (dim==1)
+    return GeometryInfo<dim>::opposite_face[neighbor];
+  
   const TriaIterator<dim,CellAccessor<dim> > neighbor_cell = this->neighbor(neighbor);
   
 				   // usually, on regular patches of
@@ -2171,12 +2174,14 @@ unsigned int CellAccessor<dim>::neighbor_of_neighbor (const unsigned int neighbo
 				   // cases. look up this relationship
 				   // in the table provided by
 				   // GeometryInfo and try it
+
+  const unsigned int this_face_index=face_index(neighbor);
+  
   const unsigned int neighbor_guess
     = GeometryInfo<dim>::opposite_face[neighbor];
   
-  if ((neighbor_cell->neighbor_index (neighbor_guess) == this->present_index) &&
-      (neighbor_cell->neighbor_level (neighbor_guess) == this->present_level))
-    return neighbor_guess;
+  if (neighbor_cell->face_index (neighbor_guess) == this_face_index)
+      return neighbor_guess;
   else
 				     // if the guess was false, then
 				     // we need to loop over all
@@ -2184,8 +2189,7 @@ unsigned int CellAccessor<dim>::neighbor_of_neighbor (const unsigned int neighbo
 				     // the hard way
     {
       for (unsigned int face=0; face<GeometryInfo<dim>::faces_per_cell; ++face)
-	if ((neighbor_cell->neighbor_index (face) == this->present_index) &&
-	    (neighbor_cell->neighbor_level (face) == this->present_level))
+	if (neighbor_cell->face_index (face) == this_face_index)
 	  return face;
 
 				       // we should never get here,
@@ -2193,7 +2197,7 @@ unsigned int CellAccessor<dim>::neighbor_of_neighbor (const unsigned int neighbo
 				       // our way back...
       Assert (false, ExcInternalError());
       return deal_II_numbers::invalid_unsigned_int;
-    };
+    }
 }
 
 
@@ -2208,8 +2212,9 @@ CellAccessor<dim>::neighbor_of_coarser_neighbor (const unsigned int neighbor) co
 	  TriaAccessorExceptions::ExcNeighborIsNotCoarser());
   Assert (neighbor < GeometryInfo<dim>::faces_per_cell,
 	  TriaAccessorExceptions::ExcInvalidNeighbor(neighbor));
-
-  const TriaIterator<dim,TriaObjectAccessor<dim-1, dim> > this_face=face(neighbor);
+  Assert (dim>1, ExcImpossibleInDim(dim));
+  
+  const int this_face_index=face_index(neighbor);
   const TriaIterator<dim,CellAccessor<dim> > neighbor_cell = this->neighbor(neighbor);
   
 				   // usually, on regular patches of
@@ -2233,7 +2238,7 @@ CellAccessor<dim>::neighbor_of_coarser_neighbor (const unsigned int neighbor) co
   
   if (face_guess->has_children())
     for (unsigned int subface_no=0; subface_no<face_guess->n_children(); ++subface_no)
-      if (face_guess->child(subface_no)==this_face)
+      if (face_guess->child_index(subface_no)==this_face_index)
 	return std::make_pair (face_no_guess, subface_no);
 
 				     // if the guess was false, then
@@ -2248,7 +2253,7 @@ CellAccessor<dim>::neighbor_of_coarser_neighbor (const unsigned int neighbor) co
 	    =neighbor_cell->face(face_no);
 	  if (face->has_children())
 	    for (unsigned int subface_no=0; subface_no<face->n_children(); ++subface_no)
-	      if (face->child(subface_no)==this_face)
+	      if (face->child_index(subface_no)==this_face_index)
 		return std::make_pair (face_no, subface_no);
 	}
     }

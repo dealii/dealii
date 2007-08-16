@@ -1301,6 +1301,37 @@ CellAccessor<3>::face (const unsigned int i) const
 
 
 
+template <>
+inline
+unsigned int
+CellAccessor<1>::face_index (const unsigned int) const 
+{
+  Assert (false, ExcImpossibleInDim(1));
+  return deal_II_numbers::invalid_unsigned_int;
+}
+
+
+
+template <>
+inline
+unsigned int
+CellAccessor<2>::face_index (const unsigned int i) const 
+{
+  return this->line_index(i);
+}
+
+
+
+template <>
+inline
+unsigned int
+CellAccessor<3>::face_index (const unsigned int i) const 
+{
+  return this->quad_index(i);
+}
+
+
+
 template <int dim>
 inline
 int
