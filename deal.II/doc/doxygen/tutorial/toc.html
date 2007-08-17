@@ -15,188 +15,411 @@
 <!-- Page Body -->
 <body lang="en">
 
-<h1>Step-by-Step Examples</h1>
+<a name="overview"></a>
+<h2>Overview</h2>
 
 <p>
 The <acronym>deal.II</acronym> tutorial contains a collection of 
 programs, each more 
-or less built atop of the previous ones, which demonstrate various
-aspects of the library. The general layout of each such example is as
+or less built atop of previous ones, which demonstrate various
+aspects of the library. Each such example has the following structure
 follows:
 <ol>
-  <li> A brief description of what the program does and what is new
-       compared to the previous programs.
-  <li> The program, in commented form.
-  <li> The output of the program, with some comments.
-  <li> Since the program itself usually is a little bit unreadable
-       with all the comments intertwingled, we present the program again,
-       with all comments stripped off, to allow getting an overview of it.
+  <li> <b>Introduction:</b>A brief description of what the program does and
+       what is new compared to the previous programs. This also includes a
+       discussion of the mathematical model and its formulation.
+  <li> <b>The commented program:</b>: A listing of the program, interspersed
+       with many comments that explain what is going on, how things are done
+       and why. 
+  <li> <b>Results:</b>The output of the program, with some comments and
+       interpretation. 
+  <li> <b>The plain program:</b>Since the program itself usually is a little
+       bit unreadable with all the comments intertwingled, we present the
+       program again, with all comments stripped off, to allow getting an
+       overview of it. 
 </ol>
 </p>
 
 <p>
-The programs themselves can be found at a path which is indicated at
+The programs can be found at a path which is indicated at
 the beginning of the last section of each example. You can compile
 them by typing <strong>make</strong> in the respective directory, and run them
-using <strong>make run</strong>. The latter command also compiles the program if
-that has not already been done. The Makefiles in the different
+using <strong>make run</strong>. The latter command also compiles the program
+if that has not already been done. The Makefiles in the different
 directories are based on the small program Makefile template described
 in <a href="../../development/index.html" target="_top">in this section</a>.
 </p>
 
-
 <p>
-At present, the following programs exist:
+Below we will list the currently available tutorial programs twice, once 
+<a href="#bynumber>in numerical order explaining what is new in each
+program</a> and once <a href="#bytopic">listed by topic</a> to facilitate
+searching for programs for certain functionality.
 </p>
 
-<dl>
-      <dt><a href="../../doxygen/deal.II/step_1.html">Step 1</a></dt> 
-      <dd><strong>What's new:</strong> Everything. We create a grid
-      and show a simple way to write it to a file.
-      </dd>
+
+<a name="bynumber"></a>
+<h2>Tutorial programs listed by number</h2>
+
+<table align="center" width="80%">
+  <tr><td><a href="../../doxygen/deal.II/step_1.html">Step-1</a></td> 
+      <td> Creating a grid. A simple way to write it to a file.
+      </td></tr>
     
-      <dt><a href="../../doxygen/deal.II/step_2.html">Step 2</a></dt> 
-      <dd><strong>What's new:</strong> Associate degrees of freedom to
+  <tr><td><a href="../../doxygen/deal.II/step_2.html">Step-2</a></td> 
+      <td> Associate degrees of freedom to
       each vertex and compute the resulting sparsity pattern of
       matrices. Show that renumbering reduces the bandwidth of
       matrices significantly, i.e. clusters nonzero entries around the
       diagonal.
-      </dd>
+      </td></tr>
 
-      <dt><a href="../../doxygen/deal.II/step_3.html">Step 3</a></dt> 
-      <dd><strong>What's new:</strong> Actually solve Laplace's
+  <tr><td><a href="../../doxygen/deal.II/step_3.html">Step-3</a></td> 
+      <td> Actually solve Laplace's
       problem. Object-orientation. Assembling matrices and
       vectors. Boundary values.
-      </dd>
+      </td></tr>
 
-      <dt><a href="../../doxygen/deal.II/step_4.html">Step 4</a></dt> 
-      <dd><strong>What's new:</strong> This example is programmed in a
+  <tr><td><a href="../../doxygen/deal.II/step_4.html">Step-4</a></td> 
+      <td> This example is programmed in a
       way that it is independent of the dimension for which we want to
       solve Laplace's equation; we will solve the equation in 2D and
       3D, although the program is exactly the same. Non-constant right
       hand side function. Non-homogeneous boundary values.
-      </dd>
+      </td></tr>
 
-      <dt><a href="../../doxygen/deal.II/step_5.html">Step 5</a></dt> 
-      <dd><strong>What's new:</strong> Computations on successively
+  <tr><td><a href="../../doxygen/deal.II/step_5.html">Step-5</a></td> 
+      <td> Computations on successively
       refined grids. Reading a grid from disk. Some optimizations.  
       Using assertions. Non-constant coefficient in
       the elliptic operator. Preconditioning the CG solver for the
       linear system of equations.
-      </dd>
+      </td></tr>
 
-      <dt><a href="../../doxygen/deal.II/step_6.html">Step 6</a></dt> 
-      <dd><strong>What's new:</strong> Adaptive local
+  <tr><td><a href="../../doxygen/deal.II/step_6.html">Step-6</a></td> 
+      <td> Adaptive local
       refinement. Handling of hanging nodes. Higher order elements.
       Catching exceptions in the &#8220;main&#8221; function.
-      </dd>
+      </td></tr>
 
-      <dt><a href="../../doxygen/deal.II/step_7.html">Step 7</a></dt> 
-      <dd><strong>What's new:</strong> Helmholtz
+  <tr><td><a href="../../doxygen/deal.II/step_7.html">Step-7</a></td> 
+      <td> Helmholtz
       equation. Non-homogeneous Neumann boundary conditions and
       boundary integrals. Verification of correctness of computed
       solutions. Computing the error between exact and numerical
       solution and output of the data in tables. Using counted pointers.
-      </dd>
+      </td></tr>
 
-      <dt><a href="../../doxygen/deal.II/step_8.html">Step 8</a></dt> 
-      <dd><strong>What's new:</strong> The elastic equations will be
+  <tr><td><a href="../../doxygen/deal.II/step_8.html">Step-8</a></td> 
+      <td> The elastic equations will be
       solved instead of Laplace's equation. The solution is
       vector-valued and the equations form a system with as many
       equations as the dimension of the space in which it is posed.
-      </dd>
+      </td></tr>
 
-      <dt><a href="../../doxygen/deal.II/step_9.html">Step 9</a></dt> 
-      <dd><strong>What's new:</strong> Transport equation, assembling 
+  <tr><td><a href="../../doxygen/deal.II/step_9.html">Step-9</a></td> 
+      <td> Transport equation, assembling 
       the system of equations in parallel using multi-threading, 
       implementing a refinement criterion based on a finite difference
       approximation of the gradient.
 
-      <dt><a href="../../doxygen/deal.II/step_10.html">Step 10</a></dt> 
-      <dd><strong>What's new:</strong> Higher order mappings. Do not
+  <tr><td><a href="../../doxygen/deal.II/step_10.html">Step-10</a></td> 
+      <td> Higher order mappings. Do not
       solve equations, but rather compute the value of pi to high
       accuracy.
-      </dd>
+      </td></tr>
 
-      <dt><a href="../../doxygen/deal.II/step_11.html">Step 11</a></dt> 
-      <dd><strong>What's new:</strong> Solving a Laplace problem with
+  <tr><td><a href="../../doxygen/deal.II/step_11.html">Step-11</a></td> 
+      <td> Solving a Laplace problem with
       higher order mappings. Using strange constraints and
       intermediate representations of sparsity patterns.
-      </dd>
+      </td></tr>
 
-      <dt><a href="../../doxygen/deal.II/step_12.html">Step 12</a></dt>
-      <dd><strong>What's new:</strong> General framework for
+  <tr><td><a href="../../doxygen/deal.II/step_12.html">Step-12</a></td>
+      <td> General framework for
       discontinuous Galerkin methods. Use of Timer class.
-      </dd>
+      </td></tr>
 
-      <dt><a href="../../doxygen/deal.II/step_13.html">Step 13</a></dt>
-      <dd><strong>What's new:</strong> Software design questions and
+  <tr><td><a href="../../doxygen/deal.II/step_13.html">Step-13</a></td>
+      <td> Software design questions and
       how to write a modular, extensible finite element program.
-      </dd>
+      </td></tr>
 
-      <dt><a href="../../doxygen/deal.II/step_14.html">Step 14</a></dt>
-      <dd><strong>What's new:</strong> Duality based error estimators,
+  <tr><td><a href="../../doxygen/deal.II/step_14.html">Step-14</a></td>
+      <td> Duality based error estimators,
       more strategies to write a modular, extensible finite element
       program.
-      </dd>
+      </td></tr>
 
-      <dt><a href="../../doxygen/deal.II/step_15.html">Step 15</a></dt>
-      <dd><strong>What's new:</strong> 1d problems, nonlinear solvers,
+  <tr><td><a href="../../doxygen/deal.II/step_15.html">Step-15</a></td>
+      <td> 1d problems, nonlinear solvers,
       transfering a solution across mesh refinement.
-      </dd>
+      </td></tr>
 
-      <dt><a href="../../doxygen/deal.II/step_16.html">Step 16</a></dt>
-      <dd><strong>What's new:</strong> Based on step 5, a multilevel
+  <tr><td><a href="../../doxygen/deal.II/step_16.html">Step-16</a></td>
+      <td> Based on step 5, a multilevel
       preconditioner is implemented.
-      </dd>
+      </td></tr>
 
-      <dt><a href="../../doxygen/deal.II/step_17.html">Step 17</a></dt>
-      <dd><strong>What's new:</strong> Using PETSc for linear algebra; running
+  <tr><td><a href="../../doxygen/deal.II/step_17.html">Step-17</a></td>
+      <td> Using PETSc for linear algebra; running
       in parallel on clusters of computers linked together by MPI.
-      </dd>
+      </td></tr>
 
-      <dt><a href="../../doxygen/deal.II/step_18.html">Step 18</a></dt>
-      <dd><strong>What's new:</strong> A time dependent problem; using a much
+  <tr><td><a href="../../doxygen/deal.II/step_18.html">Step-18</a></td>
+      <td> A time dependent problem; using a much
       simplified version of implementing elasticity; moving meshes; handling
       large scale output of parallel programs.
-      </dd>
+      </td></tr>
 
-      <dt><a href="../../doxygen/deal.II/step_19.html">Step 19</a></dt>
-      <dd><strong>What's new:</strong> Input parameter file handling. Merging
+  <tr><td><a href="../../doxygen/deal.II/step_19.html">Step-19</a></td>
+      <td> Input parameter file handling. Merging
       output of a parallel program.
-      </dd>
+      </td></tr>
 
-      <dt><a href="../../doxygen/deal.II/step_20.html">Step 20</a></dt>
-      <dd><strong>What's new:</strong> Mixed finite elements. Using block
+  <tr><td><a href="../../doxygen/deal.II/step_20.html">Step-20</a></td>
+      <td> Mixed finite elements. Using block
       matrices and block vectors to define more complicated solvers and
       preconditioners working on the Schur complement.
-      </dd>
+      </td></tr>
 
-      <dt><a href="../../doxygen/deal.II/step_21.html">Step 21</a></dt>
-      <dd><strong>What's new:</strong> The time dependent two-phase flow in
+  <tr><td><a href="../../doxygen/deal.II/step_21.html">Step-21</a></td>
+      <td> The time dependent two-phase flow in
       porous media. Extensions of mixed Laplace discretizations. More
       complicated block solvers. Simple time stepping.
-      </dd>
+      </td></tr>
 
-      <dt><a href="../../doxygen/deal.II/step_23.html">Step 23</a></dt>
-      <dd><strong>What's new:</strong> Finally a "real" time dependent problem,
+  <tr><td><a href="../../doxygen/deal.II/step_23.html">Step-23</a></td>
+      <td> Finally a "real" time dependent problem,
       the wave equation.
-      </dd>
+      </td></tr>
 
-      <dt><a href="../../doxygen/deal.II/step_24.html">Step 24</a></dt>
-      <dd><strong>What's new:</strong> A variant of step-23 with absorbing
+  <tr><td><a href="../../doxygen/deal.II/step_24.html">Step-24</a></td>
+      <td> A variant of step-23 with absorbing
       boundary conditions, and extracting practically useful data.
-      </dd>
+      </td></tr>
 
-      <dt><a href="../../doxygen/deal.II/step_25.html">Step 25</a></dt>
-      <dd><strong>What's new:</strong> The sine-Gordon
+  <tr><td><a href="../../doxygen/deal.II/step_25.html">Step-25</a></td>
+      <td> The sine-Gordon
       soliton equation, which is a nonlinear variant of the time
-      dependent wave equation covered in step-23 and step-24.  </dd>
-      </dl>
+      dependent wave equation covered in step-23 and step-24.  </td></tr>
+      </td></tr>
 
-      <dt><a href="../../doxygen/deal.II/step_27.html">Step 27</a></dt>
-      <dd><strong>What's new:</strong> hp finite element methods  </dd>
-      </dl>
+  <tr><td><a href="../../doxygen/deal.II/step_27.html">Step-27</a></td>
+      <td> hp finite element methods  </td></tr>
+</table>
+
+
+<a name="bytopic"></a>
+<h2>Tutorial programs listed by topics</h2>
+
+The existing tutorial programs can be sorted into the following groups sorted
+by topic:
+
+<table align="center" width="80%">
+  <tr>
+    <td><b>Basic techniques</b></td>
+    <td><a href="../../doxygen/deal.II/step_1.html">Step-1</a></td> 
+    <td> Creating a grid. A simple way to write it to a file.
+    </td>
+  </tr>
+
+  <tr>
+    <td></td>
+    <td><a href="../../doxygen/deal.II/step_2.html">Step-2</a></td> 
+    <td> Degrees of freedom.
+    </td>
+  </tr>
+
+  <tr>
+    <td></td>
+    <td><a href="../../doxygen/deal.II/step_3.html">Step-3</a></td> 
+    <td> Solve the Laplace equation.
+    </td>
+  </tr>
+
+  <tr>
+    <td></td>
+    <td><a href="../../doxygen/deal.II/step_4.html">Step-4</a></td> 
+    <td> Dimension independent programming. Non-zero data.
+    </td>
+  </tr>
+
+  <tr>
+    <td></td>
+    <td><a href="../../doxygen/deal.II/step_5.html">Step-5</a></td> 
+    <td> Computing on uniformly refined meshes.
+    </td>
+  </tr>
+
+  <tr>
+    <td></td>
+    <td><a href="../../doxygen/deal.II/step_6.html">Step-6</a></td> 
+    <td> Adaptivity.
+    </td>
+  </tr>
+
+  <tr>
+    <td></td>
+    <td><a href="../../doxygen/deal.II/step_7.html">Step-7</a></td> 
+    <td> Evaluating errors.
+    </td>
+  </tr>
+
+
+  <tr>
+    <td><b>Advanced techniques</b></td>
+    <td><a href="../../doxygen/deal.II/step_9.html">Step-9</a></td> 
+    <td> Multithreading.
+    </td>
+  </tr>
+
+  <tr>
+    <td></td>
+    <td><a href="../../doxygen/deal.II/step_20.html">Step-20</a>, 
+        <a href="../../doxygen/deal.II/step_21.html">Step-21</a></td> 
+    <td> Block solvers and preconditioners.
+    </td>
+  </tr>
+
+  <tr>
+    <td></td>
+    <td><a href="../../doxygen/deal.II/step_17.html">Step-17</a>, 
+        <a href="../../doxygen/deal.II/step_18.html">Step-18</a>, 
+        <a href="../../doxygen/deal.II/step_19.html">Step-19</a></td> 
+    <td> Parallelization via PETSc and MPI.
+    </td>
+  </tr>
+
+  <tr>
+    <td></td>
+    <td><a href="../../doxygen/deal.II/step_19.html">Step-19</a></td> 
+    <td> Input parameter handling.
+    </td>
+  </tr>
+
+  <tr>
+    <td></td>
+    <td><a href="../../doxygen/deal.II/step_10.html">Step-10</a>, 
+        <a href="../../doxygen/deal.II/step_11.html">Step-11</a></td> 
+    <td> Higher order mappings.
+    </td>
+  </tr>
+
+  <tr>
+    <td></td>
+    <td><a href="../../doxygen/deal.II/step_6.html">Step-6</a>, 
+        <a href="../../doxygen/deal.II/step_9.html">Step-9</a>, 
+        <a href="../../doxygen/deal.II/step_14.html">Step-14</a></td> 
+    <td> Error indicators and estimators.
+    </td>
+  </tr>
+
+  <tr>
+    <td></td>
+    <td><a href="../../doxygen/deal.II/step_15.html">Step-15</a></td> 
+    <td> Transfering solutions across mesh refinement
+    </td>
+  </tr>
+
+  <tr>
+    <td></td>
+    <td><a href="../../doxygen/deal.II/step_12.html">Step-12</a></td> 
+    <td> Discontinuous Galerkin methods.
+    </td>
+  </tr>
+
+  <tr>
+    <td></td>
+    <td><a href="../../doxygen/deal.II/step_27.html">Step-27</a></td> 
+    <td> hp finite elements.
+    </td>
+  </tr>
+
+  <tr>
+    <td></td>
+    <td><a href="../../doxygen/deal.II/step_16.html">Step-16</a></td> 
+    <td> Multilevel preconditioners
+    </td>
+  </tr>
+
+
+
+  <tr>
+    <td><b>Other equations</b></td>
+    <td><a href="../../doxygen/deal.II/step_7.html">Step-7</a></td> 
+    <td> Helmholtz equation.
+    </td>
+  </tr>
+
+  <tr>
+    <td></td>
+    <td><a href="../../doxygen/deal.II/step_8.html">Step-8</a></td> 
+    <td> Elasticity equations.
+    </td>
+  </tr>
+
+  <tr>
+    <td></td>
+    <td><a href="../../doxygen/deal.II/step_18.html">Step-18</a></td> 
+    <td> Quasi-static elasticity equations.
+    </td>
+  </tr>
+
+  <tr>
+    <td></td>
+    <td><a href="../../doxygen/deal.II/step_9.html">Step-9</a></td> 
+    <td> Transport (advection) equations.
+    </td>
+  </tr>
+
+  <tr>
+    <td></td>
+    <td><a href="../../doxygen/deal.II/step_20.html">Step-20</a></td> 
+    <td> Mixed Laplace.
+    </td>
+  </tr>
+
+  <tr>
+    <td></td>
+    <td><a href="../../doxygen/deal.II/step_21.html">Step-21</a></td> 
+    <td> Porous media flow.
+    </td>
+  </tr>
+
+  <tr>
+    <td></td>
+    <td><a href="../../doxygen/deal.II/step_23.html">Step-23</a>, 
+        <a href="../../doxygen/deal.II/step_24.html">Step-24</a>, 
+        <a href="../../doxygen/deal.II/step_25.html">Step-25</a></td> 
+    <td> The wave equation, in linear and nonlinear variants.
+    </td>
+  </tr>
+
+
+
+  <tr>
+    <td><b>Vector problems</b></td>
+    <td><a href="../../doxygen/deal.II/step_8.html">Step-8</a></td> 
+    <td> Elasticity equations.
+    </td>
+  </tr>
+
+  <tr>
+    <td></td>
+    <td><a href="../../doxygen/deal.II/step_20.html">Step-20</a></td> 
+    <td> Mixed Laplace.
+    </td>
+  </tr>
+
+  <tr>
+    <td></td>
+    <td><a href="../../doxygen/deal.II/step_21.html">Step-21</a></td> 
+    <td> Mixed Laplace plus an advection equation.
+    </td>
+  </tr>
+
+</table>
 
 <!-- Page Foot -->
 <hr>
