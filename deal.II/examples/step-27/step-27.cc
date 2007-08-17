@@ -872,7 +872,7 @@ estimate_smoothness (Vector<float> &smoothness_indicators) const
 				   // Gauss formula as many times as
 				   // the maximal exponent we use for
 				   // the term $e^{i{\bf k}\cdot{\bf
-				   // x}$:
+				   // x}}$:
   QGauss<1>      base_quadrature (2);
   QIterated<dim> quadrature (base_quadrature, N);
 
@@ -882,7 +882,7 @@ estimate_smoothness (Vector<float> &smoothness_indicators) const
 				   // right size, and integrate each entry of
 				   // the matrix numerically as ${\cal
 				   // F}_{{\bf k},j}=\sum_q e^{i{\bf k}\cdot
-				   // {\bf x}\varphi_j({\bf x}_q)
+				   // {\bf x}}\varphi_j({\bf x}_q)
 				   // w_q$, where $x_q$  
 				   // are the quadrature points and $w_q$ are
 				   // the quadrature weights. Note that the
