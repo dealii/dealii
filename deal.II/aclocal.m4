@@ -4735,18 +4735,23 @@ AC_DEFUN(DEAL_II_CHECK_DOXYGEN, dnl
     AC_PATH_PROG(DOXYGEN,doxygen)
     if test "x$DOXYGEN" = "x" ; then
       doxygen_not_found=yes;
-    else
-      DOXYGEN_VERSION_STRING=`($DOXYGEN -v 2>&1) | grep "oxygen version"`
-      AC_MSG_NOTICE($DOXYGEN_VERSION_STRING)
-      case "$DOXYGEN_VERSION_STRING" in
-	*2.3.* | *2.4.*)
-          DOXYGEN_OPTIONS="options.136"
-	  ;;
-	*)
-	  DOXYGEN_OPTIONS="options.dox"
-	  ;;
-      esac
     fi
+  fi
+
+  if test "x$doxygen_not_found" != "xyes" ; then
+    AC_MSG_CHECKING(doxygen version)
+
+    DOXYGEN_VERSION_STRING=`($DOXYGEN -v 2>&1) | grep "oxygen version"`
+    case "$DOXYGEN_VERSION_STRING" in
+      *1.3.* | *1.4.*)
+        DOXYGEN_OPTIONS="options.136"
+	AC_MSG_RESULT(pre 1.5)
+	;;
+      *)
+	DOXYGEN_OPTIONS="options.dox"
+	AC_MSG_RESULT(1.5.x or later)
+	;;
+    esac
   fi
 
   dnl Doxygen needs 'dot' for inheritance graph generation
