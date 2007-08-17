@@ -84,6 +84,13 @@ do {
     }
     else
     {
+        # in program mode, output the program line. the only thing we need
+	# to do is to avoid $ signs because that confuses doxygen. since
+	# we don't want formulas rendered in the program text anyway, 
+	# simply replace them by spaces (it would be nice to suppress their
+	# meaning somehow, but I don't know how...)
+	s/\$//g;
+
 	print " * $_";
     }
 } while (<>);
