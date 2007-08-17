@@ -20,9 +20,14 @@ while (<>) {
     # the only thing we have to make sure is that if we copy /*...*/
     # comments that doxygen doesn't get confused; do so by simply
     # adding a space
+    #
+    # we also need to somehow strip the $ signs out of the svn Id: string
+    # to avoid trouble
     if ( ! m!^\s*//! ) {
         s!/\*!/ \*!g;
         s!\*/!\* /!g;
+
+	s!\$Id:(.*)\$!Subversion Id: \1!g;
 	print " * $_";
     } else {
 	# for comments, all we do is replace section headers, and
