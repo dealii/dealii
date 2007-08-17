@@ -22,12 +22,14 @@ while (<>) {
     # adding a space
     #
     # we also need to somehow strip the $ signs out of the svn Id: string
-    # to avoid trouble
+    # to avoid trouble. The same holds for the $Name:$ tags.
     if ( ! m!^\s*//! ) {
         s!/\*!/ \*!g;
         s!\*/!\* /!g;
 
 	s!\$Id:(.*)\$!Subversion Id: \1!g;
+	s!\$Name:?(.*)\$!Name: \1!g;
+
 	print " * $_";
     } else {
 	# for comments, all we do is replace section headers, and
