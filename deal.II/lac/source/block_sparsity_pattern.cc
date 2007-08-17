@@ -425,7 +425,7 @@ BlockCompressedSparsityPattern::reinit (
   const std::vector< unsigned int > &row_block_sizes,
   const std::vector< unsigned int > &col_block_sizes)
 {
-  this->reinit(row_block_sizes.size(), col_block_sizes.size());
+  BlockSparsityPatternBase<CompressedSparsityPattern>::reinit(row_block_sizes.size(), col_block_sizes.size());
   for (unsigned int i=0;i<row_block_sizes.size();++i)
     for (unsigned int j=0;j<col_block_sizes.size();++j)
       this->block(i,j).reinit(row_block_sizes[i],col_block_sizes[j]);
@@ -467,7 +467,7 @@ BlockCompressedSetSparsityPattern::reinit (
   const std::vector< unsigned int > &row_block_sizes,
   const std::vector< unsigned int > &col_block_sizes)
 {
-  this->reinit(row_block_sizes.size(), col_block_sizes.size());
+  BlockSparsityPatternBase<CompressedSetSparsityPattern>::reinit(row_block_sizes.size(), col_block_sizes.size());
   for (unsigned int i=0;i<row_block_sizes.size();++i)
     for (unsigned int j=0;j<col_block_sizes.size();++j)
       this->block(i,j).reinit(row_block_sizes[i],col_block_sizes[j]);
