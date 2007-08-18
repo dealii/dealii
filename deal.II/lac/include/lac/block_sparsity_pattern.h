@@ -617,6 +617,13 @@ class BlockCompressedSparsityPattern : public BlockSparsityPatternBase<Compresse
 				      */
     void reinit (const std::vector< unsigned int > &row_block_sizes,
 		 const std::vector< unsigned int > &col_block_sizes);
+
+				     /**
+				      * Allow the use of the reinit
+				      * functions of the base class as
+				      * well.
+				      */
+    BlockSparsityPatternBase<CompressedSparsityPattern>::reinit;
 };
 
 
@@ -702,6 +709,13 @@ class BlockCompressedSetSparsityPattern : public BlockSparsityPatternBase<Compre
 				      */
     void reinit (const std::vector< unsigned int > &row_block_sizes,
 		 const std::vector< unsigned int > &col_block_sizes);
+
+				     /**
+				      * Allow the use of the reinit
+				      * functions of the base class as
+				      * well.
+				      */
+    BlockSparsityPatternBase<CompressedSetSparsityPattern>::reinit;
 };
 
 
