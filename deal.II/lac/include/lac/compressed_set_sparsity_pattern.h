@@ -106,7 +106,7 @@ class CompressedSetSparsityPattern : public Subscriptor
 				      * row. The result of dereferencing such
 				      * an iterator is a column index.
 				      */
-    typedef std::set<unsigned int>::iterator row_iterator;
+    typedef std::set<unsigned int>::const_iterator row_iterator;
 
 
 				     /**
