@@ -2,7 +2,7 @@
 #    $Id$
 #    Version: $Name$
 #
-#    Copyright (C) 1998 - 2006 by the deal.II authors
+#    Copyright (C) 1998 - 2007 by the deal.II authors
 #
 #    This file is subject to QPL and may not be  distributed
 #    without copyright and license information. Please refer
@@ -19,25 +19,28 @@ all: product_matrix$(EXEEXT) block_matrix_array$(EXEEXT) \
 # Compilation of source code
 ######################################################################
 
-%.$(OBJEXT) :
-	@echo =====debug======$(MT)== $<
-	@$(CXX) $(CXXFLAGS.g) $(CXXFLAGS) -c $< -o $@
+./%.g.$(OBJEXT) :
+	@echo ==============debug========= $(<F)
+	@$(CXX) $(CXXFLAGS.g) -c $< -o $@
+./%.$(OBJEXT) :
+	@echo ==============optimized===== $(<F)
+	@$(CXX) $(CXXFLAGS.o) -c $< -o $@
 
 ######################################################################
 # Specific targets
 ######################################################################
 
-block_matrix_array$(EXEEXT): block_matrix_array.$(OBJEXT) $(lib-lac.g) $(lib-base.g)
-	@echo =====linking====$(MT)== $<
-	@$(CXX) $(CXXFLAGS.g) $(LDFLAGS) -o $@ $^ $(LIBS)
+block_matrix_array$(EXEEXT): block_matrix_array.g.$(OBJEXT) $(lib-lac.g) $(lib-base.g)
+	@echo ============================ Linking $@
+	@$(CXX) -o $@ $^ $(LIBS) $(LDFLAGS)
 
-product_matrix$(EXEEXT): product_matrix.$(OBJEXT) $(lib-lac.g) $(lib-base.g)
-	@echo =====linking====$(MT)== $<
-	@$(CXX) $(CXXFLAGS.g) $(LDFLAGS) -o $@ $^ $(LIBS)
+product_matrix$(EXEEXT): product_matrix.g.$(OBJEXT) $(lib-lac.g) $(lib-base.g)
+	@echo ============================ Linking $@
+	@$(CXX) -o $@ $^ $(LIBS) $(LDFLAGS)
 
-compressed_block_sparsity_pattern$(EXEEXT): compressed_block_sparsity_pattern.$(OBJEXT) $(lib-deal2-2d.g) $(lib-lac.g) $(lib-base.g)
-	@echo =====linking====$(MT)== $<
-	@$(CXX) $(CXXFLAGS.g) $(LDFLAGS) -o $@ $^ $(LIBS)
+compressed_block_sparsity_pattern$(EXEEXT): compressed_block_sparsity_pattern.g.$(OBJEXT) $(lib-deal2-2d.g) $(lib-lac.g) $(lib-base.g)
+	@echo ============================ Linking $@
+	@$(CXX) -o $@ $^ $(LIBS) $(LDFLAGS)
 
 ######################################################################
 # Pseudo target for cleaning directory
