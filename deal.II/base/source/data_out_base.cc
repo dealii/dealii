@@ -3966,7 +3966,7 @@ DataOutReader<dim,spacedim>::read (std::istream &in)
     getline (in, header);
 
     std::ostringstream s;
-    s << "[Version: " << DataOutBase::Deal_II_IntermediateFlags::format_version << "]";
+    s << "[Version: " << dealii::DataOutBase::Deal_II_IntermediateFlags::format_version << "]";
     
     Assert (header == s.str(), 
 	    ExcMessage("Invalid or incompatible file format. Intermediate format "
