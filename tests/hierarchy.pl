@@ -42,6 +42,7 @@ $hierarchy{"i686-pc-linux-gnu+icc7"}          = "generic";
 $hierarchy{"i686-pc-linux-gnu+icc7.1"}        = "i686-pc-linux-gnu+icc7";
 $hierarchy{"i686-pc-linux-gnu+icc8"}          = "i686-pc-linux-gnu+icc7.1";
 $hierarchy{"i686-pc-linux-gnu+icc9"}          = "i686-pc-linux-gnu+icc8";
+$hierarchy{"i686-pc-linux-gnu+icc10"}         = "i686-pc-linux-gnu+icc9";
 
 $hierarchy{"mips-sgi-irix6.5+MIPSpro7.4"}     = "generic";
 
