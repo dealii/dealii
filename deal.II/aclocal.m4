@@ -1091,7 +1091,7 @@ AC_DEFUN(DEAL_II_DETERMINE_CC_BRAND, dnl
 	  version7="`echo $is_intel_icc | grep 'Version 7'`"
 	  version8="`echo $is_intel_icc | grep 'Version 8'`"
 	  version9="`echo $is_intel_icc | grep 'Version 9'`"
-	  version9="`echo $is_intel_icc | grep 'Version 10'`"
+	  version10="`echo $is_intel_icc | grep 'Version 10'`"
           if test "x$version5" != "x" ; then
             AC_MSG_RESULT(C compiler is icc-5)
             CC_VERSION=intel_icc5
@@ -1251,13 +1251,32 @@ AC_DEFUN(DEAL_II_SET_CC_FLAGS, dnl
   
       intel_icc*)
           CFLAGS="$CFLAGS -O2 -unroll"
-          CFLAGSPIC="-KPIC"
+    	  case "$CC_VERSION" in
+	    intel_icc5 | intel_icc6 | intel_icc7 | intel_icc8 | intel_icc9)
+                CFLAGSPIC="-KPIC"
+		;;
+
+	    intel_icc*)
+		CFLAGSPIC="-fPIC"
+		;;
+	  esac
 
           dnl To reduce output, use -opt_report_levelmin where possible,
-          dnl i.e. post icc5
-          if test "x$CC_VERSION" != "xintel_icc5" ; then
-            CFLAGS="$CFLAGS -opt_report_levelmin"
-          fi
+          dnl i.e. post icc5. from icc10 onwards, this flag is called 
+	  dnl -opt-report, and -vec-report controls output of the
+          dnl autovectorizer (to make things simpler, one of the two options
+          dnl wants a space between option and level, whereas the other does
+          dnl not)
+    	  case "$CC_VERSION" in
+	    intel_icc5)
+              ;;
+	    intel_icc6 | intel_icc7 | intel_icc8 | intel_icc9)
+              CFLAGSO="$CFLAGSO -opt_report_levelmin"
+              ;;
+	    *)
+              CFLAGSO="$CFLAGSO -opt-report 0 -vec-report0"
+	      ;;
+          esac
 
           CFLAGS="$CFLAGS -ansi_alias -vec_report0"
 	
@@ -1265,7 +1284,16 @@ AC_DEFUN(DEAL_II_SET_CC_FLAGS, dnl
 	  dnl flags
 	  case "$target" in
 	    *86*)
-		CFLAGS="$CFLAGS -tpp6"
+    	        case "$CC_VERSION" in
+	          intel_icc5)
+                    ;;
+	          intel_icc6 | intel_icc7 | intel_icc8 | intel_icc9)
+                    CFLAGSO="$CFLAGSO -tpp6"
+                    ;;
+	          *)
+                    CFLAGSO="$CFLAGSO -mcpu=pentium4"
+	            ;;
+                esac
 		;;
 	  esac
 
