@@ -2,7 +2,7 @@
 //    $Id$
 //    Version: $Name$
 //
-//    Copyright (C) 2004, 2005, 2006 by the deal.II authors
+//    Copyright (C) 2004, 2005, 2006, 2007 by the deal.II authors
 //
 //    This file is subject to QPL and may not be  distributed
 //    without copyright and license information. Please refer
@@ -25,6 +25,8 @@
 
 DEAL_II_NAMESPACE_OPEN
 
+
+template <typename> class MatrixIterator;
 
 
 /*! @addtogroup Matrix1
@@ -282,7 +284,7 @@ namespace BlockMatrixIterators
 					* friend.
 					*/
       template <typename>
-      friend class MatrixIterator;
+      friend class dealii::MatrixIterator;
   };
 }
 
