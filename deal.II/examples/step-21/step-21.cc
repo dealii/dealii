@@ -291,18 +291,29 @@ InitialValues<dim>::vector_value (const Point<dim> &p,
 
                                  // @sect4{Single curving crack permeability}
 
-                                 // The first function for the permeability
-                                 // was the one that models a single curving
-                                 // crack. It was already used at the end of
-                                 // step-20, and its functional form is given
-                                 // in the introduction of the present
-                                 // tutorial program:
+                                 // The first function for the
+                                 // permeability was the one that
+                                 // models a single curving crack. It
+                                 // was already used at the end of
+                                 // step-20, and its functional form
+                                 // is given in the introduction of
+                                 // the present tutorial program. As
+                                 // in some previous programs, we have
+                                 // to declare a (seemingly
+                                 // unnecessary) default constructor
+                                 // of the KInverse class to avoid
+                                 // warnings from some compilers:
 namespace SingleCurvingCrack
 {
   template <int dim>
   class KInverse : public TensorFunction<2,dim>
   {
     public:
+      KInverse ()
+		      :
+		      TensorFunction<2,dim> ()
+	{}
+      
       virtual void value_list (const std::vector<Point<dim> > &points,
                                std::vector<Tensor<2,dim> >    &values) const;
   };
@@ -392,6 +403,11 @@ namespace RandomMedium
   class KInverse : public TensorFunction<2,dim>
   {
     public:
+      KInverse ()
+		      :
+		      TensorFunction<2,dim> ()
+	{}
+      
       virtual void value_list (const std::vector<Point<dim> > &points,
                                std::vector<Tensor<2,dim> >    &values) const;
 

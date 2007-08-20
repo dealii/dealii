@@ -159,7 +159,10 @@ template <int dim>
 class InitialValuesP : public Function<dim> 
 {
   public:
-    InitialValuesP () : Function<dim>() {}
+    InitialValuesP ()
+		    :
+		    Function<dim>()
+      {}
     
     virtual double value (const Point<dim> &p,
 			  const unsigned int  component = 0) const;
@@ -167,6 +170,13 @@ class InitialValuesP : public Function<dim>
   private:
     struct Source
     {
+	Source (const Point<dim> &l,
+		const double      r)
+			:
+			location (l),
+			radius (r)
+	  {}
+	
 	const Point<dim> location;
 	const double     radius;
     };
@@ -177,11 +187,11 @@ template <int dim>
 double InitialValuesP<dim>::value (const Point<dim> &p,
 				    const unsigned int /*component*/) const       
 {
-  static const Source sources[] = {{ Point<dim> (0, 0),         0.025 },
-				   { Point<dim> (-0.135, 0),    0.05 },
-				   { Point<dim> (0.17, 0),      0.03 },
-				   { Point<dim> (-0.25, 0),     0.02 },
-				   { Point<dim> (-0.05, -0.15), 0.015 }};
+  static const Source sources[] = {Source (Point<dim> (0, 0),         0.025),
+				   Source (Point<dim> (-0.135, 0),    0.05),
+				   Source (Point<dim> (0.17, 0),      0.03),
+				   Source (Point<dim> (-0.25, 0),     0.02),
+				   Source (Point<dim> (-0.05, -0.15), 0.015)};
   static const unsigned int n_sources = sizeof(sources)/sizeof(sources[0]);
   
   for (unsigned int i=0; i<n_sources; ++i)
