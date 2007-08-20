@@ -656,6 +656,7 @@ process_files="common/Make.global_options
                doc/doxygen/options.dox
                doc/doxygen/options.136
 	       doc/doxygen/header.html
+	       doc/doxygen/header.136
                doc/doxygen/header.tex"
 AC_OUTPUT($process_files)
 
