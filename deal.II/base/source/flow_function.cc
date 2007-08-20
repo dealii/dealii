@@ -549,12 +549,12 @@ namespace Functions
   {
     long double r2 = Reynolds/2.;
     long double b = 4*M_PI*M_PI;
-    long double l = -b/(r2+sqrt(r2*r2+b));
+    long double l = -b/(r2+std::sqrt(r2*r2+b));
     lambda = l;
 				     // mean pressure for a domain
 				     // spreading from -.5 to 1.5 in
 				     // x-direction
-    p_average = 1/(8*l)*(exp(3.*l)-exp(-l));
+    p_average = 1/(8*l)*(std::exp(3.*l)-std::exp(-l));
   }
   
   
@@ -602,9 +602,9 @@ namespace Functions
 	const double x = points[i](0);
 	const double y = points[i](1);
 	
-	const double elx = exp(lambda*x);
-	const double cy = cos(2*M_PI*y);
-	const double sy = sin(2*M_PI*y);
+	const double elx = std::exp(lambda*x);
+	const double cy = std::cos(2*M_PI*y);
+	const double sy = std::sin(2*M_PI*y);
 	
 					 // u
 	gradients[0][i][0] = -lambda*elx*cy;
