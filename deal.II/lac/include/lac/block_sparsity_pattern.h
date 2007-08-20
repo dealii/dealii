@@ -623,7 +623,7 @@ class BlockCompressedSparsityPattern : public BlockSparsityPatternBase<Compresse
 				      * functions of the base class as
 				      * well.
 				      */
-    BlockSparsityPatternBase<CompressedSparsityPattern>::reinit;
+    using BlockSparsityPatternBase<CompressedSparsityPattern>::reinit;
 };
 
 
@@ -715,7 +715,7 @@ class BlockCompressedSetSparsityPattern : public BlockSparsityPatternBase<Compre
 				      * functions of the base class as
 				      * well.
 				      */
-    BlockSparsityPatternBase<CompressedSetSparsityPattern>::reinit;
+    using BlockSparsityPatternBase<CompressedSetSparsityPattern>::reinit;
 };
 
 
