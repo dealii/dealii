@@ -1061,6 +1061,11 @@ class DataOutBase
 
       public:
 					 /**
+					  * Default constructor.
+					  */
+	GmvFlags ();
+	
+					 /**
 					  * Declare all flags with name
 					  * and type as offered by this
 					  * class, for use in input files.

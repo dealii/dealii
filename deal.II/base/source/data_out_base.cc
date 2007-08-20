@@ -672,6 +672,11 @@ DataOutBase::EpsFlags::memory_consumption () const
 
 
 
+DataOutBase::GmvFlags::GmvFlags ()
+{}
+
+
+
 void DataOutBase::GmvFlags::declare_parameters (ParameterHandler &/*prm*/)
 {}
 
