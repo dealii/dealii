@@ -152,8 +152,8 @@ namespace FiniteElementDomination
 				    * then the returned value is
 				    * <code>neither_element_dominates</code>.
 				    */
-  Domination operator & (const Domination d1,
-			 const Domination d2);
+  inline Domination operator & (const Domination d1,
+				const Domination d2);
 }
 
 
