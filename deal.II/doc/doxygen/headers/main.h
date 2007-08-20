@@ -2,7 +2,7 @@
 //    $Id$
 //    Version: $Name$
 //
-//    Copyright (C) 2006 by the deal.II authors
+//    Copyright (C) 2006, 2007 by the deal.II authors
 //
 //    This file is subject to QPL and may not be  distributed
 //    without copyright and license information. Please refer
@@ -13,6 +13,8 @@
 
 /**
  * @mainpage
+ *
+ * @image html logo200.png
  *
  * This is the main page for class and function documentation in
  * deal.II. Documentation on other aspects of deal.II can be found
