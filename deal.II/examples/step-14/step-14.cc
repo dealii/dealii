@@ -852,9 +852,7 @@ namespace LaplaceSolver
 				       // some problems in one of the
 				       // compilers this library can
 				       // be compiled with, we will
-				       // have to use some
-				       // workarounds. This will
-				       // require that we declare a
+				       // have to declare a
 				       // class that is actually
 				       // derived from the present
 				       // one, as a friend (strange as
