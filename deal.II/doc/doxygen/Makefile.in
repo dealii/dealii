@@ -30,6 +30,7 @@ deal.II deal.tag: tutorial \
 	@echo "=== Generating reference documentation. " \
               "This can take several minutes..."
 	cat @DOXYGEN_OPTIONS@ deal.dox | @DOXYGEN@ - > doxygen.log
+	@cp deal.css deal.II
 
 
 tutorial:
