@@ -2,7 +2,7 @@
 //    $Id$
 //    Version: $Name$
 //
-//    Copyright (C) 1999, 2000, 2001, 2002, 2003, 2004, 2005, 2006 by the deal.II authors
+//    Copyright (C) 1999, 2000, 2001, 2002, 2003, 2004, 2005, 2006, 2007 by the deal.II authors
 //
 //    This file is subject to QPL and may not be  distributed
 //    without copyright and license information. Please refer
@@ -1612,20 +1612,6 @@ void FullMatrix<number>::Tadd (const FullMatrix<number2> &src,
 template <typename number>
 template <typename number2>
 void
-FullMatrix<number>::add_scaled (const number               s,
-				const FullMatrix<number2> &src)
-{
-                                   // this function is
-                                   // deprecated. forward to the other
-                                   // one
-  add (s, src);
-}
-
-
-
-template <typename number>
-template <typename number2>
-void
 FullMatrix<number>::add_diag (const number s, const FullMatrix<number2>& src)
 {
   Assert (!this->empty(), ExcEmptyMatrix());
@@ -1952,15 +1938,6 @@ FullMatrix<number>::frobenius_norm () const
   for (unsigned int i=0; i<this->n_rows()*this->n_cols(); ++i)
     s += this->data()[i]*this->data()[i];
   return std::sqrt(s);
-}
-
-
-
-template <typename number>
-number
-FullMatrix<number>::norm2 () const
-{
-  return frobenius_norm();
 }
 
 
@@ -2319,71 +2296,6 @@ FullMatrix<number>::gauss_jordan ()
       for (unsigned int k=0; k<N; ++k)
 	this->el(i,k) = hv[k];
     }
-}
-
-// QR-transformation cf. Stoer 1 4.8.2 (p. 191)
-
-template <typename number>
-template <typename number2>
-void
-FullMatrix<number>::householder(Vector<number2>& src)
-{
-  Assert (!this->empty(), ExcEmptyMatrix());
-  
-				   // m > n, src.n() = m
-  Assert (this->n_cols() <= this->n_rows(),
-	  ExcDimensionMismatch(this->n_cols(), this->n_rows()));
-  Assert (src.size() == this->n_rows(),
-	  ExcDimensionMismatch(src.size(), this->n_rows()));
-
-  for (unsigned int j=0 ; j<n() ; ++j)
-  {
-    number2 sigma = 0;
-    unsigned int i;
-    for (i=j ; i<m() ; ++i) sigma += this->el(i,j)*this->el(i,j);
-    if (std::fabs(sigma) < 1.e-15) return;
-    number2 s = this->el(j,j);
-    s = (s<0) ? std::sqrt(sigma) : -std::sqrt(sigma);
-    number2 dj = s;
-
-    number2 beta = 1./(s*this->el(j,j)-sigma);
-    this->el(j,j) -= s;
-
-    for (unsigned int k=j+1 ; k<n() ; ++k)
-    {
-      number2 sum = 0.;
-      for (i=j ; i<m() ; ++i) sum += this->el(i,j)*this->el(i,k);
-      sum *= beta;
-
-      for (i=j ; i<m() ; ++i) this->el(i,k) += sum*this->el(i,j);
-    }
-
-    number2 sum = 0.;
-    for (i=j ; i<m() ; ++i) sum += this->el(i,j)*src(i);
-    sum *= beta;
-
-    for (i=j ; i<m() ; ++i) src(i) += sum*this->el(i,j);
-    this->el(j,j) = dj;
-  }
-}
-
-
-template <typename number>
-template <typename number2>
-double
-FullMatrix<number>::least_squares (Vector<number2>& dst,
-                                   Vector<number2>& src)
-{
-  Assert (!this->empty(), ExcEmptyMatrix());
-  
-  // m > n, m = src.n, n = dst.n
-
-  householder(src);
-  backward(dst, src);
-
-  number2 sum = 0.;
-  for (unsigned int i=n() ; i<m() ; ++i) sum += src(i) * src(i);
-  return std::sqrt(sum);
 }
 
 

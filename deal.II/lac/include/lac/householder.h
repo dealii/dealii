@@ -52,12 +52,25 @@ class Householder : private FullMatrix<number>
 {
   public:
 				     /**
+				      * Create an empty object.
+				      */
+    Householder ();
+
+				     /**
 				      * Create an object holding the
 				      * QR-decomposition of a matrix.
 				      */
     template<typename number2>
     Householder (const FullMatrix<number2>&);
 
+				     /**
+				      * Compute the QR-decomposition
+				      * of another matrix.
+				      */
+    template<typename number2>
+    void
+    initialize (const FullMatrix<number2>&);
+    
 				     /**
 				      * Solve the least-squares
 				      * problem for the right hand
@@ -77,7 +90,7 @@ class Householder : private FullMatrix<number>
 				      */
     template<typename number2>
     double least_squares (Vector<number2> &dst,
-			  Vector<number2> &src) const;
+			  const Vector<number2> &src) const;
 
   private:
 				     /**
@@ -96,14 +109,19 @@ class Householder : private FullMatrix<number>
 // QR-transformation cf. Stoer 1 4.8.2 (p. 191)
 
 template <typename number>
+Householder<number>::Householder()		
+{}
+
+
+template <typename number>
 template <typename number2>
-Householder<number>::Householder(const FullMatrix<number2>& M)
-		:
-		FullMatrix<number>(M),
-		diagonal(M.n_rows())
+void
+Householder<number>::initialize(const FullMatrix<number2>& M)
 {
-//  Assert (!this->empty(), ExcEmptyMatrix());
-  
+  this->reinit(M.n_rows(), M.n_cols());
+  this->fill(M);
+  diagonal.resize(M.n_rows());
+  Assert (!this->empty(), typename FullMatrix<number2>::ExcEmptyMatrix());
 				   // m > n, src.n() = m
   Assert (this->n_cols() <= this->n_rows(),
 	  ExcDimensionMismatch(this->n_cols(), this->n_rows()));
@@ -151,33 +169,42 @@ Householder<number>::Householder(const FullMatrix<number2>& M)
 
 template <typename number>
 template <typename number2>
+Householder<number>::Householder(const FullMatrix<number2>& M)		
+{
+  initialize(M);
+}
+
+
+template <typename number>
+template <typename number2>
 double
 Householder<number>::least_squares (Vector<number2>& dst,
-				    Vector<number2>& src) const
+				    const Vector<number2>& src) const
 {
-//  Assert (!this->empty(), ExcEmptyMatrix());
-  
+  Assert (!this->empty(), typename FullMatrix<number2>::ExcEmptyMatrix());
+  dst = src;
 				   // m > n, m = src.n, n = dst.n
 
 				   // Multiply Q_n ... Q_2 Q_1 src
 				   // Where Q_i = I-v_i v_i^T
   for (unsigned int j=0;j<this->n();++j)
     {
-				       // sum = v_i^T src
-      number2 sum = diagonal[j]*src(j);
+				       // sum = v_i^T dst
+      number2 sum = diagonal[j]*dst(j);
       for (unsigned int i=j+1 ; i<this->m() ; ++i)
-	sum += this->el(i,j)*src(i);
-				       // src -= v * sum
-      src(j) -= sum*diagonal[j];
+	sum += this->el(i,j)*dst(i);
+				       // dst -= v * sum
+      dst(j) -= sum*diagonal[j];
       for (unsigned int i=j+1 ; i<this->m() ; ++i)
-	src(i) -= sum*this->el(i,j);
+	dst(i) -= sum*this->el(i,j);
     }
-  
-  this->backward(dst, src);
-  
+				   // Compute norm of residual
   number2 sum = 0.;
   for (unsigned int i=this->n() ; i<this->m() ; ++i)
-    sum += src(i) * src(i);
+    sum += dst(i) * dst(i);
+				   // Compute solution
+  this->backward(dst, dst);
+  
   return std::sqrt(sum);
 }
 

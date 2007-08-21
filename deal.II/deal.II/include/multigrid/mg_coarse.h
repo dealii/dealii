@@ -2,7 +2,7 @@
 //    $Id$
 //    Version: $Name$
 //
-//    Copyright (C) 2002, 2003, 2004, 2005, 2006 by the deal.II authors
+//    Copyright (C) 2002, 2003, 2004, 2005, 2006, 2007 by the deal.II authors
 //
 //    This file is subject to QPL and may not be  distributed
 //    without copyright and license information. Please refer
@@ -16,6 +16,7 @@
 
 #include <lac/full_matrix.h>
 #include <lac/matrix_lib.h>
+#include <lac/householder.h>
 #include <multigrid/mg_base.h>
 
 DEAL_II_NAMESPACE_OPEN
@@ -157,20 +158,9 @@ class MGCoarseGridHouseholder : public MGCoarseGridBase<VECTOR>
 
   private:
 				     /**
-				      * Pointer to the coarse grid
-				      * matrix.
-				      */
-    SmartPointer<const FullMatrix<number> > matrix;
-
-				     /**
 				      * Matrix for QR-factorization.
 				      */
-    mutable FullMatrix<number> work;
-
-				     /**
-				      * Auxiliary vector.
-				      */
-    mutable VECTOR aux;
+    Householder<number> householder;
 };
 
 /*@}*/
@@ -274,9 +264,9 @@ MGCoarseGridLACIteration<SOLVER, VECTOR>
 template<typename number, class VECTOR>
 MGCoarseGridHouseholder<number, VECTOR>::MGCoarseGridHouseholder(
   const FullMatrix<number>* A)
-		:
-		matrix(A, typeid(*this).name())
-{}
+{
+  if (A != 0) householder.initialize(*A);
+}
 
 
 
@@ -285,7 +275,7 @@ void
 MGCoarseGridHouseholder<number, VECTOR>::initialize(
   const FullMatrix<number>& A)
 {
-  matrix = &A;
+  householder.initialize(A);
 }
 
 
@@ -293,9 +283,7 @@ MGCoarseGridHouseholder<number, VECTOR>::initialize(
 template<typename number, class VECTOR>
 void
 MGCoarseGridHouseholder<number, VECTOR>::clear()
-{
-  matrix = 0;
-}
+{}
 
 
 
@@ -306,9 +294,7 @@ MGCoarseGridHouseholder<number, VECTOR>::operator() (
   VECTOR       &dst,
   const VECTOR &src) const
 {
-  work = *matrix;
-  aux = src;
-  work.least_squares(dst, aux);
+  householder.least_squares(dst, src);
 }
 
 #endif // DOXYGEN

@@ -2,7 +2,7 @@
 //    $Id$
 //    Version: $Name$
 //
-//    Copyright (C) 1999, 2000, 2001, 2002, 2003, 2004, 2005, 2006 by the deal.II authors
+//    Copyright (C) 1999, 2000, 2001, 2002, 2003, 2004, 2005, 2006, 2007 by the deal.II authors
 //
 //    This file is subject to QPL and may not be  distributed
 //    without copyright and license information. Please refer
@@ -485,13 +485,7 @@ class FullMatrix : public Table<2,number>
 				      * the vector space.
 				      */
     number frobenius_norm () const;
-
-				     /**
-				      * @deprecated Old name for
-				      * FullMatrix::frobenius_norm().
-				      */
-    number norm2 () const;
-
+    
 				     /**
 				      * Compute the relative norm of
 				      * the skew-symmetric part. The
@@ -691,23 +685,7 @@ class FullMatrix : public Table<2,number>
 	      const FullMatrix<number2> &B,
 	      const number               c,
 	      const FullMatrix<number2> &C);
-
-				     /**
-				      * @deprecated Simple addition of
-				      * a scaled matrix,
-				      * i.e. <tt>*this += a*A</tt>.
-				      *
-				      * This function is
-				      * deprecated. Use <tt>add</tt>
-				      * instead, since this has the
-				      * same interface as the other
-				      * matrix and vector classes in
-				      * the library.
-				      */
-    template <typename number2>
-    void add_scaled (const number               a,
-		     const FullMatrix<number2> &A);
-
+    
 				     /**
 				      * Add rectangular block.
 				      *
@@ -917,26 +895,6 @@ class FullMatrix : public Table<2,number>
     void invert (const FullMatrix<number2> &M);
 
 
-				     /**
-				      * @deprecated Use the class Householder
-				      * to compute a QR-factorization which
-				      * can be applied to several vectors.
-				      *
-				      * QR-factorization of a matrix.
-				      * The orthogonal transformation
-				      * Q is applied to the vector y
-				      * and this matrix.
-				      *
-				      * After execution of
-				      * householder, the upper
-				      * triangle contains the
-				      * resulting matrix R, the lower
-				      * the incomplete factorization
-				      * matrices.
-				      */
-    template<typename number2>
-    void householder (Vector<number2> &y);
-
 //@}
 ///@name Multiplications
 //@{
@@ -1090,7 +1048,7 @@ class FullMatrix : public Table<2,number>
 				     /**
 				      * Forward elimination of lower
 				      * triangle.  Inverts the lower
-				      * triangle of a quadratic matrix
+				      * triangle of a rectangular matrix
 				      * for a given right hand side.
 				      *
 				      * If the matrix has more columns
@@ -1100,28 +1058,9 @@ class FullMatrix : public Table<2,number>
 				      * rows, the upper quadratic part
 				      * of the matrix is considered.
 				      *
-				      * Note that this function does
-				      * not fit into this class at
-				      * all, since it assumes that the
-				      * elements of this object do not
-				      * represent a matrix, but rather
-				      * a decomposition into two
-				      * factors. Therefore, if this
-				      * assumption holds, all
-				      * functions like multiplication
-				      * by matrices or vectors, norms,
-				      * etc, have no meaning any
-				      * more. Conversely, if these
-				      * functions have a meaning on
-				      * this object, then the
-				      * forward() function has no
-				      * meaning. This bifacial
-				      * property of this class is
-				      * probably a design mistake and
-				      * may once go away by separating
-				      * the forward() and backward()
-				      * functions into a class of
-				      * their own.
+				      * @note It is safe to use the
+				      * same object for @p dst and @p
+				      * src.
 				      */
     template<typename number2>
     void forward (Vector<number2>       &dst,
@@ -1132,24 +1071,15 @@ class FullMatrix : public Table<2,number>
 				      * triangle.
 				      *
 				      * See forward()
+				      *
+				      * @note It is safe to use the
+				      * same object for @p dst and @p
+				      * src.
 				      */
     template<typename number2>
     void backward (Vector<number2>       &dst,
 		   const Vector<number2> &src) const;
 
-				     /**
-				      * @deprecated Use the class
-				      * Householder to solve least
-				      * squares problems.
-				      *
-				      * Least-Squares-Approximation by
-				      * QR-factorization. The return
-				      * value is the Euclidean norm of
-				      * the approximation error.
-				      */
-    template<typename number2>
-    double least_squares (Vector<number2> &dst,
-			  Vector<number2> &src);
                                      //@}
 
 				     /** @addtogroup Exceptions

@@ -18,6 +18,7 @@
 #include <base/exceptions.h>
 #include <base/logstream.h>
 #include <base/memory_consumption.h>
+#include <lac/householder.h>
 #include <lac/precondition_block.h>
 #include <lac/vector.h>
 #include <lac/full_matrix.h>
@@ -446,8 +447,8 @@ void PreconditionBlockJacobi<MATRIX,inverse_type>
 		   column_cell<this->blocksize; ++column_cell, ++column)
 		M_cell(row_cell,column_cell)=M(row,column);
 	    }
-	  M_cell.householder(b_cell);
-	  M_cell.backward(x_cell,b_cell);
+	  Householder<number> house(M_cell);
+	  house.least_squares(x_cell,b_cell);
 					   // distribute x_cell to dst
 	  for (row=cell*this->blocksize, row_cell=0;
 	       row_cell<this->blocksize;
@@ -637,8 +638,8 @@ void PreconditionBlockSOR<MATRIX,inverse_type>::forward (
 	}
       else
 	{
-	  M_cell.householder(b_cell);
-	  M_cell.backward(x_cell,b_cell);
+	  Householder<number> house(M_cell);
+	  house.least_squares(x_cell,b_cell);
 	}
       
 				       // distribute x_cell to dst
@@ -751,8 +752,8 @@ void PreconditionBlockSOR<MATRIX,inverse_type>::backward (
 	}
       else
 	{
-	  M_cell.householder(b_cell);
-	  M_cell.backward(x_cell,b_cell);
+	  Householder<number> house(M_cell);
+	  house.least_squares(x_cell,b_cell);
 	}
       
       

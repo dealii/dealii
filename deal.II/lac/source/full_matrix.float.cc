@@ -2,7 +2,7 @@
 //    $Id$
 //    Version: $Name$
 //
-//    Copyright (C) 1999, 2000, 2001, 2002, 2003, 2004, 2005, 2006 by the deal.II authors
+//    Copyright (C) 1999, 2000, 2001, 2002, 2003, 2004, 2005, 2006, 2007 by the deal.II authors
 //
 //    This file is subject to QPL and may not be  distributed
 //    without copyright and license information. Please refer
@@ -40,7 +40,6 @@ template void FullMatrix<TYPEMAT>::add<TYPEMAT2> (const TYPEMAT, const FullMatri
 template void FullMatrix<TYPEMAT>::add<TYPEMAT2> (const TYPEMAT, const FullMatrix<TYPEMAT2>&,
 						  const TYPEMAT, const FullMatrix<TYPEMAT2>&,
 						  const TYPEMAT, const FullMatrix<TYPEMAT2>&);
-template void FullMatrix<TYPEMAT>::add_scaled<TYPEMAT2> (const TYPEMAT, const FullMatrix<TYPEMAT2>&);
 template void FullMatrix<TYPEMAT>::add<TYPEMAT2> (
   const FullMatrix<TYPEMAT2>&, double, unsigned, unsigned, unsigned, unsigned);
 template void FullMatrix<TYPEMAT>::Tadd<TYPEMAT2> (const TYPEMAT, const FullMatrix<TYPEMAT2>&);
@@ -78,9 +77,6 @@ template void FullMatrix<TYPEMAT>::forward<TYPEVEC>(
   Vector<TYPEVEC>&, const Vector<TYPEVEC>&) const;
 template void FullMatrix<TYPEMAT>::backward<TYPEVEC>(
   Vector<TYPEVEC>&, const Vector<TYPEVEC>&) const;
-template void FullMatrix<TYPEMAT>::householder<TYPEVEC>(Vector<TYPEVEC>&);
-template double FullMatrix<TYPEMAT>::least_squares<TYPEVEC>(
-  Vector<TYPEVEC>&, Vector<TYPEVEC>&);
 
 template
 void FullMatrix<TYPEMAT>::precondition_Jacobi<TYPEVEC> (
@@ -107,9 +103,6 @@ template void FullMatrix<TYPEMAT>::forward<TYPEVEC>(
   Vector<TYPEVEC>&, const Vector<TYPEVEC>&) const;
 template void FullMatrix<TYPEMAT>::backward<TYPEVEC>(
   Vector<TYPEVEC>&, const Vector<TYPEVEC>&) const;
-template void FullMatrix<TYPEMAT>::householder<TYPEVEC>(Vector<TYPEVEC>&);
-template double FullMatrix<TYPEMAT>::least_squares<TYPEVEC>(
-  Vector<TYPEVEC>&, Vector<TYPEVEC>&);
 template
 void FullMatrix<TYPEMAT>::precondition_Jacobi<TYPEVEC> (
   Vector<TYPEVEC> &, const Vector<TYPEVEC> &, const TYPEMAT) const;

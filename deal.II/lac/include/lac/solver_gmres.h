@@ -18,6 +18,7 @@
 #include <base/config.h>
 #include <base/subscriptor.h>
 #include <base/logstream.h>
+#include <lac/householder.h>
 #include <lac/solver.h>
 #include <lac/solver_control.h>
 #include <lac/full_matrix.h>
@@ -930,8 +931,8 @@ SolverFGMRES<VECTOR>::solve (
 	      y.reinit(j);	  
 	      projected_rhs(0) = beta;
 	      H1.fill(H);
-	      
-	      double res = H1.least_squares(y, projected_rhs);
+	      Householder<double> house(H1);
+	      double res = house.least_squares(y, projected_rhs);
 	      iteration_state = this->control().check(++accumulated_iterations, res);
 	      if (iteration_state != SolverControl::iterate)
 		break;
