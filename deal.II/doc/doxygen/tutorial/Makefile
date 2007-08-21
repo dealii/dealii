@@ -72,15 +72,16 @@ $(example-toc-results):
 
 $(example-toc):
 	@echo ================== Making $@
-	@echo "<table class=\"tutorial\">" > $@
-	@echo "<tr><td><b>Table of contents</b></td></tr>" >> $@
-	@echo "<tr><td>" >> $@
+	@echo "<table class=\"tutorial\" width=\"50%\">" > $@
+	@echo "<tr><th colspan=\"2\"><b><small>Table of contents</small></b></th></tr>" >> $@
+	@echo "<tr><td width=\"50%\" valign=\"top\">" >> $@
 	@echo "<ol>" >> $@
 	@echo "  <li> <a href=\"#Intro\" class=bold>Introduction</a>" >> $@
 	@cat generated/$(call get_basename, $@)_toc.intro >> $@
 	@echo "  <li> <a href=\"#CommProg\" class=bold>The commented program</a>" >> $@
 	@cat generated/$(call get_basename, $@)_toc.prog >> $@
-	@echo "  <li> <a href=\"#Results\" class=bold>Results</a>" >> $@
+	@echo "</ol></td><td width=\"50%\" valign=\"top\"><ol>" >> $@
+	@echo "  <li value=\"3\"> <a href=\"#Results\" class=bold>Results</a>" >> $@
 	@cat generated/$(call get_basename, $@)_toc.results >> $@
 	@echo "  <li> <a href=\"#PlainProg\" class=bold>The plain program</a>" >> $@
 	@cat generated/$(call get_basename, $@)_toc.plain >> $@
