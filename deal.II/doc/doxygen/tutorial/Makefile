@@ -72,7 +72,9 @@ $(example-toc-results):
 
 $(example-toc):
 	@echo ================== Making $@
-	@echo "<table class=\"tutorial\">  <tr>    <td>" > $@
+	@echo "<table class=\"tutorial\">" > $@
+	@echo "<tr><td><b>Table of contents</b></td></tr>" >> $@
+	@echo "<tr><td>" >> $@
 	@echo "<ol>" >> $@
 	@echo "  <li> <a href=\"#Intro\" class=bold>Introduction</a>" >> $@
 	@cat generated/$(call get_basename, $@)_toc.intro >> $@
