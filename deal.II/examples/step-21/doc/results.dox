@@ -1,8 +1,7 @@
 <a name="Results"></a> <h1>Results</h1>
 
 If we run the program, we get the following kind of output:
-<pre>
-<code>
+@code
 Number of active cells: 1024
 Number of degrees of freedom: 4160 (2112+1024+1024)
 
@@ -22,8 +21,7 @@ Timestep 3
    Now at t=0.0980651, dt=0.0326836.
 
 ...
-</code>
-</pre>
+@endcode
 As we can see, the time step is pretty much constant right from the start,
 which indicates that the velocities in the domain are not strongly dependent
 on changes in saturation, although they certainly are through the factor
@@ -78,17 +76,13 @@ and 167,000 degrees of freedom:
 @image html step-21.random3d.gif
 
 To repeat these computations, all you have to do is to change the line
-<pre>
-<code>
+@code
       TwoPhaseFlowProblem<2> two_phase_flow_problem(0);
-</code>
-</pre>
+@endcode
 in the main function to
-<pre>
-<code>
+@code
       TwoPhaseFlowProblem<3> two_phase_flow_problem(0);
-</code>
-</pre>
+@endcode
 The visualization uses a cloud technique, where the saturation is indicated by
 colored but transparent clouds for each cell. This way, one can also see
 somewhat what happens deep inside the domain. A different way of visualizing

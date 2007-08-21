@@ -3,7 +3,7 @@
 
 
 The output of the program looks as follows:
-<pre><code>
+@code
 Cycle 0:
    Number of active cells:       20
    Number of degrees of freedom: 89
@@ -28,7 +28,7 @@ Cycle 6:
 Cycle 7:
    Number of active cells:       3884
    Number of degrees of freedom: 18401
-</code></pre>
+@endcode
 
 
 

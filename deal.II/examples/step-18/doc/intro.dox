@@ -359,11 +359,9 @@ been generated, and <code>NNN</code> the number of the MPI process that did this
 The next step is to convert this file or these files into whatever
 format you like. The program that does this is the @ref step_19 "step-19" tutorial program:
 for example, for the first time step, call it through
-<pre>
-<code>
+@code
     ../step-19/step-19 solution-0001.0000.*.d2 solution-0001.0000.gmv
-</code>
-</pre>
+@endcode
 to merge all the intermediate format files into a single file in GMV
 format. More details on the parameters of this program and what it can do for
 you can be found in the documentation of the @ref step_19 "step-19" tutorial program.

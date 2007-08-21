@@ -8,8 +8,7 @@ components of the program take, are given in the @ref hp_paper .
 
 When run, this is what the program produces:
 
-<code>
-<pre>
+@code
 examples/step-27> make run
 ============================ Running step-27
 Cycle 0:
@@ -36,8 +35,7 @@ Cycle 5:
    Number of active cells:       2577
    Number of degrees of freedom: 26936
    Number of constraints       : 6196
-</pre>
-</code>
+@endcode
 
 The first thing we learn from this is that the number of constrained
 degrees of freedom is on the order of 20-25% of the total number of

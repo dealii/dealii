@@ -111,13 +111,11 @@ described in the @ref hpcollection overview.
 In this tutorial program, we will use continuous Lagrange elements of
 orders 2 through 7 (in 2d) or 2 through 5 (in 3d). The collection of
 used elements can then be created as follows:
-<code>
-<pre>
+@code
   hp::FECollection<dim> fe_collection;
   for (unsigned int degree=2; degree<=max_degree; ++degree)
     fe_collection.push_back (FE_Q<dim>(degree));
-</pre>
-</code>
+@endcode
 
 
 
@@ -149,16 +147,14 @@ index</i> to indicate that this is the finite element that is active
 on this cell, whereas all the other elements of the collection are
 inactive on it. The general outline of this reads like this:
 
-<code>
-<pre>
+@code
   hp::DoFHandler<dim> dof_handler (triangulation);
   for (typename hp::DoFHandler<dim>::active_cell_iterator
          cell = dof_handler.begin_active();
        cell != dof_handler.end(); ++cell)
     cell->set_active_fe_index (...);
   dof_handler.distribute_dofs (fe_collection);
-</pre>
-</code>
+@endcode
 
 Dots in the call to <code>set_active_fe_index()</code> indicate that
 we will have to have some sort of strategy later on to decide which
@@ -174,13 +170,11 @@ a Q3 element) then we have to compute additional constraints on the
 finite element field to ensure that it is continuous. This is
 conceptually very similar to how we compute hanging node constraints,
 and in fact the code looks exactly the same:
-<code>
-<pre>
+@code
   ConstraintMatrix constraints;
   DoFTools::make_hanging_node_constraints (dof_handler,
 					   constraints);
-</pre>
-</code>
+@endcode
 In other words, the DoFTools::make_hanging_node_constraints deals not
 only with hanging node constraints, but also with $hp$ constraints at
 the same time.
@@ -217,8 +211,7 @@ single finite element, quadrature formula, and mapping, it takes collections
 of these objects. It's use is very much like the regular FEValues class,
 i.e. the interesting part of the loop over all cells would look like this:
 
-<code>
-<pre>
+@code
   hp::FEValues<dim> hp_fe_values (mapping_collection,
                                   fe_collection,
 				  quadrature_collection, 
@@ -239,8 +232,7 @@ i.e. the interesting part of the loop over all cells would look like this:
 
       ...  // assemble local contributions and copy them into global object
     }
-</pre>
-</code>
+@endcode
 
 In this tutorial program, we will always use a Q1 mapping, so the mapping
 collection argument to the hp::FEValues construction will be omitted. Inside
@@ -703,33 +695,28 @@ time of creating the sparsity pattern, or while copying local contributions
 into the global matrix object (or global vector).
 
 So, instead of the code snippet (taken from @ref step_6 "step-6")
-<code>
-<pre>
+@code
   DoFTools::make_hanging_node_constraints (dof_handler,
 					   hanging_node_constraints);
   hanging_node_constraints.close ();
 
   DoFTools::make_sparsity_pattern (dof_handler, sparsity_pattern);
   hanging_node_constraints.condense (sparsity_pattern);
-</pre>
-</code>
+@endcode
 we now use the following:
-<code>
-<pre>
+@code
   DoFTools::make_hanging_node_constraints (dof_handler,
 					   hanging_node_constraints);
   hanging_node_constraints.close ();
 
   DoFTools::make_sparsity_pattern (dof_handler, sparsity_pattern,
                                    hanging_node_constraints);
-</pre>
-</code>
+@endcode
 
 In a similar vein, we have to slightly modify the way we copy local
 contributions into global matrices and vectors. In previous tutorial programs,
 we have always used a process like this:
-<code>
-<pre>
+@code
   typename hp::DoFHandler<dim>::active_cell_iterator
     cell = dof_handler.begin_active(),
     endc = dof_handler.end();
@@ -750,12 +737,10 @@ we have always used a process like this:
 
   hanging_node_constraints.condense (system_matrix);
   hanging_node_constraints.condense (system_rhs);
-</pre>
-</code>
+@endcode
 We now replace copying and later condensing into one step, as already shown in
 @ref step_17 "step-17" and @ref step_18 "step-18":
-<code>
-<pre>
+@code
   typename hp::DoFHandler<dim>::active_cell_iterator
     cell = dof_handler.begin_active(),
     endc = dof_handler.end();
@@ -775,8 +760,7 @@ We now replace copying and later condensing into one step, as already shown in
 				     local_dof_indices,
 				     system_rhs);
     }
-</pre>
-</code>
+@endcode
 Essentially, what the
 <code>hanging_node_constraints.distribute_local_to_global</code> calls do is
 to implement the same loop as before, but whenever we hit a constrained degree
