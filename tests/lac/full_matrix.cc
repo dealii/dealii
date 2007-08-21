@@ -2,7 +2,7 @@
 //    $Id$
 //    Version: $Name$ 
 //
-//    Copyright (C) 1998, 1999, 2000, 2001, 2002, 2003, 2004, 2005 by the deal.II authors
+//    Copyright (C) 1998, 1999, 2000, 2001, 2002, 2003, 2004, 2005, 2007 by the deal.II authors
 //
 //    This file is subject to QPL and may not be  distributed
 //    without copyright and license information. Please refer
@@ -126,7 +126,7 @@ main ()
 	  D.gauss_jordan();
 	  D.print_formatted (logfile,3,false);
 	  deallog << "linfty-norm: " << D.linfty_norm() << std::endl
-		  << "Frobenius-norm: " << D.norm2() << std::endl;
+		  << "Frobenius-norm: " << D.frobenius_norm() << std::endl;
 	  
 					   // Rotate original matrix
 	  A.mmult(H,C);

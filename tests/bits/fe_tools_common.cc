@@ -2,7 +2,7 @@
 //    $Id$
 //    Version: $Name$ 
 //
-//    Copyright (C) 2003, 2004, 2005, 2006 by the deal.II authors
+//    Copyright (C) 2003, 2004, 2005, 2006, 2007 by the deal.II authors
 //
 //    This file is subject to QPL and may not be  distributed
 //    without copyright and license information. Please refer
@@ -65,7 +65,7 @@ output_matrix (const FullMatrix<double> &m)
   deallog << m.l1_norm() << ' ' << m.linfty_norm()
           << std::endl;
   if (m.m() == m.n())
-    deallog << m.norm2() << std::endl;
+    deallog << m.frobenius_norm() << std::endl;
   
   for (unsigned int i=0; i<std::min(m.m(),m.n()); ++i)
     deallog << m(i,i) << ' ' << m(i,std::min(m.m(),m.n())-i-1) << ' ';
