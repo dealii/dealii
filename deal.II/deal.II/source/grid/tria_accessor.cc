@@ -109,6 +109,15 @@ void TriaObjectAccessor<1, dim>::recursively_clear_user_flag () const
 
 
 template <int dim>
+void TriaObjectAccessor<1, dim>::clear_user_data () const
+{
+  Assert (used(), TriaAccessorExceptions::ExcCellNotUsed());
+  objects().clear_user_data(this->present_index);
+}
+
+
+
+template <int dim>
 void TriaObjectAccessor<1, dim>::set_user_pointer (void *p) const
 {
   Assert (used(), TriaAccessorExceptions::ExcCellNotUsed());
@@ -401,6 +410,15 @@ void TriaObjectAccessor<2, dim>::recursively_clear_user_flag () const
   if (has_children())
     for (unsigned int c=0; c<n_children(); ++c)
       child(c)->recursively_clear_user_flag ();
+}
+
+
+
+template <int dim>
+void TriaObjectAccessor<2, dim>::clear_user_data () const
+{
+  Assert (used(), TriaAccessorExceptions::ExcCellNotUsed());
+  objects().clear_user_data(this->present_index);
 }
 
 
@@ -929,6 +947,15 @@ void TriaObjectAccessor<3, dim>::recursively_clear_user_flag () const
 
 
 #if deal_II_dimension == 3
+
+template <>
+void TriaObjectAccessor<3, 3>::clear_user_data () const
+{
+  Assert (used(), TriaAccessorExceptions::ExcCellNotUsed());
+  this->tria->levels[this->present_level]->cells.clear_user_data(this->present_index);
+}
+
+
 
 template <>
 void TriaObjectAccessor<3, 3>::set_user_pointer (void *p) const

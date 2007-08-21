@@ -329,7 +329,7 @@ void Triangulation<1>::create_triangulation (const std::vector<Point<1> >    &v,
                                    cells[cell].vertices[1]));
       next_free_line->set_used_flag ();
       next_free_line->set_material_id (cells[cell].material_id);
-      next_free_line->clear_user_pointer ();
+      next_free_line->clear_user_data ();
       next_free_line->set_subdomain_id (0);
       
 				       // note that this cell is
@@ -613,7 +613,7 @@ void Triangulation<2>::create_triangulation (const std::vector<Point<2> >    &v,
                                                    i->first.second));
 	  line->set_used_flag ();
 	  line->clear_user_flag ();
-	  line->clear_user_pointer ();
+	  line->clear_user_data ();
 	  i->second = line;
 	}
     }
@@ -642,7 +642,7 @@ void Triangulation<2>::create_triangulation (const std::vector<Point<2> >    &v,
 	  
 	  cell->set_used_flag ();
 	  cell->set_material_id (cells[c].material_id);
-	  cell->clear_user_pointer ();
+	  cell->clear_user_data ();
 	  cell->set_subdomain_id (0);
 	  
 					   // note that this cell is
@@ -1035,7 +1035,7 @@ Triangulation<3>::create_triangulation (const std::vector<Point<3> >    &v,
                                                    i->first.second));
 	  line->set_used_flag ();
 	  line->clear_user_flag ();
-	  line->clear_user_pointer ();
+	  line->clear_user_data ();
 
 					   // now set the iterator for
 					   // this line
@@ -1214,7 +1214,7 @@ Triangulation<3>::create_triangulation (const std::vector<Point<3> >    &v,
 	  quad->set (q->first);
 	  quad->set_used_flag ();
 	  quad->clear_user_flag ();
-	  quad->clear_user_pointer ();
+	  quad->clear_user_data ();
 					   // set the line orientation
 	  quad->set_line_orientation(0,q->second.second[0]);
 	  quad->set_line_orientation(1,q->second.second[1]);
@@ -1403,7 +1403,7 @@ Triangulation<3>::create_triangulation (const std::vector<Point<3> >    &v,
 	  cell->set_used_flag ();
 	  cell->set_material_id (cells[c].material_id);
 	  cell->clear_user_flag ();
-	  cell->clear_user_pointer ();
+	  cell->clear_user_data ();
 	  cell->set_subdomain_id (0);
 
                                            // set orientation flag for
@@ -5069,13 +5069,13 @@ Triangulation<1>::execute_refinement ()
 	      ++next_unused_cell;
 	    first_child = next_unused_cell;
 	    first_child->set_used_flag ();
-	    first_child->clear_user_pointer ();
+	    first_child->clear_user_data ();
 	    ++next_unused_cell;
 	    Assert (next_unused_cell->used() == false,
 		    ExcCellShouldBeUnused());
 	    second_child = next_unused_cell;
 	    second_child->set_used_flag ();
-	    second_child->clear_user_pointer ();
+	    second_child->clear_user_data ();
 
 					     // insert first child
 	    cell->set_children (first_child->index());
@@ -5418,8 +5418,8 @@ Triangulation<2>::execute_refinement ()
 	    children[1]->set_used_flag();
 	    children[0]->clear_children();
 	    children[1]->clear_children();
-	    children[0]->clear_user_pointer();
-	    children[1]->clear_user_pointer();
+	    children[0]->clear_user_data();
+	    children[1]->clear_user_data();
 	    children[0]->clear_user_flag();
 	    children[1]->clear_user_flag();
 
@@ -5601,7 +5601,7 @@ Triangulation<2>::execute_refinement ()
 	      {
 		new_lines[l]->set_used_flag();
 		new_lines[l]->clear_user_flag();
-		new_lines[l]->clear_user_pointer();
+		new_lines[l]->clear_user_data();
 		new_lines[l]->clear_children();
 						 // interior line
 		new_lines[l]->set_boundary_indicator(255);
@@ -5657,7 +5657,7 @@ Triangulation<2>::execute_refinement ()
 	      {
 		subcells[i]->set_used_flag();
 		subcells[i]->clear_user_flag();
-		subcells[i]->clear_user_pointer();
+		subcells[i]->clear_user_data();
 		subcells[i]->clear_children();
 						 // inherit material
 						 // properties		
@@ -6166,8 +6166,8 @@ Triangulation<3>::execute_refinement ()
 	    children[1]->set_used_flag();
 	    children[0]->clear_children();
 	    children[1]->clear_children();
-	    children[0]->clear_user_pointer();
-	    children[1]->clear_user_pointer();
+	    children[0]->clear_user_data();
+	    children[1]->clear_user_data();
 	    children[0]->clear_user_flag();
 	    children[1]->clear_user_flag();
 
@@ -6324,7 +6324,7 @@ Triangulation<3>::execute_refinement ()
 	      {
 		new_lines[i]->set_used_flag();
 		new_lines[i]->clear_user_flag();
-		new_lines[i]->clear_user_pointer();
+		new_lines[i]->clear_user_data();
 		new_lines[i]->clear_children();
 		new_lines[i]->set_boundary_indicator(quad->boundary_indicator());
 	      }
@@ -6425,7 +6425,7 @@ Triangulation<3>::execute_refinement ()
 	      {
 		new_quads[i]->set_used_flag();
 		new_quads[i]->clear_user_flag();
-		new_quads[i]->clear_user_pointer();
+		new_quads[i]->clear_user_data();
 		new_quads[i]->clear_children();
 		new_quads[i]->set_boundary_indicator (quad->boundary_indicator());
 						 // set all line orientations to
@@ -6624,7 +6624,7 @@ Triangulation<3>::execute_refinement ()
 	      {
 		new_lines[i]->set_used_flag();
 		new_lines[i]->clear_user_flag();
-		new_lines[i]->clear_user_pointer();
+		new_lines[i]->clear_user_data();
 		new_lines[i]->clear_children();
 						 // interior line
 		new_lines[i]->set_boundary_indicator(255);
@@ -6959,7 +6959,7 @@ Triangulation<3>::execute_refinement ()
 	      {
 		new_quads[i]->set_used_flag();
 		new_quads[i]->clear_user_flag();
-		new_quads[i]->clear_user_pointer();
+		new_quads[i]->clear_user_data();
 		new_quads[i]->clear_children();
 						 // interior quad
 		new_quads[i]->set_boundary_indicator (255);
@@ -7190,7 +7190,7 @@ Triangulation<3>::execute_refinement ()
 	      {
 		new_hexes[i]->set_used_flag();
 		new_hexes[i]->clear_user_flag();
-		new_hexes[i]->clear_user_pointer();
+		new_hexes[i]->clear_user_data();
 		new_hexes[i]->clear_children();
 						 // inherit material
 						 // properties
@@ -9063,7 +9063,7 @@ void Triangulation<1>::delete_children (cell_iterator &cell,
 				   // on...
   for (unsigned int child=0; child<GeometryInfo<dim>::children_per_cell; ++child)
     {
-      cell->child(child)->clear_user_pointer();
+      cell->child(child)->clear_user_data();
       cell->child(child)->clear_user_flag();
       cell->child(child)->clear_used_flag();
     }
@@ -9152,10 +9152,10 @@ void Triangulation<2>::delete_children (cell_iterator &cell,
 				   // clear user pointers, to avoid
 				   // that they may appear at unwanted
 				   // places later on...
-  cell->child(0)->line(1)->clear_user_pointer();
-  cell->child(0)->line(3)->clear_user_pointer();
-  cell->child(3)->line(0)->clear_user_pointer();
-  cell->child(3)->line(2)->clear_user_pointer();
+  cell->child(0)->line(1)->clear_user_data();
+  cell->child(0)->line(3)->clear_user_data();
+  cell->child(3)->line(0)->clear_user_data();
+  cell->child(3)->line(2)->clear_user_data();
   
 				   // same for user flags
   cell->child(0)->line(1)->clear_user_flag();
@@ -9187,7 +9187,7 @@ void Triangulation<2>::delete_children (cell_iterator &cell,
 	for (unsigned int subface=0;
 	     subface<GeometryInfo<dim>::subfaces_per_face; ++subface)
 	  {
-	    cell->face(face)->child(subface)->clear_user_pointer ();
+	    cell->face(face)->child(subface)->clear_user_data ();
 	    cell->face(face)->child(subface)->clear_user_flag ();
 	    cell->face(face)->child(subface)->clear_used_flag ();
 	  }
@@ -9198,7 +9198,7 @@ void Triangulation<2>::delete_children (cell_iterator &cell,
 				   // invalidate children
   for (unsigned int child=0; child<GeometryInfo<dim>::children_per_cell; ++child)
     {
-      cell->child(child)->clear_user_pointer();
+      cell->child(child)->clear_user_data();
       cell->child(child)->clear_user_flag();
       cell->child(child)->clear_used_flag();
     }
@@ -9326,14 +9326,14 @@ void Triangulation<3>::delete_children (cell_iterator &cell,
 				   // delete thes quads and lines
   for (unsigned int q=0; q<12; ++q)
     {
-      interior_quads[q]->clear_user_pointer();
+      interior_quads[q]->clear_user_data();
       interior_quads[q]->clear_user_flag();
       interior_quads[q]->clear_used_flag();
     }
 
   for (unsigned int l=0; l<6; ++l)
     {
-      interior_lines[l]->clear_user_pointer();
+      interior_lines[l]->clear_user_data();
       interior_lines[l]->clear_user_flag();
       interior_lines[l]->clear_used_flag();
     }
@@ -9365,7 +9365,7 @@ void Triangulation<3>::delete_children (cell_iterator &cell,
 					 // delete interior lines
 	for (unsigned int l=0; l<4; ++l)
 	  {
-	    interior_lines[l]->clear_user_pointer ();
+	    interior_lines[l]->clear_user_data ();
 	    interior_lines[l]->clear_user_flag ();
 	    interior_lines[l]->clear_used_flag ();
 	  }
@@ -9374,7 +9374,7 @@ void Triangulation<3>::delete_children (cell_iterator &cell,
 	for (unsigned int subface=0;
 	     subface<GeometryInfo<dim>::subfaces_per_face; ++subface)
 	  {
-	    quad->child(subface)->clear_user_pointer ();
+	    quad->child(subface)->clear_user_data ();
 	    quad->child(subface)->clear_user_flag ();
 	    quad->child(subface)->clear_used_flag ();
 	  }
@@ -9385,7 +9385,7 @@ void Triangulation<3>::delete_children (cell_iterator &cell,
 				   // invalidate children
   for (unsigned int child=0; child<GeometryInfo<dim>::children_per_cell; ++child)
     {
-      cell->child(child)->clear_user_pointer();
+      cell->child(child)->clear_user_data();
       cell->child(child)->clear_user_flag();
 
       for (unsigned int f=0; f<GeometryInfo<dim>::faces_per_cell; ++f)
@@ -9453,7 +9453,7 @@ void Triangulation<3>::delete_children (cell_iterator &cell,
 		
 	  for (unsigned int child=0; child<2; ++child)
 	    {
-	      line->child(child)->clear_user_pointer();
+	      line->child(child)->clear_user_data();
 	      line->child(child)->clear_user_flag();
 	      line->child(child)->clear_used_flag();
 	    }

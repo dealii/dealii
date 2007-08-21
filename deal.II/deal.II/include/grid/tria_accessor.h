@@ -655,6 +655,12 @@ class TriaObjectAccessor :  public TriaAccessor<celldim,dim>
     void recursively_clear_user_flag () const;
 
 				     /**
+				      * Reset the user data to zero,
+				      * independent if pointer or index.
+				      */
+    void clear_user_data () const;
+    
+				     /**
 				      * Set the user pointer
 				      * to @p p.
 				      */
@@ -1321,6 +1327,12 @@ class TriaObjectAccessor<1, dim> :  public TriaAccessor<1,dim>
     void recursively_clear_user_flag () const;
 
 				     /**
+				      * Reset the user data to zero,
+				      * independent if pointer or index.
+				      */
+    void clear_user_data () const;
+    
+				     /**
 				      * Set the user pointer of this
 				      * line to @p p.
 				      */
@@ -1953,6 +1965,12 @@ class TriaObjectAccessor<2, dim> :  public TriaAccessor<2,dim>
 				      */
     void recursively_clear_user_flag () const;
 
+				     /**
+				      * Reset the user data to zero,
+				      * independent if pointer or index.
+				      */
+    void clear_user_data () const;
+    
 				     /**
 				      * Set the user pointer of this
 				      * quad to @p p.
@@ -2621,6 +2639,12 @@ class TriaObjectAccessor<3, dim> :  public TriaAccessor<3,dim>
 				      */
     void recursively_clear_user_flag () const;
 
+				     /**
+				      * Reset the user data to zero,
+				      * independent if pointer or index.
+				      */
+    void clear_user_data () const;
+    
 				     /**
 				      * Set the user pointer of this
 				      * hex to @p p.

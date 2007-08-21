@@ -199,6 +199,11 @@ namespace internal
 	unsigned int user_index(const unsigned int i) const;
 
 					 /**
+					  * Reset user data to zero.
+					  */
+	void clear_user_data(const unsigned int i);
+	
+					 /**
 					  * Clear all user pointers or
 					  * indices and reset their
 					  * type, such that the next
@@ -546,6 +551,16 @@ namespace internal
 #endif
       Assert(i<user_data.size(), ExcIndexRange(i,0,user_data.size()));
       return user_data[i].i;
+    }
+    
+    
+    template<typename G>
+    inline
+    void
+    TriaObjects<G>::clear_user_data (const unsigned int i)
+    {
+      Assert(i<user_data.size(), ExcIndexRange(i,0,user_data.size()));
+      user_data[i].i = 0;
     }
     
     
