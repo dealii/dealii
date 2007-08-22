@@ -520,22 +520,6 @@ class SparseMatrixEZ : public Subscriptor
     void add (const number factor,
 	      const MATRIX &matrix);
 
-    				     /**
-				      * @deprecated Add @p matrix
-				      * scaled by @p factor to this
-				      * matrix.
-				      *
-				      * This function is
-				      * deprecated. Use <tt>add</tt>
-				      * instead, since this has the
-				      * same interface as the other
-				      * matrix and vector classes in
-				      * the library.
-				      */
-    template <class MATRIX>
-    void add_scaled (const number factor,
-		     const MATRIX &matrix);
-    
 				     /**
 				      * Return the value of the entry
 				      * (i,j).  This may be an
@@ -1464,16 +1448,6 @@ SparseMatrixEZ<number>::add (const number factor,
     }
 }
 
-
-template<typename number>
-template <class MATRIX>
-inline
-void
-SparseMatrixEZ<number>::add_scaled (const number factor,
-				    const MATRIX& M)
-{
-  add (factor, M);
-}
 
 
 template<typename number>

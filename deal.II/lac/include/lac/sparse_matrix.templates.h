@@ -326,16 +326,6 @@ SparseMatrix<number>::add (const number factor,
 
 
 template <typename number>
-template <typename somenumber>
-void
-SparseMatrix<number>::add_scaled (const number factor,
-				  const SparseMatrix<somenumber> &matrix)
-{
-  add(factor, matrix);
-}
-
-
-template <typename number>
 template <class OutVector, class InVector>
 void
 SparseMatrix<number>::vmult (OutVector& dst,

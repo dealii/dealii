@@ -2,7 +2,7 @@
 //    $Id$
 //    Version: $Name$
 //
-//    Copyright (C) 1998, 1999, 2000, 2001, 2002, 2003, 2006 by the deal.II authors
+//    Copyright (C) 1998, 1999, 2000, 2001, 2002, 2003, 2006, 2007 by the deal.II authors
 //
 //    This file is subject to QPL and may not be  distributed
 //    without copyright and license information. Please refer
@@ -26,8 +26,5 @@ void SparseMatrix<TYPEMAT>::copy_from<TYPE2> (const FullMatrix<TYPE2> &);
 
 template void SparseMatrix<TYPEMAT>::add<TYPE2> (const TYPEMAT,
 						 const SparseMatrix<TYPE2> &);
-
-template void SparseMatrix<TYPEMAT>::add_scaled<TYPE2> (const TYPEMAT,
-							const SparseMatrix<TYPE2> &);
 
 DEAL_II_NAMESPACE_CLOSE
