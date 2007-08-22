@@ -345,7 +345,7 @@ int main()
     check_iterator(E);
 #endif
     E.print_statistics(deallog, true);
-    E.add_scaled(-1., A);
+    E.add(-1., A);
     if (E.l2_norm() < 1.e-14)
       deallog << "Matrices are equal" << std::endl;
     else

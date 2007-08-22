@@ -2,7 +2,7 @@
 //    $Id$
 //    Version: $Name$ 
 //
-//    Copyright (C) 2004, 2005 by the deal.II authors
+//    Copyright (C) 2004, 2005, 2007 by the deal.II authors
 //
 //    This file is subject to QPL and may not be  distributed
 //    without copyright and license information. Please refer
@@ -115,7 +115,7 @@ void test ()
   
                                    // now comes the check: we subtract B from
                                    // A, and make sure that the result is zero
-  A.add_scaled (-1., B);
+  A.add (-1., B);
   deallog << "|A|=" << A.frobenius_norm() << std::endl;
   deallog << "|B|=" << B.frobenius_norm() << std::endl;
   Assert (A.frobenius_norm() < 1e-12*B.frobenius_norm(),

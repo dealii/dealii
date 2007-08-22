@@ -2,7 +2,9 @@
 # Makefile,v 1.14 2002/09/19 13:53:47 wolf Exp
 # Common Makefile for all test directories
 
-all: base lac fe deal.II multigrid bits hp fail
+
+all: nofail fail
+nofail: base lac fe deal.II multigrid bits hp
 	@-if grep -q 'define HAVE_LIBUMFPACK' $D/base/include/base/config.h ; then \
 		cd umfpack ; $(MAKE) ; cd .. ; \
 	fi
