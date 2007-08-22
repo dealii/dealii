@@ -414,13 +414,13 @@ dnl Make sure we configure for libraries used by other libraries. For
 dnl example, UMFPACK needs blas, and so does LAPACK
 
 if test "x$with_umfpack" != "x" -a "x$with_umfpack" != "xno" ; then
-  if test "x$with_blas" = "x" ; then
+  if test "x$with_blas" = "x" -o "x$with_blas" = "xno"; then
     with_blas="yes"
   fi
 fi
 
 if test "x$with_lapack" != "x" -a "x$with_lapack" != "xno" ; then
-  if test "x$with_blas" = "x" ; then
+  if test "x$with_blas" = "x" -o "x$with_blas" = "xno"; then
     with_blas="yes"
   fi
 fi
@@ -431,7 +431,7 @@ dnl linker line (if we use shared libs, then the PETSc libs already carry this
 dnl dependence, but static archives do not have a method to list dependencies)
 if test "x$with_petsc" != "x" -a "x$with_petsc" != "xno" ; then
   if test "x$enableshared" = "xno" ; then
-    if test "x$with_blas" = "x" ; then
+    if test "x$with_blas" = "x" -o "x$with_blas" = "xno"; then
       with_blas="yes"
     fi
   fi

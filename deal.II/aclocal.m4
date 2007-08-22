@@ -5249,14 +5249,14 @@ dnl Include the LAPACK library
 dnl --------------------------------------------------
 AC_DEFUN(DEAL_II_WITH_LAPACK, dnl
 [
-  if test "x$1" != "xyes" ; then
-    AC_CHECK_LIB($1, dgbsv_,
-    [ LIBS="-l$1 $LIBS"
-      AC_DEFINE(HAVE_LIBLAPACK)
-    ])
-dnl    fi
-  else
-    AC_CHECK_LIB(lapack, dgbsv_)
+  if test "x$1" != "xno" ; then
+    if test "x$1" != "xyes" ; then lapack="$1"; else lapack="lapack"; fi
+    AC_CHECK_LIB($lapack, dgbsv_,
+      [ LIBS="-l$lapack $LIBS"
+        AC_DEFINE(HAVE_LIBLAPACK)
+      ],
+      [AC_MSG_ERROR([LAPACK library $lapack not found])]
+    )
   fi
 ])
 
@@ -5283,14 +5283,16 @@ dnl Include the BLAS library
 dnl --------------------------------------------------
 AC_DEFUN(DEAL_II_WITH_BLAS, dnl
 [
-  if test "x$1" != "xyes" ; then blas="$1"; else blas="blas"; fi
-  AC_CHECK_LIB($blas, daxpy_,
-               [ 
-                 LIBS="-l$blas $LIBS"
-                 AC_DEFINE(HAVE_LIBBLAS)
-               ],
-               [ABORT_BLAS_ON_ERROR($blas)],$F77LIBS)
-  AC_SUBST(NEEDS_F77LIBS, "yes")
+  if test "x$1" != "xno" ; then
+    if test "x$1" != "xyes" ; then blas="$1"; else blas="blas"; fi
+    AC_CHECK_LIB($blas, daxpy_,
+                 [ 
+                   LIBS="-l$blas $LIBS"
+                   AC_DEFINE(HAVE_LIBBLAS)
+                 ],
+                 [ABORT_BLAS_ON_ERROR($blas)],$F77LIBS)
+    AC_SUBST(NEEDS_F77LIBS, "yes")
+  fi
 ])
 
 dnl --------------------------------------------------

@@ -11066,13 +11066,13 @@ echo "${ECHO_T}$DEAL_II_PETSC_MPIUNI_LIB" >&6
 
 
 if test "x$with_umfpack" != "x" -a "x$with_umfpack" != "xno" ; then
-  if test "x$with_blas" = "x" ; then
+  if test "x$with_blas" = "x" -o "x$with_blas" = "xno"; then
     with_blas="yes"
   fi
 fi
 
 if test "x$with_lapack" != "x" -a "x$with_lapack" != "xno" ; then
-  if test "x$with_blas" = "x" ; then
+  if test "x$with_blas" = "x" -o "x$with_blas" = "xno"; then
     with_blas="yes"
   fi
 fi
@@ -11080,7 +11080,7 @@ fi
 
 if test "x$with_petsc" != "x" -a "x$with_petsc" != "xno" ; then
   if test "x$enableshared" = "xno" ; then
-    if test "x$with_blas" = "x" ; then
+    if test "x$with_blas" = "x" -o "x$with_blas" = "xno"; then
       with_blas="yes"
     fi
   fi
@@ -11092,8 +11092,9 @@ fi
 if test "${with_blas+set}" = set; then
   withval="$with_blas"
 
-  if test "x$withval" != "xyes" ; then blas="$withval"; else blas="blas"; fi
-  as_ac_Lib=`echo "ac_cv_lib_$blas''_daxpy_" | $as_tr_sh`
+  if test "x$withval" != "xno" ; then
+    if test "x$withval" != "xyes" ; then blas="$withval"; else blas="blas"; fi
+    as_ac_Lib=`echo "ac_cv_lib_$blas''_daxpy_" | $as_tr_sh`
 echo "$as_me:$LINENO: checking for daxpy_ in -l$blas" >&5
 echo $ECHO_N "checking for daxpy_ in -l$blas... $ECHO_C" >&6
 if eval "test \"\${$as_ac_Lib+set}\" = set"; then
@@ -11160,8 +11161,8 @@ echo "$as_me:$LINENO: result: `eval echo '${'$as_ac_Lib'}'`" >&5
 echo "${ECHO_T}`eval echo '${'$as_ac_Lib'}'`" >&6
 if test `eval echo '${'$as_ac_Lib'}'` = yes; then
 
-                 LIBS="-l$blas $LIBS"
-                 cat >>confdefs.h <<\_ACEOF
+                   LIBS="-l$blas $LIBS"
+                   cat >>confdefs.h <<\_ACEOF
 #define HAVE_LIBBLAS 1
 _ACEOF
 
@@ -11194,8 +11195,9 @@ echo "$as_me: error: Configuring BLAS library failed although it was requested.
 
 fi
 
-  NEEDS_F77LIBS="yes"
+    NEEDS_F77LIBS="yes"
 
+  fi
 
 fi;
 
@@ -12048,15 +12050,16 @@ fi;
 if test "${with_lapack+set}" = set; then
   withval="$with_lapack"
 
-  if test "x$withval" != "xyes" ; then
-    as_ac_Lib=`echo "ac_cv_lib_$withval''_dgbsv_" | $as_tr_sh`
-echo "$as_me:$LINENO: checking for dgbsv_ in -l$withval" >&5
-echo $ECHO_N "checking for dgbsv_ in -l$withval... $ECHO_C" >&6
+  if test "x$withval" != "xno" ; then
+    if test "x$withval" != "xyes" ; then lapack="$withval"; else lapack="lapack"; fi
+    as_ac_Lib=`echo "ac_cv_lib_$lapack''_dgbsv_" | $as_tr_sh`
+echo "$as_me:$LINENO: checking for dgbsv_ in -l$lapack" >&5
+echo $ECHO_N "checking for dgbsv_ in -l$lapack... $ECHO_C" >&6
 if eval "test \"\${$as_ac_Lib+set}\" = set"; then
   echo $ECHO_N "(cached) $ECHO_C" >&6
 else
   ac_check_lib_save_LIBS=$LIBS
-LIBS="-l$withval  $LIBS"
+LIBS="-l$lapack  $LIBS"
 cat >conftest.$ac_ext <<_ACEOF
 /* confdefs.h.  */
 _ACEOF
@@ -12115,86 +12118,16 @@ fi
 echo "$as_me:$LINENO: result: `eval echo '${'$as_ac_Lib'}'`" >&5
 echo "${ECHO_T}`eval echo '${'$as_ac_Lib'}'`" >&6
 if test `eval echo '${'$as_ac_Lib'}'` = yes; then
-   LIBS="-l$withval $LIBS"
-      cat >>confdefs.h <<\_ACEOF
+   LIBS="-l$lapack $LIBS"
+        cat >>confdefs.h <<\_ACEOF
 #define HAVE_LIBLAPACK 1
 _ACEOF
 
 
-fi
-
-  else
-
-echo "$as_me:$LINENO: checking for dgbsv_ in -llapack" >&5
-echo $ECHO_N "checking for dgbsv_ in -llapack... $ECHO_C" >&6
-if test "${ac_cv_lib_lapack_dgbsv_+set}" = set; then
-  echo $ECHO_N "(cached) $ECHO_C" >&6
 else
-  ac_check_lib_save_LIBS=$LIBS
-LIBS="-llapack  $LIBS"
-cat >conftest.$ac_ext <<_ACEOF
-/* confdefs.h.  */
-_ACEOF
-cat confdefs.h >>conftest.$ac_ext
-cat >>conftest.$ac_ext <<_ACEOF
-/* end confdefs.h.  */
-
-/* Override any gcc2 internal prototype to avoid an error.  */
-#ifdef __cplusplus
-extern "C"
-#endif
-/* We use char because int might match the return type of a gcc2
-   builtin and then its argument prototype would still apply.  */
-char dgbsv_ ();
-int
-main ()
-{
-dgbsv_ ();
-  ;
-  return 0;
-}
-_ACEOF
-rm -f conftest.$ac_objext conftest$ac_exeext
-if { (eval echo "$as_me:$LINENO: \"$ac_link\"") >&5
-  (eval $ac_link) 2>conftest.er1
-  ac_status=$?
-  grep -v '^ *+' conftest.er1 >conftest.err
-  rm -f conftest.er1
-  cat conftest.err >&5
-  echo "$as_me:$LINENO: \$? = $ac_status" >&5
-  (exit $ac_status); } &&
-	 { ac_try='test -z "$ac_cxx_werror_flag"
-			 || test ! -s conftest.err'
-  { (eval echo "$as_me:$LINENO: \"$ac_try\"") >&5
-  (eval $ac_try) 2>&5
-  ac_status=$?
-  echo "$as_me:$LINENO: \$? = $ac_status" >&5
-  (exit $ac_status); }; } &&
-	 { ac_try='test -s conftest$ac_exeext'
-  { (eval echo "$as_me:$LINENO: \"$ac_try\"") >&5
-  (eval $ac_try) 2>&5
-  ac_status=$?
-  echo "$as_me:$LINENO: \$? = $ac_status" >&5
-  (exit $ac_status); }; }; then
-  ac_cv_lib_lapack_dgbsv_=yes
-else
-  echo "$as_me: failed program was:" >&5
-sed 's/^/| /' conftest.$ac_ext >&5
-
-ac_cv_lib_lapack_dgbsv_=no
-fi
-rm -f conftest.err conftest.$ac_objext \
-      conftest$ac_exeext conftest.$ac_ext
-LIBS=$ac_check_lib_save_LIBS
-fi
-echo "$as_me:$LINENO: result: $ac_cv_lib_lapack_dgbsv_" >&5
-echo "${ECHO_T}$ac_cv_lib_lapack_dgbsv_" >&6
-if test $ac_cv_lib_lapack_dgbsv_ = yes; then
-  cat >>confdefs.h <<_ACEOF
-#define HAVE_LIBLAPACK 1
-_ACEOF
-
-  LIBS="-llapack $LIBS"
+  { { echo "$as_me:$LINENO: error: LAPACK library $lapack not found" >&5
+echo "$as_me: error: LAPACK library $lapack not found" >&2;}
+   { (exit 1); exit 1; }; }
 
 fi
 
