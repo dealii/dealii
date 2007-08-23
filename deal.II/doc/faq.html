@@ -5,7 +5,7 @@
   <title>The deal.II FAQ</title>
   <link href="screen.css" rel="StyleSheet">
   <meta name="author" content="the deal.II authors <authors@dealii.org>">
-  <meta name="copyright" content="Copyright (C) 2001, 2002, 2003, 2004, 2005, 2006 by the deal.II authors">
+  <meta name="copyright" content="Copyright (C) 2001, 2002, 2003, 2004, 2005, 2006, 2007 by the deal.II authors">
   <meta name="date" content="$Date$">
   <meta name="svn_id" content="$Id$">
 </head>
@@ -27,8 +27,6 @@
   <li> <a href="#nodata">I tried to install <acronym>deal.II</acronym>
        on system X and it does not work.</a>
   <li> <a href="#compiler">How do I change the compiler?</a>
-  <li> <a href="#gcc296">I cannot compile <acronym>deal.II</acronym>
-       with gcc version 2.96!</a>
   <li> <a href="#gfortran">I cannot link with BLAS or LAPACK even if the
        libraries exist</a>
   <li> <a href="#windows">Can I use <acronym>deal.II</acronym> on a
@@ -77,88 +75,6 @@
   selecting another is simple, and described in an
   <a href="http:readme.html#choose-compiler">according
   section</a> in the <a href="http:readme.html">readme file</a>.
-  </p>
-
-
-  <a name="gcc296"></a>
-  <h3>I cannot compile <acronym>deal.II</acronym>
-  with gcc version 2.96!</h3>
-
-  <p>
-  You can't, this version of gcc simply does not work with
-  <acronym>deal.II</acronym>, or at least did not. <acronym>deal.II</acronym>
-  version 4.0 will contain fixes to allow compilation, but versions
-  up to and including 3.4 cannot be compiled with gcc 2.96. Furthermore, later
-  versions don't support this compiler any more at all, and will tell you so
-  during configuration.
-  </p>
-
-  <p>
-  gcc 2.96 was created by
-  RedHat from a snapshot somewhere between 2.95 and 3.0; it contained a large
-  number of compiler bugs, which have partly been fixed, but too many remain as
-  that we were able to make the library work with this compiler until we could
-  get hold of such a system (initially, the main development of
-  <acronym>deal.II</acronym> was done in Germany, which is SuSE country, not
-  Red Hat). Also note that version 2.96 is not an officially 
-  released version of gcc. Simply use either gcc 2.95 or 3.X. The reason we
-  finally decided not to support this compiler is that we 
-  have reports that gcc 2.96 may miscompile parts of the library, see for
-  example 
-  <a href="http://www.dealii.org/mail/msg00837.html" target="body">this
-  message</a>. We have also found that some of the example programs return
-  wrong values or go into infinite loops if compiled with this version of gcc.
-  </p>
-
-  <p>
-  RedHat provides updates to gcc version 3.0 or later, and downgrades
-  to gcc version 2.95, all of which work with <acronym>deal.II</acronym>. Red
-  Hat releases starting with version 8.0 will also be based on a different
-  compiler, so the problem does not exist there any more.
-  </p>
-  
-  <p>
-  However, there are more problems lurking around the corner: even though we
-  have included patches so that the library can be compiled, presently not all
-  of the examples can. There is at least one problem in the compiler which we
-  could not work around (I reported this to the gcc bug tracking system as
-  c++/616 in October 2000, and it was fixed a few weeks later, but apparently
-  did not make it to Red Hat's version). The problem manifests itself in
-  situations like this:
-  </p>
-  <pre>
-    template &lt;int dim&gt; struct Function {};
-    template &lt;int dim&gt; struct RHS : Function&lt;dim&gt; { RHS() {}; };
-
-    template &lt;int dim&gt; void f ()
-    {
-      const RHS&lt;dim&gt; rhs;
-    };
-    template void f&lt;1&gt; ();
-  </pre>
-   
-  <p>Here, the compiler reports</p>
-  <pre>
-    x.cc: In function `void f () [with int dim = 1]':
-    x.cc:7:   instantiated from here
-    x.cc:5: uninitialized const `rhs'
-  </pre>
-  <p>
-  which is clearly bogus since <code>rhs</code> uses the default constructor of
-  the class. Unfortunately, there is no way of working around the bug short of
-  removing the constness of the variable. We did not want to do this, since
-  this changes the semantics of the programs and is promoting bad style which
-  we do not want to do in example programs. Furthermore, since gcc 2.96 is
-  being phased out at the time of this writing, there is no point in doing this
-  any more. Therefore, we advise you to remove the constness of these variables
-  if you are forced to use this compiler and want to use the example programs,
-  or use them as the basis for your own
-  project. You can either do this by hand, or by using 
-  <a href="http://www.dealii.org/mail/msg00846.html" target="body">this
-  patch</a> that is archived in out <a
-  href="http://www.dealii.org/mail/maillist.html" target="body">mailing list
-  archives</a>. A better way is probably to up- or downgrade your compiler, if
-  this is possible for your machine.
   </p>
 
 
