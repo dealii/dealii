@@ -5205,10 +5205,11 @@ AC_DEFUN(DEAL_II_CONFIGURE_METIS, dnl
           AC_MSG_RESULT(not found)
         fi
      ])
-  if test "$USE_CONTRIB_METIS" = "yes" ; then
+  if test "x$USE_CONTRIB_METIS" = "xyes" ; then
     AC_DEFINE(DEAL_II_USE_METIS, 1,
               [Defined if a Metis installation was found and is going
                to be used])
+    LDFLAGS="$LDFLAGS -L$DEAL_II_METIS_DIR -lmetis"
 
     AC_MSG_CHECKING(for Metis version)
     DEAL_II_METIS_VERSION=`cat $DEAL_II_METIS_DIR/VERSION`
