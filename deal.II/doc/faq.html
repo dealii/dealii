@@ -27,6 +27,7 @@
   <li> <a href="#nodata">I tried to install <acronym>deal.II</acronym>
        on system X and it does not work.</a>
   <li> <a href="#compiler">How do I change the compiler?</a>
+  <li> <a href="#petsc">I am having trouble linking with PETSc!</a>
   <li> <a href="#gfortran">I cannot link with BLAS or LAPACK even if the
        libraries exist</a>
   <li> <a href="#windows">Can I use <acronym>deal.II</acronym> on a
@@ -67,9 +68,10 @@
   </p>
   </dd>
 
-
-  <a name="compiler"></a>
-  <dt>How do I change the compiler?</dt>
+  
+  <dt><a name="compiler">
+  How do I change the compiler?
+  </a></dt>
 
   <dd>
   <p>
@@ -82,10 +84,39 @@
   section</a> in the <a href="http:readme.html">readme file</a>.
   </p>
 
-
   </dd>
 
   
+  <dt><a name="petsc">
+  I am having trouble linking with PETSc!
+  </a></dt>
+
+  <dd>
+  <p>
+  Let's put it this way: the configuration of PETSc is really
+  non-trivial, and it isn't made much easier by the 
+  documentation (or lack thereof) that the library's developers
+  provide and the constant incompatible changes they make to
+  everything. We've got the interface to PETSc working pretty well on
+  many platforms, but there are cases where PETSc requires linking
+  with other libraries that the deal.II Makefiles are unaware of.
+  </p>
+
+  <p>
+  If you get linker errors about undefined symbols, try to figure out
+  which library these functions reside in. If you can't manage to get
+  this going yourself, feel free to send email to the mailing list.
+  </p>
+
+  <p>
+  In general, try to get things going first by configuring PETSc with
+  options <code>--with-shared=0 --with-mpi=0
+  --with-clanguage=C++</code> and then configuring
+  <acronym>deal.II</acronym> with the option
+  <code>--disable-shared</code>.
+  </p>
+
+
   <dt><a name="gfortran">
   I cannot link with BLAS or LAPACK even if the libraries exist
   </a></dt>
