@@ -39,7 +39,28 @@ $(LIBDIR)/base/%.$(OBJEXT) :
 	@$(CXX) $(CXXFLAGS.o) -c $< -o $@
 
 
-# rules
+# in general, when linking shared libraries, we will want to link with
+# the underlying libs as well. AIX even requires this. on the other
+# hand, on DEC OSF with CXX this will fail with duplicate symbols, so
+# make sure that it doesn't happen on that system and that compiler
+#
+# for the current directory, this is only the PETSc libraries since we
+# reference them in base/source/utilities
+ifneq ($(GXX-VERSION),compaq_cxx)
+  deplibs.g =
+  deplibs.o =
+
+  ifeq ($(USE_CONTRIB_PETSC),yes)
+    deplibs.g += $(lib-contrib-petsc.g) $(DEAL_II_PETSC_MPIUNI_LIB)
+    deplibs.o += $(lib-contrib-petsc.o) $(DEAL_II_PETSC_MPIUNI_LIB)
+  endif
+else
+  deplibs.g =
+  deplibs.o =
+endif
+
+
+# rules for libraries
 lib: $(LIBDIR)/libbase.g$(lib-suffix) $(LIBDIR)/libbase$(lib-suffix)
 libg: $(LIBDIR)/libbase.g$(lib-suffix)
 libo: $(LIBDIR)/libbase$(lib-suffix)
@@ -57,11 +78,11 @@ $(LIBDIR)/libbase.g$(static-lib-suffix): $(go-files)
 
 $(LIBDIR)/libbase$(shared-lib-suffix): $(o-files)
 	@echo "=====base=============optimized==$(MT)== Linking library:   $(@F)"
-	@$(SHLIBLD) $(LDFLAGS) $(SHLIBFLAGS) -o $@ $(o-files) $(extra-o-files)
+	@$(SHLIBLD) $(LDFLAGS) $(SHLIBFLAGS) -o $@ $(o-files) $(extra-o-files)  $(deplibs.o)
 
 $(LIBDIR)/libbase.g$(shared-lib-suffix): $(go-files)
 	@echo "=====base=============debug======$(MT)== Linking library:   $(@F)"
-	@$(SHLIBLD) $(LDFLAGS) $(SHLIBFLAGS) -o $@ $(go-files) $(extra-o-files)
+	@$(SHLIBLD) $(LDFLAGS) $(SHLIBFLAGS) -o $@ $(go-files) $(extra-o-files)  $(deplibs.g)
 
 
 
