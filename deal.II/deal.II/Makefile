@@ -81,6 +81,32 @@ $(LIBDIR)/3d/%.$(OBJEXT) :
 ifneq ($(GXX-VERSION),compaq_cxx)
   deplibs.g = $(lib-lac.g) $(lib-base.g)
   deplibs.o = $(lib-lac.o) $(lib-base.o)
+
+  # if we use HSL, then we need to link against libhsl.so.
+  ifeq ($(USE_CONTRIB_HSL),yes)
+    deplibs.g += $(lib-contrib-hsl)
+    deplibs.o += $(lib-contrib-hsl)
+  endif
+
+  # same with PETSC
+  ifeq ($(USE_CONTRIB_PETSC),yes)
+    deplibs.g += $(lib-contrib-petsc.g)
+    deplibs.o += $(lib-contrib-petsc.o)
+  endif
+
+  # and METIS
+  ifeq ($(USE_CONTRIB_METIS),yes)
+    deplibs.g += $(lib-contrib-metis)
+    deplibs.o += $(lib-contrib-metis)
+  endif
+
+  # for cygwin and darwin, also llapack and such are necessary
+  # we better link all libraries mentioned in $(LIBS)
+  ifneq ($(findstring cygwin,$(TARGET))$(findstring darwin,$(TARGET)),)
+    deplibs.g += $(LIBS)
+    deplibs.o += $(LIBS)
+  endif
+
 else
   deplibs.g =
   deplibs.o =
