@@ -66,6 +66,12 @@ ifneq ($(GXX-VERSION),compaq_cxx)
     deplibs.o += $(lib-contrib-petsc.o)
   endif
 
+  # and METIS
+  ifeq ($(USE_CONTRIB_METIS),yes)
+    deplibs.g += $(lib-contrib-metis)
+    deplibs.o += $(lib-contrib-metis)
+  endif
+
   # for cygwin and darwin, also llapack and such are necessary
   # we better link all libraries mentioned in $(LIBS)
   ifneq ($(findstring cygwin,$(TARGET))$(findstring darwin,$(TARGET)),)
