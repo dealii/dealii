@@ -31,6 +31,8 @@
        libraries exist</a>
   <li> <a href="#windows">Can I use <acronym>deal.II</acronym> on a
        Windows platform?</a>       
+  <li> <a href="#mac">Can I use <acronym>deal.II</acronym> on an
+       Apple MacIntosh?</a>       
   <li> <a href="#parallel">Does <acronym>deal.II</acronym> support parallel
        computing?</a>
   <li> <a href="#perl-bug">I can't build the online documentation under Cygwin!</a>
@@ -44,18 +46,18 @@
   <li> <a href="#problem-howto">How do I solve problem XXX with
        <acronym>deal.II</acronym>?</a>
   <li> <a href="#problem-complex">Can I solve problems over complex numbers?</a>
-  <li> <a href="#time-dependent">There is no tutorial program for
-       time-dependent problems!</a>
   <li> <a href="#contribute">I want to contribute to the development
        of <acronym>deal.II</acronym>!</a>
   </ol>
 
 
   
-  <h3><a name="nodata">
+<dl>
+  <dt><a name="nodata">
   I tried to install deal.II on system X and it does not work.
-  </a></h3>
+  </a></dt>
 
+  <dd>
   <p>
   Even if people reading this list and especially people managing this list
   belong to the most able programmers in the universe (and a decent number of
@@ -63,10 +65,13 @@
   wrong, paste the error message into your email. If appropriate, add lines
   from the file producing the error.
   </p>
+  </dd>
+
 
   <a name="compiler"></a>
-  <h3>How do I change the compiler?</h3>
+  <dt>How do I change the compiler?</dt>
 
+  <dd>
   <p>
   <acronym>deal.II</acronym> can be compiled by a number of compilers
   without problems (see the section <a
@@ -78,11 +83,14 @@
   </p>
 
 
+  </dd>
+
   
-  <h3><a name="gfortran">
+  <dt><a name="gfortran">
   I cannot link with BLAS or LAPACK even if the libraries exist
-  </a></h3>
+  </a></dt>
   
+  <dd>
   <p>This is probably due to the introduction of the new GNU FORTRAN
   Compiler <tt>gfortran</tt>. If those libraries were compiled with
   <tt>gfortran</tt> and you have the old <tt>g77</tt> installed, then
@@ -91,11 +99,14 @@
   test for BLAS to see if it complains about missing symbols
   indicating such a thing. If so, install the missing compiler.
   </p>
-  
-  <h3><a name="windows">
-  Can I use <acronym>deal.II</acronym> on a Windows platform?
-  </a></h3>
+  </dd>
 
+  
+  <dt><a name="windows">
+  Can I use <acronym>deal.II</acronym> on a Windows platform?
+  </a></dt>
+
+  <dd>
   <p>
   First the good news: yes, you can. Still, this answer needs to be
   more specific. The configuration program for
@@ -128,7 +139,7 @@
   </p>
 
 
-  <h4>Other Windows compilers</h4>
+  <h6>Other Windows compilers</h6>
   <p>
   As long as a compiler is sufficiently standards conforming, and has
   a command line interface, it may be used to compile the library. In
@@ -143,11 +154,14 @@
   </p>
 
 
-  
-  <h3><a name="perl-bug">
-  I can't build the online documentation under Cygwin!
-  </a></h3>
+  </dd>
 
+  
+  <dt><a name="perl-bug">
+  I can't build the online documentation under Cygwin!
+  </a></dt>
+
+  <dd>
   <p>
   The Perl utility from Cygwin distribution (up to version 5.6.1-2)
   contains a bug that causes a "permission denied" error with in-place
@@ -163,13 +177,16 @@
   patch to the source code of the perl utility and recompile.
   </p>
 
+  </dd>
+
   
-  <h3><a name="cygwin-shared">
+  <dt><a name="cygwin-shared">
   My program compiles and links under Cygwin, but it issues a 
   run-time error saying that <code>libXXX.DLL</code> cannot 
   be found!
-  </a></h3>
+  </a></dt>
 
+  <dd>
   <p>
   With Version 5.1.0, <acronym>deal.II</acronym> creates and uses shared 
   libraries (DLLs) under cygwin. These DLLs will be linked to your program
@@ -192,11 +209,32 @@
   </p>
 
 
-  
-  <h3><a name="parallel">
-  Does <acronym>deal.II</acronym> support parallel computing?
-  </a></h3>
+  </dd>
 
+  
+  <dt><a name="mac">
+  Can I use <acronym>deal.II</acronym> on an Apple MacIntosh?
+  </a></dt>
+
+  <dd>
+  <p>
+  Yes, at least on the more modern OS X operating systems this works
+  just fine, as long as the developer tools like the GCC compiler,
+  PERL, etc are installed. The only issue we are currently aware of is
+  that if <acronym>deal.II</acronym> is configured to interface with
+  PETSc, then PETSc needs to be configured with the
+  <code>--with-x=0</code> flag to prevent linking in the X11 libraries
+  (you probably won't need them anyway).
+  </p>
+
+  </dd>
+
+
+  <dt><a name="parallel">
+  Does <acronym>deal.II</acronym> support parallel computing?
+  </a></dt>
+
+  <dd>
   <p>
   Yes. If you use the <code>--with-multithreading
   --enable-multithreading</code> flags when you run <code>./configure</code>
@@ -234,13 +272,16 @@
   METIS, refer to the <a href="readme.html">readme file</a>.
   </p>
 
+  </dd>
+
 
   <a name="triangles"></a>
-  <h3>Can I use/implement triangles/tetrahedra in
-  <acronym>deal.II</acronym>?</h3>
+  <dt>Can I use/implement triangles/tetrahedra in
+  <acronym>deal.II</acronym>?</dt>
 
+  <dd>
   <p>
-  No, you cannot do either. The basic data structures are too much
+  No, you can't. The basic data structures are too much
   tailored to quadrilaterals and hexahedra. Implementing other cells
   amounts to re-implementing nearly all grid and DoF classes from
   scratch. On the other hand, the restriction to quadrilaterals and
@@ -249,13 +290,19 @@
   </p>
 
 
+  </dd>
+
 
   <a name="problem-types"></a>
-  <h3>Can I solve problem XXX with <acronym>deal.II</acronym>?</h3>
+  <dt>Can I solve problem XXX with <acronym>deal.II</acronym>?</dt>
 
+  <dd>
   <p>
   The simple answer is: if it can be written as a PDE, then this is
-  possible. The more complicated answer is: <acronym>deal.II</acronym>
+  possible as evidenced by the many <a
+  href="publications/toc.html">publications</a> in widely disparate
+  fields obtained with the help of <acronym>deal.II</acronym>. The
+  more complicated answer is: <acronym>deal.II</acronym> 
   is not a problem-solving environment, it is a toolbox that supports
   you in solving a PDE by the method of finite elements. You will have
   to implement assembling matrices and right hand side vectors
@@ -320,11 +367,14 @@
   project added to this page, just contact us.
   </p>
 
+  </dd>
+
 
   <a name="problem-howto"></a>
-  <h3>How do I solve problem XXX
-  with <acronym>deal.II</acronym>?</h3>
+  <dt>How do I solve problem XXX
+  with <acronym>deal.II</acronym>?</dt>
 
+  <dd>
   <p>
   There is no general rule on how to attack implementing a program to
   solve your particular problem. However, the way most often taken is
@@ -342,10 +392,13 @@
   how to program with <acronym>deal.II</acronym>.
   </p>
 
+  </dd>
+
 
   <a name="problem-complex"></a>
-  <h3>Can I solve problems over complex numbers?</h3>
+  <dt>Can I solve problems over complex numbers?</dt>
 
+  <dd>
   <p>
   Yes, you can, and it has been done numerous times with
   <acronym>deal.II</acronym>. However, we have a standard
@@ -363,51 +416,14 @@
   about which solver may be adequate for it.
   </p>
 
-
-  <a name="time-dependent"></a>
-  <h3>There is no tutorial program for
-       time-dependent problems!</h3>
-
-  <p>
-  While there are a number of projects in which deal.II is used to
-  write solvers for time-dependent problems, there is indeed no
-  tutorial program showing this. The reason for this is two-fold:
-  first, writing tutorial programs takes awfully long, on the order of
-  at least one full work week, and a time-dependent program would
-  likely be large and complex so may even take longer. These days, the
-  main authors of the library unfortunately lack the time for projects
-  of this size unless it would be directly related to one of their
-  ongoing projects, and would therefore be a side-product of what they
-  do anyway.
-  </p>
-
-  <p>
-  The second reason is that over time we have found out that there is
-  not much common ground in time-dependent solvers: most of our
-  time-dependent projects build on deal.II serve very different
-  purposes, from research into error estimators to solving actual
-  engineering problems. They may change the mesh between each
-  successive step, once in a while, or never. They may use explicit or
-  implicit time stepping schemes. Since they differ in so many
-  aspects, there are only few aspects specific to their
-  time-dependentness that can be moved to the library, and example
-  programs would be very different depending on the purpose for which
-  it was written. Furthermore, unlike most of the other tutorial
-  programs, it may not serve as a template for your own project unless
-  it happens to have the same objectives. It may therefore not be
-  terribly useful to a lot of people.
-  </p>
-
-  <p>
-  That said, if someone has a nice program to contribute as an example
-  program: we would be delighted to take it in!
-  </p>
+  </dd>
 
 
   <a name="contribute"></a>
-  <h3>I want to contribute to the development
-      of <acronym>deal.II</acronym>!</h3>
+  <dt>I want to contribute to the development
+      of <acronym>deal.II</acronym>!</dt>
 
+  <dd>
   <p>
   <acronym>deal.II</acronym> is Open Source -- this not only implies
   that you as everyone else has access to the source codes, it also
@@ -478,6 +494,9 @@
   interesting to others, there most probably is a way to get it into
   the library!
   </p>
+  </dd>
+
+</dl>
 
 </body>
 </html>
