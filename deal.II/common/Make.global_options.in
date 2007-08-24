@@ -117,7 +117,7 @@ lib-deal2-3d.g = $(LIBDIR)/libdeal_II_3d.g$(lib-suffix)
 #
 # also sort of annoying is the fact that on Mac OS X, the trick with the
 # one library doesn't appear to work. Instead of a single library, we therefore
-# have to list all of them.
+# have to list all of them, at least if we are using shared libs.
 ifeq ($(DEAL_II_PETSC_VERSION_MINOR),2)
   lib-contrib-petsc-path.g = $(DEAL_II_PETSC_DIR)/lib/libg_c++/$(DEAL_II_PETSC_ARCH)
   lib-contrib-petsc-path.o = $(DEAL_II_PETSC_DIR)/lib/libO_c++/$(DEAL_II_PETSC_ARCH)
@@ -129,8 +129,13 @@ ifeq ($(findstring darwin,$(TARGET)),)
   lib-contrib-petsc.g = $(LIBDIR)/libpetscall.g$(lib-suffix)
   lib-contrib-petsc.o = $(LIBDIR)/libpetscall$(lib-suffix)
 else
-  lib-contrib-petsc.g = $(shell echo $(DEAL_II_PETSC_DIR)/lib/$(DEAL_II_PETSC_ARCH)/*$(lib-suffix))
-  lib-contrib-petsc.o = $(shell echo $(DEAL_II_PETSC_DIR)/lib/$(DEAL_II_PETSC_ARCH)/*$(lib-suffix))
+  ifeq ($(enable-shared),yes)
+    lib-contrib-petsc.g = $(shell echo $(DEAL_II_PETSC_DIR)/lib/$(DEAL_II_PETSC_ARCH)/*$(lib-suffix))
+    lib-contrib-petsc.o = $(shell echo $(DEAL_II_PETSC_DIR)/lib/$(DEAL_II_PETSC_ARCH)/*$(lib-suffix))
+  else
+    lib-contrib-petsc.g = $(LIBDIR)/libpetscall.g$(lib-suffix)
+    lib-contrib-petsc.o = $(LIBDIR)/libpetscall$(lib-suffix)
+  endif
 endif  
 
 
