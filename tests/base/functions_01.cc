@@ -106,7 +106,14 @@ check_function(const Functions::FlowFunction<dim>& f,
   for (unsigned int i=0;i<values.size();++i)
     for (unsigned int j=0;j<values[i].size();++j)
       {
-	patches[0].data(j, i) = values[i](j);
+					 // generate data, but
+					 // truncate too small values
+					 // to avoid output that
+					 // depends on round-off
+	if (std::fabs (values[i](j)) > 1e-10)
+	  patches[0].data(j, i) = values[i](j);
+	else
+	  patches[0].data(j, i) = 0;
 	Assert (values[i](j) == values2[j][i], ExcInternalError());
       }
   
