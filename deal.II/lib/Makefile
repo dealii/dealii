@@ -71,7 +71,11 @@ ifeq ($(enable-shared),yes)
 
 else
 
-  external-links-petsc: libpetscall.g$(static-lib-suffix) libpetscall$(static-lib-suffix)
+  # make static libraries. ensure that they are built one after the other because
+  # both create temporary files with the same name
+  external-links-petsc: 
+	@$(MAKE) libpetscall.g$(static-lib-suffix)
+	@$(MAKE) libpetscall$(static-lib-suffix)
 
   # As I don't know how to merge archives, here's a workaround: Extract each of
   # the archives and append the object files to the libpetsc archive. Do the
