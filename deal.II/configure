@@ -10232,6 +10232,16 @@ echo "${ECHO_T}F77 compiler is gcc-4.0" >&6
 echo "${ECHO_T}F77 compiler is gcc-4.1" >&6
   	  F77_VERSION=gcc4.1
   	  ;;
+        *4.2*)
+  	  echo "$as_me:$LINENO: result: F77 compiler is gcc-4.2" >&5
+echo "${ECHO_T}F77 compiler is gcc-4.2" >&6
+  	  F77_VERSION=gcc4.2
+  	  ;;
+        *4.3*)
+  	  echo "$as_me:$LINENO: result: F77 compiler is gcc-4.3" >&5
+echo "${ECHO_T}F77 compiler is gcc-4.3" >&6
+  	  F77_VERSION=gcc4.3
+  	  ;;
         *2.4* | *2.5* | *2.6* | *2.7* | *2.8*)
   	    	  	  	  	    	  echo "$as_me:$LINENO: result: F77 compiler is $G77_VERSION_STRING" >&5
 echo "${ECHO_T}F77 compiler is $G77_VERSION_STRING" >&6
