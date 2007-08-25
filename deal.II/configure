@@ -11177,32 +11177,6 @@ if test `eval echo '${'$as_ac_Lib'}'` = yes; then
 _ACEOF
 
 
-else
-
-  { { echo "$as_me:$LINENO: error: Configuring BLAS library failed although it was requested.
-  Most common is one of the following reasons:
-    1. A library with name lib$blas.a or lib$blas.so is not in your library path.
-    2. Neither -lgfortran nor -lg2c is in \$F77LIBS.
-    3. BLAS requires -lg2c, but only -lgfortran was found.
-    4. BLAS requires -lgfortran, but only -lg2c was found.
-
-  In cases 2-4, you may not have the right version of GNU FORTRAN installed
-  (<g2c> is the GNU F77 support library, <gfortran> the library for the
-  GNU Fortran95 compiler shipped since gcc 4.0) or BLAS has to be recompiled.
-" >&5
-echo "$as_me: error: Configuring BLAS library failed although it was requested.
-  Most common is one of the following reasons:
-    1. A library with name lib$blas.a or lib$blas.so is not in your library path.
-    2. Neither -lgfortran nor -lg2c is in \$F77LIBS.
-    3. BLAS requires -lg2c, but only -lgfortran was found.
-    4. BLAS requires -lgfortran, but only -lg2c was found.
-
-  In cases 2-4, you may not have the right version of GNU FORTRAN installed
-  (<g2c> is the GNU F77 support library, <gfortran> the library for the
-  GNU Fortran95 compiler shipped since gcc 4.0) or BLAS has to be recompiled.
-" >&2;}
-   { (exit 1); exit 1; }; }
-
 fi
 
     NEEDS_F77LIBS="yes"

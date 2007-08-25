@@ -5298,8 +5298,7 @@ AC_DEFUN(DEAL_II_WITH_BLAS, dnl
                  [ 
                    LIBS="-l$blas $LIBS"
                    AC_DEFINE(HAVE_LIBBLAS)
-                 ],
-                 [ABORT_BLAS_ON_ERROR($blas)],$F77LIBS)
+                 ],,$F77LIBS)
     AC_SUBST(NEEDS_F77LIBS, "yes")
   fi
 ])
