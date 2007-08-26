@@ -2,7 +2,7 @@
 //    $Id$
 //    Version: $Name$
 //
-//    Copyright (C) 2006 by the deal.II authors
+//    Copyright (C) 2006, 2007 by the deal.II authors
 //
 //    This file is subject to QPL and may not be  distributed
 //    without copyright and license information. Please refer
@@ -104,10 +104,22 @@ namespace deal_II_numbers {
 
 				             /**
 				              * Return @p true if the given
-				              * value is a finite floating point
-				              * number, i.e. is neither plus or
-				              * minus infinity nor NaN (not a
-				              * number).
+				              * value is a finite floating
+				              * point number, i.e. is neither
+				              * plus or minus infinity nor NaN
+				              * (not a number).
+					      *
+					      * Note that the argument type of
+					      * this function is
+					      * <code>double</code>. In other
+					      * words, if you give a very
+					      * large number of type
+					      * <code>long double</code>, this
+					      * function may return
+					      * <code>false</code> even if the
+					      * number is finite with respect
+					      * to type <code>long
+					      * double</code>.
 				              */
   bool is_finite (const double x);
 }
