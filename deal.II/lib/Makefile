@@ -82,6 +82,7 @@ else
   # same for debug and optimized mode.
   libpetscall.g$(static-lib-suffix): $(xlib.g)
 	@echo "======================debug============= Linking library:   libpetscall.g$(static-lib-suffix)"
+	@rm -f $@
 	@rm -rf .ar_tmp
 	@mkdir .ar_tmp; cd .ar_tmp; \
 	 for arfile in $(xlib.g) ; do \
@@ -95,6 +96,7 @@ else
 
   libpetscall$(static-lib-suffix): $(xlib.o)
 	@echo "======================optimized========= Linking library:   libpetscall$(static-lib-suffix)"
+	@rm -f $@
 	@rm -rf .ar_tmp
 	@mkdir .ar_tmp; cd .ar_tmp; \
 	 for arfile in $(xlib.o) ; do \
