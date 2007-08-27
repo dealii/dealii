@@ -321,7 +321,7 @@ void DataOutBase::DXFlags::declare_parameters (ParameterHandler &prm)
 
 
 
-void DataOutBase::DXFlags::parse_parameters (ParameterHandler &prm)
+void DataOutBase::DXFlags::parse_parameters (const ParameterHandler &prm)
 {
   write_neighbors = prm.get_bool ("Write neighbors");
 //TODO:[GK] Read the new  parameters
@@ -352,7 +352,7 @@ void DataOutBase::UcdFlags::declare_parameters (ParameterHandler &prm)
 
 
 
-void DataOutBase::UcdFlags::parse_parameters (ParameterHandler &prm)
+void DataOutBase::UcdFlags::parse_parameters (const ParameterHandler &prm)
 {
   write_preamble = prm.get_bool ("Write preamble");
 }
@@ -373,7 +373,7 @@ void DataOutBase::GnuplotFlags::declare_parameters (ParameterHandler &/*prm*/)
 
 
 
-void DataOutBase::GnuplotFlags::parse_parameters (ParameterHandler &/*prm*/)
+void DataOutBase::GnuplotFlags::parse_parameters (const ParameterHandler &/*prm*/)
 {}
 
 
@@ -407,7 +407,7 @@ void DataOutBase::PovrayFlags::declare_parameters (ParameterHandler &prm)
 
 
 
-void DataOutBase::PovrayFlags::parse_parameters (ParameterHandler &prm)
+void DataOutBase::PovrayFlags::parse_parameters (const ParameterHandler &prm)
 {
   smooth        = prm.get_bool ("Use smooth triangles");
   bicubic_patch = prm.get_bool ("Use bicubic patches");
@@ -630,7 +630,7 @@ void DataOutBase::EpsFlags::declare_parameters (ParameterHandler &prm)
 
 
 
-void DataOutBase::EpsFlags::parse_parameters (ParameterHandler &prm)
+void DataOutBase::EpsFlags::parse_parameters (const ParameterHandler &prm)
 {
   height_vector = prm.get_integer ("Index of vector for height");
   color_vector  = prm.get_integer ("Index of vector for color");
@@ -682,7 +682,7 @@ void DataOutBase::GmvFlags::declare_parameters (ParameterHandler &/*prm*/)
 
 
 
-void DataOutBase::GmvFlags::parse_parameters (ParameterHandler &/*prm*/)
+void DataOutBase::GmvFlags::parse_parameters (const ParameterHandler &/*prm*/)
 {}
 
 
@@ -709,7 +709,7 @@ void DataOutBase::TecplotFlags::declare_parameters (ParameterHandler &/*prm*/)
 
 
 
-void DataOutBase::TecplotFlags::parse_parameters (ParameterHandler &/*prm*/)
+void DataOutBase::TecplotFlags::parse_parameters (const ParameterHandler &/*prm*/)
 {}
 
 
@@ -728,7 +728,7 @@ void DataOutBase::VtkFlags::declare_parameters (ParameterHandler &/*prm*/)
 
 
 
-void DataOutBase::VtkFlags::parse_parameters (ParameterHandler &/*prm*/)
+void DataOutBase::VtkFlags::parse_parameters (const ParameterHandler &/*prm*/)
 {}
 
 
@@ -747,7 +747,7 @@ void DataOutBase::Deal_II_IntermediateFlags::declare_parameters (ParameterHandle
 
 
 
-void DataOutBase::Deal_II_IntermediateFlags::parse_parameters (ParameterHandler &/*prm*/)
+void DataOutBase::Deal_II_IntermediateFlags::parse_parameters (const ParameterHandler &/*prm*/)
 {}
 
 

@@ -492,7 +492,7 @@ class DataOutBase
 					  * The flags thus obtained overwrite
 					  * all previous contents of this object.
 					  */
-	void parse_parameters (ParameterHandler &prm);
+	void parse_parameters (const ParameterHandler &prm);
 
 					 /**
 					  * Determine an estimate for
@@ -547,7 +547,7 @@ class DataOutBase
 					  * The flags thus obtained overwrite
 					  * all previous contents of this object.
 					  */
-	void parse_parameters (ParameterHandler &prm);
+	void parse_parameters (const ParameterHandler &prm);
 
 					 /**
 					  * Determine an estimate for
@@ -605,7 +605,7 @@ class DataOutBase
 					  * The flags thus obtained overwrite
 					  * all previous contents of this object.
 					  */
-	void parse_parameters (ParameterHandler &prm);
+	void parse_parameters (const ParameterHandler &prm);
 
 					 /**
 					  * Determine an estimate for
@@ -686,7 +686,7 @@ class DataOutBase
 					  * The flags thus obtained overwrite
 					  * all previous contents of this object.
 					  */
-	void parse_parameters (ParameterHandler &prm);
+	void parse_parameters (const ParameterHandler &prm);
 
 					 /**
 					  * Determine an estimate for
@@ -1017,7 +1017,7 @@ class DataOutBase
 					  * The flags thus obtained overwrite
 					  * all previous contents of this object.
 					  */
-	void parse_parameters (ParameterHandler &prm);
+	void parse_parameters (const ParameterHandler &prm);
 
 					 /**
 					  * Determine an estimate for
@@ -1081,7 +1081,7 @@ class DataOutBase
 					  * The flags thus obtained overwrite
 					  * all previous contents of this object.
 					  */
-	void parse_parameters (ParameterHandler &prm);
+	void parse_parameters (const ParameterHandler &prm);
 
 					 /**
 					  * Determine an estimate for
@@ -1146,7 +1146,7 @@ class DataOutBase
 					  * The flags thus obtained overwrite
 					  * all previous contents of this object.
 					  */
-	void parse_parameters (ParameterHandler &prm);
+	void parse_parameters (const ParameterHandler &prm);
 
 					 /**
 					  * Determine an estimate for
@@ -1205,7 +1205,7 @@ class DataOutBase
 					  * The flags thus obtained overwrite
 					  * all previous contents of this object.
 					  */
-	void parse_parameters (ParameterHandler &prm);
+	void parse_parameters (const ParameterHandler &prm);
 
 					 /**
 					  * Determine an estimate for
@@ -1281,7 +1281,7 @@ class DataOutBase
 					  * The flags thus obtained overwrite
 					  * all previous contents of this object.
 					  */
-	void parse_parameters (ParameterHandler &prm);
+	void parse_parameters (const ParameterHandler &prm);
 
 					 /**
 					  * Determine an estimate for
