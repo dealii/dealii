@@ -56,6 +56,7 @@ $hierarchy{"x86_64-unknown-linux-gnu+gcc4.3"} = "x86_64-unknown-linux-gnu+gcc4.2
 $hierarchy{"x86_64-unknown-linux-gnu+icc9"} = "x86_64-unknown-linux-gnu+gcc3.3";
 $hierarchy{"x86_64-unknown-linux-gnu+icc10"} = "x86_64-unknown-linux-gnu+icc9";
 
+$hierarchy{"powerpc-apple-darwin8.8.0+gcc4.0"} = "generic";
 $hierarchy{"powerpc-apple-darwin8.10.0+gcc4.0"} = "powerpc-apple-darwin8.8.0+gcc4.0";
 
 $configuration = $ARGV[0];
