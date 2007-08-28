@@ -2,7 +2,7 @@
 //    $Id$
 //    Version: $Name$
 //
-//    Copyright (C) 1999, 2000, 2001, 2002, 2003, 2004, 2005, 2006 by the deal.II authors
+//    Copyright (C) 1999, 2000, 2001, 2002, 2003, 2004, 2005, 2006, 2007 by the deal.II authors
 //
 //    This file is subject to QPL and may not be  distributed
 //    without copyright and license information. Please refer
@@ -409,19 +409,41 @@ void DataOut<dim,DH>::build_some_patches (Data &data)
 
   const unsigned int n_q_points = patch_points.n_quadrature_points;
   
-  typename std::vector< dealii::DataOutBase::Patch<DH::dimension> >::iterator patch = this->patches.begin();
+  typename std::vector< dealii::DataOutBase::Patch<DH::dimension> >::iterator
+    patch = this->patches.begin();
   cell_iterator cell=first_cell();
+
+				   // keep track of the index of the
+				   // current cell so we can
+				   // efficiently evaluate cell-based
+				   // data (as opposed to DoF-based
+				   // data). we do so only if
+				   // this->cell_data.size() != 0
+  unsigned int cell_index = (this->cell_data.size() != 0
+			     ?
+			     std::distance (this->dofs->begin_active(),
+					    active_cell_iterator (cell))
+			     :
+			     deal_II_numbers::invalid_unsigned_int);
+  
   
 				   // get first cell in this thread
   for (unsigned int i=0; (i<data.this_thread)&&(cell != this->dofs->end()); ++i)
     {
       ++patch;
+
+      const cell_iterator old_cell = cell;
+      
       cell = next_cell(cell);
+
+      if (this->cell_data.size() != 0)
+	cell_index += std::distance (active_cell_iterator(old_cell),
+				     active_cell_iterator(cell));
     }
 
   				   // now loop over all cells and
 				   // actually create the patches
-  for (;cell != this->dofs->end();)
+  for (; cell != this->dofs->end();)
     {
       Assert (patch != this->patches.end(), ExcInternalError());
 
@@ -483,8 +505,8 @@ void DataOut<dim,DH>::build_some_patches (Data &data)
 		    for (unsigned int q=0; q<n_q_points; ++q)
 		      patch->data(dataset*data.n_components+component,q) =
 			data.patch_values_system[q](component);
-		};
-	    };
+		}
+	    }
 
 					   // then do the cell data. only
 					   // compute the number of a cell if
@@ -495,15 +517,11 @@ void DataOut<dim,DH>::build_some_patches (Data &data)
           if (this->cell_data.size() != 0)
             {
               Assert (!cell->has_children(), ExcNotImplemented());
-//TODO: This introduces a quadratic component into the algorithm. We may be doing better if we always kept track of the cell_number when 'cell' is increased, but we have to make sure that we only do this if cell_number is actually used, since we don't want to enforce the activeness constraints otherwise
-              const unsigned int cell_number
-                = std::distance (this->dofs->begin_active(),
-                                 active_cell_iterator (cell));
               
               for (unsigned int dataset=0; dataset<this->cell_data.size(); ++dataset)
                 {
                   const double value
-                    = this->cell_data[dataset]->get_cell_data_value (cell_number);
+                    = this->cell_data[dataset]->get_cell_data_value (cell_index);
                   for (unsigned int q=0; q<n_q_points; ++q)
                     patch->data(dataset+this->dof_data.size()*data.n_components,q) =
                       value;
@@ -564,7 +582,7 @@ void DataOut<dim,DH>::build_some_patches (Data &data)
                                            // for the neighbor index
           patch->neighbors[f] = this->patches[(*data.cell_to_patch_index_map)
 					     [neighbor->level()][neighbor->index()]].patch_index;
-        };
+        }
       
       				       // next cell (patch) in this
       				       // thread
@@ -572,7 +590,14 @@ void DataOut<dim,DH>::build_some_patches (Data &data)
 	   (i<data.n_threads)&&(cell != this->dofs->end()); ++i)
 	{
 	  ++patch;
+
+	  const cell_iterator old_cell = cell;
+	  
           cell = next_cell(cell);
+
+	  if (this->cell_data.size() != 0)
+	    cell_index += std::distance (active_cell_iterator(old_cell),
+					 active_cell_iterator(cell));
 	}
     }
 }

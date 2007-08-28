@@ -1115,6 +1115,16 @@ inconvenience this causes.
 <h3>deal.II</h3>
 
 <ol>
+   <li> <p>Fixed: the function
+       <code>DataOut::build_patches</code> 
+       had a quadratic algorithm when generatic cell-data (as opposed
+       to DoF data). This algorithm became a bottleneck when
+       generating output on meshes with large number of cells. This is
+       now fixed.
+       <br>
+       (WB 2007/08/28)
+       </p>
+
    <li> <p>New: the function
        <code>DoFTools::get_active_fe_indices</code> 
        extracts for each cell the active finite element index used on it.
