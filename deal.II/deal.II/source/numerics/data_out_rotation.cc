@@ -2,7 +2,7 @@
 //    $Id$
 //    Version: $Name$
 //
-//    Copyright (C) 2000, 2001, 2002, 2003, 2004, 2005, 2006 by the deal.II authors
+//    Copyright (C) 2000, 2001, 2002, 2003, 2004, 2005, 2006, 2007 by the deal.II authors
 //
 //    This file is subject to QPL and may not be  distributed
 //    without copyright and license information. Please refer
@@ -33,6 +33,11 @@ DEAL_II_NAMESPACE_OPEN
 
 //TODO: Update documentation
 //TODO: Unify code for dimensions
+
+
+//TODO: build_some_patches isn't going to work if first_cell/next_cell
+//don't iterate over all cells and if cell data is requested. in that
+//case, we need to calculate cell_number as in the DataOut class
 
 // Not implemented for 3D
 
