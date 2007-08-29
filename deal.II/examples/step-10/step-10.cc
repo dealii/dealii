@@ -4,7 +4,7 @@
 /*    $Id$       */
 /*    Version: $Name$                                          */
 /*                                                                */
-/*    Copyright (C) 2001, 2002, 2003, 2004, 2006 by the deal.II authors */
+/*    Copyright (C) 2001, 2002, 2003, 2004, 2006, 2007 by the deal.II authors */
 /*                                                                */
 /*    This file is subject to QPL and may not be  distributed     */
 /*    without copyright and license information. Please refer     */
@@ -44,15 +44,15 @@
 using namespace dealii;
 
 				 // Now, as we want to compute the
-				 // value of pi, we have to compare to
+				 // value of $\pi$, we have to compare to
 				 // somewhat. These are the first few
-				 // digits of pi, which we define
+				 // digits of $\pi$, which we define
 				 // beforehand for later use. Since we
 				 // would like to compute the
 				 // difference between two numbers
 				 // which are quite accurate, with the
 				 // accuracy of the computed
-				 // approximation to pi being in the
+				 // approximation to $\pi$ being in the
 				 // range of the number of digits
 				 // which a double variable can hold,
 				 // we rather declare the reference
@@ -260,21 +260,22 @@ void gnuplot_output()
 
 				 // Now we proceed with the main part
 				 // of the code, the approximation of
-				 // pi. The area of a circle is given
-				 // by pi*radius^2, so having a circle
-				 // of radius 1, the area represents
-				 // just the number that is searched
-				 // for. The numerical computation of
-				 // the area is performed by
-				 // integrating the constant function
-				 // of value 1 over the whole
-				 // computational domain, i.e. by
-				 // computing the areas $\int_K 1
-				 // dx=\int_{\hat K} 1\ \textrm{det}\ J(\hat x)
-				 // d\hat x \approx \sum_i \textrm{det}\ J(\hat
-				 // x_i)w(\hat x_i)$, where the sum
-				 // extends over all quadrature points
-				 // on all active cells in the
+				 // $\pi$. The area of a circle is of
+				 // course given by $\pi r^2$, so
+				 // having a circle of radius 1, the
+				 // area represents just the number
+				 // that is searched for. The
+				 // numerical computation of the area
+				 // is performed by integrating the
+				 // constant function of value 1 over
+				 // the whole computational domain,
+				 // i.e. by computing the areas
+				 // $\int_K 1 dx=\int_{\hat K} 1\
+				 // \textrm{det}\ J(\hat x) d\hat x
+				 // \approx \sum_i \textrm{det}\
+				 // J(\hat x_i)w(\hat x_i)$, where the
+				 // sum extends over all quadrature
+				 // points on all active cells in the
 				 // triangulation, with $w(x_i)$ being
 				 // the weight of quadrature point
 				 // $x_i$. The integrals on each cell
@@ -420,13 +421,13 @@ void compute_pi_by_area ()
 				       // ConvergenceTable class to
 				       // store all important data
 				       // like the approximated values
-				       // for pi and the error with
+				       // for $\pi$ and the error with
 				       // respect to the true value of
-				       // pi. We will also use
+				       // $\pi$. We will also use
 				       // functions provided by the
 				       // ConvergenceTable class to
 				       // compute convergence rates of
-				       // the approximations to pi.
+				       // the approximations to $\pi$.
       ConvergenceTable table;
 
 				       // Now we loop over several
@@ -536,9 +537,9 @@ void compute_pi_by_area ()
 
 
 				 // The following, second function also
-				 // computes an approximation of pi
+				 // computes an approximation of $\pi$
 				 // but this time via the perimeter
-				 // 2*pi*radius of the domain instead
+				 // $2\pi r$ of the domain instead
 				 // of the area. This function is only
 				 // a variation of the previous
 				 // function. So we will mainly give
