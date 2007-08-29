@@ -429,12 +429,26 @@ fi
 dnl Likewise, if we use PETSc and link statically, we have to add blas to the
 dnl linker line (if we use shared libs, then the PETSc libs already carry this
 dnl dependence, but static archives do not have a method to list dependencies)
+dnl
+dnl On Mac OS X, when using PETSc, it appears as if we always need to link with
+dnl blas and lapack, independently of whether we use static or shared libs
 if test "x$with_petsc" != "x" -a "x$with_petsc" != "xno" ; then
   if test "x$enableshared" = "xno" ; then
     if test "x$with_blas" = "x" -o "x$with_blas" = "xno"; then
       with_blas="yes"
     fi
   fi
+
+  case "$target" in
+    *-apple-darwin* )
+	if test "x$with_blas" = "x" -o "x$with_blas" = "xno"; then
+          with_blas="yes"
+        fi
+	if test "x$with_lapack" = "x" -o "x$with_lapack" = "xno"; then
+          with_lapack="yes"
+        fi
+	;;
+  esac
 fi
 
 dnl -------------------------------------------------------------
