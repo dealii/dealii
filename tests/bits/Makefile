@@ -34,12 +34,14 @@ tests_x = grid_generator_?? \
 	  fe_tools_[0-9]* \
 	  fe_tools_cpfqpm* \
 	  fe_face_to_cell_index \
+	  fe_field_function \
           anna_? \
 	  gerold_1 \
 	  roy_1 \
           denis_1 \
 	  unit_support_points \
 	  parameter_handler_* \
+	  parsed_function \
 	  sparse_lu_decomposition_1 \
 	  block_sparse_matrix_* \
 	  block_vector_* \

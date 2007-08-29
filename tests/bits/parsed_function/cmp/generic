@@ -1,0 +1,22 @@
+
+DEAL::Tested on: 
+DEAL:parameters:Function 1 - 0::Function constants: f=1
+DEAL:parameters:Function 1 - 0::Function expression: cos(pi*f*x)*t
+DEAL:parameters:Function 1 - 0::Variable names: x,t
+DEAL::Tested on: 
+DEAL:parameters:Function 2 - 0::Function constants: f=1
+DEAL:parameters:Function 2 - 0::Function expression: cos(pi*f*x)*t
+DEAL:parameters:Function 2 - 0::Variable names: x,y,t
+DEAL:parameters:Function 2 - 1::Function constants: f=2
+DEAL:parameters:Function 2 - 1::Function expression: cos(pi*f*x)*t; cos(pi*f*y)*t
+DEAL:parameters:Function 2 - 1::Variable names: x,y,t
+DEAL::Tested on: 
+DEAL:parameters:Function 3 - 0::Function constants: f=1
+DEAL:parameters:Function 3 - 0::Function expression: cos(pi*f*x)*t
+DEAL:parameters:Function 3 - 0::Variable names: x,y,z,t
+DEAL:parameters:Function 3 - 1::Function constants: f=2
+DEAL:parameters:Function 3 - 1::Function expression: cos(pi*f*x)*t; cos(pi*f*y)*t
+DEAL:parameters:Function 3 - 1::Variable names: x,y,z,t
+DEAL:parameters:Function 3 - 2::Function constants: f=3
+DEAL:parameters:Function 3 - 2::Function expression: cos(pi*f*x)*t; cos(pi*f*y)*t; cos(pi*f*z)*t
+DEAL:parameters:Function 3 - 2::Variable names: x,y,z,t
