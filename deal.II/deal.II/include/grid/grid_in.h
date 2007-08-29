@@ -119,10 +119,13 @@ class SubCellData;
  * can read in several example files. If the reader does not grok your files,
  * it should be fairly simple to extend it.
  *
- * <li> <tt>Gmsh mesh</tt> format: this format is used by the @p GMSH
- * mesh generator (see http://www.geuz.org/gmsh/ ). The documentation
- * in the @p GMSH manual explains how to generate meshes compatible with
- * the deal.II library (i.e. quads rather than triangles).
+ * <li> <tt>Gmsh 1.0 mesh</tt> format: this format is used by the @p
+ * GMSH mesh generator (see http://www.geuz.org/gmsh/ ). The
+ * documentation in the @p GMSH manual explains how to generate meshes
+ * compatible with the deal.II library (i.e. quads rather than
+ * triangles). In order to use this format, Gmsh has to output the
+ * file in the old format 1.0. This is done adding the line
+ * "Mesh.MshFileVersion = 1" to the input file.
  *
  * <li> <tt>Tecplot</tt> format: this format is used by @p TECPLOT and often
  * serves as a basis for data exchange between different applications. Note,
@@ -133,7 +136,7 @@ class SubCellData;
  * Cubit at this time. However, Cubit can export in UCD format using a simple
  * plugin, and the resulting UCD file can then be read by this class. The
  * plugin script can be found on the deal.II wiki page,
- * http://www-dimat.unipv.it/heltai/wikideal/index.php/Main_Page, in the
+ * http://www-dimat.unipv.it/heltai/wikideal/, in the
  * section on external tools.
  * </ul>
  *
@@ -193,7 +196,7 @@ class SubCellData;
  *
  * @ingroup grid
  * @ingroup input
- * @author Wolfgang Bangerth, 1998, 2000, Luca Heltai, 2004
+ * @author Wolfgang Bangerth, 1998, 2000, Luca Heltai, 2004, 2007
  */
 template <int dim>
 class GridIn

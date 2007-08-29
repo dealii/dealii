@@ -45,7 +45,7 @@ template <typename number> class SparseMatrix;
  *
  * @ingroup grid
  * @author Wolfgang Bangerth, Ralf Hartmann, Guido Kanschat, Stefan
- * Nauber, Joerg Weimar, Yaqi Wang, 1998, 1999, 2000, 2001, 2002,
+ * Nauber, Joerg Weimar, Yaqi Wang, Luca Heltai, 1998, 1999, 2000, 2001, 2002,
  * 2003, 2006, 2007.
  */
 class GridGenerator

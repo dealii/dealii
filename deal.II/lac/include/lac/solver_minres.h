@@ -53,7 +53,7 @@ DEAL_II_NAMESPACE_OPEN
  * The full text can be found at
  * <tt>http://scholar.lib.vt.edu/theses/public/etd-12164379662151/etd-title.html</tt>
  *
- * @author Thomas Richter, 2000
+ * @author Thomas Richter, 2000, Luca Heltai, 2006
  */
 template <class VECTOR = Vector<double> >
 class SolverMinRes : public Solver<VECTOR>
