@@ -2,7 +2,7 @@
 //    $Id$
 //    Version: $Name$
 //
-//    Copyright (C) 2005, 2006 by the deal.II authors
+//    Copyright (C) 2005, 2006, 2007 by the deal.II authors
 //
 //    This file is subject to QPL and may not be  distributed
 //    without copyright and license information. Please refer
@@ -12,10 +12,10 @@
 //-------------------------------------------------------------------------
 
 /**
- * @defgroup Quadrature Quadrature formulæ
+ * @defgroup Quadrature Quadrature formulas
  *
  * This module contains the base class Quadrature as well as the quadrature
- * formulæ provided by deal.II. Quadrature formulas provide two essential
+ * formulas provided by deal.II. Quadrature formulas provide two essential
  * pieces of data: the locations of quadrature points on the unit cell
  * [0,1]^d, and the weight of each quadrature point.
  *
@@ -73,10 +73,10 @@
  *
  * <h3>QAnisotropic</h3>
  *
- * While the usual quadrature formulæ of higher dimensions
+ * While the usual quadrature formulas of higher dimensions
  * generate tensor products which are equal in each direction, the
  * class QAnisotropic generates tensor products of possibly different
- * formulæ in each direction.
+ * formulas in each direction.
  *
  *
  * <h3>QProjector</h3>
