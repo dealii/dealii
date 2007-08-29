@@ -1,4 +1,4 @@
-<a name="Results"></a> <h1>Results</h1>
+<h1>Results</h1>
 The explicit Euler time stepping scheme  ($\theta=0$) performs adequately for the problems we wish to solve. Unfortunately, a rather small time step has to be chosen due to stability issues --- $k\sim h/10$ appears to work for most the simulations we performed. On the other hand, the Crank-Nicolson scheme ($\theta=\frac{1}{2}$) is unconditionally stable, and (at least for the case of the 1D breather) we can pick the time step to be as large as $25h$ without any ill effects on the solution. The implicit Euler scheme ($\theta=1$) is "exponentially damped," so it is not a good choice for solving the sine-Gordon equation, which is conservative. However, some of the damped schemes in the continuum that is offered by the $\theta$-method were useful for eliminating spurious oscillations due to boundary effects.
 
 In the simulations below, we solve the sine-Gordon equation on the interval $\Omega =
