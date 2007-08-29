@@ -25,7 +25,8 @@
 
 DEAL_II_NAMESPACE_OPEN
 
-namespace Functions {
+namespace Functions
+{
 
   template class FEFieldFunction<deal_II_dimension, 
 				 DoFHandler<deal_II_dimension>, 
@@ -40,8 +41,8 @@ namespace Functions {
 				 Vector<double> >;
 
   template class FEFieldFunction<deal_II_dimension, 
-			       MGDoFHandler<deal_II_dimension>, 
-			       BlockVector<double> >;
+				 MGDoFHandler<deal_II_dimension>, 
+				 BlockVector<double> >;
 
 #ifdef DEAL_II_USE_PETSC
 
@@ -50,27 +51,19 @@ namespace Functions {
 				 PETScWrappers::Vector >;
 
   template class FEFieldFunction<deal_II_dimension, 
-			       DoFHandler<deal_II_dimension>, 
-			       PETScWrappers::BlockVector >;
+				 DoFHandler<deal_II_dimension>, 
+				 PETScWrappers::BlockVector >;
 
   template class FEFieldFunction<deal_II_dimension, 
 				 MGDoFHandler<deal_II_dimension>, 
 				 PETScWrappers::Vector >;
 
   template class FEFieldFunction<deal_II_dimension, 
-			       MGDoFHandler<deal_II_dimension>, 
-			       PETScWrappers::BlockVector >;
+				 MGDoFHandler<deal_II_dimension>, 
+				 PETScWrappers::BlockVector >;
 
 #endif
   
-//   template class FEFieldFunction<deal_II_dimension, 
-// 				 DoFHandler<deal_II_dimension>, 
-// 				 Vector<double> >;
-
-//   template class FEFieldFunction<deal_II_dimension, 
-// 				 DoFHandler<deal_II_dimension>, 
-// 				 BlockVector<double> >;
-
 }
 
 DEAL_II_NAMESPACE_CLOSE
