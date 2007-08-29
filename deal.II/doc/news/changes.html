@@ -481,6 +481,13 @@ inconvenience this causes.
 
 <ol>
 
+  <li> <p> New: There is a new class:
+       <code>Functions::FEFieldFunction</code> which is a Function
+       interface to a finite element solution. 
+       <br> 
+       (Luca Heltai 2007/08/29)
+
+  
   <li> <p> Improved: <code class="class">FunctionDerivative</code> is now
   derived from <code class="class">AutoDerivativeFunction</code> and implements
   gradients as well, giving you automatic second derivatives of a function.
@@ -1115,6 +1122,12 @@ inconvenience this causes.
 <h3>deal.II</h3>
 
 <ol>
+  <li> <p> New: There is a new class:
+       <code>Functions::ParsedFunction</code> which is friendly
+       wrapper to the <code>FunctionParser</code> class.
+       <br> 
+       (Luca Heltai 2007/08/29)
+  
    <li> <p>Fixed: the function
        <code>DataOut::build_patches</code> 
        had a quadratic algorithm when generatic cell-data (as opposed
