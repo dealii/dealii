@@ -24,9 +24,13 @@
       <li> <a href="#prerequisites">System requirements</a>
       <li> <a href="#installation">Installation</a>
       <li> <a href="#configuration-options">Configuration options</a>
-      <li> <a href="#compiler-flags">Compiler flags</a>
-      <li> <a href="#external-libs">Using third-party libraries and
-             subroutines</a>
+         <ul>
+	 <li> <a href="#choose-compiler">Changing the compiler or
+               compiler flags</a>
+	 <li> <a href="#optional">Selecting optional behavior</a>
+	 <li> <a href="#optional-software">Optional interfaces to
+      other software packages</a>
+	 </ul>
       <li> <a href="#problems">Problems, questions, mailing lists</a>
       <li> <a href="#license">License</a>
     </ul>
@@ -109,31 +113,20 @@
     libraries you need to have the following programs installed:
     <ul>
       <li> <p>
-           A fairly complete C++ compiler. We usually use 
-           <a href="http://gcc.gnu.org" target="_top">gcc3.x or
-           4.x</a> but also some others. Various working compilers 
+           A fairly complete C++ compiler. Various working compilers 
            are listed above. We do not support gcc versions older than
-           3.2 any more at this time. Except for the most recent versions, Sun 
-           Workshop C++ and Sun Forte C++ will not work since they only
-           supports a limited subset of C++. The most recent versions of
-	   IBM C Set++ should work. The SGI MIPSpro
-           compiler 7.3 or earlier will not work since it is not C++
-           standard conforming. The MIPSpro compiler 7.4 will also not
-           work since it is still too buggy.
-	   </p>
-
-	   <p>
-           We are interested in writing portable C++, so if you find
+           3.2 any more at this time.
+           Note that we are interested in writing portable C++, so if you find
            something that does not work with your compiler, we are
            likely to accept patches.
 	   </p>
 
       <li> <p>
-           Perl: any Perl 5.x version should work.
+           Perl: Any Perl 5.x version should work.
 	   </p>
 
       <li> <p> 
-           Make: we use <a href="http://www.gnu.org"
+           Make: We use <a href="http://www.gnu.org"
            target="_top">GNU make</a>, version 3.78 or later which also
            has rather good support for parallel builds, so you may
            want to consider this version if you have a multiprocessor
@@ -150,20 +143,14 @@
       <li> <p>
            For debugging programs, we have found that the
 	   <a href="http://www.gnu.org" target="_top">GNU
-	   debugger gdb</a> is a valuable tool. However, it is noted
-           that gdb 4.18 is quite broken with respect to debugging C++
-           programs. A better choice is to use the older version 4.17
-           which works well, or 5.0 or later. If you want to debug
-           multithreaded programs, you may want to use gdb 5.0 or
-           later, since gdb 4.17 did not support multiple threads too
-           well.
+	   debugger gdb</a> is a valuable tool.
 	   </p>
 
       <li> <p>
            In case you want to generate the documentation from the
            header files, you need a copy of <a href="http://www.doxygen.org/"
-           target="_top">doxygen</a> on your machine (we use 
-           version 1.4.1, later versions will presumably work as well). If you
+           target="_top">doxygen</a> on your machine. Versions 1.4.6
+           and later are known to work. If you
            have this program, you can generate all the documentation on
 	   your local machine. If not, you can still work with the library and
 	   use the documentation provided on our homepage for reference. Note
@@ -243,6 +230,7 @@
     <pre><code>
          ./configure
     </code></pre>
+    in the top-level directory,
     which sets some paths and finds out what compiler you
     use. ./configure supports several flags which are discussed
     further down <a href="#configuration-options">below</a>. 
@@ -299,73 +287,67 @@
     </code></pre>
 
     <p>
-    To execute one of the commands, type `make target-name'. Please
-    note that building all libraries in debug and optimized mode
-    presently takes about three hours on a Sun Ultra 450 (with 250 MHz),
-    or about half an hour on a Pentium IV 1000 Mhz, so you may want to do
-    this during lunchtime or night. Also, note that building all
-    libraries requires 200-400 MB of free disk space (depending on
-    platform).
-    </p>
-
-    <p>
-    In case you have a multi-processor machine, you can call `make -j4
+    To execute one of the commands, type `make target-name'. Building
+    all libraries takes somewhere between 10 minutes and 1 hour,
+    depending on your machine and requires 200-400 MB of free disk
+    space. If you have a multi-processor machine, you can call `make -j4
     target-name' to let `make' call multiple instances of the compiler
-    (in this case four). Since the make files are written in a way to
-    minimize cross-dependencies, this speeds up compilation by about
+    (in this case four). This speeds up compilation by about
     the factor given after `-j', at least if you have as many
-    processors. Note, however, that parallel makes will sometimes fail
-    when compiling the library for the very first time (this is due to a
-    bug in `make'); in that case, simply re-run `make', or run it
-    without `-jN'.
+    processors.
     </p>
 
     <p>
     After `make' has finished, you will have two sets of
     libraries. The first consists of the files
     <ul>
-      <li> <p><code>lib/libbase.a</code>: The library containing the
+      <li> <p><code>lib/libbase</code>: The library containing the
       code of the classes in the <code>/base</code> directory. These
       are mostly helper classes (such as output of various data in
       different data formats), and classes of general numerical
-      interest (such as classes representing functions, tensors,
-      etc.), but not very specifically about finite elements.
+      interest (functions, tensors, etc.). 
       </p>
 
-      <li> <p><code>lib/liblac.a</code>: <code>lac</code> is the
+      <li> <p><code>lib/liblac</code>: <code>lac</code> is the
       acronym for <i>L</i>inear <i>A</i>lgebra <i>C</i>lasses. This
       library contains classes representing vectors, matrices, sparse
       matrices, linear solvers, and the like.
       </p>
 
-      <li> <p><code>lib/libdeal_II_2d.a</code>: This is the
+      <li> <p><code>lib/libdeal_II_2d</code>: This is the
       library containing all the classes representing finite element
-      methods, such as grid handling, different finite elements,
+      methods, grid handling, different finite elements,
       etc. Thus suffix <code>_2d</code> obviously indicates that this
       particularly library was compiled for two spatial dimensions,
       but if you told `make' to do so, there will also be libraries
       for one and three spatial dimensions.
       </p>
     </ul>
+    Each library file will have a suffix that depends on the system.
+    If static libraries were requested during
+    configuration, then the suffix is <code>.a</code>. For shared
+    libraries, it is <code>.so</code> (for most Unix-like and Linux
+    systems), <code>.dylib</code> (for Mac OS X), or <code>.dll</code>
+    (for Cygwin/Windows).
     </p>
 
     <p>
-    For each library, there will also be another library with the
-    suffix <code>.g.a</code> instead of <code>.a</code>. The
+    For each library, there will also be another one with an 
+    infix <code>.g</code> between library name and suffix. The
     difference between the two sets of libraries is the following:
     <ul>
       <li>
       <p>
-      The <code>.g.a</code> versions contain debugging
-      information. In fact the <code>.g</code> reminds us of the fact
-      that gcc is called using the option <code>-g</code> to include
-      debugging information into its output.
+      The <code>.g</code> versions contain debugging
+      information (the infix <code>.g</code> was historically chosen
+      because gcc uses the flag <code>-g</code> to request
+      debugging information).
       </p>
 
       <p>
-      Besides the debugging output the compiler puts into the output,
-      the library contains a great number of assertions (presently
-      about 3700) checking the validity of parameters to functions and
+      In addition, the <code>.g</code> libraries
+      contain a large number of assertions (presently
+      about 5000) checking the validity of parameters to functions and
       internal states. These assertions have proven to be an
       invaluable means to finding programming bugs since they will
       almost always abort your program if something goes wrong. In our
@@ -383,10 +365,10 @@
 
       <li>
       <p>
-      The <code>.a</code> libraries do not contain debugging
-      information nor the assertions. For these reasons, they are much
+      The libraries without the <code>.g</code> infix do not contain
+      neither debugging information nor assertions. They are therefore much 
       smaller and your program will run significantly faster (the
-      performance penalty of the <code>.g.a</code> libraries is
+      performance penalty of the <code>.g</code> libraries is
       between a factor of two and four, depending on which parts of
       the libraries you use). Furthermore, these libraries are
       compiled with optimization options of the compiler.
@@ -397,43 +379,29 @@
       they run stable and are used in production mode.
       </p>
     </ul>
-    If shared libraries were built instead of static ones, then the
-    suffix <code>.a</code> is replaced by <code>.so</code> or
-    <code>.dll</code> (for Cygwin/Windows).
+    
     </p>
 
     <p>
     Apart from the libraries, you should generate the full set of
     documentation files, by typing `make online-doc'; this takes some
-    minutes since quite a lot of information is generated and
-    transformed in various ways, but this way, you
-    have (almost) all the documentation locally on your computer and
-    need not use the <acronym>deal.II</acronym> homepage in
-    Heidelberg. You can access all documentation through <a
-    href="documentation.html" target="body">this page</a>. (For
-    obvious reasons, the only document that you don't have locally is
-    the News page, and a few of the pages in the "Development"
-    section, as they are re-generated nightly and carry the present
-    development status of the library, rather than the status of the
-    particular version of the library you have on your harddisk. Also, the page
-    listing presentations on <acronym>deal.II</acronym> is not available
-    locally since the presentations are just too big to be included in the
-    distribution. You can access these non-local pages through the 
-    <a href="http://www.dealii.org" target="_top">global 
-    homepage</a>.)
+    minutes but you will
+    have (almost) all the documentation locally on your computer. You
+    can access all documentation through <a 
+    href="documentation.html" target="body">this page</a>.
     </p>
+
 
 
     <a name="configuration-options"></a>
     <h3>Configuration options</h3>
 
     <a name="choose-compiler"></a></a>
-    <h4>Changing the compiler</h4>
+    <h4>Changing the compiler or compiler flags</h4>
 
     If <code>configure</code> uses a wrong compiler, there are two
     options: first, you can prepend your search path by the directory
-    of the desired compiler. If you do not want to do this (and there
-    are reasons), try the following: If your full compiler paths are
+    of the desired compiler. Alternatively, if your full compiler paths are
     <tt>mycc</tt> and <tt>myc++</tt> for your C and C++ compilers,
     respectively, type into your <tt>csh</tt>:
     <pre>
@@ -457,8 +425,22 @@
     purposes).
     </p>
 
+    <p>
+    If all you want to do is pass different compiler flags to the
+    compiler, set the standard environment variables <code>CXXFLAGS,
+    CFLAGS, LDFLAGS</code> before calling
+    <code>./configure</code>. For example, to produce
+    <code>gprof</code> output, do:
+    <pre>
+      setenv CXXFLAGS -pg
+      setenv LDFLAGS -pg
+      configure &lt;configure-options&gt;
+    </pre>
 
-    <h4>Selecting optional behavior</h4>
+
+    <a name="optional">
+    <h4>Selecting optional behavior</h4></a>
+
     You can give several flags to ./configure:
     <ul>
     <li>
@@ -466,93 +448,27 @@
       <code>--enable-shared</code>: Compile the files of deal.II into
       shared libraries, rather than statically linked
       libraries. Enabling this option saves disk space, link time and
-      start-up time, so this is the default. However, some systems
+      start-up time, so this is the default. Some systems
       might not support shared libraries, in which case you should
       call ./configure with the parameter
-      <code>--disable-shared</code>. (They are disabled by default on
-      those systems for which we could not make them work. This
-      applies to AIX, DEC Alpha stations running Linux and OSF1,
-      and some other systems as
-      well. Probably, there are simple solutions, but since we can't
-      regularly test on these systems, we did not try very hard. If
-      anyone would like to look into this, we would be pleased to
-      offer advice.)
-      </p>
-
-      <p>
-      It is important to note that the actual size of the executable
-      program in memory will be larger than when linked statically,
-      since the dynamic linker does not remove symbols which are not
-      used, in contrast to the static linker. Therefore, more main
-      memory will be used when running your applications, but link
-      time is significantly reduced.      
+      <code>--disable-shared</code>.
       </p>
 
     <li>
       <p>
-      <code>--enable-multithreading</code>: This sets compiler
-      variables such that the resulting program supports
-      multi-threading. Basically, for this, different system include
-      files have to be selected (gcc option -threads) and memory
-      allocation has to be made thread-safe; the latter can be done
-      for the C++ standard containers in gcc versions prior to 3.0 by
-      defining <code>-D__USE_MALLOC</code>. Note also that 
-      gcc's runtime library was not thread-safe prior to gcc 3.x
-      unless you configured gcc 
-      with <code>--enable-threads</code> and recompiled it. Using a gcc
-      that was not configured with this option may lead to errors in
-      your threaded programs that are extremely hard to find. Newer
-      versions of gcc and their standard libraries are thread-safe by 
-      default.
-      </p>
+      <code>--enable-multithreading --with-multithreading</code>: The
+      first of these flags instructs the compiler to generate code
+      that can be run from multiple threads. The second switches on
+      code in the library that actually creates multiple threads for
+      some tasks, making programs significantly faster on machines
+      with multiple cores or processors.
 
     <li>
       <p>
-      <code>--with-multithreading=name</code>: enabling
-      multi-threading as shown above does not enable multi-threading
-      inside the library itself, it just sets the compiler flags to make
-      the generated code thread-safe. However, there are many places in the
-      library and example programs
-      where multi-threading can be used, and you can switch to
-      multi-threading using this configure option.
-      </p>
-
-      <p>
-      We used to support two different ways to achieve multi-threading in a
-      cross-platform way, which were selected by the argument given to
-      <code>--with-multithreading=name</code>. Since after
-      <acronym>deal.II</acronym> version 3.4 we dropped support for 
-      the <a href="http://www.cs.wustl.edu/~schmidt/ACE.html"
-      target="_top">ACE (Adaptive Communications Environment)</a>
-      library for cross-platform portability, there remains only one valid
-      value for this option:
-      <ul>
-        <li> <code>name=posix</code>: use POSIX functions to start threads and
-	to implement mutex, condition variable, and barrier
-        data structures. Most systems today support POSIX, so this
-        should be fairly portable.
-      </ul>
-      If no argument is given to <code>--with-multithreading</code>, then 
-      POSIX is assumed. In other words, giving any particular value to this
-      flag is redundant. However, you still need to give this flag (with or
-      without value) upon configuration if you want to use multithreading.
-      </p>
-
-      <p>
-      Note that the library tries to detect the number of processors
-      in your system in multi-threaded mode, to determine a default
-      number of threads to start in some situations. We presently
-      support this detection only on Linux, Solaris, OSF, and SGI
-      systems.
-      </p>
-
-    <li>
-      <p>
-      <code>--with-cpu=...</code>: this enables specific optimization
-      flags for your processor. Programs compiled with these options
-      might not execute on an other system, even if that system has a very
-      similar CPU (e.g. AMD and Intel processors). However, execution speed
-      can be increased by up to 30 percent if this optimization is enabled.
+      <code>--with-cpu=...</code>: Enable specific optimization
+      flags for a particular processor. Programs compiled with these options
+      might not execute on an other system, but will be faster by up to
+      30 percent on the CPU selected.
       </p>
 
       <p>
@@ -574,39 +490,10 @@
 
     <li>
       <p>
-      <code>--with-doxygen=...</code>: usually, <code>./configure</code> is
-      able to figure out the path to the doxygen program by itself. However,
-      if you have multiple versions installed and want to select a specific
-      one, then you may want to specify path and filename to this version by
-      using the <code>--with-doxygen</code> flag.
-      </p>
-
-    <li>
-      <p>
-      <code>--enable-compat-blocker=...</code>: the library offers
-      various functions that maintain compatibility with older
-      versions of <acronym>deal.II</acronym>, for example many
-      functions that assume that the mapping between unit and real
-      cell is a (bi-, tri-)linear one. There are respective functions
-      that take a mapping object, and the compatibility functions
-      simply call these with a Q1 mapping object.
-      </p>
-      
-      <p>
-      When converting old programs, and also sometimes with new
-      programs, you may want to make sure that these compatibility
-      functions are not called, to ensure that the mapping taken is
-      always the same. In that case, you can configure the library
-      with the flag
-      <code>--enable-compat-blocker=mapping</code>. After
-      recompilation of the library, each access to these functions is
-      blocked, and an exception is thrown.
-      </p>  
-
-      <p>
-      In later versions of the library, other compatibility blockers
-      will be implemented as well, as we extend the functionality of
-      the library.
+      <code>--with-doxygen=...</code>: Select the specified executable
+      of <code>doxygen</code> over the one automatically found by
+      <code>./configure</code>. May also be used if no
+      <code>doxygen</code> can be found automatically.
       </p>
     </ul>
 
@@ -615,18 +502,9 @@
     programs, such as the compilers or the Perl interpreter. The
     compiler which will be used when compiling the library (or your
     own application) is therefore selected at the time of
-    configuration and independent of the present setting of your $PATH
-    environment value. The reason for this is that presently there are
-    still too many incompatibilities between different versions of
-    compilers and that compiling different parts of programs with
-    different compilers often leads to hard-to-find problems. By
-    storing the absolute paths of compilers, we can at least catch
-    those problems where different compiler revisions are located in
-    different directories.
-    </p>
-
-    <p>
-    If you want to use a new compiler version, you will therefore have
+    configuration and independent of the setting of your $PATH
+    environment value at the time when you run <code>make</code>. If
+    you want to change the compiler used, you will therefore have
     to re-run ./configure with the new compiler being in the $PATH
     environment variable.
     </p>
@@ -640,7 +518,7 @@
 
 
     <a name="optional-software"></a>
-    <h4>Optional Software Support</h4>
+    <h4>Optional interfaces to other software packages</h4>
 
     <p> <acronym>deal.II</acronym> comes with built-in support for a
     number of external software packages. These packages are
@@ -661,11 +539,13 @@
 
     <a name="umfpack"></a>
     <dt>UMFPACK</dt>
-    <dd>Enabled by <tt>--with-umfpack</tt>. Right now, only the included
-    version in the contrib directory is supported, but pre-installed versions
-    will be supported soon by using an argument to this option. Enabling
-    UMFPACK adds the class <tt>SparseDirectUMFPACK</tt> to the library.
-    Implies <tt>--with-blas</tt>.
+    <dd>Enabled by <tt>--with-umfpack</tt>. If no argument is given,
+    use the version of UMFPACK that comes bundled with deal.II. If you
+    want a different version of UMFPACK, provide the path to that
+    version as an argument. Enabling
+    UMFPACK adds the class <tt>SparseDirectUMFPACK</tt> to the
+    library. The default is to not use UMFPACK.
+
     <p>
     Note that UMFPACK has its own license; if
     you want to use it with deal.II, please read it and make sure that you
@@ -676,93 +556,7 @@
     </dd>
 
     <dt>Petsc</dt>
-    <dd></dd>
-
-    <dt>Metis</dt>
-    <dd></dd>
-
-    <dt>BLAS</dt>
-    <dd>Enabled by <tt>--with-blas=blasname</tt>. Requires
-    <tt>libblasname.a/so</tt> in your linkers seach path. It will add the
-    library and required FORTRAN libraries to the linker calls. BLAS
-    subroutines are not used within <acronym>deal.II</acronym>.
-     </dd>
-
-    <dt>NetCDF</dt>
-    <dd>Autodetected if the <tt>NETCDF_DIR</tt> environment variable
-    points to a valid installation of the <a
-    href="http://www.unidata.ucar.edu/software/netcdf/">NetCDF</a>
-    library. Can also be enabled by
-    <tt>--with-netcdf=/path/to/netcdf</tt> which overrides the path in
-    <tt>$NETCDF_DIR</tt>. If enabled, allows grid input in NetCDF
-    format (GridIn::read_netcdf).
-    </dd>
-
-    </dl>
-
-    <a name="compiler-flags"></a>
-    <h3>Compiler flags</h3>
-
-    <p>
-    Not all C++ compilers are created equal, and some might need you to provide
-    special options. We have tried to automatize this process using the
-    ./configure script as far as we could. If you nevertheless need
-    additional flags, try the following two ways:
-    </p>
-
-    <ul>
-    <li> <p>
-    Set environment variables before configuring. If you want to add
-    a flag to produce <code>gprof</code> output, for instance, configure
-    the package using the following command sequence:
-    <pre>
-      setenv CXXFLAGS -pg
-      setenv LDFLAGS -pg
-      configure &lt;configure-options&gt;
-    </pre>
-    These are the commands for <tt>csh</tt>. They have to be changed
-    accordingly for <tt>bash</tt>
-    </p>
-
-    <li> 
-    <p>
-    If that does not work, edit the file
-    common/Make.global_options.in and rerun ./configure in the
-    top-level directory, or change the file 
-    common/Make.global_options, which is what ./configure generates
-    out of common/Make.global_options.in.
-    </p>
-    </ul>
-
-    <p>
-    The first method is preferred, since it will be easier to
-    incorporate it into the configuration script later. Furthermore,
-    your version of <acronym>deal.II</acronym> will not be changed
-    from the original.
-    </p>
-
-    <p>
-    We would like to hear about necessary or useful modifications so
-    that we can include them into the distribution. If you feel that
-    certain flags should be included always (for example because this
-    results in significantly better optimizations), then it might be
-    interesting to modify the <code>aclocal.m4</code> file in the
-    top-level directory and send us your changes.
-    </p>
-
-
-    <a name="external-libs"></a>
-    <h2>Using third-party libraries and subroutines</h2>
-
-    <p>
-    <acronym>deal.II</acronym> is able to interface some external 
-    libraries and subroutines for special purposes inside the library
-    or application programs built on
-    <acronym>deal.II</acronym>. Presently supported are the following:
-
-    <ul>
-      <li>
-      <p>
+    <dd>
       <acronym>deal.II</acronym> can interface to the <a
       href="http://www.mcs.anl.gov/petsc/" target="_top">PETSc</a>
       library. PETSc's main strength is to provide lots of functions for
@@ -807,29 +601,26 @@
       </p>
 
       <p>
-      Note that in order to use PETSc with <acronym>deal.II</acronym>, you
-      need to have at least PETSc version 2.2.0 installed. Version 2.1.6 may
-      work in most cases, but you will get some (harmless) warnings during
-      compilation. Also, during testing with this version, we discovered a
-      serious bug in PETSc's TCQMR linear solver which basically renders it
-      useless. All these problems have been reported and are
-      fixed in 2.2.0. Versions prior to 2.1.6 are likely not to work, but have
-      not been tested. While deal.II 5.0.0 could not be linked against PETSc
-      2.2.1 (which came out after our version 5.0.0 and had a number of
-      incompatible interface changes), later versions of
-      <acronym>deal.II</acronym> have workarounds for PETSc
-      2.2.1. <acronym>deal.II</acronym> version 6.0 has been tested up to PETSc
-      release 2.3.3-p4.
+      Note that in order to use PETSc with <acronym>deal.II</acronym>
+      with the current version of <acronym>deal.II</acronym>, you
+      need to have at least PETSc version 2.3.1
+      installed. <acronym>deal.II</acronym> version 6.0 has been
+      tested up to PETSc release 2.3.3-p4.
       </p>
 
       <p>
       Installing both PETSc and deal.II together can be a bit of a challenge. A
-      good summary of the relevant steps can be found <a
-      href="http://ganymed.iwr.uni-heidelberg.de/pipermail/dealii/2007/001820.html">on this posting to the mailing list</a>.
+      good summary of the relevant steps can be found on the <a
+      href="http://www-dimat.unipv.it/heltai/wikideal/index.php/Deal.II_Questions_and_Answers"
+      target="_top">Frequently Asked Questions page</a>, as well as
+      <a
+      href="http://ganymed.iwr.uni-heidelberg.de/pipermail/dealii/2007/001820.html">in
+      this posting to the mailing list</a>. 
       </p>
+    </dd>
 
-
-      <li>
+    <dt>Metis</dt>
+    <dd>
       <p>
       In order to generate partitionings of triangulations, we have functions
       that call <a href="http://www-users.cs.umn.edu/~karypis/metis/index.html"
@@ -870,35 +661,42 @@
       not need these function declarations itself, just removing their
       declarations should not be a problem.
       </p>
+    </dd>
+
+    <dt>BLAS, LAPACK</dt>
+    <dd>If <code>--with-blas=blasname</code> and/or
+    <code>--with-lapack=lapackname</code> is given, provide wrappers
+    around some of the BLAS and LAPACK functions, and link with the
+    respective libraries. It will make sure that we link with the
+    required FORTRAN libraries. If no argument is given to
+    <code>--with-blas</code>, then a BLAS library is searched for in
+    the default locations of your system, and similarly for LAPACK.
+    </dd>
+
+    <dt>NetCDF</dt>
+    <dd>Autodetected if the <tt>NETCDF_DIR</tt> environment variable
+    points to a valid installation of the <a
+    href="http://www.unidata.ucar.edu/software/netcdf/">NetCDF</a>
+    library. Can also be enabled by
+    <tt>--with-netcdf=/path/to/netcdf</tt> which overrides the path in
+    <tt>$NETCDF_DIR</tt>. If enabled, allows grid input in NetCDF
+    format (GridIn::read_netcdf).
+    </dd>
 
 
-      <li>
-      <p>
+    <dt>Harwell Subroutine Library (HSL)</dt>
+    <dd>
       It is possible to use some subroutines from the
       <a href="http://www.cse.clrc.ac.uk/Activity/HSL"
       target="_top">Harwell Subroutine Library (HSL)</a> to make use
       of some sparse direct solvers. For a description of how to
       include these functions, see
       <a href="external-libs/hsl.html" target="body">this page</a>.
-      </p>
-      
-      <li>
-      <p>
-      Deal.II supports writing <a href="http://www.amtec.com">Tecplot</a>
-      binary files directly. For this feature to work properly be sure that the
-      environment variable TECHOME points to a valid Tecplot installation and that
-      the files $TECHOME/include/TECIO.h and $TECHOME/lib/tecio.a exist.
-      </p>
+    </dd>
 
-      <li>
-      <p>
-      Deal.II comes with its own copy of the <a
-      href="http://www.cise.ufl.edu/research/sparse/umfpack/">UMFPACK</a>
-      library. In order to use it, follow the steps listed <a
-      href="#umfpack">here</a>.
-      </p>
-      
-      <li>
+
+    <dt>FunctionParser</dt>
+    <dd>
       There is a wrapper for the 
       <a href="http://www.students.tut.fi/~warp/FunctionParser/">FunctionParser</a>
       library, which  has its own license; if you want to use it with deal.II, 
@@ -907,10 +705,10 @@
       <a href="http://www.students.tut.fi/~warp/FunctionParser/">here</a>. We
       include FunctionParser in the deal.II distributions courtesy of its author, 
       <a href="http://www.students.tut.fi/~warp/">Juha Nieminen</a>.
-      </p>
+    </dd>    
+    
 
-    </ul>
-    </p>
+    </dl>
 
 
     <a name="problems"></a>
