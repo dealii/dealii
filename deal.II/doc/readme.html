@@ -114,34 +114,16 @@
     <ul>
       <li> <p>
            A fairly complete C++ compiler. We usually use 
-           <a href="http://gcc.gnu.org" target="_top">gcc3.x</a> but also some
-	   others. Various working compilers 
-           are listed above. egcs1.x and older gcc versions will not
-           work, however. For gcc 2.96, see the <a href="faq.html#gcc296"
-           target="body">Frequently Asked Questions</a>. Also, Sun 
-           Workshop C++ 5.0 will not work since it does not support
-           template member functions, Sun Forte C++ 5.5 will not work since it
-           does not understand a number of other advanced template features,
-	   and IBM C Set++ 3.0 will not
-           work since they only have non-ISO header file names (with
-           appended .h. Version 5.0 does not work since they do not
-           allow the declaration of explicit specializations and a
-           larger number of other techniques that are used in the
-           library, see the link in the list above. The SGI MIPSpro
+           <a href="http://gcc.gnu.org" target="_top">gcc3.x or
+           4.x</a> but also some others. Various working compilers 
+           are listed above. We do not support gcc versions older than
+           3.2 any more at this time. Except for the most recent versions, Sun 
+           Workshop C++ and Sun Forte C++ will not work since they only
+           supports a limited subset of C++. The most recent versions of
+	   IBM C Set++ should work. The SGI MIPSpro
            compiler 7.3 or earlier will not work since it is not C++
            standard conforming. The MIPSpro compiler 7.4 will also not
            work since it is still too buggy.
-	   </p>
-
-	   <p>
-	   Note that we have supported egcs 1.1.x in previous releases
-           of the library (up to <acronym>deal.II</acronym> 3.0.x),
-           but due to some missing feature in the support of Standard
-           C++, we now only support later versions of gcc for releases
-           of <acronym>deal.II</acronym> after version 3.0.x. Beyond
-           that, we frequently compile <acronym>deal.II</acronym> with
-           newer gcc snapshots, to ensure that the library will
-           compile with upcoming releases.
 	   </p>
 
 	   <p>
@@ -941,7 +923,7 @@
     the library may be found on the
     <a href="http://www.dealii.org" target="_top">homepage of
     <acronym>deal.II</acronym></a>, or in the
-    <a href="faq.html" target="body">Frequently Asked Questions</a> section.
+    <a href="http://www-dimat.unipv.it/heltai/wikideal/index.php/Deal.II_Questions_and_Answers" target="_top">Frequently Asked Questions</a> section.
     If you don't find anything there,
     feel free to ask if you have any problems with deal.II. If a
     question is of general interest, you may want to use our mailing list,
