@@ -525,6 +525,13 @@ AC_ARG_WITH(lapack,
                           argument is given, use -llapack. Default is not to
                           use -llapack.],
   DEAL_II_WITH_LAPACK($withval))
+
+dnl Finally check if BLAS is really there. We have to do it this way, since
+dnl MAC OSX links BLAS functions in a different way
+if test "x$with_ blas" != "x" -a "x$with_blas" != "xno" ; then
+  AC_CHECK_FUNC(daxpy_,,[AC_MSG_ERROR([BLAS library not installed correctly])])
+fi
+
 AC_CHECK_FUNCS([dgemv_ sgemv_ dgeev_ sgeev_ dgeevx_ sgeevx_ dgesvd_ sgesvd_])
 AC_CHECK_FUNCS([dgetrf_ sgetrf_ dgetrs_ sgetrs_ dstev_ sstev_])
 
