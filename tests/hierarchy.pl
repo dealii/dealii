@@ -59,6 +59,11 @@ $hierarchy{"x86_64-unknown-linux-gnu+icc10"} = "x86_64-unknown-linux-gnu+icc9";
 $hierarchy{"powerpc-apple-darwin8.8.0+gcc4.0"} = "generic";
 $hierarchy{"powerpc-apple-darwin8.10.0+gcc4.0"} = "powerpc-apple-darwin8.8.0+gcc4.0";
 
+# derive mac os x from mac os x because they use the same random number
+# generator
+$hierarchy{"i386-apple-darwin8.10.1+gcc4.0"}  = "powerpc-apple-darwin8.10.0+gcc4.0";
+
+
 $configuration = $ARGV[0];
 
 # first check whether the given configuration is known at all. if not,
