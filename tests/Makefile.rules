@@ -1,7 +1,7 @@
 ######################################################################
 # Makefile.rules,v 1.11 2001/04/24 13:18:09 wolf Exp
 #
-# Copyright (C) 2001, 2002, 2003, 2004, 2005, 2006, the deal.II authors
+# Copyright (C) 2001, 2002, 2003, 2004, 2005, 2006, 2007, the deal.II authors
 #
 # Common make rules for test files. To be included by the Makefiles
 # in the subdirectories.
@@ -143,7 +143,7 @@ endif
 ############################################################
 report:
 	@-$(MAKE) -k run-tests
-	@svn info $D | grep '^Revision'
+	@-svn info $D | grep '^Revision'
 	@echo 'Date: ' `date -u +"%Y %j  %F  %U-%w"`
 	@echo 'Id: ' $(ID)
 	@for test in $(sort $(tests)) ; do \
