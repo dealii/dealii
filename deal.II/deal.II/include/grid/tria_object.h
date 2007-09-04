@@ -105,20 +105,10 @@ namespace internal
                                           */
         int faces[GeometryInfo<structdim>::faces_per_cell];
     };
-
-				     /**
-				      * Legacy typedef.
-				      */
+//TODO: Remove these after 08/2008
+    
     typedef TriaObject<1> Line;
-
-				     /**
-				      * Legacy typedef.
-				      */
     typedef TriaObject<2> Quad;
-
-				     /**
-				      * Legacy typedef.
-				      */
     typedef TriaObject<3> Hexahedron;
 
 //----------------------------------------------------------------------//
