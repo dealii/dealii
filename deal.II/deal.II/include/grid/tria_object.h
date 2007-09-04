@@ -100,18 +100,25 @@ namespace internal
 	
       protected:
                                          /**
-                                          *  Global indices of the two end points.
+                                          *  Global indices of the two end
+                                          *  points.
                                           */
         int faces[GeometryInfo<structdim>::faces_per_cell];
     };
 
-				     /// Legacy typedef
+				     /**
+				      * Legacy typedef.
+				      */
     typedef TriaObject<1> Line;
 
-				     /// Legacy typedef
+				     /**
+				      * Legacy typedef.
+				      */
     typedef TriaObject<2> Quad;
 
-				     /// Legacy typedef
+				     /**
+				      * Legacy typedef.
+				      */
     typedef TriaObject<3> Hexahedron;
 
 //----------------------------------------------------------------------//
