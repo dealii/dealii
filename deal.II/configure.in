@@ -528,8 +528,8 @@ AC_ARG_WITH(lapack,
 
 dnl Finally check if BLAS is really there. We have to do it this way, since
 dnl MAC OSX links BLAS functions in a different way
-if test "x$with_ blas" != "x" -a "x$with_blas" != "xno" ; then
-  AC_CHECK_FUNC(daxpy_,,[AC_MSG_ERROR([BLAS library not installed correctly])])
+if test "x$with_blas" != "x" -a "x$with_blas" != "xno" ; then
+  AC_CHECK_FUNC(daxpy_,,[AC_MSG_ERROR([BLAS library not installed correctly($with_blas)])])
 fi
 
 AC_CHECK_FUNCS([dgemv_ sgemv_ dgeev_ sgeev_ dgeevx_ sgeevx_ dgesvd_ sgesvd_])
