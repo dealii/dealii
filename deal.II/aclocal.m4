@@ -640,6 +640,9 @@ AC_DEFUN(DEAL_II_SET_CXX_FLAGS, dnl
           dnl autovectorizer (to make things simpler, one of the two options
           dnl wants a space between option and level, whereas the other does
           dnl not)
+	  dnl
+	  dnl Since only the x86 and x86_64 compilers can vectorize, this
+	  dnl flag needs to be suppressed on ia64 (itanium)
     	  case "$GXX_VERSION" in
 	    intel_icc5)
               ;;
@@ -647,7 +650,14 @@ AC_DEFUN(DEAL_II_SET_CXX_FLAGS, dnl
               CXXFLAGSO="$CXXFLAGSO -opt_report_levelmin"
               ;;
 	    *)
-              CXXFLAGSO="$CXXFLAGSO -opt-report 0 -vec-report0"
+	      case "$target" in
+		*ia64*)
+              	    CXXFLAGSO="$CXXFLAGSO -opt-report 0"
+		    ;;
+		*)
+              	    CXXFLAGSO="$CXXFLAGSO -opt-report 0 -vec-report0"
+		    ;;
+	      esac
 	      ;;
           esac
 
