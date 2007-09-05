@@ -350,7 +350,7 @@ GridGenerator::subdivided_hyper_cube (Triangulation<dim> &tria,
 	      cells[c].material_id = 0;
 	    }
 	break;
-//TODO: Make sure this is correct!	
+
       case 3:
 	cells.resize (repetitions*repetitions*repetitions);
 	for (unsigned int z=0; z<repetitions; ++z)
