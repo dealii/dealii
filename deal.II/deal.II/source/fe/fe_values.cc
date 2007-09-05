@@ -2,7 +2,7 @@
 //    $Id$
 //    Version: $Name$
 //
-//    Copyright (C) 1998, 1999, 2000, 2001, 2002, 2003, 2004, 2005, 2006 by the deal.II authors
+//    Copyright (C) 1998, 1999, 2000, 2001, 2002, 2003, 2004, 2005, 2006, 2007 by the deal.II authors
 //
 //    This file is subject to QPL and may not be  distributed
 //    without copyright and license information. Please refer
@@ -1421,9 +1421,6 @@ void FEFaceValues<dim>::reinit (const typename DoFHandler<dim>::cell_iterator &c
 
 
 
-//TODO:[?] Change for real hp::DoFHandler
-// Probably the first assertion has to be changed, when the real hp::DoFHandler
-// is available.
 template <int dim>
 void FEFaceValues<dim>::reinit (const typename hp::DoFHandler<dim>::cell_iterator &cell,
 				const unsigned int              face_no)
@@ -1658,9 +1655,7 @@ void FESubfaceValues<dim>::reinit (const typename DoFHandler<dim>::cell_iterator
 }
 
 
-//TODO:[?] Change for real hp::DoFHandler
-// Probably the first assertion has to be changed, when the real hp::DoFHandler
-// is available.
+
 template <int dim>
 void FESubfaceValues<dim>::reinit (const typename hp::DoFHandler<dim>::cell_iterator &cell,
 				   const unsigned int         face_no,
