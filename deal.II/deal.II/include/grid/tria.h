@@ -2716,16 +2716,21 @@ class Triangulation : public Subscriptor
 
 				     /**
 				      *  Return total number of used faces,
-				      *  active or not.
-				      *  Maps to <tt>n_lines()</tt> in two space
-				      *  dimensions and so on.
+				      *  active or not.  In 2d, the result
+				      *  equals n_lines(), while in 3d it
+				      *  equals n_quads(). Since there are no
+				      *  face objects in 1d, the function
+				      *  returns zero in 1d.
 				      */
     unsigned int n_faces () const;
 
     				     /**
-				      *  Return total number of active faces.
-				      *  Maps to <tt>n_active_lines()</tt> in two space
-				      *  dimensions and so on.
+				      *  Return total number of active faces,
+				      *  active or not.  In 2d, the result
+				      *  equals n_active_lines(), while in 3d
+				      *  it equals n_active_quads(). Since
+				      *  there are no face objects in 1d, the
+				      *  function returns zero in 1d.
 				      */
     unsigned int n_active_faces () const;
 
@@ -3399,15 +3404,6 @@ template <> Triangulation<3>::raw_face_iterator Triangulation<3>::last_raw_face 
 template <> Triangulation<3>::face_iterator Triangulation<3>::last_face () const;
 template <> Triangulation<3>::active_face_iterator Triangulation<3>::last_active_face () const;
 template <> Triangulation<3>::raw_quad_iterator Triangulation<3>::begin_raw_quad (const unsigned int level) const;
-template <> unsigned int Triangulation<1>::n_raw_cells (const unsigned int level) const;
-template <> unsigned int Triangulation<1>::n_cells (const unsigned int level) const;
-template <> unsigned int Triangulation<1>::n_active_cells (const unsigned int level) const;
-template <> unsigned int Triangulation<2>::n_raw_cells (const unsigned int level) const;
-template <> unsigned int Triangulation<2>::n_cells (const unsigned int level) const;
-template <> unsigned int Triangulation<2>::n_active_cells (const unsigned int level) const;
-template <> unsigned int Triangulation<3>::n_raw_cells (const unsigned int level) const;
-template <> unsigned int Triangulation<3>::n_cells (const unsigned int level) const;
-template <> unsigned int Triangulation<3>::n_active_cells (const unsigned int level) const;
 template <> unsigned int Triangulation<1>::n_raw_lines (const unsigned int level) const;
 template <> unsigned int Triangulation<1>::n_quads () const;
 template <> unsigned int Triangulation<1>::n_quads (const unsigned int level) const;

@@ -4399,9 +4399,17 @@ unsigned int Triangulation<dim>::n_active_cells () const
 template <int dim>
 unsigned int Triangulation<dim>::n_faces () const
 {
-  Assert (dim<=3, ExcNotImplemented());
-  if (dim==2) return n_lines();
-  if (dim==3) return n_quads();
+  switch (dim)
+    {
+      case 1:
+	    return 0;
+      case 2:
+	    return n_lines();
+      case 3:
+	     return n_quads();
+      default:
+	    Assert (false, ExcNotImplemented());
+    }
   return 0;
 }
 
@@ -4409,89 +4417,76 @@ unsigned int Triangulation<dim>::n_faces () const
 template <int dim>
 unsigned int Triangulation<dim>::n_active_faces () const
 {
-  Assert (dim<=3, ExcNotImplemented());
-  if (dim==2) return n_active_lines();
-  if (dim==3) return n_active_quads();
+  switch (dim)
+    {
+      case 1:
+	    return 0;
+      case 2:
+	    return n_active_lines();
+      case 3:
+	     return n_active_quads();
+      default:
+	    Assert (false, ExcNotImplemented());
+    }
   return 0;
 }
 
 
-//TODO:[GK] Implement this like above and remove specialization declaration in tria.h
-//TODO:[GK] Add a remark to Triangulation doc telling 1d-Triangulations have no face
-
-#if deal_II_dimension == 1
-
-template <>
-unsigned int Triangulation<1>::n_raw_cells (const unsigned int level) const
+template <int dim>
+unsigned int Triangulation<dim>::n_raw_cells (const unsigned int level) const
 {
-  return n_raw_lines (level);
-}
-
-template <>
-unsigned int Triangulation<1>::n_cells (const unsigned int level) const
-{
-  return n_lines (level);
-}
-
-
-template <>
-unsigned int Triangulation<1>::n_active_cells (const unsigned int level) const
-{
-  return n_active_lines (level);
+  switch (dim)
+    {
+      case 1:
+	    return n_raw_lines(level);
+      case 2:
+	    return n_raw_quads(level);
+      case 3:
+	     return n_raw_hexs(level);
+      default:
+	    Assert (false, ExcNotImplemented());
+    }
+  return 0;
 }
 
 
-#endif
 
-
-#if deal_II_dimension == 2
-
-template <>
-unsigned int Triangulation<2>::n_raw_cells (const unsigned int level) const
+template <int dim>
+unsigned int Triangulation<dim>::n_cells (const unsigned int level) const
 {
-  return n_raw_quads (level);
+  switch (dim)
+    {
+      case 1:
+	    return n_lines(level);
+      case 2:
+	    return n_quads(level);
+      case 3:
+	     return n_hexs(level);
+      default:
+	    Assert (false, ExcNotImplemented());
+    }
+  return 0;
 }
 
 
-template <>
-unsigned int Triangulation<2>::n_cells (const unsigned int level) const
+
+template <int dim>
+unsigned int Triangulation<dim>::n_active_cells (const unsigned int level) const
 {
-  return n_quads (level);
+  switch (dim)
+    {
+      case 1:
+	    return n_active_lines(level);
+      case 2:
+	    return n_active_quads(level);
+      case 3:
+	     return n_active_hexs(level);
+      default:
+	    Assert (false, ExcNotImplemented());
+    }
+  return 0;
 }
 
-
-template <>
-unsigned int Triangulation<2>::n_active_cells (const unsigned int level) const
-{
-  return n_active_quads (level);
-}
-
-#endif
-
-
-#if deal_II_dimension == 3
-
-template <>
-unsigned int Triangulation<3>::n_raw_cells (const unsigned int level) const
-{
-  return n_raw_hexs (level);
-}
-
-
-template <>
-unsigned int Triangulation<3>::n_cells (const unsigned int level) const
-{
-  return n_hexs (level);
-}
-
-
-template <>
-unsigned int Triangulation<3>::n_active_cells (const unsigned int level) const
-{
-  return n_active_hexs (level);
-}
-
-#endif
 
 
 template <int dim>
