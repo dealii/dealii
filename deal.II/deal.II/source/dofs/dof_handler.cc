@@ -30,7 +30,9 @@
 DEAL_II_NAMESPACE_OPEN
 
 
-//TODO[WB]: do not use a plain pointer for faces, but rather an auto_ptr or some such thing
+//TODO[WB]: do not use a plain pointer for DoFHandler::faces, but rather an
+//auto_ptr or some such thing. alternatively, why not use the DoFFaces object
+//right away?
 
 template <int dim>
 const unsigned int DoFHandler<dim>::dimension;
