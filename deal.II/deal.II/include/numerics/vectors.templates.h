@@ -1612,8 +1612,7 @@ VectorTools::interpolate_boundary_values (const Mapping<dim>            &mapping
 
 #endif
   
-//TODO[?] Change for real hp::DoFHandler
-// This function might not work anymore if the real hp::DoFHandler is available.
+
 template <int dim, template <int> class DH>
 void
 VectorTools::interpolate_boundary_values (const DH<dim>                 &dof,
@@ -1630,8 +1629,6 @@ VectorTools::interpolate_boundary_values (const DH<dim>                 &dof,
 
 
 
-//TODO[?] Change for real hp::DoFHandler
-// This function might not work anymore if the real hp::DoFHandler is available.
 template <int dim, template <int> class DH>
 void
 VectorTools::interpolate_boundary_values (const DH<dim>                 &dof,
