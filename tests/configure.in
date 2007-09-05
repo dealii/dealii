@@ -46,7 +46,7 @@ AC_SUBST(TEST_MINUS_L)
 dnl Check whether we can call 'ulimit' on a system. Some systems do
 dnl not appear to allow this, for whatever reason.
 AC_MSG_CHECKING(whether we can call ulimit)
-ulimit -t 2400
+(ulimit -t 2400 2>&1) > /dev/null
 if test ! $? = 0 ; then
   AC_MSG_RESULT(no)
   ULIMIT=":"

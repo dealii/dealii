@@ -1244,7 +1244,7 @@ echo "${ECHO_T}$TEST_MINUS_L" >&6
 
 echo "$as_me:$LINENO: checking whether we can call ulimit" >&5
 echo $ECHO_N "checking whether we can call ulimit... $ECHO_C" >&6
-ulimit -t 2400
+(ulimit -t 2400 2>&1) > /dev/null
 if test ! $? = 0 ; then
   echo "$as_me:$LINENO: result: no" >&5
 echo "${ECHO_T}no" >&6
