@@ -111,7 +111,7 @@ namespace Functions
  * author of this class for the implementation of a Finite Element
  * Immersed Boundary Method.
  *
- *  \addtogroup functions
+ *  \ingroup functions
  *
  *  \author Luca Heltai, 2006    
  *  
