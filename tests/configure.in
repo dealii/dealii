@@ -41,4 +41,21 @@ rm -f acconfig.link acconfig.test
 AC_MSG_RESULT($TEST_MINUS_L)
 AC_SUBST(TEST_MINUS_L)
 
+
+
+dnl Check whether we can call 'ulimit' on a system. Some systems do
+dnl not appear to allow this, for whatever reason.
+AC_MSG_CHECKING(whether we can call ulimit)
+ulimit -t 2400
+if test ! $? = 0 ; then
+  AC_MSG_RESULT(no)
+  ULIMIT=":"
+else
+  AC_MSG_RESULT(yes)
+  ULIMIT="ulimit"
+fi
+AC_SUBST(ULIMIT)
+
+
+
 AC_OUTPUT(Makefile.paths)
