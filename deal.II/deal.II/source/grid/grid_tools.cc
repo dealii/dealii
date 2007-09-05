@@ -379,10 +379,8 @@ GridTools::delete_duplicated_vertices (std::vector<Point<dim> >    &vertices,
 {
 				   // create a vector of vertex
 				   // indices. initialize it to the identity,
-				   // later on change that if possible.
+				   // later on change that if necessary.
   std::vector<unsigned int> new_vertex_numbers(vertices.size());
-				   //TODO: find a better way to initialize this
-				   //vector
   for (unsigned int i=0; i<vertices.size(); ++i)
     new_vertex_numbers[i]=i;
 
