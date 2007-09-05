@@ -2,7 +2,7 @@
 //    $Id$
 //    Version: $Name$
 //
-//    Copyright (C) 1999, 2000, 2001, 2002, 2003, 2004, 2005, 2006 by the deal.II authors
+//    Copyright (C) 1999, 2000, 2001, 2002, 2003, 2004, 2005, 2006, 2007 by the deal.II authors
 //
 //    This file is subject to QPL and may not be  distributed
 //    without copyright and license information. Please refer
@@ -166,7 +166,7 @@ template <int> class FEValuesBase;
 template <class DH, int patch_dim, int patch_space_dim=patch_dim>
 class DataOut_DoFData : public DataOutInterface<patch_dim,patch_space_dim>
 {
-//TODO: Do we still need this after changing the template argument?
+//TODO: Do we still need this after changing the template argument? it also appears as if this bug is only triggered with gcc2.95, which we don't support any more anyway...
 #ifdef DEAL_II_TEMPLATE_TEMPLATE_TYPEDEF_BUG
 				     // helper class
     struct DH_dim : public DH
