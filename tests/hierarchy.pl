@@ -53,11 +53,14 @@ $hierarchy{"x86_64-unknown-linux-gnu+gcc4.1"} = "x86_64-unknown-linux-gnu+gcc4.0
 $hierarchy{"x86_64-unknown-linux-gnu+gcc4.2"} = "x86_64-unknown-linux-gnu+gcc4.1";
 $hierarchy{"x86_64-unknown-linux-gnu+gcc4.3"} = "x86_64-unknown-linux-gnu+gcc4.2";
 
-$hierarchy{"x86_64-unknown-linux-gnu+icc9"} = "x86_64-unknown-linux-gnu+gcc3.3";
-$hierarchy{"x86_64-unknown-linux-gnu+icc10"} = "x86_64-unknown-linux-gnu+icc9";
+$hierarchy{"x86_64-unknown-linux-gnu+icc9"}   = "x86_64-unknown-linux-gnu+gcc3.3";
+$hierarchy{"x86_64-unknown-linux-gnu+icc10"}  = "x86_64-unknown-linux-gnu+icc9";
 
-$hierarchy{"powerpc-apple-darwin8.8.0+gcc4.0"} = "generic";
+$hierarchy{"powerpc-apple-darwin8.8.0+gcc4.0"}  = "generic";
 $hierarchy{"powerpc-apple-darwin8.10.0+gcc4.0"} = "powerpc-apple-darwin8.8.0+gcc4.0";
+
+$hierarchy{"ia64-unknown-linux-gnu+icc9"}     = "x86_64-unknown-linux-gnu+icc9";
+$hierarchy{"ia64-unknown-linux-gnu+icc10"}    = "ia64-unknown-linux-gnu+icc9";
 
 # derive mac os x from mac os x because they use the same random number
 # generator
