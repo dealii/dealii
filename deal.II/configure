@@ -3101,8 +3101,9 @@ echo "${ECHO_T}C++ compiler is unknown version but accepted MIPSpro compiler ver
       else
 
         	        is_intel_icc1="`($CXX -V 2>&1) | grep 'Intel'`"
-        is_intel_icc2="`($CXX -help 2>&1) | grep 'Intel'`"
-	is_intel_icc="$is_intel_icc1$is_intel_icc2"
+        is_intel_icc2="`($CXX -V 2>&1) | grep 'Version'`"
+        is_intel_icc3="`($CXX -help 2>&1) | grep 'Intel'`"
+	is_intel_icc="$is_intel_icc1$is_intel_icc2$is_intel_icc3"
         if test "x$is_intel_icc" != "x" ; then
 	  version5="`echo $is_intel_icc | grep 'Version 5'`"
 	  version6="`echo $is_intel_icc | grep 'Version 6'`"
@@ -3542,21 +3543,14 @@ rm -f conftest.err conftest.$ac_objext conftest.$ac_ext
                     	  	                                                                                            	  	  	  	  	            CXXFLAGSG="$CXXFLAGSG -w1 -wd175 -wd525 -wd327 -wd424 -wd11 -wd734 -wd858"
           CXXFLAGSO="$CXXFLAGSO -w0 -wd424 -wd11"
 
-                    	                                	  	  	      	  case "$GXX_VERSION" in
+                    	                                    	  case "$GXX_VERSION" in
 	    intel_icc5)
               ;;
 	    intel_icc6 | intel_icc7 | intel_icc8 | intel_icc9)
               CXXFLAGSO="$CXXFLAGSO -opt_report_levelmin"
               ;;
 	    *)
-	      case "$target" in
-		*ia64*)
-              	    CXXFLAGSO="$CXXFLAGSO -opt-report 0"
-		    ;;
-		*)
-              	    CXXFLAGSO="$CXXFLAGSO -opt-report 0 -vec-report0"
-		    ;;
-	      esac
+              CXXFLAGSO="$CXXFLAGSO -opt-report 0 -vec-report0"
 	      ;;
           esac
 
@@ -4092,9 +4086,10 @@ echo "${ECHO_T}C compiler is unknown version but accepted MIPSpro compiler versi
       else
 
         						        is_intel_icc1="`($CC -V 2>&1) | grep 'Intel'`"
-        is_intel_icc2="`($CC -help 2>&1) | grep 'Intel'`"
+        is_intel_icc2="`($CC -V 2>&1) | grep 'Version'`"
+        is_intel_icc3="`($CC -help 2>&1) | grep 'Intel'`"
         is_intel_ecc="`($CC -V 2>&1) | perl -pi -e 's/applications\n/\1/g;' | grep 'Intel(R) C++ Itanium(TM) Compiler'`"
-	is_intel_icc="$is_intel_icc1$is_intel_icc2$is_intel_ecc"
+	is_intel_icc="$is_intel_icc1$is_intel_icc2$is_intel_icc3$is_intel_ecc"
         if test "x$is_intel_icc" != "x" ; then
 	  version5="`echo $is_intel_icc | grep 'Version 5'`"
 	  version6="`echo $is_intel_icc | grep 'Version 6'`"
