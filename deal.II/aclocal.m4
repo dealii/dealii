@@ -234,16 +234,16 @@ AC_DEFUN(DEAL_II_DETERMINE_CXX_BRAND, dnl
         dnl Intel's ICC C++ compiler? On Linux, it uses -V, on Windows
 	dnl it is -help
         is_intel_icc1="`($CXX -V 2>&1) | grep 'Intel'`"
-        is_intel_icc2="`($CXX -V 2>&1) | grep 'Version'`"
-        is_intel_icc3="`($CXX -help 2>&1) | grep 'Intel'`"
-	is_intel_icc="$is_intel_icc1$is_intel_icc2$is_intel_icc3"
+        is_intel_icc2="`($CXX -help 2>&1) | grep 'Intel'`"
+	is_intel_icc="$is_intel_icc1$is_intel_icc2"
         if test "x$is_intel_icc" != "x" ; then
-	  version5="`echo $is_intel_icc | grep 'Version 5'`"
-	  version6="`echo $is_intel_icc | grep 'Version 6'`"
-	  version7="`echo $is_intel_icc | grep 'Version 7'`"
-	  version8="`echo $is_intel_icc | grep 'Version 8'`"
-	  version9="`echo $is_intel_icc | grep 'Version 9'`"
-	  version10="`echo $is_intel_icc | grep 'Version 10'`"
+	  version_string="`($CXX -V 2>&1) | grep 'Version'` `($CXX -help 2>&1) | grep 'Version'`"
+	  version5="`echo $version_string | grep 'Version 5'`"
+	  version6="`echo $version_string | grep 'Version 6'`"
+	  version7="`echo $version_string | grep 'Version 7'`"
+	  version8="`echo $version_string | grep 'Version 8'`"
+	  version9="`echo $version_string | grep 'Version 9'`"
+	  version10="`echo $version_string | grep 'Version 10'`"
           if test "x$version5" != "x" ; then
             AC_MSG_RESULT(C++ compiler is icc-5)
             GXX_VERSION=intel_icc5
@@ -1093,17 +1093,17 @@ AC_DEFUN(DEAL_II_DETERMINE_CC_BRAND, dnl
 	dnl so join this one to the previous one with a little bit of
 	dnl perl.
         is_intel_icc1="`($CC -V 2>&1) | grep 'Intel'`"
-        is_intel_icc2="`($CC -V 2>&1) | grep 'Version'`"
-        is_intel_icc3="`($CC -help 2>&1) | grep 'Intel'`"
+        is_intel_icc2="`($CC -help 2>&1) | grep 'Intel'`"
         is_intel_ecc="`($CC -V 2>&1) | perl -pi -e 's/applications\n/\1/g;' | grep 'Intel(R) C++ Itanium(TM) Compiler'`"
-	is_intel_icc="$is_intel_icc1$is_intel_icc2$is_intel_icc3$is_intel_ecc"
+	is_intel_icc="$is_intel_icc1$is_intel_icc2$is_intel_ecc"
         if test "x$is_intel_icc" != "x" ; then
-	  version5="`echo $is_intel_icc | grep 'Version 5'`"
-	  version6="`echo $is_intel_icc | grep 'Version 6'`"
-	  version7="`echo $is_intel_icc | grep 'Version 7'`"
-	  version8="`echo $is_intel_icc | grep 'Version 8'`"
-	  version9="`echo $is_intel_icc | grep 'Version 9'`"
-	  version10="`echo $is_intel_icc | grep 'Version 10'`"
+	  version_string="`($CC -V 2>&1) | grep 'Version'` `($CC -help 2>&1) | grep 'Version'`"
+	  version5="`echo $version_string | grep 'Version 5'`"
+	  version6="`echo $version_string | grep 'Version 6'`"
+	  version7="`echo $version_string | grep 'Version 7'`"
+	  version8="`echo $version_string | grep 'Version 8'`"
+	  version9="`echo $version_string | grep 'Version 9'`"
+	  version10="`echo $version_string | grep 'Version 10'`"
           if test "x$version5" != "x" ; then
             AC_MSG_RESULT(C compiler is icc-5)
             CC_VERSION=intel_icc5
