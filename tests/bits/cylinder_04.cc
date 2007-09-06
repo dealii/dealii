@@ -49,7 +49,7 @@ void check ()
   Triangulation<dim> triangulation;
   GridGenerator::cylinder (triangulation);
 
-  GridTools::transform (&rotate_to_y<dim>, triangulation);
+  GridTools::transform ((Point<dim> (*)(const Point<dim>&))&rotate_to_y<dim>, triangulation);
   
   static const CylinderBoundary<dim> boundary (1,
 					       Point<dim>(std::cos(xy_angle), std::sin(xy_angle), 0),
