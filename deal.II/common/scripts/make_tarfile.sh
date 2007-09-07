@@ -1,16 +1,19 @@
 ######################################################################
-# We assume that the most recent checked out version of the branch
-# is in subdir checkout and configured.
+# creates both tar files (source and documentation). call this script
+# in an otherwise empty directory as follows:
+# 
+#   bash make_tarfile.sh 6 0 0
 #
-# Will create both tar files (source and documentation)
+# to generate the tar files for release 6.0.0
 #
 ######################################################################
 
-MAJOR=`perl -n -e "m/(\\d+)\\.(\\d+)\\.(\\d+)/; print \\$1" checkout/Version`
-MINOR=`perl -n -e "m/(\\d+)\\.(\\d+)\\.(\\d+)/; print \\$2" checkout/Version`
-PATCH=`perl -n -e "m/(\\d+)\\.(\\d+)\\.(\\d+)/; print \\$3" checkout/Version`
+MAJOR=$1
+MINOR=$2
+PATCH=$3
 
-cvs -d `cat checkout/CVS/Root` export -kv -r Version-$MAJOR-$MINOR-$PATCH deal.II
+svn export http://wolfgang.math.tamu.edu/svn/public/deal.II/tags/Version-$MAJOR-$MINOR-$PATCH/deal.II
+
 tar czf deal.II-$MAJOR.$MINOR.$PATCH.tar.gz deal.II
 cd deal.II
 ./configure --with-umfpack
