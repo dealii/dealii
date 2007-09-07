@@ -312,7 +312,7 @@ $M^n=M^{n,n-1}=M$ and $A^n=A^{n,n-1}=A$. On the other hand, if we had
 used different shape functions, then we would have to compute
 integrals that contain shape functions defined on two meshes. This is a
 somewhat messy process that we omit here, but that is treated in some
-detail in @ref step_22 "step-22".
+detail in @ref step_28 "step-28".
 
 Under these conditions (i.e. a mesh that doesn't change), one can optimize the
 solution procedure a bit by basically eliminating the solution of the second

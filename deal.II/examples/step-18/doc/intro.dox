@@ -636,7 +636,7 @@ data for the cells it owned on the old mesh, and it may need to know the
 values of the quadrature point data on other cells if the corresponding cells
 on the new mesh are assigned to this process after subdividing the new mesh. A
 global communication of these data elements is therefore necessary, making the
-entire process a little more unpleasant. The @ref step_22 "step-22" tutorial
+entire process a little more unpleasant. The @ref step_28 "step-28" tutorial
 program shows how to work with different meshes at the same time, albeit for a
 different kind of problem, giving indications on how to approach the problem
 for time-dependent adaptivity as well.
