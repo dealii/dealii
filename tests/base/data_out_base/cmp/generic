@@ -155,7 +155,7 @@ LOOKUP_TABLE default
 Writing deal_II_intermediate dimensions 1,2
 1 2
 [deal.II intermediate format graphics data]
-[written by deal.II 6.0.pre]
+[written by deal.II 6.1.pre]
 [Version: 2]
 2
 first name
@@ -1258,7 +1258,7 @@ LOOKUP_TABLE default
 Writing deal_II_intermediate dimensions 2,2
 2 2
 [deal.II intermediate format graphics data]
-[written by deal.II 6.0.pre]
+[written by deal.II 6.1.pre]
 [Version: 2]
 2
 first name
@@ -2047,7 +2047,7 @@ LOOKUP_TABLE default
 Writing deal_II_intermediate dimensions 2,3
 2 3
 [deal.II intermediate format graphics data]
-[written by deal.II 6.0.pre]
+[written by deal.II 6.1.pre]
 [Version: 2]
 2
 first name
@@ -10412,7 +10412,7 @@ LOOKUP_TABLE default
 Writing deal_II_intermediate dimensions 3,3
 3 3
 [deal.II intermediate format graphics data]
-[written by deal.II 6.0.pre]
+[written by deal.II 6.1.pre]
 [Version: 2]
 2
 first name

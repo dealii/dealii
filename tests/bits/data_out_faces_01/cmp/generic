@@ -361,7 +361,7 @@ LOOKUP_TABLE default
 
 1 2
 [deal.II intermediate format graphics data]
-[written by deal.II 6.0.pre]
+[written by deal.II 6.1.pre]
 [Version: 2]
 2
 node_data
@@ -2289,7 +2289,7 @@ LOOKUP_TABLE default
 
 2 3
 [deal.II intermediate format graphics data]
-[written by deal.II 6.0.pre]
+[written by deal.II 6.1.pre]
 [Version: 2]
 2
 node_data
@@ -2955,7 +2955,7 @@ LOOKUP_TABLE default
 
 1 2
 [deal.II intermediate format graphics data]
-[written by deal.II 6.0.pre]
+[written by deal.II 6.1.pre]
 [Version: 2]
 2
 node_data
@@ -4883,7 +4883,7 @@ LOOKUP_TABLE default
 
 2 3
 [deal.II intermediate format graphics data]
-[written by deal.II 6.0.pre]
+[written by deal.II 6.1.pre]
 [Version: 2]
 2
 node_data
@@ -5549,7 +5549,7 @@ LOOKUP_TABLE default
 
 1 2
 [deal.II intermediate format graphics data]
-[written by deal.II 6.0.pre]
+[written by deal.II 6.1.pre]
 [Version: 2]
 2
 node_data
@@ -7477,7 +7477,7 @@ LOOKUP_TABLE default
 
 2 3
 [deal.II intermediate format graphics data]
-[written by deal.II 6.0.pre]
+[written by deal.II 6.1.pre]
 [Version: 2]
 2
 node_data
@@ -8143,7 +8143,7 @@ LOOKUP_TABLE default
 
 1 2
 [deal.II intermediate format graphics data]
-[written by deal.II 6.0.pre]
+[written by deal.II 6.1.pre]
 [Version: 2]
 2
 node_data
@@ -10071,7 +10071,7 @@ LOOKUP_TABLE default
 
 2 3
 [deal.II intermediate format graphics data]
-[written by deal.II 6.0.pre]
+[written by deal.II 6.1.pre]
 [Version: 2]
 2
 node_data
@@ -10737,7 +10737,7 @@ LOOKUP_TABLE default
 
 1 2
 [deal.II intermediate format graphics data]
-[written by deal.II 6.0.pre]
+[written by deal.II 6.1.pre]
 [Version: 2]
 2
 node_data
@@ -12665,7 +12665,7 @@ LOOKUP_TABLE default
 
 2 3
 [deal.II intermediate format graphics data]
-[written by deal.II 6.0.pre]
+[written by deal.II 6.1.pre]
 [Version: 2]
 2
 node_data
@@ -13331,7 +13331,7 @@ LOOKUP_TABLE default
 
 1 2
 [deal.II intermediate format graphics data]
-[written by deal.II 6.0.pre]
+[written by deal.II 6.1.pre]
 [Version: 2]
 2
 node_data
@@ -15259,7 +15259,7 @@ LOOKUP_TABLE default
 
 2 3
 [deal.II intermediate format graphics data]
-[written by deal.II 6.0.pre]
+[written by deal.II 6.1.pre]
 [Version: 2]
 2
 node_data
@@ -15952,7 +15952,7 @@ LOOKUP_TABLE default
 
 1 2
 [deal.II intermediate format graphics data]
-[written by deal.II 6.0.pre]
+[written by deal.II 6.1.pre]
 [Version: 2]
 3
 node_data_0
@@ -18161,7 +18161,7 @@ LOOKUP_TABLE default
 
 2 3
 [deal.II intermediate format graphics data]
-[written by deal.II 6.0.pre]
+[written by deal.II 6.1.pre]
 [Version: 2]
 4
 node_data_0
