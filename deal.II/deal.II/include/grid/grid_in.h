@@ -374,9 +374,8 @@ class GridIn
 		    << "Supported elements are: \n"
 		    << "ELM-TYPE\n"
 		    << "1 Line (2 nodes, 1 edge).\n"
-		    << "3 Quadrangle (4 nodes, 4 edges).\n"
-		    << "5 Hexahedron (8 nodes, 12 edges, 6 faces).\n"
-		    << "15 Point (1 node).");
+		    << "3 Quadrilateral (4 nodes, 4 edges).\n"
+		    << "5 Hexahedron (8 nodes, 12 edges, 6 faces).");
   private:
 				     /**
 				      * Store address of the triangulation to
