@@ -646,6 +646,7 @@ namespace internal
     const EdgeOrientation forward_edge    = {'f'};
     const EdgeOrientation backward_edge   = {'b'};
 
+    
     inline
     bool
     EdgeOrientation::
@@ -700,17 +701,16 @@ namespace internal
 					* the edge -1 means the end
 					* of the edge.
 					*/
-//TODO: we should really initialize these entries as forward_edge or backward_edge, but gcc2.95 has a bug where it zero-initializes these data elements instead, leading to aborts later on.
       static const EdgeOrientation edge_to_node_orient[8][3] = 
       {
-	    {{'f'},{'f'},{'f'}},
-	    {{'b'},{'f'},{'f'}},
-	    {{'b'},{'b'},{'f'}},
-	    {{'f'},{'b'},{'f'}},
-	    {{'f'},{'f'},{'b'}},
-	    {{'b'},{'f'},{'b'}},
-	    {{'b'},{'b'},{'b'}}, 
-	    {{'f'},{'b'},{'b'}}
+	    {forward_edge,  forward_edge,  forward_edge},
+	    {backward_edge, forward_edge,  forward_edge},
+	    {backward_edge, backward_edge, forward_edge},
+	    {forward_edge,  backward_edge, forward_edge},
+	    {forward_edge,  forward_edge,  backward_edge},
+	    {backward_edge, forward_edge,  backward_edge},
+	    {backward_edge, backward_edge, backward_edge}, 
+	    {forward_edge,  backward_edge, backward_edge}
       };	    
     
 				       /**
