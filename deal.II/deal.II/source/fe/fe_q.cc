@@ -419,7 +419,8 @@ get_face_interpolation_matrix (const FiniteElement<dim> &x_source_fe,
       //TODO: Verify that all faces are the same with respect to
       // these support points. Furthermore, check if something has to
       // be done for the face orientation flag in 3D.
-      Point<dim> p = QProjector<dim>::project_to_face (quad_face_support, 0).point (i);
+      const Point<dim> p
+	= QProjector<dim>::project_to_face (quad_face_support, 0).point (i);
 
       for (unsigned int j=0; j<this->dofs_per_face; ++j)
 	{ 
