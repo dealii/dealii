@@ -325,8 +325,8 @@ void Triangulation<1>::create_triangulation (const std::vector<Point<1> >    &v,
 	++next_free_line;
       
       next_free_line->set (internal::Triangulation
-                           ::Line (cells[cell].vertices[0],
-                                   cells[cell].vertices[1]));
+                           ::TriaObject<1> (cells[cell].vertices[0],
+					    cells[cell].vertices[1]));
       next_free_line->set_used_flag ();
       next_free_line->set_material_id (cells[cell].material_id);
       next_free_line->clear_user_data ();
@@ -512,12 +512,12 @@ void Triangulation<2>::create_triangulation (const std::vector<Point<2> >    &v,
 
       for (unsigned int line=0; line<GeometryInfo<dim>::faces_per_cell; ++line)
 	{
-				       // given a line vertex number
-				       // (0,1) on a specific line we
-				       // get the cell vertex number
-				       // (0-4) through the
-				       // line_to_cell_vertices
-				       // function
+					   // given a line vertex number
+					   // (0,1) on a specific line we
+					   // get the cell vertex number
+					   // (0-4) through the
+					   // line_to_cell_vertices
+					   // function
 	  std::pair<int,int> line_vertices(
 	    cells[cell].vertices[GeometryInfo<dim>::line_to_cell_vertices(line, 0)],
 	    cells[cell].vertices[GeometryInfo<dim>::line_to_cell_vertices(line, 1)]);
@@ -609,8 +609,8 @@ void Triangulation<2>::create_triangulation (const std::vector<Point<2> >    &v,
       std::map<std::pair<int,int>,line_iterator>::iterator i;
       for (i = needed_lines.begin(); line!=end_line(); ++line, ++i) 
 	{
-	  line->set (internal::Triangulation::Line(i->first.first,
-                                                   i->first.second));
+	  line->set (internal::Triangulation::TriaObject<1>(i->first.first,
+							    i->first.second));
 	  line->set_used_flag ();
 	  line->clear_user_flag ();
 	  line->clear_user_data ();
@@ -632,13 +632,13 @@ void Triangulation<2>::create_triangulation (const std::vector<Point<2> >    &v,
 	  line_iterator lines[GeometryInfo<dim>::lines_per_cell];
 	  for (unsigned int line=0; line<GeometryInfo<dim>::lines_per_cell; ++line)
 	    lines[line]=needed_lines[std::make_pair(
-	      cells[c].vertices[GeometryInfo<dim>::line_to_cell_vertices(line, 0)],
-	      cells[c].vertices[GeometryInfo<dim>::line_to_cell_vertices(line, 1)])];
+				       cells[c].vertices[GeometryInfo<dim>::line_to_cell_vertices(line, 0)],
+				       cells[c].vertices[GeometryInfo<dim>::line_to_cell_vertices(line, 1)])];
 	  
-	  cell->set (internal::Triangulation::Quad(lines[0]->index(),
-                                                   lines[1]->index(),
-                                                   lines[2]->index(),
-                                                   lines[3]->index()));
+	  cell->set (internal::Triangulation::TriaObject<2> (lines[0]->index(),
+							     lines[1]->index(),
+							     lines[2]->index(),
+							     lines[3]->index()));
 	  
 	  cell->set_used_flag ();
 	  cell->set_material_id (cells[c].material_id);
@@ -718,7 +718,7 @@ void Triangulation<2>::create_triangulation (const std::vector<Point<2> >    &v,
 	  clear_despite_subscriptions();
 	  
 	  AssertThrow (false, ExcMultiplySetLineInfoOfLine(
-	    line_vertices.first, line_vertices.second));
+			 line_vertices.first, line_vertices.second));
 	}
       
 				       // Assert that only exterior lines
@@ -765,17 +765,18 @@ void Triangulation<2>::create_triangulation (const std::vector<Point<2> >    &v,
 #if deal_II_dimension == 3
 
 /**
- * Invent an object which compares two internal::Triangulation::Quad against
- * each other. This comparison is needed in order to establish a map of Quads
- * to iterators in the Triangulation<3>::create_triangulation function.
+ * Invent an object which compares two internal::Triangulation::TriaObject<2>
+ * against each other. This comparison is needed in order to establish a map
+ * of TriaObject<2> to iterators in the Triangulation<3>::create_triangulation
+ * function.
  *
- * Since this comparison is not canonical, we do not include it into
- * the general internal::Triangulation::Quad class.
+ * Since this comparison is not canonical, we do not include it into the
+ * general internal::Triangulation::TriaObject<2> class.
  */
 struct QuadComparator
 {
-    inline bool operator () (const internal::Triangulation::Quad &q1,
-                             const internal::Triangulation::Quad &q2) const
+    inline bool operator () (const internal::Triangulation::TriaObject<2> &q1,
+                             const internal::Triangulation::TriaObject<2> &q2) const
       {
 					 // here is room to optimize
 					 // the repeated equality test
@@ -956,12 +957,12 @@ Triangulation<3>::create_triangulation (const std::vector<Point<3> >    &v,
       
       for (unsigned int line=0; line<GeometryInfo<dim>::lines_per_cell; ++line)
 	{
-				       // given a line vertex number
-				       // (0,1) on a specific line we
-				       // get the cell vertex number
-				       // (0-7) through the
-				       // line_to_cell_vertices
-				       // function
+					   // given a line vertex number
+					   // (0,1) on a specific line we
+					   // get the cell vertex number
+					   // (0-7) through the
+					   // line_to_cell_vertices
+					   // function
 	  std::pair<int,int> line_vertices(
 	    cells[cell].vertices[GeometryInfo<dim>::line_to_cell_vertices(line, 0)],
 	    cells[cell].vertices[GeometryInfo<dim>::line_to_cell_vertices(line, 1)]);
@@ -970,9 +971,9 @@ Triangulation<3>::create_triangulation (const std::vector<Point<3> >    &v,
 					   // in reverse order do nothing, else
 					   // insert the line
 	  if ( (needed_lines.find(std::make_pair(line_vertices.second,
-						  line_vertices.first))
-		 ==
-		 needed_lines.end()))
+						 line_vertices.first))
+		==
+		needed_lines.end()))
 	    {
 					       // insert line, with
 					       // invalid iterator. if line
@@ -1031,8 +1032,8 @@ Triangulation<3>::create_triangulation (const std::vector<Point<3> >    &v,
       std::map<std::pair<int,int>,line_iterator>::iterator i;
       for (i = needed_lines.begin(); line!=end_line(); ++line, ++i) 
 	{
-	  line->set (internal::Triangulation::Line(i->first.first,
-                                                   i->first.second));
+	  line->set (internal::Triangulation::TriaObject<1>(i->first.first,
+							    i->first.second));
 	  line->set_used_flag ();
 	  line->clear_user_flag ();
 	  line->clear_user_data ();
@@ -1058,7 +1059,7 @@ Triangulation<3>::create_triangulation (const std::vector<Point<3> >    &v,
 				   // note that QuadComparator is a
 				   // class declared and defined in
 				   // this file
-  std::map<internal::Triangulation::Quad,std::pair<quad_iterator,boost::array<bool,GeometryInfo<dim>::lines_per_face> >,QuadComparator>
+  std::map<internal::Triangulation::TriaObject<2>,std::pair<quad_iterator,boost::array<bool,GeometryInfo<dim>::lines_per_face> >,QuadComparator>
     needed_quads;
   for (unsigned int cell=0; cell<cells.size(); ++cell) 
     {
@@ -1126,7 +1127,7 @@ Triangulation<3>::create_triangulation (const std::vector<Point<3> >    &v,
 	      }
 	    
 	  
-	  internal::Triangulation::Quad
+	  internal::Triangulation::TriaObject<2> 
             quad(face_line_list[0],
 		 face_line_list[1],
 		 face_line_list[2],
@@ -1207,7 +1208,7 @@ Triangulation<3>::create_triangulation (const std::vector<Point<3> >    &v,
   if (true) 
     {
       raw_quad_iterator quad = begin_raw_quad();
-      std::map<internal::Triangulation::Quad,std::pair<quad_iterator,boost::array<bool,GeometryInfo<dim>::lines_per_face> >,QuadComparator>
+      std::map<internal::Triangulation::TriaObject<2>,std::pair<quad_iterator,boost::array<bool,GeometryInfo<dim>::lines_per_face> >,QuadComparator>
         ::iterator q;
       for (q = needed_quads.begin(); quad!=end_quad(); ++quad, ++q)
 	{
@@ -1286,7 +1287,7 @@ Triangulation<3>::create_triangulation (const std::vector<Point<3> >    &v,
 		  face_line_list[l]=needed_lines[inverse_line_list[GeometryInfo<dim>::
 								   face_to_cell_lines(face,l)]]->index();
 	      
-	      internal::Triangulation::Quad
+	      internal::Triangulation::TriaObject<2> 
 		quad(face_line_list[0],
 		     face_line_list[1],
 		     face_line_list[2],
@@ -1381,10 +1382,10 @@ Triangulation<3>::create_triangulation (const std::vector<Point<3> >    &v,
 		    }
 
 		  else
-						       // we didn't find the
-						       // face in any direction,
-						       // so something went
-						       // wrong above
+						     // we didn't find the
+						     // face in any direction,
+						     // so something went
+						     // wrong above
 		    Assert(false,ExcInternalError());
 		  
 		}
@@ -1393,12 +1394,12 @@ Triangulation<3>::create_triangulation (const std::vector<Point<3> >    &v,
 					   // make the cell out of
 					   // these iterators
 	  cell->set (internal::Triangulation
-                     ::Hexahedron(face_iterator[0]->index(),
-                                  face_iterator[1]->index(),
-                                  face_iterator[2]->index(),
-                                  face_iterator[3]->index(),
-                                  face_iterator[4]->index(),
-                                  face_iterator[5]->index()));
+                     ::TriaObject<3> (face_iterator[0]->index(),
+				      face_iterator[1]->index(),
+				      face_iterator[2]->index(),
+				      face_iterator[3]->index(),
+				      face_iterator[4]->index(),
+				      face_iterator[5]->index()));
 	  
 	  cell->set_used_flag ();
 	  cell->set_material_id (cells[c].material_id);
@@ -1605,8 +1606,8 @@ Triangulation<3>::create_triangulation (const std::vector<Point<3> >    &v,
 	      clear_despite_subscriptions ();
 
 	      AssertThrow (false, ExcMessage (
-		"Duplicate boundary lines are only allowed "
-		"if they carry the same boundary indicator."));
+			     "Duplicate boundary lines are only allowed "
+			     "if they carry the same boundary indicator."));
 	    }
 	}
       line->set_boundary_indicator (boundary_line->material_id);
@@ -1672,10 +1673,10 @@ Triangulation<3>::create_triangulation (const std::vector<Point<3> >    &v,
 				       // and because boundary quad
 				       // orientation does not carry
 				       // any information.
-      internal::Triangulation::Quad
+      internal::Triangulation::TriaObject<2> 
         quad_compare_1(line[0]->index(), line[1]->index(),
                        line[2]->index(), line[3]->index());
-      internal::Triangulation::Quad
+      internal::Triangulation::TriaObject<2> 
         quad_compare_2(line[2]->index(), line[3]->index(),
                        line[0]->index(), line[1]->index());
       
@@ -1724,7 +1725,7 @@ Triangulation<3>::create_triangulation (const std::vector<Point<3> >    &v,
 	{
 	  clear_despite_subscriptions();
 
- 	                        // quad does not exist
+					   // quad does not exist
  	  AssertThrow (false, ExcQuadInexistant(line[0]->index(), line[1]->index(),
  	                                        line[2]->index(), line[3]->index()));
  	  quad = end_quad();
@@ -1759,8 +1760,8 @@ Triangulation<3>::create_triangulation (const std::vector<Point<3> >    &v,
 	      clear_despite_subscriptions ();
 	  
 	      AssertThrow (false, ExcMessage (
-		"Duplicate boundary quads are only allowed "
-		"if they carry the same boundary indicator."));
+			     "Duplicate boundary quads are only allowed "
+			     "if they carry the same boundary indicator."));
 	    }
 	}
       quad->set_boundary_indicator (boundary_quad->material_id); 
@@ -3789,9 +3790,9 @@ Triangulation<3>::begin_raw_quad (const unsigned int level) const
 {
   Assert (level == 0, ExcFacesHaveNoLevel())
 
-  return raw_quad_iterator (const_cast<Triangulation<3>*>(this),
-			    0,
-			    0);
+		 return raw_quad_iterator (const_cast<Triangulation<3>*>(this),
+					   0,
+					   0);
 }
 
 #endif
@@ -4406,7 +4407,7 @@ unsigned int Triangulation<dim>::n_faces () const
       case 2:
 	    return n_lines();
       case 3:
-	     return n_quads();
+	    return n_quads();
       default:
 	    Assert (false, ExcNotImplemented());
     }
@@ -4424,7 +4425,7 @@ unsigned int Triangulation<dim>::n_active_faces () const
       case 2:
 	    return n_active_lines();
       case 3:
-	     return n_active_quads();
+	    return n_active_quads();
       default:
 	    Assert (false, ExcNotImplemented());
     }
@@ -4442,7 +4443,7 @@ unsigned int Triangulation<dim>::n_raw_cells (const unsigned int level) const
       case 2:
 	    return n_raw_quads(level);
       case 3:
-	     return n_raw_hexs(level);
+	    return n_raw_hexs(level);
       default:
 	    Assert (false, ExcNotImplemented());
     }
@@ -4461,7 +4462,7 @@ unsigned int Triangulation<dim>::n_cells (const unsigned int level) const
       case 2:
 	    return n_quads(level);
       case 3:
-	     return n_hexs(level);
+	    return n_hexs(level);
       default:
 	    Assert (false, ExcNotImplemented());
     }
@@ -4480,7 +4481,7 @@ unsigned int Triangulation<dim>::n_active_cells (const unsigned int level) const
       case 2:
 	    return n_active_quads(level);
       case 3:
-	     return n_active_hexs(level);
+	    return n_active_hexs(level);
       default:
 	    Assert (false, ExcNotImplemented());
     }
@@ -4889,10 +4890,10 @@ Triangulation<dim>::execute_coarsening_and_refinement ()
 				   // Inform RefinementListeners
                                    // about beginning of refinement.
   typename std::list<RefinementListener *>::iterator ref_listener =
-      refinement_listeners.begin (),
-      end_listener = refinement_listeners.end ();
+    refinement_listeners.begin (),
+    end_listener = refinement_listeners.end ();
   for (; ref_listener != end_listener; ++ref_listener)
-      (*ref_listener)->pre_refinement_notification (*this);
+    (*ref_listener)->pre_refinement_notification (*this);
 
   execute_coarsening();
   execute_refinement();
@@ -4901,7 +4902,7 @@ Triangulation<dim>::execute_coarsening_and_refinement ()
                                    // about end of refinement.
   for (ref_listener = refinement_listeners.begin ();
        ref_listener != end_listener; ++ref_listener)
-      (*ref_listener)->post_refinement_notification (*this);
+    (*ref_listener)->post_refinement_notification (*this);
 }
 
 
@@ -5076,8 +5077,8 @@ Triangulation<1>::execute_refinement ()
 	    cell->set_children (first_child->index());
 	    first_child->clear_children ();
 	    first_child->set (internal::Triangulation
-                              ::Line (cell->vertex_index(0),
-                                      next_unused_vertex));
+                              ::TriaObject<1> (cell->vertex_index(0),
+					       next_unused_vertex));
 	    first_child->set_material_id (cell->material_id());
 	    first_child->set_subdomain_id (cell->subdomain_id());	    
 	    
@@ -5131,8 +5132,8 @@ Triangulation<1>::execute_refinement ()
 					     // insert second child
 	    second_child->clear_children ();
 	    second_child->set (internal::Triangulation
-                               ::Line (next_unused_vertex,
-                                       cell->vertex_index(1)));
+                               ::TriaObject<1>(next_unused_vertex,
+					       cell->vertex_index(1)));
 	    second_child->set_neighbor (0, first_child);
 	    second_child->set_material_id (cell->material_id());
 	    second_child->set_subdomain_id (cell->subdomain_id());	    
@@ -5403,11 +5404,11 @@ Triangulation<2>::execute_refinement ()
 	    Assert (children[1]->used() == false, ExcCellShouldBeUnused());
 	  
 	    children[0]->set (internal::Triangulation
-                              ::Line(line->vertex_index(0),
-                                     next_unused_vertex));
+                              ::TriaObject<1>(line->vertex_index(0),
+					      next_unused_vertex));
 	    children[1]->set (internal::Triangulation
-                              ::Line(next_unused_vertex,
-                                     line->vertex_index(1)));
+                              ::TriaObject<1>(next_unused_vertex,
+					      line->vertex_index(1)));
     
 	    children[0]->set_used_flag();
 	    children[1]->set_used_flag();
@@ -5486,13 +5487,13 @@ Triangulation<2>::execute_refinement ()
    Third:
    Set up an array of neighbors:
    
-      6  7
-    .--.--.
+   6  7
+   .--.--.
    1|  |  |3
-    .--.--.
+   .--.--.
    0|  |  |2
-    .--.--.
-     4   5
+   .--.--.
+   4   5
 
    We need this array for two reasons: first to get the lines which will
    bound the four subcells (if the neighboring cell is refined, these
@@ -5584,13 +5585,13 @@ Triangulation<2>::execute_refinement ()
 	      }
 
 	    new_lines[8] ->set (internal::Triangulation
-                                ::Line(new_vertices[6], new_vertices[8]));
+                                ::TriaObject<1>(new_vertices[6], new_vertices[8]));
 	    new_lines[9] ->set (internal::Triangulation
-                                ::Line(new_vertices[8], new_vertices[7]));
+                                ::TriaObject<1>(new_vertices[8], new_vertices[7]));
 	    new_lines[10]->set (internal::Triangulation
-                                ::Line(new_vertices[4], new_vertices[8]));
+                                ::TriaObject<1>(new_vertices[4], new_vertices[8]));
 	    new_lines[11]->set (internal::Triangulation
-                                ::Line(new_vertices[8], new_vertices[5]));
+                                ::TriaObject<1>(new_vertices[8], new_vertices[5]));
 	
 	    for (l=8; l<12; ++l)
 	      {
@@ -5628,25 +5629,25 @@ Triangulation<2>::execute_refinement ()
 
 	    Assert(n_children==4, ExcNotImplemented());
 	    subcells[0]->set (internal::Triangulation
-                              ::Quad(new_lines[0]->index(),
-                                     new_lines[8]->index(),
-                                     new_lines[4]->index(),
-                                     new_lines[10]->index()));
+                              ::TriaObject<2> (new_lines[0]->index(),
+					       new_lines[8]->index(),
+					       new_lines[4]->index(),
+					       new_lines[10]->index()));
 	    subcells[1]->set (internal::Triangulation
-                              ::Quad(new_lines[8]->index(),
-                                     new_lines[2]->index(),
-                                     new_lines[5]->index(),
-                                     new_lines[11]->index()));
+                              ::TriaObject<2> (new_lines[8]->index(),
+					       new_lines[2]->index(),
+					       new_lines[5]->index(),
+					       new_lines[11]->index()));
 	    subcells[2]->set (internal::Triangulation
-                              ::Quad(new_lines[1]->index(),
-                                     new_lines[9]->index(),
-                                     new_lines[10]->index(),
-                                     new_lines[6]->index()));
+                              ::TriaObject<2> (new_lines[1]->index(),
+					       new_lines[9]->index(),
+					       new_lines[10]->index(),
+					       new_lines[6]->index()));
 	    subcells[3]->set (internal::Triangulation
-                              ::Quad(new_lines[9]->index(),
-                                     new_lines[3]->index(),
-                                     new_lines[11]->index(),
-                                     new_lines[7]->index()));
+                              ::TriaObject<2> (new_lines[9]->index(),
+					       new_lines[3]->index(),
+					       new_lines[11]->index(),
+					       new_lines[7]->index()));
 
 	    for (unsigned int i=0; i<n_children; ++i)
 	      {
@@ -5834,7 +5835,7 @@ Triangulation<2>::execute_refinement ()
 			    ExcInternalError());
 
 		    neighbor->set_neighbor(face, subcells[
-		      GeometryInfo<dim>::child_cell_on_face(nb, subface)]);
+					     GeometryInfo<dim>::child_cell_on_face(nb, subface)]);
 		  }
 
 					     // note that the
@@ -6151,11 +6152,11 @@ Triangulation<3>::execute_refinement ()
 	    Assert (children[1]->used() == false, ExcCellShouldBeUnused());
 	  
 	    children[0]->set (internal::Triangulation
-                              ::Line(line->vertex_index(0),
-                                     next_unused_vertex));
+                              ::TriaObject<1>(line->vertex_index(0),
+					      next_unused_vertex));
 	    children[1]->set (internal::Triangulation
-                              ::Line(next_unused_vertex,
-                                     line->vertex_index(1)));
+                              ::TriaObject<1>(next_unused_vertex,
+					      line->vertex_index(1)));
     
 	    children[0]->set_used_flag();
 	    children[1]->set_used_flag();
@@ -6307,13 +6308,13 @@ Triangulation<3>::execute_refinement ()
 	      };
 	    
 	    new_lines[0]->set (internal::Triangulation
-                               ::Line(vertex_indices[2], vertex_indices[4]));
+                               ::TriaObject<1>(vertex_indices[2], vertex_indices[4]));
 	    new_lines[1]->set (internal::Triangulation
-                               ::Line(vertex_indices[4], vertex_indices[3]));
+                               ::TriaObject<1>(vertex_indices[4], vertex_indices[3]));
 	    new_lines[2]->set (internal::Triangulation
-                               ::Line(vertex_indices[0], vertex_indices[4]));
+                               ::TriaObject<1>(vertex_indices[0], vertex_indices[4]));
 	    new_lines[3]->set (internal::Triangulation
-                               ::Line(vertex_indices[4], vertex_indices[1]));
+                               ::TriaObject<1>(vertex_indices[4], vertex_indices[1]));
 
 	    for (unsigned int i=0; i<4; ++i)
 	      {
@@ -6397,25 +6398,25 @@ Triangulation<3>::execute_refinement ()
 	    quad->set_children (new_quads[0]->index());
 
 	    new_quads[0]->set (internal::Triangulation
-                               ::Quad(line_indices[0],
-                                      line_indices[8],
-                                      line_indices[4],
-                                      line_indices[10]));
+                               ::TriaObject<2> (line_indices[0],
+						line_indices[8],
+						line_indices[4],
+						line_indices[10]));
 	    new_quads[1]->set (internal::Triangulation
-                               ::Quad(line_indices[8],
-                                      line_indices[2],
-                                      line_indices[5],
-                                      line_indices[11]));
+                               ::TriaObject<2> (line_indices[8],
+						line_indices[2],
+						line_indices[5],
+						line_indices[11]));
 	    new_quads[2]->set (internal::Triangulation
-                               ::Quad(line_indices[1],
-                                      line_indices[9],
-                                      line_indices[10],
-                                      line_indices[6]));
+                               ::TriaObject<2> (line_indices[1],
+						line_indices[9],
+						line_indices[10],
+						line_indices[6]));
 	    new_quads[3]->set (internal::Triangulation
-                               ::Quad(line_indices[9],
-                                      line_indices[3],
-                                      line_indices[11],
-                                      line_indices[7]));
+                               ::TriaObject<2> (line_indices[9],
+						line_indices[3],
+						line_indices[11],
+						line_indices[7]));
 	    for (unsigned int i=0; i<4; ++i)
 	      {
 		new_quads[i]->set_used_flag();
@@ -6603,17 +6604,17 @@ Triangulation<3>::execute_refinement ()
 	      };
 	    
 	    new_lines[0]->set (internal::Triangulation
-                               ::Line(vertex_indices[2], vertex_indices[6]));
+                               ::TriaObject<1>(vertex_indices[2], vertex_indices[6]));
 	    new_lines[1]->set (internal::Triangulation
-                               ::Line(vertex_indices[6], vertex_indices[3]));
+                               ::TriaObject<1>(vertex_indices[6], vertex_indices[3]));
 	    new_lines[2]->set (internal::Triangulation
-                               ::Line(vertex_indices[0], vertex_indices[6]));
+                               ::TriaObject<1>(vertex_indices[0], vertex_indices[6]));
 	    new_lines[3]->set (internal::Triangulation
-                               ::Line(vertex_indices[6], vertex_indices[1]));
+                               ::TriaObject<1>(vertex_indices[6], vertex_indices[1]));
 	    new_lines[4]->set (internal::Triangulation
-                               ::Line(vertex_indices[4], vertex_indices[6]));
+                               ::TriaObject<1>(vertex_indices[4], vertex_indices[6]));
 	    new_lines[5]->set (internal::Triangulation
-                               ::Line(vertex_indices[6], vertex_indices[5]));
+                               ::TriaObject<1>(vertex_indices[6], vertex_indices[5]));
 
 	    for (unsigned int i=0; i<6; ++i)
 	      {
@@ -6889,65 +6890,65 @@ Triangulation<3>::execute_refinement ()
 					     //  *----*----*x     *--8-*--9-*
 	    
 	    new_quads[0]->set (internal::Triangulation
-                               ::Quad(line_indices[10],
-                                      line_indices[28],
-                                      line_indices[16],
-                                      line_indices[24]));
+                               ::TriaObject<2> (line_indices[10],
+						line_indices[28],
+						line_indices[16],
+						line_indices[24]));
 	    new_quads[1]->set (internal::Triangulation
-                               ::Quad(line_indices[28],
-                                      line_indices[14],
-                                      line_indices[17],
-                                      line_indices[25]));
+                               ::TriaObject<2> (line_indices[28],
+						line_indices[14],
+						line_indices[17],
+						line_indices[25]));
 	    new_quads[2]->set (internal::Triangulation
-                               ::Quad(line_indices[11],
-                                      line_indices[29],
-                                      line_indices[24],
-                                      line_indices[20]));
+                               ::TriaObject<2> (line_indices[11],
+						line_indices[29],
+						line_indices[24],
+						line_indices[20]));
 	    new_quads[3]->set (internal::Triangulation
-                               ::Quad(line_indices[29],
-                                      line_indices[15],
-                                      line_indices[25],
-                                      line_indices[21]));
+                               ::TriaObject<2> (line_indices[29],
+						line_indices[15],
+						line_indices[25],
+						line_indices[21]));
 	    new_quads[4]->set (internal::Triangulation
-                               ::Quad(line_indices[18],
-                                      line_indices[26],
-                                      line_indices[0],
-                                      line_indices[28]));
+                               ::TriaObject<2> (line_indices[18],
+						line_indices[26],
+						line_indices[0],
+						line_indices[28]));
 	    new_quads[5]->set (internal::Triangulation
-                               ::Quad(line_indices[26],
-                                      line_indices[22],
-                                      line_indices[1],
-                                      line_indices[29]));
+                               ::TriaObject<2> (line_indices[26],
+						line_indices[22],
+						line_indices[1],
+						line_indices[29]));
 	    new_quads[6]->set (internal::Triangulation
-                               ::Quad(line_indices[19],
-                                      line_indices[27],
-                                      line_indices[28],
-                                      line_indices[4]));
+                               ::TriaObject<2> (line_indices[19],
+						line_indices[27],
+						line_indices[28],
+						line_indices[4]));
 	    new_quads[7]->set (internal::Triangulation
-                               ::Quad(line_indices[27],
-                                      line_indices[23],
-                                      line_indices[29],
-                                      line_indices[5]));
+                               ::TriaObject<2> (line_indices[27],
+						line_indices[23],
+						line_indices[29],
+						line_indices[5]));
 	    new_quads[8]->set (internal::Triangulation
-                               ::Quad(line_indices[2],
-                                      line_indices[24],
-                                      line_indices[8],
-                                      line_indices[26]));
+                               ::TriaObject<2> (line_indices[2],
+						line_indices[24],
+						line_indices[8],
+						line_indices[26]));
 	    new_quads[9]->set (internal::Triangulation
-                               ::Quad(line_indices[24],
-                                      line_indices[6],
-                                      line_indices[9],
-                                      line_indices[27]));
+                               ::TriaObject<2> (line_indices[24],
+						line_indices[6],
+						line_indices[9],
+						line_indices[27]));
 	    new_quads[10]->set (internal::Triangulation
-                                ::Quad(line_indices[3],
-                                       line_indices[25],
-                                       line_indices[26],
-                                       line_indices[12]));
+                                ::TriaObject<2> (line_indices[3],
+						 line_indices[25],
+						 line_indices[26],
+						 line_indices[12]));
 	    new_quads[11]->set (internal::Triangulation
-                                ::Quad(line_indices[25],
-                                       line_indices[7],
-                                       line_indices[27],
-                                       line_indices[13]));
+                                ::TriaObject<2> (line_indices[25],
+						 line_indices[7],
+						 line_indices[27],
+						 line_indices[13]));
 
 					     // set flags
 	    for (unsigned int i=0; i<12; ++i)
@@ -7122,63 +7123,63 @@ Triangulation<3>::execute_refinement ()
 
 					     // bottom children
 	    new_hexes[0]->set (internal::Triangulation
-                               ::Hexahedron(quad_indices[12],
-                                            quad_indices[0],
-                                            quad_indices[20],
-                                            quad_indices[4],
-                                            quad_indices[28],
-                                            quad_indices[8]));
+                               ::TriaObject<3>(quad_indices[12],
+					       quad_indices[0],
+					       quad_indices[20],
+					       quad_indices[4],
+					       quad_indices[28],
+					       quad_indices[8]));
 	    new_hexes[1]->set (internal::Triangulation
-                               ::Hexahedron(quad_indices[0],
-                                            quad_indices[16],
-                                            quad_indices[22],
-                                            quad_indices[6],
-                                            quad_indices[29],
-                                            quad_indices[9]));
+                               ::TriaObject<3>(quad_indices[0],
+					       quad_indices[16],
+					       quad_indices[22],
+					       quad_indices[6],
+					       quad_indices[29],
+					       quad_indices[9]));
 	    new_hexes[2]->set (internal::Triangulation
-                               ::Hexahedron(quad_indices[13],
-                                            quad_indices[1],
-                                            quad_indices[4],
-                                            quad_indices[24],
-                                            quad_indices[30],
-                                            quad_indices[10]));
+                               ::TriaObject<3>(quad_indices[13],
+					       quad_indices[1],
+					       quad_indices[4],
+					       quad_indices[24],
+					       quad_indices[30],
+					       quad_indices[10]));
 	    new_hexes[3]->set (internal::Triangulation
-                               ::Hexahedron(quad_indices[1],
-                                            quad_indices[17],
-                                            quad_indices[6],
-                                            quad_indices[26],
-                                            quad_indices[31],
-                                            quad_indices[11]));
+                               ::TriaObject<3>(quad_indices[1],
+					       quad_indices[17],
+					       quad_indices[6],
+					       quad_indices[26],
+					       quad_indices[31],
+					       quad_indices[11]));
 	    
 					     // top children
 	    new_hexes[4]->set (internal::Triangulation
-                               ::Hexahedron(quad_indices[14],
-                                            quad_indices[2],
-                                            quad_indices[21],
-                                            quad_indices[5],
-                                            quad_indices[8],
-                                            quad_indices[32]));
+                               ::TriaObject<3>(quad_indices[14],
+					       quad_indices[2],
+					       quad_indices[21],
+					       quad_indices[5],
+					       quad_indices[8],
+					       quad_indices[32]));
 	    new_hexes[5]->set (internal::Triangulation
-                               ::Hexahedron(quad_indices[2],
-                                            quad_indices[18],
-                                            quad_indices[23],
-                                            quad_indices[7],
-                                            quad_indices[9],
-                                            quad_indices[33]));
+                               ::TriaObject<3>(quad_indices[2],
+					       quad_indices[18],
+					       quad_indices[23],
+					       quad_indices[7],
+					       quad_indices[9],
+					       quad_indices[33]));
 	    new_hexes[6]->set (internal::Triangulation
-                               ::Hexahedron(quad_indices[15],
-                                            quad_indices[3],
-                                            quad_indices[5],
-                                            quad_indices[25],
-                                            quad_indices[10],
-                                            quad_indices[34]));
+                               ::TriaObject<3>(quad_indices[15],
+					       quad_indices[3],
+					       quad_indices[5],
+					       quad_indices[25],
+					       quad_indices[10],
+					       quad_indices[34]));
 	    new_hexes[7]->set (internal::Triangulation
-                               ::Hexahedron(quad_indices[3],
-                                            quad_indices[19],
-                                            quad_indices[7],
-                                            quad_indices[27],
-                                            quad_indices[11],
-                                            quad_indices[35]));
+                               ::TriaObject<3>(quad_indices[3],
+					       quad_indices[19],
+					       quad_indices[7],
+					       quad_indices[27],
+					       quad_indices[11],
+					       quad_indices[35]));
             
 
 	    for (unsigned int i=0; i<8; ++i)
@@ -7244,8 +7245,8 @@ Triangulation<3>::execute_refinement ()
 	    for (unsigned int f=0; f<GeometryInfo<dim>::faces_per_cell; ++f)
 	      for (unsigned int s=0; s<GeometryInfo<dim>::subfaces_per_face; ++s) 
 		Assert(hex->face(f)->child(s)==hex->child(
-		  GeometryInfo<dim>::child_cell_on_face(
-		    f, s, hex->face_orientation(f), hex->face_flip(f), hex->face_rotation(f)))->face(f), ExcInternalError());
+			 GeometryInfo<dim>::child_cell_on_face(
+			   f, s, hex->face_orientation(f), hex->face_flip(f), hex->face_rotation(f)))->face(f), ExcInternalError());
 #endif
 
 					     /////////////////////////////////
@@ -9857,7 +9858,7 @@ template<int dim>
 void
 Triangulation<dim>::add_refinement_listener (RefinementListener &listener) const
 {
-    refinement_listeners.push_back (&listener);
+  refinement_listeners.push_back (&listener);
 }
 
 
@@ -9866,10 +9867,10 @@ template<int dim>
 void
 Triangulation<dim>::remove_refinement_listener (RefinementListener &listener) const
 {
-    typename std::list<RefinementListener *>::iterator p =
-	find (refinement_listeners.begin (), refinement_listeners.end (), &listener);
-    Assert (p != refinement_listeners.end (), ExcInternalError ());
-    refinement_listeners.erase (p);
+  typename std::list<RefinementListener *>::iterator p =
+    find (refinement_listeners.begin (), refinement_listeners.end (), &listener);
+  Assert (p != refinement_listeners.end (), ExcInternalError ());
+  refinement_listeners.erase (p);
 }
 
 

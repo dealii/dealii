@@ -436,7 +436,7 @@ namespace internal
  * @ingroup grid
  */
     
-    class TriaObjectsQuad3D: public TriaObjects<Quad>
+    class TriaObjectsQuad3D: public TriaObjects<TriaObject<2> >
     {
       public:
 					 /**
@@ -626,15 +626,15 @@ namespace internal
 
     template<>
     void
-    TriaObjects<Line>::reserve_space (const unsigned int new_lines);
+    TriaObjects<TriaObject<1> >::reserve_space (const unsigned int new_lines);
 
     template<>
     void
-    TriaObjects<Quad>::reserve_space (const unsigned int new_quads);
+    TriaObjects<TriaObject<2> >::reserve_space (const unsigned int new_quads);
 
     template<>
     void
-    TriaObjects<Quad>::monitor_memory (const unsigned int) const;
+    TriaObjects<TriaObject<2> >::monitor_memory (const unsigned int) const;
     
   }
 }

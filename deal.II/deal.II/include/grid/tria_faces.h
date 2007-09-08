@@ -84,7 +84,7 @@ namespace internal
 					 /**
 					  *  The TriaObject containing the data of lines.
 					  */
-	TriaObjects<Line> lines;
+	TriaObjects<TriaObject<1> > lines;
 
       public:
 					 /**
@@ -113,7 +113,7 @@ namespace internal
 					 /**
 					  *  The TriaObject containing the data of lines.
 					  */
-        TriaObjects<Line> lines;	    
+        TriaObjects<TriaObject<1> > lines;	    
 
       public:
 					 /**

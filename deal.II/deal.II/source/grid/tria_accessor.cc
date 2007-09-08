@@ -39,7 +39,7 @@ const unsigned int TriaObjectAccessor<1, dim>::objectdim;
 
 template <int dim>
 void
-TriaObjectAccessor<1, dim>::set (const internal::Triangulation::Line &line) const
+TriaObjectAccessor<1, dim>::set (const internal::Triangulation::TriaObject<1>  &line) const
 {
   objects().cells[this->present_index] = line;
 }
@@ -332,7 +332,7 @@ const unsigned int TriaObjectAccessor<2, dim>::objectdim;
 
 template <int dim>
 void
-TriaObjectAccessor<2, dim>::set (const internal::Triangulation::Quad &quad) const
+TriaObjectAccessor<2, dim>::set (const internal::Triangulation::TriaObject<2> &quad) const
 {
   objects().cells[this->present_index] = quad;
 }
@@ -860,7 +860,7 @@ const unsigned int TriaObjectAccessor<3, dim>::objectdim;
 
 template <>
 void
-TriaObjectAccessor<3, 3>::set (const internal::Triangulation::Hexahedron &hex) const
+TriaObjectAccessor<3, 3>::set (const internal::Triangulation::TriaObject<3> &hex) const
 {
   this->tria->levels[this->present_level]
     ->cells.cells[this->present_index] = hex;

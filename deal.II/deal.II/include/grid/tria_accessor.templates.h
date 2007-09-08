@@ -249,7 +249,7 @@ TriaObjectAccessor<1,dim>::TriaObjectAccessor (
 // subsequent accessor functions
 template <>
 inline
-internal::Triangulation::TriaObjects<internal::Triangulation::Line> &
+internal::Triangulation::TriaObjects<internal::Triangulation::TriaObject<1> > &
 TriaObjectAccessor<1,1>::objects() const
 {
   return this->tria->levels[this->present_level]->cells;
@@ -259,7 +259,7 @@ TriaObjectAccessor<1,1>::objects() const
 
 template <int dim>
 inline
-internal::Triangulation::TriaObjects<internal::Triangulation::Line> &
+internal::Triangulation::TriaObjects<internal::Triangulation::TriaObject<1> > &
 TriaObjectAccessor<1,dim>::objects() const
 {
   return this->tria->faces->lines;
@@ -531,7 +531,7 @@ TriaObjectAccessor<2,dim>::TriaObjectAccessor (
 // subsequent accessor functions
 template <>
 inline
-internal::Triangulation::TriaObjects<internal::Triangulation::Quad> &
+internal::Triangulation::TriaObjects<internal::Triangulation::TriaObject<2> > &
 TriaObjectAccessor<2,2>::objects() const
 {
   return this->tria->levels[this->present_level]->cells;
@@ -541,7 +541,7 @@ TriaObjectAccessor<2,2>::objects() const
 
 template <int dim>
 inline
-internal::Triangulation::TriaObjects<internal::Triangulation::Quad> &
+internal::Triangulation::TriaObjects<internal::Triangulation::TriaObject<2> > &
 TriaObjectAccessor<2,dim>::objects() const
 {
   return this->tria->faces->quads;

@@ -28,7 +28,7 @@ namespace internal
   {    
     template<>
     void
-    TriaObjects<Line>::reserve_space (const unsigned int new_lines)
+    TriaObjects<TriaObject<1> >::reserve_space (const unsigned int new_lines)
     {
       const unsigned int new_size = new_lines +
                                     std::count_if (used.begin(),
@@ -41,7 +41,7 @@ namespace internal
           cells.reserve (new_size);
           cells.insert (cells.end(),
 			new_size-cells.size(),
-			Line());
+			TriaObject<1> ());
   
           used.reserve (new_size);
           used.insert (used.end(),
@@ -73,7 +73,7 @@ namespace internal
 
     template<>
     void
-    TriaObjects<Quad>::reserve_space (const unsigned int new_quads)
+    TriaObjects<TriaObject<2> >::reserve_space (const unsigned int new_quads)
     {
       const unsigned int new_size = new_quads +
                                     std::count_if (used.begin(),
@@ -86,7 +86,7 @@ namespace internal
           cells.reserve (new_size);
           cells.insert (cells.end(),
 			new_size-cells.size(),
-			Quad());
+			TriaObject<2> ());
       
           used.reserve (new_size);
           used.insert (used.end(),
@@ -130,7 +130,7 @@ namespace internal
           cells.reserve (new_size);
           cells.insert (cells.end(),
 			new_size-cells.size(),
-			Hexahedron());
+			TriaObject<3> ());
       
           used.reserve (new_size);
           used.insert (used.end(),
@@ -187,7 +187,7 @@ namespace internal
                                        // see above...
       if (new_size>cells.size())
         {
-          TriaObjects<Quad>::reserve_space(new_quads);
+          TriaObjects<TriaObject<2> >::reserve_space(new_quads);
           line_orientations.reserve (new_size * GeometryInfo<2>::lines_per_cell);
           line_orientations.insert (line_orientations.end(),
 				    new_size * GeometryInfo<2>::lines_per_cell
@@ -199,7 +199,7 @@ namespace internal
 
     template<>
     void
-    TriaObjects<Line>::monitor_memory (const unsigned int) const
+    TriaObjects<TriaObject<1> >::monitor_memory (const unsigned int) const
     {
                                        // check that we have not allocated
                                        // too much memory. note that bool
@@ -239,7 +239,7 @@ namespace internal
 
     template<>
     void
-    TriaObjects<Quad>::monitor_memory (const unsigned int) const
+    TriaObjects<TriaObject<2> >::monitor_memory (const unsigned int) const
     {
                                        // check that we have not allocated
                                        // too much memory. note that bool
@@ -342,7 +342,7 @@ namespace internal
               == line_orientations.size(),
               ExcMemoryInexact (cells.size() * GeometryInfo<2>::lines_per_cell,
                                 line_orientations.size()));
-      TriaObjects<Quad>::monitor_memory (3);
+      TriaObjects<TriaObject<2> >::monitor_memory (3);
       
     }
 
@@ -364,7 +364,7 @@ namespace internal
     void
     TriaObjectsHex::clear()
     {
-      TriaObjects<Hexahedron>::clear();
+      TriaObjects<TriaObject<3> >::clear();
       face_orientations.clear();
       face_flips.clear();
       face_rotations.clear();
@@ -374,7 +374,7 @@ namespace internal
     void
     TriaObjectsQuad3D::clear()
     {
-      TriaObjects<Quad>::clear();
+      TriaObjects<TriaObject<2> >::clear();
       line_orientations.clear();
     }
     
@@ -398,7 +398,7 @@ namespace internal
       return (MemoryConsumption::memory_consumption (face_orientations) +
 	      MemoryConsumption::memory_consumption (face_flips) +
 	      MemoryConsumption::memory_consumption (face_rotations) +
-	      TriaObjects<Hexahedron>::memory_consumption() );
+	      TriaObjects<TriaObject<3> >::memory_consumption() );
     }
 
 
@@ -406,13 +406,13 @@ namespace internal
     TriaObjectsQuad3D::memory_consumption () const
     {
       return (MemoryConsumption::memory_consumption (line_orientations) +
-	      this->TriaObjects<Quad>::memory_consumption() );
+	      this->TriaObjects<TriaObject<2> >::memory_consumption() );
     }
 
 				     // explicit instantiations
 
-    template class TriaObjects<Line>;
-    template class TriaObjects<Quad>;
+    template class TriaObjects<TriaObject<1> >;
+    template class TriaObjects<TriaObject<2> >;
   }
 }
 
