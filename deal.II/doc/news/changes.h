@@ -1,23 +1,9 @@
-<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN"
-                 "http://www.w3.org/TR/html4/loose.dtd">
-<html>
-<head>
-  <link href="../screen.css" rel="StyleSheet">
-  <title>The deal.II news page</title>
-  <meta name="author" content="the deal.II authors <authors@dealii.org>">
-  <meta name="copyright" content="Copyright (C) 2000, 2001, 2002, 2003, 2004, 2005, 2006, 2007 by the deal.II authors">
-  <meta name="date" content="$Date$">
-  <meta name="keywords" content="deal.II"></head>
-  <meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1">
-</head>
-<body>
-
-
-<h2>Changes after Version 6.0</h2>
+/**
+ * @page changes_after_6.0 Changes after Version 6.0
 
 <p>
 This is the list of changes made after the release of 
-<acronym>deal.II</acronym> version 6.0. It is subdivided into changes
+deal.II version 6.0. It is subdivided into changes
 made to the three sub-libraries <a href="#base">base</a>, 
 <a href="#lac">lac</a>, and <a href="#deal.II">deal.II</a>, as well as
 changes to the <a href="#general">general infrastructure,
@@ -44,14 +30,6 @@ inconvenience this causes.
 </p>
 
 <ol>
-</ol>
-
-
-
-<a name="general"></a>
-<h3>General</h3>
-
-<ol>
   <li> <p>Changed: The deprecated typedefs
   <code>internal::Triangulation::Line</code>, 
   <code>internal::Triangulation::Quad</code>, and
@@ -63,10 +41,20 @@ inconvenience this causes.
 
 
 
+<a name="general"></a>
+<h3>General</h3>
+
+<ol>
+  <li>
+</ol>
+
+
+
 <a name="base"></a>
 <h3>base</h3>
 
 <ol>
+  <li>
 </ol>
 
 
@@ -75,6 +63,7 @@ inconvenience this causes.
 <h3>lac</h3>
 
 <ol>
+  <li>
 </ol>
 
 
@@ -83,10 +72,8 @@ inconvenience this causes.
 <h3>deal.II</h3>
 
 <ol>
+  <li>
 </ol>
 
-<hr>
-Last update $Date$
 
-</body>
-</html>
+*/

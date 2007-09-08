@@ -9,7 +9,8 @@ INPUT    = headers/ \
 	../../deal.II/include/grid \
 	../../deal.II/include/multigrid \
 	../../deal.II/include/numerics \
-	tutorial/doxygen
+	tutorial/doxygen \
+	../news/changes.h
 
 HTML_OUTPUT      = deal.II
 LATEX_OUTPUT     = LaTeX/deal.II
