@@ -157,9 +157,6 @@ namespace internal
  * and since access to the number of lines etc is a rather frequent
  * operation, this was not an optimal solution.
  *
- * Note: these class should be made local to the triangulation class
- * once the compiler supports that (gcc2.95 does not at present).
- *
  * @ingroup grid
  * @author Wolfgang Bangerth, 1999
  */
@@ -178,9 +175,6 @@ namespace internal
  * the elements until we hit the end iterator. This is time consuming
  * and since access to the number of lines etc is a rather frequent
  * operation, this was not an optimal solution.
- *
- * Note: these class should be made local to the triangulation class
- * once the compiler supports that (gcc2.95 does not at present).
  *
  * @ingroup grid
  * @author Wolfgang Bangerth, 1999
@@ -240,9 +234,6 @@ namespace internal
  * and since access to the number of lines etc is a rather frequent
  * operation, this was not an optimal solution.
  *
- * Note: these class should be made local to the triangulation class
- * once the compiler supports that (gcc2.95 does not at present).
- *
  * @ingroup grid
  * @author Wolfgang Bangerth, 1999
  */
@@ -301,9 +292,6 @@ namespace internal
  * the elements until we hit the end iterator. This is time consuming
  * and since access to the number of lines etc is a rather frequent
  * operation, this was not an optimal solution.
- *
- * Note: these class should be made local to the triangulation class
- * once the compiler supports that (gcc2.95 does not at present).
  *
  * @ingroup grid
  * @author Wolfgang Bangerth, 1999
