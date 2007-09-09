@@ -34,22 +34,16 @@
 
 DEAL_II_NAMESPACE_OPEN
 
-// initialize the @p{straight_boundary} pointer of the triangulation
-// class. for the reasons why it is done like this, see the
-// documentation of that member variable
-namespace 
-{
-  const StraightBoundary<deal_II_dimension> dummy_straight_boundary;
-}
-
-
 template <int dim>
-const StraightBoundary<dim> *
-Triangulation<dim>::straight_boundary = &dummy_straight_boundary;
+const StraightBoundary<dim>
+Triangulation<dim>::straight_boundary = StraightBoundary<dim>();
+
+
 
 template <int dim>
 const unsigned int
 Triangulation<dim>::dimension;
+
 
 
 template <int dim>
@@ -61,7 +55,7 @@ Triangulation<dim>::Triangulation (const MeshSmoothing smooth_grid) :
 				   // set default boundary for all
 				   // possible components
   for (unsigned int i=0;i<255;++i)
-    boundary[i] = straight_boundary;
+    boundary[i] = &straight_boundary;
 }
 
 
@@ -110,7 +104,7 @@ template <int dim>
 void
 Triangulation<dim>::set_boundary (const unsigned int number)
 {
-  set_boundary (number, *straight_boundary);
+  set_boundary (number, straight_boundary);
 }
 
 
@@ -4924,7 +4918,7 @@ Triangulation<dim>::clear_despite_subscriptions()
   vertices_used.clear ();
   
   for (unsigned int i=0; i<255; ++i)
-    boundary[i] = straight_boundary;
+    boundary[i] = &straight_boundary;
   
   number_cache = internal::Triangulation::NumberCache<dim>();
 }

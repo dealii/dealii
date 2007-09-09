@@ -1142,33 +1142,12 @@ class Triangulation : public Subscriptor
 {
   private:
 				     /**
-				      * Default boundary object. This
-				      * declaration is used for the
-				      * default argument in
-				      * @p set_boundary.
-				      *
-				      * The proper way would have been
-				      * to use a static object here,
-				      * rather than a pointer to an
-				      * object. However, we have to
-				      * work around a bug in gcc2.95,
-				      * where the compiler tries to
-				      * instantiate @p Triangulation
-				      * while instantiating
-				      * @p Boundary (which it needs
-				      * to do, since local typedefs
-				      * are involved), but then tries
-				      * to in turn instantiate
-				      * @p StraightBoundary because
-				      * of this member variable. This
-				      * is not needed since the member
-				      * variable is a static one, but
-				      * the compiler tries anyway and
-				      * finds that it can't since the
-				      * base class @p Boundary is not
-				      * yet complete...
+				      * Default boundary object. This is used
+				      * for those boundaries for which no
+				      * boundary object has been explicitly
+				      * set using set_boundary().
 				      */
-    static const StraightBoundary<dim> *straight_boundary;
+    static const StraightBoundary<dim> straight_boundary;
 
 				     /**
 				      * An internal typedef to make
