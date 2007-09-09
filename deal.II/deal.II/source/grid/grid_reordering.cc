@@ -108,12 +108,6 @@ namespace internal
                                            // for each of them, check
                                            // whether they are already
                                            // in the set
-	                                   //
-	                                   // unroll the loop by hand to
-	                                   // avoid a nasty compiler error
-	                                   // in gcc2.95 that generated
-	                                   // duplicate	assembler labels
-	                                   // otherwise	  
 	  if ((edges.find (reverse_edges[0]) != edges.end()) ||
 	      (edges.find (reverse_edges[1]) != edges.end()) ||
 	      (edges.find (reverse_edges[2]) != edges.end()) ||
