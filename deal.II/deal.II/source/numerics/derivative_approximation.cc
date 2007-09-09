@@ -614,31 +614,6 @@ approximate_derivative_tensor (const DH<dim>                                &dof
 
 
 
-#ifdef DEAL_II_FUNPTR_TEMPLATE_TEMPLATE_BUG
-namespace WorkAround
-{
-// gcc 2.95 is not happy if we take the address of a template function as in
-//
-//  DerivativeApproximation::template approximate<DerivativeDescription,dim,DH>
-//
-// if one of the template arguments is a template-template
-// parameter. so work around this problem in a rather unnerving and
-// weird way, but at least it works
-  template <template <int> class DH> struct IsHP
-  {
-      static const bool value = false;
-  };
-  template <template <int> class DH> const bool IsHP<DH>::value;
-
-  template <> struct IsHP<hp::DoFHandler>
-  {
-      static const bool value = true;
-  };
-  const bool IsHP<hp::DoFHandler>::value;  
-}
-#endif
-
-
 template <class DerivativeDescription, int dim,
           template <int> class DH, class InputVector>
 void 
@@ -667,19 +642,13 @@ approximate_derivative (const Mapping<dim>    &mapping,
                           const IndexInterval   &,
                           Vector<float>         &);
 
-#ifdef DEAL_II_FUNPTR_TEMPLATE_TEMPLATE_BUG
-  const FunPtr fun_ptr
-    = (WorkAround::IsHP<DH>::value ?
-       &DerivativeApproximation::template approximate<DerivativeDescription,dim,hp::DoFHandler,InputVector> :
-       &DerivativeApproximation::template approximate<DerivativeDescription,dim,DoFHandler,InputVector>);
-#else
-  const FunPtr fun_ptr
-    = &DerivativeApproximation::template approximate<DerivativeDescription,dim,DH,InputVector>;
-#endif
   for (unsigned int i=0; i<n_threads; ++i)
-    threads += Threads::spawn (fun_ptr)(mapping, dof_handler, solution, component,
-                                        index_intervals[i],
-                                        derivative_norm);
+    threads += Threads::spawn (&DerivativeApproximation::
+			       template approximate<DerivativeDescription,dim,
+			       DH,InputVector>)
+	       (mapping, dof_handler, solution, component,
+		index_intervals[i],
+		derivative_norm);
   threads.join_all ();
 }
 
