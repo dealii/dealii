@@ -2,7 +2,7 @@
 //    $Id$
 //    Version: $Name$
 //
-//    Copyright (C) 1998, 1999, 2000, 2001, 2002, 2003, 2004, 2005, 2006 by the deal.II authors
+//    Copyright (C) 1998, 1999, 2000, 2001, 2002, 2003, 2004, 2005, 2006, 2007 by the deal.II authors
 //
 //    This file is subject to QPL and may not be  distributed
 //    without copyright and license information. Please refer
@@ -511,23 +511,6 @@ class TriaRawIterator :
 		    << (arg1.state() == IteratorState::valid ? "valid" :
 			(arg1.state() == IteratorState::past_the_end ?
 			 "past_the_end" : "invalid")));
-
-#ifdef DEAL_II_NESTED_CLASS_FRIEND_BUG
-				     // the above exception class is
-				     // supposed to report information
-				     // about *this, but to do so it
-				     // needs to access member
-				     // elements of the enclosing
-				     // class. by defect report #45
-				     // to the C++ standard, this is
-				     // supposed to be allowed, but
-				     // gcc2.95 rejects it (pre-defect
-				     // report era), so declare the
-				     // member class a friend. only do
-				     // this if ./configure detected
-				     // the necessity to do so
-    friend class ExcDereferenceInvalidObject;
-#endif
     
 				     /**
 				      *  Exception
