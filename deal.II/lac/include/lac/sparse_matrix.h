@@ -76,17 +76,6 @@ namespace internals
         typedef const SparseMatrix<number> MatrixType;
 
                                          /**
-                                          * Create a typedef for the non-const
-                                          * version of this accessor. This is
-                                          * only used in one place, but is
-                                          * needed to work around a problem in
-                                          * gcc 2.95 and 3.0.
-                                          */
-        typedef
-        internals::SparseMatrixIterators::Accessor<number,false>
-        NonConstAccessor;
-        
-                                         /**
                                           * Constructor.
                                           */
         Accessor (MatrixType         *matrix,
@@ -104,7 +93,7 @@ namespace internals
                                           * non-const accessor to a const
                                           * accessor.
                                           */
-        Accessor (const NonConstAccessor &a);
+        Accessor (const internals::SparseMatrixIterators::Accessor<number,false> &a);
 
                                          /**
                                           * Value of this matrix entry.
@@ -119,12 +108,24 @@ namespace internals
                                           * reference.
                                           */
         MatrixType & get_matrix () const;
-        
+
       private:
                                          /**
                                           * Pointer to the matrix we use.
                                           */
         MatrixType *matrix;
+
+					 /**
+					  * Make the advance function of the
+					  * base class available.
+					  */
+	using SparsityPatternIterators::Accessor::advance;
+
+					 /**
+					  * Make iterator class a friend.
+					  */
+	template <typename, bool>
+	friend class Iterator;
     };
     
 
@@ -287,6 +288,18 @@ namespace internals
                                           */
         MatrixType *matrix;
 
+					 /**
+					  * Make the advance function of the
+					  * base class available.
+					  */
+	using SparsityPatternIterators::Accessor::advance;
+
+					 /**
+					  * Make iterator class a friend.
+					  */
+	template <typename, bool>
+	friend class Iterator;
+	
                                          /**
                                           * Make the inner reference class a
                                           * friend if the compiler has a bug
@@ -325,18 +338,6 @@ namespace internals
         typedef
         typename Accessor<number,Constness>::MatrixType
         MatrixType;
-        
-
-                                         /**
-                                          * Create a typedef for the non-const
-                                          * version of this iterator. This is
-                                          * only used in one place, but is
-                                          * needed to work around a problem in
-                                          * gcc 2.95 and 3.0.
-                                          */
-        typedef
-        internals::SparseMatrixIterators::Iterator<number,false>
-        NonConstIterator;
 
                                          /**
                                           * Constructor. Create an iterator
@@ -357,15 +358,8 @@ namespace internals
                                           * Conversion constructor to get from
                                           * a non-const iterator to a const
                                           * iterator.
-                                          *
-                                          * (Note: the fact that we fully
-                                          * specialize the namespace of the
-                                          * accessor class is to work around a
-                                          * bug in gcc 2.95 and 3.0. We really
-                                          * mean the present class, but with
-                                          * different template arguments.)
                                           */
-        Iterator (const NonConstIterator &i);
+        Iterator (const internals::SparseMatrixIterators::Iterator<number,false> &i);
         
                                          /**
                                           * Prefix increment.
@@ -2057,7 +2051,7 @@ namespace internals
     template <typename number>
     inline
     Accessor<number,true>::
-    Accessor (const NonConstAccessor &a)
+    Accessor (const internals::SparseMatrixIterators::Accessor<number,false> &a)
                     :
                     SparsityPatternIterators::Accessor (a),
                     matrix (&a.get_matrix())
@@ -2241,7 +2235,7 @@ namespace internals
     template <typename number, bool Constness>
     inline
     Iterator<number, Constness>::
-    Iterator (const NonConstIterator &i)
+    Iterator (const internals::SparseMatrixIterators::Iterator<number,false> &i)
                     :
                     accessor(*i)
     {}

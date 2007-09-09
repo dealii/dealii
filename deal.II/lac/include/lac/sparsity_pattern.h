@@ -259,18 +259,6 @@ namespace internals
                                           */
 	bool operator < (const Accessor &) const;
 
-                                         /**
-                                          * Move the accessor to the next
-                                          * nonzero entry in the matrix. This
-                                          * function should actually only be
-                                          * called from iterator classes, but
-                                          * due to various problems with
-                                          * friends and templates in gcc 2.95,
-                                          * we can't make it protected. Don't
-                                          * use it in your own programs.
-                                          */
-        void advance ();
-
 					 /** @addtogroup Exceptions
 					  * @{ */
 	
@@ -296,6 +284,12 @@ namespace internals
                                           */
         unsigned int a_index;
 
+                                         /**
+                                          * Move the accessor to the next
+                                          * nonzero entry in the matrix.
+                                          */
+        void advance ();
+	
                                          /**
                                           * Grant access to iterator class.
                                           */
