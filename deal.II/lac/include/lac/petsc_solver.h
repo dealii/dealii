@@ -2,7 +2,7 @@
 //    $Id$
 //    Version: $Name$
 //
-//    Copyright (C) 2004, 2005, 2006 by the deal.II authors
+//    Copyright (C) 2004, 2005, 2006, 2007 by the deal.II authors
 //
 //    This file is subject to QPL and may not be  distributed
 //    without copyright and license information. Please refer
@@ -276,11 +276,7 @@ namespace PETScWrappers
                                         *
                                         * The last argument takes a structure
                                         * with additional, solver dependent
-                                        * flags for tuning. We specify the
-                                        * (default) value to the constructor
-                                        * call in this default argument
-                                        * because otherwise gcc 2.95 generates
-                                        * a compiler fault.
+                                        * flags for tuning.
                                         *
                                         * Note that the communicator used here
                                         * must match the communicator used in
@@ -294,7 +290,7 @@ namespace PETScWrappers
                                         */
       SolverRichardson (SolverControl        &cn,
                         const MPI_Comm       &mpi_communicator = PETSC_COMM_SELF,
-                        const AdditionalData &data = AdditionalData(1));
+                        const AdditionalData &data = AdditionalData());
 
     protected:
                                        /**
@@ -572,11 +568,7 @@ namespace PETScWrappers
                                         *
                                         * The last argument takes a structure
                                         * with additional, solver dependent
-                                        * flags for tuning. We specify the
-                                        * (default) value to the constructor
-                                        * call in this default argument
-                                        * because otherwise gcc 2.95 generates
-                                        * a compiler fault.
+                                        * flags for tuning.
                                         *
                                         * Note that the communicator used here
                                         * must match the communicator used in
@@ -590,7 +582,7 @@ namespace PETScWrappers
                                         */
       SolverGMRES (SolverControl        &cn,
                    const MPI_Comm       &mpi_communicator = PETSC_COMM_SELF,
-                   const AdditionalData &data = AdditionalData(30,false));
+                   const AdditionalData &data = AdditionalData());
 
     protected:
                                        /**
