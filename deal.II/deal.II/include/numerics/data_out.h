@@ -166,36 +166,6 @@ template <int> class FEValuesBase;
 template <class DH, int patch_dim, int patch_space_dim=patch_dim>
 class DataOut_DoFData : public DataOutInterface<patch_dim,patch_space_dim>
 {
-//TODO: Do we still need this after changing the template argument? it also appears as if this bug is only triggered with gcc2.95, which we don't support any more anyway...
-#ifdef DEAL_II_TEMPLATE_TEMPLATE_TYPEDEF_BUG
-				     // helper class
-    struct DH_dim : public DH
-    {
-					 // constructor. will
-					 // not be implemented,
-					 // but suppresses compiler
-					 // warning about non-default
-					 // constructor of GridClass
-	DH_dim ();
-
-					 /**
-					  * Declare iterator type, for
-					  * access from outside.
-					  */
-	typedef typename DH::cell_iterator cell_iterator;
-	typedef typename DH::active_cell_iterator active_cell_iterator;
-    };
-  public:
-    
-				     /**
-				      * Typedef to the iterator type
-				      * of the dof handler class under
-				      * consideration.
-				      */
-    typedef typename DH_dim::cell_iterator cell_iterator;
-    typedef typename DH_dim::active_cell_iterator active_cell_iterator;
-
-#else
   public:
 
 				     /**
@@ -205,7 +175,7 @@ class DataOut_DoFData : public DataOutInterface<patch_dim,patch_space_dim>
 				      */
     typedef typename DH::cell_iterator cell_iterator;
     typedef typename DH::active_cell_iterator active_cell_iterator;
-#endif
+
   public:
 
 				     /**
