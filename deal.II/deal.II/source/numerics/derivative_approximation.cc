@@ -641,11 +641,12 @@ approximate_derivative (const Mapping<dim>    &mapping,
                           const unsigned int     ,
                           const IndexInterval   &,
                           Vector<float>         &);
-
+  FunPtr fun_ptr = &DerivativeApproximation::
+		   template approximate<DerivativeDescription,dim,
+		   DH,InputVector>;
+  
   for (unsigned int i=0; i<n_threads; ++i)
-    threads += Threads::spawn (&DerivativeApproximation::
-			       template approximate<DerivativeDescription,dim,
-			       DH,InputVector>)
+    threads += Threads::spawn (fun_ptr)
 	       (mapping, dof_handler, solution, component,
 		index_intervals[i],
 		derivative_norm);
