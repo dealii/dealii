@@ -747,7 +747,8 @@ class DataOut_DoFData : public DataOutInterface<patch_dim,patch_space_dim>
 				      * the non-qualified version...
                                       */
 #  ifdef DEAL_II_NESTED_CLASS_TEMPL_FRIEND_BUG
-    template <typename> friend class DataEntry;
+    template <typename>
+    friend class DataEntry;
 #  else
     template <int N1, template <int> class DH1, int N2, int N3>
     template <typename>
