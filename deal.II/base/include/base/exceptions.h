@@ -909,6 +909,17 @@ namespace StandardExceptions
 //@}
 }
 
+/**
+ * Special assertion for dimension mismatch.
+ *
+ * Since this is used very often and always repeats the arguments, we
+ *introduce this special assertion for ExcDimensionMismatch in order
+ *to keep the user codes shorter.
+ */
+#define AssertDimension(dim1,dim2) Assert((dim1) == (dim2), \
+  ExcDimensionMismatch((dim1),(dim2)))
+
+
 /*
  * Unfortunately, the following must be repeated for each library,
  * since we cannot have ifdefs in macros.
