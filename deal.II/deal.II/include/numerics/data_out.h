@@ -21,6 +21,7 @@
 #include <base/data_out_base.h>
 #include <dofs/dof_handler.h>
 #include <fe/mapping.h>
+#include <numerics/data_postprocessor.h>
 
 #include <boost/shared_ptr.hpp>
 
@@ -344,6 +345,31 @@ class DataOut_DoFData : public DataOutInterface<patch_dim,patch_space_dim>
 			  const DataVectorType  type = type_automatic);
 
 				     /**
+				      * This function is an alternative to the
+				      * above ones, allowing the output of
+				      * derived quantities instead of the given
+				      * data. This converison has to be done in
+				      * a class derived from DataPostprocessor.
+				      *
+				      * The names for these derived quantities
+				      * are implicitly given via the @p
+				      * data_postprocessor argument. As only
+				      * data of type @p type_dof_data can be
+				      * transformed, this type is also known
+				      * implicitly and does not have to be
+				      * given.
+				      *
+				      * The actual type for the template
+				      * argument may be any vector type from
+				      * which FEValues can extract values
+				      * on a cell using the
+				      * FEValuesBase::get_function_values() function.
+				      */
+    template <class VECTOR>
+    void add_data_vector (const VECTOR                           &data,
+			  const DataPostprocessor<DH::dimension> &data_postprocessor);
+
+				     /**
 				      * Release the pointers to the
 				      * data vectors. This allows
 				      * output of a new set of vectors
@@ -460,6 +486,10 @@ class DataOut_DoFData : public DataOutInterface<patch_dim,patch_space_dim>
 				     /**
 				      * Exception
 				      */
+    DeclException0 (ExcDataPostprocessingIsNotPossibleForCellData);
+				     /**
+				      * Exception
+				      */
     DeclException3 (ExcInvalidVectorSize,
 		    int, int, int,
 		    << "The vector has size " << arg1
@@ -533,7 +563,8 @@ class DataOut_DoFData : public DataOutInterface<patch_dim,patch_space_dim>
 					  * for the individual components of
 					  * the vector.
 					  */
-	DataEntryBase (const std::vector<std::string> &names);
+	DataEntryBase (const std::vector<std::string>         &names,
+		       const DataPostprocessor<DH::dimension> *data_postprocessor=0);
 
                                          /**
                                           * Destructor made virtual.
@@ -574,6 +605,54 @@ class DataOut_DoFData : public DataOutInterface<patch_dim,patch_space_dim>
                              std::vector<Vector<double> >    &patch_values_system) const = 0;
 
                                          /**
+                                          * Given a FEValuesBase object,
+                                          * extract the gradients on the present
+                                          * cell from the vector we actually
+                                          * store.
+                                          */
+        virtual
+        void
+        get_function_gradients (const FEValuesBase<DH::dimension> &fe_patch_values,
+				std::vector<Tensor<1,DH::dimension> >       &patch_gradients) const = 0;
+        
+                                         /**
+                                          * Given a FEValuesBase object,
+                                          * extract the gradients on the present
+                                          * cell from the vector we actually
+                                          * store. This function does the same
+                                          * as the one above but for
+                                          * vector-valued finite elements.
+                                          */
+        virtual
+        void
+        get_function_gradients (const FEValuesBase<DH::dimension> &fe_patch_values,
+				std::vector<std::vector<Tensor<1,DH::dimension> > > &patch_gradients_system) const = 0;
+
+                                         /**
+                                          * Given a FEValuesBase object, extract
+                                          * the second derivatives on the
+                                          * present cell from the vector we
+                                          * actually store.
+                                          */
+        virtual
+        void
+        get_function_second_derivatives (const FEValuesBase<DH::dimension> &fe_patch_values,
+					 std::vector<Tensor<2,DH::dimension> >       &patch_second_derivatives) const = 0;
+        
+                                         /**
+                                          * Given a FEValuesBase object, extract
+                                          * the second derivatives on the
+                                          * present cell from the vector we
+                                          * actually store. This function does
+                                          * the same as the one above but for
+                                          * vector-valued finite elements.
+                                          */
+        virtual
+        void
+        get_function_second_derivatives (const FEValuesBase<DH::dimension> &fe_patch_values,
+					 std::vector<std::vector< Tensor<2,DH::dimension> > > &patch_second_derivatives_system) const = 0;
+
+                                         /**
                                           * Clear all references to the
                                           * vectors.
                                           */
@@ -590,7 +669,26 @@ class DataOut_DoFData : public DataOutInterface<patch_dim,patch_space_dim>
 					  * Names of the components of this
 					  * data vector.
 					  */
-	std::vector<std::string> names;
+	const std::vector<std::string> names;
+
+					 /**
+					  * Pointer to a DataPostprocessing
+					  * object which shall be applied to
+					  * this data vector.
+					  */
+	SmartPointer<const DataPostprocessor<DH::dimension> > postprocessor;
+
+					 /**
+					  * Number of output variables this
+					  * dataset provides (either number of
+					  * components in vector valued function
+					  * / data vector or number of computed
+					  * quantities, if DataPostprocessor is
+					  * applied). This variable is
+					  * determined via and thus equivalent
+					  * to <tt>names.size()</tt>.
+					  */
+	unsigned int n_output_variables;
     };
 
 
@@ -611,8 +709,9 @@ class DataOut_DoFData : public DataOutInterface<patch_dim,patch_space_dim>
 					  * vector and the list of names for
 					  * the individual components.
 					  */
-	DataEntry (const VectorType               *data,
-		   const std::vector<std::string> &names);
+	DataEntry (const VectorType                       *data,
+		   const std::vector<std::string>         &names,
+		   const DataPostprocessor<DH::dimension> *data_postprocessor);
 
                                          /**
                                           * Assuming that the stored vector is
@@ -648,6 +747,54 @@ class DataOut_DoFData : public DataOutInterface<patch_dim,patch_space_dim>
                              std::vector<Vector<double> >    &patch_values_system) const;
 
                                          /**
+                                          * Given a FEValuesBase object,
+                                          * extract the gradients on the present
+                                          * cell from the vector we actually
+                                          * store.
+                                          */
+        virtual
+        void
+        get_function_gradients (const FEValuesBase<DH::dimension> &fe_patch_values,
+				std::vector<Tensor<1,DH::dimension> >       &patch_gradients) const;
+        
+                                         /**
+                                          * Given a FEValuesBase object,
+                                          * extract the gradients on the present
+                                          * cell from the vector we actually
+                                          * store. This function does the same
+                                          * as the one above but for
+                                          * vector-valued finite elements.
+                                          */
+        virtual
+        void
+        get_function_gradients (const FEValuesBase<DH::dimension> &fe_patch_values,
+				std::vector<std::vector<Tensor<1,DH::dimension> > > &patch_gradients_system) const;
+
+                                         /**
+                                          * Given a FEValuesBase object, extract
+                                          * the second derivatives on the
+                                          * present cell from the vector we
+                                          * actually store.
+                                          */
+        virtual
+        void
+        get_function_second_derivatives (const FEValuesBase<DH::dimension> &fe_patch_values,
+					 std::vector<Tensor<2,DH::dimension> >       &patch_second_derivatives) const;
+        
+                                         /**
+                                          * Given a FEValuesBase object, extract
+                                          * the second derivatives on the
+                                          * present cell from the vector we
+                                          * actually store. This function does
+                                          * the same as the one above but for
+                                          * vector-valued finite elements.
+                                          */
+        virtual
+        void
+        get_function_second_derivatives (const FEValuesBase<DH::dimension> &fe_patch_values,
+					 std::vector<std::vector< Tensor<2,DH::dimension> > > &patch_second_derivatives_system) const;
+
+                                         /**
                                           * Clear all references to the
                                           * vectors.
                                           */
@@ -670,7 +817,19 @@ class DataOut_DoFData : public DataOutInterface<patch_dim,patch_space_dim>
                                           */
         const VectorType *vector;
     };
-    
+
+				     /**
+				      * Common form of the three disctinct public
+				      * functions with the same name, but
+				      * different parameter list.
+				      */
+    template <class VECTOR>
+    void add_data_vector (const VECTOR                           &data,
+			  const std::vector<std::string>         &names,
+			  const DataVectorType                    type,
+			  const DataPostprocessor<DH::dimension> *data_postprocessor);
+
+
 
 				     /**
 				      * Abbreviate the somewhat lengthy
@@ -982,6 +1141,12 @@ class DataOut : public DataOut_DoFData<DH, DH::dimension>
         SmartPointer<const Mapping<DH::dimension> > mapping;
 	std::vector<double>          patch_values;
 	std::vector<Vector<double> > patch_values_system;
+	std::vector<Tensor<1,DH::dimension> >               patch_gradients;
+	std::vector<std::vector<Tensor<1,DH::dimension> > > patch_gradients_system;
+	std::vector<Tensor<2,DH::dimension> >               patch_second_derivatives;
+	std::vector<std::vector<Tensor<2,DH::dimension> > > patch_second_derivatives_system;
+	std::vector<Point<dim> >                            dummy_normals;
+	std::vector<std::vector<Vector<double> > >          postprocessed_values;
 
         std::vector<std::vector<unsigned int> > *cell_to_patch_index_map;
     };

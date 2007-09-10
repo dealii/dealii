@@ -196,8 +196,14 @@ class DataOutFaces : public DataOut_DoFData<DH,DH::dimension-1,
 	unsigned int n_components;
 	unsigned int n_datasets;
 	unsigned int n_subdivisions;
-	std::vector<double>          patch_values;
-	std::vector<Vector<double> > patch_values_system;
+	std::vector<double>                        patch_values;
+	std::vector<Vector<double> >               patch_values_system;
+	std::vector<Tensor<1,dim> >                patch_gradients;
+	std::vector<std::vector<Tensor<1,dim> > >  patch_gradients_system;
+	std::vector<Tensor<2,dim> >                patch_second_derivatives;
+	std::vector<std::vector<Tensor<2,dim> > >  patch_second_derivatives_system;
+	std::vector<std::vector<Vector<double> > > postprocessed_values;
+	std::vector<Point<dim> >                   patch_normals;
 	Data ()
 	  {}
     };

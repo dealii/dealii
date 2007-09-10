@@ -64,8 +64,18 @@ void DataOutRotation<dim,DH>::build_some_patches (Data &data)
   const hp::QCollection<DH::dimension>       q_collection (patch_points);
   const hp::FECollection<DH::dimension>      fe_collection(this->dofs->get_fe());
   
+  UpdateFlags update_flags=update_values | update_q_points;
+  for (unsigned int i=0; i<this->dof_data.size(); ++i)
+    if (this->dof_data[i]->postprocessor)
+      update_flags |= this->dof_data[i]->postprocessor->get_needed_update_flags();
+				   // perhaps update_normal_vectors is present,
+				   // which would only be useful on faces, but
+				   // we may not use it here.
+  Assert (!(update_flags & update_normal_vectors),
+	  ExcMessage("The update of normal vectors may not be requested for evaluation of data on cells via DataPostprocessor."));
+  
   hp::FEValues<DH::dimension> x_fe_patch_values (fe_collection, q_collection,
-                                       update_values);
+                                       update_flags);
 
   const unsigned int n_patches_per_circle = data.n_patches_per_circle;
 
@@ -171,6 +181,7 @@ void DataOutRotation<dim,DH>::build_some_patches (Data &data)
 		    Assert (false, ExcNotImplemented());
 	    };
 	  
+	  unsigned int offset=0;
 	       
 					   // then fill in data
 	  if (data.n_datasets > 0)
@@ -182,72 +193,154 @@ void DataOutRotation<dim,DH>::build_some_patches (Data &data)
 					       // first fill dof_data
 	      for (unsigned int dataset=0; dataset<this->dof_data.size(); ++dataset)
 		{
-		  if (data.n_components == 1)
+		  const DataPostprocessor<dim> *postprocessor=this->dof_data[dataset]->postprocessor;
+		  if (postprocessor)
 		    {
-                      this->dof_data[dataset]->get_function_values (fe_patch_values,
-                                                                    data.patch_values);
-		      
-		      switch (DH::dimension)
+						       // we have to postprocess the
+						       // data, so determine, which
+						       // fields have to be updated
+		      const UpdateFlags update_flags=postprocessor->get_needed_update_flags();
+
+		      if (data.n_components == 1)
 			{
-			  case 1:
-			    for (unsigned int x=0; x<n_points; ++x)
-			      for (unsigned int y=0; y<n_points; ++y)
-				patch->data(dataset,
-					    x*n_points + y)
-				  = data.patch_values[x];
-			    break;
-			    
-			  case 2:
-			    for (unsigned int x=0; x<n_points; ++x)
-			      for (unsigned int y=0; y<n_points; ++y)
-				for (unsigned int z=0; z<n_points; ++z)
-				  patch->data(dataset,
-					      x*n_points*n_points +
-					      y +
-					      z*n_points)
-				    = data.patch_values[x*n_points+z];
-			    break;
-			    
-			  default:
-				Assert (false, ExcNotImplemented());
-			};
+							   // at each point there is
+							   // only one component of
+							   // value, gradient etc.
+			  if (update_flags & update_values)
+			    this->dof_data[dataset]->get_function_values (fe_patch_values,
+									  data.patch_values);
+			  if (update_flags & update_gradients)
+			    this->dof_data[dataset]->get_function_gradients (fe_patch_values,
+									     data.patch_gradients);
+			  if (update_flags & update_second_derivatives)
+			    this->dof_data[dataset]->get_function_second_derivatives (fe_patch_values,
+										      data.patch_second_derivatives);
+			  postprocessor->compute_derived_quantities(data.postprocessed_values[dataset],
+								    data.patch_values,
+								    data.patch_gradients,
+								    data.patch_second_derivatives,
+								    data.dummy_normals);
+			}
+		      else
+			{
+							   // at each point there is
+							   // a vector valued
+							   // function and its
+							   // derivative...
+			  if (update_flags & update_values)
+			    this->dof_data[dataset]->get_function_values (fe_patch_values,
+									  data.patch_values_system);
+			  if (update_flags & update_gradients)
+			    this->dof_data[dataset]->get_function_gradients (fe_patch_values,
+									     data.patch_gradients_system);
+			  if (update_flags & update_second_derivatives)
+			    this->dof_data[dataset]->get_function_second_derivatives (fe_patch_values,
+										      data.patch_second_derivatives_system);
+			  postprocessor->compute_derived_quantities(data.postprocessed_values[dataset],
+								    data.patch_values_system,
+								    data.patch_gradients_system,
+								    data.patch_second_derivatives_system,
+								    data.dummy_normals);
+			}
+		      
+		      for (unsigned int component=0;
+			   component<this->dof_data[dataset]->n_output_variables;
+			   ++component)
+			  {
+			    switch (DH::dimension)
+			      {
+				case 1:
+				      for (unsigned int x=0; x<n_points; ++x)
+					for (unsigned int y=0; y<n_points; ++y)
+					  patch->data(offset+component,
+						      x*n_points + y)
+					    = data.postprocessed_values[dataset][x](component);
+				      break;
+				      
+				case 2:
+				      for (unsigned int x=0; x<n_points; ++x)
+					for (unsigned int y=0; y<n_points; ++y)
+					  for (unsigned int z=0; z<n_points; ++z)
+					    patch->data(offset+component,
+							x*n_points*n_points +
+							y*n_points +
+							z)
+					      = data.postprocessed_values[dataset][x*n_points+z](component);
+				      break;
+				      
+				default:
+				      Assert (false, ExcNotImplemented());
+			      }
+			  }
 		    }
 		  else
-						     // system of components
-		    {
-                      this->dof_data[dataset]->get_function_values (fe_patch_values,
-                                                                    data.patch_values_system);
-
-		      for (unsigned int component=0; component<data.n_components;
-			   ++component)
-			{
-			  switch (DH::dimension)
-			    {
-			      case 1:
-				    for (unsigned int x=0; x<n_points; ++x)
-				      for (unsigned int y=0; y<n_points; ++y)
-					patch->data(dataset*data.n_components+component,
-						    x*n_points + y)
+		    if (data.n_components == 1)
+		      {
+			this->dof_data[dataset]->get_function_values (fe_patch_values,
+								      data.patch_values);
+			
+			switch (DH::dimension)
+			  {
+			    case 1:
+				  for (unsigned int x=0; x<n_points; ++x)
+				    for (unsigned int y=0; y<n_points; ++y)
+				      patch->data(offset,
+						  x*n_points + y)
+					= data.patch_values[x];
+				  break;
+				  
+			    case 2:
+				  for (unsigned int x=0; x<n_points; ++x)
+				    for (unsigned int y=0; y<n_points; ++y)
+				      for (unsigned int z=0; z<n_points; ++z)
+					patch->data(offset,
+						    x*n_points*n_points +
+						    y +
+						    z*n_points)
+					  = data.patch_values[x*n_points+z];
+				  break;
+				  
+			    default:
+				  Assert (false, ExcNotImplemented());
+			  }
+		      }
+		    else
+						       // system of components
+		      {
+			this->dof_data[dataset]->get_function_values (fe_patch_values,
+								      data.patch_values_system);
+			
+			for (unsigned int component=0; component<data.n_components;
+			     ++component)
+			  {
+			    switch (DH::dimension)
+			      {
+				case 1:
+				      for (unsigned int x=0; x<n_points; ++x)
+					for (unsigned int y=0; y<n_points; ++y)
+					  patch->data(offset+component,
+						      x*n_points + y)
 					    = data.patch_values_system[x](component);
-				    break;
-
-			      case 2:
-				    for (unsigned int x=0; x<n_points; ++x)
-				      for (unsigned int y=0; y<n_points; ++y)
-					for (unsigned int z=0; z<n_points; ++z)
-					  patch->data(dataset*data.n_components+component,
-						      x*n_points*n_points +
-						      y*n_points +
-						      z)
-					    = data.patch_values_system[x*n_points+z](component);
-				    break;
-
-			      default:
-				    Assert (false, ExcNotImplemented());
-			    };
-			};
-		    };
-		};
+				      break;
+				      
+				case 2:
+				      for (unsigned int x=0; x<n_points; ++x)
+					for (unsigned int y=0; y<n_points; ++y)
+					  for (unsigned int z=0; z<n_points; ++z)
+					    patch->data(offset+component,
+							x*n_points*n_points +
+							y*n_points +
+							z)
+					      = data.patch_values_system[x*n_points+z](component);
+				      break;
+				      
+				default:
+				      Assert (false, ExcNotImplemented());
+			      }
+			  }
+		      }
+		  offset+=this->dof_data[dataset]->n_output_variables;
+		}
 		  
 					       // then do the cell data
 	      for (unsigned int dataset=0; dataset<this->cell_data.size(); ++dataset)
@@ -259,7 +352,7 @@ void DataOutRotation<dim,DH>::build_some_patches (Data &data)
 		      case 1:
 			    for (unsigned int x=0; x<n_points; ++x)
 			      for (unsigned int y=0; y<n_points; ++y)
-				patch->data(dataset+this->dof_data.size()*data.n_components,
+				patch->data(dataset+offset,
 					    x*n_points +
 					    y)
 				  = value;
@@ -269,7 +362,7 @@ void DataOutRotation<dim,DH>::build_some_patches (Data &data)
 			    for (unsigned int x=0; x<n_points; ++x)
 			      for (unsigned int y=0; y<n_points; ++y)
 				for (unsigned int z=0; z<n_points; ++z)
-				  patch->data(dataset+this->dof_data.size()*data.n_components,
+				  patch->data(dataset+offset,
 					      x*n_points*n_points +
 					      y*n_points +
 					      z)
@@ -278,10 +371,10 @@ void DataOutRotation<dim,DH>::build_some_patches (Data &data)
 
 		      default:
 			    Assert (false, ExcNotImplemented());
-		    };
-		};
-	    };
-	};
+		    }
+		}
+	    }
+	}
       
 				       // next cell (patch) in this
 				       // thread. note that we have
@@ -302,8 +395,8 @@ void DataOutRotation<dim,DH>::build_some_patches (Data &data)
 	{
 	  ++cell_number;
 	  cell=next_cell(cell);
-	};
-    };
+	}
+    }
 }
 
 
@@ -357,8 +450,9 @@ void DataOutRotation<dim,DH>::build_patches (
 
   const unsigned int n_q_points     = patch_points.n_quadrature_points;
   const unsigned int n_components   = this->dofs->get_fe().n_components();
-  const unsigned int n_datasets     = this->dof_data.size() * n_components +
-				      this->cell_data.size();
+  unsigned int n_datasets=this->cell_data.size();
+  for (unsigned int i=0; i<this->dof_data.size(); ++i)
+    n_datasets+= this->dof_data[i]->n_output_variables;
   
 				   // clear the patches array
   if (true)
@@ -394,9 +488,23 @@ void DataOutRotation<dim,DH>::build_patches (
       thread_data[i].n_subdivisions       = n_subdivisions;
       thread_data[i].patch_values.resize (n_q_points);
       thread_data[i].patch_values_system.resize (n_q_points);
+      thread_data[i].patch_gradients.resize (n_q_points);
+      thread_data[i].patch_gradients_system.resize (n_q_points);
+      thread_data[i].patch_second_derivatives.resize (n_q_points);
+      thread_data[i].patch_second_derivatives_system.resize (n_q_points);
+      thread_data[i].dummy_normals.clear();
+      thread_data[i].postprocessed_values.resize(this->dof_data.size());
       
       for (unsigned int k=0; k<n_q_points; ++k)
-	thread_data[i].patch_values_system[k].reinit(n_components);
+	{
+	  thread_data[i].patch_values_system[k].reinit(n_components);
+	  thread_data[i].patch_gradients_system[k].resize(n_components);
+	  thread_data[i].patch_second_derivatives_system[k].resize(n_components);
+	}
+
+      for (unsigned int dataset=0; dataset<this->dof_data.size(); ++dataset)
+	if (this->dof_data[dataset]->postprocessor)
+	  thread_data[i].postprocessed_values[dataset].resize(n_q_points,Vector<double>(this->dof_data[dataset]->n_output_variables));
     }
 
 				   // create the patches with default

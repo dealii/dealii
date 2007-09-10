@@ -58,8 +58,13 @@ void DataOutFaces<dim,DH>::build_some_patches (Data &data)
   const hp::QCollection<DH::dimension-1>     q_collection (patch_points);
   const hp::FECollection<DH::dimension>      fe_collection(this->dofs->get_fe());
   
+  UpdateFlags update_flags=update_values;
+  for (unsigned int i=0; i<this->dof_data.size(); ++i)
+    if (this->dof_data[i]->postprocessor)
+      update_flags |= this->dof_data[i]->postprocessor->get_needed_update_flags();
+  
   hp::FEFaceValues<DH::dimension> x_fe_patch_values (fe_collection, q_collection,
-                                           update_values);
+						     update_flags);
 
   const unsigned int n_q_points = patch_points.n_quadrature_points;
   
@@ -88,30 +93,104 @@ void DataOutFaces<dim,DH>::build_some_patches (Data &data)
           const FEFaceValues<DH::dimension> &fe_patch_values
             = x_fe_patch_values.get_present_fe_values ();
 	  
+					   // counter for data records
+	  unsigned int offset=0;
+	  
 					   // first fill dof_data
 	  for (unsigned int dataset=0; dataset<this->dof_data.size(); ++dataset)
 	    {
-	      if (data.n_components == 1)
+	      const DataPostprocessor<dim> *postprocessor=this->dof_data[dataset]->postprocessor;
+	      if (postprocessor)
 		{
-                  this->dof_data[dataset]->get_function_values (fe_patch_values,
-                                                                data.patch_values);
+						   // we have to postprocess the
+						   // data, so determine, which
+						   // fields have to be updated
+		  const UpdateFlags update_flags=postprocessor->get_needed_update_flags();
+		  
+						   // get normals, if
+						   // needed. this is a
+						   // geometrical information
+						   // and thus does not depend
+						   // on the number of
+						   // components of the data
+						   // vector
+		  if (update_flags & update_normal_vectors)
+		    data.patch_normals=fe_patch_values.get_normal_vectors();
 
+		  if (data.n_components == 1)
+		    {
+						       // at each point there is
+						       // only one component of
+						       // value, gradient etc.
+		      if (update_flags & update_values)
+			this->dof_data[dataset]->get_function_values (fe_patch_values,
+								      data.patch_values);
+		      if (update_flags & update_gradients)
+			this->dof_data[dataset]->get_function_gradients (fe_patch_values,
+									 data.patch_gradients);
+		      if (update_flags & update_second_derivatives)
+			this->dof_data[dataset]->get_function_second_derivatives (fe_patch_values,
+										  data.patch_second_derivatives);
+		      postprocessor->compute_derived_quantities(data.postprocessed_values[dataset],
+								data.patch_values,
+								data.patch_gradients,
+								data.patch_second_derivatives,
+								data.patch_normals);
+		    }
+		  else
+		    {
+						       // at each point there is
+						       // a vector valued
+						       // function and its
+						       // derivative...
+		      if (update_flags & update_values)
+			this->dof_data[dataset]->get_function_values (fe_patch_values,
+								      data.patch_values_system);
+		      if (update_flags & update_gradients)
+			this->dof_data[dataset]->get_function_gradients (fe_patch_values,
+									 data.patch_gradients_system);
+		      if (update_flags & update_second_derivatives)
+			this->dof_data[dataset]->get_function_second_derivatives (fe_patch_values,
+										  data.patch_second_derivatives_system);
+		      postprocessor->compute_derived_quantities(data.postprocessed_values[dataset],
+								data.patch_values_system,
+								data.patch_gradients_system,
+								data.patch_second_derivatives_system,
+								data.patch_normals);
+		    }
+		  
 		  for (unsigned int q=0; q<n_q_points; ++q)
-		    patch->data(dataset,q) = data.patch_values[q];
+		    for (unsigned int component=0; component<this->dof_data[dataset]->n_output_variables;++component)
+		      patch->data(offset+component,q)= data.postprocessed_values[dataset][q](component);
 		}
 	      else
-						 // system of components
-		{
-                  this->dof_data[dataset]->get_function_values (fe_patch_values,
-                                                                data.patch_values_system);
-
-		  for (unsigned int component=0; component<data.n_components;
-		       ++component)
-		    for (unsigned int q=0; q<n_q_points; ++q)
-		      patch->data(dataset*data.n_components+component,q) =
-			data.patch_values_system[q](component);
-		};
-	    };
+						 // now we use the given data
+						 // vector without
+						 // modifications. again, we
+						 // treat single component
+						 // functions separately for
+						 // efficiency reasons.
+		  if (data.n_components == 1)
+		    {
+		      this->dof_data[dataset]->get_function_values (fe_patch_values,
+								    data.patch_values);
+		      for (unsigned int q=0; q<n_q_points; ++q)
+			patch->data(offset,q) = data.patch_values[q];
+		    }
+		  else
+		    {
+		      this->dof_data[dataset]->get_function_values (fe_patch_values,
+								    data.patch_values_system);
+		      for (unsigned int component=0; component<data.n_components;
+			   ++component)
+			for (unsigned int q=0; q<n_q_points; ++q)
+			  patch->data(offset+component,q) =
+			    data.patch_values_system[q](component);
+		    }
+					       // increment the counter for the
+					       // actual data record
+	      offset+=this->dof_data[dataset]->n_output_variables;
+	    }
 
 					   // then do the cell data
 	  for (unsigned int dataset=0; dataset<this->cell_data.size(); ++dataset)
@@ -134,10 +213,10 @@ void DataOutFaces<dim,DH>::build_some_patches (Data &data)
               const double value
                 = this->cell_data[dataset]->get_cell_data_value (cell_number);
               for (unsigned int q=0; q<n_q_points; ++q)
-                patch->data(dataset+this->dof_data.size()*data.n_components,q) =
+                patch->data(dataset+offset,q) =
                   value;
-	    };
-	};
+	    }
+	}
       				       // next cell (patch) in this thread
       for (unsigned int i=0;
 	   (i<data.n_threads)&&(face.first != this->dofs->end()); ++i)
@@ -145,7 +224,7 @@ void DataOutFaces<dim,DH>::build_some_patches (Data &data)
 	  ++patch;
 	  face=next_face(face);
 	}
-    };
+    }
 }
 
 
@@ -178,8 +257,9 @@ void DataOutFaces<dim,DH>::build_patches (const unsigned int nnnn_subdivisions,
 
   const unsigned int n_q_points     = patch_points.n_quadrature_points;
   const unsigned int n_components   = this->dofs->get_fe().n_components();
-  const unsigned int n_datasets     = this->dof_data.size() * n_components +
-				      this->cell_data.size();
+  unsigned int n_datasets     = this->cell_data.size();
+  for (unsigned int i=0; i<this->dof_data.size(); ++i)
+    n_datasets+= this->dof_data[i]->n_output_variables;
   
 				   // clear the patches array
   if (true)
@@ -209,9 +289,23 @@ void DataOutFaces<dim,DH>::build_patches (const unsigned int nnnn_subdivisions,
       thread_data[i].n_subdivisions       = n_subdivisions;
       thread_data[i].patch_values.resize (n_q_points);
       thread_data[i].patch_values_system.resize (n_q_points);
+      thread_data[i].patch_gradients.resize (n_q_points);
+      thread_data[i].patch_gradients_system.resize (n_q_points);
+      thread_data[i].patch_second_derivatives.resize (n_q_points);
+      thread_data[i].patch_second_derivatives_system.resize (n_q_points);
+      thread_data[i].patch_normals.resize (n_q_points);
+      thread_data[i].postprocessed_values.resize (this->dof_data.size());
       
       for (unsigned int k=0; k<n_q_points; ++k)
-	thread_data[i].patch_values_system[k].reinit(n_components);
+	{
+	  thread_data[i].patch_values_system[k].reinit(n_components);
+	  thread_data[i].patch_gradients_system[k].resize(n_components);
+	  thread_data[i].patch_second_derivatives_system[k].resize(n_components);
+	}
+
+      for (unsigned int dataset=0; dataset<this->dof_data.size(); ++dataset)
+	if (this->dof_data[dataset]->postprocessor)
+	  thread_data[i].postprocessed_values[dataset].resize(n_q_points,Vector<double>(this->dof_data[dataset]->n_output_variables));
     }
 
 				   // create the patches with default

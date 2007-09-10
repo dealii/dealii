@@ -37,10 +37,17 @@ DEAL_II_NAMESPACE_OPEN
 
 template <class DH, int patch_dim, int patch_space_dim>
 DataOut_DoFData<DH,patch_dim,patch_space_dim>::
-DataEntryBase::DataEntryBase (const std::vector<std::string> &names)
+DataEntryBase::DataEntryBase (const std::vector<std::string>         &names_in,
+			      const DataPostprocessor<DH::dimension> *data_postprocessor)
 		:
-		names(names)
-{}
+		names(names_in),
+		postprocessor(data_postprocessor),
+		n_output_variables(names.size())
+{
+  Assert(!data_postprocessor ||
+	 data_postprocessor->n_output_variables()==names.size(),
+	 ExcDimensionMismatch(data_postprocessor->n_output_variables(),names.size()));
+}
 
 
 
@@ -55,10 +62,11 @@ template <class DH, int patch_dim, int patch_space_dim>
 template <typename VectorType>
 DataOut_DoFData<DH,patch_dim,patch_space_dim>::
 DataEntry<VectorType>::
-DataEntry (const VectorType               *data,
-	   const std::vector<std::string> &names)
+DataEntry (const VectorType                       *data,
+	   const std::vector<std::string>         &names,
+	   const DataPostprocessor<DH::dimension> *data_postprocessor)
 		:
-                DataEntryBase (names),
+                DataEntryBase (names,data_postprocessor),
 		vector (data)
 {}
 
@@ -98,6 +106,60 @@ get_function_values (const FEValuesBase<DH::dimension> &fe_patch_values,
                      std::vector<double>             &patch_values) const
 {
   fe_patch_values.get_function_values (*vector, patch_values);
+}
+
+
+
+template <class DH, int patch_dim, int patch_space_dim>
+template <typename VectorType>
+void
+DataOut_DoFData<DH,patch_dim,patch_space_dim>::
+DataEntry<VectorType>::
+get_function_gradients (const FEValuesBase<DH::dimension> &fe_patch_values,
+			std::vector<std::vector<Tensor<1,DH::dimension> > >   &patch_gradients_system) const
+{
+  fe_patch_values.get_function_grads (*vector, patch_gradients_system);
+}
+
+
+
+template <class DH,
+	  int patch_dim, int patch_space_dim>
+template <typename VectorType>
+void
+DataOut_DoFData<DH,patch_dim,patch_space_dim>::
+DataEntry<VectorType>::
+get_function_gradients (const FEValuesBase<DH::dimension> &fe_patch_values,
+			std::vector<Tensor<1,DH::dimension> >       &patch_gradients) const
+{
+  fe_patch_values.get_function_grads (*vector, patch_gradients);
+}
+
+
+
+template <class DH, int patch_dim, int patch_space_dim>
+template <typename VectorType>
+void
+DataOut_DoFData<DH,patch_dim,patch_space_dim>::
+DataEntry<VectorType>::
+get_function_second_derivatives (const FEValuesBase<DH::dimension> &fe_patch_values,
+				 std::vector<std::vector<Tensor<2,DH::dimension> > >   &patch_second_derivatives_system) const
+{
+  fe_patch_values.get_function_2nd_derivatives (*vector, patch_second_derivatives_system);
+}
+
+
+
+template <class DH,
+	  int patch_dim, int patch_space_dim>
+template <typename VectorType>
+void
+DataOut_DoFData<DH,patch_dim,patch_space_dim>::
+DataEntry<VectorType>::
+get_function_second_derivatives (const FEValuesBase<DH::dimension> &fe_patch_values,
+				 std::vector<Tensor<2,DH::dimension> >       &patch_second_derivatives) const
+{
+  fe_patch_values.get_function_2nd_derivatives (*vector, patch_second_derivatives);
 }
 
 
@@ -162,9 +224,10 @@ template <class DH,
 template <class VECTOR>
 void
 DataOut_DoFData<DH,patch_dim,patch_space_dim>::
-add_data_vector (const VECTOR                   &vec,
-		 const std::vector<std::string> &names,
-		 const DataVectorType            type)
+add_data_vector (const VECTOR                           &vec,
+		 const std::vector<std::string>         &names,
+		 const DataVectorType                    type,
+		 const DataPostprocessor<DH::dimension> *data_postprocessor)
 {
   Assert (dofs != 0, ExcNoDoFHandlerSelected ());
 
@@ -203,7 +266,7 @@ add_data_vector (const VECTOR                   &vec,
 		    ExcInvalidVectorSize (vec.size(),
 					  dofs->n_dofs(),
 					  dofs->get_tria().n_active_cells()));
-	    Assert (names.size() == dofs->get_fe().n_components(),
+	    Assert (data_postprocessor || (names.size() == dofs->get_fe().n_components()),
 		    ExcInvalidNumberOfNames (names.size(), dofs->get_fe().n_components()));
 	    break;
 
@@ -212,7 +275,8 @@ add_data_vector (const VECTOR                   &vec,
 					     // been handled above...
 	    Assert (false, ExcInternalError());
     };
-  
+
+				   // check names for invalid characters
   for (unsigned int i=0; i<names.size(); ++i)
     Assert (names[i].find_first_not_of("abcdefghijklmnopqrstuvwxyz"
 				       "ABCDEFGHIJKLMNOPQRSTUVWXYZ"
@@ -222,7 +286,7 @@ add_data_vector (const VECTOR                   &vec,
 							    "ABCDEFGHIJKLMNOPQRSTUVWXYZ"
 							    "0123456789_<>()")));
   
-  DataEntryBase * new_entry = new DataEntry<VECTOR>(&vec, names);
+  DataEntryBase * new_entry = new DataEntry<VECTOR>(&vec, names, data_postprocessor);
   if (actual_type == type_dof_data)
     dof_data.push_back (boost::shared_ptr<DataEntryBase>(new_entry));
   else
@@ -236,9 +300,9 @@ template <class DH,
 template <class VECTOR>
 void
 DataOut_DoFData<DH,patch_dim,patch_space_dim>::
-add_data_vector (const VECTOR         &vec,
-		 const std::string    &name,
-		 const DataVectorType  type)
+add_data_vector (const VECTOR                             &vec,
+		 const std::string                        &name,
+		 const DataVectorType                      type)
 {
   Assert (dofs != 0, ExcNoDoFHandlerSelected ());
   const unsigned int n_components = dofs->get_fe().n_components ();
@@ -265,7 +329,38 @@ add_data_vector (const VECTOR         &vec,
   	}
     }
   
-  add_data_vector (vec, names, type);
+  add_data_vector (vec, names, type, 0);
+}
+
+
+
+template <class DH,
+	  int patch_dim, int patch_space_dim>
+template <class VECTOR>
+void
+DataOut_DoFData<DH,patch_dim,patch_space_dim>::
+add_data_vector (const VECTOR                             &vec,
+		 const std::vector<std::string>           &names,
+		 const DataVectorType                      type)
+{
+  add_data_vector(vec,names,type,0);
+}
+
+
+
+template <class DH,
+	  int patch_dim, int patch_space_dim>
+template <class VECTOR>
+void
+DataOut_DoFData<DH,patch_dim,patch_space_dim>::
+add_data_vector (const VECTOR                           &vec,
+		 const DataPostprocessor<DH::dimension> &data_postprocessor)
+{
+  Assert (dofs != 0, ExcNoDoFHandlerSelected ());
+  
+  std::vector<std::string> names=data_postprocessor.get_names();
+
+  add_data_vector (vec, names, type_dof_data, &data_postprocessor);
 }
 
 
@@ -401,11 +496,21 @@ void DataOut<dim,DH>::build_some_patches (Data &data)
   const hp::QCollection<DH::dimension>       q_collection (patch_points);
   const hp::FECollection<DH::dimension>      fe_collection(this->dofs->get_fe());
   const hp::MappingCollection<DH::dimension> mapping_collection(*(data.mapping));
+
+  UpdateFlags update_flags=update_values | update_q_points;
+  for (unsigned int i=0; i<this->dof_data.size(); ++i)
+    if (this->dof_data[i]->postprocessor)
+      update_flags |= this->dof_data[i]->postprocessor->get_needed_update_flags();
+				   // perhaps update_normal_vectors is present,
+				   // which would only be useful on faces, but
+				   // we may not use it here.
+  Assert (!(update_flags & update_normal_vectors),
+	  ExcMessage("The update of normal vectors may not be requested for evaluation of data on cells via DataPostprocessor."));
   
   hp::FEValues<DH::dimension> x_fe_patch_values (mapping_collection,
 						 fe_collection,
 						 q_collection,
-						 update_values | update_q_points);
+						 update_flags);
 
   const unsigned int n_q_points = patch_points.n_quadrature_points;
   
@@ -483,29 +588,93 @@ void DataOut<dim,DH>::build_some_patches (Data &data)
 		  patch->data(patch->data.size(0)-dim+i,q)=q_points[q][i];
 	    }
 
+					   // counter for data records
+	  unsigned int offset=0;
+	  
 					   // first fill dof_data
 	  for (unsigned int dataset=0; dataset<this->dof_data.size(); ++dataset)
 	    {
-	      if (data.n_components == 1)
+	      const DataPostprocessor<dim> *postprocessor=this->dof_data[dataset]->postprocessor;
+	      
+	      if (postprocessor)
 		{
-                  this->dof_data[dataset]->get_function_values (fe_patch_values,
-                                                                data.patch_values);
-
+						   // we have to postprocess the
+						   // data, so determine, which
+						   // fields have to be updated
+		  const UpdateFlags update_flags=postprocessor->get_needed_update_flags();
+		  if (data.n_components == 1)
+		    {
+						       // at each point there is
+						       // only one component of
+						       // value, gradient etc.
+		      if (update_flags & update_values)
+			this->dof_data[dataset]->get_function_values (fe_patch_values,
+								      data.patch_values);
+		      if (update_flags & update_gradients)
+			this->dof_data[dataset]->get_function_gradients (fe_patch_values,
+									 data.patch_gradients);
+		      if (update_flags & update_second_derivatives)
+			this->dof_data[dataset]->get_function_second_derivatives (fe_patch_values,
+										  data.patch_second_derivatives);
+		      postprocessor->compute_derived_quantities(data.postprocessed_values[dataset],
+								data.patch_values,
+								data.patch_gradients,
+								data.patch_second_derivatives,
+								data.dummy_normals);
+		    }
+		  else
+		    {
+						       // at each point there is
+						       // a vector valued
+						       // function and its
+						       // derivative...
+		      if (update_flags & update_values)
+			this->dof_data[dataset]->get_function_values (fe_patch_values,
+								      data.patch_values_system);
+		      if (update_flags & update_gradients)
+			this->dof_data[dataset]->get_function_gradients (fe_patch_values,
+									 data.patch_gradients_system);
+		      if (update_flags & update_second_derivatives)
+			this->dof_data[dataset]->get_function_second_derivatives (fe_patch_values,
+										  data.patch_second_derivatives_system);
+		      postprocessor->compute_derived_quantities(data.postprocessed_values[dataset],
+								data.patch_values_system,
+								data.patch_gradients_system,
+								data.patch_second_derivatives_system,
+								data.dummy_normals);
+		    }
+		  
 		  for (unsigned int q=0; q<n_q_points; ++q)
-		    patch->data(dataset,q) = data.patch_values[q];
+		    for (unsigned int component=0; component<this->dof_data[dataset]->n_output_variables;++component)
+		      patch->data(offset+component,q)= data.postprocessed_values[dataset][q](component);
 		}
 	      else
-						 // system of components
-		{
-                  this->dof_data[dataset]->get_function_values (fe_patch_values,
-                                                                data.patch_values_system);
-
-		  for (unsigned int component=0; component<data.n_components;
-		       ++component)
-		    for (unsigned int q=0; q<n_q_points; ++q)
-		      patch->data(dataset*data.n_components+component,q) =
-			data.patch_values_system[q](component);
-		}
+						 // now we use the given data
+						 // vector without
+						 // modifications. again, we
+						 // treat single component
+						 // functions separately for
+						 // efficiency reasons.
+		  if (data.n_components == 1)
+		    {
+		      this->dof_data[dataset]->get_function_values (fe_patch_values,
+								    data.patch_values);
+		      for (unsigned int q=0; q<n_q_points; ++q)
+			patch->data(offset,q) = data.patch_values[q];
+		    }
+		  else
+		    {
+		      this->dof_data[dataset]->get_function_values (fe_patch_values,
+								    data.patch_values_system);
+		      for (unsigned int component=0; component<data.n_components;
+			   ++component)
+			for (unsigned int q=0; q<n_q_points; ++q)
+			  patch->data(offset+component,q) =
+			    data.patch_values_system[q](component);
+		    }
+					       // increment the counter for the
+					       // actual data record
+	      offset+=this->dof_data[dataset]->n_output_variables;
 	    }
 
 					   // then do the cell data. only
@@ -523,7 +692,7 @@ void DataOut<dim,DH>::build_some_patches (Data &data)
                   const double value
                     = this->cell_data[dataset]->get_cell_data_value (cell_index);
                   for (unsigned int q=0; q<n_q_points; ++q)
-                    patch->data(dataset+this->dof_data.size()*data.n_components,q) =
+                    patch->data(offset+dataset,q) =
                       value;
                 }
             }
@@ -642,8 +811,9 @@ void DataOut<dim,DH>::build_patches (const Mapping<DH::dimension> &mapping,
   
   const unsigned int n_q_points     = patch_points.n_quadrature_points;
   const unsigned int n_components   = this->dofs->get_fe().n_components();
-  const unsigned int n_datasets     = this->dof_data.size() * n_components +
-				      this->cell_data.size();
+  unsigned int n_datasets=this->cell_data.size();
+  for (unsigned int i=0; i<this->dof_data.size(); ++i)
+    n_datasets+= this->dof_data[i]->n_output_variables;
   
 				   // clear the patches array
   if (true)
@@ -719,12 +889,26 @@ void DataOut<dim,DH>::build_patches (const Mapping<DH::dimension> &mapping,
       thread_data[i].n_subdivisions = n_subdivisions;
       thread_data[i].patch_values.resize (n_q_points);
       thread_data[i].patch_values_system.resize (n_q_points);
+      thread_data[i].patch_gradients.resize (n_q_points);
+      thread_data[i].patch_gradients_system.resize (n_q_points);
+      thread_data[i].patch_second_derivatives.resize (n_q_points);
+      thread_data[i].patch_second_derivatives_system.resize (n_q_points);
+      thread_data[i].dummy_normals.clear();
+      thread_data[i].postprocessed_values.resize(this->dof_data.size());
       thread_data[i].mapping        = &mapping;
 
       thread_data[i].cell_to_patch_index_map = &cell_to_patch_index_map;
       
       for (unsigned int k=0; k<n_q_points; ++k)
-	thread_data[i].patch_values_system[k].reinit(n_components);
+	{
+	  thread_data[i].patch_values_system[k].reinit(n_components);
+	  thread_data[i].patch_gradients_system[k].resize(n_components);
+	  thread_data[i].patch_second_derivatives_system[k].resize(n_components);
+	}
+
+      for (unsigned int dataset=0; dataset<this->dof_data.size(); ++dataset)
+	if (this->dof_data[dataset]->postprocessor)
+	  thread_data[i].postprocessed_values[dataset].resize(n_q_points,Vector<double>(this->dof_data[dataset]->n_output_variables));
     }
 
   Threads::ThreadGroup<> threads;  
@@ -770,7 +954,12 @@ template void \
 DataOut_DoFData<DH,D2,D3>:: \
 add_data_vector<V > (const V                        &, \
                      const std::vector<std::string> &, \
-                     const DataVectorType)
+                     const DataVectorType); \
+\
+template void \
+DataOut_DoFData<DH,D2,D3>:: \
+add_data_vector<V > (const V                  &, \
+		     const DataPostprocessor<DH::dimension> &)
 
 #ifndef DEAL_II_USE_PETSC
 # define INSTANTIATE_VECTORS(DH,D2,D3) \
