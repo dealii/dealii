@@ -1,5 +1,5 @@
 //----------------------------  bicgstab_early.cc  ---------------------------
-//    $Id: bicgstab_early.cc 11749 2005-11-09 19:11:20Z wolf $
+//    $Id$
 //    Version: $Name$ 
 //
 //    Copyright (C) 2007 by the deal.II authors

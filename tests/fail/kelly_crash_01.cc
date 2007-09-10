@@ -1,5 +1,5 @@
 //----------------------------  kelly_crash_01.cc  ---------------------------
-//    $Id: kelly_crash_01.cc 12732 2006-03-28 23:15:45Z wolf $
+//    $Id$
 //    Version: $Name$ 
 //
 //    Copyright (C) 2006, 2007 by the deal.II authors

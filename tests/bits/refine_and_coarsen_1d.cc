@@ -1,5 +1,5 @@
 //----------------------------  refine_and_coarsen_1d.cc  ---------------------------
-//    $Id: refine_and_coarsen_1d.cc 11749 2005-11-09 19:11:20Z wolf $
+//    $Id$
 //    Version: $Name$ 
 //
 //    Copyright (C) 2006 by the deal.II authors

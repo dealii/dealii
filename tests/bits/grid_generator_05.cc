@@ -1,5 +1,5 @@
 //---------------------------------------------------------------------------
-//    $Id: grid_generator_05.cc 14204 2006-11-17 03:49:08Z bangerth $
+//    $Id$
 //    Version: $Name$ 
 //
 //    Copyright (C) 2005, 2006, 2007 by the deal.II authors

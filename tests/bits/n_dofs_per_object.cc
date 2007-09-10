@@ -1,5 +1,5 @@
 //----------------------------  n_dofs_per_object.cc  ---------------------------
-//    $Id: n_dofs_per_object.cc 11749 2005-11-09 19:11:20Z wolf $
+//    $Id$
 //    Version: $Name$ 
 //
 //    Copyright (C) 2003, 2004, 2006 by the deal.II authors

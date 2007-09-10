@@ -1,5 +1,5 @@
 //----------------------------  vectors_boundary_rhs_03.cc  ---------------------------
-//    $Id: vectors_boundary_rhs_03.cc 14279 2006-12-28 04:53:24Z bangerth $
+//    $Id$
 //    Version: $Name$ 
 //
 //    Copyright (C) 2000, 2001, 2003, 2004, 2006, 2007 by the deal.II authors

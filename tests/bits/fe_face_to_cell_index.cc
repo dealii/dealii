@@ -1,4 +1,4 @@
-//    $Id: $
+//    $Id$
 //    Version: $Name: $ 
 //
 //    Copyright (C) 2005, 2006 by the deal.II authors

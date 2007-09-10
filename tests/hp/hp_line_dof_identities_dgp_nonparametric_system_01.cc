@@ -1,5 +1,5 @@
 //----------------------------  hp_line_dof_identities_dgp_nonparametric_system_01.cc  ---------------------------
-//    $Id: hp_line_dof_identities_dgp_nonparametric_system_01.cc 12464 2006-02-23 01:13:17Z wolf $
+//    $Id$
 //    Version: $Name$ 
 //
 //    Copyright (C) 2005, 2006 by the deal.II authors

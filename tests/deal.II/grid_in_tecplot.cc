@@ -1,5 +1,5 @@
 //------------------------  grid_in_tecplot.cc  -----------------------
-//    $Id: grid_in.cc 11749 2005-11-09 19:11:20Z wolf $
+//    $Id$
 //    Version: $Name$ 
 //
 //    Copyright (C) 2002, 2003, 2004, 2005 by the deal.II authors

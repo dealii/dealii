@@ -1,5 +1,5 @@
 //----------------------------  union_triangulation.cc  ---------------------------
-//    $Id: union_triangulation.cc 11749 2005-11-09 19:11:20Z wolf $
+//    $Id$
 //    Version: $Name$ 
 //
 //    Copyright (C) 2006 by the deal.II authors

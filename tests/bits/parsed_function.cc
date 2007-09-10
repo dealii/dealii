@@ -1,5 +1,5 @@
 //----------------------------  function_parser.cc  ---------------------------
-//    $Id: function_parser.cc 11749 2005-11-09 19:11:20Z wolf $
+//    $Id$
 //    Version: $Name$ 
 //
 //    Copyright (C) 2005 by the deal.II authors 

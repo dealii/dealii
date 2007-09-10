@@ -1,5 +1,5 @@
 //----------------------------------------------------------------------
-//    $Id: reference.cc 13395 2006-07-19 12:45:54Z kanschat $
+//    $Id$
 //    Version: $Name$ 
 //
 //    Copyright (C) 2006 by the deal.II authors

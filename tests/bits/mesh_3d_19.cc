@@ -1,5 +1,5 @@
 //----------------------------  mesh_3d_19.cc  ---------------------------
-//    $Id: mesh_3d_19.cc 12732 2006-03-28 23:15:45Z wolf $
+//    $Id$
 //    Version: $Name$ 
 //
 //    Copyright (C) 2006 by the deal.II authors

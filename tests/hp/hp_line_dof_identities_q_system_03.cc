@@ -1,5 +1,5 @@
 //----------------------------  hp_line_dof_identities_q_system_03.cc  ---------------------------
-//    $Id: hp_line_dof_identities_q_system_03.cc 12464 2006-02-23 01:13:17Z wolf $
+//    $Id$
 //    Version: $Name$ 
 //
 //    Copyright (C) 2005, 2006, 2007 by the deal.II authors

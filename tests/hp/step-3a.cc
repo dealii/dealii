@@ -1,5 +1,5 @@
 //----------------------------  step-3a.cc  ---------------------------
-//    $Id: step-3a.cc 13000 2006-05-02 23:16:07Z wolf $
+//    $Id$
 //    Version: $Name$ 
 //
 //    Copyright (C) 2005, 2006 by the deal.II authors

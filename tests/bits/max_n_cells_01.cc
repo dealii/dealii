@@ -1,5 +1,5 @@
 //----------------------------  max_n_cells_01.cc  ---------------------------
-//    $Id: max_n_cells_01.cc 12193 2006-01-27 15:57:34Z wolf $
+//    $Id$
 //    Version: $Name$ 
 //
 //    Copyright (C) 2007 by the deal.II authors

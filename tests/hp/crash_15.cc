@@ -1,5 +1,5 @@
 //----------------------------  crash_15.cc  ---------------------------
-//    $Id: crash_15.cc 14021 2006-10-19 00:17:16Z bangerth $
+//    $Id$
 //    Version: $Name$ 
 //
 //    Copyright (C) 2005, 2006, 2007 by the deal.II authors

@@ -1,5 +1,5 @@
 //----------------------------  dof_tools_19.cc  ---------------------------
-//    $Id: dof_tools_03.cc 11749 2005-11-09 19:11:20Z wolf $
+//    $Id$
 //    Version: $Name$ 
 //
 //    Copyright (C) 2003, 2004, 2006 by the deal.II authors

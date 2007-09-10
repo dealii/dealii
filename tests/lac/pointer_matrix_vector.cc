@@ -1,5 +1,5 @@
 //----------------------------------------------------------------------
-//    $Id: pointer_matrix.cc 13349 2006-07-07 09:39:32Z guido $
+//    $Id$
 //    Version: $Name$ 
 //
 //    Copyright (C) 2006 by the deal.II authors
