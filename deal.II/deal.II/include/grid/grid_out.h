@@ -121,11 +121,34 @@ namespace GridOutFlags
 					* Default: @p false.
 					*/
       bool write_faces;
+				      /**
+					* When writing a mesh, write boundary
+					* lines explicitly if their boundary
+					* indicator is not the default
+					* boundary indicator, which is zero.
+					* This is necessary if you later
+					* want to re-read the grid and want
+					* to get the same boundary indicators
+					* for the different parts of the
+					* boundary of the triangulation.
+					*
+					* It is not necessary if you only want
+					* to write the triangulation to
+					* view or print it.
+					* 
+					* This is used only if
+					* <tt>dim==3</tt>, and ignored
+					* in all other cases.
+					*
+					* Default: @p false.
+					*/
+      bool write_lines;
       
 				       /**
 					* Constructor.
 					*/
-      Msh (const bool write_faces    = false);
+    Msh (const bool write_faces    = false, 
+	 const bool write_lines	   = false);
       				       /**
 					* Declare parameters in
 					* ParameterHandler.
@@ -182,10 +205,34 @@ namespace GridOutFlags
       bool write_faces;
       
 				       /**
+					* When writing a mesh, write boundary
+					* lines explicitly if their boundary
+					* indicator is not the default
+					* boundary indicator, which is zero.
+					* This is necessary if you later
+					* want to re-read the grid and want
+					* to get the same boundary indicators
+					* for the different parts of the
+					* boundary of the triangulation.
+					*
+					* It is not necessary if you only want
+					* to write the triangulation to
+					* view or print it.
+					*
+					* This directive is ignored if
+					* <tt>dim!=3</tt>.
+					*
+					*  Default: @p false.
+					*/
+      bool write_lines;
+      
+				       /**
 					* Constructor.
 					*/
       Ucd (const bool write_preamble = true,
-	   const bool write_faces    = false);
+	   const bool write_faces    = false,
+	   const bool write_lines    = false);
+
 				       /**
 					* Declare parameters in
 					* ParameterHandler.
@@ -1245,6 +1292,58 @@ class GridOut
    
 				     /**
 				      * Write the grid information about
+				      * lines to @p out. Only those lines
+				      * are printed which are on the boundary
+				      * and which have a boundary indicator
+				      * not equal to zero, since the latter
+				      * is the default for boundary faces.
+				      *
+				      * Since cells and faces are continuously
+				      * numbered, the @p starting_index for
+				      * the numbering of the lines is passed
+				      * also.
+				      *
+				      * This function unfortunately
+				      * can not be included in the
+				      * regular @p write_msh function,
+				      * since it needs special
+				      * treatment for the case
+				      * <tt>dim==1</tt> and
+				      * <tt>dim==2</tt>, in which case
+				      * the edge iterators are
+				      * <tt>void*</tt>'s and lack the
+				      * member functions which are
+				      * called. We would not actually
+				      * call these functions, but the
+				      * compiler would complain anyway
+				      * when compiling the function
+				      * for <tt>dim==1/2</tt>. Bad luck.
+				      */
+    template <int dim>
+    void write_msh_lines (const Triangulation<dim> &tria,
+			  const unsigned int        starting_index,
+			  std::ostream             &out) const;
+
+				     /**
+				      * Declaration of the specialization
+				      * of above function for 1d. Does
+				      * nothing.
+				      */
+    void write_msh_lines (const Triangulation<1> &tria,
+			  const unsigned int      starting_index,
+			  std::ostream           &out) const;
+   
+				     /**
+				      * Declaration of the specialization
+				      * of above function for 2d. Does
+				      * nothing.
+				      */
+    void write_msh_lines (const Triangulation<2> &tria,
+			  const unsigned int      starting_index,
+			  std::ostream           &out) const;
+
+				     /**
+				      * Write the grid information about
 				      * faces to @p out. Only those faces
 				      * are printed which are on the boundary
 				      * and which have a boundary indicator
@@ -1267,6 +1366,8 @@ class GridOut
 				      * would complain anyway when compiling
 				      * the function for <tt>dim==1</tt>. Bad luck.
 				      */
+
+   
     template <int dim>
     void write_ucd_faces (const Triangulation<dim> &tria,
 			  const unsigned int        starting_index,
@@ -1278,6 +1379,57 @@ class GridOut
 				      * nothing.
 				      */
     void write_ucd_faces (const Triangulation<1> &tria,
+			  const unsigned int      starting_index,
+			  std::ostream           &out) const;
+
+
+				     /**
+				      * Write the grid information about
+				      * lines to @p out. Only those lines
+				      * are printed which are on the boundary
+				      * and which have a boundary indicator
+				      * not equal to zero, since the latter
+				      * is the default for boundary lines.
+				      *
+				      * Since cells, faces and lines
+				      * are continuously numbered, the
+				      * @p starting_index for the
+				      * numbering of the faces is
+				      * passed also.
+				      *
+				      * This function unfortunately can not
+				      * be included in the regular @p write_ucd
+				      * function, since it needs special
+				      * treatment for the case <tt>dim==1/2</tt>, in
+				      * which case the edge iterators are
+				      * <tt>void*</tt>'s and lack the member functions
+				      * which are called. We would not actually
+				      * call these functions, but the compiler
+				      * would complain anyway when compiling
+				      * the function for <tt>dim==1/2</tt>. Bad luck.
+				      */
+
+   
+    template <int dim>
+    void write_ucd_lines (const Triangulation<dim> &tria,
+			  const unsigned int        starting_index,
+			  std::ostream             &out) const;
+
+				     /**
+				      * Declaration of the specialization
+				      * of above function for 1d. Does
+				      * nothing.
+				      */
+    void write_ucd_lines (const Triangulation<1> &tria,
+			  const unsigned int      starting_index,
+			  std::ostream           &out) const;
+
+				     /**
+				      * Declaration of the specialization
+				      * of above function for 2d. Does
+				      * nothing.
+				      */
+    void write_ucd_lines (const Triangulation<2> &tria,
 			  const unsigned int      starting_index,
 			  std::ostream           &out) const;
     
@@ -1308,6 +1460,41 @@ class GridOut
 				      * 1d. Simply returns zero.
 				      */
     unsigned int n_boundary_faces (const Triangulation<1> &tria) const;
+
+				     /**
+				      * Return the number of lines in the
+				      * triangulation which have a boundary
+				      * indicator not equal to zero. Only
+				      * these lines are explicitly printed
+				      * in the <tt>write_*</tt> functions;
+				      * all lines with indicator 255 are
+				      * interior ones and an indicator with
+				      * value zero for faces at the boundary
+				      * are considered default.
+				      *
+				      * This function always returns an empty
+				      * list in one and two dimensions.
+				      *
+				      * The reason for this function is the
+				      * same as for @p write_ucd_faces. See
+				      * there for more information.
+				      */
+    template <int dim>
+    unsigned int n_boundary_lines (const Triangulation<dim> &tria) const;
+
+				     /**
+				      * Declaration of the specialization
+				      * of above function for
+				      * 1d. Simply returns zero.
+				      */
+    unsigned int n_boundary_lines (const Triangulation<1> &tria) const;
+
+				     /**
+				      * Declaration of the specialization
+				      * of above function for
+				      * 2d. Simply returns zero.
+				      */
+    unsigned int n_boundary_lines (const Triangulation<2> &tria) const;
 };
 
 

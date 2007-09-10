@@ -333,8 +333,10 @@ void GridOut::write_msh (const Triangulation<dim> &tria,
 				   // Write cells preamble
   out << "$ENDNOD" << std::endl
       << "$ELM" << std::endl
-      << tria.n_active_cells() + (msh_flags.write_faces ?
-				  n_boundary_faces(tria) : 0) << std::endl;
+      << tria.n_active_cells() + ( (msh_flags.write_faces ?
+				    n_boundary_faces(tria) :0 ) + 
+				   ( msh_flags.write_lines ? 
+				     n_boundary_lines(tria) : 0 ) ) << std::endl;
 
 				   /*
 				     elm-type
@@ -404,10 +406,12 @@ void GridOut::write_msh (const Triangulation<dim> &tria,
       out << std::endl;
     };
 
-				   // write faces with non-zero boundary
-				   // indicator
-  if (msh_flags.write_faces)
+				   // write faces and lines with
+				   // non-zero boundary indicator
+  if (msh_flags.write_faces) 
     write_msh_faces (tria, cell_index, out);
+  if (msh_flags.write_lines)
+    write_msh_lines (tria, cell_index, out);
 
   out << "$ENDELM" << std::endl;
 
@@ -461,9 +465,10 @@ void GridOut::write_ucd (const Triangulation<dim> &tria,
 
 				   // start with ucd data
   out << n_vertices << ' '
-      << tria.n_active_cells() + (ucd_flags.write_faces ?
-				  n_boundary_faces(tria) :
-				  0)
+      << tria.n_active_cells() + ( (ucd_flags.write_faces ?
+				    n_boundary_faces(tria) : 0) +
+				   (ucd_flags.write_lines ? 
+				    n_boundary_lines(tria) : 0) )
       << " 0 0 0"                  // no data
       << '\n';
 
@@ -520,10 +525,12 @@ void GridOut::write_ucd (const Triangulation<dim> &tria,
       out << '\n';
     };
 
-				   // write faces with non-zero boundary
-				   // indicator
-  if (ucd_flags.write_faces)
+				   // write faces and lines with
+				   // non-zero boundary indicator
+  if (ucd_flags.write_faces) 
     write_ucd_faces (tria, cell_index, out);
+  if (ucd_flags.write_lines)
+    write_ucd_lines (tria, cell_index, out);
 
 				   // make sure everything now gets to
 				   // disk
@@ -687,6 +694,21 @@ unsigned int GridOut::n_boundary_faces (const Triangulation<1> &) const
   return 0;
 }
 
+unsigned int GridOut::n_boundary_lines (const Triangulation<1> &) const
+{
+  return 0;
+}
+
+#endif
+
+
+#if deal_II_dimension == 2
+
+unsigned int GridOut::n_boundary_lines (const Triangulation<2> &) const
+{
+  return 0;
+}
+
 #endif
 
 
@@ -708,9 +730,46 @@ unsigned int GridOut::n_boundary_faces (const Triangulation<dim> &tria) const
 
 
 
+template <int dim>
+unsigned int GridOut::n_boundary_lines (const Triangulation<dim> &tria) const
+{
+  typename Triangulation<dim>::active_line_iterator edge, endedge;
+  unsigned int n_lines = 0;
+
+  for (edge=tria.begin_active_line(), endedge=tria.end_line();
+       edge != endedge; ++edge)
+    if ((edge->at_boundary()) &&
+	(edge->boundary_indicator() != 0))
+      n_lines++;
+
+  return n_lines;
+}
+
+
+
 #if deal_II_dimension == 1
 
 void GridOut::write_msh_faces (const Triangulation<1> &,
+			       const unsigned int,
+			       std::ostream &) const
+{
+  return;
+}
+
+
+void GridOut::write_msh_lines (const Triangulation<1> &,
+			       const unsigned int,
+			       std::ostream &) const
+{
+  return;
+}
+
+#endif
+
+
+#if deal_II_dimension == 2
+
+void GridOut::write_msh_lines (const Triangulation<2> &,
 			       const unsigned int,
 			       std::ostream &) const
 {
@@ -757,10 +816,60 @@ void GridOut::write_msh_faces (const Triangulation<dim> &tria,
 }
 
 
+template <int dim>
+void GridOut::write_msh_lines (const Triangulation<dim> &tria,
+			       const unsigned int        starting_index,
+			       std::ostream             &out) const
+{
+  typename Triangulation<dim>::active_line_iterator line, endl;
+  unsigned int index=starting_index;
+
+  for (line=tria.begin_active_line(), endl=tria.end_line();
+       line != endl; ++line)
+    if (line->at_boundary() &&
+	(line->boundary_indicator() != 0)) 
+      {
+	out << index << " 1 ";
+	out << static_cast<unsigned int>(line->boundary_indicator()) 
+	    << ' ' 
+	    << static_cast<unsigned int>(line->boundary_indicator()) 
+	    << " 2 ";
+					 // note: vertex numbers are 1-base
+	for (unsigned int vertex=0; vertex<2; ++vertex)
+	  out << ' ' 
+	      << line->vertex_index(GeometryInfo<dim-2>::ucd_to_deal[vertex])+1;
+	out << '\n';
+
+	++index;
+      };	  
+}
+
+
 
 #if deal_II_dimension == 1
 
 void GridOut::write_ucd_faces (const Triangulation<1> &,
+			       const unsigned int,
+			       std::ostream &) const
+{
+  return;
+}
+
+
+void GridOut::write_ucd_lines (const Triangulation<1> &,
+			       const unsigned int,
+			       std::ostream &) const
+{
+  return;
+}
+
+#endif
+
+
+
+#if deal_II_dimension == 2
+
+void GridOut::write_ucd_lines (const Triangulation<2> &,
 			       const unsigned int,
 			       std::ostream &) const
 {
@@ -803,6 +912,32 @@ void GridOut::write_ucd_faces (const Triangulation<dim> &tria,
       };	  
 }
 
+
+
+template <int dim>
+void GridOut::write_ucd_lines (const Triangulation<dim> &tria,
+			       const unsigned int        starting_index,
+			       std::ostream             &out) const
+{
+  typename Triangulation<dim>::active_line_iterator line, endl;
+  unsigned int index=starting_index;
+
+  for (line=tria.begin_active_line(), endl=tria.end_line();
+       line != endl; ++line)
+    if (line->at_boundary() &&
+	(line->boundary_indicator() != 0)) 
+      {
+	out << index << "  "
+	    << static_cast<unsigned int>(line->boundary_indicator())
+	    << "  line    ";
+	// note: vertex numbers are 1-base
+	for (unsigned int vertex=0; vertex<2; ++vertex)
+	  out << line->vertex_index(GeometryInfo<dim-2>::ucd_to_deal[vertex])+1 << ' ';
+	out << '\n';
+
+	++index;
+      };	  
+}
 
 
 #if deal_II_dimension==1

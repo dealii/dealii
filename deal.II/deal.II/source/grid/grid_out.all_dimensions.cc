@@ -59,26 +59,32 @@ namespace GridOutFlags
   }
   
   
-  Msh::Msh (const bool write_faces) :
-		  write_faces (write_faces)
+  Msh::Msh (const bool write_faces, 
+	    const bool write_lines) :
+    write_faces (write_faces),
+    write_lines (write_lines)
   {}
   
   void Msh::declare_parameters (ParameterHandler& param)
   {
     param.declare_entry("Write faces", "false", Patterns::Bool());
+    param.declare_entry("Write lines", "false", Patterns::Bool());
   }
 
 
   void Msh::parse_parameters (ParameterHandler& param)
   {
     write_faces = param.get_bool("Write faces");
+    write_lines = param.get_bool("Write lines");
   }
 
   
   Ucd::Ucd (const bool write_preamble,
-	    const bool write_faces) :
+	    const bool write_faces,
+	    const bool write_lines) :
 		  write_preamble (write_preamble),
-		  write_faces (write_faces)
+		  write_faces (write_faces),
+		  write_lines (write_lines)
   {}
 
   
@@ -87,6 +93,7 @@ namespace GridOutFlags
   {
     param.declare_entry("Write preamble", "true", Patterns::Bool());
     param.declare_entry("Write faces", "false", Patterns::Bool());
+    param.declare_entry("Write lines", "false", Patterns::Bool());
   }
 
 
@@ -94,6 +101,7 @@ namespace GridOutFlags
   {
     write_preamble = param.get_bool("Write preamble");
     write_faces = param.get_bool("Write faces");
+    write_lines = param.get_bool("Write lines");
   }
 
   
