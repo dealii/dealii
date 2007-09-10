@@ -31,8 +31,8 @@ template<int dim>
 void test(std::ostream& out)
 {
   GridOut go;
-  go.set_flags(GridOutFlags::Ucd(false, true));
-  go.set_flags(GridOutFlags::Msh(true));
+  go.set_flags(GridOutFlags::Ucd(false, true, true));
+  go.set_flags(GridOutFlags::Msh(true, true));
   Triangulation<dim> tr;
   
   GridGenerator::hyper_cube_with_cylindrical_hole(tr, .3, .4, 1, 1, false);
