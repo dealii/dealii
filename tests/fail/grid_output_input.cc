@@ -2,7 +2,7 @@
 //    $Id: grid_generator_03.cc 14287 2006-12-30 00:52:57Z bangerth $
 //    Version: $Name$ 
 //
-//    Copyright (C) 2005, 2006 by the deal.II authors
+//    Copyright (C) 2007 by the deal.II authors and Luca Heltai
 //
 //    This file is subject to QPL and may not be  distributed
 //    without copyright and license information. Please refer
