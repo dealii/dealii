@@ -406,14 +406,14 @@ get_projected_derivative (const FEValues<dim>  &fe_values,
   if (fe_values.get_fe().n_components() == 1)
     {
       std::vector<ProjectedDerivative> values (1);
-      fe_values.get_function_2nd_derivatives (solution, values);
+      fe_values.get_function_hessians (solution, values);
       return values[0];
     }
   else
     {
       std::vector<std::vector<ProjectedDerivative> > values
 	(1, std::vector<ProjectedDerivative>(fe_values.get_fe().n_components()));
-      fe_values.get_function_2nd_derivatives (solution, values);
+      fe_values.get_function_hessians (solution, values);
       return values[0][component];
     };
 }

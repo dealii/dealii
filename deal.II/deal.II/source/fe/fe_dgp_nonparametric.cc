@@ -212,7 +212,7 @@ FE_DGPNonparametric<dim>::update_each (const UpdateFlags flags) const
 {
   UpdateFlags out = flags;
 
-  if (flags & (update_values | update_gradients | update_second_derivatives))
+  if (flags & (update_values | update_gradients | update_hessians))
     out |= update_q_points ;
 
   return out;
@@ -255,7 +255,7 @@ FE_DGPNonparametric<dim>::get_data (
       data->grads.resize (this->dofs_per_cell);
     }
 
-  if (flags & update_second_derivatives)
+  if (flags & update_hessians)
     {
       data->grad_grads.resize (this->dofs_per_cell);
     }
@@ -300,8 +300,8 @@ FE_DGPNonparametric<dim>::fill_fe_values (
 	      data.shape_values[k][i] = fe_data.values[k];
 	    if (flags & update_gradients)
 	      data.shape_gradients[k][i] = fe_data.grads[k];
-	    if (flags & update_second_derivatives)
-	      data.shape_2nd_derivatives[k][i] = fe_data.grad_grads[k];
+	    if (flags & update_hessians)
+	      data.shape_hessians[k][i] = fe_data.grad_grads[k];
 	  }
       }
 }
@@ -341,8 +341,8 @@ FE_DGPNonparametric<dim>::fill_fe_face_values (
 	      data.shape_values[k][i] = fe_data.values[k];
 	    if (flags & update_gradients)
 	      data.shape_gradients[k][i] = fe_data.grads[k];
-	    if (flags & update_second_derivatives)
-	      data.shape_2nd_derivatives[k][i] = fe_data.grad_grads[k];
+	    if (flags & update_hessians)
+	      data.shape_hessians[k][i] = fe_data.grad_grads[k];
 	  }
       }
 }
@@ -383,8 +383,8 @@ FE_DGPNonparametric<dim>::fill_fe_subface_values (
 	      data.shape_values[k][i] = fe_data.values[k];
 	    if (flags & update_gradients)
 	      data.shape_gradients[k][i] = fe_data.grads[k];
-	    if (flags & update_second_derivatives)
-	      data.shape_2nd_derivatives[k][i] = fe_data.grad_grads[k];
+	    if (flags & update_hessians)
+	      data.shape_hessians[k][i] = fe_data.grad_grads[k];
 	  }
       }
 }

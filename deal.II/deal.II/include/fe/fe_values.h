@@ -2,7 +2,7 @@
 //    $Id$
 //    Version: $Name:  $
 //
-//    Copyright (C) 1998, 1999, 2000, 2001, 2002, 2003, 2004, 2005, 2006 by the deal.II authors
+//    Copyright (C) 1998, 1999, 2000, 2001, 2002, 2003, 2004, 2005, 2006, 2007 by the deal.II authors
 //
 //    This file is subject to QPL and may not be  distributed
 //    without copyright and license information. Please refer
@@ -125,7 +125,7 @@ class FEValuesData
 				      * Likewise for second order
 				      * derivatives.
 				      */
-    typedef std::vector<std::vector<Tensor<2,dim> > > GradGradVector;
+    typedef std::vector<std::vector<Tensor<2,dim> > > HessianVector;
 
 				     /**
 				      * Store the values of the shape
@@ -154,7 +154,7 @@ class FEValuesData
 				      * for the layout of the data in
 				      * this field.
 				      */
-    GradGradVector shape_2nd_derivatives;
+    HessianVector shape_hessians;
 
 				     /**
 				      * Store an array of weights
@@ -238,7 +238,7 @@ class FEValuesData
 				      * given shape function occupies
 				      * in the #shape_values,
 				      * #shape_gradients and
-				      * #shape_2nd_derivatives
+				      * #shape_hessians
 				      * arrays. If all shape functions
 				      * are primitive, then this is
 				      * the identity mapping. If, on
@@ -357,7 +357,7 @@ class FEValuesData
  *    and you have to walk over all (or only the non-zero) components of
  *    the shape function using this set of functions.
  *   
- *  <li> get_function_values(), get_function_grads(), etc.: Compute a
+ *  <li> get_function_values(), get_function_gradients(), etc.: Compute a
  *    finite element function or its derivative in quadrature points.
  *
  *  <li> reinit: initialize the FEValues object for a certain cell.
@@ -591,6 +591,13 @@ class FEValuesBase : protected FEValuesData<dim>,
 				      * function.
 				      */
     const Tensor<2,dim> &
+    shape_hessian (const unsigned int function_no,
+		   const unsigned int point_no) const;
+
+				     /**
+				      * @deprecated Wrapper for shape_hessian()
+				      */
+    const Tensor<2,dim> &
     shape_2nd_derivative (const unsigned int function_no,
 			  const unsigned int point_no) const;
 
@@ -603,7 +610,7 @@ class FEValuesBase : protected FEValuesData<dim>,
 				      * is scalar, then only component
 				      * zero is allowed and the return
 				      * value equals that of the
-				      * shape_2nd_derivative()
+				      * shape_hessian()
 				      * function. If the finite
 				      * element is vector valued but
 				      * all shape functions are
@@ -611,7 +618,7 @@ class FEValuesBase : protected FEValuesData<dim>,
 				      * non-zero in only one
 				      * component), then the value
 				      * returned by
-				      * shape_2nd_derivative()
+				      * shape_hessian()
 				      * equals that of this function
 				      * for exactly one
 				      * component. This function is
@@ -620,6 +627,14 @@ class FEValuesBase : protected FEValuesData<dim>,
 				      * is not primitive, but then it
 				      * is necessary since the other
 				      * function cannot be used.
+				      */
+    Tensor<2,dim>
+    shape_hessian_component (const unsigned int function_no,
+				    const unsigned int point_no,
+				    const unsigned int component) const;
+    
+				     /**
+				      * @deprecated Wrapper for shape_hessian_component()
 				      */
     Tensor<2,dim>
     shape_2nd_derivative_component (const unsigned int function_no,
@@ -860,7 +875,7 @@ class FEValuesBase : protected FEValuesData<dim>,
 				      * finite element in use is a scalar one,
 				      * i.e. has only one vector component. If
 				      * it is a vector-valued one, then use
-				      * the other get_function_grads()
+				      * the other get_function_gradients()
 				      * function.
 				      * 
 				      * The function assumes that the
@@ -882,6 +897,14 @@ class FEValuesBase : protected FEValuesData<dim>,
 				      * these DoF values, as computed
 				      * in real space (as opposed to
 				      * on the unit cell).
+				      */
+    template <class InputVector>
+    void get_function_gradients (const InputVector      &fe_function,
+			     std::vector<Tensor<1,dim> > &gradients) const;
+
+				     /**
+				      * @deprecated Use
+				      * get_function_gradients() instead.
 				      */
     template <class InputVector>
     void get_function_grads (const InputVector      &fe_function,
@@ -923,6 +946,15 @@ class FEValuesBase : protected FEValuesData<dim>,
 				      * on the unit cell).
 				      */
     template <class InputVector>
+    void get_function_gradients (const InputVector               &fe_function,
+			     std::vector<std::vector<Tensor<1,dim> > > &gradients) const;
+
+    
+				     /**
+				      * @deprecated Use
+				      * get_function_gradients() instead.
+				      */
+    template <class InputVector>
     void get_function_grads (const InputVector               &fe_function,
 			     std::vector<std::vector<Tensor<1,dim> > > &gradients) const;
 
@@ -931,6 +963,15 @@ class FEValuesBase : protected FEValuesData<dim>,
 				      * more flexibility. see
 				      * get_function_values() with
 				      * corresponding arguments.
+				      */
+    template <class InputVector>
+    void get_function_gradients (const InputVector& fe_function,
+				 const VectorSlice<const std::vector<unsigned int> >& indices,
+				 std::vector<Tensor<1,dim> >& gradients) const;
+
+				     /**
+				      * @deprecated Use
+				      * get_function_gradients() instead.
 				      */
     template <class InputVector>
     void get_function_grads (const InputVector& fe_function,
@@ -942,6 +983,16 @@ class FEValuesBase : protected FEValuesData<dim>,
 				      * more flexibility. see
 				      * get_function_values() with
 				      * corresponding arguments.
+				      */
+    template <class InputVector>
+    void get_function_gradients (const InputVector& fe_function,
+				 const VectorSlice<const std::vector<unsigned int> >& indices,
+				 std::vector<std::vector<Tensor<1,dim> > >& gradients,
+				 bool quadrature_points_fastest = false) const;
+
+				     /**
+				      * @deprecated Use
+				      * get_function_gradients() instead.
 				      */
     template <class InputVector>
     void get_function_grads (const InputVector& fe_function,
@@ -958,7 +1009,7 @@ class FEValuesBase : protected FEValuesData<dim>,
 				      * points.
 				      *
 				      * The function assumes that the
-				      * @p second_derivatives object
+				      * @p hessians object
 				      * already has the correct size.
 				      *
 				      * This function may only be used if the
@@ -966,7 +1017,7 @@ class FEValuesBase : protected FEValuesData<dim>,
 				      * i.e. has only one vector component. If
 				      * it is a vector-valued one, then use
 				      * the other
-				      * get_function_2nd_derivatives()
+				      * get_function_hessians()
 				      * function.
 				      * 
 				      * The actual data type of the input
@@ -987,8 +1038,8 @@ class FEValuesBase : protected FEValuesData<dim>,
 				      */
     template <class InputVector>
     void
-    get_function_2nd_derivatives (const InputVector& fe_function,
-                                  std::vector<Tensor<2,dim> >& second_derivatives) const;
+    get_function_hessians (const InputVector& fe_function,
+			   std::vector<Tensor<2,dim> >& hessians) const;
 
     
 				     /**
@@ -999,7 +1050,7 @@ class FEValuesBase : protected FEValuesData<dim>,
 				      * @p cell at the quadrature points.
 				      *
 				      * The function assumes that the
-				      * @p second_derivatives object already has
+				      * @p hessians object already has
 				      * the right size.
 				      *
 				      * This function does the same as
@@ -1025,9 +1076,27 @@ class FEValuesBase : protected FEValuesData<dim>,
 				      */
     template <class InputVector>
     void
-    get_function_2nd_derivatives (const InputVector      &fe_function,
-                                  std::vector<std::vector<Tensor<2,dim> > > &second_derivatives,
-				  bool quadrature_points_fastest = false) const;
+    get_function_hessians (const InputVector      &fe_function,
+			   std::vector<std::vector<Tensor<2,dim> > > &hessians,
+			   bool quadrature_points_fastest = false) const;
+
+				     /**
+				      * @deprecated Wrapper for get_function_hessians()
+				      */
+    template <class InputVector>
+    void
+    get_function_2nd_derivatives (const InputVector&,
+				  std::vector<Tensor<2,dim> >&) const;
+
+				     /**
+				      * @deprecated Wrapper for get_function_hessians()
+				      */
+    template <class InputVector>
+    void
+    get_function_2nd_derivatives (const InputVector&,
+				  std::vector<std::vector<Tensor<2,dim> > >&,
+				  bool = false) const;
+    
 				     //@}
     
 				     /**
@@ -1768,7 +1837,7 @@ class FEValues : public FEValuesBase<dim>
 				      * about degrees of
 				      * freedom. These functions are,
 				      * above all, the
-				      * <tt>get_function_value/grads/2nd_derivatives</tt>
+				      * <tt>get_function_value/gradients/hessians</tt>
 				      * functions. If you want to call
 				      * these functions, you have to
 				      * call the @p reinit variants
@@ -2071,7 +2140,7 @@ class FEFaceValues : public FEFaceValuesBase<dim>
 				      * information about degrees of
 				      * freedom. These functions are,
 				      * above all, the
-				      * <tt>get_function_value/grads/2nd_derivatives</tt>
+				      * <tt>get_function_value/gradients/hessians</tt>
 				      * functions. If you want to call
 				      * these functions, you have to
 				      * call the @p reinit variants
@@ -2254,7 +2323,7 @@ class FESubfaceValues : public FEFaceValuesBase<dim>
 				      * information about degrees of
 				      * freedom. These functions are,
 				      * above all, the
-				      * <tt>get_function_value/grads/2nd_derivatives</tt>
+				      * <tt>get_function_value/gradients/hessians</tt>
 				      * functions. If you want to call
 				      * these functions, you have to
 				      * call the @p reinit variants
@@ -2522,22 +2591,22 @@ FEValuesBase<dim>::shape_grad_component (const unsigned int i,
 template <int dim>
 inline
 const Tensor<2,dim> &
-FEValuesBase<dim>::shape_2nd_derivative (const unsigned int i,
+FEValuesBase<dim>::shape_hessian (const unsigned int i,
 					 const unsigned int j) const
 {
-  Assert (this->update_flags & update_second_derivatives,
+  Assert (this->update_flags & update_hessians,
 	  ExcAccessToUninitializedField());
   Assert (fe->is_primitive (i),
 	  ExcShapeFunctionNotPrimitive(i));
-  Assert (i<this->shape_2nd_derivatives.size(),
-	  ExcIndexRange (i, 0, this->shape_2nd_derivatives.size()));
-  Assert (j<this->shape_2nd_derivatives[0].size(),
-	  ExcIndexRange (j, 0, this->shape_2nd_derivatives[0].size()));
+  Assert (i<this->shape_hessians.size(),
+	  ExcIndexRange (i, 0, this->shape_hessians.size()));
+  Assert (j<this->shape_hessians[0].size(),
+	  ExcIndexRange (j, 0, this->shape_hessians[0].size()));
 
 				   // if the entire FE is primitive,
 				   // then we can take a short-cut:
   if (fe->is_primitive())
-    return this->shape_2nd_derivatives[i][j];
+    return this->shape_hessians[i][j];
   else
 				     // otherwise, use the mapping
 				     // between shape function numbers
@@ -2548,19 +2617,29 @@ FEValuesBase<dim>::shape_2nd_derivative (const unsigned int i,
 				     // question to which vector
 				     // component the call of this
 				     // function refers
-    return this->shape_2nd_derivatives[this->shape_function_to_row_table[i]][j];
+    return this->shape_hessians[this->shape_function_to_row_table[i]][j];
 }
 
 
 
 template <int dim>
 inline
+const Tensor<2,dim> &
+FEValuesBase<dim>::shape_2nd_derivative (const unsigned int i,
+					 const unsigned int j) const
+{
+  return shape_hessian(i,j);
+}
+
+
+template <int dim>
+inline
 Tensor<2,dim>
-FEValuesBase<dim>::shape_2nd_derivative_component (const unsigned int i,
+FEValuesBase<dim>::shape_hessian_component (const unsigned int i,
 						   const unsigned int j,
 						   const unsigned int component) const
 {
-  Assert (this->update_flags & update_second_derivatives,
+  Assert (this->update_flags & update_hessians,
 	  ExcAccessToUninitializedField());
   Assert (component < fe->n_components(),
 	  ExcIndexRange(component, 0, fe->n_components()));
@@ -2577,7 +2656,7 @@ FEValuesBase<dim>::shape_2nd_derivative_component (const unsigned int i,
   if (fe->is_primitive(i))
     {
       if (component == fe->system_to_component_index(i).first)
-	return this->shape_2nd_derivatives[this->shape_function_to_row_table[i]][j];
+	return this->shape_hessians[this->shape_function_to_row_table[i]][j];
       else
 	return Tensor<2,dim>();
     }
@@ -2609,10 +2688,20 @@ FEValuesBase<dim>::shape_2nd_derivative_component (const unsigned int i,
 	       std::count (fe->get_nonzero_components(i).begin(),
 			   fe->get_nonzero_components(i).begin()+component,
 			   true));
-      return this->shape_2nd_derivatives[row][j];
+      return this->shape_hessians[row][j];
     };
 }
 
+
+template <int dim>
+inline
+Tensor<2,dim>
+FEValuesBase<dim>::shape_2nd_derivative_component (const unsigned int i,
+						   const unsigned int j,
+						   const unsigned int component) const
+{
+  return shape_hessian_component(i,j,component);
+}
 
 
 template <int dim>
@@ -2689,6 +2778,76 @@ FEValuesBase<dim>::JxW (const unsigned int i) const
   
   return this->JxW_values[i];
 }
+
+
+template <int dim>
+template <class InputVector>
+void
+FEValuesBase<dim>::get_function_grads (const InputVector           &fe_function,
+		    std::vector<Tensor<1,dim> > &gradients) const
+{
+  get_function_gradients(fe_function, gradients);
+}
+
+
+template <int dim>
+template <class InputVector>
+void FEValuesBase<dim>::get_function_grads (
+  const InputVector& fe_function,
+  const VectorSlice<const std::vector<unsigned int> >& indices,
+  std::vector<Tensor<1,dim> > &values) const
+{
+  get_function_gradients(fe_function, indices, values);
+}
+
+
+template <int dim>
+template <class InputVector>
+void
+FEValuesBase<dim>::
+get_function_grads (const InputVector                         &fe_function,
+		    std::vector<std::vector<Tensor<1,dim> > > &gradients) const
+{
+  get_function_gradients(fe_function, gradients);
+}
+
+
+template <int dim>
+template <class InputVector>
+void FEValuesBase<dim>::get_function_grads (
+  const InputVector& fe_function,
+  const VectorSlice<const std::vector<unsigned int> >& indices,
+  std::vector<std::vector<Tensor<1,dim> > >& values,
+  bool q_points_fastest) const
+{
+  get_function_gradients(fe_function, indices, values, q_points_fastest);
+}
+
+
+
+template <int dim>
+template <class InputVector>
+inline void
+FEValuesBase<dim>::
+get_function_2nd_derivatives (const InputVector           &fe_function,
+			      std::vector<Tensor<2,dim> > &hessians) const
+{
+  get_function_hessians(fe_function, hessians);
+}
+
+
+
+template <int dim>
+template <class InputVector>
+void
+FEValuesBase<dim>::
+get_function_2nd_derivatives (const InputVector                         &fe_function,
+			      std::vector<std::vector<Tensor<2,dim> > > &hessians,
+			      bool quadrature_points_fastest) const
+{
+  get_function_hessians(fe_function, hessians, quadrature_points_fastest);
+}
+
 
 
 /*------------------------ Inline functions: FEValues ----------------------------*/

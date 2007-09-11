@@ -153,7 +153,7 @@ FEValuesBase<dim>::TriaCellIterator::message_string
 = ("You have previously called the FEValues::reinit function with a\n"
    "cell iterator of type Triangulation<dim>::cell_iterator. However,\n"
    "when you do this, you cannot call some functions in the FEValues\n"
-   "class, such as the get_function_values/grads/2nd_derivatives\n"
+   "class, such as the get_function_values/gradients/hessians\n"
    "functions. If you need these functions, then you need to call\n"
    "FEValues::reinit with an iterator type that allows to extract\n"
    "degrees of freedom, such as DoFHandler<dim>::cell_iterator.");
@@ -298,8 +298,8 @@ FEValuesData<dim>::initialize (const unsigned int        n_quadrature_points,
     this->shape_gradients.resize (n_nonzero_shape_components,
                                   std::vector<Tensor<1,dim> > (n_quadrature_points));
 
-  if (flags & update_second_derivatives)
-    this->shape_2nd_derivatives.resize (n_nonzero_shape_components,
+  if (flags & update_hessians)
+    this->shape_hessians.resize (n_nonzero_shape_components,
                                         std::vector<Tensor<2,dim> > (n_quadrature_points));
   
   if (flags & update_q_points)
@@ -663,7 +663,7 @@ template <int dim>
 template <class InputVector>
 void
 FEValuesBase<dim>::
-get_function_grads (const InputVector           &fe_function,
+get_function_gradients (const InputVector           &fe_function,
 		    std::vector<Tensor<1,dim> > &gradients) const
 {
   Assert (this->update_flags & update_gradients, ExcAccessToUninitializedField());
@@ -705,7 +705,7 @@ get_function_grads (const InputVector           &fe_function,
 
 template <int dim>
 template <class InputVector>
-void FEValuesBase<dim>::get_function_grads (
+void FEValuesBase<dim>::get_function_gradients (
   const InputVector& fe_function,
   const VectorSlice<const std::vector<unsigned int> >& indices,
   std::vector<Tensor<1,dim> > &values) const
@@ -745,7 +745,7 @@ template <int dim>
 template <class InputVector>
 void
 FEValuesBase<dim>::
-get_function_grads (const InputVector                         &fe_function,
+get_function_gradients (const InputVector                         &fe_function,
 		    std::vector<std::vector<Tensor<1,dim> > > &gradients) const
 {
   Assert (gradients.size() == n_quadrature_points,
@@ -800,7 +800,7 @@ get_function_grads (const InputVector                         &fe_function,
 
 template <int dim>
 template <class InputVector>
-void FEValuesBase<dim>::get_function_grads (
+void FEValuesBase<dim>::get_function_gradients (
   const InputVector& fe_function,
   const VectorSlice<const std::vector<unsigned int> >& indices,
   std::vector<std::vector<Tensor<1,dim> > >& values,
@@ -893,14 +893,14 @@ template <int dim>
 template <class InputVector>
 void
 FEValuesBase<dim>::
-get_function_2nd_derivatives (const InputVector           &fe_function,
-			      std::vector<Tensor<2,dim> > &second_derivatives) const
+get_function_hessians (const InputVector           &fe_function,
+			      std::vector<Tensor<2,dim> > &hessians) const
 {
   Assert (fe->n_components() == 1,
 	  ExcDimensionMismatch(fe->n_components(), 1));
-  Assert (second_derivatives.size() == n_quadrature_points,
-	  ExcDimensionMismatch(second_derivatives.size(), n_quadrature_points));
-  Assert (this->update_flags & update_second_derivatives, ExcAccessToUninitializedField());
+  Assert (hessians.size() == n_quadrature_points,
+	  ExcDimensionMismatch(hessians.size(), n_quadrature_points));
+  Assert (this->update_flags & update_hessians, ExcAccessToUninitializedField());
   Assert (present_cell.get() != 0,
 	  ExcMessage ("FEValues object is not reinit'ed to any cell"));
   Assert (fe_function.size() == present_cell->n_dofs_for_dof_handler(),
@@ -913,7 +913,7 @@ get_function_2nd_derivatives (const InputVector           &fe_function,
   present_cell->get_interpolated_dof_values(fe_function, dof_values);
 
 				   // initialize with zero
-  std::fill_n (second_derivatives.begin(), n_quadrature_points, Tensor<2,dim>());
+  std::fill_n (hessians.begin(), n_quadrature_points, Tensor<2,dim>());
 
 				   // add up contributions of trial
 				   // functions. note that here we
@@ -924,9 +924,9 @@ get_function_2nd_derivatives (const InputVector           &fe_function,
   for (unsigned int point=0; point<n_quadrature_points; ++point)
     for (unsigned int shape_func=0; shape_func<dofs_per_cell; ++shape_func)
       {
-	Tensor<2,dim> tmp = this->shape_2nd_derivative(shape_func,point);
+	Tensor<2,dim> tmp = this->shape_hessian(shape_func,point);
 	tmp *= dof_values(shape_func);
-	second_derivatives[point] += tmp;
+	hessians[point] += tmp;
       };
 }
 
@@ -936,7 +936,7 @@ template <int dim>
 template <class InputVector>
 void
 FEValuesBase<dim>::
-get_function_2nd_derivatives (const InputVector                         &fe_function,
+get_function_hessians (const InputVector                         &fe_function,
 			      std::vector<std::vector<Tensor<2,dim> > > &second_derivs,
 			      bool quadrature_points_fastest) const
 {
@@ -948,7 +948,7 @@ get_function_2nd_derivatives (const InputVector                         &fe_func
     Assert (second_derivs[i].size() == n_components,
 	    ExcDimensionMismatch(second_derivs[i].size(), n_components));
 
-  Assert (this->update_flags & update_second_derivatives, ExcAccessToUninitializedField());
+  Assert (this->update_flags & update_hessians, ExcAccessToUninitializedField());
   Assert (present_cell.get() != 0,
 	  ExcMessage ("FEValues object is not reinit'ed to any cell"));
   Assert (fe_function.size() == present_cell->n_dofs_for_dof_handler(),
@@ -971,7 +971,7 @@ get_function_2nd_derivatives (const InputVector                         &fe_func
       for (unsigned int shape_func=0; shape_func<dofs_per_cell; ++shape_func)
 	if (fe->is_primitive(shape_func))
 	  {
-	    Tensor<2,dim> tmp(shape_2nd_derivative(shape_func,point));
+	    Tensor<2,dim> tmp(shape_hessian(shape_func,point));
 	    tmp *= dof_values(shape_func);
 	    second_derivs[fe->system_to_component_index(shape_func).first][point]
 	      += tmp;
@@ -979,7 +979,7 @@ get_function_2nd_derivatives (const InputVector                         &fe_func
 	else
 	  for (unsigned int c=0; c<n_components; ++c)
 	    {
-	      Tensor<2,dim> tmp = this->shape_2nd_derivative_component(shape_func,point,c);
+	      Tensor<2,dim> tmp = this->shape_hessian_component(shape_func,point,c);
 	      tmp *= dof_values(shape_func);
 	      second_derivs[c][point] += tmp;
 	    }
@@ -988,7 +988,7 @@ get_function_2nd_derivatives (const InputVector                         &fe_func
       for (unsigned int shape_func=0; shape_func<dofs_per_cell; ++shape_func)
 	if (fe->is_primitive(shape_func))
 	  {
-	    Tensor<2,dim> tmp(shape_2nd_derivative(shape_func,point));
+	    Tensor<2,dim> tmp(shape_hessian(shape_func,point));
 	    tmp *= dof_values(shape_func);
 	    second_derivs[point][fe->system_to_component_index(shape_func).first]
 	      += tmp;
@@ -996,7 +996,7 @@ get_function_2nd_derivatives (const InputVector                         &fe_func
 	else
 	  for (unsigned int c=0; c<n_components; ++c)
 	    {
-	      Tensor<2,dim> tmp = this->shape_2nd_derivative_component(shape_func,point,c);
+	      Tensor<2,dim> tmp = this->shape_hessian_component(shape_func,point,c);
 	      tmp *= dof_values(shape_func);
 	      second_derivs[point][c] += tmp;
 	    }
@@ -1010,7 +1010,7 @@ FEValuesBase<dim>::memory_consumption () const
 {
   return (MemoryConsumption::memory_consumption (this->shape_values) +
 	  MemoryConsumption::memory_consumption (this->shape_gradients) +
-	  MemoryConsumption::memory_consumption (this->shape_2nd_derivatives) +
+	  MemoryConsumption::memory_consumption (this->shape_hessians) +
 	  MemoryConsumption::memory_consumption (this->JxW_values) +
 	  MemoryConsumption::memory_consumption (this->quadrature_points) +
 	  MemoryConsumption::memory_consumption (this->normal_vectors) +

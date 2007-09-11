@@ -2,7 +2,7 @@
 //    $Id$
 //    Version: $Name$
 //
-//    Copyright (C) 1998, 1999, 2000, 2001, 2002, 2003, 2004, 2005, 2006 by the deal.II authors
+//    Copyright (C) 1998, 1999, 2000, 2001, 2002, 2003, 2004, 2005, 2006, 2007 by the deal.II authors
 //
 //    This file is subject to QPL and may not be  distributed
 //    without copyright and license information. Please refer
@@ -56,27 +56,27 @@ void FEValuesBase<deal_II_dimension>::get_function_values<IN>
  std::vector<std::vector<float> > &, bool) const;
 
 template
-void FEValuesBase<deal_II_dimension>::get_function_grads<IN>
+void FEValuesBase<deal_II_dimension>::get_function_gradients<IN>
 (const IN&, std::vector<Tensor<1,deal_II_dimension> > &) const;
 template
-void FEValuesBase<deal_II_dimension>::get_function_grads<IN>
+void FEValuesBase<deal_II_dimension>::get_function_gradients<IN>
 (const IN&, const VectorSlice<const std::vector<unsigned int> >&,
  std::vector<Tensor<1,deal_II_dimension> > &) const;
 
 template
-void FEValuesBase<deal_II_dimension>::get_function_grads<IN>
+void FEValuesBase<deal_II_dimension>::get_function_gradients<IN>
 (const IN&, std::vector<std::vector<Tensor<1,deal_II_dimension> > > &) const;
 template
-void FEValuesBase<deal_II_dimension>::get_function_grads<IN>
+void FEValuesBase<deal_II_dimension>::get_function_gradients<IN>
 (const IN&, const VectorSlice<const std::vector<unsigned int> >&,
  std::vector<std::vector<Tensor<1,deal_II_dimension> > > &, bool) const;
 
 template
-void FEValuesBase<deal_II_dimension>::get_function_2nd_derivatives<IN>
+void FEValuesBase<deal_II_dimension>::get_function_hessians<IN>
 (const IN&, std::vector<Tensor<2,deal_II_dimension> > &) const;
 
 template
-void FEValuesBase<deal_II_dimension>::get_function_2nd_derivatives<IN>
+void FEValuesBase<deal_II_dimension>::get_function_hessians<IN>
 (const IN&, std::vector<std::vector<Tensor<2,deal_II_dimension> > > &, bool) const;
 
 DEAL_II_NAMESPACE_CLOSE

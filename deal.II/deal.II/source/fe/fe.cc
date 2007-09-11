@@ -845,17 +845,17 @@ FiniteElement<dim>::compute_2nd (
   FEValuesData<dim>                    &data) const
 {
   Assert ((fe_internal.update_each | fe_internal.update_once)
-	  & update_second_derivatives,
+	  & update_hessians,
 	  ExcInternalError());
 
 // make sure we have as many entries as there are nonzero components  
-//  Assert (data.shape_2nd_derivatives.size() ==
+//  Assert (data.shape_hessians.size() ==
 //	    std::accumulate (n_nonzero_components_table.begin(),
 //                        n_nonzero_components_table.end(),
 //                        0U),
 //	  ExcInternalError());
 				   // Number of quadrature points
-  const unsigned int n_q_points = data.shape_2nd_derivatives[0].size();
+  const unsigned int n_q_points = data.shape_hessians[0].size();
 
 				   // first reinit the fe_values
 				   // objects used for the finite
@@ -971,7 +971,7 @@ FiniteElement<dim>::compute_2nd (
             
             for (unsigned int q=0; q<n_q_points; ++q)
               for (unsigned int d1=0; d1<dim; ++d1)
-                data.shape_2nd_derivatives[total_index][q][d][d1]
+                data.shape_hessians[total_index][q][d][d1]
                   = diff_quot2[q][d1];
           }
       }
