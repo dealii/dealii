@@ -2543,7 +2543,7 @@ namespace LaplaceSolver
 		  :
 		  fe_values (fe, quadrature,
 			     update_values             |
-			     update_second_derivatives |
+			     update_hessians |
 			     update_q_points           |
 			     update_JxW_values),
 		  right_hand_side (&right_hand_side)

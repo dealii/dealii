@@ -2,7 +2,7 @@
 //    $Id$
 //    Version: $Name$
 //
-//    Copyright (C) 2006 by the deal.II authors
+//    Copyright (C) 2006, 2007 by the deal.II authors
 //
 //    This file is subject to QPL and may not be  distributed
 //    without copyright and license information. Please refer
@@ -137,8 +137,8 @@ FE_Poly<POLY,dim>::update_each (const UpdateFlags flags) const
 
   if (flags & update_gradients)
     out |= update_gradients | update_covariant_transformation;
-  if (flags & update_second_derivatives)
-    out |= update_second_derivatives | update_covariant_transformation;
+  if (flags & update_hessians)
+    out |= update_hessians | update_covariant_transformation;
 
   return out;
 }
@@ -196,7 +196,7 @@ FE_Poly<POLY,dim>::get_data (const UpdateFlags      update_flags,
 				   // finite differencing is required,
 				   // then initialize some objects for
 				   // that
-  if (flags & update_second_derivatives)
+  if (flags & update_hessians)
     data->initialize_2nd (this, mapping, quadrature);
 
 				   // next already fill those fields
@@ -265,7 +265,7 @@ FE_Poly<POLY,dim>::fill_fe_values (const Mapping<dim>                   &mapping
     }
 
   const typename QProjector<dim>::DataSetDescriptor dsd;
-  if (flags & update_second_derivatives)
+  if (flags & update_hessians)
     this->compute_2nd (mapping, cell, dsd.cell(),
 		       mapping_data, fe_data, data);
 }
@@ -319,7 +319,7 @@ FE_Poly<POLY,dim>::fill_fe_face_values (const Mapping<dim>                   &ma
 	}
     }
 
-  if (flags & update_second_derivatives)
+  if (flags & update_hessians)
     this->compute_2nd (mapping, cell, offset, mapping_data, fe_data, data);
 }
 
@@ -373,7 +373,7 @@ FE_Poly<POLY,dim>::fill_fe_subface_values (const Mapping<dim>                   
 	}
     }
   
-  if (flags & update_second_derivatives)
+  if (flags & update_hessians)
     this->compute_2nd (mapping, cell, offset, mapping_data, fe_data, data);
 }
 

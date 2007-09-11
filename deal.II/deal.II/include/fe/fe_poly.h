@@ -2,7 +2,7 @@
 //    $Id$
 //    Version: $Name$
 //
-//    Copyright (C) 2004, 2005, 2006 by the deal.II authors
+//    Copyright (C) 2004, 2005, 2006, 2007 by the deal.II authors
 //
 //    This file is subject to QPL and may not be  distributed
 //    without copyright and license information. Please refer
@@ -311,10 +311,10 @@ class FE_Poly : public FiniteElement<dim>
 				      * Mapping object used in
 				      * conjunction with this finite
 				      * element.  <li> if
-				      * <tt>update_second_derivatives</tt>
+				      * <tt>update_hessians</tt>
 				      * is set, the result will
 				      * contain
-				      * <tt>update_second_derivatives</tt>
+				      * <tt>update_hessians</tt>
 				      * and
 				      * <tt>update_covariant_transformation</tt>.
 				      * The rationale is the same as

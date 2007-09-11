@@ -878,7 +878,7 @@ void MinimizationProblem<1>::refine_grid ()
   QTrapez<dim> quadrature;
   FEValues<dim> fe_values (fe, quadrature,
                            update_values   | update_gradients |
-                           update_second_derivatives |
+                           update_hessians |
                            update_q_points | update_JxW_values);
 
                                    // The error indicator formula presented in

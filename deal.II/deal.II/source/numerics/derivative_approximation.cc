@@ -53,7 +53,7 @@ template <int dim>
 const UpdateFlags DerivativeApproximation::SecondDerivative<dim>::update_flags = update_gradients;
 
 template <int dim>
-const UpdateFlags DerivativeApproximation::ThirdDerivative<dim>::update_flags = update_second_derivatives;
+const UpdateFlags DerivativeApproximation::ThirdDerivative<dim>::update_flags = update_hessians;
 
 
 

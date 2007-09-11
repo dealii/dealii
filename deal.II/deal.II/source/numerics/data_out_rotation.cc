@@ -212,7 +212,7 @@ void DataOutRotation<dim,DH>::build_some_patches (Data &data)
 			  if (update_flags & update_gradients)
 			    this->dof_data[dataset]->get_function_gradients (fe_patch_values,
 									     data.patch_gradients);
-			  if (update_flags & update_second_derivatives)
+			  if (update_flags & update_hessians)
 			    this->dof_data[dataset]->get_function_second_derivatives (fe_patch_values,
 										      data.patch_second_derivatives);
 			  postprocessor->compute_derived_quantities(data.postprocessed_values[dataset],
@@ -233,7 +233,7 @@ void DataOutRotation<dim,DH>::build_some_patches (Data &data)
 			  if (update_flags & update_gradients)
 			    this->dof_data[dataset]->get_function_gradients (fe_patch_values,
 									     data.patch_gradients_system);
-			  if (update_flags & update_second_derivatives)
+			  if (update_flags & update_hessians)
 			    this->dof_data[dataset]->get_function_second_derivatives (fe_patch_values,
 										      data.patch_second_derivatives_system);
 			  postprocessor->compute_derived_quantities(data.postprocessed_values[dataset],

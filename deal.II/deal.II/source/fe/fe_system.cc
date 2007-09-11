@@ -564,8 +564,8 @@ FESystem<dim>::update_each (const UpdateFlags flags) const
 				   // therefore have to set the
 				   // respective flag since the base
 				   // elements don't have them
-  if (flags & update_second_derivatives)
-    out |= update_second_derivatives | update_covariant_transformation;
+  if (flags & update_hessians)
+    out |= update_hessians | update_covariant_transformation;
     
   return out;
 }
@@ -592,13 +592,13 @@ FESystem<dim>::get_data (const UpdateFlags      flags_,
 				   // finite differencing are required,
 				   // then initialize some objects for
 				   // that
-  data->compute_second_derivatives = flags & update_second_derivatives;
-  if (data->compute_second_derivatives)
+  data->compute_hessians = flags & update_hessians;
+  if (data->compute_hessians)
     {
 				       // delete
-				       // update_second_derivatives
+				       // update_hessians
 				       // from flags list
-      sub_flags = UpdateFlags (sub_flags ^ update_second_derivatives);
+      sub_flags = UpdateFlags (sub_flags ^ update_hessians);
       data->initialize_2nd (this, mapping, quadrature);
     }
   
@@ -619,9 +619,9 @@ FESystem<dim>::get_data (const UpdateFlags      flags_,
 				       // make sure that *we* compute
 				       // second derivatives, base
 				       // elements should not do it
-      Assert (!(base_fe_data->update_each & update_second_derivatives),
+      Assert (!(base_fe_data->update_each & update_hessians),
 	      ExcInternalError());
-      Assert (!(base_fe_data->update_once & update_second_derivatives),
+      Assert (!(base_fe_data->update_once & update_hessians),
 	      ExcInternalError());
       
 				       // The FEValuesData @p{data}
@@ -950,7 +950,7 @@ compute_fill (const Mapping<dim>                   &mapping,
                                                      // should not
                                                      // have computed
                                                      // them!
-                    Assert (!(base_flags & update_second_derivatives),
+                    Assert (!(base_flags & update_hessians),
                             ExcInternalError());
                   };
               };
@@ -980,7 +980,7 @@ compute_fill (const Mapping<dim>                   &mapping,
 	}
     }
   
-  if (fe_data.compute_second_derivatives)
+  if (fe_data.compute_hessians)
     {
       unsigned int offset = 0;
       if (face_no != invalid_face_number)

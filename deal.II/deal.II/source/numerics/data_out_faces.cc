@@ -2,7 +2,7 @@
 //    $Id$
 //    Version: $Name$
 //
-//    Copyright (C) 2000, 2001, 2002, 2003, 2004, 2005, 2006 by the deal.II authors
+//    Copyright (C) 2000, 2001, 2002, 2003, 2004, 2005, 2006, 2007 by the deal.II authors
 //
 //    This file is subject to QPL and may not be  distributed
 //    without copyright and license information. Please refer
@@ -128,7 +128,7 @@ void DataOutFaces<dim,DH>::build_some_patches (Data &data)
 		      if (update_flags & update_gradients)
 			this->dof_data[dataset]->get_function_gradients (fe_patch_values,
 									 data.patch_gradients);
-		      if (update_flags & update_second_derivatives)
+		      if (update_flags & update_hessians)
 			this->dof_data[dataset]->get_function_second_derivatives (fe_patch_values,
 										  data.patch_second_derivatives);
 		      postprocessor->compute_derived_quantities(data.postprocessed_values[dataset],
@@ -149,7 +149,7 @@ void DataOutFaces<dim,DH>::build_some_patches (Data &data)
 		      if (update_flags & update_gradients)
 			this->dof_data[dataset]->get_function_gradients (fe_patch_values,
 									 data.patch_gradients_system);
-		      if (update_flags & update_second_derivatives)
+		      if (update_flags & update_hessians)
 			this->dof_data[dataset]->get_function_second_derivatives (fe_patch_values,
 										  data.patch_second_derivatives_system);
 		      postprocessor->compute_derived_quantities(data.postprocessed_values[dataset],

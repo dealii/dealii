@@ -545,8 +545,8 @@ FE_ABF<dim>::update_each (const UpdateFlags flags) const
                                      | update_JxW_values;
   //TODO: Set update flags appropriately and figure out, how the second
   // derivatives for the RT elements can be computed correctly.
-  if (flags & update_second_derivatives)
-    out |= update_second_derivatives | update_contravariant_transformation;
+  if (flags & update_hessians)
+    out |= update_hessians | update_contravariant_transformation;
 
   return out;
 }
