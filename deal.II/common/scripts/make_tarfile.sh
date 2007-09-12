@@ -22,9 +22,10 @@ tar czf deal.II-$MAJOR.$MINOR.$PATCH.tar.gz deal.II
 
 mv deal.II/doc deal.II/examples .
 cd deal.II
-mkdir doc mkdir doxygen
+mkdir doc
 cd doc
 touch Makefile.in
+mkdir doxygen
 cd doxygen
 touch Makefile.in options.dox.in options.136.in header.html.in header.136.in header.tex.in
 cd ../../..
