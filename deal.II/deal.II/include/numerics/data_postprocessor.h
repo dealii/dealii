@@ -26,7 +26,7 @@
 DEAL_II_NAMESPACE_OPEN
 
 
-/*
+/**
  * For the (graphical) output of a FE solution one frequently wants to include
  * derived quantities, which are calculated from the values of the solution and
  * possibly the first and second derivates of the solution. This class offers
@@ -121,7 +121,7 @@ class DataPostprocessor: public Subscriptor
 				      * compute the derived quantities. This has
 				      * to be a combination of @p update_values,
 				      * @p update_gradients and @p
-				      * update_second_derivatives. If the
+				      * update_hessians. If the
 				      * DataPostprocessor is to be used in
 				      * combination with DataOutFaces, you may
 				      * also ask for a update of normals via the
