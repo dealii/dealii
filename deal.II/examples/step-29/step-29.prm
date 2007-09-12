@@ -1,109 +1,28 @@
 # Listing of Parameters
 # ---------------------
-# Distance of the focal point of the lens to the x-axis (or xy-plane in 3D)
-set Focal distance        = 0.3
 
-# Number of global mesh refinement steps applied to initial coarse grid
-set Number of refinements = 5
+subsection Mesh & geometry parameters
+  # Distance of the focal point of the lens to the x-axis (or xy-plane in 3D)
+  set Focal distance        = 0.3
 
-# Name of the output file (without extension)
-set Output file           = solution
-
-# A name for the output format to be used
-set Output format         = vtk
-
-# Number of subdivisions of each mesh cell
-set Subdivisions          = 1
-
-# Wave speed
-set c                     = 1.5e5
-
-# Frequency
-set omega                 = 1.5e7
-
-
-subsection DX output parameters
-  # Output format of vertex coordinates, which is either a text representation
-  # (ascii) or binary floating point values of 32 or 64 bits length
-  set Coordinates format = ascii
-
-  # Output format of data values, which is either a text representation
-  # (ascii) or binary floating point values of 32 or 64 bits length
-  set Data format        = ascii
-
-  # Output format of integer numbers, which is either a text representation
-  # (ascii) or binary integer values of 32 or 64 bits length
-  set Integer format     = ascii
-
-  # A boolean field indicating whether neighborship information between cells
-  # is to be written to the OpenDX output file
-  set Write neighbors    = true
+  # Number of global mesh refinement steps applied to initial coarse grid
+  set Number of refinements = 6
 end
 
 
-subsection Eps output parameters
-  # Angle of the viewing position against the vertical axis
-  set Azimut angle                        = 60
+subsection Physical constants
+  # Wave speed
+  set c     = 1.5e5
 
-  # Name of a color function used to colorize mesh lines and/or cell
-  # interiors
-  set Color function                      = default
-
-  # Whether the interior of cells shall be shaded
-  set Color shading of interior of cells  = true
-
-  # Whether the mesh lines, or only the surface should be drawn
-  set Draw mesh lines                     = true
-
-  # Whether only the mesh lines, or also the interior of cells should be
-  # plotted. If this flag is false, then one can see through the mesh
-  set Fill interior of cells              = true
-
-  # Number of the input vector that is to be used to generate color
-  # information
-  set Index of vector for color           = 0
-
-  # Number of the input vector that is to be used to generate height
-  # information
-  set Index of vector for height          = 0
-
-  # The width in which the postscript renderer is to plot lines
-  set Line widths in eps units            = 0.5
-
-  # Whether width or height should be scaled to match the given size
-  set Scale to width or height            = width
-
-  # Scaling for the z-direction relative to the scaling used in x- and
-  # y-directions
-  set Scaling for z-axis                  = 1
-
-  # The size (width or height) to which the eps output file is to be scaled
-  set Size (width or height) in eps units = 300
-
-  # Angle of the viewing direction against the y-axis
-  set Turn angle                          = 30
+  # Frequency
+  set omega = 5.0e7
 end
 
 
-subsection Povray output parameters
-  # Whether camera and lightling information should be put into an external
-  # file "data.inc" or into the POVRAY input file
-  set Include external file = true
+subsection Output parameters
+  # Name of the output file (without extension)
+  set Output file   = solution
 
-  # Whether POVRAY should use bicubic patches
-  set Use bicubic patches   = false
-
-  # A flag indicating whether POVRAY should use smoothed triangles instead of
-  # the usual ones
-  set Use smooth triangles  = false
+  # A name for the output format to be used
+  set Output format = gmv
 end
-
-
-subsection UCD output parameters
-  # A flag indicating whether a comment should be written to the beginning of
-  # the output file indicating date and time of creation as well as the
-  # creating program
-  set Write preamble = true
-end
-
-
