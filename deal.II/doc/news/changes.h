@@ -82,6 +82,19 @@ inconvenience this causes.
   refinement.
   <br>
   (Luca Heltai 2007/09/10) 
+  </p>
+  </li>
+  <li> <p>Extendend: The possibilities of graphical output via the DataOut,
+  DataOutFaces and DataOutRotation classes have been extended by the
+  ability to perform a postrocessing step before a given data
+  vector is written to the output. This way, derived variables can be
+  written instead of the original data. To this end, there is a new
+  version of <code>DataOut_DoFData::add_data_vector</code> taking a
+  data vector and a DataPostprocessor, which performs the actual
+  calculation of new data based on the values and possibly derivatives
+  of the original data at each point of the patch.
+  <br>
+  (Tobias Leicht 2007/09/10) 
   </p> 
   </li>
 
