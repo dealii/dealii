@@ -71,14 +71,14 @@ inconvenience this causes.
 <a name="deal.II"></a>
 <h3>deal.II</h3>
 
-<ol> 
-  <li> <p>Fixed+New: The <code>GridOut::Ucd</code> and
-  <code>GridOut::Msh</code> structures now take a new parameter
+<ol>
+  <li> <p>Fixed+New: The @p GridOutFlags::Ucd and
+  @p GridOutFlags::Msh structures now take a new parameter
   <code>write_lines</code> to output lines with boundary id different
   from 0 in three-dimensional meshes. This fixes an annoying bug for
   which meshes with ids different from zero where not written in a
   compatible way, and if re-read with the corresponding
-  <code>GridIn</code> functions, would not yield the same mesh upon
+  @p GridIn functions, would not yield the same mesh upon
   refinement.
   <br>
   (Luca Heltai 2007/09/10) 
