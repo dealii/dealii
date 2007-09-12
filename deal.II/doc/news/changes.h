@@ -72,21 +72,21 @@ inconvenience this causes.
 <h3>deal.II</h3>
 
 <ol>
-  <li> <p>Fixed+New: The @p GridOutFlags::Ucd and
-  @p GridOutFlags::Msh structures now take a new parameter
+  <li> <p>Fixed+New: The GridOutFlags::Ucd and
+  GridOutFlags::Msh structures now take a new parameter
   <code>write_lines</code> to output lines with boundary id different
   from 0 in three-dimensional meshes. This fixes an annoying bug for
   which meshes with ids different from zero where not written in a
   compatible way, and if re-read with the corresponding
-  @p GridIn functions, would not yield the same mesh upon
+  GridIn functions, would not yield the same mesh upon
   refinement.
   <br>
   (Luca Heltai 2007/09/10) 
   </p>
   </li>
-  <li> <p>Extendend: The possibilities of graphical output via the DataOut,
+  <li> <p>Extended: The possibilities of graphical output via the DataOut,
   DataOutFaces and DataOutRotation classes have been extended by the
-  ability to perform a postrocessing step before a given data
+  ability to perform a postprocessing step before a given data
   vector is written to the output. This way, derived variables can be
   written instead of the original data. To this end, there is a new
   version of <code>DataOut_DoFData::add_data_vector</code> taking a
