@@ -40,17 +40,21 @@ DEAL_II_NAMESPACE_OPEN
  * DataPostprocessor has to live until @p build_patches has been
  * called. DataOutFaces and DataOutRotation can be used as well.
  *
- * In order not to perform needless calculations, DataPostprocessor has to
- * provide the information, which input data is needed for the calculation of
- * the derived quantities, i.e. whether it needs the values, the first
- * derivative and/or the second derivative of the provided
- * data. DataPostprocessor objects which are used in combination with a
- * DataOutFaces object can also ask for the normal vectors at each point. The
- * information, which data is needed has to be provided via the UpdateFlags
- * returned by the virtual function @p get_needed_update_flags. It is your
- * responsibility to use only those values which were updated in the calculation
- * of derived quantities. The DataOut object will provide references to the
- * requested data in the call to @p compute_derived_quantities.
+ * In order not to perform needless calculations, DataPostprocessor
+ * has to provide the information, which input data is needed for the
+ * calculation of the derived quantities, i.e. whether it needs the
+ * values, the first derivative and/or the second derivative of the
+ * provided data. DataPostprocessor objects which are used in
+ * combination with a DataOutFaces object can also ask for the normal
+ * vectors at each point. The information, which data is needed has to
+ * be provided via the UpdateFlags returned by the virtual function @p
+ * get_needed_update_flags. It is your responsibility to use only
+ * those values which were updated in the calculation of derived
+ * quantities. The DataOut object will provide references to the
+ * requested data in the call to compute_derived_quantities_scalar()
+ * or compute_derived_quantities_vector() (DataOut decides which of
+ * the two functions to call depending on whether the finite element
+ * in use has only a single, or multiple vector components).
  *
  * Furthermore, derived classes have to implement the @p get_names and @p
  * n_output_variables functions, where the number of output variables returned
@@ -91,24 +95,37 @@ class DataPostprocessor: public Subscriptor
 				      * empty vector when working on cells, not
 				      * on faces.
 				      *
-				      * This function is called, when the
-				      * original data vector is scalar valued.
+				      * This function is called when
+				      * the original data vector
+				      * represents scalar data,
+				      * i.e. the finite element in use
+				      * has only a single vector
+				      * component.
 				      */
-    virtual void compute_derived_quantities (std::vector<Vector<double> >      &computed_quantities,
-					     const std::vector<double>         &uh,
-					     const std::vector<Tensor<1,dim> > &duh,
-					     const std::vector<Tensor<2,dim> > &dduh,
-					     const std::vector<Point<dim> >    &normals) const;
+    virtual
+    void
+    compute_derived_quantities_scalar (std::vector<Vector<double> >      &computed_quantities,
+				       const std::vector<double>         &uh,
+				       const std::vector<Tensor<1,dim> > &duh,
+				       const std::vector<Tensor<2,dim> > &dduh,
+				       const std::vector<Point<dim> >    &normals) const;
+    
 				     /**
-				      * Same as above function, but this one is
-				      * called in case of vector-valued original
-				      * data.
+				      * Same as above function, but
+				      * this function is called when
+				      * the original data vector
+				      * represents vector data,
+				      * i.e. the finite element in use
+				      * has multiple vector
+				      * components.
 				      */
-    virtual void compute_derived_quantities (std::vector<Vector<double> >                    &computed_quantities,
-					     const std::vector<Vector<double> >              &uh,
-					     const std::vector<std::vector<Tensor<1,dim> > > &duh,
-					     const std::vector<std::vector<Tensor<2,dim> > > &dduh,
-					     const std::vector<Point<dim> >                  &normals) const;
+    virtual
+    void
+    compute_derived_quantities_vector (std::vector<Vector<double> >                    &computed_quantities,
+				       const std::vector<Vector<double> >              &uh,
+				       const std::vector<std::vector<Tensor<1,dim> > > &duh,
+				       const std::vector<std::vector<Tensor<2,dim> > > &dduh,
+				       const std::vector<Point<dim> >                  &normals) const;
 
 				     /**
 				      * Return the vector of strings describing
@@ -130,11 +147,15 @@ class DataPostprocessor: public Subscriptor
     virtual UpdateFlags get_needed_update_flags () const=0;
 
 				     /**
-				      * Number of postprocessed variables. Has
-				      * to match the number of entries filled by
-				      * @p compute_derived_quantities as well as
-				      * the size of the vector of names returned
-				      * by @p get_names.
+				      * Number of postprocessed
+				      * variables. Has to match the
+				      * number of entries filled by
+				      * compute_derived_quantities_scalar()
+				      * or
+				      * compute_derived_quantities_vector()
+				      * as well as the size of the
+				      * vector of names returned by
+				      * get_names().
 				      */
     virtual unsigned int n_output_variables() const=0;
     

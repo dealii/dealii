@@ -596,7 +596,7 @@ void DataOut<dim,DH>::build_some_patches (Data &data)
 	    {
 	      const DataPostprocessor<dim> *postprocessor=this->dof_data[dataset]->postprocessor;
 	      
-	      if (postprocessor)
+	      if (postprocessor != 0)
 		{
 						   // we have to postprocess the
 						   // data, so determine, which
@@ -616,11 +616,12 @@ void DataOut<dim,DH>::build_some_patches (Data &data)
 		      if (update_flags & update_hessians)
 			this->dof_data[dataset]->get_function_second_derivatives (fe_patch_values,
 										  data.patch_second_derivatives);
-		      postprocessor->compute_derived_quantities(data.postprocessed_values[dataset],
-								data.patch_values,
-								data.patch_gradients,
-								data.patch_second_derivatives,
-								data.dummy_normals);
+		      postprocessor->
+			compute_derived_quantities_scalar(data.postprocessed_values[dataset],
+							  data.patch_values,
+							  data.patch_gradients,
+							  data.patch_second_derivatives,
+							  data.dummy_normals);
 		    }
 		  else
 		    {
@@ -637,11 +638,12 @@ void DataOut<dim,DH>::build_some_patches (Data &data)
 		      if (update_flags & update_hessians)
 			this->dof_data[dataset]->get_function_second_derivatives (fe_patch_values,
 										  data.patch_second_derivatives_system);
-		      postprocessor->compute_derived_quantities(data.postprocessed_values[dataset],
-								data.patch_values_system,
-								data.patch_gradients_system,
-								data.patch_second_derivatives_system,
-								data.dummy_normals);
+		      postprocessor->
+			compute_derived_quantities_vector(data.postprocessed_values[dataset],
+							  data.patch_values_system,
+							  data.patch_gradients_system,
+							  data.patch_second_derivatives_system,
+							  data.dummy_normals);
 		    }
 		  
 		  for (unsigned int q=0; q<n_q_points; ++q)

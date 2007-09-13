@@ -154,9 +154,7 @@ class Postprocessor : public DataPostprocessor<dim>
 {
   public:
 
-    using DataPostprocessor<dim>::compute_derived_quantities;
-
-    void compute_derived_quantities (
+    void compute_derived_quantities_vector (
 			std::vector< Vector< double > > &,
 			const std::vector< Vector< double > > &, 
 			const std::vector< std::vector< Tensor< 1, dim > > > &, 
@@ -202,7 +200,7 @@ Postprocessor<dim>::n_output_variables () const
 
 template <int dim>
 void
-Postprocessor<dim>::compute_derived_quantities (
+Postprocessor<dim>::compute_derived_quantities_vector (
 			std::vector< Vector< double > >                       &computed_quantities,
 			const std::vector< Vector< double > >                 &uh,
 			const std::vector< std::vector< Tensor< 1, dim > > >  &/*duh*/,
