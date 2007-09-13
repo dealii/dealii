@@ -99,8 +99,8 @@ inconvenience this causes.
   <br>
   (Luca Heltai 2007/09/10) 
   </p>
-
   </li>
+
   <li> <p>Extended: The possibilities of graphical output via the DataOut,
   DataOutFaces and DataOutRotation classes have been extended by the
   ability to perform a postprocessing step before a given data
