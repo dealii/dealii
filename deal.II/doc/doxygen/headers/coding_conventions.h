@@ -14,7 +14,7 @@
 /**
  * @page CodingConventions Coding conventions used throughout deal.II
  
-Throught deal.II, we strive to keep our programming style and the kind
+Throughout deal.II, we strive to keep our programming style and the kind
 of interfaces we provide as consistent as possible. To this end, we
 have adopted a set of coding conventions that we attempt to follow
 wherever possible. When reading through them, it is important to
@@ -27,7 +27,7 @@ because some things become clear already by looking at the style a
 piece of code is written, without having to look up the exact
 definition of something.
 
-The following are the general rules we have attempted to follow:
+The following are the general rules we attempt to follow:
  
 <ol>
 <li> %Functions which return the number of something (number of cells,
