@@ -637,7 +637,7 @@ class DataOut_DoFData : public DataOutInterface<patch_dim,patch_space_dim>
         virtual
         void
         get_function_second_derivatives (const FEValuesBase<DH::dimension> &fe_patch_values,
-					 std::vector<Tensor<2,DH::dimension> >       &patch_second_derivatives) const = 0;
+					 std::vector<Tensor<2,DH::dimension> >       &patch_hessians) const = 0;
         
                                          /**
                                           * Given a FEValuesBase object, extract
@@ -650,7 +650,7 @@ class DataOut_DoFData : public DataOutInterface<patch_dim,patch_space_dim>
         virtual
         void
         get_function_second_derivatives (const FEValuesBase<DH::dimension> &fe_patch_values,
-					 std::vector<std::vector< Tensor<2,DH::dimension> > > &patch_second_derivatives_system) const = 0;
+					 std::vector<std::vector< Tensor<2,DH::dimension> > > &patch_hessians_system) const = 0;
 
                                          /**
                                           * Clear all references to the
@@ -779,7 +779,7 @@ class DataOut_DoFData : public DataOutInterface<patch_dim,patch_space_dim>
         virtual
         void
         get_function_second_derivatives (const FEValuesBase<DH::dimension> &fe_patch_values,
-					 std::vector<Tensor<2,DH::dimension> >       &patch_second_derivatives) const;
+					 std::vector<Tensor<2,DH::dimension> >       &patch_hessians) const;
         
                                          /**
                                           * Given a FEValuesBase object, extract
@@ -792,7 +792,7 @@ class DataOut_DoFData : public DataOutInterface<patch_dim,patch_space_dim>
         virtual
         void
         get_function_second_derivatives (const FEValuesBase<DH::dimension> &fe_patch_values,
-					 std::vector<std::vector< Tensor<2,DH::dimension> > > &patch_second_derivatives_system) const;
+					 std::vector<std::vector< Tensor<2,DH::dimension> > > &patch_hessians_system) const;
 
                                          /**
                                           * Clear all references to the
@@ -1143,8 +1143,8 @@ class DataOut : public DataOut_DoFData<DH, DH::dimension>
 	std::vector<Vector<double> > patch_values_system;
 	std::vector<Tensor<1,DH::dimension> >               patch_gradients;
 	std::vector<std::vector<Tensor<1,DH::dimension> > > patch_gradients_system;
-	std::vector<Tensor<2,DH::dimension> >               patch_second_derivatives;
-	std::vector<std::vector<Tensor<2,DH::dimension> > > patch_second_derivatives_system;
+	std::vector<Tensor<2,DH::dimension> >               patch_hessians;
+	std::vector<std::vector<Tensor<2,DH::dimension> > > patch_hessians_system;
 	std::vector<Point<dim> >                            dummy_normals;
 	std::vector<std::vector<Vector<double> > >          postprocessed_values;
 

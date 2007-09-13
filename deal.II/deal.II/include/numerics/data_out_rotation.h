@@ -189,8 +189,8 @@ class DataOutRotation : public DataOut_DoFData<DH,DH::dimension+1>
 	std::vector<Vector<double> >               patch_values_system;
 	std::vector<Tensor<1,dim> >                patch_gradients;
 	std::vector<std::vector<Tensor<1,dim> > >  patch_gradients_system;
-	std::vector<Tensor<2,dim> >                patch_second_derivatives;
-	std::vector<std::vector<Tensor<2,dim> > >  patch_second_derivatives_system;
+	std::vector<Tensor<2,dim> >                patch_hessians;
+	std::vector<std::vector<Tensor<2,dim> > >  patch_hessians_system;
 	std::vector<std::vector<Vector<double> > > postprocessed_values;
 	std::vector<Point<dim> >                   dummy_normals;
 	Data ()

@@ -143,9 +143,9 @@ void
 DataOut_DoFData<DH,patch_dim,patch_space_dim>::
 DataEntry<VectorType>::
 get_function_second_derivatives (const FEValuesBase<DH::dimension> &fe_patch_values,
-				 std::vector<std::vector<Tensor<2,DH::dimension> > >   &patch_second_derivatives_system) const
+				 std::vector<std::vector<Tensor<2,DH::dimension> > >   &patch_hessians_system) const
 {
-  fe_patch_values.get_function_2nd_derivatives (*vector, patch_second_derivatives_system);
+  fe_patch_values.get_function_2nd_derivatives (*vector, patch_hessians_system);
 }
 
 
@@ -157,9 +157,9 @@ void
 DataOut_DoFData<DH,patch_dim,patch_space_dim>::
 DataEntry<VectorType>::
 get_function_second_derivatives (const FEValuesBase<DH::dimension> &fe_patch_values,
-				 std::vector<Tensor<2,DH::dimension> >       &patch_second_derivatives) const
+				 std::vector<Tensor<2,DH::dimension> >       &patch_hessians) const
 {
-  fe_patch_values.get_function_2nd_derivatives (*vector, patch_second_derivatives);
+  fe_patch_values.get_function_2nd_derivatives (*vector, patch_hessians);
 }
 
 
@@ -615,11 +615,11 @@ void DataOut<dim,DH>::build_some_patches (Data &data)
 									 data.patch_gradients);
 		      if (update_flags & update_hessians)
 			this->dof_data[dataset]->get_function_second_derivatives (fe_patch_values,
-										  data.patch_second_derivatives);
+										  data.patch_hessians);
 		      postprocessor->
 			compute_derived_quantities_scalar(data.patch_values,
 							  data.patch_gradients,
-							  data.patch_second_derivatives,
+							  data.patch_hessians,
 							  data.dummy_normals,
 							  data.postprocessed_values[dataset]);
 		    }
@@ -637,11 +637,11 @@ void DataOut<dim,DH>::build_some_patches (Data &data)
 									 data.patch_gradients_system);
 		      if (update_flags & update_hessians)
 			this->dof_data[dataset]->get_function_second_derivatives (fe_patch_values,
-										  data.patch_second_derivatives_system);
+										  data.patch_hessians_system);
 		      postprocessor->
 			compute_derived_quantities_vector(data.patch_values_system,
 							  data.patch_gradients_system,
-							  data.patch_second_derivatives_system,
+							  data.patch_hessians_system,
 							  data.dummy_normals,
 							  data.postprocessed_values[dataset]);
 		    }
@@ -893,8 +893,8 @@ void DataOut<dim,DH>::build_patches (const Mapping<DH::dimension> &mapping,
       thread_data[i].patch_values_system.resize (n_q_points);
       thread_data[i].patch_gradients.resize (n_q_points);
       thread_data[i].patch_gradients_system.resize (n_q_points);
-      thread_data[i].patch_second_derivatives.resize (n_q_points);
-      thread_data[i].patch_second_derivatives_system.resize (n_q_points);
+      thread_data[i].patch_hessians.resize (n_q_points);
+      thread_data[i].patch_hessians_system.resize (n_q_points);
       thread_data[i].dummy_normals.clear();
       thread_data[i].postprocessed_values.resize(this->dof_data.size());
       thread_data[i].mapping        = &mapping;
@@ -905,7 +905,7 @@ void DataOut<dim,DH>::build_patches (const Mapping<DH::dimension> &mapping,
 	{
 	  thread_data[i].patch_values_system[k].reinit(n_components);
 	  thread_data[i].patch_gradients_system[k].resize(n_components);
-	  thread_data[i].patch_second_derivatives_system[k].resize(n_components);
+	  thread_data[i].patch_hessians_system[k].resize(n_components);
 	}
 
       for (unsigned int dataset=0; dataset<this->dof_data.size(); ++dataset)

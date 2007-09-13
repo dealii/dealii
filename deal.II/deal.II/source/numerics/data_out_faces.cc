@@ -130,11 +130,11 @@ void DataOutFaces<dim,DH>::build_some_patches (Data &data)
 									 data.patch_gradients);
 		      if (update_flags & update_hessians)
 			this->dof_data[dataset]->get_function_second_derivatives (fe_patch_values,
-										  data.patch_second_derivatives);
+										  data.patch_hessians);
 		      postprocessor->
 			compute_derived_quantities_scalar(data.patch_values,
 							  data.patch_gradients,
-							  data.patch_second_derivatives,
+							  data.patch_hessians,
 							  data.patch_normals,
 							  data.postprocessed_values[dataset]);
 		    }
@@ -152,11 +152,11 @@ void DataOutFaces<dim,DH>::build_some_patches (Data &data)
 									 data.patch_gradients_system);
 		      if (update_flags & update_hessians)
 			this->dof_data[dataset]->get_function_second_derivatives (fe_patch_values,
-										  data.patch_second_derivatives_system);
+										  data.patch_hessians_system);
 		      postprocessor->
 			compute_derived_quantities_vector(data.patch_values_system,
 							  data.patch_gradients_system,
-							  data.patch_second_derivatives_system,
+							  data.patch_hessians_system,
 							  data.patch_normals,
 							  data.postprocessed_values[dataset]);
 		    }
@@ -293,8 +293,8 @@ void DataOutFaces<dim,DH>::build_patches (const unsigned int nnnn_subdivisions,
       thread_data[i].patch_values_system.resize (n_q_points);
       thread_data[i].patch_gradients.resize (n_q_points);
       thread_data[i].patch_gradients_system.resize (n_q_points);
-      thread_data[i].patch_second_derivatives.resize (n_q_points);
-      thread_data[i].patch_second_derivatives_system.resize (n_q_points);
+      thread_data[i].patch_hessians.resize (n_q_points);
+      thread_data[i].patch_hessians_system.resize (n_q_points);
       thread_data[i].patch_normals.resize (n_q_points);
       thread_data[i].postprocessed_values.resize (this->dof_data.size());
       
@@ -302,7 +302,7 @@ void DataOutFaces<dim,DH>::build_patches (const unsigned int nnnn_subdivisions,
 	{
 	  thread_data[i].patch_values_system[k].reinit(n_components);
 	  thread_data[i].patch_gradients_system[k].resize(n_components);
-	  thread_data[i].patch_second_derivatives_system[k].resize(n_components);
+	  thread_data[i].patch_hessians_system[k].resize(n_components);
 	}
 
       for (unsigned int dataset=0; dataset<this->dof_data.size(); ++dataset)
