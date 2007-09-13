@@ -132,11 +132,11 @@ void DataOutFaces<dim,DH>::build_some_patches (Data &data)
 			this->dof_data[dataset]->get_function_second_derivatives (fe_patch_values,
 										  data.patch_second_derivatives);
 		      postprocessor->
-			compute_derived_quantities_scalar(data.postprocessed_values[dataset],
-							  data.patch_values,
+			compute_derived_quantities_scalar(data.patch_values,
 							  data.patch_gradients,
 							  data.patch_second_derivatives,
-							  data.patch_normals);
+							  data.patch_normals,
+							  data.postprocessed_values[dataset]);
 		    }
 		  else
 		    {
@@ -154,11 +154,11 @@ void DataOutFaces<dim,DH>::build_some_patches (Data &data)
 			this->dof_data[dataset]->get_function_second_derivatives (fe_patch_values,
 										  data.patch_second_derivatives_system);
 		      postprocessor->
-			compute_derived_quantities_vector(data.postprocessed_values[dataset],
-							  data.patch_values_system,
+			compute_derived_quantities_vector(data.patch_values_system,
 							  data.patch_gradients_system,
 							  data.patch_second_derivatives_system,
-							  data.patch_normals);
+							  data.patch_normals,
+							  data.postprocessed_values[dataset]);
 		    }
 		  
 		  for (unsigned int q=0; q<n_q_points; ++q)

@@ -155,11 +155,11 @@ class Postprocessor : public DataPostprocessor<dim>
   public:
 
     void compute_derived_quantities_vector (
-			std::vector< Vector< double > > &,
 			const std::vector< Vector< double > > &, 
 			const std::vector< std::vector< Tensor< 1, dim > > > &, 
 			const std::vector< std::vector< Tensor< 2, dim > > > &, 
-			const std::vector< Point< dim > >                    &
+			const std::vector< Point< dim > >                    &,
+			std::vector< Vector< double > > &
 			) const;
 
     std::vector<std::string> get_names () const;
@@ -201,11 +201,11 @@ Postprocessor<dim>::n_output_variables () const
 template <int dim>
 void
 Postprocessor<dim>::compute_derived_quantities_vector (
-			std::vector< Vector< double > >                       &computed_quantities,
 			const std::vector< Vector< double > >                 &uh,
 			const std::vector< std::vector< Tensor< 1, dim > > >  &/*duh*/,
 			const std::vector< std::vector< Tensor< 2, dim > > >  &/*dduh*/,
-			const std::vector< Point< dim > >                     &/*normals*/
+			const std::vector< Point< dim > >                     &/*normals*/,
+			std::vector< Vector< double > >                       &computed_quantities
 			) const
 {
   Assert(computed_quantities.size() == uh.size(), 

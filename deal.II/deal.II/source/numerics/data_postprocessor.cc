@@ -24,11 +24,11 @@ DataPostprocessor<dim>::~DataPostprocessor()
 template <int dim>
 void
 DataPostprocessor<dim>::
-compute_derived_quantities_scalar (std::vector<Vector<double> >      &computed_quantities,
-				   const std::vector<double>         &/*uh*/,
+compute_derived_quantities_scalar (const std::vector<double>         &/*uh*/,
 				   const std::vector<Tensor<1,dim> > &/*duh*/,
 				   const std::vector<Tensor<2,dim> > &/*dduh*/,
-				   const std::vector<Point<dim> >    &/*normals*/) const
+				   const std::vector<Point<dim> >    &/*normals*/,
+				   std::vector<Vector<double> >      &computed_quantities) const
 {
   computed_quantities.clear();
   AssertThrow(false,ExcPureFunctionCalled());
@@ -39,11 +39,11 @@ compute_derived_quantities_scalar (std::vector<Vector<double> >      &computed_q
 template <int dim>
 void
 DataPostprocessor<dim>::
-compute_derived_quantities_vector (std::vector<Vector<double> >                    &computed_quantities,
-				   const std::vector<Vector<double> >              &/*uh*/,
+compute_derived_quantities_vector (const std::vector<Vector<double> >              &/*uh*/,
 				   const std::vector<std::vector<Tensor<1,dim> > > &/*duh*/,
 				   const std::vector<std::vector<Tensor<2,dim> > > &/*dduh*/,
-				   const std::vector<Point<dim> >                  &/*normals*/) const
+				   const std::vector<Point<dim> >                  &/*normals*/,
+				   std::vector<Vector<double> >                    &computed_quantities) const
 {
   computed_quantities.clear();
   AssertThrow(false,ExcPureFunctionCalled());

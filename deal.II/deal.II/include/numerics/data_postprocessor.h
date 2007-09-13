@@ -28,11 +28,14 @@ DEAL_II_NAMESPACE_OPEN
 
 /**
  * For the (graphical) output of a FE solution one frequently wants to include
- * derived quantities, which are calculated from the values of the solution and
- * possibly the first and second derivates of the solution. This class offers
- * the interface to perform such a postprocessing. Given the values and
- * derivatives of provided dataon given points of a cell, new quantities can be
- * calculated.
+ * derived quantities, which are calculated from the values of the solution
+ * and possibly the first and second derivates of the solution. Examples are
+ * the calculation Mach numbers from velocity and density in supersonic flow
+ * computations, or the computation of the magnitude of a complex-valued
+ * solution as demonstrated in @ref step_29 "step-29".  This class offers the
+ * interface to perform such postprocessing. Given the values and derivatives
+ * of the solution at those points where we want to generated output, the
+ * functions of this class can be overloaded to compute new quantities.
  *
  * A data vector and an object of a derived class can be given to the
  * <tt>DataOut::add_data_vector</tt> function, which will write the derived
@@ -77,7 +80,7 @@ class DataPostprocessor: public Subscriptor
 
 				     /**
 				      * This is the main function which actually
-				      * performs the postprocessing. The first
+				      * performs the postprocessing. The last
 				      * argument is a reference to the
 				      * postprocessed data which has correct
 				      * size already and must be filled by this
@@ -104,11 +107,11 @@ class DataPostprocessor: public Subscriptor
 				      */
     virtual
     void
-    compute_derived_quantities_scalar (std::vector<Vector<double> >      &computed_quantities,
-				       const std::vector<double>         &uh,
+    compute_derived_quantities_scalar (const std::vector<double>         &uh,
 				       const std::vector<Tensor<1,dim> > &duh,
 				       const std::vector<Tensor<2,dim> > &dduh,
-				       const std::vector<Point<dim> >    &normals) const;
+				       const std::vector<Point<dim> >    &normals,
+				       std::vector<Vector<double> >      &computed_quantities) const;
     
 				     /**
 				      * Same as above function, but
@@ -121,11 +124,11 @@ class DataPostprocessor: public Subscriptor
 				      */
     virtual
     void
-    compute_derived_quantities_vector (std::vector<Vector<double> >                    &computed_quantities,
-				       const std::vector<Vector<double> >              &uh,
+    compute_derived_quantities_vector (const std::vector<Vector<double> >              &uh,
 				       const std::vector<std::vector<Tensor<1,dim> > > &duh,
 				       const std::vector<std::vector<Tensor<2,dim> > > &dduh,
-				       const std::vector<Point<dim> >                  &normals) const;
+				       const std::vector<Point<dim> >                  &normals,
+				       std::vector<Vector<double> >                    &computed_quantities) const;
 
 				     /**
 				      * Return the vector of strings describing
