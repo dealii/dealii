@@ -129,8 +129,8 @@ void DataOutFaces<dim,DH>::build_some_patches (Data &data)
 			this->dof_data[dataset]->get_function_gradients (fe_patch_values,
 									 data.patch_gradients);
 		      if (update_flags & update_hessians)
-			this->dof_data[dataset]->get_function_second_derivatives (fe_patch_values,
-										  data.patch_hessians);
+			this->dof_data[dataset]->get_function_hessians (fe_patch_values,
+									data.patch_hessians);
 		      postprocessor->
 			compute_derived_quantities_scalar(data.patch_values,
 							  data.patch_gradients,
@@ -151,8 +151,8 @@ void DataOutFaces<dim,DH>::build_some_patches (Data &data)
 			this->dof_data[dataset]->get_function_gradients (fe_patch_values,
 									 data.patch_gradients_system);
 		      if (update_flags & update_hessians)
-			this->dof_data[dataset]->get_function_second_derivatives (fe_patch_values,
-										  data.patch_hessians_system);
+			this->dof_data[dataset]->get_function_hessians (fe_patch_values,
+									data.patch_hessians_system);
 		      postprocessor->
 			compute_derived_quantities_vector(data.patch_values_system,
 							  data.patch_gradients_system,
@@ -172,23 +172,23 @@ void DataOutFaces<dim,DH>::build_some_patches (Data &data)
 						 // treat single component
 						 // functions separately for
 						 // efficiency reasons.
-		  if (data.n_components == 1)
-		    {
-		      this->dof_data[dataset]->get_function_values (fe_patch_values,
-								    data.patch_values);
+		if (data.n_components == 1)
+		  {
+		    this->dof_data[dataset]->get_function_values (fe_patch_values,
+								  data.patch_values);
+		    for (unsigned int q=0; q<n_q_points; ++q)
+		      patch->data(offset,q) = data.patch_values[q];
+		  }
+		else
+		  {
+		    this->dof_data[dataset]->get_function_values (fe_patch_values,
+								  data.patch_values_system);
+		    for (unsigned int component=0; component<data.n_components;
+			 ++component)
 		      for (unsigned int q=0; q<n_q_points; ++q)
-			patch->data(offset,q) = data.patch_values[q];
-		    }
-		  else
-		    {
-		      this->dof_data[dataset]->get_function_values (fe_patch_values,
-								    data.patch_values_system);
-		      for (unsigned int component=0; component<data.n_components;
-			   ++component)
-			for (unsigned int q=0; q<n_q_points; ++q)
-			  patch->data(offset+component,q) =
-			    data.patch_values_system[q](component);
-		    }
+			patch->data(offset+component,q) =
+			  data.patch_values_system[q](component);
+		  }
 					       // increment the counter for the
 					       // actual data record
 	      offset+=this->dof_data[dataset]->n_output_variables;
@@ -327,7 +327,7 @@ void DataOutFaces<dim,DH>::build_patches (const unsigned int nnnn_subdivisions,
       threads.join_all();
     }
   else
-				   // just one thread
+				     // just one thread
     build_some_patches(thread_data[0]);
 }
 

@@ -636,8 +636,8 @@ class DataOut_DoFData : public DataOutInterface<patch_dim,patch_space_dim>
                                           */
         virtual
         void
-        get_function_second_derivatives (const FEValuesBase<DH::dimension> &fe_patch_values,
-					 std::vector<Tensor<2,DH::dimension> >       &patch_hessians) const = 0;
+        get_function_hessians (const FEValuesBase<DH::dimension> &fe_patch_values,
+			       std::vector<Tensor<2,DH::dimension> >       &patch_hessians) const = 0;
         
                                          /**
                                           * Given a FEValuesBase object, extract
@@ -649,8 +649,8 @@ class DataOut_DoFData : public DataOutInterface<patch_dim,patch_space_dim>
                                           */
         virtual
         void
-        get_function_second_derivatives (const FEValuesBase<DH::dimension> &fe_patch_values,
-					 std::vector<std::vector< Tensor<2,DH::dimension> > > &patch_hessians_system) const = 0;
+        get_function_hessians (const FEValuesBase<DH::dimension> &fe_patch_values,
+			       std::vector<std::vector< Tensor<2,DH::dimension> > > &patch_hessians_system) const = 0;
 
                                          /**
                                           * Clear all references to the
@@ -778,8 +778,8 @@ class DataOut_DoFData : public DataOutInterface<patch_dim,patch_space_dim>
                                           */
         virtual
         void
-        get_function_second_derivatives (const FEValuesBase<DH::dimension> &fe_patch_values,
-					 std::vector<Tensor<2,DH::dimension> >       &patch_hessians) const;
+        get_function_hessians (const FEValuesBase<DH::dimension> &fe_patch_values,
+			       std::vector<Tensor<2,DH::dimension> >       &patch_hessians) const;
         
                                          /**
                                           * Given a FEValuesBase object, extract
@@ -791,8 +791,8 @@ class DataOut_DoFData : public DataOutInterface<patch_dim,patch_space_dim>
                                           */
         virtual
         void
-        get_function_second_derivatives (const FEValuesBase<DH::dimension> &fe_patch_values,
-					 std::vector<std::vector< Tensor<2,DH::dimension> > > &patch_hessians_system) const;
+        get_function_hessians (const FEValuesBase<DH::dimension> &fe_patch_values,
+			       std::vector<std::vector< Tensor<2,DH::dimension> > > &patch_hessians_system) const;
 
                                          /**
                                           * Clear all references to the

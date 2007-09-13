@@ -75,7 +75,7 @@ void DataOutRotation<dim,DH>::build_some_patches (Data &data)
 	  ExcMessage("The update of normal vectors may not be requested for evaluation of data on cells via DataPostprocessor."));
   
   hp::FEValues<DH::dimension> x_fe_patch_values (fe_collection, q_collection,
-                                       update_flags);
+						 update_flags);
 
   const unsigned int n_patches_per_circle = data.n_patches_per_circle;
 
@@ -97,9 +97,9 @@ void DataOutRotation<dim,DH>::build_some_patches (Data &data)
   for (unsigned int i=0; i<=n_patches_per_circle; ++i)
     {
       angle_directions[i][DH::dimension-1] = std::cos(2*deal_II_numbers::PI *
-                                        i/n_patches_per_circle);
+						      i/n_patches_per_circle);
       angle_directions[i][DH::dimension] = std::sin(2*deal_II_numbers::PI *
-                                        i/n_patches_per_circle);
+						    i/n_patches_per_circle);
     };
   
   
@@ -213,8 +213,8 @@ void DataOutRotation<dim,DH>::build_some_patches (Data &data)
 			    this->dof_data[dataset]->get_function_gradients (fe_patch_values,
 									     data.patch_gradients);
 			  if (update_flags & update_hessians)
-			    this->dof_data[dataset]->get_function_second_derivatives (fe_patch_values,
-										      data.patch_hessians);
+			    this->dof_data[dataset]->get_function_hessians (fe_patch_values,
+									    data.patch_hessians);
 			  postprocessor->
 			    compute_derived_quantities_scalar(data.patch_values,
 							      data.patch_gradients,
@@ -235,8 +235,8 @@ void DataOutRotation<dim,DH>::build_some_patches (Data &data)
 			    this->dof_data[dataset]->get_function_gradients (fe_patch_values,
 									     data.patch_gradients_system);
 			  if (update_flags & update_hessians)
-			    this->dof_data[dataset]->get_function_second_derivatives (fe_patch_values,
-										      data.patch_hessians_system);
+			    this->dof_data[dataset]->get_function_hessians (fe_patch_values,
+									    data.patch_hessians_system);
 			  postprocessor->
 			    compute_derived_quantities_vector(data.patch_values_system,
 							      data.patch_gradients_system,
@@ -248,32 +248,32 @@ void DataOutRotation<dim,DH>::build_some_patches (Data &data)
 		      for (unsigned int component=0;
 			   component<this->dof_data[dataset]->n_output_variables;
 			   ++component)
-			  {
-			    switch (DH::dimension)
-			      {
-				case 1:
-				      for (unsigned int x=0; x<n_points; ++x)
-					for (unsigned int y=0; y<n_points; ++y)
+			{
+			  switch (DH::dimension)
+			    {
+			      case 1:
+				    for (unsigned int x=0; x<n_points; ++x)
+				      for (unsigned int y=0; y<n_points; ++y)
+					patch->data(offset+component,
+						    x*n_points + y)
+					  = data.postprocessed_values[dataset][x](component);
+				    break;
+				      
+			      case 2:
+				    for (unsigned int x=0; x<n_points; ++x)
+				      for (unsigned int y=0; y<n_points; ++y)
+					for (unsigned int z=0; z<n_points; ++z)
 					  patch->data(offset+component,
-						      x*n_points + y)
-					    = data.postprocessed_values[dataset][x](component);
-				      break;
+						      x*n_points*n_points +
+						      y*n_points +
+						      z)
+					    = data.postprocessed_values[dataset][x*n_points+z](component);
+				    break;
 				      
-				case 2:
-				      for (unsigned int x=0; x<n_points; ++x)
-					for (unsigned int y=0; y<n_points; ++y)
-					  for (unsigned int z=0; z<n_points; ++z)
-					    patch->data(offset+component,
-							x*n_points*n_points +
-							y*n_points +
-							z)
-					      = data.postprocessed_values[dataset][x*n_points+z](component);
-				      break;
-				      
-				default:
-				      Assert (false, ExcNotImplemented());
-			      }
-			  }
+			      default:
+				    Assert (false, ExcNotImplemented());
+			    }
+			}
 		    }
 		  else
 		    if (data.n_components == 1)

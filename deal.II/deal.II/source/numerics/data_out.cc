@@ -142,8 +142,8 @@ template <typename VectorType>
 void
 DataOut_DoFData<DH,patch_dim,patch_space_dim>::
 DataEntry<VectorType>::
-get_function_second_derivatives (const FEValuesBase<DH::dimension> &fe_patch_values,
-				 std::vector<std::vector<Tensor<2,DH::dimension> > >   &patch_hessians_system) const
+get_function_hessians (const FEValuesBase<DH::dimension> &fe_patch_values,
+		       std::vector<std::vector<Tensor<2,DH::dimension> > >   &patch_hessians_system) const
 {
   fe_patch_values.get_function_2nd_derivatives (*vector, patch_hessians_system);
 }
@@ -156,8 +156,8 @@ template <typename VectorType>
 void
 DataOut_DoFData<DH,patch_dim,patch_space_dim>::
 DataEntry<VectorType>::
-get_function_second_derivatives (const FEValuesBase<DH::dimension> &fe_patch_values,
-				 std::vector<Tensor<2,DH::dimension> >       &patch_hessians) const
+get_function_hessians (const FEValuesBase<DH::dimension> &fe_patch_values,
+		       std::vector<Tensor<2,DH::dimension> >       &patch_hessians) const
 {
   fe_patch_values.get_function_2nd_derivatives (*vector, patch_hessians);
 }
@@ -614,8 +614,8 @@ void DataOut<dim,DH>::build_some_patches (Data &data)
 			this->dof_data[dataset]->get_function_gradients (fe_patch_values,
 									 data.patch_gradients);
 		      if (update_flags & update_hessians)
-			this->dof_data[dataset]->get_function_second_derivatives (fe_patch_values,
-										  data.patch_hessians);
+			this->dof_data[dataset]->get_function_hessians (fe_patch_values,
+									data.patch_hessians);
 		      postprocessor->
 			compute_derived_quantities_scalar(data.patch_values,
 							  data.patch_gradients,
@@ -636,8 +636,8 @@ void DataOut<dim,DH>::build_some_patches (Data &data)
 			this->dof_data[dataset]->get_function_gradients (fe_patch_values,
 									 data.patch_gradients_system);
 		      if (update_flags & update_hessians)
-			this->dof_data[dataset]->get_function_second_derivatives (fe_patch_values,
-										  data.patch_hessians_system);
+			this->dof_data[dataset]->get_function_hessians (fe_patch_values,
+									data.patch_hessians_system);
 		      postprocessor->
 			compute_derived_quantities_vector(data.patch_values_system,
 							  data.patch_gradients_system,
@@ -657,23 +657,23 @@ void DataOut<dim,DH>::build_some_patches (Data &data)
 						 // treat single component
 						 // functions separately for
 						 // efficiency reasons.
-		  if (data.n_components == 1)
-		    {
-		      this->dof_data[dataset]->get_function_values (fe_patch_values,
-								    data.patch_values);
+		if (data.n_components == 1)
+		  {
+		    this->dof_data[dataset]->get_function_values (fe_patch_values,
+								  data.patch_values);
+		    for (unsigned int q=0; q<n_q_points; ++q)
+		      patch->data(offset,q) = data.patch_values[q];
+		  }
+		else
+		  {
+		    this->dof_data[dataset]->get_function_values (fe_patch_values,
+								  data.patch_values_system);
+		    for (unsigned int component=0; component<data.n_components;
+			 ++component)
 		      for (unsigned int q=0; q<n_q_points; ++q)
-			patch->data(offset,q) = data.patch_values[q];
-		    }
-		  else
-		    {
-		      this->dof_data[dataset]->get_function_values (fe_patch_values,
-								    data.patch_values_system);
-		      for (unsigned int component=0; component<data.n_components;
-			   ++component)
-			for (unsigned int q=0; q<n_q_points; ++q)
-			  patch->data(offset+component,q) =
-			    data.patch_values_system[q](component);
-		    }
+			patch->data(offset+component,q) =
+			  data.patch_values_system[q](component);
+		  }
 					       // increment the counter for the
 					       // actual data record
 	      offset+=this->dof_data[dataset]->n_output_variables;
@@ -752,7 +752,7 @@ void DataOut<dim,DH>::build_some_patches (Data &data)
                                            // patch number and set it
                                            // for the neighbor index
           patch->neighbors[f] = this->patches[(*data.cell_to_patch_index_map)
-					     [neighbor->level()][neighbor->index()]].patch_index;
+					      [neighbor->level()][neighbor->index()]].patch_index;
         }
       
       				       // next cell (patch) in this
