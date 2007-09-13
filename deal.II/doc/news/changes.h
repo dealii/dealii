@@ -54,7 +54,13 @@ inconvenience this causes.
 <h3>base</h3>
 
 <ol>
-  <li>
+
+  <li> <p>New: Macro #AssertDimension introduced for easier handling of
+  ExcDimensionMismatch.
+  <br>
+  (GK 2007/09/13)
+  </p> </li>
+
 </ol>
 
 
@@ -71,7 +77,17 @@ inconvenience this causes.
 <a name="deal.II"></a>
 <h3>deal.II</h3>
 
-<ol>
+<ol> 
+
+  <li> <p>Improved: In an effort to make names more consistent, second
+  derivatives in FEValuesBase and UpdateFlags have been renamed to
+  Hessians. Thus, the clash between the forms <tt>2nd</tt> and
+  <tt>second</tt> has been removed. Old function and enum names are
+  available for compatibility but have been marked deprecated.
+  <br>
+  (GK 2007/09/12)
+  </p></li>
+
   <li> <p>Fixed+New: The GridOutFlags::Ucd and
   GridOutFlags::Msh structures now take a new parameter
   <code>write_lines</code> to output lines with boundary id different
@@ -83,6 +99,7 @@ inconvenience this causes.
   <br>
   (Luca Heltai 2007/09/10) 
   </p>
+
   </li>
   <li> <p>Extended: The possibilities of graphical output via the DataOut,
   DataOutFaces and DataOutRotation classes have been extended by the
