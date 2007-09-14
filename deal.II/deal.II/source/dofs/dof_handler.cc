@@ -1719,9 +1719,9 @@ DoFHandler<dim>::n_boundary_dofs (const std::set<unsigned char> &boundary_indica
   active_face_iterator face = begin_active_face (),
 		       endf = end_face();
   for (; face!=endf; ++face)
-    if (find (boundary_indicators.begin(),
-	      boundary_indicators.end(),
-	      face->boundary_indicator()) !=
+    if (std::find (boundary_indicators.begin(),
+		   boundary_indicators.end(),
+		   face->boundary_indicator()) !=
 	boundary_indicators.end())
       {
 	face->get_dof_indices (dofs_on_face);
