@@ -9862,7 +9862,9 @@ void
 Triangulation<dim>::remove_refinement_listener (RefinementListener &listener) const
 {
   typename std::list<RefinementListener *>::iterator p =
-    find (refinement_listeners.begin (), refinement_listeners.end (), &listener);
+    std::find (refinement_listeners.begin (),
+	       refinement_listeners.end (),
+	       &listener);
   Assert (p != refinement_listeners.end (), ExcInternalError ());
   refinement_listeners.erase (p);
 }
