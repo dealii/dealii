@@ -96,6 +96,12 @@ class LogStream
     std::ostream& get_file_stream ();
 
 				     /**
+				      * @return true, if file stream
+				      * has already been attached.
+				      */
+    bool has_file () const;
+    
+				     /**
 				      * Reroutes cerr to LogStream.
 				      * Works as a switch, turning
 				      * logging of <tt>cerr</tt> on

@@ -103,6 +103,13 @@ LogStream::get_file_stream()
 }
 
 
+bool
+LogStream::has_file() const
+{
+  return (file != 0);
+}
+
+
 const std::string&
 LogStream::get_prefix() const
 {
