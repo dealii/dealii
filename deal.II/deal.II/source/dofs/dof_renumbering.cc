@@ -1203,7 +1203,7 @@ DoFRenumbering::compute_downstream_dg (
   typename DH::active_cell_iterator end = dof.end();
   
   copy (begin, end, ordered_cells.begin());
-  sort (ordered_cells.begin(), ordered_cells.end(), comparator);
+  std::sort (ordered_cells.begin(), ordered_cells.end(), comparator);
 
   std::vector<unsigned int> reverse(new_indices.size());
   compute_cell_wise_dg(new_indices, reverse, dof, ordered_cells);
@@ -1226,7 +1226,7 @@ DoFRenumbering::compute_downstream_dg (
   typename DH::active_cell_iterator end = dof.end();
   
   copy (begin, end, ordered_cells.begin());
-  sort (ordered_cells.begin(), ordered_cells.end(), comparator);
+  std::sort (ordered_cells.begin(), ordered_cells.end(), comparator);
   
   compute_cell_wise_dg(new_indices, reverse, dof, ordered_cells);
 }
@@ -1248,7 +1248,7 @@ DoFRenumbering::compute_downstream (
   typename DH::active_cell_iterator end = dof.end();
   
   copy (begin, end, ordered_cells.begin());
-  sort (ordered_cells.begin(), ordered_cells.end(), comparator);
+  std::sort (ordered_cells.begin(), ordered_cells.end(), comparator);
   
   compute_cell_wise(new_indices, reverse, dof, ordered_cells);
 }
@@ -1296,8 +1296,8 @@ DoFRenumbering::compute_downstream_dg (
   typename MGDoFHandler<dim>::cell_iterator begin = dof.begin(level);
   typename MGDoFHandler<dim>::cell_iterator end = dof.end(level);
   
-  copy (begin, end, ordered_cells.begin());
-  sort (ordered_cells.begin(), ordered_cells.end(), comparator);
+  std::copy (begin, end, ordered_cells.begin());
+  std::sort (ordered_cells.begin(), ordered_cells.end(), comparator);
   
   compute_cell_wise_dg(new_indices, reverse, dof, level, ordered_cells);
 }
@@ -1319,8 +1319,8 @@ DoFRenumbering::compute_downstream (
   typename MGDoFHandler<dim>::cell_iterator begin = dof.begin(level);
   typename MGDoFHandler<dim>::cell_iterator end = dof.end(level);
   
-  copy (begin, end, ordered_cells.begin());
-  sort (ordered_cells.begin(), ordered_cells.end(), comparator);
+  std::copy (begin, end, ordered_cells.begin());
+  std::sort (ordered_cells.begin(), ordered_cells.end(), comparator);
   
   compute_cell_wise(new_indices, reverse, dof, level, ordered_cells);
 }
@@ -1397,8 +1397,8 @@ DoFRenumbering::compute_clockwise_dg (
   typename DH::active_cell_iterator begin = dof.begin_active();
   typename DH::active_cell_iterator end = dof.end();
   
-  copy (begin, end, ordered_cells.begin());
-  sort (ordered_cells.begin(), ordered_cells.end(), comparator);
+  std::copy (begin, end, ordered_cells.begin());
+  std::sort (ordered_cells.begin(), ordered_cells.end(), comparator);
 
   std::vector<unsigned int> reverse(new_indices.size());
   compute_cell_wise_dg(new_indices, reverse, dof, ordered_cells);
