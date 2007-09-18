@@ -2,7 +2,7 @@
 //    $Id$
 //    Version: $Name$
 //
-//    Copyright (C) 2002, 2003, 2004, 2005, 2006 by the deal.II authors
+//    Copyright (C) 2002, 2003, 2004, 2005, 2006, 2007 by the deal.II authors
 //
 //    This file is subject to QPL and may not be  distributed
 //    without copyright and license information. Please refer
@@ -500,21 +500,166 @@ class PointerMatrixVector : public PointerMatrixBase<Vector<number> >
 /**
  * This function helps you creating a PointerMatrixBase object if you
  * do not want to provide the full template arguments of
- * PointerMatrix.
+ * PointerMatrix or PointerMatrixAux.
+ *
+ * Note that this function by default creates a PointerMatrixAux,
+ * emulating the functions <tt>vmult_add</tt> and <tt>Tvmult_add</tt>,
+ * using an auxiliary vector. It is overloaded for the library matrix
+ * classes implementing these functions themselves. If you have such a
+ * class, you should overload the function in order to save memory and
+ * time.
  *
  * The result is a PointerMatrixBase* pointing to <tt>matrix</tt>. The
  * <TT>VECTOR</tt> argument is a dummy just used to determine the
  * template arguments.
  *
  * @relates PointerMatrixBase
+ * @relates PointerMatrixAux
  */
-template <class MATRIX, class VECTOR>
+template <class VECTOR, class MATRIX>
 inline
 PointerMatrixBase<VECTOR>*
 new_pointer_matrix_base(MATRIX& matrix, const VECTOR&)
 {
-  return new PointerMatrix<MATRIX, VECTOR>(&matrix);
+  return new PointerMatrixAux<MATRIX, VECTOR>(0, &matrix);
 }
+
+class IdentityMatrix;
+template <typename number> class FullMatrix;
+template <typename number> class LAPACKFullMatrix;
+template <typename number> class SparseMatrix;
+template <typename number> class BlockSparseMatrix;
+template <typename number> class SparseMatrixEZ;
+template <typename number> class BlockSparseMatrixEZ;
+template <typename number> class BlockMatrixArray;
+template <typename number> class TridiagonalMatrix;
+
+/**
+ * Specialized version for IdentityMatrix.
+ *
+ * @relates PointerMatrixBase
+ * @relates PointerMatrix
+ */
+template <typename numberv>
+PointerMatrixBase<Vector<numberv> >*
+new_pointer_matrix_base(IdentityMatrix& matrix, const Vector<numberv>&)
+{
+  return new PointerMatrix<IdentityMatrix, Vector<numberv> >(&matrix);
+}
+
+
+/**
+ * Specialized version for FullMatrix.
+ *
+ * @relates PointerMatrixBase
+ * @relates PointerMatrix
+ */
+template <typename numberv, typename numberm>
+PointerMatrixBase<Vector<numberv> >*
+new_pointer_matrix_base(FullMatrix<numberm>& matrix, const Vector<numberv>&)
+{
+  return new PointerMatrix<FullMatrix<numberm>, Vector<numberv> >(&matrix);
+}
+
+
+/**
+ * Specialized version for LAPACKFullMatrix.
+ *
+ * @relates PointerMatrixBase
+ * @relates PointerMatrix
+ */
+template <typename numberv, typename numberm>
+PointerMatrixBase<Vector<numberv> >*
+new_pointer_matrix_base(LAPACKFullMatrix<numberm>& matrix, const Vector<numberv>&)
+{
+  return new PointerMatrix<LAPACKFullMatrix<numberm>, Vector<numberv> >(&matrix);
+}
+
+
+/**
+ * Specialized version for SparseMatrix.
+ *
+ * @relates PointerMatrixBase
+ * @relates PointerMatrix
+ */
+template <typename numberv, typename numberm>
+PointerMatrixBase<Vector<numberv> >*
+new_pointer_matrix_base(SparseMatrix<numberm>& matrix, const Vector<numberv>&)
+{
+  return new PointerMatrix<SparseMatrix<numberm>, Vector<numberv> >(&matrix);
+}
+
+
+/**
+ * Specialized version for BlockSparseMatrix.
+ *
+ * @relates PointerMatrixBase
+ * @relates PointerMatrix
+ */
+template <class VECTOR, typename numberm>
+PointerMatrixBase<VECTOR>*
+new_pointer_matrix_base(BlockSparseMatrix<numberm>& matrix, const VECTOR&)
+{
+  return new PointerMatrix<BlockSparseMatrix<numberm>, VECTOR>(&matrix);
+}
+
+
+/**
+ * Specialized version for SparseMatrixEZ.
+ *
+ * @relates PointerMatrixBase
+ * @relates PointerMatrix
+ */
+template <typename numberv, typename numberm>
+PointerMatrixBase<Vector<numberv> >*
+new_pointer_matrix_base(SparseMatrixEZ<numberm>& matrix, const Vector<numberv>&)
+{
+  return new PointerMatrix<SparseMatrixEZ<numberm>, Vector<numberv> >(&matrix);
+}
+
+
+/**
+ * Specialized version for BlockSparseMatrixEZ.
+ *
+ * @relates PointerMatrixBase
+ * @relates PointerMatrix
+ */
+template <class VECTOR, typename numberm>
+PointerMatrixBase<VECTOR>*
+new_pointer_matrix_base(BlockSparseMatrixEZ<numberm>& matrix, const VECTOR&)
+{
+  return new PointerMatrix<BlockSparseMatrixEZ<numberm>, VECTOR>(&matrix);
+}
+
+
+/**
+ * Specialized version for BlockMatrixArray.
+ *
+ * @relates PointerMatrixBase
+ * @relates PointerMatrix
+ */
+template <typename numberv, typename numberm>
+PointerMatrixBase<BlockVector<numberv> >*
+new_pointer_matrix_base(BlockMatrixArray<numberm>& matrix, const BlockVector<numberv>&)
+{
+  return new PointerMatrix<BlockMatrixArray<numberm>, BlockVector<numberv> >(&matrix);
+}
+
+
+/**
+ * Specialized version for TridiagonalMatrix.
+ *
+ * @relates PointerMatrixBase
+ * @relates PointerMatrix
+ */
+template <typename numberv, typename numberm>
+PointerMatrixBase<Vector<numberv> >*
+new_pointer_matrix_base(TridiagonalMatrix<numberm>& matrix, const Vector<numberv>&)
+{
+  return new PointerMatrix<TridiagonalMatrix<numberm>, Vector<numberv> >(&matrix);
+}
+
+
 
 /*@}*/
 //---------------------------------------------------------------------------
