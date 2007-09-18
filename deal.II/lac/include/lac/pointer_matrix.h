@@ -16,6 +16,7 @@
 #include <base/subscriptor.h>
 #include <base/smartpointer.h>
 #include <lac/vector.h>
+#include <lac/vector_memory.h>
 
 DEAL_II_NAMESPACE_OPEN
 
@@ -267,6 +268,10 @@ class PointerMatrixAux : public PointerMatrixBase<VECTOR>
 				      *
 				      * If <tt>M</tt> is zero, no
 				      * matrix is stored.
+				      *
+				      * If <tt>mem</tt> is zero, a
+				      * PrimitiveVectorMemory is
+				      * generated.
 				      */
     PointerMatrixAux (VectorMemory<VECTOR>* mem = 0,
 		      const MATRIX* M=0);
@@ -347,6 +352,11 @@ class PointerMatrixAux : public PointerMatrixBase<VECTOR>
 				      * matrix for comparison.
 				      */
     virtual const void* get() const;
+
+				     /**
+				      * The backup memory if none was provided.
+				      */
+    PrimitiveVectorMemory<VECTOR> my_memory;
 
 				     /**
 				      * Object for getting the
@@ -836,7 +846,10 @@ PointerMatrixAux<MATRIX, VECTOR>::PointerMatrixAux (
   const MATRIX* M)
 		: mem(mem, typeid(*this).name()),
 		  m(M, typeid(*this).name())
-{}
+{
+  if (mem == 0)
+    mem = &my_memory;
+}
 
 
 template<class MATRIX, class VECTOR>
@@ -845,7 +858,10 @@ PointerMatrixAux<MATRIX, VECTOR>::PointerMatrixAux (
   const char* name)
 		: mem(mem, name),
 		  m(0, name)
-{}
+{
+  if (mem == 0)
+    mem = &my_memory;
+}
 
 
 template<class MATRIX, class VECTOR>
@@ -855,7 +871,10 @@ PointerMatrixAux<MATRIX, VECTOR>::PointerMatrixAux (
   const char* name)
 		: mem(mem, name),
 		  m(M, name)
-{}
+{
+  if (mem == 0)
+    mem = &my_memory;
+}
 
 
 template<class MATRIX, class VECTOR>
@@ -880,6 +899,8 @@ inline void
 PointerMatrixAux<MATRIX, VECTOR>::set_memory(VectorMemory<VECTOR>* M)
 {
   mem = M;
+  if (mem == 0)
+    mem = &my_memory;
 }
 
 
