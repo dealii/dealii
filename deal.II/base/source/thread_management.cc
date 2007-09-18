@@ -2,7 +2,7 @@
 //    $Id$
 //    Version: $Name$
 //
-//    Copyright (C) 2000, 2001, 2002, 2003, 2005, 2006 by the deal.II authors
+//    Copyright (C) 2000, 2001, 2002, 2003, 2005, 2006, 2007 by the deal.II authors
 //
 //    This file is subject to QPL and may not be  distributed
 //    without copyright and license information. Please refer
@@ -258,6 +258,13 @@ namespace Threads
 
   namespace internal
   {
+    thread_description_base::thread_description_base ()
+		    :
+		    was_joined (false)
+    {}
+
+
+    
     thread_description_base::~thread_description_base ()
     {
                                        // if we are here, then the

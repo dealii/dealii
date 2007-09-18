@@ -2898,7 +2898,7 @@ namespace Threads
                                          /**
                                           * Constructor.
                                           */
-        thread_description_base () : was_joined (false) {}
+        thread_description_base ();
 
                                          /**
                                           * Destructor.
