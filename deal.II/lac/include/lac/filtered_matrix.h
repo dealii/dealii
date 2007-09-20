@@ -94,7 +94,7 @@ template <typename number> class Vector;
  * that does the matrix-vector product, as well as @p Tvmult for
  * transpose matrix-vector multiplication and @p residual for
  * residual computation, and can thus be used as a matrix replacement
- * in lineaer solvers.
+ * in linear solvers.
  *
  * It also has the ability to generate the modification of the right
  * hand side, through the apply_constraints() function.
