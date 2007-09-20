@@ -1081,6 +1081,31 @@ class FEValuesBase : protected FEValuesData<dim>,
 			   bool quadrature_points_fastest = false) const;
 
 				     /**
+				      * Function gradient access with
+				      * more flexibility. see
+				      * get_function_values() with
+				      * corresponding arguments.
+				      */
+    template <class InputVector>
+    void get_function_hessians (
+      const InputVector& fe_function,
+      const VectorSlice<const std::vector<unsigned int> >& indices,
+      std::vector<Tensor<2,dim> >& result) const;
+
+				     /**
+				      * Function gradient access with
+				      * more flexibility. see
+				      * get_function_values() with
+				      * corresponding arguments.
+				      */
+    template <class InputVector>
+    void get_function_hessians (
+      const InputVector& fe_function,
+      const VectorSlice<const std::vector<unsigned int> >& indices,
+      std::vector<std::vector<Tensor<2,dim> > >& result,
+      bool quadrature_points_fastest = false) const;
+
+				     /**
 				      * @deprecated Wrapper for get_function_hessians()
 				      */
     template <class InputVector>
@@ -1097,6 +1122,7 @@ class FEValuesBase : protected FEValuesData<dim>,
 				  std::vector<std::vector<Tensor<2,dim> > >&,
 				  bool = false) const;
     
+
 				     //@}
     
 				     /**

@@ -74,9 +74,17 @@ void FEValuesBase<deal_II_dimension>::get_function_gradients<IN>
 template
 void FEValuesBase<deal_II_dimension>::get_function_hessians<IN>
 (const IN&, std::vector<Tensor<2,deal_II_dimension> > &) const;
+template
+void FEValuesBase<deal_II_dimension>::get_function_hessians<IN>
+(const IN&, const VectorSlice<const std::vector<unsigned int> >&,
+ std::vector<Tensor<2,deal_II_dimension> > &) const;
 
 template
 void FEValuesBase<deal_II_dimension>::get_function_hessians<IN>
 (const IN&, std::vector<std::vector<Tensor<2,deal_II_dimension> > > &, bool) const;
+template
+void FEValuesBase<deal_II_dimension>::get_function_hessians<IN>
+(const IN&, const VectorSlice<const std::vector<unsigned int> >&,
+ std::vector<std::vector<Tensor<2,deal_II_dimension> > > &, bool) const;
 
 DEAL_II_NAMESPACE_CLOSE

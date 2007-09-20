@@ -662,9 +662,9 @@ void FEValuesBase<dim>::get_function_values (
 template <int dim>
 template <class InputVector>
 void
-FEValuesBase<dim>::
-get_function_gradients (const InputVector           &fe_function,
-		    std::vector<Tensor<1,dim> > &gradients) const
+FEValuesBase<dim>::get_function_gradients (
+  const InputVector           &fe_function,
+  std::vector<Tensor<1,dim> > &gradients) const
 {
   Assert (this->update_flags & update_gradients, ExcAccessToUninitializedField());
 
@@ -744,9 +744,9 @@ void FEValuesBase<dim>::get_function_gradients (
 template <int dim>
 template <class InputVector>
 void
-FEValuesBase<dim>::
-get_function_gradients (const InputVector                         &fe_function,
-		    std::vector<std::vector<Tensor<1,dim> > > &gradients) const
+FEValuesBase<dim>::get_function_gradients (
+  const InputVector                         &fe_function,
+  std::vector<std::vector<Tensor<1,dim> > > &gradients) const
 {
   Assert (gradients.size() == n_quadrature_points,
 	  ExcDimensionMismatch(gradients.size(), n_quadrature_points));
@@ -934,6 +934,44 @@ get_function_hessians (const InputVector           &fe_function,
 
 template <int dim>
 template <class InputVector>
+void FEValuesBase<dim>::get_function_hessians (
+  const InputVector& fe_function,
+  const VectorSlice<const std::vector<unsigned int> >& indices,
+  std::vector<Tensor<2,dim> > &values) const
+{
+  Assert (this->update_flags & update_second_derivatives, ExcAccessToUninitializedField());
+				   // This function fills a single
+				   // component only
+  Assert (fe->n_components() == 1,
+	  ExcDimensionMismatch(fe->n_components(), 1));
+				   // One index for each dof
+  Assert (indices.size() == dofs_per_cell,
+	  ExcDimensionMismatch(indices.size(), dofs_per_cell));
+				   // This vector has one entry for
+				   // each quadrature point
+  Assert (values.size() == n_quadrature_points,
+	  ExcDimensionMismatch(values.size(), n_quadrature_points));
+  
+				   // initialize with zero
+  std::fill_n (values.begin(), n_quadrature_points, Tensor<2,dim>());
+  
+				   // add up contributions of trial
+				   // functions. note that here we
+				   // deal with scalar finite
+				   // elements, so no need to check
+				   // for non-primitivity of shape
+				   // functions
+  for (unsigned int point=0; point<n_quadrature_points; ++point)
+    for (unsigned int shape_func=0; shape_func<dofs_per_cell; ++shape_func)
+      values[point] += (fe_function(indices[shape_func]) *
+			this->shape_hessian(shape_func, point));
+}
+
+
+
+
+template <int dim>
+template <class InputVector>
 void
 FEValuesBase<dim>::
 get_function_hessians (const InputVector                         &fe_function,
@@ -1000,6 +1038,97 @@ get_function_hessians (const InputVector                         &fe_function,
 	      tmp *= dof_values(shape_func);
 	      second_derivs[point][c] += tmp;
 	    }
+}
+
+
+
+template <int dim>
+template <class InputVector>
+void FEValuesBase<dim>::get_function_hessians (
+  const InputVector& fe_function,
+  const VectorSlice<const std::vector<unsigned int> >& indices,
+  std::vector<std::vector<Tensor<2,dim> > >& values,
+  bool quadrature_points_fastest) const
+{
+  Assert (this->update_flags & update_second_derivatives, ExcAccessToUninitializedField());
+    
+  const unsigned int n_components = fe->n_components();
+  
+				   // Size of indices must be a
+				   // multiple of dofs_per_cell such
+				   // that an integer number of
+				   // function values is generated in
+				   // each point.
+  Assert (indices.size() % dofs_per_cell == 0,
+	  ExcNotMultiple(indices.size(), dofs_per_cell));
+
+				   // The number of components of the
+				   // result may be a multiple of the
+				   // number of components of the
+				   // finite element
+  const unsigned int result_components = indices.size() * n_components / dofs_per_cell;
+  
+				   // Check if the value argument is
+				   // initialized to the correct sizes
+  if (quadrature_points_fastest)
+    {
+      Assert (values.size() == result_components,
+	      ExcDimensionMismatch(values.size(), result_components));
+      for (unsigned i=0;i<values.size();++i)
+	Assert (values[i].size() == n_quadrature_points,
+		ExcDimensionMismatch(values[i].size(), n_quadrature_points));
+    }
+  else
+    {
+      Assert(values.size() == n_quadrature_points,
+	     ExcDimensionMismatch(values.size(), n_quadrature_points));
+      for (unsigned i=0;i<values.size();++i)
+	Assert (values[i].size() == result_components,
+		ExcDimensionMismatch(values[i].size(), result_components));
+    }
+
+				   // If the result has more
+				   // components than the finite
+				   // element, we need this number for
+				   // loops filling all components
+  const unsigned int component_multiple = result_components / n_components;
+  
+				   // initialize with zero
+  for (unsigned i=0;i<values.size();++i)
+    std::fill_n (values[i].begin(), values[i].size(), Tensor<2,dim>());
+
+				   // add up contributions of trial
+				   // functions. now check whether the
+				   // shape function is primitive or
+				   // not. if it is, then set its only
+				   // non-zero component, otherwise
+				   // loop over components
+  if (quadrature_points_fastest)
+    for (unsigned int mc = 0; mc < component_multiple; ++mc)
+      for (unsigned int point=0; point<n_quadrature_points; ++point)
+	for (unsigned int shape_func=0; shape_func<dofs_per_cell; ++shape_func)
+	  if (fe->is_primitive(shape_func))
+	    values[fe->system_to_component_index(shape_func).first
+		   +mc * n_components][point]
+	      += fe_function(indices[shape_func+mc*dofs_per_cell])
+	      * shape_hessian(shape_func, point);
+	  else
+	    for (unsigned int c=0; c<n_components; ++c)
+	      values[c][point] += (fe_function(indices[shape_func]) *
+				   shape_hessian_component(shape_func, point, c));
+  else
+    for (unsigned int mc = 0; mc < component_multiple; ++mc)
+      for (unsigned int point=0; point<n_quadrature_points; ++point)
+	for (unsigned int shape_func=0; shape_func<dofs_per_cell; ++shape_func)
+	  if (fe->is_primitive(shape_func))
+	    values[point][fe->system_to_component_index(shape_func).first
+			  +mc * n_components]
+	      += fe_function(indices[shape_func+mc*dofs_per_cell])
+	      * shape_hessian(shape_func, point);
+	  else
+	    for (unsigned int c=0; c<n_components; ++c)
+	      values[point][c] += (fe_function(indices[shape_func]) *
+				   shape_hessian_component(shape_func, point, c));
 }
 
 
