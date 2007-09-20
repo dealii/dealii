@@ -19,6 +19,8 @@
 
 #include <cmath>
 
+using namespace std;
+
 DEAL_II_NAMESPACE_OPEN
 
 
@@ -294,10 +296,10 @@ namespace Functions
 	const Point<dim>& p = points[k];
 	const double x = deal_II_numbers::PI/2. * p(0);
 	const double y = deal_II_numbers::PI/2. * p(1);
-	const double cx = std::cos(x);
-	const double cy = std::cos(y);
-	const double sx = std::sin(x);
-	const double sy = std::sin(y);
+	const double cx = cos(x);
+	const double cy = cos(y);
+	const double sx = sin(x);
+	const double sy = sin(y);
 	
 	if (dim==2)
 	  {
@@ -308,8 +310,8 @@ namespace Functions
 	else if (dim==3)
 	  {
 	    const double z = deal_II_numbers::PI/2. * p(2);
-	    const double cz = std::cos(z);
-	    const double sz = std::sin(z);
+	    const double cz = cos(z);
+	    const double sz = sin(z);
 	    
 	    values[0][k] = cx*cx*cy*sy*cz*sz;
 	    values[1][k] = cx*sx*cy*cy*cz*sz;
@@ -341,10 +343,10 @@ namespace Functions
 	const Point<dim>& p = points[k];
 	const double x = deal_II_numbers::PI/2. * p(0);
 	const double y = deal_II_numbers::PI/2. * p(1);
-	const double c2x = std::cos(2*x);
-	const double c2y = std::cos(2*y);
-	const double s2x = std::sin(2*x);
-	const double s2y = std::sin(2*y);
+	const double c2x = cos(2*x);
+	const double c2y = cos(2*y);
+	const double s2x = sin(2*x);
+	const double s2y = sin(2*y);
 	const double cx2 = .5+.5*c2x;               // cos^2 x
 	const double cy2 = .5+.5*c2y;               // cos^2 y
 	
@@ -360,8 +362,8 @@ namespace Functions
 	else if (dim==3)
 	  {
 	    const double z = deal_II_numbers::PI/2. * p(2);
-	    const double c2z = std::cos(2*z);
-	    const double s2z = std::sin(2*z);
+	    const double c2z = cos(2*z);
+	    const double s2z = sin(2*z);
 	    const double cz2 = .5+.5*c2z;               // cos^2 z
 	    
  	    values[0][k][0] = -.125*deal_II_numbers::PI * s2x*s2y*s2z;
@@ -405,10 +407,10 @@ namespace Functions
 	const Point<dim>& p = points[k];
 	const double x = deal_II_numbers::PI/2. * p(0);
 	const double y = deal_II_numbers::PI/2. * p(1);
-	const double c2x = std::cos(2*x);
-	const double c2y = std::cos(2*y);
-	const double s2x = std::sin(2*x);
-	const double s2y = std::sin(2*y);
+	const double c2x = cos(2*x);
+	const double c2y = cos(2*y);
+	const double s2x = sin(2*x);
+	const double s2y = sin(2*y);
 	const double pi2 = .25 * deal_II_numbers::PI * deal_II_numbers::PI;
 	
 	if (dim==2)
@@ -420,8 +422,8 @@ namespace Functions
 	else if (dim==3)
 	  {
 	    const double z = deal_II_numbers::PI * p(2);
-	    const double c2z = std::cos(2*z);
-	    const double s2z = std::sin(2*z);
+	    const double c2z = cos(2*z);
+	    const double s2z = sin(2*z);
 	    
 	    values[0][k] = - .5*pi2 * (1.+2.*c2x) * s2y * s2z - deal_II_numbers::PI/8. * c2x * s2y * s2z;
 	    values[1][k] =   .5*pi2 * s2x * (1.+2.*c2y) * s2z - deal_II_numbers::PI/8. * s2x * c2y * s2z;
@@ -443,7 +445,9 @@ namespace Functions
   StokesLSingularity::StokesLSingularity()
 		  :
 		  omega (3./2.*deal_II_numbers::PI),
-		  coslo (std::cos(lambda*omega))
+		  coslo (cos(lambda*omega)),
+		  lp(1.+lambda),
+		  lm(1.-lambda)
   {}
   
   
@@ -451,8 +455,8 @@ namespace Functions
   double
   StokesLSingularity::Psi(double phi) const
   {
-    return std::sin((1.+lambda) * phi) * coslo / (1.+lambda) - std::cos((1.+lambda) * phi)
-      - std::sin((1.-lambda) * phi) * coslo / (1.-lambda) + std::cos((1.-lambda) * phi);
+    return coslo * (sin(lp*phi)/lp - sin(lm*phi)/lm)
+      - cos(lp*phi) + cos(lm*phi);
   }
   
   
@@ -460,8 +464,17 @@ namespace Functions
   double
   StokesLSingularity::Psi_1(double phi) const
   {
-    return std::cos((1.+lambda) * phi) * coslo + (1.+lambda) * std::sin((1.+lambda) * phi)
-      - std::cos((1.-lambda) * phi) * coslo - (1.-lambda) * std::sin((1.-lambda) * phi);
+    return coslo * (cos(lp*phi) - cos(lm*phi))
+      + lp*sin(lp*phi) - lm*sin(lm*phi);
+  }
+  
+  
+  inline
+  double
+  StokesLSingularity::Psi_2(double phi) const
+  {
+    return coslo * (lm*sin(lm*phi) - lp*sin(lp*phi))
+      + lp*lp*cos(lp*phi) - lm*lm*cos(lm*phi);
   }
   
   
@@ -469,10 +482,17 @@ namespace Functions
   double
   StokesLSingularity::Psi_3(double phi) const
   {
-    return - (1.+lambda) * (1.+lambda)
-      * (std::cos((1.+lambda) * phi) * coslo + (1.+lambda) * std::sin((1.+lambda) * phi))
-      - (1.-lambda) * (1.-lambda) *
-      (- std::cos((1.-lambda) * phi) * coslo - (1.-lambda) * std::sin((1.-lambda) * phi));
+    return coslo * (lm*lm*cos(lm*phi) - lp*lp*cos(lp*phi))
+      + lm*lm*lm*sin(lm*phi) - lp*lp*lp*sin(lp*phi);
+  }
+  
+  
+  inline
+  double
+  StokesLSingularity::Psi_4(double phi) const
+  {
+    return coslo * (lp*lp*lp*sin(lp*phi) - lm*lm*lm*sin(lm*phi))
+      + lm*lm*lm*lm*cos(lm*phi) - lp*lp*lp*lp*cos(lp*phi);
   }
   
   
@@ -496,15 +516,11 @@ namespace Functions
 	  {
 	    const double phi = std::atan2(y,-x)+M_PI;
 	    const double r2 = x*x+y*y;
-	    values[0][k] = std::pow(r2,lambda/2.)
-			   * ((1.+lambda) * std::sin(phi) * Psi(phi)
-			      + std::cos(phi) * Psi_1(phi));
-	    values[1][k] = -std::pow(r2,lambda/2.)
-			   * (std::sin(phi) * Psi_1(phi)
-			      -(1.+lambda) * std::cos(phi) * Psi(phi));
-	    values[2][k] = -std::pow(r2,lambda/2.-.5)
-			   * ((1.+lambda) * (1.+lambda) * Psi_1(phi) + Psi_3(phi))
-			   / (1.-lambda);
+	    const double rl = pow(r2,lambda/2.);
+	    const double rl1 = pow(r2,lambda/2.-.5);
+	    values[0][k] = rl * (lp*sin(phi)*Psi(phi) + cos(phi)*Psi_1(phi));
+	    values[1][k] = rl * (lp*cos(phi)*Psi(phi) - sin(phi)*Psi_1(phi));
+	    values[2][k] = -rl1 * (lp*lp*Psi_1(phi) + Psi_3(phi)) / lm;
 	  }
 	else
 	  {
@@ -517,10 +533,57 @@ namespace Functions
 
   
   void StokesLSingularity::vector_gradients (
-    const std::vector<Point<2> >&,
-    std::vector<std::vector<Tensor<1,2> > >&) const
+    const std::vector<Point<2> >& points,
+    std::vector<std::vector<Tensor<1,2> > >& values) const
   {
-    Assert(false, ExcNotImplemented());
+    unsigned int n = points.size();
+    
+    Assert(values.size() == 2+1, ExcDimensionMismatch(values.size(), 2+1));
+    for (unsigned int d=0;d<2+1;++d)
+      Assert(values[d].size() == n, ExcDimensionMismatch(values[d].size(), n));
+    
+    for (unsigned int k=0;k<n;++k)
+      {
+	const Point<2>& p = points[k];
+	const double x = p(0);
+	const double y = p(1);
+
+	if ((x<0) || (y<0))
+	  {
+	    const double phi = std::atan2(y,-x)+M_PI;
+	    const double r2 = x*x+y*y;
+	    const double r = sqrt(r2);
+	    const double rl = pow(r2,lambda/2.);
+	    const double rl1 = pow(r2,lambda/2.-.5);
+	    const double rl2 = pow(r2,lambda/2.-1.);
+	    const double psi =Psi(phi);
+	    const double psi1=Psi_1(phi);
+	    const double psi2=Psi_2(phi);
+	    const double cosp= cos(phi);
+	    const double sinp= sin(phi);
+	    
+ 					     // Derivatives of u with respect to r, phi
+ 	    const double udr = lambda * rl1 * (lp*sinp*psi + cosp*psi1);
+ 	    const double udp = rl * (lp*cosp*psi + lp*sinp*psi1 - sinp*psi1 + cosp*psi2);
+ 					     // Derivatives of v with respect to r, phi	    
+ 	    const double vdr = lambda * rl1 * (lp*cosp*psi - sinp*psi1);
+ 	    const double vdp = rl * (lp*(cosp*psi1 - sinp*psi) - cosp*psi1 - sinp*psi2);
+ 					     // Derivatives of p with respect to r, phi
+ 	    const double pdr = -(lambda-1.) * rl2 * (lp*lp*psi1+Psi_3(phi)) / lm;
+ 	    const double pdp = -rl1 * (lp*lp*psi2+Psi_4(phi)) / lm;
+	    values[0][k][0] = cosp*udr - sinp/r*udp;
+	    values[0][k][1] = - sinp*udr - cosp/r*udp;
+	    values[1][k][0] = cosp*vdr - sinp/r*vdp;
+	    values[1][k][1] = - sinp*vdr - cosp/r*vdp;
+	    values[2][k][0] = cosp*pdr - sinp/r*pdp;
+	    values[2][k][1] = - sinp*pdr - cosp/r*pdp;
+	  }
+	else
+	  {
+	    for (unsigned int d=0;d<3;++d)
+	      values[d][k] = 0.;
+	  }
+      }
   }
   
 
@@ -579,8 +642,8 @@ namespace Functions
 	const double y = 2. * deal_II_numbers::PI * p(1);
 	const double elx = std::exp(lambda*x);
 	
-	values[0][k] = 1. - elx * std::cos(y);
-	values[1][k] = .5 / deal_II_numbers::PI * lambda * elx * std::sin(y);
+	values[0][k] = 1. - elx * cos(y);
+	values[1][k] = .5 / deal_II_numbers::PI * lambda * elx * sin(y);
 	values[2][k] = .5 * elx * elx - p_average - this->mean_pressure;
       }
   }
@@ -603,8 +666,8 @@ namespace Functions
 	const double y = points[i](1);
 	
 	const double elx = std::exp(lambda*x);
-	const double cy = std::cos(2*M_PI*y);
-	const double sy = std::sin(2*M_PI*y);
+	const double cy = cos(2*M_PI*y);
+	const double sy = sin(2*M_PI*y);
 	
 					 // u
 	gradients[0][i][0] = -lambda*elx*cy;
@@ -637,12 +700,12 @@ namespace Functions
 	    const double x = p(0);
 	    const double y = zp * p(1);
 	    const double elx = std::exp(lambda*x);
-	    const double u  = 1. - elx * std::cos(y);
-	    const double ux = -lambda * elx * std::cos(y);
-	    const double uy = elx * zp * std::sin(y);
-	    const double v  = lambda/zp * elx * std::sin(y);
-	    const double vx = lambda*lambda/zp * elx * std::sin(y);
-	    const double vy = zp*lambda/zp * elx * std::cos(y);
+	    const double u  = 1. - elx * cos(y);
+	    const double ux = -lambda * elx * cos(y);
+	    const double uy = elx * zp * sin(y);
+	    const double v  = lambda/zp * elx * sin(y);
+	    const double vx = lambda*lambda/zp * elx * sin(y);
+	    const double vy = zp*lambda/zp * elx * cos(y);
 	    
 	    values[0][k] = u*ux+v*uy;
 	    values[1][k] = u*vx+v*vy;
