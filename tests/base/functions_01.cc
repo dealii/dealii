@@ -120,13 +120,13 @@ check_function(const Functions::FlowFunction<dim>& f,
   deallog << "Gradients ";
 				   // Compute gradients and difference approximations
   std::vector<std::vector<Tensor<1,dim> > >
-    gradients(points.size(), std::vector<Tensor<1,dim> >(f.n_components));
+    gradients(f.n_components, std::vector<Tensor<1,dim> >(points.size()));
   std::vector<std::vector<Tensor<1,dim> > >
     gradients1(points.size(), std::vector<Tensor<1,dim> >(f.n_components));
   std::vector<std::vector<Tensor<1,dim> > >
     gradients2(points.size(), std::vector<Tensor<1,dim> >(f.n_components));
   
-  f.vector_gradient_list(points, gradients);
+  f.vector_gradients(points, gradients);
   dtest1.vector_gradient_list(points, gradients1);
   dtest2.vector_gradient_list(points, gradients2);
 
@@ -135,8 +135,8 @@ check_function(const Functions::FlowFunction<dim>& f,
     for (unsigned int i=0;i<gradients[k].size();++i)
       {
 					 // Compute difference
- 	Tensor<1,dim> d1 = gradients1[k][i] - gradients[k][i];
- 	Tensor<1,dim> d2 = gradients2[k][i] - gradients[k][i];
+ 	Tensor<1,dim> d1 = gradients1[i][k] - gradients[k][i];
+ 	Tensor<1,dim> d2 = gradients2[i][k] - gradients[k][i];
 	
 					 // If the difference is
 					 // already small, we are fine
@@ -150,15 +150,16 @@ check_function(const Functions::FlowFunction<dim>& f,
 					     // bit generous
 	    if (d2.norm() < 12.* d1.norm())
 	      {
-		deallog << "Gradient error: point " << k << " comp " << i
-			<< " norms " << d1.norm() << " " << d2.norm()
+		deallog << "Gradient error: point " << i
+			<< " (" << points[i] << " )"
+			<< " comp " << k
+//			<< " norms " << d1.norm() << " " << d2.norm()
 			<< std::endl;
-//		for (unsigned int i=0;i<f.n_components;++i)
-		  for (unsigned int d=0;d<dim;++d)
-		    deallog
-		      << " " << gradients[k][i][d]
-		      << " " << gradients1[k][i][d]
-		      << std::endl;
+		for (unsigned int d=0;d<dim;++d)
+		  deallog
+		    << " " << gradients[k][i][d]
+		    << " " << gradients1[i][k][d]
+		    << std::endl;
 	      }
 	  }
       }
@@ -167,11 +168,11 @@ check_function(const Functions::FlowFunction<dim>& f,
 				   // Check if divergence is zero
   deallog << "Divergence ";
   
-  for (unsigned int k=0;k<gradients.size();++k)
+  for (unsigned int k=0;k<points.size();++k)
     {
       double div = 0.;
       for (unsigned int d=0;d<dim;++d)
-	div += gradients[k][d][d];
+	div += gradients[d][k][d];
       if (std::fabs(div)> 1.e-13)
 	deallog << "Divergence " << k << " "
 		<< div << std::endl;
@@ -226,11 +227,14 @@ int main()
       check_function(f, 4, logfile);
     }
 
-  if (false)
+  if (true)
     {
       deallog << "Functions::StokesLSingularity" << std::endl;
       Functions::StokesLSingularity f;
-      check_function(f, 4, logfile);
+				       // Use odd number of points to
+				       // avoid lines with
+				       // discontinuous derivatives.
+      check_function(f, 5, logfile);
     }
 
   if (true)
