@@ -99,6 +99,21 @@ class VectorMemory : public Subscriptor
 				      */
     virtual void free (const VECTOR * const) = 0;
 
+				     /**
+				      * Access the default memory
+				      * space deal.II is offering for
+				      * vectors of this kind.
+				      *
+				      * This function accesses static
+				      * VectorMemory objects used by
+				      * deal.II classes to allocate
+				      * vectors. It is good practice
+				      * to use these in your program
+				      * as well, in order to optimize
+				      * memory usage.
+				      */
+    static VectorMemory<VECTOR>& default_pool();
+    
 				     /** @addtogroup Exceptions
 				      * @{ */
     
@@ -111,6 +126,16 @@ class VectorMemory : public Subscriptor
 				      * this memory pool.
 				      */
     DeclException0(ExcNotAllocatedHere);
+
+				     /**
+				      * You tried to access the
+				      * deal.II
+				      * VectorMemory::default_pool(),
+				      * but the vector class you are
+				      * using is not a standard
+				      * deal.II vector class.
+				      */
+    DeclException0(ExcNoDefaultMemoryForThisVectorClass);
 				     //@}
 };
 
@@ -251,6 +276,12 @@ class GrowingVectorMemory : public VectorMemory<VECTOR>
 				      */
     unsigned int memory_consumption() const;
 
+				     /**
+				      * A flag controlling the logging
+				      * of statistics at the end.
+				      */
+    bool log_statistics;
+    
   private:
 				     /**
 				      * Type to enter into the
@@ -292,6 +323,7 @@ class GrowingVectorMemory : public VectorMemory<VECTOR>
 template <typename VECTOR>
 GrowingVectorMemory<VECTOR>::GrowingVectorMemory (const unsigned int initial_size)
 		:
+		log_statistics(false),
 		pool(initial_size)
 {
   Threads::ThreadMutex::ScopedLock lock(mutex);
@@ -326,10 +358,13 @@ GrowingVectorMemory<VECTOR>::~GrowingVectorMemory()
 	++n;
       delete i->second;
     }
-  deallog << "GrowingVectorMemory:Overall allocated vectors: "
-	  << n_alloc << std::endl;
-  deallog << "GrowingVectorMemory:Maximum allocated vectors: "
-	  << pool.size() << std::endl;
+  if (log_statistics)
+    {
+      deallog << "GrowingVectorMemory:Overall allocated vectors: "
+	      << n_alloc << std::endl;
+      deallog << "GrowingVectorMemory:Maximum allocated vectors: "
+	      << pool.size() << std::endl;
+    }
   pool.clear ();
 
 				   // write out warning if memory leak
