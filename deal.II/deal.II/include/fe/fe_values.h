@@ -1081,7 +1081,8 @@ class FEValuesBase : protected FEValuesData<dim>,
 			   bool quadrature_points_fastest = false) const;
 
 				     /**
-				      * Function gradient access with
+				      * Access to the second
+				      * derivatives of a function with
 				      * more flexibility. see
 				      * get_function_values() with
 				      * corresponding arguments.
@@ -1093,7 +1094,8 @@ class FEValuesBase : protected FEValuesData<dim>,
       std::vector<Tensor<2,dim> >& result) const;
 
 				     /**
-				      * Function gradient access with
+				      * Access to the second
+				      * derivatives of a function with
 				      * more flexibility. see
 				      * get_function_values() with
 				      * corresponding arguments.
