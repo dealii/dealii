@@ -215,7 +215,7 @@ class PrimitiveVectorMemory : public VectorMemory<VECTOR>
  * earliest possible time and may therefore lead to an increased
  * overall memory consumption.
  * 
- * @author Guido Kanschat, 1999
+ * @author Guido Kanschat, 1999, 2007
  */
 template<class VECTOR = dealii::Vector<double> >
 class GrowingVectorMemory : public VectorMemory<VECTOR>
@@ -227,7 +227,8 @@ class GrowingVectorMemory : public VectorMemory<VECTOR>
 				      * certain number of vectors. The
 				      * default is not to do this.
 				      */
-    GrowingVectorMemory (const unsigned int initial_size = 0);
+    GrowingVectorMemory (const unsigned int initial_size = 0,
+			 const bool log_statistics = true);
 
 				     /**
 				      * Destructor.
@@ -321,9 +322,10 @@ class GrowingVectorMemory : public VectorMemory<VECTOR>
 
 
 template <typename VECTOR>
-GrowingVectorMemory<VECTOR>::GrowingVectorMemory (const unsigned int initial_size)
+GrowingVectorMemory<VECTOR>::GrowingVectorMemory (const unsigned int initial_size,
+						  const bool log_statistics)
 		:
-		log_statistics(false),
+		log_statistics(log_statistics),
 		pool(initial_size)
 {
   Threads::ThreadMutex::ScopedLock lock(mutex);

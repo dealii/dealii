@@ -21,10 +21,11 @@ DEAL_II_NAMESPACE_OPEN
   
 namespace
 {
-  GrowingVectorMemory<Vector<double> > default_pool_Vector_double;
-  GrowingVectorMemory<Vector<float> > default_pool_Vector_float;
-  GrowingVectorMemory<BlockVector<double> > default_pool_BlockVector_double;
-  GrowingVectorMemory<BlockVector<float> > default_pool_BlockVector_float;
+  GrowingVectorMemory<Vector<double> > default_pool_Vector_double(0, false);
+  GrowingVectorMemory<Vector<float> > default_pool_Vector_float(0, false);
+  GrowingVectorMemory<BlockVector<double> > default_pool_BlockVector_double(0, false);
+  GrowingVectorMemory<BlockVector<float> > default_pool_BlockVector_float(0, false);
+
   
   template<class VECTOR>
   inline
