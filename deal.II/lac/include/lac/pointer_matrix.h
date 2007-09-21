@@ -269,21 +269,22 @@ class PointerMatrixAux : public PointerMatrixBase<VECTOR>
 				      * If <tt>M</tt> is zero, no
 				      * matrix is stored.
 				      *
-				      * If <tt>mem</tt> is zero, a
-				      * PrimitiveVectorMemory is
-				      * generated.
+				      * If <tt>mem</tt> is zero, the
+				      * VectorMemory::default_pool()
+				      * is used.
 				      */
     PointerMatrixAux (VectorMemory<VECTOR>* mem = 0,
 		      const MATRIX* M=0);
 
 				     /**
-				      * Constructor. The name argument
-				      * is used to identify the
+				      * Constructor not using a
+				      * matrix. The name argument is
+				      * used to identify the
 				      * SmartPointer for this object.
 				      */
     PointerMatrixAux(VectorMemory<VECTOR>* mem,
 		     const char* name);
-    
+
 				     /**
 				      * Constructor. <tt>M</tt> points
 				      * to a matrix which must live
@@ -356,13 +357,13 @@ class PointerMatrixAux : public PointerMatrixBase<VECTOR>
 				     /**
 				      * The backup memory if none was provided.
 				      */
-    PrimitiveVectorMemory<VECTOR> my_memory;
+    mutable PrimitiveVectorMemory<VECTOR> my_memory;
 
 				     /**
 				      * Object for getting the
 				      * auxiliary vector.
 				      */
-    SmartPointer<VectorMemory<VECTOR> > mem;
+    mutable SmartPointer<VectorMemory<VECTOR> > mem;
     
 				     /**
 				      * The pointer to the actual matrix.
@@ -848,7 +849,7 @@ PointerMatrixAux<MATRIX, VECTOR>::PointerMatrixAux (
 		  m(M, typeid(*this).name())
 {
   if (mem == 0)
-    mem = &my_memory;
+    mem = &VectorMemory<VECTOR>::default_pool();
 }
 
 
@@ -860,7 +861,7 @@ PointerMatrixAux<MATRIX, VECTOR>::PointerMatrixAux (
 		  m(0, name)
 {
   if (mem == 0)
-    mem = &my_memory;
+    mem = &VectorMemory<VECTOR>::default_pool();
 }
 
 
@@ -873,7 +874,7 @@ PointerMatrixAux<MATRIX, VECTOR>::PointerMatrixAux (
 		  m(M, name)
 {
   if (mem == 0)
-    mem = &my_memory;
+    mem = &VectorMemory<VECTOR>::default_pool();
 }
 
 
@@ -918,6 +919,8 @@ inline void
 PointerMatrixAux<MATRIX, VECTOR>::vmult (VECTOR& dst,
 				      const VECTOR& src) const
 {
+  if (mem == 0)
+    mem = &my_memory;
   Assert (mem != 0, ExcNotInitialized());
   Assert (m != 0, ExcNotInitialized());
   m->vmult (dst, src);
@@ -929,6 +932,8 @@ inline void
 PointerMatrixAux<MATRIX, VECTOR>::Tvmult (VECTOR& dst,
 				       const VECTOR& src) const
 {
+  if (mem == 0)
+    mem = &my_memory;
   Assert (mem != 0, ExcNotInitialized());
   Assert (m != 0, ExcNotInitialized());
   m->Tvmult (dst, src);
@@ -940,6 +945,8 @@ inline void
 PointerMatrixAux<MATRIX, VECTOR>::vmult_add (VECTOR& dst,
 					  const VECTOR& src) const
 {
+  if (mem == 0)
+    mem = &my_memory;
   Assert (mem != 0, ExcNotInitialized());
   Assert (m != 0, ExcNotInitialized());
   VECTOR* v = mem->alloc();
@@ -955,6 +962,8 @@ inline void
 PointerMatrixAux<MATRIX, VECTOR>::Tvmult_add (VECTOR& dst,
 					      const VECTOR& src) const
 {
+  if (mem == 0)
+    mem = &my_memory;
   Assert (mem != 0, ExcNotInitialized());
   Assert (m != 0, ExcNotInitialized());
   VECTOR* v = mem->alloc();
