@@ -1683,8 +1683,8 @@ namespace Data
 				     // but we don't want that here,
 				     // so we give an empty object:
     coarse_grid.create_triangulation (vertices,
-						    cells,
-						    SubCellData());
+				      cells,
+				      SubCellData());
     
 				     // And since we want that the
 				     // evaluation point (3/4,3/4) in
