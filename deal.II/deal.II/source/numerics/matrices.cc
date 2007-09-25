@@ -2,7 +2,7 @@
 //    $Id$
 //    Version: $Name$
 //
-//    Copyright (C) 1998, 1999, 2000, 2001, 2002, 2003, 2004, 2005, 2006 by the deal.II authors
+//    Copyright (C) 1998, 1999, 2000, 2001, 2002, 2003, 2004, 2005, 2006, 2007 by the deal.II authors
 //
 //    This file is subject to QPL and may not be  distributed
 //    without copyright and license information. Please refer
@@ -994,7 +994,8 @@ create_boundary_mass_matrix_1 (const Mapping<dim>        &mapping,
   const FiniteElement<dim> &fe = dof.get_fe();
   const unsigned int n_components  = fe.n_components();
   const bool         fe_is_system  = (n_components != 1);
-
+  const bool         fe_is_primitive = fe.is_primitive();
+  
   Assert (matrix.n() == dof.n_boundary_dofs(boundary_functions),
           ExcInternalError());
   Assert (matrix.n() == matrix.m(), ExcInternalError());
@@ -1035,10 +1036,12 @@ create_boundary_mass_matrix_1 (const Mapping<dim>        &mapping,
 				   // two variables for the coefficient,
 				   // one for the two cases indicated in
 				   // the name
-  std::vector<double>          coefficient_values (fe_values.n_quadrature_points);
+  std::vector<double>          coefficient_values (fe_values.n_quadrature_points, 1.);
   std::vector<Vector<double> > coefficient_vector_values (fe_values.n_quadrature_points,
 							  Vector<double>(n_components));
-
+  const bool coefficient_is_vector = (coefficient != 0 && coefficient->n_components != 1)
+				     ? true : false;
+  
   std::vector<double>          rhs_values_scalar (fe_values.n_quadrature_points);
   std::vector<Vector<double> > rhs_values_system (fe_values.n_quadrature_points,
 						  Vector<double>(n_components));
@@ -1069,84 +1072,69 @@ create_boundary_mass_matrix_1 (const Mapping<dim>        &mapping,
 	      boundary_functions.find(cell->face(face)->boundary_indicator())
 		->second->vector_value_list (fe_values.get_quadrature_points(),
 					     rhs_values_system);
-	      
-	      if (coefficient != 0)
+
+	      if (coefficient_is_vector)
+						 // If coefficient is
+						 // vector valued, fill
+						 // all components
+		coefficient->vector_value_list (fe_values.get_quadrature_points(),
+						coefficient_vector_values);
+	      else
 		{
-		  if (coefficient->n_components==1)
-		    {
-		      coefficient->value_list (fe_values.get_quadrature_points(),
-					       coefficient_values);
-		      for (unsigned int point=0; point<fe_values.n_quadrature_points; ++point)
-			{
-			  const double weight = fe_values.JxW(point);
-			  for (unsigned int i=0; i<fe_values.dofs_per_cell; ++i) 
-			    {
-			      const double v = fe_values.shape_value(i,point);
-			      for (unsigned int j=0; j<fe_values.dofs_per_cell; ++j)
-				{
-				  const double u = fe_values.shape_value(j,point);
-				  if (fe.system_to_component_index(i).first ==
-				      fe.system_to_component_index(j).first)
-				    {
-				      cell_matrix(i,j)
-					+= (u * v * weight * coefficient_values[point]);
-				    }
-				}
-			      cell_vector(i) += v *
-						rhs_values_system[point](
-						  fe.system_to_component_index(i).first) * weight;
-			    }
-			}
-		    }
-		  else
-		    {
-		      coefficient->vector_value_list (fe_values.get_quadrature_points(),
-						      coefficient_vector_values);
-		      for (unsigned int point=0; point<fe_values.n_quadrature_points; ++point)
-			{
-			  const double weight = fe_values.JxW(point);
-			  for (unsigned int i=0; i<fe_values.dofs_per_cell; ++i) 
-			    {
-			      const double v = fe_values.shape_value(i,point);
-			      const unsigned int component_i=
-				fe.system_to_component_index(i).first;
-			      for (unsigned int j=0; j<fe_values.dofs_per_cell; ++j)
-				{
-				  const double u = fe_values.shape_value(j,point);
-				  if (fe.system_to_component_index(j).first ==
-				      component_i)
-				    {
-				      cell_matrix(i,j) +=
-					(u * v * weight * coefficient_vector_values[point](component_i));
-				    }
-				} 
-			      cell_vector(i) += v * rhs_values_system[point](component_i) * weight;
-			    }
-			}
-		    }
+						   // If a scalar
+						   // function is
+						   // geiven, update
+						   // the values, if
+						   // not, use the
+						   // default one set
+						   // in the
+						   // constructor above
+		  if (coefficient != 0)
+		    coefficient->value_list (fe_values.get_quadrature_points(),
+					     coefficient_values);
+						   // Copy scalar
+						   // values into vector
+		  for (unsigned int point=0; point<fe_values.n_quadrature_points; ++point)
+		    coefficient_vector_values[point] = coefficient_values[point];
 		}
-	      else	//      if (coefficient == 0)
-		for (unsigned int point=0; point<fe_values.n_quadrature_points; ++point)
-		  {
-		    const double weight = fe_values.JxW(point);
-		    for (unsigned int i=0; i<fe_values.dofs_per_cell; ++i) 
+	      
+	      for (unsigned int point=0; point<fe_values.n_quadrature_points; ++point)
+		{
+		  const double weight = fe_values.JxW(point);
+		  for (unsigned int i=0; i<fe_values.dofs_per_cell; ++i) 
+		    if (fe_is_primitive)
 		      {
-			const double v = fe_values.shape_value(i,point);
 			for (unsigned int j=0; j<fe_values.dofs_per_cell; ++j)
 			  {
-			    const double u = fe_values.shape_value(j,point);
-			    if (fe.system_to_component_index(i).first ==
-				fe.system_to_component_index(j).first)
+			    if (fe.system_to_component_index(j).first ==
+				fe.system_to_component_index(i).first)
 			      {
-				cell_matrix(i,j) += (u * v * weight);
+				cell_matrix(i,j)
+				  += weight
+				  * fe_values.shape_value(j,point)
+				  * fe_values.shape_value(i,point)
+				  * coefficient_vector_values[point](fe.system_to_component_index(i).first);
 			      }
 			  }
-			cell_vector(i) += v *
-					  rhs_values_system[point](
-					    fe.system_to_component_index(i).first) *
-					  weight;
+			cell_vector(i) += fe_values.shape_value(i,point)
+					  * rhs_values_system[point](fe.system_to_component_index(i).first)
+					  * weight;
 		      }
-		  }
+		    else
+		      {
+			for (unsigned int comp=0;comp<n_components;++comp)
+			  {
+			    for (unsigned int j=0; j<fe_values.dofs_per_cell; ++j)
+			      cell_matrix(i,j)
+				+= fe_values.shape_value_component(j,point,comp)
+				* fe_values.shape_value_component(i,point,comp)
+				* weight * coefficient_vector_values[point](comp);
+			    cell_vector(i) += fe_values.shape_value_component(i,point,comp) *
+					      rhs_values_system[point](comp)
+					      * weight;
+			  }
+		      }
+		}
 	    }
 	  else
 					     // FE is a scalar one
@@ -1155,41 +1143,23 @@ create_boundary_mass_matrix_1 (const Mapping<dim>        &mapping,
 		->second->value_list (fe_values.get_quadrature_points(), rhs_values_scalar);
 	      
 	      if (coefficient != 0)
+		coefficient->value_list (fe_values.get_quadrature_points(),
+					 coefficient_values);
+	      for (unsigned int point=0; point<fe_values.n_quadrature_points; ++point)
 		{
-		  coefficient->value_list (fe_values.get_quadrature_points(),
-					   coefficient_values);
-		  for (unsigned int point=0; point<fe_values.n_quadrature_points; ++point)
+		  const double weight = fe_values.JxW(point);
+		  for (unsigned int i=0; i<fe_values.dofs_per_cell; ++i) 
 		    {
-		      const double weight = fe_values.JxW(point);
-		      for (unsigned int i=0; i<fe_values.dofs_per_cell; ++i) 
+		      const double v = fe_values.shape_value(i,point);
+		      for (unsigned int j=0; j<fe_values.dofs_per_cell; ++j)
 			{
-			  const double v = fe_values.shape_value(i,point);
-			  for (unsigned int j=0; j<fe_values.dofs_per_cell; ++j)
-			    {
-			      const double u = fe_values.shape_value(j,point);
-			      cell_matrix(i,j) += (u * v * weight * coefficient_values[point]);
-			    }
-			  cell_vector(i) += v * rhs_values_scalar[point] *weight;
+			  const double u = fe_values.shape_value(j,point);
+			  cell_matrix(i,j) += (u * v * weight * coefficient_values[point]);
 			}
+		      cell_vector(i) += v * rhs_values_scalar[point] *weight;
 		    }
 		}
-	      else
-		for (unsigned int point=0; point<fe_values.n_quadrature_points; ++point)
-		  {
-		    const double weight = fe_values.JxW(point);
-		    for (unsigned int i=0; i<fe_values.dofs_per_cell; ++i) 
-		      {
-			const double v = fe_values.shape_value(i,point);
-			for (unsigned int j=0; j<fe_values.dofs_per_cell; ++j)
-			  {
-			    const double u = fe_values.shape_value(j,point);
-			    cell_matrix(i,j) += (u * v * weight);
-			  }
-			cell_vector(i) += v * rhs_values_scalar[point] * weight;
-		      }
-		  }
 	    }
-
 					   // now transfer cell matrix and vector
 					   // to the whole boundary matrix
 					   //
@@ -1239,7 +1209,7 @@ create_boundary_mass_matrix_1 (const Mapping<dim>        &mapping,
 					   // searches.
 	  cell->get_dof_indices (dofs);
 	  cell->face(face)->get_dof_indices (dofs_on_face_vector);
-
+	  
 					   // check for each of the
 					   // dofs on this cell
 					   // whether it is on the
@@ -1288,52 +1258,11 @@ create_boundary_mass_matrix_1 (const Mapping<dim>        &mapping,
 		matrix.add(dof_to_boundary_mapping[dofs[i]],
 			   dof_to_boundary_mapping[dofs[j]],
 			   cell_matrix(i,j));
-	      else
-		{
-						   // assume that all
-						   // shape functions
-						   // that are nonzero
-						   // on the boundary
-						   // are also listed
-						   // in the
-						   // @p{dof_to_boundary}
-						   // mapping. if that
-						   // is not the case,
-						   // then the
-						   // boundary mass
-						   // matrix does not
-						   // make that much
-						   // sense anyway, as
-						   // it only contains
-						   // entries for
-						   // parts of the
-						   // functions living
-						   // on the boundary
-						   //
-						   // these, we may
-						   // compare here for
-						   // relative
-						   // smallness of all
-						   // entries in the
-						   // local matrix
-						   // which are not
-						   // taken over to
-						   // the global one
-		  Assert (std::fabs(cell_matrix(i,j)) <= 1e-10 * max_diag_entry,
-			  ExcInternalError ());
-		};
 	  
 	  for (unsigned int j=0; j<dofs_per_cell; ++j)
 	    if (dof_is_on_face[j])
 	      rhs_vector(dof_to_boundary_mapping[dofs[j]]) += cell_vector(j);
-	    else
-	      {
-						 // compare here for relative
-						 // smallness
-		Assert (std::fabs(cell_vector(j)) <= 1e-10 * max_diag_entry,
-			ExcInternalError());
-	      };
-	};
+	}
 }
 
 
