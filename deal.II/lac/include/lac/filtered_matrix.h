@@ -547,14 +547,15 @@ FilteredMatrix<VECTOR>::initialize (const MATRIX &m, bool ecs)
 
 
 template <class VECTOR>
+inline
 FilteredMatrix<VECTOR>::FilteredMatrix ()
 {}
 
 
 
 template <class VECTOR>
-FilteredMatrix<VECTOR>::
-FilteredMatrix (const FilteredMatrix &fm)
+inline
+FilteredMatrix<VECTOR>::FilteredMatrix (const FilteredMatrix &fm)
 		:
 		Subscriptor(),
 		constraints (fm.constraints)
@@ -590,6 +591,7 @@ FilteredMatrix<VECTOR>::operator = (const FilteredMatrix &fm)
 
 template <class VECTOR>
 template <class ConstraintList>
+inline
 void
 FilteredMatrix<VECTOR>::
 add_constraints (const ConstraintList &new_constraints)
