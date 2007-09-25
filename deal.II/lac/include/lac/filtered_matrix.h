@@ -18,6 +18,9 @@
 #include <base/config.h>
 #include <base/smartpointer.h>
 #include <base/thread_management.h>
+#include <base/memory_consumption.h>
+#include <lac/pointer_matrix.h>
+#include <lac/vector_memory.h>
 #include <vector>
 #include <algorithm>
 
@@ -35,7 +38,82 @@ template <typename number> class Vector;
  * This class is a wrapper for linear systems of equations with simple
  * equality constraints fixing individual degrees of freedom to a
  * certain value such as when using Dirichlet boundary
- * values. Mathematically speaking, it is used to represent a system
+ * values.
+ *
+ * In order to accomplish this, the vmult(), Tvmult(), vmult_add() and
+ * Tvmult_add functions modify the same function of the original
+ * matrix such as if all constrained entries of the source vector were
+ * zero. Additionally, all constrained entries of the destination
+ * vector are set to zero.
+ *
+ * <h3>Usage</h3>
+ *
+ * Usage is simple: create an object of this type, point it to a
+ * matrix that shall be used for $A$ above (either through the
+ * constructor, the copy constructor, or the
+ * set_referenced_matrix() function), specify the list of boundary
+ * values or other constraints (through the add_constraints()
+ * function), and then for each required solution modify the right
+ * hand side vector (through apply_constraints()) and use this
+ * object as matrix object in a linear solver. As linear solvers
+ * should only use vmult() and residual() functions of a
+ * matrix class, this class should be as a good a matrix as any other
+ * for that purpose.
+ *
+ * Furthermore, also the precondition_Jacobi() function is
+ * provided (since the computation of diagonal elements of the
+ * filtered matrix $A_X$ is simple), so you can use this as a
+ * preconditioner. Some other function useful for matrices are also
+ * available.
+ *
+ * A typical code snippet showing the above steps is as follows:
+ * @verbatim
+ *   ... // set up sparse matrix A and right hand side b somehow
+ *
+ *                     // initialize filtered matrix with
+ *                     // matrix and boundary value constraints
+ *   FilteredMatrix<SparseMatrix<double> > filtered_A (A);
+ *   filtered_A.add_constraints (boundary_values);
+ *
+ *                     // set up a linear solver
+ *   SolverControl control (1000, 1.e-10, false, false);
+ *   PrimitiveVectorMemory<Vector<double> > mem;
+ *   SolverCG<Vector<double> > solver (control, mem);
+ *
+ *                     // set up a preconditioner object
+ *   PreconditionJacobi<FilteredMatrix<SparseMatrix<double> > > prec;
+ *   prec.initialize (filtered_A, 1.2);
+ *
+ *                     // compute modification of right hand side
+ *   filtered_A.apply_constraints (b, true);
+ *
+ *                     // solve for solution vector x
+ *   solver.solve (filtered_A, x, b, prec);
+ * @endverbatim
+ *
+ * <h3>Connection to other classes</h3>
+ *
+ * The function MatrixTools::apply_boundary_values() does exactly
+ * the same that this class does, except for the fact that that
+ * function actually modifies the matrix. Due to this, it is only
+ * possible to solve with a matrix onto which
+ * MatrixTools::apply_boundary_values() was applied for one right
+ * hand side and one set of boundary values since the modification of
+ * the right hand side depends on the original matrix.
+ *
+ * While this is fine (and the recommended way) in cases where only
+ * one solution of the linear system is required, for example in
+ * solving linear stationary systems, one would often like to have the
+ * ability to solve multiply with the same matrix in nonlinear
+ * problems (where one often does not want to update the Hessian
+ * between Newton steps, despite having different right hand sides in
+ * subsequent steps) or time dependent problems, without having to
+ * re-assemble the matrix or copy it to temporary matrices with which
+ * one then can work. For these cases, this class is meant.
+ *
+ *
+ * <h3>Some background</h3>
+ * Mathematically speaking, it is used to represent a system
  * of linear equations $Ax=b$ with the constraint that $B_D x = g_D$,
  * where $B_D$ is a rectangular matrix with exactly one $1$ in each
  * row, and these $1$s in those columns representing constrained
@@ -100,72 +178,6 @@ template <typename number> class Vector;
  * hand side, through the apply_constraints() function.
  *
  *
- * <h3>Connection to other classes</h3>
- *
- * The function MatrixTools::apply_boundary_values() does exactly
- * the same that this class does, except for the fact that that
- * function actually modifies the matrix. Due to this, it is only
- * possible to solve with a matrix onto which
- * MatrixTools::apply_boundary_values() was applied for one right
- * hand side and one set of boundary values since the modification of
- * the right hand side depends on the original matrix.
- *
- * While this is fine (and the recommended way) in cases where only
- * one solution of the linear system is required, for example in
- * solving linear stationary systems, one would often like to have the
- * ability to solve multiply with the same matrix in nonlinear
- * problems (where one often does not want to update the Hessian
- * between Newton steps, despite having different right hand sides in
- * subsequent steps) or time dependent problems, without having to
- * re-assemble the matrix or copy it to temporary matrices with which
- * one then can work. For these cases, this class is meant.
- *
- *
- * <h3>Usage</h3>
- *
- * Usage is simple: create an object of this type, point it to a
- * matrix that shall be used for $A$ above (either through the
- * constructor, the copy constructor, or the
- * set_referenced_matrix() function), specify the list of boundary
- * values or other constraints (through the add_constraints()
- * function), and then for each required solution modify the right
- * hand side vector (through apply_constraints()) and use this
- * object as matrix object in a linear solver. As linear solvers
- * should only use vmult() and residual() functions of a
- * matrix class, this class should be as a good a matrix as any other
- * for that purpose.
- *
- * Furthermore, also the precondition_Jacobi() function is
- * provided (since the computation of diagonal elements of the
- * filtered matrix $A_X$ is simple), so you can use this as a
- * preconditioner. Some other function useful for matrices are also
- * available.
- *
- * A typical code snippet showing the above steps is as follows:
- * @verbatim
- *   ... // set up sparse matrix A and right hand side b somehow
- *
- *                     // initialize filtered matrix with
- *                     // matrix and boundary value constraints
- *   FilteredMatrix<SparseMatrix<double> > filtered_A (A);
- *   filtered_A.add_constraints (boundary_values);
- *
- *                     // set up a linear solver
- *   SolverControl control (1000, 1.e-10, false, false);
- *   PrimitiveVectorMemory<Vector<double> > mem;
- *   SolverCG<Vector<double> > solver (control, mem);
- *
- *                     // set up a preconditioner object
- *   PreconditionJacobi<FilteredMatrix<SparseMatrix<double> > > prec;
- *   prec.initialize (filtered_A, 1.2);
- *
- *                     // compute modification of right hand side
- *   filtered_A.apply_constraints (b, true);
- *
- *                     // solve for solution vector x
- *   solver.solve (filtered_A, x, b, prec);
- * @endverbatim
- *
  *
  * <h3>Template arguments</h3>
  *
@@ -191,26 +203,19 @@ template <typename number> class Vector;
  * bottleneck. If you don't want this serialization of operations, you
  * have to use several objects of this type.
  *
- * @author Wolfgang Bangerth 2001, Luca Heltai 2006
+ * @author Wolfgang Bangerth 2001, Luca Heltai 2006, Guido Kanschat 2007
  */
-template <class MATRIX, class VECTOR=Vector<typename MATRIX::value_type> >
+template <class VECTOR>
 class FilteredMatrix : public Subscriptor
 {
   public:
-				     /**
-				      * Type of matrix entries. In
-				      * analogy to the STL container
-				      * classes.
-				      */
-    typedef typename MATRIX::value_type value_type;
-
 				     /**
 				      * Typedef defining a type that
 				      * represents a pair of degree of
 				      * freedom index and the value it
 				      * shall have.
 				      */
-    typedef std::pair<unsigned int,value_type> IndexValuePair;
+    typedef std::pair<unsigned int, double> IndexValuePair;
 
 				     /**
 				      * Default constructor. You will
@@ -228,12 +233,21 @@ class FilteredMatrix : public Subscriptor
 				      */
     FilteredMatrix (const FilteredMatrix &fm);
     
-				     /**
+ 				     /**
 				      * Constructor. Use the given
 				      * matrix for future operations.
+				      *
+				      * @arg @p m: The matrix being used in multiplications.
+				      *
+				      * @arg @p
+				      * expect_constrained_source: See
+				      * documentation of
+				      * #expect_constrained_source.
 				      */
-    FilteredMatrix (const MATRIX &matrix);
-
+    template <class MATRIX>
+    FilteredMatrix (const MATRIX &matrix,
+		    bool expect_constrained_source = false);
+    
 				     /**
 				      * Copy operator. Take over
 				      * matrix and constraints from
@@ -248,16 +262,18 @@ class FilteredMatrix : public Subscriptor
 				      * clear_constraints()
 				      * function if constraits were
 				      * previously added.
+				      *
+				      * @arg @p m: The matrix being used in multiplications.
+				      *
+				      * @arg @p
+				      * expect_constrained_source: See
+				      * documentation of
+				      * #expect_constrained_source.
 				      */
-    void set_referenced_matrix (const MATRIX &m);
+    template <class MATRIX>
+    void initialize (const MATRIX &m,
+		     bool expect_constrained_source = false);
     
-				     /**
-				      * Return a reference to the
-				      * matrix that is used by this
-				      * object.
-				      */
-    const MATRIX & get_referenced_matrix () const;
-
 				     /**
 				      * Add a list of constraints to
 				      * the ones already managed by
@@ -274,6 +290,13 @@ class FilteredMatrix : public Subscriptor
 				      * IndexValuePair objects,
 				      * but also a
 				      * <tt>std::map<unsigned,value_type></tt>.
+				      *
+				      * The second component of these
+				      * pairs will only be used in
+				      * apply_constraints(). The first
+				      * is used to set values to zero
+				      * in matrix vector
+				      * multiplications.
 				      *
 				      * It is an error if the argument
 				      * contains an entry for a degree
@@ -306,22 +329,6 @@ class FilteredMatrix : public Subscriptor
 			    const bool  matrix_is_symmetric) const;
 
 				     /**
-				      * Return the dimension of the
-				      * image space.  To remember: the
-				      * matrix is of dimension
-				      * $m \times n$.
-				      */
-    unsigned int m () const;
-    
-				     /**
-				      * Return the dimension of the
-				      * range space.  To remember: the
-				      * matrix is of dimension
-				      * $m \times n$.
-				      */
-    unsigned int n () const;
-
-				     /**
 				      * Matrix-vector multiplication:
 				      * let $dst = M*src$ with $M$
 				      * being this matrix. (This
@@ -352,81 +359,42 @@ class FilteredMatrix : public Subscriptor
 		 const VECTOR &src) const;
   
 				     /**
-				      * Return the square of the norm
-				      * of the vector $v$ with respect
-				      * to the norm induced by this
-				      * matrix,
-				      * i.e. $\left(v,Mv\right)$. This
-				      * is useful, e.g. in the finite
-				      * element context, where the
-				      * $L_2$ norm of a function
-				      * equals the matrix norm with
-				      * respect to the mass matrix of
-				      * the vector representing the
-				      * nodal values of the finite
-				      * element function.
+				      * Adding matrix-vector multiplication.
 				      *
-				      * Obviously, the matrix needs to
-				      * be square for this operation.
-				      *
-				      * Note that in many cases, you
-				      * will not want to compute the
-				      * norm with respect to the
-				      * filtered matrix, but with
-				      * respect to the original
-				      * one. For example, if you want
-				      * to compute the $L^2$ norm of a
-				      * vector by forming the matrix
-				      * norm with the mass matrix,
-				      * then you want to use the
-				      * original mass matrix, not the
-				      * filtered one where you might
-				      * have eliminated Dirichlet
-				      * boundary values.
+				      * @note The result vector of
+				      * this multiplication will have
+				      * the constraint entries set to
+				      * zero, independent of the
+				      * previous value of
+				      * <tt>dst</tt>. We excpect that
+				      * in most cases this is the
+				      * required behavior.
 				      */
-    value_type matrix_norm_square (const VECTOR &v) const;
-
-				     /**
-				      * Compute the residual of an
-				      * equation <tt>Mx=b</tt>, where the
-				      * residual is defined to be
-				      * <tt>r=b-Mx</tt> with @p x
-				      * typically being an approximate
-				      * of the true solution of the
-				      * equation. Write the residual
-				      * into @p dst. The l2 norm of
-				      * the residual vector is
-				      * returned.
-				      *
-				      * Note that it is assumed that
-				      * @p b is a vector that has been
-				      * treated by the
-				      * modify_rhs() function,
-				      * since we can then assume that
-				      * the components of the residual
-				      * which correspond to
-				      * constrained degrees of freedom
-				      * do not contribute to the
-				      * residual at all.
-				      */
-    value_type residual (VECTOR       &dst,
-			 const VECTOR &x,
-			 const VECTOR &b) const;
+    void vmult_add (VECTOR       &dst,
+		    const VECTOR &src) const;
     
 				     /**
-				      * Apply the Jacobi
-				      * preconditioner, which
-				      * multiplies every element of
-				      * the @p src vector by the
-				      * inverse of the respective
-				      * diagonal element and
-				      * multiplies the result with the
-				      * damping factor @p omega.
+				      * Adding transpose matrix-vector multiplication:
+				      *
+				      * Because we need to use a
+				      * temporary variable and since
+				      * we only allocate that each
+				      * time the matrix changed, this
+				      * function only works for
+				      * quadratic matrices.
+				      *
+				      * @note The result vector of
+				      * this multiplication will have
+				      * the constraint entries set to
+				      * zero, independent of the
+				      * previous value of
+				      * <tt>dst</tt>. We excpect that
+				      * in most cases this is the
+				      * required behavior.
 				      */
-    void precondition_Jacobi (VECTOR           &dst,
-			      const VECTOR     &src,
-			      const value_type  omega = 1.) const;
-
+    void Tvmult_add (VECTOR       &dst,
+		     const VECTOR &src) const;
+  
 				     /**
 				      * Determine an estimate for the
 				      * memory consumption (in bytes)
@@ -438,6 +406,27 @@ class FilteredMatrix : public Subscriptor
     unsigned int memory_consumption () const;
     
   private:
+				     /**
+				      * Determine, whether
+				      * multiplications can expect
+				      * that the source vector has all
+				      * constrained entries set to
+				      * zero.
+				      *
+				      * If so, the auxiliary vector
+				      * can be avoided and memory as
+				      * well as time can be saved.
+				      *
+				      * We expect this for instance in
+				      * Newton's method, where the
+				      * residual already should be
+				      * zero on constrained
+				      * nodes. This is, because there
+				      * is no testfunction in these
+				      * nodes.
+				      */
+    bool expect_constrained_source;
+    
 				     /**
 				      * Declare an abbreviation for an
 				      * iterator into the array
@@ -474,7 +463,7 @@ class FilteredMatrix : public Subscriptor
 				      * it using the SmartPointer
 				      * class.
 				      */
-    SmartPointer<const MATRIX> matrix;
+    boost::shared_ptr<PointerMatrixBase<VECTOR> > matrix;
 
 				     /**
 				      * Sorted list of pairs denoting
@@ -525,32 +514,16 @@ class FilteredMatrix : public Subscriptor
 				      */
     void post_filter (const VECTOR &in,
 		      VECTOR       &out) const;
-
-				     /**
-				      * Based on the size of the
-				      * matrix and type of the matrix
-				      * and vector, allocate a
-				      * temporary vector. This
-				      * function has to be overloaded
-				      * for the various template
-				      * parameter choices. Since the
-				      * allocated vector will be
-				      * filled by the site that calls
-				      * this function, no
-				      * initialization is necessary.
-				      */
-    void allocate_tmp_vector ();
-
 };
 
 /*@}*/
 /*---------------------- Inline functions -----------------------------------*/
 
 
-template <class MATRIX, class VECTOR>
+template <class VECTOR>
 inline
 bool
-FilteredMatrix<MATRIX,VECTOR>::PairComparison::
+FilteredMatrix<VECTOR>::PairComparison::
 operator () (const IndexValuePair &i1,
 	     const IndexValuePair &i2) const
 {
@@ -559,10 +532,66 @@ operator () (const IndexValuePair &i1,
 
 
 
-template <class MATRIX, class VECTOR>
+template <class VECTOR>
+template <class MATRIX>
+inline
+void
+FilteredMatrix<VECTOR>::initialize (const MATRIX &m, bool ecs)
+{
+  matrix = boost::shared_ptr<PointerMatrixBase<VECTOR> > (
+    new_pointer_matrix_base(m, VECTOR()));
+  
+  expect_constrained_source = ecs;
+}
+
+
+
+template <class VECTOR>
+FilteredMatrix<VECTOR>::FilteredMatrix ()
+{}
+
+
+
+template <class VECTOR>
+FilteredMatrix<VECTOR>::
+FilteredMatrix (const FilteredMatrix &fm)
+		:
+		Subscriptor(),
+		constraints (fm.constraints)
+{
+  initialize (*fm.matrix, fm.expect_constrained_source);
+}
+
+
+
+template <class VECTOR>
+template <class MATRIX>
+inline
+FilteredMatrix<VECTOR>::
+FilteredMatrix (const MATRIX &m, bool ecs)
+{
+  initialize (m, ecs);
+}
+
+
+
+template <class VECTOR>
+inline
+FilteredMatrix<VECTOR> &
+FilteredMatrix<VECTOR>::operator = (const FilteredMatrix &fm)
+{
+  matrix = fm.matrix;
+  expect_constrained_source = fm.expect_constrained_source;
+  constraints = fm.constraints;
+  return *this;
+}
+
+
+
+template <class VECTOR>
 template <class ConstraintList>
 void
-FilteredMatrix<MATRIX,VECTOR>::
+FilteredMatrix<VECTOR>::
 add_constraints (const ConstraintList &new_constraints)
 {
 				   // add new constraints to end
@@ -581,31 +610,187 @@ add_constraints (const ConstraintList &new_constraints)
 
 
 
-template <class MATRIX, class VECTOR>
+template <class VECTOR>
 inline
-const MATRIX &
-FilteredMatrix<MATRIX,VECTOR>::get_referenced_matrix () const
+void
+FilteredMatrix<VECTOR>::clear_constraints ()
 {
-  return *matrix;
+				   // swap vectors to release memory
+  std::vector<IndexValuePair> empty;
+  constraints.swap (empty);
 }
 
 
 
-template <class MATRIX, class VECTOR>
+template <class VECTOR>
 inline
-unsigned int FilteredMatrix<MATRIX,VECTOR>::m () const
+void
+FilteredMatrix<VECTOR>::
+apply_constraints (VECTOR     &v,
+		   const bool  /* matrix_is_symmetric */) const
 {
-  return matrix->m();
+    tmp_vector.reinit(v);
+    const_index_value_iterator       i = constraints.begin();
+    const const_index_value_iterator e = constraints.end();
+    for (; i!=e; ++i)
+	tmp_vector(i->first) = -i->second;
+
+    // This vmult is without bc, to get the rhs correction in a correct way.
+    matrix->vmult_add(v, tmp_vector);
+
+    // finally set constrained entries themselves
+    for (i=constraints.begin(); i!=e; ++i)
+	v(i->first) = i->second;
 }
 
 
 
-template <class MATRIX, class VECTOR>
+template <class VECTOR>
 inline
-unsigned int FilteredMatrix<MATRIX,VECTOR>::n () const
+void
+FilteredMatrix<VECTOR>::pre_filter (VECTOR &v) const
 {
-  return matrix->n();
+    // iterate over all constraints and
+    // zero out value
+    const_index_value_iterator       i = constraints.begin();
+    const const_index_value_iterator e = constraints.end();
+    for (; i!=e; ++i)
+	v(i->first) = 0;
 }
+
+
+
+template <class VECTOR>
+inline
+void
+FilteredMatrix<VECTOR>::post_filter (const VECTOR &in,
+	VECTOR       &out) const
+{
+    // iterate over all constraints and
+    // set value correctly
+    const_index_value_iterator       i = constraints.begin();
+    const const_index_value_iterator e = constraints.end();
+    for (; i!=e; ++i)
+	out(i->first) = in(i->first);
+}
+
+
+
+template <class VECTOR>
+inline
+void
+FilteredMatrix<VECTOR>::vmult (VECTOR& dst, const VECTOR& src) const
+{
+  if (!expect_constrained_source)
+    {
+      tmp_mutex.acquire ();
+				       // first copy over src vector and
+				       // pre-filter
+      tmp_vector.reinit(src, true);
+      tmp_vector = src;
+      pre_filter (tmp_vector);
+				       // then let matrix do its work
+      matrix->vmult (dst, tmp_vector);
+				       // tmp_vector now no more needed
+      tmp_mutex.release ();
+    }
+  else
+    matrix->vmult (dst, src);
+    // finally do post-filtering
+    post_filter (src, dst);
+}
+
+
+
+template <class VECTOR>
+inline
+void
+FilteredMatrix<VECTOR>::Tvmult (VECTOR& dst, const VECTOR& src) const
+{
+  if (!expect_constrained_source)
+    {
+      tmp_mutex.acquire ();
+				       // first copy over src vector and
+				       // pre-filter
+      tmp_vector.reinit(src, true);
+      tmp_vector = src;
+      pre_filter (tmp_vector);
+				       // then let matrix do its work
+      matrix->Tvmult (dst, tmp_vector);
+				       // tmp_vector now no more needed
+      tmp_mutex.release ();
+    }
+  else
+    matrix->Tvmult (dst, src);  
+				   // finally do post-filtering
+  post_filter (src, dst);
+}
+
+
+
+template <class VECTOR>
+inline
+void
+FilteredMatrix<VECTOR>::vmult_add (VECTOR& dst, const VECTOR& src) const
+{
+  if (!expect_constrained_source)
+    {
+      tmp_mutex.acquire ();
+				       // first copy over src vector and
+				       // pre-filter
+      tmp_vector.reinit(src, true);
+      tmp_vector = src;
+      pre_filter (tmp_vector);
+				       // then let matrix do its work
+      matrix->vmult_add (dst, tmp_vector);
+				       // tmp_vector now no more needed
+      tmp_mutex.release ();
+    }
+  else
+    matrix->vmult_add (dst, src);
+    // finally do post-filtering
+    post_filter (src, dst);
+}
+
+
+
+template <class VECTOR>
+inline
+void
+FilteredMatrix<VECTOR>::Tvmult_add (VECTOR& dst, const VECTOR& src) const
+{
+  if (!expect_constrained_source)
+    {
+      tmp_mutex.acquire ();
+				       // first copy over src vector and
+				       // pre-filter
+      tmp_vector.reinit(src, true);
+      tmp_vector = src;
+      pre_filter (tmp_vector);
+				       // then let matrix do its work
+      matrix->Tvmult_add (dst, tmp_vector);
+				       // tmp_vector now no more needed
+      tmp_mutex.release ();
+    }
+  else
+    matrix->Tvmult_add (dst, src);  
+				   // finally do post-filtering
+  post_filter (src, dst);
+}
+
+
+
+template <class VECTOR>
+inline
+unsigned int
+FilteredMatrix<VECTOR>::memory_consumption () const
+{
+    return (MemoryConsumption::memory_consumption (matrix) +
+	    MemoryConsumption::memory_consumption (constraints) +
+	    MemoryConsumption::memory_consumption (tmp_vector));
+}
+
+
 
 
 

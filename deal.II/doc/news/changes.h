@@ -30,6 +30,16 @@ inconvenience this causes.
 </p>
 
 <ol>
+
+<li> <p>Changed: FilteredMatrix now can be applied to any matrix having the standard
+set of <code>vmult</code> functions. In order to achieve this, its interface had to be overhauled.
+Only the <code>VECTOR</code> template argument remains. Furthermore, instead of
+PreconditionJacobi being applied to FilteredMatrix, FilteredMatrix
+can now be applied to any preconditioner.
+<br>
+(GK 2007/09/25)
+</p>
+
   <li> <p>Changed: The deprecated typedefs
   <code>internal::Triangulation::Line</code>, 
   <code>internal::Triangulation::Quad</code>, and

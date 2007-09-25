@@ -2287,17 +2287,20 @@ void GridGenerator::laplace_solve (const SparseMatrix<double> &S,
 				   Vector<double> &u)
 {
   const unsigned int n_dofs=S.n();
-  FilteredMatrix<SparseMatrix<double> > SF (S);
+  FilteredMatrix<Vector<double> > SF (S);
+  PreconditionJacobi<SparseMatrix<double> > prec;
+  prec.initialize(S, 1.2);
+  FilteredMatrix<Vector<double> > PF (prec);
+  
   SolverControl control (1000, 1.e-10, false, false);
   PrimitiveVectorMemory<Vector<double> > mem;
   SolverCG<Vector<double> > solver (control, mem);
-  PreconditionJacobi<FilteredMatrix<SparseMatrix<double> > > prec;
+  
   Vector<double> f(n_dofs);
   
   SF.add_constraints(m);
-  prec.initialize (SF);
   SF.apply_constraints (f, true);
-  solver.solve(SF, u, f, prec);
+  solver.solve(SF, u, f, PF);
 }
 
 
