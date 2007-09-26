@@ -613,7 +613,7 @@ namespace Functions
     long double r2 = Reynolds/2.;
     long double b = 4*M_PI*M_PI;
     long double l = -b/(r2+std::sqrt(r2*r2+b));
-    lambda = l;
+    lbda = l;
 				     // mean pressure for a domain
 				     // spreading from -.5 to 1.5 in
 				     // x-direction
@@ -640,11 +640,11 @@ namespace Functions
 	const Point<2>& p = points[k];
 	const double x = p(0);
 	const double y = 2. * deal_II_numbers::PI * p(1);
-	const double elx = std::exp(lambda*x);
+	const double elx = std::exp(lbda*x);
 	
 	values[0][k] = 1. - elx * cos(y);
-	values[1][k] = .5 / deal_II_numbers::PI * lambda * elx * sin(y);
-	values[2][k] = .5 * elx * elx - p_average - this->mean_pressure;
+	values[1][k] = .5 / deal_II_numbers::PI * lbda * elx * sin(y);
+	values[2][k] = -.5 * elx * elx + p_average - this->mean_pressure;
       }
   }
   
@@ -653,29 +653,28 @@ namespace Functions
     const std::vector<Point<2> >& points,
     std::vector<std::vector<Tensor<1,2> > >& gradients) const
   {
-    Assert(false, ExcNotImplemented());
     unsigned int n = points.size();
     
-    Assert (gradients.size() == n, ExcDimensionMismatch(gradients.size(), n));
-    Assert (gradients[0].size() >= this->n_components,
-	    ExcDimensionMismatch(gradients[0].size(), this->n_components));
+    Assert (gradients.size() == 3, ExcDimensionMismatch(gradients.size(), 3));
+    Assert (gradients[0].size() == n,
+	    ExcDimensionMismatch(gradients[0].size(), n));
     
     for (unsigned int i=0;i<n;++i)
       {
 	const double x = points[i](0);
 	const double y = points[i](1);
 	
-	const double elx = std::exp(lambda*x);
+	const double elx = std::exp(lbda*x);
 	const double cy = cos(2*M_PI*y);
 	const double sy = sin(2*M_PI*y);
 	
 					 // u
-	gradients[0][i][0] = -lambda*elx*cy;
-	gradients[0][i][1] = 2*M_PI*elx*sy;
-	gradients[1][i][0] = lambda*lambda/(2*M_PI)*elx*sy;
-	gradients[1][i][1] =lambda*elx*cy;
+	gradients[0][i][0] = -lbda*elx*cy;
+	gradients[0][i][1] = 2. * deal_II_numbers::PI*elx*sy;
+	gradients[1][i][0] = lbda*lbda/(2*M_PI)*elx*sy;
+	gradients[1][i][1] =lbda*elx*cy;
 					 // p
-	gradients[2][i][0] = -lambda*elx*elx;
+	gradients[2][i][0] = -lbda*elx*elx;
 	gradients[2][i][1] = 0.;
     }
   }
@@ -699,13 +698,13 @@ namespace Functions
 	    const Point<2>& p = points[k];
 	    const double x = p(0);
 	    const double y = zp * p(1);
-	    const double elx = std::exp(lambda*x);
+	    const double elx = std::exp(lbda*x);
 	    const double u  = 1. - elx * cos(y);
-	    const double ux = -lambda * elx * cos(y);
+	    const double ux = -lbda * elx * cos(y);
 	    const double uy = elx * zp * sin(y);
-	    const double v  = lambda/zp * elx * sin(y);
-	    const double vx = lambda*lambda/zp * elx * sin(y);
-	    const double vy = zp*lambda/zp * elx * cos(y);
+	    const double v  = lbda/zp * elx * sin(y);
+	    const double vx = lbda*lbda/zp * elx * sin(y);
+	    const double vy = zp*lbda/zp * elx * cos(y);
 	    
 	    values[0][k] = u*ux+v*uy;
 	    values[1][k] = u*vx+v*vy;
@@ -720,6 +719,11 @@ namespace Functions
       }
   }
   
+  double
+  Kovasznay::lambda () const
+  {
+    return lbda;
+  }
   
   
   

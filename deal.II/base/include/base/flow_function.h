@@ -226,7 +226,6 @@ namespace Functions
 				     std::vector<std::vector<Tensor<1,2> > >& gradients) const;
       virtual void vector_laplacians (const std::vector<Point<2> > &points,
 				      std::vector<std::vector<double> >   &values) const;
-
     private:
 				       /// The auxiliary function Psi.
       double Psi(double phi) const;
@@ -286,9 +285,11 @@ namespace Functions
       virtual void vector_laplacians (const std::vector<Point<2> > &points,
 				      std::vector<std::vector<double> >   &values) const;
 
+				       /// The value of lambda.
+      double lambda () const;
     private:
       const double Reynolds;
-      double lambda;
+      double lbda;
       double p_average;
       const bool stokes;
   };
