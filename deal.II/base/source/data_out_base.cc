@@ -1358,7 +1358,7 @@ void DataOutBase::write_ucd (const std::vector<Patch<dim,spacedim> > &patches,
 				   // and cells for later use
   unsigned int n_nodes;
   unsigned int n_cells;
-  compute_sizes (patches, n_nodes, n_cells);
+  compute_sizes<dim,spacedim> (patches, n_nodes, n_cells);
 				   ///////////////////////
 				   // preamble
   if (flags.write_preamble)
@@ -1442,7 +1442,7 @@ void DataOutBase::write_dx (const std::vector<Patch<dim,spacedim> > &patches,
 				   // and cells for later use
   unsigned int n_nodes;
   unsigned int n_cells;
-  compute_sizes(patches, n_nodes, n_cells);
+  compute_sizes<dim,spacedim>(patches, n_nodes, n_cells);
 				   // start with vertices order is
 				   // lexicographical, x varying
 				   // fastest
@@ -2623,7 +2623,7 @@ void DataOutBase::write_gmv (const std::vector<Patch<dim,spacedim> > &patches,
 				   // and cells for later use
   unsigned int n_nodes;
   unsigned int n_cells;
-  compute_sizes(patches, n_nodes, n_cells);
+  compute_sizes<dim,spacedim>(patches, n_nodes, n_cells);
   
 				   // in gmv format the vertex
 				   // coordinates and the data have an
@@ -2750,7 +2750,7 @@ void DataOutBase::write_tecplot (const std::vector<Patch<dim,spacedim> > &patche
 				   // and cells for later use
   unsigned int n_nodes;
   unsigned int n_cells;
-  compute_sizes(patches, n_nodes, n_cells);
+  compute_sizes<dim,spacedim>(patches, n_nodes, n_cells);
 
 				   ///////////
 				   // preamble
@@ -3018,7 +3018,7 @@ void DataOutBase::write_tecplot_binary (const std::vector<Patch<dim,spacedim> > 
 				   // and cells for later use
   unsigned int n_nodes;
   unsigned int n_cells;
-  compute_sizes(patches, n_nodes, n_cells);
+  compute_sizes<dim,spacedim>(patches, n_nodes, n_cells);
                                     // local variables only needed to write Tecplot
                                     // binary output files  
   const unsigned int vars_per_node  = (spacedim+n_data_sets),  
@@ -3329,7 +3329,7 @@ void DataOutBase::write_vtk (const std::vector<Patch<dim,spacedim> > &patches,
 				   // and cells for later use
   unsigned int n_nodes;
   unsigned int n_cells;
-  compute_sizes(patches, n_nodes, n_cells);
+  compute_sizes<dim,spacedim>(patches, n_nodes, n_cells);
 				   // in gmv format the vertex
 				   // coordinates and the data have an
 				   // order that is a bit unpleasant
