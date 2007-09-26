@@ -68,10 +68,10 @@ namespace
 #ifdef DEAL_II_ANON_NAMESPACE_BUG
     static
 #endif  
-  std::map<const std::string,FEFactoryPointer>
+  std::map<std::string,FEFactoryPointer>
   get_default_fe_names ()
   {
-    std::map<const std::string,FEFactoryPointer> default_map;
+    std::map<std::string,FEFactoryPointer> default_map;
 
     default_map["FE_Q_Hierarchical"]
       = FEFactoryPointer(new FETools::FEFactory<FE_Q_Hierarchical<deal_II_dimension> >);
@@ -136,7 +136,7 @@ namespace
                                    // there are no thread-safety
                                    // issues here
   static
-  std::map<const std::string,
+  std::map<std::string,
 	   boost::shared_ptr<const FETools::FEFactoryBase<deal_II_dimension> > >
   fe_name_map
   = get_default_fe_names ();
