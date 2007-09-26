@@ -411,14 +411,10 @@ class InverseMatrixRichardson : public Subscriptor
 
   private:
 				     /**
-				      * Access to the provided
+				      * A reference to the provided
 				      * VectorMemory object.
-				      *
-				      * Declared as a pointer instead of a
-				      * reference because C++ doesn't allow
-				      * mutable references.
 				      */
-    mutable VectorMemory<VECTOR>  *mem;
+    VectorMemory<VECTOR> &mem;
     
 				     /**
 				      * The solver object.
@@ -610,8 +606,7 @@ MeanValueFilter::Tvmult_add(VECTOR&, const VECTOR&) const
 template <class VECTOR>
 template <class MATRIX, class PRECONDITION>
 inline void
-InverseMatrixRichardson<VECTOR>::
-initialize (const MATRIX& m, const PRECONDITION& p)
+InverseMatrixRichardson<VECTOR>::initialize (const MATRIX& m, const PRECONDITION& p)
 {
   if (matrix != 0)
     delete matrix;
