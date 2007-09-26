@@ -2,7 +2,7 @@
 //    $Id$
 //    Version: $Name$
 //
-//    Copyright (C) 2002, 2003, 2004, 2005, 2006 by the deal.II authors
+//    Copyright (C) 2002, 2003, 2004, 2005, 2006, 2007 by the deal.II authors
 //
 //    This file is subject to QPL and may not be  distributed
 //    without copyright and license information. Please refer
@@ -413,8 +413,12 @@ class InverseMatrixRichardson : public Subscriptor
 				     /**
 				      * Access to the provided
 				      * VectorMemory object.
+				      *
+				      * Declared as a pointer instead of a
+				      * reference because C++ doesn't allow
+				      * mutable references.
 				      */
-    mutable VectorMemory<VECTOR>& mem;
+    mutable VectorMemory<VECTOR>  *mem;
     
 				     /**
 				      * The solver object.
@@ -606,7 +610,8 @@ MeanValueFilter::Tvmult_add(VECTOR&, const VECTOR&) const
 template <class VECTOR>
 template <class MATRIX, class PRECONDITION>
 inline void
-InverseMatrixRichardson<VECTOR>::initialize (const MATRIX& m, const PRECONDITION& p)
+InverseMatrixRichardson<VECTOR>::
+initialize (const MATRIX& m, const PRECONDITION& p)
 {
   if (matrix != 0)
     delete matrix;

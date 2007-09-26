@@ -2,7 +2,7 @@
 //    $Id$
 //    Version: $Name$
 //
-//    Copyright (C) 2002, 2003, 2005, 2006 by the deal.II authors
+//    Copyright (C) 2002, 2003, 2005, 2006, 2007 by the deal.II authors
 //
 //    This file is subject to QPL and may not be  distributed
 //    without copyright and license information. Please refer
@@ -126,7 +126,7 @@ InverseMatrixRichardson<VECTOR>::InverseMatrixRichardson(
   SolverControl& c,
   VectorMemory<VECTOR>& m)
 		:
-		mem(m),
+		mem(&m),
 		solver(c,m),
 		matrix(0),
 		precondition(0)
@@ -164,7 +164,7 @@ InverseMatrixRichardson<VECTOR>::vmult_add(VECTOR& dst, const VECTOR& src) const
 {
   Assert (matrix != 0, ExcNotInitialized());
   Assert (precondition != 0, ExcNotInitialized());
-  VECTOR* aux = mem.alloc();
+  VECTOR* aux = mem->alloc();
   aux->reinit(dst);
   try
     {
@@ -173,7 +173,7 @@ InverseMatrixRichardson<VECTOR>::vmult_add(VECTOR& dst, const VECTOR& src) const
   catch(...)
     {}  
   dst += *aux;
-  mem.free(aux);
+  mem->free(aux);
 }
 
 
@@ -201,7 +201,7 @@ InverseMatrixRichardson<VECTOR>::Tvmult_add(VECTOR& dst, const VECTOR& src) cons
 {
   Assert (matrix != 0, ExcNotInitialized());
   Assert (precondition != 0, ExcNotInitialized());
-  VECTOR* aux = mem.alloc();
+  VECTOR* aux = mem->alloc();
   aux->reinit(dst);
   try
     {
@@ -210,7 +210,7 @@ InverseMatrixRichardson<VECTOR>::Tvmult_add(VECTOR& dst, const VECTOR& src) cons
   catch(...)
     {}  
   dst += *aux;
-  mem.free(aux);
+  mem->free(aux);
 }
 
 
