@@ -557,8 +557,8 @@ AC_DEFUN(DEAL_II_SET_CXX_FLAGS, dnl
       ibm_xlc)
           CXXFLAGSG="$CXXFLAGS -DDEBUG -check=bounds -info=all -qrtti=all"
           CXXFLAGSO="$CXXFLAGS -O2 -w -qansialias -qrtti=all"
-          CXXFLAGSPIC="-fPIC"
-          LDFLAGSPIC="-fPIC"
+          CXXFLAGSPIC="-qpic"
+          LDFLAGSPIC="-qpic"
           ;;
   
       MIPSpro*)
