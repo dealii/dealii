@@ -185,7 +185,7 @@ AC_DEFUN(DEAL_II_DETERMINE_CXX_BRAND, dnl
     dnl variables, moon position, and other reasons unknown to me, the
     dnl compiler displays different names in the first line of output, so
     dnl check various possibilities
-    is_ibm_xlc="`($CXX 2>&1) | egrep 'VisualAge C++|C Set ++|C for AIX Compiler'`"
+    is_ibm_xlc="`($CXX -qversion 2>&1) | grep IBM`"
     if test "x$is_ibm_xlc" != "x"  ; then
       dnl Ah, this is IBM's C++ compiler. Unfortunately, we don't presently
       dnl know how to check the version number, so assume that is sufficiently
