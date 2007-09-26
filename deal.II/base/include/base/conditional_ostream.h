@@ -141,23 +141,10 @@ class ConditionalOStream
 
   private:
 				     /**
-				      * Pointer to <tt>cout</tt>. This
-				      * class could easily be extended
-				      * to treat streams different
-				      * to the standard output.
-				      *
-				      * This variable must be @p mutable so
-				      * that we can write to it in above @p
-				      * const @p operator<< functions. For the
-				      * reason why they, in turn, need to be
-				      * @p const, see there.
-				      *
-				      * Now, we would like to make the
-				      * variable a reference, but then the C++
-				      * standard says that 'mutable' can't be
-				      * applied to reference members.
+				      * Reference to the stream we
+				      * want to write to.
 				      */
-    mutable std::ostream  *output_stream;
+    std::ostream  &output_stream;
 
 				     /**
 				      * Stores the actual condition
@@ -175,7 +162,7 @@ const ConditionalOStream &
 ConditionalOStream::operator<< (const T& t) const
 {
   if (active_flag == true)
-    *output_stream << t;
+    output_stream << t;
 
   return *this;
 }
@@ -186,7 +173,7 @@ const ConditionalOStream &
 ConditionalOStream::operator<< (std::ostream& (*p) (std::ostream&)) const
 {
   if (active_flag == true)
-    *output_stream << p;
+    output_stream << p;
 
   return *this;
 }
