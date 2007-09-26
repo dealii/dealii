@@ -2,7 +2,7 @@
 //    $Id$
 //    Version: $Name$
 //
-//    Copyright (C) 2004, 2005, 2006 by the deal.II authors
+//    Copyright (C) 2004, 2005, 2006, 2007 by the deal.II authors
 //
 //    This file is subject to QPL and may not be  distributed
 //    without copyright and license information. Please refer
@@ -151,8 +151,13 @@ class ConditionalOStream
 				      * const @p operator<< functions. For the
 				      * reason why they, in turn, need to be
 				      * @p const, see there.
+				      *
+				      * Now, we would like to make the
+				      * variable a reference, but then the C++
+				      * standard says that 'mutable' can't be
+				      * applied to reference members.
 				      */
-    mutable std::ostream  &output_stream;
+    mutable std::ostream  *output_stream;
 
 				     /**
 				      * Stores the actual condition
@@ -170,7 +175,7 @@ const ConditionalOStream &
 ConditionalOStream::operator<< (const T& t) const
 {
   if (active_flag == true)
-    output_stream << t;
+    *output_stream << t;
 
   return *this;
 }
@@ -181,7 +186,7 @@ const ConditionalOStream &
 ConditionalOStream::operator<< (std::ostream& (*p) (std::ostream&)) const
 {
   if (active_flag == true)
-    output_stream << p;
+    *output_stream << p;
 
   return *this;
 }
