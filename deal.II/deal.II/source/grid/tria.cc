@@ -9538,7 +9538,7 @@ Triangulation<dim>::memory_consumption () const
   mem += sizeof(boundary);
   mem += sizeof(smooth_grid);
   mem += MemoryConsumption::memory_consumption (number_cache);
-  mem += MemoryConsumption::memory_consumption (faces);
+  mem += sizeof (faces);
   mem += MemoryConsumption::memory_consumption (*faces);  
 
   return mem;
