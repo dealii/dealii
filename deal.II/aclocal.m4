@@ -555,8 +555,8 @@ AC_DEFUN(DEAL_II_SET_CXX_FLAGS, dnl
   
     case "$GXX_VERSION" in
       ibm_xlc)
-          CXXFLAGSG="$CXXFLAGS -DDEBUG -check=bounds -info=all -qrtti=all"
-          CXXFLAGSO="$CXXFLAGS -O2 -w -qansialias -qrtti=all"
+          CXXFLAGSG="$CXXFLAGS -DDEBUG -check=bounds -info=all -qrtti=all -qsuppress=1540-2907"
+          CXXFLAGSO="$CXXFLAGS -O2 -w -qansialias -qrtti=all -qsuppress=1540-2907"
           CXXFLAGSPIC="-qpic"
           LDFLAGSPIC="-qpic"
           ;;

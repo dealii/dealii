@@ -4173,8 +4173,8 @@ rm -f core conftest.err conftest.$ac_objext conftest.$ac_ext
 
     case "$GXX_VERSION" in
       ibm_xlc)
-          CXXFLAGSG="$CXXFLAGS -DDEBUG -check=bounds -info=all -qrtti=all"
-          CXXFLAGSO="$CXXFLAGS -O2 -w -qansialias -qrtti=all"
+          CXXFLAGSG="$CXXFLAGS -DDEBUG -check=bounds -info=all -qrtti=all -qsuppress=1540-2907"
+          CXXFLAGSO="$CXXFLAGS -O2 -w -qansialias -qrtti=all -qsuppress=1540-2907"
           CXXFLAGSPIC="-qpic"
           LDFLAGSPIC="-qpic"
           ;;
