@@ -731,7 +731,7 @@ DoFCellAccessor<DoFHandler<1> >::
 get_dof_indices (std::vector<unsigned int> &dof_indices) const
 {
   Assert (dof_indices.size() == this->get_fe().dofs_per_cell,
-	  ExcVectorDoesNotMatch());
+	  BaseClass::ExcVectorDoesNotMatch());
 
 				   // check as in documentation that
 				   // cell is either active, or dofs
@@ -769,7 +769,7 @@ DoFCellAccessor<DoFHandler<2> >::
 get_dof_indices (std::vector<unsigned int> &dof_indices) const
 {
   Assert (dof_indices.size() == this->get_fe().dofs_per_cell,
-	  ExcVectorDoesNotMatch());
+	  BaseClass::ExcVectorDoesNotMatch());
 
 				   // check as in documentation that
 				   // cell is either active, or dofs
@@ -808,7 +808,7 @@ DoFCellAccessor<DoFHandler<3> >::
 get_dof_indices (std::vector<unsigned int> &dof_indices) const
 {
   Assert (dof_indices.size() == this->get_fe().dofs_per_cell,
-	  ExcVectorDoesNotMatch());
+	  BaseClass::ExcVectorDoesNotMatch());
 
 				   // check as in documentation that
 				   // cell is either active, or dofs
