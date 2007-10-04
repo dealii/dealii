@@ -65,9 +65,14 @@ DEAL_II_NAMESPACE_OPEN
  * coupled to @p u at the vertices and the line on the larger cell next to this
  * vertex, there is no interaction with @p v and @p w of this or the other cell.
  *
+ * The number of components of such a system element is the
+ * accumulated number of components of all base elements times their
+ * multiplicity. The number of blocks of the system is simply the sum
+ * of all multiplicities.
+ *
  * @ingroup febase fe
  * 
- * @author Wolfgang Bangerth, Guido Kanschat, 1999, 2002, 2003, 2006, partial reimplementation Ralf Hartmann 2001.
+ * @author Wolfgang Bangerth, Guido Kanschat, 1999, 2002, 2003, 2006, Ralf Hartmann 2001.
  */
 template <int dim>
 class FESystem : public FiniteElement<dim>

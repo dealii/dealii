@@ -26,11 +26,11 @@
  * <dd>Mesh cells not refined any further in the hierarchy.</dd>
  *
  * <dt class="glossary">@anchor GlossBlock block</dt>
- * <dd>Originally, blocks were introduced in BlockVector,
+ * <dd>Blocks were introduced in BlockVector,
  * BlockSparseMatrix and related classes. These are used to reflect the
  * structure of a PDE system in linear algebra, in particular allowing
  * for modular solvers. In DoFHandler, this block structure is
- * prepared by DoFRenumbering::component_wise().
+ * prepared by DoFRenumbering::block_wise().
  *
  * Originally, this concept was intermixed with the idea of the vector
  * @ref GlossComponent "component". Since the introduction of non-@ref
