@@ -89,6 +89,12 @@ can now be applied to any preconditioner.
 
 <ol> 
 
+<li> <p>Improved: The number of blocks of an FESystem was properly defined and the
+constructors changed accordingly. At least non of the test programs noticed the change.
+<br>
+(GK 2007/10/03)
+</p></li>
+
   <li> <p>Improved: In an effort to make names more consistent, second
   derivatives in FEValuesBase and UpdateFlags have been renamed to
   Hessians. Thus, the clash between the forms <tt>2nd</tt> and
