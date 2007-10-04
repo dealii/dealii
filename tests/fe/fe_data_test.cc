@@ -142,6 +142,7 @@ void test_fe_datas()
       deallog << "dofs_per_face=" << fe_data->dofs_per_face << std::endl;
       deallog << "dofs_per_cell=" << fe_data->dofs_per_cell << std::endl;
       deallog << "components=" << fe_data->components << std::endl
+	      << "blocks=" << fe_data->n_blocks() << std::endl
 	      << "degree=" << fe_data->tensor_degree() << std::endl
 	      << "conformity=";
       if (fe_data->conforms(FiniteElementData<dim>::L2)) deallog << " L2";
