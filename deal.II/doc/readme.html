@@ -666,14 +666,31 @@
     
     <a name="blas"></a>
     <dt>BLAS, LAPACK</dt>
-    <dd>If <code>--with-blas=blasname</code> and/or
+
+    <dd> <p>If <code>--with-blas=blasname</code> and/or
     <code>--with-lapack=lapackname</code> is given, provide wrappers
     around some of the BLAS and LAPACK functions, and link with the
     respective libraries. It will make sure that we link with the
     required FORTRAN libraries. If no argument is given to
-    <code>--with-blas</code>, then a BLAS library is searched for in
-    the default locations of your system, and similarly for LAPACK.
-    </dd>
+    <code>--with-blas</code>, then a BLAS library
+    <code>libblas.a</code> or <code>libblas.so</code> is searched for
+    in the default locations of your system, and similarly for LAPACK.</p>
+
+    <p>If your BLAS or LAPACK libraries are not in the standard search
+    path of your linker, you heve to linker where to find them. The
+    path is not given as an argument to
+    <code>--with-blas</code>. Rather, you set the variable
+    <code>LDFLAGS</code> accordingly or make sure that the path is in
+    your <code>LD_LIBRARY_PATH</code> or similar. For details, please
+    look up the documentation of your linker. An example configuration
+    for Linux is:</p>
+    <pre>
+    ./configure --with-blas=myblas LDFLAGS=-L/my/lib/
+    </pre>
+    <p> This example will search for a library
+    <code>libmyblas.a</code> or <code>libmyblas.so</code> in the
+    directory <code>/my/lib</code> and elswhere in the system library
+    paths.</p> </dd>
 
     <a name="netcdf"></a>
     <dt>NetCDF</dt>
