@@ -1750,7 +1750,7 @@ FESystem<dim>::multiply_dof_numbers (const FiniteElementData<dim> &fe_data,
 				 fe_data.n_components() * N,
 				 fe_data.tensor_degree(),
 				 fe_data.conforming_space,
-				 fe_data.n_blocks() * N);
+				 N);
 }
 
 
@@ -2414,7 +2414,7 @@ FESystem<dim>::multiply_dof_numbers (const FiniteElementData<dim> &fe1,
     degree,
     typename FiniteElementData<dim>::Conformity(fe1.conforming_space
 						& fe2.conforming_space),
-    fe1.n_blocks() * N1 + fe2.n_blocks() * N2);
+    N1 + N2);
 }
 
 
@@ -2453,7 +2453,7 @@ FESystem<dim>::multiply_dof_numbers (const FiniteElementData<dim> &fe1,
     typename FiniteElementData<dim>::Conformity(fe1.conforming_space
 						& fe2.conforming_space
 						& fe3.conforming_space),
-    fe1.n_blocks() * N1 + fe2.n_blocks() * N2 + fe3.n_blocks() * N3);
+    N1 + N2 + N3);
 }
 
 

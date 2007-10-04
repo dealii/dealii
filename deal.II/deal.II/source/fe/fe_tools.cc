@@ -328,7 +328,7 @@ void FETools::compute_block_renumbering (
 	k += element.base_element(b).n_dofs_per_cell();
       }
   Assert (i == element.n_blocks(), ExcInternalError());
-  
+//TODO:[GK] This does not work for a single RT  
   for (unsigned int i=0;i<element.dofs_per_cell;++i)
     {
       std::pair<unsigned int, unsigned int>
