@@ -2,7 +2,7 @@
 //    $Id$
 //    Version: $Name$
 //
-//    Copyright (C) 2002, 2003, 2004, 2005, 2006 by the deal.II authors
+//    Copyright (C) 2002, 2003, 2004, 2005, 2006, 2007 by the deal.II authors
 //
 //    This file is subject to QPL and may not be  distributed
 //    without copyright and license information. Please refer
@@ -538,7 +538,9 @@ SparseMatrixEZ<number>::block_write (std::ostream &out) const
 }
 
 
-#define CHECKFOR(in,a,c) {in >> c; AssertThrow(c == a, ExcIO());}
+#define DEAL_II_CHECK_INPUT(in,a,c) \
+  {in >> c; AssertThrow(c == a, \
+                 ExcMessage("Unexpected character in input stream"));}
 
 template <typename number>
 void
@@ -549,38 +551,42 @@ SparseMatrixEZ<number>::block_read (std::istream &in)
   char c;
   int n;
                                    // first read in simple data
-  CHECKFOR(in,'[',c);
+  DEAL_II_CHECK_INPUT(in,'[',c);
   in >> n;
   row_info.resize(n);
   
-  CHECKFOR(in,']',c);
-  CHECKFOR(in,'[',c);
+  DEAL_II_CHECK_INPUT(in,']',c);
+  DEAL_II_CHECK_INPUT(in,'[',c);
   in >> n_columns;
   
-  CHECKFOR(in,']',c);
-  CHECKFOR(in,'[',c);
+  DEAL_II_CHECK_INPUT(in,']',c);
+  DEAL_II_CHECK_INPUT(in,'[',c);
   in >> n;
   data.resize(n);
   
-  CHECKFOR(in,']',c);
-  CHECKFOR(in,'[',c);
+  DEAL_II_CHECK_INPUT(in,']',c);
+  DEAL_II_CHECK_INPUT(in,'[',c);
   in >> increment;
 
-  CHECKFOR(in,']',c);
-  CHECKFOR(in,'[',c);
+  DEAL_II_CHECK_INPUT(in,']',c);
+  DEAL_II_CHECK_INPUT(in,'[',c);
 
                                    // then read data
   in.read(reinterpret_cast<char*>(&row_info[0]),
 	  sizeof(RowInfo) * row_info.size());
   
-  CHECKFOR(in,']',c);
-  CHECKFOR(in,'[',c);
+  DEAL_II_CHECK_INPUT(in,']',c);
+  DEAL_II_CHECK_INPUT(in,'[',c);
 	    
   in.read(reinterpret_cast<char*>(&data[0]),
 	  sizeof(Entry) * data.size());
   
-  CHECKFOR(in,']',c);
+  DEAL_II_CHECK_INPUT(in,']',c);
 }
+
+#undef DEAL_II_CHECK_INPUT
+
+
 
 DEAL_II_NAMESPACE_CLOSE
 
