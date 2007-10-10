@@ -64,10 +64,10 @@ class BoussinesqFlowProblem
   private:
     void make_grid_and_dofs ();
     void assemble_system ();
-    void assemble_rhs_S ();
+    void assemble_rhs_T ();
     double get_maximal_velocity () const;
     void solve ();
-    void project_back_saturation ();
+    void project_back_temperature ();
     void output_results () const;
     
     const unsigned int   degree;
@@ -157,10 +157,10 @@ PressureBoundaryValues<dim>::value (const Point<dim>  &/*p*/,
 
 
 template <int dim>
-class SaturationBoundaryValues : public Function<dim> 
+class TemperatureBoundaryValues : public Function<dim> 
 {
   public:
-    SaturationBoundaryValues () : Function<dim>(1) {}
+    TemperatureBoundaryValues () : Function<dim>(1) {}
     
     virtual double value (const Point<dim>   &p,
                           const unsigned int  component = 0) const;
@@ -170,7 +170,7 @@ class SaturationBoundaryValues : public Function<dim>
 
 template <int dim>
 double
-SaturationBoundaryValues<dim>::value (const Point<dim> &p,
+TemperatureBoundaryValues<dim>::value (const Point<dim> &p,
                                       const unsigned int /*component*/) const 
 {
   if (p[0] == 0)
@@ -202,7 +202,10 @@ double
 InitialValues<dim>::value (const Point<dim>  &p,
                            const unsigned int component) const 
 {
-  return ZeroFunction<dim>(dim+2).value (p, component);
+  if (component == dim+1)
+    return (p.distance (Point<dim>(.5,.5)) < .2 ? 1 : 0);
+  else
+    return 0;
 }
 
 
@@ -211,7 +214,8 @@ void
 InitialValues<dim>::vector_value (const Point<dim> &p,
                                   Vector<double>   &values) const 
 {
-  ZeroFunction<dim>(dim+2).vector_value (p, values);
+  for (unsigned int c=0; c<this->n_components; ++c)
+    values(c) = InitialValues<dim>::value (p, c);
 }
 
 
@@ -279,7 +283,7 @@ double extract_p (const FEValuesBase<dim> &fe_values,
 
 
 template <int dim>
-double extract_s (const FEValuesBase<dim> &fe_values,
+double extract_T (const FEValuesBase<dim> &fe_values,
                   const unsigned int i,
                   const unsigned int q)
 {
@@ -290,7 +294,7 @@ double extract_s (const FEValuesBase<dim> &fe_values,
 
 template <int dim>
 Tensor<1,dim>
-extract_grad_s (const FEValuesBase<dim> &fe_values,
+extract_grad_T (const FEValuesBase<dim> &fe_values,
                 const unsigned int i,
                 const unsigned int q)
 {
@@ -397,7 +401,7 @@ BoussinesqFlowProblem<dim>::BoussinesqFlowProblem (const unsigned int degree)
                     FE_DGQ<dim>(degree), 1,
                     FE_DGQ<dim>(degree), 1),
                 dof_handler (triangulation),
-                n_refinement_steps (3),
+                n_refinement_steps (4),
                 time_step (0)
 {}
 
@@ -417,14 +421,14 @@ void BoussinesqFlowProblem<dim>::make_grid_and_dofs ()
   DoFTools::count_dofs_per_component (dof_handler, dofs_per_component);  
   const unsigned int n_u = dofs_per_component[0] * dim,
                      n_p = dofs_per_component[dim],
-                     n_s = dofs_per_component[dim+1];
+                     n_T = dofs_per_component[dim+1];
 
   std::cout << "Number of active cells: "
             << triangulation.n_active_cells()
             << std::endl
             << "Number of degrees of freedom: "
             << dof_handler.n_dofs()
-            << " (" << n_u << '+' << n_p << '+'<< n_s <<')'
+            << " (" << n_u << '+' << n_p << '+'<< n_T <<')'
             << std::endl
             << std::endl;
   
@@ -434,13 +438,13 @@ void BoussinesqFlowProblem<dim>::make_grid_and_dofs ()
   sparsity_pattern.reinit (3,3);
   sparsity_pattern.block(0,0).reinit (n_u, n_u, n_couplings);
   sparsity_pattern.block(1,0).reinit (n_p, n_u, n_couplings);
-  sparsity_pattern.block(2,0).reinit (n_s, n_u, n_couplings);
+  sparsity_pattern.block(2,0).reinit (n_T, n_u, n_couplings);
   sparsity_pattern.block(0,1).reinit (n_u, n_p, n_couplings);
   sparsity_pattern.block(1,1).reinit (n_p, n_p, n_couplings);
-  sparsity_pattern.block(2,1).reinit (n_s, n_p, n_couplings);
-  sparsity_pattern.block(0,2).reinit (n_u, n_s, n_couplings);
-  sparsity_pattern.block(1,2).reinit (n_p, n_s, n_couplings);
-  sparsity_pattern.block(2,2).reinit (n_s, n_s, n_couplings);
+  sparsity_pattern.block(2,1).reinit (n_T, n_p, n_couplings);
+  sparsity_pattern.block(0,2).reinit (n_u, n_T, n_couplings);
+  sparsity_pattern.block(1,2).reinit (n_p, n_T, n_couplings);
+  sparsity_pattern.block(2,2).reinit (n_T, n_T, n_couplings);
   
   sparsity_pattern.collect_sizes();
   
@@ -454,19 +458,19 @@ void BoussinesqFlowProblem<dim>::make_grid_and_dofs ()
   solution.reinit (3);
   solution.block(0).reinit (n_u);
   solution.block(1).reinit (n_p);
-  solution.block(2).reinit (n_s);
+  solution.block(2).reinit (n_T);
   solution.collect_sizes ();
   
   old_solution.reinit (3);
   old_solution.block(0).reinit (n_u);
   old_solution.block(1).reinit (n_p);
-  old_solution.block(2).reinit (n_s);
+  old_solution.block(2).reinit (n_T);
   old_solution.collect_sizes ();
   
   system_rhs.reinit (3);
   system_rhs.block(0).reinit (n_u);
   system_rhs.block(1).reinit (n_p);
-  system_rhs.block(2).reinit (n_s);
+  system_rhs.block(2).reinit (n_T);
   system_rhs.collect_sizes ();
 }
 
@@ -547,20 +551,20 @@ void BoussinesqFlowProblem<dim>::assemble_system ()
             const Tensor<2,dim> phi_i_grads_u= extract_grad_s_u (fe_values, i, q);
             const double        div_phi_i_u  = extract_div_u (fe_values, i, q);
             const double        phi_i_p      = extract_p (fe_values, i, q);
-            const double        phi_i_s      = extract_s (fe_values, i, q); 
-            const Tensor<1,dim> grad_phi_i_s = extract_grad_s(fe_values, i, q);
+            const double        phi_i_T      = extract_T (fe_values, i, q); 
+            const Tensor<1,dim> grad_phi_i_T = extract_grad_T(fe_values, i, q);
             
             for (unsigned int j=0; j<dofs_per_cell; ++j)
               {
                 const Tensor<2,dim> phi_j_grads_u     = extract_grad_s_u (fe_values, j, q);
                 const double        div_phi_j_u = extract_div_u (fe_values, j, q);
                 const double        phi_j_p     = extract_p (fe_values, j, q);
-                const double        phi_j_s     = extract_s (fe_values, j, q);
+                const double        phi_j_T     = extract_T (fe_values, j, q);
                 
                 local_matrix(i,j) += (scalar_product(phi_i_grads_u, phi_j_grads_u)
                                       - div_phi_i_u * phi_j_p
                                       - phi_i_p * div_phi_j_u
-                                      + phi_i_s * phi_j_s)
+                                      + phi_i_T * phi_j_T)
                                      * fe_values.JxW(q);     
               }
 
@@ -629,7 +633,7 @@ void BoussinesqFlowProblem<dim>::assemble_system ()
 
 
 template <int dim>
-void BoussinesqFlowProblem<dim>::assemble_rhs_S () 
+void BoussinesqFlowProblem<dim>::assemble_rhs_T () 
 {  
   QGauss<dim>   quadrature_formula(degree+2); 
   QGauss<dim-1> face_quadrature_formula(degree+2);  
@@ -654,10 +658,10 @@ void BoussinesqFlowProblem<dim>::assemble_rhs_S ()
   std::vector<Vector<double> > present_solution_values(n_q_points, Vector<double>(dim+2));
   std::vector<Vector<double> > present_solution_values_face(n_face_q_points, Vector<double>(dim+2));
 
-  std::vector<double> neighbor_saturation (n_face_q_points);
+  std::vector<double> neighbor_temperature (n_face_q_points);
   std::vector<unsigned int> local_dof_indices (dofs_per_cell);
 
-  SaturationBoundaryValues<dim> saturation_boundary_values;
+  TemperatureBoundaryValues<dim> temperature_boundary_values;
   
   typename DoFHandler<dim>::active_cell_iterator
     cell = dof_handler.begin_active(),
@@ -673,20 +677,20 @@ void BoussinesqFlowProblem<dim>::assemble_rhs_S ()
       for (unsigned int q=0; q<n_q_points; ++q) 
         for (unsigned int i=0; i<dofs_per_cell; ++i)
           {
-            const double old_s = old_solution_values[q](dim+1);
+            const double old_T = old_solution_values[q](dim+1);
             Tensor<1,dim> present_u;
             for (unsigned int d=0; d<dim; ++d)
               present_u[d] = present_solution_values[q](d);
 
-            const double        phi_i_s      = extract_s(fe_values, i, q);
-            const Tensor<1,dim> grad_phi_i_s = extract_grad_s(fe_values, i, q);
+            const double        phi_i_T      = extract_T(fe_values, i, q);
+            const Tensor<1,dim> grad_phi_i_T = extract_grad_T(fe_values, i, q);
                      
             local_rhs(i) += (time_step *
-                             old_s *
+                             old_T *
                              present_u *
-                             grad_phi_i_s
+                             grad_phi_i_T
                              +
-                             old_s * phi_i_s)
+                             old_T * phi_i_T)
                             *
                             fe_values.JxW(q);
           }
@@ -700,9 +704,9 @@ void BoussinesqFlowProblem<dim>::assemble_rhs_S ()
           fe_face_values.get_function_values (solution, present_solution_values_face);
 
           if (cell->at_boundary(face_no))
-            saturation_boundary_values
+            temperature_boundary_values
               .value_list (fe_face_values.get_quadrature_points(),
-                           neighbor_saturation);
+                           neighbor_temperature);
           else
             {
               const typename DoFHandler<dim>::active_cell_iterator
@@ -717,7 +721,7 @@ void BoussinesqFlowProblem<dim>::assemble_rhs_S ()
                                       old_solution_values_face_neighbor);
              
               for (unsigned int q=0; q<n_face_q_points; ++q)
-                neighbor_saturation[q] = old_solution_values_face_neighbor[q](dim+1);
+                neighbor_temperature[q] = old_solution_values_face_neighbor[q](dim+1);
             }
           
 
@@ -739,8 +743,8 @@ void BoussinesqFlowProblem<dim>::assemble_rhs_S ()
 				 ?
 				 old_solution_values_face[q](dim+1)
 				 :
-				 neighbor_saturation[q]) *
-                                extract_s(fe_face_values,i,q) *
+				 neighbor_temperature[q]) *
+                                extract_T(fe_face_values,i,q) *
                                 fe_face_values.JxW(q);
             }
         }
@@ -806,7 +810,7 @@ void BoussinesqFlowProblem<dim>::solve ()
   time_step = std::pow(0.5, double(n_refinement_steps)) /
               std::max(get_maximal_velocity(),1.);
 
-  assemble_rhs_S ();
+  assemble_rhs_T ();
   {
     
     SolverControl solver_control (system_matrix.block(2,2).m(),
@@ -825,11 +829,11 @@ void BoussinesqFlowProblem<dim>::solve ()
       }
 	
                 
-    project_back_saturation ();
+    project_back_temperature ();
         
     std::cout << "   "
               << solver_control.last_step()
-              << " CG iterations for saturation."
+              << " CG iterations for temperature."
               << std::endl;             
   } 
 
@@ -852,7 +856,7 @@ void BoussinesqFlowProblem<dim>::output_results ()  const
             solution_names.push_back ("u");
             solution_names.push_back ("v");
             solution_names.push_back ("p");
-            solution_names.push_back ("S");
+            solution_names.push_back ("T");
             break;
             
       case 3:
@@ -860,7 +864,7 @@ void BoussinesqFlowProblem<dim>::output_results ()  const
             solution_names.push_back ("v");
             solution_names.push_back ("w");
             solution_names.push_back ("p");
-            solution_names.push_back ("S");
+            solution_names.push_back ("T");
             break;
             
       default:
@@ -886,7 +890,7 @@ void BoussinesqFlowProblem<dim>::output_results ()  const
 
 template <int dim>
 void
-BoussinesqFlowProblem<dim>::project_back_saturation ()
+BoussinesqFlowProblem<dim>::project_back_temperature ()
 {
   for (unsigned int i=0; i<solution.block(2).size(); ++i)
     if (solution.block(2)(i) < 0)
