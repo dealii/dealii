@@ -4404,10 +4404,10 @@ namespace hp
 
                                          // Check for each cell, if it
                                          // has children.
-	transform (tria.levels[i]->cells.children.begin (),
-		   tria.levels[i]->cells.children.end (),
-		   has_children_level->begin (),
-		   std::bind2nd (std::not_equal_to<int>(), -1));
+	std::transform (tria.levels[i]->cells.children.begin (),
+			tria.levels[i]->cells.children.end (),
+			has_children_level->begin (),
+			std::bind2nd (std::not_equal_to<int>(), -1));
 
 	has_children.push_back (has_children_level);
       }
