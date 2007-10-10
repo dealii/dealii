@@ -295,14 +295,6 @@ namespace
 		      const unsigned int x_offset,
 		      const unsigned int y_offset,
 		      const unsigned int z_offset);
-
-				       /**
-					* Write a complete set of
-					* data for a single node.
-					*/
-      template<typename data>
-      void write_dataset(unsigned int index,
-			 const std::vector<data>& values);
 	
 				       /**
 					* Forwarding of output stream
@@ -381,14 +373,6 @@ namespace
 		      const unsigned int x_offset,
 		      const unsigned int y_offset,
 		      const unsigned int z_offset);
-
-				       /**
-					* Write a complete set of
-					* data for a single node.
-					*/
-      template<typename data>
-      void write_dataset(unsigned int index,
-			 const std::vector<data>& values);
 	
 				       /**
 					* Forwarding of output stream
@@ -543,14 +527,6 @@ namespace
 		      const unsigned int x_offset,
 		      const unsigned int y_offset,
 		      const unsigned int z_offset);
-	
-				       /**
-					* Write a complete set of
-					* data for a single node.
-					*/
-      template<typename data>
-      void write_dataset(unsigned int index,
-			 const std::vector<data>& values);
 	
 				       /**
 					* Forwarding of output stream
@@ -718,16 +694,6 @@ namespace
   }
 
 
-  template<typename data>
-  inline
-  void
-  GmvStream::write_dataset(unsigned int,
-			   const std::vector<data>& values)
-  {
-    Assert (false, ExcInternalError());
-  }
-
-
 
 //----------------------------------------------------------------------//
 
@@ -775,16 +741,6 @@ namespace
 	  }
       }
     stream << '\n';
-  }
-
-
-  template<typename data>
-  inline
-  void
-  TecplotStream::write_dataset(unsigned int,
-			       const std::vector<data>& values)
-  {
-    Assert (false, ExcInternalError());
   }
 
 
@@ -912,18 +868,6 @@ namespace
 		   << '\t' << start+d3+d2;
 	  }
       }
-    stream << '\n';
-  }
-
-
-  template<typename data>
-  inline
-  void
-  VtkStream::write_dataset(unsigned int,
-			   const std::vector<data>& values)
-  {
-    for (unsigned int i=0;i<values.size();++i)
-      stream << '\t' << values[i];
     stream << '\n';
   }
 
