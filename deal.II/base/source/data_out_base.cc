@@ -831,30 +831,30 @@ default_suffix (const OutputFormat output_format)
   switch (output_format) 
     {
       case none:
-	return "";
+	    return "";
       case dx:
-	return ".dx";
+	    return ".dx";
       case ucd:
-	return ".inp"; 
+	    return ".inp"; 
       case gnuplot: 
-	return ".gnuplot";
+	    return ".gnuplot";
       case povray: 
-	return ".pov";
+	    return ".pov";
       case eps: 
-	return ".eps";
+	    return ".eps";
       case gmv:
-	return ".gmv";
+	    return ".gmv";
       case tecplot:
-	return ".dat";
+	    return ".dat";
       case tecplot_binary:
-	return ".plt";
+	    return ".plt";
       case vtk:
-	return ".vtk"; 
+	    return ".vtk"; 
       case deal_II_intermediate:
-	return ".d2";
+	    return ".d2";
       default: 
-	Assert (false, ExcNotImplemented()); 
-	return "";
+	    Assert (false, ExcNotImplemented()); 
+	    return "";
     }
 }
 
@@ -961,7 +961,7 @@ DataOutBase::GmvStream::GmvStream(std::ostream& out, DataOutBase::GmvFlags f)
 template<int dim>
 void
 DataOutBase::GmvStream::write (const unsigned int,
-			      const Point<dim>& p)
+			       const Point<dim>& p)
 {
   Assert(selected_component != deal_II_numbers::invalid_unsigned_int,
 	 ExcNotInitialized());
@@ -1005,7 +1005,7 @@ template<typename data>
 inline
 void
 DataOutBase::GmvStream::write_dataset(unsigned int,
-				     const std::vector<data>& values)
+				      const std::vector<data>& values)
 {
 }
 
@@ -1023,7 +1023,7 @@ DataOutBase::TecplotStream::TecplotStream(std::ostream& out, DataOutBase::Tecplo
 template<int dim>
 void
 DataOutBase::TecplotStream::write (const unsigned int,
-			      const Point<dim>& p)
+				   const Point<dim>& p)
 {
   Assert(selected_component != deal_II_numbers::invalid_unsigned_int,
 	 ExcNotInitialized());
@@ -1064,7 +1064,7 @@ template<typename data>
 inline
 void
 DataOutBase::TecplotStream::write_dataset(unsigned int,
-				     const std::vector<data>& values)
+					  const std::vector<data>& values)
 {
 }
 
@@ -1084,7 +1084,7 @@ DataOutBase::UcdStream::write (const unsigned int index,
 			       const Point<dim>& p)
 {
   stream << index+1
-      << "   ";
+	 << "   ";
 				   // write out coordinates
   for (unsigned int i=0; i<dim; ++i)
     stream << p(i) << ' ';
@@ -1161,7 +1161,7 @@ DataOutBase::VtkStream::write (const unsigned int,
 			       const Point<dim>& p)
 {
 				   // write out coordinates
-    stream << p;
+  stream << p;
 				   // fill with zeroes
   for (unsigned int i=dim; i<3; ++i)
     stream << " 0";
@@ -1417,7 +1417,7 @@ void DataOutBase::write_ucd (const std::vector<Patch<dim,spacedim> > &patches,
   
 				   // assert the stream is still ok
   AssertThrow (out, ExcIO());
-    }
+}
 
 
 template <int dim, int spacedim>
@@ -1538,9 +1538,9 @@ void DataOutBase::write_dx (const std::vector<Patch<dim,spacedim> > &patches,
 		      out << '\t'
 			  << patch_start+nx-dx+ny+nz;
 		    }
-						       // Direction +x
-						       // First cell in row
-						       // of other patch
+						   // Direction +x
+						   // First cell in row
+						   // of other patch
 		  if (i1 == n-1)
 		    {
 		      const unsigned int nn = patch->neighbors[1];
@@ -1758,7 +1758,11 @@ void DataOutBase::write_gnuplot (const std::vector<Patch<dim,spacedim> > &patche
       
       Assert ((patch->data.n_rows() == n_data_sets && !patch->points_are_available) ||
 	      (patch->data.n_rows() == n_data_sets+spacedim && patch->points_are_available),
-	      ExcDimensionMismatch (patch->points_are_available ? (patch->data.n_rows() + spacedim) : patch->data.n_rows(), n_data_sets));
+	      ExcDimensionMismatch (patch->points_are_available
+				    ?
+				    (patch->data.n_rows() + spacedim)
+				    :
+				    patch->data.n_rows(), n_data_sets));
       Assert (patch->data.n_cols() == Utilities::fixed_power<dim>(n),
 	      ExcInvalidDatasetSize (patch->data.n_cols(), n_subdivisions+1));
 
@@ -2298,31 +2302,31 @@ void DataOutBase::write_eps (const std::vector<Patch<dim,spacedim> > &patches,
 	    switch (spacedim)
 	      {
 		case 2:
-		  Assert ((flags.height_vector < patch->data.n_rows()) ||
-			  patch->data.n_rows() == 0,
-			  ExcIndexRange (flags.height_vector, 0,
-					 patch->data.n_rows()));
-		  heights[0] = patch->data.n_rows() != 0 ?
-			       patch->data(flags.height_vector,i1*d1 + i2*d2) * flags.z_scaling
-			       : 0;
-		  heights[1] = patch->data.n_rows() != 0 ?
-			       patch->data(flags.height_vector,(i1+1)*d1 + i2*d2) * flags.z_scaling
-			       : 0;		  
-		  heights[2] = patch->data.n_rows() != 0 ?
-			       patch->data(flags.height_vector,i1*d1 + (i2+1)*d2) * flags.z_scaling
-			       : 0;
-		  heights[3] = patch->data.n_rows() != 0 ?
-			       patch->data(flags.height_vector,(i1+1)*d1 + (i2+1)*d2) * flags.z_scaling
-			       : 0;
+		      Assert ((flags.height_vector < patch->data.n_rows()) ||
+			      patch->data.n_rows() == 0,
+			      ExcIndexRange (flags.height_vector, 0,
+					     patch->data.n_rows()));
+		      heights[0] = patch->data.n_rows() != 0 ?
+				   patch->data(flags.height_vector,i1*d1 + i2*d2) * flags.z_scaling
+				   : 0;
+		      heights[1] = patch->data.n_rows() != 0 ?
+				   patch->data(flags.height_vector,(i1+1)*d1 + i2*d2) * flags.z_scaling
+				   : 0;		  
+		      heights[2] = patch->data.n_rows() != 0 ?
+				   patch->data(flags.height_vector,i1*d1 + (i2+1)*d2) * flags.z_scaling
+				   : 0;
+		      heights[3] = patch->data.n_rows() != 0 ?
+				   patch->data(flags.height_vector,(i1+1)*d1 + (i2+1)*d2) * flags.z_scaling
+				   : 0;
 		  
-		  break;
+		      break;
 		case 3:
-						   // Copy z-coordinates into the height vector
-		  for (unsigned int i=0;i<4;++i)
-		    heights[i] = points[i](2);
-		  break;
+						       // Copy z-coordinates into the height vector
+		      for (unsigned int i=0;i<4;++i)
+			heights[i] = points[i](2);
+		      break;
 		default:
-		  Assert(false, ExcNotImplemented());
+		      Assert(false, ExcNotImplemented());
 	      }
 	    
 	    
@@ -2882,9 +2886,9 @@ void DataOutBase::write_tecplot (const std::vector<Patch<dim,spacedim> > &patche
 #ifdef DEAL_II_HAVE_TECPLOT
 
 #ifdef DEAL_II_ANON_NAMESPACE_BOGUS_WARNING
-  namespace TEC
+namespace TEC
 #else
-  namespace
+namespace
 #endif
 {
   class TecplotMacros
@@ -3019,8 +3023,8 @@ void DataOutBase::write_tecplot_binary (const std::vector<Patch<dim,spacedim> > 
   unsigned int n_nodes;
   unsigned int n_cells;
   compute_sizes<dim,spacedim>(patches, n_nodes, n_cells);
-                                    // local variables only needed to write Tecplot
-                                    // binary output files  
+				   // local variables only needed to write Tecplot
+				   // binary output files  
   const unsigned int vars_per_node  = (spacedim+n_data_sets),  
                      nodes_per_cell = GeometryInfo<dim>::vertices_per_cell;
   
@@ -3052,27 +3056,27 @@ void DataOutBase::write_tecplot_binary (const std::vector<Patch<dim,spacedim> > 
       tec_var_names += " ";
       tec_var_names += data_names[data_set];
     }
-				    // in Tecplot FEBLOCK format the vertex
-				    // coordinates and the data have an
-				    // order that is a bit unpleasant
-				    // (first all x coordinates, then
-				    // all y coordinate, ...; first all
-				    // data of variable 1, then
-				    // variable 2, etc), so we have to
-				    // copy the data vectors a bit around
-				    //
-				    // note that we copy vectors when
-				    // looping over the patches since we
-				    // have to write them one variable
-				    // at a time and don't want to use
-				    // more than one loop
-				    //
-				    // this copying of data vectors can
-				    // be done while we already output
-				    // the vertices, so do this on a
-				    // separate thread and when wanting
-				    // to write out the data, we wait
-				    // for that thread to finish  
+				   // in Tecplot FEBLOCK format the vertex
+				   // coordinates and the data have an
+				   // order that is a bit unpleasant
+				   // (first all x coordinates, then
+				   // all y coordinate, ...; first all
+				   // data of variable 1, then
+				   // variable 2, etc), so we have to
+				   // copy the data vectors a bit around
+				   //
+				   // note that we copy vectors when
+				   // looping over the patches since we
+				   // have to write them one variable
+				   // at a time and don't want to use
+				   // more than one loop
+				   //
+				   // this copying of data vectors can
+				   // be done while we already output
+				   // the vertices, so do this on a
+				   // separate thread and when wanting
+				   // to write out the data, we wait
+				   // for that thread to finish  
   Table<2,double> data_vectors (n_data_sets, n_nodes);
 
   void (*fun_ptr) (const std::vector<Patch<dim,spacedim> > &,
@@ -3080,202 +3084,202 @@ void DataOutBase::write_tecplot_binary (const std::vector<Patch<dim,spacedim> > 
     = &DataOutBase::template write_gmv_reorder_data_vectors<dim,spacedim>;
   Threads::Thread<> reorder_thread = Threads::spawn (fun_ptr)(patches, data_vectors);
   
-				    ///////////////////////////////
-				    // first make up a list of used
-				    // vertices along with their
-				    // coordinates  
+				   ///////////////////////////////
+				   // first make up a list of used
+				   // vertices along with their
+				   // coordinates  
   for (unsigned int d=1; d<=spacedim; ++d)
-     {       
-       unsigned int entry=0;
+    {       
+      unsigned int entry=0;
        
-       for (typename std::vector<Patch<dim,spacedim> >::const_iterator patch=patches.begin();
-	    patch!=patches.end(); ++patch)
-	 {
-	   const unsigned int n_subdivisions = patch->n_subdivisions;
+      for (typename std::vector<Patch<dim,spacedim> >::const_iterator patch=patches.begin();
+	   patch!=patches.end(); ++patch)
+	{
+	  const unsigned int n_subdivisions = patch->n_subdivisions;
 	  
-	   switch (dim)
-	     {
-	       case 2:
-	       {
-		 for (unsigned int j=0; j<n_subdivisions+1; ++j)
-		   for (unsigned int i=0; i<n_subdivisions+1; ++i)
-		     {
-		       const double x_frac = i * 1./n_subdivisions,
-				    y_frac = j * 1./n_subdivisions;
+	  switch (dim)
+	    {
+	      case 2:
+	      {
+		for (unsigned int j=0; j<n_subdivisions+1; ++j)
+		  for (unsigned int i=0; i<n_subdivisions+1; ++i)
+		    {
+		      const double x_frac = i * 1./n_subdivisions,
+				   y_frac = j * 1./n_subdivisions;
 		      
-		       tm.nd((d-1),entry) = static_cast<float>(
-			 (((patch->vertices[1](d-1) * x_frac) +
-			   (patch->vertices[0](d-1) * (1-x_frac))) * (1-y_frac) +
-			  ((patch->vertices[3](d-1) * x_frac) +
-			   (patch->vertices[2](d-1) * (1-x_frac))) * y_frac)
-		       );
-		       entry++;
-		     }
-		 break;
-	       }
+		      tm.nd((d-1),entry) = static_cast<float>(
+			(((patch->vertices[1](d-1) * x_frac) +
+			  (patch->vertices[0](d-1) * (1-x_frac))) * (1-y_frac) +
+			 ((patch->vertices[3](d-1) * x_frac) +
+			  (patch->vertices[2](d-1) * (1-x_frac))) * y_frac)
+		      );
+		      entry++;
+		    }
+		break;
+	      }
 	      
-	       case 3:
-	       {
-		 for (unsigned int j=0; j<n_subdivisions+1; ++j)
-		   for (unsigned int k=0; k<n_subdivisions+1; ++k)
-		     for (unsigned int i=0; i<n_subdivisions+1; ++i)
-		       {
-			 const double x_frac = i * 1./n_subdivisions,
-				      y_frac = k * 1./n_subdivisions,
-				      z_frac = j * 1./n_subdivisions;
+	      case 3:
+	      {
+		for (unsigned int j=0; j<n_subdivisions+1; ++j)
+		  for (unsigned int k=0; k<n_subdivisions+1; ++k)
+		    for (unsigned int i=0; i<n_subdivisions+1; ++i)
+		      {
+			const double x_frac = i * 1./n_subdivisions,
+				     y_frac = k * 1./n_subdivisions,
+				     z_frac = j * 1./n_subdivisions;
 			
-							  // compute coordinates for
-							  // this patch point
-			 tm.nd((d-1),entry) = static_cast<float>(
-			   ((((patch->vertices[1](d-1) * x_frac) +
-			      (patch->vertices[0](d-1) * (1-x_frac))) * (1-y_frac) +
-			     ((patch->vertices[3](d-1) * x_frac) +
-			      (patch->vertices[2](d-1) * (1-x_frac))) * y_frac)   * (1-z_frac) +
-			    (((patch->vertices[5](d-1) * x_frac) +
-			      (patch->vertices[4](d-1) * (1-x_frac))) * (1-y_frac) +
-			     ((patch->vertices[7](d-1) * x_frac) +
-			      (patch->vertices[6](d-1) * (1-x_frac))) * y_frac)   * z_frac)
-			 );
-			 entry++;
-		       }
-		 break;
-	       }
+							 // compute coordinates for
+							 // this patch point
+			tm.nd((d-1),entry) = static_cast<float>(
+			  ((((patch->vertices[1](d-1) * x_frac) +
+			     (patch->vertices[0](d-1) * (1-x_frac))) * (1-y_frac) +
+			    ((patch->vertices[3](d-1) * x_frac) +
+			     (patch->vertices[2](d-1) * (1-x_frac))) * y_frac)   * (1-z_frac) +
+			   (((patch->vertices[5](d-1) * x_frac) +
+			     (patch->vertices[4](d-1) * (1-x_frac))) * (1-y_frac) +
+			    ((patch->vertices[7](d-1) * x_frac) +
+			     (patch->vertices[6](d-1) * (1-x_frac))) * y_frac)   * z_frac)
+			);
+			entry++;
+		      }
+		break;
+	      }
 	      
-	       default:
-		     Assert (false, ExcNotImplemented());
-	     }
-	 }
-     }
+	      default:
+		    Assert (false, ExcNotImplemented());
+	    }
+	}
+    }
 
 
-				    ///////////////////////////////////////
-				    // data output.
-				    //
-   reorder_thread.join ();
+				   ///////////////////////////////////////
+				   // data output.
+				   //
+  reorder_thread.join ();
 
-				    // then write data.
-   for (unsigned int data_set=0; data_set<n_data_sets; ++data_set)
-     for (unsigned int entry=0; entry<data_vectors[data_set].size(); entry++)
-       tm.nd((spacedim+data_set),entry) = static_cast<float>(data_vectors[data_set][entry]);
+				   // then write data.
+  for (unsigned int data_set=0; data_set<n_data_sets; ++data_set)
+    for (unsigned int entry=0; entry<data_vectors[data_set].size(); entry++)
+      tm.nd((spacedim+data_set),entry) = static_cast<float>(data_vectors[data_set][entry]);
 
 
 
   
-				    /////////////////////////////////
-				    // now for the cells. note that
-				    // vertices are counted from 1 onwards
-   unsigned int first_vertex_of_patch = 0;
-   unsigned int elem=0;
+				   /////////////////////////////////
+				   // now for the cells. note that
+				   // vertices are counted from 1 onwards
+  unsigned int first_vertex_of_patch = 0;
+  unsigned int elem=0;
       
-   for (typename std::vector<Patch<dim,spacedim> >::const_iterator patch=patches.begin();
-	patch!=patches.end(); ++patch)
-     {
-       const unsigned int n_subdivisions = patch->n_subdivisions;
-       const unsigned int n = n_subdivisions+1;
-       const unsigned int d1=1;
-       const unsigned int d2=n;
-       const unsigned int d3=n*n;
-					// write out the cells making
-					// up this patch
-       switch (dim)
-	 {
-	   case 2:
-	   {
-	     for (unsigned int i2=0; i2<n_subdivisions; ++i2)
-	       for (unsigned int i1=0; i1<n_subdivisions; ++i1)
-		 {
-		   tm.cd(0,elem) = first_vertex_of_patch+(i1  )*d1+(i2  )*d2+1;
-		   tm.cd(1,elem) = first_vertex_of_patch+(i1+1)*d1+(i2  )*d2+1;
-		   tm.cd(2,elem) = first_vertex_of_patch+(i1+1)*d1+(i2+1)*d2+1;
-		   tm.cd(3,elem) = first_vertex_of_patch+(i1  )*d1+(i2+1)*d2+1;
+  for (typename std::vector<Patch<dim,spacedim> >::const_iterator patch=patches.begin();
+       patch!=patches.end(); ++patch)
+    {
+      const unsigned int n_subdivisions = patch->n_subdivisions;
+      const unsigned int n = n_subdivisions+1;
+      const unsigned int d1=1;
+      const unsigned int d2=n;
+      const unsigned int d3=n*n;
+				       // write out the cells making
+				       // up this patch
+      switch (dim)
+	{
+	  case 2:
+	  {
+	    for (unsigned int i2=0; i2<n_subdivisions; ++i2)
+	      for (unsigned int i1=0; i1<n_subdivisions; ++i1)
+		{
+		  tm.cd(0,elem) = first_vertex_of_patch+(i1  )*d1+(i2  )*d2+1;
+		  tm.cd(1,elem) = first_vertex_of_patch+(i1+1)*d1+(i2  )*d2+1;
+		  tm.cd(2,elem) = first_vertex_of_patch+(i1+1)*d1+(i2+1)*d2+1;
+		  tm.cd(3,elem) = first_vertex_of_patch+(i1  )*d1+(i2+1)*d2+1;
 		   
-		   elem++;
-		 }
-	     break;
-	   }
+		  elem++;
+		}
+	    break;
+	  }
 	      
-	   case 3:
-	   {
-	     for (unsigned int i3=0; i3<n_subdivisions; ++i3)
-	       for (unsigned int i2=0; i2<n_subdivisions; ++i2)
-		 for (unsigned int i1=0; i1<n_subdivisions; ++i1)
-		   {
-						      // note: vertex indices start with 1!
+	  case 3:
+	  {
+	    for (unsigned int i3=0; i3<n_subdivisions; ++i3)
+	      for (unsigned int i2=0; i2<n_subdivisions; ++i2)
+		for (unsigned int i1=0; i1<n_subdivisions; ++i1)
+		  {
+						     // note: vertex indices start with 1!
 
 		     
-		     tm.cd(0,elem) = first_vertex_of_patch+(i1  )*d1+(i2  )*d2+(i3  )*d3+1;
-		     tm.cd(1,elem) = first_vertex_of_patch+(i1+1)*d1+(i2  )*d2+(i3  )*d3+1;
-		     tm.cd(2,elem) = first_vertex_of_patch+(i1+1)*d1+(i2+1)*d2+(i3  )*d3+1;
-		     tm.cd(3,elem) = first_vertex_of_patch+(i1  )*d1+(i2+1)*d2+(i3  )*d3+1;
-		     tm.cd(4,elem) = first_vertex_of_patch+(i1  )*d1+(i2  )*d2+(i3+1)*d3+1;
-		     tm.cd(5,elem) = first_vertex_of_patch+(i1+1)*d1+(i2  )*d2+(i3+1)*d3+1;
-		     tm.cd(6,elem) = first_vertex_of_patch+(i1+1)*d1+(i2+1)*d2+(i3+1)*d3+1;
-		     tm.cd(7,elem) = first_vertex_of_patch+(i1  )*d1+(i2+1)*d2+(i3+1)*d3+1;
+		    tm.cd(0,elem) = first_vertex_of_patch+(i1  )*d1+(i2  )*d2+(i3  )*d3+1;
+		    tm.cd(1,elem) = first_vertex_of_patch+(i1+1)*d1+(i2  )*d2+(i3  )*d3+1;
+		    tm.cd(2,elem) = first_vertex_of_patch+(i1+1)*d1+(i2+1)*d2+(i3  )*d3+1;
+		    tm.cd(3,elem) = first_vertex_of_patch+(i1  )*d1+(i2+1)*d2+(i3  )*d3+1;
+		    tm.cd(4,elem) = first_vertex_of_patch+(i1  )*d1+(i2  )*d2+(i3+1)*d3+1;
+		    tm.cd(5,elem) = first_vertex_of_patch+(i1+1)*d1+(i2  )*d2+(i3+1)*d3+1;
+		    tm.cd(6,elem) = first_vertex_of_patch+(i1+1)*d1+(i2+1)*d2+(i3+1)*d3+1;
+		    tm.cd(7,elem) = first_vertex_of_patch+(i1  )*d1+(i2+1)*d2+(i3+1)*d3+1;
 		     
-		     elem++;
-		   }
-	     break;
-	   }
+		    elem++;
+		  }
+	    break;
+	  }
 
-	   default:
-		 Assert (false, ExcNotImplemented());
-	 }
-
-
-					// finally update the number
-					// of the first vertex of this patch
-       first_vertex_of_patch += Utilities::fixed_power<dim>(n);
-     }
+	  default:
+		Assert (false, ExcNotImplemented());
+	}
 
 
-   {     
-     int ierr      = 0,
-         num_nodes = static_cast<int>(n_nodes),
-         num_cells = static_cast<int>(n_cells);
+				       // finally update the number
+				       // of the first vertex of this patch
+      first_vertex_of_patch += Utilities::fixed_power<dim>(n);
+    }
 
-     char dot[2] = {'.', 0};
-				      // Unfortunately, TECINI takes a
-				      // char *, but c_str() gives a
-				      // const char *.  As we don't do
-				      // anything else with
-				      // tec_var_names following
-				      // const_cast is ok
-     char *var_names=const_cast<char *> (tec_var_names.c_str());
-     ierr = TECINI (NULL,
-		    var_names,
-		    file_name,
-		    dot,
-		    &tec_debug,
-		    &is_double);
-     
-     Assert (ierr == 0, ExcErrorOpeningTecplotFile(file_name));
 
-     char FEBLOCK[] = {'F','E','B','L','O','C','K',0};
-     ierr = TECZNE (NULL,
-		    &num_nodes,
-		    &num_cells,
-		    &cell_type,
-		    FEBLOCK,
-		    NULL);
-     
-     Assert (ierr == 0, ExcTecplotAPIError());
-     
-     int total = (vars_per_node*num_nodes);
+  {     
+    int ierr      = 0,
+	num_nodes = static_cast<int>(n_nodes),
+	num_cells = static_cast<int>(n_cells);
 
-     ierr = TECDAT (&total,
-		    &tm.nodalData[0],
-		    &is_double);
+    char dot[2] = {'.', 0};
+				     // Unfortunately, TECINI takes a
+				     // char *, but c_str() gives a
+				     // const char *.  As we don't do
+				     // anything else with
+				     // tec_var_names following
+				     // const_cast is ok
+    char *var_names=const_cast<char *> (tec_var_names.c_str());
+    ierr = TECINI (NULL,
+		   var_names,
+		   file_name,
+		   dot,
+		   &tec_debug,
+		   &is_double);
      
-     Assert (ierr == 0, ExcTecplotAPIError());
+    Assert (ierr == 0, ExcErrorOpeningTecplotFile(file_name));
+
+    char FEBLOCK[] = {'F','E','B','L','O','C','K',0};
+    ierr = TECZNE (NULL,
+		   &num_nodes,
+		   &num_cells,
+		   &cell_type,
+		   FEBLOCK,
+		   NULL);
      
-     ierr = TECNOD (&tm.connData[0]);
+    Assert (ierr == 0, ExcTecplotAPIError());
      
-     Assert (ierr == 0, ExcTecplotAPIError());
+    int total = (vars_per_node*num_nodes);
+
+    ierr = TECDAT (&total,
+		   &tm.nodalData[0],
+		   &is_double);
      
-     ierr = TECEND ();
+    Assert (ierr == 0, ExcTecplotAPIError());
      
-     Assert (ierr == 0, ExcTecplotAPIError());     
-   }
+    ierr = TECNOD (&tm.connData[0]);
+     
+    Assert (ierr == 0, ExcTecplotAPIError());
+     
+    ierr = TECEND ();
+     
+    Assert (ierr == 0, ExcTecplotAPIError());     
+  }
 #endif
 }
 
@@ -3375,9 +3379,9 @@ void DataOutBase::write_vtk (const std::vector<Patch<dim,spacedim> > &patches,
       << '\n';
   write_cells(patches, vtk_out);
   out << '\n';
-				       // next output the types of the
-				       // cells. since all cells are
-				       // the same, this is simple
+				   // next output the types of the
+				   // cells. since all cells are
+				   // the same, this is simple
   out << "CELL_TYPES " << n_cells << '\n';
   for (unsigned int i=0; i<n_cells; ++i)
     out << ' ' << vtk_cell_type[dim];
@@ -3640,50 +3644,50 @@ DataOutInterface<dim,spacedim>::write (std::ostream &out,
   switch (output_format) 
     {
       case none:
-	break;
+	    break;
 	
       case dx:
-	write_dx (out);
-	break;
+	    write_dx (out);
+	    break;
 	    
       case ucd:
-	write_ucd (out);
-	break;
+	    write_ucd (out);
+	    break;
 	    
       case gnuplot:
-	write_gnuplot (out);
-	break;
+	    write_gnuplot (out);
+	    break;
 	    
       case povray:
-	write_povray (out);
-	break;
+	    write_povray (out);
+	    break;
 	    
       case eps:
-	write_eps(out);
-	break;
+	    write_eps(out);
+	    break;
 	    
       case gmv:
-	write_gmv (out);
-	break;
+	    write_gmv (out);
+	    break;
 	    
       case tecplot:
-	write_tecplot (out);
-	break;
+	    write_tecplot (out);
+	    break;
 	    
       case tecplot_binary:
-	write_tecplot_binary (out);
-	break;
+	    write_tecplot_binary (out);
+	    break;
 	    
       case vtk:
-	write_vtk (out);
-	break;
+	    write_vtk (out);
+	    break;
 
       case deal_II_intermediate:
-	write_deal_II_intermediate (out);
-	break;
+	    write_deal_II_intermediate (out);
+	    break;
 	    
       default:
-	Assert (false, ExcNotImplemented());
+	    Assert (false, ExcNotImplemented());
     }
 }
 
