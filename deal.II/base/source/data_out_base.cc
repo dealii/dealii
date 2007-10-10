@@ -194,12 +194,16 @@ namespace
 					* persistent values for
 					* later use.
 					*/
-      DXStream (std::ostream& stream, DataOutBase::DXFlags flags);
+      DXStream (std::ostream& stream,
+		const DataOutBase::DXFlags flags);
+
 				       /**
 					* Output operator for points.
 					*/
       template <int dim>
-      void write(const unsigned int index, const Point<dim>&);
+      void write_point (const unsigned int index,
+			const Point<dim>&);
+
 				       /**
 					* Write dim-dimensional cell
 					* with first vertex at
@@ -218,25 +222,32 @@ namespace
 					* </ol>
 					*/
       template <int dim>
-      void write_cell(const unsigned int index,
-		      const unsigned int start,
-		      const unsigned int x_offset,
-		      const unsigned int y_offset,
-		      const unsigned int z_offset);
+      void write_cell (const unsigned int index,
+		       const unsigned int start,
+		       const unsigned int x_offset,
+		       const unsigned int y_offset,
+		       const unsigned int z_offset);
 
 				       /**
 					* Write a complete set of
 					* data for a single node.
+					*
+					* The index given as first
+					* argument indicates the
+					* number of a data set, as
+					* some output formats require
+					* this number to be printed.
 					*/
       template<typename data>
-      void write_dataset(unsigned int index,
-			 const std::vector<data>& values);
+      void write_dataset (const unsigned int       index,
+			  const std::vector<data>& values);
 	
 				       /**
 					* Forwarding of output stream
 					*/
       template <typename T>
       std::ostream& operator<< (const T&);
+
     private:
 				       /**
 					* The ostream to use. Since
@@ -246,10 +257,11 @@ namespace
 					* technique.
 					*/
       std::ostream& stream;
+
 				       /**
 					* The flags controlling the output
 					*/
-      DataOutBase::DXFlags flags;
+      const DataOutBase::DXFlags flags;
   };
     
 				   /**
@@ -266,12 +278,16 @@ namespace
 					* persistent values for
 					* later use.
 					*/
-      GmvStream (std::ostream& stream, DataOutBase::GmvFlags flags);
+      GmvStream (std::ostream& stream,
+		 const DataOutBase::GmvFlags flags);
+
 				       /**
 					* Output operator for points.
 					*/
       template <int dim>
-      void write(const unsigned int index, const Point<dim>&);
+      void write_point (const unsigned int index,
+			const Point<dim>&);
+
 				       /**
 					* Write dim-dimensional cell
 					* with first vertex at
@@ -301,6 +317,7 @@ namespace
 					*/
       template <typename T>
       std::ostream& operator<< (const T&);
+
 				       /**
 					* Since GMV reads the x, y
 					* and z coordinates in
@@ -324,10 +341,11 @@ namespace
 					* technique.
 					*/
       std::ostream& stream;
+
 				       /**
 					* The flags controlling the output
 					*/
-      DataOutBase::GmvFlags flags;
+      const DataOutBase::GmvFlags flags;
   };
     
 				   /**
@@ -344,12 +362,15 @@ namespace
 					* persistent values for
 					* later use.
 					*/
-      TecplotStream (std::ostream& stream, DataOutBase::TecplotFlags flags);
+      TecplotStream (std::ostream& stream, const DataOutBase::TecplotFlags flags);
+
 				       /**
 					* Output operator for points.
 					*/
       template <int dim>
-      void write(const unsigned int index, const Point<dim>&);
+      void write_point (const unsigned int index,
+			const Point<dim>&);
+
 				       /**
 					* Write dim-dimensional cell
 					* with first vertex at
@@ -379,6 +400,7 @@ namespace
 					*/
       template <typename T>
       std::ostream& operator<< (const T&);
+
 				       /**
 					* Since TECPLOT reads the x, y
 					* and z coordinates in
@@ -402,10 +424,11 @@ namespace
 					* technique.
 					*/
       std::ostream& stream;
+
 				       /**
 					* The flags controlling the output
 					*/
-      DataOutBase::TecplotFlags flags;
+      const DataOutBase::TecplotFlags flags;
   };
     
 				   /**
@@ -422,12 +445,16 @@ namespace
 					* persistent values for
 					* later use.
 					*/
-      UcdStream (std::ostream& stream, DataOutBase::UcdFlags flags);
+      UcdStream (std::ostream& stream,
+		 const DataOutBase::UcdFlags flags);
+
 				       /**
 					* Output operator for points.
 					*/
       template <int dim>
-      void write(const unsigned int index, const Point<dim>&);
+      void write_point (const unsigned int index,
+			const Point<dim>&);
+
 				       /**
 					* Write dim-dimensional cell
 					* with first vertex at
@@ -459,10 +486,16 @@ namespace
 				       /**
 					* Write a complete set of
 					* data for a single node.
+					*
+					* The index given as first
+					* argument indicates the
+					* number of a data set, as
+					* some output formats require
+					* this number to be printed.
 					*/
       template<typename data>
-      void write_dataset(unsigned int index,
-			 const std::vector<data>& values);
+      void write_dataset (const unsigned int       index,
+			  const std::vector<data> &values);
 	
 				       /**
 					* Forwarding of output stream
@@ -478,10 +511,11 @@ namespace
 					* technique.
 					*/
       std::ostream& stream;
+
 				       /**
 					* The flags controlling the output
 					*/
-      DataOutBase::UcdFlags flags;
+      const DataOutBase::UcdFlags flags;
   };
     
 				   /**
@@ -498,12 +532,16 @@ namespace
 					* persistent values for
 					* later use.
 					*/
-      VtkStream (std::ostream& stream, DataOutBase::VtkFlags flags);
+      VtkStream (std::ostream& stream,
+		 const DataOutBase::VtkFlags flags);
+
 				       /**
 					* Output operator for points.
 					*/
       template <int dim>
-      void write(const unsigned int index, const Point<dim>&);
+      void write_point (const unsigned int index,
+			const Point<dim>&);
+
 				       /**
 					* Write dim-dimensional cell
 					* with first vertex at
@@ -533,6 +571,7 @@ namespace
 					*/
       template <typename T>
       std::ostream& operator<< (const T&);
+
     private:
 				       /**
 					* The ostream to use. Since
@@ -542,10 +581,11 @@ namespace
 					* technique.
 					*/
       std::ostream& stream;
+
 				       /**
 					* The flags controlling the output
 					*/
-      DataOutBase::VtkFlags flags;
+      const DataOutBase::VtkFlags flags;
   };
 
 
@@ -553,7 +593,8 @@ namespace
 
 //----------------------------------------------------------------------//
 
-  DXStream::DXStream(std::ostream& out, DataOutBase::DXFlags f)
+  DXStream::DXStream(std::ostream& out,
+		     const DataOutBase::DXFlags f)
 		  :
 		  stream(out), flags(f)
   {}
@@ -561,8 +602,8 @@ namespace
 
   template<int dim>
   void
-  DXStream::write (const unsigned int,
-		   const Point<dim>& p)
+  DXStream::write_point (const unsigned int,
+			 const Point<dim>& p)
   {
     if (flags.coordinates_binary)
       {
@@ -624,8 +665,8 @@ namespace
   template<typename data>
   inline
   void
-  DXStream::write_dataset(unsigned int,
-			  const std::vector<data>& values)
+  DXStream::write_dataset(const unsigned int     /*index*/,
+			  const std::vector<data> &values)
   {
     if (flags.data_binary)
       {
@@ -644,7 +685,8 @@ namespace
 
 //----------------------------------------------------------------------//
 
-  GmvStream::GmvStream(std::ostream& out, DataOutBase::GmvFlags f)
+  GmvStream::GmvStream (std::ostream& out,
+			const DataOutBase::GmvFlags f)
 		  :
 		  selected_component(deal_II_numbers::invalid_unsigned_int),
 		  stream(out), flags(f)
@@ -653,8 +695,8 @@ namespace
 
   template<int dim>
   void
-  GmvStream::write (const unsigned int,
-		    const Point<dim>& p)
+  GmvStream::write_point (const unsigned int,
+			  const Point<dim>& p)
   {
     Assert(selected_component != deal_II_numbers::invalid_unsigned_int,
 	   ExcNotInitialized());
@@ -697,7 +739,7 @@ namespace
 
 //----------------------------------------------------------------------//
 
-  TecplotStream::TecplotStream(std::ostream& out, DataOutBase::TecplotFlags f)
+  TecplotStream::TecplotStream(std::ostream& out, const DataOutBase::TecplotFlags f)
 		  :
 		  selected_component(deal_II_numbers::invalid_unsigned_int),
 		  stream(out), flags(f)
@@ -706,8 +748,8 @@ namespace
 
   template<int dim>
   void
-  TecplotStream::write (const unsigned int,
-			const Point<dim>& p)
+  TecplotStream::write_point (const unsigned int,
+			      const Point<dim>& p)
   {
     Assert(selected_component != deal_II_numbers::invalid_unsigned_int,
 	   ExcNotInitialized());
@@ -747,7 +789,7 @@ namespace
 
 //----------------------------------------------------------------------//
 
-  UcdStream::UcdStream(std::ostream& out, DataOutBase::UcdFlags f)
+  UcdStream::UcdStream(std::ostream& out, const DataOutBase::UcdFlags f)
 		  :
 		  stream(out), flags(f)
   {}
@@ -755,8 +797,8 @@ namespace
 
   template<int dim>
   void
-  UcdStream::write (const unsigned int index,
-		    const Point<dim>& p)
+  UcdStream::write_point (const unsigned int index,
+			  const Point<dim>& p)
   {
     stream << index+1
 	   << "   ";
@@ -811,8 +853,8 @@ namespace
   template<typename data>
   inline
   void
-  UcdStream::write_dataset(unsigned int index,
-			   const std::vector<data>& values)
+  UcdStream::write_dataset(const unsigned int       index,
+			   const std::vector<data> &values)
   {
     stream << index+1;
     for (unsigned int i=0;i<values.size();++i)
@@ -824,7 +866,7 @@ namespace
 
 //----------------------------------------------------------------------//
 
-  VtkStream::VtkStream(std::ostream& out, DataOutBase::VtkFlags f)
+  VtkStream::VtkStream(std::ostream& out, const DataOutBase::VtkFlags f)
 		  :
 		  stream(out), flags(f)
   {}
@@ -832,8 +874,8 @@ namespace
 
   template<int dim>
   void
-  VtkStream::write (const unsigned int,
-		    const Point<dim>& p)
+  VtkStream::write_point (const unsigned int,
+			  const Point<dim>& p)
   {
 				     // write out coordinates
     stream << p;
@@ -1628,7 +1670,7 @@ DataOutBase::write_nodes (
 			   i2,
 			   i3,
 			   n_subdivisions);
-	      out.write(count++, node);
+	      out.write_point(count++, node);
 	    }
     }
 }
@@ -1695,7 +1737,11 @@ DataOutBase::write_data (
 				       // Length of loops in all dimensions
       Assert ((patch->data.n_rows() == n_data_sets && !patch->points_are_available) ||
 	      (patch->data.n_rows() == n_data_sets+spacedim && patch->points_are_available),
-	      ExcDimensionMismatch (patch->points_are_available ? (patch->data.n_rows() + spacedim) : patch->data.n_rows(), n_data_sets));
+	      ExcDimensionMismatch (patch->points_are_available
+				    ?
+				    (patch->data.n_rows() + spacedim)
+				    :
+				    patch->data.n_rows(), n_data_sets));
       Assert (patch->data.n_cols() == Utilities::fixed_power<dim>(n),
 	      ExcInvalidDatasetSize (patch->data.n_cols(), n));
       
@@ -1704,18 +1750,18 @@ DataOutBase::write_data (
 
 				       // Data is already in
 				       // lexicographic ordering
-      for (unsigned int i=0; i<Utilities::fixed_power<dim>(n); ++i)
+      for (unsigned int i=0; i<Utilities::fixed_power<dim>(n); ++i, ++count)
 	if (double_precision)
 	  {
 	    for (unsigned int data_set=0; data_set<n_data_sets; ++data_set)
 	      doubles[data_set] = patch->data(data_set, i);
-	    out.write_dataset(count++, doubles);
+	    out.write_dataset(count, doubles);
 	  }
 	else
 	  {
 	    for (unsigned int data_set=0; data_set<n_data_sets; ++data_set)
 	      floats[data_set] = patch->data(data_set, i);
-	    out.write_dataset(count++, floats);
+	    out.write_dataset(count, floats);
 	  }
     }
 }
@@ -3776,7 +3822,7 @@ void DataOutBase::write_vtk (const std::vector<Patch<dim,spacedim> > &patches,
   reorder_thread.join ();
 
 				   // then write data.  the
-				   // 'POINTD_DATA' means: node data
+				   // 'POINT_DATA' means: node data
 				   // (as opposed to cell data, which
 				   // we do not support explicitly
 				   // here). all following data sets
