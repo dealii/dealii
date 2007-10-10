@@ -2,7 +2,7 @@
 //    $Id$
 //    Version: $Name$
 //
-//    Copyright (C) 2005, 2006 by the deal.II authors
+//    Copyright (C) 2005, 2006, 2007 by the deal.II authors
 //
 //    This file is subject to QPL and may not be  distributed
 //    without copyright and license information. Please refer
@@ -79,7 +79,8 @@
  *
  * The Visualisation Toolkit VTK is an open format supported by a
  * number of visualization projects such as ParaView, VisIt, or
- * MayaVi. See http://public.kitware.com/VTK/
+ * MayaVi. See http://public.kitware.com/VTK/ . The file format is described
+ * at http://vtk.org/pdf/file-formats.pdf .
  *
  *
  * 
