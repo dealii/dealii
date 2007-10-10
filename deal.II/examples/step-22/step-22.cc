@@ -83,7 +83,6 @@ class BoussinesqFlowProblem
     
     double time_step;
     unsigned int timestep_number;
-    double viscosity;    
  
     BlockVector<double> solution;
     BlockVector<double> old_solution;
@@ -220,139 +219,6 @@ InitialValues<dim>::vector_value (const Point<dim> &p,
 
 
 
-
-namespace SingleCurvingCrack
-{
-  template <int dim>
-  class KInverse : public TensorFunction<2,dim>
-  {
-    public:
-      virtual void value_list (const std::vector<Point<dim> > &points,
-                               std::vector<Tensor<2,dim> >    &values) const;
-  };
-
-
-  template <int dim>
-  void
-  KInverse<dim>::value_list (const std::vector<Point<dim> > &points,
-                             std::vector<Tensor<2,dim> >    &values) const
-  {
-    Assert (points.size() == values.size(),
-            ExcDimensionMismatch (points.size(), values.size()));
-
-    for (unsigned int p=0; p<points.size(); ++p)
-      {
-        values[p].clear ();
-
-        const double distance_to_flowline
-          = std::fabs(points[p][1]-0.5-0.1*std::sin(10*points[p][0]));
-      
-        const double permeability = std::max(std::exp(-(distance_to_flowline*
-                                                        distance_to_flowline)
-                                                      / (0.1 * 0.1)),
-                                             0.01);
-      
-        for (unsigned int d=0; d<dim; ++d)
-          values[p][d][d] = 1./permeability;
-      }
-  }
-}
-
-
-
-namespace RandomMedium
-{
-  template <int dim>
-  class KInverse : public TensorFunction<2,dim>
-  {
-    public:
-      KInverse ()
-		      :
-		      TensorFunction<2,dim>()
-	{}
-      
-      virtual void value_list (const std::vector<Point<dim> > &points,
-                               std::vector<Tensor<2,dim> >    &values) const;
-
-    private:
-      static std::vector<Point<dim> > centers;
-
-      static std::vector<Point<dim> > get_centers ();
-  };
-
-
-
-  template <int dim>
-  std::vector<Point<dim> >
-  KInverse<dim>::centers = KInverse<dim>::get_centers();
-
-
-  template <int dim>
-  std::vector<Point<dim> >
-  KInverse<dim>::get_centers ()
-  {
-    const unsigned int N = (dim == 2 ?
-                            40 :
-                            (dim == 3 ?
-                             100 :
-                             throw ExcNotImplemented()));
-  
-    std::vector<Point<dim> > centers_list (N);
-    for (unsigned int i=0; i<N; ++i)
-      for (unsigned int d=0; d<dim; ++d)
-        centers_list[i][d] = static_cast<double>(rand())/RAND_MAX;
-
-    return centers_list;
-  }
-
-
-
-  template <int dim>
-  void
-  KInverse<dim>::value_list (const std::vector<Point<dim> > &points,
-                             std::vector<Tensor<2,dim> >    &values) const
-  {
-    Assert (points.size() == values.size(),
-            ExcDimensionMismatch (points.size(), values.size()));
-
-    for (unsigned int p=0; p<points.size(); ++p)
-      {
-        values[p].clear ();
-
-        double permeability = 0;
-        for (unsigned int i=0; i<centers.size(); ++i)
-          permeability += std::exp(-(points[p]-centers[i]).square()
-                                   / (0.05 * 0.05));
-      
-        const double normalized_permeability
-          = std::min (std::max(permeability, 0.01), 4.);
-      
-        for (unsigned int d=0; d<dim; ++d)
-          values[p][d][d] = 1./normalized_permeability;
-      }
-  }
-}
-
-
-
-
-double mobility_inverse (const double S,
-                         const double viscosity)
-{
-  return 1.0 /(1.0/viscosity * S * S + (1-S) * (1-S));
-}
-
-double f_saturation (const double S,
-                     const double viscosity)
-{   
-  return S*S /( S * S +viscosity * (1-S) * (1-S));
-}
-
-
-
-
-
-
 template <int dim>
 Tensor<1,dim>
 extract_u (const FEValuesBase<dim> &fe_values,
@@ -470,8 +336,16 @@ void InverseMatrix<Matrix>::vmult (Vector<double>       &dst,
   SolverCG<> cg (solver_control, vector_memory);
 
   dst = 0;
-  
-  cg.solve (*matrix, dst, src, PreconditionIdentity());        
+
+  try
+    {
+      cg.solve (*matrix, dst, src, PreconditionIdentity());
+    }
+  catch (...)
+    {
+      std::cout << "ups 1..." << std::endl;
+      Assert (false, ExcInternalError());
+    }
 }
 
 
@@ -515,44 +389,6 @@ void SchurComplement::vmult (Vector<double>       &dst,
 
 
 
-class ApproximateSchurComplement : public Subscriptor
-{
-  public:
-    ApproximateSchurComplement (const BlockSparseMatrix<double> &A);
-
-    void vmult (Vector<double>       &dst,
-                const Vector<double> &src) const;
-
-  private:
-    const SmartPointer<const BlockSparseMatrix<double> > system_matrix;
-    
-    mutable Vector<double> tmp1, tmp2;
-};
-
-
-ApproximateSchurComplement::
-ApproximateSchurComplement (const BlockSparseMatrix<double> &A)
-                :
-                system_matrix (&A),
-                tmp1 (A.block(0,0).m()),
-                tmp2 (A.block(0,0).m())
-{}
-
-
-void ApproximateSchurComplement::vmult (Vector<double>       &dst,
-                                        const Vector<double> &src) const
-{
-  system_matrix->block(0,1).vmult (tmp1, src);
-  system_matrix->block(0,0).precondition_Jacobi (tmp2, tmp1);
-  system_matrix->block(1,0).vmult (dst, tmp2);
-}
-
-
-
-
-
-
-
 template <int dim>
 BoussinesqFlowProblem<dim>::BoussinesqFlowProblem (const unsigned int degree)
                 :
@@ -561,9 +397,8 @@ BoussinesqFlowProblem<dim>::BoussinesqFlowProblem (const unsigned int degree)
                     FE_DGQ<dim>(degree), 1,
                     FE_DGQ<dim>(degree), 1),
                 dof_handler (triangulation),
-                n_refinement_steps (5),
-                time_step (0),
-                viscosity (0.2)
+                n_refinement_steps (3),
+                time_step (0)
 {}
 
 
@@ -679,13 +514,11 @@ void BoussinesqFlowProblem<dim>::assemble_system ()
   const PressureRightHandSide<dim>  pressure_right_hand_side;
   const Buoyancy<dim>               buoyancy;
   const PressureBoundaryValues<dim> pressure_boundary_values;
-  const RandomMedium::KInverse<dim> k_inverse;   
   
   std::vector<double>               pressure_rhs_values (n_q_points);
   std::vector<Vector<double> >      buoyancy_values (n_q_points,
 						     Vector<double>(dim));
   std::vector<double>               boundary_values (n_face_q_points);
-  std::vector<Tensor<2,dim> >       k_inverse_values (n_q_points);
   
   std::vector<Vector<double> >      old_solution_values(n_q_points, Vector<double>(dim+2));
   std::vector<std::vector<Tensor<1,dim> > >  old_solution_grads(n_q_points,
@@ -706,9 +539,6 @@ void BoussinesqFlowProblem<dim>::assemble_system ()
                                            pressure_rhs_values);
       buoyancy.vector_value_list (fe_values.get_quadrature_points(),
 				  buoyancy_values);
-      k_inverse.value_list (fe_values.get_quadrature_points(),
-                            k_inverse_values);
-
       for (unsigned int q=0; q<n_q_points; ++q)            
         for (unsigned int i=0; i<dofs_per_cell; ++i)
           {
@@ -852,7 +682,7 @@ void BoussinesqFlowProblem<dim>::assemble_rhs_S ()
             const Tensor<1,dim> grad_phi_i_s = extract_grad_s(fe_values, i, q);
                      
             local_rhs(i) += (time_step *
-                             f_saturation(old_s,viscosity) *
+                             old_s *
                              present_u *
                              grad_phi_i_s
                              +
@@ -905,12 +735,11 @@ void BoussinesqFlowProblem<dim>::assemble_rhs_S ()
               for (unsigned int i=0; i<dofs_per_cell; ++i)
                 local_rhs(i) -= time_step *
                                 normal_flux *
-                                f_saturation((is_outflow_q_point == true
-                                              ?
-                                              old_solution_values_face[q](dim+1)
-                                              :
-                                              neighbor_saturation[q]),
-                                             viscosity) *
+                                (is_outflow_q_point == true
+				 ?
+				 old_solution_values_face[q](dim+1)
+				 :
+				 neighbor_saturation[q]) *
                                 extract_s(fe_face_values,i,q) *
                                 fe_face_values.JxW(q);
             }
@@ -944,19 +773,21 @@ void BoussinesqFlowProblem<dim>::solve ()
     SchurComplement
       schur_complement (system_matrix, m_inverse);
     
-    ApproximateSchurComplement
-      approximate_schur_complement (system_matrix);
-      
-    InverseMatrix<ApproximateSchurComplement>
-      preconditioner (approximate_schur_complement);
-
-    
     SolverControl solver_control (system_matrix.block(0,0).m(),
                                   1e-12*schur_rhs.l2_norm());
     SolverCG<>    cg (solver_control);
 
-    cg.solve (schur_complement, solution.block(1), schur_rhs,
-              preconditioner);
+    try
+      {
+	cg.solve (schur_complement, solution.block(1), schur_rhs,
+		  PreconditionIdentity());
+      }
+    catch (...)
+      {
+	std::cout << "ups 2..." << std::endl;
+	abort ();
+      }
+	
   
     std::cout << "   "
               << solver_control.last_step()
@@ -981,8 +812,18 @@ void BoussinesqFlowProblem<dim>::solve ()
     SolverControl solver_control (system_matrix.block(2,2).m(),
                                   1e-8*system_rhs.block(2).l2_norm());
     SolverCG<>   cg (solver_control);
-    cg.solve (system_matrix.block(2,2), solution.block(2), system_rhs.block(2),
-              PreconditionIdentity());
+
+    try
+      {
+	cg.solve (system_matrix.block(2,2), solution.block(2), system_rhs.block(2),
+		  PreconditionIdentity());
+      }
+    catch (...)
+      {
+	std::cout << "ups 3..." << std::endl;
+	abort ();
+      }
+	
                 
     project_back_saturation ();
         
