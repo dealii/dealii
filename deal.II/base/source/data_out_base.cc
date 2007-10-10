@@ -1007,6 +1007,7 @@ void
 DataOutBase::GmvStream::write_dataset(unsigned int,
 				      const std::vector<data>& values)
 {
+  Assert (false, ExcInternalError());
 }
 
 
@@ -1066,6 +1067,7 @@ void
 DataOutBase::TecplotStream::write_dataset(unsigned int,
 					  const std::vector<data>& values)
 {
+  Assert (false, ExcInternalError());
 }
 
 
