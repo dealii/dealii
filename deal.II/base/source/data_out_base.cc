@@ -1,4 +1,4 @@
-//---------------------------------------------------------------------------
+				 //---------------------------------------------------------------------------
 //    $Id$
 //    Version: $Name$
 //
@@ -176,6 +176,794 @@ namespace
       }
   }
   
+
+
+
+    
+				   /**
+				    * Class for writing basic
+				    * entities in @ref
+				    * SoftwareOpenDX format,
+				    * depending on the flags.
+				    */
+  class DXStream
+  {
+    public:
+				       /**
+					* Constructor, storing
+					* persistent values for
+					* later use.
+					*/
+      DXStream (std::ostream& stream, DataOutBase::DXFlags flags);
+				       /**
+					* Output operator for points.
+					*/
+      template <int dim>
+      void write(const unsigned int index, const Point<dim>&);
+				       /**
+					* Write dim-dimensional cell
+					* with first vertex at
+					* number start and further
+					* vertices offset by the
+					* specified values. Values
+					* not needed are ignored.
+					*
+					* The order of vertices for
+					* these cells in different
+					* dimensions is
+					* <ol>
+					* <li> [0,1]
+					* <li> [0,2,1,3]
+					* <li> [0,4,2,6,1,5,3,7]
+					* </ol>
+					*/
+      template <int dim>
+      void write_cell(const unsigned int index,
+		      const unsigned int start,
+		      const unsigned int x_offset,
+		      const unsigned int y_offset,
+		      const unsigned int z_offset);
+
+				       /**
+					* Write a complete set of
+					* data for a single node.
+					*/
+      template<typename data>
+      void write_dataset(unsigned int index,
+			 const std::vector<data>& values);
+	
+				       /**
+					* Forwarding of output stream
+					*/
+      template <typename T>
+      std::ostream& operator<< (const T&);
+    private:
+				       /**
+					* The ostream to use. Since
+					* the life span of these
+					* objects is small, we use a
+					* very simple storage
+					* technique.
+					*/
+      std::ostream& stream;
+				       /**
+					* The flags controlling the output
+					*/
+      DataOutBase::DXFlags flags;
+  };
+    
+				   /**
+				    * Class for writing basic
+				    * entities in @ref SoftwareGMV
+				    * format, depending on the
+				    * flags.
+				    */
+  class GmvStream
+  {
+    public:
+				       /**
+					* Constructor, storing
+					* persistent values for
+					* later use.
+					*/
+      GmvStream (std::ostream& stream, DataOutBase::GmvFlags flags);
+				       /**
+					* Output operator for points.
+					*/
+      template <int dim>
+      void write(const unsigned int index, const Point<dim>&);
+				       /**
+					* Write dim-dimensional cell
+					* with first vertex at
+					* number start and further
+					* vertices offset by the
+					* specified values. Values
+					* not needed are ignored.
+					*
+					* The order of vertices for
+					* these cells in different
+					* dimensions is
+					* <ol>
+					* <li> [0,1]
+					* <li> [0,1,3,2]
+					* <li> [0,1,3,2,4,5,7,6]
+					* </ol>
+					*/
+      template <int dim>
+      void write_cell(const unsigned int index,
+		      const unsigned int start,
+		      const unsigned int x_offset,
+		      const unsigned int y_offset,
+		      const unsigned int z_offset);
+
+				       /**
+					* Write a complete set of
+					* data for a single node.
+					*/
+      template<typename data>
+      void write_dataset(unsigned int index,
+			 const std::vector<data>& values);
+	
+				       /**
+					* Forwarding of output stream
+					*/
+      template <typename T>
+      std::ostream& operator<< (const T&);
+				       /**
+					* Since GMV reads the x, y
+					* and z coordinates in
+					* separate fields, we enable
+					* write() to output only a
+					* single selected component
+					* at once and do this dim
+					* times for the whole set of
+					* nodes. This integer can be
+					* used to select the
+					* component written.
+					*/
+      unsigned int selected_component;
+	
+    private:
+				       /**
+					* The ostream to use. Since
+					* the life span of these
+					* objects is small, we use a
+					* very simple storage
+					* technique.
+					*/
+      std::ostream& stream;
+				       /**
+					* The flags controlling the output
+					*/
+      DataOutBase::GmvFlags flags;
+  };
+    
+				   /**
+				    * Class for writing basic
+				    * entities in @ref
+				    * SoftwareTecplot format,
+				    * depending on the flags.
+				    */
+  class TecplotStream
+  {
+    public:
+				       /**
+					* Constructor, storing
+					* persistent values for
+					* later use.
+					*/
+      TecplotStream (std::ostream& stream, DataOutBase::TecplotFlags flags);
+				       /**
+					* Output operator for points.
+					*/
+      template <int dim>
+      void write(const unsigned int index, const Point<dim>&);
+				       /**
+					* Write dim-dimensional cell
+					* with first vertex at
+					* number start and further
+					* vertices offset by the
+					* specified values. Values
+					* not needed are ignored.
+					*
+					* The order of vertices for
+					* these cells in different
+					* dimensions is
+					* <ol>
+					* <li> [0,1]
+					* <li> [0,1,3,2]
+					* <li> [0,1,3,2,4,5,7,6]
+					* </ol>
+					*/
+      template <int dim>
+      void write_cell(const unsigned int index,
+		      const unsigned int start,
+		      const unsigned int x_offset,
+		      const unsigned int y_offset,
+		      const unsigned int z_offset);
+
+				       /**
+					* Write a complete set of
+					* data for a single node.
+					*/
+      template<typename data>
+      void write_dataset(unsigned int index,
+			 const std::vector<data>& values);
+	
+				       /**
+					* Forwarding of output stream
+					*/
+      template <typename T>
+      std::ostream& operator<< (const T&);
+				       /**
+					* Since TECPLOT reads the x, y
+					* and z coordinates in
+					* separate fields, we enable
+					* write() to output only a
+					* single selected component
+					* at once and do this dim
+					* times for the whole set of
+					* nodes. This integer can be
+					* used to select the
+					* component written.
+					*/
+      unsigned int selected_component;
+	
+    private:
+				       /**
+					* The ostream to use. Since
+					* the life span of these
+					* objects is small, we use a
+					* very simple storage
+					* technique.
+					*/
+      std::ostream& stream;
+				       /**
+					* The flags controlling the output
+					*/
+      DataOutBase::TecplotFlags flags;
+  };
+    
+				   /**
+				    * Class for writing basic
+				    * entities in UCD format for
+				    * @ref SoftwareAVS, depending on
+				    * the flags.
+				    */
+  class UcdStream
+  {
+    public:
+				       /**
+					* Constructor, storing
+					* persistent values for
+					* later use.
+					*/
+      UcdStream (std::ostream& stream, DataOutBase::UcdFlags flags);
+				       /**
+					* Output operator for points.
+					*/
+      template <int dim>
+      void write(const unsigned int index, const Point<dim>&);
+				       /**
+					* Write dim-dimensional cell
+					* with first vertex at
+					* number start and further
+					* vertices offset by the
+					* specified values. Values
+					* not needed are ignored.
+					*
+					* The additional offset 1 is
+					* added inside this
+					* function.
+					*
+					* The order of vertices for
+					* these cells in different
+					* dimensions is
+					* <ol>
+					* <li> [0,1]
+					* <li> [0,1,3,2]
+					* <li> [0,1,5,4,2,3,7,6]
+					* </ol>
+					*/
+      template <int dim>
+      void write_cell(const unsigned int index,
+		      const unsigned int start,
+		      const unsigned int x_offset,
+		      const unsigned int y_offset,
+		      const unsigned int z_offset);
+	
+				       /**
+					* Write a complete set of
+					* data for a single node.
+					*/
+      template<typename data>
+      void write_dataset(unsigned int index,
+			 const std::vector<data>& values);
+	
+				       /**
+					* Forwarding of output stream
+					*/
+      template <typename T>
+      std::ostream& operator<< (const T&);
+    private:
+				       /**
+					* The ostream to use. Since
+					* the life span of these
+					* objects is small, we use a
+					* very simple storage
+					* technique.
+					*/
+      std::ostream& stream;
+				       /**
+					* The flags controlling the output
+					*/
+      DataOutBase::UcdFlags flags;
+  };
+    
+				   /**
+				    * Class for writing basic
+				    * entities in @ref SoftwareVTK
+				    * format, depending on the
+				    * flags.
+				    */
+  class VtkStream
+  {
+    public:
+				       /**
+					* Constructor, storing
+					* persistent values for
+					* later use.
+					*/
+      VtkStream (std::ostream& stream, DataOutBase::VtkFlags flags);
+				       /**
+					* Output operator for points.
+					*/
+      template <int dim>
+      void write(const unsigned int index, const Point<dim>&);
+				       /**
+					* Write dim-dimensional cell
+					* with first vertex at
+					* number start and further
+					* vertices offset by the
+					* specified values. Values
+					* not needed are ignored.
+					*
+					* The order of vertices for
+					* these cells in different
+					* dimensions is
+					* <ol>
+					* <li> [0,1]
+					* <li> []
+					* <li> []
+					* </ol>
+					*/
+      template <int dim>
+      void write_cell(const unsigned int index,
+		      const unsigned int start,
+		      const unsigned int x_offset,
+		      const unsigned int y_offset,
+		      const unsigned int z_offset);
+	
+				       /**
+					* Write a complete set of
+					* data for a single node.
+					*/
+      template<typename data>
+      void write_dataset(unsigned int index,
+			 const std::vector<data>& values);
+	
+				       /**
+					* Forwarding of output stream
+					*/
+      template <typename T>
+      std::ostream& operator<< (const T&);
+    private:
+				       /**
+					* The ostream to use. Since
+					* the life span of these
+					* objects is small, we use a
+					* very simple storage
+					* technique.
+					*/
+      std::ostream& stream;
+				       /**
+					* The flags controlling the output
+					*/
+      DataOutBase::VtkFlags flags;
+  };
+
+
+
+
+//----------------------------------------------------------------------//
+
+  DXStream::DXStream(std::ostream& out, DataOutBase::DXFlags f)
+		  :
+		  stream(out), flags(f)
+  {}
+
+
+  template<int dim>
+  void
+  DXStream::write (const unsigned int,
+		   const Point<dim>& p)
+  {
+    if (flags.coordinates_binary)
+      {
+	float data[dim];
+	for (unsigned int d=0; d<dim; ++d)
+	  data[d] = p(d);
+	stream.write(reinterpret_cast<const char*>(data),
+		     dim * sizeof(*data));
+      }
+    else
+      {	      
+	for (unsigned int d=0; d<dim; ++d)
+	  stream << p(d) << '\t';
+	stream << '\n';
+      }
+  }
+
+
+  template<int dim>
+  void
+  DXStream::write_cell(
+    unsigned int,
+    unsigned int start,
+    unsigned int d1,
+    unsigned int d2,
+    unsigned int d3)
+  {
+    int nodes[8];
+    nodes[GeometryInfo<dim>::dx_to_deal[0]] = start;
+    nodes[GeometryInfo<dim>::dx_to_deal[1]] = start+d1;
+    if (dim>=2)
+      {
+					 // Add shifted line in y direction
+	nodes[GeometryInfo<dim>::dx_to_deal[2]] = start+d2;
+	nodes[GeometryInfo<dim>::dx_to_deal[3]] = start+d2+d1;
+	if (dim>=3)
+	  {
+					     // Add shifted quad in z direction
+	    nodes[GeometryInfo<dim>::dx_to_deal[4]] = start+d3;
+	    nodes[GeometryInfo<dim>::dx_to_deal[5]] = start+d3+d1;
+	    nodes[GeometryInfo<dim>::dx_to_deal[6]] = start+d3+d2;  
+	    nodes[GeometryInfo<dim>::dx_to_deal[7]] = start+d3+d2+d1;
+	  }
+      }
+  
+    if (flags.int_binary)
+      stream.write(reinterpret_cast<const char*>(nodes),
+		   (1<<dim) * sizeof(*nodes));
+    else
+      {
+	const unsigned int final = (1<<dim) - 1;
+	for (unsigned int i=0;i<final ;++i)
+	  stream << nodes[i] << '\t';
+	stream << nodes[final] << '\n';
+      }
+  }
+
+
+  template<typename data>
+  inline
+  void
+  DXStream::write_dataset(unsigned int,
+			  const std::vector<data>& values)
+  {
+    if (flags.data_binary)
+      {
+	stream.write(reinterpret_cast<const char*>(&values[0]),
+		     values.size()*sizeof(data));
+      }
+    else
+      {
+	for (unsigned int i=0;i<values.size();++i)
+	  stream << '\t' << values[i];
+	stream << '\n';
+      }
+  }
+
+
+
+//----------------------------------------------------------------------//
+
+  GmvStream::GmvStream(std::ostream& out, DataOutBase::GmvFlags f)
+		  :
+		  selected_component(deal_II_numbers::invalid_unsigned_int),
+		  stream(out), flags(f)
+  {}
+
+
+  template<int dim>
+  void
+  GmvStream::write (const unsigned int,
+		    const Point<dim>& p)
+  {
+    Assert(selected_component != deal_II_numbers::invalid_unsigned_int,
+	   ExcNotInitialized());
+    stream << p(selected_component) << ' ';
+  }
+
+
+  template<int dim>
+  void
+  GmvStream::write_cell(
+    unsigned int,
+    unsigned int s,
+    unsigned int d1,
+    unsigned int d2,
+    unsigned int d3)
+  {
+				     // Vertices are numbered starting
+				     // with one.
+    const unsigned int start=s+1;
+    stream << gmv_cell_type[dim] << '\n';
+  
+    stream << start << '\t'
+	   << start+d1;
+    if (dim>=2)
+      {
+	stream << '\t' << start+d2+d1
+	       << '\t' << start+d2;
+	if (dim>=3)
+	  {
+	    stream << '\t' << start+d3
+		   << '\t' << start+d3+d1
+		   << '\t' << start+d3+d2+d1
+		   << '\t' << start+d3+d2;
+	  }
+      }
+    stream << '\n';
+  }
+
+
+  template<typename data>
+  inline
+  void
+  GmvStream::write_dataset(unsigned int,
+			   const std::vector<data>& values)
+  {
+    Assert (false, ExcInternalError());
+  }
+
+
+
+//----------------------------------------------------------------------//
+
+  TecplotStream::TecplotStream(std::ostream& out, DataOutBase::TecplotFlags f)
+		  :
+		  selected_component(deal_II_numbers::invalid_unsigned_int),
+		  stream(out), flags(f)
+  {}
+
+
+  template<int dim>
+  void
+  TecplotStream::write (const unsigned int,
+			const Point<dim>& p)
+  {
+    Assert(selected_component != deal_II_numbers::invalid_unsigned_int,
+	   ExcNotInitialized());
+    stream << p(selected_component) << '\n';
+  }
+
+
+  template<int dim>
+  void
+  TecplotStream::write_cell(
+    unsigned int,
+    unsigned int s,
+    unsigned int d1,
+    unsigned int d2,
+    unsigned int d3)
+  {
+    const unsigned int start = s+1;
+  
+    stream << start << '\t'
+	   << start+d1;
+    if (dim>=2)
+      {
+	stream << '\t' << start+d2+d1
+	       << '\t' << start+d2;
+	if (dim>=3)
+	  {
+	    stream << '\t' << start+d3
+		   << '\t' << start+d3+d1
+		   << '\t' << start+d3+d2+d1
+		   << '\t' << start+d3+d2;
+	  }
+      }
+    stream << '\n';
+  }
+
+
+  template<typename data>
+  inline
+  void
+  TecplotStream::write_dataset(unsigned int,
+			       const std::vector<data>& values)
+  {
+    Assert (false, ExcInternalError());
+  }
+
+
+
+//----------------------------------------------------------------------//
+
+  UcdStream::UcdStream(std::ostream& out, DataOutBase::UcdFlags f)
+		  :
+		  stream(out), flags(f)
+  {}
+
+
+  template<int dim>
+  void
+  UcdStream::write (const unsigned int index,
+		    const Point<dim>& p)
+  {
+    stream << index+1
+	   << "   ";
+				     // write out coordinates
+    for (unsigned int i=0; i<dim; ++i)
+      stream << p(i) << ' ';
+				     // fill with zeroes
+    for (unsigned int i=dim; i<3; ++i)
+      stream << "0 ";
+    stream << '\n';
+  }
+
+
+  template<int dim>
+  void
+  UcdStream::write_cell(
+    unsigned int index,
+    unsigned int start,
+    unsigned int d1,
+    unsigned int d2,
+    unsigned int d3)
+  {
+    int nodes[8];
+    nodes[GeometryInfo<dim>::ucd_to_deal[0]] = start;
+    nodes[GeometryInfo<dim>::ucd_to_deal[1]] = start+d1;
+    if (dim>=2)
+      {
+					 // Add shifted line in y direction
+	nodes[GeometryInfo<dim>::ucd_to_deal[2]] = start+d2;
+	nodes[GeometryInfo<dim>::ucd_to_deal[3]] = start+d2+d1;
+	if (dim>=3)
+	  {
+					     // Add shifted quad in z direction
+	    nodes[GeometryInfo<dim>::ucd_to_deal[4]] = start+d3;
+	    nodes[GeometryInfo<dim>::ucd_to_deal[5]] = start+d3+d1;
+	    nodes[GeometryInfo<dim>::ucd_to_deal[6]] = start+d3+d2;  
+	    nodes[GeometryInfo<dim>::ucd_to_deal[7]] = start+d3+d2+d1;
+	  }
+      }
+
+				     // Write out all cells and remember
+				     // that all indices must be shifted
+				     // by one.
+    stream << index+1 << "\t0 " << ucd_cell_type[dim];
+    const unsigned int final = (1<<dim);
+    for (unsigned int i=0;i<final ;++i)
+      stream << '\t' << nodes[i]+1;
+    stream << '\n';
+  }
+
+
+  template<typename data>
+  inline
+  void
+  UcdStream::write_dataset(unsigned int index,
+			   const std::vector<data>& values)
+  {
+    stream << index+1;
+    for (unsigned int i=0;i<values.size();++i)
+      stream << '\t' << values[i];
+    stream << '\n';
+  }
+
+
+
+//----------------------------------------------------------------------//
+
+  VtkStream::VtkStream(std::ostream& out, DataOutBase::VtkFlags f)
+		  :
+		  stream(out), flags(f)
+  {}
+
+
+  template<int dim>
+  void
+  VtkStream::write (const unsigned int,
+		    const Point<dim>& p)
+  {
+				     // write out coordinates
+    stream << p;
+				     // fill with zeroes
+    for (unsigned int i=dim; i<3; ++i)
+      stream << " 0";
+    stream << '\n';
+  }
+
+
+  template<int dim>
+  void
+  VtkStream::write_cell(
+    unsigned int,
+    unsigned int start,
+    unsigned int d1,
+    unsigned int d2,
+    unsigned int d3)
+  {
+    stream << GeometryInfo<dim>::vertices_per_cell << '\t'
+	   << start << '\t'
+	   << start+d1;
+    if (dim>=2)
+      {
+	stream << '\t' << start+d2+d1
+	       << '\t' << start+d2;
+	if (dim>=3)
+	  {
+	    stream << '\t' << start+d3
+		   << '\t' << start+d3+d1
+		   << '\t' << start+d3+d2+d1
+		   << '\t' << start+d3+d2;
+	  }
+      }
+    stream << '\n';
+  }
+
+
+  template<typename data>
+  inline
+  void
+  VtkStream::write_dataset(unsigned int,
+			   const std::vector<data>& values)
+  {
+    for (unsigned int i=0;i<values.size();++i)
+      stream << '\t' << values[i];
+    stream << '\n';
+  }
+
+
+
+
+  template <typename T>
+  std::ostream&
+  DXStream::operator<< (const T& t)
+  {
+    stream << t;
+    return stream;
+  }
+
+
+  template <typename T>
+  std::ostream&
+  GmvStream::operator<< (const T& t)
+  {
+    stream << t;
+    return stream;
+  }
+
+
+  template <typename T>
+  std::ostream&
+  UcdStream::operator<< (const T& t)
+  {
+    stream << t;
+    return stream;
+  }
+
+
+  template <typename T>
+  std::ostream&
+  VtkStream::operator<< (const T& t)
+  {
+    stream << t;
+    return stream;
+  }
 }
 
   
@@ -857,359 +1645,6 @@ default_suffix (const OutputFormat output_format)
 	    return "";
     }
 }
-
-//----------------------------------------------------------------------//
-
-DataOutBase::DXStream::DXStream(std::ostream& out, DataOutBase::DXFlags f)
-		:
-		stream(out), flags(f)
-{}
-
-
-template<int dim>
-void
-DataOutBase::DXStream::write (const unsigned int,
-			      const Point<dim>& p)
-{
-  if (flags.coordinates_binary)
-    {
-      float data[dim];
-      for (unsigned int d=0; d<dim; ++d)
-	data[d] = p(d);
-      stream.write(reinterpret_cast<const char*>(data),
-		   dim * sizeof(*data));
-    }
-  else
-    {	      
-      for (unsigned int d=0; d<dim; ++d)
-	stream << p(d) << '\t';
-      stream << '\n';
-    }
-}
-
-
-template<int dim>
-void
-DataOutBase::DXStream::write_cell(
-  unsigned int,
-  unsigned int start,
-  unsigned int d1,
-  unsigned int d2,
-  unsigned int d3)
-{
-  int nodes[8];
-  nodes[GeometryInfo<dim>::dx_to_deal[0]] = start;
-  nodes[GeometryInfo<dim>::dx_to_deal[1]] = start+d1;
-  if (dim>=2)
-    {
-				       // Add shifted line in y direction
-      nodes[GeometryInfo<dim>::dx_to_deal[2]] = start+d2;
-      nodes[GeometryInfo<dim>::dx_to_deal[3]] = start+d2+d1;
-      if (dim>=3)
-	{
-					   // Add shifted quad in z direction
-	  nodes[GeometryInfo<dim>::dx_to_deal[4]] = start+d3;
-	  nodes[GeometryInfo<dim>::dx_to_deal[5]] = start+d3+d1;
-	  nodes[GeometryInfo<dim>::dx_to_deal[6]] = start+d3+d2;  
-	  nodes[GeometryInfo<dim>::dx_to_deal[7]] = start+d3+d2+d1;
-	}
-    }
-  
-  if (flags.int_binary)
-    stream.write(reinterpret_cast<const char*>(nodes),
-		 (1<<dim) * sizeof(*nodes));
-  else
-    {
-      const unsigned int final = (1<<dim) - 1;
-      for (unsigned int i=0;i<final ;++i)
-	stream << nodes[i] << '\t';
-      stream << nodes[final] << '\n';
-    }
-}
-
-
-template<typename data>
-inline
-void
-DataOutBase::DXStream::write_dataset(unsigned int,
-				     const std::vector<data>& values)
-{
-  if (flags.data_binary)
-    {
-      stream.write(reinterpret_cast<const char*>(&values[0]),
-		   values.size()*sizeof(data));
-    }
-  else
-    {
-      for (unsigned int i=0;i<values.size();++i)
-	stream << '\t' << values[i];
-      stream << '\n';
-    }
-}
-
-
-
-//----------------------------------------------------------------------//
-
-DataOutBase::GmvStream::GmvStream(std::ostream& out, DataOutBase::GmvFlags f)
-		:
-		selected_component(deal_II_numbers::invalid_unsigned_int),
-		stream(out), flags(f)
-{}
-
-
-template<int dim>
-void
-DataOutBase::GmvStream::write (const unsigned int,
-			       const Point<dim>& p)
-{
-  Assert(selected_component != deal_II_numbers::invalid_unsigned_int,
-	 ExcNotInitialized());
-  stream << p(selected_component) << ' ';
-}
-
-
-template<int dim>
-void
-DataOutBase::GmvStream::write_cell(
-  unsigned int,
-  unsigned int s,
-  unsigned int d1,
-  unsigned int d2,
-  unsigned int d3)
-{
-				   // Vertices are numbered starting
-				   // with one.
-  const unsigned int start=s+1;
-  stream << gmv_cell_type[dim] << '\n';
-  
-  stream << start << '\t'
-	 << start+d1;
-  if (dim>=2)
-    {
-      stream << '\t' << start+d2+d1
-	     << '\t' << start+d2;
-      if (dim>=3)
-	{
-	  stream << '\t' << start+d3
-		 << '\t' << start+d3+d1
-		 << '\t' << start+d3+d2+d1
-		 << '\t' << start+d3+d2;
-	}
-    }
-  stream << '\n';
-}
-
-
-template<typename data>
-inline
-void
-DataOutBase::GmvStream::write_dataset(unsigned int,
-				      const std::vector<data>& values)
-{
-  Assert (false, ExcInternalError());
-}
-
-
-
-//----------------------------------------------------------------------//
-
-DataOutBase::TecplotStream::TecplotStream(std::ostream& out, DataOutBase::TecplotFlags f)
-		:
-		selected_component(deal_II_numbers::invalid_unsigned_int),
-		stream(out), flags(f)
-{}
-
-
-template<int dim>
-void
-DataOutBase::TecplotStream::write (const unsigned int,
-				   const Point<dim>& p)
-{
-  Assert(selected_component != deal_II_numbers::invalid_unsigned_int,
-	 ExcNotInitialized());
-  stream << p(selected_component) << '\n';
-}
-
-
-template<int dim>
-void
-DataOutBase::TecplotStream::write_cell(
-  unsigned int,
-  unsigned int s,
-  unsigned int d1,
-  unsigned int d2,
-  unsigned int d3)
-{
-  const unsigned int start = s+1;
-  
-  stream << start << '\t'
-	 << start+d1;
-  if (dim>=2)
-    {
-      stream << '\t' << start+d2+d1
-	     << '\t' << start+d2;
-      if (dim>=3)
-	{
-	  stream << '\t' << start+d3
-		 << '\t' << start+d3+d1
-		 << '\t' << start+d3+d2+d1
-		 << '\t' << start+d3+d2;
-	}
-    }
-  stream << '\n';
-}
-
-
-template<typename data>
-inline
-void
-DataOutBase::TecplotStream::write_dataset(unsigned int,
-					  const std::vector<data>& values)
-{
-  Assert (false, ExcInternalError());
-}
-
-
-
-//----------------------------------------------------------------------//
-
-DataOutBase::UcdStream::UcdStream(std::ostream& out, DataOutBase::UcdFlags f)
-		:
-		stream(out), flags(f)
-{}
-
-
-template<int dim>
-void
-DataOutBase::UcdStream::write (const unsigned int index,
-			       const Point<dim>& p)
-{
-  stream << index+1
-	 << "   ";
-				   // write out coordinates
-  for (unsigned int i=0; i<dim; ++i)
-    stream << p(i) << ' ';
-				   // fill with zeroes
-  for (unsigned int i=dim; i<3; ++i)
-    stream << "0 ";
-  stream << '\n';
-}
-
-
-template<int dim>
-void
-DataOutBase::UcdStream::write_cell(
-  unsigned int index,
-  unsigned int start,
-  unsigned int d1,
-  unsigned int d2,
-  unsigned int d3)
-{
-  int nodes[8];
-  nodes[GeometryInfo<dim>::ucd_to_deal[0]] = start;
-  nodes[GeometryInfo<dim>::ucd_to_deal[1]] = start+d1;
-  if (dim>=2)
-    {
-				       // Add shifted line in y direction
-      nodes[GeometryInfo<dim>::ucd_to_deal[2]] = start+d2;
-      nodes[GeometryInfo<dim>::ucd_to_deal[3]] = start+d2+d1;
-      if (dim>=3)
-	{
-					   // Add shifted quad in z direction
-	  nodes[GeometryInfo<dim>::ucd_to_deal[4]] = start+d3;
-	  nodes[GeometryInfo<dim>::ucd_to_deal[5]] = start+d3+d1;
-	  nodes[GeometryInfo<dim>::ucd_to_deal[6]] = start+d3+d2;  
-	  nodes[GeometryInfo<dim>::ucd_to_deal[7]] = start+d3+d2+d1;
-	}
-    }
-
-				   // Write out all cells and remember
-				   // that all indices must be shifted
-				   // by one.
-  stream << index+1 << "\t0 " << ucd_cell_type[dim];
-  const unsigned int final = (1<<dim);
-  for (unsigned int i=0;i<final ;++i)
-    stream << '\t' << nodes[i]+1;
-  stream << '\n';
-}
-
-
-template<typename data>
-inline
-void
-DataOutBase::UcdStream::write_dataset(unsigned int index,
-				      const std::vector<data>& values)
-{
-  stream << index+1;
-  for (unsigned int i=0;i<values.size();++i)
-    stream << '\t' << values[i];
-  stream << '\n';
-}
-
-
-
-//----------------------------------------------------------------------//
-
-DataOutBase::VtkStream::VtkStream(std::ostream& out, DataOutBase::VtkFlags f)
-		:
-		stream(out), flags(f)
-{}
-
-
-template<int dim>
-void
-DataOutBase::VtkStream::write (const unsigned int,
-			       const Point<dim>& p)
-{
-				   // write out coordinates
-  stream << p;
-				   // fill with zeroes
-  for (unsigned int i=dim; i<3; ++i)
-    stream << " 0";
-  stream << '\n';
-}
-
-
-template<int dim>
-void
-DataOutBase::VtkStream::write_cell(
-  unsigned int,
-  unsigned int start,
-  unsigned int d1,
-  unsigned int d2,
-  unsigned int d3)
-{
-  stream << GeometryInfo<dim>::vertices_per_cell << '\t'
-	 << start << '\t'
-	 << start+d1;
-  if (dim>=2)
-    {
-      stream << '\t' << start+d2+d1
-	     << '\t' << start+d2;
-      if (dim>=3)
-	{
-	  stream << '\t' << start+d3
-		 << '\t' << start+d3+d1
-		 << '\t' << start+d3+d2+d1
-		 << '\t' << start+d3+d2;
-	}
-    }
-  stream << '\n';
-}
-
-
-template<typename data>
-inline
-void
-DataOutBase::VtkStream::write_dataset(unsigned int,
-				      const std::vector<data>& values)
-{
-  for (unsigned int i=0;i<values.size();++i)
-    stream << '\t' << values[i];
-  stream << '\n';
-}
-
 
 
 //----------------------------------------------------------------------//
