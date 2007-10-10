@@ -2616,6 +2616,12 @@ class DataOutReader : public DataOutInterface<dim,spacedim>
     virtual std::vector<std::string> get_dataset_names () const;
     
   private:
+				     /**
+				      * Arrays holding the set of
+				      * patches that will be filled by
+				      * derived classes as well as the
+				      * names of output variables.
+				      */
     std::vector<typename dealii::DataOutBase::Patch<dim,spacedim> > patches;
     std::vector<std::string> dataset_names;
 };
