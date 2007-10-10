@@ -92,28 +92,6 @@ class BoussinesqFlowProblem
 
 
 template <int dim>
-class PressureRightHandSide : public Function<dim> 
-{
-  public:
-    PressureRightHandSide () : Function<dim>(1) {}
-    
-    virtual double value (const Point<dim>   &p,
-                          const unsigned int  component = 0) const;
-};
-
-
-
-template <int dim>
-double
-PressureRightHandSide<dim>::value (const Point<dim>  &/*p*/,
-                                   const unsigned int /*component*/) const 
-{
-  return 0;
-}
-
-
-
-template <int dim>
 class Buoyancy : public Function<dim> 
 {
   public:
@@ -130,8 +108,10 @@ void
 Buoyancy<dim>::vector_value (const Point<dim>  &p,
 			     Vector<double>    &values) const 
 {
+  Assert (values.size() == dim, ExcInternalError());
+  
   values = 0;
-  values(dim-1) = p[dim-1];
+  values(dim-1) = (p.distance (Point<dim>(.5,.5)) < .2 ? 1 : 0);
 }
 
 
@@ -515,11 +495,9 @@ void BoussinesqFlowProblem<dim>::assemble_system ()
 
   std::vector<unsigned int> local_dof_indices (dofs_per_cell);
   
-  const PressureRightHandSide<dim>  pressure_right_hand_side;
   const Buoyancy<dim>               buoyancy;
   const PressureBoundaryValues<dim> pressure_boundary_values;
   
-  std::vector<double>               pressure_rhs_values (n_q_points);
   std::vector<Vector<double> >      buoyancy_values (n_q_points,
 						     Vector<double>(dim));
   std::vector<double>               boundary_values (n_face_q_points);
@@ -539,8 +517,6 @@ void BoussinesqFlowProblem<dim>::assemble_system ()
 
       fe_values.get_function_values (old_solution, old_solution_values);
 
-      pressure_right_hand_side.value_list (fe_values.get_quadrature_points(),
-                                           pressure_rhs_values);
       buoyancy.vector_value_list (fe_values.get_quadrature_points(),
 				  buoyancy_values);
       for (unsigned int q=0; q<n_q_points; ++q)            
@@ -569,8 +545,7 @@ void BoussinesqFlowProblem<dim>::assemble_system ()
               }
 
 	    Assert (dim == 2, ExcInternalError());
-            local_rhs(i) += (-phi_i_p * pressure_rhs_values[q]
-			     +phi_i_u[0] * buoyancy_values[q](0)
+            local_rhs(i) += ( phi_i_u[0] * buoyancy_values[q](0)
 			     +phi_i_u[1] * buoyancy_values[q](1))*
                             fe_values.JxW(q);
           }
