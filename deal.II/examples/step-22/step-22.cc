@@ -737,20 +737,20 @@ template <int dim>
 void BoussinesqFlowProblem<dim>::solve () 
 {
   const InverseMatrix<SparseMatrix<double> >
-    m_inverse (system_matrix.block(0,0));
+    A_inverse (system_matrix.block(0,0));
   Vector<double> tmp (solution.block(0).size());
   Vector<double> schur_rhs (solution.block(1).size());
   Vector<double> tmp2 (solution.block(2).size());
   
 
   {
-    m_inverse.vmult (tmp, system_rhs.block(0));
+    A_inverse.vmult (tmp, system_rhs.block(0));
     system_matrix.block(1,0).vmult (schur_rhs, tmp);
     schur_rhs -= system_rhs.block(1);
 
     
     SchurComplement
-      schur_complement (system_matrix, m_inverse);
+      schur_complement (system_matrix, A_inverse);
     
     SolverControl solver_control (system_matrix.block(0,0).m(),
                                   1e-12*schur_rhs.l2_norm());
@@ -779,7 +779,7 @@ void BoussinesqFlowProblem<dim>::solve ()
     tmp *= -1;
     tmp += system_rhs.block(0);
     
-    m_inverse.vmult (solution.block(0), tmp);
+    A_inverse.vmult (solution.block(0), tmp);
   }
 
   time_step = std::pow(0.5, double(n_refinement_steps)) /
