@@ -270,7 +270,7 @@ estimate (const Mapping<1>                    &mapping,
 				    std::vector<bool>(n_components, true) :
 				    component_mask_);
   Assert (component_mask.size() == n_components, ExcInvalidComponentMask());
-  Assert (count(component_mask.begin(), component_mask.end(), true) > 0,
+  Assert (std::count(component_mask.begin(), component_mask.end(), true) > 0,
 	  ExcInvalidComponentMask());
   
   Assert ((coefficient == 0) ||
