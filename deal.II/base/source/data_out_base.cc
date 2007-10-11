@@ -4589,6 +4589,28 @@ merge (const DataOutReader<dim,spacedim> &source)
                                    // names
   Assert (get_dataset_names() == source.get_dataset_names(),
           ExcIncompatibleDatasetNames());
+
+				   // check equality of the vector data
+				   // specifications
+  Assert (get_vector_data_ranges().size() == source.get_vector_data_ranges().size(),
+	  ExcMessage ("Both sources need to declare the same components "
+		      "as vectors."));
+  for (unsigned int i=0; i<get_vector_data_ranges().size(); ++i)
+    {
+      Assert (get_vector_data_ranges()[i].template get<0>() ==
+	      source.get_vector_data_ranges()[i].template get<0>(),
+	      ExcMessage ("Both sources need to declare the same components "
+			  "as vectors."));
+      Assert (get_vector_data_ranges()[i].template get<1>() ==
+	      source.get_vector_data_ranges()[i].template get<1>(),
+	      ExcMessage ("Both sources need to declare the same components "
+			  "as vectors."));
+      Assert (get_vector_data_ranges()[i].template get<2>() ==
+	      source.get_vector_data_ranges()[i].template get<2>(),
+	      ExcMessage ("Both sources need to declare the same components "
+			  "as vectors."));
+    }
+  
                                    // make sure patches are compatible
   Assert (patches[0].n_subdivisions == source_patches[0].n_subdivisions,
           ExcIncompatiblePatchLists());
