@@ -2,7 +2,7 @@
 //    $Id$
 //    Version: $Name$
 //
-//    Copyright (C) 1998, 1999, 2000, 2001, 2002, 2003, 2004, 2005, 2006 by the deal.II authors
+//    Copyright (C) 1998, 1999, 2000, 2001, 2002, 2003, 2004, 2005, 2006, 2007 by the deal.II authors
 //
 //    This file is subject to QPL and may not be  distributed
 //    without copyright and license information. Please refer
@@ -155,6 +155,20 @@ class Subscriptor
 
   private:
 				     /**
+				      * Register a subscriber for
+				      * debugging purposes. Called by
+				      * subscribe() in debug mode.
+				      */
+    void do_subscribe(const char* id) const;
+    
+				     /**
+				      * Deregister a subscriber for
+				      * debugging purposes. Called by
+				      * unsubscribe() in debug mode.
+				      */
+    void do_unsubscribe(const char* id) const;
+    
+				     /**
 				      * The data type used in
 				      * #counter_map.
 				      */
@@ -229,7 +243,22 @@ class Subscriptor
 // unsubscribe here. The definitions for debug mode are in
 // subscriptor.cc.
 
-#ifndef DEBUG
+#ifdef DEBUG
+
+inline void
+Subscriptor::subscribe(const char* id) const
+{
+  do_subscribe(id);
+}
+
+
+inline void
+Subscriptor::unsubscribe(const char* id) const
+{
+  do_unsubscribe(id);
+}
+
+#else
 
 inline void
 Subscriptor::subscribe(const char*) const

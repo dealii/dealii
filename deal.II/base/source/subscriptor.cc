@@ -2,7 +2,7 @@
 //    $Id$
 //    Version: $Name$
 //
-//    Copyright (C) 1998, 1999, 2000, 2001, 2002, 2003, 2005, 2006 by the deal.II authors
+//    Copyright (C) 1998, 1999, 2000, 2001, 2002, 2003, 2005, 2006, 2007 by the deal.II authors
 //
 //    This file is subject to QPL and may not be  distributed
 //    without copyright and license information. Please refer
@@ -134,9 +134,9 @@ Subscriptor & Subscriptor::operator = (const Subscriptor &s)
 // These are the implementations for debug mode. The optimized
 // versions are inlined in the header file.
 
-#ifdef DEBUG
-void Subscriptor::subscribe (const char* id) const
+void Subscriptor::do_subscribe (const char* id) const
 {
+#ifdef DEBUG
   if (object_info == 0)
     object_info = &typeid(*this);
   Threads::ThreadMutex::ScopedLock lock (subscription_lock);
@@ -152,11 +152,13 @@ void Subscriptor::subscribe (const char* id) const
   else
     it->second++;
 #endif
+#endif
 }
 
 
-void Subscriptor::unsubscribe (const char* id) const
+void Subscriptor::do_unsubscribe (const char* id) const
 {
+#ifdef DEBUG
   Assert (counter>0, ExcNotUsed());
   Threads::ThreadMutex::ScopedLock lock (subscription_lock);
   --counter;
@@ -170,8 +172,8 @@ void Subscriptor::unsubscribe (const char* id) const
   
   it->second--;
 #endif
-}
 #endif
+}
 
 
 unsigned int Subscriptor::n_subscriptions () const
