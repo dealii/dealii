@@ -50,20 +50,22 @@ solve_filtered (std::map<unsigned int,double> &bv,
 		Vector<double>                &u,
 		Vector<double>                &f)
 {
-  FilteredMatrix<SparseMatrix<double> > A1 (A);
+  FilteredMatrix<Vector<double> > A1 (A);
   A1.add_constraints (bv);
   
   SolverControl control (1000, 1.e-10, false, false);
   PrimitiveVectorMemory<Vector<double> > mem;
   SolverCG<Vector<double> > solver (control, mem);
-  PreconditionJacobi<FilteredMatrix<SparseMatrix<double> > > prec;
-  prec.initialize (A1, 1.2);
+  PreconditionJacobi<SparseMatrix<double> > prec;
+  FilteredMatrix<Vector<double> > fprec;
+  prec.initialize (A, 1.2);
+  fprec.initialize(prec);
   
   Vector<double> f1 (f.size());
   f1 = f;
   A1.apply_constraints (f1, true);
   
-  solver.solve (A1, u, f1, prec);
+  solver.solve (A1, u, f1, fprec);
 
   for (std::map<unsigned int,double>::const_iterator i=bv.begin();
        i!=bv.end(); ++i)
