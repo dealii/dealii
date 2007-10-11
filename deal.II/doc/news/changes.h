@@ -30,15 +30,25 @@ inconvenience this causes.
 </p>
 
 <ol>
+  <li> <p>Changed: The version number of the deal.II intermediate format written by
+  DataOutBase::write_deal_intermediate has been increased to 3 to accomodate the fact that
+  we now support writing vector-valued data to output files in at least some output formats.
+  (Previously, vector-valued date was written as a collection of scalar fields.) Since
+  we can only read files written in intermediate format that has the same number as the
+  files we generate, this means that files written with previous format numbers can now
+  no longer be read.
+  <br>
+  (WB 2007/10/11)
+  </p>
 
-<li> <p>Changed: FilteredMatrix now can be applied to any matrix having the standard
-set of <code>vmult</code> functions. In order to achieve this, its interface had to be overhauled.
-Only the <code>VECTOR</code> template argument remains. Furthermore, instead of
-PreconditionJacobi being applied to FilteredMatrix, FilteredMatrix
-can now be applied to any preconditioner.
-<br>
-(GK 2007/09/25)
-</p>
+  <li> <p>Changed: FilteredMatrix now can be applied to any matrix having the standard
+  set of <code>vmult</code> functions. In order to achieve this, its interface had to be overhauled.
+  Only the <code>VECTOR</code> template argument remains. Furthermore, instead of
+  PreconditionJacobi being applied to FilteredMatrix, FilteredMatrix
+  can now be applied to any preconditioner.
+  <br>
+  (GK 2007/09/25)
+  </p>
 
   <li> <p>Changed: The deprecated typedefs
   <code>internal::Triangulation::Line</code>, 
@@ -64,6 +74,21 @@ can now be applied to any preconditioner.
 <h3>base</h3>
 
 <ol>
+
+  <li> <p>New: The DataOutBase class and derived classes can now deal with data that is
+  logically vector-valued, i.e. derived classes can pass down information that some of
+  the components of the output should be grouped together as vectors, instead of being
+  treated as a number of separate scalar fields. This allows visualization programs to
+  display these components as vector-fields right away, without the need to manually group
+  them together into a vector.
+  <p>
+  While all output format writers receive the information necessary to do this, currently
+  only the VTK reader in DataOutBase::write_vtk makes use of it.
+  <p>
+  The use of this ability is explained in the @ref step_22 "step-22" tutorial program.
+  <br>
+  (WB 2007/10/11)
+  </p> </li>
 
   <li> <p>New: Macro #AssertDimension introduced for easier handling of
   ExcDimensionMismatch.

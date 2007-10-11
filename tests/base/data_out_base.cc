@@ -2,7 +2,7 @@
 //    $Id$
 //    Version: $Name$ 
 //
-//    Copyright (C) 2000, 2001, 2002, 2003, 2004, 2005, 2006 by the deal.II authors
+//    Copyright (C) 2000, 2001, 2002, 2003, 2004, 2005, 2006, 2007 by the deal.II authors
 //
 //    This file is subject to QPL and may not be  distributed
 //    without copyright and license information. Please refer
@@ -24,7 +24,7 @@
 
 #define WRITE(type) { out << "Writing " # type " dimensions " \
 << dim << ',' << spacedim << std::endl; \
-DataOutBase::write_ ## type (patches, names, type ## flags, out); }
+DataOutBase::write_ ## type (patches, names, vectors, type ## flags, out); }
 
 template <int dim, int spacedim>
 void
@@ -43,6 +43,8 @@ write_patches(const std::vector<DataOutBase::Patch<dim,spacedim> >& patches,
   DataOutBase::UcdFlags ucdflags;
   DataOutBase::VtkFlags vtkflags;
   DataOutBase::Deal_II_IntermediateFlags deal_II_intermediateflags;
+
+  std::vector<boost::tuple<unsigned int, unsigned int, std::string> > vectors;
   
   WRITE(dx);
   if (dim==2)

@@ -19,6 +19,8 @@
 #include <base/table.h>
 #include <base/geometry_info.h>
 
+#include <boost/tuple/tuple.hpp>
+
 #include <vector>
 #include <string>
 
@@ -1248,7 +1250,7 @@ class DataOutBase
 					  * current readers and
 					  * writers understand.
 					  */
-        static const unsigned int format_version = 2;
+        static const unsigned int format_version = 3;
       private:
 					 /**
 					  * Dummy entry to suppress compiler
@@ -1384,7 +1386,8 @@ class DataOutBase
     template <int dim, int spacedim>
     static void write_dx (const std::vector<Patch<dim,spacedim> > &patches,
 			  const std::vector<std::string>          &data_names,
-			  const DXFlags                          &flags,
+			  const std::vector<boost::tuple<unsigned int, unsigned int, std::string> > &vector_data_ranges,
+			  const DXFlags                           &flags,
 			  std::ostream                            &out);
 
 /**
@@ -1435,6 +1438,7 @@ class DataOutBase
     template <int dim, int spacedim>
     static void write_eps (const std::vector<Patch<dim,spacedim> > &patches,
 			   const std::vector<std::string>          &data_names,
+			   const std::vector<boost::tuple<unsigned int, unsigned int, std::string> > &vector_data_ranges,
 			   const EpsFlags                          &flags,
 			   std::ostream                            &out);
 
@@ -1451,6 +1455,7 @@ class DataOutBase
     template <int dim, int spacedim>
     static void write_gmv (const std::vector<Patch<dim,spacedim> > &patches,
 			   const std::vector<std::string>          &data_names,
+			   const std::vector<boost::tuple<unsigned int, unsigned int, std::string> > &vector_data_ranges,
 			   const GmvFlags                          &flags,
 			   std::ostream                            &out);
 
@@ -1517,6 +1522,7 @@ class DataOutBase
     template <int dim, int spacedim>
     static void write_gnuplot (const std::vector<Patch<dim,spacedim> > &patches,
 			       const std::vector<std::string>          &data_names,
+			       const std::vector<boost::tuple<unsigned int, unsigned int, std::string> > &vector_data_ranges,
 			       const GnuplotFlags                      &flags,
 			       std::ostream                            &out);
 
@@ -1570,6 +1576,7 @@ class DataOutBase
     template <int dim, int spacedim>
     static void write_povray (const std::vector<Patch<dim,spacedim> > &patches,
 			      const std::vector<std::string>          &data_names,
+			      const std::vector<boost::tuple<unsigned int, unsigned int, std::string> > &vector_data_ranges,
 			      const PovrayFlags                       &flags,
 			      std::ostream                            &out);
 
@@ -1583,6 +1590,7 @@ class DataOutBase
     template <int dim, int spacedim>
     static void write_tecplot (const std::vector<Patch<dim,spacedim> > &patches,
 			       const std::vector<std::string>          &data_names,
+			       const std::vector<boost::tuple<unsigned int, unsigned int, std::string> > &vector_data_ranges,
 			       const TecplotFlags                      &flags,
 			       std::ostream                            &out);
 
@@ -1611,6 +1619,7 @@ class DataOutBase
     static void write_tecplot_binary (
       const std::vector<Patch<dim,spacedim> > &patches,
       const std::vector<std::string>          &data_names,
+      const std::vector<boost::tuple<unsigned int, unsigned int, std::string> > &vector_data_ranges,
       const TecplotFlags                      &flags,
       std::ostream                            &out);
 
@@ -1632,6 +1641,7 @@ class DataOutBase
     template <int dim, int spacedim>
     static void write_ucd (const std::vector<Patch<dim,spacedim> > &patches,
 			   const std::vector<std::string>          &data_names,
+			   const std::vector<boost::tuple<unsigned int, unsigned int, std::string> > &vector_data_ranges,
 			   const UcdFlags                          &flags,
 			   std::ostream                            &out);
 
@@ -1640,11 +1650,19 @@ class DataOutBase
  * SoftwareVTK format.
  *
  * This is the file format used by @ref SoftwareVTK, as described in
- * their manual, section 14.3. It is similar to write_gmv().
+ * their manual, section 14.3.
+ *
+ * The vector_data_ranges argument denotes ranges of components in the
+ * output that are considered a vector, rather than simply a
+ * collection of scalar fields. The VTK output format has special
+ * provisions that allow these components to be output by a single
+ * name rather than having to group several scalar fields into a
+ * vector later on in the visualization program.
  */
     template <int dim, int spacedim>
     static void write_vtk (const std::vector<Patch<dim,spacedim> > &patches,
 			   const std::vector<std::string>          &data_names,
+			   const std::vector<boost::tuple<unsigned int, unsigned int, std::string> > &vector_data_ranges,
 			   const VtkFlags                          &flags,
 			   std::ostream                            &out);
 
@@ -1692,6 +1710,7 @@ class DataOutBase
     static void write_deal_II_intermediate (
       const std::vector<Patch<dim,spacedim> > &patches,
       const std::vector<std::string>          &data_names,
+      const std::vector<boost::tuple<unsigned int, unsigned int, std::string> > &vector_data_ranges,
       const Deal_II_IntermediateFlags         &flags,
       std::ostream                            &out);
 
@@ -2338,7 +2357,8 @@ class DataOutInterface : private DataOutBase
 				      * output functions to know what
 				      * they shall print.
 				      */
-    virtual const std::vector<typename DataOutBase::Patch<dim,spacedim> > &
+    virtual
+    const std::vector<typename DataOutBase::Patch<dim,spacedim> > &
     get_patches () const = 0;
 
 				     /**
@@ -2348,8 +2368,48 @@ class DataOutInterface : private DataOutBase
 				      * output functions of the base
 				      * class.
 				      */
-    virtual std::vector<std::string> get_dataset_names () const = 0;
+    virtual
+    std::vector<std::string>
+    get_dataset_names () const = 0;
 
+				     /**
+				      * This functions returns
+				      * information about how the
+				      * individual components of
+				      * output files that consist of
+				      * more than one data set are to
+				      * be interpreted.
+				      *
+				      * It returns a list of index
+				      * pairs and corresponding name
+				      * indicating which components of
+				      * the output are to be
+				      * considered vector-valued
+				      * rather than just a collection
+				      * of scalar data. The index
+				      * pairs are inclusive; for
+				      * example, if we have a Stokes
+				      * problem in 2d with components
+				      * (u,v,p), then the
+				      * corresponding vector data
+				      * range should be (0,1), and the
+				      * returned list would consist of
+				      * only a single element with a
+				      * tuple such as (0,1,"velocity").
+				      *
+				      * Since some of the derived
+				      * classes do not know about
+				      * vector data, this function has
+				      * a default implementation that
+				      * simply returns an empty
+				      * string, meaning that all data
+				      * is to be considered a
+				      * collection of scalar fields.
+				      */
+    virtual
+    std::vector<boost::tuple<unsigned int, unsigned int, std::string> >
+    get_vector_data_ranges () const;
+    
 				     /**
 				      * The default number of
 				      * subdivisions for patches. This
@@ -2615,15 +2675,63 @@ class DataOutReader : public DataOutInterface<dim,spacedim>
 				      */
     virtual std::vector<std::string> get_dataset_names () const;
     
+				     /**
+				      * This functions returns
+				      * information about how the
+				      * individual components of
+				      * output files that consist of
+				      * more than one data set are to
+				      * be interpreted.
+				      *
+				      * It returns a list of index
+				      * pairs and corresponding name
+				      * indicating which components of
+				      * the output are to be
+				      * considered vector-valued
+				      * rather than just a collection
+				      * of scalar data. The index
+				      * pairs are inclusive; for
+				      * example, if we have a Stokes
+				      * problem in 2d with components
+				      * (u,v,p), then the
+				      * corresponding vector data
+				      * range should be (0,1), and the
+				      * returned list would consist of
+				      * only a single element with a
+				      * tuple such as (0,1,"velocity").
+				      *
+				      * Since some of the derived
+				      * classes do not know about
+				      * vector data, this function has
+				      * a default implementation that
+				      * simply returns an empty
+				      * string, meaning that all data
+				      * is to be considered a
+				      * collection of scalar fields.
+				      */
+    virtual
+    std::vector<boost::tuple<unsigned int, unsigned int, std::string> >
+    get_vector_data_ranges () const;
+
   private:
 				     /**
 				      * Arrays holding the set of
-				      * patches that will be filled by
-				      * derived classes as well as the
-				      * names of output variables.
+				      * patches as well as the names
+				      * of output variables, all of
+				      * which we read from an input
+				      * stream.
 				      */
     std::vector<typename dealii::DataOutBase::Patch<dim,spacedim> > patches;
     std::vector<std::string> dataset_names;
+
+				     /**
+				      * Information about whether
+				      * certain components of the
+				      * output field are to be
+				      * considered vectors.
+				      */
+    std::vector<boost::tuple<unsigned int, unsigned int, std::string> >
+    vector_data_ranges;
 };
 
 

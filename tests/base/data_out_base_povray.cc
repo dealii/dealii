@@ -2,7 +2,7 @@
 //    $Id$
 //    Version: $Name$ 
 //
-//    Copyright (C) 2006 by the deal.II authors
+//    Copyright (C) 2006, 2007 by the deal.II authors
 //
 //    This file is subject to QPL and may not be  distributed
 //    without copyright and license information. Please refer
@@ -46,7 +46,8 @@ void check(DataOutBase::PovrayFlags flags,
   names[2] = "x3";
   names[3] = "x4";
   names[4] = "i";
-  DataOutBase::write_povray(patches, names, flags, out);
+  std::vector<boost::tuple<unsigned int, unsigned int, std::string> > vectors;
+  DataOutBase::write_povray(patches, names, vectors, flags, out);
 }
 
 
@@ -62,7 +63,8 @@ void check_cont(unsigned int ncells,
   
   std::vector<std::string> names(1);
   names[0] = "CutOff";
-  DataOutBase::write_povray(patches, names, flags, out);
+  std::vector<boost::tuple<unsigned int, unsigned int, std::string> > vectors;
+  DataOutBase::write_povray(patches, names, vectors, flags, out);
 }
 
 

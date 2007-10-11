@@ -1506,6 +1506,7 @@ void DataOutBase::VtkFlags::parse_parameters (const ParameterHandler &/*prm*/)
 {}
 
 
+
 unsigned int
 DataOutBase::VtkFlags::memory_consumption () const
 {
@@ -1770,6 +1771,7 @@ DataOutBase::write_data (
 template <int dim, int spacedim>
 void DataOutBase::write_ucd (const std::vector<Patch<dim,spacedim> > &patches,
 			     const std::vector<std::string>          &data_names,
+			     const std::vector<boost::tuple<unsigned int, unsigned int, std::string> > &,
 			     const UcdFlags                          &flags,
 			     std::ostream                            &out) 
 {
@@ -1850,6 +1852,7 @@ void DataOutBase::write_ucd (const std::vector<Patch<dim,spacedim> > &patches,
 template <int dim, int spacedim>
 void DataOutBase::write_dx (const std::vector<Patch<dim,spacedim> > &patches,
 			    const std::vector<std::string>          &data_names,
+			    const std::vector<boost::tuple<unsigned int, unsigned int, std::string> > &,
 			    const DXFlags                           &flags,
 			    std::ostream                            &out) 
 {
@@ -2115,6 +2118,7 @@ void DataOutBase::write_dx (const std::vector<Patch<dim,spacedim> > &patches,
 template <int dim, int spacedim>
 void DataOutBase::write_gnuplot (const std::vector<Patch<dim,spacedim> > &patches,
 				 const std::vector<std::string>          &data_names,
+				 const std::vector<boost::tuple<unsigned int, unsigned int, std::string> > &,
 				 const GnuplotFlags                      &/*flags*/,
 				 std::ostream                            &out) 
 {
@@ -2330,6 +2334,7 @@ void DataOutBase::write_gnuplot (const std::vector<Patch<dim,spacedim> > &patche
 template <int dim, int spacedim>
 void DataOutBase::write_povray (const std::vector<Patch<dim,spacedim> > &patches,
 				const std::vector<std::string>          &data_names,
+				const std::vector<boost::tuple<unsigned int, unsigned int, std::string> > &,
 				const PovrayFlags                       &flags,
 				std::ostream                            &out) 
 {
@@ -2665,6 +2670,7 @@ void DataOutBase::write_povray (const std::vector<Patch<dim,spacedim> > &patches
 template <int dim, int spacedim>
 void DataOutBase::write_eps (const std::vector<Patch<dim,spacedim> > &patches,
 			     const std::vector<std::string>          &/*data_names*/,
+			     const std::vector<boost::tuple<unsigned int, unsigned int, std::string> > &,
 			     const EpsFlags                          &flags,
 			     std::ostream                            &out) 
 {
@@ -3026,6 +3032,7 @@ void DataOutBase::write_eps (const std::vector<Patch<dim,spacedim> > &patches,
 template <int dim, int spacedim>
 void DataOutBase::write_gmv (const std::vector<Patch<dim,spacedim> > &patches,
 			     const std::vector<std::string>          &data_names,
+			     const std::vector<boost::tuple<unsigned int, unsigned int, std::string> > &,
 			     const GmvFlags                          &flags,
 			     std::ostream                            &out) 
 {
@@ -3157,6 +3164,7 @@ void DataOutBase::write_gmv (const std::vector<Patch<dim,spacedim> > &patches,
 template <int dim, int spacedim>
 void DataOutBase::write_tecplot (const std::vector<Patch<dim,spacedim> > &patches,
 				 const std::vector<std::string>          &data_names,
+				 const std::vector<boost::tuple<unsigned int, unsigned int, std::string> > &,
 				 const TecplotFlags                      &flags,
 				 std::ostream                            &out)
 {
@@ -3388,6 +3396,7 @@ namespace
 template <int dim, int spacedim>
 void DataOutBase::write_tecplot_binary (const std::vector<Patch<dim,spacedim> > &patches,
 					const std::vector<std::string>          &data_names,
+					const std::vector<boost::tuple<unsigned int, unsigned int, std::string> > &vector_data_ranges,
 					const TecplotFlags                      &flags,
 					std::ostream                            &out)
 {
@@ -3397,7 +3406,7 @@ void DataOutBase::write_tecplot_binary (const std::vector<Patch<dim,spacedim> > 
                                    // simply call the ASCII output
                                    // function if the Tecplot API
                                    // isn't present
-  write_tecplot (patches, data_names, flags, out);
+  write_tecplot (patches, data_names, vector_data_ranges, flags, out);
   return;
   
 #else
@@ -3406,7 +3415,7 @@ void DataOutBase::write_tecplot_binary (const std::vector<Patch<dim,spacedim> > 
                                    // for 2D & 3D
   if (dim == 1)
     {
-      write_tecplot (patches, data_names, flags, out);
+      write_tecplot (patches, data_names, vector_data_ranges, flags, out);
       return;
     }
 
@@ -3713,14 +3722,17 @@ void DataOutBase::write_tecplot_binary (const std::vector<Patch<dim,spacedim> > 
 
 
 template <int dim, int spacedim>
-void DataOutBase::write_vtk (const std::vector<Patch<dim,spacedim> > &patches,
-			     const std::vector<std::string>          &data_names,
-			     const VtkFlags                          &flags,
-			     std::ostream                            &out) 
+void
+DataOutBase::write_vtk (const std::vector<Patch<dim,spacedim> > &patches,
+			const std::vector<std::string>          &data_names,
+			const std::vector<boost::tuple<unsigned int, unsigned int, std::string> > &vector_data_ranges,
+			const VtkFlags                          &flags,
+			std::ostream                            &out) 
 {
   AssertThrow (out, ExcIO());
 
   Assert (patches.size() > 0, ExcNoPatches());
+
   VtkStream vtk_out(out, flags);
   
   const unsigned int n_data_sets = data_names.size();
@@ -3730,7 +3742,11 @@ void DataOutBase::write_vtk (const std::vector<Patch<dim,spacedim> > &patches,
 				   // write_gmv_reorder_data_vectors
   Assert ((patches[0].data.n_rows() == n_data_sets && !patches[0].points_are_available) ||
 	  (patches[0].data.n_rows() == n_data_sets+spacedim && patches[0].points_are_available),
-	  ExcDimensionMismatch (patches[0].points_are_available ? (patches[0].data.n_rows() + spacedim) : patches[0].data.n_rows(), n_data_sets));
+	  ExcDimensionMismatch (patches[0].points_are_available
+				?
+				(patches[0].data.n_rows() + spacedim)
+				:
+				patches[0].data.n_rows(), n_data_sets));
   
   
 				   ///////////////////////
@@ -3829,19 +3845,106 @@ void DataOutBase::write_vtk (const std::vector<Patch<dim,spacedim> > &patches,
 				   // are point data
   out << "POINT_DATA " << n_nodes
       << '\n';
-  for (unsigned int data_set=0; data_set<n_data_sets; ++data_set)
+
+				   // when writing, first write out
+				   // all vector data, then handle the
+				   // scalar data sets that have been
+				   // left over
+  std::vector<bool> data_set_written (n_data_sets, false);
+  for (unsigned int n_th_vector=0; n_th_vector<vector_data_ranges.size(); ++n_th_vector)
     {
-      out << "SCALARS "
-	  << data_names[data_set]
-	  << " double 1"
-	  << '\n'
-	  << "LOOKUP_TABLE default"
+      
+      AssertThrow (vector_data_ranges[n_th_vector].get<1>() >
+		   vector_data_ranges[n_th_vector].get<0>(),
+		   ExcLowerRange (vector_data_ranges[n_th_vector].get<1>(),
+				  vector_data_ranges[n_th_vector].get<0>()));
+      AssertThrow (vector_data_ranges[n_th_vector].get<1>() < n_data_sets,
+		   ExcIndexRange (vector_data_ranges[n_th_vector].get<1>(),
+				  0, n_data_sets));
+      AssertThrow (vector_data_ranges[n_th_vector].get<1>() + 1
+		   - vector_data_ranges[n_th_vector].get<0>() <= 3,
+		   ExcMessage ("Can't declare a vector with more than 3 components "
+			       "in VTK"));
+
+				       // mark these components as already written:
+      for (unsigned int i=vector_data_ranges[n_th_vector].get<0>();
+	   i<=vector_data_ranges[n_th_vector].get<1>();
+	   ++i)
+	data_set_written[i] = true;
+      
+				       // write the
+				       // header. concatenate all the
+				       // component names with double
+				       // underscores unless a vector
+				       // name has been specified
+      out << "VECTORS ";
+
+      if (vector_data_ranges[n_th_vector].get<2>() != "")
+	out << vector_data_ranges[n_th_vector].get<2>();
+      else
+	{
+	  for (unsigned int i=vector_data_ranges[n_th_vector].get<0>();
+	       i<vector_data_ranges[n_th_vector].get<1>();
+	       ++i)
+	    out << data_names[i] << "__";
+	  out << data_names[vector_data_ranges[n_th_vector].get<1>()];
+	}
+      
+      out << " double"
 	  << '\n';
-      std::copy (data_vectors[data_set].begin(),
-		 data_vectors[data_set].end(),
-		 std::ostream_iterator<double>(out, " "));
-      out << '\n';
+
+				       // now write data. pad all
+				       // vectors to have three
+				       // components
+      for (unsigned int n=0; n<n_nodes; ++n)
+	{
+	  switch (vector_data_ranges[n_th_vector].get<1>() -
+		  vector_data_ranges[n_th_vector].get<0>())
+	    {
+	      case 0:
+		    out << data_vectors(vector_data_ranges[n_th_vector].get<0>(), n) << " 0 0"
+			<< '\n';
+		    break;
+		    
+	      case 1:
+		    out << data_vectors(vector_data_ranges[n_th_vector].get<0>(),   n) << ' '
+			<< data_vectors(vector_data_ranges[n_th_vector].get<0>()+1, n) << " 0"
+			<< '\n';
+		    break;
+	      case 2:
+		    out << data_vectors(vector_data_ranges[n_th_vector].get<0>(),   n) << ' '
+			<< data_vectors(vector_data_ranges[n_th_vector].get<0>()+1, n) << ' '
+			<< data_vectors(vector_data_ranges[n_th_vector].get<0>()+2, n)
+			<< '\n';
+		    break;
+
+	      default:
+						     // VTK doesn't
+						     // support
+						     // anything else
+						     // than vectors
+						     // with 1, 2, or
+						     // 3 components
+		    Assert (false, ExcInternalError());
+	    }
+	}
     }
+
+				   // now do the left over scalar data sets
+  for (unsigned int data_set=0; data_set<n_data_sets; ++data_set)
+    if (data_set_written[data_set] == false)
+      {
+	out << "SCALARS "
+	    << data_names[data_set]
+	    << " double 1"
+	    << '\n'
+	    << "LOOKUP_TABLE default"
+	    << '\n';
+	std::copy (data_vectors[data_set].begin(),
+		   data_vectors[data_set].end(),
+		   std::ostream_iterator<double>(out, " "));
+	out << '\n';
+      }
   
 				   // make sure everything now gets to
 				   // disk
@@ -3858,6 +3961,7 @@ void
 DataOutBase::
 write_deal_II_intermediate (const std::vector<Patch<dim,spacedim> > &patches,
 			    const std::vector<std::string>          &data_names,
+			    const std::vector<boost::tuple<unsigned int, unsigned int, std::string> > &vector_data_ranges,
 			    const Deal_II_IntermediateFlags         &/*flags*/,
 			    std::ostream                            &out) 
 {
@@ -3883,6 +3987,12 @@ write_deal_II_intermediate (const std::vector<Patch<dim,spacedim> > &patches,
   for (unsigned int i=0; i<patches.size(); ++i)
     out << patches[i] << '\n';
 
+  out << vector_data_ranges.size() << '\n';
+  for (unsigned int i=0; i<vector_data_ranges.size(); ++i)
+    out << vector_data_ranges[i].get<0>() << ' '
+	<< vector_data_ranges[i].get<1>() << '\n'
+	<< vector_data_ranges[i].get<2>() << '\n';
+  
   out << '\n';
 				   // make sure everything now gets to
 				   // disk
@@ -3972,6 +4082,7 @@ template <int dim, int spacedim>
 void DataOutInterface<dim,spacedim>::write_dx (std::ostream &out) const 
 {
   DataOutBase::write_dx (get_patches(), get_dataset_names(),
+			 get_vector_data_ranges(),
 			 dx_flags, out);
 }
 
@@ -3981,6 +4092,7 @@ template <int dim, int spacedim>
 void DataOutInterface<dim,spacedim>::write_ucd (std::ostream &out) const 
 {
   DataOutBase::write_ucd (get_patches(), get_dataset_names(),
+			  get_vector_data_ranges(),
 			  ucd_flags, out);
 }
 
@@ -3990,6 +4102,7 @@ template <int dim, int spacedim>
 void DataOutInterface<dim,spacedim>::write_gnuplot (std::ostream &out) const 
 {
   DataOutBase::write_gnuplot (get_patches(), get_dataset_names(),
+			      get_vector_data_ranges(),
 			      gnuplot_flags, out);
 }
 
@@ -3999,6 +4112,7 @@ template <int dim, int spacedim>
 void DataOutInterface<dim,spacedim>::write_povray (std::ostream &out) const 
 {
   DataOutBase::write_povray (get_patches(), get_dataset_names(),
+			     get_vector_data_ranges(),
 			     povray_flags, out);
 }
 
@@ -4008,6 +4122,7 @@ template <int dim, int spacedim>
 void DataOutInterface<dim,spacedim>::write_eps (std::ostream &out) const 
 {
   DataOutBase::write_eps (get_patches(), get_dataset_names(),
+			  get_vector_data_ranges(),
 			  eps_flags, out);
 }
 
@@ -4017,6 +4132,7 @@ template <int dim, int spacedim>
 void DataOutInterface<dim,spacedim>::write_gmv (std::ostream &out) const 
 {
   DataOutBase::write_gmv (get_patches(), get_dataset_names(),
+			  get_vector_data_ranges(),
 			  gmv_flags, out);
 }
 
@@ -4026,6 +4142,7 @@ template <int dim, int spacedim>
 void DataOutInterface<dim,spacedim>::write_tecplot (std::ostream &out) const 
 {
   DataOutBase::write_tecplot (get_patches(), get_dataset_names(),
+			      get_vector_data_ranges(),
 			      tecplot_flags, out);
 }
 
@@ -4035,6 +4152,7 @@ template <int dim, int spacedim>
 void DataOutInterface<dim,spacedim>::write_tecplot_binary (std::ostream &out) const 
 {
   DataOutBase::write_tecplot_binary (get_patches(), get_dataset_names(),
+				     get_vector_data_ranges(),
 				     tecplot_flags, out);
 }
 
@@ -4044,6 +4162,7 @@ template <int dim, int spacedim>
 void DataOutInterface<dim,spacedim>::write_vtk (std::ostream &out) const 
 {
   DataOutBase::write_vtk (get_patches(), get_dataset_names(),
+			  get_vector_data_ranges(),
 			  vtk_flags, out);
 }
 
@@ -4054,6 +4173,7 @@ void DataOutInterface<dim,spacedim>::
 write_deal_II_intermediate (std::ostream &out) const 
 {
   DataOutBase::write_deal_II_intermediate (get_patches(), get_dataset_names(),
+					   get_vector_data_ranges(),
 					   deal_II_intermediate_flags, out);
 }
 
@@ -4339,6 +4459,17 @@ DataOutInterface<dim,spacedim>::memory_consumption () const
 
 
 
+template <int dim, int spacedim>
+std::vector<boost::tuple<unsigned int, unsigned int, std::string> >
+DataOutInterface<dim,spacedim>::get_vector_data_ranges () const
+{
+  return std::vector<boost::tuple<unsigned int, unsigned int, std::string> >();
+}
+
+
+
+
+// ---------------------------------------------- DataOutReader ----------
 
 template <int dim, int spacedim>
 void
@@ -4356,7 +4487,11 @@ DataOutReader<dim,spacedim>::read (std::istream &in)
     std::vector<std::string> tmp;
     tmp.swap (dataset_names);
   }
-
+  {
+    std::vector<boost::tuple<unsigned int, unsigned int, std::string> > tmp;
+    tmp.swap (vector_data_ranges);
+  }
+  
 				   // then check that we have the
 				   // correct header of this
 				   // file. both the first and second
@@ -4422,6 +4557,18 @@ DataOutReader<dim,spacedim>::read (std::istream &in)
   patches.resize (n_patches);
   for (unsigned int i=0; i<n_patches; ++i)
     in >> patches[i];
+
+  unsigned int n_vector_data_ranges;
+  in >> n_vector_data_ranges;
+  vector_data_ranges.resize (n_vector_data_ranges);
+  for (unsigned int i=0; i<n_patches; ++i)
+    {
+      in >> vector_data_ranges[i].get<0>()
+	 >> vector_data_ranges[i].get<1>();
+      std::string name;
+      getline(in, name);
+      vector_data_ranges[i].get<2>() = name;
+    }
   
   Assert (in, ExcIO());  
 }
@@ -4486,6 +4633,15 @@ std::vector<std::string>
 DataOutReader<dim,spacedim>::get_dataset_names () const
 {
   return dataset_names;
+}
+
+
+
+template <int dim, int spacedim>
+std::vector<boost::tuple<unsigned int, unsigned int, std::string> >
+DataOutReader<dim,spacedim>::get_vector_data_ranges () const
+{
+  return vector_data_ranges;
 }
 
 

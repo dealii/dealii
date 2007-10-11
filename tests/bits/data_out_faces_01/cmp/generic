@@ -362,7 +362,7 @@ LOOKUP_TABLE default
 1 2
 [deal.II intermediate format graphics data]
 [written by deal.II 6.1.pre]
-[Version: 2]
+[Version: 3]
 2
 node_data
 cell_data
@@ -457,6 +457,7 @@ cell_data
 10. 4.0 5.0 5.0 
 
 
+0
 
 DEAL::Checking Q1 in 3d:
 object "vertices" class array type float rank 1 shape 3 items 132 data follows
@@ -2290,7 +2291,7 @@ LOOKUP_TABLE default
 2 3
 [deal.II intermediate format graphics data]
 [written by deal.II 6.1.pre]
-[Version: 2]
+[Version: 3]
 2
 node_data
 cell_data
@@ -2592,6 +2593,7 @@ cell_data
 32. 38. 42. 11. 13. 13. 13. 13. 
 
 
+0
 
 DEAL::Checking Q2 in 1d:
 DEAL::Checking Q2 in 2d:
@@ -2956,7 +2958,7 @@ LOOKUP_TABLE default
 1 2
 [deal.II intermediate format graphics data]
 [written by deal.II 6.1.pre]
-[Version: 2]
+[Version: 3]
 2
 node_data
 cell_data
@@ -3051,6 +3053,7 @@ cell_data
 23. 9.0 5.0 5.0 
 
 
+0
 
 DEAL::Checking Q2 in 3d:
 object "vertices" class array type float rank 1 shape 3 items 132 data follows
@@ -4884,7 +4887,7 @@ LOOKUP_TABLE default
 2 3
 [deal.II intermediate format graphics data]
 [written by deal.II 6.1.pre]
-[Version: 2]
+[Version: 3]
 2
 node_data
 cell_data
@@ -5186,6 +5189,7 @@ cell_data
 1.2e+02 1.6e+02 1.9e+02 30. 13. 13. 13. 13. 
 
 
+0
 
 DEAL::Checking Q3 in 1d:
 DEAL::Checking Q3 in 2d:
@@ -5550,7 +5554,7 @@ LOOKUP_TABLE default
 1 2
 [deal.II intermediate format graphics data]
 [written by deal.II 6.1.pre]
-[Version: 2]
+[Version: 3]
 2
 node_data
 cell_data
@@ -5645,6 +5649,7 @@ cell_data
 42. 16. 5.0 5.0 
 
 
+0
 
 DEAL::Checking Q3 in 3d:
 object "vertices" class array type float rank 1 shape 3 items 132 data follows
@@ -7478,7 +7483,7 @@ LOOKUP_TABLE default
 2 3
 [deal.II intermediate format graphics data]
 [written by deal.II 6.1.pre]
-[Version: 2]
+[Version: 3]
 2
 node_data
 cell_data
@@ -7780,6 +7785,7 @@ cell_data
 3.2e+02 4.3e+02 5.1e+02 67. 13. 13. 13. 13. 
 
 
+0
 
 DEAL::Checking DGQ0 in 1d:
 DEAL::Checking DGQ0 in 2d:
@@ -8144,7 +8150,7 @@ LOOKUP_TABLE default
 1 2
 [deal.II intermediate format graphics data]
 [written by deal.II 6.1.pre]
-[Version: 2]
+[Version: 3]
 2
 node_data
 cell_data
@@ -8239,6 +8245,7 @@ cell_data
 5.0 5.0 5.0 5.0 
 
 
+0
 
 DEAL::Checking DGQ0 in 3d:
 object "vertices" class array type float rank 1 shape 3 items 132 data follows
@@ -10072,7 +10079,7 @@ LOOKUP_TABLE default
 2 3
 [deal.II intermediate format graphics data]
 [written by deal.II 6.1.pre]
-[Version: 2]
+[Version: 3]
 2
 node_data
 cell_data
@@ -10374,6 +10381,7 @@ cell_data
 13. 13. 13. 13. 13. 13. 13. 13. 
 
 
+0
 
 DEAL::Checking DGQ1 in 1d:
 DEAL::Checking DGQ1 in 2d:
@@ -10738,7 +10746,7 @@ LOOKUP_TABLE default
 1 2
 [deal.II intermediate format graphics data]
 [written by deal.II 6.1.pre]
-[Version: 2]
+[Version: 3]
 2
 node_data
 cell_data
@@ -10833,6 +10841,7 @@ cell_data
 20. 22. 5.0 5.0 
 
 
+0
 
 DEAL::Checking DGQ1 in 3d:
 object "vertices" class array type float rank 1 shape 3 items 132 data follows
@@ -12666,7 +12675,7 @@ LOOKUP_TABLE default
 2 3
 [deal.II intermediate format graphics data]
 [written by deal.II 6.1.pre]
-[Version: 2]
+[Version: 3]
 2
 node_data
 cell_data
@@ -12968,6 +12977,7 @@ cell_data
 1.0e+02 1.1e+02 1.1e+02 1.1e+02 13. 13. 13. 13. 
 
 
+0
 
 DEAL::Checking DGQ2 in 1d:
 DEAL::Checking DGQ2 in 2d:
@@ -13332,7 +13342,7 @@ LOOKUP_TABLE default
 1 2
 [deal.II intermediate format graphics data]
 [written by deal.II 6.1.pre]
-[Version: 2]
+[Version: 3]
 2
 node_data
 cell_data
@@ -13427,6 +13437,7 @@ cell_data
 45. 51. 5.0 5.0 
 
 
+0
 
 DEAL::Checking DGQ2 in 3d:
 object "vertices" class array type float rank 1 shape 3 items 132 data follows
@@ -15260,7 +15271,7 @@ LOOKUP_TABLE default
 2 3
 [deal.II intermediate format graphics data]
 [written by deal.II 6.1.pre]
-[Version: 2]
+[Version: 3]
 2
 node_data
 cell_data
@@ -15562,6 +15573,7 @@ cell_data
 3.5e+02 3.6e+02 3.7e+02 3.8e+02 13. 13. 13. 13. 
 
 
+0
 
 DEAL::Checking Nedelec1 in 2d:
 object "vertices" class array type float rank 1 shape 2 items 20 data follows
@@ -15953,7 +15965,7 @@ LOOKUP_TABLE default
 1 2
 [deal.II intermediate format graphics data]
 [written by deal.II 6.1.pre]
-[Version: 2]
+[Version: 3]
 3
 node_data_0
 node_data_1
@@ -16049,6 +16061,7 @@ cell_data
 52. 76. 68. 68. 5.0 5.0 
 
 
+0
 
 DEAL::Checking Nedelec1 in 3d:
 object "vertices" class array type float rank 1 shape 3 items 132 data follows
@@ -18162,7 +18175,7 @@ LOOKUP_TABLE default
 2 3
 [deal.II intermediate format graphics data]
 [written by deal.II 6.1.pre]
-[Version: 2]
+[Version: 3]
 4
 node_data_0
 node_data_1
@@ -18466,4 +18479,5 @@ cell_data
 2.3e+02 3.0e+02 3.5e+02 4.0e+02 3.0e+02 3.0e+02 3.9e+02 3.9e+02 3.6e+02 4.0e+02 3.6e+02 4.0e+02 13. 13. 13. 13. 
 
 
+0
 
