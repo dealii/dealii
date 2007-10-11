@@ -970,21 +970,6 @@ void DGMethod<dim>::assemble_system1 ()
                         neighbor_child
                         = cell->neighbor_child_on_subface (face_no, subface_no);
 		      
-						       // As these are
-						       // quite
-						       // complicated
-						       // indirections
-						       // which one
-						       // does not
-						       // usually get
-						       // right at
-						       // first
-						       // attempt we
-						       // check for
-						       // the internal
-						       // consistency.
-		      Assert (neighbor_child->face(neighbor2) == face->child(subface_no),
-			      ExcInternalError());
 		      Assert (!neighbor_child->has_children(), ExcInternalError());
 
 						       // We need to
@@ -1320,8 +1305,6 @@ void DGMethod<dim>::assemble_system2 ()
 		    {
 		      typename DoFHandler<dim>::cell_iterator neighbor_child
                         = cell->neighbor_child_on_subface (face_no, subface_no);
-		      Assert (neighbor_child->face(neighbor2) == face->child(subface_no),
-			      ExcInternalError());
 		      Assert (!neighbor_child->has_children(), ExcInternalError());
 		      
 		      ue_vi_matrix = 0;
