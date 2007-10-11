@@ -4561,7 +4561,7 @@ DataOutReader<dim,spacedim>::read (std::istream &in)
   unsigned int n_vector_data_ranges;
   in >> n_vector_data_ranges;
   vector_data_ranges.resize (n_vector_data_ranges);
-  for (unsigned int i=0; i<n_patches; ++i)
+  for (unsigned int i=0; i<n_vector_data_ranges; ++i)
     {
       in >> vector_data_ranges[i].get<0>()
 	 >> vector_data_ranges[i].get<1>();
