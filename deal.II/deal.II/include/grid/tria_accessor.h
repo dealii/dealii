@@ -3261,7 +3261,7 @@ class CellAccessor :  public TriaObjectAccessor<dim,dim>
 				      * pair of numbers, face_no and
 				      * subface_no, with the following
 				      * property:
-				      * <tt>cell->neighbor(neighbor)->face(face_no)->child(subface_no)==cell->face(neighbor)</tt>.
+				      * <tt>cell->neighbor(neighbor)->neighbor_child_on_subface(face_no,subface_no)==cell</tt>.
 				      *
 				      * This function is impossible
 				      * for <tt>dim==1</tt>.

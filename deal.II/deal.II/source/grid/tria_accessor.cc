@@ -2266,7 +2266,15 @@ CellAccessor<dim>::neighbor_of_coarser_neighbor (const unsigned int neighbor) co
   if (face_guess->has_children())
     for (unsigned int subface_no=0; subface_no<face_guess->n_children(); ++subface_no)
       if (face_guess->child_index(subface_no)==this_face_index)
-	return std::make_pair (face_no_guess, subface_no);
+					 // return the result, but don't forget
+					 // to take care of possible rotation,
+					 // flip and wrong orientation of the
+					 // neighbor's face...
+	return std::make_pair (face_no_guess,
+			       GeometryInfo<dim>::real_to_standard_face_vertex(subface_no,
+									       neighbor_cell->face_orientation(face_no_guess),
+									       neighbor_cell->face_flip(face_no_guess),
+									       neighbor_cell->face_rotation(face_no_guess)));
 
 				     // if the guess was false, then
 				     // we need to loop over all faces
@@ -2281,7 +2289,15 @@ CellAccessor<dim>::neighbor_of_coarser_neighbor (const unsigned int neighbor) co
 	  if (face->has_children())
 	    for (unsigned int subface_no=0; subface_no<face->n_children(); ++subface_no)
 	      if (face->child_index(subface_no)==this_face_index)
-		return std::make_pair (face_no, subface_no);
+						 // return the result, but don't forget
+						 // to take care of possible rotation,
+						 // flip and wrong orientation of the
+						 // neighbor's face...
+		return std::make_pair (face_no,
+				       GeometryInfo<dim>::real_to_standard_face_vertex(subface_no,
+										       neighbor_cell->face_orientation(face_no),
+										       neighbor_cell->face_flip(face_no),
+										       neighbor_cell->face_rotation(face_no)));
 	}
     }
   
