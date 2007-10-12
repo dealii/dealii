@@ -3434,7 +3434,7 @@ void DataOutBase::write_tecplot_binary (const std::vector<Patch<dim,spacedim> > 
 				       // output
       Assert(false, ExcMessage("Specify the name of the tecplot_binary"
 			       " file through the TecplotFlags interface."));
-      write_tecplot (patches, data_names, flags, out);
+      write_tecplot (patches, data_names, vector_data_ranges, flags, out);
       return;      
     }
   
