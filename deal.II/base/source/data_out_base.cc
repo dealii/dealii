@@ -3854,21 +3854,21 @@ DataOutBase::write_vtk (const std::vector<Patch<dim,spacedim> > &patches,
   for (unsigned int n_th_vector=0; n_th_vector<vector_data_ranges.size(); ++n_th_vector)
     {
       
-      AssertThrow (vector_data_ranges[n_th_vector].get<1>() >
-		   vector_data_ranges[n_th_vector].get<0>(),
-		   ExcLowerRange (vector_data_ranges[n_th_vector].get<1>(),
-				  vector_data_ranges[n_th_vector].get<0>()));
-      AssertThrow (vector_data_ranges[n_th_vector].get<1>() < n_data_sets,
-		   ExcIndexRange (vector_data_ranges[n_th_vector].get<1>(),
+      AssertThrow (vector_data_ranges[n_th_vector].template get<1>() >
+		   vector_data_ranges[n_th_vector].template get<0>(),
+		   ExcLowerRange (vector_data_ranges[n_th_vector].template get<1>(),
+				  vector_data_ranges[n_th_vector].template get<0>()));
+      AssertThrow (vector_data_ranges[n_th_vector].template get<1>() < n_data_sets,
+		   ExcIndexRange (vector_data_ranges[n_th_vector].template get<1>(),
 				  0, n_data_sets));
-      AssertThrow (vector_data_ranges[n_th_vector].get<1>() + 1
-		   - vector_data_ranges[n_th_vector].get<0>() <= 3,
+      AssertThrow (vector_data_ranges[n_th_vector].template get<1>() + 1
+		   - vector_data_ranges[n_th_vector].template get<0>() <= 3,
 		   ExcMessage ("Can't declare a vector with more than 3 components "
 			       "in VTK"));
 
 				       // mark these components as already written:
-      for (unsigned int i=vector_data_ranges[n_th_vector].get<0>();
-	   i<=vector_data_ranges[n_th_vector].get<1>();
+      for (unsigned int i=vector_data_ranges[n_th_vector].template get<0>();
+	   i<=vector_data_ranges[n_th_vector].template get<1>();
 	   ++i)
 	data_set_written[i] = true;
       
@@ -3879,15 +3879,15 @@ DataOutBase::write_vtk (const std::vector<Patch<dim,spacedim> > &patches,
 				       // name has been specified
       out << "VECTORS ";
 
-      if (vector_data_ranges[n_th_vector].get<2>() != "")
-	out << vector_data_ranges[n_th_vector].get<2>();
+      if (vector_data_ranges[n_th_vector].template get<2>() != "")
+	out << vector_data_ranges[n_th_vector].template get<2>();
       else
 	{
-	  for (unsigned int i=vector_data_ranges[n_th_vector].get<0>();
-	       i<vector_data_ranges[n_th_vector].get<1>();
+	  for (unsigned int i=vector_data_ranges[n_th_vector].template get<0>();
+	       i<vector_data_ranges[n_th_vector].template get<1>();
 	       ++i)
 	    out << data_names[i] << "__";
-	  out << data_names[vector_data_ranges[n_th_vector].get<1>()];
+	  out << data_names[vector_data_ranges[n_th_vector].template get<1>()];
 	}
       
       out << " double"
@@ -3898,23 +3898,23 @@ DataOutBase::write_vtk (const std::vector<Patch<dim,spacedim> > &patches,
 				       // components
       for (unsigned int n=0; n<n_nodes; ++n)
 	{
-	  switch (vector_data_ranges[n_th_vector].get<1>() -
-		  vector_data_ranges[n_th_vector].get<0>())
+	  switch (vector_data_ranges[n_th_vector].template get<1>() -
+		  vector_data_ranges[n_th_vector].template get<0>())
 	    {
 	      case 0:
-		    out << data_vectors(vector_data_ranges[n_th_vector].get<0>(), n) << " 0 0"
+		    out << data_vectors(vector_data_ranges[n_th_vector].template get<0>(), n) << " 0 0"
 			<< '\n';
 		    break;
 		    
 	      case 1:
-		    out << data_vectors(vector_data_ranges[n_th_vector].get<0>(),   n) << ' '
-			<< data_vectors(vector_data_ranges[n_th_vector].get<0>()+1, n) << " 0"
+		    out << data_vectors(vector_data_ranges[n_th_vector].template get<0>(),   n) << ' '
+			<< data_vectors(vector_data_ranges[n_th_vector].template get<0>()+1, n) << " 0"
 			<< '\n';
 		    break;
 	      case 2:
-		    out << data_vectors(vector_data_ranges[n_th_vector].get<0>(),   n) << ' '
-			<< data_vectors(vector_data_ranges[n_th_vector].get<0>()+1, n) << ' '
-			<< data_vectors(vector_data_ranges[n_th_vector].get<0>()+2, n)
+		    out << data_vectors(vector_data_ranges[n_th_vector].template get<0>(),   n) << ' '
+			<< data_vectors(vector_data_ranges[n_th_vector].template get<0>()+1, n) << ' '
+			<< data_vectors(vector_data_ranges[n_th_vector].template get<0>()+2, n)
 			<< '\n';
 		    break;
 
@@ -3989,9 +3989,9 @@ write_deal_II_intermediate (const std::vector<Patch<dim,spacedim> > &patches,
 
   out << vector_data_ranges.size() << '\n';
   for (unsigned int i=0; i<vector_data_ranges.size(); ++i)
-    out << vector_data_ranges[i].get<0>() << ' '
-	<< vector_data_ranges[i].get<1>() << '\n'
-	<< vector_data_ranges[i].get<2>() << '\n';
+    out << vector_data_ranges[i].template get<0>() << ' '
+	<< vector_data_ranges[i].template get<1>() << '\n'
+	<< vector_data_ranges[i].template get<2>() << '\n';
   
   out << '\n';
 				   // make sure everything now gets to
@@ -4563,11 +4563,11 @@ DataOutReader<dim,spacedim>::read (std::istream &in)
   vector_data_ranges.resize (n_vector_data_ranges);
   for (unsigned int i=0; i<n_vector_data_ranges; ++i)
     {
-      in >> vector_data_ranges[i].get<0>()
-	 >> vector_data_ranges[i].get<1>();
+      in >> vector_data_ranges[i].template get<0>()
+	 >> vector_data_ranges[i].template get<1>();
       std::string name;
       getline(in, name);
-      vector_data_ranges[i].get<2>() = name;
+      vector_data_ranges[i].template get<2>() = name;
     }
   
   Assert (in, ExcIO());  
