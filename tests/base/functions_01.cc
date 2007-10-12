@@ -240,10 +240,18 @@ int main()
 
   if (true)
     {
+      deallog << "Functions::Kovasznay" << std::endl;
+      Functions::Kovasznay f(10.);
+      check_function(f, 4, logfile);
+    }
+  
+  if (true)
+    {
       deallog << "Functions::PoisseuilleFlow<2>" << std::endl;
       Functions::PoisseuilleFlow<2> f(.8, 10.);
       check_function(f, 4, logfile);
     }
+  
   if (true)
     {
       deallog << "Functions::PoisseuilleFlow<3>" << std::endl;
