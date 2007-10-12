@@ -355,9 +355,8 @@ GeometryInfo<dim>::real_to_standard_face_vertex(const unsigned int vertex,
 						const bool,
 						const bool)
 {
-  Assert(false, ExcNotImplemented());
+//TODO:[Tobias] do we need to care here about face_orientation in 2d?!
   return vertex;
-  
 }
 
 
