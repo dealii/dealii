@@ -35,8 +35,6 @@
 #include <dofs/dof_tools.h>
 #include <dofs/dof_constraints.h>
 
-#include <fe/fe_raviart_thomas.h>
-#include <fe/fe_dgq.h>
 #include <fe/fe_q.h>
 #include <fe/fe_system.h>
 #include <fe/fe_values.h>
@@ -91,28 +89,6 @@ class BoussinesqFlowProblem
 
 
 
-template <int dim>
-class Buoyancy : public Function<dim> 
-{
-  public:
-    Buoyancy () : Function<dim>(dim) {}
-    
-    virtual void vector_value (const Point<dim>   &p,
-			       Vector<double>     &values) const;
-};
-
-
-
-template <int dim>
-void
-Buoyancy<dim>::vector_value (const Point<dim>  &p,
-			     Vector<double>    &values) const 
-{
-  Assert (values.size() == dim, ExcInternalError());
-  
-  values = 0;
-  values(dim-1) = (p.distance (Point<dim>(.5,.5)) < .2 ? 1 : 0);
-}
 
 
 template <int dim>
@@ -183,7 +159,7 @@ InitialValues<dim>::value (const Point<dim>  &p,
                            const unsigned int component) const 
 {
   if (component == dim+1)
-    return (p.distance (Point<dim>(.5,.5)) < .2 ? 1 : 0);
+    return (p.distance (Point<dim>(.25,.5)) < .1 ? 1 : 0);
   else
     return 0;
 }
@@ -378,10 +354,10 @@ BoussinesqFlowProblem<dim>::BoussinesqFlowProblem (const unsigned int degree)
                 :
                 degree (degree),
                 fe (FE_Q<dim>(degree+1), dim,
-                    FE_DGQ<dim>(degree), 1,
-                    FE_DGQ<dim>(degree), 1),
+                    FE_Q<dim>(degree), 1,
+                    FE_Q<dim>(degree), 1),
                 dof_handler (triangulation),
-                n_refinement_steps (4),
+                n_refinement_steps (5),
                 time_step (0)
 {}
 
@@ -460,7 +436,7 @@ double
 scalar_product (const Tensor<2,dim> &a,
 		const Tensor<2,dim> &b)
 {
-  double tmp;
+  double tmp = 0;
   for (unsigned int i=0; i<dim; ++i)
     for (unsigned int j=0; j<dim; ++j)
       tmp += a[i][j] * b[i][j];
@@ -495,16 +471,15 @@ void BoussinesqFlowProblem<dim>::assemble_system ()
 
   std::vector<unsigned int> local_dof_indices (dofs_per_cell);
   
-  const Buoyancy<dim>               buoyancy;
   const PressureBoundaryValues<dim> pressure_boundary_values;
   
-  std::vector<Vector<double> >      buoyancy_values (n_q_points,
-						     Vector<double>(dim));
   std::vector<double>               boundary_values (n_face_q_points);
   
   std::vector<Vector<double> >      old_solution_values(n_q_points, Vector<double>(dim+2));
   std::vector<std::vector<Tensor<1,dim> > >  old_solution_grads(n_q_points,
                                                                 std::vector<Tensor<1,dim> > (dim+2));
+
+  const double Raleigh_number = 10;
   
   typename DoFHandler<dim>::active_cell_iterator
     cell = dof_handler.begin_active(),
@@ -517,38 +492,40 @@ void BoussinesqFlowProblem<dim>::assemble_system ()
 
       fe_values.get_function_values (old_solution, old_solution_values);
 
-      buoyancy.vector_value_list (fe_values.get_quadrature_points(),
-				  buoyancy_values);
-      for (unsigned int q=0; q<n_q_points; ++q)            
-        for (unsigned int i=0; i<dofs_per_cell; ++i)
-          {
+      for (unsigned int q=0; q<n_q_points; ++q)
+	{
+	  const double old_temperature = old_solution_values[q](dim+1);
+	  
+	  for (unsigned int i=0; i<dofs_per_cell; ++i)
+	    {
 
-            const Tensor<1,dim> phi_i_u      = extract_u (fe_values, i, q);
-            const Tensor<2,dim> phi_i_grads_u= extract_grad_s_u (fe_values, i, q);
-            const double        div_phi_i_u  = extract_div_u (fe_values, i, q);
-            const double        phi_i_p      = extract_p (fe_values, i, q);
-            const double        phi_i_T      = extract_T (fe_values, i, q); 
-            const Tensor<1,dim> grad_phi_i_T = extract_grad_T(fe_values, i, q);
+	      const Tensor<1,dim> phi_i_u      = extract_u (fe_values, i, q);
+	      const Tensor<2,dim> phi_i_grads_u= extract_grad_s_u (fe_values, i, q);
+	      const double        div_phi_i_u  = extract_div_u (fe_values, i, q);
+	      const double        phi_i_p      = extract_p (fe_values, i, q);
+	      const double        phi_i_T      = extract_T (fe_values, i, q); 
+	      const Tensor<1,dim> grad_phi_i_T = extract_grad_T(fe_values, i, q);
             
-            for (unsigned int j=0; j<dofs_per_cell; ++j)
-              {
-                const Tensor<2,dim> phi_j_grads_u     = extract_grad_s_u (fe_values, j, q);
-                const double        div_phi_j_u = extract_div_u (fe_values, j, q);
-                const double        phi_j_p     = extract_p (fe_values, j, q);
-                const double        phi_j_T     = extract_T (fe_values, j, q);
+	      for (unsigned int j=0; j<dofs_per_cell; ++j)
+		{
+		  const Tensor<2,dim> phi_j_grads_u     = extract_grad_s_u (fe_values, j, q);
+		  const double        div_phi_j_u = extract_div_u (fe_values, j, q);
+		  const double        phi_j_p     = extract_p (fe_values, j, q);
+		  const double        phi_j_T     = extract_T (fe_values, j, q);
                 
-                local_matrix(i,j) += (scalar_product(phi_i_grads_u, phi_j_grads_u)
-                                      - div_phi_i_u * phi_j_p
-                                      - phi_i_p * div_phi_j_u
-                                      + phi_i_T * phi_j_T)
-                                     * fe_values.JxW(q);     
-              }
+		  local_matrix(i,j) += (scalar_product(phi_i_grads_u, phi_j_grads_u)
+					- div_phi_i_u * phi_j_p
+					- phi_i_p * div_phi_j_u
+					+ phi_i_T * phi_j_T)
+				       * fe_values.JxW(q);     
+		}
 
-	    Assert (dim == 2, ExcInternalError());
-            local_rhs(i) += ( phi_i_u[0] * buoyancy_values[q](0)
-			     +phi_i_u[1] * buoyancy_values[q](1))*
-                            fe_values.JxW(q);
+	      Assert (dim == 2, ExcInternalError());
+	      local_rhs(i) += (Raleigh_number *
+			       phi_i_u[1] * old_temperature)*
+			      fe_values.JxW(q);
           }
+	}
       
 
       for (unsigned int face_no=0;
@@ -821,7 +798,7 @@ void BoussinesqFlowProblem<dim>::solve ()
 template <int dim>
 void BoussinesqFlowProblem<dim>::output_results ()  const
 {
-  if (timestep_number % 5 != 0)
+  if (timestep_number % 10 != 0)
     return;
   
   std::vector<std::string> solution_names;
@@ -952,7 +929,7 @@ void BoussinesqFlowProblem<dim>::run ()
                 << std::endl
                 << std::endl;
     }
-  while (time <= 250);
+  while (time <= 50);
 }
 
     
@@ -963,7 +940,7 @@ int main ()
     {
       deallog.depth_console (0);
 
-      BoussinesqFlowProblem<2> flow_problem(0);
+      BoussinesqFlowProblem<2> flow_problem(1);
       flow_problem.run ();
     }
   catch (std::exception &exc)
