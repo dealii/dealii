@@ -4845,7 +4845,7 @@ DoFTools::map_dofs_to_support_points (const Mapping<dim>       &mapping,
 				   // by the used constructor.
   Quadrature<dim> q_dummy(dof_handler.get_fe().get_unit_support_points());
   FEValues<dim> fe_values (mapping, dof_handler.get_fe(),
-			   q_dummy, update_q_points);
+			   q_dummy, update_quadrature_points);
   typename DoFHandler<dim>::active_cell_iterator
     cell = dof_handler.begin_active(),
     endc = dof_handler.end();

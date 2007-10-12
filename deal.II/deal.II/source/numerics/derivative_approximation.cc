@@ -726,7 +726,7 @@ approximate_cell (const Mapping<dim>                            &mapping,
   hp::FEValues<dim> x_fe_midpoint_value (mapping_collection, fe_collection,
 					 q_collection,
 					 DerivativeDescription::update_flags |
-					 update_q_points);
+					 update_quadrature_points);
   
 				   // matrix Y=sum_i y_i y_i^T
   Tensor<2,dim> Y;

@@ -985,9 +985,9 @@ assemble_system_interval (const typename DoFHandler<dim>::active_cell_iterator &
 				   // vectors to the cells.
   FEValues<dim> fe_values (fe, quadrature_formula, 
 			   update_values   | update_gradients |
-                           update_q_points | update_JxW_values);
+                           update_quadrature_points | update_JxW_values);
   FEFaceValues<dim> fe_face_values (fe, face_quadrature_formula,
-				    update_values     | update_q_points   |
+				    update_values     | update_quadrature_points   |
                                     update_JxW_values | update_normal_vectors);
 
 				   // Then we define some
@@ -1590,7 +1590,7 @@ GradientEstimation::estimate_interval (const DoFHandler<dim> &dof_handler,
   QMidpoint<dim> midpoint_rule;
   FEValues<dim>  fe_midpoint_value (dof_handler.get_fe(),
 				    midpoint_rule,
-				    update_values | update_q_points);
+				    update_values | update_quadrature_points);
   
 				   // Then we need space foe the
 				   // tensor <code>Y</code>, which is the sum

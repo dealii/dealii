@@ -400,7 +400,7 @@ void MinimizationProblem<dim>::assemble_step ()
                                    // quadrature point in real space for the
                                    // $x-u^3$ terms; to get these from the
                                    // <code>FEValues</code> object, we need to pass it
-                                   // the <code>update_q_points</code> flag.
+                                   // the <code>update_quadrature_points</code> flag.
                                    //
                                    // It is a simple calculation to figure out
                                    // that for linear elements, the integrals
@@ -411,7 +411,7 @@ void MinimizationProblem<dim>::assemble_step ()
   QGauss<dim>  quadrature_formula(4);
   FEValues<dim> fe_values (fe, quadrature_formula, 
 			   update_values   | update_gradients |
-                           update_q_points | update_JxW_values);
+                           update_quadrature_points | update_JxW_values);
 
                                    // Next, here are the usual two convenience
                                    // variables, followed by declarations for
@@ -879,7 +879,7 @@ void MinimizationProblem<1>::refine_grid ()
   FEValues<dim> fe_values (fe, quadrature,
                            update_values   | update_gradients |
                            update_hessians |
-                           update_q_points | update_JxW_values);
+                           update_quadrature_points | update_JxW_values);
 
                                    // The error indicator formula presented in
                                    // the introduction requires us to compute
@@ -1254,7 +1254,7 @@ MinimizationProblem<dim>::energy (const DoFHandler<dim> &dof_handler,
   QGauss<dim>  quadrature_formula(4);
   FEValues<dim> fe_values (dof_handler.get_fe(), quadrature_formula, 
 			   update_values   | update_gradients |
-                           update_q_points | update_JxW_values);
+                           update_quadrature_points | update_JxW_values);
 
   const unsigned int   n_q_points    = quadrature_formula.n_quadrature_points;
 

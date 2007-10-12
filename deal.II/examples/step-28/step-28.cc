@@ -1018,7 +1018,7 @@ void EnergyGroup<dim>::assemble_ingroup_rhs (const Function<dim> &extraneous_sou
   const unsigned int n_q_points = quadrature_formula.n_quadrature_points;
   
   FEValues<dim> fe_values (fe, quadrature_formula, 
-			   update_values    |  update_q_points  |
+			   update_values    |  update_quadrature_points  |
                            update_JxW_values);
   
   Vector<double>            cell_rhs (dofs_per_cell);

@@ -119,7 +119,7 @@ void MatrixCreator::create_mass_matrix_1 (const Mapping<dim>       &mapping,
 {
   UpdateFlags update_flags = UpdateFlags(update_values | update_JxW_values);
   if (coefficient != 0)
-    update_flags = UpdateFlags (update_flags | update_q_points);
+    update_flags = UpdateFlags (update_flags | update_quadrature_points);
   
   FEValues<dim> fe_values (mapping, dof.get_fe(), q, update_flags);
     
@@ -370,10 +370,10 @@ MatrixCreator::create_mass_matrix_2 (const Mapping<dim>       &mapping,
 				     Threads::ThreadMutex     &mutex)
 {
   UpdateFlags update_flags = UpdateFlags(update_values |
-					 update_q_points |
+					 update_quadrature_points |
 					 update_JxW_values);
   if (coefficient != 0)
-    update_flags = UpdateFlags (update_flags | update_q_points);
+    update_flags = UpdateFlags (update_flags | update_quadrature_points);
 
   FEValues<dim> fe_values (mapping, dof.get_fe(), q, update_flags);
     
@@ -564,7 +564,7 @@ MatrixCreator::create_mass_matrix_1 (const hp::MappingCollection<dim>       &map
   UpdateFlags update_flags = UpdateFlags(update_values |
 					 update_JxW_values);
   if (coefficient != 0)
-    update_flags = UpdateFlags (update_flags | update_q_points);
+    update_flags = UpdateFlags (update_flags | update_quadrature_points);
 
   hp::FEValues<dim> x_fe_values (mapping, dof.get_fe(), q, update_flags);
     
@@ -755,10 +755,10 @@ MatrixCreator::create_mass_matrix_2 (const hp::MappingCollection<dim>       &map
 				     Threads::ThreadMutex     &mutex)
 {
   UpdateFlags update_flags = UpdateFlags(update_values    |
-					 update_q_points  |
+					 update_quadrature_points  |
 					 update_JxW_values);
   if (coefficient != 0)
-    update_flags = UpdateFlags (update_flags | update_q_points);
+    update_flags = UpdateFlags (update_flags | update_quadrature_points);
 
   hp::FEValues<dim> x_fe_values (mapping, dof.get_fe(), q, update_flags);
     
@@ -1030,7 +1030,7 @@ create_boundary_mass_matrix_1 (const Mapping<dim>        &mapping,
 
   UpdateFlags update_flags = UpdateFlags (update_values     |
 					  update_JxW_values |
-					  update_q_points);
+					  update_quadrature_points);
   FEFaceValues<dim> fe_values (mapping, fe, q, update_flags);
 
 				   // two variables for the coefficient,
@@ -1404,7 +1404,7 @@ create_boundary_mass_matrix_1 (const hp::MappingCollection<dim>        &mapping,
 
   UpdateFlags update_flags = UpdateFlags (update_values     |
 					  update_JxW_values |
-					  update_q_points);
+					  update_quadrature_points);
   hp::FEFaceValues<dim> x_fe_values (mapping, fe_collection, q, update_flags);
 
 				   // two variables for the coefficient,
@@ -1802,7 +1802,7 @@ void MatrixCreator::create_laplace_matrix_1 (const Mapping<dim>       &mapping,
   UpdateFlags update_flags = UpdateFlags(update_JxW_values |
 					 update_gradients);
   if (coefficient != 0)
-    update_flags = UpdateFlags (update_flags | update_q_points);
+    update_flags = UpdateFlags (update_flags | update_quadrature_points);
 
   FEValues<dim> fe_values (mapping, dof.get_fe(), q, update_flags);
     
@@ -1987,10 +1987,10 @@ MatrixCreator::create_laplace_matrix_2 (const Mapping<dim>       &mapping,
 {
   UpdateFlags update_flags = UpdateFlags(update_values    |
 					 update_gradients |
-					 update_q_points  |
+					 update_quadrature_points  |
 					 update_JxW_values);
   if (coefficient != 0)
-    update_flags = UpdateFlags (update_flags | update_q_points);
+    update_flags = UpdateFlags (update_flags | update_quadrature_points);
 
   FEValues<dim> fe_values (mapping, dof.get_fe(), q, update_flags);
     
@@ -2184,7 +2184,7 @@ MatrixCreator::create_laplace_matrix_1 (const hp::MappingCollection<dim>       &
   UpdateFlags update_flags = UpdateFlags(update_gradients |
 					 update_JxW_values);
   if (coefficient != 0)
-    update_flags = UpdateFlags (update_flags | update_q_points);
+    update_flags = UpdateFlags (update_flags | update_quadrature_points);
 
   hp::FEValues<dim> x_fe_values (mapping, dof.get_fe(), q, update_flags);
     
@@ -2376,10 +2376,10 @@ MatrixCreator::create_laplace_matrix_2 (const hp::MappingCollection<dim>       &
 {
   UpdateFlags update_flags = UpdateFlags(update_values    |
 					 update_gradients |
-					 update_q_points  |
+					 update_quadrature_points  |
 					 update_JxW_values);
   if (coefficient != 0)
-    update_flags = UpdateFlags (update_flags | update_q_points);
+    update_flags = UpdateFlags (update_flags | update_quadrature_points);
 
   hp::FEValues<dim> x_fe_values (mapping, dof.get_fe(), q, update_flags);
     

@@ -64,7 +64,7 @@ void DataOutRotation<dim,DH>::build_some_patches (Data &data)
   const hp::QCollection<DH::dimension>       q_collection (patch_points);
   const hp::FECollection<DH::dimension>      fe_collection(this->dofs->get_fe());
   
-  UpdateFlags update_flags=update_values | update_q_points;
+  UpdateFlags update_flags=update_values | update_quadrature_points;
   for (unsigned int i=0; i<this->dof_data.size(); ++i)
     if (this->dof_data[i]->postprocessor)
       update_flags |= this->dof_data[i]->postprocessor->get_needed_update_flags();

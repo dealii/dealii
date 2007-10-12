@@ -746,14 +746,14 @@ void DGMethod<dim>::assemble_system1 ()
 				   // <code>FEFaceValues</code> objects.
   const UpdateFlags update_flags = update_values
                                    | update_gradients
-                                   | update_q_points
+                                   | update_quadrature_points
                                    | update_JxW_values;
 
 				   // Note, that on faces we do not
 				   // need gradients but we need
 				   // normal vectors.
   const UpdateFlags face_update_flags = update_values
-                                        | update_q_points
+                                        | update_quadrature_points
                                         | update_JxW_values
                                         | update_normal_vectors;
   
@@ -1213,11 +1213,11 @@ void DGMethod<dim>::assemble_system2 ()
 
   const UpdateFlags update_flags = update_values
                                    | update_gradients
-                                   | update_q_points
+                                   | update_quadrature_points
                                    | update_JxW_values;
   
   const UpdateFlags face_update_flags = update_values
-                                        | update_q_points
+                                        | update_quadrature_points
                                         | update_JxW_values
                                         | update_normal_vectors;
   

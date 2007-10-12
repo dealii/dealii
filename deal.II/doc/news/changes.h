@@ -114,6 +114,13 @@ inconvenience this causes.
 
 <ol> 
 
+  <li> <p>Improved: UpdateFlags::update_q_points has been renamed to
+  UpdateFlags::update_quadrature_points. Additional update flags for support
+  points have been added without functionality, yet.
+  <br>
+  (GK 2007/10/12)
+  </p></li>
+
 <li> <p>Improved: The number of blocks of an FESystem was properly defined and the
 constructors changed accordingly. At least non of the test programs noticed the change.
 <br>

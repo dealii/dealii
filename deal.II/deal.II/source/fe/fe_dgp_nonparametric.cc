@@ -213,7 +213,7 @@ FE_DGPNonparametric<dim>::update_each (const UpdateFlags flags) const
   UpdateFlags out = flags;
 
   if (flags & (update_values | update_gradients | update_hessians))
-    out |= update_q_points ;
+    out |= update_quadrature_points ;
 
   return out;
 }
@@ -285,7 +285,7 @@ FE_DGPNonparametric<dim>::fill_fe_values (
   InternalData &fe_data = dynamic_cast<InternalData &> (fedata);
   
   const UpdateFlags flags(fe_data.current_update_flags());
-  Assert (flags & update_q_points, ExcInternalError());
+  Assert (flags & update_quadrature_points, ExcInternalError());
   
   const unsigned int n_q_points = data.quadrature_points.size();
   
@@ -326,7 +326,7 @@ FE_DGPNonparametric<dim>::fill_fe_face_values (
   InternalData &fe_data = dynamic_cast<InternalData &> (fedata);
 
   const UpdateFlags flags(fe_data.update_once | fe_data.update_each);
-  Assert (flags & update_q_points, ExcInternalError());
+  Assert (flags & update_quadrature_points, ExcInternalError());
 
   const unsigned int n_q_points = data.quadrature_points.size();
   
@@ -368,7 +368,7 @@ FE_DGPNonparametric<dim>::fill_fe_subface_values (
   InternalData &fe_data = dynamic_cast<InternalData &> (fedata);
   
   const UpdateFlags flags(fe_data.update_once | fe_data.update_each);
-  Assert (flags & update_q_points, ExcInternalError());
+  Assert (flags & update_quadrature_points, ExcInternalError());
 
   const unsigned int n_q_points = data.quadrature_points.size();
   

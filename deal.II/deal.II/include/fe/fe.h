@@ -95,7 +95,7 @@ namespace hp
  * @code
  * Quadrature<dim> dummy_quadrature (fe.get_unit_support_points());
  * FEValues<dim>   fe_values (mapping, fe, dummy_quadrature,
- *                            update_q_points);
+ *                            update_quadrature_points);
  * fe_values.reinit (cell);
  * Point<dim>& mapped_point = fe_values.quadrature_point (i);
  * @endcode

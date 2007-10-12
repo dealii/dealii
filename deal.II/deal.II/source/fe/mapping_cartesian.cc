@@ -2,7 +2,7 @@
 //    $Id$
 //    Version: $Name$
 //
-//    Copyright (C) 2001, 2002, 2003, 2004, 2005, 2006 by the deal.II authors
+//    Copyright (C) 2001, 2002, 2003, 2004, 2005, 2006, 2007 by the deal.II authors
 //
 //    This file is subject to QPL and may not be  distributed
 //    without copyright and license information. Please refer
@@ -193,7 +193,7 @@ MappingCartesian<dim>::compute_fill (const typename Triangulation<dim>::cell_ite
 				   // is obtained simply by scaling
 				   // unit coordinates with lengths in
 				   // each direction
-  if (update_flags & update_q_points)
+  if (update_flags & update_quadrature_points)
     {
       const typename QProjector<dim>::DataSetDescriptor offset
 	= (face_no == invalid_face_number

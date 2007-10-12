@@ -302,7 +302,7 @@ FEValuesData<dim>::initialize (const unsigned int        n_quadrature_points,
     this->shape_hessians.resize (n_nonzero_shape_components,
                                         std::vector<Tensor<2,dim> > (n_quadrature_points));
   
-  if (flags & update_q_points)
+  if (flags & update_quadrature_points)
     this->quadrature_points.resize(n_quadrature_points);
 
   if (flags & update_JxW_values)

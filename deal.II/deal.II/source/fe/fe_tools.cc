@@ -485,7 +485,7 @@ void FETools::get_projection_matrix (const FiniteElement<dim> &fe1,
   
   QGauss<dim> quadrature(degree+1);
 				   // Set up FEValues.
-  const UpdateFlags flags = update_values | update_q_points | update_JxW_values;
+  const UpdateFlags flags = update_values | update_quadrature_points | update_JxW_values;
   FEValues<dim> val1 (fe1, quadrature, update_values);
   val1.reinit (tr.begin_active());
   FEValues<dim> val2 (fe2, quadrature, flags);
@@ -609,7 +609,7 @@ FETools::compute_embedding_matrices(const FiniteElement<dim>& fe,
   const unsigned int nq = q_fine.n_quadrature_points;
   
   FEValues<dim> fine (mapping, fe, q_fine,
-		      update_q_points | update_JxW_values | update_values);
+		      update_quadrature_points | update_JxW_values | update_values);
   
 				   // We search for the polynomial on
 				   // the small cell, being equal to
@@ -781,7 +781,7 @@ FETools::compute_face_embedding_matrices(const FiniteElement<dim>& fe,
   Assert (k == fe.dofs_per_face, ExcInternalError());
   
   FEValues<dim> fine (mapping, fe, q_fine,
-		      update_q_points | update_JxW_values | update_values);
+		      update_quadrature_points | update_JxW_values | update_values);
   
 				   // We search for the polynomial on
 				   // the small cell, being equal to
@@ -888,9 +888,9 @@ FETools::compute_projection_matrices(const FiniteElement<dim>& fe,
   const unsigned int nq = q_fine.n_quadrature_points;
   
   FEValues<dim> coarse (mapping, fe, q_fine,
-			update_q_points | update_JxW_values | update_values);
+			update_quadrature_points | update_JxW_values | update_values);
   FEValues<dim> fine (mapping, fe, q_fine,
-		      update_q_points | update_JxW_values | update_values);
+		      update_quadrature_points | update_JxW_values | update_values);
   
   typename Triangulation<dim>::cell_iterator coarse_cell
     = tr.begin(0);

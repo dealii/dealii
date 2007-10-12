@@ -503,7 +503,7 @@ void SineGordonProblem<dim>::compute_nl_term (const Vector<double> &old_data,
   FEValues<dim>     fe_values (fe, quadrature_formula, 
 			       update_values |
 			       update_JxW_values |
-			       update_q_points);
+			       update_quadrature_points);
   
   const unsigned int dofs_per_cell = fe.dofs_per_cell;
   const unsigned int n_q_points    = quadrature_formula.n_quadrature_points;
@@ -576,7 +576,7 @@ void SineGordonProblem<dim>::compute_nl_matrix (const Vector<double> &old_data,
 {
   QGauss<dim>   quadrature_formula (3);
   FEValues<dim> fe_values (fe, quadrature_formula, 
-			   update_values | update_JxW_values | update_q_points);
+			   update_values | update_JxW_values | update_quadrature_points);
   
   const unsigned int dofs_per_cell = fe.dofs_per_cell;
   const unsigned int n_q_points    = quadrature_formula.n_quadrature_points;

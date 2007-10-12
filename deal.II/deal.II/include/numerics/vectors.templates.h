@@ -174,7 +174,7 @@ void VectorTools::interpolate (const Mapping<dim>    &mapping,
   hp::MappingCollection<dim> mapping_collection (mapping);
   
   hp::FEValues<dim> fe_values (mapping_collection,
-			       fe, support_quadrature, update_q_points);
+			       fe, support_quadrature, update_quadrature_points);
   
   for (; cell!=endc; ++cell)
     {
@@ -516,7 +516,7 @@ void VectorTools::create_right_hand_side (const Mapping<dim>    &mapping,
   rhs_vector = 0;
   
   UpdateFlags update_flags = UpdateFlags(update_values   |
-					 update_q_points |
+					 update_quadrature_points |
 					 update_JxW_values);
   FEValues<dim> fe_values (mapping, fe, quadrature, update_flags);
 
@@ -641,7 +641,7 @@ void VectorTools::create_right_hand_side (const hp::MappingCollection<dim>    &m
   rhs_vector = 0;
   
   UpdateFlags update_flags = UpdateFlags(update_values   |
-					 update_q_points |
+					 update_quadrature_points |
 					 update_JxW_values);
   hp::FEValues<dim> x_fe_values (mapping, fe, quadrature, update_flags);
 
@@ -877,7 +877,7 @@ VectorTools::create_boundary_right_hand_side (const Mapping<dim>      &mapping,
   rhs_vector = 0;
   
   UpdateFlags update_flags = UpdateFlags(update_values   |
-					 update_q_points |
+					 update_quadrature_points |
 					 update_JxW_values);
   FEFaceValues<dim> fe_values (mapping, fe, quadrature, update_flags);
 
@@ -1033,7 +1033,7 @@ VectorTools::create_boundary_right_hand_side (const hp::MappingCollection<dim>  
   rhs_vector = 0;
   
   UpdateFlags update_flags = UpdateFlags(update_values   |
-					 update_q_points |
+					 update_quadrature_points |
 					 update_JxW_values);
   hp::FEFaceValues<dim> x_fe_values (mapping, fe, quadrature, update_flags);
 
@@ -1433,7 +1433,7 @@ interpolate_boundary_values (const Mapping<dim>            &mapping,
               }
 
             Quadrature<dim-1> aux_quad (unit_support_points);
-            FEFaceValues<dim> fe_values (mapping, fe, aux_quad, update_q_points);
+            FEFaceValues<dim> fe_values (mapping, fe, aux_quad, update_quadrature_points);
 //TODO[?] End of inefficient code
 
 					     // get indices, physical location and
@@ -1829,7 +1829,7 @@ namespace internal
                 break;
         }
   
-      UpdateFlags update_flags = UpdateFlags (update_q_points  |
+      UpdateFlags update_flags = UpdateFlags (update_quadrature_points  |
                                               update_JxW_values);
       switch (norm)
         {

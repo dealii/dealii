@@ -125,7 +125,7 @@ class MappingQ1 : public Mapping<dim>
 				      *
 				      * Description of effects:
 				      * <ul>
-				      * <li> if @p update_q_points
+				      * <li> if @p update_quadrature_points
 				      * is required, the output will
 				      * contain
 				      * @p update_transformation_values. This
@@ -156,7 +156,7 @@ class MappingQ1 : public Mapping<dim>
 				      * Description of effects if
 				      * @p flags contains:
 				      * <ul>
-				      * <li> <code>update_q_points</code> is
+				      * <li> <code>update_quadrature_points</code> is
 				      * copied to the output to
 				      * compute the quadrature points
 				      * on the real cell.
@@ -291,7 +291,7 @@ class MappingQ1 : public Mapping<dim>
 	std::vector<Tensor<2,dim> > covariant;
 	
 					 /**
-					  * Tensors of covariant
+					  * Tensors of contravariant
 					  * transformation at each of
 					  * the quadrature points. The
 					  * contravariant matrix is

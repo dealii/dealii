@@ -680,7 +680,7 @@ estimate_some (const hp::MappingCollection<dim>                  &mapping,
 					       update_JxW_values     |
 					       ((!neumann_bc.empty() ||
 						 (coefficients != 0))  ?
-						update_q_points : 0) |
+						update_quadrature_points : 0) |
 					       update_normal_vectors));
   hp::FEFaceValues<dim> fe_face_values_neighbor (mapping,
 					     fe,

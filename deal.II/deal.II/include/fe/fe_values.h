@@ -234,6 +234,26 @@ class FEValuesData
     std::vector<Tensor<1,dim> >  boundary_forms;
 
 				     /**
+				      * Array of the mapped support
+				      * points, filled by Mapping.
+				      */
+    std::vector<Point<dim> > support_points;
+
+				     /**
+				      * Array of the Jacobian of the
+				      * mapping in the support points,
+				      * filled by Mapping.
+				      */
+    HessianVector support_jacobians;
+    
+				     /**
+				      * Array of the inverse Jacobian of the
+				      * mapping in the support points,
+				      * filled by Mapping.
+				      */
+    HessianVector support_inverse_jacobians;
+    
+				     /**
 				      * Indicate the first row which a
 				      * given shape function occupies
 				      * in the #shape_values,
@@ -2765,7 +2785,7 @@ inline
 const std::vector<Point<dim> > &
 FEValuesBase<dim>::get_quadrature_points () const
 {
-  Assert (this->update_flags & update_q_points, ExcAccessToUninitializedField());
+  Assert (this->update_flags & update_quadrature_points, ExcAccessToUninitializedField());
   return this->quadrature_points;
 }
 
@@ -2787,7 +2807,7 @@ inline
 const Point<dim> &
 FEValuesBase<dim>::quadrature_point (const unsigned int i) const
 {
-  Assert (this->update_flags & update_q_points, ExcAccessToUninitializedField());
+  Assert (this->update_flags & update_quadrature_points, ExcAccessToUninitializedField());
   Assert (i<this->quadrature_points.size(), ExcIndexRange(i, 0, this->quadrature_points.size()));
   
   return this->quadrature_points[i];

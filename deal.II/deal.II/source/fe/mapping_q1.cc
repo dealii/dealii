@@ -2,7 +2,7 @@
 //    $Id$
 //    Version: $Name$
 //
-//    Copyright (C) 2000, 2001, 2002, 2003, 2004, 2005, 2006 by the deal.II authors
+//    Copyright (C) 2000, 2001, 2002, 2003, 2004, 2005, 2006, 2007 by the deal.II authors
 //
 //    This file is subject to QPL and may not be  distributed
 //    without copyright and license information. Please refer
@@ -224,7 +224,7 @@ MappingQ1<dim>::update_once (const UpdateFlags in) const
 				      | update_transformation_gradients));
 
 				   // Shape function values
-  if (in & update_q_points)
+  if (in & update_quadrature_points)
     out |= update_transformation_values;
 
 				   // Shape function gradients
@@ -246,7 +246,7 @@ MappingQ1<dim>::update_each (const UpdateFlags in) const
 {
 				   // Select flags of concern for the
 				   // transformation.
-  UpdateFlags out = UpdateFlags(in & (update_q_points
+  UpdateFlags out = UpdateFlags(in & (update_quadrature_points
 				      | update_covariant_transformation
 				      | update_contravariant_transformation
 				      | update_JxW_values
@@ -465,7 +465,7 @@ MappingQ1<dim>::compute_fill (const typename Triangulation<dim>::cell_iterator &
 {
   const UpdateFlags update_flags(data.current_update_flags());
 
-  if (update_flags & update_q_points)
+  if (update_flags & update_quadrature_points)
     {
       Assert (quadrature_points.size() == n_q_points,
 	      ExcDimensionMismatch(quadrature_points.size(), n_q_points));
@@ -517,7 +517,7 @@ MappingQ1<dim>::compute_fill (const typename Triangulation<dim>::cell_iterator &
     }
 
                                    // first compute quadrature points
-  if (update_flags & update_q_points)
+  if (update_flags & update_quadrature_points)
     for (unsigned int point=0; point<n_q_points; ++point)
       for (unsigned int k=0; k<data.n_shape_functions; ++k)
         quadrature_points[point]

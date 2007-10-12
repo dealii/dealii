@@ -127,7 +127,7 @@ enum UpdateFlags
 					* points transformed into real
 					* cell coordinates.
 					*/
-      update_q_points                     = 0x0010,
+      update_quadrature_points            = 0x0010,
 				       //! Transformed quadrature weights
 				       /**
 					* Compute the quadrature
@@ -212,6 +212,29 @@ enum UpdateFlags
 					* H_div subspaces like RT and ABF.
 					*/
       update_cell_JxW_values              = 0x2000,
+				       /**
+					* Update the location of the
+					* mapped generalized support
+					* points of the element.
+					*/
+      update_support_points               = 0x4000,
+				       /**
+					* Update the Jacobian of the
+					* mapping in generalized
+					* support points.
+					*/
+      update_support_jacobians            = 0x8000,
+				       /**
+					* Update the inverse Jacobian
+					* of the mapping in
+					* generalized support points.
+					*/
+      update_support_inverse_jacobians    = 0x10000,
+				       /**
+					* @deprecated Update
+					* quadrature points
+					*/
+      update_q_points = update_quadrature_points,
 				       /**
 					* @deprecated Update second
 					* derivatives.

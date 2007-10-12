@@ -414,10 +414,10 @@ void LaplaceProblem<dim>::assemble_system ()
 				   // object, as well as the quadrature
 				   // weights, <code>JxW</code>). We can tell the
 				   // <code>FEValues</code> object to do for us by also
-				   // giving it the <code>update_q_points</code> flag:
+				   // giving it the <code>update_quadrature_points</code> flag:
   FEValues<dim> fe_values (fe, quadrature_formula, 
 			   update_values   | update_gradients |
-                           update_q_points | update_JxW_values);
+                           update_quadrature_points | update_JxW_values);
 
 				   // We then again define a few
 				   // abbreviations. The values of these
