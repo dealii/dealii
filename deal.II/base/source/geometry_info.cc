@@ -287,9 +287,10 @@ GeometryInfo<dim>::standard_to_real_face_vertex(const unsigned int vertex,
 						const bool,
 						const bool)
 {
-  Assert(false, ExcNotImplemented());
+  Assert(dim>1, ExcImpossibleInDim(dim));
+  Assert(vertex<GeometryInfo<dim>::vertices_per_face,
+	 ExcIndexRange(vertex,0,GeometryInfo<dim>::vertices_per_face));
   return vertex;
-  
 }
 
 
@@ -355,7 +356,9 @@ GeometryInfo<dim>::real_to_standard_face_vertex(const unsigned int vertex,
 						const bool,
 						const bool)
 {
-//TODO:[Tobias] do we need to care here about face_orientation in 2d?!
+  Assert(dim>1, ExcImpossibleInDim(dim));
+  Assert(vertex<GeometryInfo<dim>::vertices_per_face,
+	 ExcIndexRange(vertex,0,GeometryInfo<dim>::vertices_per_face));
   return vertex;
 }
 
