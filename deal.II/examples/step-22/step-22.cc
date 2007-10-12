@@ -65,7 +65,6 @@ class BoussinesqFlowProblem
     void assemble_rhs_T ();
     double get_maximal_velocity () const;
     void solve ();
-    void project_back_temperature ();
     void output_results () const;
     
     const unsigned int   degree;
@@ -357,7 +356,7 @@ BoussinesqFlowProblem<dim>::BoussinesqFlowProblem (const unsigned int degree)
                     FE_Q<dim>(degree), 1,
                     FE_Q<dim>(degree), 1),
                 dof_handler (triangulation),
-                n_refinement_steps (5),
+                n_refinement_steps (6),
                 time_step (0)
 {}
 
@@ -781,8 +780,6 @@ void BoussinesqFlowProblem<dim>::solve ()
       }
 	
                 
-    project_back_temperature ();
-        
     std::cout << "   "
               << solver_control.last_step()
               << " CG iterations for temperature."
@@ -798,7 +795,7 @@ void BoussinesqFlowProblem<dim>::solve ()
 template <int dim>
 void BoussinesqFlowProblem<dim>::output_results ()  const
 {
-  if (timestep_number % 10 != 0)
+  if (timestep_number % 25 != 0)
     return;
   
   std::vector<std::string> solution_names;
@@ -835,21 +832,6 @@ void BoussinesqFlowProblem<dim>::output_results ()  const
 
   std::ofstream output (filename.str().c_str());
   data_out.write_vtk (output);
-}
-
-
-
-
-template <int dim>
-void
-BoussinesqFlowProblem<dim>::project_back_temperature ()
-{
-  for (unsigned int i=0; i<solution.block(2).size(); ++i)
-    if (solution.block(2)(i) < 0)
-      solution.block(2)(i) = 0;
-    else
-      if (solution.block(2)(i) > 1)
-        solution.block(2)(i) = 1;
 }
 
 
