@@ -4601,7 +4601,8 @@ merge (const DataOutReader<dim,spacedim> &source)
 
 				   // check equality of the vector data
 				   // specifications
-  Assert (get_vector_data_ranges().size() == source.get_vector_data_ranges().size(),
+  Assert (get_vector_data_ranges().size() ==
+	  source.get_vector_data_ranges().size(),
 	  ExcMessage ("Both sources need to declare the same components "
 		      "as vectors."));
   for (unsigned int i=0; i<get_vector_data_ranges().size(); ++i)
