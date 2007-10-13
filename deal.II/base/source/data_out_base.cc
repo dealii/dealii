@@ -28,7 +28,6 @@
 //    array of nodes.
 //////////////////////////////////////////////////////////////////////
 
-
 #include <base/data_out_base.h>
 #include <base/utilities.h>
 #include <base/parameter_handler.h>
@@ -4565,7 +4564,17 @@ DataOutReader<dim,spacedim>::read (std::istream &in)
     {
       in >> vector_data_ranges[i].template get<0>()
 	 >> vector_data_ranges[i].template get<1>();
+
+				       // read in the name of that vector
+				       // range. because it is on a separate
+				       // line, we first need to read to the
+				       // end of the previous line (nothing
+				       // should be there any more after we've
+				       // read the previous two integers) and
+				       // then read the entire next line for
+				       // the name
       std::string name;
+      getline(in, name);
       getline(in, name);
       vector_data_ranges[i].template get<2>() = name;
     }
