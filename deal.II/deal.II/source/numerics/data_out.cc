@@ -41,12 +41,20 @@ DataEntryBase::DataEntryBase (const std::vector<std::string>         &names_in,
 			      const DataPostprocessor<DH::dimension> *data_postprocessor)
 		:
 		names(names_in),
+		data_component_interpretation (names.size(),
+					       component_is_scalar),
 		postprocessor(data_postprocessor),
 		n_output_variables(names.size())
 {
+//TODO this function should check that the number of names we have here equals the number of components to be obtained from the postprocessor
   Assert(!data_postprocessor ||
 	 data_postprocessor->n_output_variables()==names.size(),
-	 ExcDimensionMismatch(data_postprocessor->n_output_variables(),names.size()));
+	 ExcDimensionMismatch(data_postprocessor->n_output_variables(),
+			      names.size()));
+  Assert (!data_postprocessor ||
+	  names.size() == data_component_interpretation.size(),
+	  ExcDimensionMismatch(data_component_interpretation.size(),
+			       names.size()));
 }
 
 
@@ -436,9 +444,100 @@ get_dataset_names () const
     {
       Assert ((*d)->names.size() == 1, ExcInternalError());
       names.push_back ((*d)->names[0]);
-    };
+    }
 
   return names;
+}
+
+
+
+template <class DH,
+	  int patch_dim, int patch_space_dim>
+std::vector<boost::tuple<unsigned int, unsigned int, std::string> >
+DataOut_DoFData<DH,patch_dim,patch_space_dim>::get_vector_data_ranges () const
+{
+  std::vector<boost::tuple<unsigned int, unsigned int, std::string> >
+    ranges;
+  
+				   // collect the ranges of dof
+				   // and cell data
+  typedef
+    typename std::vector<boost::shared_ptr<DataEntryBase> >::const_iterator
+    data_iterator;
+
+  unsigned int output_component = 0;
+  for (data_iterator  d=dof_data.begin();
+       d!=dof_data.end(); ++d)
+    for (unsigned int i=0; i<(*d)->n_output_variables;
+	 ++i, ++output_component)
+				       // see what kind of data we have
+				       // here. note that for the purpose of
+				       // the current function all we care
+				       // about is vector data
+      if ((*d)->data_component_interpretation[i] ==
+	  component_is_part_of_vector)
+	{
+					   // ensure that there is a
+					   // continuous number of next
+					   // space_dim components that all
+					   // deal with vectors
+	  Assert (i+patch_space_dim <=
+		  (*d)->n_output_variables,
+		  ExcInvalidVectorDeclaration (i,
+					       (*d)->names[i]));
+	  for (unsigned int dd=1; dd<patch_space_dim; ++dd)
+	    Assert ((*d)->data_component_interpretation[i+dd]
+		    ==
+		    component_is_part_of_vector,
+		    ExcInvalidVectorDeclaration (i,
+						 (*d)->names[i]));
+
+					   // all seems alright, so figure out
+					   // whether there is a common name
+					   // to these components. if not,
+					   // leave the name empty and let the
+					   // output format writer decide what
+					   // to do here
+	  std::string name = (*d)->names[i];
+	  for (unsigned int dd=1; dd<patch_space_dim; ++dd)
+	    if (name != (*d)->names[i+dd])
+	      {
+		name = "";
+		break;
+	      }
+
+					   // finally add a corresponding
+					   // range
+	  boost::tuple<unsigned int, unsigned int, std::string>
+	    range (output_component,
+		   output_component+patch_space_dim-1,
+		   name);
+	  
+	  ranges.push_back (range);
+
+					   // increase the 'component' counter
+					   // by the appropriate amount
+	  output_component += patch_space_dim-1;
+	}
+
+				   // note that we do not have to traverse the
+				   // list of cell data here because cell data
+				   // is one value per (logical) cell and
+				   // therefore cannot be a vector
+
+				   // as a final check, the 'component'
+				   // counter should be at the total number of
+				   // components added up now
+#ifdef DEBUG
+  unsigned int n_output_components = 0;
+  for (data_iterator  d=dof_data.begin();
+       d!=dof_data.end(); ++d)
+    n_output_components = (*d)->n_output_variables;
+  Assert (output_component == n_output_components,
+	  ExcInternalError());
+#endif
+  
+  return ranges;
 }
 
 

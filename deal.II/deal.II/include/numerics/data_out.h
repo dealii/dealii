@@ -198,13 +198,64 @@ class DataOut_DoFData : public DataOutInterface<patch_dim,patch_space_dim>
 				      * add_data_vector() for the
 				      * method used).
 				      */
-    enum DataVectorType {
-					   /// Data vector entries are associated to degrees of freedom
+    enum DataVectorType
+    {
+					   /**
+					    * Data vector entries are
+					    * associated to degrees of freedom
+					    */
 	  type_dof_data,
-					   /// Data vector entries are one per grid cell
+	  
+					   /**
+					    * Data vector entries are one per
+					    * grid cell
+					    */
 	  type_cell_data,
-					   /// Find out automatically
+	  
+					   /**
+					    * Find out automatically
+					    */
 	  type_automatic
+    };
+
+				     /**
+				      * The members of this enum are used to
+				      * describe the logical interpretation of
+				      * what the various components of a
+				      * vector-valued data set mean. For
+				      * example, if one has a finite element
+				      * for the Stokes equations in 2d,
+				      * representing components (u,v,p), one
+				      * would like to indicate that the first
+				      * two, u and v, represent a logical
+				      * vector so that later on when we
+				      * generate graphical output we can hand
+				      * them off to a visualization program
+				      * that will automatically know to render
+				      * them as a vector field, rather than as
+				      * two separate and independent scalar
+				      * fields.
+				      *
+				      * By passing a set of enums of the
+				      * current kind to the
+				      * DataOut_DoFData::add_data_vector
+				      * functions, this can be achieved.
+				      */
+    enum DataComponentInterpretation
+    {
+					   /**
+					    * Indicates that a component of a
+					    * data set corresponds to a scalar
+					    * field independent of the others.
+					    */
+	  component_is_scalar,
+
+					   /**
+					    * Indicates that a component of a
+					    * data set is part of a
+					    * vector-valued quantity.
+					    */
+	  component_is_part_of_vector
     };
     
 				     /**
@@ -531,6 +582,17 @@ class DataOut_DoFData : public DataOutInterface<patch_dim,patch_space_dim>
                                       * Exception
                                       */
     DeclException0 (ExcIncompatiblePatchLists);
+
+    DeclException2 (ExcInvalidVectorDeclaration,
+		    int, std::string,
+		    << "When declaring that a number of components in a data\n"
+		    << "set to be output logically form a vector instead of\n"
+		    << "simply a set of scalar fields, you need to specify\n"
+		    << "this for all relevant components. Furthermore,\n"
+		    << "vectors must always consist of exactly <dim>\n"
+		    << "components. However, the vector component at\n"
+		    << "position " << arg1 << " with name <" << arg2
+		    << " does not satisfy these conditions.");
     
   protected:
     				     /**
@@ -671,6 +733,17 @@ class DataOut_DoFData : public DataOutInterface<patch_dim,patch_space_dim>
 					  */
 	const std::vector<std::string> names;
 
+					 /**
+					  * A vector that for each of the
+					  * n_output_variables variables of
+					  * the current data set indicates
+					  * whether they are scalar fields,
+					  * parts of a vector-field, or any of
+					  * the other supported kinds of data.
+					  */
+	const std::vector<DataComponentInterpretation>
+	data_component_interpretation;
+	
 					 /**
 					  * Pointer to a DataPostprocessing
 					  * object which shall be applied to
@@ -862,15 +935,15 @@ class DataOut_DoFData : public DataOutInterface<patch_dim,patch_space_dim>
 				      * classes.
 				      */
     std::vector<Patch> patches;
-
+    
 				     /**
 				      * Function by which the base
 				      * class's functions get to know
 				      * what patches they shall write
 				      * to a file.
 				      */
-    virtual const std::vector<Patch> &
-    get_patches () const;
+    virtual
+    const std::vector<Patch> & get_patches () const;
 
 				     /**
 				      * Virtual function through
@@ -878,8 +951,18 @@ class DataOut_DoFData : public DataOutInterface<patch_dim,patch_space_dim>
 				      * obtained by the output functions
 				      * of the base class.
 				      */
-    virtual std::vector<std::string> get_dataset_names () const;
+    virtual
+    std::vector<std::string> get_dataset_names () const;
 
+				     /**
+				      * Overload of the respective
+				      * DataOutBase::get_vector_data_ranges()
+				      * function.
+				      */
+    virtual
+    std::vector<boost::tuple<unsigned int, unsigned int, std::string> >
+    get_vector_data_ranges () const;
+    
 				     /**
 				      * Make all template siblings
 				      * friends. Needed for the
@@ -1179,7 +1262,10 @@ merge_patches (const DataOut_DoFData<DH2,patch_dim,patch_space_dim> &source,
                                    // names
   Assert (get_dataset_names() == source.get_dataset_names(),
           ExcIncompatibleDatasetNames());
-                                   // make sure patches are compatible
+                                   // make sure patches are compatible. we'll
+                                   // assume that if the first respective
+                                   // patches are ok that all the other ones
+                                   // are ok as well
   Assert (patches[0].n_subdivisions == source_patches[0].n_subdivisions,
           ExcIncompatiblePatchLists());
   Assert (patches[0].data.n_rows() == source_patches[0].data.n_rows(),
@@ -1187,6 +1273,28 @@ merge_patches (const DataOut_DoFData<DH2,patch_dim,patch_space_dim> &source,
   Assert (patches[0].data.n_cols() == source_patches[0].data.n_cols(),
           ExcIncompatiblePatchLists());
 
+				   // check equality of the vector data
+				   // specifications
+  Assert (get_vector_data_ranges().size() ==
+	  source.get_vector_data_ranges().size(),
+	  ExcMessage ("Both sources need to declare the same components "
+		      "as vectors."));
+  for (unsigned int i=0; i<get_vector_data_ranges().size(); ++i)
+    {
+      Assert (get_vector_data_ranges()[i].template get<0>() ==
+	      source.get_vector_data_ranges()[i].template get<0>(),
+	      ExcMessage ("Both sources need to declare the same components "
+			  "as vectors."));
+      Assert (get_vector_data_ranges()[i].template get<1>() ==
+	      source.get_vector_data_ranges()[i].template get<1>(),
+	      ExcMessage ("Both sources need to declare the same components "
+			  "as vectors."));
+      Assert (get_vector_data_ranges()[i].template get<2>() ==
+	      source.get_vector_data_ranges()[i].template get<2>(),
+	      ExcMessage ("Both sources need to declare the same components "
+			  "as vectors."));
+    }
+  
                                    // merge patches. store old number
                                    // of elements, since we need to
                                    // adjust patch numbers, etc
