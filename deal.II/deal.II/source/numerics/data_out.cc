@@ -564,8 +564,11 @@ DataOut_DoFData<DH,patch_dim,patch_space_dim>::get_vector_data_ranges () const
 	  ranges.push_back (range);
 
 					   // increase the 'component' counter
-					   // by the appropriate amount
+					   // by the appropriate amount, same
+					   // for 'i', since we have already
+					   // dealt with all these components
 	  output_component += patch_space_dim-1;
+	  i += patch_space_dim-1;
 	}
 
 				   // note that we do not have to traverse the
