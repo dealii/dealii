@@ -798,34 +798,26 @@ void BoussinesqFlowProblem<dim>::output_results ()  const
   if (timestep_number % 25 != 0)
     return;
   
-  std::vector<std::string> solution_names;
-  switch (dim)
-    {
-      case 2:
-            solution_names.push_back ("u");
-            solution_names.push_back ("v");
-            solution_names.push_back ("p");
-            solution_names.push_back ("T");
-            break;
-            
-      case 3:
-            solution_names.push_back ("u");
-            solution_names.push_back ("v");
-            solution_names.push_back ("w");
-            solution_names.push_back ("p");
-            solution_names.push_back ("T");
-            break;
-            
-      default:
-            Assert (false, ExcNotImplemented());
-    }
+  std::vector<std::string> solution_names (dim, "velocity");
+  solution_names.push_back ("p");
+  solution_names.push_back ("T");
   
   DataOut<dim> data_out;
 
   data_out.attach_dof_handler (dof_handler);
-  data_out.add_data_vector (solution, solution_names);
 
-  data_out.build_patches (degree+1);
+  std::vector<DataComponentInterpretation::DataComponentInterpretation>
+    data_component_interpretation
+    (dim+2, DataComponentInterpretation::component_is_scalar);
+  for (unsigned int i=0; i<dim; ++i)
+    data_component_interpretation[i]
+      = DataComponentInterpretation::component_is_part_of_vector;
+  
+  data_out.add_data_vector (solution, solution_names,
+			    DataOut<dim>::type_dof_data,
+			    data_component_interpretation);
+
+  data_out.build_patches (degree);
   
   std::ostringstream filename;
   filename << "solution-" << timestep_number << ".vtk";

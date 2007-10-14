@@ -42,7 +42,8 @@ inconvenience this causes.
   </p>
 
   <li> <p>Changed: FilteredMatrix now can be applied to any matrix having the standard
-  set of <code>vmult</code> functions. In order to achieve this, its interface had to be overhauled.
+  set of <code>vmult</code> functions. In order to achieve this, its interface
+  had to be overhauled.
   Only the <code>VECTOR</code> template argument remains. Furthermore, instead of
   PreconditionJacobi being applied to FilteredMatrix, FilteredMatrix
   can now be applied to any preconditioner.
@@ -83,7 +84,8 @@ inconvenience this causes.
   them together into a vector.
   <p>
   While all output format writers receive the information necessary to do this, currently
-  only the VTK reader in DataOutBase::write_vtk makes use of it.
+  only the VTK reader in DataOutBase::write_vtk as well as the deal.II
+  intermediate format writer make use of it.
   <p>
   The use of this ability is explained in the @ref step_22 "step-22" tutorial program.
   <br>
@@ -114,6 +116,24 @@ inconvenience this causes.
 
 <ol> 
 
+  <li> <p>New: The DataOut, DataOutRotation, DataOutStack, and DataOutFaces
+  can now deal with vector-valued data if the functions in DataOutBase
+  that write in a particular graphical output format can deal with it.
+  Previously, if a finite element field had more than one component,
+  they were all output as logically independent scalar components;
+  most visualization programs then allowed to display vector fields
+  by composing them of individual scalar fields for each vector component.
+  <p>
+  With the new scheme, the DataOut_DoFData::add_data_vector() functions
+  inherited by the classes listed above take an additional parameter
+  that may be used to indicate that certain components of the data
+  logically form a vector field. The output formats for which this
+  is presently implemented then indicate this fact in the output file. The
+  mechanism is shown in action in @ref step_22 "step-22".
+  <br>
+  (WB 2007/10/14)
+  </p></li>
+
   <li> <p>Improved: UpdateFlags::update_q_points has been renamed to
   UpdateFlags::update_quadrature_points. Additional update flags for support
   points have been added without functionality, yet.
@@ -121,11 +141,11 @@ inconvenience this causes.
   (GK 2007/10/12)
   </p></li>
 
-<li> <p>Improved: The number of blocks of an FESystem was properly defined and the
-constructors changed accordingly. At least non of the test programs noticed the change.
-<br>
-(GK 2007/10/03)
-</p></li>
+  <li> <p>Improved: The number of blocks of an FESystem was properly defined and the
+  constructors changed accordingly. At least non of the test programs noticed the change.
+  <br>
+  (GK 2007/10/03)
+  </p></li>
 
   <li> <p>Improved: In an effort to make names more consistent, second
   derivatives in FEValuesBase and UpdateFlags have been renamed to
