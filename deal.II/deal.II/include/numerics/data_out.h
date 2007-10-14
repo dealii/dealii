@@ -623,11 +623,21 @@ class DataOut_DoFData : public DataOutInterface<patch_dim,patch_space_dim>
 					 /**
 					  * Constructor. Give a list of names
 					  * for the individual components of
-					  * the vector.
+					  * the vector. This constructor
+					  * assumes that no postprocessor is
+					  * going to be used.
 					  */
-	DataEntryBase (const std::vector<std::string>         &names,
-		       const DataPostprocessor<DH::dimension> *data_postprocessor=0);
+	DataEntryBase (const std::vector<std::string> &names);
 
+					 /**
+					  * Constructor when a data
+					  * postprocessor is going to be
+					  * used. In that case, the names and
+					  * vector declarations are going to
+					  * be aquired from the postprocessor.
+					  */
+	DataEntryBase (const DataPostprocessor<DH::dimension> *data_postprocessor);
+	
                                          /**
                                           * Destructor made virtual.
                                           */
@@ -778,12 +788,23 @@ class DataOut_DoFData : public DataOutInterface<patch_dim,patch_space_dim>
     {
       public:
 					 /**
-					  * Constructor. Give a pointer to a
-					  * vector and the list of names for
-					  * the individual components.
+					  * Constructor. Give a list of names
+					  * for the individual components of
+					  * the vector. This constructor
+					  * assumes that no postprocessor is
+					  * going to be used.
+					  */
+	DataEntry (const VectorType               *data,
+		   const std::vector<std::string> &names);
+
+					 /**
+					  * Constructor when a data
+					  * postprocessor is going to be
+					  * used. In that case, the names and
+					  * vector declarations are going to
+					  * be aquired from the postprocessor.
 					  */
 	DataEntry (const VectorType                       *data,
-		   const std::vector<std::string>         &names,
 		   const DataPostprocessor<DH::dimension> *data_postprocessor);
 
                                          /**
@@ -890,18 +911,6 @@ class DataOut_DoFData : public DataOutInterface<patch_dim,patch_space_dim>
                                           */
         const VectorType *vector;
     };
-
-				     /**
-				      * Common form of the three disctinct public
-				      * functions with the same name, but
-				      * different parameter list.
-				      */
-    template <class VECTOR>
-    void add_data_vector (const VECTOR                           &data,
-			  const std::vector<std::string>         &names,
-			  const DataVectorType                    type,
-			  const DataPostprocessor<DH::dimension> *data_postprocessor);
-
 
 
 				     /**

@@ -37,24 +37,67 @@ DEAL_II_NAMESPACE_OPEN
 
 template <class DH, int patch_dim, int patch_space_dim>
 DataOut_DoFData<DH,patch_dim,patch_space_dim>::
-DataEntryBase::DataEntryBase (const std::vector<std::string>         &names_in,
-			      const DataPostprocessor<DH::dimension> *data_postprocessor)
+DataEntryBase::DataEntryBase (const std::vector<std::string> &names_in)
 		:
 		names(names_in),
 		data_component_interpretation (names.size(),
 					       component_is_scalar),
-		postprocessor(data_postprocessor),
+		postprocessor(0),
 		n_output_variables(names.size())
 {
-//TODO this function should check that the number of names we have here equals the number of components to be obtained from the postprocessor
-  Assert(!data_postprocessor ||
-	 data_postprocessor->n_output_variables()==names.size(),
-	 ExcDimensionMismatch(data_postprocessor->n_output_variables(),
-			      names.size()));
-  Assert (!data_postprocessor ||
-	  names.size() == data_component_interpretation.size(),
+  Assert (names.size() == data_component_interpretation.size(),
 	  ExcDimensionMismatch(data_component_interpretation.size(),
 			       names.size()));
+
+				   // check that the names use only allowed
+				   // characters
+				   // check names for invalid characters
+  for (unsigned int i=0; i<names.size(); ++i)
+    Assert (names[i].find_first_not_of("abcdefghijklmnopqrstuvwxyz"
+				       "ABCDEFGHIJKLMNOPQRSTUVWXYZ"
+				       "0123456789_<>()") == std::string::npos,
+	    ExcInvalidCharacter (names[i],
+				 names[i].find_first_not_of("abcdefghijklmnopqrstuvwxyz"
+							    "ABCDEFGHIJKLMNOPQRSTUVWXYZ"
+							    "0123456789_<>()")));  
+}
+
+
+
+template <class DH, int patch_dim, int patch_space_dim>
+DataOut_DoFData<DH,patch_dim,patch_space_dim>::
+DataEntryBase::DataEntryBase (const DataPostprocessor<DH::dimension> *data_postprocessor)
+		:
+		names(data_postprocessor->get_names()),
+		data_component_interpretation (names.size(),
+					       component_is_scalar),
+		postprocessor(data_postprocessor),
+		n_output_variables(data_postprocessor->n_output_variables())
+{
+				   // if there is a post processor, then we
+				   // should have gotten the names from the
+				   // postprocessor. check that the number of
+				   // elements in the names vector is
+				   // correct. otherwise there is nothing for
+				   // us to check
+  Assert(data_postprocessor->n_output_variables()==names.size(),
+	 ExcDimensionMismatch(data_postprocessor->n_output_variables(),
+			      names.size()));
+  Assert (names.size() == data_component_interpretation.size(),
+	  ExcDimensionMismatch(data_component_interpretation.size(),
+			       names.size()));
+
+				   // check that the names use only allowed
+				   // characters
+				   // check names for invalid characters
+  for (unsigned int i=0; i<names.size(); ++i)
+    Assert (names[i].find_first_not_of("abcdefghijklmnopqrstuvwxyz"
+				       "ABCDEFGHIJKLMNOPQRSTUVWXYZ"
+				       "0123456789_<>()") == std::string::npos,
+	    ExcInvalidCharacter (names[i],
+				 names[i].find_first_not_of("abcdefghijklmnopqrstuvwxyz"
+							    "ABCDEFGHIJKLMNOPQRSTUVWXYZ"
+							    "0123456789_<>()")));  
 }
 
 
@@ -71,12 +114,25 @@ template <typename VectorType>
 DataOut_DoFData<DH,patch_dim,patch_space_dim>::
 DataEntry<VectorType>::
 DataEntry (const VectorType                       *data,
-	   const std::vector<std::string>         &names,
-	   const DataPostprocessor<DH::dimension> *data_postprocessor)
+	   const std::vector<std::string>         &names)
 		:
-                DataEntryBase (names,data_postprocessor),
+                DataEntryBase (names),
 		vector (data)
 {}
+
+
+
+template <class DH, int patch_dim, int patch_space_dim>
+template <typename VectorType>
+DataOut_DoFData<DH,patch_dim,patch_space_dim>::
+DataEntry<VectorType>::
+DataEntry (const VectorType                       *data,
+	   const DataPostprocessor<DH::dimension> *data_postprocessor)
+		:
+                DataEntryBase (data_postprocessor),
+		vector (data)
+{}
+
 
 
 template <class DH, int patch_dim, int patch_space_dim>
@@ -227,81 +283,6 @@ attach_dof_handler (const DH &d)
 
 
 
-template <class DH,
-	  int patch_dim, int patch_space_dim>
-template <class VECTOR>
-void
-DataOut_DoFData<DH,patch_dim,patch_space_dim>::
-add_data_vector (const VECTOR                           &vec,
-		 const std::vector<std::string>         &names,
-		 const DataVectorType                    type,
-		 const DataPostprocessor<DH::dimension> *data_postprocessor)
-{
-  Assert (dofs != 0, ExcNoDoFHandlerSelected ());
-
-				   // check for allowed sizes of
-				   // vectors
-  Assert ((vec.size() == dofs->get_tria().n_active_cells()) ||
-	  (vec.size() == dofs->n_dofs()),
-	  ExcInvalidVectorSize(vec.size(),
-			       dofs->n_dofs(),
-			       dofs->get_tria().n_active_cells()));
-  
-				   // either cell data and one name,
-				   // or dof data and n_components names
-  DataVectorType actual_type = type;
-  if (type == type_automatic)
-    {
-      if (vec.size() == dofs->get_tria().n_active_cells())
-	actual_type = type_cell_data;
-      else
-	actual_type = type_dof_data;
-    };
-  
-  switch (actual_type)
-    {
-      case type_cell_data:
-	    Assert (vec.size() == dofs->get_tria().n_active_cells(),
-		    ExcInvalidVectorSize (vec.size(),
-					  dofs->n_dofs(),
-					  dofs->get_tria().n_active_cells()));
-	    Assert (names.size() == 1,
-		    ExcInvalidNumberOfNames (names.size(), 1));
-	    break;
-      
-      case type_dof_data:
-	    Assert (vec.size() == dofs->n_dofs(),
-		    ExcInvalidVectorSize (vec.size(),
-					  dofs->n_dofs(),
-					  dofs->get_tria().n_active_cells()));
-	    Assert (data_postprocessor || (names.size() == dofs->get_fe().n_components()),
-		    ExcInvalidNumberOfNames (names.size(), dofs->get_fe().n_components()));
-	    break;
-
-      case type_automatic:
-					     // this case should have
-					     // been handled above...
-	    Assert (false, ExcInternalError());
-    };
-
-				   // check names for invalid characters
-  for (unsigned int i=0; i<names.size(); ++i)
-    Assert (names[i].find_first_not_of("abcdefghijklmnopqrstuvwxyz"
-				       "ABCDEFGHIJKLMNOPQRSTUVWXYZ"
-				       "0123456789_<>()") == std::string::npos,
-	    ExcInvalidCharacter (names[i],
-				 names[i].find_first_not_of("abcdefghijklmnopqrstuvwxyz"
-							    "ABCDEFGHIJKLMNOPQRSTUVWXYZ"
-							    "0123456789_<>()")));
-  
-  DataEntryBase * new_entry = new DataEntry<VECTOR>(&vec, names, data_postprocessor);
-  if (actual_type == type_dof_data)
-    dof_data.push_back (boost::shared_ptr<DataEntryBase>(new_entry));
-  else
-    cell_data.push_back (boost::shared_ptr<DataEntryBase>(new_entry));
-}
-
-
 
 template <class DH,
 	  int patch_dim, int patch_space_dim>
@@ -337,7 +318,7 @@ add_data_vector (const VECTOR                             &vec,
   	}
     }
   
-  add_data_vector (vec, names, type, 0);
+  add_data_vector (vec, names, type);
 }
 
 
@@ -351,7 +332,50 @@ add_data_vector (const VECTOR                             &vec,
 		 const std::vector<std::string>           &names,
 		 const DataVectorType                      type)
 {
-  add_data_vector(vec,names,type,0);
+  Assert (dofs != 0, ExcNoDoFHandlerSelected ());
+
+				   // either cell data and one name,
+				   // or dof data and n_components names
+  DataVectorType actual_type = type;
+  if (type == type_automatic)
+    {
+      if (vec.size() == dofs->get_tria().n_active_cells())
+	actual_type = type_cell_data;
+      else
+	actual_type = type_dof_data;
+    }
+  
+  switch (actual_type)
+    {
+      case type_cell_data:
+	    Assert (vec.size() == dofs->get_tria().n_active_cells(),
+		    ExcInvalidVectorSize (vec.size(),
+					  dofs->n_dofs(),
+					  dofs->get_tria().n_active_cells()));
+	    Assert (names.size() == 1,
+		    ExcInvalidNumberOfNames (names.size(), 1));
+	    break;
+      
+      case type_dof_data:
+	    Assert (vec.size() == dofs->n_dofs(),
+		    ExcInvalidVectorSize (vec.size(),
+					  dofs->n_dofs(),
+					  dofs->get_tria().n_active_cells()));
+	    Assert (names.size() == dofs->get_fe().n_components(),
+		    ExcInvalidNumberOfNames (names.size(), dofs->get_fe().n_components()));
+	    break;
+
+      case type_automatic:
+					     // this case should have
+					     // been handled above...
+	    Assert (false, ExcInternalError());
+    }
+
+  DataEntryBase * new_entry = new DataEntry<VECTOR>(&vec, names);
+  if (actual_type == type_dof_data)
+    dof_data.push_back (boost::shared_ptr<DataEntryBase>(new_entry));
+  else
+    cell_data.push_back (boost::shared_ptr<DataEntryBase>(new_entry));
 }
 
 
@@ -364,11 +388,23 @@ DataOut_DoFData<DH,patch_dim,patch_space_dim>::
 add_data_vector (const VECTOR                           &vec,
 		 const DataPostprocessor<DH::dimension> &data_postprocessor)
 {
-  Assert (dofs != 0, ExcNoDoFHandlerSelected ());
+				   // this is a specialized version of the
+				   // other function where we have a
+				   // postprocessor. if we do, we know that we
+				   // have type_dof_data, which makes things a
+				   // bit simpler, we also don't need to deal
+				   // with some of the other stuff and use a
+				   // different constructor of DataEntry
   
-  std::vector<std::string> names=data_postprocessor.get_names();
+  Assert (dofs != 0, ExcNoDoFHandlerSelected ());
 
-  add_data_vector (vec, names, type_dof_data, &data_postprocessor);
+  Assert (vec.size() == dofs->n_dofs(),
+	  ExcInvalidVectorSize (vec.size(),
+				dofs->n_dofs(),
+				dofs->get_tria().n_active_cells()));
+
+  DataEntryBase * new_entry = new DataEntry<VECTOR>(&vec, &data_postprocessor);
+  dof_data.push_back (boost::shared_ptr<DataEntryBase>(new_entry));
 }
 
 
