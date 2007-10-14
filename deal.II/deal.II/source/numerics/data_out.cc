@@ -580,7 +580,7 @@ DataOut_DoFData<DH,patch_dim,patch_space_dim>::get_vector_data_ranges () const
   unsigned int n_output_components = 0;
   for (data_iterator  d=dof_data.begin();
        d!=dof_data.end(); ++d)
-    n_output_components = (*d)->n_output_variables;
+    n_output_components += (*d)->n_output_variables;
   Assert (output_component == n_output_components,
 	  ExcInternalError());
 #endif
