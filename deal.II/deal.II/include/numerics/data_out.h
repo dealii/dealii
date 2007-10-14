@@ -22,6 +22,7 @@
 #include <dofs/dof_handler.h>
 #include <fe/mapping.h>
 #include <numerics/data_postprocessor.h>
+#include <numerics/data_component_interpretation.h>
 
 #include <boost/shared_ptr.hpp>
 
@@ -85,19 +86,28 @@ template <int> class FEValuesBase;
  * you can use the second add_data_vector() function which takes a @p
  * string instead of the <tt>vector<string></tt>.
  *
- * You should note that this class does not copy the vector given to it through
+ * The add_data_vector() functions have additional arguments (with default
+ * values) that can be used to specify certain transformations. In particular,
+ * it allows to attach DataPostprocessor arguments to compute derived
+ * information from a data vector at each quadrature point (for example, the
+ * Mach number in hypersonic flow can be computed from density and velocities;
+ * @ref step_29 "step-29" also shows an example); another piece of information
+ * specified through arguments with default values is how certain output
+ * components should be interpreted, i.e. whether each component of the data
+ * is logically an independent scalar field, or whether some of them together
+ * form logically a vector-field (see the
+ * DataComponentInterpretation::DataComponentInterpretation enum, and the @ref
+ * step_22 "step-22" tutorial program).
+ *
+ * It should be noted that this class does not copy the vector given to it through
  * the add_data_vector() functions, for memory consumption reasons. It only
  * stores a reference to it, so it is in your responsibility to make sure that
  * the data vectors exist long enough.
  *
  * After adding all data vectors, you need to call a function which generates
- * the patches for output from the stored data. This function is here called
- * build_patches(), but the naming is up to the derived class that actually
- * implements this.
- *
- * Finally, you write() the data in one format or other,
- * to a file and may want to clear this object as soon as possible to reduce
- * memory requirements.
+ * the patches for output from the stored data. Derived classes name this
+ * function build_patches(). Finally, you write() the data in one format or other,
+ * to a file.
  *
  * Please note, that in the example above, an object of type DataOut was
  * used, i.e. an object of a derived class. This is necessary since this
@@ -217,46 +227,6 @@ class DataOut_DoFData : public DataOutInterface<patch_dim,patch_space_dim>
 					    */
 	  type_automatic
     };
-
-				     /**
-				      * The members of this enum are used to
-				      * describe the logical interpretation of
-				      * what the various components of a
-				      * vector-valued data set mean. For
-				      * example, if one has a finite element
-				      * for the Stokes equations in 2d,
-				      * representing components (u,v,p), one
-				      * would like to indicate that the first
-				      * two, u and v, represent a logical
-				      * vector so that later on when we
-				      * generate graphical output we can hand
-				      * them off to a visualization program
-				      * that will automatically know to render
-				      * them as a vector field, rather than as
-				      * two separate and independent scalar
-				      * fields.
-				      *
-				      * By passing a set of enums of the
-				      * current kind to the
-				      * DataOut_DoFData::add_data_vector
-				      * functions, this can be achieved.
-				      */
-    enum DataComponentInterpretation
-    {
-					   /**
-					    * Indicates that a component of a
-					    * data set corresponds to a scalar
-					    * field independent of the others.
-					    */
-	  component_is_scalar,
-
-					   /**
-					    * Indicates that a component of a
-					    * data set is part of a
-					    * vector-valued quantity.
-					    */
-	  component_is_part_of_vector
-    };
     
 				     /**
 				      * Constructor
@@ -340,6 +310,42 @@ class DataOut_DoFData : public DataOutInterface<patch_dim,patch_space_dim>
 				      * name instead of a vector of
 				      * names.
 				      *
+				      * The data_component_interpretation
+				      * argument contains information about
+				      * how the individual components of
+				      * output files that consist of more than
+				      * one data set are to be interpreted.
+				      *
+				      * For example, if one has a finite
+				      * element for the Stokes equations in
+				      * 2d, representing components (u,v,p),
+				      * one would like to indicate that the
+				      * first two, u and v, represent a
+				      * logical vector so that later on when
+				      * we generate graphical output we can
+				      * hand them off to a visualization
+				      * program that will automatically know
+				      * to render them as a vector field,
+				      * rather than as two separate and
+				      * independent scalar fields.
+				      *
+				      * The default value of this argument
+				      * (i.e. an empty vector) corresponds is
+				      * equivalent to a vector of values
+				      * DataComponentInterpretation::component_is_scalar,
+				      * indicating that all output components
+				      * are independent scalar
+				      * fields. However, if the given data
+				      * vector represents logical vectors, you
+				      * may pass a vector that contains values
+				      * DataComponentInterpretation::component_is_part_of_vector. In
+				      * the example above, one would pass in a
+				      * vector with components
+				      * (DataComponentInterpretation::component_is_part_of_vector,
+				      * DataComponentInterpretation::component_is_part_of_vector,
+				      * DataComponentInterpretation::component_is_scalar)
+				      * for (u,v,p).
+				      *
 				      * The names of a data vector
 				      * shall only contain characters
 				      * which are letters, underscore
@@ -358,23 +364,23 @@ class DataOut_DoFData : public DataOutInterface<patch_dim,patch_space_dim>
     template <class VECTOR>
     void add_data_vector (const VECTOR                   &data,
 			  const std::vector<std::string> &names,
-			  const DataVectorType            type = type_automatic);
+			  const DataVectorType            type = type_automatic,
+			  const std::vector<DataComponentInterpretation::DataComponentInterpretation> &data_component_interpretation
+			  = std::vector<DataComponentInterpretation::DataComponentInterpretation>());
 
 				     /**
-				      * This function is an
-				      * abbreviation to the above one,
-				      * intended for use with finite
-				      * elements that are not composed
-				      * of subelements. In this case,
-				      * only one name per data vector
-				      * needs to be given, which is
-				      * what this function takes. It
-				      * simply relays its arguments
-				      * after a conversion of the
-				      * @p name to a vector of
-				      * strings, to the other
-				      * add_data_vector() function
-				      * above.
+				      * This function is an abbreviation to
+				      * the above one (see there for a
+				      * discussion of the various arguments),
+				      * intended for use with finite elements
+				      * that are not composed of
+				      * subelements. In this case, only one
+				      * name per data vector needs to be
+				      * given, which is what this function
+				      * takes. It simply relays its arguments
+				      * after a conversion of the @p name to a
+				      * vector of strings, to the other
+				      * add_data_vector() function above.
 				      *
 				      * If @p data is a vector with
 				      * multiple components this
@@ -393,7 +399,9 @@ class DataOut_DoFData : public DataOutInterface<patch_dim,patch_space_dim>
     template <class VECTOR>
     void add_data_vector (const VECTOR         &data,
 			  const std::string    &name,
-			  const DataVectorType  type = type_automatic);
+			  const DataVectorType  type = type_automatic,
+			  const std::vector<DataComponentInterpretation::DataComponentInterpretation> &data_component_interpretation
+			  = std::vector<DataComponentInterpretation::DataComponentInterpretation>());
 
 				     /**
 				      * This function is an alternative to the
@@ -403,12 +411,16 @@ class DataOut_DoFData : public DataOutInterface<patch_dim,patch_space_dim>
 				      * a class derived from DataPostprocessor.
 				      *
 				      * The names for these derived quantities
-				      * are implicitly given via the @p
-				      * data_postprocessor argument. As only
-				      * data of type @p type_dof_data can be
-				      * transformed, this type is also known
-				      * implicitly and does not have to be
-				      * given.
+				      * are provided by the @p
+				      * data_postprocessor argument. Likewise,
+				      * the data_component_interpretation
+				      * argument of the other
+				      * add_data_vector() functions is
+				      * provided by the data_postprocessor
+				      * argument. As only data of type @p
+				      * type_dof_data can be transformed, this
+				      * type is also known implicitly and does
+				      * not have to be given.
 				      *
 				      * The actual type for the template
 				      * argument may be any vector type from
@@ -623,11 +635,14 @@ class DataOut_DoFData : public DataOutInterface<patch_dim,patch_space_dim>
 					 /**
 					  * Constructor. Give a list of names
 					  * for the individual components of
-					  * the vector. This constructor
-					  * assumes that no postprocessor is
-					  * going to be used.
+					  * the vector and their
+					  * interpretation as scalar or vector
+					  * data. This constructor assumes
+					  * that no postprocessor is going to
+					  * be used.
 					  */
-	DataEntryBase (const std::vector<std::string> &names);
+	DataEntryBase (const std::vector<std::string> &names,
+		       const std::vector<DataComponentInterpretation::DataComponentInterpretation> &data_component_interpretation);
 
 					 /**
 					  * Constructor when a data
@@ -751,7 +766,7 @@ class DataOut_DoFData : public DataOutInterface<patch_dim,patch_space_dim>
 					  * parts of a vector-field, or any of
 					  * the other supported kinds of data.
 					  */
-	const std::vector<DataComponentInterpretation>
+	const std::vector<DataComponentInterpretation::DataComponentInterpretation>
 	data_component_interpretation;
 	
 					 /**
@@ -790,12 +805,15 @@ class DataOut_DoFData : public DataOutInterface<patch_dim,patch_space_dim>
 					 /**
 					  * Constructor. Give a list of names
 					  * for the individual components of
-					  * the vector. This constructor
-					  * assumes that no postprocessor is
-					  * going to be used.
+					  * the vector and their
+					  * interpretation as scalar or vector
+					  * data. This constructor assumes
+					  * that no postprocessor is going to
+					  * be used.
 					  */
 	DataEntry (const VectorType               *data,
-		   const std::vector<std::string> &names);
+		   const std::vector<std::string> &names,
+		   const std::vector<DataComponentInterpretation::DataComponentInterpretation> &data_component_interpretation);
 
 					 /**
 					  * Constructor when a data
@@ -965,8 +983,9 @@ class DataOut_DoFData : public DataOutInterface<patch_dim,patch_space_dim>
 
 				     /**
 				      * Overload of the respective
-				      * DataOutBase::get_vector_data_ranges()
-				      * function.
+				      * DataOutInterface::get_vector_data_ranges()
+				      * function. See there for a more
+				      * extensive documentation.
 				      */
     virtual
     std::vector<boost::tuple<unsigned int, unsigned int, std::string> >

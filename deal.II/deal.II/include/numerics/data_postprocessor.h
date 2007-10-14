@@ -19,6 +19,7 @@
 #include <base/tensor.h>
 #include <lac/vector.h>
 #include <fe/fe_update_flags.h>
+#include <numerics/data_component_interpretation.h>
 
 #include <vector>
 #include <string>
@@ -135,7 +136,49 @@ class DataPostprocessor: public Subscriptor
 				      * the names of the computed quantities.
 				      */
     virtual std::vector<std::string> get_names () const=0;
-
+    
+				     /**
+				      * This functions returns
+				      * information about how the
+				      * individual components of
+				      * output files that consist of
+				      * more than one data set are to
+				      * be interpreted.
+				      *
+				      * For example, if one has a finite
+				      * element for the Stokes equations in
+				      * 2d, representing components (u,v,p),
+				      * one would like to indicate that the
+				      * first two, u and v, represent a
+				      * logical vector so that later on when
+				      * we generate graphical output we can
+				      * hand them off to a visualization
+				      * program that will automatically know
+				      * to render them as a vector field,
+				      * rather than as two separate and
+				      * independent scalar fields.
+				      *
+				      * The default implementation of this
+				      * function returns a vector of values
+				      * DataComponentInterpretation::component_is_scalar,
+				      * indicating that all output components
+				      * are independent scalar
+				      * fields. However, if a derived class
+				      * produces data that represents vectors,
+				      * it may return a vector that contains
+				      * values
+				      * DataComponentInterpretation::component_is_part_of_vector. In
+				      * the example above, one would return a
+				      * vector with components
+				      * (DataComponentInterpretation::component_is_part_of_vector,
+				      * DataComponentInterpretation::component_is_part_of_vector,
+				      * DataComponentInterpretation::component_is_scalar)
+				      * for (u,v,p).
+				      */
+    virtual
+    std::vector<DataComponentInterpretation::DataComponentInterpretation>
+    get_data_component_interpretation () const;
+    
 				     /**
 				      * Return, which data has to be provided to
 				      * compute the derived quantities. This has

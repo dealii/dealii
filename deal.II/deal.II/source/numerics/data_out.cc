@@ -37,11 +37,11 @@ DEAL_II_NAMESPACE_OPEN
 
 template <class DH, int patch_dim, int patch_space_dim>
 DataOut_DoFData<DH,patch_dim,patch_space_dim>::
-DataEntryBase::DataEntryBase (const std::vector<std::string> &names_in)
+DataEntryBase::DataEntryBase (const std::vector<std::string> &names_in,
+			      const std::vector<DataComponentInterpretation::DataComponentInterpretation> &data_component_interpretation)
 		:
 		names(names_in),
-		data_component_interpretation (names.size(),
-					       component_is_scalar),
+		data_component_interpretation (data_component_interpretation),
 		postprocessor(0),
 		n_output_variables(names.size())
 {
@@ -69,8 +69,7 @@ DataOut_DoFData<DH,patch_dim,patch_space_dim>::
 DataEntryBase::DataEntryBase (const DataPostprocessor<DH::dimension> *data_postprocessor)
 		:
 		names(data_postprocessor->get_names()),
-		data_component_interpretation (names.size(),
-					       component_is_scalar),
+		data_component_interpretation (data_postprocessor->get_data_component_interpretation()),
 		postprocessor(data_postprocessor),
 		n_output_variables(data_postprocessor->n_output_variables())
 {
@@ -114,9 +113,10 @@ template <typename VectorType>
 DataOut_DoFData<DH,patch_dim,patch_space_dim>::
 DataEntry<VectorType>::
 DataEntry (const VectorType                       *data,
-	   const std::vector<std::string>         &names)
+	   const std::vector<std::string>         &names,
+	   const std::vector<DataComponentInterpretation::DataComponentInterpretation> &data_component_interpretation)
 		:
-                DataEntryBase (names),
+                DataEntryBase (names, data_component_interpretation),
 		vector (data)
 {}
 
@@ -291,7 +291,8 @@ void
 DataOut_DoFData<DH,patch_dim,patch_space_dim>::
 add_data_vector (const VECTOR                             &vec,
 		 const std::string                        &name,
-		 const DataVectorType                      type)
+		 const DataVectorType                      type,
+		 const std::vector<DataComponentInterpretation::DataComponentInterpretation> &data_component_interpretation)
 {
   Assert (dofs != 0, ExcNoDoFHandlerSelected ());
   const unsigned int n_components = dofs->get_fe().n_components ();
@@ -318,7 +319,7 @@ add_data_vector (const VECTOR                             &vec,
   	}
     }
   
-  add_data_vector (vec, names, type);
+  add_data_vector (vec, names, type, data_component_interpretation);
 }
 
 
@@ -330,10 +331,20 @@ void
 DataOut_DoFData<DH,patch_dim,patch_space_dim>::
 add_data_vector (const VECTOR                             &vec,
 		 const std::vector<std::string>           &names,
-		 const DataVectorType                      type)
+		 const DataVectorType                      type,
+		 const std::vector<DataComponentInterpretation::DataComponentInterpretation> &data_component_interpretation_)
 {
   Assert (dofs != 0, ExcNoDoFHandlerSelected ());
 
+  const std::vector<DataComponentInterpretation::DataComponentInterpretation> &
+    data_component_interpretation
+    = (data_component_interpretation_.size() != 0
+       ?
+       data_component_interpretation_
+       :
+       std::vector<DataComponentInterpretation::DataComponentInterpretation>
+       (names.size(), DataComponentInterpretation::component_is_scalar));
+  
 				   // either cell data and one name,
 				   // or dof data and n_components names
   DataVectorType actual_type = type;
@@ -371,7 +382,8 @@ add_data_vector (const VECTOR                             &vec,
 	    Assert (false, ExcInternalError());
     }
 
-  DataEntryBase * new_entry = new DataEntry<VECTOR>(&vec, names);
+  DataEntryBase * new_entry = new DataEntry<VECTOR>(&vec, names,
+						    data_component_interpretation);
   if (actual_type == type_dof_data)
     dof_data.push_back (boost::shared_ptr<DataEntryBase>(new_entry));
   else
@@ -511,7 +523,7 @@ DataOut_DoFData<DH,patch_dim,patch_space_dim>::get_vector_data_ranges () const
 				       // the current function all we care
 				       // about is vector data
       if ((*d)->data_component_interpretation[i] ==
-	  component_is_part_of_vector)
+	  DataComponentInterpretation::component_is_part_of_vector)
 	{
 					   // ensure that there is a
 					   // continuous number of next
@@ -524,7 +536,7 @@ DataOut_DoFData<DH,patch_dim,patch_space_dim>::get_vector_data_ranges () const
 	  for (unsigned int dd=1; dd<patch_space_dim; ++dd)
 	    Assert ((*d)->data_component_interpretation[i+dd]
 		    ==
-		    component_is_part_of_vector,
+		    DataComponentInterpretation::component_is_part_of_vector,
 		    ExcInvalidVectorDeclaration (i,
 						 (*d)->names[i]));
 
@@ -1085,13 +1097,15 @@ template void \
 DataOut_DoFData<DH,D2,D3>:: \
 add_data_vector<V > (const V             &, \
                      const std::string   &, \
-                     const DataVectorType); \
+                     const DataVectorType,  \
+		     const std::vector<DataComponentInterpretation::DataComponentInterpretation> &); \
 \
 template void \
 DataOut_DoFData<DH,D2,D3>:: \
 add_data_vector<V > (const V                        &, \
                      const std::vector<std::string> &, \
-                     const DataVectorType); \
+                     const DataVectorType,  \
+		     const std::vector<DataComponentInterpretation::DataComponentInterpretation> &); \
 \
 template void \
 DataOut_DoFData<DH,D2,D3>:: \

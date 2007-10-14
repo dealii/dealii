@@ -49,6 +49,22 @@ compute_derived_quantities_vector (const std::vector<Vector<double> >           
   AssertThrow(false,ExcPureFunctionCalled());
 }
 
+
+
+template <int dim>
+std::vector<DataComponentInterpretation::DataComponentInterpretation>
+DataPostprocessor<dim>::get_data_component_interpretation () const
+{
+				   // default implementation assumes that all
+				   // components are independent scalars
+  return
+    std::vector<DataComponentInterpretation::DataComponentInterpretation>
+    (n_output_variables(),
+     DataComponentInterpretation::component_is_scalar);
+}
+
+
+
 // explicit instantiation
 template class DataPostprocessor<deal_II_dimension>;
 
