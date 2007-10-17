@@ -3853,7 +3853,7 @@ DataOutBase::write_vtk (const std::vector<Patch<dim,spacedim> > &patches,
   for (unsigned int n_th_vector=0; n_th_vector<vector_data_ranges.size(); ++n_th_vector)
     {
       
-      AssertThrow (vector_data_ranges[n_th_vector].template get<1>() >
+      AssertThrow (vector_data_ranges[n_th_vector].template get<1>() >=
 		   vector_data_ranges[n_th_vector].template get<0>(),
 		   ExcLowerRange (vector_data_ranges[n_th_vector].template get<1>(),
 				  vector_data_ranges[n_th_vector].template get<0>()));
