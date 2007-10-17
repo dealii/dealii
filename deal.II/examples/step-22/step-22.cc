@@ -23,6 +23,7 @@
 #include <lac/block_sparse_matrix.h>
 #include <lac/solver_cg.h>
 #include <lac/precondition.h>
+#include <lac/sparse_direct.h>
 
 #include <grid/tria.h>
 #include <grid/grid_generator.h>
@@ -46,8 +47,6 @@
 
 #include <fstream>
 #include <sstream>
-
-#include <base/tensor_function.h>
 
 using namespace dealii;
 
@@ -85,6 +84,10 @@ class BoussinesqFlowProblem
     BlockVector<double> solution;
     BlockVector<double> old_solution;
     BlockVector<double> system_rhs;
+
+    boost::shared_ptr<SparseDirectUMFPACK> A_preconditioner;
+    
+    bool rebuild_preconditioner;
 };
 
 
@@ -264,40 +267,41 @@ extract_grad_T (const FEValuesBase<dim> &fe_values,
 
 
 
-template <class Matrix>
+template <class Matrix, class Preconditioner>
 class InverseMatrix : public Subscriptor
 {
   public:
-    InverseMatrix (const Matrix &m);
+    InverseMatrix (const Matrix         &m,
+		   const Preconditioner &preconditioner);
 
     void vmult (Vector<double>       &dst,
                 const Vector<double> &src) const;
 
   private:
     const SmartPointer<const Matrix> matrix;
+    const Preconditioner &preconditioner;
 
     mutable GrowingVectorMemory<> vector_memory;    
 };
 
 
-template <class Matrix>
-InverseMatrix<Matrix>::InverseMatrix (const Matrix &m)
+template <class Matrix, class Preconditioner>
+InverseMatrix<Matrix,Preconditioner>::InverseMatrix (const Matrix &m,
+						     const Preconditioner &preconditioner)
                 :
-                matrix (&m)
+                matrix (&m),
+		preconditioner (preconditioner)
 {}
 
 
                                  
-template <class Matrix>
-void InverseMatrix<Matrix>::vmult (Vector<double>       &dst,
-                                   const Vector<double> &src) const
+template <class Matrix, class Preconditioner>
+void InverseMatrix<Matrix,Preconditioner>::vmult (Vector<double>       &dst,
+						  const Vector<double> &src) const
 {
   SolverControl solver_control (src.size(), 1e-6*src.l2_norm());
   SolverCG<> cg (solver_control, vector_memory);
 
-  PreconditionJacobi<> preconditioner;
-  preconditioner.initialize (*matrix);
-  
   dst = 0;
 
   try
@@ -312,27 +316,29 @@ void InverseMatrix<Matrix>::vmult (Vector<double>       &dst,
 
 
 
+template <class Preconditioner>
 class SchurComplement : public Subscriptor
 {
   public:
     SchurComplement (const BlockSparseMatrix<double> &A,
-                     const InverseMatrix<SparseMatrix<double> > &Minv);
+                     const InverseMatrix<SparseMatrix<double>,Preconditioner> &Minv);
 
     void vmult (Vector<double>       &dst,
                 const Vector<double> &src) const;
 
   private:
     const SmartPointer<const BlockSparseMatrix<double> > system_matrix;
-    const SmartPointer<const InverseMatrix<SparseMatrix<double> > > m_inverse;
+    const SmartPointer<const InverseMatrix<SparseMatrix<double>,Preconditioner> > m_inverse;
     
     mutable Vector<double> tmp1, tmp2;
 };
 
 
 
-SchurComplement::
+template <class Preconditioner>
+SchurComplement<Preconditioner>::
 SchurComplement (const BlockSparseMatrix<double> &A,
-                 const InverseMatrix<SparseMatrix<double> > &Minv)
+                 const InverseMatrix<SparseMatrix<double>,Preconditioner> &Minv)
                 :
                 system_matrix (&A),
                 m_inverse (&Minv),
@@ -341,8 +347,9 @@ SchurComplement (const BlockSparseMatrix<double> &A,
 {}
 
 
-void SchurComplement::vmult (Vector<double>       &dst,
-                             const Vector<double> &src) const
+template <class Preconditioner>
+void SchurComplement<Preconditioner>::vmult (Vector<double>       &dst,
+					     const Vector<double> &src) const
 {
   system_matrix->block(0,1).vmult (tmp1, src);
   m_inverse->vmult (tmp2, tmp1);
@@ -359,8 +366,9 @@ BoussinesqFlowProblem<dim>::BoussinesqFlowProblem (const unsigned int degree)
                     FE_Q<dim>(degree), 1,
                     FE_Q<dim>(degree), 1),
                 dof_handler (triangulation),
-                n_refinement_steps (4),
-                time_step (0)
+                n_refinement_steps (6),
+                time_step (0),
+		rebuild_preconditioner (true)
 {}
 
 
@@ -579,6 +587,19 @@ void BoussinesqFlowProblem<dim>::assemble_system ()
 					solution,
 					system_rhs);  
   }
+
+  if (rebuild_preconditioner == true)
+    {
+      std::cout << "   Rebuilding preconditioner..." << std::flush;
+      
+      A_preconditioner
+	= boost::shared_ptr<SparseDirectUMFPACK>(new SparseDirectUMFPACK());
+      A_preconditioner->initialize (system_matrix.block(0,0));
+
+      std::cout << std::endl;
+      
+      rebuild_preconditioner = false;
+    }
 }
 
 
@@ -715,8 +736,8 @@ void BoussinesqFlowProblem<dim>::assemble_rhs_T ()
 template <int dim>
 void BoussinesqFlowProblem<dim>::solve () 
 {
-  const InverseMatrix<SparseMatrix<double> >
-    A_inverse (system_matrix.block(0,0));
+  const InverseMatrix<SparseMatrix<double>,SparseDirectUMFPACK>
+    A_inverse (system_matrix.block(0,0), *A_preconditioner);
   Vector<double> tmp (solution.block(0).size());
   Vector<double> schur_rhs (solution.block(1).size());
   Vector<double> tmp2 (solution.block(2).size());
@@ -728,7 +749,7 @@ void BoussinesqFlowProblem<dim>::solve ()
     schur_rhs -= system_rhs.block(1);
 
     
-    SchurComplement
+    SchurComplement<SparseDirectUMFPACK>
       schur_complement (system_matrix, A_inverse);
     
     SolverControl solver_control (system_matrix.block(0,0).m(),
@@ -889,22 +910,24 @@ void BoussinesqFlowProblem<dim>::run ()
   do
     { 
       std::cout << "Timestep " << timestep_number
+		<< ":  t=" << time
+		<< ", dt=" << time_step
                 << std::endl; 
 
-      assemble_system ();
+      std::cout << "   Assembling..." << std::endl;
+      assemble_system ();      
 
+      std::cout << "   Solving..." << std::endl;
       solve ();
       
       output_results ();
 
       time += time_step;
       ++timestep_number;
-      std::cout << "   Now at t=" << time
-                << ", dt=" << time_step << '.'
-                << std::endl
-                << std::endl;
+
+      std::cout << std::endl;
     }
-  while (time <= 50);
+  while (time <= 10);
 }
 
     
