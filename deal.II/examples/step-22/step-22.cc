@@ -294,15 +294,17 @@ void InverseMatrix<Matrix>::vmult (Vector<double>       &dst,
   SolverControl solver_control (src.size(), 1e-8*src.l2_norm());
   SolverCG<> cg (solver_control, vector_memory);
 
+  PreconditionJacobi<> preconditioner;
+  preconditioner.initialize (*matrix);
+  
   dst = 0;
 
   try
     {
-      cg.solve (*matrix, dst, src, PreconditionIdentity());
+      cg.solve (*matrix, dst, src, preconditioner);
     }
   catch (...)
     {
-      std::cout << "ups 1..." << std::endl;
       Assert (false, ExcInternalError());
     }
 }
@@ -356,7 +358,7 @@ BoussinesqFlowProblem<dim>::BoussinesqFlowProblem (const unsigned int degree)
                     FE_Q<dim>(degree), 1,
                     FE_Q<dim>(degree), 1),
                 dof_handler (triangulation),
-                n_refinement_steps (6),
+                n_refinement_steps (4),
                 time_step (0)
 {}
 
@@ -446,7 +448,7 @@ scalar_product (const Tensor<2,dim> &a,
 
 template <int dim>
 void BoussinesqFlowProblem<dim>::assemble_system () 
-{  
+{
   system_matrix=0;
   system_rhs=0;
 
@@ -729,7 +731,7 @@ void BoussinesqFlowProblem<dim>::solve ()
       schur_complement (system_matrix, A_inverse);
     
     SolverControl solver_control (system_matrix.block(0,0).m(),
-                                  1e-12*schur_rhs.l2_norm());
+                                  1e-8*schur_rhs.l2_norm());
     SolverCG<>    cg (solver_control);
 
     try
@@ -739,7 +741,6 @@ void BoussinesqFlowProblem<dim>::solve ()
       }
     catch (...)
       {
-	std::cout << "ups 2..." << std::endl;
 	abort ();
       }
 	
@@ -775,7 +776,6 @@ void BoussinesqFlowProblem<dim>::solve ()
       }
     catch (...)
       {
-	std::cout << "ups 3..." << std::endl;
 	abort ();
       }
 	
