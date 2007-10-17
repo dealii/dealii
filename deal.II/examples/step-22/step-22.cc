@@ -16,6 +16,7 @@
 #include <base/quadrature_lib.h>
 #include <base/logstream.h>
 #include <base/function.h>
+#include <base/utilities.h>
 
 #include <lac/block_vector.h>
 #include <lac/full_matrix.h>
@@ -291,7 +292,7 @@ template <class Matrix>
 void InverseMatrix<Matrix>::vmult (Vector<double>       &dst,
                                    const Vector<double> &src) const
 {
-  SolverControl solver_control (src.size(), 1e-8*src.l2_norm());
+  SolverControl solver_control (src.size(), 1e-6*src.l2_norm());
   SolverCG<> cg (solver_control, vector_memory);
 
   PreconditionJacobi<> preconditioner;
@@ -820,7 +821,7 @@ void BoussinesqFlowProblem<dim>::output_results ()  const
   data_out.build_patches (degree);
   
   std::ostringstream filename;
-  filename << "solution-" << timestep_number << ".vtk";
+  filename << "solution-" << Utilities::int_to_string(timestep_number, 4) << ".vtk";
 
   std::ofstream output (filename.str().c_str());
   data_out.write_vtk (output);
@@ -882,7 +883,7 @@ void BoussinesqFlowProblem<dim>::run ()
                           old_solution);
   }
   
-  timestep_number = 1;
+  timestep_number = 0;
   double time = 0;
   
   do
