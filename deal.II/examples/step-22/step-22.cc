@@ -62,7 +62,7 @@ class BoussinesqFlowProblem
     void run ();
     
   private:
-    void make_grid_and_dofs ();
+    void setup_dofs ();
     void assemble_system ();
     void assemble_rhs_T ();
     double get_maximal_velocity () const;
@@ -75,11 +75,11 @@ class BoussinesqFlowProblem
     FESystem<dim>        fe;
     DoFHandler<dim>      dof_handler;
 
+    ConstraintMatrix     hanging_node_constraints;
+    
     BlockSparsityPattern      sparsity_pattern;
     BlockSparseMatrix<double> system_matrix;
 
-    const unsigned int n_refinement_steps;
-    
     double time_step;
     unsigned int timestep_number;
  
@@ -368,7 +368,6 @@ BoussinesqFlowProblem<dim>::BoussinesqFlowProblem (const unsigned int degree)
                     FE_Q<dim>(degree), 1,
                     FE_DGQ<dim>(degree-1), 1),
                 dof_handler (triangulation),
-                n_refinement_steps (5),
                 time_step (0),
 		rebuild_preconditioner (true)
 {}
@@ -377,18 +376,13 @@ BoussinesqFlowProblem<dim>::BoussinesqFlowProblem (const unsigned int degree)
 
 
 template <int dim>
-void BoussinesqFlowProblem<dim>::make_grid_and_dofs ()
-{
-  GridGenerator::half_hyper_shell (triangulation, Point<dim>(), 0.5, 1.0);
-
-  static HalfHyperShellBoundary<dim> boundary;
-  triangulation.set_boundary (0, boundary);
-  
-  triangulation.refine_global (n_refinement_steps);
-  
+void BoussinesqFlowProblem<dim>::setup_dofs ()
+{  
   dof_handler.distribute_dofs (fe); 
   DoFRenumbering::component_wise (dof_handler);
-                                  
+  DoFTools::make_hanging_node_constraints (dof_handler, hanging_node_constraints);
+  hanging_node_constraints.close ();
+  
   std::vector<unsigned int> dofs_per_component (dim+2);
   DoFTools::count_dofs_per_component (dof_handler, dofs_per_component);  
   const unsigned int n_u = dofs_per_component[0] * dim,
@@ -418,11 +412,12 @@ void BoussinesqFlowProblem<dim>::make_grid_and_dofs ()
   sparsity_pattern.block(1,2).reinit (n_p, n_T, n_couplings);
   sparsity_pattern.block(2,2).reinit (n_T, n_T, n_couplings);
   
-  sparsity_pattern.collect_sizes();
+  sparsity_pattern.collect_sizes();    
+
   
   DoFTools::make_sparsity_pattern (dof_handler, sparsity_pattern);
+  hanging_node_constraints.condense (sparsity_pattern);
   sparsity_pattern.compress();
-
   
   system_matrix.reinit (sparsity_pattern);
 
@@ -578,6 +573,9 @@ void BoussinesqFlowProblem<dim>::assemble_system ()
       for (unsigned int i=0; i<dofs_per_cell; ++i)
         system_rhs(local_dof_indices[i]) += local_rhs(i);
     }
+
+  hanging_node_constraints.condense (system_matrix);
+  hanging_node_constraints.condense (system_rhs);  
   
   {
     std::vector<bool> component_mask (dim+2, true);
@@ -789,7 +787,7 @@ void BoussinesqFlowProblem<dim>::solve ()
   }
 
   time_step = GridTools::minimal_cell_diameter(triangulation) /
-              std::max(get_maximal_velocity(),1.);
+              get_maximal_velocity() / 10;
 
   assemble_rhs_T ();
   {
@@ -892,6 +890,8 @@ BoussinesqFlowProblem<dim>::get_maximal_velocity () const
         }
     }
 
+  std::cout << "Maximal velocity=" << max_velocity << std::endl;
+  
   return max_velocity;
 }
 
@@ -900,14 +900,18 @@ BoussinesqFlowProblem<dim>::get_maximal_velocity () const
 template <int dim>
 void BoussinesqFlowProblem<dim>::run () 
 {
-  make_grid_and_dofs();
+  GridGenerator::half_hyper_shell (triangulation, Point<dim>(), 0.5, 1.0);
+
+  static HalfHyperShellBoundary<dim> boundary;
+  triangulation.set_boundary (0, boundary);
+  
+  triangulation.refine_global (5);
+
+  setup_dofs();
   
   {
-    ConstraintMatrix constraints;
-    constraints.close();
-    
     VectorTools::project (dof_handler,
-                          constraints,
+                          hanging_node_constraints,
                           QGauss<dim>(degree+2),
                           InitialValues<dim>(),
                           old_solution);
