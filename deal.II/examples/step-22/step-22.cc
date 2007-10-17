@@ -788,7 +788,7 @@ void BoussinesqFlowProblem<dim>::solve ()
     A_inverse.vmult (solution.block(0), tmp);
   }
 
-  time_step = std::pow(0.5, double(n_refinement_steps)) /
+  time_step = GridTools::minimal_cell_diameter(triangulation) /
               std::max(get_maximal_velocity(),1.);
 
   assemble_rhs_T ();
