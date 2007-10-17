@@ -787,7 +787,7 @@ void BoussinesqFlowProblem<dim>::solve ()
   }
 
   time_step = GridTools::minimal_cell_diameter(triangulation) /
-              get_maximal_velocity() / 10;
+              get_maximal_velocity() / 2;
 
   assemble_rhs_T ();
   {
@@ -889,8 +889,6 @@ BoussinesqFlowProblem<dim>::get_maximal_velocity () const
                                    velocity.norm());
         }
     }
-
-  std::cout << "Maximal velocity=" << max_velocity << std::endl;
   
   return max_velocity;
 }
@@ -940,7 +938,7 @@ void BoussinesqFlowProblem<dim>::run ()
 
       std::cout << std::endl;
     }
-  while (time <= 40);
+  while (time <= 500);
 }
 
     
