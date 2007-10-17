@@ -38,6 +38,7 @@
 #include <dofs/dof_constraints.h>
 
 #include <fe/fe_q.h>
+#include <fe/fe_dgq.h>
 #include <fe/fe_system.h>
 #include <fe/fe_values.h>
 
@@ -364,9 +365,9 @@ BoussinesqFlowProblem<dim>::BoussinesqFlowProblem (const unsigned int degree)
                 degree (degree),
                 fe (FE_Q<dim>(degree+1), dim,
                     FE_Q<dim>(degree), 1,
-                    FE_Q<dim>(degree), 1),
+                    FE_DGQ<dim>(degree-1), 1),
                 dof_handler (triangulation),
-                n_refinement_steps (6),
+                n_refinement_steps (5),
                 time_step (0),
 		rebuild_preconditioner (true)
 {}
@@ -628,6 +629,7 @@ void BoussinesqFlowProblem<dim>::assemble_rhs_T ()
   Vector<double>       local_rhs (dofs_per_cell);
 
   std::vector<Vector<double> > old_solution_values(n_q_points, Vector<double>(dim+2));
+
   std::vector<Vector<double> > old_solution_values_face(n_face_q_points, Vector<double>(dim+2));
   std::vector<Vector<double> > old_solution_values_face_neighbor(n_face_q_points, Vector<double>(dim+2));
   std::vector<Vector<double> > present_solution_values(n_q_points, Vector<double>(dim+2));
@@ -839,7 +841,7 @@ void BoussinesqFlowProblem<dim>::output_results ()  const
 			    DataOut<dim>::type_dof_data,
 			    data_component_interpretation);
 
-  data_out.build_patches (degree);
+  data_out.build_patches (degree+1);
   
   std::ostringstream filename;
   filename << "solution-" << Utilities::int_to_string(timestep_number, 4) << ".vtk";
