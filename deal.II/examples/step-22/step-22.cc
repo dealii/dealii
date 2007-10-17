@@ -29,6 +29,7 @@
 #include <grid/grid_generator.h>
 #include <grid/tria_accessor.h>
 #include <grid/tria_iterator.h>
+#include <grid/tria_boundary_lib.h>
 #include <grid/grid_tools.h>
 
 #include <dofs/dof_handler.h>
@@ -163,7 +164,7 @@ InitialValues<dim>::value (const Point<dim>  &p,
                            const unsigned int component) const 
 {
   if (component == dim+1)
-    return (p.distance (Point<dim>(.25,.5)) < .1 ? 1 : 0);
+    return (p.distance (Point<dim>(.05,-.95)) < .05 ? 1 : 0);
   else
     return 0;
 }
@@ -378,7 +379,11 @@ BoussinesqFlowProblem<dim>::BoussinesqFlowProblem (const unsigned int degree)
 template <int dim>
 void BoussinesqFlowProblem<dim>::make_grid_and_dofs ()
 {
-  GridGenerator::hyper_cube (triangulation, 0, 1);  
+  GridGenerator::half_hyper_shell (triangulation, Point<dim>(), 0.5, 1.0);
+
+  static HalfHyperShellBoundary<dim> boundary;
+  triangulation.set_boundary (0, boundary);
+  
   triangulation.refine_global (n_refinement_steps);
   
   dof_handler.distribute_dofs (fe); 
@@ -792,11 +797,13 @@ void BoussinesqFlowProblem<dim>::solve ()
     SolverControl solver_control (system_matrix.block(2,2).m(),
                                   1e-8*system_rhs.block(2).l2_norm());
     SolverCG<>   cg (solver_control);
-
+    PreconditionJacobi<> preconditioner;
+    preconditioner.initialize (system_matrix.block(2,2));
+    
     try
       {
 	cg.solve (system_matrix.block(2,2), solution.block(2), system_rhs.block(2),
-		  PreconditionIdentity());
+		  preconditioner);
       }
     catch (...)
       {
@@ -929,7 +936,7 @@ void BoussinesqFlowProblem<dim>::run ()
 
       std::cout << std::endl;
     }
-  while (time <= 10);
+  while (time <= 40);
 }
 
     
