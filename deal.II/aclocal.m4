@@ -1343,7 +1343,7 @@ AC_DEFUN(DEAL_II_DETERMINE_F77_BRAND, dnl
     dnl we do things like "echo $F77_VERSION_STRING | grep ..." and
     dnl the shell says that we exceeded the limit for the length of
     dnl command lines :-(
-    F77_VERSION_STRING="`($F77 -v 2>&1) | head -10`"
+    F77_VERSION_STRING="`($F77 -v 2>&1) | head -n 10`"
     if test -n "`echo $F77_VERSION_STRING | grep \"GNU F77\"`" -o \
 	    -n "`echo $F77_VERSION_STRING | grep \"gcc version\"`" ; then
       dnl Yes, this is a GNU g77 version. find out the right version
