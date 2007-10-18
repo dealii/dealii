@@ -563,7 +563,6 @@ void BoussinesqFlowProblem<dim>::assemble_system ()
 	      const Point<dim> gravity = fe_values.quadrature_point(q) /
 					 fe_values.quadrature_point(q).norm();
 	      
-	      Assert (dim == 2, ExcInternalError());
 	      local_rhs(i) += (Raleigh_number *
 			       gravity * phi_i_u * old_temperature)*
 			      fe_values.JxW(q);
@@ -930,12 +929,38 @@ BoussinesqFlowProblem<dim>::get_maximal_velocity () const
 template <int dim>
 void BoussinesqFlowProblem<dim>::run () 
 {
-  GridGenerator::half_hyper_shell (triangulation, Point<dim>(), 0.5, 1.0);
+  switch (dim)
+    {
+      case 2:
+      {
+	GridGenerator::half_hyper_shell (triangulation,
+					 Point<dim>(), 0.5, 1.0);
+	
+	static HalfHyperShellBoundary<dim> boundary;
+	triangulation.set_boundary (0, boundary);
+	
+	triangulation.refine_global (5);
 
-  static HalfHyperShellBoundary<dim> boundary;
-  triangulation.set_boundary (0, boundary);
+	break;
+      }
+
+      case 3:
+      {
+	GridGenerator::hyper_shell (triangulation,
+				    Point<dim>(), 0.5, 1.0);
+	
+	static HyperShellBoundary<dim> boundary;
+	triangulation.set_boundary (0, boundary);
+	
+	triangulation.refine_global (2);
+
+	break;
+      }
+
+      default:
+	    Assert (false, ExcNotImplemented());
+    }
   
-  triangulation.refine_global (5);
 
   setup_dofs();
   
