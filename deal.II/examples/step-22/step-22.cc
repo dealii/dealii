@@ -192,8 +192,11 @@ extract_u (const FEValuesBase<dim> &fe_values,
 {
   Tensor<1,dim> tmp;
 
-  for (unsigned int d=0; d<dim; ++d)
-    tmp[d] = fe_values.shape_value_component (i,q,d);
+  const unsigned int component
+    = fe_values.get_fe().system_to_component_index(i).first;
+
+  if (component < dim)
+    tmp[component] = fe_values.shape_value (i,q);
 
   return tmp;
 }
@@ -206,11 +209,13 @@ extract_div_u (const FEValuesBase<dim> &fe_values,
                const unsigned int i,
                const unsigned int q)
 {
-  double divergence = 0;
-  for (unsigned int d=0; d<dim; ++d)
-    divergence += fe_values.shape_grad_component (i,q,d)[d];
+  const unsigned int component
+    = fe_values.get_fe().system_to_component_index(i).first;
 
-  return divergence;
+  if (component < dim)
+    return fe_values.shape_grad (i,q)[component];
+  else
+    return 0;
 }
 
 
@@ -223,11 +228,19 @@ extract_grad_s_u (const FEValuesBase<dim> &fe_values,
 {
   Tensor<2,dim> tmp;
 
-  for (unsigned int d=0; d<dim; ++d)
-    for (unsigned int e=0; e<dim; ++e)
-      tmp[d][e] += (fe_values.shape_grad_component (i,q,d)[e] +
-		    fe_values.shape_grad_component (i,q,e)[d]) / 2;
-
+  const unsigned int component
+    = fe_values.get_fe().system_to_component_index(i).first;
+  
+  if (component < dim)
+    {
+      const Tensor<1,dim> grad_phi_over_2 = fe_values.shape_grad (i,q) / 2;
+      
+      for (unsigned int e=0; e<dim; ++e)
+	tmp[component][e] += grad_phi_over_2[e];
+      for (unsigned int d=0; d<dim; ++d)
+	tmp[d][component] += grad_phi_over_2[d];
+    }
+  
   return tmp;
 }
 
@@ -238,7 +251,13 @@ double extract_p (const FEValuesBase<dim> &fe_values,
                   const unsigned int i,
                   const unsigned int q)
 {
-  return fe_values.shape_value_component (i,q,dim);
+  const unsigned int component
+    = fe_values.get_fe().system_to_component_index(i).first;
+
+  if (component == dim)
+    return fe_values.shape_value (i,q);
+  else
+    return 0;
 }
 
 
@@ -248,7 +267,13 @@ double extract_T (const FEValuesBase<dim> &fe_values,
                   const unsigned int i,
                   const unsigned int q)
 {
-  return fe_values.shape_value_component (i,q,dim+1);
+  const unsigned int component
+    = fe_values.get_fe().system_to_component_index(i).first;
+
+  if (component == dim+1)
+    return fe_values.shape_value (i,q);
+  else
+    return 0;
 }
 
 
@@ -260,8 +285,12 @@ extract_grad_T (const FEValuesBase<dim> &fe_values,
                 const unsigned int q)
 {
   Tensor<1,dim> tmp;
-  for (unsigned int d=0; d<dim; ++d)
-    tmp[d] = fe_values.shape_grad_component (i,q,dim+1)[d];
+
+  const unsigned int component
+    = fe_values.get_fe().system_to_component_index(i).first;
+
+  if (component == dim+1)
+    tmp = fe_values.shape_grad (i,q);
 
   return tmp;
 }
@@ -824,7 +853,7 @@ void BoussinesqFlowProblem<dim>::solve ()
 template <int dim>
 void BoussinesqFlowProblem<dim>::output_results ()  const
 {
-  if (timestep_number % 25 != 0)
+  if (timestep_number % 10 != 0)
     return;
   
   std::vector<std::string> solution_names (dim, "velocity");
