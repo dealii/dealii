@@ -643,8 +643,8 @@ void BoussinesqFlowProblem<dim>::assemble_system ()
 template <int dim>
 void BoussinesqFlowProblem<dim>::assemble_rhs_T () 
 {  
-  QGauss<dim>   quadrature_formula(degree+2); 
-  QGauss<dim-1> face_quadrature_formula(degree+2);  
+  QGauss<dim>   quadrature_formula(degree+1); 
+  QGauss<dim-1> face_quadrature_formula(degree+1);
   FEValues<dim> fe_values (fe, quadrature_formula, 
                            update_values    | update_gradients |
                            update_quadrature_points  | update_JxW_values);
@@ -875,7 +875,7 @@ void BoussinesqFlowProblem<dim>::output_results ()  const
 			    DataOut<dim>::type_dof_data,
 			    data_component_interpretation);
 
-  data_out.build_patches (degree+1);
+  data_out.build_patches ();
   
   std::ostringstream filename;
   filename << "solution-" << Utilities::int_to_string(timestep_number, 4) << ".vtk";
