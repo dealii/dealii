@@ -164,7 +164,7 @@ InitialValues<dim>::value (const Point<dim>  &p,
                            const unsigned int component) const 
 {
   if (component == dim+1)
-    return (p.distance (Point<dim>(.05,-.95)) < .05 ? 1 : 0);
+    return (p.distance (Point<dim>()) < .6 ? 1 : 0);
   else
     return 0;
 }
@@ -560,9 +560,12 @@ void BoussinesqFlowProblem<dim>::assemble_system ()
 				       * fe_values.JxW(q);     
 		}
 
+	      const Point<dim> gravity = fe_values.quadrature_point(q) /
+					 fe_values.quadrature_point(q).norm();
+	      
 	      Assert (dim == 2, ExcInternalError());
 	      local_rhs(i) += (Raleigh_number *
-			       phi_i_u[1] * old_temperature)*
+			       gravity * phi_i_u * old_temperature)*
 			      fe_values.JxW(q);
           }
 	}
