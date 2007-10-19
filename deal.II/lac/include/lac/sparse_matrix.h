@@ -1576,6 +1576,18 @@ class SparseMatrix : public virtual Subscriptor
 			  const double        denominator = 1.) const;
 
 				     /**
+				      * Print the actual pattern of
+				      * the matrix. For each entry
+				      * with an absolute value larger
+				      * than threshold, a '*' is
+				      * printed, a ':' for every value
+				      * smaller and a '.' for every
+				      * entry not allocated.
+				      */
+    void print_pattern(std::ostream& out,
+		       const double threshold = 0.) const;
+    
+				     /**
 				      * Write the data of this object
 				      * en bloc to a file. This is
 				      * done in a binary mode, so the

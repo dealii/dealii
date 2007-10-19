@@ -1372,6 +1372,30 @@ void SparseMatrix<number>::print_formatted (std::ostream &out,
 
 
 template <typename number>
+void SparseMatrix<number>::print_pattern (std::ostream &out,
+					  const double threshold) const
+{
+  Assert (cols != 0, ExcNotInitialized());
+  Assert (val != 0, ExcNotInitialized());
+
+  for (unsigned int i=0; i<m(); ++i)
+    {
+      for (unsigned int j=0; j<n(); ++j)
+	if ((*cols)(i,j) == SparsityPattern::invalid_entry)
+	  out << '.';
+	else
+	  if (std::fabs(val[cols->operator()(i,j)]) > threshold)
+	    out << '*';
+	  else
+	    out << ':';
+      out << std::endl;
+    };
+  AssertThrow (out, ExcIO());
+}
+
+
+
+template <typename number>
 void
 SparseMatrix<number>::block_write (std::ostream &out) const 
 {
