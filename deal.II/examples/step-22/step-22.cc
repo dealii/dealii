@@ -31,6 +31,7 @@
 #include <grid/tria_iterator.h>
 #include <grid/tria_boundary_lib.h>
 #include <grid/grid_tools.h>
+#include <grid/grid_refinement.h>
 
 #include <dofs/dof_handler.h>
 #include <dofs/dof_renumbering.h>
@@ -46,6 +47,7 @@
 #include <numerics/vectors.h>
 #include <numerics/matrices.h>
 #include <numerics/data_out.h>
+#include <numerics/derivative_approximation.h>
 
 #include <fstream>
 #include <sstream>
@@ -62,7 +64,7 @@ class BoussinesqFlowProblem
     void run ();
     
   private:
-    void setup_dofs ();
+    void setup_dofs (const bool setup_matrices);
     void assemble_system ();
     void assemble_rhs_T ();
     double get_maximal_velocity () const;
@@ -405,13 +407,16 @@ BoussinesqFlowProblem<dim>::BoussinesqFlowProblem (const unsigned int degree)
 
 
 template <int dim>
-void BoussinesqFlowProblem<dim>::setup_dofs ()
+void BoussinesqFlowProblem<dim>::setup_dofs (const bool setup_matrices)
 {  
   dof_handler.distribute_dofs (fe); 
   DoFRenumbering::component_wise (dof_handler);
-  DoFTools::make_hanging_node_constraints (dof_handler, hanging_node_constraints);
+
+  hanging_node_constraints.clear ();
+  DoFTools::make_hanging_node_constraints (dof_handler,
+					   hanging_node_constraints);
   hanging_node_constraints.close ();
-  
+
   std::vector<unsigned int> dofs_per_component (dim+2);
   DoFTools::count_dofs_per_component (dof_handler, dofs_per_component);  
   const unsigned int n_u = dofs_per_component[0] * dim,
@@ -429,27 +434,29 @@ void BoussinesqFlowProblem<dim>::setup_dofs ()
   
   const unsigned int
     n_couplings = dof_handler.max_couplings_between_dofs();
+
+  if (setup_matrices == true)
+    {
+      sparsity_pattern.reinit (3,3);
+      sparsity_pattern.block(0,0).reinit (n_u, n_u, n_couplings);
+      sparsity_pattern.block(1,0).reinit (n_p, n_u, n_couplings);
+      sparsity_pattern.block(2,0).reinit (n_T, n_u, n_couplings);
+      sparsity_pattern.block(0,1).reinit (n_u, n_p, n_couplings);
+      sparsity_pattern.block(1,1).reinit (n_p, n_p, n_couplings);
+      sparsity_pattern.block(2,1).reinit (n_T, n_p, n_couplings);
+      sparsity_pattern.block(0,2).reinit (n_u, n_T, n_couplings);
+      sparsity_pattern.block(1,2).reinit (n_p, n_T, n_couplings);
+      sparsity_pattern.block(2,2).reinit (n_T, n_T, n_couplings);
   
-  sparsity_pattern.reinit (3,3);
-  sparsity_pattern.block(0,0).reinit (n_u, n_u, n_couplings);
-  sparsity_pattern.block(1,0).reinit (n_p, n_u, n_couplings);
-  sparsity_pattern.block(2,0).reinit (n_T, n_u, n_couplings);
-  sparsity_pattern.block(0,1).reinit (n_u, n_p, n_couplings);
-  sparsity_pattern.block(1,1).reinit (n_p, n_p, n_couplings);
-  sparsity_pattern.block(2,1).reinit (n_T, n_p, n_couplings);
-  sparsity_pattern.block(0,2).reinit (n_u, n_T, n_couplings);
-  sparsity_pattern.block(1,2).reinit (n_p, n_T, n_couplings);
-  sparsity_pattern.block(2,2).reinit (n_T, n_T, n_couplings);
-  
-  sparsity_pattern.collect_sizes();    
+      sparsity_pattern.collect_sizes();    
 
   
-  DoFTools::make_sparsity_pattern (dof_handler, sparsity_pattern);
-  hanging_node_constraints.condense (sparsity_pattern);
-  sparsity_pattern.compress();
+      DoFTools::make_sparsity_pattern (dof_handler, sparsity_pattern);
+      hanging_node_constraints.condense (sparsity_pattern);
+      sparsity_pattern.compress();
   
-  system_matrix.reinit (sparsity_pattern);
-
+      system_matrix.reinit (sparsity_pattern);
+    }
                                    
   solution.reinit (3);
   solution.block(0).reinit (n_u);
@@ -708,58 +715,67 @@ void BoussinesqFlowProblem<dim>::assemble_rhs_T ()
 
       for (unsigned int face_no=0; face_no<GeometryInfo<dim>::faces_per_cell;
            ++face_no)
-        {
-          fe_face_values.reinit (cell, face_no);
+        if (cell->at_boundary(face_no)
+	    ||
+	    ((cell->neighbor(face_no)->has_children() == false)
+	     &&
+	     (cell->neighbor(face_no)->level() == cell->level())))
+	  {
+	    fe_face_values.reinit (cell, face_no);
 
-          fe_face_values.get_function_values (old_solution, old_solution_values_face);
-          fe_face_values.get_function_values (solution, present_solution_values_face);
+	    fe_face_values.get_function_values (old_solution, old_solution_values_face);
+	    fe_face_values.get_function_values (solution, present_solution_values_face);
 
-          if (cell->at_boundary(face_no))
-            temperature_boundary_values
-              .value_list (fe_face_values.get_quadrature_points(),
-                           neighbor_temperature);
-          else
-            {
-              const typename DoFHandler<dim>::active_cell_iterator
-                neighbor = cell->neighbor(face_no);
-              const unsigned int
-                neighbor_face = cell->neighbor_of_neighbor(face_no);
+	    if (cell->at_boundary(face_no))
+	      temperature_boundary_values
+		.value_list (fe_face_values.get_quadrature_points(),
+			     neighbor_temperature);
+	    else
+	      {
+		const typename DoFHandler<dim>::active_cell_iterator
+		  neighbor = cell->neighbor(face_no);
+		const unsigned int
+		  neighbor_face = cell->neighbor_of_neighbor(face_no);
 
-              fe_face_values_neighbor.reinit (neighbor, neighbor_face);
+		fe_face_values_neighbor.reinit (neighbor, neighbor_face);
              
-              fe_face_values_neighbor
-                .get_function_values (old_solution,
-                                      old_solution_values_face_neighbor);
+		fe_face_values_neighbor
+		  .get_function_values (old_solution,
+					old_solution_values_face_neighbor);
              
-              for (unsigned int q=0; q<n_face_q_points; ++q)
-                neighbor_temperature[q] = old_solution_values_face_neighbor[q](dim+1);
-            }
+		for (unsigned int q=0; q<n_face_q_points; ++q)
+		  neighbor_temperature[q] = old_solution_values_face_neighbor[q](dim+1);
+	      }
           
 
-          for (unsigned int q=0; q<n_face_q_points; ++q)
-            {
-              Tensor<1,dim> present_u_face;
-              for (unsigned int d=0; d<dim; ++d)
-                present_u_face[d] = present_solution_values_face[q](d);
+	    for (unsigned int q=0; q<n_face_q_points; ++q)
+	      {
+		Tensor<1,dim> present_u_face;
+		for (unsigned int d=0; d<dim; ++d)
+		  present_u_face[d] = present_solution_values_face[q](d);
 
-              const double normal_flux = present_u_face *
-                                         fe_face_values.normal_vector(q);
+		const double normal_flux = present_u_face *
+					   fe_face_values.normal_vector(q);
 
-              const bool is_outflow_q_point = (normal_flux >= 0);
+		const bool is_outflow_q_point = (normal_flux >= 0);
                                      
-              for (unsigned int i=0; i<dofs_per_cell; ++i)
-                local_rhs(i) -= time_step *
-                                normal_flux *
-                                (is_outflow_q_point == true
-				 ?
-				 old_solution_values_face[q](dim+1)
-				 :
-				 neighbor_temperature[q]) *
-                                extract_T(fe_face_values,i,q) *
-                                fe_face_values.JxW(q);
-            }
-        }
-  
+		for (unsigned int i=0; i<dofs_per_cell; ++i)
+		  local_rhs(i) -= time_step *
+				  normal_flux *
+				  (is_outflow_q_point == true
+				   ?
+				   old_solution_values_face[q](dim+1)
+				   :
+				   neighbor_temperature[q]) *
+				  extract_T(fe_face_values,i,q) *
+				  fe_face_values.JxW(q);
+	      }
+	  }
+	else
+	  {
+//	    Assert (false, ExcNotImplemented());
+	  }
+      
       cell->get_dof_indices (local_dof_indices);
       for (unsigned int i=0; i<dofs_per_cell; ++i)
         system_rhs(local_dof_indices[i]) += local_rhs(i);       
@@ -806,7 +822,7 @@ void BoussinesqFlowProblem<dim>::solve ()
     std::cout << "   "
               << solver_control.last_step()
               << " CG Schur complement iterations for pressure."
-              << std::endl;
+              << std::endl;    
   }
 
   {
@@ -939,7 +955,7 @@ void BoussinesqFlowProblem<dim>::run ()
 	static HalfHyperShellBoundary<dim> boundary;
 	triangulation.set_boundary (0, boundary);
 	
-	triangulation.refine_global (5);
+	triangulation.refine_global (3);
 
 	break;
       }
@@ -952,7 +968,7 @@ void BoussinesqFlowProblem<dim>::run ()
 	static HyperShellBoundary<dim> boundary;
 	triangulation.set_boundary (0, boundary);
 	
-	triangulation.refine_global (2);
+	triangulation.refine_global (1);
 
 	break;
       }
@@ -962,15 +978,37 @@ void BoussinesqFlowProblem<dim>::run ()
     }
   
 
-  setup_dofs();
-  
-  {
-    VectorTools::project (dof_handler,
-                          hanging_node_constraints,
-                          QGauss<dim>(degree+2),
-                          InitialValues<dim>(),
-                          old_solution);
-  }
+  for (unsigned int pre_refinement=0; pre_refinement<6-dim; ++pre_refinement)
+    {
+      setup_dofs(false);
+      
+      VectorTools::project (dof_handler,
+			    hanging_node_constraints,
+			    QGauss<dim>(degree+2),
+			    InitialValues<dim>(),
+			    old_solution);
+      
+      Vector<float> estimated_error_per_cell (triangulation.n_active_cells());
+
+      DerivativeApproximation::approximate_gradient (dof_handler,
+						     old_solution,
+						     estimated_error_per_cell,
+						     dim+1);
+      
+      GridRefinement::refine_and_coarsen_fixed_number (triangulation,
+						       estimated_error_per_cell,
+						       0.3, 0.03);
+
+      triangulation.execute_coarsening_and_refinement ();
+    }
+
+  setup_dofs(true);
+  VectorTools::project (dof_handler,
+			hanging_node_constraints,
+			QGauss<dim>(degree+2),
+			InitialValues<dim>(),
+			old_solution);
+      
   
   timestep_number = 0;
   double time = 0;
