@@ -1036,11 +1036,7 @@ create_boundary_mass_matrix_1 (const Mapping<dim>        &mapping,
 
   std::vector<unsigned int> dofs (dofs_per_cell);
   std::vector<unsigned int> dofs_on_face_vector (dofs_per_face);
-
-				   // for each dof on the cell, have a
-				   // flag whether it is on the face
-  std::vector<bool>         dof_is_on_face(dofs_per_cell);
-
+  
   typename DoFHandler<dim>::active_cell_iterator cell = range.first;
   for (; cell!=range.second; ++cell)
     for (unsigned int face=0; face<GeometryInfo<dim>::faces_per_cell; ++face)
@@ -1198,57 +1194,18 @@ create_boundary_mass_matrix_1 (const Mapping<dim>        &mapping,
 	  cell->get_dof_indices (dofs);
 	  cell->face(face)->get_dof_indices (dofs_on_face_vector);
 	  
-					   // check for each of the
-					   // dofs on this cell
-					   // whether it is on the
-					   // face
-	  for (unsigned int i=0; i<dofs_per_cell; ++i)
-	    dof_is_on_face[i] = (std::find(dofs_on_face_vector.begin(),
-					   dofs_on_face_vector.end(),
-					   dofs[i])
-				 !=
-				 dofs_on_face_vector.end());
-	  
-					   // in debug mode: compute an element
-					   // in the matrix which is
-					   // guaranteed to belong to a boundary
-					   // dof. We do this to check that the
-					   // entries in the cell matrix are
-					   // guaranteed to be zero if the
-					   // respective dof is not on the
-					   // boundary. Since because of
-					   // round-off, the actual
-					   // value of the matrix entry may be
-					   // only close to zero, we assert that
-					   // it is small relative to an element
-					   // which is guaranteed to be nonzero.
-					   // (absolute smallness does not
-					   // suffice since the size of the
-					   // domain scales in here)
-					   //
-					   // for this purpose we seek the
-					   // diagonal of the matrix, where there
-					   // must be an element belonging to
-					   // the boundary. we take the maximum
-					   // diagonal entry.
-#ifdef DEBUG
-	  double max_diag_entry = 0;
-	  for (unsigned int i=0; i<dofs_per_cell; ++i)
-	    if (std::fabs(cell_matrix(i,i)) > max_diag_entry)
-	      max_diag_entry = std::fabs(cell_matrix(i,i));
-#endif  
-
                                            // lock the matrix
           Threads::ThreadMutex::ScopedLock lock (mutex);
 	  for (unsigned int i=0; i<dofs_per_cell; ++i)
 	    for (unsigned int j=0; j<dofs_per_cell; ++j)
-	      if (dof_is_on_face[i] && dof_is_on_face[j])
+	      if (dof_to_boundary_mapping[dofs[i]] != deal_II_numbers::invalid_unsigned_int
+		  && dof_to_boundary_mapping[dofs[j]] != deal_II_numbers::invalid_unsigned_int)
 		matrix.add(dof_to_boundary_mapping[dofs[i]],
 			   dof_to_boundary_mapping[dofs[j]],
 			   cell_matrix(i,j));
 	  
 	  for (unsigned int j=0; j<dofs_per_cell; ++j)
-	    if (dof_is_on_face[j])
+	    if (dof_to_boundary_mapping[dofs[j]] != deal_II_numbers::invalid_unsigned_int)
 	      rhs_vector(dof_to_boundary_mapping[dofs[j]]) += cell_vector(j);
 	}
 }
