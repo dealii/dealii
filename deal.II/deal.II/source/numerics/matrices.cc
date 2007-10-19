@@ -1008,18 +1008,6 @@ create_boundary_mass_matrix_1 (const Mapping<dim>        &mapping,
   Assert (coefficient ==0 ||
 	  coefficient->n_components==1 ||
 	  coefficient->n_components==n_components, ExcComponentMismatch());
-#ifdef DEBUG
-  if (true)
-    {
-      unsigned int max_element = 0;
-      for (std::vector<unsigned int>::const_iterator i=dof_to_boundary_mapping.begin();
-	   i!=dof_to_boundary_mapping.end(); ++i)
-	if ((*i != DoFHandler<dim>::invalid_dof_index) &&
-	    (*i > max_element))
-	  max_element = *i;
-      Assert (max_element  == matrix.n()-1, ExcInternalError());
-    };
-#endif
   
   const unsigned int dofs_per_cell = fe.dofs_per_cell,
 		     dofs_per_face = fe.dofs_per_face;
