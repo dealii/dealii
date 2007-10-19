@@ -857,7 +857,7 @@ Vector<Number> & Vector<Number>::operator = (const Number s)
   Assert (deal_II_numbers::is_finite(s), 
           ExcMessage("The given value is not finite but either infinite or Not A Number (NaN)"));
   
-  if (s != 0.)
+  if (s != Number())
     Assert (vec_size!=0, ExcEmptyObject());
   if (vec_size!=0)
     std::fill (begin(), end(), s);

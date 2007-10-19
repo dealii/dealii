@@ -15,6 +15,7 @@
 
 
 #include <base/config.h>
+#include <complex>
 
 DEAL_II_NAMESPACE_OPEN
 
@@ -102,12 +103,12 @@ namespace deal_II_numbers {
                                               */
   static const double  SQRT1_2 = 0.70710678118654752440;
 
-				             /**
-				              * Return @p true if the given
-				              * value is a finite floating
-				              * point number, i.e. is neither
-				              * plus or minus infinity nor NaN
-				              * (not a number).
+					      /**
+					      * Return @p true if the given
+					      * value is a finite floating
+					      * point number, i.e. is neither
+					      * plus or minus infinity nor NaN
+					      * (not a number).
 					      *
 					      * Note that the argument type of
 					      * this function is
@@ -120,8 +121,29 @@ namespace deal_II_numbers {
 					      * number is finite with respect
 					      * to type <code>long
 					      * double</code>.
-				              */
+					      */
   bool is_finite (const double x);
+
+					      /**
+					      * Return @p true if real and 
+					      * imaginary parts of the given
+					      * complex number are finite.
+					      */
+  bool is_finite (const std::complex<double> x);
+
+					      /**
+					      * Return @p true if real and 
+					      * imaginary parts of the given
+					      * complex number are finite.
+					      *
+					      * Again may not work correctly if
+					      * real or imaginary parts are very	
+					      * large numbers that are infinite in 
+					      * terms of <code>double</code>, but 
+					      * finite with respect to 
+					      * <code>long double</code>.
+					      */
+  bool is_finite (const std::complex<long double> x);
 }
 
 DEAL_II_NAMESPACE_CLOSE

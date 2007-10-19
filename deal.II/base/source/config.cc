@@ -15,6 +15,7 @@
 #include <base/config.h>
 #include <cmath>
 #include <limits>
+#include <complex>
 
 DEAL_II_NAMESPACE_OPEN
 
@@ -25,13 +26,34 @@ namespace deal_II_numbers
 #ifdef DEAL_II_HAVE_ISFINITE
     return std::isfinite (x);
 #else
-				     // check against infinities. not
+				     // Check against infinities. Note
 				     // that if x is a NaN, then both
 				     // comparisons will be false
     return ((x >= -std::numeric_limits<double>::max())
 	    &&
 	    (x <= std::numeric_limits<double>::max()));
 #endif
+  }
+
+
+
+  bool is_finite (const std::complex<double> x) 
+  {
+					// Check complex numbers for infinity
+					// by testing real and imaginary part
+    return ( is_finite (x.real()) 
+             && 
+             is_finite (x.imag()) );
+  }
+
+
+
+  bool is_finite (const std::complex<long double> x) 
+  {
+					// Same for std::complex<long double>
+    return ( is_finite (x.real()) 
+             && 
+             is_finite (x.imag()) );
   }
 }
 
