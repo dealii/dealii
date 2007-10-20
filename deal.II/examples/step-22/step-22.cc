@@ -48,6 +48,7 @@
 #include <numerics/matrices.h>
 #include <numerics/data_out.h>
 #include <numerics/derivative_approximation.h>
+#include <numerics/solution_transfer.h>
 
 #include <fstream>
 #include <sstream>
@@ -70,6 +71,7 @@ class BoussinesqFlowProblem
     double get_maximal_velocity () const;
     void solve ();
     void output_results () const;
+    void refine_mesh ();
     
     const unsigned int   degree;
     
@@ -437,6 +439,8 @@ void BoussinesqFlowProblem<dim>::setup_dofs (const bool setup_matrices)
 
   if (setup_matrices == true)
     {
+      system_matrix.clear ();
+      
       sparsity_pattern.reinit (3,3);
       sparsity_pattern.block(0,0).reinit (n_u, n_u, n_couplings);
       sparsity_pattern.block(1,0).reinit (n_p, n_u, n_couplings);
@@ -987,9 +991,6 @@ void BoussinesqFlowProblem<dim>::solve ()
               << " CG iterations for temperature."
               << std::endl;             
   } 
-
-   
-  old_solution = solution; 
 }
                                  
 
@@ -1026,6 +1027,47 @@ void BoussinesqFlowProblem<dim>::output_results ()  const
 
   std::ofstream output (filename.str().c_str());
   data_out.write_vtk (output);
+}
+
+
+
+template <int dim>
+void
+BoussinesqFlowProblem<dim>::refine_mesh () 
+{
+  return;
+  
+  Vector<float> estimated_error_per_cell (triangulation.n_active_cells());
+
+//TODO do this better      
+  DerivativeApproximation::approximate_gradient (dof_handler,
+						 old_solution,
+						 estimated_error_per_cell,
+						 dim+1);
+      
+  GridRefinement::refine_and_coarsen_fixed_fraction (triangulation,
+						     estimated_error_per_cell,
+						     0.3, 0.03,
+						     triangulation.n_active_cells());
+
+  SolutionTransfer<dim, double> soltrans(dof_handler);
+
+  triangulation.prepare_coarsening_and_refinement();
+
+  Vector<double> x_old_solution (dof_handler.n_dofs());
+  x_old_solution = old_solution;
+  
+  soltrans.prepare_for_coarsening_and_refinement(x_old_solution);
+
+  triangulation.execute_coarsening_and_refinement ();
+  setup_dofs (true);
+
+  Vector<double> tmp (dof_handler.n_dofs());
+  soltrans.interpolate(x_old_solution, tmp);
+
+  rebuild_preconditioner = true;
+
+  old_solution = tmp;
 }
 
 
@@ -1104,7 +1146,7 @@ void BoussinesqFlowProblem<dim>::run ()
     }
   
 
-  for (unsigned int pre_refinement=0; pre_refinement<5-dim; ++pre_refinement)
+  for (unsigned int pre_refinement=0; pre_refinement<3-dim; ++pre_refinement)
     {
       setup_dofs(false);
       
@@ -1116,6 +1158,7 @@ void BoussinesqFlowProblem<dim>::run ()
       
       Vector<float> estimated_error_per_cell (triangulation.n_active_cells());
 
+//TODO do this better      
       DerivativeApproximation::approximate_gradient (dof_handler,
 						     old_solution,
 						     estimated_error_per_cell,
@@ -1156,8 +1199,13 @@ void BoussinesqFlowProblem<dim>::run ()
 
       time += time_step;
       ++timestep_number;
+   
+      old_solution = solution; 
 
       std::cout << std::endl;
+
+      if (timestep_number % 1 == 0)
+	refine_mesh ();
     }
   while (time <= 500);
 }
