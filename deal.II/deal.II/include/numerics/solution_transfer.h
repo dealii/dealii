@@ -2,7 +2,7 @@
 //    $Id$
 //    Version: $Name$
 //
-//    Copyright (C) 1999, 2000, 2001, 2002, 2003, 2004, 2005, 2006 by the deal.II authors
+//    Copyright (C) 1999, 2000, 2001, 2002, 2003, 2004, 2005, 2006, 2007 by the deal.II authors
 //
 //    This file is subject to QPL and may not be  distributed
 //    without copyright and license information. Please refer
@@ -51,7 +51,7 @@ DEAL_II_NAMESPACE_OPEN
  *                                     // for refinement,
  * tria->prepare_coarsening_and_refinement();
  *                                     // tell the SolutionTransfer object
- *                                     // that we intent to do pure refinement,
+ *                                     // that we intend to do pure refinement,
  * soltrans.prepare_for_pure_refinement();
  *                                     // actually execute the refinement,
  * tria->execute_coarsening_and_refinement();
