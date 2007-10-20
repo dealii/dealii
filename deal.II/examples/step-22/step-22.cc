@@ -660,8 +660,13 @@ void BoussinesqFlowProblem<dim>::assemble_rhs_T ()
   FEFaceValues<dim> fe_face_values (fe, face_quadrature_formula, 
                                     update_values    | update_normal_vectors |
                                     update_quadrature_points  | update_JxW_values);
+  FESubfaceValues<dim> fe_subface_values (fe, face_quadrature_formula, 
+					  update_values    | update_normal_vectors |
+					  update_JxW_values);
   FEFaceValues<dim> fe_face_values_neighbor (fe, face_quadrature_formula, 
                                              update_values);
+  FESubfaceValues<dim> fe_subface_values_neighbor (fe, face_quadrature_formula, 
+						   update_values);
  
   const unsigned int   dofs_per_cell   = fe.dofs_per_cell;
   const unsigned int   n_q_points      = quadrature_formula.n_quadrature_points;
@@ -684,6 +689,7 @@ void BoussinesqFlowProblem<dim>::assemble_rhs_T ()
   typename DoFHandler<dim>::active_cell_iterator
     cell = dof_handler.begin_active(),
     endc = dof_handler.end();
+
   for (; cell!=endc; ++cell)
     {
       local_rhs = 0;
@@ -713,6 +719,7 @@ void BoussinesqFlowProblem<dim>::assemble_rhs_T ()
                             fe_values.JxW(q);
           }
 
+//TODO: unify the code that actually does the assembly down below      
       for (unsigned int face_no=0; face_no<GeometryInfo<dim>::faces_per_cell;
            ++face_no)
         if (cell->at_boundary(face_no)
@@ -721,6 +728,12 @@ void BoussinesqFlowProblem<dim>::assemble_rhs_T ()
 	     &&
 	     (cell->neighbor(face_no)->level() == cell->level())))
 	  {
+					     // cell either at
+					     // boundary or with a
+					     // neighbor that has the
+					     // same refinement level
+					     // and is not further
+					     // refined
 	    fe_face_values.reinit (cell, face_no);
 
 	    fe_face_values.get_function_values (old_solution, old_solution_values_face);
@@ -734,10 +747,9 @@ void BoussinesqFlowProblem<dim>::assemble_rhs_T ()
 	      {
 		const typename DoFHandler<dim>::active_cell_iterator
 		  neighbor = cell->neighbor(face_no);
-		const unsigned int
-		  neighbor_face = cell->neighbor_of_neighbor(face_no);
 
-		fe_face_values_neighbor.reinit (neighbor, neighbor_face);
+		fe_face_values_neighbor.reinit (neighbor,
+						cell->neighbor_of_neighbor(face_no));
              
 		fe_face_values_neighbor
 		  .get_function_values (old_solution,
@@ -772,9 +784,116 @@ void BoussinesqFlowProblem<dim>::assemble_rhs_T ()
 	      }
 	  }
 	else
-	  {
-//	    Assert (false, ExcNotImplemented());
-	  }
+	  if (cell->neighbor(face_no)->has_children())
+	    {
+					       // neighbor is further
+					       // refined. loop over
+					       // all sub faces
+	      for (unsigned int subface_no=0;
+		   subface_no<GeometryInfo<dim>::subfaces_per_face;
+		   ++subface_no)
+		{
+		  fe_subface_values.reinit (cell, face_no, subface_no);
+
+		  fe_subface_values.get_function_values (old_solution, old_solution_values_face);
+		  fe_subface_values.get_function_values (solution, present_solution_values_face);
+
+		  const typename DoFHandler<dim>::active_cell_iterator
+		    neighbor = cell->neighbor_child_on_subface (face_no, subface_no);
+
+		  fe_face_values_neighbor.reinit (neighbor,
+						  cell->neighbor_of_neighbor(face_no));
+             
+		  fe_face_values_neighbor
+		    .get_function_values (old_solution,
+					  old_solution_values_face_neighbor);
+             
+		  for (unsigned int q=0; q<n_face_q_points; ++q)
+		    neighbor_temperature[q] = old_solution_values_face_neighbor[q](dim+1);
+
+		  for (unsigned int q=0; q<n_face_q_points; ++q)
+		    {
+		      Tensor<1,dim> present_u_face;
+		      for (unsigned int d=0; d<dim; ++d)
+			present_u_face[d] = present_solution_values_face[q](d);
+
+		      const double normal_flux = present_u_face *
+						 fe_subface_values.normal_vector(q);
+
+		      const bool is_outflow_q_point = (normal_flux >= 0);
+                                     
+		      for (unsigned int i=0; i<dofs_per_cell; ++i)
+			local_rhs(i) -= time_step *
+					normal_flux *
+					(is_outflow_q_point == true
+					 ?
+					 old_solution_values_face[q](dim+1)
+					 :
+					 neighbor_temperature[q]) *
+					extract_T(fe_face_values,i,q) *
+					fe_face_values.JxW(q);
+		    }
+		}
+	    }
+	  else
+	    {
+					       // neighbor is less
+					       // refined. we need to
+					       // use a subface values
+					       // object for the
+					       // neighbor's subface
+	      fe_face_values.reinit (cell, face_no);
+
+	      fe_face_values.get_function_values (old_solution, old_solution_values_face);
+	      fe_face_values.get_function_values (solution, present_solution_values_face);
+
+	      const typename DoFHandler<dim>::active_cell_iterator
+		neighbor = cell->neighbor (face_no);
+
+	      const std::pair<unsigned int, unsigned int> faceno_subfaceno=
+		cell->neighbor_of_coarser_neighbor(face_no);
+	      const unsigned int neighbor_face_no    = faceno_subfaceno.first,
+				 neighbor_subface_no = faceno_subfaceno.second;
+
+	      Assert (neighbor->neighbor_child_on_subface (neighbor_face_no,
+							   neighbor_subface_no)
+		      == cell,
+		      ExcInternalError());
+
+	      fe_subface_values_neighbor.reinit (neighbor,
+						 neighbor_face_no,
+						 neighbor_subface_no);
+	      
+	      fe_face_values_neighbor
+		.get_function_values (old_solution,
+				      old_solution_values_face_neighbor);
+             
+	      for (unsigned int q=0; q<n_face_q_points; ++q)
+		neighbor_temperature[q] = old_solution_values_face_neighbor[q](dim+1);
+
+	      for (unsigned int q=0; q<n_face_q_points; ++q)
+		{
+		  Tensor<1,dim> present_u_face;
+		  for (unsigned int d=0; d<dim; ++d)
+		    present_u_face[d] = present_solution_values_face[q](d);
+
+		  const double normal_flux = present_u_face *
+					     fe_face_values.normal_vector(q);
+
+		  const bool is_outflow_q_point = (normal_flux >= 0);
+                                     
+		  for (unsigned int i=0; i<dofs_per_cell; ++i)
+		    local_rhs(i) -= time_step *
+				    normal_flux *
+				    (is_outflow_q_point == true
+				     ?
+				     old_solution_values_face[q](dim+1)
+				     :
+				     neighbor_temperature[q]) *
+				    extract_T(fe_face_values,i,q) *
+				    fe_face_values.JxW(q);
+		}
+	    }      
       
       cell->get_dof_indices (local_dof_indices);
       for (unsigned int i=0; i<dofs_per_cell; ++i)
@@ -817,7 +936,9 @@ void BoussinesqFlowProblem<dim>::solve ()
       {
 	abort ();
       }
-	
+
+				     // produce a consistent flow field
+    hanging_node_constraints.distribute (solution);
   
     std::cout << "   "
               << solver_control.last_step()
@@ -831,6 +952,9 @@ void BoussinesqFlowProblem<dim>::solve ()
     tmp += system_rhs.block(0);
     
     A_inverse.vmult (solution.block(0), tmp);
+
+				     // produce a consistent pressure field
+    hanging_node_constraints.distribute (solution);
   }
 
   time_step = GridTools::minimal_cell_diameter(triangulation) /
@@ -855,6 +979,8 @@ void BoussinesqFlowProblem<dim>::solve ()
 	abort ();
       }
 	
+				     // produce a consistent temperature field
+    hanging_node_constraints.distribute (solution);
                 
     std::cout << "   "
               << solver_control.last_step()
@@ -871,7 +997,7 @@ void BoussinesqFlowProblem<dim>::solve ()
 template <int dim>
 void BoussinesqFlowProblem<dim>::output_results ()  const
 {
-  if (timestep_number % 10 != 0)
+  if (timestep_number % 1 != 0)
     return;
   
   std::vector<std::string> solution_names (dim, "velocity");
@@ -978,7 +1104,7 @@ void BoussinesqFlowProblem<dim>::run ()
     }
   
 
-  for (unsigned int pre_refinement=0; pre_refinement<6-dim; ++pre_refinement)
+  for (unsigned int pre_refinement=0; pre_refinement<5-dim; ++pre_refinement)
     {
       setup_dofs(false);
       
