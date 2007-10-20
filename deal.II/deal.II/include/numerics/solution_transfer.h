@@ -88,6 +88,7 @@ DEAL_II_NAMESPACE_OPEN
  * vector<Vector<double> > solutions(n_vectors, Vector<double> (n));
  * soltrans.refine_interpolate(solutions_old, solutions);
  * @endverbatim
+ *
  * <li> If the grid will be refined AND coarsened
  * then use @p SolutionTransfer as follows
  * @verbatim
@@ -100,7 +101,7 @@ DEAL_II_NAMESPACE_OPEN
  * tria->prepare_coarsening_and_refinement();
  *                                     // prepare the SolutionTransfer object
  *                                     // for coarsening and refinement and give
- *                                     // the solution vector that we intent to
+ *                                     // the solution vector that we intend to
  *                                     // interpolate later,
  * soltrans.prepare_for_coarsening_and_refinement(solution);
  *                                     // actually execute the refinement,
