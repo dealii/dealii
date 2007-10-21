@@ -685,6 +685,11 @@ void BoussinesqFlowProblem<dim>::assemble_rhs_T ()
   std::vector<Vector<double> > present_solution_values(n_q_points, Vector<double>(dim+2));
   std::vector<Vector<double> > present_solution_values_face(n_face_q_points, Vector<double>(dim+2));
 
+  std::vector<std::vector<Tensor<1,dim> > >
+    present_solution_grads(n_q_points,
+			   std::vector<Tensor<1,dim> >(dim+2));
+	  
+  
   std::vector<double> neighbor_temperature (n_face_q_points);
   std::vector<unsigned int> local_dof_indices (dofs_per_cell);
 
@@ -701,6 +706,7 @@ void BoussinesqFlowProblem<dim>::assemble_rhs_T ()
 
       fe_values.get_function_values (old_solution, old_solution_values);
       fe_values.get_function_values (solution, present_solution_values);
+      fe_values.get_function_gradients (solution, present_solution_grads);
 
       for (unsigned int q=0; q<n_q_points; ++q) 
         for (unsigned int i=0; i<dofs_per_cell; ++i)
@@ -710,19 +716,27 @@ void BoussinesqFlowProblem<dim>::assemble_rhs_T ()
             for (unsigned int d=0; d<dim; ++d)
               present_u[d] = present_solution_values[q](d);
 
+	    double present_div_u = 0;
+            for (unsigned int d=0; d<dim; ++d)
+              present_div_u += present_solution_grads[q][d][d];	    
+	    
             const double        phi_i_T      = extract_T(fe_values, i, q);
             const Tensor<1,dim> grad_phi_i_T = extract_grad_T(fe_values, i, q);
                      
             local_rhs(i) += (time_step *
                              old_T *
-                             present_u *
-                             grad_phi_i_T
+                             (present_u *
+			      grad_phi_i_T
+			      +
+			      present_div_u *
+			      phi_i_T)
                              +
                              old_T * phi_i_T)
                             *
                             fe_values.JxW(q);
           }
 
+      
 //TODO: unify the code that actually does the assembly down below      
       for (unsigned int face_no=0; face_no<GeometryInfo<dim>::faces_per_cell;
            ++face_no)
@@ -764,7 +778,6 @@ void BoussinesqFlowProblem<dim>::assemble_rhs_T ()
 		for (unsigned int q=0; q<n_face_q_points; ++q)
 		  neighbor_temperature[q] = old_solution_values_face_neighbor[q](dim+1);
 	      }
-          
 
 	    for (unsigned int q=0; q<n_face_q_points; ++q)
 	      {
@@ -878,7 +891,7 @@ void BoussinesqFlowProblem<dim>::assemble_rhs_T ()
              
 	      for (unsigned int q=0; q<n_face_q_points; ++q)
 		neighbor_temperature[q] = old_solution_values_face_neighbor[q](dim+1);
-	      
+
 	      for (unsigned int q=0; q<n_face_q_points; ++q)
 		{
 		  Tensor<1,dim> present_u_face;
@@ -1023,7 +1036,7 @@ void BoussinesqFlowProblem<dim>::output_results ()  const
   data_out.add_data_vector (solution, solution_names,
 			    DataOut<dim>::type_dof_data,
 			    data_component_interpretation);
-
+  
   data_out.build_patches ();
   
   std::ostringstream filename;
@@ -1046,11 +1059,18 @@ BoussinesqFlowProblem<dim>::refine_mesh ()
 						 old_solution,
 						 estimated_error_per_cell,
 						 dim+1);
-      
+
+  typename Triangulation<dim>::active_cell_iterator
+    cell = triangulation.begin_active(),
+    endc = triangulation.end();
+  for (unsigned int cell_index=0; cell!=endc; ++cell, ++cell_index)
+    estimated_error_per_cell(cell_index) *= cell->diameter();
+
   GridRefinement::refine_and_coarsen_fixed_fraction (triangulation,
 						     estimated_error_per_cell,
 						     0.3, 0.03,
-						     triangulation.n_active_cells());
+						     static_cast<unsigned int>
+						     (triangulation.n_active_cells()*1.1));
 
   SolutionTransfer<dim, double> soltrans(dof_handler);
 
@@ -1125,7 +1145,7 @@ void BoussinesqFlowProblem<dim>::run ()
 	static HalfHyperShellBoundary<dim> boundary;
 	triangulation.set_boundary (0, boundary);
 	
-	triangulation.refine_global (3);
+	triangulation.refine_global (4);
 
 	break;
       }
@@ -1148,38 +1168,24 @@ void BoussinesqFlowProblem<dim>::run ()
     }
   
 
-  for (unsigned int pre_refinement=0; pre_refinement<3-dim; ++pre_refinement)
-    {
-      setup_dofs(false);
-      
-      VectorTools::project (dof_handler,
-			    hanging_node_constraints,
-			    QGauss<dim>(degree+2),
-			    InitialValues<dim>(),
-			    old_solution);
-      
-      Vector<float> estimated_error_per_cell (triangulation.n_active_cells());
+  setup_dofs(false);    
 
-//TODO do this better      
-      DerivativeApproximation::approximate_gradient (dof_handler,
-						     old_solution,
-						     estimated_error_per_cell,
-						     dim+1);
-      
-      GridRefinement::refine_and_coarsen_fixed_number (triangulation,
-						       estimated_error_per_cell,
-						       0.3, 0.03);
-
-      triangulation.execute_coarsening_and_refinement ();
-    }
-
-  setup_dofs(true);
   VectorTools::project (dof_handler,
 			hanging_node_constraints,
 			QGauss<dim>(degree+2),
 			InitialValues<dim>(),
 			old_solution);
-      
+  
+  for (unsigned int pre_refinement=0; pre_refinement<4-dim; ++pre_refinement)
+    {
+      refine_mesh ();
+
+      VectorTools::project (dof_handler,
+			    hanging_node_constraints,
+			    QGauss<dim>(degree+2),
+			    InitialValues<dim>(),
+			    old_solution);
+    }
   
   timestep_number = 0;
   double time = 0;
@@ -1206,6 +1212,8 @@ void BoussinesqFlowProblem<dim>::run ()
 
       std::cout << std::endl;
 
+      break;
+      
       if (timestep_number % 10 == 0)
 	refine_mesh ();
     }
