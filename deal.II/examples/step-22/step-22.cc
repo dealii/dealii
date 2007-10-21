@@ -740,8 +740,10 @@ void BoussinesqFlowProblem<dim>::assemble_rhs_T ()
 					     // refined
 	    fe_face_values.reinit (cell, face_no);
 
-	    fe_face_values.get_function_values (old_solution, old_solution_values_face);
-	    fe_face_values.get_function_values (solution, present_solution_values_face);
+	    fe_face_values.get_function_values (old_solution,
+						old_solution_values_face);
+	    fe_face_values.get_function_values (solution,
+						present_solution_values_face);
 
 	    if (cell->at_boundary(face_no))
 	      temperature_boundary_values
@@ -751,7 +753,7 @@ void BoussinesqFlowProblem<dim>::assemble_rhs_T ()
 	      {
 		const typename DoFHandler<dim>::active_cell_iterator
 		  neighbor = cell->neighbor(face_no);
-
+		
 		fe_face_values_neighbor.reinit (neighbor,
 						cell->neighbor_of_neighbor(face_no));
              
@@ -799,8 +801,10 @@ void BoussinesqFlowProblem<dim>::assemble_rhs_T ()
 		{
 		  fe_subface_values.reinit (cell, face_no, subface_no);
 
-		  fe_subface_values.get_function_values (old_solution, old_solution_values_face);
-		  fe_subface_values.get_function_values (solution, present_solution_values_face);
+		  fe_subface_values.get_function_values (old_solution,
+							 old_solution_values_face);
+		  fe_subface_values.get_function_values (solution,
+							 present_solution_values_face);
 
 		  const typename DoFHandler<dim>::active_cell_iterator
 		    neighbor = cell->neighbor_child_on_subface (face_no, subface_no);
@@ -811,7 +815,7 @@ void BoussinesqFlowProblem<dim>::assemble_rhs_T ()
 		  fe_face_values_neighbor
 		    .get_function_values (old_solution,
 					  old_solution_values_face_neighbor);
-             
+		  
 		  for (unsigned int q=0; q<n_face_q_points; ++q)
 		    neighbor_temperature[q] = old_solution_values_face_neighbor[q](dim+1);
 
@@ -868,13 +872,13 @@ void BoussinesqFlowProblem<dim>::assemble_rhs_T ()
 						 neighbor_face_no,
 						 neighbor_subface_no);
 	      
-	      fe_face_values_neighbor
+	      fe_subface_values_neighbor
 		.get_function_values (old_solution,
 				      old_solution_values_face_neighbor);
              
 	      for (unsigned int q=0; q<n_face_q_points; ++q)
 		neighbor_temperature[q] = old_solution_values_face_neighbor[q](dim+1);
-
+	      
 	      for (unsigned int q=0; q<n_face_q_points; ++q)
 		{
 		  Tensor<1,dim> present_u_face;
@@ -1035,8 +1039,6 @@ template <int dim>
 void
 BoussinesqFlowProblem<dim>::refine_mesh () 
 {
-  return;
-  
   Vector<float> estimated_error_per_cell (triangulation.n_active_cells());
 
 //TODO do this better      
@@ -1204,7 +1206,7 @@ void BoussinesqFlowProblem<dim>::run ()
 
       std::cout << std::endl;
 
-      if (timestep_number % 1 == 0)
+      if (timestep_number % 10 == 0)
 	refine_mesh ();
     }
   while (time <= 500);
