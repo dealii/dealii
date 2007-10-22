@@ -567,6 +567,7 @@ void BoussinesqFlowProblem<dim>::assemble_system ()
 		  local_matrix(i,j) += (scalar_product(phi_i_grads_u, phi_j_grads_u)
 					- div_phi_i_u * phi_j_p
 					- phi_i_p * div_phi_j_u
+					+ phi_i_p * phi_j_p
 					+ phi_i_T * phi_j_T)
 				       * fe_values.JxW(q);     
 		}
@@ -948,10 +949,14 @@ void BoussinesqFlowProblem<dim>::solve ()
                                   1e-6*schur_rhs.l2_norm());
     SolverCG<>    cg (solver_control);
 
+    PreconditionSSOR<> preconditioner;
+    preconditioner.initialize (system_matrix.block(1,1), 1.2);
+    
+    
     try
       {
 	cg.solve (schur_complement, solution.block(1), schur_rhs,
-		  PreconditionIdentity());
+		  preconditioner);
       }
     catch (...)
       {
