@@ -100,8 +100,11 @@ namespace internal
 	
       protected:
                                          /**
-                                          *  Global indices of the two end
-                                          *  points.
+                                          *  Global indices of the
+                                          *  face iterators bounding
+                                          *  this cell if dim@>1, and
+                                          *  the two vertex indices in
+                                          *  1d.
                                           */
         int faces[GeometryInfo<structdim>::faces_per_cell];
     };
