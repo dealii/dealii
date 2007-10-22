@@ -502,11 +502,10 @@ template <int dim>
 void BoussinesqFlowProblem<dim>::assemble_system () 
 {
   if (rebuild_matrices == true)
-    {
-      system_matrix=0;
-      system_rhs=0;
-    }
-      
+    system_matrix=0;
+
+  system_rhs=0;
+  
   QGauss<dim>   quadrature_formula(degree+2); 
   QGauss<dim-1> face_quadrature_formula(degree+2);
 
@@ -1048,7 +1047,7 @@ void BoussinesqFlowProblem<dim>::solve ()
 template <int dim>
 void BoussinesqFlowProblem<dim>::output_results ()  const
 {
-  if (timestep_number % 1 != 0)
+  if (timestep_number % 10 != 0)
     return;
   
   std::vector<std::string> solution_names (dim, "velocity");
@@ -1202,17 +1201,32 @@ void BoussinesqFlowProblem<dim>::run ()
     }
   
 
-  setup_dofs(false);    
+  const bool do_adaptivity = false;
 
-  VectorTools::project (dof_handler,
-			hanging_node_constraints,
-			QGauss<dim>(degree+2),
-			InitialValues<dim>(),
-			old_solution);
-  
-  for (unsigned int pre_refinement=0; pre_refinement<4-dim; ++pre_refinement)
+  if (do_adaptivity)
     {
-      refine_mesh ();
+      setup_dofs(false);
+
+      VectorTools::project (dof_handler,
+			    hanging_node_constraints,
+			    QGauss<dim>(degree+2),
+			    InitialValues<dim>(),
+			    old_solution);
+  
+      for (unsigned int pre_refinement=0; pre_refinement<4-dim; ++pre_refinement)
+	{
+	  refine_mesh ();
+
+	  VectorTools::project (dof_handler,
+				hanging_node_constraints,
+				QGauss<dim>(degree+2),
+				InitialValues<dim>(),
+				old_solution);
+	}
+    }
+  else
+    {
+      setup_dofs(true);
 
       VectorTools::project (dof_handler,
 			    hanging_node_constraints,
@@ -1246,8 +1260,9 @@ void BoussinesqFlowProblem<dim>::run ()
 
       std::cout << std::endl;
 
-      if (timestep_number % 10 == 0)
-	refine_mesh ();
+      if (do_adaptivity)
+	if (timestep_number % 10 == 0)
+	  refine_mesh ();
     }
   while (time <= 500);
 }
