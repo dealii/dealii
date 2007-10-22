@@ -92,7 +92,8 @@ class BoussinesqFlowProblem
     BlockVector<double> system_rhs;
 
     boost::shared_ptr<SparseDirectUMFPACK> A_preconditioner;
-    
+
+    bool rebuild_matrices;
     bool rebuild_preconditioner;
 };
 
@@ -402,6 +403,7 @@ BoussinesqFlowProblem<dim>::BoussinesqFlowProblem (const unsigned int degree)
                     FE_DGQ<dim>(degree-1), 1),
                 dof_handler (triangulation),
                 time_step (0),
+		rebuild_matrices (true),
 		rebuild_preconditioner (true)
 {}
 
@@ -499,15 +501,24 @@ scalar_product (const Tensor<2,dim> &a,
 template <int dim>
 void BoussinesqFlowProblem<dim>::assemble_system () 
 {
-  system_matrix=0;
-  system_rhs=0;
-
+  if (rebuild_matrices == true)
+    {
+      system_matrix=0;
+      system_rhs=0;
+    }
+      
   QGauss<dim>   quadrature_formula(degree+2); 
   QGauss<dim-1> face_quadrature_formula(degree+2);
 
-  FEValues<dim> fe_values (fe, quadrature_formula, 
-                           update_values    | update_gradients |
-                           update_quadrature_points  | update_JxW_values);
+  FEValues<dim> fe_values (fe, quadrature_formula,
+			   update_values    |
+			   update_quadrature_points  |
+			   update_JxW_values |
+			   (rebuild_matrices == true
+			    ?
+			    update_gradients
+			    :
+			    UpdateFlags(0)));
   FEFaceValues<dim> fe_face_values (fe, face_quadrature_formula, 
                                     update_values    | update_normal_vectors |
                                     update_quadrature_points  | update_JxW_values);
@@ -551,27 +562,31 @@ void BoussinesqFlowProblem<dim>::assemble_system ()
 	    {
 
 	      const Tensor<1,dim> phi_i_u      = extract_u (fe_values, i, q);
-	      const Tensor<2,dim> phi_i_grads_u= extract_grad_s_u (fe_values, i, q);
-	      const double        div_phi_i_u  = extract_div_u (fe_values, i, q);
-	      const double        phi_i_p      = extract_p (fe_values, i, q);
-	      const double        phi_i_T      = extract_T (fe_values, i, q); 
-	      const Tensor<1,dim> grad_phi_i_T = extract_grad_T(fe_values, i, q);
-            
-	      for (unsigned int j=0; j<dofs_per_cell; ++j)
-		{
-		  const Tensor<2,dim> phi_j_grads_u     = extract_grad_s_u (fe_values, j, q);
-		  const double        div_phi_j_u = extract_div_u (fe_values, j, q);
-		  const double        phi_j_p     = extract_p (fe_values, j, q);
-		  const double        phi_j_T     = extract_T (fe_values, j, q);
-                
-		  local_matrix(i,j) += (scalar_product(phi_i_grads_u, phi_j_grads_u)
-					- div_phi_i_u * phi_j_p
-					- phi_i_p * div_phi_j_u
-					+ phi_i_p * phi_j_p
-					+ phi_i_T * phi_j_T)
-				       * fe_values.JxW(q);     
-		}
 
+	      if (rebuild_matrices)
+		{
+		  const Tensor<2,dim> phi_i_grads_u= extract_grad_s_u (fe_values, i, q);
+		  const double        div_phi_i_u  = extract_div_u (fe_values, i, q);
+		  const double        phi_i_p      = extract_p (fe_values, i, q);
+		  const double        phi_i_T      = extract_T (fe_values, i, q); 
+		  const Tensor<1,dim> grad_phi_i_T = extract_grad_T(fe_values, i, q);
+            
+		  for (unsigned int j=0; j<dofs_per_cell; ++j)
+		    {
+		      const Tensor<2,dim> phi_j_grads_u     = extract_grad_s_u (fe_values, j, q);
+		      const double        div_phi_j_u = extract_div_u (fe_values, j, q);
+		      const double        phi_j_p     = extract_p (fe_values, j, q);
+		      const double        phi_j_T     = extract_T (fe_values, j, q);
+                
+		      local_matrix(i,j) += (scalar_product(phi_i_grads_u, phi_j_grads_u)
+					    - div_phi_i_u * phi_j_p
+					    - phi_i_p * div_phi_j_u
+					    + phi_i_p * phi_j_p
+					    + phi_i_T * phi_j_T)
+					   * fe_values.JxW(q);     
+		    }
+		}
+	      
 	      const Point<dim> gravity = fe_values.quadrature_point(q) /
 					 fe_values.quadrature_point(q).norm();
 	      
@@ -607,36 +622,47 @@ void BoussinesqFlowProblem<dim>::assemble_system ()
           }
 
       cell->get_dof_indices (local_dof_indices);
-      for (unsigned int i=0; i<dofs_per_cell; ++i)
-        for (unsigned int j=0; j<dofs_per_cell; ++j)
-	  system_matrix.add (local_dof_indices[i],
-			     local_dof_indices[j],
-			     local_matrix(i,j));
+
+      if (rebuild_matrices == true)
+	{
+	  for (unsigned int i=0; i<dofs_per_cell; ++i)
+	    for (unsigned int j=0; j<dofs_per_cell; ++j)
+	      system_matrix.add (local_dof_indices[i],
+				 local_dof_indices[j],
+				 local_matrix(i,j));
+	}
       
       for (unsigned int i=0; i<dofs_per_cell; ++i)
         system_rhs(local_dof_indices[i]) += local_rhs(i);
     }
 
-  hanging_node_constraints.condense (system_matrix);
+  if (rebuild_matrices == true)
+    hanging_node_constraints.condense (system_matrix);
+  
   hanging_node_constraints.condense (system_rhs);  
   
-  {
-    std::vector<bool> component_mask (dim+2, true);
-    component_mask[dim] = component_mask[dim+1] = false;
-    std::map<unsigned int,double> boundary_values;
-    VectorTools::interpolate_boundary_values (dof_handler,
-					      0,
-					      ZeroFunction<dim>(dim+2),
-					      boundary_values,
-					      component_mask);
-    MatrixTools::apply_boundary_values (boundary_values,
-					system_matrix,
-					solution,
-					system_rhs);  
-  }
+  if (rebuild_matrices == true)
+    {
+      std::vector<bool> component_mask (dim+2, true);
+      component_mask[dim] = component_mask[dim+1] = false;
+      std::map<unsigned int,double> boundary_values;
+      VectorTools::interpolate_boundary_values (dof_handler,
+						0,
+						ZeroFunction<dim>(dim+2),
+						boundary_values,
+						component_mask);
+      MatrixTools::apply_boundary_values (boundary_values,
+					  system_matrix,
+					  solution,
+					  system_rhs);  
+    }
 
   if (rebuild_preconditioner == true)
     {
+      Assert (rebuild_matrices == true,
+	      ExcMessage ("There is no point in rebuilding the preconditioner "
+			  "without a rebuilt matrix!"));
+      
       std::cout << "   Rebuilding preconditioner..." << std::flush;
       
       A_preconditioner
@@ -647,6 +673,8 @@ void BoussinesqFlowProblem<dim>::assemble_system ()
       
       rebuild_preconditioner = false;
     }
+
+  rebuild_matrices = false;
 }
 
 
@@ -1092,6 +1120,7 @@ BoussinesqFlowProblem<dim>::refine_mesh ()
   Vector<double> tmp (dof_handler.n_dofs());
   soltrans.interpolate(x_old_solution, tmp);
 
+  rebuild_matrices       = true;
   rebuild_preconditioner = true;
 
   old_solution = tmp;
