@@ -1,2 +1,162 @@
 <a name="Intro"></a>
 <h1>Introduction</h1>
+
+
+@code
+template <int dim>
+Tensor<1,dim>
+extract_u (const FEValuesBase<dim> &fe_values,
+           const unsigned int i,
+           const unsigned int q)
+{
+  Tensor<1,dim> tmp;
+
+  const unsigned int component
+    = fe_values.get_fe().system_to_component_index(i).first;
+
+  if (component < dim)
+    tmp[component] = fe_values.shape_value (i,q);
+
+  return tmp;
+}
+
+
+
+template <int dim>
+double
+extract_div_u (const FEValuesBase<dim> &fe_values,
+               const unsigned int i,
+               const unsigned int q)
+{
+  const unsigned int component
+    = fe_values.get_fe().system_to_component_index(i).first;
+
+  if (component < dim)
+    return fe_values.shape_grad (i,q)[component];
+  else
+    return 0;
+}
+
+
+
+template <int dim>
+Tensor<2,dim>
+extract_grad_s_u (const FEValuesBase<dim> &fe_values,
+		  const unsigned int i,
+		  const unsigned int q)
+{
+  Tensor<2,dim> tmp;
+
+  const unsigned int component
+    = fe_values.get_fe().system_to_component_index(i).first;
+  
+  if (component < dim)
+    {
+      const Tensor<1,dim> grad_phi_over_2 = fe_values.shape_grad (i,q) / 2;
+      
+      for (unsigned int e=0; e<dim; ++e)
+	tmp[component][e] += grad_phi_over_2[e];
+      for (unsigned int d=0; d<dim; ++d)
+	tmp[d][component] += grad_phi_over_2[d];
+    }
+  
+  return tmp;
+}
+
+
+  
+template <int dim>
+double extract_p (const FEValuesBase<dim> &fe_values,
+                  const unsigned int i,
+                  const unsigned int q)
+{
+  const unsigned int component
+    = fe_values.get_fe().system_to_component_index(i).first;
+
+  if (component == dim)
+    return fe_values.shape_value (i,q);
+  else
+    return 0;
+}
+
+
+
+template <int dim>
+double extract_T (const FEValuesBase<dim> &fe_values,
+                  const unsigned int i,
+                  const unsigned int q)
+{
+  const unsigned int component
+    = fe_values.get_fe().system_to_component_index(i).first;
+
+  if (component == dim+1)
+    return fe_values.shape_value (i,q);
+  else
+    return 0;
+}
+
+
+
+template <int dim>
+Tensor<1,dim>
+extract_grad_T (const FEValuesBase<dim> &fe_values,
+                const unsigned int i,
+                const unsigned int q)
+{
+  Tensor<1,dim> tmp;
+
+  const unsigned int component
+    = fe_values.get_fe().system_to_component_index(i).first;
+
+  if (component == dim+1)
+    tmp = fe_values.shape_grad (i,q);
+
+  return tmp;
+}
+@endcode
+
+@code
+  {
+    Vector<double> xx(dof_handler.n_dofs());
+    std::vector<bool> p_component (dof_handler.n_dofs());
+    std::vector<bool> p_boundary (dof_handler.n_dofs());
+    std::vector<bool> component_mask (dim+2, false);
+    component_mask[dim] = true;
+    DoFTools::extract_dofs (dof_handler, component_mask, p_component);
+    DoFTools::extract_boundary_dofs (dof_handler, component_mask, p_boundary);
+    
+    QGauss<dim>   quadrature_formula(degree+2); 
+    FEValues<dim> fe_values (fe, quadrature_formula, 
+			     update_values | update_gradients  | update_JxW_values);
+    std::vector<std::vector<Tensor<1,dim> > >  solution_grads(fe_values.n_quadrature_points,
+							      std::vector<Tensor<1,dim> > (dim+2));
+    std::vector<unsigned int> local_dof_indices (fe.dofs_per_cell);
+    
+    typename DoFHandler<dim>::active_cell_iterator
+      cell = dof_handler.begin_active(),
+      endc = dof_handler.end();
+    for (; cell!=endc; ++cell)
+      { 
+	fe_values.reinit (cell);
+	fe_values.get_function_gradients (solution, solution_grads);
+
+	cell->get_dof_indices (local_dof_indices);
+	
+	for (unsigned int q=0; q<fe_values.n_quadrature_points; ++q)
+	  for (unsigned int i=0; i<fe.dofs_per_cell; ++i)
+	    if (p_component[local_dof_indices[i]] == true)
+	      { 
+		double divergence(solution_grads[q][0][0] +
+				  solution_grads[q][1][1]);
+		xx(local_dof_indices[i]) += divergence * fe_values.shape_value(i,q) *
+					    fe_values.JxW(q);
+	      }
+      }
+    hanging_node_constraints.condense (xx);
+    
+    for (unsigned int i=0; i<dof_handler.n_dofs(); ++i)
+      if ((p_component[i] == true) && (hanging_node_constraints.is_constrained(i) == false)
+	  && (p_boundary[i] == false))
+	Assert (std::fabs(xx(i)) < 1e-11, ExcInternalError());
+  }
+@endcode
