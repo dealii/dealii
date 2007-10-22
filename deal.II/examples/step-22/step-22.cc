@@ -945,7 +945,7 @@ void BoussinesqFlowProblem<dim>::solve ()
       schur_complement (system_matrix, A_inverse);
     
     SolverControl solver_control (system_matrix.block(0,0).m(),
-                                  1e-8*schur_rhs.l2_norm());
+                                  1e-6*schur_rhs.l2_norm());
     SolverCG<>    cg (solver_control);
 
     try
