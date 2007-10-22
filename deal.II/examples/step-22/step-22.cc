@@ -1212,8 +1212,6 @@ void BoussinesqFlowProblem<dim>::run ()
 
       std::cout << std::endl;
 
-      break;
-      
       if (timestep_number % 10 == 0)
 	refine_mesh ();
     }
