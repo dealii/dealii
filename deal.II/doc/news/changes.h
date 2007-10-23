@@ -66,7 +66,18 @@ inconvenience this causes.
 <h3>General</h3>
 
 <ol>
-  <li>
+
+  <li> <p>Improved: On Mac OS X, the operating system provides for
+  "frameworks", which are essentially collections of shared libraries.
+  We now link with the "Accelerate" framework (from Mac OS X 10.4
+  onwards) or the "vecLib" framework (for previous versions) instead
+  of the individual BLAS and LAPACK libraries if they are needed. This
+  insulates us from having to use the actual name of these libraries,
+  which may be subject to change, and it may also link with optimized
+  or vectorized libraries if they are available.
+  <br>
+  (Eh Tan, WB 2007/10/22)
+  </p></li>
 </ol>
 
 

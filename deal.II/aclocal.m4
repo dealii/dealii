@@ -5300,20 +5300,102 @@ AC_DEFUN(ABORT_BLAS_ON_ERROR, dnl
 ])
 
 dnl --------------------------------------------------
-dnl Include the BLAS library
+dnl Make sure we can link with blas. If something was
+dnl given as an argument to --with-blas=xxx, then use
+dnl that library, otherwise use 'blas' as library name.
+dnl
+dnl On Mac OS X, first try something different. OS X has
+dnl the concept of a 'framework', which is something like
+dnl a collection of libraries. One links with a framework
+dnl using '-framework name' on the linker line. On OS X
+dnl 10.3, there is a framework called 'vecLib', later
+dnl versions have 'Accelerate', both of which include
+dnl both the standard blas and cblas libraries. So if no
+dnl name is given to --with-blas, and we are on Mac OS X,
+dnl try first to link with the Accelerate framework, and
+dnl if that fails with the vecLib framework. Only if
+dnl that too fails, fall back to the usual rules.
+dnl
+dnl For more information on frameworks, see here:
+dnl http://www.macresearch.org/performance_tutorial_part_i_introducing_accelerate
+dnl http://www.macresearch.org/using_the_accelerate_framework
 dnl --------------------------------------------------
+AC_DEFUN(DEAL_II_CHECK_BLAS_FRAMEWORK, dnl
+[
+  dnl No argument to --with-blas has been given.
+  dnl Try the special arguments for Mac OS X if
+  dnl we are on that sort of system
+  if (echo $target | grep apple-darwin > /dev/null) ; then
+    OLD_LDFLAGS="$LDFLAGS"
+
+    dnl Try to use -framework Accelerate
+    AC_MSG_CHECKING(-framework Accelerate)
+    LDFLAGS="$OLD_LDFLAGS -framework Accelerate"
+    AC_LINK_IFELSE(
+              [  AC_LANG_PROGRAM([[extern "C" void daxpy(int,double,double*,int,double*,int);]],
+                                 [[daxpy(0,0.,0,0,0,0);]])
+              ],
+              [ 
+                AC_MSG_RESULT(yes)
+                framework_works=yes
+              ],
+              [ 
+                AC_MSG_RESULT(no)
+              ])
+
+    dnl If that didn't work, try to use -framework vecLib
+    if test "x$framework_works" != "xyes"; then
+      AC_MSG_CHECKING(-framework vecLib)
+      LDFLAGS="$OLD_LDFLAGS -framework vecLib"
+      AC_LINK_IFELSE(
+                [  AC_LANG_PROGRAM([[extern "C" void daxpy(int,double,double*,int,double*,int);]],
+                                   [[daxpy(0,0.,0,0,0,0);]])
+                ],
+                [ 
+                  AC_MSG_RESULT(yes)
+                  framework_works=yes
+                ],
+                [ 
+                  AC_MSG_RESULT(no)
+                ])
+    fi
+
+    dnl If none of the above worked, revert LDFLAGS to their previous
+    dnl values
+    if test "x$framework_works" != "xyes"; then
+      LDFLAGS="$OLD_LDFLAGS"
+    fi
+  fi
+])
+
 AC_DEFUN(DEAL_II_WITH_BLAS, dnl
 [
   if test "x$1" != "xno" ; then
-    if test "x$1" != "xyes" ; then blas="$1"; else blas="blas"; fi
-    AC_CHECK_LIB($blas, daxpy_,
-                 [ 
-                   LIBS="-l$blas $LIBS"
-                   AC_DEFINE(HAVE_LIBBLAS)
-                 ],,$F77LIBS)
-    AC_SUBST(NEEDS_F77LIBS, "yes")
+    if test "x$1" != "xyes" ; then 
+      blas="$1"
+      AC_CHECK_LIB($blas, daxpy_,
+                   [ 
+                     LIBS="-l$blas $LIBS"
+                     AC_DEFINE(HAVE_LIBBLAS)
+                   ],,$F77LIBS)
+      AC_SUBST(NEEDS_F77LIBS, "yes")
+    else
+      DEAL_II_CHECK_BLAS_FRAMEWORK
+      if test "x$framework_works" != "xyes"; then
+        blas="blas"; 
+        AC_CHECK_LIB($blas, daxpy_,
+                     [ 
+                       LIBS="-l$blas $LIBS"
+                       AC_DEFINE(HAVE_LIBBLAS)
+                     ],,$F77LIBS)
+     
+        AC_SUBST(NEEDS_F77LIBS, "yes")
+      fi
+    fi
   fi
 ])
+
+
 
 dnl --------------------------------------------------
 dnl What to do if external boost is selected
