@@ -67,14 +67,45 @@ void fevalues (const DoFHandler<dim>& dof,
 
 
 template <int dim>
+void fefacevalues (const DoFHandler<dim>& dof,
+		   UpdateFlags updates)
+{
+  typedef typename DoFHandler<dim>::active_cell_iterator I;
+  const I end = dof.end();
+  
+  QGauss<dim-1> quadrature(5);
+  MappingQ1<dim> mapping;
+  FEFaceValues<dim> fe(mapping, dof.get_fe(), quadrature, updates);
+  
+  for (I i=dof.begin_active(); i!=end;++i)
+    for (unsigned int f=0;f<GeometryInfo<dim>::faces_per_cell;++f)
+      fe.reinit(i, f);
+}
+
+
+template <int dim>
 void check_mapping (const DoFHandler<dim>& dof)
 {
+  deallog.push("cell");
   fevalues(dof,  update_q_points);
   deallog << "qpoints" << std::endl;
   fevalues(dof, update_JxW_values);
   deallog << "JxW" << std::endl;
   fevalues(dof,  update_q_points | update_JxW_values);
-  deallog << "qpoints|JxW" << std::endl;  
+  deallog << "qpoints|JxW" << std::endl;
+  deallog.pop();
+  
+  deallog.push("face");
+  fefacevalues(dof,  update_quadrature_points);
+  deallog << "qpoints" << std::endl;
+  fefacevalues(dof, update_JxW_values);
+  deallog << "JxW" << std::endl;
+  fefacevalues(dof, update_normal_vectors);
+  deallog << "normals" << std::endl;
+  fefacevalues(dof,  update_q_points | update_JxW_values | update_normal_vectors);
+  deallog << "qpoints|JxW|normals" << std::endl;
+  deallog.pop();
+  
 }
 
 
@@ -83,8 +114,11 @@ void check_values (const DoFHandler<dim>& dof)
 {
   indices(dof, 100);
   deallog << "Index*100" << std::endl;
+  deallog.push("cell");
   fevalues(dof,  update_values);
   deallog << "values" << std::endl;
+  fevalues(dof,  update_gradients);
+  deallog << "gradients" << std::endl;
   fevalues(dof,  update_values | update_JxW_values);
   deallog << "values|JxW" << std::endl;
   fevalues(dof,  update_values | update_gradients
@@ -93,6 +127,22 @@ void check_values (const DoFHandler<dim>& dof)
 //  fevalues(dof,  update_values | update_gradients | update_second_derivatives
 //	   | update_q_points | update_JxW_values);
 //  deallog << "values|gradients|2nds|qpoints|JxW" << std::endl;
+  deallog.pop();
+  
+  deallog.push("face");
+  fefacevalues(dof,  update_values);
+  deallog << "values" << std::endl;
+  fefacevalues(dof,  update_gradients);
+  deallog << "gradients" << std::endl;
+  fefacevalues(dof,  update_values | update_JxW_values);
+  deallog << "values|JxW" << std::endl;
+  fefacevalues(dof,  update_values | update_gradients
+	       | update_q_points | update_JxW_values | update_normal_vectors);
+  deallog << "values|gradients|qpoints|JxW|normals" << std::endl;
+//  fefacevalues(dof,  update_values | update_gradients | update_second_derivatives
+//	   | update_q_points | update_JxW_values);
+//  deallog << "values|gradients|2nds|qpoints|JxW" << std::endl;
+  deallog.pop();  
 }
 
 
