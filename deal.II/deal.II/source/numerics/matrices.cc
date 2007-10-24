@@ -1037,6 +1037,10 @@ create_boundary_mass_matrix_1 (const Mapping<dim>        &mapping,
   std::vector<unsigned int> dofs (dofs_per_cell);
   std::vector<unsigned int> dofs_on_face_vector (dofs_per_face);
   
+				   // for each dof on the cell, have a
+				   // flag whether it is on the face
+  std::vector<bool>         dof_is_on_face(dofs_per_cell);
+  
   typename DoFHandler<dim>::active_cell_iterator cell = range.first;
   for (; cell!=range.second; ++cell)
     for (unsigned int face=0; face<GeometryInfo<dim>::faces_per_cell; ++face)
@@ -1085,7 +1089,7 @@ create_boundary_mass_matrix_1 (const Mapping<dim>        &mapping,
 	      for (unsigned int point=0; point<fe_values.n_quadrature_points; ++point)
 		{
 		  const double weight = fe_values.JxW(point);
-		  for (unsigned int i=0; i<fe_values.dofs_per_cell; ++i) 
+		  for (unsigned int i=0; i<fe_values.dofs_per_cell; ++i)
 		    if (fe_is_primitive)
 		      {
 			for (unsigned int j=0; j<fe_values.dofs_per_cell; ++j)
@@ -1193,20 +1197,28 @@ create_boundary_mass_matrix_1 (const Mapping<dim>        &mapping,
 					   // searches.
 	  cell->get_dof_indices (dofs);
 	  cell->face(face)->get_dof_indices (dofs_on_face_vector);
+	  for (unsigned int i=0; i<dofs_per_cell; ++i)
+	    dof_is_on_face[i] = (std::find(dofs_on_face_vector.begin(),
+					   dofs_on_face_vector.end(),
+					   dofs[i])
+				 !=
+				 dofs_on_face_vector.end());
 	  
                                            // lock the matrix
           Threads::ThreadMutex::ScopedLock lock (mutex);
 	  for (unsigned int i=0; i<dofs_per_cell; ++i)
-	    for (unsigned int j=0; j<dofs_per_cell; ++j)
-	      if (dof_to_boundary_mapping[dofs[i]] != deal_II_numbers::invalid_unsigned_int
-		  && dof_to_boundary_mapping[dofs[j]] != deal_II_numbers::invalid_unsigned_int)
-		matrix.add(dof_to_boundary_mapping[dofs[i]],
-			   dof_to_boundary_mapping[dofs[j]],
-			   cell_matrix(i,j));
-	  
-	  for (unsigned int j=0; j<dofs_per_cell; ++j)
-	    if (dof_to_boundary_mapping[dofs[j]] != deal_II_numbers::invalid_unsigned_int)
-	      rhs_vector(dof_to_boundary_mapping[dofs[j]]) += cell_vector(j);
+	    {
+	      if (dof_is_on_face[i] && dof_to_boundary_mapping[dofs[i]] != deal_II_numbers::invalid_unsigned_int)
+		{
+		  for (unsigned int j=0; j<dofs_per_cell; ++j)
+		    if (dof_is_on_face[j] && dof_to_boundary_mapping[dofs[j]] != deal_II_numbers::invalid_unsigned_int)
+		      matrix.add(dof_to_boundary_mapping[dofs[i]],
+				 dof_to_boundary_mapping[dofs[j]],
+				 cell_matrix(i,j));
+		  
+		  rhs_vector(dof_to_boundary_mapping[dofs[i]]) += cell_vector(i);
+		}
+	    }
 	}
 }
 
