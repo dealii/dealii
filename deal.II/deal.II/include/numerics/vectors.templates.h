@@ -1712,11 +1712,29 @@ VectorTools::project_boundary_values (const Mapping<dim>       &mapping,
 				   // needs to use another indirection. There
 				   // should be not many technical problems,
 				   // but it needs to be implemented
-  if (dim<3)
-    sparsity.compress();
-  else
-    Assert (false, ExcNotImplemented());
-
+  if (dim>=3)
+    {
+#ifdef DEBUG
+// Assert that there are no hanging nodes at the boundary
+      int level = -1;
+      for (typename DoFHandler<dim>::active_cell_iterator cell = dof.begin_active();
+	   cell != dof.end(); ++cell)
+	for (unsigned int f=0;f<GeometryInfo<dim>::faces_per_cell;++f)
+	  {
+	    if (cell->at_boundary(f))
+	      {
+		if (level == -1)
+		  level = cell->level();
+		else
+		  {		          
+		    Assert (level == cell->level(), ExcNotImplemented());
+		  }
+	      }
+	  }
+#endif
+    }
+  sparsity.compress();
+  
 
 				   // make mass matrix and right hand side
   SparseMatrix<double> mass_matrix(sparsity);

@@ -2,7 +2,7 @@
 //    $Id$
 //    Version: $Name$
 //
-//    Copyright (C) 1998, 1999, 2000, 2001, 2002, 2003, 2004, 2005, 2006 by the deal.II authors
+//    Copyright (C) 1998, 1999, 2000, 2001, 2002, 2003, 2004, 2005, 2006, 2007 by the deal.II authors
 //
 //    This file is subject to QPL and may not be  distributed
 //    without copyright and license information. Please refer
@@ -323,8 +323,9 @@ class MatrixCreator
 				      * to use multithreading, this
 				      * function works in parallel.
 				      *
-				      * See the general doc of this
-				      * class for more information.
+				      * @todo This function does not
+				      * work for finite elements with
+				      * cell-dependent shape functions.
 				      */
     template <int dim>
     static
