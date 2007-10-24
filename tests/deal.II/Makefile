@@ -62,6 +62,7 @@ tests_x = block_matrices \
 	have_same_coarse_mesh_* \
 	get_finest_common_cells_* \
 	project_*[0-9] \
+	project_boundary_* \
 	minimal_cell_diameter \
 	maximal_cell_diameter \
 	union_triangulation \
