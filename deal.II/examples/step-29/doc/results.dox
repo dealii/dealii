@@ -1,3 +1,58 @@
 <a name="Results"></a>
 <h1>Results</h1>
 
+The parameter file that comes with the tutorial code sets
+d=0.3, which amounts to a focus of the transducer lens 
+at x=0.5, y=0.3. The coarse mesh is refined 5 times, 
+resulting in 160x160 cells, and the output is written in gmv 
+format.
+
+Here's the console output of the program in debug mode: 
+
+@code 
+examples/step-29> make run
+============================ Running step-29
+DEAL::Generating grid... done (1.34000s)
+DEAL::  Number of active cells:  25600
+DEAL::Setting up system... done (1.17000s)
+DEAL::  Number of degrees of freedom: 51842
+DEAL::Assembling system matrix... done (7.52000s)
+DEAL::Solving linear system... done (4.43000s)
+DEAL::Generating output... done (5.94000s)
+@endcode
+
+(Of course, execution times will differ if you run the program 
+locally.) The fact that most of the time is spent on assembling 
+the system matrix and generating output is due to some extra checks 
+done in debug mode, in optimized mode these parts of the program  
+run much faster: 
+
+@code
+examples/step-29> make run
+============================ Running step-29
+DEAL::Generating grid... done (0.0500000s)
+DEAL::  Number of active cells:  25600
+DEAL::Setting up system... done (0.170000s)
+DEAL::  Number of degrees of freedom: 51842
+DEAL::Assembling system matrix... done (0.370000s)
+DEAL::Solving linear system... done (3.65000s)
+DEAL::Generating output... done (1.23000s)
+@endcode
+
+The graphical output of the program looks as follows: 
+
+
+@image html step-29.v.png "v = Re(u)" width=5cm
+
+@image html step-29.w.png "w = Im(u)" width=5cm
+
+@image html step-29.intensity.png "|u|" width=5cm
+
+The first two picturse show the real and imaginary parts of 
+$u$, whereas the last shows the intensity $|u|$. One can clearly 
+see that the intensity is focussed around the focal point of the 
+lens (0.5, 0.3), and that the focus 
+is rather sharp in x-direction but more blurred in y-direction, which is a 
+consequence of the geometry and the wave nature of the problem. 
+
+
