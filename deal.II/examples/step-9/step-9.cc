@@ -1068,7 +1068,7 @@ assemble_system_interval (const typename DoFHandler<dim>::active_cell_iterator &
 			     delta *
 			     (advection_directions[q_point] *
 			      fe_values.shape_grad(i,q_point))        ) *
-			    rhs_values[i] *
+			    rhs_values[q_point] *
 			    fe_values.JxW (q_point));
 	  };
 
