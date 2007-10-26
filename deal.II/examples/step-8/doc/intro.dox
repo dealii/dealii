@@ -315,7 +315,8 @@ As a final note: in the @ref step_17 "step-17" example program, we will revisit 
 problem laid out here, and will show how to solve it in parallel on a cluster
 of computers. The resulting program will thus be able to solve this problem to
 significantly higher accuracy, and more efficiently if this is
-required. In addition, in @ref step_20 "step-20", we will revisit some
+required. In addition, in @ref step_20 "step-20", @ref step_21 "step-21", and
+@ref step_22 "step-22", we will revisit some 
 vector-valued problems and show a few techniques that may make it
 simpler to actually go through all the stuff shown above, with
 <code>FiniteElement::system_to_component_index</code> etc.

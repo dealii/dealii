@@ -287,8 +287,8 @@ for (unsigned int q=0; q<n_q_points; ++q)
                         fe_values.JxW(q));
     }
 @endcode
-This very closely resembles the form we have originally written down the
-bilinear form and right hand side.
+This very closely resembles the form in which we have originally written down
+the bilinear form and right hand side.
 
 There is one final term that we have to take care of: the right hand side
 contained the term $(g,{\mathbf v}\cdot {\mathbf n})_{\partial\Omega}$, constituting the
