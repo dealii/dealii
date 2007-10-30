@@ -2,7 +2,7 @@
 //    $Id$
 //    Version: $Name$
 //
-//    Copyright (C) 1999, 2000, 2001, 2002, 2003, 2004, 2005, 2006 by the deal.II authors
+//    Copyright (C) 1999, 2000, 2001, 2002, 2003, 2004, 2005, 2006, 2007 by the deal.II authors
 //
 //    This file is subject to QPL and may not be  distributed
 //    without copyright and license information. Please refer
@@ -172,16 +172,21 @@ namespace GridOutFlags
   struct Ucd 
   {
 				       /**
-					* Write a comment at the beginning
-					* of the file stating the date of
-					* creation and some other data.
-					* While this is supported by the
-					* UCD format (and the AVS program),
-					* some other programs get confused
-					* by this, so you can switch it off
-					* this way.
+					* Write a comment at the
+					* beginning of the file
+					* stating the date of creation
+					* and some other data.  While
+					* this is supported by the UCD
+					* format (and the AVS
+					* program), some other
+					* programs get confused by
+					* this, so the default is to
+					* not write a
+					* preamble. However, a
+					* preamble can be written
+					* using this flag.
 					*
-					* Default: @p true.
+					* Default: <code>false</code>.
 					*/
       bool write_preamble;
       
@@ -229,7 +234,7 @@ namespace GridOutFlags
 				       /**
 					* Constructor.
 					*/
-      Ucd (const bool write_preamble = true,
+      Ucd (const bool write_preamble = false,
 	   const bool write_faces    = false,
 	   const bool write_lines    = false);
 

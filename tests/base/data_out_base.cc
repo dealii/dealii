@@ -40,7 +40,7 @@ write_patches(const std::vector<DataOutBase::Patch<dim,spacedim> >& patches,
   DataOutBase::GnuplotFlags gnuplotflags;
   DataOutBase::GmvFlags gmvflags;
   DataOutBase::PovrayFlags povrayflags;
-  DataOutBase::UcdFlags ucdflags;
+  DataOutBase::UcdFlags ucdflags(true);
   DataOutBase::VtkFlags vtkflags;
   DataOutBase::Deal_II_IntermediateFlags deal_II_intermediateflags;
 

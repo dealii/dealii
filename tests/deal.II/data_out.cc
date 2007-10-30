@@ -2,7 +2,7 @@
 //    $Id$
 //    Version: $Name$ 
 //
-//    Copyright (C) 2000, 2001, 2002, 2003, 2004 by the deal.II authors
+//    Copyright (C) 2000, 2001, 2002, 2003, 2004, 2007 by the deal.II authors
 //
 //    This file is subject to QPL and may not be  distributed
 //    without copyright and license information. Please refer
@@ -189,6 +189,7 @@ void LaplaceProblem<2>::output_results () const
       data_out.write_dx (logfile);
       data_out.write_gmv (logfile);
       data_out.write_gnuplot (logfile);
+      data_out.set_flags (DataOutBase::UcdFlags(true));
       data_out.write_ucd (logfile);
       data_out.write_povray (logfile);
       data_out.write_eps (logfile);
@@ -204,6 +205,7 @@ void LaplaceProblem<2>::output_results () const
       data_out.write_dx (logfile);
       data_out.write_gmv (logfile);
       data_out.write_gnuplot (logfile);
+      data_out.set_flags (DataOutBase::UcdFlags(true));
       data_out.write_ucd (logfile);
     };
 }
@@ -225,6 +227,7 @@ void LaplaceProblem<3>::output_results () const
       data_out.write_dx (logfile);
       data_out.write_gmv (logfile);
       data_out.write_gnuplot (logfile);
+      data_out.set_flags (DataOutBase::UcdFlags(true));
       data_out.write_ucd (logfile);
     };
 
@@ -240,6 +243,7 @@ void LaplaceProblem<3>::output_results () const
       data_out.write_dx (logfile);
       data_out.write_gmv (logfile);
       data_out.write_gnuplot (logfile);
+      data_out.set_flags (DataOutBase::UcdFlags(true));
       data_out.write_ucd (logfile);
     };
 }

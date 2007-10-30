@@ -2,7 +2,7 @@
 //    $Id$
 //    Version: $Name$ 
 //
-//    Copyright (C) 2002, 2003, 2004, 2005 by the deal.II authors
+//    Copyright (C) 2002, 2003, 2004, 2005, 2007 by the deal.II authors
 //
 //    This file is subject to QPL and may not be  distributed
 //    without copyright and license information. Please refer
@@ -36,6 +36,7 @@ void test (const std::string &infilename)
 	 <<"output for grid in "<<infilename<<std::endl;
   
   GridOut grid_out;
+  grid_out.set_flags (GridOutFlags::Ucd(true));
   grid_out.write_ucd (tria, logfile);
 }
 

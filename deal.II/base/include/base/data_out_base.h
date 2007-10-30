@@ -511,23 +511,29 @@ class DataOutBase
     struct UcdFlags 
     {
 					 /**
-					  * Write a comment at the beginning
-					  * of the file stating the date of
-					  * creation and some other data.
-					  * While this is supported by the
-					  * UCD format and @ref SoftwareAVS,
-					  * some other programs get confused
-					  * by this, so you can switch it off
-					  * this way.
+					  * Write a comment at the
+					  * beginning of the file
+					  * stating the date of
+					  * creation and some other
+					  * data.  While this is
+					  * supported by the UCD
+					  * format and @ref
+					  * SoftwareAVS, some other
+					  * programs get confused by
+					  * this, so the default is to
+					  * not write a
+					  * preamble. However, a
+					  * preamble can be written
+					  * using this flag.
 					  *
-					  * Default: <tt>true</tt>.
+					  * Default: <code>false</code>.
 					  */
 	bool write_preamble;
 	
 					 /**
 					  * Constructor.
 					  */
-	UcdFlags (const bool write_preamble = true);
+	UcdFlags (const bool write_preamble = false);
 
 					 /**
 					  * Declare all flags with name

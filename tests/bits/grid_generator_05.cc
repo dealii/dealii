@@ -49,7 +49,9 @@ void test(std::ostream& out)
       deallog <<"moebius, no rotation" << std::endl;
       Triangulation<dim> tr;
       GridGenerator::moebius(tr, 20, 0, 10.0, 2.0);
-      GridOut().write_ucd(tr, out);
+      GridOut go;
+      go.set_flags (GridOutFlags::Ucd(true));
+      go.write_ucd(tr, out);
     }
 
                                    // loop with quarter rotation (1 * pi/2)
@@ -59,7 +61,9 @@ void test(std::ostream& out)
 	      << "moebius, quarter rotation (1* Pi/2)" << std::endl;
       Triangulation<dim> tr;
       GridGenerator::moebius(tr, 20, 1, 10.0, 2.0);
-      GridOut().write_ucd(tr, out);
+      GridOut go;
+      go.set_flags (GridOutFlags::Ucd(true));
+      go.write_ucd(tr, out);
     }
 
                                    // loop with half rotation (2 * pi/2)
@@ -69,7 +73,9 @@ void test(std::ostream& out)
 	      << "moebius, half rotation (2* Pi/2)" << std::endl;
       Triangulation<dim> tr;
       GridGenerator::moebius(tr, 20, 2, 10.0, 2.0);
-      GridOut().write_ucd(tr, out);
+      GridOut go;
+      go.set_flags (GridOutFlags::Ucd(true));
+      go.write_ucd(tr, out);
     }
 
                                    // loop with three quarter rotation (3 * pi/2)
@@ -79,7 +85,9 @@ void test(std::ostream& out)
 	      << "moebius, three quarter rotation (3* Pi/2)" << std::endl;
       Triangulation<dim> tr;
       GridGenerator::moebius(tr, 20, 3, 10.0, 2.0);
-      GridOut().write_ucd(tr, out);
+      GridOut go;
+      go.set_flags (GridOutFlags::Ucd(true));
+      go.write_ucd(tr, out);
     }
 
                                    // loop with full rotation (1 * pi/2)
@@ -89,7 +97,9 @@ void test(std::ostream& out)
 	      << "moebius, full rotation (2* Pi)" << std::endl;
       Triangulation<dim> tr;
       GridGenerator::moebius(tr, 20, 4, 10.0, 2.0);
-      GridOut().write_ucd(tr, out);
+      GridOut go;
+      go.set_flags (GridOutFlags::Ucd(true));
+      go.write_ucd(tr, out);
     }
 }
 

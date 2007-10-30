@@ -30,6 +30,24 @@ inconvenience this causes.
 </p>
 
 <ol>
+  <li> <p>Changed: When writing output files in UCD format using either the
+  DataOutBase or the GridOut class, we used to write a preamble at the
+  beginning of the file that included the date and time the file was created.
+  However, several visualization programs get confused when confronted with
+  comments at the beginning of UCD files. Rather than printing a sensible
+  error message, they usually simply refuse to show any output, making it
+  very hard to track down the actual cause.
+  <br>
+  The classes mentioned above previously allowed to suppress writing a preamble
+  by setting a flag in the DataOutBase::UcdFlags or GridOutFlags::Ucd
+  structures. Given how complicated it is to find the actual
+  source of trouble, the default for these flags has been changed to not
+  produce this preamble any more. If desired, the flag can be used to still
+  produce a preamble.
+  <br>
+  (WB 2007/10/30)
+  </p>
+
   <li> <p>Changed: The version number of the deal.II intermediate format written by
   DataOutBase::write_deal_II_intermediate has been increased to 3 to accomodate the fact that
   we now support writing vector-valued data to output files in at least some output formats.

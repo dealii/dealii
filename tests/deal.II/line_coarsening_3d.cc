@@ -87,7 +87,9 @@ void check ()
   cell->set_refine_flag();
   tria.execute_coarsening_and_refinement ();
 				   // write grid to file
-  GridOut().write_ucd(tria,logfile);
+  GridOut go;
+  go.set_flags (GridOutFlags::Ucd(true));  
+  go.write_ucd(tria,logfile);
 				   // coarsen the first cell again
   cell=tria.begin_active(1);
   for (unsigned int c=0;c<8; ++c)
@@ -97,7 +99,7 @@ void check ()
     }
   tria.execute_coarsening_and_refinement ();
   
-  GridOut().write_ucd(tria,logfile);
+  go.write_ucd(tria,logfile);
 }
 
 

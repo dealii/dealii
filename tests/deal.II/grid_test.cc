@@ -255,7 +255,9 @@ void test (const int test_case)
       }
     }
 
-  GridOut().write_ucd (tria, logfile);
+  GridOut go;
+  go.set_flags (GridOutFlags::Ucd(true));  
+  go.write_ucd (tria, logfile);
 
   deallog << "     Total number of cells        = " << tria.n_cells() << std::endl
 	  << "     Total number of active cells = " << tria.n_active_cells() << std::endl;

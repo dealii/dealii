@@ -2,7 +2,7 @@
 //    $Id$
 //    Version: $Name$ 
 //
-//    Copyright (C) 2003, 2004 by the deal.II authors
+//    Copyright (C) 2003, 2004, 2007 by the deal.II authors
 //
 //    This file is subject to QPL and may not be  distributed
 //    without copyright and license information. Please refer
@@ -62,6 +62,7 @@ check_this (const DoFHandler<dim> &dof_handler,
   data_out_stack.finish_parameter_value ();
   
   data_out_stack.write_dx (deallog.get_file_stream());
+  data_out_stack.set_flags (DataOutBase::UcdFlags(true));
   data_out_stack.write_ucd (deallog.get_file_stream());  
   data_out_stack.write_gmv (deallog.get_file_stream());
   data_out_stack.write_tecplot (deallog.get_file_stream());

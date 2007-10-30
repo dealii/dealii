@@ -2,7 +2,7 @@
 //    $Id$
 //    Version: $Name$ 
 //
-//    Copyright (C) 2002, 2003, 2004, 2005 by the deal.II authors
+//    Copyright (C) 2002, 2003, 2004, 2005, 2007 by the deal.II authors
 //
 //    This file is subject to QPL and may not be  distributed
 //    without copyright and license information. Please refer
@@ -49,6 +49,7 @@ void test ()
   if (dim != 1)
     grid_out.write_eps (tria, logfile);
   grid_out.write_gnuplot (tria, logfile);
+  grid_out.set_flags (GridOutFlags::Ucd(true));
   grid_out.write_ucd (tria, logfile);
   if (dim != 1)
     grid_out.write_dx (tria, logfile);
