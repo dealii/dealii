@@ -68,11 +68,12 @@
 				// takes:
 #include <base/timer.h>
 
-				// Although we'll follow good deal.ii practice and keep 
-				// all of the code dimension independent, we will 
-				// really only consider the 2D problem here: 
-#define DIM 2
-
+				// As the last step at the beginning of this program,
+				// we make everything that is in the
+				// deal.II namespace globally
+				// available, without the need to
+				// prefix everything with
+				// <code>dealii</code><code>::</code>:
 using namespace dealii;
 
 
@@ -80,7 +81,23 @@ using namespace dealii;
 
 				// First we define a class for the function representing 
 				// the Dirichlet boundary values. This has been done many times before
-				// and therefore does not need much explanation. 
+				// and therefore does not need much explanation.
+				//
+				// Since there are two values $v$ and
+				// $w$ that need to be prescribed at
+				// the boundary, we have to tell the
+				// base class that this is a
+				// vector-valued function with two
+				// components, and the
+				// <code>vector_value</code> function
+				// and its cousin
+				// <code>vector_value_list</code> must
+				// return vectors with two entries. In
+				// our case the function is very
+				// simple, it just returns 1 for the
+				// real part $v$ and 0 for the
+				// imaginary part $w$ regardless of
+				// the point where it is evaluated.
 template <int dim>
 class DirichletBoundaryValues : public Function<dim>
 {
@@ -95,11 +112,6 @@ class DirichletBoundaryValues : public Function<dim>
 };
 
 
-				// Since there are two values $v$ and $w$ that need to be prescribed 
-				// at the boundary, the boundary value function must return a vector
-				// with two entries. In our case the function is very simple, 
-				// it just returns 1 for the real part $v$ and 0 for the imaginary 
-				// part $w$ regardless of the point where it is evaluated.
 template <int dim>
 inline
 void DirichletBoundaryValues<dim>::vector_value (const Point<dim> &/*p*/,
@@ -125,7 +137,7 @@ void DirichletBoundaryValues<dim>::vector_value_list (const std::vector<Point<di
 
 				// @sect3{The <code>ParameterReader</code> class}
 
-				// The next classis responsible for preparing the 
+				// The next class is responsible for preparing the 
 				// ParameterHandler object and reading parameters from
 				// an input file. 
 				// It includes a function <code>declare_parameters</code>
@@ -147,42 +159,65 @@ class ParameterReader : public Subscriptor
 				// The constructor stores a reference to 
 				// the ParameterHandler object that is passed to it:
 ParameterReader::ParameterReader(ParameterHandler &paramhandler)
-  :
-  prm(paramhandler)
+		:
+		prm(paramhandler)
 {}
 
 				// @sect4{<code>ParameterReader::declare_parameters</code>}
 
-				// The <code>declare_parameters</code> function declares all the parameters 
-				// that our ParameterHandler object will discover in the input file, 
-				// along with their types, range conditions and the subsections
-				// they appear in: 
+				// The <code>declare_parameters</code>
+				// function declares all the
+				// parameters that our
+				// ParameterHandler object will be
+				// able to read from input files,
+				// along with their types, range
+				// conditions and the subsections they
+				// appear in. We will wrap all the
+				// entries that go into a section in a
+				// pair of braces to force the editor
+				// to indent them by one level, making
+				// it simpler to read which entries
+				// together form a section:
 void ParameterReader::declare_parameters()
 {
-				// Parameters for mesh and geometry include the number 
-				// of global refinement steps that are applied to the initial
-				// coarse mesh and the focal distance $d$ of the transducer lens. For the number
-				// of refinement steps, we allow integer values between 1 and 10, 
-				// and for the focal distance any number greater than zero:
+				// Parameters for mesh and geometry
+				// include the number of global
+				// refinement steps that are applied
+				// to the initial coarse mesh and the
+				// focal distance $d$ of the
+				// transducer lens. For the number of
+				// refinement steps, we allow integer
+				// values in the range $[0,\infty)$,
+				// where the omitted second argument
+				// to the Patterns::Integer object
+				// denotes the half-open interval.
+				// For the focal distance any number
+				// greater than zero is accepted:
   prm.enter_subsection ("Mesh & geometry parameters");
-
+  {
     prm.declare_entry("Number of refinements", "6",
-		      Patterns::Integer(1,10),
+		      Patterns::Integer(0),
 		      "Number of global mesh refinement steps "
 		      "applied to initial coarse grid");
-
-     prm.declare_entry("Focal distance", "0.3",
-		       Patterns::Double(0),
-		       "Distance of the focal point of the lens "
-		       "to the x-axis");
-
+    
+    prm.declare_entry("Focal distance", "0.3",
+		      Patterns::Double(0),
+		      "Distance of the focal point of the lens "
+		      "to the x-axis");
+  }
   prm.leave_subsection ();
 
-				// The next subsection is devoted to the physical parameters appearing
-				// in the equation, which are the frequency $\omega$
-				// and wave speed $c$:
+				// The next subsection is devoted to
+				// the physical parameters appearing
+				// in the equation, which are the
+				// frequency $\omega$ and wave speed
+				// $c$. Again, both need to lie in the
+				// half-open interval $[0,\infty)$
+				// represented by calling the
+				// Patterns::Double class with only
+				// the left end-point as argument:
   prm.enter_subsection ("Physical constants");
-
+  {
     prm.declare_entry("c", "1.5e5",
 		      Patterns::Double(0),
 		      "Wave speed");
@@ -190,7 +225,7 @@ void ParameterReader::declare_parameters()
     prm.declare_entry("omega", "5.0e7",
 		      Patterns::Double(0),
 		      "Frequency");
-
+  }
   prm.leave_subsection ();
 
 
@@ -199,7 +234,7 @@ void ParameterReader::declare_parameters()
 				// through entries in the configuration file, which is the 
 				// purpose of the last subsection:
   prm.enter_subsection ("Output parameters");
-
+  {
     prm.declare_entry("Output file", "solution",
 		      Patterns::Anything(),
 		      "Name of the output file (without extension)");
@@ -215,24 +250,30 @@ void ParameterReader::declare_parameters()
 				// DataOutInterface<1>::declare_parameters executes
 				// <code>declare_parameters</code> for all available output formats, so that 
 				// for each format an own subsection will be created with parameters declared
-				// for that particular output format. 
+				// for that particular output format. (The actual value of the template
+				// parameter in the call, <code>@<1@></code> above, does not matter
+				// here: the function does the same work independent of the dimension,
+				// but happens to be in a template-parameter-dependent class.)
 				// To find out what parameters there are for which output format, you can either 
 				// consult the documentation of the DataOutBase class, or simply run this 
 				// program without a parameter file present. It will then create a file with all 
 				// declared parameters set to their default values, which can conveniently serve
 				// as a starting point for setting the parameters to the values you desire. 
     DataOutInterface<1>::declare_parameters (prm);
-
+  }
   prm.leave_subsection ();
 }
 
 				// @sect4{<code>ParameterReader::read_parameters</code>}
 
 				// This is the main function in the ParameterReader class. 
-				// It gets called from outside and first initiates declaration of 
-				// the parameters, and then tries to read them from the input file whose 
-				// filename is provided by the caller. 
-void ParameterReader::read_parameters(const std::string parameter_file)
+				// It gets called from outside, first declares all 
+				// the parameters, and then reads them from the input file whose 
+				// filename is provided by the caller. After the call to this
+				// function is complete, the <code>prm</code> object
+				// can be used to retrieve the values of the parameters read
+				// in from the file:
+void ParameterReader::read_parameters (const std::string parameter_file)
 {
   declare_parameters();
 
@@ -254,7 +295,7 @@ void ParameterReader::read_parameters(const std::string parameter_file)
 				// to make use of this mechanism here. 
 
 				// So far we have always used the DataOut::add_data_vector function 
-				// to add vectors contaning output data to a DataOut object. 
+				// to add vectors containing output data to a DataOut object. 
 				// There is a special version of this function 
 				// that in addition to the data vector has an additional argument of 
 				// type DataPostprocessor. What happens when this function
@@ -299,15 +340,12 @@ class ComputeIntensity : public DataPostprocessor<dim>
 				// representing the names we assign to the individual
 				// quantities that our postprocessor outputs. In our
 				// case, the postprocessor has only $|u|$ as an output, so we 
-				// need to provide just that one name:
+				// return a vector with a single component named "Intensity":
 template <int dim>
 std::vector<std::string>
 ComputeIntensity<dim>::get_names() const
 {
-  std::vector<std::string> field_names;
-  field_names.push_back("Intensity");
-
-  return field_names;
+  return std::vector<std::string> (1, "Intensity");
 }
 
 				// The next function returns a set of flags that indicate
@@ -316,10 +354,11 @@ ComputeIntensity<dim>::get_names() const
 				// This can be any subset of update_values, 
 				// update_gradients and update_hessians 
 				// (and, in the case of face data, also 
-				// update_normal_vectors). 
+				// update_normal_vectors), which are documented in UpdateFlags. 
 				// Of course, computation of the derivatives requires additional 
 				// resources, so only the flags for data that is really needed 
-				// should be given here. In our case, only the function values 
+				// should be given here, just as we do when we use FEValues objects.
+				// In our case, only the function values 
 				// of $v$ and $w$ are needed to compute $|u|$, so we're good 
 				// with the update_values flag. 
 template <int dim>
@@ -343,9 +382,13 @@ ComputeIntensity<dim>::n_output_variables () const
 
 
 				// The actual prostprocessing happens in the following function. 
-				// Its inputs are a vector representing point values of the function 
+				// Its inputs are a vector representing values of the function
+				// (which is here vector-valued) representing the data vector
+				// given to DataOut::add_data_vector, evaluated at all quadrature
+				// points where we generate output,
 				// and some tensor objects representing derivatives (that we don't 
-				// use here since $|u|$ is computed from just $v$ and $w$). 
+				// use here since $|u|$ is computed from just $v$ and $w$, and for
+				// which we assign no name to the corresponding function argument). 
 				// The derived quantities are returned in the 
 				// <code>computed_quantities</code> vector. 
 				// Remember that this function may only use data for which the
@@ -385,7 +428,8 @@ ComputeIntensity<dim>::compute_derived_quantities_vector (
 
 				// Finally here is the main class of this program. 
 				// It's member functions are very similar to the previous 
-				// examples and the list of member variables does not contain 
+				// examples, in particular @ref step_4 "step-4", and the list
+				// of member variables does not contain 
 				// any major surprises either.  
 				// The ParameterHandler object that is passed 
 				// to the constructor is stored as a reference to allow 
@@ -407,7 +451,7 @@ class UltrasoundProblem
     void solve ();
     void output_results () const;
 
-    ParameterHandler       &prm; 
+    ParameterHandler      &prm; 
 
     Triangulation<dim>     triangulation;
     DoFHandler<dim>        dof_handler;
@@ -426,10 +470,10 @@ class UltrasoundProblem
 				// of the scalar Q1 field, one for $v$ and one for $w$: 
 template <int dim>
 UltrasoundProblem<dim>::UltrasoundProblem (ParameterHandler&  param) 
-  :
-  prm(param),
-  dof_handler(triangulation),
-  fe(FE_Q<dim>(1), 2)
+		:
+		prm(param),
+		dof_handler(triangulation),
+		fe(FE_Q<dim>(1), 2)
 {}
 
 
@@ -443,7 +487,7 @@ UltrasoundProblem<dim>::~UltrasoundProblem ()
 
 				// Here we setup the grid for our domain. 
 				// As mentioned in the exposition, the geometry is just a unit square 
-				// with the part of the boundary that represents the transducer 
+				// (in 2d) with the part of the boundary that represents the transducer 
 				// lens replaced by a sector of a circle.
 template <int dim>
 void UltrasoundProblem<dim>::make_grid ()
@@ -461,7 +505,7 @@ void UltrasoundProblem<dim>::make_grid ()
   prm.enter_subsection ("Mesh & geometry parameters");
 
   const double		focal_distance = prm.get_double("Focal distance");
-  const unsigned int	N_ref          = prm.get_integer("Number of refinements");
+  const unsigned int	n_refinements  = prm.get_integer("Number of refinements");
 
   prm.leave_subsection ();
 
@@ -482,13 +526,16 @@ void UltrasoundProblem<dim>::make_grid ()
 				      Point<dim> (0.5, focal_distance) :
 				      Point<dim> (0.5, 0.5, focal_distance);
 
-  double radius = sqrt( (focal_point.distance(transducer) * 
-			 focal_point.distance(transducer)) + 
-			((dim==2) ? 0.01 : 0.02));
+  const double radius = std::sqrt( (focal_point.distance(transducer) * 
+				    focal_point.distance(transducer)) + 
+				   ((dim==2) ? 0.01 : 0.02));
 
 
 				// As initial coarse grid we take a simple unit square with 5 subdivisions 
-				// in each direction. Then we step through all cells to find the 
+				// in each direction. The number of subdivisions is chosen so that
+				// the line segment $[0.4,0.6]$ that we want to designate as the
+				// transducer boundary is spanned by a single face. Then we step
+				// through all cells to find the 
 				// faces where the transducer is to be located, which in fact is just 
 				// the single edge from 0.4 to 0.6 on the x-axis. This is where we want 
 				// the refinements to be made according to a circle shaped boundary, 
@@ -506,24 +553,27 @@ void UltrasoundProblem<dim>::make_grid ()
 
         cell->face(face)->set_boundary_indicator (1);
 
-				// For the circle part of the transducer lens, a hyper-ball object is used 
-				// (which, of course, in 2D just represents a circle),  
-				// with radius and center as computed above. Then we assign this boundary-object
-				// to the part of the boundary with boundary indicator 1:
-  const HyperBallBoundary<dim> boundary(focal_point, radius);
+				// For the circle part of the
+				// transducer lens, a hyper-ball
+				// object is used (which, of course,
+				// in 2D just represents a circle),
+				// with radius and center as computed
+				// above. By marking this object as
+				// <code>static</code>, we ensure that
+				// it lives until the end of the
+				// program and thereby longer than the
+				// triangulation object we will
+				// associated with it. We then assign
+				// this boundary-object to the part of
+				// the boundary with boundary
+				// indicator 1:
+  static const HyperBallBoundary<dim> boundary(focal_point, radius);
   triangulation.set_boundary(1, boundary);
 
-				// Now the global refinement is executed. Cells near the transducer 
+				// Now global refinement is executed. Cells near the transducer 
 				// location will be automatically refined according to the 
 				// circle shaped boundary of the transducer lens:
-  triangulation.refine_global (N_ref);
-
-				// The next line releases the triangulation's 
-				// pointer to the boundary object that we just created, which 
-				// is necessary since the boundary object will be destructed 
-				// as we leave this function 
-				// and we don't want the triangulation to keep a hanging pointer. 
-  triangulation.set_boundary(1);
+  triangulation.refine_global (n_refinements);
 
 				// Lastly, we generate some more logging output. We stop
 				// the timer and query the number of CPU seconds 
@@ -604,7 +654,7 @@ void UltrasoundProblem<dim>::assemble_system ()
 				// As usual, for computing integrals ordinary Gauss quadrature
 				// rule is used. Since our bilinear form involves boundary integrals
 				// on $\Gamma_2$, we also need a quadrature rule for surface
-				// integration on the faces, which are dim-1 dimensional:
+				// integration on the faces, which are $dim-1$ dimensional:
   QGauss<dim>    quadrature_formula(2);
   QGauss<dim-1>  face_quadrature_formula(2);
 
@@ -654,14 +704,15 @@ void UltrasoundProblem<dim>::assemble_system ()
 				// finite element system with two components. Due  
 				// to the way we constructed this FESystem, namely as the cartesian product of 
 				// two scalar finite element fields, each shape function 
-				// has only a single nonzero component (they are, in deal.II lingo, primitive). 
+				// has only a single nonzero component (they are, in deal.II lingo,
+				// @ref GlossPrimitive "primitive"). 
 				// Hence, each shape function can be viewed as one of the $\phi$'s or $\psi$'s
 				// from the introduction, and similarly
 				// the corresponding degrees of freedom can be attributed to either $\alpha$ or $\beta$. 
 				// As we iterate through all the degrees of freedom on the current cell however, 
 				// they do not come in any particular order, and so we cannot decide right away 
-				// whether the DoFs with index i and j belong to the real or imaginary part of our solution. 
-				// But if you look at the form of the system matrix in the introduction, this disctinction 
+				// whether the DoFs with index $i$ and $j$ belong to the real or imaginary part of our solution. 
+				// On the other hand, if you look at the form of the system matrix in the introduction, this distinction 
 				// is crucial since it will determine to which block in the system matrix the  
 				// contribution of the current pair of DoFs will go and hence which quantity we need to 
 				// compute from the given two shape functions. 
@@ -671,13 +722,13 @@ void UltrasoundProblem<dim>::assemble_system ()
 				// system the DoF belongs. The second integer of the pair indicates 
 				// which index the DoF has in the scalar base finite element field, but this information 
 				// is not relevant here. If you want to know more about this function and the underlying 
-				// scheme behind primitive vector valued elements, take a look at step-8, 
+				// scheme behind primitive vector valued elements, take a look at step-8 or step-22, 
 				// where these topics are explained in depth. 
         if (fe.system_to_component_index(i).first == 
 	     fe.system_to_component_index(j).first)
         {
 
-				// If both DoFs i and j belong to same component, i.e. their shape functions are 
+				// If both DoFs $i$ and $j$ belong to same component, i.e. their shape functions are 
 				// both $\phi$'s or both $\psi$'s, the contribution will end up in one of the diagonal 
 				// blocks in our system matrix, and since the corresponding entries are computed 
 				// by the same formula, we do not bother if they actually are 
@@ -707,19 +758,18 @@ void UltrasoundProblem<dim>::assemble_system ()
     }
 
 
-				// For DoFs that belong to different components of the system, i.e. one DoF
-				// representing a $\phi$ and the other a $\psi$, a contribution is only 
-				// possible in the off-diagonal blocks of the system matrix. The entries 
-				// in these blocks consist of a boundary integral on $\Gamma_2$, so we 
-				// should first check if the current cell is on the boundary at all, since 
-				// if it is not, its shape functions will certainly not have support on the boundary. 
-    if (cell->at_boundary())
-
-				// If the current cell is at the boundary, we look through its
-				// faces to identify the ones that lie on $\Gamma_2$:
-      for (unsigned int face=0; face<GeometryInfo<dim>::faces_per_cell; ++face)
-        if (cell->face(face)->at_boundary() &&
-            (cell->face(face)->boundary_indicator() == 0) )
+				// We also have to add contributions
+				// due to boundary terms. To this end,
+				// we loop over all faces of the
+				// current cell and see if first it is
+				// at the boundary, and second has the
+				// correct boundary indicator
+				// associated with $\Gamma_2$, the
+				// part of the boundary where we have
+				// absorbing boundary conditions:
+    for (unsigned int face=0; face<GeometryInfo<dim>::faces_per_cell; ++face)
+      if (cell->face(face)->at_boundary() &&
+	  (cell->face(face)->boundary_indicator() == 0) )
         {
 
 
@@ -738,9 +788,18 @@ void UltrasoundProblem<dim>::assemble_system ()
 		   fe.system_to_component_index(j).first) &&
 		  fe.has_support_on_face(i, face) &&
 		  fe.has_support_on_face(j, face))
+				// The check whether shape functions
+				// have support on a face is not
+				// strictly necessary: if we don't
+				// check for it we would simply add up
+				// terms to the local cell matrix that
+				// happen to be zero because at least
+				// one of the shape functions happens
+				// to be zero. However, we can save
+				// that work by adding the checks
+				// above.
 
-
-				// These DoFs will then contribute to the boundary integrals 
+				// In either case, these DoFs will contribute to the boundary integrals 
 				// in the off-diagonal blocks of the system matrix. To compute the 
 				// integral, we loop over all the quadrature points on the face and 
 				// sum up the contribution weighted with the quadrature weights that 
@@ -750,7 +809,7 @@ void UltrasoundProblem<dim>::assemble_system ()
 				// is a $\phi$, since that will determine the sign of the entry. 
 				// We account for this by a simple conditional statement 
 				// that determines the correct sign. Since we already checked 
-				// that DoF i and j belong to different components, so it suffices here
+				// that DoF $i$ and $j$ belong to different components, it suffices here
 				// to test for one of them to which component it belongs.
                 for (unsigned int q_point=0; q_point<n_face_q_points; ++q_point)
                   cell_matrix(i,j) += ((fe.system_to_component_index(i).first) ? -1 : 1) * 
@@ -802,13 +861,6 @@ void UltrasoundProblem<dim>::assemble_system ()
 
 				// @sect4{<code>UltrasoundProblem::solve</code>}
 				
-template <int dim>
-void UltrasoundProblem<dim>::solve ()
-{
-  deallog << "Solving linear system... ";
-  Timer timer;
-  timer.start ();
-
 				// As already mentioned in the introduction, the system matrix 
 				// is neither symmetric nor definite, and so it is not 
 				// quite obvious how to come up with an iterative solver
@@ -825,18 +877,24 @@ void UltrasoundProblem<dim>::solve ()
 				// to have the deal.II library built with UMFPACK support, which 
 				// can be achieved by providing the <code> --with-umfpack</code>
 				// switch to the configure script prior to compilation of the library. 
-  SparseDirectUMFPACK  A_direct;
+template <int dim>
+void UltrasoundProblem<dim>::solve ()
+{
+  deallog << "Solving linear system... ";
+  Timer timer;
+  timer.start ();
 
-				// The <code>initialize</code> call provides the matrix that we would like to invert
+				// The code to solve the linear system is short: First, we allocate an object of the right type. The following <code>initialize</code> call provides the matrix that we would like to invert
 				// to the SparseDirectUMFPACK object, and at the same
 				// time kicks off the LU-decomposition. Hence, this is also the point 
 				// where most of the computational work in this program happens. 
+  SparseDirectUMFPACK  A_direct;
   A_direct.initialize(system_matrix);
 
 				// After the decomposition, we can use <code>A_direct</code> like a matrix representing 
 				// the inverse of our system matrix, so to compute the solution we just have 
 				// to multiply with the right hand side vector:
-  A_direct.vmult(solution,system_rhs);
+  A_direct.vmult (solution, system_rhs);
 
   timer.stop ();
   deallog << "done (" 
@@ -870,18 +928,17 @@ void UltrasoundProblem<dim>::output_results () const
 
   data_out.attach_dof_handler (dof_handler);
 
-				// Next we query the output-related parameters from the ParameterHandler: 
-  prm.enter_subsection("Output parameters");
-
-  const std::string output_file    = prm.get("Output file"),
-		    output_format  = prm.get("Output format");
-
+				// Next we query the output-related parameters from the ParameterHandler.
 				// The DataOut::parse_parameters call acts as a counterpart to the  
 				// DataOutInterface<1>::declare_parameters call in 
 				// <code>ParameterReader::declare_parameters</code>. It collects all 
 				// the output format related parameters from the ParameterHandler
 				// and sets the corresponding properties of the 
 				// DataOut object accordingly. 
+  prm.enter_subsection("Output parameters");
+
+  const std::string output_file    = prm.get("Output file"),
+		    output_format  = prm.get("Output format");
   data_out.parse_parameters(prm);
 
   prm.leave_subsection ();
@@ -913,7 +970,12 @@ void UltrasoundProblem<dim>::output_results () const
 				// which effectively adds $|u|$ to the output data:
   data_out.add_data_vector (solution, intensities);
 
-				// The last steps are as before: 
+				// The last steps are as before. Note
+				// that the actual output format is
+				// now determined by what is stated in
+				// the input file, i.e. one can change
+				// the output format without having to
+				// re-compile this program:
   data_out.build_patches ();
   data_out.write (output, format);
 
@@ -941,26 +1003,29 @@ void UltrasoundProblem<dim>::run ()
 
 				// @sect4{The <code>main</code> function}
 
-				// Finally the <code>main</code> function of the program: 
+				// Finally the <code>main</code>
+				// function of the program. It has the
+				// same structure as in almost all of
+				// the other tutorial programs. The
+				// only exception is that we define
+				// ParameterHandler and
+				// <code>ParameterReader</code>
+				// objects, and let the latter read in
+				// the parameter values from a
+				// textfile called
+				// <code>step-29.prm</code>. The
+				// values so read are then handed over
+				// to an instance of the
+				// UltrasoundProblem class:
 int main () 
 {
   try
   {
-				// In 1D, the description of the domain
-				// and the boundary conditions is not very sensible, so
-				// exclude this case:
-    Assert (DIM > 1, ExcNotImplemented());
-
-				// Next define ParameterHandler and <code>ParameterReader</code> objects, 
-				// and let the latter read in the parameter values from 
-				// a textfile called <code>step-29.prm</code>:
     ParameterHandler  prm;
     ParameterReader   param(prm);
     param.read_parameters("step-29.prm");
 
-				// Lastly, we instantiate our main class with the ParameterHandler
-				// object and start the computations:
-    UltrasoundProblem<DIM>  ultrasound_problem (prm);
+    UltrasoundProblem<2>  ultrasound_problem (prm);
     ultrasound_problem.run ();
   }
   catch (std::exception &exc)
