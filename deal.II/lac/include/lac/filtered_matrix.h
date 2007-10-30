@@ -209,6 +209,133 @@ template <class VECTOR>
 class FilteredMatrix : public Subscriptor
 {
   public:
+        class const_iterator;
+    
+				     /**
+				      * Accessor class for iterators
+				      */
+    class Accessor
+    {
+					 /**
+					  * Constructor. Since we use
+					  * accessors only for read
+					  * access, a const matrix
+					  * pointer is sufficient.
+					  */
+	Accessor (const FilteredMatrix<VECTOR> *matrix,
+		  const unsigned int index);
+
+      public:
+					 /**
+					  * Row number of the element
+					  * represented by this
+					  * object.
+					  */
+	unsigned int row() const;
+
+					 /**
+					  * Column number of the
+					  * element represented by
+					  * this object.
+					  */
+	unsigned int column() const;
+
+					 /**
+					  * Value of the right hand
+					  * side for this row.
+					  */
+	double value() const;
+	
+      private:
+					 /**
+					  * Advance to next entry
+					  */
+	void advance ();
+	
+					 /**
+					  * The matrix accessed.
+					  */
+	const FilteredMatrix<VECTOR>* matrix;
+
+					 /**
+					  * Current row number.
+					  */
+	unsigned int index;
+					 /*
+					  * Make enclosing class a
+					  * friend.
+					  */
+	friend class const_iterator;
+    };
+
+				     /**
+				      * STL conforming iterator.
+				      */
+    class const_iterator
+    {
+      public:
+                                         /**
+                                          * Constructor.
+                                          */ 
+	const_iterator(const FilteredMatrix<VECTOR> *matrix,
+		       const unsigned int index);
+	  
+                                         /**
+                                          * Prefix increment.
+                                          */
+	const_iterator& operator++ ();
+
+                                         /**
+                                          * Postfix increment.
+                                          */
+	const_iterator& operator++ (int);
+
+                                         /**
+                                          * Dereferencing operator.
+                                          */
+	const Accessor& operator* () const;
+
+                                         /**
+                                          * Dereferencing operator.
+                                          */
+	const Accessor* operator-> () const;
+
+                                         /**
+                                          * Comparison. True, if
+                                          * both iterators point to
+                                          * the same matrix
+                                          * position.
+                                          */
+	bool operator == (const const_iterator&) const;
+                                         /**
+                                          * Inverse of <tt>==</tt>.
+                                          */
+	bool operator != (const const_iterator&) const;
+
+                                         /**
+                                          * Comparison operator. Result is
+                                          * true if either the first row
+                                          * number is smaller or if the row
+                                          * numbers are equal and the first
+                                          * index is smaller.
+                                          */
+	bool operator < (const const_iterator&) const;
+
+                                         /**
+                                          * Comparison operator. Compares just
+                                          * the other way around than the
+                                          * operator above.
+                                          */
+	bool operator > (const const_iterator&) const;
+        
+      private:
+                                         /**
+                                          * Store an object of the
+                                          * accessor class.
+                                          */
+        Accessor accessor;
+    };
+
 				     /**
 				      * Typedef defining a type that
 				      * represents a pair of degree of
@@ -216,7 +343,11 @@ class FilteredMatrix : public Subscriptor
 				      * shall have.
 				      */
     typedef std::pair<unsigned int, double> IndexValuePair;
-
+    
+/**
+ * @name Constructors and initialization
+ */
+//@{
 				     /**
 				      * Default constructor. You will
 				      * have to set the matrix to be
@@ -273,6 +404,19 @@ class FilteredMatrix : public Subscriptor
     template <class MATRIX>
     void initialize (const MATRIX &m,
 		     bool expect_constrained_source = false);
+
+//@}
+/**
+ * @name Managing constraints
+ */
+//@{
+				     /**
+				      * Add the constraint that the
+				      * value with index <tt>i</tt>
+				      * should have the value
+				      * <tt>v</tt>.
+				      */
+    void add_constraint (const unsigned int i, const double v);
     
 				     /**
 				      * Add a list of constraints to
@@ -289,7 +433,7 @@ class FilteredMatrix : public Subscriptor
 				      * @p std::vector of
 				      * IndexValuePair objects,
 				      * but also a
-				      * <tt>std::map<unsigned,value_type></tt>.
+				      * <tt>std::map<unsigned, double></tt>.
 				      *
 				      * The second component of these
 				      * pairs will only be used in
@@ -306,13 +450,17 @@ class FilteredMatrix : public Subscriptor
 				      */
     template <class ConstraintList>
     void add_constraints (const ConstraintList &new_constraints);
-
+    
 				     /**
 				      * Delete the list of constraints
 				      * presently in use.
 				      */
     void clear_constraints ();
-
+//@}
+/**
+ * Vector operations
+ */
+//@{
 				     /**
 				      * Apply the constraints to a
 				      * right hand side vector. This
@@ -394,7 +542,23 @@ class FilteredMatrix : public Subscriptor
 				      */
     void Tvmult_add (VECTOR       &dst,
 		     const VECTOR &src) const;
-  
+//@}
+
+/**
+ * @name Iterators
+ */
+//@{
+				     /**
+				      * Iterator to the first
+				      * constraint.
+				      */
+    const_iterator begin () const;
+				     /**
+				      * Final iterator.
+				      */
+    const_iterator end () const;
+//@}
+    
 				     /**
 				      * Determine an estimate for the
 				      * memory consumption (in bytes)
@@ -514,10 +678,152 @@ class FilteredMatrix : public Subscriptor
 				      */
     void post_filter (const VECTOR &in,
 		      VECTOR       &out) const;
+    
+    friend class Accessor;
 };
 
 /*@}*/
 /*---------------------- Inline functions -----------------------------------*/
+
+
+//--------------------------------Iterators--------------------------------------//
+
+template<class VECTOR>
+inline
+FilteredMatrix<VECTOR>::Accessor::Accessor(
+  const FilteredMatrix<VECTOR> *matrix,
+  const unsigned int index)
+		:
+		matrix(matrix),
+		index(index)
+{
+  Assert (index <= matrix->constraints.size(),
+	  ExcIndexRange(index, 0, matrix->constraints.size()));
+}
+
+
+
+template<class VECTOR>
+inline
+unsigned int
+FilteredMatrix<VECTOR>::Accessor::row() const
+{
+  return matrix->constraints[index].first;
+}
+
+
+
+template<class VECTOR>
+inline
+unsigned int
+FilteredMatrix<VECTOR>::Accessor::column() const
+{
+  return matrix->constraints[index].first;
+}
+
+
+
+template<class VECTOR>
+inline
+double
+FilteredMatrix<VECTOR>::Accessor::value() const
+{
+  return matrix->constraints[index].second;
+}
+
+
+
+template<class VECTOR>
+inline
+void
+FilteredMatrix<VECTOR>::Accessor::advance()
+{
+  Assert (index < matrix->constraints.size(), ExcIteratorPastEnd());
+  ++index;
+}
+
+
+
+
+template<class VECTOR>
+inline
+FilteredMatrix<VECTOR>::const_iterator::const_iterator(
+  const FilteredMatrix<VECTOR> *matrix,
+  const unsigned int index)
+		:
+		accessor(matrix, index)
+{}
+
+
+
+template<class VECTOR>
+inline
+typename FilteredMatrix<VECTOR>::const_iterator&
+FilteredMatrix<VECTOR>::const_iterator::operator++ ()
+{
+  accessor.advance();
+  return *this;
+}
+
+
+template <typename number>
+inline
+const typename FilteredMatrix<number>::Accessor &
+FilteredMatrix<number>::const_iterator::operator* () const
+{
+  return accessor;
+}
+
+
+template <typename number>
+inline
+const typename FilteredMatrix<number>::Accessor *
+FilteredMatrix<number>::const_iterator::operator-> () const
+{
+  return &accessor;
+}
+
+
+template <typename number>
+inline
+bool
+FilteredMatrix<number>::const_iterator::
+operator == (const const_iterator& other) const
+{
+  return (accessor.index == other.accessor.index
+	  && accessor.matrix == other.accessor.matrix);
+}
+
+
+template <typename number>
+inline
+bool
+FilteredMatrix<number>::const_iterator::
+operator != (const const_iterator& other) const
+{
+  return ! (*this == other);
+}
+
+
+
+//------------------------------- FilteredMatrix ---------------------------------------//
+
+template <typename number>
+inline
+typename FilteredMatrix<number>::const_iterator
+FilteredMatrix<number>::begin () const
+{
+  return const_iterator(this, 0);
+}
+
+
+template <typename number>
+inline
+typename FilteredMatrix<number>::const_iterator
+FilteredMatrix<number>::end () const
+{
+  return const_iterator(this, constraints.size());
+}
 
 
 template <class VECTOR>
@@ -585,6 +891,18 @@ FilteredMatrix<VECTOR>::operator = (const FilteredMatrix &fm)
   expect_constrained_source = fm.expect_constrained_source;
   constraints = fm.constraints;
   return *this;
+}
+
+
+
+template <class VECTOR>
+inline
+void
+FilteredMatrix<VECTOR>::
+add_constraint (const unsigned int index, const double value)
+{
+				   // add new constraint to end
+  constraints.push_back(IndexValuePair(index, value));
 }
 
 
@@ -670,10 +988,10 @@ FilteredMatrix<VECTOR>::post_filter (const VECTOR &in,
 {
     // iterate over all constraints and
     // set value correctly
-    const_index_value_iterator       i = constraints.begin();
+  const_index_value_iterator       i = constraints.begin();
     const const_index_value_iterator e = constraints.end();
     for (; i!=e; ++i)
-	out(i->first) = in(i->first);
+      out(i->first) = in(i->first);
 }
 
 
@@ -697,9 +1015,12 @@ FilteredMatrix<VECTOR>::vmult (VECTOR& dst, const VECTOR& src) const
       tmp_mutex.release ();
     }
   else
-    matrix->vmult (dst, src);
-    // finally do post-filtering
-    post_filter (src, dst);
+    {
+      matrix->vmult (dst, src);
+    }
+  
+				   // finally do post-filtering
+  post_filter (src, dst);
 }
 
 
@@ -723,7 +1044,10 @@ FilteredMatrix<VECTOR>::Tvmult (VECTOR& dst, const VECTOR& src) const
       tmp_mutex.release ();
     }
   else
-    matrix->Tvmult (dst, src);  
+    {
+      matrix->Tvmult (dst, src);
+    }
+  
 				   // finally do post-filtering
   post_filter (src, dst);
 }
@@ -749,9 +1073,12 @@ FilteredMatrix<VECTOR>::vmult_add (VECTOR& dst, const VECTOR& src) const
       tmp_mutex.release ();
     }
   else
-    matrix->vmult_add (dst, src);
-    // finally do post-filtering
-    post_filter (src, dst);
+    {
+      matrix->vmult_add (dst, src);
+    }
+  
+				   // finally do post-filtering
+  post_filter (src, dst);
 }
 
 
@@ -775,7 +1102,10 @@ FilteredMatrix<VECTOR>::Tvmult_add (VECTOR& dst, const VECTOR& src) const
       tmp_mutex.release ();
     }
   else
-    matrix->Tvmult_add (dst, src);  
+    {
+      matrix->Tvmult_add (dst, src);
+    }
+  
 				   // finally do post-filtering
   post_filter (src, dst);
 }

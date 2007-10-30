@@ -147,6 +147,69 @@ class ProductMatrix : public PointerMatrixBase<VECTOR>
 
 
 /**
+ * A matrix that is the scaled version of another matrix.
+ *
+ * Matrix-vector products of this matrix are composed of those of the
+ * original matrix and scaling by a constant factor.
+ *
+ * @author Guido Kanschat, 2007
+ */
+template<class VECTOR>
+class ScaledMatrix : public Subscriptor
+{
+  public:
+				     /**
+				      * Constructor leaving an
+				      * uninitialized object.
+				      */
+    ScaledMatrix ();
+				     /**
+				      * Constructor with initialization.
+				      */
+    template <class MATRIX>
+    ScaledMatrix (const MATRIX& M, const double factor);
+
+				     /**
+				      * Destructor
+				      */
+    ~ScaledMatrix ();
+				     /**
+				      * Initialize for use with a new
+				      * matrix and factor.
+				      */
+    template <class MATRIX>
+    void initialize (const MATRIX& M, const double factor);
+
+   				     /**
+				      * Delete internal matrix pointer.
+				      */
+    void clear ();
+    
+				     /**
+				      * Matrix-vector product.
+				      */
+    void vmult (VECTOR& w, const VECTOR& v) const;
+    
+				     /**
+				      * Tranposed matrix-vector
+				      * product.
+				      */
+    void Tvmult (VECTOR& w, const VECTOR& v) const;
+    
+  private:
+				     /**
+				      * The matrix.
+				      */
+    PointerMatrixBase<VECTOR>* m;
+				     /**
+				      * The scaling factor;
+				      */
+    double factor;
+};
+
+
+
+/**
  * Poor man's matrix product of two sparse matrices. Stores two
  * matrices #m1 and #m2 of arbitrary type SparseMatrix and implements
  * matrix-vector multiplications for the product
@@ -436,6 +499,81 @@ class InverseMatrixRichardson : public Subscriptor
 
 
 /*@}*/
+//---------------------------------------------------------------------------
+
+
+template<class VECTOR>
+inline
+ScaledMatrix<VECTOR>::ScaledMatrix()
+		:
+		m(0)
+{}
+
+
+
+template<class VECTOR>
+template<class MATRIX>
+inline
+ScaledMatrix<VECTOR>::ScaledMatrix(const MATRIX& mat, const double factor)
+		:
+		m(new_pointer_matrix_base(mat, VECTOR())),
+		factor(factor)
+{}
+
+
+
+template<class VECTOR>
+template<class MATRIX>
+inline
+void
+ScaledMatrix<VECTOR>::initialize(const MATRIX& mat, const double f)
+{
+  if (m) delete m;
+  m = new_pointer_matrix_base(mat, VECTOR());
+  factor = f;
+}
+
+
+
+template<class VECTOR>
+inline
+void
+ScaledMatrix<VECTOR>::clear()
+{
+  if (m) delete m;
+  m = 0;
+}
+
+
+
+template<class VECTOR>
+inline
+ScaledMatrix<VECTOR>::~ScaledMatrix()
+{
+  clear ();
+}
+
+
+template<class VECTOR>
+inline
+void
+ScaledMatrix<VECTOR>::vmult (VECTOR& w, const VECTOR& v) const
+{
+  m->vmult(w, v);
+  w *= factor;
+}
+
+
+template<class VECTOR>
+inline
+void
+ScaledMatrix<VECTOR>::Tvmult (VECTOR& w, const VECTOR& v) const
+{
+  m->Tvmult(w, v);
+  w *= factor;
+}
+
+
 //---------------------------------------------------------------------------
 
 template<class VECTOR>
