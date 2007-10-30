@@ -135,7 +135,20 @@ inconvenience this causes.
 <h3>lac</h3>
 
 <ol>
-  <li>
+
+<li> New: A class ScaledMatrix was introduced which combines the vector operations of
+an underlying matrix with a scaling.
+<br>
+(GK 2007/10/30)
+</li>
+
+<li> Improved: FilteredMatrix has an iterator now that allows users to access the
+constraints individually.
+<br>
+(GK 2007/10/30)
+</li>
+
+
 </ol>
 
 
