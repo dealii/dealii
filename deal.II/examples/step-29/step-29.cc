@@ -1,4 +1,4 @@
-/* $Id: step-22.cc 15365 2007-10-22 19:12:50Z bangerth $ */
+/* $Id$ */
 /* Author: Moritz Allmaras, Texas A&M University, 2007 */
 
 /*                                                                */
