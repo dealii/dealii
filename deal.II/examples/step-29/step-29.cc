@@ -428,7 +428,7 @@ ComputeIntensity<dim>::compute_derived_quantities_vector (
 
 				// Finally here is the main class of this program. 
 				// It's member functions are very similar to the previous 
-				// examples, in particular @ref step_4 "step-4", and the list
+				// examples, in particular step-4, and the list
 				// of member variables does not contain 
 				// any major surprises either.  
 				// The ParameterHandler object that is passed 
