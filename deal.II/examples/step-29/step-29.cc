@@ -62,10 +62,11 @@
 				// are provided in this header file:
 #include <fe/fe_system.h>
 
-				// The last header is from the C++ standard library and provides
-				// functions that will allow us to measure execution time
-				// of various parts of our program:
-#include <ctime>
+				// Finally, include the header file that declares the
+				// Timer class that we will use to determine how
+				// much time each of the operations of our program
+				// takes:
+#include <base/timer.h>
 
 				// Although we'll follow good deal.ii practice and keep 
 				// all of the code dimension independent, we will 
@@ -73,13 +74,6 @@
 #define DIM 2
 
 using namespace dealii;
-
-				// The next line provides a shorthand to the CLOCKS_PER_SEC 
-				// constant, which is defined in the <code>ctime</code> header
-				// and contains the number of processor ticks in each second. 
-				// Henceforth we can compute actual time from ticks by simply dividing
-				// by tps. 
-const double tps = CLOCKS_PER_SEC;
 
 
 				// @sect3{The <code>DirichletBoundaryValues</code> class}
@@ -455,10 +449,11 @@ template <int dim>
 void UltrasoundProblem<dim>::make_grid ()
 {
 				// First we generate some logging output 
-				// and store the current number of ticks to be able to 
+				// and start a timer so we can
 				// compute execution time when this function is done:
   deallog << "Generating grid... ";
-  clock_t start = clock();
+  Timer timer;
+  timer.start ();
 
 				// Then we query the values for the focal distance of the 
 				// transducer lens and the number of mesh refinement steps 
@@ -530,18 +525,12 @@ void UltrasoundProblem<dim>::make_grid ()
 				// and we don't want the triangulation to keep a hanging pointer. 
   triangulation.set_boundary(1);
 
-				// Lastly, we generate some more logging output. By querying 
-				// the present number of ticks again and comparing to 
-				// what we had at the beginning of the function, we can 
-				// calculate execution time by dividing by tps. 
-				// Note that the resolution of the <code>clock()</code> function 
-				// is implementation depended, and also the <code>clock_t</code> values 
-				// it returns may overflow, so this way of measuring execution 
-				// time should be taken with a grain of salt as it may not 
-				// be very accurate and even completely wrong for longer timespans:
-  clock_t end = clock();
+				// Lastly, we generate some more logging output. We stop
+				// the timer and query the number of CPU seconds 
+				// elapsed since the beginning of the function:
+  timer.stop ();
   deallog << "done (" 
-	  << (end - start) / tps 
+	  << timer()
 	  << "s)" 
 	  << std::endl;
 
@@ -552,14 +541,18 @@ void UltrasoundProblem<dim>::make_grid ()
 
 
 				// @sect4{<code>UltrasoundProblem::setup_system</code>}
+				//
 				// Initialization of the system matrix, sparsity patterns 
 				// and vectors are the same as in previous examples
-				// and therefore do not need further comment:
+				// and therefore do not need further comment. As in the
+				// previous function, we also output the run time of
+				// what we do here:
 template <int dim>
 void UltrasoundProblem<dim>::setup_system ()
 {
   deallog << "Setting up system... ";
-  clock_t start = clock();
+  Timer timer;
+  timer.start();
 
   dof_handler.distribute_dofs (fe);
 
@@ -574,9 +567,9 @@ void UltrasoundProblem<dim>::setup_system ()
   system_rhs.reinit (dof_handler.n_dofs());
   solution.reinit (dof_handler.n_dofs());
 
-  clock_t end = clock();
+  timer.stop ();
   deallog << "done (" 
-	  << (end - start) / tps 
+	  << timer()
 	  << "s)" 
 	  << std::endl;
 
@@ -593,7 +586,8 @@ template <int dim>
 void UltrasoundProblem<dim>::assemble_system () 
 {
   deallog << "Assembling system matrix... ";
-  clock_t start = clock();
+  Timer timer;
+  timer.start ();
 
 				// First we query wavespeed and frequency from the 
 				// ParameterHandler object and store them in local variables, 
@@ -797,9 +791,9 @@ void UltrasoundProblem<dim>::assemble_system ()
 				      solution,
 				      system_rhs);
 
-  clock_t end = clock();
+  timer.stop ();
   deallog << "done (" 
-	  << (end - start) / tps 
+	  << timer()
 	  << "s)" 
 	  << std::endl;
 }
@@ -812,7 +806,8 @@ template <int dim>
 void UltrasoundProblem<dim>::solve ()
 {
   deallog << "Solving linear system... ";
-  clock_t start = clock();
+  Timer timer;
+  timer.start ();
 
 				// As already mentioned in the introduction, the system matrix 
 				// is neither symmetric nor definite, and so it is not 
@@ -843,9 +838,9 @@ void UltrasoundProblem<dim>::solve ()
 				// to multiply with the right hand side vector:
   A_direct.vmult(solution,system_rhs);
 
-  clock_t end = clock();
+  timer.stop ();
   deallog << "done (" 
-	  << (end - start) / tps 
+	  << timer ()
 	  << "s)" 
 	  << std::endl;
 }
@@ -865,7 +860,8 @@ template <int dim>
 void UltrasoundProblem<dim>::output_results () const
 {
   deallog << "Generating output... ";
-  clock_t start = clock();
+  Timer timer;
+  timer.start ();
 
 				// Define objects of our <code>ComputeIntensity</code> class and a DataOut
 				// object:
@@ -921,10 +917,10 @@ void UltrasoundProblem<dim>::output_results () const
   data_out.build_patches ();
   data_out.write (output, format);
 
-  clock_t end = clock();
+  timer.stop ();
   deallog << "done (" 
-	  << (end - start) / tps 
-	  << "s)" 
+	  << timer()
+	  << "s)"
 	  << std::endl;
 }
 
