@@ -2,7 +2,7 @@
 //    $Id$
 //    Version: $Name$
 //
-//    Copyright (C) 1998, 1999, 2000, 2001, 2002, 2003, 2004, 2005, 2006 by the deal.II authors
+//    Copyright (C) 1998, 1999, 2000, 2001, 2002, 2003, 2004, 2005, 2006, 2007 by the deal.II authors
 //
 //    This file is subject to QPL and may not be  distributed
 //    without copyright and license information. Please refer
@@ -46,7 +46,8 @@ DEAL_II_NAMESPACE_OPEN
  *
  * Alternatively, you can also restart the timer instead of resetting
  * it. The times between successive calls to start()/ stop() will then be
- * accumulated.
+ * accumulated. The usage of this class is also explained in the
+ * @ref step_12 "step-12" and @ref step_29 "step-29" tutorial programs.
  *
  * @note Implementation of this class is system
  * dependent. Unfortunately, it does not work with multithreading
