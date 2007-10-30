@@ -33,8 +33,8 @@
  * prepared by DoFRenumbering::block_wise().
  *
  * Originally, this concept was intermixed with the idea of the vector
- * @ref GlossComponent "component". Since the introduction of non-@ref
- * GlossPrimitive "primitive" elements, they became different. Take
+ * @ref GlossComponent "component". Since the introduction of
+ * non-@ref GlossPrimitive "primitive" elements, they became different. Take
  * for instance the solution of the mixed Laplacian system with
  * FE_RaviartThomas. There, the first <tt>dim</tt> components are the
  * directional derivatives. Since the shape functions are linear
