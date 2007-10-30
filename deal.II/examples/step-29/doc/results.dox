@@ -1,58 +1,164 @@
 <a name="Results"></a>
 <h1>Results</h1>
 
-The parameter file that comes with the tutorial code sets
-d=0.3, which amounts to a focus of the transducer lens 
-at x=0.5, y=0.3. The coarse mesh is refined 5 times, 
+The current program reads its run-time parameters from an input file
+called <code>step-29.prm</code> that looks like this:
+@code
+subsection Mesh & geometry parameters
+  # Distance of the focal point of the lens to the x-axis
+  set Focal distance        = 0.3
+
+  # Number of global mesh refinement steps applied to initial coarse grid
+  set Number of refinements = 5
+end
+
+
+subsection Physical constants
+  # Wave speed
+  set c     = 1.5e5
+
+  # Frequency
+  set omega = 3.0e7
+end
+
+
+subsection Output parameters
+  # Name of the output file (without extension)
+  set Output file   = solution
+
+  # A name for the output format to be used
+  set Output format = gmv
+end
+@endcode
+
+As can be seen, we set
+$d=0.3$, which amounts to a focus of the transducer lens 
+at $x=0.5$, $y=0.3$. The coarse mesh is refined 5 times, 
 resulting in 160x160 cells, and the output is written in gmv 
-format.
+format. The parameter reader understands many more parameters
+pertaining in particular to the generation of output, see the
+explanation in @ref step_19 "step-19", but we need none of these
+parameters here and therefore stick with their default values.
 
 Here's the console output of the program in debug mode: 
 
 @code 
 examples/step-29> make run
 ============================ Running step-29
-DEAL::Generating grid... done (1.34000s)
+DEAL::Generating grid... done (1.11607s)
 DEAL::  Number of active cells:  25600
-DEAL::Setting up system... done (1.17000s)
+DEAL::Setting up system... done (1.10807s)
 DEAL::  Number of degrees of freedom: 51842
-DEAL::Assembling system matrix... done (7.52000s)
-DEAL::Solving linear system... done (4.43000s)
-DEAL::Generating output... done (5.94000s)
+DEAL::Assembling system matrix... done (6.50841s)
+DEAL::Solving linear system... done (2.89218s)
+DEAL::Generating output... done (4.52428s)
 @endcode
 
 (Of course, execution times will differ if you run the program 
 locally.) The fact that most of the time is spent on assembling 
-the system matrix and generating output is due to some extra checks 
-done in debug mode, in optimized mode these parts of the program  
-run much faster: 
+the system matrix and generating output is due to the many assertion
+that need to be checked in debug mode. In optimized mode these parts
+of the program run much faster whereas solving the linear system is
+hardly sped up at all: 
 
 @code
-examples/step-29> make run
 ============================ Running step-29
-DEAL::Generating grid... done (0.0500000s)
+DEAL::Generating grid... done (0.0280020s)
 DEAL::  Number of active cells:  25600
-DEAL::Setting up system... done (0.170000s)
+DEAL::Setting up system... done (0.112007s)
 DEAL::  Number of degrees of freedom: 51842
-DEAL::Assembling system matrix... done (0.370000s)
-DEAL::Solving linear system... done (3.65000s)
-DEAL::Generating output... done (1.23000s)
+DEAL::Assembling system matrix... done (0.160010s)
+DEAL::Solving linear system... done (2.21614s)
+DEAL::Generating output... done (0.880055s)
 @endcode
 
 The graphical output of the program looks as follows: 
 
 
-@image html step-29.v.png "v = Re(u)" width=5cm
+<table align="center" border="1" cellspacing="3" cellpadding="3">
+  <tr>
+    <td>
+      @image html step-29.v.png "v = Re(u)" width=4cm
+    </td>
+    <td>
+      @image html step-29.w.png "w = Im(u)" width=4cm
+    </td>
+  </tr>
 
-@image html step-29.w.png "w = Im(u)" width=5cm
+  <tr>
+    <td colspan="2">
+      @image html step-29.intensity.png "|u|" width=4cm
+    </td>
+  </tr>
+</table>
 
-@image html step-29.intensity.png "|u|" width=5cm
-
-The first two picturse show the real and imaginary parts of 
+The first two pictures show the real and imaginary parts of 
 $u$, whereas the last shows the intensity $|u|$. One can clearly 
 see that the intensity is focussed around the focal point of the 
 lens (0.5, 0.3), and that the focus 
-is rather sharp in x-direction but more blurred in y-direction, which is a 
-consequence of the geometry and the wave nature of the problem. 
+is rather sharp in $x$-direction but more blurred in $y$-direction, which is a 
+consequence of the geometry of the focusing lens, its finite aperture,
+and the wave nature of the problem. 
+
+Because colorful graphics are always fun, and to stress the focusing
+effects some more, here is another set of images highlighting how well
+the intensity is actually focused in $x$-direction:
+
+<table align="center" border="1" cellspacing="3" cellpadding="3">
+  <tr>
+    <td>
+      @image html step-29.surface.png "|u|" width=4cm
+    </td>
+    <td>
+      @image html step-29.contours.png "|u|" width=4cm
+    </td>
+  </tr>
+</table>
 
 
+As a final note, the structure of the program makes it easy to
+determine which parts of the program scale nicely as the mesh is
+refined and which parts don't. Here are the run times for 5, 6, and 7
+global refinements:
+
+@code
+DEAL::Generating grid... done (0.0320020s)
+DEAL::  Number of active cells:  25600
+DEAL::Setting up system... done (0.104006s)
+DEAL::  Number of degrees of freedom: 51842
+DEAL::Assembling system matrix... done (0.164011s)
+DEAL::Solving linear system... done (2.23214s)
+DEAL::Generating output... done (0.900056s)
+
+DEAL::Generating grid... done (0.132009s)
+DEAL::  Number of active cells:  102400
+DEAL::Setting up system... done (0.408025s)
+DEAL::  Number of degrees of freedom: 206082
+DEAL::Assembling system matrix... done (0.656041s)
+DEAL::Solving linear system... done (14.8849s)
+DEAL::Generating output... done (3.57222s)
+
+DEAL::Generating grid... done (0.504031s)
+DEAL::  Number of active cells:  409600
+DEAL::Setting up system... done (1.72011s)
+DEAL::  Number of degrees of freedom: 821762
+DEAL::Assembling system matrix... done (2.63216s)
+DEAL::Solving linear system... done (117.811s)
+DEAL::Generating output... done (15.1489s)
+@endcode
+
+Each time we refine the mesh once, so the number of cells and degrees
+of freedom roughlt quadruples from each step to the next. As can be seen, 
+generating the grid, setting up degrees of freedom, assembling the
+linear system, and generating output scale pretty closely to linear,
+whereas solving the linear system is an operation that requires 8
+times more time each time the number of degrees of freedom is
+increased by a factor of 4, i.e. it is ${\cal O}(N^{3/2})$. This can
+be explained by the fact that (using optimal ordering) the
+bandwidth of a finite element matrix is $B={\cal O}(N^{(dim-1)/dim})$,
+and the effort to solve a banded linear system using LU decomposition
+is ${\cal O}(BN)$. This also explains why the program does run in 3d
+as well (after changing the dimension on the
+<code>UltrasoundProblem</code> object), but scales very badly and
+takes extraordinate patience before it finishes solving the linear
+system. 
