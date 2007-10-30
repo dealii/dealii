@@ -2,7 +2,7 @@
 //    $Id$
 //    Version: $Name$
 //
-//    Copyright (C) 2001, 2002, 2003, 2004, 2005, 2006 by the deal.II authors
+//    Copyright (C) 2001, 2002, 2003, 2004, 2005, 2006, 2007 by the deal.II authors
 //
 //    This file is subject to QPL and may not be  distributed
 //    without copyright and license information. Please refer
@@ -1003,12 +1003,15 @@ class SparseDirectMA47 : public Subscriptor
 
 
 /**
- * This class provides an interface to the sparse direct solver UMFPACK (see
- * <a href="http://www.cise.ufl.edu/research/sparse/umfpack">this
- * link</a>). UMFPACK is a set of routines for solving non-symmetric sparse
- * linear systems, Ax=b, using the Unsymmetric-pattern MultiFrontal method and
- * direct sparse LU factorization. Matrices may have symmetric or unsymmetrix
- * sparsity patterns, and may have unsymmetric entries.
+ * This class provides an interface to the sparse direct solver
+ * UMFPACK (see <a
+ * href="http://www.cise.ufl.edu/research/sparse/umfpack">this
+ * link</a>). UMFPACK is a set of routines for solving non-symmetric
+ * sparse linear systems, Ax=b, using the Unsymmetric-pattern
+ * MultiFrontal method and direct sparse LU factorization. Matrices
+ * may have symmetric or unsymmetrix sparsity patterns, and may have
+ * unsymmetric entries. The use of this class is explained in the @ref
+ * step_29 "step-29" tutorial program.
  *
  * This matrix class implements the usual interface of
  * preconditioners, that is a function initialize(const
