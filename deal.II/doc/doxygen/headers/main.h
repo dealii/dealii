@@ -18,8 +18,9 @@
  *
  * This is the main page for class and function documentation in
  * deal.II. Documentation on other aspects of deal.II can be found
- * elsewhere. In particular, there are tutorial programs on the use of this
- * library.
+ * elsewhere. In particular, there are
+ * <a href="../tutorial/index.html">tutorial programs on the use of
+ * this library</a>.
  *
  * Many of the classes in the deal.II library can be grouped into
  * modules (see the <a href="modules.html">Modules page</a> or the
@@ -36,8 +37,8 @@
  * <ol>
  * 
  *   <li> <b>Unit cell</b>: deal.II supports only hypercubes as unit
- *   cells, i.e. the unit cell [0,1] in 1d, the unit square [0,1]^2 in
- *   2d, and the unit cube [0,1]^3 in 3d. We do not support triangles,
+ *   cells, i.e. the unit cell $[0,1]$ in 1d, the unit square $[0,1]^2$ in
+ *   2d, and the unit cube $[0,1]^3$ in 3d. We do not support triangles,
  *   tetrahedra, pyramids, or prisms.
  *
  *   Inside the library, most properties of unit cells such as the
@@ -102,7 +103,7 @@
  *
  *   Just as with triangulation objects, most operations on
  *   DoFHandlers is done by looping over all cells and doing something
- *   on each or a subset of them. The interfaces of the two classes is
+ *   on each or a subset of them. The interfaces of the two classes are
  *   therefore rather similar: they allow to get iterators to the
  *   first and last cell (or face, or line, etc) and offer information
  *   through these iterators. The information that can be gotten from
@@ -120,8 +121,8 @@
  *   to its individual cells. It is also ignorant of the shape
  *   functions that correspond to the degrees of freedom it manages:
  *   all it knows is that there are, for example, 2 degrees of freedom
- *   for each vertex and 4 per cell. Nothing about their specifics is
- *   relevant to the DoFHandler class.
+ *   for each vertex and 4 per cell interior. Nothing about their
+ *   specifics is relevant to the DoFHandler class.
  *
  *   The DoFHandler class and its associates are described in the @ref
  *   dofs module. In addition, there are specialized versions that can
@@ -202,7 +203,7 @@
  *   want to postprocess it using a visualization program. This
  *   library doesn't do that by itself, but rather generates output
  *   files in a variety of graphics formats understood by widely
- *   distributed visualization tools.
+ *   available visualization tools.
  *
  *   A description of the classes that do so is given in the @ref
  *   output module.
