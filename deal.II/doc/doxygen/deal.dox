@@ -44,4 +44,5 @@ IMAGE_PATH             = images \
 			 ../../examples/step-25/doc \
 			 ../../examples/step-26/doc \
 			 ../../examples/step-27/doc \
-			 ../../examples/step-28/doc 
+			 ../../examples/step-28/doc \
+			 ../../examples/step-29/doc 
