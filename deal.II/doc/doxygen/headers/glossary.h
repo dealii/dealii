@@ -187,9 +187,19 @@
  * <td>Gauss points on edges(faces) and anisotropic Gauss points in the interior</td></tr>
  * </table>
  *
- * <dt class="glossary">@anchor GlossPrimitive Primitive finite elements</dt>
- * <dd>Finite element shape function sets with a unique relation from
- * shape function number to vector @ref GlossComponent "component".</dd>
+ * <dt class="glossary">@anchor GlossPrimitive Primitive finite
+ * elements</dt> <dd>Finite element shape function sets with a unique
+ * relation from shape function number to vector @ref GlossComponent
+ * "component". What this means is that each shape function of a
+ * vector-valued element has exactly one-nonzero component if an
+ * element is primitive. This includes, in particular, all scalar
+ * elements as well as vector-valued elements assembled via the
+ * FESystem class from other primitive (for example scalar) elements
+ * as shown in @ref step_8 "step-8", @ref step_29 "step_29" or @ref
+ * step_22 "step-22". On the other hand, the FE_RaviartThomas and
+ * FE_Nedelec classes provide non-primitive finite elements because
+ * there each vector-value shape function may have several non-zero
+ * components.</dd>
  *
  * <dt class="glossary">@anchor GlossReferenceCell Reference cell</dt>
  * <dd>The hypercube [0,1]<sup>dim</sup>, on which all parametric finite
