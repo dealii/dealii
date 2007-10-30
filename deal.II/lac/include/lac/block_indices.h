@@ -2,7 +2,7 @@
 //    $Id$
 //    Version: $Name$
 //
-//    Copyright (C) 2000, 2001, 2002, 2003, 2004, 2005, 2006 by the deal.II authors
+//    Copyright (C) 2000, 2001, 2002, 2003, 2004, 2005, 2006, 2007 by the deal.II authors
 //
 //    This file is subject to QPL and may not be  distributed
 //    without copyright and license information. Please refer
@@ -30,7 +30,7 @@ DEAL_II_NAMESPACE_OPEN
  * translate global row and column indices to local ones.
  *
  * @ingroup data
- * @author Wolfgang Bangerth, Guido Kanschat, 2000
+ * @author Wolfgang Bangerth, Guido Kanschat, 2000, 2007
  */
 class BlockIndices
 {
@@ -105,11 +105,15 @@ class BlockIndices
     inline unsigned int total_size () const;
 
 				     /**
-				      * Return the size of the @p ith
-				      * block.
+				      * The size of the @p ith block.
 				      */
     unsigned int block_size (const unsigned int i) const;
-      
+
+				     /**
+				      * The start index of the ith block.
+				      */
+    unsigned int block_start (const unsigned int i) const;
+    
 				     /**
 				      * Copy operator.
 				      */
@@ -261,6 +265,16 @@ BlockIndices::block_size (const unsigned int block) const
 {
   Assert (block < n_blocks, ExcIndexRange(block, 0, n_blocks));
   return start_indices[block+1]-start_indices[block];
+}
+
+
+
+inline
+unsigned int
+BlockIndices::block_start (const unsigned int block) const 
+{
+  Assert (block < n_blocks, ExcIndexRange(block, 0, n_blocks));
+  return start_indices[block];
 }
 
 
