@@ -84,9 +84,10 @@ inconvenience this causes.
 <h3>General</h3>
 
 <ol>
-  <li> <p>New: step-29 demonstrates how problems involving complex numbers 
-  can be implemented by viewing real and imaginary parts of a complex-valued 
-  solution as the two components of a vector-valued function. 
+  <li> <p>New: @ref step_29 "step-29" demonstrates how problems involving
+  complex numbers can be implemented by viewing real and imaginary parts
+  of a complex-valued solution as the two components of a vector-valued
+  function. 
   <br>
   (Moritz Allmaras, 2007/10/31)
   </p>
