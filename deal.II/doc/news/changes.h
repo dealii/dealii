@@ -84,7 +84,7 @@ inconvenience this causes.
 <h3>General</h3>
 
 <ol>
-  <li> <p>New: step-27 demonstrates how problems involving complex numbers 
+  <li> <p>New: step-29 demonstrates how problems involving complex numbers 
   can be implemented by viewing real and imaginary parts of a complex-valued 
   solution as the two components of a vector-valued function. 
   <br>
