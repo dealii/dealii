@@ -405,6 +405,11 @@ class FilteredMatrix : public Subscriptor
     void initialize (const MATRIX &m,
 		     bool expect_constrained_source = false);
 
+				     /**
+				      * Delete all constraints and the
+				      * matrix pointer.
+				      */
+    void clear ();
 //@}
 /**
  * @name Managing constraints
@@ -898,8 +903,7 @@ FilteredMatrix<VECTOR>::operator = (const FilteredMatrix &fm)
 template <class VECTOR>
 inline
 void
-FilteredMatrix<VECTOR>::
-add_constraint (const unsigned int index, const double value)
+FilteredMatrix<VECTOR>::add_constraint (const unsigned int index, const double value)
 {
 				   // add new constraint to end
   constraints.push_back(IndexValuePair(index, value));
@@ -911,8 +915,7 @@ template <class VECTOR>
 template <class ConstraintList>
 inline
 void
-FilteredMatrix<VECTOR>::
-add_constraints (const ConstraintList &new_constraints)
+FilteredMatrix<VECTOR>::add_constraints (const ConstraintList &new_constraints)
 {
 				   // add new constraints to end
   const unsigned int old_size = constraints.size();
@@ -938,6 +941,17 @@ FilteredMatrix<VECTOR>::clear_constraints ()
 				   // swap vectors to release memory
   std::vector<IndexValuePair> empty;
   constraints.swap (empty);
+}
+
+
+
+template <class VECTOR>
+inline
+void
+FilteredMatrix<VECTOR>::clear ()
+{
+  clear_constraints();
+  matrix.reset();
 }
 
 
