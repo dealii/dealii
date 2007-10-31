@@ -148,7 +148,7 @@ DEAL::Generating output... done (15.1489s)
 @endcode
 
 Each time we refine the mesh once, so the number of cells and degrees
-of freedom roughlt quadruples from each step to the next. As can be seen, 
+of freedom roughly quadruples from each step to the next. As can be seen, 
 generating the grid, setting up degrees of freedom, assembling the
 linear system, and generating output scale pretty closely to linear,
 whereas solving the linear system is an operation that requires 8

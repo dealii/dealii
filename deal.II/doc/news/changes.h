@@ -84,6 +84,12 @@ inconvenience this causes.
 <h3>General</h3>
 
 <ol>
+  <li> <p>New: step-27 demonstrates how problems involving complex numbers 
+  can be implemented by viewing real and imaginary parts of a complex-valued 
+  solution as the two components of a vector-valued function. 
+  <br>
+  (Moritz Allmaras, 2007/10/31)
+  </p>
 
   <li> <p>Improved: On Mac OS X, the operating system provides for
   "frameworks", which are essentially collections of shared libraries.
@@ -95,7 +101,8 @@ inconvenience this causes.
   or vectorized libraries if they are available.
   <br>
   (Eh Tan, WB 2007/10/22)
-  </p></li>
+  </p>
+
 </ol>
 
 
