@@ -22,6 +22,7 @@
 #include <lac/precondition.h>
 #include <lac/solver_cg.h>
 #include <lac/vector_memory.h>
+#include <lac/filtered_matrix.h>
 #include <grid/tria_iterator.h>
 #include <grid/grid_tools.h>
 #include <dofs/dof_handler.h>
@@ -1689,7 +1690,11 @@ VectorTools::project_boundary_values (const Mapping<dim>       &mapping,
   
   DoFTools::map_dof_to_boundary_indices (dof, selected_boundary_components,
 					 dof_to_boundary_mapping);
-  
+
+				   // Done if no degrees of freedom on
+				   // the boundary
+  if (dof.n_boundary_dofs (boundary_functions) == 0)
+    return;
 				   // set up sparsity structure
   SparsityPattern sparsity(dof.n_boundary_dofs (boundary_functions),
 			   dof.max_couplings_between_boundary_dofs());
@@ -1715,7 +1720,7 @@ VectorTools::project_boundary_values (const Mapping<dim>       &mapping,
   if (dim>=3)
     {
 #ifdef DEBUG
-// Assert that there are no hanging nodes at the boundary
+// Assert that there are no hanging nodes at the boundary      
       int level = -1;
       for (typename DoFHandler<dim>::active_cell_iterator cell = dof.begin_active();
 	   cell != dof.end(); ++cell)
@@ -1745,11 +1750,33 @@ VectorTools::project_boundary_values (const Mapping<dim>       &mapping,
 					      mass_matrix, boundary_functions,
 					      rhs, dof_to_boundary_mapping);
 
-				   // same thing as above: if dim>=3 we need
-				   // to consider constraints
-  Assert (dim<3, ExcNotImplemented());
+				   // For certain weird elements,
+				   // there might be degrees of
+				   // freedom on the boundary, but
+				   // their shape functions do not
+				   // have support there. Let's
+				   // eliminate them here.
 
+//TODO: Maybe we should figure out ith the element really needs this
+  
+  FilteredMatrix<Vector<double> > filtered_mass_matrix(mass_matrix, true);
+  FilteredMatrix<Vector<double> > filtered_precondition;
+  std::vector<bool> excluded_dofs(mass_matrix.m(), false);
 
+  double max_element = 0.;
+  for (unsigned int i=0;i<mass_matrix.m();++i)
+    if (mass_matrix.diag_element(i) > max_element)
+      max_element = mass_matrix.diag_element(i);
+  
+  for (unsigned int i=0;i<mass_matrix.m();++i)
+    if (mass_matrix.diag_element(i) < 1.e-8 * max_element)
+      {
+	filtered_mass_matrix.add_constraint(i, 0.);
+	filtered_precondition.add_constraint(i, 0.);
+	mass_matrix.diag_element(i) = 1.;
+	excluded_dofs[i] = true;
+      }
+  
   Vector<double> boundary_projection (rhs.size());
 
 				   // Allow for a maximum of 5*n
@@ -1764,12 +1791,15 @@ VectorTools::project_boundary_values (const Mapping<dim>       &mapping,
 
   PreconditionSSOR<> prec;
   prec.initialize(mass_matrix, 1.2);
+  filtered_precondition.initialize(prec, true);
 				   // solve
-  cg.solve (mass_matrix, boundary_projection, rhs, prec);
-
+  cg.solve (filtered_mass_matrix, boundary_projection, rhs, filtered_precondition);
+  filtered_precondition.apply_constraints(boundary_projection, true);
+  filtered_precondition.clear();  
 				   // fill in boundary values
   for (unsigned int i=0; i<dof_to_boundary_mapping.size(); ++i)
-    if (dof_to_boundary_mapping[i] != DoFHandler<dim>::invalid_dof_index)
+    if (dof_to_boundary_mapping[i] != DoFHandler<dim>::invalid_dof_index
+    && ! excluded_dofs[dof_to_boundary_mapping[i]])
 				       // this dof is on one of the
 				       // interesting boundary parts
 				       //
