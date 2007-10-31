@@ -359,7 +359,7 @@ DoFTools::make_boundary_sparsity_pattern (
   Assert (sparsity.n_cols() == dof.n_boundary_dofs(),
 	  ExcDimensionMismatch (sparsity.n_cols(), dof.n_boundary_dofs()));
 #ifdef DEBUG
-  if (true)
+  if (sparsity.n_rows() != 0)
     {
       unsigned int max_element = 0;
       for (std::vector<unsigned int>::const_iterator i=dof_to_boundary_mapping.begin();
@@ -423,7 +423,7 @@ void DoFTools::make_boundary_sparsity_pattern (
   Assert (sparsity.n_cols() == dof.n_boundary_dofs (boundary_indicators),
 	  ExcDimensionMismatch (sparsity.n_cols(), dof.n_boundary_dofs (boundary_indicators)));
 #ifdef DEBUG
-  if (true)
+  if (sparsity.n_rows() != 0)
     {
       unsigned int max_element = 0;
       for (std::vector<unsigned int>::const_iterator i=dof_to_boundary_mapping.begin();
