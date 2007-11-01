@@ -75,11 +75,14 @@ and after five adaptive refinement steps.
 @image html step-12.sol-5.png
 
 
-Then we show the final grid (after 5 refinement steps). The
-grid is largely concentrated in the vicinity of the jump of the
-solution.
+Then we show the final grid (after 5 refinement steps) and the solution again,
+this time with a nicer 3d rendering (obtained using the DataOutBase::write_vtk
+function and the VTK-based VisIt visualization program) that better shows the
+sharpness of the jump on the refined mesh and the over- and undershoots of the
+solution along the interface:
 
 @image html step-12.grid-5.png
+@image html step-12.3d-solution.png
 
 
 And finally we show a plot of a 3d computation.
