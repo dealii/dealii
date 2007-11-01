@@ -604,7 +604,7 @@ class DataOut_DoFData : public DataOutInterface<patch_dim,patch_space_dim>
 		    << "vectors must always consist of exactly <dim>\n"
 		    << "components. However, the vector component at\n"
 		    << "position " << arg1 << " with name <" << arg2
-		    << " does not satisfy these conditions.");
+		    << "> does not satisfy these conditions.");
     
   protected:
     				     /**
