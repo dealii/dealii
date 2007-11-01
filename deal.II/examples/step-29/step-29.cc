@@ -53,7 +53,8 @@
 				 // For solving the linear system,
 				 // we'll use the sparse
 				 // LU-decomposition provided by
-				 // UMFPACK, for which the following
+				 // UMFPACK (see the SparseDirectUMFPACK
+				 // class), for which the following
 				 // header file is needed.  Note that
 				 // in order to compile this tutorial
 				 // program, the deal.II-library needs
