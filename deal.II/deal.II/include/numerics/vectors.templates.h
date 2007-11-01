@@ -1324,11 +1324,9 @@ interpolate_boundary_values (const Mapping<dim>            &mapping,
 				   // field to store the indices
   std::vector<unsigned int> face_dofs;
   face_dofs.reserve (DoFTools::max_dofs_per_face(dof));
-  std::fill (face_dofs.begin (), face_dofs.end (), DoFHandler<dim>::invalid_dof_index);
 
   std::vector<Point<dim> >  dof_locations;
   dof_locations.reserve (DoFTools::max_dofs_per_face(dof));
-  std::fill (dof_locations.begin(), dof_locations.end (), Point<dim>());
 
 				   // array to store the values of
 				   // the boundary function at the
