@@ -148,6 +148,7 @@ namespace numbers
 }
 
 
+//TODO[WB]: eventually remove this namespace alias
 /**
  * Namespace alias with the old name for the numbers namespace. The namespace
  * was originally called numbers, but has since been renamed to
