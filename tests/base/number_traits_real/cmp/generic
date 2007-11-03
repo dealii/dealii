@@ -1,0 +1,25 @@
+
+DEAL::typeid(x).name() = f
+DEAL::typeid(NumberTraits<number>::real_type).name() = f
+DEAL::1.50
+DEAL::2.25
+DEAL::typeid(x).name() = f
+DEAL::typeid(NumberTraits<number>::real_type).name() = f
+DEAL::-1.50
+DEAL::2.25
+DEAL::typeid(x).name() = d
+DEAL::typeid(NumberTraits<number>::real_type).name() = d
+DEAL::1.50
+DEAL::2.25
+DEAL::typeid(x).name() = d
+DEAL::typeid(NumberTraits<number>::real_type).name() = d
+DEAL::-1.50
+DEAL::2.25
+DEAL::typeid(x).name() = e
+DEAL::typeid(NumberTraits<number>::real_type).name() = e
+DEAL::1.50
+DEAL::2.25
+DEAL::typeid(x).name() = e
+DEAL::typeid(NumberTraits<number>::real_type).name() = e
+DEAL::-1.50
+DEAL::2.25

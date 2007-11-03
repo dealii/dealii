@@ -145,6 +145,102 @@ namespace numbers
 				    * <code>long double</code>.
 				    */
   bool is_finite (const std::complex<long double> x);
+
+				   /**
+				    * A structure that, together with its
+				    * partial specializations, provides traits
+				    * and member functions that make it
+				    * possible to write templates that work on
+				    * both real number types and complex
+				    * number types. This template is mostly
+				    * used to implement linear algebra classes
+				    * such as vectors and matrices that work
+				    * for both real and complex numbers.
+				    *
+				    * @author Wolfgang Bangerth, 2007
+				    */
+  template <typename number>
+  struct NumberTraits
+  {
+				       /**
+					* For this data type, typedef the
+					* corresponding real type. Since the
+					* general template is selected for all
+					* data types that are not
+					* specializations of std::complex<T>,
+					* the underlying type must be
+					* real-values, so the real_type is
+					* equal to the underlying type.
+					*/
+      typedef number real_type;
+
+				       /**
+					* Return the complex-conjugate of the
+					* given number. Since the general
+					* template is selected if number is
+					* not a complex data type, this
+					* function simply returns the given
+					* number.
+					*/
+      static
+      const number & conjugate (const number &x);
+
+				       /**
+					* Return the square of the absolute
+					* value of the given number. Since the
+					* general template is chosen for types
+					* not equal to std::complex, this
+					* function simply returns the square
+					* of the given number.
+					*/
+      static
+      real_type abs_square (const number &x);
+  };
+
+
+				   /**
+				    * Specialization of the general
+				    * NumberTraits class that provides the
+				    * relevant information if the underlying
+				    * data type is std::complex<T>.
+				    *
+				    * @author Wolfgang Bangerth, 2007
+				    */
+  template <typename number>
+  struct NumberTraits<std::complex<number> >
+  {
+				       /**
+					* For this data type, typedef the
+					* corresponding real type. Since this
+					* specialization of the template is
+					* selected for number types
+					* std::complex<T>, the real type is
+					* equal to the type used to store the
+					* two components of the complex
+					* number.
+					*/
+      typedef number real_type;
+
+				       /**
+					* Return the complex-conjugate of the
+					* given number.
+					*/
+      static
+      std::complex<number> conjugate (const std::complex<number> &x);
+
+				       /**
+					* Return the square of the absolute
+					* value of the given number. Since
+					* this specialization of the general
+					* template is chosen for types equal
+					* to std::complex, this function
+					* returns the product of a number and
+					* its complex conjugate.
+					*/
+      static
+      real_type abs_square (const std::complex<number> &x);
+  };
+  
 }
 
 
@@ -159,6 +255,46 @@ namespace numbers
 namespace deal_II_numbers = numbers;
 
 
+/* --------------- inline and template functions ---------------- */
+namespace numbers
+{
+  template <typename number>
+  const number &
+  NumberTraits<number>::conjugate (const number &x)
+  {
+    return x;
+  }
+
+
+
+  template <typename number>
+  typename NumberTraits<number>::real_type
+  NumberTraits<number>::abs_square (const number &x)
+  {
+    return x * x;
+  }
+
+
+
+  template <typename number>
+  std::complex<number>
+  NumberTraits<std::complex<number> >::conjugate (const std::complex<number> &x)
+  {
+    return std::conj(x);
+  }
+
+
+
+  template <typename number>
+  typename NumberTraits<std::complex<number> >::real_type
+  NumberTraits<std::complex<number> >::abs_square (const std::complex<number> &x)
+  {
+    return std::norm (x);
+  }
+  
+}
+
+  
 
 DEAL_II_NAMESPACE_CLOSE
 

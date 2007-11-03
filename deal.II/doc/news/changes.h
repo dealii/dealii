@@ -120,6 +120,12 @@ inconvenience this causes.
 <h3>base</h3>
 
 <ol>
+  <li> <p>New: There is now a template numbers::NumberTraits that provides
+  the means to implement linear algebra and other algorithms for both real
+  and complex data types.
+  <br>
+  (WB 2007/11/03)
+  </p> </li>
 
   <li> <p>New: The DataOutBase class and derived classes can now deal with data that is
   logically vector-valued, i.e. derived classes can pass down information that some of

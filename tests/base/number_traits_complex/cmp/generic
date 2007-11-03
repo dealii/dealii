@@ -1,0 +1,25 @@
+
+DEAL::typeid(x).name() = St7complexIfE
+DEAL::typeid(NumberTraits<number>::real_type).name() = f
+DEAL::(1.50,-2.50)
+DEAL::8.50
+DEAL::typeid(x).name() = St7complexIfE
+DEAL::typeid(NumberTraits<number>::real_type).name() = f
+DEAL::(-1.50,2.50)
+DEAL::8.50
+DEAL::typeid(x).name() = St7complexIdE
+DEAL::typeid(NumberTraits<number>::real_type).name() = d
+DEAL::(1.50,-2.50)
+DEAL::8.50
+DEAL::typeid(x).name() = St7complexIdE
+DEAL::typeid(NumberTraits<number>::real_type).name() = d
+DEAL::(-1.50,2.50)
+DEAL::8.50
+DEAL::typeid(x).name() = St7complexIeE
+DEAL::typeid(NumberTraits<number>::real_type).name() = e
+DEAL::(1.50,-2.50)
+DEAL::8.50
+DEAL::typeid(x).name() = St7complexIeE
+DEAL::typeid(NumberTraits<number>::real_type).name() = e
+DEAL::(-1.50,2.50)
+DEAL::8.50
