@@ -103,7 +103,7 @@ namespace hp
                                         * certain value, but rather take
                                         * its symbolic name.
                                         */
-      static const unsigned int invalid_dof_index = deal_II_numbers::invalid_unsigned_int;
+      static const unsigned int invalid_dof_index = numbers::invalid_unsigned_int;
 
 				       /**
 					* The default index of the
@@ -127,7 +127,7 @@ namespace hp
 					* corresponds to an invalid
 					* value.
 					*/
-      static const unsigned int default_fe_index = deal_II_numbers::invalid_unsigned_int;
+      static const unsigned int default_fe_index = numbers::invalid_unsigned_int;
 
       
                                        /**
@@ -1459,7 +1459,7 @@ namespace hp
     Assert (vertex_index < vertex_dofs_offsets.size(),
 	    ExcIndexRange (vertex_index, 0, vertex_dofs_offsets.size()));
     Assert (vertex_dofs_offsets[vertex_index] !=
-	    deal_II_numbers::invalid_unsigned_int,
+	    numbers::invalid_unsigned_int,
 	    ExcMessage ("This vertex is unused and has no DoFs associated with it"));
 
 				     // hop along the list of index
@@ -1477,7 +1477,7 @@ namespace hp
 
 	const unsigned int this_fe_index = *pointer;
 	
-	Assert (this_fe_index != deal_II_numbers::invalid_unsigned_int,
+	Assert (this_fe_index != numbers::invalid_unsigned_int,
 		ExcInternalError());
 	Assert (this_fe_index < finite_elements->size(),
 		ExcInternalError());
@@ -1512,7 +1512,7 @@ namespace hp
     Assert (fe_index < finite_elements->size(),
 	    ExcInternalError());
     Assert (vertex_dofs_offsets[vertex_index] !=
-	    deal_II_numbers::invalid_unsigned_int,
+	    numbers::invalid_unsigned_int,
 	    ExcMessage ("This vertex is unused and has no DoFs associated with it"));
 
 				     // hop along the list of index
@@ -1530,7 +1530,7 @@ namespace hp
 
 	const unsigned int this_fe_index = *pointer;
 	
-	Assert (this_fe_index != deal_II_numbers::invalid_unsigned_int,
+	Assert (this_fe_index != numbers::invalid_unsigned_int,
 		ExcInternalError());
 	Assert (this_fe_index < finite_elements->size(),
 		ExcInternalError());
@@ -1558,7 +1558,7 @@ namespace hp
 			"this DoFHandler"));
 
 				     // if this vertex is unused, return 0
-    if (vertex_dofs_offsets[vertex_index] == deal_II_numbers::invalid_unsigned_int)
+    if (vertex_dofs_offsets[vertex_index] == numbers::invalid_unsigned_int)
       return 0;
 
 				     // hop along the list of index
@@ -1567,7 +1567,7 @@ namespace hp
     const unsigned int starting_offset = vertex_dofs_offsets[vertex_index];
     const unsigned int *pointer        = &vertex_dofs[starting_offset];
 
-    Assert (*pointer != deal_II_numbers::invalid_unsigned_int,
+    Assert (*pointer != numbers::invalid_unsigned_int,
 	    ExcInternalError());
     
     unsigned int counter = 0;
@@ -1577,7 +1577,7 @@ namespace hp
 
 	const unsigned int this_fe_index = *pointer;
 	
-	if (this_fe_index == deal_II_numbers::invalid_unsigned_int)
+	if (this_fe_index == numbers::invalid_unsigned_int)
 	  return counter;
 	else
 	  {
@@ -1604,7 +1604,7 @@ namespace hp
 				     // make sure we don't ask on
 				     // unused vertices
     Assert (vertex_dofs_offsets[vertex_index] !=
-	    deal_II_numbers::invalid_unsigned_int,
+	    numbers::invalid_unsigned_int,
 	    ExcInternalError());
 
 				     // hop along the list of index
@@ -1613,7 +1613,7 @@ namespace hp
     const unsigned int starting_offset = vertex_dofs_offsets[vertex_index];
     const unsigned int *pointer        = &vertex_dofs[starting_offset];
 
-    Assert (*pointer != deal_II_numbers::invalid_unsigned_int,
+    Assert (*pointer != numbers::invalid_unsigned_int,
 	    ExcInternalError());
     
     unsigned int counter = 0;
@@ -1629,7 +1629,7 @@ namespace hp
 	if (counter == n)
 	  return this_fe_index;
 
-	Assert (this_fe_index != deal_II_numbers::invalid_unsigned_int,
+	Assert (this_fe_index != numbers::invalid_unsigned_int,
 		ExcInternalError());
 	
 	pointer += (*finite_elements)[this_fe_index].dofs_per_vertex + 1;
@@ -1658,7 +1658,7 @@ namespace hp
 				     // make sure we don't ask on
 				     // unused vertices
     Assert (vertex_dofs_offsets[vertex_index] !=
-	    deal_II_numbers::invalid_unsigned_int,
+	    numbers::invalid_unsigned_int,
 	    ExcInternalError());
 
 				     // hop along the list of index
@@ -1667,7 +1667,7 @@ namespace hp
     const unsigned int starting_offset = vertex_dofs_offsets[vertex_index];
     const unsigned int *pointer        = &vertex_dofs[starting_offset];
 
-    Assert (*pointer != deal_II_numbers::invalid_unsigned_int,
+    Assert (*pointer != numbers::invalid_unsigned_int,
 	    ExcInternalError());
     
     while (true)
@@ -1679,7 +1679,7 @@ namespace hp
 	Assert (this_fe_index < finite_elements->size(),
 		ExcInternalError());
 
-	if (this_fe_index == deal_II_numbers::invalid_unsigned_int)
+	if (this_fe_index == numbers::invalid_unsigned_int)
 	  return false;
 	else
 	  if (this_fe_index == fe_index)

@@ -854,7 +854,7 @@ template <typename Number>
 inline
 Vector<Number> & Vector<Number>::operator = (const Number s)
 {
-  Assert (deal_II_numbers::is_finite(s), 
+  Assert (numbers::is_finite(s), 
           ExcMessage("The given value is not finite but either infinite or Not A Number (NaN)"));
   
   if (s != Number())
@@ -940,7 +940,7 @@ inline
 Vector<Number> & Vector<Number>::operator *= (const Number factor)
 {
 
-  Assert (deal_II_numbers::is_finite(factor), 
+  Assert (numbers::is_finite(factor), 
           ExcMessage("The given value is not finite but either infinite or Not A Number (NaN)"));
 
   scale (factor);
@@ -954,7 +954,7 @@ inline
 Vector<Number> &
 Vector<Number>::operator /= (const Number factor)
 {
-  Assert (deal_II_numbers::is_finite(factor), 
+  Assert (numbers::is_finite(factor), 
           ExcMessage("The given value is not finite but either infinite or Not A Number (NaN)"));
   Assert (factor > 0., ExcZero() );
 
@@ -969,7 +969,7 @@ inline
 void
 Vector<Number>::scale (const Number factor)
 {
-  Assert (deal_II_numbers::is_finite(factor), 
+  Assert (numbers::is_finite(factor), 
           ExcMessage("The given value is not finite but either infinite or Not A Number (NaN)"));
 
   Assert (vec_size!=0, ExcEmptyObject());
@@ -988,7 +988,7 @@ void
 Vector<Number>::add (const Number a,
 		     const Vector<Number>& v)
 {
-  Assert (deal_II_numbers::is_finite(a), 
+  Assert (numbers::is_finite(a), 
           ExcMessage("The given value is not finite but either infinite or Not A Number (NaN)"));
 
   Assert (vec_size!=0, ExcEmptyObject());
@@ -1010,9 +1010,9 @@ Vector<Number>::sadd (const Number x,
 		      const Number a,
 		      const Vector<Number>& v)
 {
-  Assert (deal_II_numbers::is_finite(x), 
+  Assert (numbers::is_finite(x), 
           ExcMessage("The given value is not finite but either infinite or Not A Number (NaN)"));
-  Assert (deal_II_numbers::is_finite(a), 
+  Assert (numbers::is_finite(a), 
           ExcMessage("The given value is not finite but either infinite or Not A Number (NaN)"));
 
   Assert (vec_size!=0, ExcEmptyObject());

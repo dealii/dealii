@@ -19,7 +19,7 @@
 
 DEAL_II_NAMESPACE_OPEN
 
-namespace deal_II_numbers 
+namespace numbers 
 {
   bool is_finite (const double x) 
   {

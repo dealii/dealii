@@ -130,7 +130,7 @@ class SparseMatrixEZ : public Subscriptor
 					 /**
 					  * Non-existent column number.
 					  */
-	static const unsigned int invalid = deal_II_numbers::invalid_unsigned_int;
+	static const unsigned int invalid = numbers::invalid_unsigned_int;
     };
 
 				     /**
@@ -1297,7 +1297,7 @@ void SparseMatrixEZ<number>::set (const unsigned int i,
 				  const number value)
 {
 
-  Assert (deal_II_numbers::is_finite(value), 
+  Assert (numbers::is_finite(value), 
           ExcMessage("The given value is not finite but either infinite or Not A Number (NaN)"));
 
   Assert (i<m(), ExcIndexRange(i,0,m()));
@@ -1325,7 +1325,7 @@ void SparseMatrixEZ<number>::add (const unsigned int i,
 				  const number value)
 {
 
-  Assert (deal_II_numbers::is_finite(value), 
+  Assert (numbers::is_finite(value), 
           ExcMessage("The given value is not finite but either infinite or Not A Number (NaN)"));
 
   Assert (i<m(), ExcIndexRange(i,0,m()));

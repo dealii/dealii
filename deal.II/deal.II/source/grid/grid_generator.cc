@@ -203,15 +203,15 @@ GridGenerator::moebius (
     
   
   std::vector<Point<dim> > vertices (4*n_cells);
-  double beta_step=n_rotations*deal_II_numbers::PI/2.0/n_cells;
-  double alpha_step=2.0*deal_II_numbers::PI/n_cells;
+  double beta_step=n_rotations*numbers::PI/2.0/n_cells;
+  double alpha_step=2.0*numbers::PI/n_cells;
   
   for (unsigned int i=0; i<n_cells; ++i)
     for (unsigned int j=0; j<4; ++j)
       {
-	vertices[4*i+j][0]=R*std::cos(i*alpha_step)+r*std::cos(i*beta_step+j*deal_II_numbers::PI/2.0)*std::cos(i*alpha_step);
-	vertices[4*i+j][1]=R*std::sin(i*alpha_step)+r*std::cos(i*beta_step+j*deal_II_numbers::PI/2.0)*std::sin(i*alpha_step);
-	vertices[4*i+j][2]=r*std::sin(i*beta_step+j*deal_II_numbers::PI/2.0);
+	vertices[4*i+j][0]=R*std::cos(i*alpha_step)+r*std::cos(i*beta_step+j*numbers::PI/2.0)*std::cos(i*alpha_step);
+	vertices[4*i+j][1]=R*std::sin(i*alpha_step)+r*std::cos(i*beta_step+j*numbers::PI/2.0)*std::sin(i*alpha_step);
+	vertices[4*i+j][2]=r*std::sin(i*beta_step+j*numbers::PI/2.0);
       }
 
   unsigned int offset=0;
@@ -1387,7 +1387,7 @@ void GridGenerator::hyper_shell (Triangulation<dim>   &tria,
   Assert ((inner_radius > 0) && (inner_radius < outer_radius),
 	  ExcInvalidRadii ());
   
-  const double pi = deal_II_numbers::PI;
+  const double pi = numbers::PI;
   
 				   // determine the number of cells
 				   // for the grid. if not provided by
@@ -1557,7 +1557,7 @@ GridGenerator::half_hyper_shell (Triangulation<dim>   &tria,
   Assert ((inner_radius > 0) && (inner_radius < outer_radius),
 	  ExcInvalidRadii ());
   
-  const double pi     = deal_II_numbers::PI;
+  const double pi     = numbers::PI;
 				   // determine the number of cells
 				   // for the grid. if not provided by
 				   // the user determine it such that
@@ -2202,7 +2202,7 @@ void GridGenerator::cylinder_shell (Triangulation<dim>   &tria,
   Assert ((inner_radius > 0) && (inner_radius < outer_radius),
 	  ExcInvalidRadii ());
   
-  const double pi = deal_II_numbers::PI;
+  const double pi = numbers::PI;
   
 				   // determine the number of cells
 				   // for the grid. if not provided by

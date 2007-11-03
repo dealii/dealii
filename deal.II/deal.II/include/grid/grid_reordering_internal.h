@@ -531,7 +531,7 @@ namespace internal
                                           * class of parallel edges
                                           * the edge falls in when
                                           * oriented.
-                                          * deal_II_numbers::invalid_unsigned_int
+                                          * numbers::invalid_unsigned_int
                                           * means not yet
                                           * decided. This is also the
                                           * default value after

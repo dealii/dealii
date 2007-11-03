@@ -1514,7 +1514,7 @@ interpolate_boundary_values (const Mapping<dim>            &mapping,
                                  :
                                  i+4*fe.dofs_per_vertex+8*fe.dofs_per_line))
                                :
-                               deal_II_numbers::invalid_unsigned_int)));
+                               numbers::invalid_unsigned_int)));
                         Assert (cell_i < fe.dofs_per_cell, ExcInternalError());
 
                                                          // make sure
@@ -2167,7 +2167,7 @@ namespace internal
             }
                                            // append result of this cell
                                            // to the end of the vector
-          Assert (deal_II_numbers::is_finite(diff), ExcInternalError());
+          Assert (numbers::is_finite(diff), ExcInternalError());
           difference(index) = diff;
         }
     }

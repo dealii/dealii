@@ -11,7 +11,7 @@
 //
 //----------------------------  is_finite.cc  ---------------------------
 
-// check deal_II_numbers::is_finite
+// check numbers::is_finite
 
 #include "../tests.h"
 #include <base/logstream.h>
@@ -23,7 +23,7 @@
 template <typename T>
 void check ()
 {
-  using namespace deal_II_numbers;
+  using namespace numbers;
   
   deallog << std::numeric_limits<T>::quiet_NaN() << "   -->   ";
   deallog << is_finite(std::numeric_limits<T>::quiet_NaN()) << std::endl;

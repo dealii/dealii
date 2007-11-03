@@ -46,7 +46,7 @@ namespace internal
     template <typename Number>
     inline Number sqr (const Number x)
     {
-      Assert (deal_II_numbers::is_finite(x), 
+      Assert (numbers::is_finite(x), 
 	      ExcMessage("The given value is not finite but either infinite or Not A Number (NaN)"));
       return x*x;
     }
@@ -443,9 +443,9 @@ template <typename Number>
 void Vector<Number>::add (const Number a, const Vector<Number>& v,
 			  const Number b, const Vector<Number>& w)
 {
-  Assert (deal_II_numbers::is_finite(a), 
+  Assert (numbers::is_finite(a), 
           ExcMessage("The given value is not finite but either infinite or Not A Number (NaN)"));
-  Assert (deal_II_numbers::is_finite(b), 
+  Assert (numbers::is_finite(b), 
           ExcMessage("The given value is not finite but either infinite or Not A Number (NaN)"));
 
   Assert (vec_size!=0, ExcEmptyObject());
@@ -463,7 +463,7 @@ void Vector<Number>::add (const Number a, const Vector<Number>& v,
 template <typename Number>
 void Vector<Number>::sadd (const Number x, const Vector<Number>& v)
 {
-  Assert (deal_II_numbers::is_finite(x), 
+  Assert (numbers::is_finite(x), 
           ExcMessage("The given value is not finite but either infinite or Not A Number (NaN)"));
 
   Assert (vec_size!=0, ExcEmptyObject());
@@ -482,11 +482,11 @@ void Vector<Number>::sadd (const Number x, const Number a,
 			   const Vector<Number>& v, const Number b,
                            const Vector<Number>& w)
 {
-  Assert (deal_II_numbers::is_finite(x), 
+  Assert (numbers::is_finite(x), 
           ExcMessage("The given value is not finite but either infinite or Not A Number (NaN)"));
-  Assert (deal_II_numbers::is_finite(a), 
+  Assert (numbers::is_finite(a), 
           ExcMessage("The given value is not finite but either infinite or Not A Number (NaN)"));
-  Assert (deal_II_numbers::is_finite(b), 
+  Assert (numbers::is_finite(b), 
           ExcMessage("The given value is not finite but either infinite or Not A Number (NaN)"));
 
   Assert (vec_size!=0, ExcEmptyObject());
@@ -507,13 +507,13 @@ void Vector<Number>::sadd (const Number x, const Number a,
 			   const Vector<Number>& w, const Number c,
                            const Vector<Number>& y)
 {
-  Assert (deal_II_numbers::is_finite(x), 
+  Assert (numbers::is_finite(x), 
           ExcMessage("The given value is not finite but either infinite or Not A Number (NaN)"));
-  Assert (deal_II_numbers::is_finite(a), 
+  Assert (numbers::is_finite(a), 
           ExcMessage("The given value is not finite but either infinite or Not A Number (NaN)"));
-  Assert (deal_II_numbers::is_finite(b), 
+  Assert (numbers::is_finite(b), 
           ExcMessage("The given value is not finite but either infinite or Not A Number (NaN)"));
-  Assert (deal_II_numbers::is_finite(c), 
+  Assert (numbers::is_finite(c), 
           ExcMessage("The given value is not finite but either infinite or Not A Number (NaN)"));
 
   Assert (vec_size!=0, ExcEmptyObject());
@@ -551,7 +551,7 @@ template <typename Number>
 template <typename Number2>
 void Vector<Number>::equ (const Number a, const Vector<Number2>& u)
 {
-  Assert (deal_II_numbers::is_finite(a), 
+  Assert (numbers::is_finite(a), 
 	  ExcMessage("The given value is not finite but either infinite or Not A Number (NaN)"));
 
   Assert (vec_size!=0, ExcEmptyObject());
@@ -568,9 +568,9 @@ template <typename Number>
 void Vector<Number>::equ (const Number a, const Vector<Number>& u,
 			  const Number b, const Vector<Number>& v)
 {
-  Assert (deal_II_numbers::is_finite(a), 
+  Assert (numbers::is_finite(a), 
           ExcMessage("The given value is not finite but either infinite or Not A Number (NaN)"));
-  Assert (deal_II_numbers::is_finite(b), 
+  Assert (numbers::is_finite(b), 
           ExcMessage("The given value is not finite but either infinite or Not A Number (NaN)"));
 
   Assert (vec_size!=0, ExcEmptyObject());

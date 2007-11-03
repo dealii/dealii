@@ -88,8 +88,8 @@ namespace Functions {
 	constants[this_c[0]] = tmp;
       }
     
-    constants["pi"] = deal_II_numbers::PI;
-    constants["Pi"] = deal_II_numbers::PI;
+    constants["pi"] = numbers::PI;
+    constants["Pi"] = numbers::PI;
 
     unsigned int nn = (Utilities::split_string_list(vnames)).size();
     switch (nn)

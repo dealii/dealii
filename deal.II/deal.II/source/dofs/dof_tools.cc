@@ -3279,7 +3279,7 @@ DoFTools::extract_boundary_dofs (const DH                      &dof_handler,
                            :
                            i+4*fe.dofs_per_vertex+8*fe.dofs_per_line))
                          :
-                         deal_II_numbers::invalid_unsigned_int)));
+                         numbers::invalid_unsigned_int)));
                   if (fe.is_primitive (cell_index))
                     selected_dofs[face_dof_indices[i]]
                       = (component_select[fe.face_system_to_component_index(i).first]
@@ -3617,7 +3617,7 @@ DoFTools::get_subdomain_association (const DH                  &dof_handler,
 
                                    // preset all values by an invalid value
   std::fill_n (subdomain_association.begin(), dof_handler.n_dofs(),
-               deal_II_numbers::invalid_unsigned_int);
+               numbers::invalid_unsigned_int);
 
   std::vector<unsigned int> local_dof_indices;
   local_dof_indices.reserve (max_dofs_per_cell(dof_handler));
@@ -3646,7 +3646,7 @@ DoFTools::get_subdomain_association (const DH                  &dof_handler,
 
   Assert (std::find (subdomain_association.begin(),
                      subdomain_association.end(),
-                     deal_II_numbers::invalid_unsigned_int)
+                     numbers::invalid_unsigned_int)
           == subdomain_association.end(),
           ExcInternalError());
 }
@@ -4158,7 +4158,7 @@ compute_intergrid_transfer_representation (
       const unsigned int parameter_dof = weight_mapping[i];
 				       // if this global dof is a
 				       // parameter
-      if (parameter_dof != deal_II_numbers::invalid_unsigned_int)
+      if (parameter_dof != numbers::invalid_unsigned_int)
 	{
 	  Assert (parameter_dof < n_global_parm_dofs, ExcInternalError());
 	  Assert (inverse_weight_mapping[parameter_dof] == DoFHandler<dim>::invalid_dof_index,

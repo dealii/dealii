@@ -76,7 +76,7 @@ FiniteElementData (const std::vector<unsigned int> &dofs_per_object,
 			       GeometryInfo<dim>::quads_per_cell * dofs_per_quad +
 			       GeometryInfo<dim>::hexes_per_cell * dofs_per_hex),
 		components(n_components),
-		blocks(n_blocks == deal_II_numbers::invalid_unsigned_int
+		blocks(n_blocks == numbers::invalid_unsigned_int
 		       ? n_components : n_blocks),
 		degree(degree),
 		conforming_space(conformity)

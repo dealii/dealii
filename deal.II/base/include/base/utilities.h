@@ -48,7 +48,7 @@ namespace Utilities
                                     */
   std::string
   int_to_string (const unsigned int i,
-		 const unsigned int digits = deal_II_numbers::invalid_unsigned_int);
+		 const unsigned int digits = numbers::invalid_unsigned_int);
 
                                    /**
                                     * Determine how many digits are needed to
@@ -125,7 +125,7 @@ namespace Utilities
 				    *
 				    * If no integer can be read at the
 				    * indicated position, return
-				    * (-1,deal_II_numbers::invalid_unsigned_int)
+				    * (-1,numbers::invalid_unsigned_int)
 				    */
   std::pair<int, unsigned int>
   get_integer_at_position (const std::string &name,

@@ -34,7 +34,7 @@ DEAL_II_NAMESPACE_OPEN
  * the library as a marker for an invalid index, an invalid size of an
  * array, and similar purposes.
  */
-namespace deal_II_numbers
+namespace numbers
 {
 				   /**
 				    * Representation of the
@@ -146,6 +146,18 @@ namespace deal_II_numbers
 				    */
   bool is_finite (const std::complex<long double> x);
 }
+
+
+/**
+ * Namespace alias with the old name for the numbers namespace. The namespace
+ * was originally called numbers, but has since been renamed to
+ * dealii::numbers when everything was moved into namespace dealii.
+ *
+ * @deprecated
+ */
+namespace deal_II_numbers = numbers;
+
+
 
 DEAL_II_NAMESPACE_CLOSE
 

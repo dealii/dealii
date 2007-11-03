@@ -176,7 +176,7 @@ template <>
 Quadrature<1>::Quadrature (const Quadrature<0> &)
 		:
 		Subscriptor(),
-		n_quadrature_points (deal_II_numbers::invalid_unsigned_int),
+		n_quadrature_points (numbers::invalid_unsigned_int),
 		quadrature_points (),
 		weights ()
 {
@@ -1140,7 +1140,7 @@ face (const unsigned int face_no,
       default:
             Assert (false, ExcInternalError());
     }
-  return deal_II_numbers::invalid_unsigned_int;
+  return numbers::invalid_unsigned_int;
 }
 
 
@@ -1215,7 +1215,7 @@ subface (const unsigned int face_no,
       default:
             Assert (false, ExcInternalError());
     }
-  return deal_II_numbers::invalid_unsigned_int;              
+  return numbers::invalid_unsigned_int;              
 }
 
 
@@ -1239,7 +1239,7 @@ template <int dim>
 QProjector<dim>::DataSetDescriptor::
 DataSetDescriptor ()
                 :
-                dataset_offset (deal_II_numbers::invalid_unsigned_int)
+                dataset_offset (numbers::invalid_unsigned_int)
 {}
 
 

@@ -56,7 +56,7 @@ void MGTransferBlockBase::build_matrices (
     if (selected[i])
       mg_block[i] = n_mg_blocks++;
     else
-      mg_block[i] = deal_II_numbers::invalid_unsigned_int;
+      mg_block[i] = numbers::invalid_unsigned_int;
   
 				   // Compute the lengths of all blocks
   sizes.resize(n_levels);

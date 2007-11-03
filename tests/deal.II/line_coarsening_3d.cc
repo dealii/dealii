@@ -41,8 +41,8 @@ void create_star_structured_cylinder (Triangulation<3> &coarse_grid,
   points[1] = Point<3>(1,0,0);
   for (unsigned int i=0; i<2*n_cells-1; ++i)
     {
-      points[2+i]=Point<3>(std::cos(deal_II_numbers::PI/n_cells*(i+1)),
-			   std::sin(deal_II_numbers::PI/n_cells*(i+1)),
+      points[2+i]=Point<3>(std::cos(numbers::PI/n_cells*(i+1)),
+			   std::sin(numbers::PI/n_cells*(i+1)),
 			   0);
     }
   

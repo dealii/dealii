@@ -445,7 +445,7 @@ class FiniteElementData
 		       const unsigned int n_components,
 		       const unsigned int degree,
 		       const Conformity conformity = unknown,
-		       const unsigned int n_blocks = deal_II_numbers::invalid_unsigned_int);
+		       const unsigned int n_blocks = numbers::invalid_unsigned_int);
 
 				     /**
 				      * Number of dofs per vertex.
@@ -735,7 +735,7 @@ FiniteElementData<dim>::n_dofs_per_object () const
       default:
 	    Assert (false, ExcInternalError());
     }
-  return deal_II_numbers::invalid_unsigned_int;
+  return numbers::invalid_unsigned_int;
 }
 
 

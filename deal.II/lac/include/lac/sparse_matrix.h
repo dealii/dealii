@@ -1819,7 +1819,7 @@ void SparseMatrix<number>::set (const unsigned int i,
 				const number value)
 {
 
-  Assert (deal_II_numbers::is_finite(value), 
+  Assert (numbers::is_finite(value), 
           ExcMessage("The given value is not finite but either infinite or Not A Number (NaN)"));
 
   Assert (cols != 0, ExcNotInitialized());
@@ -1845,7 +1845,7 @@ void SparseMatrix<number>::add (const unsigned int i,
 				const number value)
 {
 
-  Assert (deal_II_numbers::is_finite(value), 
+  Assert (numbers::is_finite(value), 
           ExcMessage("The given value is not finite but either infinite or Not A Number (NaN)"));
 
   Assert (cols != 0, ExcNotInitialized());

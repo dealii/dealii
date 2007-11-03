@@ -34,8 +34,8 @@ template <int structdim, class DH>
 DoFAccessor<structdim,DH>::DoFAccessor ()
                 :
 		DoFObjectAccessor_Inheritance<structdim, DH::dimension>::BaseClass (0,
-										    deal_II_numbers::invalid_unsigned_int,
-										    deal_II_numbers::invalid_unsigned_int),
+										    numbers::invalid_unsigned_int,
+										    numbers::invalid_unsigned_int),
 		dof_handler(0)
 {
   Assert (false, ExcInvalidObject());

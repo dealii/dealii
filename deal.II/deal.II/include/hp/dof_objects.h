@@ -285,7 +285,7 @@ namespace internal
                                        // make sure we are on an
                                        // object for which DoFs have
                                        // been allocated at all
-      Assert (dof_offsets[obj_index] != deal_II_numbers::invalid_unsigned_int,
+      Assert (dof_offsets[obj_index] != numbers::invalid_unsigned_int,
               ExcMessage ("You are trying to access degree of freedom "
                           "information for an object on which no such "
                           "information is available"));
@@ -321,7 +321,7 @@ namespace internal
           const unsigned int *pointer        = &dofs[starting_offset];
           while (true)
             {
-              Assert (*pointer != deal_II_numbers::invalid_unsigned_int,
+              Assert (*pointer != numbers::invalid_unsigned_int,
                       ExcInternalError());
               if (*pointer == fe_index)
                 return *(pointer + 1 + local_index);
@@ -367,7 +367,7 @@ namespace internal
                                        // make sure we are on an
                                        // object for which DoFs have
                                        // been allocated at all
-      Assert (dof_offsets[obj_index] != deal_II_numbers::invalid_unsigned_int,
+      Assert (dof_offsets[obj_index] != numbers::invalid_unsigned_int,
               ExcMessage ("You are trying to access degree of freedom "
                           "information for an object on which no such "
                           "information is available"));
@@ -403,7 +403,7 @@ namespace internal
           unsigned int      *pointer         = &dofs[starting_offset];
           while (true)
             {
-              Assert (*pointer != deal_II_numbers::invalid_unsigned_int,
+              Assert (*pointer != numbers::invalid_unsigned_int,
                       ExcInternalError());
               if (*pointer == fe_index)
                 {
@@ -439,7 +439,7 @@ namespace internal
                                        // make sure we are on an
                                        // object for which DoFs have
                                        // been allocated at all
-      if (dof_offsets[obj_index] == deal_II_numbers::invalid_unsigned_int)
+      if (dof_offsets[obj_index] == numbers::invalid_unsigned_int)
 	return 0;
       
                                        // if we are on a cell, then the
@@ -467,7 +467,7 @@ namespace internal
           unsigned int counter = 0;
           while (true)
             {
-              if (*pointer == deal_II_numbers::invalid_unsigned_int)
+              if (*pointer == numbers::invalid_unsigned_int)
                                                  // end of list reached
                 return counter;
               else
@@ -504,7 +504,7 @@ namespace internal
                                        // make sure we are on an
                                        // object for which DoFs have
                                        // been allocated at all
-      Assert (dof_offsets[obj_index] != deal_II_numbers::invalid_unsigned_int,
+      Assert (dof_offsets[obj_index] != numbers::invalid_unsigned_int,
               ExcMessage ("You are trying to access degree of freedom "
                           "information for an object on which no such "
                           "information is available"));
@@ -542,7 +542,7 @@ namespace internal
           unsigned int counter = 0;
           while (true)
             {
-              Assert (*pointer != deal_II_numbers::invalid_unsigned_int,
+              Assert (*pointer != numbers::invalid_unsigned_int,
                       ExcInternalError());
 
               const unsigned int fe_index = *pointer;
@@ -588,7 +588,7 @@ namespace internal
                                        // make sure we are on an
                                        // object for which DoFs have
                                        // been allocated at all
-      Assert (dof_offsets[obj_index] != deal_II_numbers::invalid_unsigned_int,
+      Assert (dof_offsets[obj_index] != numbers::invalid_unsigned_int,
               ExcMessage ("You are trying to access degree of freedom "
                           "information for an object on which no such "
                           "information is available"));
@@ -623,7 +623,7 @@ namespace internal
           const unsigned int *pointer        = &dofs[starting_offset];
           while (true)
             {
-              if (*pointer == deal_II_numbers::invalid_unsigned_int)
+              if (*pointer == numbers::invalid_unsigned_int)
                                                  // end of list reached
                 return false;
               else

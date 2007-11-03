@@ -1307,7 +1307,7 @@ unsigned int
 CellAccessor<1>::face_index (const unsigned int) const 
 {
   Assert (false, ExcImpossibleInDim(1));
-  return deal_II_numbers::invalid_unsigned_int;
+  return numbers::invalid_unsigned_int;
 }
 
 

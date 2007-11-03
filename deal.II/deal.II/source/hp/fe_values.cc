@@ -37,9 +37,9 @@ namespace internal
                     fe_values_table (fe_collection.size(),
                                      mapping_collection.size(),
                                      q_collection.size()),
-                    present_fe_values_index (deal_II_numbers::invalid_unsigned_int,
-                                             deal_II_numbers::invalid_unsigned_int,
-                                             deal_II_numbers::invalid_unsigned_int),
+                    present_fe_values_index (numbers::invalid_unsigned_int,
+                                             numbers::invalid_unsigned_int,
+                                             numbers::invalid_unsigned_int),
                     update_flags (update_flags)
     {}
 
@@ -56,9 +56,9 @@ namespace internal
                     fe_values_table (fe_collection.size(),
                                      1,
                                      q_collection.size()),
-                    present_fe_values_index (deal_II_numbers::invalid_unsigned_int,
-                                             deal_II_numbers::invalid_unsigned_int,
-                                             deal_II_numbers::invalid_unsigned_int),
+                    present_fe_values_index (numbers::invalid_unsigned_int,
+                                             numbers::invalid_unsigned_int,
+                                             numbers::invalid_unsigned_int),
                     update_flags (update_flags)
     {}
 
@@ -149,7 +149,7 @@ namespace hp
                  real_mapping_index = mapping_index,
                  real_fe_index      = fe_index;
 
-    if (real_q_index == deal_II_numbers::invalid_unsigned_int)
+    if (real_q_index == numbers::invalid_unsigned_int)
       {
 	if (this->q_collection.size() > 1)
 	  real_q_index = cell->active_fe_index();
@@ -157,7 +157,7 @@ namespace hp
 	  real_q_index = 0;
       }
     
-    if (real_mapping_index == deal_II_numbers::invalid_unsigned_int)
+    if (real_mapping_index == numbers::invalid_unsigned_int)
       {
 	if (this->mapping_collection->size() > 1)
 	  real_mapping_index = cell->active_fe_index();
@@ -165,7 +165,7 @@ namespace hp
 	  real_mapping_index = 0;
       }
     
-    if (real_fe_index == deal_II_numbers::invalid_unsigned_int)
+    if (real_fe_index == numbers::invalid_unsigned_int)
       real_fe_index = cell->active_fe_index();
 
                                      // some checks
@@ -199,13 +199,13 @@ namespace hp
                  real_mapping_index = mapping_index,
                  real_fe_index      = fe_index;
 
-    if (real_q_index == deal_II_numbers::invalid_unsigned_int)
+    if (real_q_index == numbers::invalid_unsigned_int)
       real_q_index = 0;
     
-    if (real_mapping_index == deal_II_numbers::invalid_unsigned_int)
+    if (real_mapping_index == numbers::invalid_unsigned_int)
       real_mapping_index = 0;
 
-    if (real_fe_index == deal_II_numbers::invalid_unsigned_int)
+    if (real_fe_index == numbers::invalid_unsigned_int)
       real_fe_index = 0;
 
                                      // some checks
@@ -239,13 +239,13 @@ namespace hp
                  real_mapping_index = mapping_index,
                  real_fe_index      = fe_index;
 
-    if (real_q_index == deal_II_numbers::invalid_unsigned_int)
+    if (real_q_index == numbers::invalid_unsigned_int)
       real_q_index = 0;
     
-    if (real_mapping_index == deal_II_numbers::invalid_unsigned_int)
+    if (real_mapping_index == numbers::invalid_unsigned_int)
       real_mapping_index = 0;
 
-    if (real_fe_index == deal_II_numbers::invalid_unsigned_int)
+    if (real_fe_index == numbers::invalid_unsigned_int)
       real_fe_index = 0;
 
                                      // some checks
@@ -279,13 +279,13 @@ namespace hp
                  real_mapping_index = mapping_index,
                  real_fe_index      = fe_index;
 
-    if (real_q_index == deal_II_numbers::invalid_unsigned_int)
+    if (real_q_index == numbers::invalid_unsigned_int)
       real_q_index = 0;
     
-    if (real_mapping_index == deal_II_numbers::invalid_unsigned_int)
+    if (real_mapping_index == numbers::invalid_unsigned_int)
       real_mapping_index = 0;
 
-    if (real_fe_index == deal_II_numbers::invalid_unsigned_int)
+    if (real_fe_index == numbers::invalid_unsigned_int)
       real_fe_index = 0;
 
                                      // some checks
@@ -346,7 +346,7 @@ namespace hp
                  real_mapping_index = mapping_index,
                  real_fe_index      = fe_index;
 
-    if (real_q_index == deal_II_numbers::invalid_unsigned_int)
+    if (real_q_index == numbers::invalid_unsigned_int)
       {
 	if (this->q_collection.size() > 1)
 	  real_q_index = cell->active_fe_index();
@@ -354,7 +354,7 @@ namespace hp
 	  real_q_index = 0;
       }
     
-    if (real_mapping_index == deal_II_numbers::invalid_unsigned_int)
+    if (real_mapping_index == numbers::invalid_unsigned_int)
       {
 	if (this->mapping_collection->size() > 1)
 	  real_mapping_index = cell->active_fe_index();
@@ -362,7 +362,7 @@ namespace hp
 	  real_mapping_index = 0;
       }
     
-    if (real_fe_index == deal_II_numbers::invalid_unsigned_int)
+    if (real_fe_index == numbers::invalid_unsigned_int)
       real_fe_index = cell->active_fe_index();
 
                                      // some checks
@@ -397,13 +397,13 @@ namespace hp
                  real_mapping_index = mapping_index,
                  real_fe_index      = fe_index;
 
-    if (real_q_index == deal_II_numbers::invalid_unsigned_int)
+    if (real_q_index == numbers::invalid_unsigned_int)
       real_q_index = 0;
     
-    if (real_mapping_index == deal_II_numbers::invalid_unsigned_int)
+    if (real_mapping_index == numbers::invalid_unsigned_int)
       real_mapping_index = 0;
 
-    if (real_fe_index == deal_II_numbers::invalid_unsigned_int)
+    if (real_fe_index == numbers::invalid_unsigned_int)
       real_fe_index = 0;
 
                                      // some checks
@@ -438,13 +438,13 @@ namespace hp
                  real_mapping_index = mapping_index,
                  real_fe_index      = fe_index;
 
-    if (real_q_index == deal_II_numbers::invalid_unsigned_int)
+    if (real_q_index == numbers::invalid_unsigned_int)
       real_q_index = 0;
     
-    if (real_mapping_index == deal_II_numbers::invalid_unsigned_int)
+    if (real_mapping_index == numbers::invalid_unsigned_int)
       real_mapping_index = 0;
 
-    if (real_fe_index == deal_II_numbers::invalid_unsigned_int)
+    if (real_fe_index == numbers::invalid_unsigned_int)
       real_fe_index = 0;
 
                                      // some checks
@@ -479,13 +479,13 @@ namespace hp
                  real_mapping_index = mapping_index,
                  real_fe_index      = fe_index;
 
-    if (real_q_index == deal_II_numbers::invalid_unsigned_int)
+    if (real_q_index == numbers::invalid_unsigned_int)
       real_q_index = 0;
     
-    if (real_mapping_index == deal_II_numbers::invalid_unsigned_int)
+    if (real_mapping_index == numbers::invalid_unsigned_int)
       real_mapping_index = 0;
 
-    if (real_fe_index == deal_II_numbers::invalid_unsigned_int)
+    if (real_fe_index == numbers::invalid_unsigned_int)
       real_fe_index = 0;
 
                                      // some checks
@@ -547,7 +547,7 @@ namespace hp
                  real_mapping_index = mapping_index,
                  real_fe_index      = fe_index;
 
-    if (real_q_index == deal_II_numbers::invalid_unsigned_int)
+    if (real_q_index == numbers::invalid_unsigned_int)
       {
 	if (this->q_collection.size() > 1)
 	  real_q_index = cell->active_fe_index();
@@ -555,7 +555,7 @@ namespace hp
 	  real_q_index = 0;
       }
     
-    if (real_mapping_index == deal_II_numbers::invalid_unsigned_int)
+    if (real_mapping_index == numbers::invalid_unsigned_int)
       {
 	if (this->mapping_collection->size() > 1)
 	  real_mapping_index = cell->active_fe_index();
@@ -563,7 +563,7 @@ namespace hp
 	  real_mapping_index = 0;
       }
     
-    if (real_fe_index == deal_II_numbers::invalid_unsigned_int)
+    if (real_fe_index == numbers::invalid_unsigned_int)
       real_fe_index = cell->active_fe_index();
 
                                      // some checks
@@ -599,13 +599,13 @@ namespace hp
                  real_mapping_index = mapping_index,
                  real_fe_index      = fe_index;
 
-    if (real_q_index == deal_II_numbers::invalid_unsigned_int)
+    if (real_q_index == numbers::invalid_unsigned_int)
       real_q_index = 0;
     
-    if (real_mapping_index == deal_II_numbers::invalid_unsigned_int)
+    if (real_mapping_index == numbers::invalid_unsigned_int)
       real_mapping_index = 0;
 
-    if (real_fe_index == deal_II_numbers::invalid_unsigned_int)
+    if (real_fe_index == numbers::invalid_unsigned_int)
       real_fe_index = 0;
 
                                      // some checks
@@ -641,13 +641,13 @@ namespace hp
                  real_mapping_index = mapping_index,
                  real_fe_index      = fe_index;
 
-    if (real_q_index == deal_II_numbers::invalid_unsigned_int)
+    if (real_q_index == numbers::invalid_unsigned_int)
       real_q_index = 0;
     
-    if (real_mapping_index == deal_II_numbers::invalid_unsigned_int)
+    if (real_mapping_index == numbers::invalid_unsigned_int)
       real_mapping_index = 0;
 
-    if (real_fe_index == deal_II_numbers::invalid_unsigned_int)
+    if (real_fe_index == numbers::invalid_unsigned_int)
       real_fe_index = 0;
 
                                      // some checks
@@ -683,13 +683,13 @@ namespace hp
                  real_mapping_index = mapping_index,
                  real_fe_index      = fe_index;
 
-    if (real_q_index == deal_II_numbers::invalid_unsigned_int)
+    if (real_q_index == numbers::invalid_unsigned_int)
       real_q_index = 0;
     
-    if (real_mapping_index == deal_II_numbers::invalid_unsigned_int)
+    if (real_mapping_index == numbers::invalid_unsigned_int)
       real_mapping_index = 0;
 
-    if (real_fe_index == deal_II_numbers::invalid_unsigned_int)
+    if (real_fe_index == numbers::invalid_unsigned_int)
       real_fe_index = 0;
 
                                      // some checks

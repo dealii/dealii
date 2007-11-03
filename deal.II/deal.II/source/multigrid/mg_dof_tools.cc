@@ -1246,7 +1246,7 @@ MGTools::make_boundary_list(
                                  :
                                  i+4*fe.dofs_per_vertex+8*fe.dofs_per_line))
                                :
-                               deal_II_numbers::invalid_unsigned_int)));
+                               numbers::invalid_unsigned_int)));
                         Assert (cell_i < fe.dofs_per_cell, ExcInternalError());
 
                                                          // make sure

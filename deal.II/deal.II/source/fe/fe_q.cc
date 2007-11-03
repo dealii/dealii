@@ -82,7 +82,7 @@ namespace FE_Q_Helper
 	if (i*i == N)
 	  return i;
       Assert (false, ExcInternalError());
-      return deal_II_numbers::invalid_unsigned_int;
+      return numbers::invalid_unsigned_int;
     }
 
 
@@ -99,7 +99,7 @@ namespace FE_Q_Helper
 	if (i*i*i == N)
 	  return i;
       Assert (false, ExcInternalError());
-      return deal_II_numbers::invalid_unsigned_int;
+      return numbers::invalid_unsigned_int;
     }
 
 

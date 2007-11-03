@@ -310,7 +310,7 @@ double BoundaryValuesU<dim>::value (const Point<dim> &p,
       (p[0] < 0) &&
       (p[1] < 1./3) &&
       (p[1] > -1./3))
-    return std::sin (this->get_time() * 4 * deal_II_numbers::PI);
+    return std::sin (this->get_time() * 4 * numbers::PI);
   else
     return 0;
 }
@@ -327,8 +327,8 @@ double BoundaryValuesV<dim>::value (const Point<dim> &p,
       (p[0] < 0) &&
       (p[1] < 1./3) &&
       (p[1] > -1./3))
-    return (std::cos (this->get_time() * 4 * deal_II_numbers::PI) *
-	    4 * deal_II_numbers::PI);
+    return (std::cos (this->get_time() * 4 * numbers::PI) *
+	    4 * numbers::PI);
   else
     return 0;
 }

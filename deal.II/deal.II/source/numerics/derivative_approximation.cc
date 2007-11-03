@@ -341,8 +341,8 @@ C DEFINE A TEST MATRIX
 	{
 	  const double theta = std::acos(XX) / 3.;
 	  EE[0] = am + R*std::cos(theta);
-	  EE[1] = am + R*std::cos(theta + 2./3.*deal_II_numbers::PI);
-	  EE[2] = am + R*std::cos(theta + 4./3.*deal_II_numbers::PI);
+	  EE[1] = am + R*std::cos(theta + 2./3.*numbers::PI);
+	  EE[2] = am + R*std::cos(theta + 4./3.*numbers::PI);
 	};
     };
 

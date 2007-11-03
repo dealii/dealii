@@ -252,9 +252,9 @@ TATForwardProblem<dim>::TATForwardProblem ()
   const double detector_step_angle = 2.25;
   const double detector_radius = 0.5;
   
-  for (double detector_angle = 2*deal_II_numbers::PI;
+  for (double detector_angle = 2*numbers::PI;
        detector_angle >= 0;
-       detector_angle -= detector_step_angle/360*2*deal_II_numbers::PI)
+       detector_angle -= detector_step_angle/360*2*numbers::PI)
     detector_locations.push_back (Point<dim> (std::cos(detector_angle),
 					      std::sin(detector_angle)) *
 				  detector_radius);

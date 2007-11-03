@@ -2610,8 +2610,8 @@ FiniteElement<dim>::block_to_base_index (const unsigned int index) const
     if (first_block_of_base_table[i] <= index)
       return std::pair<unsigned int, unsigned int>(static_cast<unsigned int> (i),
 						   index - first_block_of_base_table[i]);
-  return std::make_pair(deal_II_numbers::invalid_unsigned_int,
-			deal_II_numbers::invalid_unsigned_int);
+  return std::make_pair(numbers::invalid_unsigned_int,
+			numbers::invalid_unsigned_int);
 }
 
 

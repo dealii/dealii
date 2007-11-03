@@ -406,7 +406,7 @@ class DataOutBase
 					  * patch has no neighbor on
 					  * one side.
 					  */
-	static const unsigned int no_neighbor = deal_II_numbers::invalid_unsigned_int;
+	static const unsigned int no_neighbor = numbers::invalid_unsigned_int;
 					 /** @addtogroup Exceptions
 					  * @{ */
 	

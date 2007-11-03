@@ -1496,13 +1496,13 @@ compute_subdomain_wise (std::vector<unsigned int> &new_dof_indices,
                                    // same subdomain, then they will be in
                                    // this order also after reordering
   std::fill (new_dof_indices.begin(), new_dof_indices.end(),
-             deal_II_numbers::invalid_unsigned_int);
+             numbers::invalid_unsigned_int);
   unsigned int next_free_index = 0;
   for (unsigned int subdomain=0; subdomain<n_subdomains; ++subdomain)
     for (unsigned int i=0; i<n_dofs; ++i)
       if (subdomain_association[i] == subdomain)
         {
-          Assert (new_dof_indices[i] == deal_II_numbers::invalid_unsigned_int,
+          Assert (new_dof_indices[i] == numbers::invalid_unsigned_int,
                   ExcInternalError());
           new_dof_indices[i] = next_free_index;
           ++next_free_index;
@@ -1511,7 +1511,7 @@ compute_subdomain_wise (std::vector<unsigned int> &new_dof_indices,
                                    // we should have numbered all dofs
   Assert (next_free_index == n_dofs, ExcInternalError());
   Assert (std::find (new_dof_indices.begin(), new_dof_indices.end(),
-                     deal_II_numbers::invalid_unsigned_int)
+                     numbers::invalid_unsigned_int)
           == new_dof_indices.end(),
           ExcInternalError());
 }

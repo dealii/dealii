@@ -687,7 +687,7 @@ namespace
   GmvStream::GmvStream (std::ostream& out,
 			const DataOutBase::GmvFlags f)
 		  :
-		  selected_component(deal_II_numbers::invalid_unsigned_int),
+		  selected_component(numbers::invalid_unsigned_int),
 		  stream(out), flags(f)
   {}
 
@@ -697,7 +697,7 @@ namespace
   GmvStream::write_point (const unsigned int,
 			  const Point<dim>& p)
   {
-    Assert(selected_component != deal_II_numbers::invalid_unsigned_int,
+    Assert(selected_component != numbers::invalid_unsigned_int,
 	   ExcNotInitialized());
     stream << p(selected_component) << ' ';
   }
@@ -740,7 +740,7 @@ namespace
 
   TecplotStream::TecplotStream(std::ostream& out, const DataOutBase::TecplotFlags f)
 		  :
-		  selected_component(deal_II_numbers::invalid_unsigned_int),
+		  selected_component(numbers::invalid_unsigned_int),
 		  stream(out), flags(f)
   {}
 
@@ -750,7 +750,7 @@ namespace
   TecplotStream::write_point (const unsigned int,
 			      const Point<dim>& p)
   {
-    Assert(selected_component != deal_II_numbers::invalid_unsigned_int,
+    Assert(selected_component != numbers::invalid_unsigned_int,
 	   ExcNotInitialized());
     stream << p(selected_component) << '\n';
   }
@@ -2782,7 +2782,7 @@ void DataOutBase::write_eps (const std::vector<Patch<dim,spacedim> > &patches,
 					     // the height field, I don't know
 					     // it.
 	    EpsCell2d eps_cell;
-	    const double pi = deal_II_numbers::PI;
+	    const double pi = numbers::PI;
 	    const double cx = -std::cos(pi-flags.azimut_angle * 2*pi / 360.),
 			 cz = -std::cos(flags.turn_angle * 2*pi / 360.),
 			 sx = std::sin(pi-flags.azimut_angle * 2*pi / 360.),
@@ -3103,7 +3103,7 @@ void DataOutBase::write_gmv (const std::vector<Patch<dim,spacedim> > &patches,
       write_nodes(patches, gmv_out);
       out << '\n';
     }
-  gmv_out.selected_component = deal_II_numbers::invalid_unsigned_int;
+  gmv_out.selected_component = numbers::invalid_unsigned_int;
 
   for (unsigned int d=spacedim;d<3;++d)
     {

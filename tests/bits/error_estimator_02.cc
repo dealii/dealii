@@ -164,7 +164,7 @@ check ()
                                           v, this_error,
                                           std::vector<bool>(), 0,
                                           multithread_info.n_default_threads,
-                                          deal_II_numbers::invalid_unsigned_int,
+                                          numbers::invalid_unsigned_int,
                                           material);
       this_error *= scaling_factor;
 

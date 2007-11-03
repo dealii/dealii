@@ -332,11 +332,11 @@ estimate (const Mapping<1>                    &mapping,
   typename DH::active_cell_iterator cell = dof_handler.begin_active();
   for (unsigned int cell_index=0; cell != dof_handler.end();
        ++cell, ++cell_index)
-    if (((subdomain_id == deal_II_numbers::invalid_unsigned_int)
+    if (((subdomain_id == numbers::invalid_unsigned_int)
          ||
          (cell->subdomain_id() == subdomain_id))
         &&
-        ((material_id == deal_II_numbers::invalid_unsigned_int)
+        ((material_id == numbers::invalid_unsigned_int)
          ||
          (cell->material_id() == material_id)))
       {
@@ -796,11 +796,11 @@ estimate_some (const hp::MappingCollection<dim>                  &mapping,
                                            // material_id), or if one of the
                                            // neighbors behind the face is on
                                            // the subdomain we care for
-          if ( ! ( ((subdomain_id == deal_II_numbers::invalid_unsigned_int)
+          if ( ! ( ((subdomain_id == numbers::invalid_unsigned_int)
                     ||
                     (cell->subdomain_id() == subdomain_id))
                    &&
-                   ((material_id == deal_II_numbers::invalid_unsigned_int)
+                   ((material_id == numbers::invalid_unsigned_int)
                     ||
                     (cell->material_id() == material_id))) )
             {
@@ -816,11 +816,11 @@ estimate_some (const hp::MappingCollection<dim>                  &mapping,
               if (face->has_children() == false)
                 care_for_cell |= ((cell->neighbor(face_no)->subdomain_id()
                                    == subdomain_id) ||
-                                  (subdomain_id == deal_II_numbers::invalid_unsigned_int))
+                                  (subdomain_id == numbers::invalid_unsigned_int))
                                  &&
                                  ((cell->neighbor(face_no)->material_id()
                                    == material_id) ||
-                                  (material_id == deal_II_numbers::invalid_unsigned_int));
+                                  (material_id == numbers::invalid_unsigned_int));
               else
                 {
                   for (unsigned int sf=0; sf<face->n_children(); ++sf)
@@ -828,13 +828,13 @@ estimate_some (const hp::MappingCollection<dim>                  &mapping,
                           ->subdomain_id() == subdomain_id)
                          &&
                          (material_id ==
-                          deal_II_numbers::invalid_unsigned_int))
+                          numbers::invalid_unsigned_int))
                         ||
                         ((cell->neighbor_child_on_subface(face_no,sf)
                           ->material_id() == material_id)
                          &&
                          (subdomain_id ==
-                          deal_II_numbers::invalid_unsigned_int)))
+                          numbers::invalid_unsigned_int)))
                       {
                         care_for_cell = true;
                         break;
@@ -1068,11 +1068,11 @@ estimate (const Mapping<dim>                  &mapping,
   for (typename DH::active_cell_iterator cell=dof_handler.begin_active();
        cell!=dof_handler.end();
        ++cell, ++present_cell)
-    if ( ((subdomain_id == deal_II_numbers::invalid_unsigned_int)
+    if ( ((subdomain_id == numbers::invalid_unsigned_int)
           ||
           (cell->subdomain_id() == subdomain_id))
          &&
-         ((material_id == deal_II_numbers::invalid_unsigned_int)
+         ((material_id == numbers::invalid_unsigned_int)
           ||
           (cell->material_id() == material_id)))
       {

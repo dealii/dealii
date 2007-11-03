@@ -249,7 +249,7 @@ class MGTransferSelect : public MGTransferBase<Vector<number> >,
 				      * component. Handle with care!
 				      */
     void select (const unsigned int component,
-		 const unsigned int mg_component = deal_II_numbers::invalid_unsigned_int);
+		 const unsigned int mg_component = numbers::invalid_unsigned_int);
     
     virtual void prolongate (const unsigned int    to_level,
 			     Vector<number>       &dst,
@@ -395,7 +395,7 @@ MGTransferSelect<number>::select(const unsigned int component,
 				 const unsigned int mg_component)
 {
   selected_component = component;
-  mg_selected_component = (mg_component == deal_II_numbers::invalid_unsigned_int)
+  mg_selected_component = (mg_component == numbers::invalid_unsigned_int)
 			  ? component
 			  : mg_component;
 }

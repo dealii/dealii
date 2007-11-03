@@ -689,7 +689,7 @@ class FESystem : public FiniteElement<dim>
 				      * face or subface number is
 				      * invalid.
 				      */
-    static const unsigned int invalid_face_number = deal_II_numbers::invalid_unsigned_int;
+    static const unsigned int invalid_face_number = numbers::invalid_unsigned_int;
     
 				     /**
 				      * Pairs of multiplicity and

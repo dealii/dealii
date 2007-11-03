@@ -331,7 +331,7 @@ AdvectionField<dim>::value (const Point<dim> &p) const
   Point<dim> value;
   value[0] = 2;
   for (unsigned int i=1; i<dim; ++i)
-    value[i] = 1+0.8*std::sin(8*deal_II_numbers::PI*p[0]);
+    value[i] = 1+0.8*std::sin(8*numbers::PI*p[0]);
 
   return value;
 }
@@ -478,7 +478,7 @@ BoundaryValues<dim>::value (const Point<dim>   &p,
 {
   Assert (component == 0, ExcIndexRange (component, 0, 1));
 
-  const double sine_term = std::sin(16*deal_II_numbers::PI*std::sqrt(p.square()));
+  const double sine_term = std::sin(16*numbers::PI*std::sqrt(p.square()));
   const double weight    = std::exp(-5*p.square()) / std::exp(-5.);
   return sine_term * weight;
 }

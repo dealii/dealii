@@ -274,7 +274,7 @@ class KellyErrorEstimator
 				      * indicates whether we shall compute
 				      * indicators for all cells (in case its
 				      * value is the default,
-				      * <tt>deal_II_numbers::invalid_unsigned_int</tt>),
+				      * <tt>numbers::invalid_unsigned_int</tt>),
 				      * or only for the cells belonging to a
 				      * certain subdomain with the given
 				      * indicator. The latter case is used for
@@ -319,8 +319,8 @@ class KellyErrorEstimator
 			  const std::vector<bool> &component_mask = std::vector<bool>(),
 			  const Function<dim>     *coefficients   = 0,
 			  const unsigned int       n_threads = multithread_info.n_default_threads,
-                          const unsigned int       subdomain_id = deal_II_numbers::invalid_unsigned_int,
-                          const unsigned int       material_id = deal_II_numbers::invalid_unsigned_int);
+                          const unsigned int       subdomain_id = numbers::invalid_unsigned_int,
+                          const unsigned int       material_id = numbers::invalid_unsigned_int);
     
 				     /**
 				      * Calls the @p estimate
@@ -336,8 +336,8 @@ class KellyErrorEstimator
 			  const std::vector<bool> &component_mask = std::vector<bool>(),
 			  const Function<dim>     *coefficients   = 0,
 			  const unsigned int       n_threads = multithread_info.n_default_threads,
-                          const unsigned int       subdomain_id = deal_II_numbers::invalid_unsigned_int,
-                          const unsigned int       material_id = deal_II_numbers::invalid_unsigned_int);
+                          const unsigned int       subdomain_id = numbers::invalid_unsigned_int,
+                          const unsigned int       material_id = numbers::invalid_unsigned_int);
     
 				     /**
 				      * Same function as above, but
@@ -376,8 +376,8 @@ class KellyErrorEstimator
 			  const std::vector<bool>     &component_mask = std::vector<bool>(),
 			  const Function<dim>         *coefficients   = 0,
 			  const unsigned int           n_threads = multithread_info.n_default_threads,
-                          const unsigned int           subdomain_id = deal_II_numbers::invalid_unsigned_int,
-                          const unsigned int           material_id = deal_II_numbers::invalid_unsigned_int);
+                          const unsigned int           subdomain_id = numbers::invalid_unsigned_int,
+                          const unsigned int           material_id = numbers::invalid_unsigned_int);
 
 				     /**
 				      * Calls the @p estimate
@@ -393,8 +393,8 @@ class KellyErrorEstimator
 			  const std::vector<bool>     &component_mask = std::vector<bool>(),
 			  const Function<dim>         *coefficients   = 0,
 			  const unsigned int           n_threads = multithread_info.n_default_threads,
-                          const unsigned int           subdomain_id = deal_II_numbers::invalid_unsigned_int,
-                          const unsigned int           material_id = deal_II_numbers::invalid_unsigned_int);
+                          const unsigned int           subdomain_id = numbers::invalid_unsigned_int,
+                          const unsigned int           material_id = numbers::invalid_unsigned_int);
 
 
 				     /**
@@ -413,8 +413,8 @@ class KellyErrorEstimator
 			  const std::vector<bool> &component_mask = std::vector<bool>(),
 			  const Function<dim>     *coefficients   = 0,
 			  const unsigned int       n_threads = multithread_info.n_default_threads,
-                          const unsigned int       subdomain_id = deal_II_numbers::invalid_unsigned_int,
-                          const unsigned int       material_id = deal_II_numbers::invalid_unsigned_int);
+                          const unsigned int       subdomain_id = numbers::invalid_unsigned_int,
+                          const unsigned int       material_id = numbers::invalid_unsigned_int);
 
 
 				     /**
@@ -432,8 +432,8 @@ class KellyErrorEstimator
 			  const std::vector<bool> &component_mask = std::vector<bool>(),
 			  const Function<dim>     *coefficients   = 0,
 			  const unsigned int       n_threads = multithread_info.n_default_threads,
-                          const unsigned int       subdomain_id = deal_II_numbers::invalid_unsigned_int,
-                          const unsigned int       material_id = deal_II_numbers::invalid_unsigned_int);
+                          const unsigned int       subdomain_id = numbers::invalid_unsigned_int,
+                          const unsigned int       material_id = numbers::invalid_unsigned_int);
 
 
 				     /**
@@ -452,8 +452,8 @@ class KellyErrorEstimator
 			  const std::vector<bool>     &component_mask = std::vector<bool>(),
 			  const Function<dim>         *coefficients   = 0,
 			  const unsigned int           n_threads = multithread_info.n_default_threads,
-                          const unsigned int           subdomain_id = deal_II_numbers::invalid_unsigned_int,
-                          const unsigned int           material_id = deal_II_numbers::invalid_unsigned_int);
+                          const unsigned int           subdomain_id = numbers::invalid_unsigned_int,
+                          const unsigned int           material_id = numbers::invalid_unsigned_int);
 
 
 				     /**
@@ -471,8 +471,8 @@ class KellyErrorEstimator
 			  const std::vector<bool>     &component_mask = std::vector<bool>(),
 			  const Function<dim>         *coefficients   = 0,
 			  const unsigned int           n_threads = multithread_info.n_default_threads,
-                          const unsigned int           subdomain_id = deal_II_numbers::invalid_unsigned_int,
-                          const unsigned int           material_id = deal_II_numbers::invalid_unsigned_int);
+                          const unsigned int           subdomain_id = numbers::invalid_unsigned_int,
+                          const unsigned int           material_id = numbers::invalid_unsigned_int);
     
     
 				     /**
@@ -857,8 +857,8 @@ class KellyErrorEstimator<1>
 			  const std::vector<bool> &component_mask = std::vector<bool>(),
 			  const Function<1>     *coefficients   = 0,
 			  const unsigned int       n_threads = multithread_info.n_default_threads,
-                          const unsigned int       subdomain_id = deal_II_numbers::invalid_unsigned_int,
-                          const unsigned int       material_id = deal_II_numbers::invalid_unsigned_int);
+                          const unsigned int       subdomain_id = numbers::invalid_unsigned_int,
+                          const unsigned int       material_id = numbers::invalid_unsigned_int);
 
 				     /**
 				      * Calls the @p estimate
@@ -874,8 +874,8 @@ class KellyErrorEstimator<1>
 			  const std::vector<bool> &component_mask = std::vector<bool>(),
 			  const Function<1>     *coefficients   = 0,
 			  const unsigned int       n_threads = multithread_info.n_default_threads,
-                          const unsigned int       subdomain_id = deal_II_numbers::invalid_unsigned_int,
-                          const unsigned int       material_id = deal_II_numbers::invalid_unsigned_int);
+                          const unsigned int       subdomain_id = numbers::invalid_unsigned_int,
+                          const unsigned int       material_id = numbers::invalid_unsigned_int);
     
 				     /**
 				      * Same function as above, but
@@ -914,8 +914,8 @@ class KellyErrorEstimator<1>
 			  const std::vector<bool>     &component_mask = std::vector<bool>(),
 			  const Function<1>         *coefficients   = 0,
 			  const unsigned int           n_threads = multithread_info.n_default_threads,
-                          const unsigned int           subdomain_id = deal_II_numbers::invalid_unsigned_int,
-                          const unsigned int           material_id = deal_II_numbers::invalid_unsigned_int);
+                          const unsigned int           subdomain_id = numbers::invalid_unsigned_int,
+                          const unsigned int           material_id = numbers::invalid_unsigned_int);
 
 				     /**
 				      * Calls the @p estimate
@@ -931,8 +931,8 @@ class KellyErrorEstimator<1>
 			  const std::vector<bool>     &component_mask = std::vector<bool>(),
 			  const Function<1>         *coefficients   = 0,
 			  const unsigned int           n_threads = multithread_info.n_default_threads,
-                          const unsigned int           subdomain_id = deal_II_numbers::invalid_unsigned_int,
-                          const unsigned int           material_id = deal_II_numbers::invalid_unsigned_int);
+                          const unsigned int           subdomain_id = numbers::invalid_unsigned_int,
+                          const unsigned int           material_id = numbers::invalid_unsigned_int);
 
 
 				     /**
@@ -951,8 +951,8 @@ class KellyErrorEstimator<1>
 			  const std::vector<bool> &component_mask = std::vector<bool>(),
 			  const Function<1>     *coefficients   = 0,
 			  const unsigned int       n_threads = multithread_info.n_default_threads,
-                          const unsigned int       subdomain_id = deal_II_numbers::invalid_unsigned_int,
-                          const unsigned int       material_id = deal_II_numbers::invalid_unsigned_int);
+                          const unsigned int       subdomain_id = numbers::invalid_unsigned_int,
+                          const unsigned int       material_id = numbers::invalid_unsigned_int);
 
 
 				     /**
@@ -970,8 +970,8 @@ class KellyErrorEstimator<1>
 			  const std::vector<bool> &component_mask = std::vector<bool>(),
 			  const Function<1>     *coefficients   = 0,
 			  const unsigned int       n_threads = multithread_info.n_default_threads,
-                          const unsigned int       subdomain_id = deal_II_numbers::invalid_unsigned_int,
-                          const unsigned int       material_id = deal_II_numbers::invalid_unsigned_int);
+                          const unsigned int       subdomain_id = numbers::invalid_unsigned_int,
+                          const unsigned int       material_id = numbers::invalid_unsigned_int);
 
 
 				     /**
@@ -990,8 +990,8 @@ class KellyErrorEstimator<1>
 			  const std::vector<bool>     &component_mask = std::vector<bool>(),
 			  const Function<1>         *coefficients   = 0,
 			  const unsigned int           n_threads = multithread_info.n_default_threads,
-                          const unsigned int           subdomain_id = deal_II_numbers::invalid_unsigned_int,
-                          const unsigned int           material_id = deal_II_numbers::invalid_unsigned_int);
+                          const unsigned int           subdomain_id = numbers::invalid_unsigned_int,
+                          const unsigned int           material_id = numbers::invalid_unsigned_int);
 
 
 				     /**
@@ -1009,8 +1009,8 @@ class KellyErrorEstimator<1>
 			  const std::vector<bool>     &component_mask = std::vector<bool>(),
 			  const Function<1>         *coefficients   = 0,
 			  const unsigned int           n_threads = multithread_info.n_default_threads,
-                          const unsigned int           subdomain_id = deal_II_numbers::invalid_unsigned_int,
-                          const unsigned int           material_id = deal_II_numbers::invalid_unsigned_int);
+                          const unsigned int           subdomain_id = numbers::invalid_unsigned_int,
+                          const unsigned int           material_id = numbers::invalid_unsigned_int);
     
 				     /**
 				      * Exception

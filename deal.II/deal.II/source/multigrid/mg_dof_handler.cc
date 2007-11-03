@@ -38,7 +38,7 @@ DEAL_II_NAMESPACE_OPEN
 template <int dim>
 MGDoFHandler<dim>::MGVertexDoFs::MGVertexDoFs ()
 		:
-		coarsest_level (deal_II_numbers::invalid_unsigned_int),
+		coarsest_level (numbers::invalid_unsigned_int),
 		finest_level (0),
 		indices (0)
 {}

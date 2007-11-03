@@ -1010,7 +1010,7 @@ namespace BlockMatrixIterators
   unsigned int
   AccessorBase<BlockMatrix>::block_row() const
   {
-    Assert (row_block != deal_II_numbers::invalid_unsigned_int,
+    Assert (row_block != numbers::invalid_unsigned_int,
 	    ExcIteratorPastEnd());
     
     return row_block;
@@ -1022,7 +1022,7 @@ namespace BlockMatrixIterators
   unsigned int
   AccessorBase<BlockMatrix>::block_column() const
   {
-    Assert (col_block != deal_II_numbers::invalid_unsigned_int,
+    Assert (col_block != numbers::invalid_unsigned_int,
 	    ExcIteratorPastEnd());
     
     return col_block;
@@ -1075,8 +1075,8 @@ namespace BlockMatrixIterators
       {
 					 // we were asked to create the end
 					 // iterator for this matrix
-	this->row_block = deal_II_numbers::invalid_unsigned_int;
-	this->col_block = deal_II_numbers::invalid_unsigned_int;
+	this->row_block = numbers::invalid_unsigned_int;
+	this->col_block = numbers::invalid_unsigned_int;
       }
   }
   
@@ -1110,7 +1110,7 @@ namespace BlockMatrixIterators
   unsigned int
   Accessor<BlockMatrix, true>::row() const
   {
-    Assert (this->row_block != deal_II_numbers::invalid_unsigned_int,
+    Assert (this->row_block != numbers::invalid_unsigned_int,
 	    ExcIteratorPastEnd());
     
     return (matrix->row_block_indices.local_to_global(this->row_block, 0) +
@@ -1123,7 +1123,7 @@ namespace BlockMatrixIterators
   unsigned int
   Accessor<BlockMatrix, true>::column() const
   {
-    Assert (this->col_block != deal_II_numbers::invalid_unsigned_int,
+    Assert (this->col_block != numbers::invalid_unsigned_int,
 	    ExcIteratorPastEnd());
     
     return (matrix->column_block_indices.local_to_global(this->col_block,0) +
@@ -1136,9 +1136,9 @@ namespace BlockMatrixIterators
   typename Accessor<BlockMatrix, true>::value_type
   Accessor<BlockMatrix, true>::value () const
   {
-    Assert (this->row_block != deal_II_numbers::invalid_unsigned_int,
+    Assert (this->row_block != numbers::invalid_unsigned_int,
 	    ExcIteratorPastEnd());
-    Assert (this->col_block != deal_II_numbers::invalid_unsigned_int,
+    Assert (this->col_block != numbers::invalid_unsigned_int,
 	    ExcIteratorPastEnd());
     
     return base_iterator->value();
@@ -1151,9 +1151,9 @@ namespace BlockMatrixIterators
   void
   Accessor<BlockMatrix, true>::advance ()
   {      
-    Assert (this->row_block != deal_II_numbers::invalid_unsigned_int,
+    Assert (this->row_block != numbers::invalid_unsigned_int,
 	    ExcIteratorPastEnd());
-    Assert (this->col_block != deal_II_numbers::invalid_unsigned_int,
+    Assert (this->col_block != numbers::invalid_unsigned_int,
 	    ExcIteratorPastEnd());
     
 				     // Remember current row inside block
@@ -1199,8 +1199,8 @@ namespace BlockMatrixIterators
 		++this->row_block;
 		if (this->row_block == matrix->n_block_rows())
 		  {
-		    this->row_block = deal_II_numbers::invalid_unsigned_int;
-		    this->col_block = deal_II_numbers::invalid_unsigned_int;
+		    this->row_block = numbers::invalid_unsigned_int;
+		    this->col_block = numbers::invalid_unsigned_int;
 		    return;
 		  }
 	      }
@@ -1226,9 +1226,9 @@ namespace BlockMatrixIterators
 				       // have to have the same
 				       // base_iterator representation, but
 				       // valid iterators have to
-      return (((this->row_block == deal_II_numbers::invalid_unsigned_int)
+      return (((this->row_block == numbers::invalid_unsigned_int)
 	       &&
-	       (this->col_block == deal_II_numbers::invalid_unsigned_int))
+	       (this->col_block == numbers::invalid_unsigned_int))
 	      ||
 	      (base_iterator == a.base_iterator));
 
@@ -1283,8 +1283,8 @@ namespace BlockMatrixIterators
       {
 					 // we were asked to create the end
 					 // iterator for this matrix
-	this->row_block = deal_II_numbers::invalid_unsigned_int;
-	this->col_block = deal_II_numbers::invalid_unsigned_int;
+	this->row_block = numbers::invalid_unsigned_int;
+	this->col_block = numbers::invalid_unsigned_int;
       }
   }
   
@@ -1294,7 +1294,7 @@ namespace BlockMatrixIterators
   unsigned int
   Accessor<BlockMatrix, false>::row() const
   {
-    Assert (this->row_block != deal_II_numbers::invalid_unsigned_int,
+    Assert (this->row_block != numbers::invalid_unsigned_int,
 	    ExcIteratorPastEnd());
     
     return (matrix->row_block_indices.local_to_global(this->row_block, 0) +
@@ -1307,7 +1307,7 @@ namespace BlockMatrixIterators
   unsigned int
   Accessor<BlockMatrix, false>::column() const
   {
-    Assert (this->col_block != deal_II_numbers::invalid_unsigned_int,
+    Assert (this->col_block != numbers::invalid_unsigned_int,
 	    ExcIteratorPastEnd());
     
     return (matrix->column_block_indices.local_to_global(this->col_block,0) +
@@ -1320,9 +1320,9 @@ namespace BlockMatrixIterators
   typename Accessor<BlockMatrix, false>::value_type
   Accessor<BlockMatrix, false>::value () const
   {
-    Assert (this->row_block != deal_II_numbers::invalid_unsigned_int,
+    Assert (this->row_block != numbers::invalid_unsigned_int,
 	    ExcIteratorPastEnd());
-    Assert (this->col_block != deal_II_numbers::invalid_unsigned_int,
+    Assert (this->col_block != numbers::invalid_unsigned_int,
 	    ExcIteratorPastEnd());
     
     return base_iterator->value();
@@ -1335,9 +1335,9 @@ namespace BlockMatrixIterators
   void
   Accessor<BlockMatrix, false>::set_value (typename Accessor<BlockMatrix, false>::value_type newval) const
   {
-    Assert (this->row_block != deal_II_numbers::invalid_unsigned_int,
+    Assert (this->row_block != numbers::invalid_unsigned_int,
 	    ExcIteratorPastEnd());
-    Assert (this->col_block != deal_II_numbers::invalid_unsigned_int,
+    Assert (this->col_block != numbers::invalid_unsigned_int,
 	    ExcIteratorPastEnd());
     
     base_iterator->value() = newval;
@@ -1350,9 +1350,9 @@ namespace BlockMatrixIterators
   void
   Accessor<BlockMatrix, false>::advance ()
   {      
-    Assert (this->row_block != deal_II_numbers::invalid_unsigned_int,
+    Assert (this->row_block != numbers::invalid_unsigned_int,
 	    ExcIteratorPastEnd());
-    Assert (this->col_block != deal_II_numbers::invalid_unsigned_int,
+    Assert (this->col_block != numbers::invalid_unsigned_int,
 	    ExcIteratorPastEnd());
     
 				     // Remember current row inside block
@@ -1398,8 +1398,8 @@ namespace BlockMatrixIterators
 		++this->row_block;
 		if (this->row_block == matrix->n_block_rows())
 		  {
-		    this->row_block = deal_II_numbers::invalid_unsigned_int;
-		    this->col_block = deal_II_numbers::invalid_unsigned_int;
+		    this->row_block = numbers::invalid_unsigned_int;
+		    this->col_block = numbers::invalid_unsigned_int;
 		    return;
 		  }
 	      }
@@ -1426,9 +1426,9 @@ namespace BlockMatrixIterators
 				       // have to have the same
 				       // base_iterator representation, but
 				       // valid iterators have to
-      return (((this->row_block == deal_II_numbers::invalid_unsigned_int)
+      return (((this->row_block == numbers::invalid_unsigned_int)
 	       &&
-	       (this->col_block == deal_II_numbers::invalid_unsigned_int))
+	       (this->col_block == numbers::invalid_unsigned_int))
 	      ||
 	      (base_iterator == a.base_iterator));
 
@@ -1558,7 +1558,7 @@ BlockMatrixBase<MatrixType>::set (const unsigned int i,
                                   const value_type value)
 {
 
-  Assert (deal_II_numbers::is_finite(value), 
+  Assert (numbers::is_finite(value), 
           ExcMessage("The given value is not finite but either infinite or Not A Number (NaN)"));
 
   const std::pair<unsigned int,unsigned int>
@@ -1579,7 +1579,7 @@ BlockMatrixBase<MatrixType>::add (const unsigned int i,
                                   const value_type value)
 {
 
-  Assert (deal_II_numbers::is_finite(value), 
+  Assert (numbers::is_finite(value), 
           ExcMessage("The given value is not finite but either infinite or Not A Number (NaN)"));
 
                                    // save some cycles for zero additions, but

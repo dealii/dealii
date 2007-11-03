@@ -118,7 +118,7 @@ QGauss<1>::QGauss (const unsigned int n)
   
   for (unsigned int i=1; i<=m; ++i)
     {
-      long double z = std::cos(deal_II_numbers::PI * (i-.25)/(n+.5));
+      long double z = std::cos(numbers::PI * (i-.25)/(n+.5));
 
       long double pp;
       long double p1, p2, p3;

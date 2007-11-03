@@ -331,7 +331,7 @@ class MeanValueFilter : public Subscriptor
 				      * Constructor, optionally
 				      * selecting a component.
 				      */
-    MeanValueFilter(unsigned int component = deal_II_numbers::invalid_unsigned_int);
+    MeanValueFilter(unsigned int component = numbers::invalid_unsigned_int);
 
 				     /**
 				      * Subtract mean value from @p v.

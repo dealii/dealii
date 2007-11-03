@@ -1537,7 +1537,7 @@ void GridOut::write_eps (
 					 // is in direction of the viewer, but
 					 // I am too tired at present to fix
 					 // this
-	const double pi = deal_II_numbers::PI;
+	const double pi = numbers::PI;
 	const double z_angle    = eps_flags_3.azimut_angle;
 	const double turn_angle = eps_flags_3.turn_angle;
 	const Point<dim> view_direction(-std::sin(z_angle * 2.*pi / 360.) * std::sin(turn_angle * 2.*pi / 360.),

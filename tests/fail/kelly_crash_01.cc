@@ -315,8 +315,8 @@ estimate_smoothness (Vector<float> &smoothness_indicators) const
 		&&
 		(i*i + j*j < N*N))
 	      {
-		k_vectors.push_back (Point<dim>(deal_II_numbers::PI * i,
-						deal_II_numbers::PI * j));
+		k_vectors.push_back (Point<dim>(numbers::PI * i,
+						numbers::PI * j));
 		k_vectors_magnitude.push_back (i*i+j*j);
 	      }
 	
@@ -332,9 +332,9 @@ estimate_smoothness (Vector<float> &smoothness_indicators) const
 		  &&
 		  (i*i + j*j + k*k < N*N))
 		{
-		  k_vectors.push_back (Point<dim>(deal_II_numbers::PI * i,
-						  deal_II_numbers::PI * j,
-						  deal_II_numbers::PI * k));
+		  k_vectors.push_back (Point<dim>(numbers::PI * i,
+						  numbers::PI * j,
+						  numbers::PI * k));
 		  k_vectors_magnitude.push_back (i*i+j*j+k*k);
 	      }
 	
@@ -380,7 +380,7 @@ estimate_smoothness (Vector<float> &smoothness_indicators) const
 		       quadrature.weight(q);
 	      }
 	    fourier_transform_matrices[fe](k,i)
-	      = sum / std::pow(2*deal_II_numbers::PI, 1.*dim/2);
+	      = sum / std::pow(2*numbers::PI, 1.*dim/2);
 	  }
     }
 
@@ -654,46 +654,46 @@ void LaplaceProblem<3>::create_coarse_grid ()
     {
 					   // points on the lower surface
 	  Point<dim>(0,  0, -4),
-	  Point<dim>(std::cos(0*deal_II_numbers::PI/6),
-		     std::sin(0*deal_II_numbers::PI/6),
+	  Point<dim>(std::cos(0*numbers::PI/6),
+		     std::sin(0*numbers::PI/6),
 		     -4),
-	  Point<dim>(std::cos(2*deal_II_numbers::PI/6),
-		     std::sin(2*deal_II_numbers::PI/6),
+	  Point<dim>(std::cos(2*numbers::PI/6),
+		     std::sin(2*numbers::PI/6),
 		     -4),
-	  Point<dim>(std::cos(4*deal_II_numbers::PI/6),
-		     std::sin(4*deal_II_numbers::PI/6),
+	  Point<dim>(std::cos(4*numbers::PI/6),
+		     std::sin(4*numbers::PI/6),
 		     -4),
-	  Point<dim>(std::cos(6*deal_II_numbers::PI/6),
-		     std::sin(6*deal_II_numbers::PI/6),
+	  Point<dim>(std::cos(6*numbers::PI/6),
+		     std::sin(6*numbers::PI/6),
 		     -4),
-	  Point<dim>(std::cos(8*deal_II_numbers::PI/6),
-		     std::sin(8*deal_II_numbers::PI/6),
+	  Point<dim>(std::cos(8*numbers::PI/6),
+		     std::sin(8*numbers::PI/6),
 		     -4),
-	  Point<dim>(std::cos(10*deal_II_numbers::PI/6),
-		     std::sin(10*deal_II_numbers::PI/6),
+	  Point<dim>(std::cos(10*numbers::PI/6),
+		     std::sin(10*numbers::PI/6),
 		     -4),
 
 					   // same points on the top
 					   // of the stem, with
 					   // indentation in the middle
 	  Point<dim>(0,  0, 4-std::sqrt(2.)/2),
-	  Point<dim>(std::cos(0*deal_II_numbers::PI/6),
-		     std::sin(0*deal_II_numbers::PI/6),
+	  Point<dim>(std::cos(0*numbers::PI/6),
+		     std::sin(0*numbers::PI/6),
 		     4),
-	  Point<dim>(std::cos(2*deal_II_numbers::PI/6),
-		     std::sin(2*deal_II_numbers::PI/6),
+	  Point<dim>(std::cos(2*numbers::PI/6),
+		     std::sin(2*numbers::PI/6),
 		     4),
-	  Point<dim>(std::cos(4*deal_II_numbers::PI/6),
-		     std::sin(4*deal_II_numbers::PI/6),
+	  Point<dim>(std::cos(4*numbers::PI/6),
+		     std::sin(4*numbers::PI/6),
 		     4),
-	  Point<dim>(std::cos(6*deal_II_numbers::PI/6),
-		     std::sin(6*deal_II_numbers::PI/6),
+	  Point<dim>(std::cos(6*numbers::PI/6),
+		     std::sin(6*numbers::PI/6),
 		     4),
-	  Point<dim>(std::cos(8*deal_II_numbers::PI/6),
-		     std::sin(8*deal_II_numbers::PI/6),
+	  Point<dim>(std::cos(8*numbers::PI/6),
+		     std::sin(8*numbers::PI/6),
 		     4),
-	  Point<dim>(std::cos(10*deal_II_numbers::PI/6),
-		     std::sin(10*deal_II_numbers::PI/6),
+	  Point<dim>(std::cos(10*numbers::PI/6),
+		     std::sin(10*numbers::PI/6),
 		     4),
 
 					   // point at top of chevron
@@ -702,67 +702,67 @@ void LaplaceProblem<3>::create_coarse_grid ()
 					   // points at the top of the
 					   // first extension
 					   // points 15-18
-	  Point<dim>(0,  0, 7) + Point<dim> (std::cos(2*deal_II_numbers::PI/6),
-					     std::sin(2*deal_II_numbers::PI/6),
+	  Point<dim>(0,  0, 7) + Point<dim> (std::cos(2*numbers::PI/6),
+					     std::sin(2*numbers::PI/6),
 					     0) * 4,
-	  Point<dim>(std::cos(0*deal_II_numbers::PI/6),
-		     std::sin(0*deal_II_numbers::PI/6),
-		     7) + Point<dim> (std::cos(2*deal_II_numbers::PI/6),
-				      std::sin(2*deal_II_numbers::PI/6),
+	  Point<dim>(std::cos(0*numbers::PI/6),
+		     std::sin(0*numbers::PI/6),
+		     7) + Point<dim> (std::cos(2*numbers::PI/6),
+				      std::sin(2*numbers::PI/6),
 				      0) * 4,
-	  Point<dim>(std::cos(2*deal_II_numbers::PI/6),
-		     std::sin(2*deal_II_numbers::PI/6),
-		     7) + Point<dim> (std::cos(2*deal_II_numbers::PI/6),
-				      std::sin(2*deal_II_numbers::PI/6),
+	  Point<dim>(std::cos(2*numbers::PI/6),
+		     std::sin(2*numbers::PI/6),
+		     7) + Point<dim> (std::cos(2*numbers::PI/6),
+				      std::sin(2*numbers::PI/6),
 				      0) * 4,
-	  Point<dim>(std::cos(4*deal_II_numbers::PI/6),
-		     std::sin(4*deal_II_numbers::PI/6),
-		     7) + Point<dim> (std::cos(2*deal_II_numbers::PI/6),
-				      std::sin(2*deal_II_numbers::PI/6),
+	  Point<dim>(std::cos(4*numbers::PI/6),
+		     std::sin(4*numbers::PI/6),
+		     7) + Point<dim> (std::cos(2*numbers::PI/6),
+				      std::sin(2*numbers::PI/6),
 				      0) * 4,
 
 					   // points at the top of the
 					   // second extension
 					   // points 19-22
-	  Point<dim>(0,  0, 7) + Point<dim> (std::cos(6*deal_II_numbers::PI/6),
-					     std::sin(6*deal_II_numbers::PI/6),
+	  Point<dim>(0,  0, 7) + Point<dim> (std::cos(6*numbers::PI/6),
+					     std::sin(6*numbers::PI/6),
 					     0) * 4,
-	  Point<dim>(std::cos(4*deal_II_numbers::PI/6),
-		     std::sin(4*deal_II_numbers::PI/6),
-		     7) + Point<dim> (std::cos(6*deal_II_numbers::PI/6),
-				      std::sin(6*deal_II_numbers::PI/6),
+	  Point<dim>(std::cos(4*numbers::PI/6),
+		     std::sin(4*numbers::PI/6),
+		     7) + Point<dim> (std::cos(6*numbers::PI/6),
+				      std::sin(6*numbers::PI/6),
 				      0) * 4,
-	  Point<dim>(std::cos(6*deal_II_numbers::PI/6),
-		     std::sin(6*deal_II_numbers::PI/6),
-		     7) + Point<dim> (std::cos(6*deal_II_numbers::PI/6),
-				      std::sin(6*deal_II_numbers::PI/6),
+	  Point<dim>(std::cos(6*numbers::PI/6),
+		     std::sin(6*numbers::PI/6),
+		     7) + Point<dim> (std::cos(6*numbers::PI/6),
+				      std::sin(6*numbers::PI/6),
 				      0) * 4,
-	  Point<dim>(std::cos(8*deal_II_numbers::PI/6),
-		     std::sin(8*deal_II_numbers::PI/6),
-		     7) + Point<dim> (std::cos(6*deal_II_numbers::PI/6),
-				      std::sin(6*deal_II_numbers::PI/6),
+	  Point<dim>(std::cos(8*numbers::PI/6),
+		     std::sin(8*numbers::PI/6),
+		     7) + Point<dim> (std::cos(6*numbers::PI/6),
+				      std::sin(6*numbers::PI/6),
 				      0) * 4,
 
 					   // points at the top of the
 					   // third extension
 					   // points 23-26
-	  Point<dim>(0,  0, 7) + Point<dim> (std::cos(10*deal_II_numbers::PI/6),
-					     std::sin(10*deal_II_numbers::PI/6),
+	  Point<dim>(0,  0, 7) + Point<dim> (std::cos(10*numbers::PI/6),
+					     std::sin(10*numbers::PI/6),
 					     0) * 4,
-	  Point<dim>(std::cos(8*deal_II_numbers::PI/6),
-		     std::sin(8*deal_II_numbers::PI/6),
-		     7) + Point<dim> (std::cos(10*deal_II_numbers::PI/6),
-				      std::sin(10*deal_II_numbers::PI/6),
+	  Point<dim>(std::cos(8*numbers::PI/6),
+		     std::sin(8*numbers::PI/6),
+		     7) + Point<dim> (std::cos(10*numbers::PI/6),
+				      std::sin(10*numbers::PI/6),
 				      0) * 4,
-	  Point<dim>(std::cos(10*deal_II_numbers::PI/6),
-		     std::sin(10*deal_II_numbers::PI/6),
-		     7) + Point<dim> (std::cos(10*deal_II_numbers::PI/6),
-				      std::sin(10*deal_II_numbers::PI/6),
+	  Point<dim>(std::cos(10*numbers::PI/6),
+		     std::sin(10*numbers::PI/6),
+		     7) + Point<dim> (std::cos(10*numbers::PI/6),
+				      std::sin(10*numbers::PI/6),
 				      0) * 4,
-	  Point<dim>(std::cos(0*deal_II_numbers::PI/6),
-		     std::sin(0*deal_II_numbers::PI/6),
-		     7) + Point<dim> (std::cos(10*deal_II_numbers::PI/6),
-				      std::sin(10*deal_II_numbers::PI/6),
+	  Point<dim>(std::cos(0*numbers::PI/6),
+		     std::sin(0*numbers::PI/6),
+		     7) + Point<dim> (std::cos(10*numbers::PI/6),
+				      std::sin(10*numbers::PI/6),
 				      0) * 4,
 	  
     };

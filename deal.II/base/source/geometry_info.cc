@@ -29,7 +29,7 @@ template <int dim> const unsigned int GeometryInfo<dim>::quads_per_cell;
 template <int dim> const unsigned int GeometryInfo<dim>::hexes_per_cell;
 
 
-using namespace deal_II_numbers;
+using namespace numbers;
 
 // make sure that also the icc compiler defines (and not only declares) 
 // these variables

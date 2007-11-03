@@ -127,7 +127,7 @@ FullMatrix<number> &
 FullMatrix<number>::operator *= (const double factor)
 {
 
-  Assert (deal_II_numbers::is_finite(factor), 
+  Assert (numbers::is_finite(factor), 
           ExcMessage("The given value is not finite but either infinite or Not A Number (NaN)"));
 
   number       *p = &this->el(0,0);
@@ -145,7 +145,7 @@ FullMatrix<number> &
 FullMatrix<number>::operator /= (const double factor)
 {
 
-  Assert (deal_II_numbers::is_finite(factor), 
+  Assert (numbers::is_finite(factor), 
           ExcMessage("The given value is not finite but either infinite or Not A Number (NaN)"));
 
   number       *p = &this->el(0,0);
@@ -153,7 +153,7 @@ FullMatrix<number>::operator /= (const double factor)
 
   const number factor_inv = 1./factor;
 
-  Assert (deal_II_numbers::is_finite(factor_inv), 
+  Assert (numbers::is_finite(factor_inv), 
           ExcMessage("The given value is not finite but either infinite or Not A Number (NaN)"));
  
   while (p != e)

@@ -74,7 +74,7 @@ check_function(const Functions::FlowFunction<dim>& f,
 	  ++vertex_number;
 	}
   for (unsigned int i=0;i<GeometryInfo<dim>::faces_per_cell;++i)
-    patches[0].neighbors[i] = deal_II_numbers::invalid_unsigned_int;
+    patches[0].neighbors[i] = numbers::invalid_unsigned_int;
   patches[0].patch_index = 0;
   patches[0].n_subdivisions = sub;
   patches[0].points_are_available = false;

@@ -231,10 +231,10 @@ namespace internal
 		  const unsigned int initv1)
 		    :
 		    v0(initv0), v1(initv1),
-		    Q0(deal_II_numbers::invalid_unsigned_int),
-                    Q1(deal_II_numbers::invalid_unsigned_int),
-		    lsn0(deal_II_numbers::invalid_unsigned_int),
-                    lsn1(deal_II_numbers::invalid_unsigned_int),
+		    Q0(numbers::invalid_unsigned_int),
+                    Q1(numbers::invalid_unsigned_int),
+		    lsn0(numbers::invalid_unsigned_int),
+                    lsn1(numbers::invalid_unsigned_int),
 		    Oriented(false)
     {}
 
@@ -342,12 +342,12 @@ namespace internal
 	  for (unsigned int i = 0;i<4;++i)
 	    {
 	      MSide &ss = sides[(*it).side[i]];
-	      if (ss.Q0 == deal_II_numbers::invalid_unsigned_int)
+	      if (ss.Q0 == numbers::invalid_unsigned_int)
 		{
 		  ss.Q0 = qctr;
 		  ss.lsn0 = i;
 		}
-	      else if (ss.Q1 == deal_II_numbers::invalid_unsigned_int)
+	      else if (ss.Q1 == numbers::invalid_unsigned_int)
 		{
 		  ss.Q1 = qctr;
 		  ss.lsn1 = i;
@@ -509,7 +509,7 @@ namespace internal
 	  lsn = s.lsn0;
 	}
   
-      if (opquad != deal_II_numbers::invalid_unsigned_int)
+      if (opquad != numbers::invalid_unsigned_int)
 	{
 	  qnum = opquad;
 	  return true;
@@ -757,7 +757,7 @@ namespace internal
 		const unsigned int n1)
 		    :
 		    orientation_flag (unoriented_edge),
-		    group (deal_II_numbers::invalid_unsigned_int)
+		    group (numbers::invalid_unsigned_int)
     {
       nodes[0] = n0;
       nodes[1] = n1;
@@ -769,12 +769,12 @@ namespace internal
     {
       for (unsigned int i=0; i<GeometryInfo<3>::lines_per_cell; ++i)
 	{
-	  edges[i] = deal_II_numbers::invalid_unsigned_int;
+	  edges[i] = numbers::invalid_unsigned_int;
 	  local_orientation_flags[i] = forward_edge;
 	}
       
       for (unsigned int i=0; i<GeometryInfo<3>::vertices_per_cell; ++i)
-	nodes[i] = deal_II_numbers::invalid_unsigned_int;
+	nodes[i] = numbers::invalid_unsigned_int;
       
       waiting_to_be_processed = false;
     }
@@ -1409,7 +1409,7 @@ namespace internal
 					   // Here the number of
 					   // incoming edges is
 					   // tallied for each node.
-	  unsigned int perm_num = deal_II_numbers::invalid_unsigned_int;
+	  unsigned int perm_num = numbers::invalid_unsigned_int;
 	  for (unsigned int node_num=0; node_num<8; ++node_num)
 	    {
 					       // The local edge
@@ -1444,7 +1444,7 @@ namespace internal
       
 	      if (total == 3) 
 		{
-		  Assert (perm_num == deal_II_numbers::invalid_unsigned_int,
+		  Assert (perm_num == numbers::invalid_unsigned_int,
 			  ExcGridOrientError("More than one node with 3 incoming "
 					     "edges found in curent hex.")); 
 		  perm_num = node_num;
@@ -1452,7 +1452,7 @@ namespace internal
 	    }
 					   // We should now have a
 					   // valid permutation number
-	  Assert (perm_num != deal_II_numbers::invalid_unsigned_int,
+	  Assert (perm_num != numbers::invalid_unsigned_int,
 		  ExcGridOrientError("No node having 3 incoming edges found in curent hex.")); 
 
 					   // So use the apropriate

@@ -129,7 +129,7 @@ void GridIn<dim>::read_ucd (std::istream &in)
 	      {
 						 // no such vertex index
 		AssertThrow (false, ExcInvalidVertexIndex(cell, cells.back().vertices[i]));
-		cells.back().vertices[i] = deal_II_numbers::invalid_unsigned_int;
+		cells.back().vertices[i] = numbers::invalid_unsigned_int;
 	      };
 	}
       else
@@ -156,7 +156,7 @@ void GridIn<dim>::read_ucd (std::istream &in)
 			       ExcInvalidVertexIndex(cell,
 						     subcelldata.boundary_lines.back().vertices[i]));
 		  subcelldata.boundary_lines.back().vertices[i]
-		    = deal_II_numbers::invalid_unsigned_int;
+		    = numbers::invalid_unsigned_int;
 		};
 	  }
 	else
@@ -186,7 +186,7 @@ void GridIn<dim>::read_ucd (std::istream &in)
  		            ExcInvalidVertexIndex(cell,
  			                          subcelldata.boundary_quads.back().vertices[i]));
  		    subcelldata.boundary_quads.back().vertices[i] =
-		      deal_II_numbers::invalid_unsigned_int;
+		      numbers::invalid_unsigned_int;
  		  };
 	      
 	    }
@@ -667,7 +667,7 @@ void GridIn<dim>::read_msh (std::istream &in)
 	      {
 						 // no such vertex index
 		AssertThrow (false, ExcInvalidVertexIndex(cell, cells.back().vertices[i]));
-		cells.back().vertices[i] = deal_II_numbers::invalid_unsigned_int;
+		cells.back().vertices[i] = numbers::invalid_unsigned_int;
 	      };
 	}
       else
@@ -694,7 +694,7 @@ void GridIn<dim>::read_msh (std::istream &in)
 			       ExcInvalidVertexIndex(cell,
 						     subcelldata.boundary_lines.back().vertices[i]));
 		  subcelldata.boundary_lines.back().vertices[i] =
-		    deal_II_numbers::invalid_unsigned_int;
+		    numbers::invalid_unsigned_int;
 		};
 	  }
 	else
@@ -724,7 +724,7 @@ void GridIn<dim>::read_msh (std::istream &in)
  		            ExcInvalidVertexIndex(cell,
  			                          subcelldata.boundary_quads.back().vertices[i]));
  		    subcelldata.boundary_quads.back().vertices[i] =
-		      deal_II_numbers::invalid_unsigned_int;
+		      numbers::invalid_unsigned_int;
  		  };
 	      
 	    }

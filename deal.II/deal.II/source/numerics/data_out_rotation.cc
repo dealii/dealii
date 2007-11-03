@@ -96,9 +96,9 @@ void DataOutRotation<dim,DH>::build_some_patches (Data &data)
   std::vector<Point<DH::dimension+1> > angle_directions (n_patches_per_circle+1);
   for (unsigned int i=0; i<=n_patches_per_circle; ++i)
     {
-      angle_directions[i][DH::dimension-1] = std::cos(2*deal_II_numbers::PI *
+      angle_directions[i][DH::dimension-1] = std::cos(2*numbers::PI *
 						      i/n_patches_per_circle);
-      angle_directions[i][DH::dimension] = std::sin(2*deal_II_numbers::PI *
+      angle_directions[i][DH::dimension] = std::sin(2*numbers::PI *
 						    i/n_patches_per_circle);
     };
   

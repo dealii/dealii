@@ -1956,8 +1956,8 @@ std::pair<unsigned int, unsigned int>
 CellAccessor<1>::neighbor_of_coarser_neighbor (const unsigned int) const
 {
   Assert(false, ExcImpossibleInDim(1));
-  return std::make_pair (deal_II_numbers::invalid_unsigned_int,
-			 deal_II_numbers::invalid_unsigned_int);
+  return std::make_pair (numbers::invalid_unsigned_int,
+			 numbers::invalid_unsigned_int);
 }
 
 
@@ -2223,7 +2223,7 @@ unsigned int CellAccessor<dim>::neighbor_of_neighbor (const unsigned int neighbo
 				       // since then we did not find
 				       // our way back...
       Assert (false, ExcInternalError());
-      return deal_II_numbers::invalid_unsigned_int;
+      return numbers::invalid_unsigned_int;
     }
 }
 
@@ -2305,8 +2305,8 @@ CellAccessor<dim>::neighbor_of_coarser_neighbor (const unsigned int neighbor) co
 				   // since then we did not find
 				   // our way back...
   Assert (false, ExcInternalError());
-  return std::make_pair (deal_II_numbers::invalid_unsigned_int,
-			 deal_II_numbers::invalid_unsigned_int);
+  return std::make_pair (numbers::invalid_unsigned_int,
+			 numbers::invalid_unsigned_int);
 }
 
 

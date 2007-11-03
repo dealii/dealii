@@ -294,8 +294,8 @@ namespace Functions
     for (unsigned int k=0;k<n;++k)
       {
 	const Point<dim>& p = points[k];
-	const double x = deal_II_numbers::PI/2. * p(0);
-	const double y = deal_II_numbers::PI/2. * p(1);
+	const double x = numbers::PI/2. * p(0);
+	const double y = numbers::PI/2. * p(1);
 	const double cx = cos(x);
 	const double cy = cos(y);
 	const double sx = sin(x);
@@ -309,7 +309,7 @@ namespace Functions
 	  }
 	else if (dim==3)
 	  {
-	    const double z = deal_II_numbers::PI/2. * p(2);
+	    const double z = numbers::PI/2. * p(2);
 	    const double cz = cos(z);
 	    const double sz = sin(z);
 	    
@@ -341,8 +341,8 @@ namespace Functions
     for (unsigned int k=0;k<n;++k)
       {
 	const Point<dim>& p = points[k];
-	const double x = deal_II_numbers::PI/2. * p(0);
-	const double y = deal_II_numbers::PI/2. * p(1);
+	const double x = numbers::PI/2. * p(0);
+	const double y = numbers::PI/2. * p(1);
 	const double c2x = cos(2*x);
 	const double c2y = cos(2*y);
 	const double s2x = sin(2*x);
@@ -352,35 +352,35 @@ namespace Functions
 	
 	if (dim==2)
 	  {
-	    values[0][k][0] = -.25*deal_II_numbers::PI * s2x*s2y;
-	    values[0][k][1] =  .5 *deal_II_numbers::PI * cx2*c2y;
-	    values[1][k][0] = -.5 *deal_II_numbers::PI * c2x*cy2;
-	    values[1][k][1] =  .25*deal_II_numbers::PI * s2x*s2y;
-	    values[2][k][0] =  .25*deal_II_numbers::PI * c2x*s2y;
-	    values[2][k][1] =  .25*deal_II_numbers::PI * s2x*c2y;
+	    values[0][k][0] = -.25*numbers::PI * s2x*s2y;
+	    values[0][k][1] =  .5 *numbers::PI * cx2*c2y;
+	    values[1][k][0] = -.5 *numbers::PI * c2x*cy2;
+	    values[1][k][1] =  .25*numbers::PI * s2x*s2y;
+	    values[2][k][0] =  .25*numbers::PI * c2x*s2y;
+	    values[2][k][1] =  .25*numbers::PI * s2x*c2y;
 	  }
 	else if (dim==3)
 	  {
-	    const double z = deal_II_numbers::PI/2. * p(2);
+	    const double z = numbers::PI/2. * p(2);
 	    const double c2z = cos(2*z);
 	    const double s2z = sin(2*z);
 	    const double cz2 = .5+.5*c2z;               // cos^2 z
 	    
- 	    values[0][k][0] = -.125*deal_II_numbers::PI * s2x*s2y*s2z;
- 	    values[0][k][1] =  .25 *deal_II_numbers::PI * cx2*c2y*s2z;
- 	    values[0][k][2] =  .25 *deal_II_numbers::PI * cx2*s2y*c2z;
+ 	    values[0][k][0] = -.125*numbers::PI * s2x*s2y*s2z;
+ 	    values[0][k][1] =  .25 *numbers::PI * cx2*c2y*s2z;
+ 	    values[0][k][2] =  .25 *numbers::PI * cx2*s2y*c2z;
 	    
- 	    values[1][k][0] =  .25 *deal_II_numbers::PI * c2x*cy2*s2z;
- 	    values[1][k][1] = -.125*deal_II_numbers::PI * s2x*s2y*s2z;
- 	    values[1][k][2] =  .25 *deal_II_numbers::PI * s2x*cy2*c2z;
+ 	    values[1][k][0] =  .25 *numbers::PI * c2x*cy2*s2z;
+ 	    values[1][k][1] = -.125*numbers::PI * s2x*s2y*s2z;
+ 	    values[1][k][2] =  .25 *numbers::PI * s2x*cy2*c2z;
 
- 	    values[2][k][0] = -.5  *deal_II_numbers::PI * c2x*s2y*cz2;
- 	    values[2][k][1] = -.5  *deal_II_numbers::PI * s2x*c2y*cz2;
- 	    values[2][k][2] =  .25 *deal_II_numbers::PI * s2x*s2y*s2z;
+ 	    values[2][k][0] = -.5  *numbers::PI * c2x*s2y*cz2;
+ 	    values[2][k][1] = -.5  *numbers::PI * s2x*c2y*cz2;
+ 	    values[2][k][2] =  .25 *numbers::PI * s2x*s2y*s2z;
 
-	    values[3][k][0] = .125*deal_II_numbers::PI * c2x*s2y*s2z;
-	    values[3][k][1] = .125*deal_II_numbers::PI * s2x*c2y*s2z;
-	    values[3][k][2] = .125*deal_II_numbers::PI * s2x*s2y*c2z;
+	    values[3][k][0] = .125*numbers::PI * c2x*s2y*s2z;
+	    values[3][k][1] = .125*numbers::PI * s2x*c2y*s2z;
+	    values[3][k][2] = .125*numbers::PI * s2x*s2y*c2z;
 	  }
 	else
 	  {
@@ -405,29 +405,29 @@ namespace Functions
     for (unsigned int k=0;k<n;++k)
       {
 	const Point<dim>& p = points[k];
-	const double x = deal_II_numbers::PI/2. * p(0);
-	const double y = deal_II_numbers::PI/2. * p(1);
+	const double x = numbers::PI/2. * p(0);
+	const double y = numbers::PI/2. * p(1);
 	const double c2x = cos(2*x);
 	const double c2y = cos(2*y);
 	const double s2x = sin(2*x);
 	const double s2y = sin(2*y);
-	const double pi2 = .25 * deal_II_numbers::PI * deal_II_numbers::PI;
+	const double pi2 = .25 * numbers::PI * numbers::PI;
 	
 	if (dim==2)
 	  {
-	    values[0][k] = - pi2 * (1.+2.*c2x) * s2y - deal_II_numbers::PI/4. * c2x*s2y;
-	    values[1][k] =   pi2 * s2x * (1.+2.*c2y) - deal_II_numbers::PI/4. * s2x*c2y;
+	    values[0][k] = - pi2 * (1.+2.*c2x) * s2y - numbers::PI/4. * c2x*s2y;
+	    values[1][k] =   pi2 * s2x * (1.+2.*c2y) - numbers::PI/4. * s2x*c2y;
 	    values[2][k] = 0.;
 	  }
 	else if (dim==3)
 	  {
-	    const double z = deal_II_numbers::PI * p(2);
+	    const double z = numbers::PI * p(2);
 	    const double c2z = cos(2*z);
 	    const double s2z = sin(2*z);
 	    
-	    values[0][k] = - .5*pi2 * (1.+2.*c2x) * s2y * s2z - deal_II_numbers::PI/8. * c2x * s2y * s2z;
-	    values[1][k] =   .5*pi2 * s2x * (1.+2.*c2y) * s2z - deal_II_numbers::PI/8. * s2x * c2y * s2z;
-	    values[2][k] = - .5*pi2 * s2x * s2y * (1.+2.*c2z) - deal_II_numbers::PI/8. * s2x * s2y * c2z;
+	    values[0][k] = - .5*pi2 * (1.+2.*c2x) * s2y * s2z - numbers::PI/8. * c2x * s2y * s2z;
+	    values[1][k] =   .5*pi2 * s2x * (1.+2.*c2y) * s2z - numbers::PI/8. * s2x * c2y * s2z;
+	    values[2][k] = - .5*pi2 * s2x * s2y * (1.+2.*c2z) - numbers::PI/8. * s2x * s2y * c2z;
 	    values[3][k] = 0.;
 	  }
 	else
@@ -444,7 +444,7 @@ namespace Functions
   
   StokesLSingularity::StokesLSingularity()
 		  :
-		  omega (3./2.*deal_II_numbers::PI),
+		  omega (3./2.*numbers::PI),
 		  coslo (cos(lambda*omega)),
 		  lp(1.+lambda),
 		  lm(1.-lambda)
@@ -639,11 +639,11 @@ namespace Functions
       {
 	const Point<2>& p = points[k];
 	const double x = p(0);
-	const double y = 2. * deal_II_numbers::PI * p(1);
+	const double y = 2. * numbers::PI * p(1);
 	const double elx = std::exp(lbda*x);
 	
 	values[0][k] = 1. - elx * cos(y);
-	values[1][k] = .5 / deal_II_numbers::PI * lbda * elx * sin(y);
+	values[1][k] = .5 / numbers::PI * lbda * elx * sin(y);
 	values[2][k] = -.5 * elx * elx + p_average - this->mean_pressure;
       }
   }
@@ -670,7 +670,7 @@ namespace Functions
 	
 					 // u
 	gradients[0][i][0] = -lbda*elx*cy;
-	gradients[0][i][1] = 2. * deal_II_numbers::PI*elx*sy;
+	gradients[0][i][1] = 2. * numbers::PI*elx*sy;
 	gradients[1][i][0] = lbda*lbda/(2*M_PI)*elx*sy;
 	gradients[1][i][1] =lbda*elx*cy;
 					 // p
@@ -692,7 +692,7 @@ namespace Functions
 
     if (stokes)
       {
-	const double zp = 2. * deal_II_numbers::PI;
+	const double zp = 2. * numbers::PI;
 	for (unsigned int k=0;k<n;++k)
 	  {
 	    const Point<2>& p = points[k];

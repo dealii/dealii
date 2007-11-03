@@ -226,7 +226,7 @@ namespace Functions
 	if (d>=r)
 	  return 0.;
 	const double e = -r*r/(r*r-d*d);
-	return  ((e<-50) ? 0. : deal_II_numbers::E * exp(e));
+	return  ((e<-50) ? 0. : numbers::E * exp(e));
       }
     return 0.;
   }
@@ -254,7 +254,7 @@ namespace Functions
 	      values[i] = 0.;
 	    } else {
 	      const double e = -r*r/(r*r-d*d);
-	      values[i] = (e<-50) ? 0. : deal_II_numbers::E * exp(e);
+	      values[i] = (e<-50) ? 0. : numbers::E * exp(e);
 	    }
 	}
     else
@@ -281,7 +281,7 @@ namespace Functions
 	  {
 	    e = -r*r/(r*r-d*d);
 	    if (e>-50)
-	      val = deal_II_numbers::E * exp(e);
+	      val = numbers::E * exp(e);
 	  }
 
 	if (this->selected==CutOffFunctionBase<dim>::no_component)

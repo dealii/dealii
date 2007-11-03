@@ -123,7 +123,7 @@ namespace PETScWrappers
   VectorBase::operator = (const PetscScalar s)
   {
 
-    Assert (deal_II_numbers::is_finite(s), 
+    Assert (numbers::is_finite(s), 
 	    ExcMessage("The given value is not finite but either infinite or Not A Number (NaN)"));
 
                                      // flush previously cached elements. this
@@ -467,7 +467,7 @@ namespace PETScWrappers
   VectorBase::operator *= (const PetscScalar a)
   {
 
-    Assert (deal_II_numbers::is_finite(a), 
+    Assert (numbers::is_finite(a), 
 	    ExcMessage("The given value is not finite but either infinite or Not A Number (NaN)"));
 
 #if (PETSC_VERSION_MAJOR <= 2) && (PETSC_VERSION_MINOR < 3)
@@ -487,12 +487,12 @@ namespace PETScWrappers
   VectorBase::operator /= (const PetscScalar a)
   {
 
-    Assert (deal_II_numbers::is_finite(a), 
+    Assert (numbers::is_finite(a), 
 	    ExcMessage("The given value is not finite but either infinite or Not A Number (NaN)"));
 
     const PetscScalar factor = 1./a;
     
-    Assert (deal_II_numbers::is_finite(factor), 
+    Assert (numbers::is_finite(factor), 
 	    ExcMessage("The given value is not finite but either infinite or Not A Number (NaN)"));
 
 #if (PETSC_VERSION_MAJOR <= 2) && (PETSC_VERSION_MINOR < 3)
@@ -546,7 +546,7 @@ namespace PETScWrappers
   VectorBase::add (const PetscScalar s)
   {
 
-    Assert (deal_II_numbers::is_finite(s), 
+    Assert (numbers::is_finite(s), 
 	    ExcMessage("The given value is not finite but either infinite or Not A Number (NaN)"));
 
 #if (PETSC_VERSION_MAJOR <= 2) && (PETSC_VERSION_MINOR < 3)
@@ -573,7 +573,7 @@ namespace PETScWrappers
                    const VectorBase     &v)
   {
 
-    Assert (deal_II_numbers::is_finite(a), 
+    Assert (numbers::is_finite(a), 
 	    ExcMessage("The given value is not finite but either infinite or Not A Number (NaN)"));
 
 #if (PETSC_VERSION_MAJOR <= 2) && (PETSC_VERSION_MINOR < 3)
@@ -594,9 +594,9 @@ namespace PETScWrappers
                    const VectorBase &w)
   {
 
-    Assert (deal_II_numbers::is_finite(a), 
+    Assert (numbers::is_finite(a), 
 	    ExcMessage("The given value is not finite but either infinite or Not A Number (NaN)"));
-    Assert (deal_II_numbers::is_finite(b), 
+    Assert (numbers::is_finite(b), 
 	    ExcMessage("The given value is not finite but either infinite or Not A Number (NaN)"));
 
     const PetscScalar weights[2] = {a,b};
@@ -618,7 +618,7 @@ namespace PETScWrappers
                     const VectorBase &v)
   {
 
-    Assert (deal_II_numbers::is_finite(s), 
+    Assert (numbers::is_finite(s), 
 	    ExcMessage("The given value is not finite but either infinite or Not A Number (NaN)"));
 
 #if (PETSC_VERSION_MAJOR <= 2) && (PETSC_VERSION_MINOR < 3)
@@ -638,9 +638,9 @@ namespace PETScWrappers
                     const VectorBase     &v)
   {
 
-    Assert (deal_II_numbers::is_finite(s), 
+    Assert (numbers::is_finite(s), 
 	    ExcMessage("The given value is not finite but either infinite or Not A Number (NaN)"));
-    Assert (deal_II_numbers::is_finite(a), 
+    Assert (numbers::is_finite(a), 
 	    ExcMessage("The given value is not finite but either infinite or Not A Number (NaN)"));
 
                                      // there is nothing like a AXPAY
@@ -660,11 +660,11 @@ namespace PETScWrappers
                     const VectorBase     &w)
   {
  
-    Assert (deal_II_numbers::is_finite(s), 
+    Assert (numbers::is_finite(s), 
 	    ExcMessage("The given value is not finite but either infinite or Not A Number (NaN)"));
-    Assert (deal_II_numbers::is_finite(a), 
+    Assert (numbers::is_finite(a), 
 	    ExcMessage("The given value is not finite but either infinite or Not A Number (NaN)"));
-    Assert (deal_II_numbers::is_finite(b), 
+    Assert (numbers::is_finite(b), 
 	    ExcMessage("The given value is not finite but either infinite or Not A Number (NaN)"));
 
                                      // there is no operation like MAXPAY, so
@@ -695,13 +695,13 @@ namespace PETScWrappers
                     const VectorBase     &x)
   {
  
-    Assert (deal_II_numbers::is_finite(s), 
+    Assert (numbers::is_finite(s), 
 	    ExcMessage("The given value is not finite but either infinite or Not A Number (NaN)"));
-    Assert (deal_II_numbers::is_finite(a), 
+    Assert (numbers::is_finite(a), 
 	    ExcMessage("The given value is not finite but either infinite or Not A Number (NaN)"));
-    Assert (deal_II_numbers::is_finite(b), 
+    Assert (numbers::is_finite(b), 
 	    ExcMessage("The given value is not finite but either infinite or Not A Number (NaN)"));
-    Assert (deal_II_numbers::is_finite(c), 
+    Assert (numbers::is_finite(c), 
 	    ExcMessage("The given value is not finite but either infinite or Not A Number (NaN)"));
 
                                      // there is no operation like MAXPAY, so
@@ -737,7 +737,7 @@ namespace PETScWrappers
                    const VectorBase &v)
   {
 
-    Assert (deal_II_numbers::is_finite(a), 
+    Assert (numbers::is_finite(a), 
 	    ExcMessage("The given value is not finite but either infinite or Not A Number (NaN)"));
 
     Assert (size() == v.size(),
@@ -761,9 +761,9 @@ namespace PETScWrappers
                    const VectorBase &w)
   {
 
-    Assert (deal_II_numbers::is_finite(a), 
+    Assert (numbers::is_finite(a), 
 	    ExcMessage("The given value is not finite but either infinite or Not A Number (NaN)"));
-    Assert (deal_II_numbers::is_finite(b), 
+    Assert (numbers::is_finite(b), 
 	    ExcMessage("The given value is not finite but either infinite or Not A Number (NaN)"));
 
     Assert (size() == v.size(),

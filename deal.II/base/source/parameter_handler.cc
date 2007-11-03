@@ -269,7 +269,7 @@ namespace Patterns
 #ifdef HAVE_STD_NUMERIC_LIMITS
           std::numeric_limits<unsigned int>::max();
 #else
-          deal_II_numbers::invalid_unsigned_int;
+          numbers::invalid_unsigned_int;
 #endif
 
 

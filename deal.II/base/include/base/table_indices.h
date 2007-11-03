@@ -171,7 +171,7 @@ class TableIndices<2> : public TableIndicesBase<2>
 				      * later indices.
                                       */
     TableIndices (const unsigned int index1,
-                  const unsigned int index2 = deal_II_numbers::invalid_unsigned_int);
+                  const unsigned int index2 = numbers::invalid_unsigned_int);
 };
 
 
@@ -214,8 +214,8 @@ class TableIndices<3> : public TableIndicesBase<3>
 				      * later indices.
                                       */
     TableIndices (const unsigned int index1,
-                  const unsigned int index2 = deal_II_numbers::invalid_unsigned_int,
-                  const unsigned int index3 = deal_II_numbers::invalid_unsigned_int);
+                  const unsigned int index2 = numbers::invalid_unsigned_int,
+                  const unsigned int index3 = numbers::invalid_unsigned_int);
 };
 
 
@@ -257,9 +257,9 @@ class TableIndices<4> : public TableIndicesBase<4>
 				      * later indices.
                                       */
     TableIndices (const unsigned int index1,
-                  const unsigned int index2 = deal_II_numbers::invalid_unsigned_int,
-                  const unsigned int index3 = deal_II_numbers::invalid_unsigned_int,
-                  const unsigned int index4 = deal_II_numbers::invalid_unsigned_int);
+                  const unsigned int index2 = numbers::invalid_unsigned_int,
+                  const unsigned int index3 = numbers::invalid_unsigned_int,
+                  const unsigned int index4 = numbers::invalid_unsigned_int);
 };
 
 
@@ -301,10 +301,10 @@ class TableIndices<5> : public TableIndicesBase<5>
 				      * later indices.
                                       */
     TableIndices (const unsigned int index1,
-                  const unsigned int index2 = deal_II_numbers::invalid_unsigned_int,
-                  const unsigned int index3 = deal_II_numbers::invalid_unsigned_int,
-                  const unsigned int index4 = deal_II_numbers::invalid_unsigned_int,
-                  const unsigned int index5 = deal_II_numbers::invalid_unsigned_int);
+                  const unsigned int index2 = numbers::invalid_unsigned_int,
+                  const unsigned int index3 = numbers::invalid_unsigned_int,
+                  const unsigned int index4 = numbers::invalid_unsigned_int,
+                  const unsigned int index5 = numbers::invalid_unsigned_int);
 };
 
 
@@ -346,11 +346,11 @@ class TableIndices<6> : public TableIndicesBase<6>
 				      * later indices.
                                       */
     TableIndices (const unsigned int index1,
-                  const unsigned int index2 = deal_II_numbers::invalid_unsigned_int,
-                  const unsigned int index3 = deal_II_numbers::invalid_unsigned_int,
-                  const unsigned int index4 = deal_II_numbers::invalid_unsigned_int,
-                  const unsigned int index5 = deal_II_numbers::invalid_unsigned_int,
-                  const unsigned int index6 = deal_II_numbers::invalid_unsigned_int);
+                  const unsigned int index2 = numbers::invalid_unsigned_int,
+                  const unsigned int index3 = numbers::invalid_unsigned_int,
+                  const unsigned int index4 = numbers::invalid_unsigned_int,
+                  const unsigned int index5 = numbers::invalid_unsigned_int,
+                  const unsigned int index6 = numbers::invalid_unsigned_int);
 };
 
 
@@ -392,12 +392,12 @@ class TableIndices<7> : public TableIndicesBase<7>
 				      * later indices.
                                       */
     TableIndices (const unsigned int index1,
-                  const unsigned int index2 = deal_II_numbers::invalid_unsigned_int,
-                  const unsigned int index3 = deal_II_numbers::invalid_unsigned_int,
-                  const unsigned int index4 = deal_II_numbers::invalid_unsigned_int,
-                  const unsigned int index5 = deal_II_numbers::invalid_unsigned_int,
-                  const unsigned int index6 = deal_II_numbers::invalid_unsigned_int,
-                  const unsigned int index7 = deal_II_numbers::invalid_unsigned_int);
+                  const unsigned int index2 = numbers::invalid_unsigned_int,
+                  const unsigned int index3 = numbers::invalid_unsigned_int,
+                  const unsigned int index4 = numbers::invalid_unsigned_int,
+                  const unsigned int index5 = numbers::invalid_unsigned_int,
+                  const unsigned int index6 = numbers::invalid_unsigned_int,
+                  const unsigned int index7 = numbers::invalid_unsigned_int);
 };
 
 

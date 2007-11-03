@@ -156,7 +156,7 @@ class DoFHandler  :  public Subscriptor
 				      * certain value, but rather take
 				      * its symbolic name.
 				      */
-    static const unsigned int invalid_dof_index = deal_II_numbers::invalid_unsigned_int;
+    static const unsigned int invalid_dof_index = numbers::invalid_unsigned_int;
 
 				     /**
 				      * The default index of the

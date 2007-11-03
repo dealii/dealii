@@ -1208,10 +1208,10 @@ create_boundary_mass_matrix_1 (const Mapping<dim>        &mapping,
           Threads::ThreadMutex::ScopedLock lock (mutex);
 	  for (unsigned int i=0; i<dofs_per_cell; ++i)
 	    {
-	      if (dof_is_on_face[i] && dof_to_boundary_mapping[dofs[i]] != deal_II_numbers::invalid_unsigned_int)
+	      if (dof_is_on_face[i] && dof_to_boundary_mapping[dofs[i]] != numbers::invalid_unsigned_int)
 		{
 		  for (unsigned int j=0; j<dofs_per_cell; ++j)
-		    if (dof_is_on_face[j] && dof_to_boundary_mapping[dofs[j]] != deal_II_numbers::invalid_unsigned_int)
+		    if (dof_is_on_face[j] && dof_to_boundary_mapping[dofs[j]] != numbers::invalid_unsigned_int)
 		      matrix.add(dof_to_boundary_mapping[dofs[i]],
 				 dof_to_boundary_mapping[dofs[j]],
 				 cell_matrix(i,j));

@@ -315,8 +315,8 @@ estimate_smoothness (Vector<float> &smoothness_indicators) const
 		&&
 		(i*i + j*j < N*N))
 	      {
-		k_vectors.push_back (Point<dim>(deal_II_numbers::PI * i,
-						deal_II_numbers::PI * j));
+		k_vectors.push_back (Point<dim>(numbers::PI * i,
+						numbers::PI * j));
 		k_vectors_magnitude.push_back (i*i+j*j);
 	      }
 	
@@ -332,9 +332,9 @@ estimate_smoothness (Vector<float> &smoothness_indicators) const
 		  &&
 		  (i*i + j*j + k*k < N*N))
 		{
-		  k_vectors.push_back (Point<dim>(deal_II_numbers::PI * i,
-						  deal_II_numbers::PI * j,
-						  deal_II_numbers::PI * k));
+		  k_vectors.push_back (Point<dim>(numbers::PI * i,
+						  numbers::PI * j,
+						  numbers::PI * k));
 		  k_vectors_magnitude.push_back (i*i+j*j+k*k);
 	      }
 	
@@ -380,7 +380,7 @@ estimate_smoothness (Vector<float> &smoothness_indicators) const
 		       quadrature.weight(q);
 	      }
 	    fourier_transform_matrices[fe](k,i)
-	      = sum / std::pow(2*deal_II_numbers::PI, 1.*dim/2);
+	      = sum / std::pow(2*numbers::PI, 1.*dim/2);
 	  }
     }
 

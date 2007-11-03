@@ -2297,7 +2297,7 @@ namespace hp
 					      identities[i].second);
 
 		    Assert ((new_dof_indices[higher_dof_index] ==
-			     deal_II_numbers::invalid_unsigned_int)
+			     numbers::invalid_unsigned_int)
 			    ||
 			    (new_dof_indices[higher_dof_index] ==
 			     lower_dof_index),
@@ -2441,10 +2441,10 @@ namespace hp
 							       // slave to
 							       // master
 			      if (new_dof_indices[master_dof_index] !=
-				  deal_II_numbers::invalid_unsigned_int)
+				  numbers::invalid_unsigned_int)
 				{
 				  Assert (new_dof_indices[new_dof_indices[master_dof_index]] ==
-					  deal_II_numbers::invalid_unsigned_int,
+					  numbers::invalid_unsigned_int,
 					  ExcInternalError());
 				
 				  new_dof_indices[slave_dof_index]
@@ -2453,7 +2453,7 @@ namespace hp
 			      else
 				{
 				  Assert ((new_dof_indices[master_dof_index] ==
-					   deal_II_numbers::invalid_unsigned_int)
+					   numbers::invalid_unsigned_int)
 					  ||
 					  (new_dof_indices[slave_dof_index] ==
 					   master_dof_index),
@@ -2519,7 +2519,7 @@ namespace hp
 			= line->dof_index (identities[i].second, other_fe_index);
 
 		      Assert ((new_dof_indices[master_dof_index] ==
-			       deal_II_numbers::invalid_unsigned_int)
+			       numbers::invalid_unsigned_int)
 			      ||
 			      (new_dof_indices[slave_dof_index] ==
 			       master_dof_index),
@@ -2624,7 +2624,7 @@ namespace hp
                       = quad->dof_index (identities[i].second, other_fe_index);
 
                     Assert ((new_dof_indices[master_dof_index] ==
-                             deal_II_numbers::invalid_unsigned_int)
+                             numbers::invalid_unsigned_int)
                             ||
                             (new_dof_indices[slave_dof_index] ==
                              master_dof_index),
@@ -2704,7 +2704,7 @@ namespace hp
 				     // lower-dimensional objects
 				     // where elements come together
     std::vector<unsigned int>
-      constrained_indices (used_dofs, deal_II_numbers::invalid_unsigned_int);
+      constrained_indices (used_dofs, numbers::invalid_unsigned_int);
     compute_vertex_dof_identities (constrained_indices);
     compute_line_dof_identities (constrained_indices);
     compute_quad_dof_identities (constrained_indices);
@@ -2713,10 +2713,10 @@ namespace hp
 				     // new numbers to those which are
 				     // not constrained
     std::vector<unsigned int>
-      new_dof_indices (used_dofs, deal_II_numbers::invalid_unsigned_int);
+      new_dof_indices (used_dofs, numbers::invalid_unsigned_int);
     unsigned int next_free_dof = 0;
     for (unsigned int i=0; i<used_dofs; ++i)
-      if (constrained_indices[i] == deal_II_numbers::invalid_unsigned_int)
+      if (constrained_indices[i] == numbers::invalid_unsigned_int)
 	{
 	  new_dof_indices[i] = next_free_dof;
 	  ++next_free_dof;
@@ -2726,10 +2726,10 @@ namespace hp
 				     // are constrained and record the
 				     // new dof number for those:
     for (unsigned int i=0; i<used_dofs; ++i)
-      if (constrained_indices[i] != deal_II_numbers::invalid_unsigned_int)
+      if (constrained_indices[i] != numbers::invalid_unsigned_int)
 	{
 	  Assert (new_dof_indices[constrained_indices[i]] !=
-		  deal_II_numbers::invalid_unsigned_int,
+		  numbers::invalid_unsigned_int,
 		  ExcInternalError());
 	  
 	  new_dof_indices[i] = new_dof_indices[constrained_indices[i]];
@@ -2737,7 +2737,7 @@ namespace hp
 
     for (unsigned int i=0; i<used_dofs; ++i)
       {
-	Assert (new_dof_indices[i] != deal_II_numbers::invalid_unsigned_int,
+	Assert (new_dof_indices[i] != numbers::invalid_unsigned_int,
 		ExcInternalError());
 	Assert (new_dof_indices[i] < next_free_dof,
 		ExcInternalError());
@@ -4134,7 +4134,7 @@ namespace hp
 					 // line_dofs_offsets field
 	faces->lines.dof_offsets
 	  .resize (tria->n_raw_lines(),
-		   deal_II_numbers::invalid_unsigned_int);
+		   numbers::invalid_unsigned_int);
 	
 	unsigned int line_slots_needed = 0;
 	for (unsigned int line=0; line<tria->n_raw_lines(); ++line)
@@ -4171,7 +4171,7 @@ namespace hp
 		  }
 					       // finally place the end
 					       // marker
-	      faces->lines.dofs[pointer] = deal_II_numbers::invalid_unsigned_int;
+	      faces->lines.dofs[pointer] = numbers::invalid_unsigned_int;
 	    }
       }
 
@@ -4242,7 +4242,7 @@ namespace hp
 				     // already fill the
 				     // vertex_dofs_offsets field
     vertex_dofs_offsets.resize (tria->n_vertices(),
-				deal_II_numbers::invalid_unsigned_int);
+				numbers::invalid_unsigned_int);
       
     unsigned int vertex_slots_needed = 0;
     for (unsigned int v=0; v<tria->n_vertices(); ++v)
@@ -4279,7 +4279,7 @@ namespace hp
 	      }
 					   // finally place the end
 					   // marker
-	  vertex_dofs[pointer] = deal_II_numbers::invalid_unsigned_int;
+	  vertex_dofs[pointer] = numbers::invalid_unsigned_int;
 	}
   }    
   

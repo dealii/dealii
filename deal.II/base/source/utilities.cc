@@ -58,7 +58,7 @@ namespace Utilities
   {
 				     // if second argument is invalid, then do
 				     // not pad the resulting string at all
-    if (digits == deal_II_numbers::invalid_unsigned_int)
+    if (digits == numbers::invalid_unsigned_int)
       return int_to_string (i, needed_digits(i));
     
     
@@ -291,11 +291,11 @@ namespace Utilities
 	else
 	  {
 	    Assert (false, ExcNotImplemented());
-	    return std::make_pair (-1, deal_II_numbers::invalid_unsigned_int);
+	    return std::make_pair (-1, numbers::invalid_unsigned_int);
 	  }
       }
     else
-      return std::make_pair (-1, deal_II_numbers::invalid_unsigned_int);
+      return std::make_pair (-1, numbers::invalid_unsigned_int);
   }
 
   

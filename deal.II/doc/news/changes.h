@@ -30,6 +30,14 @@ inconvenience this causes.
 </p>
 
 <ol>
+  <li> <p>Changed: The namespace deal_II_numbers has been renamed dealii::numbers.
+  The old name stemmed from a time when not everything was already in
+  namespace <code>dealii</code>. The old name is retained via a namespace
+  alias but is deprecated and will eventually be removed.
+  <br>
+  (WB 2007/11/02)
+  </p>
+
   <li> <p>Changed: When writing output files in UCD format using either the
   DataOutBase or the GridOut class, we used to write a preamble at the
   beginning of the file that included the date and time the file was created.

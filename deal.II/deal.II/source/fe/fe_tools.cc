@@ -480,7 +480,7 @@ void FETools::get_projection_matrix (const FiniteElement<dim> &fe1,
 				   // Choose a quadrature rule
 				   // Gauss is exact up to degree 2n-1
   const unsigned int degree = std::max(fe1.tensor_degree(), fe2.tensor_degree());
-  Assert (degree != deal_II_numbers::invalid_unsigned_int,
+  Assert (degree != numbers::invalid_unsigned_int,
 	  ExcNotImplemented());
   
   QGauss<dim> quadrature(degree+1);

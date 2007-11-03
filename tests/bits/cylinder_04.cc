@@ -32,7 +32,7 @@
 #include <fstream>
 
 
-const double xy_angle = deal_II_numbers::PI/6;
+const double xy_angle = numbers::PI/6;
 
 template <int dim>
 Point<dim> rotate_to_y (const Point<dim> &p)

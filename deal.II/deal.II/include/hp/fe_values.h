@@ -390,9 +390,9 @@ namespace hp
                                         */
       void
       reinit (const typename hp::DoFHandler<dim>::cell_iterator &cell,
-              const unsigned int q_index = deal_II_numbers::invalid_unsigned_int,
-              const unsigned int mapping_index = deal_II_numbers::invalid_unsigned_int,
-              const unsigned int fe_index = deal_II_numbers::invalid_unsigned_int);
+              const unsigned int q_index = numbers::invalid_unsigned_int,
+              const unsigned int mapping_index = numbers::invalid_unsigned_int,
+              const unsigned int fe_index = numbers::invalid_unsigned_int);
 
                                        /**
                                         * Like the previous function,
@@ -425,9 +425,9 @@ namespace hp
                                         */
       void
       reinit (const typename dealii::DoFHandler<dim>::cell_iterator &cell,
-              const unsigned int q_index = deal_II_numbers::invalid_unsigned_int,
-              const unsigned int mapping_index = deal_II_numbers::invalid_unsigned_int,
-              const unsigned int fe_index = deal_II_numbers::invalid_unsigned_int);
+              const unsigned int q_index = numbers::invalid_unsigned_int,
+              const unsigned int mapping_index = numbers::invalid_unsigned_int,
+              const unsigned int fe_index = numbers::invalid_unsigned_int);
 
                                        /**
                                         * Like the previous function,
@@ -460,9 +460,9 @@ namespace hp
                                         */
       void
       reinit (const typename MGDoFHandler<dim>::cell_iterator &cell,
-              const unsigned int q_index = deal_II_numbers::invalid_unsigned_int,
-              const unsigned int mapping_index = deal_II_numbers::invalid_unsigned_int,
-              const unsigned int fe_index = deal_II_numbers::invalid_unsigned_int);
+              const unsigned int q_index = numbers::invalid_unsigned_int,
+              const unsigned int mapping_index = numbers::invalid_unsigned_int,
+              const unsigned int fe_index = numbers::invalid_unsigned_int);
       
                                        /**
                                         * Like the previous function,
@@ -496,9 +496,9 @@ namespace hp
                                         */
       void
       reinit (const typename Triangulation<dim>::cell_iterator &cell,
-              const unsigned int q_index = deal_II_numbers::invalid_unsigned_int,
-              const unsigned int mapping_index = deal_II_numbers::invalid_unsigned_int,
-              const unsigned int fe_index = deal_II_numbers::invalid_unsigned_int);
+              const unsigned int q_index = numbers::invalid_unsigned_int,
+              const unsigned int mapping_index = numbers::invalid_unsigned_int,
+              const unsigned int fe_index = numbers::invalid_unsigned_int);
   };
 
 
@@ -684,9 +684,9 @@ namespace hp
       void
       reinit (const typename hp::DoFHandler<dim>::cell_iterator &cell,
               const unsigned int face_no,
-              const unsigned int q_index = deal_II_numbers::invalid_unsigned_int,
-              const unsigned int mapping_index = deal_II_numbers::invalid_unsigned_int,
-              const unsigned int fe_index = deal_II_numbers::invalid_unsigned_int);
+              const unsigned int q_index = numbers::invalid_unsigned_int,
+              const unsigned int mapping_index = numbers::invalid_unsigned_int,
+              const unsigned int fe_index = numbers::invalid_unsigned_int);
 
                                        /**
                                         * Like the previous function,
@@ -720,9 +720,9 @@ namespace hp
       void
       reinit (const typename dealii::DoFHandler<dim>::cell_iterator &cell,
               const unsigned int face_no,
-              const unsigned int q_index = deal_II_numbers::invalid_unsigned_int,
-              const unsigned int mapping_index = deal_II_numbers::invalid_unsigned_int,
-              const unsigned int fe_index = deal_II_numbers::invalid_unsigned_int);
+              const unsigned int q_index = numbers::invalid_unsigned_int,
+              const unsigned int mapping_index = numbers::invalid_unsigned_int,
+              const unsigned int fe_index = numbers::invalid_unsigned_int);
 
                                        /**
                                         * Like the previous function,
@@ -756,9 +756,9 @@ namespace hp
       void
       reinit (const typename MGDoFHandler<dim>::cell_iterator &cell,
               const unsigned int face_no,
-              const unsigned int q_index = deal_II_numbers::invalid_unsigned_int,
-              const unsigned int mapping_index = deal_II_numbers::invalid_unsigned_int,
-              const unsigned int fe_index = deal_II_numbers::invalid_unsigned_int);
+              const unsigned int q_index = numbers::invalid_unsigned_int,
+              const unsigned int mapping_index = numbers::invalid_unsigned_int,
+              const unsigned int fe_index = numbers::invalid_unsigned_int);
       
                                        /**
                                         * Like the previous function,
@@ -793,9 +793,9 @@ namespace hp
       void
       reinit (const typename Triangulation<dim>::cell_iterator &cell,
               const unsigned int face_no,
-              const unsigned int q_index = deal_II_numbers::invalid_unsigned_int,
-              const unsigned int mapping_index = deal_II_numbers::invalid_unsigned_int,
-              const unsigned int fe_index = deal_II_numbers::invalid_unsigned_int);
+              const unsigned int q_index = numbers::invalid_unsigned_int,
+              const unsigned int mapping_index = numbers::invalid_unsigned_int,
+              const unsigned int fe_index = numbers::invalid_unsigned_int);
   };
 
 
@@ -945,9 +945,9 @@ namespace hp
       reinit (const typename hp::DoFHandler<dim>::cell_iterator &cell,
               const unsigned int face_no,
               const unsigned int subface_no,
-              const unsigned int q_index = deal_II_numbers::invalid_unsigned_int,
-              const unsigned int mapping_index = deal_II_numbers::invalid_unsigned_int,
-              const unsigned int fe_index = deal_II_numbers::invalid_unsigned_int);
+              const unsigned int q_index = numbers::invalid_unsigned_int,
+              const unsigned int mapping_index = numbers::invalid_unsigned_int,
+              const unsigned int fe_index = numbers::invalid_unsigned_int);
 
                                        /**
                                         * Like the previous function,
@@ -982,9 +982,9 @@ namespace hp
       reinit (const typename dealii::DoFHandler<dim>::cell_iterator &cell,
               const unsigned int face_no,
               const unsigned int subface_no,
-              const unsigned int q_index = deal_II_numbers::invalid_unsigned_int,
-              const unsigned int mapping_index = deal_II_numbers::invalid_unsigned_int,
-              const unsigned int fe_index = deal_II_numbers::invalid_unsigned_int);
+              const unsigned int q_index = numbers::invalid_unsigned_int,
+              const unsigned int mapping_index = numbers::invalid_unsigned_int,
+              const unsigned int fe_index = numbers::invalid_unsigned_int);
 
                                        /**
                                         * Like the previous function,
@@ -1019,9 +1019,9 @@ namespace hp
       reinit (const typename MGDoFHandler<dim>::cell_iterator &cell,
               const unsigned int face_no,
               const unsigned int subface_no,
-              const unsigned int q_index = deal_II_numbers::invalid_unsigned_int,
-              const unsigned int mapping_index = deal_II_numbers::invalid_unsigned_int,
-              const unsigned int fe_index = deal_II_numbers::invalid_unsigned_int);
+              const unsigned int q_index = numbers::invalid_unsigned_int,
+              const unsigned int mapping_index = numbers::invalid_unsigned_int,
+              const unsigned int fe_index = numbers::invalid_unsigned_int);
       
                                        /**
                                         * Like the previous function,
@@ -1057,9 +1057,9 @@ namespace hp
       reinit (const typename Triangulation<dim>::cell_iterator &cell,
               const unsigned int face_no,
               const unsigned int subface_no,
-              const unsigned int q_index = deal_II_numbers::invalid_unsigned_int,
-              const unsigned int mapping_index = deal_II_numbers::invalid_unsigned_int,
-              const unsigned int fe_index = deal_II_numbers::invalid_unsigned_int);
+              const unsigned int q_index = numbers::invalid_unsigned_int,
+              const unsigned int mapping_index = numbers::invalid_unsigned_int,
+              const unsigned int fe_index = numbers::invalid_unsigned_int);
   };
   
 }

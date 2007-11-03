@@ -679,7 +679,7 @@ void DataOut<dim,DH>::build_some_patches (Data &data)
 			     std::distance (this->dofs->begin_active(),
 					    active_cell_iterator (cell))
 			     :
-			     deal_II_numbers::invalid_unsigned_int);
+			     numbers::invalid_unsigned_int);
   
   
 				   // get first cell in this thread
