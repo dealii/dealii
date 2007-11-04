@@ -2,7 +2,7 @@
 //    $Id$
 //    Version: $Name$ 
 //
-//    Copyright (C) 2004, 2005 by the deal.II authors
+//    Copyright (C) 2004, 2005, 2007 by the deal.II authors
 //
 //    This file is subject to QPL and may not be  distributed
 //    without copyright and license information. Please refer
@@ -12,7 +12,7 @@
 //----------------------------  petsc_32.cc  ---------------------------
 
 
-// check PETScWrappers::Vector::l2_norm()
+// check PETScWrappers::Vector::mean_value()
 
 #include "../tests.h"
 #include <lac/petsc_vector.h>    
