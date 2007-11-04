@@ -956,7 +956,7 @@ Vector<Number>::operator /= (const Number factor)
 {
   Assert (numbers::is_finite(factor), 
           ExcMessage("The given value is not finite but either infinite or Not A Number (NaN)"));
-  Assert (factor > 0., ExcZero() );
+  Assert (factor != 0., ExcZero() );
 
   *this *= (1./factor);
   return *this;

@@ -158,6 +158,14 @@ inconvenience this causes.
 
 <ol>
 
+<li> Fixed: Vector::operator/= can't work when the scaling factor is zero,
+but it happened to check whether the factor was positive. That's of course
+bogus, the check should have been whether it is non-zero. This has now been
+fixed.
+<br>
+(WB 2007/11/03)
+</li>
+
 <li> New: A class ScaledMatrix was introduced which combines the vector operations of
 an underlying matrix with a scaling.
 <br>
