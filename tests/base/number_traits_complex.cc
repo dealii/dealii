@@ -36,6 +36,9 @@ void check (const number &x)
 
   deallog << numbers::NumberTraits<number>::abs_square (x)
 	  << std::endl;
+
+  deallog << numbers::NumberTraits<number>::abs (x)
+	  << std::endl;
 } 
 
 

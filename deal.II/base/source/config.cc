@@ -2,7 +2,7 @@
 //    $Id$
 //    Version: $Name$
 //
-//    Copyright (C) 2006 by the deal.II authors
+//    Copyright (C) 2006, 2007 by the deal.II authors
 //
 //    This file is subject to QPL and may not be  distributed
 //    without copyright and license information. Please refer
@@ -38,6 +38,17 @@ namespace numbers
 
 
   bool is_finite (const std::complex<double> x) 
+  {
+					// Check complex numbers for infinity
+					// by testing real and imaginary part
+    return ( is_finite (x.real()) 
+             && 
+             is_finite (x.imag()) );
+  }
+
+
+
+  bool is_finite (const std::complex<float> x) 
   {
 					// Check complex numbers for infinity
 					// by testing real and imaginary part

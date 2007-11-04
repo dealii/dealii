@@ -136,6 +136,13 @@ namespace numbers
 				    * Return @p true if real and 
 				    * imaginary parts of the given
 				    * complex number are finite.
+				    */
+  bool is_finite (const std::complex<float> x);
+  
+				   /**
+				    * Return @p true if real and 
+				    * imaginary parts of the given
+				    * complex number are finite.
 				    *
 				    * Again may not work correctly if
 				    * real or imaginary parts are very	
@@ -195,6 +202,13 @@ namespace numbers
 					*/
       static
       real_type abs_square (const number &x);
+
+				       /**
+					* Return the absolute value of a
+					* number.
+					*/
+      static
+      real_type abs (const number &x);
   };
 
 
@@ -239,6 +253,14 @@ namespace numbers
 					*/
       static
       real_type abs_square (const std::complex<number> &x);
+
+
+				       /**
+					* Return the absolute value of a
+					* complex number.
+					*/
+      static
+      real_type abs (const std::complex<number> &x);
   };
   
 }
@@ -277,10 +299,28 @@ namespace numbers
 
 
   template <typename number>
+  typename NumberTraits<number>::real_type
+  NumberTraits<number>::abs (const number &x)
+  {
+    return std::fabs(x);
+  }
+
+
+
+  template <typename number>
   std::complex<number>
   NumberTraits<std::complex<number> >::conjugate (const std::complex<number> &x)
   {
     return std::conj(x);
+  }
+
+
+
+  template <typename number>
+  typename NumberTraits<std::complex<number> >::real_type
+  NumberTraits<std::complex<number> >::abs (const std::complex<number> &x)
+  {
+    return std::abs(x);
   }
 
 
