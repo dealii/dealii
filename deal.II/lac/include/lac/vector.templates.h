@@ -14,6 +14,7 @@
 #define __deal2__vector_templates_h
 
 
+#include <base/template_constraints.h>
 #include <lac/vector.h>
 #include <lac/block_vector.h>
 
@@ -201,7 +202,7 @@ Number Vector<Number>::operator * (const Vector<Number2>& v) const
 {
   Assert (vec_size!=0, ExcEmptyObject());
   
-  if (this == reinterpret_cast<const Vector<Number>*>(&v))
+  if (PointerComparison::equal (this, &v))
     return norm_sqr();
   
   Assert (vec_size == v.size(), ExcDimensionMismatch(vec_size, v.size()));
