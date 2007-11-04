@@ -51,7 +51,7 @@ tests_x =  geometry_info_* \
            functions_* \
 	   function_parser \
 	   utilities_* \
-	   is_finite \
+	   is_finite* \
 	   number_traits_*
 
 ifeq ($(enable-multithreading),no)
