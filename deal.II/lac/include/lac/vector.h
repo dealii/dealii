@@ -71,14 +71,15 @@ class Vector : public Subscriptor
 				      * those in the <tt>C++</tt> standard libraries
 				      * <tt>vector<...></tt> class.
 				      */
-    typedef Number            value_type;
-    typedef value_type       *pointer;
-    typedef const value_type *const_pointer;
-    typedef value_type       *iterator;
-    typedef const value_type *const_iterator;
-    typedef value_type       &reference;
-    typedef const value_type &const_reference;
-    typedef size_t            size_type;
+    typedef Number                                            value_type;
+    typedef typename numbers::NumberTraits<Number>::real_type real_type;
+    typedef value_type                                       *pointer;
+    typedef const value_type                                 *const_pointer;
+    typedef value_type                                       *iterator;
+    typedef const value_type                                 *const_iterator;
+    typedef value_type                                       &reference;
+    typedef const value_type                                 &const_reference;
+    typedef size_t                                            size_type;
 
 
 				     /**
@@ -389,7 +390,7 @@ class Vector : public Subscriptor
 				     /**
 				      * Return square of the $l_2$-norm.
 				      */
-    Number norm_sqr () const;
+    real_type norm_sqr () const;
 
 				     /**
 				      * Mean value of the elements of
@@ -401,14 +402,14 @@ class Vector : public Subscriptor
 				      * $l_1$-norm of the vector.
 				      * The sum of the absolute values.
 				      */
-    Number l1_norm () const;
+    real_type l1_norm () const;
 
 				     /**
 				      * $l_2$-norm of the vector.  The
 				      * square root of the sum of the
 				      * squares of the elements.
 				      */
-    Number l2_norm () const;
+    real_type l2_norm () const;
 
 				     /**
 				      * $l_p$-norm of the vector. The
@@ -416,13 +417,13 @@ class Vector : public Subscriptor
 				      * powers of the absolute values
 				      * of the elements.
 				      */
-    Number lp_norm (const Number p) const;
+    real_type lp_norm (const real_type p) const;
 
 				     /**
 				      * Maximum absolute value of the
 				      * elements.
 				      */
-    Number linfty_norm () const;
+    real_type linfty_norm () const;
 
 				     /**
 				      * Return dimension of the vector.
@@ -446,15 +447,21 @@ class Vector : public Subscriptor
                                       * used, for example, to check whether
                                       * refinement indicators are really all
                                       * positive (or zero).
+				      *
+				      * The function obviously only makes
+				      * sense if the template argument of this
+				      * class is a real type. If it is a
+				      * complex type, then an exception is
+				      * thrown.
                                       */
     bool is_non_negative () const;
     
 				     /**
-				      * Make the @p Vector class a bit like the
-				      * <tt>vector<></tt> class of the C++ standard
-				      * library by returning iterators to
-				      * the start and end of the elements of this
-				      * vector.
+				      * Make the @p Vector class a bit like
+				      * the <tt>vector<></tt> class of the C++
+				      * standard library by returning
+				      * iterators to the start and end of the
+				      * elements of this vector.
 				      */
     iterator begin ();
 
@@ -660,7 +667,11 @@ class Vector : public Subscriptor
 				      */
 				     //@{
 				     /**
-				      *  Output of vector in user-defined format.
+				      *  Output of vector in user-defined
+				      *  format. For complex-valued vectors,
+				      *  the format should include specifiers
+				      *  for both the real and imaginary
+				      *  parts.
 				      */
     void print (const char* format = 0) const;
 
@@ -956,9 +967,9 @@ Vector<Number>::operator /= (const Number factor)
 {
   Assert (numbers::is_finite(factor), 
           ExcMessage("The given value is not finite but either infinite or Not A Number (NaN)"));
-  Assert (factor != 0., ExcZero() );
+  Assert (factor != Number(0.), ExcZero() );
 
-  *this *= (1./factor);
+  this->operator *= (Number(1.)/factor);
   return *this;
 }
 

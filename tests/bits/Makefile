@@ -64,6 +64,7 @@ tests_x = grid_generator_?? \
 	  solver_* \
 	  deal_solver_* \
 	  vector_* \
+	  complex-vector_* \
 	  subdomain_ids_* \
 	  dof_constraints_* \
 	  apply_boundary_values_* \

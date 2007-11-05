@@ -15,6 +15,7 @@
 
 
 #include <base/template_constraints.h>
+#include <base/numbers.h>
 #include <lac/vector.h>
 #include <lac/block_vector.h>
 
@@ -30,36 +31,54 @@
 
 DEAL_II_NAMESPACE_OPEN
 
-/*
-  Note that in this file, we use std::fabs, std::sqrt, etc
-  everywhere. The reason is that we want to use those version of these
-  functions that take a variable of the template type "Number", rather
-  than the C standard function which accepts and returns a double. The
-  C++ standard library therefore offers overloaded versions of these
-  functions taking floats, or long doubles, with the importance on the
-  additional accuracy when using long doubles.
- */
-
 namespace internal
 {
-  namespace VectorHelper
+  template <typename T>
+  bool is_non_negative (const T &t)
   {
-    template <typename Number>
-    inline Number sqr (const Number x)
-    {
-      Assert (numbers::is_finite(x), 
-	      ExcMessage("The given value is not finite but either infinite or Not A Number (NaN)"));
-      return x*x;
-    }
+    return t >= 0;
+  }
+
+
+  template <typename T>
+  bool is_non_negative (const std::complex<T> &)
+  {
+    Assert (false,
+	    ExcMessage ("Complex numbers do not have an ordering."));
+    
+    return false;
+  }
+
+
+  template <typename T>
+  void print (const T    &t,
+	      const char *format)
+  {
+    if (format != 0)
+      std::printf (format, t);
+    else
+      std::printf (" %5.2f", double(t));
+  }
+  
+
+
+  template <typename T>
+  void print (const std::complex<T> &t,
+	      const char            *format)
+  {
+    if (format != 0)
+      std::printf (format, t.real(), t.imag());
+    else
+      std::printf (" %5.2f+%5.2fi",
+		   double(t.real()), double(t.imag()));
   }
 }
 
 
-
-
 template <typename Number>
 Vector<Number>::Vector (const Vector<Number>& v)
-                : Subscriptor(),
+                :
+		Subscriptor(),
 		vec_size(v.size()),
 		max_vec_size(v.size()),
 		val(0)
@@ -78,7 +97,8 @@ Vector<Number>::Vector (const Vector<Number>& v)
 template <typename Number>
 template <typename OtherNumber>
 Vector<Number>::Vector (const Vector<OtherNumber>& v)
-                : Subscriptor(),
+                :
+		Subscriptor(),
 		vec_size(v.size()),
 		max_vec_size(v.size()),
 		val(0)
@@ -97,7 +117,8 @@ Vector<Number>::Vector (const Vector<OtherNumber>& v)
 
 template <typename Number>
 Vector<Number>::Vector (const PETScWrappers::Vector &v)
-                : Subscriptor(),
+                :
+		Subscriptor(),
 		vec_size(v.size()),
 		max_vec_size(v.size()),
 		val(0)
@@ -126,7 +147,8 @@ Vector<Number>::Vector (const PETScWrappers::Vector &v)
 
 template <typename Number>
 Vector<Number>::Vector (const PETScWrappers::MPI::Vector &v)
-                : Subscriptor(),
+                :
+		Subscriptor(),
 		vec_size(0),
 		max_vec_size(0),
 		val(0)
@@ -146,7 +168,8 @@ Vector<Number>::Vector (const PETScWrappers::MPI::Vector &v)
 
 template <typename Number>
 template <typename Number2>
-void Vector<Number>::reinit (const Vector<Number2>& v, const bool fast)
+void Vector<Number>::reinit (const Vector<Number2>& v,
+			     const bool fast)
 {
   reinit (v.size(), fast);
 }
@@ -157,9 +180,9 @@ template <typename Number>
 void
 Vector<Number>::swap (Vector<Number> &v)
 {
-  std::swap (vec_size,    v.vec_size);
+  std::swap (vec_size,     v.vec_size);
   std::swap (max_vec_size, v.max_vec_size);
-  std::swap (val,    v.val);
+  std::swap (val,          v.val);
 }
 
 
@@ -169,11 +192,9 @@ bool
 Vector<Number>::all_zero () const
 {
   Assert (vec_size!=0, ExcEmptyObject());
-  
-  const_iterator p = begin(),
-		 e = end();
-  while (p!=e)
-    if (*p++ != 0.0)
+
+  for (unsigned int i=0; i<vec_size; ++i)
+    if (val[i] != Number(0))
       return false;
   return true;
 }
@@ -186,11 +207,10 @@ Vector<Number>::is_non_negative () const
 {
   Assert (vec_size!=0, ExcEmptyObject());
   
-  const_iterator p = begin(),
-		 e = end();
-  while (p!=e)
-    if (*p++ < 0.0)
+  for (unsigned int i=0; i<vec_size; ++i)
+    if ( ! internal::is_non_negative (val[i]))
       return false;
+
   return true;
 }
 
@@ -205,61 +225,36 @@ Number Vector<Number>::operator * (const Vector<Number2>& v) const
   if (PointerComparison::equal (this, &v))
     return norm_sqr();
   
-  Assert (vec_size == v.size(), ExcDimensionMismatch(vec_size, v.size()));
+  Assert (vec_size == v.size(),
+	  ExcDimensionMismatch(vec_size, v.size()));
   
-  Number sum0 = 0,
-	 sum1 = 0,
-	 sum2 = 0,
-	 sum3 = 0;
+  Number sum = 0;
 
-				   // use modern processors better by
-				   // allowing pipelined commands to be
-				   // executed in parallel
-  const_iterator ptr  = begin(),
-		 eptr = ptr + (vec_size/4)*4;
-  typename Vector<Number2>::const_iterator vptr = v.begin();
-  while (ptr!=eptr)
-    {
-      sum0 += (*ptr++ * *vptr++);
-      sum1 += (*ptr++ * *vptr++);
-      sum2 += (*ptr++ * *vptr++);
-      sum3 += (*ptr++ * *vptr++);
-    };
-				   // add up remaining elements
-  while (ptr != end())
-    sum0 += *ptr++ * *vptr++;
+				   // multiply the two vectors. we have to
+				   // convert the elements of u to the type of
+				   // the result vector. this is necessary
+				   // because
+				   // operator*(complex<float>,complex<double>)
+				   // is not defined by default
+  for (unsigned int i=0; i<vec_size; ++i)
+    sum += numbers::NumberTraits<Number>::conjugate(val[i]) * Number(v.val[i]);
     
-  return sum0+sum1+sum2+sum3;
+  return sum;
 }
 
 
 template <typename Number>
-Number Vector<Number>::norm_sqr () const
+typename Vector<Number>::real_type
+Vector<Number>::norm_sqr () const
 {
   Assert (vec_size!=0, ExcEmptyObject());
 
-  Number sum0 = 0,
-	 sum1 = 0,
-	 sum2 = 0,
-	 sum3 = 0;
+  real_type sum = 0;
 
-				   // use modern processors better by
-				   // allowing pipelined commands to be
-				   // executed in parallel
-  const_iterator ptr  = begin(),
-		 eptr = ptr + (vec_size/4)*4;
-  while (ptr!=eptr)
-    {
-      sum0 += internal::VectorHelper::sqr(*ptr++);
-      sum1 += internal::VectorHelper::sqr(*ptr++);
-      sum2 += internal::VectorHelper::sqr(*ptr++);
-      sum3 += internal::VectorHelper::sqr(*ptr++);
-    };
-				   // add up remaining elements
-  while (ptr != end())
-    sum0 += internal::VectorHelper::sqr(*ptr++);
+  for (unsigned int i=0; i<vec_size; ++i)
+    sum += numbers::NumberTraits<Number>::abs_square(val[i]);
   
-  return sum0+sum1+sum2+sum3;
+  return sum;
 }
 
 
@@ -268,123 +263,69 @@ Number Vector<Number>::mean_value () const
 {
   Assert (vec_size!=0, ExcEmptyObject());
 
-  Number sum0 = 0,
-	 sum1 = 0,
-	 sum2 = 0,
-	 sum3 = 0;
+  Number sum = 0;
 
-				   // use modern processors better by
-				   // allowing pipelined commands to be
-				   // executed in parallel
-  const_iterator ptr  = begin(),
-		 eptr = ptr + (vec_size/4)*4;
-  while (ptr!=eptr)
-    {
-      sum0 += *ptr++;
-      sum1 += *ptr++;
-      sum2 += *ptr++;
-      sum3 += *ptr++;
-    };
-				   // add up remaining elements
-  while (ptr != end())
-    sum0 += *ptr++;
+  for (unsigned int i=0; i<vec_size; ++i)
+    sum += val[i];
   
-  return (sum0+sum1+sum2+sum3)/size();
+  return sum / real_type(size());
 }
 
 
 
 template <typename Number>
-Number Vector<Number>::l1_norm () const
+typename Vector<Number>::real_type
+Vector<Number>::l1_norm () const
 {
   Assert (vec_size!=0, ExcEmptyObject());
 
-  Number sum0 = 0,
-	 sum1 = 0,
-	 sum2 = 0,
-	 sum3 = 0;
+  real_type sum = 0;
 
-				   // use modern processors better by
-				   // allowing pipelined commands to be
-				   // executed in parallel
-  const_iterator ptr  = begin(),
-		 eptr = ptr + (vec_size/4)*4;
-  while (ptr!=eptr)
-    {
-      sum0 += std::fabs(*ptr++);
-      sum1 += std::fabs(*ptr++);
-      sum2 += std::fabs(*ptr++);
-      sum3 += std::fabs(*ptr++);
-    };
-				   // add up remaining elements
-  while (ptr != end())
-    sum0 += std::fabs(*ptr++);
-  
-  return sum0+sum1+sum2+sum3;
+  for (unsigned int i=0; i<vec_size; ++i)
+    sum += numbers::NumberTraits<Number>::abs(val[i]);
+
+  return sum;
 }
 
 
+
 template <typename Number>
-Number Vector<Number>::l2_norm () const
+typename Vector<Number>::real_type
+Vector<Number>::l2_norm () const
 {
   return std::sqrt(norm_sqr());
 }
 
 
+
 template <typename Number>
-Number Vector<Number>::lp_norm (const Number p) const
+typename Vector<Number>::real_type
+Vector<Number>::lp_norm (const real_type p) const
 {
   Assert (vec_size!=0, ExcEmptyObject());
 
-  Number sum0 = 0,
-	 sum1 = 0,
-	 sum2 = 0,
-	 sum3 = 0;
+  real_type sum = 0;
 
-				   // use modern processors better by
-				   // allowing pipelined commands to be
-				   // executed in parallel
-  const_iterator ptr  = begin(),
-		 eptr = ptr + (vec_size/4)*4;
-  while (ptr!=eptr)
-    {
-      sum0 += std::pow(std::fabs(*ptr++), p);
-      sum1 += std::pow(std::fabs(*ptr++), p);
-      sum2 += std::pow(std::fabs(*ptr++), p);
-      sum3 += std::pow(std::fabs(*ptr++), p);
-    };
-				   // add up remaining elements
-  while (ptr != end())
-    sum0 += std::pow(std::fabs(*ptr++), p);
+  for (unsigned int i=0; i<vec_size; ++i)
+    sum += std::pow (numbers::NumberTraits<Number>::abs(val[i]), p);
   
-  return std::pow(sum0+sum1+sum2+sum3,
-		  static_cast<Number>(1./p));
+  return std::pow(sum, static_cast<real_type>(1./p));
 }
 
 
+
 template <typename Number>
-Number Vector<Number>::linfty_norm () const
+typename Vector<Number>::real_type
+Vector<Number>::linfty_norm () const
 {
   Assert (vec_size!=0, ExcEmptyObject());
 
-  Number max0=0.,
-	 max1=0.,
-	 max2=0.,
-	 max3=0.;
-  for (unsigned int i=0; i<(vec_size/4); ++i) 
-    {
-      if (max0<std::fabs(val[4*i]))   max0=std::fabs(val[4*i]);
-      if (max1<std::fabs(val[4*i+1])) max1=std::fabs(val[4*i+1]);
-      if (max2<std::fabs(val[4*i+2])) max2=std::fabs(val[4*i+2]);
-      if (max3<std::fabs(val[4*i+3])) max3=std::fabs(val[4*i+3]);
-    };
-				   // add up remaining elements
-  for (unsigned int i=(vec_size/4)*4; i<vec_size; ++i)
-    if (max0<std::fabs(val[i]))
-      max0 = std::fabs(val[i]);
+  real_type max = 0;
 
-  return std::max (std::max(max0, max1),
-		   std::max(max2, max3));
+  for (unsigned int i=0; i<vec_size; ++i)
+    max = std::max (numbers::NumberTraits<Number>::abs(val[i]), max);
+
+  return max;
 }
 
 
@@ -404,11 +345,8 @@ Vector<Number>& Vector<Number>::operator -= (const Vector<Number>& v)
   Assert (vec_size!=0, ExcEmptyObject());
   Assert (vec_size == v.vec_size, ExcDimensionMismatch(vec_size, v.vec_size));
 
-  iterator i_ptr = begin(),
-	   i_end = end();
-  const_iterator v_ptr = v.begin();
-  while (i_ptr!=i_end)
-    *i_ptr++ -= *v_ptr++;
+  for (unsigned int i=0; i<vec_size; ++i)
+    val[i] -= v.val[i];
 
   return *this;
 }
@@ -419,10 +357,8 @@ void Vector<Number>::add (const Number v)
 {
   Assert (vec_size!=0, ExcEmptyObject());
 
-  iterator i_ptr = begin(),
-	   i_end = end();
-  while (i_ptr!=i_end)
-    *i_ptr++ += v;
+  for (unsigned int i=0; i<vec_size; ++i)
+    val[i] += v;
 }
 
 
@@ -432,11 +368,8 @@ void Vector<Number>::add (const Vector<Number>& v)
   Assert (vec_size!=0, ExcEmptyObject());
   Assert (vec_size == v.vec_size, ExcDimensionMismatch(vec_size, v.vec_size));
 
-  iterator i_ptr = begin(),
-	   i_end = end();
-  const_iterator v_ptr = v.begin();
-  while (i_ptr!=i_end)
-    *i_ptr++ += *v_ptr++;
+  for (unsigned int i=0; i<vec_size; ++i)
+    val[i] += v.val[i];
 }
 
 
@@ -452,28 +385,24 @@ void Vector<Number>::add (const Number a, const Vector<Number>& v,
   Assert (vec_size!=0, ExcEmptyObject());
   Assert (vec_size == v.vec_size, ExcDimensionMismatch(vec_size, v.vec_size));
   Assert (vec_size == w.vec_size, ExcDimensionMismatch(vec_size, w.vec_size));
-  iterator i_ptr = begin(),
-	   i_end = end();
-  const_iterator v_ptr = v.begin(),
-		 w_ptr = w.begin();
-  while (i_ptr!=i_end)
-    *i_ptr++ += a * *v_ptr++ + b * *w_ptr++;
+
+  for (unsigned int i=0; i<vec_size; ++i)
+    val[i] += a*v.val[i] + b*w.val[i];
 }
 
 
 template <typename Number>
-void Vector<Number>::sadd (const Number x, const Vector<Number>& v)
+void Vector<Number>::sadd (const Number x,
+			   const Vector<Number>& v)
 {
   Assert (numbers::is_finite(x), 
           ExcMessage("The given value is not finite but either infinite or Not A Number (NaN)"));
 
   Assert (vec_size!=0, ExcEmptyObject());
   Assert (vec_size == v.vec_size, ExcDimensionMismatch(vec_size, v.vec_size));
-  iterator i_ptr = begin(),
-	   i_end = end();
-  const_iterator v_ptr = v.begin();
-  for (; i_ptr!=i_end; ++i_ptr)
-    *i_ptr = x * *i_ptr  + *v_ptr++;
+
+  for (unsigned int i=0; i<vec_size; ++i)
+    val[i] = x*val[i] + v.val[i];
 }
 
 
@@ -493,12 +422,9 @@ void Vector<Number>::sadd (const Number x, const Number a,
   Assert (vec_size!=0, ExcEmptyObject());
   Assert (vec_size == v.vec_size, ExcDimensionMismatch(vec_size, v.vec_size));
   Assert (vec_size == w.vec_size, ExcDimensionMismatch(vec_size, w.vec_size));
-  iterator i_ptr = begin(),
-	   i_end = end();
-  const_iterator v_ptr = v.begin(),
-		 w_ptr = w.begin();
-  for (; i_ptr!=i_end; ++i_ptr)
-    *i_ptr = x * *i_ptr  +  a * *v_ptr++  + b * *w_ptr++;
+
+  for (unsigned int i=0; i<vec_size; ++i)
+    val[i] = x*val[i] + a*v.val[i] + b*w.val[i];
 }
 
 
@@ -521,14 +447,9 @@ void Vector<Number>::sadd (const Number x, const Number a,
   Assert (vec_size == v.vec_size, ExcDimensionMismatch(vec_size, v.vec_size));
   Assert (vec_size == w.vec_size, ExcDimensionMismatch(vec_size, w.vec_size));
   Assert (vec_size == y.vec_size, ExcDimensionMismatch(vec_size, y.vec_size));
-  iterator i_ptr = begin(),
-	   i_end = end();
-  const_iterator v_ptr = v.begin(),
-		 w_ptr = w.begin(),
-		 y_ptr = y.begin();
-  
-  for (; i_ptr!=i_end; ++i_ptr)
-    *i_ptr = (x * *i_ptr)  +  (a * *v_ptr++)  +  (b * *w_ptr++)  + (c * *y_ptr++);
+
+  for (unsigned int i=0; i<vec_size; ++i)
+    val[i] = x*val[i] + a*v.val[i] + b*w.val[i] +c*y.val[i];
 }
 
 
@@ -540,28 +461,30 @@ void Vector<Number>::scale (const Vector<Number2> &s)
   Assert (vec_size!=0, ExcEmptyObject());
   Assert (vec_size == s.vec_size, ExcDimensionMismatch(vec_size, s.vec_size));
   
-  iterator             ptr  = begin();
-  const const_iterator eptr = end();
-  typename Vector<Number2>::const_iterator sptr = s.begin();
-  while (ptr!=eptr)
-    *ptr++ *= *sptr++;
+  for (unsigned int i=0; i<vec_size; ++i)
+    val[i] *= s.val[i];
 }
 
 
 template <typename Number>
 template <typename Number2>
-void Vector<Number>::equ (const Number a, const Vector<Number2>& u)
+void Vector<Number>::equ (const Number a,
+			  const Vector<Number2>& u)
 {
   Assert (numbers::is_finite(a), 
 	  ExcMessage("The given value is not finite but either infinite or Not A Number (NaN)"));
 
   Assert (vec_size!=0, ExcEmptyObject());
   Assert (vec_size == u.vec_size, ExcDimensionMismatch(vec_size, u.vec_size));
-  iterator i_ptr = begin(),
-	   i_end = end();
-  typename Vector<Number2>::const_iterator u_ptr = u.begin();
-  while (i_ptr!=i_end)
-    *i_ptr++ = a * *u_ptr++;
+
+				   // set the result vector to a*u. we have to
+				   // convert the elements of u to the type of
+				   // the result vector. this is necessary
+				   // because
+				   // operator*(complex<float>,complex<double>)
+				   // is not defined by default
+  for (unsigned int i=0; i<vec_size; ++i)
+    val[i] = a * Number(u.val[i]);
 }
 
 
@@ -577,12 +500,9 @@ void Vector<Number>::equ (const Number a, const Vector<Number>& u,
   Assert (vec_size!=0, ExcEmptyObject());
   Assert (vec_size == u.vec_size, ExcDimensionMismatch(vec_size, u.vec_size));
   Assert (vec_size == v.vec_size, ExcDimensionMismatch(vec_size, v.vec_size));
-  iterator i_ptr = begin(),
-	   i_end = end();
-  const_iterator u_ptr = u.begin(),
-		 v_ptr = v.begin();
-  while (i_ptr!=i_end)
-    *i_ptr++ = a * *u_ptr++  + b * *v_ptr++;
+
+  for (unsigned int i=0; i<vec_size; ++i)
+    val[i] = a * u.val[i] + b * v.val[i];
 }
 
 
@@ -595,31 +515,26 @@ void Vector<Number>::equ (const Number a, const Vector<Number>& u,
   Assert (vec_size == u.vec_size, ExcDimensionMismatch(vec_size, u.vec_size));
   Assert (vec_size == v.vec_size, ExcDimensionMismatch(vec_size, v.vec_size));
   Assert (vec_size == w.vec_size, ExcDimensionMismatch(vec_size, w.vec_size));
-  iterator i_ptr = begin(),
-	   i_end = end();
-  const_iterator u_ptr = u.begin(),
-		 v_ptr = v.begin(),
-		 w_ptr = w.begin();
-  while (i_ptr!=i_end)
-    *i_ptr++ = a * *u_ptr++  + b * *v_ptr++ + c * *w_ptr++;
+
+  for (unsigned int i=0; i<vec_size; ++i)
+    val[i] = a * u.val[i] + b * v.val[i] + c * w.val[i];
 }
 
 
 template <typename Number>
-void Vector<Number>::ratio (const Vector<Number> &a, const Vector<Number> &b)
+void Vector<Number>::ratio (const Vector<Number> &a,
+			    const Vector<Number> &b)
 {
   Assert (vec_size!=0, ExcEmptyObject());
-  Assert (a.vec_size == b.vec_size, ExcDimensionMismatch (a.vec_size, b.vec_size));
+  Assert (a.vec_size == b.vec_size,
+	  ExcDimensionMismatch (a.vec_size, b.vec_size));
 
 				   // no need to reinit with zeros, since
 				   // we overwrite them anyway
   reinit (a.size(), true);
-  iterator i_ptr = begin(),
-	   i_end = end();
-  const_iterator a_ptr = a.begin(),
-		 b_ptr = b.begin();
-  while (i_ptr!=i_end)
-    *i_ptr++ = *a_ptr++ / *b_ptr++;
+
+  for (unsigned int i=0; i<vec_size; ++i)
+    val[i] = a.val[i] / b.val[i];
 }
 
 
@@ -723,8 +638,14 @@ Vector<Number>::operator == (const Vector<Number2>& v) const
   Assert (vec_size!=0, ExcEmptyObject());
   Assert (vec_size == v.size(), ExcDimensionMismatch(vec_size, v.size()));
 
+				   // compare the two vector. we have to
+				   // convert the elements of v to the type of
+				   // the result vector. this is necessary
+				   // because
+				   // operator==(complex<float>,complex<double>)
+				   // is not defined by default
   for (unsigned int i=0; i<vec_size; ++i)
-    if (val[i] != v.val[i])
+    if (val[i] != Number(v.val[i]))
       return false;
 
   return true;
@@ -733,12 +654,12 @@ Vector<Number>::operator == (const Vector<Number2>& v) const
 
 
 template <typename Number>
-void Vector<Number>::print (const char* format) const
+void Vector<Number>::print (const char *format) const
 {
   Assert (vec_size!=0, ExcEmptyObject());
-  if (!format) format = " %5.2f";
-  for (unsigned int j=0;j<size();j++)
-    std::printf (format, val[j]);
+
+  for (unsigned int j=0; j<size(); ++j)
+    internal::print (val[j], format);
   std::printf ("\n");
 }
 
@@ -764,10 +685,10 @@ void Vector<Number>::print (std::ostream      &out,
 
   if (across)
     for (unsigned int i=0; i<size(); ++i)
-      out << static_cast<double>(val[i]) << ' ';
+      out << val[i] << ' ';
   else
     for (unsigned int i=0; i<size(); ++i)
-      out << static_cast<double>(val[i]) << std::endl;
+      out << val[i] << std::endl;
   out << std::endl;
   
   AssertThrow (out, ExcIO());
