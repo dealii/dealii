@@ -170,6 +170,16 @@ namespace numbers
   struct NumberTraits
   {
 				       /**
+					* A flag that specifies whether the
+					* template type given to this class is
+					* complex or real. Since the general
+					* template is selected for non-complex
+					* types, the answer is
+					* <code>false</code>.
+					*/
+      static const bool is_complex = false;
+      
+				       /**
 					* For this data type, typedef the
 					* corresponding real type. Since the
 					* general template is selected for all
@@ -223,6 +233,17 @@ namespace numbers
   template <typename number>
   struct NumberTraits<std::complex<number> >
   {
+				       /**
+					* A flag that specifies whether the
+					* template type given to this class is
+					* complex or real. Since this
+					* specialization of the general
+					* template is selected for complex
+					* types, the answer is
+					* <code>true</code>.
+					*/
+      static const bool is_complex = true;
+      
 				       /**
 					* For this data type, typedef the
 					* corresponding real type. Since this

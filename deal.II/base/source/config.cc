@@ -66,6 +66,22 @@ namespace numbers
              && 
              is_finite (x.imag()) );
   }
+
+
+  template <typename number>
+  const bool NumberTraits<number>::is_complex;
+
+  template <typename number>
+  const bool NumberTraits<std::complex<number> >::is_complex;
+
+// explicit instantiations
+  template struct NumberTraits<double>;
+  template struct NumberTraits<float>;
+  template struct NumberTraits<long double>;
+    
+  template struct NumberTraits<std::complex<double> >;
+  template struct NumberTraits<std::complex<float> >;
+  template struct NumberTraits<std::complex<long double> >;
 }
 
 DEAL_II_NAMESPACE_CLOSE
