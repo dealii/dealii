@@ -72,7 +72,6 @@ class Vector : public Subscriptor
 				      * <tt>vector<...></tt> class.
 				      */
     typedef Number                                            value_type;
-    typedef typename numbers::NumberTraits<Number>::real_type real_type;
     typedef value_type                                       *pointer;
     typedef const value_type                                 *const_pointer;
     typedef value_type                                       *iterator;
@@ -81,6 +80,26 @@ class Vector : public Subscriptor
     typedef const value_type                                 &const_reference;
     typedef size_t                                            size_type;
 
+				     /**
+				      * Declare a type that has holds
+				      * real-valued numbers with the
+				      * same precision as the template
+				      * argument to this class. If the
+				      * template argument of this
+				      * class is a real data type,
+				      * then real_type equals the
+				      * template argument. If the
+				      * template argument is a
+				      * std::complex type then
+				      * real_type equals the type
+				      * underlying the complex
+				      * numbers.
+				      *
+				      * This typedef is used to
+				      * represent the return type of
+				      * norms.
+				      */
+    typedef typename numbers::NumberTraits<Number>::real_type real_type;
 
 				     /**
 				      * @name 1: Basic Object-handling 
@@ -383,9 +402,14 @@ class Vector : public Subscriptor
 				      * computed depend on the order
 				      * of the arguments of this
 				      * vector.
+				      *
+				      * For complex vectors, the
+				      * scalar product is implemented
+				      * as $\left<v,w\right>=\sum_i
+				      * \bar{v_i} w_i$.
 				      */
     template <typename Number2>
-    Number operator* (const Vector<Number2> &V) const;
+    Number operator * (const Vector<Number2> &V) const;
 
 				     /**
 				      * Return square of the $l_2$-norm.
