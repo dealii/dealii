@@ -154,15 +154,19 @@ namespace numbers
   bool is_finite (const std::complex<long double> x);
 
 				   /**
-				    * A structure that, together with its
-				    * partial specializations, provides traits
-				    * and member functions that make it
-				    * possible to write templates that work on
-				    * both real number types and complex
-				    * number types. This template is mostly
-				    * used to implement linear algebra classes
-				    * such as vectors and matrices that work
-				    * for both real and complex numbers.
+				    * A structure that, together with
+				    * its partial specializations
+				    * NumberTraits<std::complex<number> > ,
+				    * provides traits and member
+				    * functions that make it possible
+				    * to write templates that work on
+				    * both real number types and
+				    * complex number types. This
+				    * template is mostly used to
+				    * implement linear algebra classes
+				    * such as vectors and matrices
+				    * that work for both real and
+				    * complex numbers.
 				    *
 				    * @author Wolfgang Bangerth, 2007
 				    */
@@ -288,7 +292,7 @@ namespace numbers
 
 
 //TODO[WB]: eventually remove this namespace alias
-/**
+/*
  * Namespace alias with the old name for the numbers namespace. The namespace
  * was originally called numbers, but has since been renamed to
  * dealii::numbers when everything was moved into namespace dealii.
@@ -298,7 +302,8 @@ namespace numbers
 namespace deal_II_numbers = numbers;
 
 
-/* --------------- inline and template functions ---------------- */
+// --------------- inline and template functions ---------------- //
+
 namespace numbers
 {
   template <typename number>
