@@ -124,7 +124,7 @@ FullMatrix<number>::all_zero () const
 
 template <typename number>
 FullMatrix<number> &
-FullMatrix<number>::operator *= (const double factor)
+FullMatrix<number>::operator *= (const number factor)
 {
 
   Assert (numbers::is_finite(factor), 
@@ -142,7 +142,7 @@ FullMatrix<number>::operator *= (const double factor)
 
 template <typename number>
 FullMatrix<number> &
-FullMatrix<number>::operator /= (const double factor)
+FullMatrix<number>::operator /= (const number factor)
 {
 
   Assert (numbers::is_finite(factor), 
@@ -376,7 +376,7 @@ void FullMatrix<number>::Tvmult (Vector<number2>       &dst,
 
 template <typename number>
 template <typename number2, typename number3>
-double FullMatrix<number>::residual (Vector<number2>& dst,
+number FullMatrix<number>::residual (Vector<number2>& dst,
 				     const Vector<number2>& src,
 				     const Vector<number3>& right) const
 {
@@ -1562,7 +1562,7 @@ FullMatrix<number>::add (const number               a,
 template <typename number>
 template <typename number2>
 void FullMatrix<number>::add (const FullMatrix<number2> &src,
-			      const double factor,
+			      const number factor,
 			      const unsigned int dst_offset_i,
 			      const unsigned int dst_offset_j,
 			      const unsigned int src_offset_i,
@@ -1587,7 +1587,7 @@ void FullMatrix<number>::add (const FullMatrix<number2> &src,
 template <typename number>
 template <typename number2>
 void FullMatrix<number>::Tadd (const FullMatrix<number2> &src,
-			      const double factor,
+			      const number factor,
 			      const unsigned int dst_offset_i,
 			      const unsigned int dst_offset_j,
 			      const unsigned int src_offset_i,
@@ -1881,7 +1881,7 @@ FullMatrix<number>::operator == (const FullMatrix<number> &M) const
 
 
 template <typename number>
-double
+number
 FullMatrix<number>::determinant () const
 {
   Assert (!this->empty(), ExcEmptyMatrix());
@@ -1911,7 +1911,7 @@ FullMatrix<number>::determinant () const
 
 
 template <typename number>
-double
+number
 FullMatrix<number>::trace () const
 {
   Assert (!this->empty(), ExcEmptyMatrix());
@@ -1919,7 +1919,7 @@ FullMatrix<number>::trace () const
   Assert (this->n_cols() == this->n_rows(),
 	  ExcDimensionMismatch(this->n_cols(), this->n_rows()));
 
-  double tr = 0;
+  number tr = 0;
   for (unsigned int i=0; i<this->n_rows(); ++i)
     tr += this->el(i,i);
 

@@ -40,20 +40,16 @@ template<typename number> class Vector;
  * <tt>number</tt>.  The interface is quite fat and in fact has grown every
  * time a new feature was needed. So, a lot of functions are provided.
  *
- * Since the instantiation of this template is quite an effort,
- * standard versions are precompiled into the library. These include
- * all combinations of <tt>float</tt> and <tt>double</tt> for matrices and
- * vectors. If you need more data types, the implementation of
- * non-inline functions is in <tt>fullmatrix.templates.h</tt>. Driver files
- * are in the source tree.
- *
  * Internal calculations are usually done with the accuracy of the
  * vector argument to functions. If there is no argument with a number
  * type, the matrix number type is used.
  *
- * @note Instantiations for this template are provided for <tt>@<float@> and
- * @<double@></tt>; others can be generated in application programs (see the
- * section on @ref Instantiations in the manual).
+ * @note Instantiations for this template are provided for
+ * <tt>@<float@>, @<double@>, @<long double@>,
+ * @<std::complex@<float@>@>, @<std::complex@<double@>@>,
+ * @<std::complex@<long double@>@></tt>; others can be generated in
+ * application programs (see the section on @ref Instantiations in the
+ * manual).
  *
  * @author Guido Kanschat, Franz-Theo Suttmeier, Wolfgang Bangerth, 1993-2004
  */
@@ -294,7 +290,7 @@ class FullMatrix : public Table<2,number>
 				      * way.
 				      */
     FullMatrix<number> &
-    operator = (const double d);
+    operator = (const number d);
 
 				     /**
 				      * Copy operator to create a full
@@ -511,7 +507,7 @@ class FullMatrix : public Table<2,number>
                                       * Obviously, the matrix needs to
                                       * be quadratic for this function.
                                       */
-    double determinant () const;
+    number determinant () const;
 
 				     /**
 				      * Return the trace of the matrix,
@@ -521,7 +517,7 @@ class FullMatrix : public Table<2,number>
                                       * Obviously, the matrix needs to
                                       * be quadratic for this function.
                                       */
-    double trace () const;
+    number trace () const;
     
 				     /**
 				      * Output of the matrix in
@@ -622,13 +618,13 @@ class FullMatrix : public Table<2,number>
 				      * Scale the entire matrix by a
 				      * fixed factor.
 				      */
-    FullMatrix & operator *= (const double factor);
+    FullMatrix & operator *= (const number factor);
 
 				     /**
 				      * Scale the entire matrix by the
 				      * inverse of the given factor.
 				      */
-    FullMatrix & operator /= (const double factor);
+    FullMatrix & operator /= (const number factor);
     
                                      /**
 				      * Simple addition of a scaled
@@ -706,7 +702,7 @@ class FullMatrix : public Table<2,number>
 				      */
     template<typename number2>
     void add (const FullMatrix<number2> &src,
-	      const double factor,
+	      const number factor,
 	      const unsigned int dst_offset_i = 0,
 	      const unsigned int dst_offset_j = 0,
 	      const unsigned int src_offset_i = 0,
@@ -747,7 +743,7 @@ class FullMatrix : public Table<2,number>
 				      */
     template<typename number2>
     void Tadd (const FullMatrix<number2> &src,
-	       const double factor,
+	       const number               factor,
 	       const unsigned int dst_offset_i = 0,
 	       const unsigned int dst_offset_j = 0,
 	       const unsigned int src_offset_i = 0,
@@ -1041,7 +1037,7 @@ class FullMatrix : public Table<2,number>
                                       * vector.
 				      */
     template<typename number2, typename number3>
-    double residual (Vector<number2>       &dst,
+    number residual (Vector<number2>       &dst,
 		     const Vector<number2> &x,
 		     const Vector<number3> &b) const;
 
@@ -1094,7 +1090,7 @@ class FullMatrix : public Table<2,number>
 				      * Exception
 				      */
     DeclException1 (ExcNotRegular,
-		    double,
+		    number,
 		    << "The maximal pivot is " << arg1
 		    << ", which is below the threshold. The matrix may be singular.");
 				     /**
@@ -1144,7 +1140,7 @@ FullMatrix<number>::n() const
 
 template <typename number>
 FullMatrix<number> &
-FullMatrix<number>::operator = (const double d)
+FullMatrix<number>::operator = (const number d)
 {
   Assert (d==0, ExcScalarAssignmentOnlyForZeroValue());
 

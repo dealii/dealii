@@ -41,10 +41,10 @@ template void FullMatrix<TYPEMAT>::add<TYPEMAT2> (const TYPEMAT, const FullMatri
 						  const TYPEMAT, const FullMatrix<TYPEMAT2>&,
 						  const TYPEMAT, const FullMatrix<TYPEMAT2>&);
 template void FullMatrix<TYPEMAT>::add<TYPEMAT2> (
-  const FullMatrix<TYPEMAT2>&, double, unsigned, unsigned, unsigned, unsigned);
+  const FullMatrix<TYPEMAT2>&, TYPEMAT, unsigned, unsigned, unsigned, unsigned);
 template void FullMatrix<TYPEMAT>::Tadd<TYPEMAT2> (const TYPEMAT, const FullMatrix<TYPEMAT2>&);
 template void FullMatrix<TYPEMAT>::Tadd<TYPEMAT2> (
-  const FullMatrix<TYPEMAT2>&, double, unsigned, unsigned, unsigned, unsigned);
+  const FullMatrix<TYPEMAT2>&, TYPEMAT, unsigned, unsigned, unsigned, unsigned);
 template void FullMatrix<TYPEMAT>::equ<TYPEMAT2> (const TYPEMAT, const FullMatrix<TYPEMAT2>&);
 template void FullMatrix<TYPEMAT>::equ<TYPEMAT2> (const TYPEMAT, const FullMatrix<TYPEMAT2>&,
 						  const TYPEMAT, const FullMatrix<TYPEMAT2>&);
@@ -67,7 +67,7 @@ template void FullMatrix<TYPEMAT>::vmult<TYPEVEC>(
   Vector<TYPEVEC>&, const Vector<TYPEVEC>&, bool) const;
 template void FullMatrix<TYPEMAT>::Tvmult<TYPEVEC>(
   Vector<TYPEVEC>&, const Vector<TYPEVEC>&, bool) const;
-template double FullMatrix<TYPEMAT>::residual<TYPEVEC>(
+template TYPEMAT FullMatrix<TYPEMAT>::residual<TYPEVEC>(
   Vector<TYPEVEC>&, const Vector<TYPEVEC>&, const Vector<TYPERES>&) const;
 template TYPEVEC FullMatrix<TYPEMAT>::matrix_norm_square<TYPEVEC> (
   const Vector<TYPEVEC> &) const;
@@ -93,7 +93,7 @@ template void FullMatrix<TYPEMAT>::vmult<TYPEVEC>(
   Vector<TYPEVEC>&, const Vector<TYPEVEC>&, bool) const;
 template void FullMatrix<TYPEMAT>::Tvmult<TYPEVEC>(
   Vector<TYPEVEC>&, const Vector<TYPEVEC>&, bool) const;
-template double FullMatrix<TYPEMAT>::residual<TYPEVEC>(
+template TYPEMAT FullMatrix<TYPEMAT>::residual<TYPEVEC>(
   Vector<TYPEVEC>&, const Vector<TYPEVEC>&, const Vector<TYPERES>&) const;
 template TYPEVEC FullMatrix<TYPEMAT>::matrix_norm_square<TYPEVEC> (
   const Vector<TYPEVEC> &) const;
@@ -111,7 +111,7 @@ void FullMatrix<TYPEMAT>::precondition_Jacobi<TYPEVEC> (
 #undef TYPERES
 #define TYPERES float
 
-template double FullMatrix<TYPEMAT>::residual<TYPEVEC,TYPERES>(
+template TYPEMAT FullMatrix<TYPEMAT>::residual<TYPEVEC,TYPERES>(
   Vector<TYPEVEC>&, const Vector<TYPEVEC>&, const Vector<TYPERES>&) const;
 
 DEAL_II_NAMESPACE_CLOSE
