@@ -2,7 +2,7 @@
 //    $Id$
 //    Version: $Name$
 //
-//    Copyright (C) 2005, 2006 by the deal.II authors
+//    Copyright (C) 2005, 2006, 2007 by the deal.II authors
 //
 //    This file is subject to QPL and may not be  distributed
 //    without copyright and license information. Please refer
@@ -54,13 +54,16 @@
  * If the template parameter is <tt>dim</tt>, the available instances
  * are for <tt>dim=1,2,3</tt>, if there is no other information.
  *
- * There are other cases of classes (not depending on the spatial dimension)
- * for which only a certain, small number of template arguments is supported
- * and explicit instantiations are provided in the library. In particular,
- * this includes all the linear algebra classes that are templatized on the
- * type of the scalar underlying stored values: we only support
- * <code>double</code>, <code>float</code>, and in some cases <code>long
- * double</code>.
+ * There are other cases of classes (not depending on the spatial
+ * dimension) for which only a certain, small number of template
+ * arguments is supported and explicit instantiations are provided in
+ * the library. In particular, this includes all the linear algebra
+ * classes that are templatized on the type of the scalar underlying
+ * stored values: we only support <code>double</code>,
+ * <code>float</code>, and in some cases <code>long double</code>,
+ * <code>std::complex@<double@></code>,
+ * <code>std::complex@<float@></code>, and <code>std::complex@<long
+ * double@></code>.
  * 
  *
  * @section Inst2 A few instantiations, most of which are known
