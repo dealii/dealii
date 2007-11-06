@@ -224,6 +224,7 @@ namespace PETScWrappers
                                         * class.
                                         */
       typedef PetscScalar               value_type;
+      typedef PetscScalar               real_type;
       typedef size_t                    size_type;
       typedef internal::VectorReference reference;
       typedef const internal::VectorReference const_reference;
@@ -393,7 +394,7 @@ namespace PETScWrappers
                                        /**
                                         * Return square of the $l_2$-norm.
                                         */
-      PetscScalar norm_sqr () const;
+      real_type norm_sqr () const;
 
                                        /**
                                         * Mean value of the elements of
@@ -405,14 +406,14 @@ namespace PETScWrappers
                                         * $l_1$-norm of the vector.
                                         * The sum of the absolute values.
                                         */
-      PetscScalar l1_norm () const;
+      real_type l1_norm () const;
 
                                        /**
                                         * $l_2$-norm of the vector.  The
                                         * square root of the sum of the
                                         * squares of the elements.
                                         */
-      PetscScalar l2_norm () const;
+      real_type l2_norm () const;
 
                                        /**
                                         * $l_p$-norm of the vector. The
@@ -420,13 +421,13 @@ namespace PETScWrappers
                                         * powers of the absolute values
                                         * of the elements.
                                         */
-      PetscScalar lp_norm (const PetscScalar p) const;
+      real_type lp_norm (const PetscScalar p) const;
 
                                        /**
                                         * Maximum absolute value of the
                                         * elements.
                                         */
-      PetscScalar linfty_norm () const;
+      real_type linfty_norm () const;
 
                                        /**
                                         * Return whether the vector contains

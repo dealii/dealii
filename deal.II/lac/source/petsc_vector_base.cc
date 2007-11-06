@@ -2,7 +2,7 @@
 //    $Id$
 //    Version: $Name$
 //
-//    Copyright (C) 2004, 2005, 2006 by the deal.II authors
+//    Copyright (C) 2004, 2005, 2006, 2007 by the deal.II authors
 //
 //    This file is subject to QPL and may not be  distributed
 //    without copyright and license information. Please refer
@@ -260,7 +260,7 @@ namespace PETScWrappers
 
 
 
-  PetscScalar
+  VectorBase::real_type
   VectorBase::norm_sqr () const
   {
     const PetscScalar d = l2_norm();
@@ -314,7 +314,7 @@ namespace PETScWrappers
   
 
 
-  PetscScalar
+  VectorBase::real_type
   VectorBase::l1_norm () const
   {
     PetscScalar d;
@@ -327,7 +327,7 @@ namespace PETScWrappers
   
 
 
-  PetscScalar
+  VectorBase::real_type
   VectorBase::l2_norm () const
   {
     PetscScalar d;
@@ -340,7 +340,7 @@ namespace PETScWrappers
   
 
 
-  PetscScalar
+  VectorBase::real_type
   VectorBase::lp_norm (const PetscScalar p) const
   {
                                      // get a representation of the vector and
@@ -386,7 +386,7 @@ namespace PETScWrappers
 
 
 
-  PetscScalar
+  VectorBase::real_type
   VectorBase::linfty_norm () const
   {
     PetscScalar d;
