@@ -21,17 +21,33 @@ default: run-tests
 ############################################################
 
 tests_x = vector-vector \
-	full_matrix householder \
-	tridiagonal_matrix tridiagonal_matrix_sym \
-	sparsity_pattern sparse_matrices matrices \
+	full_matrix \
+	householder \
+	tridiagonal_matrix \
+	tridiagonal_matrix_sym \
+	sparsity_pattern \
+	sparse_matrices matrices \
 	block_sparsity_pattern_01 \
-	block_indices block_vector block_vector_* block_matrices \
-	matrix_lib matrix_out pointer_matrix pointer_matrix_vector \
-	solver eigen filtered_matrix \
-	sparse_ilu sparse_ilu_t lapack_fill block_minres \
-	identity_matrix* trace \
+	block_indices \
+	block_vector \
+	block_vector_* \
+	block_matrices \
+	matrix_lib \
+	matrix_out \
+	pointer_matrix \
+	pointer_matrix_vector \
+	solver \
+	eigen \
+	filtered_matrix \
+	sparse_ilu \
+	sparse_ilu_t \
+	lapack_fill \
+	block_minres \
+	identity_matrix* \
+	trace \
 	print_formatted_* \
-	bicgstab_early
+	bicgstab_early \
+	complex*
 
 
 # from above list of regular expressions, generate the real set of

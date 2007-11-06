@@ -2,7 +2,7 @@
 //    $Id$
 //    Version: $Name$
 //
-//    Copyright (C) 2004, 2005, 2006 by the deal.II authors
+//    Copyright (C) 2004, 2005, 2006, 2007 by the deal.II authors
 //
 //    This file is subject to QPL and may not be  distributed
 //    without copyright and license information. Please refer
@@ -651,8 +651,7 @@ namespace internal
  * @author Wolfgang Bangerth, Guido Kanschat, 1999, 2000, 2001, 2002, 2004
  */
 template <class VectorType>
-class BlockVectorBase
-  : public Subscriptor
+class BlockVectorBase : public Subscriptor
 {
   public:
                                      /**
@@ -681,6 +680,27 @@ class BlockVectorBase
 
     typedef std::size_t                     size_type;
 
+				     /**
+				      * Declare a type that has holds
+				      * real-valued numbers with the
+				      * same precision as the template
+				      * argument to this class. If the
+				      * template argument of this
+				      * class is a real data type,
+				      * then real_type equals the
+				      * template argument. If the
+				      * template argument is a
+				      * std::complex type then
+				      * real_type equals the type
+				      * underlying the complex
+				      * numbers.
+				      *
+				      * This typedef is used to
+				      * represent the return type of
+				      * norms.
+				      */
+    typedef typename BlockType::real_type real_type;
+    
                                      /**
                                       * Default constructor.
                                       */
@@ -826,7 +846,7 @@ class BlockVectorBase
 				     /**
 				      * Return square of the $l_2$-norm.
 				      */
-    value_type norm_sqr () const;
+    real_type norm_sqr () const;
 
 				     /**
 				      * Return the mean value of the elements
@@ -838,21 +858,21 @@ class BlockVectorBase
 				      * Return the $l_1$-norm of the vector,
 				      * i.e. the sum of the absolute values.
 				      */
-    value_type l1_norm () const;
+    real_type l1_norm () const;
 
 				     /**
 				      * Return the $l_2$-norm of the vector,
 				      * i.e. the square root of the sum of
 				      * the squares of the elements.
 				      */
-    value_type l2_norm () const;
+    real_type l2_norm () const;
 
 				     /**
 				      * Return the maximum absolute value of
 				      * the elements of this vector, which is
 				      * the $l_\infty$-norm of a vector.
 				      */
-    value_type linfty_norm () const;
+    real_type linfty_norm () const;
 
 				     /**
 				      * Return whether the vector contains only
@@ -1752,10 +1772,10 @@ operator * (const BlockVectorBase<VectorType>& v) const
 
 
 template <class VectorType>
-typename BlockVectorBase<VectorType>::value_type
+typename BlockVectorBase<VectorType>::real_type
 BlockVectorBase<VectorType>::norm_sqr () const
 {
-  value_type sum = 0.;
+  real_type sum = 0.;
   for (unsigned int i=0;i<n_blocks();++i)
     sum += components[i].norm_sqr();
     
@@ -1778,10 +1798,10 @@ BlockVectorBase<VectorType>::mean_value () const
 
 
 template <class VectorType>
-typename BlockVectorBase<VectorType>::value_type
+typename BlockVectorBase<VectorType>::real_type
 BlockVectorBase<VectorType>::l1_norm () const
 {
-  value_type sum = 0.;
+  real_type sum = 0.;
   for (unsigned int i=0;i<n_blocks();++i)
     sum += components[i].l1_norm();
     
@@ -1791,7 +1811,7 @@ BlockVectorBase<VectorType>::l1_norm () const
 
 
 template <class VectorType>
-typename BlockVectorBase<VectorType>::value_type
+typename BlockVectorBase<VectorType>::real_type
 BlockVectorBase<VectorType>::l2_norm () const
 {
   return std::sqrt(norm_sqr());
@@ -1800,10 +1820,10 @@ BlockVectorBase<VectorType>::l2_norm () const
 
 
 template <class VectorType>
-typename BlockVectorBase<VectorType>::value_type
+typename BlockVectorBase<VectorType>::real_type
 BlockVectorBase<VectorType>::linfty_norm () const
 {
-  value_type sum = 0.;
+  real_type sum = 0.;
   for (unsigned int i=0;i<n_blocks();++i)
     {
       value_type newval = components[i].linfty_norm();
