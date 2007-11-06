@@ -237,7 +237,7 @@ Number Vector<Number>::operator * (const Vector<Number2>& v) const
 				   // operator*(complex<float>,complex<double>)
 				   // is not defined by default
   for (unsigned int i=0; i<vec_size; ++i)
-    sum += numbers::NumberTraits<Number>::conjugate(val[i]) * Number(v.val[i]);
+    sum += val[i] * Number(numbers::NumberTraits<Number2>::conjugate(v.val[i]));
     
   return sum;
 }

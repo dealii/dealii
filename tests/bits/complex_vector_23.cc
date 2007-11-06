@@ -35,7 +35,7 @@ void test (Vector<std::complex<double> > &v,
       if (i%3 == 0)
         {
           w(i) = std::complex<double> (i+1., i+2.);
-          product += 1.*i*std::complex<double> (i+1., i+2.);
+          product += 1.*i*std::conj(std::complex<double> (i+1., i+2.));
         }
     }
   

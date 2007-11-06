@@ -406,7 +406,7 @@ class Vector : public Subscriptor
 				      * For complex vectors, the
 				      * scalar product is implemented
 				      * as $\left<v,w\right>=\sum_i
-				      * \bar{v_i} w_i$.
+				      * v_i \bar{w_i}$.
 				      */
     template <typename Number2>
     Number operator * (const Vector<Number2> &V) const;
