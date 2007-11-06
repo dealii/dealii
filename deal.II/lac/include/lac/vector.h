@@ -55,9 +55,12 @@ template <typename> class BlockVector;
  * @p vector (with a lowercase "v"), this class implements an element
  * of a vector space suitable for numerical computations.
  *
- * @note Instantiations for this template are provided for <tt>@<float@> and
- * @<double@></tt>; others can be generated in application programs (see the
- * section on @ref Instantiations in the manual).
+ * @note Instantiations for this template are provided for
+ * <tt>@<float@>, @<double@>, @<long double@>,
+ * @<std::complex@<float@>@>, @<std::complex@<double@>@>,
+ * @<std::complex@<long double@>@></tt>; others can be generated in
+ * application programs (see the section on @ref Instantiations in the
+ * manual).
  * 
  * @author Guido Kanschat, Franz-Theo Suttmeier, Wolfgang Bangerth
  */
