@@ -72,6 +72,9 @@ DEAL_II_NAMESPACE_OPEN
  * computation once or on each cell. Subsequent calls to the functions
  * @p update_once and @p update_each should just select among these
  * flags, but should not add new flags.
+ *
+ * The mechanism by which all this is accomplished is also discussed
+ * on the page on @ref UpdateFlagsEssay.
  */
 enum UpdateFlags
 {

@@ -2,7 +2,7 @@
 //    $Id$
 //    Version: $Name$
 //
-//    Copyright (C) 2003, 2005, 2006 by the deal.II authors
+//    Copyright (C) 2003, 2005, 2006, 2007 by the deal.II authors
 //
 //    This file is subject to QPL and may not be  distributed
 //    without copyright and license information. Please refer
@@ -91,6 +91,11 @@
  * 
  * All these classes are used in all tutorial programs from step-3 onward, and
  * are described there in significant detail.
+ *
+ * The actual workings of the FEValues class and friends is
+ * complicated because it has to be general yet efficient. The page on
+ * @ref UpdateFlagsEssay attempts to give an overview of how this
+ * works.
  *
  * @ingroup feall
  */

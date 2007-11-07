@@ -59,6 +59,9 @@ template <int dim> class Quadrature;
  * @note All data fields are public, but this is not
  * critical, because access to this object is private in FEValues.
  *
+ * The purpose of this class is discussed
+ * on the page on @ref UpdateFlagsEssay.
+ * 
  * @author Guido Kanschat, 2000
  */
 template <int dim>
@@ -399,6 +402,9 @@ class FEValuesData
  * computed. This enables Mapping and FiniteElement to schedule
  * auxiliary data fields for updating. Still, it is recommended to
  * give <b>all</b> needed update flags to FEValues.
+ *
+ * The mechanisms by which this class works is also discussed
+ * on the page on @ref UpdateFlagsEssay. 
  *
  * @author Wolfgang Bangerth, 1998, 2003, Guido Kanschat, 2001
  */

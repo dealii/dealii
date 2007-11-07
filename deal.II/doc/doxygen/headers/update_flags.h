@@ -15,33 +15,99 @@
 
 @page UpdateFlagsEssay The interplay of UpdateFlags, Mapping and FiniteElement in FEValues
 
-@section update_flags_Intro Introduction
+<h2>Introduction</h2>
 
-The class FEValues was introduced because most of the time values of
-shape functions etc. are used in Quadrature points only and their
-computation might be sped up by doing it all at once. Furthermore,
-some quantities, like the shape function values of standard scalar
-finite elements do not depend on the actual mesh cell at all and do
-not have to be reevaluated on each cell. The interface between
-FEValues and FiniteElement should be aware of such things and do the
-best thing possible.
+In order to compute local contributions of an individual to the global
+matrix and right hand side, integrals are usually transformed to the
+reference cell. For example, for the Laplace matrix, on each cell we
+have to compute
+@f[
+  A^K_{ij} = \sum_{q}J^{-1}(\hat{\bf x}_q) \hat \nabla \varphi_i(\hat{\bf x}_q) \cdot
+  J^{-1}(\hat{\bf x}_q) \hat \nabla \varphi_j(\hat{\bf x}_q)\ |\textrm{det}\ J(\hat{\bf x}_q)|
+  w_q, 
+@f]
+where a hat indicates reference coordinates, and $J(\hat{\bf
+x}_q)$ is the Jacobian
+$\frac{\partial F_K(\hat{\bf x}_q)}{\partial\bf \hat x}$ of the mapping,
+evaluated at a quadrature point $\hat{\bf x}_q$ on the reference cell.
 
-Now, in order not to compute too much, FEValues has to be told what to
-update. This is where UpdateFlags comes into play. And each FEValues
-uses two sets of UpdateFlags internally: one that describes the values
-that can be computed on the reference cell only and one requiring
-recomputation on each cell. Furthermore, since the actual computations
-are performed by Mapping and FiniteElement objects, both of them have
-UpdateFlags.
+In order to evaluate such an expression in an application code, we
+have to access three different kinds of objects: a quadrature
+object that describes locations $\hat{\bf x}_q$ and weights $w_q$ of
+quadrature points on the reference cell; a finite element object that
+describes the gradients $\hat\nabla \varphi_i(\hat{\bf x}_q)$ of shape
+functions on the unit cell; and a mapping object that provides the
+Jacobian as well as its determinant. Dealing with all these
+objects would be cumbersome and error prone.
 
-@section update_flags_Once Update once or each
+On the other hand, these three kinds of objects almost always appear together,
+and it is in fact very rare for deal.II application codes to do anything with
+quadrature, finite element, or mapping objects besides using them together.
+For this reason, we have introduced the FEValues abstraction
+combining information on the shape functions, the geometry of the actual mesh
+cell and a quadrature rule on a reference cell. Upon construction it takes one
+object of each of the three mentioned categories. Later, it can be
+"re-initialized" for a concrete grid cell and then provides mapped quadrature
+points and weights, mapped shape function values and derivatives as well as
+some properties of the transformation from the reference cell to the actual
+mesh cell.
 
-Your desired set of values for computation given, the FiniteElement
-and Mapping involved have to perform the following tasks:
+Since computation of any of these values is potentially expensive (for
+example when using high order mappings with high order elements), the
+FEValues class only computes what is explicitly asked for. To this
+end, it takes a list of flags of type UpdateFlags at construction time
+specifying which quantities should be updated each time a cell is
+visited. In addition, allowing further optimizations, the functions
+filling the data fields of FEValues are able to distinguish between
+values that have to be recomputed on each cell (for example mapped
+gradients) and quantities that do not change from cell to cell (for
+example the values of shape functions of the usual $Q_k$
+finite elements at the same quadrature points on different cells; this
+property does not hold for the shape functions of Raviart-Thomas
+elements, however, which must be rotated with the local cell).
+
+At construction time, each FEValues object splits the given
+UpdateFlags into two sets: those flags that describe quantities that
+can be computed on the reference cell once at the beginning
+("update_once"), and those that require recomputation on each cell
+("update_each").
+
+Furthermore, each FEValues object is associated with a Mapping and a
+FiniteElement object that do the actual computations. It therefore
+keeps a set up UpdateFlags for both update_once and update_each
+operations for both the Mapping and the FiniteElement object it is
+associated with.
+
+
+<h2>Update once or each</h2>
+
+Sometimes in order to compute one quantity, something else also has to be
+computed. For example, if only update_values is requested by the user of
+a FEValues object and if the associated finite element is of type FE_Q,
+then <code>update_once=update_values</code> and <code>update_each=0</code>
+for the FiniteElement computations and <code>update_once=update_each=0</code>
+for the Mapping object: we can compute the values of the shape function
+at the quadrature points of each cell once on the reference cell, and they
+will have the same value at the quadrature point of a real cell. There is
+nothing the finite element object has to do when we move to the next cell
+(these would be update_each calculations) and there is nothing the mapping
+has to do, either up front (update_once) or on each cell (update_each).
+
+However, this is not the case if we used a FE_RaviartThomas element: there,
+computing the values of the shape functions on a cell involves knowing the
+Jacobian of the mapping, and so if a user requests <code>update_values</code>
+of a FEValues object that uses a FE_RaviartThomas element, then we can set
+<code>update_once=update_values</code> and <code>update_each=0</code>
+for the FiniteElement, but need to set <code>update_once=0</code>
+<code>update_each=update_jacobians</code> for the Mapping object.
+ 
+To accomodate this structure, at the time a FEValues object is constructed,
+it asks both the FiniteElement and the Mapping object it uses the following:
 <ol>
-<li> Are any additional values required in order to compute these
-values? If so, add these flags to the current set. For instance, the
-derivative od a standard scalar element requires the inverse of the
+<li> Are any additional values required in order to compute the
+currently required values? If so, add these flags to the current set.
+Another example to the one above would be that the
+derivative of a standard scalar element requires the inverse of the
 Jacobian of the Mapping.
 <li> Given the enhanced set, determine the subsets of values that is
 performed on the reference cell only and on each cell, respectively.
@@ -64,32 +130,29 @@ actual set of flags from the desired one looks like this:
 That is, a FiniteElement can set additional flags which are honored by
 the Mapping.
 
-@section update_flags_Functions Generation of the actual data
 
-The computation of the fields accessible through FEValues proceeds in
-two different steps:
 
-@subsection update_flags_Init Initialization
+<h2>Generation of the actual data</h2>
 
-Functions of FEValues classes involved:
-<ul>
-<li>FEValues::initialize()
-<li>FEFaceValues::initialize()
-<li>FESubfaceValues::initialize()
-</ul>
+As outlined above, data is computed at two different times: once at
+the beginning on the reference cell, and once whenever we move to an
+actual cell. The functions involved in each of these steps are
+discussed next:
 
-These function is called by the constructor of FEValues, FEFaceValues
-and FESubfaceValues, respectively, and allows the
+
+<h3>Initialization</h3>
+
+Computing data on the reference cell before we even visit the first
+real cell is a two-step process. First, the constructor of FEValues,
+FEFaceValues and FESubfaceValues, respectively, need to allow the
 Mapping and FiniteElement objects to set up internal data
-structures. These structures are internal in the sense that FEValues
-only forwards them to Mapping and FiniteElement if necessary, but does
-not access their contents. FEValues just stores a pointer to their
-base class Mapping::InternalDataBase. Concrete Mapping and
-FiniteElement classes will derive their own sutructures containing all
-the data needed to speed up updating the fields of FEValues on a cell
-or face.
-
-The functions actually providing these internal data structures are:
+structures. These structures are internal in the following sense: the
+FEValues object asks the finite element and mapping objects to create
+an object of type FiniteElement::InternalDataBase and
+Mapping::InternalDataBase each; the actual finite element and mapping
+class may in fact create objects of a derived type if they wish to
+store some data beyond what these base classes already provide. The
+functions involved in this are
 <ul>
 <li>Mapping::get_data()
 <li>Mapping::get_face_data()
@@ -99,9 +162,25 @@ The functions actually providing these internal data structures are:
 <li>FiniteElement::get_subface_data()
 </ul>
 
-@subsection update_flags_Reinit Reinitialization for a mesh cell
+The FEValues object then takes over ownership of these objects and will
+destroy them at the end of the FEValues object's lifetime. After this,
+the FEValues object asks the FiniteElement and Mapping objects to fill
+these InternalDataBase objects with the data that pertains to what
+can and needs to be computed on the reference cell. This is done in these
+functions:
+<ul>
+<li>FEValues::initialize()
+<li>FEFaceValues::initialize()
+<li>FESubfaceValues::initialize()
+</ul>
 
-Functions of FEValues classes involved:
+
+<h3>Reinitialization for a mesh cell</h3>
+
+Once initialization is over and we call FEValues::reinit, FEFaceValues::reinit
+or FESubfaceValues::reinit to move to a concrete cell or face, we need
+to calculate the update_each kinds of data. This done in the following
+functions:
 <ul>
 <li>FEValues::reinit() calls Mapping::fill_fe_values(), then FiniteElement::fill_fe_values()
 <li>FEFaceValues::reinit() calls Mapping::fill_fe_face_values(), then FiniteElement::fill_fe_face_values()
