@@ -236,7 +236,13 @@ AC_DEFUN(DEAL_II_DETERMINE_CXX_BRAND, dnl
         is_intel_icc1="`($CXX -V 2>&1) | grep 'Intel'`"
         is_intel_icc2="`($CXX -help 2>&1) | grep 'Intel'`"
 	is_intel_icc="$is_intel_icc1$is_intel_icc2"
-        if test "x$is_intel_icc" != "x" ; then
+
+	dnl When calling the Portland Group compiler, it also
+	dnl outputs the string 'Intel' in its help text, so make
+	dnl sure we're not confused
+	is_pgi="`($CXX -V 2>&1) | grep 'Portland'`"
+
+        if test "x$is_intel_icc" != "x" -a "x$is_pgi" == "x" ; then
 	  version_string="`($CXX -V 2>&1) | grep 'Version'` `($CXX -help 2>&1) | grep 'Version'`"
 	  version5="`echo $version_string | grep 'Version 5'`"
 	  version6="`echo $version_string | grep 'Version 6'`"
@@ -1096,7 +1102,13 @@ AC_DEFUN(DEAL_II_DETERMINE_CC_BRAND, dnl
         is_intel_icc2="`($CC -help 2>&1) | grep 'Intel'`"
         is_intel_ecc="`($CC -V 2>&1) | perl -pi -e 's/applications\n/\1/g;' | grep 'Intel(R) C++ Itanium(TM) Compiler'`"
 	is_intel_icc="$is_intel_icc1$is_intel_icc2$is_intel_ecc"
-        if test "x$is_intel_icc" != "x" ; then
+
+	dnl When calling the Portland Group compiler, it also
+	dnl outputs the string 'Intel' in its help text, so make
+	dnl sure we're not confused
+	is_pgi="`($CXX -V 2>&1) | grep 'Portland'`"
+
+        if test "x$is_intel_icc" != "x" -a "x$is_pgi" == "x"; then
 	  version_string="`($CC -V 2>&1) | grep 'Version'` `($CC -help 2>&1) | grep 'Version'`"
 	  version5="`echo $version_string | grep 'Version 5'`"
 	  version6="`echo $version_string | grep 'Version 6'`"
