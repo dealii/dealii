@@ -253,7 +253,7 @@ class Boundary : public Subscriptor
 
 
 /**
- *   Specialisation of Boundary<dim>, which places the new point
+ *   Specialization of Boundary<dim>, which places the new point
  *   right into the middle of the given points. The middle is defined
  *   as the arithmetic mean of the points.
  *
