@@ -27,7 +27,7 @@
 #  include <unistd.h>
 #endif
 
-#if defined(__MACH__) && defined(__ppc__) && defined(__APPLE__)
+#if defined(__MACH__) && defined(__APPLE__)
 #  include <sys/types.h>
 #  include <sys/sysctl.h>
 #endif
@@ -88,9 +88,9 @@ unsigned int MultithreadInfo::get_n_cpus()
   return sysconf(_SC_NPROC_ONLN);
 }
 
-#  elif defined(__MACH__) && defined(__ppc__) && defined(__APPLE__)
+#  elif defined(__MACH__) && defined(__APPLE__)
 // This is only tested on a dual G5 2.5GHz running MacOSX 10.3.6 
-// and gcc version 3.3 20030304 (Apple Computer, Inc. build 1666)
+// and on an Intel Mac Book Pro.
 // If it doesnt work please contact the mailinglist.
 unsigned int MultithreadInfo::get_n_cpus()
 {
