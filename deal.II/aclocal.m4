@@ -806,20 +806,30 @@ AC_DEFUN(DEAL_II_SET_CXX_FLAGS, dnl
   
       portland_group)
 	  dnl Suppress warnings:
+	  dnl  #68: "integer conversion resulted in a change of sign". This
+	  dnl       is what we get every time we use 
+	  dnl       numbers::invalid_unsigned_int
           dnl #111: "Statement unreachable": we use return statements
 	  dnl       occasionally after case-switches where you cannot
- 	  dnl       fall though, but other compilers cometimes complain
+ 	  dnl       fall though, but other compilers sometimes complain
 	  dnl       that the function might not return with a value, if
           dnl       it can't figure out that the function always uses
           dnl       one case. Also: a return statement after a failing
           dnl       assertion
+	  dnl #128: a similar case -- code not reachable because there's
+	  dnl       a return that's active for a particular space dimension
           dnl #177: "function declared but not used": might happen with
           dnl       templates and conditional compilation
  	  dnl #175: "out-of-bounds array indices": the same reason as
 	  dnl       for Compaq cxx
+	  dnl #185: "dynamic initialization in unreachable code". similar to
+	  dnl       the case #128 above
+	  dnl #236: "controlling expression is constant". this triggers
+	  dnl       somewhere in BOOST with BOOST_ASSERT. I have no idea
+	  dnl       what happens here
  	  dnl #284: "NULL references not allowed"
-	  CXXFLAGSG="$CXXFLAGS -DDEBUG -g --display_error_number --diag_suppress 111 --diag_suppress 177 --diag_suppress 175 --diag_suppress 284"
-          CXXFLAGSO="$CXXFLAGS -fast -O2 --display_error_number --diag_suppress 111 --diag_suppress 177 --diag_suppress 175 --diag_suppress 284"
+	  CXXFLAGSG="$CXXFLAGS -DDEBUG -g --display_error_number --diag_suppress 68 --diag_suppress 111 --diag_suppress 128 --diag_suppress 177 --diag_suppress 175 --diag_suppress 185 --diag_suppress 236 --diag_suppress 284"
+          CXXFLAGSO="$CXXFLAGS -fast -O2 --display_error_number --diag_suppress 68 --diag_suppress 111 --diag_suppress 128 --diag_suppress 177 --diag_suppress 175 --diag_suppress 185 --diag_suppress 236 --diag_suppress 284"
           CXXFLAGSPIC="-Kpic"
           ;;
 

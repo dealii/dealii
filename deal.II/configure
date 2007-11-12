@@ -4218,8 +4218,8 @@ rm -f core conftest.err conftest.$ac_objext conftest.$ac_ext
  	  ;;
 
       portland_group)
-	            	   	  	                                                     	  	   	  	  CXXFLAGSG="$CXXFLAGS -DDEBUG -g --display_error_number --diag_suppress 111 --diag_suppress 177 --diag_suppress 175 --diag_suppress 284"
-          CXXFLAGSO="$CXXFLAGS -fast -O2 --display_error_number --diag_suppress 111 --diag_suppress 177 --diag_suppress 175 --diag_suppress 284"
+	  	  	  	            	   	  	                                	  	                       	  	  	  	  	  	  	   	  	  CXXFLAGSG="$CXXFLAGS -DDEBUG -g --display_error_number --diag_suppress 68 --diag_suppress 111 --diag_suppress 128 --diag_suppress 177 --diag_suppress 175 --diag_suppress 185 --diag_suppress 236 --diag_suppress 284"
+          CXXFLAGSO="$CXXFLAGS -fast -O2 --display_error_number --diag_suppress 68 --diag_suppress 111 --diag_suppress 128 --diag_suppress 177 --diag_suppress 175 --diag_suppress 185 --diag_suppress 236 --diag_suppress 284"
           CXXFLAGSPIC="-Kpic"
           ;;
 
