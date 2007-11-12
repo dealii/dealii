@@ -1,6 +1,65 @@
 <a name="Intro"></a>
 <h1>Introduction</h1>
 
+<h2>The Boussinesq equations</h2>
+
+This program deals with an interesting physical problem: how does a
+fluid (i.e. a liquid or gas) behave if it experiences differences in
+buoyance caused by temperature differences? It is clear that those
+parts of the fluid that are hotter (and therefore lighter) are going
+to rise up and those that are cooler (and denser) are going to sink
+down against gravity.
+
+In cases where the fluid moves slowly enough such that inertia effects
+can be neglected, the equations that describe such behavior are the
+Boussinesq equations that read as follows:
+@f{eqnarray*}
+  -\nabla \cdot \eta \varepsilon ({\mathbf u}) + \nabla p &=& 
+  \mathrm{Ra} \; T \mathbf{g},
+  \\
+  \nabla \cdot {\mathbf u} &=& 0,
+  \\
+  \frac{\partial T}{\partial t}
+  +
+  {\mathbf u} \cdot \nabla T
+  -
+  \nabla \cdot \kappa \nabla T &=& \gamma.
+@f}
+Here, ${\mathbf u}$ is the velocity field, $p$ the pressure, and $T$
+the temperature of the fluid. As can be seen, velocity and pressure
+solve a Stokes equation describing the motion of an incompressible
+fluid. The forcing term of the fluid motion is the buoyancy of the
+fluid, expressed as the product of the Raleigh number $\mathrm{Ra}$,
+the temperature $T$ and the gravity vector ${\mathbf g}$. (A possibly
+more intuitive formulation would use $\mathrm{Ra} \; (T-\bar T)
+\mathbf{g}$ as right hand side where $\bar T$ is the average
+temperature, and the right hand side then describes the forces due to
+local deviations from the average density; this formulation is
+entirely equivalent if the gravity vector results from a gravity
+potential $\phi$, i.e. $\mathbf{g}=-\nabla\phi$, and yields the exact
+same solution except for the pressure which will now be $p+\mathrm{Ra}
+\;\bar T \phi$.)
+
+While the first two equations describe how the fluid reacts to
+temperature differences by moving around, the third equation states
+how the fluid motion affects the temperature field: it is an advection
+diffusion equation, i.e. the temperature is attached to the fluid
+particles and advected along in the flow field, with an additional
+diffusion (heat conduction) term.
+
+In these equations, $\eta$ and $\kappa$ denote the viscosity and
+diffusivity coefficients. In the more general case and in many
+physical applications, they may and $\eta$ often will depend
+on the temperature, but we will neglect this dependence for the
+purpose of this tutorial program. The term $\gamma$ on the right hand
+side denotes the heat sources and may be a spatially and temporally
+varying function.
+
+
+
+
+
+
 
 @code
 template <int dim>
