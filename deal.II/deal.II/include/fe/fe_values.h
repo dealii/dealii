@@ -1217,23 +1217,38 @@ class FEValuesBase : protected FEValuesData<dim>,
     unsigned int memory_consumption () const;
 
 				     /**
-				      * Exception
+				      * This exception is thrown if
+				      * FEValuesBase is asked to
+				      * return the value of a field
+				      * which was not required by the
+				      * UpdateFlags for this
+				      * FEValuesBase.
+				      *
+				      * @ingroup Exceptions
 				      */
     DeclException0 (ExcAccessToUninitializedField);
 				     /**
-				      * Exception
+				      * @todo Document this
+				      *
+				      * @ingroup Exceptions
 				      */
     DeclException0 (ExcCannotInitializeField);
 				     /**
-				      * Exception
+				      * @todo Document this
+				      *
+				      * @ingroup Exceptions
 				      */
     DeclException0 (ExcInvalidUpdateFlag);
 				     /**
-				      * Exception
+				      * @todo Document this
+				      *
+				      * @ingroup Exceptions
 				      */
     DeclException0 (ExcFEDontMatch);
 				     /**
-				      * Exception
+				      * @todo Document this
+				      *
+				      * @ingroup Exceptions
 				      */
     DeclException1 (ExcShapeFunctionNotPrimitive,
 		    int,
@@ -1244,7 +1259,9 @@ class FEValuesBase : protected FEValuesData<dim>,
 		    << "Maybe you want to use the same function with the "
 		    << "_component suffix?");
 				     /**
-				      * Exception
+				      * @todo Document this
+				      *
+				      * @ingroup Exceptions
 				      */
     DeclException0 (ExcFENotPrimitive);
     
@@ -2415,12 +2432,16 @@ class FESubfaceValues : public FEFaceValuesBase<dim>
     const FESubfaceValues<dim> & get_present_fe_values () const;
 
                                      /**
-				      * Exception
+				      * @todo Document this
+				      *
+				      * @ingroup Exceptions
 				      */
     DeclException0 (ExcReinitCalledWithBoundaryFace);
 
 				     /**
-				      * Exception
+				      * @todo Document this
+				      *
+				      * @ingroup Exceptions
 				      */
     DeclException0 (ExcFaceHasNoSubfaces);
 
