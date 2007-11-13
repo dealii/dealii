@@ -332,6 +332,29 @@ class Mapping : public Subscriptor
 			     const VectorSlice<std::vector<Tensor<2,dim> > > output,
 			     const typename Mapping<dim>::InternalDataBase &internal) const = 0;
 
+				     /**
+				      * The vector of the
+				      * transformed (generalized)
+				      * support points.
+				      */
+    const std::vector<Point<dim> >& support_point_values() const;
+    
+				     /**
+				      * The vector of the Jacobian
+				      * matrices of the transformation
+				      * in the (generalized) support
+				      * points.
+				      */
+    const std::vector<Tensor<2,dim> >& support_point_gradients() const;
+    
+				     /**
+				      * The vector of the inverse Jacobian
+				      * matrices of the transformation
+				      * in the (generalized) support
+				      * points.
+				      */
+    const std::vector<Tensor<2,dim> >& support_point_inverse_gradients() const;
+    
                                      /**
                                       * Return a pointer to a copy of the
                                       * present object. The caller of this
