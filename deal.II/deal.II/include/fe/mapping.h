@@ -2,7 +2,7 @@
 //    $Id$
 //    Version: $Name$
 //
-//    Copyright (C) 2000, 2001, 2002, 2003, 2004, 2005, 2006 by the deal.II authors
+//    Copyright (C) 2000, 2001, 2002, 2003, 2004, 2005, 2006, 2007 by the deal.II authors
 //
 //    This file is subject to QPL and may not be  distributed
 //    without copyright and license information. Please refer
@@ -26,6 +26,7 @@ DEAL_II_NAMESPACE_OPEN
 
 template <int dim> class Quadrature;
 template <int dim> class FEValuesData;
+template <int dim> class FEValuesBase;
 template <int dim> class FEValues;
 template <int dim> class FEFaceValues;
 template <int dim> class FESubfaceValues;
@@ -330,31 +331,6 @@ class Mapping : public Subscriptor
                              const unsigned int                 offset,
 			     const VectorSlice<std::vector<Tensor<2,dim> > > output,
 			     const typename Mapping<dim>::InternalDataBase &internal) const = 0;
-    
-				     /**
-				      * Indicate fields to be updated
-				      * in the constructor of
-				      * FEValues. Especially,
-				      * fields not asked for by
-				      * FEValues, but computed
-				      * for efficiency reasons will be
-				      * notified here.
-				      *
-				      * Refer to the same function in
-				      * FiniteElement for
-				      * further information.
-				      *
-				      * Example: refer to the same
-				      * function in MappingQ1.
-				      */
-    virtual UpdateFlags update_once (const UpdateFlags) const = 0;
-    
-				     /**
-				      * The same as @p update_once,
-				      * but for the flags to be updated for
-				      * each grid cell.
-				      */
-    virtual UpdateFlags update_each (const UpdateFlags) const = 0;
 
                                      /**
                                       * Return a pointer to a copy of the
@@ -379,6 +355,28 @@ class Mapping : public Subscriptor
 
   private:
     
+				     /**
+				      * Indicate fields to be updated
+				      * in the constructor of
+				      * FEValues. Especially,
+				      * fields not asked for by
+				      * FEValues, but computed
+				      * for efficiency reasons will be
+				      * notified here.
+				      *
+				      * See @ref UpdateFlagsEssay.
+				      */
+    virtual UpdateFlags update_once (const UpdateFlags) const = 0;
+    
+				     /**
+				      * The same as update_once(),
+				      * but for the flags to be updated for
+				      * each grid cell.
+				      *
+				      * See @ref UpdateFlagsEssay.
+				      */
+    virtual UpdateFlags update_each (const UpdateFlags) const = 0;
+
 				     /**
 				      * Prepare internal data
 				      * structures and fill in values
@@ -498,6 +496,7 @@ class Mapping : public Subscriptor
 				      * and <tt>fill_fe_...values</tt>
 				      * functions.
 				      */
+  friend class FEValuesBase<dim>;
   friend class FEValues<dim>;
   friend class FEFaceValues<dim>;
   friend class FESubfaceValues<dim>;

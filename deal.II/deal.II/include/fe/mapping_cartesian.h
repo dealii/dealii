@@ -2,7 +2,7 @@
 //    $Id$
 //    Version: $Name$
 //
-//    Copyright (C) 2001, 2002, 2003, 2004, 2005, 2006 by the deal.II authors
+//    Copyright (C) 2001, 2002, 2003, 2004, 2005, 2006, 2007 by the deal.II authors
 //
 //    This file is subject to QPL and may not be  distributed
 //    without copyright and license information. Please refer
@@ -83,40 +83,24 @@ class MappingCartesian : public Mapping<dim>
 			    std::vector<Point<dim> >        &normal_vectors,
 			    std::vector<double>             &cell_JxW_values) const ;
 
-				     /**
-				      * Implementation of the
-				      * interface in Mapping.
-				      */
     virtual void
     transform_covariant (const VectorSlice<const std::vector<Tensor<1,dim> > > input,
                          const unsigned int                 offset,
 			 VectorSlice<std::vector<Tensor<1,dim> > > output,
 			 const typename Mapping<dim>::InternalDataBase &internal) const;
-
-				     /**
-				      * Implementation of the
-				      * interface in Mapping.
-				      */
+    
     virtual void
     transform_covariant (const VectorSlice<const std::vector<Tensor<2,dim> > > input,
                          const unsigned int                 offset,
 			 VectorSlice<std::vector<Tensor<2,dim> > > output,
 			 const typename Mapping<dim>::InternalDataBase &internal) const;
     
-				     /**
-				      * Implementation of the
-				      * interface in Mapping.
-				      */
     virtual void
     transform_contravariant (const VectorSlice<const std::vector<Tensor<1,dim> > > input,
                              const unsigned int                 offset,
 			     VectorSlice<std::vector<Tensor<1,dim> > > output,
 			     const typename Mapping<dim>::InternalDataBase &internal) const;
     
-				     /**
-				      * Implementation of the
-				      * interface in Mapping.
-				      */
     virtual void
     transform_contravariant (const VectorSlice<const std::vector<Tensor<2,dim> > > input,
                              const unsigned int                 offset,
@@ -142,9 +126,6 @@ class MappingCartesian : public Mapping<dim>
     transform_real_to_unit_cell (
       const typename Triangulation<dim>::cell_iterator &cell,
       const Point<dim>                                 &p) const;
-    
-    virtual UpdateFlags update_once (const UpdateFlags) const;    
-    virtual UpdateFlags update_each (const UpdateFlags) const;
     
 
                                      /**
@@ -213,6 +194,9 @@ class MappingCartesian : public Mapping<dim>
 		       std::vector<Point<dim> >& normal_vectors) const;
 
   private:
+    virtual UpdateFlags update_once (const UpdateFlags) const;    
+    virtual UpdateFlags update_each (const UpdateFlags) const;
+    
 				     /**
 				      * Value to indicate that a given
 				      * face or subface number is

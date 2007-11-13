@@ -2,7 +2,7 @@
 //    $Id$
 //    Version: $Name$
 //
-//    Copyright (C) 2001, 2002, 2003, 2004, 2005, 2006 by the deal.II authors
+//    Copyright (C) 2001, 2002, 2003, 2004, 2005, 2006, 2007 by the deal.II authors
 //
 //    This file is subject to QPL and may not be  distributed
 //    without copyright and license information. Please refer
@@ -298,28 +298,16 @@ class MappingQ : public MappingQ1<dim>
     
   private:
     
-				     /**
-				      * Implementation of the interface in
-				      * Mapping.
-				      */
     virtual
     typename Mapping<dim>::InternalDataBase *
     get_data (const UpdateFlags,
 	      const Quadrature<dim>& quadrature) const;
 
-				     /**
-				      * Implementation of the interface in
-				      * Mapping.
-				      */
     virtual
     typename Mapping<dim>::InternalDataBase *
     get_face_data (const UpdateFlags flags,
 		   const Quadrature<dim-1>& quadrature) const;
 
-				     /**
-				      * Implementation of the interface in
-				      * Mapping.
-				      */
     virtual
     typename Mapping<dim>::InternalDataBase *
     get_subface_data (const UpdateFlags flags,

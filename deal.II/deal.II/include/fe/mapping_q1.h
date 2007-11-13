@@ -53,12 +53,6 @@ class MappingQ1 : public Mapping<dim>
 				      */
     MappingQ1 ();
     
-				     /**
-				      * Transforms the point p on the unit
-				      * cell to the point p_real on the real
-				      * cell <code>cell</code> and returns
-				      * p_real.
-				      */
     virtual Point<dim>
     transform_unit_to_real_cell (
       const typename Triangulation<dim>::cell_iterator &cell,
@@ -79,122 +73,30 @@ class MappingQ1 : public Mapping<dim>
       const typename Triangulation<dim>::cell_iterator &cell,
       const Point<dim>                                 &p) const;
     
-				     /**
-				      * Implementation of the interface in
-				      * Mapping.
-				      */
     virtual void
     transform_covariant (const VectorSlice<const std::vector<Tensor<1,dim> > > input,
                          const unsigned int                 offset,
 			 VectorSlice<std::vector<Tensor<1,dim> > > output,
 			 const typename Mapping<dim>::InternalDataBase &internal) const;
     
-				     /**
-				      * Implementation of the interface in
-				      * Mapping.
-				      */
     virtual void
     transform_covariant (const VectorSlice<const std::vector<Tensor<2,dim> > > input,
                          const unsigned int                 offset,
 			 VectorSlice<std::vector<Tensor<2,dim> > > output,
 			 const typename Mapping<dim>::InternalDataBase &internal) const;
     
-				     /**
-				      * Implementation of the interface in
-				      * Mapping.
-				      */
     virtual void
     transform_contravariant (const VectorSlice<const std::vector<Tensor<1,dim> > > input,
                              const unsigned int                 offset,
 			     VectorSlice<std::vector<Tensor<1,dim> > > output,
 			     const typename Mapping<dim>::InternalDataBase &internal) const;
     
-				     /**
-				      * Implementation of the interface in
-				      * Mapping.
-				      */
     virtual void
     transform_contravariant (const VectorSlice<const std::vector<Tensor<2,dim> > > input,
                              const unsigned int                 offset,
 			     VectorSlice<std::vector<Tensor<2,dim> > > output,
 			     const typename Mapping<dim>::InternalDataBase &internal) const;
     
-				     /**
-				      * Implementation of the interface in
-				      * Mapping.
-				      *
-				      * Description of effects:
-				      * <ul>
-				      * <li> if @p update_quadrature_points
-				      * is required, the output will
-				      * contain
-				      * @p update_transformation_values. This
-				      * computes the values of the
-				      * transformation basis
-				      * polynomials at the unit cell
-				      * quadrature points.
-				      * <li> if any of
-				      * @p update_covariant_transformation,
-				      * @p update_contravariant_transformation,
-				      * @p update_JxW_values,
-				      * @p update_boundary_forms,
-				      * @p update_normal_vectors is
-				      * required, the output will
-				      * contain
-				      * @p update_transformation_gradients
-				      * to compute derivatives of the
-				      * transformation basis
-				      * polynomials.
-				      * </ul>
-				      */
-    virtual UpdateFlags update_once (const UpdateFlags flags) const;
-    
-				     /**
-				      * Implementation of the interface in
-				      * Mapping.
-				      *
-				      * Description of effects if
-				      * @p flags contains:
-				      * <ul>
-				      * <li> <code>update_quadrature_points</code> is
-				      * copied to the output to
-				      * compute the quadrature points
-				      * on the real cell.
-				      * <li> <code>update_JxW_values</code> is
-				      * copied and requires
-				      * @p update_boundary_forms on
-				      * faces. The latter, because the
-				      * surface element is just the
-				      * norm of the boundary form.
-				      * <li> <code>update_normal_vectors</code>
-				      * is copied and requires
-				      * @p update_boundary_forms. The
-				      * latter, because the normal
-				      * vector is the normalized
-				      * boundary form.
-				      * <li>
-				      * <code>update_covariant_transformation</code>
-				      * is copied and requires
-				      * @p update_contravariant_transformation,
-				      * since it is computed as the
-				      * inverse of the latter.
-				      * <li> <code>update_JxW_values</code> is
-				      * copied and requires
-				      * <code>update_contravariant_transformation</code>,
-				      * since it is computed as one
-				      * over determinant of the
-				      * latter.
-				      * <li> <code>update_boundary_forms</code>
-				      * is copied and requires
-				      * <code>update_contravariant_transformation</code>,
-				      * since the boundary form is
-				      * computed as the contravariant
-				      * image of the normal vector to
-				      * the unit cell.
-				      * </ul>
-				      */
-    virtual UpdateFlags update_each (const UpdateFlags flags) const;
-
                                      /**
                                       * Return a pointer to a copy of the
                                       * present object. The caller of this
@@ -567,25 +469,89 @@ class MappingQ1 : public Mapping<dim>
 				     /**
 				      * Implementation of the interface in
 				      * Mapping.
+				      *
+				      * Description of effects:
+				      * <ul>
+				      * <li> if @p update_quadrature_points
+				      * is required, the output will
+				      * contain
+				      * @p update_transformation_values. This
+				      * computes the values of the
+				      * transformation basis
+				      * polynomials at the unit cell
+				      * quadrature points.
+				      * <li> if any of
+				      * @p update_covariant_transformation,
+				      * @p update_contravariant_transformation,
+				      * @p update_JxW_values,
+				      * @p update_boundary_forms,
+				      * @p update_normal_vectors is
+				      * required, the output will
+				      * contain
+				      * @p update_transformation_gradients
+				      * to compute derivatives of the
+				      * transformation basis
+				      * polynomials.
+				      * </ul>
 				      */
+    virtual UpdateFlags update_once (const UpdateFlags flags) const;
+    
+				     /**
+				      * Implementation of the interface in
+				      * Mapping.
+				      *
+				      * Description of effects if
+				      * @p flags contains:
+				      * <ul>
+				      * <li> <code>update_quadrature_points</code> is
+				      * copied to the output to
+				      * compute the quadrature points
+				      * on the real cell.
+				      * <li> <code>update_JxW_values</code> is
+				      * copied and requires
+				      * @p update_boundary_forms on
+				      * faces. The latter, because the
+				      * surface element is just the
+				      * norm of the boundary form.
+				      * <li> <code>update_normal_vectors</code>
+				      * is copied and requires
+				      * @p update_boundary_forms. The
+				      * latter, because the normal
+				      * vector is the normalized
+				      * boundary form.
+				      * <li>
+				      * <code>update_covariant_transformation</code>
+				      * is copied and requires
+				      * @p update_contravariant_transformation,
+				      * since it is computed as the
+				      * inverse of the latter.
+				      * <li> <code>update_JxW_values</code> is
+				      * copied and requires
+				      * <code>update_contravariant_transformation</code>,
+				      * since it is computed as one
+				      * over determinant of the
+				      * latter.
+				      * <li> <code>update_boundary_forms</code>
+				      * is copied and requires
+				      * <code>update_contravariant_transformation</code>,
+				      * since the boundary form is
+				      * computed as the contravariant
+				      * image of the normal vector to
+				      * the unit cell.
+				      * </ul>
+				      */
+    virtual UpdateFlags update_each (const UpdateFlags flags) const;
+
     virtual
     typename Mapping<dim>::InternalDataBase *
     get_data (const UpdateFlags,
 	      const Quadrature<dim>& quadrature) const;
 
-				     /**
-				      * Implementation of the interface in
-				      * Mapping.
-				      */
     virtual
     typename Mapping<dim>::InternalDataBase *
     get_face_data (const UpdateFlags flags,
 		   const Quadrature<dim-1>& quadrature) const;
 
-				     /**
-				      * Implementation of the interface in
-				      * Mapping.
-				      */
     virtual
     typename Mapping<dim>::InternalDataBase *
     get_subface_data (const UpdateFlags flags,
