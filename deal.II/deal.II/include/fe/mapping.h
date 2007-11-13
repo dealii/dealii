@@ -333,27 +333,26 @@ class Mapping : public Subscriptor
 			     const typename Mapping<dim>::InternalDataBase &internal) const = 0;
 
 				     /**
-				      * The vector of the
-				      * transformed (generalized)
-				      * support points.
+				      * The transformed (generalized)
+				      * support point.
 				      */
-    const std::vector<Point<dim> >& support_point_values() const;
+    const Point<dim>& support_point_value(const unsigned int index) const;
     
 				     /**
-				      * The vector of the Jacobian
-				      * matrices of the transformation
+				      * The Jacobian
+				      * matrix of the transformation
 				      * in the (generalized) support
-				      * points.
+				      * point.
 				      */
-    const std::vector<Tensor<2,dim> >& support_point_gradients() const;
+    const Tensor<2,dim>& support_point_gradient(const unsigned int index) const;
     
 				     /**
-				      * The vector of the inverse Jacobian
-				      * matrices of the transformation
+				      * The inverse Jacobian
+				      * matrix of the transformation
 				      * in the (generalized) support
-				      * points.
+				      * point.
 				      */
-    const std::vector<Tensor<2,dim> >& support_point_inverse_gradients() const;
+    const Tensor<2,dim>& support_point_inverse_gradients(const unsigned int index) const;
     
                                      /**
                                       * Return a pointer to a copy of the
