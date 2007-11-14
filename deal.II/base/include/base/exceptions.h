@@ -919,6 +919,20 @@ namespace StandardExceptions
 #define AssertDimension(dim1,dim2) Assert((dim1) == (dim2), \
   ExcDimensionMismatch((dim1),(dim2)))
 
+/**
+ * Special assertion for index range of nonnegative indices.
+ *
+ * Since this is used very often and always repeats the arguments, we
+ * introduce this special assertion for ExcIndexRange in order
+ * to keep the user codes shorter.
+ *
+ * Called wit arguments <tt>index</tt> and <tt>range</tt> it asserts
+ * that <tt>index&lt;range</tt> and throws
+ * ExcIndexRange(index,0,range) if it fails.
+ */
+#define AssertIndexRange(index,range) Assert((index) < (range), \
+  ExcIndexRange((index),0,(range)))
+
 
 /*
  * Unfortunately, the following must be repeated for each library,
