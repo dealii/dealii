@@ -180,6 +180,76 @@ advection is treated explicitly using the just-computed velocity
 field. 
 
 
+<h3>Weak form and space discretization</h3>
+
+Like solving the mixed Laplace equations, solving the Stokes equations
+requires us to choose particular pairs of finite elements for
+velocities and pressure variables. In the current program, we use the
+stable pair $Q_{p+1}^d \times Q_p, p\ge 1$. These are continuous
+elements, so we can form the weak form of the Stokes equation without
+problem by integrating by parts and substituting continuous functions
+by their discrete counterparts:
+@f{eqnarray*}
+  (\nabla {\mathbf v}_h, \eta \varepsilon ({\mathbf u}^n_h))
+  -
+  (\nabla \cdot {\mathbf v}_h, p^n_h) 
+  &=& 
+  ({\mathbf v}_h, \mathrm{Ra} \; T^{n-1}_h \mathbf{g}),
+  \\
+  (q_h, \nabla \cdot {\mathbf u}^n_h) &=& 0,
+@f}
+for all test functions $\mathbf v_h, q_h$. The first term of the first
+equation is considered as the scalar product between tensors, i.e.
+$(\nabla {\mathbf v}_h, \eta \varepsilon ({\mathbf u}^n_h))_\Omega
+ = \int_\Omega \sum_{i,j=1}^d [\nabla {\mathbf v}_h]_{ij}
+           \eta [\varepsilon ({\mathbf u}^n_h)]_{ij}$.
+Because the second tensor in this product is symmetric, the
+anti-symmetric component of $\nabla {\mathbf v}_h$ plays no role and
+it leads to the entirely same form if we use the symmetric gradient of
+$\mathbf v_h$ instead. Consequently, the formulation we consider and
+that we implement is
+@f{eqnarray*}
+  (\varepsilon({\mathbf v}_h), \eta \varepsilon ({\mathbf u}^n_h))
+  -
+  (\nabla \cdot {\mathbf v}_h, p^n_h) 
+  &=& 
+  ({\mathbf v}_h, \mathrm{Ra} \; T^{n-1}_h \mathbf{g}),
+  \\
+  (q_h, \nabla \cdot {\mathbf u}^n_h) &=& 0.
+@f}
+
+The more interesting question is what we do with the temperature
+equation. By default, not all discretizations of this equation are
+equally stable unless we either do something like upwinding,
+stabilization, or all of this. <b>XXXXXXXXXX TALK ABOUT CHOICE OF FE
+AND DG/CG XXXXX</b>
+
+@f{eqnarray*}
+  (\tau_h,T^n_h)
+  +
+  k_n(\nabla \tau_h, \kappa \nabla T^n_h) 
+  &=& 
+  (\tau_h,T^{n-1}_h+k_n\gamma)
+  -
+  k_n (\tau_h, {\mathbf u}^n \cdot \nabla T^{n-1}_h),
+@f}
+for all discrete test functions $\tau_h$. One typically integrated the
+last term on the right hand side by parts on each cell, yielding the
+following taking into account that the velocity field is assumed to be
+divergence-free: 
+@f{eqnarray*}
+  (\tau_h,T^n_h)
+  +
+  k_n(\nabla \tau_h, \kappa \nabla T^n_h) 
+  &=& 
+  (\tau_h,T^{n-1}_h+k_n\gamma)
+  +
+  k_n \sum_K \left\{ ({\mathbf u}^n \cdot \nabla \tau_h, T^{n-1}_h)_K -
+             (\tau_h, (\mathbf n \cdot {\mathbf u}^n) T^{n-1}_h)_{\partial K} \right\}.
+@f}
+<b>XXXXXXXXXX WHAT DO I DO WITH THE DIV U TERM? XXXXX</b>
+
+
 <h3>Linear solvers</h3>
 
 
