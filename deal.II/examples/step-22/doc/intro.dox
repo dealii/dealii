@@ -82,11 +82,44 @@ equations</a> hard to solve when the <a
 href="http://en.wikipedia.org/wiki/Reynolds_number">Reynolds number
 $\mathrm{Re}$</a> is large.
 
+Note that a large Rayleigh number does not necessarily involve large
+velocities in absolute terms. For example, the Rayleigh number in the
+earth mantle has a Rayleigh number larger than $10^6$. Yet the
+velocities are small: the material is in fact solid rock but it is so
+hot and under pressure that it can flow very slowly, on the order of
+at most a few centimeters per year. Nevertheless, the can lead to
+mixing over time scales of many million years, a time scale much
+shorter than for the same amount of heat to be distributed by thermal
+conductivity. 
+
+
+<h2>%Boundary and initial conditions</h2>
+
+Since the Boussinesq equations are derived under the assumption that
+inertia of the fluid's motion does not play a role, the flow field is
+at each time entirely determined by buoyancy difference at that time,
+not by the flow field at previous times. This is reflected by the fact
+that the first two equations above are the steady state Stokes
+equation. Consequently, we do not need initial conditions for either
+velocities or pressure. On the other hand, the temperature field does
+satisfy an equation with a time derivative, so we need initial
+conditions for $T$.
+
+As for boundary conditions: if $\kappa>0$ then the temperature
+satisfies a second order differential equation that requires
+temperature data all around the boundary for all times. Similarly, the
+velocity field requires us to pose boundary conditions. These may be
+no-slip no-flux conditions $\mathbf u=0$ on $\partial\Omega$ if the
+fluid sticks to the boundary, or no normal flux conditions $\mathbf n
+\cdot \mathbf u = 0$ if the fluid can flow along but not across the
+boundary, or any number of other conditions that are physically
+reasonable. In this program, we will use no normal flux conditions.
+
 
 <h2>Solution approach</h2>
 
 Like the equations solved in @ref step_21 "step-21", we here have a
-system of differential-algebraic equations: with respect to the time
+system of differential-algebraic equations (DAE): with respect to the time
 variable, only the temperature equation is a differential equation
 whereas the Stokes system for $\mathbf u$ and $p$ has no
 time-derivatives and is therefore of the sort of an algebraic
@@ -112,6 +145,43 @@ in the top-left corner of the differential operator. As it will turn
 out, it is actually a lot easier to solve the Stokes problem than it
 is to solve the mixed Laplacian, and we will make full use of this
 fact! 
+
+
+<h3>Time stepping</h3>
+
+The structure of the problem as a DAE allows us to use the same
+strategy as we have already used in @ref step_21 "step-21", i.e. we
+use time lag scheme: first solve the Stokes equations for velocity and
+pressure using the temperature field from the previous time step, then
+with the new velocities update the temperature field for the current
+time step. In other words, in time step $n$ we first solve the Stokes
+system
+@f{eqnarray*}
+  -\nabla \cdot \eta \varepsilon ({\mathbf u}^n) + \nabla p^n &=& 
+  \mathrm{Ra} \; T^{n-1} \mathbf{g},
+  \\
+  \nabla \cdot {\mathbf u}^n &=& 0,
+@f}
+and then 
+@f{eqnarray*}
+  T^n
+  -
+  k_n\nabla \cdot \kappa \nabla T^n 
+  &=& 
+  T^{n-1}
+  +
+  k_n\gamma
+  -
+  k_n{\mathbf u}^n \cdot \nabla T^{n-1},
+@f}
+where $k_n$ is the time step size. Note how the temperature equation is
+solved semi-explicitly: diffusion is treated implicitly whereas
+advection is treated explicitly using the just-computed velocity
+field. 
+
+
+<h3>Linear solvers</h3>
+
 
 
 
