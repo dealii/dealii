@@ -26,10 +26,12 @@ Boussinesq equations that read as follows:
   \nabla \cdot \kappa \nabla T &=& \gamma.
 @f}
 Here, ${\mathbf u}$ is the velocity field, $p$ the pressure, and $T$
-the temperature of the fluid. As can be seen, velocity and pressure
+the temperature of the fluid. $\varepsilon ({\mathbf u}) = \frac 12
+[(\nabla{\mathbf u}) + (\nabla {\mathbf u})^T]$ is the symmetric
+gradient of the velocity. As can be seen, velocity and pressure
 solve a Stokes equation describing the motion of an incompressible
 fluid. The forcing term of the fluid motion is the buoyancy of the
-fluid, expressed as the product of the Raleigh number $\mathrm{Ra}$,
+fluid, expressed as the product of the Rayleigh number $\mathrm{Ra}$,
 the temperature $T$ and the gravity vector ${\mathbf g}$. (A possibly
 more intuitive formulation would use $\mathrm{Ra} \; (T-\bar T)
 \mathbf{g}$ as right hand side where $\bar T$ is the average
@@ -49,13 +51,67 @@ diffusion (heat conduction) term.
 
 In these equations, $\eta$ and $\kappa$ denote the viscosity and
 diffusivity coefficients. In the more general case and in many
-physical applications, they may and $\eta$ often will depend
-on the temperature, but we will neglect this dependence for the
-purpose of this tutorial program. The term $\gamma$ on the right hand
-side denotes the heat sources and may be a spatially and temporally
-varying function.
+physical applications, they may and $\eta$ often will depend on the
+temperature, but we will neglect this dependence for the purpose of
+this tutorial program. The term $\gamma$ on the right hand side
+denotes the heat sources and may be a spatially and temporally varying
+function. 
+
+$\mathrm{Ra}$, called the <a
+href="http://en.wikipedia.org/wiki/Rayleigh_number">Rayleigh
+number</a> is a dimensionless number that describes the ratio of heat
+transport due to convection induced by buoyancy changes from
+temperature differences, and of heat transport due to thermal
+diffusion. A small Rayleigh number implies that buoyancy is not strong
+relative to viscosity and fluid motion $\mathbf u$ is slow enough so
+that heat diffusion $\kappa\Delta T$ is the dominant heat transport
+term. On the other hand, a fluid with a high Rayleigh number will show
+vigorous convection that dominates heat conduction. 
+
+For most fluids for which we are interested in computing thermal
+convection, the Rayleigh number is very large, often $10^6$ or
+larger. From the structure of the equations, we see that this will
+lead to large pressure differences and large velocities. Consequently,
+the convection term in the convection-diffusion equation for $T$ will
+also be very large and an accurate solution of this equation will
+require us to choose small time steps. Problems with large Rayleigh
+numbers are therefore hard to solve numerically for similar reasons
+that make solving the <a
+href="http://en.wikipedia.org/wiki/Navier-stokes_equations">Navier-Stokes
+equations</a> hard to solve when the <a
+href="http://en.wikipedia.org/wiki/Reynolds_number">Reynolds number
+$\mathrm{Re}$</a> is large.
 
 
+<h2>Solution approach</h2>
+
+Like the equations solved in @ref step_21 "step-21", we here have a
+system of differential-algebraic equations: with respect to the time
+variable, only the temperature equation is a differential equation
+whereas the Stokes system for $\mathbf u$ and $p$ has no
+time-derivatives and is therefore of the sort of an algebraic
+constraint that has to hold at each time instant. The main difference
+to @ref step_21 "step-21" is that the algebraic constraint there was a
+mixed Laplace system of the form
+@f{eqnarray*}
+  \mathbf u + {\mathbf K}\lambda \nabla p &=& 0, \\
+  \nabla\cdot \mathbf u &=& f,
+@f}
+where now we have a Stokes system
+@f{eqnarray*}
+  -\nabla \cdot \eta \varepsilon ({\mathbf u}) + \nabla p &=& f, \\
+  \nabla\cdot \mathbf u &=& 0,
+@f}
+where $\nabla \cdot \varepsilon (\cdot)$ is an operator similar to the
+Laplacian $\Delta$ applied to a vector field.
+
+Given the similarity to what we have done in @ref step_21 "step-21",
+it may not come as a surprise that we choose a similar approach,
+although we will have to make adjustments for the change in operator
+in the top-left corner of the differential operator. As it will turn
+out, it is actually a lot easier to solve the Stokes problem than it
+is to solve the mixed Laplacian, and we will make full use of this
+fact! 
 
 
 
