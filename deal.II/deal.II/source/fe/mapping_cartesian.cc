@@ -455,7 +455,7 @@ MappingCartesian<dim>::transform_covariant (
   const InternalData &data = dynamic_cast<const InternalData&> (mapping_data);
 
   Assert (data.update_flags & update_covariant_transformation,
-	  ExcAccessToUninitializedField());
+	  typename FEValuesBase<dim>::ExcAccessToUninitializedField());
 
   Assert (output.size() + offset <= input.size(), ExcInternalError());
   
@@ -479,7 +479,7 @@ MappingCartesian<dim>::transform_covariant (
   const InternalData &data = dynamic_cast<const InternalData&> (mapping_data);
 
   Assert (data.update_flags & update_covariant_transformation,
-	  ExcAccessToUninitializedField());
+	  typename FEValuesBase<dim>::ExcAccessToUninitializedField());
   
   Assert (output.size() + offset <= input.size(), ExcInternalError());
   
@@ -508,7 +508,7 @@ MappingCartesian<dim>::transform_contravariant (
   const InternalData &data = dynamic_cast<const InternalData&> (mapping_data);
 
   Assert (data.update_flags & update_contravariant_transformation,
-	  ExcAccessToUninitializedField());
+	  typename FEValuesBase<dim>::ExcAccessToUninitializedField());
 
   Assert (output.size() + offset <= input.size(), ExcInternalError());
   
@@ -536,7 +536,7 @@ MappingCartesian<dim>::transform_contravariant (
   const InternalData &data = dynamic_cast<const InternalData&> (mapping_data);
 
   Assert (data.update_flags & update_contravariant_transformation,
-	  ExcAccessToUninitializedField());
+	  typename FEValuesBase<dim>::ExcAccessToUninitializedField());
 
   Assert (output.size() + offset <= input.size(), ExcInternalError());
   

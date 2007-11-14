@@ -135,16 +135,7 @@ class MappingCartesian : public Mapping<dim>
                                       */
     virtual
     Mapping<dim> * clone () const;
-
-    				     /**
-				      * Exception
-				      */
-    DeclException0 (ExcInvalidData);
-				     /**
-				      * Exception
-				      */
-    DeclException0 (ExcAccessToUninitializedField);
-
+    
   protected:
 				     /** 
 				      * Storage for internal data of

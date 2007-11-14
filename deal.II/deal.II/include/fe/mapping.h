@@ -15,6 +15,7 @@
 
 
 #include <base/config.h>
+#include <base/tensor.h>
 #include <base/vector_slice.h>
 #include <grid/tria.h>
 #include <dofs/dof_handler.h>
@@ -217,7 +218,32 @@ class Mapping : public Subscriptor
 					  * object.
 					  */
 	virtual unsigned int memory_consumption () const;
-
+	
+					 /**
+					  * The positions of the
+					  * mapped (generalized)
+					  * support points.
+					  */
+	std::vector<Point<dim> > support_point_values;
+	
+					 /*
+					  * The Jacobian of the
+					  * transformation in the
+					  * (generalized) support
+					  * points.
+					  */
+	std::vector<Tensor<2,dim> > support_point_gradients;
+	
+					 /*
+					  * The inverse of the
+					  * Jacobian of the
+					  * transformation in the
+					  * (generalized) support
+					  * points.
+					  */
+	std::vector<Tensor<2,dim> > support_point_inverse_gradients;
+	
+	
       private:
                                          /**
                                           * The value returned by
@@ -336,7 +362,9 @@ class Mapping : public Subscriptor
 				      * The transformed (generalized)
 				      * support point.
 				      */
-    const Point<dim>& support_point_value(const unsigned int index) const;
+    const Point<dim>& support_point_value(
+      const unsigned int index,
+      const typename Mapping<dim>::InternalDataBase &internal) const;
     
 				     /**
 				      * The Jacobian
@@ -344,7 +372,9 @@ class Mapping : public Subscriptor
 				      * in the (generalized) support
 				      * point.
 				      */
-    const Tensor<2,dim>& support_point_gradient(const unsigned int index) const;
+    const Tensor<2,dim>& support_point_gradient(
+      const unsigned int index,
+      const typename Mapping<dim>::InternalDataBase &internal) const;
     
 				     /**
 				      * The inverse Jacobian
@@ -352,7 +382,9 @@ class Mapping : public Subscriptor
 				      * in the (generalized) support
 				      * point.
 				      */
-    const Tensor<2,dim>& support_point_inverse_gradients(const unsigned int index) const;
+    const Tensor<2,dim>& support_point_inverse_gradient(
+      const unsigned int index,
+      const typename Mapping<dim>::InternalDataBase &internal) const;
     
                                      /**
                                       * Return a pointer to a copy of the
@@ -561,6 +593,43 @@ void
 Mapping<dim>::InternalDataBase::clear_first_cell ()
 {
   first_cell = false;
+}
+
+
+
+template <int dim>
+inline
+const Point<dim>&
+Mapping<dim>::support_point_value(
+  const unsigned int index,
+  const typename Mapping<dim>::InternalDataBase& internal) const
+{
+  AssertIndexRange(index, internal.support_point_values.size());
+  return internal.support_point_values[index];  
+}
+
+
+template <int dim>
+inline
+const Tensor<2,dim>&
+Mapping<dim>::support_point_gradient(
+  const unsigned int index,
+  const typename Mapping<dim>::InternalDataBase& internal) const
+{
+  AssertIndexRange(index, internal.support_point_gradients.size());
+  return internal.support_point_gradients[index];
+}
+
+
+template <int dim>
+inline
+const Tensor<2,dim>&
+Mapping<dim>::support_point_inverse_gradient(
+  const unsigned int index,
+  const typename Mapping<dim>::InternalDataBase& internal) const
+{
+  AssertIndexRange(index, internal.support_point_inverse_gradients.size());
+  return internal.support_point_inverse_gradients[index];
 }
 
 

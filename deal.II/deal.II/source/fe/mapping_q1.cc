@@ -841,7 +841,7 @@ MappingQ1<dim>::transform_covariant (
   const InternalData &data=*data_ptr;
 
   Assert (data.update_flags & update_covariant_transformation,
-	  ExcAccessToUninitializedField());
+	  typename FEValuesBase<dim>::ExcAccessToUninitializedField());
 
   Assert (output.size() + offset <= input.size(), ExcInternalError());
 
@@ -864,7 +864,7 @@ MappingQ1<dim>::transform_covariant (
   const InternalData &data=*data_ptr;
 
   Assert (data.update_flags & update_covariant_transformation,
-	  ExcAccessToUninitializedField());
+	  typename FEValuesBase<dim>::ExcAccessToUninitializedField());
 
   Assert (output.size() + offset <= input.size(), ExcInternalError());
 
@@ -888,7 +888,7 @@ transform_contravariant (
   const InternalData &data=*data_ptr;
 
   Assert (data.update_flags & update_contravariant_transformation,
-	  ExcAccessToUninitializedField());
+	  typename FEValuesBase<dim>::ExcAccessToUninitializedField());
 
   Assert (output.size() + offset <= input.size(), ExcInternalError());
 
@@ -911,7 +911,7 @@ MappingQ1<dim>::transform_contravariant (
   const InternalData &data=*data_ptr;
 
   Assert (data.update_flags & update_contravariant_transformation,
-	  ExcAccessToUninitializedField());
+	  typename FEValuesBase<dim>::ExcAccessToUninitializedField());
 
   Assert (output.size() + offset <= input.size(), ExcInternalError());
 

@@ -258,11 +258,6 @@ class MappingQ1 : public Mapping<dim>
 					  */
 	unsigned int n_shape_functions;
     };
-    
-				     /**
-				      * Exception
-				      */
-    DeclException0 (ExcAccessToUninitializedField);
 
   protected:
 
