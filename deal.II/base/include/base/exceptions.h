@@ -438,6 +438,7 @@ class Exception0 :  public dealii::ExceptionBase {}
 /**
   *  Declare an exception class derived from ExceptionBase with
   *  one additional parameter.
+ *  @ingroup Exceptions
   */
 #define DeclException1(Exception1, type1, outsequence)                \
 class Exception1 : public dealii::ExceptionBase {                             \
@@ -913,9 +914,12 @@ namespace StandardExceptions
  * Special assertion for dimension mismatch.
  *
  * Since this is used very often and always repeats the arguments, we
- *introduce this special assertion for ExcDimensionMismatch in order
- *to keep the user codes shorter.
- */
+ * introduce this special assertion for ExcDimensionMismatch in order
+ * to keep the user codes shorter.
+ *
+ * @ingroup Exceptions
+ * @author Guido Kanschat 2007
+*/
 #define AssertDimension(dim1,dim2) Assert((dim1) == (dim2), \
   ExcDimensionMismatch((dim1),(dim2)))
 
@@ -929,6 +933,9 @@ namespace StandardExceptions
  * Called wit arguments <tt>index</tt> and <tt>range</tt> it asserts
  * that <tt>index&lt;range</tt> and throws
  * ExcIndexRange(index,0,range) if it fails.
+ *
+ * @ingroup Exceptions
+ * @author Guido Kanschat 2007
  */
 #define AssertIndexRange(index,range) Assert((index) < (range), \
   ExcIndexRange((index),0,(range)))
