@@ -116,7 +116,7 @@ FullMatrix<number>::all_zero () const
   const number* p = this->data();
   const number* const e = this->data() + this->n_elements();
   while (p!=e)
-    if (*p++ != 0.0)
+    if (*p++ != number(0.0))
       return false;
 
   return true;
@@ -153,7 +153,7 @@ FullMatrix<number>::operator /= (const number factor)
   number       *p = &this->el(0,0);
   const number *e = &this->el(0,0) + n()*m();
 
-  const number factor_inv = 1./factor;
+  const number factor_inv = number(1.)/factor;
 
   Assert (numbers::is_finite(factor_inv), 
           ExcMessage("The given value is not finite but either infinite or Not A Number (NaN)"));
@@ -265,7 +265,7 @@ number FullMatrix<number>::residual (Vector<number2>& dst,
 		     size_n = n();
   for (unsigned int i=0; i<size_n; ++i)
     {
-      number s = right(i);
+      number s = number(right(i));
       for (unsigned int j=0; j<size_m; ++j)
 	s -= number(src(j)) * this->el(i,j);
       dst(i) = s;
@@ -290,7 +290,7 @@ void FullMatrix<number>::forward (Vector<number2>       &dst,
   unsigned int nu = ( (m()<n()) ? m() : n());
   for (i=0; i<nu; ++i)
     {
-      number s = src(i);
+      number s = number(src(i));
       for (j=0; j<i; ++j)
 	s -= number(dst(j)) * this->el(i,j);
       dst(i) = s/this->el(i,i);
@@ -889,7 +889,7 @@ FullMatrix<number>::symmetrize ()
   for (unsigned int i=0; i<N; ++i)
     for (unsigned int j=i+1; j<N; ++j)
       {
-	const number t = (this->el(i,j) + this->el(j,i)) / 2.;
+	const number t = (this->el(i,j) + this->el(j,i)) / number(2.);
 	this->el(i,j) = this->el(j,i) = t;
       };
 }
@@ -1889,18 +1889,18 @@ FullMatrix<number>::invert (const FullMatrix<number2> &M)
   switch (this->n_cols()) 
     {
       case 1:
-	    this->el(0,0) = 1.0/M.el(0,0);
+	    this->el(0,0) = number(1.0)/M.el(0,0);
 	    return;
       case 2:
 					     // this is Maple output,
 					     // thus a bit unstructured
       {
-	    const number t4 = 1.0/(M.el(0,0)*M.el(1,1)-M.el(0,1)*M.el(1,0));
-	    this->el(0,0) = M.el(1,1)*t4;
-	    this->el(0,1) = -M.el(0,1)*t4;
-	    this->el(1,0) = -M.el(1,0)*t4;
-	    this->el(1,1) = M.el(0,0)*t4;
-	    return;
+	const number t4 = number(1.0)/(M.el(0,0)*M.el(1,1)-M.el(0,1)*M.el(1,0));
+	this->el(0,0) = M.el(1,1)*t4;
+	this->el(0,1) = -M.el(0,1)*t4;
+	this->el(1,0) = -M.el(1,0)*t4;
+	this->el(1,1) = M.el(0,0)*t4;
+	return;
       };
       
       case 3:
@@ -1911,7 +1911,7 @@ FullMatrix<number>::invert (const FullMatrix<number2> &M)
 			t00 = M.el(0,2)*M.el(1,0),
 			t01 = M.el(0,1)*M.el(2,0),
 			t04 = M.el(0,2)*M.el(2,0),
-			t07 = 1.0/(t4*M.el(2,2)-t6*M.el(2,1)-t8*M.el(2,2)+
+			t07 = number(1.0)/(t4*M.el(2,2)-t6*M.el(2,1)-t8*M.el(2,2)+
  				   t00*M.el(2,1)+t01*M.el(1,2)-t04*M.el(1,1));
 	    this->el(0,0) = (M.el(1,1)*M.el(2,2)-M.el(1,2)*M.el(2,1))*t07;
 	    this->el(0,1) = -(M.el(0,1)*M.el(2,2)-M.el(0,2)*M.el(2,1))*t07;
@@ -1964,7 +1964,7 @@ FullMatrix<number>::invert (const FullMatrix<number2> &M)
 	const number t63 = t43*t20-t43*t22-t46*t33+t46*t35+
 			   t49*t50-t49*t52-t54*t25+t54*t27+
 			   t57*t38-t57*t40-t60*t50+t60*t52;
-	const number t65 = 1./(t42+t63);
+	const number t65 = number(1.)/(t42+t63);
 	const number t71 = M.el(0,2)*M.el(2,1);
 	const number t73 = M.el(0,3)*M.el(2,1);
 	const number t75 = M.el(0,2)*M.el(3,1);
@@ -2095,7 +2095,7 @@ FullMatrix<number>::print_formatted (
       for (unsigned int j=0; j<n(); ++j)
 	if (std::abs(this->el(i,j)) > threshold)
 	  out << std::setw(width)
-	      << this->el(i,j) * denominator << ' ';
+	      << this->el(i,j) * number(denominator) << ' ';
 	else
 	  out << std::setw(width) << zero_string << ' ';
       out << std::endl;
@@ -2170,7 +2170,7 @@ FullMatrix<number>::gauss_jordan ()
 	}
 
 				       // transformation
-      const number hr = 1./this->el(j,j);
+      const number hr = number(1.)/this->el(j,j);
       this->el(j,j) = hr;
       for (unsigned int k=0; k<N; ++k)
 	{
