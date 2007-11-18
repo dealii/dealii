@@ -1611,16 +1611,16 @@ void FullMatrix<number>::Tadd (const FullMatrix<number2> &src,
 	  ExcIndexRange (dst_offset_i, 0, m()));
   Assert (dst_offset_j < n(),
 	  ExcIndexRange (dst_offset_j, 0, n()));
-  Assert (src_offset_i < src.m(),
-	  ExcIndexRange (src_offset_i, 0, src.m()));
-  Assert (src_offset_j < src.n(),
-	  ExcIndexRange (src_offset_j, 0, src.n()));
+  Assert (src_offset_i < src.n(),
+	  ExcIndexRange (src_offset_i, 0, src.n()));
+  Assert (src_offset_j < src.m(),
+	  ExcIndexRange (src_offset_j, 0, src.m()));
   
 				   // Compute maximal size of copied block
   const unsigned int rows = std::min (m() - dst_offset_i,
-				      src.m() - src_offset_i);
+				      src.m() - src_offset_j);
   const unsigned int cols = std::min (n() - dst_offset_j,
-				      src.n() - src_offset_j);
+				      src.n() - src_offset_i);
   
   for (unsigned int i=0; i<rows ; ++i)
     for (unsigned int j=0; j<cols ; ++j)
