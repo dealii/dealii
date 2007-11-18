@@ -1568,6 +1568,15 @@ void FullMatrix<number>::add (const FullMatrix<number2> &src,
 			      const unsigned int src_offset_i,
 			      const unsigned int src_offset_j)
 {
+  Assert (dst_offset_i < m(),
+	  ExcIndexRange (dst_offset_i, 0, m()));
+  Assert (dst_offset_j < n(),
+	  ExcIndexRange (dst_offset_j, 0, n()));
+  Assert (src_offset_i < src.m(),
+	  ExcIndexRange (src_offset_i, 0, src.m()));
+  Assert (src_offset_j < src.n(),
+	  ExcIndexRange (src_offset_j, 0, src.n()));
+  
 				   // Compute maximal size of copied block
   const unsigned int rows = (m() - dst_offset_i >= src.m() - src_offset_i)
 			    ? src.m()
@@ -1578,8 +1587,8 @@ void FullMatrix<number>::add (const FullMatrix<number2> &src,
   
   for (unsigned int i=0; i<rows ; ++i)
     for (unsigned int j=0; j<cols ; ++j)
-      this->el(dst_offset_i+i,dst_offset_j+j)
-	+= factor * src.el(src_offset_i+i,src_offset_j+j);
+      (*this)(dst_offset_i+i,dst_offset_j+j)
+	+= factor * src(src_offset_i+i,src_offset_j+j);
 }
 
 
