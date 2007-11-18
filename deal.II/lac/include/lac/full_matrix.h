@@ -685,20 +685,19 @@ class FullMatrix : public Table<2,number>
 				     /**
 				      * Add rectangular block.
 				      *
-				      * A rectangular block of the
-				      * matrix <tt>src</tt> is added to
-				      * <tt>this</tt>. The upper left
-				      * corner of the block being
-				      * copied is
+				      * A rectangular block of the matrix
+				      * <tt>src</tt> is added to
+				      * <tt>this</tt>. The upper left corner
+				      * of the block being copied is
 				      * <tt>(src_offset_i,src_offset_j)</tt>.
-				      * The upper left corner of the
-				      * copied block is
+				      * The upper left corner of the copied
+				      * block is
 				      * <tt>(dst_offset_i,dst_offset_j)</tt>.
-				      * The size of the rectangular
-				      * block being copied is the
-				      * maximum size possible,
-				      * determined either by the size
-				      * of <tt>this</tt> or <tt>src</tt>.
+				      * The size of the rectangular block
+				      * being copied is the maximum size
+				      * possible, determined either by the
+				      * size of <tt>this</tt> or <tt>src</tt>
+				      * and the given offsets.
 				      */
     template<typename number2>
     void add (const FullMatrix<number2> &src,
