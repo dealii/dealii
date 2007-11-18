@@ -24,7 +24,7 @@ default: run-tests
 tests_x = grid_generator_?? \
 	  grid_in_* \
 	  point_inside_? \
-	  full_matrix_1 \
+	  full_matrix_* \
 	  block_matrix_array_* \
 	  data_out_0* \
           data_out_faces_0* \
