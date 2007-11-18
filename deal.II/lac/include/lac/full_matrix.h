@@ -570,7 +570,7 @@ class FullMatrix : public Table<2,number>
 				      * considered zero.
 				     */
     void print_formatted (std::ostream       &out,
-			  const unsigned int  presicion=3,
+			  const unsigned int  precision=3,
 			  const bool          scientific  = true,
 			  const unsigned int  width       = 0,
 			  const char         *zero_string = " ",
