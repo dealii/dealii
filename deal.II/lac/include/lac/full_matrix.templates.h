@@ -314,9 +314,9 @@ FullMatrix<number>::vmult (Vector<number2>& dst,
       {
 	for (unsigned int i=0; i<size_m; ++i)
 	  {
-	    number2 s = 0.;
+	    number s = 0.;
 	    for (unsigned int j=0; j<size_n; ++j)
-	      s += src(j) * *(e++);
+	      s += number(src(j)) * *(e++);
 	    dst(i) = s;
 	  };
       }
@@ -324,13 +324,13 @@ FullMatrix<number>::vmult (Vector<number2>& dst,
       {
 	for (unsigned int i=0; i<size_m; ++i)
 	  {
-	    number2 s = 0.;
+	    number s = 0.;
 	    for (unsigned int j=0; j<size_n; ++j)
-	      s += src(j) * *(e++);
+	      s += number(src(j)) * *(e++);
 	    dst(i) += s;
-	  };
-      };
-  };
+	  }
+      }
+  }
 }
 
 
@@ -355,9 +355,9 @@ void FullMatrix<number>::Tvmult (Vector<number2>       &dst,
     {
       for (unsigned int i=0; i<size_n; ++i)
 	{
-	  number2 s = 0.;
+	  number s = 0.;
 	  for (unsigned int j=0; j<size_m; ++j)
-	    s += src(j) * this->el(j,i);
+	    s += number(src(j)) * this->el(j,i);
 	  dst(i) = s;
 	};
     }
@@ -365,12 +365,12 @@ void FullMatrix<number>::Tvmult (Vector<number2>       &dst,
     {
       for (unsigned int i=0; i<size_n; ++i)
 	{
-	  number2 s = 0.;
+	  number s = 0.;
 	  for (unsigned int j=0; j<size_m; ++j)
-	    s += src(j) * this->el(j,i);
+	    s += number(src(j)) * this->el(j,i);
 	  dst(i) += s;
-	};
-    };
+	}
+    }
 }
 
 
@@ -388,14 +388,14 @@ number FullMatrix<number>::residual (Vector<number2>& dst,
 
   Assert (&src != &dst, ExcSourceEqualsDestination());
 
-  number2 s, res = 0.;
+  number res = 0.;
   const unsigned int size_m = m(),
 		     size_n = n();
   for (unsigned int i=0; i<size_n; ++i)
     {
-      s = right(i);
+      number s = right(i);
       for (unsigned int j=0; j<size_m; ++j)
-	s -= src(j) * this->el(i,j);
+	s -= number(src(j)) * this->el(i,j);
       dst(i) = s;
       res += s*s;
     }
@@ -416,11 +416,11 @@ void FullMatrix<number>::forward (Vector<number2>       &dst,
 
   unsigned int i,j;
   unsigned int nu = ( (m()<n()) ? m() : n());
-  number2 s;
   for (i=0; i<nu; ++i)
     {
-      s = src(i);
-      for (j=0; j<i; ++j) s -= dst(j) * this->el(i,j);
+      number s = src(i);
+      for (j=0; j<i; ++j)
+	s -= number(dst(j)) * this->el(i,j);
       dst(i) = s/this->el(i,i);
     }
 }
@@ -436,12 +436,12 @@ void FullMatrix<number>::backward (Vector<number2>       &dst,
   
   unsigned int j;
   unsigned int nu = (m()<n() ? m() : n());
-  number2 s;
   for (int i=nu-1; i>=0; --i)
     {
-      s = src(i);
-      for (j=i+1; j<nu; ++j) s -= dst(j) * this->el(i,j);
-      dst(i) = s/this->el(i,i);
+      number2 s = src(i);
+      for (j=i+1; j<nu; ++j)
+	s -= dst(j) * number2(this->el(i,j));
+      dst(i) = s/number2(this->el(i,i));
     }
 }
 
@@ -946,7 +946,8 @@ void FullMatrix<number>::Tmmult (FullMatrix<number2>       &dst,
 
 template <typename number>
 template <typename number2>
-number2 FullMatrix<number>::matrix_norm_square (const Vector<number2> &v) const
+number2
+FullMatrix<number>::matrix_norm_square (const Vector<number2> &v) const
 {
   Assert (!this->empty(), ExcEmptyMatrix());
   
@@ -960,14 +961,14 @@ number2 FullMatrix<number>::matrix_norm_square (const Vector<number2> &v) const
   
   for (unsigned int row=0; row<n_rows; ++row)
     {
-      number2 s = 0.;
+      number s = 0.;
       const number * const val_end_of_row = val_ptr+n_rows;
       v_ptr = v.begin();
       while (val_ptr != val_end_of_row)
-	s += *val_ptr++ * *v_ptr++;
+	s += number(*val_ptr++) * number(*v_ptr++);
 
-      sum += s* v(row);
-    };
+      sum += s* number(v(row));
+    }
 
   return sum;
 }
@@ -975,7 +976,8 @@ number2 FullMatrix<number>::matrix_norm_square (const Vector<number2> &v) const
 
 template <typename number>
 template <typename number2>
-number2 FullMatrix<number>::matrix_scalar_product (const Vector<number2> &u,
+number2
+FullMatrix<number>::matrix_scalar_product (const Vector<number2> &u,
 						   const Vector<number2> &v) const
 {
   Assert (!this->empty(), ExcEmptyMatrix());
@@ -991,14 +993,14 @@ number2 FullMatrix<number>::matrix_scalar_product (const Vector<number2> &u,
   
   for (unsigned int row=0; row<n_rows; ++row)
     {
-      number2 s = 0.;
+      number s = 0.;
       const number * const val_end_of_row = val_ptr+n_cols;
       v_ptr = v.begin();
       while (val_ptr != val_end_of_row)
-	s += *val_ptr++ * *v_ptr++;
+	s += number(*val_ptr++) * number(*v_ptr++);
 
-      sum += s* u(row);
-    };
+      sum += s * number(u(row));
+    }
 
   return sum;
 }
@@ -1015,25 +1017,26 @@ FullMatrix<number>::symmetrize ()
   for (unsigned int i=0; i<N; ++i)
     for (unsigned int j=i+1; j<N; ++j)
       {
-	const number t = (this->el(i,j) + this->el(j,i)) / 2;
+	const number t = (this->el(i,j) + this->el(j,i)) / 2.;
 	this->el(i,j) = this->el(j,i) = t;
       };
 }
 
 
 template <typename number>
-number FullMatrix<number>::l1_norm () const
+typename FullMatrix<number>::real_type
+FullMatrix<number>::l1_norm () const
 {
   Assert (!this->empty(), ExcEmptyMatrix());
   
-  number sum=0, max=0;
+  real_type sum=0, max=0;
   const unsigned int n_rows = m(), n_cols = n();
   
   for (unsigned int col=0; col<n_cols; ++col)
     {
       sum=0;
       for (unsigned int row=0; row<n_rows; ++row)
-	sum += std::fabs(this->el(row,col));
+	sum += std::abs(this->el(row,col));
       if (sum > max)
 	max = sum;
     }
@@ -1043,18 +1046,19 @@ number FullMatrix<number>::l1_norm () const
 
 
 template <typename number>
-number FullMatrix<number>::linfty_norm () const
+typename FullMatrix<number>::real_type
+FullMatrix<number>::linfty_norm () const
 {
   Assert (!this->empty(), ExcEmptyMatrix());
   
-  number sum=0, max=0;
+  real_type sum=0, max=0;
   const unsigned int n_rows = m(), n_cols = n();
 
   for (unsigned int row=0; row<n_rows; ++row)
     {
       sum=0;
       for (unsigned int col=0; col<n_cols; ++col)
-	sum += std::fabs(this->el(row,col));
+	sum += std::abs(this->el(row,col));
       if (sum > max)
 	max = sum;
     }
@@ -1950,33 +1954,37 @@ FullMatrix<number>::trace () const
 
 
 template <typename number>
-number
+typename FullMatrix<number>::real_type
 FullMatrix<number>::frobenius_norm () const
 {
   Assert (!this->empty(), ExcEmptyMatrix());
   
-  number s = 0.;
+  real_type s = 0.;
   for (unsigned int i=0; i<this->n_rows()*this->n_cols(); ++i)
-    s += this->data()[i]*this->data()[i];
+    s += numbers::NumberTraits<number>::abs_square(this->data()[i]);
   return std::sqrt(s);
 }
 
 
 
 template <typename number>
-number
+typename FullMatrix<number>::real_type
 FullMatrix<number>::relative_symmetry_norm2 () const
 {
   Assert (!this->empty(), ExcEmptyMatrix());
   
-  number s = 0.;
-  number a = 0.;
+  real_type s = 0.;
+  real_type a = 0.;
   for (unsigned int i=0; i<this->n_rows(); ++i)
     for (unsigned int j=0; j<this->n_cols(); ++j)
       {
-	a += ((*this)(i,j)-(*this)(j,i))*((*this)(i,j)-(*this)(j,i));
-	s += (*this)(i,j)*(*this)(i,j);
+	const number x_ij = (*this)(i,j);
+	const number x_ji = (*this)(j,i);
+	
+	a += numbers::NumberTraits<number>::abs_square(x_ij-x_ji);
+	s += numbers::NumberTraits<number>::abs_square(x_ij);
       }
+  
   if (s!=0.)
     return std::sqrt(a)/std::sqrt(s);
   return 0;
@@ -2084,7 +2092,7 @@ FullMatrix<number>::invert (const FullMatrix<number2> &M)
 	const number t63 = t43*t20-t43*t22-t46*t33+t46*t35+
 			   t49*t50-t49*t52-t54*t25+t54*t27+
 			   t57*t38-t57*t40-t60*t50+t60*t52;
-	const number t65 = 1/(t42+t63);
+	const number t65 = 1./(t42+t63);
 	const number t71 = M.el(0,2)*M.el(2,1);
 	const number t73 = M.el(0,3)*M.el(2,1);
 	const number t75 = M.el(0,2)*M.el(3,1);
@@ -2173,7 +2181,7 @@ FullMatrix<number>::precondition_Jacobi (Vector<somenumber>       &dst,
   const somenumber        *src_ptr = src.begin();
   
   for (unsigned int i=0; i<n; ++i, ++dst_ptr, ++src_ptr)
-    *dst_ptr = om * *src_ptr / this->el(i,i);
+    *dst_ptr = somenumber(om) * *src_ptr / somenumber(this->el(i,i));
 }
 
 
@@ -2213,7 +2221,7 @@ FullMatrix<number>::print_formatted (
   for (unsigned int i=0; i<m(); ++i) 
     {
       for (unsigned int j=0; j<n(); ++j)
-	if (std::fabs(this->el(i,j)) > threshold)
+	if (std::abs(this->el(i,j)) > threshold)
 	  out << std::setw(width)
 	      << this->el(i,j) * denominator << ' ';
 	else
@@ -2249,7 +2257,7 @@ FullMatrix<number>::gauss_jordan ()
 				   // regular
   double diagonal_sum = 0;
   for (unsigned int i=0; i<N; ++i)
-    diagonal_sum += std::fabs(this->el(i,i));
+    diagonal_sum += std::abs(this->el(i,i));
   const double typical_diagonal_element = diagonal_sum/N;
 
 				   // initialize the array that holds
@@ -2265,13 +2273,13 @@ FullMatrix<number>::gauss_jordan ()
 				       // part of the line on and
 				       // right of the diagonal for
 				       // the largest element
-      number       max = std::fabs(this->el(j,j));
+      real_type max = std::abs(this->el(j,j));
       unsigned int r   = j;
       for (unsigned int i=j+1; i<N; ++i)
 	{
-	  if (std::fabs(this->el(i,j)) > max)
+	  if (std::abs(this->el(i,j)) > max)
 	    {
-	      max = std::fabs(this->el(i,j));
+	      max = std::abs(this->el(i,j));
 	      r = i;
 	    }
 	}

@@ -15,6 +15,7 @@
 
 
 #include <base/config.h>
+#include <base/numbers.h>
 #include <base/table.h>
 #include <lac/exceptions.h>
 #include <lac/identity_matrix.h>
@@ -62,6 +63,29 @@ class FullMatrix : public Table<2,number>
 				      * the STL container classes.
 				      */
     typedef number value_type;
+
+
+				     /**
+				      * Declare a type that has holds
+				      * real-valued numbers with the
+				      * same precision as the template
+				      * argument to this class. If the
+				      * template argument of this
+				      * class is a real data type,
+				      * then real_type equals the
+				      * template argument. If the
+				      * template argument is a
+				      * std::complex type then
+				      * real_type equals the type
+				      * underlying the complex
+				      * numbers.
+				      *
+				      * This typedef is used to
+				      * represent the return type of
+				      * norms.
+				      */
+    typedef typename numbers::NumberTraits<number>::real_type real_type;
+
     
     class const_iterator;
     
@@ -430,8 +454,17 @@ class FullMatrix : public Table<2,number>
 				      * of the finite element
 				      * function.
 				      *
-				      * Obviously, the matrix needs to
-				      * be quadratic for this operation.
+				      * Obviously, the matrix needs to be
+				      * quadratic for this operation, and for
+				      * the result to actually be a norm it
+				      * also needs to be either real symmetric
+				      * or complex hermitian.
+				      *
+				      * The underlying template types of both
+				      * this matrix and the given vector
+				      * should either both be real or
+				      * complex-valued, but not mixed, for
+				      * this function to make sense.
 				      */
     template<typename number2>
     number2 matrix_norm_square (const Vector<number2> &v) const;
@@ -444,6 +477,12 @@ class FullMatrix : public Table<2,number>
 				      * the cellwise scalar product of
 				      * two functions in the finite
 				      * element context.
+				      *
+				      * The underlying template types of both
+				      * this matrix and the given vector
+				      * should either both be real or
+				      * complex-valued, but not mixed, for
+				      * this function to make sense.
 				      */
     template<typename number2>
     number2 matrix_scalar_product (const Vector<number2> &u,
@@ -457,7 +496,7 @@ class FullMatrix : public Table<2,number>
 				      * |M_{ij}|$ (maximum of
 				      * the sums over columns).
 				      */
-    number l1_norm () const;
+    real_type l1_norm () const;
 
     				     /**
 				      * Return the $l_\infty$-norm of
@@ -466,7 +505,7 @@ class FullMatrix : public Table<2,number>
 				      * |M_{ij}|$ (maximum of the sums
 				      * over rows).
 				      */
-    number linfty_norm () const;
+    real_type linfty_norm () const;
     
 				     /**
 				      * Compute the Frobenius norm of
@@ -480,7 +519,7 @@ class FullMatrix : public Table<2,number>
 				      * <i>l<sub>2</sub></i>-norm of
 				      * the vector space.
 				      */
-    number frobenius_norm () const;
+    real_type frobenius_norm () const;
     
 				     /**
 				      * Compute the relative norm of
@@ -495,7 +534,7 @@ class FullMatrix : public Table<2,number>
 				      * symmetric within a certain
 				      * accuracy, or not.
 				      */
-    number relative_symmetry_norm2 () const;
+    real_type relative_symmetry_norm2 () const;
     
 				     /**
                                       * Computes the determinant of a
@@ -531,7 +570,7 @@ class FullMatrix : public Table<2,number>
 				     /**
 				      * Print the matrix and allow
 				      * formatting of entries.
-				     *
+				      *
 				      * The parameters allow for a
 				      * flexible setting of the output
 				      * format:
@@ -1141,7 +1180,7 @@ template <typename number>
 FullMatrix<number> &
 FullMatrix<number>::operator = (const number d)
 {
-  Assert (d==0, ExcScalarAssignmentOnlyForZeroValue());
+  Assert (d==number(0), ExcScalarAssignmentOnlyForZeroValue());
 
   if (this->n_elements() != 0)
     std::fill_n (this->val, this->n_elements(), number());
