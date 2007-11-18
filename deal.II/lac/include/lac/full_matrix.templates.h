@@ -14,6 +14,8 @@
 #define __deal2__full_matrix_templates_h
 
 
+//TODO: this file has a lot of operations between matrices and matrices or matrices and vectors of different precision. we should go through the file and in each case pick the more accurate data type for intermediate results. currently, the choice is pretty much random. this may also allow us some operations where one operand is complex and the other is not
+
 #include <base/config.h>
 #include <lac/vector.h>
 #include <lac/full_matrix.h>
@@ -178,159 +180,29 @@ FullMatrix<number>::vmult (Vector<number2>& dst,
 
   Assert (&src != &dst, ExcSourceEqualsDestination());
 
-  if ((n()==3) && (m()==3))
-  {
-    number2 s;
-    number2 s0,s1,s2;
-    s   = src(0);
-    s0  = s*this->data()[0];
-    s1  = s*this->data()[3];
-    s2  = s*this->data()[6];
-    
-    s   = src(1);
-    s0 += s*this->data()[1];
-    s1 += s*this->data()[4];
-    s2 += s*this->data()[7];
-    
-    s   = src(2);
-    s0 += s*this->data()[2];
-    s1 += s*this->data()[5];
-    s2 += s*this->data()[8];
-
-    if (!adding)
+  const number* e = this->data();
+  const unsigned int size_m = m(),
+		     size_n = n();
+  if (!adding)
     {
-      dst(0) = s0;
-      dst(1) = s1;
-      dst(2) = s2;
+      for (unsigned int i=0; i<size_m; ++i)
+	{
+	  number2 s = 0.;
+	  for (unsigned int j=0; j<size_n; ++j)
+	    s += number2(src(j)) * number2(*(e++));
+	  dst(i) = s;
+	};
     }
-    else
-    {
-      dst(0) += s0;
-      dst(1) += s1;
-      dst(2) += s2;
-    }
-  }
-  else if ((n()==4) && (m()==4))
-  {
-    number2 s;
-    number2 s0,s1,s2,s3;
-    s = src(0);
-    s0  = s*this->data()[0];
-    s1  = s*this->data()[4];
-    s2  = s*this->data()[8];
-    s3  = s*this->data()[12];
-    
-    s = src(1);
-    s0 += s*this->data()[1];
-    s1 += s*this->data()[5];
-    s2 += s*this->data()[9];
-    s3 += s*this->data()[13];
-    
-    s = src(2);
-    s0 += s*this->data()[2];
-    s1 += s*this->data()[6];
-    s2 += s*this->data()[10];
-    s3 += s*this->data()[14];
-    
-    s = src(3);
-    s0 += s*this->data()[3];
-    s1 += s*this->data()[7];
-    s2 += s*this->data()[11];
-    s3 += s*this->data()[15];
-    
-    if (!adding)
-    {
-      dst(0) = s0;
-      dst(1) = s1;
-      dst(2) = s2;
-      dst(3) = s3;
-    }
-    else
-    {
-      dst(0) += s0;
-      dst(1) += s1;
-      dst(2) += s2;
-      dst(3) += s3;
-    }
-  }
-  else if ((n()==8) && (m()==8))
-  {
-    number2 s;
-    number2 s0,s1,s2,s3,s4,s5,s6,s7;
-    s = src(0);
-    s0 = s*this->data()[0]; s1 = s*this->data()[8]; s2 = s*this->data()[16]; s3 = s*this->data()[24];
-    s4 = s*this->data()[32]; s5 = s*this->data()[40]; s6 = s*this->data()[48]; s7 = s*this->data()[56];
-    s = src(1);
-    s0 += s*this->data()[1]; s1 += s*this->data()[9]; s2 += s*this->data()[17]; s3 += s*this->data()[25];
-    s4 += s*this->data()[33]; s5 += s*this->data()[41]; s6 += s*this->data()[49]; s7 += s*this->data()[57];
-    s = src(2);
-    s0 += s*this->data()[2]; s1 += s*this->data()[10]; s2 += s*this->data()[18]; s3 += s*this->data()[26];
-    s4 += s*this->data()[34]; s5 += s*this->data()[42]; s6 += s*this->data()[50]; s7 += s*this->data()[58];
-    s = src(3);
-    s0 += s*this->data()[3]; s1 += s*this->data()[11]; s2 += s*this->data()[19]; s3 += s*this->data()[27];
-    s4 += s*this->data()[35]; s5 += s*this->data()[43]; s6 += s*this->data()[51]; s7 += s*this->data()[59];
-    s = src(4);
-    s0 += s*this->data()[4]; s1 += s*this->data()[12]; s2 += s*this->data()[20]; s3 += s*this->data()[28];
-    s4 += s*this->data()[36]; s5 += s*this->data()[44]; s6 += s*this->data()[52]; s7 += s*this->data()[60];
-    s = src(5);
-    s0 += s*this->data()[5]; s1 += s*this->data()[13]; s2 += s*this->data()[21]; s3 += s*this->data()[29];
-    s4 += s*this->data()[37]; s5 += s*this->data()[45]; s6 += s*this->data()[53]; s7 += s*this->data()[61];
-    s = src(6);
-    s0 += s*this->data()[6]; s1 += s*this->data()[14]; s2 += s*this->data()[22]; s3 += s*this->data()[30];
-    s4 += s*this->data()[38]; s5 += s*this->data()[46]; s6 += s*this->data()[54]; s7 += s*this->data()[62];
-    s = src(7);
-    s0 += s*this->data()[7]; s1 += s*this->data()[15]; s2 += s*this->data()[23]; s3 += s*this->data()[31];
-    s4 += s*this->data()[39]; s5 += s*this->data()[47]; s6 += s*this->data()[55]; s7 += s*this->data()[63];
-    
-    if (!adding)
-    {
-      dst(0) = s0;
-      dst(1) = s1;
-      dst(2) = s2;
-      dst(3) = s3;
-      dst(4) = s4;
-      dst(5) = s5;
-      dst(6) = s6;
-      dst(7) = s7;
-    }
-    else
-    {
-      dst(0) += s0;
-      dst(1) += s1;
-      dst(2) += s2;
-      dst(3) += s3;
-      dst(4) += s4;
-      dst(5) += s5;
-      dst(6) += s6;
-      dst(7) += s7;
-    }
-  }
   else
-  {    
-    const number* e = this->data();
-    const unsigned int size_m = m(),
-		       size_n = n();
-    if (!adding)
-      {
-	for (unsigned int i=0; i<size_m; ++i)
-	  {
-	    number s = 0.;
-	    for (unsigned int j=0; j<size_n; ++j)
-	      s += number(src(j)) * *(e++);
-	    dst(i) = s;
-	  };
-      }
-    else
-      {
-	for (unsigned int i=0; i<size_m; ++i)
-	  {
-	    number s = 0.;
-	    for (unsigned int j=0; j<size_n; ++j)
-	      s += number(src(j)) * *(e++);
-	    dst(i) += s;
-	  }
-      }
-  }
+    {
+      for (unsigned int i=0; i<size_m; ++i)
+	{
+	  number2 s = 0.;
+	  for (unsigned int j=0; j<size_n; ++j)
+	    s += number2(src(j)) * number2(*(e++));
+	  dst(i) += s;
+	}
+    }
 }
 
 

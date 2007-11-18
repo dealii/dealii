@@ -118,110 +118,110 @@ FullMatrix<TYPEMAT>::residual<TYPEVEC,TYPERES>(Vector<TYPEVEC>&,
 
 
 
-// #undef TYPEMAT
+#undef TYPEMAT
 
-// #define TYPEMAT std::complex<double>
+#define TYPEMAT std::complex<double>
 
-// template class FullMatrix<TYPEMAT>;
+template class FullMatrix<TYPEMAT>;
 
-// template void FullMatrix<TYPEMAT>::print(
-//   LogStream&, const unsigned int, const unsigned int) const;
-// template void FullMatrix<TYPEMAT>::print(
-//   std::ostream&, const unsigned int, const unsigned int) const;
+template void FullMatrix<TYPEMAT>::print(
+  LogStream&, const unsigned int, const unsigned int) const;
+template void FullMatrix<TYPEMAT>::print(
+  std::ostream&, const unsigned int, const unsigned int) const;
 
-// template FullMatrix<TYPEMAT>& FullMatrix<TYPEMAT>::operator =(
-//   const FullMatrix<std::complex<float> >&);
+template FullMatrix<TYPEMAT>& FullMatrix<TYPEMAT>::operator =(
+  const FullMatrix<std::complex<float> >&);
 
-// #undef TYPEMAT2
-// #define TYPEMAT2 std::complex<double>
+#undef TYPEMAT2
+#define TYPEMAT2 std::complex<double>
 
-// template void FullMatrix<TYPEMAT>::fill<TYPEMAT2> (
-//   const FullMatrix<TYPEMAT2>&, unsigned, unsigned, unsigned, unsigned);
-// template void FullMatrix<TYPEMAT>::add<TYPEMAT2> (const TYPEMAT, const FullMatrix<TYPEMAT2>&);
-// template void FullMatrix<TYPEMAT>::add<TYPEMAT2> (const TYPEMAT, const FullMatrix<TYPEMAT2>&,
-// 						  const TYPEMAT, const FullMatrix<TYPEMAT2>&);
-// template void FullMatrix<TYPEMAT>::add<TYPEMAT2> (const TYPEMAT, const FullMatrix<TYPEMAT2>&,
-// 						  const TYPEMAT, const FullMatrix<TYPEMAT2>&,
-// 						  const TYPEMAT, const FullMatrix<TYPEMAT2>&);
-// template void FullMatrix<TYPEMAT>::add<TYPEMAT2> (
-//   const FullMatrix<TYPEMAT2>&, std::complex<double>, unsigned, unsigned, unsigned, unsigned);
-// template void FullMatrix<TYPEMAT>::Tadd<TYPEMAT2> (const TYPEMAT, const FullMatrix<TYPEMAT2>&);
-// template void FullMatrix<TYPEMAT>::Tadd<TYPEMAT2> (
-//   const FullMatrix<TYPEMAT2>&, std::complex<double>, unsigned, unsigned, unsigned, unsigned);
-// template void FullMatrix<TYPEMAT>::equ<TYPEMAT2> (const TYPEMAT, const FullMatrix<TYPEMAT2>&);
-// template void FullMatrix<TYPEMAT>::equ<TYPEMAT2> (const TYPEMAT, const FullMatrix<TYPEMAT2>&,
-// 						  const TYPEMAT, const FullMatrix<TYPEMAT2>&);
-// template void FullMatrix<TYPEMAT>::equ<TYPEMAT2> (const TYPEMAT, const FullMatrix<TYPEMAT2>&,
-// 						  const TYPEMAT, const FullMatrix<TYPEMAT2>&,
-// 						  const TYPEMAT, const FullMatrix<TYPEMAT2>&);
-// template void FullMatrix<TYPEMAT>::mmult<TYPEMAT2> (FullMatrix<TYPEMAT2>&, const FullMatrix<TYPEMAT2>&, const bool) const;
-// template void FullMatrix<TYPEMAT>::Tmmult<TYPEMAT2> (FullMatrix<TYPEMAT2>&, const FullMatrix<TYPEMAT2>&, const bool) const;
-// template void FullMatrix<TYPEMAT>::add_diag<TYPEMAT2> (const TYPEMAT, const FullMatrix<TYPEMAT2>&);
-// template void FullMatrix<TYPEMAT>::invert<TYPEMAT2> (const FullMatrix<TYPEMAT2>&);
-
-
-// #undef TYPEVEC
-// #undef TYPERES
-// #define TYPEVEC std::complex<double>
-// #define TYPERES std::complex<double>
-
-// template void FullMatrix<TYPEMAT>::fill_permutation<TYPEVEC> (
-//   const FullMatrix<TYPEVEC>&,
-//   const std::vector<unsigned int>&,
-//   const std::vector<unsigned int>&);
-// template void FullMatrix<TYPEMAT>::vmult<TYPEVEC>(
-//   Vector<TYPEVEC>&, const Vector<TYPEVEC>&, bool) const;
-// template void FullMatrix<TYPEMAT>::Tvmult<TYPEVEC>(
-//   Vector<TYPEVEC>&, const Vector<TYPEVEC>&, bool) const;
-// template std::complex<double> FullMatrix<TYPEMAT>::residual<TYPEVEC>(
-//   Vector<TYPEVEC>&, const Vector<TYPEVEC>&, const Vector<TYPERES>&) const;
-// template TYPEVEC FullMatrix<TYPEMAT>::matrix_norm_square<TYPEVEC> (
-//   const Vector<TYPEVEC> &) const;
-// template TYPEVEC FullMatrix<TYPEMAT>::matrix_scalar_product<TYPEVEC>(
-//   const Vector<TYPEVEC>&, const Vector<TYPEVEC>&) const;
-// template void FullMatrix<TYPEMAT>::forward<TYPEVEC>(
-//   Vector<TYPEVEC>&, const Vector<TYPEVEC>&) const;
-// template void FullMatrix<TYPEMAT>::backward<TYPEVEC>(
-//   Vector<TYPEVEC>&, const Vector<TYPEVEC>&) const;
-
-// template
-// void FullMatrix<TYPEMAT>::precondition_Jacobi<TYPEVEC> (
-//   Vector<TYPEVEC> &, const Vector<TYPEVEC> &, const TYPEMAT) const;
-
-// #undef TYPEVEC
-// #define TYPEVEC std::complex<float>
-
-// template void FullMatrix<TYPEMAT>::fill_permutation<TYPEVEC> (
-//   const FullMatrix<TYPEVEC>&,
-//   const std::vector<unsigned int>&,
-//   const std::vector<unsigned int>&);
-// template void FullMatrix<TYPEMAT>::vmult<TYPEVEC>(
-//   Vector<TYPEVEC>&, const Vector<TYPEVEC>&, bool) const;
-// template void FullMatrix<TYPEMAT>::Tvmult<TYPEVEC>(
-//   Vector<TYPEVEC>&, const Vector<TYPEVEC>&, bool) const;
-// template std::complex<double> FullMatrix<TYPEMAT>::residual<TYPEVEC>(
-//   Vector<TYPEVEC>&, const Vector<TYPEVEC>&, const Vector<TYPERES>&) const;
-// template TYPEVEC FullMatrix<TYPEMAT>::matrix_norm_square<TYPEVEC> (
-//   const Vector<TYPEVEC> &) const;
-// template TYPEVEC FullMatrix<TYPEMAT>::matrix_scalar_product<TYPEVEC>(
-//   const Vector<TYPEVEC>&, const Vector<TYPEVEC>&) const;
-// template void FullMatrix<TYPEMAT>::forward<TYPEVEC>(
-//   Vector<TYPEVEC>&, const Vector<TYPEVEC>&) const;
-// template void FullMatrix<TYPEMAT>::backward<TYPEVEC>(
-//   Vector<TYPEVEC>&, const Vector<TYPEVEC>&) const;
-// template
-// void FullMatrix<TYPEMAT>::precondition_Jacobi<TYPEVEC> (
-//   Vector<TYPEVEC> &, const Vector<TYPEVEC> &, const TYPEMAT) const;
+template void FullMatrix<TYPEMAT>::fill<TYPEMAT2> (
+  const FullMatrix<TYPEMAT2>&, unsigned, unsigned, unsigned, unsigned);
+template void FullMatrix<TYPEMAT>::add<TYPEMAT2> (const TYPEMAT, const FullMatrix<TYPEMAT2>&);
+template void FullMatrix<TYPEMAT>::add<TYPEMAT2> (const TYPEMAT, const FullMatrix<TYPEMAT2>&,
+						  const TYPEMAT, const FullMatrix<TYPEMAT2>&);
+template void FullMatrix<TYPEMAT>::add<TYPEMAT2> (const TYPEMAT, const FullMatrix<TYPEMAT2>&,
+						  const TYPEMAT, const FullMatrix<TYPEMAT2>&,
+						  const TYPEMAT, const FullMatrix<TYPEMAT2>&);
+template void FullMatrix<TYPEMAT>::add<TYPEMAT2> (
+  const FullMatrix<TYPEMAT2>&, std::complex<double>, unsigned, unsigned, unsigned, unsigned);
+template void FullMatrix<TYPEMAT>::Tadd<TYPEMAT2> (const TYPEMAT, const FullMatrix<TYPEMAT2>&);
+template void FullMatrix<TYPEMAT>::Tadd<TYPEMAT2> (
+  const FullMatrix<TYPEMAT2>&, std::complex<double>, unsigned, unsigned, unsigned, unsigned);
+template void FullMatrix<TYPEMAT>::equ<TYPEMAT2> (const TYPEMAT, const FullMatrix<TYPEMAT2>&);
+template void FullMatrix<TYPEMAT>::equ<TYPEMAT2> (const TYPEMAT, const FullMatrix<TYPEMAT2>&,
+						  const TYPEMAT, const FullMatrix<TYPEMAT2>&);
+template void FullMatrix<TYPEMAT>::equ<TYPEMAT2> (const TYPEMAT, const FullMatrix<TYPEMAT2>&,
+						  const TYPEMAT, const FullMatrix<TYPEMAT2>&,
+						  const TYPEMAT, const FullMatrix<TYPEMAT2>&);
+template void FullMatrix<TYPEMAT>::mmult<TYPEMAT2> (FullMatrix<TYPEMAT2>&, const FullMatrix<TYPEMAT2>&, const bool) const;
+template void FullMatrix<TYPEMAT>::Tmmult<TYPEMAT2> (FullMatrix<TYPEMAT2>&, const FullMatrix<TYPEMAT2>&, const bool) const;
+template void FullMatrix<TYPEMAT>::add_diag<TYPEMAT2> (const TYPEMAT, const FullMatrix<TYPEMAT2>&);
+template void FullMatrix<TYPEMAT>::invert<TYPEMAT2> (const FullMatrix<TYPEMAT2>&);
 
 
-// #undef TYPERES
-// #define TYPERES std::complex<float>
+#undef TYPEVEC
+#undef TYPERES
+#define TYPEVEC std::complex<double>
+#define TYPERES std::complex<double>
 
-// template
-// std::complex<double>
-// FullMatrix<TYPEMAT>::residual<TYPEVEC,TYPERES>(Vector<TYPEVEC>&,
-// 					       const Vector<TYPEVEC>&,
-// 					       const Vector<TYPERES>&) const;
+template void FullMatrix<TYPEMAT>::fill_permutation<TYPEVEC> (
+  const FullMatrix<TYPEVEC>&,
+  const std::vector<unsigned int>&,
+  const std::vector<unsigned int>&);
+template void FullMatrix<TYPEMAT>::vmult<TYPEVEC>(
+  Vector<TYPEVEC>&, const Vector<TYPEVEC>&, bool) const;
+template void FullMatrix<TYPEMAT>::Tvmult<TYPEVEC>(
+  Vector<TYPEVEC>&, const Vector<TYPEVEC>&, bool) const;
+template std::complex<double> FullMatrix<TYPEMAT>::residual<TYPEVEC>(
+  Vector<TYPEVEC>&, const Vector<TYPEVEC>&, const Vector<TYPERES>&) const;
+template TYPEVEC FullMatrix<TYPEMAT>::matrix_norm_square<TYPEVEC> (
+  const Vector<TYPEVEC> &) const;
+template TYPEVEC FullMatrix<TYPEMAT>::matrix_scalar_product<TYPEVEC>(
+  const Vector<TYPEVEC>&, const Vector<TYPEVEC>&) const;
+template void FullMatrix<TYPEMAT>::forward<TYPEVEC>(
+  Vector<TYPEVEC>&, const Vector<TYPEVEC>&) const;
+template void FullMatrix<TYPEMAT>::backward<TYPEVEC>(
+  Vector<TYPEVEC>&, const Vector<TYPEVEC>&) const;
+
+template
+void FullMatrix<TYPEMAT>::precondition_Jacobi<TYPEVEC> (
+  Vector<TYPEVEC> &, const Vector<TYPEVEC> &, const TYPEMAT) const;
+
+#undef TYPEVEC
+#define TYPEVEC std::complex<float>
+
+template void FullMatrix<TYPEMAT>::fill_permutation<TYPEVEC> (
+  const FullMatrix<TYPEVEC>&,
+  const std::vector<unsigned int>&,
+  const std::vector<unsigned int>&);
+template void FullMatrix<TYPEMAT>::vmult<TYPEVEC>(
+  Vector<TYPEVEC>&, const Vector<TYPEVEC>&, bool) const;
+template void FullMatrix<TYPEMAT>::Tvmult<TYPEVEC>(
+  Vector<TYPEVEC>&, const Vector<TYPEVEC>&, bool) const;
+template std::complex<double> FullMatrix<TYPEMAT>::residual<TYPEVEC>(
+  Vector<TYPEVEC>&, const Vector<TYPEVEC>&, const Vector<TYPERES>&) const;
+template TYPEVEC FullMatrix<TYPEMAT>::matrix_norm_square<TYPEVEC> (
+  const Vector<TYPEVEC> &) const;
+template TYPEVEC FullMatrix<TYPEMAT>::matrix_scalar_product<TYPEVEC>(
+  const Vector<TYPEVEC>&, const Vector<TYPEVEC>&) const;
+template void FullMatrix<TYPEMAT>::forward<TYPEVEC>(
+  Vector<TYPEVEC>&, const Vector<TYPEVEC>&) const;
+template void FullMatrix<TYPEMAT>::backward<TYPEVEC>(
+  Vector<TYPEVEC>&, const Vector<TYPEVEC>&) const;
+template
+void FullMatrix<TYPEMAT>::precondition_Jacobi<TYPEVEC> (
+  Vector<TYPEVEC> &, const Vector<TYPEVEC> &, const TYPEMAT) const;
+
+
+#undef TYPERES
+#define TYPERES std::complex<float>
+
+template
+std::complex<double>
+FullMatrix<TYPEMAT>::residual<TYPEVEC,TYPERES>(Vector<TYPEVEC>&,
+					       const Vector<TYPEVEC>&,
+					       const Vector<TYPERES>&) const;
 
 
 DEAL_II_NAMESPACE_CLOSE
