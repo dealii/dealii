@@ -22,7 +22,7 @@
 #include <vector>
 
 
-void test (Vector<double> &v)
+void test (Vector<number> &v)
 {
   FullMatrix<double> m(v.size(), v.size());
   for (unsigned int i=0; i<m.m(); ++i)
@@ -62,7 +62,7 @@ int main ()
 
   try
     {
-      Vector<double> v (100);
+      Vector<number> v (100);
       test (v);
     }
   catch (std::exception &exc)

@@ -28,7 +28,7 @@ check ()
 {
   FullMatrix<number> m;
   make_matrix (m);
-  Vector<double> v, w;
+  Vector<number> v, w;
   make_vector (v);
   make_vector (w);
 

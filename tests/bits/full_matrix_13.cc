@@ -28,7 +28,7 @@ check ()
 {
   FullMatrix<number> m;
   make_matrix (m);
-  Vector<double> v;
+  Vector<number> v;
   make_vector (v);
   
   deallog << m.matrix_norm_square (v) << std::endl;
