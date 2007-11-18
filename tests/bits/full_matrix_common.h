@@ -89,6 +89,17 @@ print_matrix (const FullMatrix<number> &m)
 
 
 
+template <typename number>
+void
+print_vector (const Vector<number> &v)
+{
+  for (unsigned int i=0; i<v.size(); ++i)
+    deallog << i << ' ' << v(i)
+	    << std::endl;
+}
+
+
+
 int
 main()
 {
