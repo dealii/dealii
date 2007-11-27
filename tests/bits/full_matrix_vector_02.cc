@@ -22,8 +22,8 @@
 #include <vector>
 
 
-void test (Vector<number> &v,
-           Vector<number> &w)
+void test (Vector<double> &v,
+           Vector<double> &w)
 {
   FullMatrix<double> m(v.size(), v.size());
   for (unsigned int i=0; i<m.m(); ++i)
@@ -64,8 +64,8 @@ int main ()
 
   try
     {
-      Vector<number> v (100);
-      Vector<number> w (100);
+      Vector<double> v (100);
+      Vector<double> w (100);
       test (v,w);
     }
   catch (std::exception &exc)
