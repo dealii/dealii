@@ -2,7 +2,7 @@
 //    $Id$
 //    Version: $Name$
 //
-//    Copyright (C) 2006 by the deal.II authors
+//    Copyright (C) 2006, 2007 by the deal.II authors
 //
 //    This file is subject to QPL and may not be  distributed
 //    without copyright and license information. Please refer
@@ -16,7 +16,7 @@
  *
  * This group contains a number of classes that act as geometric
  * primitives or primitives for other mathematical objects. For
- * example, the Tensor<rank,dim> class provides tensors of rank
+ * example, the Tensor @<rank,dim@> class provides tensors of rank
  * <code>rank</code> in <code>dim</code> space dimensions. Likewise,
  * the SymmetricTensor offers symmetric tensors.
  *
