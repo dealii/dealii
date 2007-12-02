@@ -139,10 +139,8 @@ split_string_list (const std::string &s,
 	}
       else
 	tmp = "";
-      
-      while ((name.length() != 0) &&
-	     (name[0] == ' '))
-	name.erase (0,1);
+
+      skip_space (name);
 
       while (name[name.length()-1] == ' ')
 	name.erase (name.length()-1, 1);
