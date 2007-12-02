@@ -174,7 +174,10 @@ bool is_real_token (const std::string &text,
 }
 
 
-// substitute all occurrences of #token in #text by #substitute
+// substitute all occurrences of #token in #text by #substitute. because a
+// replacement token could be a templated class like std::complex<double> and
+// because the token to the substituted may be a template argument itself, we
+// surround the substitution by a space which shouldn't matter in C++
 std::string substitute_tokens (const std::string &text,
 			       const std::string &token,
 			       const std::string &substitute)
@@ -185,8 +188,9 @@ std::string substitute_tokens (const std::string &text,
     {
       if (is_real_token (x_text, pos, token.size()))
 	{  
-	  x_text.replace (pos, token.size(), substitute);
-	  pos += substitute.size();
+	  x_text.replace (pos, token.size(),
+			  std::string(" ")+substitute+std::string(" "));
+	  pos += substitute.size()+2;
 	}
       else
 	++pos;
