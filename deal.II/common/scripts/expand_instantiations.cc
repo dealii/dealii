@@ -55,6 +55,8 @@ std::map<std::string, std::list<std::string> >  expansion_lists;
 
 
 
+/* ======================== auxiliary functions ================= */
+
 // extract from the start of #in the part of the string that ends with one of
 // the characters in #delim_list. The extracted part is deleted from #in
 std::string
@@ -74,6 +76,7 @@ get_substring_with_delim (std::string       &in,
 }
 
 
+// delete all whitespace at the beginning of the given argument
 void
 skip_space (std::string &in)
 {
@@ -85,6 +88,8 @@ skip_space (std::string &in)
 
 
 
+// read the whole file specified by the stream given as argument into a string
+// for simpler parsing, and return it
 std::string read_whole_file (std::istream &in)
 {
   std::string whole_file;
@@ -112,6 +117,8 @@ std::string read_whole_file (std::istream &in)
 
 
 
+// split a given string assumed to consist of a list of substrings delimited
+// by a particular character into its components
 std::list<std::string>
 split_string_list (const std::string &s,
 		   const char         delimiter)
@@ -148,6 +155,57 @@ split_string_list (const std::string &s,
 
 
 
+// determine whether a given substring at position #pos and length #length in
+// the string #text is a real token, i.e. not just part of another word
+bool is_real_token (const std::string &text,
+		    const std::string::size_type pos,
+		    const std::string::size_type length)
+{
+  static const std::string token_chars ("abcdefghijklmnopqrstuvwxyz"
+					"ABCDEFGHIJKLMNOPQRSTUVWXYZ"
+					"0123456789"
+					"_");
+  if ((pos != 0) && (token_chars.find (text[pos-1]) != std::string::npos))
+    return false;
+
+  if ((pos+length < text.size()) &&
+      (token_chars.find (text[pos+length]) != std::string::npos))
+    return false;
+
+  return true;
+}
+
+
+// substitute all occurrences of #token in #text by #substitute
+std::string substitute_tokens (const std::string &text,
+			       const std::string &token,
+			       const std::string &substitute)
+{
+  std::string x_text = text;
+  std::string::size_type pos = 0;
+  while ((pos = x_text.find(token, pos)) != std::string::npos)
+    {
+      if (is_real_token (x_text, pos, token.size()))
+	{  
+	  x_text.replace (pos, token.size(), substitute);
+	  pos += substitute.size();
+	}
+      else
+	++pos;
+    }
+  
+  return x_text;
+}
+
+
+
+/* ======================== the main functions ================= */
+
+
+// read and parse the expansion lists like
+//     REAL_SCALARS    := { double; float; long double }
+// as specified at the top of the file and store them in
+// the global expansion_lists variable
 void read_expansion_lists (const std::string &filename)
 {
   std::ifstream in (filename.c_str());
@@ -203,47 +261,9 @@ void read_expansion_lists (const std::string &filename)
 }
 
 
-bool is_real_token (const std::string &text,
-		    const std::string::size_type pos,
-		    const std::string::size_type length)
-{
-  static const std::string token_chars ("abcdefghijklmnopqrstuvwxyz"
-					"ABCDEFGHIJKLMNOPQRSTUVWXYZ"
-					"0123456789"
-					"_");
-  if ((pos != 0) && (token_chars.find (text[pos-1]) != std::string::npos))
-    return false;
 
-  if ((pos+length < text.size()) &&
-      (token_chars.find (text[pos+length]) != std::string::npos))
-    return false;
-
-  return true;
-}
-
-    
-std::string substitute_tokens (const std::string &text,
-			       const std::string &token,
-			       const std::string &substitute)
-{
-  std::string x_text = text;
-  std::string::size_type pos = 0;
-  while ((pos = x_text.find(token, pos)) != std::string::npos)
-    {
-      if (is_real_token (x_text, pos, token.size()))
-	{  
-	  x_text.replace (pos, token.size(), substitute);
-	  pos += substitute.size();
-	}
-      else
-	++pos;
-    }
-  
-  return x_text;
-}
-
-
-
+// produce all combinations of substitutions of the tokens given in the
+// #substitutions list in #text and output it to std::cout
 void substitute (const std::string &text,
 		 const std::list<std::pair<std::string, std::string> > &substitutions)
 {
@@ -297,6 +317,10 @@ void substitute (const std::string &text,
 
 
 
+// process the list of instantiations given in the form
+// --------------------
+// for (u,v:VECTORS; z:SCALARS) { f(u, z, const v &); }
+// --------------------
 void process_instantiations ()
 {
   std::string whole_file = read_whole_file (std::cin);
@@ -359,13 +383,6 @@ void process_instantiations ()
 						     names_and_type.back()));
 	}
 
-//       for (std::list<std::pair<std::string, std::string> >::const_iterator
-// 	     x = substitutions.begin(); x != substitutions.end(); ++x)
-// 	std::cout << x->first
-// 		  << "->"
-// 		  << x->second
-// 		  << std::endl;
-
 				       // now read the part in {...}
       skip_space (whole_file);
       if (whole_file.find ("{") != 0)
@@ -392,7 +409,7 @@ int main (int argc, char **argv)
   if (argc < 2)
     {
       std::cerr << "Usage: " << std::endl
-		<< "  expand_instantiations class_list_file < in_file > out_file"
+		<< "  expand_instantiations class_list_files < in_file > out_file"
 		<< std::endl;
       std::exit (1);
     }
