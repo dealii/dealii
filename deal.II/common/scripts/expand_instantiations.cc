@@ -1,5 +1,5 @@
 //----------------------------  expand_instantiations.cc  -------------------
-//    $Id: expand_instantiations.cc 8165 2003-10-24 22:34:01Z deal $
+//    $Id$
 //    Version: $Name$
 //
 //    Copyright (C) 2007 by the deal.II authors
