@@ -839,17 +839,6 @@ class FullMatrix : public Table<2,number>
 		   const unsigned int j);
 
 				     /**
-				      *  <i>A(i,i) +=
-				      *  B(i,1...n)</i>. Addition of
-				      *  complete rows of B to
-				      *  diagonal-elements of this ;
-				      *  <p> ( i = 1 ... m )
-				      */
-    template<typename number2>
-    void add_diag (const number               s,
-		   const FullMatrix<number2> &B);
-
-				     /**
 				      * Add constant to diagonal
 				      * elements of this, i.e. add a
 				      * multiple of the identity

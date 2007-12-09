@@ -17,6 +17,7 @@
 //TODO: this file has a lot of operations between matrices and matrices or matrices and vectors of different precision. we should go through the file and in each case pick the more accurate data type for intermediate results. currently, the choice is pretty much random. this may also allow us some operations where one operand is complex and the other is not
 
 #include <base/config.h>
+#include <base/template_constraints.h>
 #include <lac/vector.h>
 #include <lac/full_matrix.h>
 
@@ -132,8 +133,8 @@ FullMatrix<number>::operator *= (const number factor)
   Assert (numbers::is_finite(factor), 
           ExcMessage("The given value is not finite but either infinite or Not A Number (NaN)"));
 
-  number       *p = &this->el(0,0);
-  const number *e = &this->el(0,0) + n()*m();
+  number       *p = &(*this)(0,0);
+  const number *e = &(*this)(0,0) + n()*m();
   while (p != e)
     *p++ *= factor;
 
@@ -150,8 +151,8 @@ FullMatrix<number>::operator /= (const number factor)
   Assert (numbers::is_finite(factor), 
           ExcMessage("The given value is not finite but either infinite or Not A Number (NaN)"));
 
-  number       *p = &this->el(0,0);
-  const number *e = &this->el(0,0) + n()*m();
+  number       *p = &(*this)(0,0);
+  const number *e = &(*this)(0,0) + n()*m();
 
   const number factor_inv = number(1.)/factor;
 
@@ -229,7 +230,7 @@ void FullMatrix<number>::Tvmult (Vector<number2>       &dst,
 	{
 	  number s = 0.;
 	  for (unsigned int j=0; j<size_m; ++j)
-	    s += number(src(j)) * this->el(j,i);
+	    s += number(src(j)) * (*this)(j,i);
 	  dst(i) = s;
 	};
     }
@@ -239,7 +240,7 @@ void FullMatrix<number>::Tvmult (Vector<number2>       &dst,
 	{
 	  number s = 0.;
 	  for (unsigned int j=0; j<size_m; ++j)
-	    s += number(src(j)) * this->el(j,i);
+	    s += number(src(j)) * (*this)(j,i);
 	  dst(i) += s;
 	}
     }
@@ -267,7 +268,7 @@ number FullMatrix<number>::residual (Vector<number2>& dst,
     {
       number s = number(right(i));
       for (unsigned int j=0; j<size_m; ++j)
-	s -= number(src(j)) * this->el(i,j);
+	s -= number(src(j)) * (*this)(i,j);
       dst(i) = s;
       res += s*s;
     }
@@ -292,8 +293,8 @@ void FullMatrix<number>::forward (Vector<number2>       &dst,
     {
       number s = number(src(i));
       for (j=0; j<i; ++j)
-	s -= number(dst(j)) * this->el(i,j);
-      dst(i) = s/this->el(i,i);
+	s -= number(dst(j)) * (*this)(i,j);
+      dst(i) = s/(*this)(i,i);
     }
 }
 
@@ -312,8 +313,8 @@ void FullMatrix<number>::backward (Vector<number2>       &dst,
     {
       number2 s = src(i);
       for (j=i+1; j<nu; ++j)
-	s -= dst(j) * number2(this->el(i,j));
-      dst(i) = s/number2(this->el(i,i));
+	s -= dst(j) * number2((*this)(i,j));
+      dst(i) = s/number2((*this)(i,i));
     }
 }
 
@@ -362,7 +363,7 @@ void FullMatrix<number>::fill_permutation (const FullMatrix<number2> &src,
 
   for (unsigned int i=0;i<this->n_rows();++i)
     for (unsigned int j=0;j<this->n_cols();++j)
-      this->el(i,j) = src(p_rows[i], p_cols[j]);
+      (*this)(i,j) = src(p_rows[i], p_cols[j]);
 }
 
 
@@ -385,7 +386,7 @@ void FullMatrix<number>::add_row (const unsigned int i,
   Assert (!this->empty(), ExcEmptyMatrix());
   
   for (unsigned int k=0; k<m(); ++k)
-    this->el(i,k) += s*this->el(j,k);
+    (*this)(i,k) += s*(*this)(j,k);
 }
 
 
@@ -400,7 +401,7 @@ void FullMatrix<number>::add_row (const unsigned int i,
   
   const unsigned int size_m = m();
   for (unsigned l=0; l<size_m; ++l)
-    this->el(i,l) += s*this->el(j,l) + t*this->el(k,l);
+    (*this)(i,l) += s*(*this)(j,l) + t*(*this)(k,l);
 }
 
 
@@ -411,7 +412,7 @@ void FullMatrix<number>::add_col (const unsigned int i, const number s,
   Assert (!this->empty(), ExcEmptyMatrix());
   
   for (unsigned int k=0; k<n(); ++k)
-    this->el(k,i) += s*this->el(k,j);
+    (*this)(k,i) += s*(*this)(k,j);
 }
 
 
@@ -423,7 +424,7 @@ void FullMatrix<number>::add_col (const unsigned int i, const number s,
   Assert (!this->empty(), ExcEmptyMatrix());
   
   for (unsigned int l=0; l<n(); ++l)
-    this->el(l,i) += s*this->el(l,j) + t*this->el(l,k);
+    (*this)(l,i) += s*(*this)(l,j) + t*(*this)(l,k);
 }
 
 
@@ -436,7 +437,7 @@ void FullMatrix<number>::swap_row (const unsigned int i, const unsigned int j)
   number s;
   for (unsigned int k=0; k<m(); ++k)
   {
-    s = this->el(i,k); this->el(i,k) = this->el(j,k); this->el(j,k) = s;
+    s = (*this)(i,k); (*this)(i,k) = (*this)(j,k); (*this)(j,k) = s;
   }
 }
 
@@ -449,7 +450,7 @@ void FullMatrix<number>::swap_col (const unsigned int i, const unsigned int j)
   number s;
   for (unsigned int k=0; k<n(); ++k)
   {
-    s = this->el(k,i); this->el(k,i) = this->el(k,j); this->el(k,j) = s;
+    s = (*this)(k,i); (*this)(k,i) = (*this)(k,j); (*this)(k,j) = s;
   }
 }
 
@@ -461,7 +462,7 @@ void FullMatrix<number>::diagadd (const number src)
   Assert (m() == n(), ExcDimensionMismatch(m(),n()));
   
   for (unsigned int i=0; i<n(); ++i)
-    this->el(i,i) += src;
+    (*this)(i,i) += src;
 }
 
 
@@ -475,82 +476,9 @@ void FullMatrix<number>::equ (const number               a,
   Assert (m() == A.m(), ExcDimensionMismatch(m(), A.m()));
   Assert (n() == A.n(), ExcDimensionMismatch(n(), A.n()));
 
-  number* val = const_cast<number*> (this->data());
-  const number2* Aval = A.data();
-  
-  if ((n()==2) && (m()==2))
-    {
-      val[0]  = a * Aval[0];
-      val[1]  = a * Aval[1];
-      val[2]  = a * Aval[2];
-      val[3]  = a * Aval[3];
-    }
-  else if ((n()==3) && (m()==3))
-    {
-      val[0]  = a * Aval[0];
-      val[1]  = a * Aval[1];
-      val[2]  = a * Aval[2];
-      val[3]  = a * Aval[3];
-      val[4]  = a * Aval[4];
-      val[5]  = a * Aval[5];
-      val[6]  = a * Aval[6];
-      val[7]  = a * Aval[7];
-      val[8]  = a * Aval[8];
-    }
-  else if ((n()==4) && (m()==4))
-    {
-      val[0]  = a * Aval[0];
-      val[1]  = a * Aval[1];
-      val[2]  = a * Aval[2];
-      val[3]  = a * Aval[3];
-      val[4]  = a * Aval[4];
-      val[5]  = a * Aval[5];
-      val[6]  = a * Aval[6];
-      val[7]  = a * Aval[7];
-      val[8]  = a * Aval[8];
-      val[9]  = a * Aval[9];
-      val[10] = a * Aval[10];
-      val[11] = a * Aval[11];
-      val[12] = a * Aval[12];
-      val[13] = a * Aval[13];
-      val[14] = a * Aval[14];
-      val[15] = a * Aval[15];
-    }
-  else if ((n()==5) && (m()==5))
-    {
-      val[0]  = a * Aval[0];
-      val[1]  = a * Aval[1];
-      val[2]  = a * Aval[2];
-      val[3]  = a * Aval[3];
-      val[4]  = a * Aval[4];
-      val[5]  = a * Aval[5];
-      val[6]  = a * Aval[6];
-      val[7]  = a * Aval[7];
-      val[8]  = a * Aval[8];
-      val[9]  = a * Aval[9];
-      val[10] = a * Aval[10];
-      val[11] = a * Aval[11];
-      val[12] = a * Aval[12];
-      val[13] = a * Aval[13];
-      val[14] = a * Aval[14];
-      val[15] = a * Aval[15];
-      val[16] = a * Aval[16];
-      val[17] = a * Aval[17];
-      val[18] = a * Aval[18];
-      val[19] = a * Aval[19];
-
-      val[20] = a * Aval[20];
-      val[21] = a * Aval[21];
-      val[22] = a * Aval[22];
-      val[23] = a * Aval[23];
-      val[24] = a * Aval[24];
-    }
-  else
-    {
-      const unsigned int size = n()*m();
-      for (unsigned int i=0; i<size; i++)
-        val[i] = a * Aval[i];
-    }
+  for (unsigned int i=0; i<n(); ++i)
+    for (unsigned int j=0; j<m(); ++j)
+      (*this)(i,j) = a * number(A(i,j));
 }
 
 
@@ -569,83 +497,9 @@ FullMatrix<number>::equ (const number               a,
   Assert (m() == B.m(), ExcDimensionMismatch(m(), B.m()));
   Assert (n() == B.n(), ExcDimensionMismatch(n(), B.n()));
 
-  number* val = const_cast<number*> (this->data());
-  const number2* Aval = A.data();
-  const number2* Bval = B.data();
-  
-  if ((n()==2) && (m()==2))
-    {
-      val[0]  = a * Aval[0]  + b * Bval[0];
-      val[1]  = a * Aval[1]  + b * Bval[1];
-      val[2]  = a * Aval[2]  + b * Bval[2];
-      val[3]  = a * Aval[3]  + b * Bval[3];
-    }
-  else if ((n()==3) && (m()==3))
-    {
-      val[0]  = a * Aval[0]  + b * Bval[0];
-      val[1]  = a * Aval[1]  + b * Bval[1];
-      val[2]  = a * Aval[2]  + b * Bval[2];
-      val[3]  = a * Aval[3]  + b * Bval[3];
-      val[4]  = a * Aval[4]  + b * Bval[4];
-      val[5]  = a * Aval[5]  + b * Bval[5];
-      val[6]  = a * Aval[6]  + b * Bval[6];
-      val[7]  = a * Aval[7]  + b * Bval[7];
-      val[8]  = a * Aval[8]  + b * Bval[8];
-    }
-  else if ((n()==4) && (m()==4))
-    {
-      val[0]  = a * Aval[0]  + b * Bval[0];
-      val[1]  = a * Aval[1]  + b * Bval[1];
-      val[2]  = a * Aval[2]  + b * Bval[2];
-      val[3]  = a * Aval[3]  + b * Bval[3];
-      val[4]  = a * Aval[4]  + b * Bval[4];
-      val[5]  = a * Aval[5]  + b * Bval[5];
-      val[6]  = a * Aval[6]  + b * Bval[6];
-      val[7]  = a * Aval[7]  + b * Bval[7];
-      val[8]  = a * Aval[8]  + b * Bval[8];
-      val[9]  = a * Aval[9]  + b * Bval[9];
-      val[10] = a * Aval[10] + b * Bval[10];
-      val[11] = a * Aval[11] + b * Bval[11];
-      val[12] = a * Aval[12] + b * Bval[12];
-      val[13] = a * Aval[13] + b * Bval[13];
-      val[14] = a * Aval[14] + b * Bval[14];
-      val[15] = a * Aval[15] + b * Bval[15];
-    }
-  else if ((n()==5) && (m()==5))
-    {
-      val[0]  = a * Aval[0]  + b * Bval[0];
-      val[1]  = a * Aval[1]  + b * Bval[1];
-      val[2]  = a * Aval[2]  + b * Bval[2];
-      val[3]  = a * Aval[3]  + b * Bval[3];
-      val[4]  = a * Aval[4]  + b * Bval[4];
-      val[5]  = a * Aval[5]  + b * Bval[5];
-      val[6]  = a * Aval[6]  + b * Bval[6];
-      val[7]  = a * Aval[7]  + b * Bval[7];
-      val[8]  = a * Aval[8]  + b * Bval[8];
-      val[9]  = a * Aval[9]  + b * Bval[9];
-      val[10] = a * Aval[10] + b * Bval[10];
-      val[11] = a * Aval[11] + b * Bval[11];
-      val[12] = a * Aval[12] + b * Bval[12];
-      val[13] = a * Aval[13] + b * Bval[13];
-      val[14] = a * Aval[14] + b * Bval[14];
-      val[15] = a * Aval[15] + b * Bval[15];
-      val[16] = a * Aval[16] + b * Bval[16];
-      val[17] = a * Aval[17] + b * Bval[17];
-      val[18] = a * Aval[18] + b * Bval[18];
-      val[19] = a * Aval[19] + b * Bval[19];
-
-      val[20] = a * Aval[20] + b * Bval[20];
-      val[21] = a * Aval[21] + b * Bval[21];
-      val[22] = a * Aval[22] + b * Bval[22];
-      val[23] = a * Aval[23] + b * Bval[23];
-      val[24] = a * Aval[24] + b * Bval[24];
-    }
-  else
-    {
-      const unsigned int size = n()*m();
-      for (unsigned int i=0; i<size; i++)
-        val[i] = a * Aval[i] + b * Bval[i];
-    }
+  for (unsigned int i=0; i<n(); ++i)
+    for (unsigned int j=0; j<m(); ++j)
+      (*this)(i,j) = a * number(A(i,j)) + b * number(B(i,j));
 }
 
 
@@ -668,84 +522,11 @@ FullMatrix<number>::equ (const number               a,
   Assert (m() == C.m(), ExcDimensionMismatch(m(), C.m()));
   Assert (n() == C.n(), ExcDimensionMismatch(n(), C.n()));
 
-  number* val = const_cast<number*> (this->data());
-  const number2* Aval = A.data();
-  const number2* Bval = B.data();
-  const number2* Cval = C.data();
-  
-  if ((n()==2) && (m()==2))
-    {
-      val[0]  = a * Aval[0]  + b * Bval[0]  + c * Cval[0];
-      val[1]  = a * Aval[1]  + b * Bval[1]  + c * Cval[1];
-      val[2]  = a * Aval[2]  + b * Bval[2]  + c * Cval[2];
-      val[3]  = a * Aval[3]  + b * Bval[3]  + c * Cval[3];
-    }
-  else if ((n()==3) && (m()==3))
-    {
-      val[0]  = a * Aval[0]  + b * Bval[0]  + c * Cval[0];
-      val[1]  = a * Aval[1]  + b * Bval[1]  + c * Cval[1];
-      val[2]  = a * Aval[2]  + b * Bval[2]  + c * Cval[2];
-      val[3]  = a * Aval[3]  + b * Bval[3]  + c * Cval[3];
-      val[4]  = a * Aval[4]  + b * Bval[4]  + c * Cval[4];
-      val[5]  = a * Aval[5]  + b * Bval[5]  + c * Cval[5];
-      val[6]  = a * Aval[6]  + b * Bval[6]  + c * Cval[6];
-      val[7]  = a * Aval[7]  + b * Bval[7]  + c * Cval[7];
-      val[8]  = a * Aval[8]  + b * Bval[8]  + c * Cval[8];
-    }
-  else if ((n()==4) && (m()==4))
-    {
-      val[0]  = a * Aval[0]  + b * Bval[0]  + c * Cval[0];
-      val[1]  = a * Aval[1]  + b * Bval[1]  + c * Cval[1];
-      val[2]  = a * Aval[2]  + b * Bval[2]  + c * Cval[2];
-      val[3]  = a * Aval[3]  + b * Bval[3]  + c * Cval[3];
-      val[4]  = a * Aval[4]  + b * Bval[4]  + c * Cval[4];
-      val[5]  = a * Aval[5]  + b * Bval[5]  + c * Cval[5];
-      val[6]  = a * Aval[6]  + b * Bval[6]  + c * Cval[6];
-      val[7]  = a * Aval[7]  + b * Bval[7]  + c * Cval[7];
-      val[8]  = a * Aval[8]  + b * Bval[8]  + c * Cval[8];
-      val[9]  = a * Aval[9]  + b * Bval[9]  + c * Cval[9];
-      val[10] = a * Aval[10] + b * Bval[10] + c * Cval[10];
-      val[11] = a * Aval[11] + b * Bval[11] + c * Cval[11];
-      val[12] = a * Aval[12] + b * Bval[12] + c * Cval[12];
-      val[13] = a * Aval[13] + b * Bval[13] + c * Cval[13];
-      val[14] = a * Aval[14] + b * Bval[14] + c * Cval[14];
-      val[15] = a * Aval[15] + b * Bval[15] + c * Cval[15];
-    }
-  else if ((n()==5) && (m()==5))
-    {
-      val[0]  = a * Aval[0]  + b * Bval[0]  + c * Cval[0];
-      val[1]  = a * Aval[1]  + b * Bval[1]  + c * Cval[1];
-      val[2]  = a * Aval[2]  + b * Bval[2]  + c * Cval[2];
-      val[3]  = a * Aval[3]  + b * Bval[3]  + c * Cval[3];
-      val[4]  = a * Aval[4]  + b * Bval[4]  + c * Cval[4];
-      val[5]  = a * Aval[5]  + b * Bval[5]  + c * Cval[5];
-      val[6]  = a * Aval[6]  + b * Bval[6]  + c * Cval[6];
-      val[7]  = a * Aval[7]  + b * Bval[7]  + c * Cval[7];
-      val[8]  = a * Aval[8]  + b * Bval[8]  + c * Cval[8];
-      val[9]  = a * Aval[9]  + b * Bval[9]  + c * Cval[9];
-      val[10] = a * Aval[10] + b * Bval[10] + c * Cval[10];
-      val[11] = a * Aval[11] + b * Bval[11] + c * Cval[11];
-      val[12] = a * Aval[12] + b * Bval[12] + c * Cval[12];
-      val[13] = a * Aval[13] + b * Bval[13] + c * Cval[13];
-      val[14] = a * Aval[14] + b * Bval[14] + c * Cval[14];
-      val[15] = a * Aval[15] + b * Bval[15] + c * Cval[15];
-      val[16] = a * Aval[16] + b * Bval[16] + c * Cval[16];
-      val[17] = a * Aval[17] + b * Bval[17] + c * Cval[17];
-      val[18] = a * Aval[18] + b * Bval[18] + c * Cval[18];
-      val[19] = a * Aval[19] + b * Bval[19] + c * Cval[19];
-
-      val[20] = a * Aval[20] + b * Bval[20] + c * Cval[20];
-      val[21] = a * Aval[21] + b * Bval[21] + c * Cval[21];
-      val[22] = a * Aval[22] + b * Bval[22] + c * Cval[22];
-      val[23] = a * Aval[23] + b * Bval[23] + c * Cval[23];
-      val[24] = a * Aval[24] + b * Bval[24] + c * Cval[24];
-    }
-  else
-    {
-      const unsigned int size = n()*m();
-      for (unsigned int i=0; i<size; i++)
-        val[i] = a * Aval[i] + b * Bval[i] + c * Cval[i];
-    }
+  for (unsigned int i=0; i<n(); ++i)
+    for (unsigned int j=0; j<m(); ++j)
+      (*this)(i,j) = a * number(A(i,j)) +
+		     b * number(B(i,j)) +
+		     c * number(C(i,j));
 }
 
 
@@ -765,19 +546,19 @@ void FullMatrix<number>::mmult (FullMatrix<number2>       &dst,
     for (unsigned int i=0; i<m(); i++)
       for (unsigned int j=0; j<src.n(); j++)
 	{
-	  number2 s = 0.;
+	  number s = 0.;
 	  for (unsigned k=0; k<n(); k++)
-	    s+= this->el(i,k) * src.el(k,j);
-	  dst.el(i,j) = s;
+	    s += (*this)(i,k) * number(src(k,j));
+	  dst(i,j) = s;
 	}
   else
     for (unsigned int i=0; i<m(); i++)
       for (unsigned int j=0; j<src.n(); j++)
 	{
-	  number2 s = 0.;
+	  number s = 0.;
 	  for (unsigned k=0; k<n(); k++)
-	    s+= this->el(i,k) * src.el(k,j);
-	  dst.el(i,j) += s;
+	    s += (*this)(i,k) * number(src(k,j));
+	  dst(i,j) += s;
 	}
 }
 
@@ -798,19 +579,19 @@ void FullMatrix<number>::Tmmult (FullMatrix<number2>       &dst,
     for (unsigned int i=0; i<n(); i++)
       for (unsigned int j=0; j<src.n(); j++)
 	{
-	  number2 s = 0;
+	  number s = 0;
 	  for (unsigned int k=0; k<m(); k++)
-	    s += this->el(k,i) * src.el(k,j);
-	  dst.el(i,j) = s;
+	    s += (*this)(k,i) * number(src(k,j));
+	  dst(i,j) = s;
 	}
   else
     for (unsigned int i=0; i<n(); i++)
       for (unsigned int j=0; j<src.n(); j++)
 	{
-	  number2 s = 0;
+	  number s = 0;
 	  for (unsigned int k=0; k<m(); k++)
-	    s += this->el(k,i) * src.el(k,j);
-	  dst.el(i,j) += s;
+	    s += (*this)(k,i) * number(src(k,j));
+	  dst(i,j) += s;
 	}
 }
 
@@ -889,8 +670,8 @@ FullMatrix<number>::symmetrize ()
   for (unsigned int i=0; i<N; ++i)
     for (unsigned int j=i+1; j<N; ++j)
       {
-	const number t = (this->el(i,j) + this->el(j,i)) / number(2.);
-	this->el(i,j) = this->el(j,i) = t;
+	const number t = ((*this)(i,j) + (*this)(j,i)) / number(2.);
+	(*this)(i,j) = (*this)(j,i) = t;
       };
 }
 
@@ -908,7 +689,7 @@ FullMatrix<number>::l1_norm () const
     {
       sum=0;
       for (unsigned int row=0; row<n_rows; ++row)
-	sum += std::abs(this->el(row,col));
+	sum += std::abs((*this)(row,col));
       if (sum > max)
 	max = sum;
     }
@@ -930,7 +711,7 @@ FullMatrix<number>::linfty_norm () const
     {
       sum=0;
       for (unsigned int col=0; col<n_cols; ++col)
-	sum += std::abs(this->el(row,col));
+	sum += std::abs((*this)(row,col));
       if (sum > max)
 	max = sum;
     }
@@ -950,154 +731,9 @@ FullMatrix<number>::add (const number               a,
   Assert (m() == A.m(), ExcDimensionMismatch(m(), A.m()));
   Assert (n() == A.n(), ExcDimensionMismatch(n(), A.n()));
 
-  number* val = const_cast<number*> (this->data());
-  const number2* Aval = A.data();
-  
-  if ((n()==2) && (m()==2))
-    {
-      val[0]  += a * Aval[0];
-      val[1]  += a * Aval[1];
-      val[2]  += a * Aval[2];
-      val[3]  += a * Aval[3];
-    }
-  else if ((n()==3) && (m()==3))
-    {
-      val[0]  += a * Aval[0];
-      val[1]  += a * Aval[1];
-      val[2]  += a * Aval[2];
-      val[3]  += a * Aval[3];
-      val[4]  += a * Aval[4];
-      val[5]  += a * Aval[5];
-      val[6]  += a * Aval[6];
-      val[7]  += a * Aval[7];
-      val[8]  += a * Aval[8];
-    }
-  else if ((n()==4) && (m()==4))
-    {
-      val[0]  += a * Aval[0];
-      val[1]  += a * Aval[1];
-      val[2]  += a * Aval[2];
-      val[3]  += a * Aval[3];
-      val[4]  += a * Aval[4];
-      val[5]  += a * Aval[5];
-      val[6]  += a * Aval[6];
-      val[7]  += a * Aval[7];
-      val[8]  += a * Aval[8];
-      val[9]  += a * Aval[9];
-      val[10] += a * Aval[10];
-      val[11] += a * Aval[11];
-      val[12] += a * Aval[12];
-      val[13] += a * Aval[13];
-      val[14] += a * Aval[14];
-      val[15] += a * Aval[15];
-    }
-  else if ((n()==5) && (m()==5))
-    {
-      val[0]  += a * Aval[0];
-      val[1]  += a * Aval[1];
-      val[2]  += a * Aval[2];
-      val[3]  += a * Aval[3];
-      val[4]  += a * Aval[4];
-      val[5]  += a * Aval[5];
-      val[6]  += a * Aval[6];
-      val[7]  += a * Aval[7];
-      val[8]  += a * Aval[8];
-      val[9]  += a * Aval[9];
-      val[10] += a * Aval[10];
-      val[11] += a * Aval[11];
-      val[12] += a * Aval[12];
-      val[13] += a * Aval[13];
-      val[14] += a * Aval[14];
-      val[15] += a * Aval[15];
-      val[16] += a * Aval[16];
-      val[17] += a * Aval[17];
-      val[18] += a * Aval[18];
-      val[19] += a * Aval[19];
-
-      val[20] += a * Aval[20];
-      val[21] += a * Aval[21];
-      val[22] += a * Aval[22];
-      val[23] += a * Aval[23];
-      val[24] += a * Aval[24];
-    }
-  else if ((n()==8) && (m()==8))
-    {
-      val[0]  += a * Aval[0];
-      val[1]  += a * Aval[1];
-      val[2]  += a * Aval[2];
-      val[3]  += a * Aval[3];
-      val[4]  += a * Aval[4];
-      val[5]  += a * Aval[5];
-      val[6]  += a * Aval[6];
-      val[7]  += a * Aval[7];
-      val[8]  += a * Aval[8];
-      val[9]  += a * Aval[9];
-      val[10] += a * Aval[10];
-      val[11] += a * Aval[11];
-      val[12] += a * Aval[12];
-      val[13] += a * Aval[13];
-      val[14] += a * Aval[14];
-      val[15] += a * Aval[15];
-      val[16] += a * Aval[16];
-      val[17] += a * Aval[17];
-      val[18] += a * Aval[18];
-      val[19] += a * Aval[19];
-
-      val[20] += a * Aval[20];
-      val[21] += a * Aval[21];
-      val[22] += a * Aval[22];
-      val[23] += a * Aval[23];
-      val[24] += a * Aval[24];
-      val[25] += a * Aval[25];
-      val[26] += a * Aval[26];
-      val[27] += a * Aval[27];
-      val[28] += a * Aval[28];
-      val[29] += a * Aval[29];
-
-      val[30] += a * Aval[30];
-      val[31] += a * Aval[31];
-      val[32] += a * Aval[32];
-      val[33] += a * Aval[33];
-      val[34] += a * Aval[34];
-      val[35] += a * Aval[35];
-      val[36] += a * Aval[36];
-      val[37] += a * Aval[37];
-      val[38] += a * Aval[38];
-      val[39] += a * Aval[39];
-
-      val[40] += a * Aval[40];
-      val[41] += a * Aval[41];
-      val[42] += a * Aval[42];
-      val[43] += a * Aval[43];
-      val[44] += a * Aval[44];
-      val[45] += a * Aval[45];
-      val[46] += a * Aval[46];
-      val[47] += a * Aval[47];
-      val[48] += a * Aval[48];
-      val[49] += a * Aval[49];
-
-      val[50] += a * Aval[50];
-      val[51] += a * Aval[51];
-      val[52] += a * Aval[52];
-      val[53] += a * Aval[53];
-      val[54] += a * Aval[54];
-      val[55] += a * Aval[55];
-      val[56] += a * Aval[56];
-      val[57] += a * Aval[57];
-      val[58] += a * Aval[58];
-      val[59] += a * Aval[59];
-
-      val[60] += a * Aval[60];
-      val[61] += a * Aval[61];
-      val[62] += a * Aval[62];
-      val[63] += a * Aval[63];
-    }
-  else
-    {
-      const unsigned int size = n()*m();
-      for (unsigned int i=0; i<size; i++)
-        val[i] += a * Aval[i];
-    }
+  for (unsigned int i=0; i<n(); ++i)
+    for (unsigned int j=0; j<m(); ++j)
+      (*this)(i,j) += a * number(A(i,j));
 }
 
 
@@ -1116,155 +752,9 @@ FullMatrix<number>::add (const number               a,
   Assert (m() == B.m(), ExcDimensionMismatch(m(), B.m()));
   Assert (n() == B.n(), ExcDimensionMismatch(n(), B.n()));
 
-  number* val = const_cast<number*> (this->data());
-  const number2* Aval = A.data();
-  const number2* Bval = B.data();
-  
-  if ((n()==2) && (m()==2))
-    {
-      val[0]  += a * Aval[0]  + b * Bval[0];
-      val[1]  += a * Aval[1]  + b * Bval[1];
-      val[2]  += a * Aval[2]  + b * Bval[2];
-      val[3]  += a * Aval[3]  + b * Bval[3];
-    }
-  else if ((n()==3) && (m()==3))
-    {
-      val[0]  += a * Aval[0]  + b * Bval[0];
-      val[1]  += a * Aval[1]  + b * Bval[1];
-      val[2]  += a * Aval[2]  + b * Bval[2];
-      val[3]  += a * Aval[3]  + b * Bval[3];
-      val[4]  += a * Aval[4]  + b * Bval[4];
-      val[5]  += a * Aval[5]  + b * Bval[5];
-      val[6]  += a * Aval[6]  + b * Bval[6];
-      val[7]  += a * Aval[7]  + b * Bval[7];
-      val[8]  += a * Aval[8]  + b * Bval[8];
-    }
-  else if ((n()==4) && (m()==4))
-    {
-      val[0]  += a * Aval[0]  + b * Bval[0];
-      val[1]  += a * Aval[1]  + b * Bval[1];
-      val[2]  += a * Aval[2]  + b * Bval[2];
-      val[3]  += a * Aval[3]  + b * Bval[3];
-      val[4]  += a * Aval[4]  + b * Bval[4];
-      val[5]  += a * Aval[5]  + b * Bval[5];
-      val[6]  += a * Aval[6]  + b * Bval[6];
-      val[7]  += a * Aval[7]  + b * Bval[7];
-      val[8]  += a * Aval[8]  + b * Bval[8];
-      val[9]  += a * Aval[9]  + b * Bval[9];
-      val[10] += a * Aval[10] + b * Bval[10];
-      val[11] += a * Aval[11] + b * Bval[11];
-      val[12] += a * Aval[12] + b * Bval[12];
-      val[13] += a * Aval[13] + b * Bval[13];
-      val[14] += a * Aval[14] + b * Bval[14];
-      val[15] += a * Aval[15] + b * Bval[15];
-    }
-  else if ((n()==5) && (m()==5))
-    {
-      val[0]  += a * Aval[0]  + b * Bval[0];
-      val[1]  += a * Aval[1]  + b * Bval[1];
-      val[2]  += a * Aval[2]  + b * Bval[2];
-      val[3]  += a * Aval[3]  + b * Bval[3];
-      val[4]  += a * Aval[4]  + b * Bval[4];
-      val[5]  += a * Aval[5]  + b * Bval[5];
-      val[6]  += a * Aval[6]  + b * Bval[6];
-      val[7]  += a * Aval[7]  + b * Bval[7];
-      val[8]  += a * Aval[8]  + b * Bval[8];
-      val[9]  += a * Aval[9]  + b * Bval[9];
-      val[10] += a * Aval[10] + b * Bval[10];
-      val[11] += a * Aval[11] + b * Bval[11];
-      val[12] += a * Aval[12] + b * Bval[12];
-      val[13] += a * Aval[13] + b * Bval[13];
-      val[14] += a * Aval[14] + b * Bval[14];
-      val[15] += a * Aval[15] + b * Bval[15];
-      val[16] += a * Aval[16] + b * Bval[16];
-      val[17] += a * Aval[17] + b * Bval[17];
-      val[18] += a * Aval[18] + b * Bval[18];
-      val[19] += a * Aval[19] + b * Bval[19];
-
-      val[20] += a * Aval[20] + b * Bval[20];
-      val[21] += a * Aval[21] + b * Bval[21];
-      val[22] += a * Aval[22] + b * Bval[22];
-      val[23] += a * Aval[23] + b * Bval[23];
-      val[24] += a * Aval[24] + b * Bval[24];
-    }
-  else if ((n()==8) && (m()==8))
-    {
-      val[0]  += a * Aval[0]  + b * Bval[0];
-      val[1]  += a * Aval[1]  + b * Bval[1];
-      val[2]  += a * Aval[2]  + b * Bval[2];
-      val[3]  += a * Aval[3]  + b * Bval[3];
-      val[4]  += a * Aval[4]  + b * Bval[4];
-      val[5]  += a * Aval[5]  + b * Bval[5];
-      val[6]  += a * Aval[6]  + b * Bval[6];
-      val[7]  += a * Aval[7]  + b * Bval[7];
-      val[8]  += a * Aval[8]  + b * Bval[8];
-      val[9]  += a * Aval[9]  + b * Bval[9];
-      val[10] += a * Aval[10] + b * Bval[10];
-      val[11] += a * Aval[11] + b * Bval[11];
-      val[12] += a * Aval[12] + b * Bval[12];
-      val[13] += a * Aval[13] + b * Bval[13];
-      val[14] += a * Aval[14] + b * Bval[14];
-      val[15] += a * Aval[15] + b * Bval[15];
-      val[16] += a * Aval[16] + b * Bval[16];
-      val[17] += a * Aval[17] + b * Bval[17];
-      val[18] += a * Aval[18] + b * Bval[18];
-      val[19] += a * Aval[19] + b * Bval[19];
-
-      val[20] += a * Aval[20] + b * Bval[20];
-      val[21] += a * Aval[21] + b * Bval[21];
-      val[22] += a * Aval[22] + b * Bval[22];
-      val[23] += a * Aval[23] + b * Bval[23];
-      val[24] += a * Aval[24] + b * Bval[24];
-      val[25] += a * Aval[25] + b * Bval[25];
-      val[26] += a * Aval[26] + b * Bval[26];
-      val[27] += a * Aval[27] + b * Bval[27];
-      val[28] += a * Aval[28] + b * Bval[28];
-      val[29] += a * Aval[29] + b * Bval[29];
-
-      val[30] += a * Aval[30] + b * Bval[30];
-      val[31] += a * Aval[31] + b * Bval[31];
-      val[32] += a * Aval[32] + b * Bval[32];
-      val[33] += a * Aval[33] + b * Bval[33];
-      val[34] += a * Aval[34] + b * Bval[34];
-      val[35] += a * Aval[35] + b * Bval[35];
-      val[36] += a * Aval[36] + b * Bval[36];
-      val[37] += a * Aval[37] + b * Bval[37];
-      val[38] += a * Aval[38] + b * Bval[38];
-      val[39] += a * Aval[39] + b * Bval[39];
-
-      val[40] += a * Aval[40] + b * Bval[40];
-      val[41] += a * Aval[41] + b * Bval[41];
-      val[42] += a * Aval[42] + b * Bval[42];
-      val[43] += a * Aval[43] + b * Bval[43];
-      val[44] += a * Aval[44] + b * Bval[44];
-      val[45] += a * Aval[45] + b * Bval[45];
-      val[46] += a * Aval[46] + b * Bval[46];
-      val[47] += a * Aval[47] + b * Bval[47];
-      val[48] += a * Aval[48] + b * Bval[48];
-      val[49] += a * Aval[49] + b * Bval[49];
-
-      val[50] += a * Aval[50] + b * Bval[50];
-      val[51] += a * Aval[51] + b * Bval[51];
-      val[52] += a * Aval[52] + b * Bval[52];
-      val[53] += a * Aval[53] + b * Bval[53];
-      val[54] += a * Aval[54] + b * Bval[54];
-      val[55] += a * Aval[55] + b * Bval[55];
-      val[56] += a * Aval[56] + b * Bval[56];
-      val[57] += a * Aval[57] + b * Bval[57];
-      val[58] += a * Aval[58] + b * Bval[58];
-      val[59] += a * Aval[59] + b * Bval[59];
-
-      val[60] += a * Aval[60] + b * Bval[60];
-      val[61] += a * Aval[61] + b * Bval[61];
-      val[62] += a * Aval[62] + b * Bval[62];
-      val[63] += a * Aval[63] + b * Bval[63];
-    }
-  else
-    {
-      const unsigned int size = n()*m();
-      for (unsigned int i=0; i<size; i++)
-        val[i] += a * Aval[i] + b * Bval[i];
-    }
+  for (unsigned int i=0; i<n(); ++i)
+    for (unsigned int j=0; j<m(); ++j)
+      (*this)(i,j) += a * number(A(i,j)) + b * number(B(i,j));
 }
 
 
@@ -1288,156 +778,12 @@ FullMatrix<number>::add (const number               a,
   Assert (m() == C.m(), ExcDimensionMismatch(m(), C.m()));
   Assert (n() == C.n(), ExcDimensionMismatch(n(), C.n()));
 
-  number* val = const_cast<number*> (this->data());
-  const number2* Aval = A.data();
-  const number2* Bval = B.data();
-  const number2* Cval = C.data();
-  
-  if ((n()==2) && (m()==2))
-    {
-      val[0]  += a * Aval[0]  + b * Bval[0]  + c * Cval[0];
-      val[1]  += a * Aval[1]  + b * Bval[1]  + c * Cval[1];
-      val[2]  += a * Aval[2]  + b * Bval[2]  + c * Cval[2];
-      val[3]  += a * Aval[3]  + b * Bval[3]  + c * Cval[3];
-    }
-  else if ((n()==3) && (m()==3))
-    {
-      val[0]  += a * Aval[0]  + b * Bval[0]  + c * Cval[0];
-      val[1]  += a * Aval[1]  + b * Bval[1]  + c * Cval[1];
-      val[2]  += a * Aval[2]  + b * Bval[2]  + c * Cval[2];
-      val[3]  += a * Aval[3]  + b * Bval[3]  + c * Cval[3];
-      val[4]  += a * Aval[4]  + b * Bval[4]  + c * Cval[4];
-      val[5]  += a * Aval[5]  + b * Bval[5]  + c * Cval[5];
-      val[6]  += a * Aval[6]  + b * Bval[6]  + c * Cval[6];
-      val[7]  += a * Aval[7]  + b * Bval[7]  + c * Cval[7];
-      val[8]  += a * Aval[8]  + b * Bval[8]  + c * Cval[8];
-    }
-  else if ((n()==4) && (m()==4))
-    {
-      val[0]  += a * Aval[0]  + b * Bval[0]  + c * Cval[0];
-      val[1]  += a * Aval[1]  + b * Bval[1]  + c * Cval[1];
-      val[2]  += a * Aval[2]  + b * Bval[2]  + c * Cval[2];
-      val[3]  += a * Aval[3]  + b * Bval[3]  + c * Cval[3];
-      val[4]  += a * Aval[4]  + b * Bval[4]  + c * Cval[4];
-      val[5]  += a * Aval[5]  + b * Bval[5]  + c * Cval[5];
-      val[6]  += a * Aval[6]  + b * Bval[6]  + c * Cval[6];
-      val[7]  += a * Aval[7]  + b * Bval[7]  + c * Cval[7];
-      val[8]  += a * Aval[8]  + b * Bval[8]  + c * Cval[8];
-      val[9]  += a * Aval[9]  + b * Bval[9]  + c * Cval[9];
-      val[10] += a * Aval[10] + b * Bval[10] + c * Cval[10];
-      val[11] += a * Aval[11] + b * Bval[11] + c * Cval[11];
-      val[12] += a * Aval[12] + b * Bval[12] + c * Cval[12];
-      val[13] += a * Aval[13] + b * Bval[13] + c * Cval[13];
-      val[14] += a * Aval[14] + b * Bval[14] + c * Cval[14];
-      val[15] += a * Aval[15] + b * Bval[15] + c * Cval[15];
-    }
-  else if ((n()==5) && (m()==5))
-    {
-      val[0]  += a * Aval[0]  + b * Bval[0]  + c * Cval[0];
-      val[1]  += a * Aval[1]  + b * Bval[1]  + c * Cval[1];
-      val[2]  += a * Aval[2]  + b * Bval[2]  + c * Cval[2];
-      val[3]  += a * Aval[3]  + b * Bval[3]  + c * Cval[3];
-      val[4]  += a * Aval[4]  + b * Bval[4]  + c * Cval[4];
-      val[5]  += a * Aval[5]  + b * Bval[5]  + c * Cval[5];
-      val[6]  += a * Aval[6]  + b * Bval[6]  + c * Cval[6];
-      val[7]  += a * Aval[7]  + b * Bval[7]  + c * Cval[7];
-      val[8]  += a * Aval[8]  + b * Bval[8]  + c * Cval[8];
-      val[9]  += a * Aval[9]  + b * Bval[9]  + c * Cval[9];
-      val[10] += a * Aval[10] + b * Bval[10] + c * Cval[10];
-      val[11] += a * Aval[11] + b * Bval[11] + c * Cval[11];
-      val[12] += a * Aval[12] + b * Bval[12] + c * Cval[12];
-      val[13] += a * Aval[13] + b * Bval[13] + c * Cval[13];
-      val[14] += a * Aval[14] + b * Bval[14] + c * Cval[14];
-      val[15] += a * Aval[15] + b * Bval[15] + c * Cval[15];
-      val[16] += a * Aval[16] + b * Bval[16] + c * Cval[16];
-      val[17] += a * Aval[17] + b * Bval[17] + c * Cval[17];
-      val[18] += a * Aval[18] + b * Bval[18] + c * Cval[18];
-      val[19] += a * Aval[19] + b * Bval[19] + c * Cval[19];
 
-      val[20] += a * Aval[20] + b * Bval[20] + c * Cval[20];
-      val[21] += a * Aval[21] + b * Bval[21] + c * Cval[21];
-      val[22] += a * Aval[22] + b * Bval[22] + c * Cval[22];
-      val[23] += a * Aval[23] + b * Bval[23] + c * Cval[23];
-      val[24] += a * Aval[24] + b * Bval[24] + c * Cval[24];
-    }
-  else if ((n()==8) && (m()==8))
-    {
-      val[0]  += a * Aval[0]  + b * Bval[0]  + c * Cval[0];
-      val[1]  += a * Aval[1]  + b * Bval[1]  + c * Cval[1];
-      val[2]  += a * Aval[2]  + b * Bval[2]  + c * Cval[2];
-      val[3]  += a * Aval[3]  + b * Bval[3]  + c * Cval[3];
-      val[4]  += a * Aval[4]  + b * Bval[4]  + c * Cval[4];
-      val[5]  += a * Aval[5]  + b * Bval[5]  + c * Cval[5];
-      val[6]  += a * Aval[6]  + b * Bval[6]  + c * Cval[6];
-      val[7]  += a * Aval[7]  + b * Bval[7]  + c * Cval[7];
-      val[8]  += a * Aval[8]  + b * Bval[8]  + c * Cval[8];
-      val[9]  += a * Aval[9]  + b * Bval[9]  + c * Cval[9];
-      val[10] += a * Aval[10] + b * Bval[10] + c * Cval[10];
-      val[11] += a * Aval[11] + b * Bval[11] + c * Cval[11];
-      val[12] += a * Aval[12] + b * Bval[12] + c * Cval[12];
-      val[13] += a * Aval[13] + b * Bval[13] + c * Cval[13];
-      val[14] += a * Aval[14] + b * Bval[14] + c * Cval[14];
-      val[15] += a * Aval[15] + b * Bval[15] + c * Cval[15];
-      val[16] += a * Aval[16] + b * Bval[16] + c * Cval[16];
-      val[17] += a * Aval[17] + b * Bval[17] + c * Cval[17];
-      val[18] += a * Aval[18] + b * Bval[18] + c * Cval[18];
-      val[19] += a * Aval[19] + b * Bval[19] + c * Cval[19];
-
-      val[20] += a * Aval[20] + b * Bval[20] + c * Cval[20];
-      val[21] += a * Aval[21] + b * Bval[21] + c * Cval[21];
-      val[22] += a * Aval[22] + b * Bval[22] + c * Cval[22];
-      val[23] += a * Aval[23] + b * Bval[23] + c * Cval[23];
-      val[24] += a * Aval[24] + b * Bval[24] + c * Cval[24];
-      val[25] += a * Aval[25] + b * Bval[25] + c * Cval[25];
-      val[26] += a * Aval[26] + b * Bval[26] + c * Cval[26];
-      val[27] += a * Aval[27] + b * Bval[27] + c * Cval[27];
-      val[28] += a * Aval[28] + b * Bval[28] + c * Cval[28];
-      val[29] += a * Aval[29] + b * Bval[29] + c * Cval[29];
-
-      val[30] += a * Aval[30] + b * Bval[30] + c * Cval[30];
-      val[31] += a * Aval[31] + b * Bval[31] + c * Cval[31];
-      val[32] += a * Aval[32] + b * Bval[32] + c * Cval[32];
-      val[33] += a * Aval[33] + b * Bval[33] + c * Cval[33];
-      val[34] += a * Aval[34] + b * Bval[34] + c * Cval[34];
-      val[35] += a * Aval[35] + b * Bval[35] + c * Cval[35];
-      val[36] += a * Aval[36] + b * Bval[36] + c * Cval[36];
-      val[37] += a * Aval[37] + b * Bval[37] + c * Cval[37];
-      val[38] += a * Aval[38] + b * Bval[38] + c * Cval[38];
-      val[39] += a * Aval[39] + b * Bval[39] + c * Cval[39];
-
-      val[40] += a * Aval[40] + b * Bval[40] + c * Cval[40];
-      val[41] += a * Aval[41] + b * Bval[41] + c * Cval[41];
-      val[42] += a * Aval[42] + b * Bval[42] + c * Cval[42];
-      val[43] += a * Aval[43] + b * Bval[43] + c * Cval[43];
-      val[44] += a * Aval[44] + b * Bval[44] + c * Cval[44];
-      val[45] += a * Aval[45] + b * Bval[45] + c * Cval[45];
-      val[46] += a * Aval[46] + b * Bval[46] + c * Cval[46];
-      val[47] += a * Aval[47] + b * Bval[47] + c * Cval[47];
-      val[48] += a * Aval[48] + b * Bval[48] + c * Cval[48];
-      val[49] += a * Aval[49] + b * Bval[49] + c * Cval[49];
-
-      val[50] += a * Aval[50] + b * Bval[50] + c * Cval[50];
-      val[51] += a * Aval[51] + b * Bval[51] + c * Cval[51];
-      val[52] += a * Aval[52] + b * Bval[52] + c * Cval[52];
-      val[53] += a * Aval[53] + b * Bval[53] + c * Cval[53];
-      val[54] += a * Aval[54] + b * Bval[54] + c * Cval[54];
-      val[55] += a * Aval[55] + b * Bval[55] + c * Cval[55];
-      val[56] += a * Aval[56] + b * Bval[56] + c * Cval[56];
-      val[57] += a * Aval[57] + b * Bval[57] + c * Cval[57];
-      val[58] += a * Aval[58] + b * Bval[58] + c * Cval[58];
-      val[59] += a * Aval[59] + b * Bval[59] + c * Cval[59];
-
-      val[60] += a * Aval[60] + b * Bval[60] + c * Cval[60];
-      val[61] += a * Aval[61] + b * Bval[61] + c * Cval[61];
-      val[62] += a * Aval[62] + b * Bval[62] + c * Cval[62];
-      val[63] += a * Aval[63] + b * Bval[63] + c * Cval[63];
-    }
-  else
-    {
-      const unsigned int size = n()*m();
-      for (unsigned int i=0; i<size; i++)
-        val[i] += a * Aval[i] + b * Bval[i] + c * Cval[i];
-    }
+  for (unsigned int i=0; i<n(); ++i)
+    for (unsigned int j=0; j<m(); ++j)
+      (*this)(i,j) += a * number(A(i,j)) +
+		      b * number(B(i,j)) +
+		      c * number(C(i,j));
 }
 
 
@@ -1469,7 +815,7 @@ void FullMatrix<number>::add (const FullMatrix<number2> &src,
   for (unsigned int i=0; i<rows ; ++i)
     for (unsigned int j=0; j<cols ; ++j)
       (*this)(dst_offset_i+i,dst_offset_j+j)
-	+= factor * src(src_offset_i+i,src_offset_j+j);
+	+= factor * number(src(src_offset_i+i,src_offset_j+j));
 }
 
 
@@ -1501,7 +847,7 @@ void FullMatrix<number>::Tadd (const FullMatrix<number2> &src,
   for (unsigned int i=0; i<rows ; ++i)
     for (unsigned int j=0; j<cols ; ++j)
       (*this)(dst_offset_i+i,dst_offset_j+j)
-	+= factor * src(src_offset_i+j,src_offset_j+i);
+	+= factor * number(src(src_offset_i+j,src_offset_j+i));
 }
 
 
@@ -1509,254 +855,18 @@ void FullMatrix<number>::Tadd (const FullMatrix<number2> &src,
 template <typename number>
 template <typename number2>
 void
-FullMatrix<number>::add_diag (const number s, const FullMatrix<number2>& src)
-{
-  Assert (!this->empty(), ExcEmptyMatrix());
-  
-  Assert (m() == src.m(), ExcDimensionMismatch(m(), src.m()));
-  Assert (n() == src.n(), ExcDimensionMismatch(n(), src.n()));
-
-  number* val = const_cast<number*> (this->data());
-  const number2* srcval = src.data();
-  
-  if ((n()==3) && (m()==3))
-  {
-    val[0] += s * srcval[0];
-    val[0] += s * srcval[1];
-    val[0] += s * srcval[2];
-    val[3] += s * srcval[3];
-    val[3] += s * srcval[4];
-    val[3] += s * srcval[5];
-    val[6] += s * srcval[6];
-    val[6] += s * srcval[7];
-    val[6] += s * srcval[8];
-  }
-  else if ((n()==4) && (m()==4))
-  {
-    val[0] += s * srcval[0];
-    val[0] += s * srcval[1];
-    val[0] += s * srcval[2];
-    val[0] += s * srcval[3];
-    val[4] += s * srcval[4];
-    val[4] += s * srcval[5];
-    val[4] += s * srcval[6];
-    val[4] += s * srcval[7];
-    val[8] += s * srcval[8];
-    val[8] += s * srcval[9];
-    val[8] += s * srcval[10];
-    val[8] += s * srcval[11];
-    val[12] += s * srcval[12];
-    val[12] += s * srcval[13];
-    val[12] += s * srcval[14];
-    val[12] += s * srcval[15];
-  }
-  else if ((n()==8) && (m()==8))
-  {
-    val[0] += s * srcval[0];
-    val[0] += s * srcval[1];
-    val[0] += s * srcval[2];
-    val[0] += s * srcval[3];
-    val[0] += s * srcval[4];
-    val[0] += s * srcval[5];
-    val[0] += s * srcval[6];
-    val[0] += s * srcval[7];
-    val[8] += s * srcval[8];
-    val[8] += s * srcval[9];
-    val[8] += s * srcval[10];
-    val[8] += s * srcval[11];
-    val[8] += s * srcval[12];
-    val[8] += s * srcval[13];
-    val[8] += s * srcval[14];
-    val[8] += s * srcval[15];
-    val[16] += s * srcval[16];
-    val[16] += s * srcval[17];
-    val[16] += s * srcval[18];
-    val[16] += s * srcval[19];
-
-    val[16] += s * srcval[20];
-    val[16] += s * srcval[21];
-    val[16] += s * srcval[22];
-    val[16] += s * srcval[23];
-    val[24] += s * srcval[24];
-    val[24] += s * srcval[25];
-    val[24] += s * srcval[26];
-    val[24] += s * srcval[27];
-    val[24] += s * srcval[28];
-    val[24] += s * srcval[29];
-
-    val[24] += s * srcval[30];
-    val[24] += s * srcval[31];
-    val[32] += s * srcval[32];
-    val[32] += s * srcval[33];
-    val[32] += s * srcval[34];
-    val[32] += s * srcval[35];
-    val[32] += s * srcval[36];
-    val[32] += s * srcval[37];
-    val[32] += s * srcval[38];
-    val[32] += s * srcval[39];
-
-    val[40] += s * srcval[40];
-    val[40] += s * srcval[41];
-    val[40] += s * srcval[42];
-    val[40] += s * srcval[43];
-    val[40] += s * srcval[44];
-    val[40] += s * srcval[45];
-    val[40] += s * srcval[46];
-    val[40] += s * srcval[47];
-    val[48] += s * srcval[48];
-    val[48] += s * srcval[49];
-
-    val[48] += s * srcval[50];
-    val[48] += s * srcval[51];
-    val[48] += s * srcval[52];
-    val[48] += s * srcval[53];
-    val[48] += s * srcval[54];
-    val[48] += s * srcval[55];
-    val[56] += s * srcval[56];
-    val[56] += s * srcval[57];
-    val[56] += s * srcval[58];
-    val[56] += s * srcval[59];
-
-    val[56] += s * srcval[60];
-    val[56] += s * srcval[61];
-    val[56] += s * srcval[62];
-    val[56] += s * srcval[63];
-  }
-  else
-  {
-    const unsigned int size = n()*m();
-    for (unsigned int i=0; i<size; i++)
-      val[i] += s * srcval[i];
-  }
-}
-
-
-template <typename number>
-template <typename number2>
-void
-FullMatrix<number>::Tadd (const number s, const FullMatrix<number2>& src)
+FullMatrix<number>::Tadd (const number a,
+			  const FullMatrix<number2> &A)
 {
   Assert (!this->empty(), ExcEmptyMatrix());
   
   Assert (m() == n(),     ExcNotQuadratic());
-  Assert (m() == src.m(), ExcDimensionMismatch(m(), src.m()));
-  Assert (n() == src.n(), ExcDimensionMismatch(n(), src.n()));
+  Assert (m() == A.m(), ExcDimensionMismatch(m(), A.m()));
+  Assert (n() == A.n(), ExcDimensionMismatch(n(), A.n()));
 
-  number* val = const_cast<number*> (this->data());
-  const number2* srcval = src.data();
-  
-  if ((n()==3) && (m()==3))
-  {
-    val[0] += s * srcval[0];
-    val[1] += s * srcval[3];
-    val[2] += s * srcval[6];
-
-    val[3] += s * srcval[1];
-    val[4] += s * srcval[4];
-    val[5] += s * srcval[7];
-
-    val[6] += s * srcval[2];
-    val[7] += s * srcval[5];
-    val[8] += s * srcval[8];
-  }
-  else if ((n()==4) && (m()==4))
-  {
-    val[0] += s * srcval[0];
-    val[1] += s * srcval[4];
-    val[2] += s * srcval[8];
-    val[3] += s * srcval[12];
-
-    val[4] += s * srcval[1];
-    val[5] += s * srcval[5];
-    val[6] += s * srcval[9];
-    val[7] += s * srcval[13];
-
-    val[8] += s * srcval[2];
-    val[9] += s * srcval[6];
-    val[10] += s * srcval[10];
-    val[11] += s * srcval[14];
-
-    val[12] += s * srcval[3];
-    val[13] += s * srcval[7];
-    val[14] += s * srcval[11];
-    val[15] += s * srcval[15];
-  }
-  else if ((n()==8) && (m()==8))
-  {
-    val[0] += s * srcval[0];
-    val[1] += s * srcval[8];
-    val[2] += s * srcval[16];
-    val[3] += s * srcval[24];
-    val[4] += s * srcval[32];
-    val[5] += s * srcval[40];
-    val[6] += s * srcval[48];
-    val[7] += s * srcval[56];
-
-    val[8] += s * srcval[1];
-    val[9] += s * srcval[9];
-    val[10] += s * srcval[17];
-    val[11] += s * srcval[25];
-    val[12] += s * srcval[33];
-    val[13] += s * srcval[41];
-    val[14] += s * srcval[49];
-    val[15] += s * srcval[57];
-
-    val[16] += s * srcval[2];
-    val[17] += s * srcval[10];
-    val[18] += s * srcval[18];
-    val[19] += s * srcval[26];
-    val[20] += s * srcval[34];
-    val[21] += s * srcval[42];
-    val[22] += s * srcval[50];
-    val[23] += s * srcval[58];
-
-    val[24] += s * srcval[3];
-    val[25] += s * srcval[11];
-    val[26] += s * srcval[19];
-    val[27] += s * srcval[27];
-    val[28] += s * srcval[35];
-    val[29] += s * srcval[43];
-    val[30] += s * srcval[51];
-    val[31] += s * srcval[59];
-
-    val[32] += s * srcval[4];
-    val[33] += s * srcval[12];
-    val[34] += s * srcval[20];
-    val[35] += s * srcval[28];
-    val[36] += s * srcval[36];
-    val[37] += s * srcval[44];
-    val[38] += s * srcval[52];
-    val[39] += s * srcval[60];
-
-    val[40] += s * srcval[5];
-    val[41] += s * srcval[13];
-    val[42] += s * srcval[21];
-    val[43] += s * srcval[29];
-    val[44] += s * srcval[37];
-    val[45] += s * srcval[45];
-    val[46] += s * srcval[53];
-    val[47] += s * srcval[61];
-
-    val[48] += s * srcval[6];
-    val[49] += s * srcval[14];
-    val[50] += s * srcval[22];
-    val[51] += s * srcval[30];
-    val[52] += s * srcval[38];
-    val[53] += s * srcval[46];
-    val[54] += s * srcval[54];
-    val[55] += s * srcval[62];
-
-    val[56] += s * srcval[7];
-    val[57] += s * srcval[15];
-    val[58] += s * srcval[23];
-    val[59] += s * srcval[31];
-    val[60] += s * srcval[39];
-    val[61] += s * srcval[47];
-    val[62] += s * srcval[55];
-    val[63] += s * srcval[63];
-  }
-  else
-    Assert (false, ExcNotImplemented());
+  for (unsigned int i=0; i<n(); ++i)
+    for (unsigned int j=0; j<m(); ++j)
+      (*this)(i,j) += a * number(A(j,i));
 }
 
 
@@ -1789,16 +899,16 @@ FullMatrix<number>::determinant () const
   switch (this->n_cols()) 
     {
       case 1:
-            return this->el(0,0);
+            return (*this)(0,0);
       case 2:
-            return this->el(0,0)*this->el(1,1) - this->el(1,0)*this->el(0,1);
+            return (*this)(0,0)*(*this)(1,1) - (*this)(1,0)*(*this)(0,1);
       case 3:
-            return  (this->el(0,0)*this->el(1,1)*this->el(2,2)
-                     -this->el(0,0)*this->el(1,2)*this->el(2,1)
-                     -this->el(1,0)*this->el(0,1)*this->el(2,2)
-                     +this->el(1,0)*this->el(0,2)*this->el(2,1)
-                     +this->el(2,0)*this->el(0,1)*this->el(1,2)
-                     -this->el(2,0)*this->el(0,2)*this->el(1,1));
+            return  ((*this)(0,0)*(*this)(1,1)*(*this)(2,2)
+                     -(*this)(0,0)*(*this)(1,2)*(*this)(2,1)
+                     -(*this)(1,0)*(*this)(0,1)*(*this)(2,2)
+                     +(*this)(1,0)*(*this)(0,2)*(*this)(2,1)
+                     +(*this)(2,0)*(*this)(0,1)*(*this)(1,2)
+                     -(*this)(2,0)*(*this)(0,2)*(*this)(1,1));
       default:
             Assert (false, ExcNotImplemented());
             return 0;
@@ -1818,7 +928,7 @@ FullMatrix<number>::trace () const
 
   number tr = 0;
   for (unsigned int i=0; i<this->n_rows(); ++i)
-    tr += this->el(i,i);
+    tr += (*this)(i,i);
 
   return tr;
 }
@@ -1878,7 +988,7 @@ FullMatrix<number>::invert (const FullMatrix<number2> &M)
   Assert (this->n_rows() == M.n_rows(),
 	  ExcDimensionMismatch(this->n_rows(), M.n_rows()));
 
-  if (&M == this)
+  if (PointerComparison::equal(&M, this))
     {
 				       // avoid overwriting source
 				       // by destination matrix:
@@ -1889,39 +999,39 @@ FullMatrix<number>::invert (const FullMatrix<number2> &M)
   switch (this->n_cols()) 
     {
       case 1:
-	    this->el(0,0) = number(1.0)/M.el(0,0);
+	    (*this)(0,0) = number2(1.0)/M(0,0);
 	    return;
       case 2:
 					     // this is Maple output,
 					     // thus a bit unstructured
       {
-	const number t4 = number(1.0)/(M.el(0,0)*M.el(1,1)-M.el(0,1)*M.el(1,0));
-	this->el(0,0) = M.el(1,1)*t4;
-	this->el(0,1) = -M.el(0,1)*t4;
-	this->el(1,0) = -M.el(1,0)*t4;
-	this->el(1,1) = M.el(0,0)*t4;
+	const number2 t4 = number2(1.0)/(M(0,0)*M(1,1)-M(0,1)*M(1,0));
+	(*this)(0,0) = M(1,1)*t4;
+	(*this)(0,1) = -M(0,1)*t4;
+	(*this)(1,0) = -M(1,0)*t4;
+	(*this)(1,1) = M(0,0)*t4;
 	return;
       };
       
       case 3:
       {
-	    const number t4 = M.el(0,0)*M.el(1,1),
-			 t6 = M.el(0,0)*M.el(1,2),
-			 t8 = M.el(0,1)*M.el(1,0),
-			t00 = M.el(0,2)*M.el(1,0),
-			t01 = M.el(0,1)*M.el(2,0),
-			t04 = M.el(0,2)*M.el(2,0),
-			t07 = number(1.0)/(t4*M.el(2,2)-t6*M.el(2,1)-t8*M.el(2,2)+
- 				   t00*M.el(2,1)+t01*M.el(1,2)-t04*M.el(1,1));
-	    this->el(0,0) = (M.el(1,1)*M.el(2,2)-M.el(1,2)*M.el(2,1))*t07;
-	    this->el(0,1) = -(M.el(0,1)*M.el(2,2)-M.el(0,2)*M.el(2,1))*t07;
-	    this->el(0,2) = -(-M.el(0,1)*M.el(1,2)+M.el(0,2)*M.el(1,1))*t07;
-	    this->el(1,0) = -(M.el(1,0)*M.el(2,2)-M.el(1,2)*M.el(2,0))*t07;
-	    this->el(1,1) = (M.el(0,0)*M.el(2,2)-t04)*t07;
-	    this->el(1,2) = -(t6-t00)*t07;
-	    this->el(2,0) = -(-M.el(1,0)*M.el(2,1)+M.el(1,1)*M.el(2,0))*t07;
-	    this->el(2,1) = -(M.el(0,0)*M.el(2,1)-t01)*t07;
-	    this->el(2,2) = (t4-t8)*t07;
+	    const number2 t4 = M(0,0)*M(1,1),
+			  t6 = M(0,0)*M(1,2),
+			  t8 = M(0,1)*M(1,0),
+			 t00 = M(0,2)*M(1,0),
+			 t01 = M(0,1)*M(2,0),
+			 t04 = M(0,2)*M(2,0),
+			 t07 = number2(1.0)/(t4*M(2,2)-t6*M(2,1)-t8*M(2,2)+
+					     t00*M(2,1)+t01*M(1,2)-t04*M(1,1));
+	    (*this)(0,0) = (M(1,1)*M(2,2)-M(1,2)*M(2,1))*t07;
+	    (*this)(0,1) = -(M(0,1)*M(2,2)-M(0,2)*M(2,1))*t07;
+	    (*this)(0,2) = -(-M(0,1)*M(1,2)+M(0,2)*M(1,1))*t07;
+	    (*this)(1,0) = -(M(1,0)*M(2,2)-M(1,2)*M(2,0))*t07;
+	    (*this)(1,1) = (M(0,0)*M(2,2)-t04)*t07;
+	    (*this)(1,2) = -(t6-t00)*t07;
+	    (*this)(2,0) = -(-M(1,0)*M(2,1)+M(1,1)*M(2,0))*t07;
+	    (*this)(2,1) = -(M(0,0)*M(2,1)-t01)*t07;
+	    (*this)(2,2) = (t4-t8)*t07;
 	    return;
       };
 
@@ -1934,94 +1044,94 @@ FullMatrix<number>::invert (const FullMatrix<number2> &M)
 					 // readlib(C);
 					 // C(ai,optimized,filename=x4);
 
-	const number t14 = M.el(0,0)*M.el(1,1);
-	const number t15 = M.el(2,2)*M.el(3,3);
-	const number t17 = M.el(2,3)*M.el(3,2);
-	const number t19 = M.el(0,0)*M.el(2,1);
-	const number t20 = M.el(1,2)*M.el(3,3);
-	const number t22 = M.el(1,3)*M.el(3,2);
-	const number t24 = M.el(0,0)*M.el(3,1);
-	const number t25 = M.el(1,2)*M.el(2,3);
-	const number t27 = M.el(1,3)*M.el(2,2);
-	const number t29 = M.el(1,0)*M.el(0,1);
-	const number t32 = M.el(1,0)*M.el(2,1);
-	const number t33 = M.el(0,2)*M.el(3,3);
-	const number t35 = M.el(0,3)*M.el(3,2);
-	const number t37 = M.el(1,0)*M.el(3,1);
-	const number t38 = M.el(0,2)*M.el(2,3);
-	const number t40 = M.el(0,3)*M.el(2,2);
-	const number t42 = t14*t15-t14*t17-t19*t20+t19*t22+
-			   t24*t25-t24*t27-t29*t15+t29*t17+
-			   t32*t33-t32*t35-t37*t38+t37*t40;
-	const number t43 = M.el(2,0)*M.el(0,1);
-	const number t46 = M.el(2,0)*M.el(1,1);
-	const number t49 = M.el(2,0)*M.el(3,1);
-	const number t50 = M.el(0,2)*M.el(1,3);
-	const number t52 = M.el(0,3)*M.el(1,2);
-	const number t54 = M.el(3,0)*M.el(0,1);
-	const number t57 = M.el(3,0)*M.el(1,1);
-	const number t60 = M.el(3,0)*M.el(2,1);
-	const number t63 = t43*t20-t43*t22-t46*t33+t46*t35+
-			   t49*t50-t49*t52-t54*t25+t54*t27+
-			   t57*t38-t57*t40-t60*t50+t60*t52;
-	const number t65 = number(1.)/(t42+t63);
-	const number t71 = M.el(0,2)*M.el(2,1);
-	const number t73 = M.el(0,3)*M.el(2,1);
-	const number t75 = M.el(0,2)*M.el(3,1);
-	const number t77 = M.el(0,3)*M.el(3,1);
-	const number t81 = M.el(0,1)*M.el(1,2);
-	const number t83 = M.el(0,1)*M.el(1,3);
-	const number t85 = M.el(0,2)*M.el(1,1);
-	const number t87 = M.el(0,3)*M.el(1,1);
-	const number t101 = M.el(1,0)*M.el(2,2);
-	const number t103 = M.el(1,0)*M.el(2,3);
-	const number t105 = M.el(2,0)*M.el(1,2);
-	const number t107 = M.el(2,0)*M.el(1,3);
-	const number t109 = M.el(3,0)*M.el(1,2);
-	const number t111 = M.el(3,0)*M.el(1,3);
-	const number t115 = M.el(0,0)*M.el(2,2);
-	const number t117 = M.el(0,0)*M.el(2,3);
-	const number t119 = M.el(2,0)*M.el(0,2);
-	const number t121 = M.el(2,0)*M.el(0,3);
-	const number t123 = M.el(3,0)*M.el(0,2);
-	const number t125 = M.el(3,0)*M.el(0,3);
-	const number t129 = M.el(0,0)*M.el(1,2);
-	const number t131 = M.el(0,0)*M.el(1,3);
-	const number t133 = M.el(1,0)*M.el(0,2);
-	const number t135 = M.el(1,0)*M.el(0,3);
-	this->el(0,0) = (M.el(1,1)*M.el(2,2)*M.el(3,3)-M.el(1,1)*M.el(2,3)*M.el(3,2)-
-			 M.el(2,1)*M.el(1,2)*M.el(3,3)+M.el(2,1)*M.el(1,3)*M.el(3,2)+
-			 M.el(3,1)*M.el(1,2)*M.el(2,3)-M.el(3,1)*M.el(1,3)*M.el(2,2))*t65;
-	this->el(0,1) = -(M.el(0,1)*M.el(2,2)*M.el(3,3)-M.el(0,1)*M.el(2,3)*M.el(3,2)-
-			  t71*M.el(3,3)+t73*M.el(3,2)+t75*M.el(2,3)-t77*M.el(2,2))*t65;
-	this->el(0,2) = (t81*M.el(3,3)-t83*M.el(3,2)-t85*M.el(3,3)+t87*M.el(3,2)+
-			 t75*M.el(1,3)-t77*M.el(1,2))*t65;
-	this->el(0,3) = -(t81*M.el(2,3)-t83*M.el(2,2)-t85*M.el(2,3)+t87*M.el(2,2)+
-			  t71*M.el(1,3)-t73*M.el(1,2))*t65;
-	this->el(1,0) = -(t101*M.el(3,3)-t103*M.el(3,2)-t105*M.el(3,3)+t107*M.el(3,2)+
-			  t109*M.el(2,3)-t111*M.el(2,2))*t65;
-	this->el(1,1) = (t115*M.el(3,3)-t117*M.el(3,2)-t119*M.el(3,3)+t121*M.el(3,2)+
-			 t123*M.el(2,3)-t125*M.el(2,2))*t65;
-	this->el(1,2) = -(t129*M.el(3,3)-t131*M.el(3,2)-t133*M.el(3,3)+t135*M.el(3,2)+
-			  t123*M.el(1,3)-t125*M.el(1,2))*t65;
-	this->el(1,3) = (t129*M.el(2,3)-t131*M.el(2,2)-t133*M.el(2,3)+t135*M.el(2,2)+
-			 t119*M.el(1,3)-t121*M.el(1,2))*t65;
-	this->el(2,0) = (t32*M.el(3,3)-t103*M.el(3,1)-t46*M.el(3,3)+t107*M.el(3,1)+
-			 t57*M.el(2,3)-t111*M.el(2,1))*t65;
-	this->el(2,1) = -(t19*M.el(3,3)-t117*M.el(3,1)-t43*M.el(3,3)+t121*M.el(3,1)+
-			  t54*M.el(2,3)-t125*M.el(2,1))*t65;
-	this->el(2,2) = (t14*M.el(3,3)-t131*M.el(3,1)-t29*M.el(3,3)+t135*M.el(3,1)+
-			 t54*M.el(1,3)-t125*M.el(1,1))*t65;
-	this->el(2,3) = -(t14*M.el(2,3)-t131*M.el(2,1)-t29*M.el(2,3)+t135*M.el(2,1)+
-			  t43*M.el(1,3)-t121*M.el(1,1))*t65;
-	this->el(3,0) = -(t32*M.el(3,2)-t101*M.el(3,1)-t46*M.el(3,2)+t105*M.el(3,1)+
-			  t57*M.el(2,2)-t109*M.el(2,1))*t65;
-	this->el(3,1) = (t19*M.el(3,2)-t115*M.el(3,1)-t43*M.el(3,2)+t119*M.el(3,1)+
-			 t54*M.el(2,2)-t123*M.el(2,1))*t65;
-	this->el(3,2) = -(t14*M.el(3,2)-t129*M.el(3,1)-t29*M.el(3,2)+t133*M.el(3,1)+
-			  t54*M.el(1,2)-t123*M.el(1,1))*t65;
-	this->el(3,3) = (t14*M.el(2,2)-t129*M.el(2,1)-t29*M.el(2,2)+t133*M.el(2,1)+
-			 t43*M.el(1,2)-t119*M.el(1,1))*t65;
+	const number2 t14 = M(0,0)*M(1,1);
+	const number2 t15 = M(2,2)*M(3,3);
+	const number2 t17 = M(2,3)*M(3,2);
+	const number2 t19 = M(0,0)*M(2,1);
+	const number2 t20 = M(1,2)*M(3,3);
+	const number2 t22 = M(1,3)*M(3,2);
+	const number2 t24 = M(0,0)*M(3,1);
+	const number2 t25 = M(1,2)*M(2,3);
+	const number2 t27 = M(1,3)*M(2,2);
+	const number2 t29 = M(1,0)*M(0,1);
+	const number2 t32 = M(1,0)*M(2,1);
+	const number2 t33 = M(0,2)*M(3,3);
+	const number2 t35 = M(0,3)*M(3,2);
+	const number2 t37 = M(1,0)*M(3,1);
+	const number2 t38 = M(0,2)*M(2,3);
+	const number2 t40 = M(0,3)*M(2,2);
+	const number2 t42 = t14*t15-t14*t17-t19*t20+t19*t22+
+			    t24*t25-t24*t27-t29*t15+t29*t17+
+			    t32*t33-t32*t35-t37*t38+t37*t40;
+	const number2 t43 = M(2,0)*M(0,1);
+	const number2 t46 = M(2,0)*M(1,1);
+	const number2 t49 = M(2,0)*M(3,1);
+	const number2 t50 = M(0,2)*M(1,3);
+	const number2 t52 = M(0,3)*M(1,2);
+	const number2 t54 = M(3,0)*M(0,1);
+	const number2 t57 = M(3,0)*M(1,1);
+	const number2 t60 = M(3,0)*M(2,1);
+	const number2 t63 = t43*t20-t43*t22-t46*t33+t46*t35+
+			    t49*t50-t49*t52-t54*t25+t54*t27+
+			    t57*t38-t57*t40-t60*t50+t60*t52;
+	const number2 t65 = number2(1.)/(t42+t63);
+	const number2 t71 = M(0,2)*M(2,1);
+	const number2 t73 = M(0,3)*M(2,1);
+	const number2 t75 = M(0,2)*M(3,1);
+	const number2 t77 = M(0,3)*M(3,1);
+	const number2 t81 = M(0,1)*M(1,2);
+	const number2 t83 = M(0,1)*M(1,3);
+	const number2 t85 = M(0,2)*M(1,1);
+	const number2 t87 = M(0,3)*M(1,1);
+	const number2 t101 = M(1,0)*M(2,2);
+	const number2 t103 = M(1,0)*M(2,3);
+	const number2 t105 = M(2,0)*M(1,2);
+	const number2 t107 = M(2,0)*M(1,3);
+	const number2 t109 = M(3,0)*M(1,2);
+	const number2 t111 = M(3,0)*M(1,3);
+	const number2 t115 = M(0,0)*M(2,2);
+	const number2 t117 = M(0,0)*M(2,3);
+	const number2 t119 = M(2,0)*M(0,2);
+	const number2 t121 = M(2,0)*M(0,3);
+	const number2 t123 = M(3,0)*M(0,2);
+	const number2 t125 = M(3,0)*M(0,3);
+	const number2 t129 = M(0,0)*M(1,2);
+	const number2 t131 = M(0,0)*M(1,3);
+	const number2 t133 = M(1,0)*M(0,2);
+	const number2 t135 = M(1,0)*M(0,3);
+	(*this)(0,0) = (M(1,1)*M(2,2)*M(3,3)-M(1,1)*M(2,3)*M(3,2)-
+			 M(2,1)*M(1,2)*M(3,3)+M(2,1)*M(1,3)*M(3,2)+
+			 M(3,1)*M(1,2)*M(2,3)-M(3,1)*M(1,3)*M(2,2))*t65;
+	(*this)(0,1) = -(M(0,1)*M(2,2)*M(3,3)-M(0,1)*M(2,3)*M(3,2)-
+			  t71*M(3,3)+t73*M(3,2)+t75*M(2,3)-t77*M(2,2))*t65;
+	(*this)(0,2) = (t81*M(3,3)-t83*M(3,2)-t85*M(3,3)+t87*M(3,2)+
+			 t75*M(1,3)-t77*M(1,2))*t65;
+	(*this)(0,3) = -(t81*M(2,3)-t83*M(2,2)-t85*M(2,3)+t87*M(2,2)+
+			  t71*M(1,3)-t73*M(1,2))*t65;
+	(*this)(1,0) = -(t101*M(3,3)-t103*M(3,2)-t105*M(3,3)+t107*M(3,2)+
+			  t109*M(2,3)-t111*M(2,2))*t65;
+	(*this)(1,1) = (t115*M(3,3)-t117*M(3,2)-t119*M(3,3)+t121*M(3,2)+
+			 t123*M(2,3)-t125*M(2,2))*t65;
+	(*this)(1,2) = -(t129*M(3,3)-t131*M(3,2)-t133*M(3,3)+t135*M(3,2)+
+			  t123*M(1,3)-t125*M(1,2))*t65;
+	(*this)(1,3) = (t129*M(2,3)-t131*M(2,2)-t133*M(2,3)+t135*M(2,2)+
+			 t119*M(1,3)-t121*M(1,2))*t65;
+	(*this)(2,0) = (t32*M(3,3)-t103*M(3,1)-t46*M(3,3)+t107*M(3,1)+
+			 t57*M(2,3)-t111*M(2,1))*t65;
+	(*this)(2,1) = -(t19*M(3,3)-t117*M(3,1)-t43*M(3,3)+t121*M(3,1)+
+			  t54*M(2,3)-t125*M(2,1))*t65;
+	(*this)(2,2) = (t14*M(3,3)-t131*M(3,1)-t29*M(3,3)+t135*M(3,1)+
+			 t54*M(1,3)-t125*M(1,1))*t65;
+	(*this)(2,3) = -(t14*M(2,3)-t131*M(2,1)-t29*M(2,3)+t135*M(2,1)+
+			  t43*M(1,3)-t121*M(1,1))*t65;
+	(*this)(3,0) = -(t32*M(3,2)-t101*M(3,1)-t46*M(3,2)+t105*M(3,1)+
+			  t57*M(2,2)-t109*M(2,1))*t65;
+	(*this)(3,1) = (t19*M(3,2)-t115*M(3,1)-t43*M(3,2)+t119*M(3,1)+
+			 t54*M(2,2)-t123*M(2,1))*t65;
+	(*this)(3,2) = -(t14*M(3,2)-t129*M(3,1)-t29*M(3,2)+t133*M(3,1)+
+			  t54*M(1,2)-t123*M(1,1))*t65;
+	(*this)(3,3) = (t14*M(2,2)-t129*M(2,1)-t29*M(2,2)+t133*M(2,1)+
+			 t43*M(1,2)-t119*M(1,1))*t65;
 	
 	break;
       }
@@ -2053,7 +1163,7 @@ FullMatrix<number>::precondition_Jacobi (Vector<somenumber>       &dst,
   const somenumber        *src_ptr = src.begin();
   
   for (unsigned int i=0; i<n; ++i, ++dst_ptr, ++src_ptr)
-    *dst_ptr = somenumber(om) * *src_ptr / somenumber(this->el(i,i));
+    *dst_ptr = somenumber(om) * *src_ptr / somenumber((*this)(i,i));
 }
 
 
@@ -2093,9 +1203,9 @@ FullMatrix<number>::print_formatted (
   for (unsigned int i=0; i<m(); ++i) 
     {
       for (unsigned int j=0; j<n(); ++j)
-	if (std::abs(this->el(i,j)) > threshold)
+	if (std::abs((*this)(i,j)) > threshold)
 	  out << std::setw(width)
-	      << this->el(i,j) * number(denominator) << ' ';
+	      << (*this)(i,j) * number(denominator) << ' ';
 	else
 	  out << std::setw(width) << zero_string << ' ';
       out << std::endl;
@@ -2129,7 +1239,7 @@ FullMatrix<number>::gauss_jordan ()
 				   // regular
   double diagonal_sum = 0;
   for (unsigned int i=0; i<N; ++i)
-    diagonal_sum += std::abs(this->el(i,i));
+    diagonal_sum += std::abs((*this)(i,i));
   const double typical_diagonal_element = diagonal_sum/N;
 
 				   // initialize the array that holds
@@ -2145,13 +1255,13 @@ FullMatrix<number>::gauss_jordan ()
 				       // part of the line on and
 				       // right of the diagonal for
 				       // the largest element
-      real_type max = std::abs(this->el(j,j));
+      real_type max = std::abs((*this)(j,j));
       unsigned int r   = j;
       for (unsigned int i=j+1; i<N; ++i)
 	{
-	  if (std::abs(this->el(i,j)) > max)
+	  if (std::abs((*this)(i,j)) > max)
 	    {
-	      max = std::abs(this->el(i,j));
+	      max = std::abs((*this)(i,j));
 	      r = i;
 	    }
 	}
@@ -2164,38 +1274,38 @@ FullMatrix<number>::gauss_jordan ()
       if (r>j)
 	{
 	  for (unsigned int k=0; k<N; ++k)
-	    std::swap (this->el(j,k), this->el(r,k));
+	    std::swap ((*this)(j,k), (*this)(r,k));
 
 	  std::swap (p[j], p[r]);
 	}
 
 				       // transformation
-      const number hr = number(1.)/this->el(j,j);
-      this->el(j,j) = hr;
+      const number hr = number(1.)/(*this)(j,j);
+      (*this)(j,j) = hr;
       for (unsigned int k=0; k<N; ++k)
 	{
 	  if (k==j) continue;
 	  for (unsigned int i=0; i<N; ++i)
 	    {
 	      if (i==j) continue;
-	      this->el(i,k) -= this->el(i,j)*this->el(j,k)*hr;
+	      (*this)(i,k) -= (*this)(i,j)*(*this)(j,k)*hr;
 	    }
 	}
       for (unsigned int i=0; i<N; ++i)
 	{
-	  this->el(i,j) *= hr;
-	  this->el(j,i) *= -hr;
+	  (*this)(i,j) *= hr;
+	  (*this)(j,i) *= -hr;
 	}
-      this->el(j,j) = hr;
+      (*this)(j,j) = hr;
     }
 				   // column interchange
   std::vector<number> hv(N);
   for (unsigned int i=0; i<N; ++i)
     {
       for (unsigned int k=0; k<N; ++k)
-	hv[p[k]] = this->el(i,k);
+	hv[p[k]] = (*this)(i,k);
       for (unsigned int k=0; k<N; ++k)
-	this->el(i,k) = hv[k];
+	(*this)(i,k) = hv[k];
     }
 }
 

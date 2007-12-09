@@ -30,6 +30,15 @@ inconvenience this causes.
 </p>
 
 <ol>
+  <li> <p>Removed: The <code>FullMatrix::add_diag</code> function was removed. It
+  offered functionality of questionable use in the first place, and its
+  implementation was correct only for matrices of size $3 \times 3$, $4 \times 4$
+  and $8 \times 8$ without anyone noticing for 10 years. Consequently, it can't
+  have been used very frequently.
+  <br>
+  (WB 2007/12/09)
+  </p>
+
   <li> <p>Changed: The namespace deal_II_numbers has been renamed dealii::numbers.
   The old name stemmed from a time when not everything was already in
   namespace <code>dealii</code>. The old name is retained via a namespace
