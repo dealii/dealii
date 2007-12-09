@@ -1,3 +1,9 @@
+template class SparseMatrixEZ< double >;
+ 
+template class SparseMatrixEZ< float >;
+ 
+template class SparseMatrixEZ< long double >;
+ 
 template
  void SparseMatrixEZ< double >::vmult< double > (Vector< double > &,
  const Vector< double > &) const;
