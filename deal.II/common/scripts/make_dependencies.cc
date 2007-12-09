@@ -2,7 +2,7 @@
 //    $Id$
 //    Version: $Name$
 //
-//    Copyright (C) 2003 by the deal.II authors
+//    Copyright (C) 2003, 2007 by the deal.II authors
 //
 //    This file is subject to QPL and may not be  distributed
 //    without copyright and license information. Please refer
@@ -15,7 +15,7 @@
 // usage: make_depencies -Iinc_path1 -Iinc_path2 ... -Bbasepath files
 
 // This program is basically a replacement for something like "gcc
-// -M", i.e. it egnerates for each input file a list of other files it
+// -M", i.e. it generates for each input file a list of other files it
 // depends on by direct or indirect inclusion (or at least those files
 // that can be found in the directories specified by -I/path/.../
 // flags on the command line). The difference to gcc -M is that it is
