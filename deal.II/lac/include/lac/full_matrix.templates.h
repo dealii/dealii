@@ -620,7 +620,7 @@ FullMatrix<number>::matrix_norm_square (const Vector<number2> &v) const
       while (val_ptr != val_end_of_row)
 	s += number(*val_ptr++) * number(*v_ptr++);
 
-      sum += s* number(v(row));
+      sum += s * number(numbers::NumberTraits<number2>::conjugate(v(row)));
     }
 
   return sum;

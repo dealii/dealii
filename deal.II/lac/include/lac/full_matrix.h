@@ -440,8 +440,7 @@ class FullMatrix : public Table<2,number>
 
     				     /**
 				      * Return the square of the norm
-				      * of the vector <tt>v</tt> with
-				      * respect to the norm induced by
+				      * of the vector <tt>v</tt> induced by
 				      * this matrix,
 				      * i.e. <i>(v,Mv)</i>. This is
 				      * useful, e.g. in the finite
