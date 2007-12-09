@@ -127,7 +127,7 @@ Makefile.dep: $(cc-files) $(h-files) \
 		$(inst-files) \
 		Makefile $D/common/Make.global_options
 	@echo ===================================== Remaking lac/Makefile
-	@$D/common/scripts/make_dependencies $(INCLUDE) "-B$(LIBDIR)/lac" source/full_matrix.cc \
+	@$D/common/scripts/make_dependencies $(INCLUDE) "-B$(LIBDIR)/lac" $(cc-files) \
 		> $@ \
 	 || (rm -f $@ ; false)
 
