@@ -1,0 +1,79 @@
+//---------------------------------------------------------------------------
+//    $Id: precondition_block.cc 14038 2006-10-23 02:46:34Z bangerth $
+//    Version: $Name$
+//
+//    Copyright (C) 1999, 2000, 2001, 2002, 2003, 2005, 2006, 2007 by the deal.II authors
+//
+//    This file is subject to QPL and may not be  distributed
+//    without copyright and license information. Please refer
+//    to the file deal.II/doc/license.html for the  text  and
+//    further information on this license.
+//
+//---------------------------------------------------------------------------
+
+
+for (S1, S2 : REAL_SCALAR)
+  {
+    template class PreconditionBlock<SparseMatrix<S1>, S2>;
+
+// ------------ PreconditionBlockJacobi -----------------
+    template class PreconditionBlockJacobi<SparseMatrix<S1>, S2>;
+
+    template
+      void PreconditionBlockJacobi<SparseMatrix<S1>, S2>::vmult<S2>
+      (Vector<S2> &, const Vector<S2> &) const;
+    template
+      void PreconditionBlockJacobi<SparseMatrix<S1>, S2>::vmult<S1>
+      (Vector<S1> &, const Vector<S1> &) const;
+    template
+      void PreconditionBlockJacobi<SparseMatrix<S1>, S2>::Tvmult<S2>
+      (Vector<S2> &, const Vector<S2> &) const;
+    template
+      void PreconditionBlockJacobi<SparseMatrix<S1>, S2>::Tvmult<S1>
+      (Vector<S1> &, const Vector<S1> &) const;
+    template
+      void PreconditionBlockJacobi<SparseMatrix<S1>, S2>::vmult_add<S2>
+      (Vector<S2> &, const Vector<S2> &) const;
+    template
+      void PreconditionBlockJacobi<SparseMatrix<S1>, S2>::vmult_add<S1>
+      (Vector<S1> &, const Vector<S1> &) const;
+    template
+      void PreconditionBlockJacobi<SparseMatrix<S1>, S2>::Tvmult_add<S2>
+      (Vector<S2> &, const Vector<S2> &) const;
+    template
+      void PreconditionBlockJacobi<SparseMatrix<S1>, S2>::Tvmult_add<S1>
+      (Vector<S1> &, const Vector<S1> &) const;
+
+// ------------ PreconditionBlockSOR -----------------
+    template class PreconditionBlockSOR<SparseMatrix<S1>, S2>;
+
+    template
+      void PreconditionBlockSOR<SparseMatrix<S1>, S2>::vmult<S2>
+      (Vector<S2> &, const Vector<S2> &) const;
+    template
+      void PreconditionBlockSOR<SparseMatrix<S1>, S2>::vmult<S1>
+      (Vector<S1> &, const Vector<S1> &) const;
+    template
+      void PreconditionBlockSOR<SparseMatrix<S1>, S2>::Tvmult<S2>
+      (Vector<S2> &, const Vector<S2> &) const;
+    template
+      void PreconditionBlockSOR<SparseMatrix<S1>, S2>::Tvmult<S1>
+      (Vector<S1> &, const Vector<S1> &) const;
+
+// ------------ PreconditionBlockSSOR -----------------
+    template class PreconditionBlockSSOR<SparseMatrix<S1>, S2>;
+
+    template
+      void PreconditionBlockSSOR<SparseMatrix<S1>, S2>::vmult<S2>
+      (Vector<S2> &, const Vector<S2> &) const;
+    template
+      void PreconditionBlockSSOR<SparseMatrix<S1>, S2>::vmult<S1>
+      (Vector<S1> &, const Vector<S1> &) const;
+    template
+      void PreconditionBlockSSOR<SparseMatrix<S1>, S2>::Tvmult<S2>
+      (Vector<S2> &, const Vector<S2> &) const;
+    template
+      void PreconditionBlockSSOR<SparseMatrix<S1>, S2>::Tvmult<S1>
+      (Vector<S1> &, const Vector<S1> &) const;
+  }
+
