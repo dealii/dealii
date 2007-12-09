@@ -12,7 +12,7 @@
 //---------------------------------------------------------------------------
 
 
-for (S1, S2 : REAL_SCALAR)
+for (S1, S2 : REAL_SCALARS)
   {
     template class PreconditionBlock<SparseMatrix<S1>, S2>;
 
