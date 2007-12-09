@@ -32,7 +32,7 @@ for (S1, S2 : REAL_SCALARS)
   }
 
 
-for (S1, S2 : SCALARS)
+for (S1, S2 : REAL_SCALARS)
   {
     template S2
       SparseMatrix<S1>::
@@ -102,7 +102,7 @@ for (S1, S2 : SCALARS)
   }
 
 
-for (S1, S2, S3 : SCALARS;
+for (S1, S2, S3 : REAL_SCALARS;
      V1, V2     : DEAL_II_VEC_TEMPLATES)
   {
     template void SparseMatrix<S1>::
