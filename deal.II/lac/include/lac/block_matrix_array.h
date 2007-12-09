@@ -2,7 +2,7 @@
 //    $Id$
 //    Version: $Name$
 //
-//    Copyright (C) 2001, 2002, 2003, 2004, 2005, 2006 by the deal.II authors
+//    Copyright (C) 2001, 2002, 2003, 2004, 2005, 2006, 2007 by the deal.II authors
 //
 //    This file is subject to QPL and may not be  distributed
 //    without copyright and license information. Please refer
@@ -252,9 +252,10 @@ class BlockMatrixArray : public Subscriptor
 				  const BlockVector<number>& v) const;
     
 				     /**
-				      * Square of the matrix norm of a
-				      * vector (at least for a
-				      * symmetric matrix).
+				      * Compute $u^T M u$. This is the square
+				      * of the norm induced by the matrix
+				      * assuming the matrix is symmetric
+				      * positive definitive.
 				      */
     number matrix_norm_square (const BlockVector<number>& u) const;
     
