@@ -16,6 +16,9 @@ o-files      = $(o-files-base)
 go-files     = $(o-files-base:.$(OBJEXT)=.g.$(OBJEXT))
 h-files      = $(sort $(shell echo include/lac/*.h))
 
+inst-in-files= $(shell echo source/*.inst.in)
+inst-files   = $(inst-in-files:%.in=%)
+
 # if umfpack was configured, simply link all the umfpack files into liblac.
 # these object files should have been generated before we got to the present
 # directory
@@ -40,7 +43,7 @@ $(LIBDIR)/lac/%.$(OBJEXT) :
 	@echo "=====lac==============optimized==$(MT)== $(<F)"
 	@$(CXX) $(CXXFLAGS.o) -c $< -o $@
 
-source/%.inst :
+source/%.inst : source/%.inst.in
 	@echo "=====lac============================= $(@F)"
 	@$D/common/scripts/expand_instantiations $D/common/template-arguments < $< > $@
 
@@ -121,16 +124,12 @@ clean:
 #
 # If the command fails, then remove Makefile.dep again and fail
 Makefile.dep: $(cc-files) $(h-files) \
-		$(shell echo source/*.inst.in) \
+		$(inst-files) \
 		Makefile $D/common/Make.global_options
-	@echo ============================ Remaking lac/Makefile
-	@$D/common/scripts/make_dependencies $(INCLUDE) "-B$(LIBDIR)/lac" $(cc-files) \
+	@echo ===================================== Remaking lac/Makefile
+	@$D/common/scripts/make_dependencies $(INCLUDE) "-B$(LIBDIR)/lac" source/full_matrix.cc \
 		> $@ \
 	 || (rm -f $@ ; false)
-	@for i in source/*inst.in ; do \
-		echo "$${i}.x : $${i}" | \
-		$(PERL) -pi -e 's/\.inst\.in\.x/.inst/g;' ; \
-	 done >> $@
 
 
 # include all the dependencies
