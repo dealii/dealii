@@ -11,6 +11,13 @@
 //
 //----------------------------  sparse_matrix_ez.inst.in  ---------------------------
 
+
+for (S : REAL_SCALARS)
+  {
+    template class SparseMatrixEZ<S>;
+  }
+
+
 for (S1, S2 : REAL_SCALARS)
   {
     template
