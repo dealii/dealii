@@ -1,0 +1,270 @@
+template
+ void SparseMatrixEZ< double >::vmult< double > (Vector< double > &,
+ const Vector< double > &) const;
+ template
+ void SparseMatrixEZ< double >::Tvmult< double > (Vector< double > &,
+ const Vector< double > &) const;
+ template
+ void SparseMatrixEZ< double >::vmult_add< double > (Vector< double > &,
+ const Vector< double > &) const;
+ template
+ void SparseMatrixEZ< double >::Tvmult_add< double > (Vector< double > &,
+ const Vector< double > &) const;
+
+ template
+ void SparseMatrixEZ< double >::precondition_SSOR< double > (Vector< double > &,
+ const Vector< double > &,
+ const  double ) const;
+ template
+ void SparseMatrixEZ< double >::precondition_SOR< double > (Vector< double > &,
+ const Vector< double > &,
+ const  double ) const;
+ template
+ void SparseMatrixEZ< double >::precondition_TSOR< double > (Vector< double > &,
+ const Vector< double > &,
+ const  double ) const;
+ template
+ void SparseMatrixEZ< double >::precondition_Jacobi< double > (Vector< double > &,
+ const Vector< double > &,
+ const  double ) const;
+ 
+template
+ void SparseMatrixEZ< double >::vmult< float > (Vector< float > &,
+ const Vector< float > &) const;
+ template
+ void SparseMatrixEZ< double >::Tvmult< float > (Vector< float > &,
+ const Vector< float > &) const;
+ template
+ void SparseMatrixEZ< double >::vmult_add< float > (Vector< float > &,
+ const Vector< float > &) const;
+ template
+ void SparseMatrixEZ< double >::Tvmult_add< float > (Vector< float > &,
+ const Vector< float > &) const;
+
+ template
+ void SparseMatrixEZ< double >::precondition_SSOR< float > (Vector< float > &,
+ const Vector< float > &,
+ const  double ) const;
+ template
+ void SparseMatrixEZ< double >::precondition_SOR< float > (Vector< float > &,
+ const Vector< float > &,
+ const  double ) const;
+ template
+ void SparseMatrixEZ< double >::precondition_TSOR< float > (Vector< float > &,
+ const Vector< float > &,
+ const  double ) const;
+ template
+ void SparseMatrixEZ< double >::precondition_Jacobi< float > (Vector< float > &,
+ const Vector< float > &,
+ const  double ) const;
+ 
+template
+ void SparseMatrixEZ< double >::vmult< long double > (Vector< long double > &,
+ const Vector< long double > &) const;
+ template
+ void SparseMatrixEZ< double >::Tvmult< long double > (Vector< long double > &,
+ const Vector< long double > &) const;
+ template
+ void SparseMatrixEZ< double >::vmult_add< long double > (Vector< long double > &,
+ const Vector< long double > &) const;
+ template
+ void SparseMatrixEZ< double >::Tvmult_add< long double > (Vector< long double > &,
+ const Vector< long double > &) const;
+
+ template
+ void SparseMatrixEZ< double >::precondition_SSOR< long double > (Vector< long double > &,
+ const Vector< long double > &,
+ const  double ) const;
+ template
+ void SparseMatrixEZ< double >::precondition_SOR< long double > (Vector< long double > &,
+ const Vector< long double > &,
+ const  double ) const;
+ template
+ void SparseMatrixEZ< double >::precondition_TSOR< long double > (Vector< long double > &,
+ const Vector< long double > &,
+ const  double ) const;
+ template
+ void SparseMatrixEZ< double >::precondition_Jacobi< long double > (Vector< long double > &,
+ const Vector< long double > &,
+ const  double ) const;
+ 
+template
+ void SparseMatrixEZ< float >::vmult< double > (Vector< double > &,
+ const Vector< double > &) const;
+ template
+ void SparseMatrixEZ< float >::Tvmult< double > (Vector< double > &,
+ const Vector< double > &) const;
+ template
+ void SparseMatrixEZ< float >::vmult_add< double > (Vector< double > &,
+ const Vector< double > &) const;
+ template
+ void SparseMatrixEZ< float >::Tvmult_add< double > (Vector< double > &,
+ const Vector< double > &) const;
+
+ template
+ void SparseMatrixEZ< float >::precondition_SSOR< double > (Vector< double > &,
+ const Vector< double > &,
+ const  float ) const;
+ template
+ void SparseMatrixEZ< float >::precondition_SOR< double > (Vector< double > &,
+ const Vector< double > &,
+ const  float ) const;
+ template
+ void SparseMatrixEZ< float >::precondition_TSOR< double > (Vector< double > &,
+ const Vector< double > &,
+ const  float ) const;
+ template
+ void SparseMatrixEZ< float >::precondition_Jacobi< double > (Vector< double > &,
+ const Vector< double > &,
+ const  float ) const;
+ 
+template
+ void SparseMatrixEZ< float >::vmult< float > (Vector< float > &,
+ const Vector< float > &) const;
+ template
+ void SparseMatrixEZ< float >::Tvmult< float > (Vector< float > &,
+ const Vector< float > &) const;
+ template
+ void SparseMatrixEZ< float >::vmult_add< float > (Vector< float > &,
+ const Vector< float > &) const;
+ template
+ void SparseMatrixEZ< float >::Tvmult_add< float > (Vector< float > &,
+ const Vector< float > &) const;
+
+ template
+ void SparseMatrixEZ< float >::precondition_SSOR< float > (Vector< float > &,
+ const Vector< float > &,
+ const  float ) const;
+ template
+ void SparseMatrixEZ< float >::precondition_SOR< float > (Vector< float > &,
+ const Vector< float > &,
+ const  float ) const;
+ template
+ void SparseMatrixEZ< float >::precondition_TSOR< float > (Vector< float > &,
+ const Vector< float > &,
+ const  float ) const;
+ template
+ void SparseMatrixEZ< float >::precondition_Jacobi< float > (Vector< float > &,
+ const Vector< float > &,
+ const  float ) const;
+ 
+template
+ void SparseMatrixEZ< float >::vmult< long double > (Vector< long double > &,
+ const Vector< long double > &) const;
+ template
+ void SparseMatrixEZ< float >::Tvmult< long double > (Vector< long double > &,
+ const Vector< long double > &) const;
+ template
+ void SparseMatrixEZ< float >::vmult_add< long double > (Vector< long double > &,
+ const Vector< long double > &) const;
+ template
+ void SparseMatrixEZ< float >::Tvmult_add< long double > (Vector< long double > &,
+ const Vector< long double > &) const;
+
+ template
+ void SparseMatrixEZ< float >::precondition_SSOR< long double > (Vector< long double > &,
+ const Vector< long double > &,
+ const  float ) const;
+ template
+ void SparseMatrixEZ< float >::precondition_SOR< long double > (Vector< long double > &,
+ const Vector< long double > &,
+ const  float ) const;
+ template
+ void SparseMatrixEZ< float >::precondition_TSOR< long double > (Vector< long double > &,
+ const Vector< long double > &,
+ const  float ) const;
+ template
+ void SparseMatrixEZ< float >::precondition_Jacobi< long double > (Vector< long double > &,
+ const Vector< long double > &,
+ const  float ) const;
+ 
+template
+ void SparseMatrixEZ< long double >::vmult< double > (Vector< double > &,
+ const Vector< double > &) const;
+ template
+ void SparseMatrixEZ< long double >::Tvmult< double > (Vector< double > &,
+ const Vector< double > &) const;
+ template
+ void SparseMatrixEZ< long double >::vmult_add< double > (Vector< double > &,
+ const Vector< double > &) const;
+ template
+ void SparseMatrixEZ< long double >::Tvmult_add< double > (Vector< double > &,
+ const Vector< double > &) const;
+
+ template
+ void SparseMatrixEZ< long double >::precondition_SSOR< double > (Vector< double > &,
+ const Vector< double > &,
+ const  long double ) const;
+ template
+ void SparseMatrixEZ< long double >::precondition_SOR< double > (Vector< double > &,
+ const Vector< double > &,
+ const  long double ) const;
+ template
+ void SparseMatrixEZ< long double >::precondition_TSOR< double > (Vector< double > &,
+ const Vector< double > &,
+ const  long double ) const;
+ template
+ void SparseMatrixEZ< long double >::precondition_Jacobi< double > (Vector< double > &,
+ const Vector< double > &,
+ const  long double ) const;
+ 
+template
+ void SparseMatrixEZ< long double >::vmult< float > (Vector< float > &,
+ const Vector< float > &) const;
+ template
+ void SparseMatrixEZ< long double >::Tvmult< float > (Vector< float > &,
+ const Vector< float > &) const;
+ template
+ void SparseMatrixEZ< long double >::vmult_add< float > (Vector< float > &,
+ const Vector< float > &) const;
+ template
+ void SparseMatrixEZ< long double >::Tvmult_add< float > (Vector< float > &,
+ const Vector< float > &) const;
+
+ template
+ void SparseMatrixEZ< long double >::precondition_SSOR< float > (Vector< float > &,
+ const Vector< float > &,
+ const  long double ) const;
+ template
+ void SparseMatrixEZ< long double >::precondition_SOR< float > (Vector< float > &,
+ const Vector< float > &,
+ const  long double ) const;
+ template
+ void SparseMatrixEZ< long double >::precondition_TSOR< float > (Vector< float > &,
+ const Vector< float > &,
+ const  long double ) const;
+ template
+ void SparseMatrixEZ< long double >::precondition_Jacobi< float > (Vector< float > &,
+ const Vector< float > &,
+ const  long double ) const;
+ 
+template
+ void SparseMatrixEZ< long double >::vmult< long double > (Vector< long double > &,
+ const Vector< long double > &) const;
+ template
+ void SparseMatrixEZ< long double >::Tvmult< long double > (Vector< long double > &,
+ const Vector< long double > &) const;
+ template
+ void SparseMatrixEZ< long double >::vmult_add< long double > (Vector< long double > &,
+ const Vector< long double > &) const;
+ template
+ void SparseMatrixEZ< long double >::Tvmult_add< long double > (Vector< long double > &,
+ const Vector< long double > &) const;
+
+ template
+ void SparseMatrixEZ< long double >::precondition_SSOR< long double > (Vector< long double > &,
+ const Vector< long double > &,
+ const  long double ) const;
+ template
+ void SparseMatrixEZ< long double >::precondition_SOR< long double > (Vector< long double > &,
+ const Vector< long double > &,
+ const  long double ) const;
+ template
+ void SparseMatrixEZ< long double >::precondition_TSOR< long double > (Vector< long double > &,
+ const Vector< long double > &,
+ const  long double ) const;
+ template
+ void SparseMatrixEZ< long double >::precondition_Jacobi< long double > (Vector< long double > &,
+ const Vector< long double > &,
+ const  long double ) const;
+ 
