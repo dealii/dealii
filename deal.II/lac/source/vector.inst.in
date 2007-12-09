@@ -1,0 +1,61 @@
+//---------------------------------------------------------------------------
+//    $Id: vector.cc 15443 2007-11-05 03:43:52Z bangerth $
+//    Version: $Name$
+//
+//    Copyright (C) 1999, 2000, 2001, 2002, 2003, 2004, 2005, 2006, 2007 by the deal.II authors
+//
+//    This file is subject to QPL and may not be  distributed
+//    without copyright and license information. Please refer
+//    to the file deal.II/doc/license.html for the  text  and
+//    further information on this license.
+//
+//---------------------------------------------------------------------------
+
+
+for (SCALAR : REAL_SCALARS)
+  {
+    template class Vector<SCALAR>;
+  }
+
+for (S1, S2 : REAL_SCALARS)
+  {
+    template
+      bool
+      Vector<S1>::DEAL_II_MEMBER_OP_TEMPLATE_INST
+      operator==<S2>(const Vector<S2>&) const;
+    template
+      S1
+      Vector<S1>::DEAL_II_MEMBER_OP_TEMPLATE_INST
+      operator*<S2>(const Vector<S2>&) const;
+    template
+      void Vector<S1>::reinit<S2>(const Vector<S2>&, const bool);
+    template
+      void Vector<S1>::equ<S2>(const S1, const Vector<S2>&);
+    template
+      void Vector<S1>::scale<S2>(const Vector<S2>&);
+  }
+
+
+
+for (SCALAR : COMPLEX_SCALARS)
+  {
+    template class Vector<SCALAR>;
+  }
+
+for (S1, S2 : COMPLEX_SCALARS)
+  {
+    template
+      bool
+      Vector<S1>::DEAL_II_MEMBER_OP_TEMPLATE_INST
+      operator==<S2>(const Vector<S2>&) const;
+    template
+      S1
+      Vector<S1>::DEAL_II_MEMBER_OP_TEMPLATE_INST
+      operator*<S2>(const Vector<S2>&) const;
+    template
+      void Vector<S1>::reinit<S2>(const Vector<S2>&, const bool);
+    template
+      void Vector<S1>::equ<S2>(const S1, const Vector<S2>&);
+    template
+      void Vector<S1>::scale<S2>(const Vector<S2>&);
+  }

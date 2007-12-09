@@ -1,0 +1,6 @@
+REAL_SCALARS    := { double; float; long double }
+COMPLEX_SCALARS := { std::complex<double>; 
+                     std::complex<float>;
+                     std::complex<long double> }
+
+DEAL_II_VEC_TEMPLATES := { Vector; BlockVector }

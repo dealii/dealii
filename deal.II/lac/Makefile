@@ -40,6 +40,10 @@ $(LIBDIR)/lac/%.$(OBJEXT) :
 	@echo "=====lac==============optimized==$(MT)== $(<F)"
 	@$(CXX) $(CXXFLAGS.o) -c $< -o $@
 
+source/%.inst :
+	@echo "=====lac============================= $(@F)"
+	@$D/common/scripts/expand_instantiations $D/common/template-arguments < $< > $@
+
 
 # rules
 lib: $(LIBDIR)/liblac.g$(lib-suffix) $(LIBDIR)/liblac$(lib-suffix)
@@ -116,11 +120,17 @@ clean:
 # of this file.
 #
 # If the command fails, then remove Makefile.dep again and fail
-Makefile.dep: $(cc-files) $(h-files) Makefile $D/common/Make.global_options
+Makefile.dep: $(cc-files) $(h-files) \
+		$(shell echo source/*.inst.in) \
+		Makefile $D/common/Make.global_options
 	@echo ============================ Remaking lac/Makefile
 	@$D/common/scripts/make_dependencies $(INCLUDE) "-B$(LIBDIR)/lac" $(cc-files) \
 		> $@ \
 	 || (rm -f $@ ; false)
+	@for i in source/*inst.in ; do \
+		echo "$${i}.x : $${i}" | \
+		$(PERL) -pi -e 's/\.inst\.in\.x/.inst/g;' ; \
+	 done >> $@
 
 
 # include all the dependencies
