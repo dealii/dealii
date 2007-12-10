@@ -476,8 +476,8 @@ void FullMatrix<number>::equ (const number               a,
   Assert (m() == A.m(), ExcDimensionMismatch(m(), A.m()));
   Assert (n() == A.n(), ExcDimensionMismatch(n(), A.n()));
 
-  for (unsigned int i=0; i<n(); ++i)
-    for (unsigned int j=0; j<m(); ++j)
+  for (unsigned int i=0; i<m(); ++i)
+    for (unsigned int j=0; j<n(); ++j)
       (*this)(i,j) = a * number(A(i,j));
 }
 
@@ -497,8 +497,8 @@ FullMatrix<number>::equ (const number               a,
   Assert (m() == B.m(), ExcDimensionMismatch(m(), B.m()));
   Assert (n() == B.n(), ExcDimensionMismatch(n(), B.n()));
 
-  for (unsigned int i=0; i<n(); ++i)
-    for (unsigned int j=0; j<m(); ++j)
+  for (unsigned int i=0; i<m(); ++i)
+    for (unsigned int j=0; j<n(); ++j)
       (*this)(i,j) = a * number(A(i,j)) + b * number(B(i,j));
 }
 
@@ -522,8 +522,8 @@ FullMatrix<number>::equ (const number               a,
   Assert (m() == C.m(), ExcDimensionMismatch(m(), C.m()));
   Assert (n() == C.n(), ExcDimensionMismatch(n(), C.n()));
 
-  for (unsigned int i=0; i<n(); ++i)
-    for (unsigned int j=0; j<m(); ++j)
+  for (unsigned int i=0; i<m(); ++i)
+    for (unsigned int j=0; j<n(); ++j)
       (*this)(i,j) = a * number(A(i,j)) +
 		     b * number(B(i,j)) +
 		     c * number(C(i,j));
@@ -731,8 +731,8 @@ FullMatrix<number>::add (const number               a,
   Assert (m() == A.m(), ExcDimensionMismatch(m(), A.m()));
   Assert (n() == A.n(), ExcDimensionMismatch(n(), A.n()));
 
-  for (unsigned int i=0; i<n(); ++i)
-    for (unsigned int j=0; j<m(); ++j)
+  for (unsigned int i=0; i<m(); ++i)
+    for (unsigned int j=0; j<n(); ++j)
       (*this)(i,j) += a * number(A(i,j));
 }
 
@@ -752,8 +752,8 @@ FullMatrix<number>::add (const number               a,
   Assert (m() == B.m(), ExcDimensionMismatch(m(), B.m()));
   Assert (n() == B.n(), ExcDimensionMismatch(n(), B.n()));
 
-  for (unsigned int i=0; i<n(); ++i)
-    for (unsigned int j=0; j<m(); ++j)
+  for (unsigned int i=0; i<m(); ++i)
+    for (unsigned int j=0; j<n(); ++j)
       (*this)(i,j) += a * number(A(i,j)) + b * number(B(i,j));
 }
 
@@ -779,8 +779,8 @@ FullMatrix<number>::add (const number               a,
   Assert (n() == C.n(), ExcDimensionMismatch(n(), C.n()));
 
 
-  for (unsigned int i=0; i<n(); ++i)
-    for (unsigned int j=0; j<m(); ++j)
+  for (unsigned int i=0; i<m(); ++i)
+    for (unsigned int j=0; j<n(); ++j)
       (*this)(i,j) += a * number(A(i,j)) +
 		      b * number(B(i,j)) +
 		      c * number(C(i,j));
