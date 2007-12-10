@@ -41,9 +41,12 @@ help:
 
 
 common/scripts/make_dependencies:
-	cd $D/common/scripts && $(MAKE) $(MAKEOPTIONS)
+	cd $D/common/scripts && $(MAKE) $(MAKEOPTIONS) make_dependencies
 
-deps: common/scripts/make_dependencies
+common/scripts/expand_instantiations:
+	cd $D/common/scripts && $(MAKE) $(MAKEOPTIONS) expand_instantiations
+
+deps: common/scripts/make_dependencies common/scripts/expand_instantiations
 	cd $D/base && $(MAKE) $(MAKEOPTIONS) Makefile.dep
 	cd $D/lac && $(MAKE) $(MAKEOPTIONS) Makefile.dep
 	cd $D/deal.II && $(MAKE) $(MAKEOPTIONS) Makefile.dep
