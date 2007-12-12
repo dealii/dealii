@@ -257,15 +257,15 @@ FE_RaviartThomas<dim>::initialize_support_points (const unsigned int deg)
 
 #if deal_II_dimension == 1
 
-template <int dim>
+template <>
 void
-FE_RaviartThomas<dim>::initialize_restriction()
+FE_RaviartThomas<1>::initialize_restriction()
 {
-  for (unsigned int i=0;i<GeometryInfo<dim>::children_per_cell;++i)
+  for (unsigned int i=0;i<GeometryInfo<1>::children_per_cell;++i)
     this->restriction[i].reinit(0,0);
 }
 
-#else
+#endif
 
 // This function is the same Raviart-Thomas interpolation performed by
 // interpolate. Still, we cannot use interpolate, since it was written
@@ -396,7 +396,6 @@ FE_RaviartThomas<dim>::initialize_restriction()
     delete polynomials[d];
 }
 
-#endif
 
 #if deal_II_dimension == 1
 
