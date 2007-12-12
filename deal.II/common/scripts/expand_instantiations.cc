@@ -45,6 +45,7 @@
 #include <fstream>
 #include <map>
 #include <list>
+#include <cstdlib>
 
 
 // a map from the keys in the expansion lists to the list itself. For
