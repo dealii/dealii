@@ -20,7 +20,7 @@ default: run-tests
 
 ############################################################
 
-tests_x = vector-vector \
+tests_x = vector-vector vector_memory \
 	full_matrix \
 	householder \
 	tridiagonal_matrix \
