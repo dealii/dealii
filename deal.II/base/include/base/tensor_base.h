@@ -2,7 +2,7 @@
 //    $Id$
 //    Version: $Name$
 //
-//    Copyright (C) 1998, 1999, 2000, 2001, 2002, 2003, 2004, 2005, 2006 by the deal.II authors
+//    Copyright (C) 1998, 1999, 2000, 2001, 2002, 2003, 2004, 2005, 2006, 2007 by the deal.II authors
 //
 //    This file is subject to QPL and may not be  distributed
 //    without copyright and license information. Please refer
@@ -305,17 +305,19 @@ class Tensor<1,dim>
 				      */
     static unsigned int memory_consumption ();
 
-    				     /** @addtogroup Exceptions
-				      * @{ */
-    
                                      /**
-                                      * Exception
+                                      * Only tensors with a positive
+				      * dimension are implemented. This
+				      * exception is thrown by the
+				      * constructor if the template
+				      * argument <tt>dim</tt> is zero or
+				      * less.
+				      *
+				      * @ingroup Exceptions
                                       */
     DeclException1 (ExcDimTooSmall,
                     int,
-                    << "Given dimensions must be >= 1, but was " << arg1);
-
-				     //@}
+                    << "dim must be positive, but was " << arg1);
   private:
 				     /**
 				      * Store the values in a simple
@@ -399,6 +401,8 @@ template <int dim>
 inline
 Tensor<1,dim>::Tensor (const array_type &initializer)
 {
+  Assert (dim>0, ExcDimTooSmall(dim));
+
   for (unsigned int i=0; i<dim; ++i)
     values[i] = initializer[i];
 }
@@ -409,6 +413,8 @@ template <int dim>
 inline
 Tensor<1,dim>::Tensor (const Tensor<1,dim> &p)
 {
+  Assert (dim>0, ExcDimTooSmall(dim));
+  
   for (unsigned int i=0; i<dim; ++i)
     values[i] = p.values[i];
 }

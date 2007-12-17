@@ -2,7 +2,7 @@
 //    $Id$
 //    Version: $Name$
 //
-//    Copyright (C) 1998, 1999, 2000, 2001, 2002, 2003, 2004, 2005, 2006 by the deal.II authors
+//    Copyright (C) 1998, 1999, 2000, 2001, 2002, 2003, 2004, 2005, 2006, 2007 by the deal.II authors
 //
 //    This file is subject to QPL and may not be  distributed
 //    without copyright and license information. Please refer
@@ -177,22 +177,6 @@ class Point : public Tensor<1,dim>
 				      * representing the two points.
 				      */
     double distance (const Point<dim> &p) const;
-
-      				     /** @addtogroup Exceptions
-				      * @{ */
-
-				     /**
-				      *  Exception
-				      */
-    DeclException1 (ExcDimTooSmall,
-		    int,
-		    << "Given dimensions must be >= 1, but was " << arg1);
-				     /**
-				      * Exception
-				      */
-    DeclException0 (ExcInvalidConstructorCalled);
-				     //@}
-
 };
 
 /*------------------------------- Inline functions: Point ---------------------------*/
@@ -228,7 +212,7 @@ template <int dim>
 inline
 Point<dim>::Point (const double x)
 {
-  Assert (dim==1, ExcInvalidConstructorCalled());
+  Assert (dim==1, StandardExceptions::ExcInvalidConstructorCall());
   this->values[0] = x;
 }
 
@@ -238,7 +222,7 @@ template <int dim>
 inline
 Point<dim>::Point (const double x, const double y)
 {
-  Assert (dim==2, ExcInvalidConstructorCalled());
+  Assert (dim==2, StandardExceptions::ExcInvalidConstructorCall());
   this->values[0] = x;
   this->values[1] = y;
 }
@@ -249,7 +233,7 @@ template <int dim>
 inline
 Point<dim>::Point (const double x, const double y, const double z)
 {
-  Assert (dim==3, ExcInvalidConstructorCalled());
+  Assert (dim==3, StandardExceptions::ExcInvalidConstructorCall());
   this->values[0] = x;
   this->values[1] = y;
   this->values[2] = z;
