@@ -226,7 +226,7 @@ class GrowingVectorMemory : public VectorMemory<VECTOR>
 				      * default is not to do this.
 				      */
     GrowingVectorMemory (const unsigned int initial_size = 0,
-			 const bool log_statistics = true);
+			 const bool log_statistics = false);
 
 				     /**
 				      * Destructor.
