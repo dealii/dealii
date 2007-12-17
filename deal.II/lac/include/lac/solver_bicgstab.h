@@ -105,7 +105,7 @@ class SolverBicgstab : public Solver<VECTOR>
 
 				     /**
 				      * Constructor. Use an object of
-				      * type PrimitiveVectorMemory as
+				      * type GrowingVectorMemory as
 				      * a default to allocate memory.
 				      */
     SolverBicgstab (SolverControl        &cn,

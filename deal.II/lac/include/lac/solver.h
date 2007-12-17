@@ -166,7 +166,7 @@ class Solver : public Subscriptor
 				      * contrast to the other
 				      * constructor, this constructor
 				      * denotes an internal object of
-				      * type PrimitiveVectorMemory to
+				      * type GrowingVectorMemory to
 				      * allocate memory.
 				      *
 				      * A reference to the control
@@ -192,7 +192,7 @@ class Solver : public Subscriptor
 				      * object has been given to the
 				      * constructor.
 				      */
-    static PrimitiveVectorMemory<VECTOR> static_vector_memory;
+    mutable GrowingVectorMemory<VECTOR> static_vector_memory;
     
 				     /**
 				      * Control structure.

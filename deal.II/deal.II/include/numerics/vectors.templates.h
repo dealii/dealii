@@ -461,7 +461,7 @@ void VectorTools::project (const Mapping<dim>       &mapping,
 				   // errors may accumulate for badly
 				   // conditioned matrices
   ReductionControl        control(5*tmp.size(), 0., 1e-12, false, false);
-  PrimitiveVectorMemory<> memory;
+  GrowingVectorMemory<> memory;
   SolverCG<>              cg(control,memory);
 
   PreconditionSSOR<> prec;
@@ -1784,7 +1784,7 @@ VectorTools::project_boundary_values (const Mapping<dim>       &mapping,
 				   // errors may accumulate for badly
 				   // conditioned matrices
   ReductionControl        control(5*rhs.size(), 0., 1.e-12, false, false);
-  PrimitiveVectorMemory<> memory;
+  GrowingVectorMemory<> memory;
   SolverCG<>              cg(control,memory);
 
   PreconditionSSOR<> prec;

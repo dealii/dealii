@@ -1,5 +1,5 @@
 //---------------------------------------------------------------------------
-//    $Id: vector.cc 15443 2007-11-05 03:43:52Z bangerth $
+//    $Id$
 //    Version: $Name$
 //
 //    Copyright (C) 1999, 2000, 2001, 2002, 2003, 2004, 2005, 2006, 2007 by the deal.II authors
@@ -13,6 +13,19 @@
 
 
 for (SCALAR : REAL_SCALARS)
+  {
+    template class VectorMemory<Vector<SCALAR> >;
+    template class GrowingVectorMemory<Vector<SCALAR> >;
+//    template GrowingVectorMemory<Vector<SCALAR> >::Pool
+//      GrowingVectorMemory<Vector<SCALAR> >::pool;
+
+    template class VectorMemory<BlockVector<SCALAR> >;
+    template class GrowingVectorMemory<BlockVector<SCALAR> >;
+//    template GrowingVectorMemory<BlockVector<SCALAR> >::Pool
+//      GrowingVectorMemory<BlockVector<SCALAR> >::pool;
+  }
+
+for (SCALAR : COMPLEX_SCALARS)
   {
     template class VectorMemory<Vector<SCALAR> >;
     template class GrowingVectorMemory<Vector<SCALAR> >;

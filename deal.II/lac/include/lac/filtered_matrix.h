@@ -77,7 +77,7 @@ template <typename number> class Vector;
  *
  *                     // set up a linear solver
  *   SolverControl control (1000, 1.e-10, false, false);
- *   PrimitiveVectorMemory<Vector<double> > mem;
+ *   GrowingVectorMemory<Vector<double> > mem;
  *   SolverCG<Vector<double> > solver (control, mem);
  *
  *                     // set up a preconditioner object

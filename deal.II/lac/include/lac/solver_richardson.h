@@ -2,7 +2,7 @@
 //    $Id$
 //    Version: $Name$
 //
-//    Copyright (C) 1999, 2000, 2001, 2002, 2003, 2004, 2005, 2006 by the deal.II authors
+//    Copyright (C) 1999, 2000, 2001, 2002, 2003, 2004, 2005, 2006, 2007 by the deal.II authors
 //
 //    This file is subject to QPL and may not be  distributed
 //    without copyright and license information. Please refer
@@ -87,7 +87,7 @@ class SolverRichardson : public Solver<VECTOR>
 
 				     /**
 				      * Constructor. Use an object of
-				      * type PrimitiveVectorMemory as
+				      * type GrowingVectorMemory as
 				      * a default to allocate memory.
 				      */
     SolverRichardson (SolverControl        &cn,

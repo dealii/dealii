@@ -817,16 +817,10 @@ void MixedLaplaceProblem<dim>::assemble_system ()
                                  // management in the API reference
                                  // manual). By default, the linear
                                  // solvers use a derived class
-                                 // <code>PrimitiveVectorMemory</code> that,
+                                 // <code>GrowingVectorMemory</code> that,
                                  // ever time a vector is requested,
-                                 // allocates one using <code>new</code>, and
-                                 // calls <code>delete</code> on it again once
-                                 // the solver returns it to the
-                                 // <code>PrimitiveVectorMemory</code>
-                                 // object. This is the appropriate
-                                 // thing to do if we do not
-                                 // anticipate that the vectors may be
-                                 // reused any time soon.
+                                 // allocates one from its internal
+                                 // pool.
                                  //
                                  // On the other hand, for the present
                                  // case, we would like to have a
@@ -887,7 +881,8 @@ class InverseMatrix : public Subscriptor
 
   private:
     const SmartPointer<const Matrix> matrix;
-
+//TODO: GrowingVectorMemory is now the default and it can be created
+//where needed. Adjust documentation and implementation here
     mutable GrowingVectorMemory<> vector_memory;    
 };
 
