@@ -81,21 +81,11 @@ DEAL::Frobenius-norm: 2.236
 -0.038 -0.060 0.220 4.552 0.518 
 0.044 0.069 -0.255 0.518 4.400 
 DEAL::Eigenvalue: 5.000
-DEAL::GrowingVectorMemory:Overall allocated vectors: 0
-DEAL::GrowingVectorMemory:Maximum allocated vectors: 2
 DEAL::Eigenvalue: 1.000
-DEAL::GrowingVectorMemory:Overall allocated vectors: 0
-DEAL::GrowingVectorMemory:Maximum allocated vectors: 2
 0.646 0.095 -0.205 0.019 -0.022 
 0.095 0.424 -0.195 0.018 -0.021 
 -0.205 -0.195 0.754 -0.047 0.054 
 0.019 0.018 -0.047 0.226 -0.030 
 -0.022 -0.021 0.054 -0.030 0.234 
 DEAL::Eigenvalue: 1.000
-DEAL::GrowingVectorMemory:Overall allocated vectors: 0
-DEAL::GrowingVectorMemory:Maximum allocated vectors: 2
 DEAL::Eigenvalue: 0.200
-DEAL::GrowingVectorMemory:Overall allocated vectors: 0
-DEAL::GrowingVectorMemory:Maximum allocated vectors: 2
-DEAL::GrowingVectorMemory:Overall allocated vectors: 8
-DEAL::GrowingVectorMemory:Maximum allocated vectors: 2

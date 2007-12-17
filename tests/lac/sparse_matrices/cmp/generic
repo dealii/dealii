@@ -97,12 +97,6 @@ DEAL:5-SparseMatrix<double>:block_sor:RichardsonT::Starting value 4.00
 DEAL:5-SparseMatrix<double>:block_sor:RichardsonT::Failure step 10 value 1.07e-06
 DEAL:5-SparseMatrix<double>:block_psor:RichardsonT::Starting value 4.00
 DEAL:5-SparseMatrix<double>:block_psor:RichardsonT::Failure step 10 value 8.62e-07
-DEAL::GrowingVectorMemory:Overall allocated vectors: 0
-DEAL::GrowingVectorMemory:Maximum allocated vectors: 2
-DEAL::GrowingVectorMemory:Overall allocated vectors: 0
-DEAL::GrowingVectorMemory:Maximum allocated vectors: 2
-DEAL::GrowingVectorMemory:Overall allocated vectors: 32
-DEAL::GrowingVectorMemory:Maximum allocated vectors: 2
 DEAL::	0	0	5.00
 DEAL::	0	1	-2.00
 DEAL::	0	4	-1.00
@@ -187,12 +181,6 @@ DEAL:5-BlockSparseMatrix<double>:jacobi:RichardsonT::Starting value 4.00
 DEAL:5-BlockSparseMatrix<double>:jacobi:RichardsonT::Failure step 10 value 1.34
 DEAL:5-BlockSparseMatrix<double>:block_jacobi:RichardsonT::Starting value 4.00
 DEAL:5-BlockSparseMatrix<double>:block_jacobi:RichardsonT::Failure step 10 value 0.00341
-DEAL::GrowingVectorMemory:Overall allocated vectors: 0
-DEAL::GrowingVectorMemory:Maximum allocated vectors: 2
-DEAL::GrowingVectorMemory:Overall allocated vectors: 0
-DEAL::GrowingVectorMemory:Maximum allocated vectors: 2
-DEAL::GrowingVectorMemory:Overall allocated vectors: 12
-DEAL::GrowingVectorMemory:Maximum allocated vectors: 2
 DEAL::	0	0	5.00
 DEAL::	0	1	-2.00
 DEAL::	0	4	-1.00
@@ -296,12 +284,6 @@ DEAL:5-SparseMatrixEZ<double>:block_sor:RichardsonT::Starting value 4.00
 DEAL:5-SparseMatrixEZ<double>:block_sor:RichardsonT::Failure step 10 value 1.07e-06
 DEAL:5-SparseMatrixEZ<double>:block_psor:RichardsonT::Starting value 4.00
 DEAL:5-SparseMatrixEZ<double>:block_psor:RichardsonT::Failure step 10 value 8.62e-07
-DEAL::GrowingVectorMemory:Overall allocated vectors: 0
-DEAL::GrowingVectorMemory:Maximum allocated vectors: 2
-DEAL::GrowingVectorMemory:Overall allocated vectors: 0
-DEAL::GrowingVectorMemory:Maximum allocated vectors: 2
-DEAL::GrowingVectorMemory:Overall allocated vectors: 32
-DEAL::GrowingVectorMemory:Maximum allocated vectors: 2
 DEAL::	0	0	5.00
 DEAL::	0	1	-2.00
 DEAL::	0	4	-1.00
@@ -413,12 +395,6 @@ DEAL:9-SparseMatrix<double>:block_sor:RichardsonT::Starting value 4.00
 DEAL:9-SparseMatrix<double>:block_sor:RichardsonT::Failure step 10 value 2.94e-06
 DEAL:9-SparseMatrix<double>:block_psor:RichardsonT::Starting value 4.00
 DEAL:9-SparseMatrix<double>:block_psor:RichardsonT::Failure step 10 value 1.86e-06
-DEAL::GrowingVectorMemory:Overall allocated vectors: 0
-DEAL::GrowingVectorMemory:Maximum allocated vectors: 2
-DEAL::GrowingVectorMemory:Overall allocated vectors: 0
-DEAL::GrowingVectorMemory:Maximum allocated vectors: 2
-DEAL::GrowingVectorMemory:Overall allocated vectors: 32
-DEAL::GrowingVectorMemory:Maximum allocated vectors: 2
 DEAL::Assemble
 DEAL:9-SparseMatrixEZ<double>:identity:Richardson::Starting value 4.00
 DEAL:9-SparseMatrixEZ<double>:identity:Richardson::Failure step 10 value 2.41
@@ -453,12 +429,6 @@ DEAL:9-SparseMatrixEZ<double>:block_sor:RichardsonT::Starting value 4.00
 DEAL:9-SparseMatrixEZ<double>:block_sor:RichardsonT::Failure step 10 value 2.94e-06
 DEAL:9-SparseMatrixEZ<double>:block_psor:RichardsonT::Starting value 4.00
 DEAL:9-SparseMatrixEZ<double>:block_psor:RichardsonT::Failure step 10 value 1.86e-06
-DEAL::GrowingVectorMemory:Overall allocated vectors: 0
-DEAL::GrowingVectorMemory:Maximum allocated vectors: 2
-DEAL::GrowingVectorMemory:Overall allocated vectors: 0
-DEAL::GrowingVectorMemory:Maximum allocated vectors: 2
-DEAL::GrowingVectorMemory:Overall allocated vectors: 32
-DEAL::GrowingVectorMemory:Maximum allocated vectors: 2
 DEAL::SparseMatrixEZ:used      entries:100
 DEAL::SparseMatrixEZ:allocated entries:111
 DEAL::SparseMatrixEZ:reserved  entries:192
