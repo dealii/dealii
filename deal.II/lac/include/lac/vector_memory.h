@@ -21,6 +21,7 @@
 #include <lac/vector.h>
 
 #include <vector>
+#include <iostream>
 
 DEAL_II_NAMESPACE_OPEN
 
@@ -99,21 +100,6 @@ class VectorMemory : public Subscriptor
 				      */
     virtual void free (const VECTOR * const) = 0;
 
-				     /**
-				      * Access the default memory
-				      * space deal.II is offering for
-				      * vectors of this kind.
-				      *
-				      * This function accesses static
-				      * VectorMemory objects used by
-				      * deal.II classes to allocate
-				      * vectors. It is good practice
-				      * to use these in your program
-				      * as well, in order to optimize
-				      * memory usage.
-				      */
-    static VectorMemory<VECTOR>& default_pool();
-    
 				     /** @addtogroup Exceptions
 				      * @{ */
     
@@ -127,15 +113,6 @@ class VectorMemory : public Subscriptor
 				      */
     DeclException0(ExcNotAllocatedHere);
 
-				     /**
-				      * You tried to access the
-				      * deal.II
-				      * VectorMemory::default_pool(),
-				      * but the vector class you are
-				      * using is not a standard
-				      * deal.II vector class.
-				      */
-    DeclException0(ExcNoDefaultMemoryForThisVectorClass);
 				     //@}
 };
 
@@ -214,6 +191,27 @@ class PrimitiveVectorMemory : public VectorMemory<VECTOR>
  * other hand, it doesn't release once-allocated memory at the
  * earliest possible time and may therefore lead to an increased
  * overall memory consumption.
+ *
+ * All GrowingVectorMemory objects of the same vector type use the
+ * same memory Pool. Therefore, functions can create such a
+ * VectorMemory object whenever needed without preformance penalty. A
+ * drawback of this policy might be that vectors once allocated are
+ * only released at the end of the program run. Nebertheless, the
+ * since they are reused, this should be of no concern. Additionally,
+ * the destructor of the Pool warns about memory leaks.
+ *
+ * @note Instantiations for this class are provided for the types
+ * Vector and BlockVector with number types <tt>float</tt>,
+ * <tt>double</tt>, <tt>long double</tt>, @<std::complex@<float@>@>,
+ * @<std::complex@<double@>@> and @<std::complex@<long
+ * double@>@></tt>. In order to generate additional instances, it is
+ * sufficient to define the Pool variable somewhere by
+ * <code>
+ * #include <lac/vector_memory.h>
+ *
+ * template GrowingVectorMemory<MyVector>::Pool
+ *   GrowingVectorMemory<MyVector>::pool;
+ * </code>
  * 
  * @author Guido Kanschat, 1999, 2007
  */
@@ -277,12 +275,6 @@ class GrowingVectorMemory : public VectorMemory<VECTOR>
 				      */
     unsigned int memory_consumption() const;
 
-				     /**
-				      * A flag controlling the logging
-				      * of statistics at the end.
-				      */
-    bool log_statistics;
-    
   private:
 				     /**
 				      * Type to enter into the
@@ -294,9 +286,34 @@ class GrowingVectorMemory : public VectorMemory<VECTOR>
     typedef std::pair<bool, VECTOR*> entry_type;
 
 				     /**
+				      * The class providing the actual
+				      * storage for the memory pool.
+				      *
+				      * This is where the actual
+				      * storage for GrowingVectorMemory
+				      * is provided. Only one of these
+				      * pools is used for each vector
+				      * type, thus allocating all
+				      * vectors from the same storage.
+				      *
+				      * @author Guido Kanschat, 2007
+				      */
+    struct Pool
+    {
+/// Standard constructor creating an empty pool
+	Pool();
+/// Destructor. Frees memory and warns about memory leaks
+	~Pool();
+/// Create data vector; does nothing after first initialization
+	void initialize(const unsigned int size);
+/// Pointer to the storage object
+	std::vector<entry_type>* data;
+    };
+    
+				     /**
 				      * Array of allocated vectors.
 				      */
-    std::vector<entry_type> pool;
+    static Pool pool;
     
 				     /**
 				      * Overall number of
@@ -305,7 +322,20 @@ class GrowingVectorMemory : public VectorMemory<VECTOR>
 				      * output at the end of an
 				      * object's lifetime.
 				      */
-    unsigned int n_alloc;
+    unsigned int total_alloc;
+				     /**
+				      * Number of vectors currently
+				      * allocated in this object; used
+				      * for detecting memory leaks.
+				      */
+    unsigned int current_alloc;
+    
+				     /**
+				      * A flag controlling the logging
+				      * of statistics by the
+				      * destructor.
+				      */
+    bool log_statistics;
     
 				     /**
 				      * Mutex to synchronise access to
@@ -320,75 +350,107 @@ class GrowingVectorMemory : public VectorMemory<VECTOR>
 #ifndef DOXYGEN
 /* --------------------- inline functions ---------------------- */
 
+template <typename VECTOR>
+inline
+GrowingVectorMemory<VECTOR>::Pool::Pool()
+		:
+		data(0)
+{}
+
+
 
 template <typename VECTOR>
-GrowingVectorMemory<VECTOR>::GrowingVectorMemory (const unsigned int initial_size,
-						  const bool log_statistics)
-		:
-		log_statistics(log_statistics),
-		pool(initial_size)
+inline
+GrowingVectorMemory<VECTOR>::Pool::~Pool()
 {
-  Threads::ThreadMutex::ScopedLock lock(mutex);
-  for (typename std::vector<entry_type>::iterator i=pool.begin();
-       i != pool.end();
-       ++i)
-    {
-      i->first = false;
-      i->second = new VECTOR;
-    }
+				   // Nothing to do if memory was unused.
+  if (data == 0) return;
 
-				   // no vectors yet claimed
-  n_alloc = 0;
-}
-
-
-
-template<typename VECTOR>
-GrowingVectorMemory<VECTOR>::~GrowingVectorMemory()
-{
-  Threads::ThreadMutex::ScopedLock lock(mutex);
-
-				   // deallocate all vectors and count
-				   // number of vectors that is still
-				   // claimed by other users
-  unsigned int n = 0;
-  for (typename std::vector<entry_type>::iterator i=pool.begin();
-       i != pool.end();
+				   // First, delete all remaining
+				   // vectors. Actually, there should
+				   // be none, if there is no memory
+				   // leak
+  unsigned int n=0;
+  for (typename std::vector<entry_type>::iterator i=data->begin();
+       i != data->end();
        ++i)
     {
       if (i->first == true)
 	++n;
       delete i->second;
     }
+  delete data;
+}
+
+
+template <typename VECTOR>
+inline
+void
+GrowingVectorMemory<VECTOR>::Pool::initialize(const unsigned int size)
+{
+  if (data == 0)
+    {
+      data = new std::vector<entry_type>(size);
+      
+      for (typename std::vector<entry_type>::iterator i= data->begin();
+	   i != data->end();
+	   ++i)
+	{
+	  i->first = false;
+	  i->second = new VECTOR;
+	}
+    }
+}
+
+
+template <typename VECTOR>
+typename GrowingVectorMemory<VECTOR>::Pool GrowingVectorMemory<VECTOR>::pool;
+
+
+template <typename VECTOR>
+inline
+GrowingVectorMemory<VECTOR>::GrowingVectorMemory (const unsigned int initial_size,
+						  const bool log_statistics)
+		
+		:
+		total_alloc(0),
+		current_alloc(0),
+		log_statistics(log_statistics)
+{
+  Threads::ThreadMutex::ScopedLock lock(mutex);
+  pool.initialize(initial_size);
+}
+
+
+template<typename VECTOR>
+inline
+GrowingVectorMemory<VECTOR>::~GrowingVectorMemory()
+{
+  AssertThrow(current_alloc == 0,
+	      StandardExceptions::ExcMemoryLeak(current_alloc));
   if (log_statistics)
     {
       deallog << "GrowingVectorMemory:Overall allocated vectors: "
-	      << n_alloc << std::endl;
+	      << total_alloc << std::endl;
       deallog << "GrowingVectorMemory:Maximum allocated vectors: "
-	      << pool.size() << std::endl;
+	      << pool.data->size() << std::endl;
     }
-  pool.clear ();
-
-				   // write out warning if memory leak
-  if (n!=0)
-    deallog << "GrowingVectorMemory:Vectors not deallocated: "
-	    << n << ". Memory leak!" << std::endl;
 }
 
 
 
 template<typename VECTOR>
+inline
 VECTOR *
 GrowingVectorMemory<VECTOR>::alloc ()
 {
   Threads::ThreadMutex::ScopedLock lock(mutex);
-  ++n_alloc;
-
+  ++total_alloc;
+  ++current_alloc;
 				   // see if there is a free vector
 				   // available in our list
-  for (typename std::vector<entry_type>::iterator i=pool.begin();
-       i != pool.end();
-       ++i)
+  for (typename std::vector<entry_type>::iterator i=pool.data->begin();
+       i != pool.data->end(); ++i)
     {
       if (i->first == false)
 	{
@@ -400,7 +462,7 @@ GrowingVectorMemory<VECTOR>::alloc ()
 				   // no free vector found, so let's
 				   // just allocate a new one
   const entry_type t (true, new VECTOR);
-  pool.push_back(t);
+  pool.data->push_back(t);
   
   return t.second;
 }
@@ -408,15 +470,18 @@ GrowingVectorMemory<VECTOR>::alloc ()
 
 
 template<typename VECTOR>
+inline
 void
 GrowingVectorMemory<VECTOR>::free(const VECTOR* const v)
 {
   Threads::ThreadMutex::ScopedLock lock(mutex);
-  for (typename std::vector<entry_type>::iterator i=pool.begin();i != pool.end() ;++i)
+  for (typename std::vector<entry_type>::iterator i=pool.data->begin();
+       i != pool.data->end(); ++i)
     {
       if (v == (i->second))
 	{
 	  i->first = false;
+	  --current_alloc;
 	  return;
 	}
     }
@@ -426,14 +491,15 @@ GrowingVectorMemory<VECTOR>::free(const VECTOR* const v)
 
 
 template<typename VECTOR>
+inline
 unsigned int
 GrowingVectorMemory<VECTOR>::memory_consumption () const
 {
   unsigned int result = sizeof (*this);
   const typename std::vector<entry_type>::const_iterator
-    end = pool.end();
+    end = pool.data->end();
   for (typename std::vector<entry_type>::const_iterator
-         i = pool.begin(); i != end ; ++i)
+         i = pool.data->begin(); i != end ; ++i)
     result += sizeof (*i) + i->second->memory_consumption();
 
   return result;

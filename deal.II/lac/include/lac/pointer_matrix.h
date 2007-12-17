@@ -269,8 +269,8 @@ class PointerMatrixAux : public PointerMatrixBase<VECTOR>
 				      * If <tt>M</tt> is zero, no
 				      * matrix is stored.
 				      *
-				      * If <tt>mem</tt> is zero, the
-				      * VectorMemory::default_pool()
+				      * If <tt>mem</tt> is zero, then
+				      * GrowingVectorMemory
 				      * is used.
 				      */
     PointerMatrixAux (VectorMemory<VECTOR>* mem = 0,
@@ -357,7 +357,7 @@ class PointerMatrixAux : public PointerMatrixBase<VECTOR>
 				     /**
 				      * The backup memory if none was provided.
 				      */
-    mutable PrimitiveVectorMemory<VECTOR> my_memory;
+    mutable GrowingVectorMemory<VECTOR> my_memory;
 
 				     /**
 				      * Object for getting the
@@ -848,8 +848,7 @@ PointerMatrixAux<MATRIX, VECTOR>::PointerMatrixAux (
 		: mem(mem, typeid(*this).name()),
 		  m(M, typeid(*this).name())
 {
-  if (mem == 0)
-    mem = &VectorMemory<VECTOR>::default_pool();
+  if (mem == 0) mem = &my_memory;
 }
 
 
@@ -860,8 +859,7 @@ PointerMatrixAux<MATRIX, VECTOR>::PointerMatrixAux (
 		: mem(mem, name),
 		  m(0, name)
 {
-  if (mem == 0)
-    mem = &VectorMemory<VECTOR>::default_pool();
+  if (mem == 0) mem = &my_memory;
 }
 
 
@@ -873,8 +871,7 @@ PointerMatrixAux<MATRIX, VECTOR>::PointerMatrixAux (
 		: mem(mem, name),
 		  m(M, name)
 {
-  if (mem == 0)
-    mem = &VectorMemory<VECTOR>::default_pool();
+  if (mem == 0) mem = &my_memory;
 }
 
 
