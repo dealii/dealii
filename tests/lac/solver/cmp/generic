@@ -157,5 +157,19 @@ DEAL:psor:GMRES::Starting value 7.345
 DEAL:psor:GMRES::Convergence step 20 value 0.0008491
 DEAL:psor:GMRES::Starting value 7.345
 DEAL:psor:GMRES::Convergence step 20 value 0.0008491
+DEAL::GrowingVectorMemory:Overall allocated vectors: 0
+DEAL::GrowingVectorMemory:Maximum allocated vectors: 8
+DEAL::GrowingVectorMemory:Overall allocated vectors: 0
+DEAL::GrowingVectorMemory:Maximum allocated vectors: 8
+DEAL::GrowingVectorMemory:Overall allocated vectors: 0
+DEAL::GrowingVectorMemory:Maximum allocated vectors: 8
+DEAL::GrowingVectorMemory:Overall allocated vectors: 0
+DEAL::GrowingVectorMemory:Maximum allocated vectors: 8
+DEAL::GrowingVectorMemory:Overall allocated vectors: 0
+DEAL::GrowingVectorMemory:Maximum allocated vectors: 8
+DEAL::GrowingVectorMemory:Overall allocated vectors: 0
+DEAL::GrowingVectorMemory:Maximum allocated vectors: 8
+DEAL::GrowingVectorMemory:Overall allocated vectors: 0
+DEAL::GrowingVectorMemory:Maximum allocated vectors: 8
 DEAL::GrowingVectorMemory:Overall allocated vectors: 380
 DEAL::GrowingVectorMemory:Maximum allocated vectors: 8

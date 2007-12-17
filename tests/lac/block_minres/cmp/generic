@@ -2,3 +2,5 @@
 DEAL:minres::Starting value 0
 DEAL:minres::Convergence step 0 value 0
 DEAL::OK
+DEAL::GrowingVectorMemory:Overall allocated vectors: 7
+DEAL::GrowingVectorMemory:Maximum allocated vectors: 7
