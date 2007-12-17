@@ -586,6 +586,17 @@ namespace StandardExceptions
   DeclException0 (ExcOutOfMemory);
 
 				   /**
+				    * A memory handler reached a point
+				    * where all allocated objects
+				    * should have been released. Since
+				    * this exception is thrown, some
+				    * where still allocated.
+				    */
+  DeclException1 (ExcMemoryLeak, int,
+		  << "Destroying memory handler while " << arg1
+		  << " objects are still allocated");
+  
+				   /**
 				    * An error occured reading or
 				    * writing a file.
 				    */
