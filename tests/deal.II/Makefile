@@ -33,6 +33,7 @@ tests_x = block_matrices \
 	dof_renumbering_* \
 	error_estimator \
 	grid_invert \
+	grid_generator* \
 	grid_out \
 	grid_out_* \
 	grid_output_input \
