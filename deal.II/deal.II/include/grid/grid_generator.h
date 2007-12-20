@@ -109,7 +109,7 @@ class GridGenerator
 
     				     /**
 				      * Create a coordinate-parallel
-				      * parallelepiped from the two
+				      * brick from the two
 				      * diagonally opposite corner
 				      * points @p p1 and @p p2.
 				      *
@@ -123,9 +123,17 @@ class GridGenerator
 				      * for the surfaces in
 				      * @p y-direction are 2 and 3,
 				      * the ones for @p z are 4 and
-				      * 5.
+				      * 5. Additionally, material ids
+				      * are assigned to the cells
+				      * according to the octant their
+				      * center is in: being in the right half
+				      * plane for any coordinate
+				      * direction <i>x<sub>i</sub></i>
+				      * adds 2<sup>i</sup>. For
+				      * instance, the center point
+				      * (1,-1,1) yields a material id 5.
 				      * 
-				      * The triangulation needs to be
+				      * @note The triangulation needs to be
 				      * void upon calling this
 				      * function.
 				      */
@@ -167,7 +175,15 @@ class GridGenerator
 				      * for the surfaces in
 				      * @p y-direction are 2 and 3,
 				      * the ones for @p z are 4 and
-				      * 5.
+				      * 5.  Additionally, material ids
+				      * are assigned to the cells
+				      * according to the octant their
+				      * center is in: being in the right half
+				      * plane for any coordinate
+				      * direction <i>x<sub>i</sub></i>
+				      * adds 2<sup>i</sup>. For
+				      * instance, the center point
+				      * (1,-1,1) yields a material id 5.
 				      *
 				      * @note The triangulation needs to be
 				      * void upon calling this

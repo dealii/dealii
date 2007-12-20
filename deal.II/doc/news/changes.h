@@ -173,6 +173,14 @@ inconvenience this causes.
 
 <ol>
 
+<li> Improved: All GrowingVectorMemory objects of one type will access
+the same memory pool. Therefore, it is now not a crime to just create
+one and discard later. Furthermore, logging of statistics has been
+switched off by default, such that linear solvers remain silent.
+<br>
+(GK 2007/12/16)
+</li>
+
 <li> Fixed: Vector::operator/= can't work when the scaling factor is zero,
 but it happened to check whether the factor was positive. That's of course
 bogus, the check should have been whether it is non-zero. This has now been
@@ -203,6 +211,13 @@ constraints individually.
 
 <ol> 
 
+  <li> <p>Improved: GridGenerator::subdivided_hyper_rectangle now also colorizes
+  cells according to the octant they are in.
+  <br>
+  (GK 2007/12/20)
+  </p></li>
+
+
   <li> <p>New: The DataOut, DataOutRotation, DataOutStack, and DataOutFaces
   can now deal with vector-valued data if the functions in DataOutBase
   that write in a particular graphical output format can deal with it.
@@ -210,7 +225,7 @@ constraints individually.
   they were all output as logically independent scalar components;
   most visualization programs then allowed to display vector fields
   by composing them of individual scalar fields for each vector component.
-  <p>
+  </p><p>
   With the new scheme, the DataOut_DoFData::add_data_vector() functions
   inherited by the classes listed above take an additional parameter
   that may be used to indicate that certain components of the data

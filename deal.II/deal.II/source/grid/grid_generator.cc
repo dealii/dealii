@@ -146,7 +146,7 @@ template <int dim>
 void
 GridGenerator::colorize_hyper_rectangle (Triangulation<dim> &)
 {
-				   // nothing to do in 1d
+				   // Nothing to do in 1D
 }
 
 
@@ -389,12 +389,12 @@ GridGenerator::subdivided_hyper_cube (Triangulation<dim> &tria,
 
 template <int dim>
 void
-GridGenerator::
-subdivided_hyper_rectangle (Triangulation<dim>              &tria,
-                            const std::vector<unsigned int> &repetitions,
-                            const Point<dim>                &p_1,
-                            const Point<dim>                &p_2,
-                            const bool                       colorize)
+GridGenerator::subdivided_hyper_rectangle (
+  Triangulation<dim>              &tria,
+  const std::vector<unsigned int> &repetitions,
+  const Point<dim>                &p_1,
+  const Point<dim>                &p_2,
+  const bool                       colorize)
 {
 				   // contributed by Joerg R. Weimar
 				   // (j.weimar@jweimar.de) 2003
@@ -1020,12 +1020,16 @@ subdivided_hyper_rectangle (Triangulation<3>&                           tria,
 // Implementation for 1D only
 template <int dim>
 void
-GridGenerator::colorize_subdivided_hyper_rectangle (Triangulation<dim> &,
-						    const Point<dim>   &,
-						    const Point<dim>   &,
-						    const double      )
+GridGenerator::colorize_subdivided_hyper_rectangle (
+  Triangulation<dim>& tria,
+  const Point<dim>&,
+  const Point<dim>&,
+  const double)
 {
-				   // nothing to do in 1d
+  for (typename Triangulation<dim>::cell_iterator cell = tria.begin();
+       cell != tria.end(); ++cell)
+    if (cell->center()(0) > 0)
+      cell->set_material_id(1);
 				   // boundary indicators are set to
 				   // 0 (left) and 1 (right) by default.
 }
@@ -1075,6 +1079,14 @@ GridGenerator::colorize_subdivided_hyper_rectangle (Triangulation<dim> &tria,
 	    Assert (false, ExcInternalError());
 	  
 	}
+    }
+  for (typename Triangulation<dim>::cell_iterator cell = tria.begin();
+       cell != tria.end(); ++cell)
+    {
+      char id = 0;
+      for (unsigned int d=0;d<dim;++d)
+	if (cell->center()(d) > 0) id += 1 << d;
+      cell->set_material_id(id);
     }
 }
 
