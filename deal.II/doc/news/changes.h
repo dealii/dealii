@@ -129,7 +129,12 @@ inconvenience this causes.
 <h3>base</h3>
 
 <ol>
-  <li> <p>Fixed: MultithreadInfo::n_cpus now gives the correct result
+<li> <p> Improved: Quadrature now has an assignment operator.
+<br>
+(GK 2007/12/27)
+</p> </li>
+
+<li> <p>Fixed: MultithreadInfo::n_cpus now gives the correct result
   also on my Intel MacBook Pro.
   <br>
   (Luca Heltai 2007/11/12)

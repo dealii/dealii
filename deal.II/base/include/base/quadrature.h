@@ -93,9 +93,24 @@ class Quadrature : public Subscriptor
     typedef Quadrature<dim-1> SubQuadrature;
     
 				     /**
+				      * @deprecated Use size()
+				      * instead.
+				      *
 				      * Number of quadrature points.
+				      *
+				      * @warning After introduction of
+				      * the assignment operator, this
+				      * number is not constant anymore
+				      * and erroneous assignment can
+				      * compromise integrity of the
+				      * Quadrature object. Since
+				      * direct data access should be
+				      * considered a design flaw
+				      * anyway, it is strongly
+				      * suggested to use size()
+				      * instead.
 				      */
-    const unsigned int n_quadrature_points;
+    unsigned int n_quadrature_points;
 
 				     /**
 				      * Constructor.
@@ -109,7 +124,7 @@ class Quadrature : public Subscriptor
 				      * q_collection(QGauss@<dim@>(3))</code>
 				      * was meant.
 				      */
-    explicit Quadrature (const unsigned int n_quadrature_points);
+    explicit Quadrature (const unsigned int n_quadrature_points = 0);
 
 				     /**
 				      * Build this quadrature formula
@@ -189,11 +204,24 @@ class Quadrature : public Subscriptor
 				      * this point to one.
 				      */
     Quadrature (const Point<dim> &point);
+
+				     /**
+				      * Assignment operator. Copies
+				      * contents of #weights and
+				      * #quadrature_points as well as
+				      * size.
+				      */
+    Quadrature& operator = (const Quadrature<dim>&);
     
 				     /**
 				      * Virtual destructor.
 				      */
     virtual ~Quadrature ();
+
+				     /**
+				      * Number of quadrature points.
+				      */
+    unsigned int size () const;
     
 				     /**
 				      * Return the <tt>i</tt>th quadrature
@@ -344,6 +372,42 @@ class QIterated : public Quadrature<dim>
 
 #ifndef DOXYGEN
 
+// ----------------------------------------------------------------------
+
+
+template<int dim>
+inline
+unsigned int
+Quadrature<dim>::size () const
+{
+  return weights.size();
+}
+
+
+template <int dim>
+inline
+const Point<dim> &
+Quadrature<dim>::point (const unsigned int i) const
+{
+  Assert (dim != 0, ExcNotImplemented());
+  AssertIndexRange(i, size());
+  return quadrature_points[i];
+}
+
+
+
+template <int dim>
+double
+Quadrature<dim>::weight (const unsigned int i) const
+{
+  Assert (dim != 0, ExcNotImplemented());
+  AssertIndexRange(i, size());
+  return weights[i];
+}
+
+
+
+
 /* -------------- declaration of explicit specializations ------------- */
 
 template <>
@@ -364,11 +428,7 @@ template <>
 Quadrature<1>::Quadrature (const Quadrature<0> &);
 
 template <>
-const Point<0> & Quadrature<0>::point (const unsigned int) const;
-template <>
 const std::vector<Point<0> > & Quadrature<0>::get_points () const;
-template <>
-double Quadrature<0>::weight (const unsigned int) const;
 template <>
 const std::vector<double> & Quadrature<0>::get_weights () const;
 
