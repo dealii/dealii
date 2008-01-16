@@ -4,3 +4,8 @@ COMPLEX_SCALARS := { std::complex<double>;
                      std::complex<long double> }
 
 DEAL_II_VEC_TEMPLATES := { Vector; BlockVector }
+
+SERIAL_VECTORS := { Vector<double>;
+                    Vector<float> ;
+	            BlockVector<double>;
+                    BlockVector<float> }
