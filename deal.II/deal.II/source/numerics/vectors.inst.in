@@ -1,0 +1,227 @@
+//---------------------------------------------------------------------------
+//    $Id: vectors.cc 14869 2007-07-25 07:38:02Z kanschat $
+//    Version: $Name$
+//
+//    Copyright (C) 1998, 1999, 2000, 2001, 2002, 2003, 2004, 2005, 2006, 2007, 2008 by the deal.II authors
+//
+//    This file is subject to QPL and may not be  distributed
+//    without copyright and license information. Please refer
+//    to the file deal.II/doc/license.html for the  text  and
+//    further information on this license.
+//
+//---------------------------------------------------------------------------
+
+for (VEC : SERIAL_VECTORS)
+{  
+  template
+    void VectorTools::interpolate<deal_II_dimension>
+    (const Mapping<deal_II_dimension>&,
+     const DoFHandler<deal_II_dimension>&,
+     const Function<deal_II_dimension>&,
+     VEC&);
+  template
+    void VectorTools::interpolate<deal_II_dimension>
+    (const DoFHandler<deal_II_dimension>&,
+     const Function<deal_II_dimension>&,
+     VEC&);
+
+  template
+    void VectorTools::interpolate<deal_II_dimension>
+    (const Mapping<deal_II_dimension>&,
+     const hp::DoFHandler<deal_II_dimension>&,
+     const Function<deal_II_dimension>&,
+     VEC&);
+  template
+    void VectorTools::interpolate<deal_II_dimension>
+    (const hp::DoFHandler<deal_II_dimension>&,
+     const Function<deal_II_dimension>&,
+     VEC&);
+
+  template
+    void VectorTools::interpolate<deal_II_dimension>
+    (const Mapping<deal_II_dimension>&,
+     const MGDoFHandler<deal_II_dimension>&,
+     const Function<deal_II_dimension>&,
+     VEC&);
+  template
+    void VectorTools::interpolate<deal_II_dimension>
+    (const MGDoFHandler<deal_II_dimension>&,
+     const Function<deal_II_dimension>&,
+     VEC&);
+
+  template
+    void VectorTools::interpolate<deal_II_dimension>
+    (const DoFHandler<deal_II_dimension>&,
+     const DoFHandler<deal_II_dimension>&,
+     const FullMatrix<double>&,
+     const VEC&,
+     VEC&);
+
+  template
+    void VectorTools::integrate_difference<deal_II_dimension>
+    (const DoFHandler<deal_II_dimension>&,
+     const VEC&,
+     const Function<deal_II_dimension>&,
+     Vector<double>&,
+     const Quadrature<deal_II_dimension>&,
+     const NormType&,
+     const Function<deal_II_dimension>*,
+     const double);
+  template
+    void VectorTools::integrate_difference<deal_II_dimension>
+    (const DoFHandler<deal_II_dimension>&,
+     const VEC&,
+     const Function<deal_II_dimension>&,
+     Vector<float>&,
+     const Quadrature<deal_II_dimension>&,
+     const NormType&,
+     const Function<deal_II_dimension>*,
+     const double);
+  template
+    void VectorTools::integrate_difference<deal_II_dimension>
+    (const Mapping<deal_II_dimension>&,
+     const DoFHandler<deal_II_dimension>&,
+     const VEC&,
+     const Function<deal_II_dimension>&,
+     Vector<double>&,
+     const Quadrature<deal_II_dimension>&,
+     const NormType&,
+     const Function<deal_II_dimension>*,
+     const double);
+  template
+    void VectorTools::integrate_difference<deal_II_dimension>
+    (const Mapping<deal_II_dimension>&,
+     const DoFHandler<deal_II_dimension>&,
+     const VEC&,
+     const Function<deal_II_dimension>&,
+     Vector<float>&,
+     const Quadrature<deal_II_dimension>&,
+     const NormType&,
+     const Function<deal_II_dimension>*,
+     const double);
+
+  template
+    void VectorTools::integrate_difference<deal_II_dimension>
+    (const hp::DoFHandler<deal_II_dimension>&,
+     const VEC&,
+     const Function<deal_II_dimension>&,
+     Vector<double>&,
+     const hp::QCollection<deal_II_dimension>&,
+     const NormType&,
+     const Function<deal_II_dimension>*,
+     const double);
+  template
+    void VectorTools::integrate_difference<deal_II_dimension>
+    (const hp::DoFHandler<deal_II_dimension>&,
+     const VEC&,
+     const Function<deal_II_dimension>&,
+     Vector<float>&,
+     const hp::QCollection<deal_II_dimension>&,
+     const NormType&,
+     const Function<deal_II_dimension>*,
+     const double);
+  template
+    void VectorTools::integrate_difference<deal_II_dimension>
+    (const hp::MappingCollection<deal_II_dimension>&,
+     const hp::DoFHandler<deal_II_dimension>&,
+     const VEC&,
+     const Function<deal_II_dimension>&,
+     Vector<double>&,
+     const hp::QCollection<deal_II_dimension>&,
+     const NormType&,
+     const Function<deal_II_dimension>*,
+     const double);
+  template
+    void VectorTools::integrate_difference<deal_II_dimension>
+    (const hp::MappingCollection<deal_II_dimension>&,
+     const hp::DoFHandler<deal_II_dimension>&,
+     const VEC&,
+     const Function<deal_II_dimension>&,
+     Vector<float>&,
+     const hp::QCollection<deal_II_dimension>&,
+     const NormType&,
+     const Function<deal_II_dimension>*,
+     const double);
+
+  template
+    void VectorTools::point_difference<deal_II_dimension> (
+      const DoFHandler<deal_II_dimension>&,
+      const VEC&,
+      const Function<deal_II_dimension>&,
+      Vector<double>&,
+      const Point<deal_II_dimension>&);
+
+  template
+    void VectorTools::point_difference<deal_II_dimension> (
+      const Mapping<deal_II_dimension>&,
+      const DoFHandler<deal_II_dimension>&,
+      const VEC&,
+      const Function<deal_II_dimension>&,
+      Vector<double>&,
+      const Point<deal_II_dimension>&);
+
+  template
+    void VectorTools::point_value<deal_II_dimension> (
+      const DoFHandler<deal_II_dimension>&,
+      const VEC&,
+      const Point<deal_II_dimension>&,
+      Vector<double>&);
+
+  template
+    double VectorTools::point_value<deal_II_dimension> (
+      const DoFHandler<deal_II_dimension>&,
+      const VEC&,
+      const Point<deal_II_dimension>&);
+
+  template
+    void VectorTools::point_value<deal_II_dimension> (
+      const Mapping<deal_II_dimension>&,
+      const DoFHandler<deal_II_dimension>&,
+      const VEC&,
+      const Point<deal_II_dimension>&,
+      Vector<double>&);
+
+  template
+    double VectorTools::point_value<deal_II_dimension> (
+      const Mapping<deal_II_dimension>&,
+      const DoFHandler<deal_II_dimension>&,
+      const VEC&,
+      const Point<deal_II_dimension>&);
+
+  template
+    double VectorTools::compute_mean_value<deal_II_dimension>
+    (const Mapping<deal_II_dimension>&,
+     const DoFHandler<deal_II_dimension>&,
+     const Quadrature<deal_II_dimension>&,
+     const VEC&,
+     const unsigned int);
+  template
+    double VectorTools::compute_mean_value<deal_II_dimension>
+    (const DoFHandler<deal_II_dimension>&,
+     const Quadrature<deal_II_dimension>&,
+     const VEC&,
+     const unsigned int);
+
+  template
+    void VectorTools::project
+    (const Mapping<deal_II_dimension>      &,
+     const DoFHandler<deal_II_dimension>   &,
+     const ConstraintMatrix                &,
+     const Quadrature<deal_II_dimension>   &,
+     const Function<deal_II_dimension>     &,
+     VEC                                   &,
+     const bool,
+     const Quadrature<deal_II_dimension-1> &,
+     const bool);
+
+  template
+    void VectorTools::project
+    (const DoFHandler<deal_II_dimension>   &,
+     const ConstraintMatrix                &,
+     const Quadrature<deal_II_dimension>   &,
+     const Function<deal_II_dimension>     &,
+     VEC                                   &,
+     const bool,
+     const Quadrature<deal_II_dimension-1> &,
+     const bool);
+}
