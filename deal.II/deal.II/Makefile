@@ -27,6 +27,9 @@ all: 2dg 2d 3dg 3d 1dg 1d
 cc-files     = $(shell echo source/*/*.cc)
 h-files      = $(sort $(shell echo include/*/*.h))
 
+inst-in-files= $(shell echo source/*/*.inst.in)
+inst-files   = $(inst-in-files:%.in=%)
+
 
 # replace subdirectories in cc file names by a prefix, preprend a "lib/[g]o"
 # and change the suffix
@@ -71,6 +74,10 @@ $(LIBDIR)/3d/%.g.$(OBJEXT) :
 $(LIBDIR)/3d/%.$(OBJEXT) :
 	@echo "=====deal.II====3d====optimized==$(MT)== $(<:source/%=%)"
 	@$(CXX) $(CXXFLAGS.o) -Ddeal_II_dimension=3 -c $< -o $@
+
+source/%.inst : source/%.inst.in
+	@echo "=====deal.II========================= $(@F)"
+	@$D/common/scripts/expand_instantiations $D/common/template-arguments < $< > $@
 
 
 
@@ -173,7 +180,8 @@ $(LIBDIR)/libdeal_II_3d$(shared-lib-suffix): $(o-files-3d)
 
 
 
-
+x:
+	echo $(inst-files)
 
 # Rule to generate the dependency file. This file is
 # automagically remade whenever needed, i.e. whenever
@@ -182,8 +190,10 @@ $(LIBDIR)/libdeal_II_3d$(shared-lib-suffix): $(o-files-3d)
 # of this file.
 #
 # If the command fails, then remove Makefile.dep again and fail
-Makefile.dep: $(cc-files) $(h-files) Makefile $D/common/Make.global_options
-	@echo "============================ Remaking deal.II/Makefile"
+Makefile.dep: $(cc-files) $(h-files) \
+		$(inst-files) \
+		Makefile $D/common/Make.global_options
+	@echo "===================================== Remaking deal.II/Makefile"
 	@(for dir in dofs fe grid hp multigrid numerics ; do $D/common/scripts/make_dependencies $(INCLUDE) "-B\$$(LIBDIR)" `echo source/$$dir/*cc` \
 		| $(PERL) -p -e 's!LIBDIR\)/(.*):!LIBDIR)/DIM_PLACEHOLDER/$$1:!g;' \
 		| $(PERL) -pe 's!((\.g)?.$(OBJEXT)):!_DIM_PLACEHOLDER$$1:!g;' \
