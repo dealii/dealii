@@ -1013,6 +1013,7 @@ INCLUDE_FILE_PATTERNS  =
 PREDEFINED             = DOXYGEN=1 \
                          DEBUG=1 \
                          DEAL_II_USE_PETSC=1 \
+                         DEAL_II_USE_TRILINOS=1 \
                          DEAL_II_USE_MT=1 \
                          DEAL_II_USE_MT_POSIX=1
 

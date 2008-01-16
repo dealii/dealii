@@ -9,7 +9,7 @@ dnl    In doc/Makefile some information on the kind of documentation
 dnl    is stored.
 dnl
 dnl
-dnl Copyright (C) 2000, 2001, 2002, 2003, 2004, 2005, 2006, 2007 by the deal.II authors
+dnl Copyright (C) 2000, 2001, 2002, 2003, 2004, 2005, 2006, 2007, 2008 by the deal.II authors
 dnl
 dnl $Id$
 
@@ -5201,6 +5201,120 @@ AC_DEFUN(DEAL_II_CONFIGURE_PETSC_MPIUNI_LIB, dnl
 
 
 dnl ------------------------------------------------------------
+dnl Check whether Trilinos is installed, and if so store the 
+dnl respective links
+dnl
+dnl Usage: DEAL_II_CONFIGURE_TRILINOS
+dnl
+dnl ------------------------------------------------------------
+AC_DEFUN(DEAL_II_CONFIGURE_TRILINOS, dnl
+[
+  AC_MSG_CHECKING(for Trilinos library directory)
+
+  AC_ARG_WITH(trilinos,
+  [  --with-trilinos=/path/to/trilinos  Specify the path to the Trilinos installation,
+                          of which the include and lib directories
+                          are subdirs; use this if you want to override
+                          the TRILINOS_DIR environment variable.],
+     [
+        dnl Special case when someone does --with-petsc=no
+        if test "x$withval" = "xno" ; then
+          AC_MSG_RESULT([explicitly disabled])
+          USE_CONTRIB_TRILINOS=no
+        else
+	  USE_CONTRIB_TRILINOS=yes
+          DEAL_II_TRILINOS_DIR=$withval
+	  AC_MSG_RESULT($DEAL_II_TRILINOS_DIR)
+
+          dnl Make sure that what was specified is actually correct
+          if test ! -d $DEAL_II_TRILINOS_DIR/include \
+               -o ! -d $DEAL_II_TRILINOS_DIR/lib ; then
+            AC_MSG_ERROR([Path to Trilinos specified with --with-trilinos does not
+ 		  	  point to a complete Trilinos installation])
+	  fi
+        fi
+     ],
+     [
+        dnl Take something from the environment variables, if it is there
+        if test "x$TRILINOS_DIR" != "x" ; then
+  	  USE_CONTRIB_TRILINOS=yes
+          DEAL_II_TRILINOS_DIR="$TRILINOS_DIR"
+	  AC_MSG_RESULT($DEAL_II_TRILINOS_DIR)
+
+          dnl Make sure that what this is actually correct
+          if test ! -d $DEAL_II_TRILINOS_DIR/include \
+               -o ! -d $DEAL_II_TRILINOS_DIR/lib ; then
+            AC_MSG_ERROR([The path to Trilinos specified in the TRILINOS_DIR
+	  		  environment variable does not
+ 			  point to a complete Trilinos installation])
+	  fi
+        else
+	  USE_CONTRIB_TRILINOS=no
+          DEAL_II_TRILINOS_DIR=""
+          AC_MSG_RESULT(not found)
+        fi
+     ])
+
+  dnl If we have found PETSc, determine and set additional pieces of data
+  if test "$USE_CONTRIB_TRILINOS" = "yes" ; then
+    AC_DEFINE(DEAL_II_USE_TRILINOS, 1,
+              [Defined if a Trilinos installation was found and is going
+               to be used])
+
+    dnl Set an additional variable (not via AC_DEFINE, since we don't want
+    dnl to have it in config.h) which we can use in doc/doxygen/options.dox.in.
+    dnl If we have Trilinos, then the value of this variable expands to
+    dnl defining the string "DEAL_II_USE_TRILINOS" for the preprocessor. If
+    dnl we don't have no Trilinos, then it does not define this string.
+    DEAL_II_DEFINE_DEAL_II_USE_TRILINOS=DEAL_II_USE_TRILINOS
+
+    DEAL_II_CHECK_TRILINOS_SHARED_STATIC
+
+    dnl Finally set with_trilinos if this hasn't happened yet
+    if test "x$with_trilinos" = "x" ; then
+      with_trilinos="yes"
+    fi
+  fi
+])
+
+
+
+dnl ------------------------------------------------------------
+dnl Check whether the installed version of Trilinos uses shared
+dnl or static libs, or both
+dnl
+dnl Usage: DEAL_II_CHECK_TRILINOS_SHARED_STATIC
+dnl
+dnl ------------------------------------------------------------
+AC_DEFUN(DEAL_II_CHECK_TRILINOS_SHARED_STATIC, dnl
+[
+  dnl Check using the epetra library since that should always be there
+
+  AC_MSG_CHECKING(whether Trilinos uses shared libraries)
+  if test -f $DEAL_II_TRILINOS_DIR/lib/libepetra${shared_lib_suffix} ; then
+    AC_MSG_RESULT(yes)
+    DEAL_II_TRILINOS_SHARED=yes
+  else
+    AC_MSG_RESULT(no)
+  fi
+
+  AC_MSG_CHECKING(whether Trilinos uses static libraries)
+  if test -f $DEAL_II_TRILINOS_DIR/lib/libepetra${static_lib_suffix} ; then
+    AC_MSG_RESULT(yes)
+    DEAL_II_TRILINOS_STATIC=yes
+  else
+    AC_MSG_RESULT(no)
+  fi
+
+  dnl Make sure something is set at least
+  if test "x${DEAL_II_TRILINOS_SHARED}${DEAL_II_TRILINOS_STATIC}" = "x" ; then
+    AC_MSG_ERROR([Unable to determine whether Trilinos uses shared or
+                  static libraries.])
+  fi
+])
+
+
+dnl ------------------------------------------------------------
 dnl Check whether Metis is installed, and if so store the 
 dnl respective links
 dnl
@@ -5296,7 +5410,8 @@ AC_DEFUN(DEAL_II_WITH_LAPACK, dnl
     if test "x$1" != "xyes" ; then lapack="$1"; else lapack="lapack"; fi
     AC_CHECK_LIB($lapack, dgbsv_,
       [ LIBS="-l$lapack $LIBS"
-        AC_DEFINE(HAVE_LIBLAPACK)
+        AC_DEFINE([HAVE_LIBLAPACK], [1], 
+                  [Defined if deal.II was configured with LAPACK support])
       ],
       [AC_MSG_ERROR([LAPACK library $lapack not found])]
     )
@@ -5398,7 +5513,8 @@ AC_DEFUN(DEAL_II_WITH_BLAS, dnl
       AC_CHECK_LIB($blas, daxpy_,
                    [ 
                      LIBS="-l$blas $LIBS"
-                     AC_DEFINE(HAVE_LIBBLAS)
+                     AC_DEFINE([HAVE_LIBBLAS], [1], 
+                               [Defined if deal.II was configured with BLAS support])
                    ],,$F77LIBS)
       AC_SUBST(NEEDS_F77LIBS, "yes")
     else
@@ -5408,7 +5524,8 @@ AC_DEFUN(DEAL_II_WITH_BLAS, dnl
         AC_CHECK_LIB($blas, daxpy_,
                      [ 
                        LIBS="-l$blas $LIBS"
-                       AC_DEFINE(HAVE_LIBBLAS)
+                       AC_DEFINE([HAVE_LIBBLAS], [1], 
+                                 [Defined if deal.II was configured with BLAS support])
                      ],,$F77LIBS)
      
         AC_SUBST(NEEDS_F77LIBS, "yes")
