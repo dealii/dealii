@@ -2,7 +2,7 @@
 /* Author: Moritz Allmaras, Texas A&M University, 2007 */
 
 /*                                                                */
-/*    Copyright (C) 2007 by the deal.II authors and M. Allmaras   */
+/*    Copyright (C) 2007, 2008 by the deal.II authors and M. Allmaras   */
 /*                                                                */
 /*    This file is subject to QPL and may not be  distributed     */
 /*    without copyright and license information. Please refer     */
@@ -824,8 +824,8 @@ void UltrasoundProblem<dim>::assemble_system ()
   QGauss<dim>    quadrature_formula(2);
   QGauss<dim-1>  face_quadrature_formula(2);
 
-  const unsigned int n_q_points	      = quadrature_formula.n_quadrature_points,
-		     n_face_q_points  = face_quadrature_formula.n_quadrature_points,
+  const unsigned int n_q_points	      = quadrature_formula.size(),
+		     n_face_q_points  = face_quadrature_formula.size(),
 		     dofs_per_cell    = fe.dofs_per_cell;
 
 				   // The FEValues objects will

@@ -4,7 +4,7 @@
 /*    $Id$       */
 /*    Version: $Name$                                          */
 /*                                                                */
-/*    Copyright (C) 2000, 2004, 2005, 2006, 2007 by the deal.II authors */
+/*    Copyright (C) 2000, 2004, 2005, 2006, 2007, 2008 by the deal.II authors */
 /*                                                                */
 /*    This file is subject to QPL and may not be  distributed     */
 /*    without copyright and license information. Please refer     */
@@ -1485,7 +1485,7 @@ namespace QuasiStaticElasticity
                              update_quadrature_points | update_JxW_values);
 
     const unsigned int   dofs_per_cell = fe.dofs_per_cell;
-    const unsigned int   n_q_points    = quadrature_formula.n_quadrature_points;
+    const unsigned int   n_q_points    = quadrature_formula.size();
 
     FullMatrix<double>   cell_matrix (dofs_per_cell, dofs_per_cell);
     Vector<double>       cell_rhs (dofs_per_cell);
@@ -1998,7 +1998,7 @@ namespace QuasiStaticElasticity
                                              // points...
             SymmetricTensor<2,dim> accumulated_stress;
             for (unsigned int q=0;
-                 q<quadrature_formula.n_quadrature_points;
+                 q<quadrature_formula.size();
                  ++q)
               accumulated_stress +=
                 reinterpret_cast<PointHistory<dim>*>(cell->user_pointer())[q]
@@ -2008,7 +2008,7 @@ namespace QuasiStaticElasticity
                                              // average to their destination:
             norm_of_stress(index)
               = (accumulated_stress /
-                 quadrature_formula.n_quadrature_points).norm();
+                 quadrature_formula.size()).norm();
           }
                                        // And on the cells that we are not
                                        // interested in, set the respective
@@ -2543,7 +2543,7 @@ namespace QuasiStaticElasticity
       tmp.swap (quadrature_point_history);
     }
     quadrature_point_history.resize (our_cells *
-				     quadrature_formula.n_quadrature_points);
+				     quadrature_formula.size());
 
 				     // Finally loop over all cells again and
 				     // set the user pointers from the cells
@@ -2558,7 +2558,7 @@ namespace QuasiStaticElasticity
       if (cell->subdomain_id() == this_mpi_process)
 	{
 	  cell->set_user_pointer (&quadrature_point_history[history_index]);
-	  history_index += quadrature_formula.n_quadrature_points;
+	  history_index += quadrature_formula.size();
 	}
 
                                      // At the end, for good measure make sure
@@ -2687,7 +2687,7 @@ namespace QuasiStaticElasticity
     FEValues<dim> fe_values (fe, quadrature_formula, 
 			     update_values | update_gradients);
     std::vector<std::vector<Tensor<1,dim> > >
-      displacement_increment_grads (quadrature_formula.n_quadrature_points,
+      displacement_increment_grads (quadrature_formula.size(),
 				    std::vector<Tensor<1,dim> >(dim));
   
 				     // Then loop over all cells and do the
@@ -2725,7 +2725,7 @@ namespace QuasiStaticElasticity
 
 					   // Then loop over the quadrature
 					   // points of this cell:
-	  for (unsigned int q=0; q<quadrature_formula.n_quadrature_points; ++q)
+	  for (unsigned int q=0; q<quadrature_formula.size(); ++q)
 	    {
                                                // On each quadrature point,
                                                // compute the strain increment

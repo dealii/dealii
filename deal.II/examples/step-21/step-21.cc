@@ -4,7 +4,7 @@
 /*    $Id$       */
 /*    Version: $Name$                                          */
 /*                                                                */
-/*    Copyright (C) 2006, 2007 by the deal.II authors */
+/*    Copyright (C) 2006, 2007, 2008 by the deal.II authors */
 /*                                                                */
 /*    This file is subject to QPL and may not be  distributed     */
 /*    without copyright and license information. Please refer     */
@@ -836,8 +836,8 @@ void TwoPhaseFlowProblem<dim>::assemble_system ()
 
   const unsigned int   dofs_per_cell   = fe.dofs_per_cell;
   
-  const unsigned int   n_q_points      = quadrature_formula.n_quadrature_points;
-  const unsigned int   n_face_q_points = face_quadrature_formula.n_quadrature_points;
+  const unsigned int   n_q_points      = quadrature_formula.size();
+  const unsigned int   n_face_q_points = face_quadrature_formula.size();
 
   FullMatrix<double>   local_matrix (dofs_per_cell, dofs_per_cell);
   Vector<double>       local_rhs (dofs_per_cell);
@@ -1008,8 +1008,8 @@ void TwoPhaseFlowProblem<dim>::assemble_rhs_S ()
                                              update_values);
  
   const unsigned int   dofs_per_cell   = fe.dofs_per_cell;
-  const unsigned int   n_q_points      = quadrature_formula.n_quadrature_points;
-  const unsigned int   n_face_q_points = face_quadrature_formula.n_quadrature_points;
+  const unsigned int   n_q_points      = quadrature_formula.size();
+  const unsigned int   n_face_q_points = face_quadrature_formula.size();
   
   Vector<double>       local_rhs (dofs_per_cell);
 
@@ -1354,7 +1354,7 @@ TwoPhaseFlowProblem<dim>::get_maximal_velocity () const
 {
   QGauss<dim>   quadrature_formula(degree+2); 
   const unsigned int   n_q_points
-    = quadrature_formula.n_quadrature_points;
+    = quadrature_formula.size();
 
   FEValues<dim> fe_values (fe, quadrature_formula, 
                            update_values);

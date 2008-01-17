@@ -4,7 +4,7 @@
 /*    $Id$       */
 /*    Version: $Name$                                          */
 /*                                                                */
-/*    Copyright (C) 2006, 2007 by the deal.II authors */
+/*    Copyright (C) 2006, 2007, 2008 by the deal.II authors */
 /*                                                                */
 /*    This file is subject to QPL and may not be  distributed     */
 /*    without copyright and license information. Please refer     */
@@ -903,7 +903,7 @@ estimate_smoothness (Vector<float> &smoothness_indicators) const
 	for (unsigned int j=0; j<fe_collection[fe].dofs_per_cell; ++j)
 	  {
 	    std::complex<double> sum = 0;
-	    for (unsigned int q=0; q<quadrature.n_quadrature_points; ++q)
+	    for (unsigned int q=0; q<quadrature.size(); ++q)
 	      {
 		const Point<dim> x_q = quadrature.point(q);
 		sum += std::exp(std::complex<double>(0,1) *

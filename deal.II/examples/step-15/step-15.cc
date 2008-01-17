@@ -4,7 +4,7 @@
 /*    $Id$       */
 /*    Version: $Name$                                          */
 /*                                                                */
-/*    Copyright (C) 2002, 2003, 2004, 2006, 2007 by the deal.II authors                   */
+/*    Copyright (C) 2002, 2003, 2004, 2006, 2007, 2008 by the deal.II authors                   */
 /*                                                                */
 /*    This file is subject to QPL and may not be  distributed     */
 /*    without copyright and license information. Please refer     */
@@ -420,7 +420,7 @@ void MinimizationProblem<dim>::assemble_step ()
                                    // hold the indices of the local degrees of
                                    // freedom on each cell:
   const unsigned int dofs_per_cell = fe.dofs_per_cell;
-  const unsigned int n_q_points    = quadrature_formula.n_quadrature_points;
+  const unsigned int n_q_points    = quadrature_formula.size();
 
   FullMatrix<double>   cell_matrix (dofs_per_cell, dofs_per_cell);
   Vector<double>       cell_rhs (dofs_per_cell);
@@ -903,9 +903,9 @@ void MinimizationProblem<1>::refine_grid ()
                                    // at quadrature points. Here, we also need
                                    // second derivatives, which is simple,
                                    // however:
-  std::vector<double> local_values (quadrature.n_quadrature_points);
-  std::vector<Tensor<1,dim> > local_gradients (quadrature.n_quadrature_points);
-  std::vector<Tensor<2,dim> > local_2nd_derivs (quadrature.n_quadrature_points);
+  std::vector<double> local_values (quadrature.size());
+  std::vector<Tensor<1,dim> > local_gradients (quadrature.size());
+  std::vector<Tensor<2,dim> > local_2nd_derivs (quadrature.size());
 
                                    // With all this, we can start the loop
                                    // over all cells. Since we need to write
@@ -942,7 +942,7 @@ void MinimizationProblem<1>::refine_grid ()
                                        // since we extract the gradient as a
                                        // scalar value.
       double cell_residual_norm = 0;
-      for (unsigned int q=0; q<quadrature.n_quadrature_points; ++q)
+      for (unsigned int q=0; q<quadrature.size(); ++q)
         {
           const double x             = fe_values.quadrature_point(q)[0];
           const double u             = local_values[q];
@@ -1256,7 +1256,7 @@ MinimizationProblem<dim>::energy (const DoFHandler<dim> &dof_handler,
 			   update_values   | update_gradients |
                            update_quadrature_points | update_JxW_values);
 
-  const unsigned int   n_q_points    = quadrature_formula.n_quadrature_points;
+  const unsigned int   n_q_points    = quadrature_formula.size();
 
                                    // Then, just as when we integrated the
                                    // linear system, we need two variables

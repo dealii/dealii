@@ -4,7 +4,7 @@
 /*    $Id$       */
 /*    Version: $Name$                                          */
 /*                                                                */
-/*    Copyright (C) 2000, 2001, 2002, 2003, 2004, 2006, 2007 by the deal.II authors */
+/*    Copyright (C) 2000, 2001, 2002, 2003, 2004, 2006, 2007, 2008 by the deal.II authors */
 /*                                                                */
 /*    This file is subject to QPL and may not be  distributed     */
 /*    without copyright and license information. Please refer     */
@@ -994,8 +994,8 @@ assemble_system_interval (const typename DoFHandler<dim>::active_cell_iterator &
 				   // abbreviations to avoid
 				   // unnecessarily long lines:
   const unsigned int   dofs_per_cell   = fe.dofs_per_cell;
-  const unsigned int   n_q_points      = quadrature_formula.n_quadrature_points;
-  const unsigned int   n_face_q_points = face_quadrature_formula.n_quadrature_points;
+  const unsigned int   n_q_points      = quadrature_formula.size();
+  const unsigned int   n_face_q_points = face_quadrature_formula.size();
 
 				   // We declare cell matrix and cell
 				   // right hand side...

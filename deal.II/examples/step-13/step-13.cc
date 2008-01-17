@@ -4,7 +4,7 @@
 /*    $Id$       */
 /*    Version: $Name$                                          */
 /*                                                                */
-/*    Copyright (C) 2001, 2002, 2003, 2004, 2006, 2007 by the deal.II authors */
+/*    Copyright (C) 2001, 2002, 2003, 2004, 2006, 2007, 2008 by the deal.II authors */
 /*                                                                */
 /*    This file is subject to QPL and may not be  distributed     */
 /*    without copyright and license information. Please refer     */
@@ -1254,7 +1254,7 @@ namespace LaplaceSolver
 			     update_gradients | update_JxW_values);
 
     const unsigned int   dofs_per_cell = fe->dofs_per_cell;
-    const unsigned int   n_q_points    = quadrature->n_quadrature_points;
+    const unsigned int   n_q_points    = quadrature->size();
 
     FullMatrix<double>   cell_matrix (dofs_per_cell, dofs_per_cell);
 
@@ -1584,7 +1584,7 @@ namespace LaplaceSolver
                              update_JxW_values);
 
     const unsigned int   dofs_per_cell = this->fe->dofs_per_cell;
-    const unsigned int   n_q_points    = this->quadrature->n_quadrature_points;
+    const unsigned int   n_q_points    = this->quadrature->size();
 
     Vector<double>       cell_rhs (dofs_per_cell);
     std::vector<double>  rhs_values (n_q_points);

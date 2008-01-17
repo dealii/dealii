@@ -1,5 +1,5 @@
 /* $Id$ */
-/*    Copyright (C) 2006, 2007 by the deal.II authors */
+/*    Copyright (C) 2006, 2007, 2008 by the deal.II authors */
 /*    Author: Ivan Christov, Wolfgang Bangerth, Texas A&M University, 2006 */
 /*                                                                */
 /*    This file is subject to QPL and may not be  distributed     */
@@ -506,7 +506,7 @@ void SineGordonProblem<dim>::compute_nl_term (const Vector<double> &old_data,
 			       update_quadrature_points);
   
   const unsigned int dofs_per_cell = fe.dofs_per_cell;
-  const unsigned int n_q_points    = quadrature_formula.n_quadrature_points;
+  const unsigned int n_q_points    = quadrature_formula.size();
   
   Vector<double> local_nl_term (dofs_per_cell);      
   std::vector<unsigned int> local_dof_indices (dofs_per_cell); 
@@ -579,7 +579,7 @@ void SineGordonProblem<dim>::compute_nl_matrix (const Vector<double> &old_data,
 			   update_values | update_JxW_values | update_quadrature_points);
   
   const unsigned int dofs_per_cell = fe.dofs_per_cell;
-  const unsigned int n_q_points    = quadrature_formula.n_quadrature_points;
+  const unsigned int n_q_points    = quadrature_formula.size();
   
   FullMatrix<double> local_nl_matrix (dofs_per_cell, dofs_per_cell);
   std::vector<unsigned int> local_dof_indices (dofs_per_cell); 
