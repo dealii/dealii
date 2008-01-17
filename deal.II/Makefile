@@ -143,7 +143,7 @@ TAGS:
 	perl -pi -e 's/ \* .*//g; s&[\t]*/\*.*&&g; s&[\t]*\*/.*&&g;' TAGS
 
 
-clean: common/scripts/make_dependencies \
+clean: deps \
        clean-contrib clean-base clean-lac clean-dealII \
        clean-doc clean-examples clean-lib clean-tests
 	-rm -f TODO common/TAGS
