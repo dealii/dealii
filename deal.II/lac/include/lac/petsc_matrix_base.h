@@ -2,7 +2,7 @@
 //    $Id$
 //    Version: $Name$
 //
-//    Copyright (C) 2004, 2005, 2006, 2007 by the deal.II authors
+//    Copyright (C) 2004, 2005, 2006, 2007, 2008 by the deal.II authors
 //
 //    This file is subject to QPL and may not be  distributed
 //    without copyright and license information. Please refer
@@ -620,6 +620,16 @@ namespace PETScWrappers
                                         *
                                         * Source and destination must
                                         * not be the same vector.
+					*
+					* Note that if the current object
+					* represents a parallel distributed
+					* matrix (of type
+					* PETScWrappers::MPI::SparseMatrix),
+					* then both vectors have to be
+					* distributed vectors as
+					* well. Conversely, if the matrix is
+					* not distributed, then neither of the
+					* vectors may be.
                                         */      
       void vmult (VectorBase       &dst,
                   const VectorBase &src) const;
@@ -633,6 +643,16 @@ namespace PETScWrappers
                                         *
                                         * Source and destination must
                                         * not be the same vector.
+					*
+					* Note that if the current object
+					* represents a parallel distributed
+					* matrix (of type
+					* PETScWrappers::MPI::SparseMatrix),
+					* then both vectors have to be
+					* distributed vectors as
+					* well. Conversely, if the matrix is
+					* not distributed, then neither of the
+					* vectors may be.
                                         */
       void Tvmult (VectorBase       &dst,
                    const VectorBase &src) const;
@@ -646,6 +666,16 @@ namespace PETScWrappers
                                         *
                                         * Source and destination must
                                         * not be the same vector.
+					*
+					* Note that if the current object
+					* represents a parallel distributed
+					* matrix (of type
+					* PETScWrappers::MPI::SparseMatrix),
+					* then both vectors have to be
+					* distributed vectors as
+					* well. Conversely, if the matrix is
+					* not distributed, then neither of the
+					* vectors may be.
                                         */
       void vmult_add (VectorBase       &dst,
                       const VectorBase &src) const;
@@ -662,6 +692,16 @@ namespace PETScWrappers
                                         *
                                         * Source and destination must
                                         * not be the same vector.
+					*
+					* Note that if the current object
+					* represents a parallel distributed
+					* matrix (of type
+					* PETScWrappers::MPI::SparseMatrix),
+					* then both vectors have to be
+					* distributed vectors as
+					* well. Conversely, if the matrix is
+					* not distributed, then neither of the
+					* vectors may be.
                                         */
       void Tvmult_add (VectorBase       &dst,
                        const VectorBase &src) const;
@@ -691,6 +731,16 @@ namespace PETScWrappers
                                         * the PETSc wrapper class) since PETSc
                                         * doesn't support this operation and
                                         * needs a temporary vector.
+					*
+					* Note that if the current object
+					* represents a parallel distributed
+					* matrix (of type
+					* PETScWrappers::MPI::SparseMatrix),
+					* then the given vector has to be
+					* a distributed vector as
+					* well. Conversely, if the matrix is
+					* not distributed, then neither
+					* may the vector be.
                                         */
       PetscScalar matrix_norm_square (const VectorBase &v) const;
 
@@ -705,6 +755,16 @@ namespace PETScWrappers
                                         * the PETSc wrapper class) since PETSc
                                         * doesn't support this operation and
                                         * needs a temporary vector.
+					*
+					* Note that if the current object
+					* represents a parallel distributed
+					* matrix (of type
+					* PETScWrappers::MPI::SparseMatrix),
+					* then both vectors have to be
+					* distributed vectors as
+					* well. Conversely, if the matrix is
+					* not distributed, then neither of the
+					* vectors may be.
                                         */
       PetscScalar matrix_scalar_product (const VectorBase &u,
                                          const VectorBase &v) const;
@@ -723,6 +783,16 @@ namespace PETScWrappers
                                         * Source <i>x</i> and destination
                                         * <i>dst</i> must not be the same
                                         * vector.
+					*
+					* Note that if the current object
+					* represents a parallel distributed
+					* matrix (of type
+					* PETScWrappers::MPI::SparseMatrix),
+					* then all vectors have to be
+					* distributed vectors as
+					* well. Conversely, if the matrix is
+					* not distributed, then neither of the
+					* vectors may be.
                                         */
       PetscScalar residual (VectorBase       &dst,
                             const VectorBase &x,
