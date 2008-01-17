@@ -2,7 +2,7 @@
 //    $Id$
 //    Version: $Name$
 //
-//    Copyright (C) 2004, 2006 by the deal.II authors
+//    Copyright (C) 2004, 2006, 2008 by the deal.II authors
 //
 //    This file is subject to QPL and may not be  distributed
 //    without copyright and license information. Please refer
@@ -169,8 +169,4 @@ namespace PETScWrappers
 
 DEAL_II_NAMESPACE_CLOSE
 
-#else
-// On gcc2.95 on Alpha OSF1, the native assembler does not like empty
-// files, so provide some dummy code
-namespace { void dummy () {} }
 #endif // DEAL_II_USE_PETSC
