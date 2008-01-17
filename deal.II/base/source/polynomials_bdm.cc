@@ -2,7 +2,7 @@
 //    $Id$
 //    Version: $Name$
 //
-//    Copyright (C) 2004, 2005, 2006 by the deal.II authors
+//    Copyright (C) 2004, 2005, 2006, 2007, 2008 by the deal.II authors
 //
 //    This file is subject to QPL and may not be  distributed
 //    without copyright and license information. Please refer
@@ -146,7 +146,7 @@ PolynomialsBDM<dim>::compute_node_matrix (Table<2,double>& A) const
       if ((face==0) || (face==3))
 	orientation = -1.;
       
-      for (unsigned int k=0;k<qface.n_quadrature_points;++k)
+      for (unsigned int k=0;k<qface.size();++k)
 	{
 	  const double w = qface.weight(k) * orientation;
 	  const double x = qface.point(k)(0);

@@ -2,7 +2,7 @@
 //    $Id$
 //    Version: $Name$
 //
-//    Copyright (C) 1998, 1999, 2000, 2001, 2002, 2003, 2005, 2006 by the deal.II authors
+//    Copyright (C) 1998, 1999, 2000, 2001, 2002, 2003, 2005, 2006, 2007, 2008 by the deal.II authors
 //
 //    This file is subject to QPL and may not be  distributed
 //    without copyright and license information. Please refer
@@ -331,7 +331,7 @@ QGauss2<1>::QGauss2 ()
   static const double wts[]  = { wts_normal[0]/2.,
 				 wts_normal[1]/2.  };
 
-  for (unsigned int i=0; i<this->n_quadrature_points; ++i) 
+  for (unsigned int i=0; i<this->size(); ++i) 
     {
       this->quadrature_points[i] = Point<1>(xpts[i]);
       this->weights[i] = wts[i];
@@ -362,7 +362,7 @@ QGauss3<1>::QGauss3 ()
 				 wts_normal[1]/2.,
 				 wts_normal[2]/2. };
 
-  for (unsigned int i=0; i<this->n_quadrature_points; ++i) 
+  for (unsigned int i=0; i<this->size(); ++i) 
     {
       this->quadrature_points[i] = Point<1>(xpts[i]);
       this->weights[i] = wts[i];
@@ -397,7 +397,7 @@ QGauss4<1>::QGauss4 ()
 				 wts_normal[2]/2.,
 				 wts_normal[3]/2. };
 
-  for (unsigned int i=0; i<this->n_quadrature_points; ++i) 
+  for (unsigned int i=0; i<this->size(); ++i) 
     {
       this->quadrature_points[i] = Point<1>(xpts[i]);
       this->weights[i] = wts[i];
@@ -435,7 +435,7 @@ QGauss5<1>::QGauss5 ()
 				 wts_normal[3]/2.,
 				 wts_normal[4]/2. };
 
-  for (unsigned int i=0; i<this->n_quadrature_points; ++i) 
+  for (unsigned int i=0; i<this->size(); ++i) 
     {
       this->quadrature_points[i] = Point<1>(xpts[i]);
       this->weights[i] = wts[i];
@@ -478,7 +478,7 @@ QGauss6<1>::QGauss6 ()
 				 wts_normal[4]/2.,
 				 wts_normal[5]/2. };
 
-  for (unsigned int i=0; i<this->n_quadrature_points; ++i) 
+  for (unsigned int i=0; i<this->size(); ++i) 
     {
       this->quadrature_points[i] = Point<1>(xpts[i]);
       this->weights[i] = wts[i];
@@ -525,7 +525,7 @@ QGauss7<1>::QGauss7 ()
 				 wts_normal[5]/2.,
 				 wts_normal[6]/2. };
 
-  for (unsigned int i=0; i<this->n_quadrature_points; ++i) 
+  for (unsigned int i=0; i<this->size(); ++i) 
     {
       this->quadrature_points[i] = Point<1>(xpts[i]);
       this->weights[i] = wts[i];
@@ -553,7 +553,7 @@ QTrapez<1>::QTrapez ()
   static const double xpts[] = { 0.0, 1.0 };
   static const double wts[]  = { 0.5, 0.5 };
 
-  for (unsigned int i=0; i<this->n_quadrature_points; ++i) 
+  for (unsigned int i=0; i<this->size(); ++i) 
     {
       this->quadrature_points[i] = Point<1>(xpts[i]);
       this->weights[i] = wts[i];
@@ -570,7 +570,7 @@ QSimpson<1>::QSimpson ()
   static const double xpts[] = { 0.0, 0.5, 1.0 };
   static const double wts[]  = { 1./6., 2./3., 1./6. };
 
-  for (unsigned int i=0; i<this->n_quadrature_points; ++i) 
+  for (unsigned int i=0; i<this->size(); ++i) 
     {
       this->quadrature_points[i] = Point<1>(xpts[i]);
       this->weights[i] = wts[i];
@@ -587,7 +587,7 @@ QMilne<1>::QMilne ()
   static const double xpts[] = { 0.0, .25, .5, .75, 1.0 };
   static const double wts[]  = { 7./90., 32./90., 12./90., 32./90., 7./90. };
 
-  for (unsigned int i=0; i<this->n_quadrature_points; ++i) 
+  for (unsigned int i=0; i<this->size(); ++i) 
     {
       this->quadrature_points[i] = Point<1>(xpts[i]);
       this->weights[i] = wts[i];
@@ -606,7 +606,7 @@ QWeddle<1>::QWeddle ()
 				 27./840., 216./840., 41./840.
   };
 
-  for (unsigned int i=0; i<this->n_quadrature_points; ++i) 
+  for (unsigned int i=0; i<this->size(); ++i) 
     {
       this->quadrature_points[i] = Point<1>(xpts[i]);
       this->weights[i] = wts[i];
