@@ -2,7 +2,7 @@
 //    $Id: full_matrix.double.cc 15518 2007-11-18 22:31:00Z bangerth $
 //    Version: $Name$
 //
-//    Copyright (C) 1999, 2000, 2001, 2002, 2003, 2004, 2005, 2006, 2007 by the deal.II authors
+//    Copyright (C) 1999, 2000, 2001, 2002, 2003, 2004, 2005, 2006, 2007, 2008 by the deal.II authors
 //
 //    This file is subject to QPL and may not be  distributed
 //    without copyright and license information. Please refer
@@ -47,5 +47,7 @@ TEMPL_OP_EQ(std::complex<double>,std::complex<long double>);
 
 TEMPL_OP_EQ(std::complex<long double>,std::complex<float>);
 TEMPL_OP_EQ(std::complex<float>,std::complex<long double>);
+
+#undef TEMPL_OP_EQ
 
 DEAL_II_NAMESPACE_CLOSE
