@@ -2,7 +2,7 @@
 //    $Id$
 //    Version: $Name$
 //
-//    Copyright (C) 2000, 2001, 2002, 2003, 2004, 2005, 2006, 2007 by the deal.II authors
+//    Copyright (C) 2000, 2001, 2002, 2003, 2004, 2005, 2006, 2007, 2008 by the deal.II authors
 //
 //    This file is subject to QPL and may not be  distributed
 //    without copyright and license information. Please refer
@@ -406,7 +406,7 @@ class FETools
                                       * What this function does is the
                                       * following: assume that there is scalar
                                       * data <tt>u<sub>q</sub>, 0 <= q <
-                                      * Q:=quadrature.n_quadrature_points</tt>
+                                      * Q:=quadrature.size()</tt>
                                       * defined at the quadrature points of a
                                       * cell, with the points defined by the
                                       * given <tt>rhs_quadrature</tt>

@@ -2,7 +2,7 @@
 //    $Id$
 //    Version: $Name:  $
 //
-//    Copyright (C) 2005, 2006, 2007 by the deal.II authors
+//    Copyright (C) 2005, 2006, 2007, 2008 by the deal.II authors
 //
 //    This file is subject to QPL and may not be  distributed
 //    without copyright and license information. Please refer
@@ -2438,7 +2438,7 @@ VectorTools::compute_mean_value (const Mapping<dim>    &mapping,
 			       | update_values));
 
   typename DoFHandler<dim>::active_cell_iterator c;
-  std::vector<Vector<double> > values(quadrature.n_quadrature_points,
+  std::vector<Vector<double> > values(quadrature.size(),
 				      Vector<double> (dof.get_fe().n_components()));
   
   double mean = 0.;
@@ -2448,7 +2448,7 @@ VectorTools::compute_mean_value (const Mapping<dim>    &mapping,
     {
       fe.reinit (c);
       fe.get_function_values(v, values);
-      for (unsigned int k=0; k< quadrature.n_quadrature_points; ++k)
+      for (unsigned int k=0; k< quadrature.size(); ++k)
 	{
 	  mean += fe.JxW(k) * values[k](component);
 	  area += fe.JxW(k);

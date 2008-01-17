@@ -2,7 +2,7 @@
 //    $Id$
 //    Version: $Name$
 //
-//    Copyright (C) 2003, 2004, 2005, 2006, 2007 by the deal.II authors
+//    Copyright (C) 2003, 2004, 2005, 2006, 2007, 2008 by the deal.II authors
 //
 //    This file is subject to QPL and may not be  distributed
 //    without copyright and license information. Please refer
@@ -321,7 +321,7 @@ FE_RaviartThomasNodal<dim>::initialize_support_points (const unsigned int deg)
   if (dim>1)
     {
       QGauss<dim-1> face_points (deg+1);
-      Assert (face_points.n_quadrature_points == this->dofs_per_face,
+      Assert (face_points.size() == this->dofs_per_face,
 	      ExcInternalError());
       for (unsigned int k=0;k<this->dofs_per_face;++k)
 	this->generalized_face_support_points[k] = face_points.point(k);
@@ -357,7 +357,7 @@ FE_RaviartThomasNodal<dim>::initialize_support_points (const unsigned int deg)
 						       ((d==2) ? low : high));
       Assert(dim<=3, ExcNotImplemented());
       
-      for (unsigned int k=0;k<quadrature->n_quadrature_points;++k)
+      for (unsigned int k=0;k<quadrature->size();++k)
 	this->generalized_support_points[current++] = quadrature->point(k);
       delete quadrature;
     }

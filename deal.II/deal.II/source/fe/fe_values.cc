@@ -2,7 +2,7 @@
 //    $Id$
 //    Version: $Name$
 //
-//    Copyright (C) 1998, 1999, 2000, 2001, 2002, 2003, 2004, 2005, 2006, 2007 by the deal.II authors
+//    Copyright (C) 1998, 1999, 2000, 2001, 2002, 2003, 2004, 2005, 2006, 2007, 2008 by the deal.II authors
 //
 //    This file is subject to QPL and may not be  distributed
 //    without copyright and license information. Please refer
@@ -1198,7 +1198,7 @@ FEValues<dim>::FEValues (const Mapping<dim>       &mapping,
 			 const Quadrature<dim>    &q,
 			 const UpdateFlags         update_flags)
 		:
-		FEValuesBase<dim> (q.n_quadrature_points,
+		FEValuesBase<dim> (q.size(),
 				   fe.dofs_per_cell,
 				   update_default,
 				   mapping,
@@ -1215,7 +1215,7 @@ FEValues<dim>::FEValues (const FiniteElement<dim> &fe,
 			 const Quadrature<dim>    &q,
 			 const UpdateFlags         update_flags)
 		:
-		FEValuesBase<dim> (q.n_quadrature_points,
+		FEValuesBase<dim> (q.size(),
 				   fe.dofs_per_cell,
 				   update_default,
 				   StaticMappingQ1<dim>::mapping,
@@ -1469,7 +1469,7 @@ FEFaceValues<dim>::FEFaceValues (const Mapping<dim>       &mapping,
 				 const Quadrature<dim-1>  &quadrature,
 				 const UpdateFlags         update_flags)
 		:
-		FEFaceValuesBase<dim> (quadrature.n_quadrature_points,
+		FEFaceValuesBase<dim> (quadrature.size(),
 				       fe.dofs_per_cell,
 				       update_flags,
 				       mapping,
@@ -1485,7 +1485,7 @@ FEFaceValues<dim>::FEFaceValues (const FiniteElement<dim> &fe,
 				 const Quadrature<dim-1>  &quadrature,
 				 const UpdateFlags         update_flags)
 		:
-		FEFaceValuesBase<dim> (quadrature.n_quadrature_points,
+		FEFaceValuesBase<dim> (quadrature.size(),
 				       fe.dofs_per_cell,
 				       update_flags,
 				       StaticMappingQ1<dim>::mapping,
@@ -1683,7 +1683,7 @@ FESubfaceValues<dim>::FESubfaceValues (const Mapping<dim>       &mapping,
 				       const Quadrature<dim-1>  &quadrature,
 				       const UpdateFlags         update_flags)
 		:
-		FEFaceValuesBase<dim> (quadrature.n_quadrature_points,
+		FEFaceValuesBase<dim> (quadrature.size(),
 				       fe.dofs_per_cell,
 				       update_flags,
 				       mapping,
@@ -1699,7 +1699,7 @@ FESubfaceValues<dim>::FESubfaceValues (const FiniteElement<dim> &fe,
 				       const Quadrature<dim-1>  &quadrature,
 				       const UpdateFlags         update_flags)
 		:
-		FEFaceValuesBase<dim> (quadrature.n_quadrature_points,
+		FEFaceValuesBase<dim> (quadrature.size(),
 				       fe.dofs_per_cell,
 				       update_flags,
 				       StaticMappingQ1<dim>::mapping,

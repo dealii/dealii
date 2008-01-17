@@ -2,7 +2,7 @@
 //    $Id$
 //    Version: $Name$
 //
-//    Copyright (C) 2002, 2003, 2004, 2005, 2006, 2007 by the deal.II authors
+//    Copyright (C) 2002, 2003, 2004, 2005, 2006, 2007, 2008 by the deal.II authors
 //
 //    This file is subject to QPL and may not be  distributed
 //    without copyright and license information. Please refer
@@ -935,7 +935,7 @@ FE_Nedelec<dim>::get_data (const UpdateFlags      update_flags,
    data->update_flags = data->update_once | data->update_each;
 
    const UpdateFlags flags(data->update_flags);
-   const unsigned int n_q_points = quadrature.n_quadrature_points;
+   const unsigned int n_q_points = quadrature.size();
 
  				   // initialize fields only if really
  				   // necessary. otherwise, don't
@@ -1005,7 +1005,7 @@ FE_Nedelec<dim>::fill_fe_values (const Mapping<dim>                   &mapping,
 				   // fields that have to be filled
   const UpdateFlags flags(fe_data.current_update_flags());
 
-  const unsigned int n_q_points = quadrature.n_quadrature_points;
+  const unsigned int n_q_points = quadrature.size();
 				  
 				   // fill shape function
 				   // values. these are vector-valued,
@@ -1136,13 +1136,13 @@ FE_Nedelec<dim>::fill_fe_face_values (const Mapping<dim>                   &mapp
 	     cell->face_orientation(face),
 	     cell->face_flip(face),
 	     cell->face_rotation(face),
-             quadrature.n_quadrature_points));
+             quadrature.size()));
 
   				   // get the flags indicating the
 				   // fields that have to be filled
   const UpdateFlags flags(fe_data.current_update_flags());
 
-  const unsigned int n_q_points = quadrature.n_quadrature_points;
+  const unsigned int n_q_points = quadrature.size();
 				  
 				   // fill shape function
 				   // values. these are vector-valued,
@@ -1285,13 +1285,13 @@ FE_Nedelec<dim>::fill_fe_subface_values (const Mapping<dim>                   &m
 		cell->face_orientation(face),
 		cell->face_flip(face),
 		cell->face_rotation(face),
-		quadrature.n_quadrature_points));
+		quadrature.size()));
 
   				   // get the flags indicating the
 				   // fields that have to be filled
   const UpdateFlags flags(fe_data.current_update_flags());
 
-  const unsigned int n_q_points = quadrature.n_quadrature_points;
+  const unsigned int n_q_points = quadrature.size();
 				  
 				   // fill shape function
 				   // values. these are vector-valued,

@@ -2,7 +2,7 @@
 //    $Id$
 //    Version: $Name:  $
 //
-//    Copyright (C) 1998, 1999, 2000, 2001, 2002, 2003, 2004, 2005, 2006, 2007 by the deal.II authors
+//    Copyright (C) 1998, 1999, 2000, 2001, 2002, 2003, 2004, 2005, 2006, 2007, 2008 by the deal.II authors
 //
 //    This file is subject to QPL and may not be  distributed
 //    without copyright and license information. Please refer
@@ -341,7 +341,7 @@ class FEValuesData
  *      ++cell)
  *   {
  *     values.reinit(cell);
- *     for (unsigned int q=0; q<quadrature.n_quadrature_points; ++q)
+ *     for (unsigned int q=0; q<quadrature.size(); ++q)
  *       for (unsigned int i=0; i<finite_element.dofs_per_cell; ++i)
  *         for (unsigned int j=0; j<finite_element.dofs_per_cell; ++j)
  *         A(i,j) += fe_values.shape_value(i,q) *

@@ -2,7 +2,7 @@
 //    $Id$
 //    Version: $Name$
 //
-//    Copyright (C) 1999, 2000, 2001, 2002, 2003, 2004, 2005, 2006, 2007 by the deal.II authors
+//    Copyright (C) 1999, 2000, 2001, 2002, 2003, 2004, 2005, 2006, 2007, 2008 by the deal.II authors
 //
 //    This file is subject to QPL and may not be  distributed
 //    without copyright and license information. Please refer
@@ -724,7 +724,7 @@ compute_fill (const Mapping<dim>                   &mapping,
               typename Mapping<dim>::InternalDataBase &fedata,
               FEValuesData<dim>                    &data) const
 {       
-  const unsigned int n_q_points = quadrature.n_quadrature_points;
+  const unsigned int n_q_points = quadrature.size();
   
 				   // convert data object to internal
 				   // data for this class. fails with

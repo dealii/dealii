@@ -2,7 +2,7 @@
 //    $Id$
 //    Version: $Name$
 //
-//    Copyright (C) 2000, 2001, 2002, 2003, 2004, 2005, 2006, 2007 by the deal.II authors
+//    Copyright (C) 2000, 2001, 2002, 2003, 2004, 2005, 2006, 2007, 2008 by the deal.II authors
 //
 //    This file is subject to QPL and may not be  distributed
 //    without copyright and license information. Please refer
@@ -495,7 +495,7 @@ void FETools::get_projection_matrix (const FiniteElement<dim> &fe1,
 				   // This happens in the target space
   FullMatrix<double> mass (n2, n2);
 
-  for (unsigned int k=0;k<quadrature.n_quadrature_points;++k)
+  for (unsigned int k=0;k<quadrature.size();++k)
     {
       const double w = val2.JxW(k);
       for (unsigned int i=0;i<n2;++i)
@@ -522,7 +522,7 @@ void FETools::get_projection_matrix (const FiniteElement<dim> &fe1,
     {
       b = 0.;
       for (unsigned int i=0;i<n2;++i)
-        for (unsigned int k=0;k<quadrature.n_quadrature_points;++k)
+        for (unsigned int k=0;k<quadrature.size();++k)
           {
             const double w = val2.JxW(k);
             const double u = val1.shape_value(j,k);
@@ -606,7 +606,7 @@ FETools::compute_embedding_matrices(const FiniteElement<dim>& fe,
 
   MappingCartesian<dim> mapping;
   QGauss<dim> q_fine(degree+1);
-  const unsigned int nq = q_fine.n_quadrature_points;
+  const unsigned int nq = q_fine.size();
   
   FEValues<dim> fine (mapping, fe, q_fine,
 		      update_quadrature_points | update_JxW_values | update_values);
@@ -725,7 +725,7 @@ FETools::compute_face_embedding_matrices(const FiniteElement<dim>& fe,
   QGauss<dim-1> q_gauss(degree+1);
   const Quadrature<dim> q_fine = QProjector<dim>::project_to_face(q_gauss, face_fine);
   
-  const unsigned int nq = q_fine.n_quadrature_points;
+  const unsigned int nq = q_fine.size();
 
 				   // In order to make the loops below
 				   // simpler, we introduce vectors
@@ -885,7 +885,7 @@ FETools::compute_projection_matrices(const FiniteElement<dim>& fe,
   
   MappingCartesian<dim> mapping;
   QGauss<dim> q_fine(degree+1);
-  const unsigned int nq = q_fine.n_quadrature_points;
+  const unsigned int nq = q_fine.size();
   
   FEValues<dim> coarse (mapping, fe, q_fine,
 			update_quadrature_points | update_JxW_values | update_values);
@@ -1795,17 +1795,17 @@ compute_projection_from_quadrature_points_matrix (const FiniteElement<dim> &fe,
                                    // first build the matrices M and Q
                                    // described in the documentation
   FullMatrix<double> M (fe.dofs_per_cell, fe.dofs_per_cell);
-  FullMatrix<double> Q (fe.dofs_per_cell, rhs_quadrature.n_quadrature_points);
+  FullMatrix<double> Q (fe.dofs_per_cell, rhs_quadrature.size());
 
   for (unsigned int i=0; i<fe.dofs_per_cell; ++i)
     for (unsigned int j=0; j<fe.dofs_per_cell; ++j)
-      for (unsigned int q=0; q<lhs_quadrature.n_quadrature_points; ++q)
+      for (unsigned int q=0; q<lhs_quadrature.size(); ++q)
         M(i,j) += fe.shape_value (i, lhs_quadrature.point(q)) *
                   fe.shape_value (j, lhs_quadrature.point(q)) *
                   lhs_quadrature.weight(q);
 
   for (unsigned int i=0; i<fe.dofs_per_cell; ++i)
-    for (unsigned int q=0; q<rhs_quadrature.n_quadrature_points; ++q)
+    for (unsigned int q=0; q<rhs_quadrature.size(); ++q)
       Q(i,q) += fe.shape_value (i, rhs_quadrature.point(q)) *
                 rhs_quadrature.weight(q);
 
@@ -1814,11 +1814,11 @@ compute_projection_from_quadrature_points_matrix (const FiniteElement<dim> &fe,
   M_inverse.invert (M);
 
                                    // finally compute the result
-  X.reinit (fe.dofs_per_cell, rhs_quadrature.n_quadrature_points);
+  X.reinit (fe.dofs_per_cell, rhs_quadrature.size());
   M_inverse.mmult (X, Q);
 
   Assert (X.m() == fe.dofs_per_cell, ExcInternalError());
-  Assert (X.n() == rhs_quadrature.n_quadrature_points, ExcInternalError());
+  Assert (X.n() == rhs_quadrature.size(), ExcInternalError());
 }
 
 
@@ -1831,11 +1831,11 @@ compute_interpolation_to_quadrature_points_matrix (const FiniteElement<dim> &fe,
                                                    FullMatrix<double>       &I_q)
 {
   Assert (fe.n_components() == 1, ExcNotImplemented());
-  Assert (I_q.m() == quadrature.n_quadrature_points,
+  Assert (I_q.m() == quadrature.size(),
           ExcMessage ("Wrong matrix size"));
   Assert (I_q.n() == fe.dofs_per_cell, ExcMessage ("Wrong matrix size"));
 
-  for (unsigned int q=0; q<quadrature.n_quadrature_points; ++q)
+  for (unsigned int q=0; q<quadrature.size(); ++q)
     for (unsigned int i=0; i<fe.dofs_per_cell; ++i)
       I_q(q,i) = fe.shape_value (i, quadrature.point(q));
 }

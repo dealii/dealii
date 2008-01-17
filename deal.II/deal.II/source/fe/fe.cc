@@ -2,7 +2,7 @@
 //    $Id$
 //    Version: $Name$
 //
-//    Copyright (C) 1998, 1999, 2000, 2001, 2002, 2003, 2004, 2005, 2006, 2007 by the deal.II authors
+//    Copyright (C) 1998, 1999, 2000, 2001, 2002, 2003, 2004, 2005, 2006, 2007, 2008 by the deal.II authors
 //
 //    This file is subject to QPL and may not be  distributed
 //    without copyright and license information. Please refer
@@ -58,7 +58,7 @@ InternalDataBase::initialize_2nd (const FiniteElement<dim> *element,
 				   // number of evaluation points)
 				   // FEValues objects with slightly
 				   // shifted positions
-  std::vector<Point<dim> > diff_points (quadrature.n_quadrature_points);
+  std::vector<Point<dim> > diff_points (quadrature.size());
   
   differences.resize(2*dim);
   for (unsigned int d=0; d<dim; ++d)

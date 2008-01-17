@@ -2,7 +2,7 @@
 //    $Id$
 //    Version: $Name$
 //
-//    Copyright (C) 2006, 2007 by the deal.II authors
+//    Copyright (C) 2006, 2007, 2008 by the deal.II authors
 //
 //    This file is subject to QPL and may not be  distributed
 //    without copyright and license information. Please refer
@@ -168,7 +168,7 @@ FE_Poly<POLY,dim>::get_data (const UpdateFlags      update_flags,
   data->update_flags = data->update_once | data->update_each;
 
   const UpdateFlags flags(data->update_flags);
-  const unsigned int n_q_points = quadrature.n_quadrature_points;
+  const unsigned int n_q_points = quadrature.size();
 
 				   // some scratch arrays
   std::vector<double> values(0);
@@ -250,7 +250,7 @@ FE_Poly<POLY,dim>::fill_fe_values (const Mapping<dim>                   &mapping
   for (unsigned int k=0; k<this->dofs_per_cell; ++k)
     {
       if (flags & update_values)
-	for (unsigned int i=0; i<quadrature.n_quadrature_points; ++i)
+	for (unsigned int i=0; i<quadrature.size(); ++i)
 	  data.shape_values(k,i) = fe_data.shape_values[k][i];
       
       if (flags & update_gradients)
@@ -298,14 +298,14 @@ FE_Poly<POLY,dim>::fill_fe_face_values (const Mapping<dim>                   &ma
 		cell->face_orientation(face),
 		cell->face_flip(face),
 		cell->face_rotation(face),
-		quadrature.n_quadrature_points);
+		quadrature.size());
   
   const UpdateFlags flags(fe_data.update_once | fe_data.update_each);
 
   for (unsigned int k=0; k<this->dofs_per_cell; ++k)
     {
       if (flags & update_values)
-        for (unsigned int i=0; i<quadrature.n_quadrature_points; ++i)
+        for (unsigned int i=0; i<quadrature.size(); ++i)
 	  data.shape_values(k,i) = fe_data.shape_values[k][i+offset];
       
       if (flags & update_gradients)
@@ -352,14 +352,14 @@ FE_Poly<POLY,dim>::fill_fe_subface_values (const Mapping<dim>                   
 		   cell->face_orientation(face),
 		   cell->face_flip(face),
 		   cell->face_rotation(face),
-		   quadrature.n_quadrature_points);
+		   quadrature.size());
 
   const UpdateFlags flags(fe_data.update_once | fe_data.update_each);
 
   for (unsigned int k=0; k<this->dofs_per_cell; ++k)
     {
       if (flags & update_values)
-        for (unsigned int i=0; i<quadrature.n_quadrature_points; ++i)
+        for (unsigned int i=0; i<quadrature.size(); ++i)
 	  data.shape_values(k,i) = fe_data.shape_values[k][i+offset];
       
       if (flags & update_gradients)

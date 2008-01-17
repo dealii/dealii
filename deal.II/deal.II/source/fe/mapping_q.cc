@@ -2,7 +2,7 @@
 //    $Id$
 //    Version: $Name$
 //
-//    Copyright (C) 2001, 2002, 2003, 2004, 2005, 2006, 2007 by the deal.II authors
+//    Copyright (C) 2001, 2002, 2003, 2004, 2005, 2006, 2007, 2008 by the deal.II authors
 //
 //    This file is subject to QPL and may not be  distributed
 //    without copyright and license information. Please refer
@@ -236,10 +236,10 @@ MappingQ<dim>::get_data (const UpdateFlags update_flags,
 {
   InternalData *data = new InternalData(n_shape_functions);
   this->compute_data (update_flags, quadrature,
-                      quadrature.n_quadrature_points, *data);
+                      quadrature.size(), *data);
   if (!use_mapping_q_on_all_cells)
     this->compute_data (update_flags, quadrature,
-                        quadrature.n_quadrature_points, data->mapping_q1_data);
+                        quadrature.size(), data->mapping_q1_data);
   return data;
 }
 
@@ -253,10 +253,10 @@ MappingQ<dim>::get_face_data (const UpdateFlags update_flags,
   InternalData *data = new InternalData(n_shape_functions);
   const Quadrature<dim> q (QProjector<dim>::project_to_all_faces(quadrature));
   this->compute_face_data (update_flags, q,
-                           quadrature.n_quadrature_points, *data);
+                           quadrature.size(), *data);
   if (!use_mapping_q_on_all_cells)
     this->compute_face_data (update_flags, q,
-                             quadrature.n_quadrature_points,
+                             quadrature.size(),
                              data->mapping_q1_data);
   return data;
 }
@@ -271,10 +271,10 @@ MappingQ<dim>::get_subface_data (const UpdateFlags update_flags,
   InternalData *data = new InternalData(n_shape_functions);
   const Quadrature<dim> q (QProjector<dim>::project_to_all_subfaces(quadrature));
   this->compute_face_data (update_flags, q,
-                           quadrature.n_quadrature_points, *data);
+                           quadrature.size(), *data);
   if (!use_mapping_q_on_all_cells)
     this->compute_face_data (update_flags, q,
-                             quadrature.n_quadrature_points,
+                             quadrature.size(),
                              data->mapping_q1_data);
   return data;
 }
@@ -362,7 +362,7 @@ MappingQ<dim>::fill_fe_face_values (const typename Triangulation<dim>::cell_iter
   else
     p_data=&data;
 
-  const unsigned int n_q_points=q.n_quadrature_points;
+  const unsigned int n_q_points=q.size();
   this->compute_fill_face (cell, face_no, false,
                            n_q_points,
                            QProjector<dim>::DataSetDescriptor::
@@ -426,7 +426,7 @@ MappingQ<dim>::fill_fe_subface_values (const typename Triangulation<dim>::cell_i
   else
     p_data=&data;
 
-  const unsigned int n_q_points=q.n_quadrature_points;
+  const unsigned int n_q_points=q.size();
   this->compute_fill_face (cell, face_no, true,
                            n_q_points,
                            QProjector<dim>::DataSetDescriptor::
@@ -749,7 +749,7 @@ MappingQ<dim>::compute_laplace_vector(Table<2,double> &lvs) const
 				   // gradients at the quadrature
 				   // points on the unit cell
   const QGauss<dim> quadrature(degree+1);
-  const unsigned int n_q_points=quadrature.n_quadrature_points;
+  const unsigned int n_q_points=quadrature.size();
   
   InternalData quadrature_data(n_shape_functions);
   quadrature_data.shape_derivatives.resize(n_shape_functions * n_q_points);

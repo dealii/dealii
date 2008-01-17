@@ -2,7 +2,7 @@
 //    $Id$
 //    Version: $Name$
 //
-//    Copyright (C) 2003, 2004, 2005, 2006, 2007 by the deal.II authors
+//    Copyright (C) 2003, 2004, 2005, 2006, 2007, 2008 by the deal.II authors
 //
 //    This file is subject to QPL and may not be  distributed
 //    without copyright and license information. Please refer
@@ -141,7 +141,7 @@ FE_RaviartThomas<dim>::initialize_support_points (const unsigned int deg)
   
   QGauss<dim> cell_quadrature(deg+1);
   const unsigned int n_interior_points
-    = (deg>0) ? cell_quadrature.n_quadrature_points : 0;
+    = (deg>0) ? cell_quadrature.size() : 0;
   
   this->generalized_support_points.resize (2 + n_interior_points);
   
@@ -153,7 +153,7 @@ FE_RaviartThomas<dim>::initialize_support_points (const unsigned int deg)
 
   interior_weights.reinit(TableIndices<3>(2+n_interior_points, 0, dim));
   
-  for (unsigned int k=0;k<cell_quadrature.n_quadrature_points;++k)
+  for (unsigned int k=0;k<cell_quadrature.size();++k)
     this->generalized_support_points[current++] = cell_quadrature.point(k);
   
   Assert (current == this->generalized_support_points.size(),
@@ -169,7 +169,7 @@ FE_RaviartThomas<dim>::initialize_support_points (const unsigned int deg)
 {
   QGauss<dim> cell_quadrature(deg+1);
   const unsigned int n_interior_points
-    = (deg>0) ? cell_quadrature.n_quadrature_points : 0;
+    = (deg>0) ? cell_quadrature.size() : 0;
   
   unsigned int n_face_points = (dim>1) ? 1 : 0;
 				   // compute (deg+1)^(dim-1)
@@ -192,7 +192,7 @@ FE_RaviartThomas<dim>::initialize_support_points (const unsigned int deg)
 
       boundary_weights.reinit(n_face_points, legendre.n());
       
-//       Assert (face_points.n_quadrature_points == this->dofs_per_face,
+//       Assert (face_points.size() == this->dofs_per_face,
 // 	      ExcInternalError());
       
       for (unsigned int k=0;k<n_face_points;++k)
@@ -236,7 +236,7 @@ FE_RaviartThomas<dim>::initialize_support_points (const unsigned int deg)
   
   interior_weights.reinit(TableIndices<3>(n_interior_points, polynomials[0]->n(), dim));
   
-  for (unsigned int k=0;k<cell_quadrature.n_quadrature_points;++k)
+  for (unsigned int k=0;k<cell_quadrature.size();++k)
     {
       this->generalized_support_points[current++] = cell_quadrature.point(k);
       for (unsigned int i=0;i<polynomials[0]->n();++i)
@@ -282,7 +282,7 @@ void
 FE_RaviartThomas<dim>::initialize_restriction()
 {
   QGauss<dim-1> q_base (rt_order+1);
-  const unsigned int n_face_points = q_base.n_quadrature_points;
+  const unsigned int n_face_points = q_base.size();
 				   // First, compute interpolation on
 				   // subfaces
   for (unsigned int face=0;face<GeometryInfo<dim>::faces_per_cell;++face)
@@ -296,8 +296,8 @@ FE_RaviartThomas<dim>::initialize_restriction()
 				       // Store shape values, since the
 				       // evaluation suffers if not
 				       // ordered by point
-      Table<2,double> cached_values(this->dofs_per_cell, q_face.n_quadrature_points);
-      for (unsigned int k=0;k<q_face.n_quadrature_points;++k)
+      Table<2,double> cached_values(this->dofs_per_cell, q_face.size());
+      for (unsigned int k=0;k<q_face.size();++k)
 	for (unsigned int i = 0; i < this->dofs_per_cell; ++i)
 	  cached_values(i,k)
 	    = this->shape_value_component(i, q_face.point(k),
@@ -369,8 +369,8 @@ FE_RaviartThomas<dim>::initialize_restriction()
 				   // Store shape values, since the
 				   // evaluation suffers if not
 				   // ordered by point
-  Table<3,double> cached_values(this->dofs_per_cell, q_cell.n_quadrature_points, dim);
-  for (unsigned int k=0;k<q_cell.n_quadrature_points;++k)
+  Table<3,double> cached_values(this->dofs_per_cell, q_cell.size(), dim);
+  for (unsigned int k=0;k<q_cell.size();++k)
     for (unsigned int i = 0; i < this->dofs_per_cell; ++i)
       for (unsigned int d=0;d<dim;++d)
 	cached_values(i,k,d) = this->shape_value_component(i, q_cell.point(k), d);
@@ -379,7 +379,7 @@ FE_RaviartThomas<dim>::initialize_restriction()
     {
       Quadrature<dim> q_sub = QProjector<dim>::project_to_child(q_cell, child);
       
-      for (unsigned int k=0;k<q_sub.n_quadrature_points;++k)
+      for (unsigned int k=0;k<q_sub.size();++k)
 	for (unsigned int i_child = 0; i_child < this->dofs_per_cell; ++i_child)
 	  for (unsigned int d=0;d<dim;++d)
 	    for (unsigned int i_weight=0;i_weight<polynomials[d]->n();++i_weight)

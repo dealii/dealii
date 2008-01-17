@@ -2,7 +2,7 @@
 //    $Id$
 //    Version: $Name$
 //
-//    Copyright (C) 2001, 2002, 2003, 2004, 2005, 2006, 2007 by the deal.II authors
+//    Copyright (C) 2001, 2002, 2003, 2004, 2005, 2006, 2007, 2008 by the deal.II authors
 //
 //    This file is subject to QPL and may not be  distributed
 //    without copyright and license information. Please refer
@@ -196,10 +196,10 @@ FE_DGQ<dim>::FE_DGQ (const Quadrature<1>& points)
 		:
 		FE_Poly<TensorProductPolynomials<dim>, dim> (
 		  TensorProductPolynomials<dim>(Polynomials::Lagrange::generate_complete_basis(points.get_points())),
-		  FiniteElementData<dim>(get_dpo_vector(points.n_quadrature_points-1), 1, points.n_quadrature_points-1, FiniteElementData<dim>::L2),
-		  std::vector<bool>(FiniteElementData<dim>(get_dpo_vector(points.n_quadrature_points-1),1, points.n_quadrature_points-1).dofs_per_cell, true),
+		  FiniteElementData<dim>(get_dpo_vector(points.size()-1), 1, points.size()-1, FiniteElementData<dim>::L2),
+		  std::vector<bool>(FiniteElementData<dim>(get_dpo_vector(points.size()-1),1, points.size()-1).dofs_per_cell, true),
 		  std::vector<std::vector<bool> >(FiniteElementData<dim>(
-		    get_dpo_vector(points.n_quadrature_points-1),1, points.n_quadrature_points-1).dofs_per_cell, std::vector<bool>(1,true)))
+		    get_dpo_vector(points.size()-1),1, points.size()-1).dofs_per_cell, std::vector<bool>(1,true)))
 {
   for (unsigned int i=0; i<GeometryInfo<dim>::children_per_cell; ++i)
     this->prolongation[i].reinit (this->dofs_per_cell,

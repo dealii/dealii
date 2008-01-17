@@ -2,7 +2,7 @@
 //    $Id$
 //    Version: $Name$
 //
-//    Copyright (C) 2005, 2006 by the deal.II authors
+//    Copyright (C) 2005, 2006, 2007, 2008 by the deal.II authors
 //
 //    This file is subject to QPL and may not be  distributed
 //    without copyright and license information. Please refer
@@ -173,8 +173,8 @@ namespace hp
     
     unsigned int m = 0;
     for (unsigned int i=0; i<quadratures.size(); ++i)
-      if (quadratures[i]->n_quadrature_points > m)
-        m = quadratures[i]->n_quadrature_points;
+      if (quadratures[i]->size() > m)
+        m = quadratures[i]->size();
     
     return m;
   }

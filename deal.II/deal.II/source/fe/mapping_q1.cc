@@ -2,7 +2,7 @@
 //    $Id$
 //    Version: $Name$
 //
-//    Copyright (C) 2000, 2001, 2002, 2003, 2004, 2005, 2006, 2007 by the deal.II authors
+//    Copyright (C) 2000, 2001, 2002, 2003, 2004, 2005, 2006, 2007, 2008 by the deal.II authors
 //
 //    This file is subject to QPL and may not be  distributed
 //    without copyright and license information. Please refer
@@ -305,7 +305,7 @@ MappingQ1<dim>::compute_data (const UpdateFlags      update_flags,
 			      const unsigned int     n_original_q_points,
 			      InternalData          &data) const
 {
-  const unsigned int n_q_points = q.n_quadrature_points;
+  const unsigned int n_q_points = q.size();
 
   data.update_once = update_once(update_flags);
   data.update_each = update_each(update_flags);
@@ -336,7 +336,7 @@ MappingQ1<dim>::get_data (const UpdateFlags update_flags,
 			  const Quadrature<dim>& q) const
 {
   InternalData* data = new InternalData(n_shape_functions);
-  compute_data (update_flags, q, q.n_quadrature_points, *data);
+  compute_data (update_flags, q, q.size(), *data);
   return data;
 }
 
@@ -430,7 +430,7 @@ MappingQ1<dim>::get_face_data (const UpdateFlags        update_flags,
   InternalData* data = new InternalData(n_shape_functions);
   compute_face_data (update_flags,
 		     QProjector<dim>::project_to_all_faces(quadrature),
-		     quadrature.n_quadrature_points,
+		     quadrature.size(),
 		     *data);
 
   return data;
@@ -446,7 +446,7 @@ MappingQ1<dim>::get_subface_data (const UpdateFlags update_flags,
   InternalData* data = new InternalData(n_shape_functions);
   compute_face_data (update_flags,
 		     QProjector<dim>::project_to_all_subfaces(quadrature),
-		     quadrature.n_quadrature_points,
+		     quadrature.size(),
 		     *data);
 
   return data;
@@ -570,7 +570,7 @@ MappingQ1<dim>::fill_fe_values (const typename Triangulation<dim>::cell_iterator
   Assert(data_ptr!=0, ExcInternalError());
   InternalData &data=*data_ptr;
 
-  const unsigned int n_q_points=q.n_quadrature_points;
+  const unsigned int n_q_points=q.size();
   
   compute_fill (cell, n_q_points, DataSetDescriptor::cell (),
                 data, quadrature_points);
@@ -718,7 +718,7 @@ MappingQ1<dim>::fill_fe_face_values (const typename Triangulation<dim>::cell_ite
   Assert(data_ptr!=0, ExcInternalError());
   InternalData &data=*data_ptr;
 
-  const unsigned int n_q_points = q.n_quadrature_points;
+  const unsigned int n_q_points = q.size();
   
   compute_fill_face (cell, face_no, false,
 		     n_q_points,
@@ -754,7 +754,7 @@ MappingQ1<dim>::fill_fe_subface_values (const typename Triangulation<dim>::cell_
   Assert(data_ptr!=0, ExcInternalError());
   InternalData &data=*data_ptr;
 
-  const unsigned int n_q_points = q.n_quadrature_points;
+  const unsigned int n_q_points = q.size();
   
   compute_fill_face (cell, face_no, true,
 		     n_q_points,

@@ -2,7 +2,7 @@
 //    $Id$
 //    Version: $Name$
 //
-//    Copyright (C) 2005, 2006, 2007 by the deal.II authors
+//    Copyright (C) 2005, 2006, 2007, 2008 by the deal.II authors
 //
 //    This file is subject to QPL and may not be  distributed
 //    without copyright and license information. Please refer
@@ -262,7 +262,7 @@ FE_PolyTensor<POLY,dim>::get_data (const UpdateFlags      update_flags,
   data->update_flags = data->update_once | data->update_each;
 
   const UpdateFlags flags(data->update_flags);
-  const unsigned int n_q_points = quadrature.n_quadrature_points;
+  const unsigned int n_q_points = quadrature.size();
   
 				   // some scratch arrays
   std::vector<Tensor<1,dim> > values(0);
@@ -364,7 +364,7 @@ FE_PolyTensor<POLY,dim>::fill_fe_values (
 // 	      && dynamic_cast<const MappingCartesian<dim>*>(&mapping) != 0),
 // 	 ExcNotImplemented());
 
-  const unsigned int n_q_points = quadrature.n_quadrature_points;
+  const unsigned int n_q_points = quadrature.size();
   const UpdateFlags flags(fe_data.current_update_flags());
   
   Assert(!(flags & update_values) || fe_data.shape_values.size() == this->dofs_per_cell,
@@ -529,7 +529,7 @@ FE_PolyTensor<POLY,dim>::fill_fe_face_values (
 				   // possible
   InternalData &fe_data = dynamic_cast<InternalData &> (fedata);
 
-  const unsigned int n_q_points = quadrature.n_quadrature_points;
+  const unsigned int n_q_points = quadrature.size();
 				   // offset determines which data set
 				   // to take (all data sets for all
 				   // faces are stored contiguously)
@@ -713,7 +713,7 @@ FE_PolyTensor<POLY,dim>::fill_fe_subface_values (
 				   // possible
   InternalData &fe_data = dynamic_cast<InternalData &> (fedata);
 
-  const unsigned int n_q_points = quadrature.n_quadrature_points;
+  const unsigned int n_q_points = quadrature.size();
 				   // offset determines which data set
 				   // to take (all data sets for all
 				 // sub-faces are stored contiguously)
