@@ -1496,6 +1496,11 @@ DataOutBase::TecplotFlags::memory_consumption () const
 
 
 
+DataOutBase::VtkFlags::VtkFlags ()
+{}
+
+
+
 void DataOutBase::VtkFlags::declare_parameters (ParameterHandler &/*prm*/)
 {}
 

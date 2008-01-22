@@ -1194,6 +1194,11 @@ class DataOutBase
 
       public:
 					 /**
+					  * Default constructor.
+					  */
+	VtkFlags ();
+
+					 /**
 					  * Declare all flags with name
 					  * and type as offered by this
 					  * class, for use in input files.
