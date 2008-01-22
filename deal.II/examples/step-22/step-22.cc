@@ -163,7 +163,6 @@ class InitialValues : public Function<dim>
 
     virtual void vector_value (const Point<dim> &p, 
                                Vector<double>   &value) const;
-
 };
 
 
@@ -172,10 +171,7 @@ double
 InitialValues<dim>::value (const Point<dim>  &p,
                            const unsigned int component) const 
 {
-  if (component == dim+1)
-    return (p.distance (Point<dim>()) < .6 ? 1 : 0);
-  else
-    return 0;
+  return 0;
 }
 
 
@@ -186,6 +182,51 @@ InitialValues<dim>::vector_value (const Point<dim> &p,
 {
   for (unsigned int c=0; c<this->n_components; ++c)
     values(c) = InitialValues<dim>::value (p, c);
+}
+
+
+
+template <int dim>
+class RightHandSide : public Function<dim> 
+{
+  public:
+    RightHandSide () : Function<dim>(dim+2) {}
+    
+    virtual double value (const Point<dim>   &p,
+                          const unsigned int  component = 0) const;
+
+    virtual void vector_value (const Point<dim> &p, 
+                               Vector<double>   &value) const;
+};
+
+
+template <int dim>
+double
+RightHandSide<dim>::value (const Point<dim>  &p,
+                           const unsigned int component) const 
+{
+  if (component == dim+1)
+    return ((p.distance (Point<dim>(.3,.1)) < 1./32)
+	    ||
+	    (p.distance (Point<dim>(.45,.1)) < 1./32)
+	    ||
+	    (p.distance (Point<dim>(.75,.1)) < 1./32)
+	    ?
+	    1
+	    :
+	    0);
+  else
+    return 0;
+}
+
+
+template <int dim>
+void
+RightHandSide<dim>::vector_value (const Point<dim> &p,
+                                  Vector<double>   &values) const 
+{
+  for (unsigned int c=0; c<this->n_components; ++c)
+    values(c) = RightHandSide<dim>::value (p, c);
 }
 
 
@@ -763,10 +804,10 @@ void BoussinesqFlowProblem<dim>::setup_dofs (const bool setup_matrices)
   hanging_node_constraints.clear ();
   DoFTools::make_hanging_node_constraints (dof_handler,
 					   hanging_node_constraints);
-  std::set<unsigned char> no_normal_flux_boundaries;
-  no_normal_flux_boundaries.insert (0);
-  compute_no_normal_flux_constraints (dof_handler, 0, no_normal_flux_boundaries,
-				      hanging_node_constraints);
+//   std::set<unsigned char> no_normal_flux_boundaries;
+//   no_normal_flux_boundaries.insert (0);
+//   compute_no_normal_flux_constraints (dof_handler, 0, no_normal_flux_boundaries,
+// 				      hanging_node_constraints);
   hanging_node_constraints.close ();
 
   std::vector<unsigned int> dofs_per_component (dim+2);
@@ -934,8 +975,7 @@ void BoussinesqFlowProblem<dim>::assemble_system ()
 		    }
 		}
 	      
-	      const Point<dim> gravity = fe_values.quadrature_point(q) /
-					 fe_values.quadrature_point(q).norm();
+	      const Point<dim> gravity (0,1);
 	      
 	      local_rhs(i) += (Raleigh_number *
 			       gravity * phi_i_u * old_temperature)*
@@ -1010,13 +1050,13 @@ void BoussinesqFlowProblem<dim>::assemble_system ()
 	      break;
 	    } 
       
-//      std::vector<bool> component_mask (dim+2, true);
-//       component_mask[dim] = component_mask[dim+1] = false;
-//       VectorTools::interpolate_boundary_values (dof_handler,
-// 						0,
-// 						ZeroFunction<dim>(dim+2),
-// 						boundary_values,
-// 						component_mask);
+     std::vector<bool> component_mask (dim+2, true);
+      component_mask[dim] = component_mask[dim+1] = false;
+      VectorTools::interpolate_boundary_values (dof_handler,
+						0,
+						ZeroFunction<dim>(dim+2),
+						boundary_values,
+						component_mask);
 
       MatrixTools::apply_boundary_values (boundary_values,
 					  system_matrix,
@@ -1052,8 +1092,8 @@ void BoussinesqFlowProblem<dim>::assemble_system ()
 template <int dim>
 void BoussinesqFlowProblem<dim>::assemble_rhs_T () 
 {  
-  QGauss<dim>   quadrature_formula(degree+1); 
-  QGauss<dim-1> face_quadrature_formula(degree+1);
+  QGauss<dim>   quadrature_formula(degree+2); 
+  QGauss<dim-1> face_quadrature_formula(degree+2);
   FEValues<dim> fe_values (fe, quadrature_formula, 
                            update_values    | update_gradients |
                            update_quadrature_points  | update_JxW_values);
@@ -1118,7 +1158,9 @@ void BoussinesqFlowProblem<dim>::assemble_rhs_T ()
 	    
             const double        phi_i_T      = extract_T(fe_values, i, q);
             const Tensor<1,dim> grad_phi_i_T = extract_grad_T(fe_values, i, q);
-                     
+
+	    const Point<dim> p = fe_values.quadrature_point(q);
+	    
             local_rhs(i) += (time_step *
                              old_T *
                              (present_u *
@@ -1127,7 +1169,11 @@ void BoussinesqFlowProblem<dim>::assemble_rhs_T ()
 			      present_div_u *
 			      phi_i_T)
                              +
-                             old_T * phi_i_T)
+                             old_T * phi_i_T
+			     +
+			     time_step *
+			     RightHandSide<dim>().value (p, dim+1)
+			     * phi_i_T)
                             *
                             fe_values.JxW(q);
           }
@@ -1381,8 +1427,9 @@ void BoussinesqFlowProblem<dim>::solve ()
     hanging_node_constraints.distribute (solution);
   }
 
+				   // for DGQ1 needs to be /15
   time_step = GridTools::minimal_cell_diameter(triangulation) /
-              get_maximal_velocity() / 2;
+              std::max (get_maximal_velocity(), .05) / 2;
 
   assemble_rhs_T ();
   {
@@ -1409,7 +1456,11 @@ void BoussinesqFlowProblem<dim>::solve ()
     std::cout << "   "
               << solver_control.last_step()
               << " CG iterations for temperature."
-              << std::endl;             
+              << std::endl;
+    std::cout << "   Max temperature: "
+	      << *std::max_element (solution.block(2).begin(),
+				    solution.block(2).end())
+	      << std::endl;
   } 
 }
                                  
@@ -1543,13 +1594,9 @@ void BoussinesqFlowProblem<dim>::run ()
     {
       case 2:
       {
-	GridGenerator::hyper_shell (triangulation,
-				    Point<dim>(), 0.5, 1.0);
+	GridGenerator::hyper_cube (triangulation);
 	
-	static HyperShellBoundary<dim> boundary;
-	triangulation.set_boundary (0, boundary);
-	
-	triangulation.refine_global (4);
+	triangulation.refine_global (5);
 
 	break;
       }
