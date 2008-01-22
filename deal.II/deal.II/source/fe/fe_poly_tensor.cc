@@ -19,8 +19,6 @@
 #include <fe/fe_values.h>
 #include <fe/mapping_cartesian.h>
 
-#include <base/logstream.h>
-
 DEAL_II_NAMESPACE_OPEN
 
 namespace

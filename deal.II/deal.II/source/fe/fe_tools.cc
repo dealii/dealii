@@ -15,7 +15,6 @@
 
 #include <base/quadrature_lib.h>
 #include <base/qprojector.h>
-#include <base/logstream.h>
 #include <base/thread_management.h>
 #include <base/utilities.h>
 #include <lac/full_matrix.h>
