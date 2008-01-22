@@ -2,7 +2,7 @@
 //    $Id$
 //    Version: $Name$
 //
-//    Copyright (C) 2002, 2003, 2004, 2005, 2006 by the deal.II authors
+//    Copyright (C) 2002, 2003, 2004, 2005, 2006, 2008 by the deal.II authors
 //    by the deal.II authors and Stephen "Cheffo" Kolaroff
 //
 //    This file is subject to QPL and may not be  distributed
@@ -27,11 +27,16 @@ DEAL_II_NAMESPACE_OPEN
 
 /**
  * Abstract base class for sparse LU decompositions of a sparse matrix
- * into another sparse matrix.
+ * into another sparse matrix. This class can't be used by itself, but
+ * only as the base class of derived classes that actually implement
+ * particular decompositions such as SparseILU or SparseMIC.
  *
  * The decomposition is stored as a sparse matrix which is why this
  * class is derived from the SparseMatrix. Since it is not a matrix in
- * the usual sense, the derivation is <tt>protected</tt> rather than <tt>public</tt>.
+ * the usual sense (the stored entries are not those of a matrix, but
+ * of two different matrix factors), the derivation is
+ * <tt>protected</tt> rather than <tt>public</tt>.
+ *
  *
  * <h3>Fill-in</h3>
  *
@@ -47,15 +52,18 @@ DEAL_II_NAMESPACE_OPEN
  * copy-constructor of the SparsityPattern class which allows the addition
  * of side-diagonals to a given sparsity structure.
  *
+ *
  * <h3>Unified use of preconditioners</h3>
  *
- * An object of this class can be used in the same form as all
- * PreconditionBlock preconditioners:
+ * While objects of this class can not be used directly (this class is
+ * only a base class for others implementing actual decompositions),
+ * derived classes such as SparseILU and SparseMIC can be used in the
+ * usual form as preconditioners. For example, this works:
  * @code
- * SparseLUDecomposition<double> lu;
- * lu.initialize(matrix, SparseLUDecomposition<double>::AdditionalData(...));
+ * SparseILU<double> ilu;
+ * ilu.initialize(matrix, SparseILU<double>::AdditionalData(...));
  *
- * somesolver.solve (A, x, f, lu);
+ * somesolver.solve (A, x, f, ilu);
  * @endcode
  *
  * Through the AdditionalData object it is possible to specify
@@ -89,7 +97,7 @@ DEAL_II_NAMESPACE_OPEN
  * The state management simply requires the initialize() function to
  * be called before the object is used as preconditioner.
  *
- * Obsolete:
+ * <b>Obsolete:</b>
  * In order to prevent users from applying decompositions before the
  * decomposition itself has been built, and to introduce some
  * optimization of common "sparse idioms", this class introduces a
@@ -150,9 +158,17 @@ class SparseLUDecomposition : protected SparseMatrix<number>,
     SparseLUDecomposition (const SparsityPattern& sparsity);
 
                                      /**
-                                      * Destruction.
+                                      * Destruction. Mark the
+                                      * destructor pure to ensure that
+                                      * this class isn't used
+                                      * directly, but only its derived
+                                      * classes.
                                       */
-    virtual ~SparseLUDecomposition ();
+    virtual ~SparseLUDecomposition ()
+#ifndef DEAL_II_IMPLEMENTED_PURE_FUNCTION_BUG
+      = 0
+#endif
+    ;
 
 				     /**
 				      * Deletes all member
