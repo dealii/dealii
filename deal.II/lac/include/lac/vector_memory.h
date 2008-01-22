@@ -2,7 +2,7 @@
 //    $Id$
 //    Version: $Name$
 //
-//    Copyright (C) 1998, 1999, 2000, 2001, 2002, 2003, 2004, 2005, 2006, 2007 by the deal.II authors
+//    Copyright (C) 1998, 1999, 2000, 2001, 2002, 2003, 2004, 2005, 2006, 2007, 2008 by the deal.II authors
 //
 //    This file is subject to QPL and may not be  distributed
 //    without copyright and license information. Please refer
@@ -202,16 +202,16 @@ class PrimitiveVectorMemory : public VectorMemory<VECTOR>
  *
  * @note Instantiations for this class are provided for the types
  * Vector and BlockVector with number types <tt>float</tt>,
- * <tt>double</tt>, <tt>long double</tt>, @<std::complex@<float@>@>,
- * @<std::complex@<double@>@> and @<std::complex@<long
+ * <tt>double</tt>, <tt>long double</tt>, <tt>@<std::complex@<float@>@></tt>,
+ * <tt>@<std::complex@<double@>@></tt> and <tt>@<std::complex@<long
  * double@>@></tt>. In order to generate additional instances, it is
  * sufficient to define the Pool variable somewhere by
- * <code>
+ * @code
  * #include <lac/vector_memory.h>
  *
  * template GrowingVectorMemory<MyVector>::Pool
  *   GrowingVectorMemory<MyVector>::pool;
- * </code>
+ * @endcode
  * 
  * @author Guido Kanschat, 1999, 2007
  */
