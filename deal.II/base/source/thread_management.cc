@@ -2,7 +2,7 @@
 //    $Id$
 //    Version: $Name$
 //
-//    Copyright (C) 2000, 2001, 2002, 2003, 2005, 2006, 2007 by the deal.II authors
+//    Copyright (C) 2000, 2001, 2002, 2003, 2005, 2006, 2007, 2008 by the deal.II authors
 //
 //    This file is subject to QPL and may not be  distributed
 //    without copyright and license information. Please refer
@@ -24,6 +24,14 @@
 #  include </usr/include/errno.h>
 #endif
 #include <sys/errno.h>
+
+#ifdef HAVE_UNISTD_H
+#  include <unistd.h>
+#endif
+
+#ifdef HAVE_SYS_SYSCALL_H
+#  include <sys/syscall.h>
+#endif
 
 DEAL_II_NAMESPACE_OPEN
 
@@ -106,6 +114,20 @@ namespace Threads
     return internal::n_existing_threads_counter;
   }
   
+
+  unsigned int this_thread_id ()
+  {
+#ifdef SYS_gettid
+    const int this_id = syscall(SYS_gettid);
+#elif HAVE_GETPID
+    const pid_t this_id = getpid();
+#else
+    const pid_t this_id = 0;
+#endif
+    return static_cast<unsigned int>(this_id);
+  }
+
+
   
 #if DEAL_II_USE_MT != 1
   DummyBarrier::DummyBarrier (const unsigned int  count,

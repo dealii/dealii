@@ -2,7 +2,7 @@
 //    $Id$
 //    Version: $Name$
 //
-//    Copyright (C) 1998, 1999, 2000, 2001, 2002, 2003, 2004, 2005, 2006 by the deal.II authors
+//    Copyright (C) 1998, 1999, 2000, 2001, 2002, 2003, 2004, 2005, 2006, 2008 by the deal.II authors
 //
 //    This file is subject to QPL and may not be  distributed
 //    without copyright and license information. Please refer
@@ -19,7 +19,9 @@
 
 #include <string>
 #include <stack>
+#include <map>
 #include <cmath>
+#include <boost/shared_ptr.hpp>
 
 DEAL_II_NAMESPACE_OPEN
 // we only need output streams, but older compilers did not provide
@@ -193,6 +195,11 @@ class LogStream
     bool log_time_differences (const bool flag);
 
 				     /**
+				      * Log the thread id.
+				      */
+    bool log_thread_id (const bool flag);
+    
+				     /**
 				      * Set a threshold for the
 				      * minimal absolute value of
 				      * double values. All numbers
@@ -258,14 +265,14 @@ class LogStream
 				      * manipulators. This passes on
 				      * the whole thing to the
 				      * template function with the
-				      * exception of the <tt>std::endl</tt>
+				      * exception of the
+				      * <tt>std::endl</tt>
 				      * manipulator, for which special
-				      * action is performed: set the
-				      * <tt>was_endl</tt> variable that
-				      * forces this object to generate
-				      * a line head the next time
-				      * something is written by this
-				      * stream.
+				      * action is performed: write the
+				      * temporary stream buffer
+				      * including a header to the file
+				      * and <tt>std::cout</tt> and
+				      * empty the buffer.
 				      *
 				      * An overload of this function is needed
 				      * anyway, since the compiler can't bind
@@ -334,17 +341,6 @@ class LogStream
     std::ostream  *file;
 
 				     /**
-				      * Flag which stores whether the
-				      * last operation was a
-				      * newline-generation. We use this flag
-				      * to generate the list of prefixes at
-				      * the next output, rather than
-				      * immediately after the newline, since
-				      * this might disturb the screen lay-out.
-				      */
-    bool was_endl;
-
-				     /**
 				      * Value denoting the number of
 				      * prefixes to be printed to the
 				      * standard output. If more than
@@ -382,6 +378,10 @@ class LogStream
 				      * values.
 				      */
     double double_threshold;
+				     /**
+				      * Flag for printing thread id.
+				      */
+    bool print_thread_id;
     
 				     /**
 				      * Original buffer of
@@ -411,10 +411,49 @@ class LogStream
 				      */
     template <typename T>
     void print (const T &t);
+				     /**
+				      * Check if we are on a new line
+				      * and print the header before
+				      * the data.
+				      */
+    std::ostringstream& get_stream();
+    
+				     /**
+				      * Type of the stream map
+				      */
+    typedef std::map<unsigned int, boost::shared_ptr<std::ostringstream> > stream_map_type;
+    
+				     /**
+				      * We generate a stringstream for
+				      * every process that sends log
+				      * messages.
+				      */
+    stream_map_type outstreams;
+    
 };
 
 
 /* ----------------------------- Inline functions and templates ---------------- */
+
+
+template <class T>
+inline
+void
+LogStream::print (const T &t)
+{
+				   // if the previous command was an
+				   // <tt>std::endl</tt>, print the topmost
+				   // prefix and a colon
+  std::ostringstream& stream = get_stream();
+  stream << t;
+				   // print the rest of the message
+//   if (prefixes.size() <= std_depth)
+//     *std_out << t;
+
+//   if (file && (prefixes.size() <= file_depth))
+//     *file << t;
+}
+
 
 
 template <class T>
@@ -458,50 +497,6 @@ LogStream::operator<< (const double t)
     print('0');
   
   return *this;
-}
-
-
-
-inline
-LogStream &
-LogStream::operator<< (std::ostream& (*p) (std::ostream&))
-{
-				   // do the work that is common to
-				   // the operator<< functions
-  print (p);
-
-				   // next check whether this is the
-				   // <tt>endl</tt> manipulator, and if so
-				   // set a flag
-  std::ostream & (* const p_endl) (std::ostream&) = &std::endl;
-  if (p == p_endl)
-    was_endl = true;
-
-  return *this;
-}
-
-
-
-template <class T>
-inline
-void
-LogStream::print (const T &t)
-{
-				   // if the previous command was an
-				   // <tt>std::endl</tt>, print the topmost
-				   // prefix and a colon
-  if (was_endl)
-    {
-      print_line_head();
-      was_endl = false;
-    };
-
-				   // print the rest of the message
-  if (prefixes.size() <= std_depth)
-    *std_out << t;
-
-  if (file && (prefixes.size() <= file_depth))
-    *file << t;
 }
 
 

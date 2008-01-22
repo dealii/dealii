@@ -129,6 +129,22 @@ inconvenience this causes.
 <h3>base</h3>
 
 <ol>
+
+<li> <p> Improved: LogStream is now thread safe and output lines from different
+threads are separated now. Additionally, a function LogStream::log_thread_id()
+has been added to log the id of the thread printing the message. The semantics
+has slightly changed in that the header is now printed at the time when the line
+is finished.
+<br>
+(GK 2008/01/22)
+</p> </li>
+
+<li> <p> New: There is a function Threads::this_thread_id() now returning
+an integer id of the current thread.
+<br>
+(GK 2008/01/22)
+</p> </li>
+
 <li> <p> Improved: Quadrature now has an assignment operator.
 <br>
 (GK 2007/12/27)

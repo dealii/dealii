@@ -2,7 +2,7 @@
 //    $Id$
 //    Version: $Name$
 //
-//    Copyright (C) 1998, 1999, 2000, 2001, 2002, 2003, 2004, 2005, 2006 by the deal.II authors
+//    Copyright (C) 1998, 1999, 2000, 2001, 2002, 2003, 2004, 2005, 2006, 2008 by the deal.II authors
 //
 //    This file is subject to QPL and may not be  distributed
 //    without copyright and license information. Please refer
@@ -15,6 +15,7 @@
 #include <base/logstream.h>
 #include <base/job_identifier.h>
 #include <base/memory_consumption.h>
+#include <base/thread_management.h>
 
 // include sys/resource.h for rusage(). Mac OS X needs sys/time.h then
 // as well (strange), so include that, too.
@@ -36,7 +37,15 @@ extern "C" {
 }
 #endif
 
+// When modifying the prefix list, we need to lock it just in case
+// another thread tries to do the same.
 DEAL_II_NAMESPACE_OPEN
+
+namespace 
+{
+  Threads::ThreadMutex log_lock;
+  Threads::ThreadMutex write_lock;
+}
 
 
 LogStream deallog;
@@ -44,7 +53,7 @@ LogStream deallog;
 
 LogStream::LogStream()
 		:
-		std_out(&std::cerr), file(0), was_endl(true),
+		std_out(&std::cerr), file(0),
 		std_depth(10000), file_depth(10000),
 		print_utime(false), diff_utime(false),
 		last_time (0.), double_threshold(0.), old_cerr(0)
@@ -61,9 +70,56 @@ LogStream::~LogStream()
 }
 
 
+LogStream &
+LogStream::operator<< (std::ostream& (*p) (std::ostream&))
+{
+				   // do the work that is common to
+				   // the operator<< functions
+  print (p);
+
+				   // next check whether this is the
+				   // <tt>endl</tt> manipulator, and if so
+				   // set a flag
+  std::ostream & (* const p_endl) (std::ostream&) = &std::endl;
+  if (p == p_endl)
+    {
+      Threads::ThreadMutex::ScopedLock lock(write_lock);
+      print_line_head();
+      std::ostringstream& stream = get_stream();
+      if (prefixes.size() <= std_depth)
+	*std_out << stream.str();
+      
+      if (file && (prefixes.size() <= file_depth))
+	*file << stream.str();
+      
+				       // Start a new string
+      stream.str("");
+    }
+  return *this;
+}
+
+
+std::ostringstream&
+LogStream::get_stream()
+{
+  Threads::ThreadMutex::ScopedLock lock(log_lock);
+  unsigned int id = Threads::this_thread_id();
+
+  boost::shared_ptr<std::ostringstream>& sptr = outstreams[id];
+  if (sptr == 0)
+    {
+      sptr = boost::shared_ptr<std::ostringstream> (new std::ostringstream());
+      sptr->setf(std::ios::showpoint | std::ios::left);
+    } 
+  return *sptr;
+}
+
+
+
 void
 LogStream::attach(std::ostream& o)
 {
+  Threads::ThreadMutex::ScopedLock lock(log_lock);
   file = &o;
   o.setf(std::ios::showpoint | std::ios::left);
   o << dealjobid();
@@ -72,12 +128,14 @@ LogStream::attach(std::ostream& o)
 
 void LogStream::detach ()
 {
+  Threads::ThreadMutex::ScopedLock lock(log_lock);
   file = 0;
 }
 
 
 void LogStream::log_cerr ()
 {
+  Threads::ThreadMutex::ScopedLock lock(log_lock);
   if (old_cerr == 0)
     {
       old_cerr = std::cerr.rdbuf(file->rdbuf());
@@ -120,6 +178,7 @@ LogStream::get_prefix() const
 void
 LogStream::push (const std::string& text)
 {
+  Threads::ThreadMutex::ScopedLock lock(log_lock);
   std::string pre=prefixes.top();
   pre += text;
   pre += std::string(":");
@@ -129,6 +188,7 @@ LogStream::push (const std::string& text)
 
 void LogStream::pop ()
 {
+  Threads::ThreadMutex::ScopedLock lock(log_lock);
   if (prefixes.size() > 1)
     prefixes.pop();
 }
@@ -137,6 +197,7 @@ void LogStream::pop ()
 unsigned int
 LogStream::depth_console (const unsigned n)
 {
+  Threads::ThreadMutex::ScopedLock lock(log_lock);
   const unsigned int h = std_depth;
   std_depth = n;
   return h;
@@ -146,6 +207,7 @@ LogStream::depth_console (const unsigned n)
 unsigned int
 LogStream::depth_file (const unsigned n)
 {
+  Threads::ThreadMutex::ScopedLock lock(log_lock);
   const unsigned int h = file_depth;
   file_depth = n;
   return h;
@@ -155,6 +217,7 @@ LogStream::depth_file (const unsigned n)
 void
 LogStream::threshold_double (const double t)
 {
+  Threads::ThreadMutex::ScopedLock lock(log_lock);
   double_threshold = t;
 }
 
@@ -162,6 +225,7 @@ LogStream::threshold_double (const double t)
 bool
 LogStream::log_execution_time (const bool flag)
 {
+  Threads::ThreadMutex::ScopedLock lock(log_lock);
   const bool h = print_utime;
   print_utime = flag;
   return h;
@@ -171,8 +235,19 @@ LogStream::log_execution_time (const bool flag)
 bool
 LogStream::log_time_differences (const bool flag)
 {
+  Threads::ThreadMutex::ScopedLock lock(log_lock);
   const bool h = diff_utime;
   diff_utime = flag;
+  return h;
+}
+
+
+bool
+LogStream::log_thread_id (const bool flag)
+{
+  Threads::ThreadMutex::ScopedLock lock(log_lock);
+  const bool h = print_thread_id;
+  print_thread_id = flag;
   return h;
 }
 
@@ -226,7 +301,8 @@ LogStream::print_line_head()
 #endif
   
   const std::string& head = get_prefix();
-
+  const unsigned int thread = Threads::this_thread_id();
+  
   if (prefixes.size() <= std_depth)
     {
       if (print_utime)
@@ -238,6 +314,9 @@ LogStream::print_line_head()
 #endif
 	  std_out->width(p);
 	}
+      if (print_thread_id)
+	*std_out << '[' << thread << ']';
+      
       *std_out <<  head << ':';
     }
   
@@ -252,6 +331,9 @@ LogStream::print_line_head()
 #endif
 	  file->width(p);
 	}  
+      if (print_thread_id)
+	*file << '[' << thread << ']';
+      
       *file << head << ':';
     }
 }

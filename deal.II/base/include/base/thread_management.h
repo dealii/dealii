@@ -2,7 +2,7 @@
 //    $Id$
 //    Version: $Name$
 //
-//    Copyright (C) 2000, 2001, 2002, 2003, 2004, 2005, 2006, 2007 by the deal.II authors
+//    Copyright (C) 2000, 2001, 2002, 2003, 2004, 2005, 2006, 2007, 2008 by the deal.II authors
 //
 //    This file is subject to QPL and may not be  distributed
 //    without copyright and license information. Please refer
@@ -632,6 +632,23 @@ namespace Threads
                                     */
   unsigned int n_existing_threads ();
 
+				   /**
+				    * Return a number used as id of
+				    * this thread. This number is
+				    * generated using the system call
+				    * <tt>getpid</tt>, or, if it
+				    * exists <tt>gettid</tt>. The
+				    * result of either is converted to
+				    * an integer and returned by this
+				    * function.
+				    *
+				    * @todo As of now, none of our
+				    * systems seems to support
+				    * <tt>gettid</tt>, so that part of
+				    * the code is untested yet.
+				    */
+  unsigned int this_thread_id ();
+  
 				   /**
 				    * Split the range <tt>[begin,end)</tt>
 				    * into <tt>n_intervals</tt> subintervals
