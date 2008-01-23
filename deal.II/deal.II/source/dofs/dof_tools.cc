@@ -2,7 +2,7 @@
 //    $Id$
 //    Version: $Name$
 //
-//    Copyright (C) 1999, 2000, 2001, 2002, 2003, 2004, 2005, 2006, 2007 by the deal.II authors
+//    Copyright (C) 1999, 2000, 2001, 2002, 2003, 2004, 2005, 2006, 2007, 2008 by the deal.II authors
 //
 //    This file is subject to QPL and may not be  distributed
 //    without copyright and license information. Please refer
@@ -189,13 +189,13 @@ DoFTools::make_sparsity_pattern (
 
 
   const std::list<std::pair<typename DH::cell_iterator,
-                            typename DH::cell_iterator> >
+    typename DH::cell_iterator> >
     cell_list
     = GridTools::get_finest_common_cells (dof_row, dof_col);
 
 
   typename std::list<std::pair<typename DH::cell_iterator,
-                               typename DH::cell_iterator> >
+    typename DH::cell_iterator> >
     ::const_iterator
     cell_iter = cell_list.begin();
 
@@ -401,7 +401,7 @@ DoFTools::make_boundary_sparsity_pattern (
             for (unsigned int j=0; j<dofs_per_face; ++j) 
               sparsity.add (dof_to_boundary_mapping[dofs_on_this_face[i]],
                             dof_to_boundary_mapping[dofs_on_this_face[j]]);
-      }
+	}
 }
 
 
@@ -1274,10 +1274,10 @@ namespace internal
 
 
 
-				     /**
-				      * Same, but for subface
-				      * interpolation matrices.
-				      */
+				       /**
+					* Same, but for subface
+					* interpolation matrices.
+					*/
       template <int dim>
       void
       ensure_existence_of_subface_matrix (const FiniteElement<dim> &fe1,
@@ -1486,20 +1486,20 @@ namespace internal
 
       
                                        /**
-                                       * Copy constraints into a constraint
-                                       * matrix object.
-                                       *
+					* Copy constraints into a constraint
+					* matrix object.
+					*
                                         * This function removes zero
                                         * constraints and those, which
                                         * constrain a DoF which was
                                         * already eliminated in one of
                                         * the previous steps of the hp
                                         * hanging node procedure.
-                                       *
-                                       * It also suppresses very small
-                                       * entries in the constraint matrix to
-                                       * avoid making the sparsity pattern
-                                       * fuller than necessary.
+					*
+					* It also suppresses very small
+					* entries in the constraint matrix to
+					* avoid making the sparsity pattern
+					* fuller than necessary.
                                         */
 #ifdef DEAL_II_ANON_NAMESPACE_BUG
       static
@@ -1540,35 +1540,35 @@ namespace internal
 
               if (constraint_already_satisfied == false)
                 {
-                                                  // add up the absolute
-                                                  // values of all
-                                                  // constraints in this line
-                                                  // to get a measure of
-                                                  // their absolute size
-                 double abs_sum = 0;
-                 for (unsigned int i=0; i<n_master_dofs; ++i)
-                   abs_sum += std::abs (face_constraints(row,i));
+						   // add up the absolute
+						   // values of all
+						   // constraints in this line
+						   // to get a measure of
+						   // their absolute size
+		  double abs_sum = 0;
+		  for (unsigned int i=0; i<n_master_dofs; ++i)
+		    abs_sum += std::abs (face_constraints(row,i));
                  
-                                                  // then enter those
-                                                  // constraints that are
-                                                  // larger than
-                                                  // 1e-14*abs_sum. everything
-                                                  // else probably originated
-                                                  // from inexact inversion
-                                                  // of matrices and similar
-                                                  // effects. having those
-                                                  // constraints in here will
-                                                  // only lead to problems
-                                                  // because it makes
-                                                  // sparsity patterns fuller
-                                                  // than necessary without
-                                                  // producing any
-                                                  // significant effect
+						   // then enter those
+						   // constraints that are
+						   // larger than
+						   // 1e-14*abs_sum. everything
+						   // else probably originated
+						   // from inexact inversion
+						   // of matrices and similar
+						   // effects. having those
+						   // constraints in here will
+						   // only lead to problems
+						   // because it makes
+						   // sparsity patterns fuller
+						   // than necessary without
+						   // producing any
+						   // significant effect
                   constraints.add_line (slave_dofs[row]);
                   for (unsigned int i=0; i<n_master_dofs; ++i)
                     if ((face_constraints(row,i) != 0)
-                       &&
-                       (std::fabs(face_constraints(row,i)) >= 1e-14*abs_sum))
+			&&
+			(std::fabs(face_constraints(row,i)) >= 1e-14*abs_sum))
                       {
 #ifdef WOLFGANG
                         std::cout << "   " << slave_dofs[row]
@@ -1838,7 +1838,7 @@ namespace internal
 				       // refined, we can only visit each
 				       // face with hanging nodes once
       typename DH::active_cell_iterator cell = dof_handler.begin_active(),
-					    endc = dof_handler.end();
+					endc = dof_handler.end();
       for (; cell!=endc; ++cell)
 	for (unsigned int face=0; face<GeometryInfo<dim>::faces_per_cell; ++face)
 	  if (cell->face(face)->has_children()) 
@@ -2530,13 +2530,13 @@ namespace internal
 		      ->fe_index_is_active(cell->active_fe_index()) == true,
 		      ExcInternalError());
 
-						   // Only if there is
-						   // a neighbor with
-						   // a different
-						   // active_fe_index
-					           // and the same h-level,
-						   // some action has
-						   // to be taken.
+					       // Only if there is
+					       // a neighbor with
+					       // a different
+					       // active_fe_index
+					       // and the same h-level,
+					       // some action has
+					       // to be taken.
 	      if ((DoFHandlerSupportsDifferentP<DH>::value == true)
                   &&
                   !cell->face(face)->at_boundary ()
@@ -2553,159 +2553,159 @@ namespace internal
 						   // face we have to
 						   // constrain
 		  switch (cell->get_fe().compare_for_face_domination (neighbor->get_fe ()))
-		  {
-		    case FiniteElementDomination::this_element_dominates:
 		    {
-                                                       // Get DoFs on
-                                                       // dominating and
-                                                       // dominated side of
-                                                       // the face
-                      master_dofs.resize (cell->get_fe().dofs_per_face);
-                      cell->face(face)->get_dof_indices (master_dofs,
-                                                         cell->active_fe_index ());
+		      case FiniteElementDomination::this_element_dominates:
+		      {
+							 // Get DoFs on
+							 // dominating and
+							 // dominated side of
+							 // the face
+			master_dofs.resize (cell->get_fe().dofs_per_face);
+			cell->face(face)->get_dof_indices (master_dofs,
+							   cell->active_fe_index ());
                           
-                      slave_dofs.resize (neighbor->get_fe().dofs_per_face);
-                      cell->face(face)->get_dof_indices (slave_dofs,
-							 neighbor->active_fe_index ());
+			slave_dofs.resize (neighbor->get_fe().dofs_per_face);
+			cell->face(face)->get_dof_indices (slave_dofs,
+							   neighbor->active_fe_index ());
 			  
 						  
-                                                       // make sure
-                                                       // the element
-                                                       // constraints
-                                                       // for this
-                                                       // face are
-                                                       // available
-                      ensure_existence_of_face_matrix
-                        (cell->get_fe(),
-                         neighbor->get_fe(),
-                         face_interpolation_matrices
-                         [cell->active_fe_index()][neighbor->active_fe_index()]);
+							 // make sure
+							 // the element
+							 // constraints
+							 // for this
+							 // face are
+							 // available
+			ensure_existence_of_face_matrix
+			  (cell->get_fe(),
+			   neighbor->get_fe(),
+			   face_interpolation_matrices
+			   [cell->active_fe_index()][neighbor->active_fe_index()]);
 
-                                                       // Add constraints to global constraint
-                                                       // matrix.
+							 // Add constraints to global constraint
+							 // matrix.
 #ifdef WOLFGANG		      
-		      std::cout << "p-constraints for cell=" << cell
-				<< ", face=" << face << std::endl;
+			std::cout << "p-constraints for cell=" << cell
+				  << ", face=" << face << std::endl;
 #endif
-                      filter_constraints (master_dofs,
-                                          slave_dofs,
-                                          *(face_interpolation_matrices
-                                            [cell->active_fe_index()]
-                                            [neighbor->active_fe_index()]),
-                                          constraints);
+			filter_constraints (master_dofs,
+					    slave_dofs,
+					    *(face_interpolation_matrices
+					      [cell->active_fe_index()]
+					      [neighbor->active_fe_index()]),
+					    constraints);
 
-		      break;
-                    }
+			break;
+		      }
 
-		    case FiniteElementDomination::other_element_dominates:
-		    {
-						       // we don't do anything
-						       // here since we will
-						       // come back to this
-						       // face from the other
-						       // cell, at which time
-						       // we will fall into
-						       // the first case
-						       // clause above
-		      break;
-		    }
+		      case FiniteElementDomination::other_element_dominates:
+		      {
+							 // we don't do anything
+							 // here since we will
+							 // come back to this
+							 // face from the other
+							 // cell, at which time
+							 // we will fall into
+							 // the first case
+							 // clause above
+			break;
+		      }
 
-		    case FiniteElementDomination::either_element_can_dominate:
-		    {
-						       // it appears as if
-						       // neither element has
-						       // any constraints on
-						       // its neighbor. this
-						       // may be because
-						       // neither element has
-						       // any DoFs on faces at
-						       // all. or that the two
-						       // elements are
-						       // actually the same,
-						       // although they happen
-						       // to run under
-						       // different fe_indices
-						       // (this is what
-						       // happens in
-						       // hp/hp_hanging_nodes_01
-						       // for example).
-						       //
-						       // another possibility
-						       // is what happens in
-						       // crash_13. there, we
-						       // have
-						       // FESystem(FE_Q(1),FE_DGQ(0))
-						       // vs. FESystem(FE_Q(1),FE_DGQ(1)).
-						       // neither of them
-						       // dominates the
-						       // other. the point is
-						       // that it doesn't
-						       // matter, since
-						       // hopefully for this
-						       // case, both sides'
-						       // dofs should have
-						       // been unified.
-						       //
-						       // make sure this is
-						       // actually true. this
-						       // actually only
-						       // matters, of course,
-						       // if either of the two
-						       // finite elements
-						       // actually do have
-						       // dofs on the face
-		      if ((cell->get_fe().dofs_per_face != 0)
-			  ||
-			  (cell->neighbor(face)->get_fe().dofs_per_face != 0))
-			{
-			  Assert (cell->get_fe().dofs_per_face
-				  ==
-				  cell->neighbor(face)->get_fe().dofs_per_face,
-				  ExcNotImplemented());
+		      case FiniteElementDomination::either_element_can_dominate:
+		      {
+							 // it appears as if
+							 // neither element has
+							 // any constraints on
+							 // its neighbor. this
+							 // may be because
+							 // neither element has
+							 // any DoFs on faces at
+							 // all. or that the two
+							 // elements are
+							 // actually the same,
+							 // although they happen
+							 // to run under
+							 // different fe_indices
+							 // (this is what
+							 // happens in
+							 // hp/hp_hanging_nodes_01
+							 // for example).
+							 //
+							 // another possibility
+							 // is what happens in
+							 // crash_13. there, we
+							 // have
+							 // FESystem(FE_Q(1),FE_DGQ(0))
+							 // vs. FESystem(FE_Q(1),FE_DGQ(1)).
+							 // neither of them
+							 // dominates the
+							 // other. the point is
+							 // that it doesn't
+							 // matter, since
+							 // hopefully for this
+							 // case, both sides'
+							 // dofs should have
+							 // been unified.
+							 //
+							 // make sure this is
+							 // actually true. this
+							 // actually only
+							 // matters, of course,
+							 // if either of the two
+							 // finite elements
+							 // actually do have
+							 // dofs on the face
+			if ((cell->get_fe().dofs_per_face != 0)
+			    ||
+			    (cell->neighbor(face)->get_fe().dofs_per_face != 0))
+			  {
+			    Assert (cell->get_fe().dofs_per_face
+				    ==
+				    cell->neighbor(face)->get_fe().dofs_per_face,
+				    ExcNotImplemented());
 
-							   // (ab)use the master
-							   // and slave dofs
-							   // arrays for a
-							   // moment here
-			  master_dofs.resize (cell->get_fe().dofs_per_face);
-			  cell->face(face)
-			    ->get_dof_indices (master_dofs,
-					       cell->active_fe_index ());
+							     // (ab)use the master
+							     // and slave dofs
+							     // arrays for a
+							     // moment here
+			    master_dofs.resize (cell->get_fe().dofs_per_face);
+			    cell->face(face)
+			      ->get_dof_indices (master_dofs,
+						 cell->active_fe_index ());
 
-			  slave_dofs.resize (cell->neighbor(face)->get_fe().dofs_per_face);
-			  cell->face(face)
-			    ->get_dof_indices (slave_dofs,
-					       cell->neighbor(face)->active_fe_index ());
+			    slave_dofs.resize (cell->neighbor(face)->get_fe().dofs_per_face);
+			    cell->face(face)
+			      ->get_dof_indices (slave_dofs,
+						 cell->neighbor(face)->active_fe_index ());
 
-			  for (unsigned int i=0; i<cell->get_fe().dofs_per_face; ++i)
-			    Assert (master_dofs[i] == slave_dofs[i],
-				    ExcInternalError());
-			}
+			    for (unsigned int i=0; i<cell->get_fe().dofs_per_face; ++i)
+			      Assert (master_dofs[i] == slave_dofs[i],
+				      ExcInternalError());
+			  }
 		      
-		      break;
-		    }
+			break;
+		      }
 		    
-		    case FiniteElementDomination::neither_element_dominates:
-		    {
-						       // we don't presently
-						       // know what exactly to
-						       // do here. it isn't quite
-						       // clear what exactly we
-						       // would have to do
-						       // here. sit tight until
-						       // someone trips over the
-						       // following statement
-						       // and see what exactly
-						       // is going on
-		      Assert (false, ExcNotImplemented());
-		      break;
-		    }
+		      case FiniteElementDomination::neither_element_dominates:
+		      {
+							 // we don't presently
+							 // know what exactly to
+							 // do here. it isn't quite
+							 // clear what exactly we
+							 // would have to do
+							 // here. sit tight until
+							 // someone trips over the
+							 // following statement
+							 // and see what exactly
+							 // is going on
+			Assert (false, ExcNotImplemented());
+			break;
+		      }
 
-		    default:
-							   // we shouldn't get
-							   // here
-			  Assert (false, ExcInternalError());
-		  }
+		      default:
+							     // we shouldn't get
+							     // here
+			    Assert (false, ExcInternalError());
+		    }
 		}
 	    }
     }
@@ -3059,7 +3059,7 @@ DoFTools::extract_dofs (
       for (unsigned int i=0; i<fe.dofs_per_cell; ++i)
         selected_dofs[indices[i]] = local_selected_dofs[i];
     }
-*/  
+*/
 }
 
 
@@ -3351,10 +3351,10 @@ DoFTools::extract_boundary_dofs (const DH                 &dof_handler,
       if (check_left_vertex)
 	if (cell->neighbor(0) == dof_handler.end())
           {
-				                 // In 1D the number of DoFs
-	                                         // on the faces should be
-                                                 // equal to the number of DoFs
-                                                 // on the vertices.
+					     // In 1D the number of DoFs
+					     // on the faces should be
+					     // equal to the number of DoFs
+					     // on the vertices.
             Assert (fe.dofs_per_face == 
 		    fe.dofs_per_vertex,
                     ExcInternalError());
@@ -3392,9 +3392,9 @@ DoFTools::extract_boundary_dofs (const DH                 &dof_handler,
                 }
           }
       
-                                             // check right-most
-                                             // vertex. same procedure here
-                                             // as above
+				       // check right-most
+				       // vertex. same procedure here
+				       // as above
       if (check_right_vertex)
 	if (cell->neighbor(1) == dof_handler.end())
           {
@@ -3761,10 +3761,10 @@ DoFTools::count_dofs_per_component (
 	  for (unsigned int dd=0;dd<d;++dd)
 	    {
 	      if (base.is_primitive() || (!only_once || dd==0))
-	      dofs_per_component[target_component[component]]
-		+= std::count(dofs_in_component[component].begin(),
-			      dofs_in_component[component].end(),
-			      true);
+		dofs_per_component[target_component[component]]
+		  += std::count(dofs_in_component[component].begin(),
+				dofs_in_component[component].end(),
+				true);
 	      ++component;
 	    }
 	}
@@ -4799,14 +4799,14 @@ void DoFTools::map_dof_to_boundary_indices (
     for (unsigned int f=0; f<GeometryInfo<DH::dimension>::faces_per_cell; ++f)
       if (boundary_indicators.find (cell->face(f)->boundary_indicator()) !=
           boundary_indicators.end())
-      {
-        const unsigned int dofs_per_face = cell->get_fe().dofs_per_face;
-        dofs_on_face.resize (dofs_per_face);
-	cell->face(f)->get_dof_indices (dofs_on_face, cell->active_fe_index());
-	for (unsigned int i=0; i<dofs_per_face; ++i)
-	  if (mapping[dofs_on_face[i]] == DH::invalid_dof_index)
-	    mapping[dofs_on_face[i]] = next_boundary_index++;
-      }
+	{
+	  const unsigned int dofs_per_face = cell->get_fe().dofs_per_face;
+	  dofs_on_face.resize (dofs_per_face);
+	  cell->face(f)->get_dof_indices (dofs_on_face, cell->active_fe_index());
+	  for (unsigned int i=0; i<dofs_per_face; ++i)
+	    if (mapping[dofs_on_face[i]] == DH::invalid_dof_index)
+	      mapping[dofs_on_face[i]] = next_boundary_index++;
+	}
 
   Assert (next_boundary_index == dof_handler.n_boundary_dofs (boundary_indicators),
 	  ExcInternalError());
@@ -4894,8 +4894,8 @@ DoFTools::compute_dof_couplings(
                        fe.get_nonzero_components(i).end(),
                        true)
             -
-           fe.get_nonzero_components(i).begin())
-           );
+	    fe.get_nonzero_components(i).begin())
+	);
       Assert (ii < fe.n_components(),
               ExcInternalError());
 
@@ -4910,7 +4910,7 @@ DoFTools::compute_dof_couplings(
                            true)
                 -
                 fe.get_nonzero_components(j).begin())
-               );
+	    );
           Assert (jj < fe.n_components(),
                   ExcInternalError());          
 
