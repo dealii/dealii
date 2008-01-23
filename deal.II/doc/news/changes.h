@@ -194,10 +194,11 @@ an integer id of the current thread.
 
 <ol>
 
-<li> Improved: All GrowingVectorMemory objects of one type will access
-the same memory pool. Therefore, it is now not a crime to just create
-one and discard later. Furthermore, logging of statistics has been
-switched off by default, such that linear solvers remain silent.
+<li> Improved: All GrowingVectorMemory objects that have the same template
+argument will access the same memory pool. Therefore, it is now not a
+crime any more to just create a memory pool and discard later. Furthermore,
+logging of statistics has been switched off by default, such that linear
+solvers remain silent.
 <br>
 (GK 2007/12/16)
 </li>
