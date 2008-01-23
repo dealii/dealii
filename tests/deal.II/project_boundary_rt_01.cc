@@ -2,7 +2,7 @@
 //    $Id$
 //    Version: $Name$ 
 //
-//    Copyright (C) 2007 by the deal.II authors
+//    Copyright (C) 2007, 2008 by the deal.II authors
 //
 //    This file is subject to QPL and may not be  distributed
 //    without copyright and license information. Please refer
@@ -11,6 +11,7 @@
 //
 //----------------------------------------------------------------------
 
+#include "../tests.h"
 #include <base/logstream.h>
 #include <base/function.h>
 #include <base/quadrature_lib.h>
@@ -25,7 +26,6 @@
 
 #include <fstream>
 
-using namespace dealii;
 
 /**
  * A vector-valued polynomial for testing RT elements.
@@ -186,7 +186,5 @@ int main()
   FE_RaviartThomasNodal<2> rt23(3);
   test_hyper_cube(rt23);
   FE_RaviartThomasNodal<2> rt24(4);
-  test_hyper_cube(rt24);
-  
-  
+  test_hyper_cube(rt24);  
 }
