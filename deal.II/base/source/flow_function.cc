@@ -2,7 +2,7 @@
 //    $Id$
 //    Version: $Name$
 //
-//    Copyright (C) 2007 by the deal.II authors
+//    Copyright (C) 2007, 2008 by the deal.II authors
 //
 //    This file is subject to QPL and may not be  distributed
 //    without copyright and license information. Please refer
@@ -214,7 +214,7 @@ namespace Functions
 	for (unsigned int d=1;d<dim;++d)
 	  values[d][k] = 0.;
 					 // pressure
-	values[dim][k] = -2*(dim-1)*stretch*stretch*p(0)/Reynolds+this->mean_pressure;
+	values[dim][k] = -2*(dim-1)*stretch*stretch*p(0)/Reynolds + this->mean_pressure;
       }
   }
   
@@ -269,9 +269,9 @@ namespace Functions
 //----------------------------------------------------------------------//
 
   template<int dim>
-  StokesCosine<dim>::StokesCosine(const double Re)
+  StokesCosine<dim>::StokesCosine(const double nu, const double r)
 		  :
-		  Reynolds(Re)
+		  viscosity(nu), reaction(r)
   {}
 
   
@@ -280,6 +280,15 @@ namespace Functions
   {}
 
 
+  template<int dim>
+  void
+  StokesCosine<dim>::set_parameters(const double nu, const double r)
+  {
+    viscosity = nu;
+    reaction = r;
+  }
+
+  
   template<int dim>
   void StokesCosine<dim>::vector_values (
     const std::vector<Point<dim> >& points,
@@ -305,7 +314,7 @@ namespace Functions
 	  {
 	    values[0][k] = cx*cx*cy*sy;
 	    values[1][k] = -cx*sx*cy*cy;
-	    values[2][k] = cx*sx*cy*sy;
+	    values[2][k] = cx*sx*cy*sy + this->mean_pressure;
 	  }
 	else if (dim==3)
 	  {
@@ -316,7 +325,7 @@ namespace Functions
 	    values[0][k] = cx*cx*cy*sy*cz*sz;
 	    values[1][k] = cx*sx*cy*cy*cz*sz;
 	    values[2][k] = -2.*cx*sx*cy*sy*cz*cz;
-	    values[3][k] = cx*sx*cy*sy*cz*sz;
+	    values[3][k] = cx*sx*cy*sy*cz*sz + this->mean_pressure;
 	  }
 	else
 	  {
@@ -401,6 +410,14 @@ namespace Functions
     Assert(values.size() == dim+1, ExcDimensionMismatch(values.size(), dim+1));
     for (unsigned int d=0;d<dim+1;++d)
       Assert(values[d].size() == n, ExcDimensionMismatch(values[d].size(), n));
+
+    if (reaction != 0.)
+      {
+	vector_values(points, values);
+	for (unsigned int d=0;d<dim;++d)
+	  for (unsigned int k=0;k<values[d].size();++k)
+	    values[d][k] *= -reaction;	
+      }
     
     for (unsigned int k=0;k<n;++k)
       {
@@ -415,8 +432,8 @@ namespace Functions
 	
 	if (dim==2)
 	  {
-	    values[0][k] = - pi2 * (1.+2.*c2x) * s2y - numbers::PI/4. * c2x*s2y;
-	    values[1][k] =   pi2 * s2x * (1.+2.*c2y) - numbers::PI/4. * s2x*c2y;
+	    values[0][k] += - viscosity*pi2 * (1.+2.*c2x) * s2y - numbers::PI/4. * c2x*s2y;
+	    values[1][k] +=   viscosity*pi2 * s2x * (1.+2.*c2y) - numbers::PI/4. * s2x*c2y;
 	    values[2][k] = 0.;
 	  }
 	else if (dim==3)
@@ -425,9 +442,9 @@ namespace Functions
 	    const double c2z = cos(2*z);
 	    const double s2z = sin(2*z);
 	    
-	    values[0][k] = - .5*pi2 * (1.+2.*c2x) * s2y * s2z - numbers::PI/8. * c2x * s2y * s2z;
-	    values[1][k] =   .5*pi2 * s2x * (1.+2.*c2y) * s2z - numbers::PI/8. * s2x * c2y * s2z;
-	    values[2][k] = - .5*pi2 * s2x * s2y * (1.+2.*c2z) - numbers::PI/8. * s2x * s2y * c2z;
+	    values[0][k] += - .5*viscosity*pi2 * (1.+2.*c2x) * s2y * s2z - numbers::PI/8. * c2x * s2y * s2z;
+	    values[1][k] +=   .5*viscosity*pi2 * s2x * (1.+2.*c2y) * s2z - numbers::PI/8. * s2x * c2y * s2z;
+	    values[2][k] += - .5*viscosity*pi2 * s2x * s2y * (1.+2.*c2z) - numbers::PI/8. * s2x * s2y * c2z;
 	    values[3][k] = 0.;
 	  }
 	else
@@ -520,7 +537,7 @@ namespace Functions
 	    const double rl1 = pow(r2,lambda/2.-.5);
 	    values[0][k] = rl * (lp*sin(phi)*Psi(phi) + cos(phi)*Psi_1(phi));
 	    values[1][k] = rl * (lp*cos(phi)*Psi(phi) - sin(phi)*Psi_1(phi));
-	    values[2][k] = -rl1 * (lp*lp*Psi_1(phi) + Psi_3(phi)) / lm;
+	    values[2][k] = -rl1 * (lp*lp*Psi_1(phi) + Psi_3(phi)) / lm + this->mean_pressure;
 	  }
 	else
 	  {
@@ -644,7 +661,7 @@ namespace Functions
 	
 	values[0][k] = 1. - elx * cos(y);
 	values[1][k] = .5 / numbers::PI * lbda * elx * sin(y);
-	values[2][k] = -.5 * elx * elx + p_average - this->mean_pressure;
+	values[2][k] = -.5 * elx * elx + p_average + this->mean_pressure;
       }
   }
   

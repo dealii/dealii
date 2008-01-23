@@ -2,7 +2,7 @@
 //    $Id$
 //    Version: $Name$
 //
-//    Copyright (C) 2007 by the deal.II authors
+//    Copyright (C) 2007, 2008 by the deal.II authors
 //
 //    This file is subject to QPL and may not be  distributed
 //    without copyright and license information. Please refer
@@ -91,6 +91,12 @@ namespace Functions
 					* is indexed by solution
 					* component, the inner by
 					* quadrature point.
+					*
+					* @warning This is not the
+					* true Laplacian, but the
+					* force term to be used as
+					* right hand side in Stokes'
+					* equations
 					*/
       virtual void vector_laplacians (const std::vector<Point<dim> > &points,
 				      std::vector<std::vector<double> >   &values) const = 0;
@@ -189,9 +195,15 @@ namespace Functions
 				       /**
 					* Constructor setting the
 					* Reynolds number required for
-					* pressure computation.
+					* pressure computation and
+					* scaling of the right hand side.
 					*/
-      StokesCosine (const double Reynolds);
+      StokesCosine (const double viscosity = 1., const double reaction = 0.);
+				       /**
+					* Change the viscosity and the
+					* reaction parameter.
+					*/
+      void set_parameters (const double viscosity, const double reaction);
       virtual ~StokesCosine();
       
       virtual void vector_values (const std::vector<Point<dim> >& points,
@@ -202,7 +214,10 @@ namespace Functions
 				      std::vector<std::vector<double> >   &values) const;
       
     private:
-      const double Reynolds;
+				       /// The viscosity
+      double viscosity;
+				       /// The reaction parameter
+      double reaction;
   };
   
   
