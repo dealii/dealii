@@ -168,8 +168,8 @@ class InitialValues : public Function<dim>
 
 template <int dim>
 double
-InitialValues<dim>::value (const Point<dim>  &p,
-                           const unsigned int component) const 
+InitialValues<dim>::value (const Point<dim>  &,
+                           const unsigned int) const 
 {
   return 0;
 }
@@ -231,44 +231,47 @@ RightHandSide<dim>::vector_value (const Point<dim> &p,
 
 
 
-namespace 
+namespace internals
 {
-				   /**
-				    * A structure that stores the dim DoF
-				    * indices that correspond to a
-				    * vector-valued quantity at a single
-				    * support point.
-				    */
-  template <int dim>
-  struct VectorDoFTuple
+  namespace VectorTools
   {
-      unsigned int dof_indices[dim];
+				     /**
+				      * A structure that stores the dim DoF
+				      * indices that correspond to a
+				      * vector-valued quantity at a single
+				      * support point.
+				      */
+    template <int dim>
+    struct VectorDoFTuple
+    {
+	unsigned int dof_indices[dim];
 
-      bool operator < (const VectorDoFTuple<dim> &other) const
-	{
-	  for (unsigned int i=0; i<dim; ++i)
-	    if (dof_indices[i] < other.dof_indices[i])
-	      return true;
-	    else
-	      if (dof_indices[i] > other.dof_indices[i])
+	bool operator < (const VectorDoFTuple<dim> &other) const
+	  {
+	    for (unsigned int i=0; i<dim; ++i)
+	      if (dof_indices[i] < other.dof_indices[i])
+		return true;
+	      else
+		if (dof_indices[i] > other.dof_indices[i])
+		  return false;
+	    return false;
+	  }
+
+	bool operator == (const VectorDoFTuple<dim> &other) const
+	  {
+	    for (unsigned int i=0; i<dim; ++i)
+	      if (dof_indices[i] != other.dof_indices[i])
 		return false;
-	  return false;
-	}
 
-      bool operator == (const VectorDoFTuple<dim> &other) const
-	{
-	  for (unsigned int i=0; i<dim; ++i)
-	    if (dof_indices[i] != other.dof_indices[i])
-	      return false;
+	    return true;
+	  }
 
-	  return true;
-	}
-
-      bool operator != (const VectorDoFTuple<dim> &other) const
-	{
-	  return ! (*this == other);
-	}
-  };
+	bool operator != (const VectorDoFTuple<dim> &other) const
+	  {
+	    return ! (*this == other);
+	  }
+    };
+  }
 }
 
 
@@ -309,7 +312,7 @@ compute_no_normal_flux_constraints (const DH<dim>         &dof_handler,
 				   // have to store which cell a normal vector
 				   // was computed on
   typedef 
-    std::multimap<VectorDoFTuple<dim>,
+    std::multimap< ::internals::VectorTools::VectorDoFTuple<dim>,
     std::pair<Tensor<1,dim>, typename DH<dim>::active_cell_iterator> >
     DoFToNormalsMap;
 
@@ -327,23 +330,31 @@ compute_no_normal_flux_constraints (const DH<dim>         &dof_handler,
 	{
 	  typename DH<dim>::face_iterator face = cell->face(face_no);
 
-	  std::vector<Point<dim-1> > 
-	    unit_support_points = fe.get_unit_face_support_points();
-  
+					   // get the indices of the
+					   // dofs on this cell...
+	  face->get_dof_indices (face_dofs, cell->active_fe_index());
+
+					   // ...and the normal
+					   // vectors at the locations
+					   // where they are defined:
+	  const std::vector<Point<dim-1> > &
+	    unit_support_points = fe.get_unit_face_support_points();  
 	  Quadrature<dim-1> aux_quad (unit_support_points);
 	  FEFaceValues<dim> fe_values (mapping, fe, aux_quad,
 				       update_normal_vectors);
-
-	  face->get_dof_indices (face_dofs, cell->active_fe_index());
 	  fe_values.reinit(cell, face_no);
-	  
+
+					   // then identify which of
+					   // them correspond to the
+					   // selected set of vector
+					   // components
 	  for (unsigned int i=0; i<face_dofs.size(); ++i)
 	    if (fe.face_system_to_component_index(i).first ==
 		first_vector_component)
 	      {
 						 // find corresponding other
 						 // components of vector
-		VectorDoFTuple<dim> vector_dofs;
+		::internals::VectorTools::VectorDoFTuple<dim> vector_dofs;
 		vector_dofs.dof_indices[0] = face_dofs[i];
 		
 		for (unsigned int k=0; k<fe.dofs_per_face; ++k)
@@ -359,6 +370,9 @@ compute_no_normal_flux_constraints (const DH<dim>         &dof_handler,
 		    vector_dofs.dof_indices[fe.face_system_to_component_index(k).first]
 		      = face_dofs[k];
 
+						 // and enter the
+						 // (dofs,(normal_vector,cell))
+						 // entry into the map
 		dof_to_normals_map
 		  .insert (std::make_pair (vector_dofs,
 					   std::make_pair (fe_values.normal_vector(i),
@@ -366,6 +380,17 @@ compute_no_normal_flux_constraints (const DH<dim>         &dof_handler,
 	      }
 	}
 
+				   // Now do something with the
+				   // collected information. To this
+				   // end, loop through all sets of
+				   // pairs (dofs,normal_vector) and
+				   // identify which entries belong to
+				   // the same set of dofs and then do
+				   // as described in the
+				   // documentation, i.e. either
+				   // average the normal vector or
+				   // don't for this particular set of
+				   // dofs
   typename DoFToNormalsMap::const_iterator
     p = dof_to_normals_map.begin();
   
@@ -414,31 +439,30 @@ compute_no_normal_flux_constraints (const DH<dim>         &dof_handler,
 	      = cell_to_normals_map[q->second.second].first;
 	    const unsigned int old_count
 	      = cell_to_normals_map[q->second.second].second;
-	    
+
+	    Assert (old_count > 0, ExcInternalError());
+
+					     // in the same entry,
+					     // store again the now
+					     // averaged normal vector
+					     // and the new count
 	    cell_to_normals_map[q->second.second]
-	      = std::make_pair (old_normal + q->second.first,
+	      = std::make_pair ((old_normal * old_count + q->second.first) / (old_count + 1),
 				old_count + 1);
 	  }
 
+      Assert (cell_to_normals_map.size() >= 1, ExcInternalError());
+
 				       // count the maximum number of
-				       // contributions from each cell and add
-				       // up all the normal vectors; we will
-				       // need the latter if each cell
-				       // contributed exactly once --
-				       // otherwise we will have to compute
-				       // something else further down below
+				       // contributions from each cell
       unsigned int max_n_contributions_per_cell = 1;
-      Tensor<1,dim> normal;
       for (typename CellToNormalsMap::const_iterator
 	     x = cell_to_normals_map.begin();
 	   x != cell_to_normals_map.end(); ++x)
-	{
-	  max_n_contributions_per_cell
-	    = std::max (max_n_contributions_per_cell,
-			x->second.second);
-	  normal += x->second.first;
-	}
-      
+	max_n_contributions_per_cell
+	  = std::max (max_n_contributions_per_cell,
+		      x->second.second);
+
 				       // verify that each cell can have only
 				       // contributed at most dim times, since
 				       // that is the maximum number of faces
@@ -462,13 +486,27 @@ compute_no_normal_flux_constraints (const DH<dim>         &dof_handler,
 	  case 1:
 	  {
 	    
-					     // compute the average normal
-					     // vector from all the ones that
-					     // have the same set of dofs
-	    VectorDoFTuple<dim> dof_indices = same_dof_range[0]->first;
-	    normal /= cell_to_normals_map.size();
+					     // compute the average
+					     // normal vector from all
+					     // the ones that have the
+					     // same set of dofs. we
+					     // could add them up and
+					     // divide them by the
+					     // number of additions,
+					     // or simply normalize
+					     // them right away since
+					     // we want them to have
+					     // unit length anyway
+	    Tensor<1,dim> normal;
+	    for (typename CellToNormalsMap::const_iterator
+		   x = cell_to_normals_map.begin();
+		 x != cell_to_normals_map.end(); ++x)
+	      normal += x->second.first;
 	    normal /= normal.norm();
 
+	    const ::internals::VectorTools::VectorDoFTuple<dim> &
+		dof_indices = same_dof_range[0]->first;
+	    
 	    if (cell_to_normals_map.size() == 2)
 	      {
 		std::cout << "XX " << same_dof_range[0]->first.dof_indices[0]
@@ -479,6 +517,16 @@ compute_no_normal_flux_constraints (const DH<dim>         &dof_handler,
 			  << std::endl;
 		std::cout << "   " << (++cell_to_normals_map.begin())->first
 			  << ' '   << (++cell_to_normals_map.begin())->second.first
+			  << std::endl;
+		std::cout << "   " << normal << std::endl;
+	      }
+	    if (cell_to_normals_map.size() == 1)
+	      {
+		std::cout << "YY " << same_dof_range[0]->first.dof_indices[0]
+			  << ' ' <<  same_dof_range[0]->first.dof_indices[1]
+			  << std::endl;
+		std::cout << "   " << cell_to_normals_map.begin()->first
+			  << ' '   << cell_to_normals_map.begin()->second.first
 			  << std::endl;
 		std::cout << "   " << normal << std::endl;
 	      }
@@ -563,7 +611,92 @@ compute_no_normal_flux_constraints (const DH<dim>         &dof_handler,
 	  }
 
 
+					   // this is the slightly
+					   // more complicated case
+					   // that a single cell has
+					   // contributed with exactly
+					   // DIM normal vectors to
+					   // the same set of vector
+					   // dofs. this is what
+					   // happens in a corner in
+					   // 2d and 3d (but not on an
+					   // edge in 3d, where we
+					   // have only 2, i.e. <DIM,
+					   // contributions. Here we
+					   // do not want to average
+					   // the normal
+					   // vectors. Since we have
+					   // DIM contributions, let's
+					   // assume (and verify) that
+					   // they are in fact all
+					   // linearly independent; in
+					   // that case, all vector
+					   // components are
+					   // constrained and we need
+					   // to set them to zero
+	  case dim:
+	  {
+					     // assert that indeed
+					     // only a single cell has
+					     // contributed
+	    Assert (cell_to_normals_map.size() == 1,
+		    ExcInternalError());
+
+					     // check linear
+					     // independence by
+					     // computing the
+					     // determinant of the
+					     // matrix created from
+					     // all the normal
+					     // vectors. if they are
+					     // linearly independent,
+					     // then the determinant
+					     // is nonzero. if they
+					     // are orthogonal, then
+					     // the matrix is in fact
+					     // equal to 1 (since they
+					     // are all unit vectors);
+					     // make sure the
+					     // determinant is larger
+					     // than 1e-3 to avoid
+					     // cases where cells are
+					     // degenerate
+	    {
+	      Tensor<2,dim> t;
+
+	      typename DoFToNormalsMap::const_iterator x = same_dof_range[0];
+	      for (unsigned int i=0; i<dim; ++i, ++x)
+		for (unsigned int j=0; j<dim; ++j)
+		  t[i][j] = x->second.first[j];
+	      
+	      Assert (std::fabs(determinant (t)) > 1e-3,
+		      ExcMessage("Found a set of normal vectors that are nearly collinear."));
+	    }
+	    
+					     // so all components of
+					     // this vector dof are
+					     // constrained. enter
+					     // this into the
+					     // constraint matrix
+	    for (unsigned int i=0; i<dim; ++i)
+	      {
+		constraints.add_line (same_dof_range[0]->first.dof_indices[i]);
+						 // no add_entries here
+	      }
+	    
+	    std::cout << "DIM contributions at "
+		      << same_dof_range[0]->first.dof_indices[0]
+		      << ' '
+		      << same_dof_range[0]->first.dof_indices[1]
+		      << std::endl;
+	    break;
+	  }
+	  
+
+					   // this is the case of an
+					   // edge contribution in 3d
 	  default:
+		Assert (dim >= 3, ExcInternalError());
 		Assert (false, ExcNotImplemented());
 	}
     }
@@ -804,10 +937,10 @@ void BoussinesqFlowProblem<dim>::setup_dofs (const bool setup_matrices)
   hanging_node_constraints.clear ();
   DoFTools::make_hanging_node_constraints (dof_handler,
 					   hanging_node_constraints);
-//   std::set<unsigned char> no_normal_flux_boundaries;
-//   no_normal_flux_boundaries.insert (0);
-//   compute_no_normal_flux_constraints (dof_handler, 0, no_normal_flux_boundaries,
-// 				      hanging_node_constraints);
+  std::set<unsigned char> no_normal_flux_boundaries;
+  no_normal_flux_boundaries.insert (0);
+  compute_no_normal_flux_constraints (dof_handler, 0, no_normal_flux_boundaries,
+				      hanging_node_constraints);
   hanging_node_constraints.close ();
 
   std::vector<unsigned int> dofs_per_component (dim+2);
@@ -1030,38 +1163,38 @@ void BoussinesqFlowProblem<dim>::assemble_system ()
   
   if (rebuild_matrices == true)
     {
-      std::map<unsigned int,double> boundary_values;
+//       std::map<unsigned int,double> boundary_values;
 
-      typename DoFHandler<dim>::active_cell_iterator
-	cell = dof_handler.begin_active(),
-	emdc = dof_handler.end();
-      for (; cell!=endc; ++cell)
-	for (unsigned int v=0; v<GeometryInfo<dim>::vertices_per_cell; ++v)
-	  if (cell->vertex(v).distance(dim == 2
-				       ?
-				       Point<dim>(0,-1)
-				       :
-				       Point<dim>(0,0,-1)) < 1e-6)
-	    {
-	      std::cout << "Found cell and vertex: " << cell << ' '
-			<< v << std::endl;
+//       typename DoFHandler<dim>::active_cell_iterator
+// 	cell = dof_handler.begin_active(),
+// 	emdc = dof_handler.end();
+//       for (; cell!=endc; ++cell)
+// 	for (unsigned int v=0; v<GeometryInfo<dim>::vertices_per_cell; ++v)
+// 	  if (cell->vertex(v).distance(dim == 2
+// 				       ?
+// 				       Point<dim>(0,-1)
+// 				       :
+// 				       Point<dim>(0,0,-1)) < 1e-6)
+// 	    {
+// 	      std::cout << "Found cell and vertex: " << cell << ' '
+// 			<< v << std::endl;
 	      
-	      boundary_values[cell->vertex_dof_index(v,0)] = 0;
-	      break;
-	    } 
+// 	      boundary_values[cell->vertex_dof_index(v,0)] = 0;
+// 	      break;
+// 	    } 
       
-     std::vector<bool> component_mask (dim+2, true);
-      component_mask[dim] = component_mask[dim+1] = false;
-      VectorTools::interpolate_boundary_values (dof_handler,
-						0,
-						ZeroFunction<dim>(dim+2),
-						boundary_values,
-						component_mask);
+//      std::vector<bool> component_mask (dim+2, true);
+//       component_mask[dim] = component_mask[dim+1] = false;
+//       VectorTools::interpolate_boundary_values (dof_handler,
+// 						0,
+// 						ZeroFunction<dim>(dim+2),
+// 						boundary_values,
+// 						component_mask);
 
-      MatrixTools::apply_boundary_values (boundary_values,
-					  system_matrix,
-					  solution,
-					  system_rhs);  
+//       MatrixTools::apply_boundary_values (boundary_values,
+// 					  system_matrix,
+// 					  solution,
+// 					  system_rhs);  
     }
 
   if (rebuild_preconditioner == true)
