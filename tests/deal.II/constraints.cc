@@ -2,7 +2,7 @@
 //    $Id$
 //    Version: $Name$ 
 //
-//    Copyright (C) 1998, 1999, 2000, 2001, 2003, 2004, 2005 by the deal.II authors
+//    Copyright (C) 1998, 1999, 2000, 2001, 2003, 2004, 2005, 2008 by the deal.II authors
 //
 //    This file is subject to QPL and may not be  distributed
 //    without copyright and license information. Please refer
@@ -11,6 +11,8 @@
 //
 //----------------------------  constraints.cc  ---------------------------
 
+
+// create, merge, and print a bunch of ConstrainMatrices
 
 #include "../tests.h"
 #include <dofs/dof_handler.h>
