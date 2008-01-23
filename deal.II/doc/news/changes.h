@@ -232,12 +232,19 @@ constraints individually.
 
 <ol> 
 
+  <li> <p>Fixed: Neither ConstraintMatrix::print nor ConstraintMatrix::write_dot
+  produced any output for constraints of the form $x_i=0$, i.e. where the right
+  hand side is a trivial linear combination of other degrees of freedom. This
+  is now fixed.
+  <br>
+  (WB 2008/01/23)
+  </p></li>
+
   <li> <p>Improved: GridGenerator::subdivided_hyper_rectangle now also colorizes
   cells according to the octant they are in.
   <br>
   (GK 2007/12/20)
   </p></li>
-
 
   <li> <p>New: The DataOut, DataOutRotation, DataOutStack, and DataOutFaces
   can now deal with vector-valued data if the functions in DataOutBase

@@ -2,7 +2,7 @@
 //    $Id$
 //    Version: $Name$
 //
-//    Copyright (C) 1998, 1999, 2000, 2001, 2002, 2003, 2004, 2005, 2006, 2007 by the deal.II authors
+//    Copyright (C) 1998, 1999, 2000, 2001, 2002, 2003, 2004, 2005, 2006, 2007, 2008 by the deal.II authors
 //
 //    This file is subject to QPL and may not be  distributed
 //    without copyright and license information. Please refer
@@ -1599,11 +1599,27 @@ unsigned int ConstraintMatrix::max_constraint_indirections () const
 void ConstraintMatrix::print (std::ostream &out) const
 {
   for (unsigned int i=0; i!=lines.size(); ++i)
-    for (unsigned int j=0; j!=lines[i].entries.size(); ++j)
-      out << "    " << lines[i].line
-	  << " " << lines[i].entries[j].first
-	  << ":  " << lines[i].entries[j].second << std::endl;
-
+    {
+				       // output the list of
+				       // constraints as pairs of dofs
+				       // and their weights
+      if (lines[i].entries.size() > 0)
+	for (unsigned int j=0; j<lines[i].entries.size(); ++j)
+	  out << "    " << lines[i].line
+	      << " " << lines[i].entries[j].first
+	      << ":  " << lines[i].entries[j].second << "\n";
+      else
+					 // but also output something
+					 // if the constraint simply
+					 // reads x[13]=0, i.e. where
+					 // the right hand side is not
+					 // a linear combination of
+					 // other dofs
+	out << "    " << lines[i].line
+	    << " = 0"
+	    << "\n";
+    }
+  
   AssertThrow (out, ExcIO());
 }
 
@@ -1616,11 +1632,16 @@ ConstraintMatrix::write_dot (std::ostream &out) const
       << std::endl;
   for (unsigned int i=0; i!=lines.size(); ++i)
     {
-      for (unsigned int j=0; j!=lines[i].entries.size(); ++j)
-	out << "  " << lines[i].line << "->" << lines[i].entries[j].first
-	    << "; // weight: "
-	    << lines[i].entries[j].second
-	    << "\n";
+				       // same concept as in the
+				       // previous function
+      if (lines[i].entries.size() > 0)
+	for (unsigned int j=0; j<lines[i].entries.size(); ++j)
+	  out << "  " << lines[i].line << "->" << lines[i].entries[j].first
+	      << "; // weight: "
+	      << lines[i].entries[j].second
+	      << "\n";
+      else
+	out << "  " << lines[i].line << "\n";
     }
   out << "}" << std::endl;
 }

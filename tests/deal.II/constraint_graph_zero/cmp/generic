@@ -1,0 +1,6 @@
+
+digraph constraints {
+  1->2; // weight: 42.
+  4
+}
+DEAL::OK
