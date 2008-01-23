@@ -153,6 +153,16 @@ void VectorTools::project_boundary_values<deal_II_dimension>
  std::map<unsigned int,double>        &);
 
 
+#if deal_II_dimension != 1
+template
+void
+VectorTools::compute_no_normal_flux_constraints (const DoFHandler<deal_II_dimension> &dof_handler,
+						 const unsigned int     first_vector_component,
+						 const std::set<unsigned char> &boundary_ids,
+						 ConstraintMatrix      &constraints,
+						 const Mapping<deal_II_dimension>    &mapping);
+#endif
+
 
 // // Due to introducing the DoFHandler as a template parameter,
 // // the following instantiations are required in 1d

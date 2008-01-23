@@ -1,6 +1,6 @@
 ############################################################
 # $Id$
-# Copyright (C) 2000, 2001, 2002, 2003, 2005, 2006, 2007 by the deal.II authors
+# Copyright (C) 2000, 2001, 2002, 2003, 2005, 2006, 2007, 2008 by the deal.II authors
 ############################################################
 
 ############################################################
@@ -24,7 +24,11 @@ default: run-tests
 tests_x = block_matrices \
 	user_data_* \
 	constraints \
+	constraints_zero \
+	constraints_zero_merge \
+	constraints_zero_condense \
 	constraint_graph \
+	constraint_graph_zero \
 	data_out \
 	derivative_* \
 	derivatives \
@@ -68,7 +72,8 @@ tests_x = block_matrices \
 	maximal_cell_diameter \
 	union_triangulation \
 	create_* \
-	line_coarsening_3d
+	line_coarsening_3d \
+	no_flux_*
 
 # from above list of regular expressions, generate the real set of
 # tests

@@ -232,6 +232,14 @@ constraints individually.
 
 <ol> 
 
+  <li> <p>New: The function VectorTools::compute_no_normal_flux_constraints computes
+  the constraints that correspond to boundary conditions of the
+  form $\vec u \cdot \vec n = 0$. The use of the function is demonstrated in the
+  @ref step_22 "step-22" tutorial program.
+  <br>
+  (WB 2008/01/23)
+  </p></li>
+
   <li> <p>Fixed: Neither ConstraintMatrix::print nor ConstraintMatrix::write_dot
   produced any output for constraints of the form $x_i=0$, i.e. where the right
   hand side is a trivial linear combination of other degrees of freedom. This
