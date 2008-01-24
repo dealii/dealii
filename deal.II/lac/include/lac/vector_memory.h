@@ -342,7 +342,7 @@ class GrowingVectorMemory : public VectorMemory<VECTOR>
 				      * internal data of this object
 				      * from multiple threads.
 				      */
-    Threads::ThreadMutex mutex;
+    static Threads::ThreadMutex mutex;
 };
 
 /*@}*/
@@ -405,6 +405,8 @@ GrowingVectorMemory<VECTOR>::Pool::initialize(const unsigned int size)
 
 template <typename VECTOR>
 typename GrowingVectorMemory<VECTOR>::Pool GrowingVectorMemory<VECTOR>::pool;
+template <typename VECTOR>
+Threads::ThreadMutex GrowingVectorMemory<VECTOR>::mutex;
 
 
 template <typename VECTOR>
