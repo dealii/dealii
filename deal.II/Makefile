@@ -179,6 +179,7 @@ clean-common-scripts:
 distclean: clean
 	cd lib && $(MAKE) distclean
 	-cd tests && $(MAKE) distclean
+	-rm base/source/*.inst lac/source/*.inst deal.II/source/*/*.inst
 	$(MAKE)	clean-common-scripts
 
 
