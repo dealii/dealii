@@ -326,7 +326,7 @@ void LaplaceProblem<dim>::output_results (const unsigned int cycle) const
 template <int dim>
 void LaplaceProblem<dim>::run () 
 {
-  for (unsigned int cycle=0; cycle<8; ++cycle)
+  for (unsigned int cycle=0; cycle<4; ++cycle)
     {
       deallog << "Cycle " << cycle << ':' << std::endl;
 

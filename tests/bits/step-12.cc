@@ -799,7 +799,7 @@ void DGMethod<dim>::output_results (const unsigned int cycle) const
 template <int dim>
 void DGMethod<dim>::run () 
 {
-  for (unsigned int cycle=0; cycle<6; ++cycle)
+  for (unsigned int cycle=0; cycle<4; ++cycle)
     {
       deallog << "Cycle " << cycle << ':' << std::endl;
 
@@ -807,7 +807,7 @@ void DGMethod<dim>::run ()
 	{
 	  GridGenerator::hyper_cube (triangulation);
 
-	  triangulation.refine_global (3);
+	  triangulation.refine_global (2);
 	}
       else
 	refine_grid ();

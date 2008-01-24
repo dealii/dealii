@@ -481,7 +481,7 @@ void HelmholtzProblem<dim>::process_solution (const unsigned int cycle)
 template <int dim>
 void HelmholtzProblem<dim>::run () 
 {
-  for (unsigned int cycle=0; cycle<7; ++cycle)
+  for (unsigned int cycle=0; cycle<4; ++cycle)
     {
       if (cycle == 0)
 	{
