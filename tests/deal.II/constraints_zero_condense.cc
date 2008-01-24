@@ -24,6 +24,7 @@
 #include <lac/sparse_matrix.h>
 
 #include <fstream>
+#include <iomanip>
 
 
 void test ()
@@ -66,7 +67,7 @@ void test ()
 int main ()
 {
   std::ofstream logfile("constraints_zero_condense/output");
-  logfile.precision(2);
+  deallog << std::setprecision (2);
   
   deallog.attach(logfile);
   deallog.depth_console(0);
