@@ -495,6 +495,8 @@ inline
 unsigned int
 GrowingVectorMemory<VECTOR>::memory_consumption () const
 {
+  Threads::ThreadMutex::ScopedLock lock(mutex);
+
   unsigned int result = sizeof (*this);
   const typename std::vector<entry_type>::const_iterator
     end = pool.data->end();
