@@ -22,7 +22,7 @@
 
 #include <numerics/data_out_stack.h>
 #include <fstream>
-#include <iostream>
+#include <iomanip>
 
 #include <base/logstream.h>
 

@@ -17,7 +17,7 @@
 #include "../tests.h"
 #include <base/logstream.h>
 #include <lac/compressed_sparsity_pattern.h>
-#include <iostream>
+#include <iomanip>
 #include <fstream>
 
 

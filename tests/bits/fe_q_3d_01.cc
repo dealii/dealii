@@ -21,7 +21,7 @@
 #include <fe/fe_q.h>
 
 #include <fstream>
-#include <iostream>
+#include <iomanip>
 
 
 // matrices taken from the old file deal.II/source/fe/fe_q_3d.cc

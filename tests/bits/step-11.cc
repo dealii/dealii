@@ -47,7 +47,7 @@ std::ofstream logfile("step-11/output");
 #include <lac/compressed_sparsity_pattern.h>
 
 #include <algorithm>
-#include <iostream>
+#include <iomanip>
 #include <iomanip>
 #include <cmath>
 
@@ -214,7 +214,7 @@ int main ()
 {
   try
     {
-      logfile.precision(2);
+      deallog << std::setprecision(2);
   
       deallog.attach(logfile);
       deallog.depth_console(0);
@@ -225,10 +225,10 @@ int main ()
     }
   catch (std::exception &exc)
     {
-      std::cerr << std::endl << std::endl
+      deallog << std::endl << std::endl
 		<< "----------------------------------------------------"
 		<< std::endl;
-      std::cerr << "Exception on processing: " << std::endl
+      deallog << "Exception on processing: " << std::endl
 		<< exc.what() << std::endl
 		<< "Aborting!" << std::endl
 		<< "----------------------------------------------------"
@@ -237,10 +237,10 @@ int main ()
     }
   catch (...) 
     {
-      std::cerr << std::endl << std::endl
+      deallog << std::endl << std::endl
 		<< "----------------------------------------------------"
 		<< std::endl;
-      std::cerr << "Unknown exception!" << std::endl
+      deallog << "Unknown exception!" << std::endl
 		<< "Aborting!" << std::endl
 		<< "----------------------------------------------------"
 		<< std::endl;

@@ -19,7 +19,7 @@
 #include <base/logstream.h>
 #include <lac/block_matrix_array.h>
 #include <lac/full_matrix.h>
-#include <iostream>
+#include <iomanip>
 #include <fstream>
 
 

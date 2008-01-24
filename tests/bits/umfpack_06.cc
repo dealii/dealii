@@ -16,7 +16,7 @@
 // for a BlockSparseMatrix<double> instead of SparseMatrix<double> matrix
 
 #include "../tests.h"
-#include <iostream>
+#include <iomanip>
 #include <fstream>
 #include <cstdlib>
 

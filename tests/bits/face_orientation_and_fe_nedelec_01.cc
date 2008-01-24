@@ -193,7 +193,7 @@ void test_with_wrong_face_orientation (const FiniteElement<dim> &fe,
 int main ()
 {
   std::ofstream logfile(logname);
-  logfile.precision (3);
+  deallog << std::setprecision (3);
   
   deallog.attach(logfile);
   deallog.depth_console(0);

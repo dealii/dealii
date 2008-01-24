@@ -2,7 +2,7 @@
 //    $Id$
 //    Version: $Name$ 
 //
-//    Copyright (C) 2003, 2004, 2005 by the deal.II authors
+//    Copyright (C) 2003, 2004, 2005, 2008 by the deal.II authors
 //
 //    This file is subject to QPL and may not be  distributed
 //    without copyright and license information. Please refer
@@ -31,7 +31,7 @@
 #include <fe/fe_system.h>
 
 #include <fstream>
-#include <iostream>
+#include <iomanip>
 #include <iomanip>
 #include <string>
 
@@ -116,7 +116,8 @@ main()
   try
     {
       std::ofstream logfile(output_file_name.c_str());
-      logfile.precision (2);
+      deallog << std::setprecision (2);
+      logfile << std::setprecision (2);
       deallog.attach(logfile);
       deallog.depth_console(0);
   deallog.threshold_double(1.e-10);
@@ -136,10 +137,10 @@ main()
     }
   catch (std::exception &exc)
     {
-      std::cerr << std::endl << std::endl
+      deallog << std::endl << std::endl
 		<< "----------------------------------------------------"
 		<< std::endl;
-      std::cerr << "Exception on processing: " << std::endl
+      deallog << "Exception on processing: " << std::endl
 		<< exc.what() << std::endl
 		<< "Aborting!" << std::endl
 		<< "----------------------------------------------------"
@@ -148,10 +149,10 @@ main()
     }
   catch (...) 
     {
-      std::cerr << std::endl << std::endl
+      deallog << std::endl << std::endl
 		<< "----------------------------------------------------"
 		<< std::endl;
-      std::cerr << "Unknown exception!" << std::endl
+      deallog << "Unknown exception!" << std::endl
 		<< "Aborting!" << std::endl
 		<< "----------------------------------------------------"
 		<< std::endl;

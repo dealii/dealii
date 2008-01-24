@@ -24,7 +24,7 @@
 #include <grid/grid_out.h>
 
 #include <fstream>
-#include <iostream>
+#include <iomanip>
 
 
 bool predicate (const Point<3> &p,

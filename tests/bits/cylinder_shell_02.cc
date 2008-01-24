@@ -37,7 +37,7 @@ int main ()
   deallog.attach(logfile);
   deallog.depth_console(0);
   deallog.threshold_double(1.e-10);
-  logfile.precision (2);
+  deallog << std::setprecision (2);
 
                                    // generate a hyperball in 3d
   Triangulation<3> tria;

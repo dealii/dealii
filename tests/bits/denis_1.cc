@@ -34,7 +34,7 @@
 #include <fe/fe_q.h>
 #include <numerics/derivative_approximation.h>
 #include <fstream>
-#include <iostream>
+#include <iomanip>
 
 
 class F : public Function<2>
@@ -59,8 +59,8 @@ int main()
   deallog.attach(logfile);
   deallog.depth_console(0);
   deallog.threshold_double(1.e-10);
-  logfile.precision (2);
-  logfile.setf(std::ios::fixed);  
+  deallog << std::setprecision (2);
+  deallog << std::fixed;  
 
   Triangulation<2>   triangulation;
   FE_Q<2>            fe(2);

@@ -2,7 +2,7 @@
 //    $Id$
 //    Version: $Name$ 
 //
-//    Copyright (C) 2003, 2004, 2005 by the deal.II authors
+//    Copyright (C) 2003, 2004, 2005, 2008 by the deal.II authors
 //
 //    This file is subject to QPL and may not be  distributed
 //    without copyright and license information. Please refer
@@ -27,7 +27,7 @@
 #include <grid/tria_accessor.h>
 #include <grid/grid_generator.h>
 #include <fstream>
-
+#include <iomanip>
     
 
 int main () 
@@ -36,7 +36,7 @@ int main ()
   deallog.attach(logfile);
   deallog.depth_console(0);
   deallog.threshold_double(1.e-10);
-  logfile.precision (2);
+  deallog << std::setprecision (2);
 
                                    // generate a hyperball in 3d
   Triangulation<3> tria;

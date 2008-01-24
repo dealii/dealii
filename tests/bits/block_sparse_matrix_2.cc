@@ -14,7 +14,7 @@
 // BlockSparseMatrix::clear used to forget to reset all sizes to zero
 
 #include "../tests.h"
-#include <iostream>
+#include <iomanip>
 #include <fstream>
 #include <cstdlib>
 

@@ -14,7 +14,7 @@
 // test for equality of accessor objects
 
 #include "../tests.h"
-#include <iostream>
+#include <iomanip>
 #include <fstream>
 
 #include <fe/fe_q.h>

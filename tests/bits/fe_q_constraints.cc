@@ -48,7 +48,7 @@
 #include <lac/sparse_matrix.h>
 
 #include <fstream>
-#include <iostream>
+#include <iomanip>
 
 template <int dim>
 class TestFunction : public Function<dim>

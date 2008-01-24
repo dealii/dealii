@@ -108,7 +108,7 @@ void renumber_dofs (DoFHandler<2> &dof_handler)
 
 int main () 
 {
-  logfile.precision(2);
+  deallog << std::setprecision(2);
   
   deallog.attach(logfile);
   deallog.depth_console(0);

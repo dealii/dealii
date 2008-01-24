@@ -35,7 +35,7 @@
 
 #include <fstream>
 #include <cmath>
-#include <iostream>
+#include <iomanip>
 
 
 template<int dim>
@@ -158,7 +158,7 @@ check ()
 int main ()
 {
   std::ofstream logfile ("point_difference_02/output");
-  logfile.precision (4);
+  deallog << std::setprecision (4);
   deallog.attach(logfile);
   deallog.depth_console (0);
 

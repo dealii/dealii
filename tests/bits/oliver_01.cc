@@ -20,7 +20,7 @@
 
 #include "../tests.h"
 #include <lac/sparse_matrix.h>
-#include <iostream>
+#include <iomanip>
 #include <fstream>
 
 

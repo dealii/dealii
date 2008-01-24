@@ -16,7 +16,7 @@
 // though the matrix is decomposed only once
 
 #include "../tests.h"
-#include <iostream>
+#include <iomanip>
 #include <fstream>
 #include <cstdlib>
 

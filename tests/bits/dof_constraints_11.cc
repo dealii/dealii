@@ -31,7 +31,7 @@
 #include <dofs/dof_constraints.h>
 #include <fe/fe_q.h>
 #include <fstream>
-#include <iostream>
+#include <iomanip>
 
 
 template <int dim>
@@ -104,10 +104,10 @@ int main ()
     }
   catch (std::exception &exc)
     {
-      std::cerr << std::endl << std::endl
+      deallog << std::endl << std::endl
 		<< "----------------------------------------------------"
 		<< std::endl;
-      std::cerr << "Exception on processing: " << std::endl
+      deallog << "Exception on processing: " << std::endl
 		<< exc.what() << std::endl
 		<< "Aborting!" << std::endl
 		<< "----------------------------------------------------"
@@ -117,10 +117,10 @@ int main ()
     }
   catch (...) 
     {
-      std::cerr << std::endl << std::endl
+      deallog << std::endl << std::endl
 		<< "----------------------------------------------------"
 		<< std::endl;
-      std::cerr << "Unknown exception!" << std::endl
+      deallog << "Unknown exception!" << std::endl
 		<< "Aborting!" << std::endl
 		<< "----------------------------------------------------"
 		<< std::endl;

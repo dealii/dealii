@@ -14,7 +14,7 @@
 // test the hsl_ma47 sparse direct solver on a mass matrix
 
 #include "../tests.h"
-#include <iostream>
+#include <iomanip>
 #include <fstream>
 #include <cstdlib>
 

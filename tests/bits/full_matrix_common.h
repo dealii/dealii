@@ -2,7 +2,7 @@
 //    $Id$
 //    Version: $Name$ 
 //
-//    Copyright (C) 2007 by the deal.II authors
+//    Copyright (C) 2007, 2008 by the deal.II authors
 //
 //    This file is subject to QPL and may not be  distributed
 //    without copyright and license information. Please refer
@@ -106,10 +106,10 @@ main()
   try
     {
       std::ofstream logfile(output_file_name.c_str());
-      logfile.precision (2);
+      deallog << std::setprecision (2);
       deallog.attach(logfile);
       deallog.depth_console(0);
-      deallog.threshold_double(1.e-10);
+      deallog.threshold_double(1.e-7);
 
       check<double> ();
       check<float> ();
@@ -118,25 +118,25 @@ main()
     }
   catch (std::exception &exc)
     {
-      std::cerr << std::endl << std::endl
-		<< "----------------------------------------------------"
-		<< std::endl;
-      std::cerr << "Exception on processing: " << std::endl
-		<< exc.what() << std::endl
-		<< "Aborting!" << std::endl
-		<< "----------------------------------------------------"
-		<< std::endl;
+      deallog << std::endl << std::endl
+	      << "----------------------------------------------------"
+	      << std::endl;
+      deallog << "Exception on processing: " << std::endl
+	      << exc.what() << std::endl
+	      << "Aborting!" << std::endl
+	      << "----------------------------------------------------"
+	      << std::endl;
       return 1;
     }
   catch (...) 
     {
-      std::cerr << std::endl << std::endl
-		<< "----------------------------------------------------"
-		<< std::endl;
-      std::cerr << "Unknown exception!" << std::endl
-		<< "Aborting!" << std::endl
-		<< "----------------------------------------------------"
-		<< std::endl;
+      deallog << std::endl << std::endl
+	      << "----------------------------------------------------"
+	      << std::endl;
+      deallog << "Unknown exception!" << std::endl
+	      << "Aborting!" << std::endl
+	      << "----------------------------------------------------"
+	      << std::endl;
       return 1;
     };
 }

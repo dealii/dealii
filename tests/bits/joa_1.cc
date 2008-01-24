@@ -40,7 +40,7 @@
 #include <numerics/data_out.h>
 
 #include <fstream>
-#include <iostream>
+#include <iomanip>
 
 				 // From the following include file we
 				 // will import the declaration of
@@ -1123,8 +1123,8 @@ void LaplaceProblem<dim>::run ()
 int main () 
 {
   std::ofstream logfile ("joa_1/output");
-  logfile.precision (3);
-  logfile.setf(std::ios::fixed);  
+  deallog << std::setprecision (3);
+  deallog << std::fixed;  
   deallog.attach(logfile);
   deallog.depth_console(0);
   deallog.threshold_double(1.e-10);
@@ -1175,10 +1175,10 @@ int main ()
 				   // <code>return 1;</code> does):
   catch (std::exception &exc)
     {
-      std::cerr << std::endl << std::endl
+      deallog << std::endl << std::endl
 		<< "----------------------------------------------------"
 		<< std::endl;
-      std::cerr << "Exception on processing: " << std::endl
+      deallog << "Exception on processing: " << std::endl
 		<< exc.what() << std::endl
 		<< "Aborting!" << std::endl
 		<< "----------------------------------------------------"
@@ -1195,10 +1195,10 @@ int main ()
 				   // message and exit.
   catch (...) 
     {
-      std::cerr << std::endl << std::endl
+      deallog << std::endl << std::endl
 		<< "----------------------------------------------------"
 		<< std::endl;
-      std::cerr << "Unknown exception!" << std::endl
+      deallog << "Unknown exception!" << std::endl
 		<< "Aborting!" << std::endl
 		<< "----------------------------------------------------"
 		<< std::endl;

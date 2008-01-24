@@ -2,7 +2,7 @@
 //    $Id$
 //    Version: $Name$ 
 //
-//    Copyright (C) 2004, 2005 by the deal.II authors
+//    Copyright (C) 2004, 2005, 2008 by the deal.II authors
 //
 //    This file is subject to QPL and may not be  distributed
 //    without copyright and license information. Please refer
@@ -17,7 +17,7 @@
 #include "../tests.h"
 #include <lac/full_matrix.h>
 #include <fstream>
-#include <iostream>
+#include <iomanip>
 
 
 void test ()
@@ -57,10 +57,10 @@ int main ()
     }
   catch (std::exception &exc)
     {
-      std::cerr << std::endl << std::endl
+      deallog << std::endl << std::endl
 		<< "----------------------------------------------------"
 		<< std::endl;
-      std::cerr << "Exception on processing: " << std::endl
+      deallog << "Exception on processing: " << std::endl
 		<< exc.what() << std::endl
 		<< "Aborting!" << std::endl
 		<< "----------------------------------------------------"
@@ -70,10 +70,10 @@ int main ()
     }
   catch (...) 
     {
-      std::cerr << std::endl << std::endl
+      deallog << std::endl << std::endl
 		<< "----------------------------------------------------"
 		<< std::endl;
-      std::cerr << "Unknown exception!" << std::endl
+      deallog << "Unknown exception!" << std::endl
 		<< "Aborting!" << std::endl
 		<< "----------------------------------------------------"
 		<< std::endl;

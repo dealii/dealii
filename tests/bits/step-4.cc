@@ -2,7 +2,7 @@
 //    $Id$
 //    Version: $Name$ 
 //
-//    Copyright (C) 2005, 2006, 2007 by the deal.II authors
+//    Copyright (C) 2005, 2006, 2007, 2008 by the deal.II authors
 //
 //    This file is subject to QPL and may not be  distributed
 //    without copyright and license information. Please refer
@@ -42,7 +42,7 @@ std::ofstream logfile("step-4/output");
 
 #include <numerics/data_out.h>
 #include <fstream>
-#include <iostream>
+#include <iomanip>
 
 #include "../tests.h"
 #include <base/logstream.h>
@@ -281,7 +281,8 @@ void LaplaceProblem<dim>::run ()
 
 int main () 
 {
-  logfile.precision(2);
+  deallog << std::setprecision(2);
+  logfile << std::setprecision(2);
   
   deallog.attach(logfile);
   deallog.depth_console(0);

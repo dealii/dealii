@@ -2,7 +2,7 @@
 //    $Id$
 //    Version: $Name$ 
 //
-//    Copyright (C) 2005, 2006, 2007 by the deal.II authors
+//    Copyright (C) 2005, 2006, 2007, 2008 by the deal.II authors
 //
 //    This file is subject to QPL and may not be  distributed
 //    without copyright and license information. Please refer
@@ -48,7 +48,7 @@ std::ofstream logfile("step-13/output");
 #include <numerics/data_out.h>
 #include <numerics/error_estimator.h>
 
-#include <iostream>
+#include <iomanip>
 #include <fstream>
 #include <list>
 #include <sstream>
@@ -181,21 +181,21 @@ namespace Evaluation
 
   template <int dim>
   void
-  SolutionOutput<dim>::operator () (const DoFHandler<dim> &dof_handler,
-				    const Vector<double>  &solution) const
+  SolutionOutput<dim>::operator () (const DoFHandler<dim> &,
+				    const Vector<double>  &) const
   {
-    DataOut<dim> data_out;
-    data_out.attach_dof_handler (dof_handler);
-    data_out.add_data_vector (solution, "solution");
-    data_out.build_patches ();
+//     DataOut<dim> data_out;
+//     data_out.attach_dof_handler (dof_handler);
+//     data_out.add_data_vector (solution, "solution");
+//     data_out.build_patches ();
   
-    std::ostringstream filename;
-    filename << output_name_base << "-"
-	     << this->refinement_cycle
-	     << data_out.default_suffix (output_format)
-	     << std::ends;
+//     std::ostringstream filename;
+//     filename << output_name_base << "-"
+// 	     << this->refinement_cycle
+// 	     << data_out.default_suffix (output_format)
+// 	     << std::ends;
     
-    data_out.write (deallog.get_file_stream(), output_format);
+//    data_out.write (deallog.get_file_stream(), output_format);
   }
 
 
@@ -732,7 +732,7 @@ run_simulation (LaplaceSolver::Base<dim>                     &solver,
 	};
 
 
-      if (solver.n_dofs() < 20000)
+      if (solver.n_dofs() < 2000)
 	solver.refine_grid ();
       else
 	break;
@@ -799,7 +799,7 @@ int main ()
 {
   try
     {
-      logfile.precision(2);
+      deallog << std::setprecision(2);
   
       deallog.attach(logfile);
       deallog.depth_console(0);
@@ -810,10 +810,10 @@ int main ()
     }
   catch (std::exception &exc)
     {
-      std::cerr << std::endl << std::endl
+      deallog << std::endl << std::endl
 		<< "----------------------------------------------------"
 		<< std::endl;
-      std::cerr << "Exception on processing: " << std::endl
+      deallog << "Exception on processing: " << std::endl
 		<< exc.what() << std::endl
 		<< "Aborting!" << std::endl
 		<< "----------------------------------------------------"
@@ -822,10 +822,10 @@ int main ()
     }
   catch (...) 
     {
-      std::cerr << std::endl << std::endl
+      deallog << std::endl << std::endl
 		<< "----------------------------------------------------"
 		<< std::endl;
-      std::cerr << "Unknown exception!" << std::endl
+      deallog << "Unknown exception!" << std::endl
 		<< "Aborting!" << std::endl
 		<< "----------------------------------------------------"
 		<< std::endl;

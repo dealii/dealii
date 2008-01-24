@@ -2,7 +2,7 @@
 //    $Id$
 //    Version: $Name$ 
 //
-//    Copyright (C) 2005, 2006, 2007 by the deal.II authors
+//    Copyright (C) 2005, 2006, 2007, 2008 by the deal.II authors
 //
 //    This file is subject to QPL and may not be  distributed
 //    without copyright and license information. Please refer
@@ -55,7 +55,7 @@ std::ofstream logfile("step-9/output");
 #include <numerics/error_estimator.h>
 
 #include <fstream>
-#include <iostream>
+#include <iomanip>
 
 
 
@@ -525,7 +525,7 @@ void AdvectionProblem<dim>::run ()
       if (cycle == 0)
 	{
 	  GridGenerator::hyper_cube (triangulation, -1, 1);
-	  triangulation.refine_global (4);
+	  triangulation.refine_global (2);
 	}
       else
 	{
@@ -713,7 +713,7 @@ GradientEstimation::estimate_interval (const DoFHandler<dim> &dof_handler,
 
 int main () 
 {
-  logfile.precision(2);
+  deallog << std::setprecision(2);
   
   deallog.attach(logfile);
   deallog.depth_console(0);
@@ -728,10 +728,10 @@ int main ()
     }
   catch (std::exception &exc)
     {
-      std::cerr << std::endl << std::endl
+      deallog << std::endl << std::endl
 		<< "----------------------------------------------------"
 		<< std::endl;
-      std::cerr << "Exception on processing: " << std::endl
+      deallog << "Exception on processing: " << std::endl
 		<< exc.what() << std::endl
 		<< "Aborting!" << std::endl
 		<< "----------------------------------------------------"
@@ -740,10 +740,10 @@ int main ()
     }
   catch (...) 
     {
-      std::cerr << std::endl << std::endl
+      deallog << std::endl << std::endl
 		<< "----------------------------------------------------"
 		<< std::endl;
-      std::cerr << "Unknown exception!" << std::endl
+      deallog << "Unknown exception!" << std::endl
 		<< "Aborting!" << std::endl
 		<< "----------------------------------------------------"
 		<< std::endl;

@@ -2,7 +2,7 @@
 //    $Id$
 //    Version: $Name$ 
 //
-//    Copyright (C) 2005, 2006 by the deal.II authors
+//    Copyright (C) 2005, 2006, 2008 by the deal.II authors
 //
 //    This file is subject to QPL and may not be  distributed
 //    without copyright and license information. Please refer
@@ -36,7 +36,7 @@ std::ofstream logfile("step-10/output");
 
 #include <fe/mapping_q.h>
 
-#include <iostream>
+#include <iomanip>
 #include <fstream>
 #include <cmath>
 
@@ -215,7 +215,8 @@ void compute_pi_by_perimeter ()
 
 int main () 
 {
-  logfile.precision(2);
+  deallog << std::setprecision(2);
+  logfile << std::setprecision(2);
   
   deallog.attach(logfile);
   deallog.depth_console(0);

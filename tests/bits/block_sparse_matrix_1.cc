@@ -14,7 +14,7 @@
 // test by Brian: check some of the scaling operations on matrices
 
 #include "../tests.h"
-#include <iostream>
+#include <iomanip>
 #include <fstream>
 #include <cstdlib>
 

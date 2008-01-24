@@ -4,5 +4,3 @@ DEAL::Solver type: N6dealii12SolverMinResINS_6VectorIdEEEE
 DEAL:minres::Starting value 31.00
 DEAL:minres::Convergence step 43 value 0.0006916
 DEAL::Solver stopped after 43 iterations
-DEAL::GrowingVectorMemory:Overall allocated vectors: 7
-DEAL::GrowingVectorMemory:Maximum allocated vectors: 7

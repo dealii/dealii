@@ -2,7 +2,7 @@
 //    $Id$
 //    Version: $Name$ 
 //
-//    Copyright (C) 2006 by the deal.II authors
+//    Copyright (C) 2006, 2008 by the deal.II authors
 //
 //    This file is subject to QPL and may not be  distributed
 //    without copyright and license information. Please refer
@@ -31,6 +31,7 @@ char logname[] = "mesh_3d_18/output";
 #include <grid/tria_iterator.h>
 
 #include <fstream>
+#include <iomanip>
 #include <vector>
 
 
@@ -99,7 +100,7 @@ void test_with_wrong_face_orientation ()
 int main ()
 {
   std::ofstream logfile(logname);
-  logfile.precision (3);
+  deallog << std::setprecision (3);
   
   deallog.attach(logfile);
   deallog.depth_console(0);

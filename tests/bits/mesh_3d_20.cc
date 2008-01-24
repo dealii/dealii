@@ -32,7 +32,7 @@
 #include <lac/vector.h>
 
 #include <fstream>
-#include <iostream>
+#include <iomanip>
 
 void check_this (Triangulation<3> &tria)
 {

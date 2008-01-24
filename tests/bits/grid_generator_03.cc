@@ -24,7 +24,7 @@
 #include <grid/grid_out.h>
 
 #include <fstream>
-#include <iostream>
+#include <iomanip>
 
 
 template <int dim> Table<dim,unsigned char> material_ids();
