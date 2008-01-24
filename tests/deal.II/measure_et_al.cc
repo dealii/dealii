@@ -1,5 +1,5 @@
 // $Id$
-// Copyright (C) 2005, 2006 by the deal.II authors
+// Copyright (C) 2005, 2006, 2008 by the deal.II authors
 //
 // Computes measure, center and barycenter on a variety of cells
 
@@ -9,6 +9,7 @@
 #include <grid/tria_accessor.h>
 #include <grid/grid_generator.h>
 #include <fstream>
+#include <iomanip>
 
 #define PRECISION 5
 
@@ -92,7 +93,7 @@ void test()
 int main()
 {
   std::ofstream logfile ("measure_et_al/output");
-  logfile.precision (PRECISION);
+  deallog << std::setprecision (PRECISION);
   deallog.attach(logfile);
   deallog.depth_console(0);
   deallog.threshold_double(1.e-10);

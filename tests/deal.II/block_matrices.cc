@@ -353,7 +353,7 @@ void LaplaceProblem<Vector,Matrix,Sparsity>::run ()
 int main () 
 {
   std::ofstream logfile("block_matrices/output");
-  logfile.precision(2);
+  deallog << std::setprecision(2);
   
   deallog.attach(logfile);
   deallog.depth_console(0);
@@ -418,7 +418,7 @@ int main ()
     Assert (solutions[i].size() == solutions[i].size(),
 	    ExcInternalError());
   
-  logfile.precision(16);
+  deallog << std::setprecision(16);
   for (unsigned int i=1; i<n_datasets; ++i)
     {
 				       // relative accuracy. data set

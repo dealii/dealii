@@ -2,7 +2,7 @@
 //    $Id$
 //    Version: $Name$ 
 //
-//    Copyright (C) 2002, 2003, 2004, 2005, 2007 by the deal.II authors
+//    Copyright (C) 2002, 2003, 2004, 2005, 2007, 2008 by the deal.II authors
 //
 //    This file is subject to QPL and may not be  distributed
 //    without copyright and license information. Please refer
@@ -25,6 +25,7 @@
 #include <base/logstream.h>
 
 #include <fstream>
+#include <iomanip>
 #include <string>
 
 std::ofstream logfile("grid_in/output");
@@ -108,7 +109,8 @@ void filename_resolution()
 
 int main ()
 {
-  logfile.precision (2);
+  deallog << std::setprecision (2);
+  logfile << std::setprecision (2);
   deallog.attach(logfile);
   deallog.depth_console(0);
   deallog.threshold_double(1.e-10);

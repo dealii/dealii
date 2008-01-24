@@ -2,7 +2,7 @@
 //    $Id$
 //    Version: $Name$ 
 //
-//    Copyright (C) 2005 by the deal.II authors
+//    Copyright (C) 2005, 2008 by the deal.II authors
 //
 //    This file is subject to QPL and may not be  distributed
 //    without copyright and license information. Please refer
@@ -26,6 +26,7 @@
 #include <grid/grid_generator.h>
 
 #include <fstream>
+#include <iomanip>
 
 
 
@@ -56,8 +57,8 @@ void create_triangulation(const unsigned int case_no,
 int main ()
 {
   std::ofstream logfile ("normals_at_vertices/output");
-  logfile.precision (3);
-  logfile.setf(std::ios::fixed);  
+  deallog << std::setprecision (3);
+  deallog << std::fixed;  
   deallog.attach(logfile);
   deallog.depth_console (0);
 

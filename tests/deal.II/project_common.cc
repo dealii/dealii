@@ -344,7 +344,7 @@ void test_with_2d_deformed_refined_mesh (const FiniteElement<dim> &fe,
 int main ()
 {
   std::ofstream logfile(logname);
-  logfile.precision (3);
+  deallog << std::setprecision (3);
   
   deallog.attach(logfile);
   deallog.depth_console(0);

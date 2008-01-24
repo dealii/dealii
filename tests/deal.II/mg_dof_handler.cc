@@ -31,7 +31,7 @@
 int main ()
 {
   std::ofstream logfile("mg_dof_handler/output");
-  logfile.precision(2);
+  deallog << std::setprecision(2);
   
   deallog.attach(logfile);
   deallog.depth_console(0);

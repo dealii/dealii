@@ -119,7 +119,7 @@ void test ()
 int main ()
 {
   std::ofstream logfile("interpolate_q_system_02/output");
-  logfile.precision (3);
+  deallog << std::setprecision (3);
   
   deallog.attach(logfile);
   deallog.depth_console(0);

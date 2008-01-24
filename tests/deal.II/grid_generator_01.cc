@@ -2,7 +2,7 @@
 //    $Id$
 //    Version: $Name$ 
 //
-//    Copyright (C) 2007 by the deal.II authors
+//    Copyright (C) 2007, 2008 by the deal.II authors
 //
 //    This file is subject to QPL and may not be  distributed
 //    without copyright and license information. Please refer
@@ -24,6 +24,7 @@
 
 #include <fstream>
 #include <iostream>
+#include <iomanip>
 
 std::ofstream logfile("grid_generator_01/output");
 

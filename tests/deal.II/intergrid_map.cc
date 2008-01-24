@@ -103,7 +103,7 @@ void check ()
 int main ()
 {
   std::ofstream logfile("intergrid_map/output");
-  logfile.precision(2);
+  deallog << std::setprecision(2);
   
   deallog.attach(logfile);
   deallog.depth_console(0);

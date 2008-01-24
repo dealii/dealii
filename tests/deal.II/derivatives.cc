@@ -213,8 +213,8 @@ void loop ()
 int main ()
 {
   std::ofstream logfile ("derivatives/output");
-  logfile.precision (2);
-  logfile.setf(std::ios::fixed);  
+  deallog << std::setprecision (2);
+  deallog << std::fixed;  
   deallog.attach(logfile);
   if (!errors) deallog.depth_console(0);
   deallog.threshold_double(1.e-10);

@@ -2,7 +2,7 @@
 //    $Id$
 //    Version: $Name$ 
 //
-//    Copyright (C) 2000, 2001, 2003, 2004, 2007 by the deal.II authors
+//    Copyright (C) 2000, 2001, 2003, 2004, 2007, 2008 by the deal.II authors
 //
 //    This file is subject to QPL and may not be  distributed
 //    without copyright and license information. Please refer
@@ -203,8 +203,10 @@ check ()
 int main ()
 {
   std::ofstream logfile ("matrices/output");
-  logfile.precision (2);
-  logfile.setf(std::ios::fixed);  
+  logfile << std::setprecision (2);
+  logfile << std::fixed;  
+  deallog << std::setprecision (2);
+  deallog << std::fixed;  
   deallog.attach(logfile);
   deallog.depth_console (0);
 

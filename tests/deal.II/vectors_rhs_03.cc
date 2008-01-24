@@ -100,8 +100,8 @@ check ()
 int main ()
 {
   std::ofstream logfile ("vectors_rhs_03/output");
-  logfile.precision (4);
-  logfile.setf(std::ios::fixed);  
+  deallog << std::setprecision (4);
+  deallog << std::fixed;  
   deallog.attach(logfile);
   deallog.depth_console (0);
 
