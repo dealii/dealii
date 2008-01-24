@@ -35,7 +35,7 @@
 
 
 template<int dim>
-void test_projection (const Triangulation<dim>& tr,
+void test (const Triangulation<dim>& tr,
 		      const FiniteElement<dim>& fe)
 {
   DoFHandler<dim> dof(tr);
@@ -75,7 +75,7 @@ void test_hyper_cube()
       FESystem<dim> fe (FE_Q<dim>(degree+1), 1,
 			FE_Q<dim>(degree), dim,
 			FE_Q<dim>(degree+1), 1);
-      test_projection(tr, fe);
+      test(tr, fe);
     }
 }
 
