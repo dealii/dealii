@@ -350,64 +350,6 @@ class GrowingVectorMemory : public VectorMemory<VECTOR>
 #ifndef DOXYGEN
 /* --------------------- inline functions ---------------------- */
 
-template <typename VECTOR>
-inline
-GrowingVectorMemory<VECTOR>::Pool::Pool()
-		:
-		data(0)
-{}
-
-
-
-template <typename VECTOR>
-inline
-GrowingVectorMemory<VECTOR>::Pool::~Pool()
-{
-				   // Nothing to do if memory was unused.
-  if (data == 0) return;
-
-				   // First, delete all remaining
-				   // vectors. Actually, there should
-				   // be none, if there is no memory
-				   // leak
-  unsigned int n=0;
-  for (typename std::vector<entry_type>::iterator i=data->begin();
-       i != data->end();
-       ++i)
-    {
-      if (i->first == true)
-	++n;
-      delete i->second;
-    }
-  delete data;
-}
-
-
-template <typename VECTOR>
-inline
-void
-GrowingVectorMemory<VECTOR>::Pool::initialize(const unsigned int size)
-{
-  if (data == 0)
-    {
-      data = new std::vector<entry_type>(size);
-      
-      for (typename std::vector<entry_type>::iterator i= data->begin();
-	   i != data->end();
-	   ++i)
-	{
-	  i->first = false;
-	  i->second = new VECTOR;
-	}
-    }
-}
-
-
-template <typename VECTOR>
-typename GrowingVectorMemory<VECTOR>::Pool GrowingVectorMemory<VECTOR>::pool;
-template <typename VECTOR>
-Threads::ThreadMutex GrowingVectorMemory<VECTOR>::mutex;
-
 
 template <typename VECTOR>
 inline
