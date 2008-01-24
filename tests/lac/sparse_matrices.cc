@@ -2,7 +2,7 @@
 //    $Id$
 //    Version: $Name$ 
 //
-//    Copyright (C) 1998, 1999, 2000, 2002, 2003, 2004, 2005, 2007 by the deal.II authors
+//    Copyright (C) 1998, 1999, 2000, 2002, 2003, 2004, 2005, 2007, 2008 by the deal.II authors
 //
 //    This file is subject to QPL and may not be  distributed
 //    without copyright and license information. Please refer
@@ -272,8 +272,8 @@ void check_conjugate(std::ostream& out)
 int main()
 {
   std::ofstream logfile("sparse_matrices/output");
-//  logfile.setf(std::ios::fixed);
-  logfile.precision(3);
+  logfile << std::setprecision(3);
+  deallog << std::setprecision(3);
   deallog.attach(logfile);
 
 				   // Switch between regression test

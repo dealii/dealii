@@ -20,7 +20,7 @@
 #include <lac/vector.h>
 
 #include <fstream>
-#include <iostream>
+#include <iomanip>
 
 const double rect[] =
 {
@@ -33,7 +33,7 @@ const double rect[] =
 int main()
 {
   std::ofstream logfile("householder/output");
-  logfile.precision(3);
+  deallog << std::setprecision(3);
   deallog.attach(logfile);
   deallog.depth_console(0);
   

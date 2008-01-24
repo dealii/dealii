@@ -17,7 +17,7 @@
 #include <lac/sparsity_pattern.h>
 #include "testmatrix.h"
 #include <fstream>
-#include <iostream>
+#include <iomanip>
 #include <list>
 #include <set>
 #include <cstdio>
@@ -28,7 +28,7 @@ main ()
 {
   std::ofstream logfile("sparsity_pattern/output");
   logfile.setf(std::ios::fixed);
-  logfile.precision(3);
+  deallog << std::setprecision(3);
   deallog.attach(logfile);
   deallog.depth_console(0);
   deallog.threshold_double(1.e-10);

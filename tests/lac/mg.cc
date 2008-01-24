@@ -15,7 +15,7 @@
 #include "../tests.h"
 #include <cmath>
 #include <fstream>
-#include <iostream>
+#include <iomanip>
 #include "testmatrix.h"
 #include <base/logstream.h>
 #include <lac/sparse_matrix.h>

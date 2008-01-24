@@ -2,7 +2,7 @@
 //    $Id$
 //    Version: $Name$ 
 //
-//    Copyright (C) 2006 by the deal.II authors
+//    Copyright (C) 2006, 2008 by the deal.II authors
 //
 //    This file is subject to QPL and may not be  distributed
 //    without copyright and license information. Please refer
@@ -19,13 +19,14 @@
 #include <base/logstream.h>
 #include <lac/block_sparsity_pattern.h>
 
+#include <iomanip>
 #include <fstream>
 
 int main()
 {
   std::ofstream logfile("block_sparsity_pattern_01/output");
   logfile.setf(std::ios::fixed);
-  logfile.precision(2);
+  deallog << std::setprecision(2);
   deallog.attach(logfile);
   deallog.depth_console(0);
   deallog.threshold_double(1.e-10);

@@ -18,7 +18,7 @@
 #include <base/logstream.h>
 
 #include <fstream>
-#include <iostream>
+#include <iomanip>
 
 class TransferTest
   :

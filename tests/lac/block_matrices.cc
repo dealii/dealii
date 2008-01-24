@@ -2,7 +2,7 @@
 //    $Id$
 //    Version: $Name$ 
 //
-//    Copyright (C) 2000, 2001, 2002, 2003, 2004, 2005 by the deal.II authors
+//    Copyright (C) 2000, 2001, 2002, 2003, 2004, 2005, 2008 by the deal.II authors
 //
 //    This file is subject to QPL and may not be  distributed
 //    without copyright and license information. Please refer
@@ -18,7 +18,7 @@
 #include <lac/block_sparse_matrix.h>
 #include <lac/block_vector.h>
 #include <fstream>
-#include <iostream>
+#include <iomanip>
 #include <algorithm>
 
 
@@ -27,8 +27,8 @@
 void test () 
 {
   std::ofstream logfile("block_matrices/output");
-  logfile.setf(std::ios::fixed);
-  logfile.precision(2);
+  deallog << std::fixed;
+  deallog << std::setprecision(2);
   deallog.attach(logfile);
   deallog.depth_console(0);
   deallog.threshold_double(1.e-10);

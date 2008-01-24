@@ -2,7 +2,7 @@
 //    $Id$
 //    Version: $Name$ 
 //
-//    Copyright (C) 2005, 2006 by the deal.II authors
+//    Copyright (C) 2005, 2006, 2008 by the deal.II authors
 //
 //    This file is subject to QPL and may not be  distributed
 //    without copyright and license information. Please refer
@@ -19,15 +19,15 @@
 #include <lac/full_matrix.h>
 
 #include <fstream>
-#include <iostream>
+#include <iomanip>
 #include <cmath>
 
 
 int main()
 {
   std::ofstream logfile("trace/output");
-  logfile.setf(std::ios::fixed);
-  logfile.precision(0);
+  deallog << std::fixed;
+  deallog << std::setprecision(0);
   deallog.attach(logfile);
   deallog.depth_console(0);
   deallog.threshold_double(1.e-10);

@@ -15,7 +15,7 @@
 #include "../tests.h"
 #include <cmath>
 #include <fstream>
-#include <iostream>
+#include <iomanip>
 #include <iomanip>
 #include "testmatrix.h"
 #include <base/logstream.h>
@@ -70,7 +70,7 @@ int main()
 {
   std::ofstream logfile("solver/output");
 //  logfile.setf(std::ios::fixed);
-  logfile.precision(4);
+  deallog << std::setprecision(4);
   deallog.attach(logfile);
   deallog.depth_console(0);
   deallog.threshold_double(1.e-10);

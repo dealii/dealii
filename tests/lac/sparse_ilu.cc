@@ -2,7 +2,7 @@
 //    $Id$
 //    Version: $Name$ 
 //
-//    Copyright (C) 2001, 2002, 2003, 2004, 2005 by the deal.II authors
+//    Copyright (C) 2001, 2002, 2003, 2004, 2005, 2008 by the deal.II authors
 //
 //    This file is subject to QPL and may not be  distributed
 //    without copyright and license information. Please refer
@@ -18,7 +18,7 @@
 #include "../tests.h"
 #include <cmath>
 #include <fstream>
-#include <iostream>
+#include <iomanip>
 #include <iomanip>
 #include <cstdlib>
 #include "testmatrix.h"
@@ -32,8 +32,8 @@
 int main()
 {
   std::ofstream logfile("sparse_ilu/output");
-  logfile.setf(std::ios::fixed);
-  logfile.precision(3);
+  deallog << std::fixed;
+  deallog << std::setprecision(3);
   deallog.attach(logfile);
   deallog.depth_console(0);
   deallog.threshold_double(1.e-10);

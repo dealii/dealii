@@ -21,7 +21,7 @@
 #include <lac/vector.h>
 
 #include <fstream>
-#include <iostream>
+#include <iomanip>
 #include <cmath>
 
 template<typename number>
@@ -68,7 +68,7 @@ int main()
 {
   std::ofstream logfile("identity_matrix_03/output");
   logfile.setf(std::ios::fixed);
-  logfile.precision(0);
+  deallog << std::setprecision(0);
   deallog.attach(logfile);
   deallog.depth_console(0);
   deallog.threshold_double(1.e-10);

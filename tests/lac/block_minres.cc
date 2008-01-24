@@ -23,13 +23,13 @@
 #include <lac/solver_minres.h>
 #include <lac/precondition.h>
 #include <fstream>
-#include <iostream>
+#include <iomanip>
 
 
 int main()
 {
   std::ofstream logfile("block_minres/output");
-  logfile.precision(2);
+  deallog << std::setprecision(2);
   deallog.attach(logfile);
   deallog.depth_console(0);
 
