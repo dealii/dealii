@@ -964,6 +964,32 @@ class VectorTools
 				      * face of the right cell belongs
 				      * to it. This case is not
 				      * currently implemented.
+				      *
+				      *
+				      * <h4>Results</h4>
+				      *
+				      * Because it makes for good
+				      * pictures, here are two images
+				      * of vector fields on a circle
+				      * and on a sphere to which the
+				      * constraints computed by this
+				      * function have been applied:
+				      *
+				      * <p ALIGN="center">
+				      * @image html no_normal_flux_5.png
+				      * @image html no_normal_flux_6.png
+				      * </p>
+				      *
+				      * The vectors fields are not
+				      * physically reasonable but the
+				      * tangentiality constraint is
+				      * clearly enforced. The fact
+				      * that the vector fields are
+				      * zero at some points on the
+				      * boundary is an artifact of the
+				      * way it is created, it is not
+				      * constrained to be zero at
+				      * these points.
 				      */
     template <int dim, template <int> class DH>
     static

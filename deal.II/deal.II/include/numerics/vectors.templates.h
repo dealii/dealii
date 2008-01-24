@@ -2333,7 +2333,7 @@ VectorTools::compute_no_normal_flux_constraints (const DH<dim>         &dof_hand
 					     // then construct constraints
 					     // from this:
 	    const internal::VectorTools::VectorDoFTuple<dim> &
-		dof_indices = same_dof_range[0]->first;	    
+	      dof_indices = same_dof_range[0]->first;	    
 	    internal::VectorTools::add_constraint (dof_indices, normal,
 						   constraints);
 
