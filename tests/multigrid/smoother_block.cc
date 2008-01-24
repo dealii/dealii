@@ -20,7 +20,7 @@
 #include <multigrid/mg_level_object.h>
 #include <multigrid/mg_block_smoother.h>
 #include <fstream>
-#include <iostream>
+#include <iomanip>
 #include <iomanip>
 #include <algorithm>
 
@@ -207,7 +207,7 @@ void check()
 int main()
 {
   std::ofstream logfile("smoother_block/output");
-  logfile.precision(3);
+  deallog << std::setprecision(3);
   deallog.attach(logfile);
   deallog.depth_console(0);
   deallog.threshold_double(1.e-10);

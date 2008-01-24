@@ -38,7 +38,3 @@ DEAL::Two steps
 DEAL::	-623	-779	-935
 DEAL::	-639	-799	-959
 DEAL::	-175	-219	-263
-DEAL::GrowingVectorMemory:Overall allocated vectors: 24
-DEAL::GrowingVectorMemory:Maximum allocated vectors: 4
-DEAL::GrowingVectorMemory:Overall allocated vectors: 48
-DEAL::GrowingVectorMemory:Maximum allocated vectors: 1

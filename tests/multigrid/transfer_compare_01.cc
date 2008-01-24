@@ -33,7 +33,7 @@
 #include <multigrid/mg_level_object.h>
 
 #include <fstream>
-#include <iostream>
+#include <iomanip>
 #include <iomanip>
 #include <algorithm>
 
@@ -195,7 +195,7 @@ void check_block(const FiniteElement<dim>& fe)
 int main()
 {
   std::ofstream logfile("transfer_compare_01/output");
-  logfile.precision(3);
+  deallog << std::setprecision(3);
   deallog.attach(logfile);
   deallog.depth_console(0);
   deallog.threshold_double(1.e-10);
