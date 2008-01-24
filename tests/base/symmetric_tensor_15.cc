@@ -17,7 +17,7 @@
 #include <base/symmetric_tensor.h>
 #include <base/logstream.h>
 #include <fstream>
-#include <iostream>
+#include <iomanip>
 
 
 template <int dim>
@@ -73,7 +73,7 @@ void test ()
 int main ()
 {
   std::ofstream logfile("symmetric_tensor_15/output");
-  logfile.precision(3);
+  deallog << std::setprecision(3);
   deallog.attach(logfile);
   deallog.depth_console(0);
   deallog.threshold_double(1.e-10);

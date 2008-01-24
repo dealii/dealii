@@ -18,7 +18,7 @@
 
 
 #include "../tests.h"
-#include <iostream>
+#include <iomanip>
 #include <fstream>
 
 #include <base/logstream.h>

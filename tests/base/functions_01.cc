@@ -2,7 +2,7 @@
 //    $Id$
 //    Version: $Name$ 
 //
-//    Copyright (C) 2007 by the deal.II authors
+//    Copyright (C) 2007, 2008 by the deal.II authors
 //
 //    This file is subject to QPL and may not be  distributed
 //    without copyright and license information. Please refer
@@ -23,7 +23,7 @@
 #include <lac/vector.h>
 
 #include <vector>
-#include <iostream>
+#include <iomanip>
 #include <fstream>
 #include <string>
 
@@ -114,7 +114,9 @@ check_function(const Functions::FlowFunction<dim>& f,
 	  patches[0].data(j, i) = values[i](j);
 	else
 	  patches[0].data(j, i) = 0;
-	Assert (values[i](j) == values2[j][i], ExcInternalError());
+	if (values[i](j) != values2[j][i])
+	  deallog << "Error values (" << i << ',' << j << ") : "
+		  << values[i](j) << " != " << values2[j][i] << std::endl;
       }
   
   deallog << "Gradients ";
@@ -186,7 +188,9 @@ check_function(const Functions::FlowFunction<dim>& f,
     for (unsigned int j=0;j<values[i].size();++j)
       {
 	sum += values[i](j)*values[i](j);
-	Assert (values[i](j) == values2[j][i], ExcInternalError());
+	if (values[i](j) != values2[j][i])
+	  deallog << "Error values (" << i << ',' << j << ") : "
+		  << values[i](j) << " != " << values2[j][i] << std::endl;
       }
   deallog << "Laplacians " << std::sqrt(sum)/points.size() << std::endl;
   

@@ -2,7 +2,7 @@
 //    $Id$
 //    Version: $Name$ 
 //
-//    Copyright (C) 1998, 1999, 2000, 2001, 2002, 2003, 2004, 2005, 2006 by the deal.II authors
+//    Copyright (C) 1998, 1999, 2000, 2001, 2002, 2003, 2004, 2005, 2006, 2008 by the deal.II authors
 //
 //    This file is subject to QPL and may not be  distributed
 //    without copyright and license information. Please refer
@@ -14,7 +14,7 @@
 // Test projection onto lines
 
 #include "../tests.h"
-#include <iostream>
+#include <iomanip>
 #include <fstream>
 
 #include <base/logstream.h>
@@ -175,7 +175,7 @@ int main()
   std::ofstream logfile("qprojector/output");
   deallog.attach(logfile);
   deallog.depth_console(0);
-  logfile.precision(2);
+  deallog << std::setprecision(2);
   
   deallog.threshold_double(1.e-10);
 

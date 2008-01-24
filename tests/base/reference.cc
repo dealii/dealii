@@ -22,7 +22,7 @@
 #include <base/subscriptor.h>
 #include <base/smartpointer.h>
 #include <base/logstream.h>
-#include <iostream>
+#include <iomanip>
 
 
 class Test : public Subscriptor

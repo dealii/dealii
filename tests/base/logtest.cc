@@ -19,7 +19,7 @@
 #include "../tests.h"
 #include <base/logstream.h>
 #include <fstream>
-#include <iostream>
+#include <iomanip>
 #include <limits>
 
 

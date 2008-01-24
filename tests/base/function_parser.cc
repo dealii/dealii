@@ -17,7 +17,7 @@
 
 #include "../tests.h"
 #include <fstream>
-#include <iostream>
+#include <iomanip>
 #include <map>
 #include <base/logstream.h>
 #include <base/point.h>

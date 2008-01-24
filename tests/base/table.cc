@@ -2,7 +2,7 @@
 //    $Id$
 //    Version: $Name$ 
 //
-//    Copyright (C) 1998 - 2005 by the deal.II authors
+//    Copyright (C) 1998 - 2005, 2008 by the deal.II authors
 //
 //    This file is subject to QPL and may not be  distributed
 //    without copyright and license information. Please refer
@@ -17,7 +17,6 @@
 #include "../tests.h"
 #include <cmath>
 #include <fstream>
-#include <iostream>
 #include <iomanip>
 #include <cstdlib>
 
@@ -35,8 +34,8 @@ int
 main ()
 {
   std::ofstream logfile("table/output");
-  logfile.setf(std::ios::fixed);
-  logfile.precision(3);
+  deallog << std::fixed;
+  deallog << std::setprecision(0);
   deallog.attach(logfile);
   deallog.depth_console(0);
   deallog.threshold_double(1.e-10);
@@ -67,7 +66,7 @@ main ()
             Assert (Td[i].begin()+j == &Td(i,j), ExcInternalError());
             Assert (Ti[i].begin()+j == &Ti(i,j), ExcInternalError());
             
-            logfile << i << " " << j << " " << Td[i][j] << " ok" << std::endl;
+            deallog << i << " " << j << " " << Td[i][j] << " ok" << std::endl;
           };
     };
   
@@ -97,7 +96,7 @@ main ()
             Assert (Td[i].begin()+j == &Td(i,j), ExcInternalError());
             Assert (Ti[i].begin()+j == &Ti(i,j), ExcInternalError());
             
-            logfile << i << " " << j << " " << Td[i][j] << " ok" << std::endl;
+            deallog << i << " " << j << " " << Td[i][j] << " ok" << std::endl;
           };
 
       for (unsigned int i=0; i<4; ++i)
@@ -129,9 +128,9 @@ main ()
 	{
 	  for (unsigned int j=0; j<3; ++j)
 	    {
-	      logfile << '\t' << Ti(i,j) << '/' << Td(i,j);
+	      deallog << '\t' << Ti(i,j) << '/' << Td(i,j);
 	    }
-	  logfile << std::endl;
+	  deallog << std::endl;
 	}
     }
   
@@ -155,7 +154,7 @@ main ()
           Assert (Ti[i] == Ti(i), ExcInternalError());
           Assert (Ti[i] == Td(i), ExcInternalError());
           
-          logfile << i << " " << Td[i] << " ok" << std::endl;
+          deallog << i << " " << Td[i] << " ok" << std::endl;
         };
     };
   
@@ -190,7 +189,7 @@ main ()
             Assert (Td[i][j].begin()+k == &Td(i,j,k), ExcInternalError());
             Assert (Ti[i][j].begin()+k == &Ti(i,j,k), ExcInternalError());
             
-            logfile << i << " " << j << " " << k << " "
+            deallog << i << " " << j << " " << k << " "
                     << Td[i][j][k] << " ok" << std::endl;
           };
 
@@ -241,7 +240,7 @@ main ()
 		Assert (Td[i][j][k].begin()+l == &Td(i,j,k,l), ExcInternalError());
 		Assert (Ti[i][j][k].begin()+l == &Ti(i,j,k,l), ExcInternalError());
 		
-		logfile << i << " " << j << " " << k << " " << l << " "
+		deallog << i << " " << j << " " << k << " " << l << " "
 			<< Td[i][j][k][l] << " ok" << std::endl;
 	      };
       
@@ -289,7 +288,7 @@ main ()
 		  Assert (Td[i][j][k][l].begin()+m == &Td(i,j,k,l,m), ExcInternalError());
 		  Assert (Ti[i][j][k][l].begin()+m == &Ti(i,j,k,l,m), ExcInternalError());
             
-		  logfile << i << " " << j << " " << k << " " << l << " " << m << " "
+		  deallog << i << " " << j << " " << k << " " << l << " " << m << " "
 			  << Td[i][j][k][l][m] << " ok" << std::endl;
 		};
       
@@ -340,7 +339,7 @@ main ()
 		    Assert (Td[i][j][k][l][m].begin()+n == &Td(i,j,k,l,m,n), ExcInternalError());
 		    Assert (Ti[i][j][k][l][m].begin()+n == &Ti(i,j,k,l,m,n), ExcInternalError());
 		    
-		    logfile << i << " " << j << " " << k << " " << l << " " << m << " " << n << " "
+		    deallog << i << " " << j << " " << k << " " << l << " " << m << " " << n << " "
 			    << Td[i][j][k][l][m][n] << " ok" << std::endl;
 		  };
       

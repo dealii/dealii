@@ -14,7 +14,7 @@
 // test functions in namespace Utilities
 
 #include "../tests.h"
-#include <iostream>
+#include <iomanip>
 #include <iomanip>
 #include <fstream>
 #include <cmath>

@@ -14,7 +14,7 @@
 // Test Lagrange interpolation
 
 #include "../tests.h"
-#include <iostream>
+#include <iomanip>
 #include <fstream>
 #include <cmath>
 
@@ -77,7 +77,7 @@ check_lge (unsigned int n)
 int main()
 {
   std::ofstream logfile("polynomial_lagrange/output");
-  logfile.precision(3);
+  deallog << std::setprecision(3);
   deallog.attach(logfile);
   deallog.depth_console(0);
 //  deallog.threshold_double(1.e-10);

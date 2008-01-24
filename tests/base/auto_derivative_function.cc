@@ -23,7 +23,7 @@
 #include <base/logstream.h>
 #include <lac/vector.h>
 
-#include <iostream>
+#include <iomanip>
 #include <cmath>
 
 
@@ -118,7 +118,7 @@ void ExactSinExp<dim>::vector_gradient (const Point<dim>       &p,
 int main()
 {
   std::ofstream logfile("auto_derivative_function/output");
-  logfile.precision(4);
+  deallog << std::setprecision(4);
   deallog.attach(logfile);
   deallog.depth_console(0);
   deallog.threshold_double(1.e-10);

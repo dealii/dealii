@@ -2,7 +2,7 @@
 //    $Id$
 //    Version: $Name$ 
 //
-//    Copyright (C) 2004, 2005, 2006 by the deal.II authors
+//    Copyright (C) 2004, 2005, 2006, 2008 by the deal.II authors
 //
 //    This file is subject to QPL and may not be  distributed
 //    without copyright and license information. Please refer
@@ -18,7 +18,7 @@
 
 #include <vector>
 #include <fstream>
-#include <iostream>
+#include <iomanip>
 
 void f(const std::vector<int>& v)
 {
@@ -50,8 +50,8 @@ int main()
     s[i] = i;
 
   for (unsigned int i=0;i<v.size();++i)
-    std::cerr << '\t' << v[i];
-  std::cerr << std::endl;
+    deallog << '\t' << v[i];
+  deallog << std::endl;
 
   f(v);
 
