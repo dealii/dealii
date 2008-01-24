@@ -2,7 +2,7 @@
 //    $Id$
 //    Version: $Name$
 //
-//    Copyright (C) 2003, 2007 by the deal.II authors
+//    Copyright (C) 2003, 2007, 2008 by the deal.II authors
 //
 //    This file is subject to QPL and may not be  distributed
 //    without copyright and license information. Please refer
@@ -146,8 +146,13 @@ void determine_direct_includes (const std::string &file)
                                          line.begin()+endpos);
             break;
           }
-      assert (included_file.length() > 0);
-
+      if (included_file.length() == 0)
+	{
+	  std::cerr << "Include file name empty in file <" << file << "> line: " << std::endl
+		    << line << std::endl;
+	  abort();
+	}
+      
                                        // next try to locate the file
                                        // in absolute paths. this is
                                        // easy if it was included via
