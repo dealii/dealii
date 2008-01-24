@@ -418,6 +418,13 @@ namespace Functions
 	  for (unsigned int k=0;k<values[d].size();++k)
 	    values[d][k] *= -reaction;	
       }
+    else
+      {
+	for (unsigned int d=0;d<dim;++d)
+	  for (unsigned int k=0;k<values[d].size();++k)
+	    values[d][k] = 0.;	
+      }
+    
     
     for (unsigned int k=0;k<n;++k)
       {
