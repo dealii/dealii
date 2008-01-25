@@ -380,14 +380,7 @@ class BlockVector : public BlockVectorBase<Vector<Number> >
 				      */
     void block_read (std::istream &in);
 
-				     /**
-				      * Determine an estimate for the
-				      * memory consumption (in bytes)
-				      * of this object.
-				      */
-    unsigned int memory_consumption () const;
-
-      				     /** @addtogroup Exceptions
+				     /** @addtogroup Exceptions
 				      * @{ */
     
 				     /**

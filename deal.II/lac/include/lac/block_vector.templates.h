@@ -15,7 +15,6 @@
 
 
 #include <base/config.h>
-#include <base/memory_consumption.h>
 #include <lac/block_vector.h>
 #include <cmath>
 #include <algorithm>
@@ -151,18 +150,6 @@ void BlockVector<Number>::block_read (std::istream &in)
 {
   for (unsigned int i=0;i<this->n_blocks();++i)
     this->components[i].block_read(in);
-}
-
-
-template <typename Number>
-unsigned int
-BlockVector<Number>::memory_consumption () const
-{
-  unsigned int mem = sizeof(this->n_blocks());
-  for (unsigned int i=0; i<this->components.size(); ++i)
-    mem += MemoryConsumption::memory_consumption (this->components[i]);
-  mem += MemoryConsumption::memory_consumption (this->block_indices);
-  return mem;
 }
 
 

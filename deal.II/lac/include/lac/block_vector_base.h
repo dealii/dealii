@@ -17,9 +17,9 @@
 #include <base/config.h>
 #include <base/exceptions.h>
 #include <base/subscriptor.h>
+#include <base/memory_consumption.h>
 #include <lac/exceptions.h>
 #include <lac/block_indices.h>
-
 #include <vector>
 #include <iterator>
 #include <cmath>
@@ -1001,9 +1001,9 @@ class BlockVectorBase : public Subscriptor
 	      const value_type b, const BlockVectorBase& W);
 
 				     /**
-				      * Estimate for the memory
-				      * consumption (not implemented
-				      * for this class).
+				      * Determine an estimate for the
+				      * memory consumption (in bytes)
+				      * of this object.
 				      */
     unsigned int memory_consumption () const;
       
@@ -2083,8 +2083,11 @@ void BlockVectorBase<VectorType>::equ (const value_type a,
 template <class VectorType>
 unsigned int BlockVectorBase<VectorType>::memory_consumption () const
 {
-  AssertThrow(false, ExcNotImplemented() );
-  return 0;
+  unsigned int mem = sizeof(this->n_blocks());
+  for (unsigned int i=0; i<this->components.size(); ++i)
+    mem += MemoryConsumption::memory_consumption (this->components[i]);
+  mem += MemoryConsumption::memory_consumption (this->block_indices);
+  return mem;
 }
 
 
