@@ -633,6 +633,13 @@ namespace PETScWrappers
                                         * vector.
                                         */
       operator const Vec & () const;
+
+				       /**
+					* Estimate for the memory
+					* consumption (not implemented
+					* for this class).
+					*/
+      unsigned int memory_consumption () const;
       
     protected:
                                        /**

@@ -849,6 +849,15 @@ namespace PETScWrappers
 
 
 
+  unsigned int
+  VectorBase::memory_consumption () const
+  {
+    AssertThrow(false, ExcNotImplemented() );
+    return 0;
+  }
+  
+
+
   void
   VectorBase::do_set_add_operation (const std::vector<unsigned int> &indices,
 				    const std::vector<PetscScalar>  &values,

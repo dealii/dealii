@@ -999,6 +999,13 @@ class BlockVectorBase : public Subscriptor
 				      */
     void equ (const value_type a, const BlockVectorBase& V,
 	      const value_type b, const BlockVectorBase& W);
+
+				     /**
+				      * Estimate for the memory
+				      * consumption (not implemented
+				      * for this class).
+				      */
+    unsigned int memory_consumption () const;
       
   protected:
 				     /**
@@ -2070,6 +2077,16 @@ void BlockVectorBase<VectorType>::equ (const value_type a,
       components[i].equ( a, v.components[i], b, w.components[i]);
     }
 }
+
+
+
+template <class VectorType>
+unsigned int BlockVectorBase<VectorType>::memory_consumption () const
+{
+  AssertThrow(false, ExcNotImplemented() );
+  return 0;
+}
+
 
 
 template <class VectorType>
