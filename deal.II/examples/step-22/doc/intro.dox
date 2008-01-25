@@ -291,7 +291,7 @@ First, in the mixed Laplace equation we had to deal with the question of how
 to precondition the Schur complement $B^TM^{-1}B$, which was spectrally
 equivalent to the Laplace operator on the pressure space (because $B$
 represents the gradient operator, $B^T$ its adjoint $-\textrm{div}$, and $M$
-the identity (up to the material parameter $K^{-1}$, so $B^TM^{-1}B$ is
+the identity (up to the material parameter $K^{-1}$), so $B^TM^{-1}B$ is
 something like $-\textrm{div} 1 \nabla = -\Delta$) and consequently badly
 conditioned for small mesh sizes. To this end, we had to come up with an
 elaborate preconditioning scheme for the Schur complement.
