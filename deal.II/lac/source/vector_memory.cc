@@ -15,6 +15,10 @@
 #include <lac/vector_memory.h>
 #include <lac/vector.h>
 #include <lac/block_vector.h>
+#include <lac/petsc_vector.h>
+#include <lac/petsc_block_vector.h>
+#include <lac/petsc_parallel_vector.h>
+#include <lac/petsc_parallel_block_vector.h>
 
 DEAL_II_NAMESPACE_OPEN
 
@@ -76,9 +80,23 @@ template <typename VECTOR>
 Threads::ThreadMutex GrowingVectorMemory<VECTOR>::mutex;
 
 
-
-
+// -------------------------------------------------------------
+// explicit instantiations
 
 #include "vector_memory.inst"
+
+#ifdef DEAL_II_USE_PETSC
+    template class VectorMemory<PETScWrappers::Vector>;
+    template class GrowingVectorMemory<PETScWrappers::Vector>;
+    
+    template class VectorMemory<PETScWrappers::BlockVector>;
+    template class GrowingVectorMemory<PETScWrappers::BlockVector>;
+
+    template class VectorMemory<PETScWrappers::MPI::Vector>;
+    template class GrowingVectorMemory<PETScWrappers::MPI::Vector>;
+    
+    template class VectorMemory<PETScWrappers::MPI::BlockVector>;
+    template class GrowingVectorMemory<PETScWrappers::MPI::BlockVector>;
+#endif
 
 DEAL_II_NAMESPACE_CLOSE
