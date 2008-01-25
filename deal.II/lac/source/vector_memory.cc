@@ -85,6 +85,7 @@ Threads::ThreadMutex GrowingVectorMemory<VECTOR>::mutex;
 
 #include "vector_memory.inst"
 
+//TODO: Fold this into the list of vectors to be instantiated
 #ifdef DEAL_II_USE_PETSC
     template class VectorMemory<PETScWrappers::Vector>;
     template class GrowingVectorMemory<PETScWrappers::Vector>;
