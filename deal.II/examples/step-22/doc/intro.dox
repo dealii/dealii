@@ -250,8 +250,84 @@ divergence-free:
 <b>XXXXXXXXXX WHAT DO I DO WITH THE DIV U TERM? XXXXX</b>
 
 
+
 <h3>Linear solvers</h3>
 
+As explained above, our approach to solving the joint system for
+velocities/pressure on the one hand and temperature on the other is to use an
+operator splitting where we first solve the Stokes system for the velocities
+and pressures using the old temperature field, and then solve for the new
+temperature field using the just computed velocity field. In other words, we
+first have to solve the following system resulting from discretization of the
+Stokes system:
+@f{eqnarray*}
+  \left(\begin{array}{cc}
+    A & B^T \\ B & 0
+  \end{array}\right)
+  \left(\begin{array}{cc}
+    U \\ P
+  \end{array}\right)
+  =
+  \left(\begin{array}{cc}
+    F \\ G
+  \end{array}\right),
+@f}
+Like in @ref step_20 "step-20" and @ref step_21 "step-21", we will solve this
+system of equations by forming the Schur complement, i.e. we will first find
+the solution $P$ of 
+@f{eqnarray*}
+  BA^{-1}B^T P &=& BM^{-1} F - G, \\
+@f}
+and then
+@f{eqnarray*}
+  MU &=& F - B^TP.
+@f}
+The way we do this is pretty much exactly like we did in these previous
+tutorial programs, i.e. we use the same classes <code>SchurComplement</code>
+and <code>InverseMatrix</code> again. There are slight differences,
+however:
+
+First, in the mixed Laplace equation we had to deal with the question of how
+to precondition the Schur complement $B^TM^{-1}B$, which was spectrally
+equivalent to the Laplace operator on the pressure space (because $B$
+represents the gradient operator, $B^T$ its adjoint $-\textrm{div}$, and $M$
+the identity (up to the material parameter $K^{-1}$, so $B^TM^{-1}B$ is
+something like $-\textrm{div} 1 \nabla = -\Delta$) and consequently badly
+conditioned for small mesh sizes. To this end, we had to come up with an
+elaborate preconditioning scheme for the Schur complement.
+
+Second, every time we multiplied with $B^TM^{-1}B$ we had to solve with the
+mass matrix $M$. This wasn't particularly difficult, however, since the mass
+matrix is always well conditioned and so simple to invert using CG and a
+little bit of preconditioning.
+
+Here, the situation is pretty much exactly the opposite. The difference stems
+from the fact that the matrix at the heart of the Schur complement does not
+stem from the identity operator but from a variant of the Laplace operator,
+$-\textrm{div} \eta \nabla^s$ (where $\nabla^s$ is the symmetric gradient)
+acting on a vector field. This makes the outer preconditioner simple: the
+Schur complement corresponds to the operator $-\textrm{div} (-\textrm{div}
+\eta \nabla^s)^{-1} \nabla$ on the pressure space; forgetting about the
+viscosity $\eta$ and ignoring the fact that we deal with symmetric gradients
+instead of the regular one, the Schur complement is something like
+$-\textrm{div} (-\textrm{div} \nabla)^{-1} \nabla = -\textrm{div}
+(-\Delta)^{-1} \nabla$, which even if not mathematically entirely concise, is
+spectrally equivalent to the identity operator. It turns out that it isn't
+easy to solve this Schur complement in a straight forward way with the CG
+method: using no preconditioner, the condition number of the Schur complement
+matrix depends on the size ratios of the largest to the smallest cells, and
+one still needs on the order of 50-100 CG iterations. However, there is a
+simple cure: precondition with the mass matrix on the pressure space and we
+get down to a number between 5-10 CG iterations, pretty much independently of
+the structure of the mesh. 
+
+So all we need in addition to what we already have is the mass matrix on the
+pressure variables. Now, it turns out that the pressure-pressure block in the
+system matrix is empty because the weak form of the equations have no term
+that would couple the pressure variable to the pressure test functions.
+...
+
+Inner preconditioner.
 
 
 
