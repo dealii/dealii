@@ -1197,7 +1197,12 @@ VectorTools::interpolate_boundary_values (const Mapping<dim>         &,
 {
   Assert (boundary_component != 255,
 	  ExcInvalidBoundaryIndicator());
-
+  Assert ((component_mask_.size() == 0) ||
+	  (component_mask_.size() == dof.get_fe().n_components()),
+	  ExcMessage ("The number of components in the mask has to be either "
+		      "zero or equal to the number of components in the finite "
+		      "element."));
+    
 				   // check whether boundary values at
 				   // the left or right boundary of
 				   // the line are
@@ -1296,6 +1301,13 @@ interpolate_boundary_values (const Mapping<dim>            &mapping,
                              std::map<unsigned int,double> &boundary_values,
                              const std::vector<bool>       &component_mask_)
 {
+  Assert ((component_mask_.size() == 0) ||
+	  (component_mask_.size() == dof.get_fe().n_components()),
+	  ExcMessage ("The number of components in the mask has to be either "
+		      "zero or equal to the number of components in the finite "
+		      "element."));
+
+
 				   // if for whatever reason we were
 				   // passed an empty map, return
 				   // immediately
