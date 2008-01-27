@@ -78,7 +78,7 @@ get_projected_derivative (const FEValues<dim>  &fe_values,
 	(1, Vector<double>(fe_values.get_fe().n_components()));
       fe_values.get_function_values (solution, values);
       return values[0](component);
-    };
+    }
 }
 
 
@@ -627,6 +627,8 @@ approximate_derivative (const Mapping<dim>    &mapping,
   Assert (derivative_norm.size() == dof_handler.get_tria().n_active_cells(),
 	  ExcInvalidVectorLength (derivative_norm.size(),
 				  dof_handler.get_tria().n_active_cells()));
+  Assert (component < dof_handler.get_fe().n_components(),
+	  ExcIndexRange (component, 0, dof_handler.get_fe().n_components()));
 
   const unsigned int n_threads = multithread_info.n_default_threads;
   std::vector<IndexInterval> index_intervals
