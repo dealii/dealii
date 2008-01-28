@@ -74,16 +74,88 @@ method: using no preconditioner, the condition number of the Schur complement
 matrix depends on the size ratios of the largest to the smallest cells, and
 one still needs on the order of 50-100 CG iterations. However, there is a
 simple cure: precondition with the mass matrix on the pressure space and we
-get down to a number between 5-10 CG iterations, pretty much independently of
-the structure of the mesh. 
+get down to a number between 5-15 CG iterations, pretty much independently of
+the structure of the mesh (take a look at the <a
+href="#Results">results section</a> of this program to see that indeed
+the number of CG iterations does not change as we refine the mesh).  
 
 So all we need in addition to what we already have is the mass matrix on the
-pressure variables. Now, it turns out that the pressure-pressure block in the
-system matrix is empty because the weak form of the equations have no term
-that would couple the pressure variable to the pressure test functions.
-...
+pressure variables. We could do that by building this matrix on the
+side in a separate data structure. However, it is worth remembering
+that although we build the system matrix
+@f{eqnarray*}
+  \left(\begin{array}{cc}
+    A & B^T \\ B & 0
+  \end{array}\right)
+@f}
+as one object (of type BlockSparseMatrix), we never actually do
+matrix-vector products with this matrix, or any other operations that
+consider the entire matrix. Rather, we only build it in this form for
+convenience (because it reflects the structure of the FESystem finite
+element and associated DoFHandler object) but later only operate on
+the $(0,0),(0,1)$, and $(1,0)$ blocks of this matrix. In other words,
+our algorithm so far entirely ignores the $(1,1)$ (pressure-pressure)
+block as it is empty anyway. 
+
+Now, as mentioned, we need a pressure mass matrix to precondition the
+Schur complement and that conveniently the pressure-pressure block of
+the matrix we build anyway is currently empty and ignored. So what we
+will do is to assemble the needed mass matrix in this space; this does
+change the global system matrix but since our algorithm never operates
+on the global matrix and instead only considers individual blocks,
+this fact does not affect what we actually compute. Later, when
+solving, we then precondition the Schur complement with $M_p^{-1}$ by
+doing a few CG iterations on the well-conditioned pressure mass matrix
+$M_p$ stored in the $(1,1)$ block.
+
+
 
 <li>
-Inner preconditioner.
+While the outer preconditioner has become simpler compared to the
+mixed Laplace case discussed in @ref step_20 "step-20", the issue of
+the inner solver has become more complicated. In the mixed Laplace
+discretization, the Schur complement has the form $B^TM^{-1}B$. Thus,
+every time we multiply with the Schur complement, we had to solve a
+linear system $M_uz=y$; this isn't too complicated there, however,
+since the mass matrix $M_u$ on the pressure space is well-conditioned.
+
+On the other hand, for the Stokes equation we consider here, the Schur
+complement is $B^TA^{-1}B$ where the matrix $A$ is related to the
+Laplace operator (it is, in fact, the matrix corresponding to the
+bilinear form $(\nabla^s \varphi_i, \nabla^s\varphi_j)$ where
+$\nabla^s$ is the symmetrized gradient of a vector field). Thus,
+solving with $A$ is a lot more complicated: the matrix is badly
+conditioned and we know that we need many iterations unless we have a
+very good preconditioner. What is worse, we have to solve with $A$
+every time we multiply with the Schur complement, which is 5-15 times
+using the preconditioner described above.
+
+Because we have to solve with $A$ several times, it pays off to spend
+a bit more time once to create a good preconditioner for this
+matrix. So here's what we're going to do: if in 2d, we use the
+ultimate preconditioner, namely a direct sparse LU decomposition of
+the matrix. This is implemented using the SparseDirectUMFPACK class
+that uses the UMFPACK direct solver to compute the decomposition. To
+use it, you will have to specify the <code>--enable-umfpack</code>
+switch when configuring the deal.II library, see the <a
+href="../../readme.html#optional-software">ReadMe file</a> for
+instructions. With this, the inner solver converges in one iteration.
+
+In 2d, we can do this sort of thing because even reasonably large
+problems rarely have more than a few 100,000 unknowns with
+relatively few nonzero entries per row. Furthermore, the bandwidth of
+matrices in 2d is ${\cal O}(\sqrt{N})$ and therefore moderate. For
+such matrices, sparse factor can be computed in a matter of a few
+seconds.
+
+The situation changes in 3d, because there we quickly have many more
+unknowns and the bandwidth of matrices (which determines the number of
+nonzero entries in sparse LU factors) is ${\cal O}(N^{2/3)$, and there
+are many more entries per row as well. This makes using a sparse
+direct solver such as UMFPACK inefficient: only for problem sizes of a
+few 10,000 to maybe 100,000 unknowns can a sparse decomposition be
+computed using reasonable time and memory resources.
+
+SO WHAT TO DO HERE?
 
 </ol>
