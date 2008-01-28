@@ -553,7 +553,7 @@ void StokesProblem<dim>::assemble_system ()
     std::vector<bool> component_mask (dim+1, true);
     component_mask[dim] = false;
     VectorTools::interpolate_boundary_values (dof_handler,
-					      3,
+					      1,
 					      BoundaryValues<dim>(),
 					      boundary_values,
 					      component_mask);
@@ -694,41 +694,31 @@ StokesProblem<dim>::refine_mesh ()
 template <int dim>
 void StokesProblem<dim>::run () 
 {
-  switch (dim)
-    {
-      case 2:
-      {
-	std::vector<unsigned int> subdivisions (dim, 1);
-	subdivisions[0] = 4;
+  std::vector<unsigned int> subdivisions (dim, 1);
+  subdivisions[0] = 4;
 	
-	GridGenerator::subdivided_hyper_rectangle (triangulation,
-						   subdivisions,
-						   Point<dim>(-2,-1),
-						   Point<dim>(2,0),
-						   true);
-	
-	triangulation.refine_global (2);
-
-	break;
-      }
-
-      case 3:
-      {
-	GridGenerator::hyper_shell (triangulation,
-				    Point<dim>(), 0.5, 1.0);
-	
-	static HyperShellBoundary<dim> boundary;
-	triangulation.set_boundary (0, boundary);
-	
-	triangulation.refine_global (2);
-
-	break;
-      }
-
-      default:
-	    Assert (false, ExcNotImplemented());
-    }
+  GridGenerator::subdivided_hyper_rectangle (triangulation,
+					     subdivisions,
+					     (dim == 2 ?
+					      Point<dim>(-2,-1) :
+					      Point<dim>(-2,0,-1)),
+					     (dim == 2 ?
+					      Point<dim>(2,0) :
+					      Point<dim>(2,1,0)));
+  for (typename Triangulation<dim>::active_cell_iterator
+	 cell = triangulation.begin_active();
+       cell != triangulation.end(); ++cell)
+    for (unsigned int f=0; f<GeometryInfo<dim>::faces_per_cell; ++f)
+      if (cell->face(f)->center()[dim-1] == 0)
+	{
+	  cell->face(f)->set_boundary_indicator(1);
+	  
+// 	  for (unsigned int e=0; e<GeometryInfo<dim>::lines_per_face; ++e)
+// 	    cell->face(f)->line(e)->set_boundary_indicator (1);
+	}
   
+  
+  triangulation.refine_global (4-dim);
 
   for (unsigned int refinement_cycle = 0; refinement_cycle<9;
        ++refinement_cycle)
