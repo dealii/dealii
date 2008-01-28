@@ -2,7 +2,7 @@
 <h1>Introduction</h1>
 
 
-<h3>Linear solver</h3>
+<h3>Linear solver and preconditioning issues</h3>
 
 For this program, we have to solve the following system resulting from
 discretization of the Stokes equations:
@@ -22,36 +22,46 @@ Like in @ref step_20 "step-20" and @ref step_21 "step-21", we will solve this
 system of equations by forming the Schur complement, i.e. we will first find
 the solution $P$ of 
 @f{eqnarray*}
-  BA^{-1}B^T P &=& BM^{-1} F - G, \\
+  BA^{-1}B^T P &=& BA^{-1} F - G, \\
 @f}
 and then
 @f{eqnarray*}
-  MU &=& F - B^TP.
+  AU &=& F - B^TP.
 @f}
 The way we do this is pretty much exactly like we did in these previous
 tutorial programs, i.e. we use the same classes <code>SchurComplement</code>
-and <code>InverseMatrix</code> again. There are slight differences,
+and <code>InverseMatrix</code> again. There are two significant differences,
 however:
 
+<ol>
+<li>
 First, in the mixed Laplace equation we had to deal with the question of how
 to precondition the Schur complement $B^TM^{-1}B$, which was spectrally
 equivalent to the Laplace operator on the pressure space (because $B$
 represents the gradient operator, $B^T$ its adjoint $-\textrm{div}$, and $M$
 the identity (up to the material parameter $K^{-1}$), so $B^TM^{-1}B$ is
-something like $-\textrm{div} 1 \nabla = -\Delta$) and consequently badly
-conditioned for small mesh sizes. To this end, we had to come up with an
-elaborate preconditioning scheme for the Schur complement.
+something like $-\textrm{div} 1 \nabla = -\Delta$). Consequently, the matrix
+is badly conditioned for small mesh sizes and we had to come up with
+an elaborate preconditioning scheme for the Schur complement.
 
+<li>
 Second, every time we multiplied with $B^TM^{-1}B$ we had to solve with the
 mass matrix $M$. This wasn't particularly difficult, however, since the mass
 matrix is always well conditioned and so simple to invert using CG and a
 little bit of preconditioning.
+</ol>
+In other words, preconditioning the inner solver for $M$ was simple whereas
+preconditioning the outer solver for $B^TM^{-1}B$ was complicated.
 
 Here, the situation is pretty much exactly the opposite. The difference stems
 from the fact that the matrix at the heart of the Schur complement does not
 stem from the identity operator but from a variant of the Laplace operator,
 $-\textrm{div} \eta \nabla^s$ (where $\nabla^s$ is the symmetric gradient)
-acting on a vector field. This makes the outer preconditioner simple: the
+acting on a vector field. This has two consequences:
+
+<ol>
+<li>
+First, it makes the outer preconditioner simple: the
 Schur complement corresponds to the operator $-\textrm{div} (-\textrm{div}
 \eta \nabla^s)^{-1} \nabla$ on the pressure space; forgetting about the
 viscosity $\eta$ and ignoring the fact that we deal with symmetric gradients
@@ -73,5 +83,7 @@ system matrix is empty because the weak form of the equations have no term
 that would couple the pressure variable to the pressure test functions.
 ...
 
+<li>
 Inner preconditioner.
 
+</ol>
