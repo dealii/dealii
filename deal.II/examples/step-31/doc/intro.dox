@@ -1,8 +1,186 @@
 <a name="Intro"></a>
 <h1>Introduction</h1>
 
+This program deals with the Stokes system of equations which reads as
+follows in their non-dimensionalized form:
+@f{eqnarray*}
+  -\textrm{div}\; \varepsilon(\textbf{u}) + \nabla p &=& \textbf{f},
+  \\
+  -\textrm{div}\; \textbf{u} &=& 0,
+@f}
+where $\textbf u$ denotes the velocity of a fluid, $p$ is its
+pressure, $\textbf f$ are external forces, and
+$\varepsilon(\textbf{u})= \nabla^s{\textbf{u}}= \frac 12 \left[
+(\nabla \textbf{u}) + (\nabla \textbf{u})^T\right]$  is the
+rankd-2 tensor of symmetrized gradients; a component-wise definition
+of it is $\varepsilon(\textbf{u})_{ij}=\frac
+12\left(\frac{\partial u_i}{\partial x_j} + \frac{\partial u_j}{\partial x_i}\right)$.
 
-<h3>Linear solver and preconditioning issues</h3>
+The Stokes equations describe the steady-state motion of a
+slow-moving, viscous fluid such as honey, rocks in the earth mantle,
+or other cases where inertia does not play a significant role. If a
+fluid is moving fast enough that inertia forces are significant
+compared to viscous friction, the Stokes equations are no longer
+valid; taking into account interia effects then leads to the
+nonlinear Navier-Stokes equations. However, in this tutorial program,
+we will focus on the simpler Stokes system.
+
+To be well-posed, we will have to add boundary conditions to the
+equations. What boundary conditions are readily possible here will
+become clear once we discuss the weak form of the equations.
+
+
+<h2>Weak form</h2>
+
+The weak form of the equations is obtained by writing it in vector
+form as
+@f{eqnarray*}
+  \left(
+  {-\textrm{div}\; \varepsilon(\textbf{u}) + \nabla p}
+  \atop
+  {-\textrm{div}\; \textbf{u}}
+  \right)
+  =
+  \left(
+  {\textbf{f}}
+  \atop
+  0
+  \right),
+@f}
+forming the dot product from the left with a vector-valued test
+function $\phi = \left({\textbf v \atop q}\right)$ and integrating
+over the domain $\Omega$, yielding the following set of equations:
+@f{eqnarray*}
+  (\mathrm v,
+   -\textrm{div}\; \varepsilon(\textbf{u}) + \nabla p)_{\Omega}
+  -
+  (q,\textrm{div}\; \textbf{u})_{\Omega}
+  =
+  (\textbf{v}, \textbf{f})_\Omega,
+@f}
+which has to hold for all test functions $\phi = \left({\textbf v
+\atop q}\right)$.
+
+In practice, one wants to impose as little regularity on the pressure
+variable; consequently, we integrate by parts the second term:
+@f{eqnarray*}
+  (\mathrm v, -\textrm{div}\; \varepsilon(\textbf{u}))_{\Omega}
+  - (\textrm{div}\; \textbf{v}, p)_{\Omega}
+  + (\textbf{n}\cdot\textbf{v}, p)_{\partial\Omega}
+  -
+  (q,\textrm{div}\; \textbf{u})_{\Omega}
+  =
+  (\textbf{v}, \textbf{f})_\Omega.
+@f}
+Likewise, we integrate by parts the first term to obtain
+@f{eqnarray*}
+  (\nabla \mathrm v,\varepsilon(\textbf{u}))_{\Omega}
+  -
+  (\textbf{n} \otimes \mathrm v,\varepsilon(\textbf{u}))_{\partial\Omega}
+  - (\textrm{div}\; \textbf{v}, p)_{\Omega}
+  + (\textbf{n}\cdot\textbf{v}, p)_{\partial\Omega}
+  -
+  (q,\textrm{div}\; \textbf{u})_{\Omega}
+  =
+  (\textbf{v}, \textbf{f})_\Omega,
+@f}
+where the scalar product between two tensor-valued quantities is here
+defined as
+@f{eqnarray*}
+  (\nabla \mathrm v,\varepsilon(\textbf{u}))_{\Omega}
+  =
+  \int_\Omega \sum_{i,j=1}^d \frac{\partial v_j}{\partial x_i}
+  \varepsilon(\textbf{u})_{ij} \ dx.
+@f}
+Because the scalar product between a general tensor like
+$\nabla\mathrm v$ and a symmetric tensor like
+$\varepsilon(\textbf{u})$ equals the scalar product between the
+symmetrized forms of the two, we can also write the bilinear form
+above as follows:
+@f{eqnarray*}
+  (\varepsilon(\mathrm v),\varepsilon(\textbf{u}))_{\Omega}
+  -
+  (\textbf{n} \otimes \mathrm v,\varepsilon(\textbf{u}))_{\partial\Omega}
+  - (\textrm{div}\; \textbf{v}, p)_{\Omega}
+  + (\textbf{n}\cdot\textbf{v}, p)_{\partial\Omega}
+  -
+  (q,\textrm{div}\; \textbf{u})_{\Omega}
+  =
+  (\textbf{v}, \textbf{f})_\Omega,
+@f}
+
+
+<h2>%Boundary conditions</h2>
+
+The weak form just presented immediately presents us with different
+possibilities for imposing boundary conditions:
+<ol>
+<li>Dirichlet velocity boundary conditions: On a part
+    $\Gamma_D\subset\partial\Omega$ we may impose Dirichlet conditions
+    on the velocity $\textbf u$:
+
+    @f{eqnarray*}
+        \textbf u = \textbf g_D \qquad\qquad \textrm{on}\ \Gamma_D.
+    @f}
+    Because test functions $\textbf v$ come from the tangent space of
+    the solution variable, we have that $\textbf v=0$ on $\Gamma_D$
+    and consequently that
+    @f{eqnarray*}
+      -(\textbf{n} \otimes \mathrm
+        v,\varepsilon(\textbf{u}))_{\Gamma_D}
+      +
+      (\textbf{n}\cdot\textbf{v}, p)_{\Gamma_D}
+      = 0.
+    @f}
+    In other words, as usual, strongly imposed boundary values do not
+    appear in the weak form.
+ 
+<li>Neumann-type boundary conditions: On the rest of the boundary
+    $\Gamma_N=\partial\Omega\backslash\Gamma_D$, let us re-write the
+    boundary terms as follows:
+    @f{eqnarray*}
+      -(\textbf{n} \otimes \mathrm
+        v,\varepsilon(\textbf{u}))_{\Gamma_N}
+      +
+      (\textbf{n}\cdot\textbf{v}, p)_{\Gamma_N}
+      &=&
+      \sum_{i,j=1}^d
+      -(n_i v_j,\varepsilon(\textbf{u})_{ij})_{\Gamma_N}
+      +
+      \sum_{i=1}^d 
+      (n_i v_i, p)_{\Gamma_N}	
+      \\
+      &=&
+      \sum_{i,j=1}^d
+      -(n_i v_j,\varepsilon(\textbf{u})_{ij})_{\Gamma_N}
+      +
+      \sum_{i,j=1}^d 
+      (n_i v_j, p \delta_{ij})_{\Gamma_N}	
+      \\
+      &=&
+      \sum_{i,j=1}^d
+      (n_i v_j,p \delta_{ij} - \varepsilon(\textbf{u})_{ij})_{\Gamma_N}
+      \\
+      &=&
+      (\textbf{n} \otimes \mathrm v,
+      p \textbf{1} - \varepsilon(\textbf{u}))_{\Gamma_N}.
+      \\
+      &=&
+      (\mathrm v,
+       \textbf{n}\cdot [p \textbf{1} - \varepsilon(\textbf{u})])_{\Gamma_N}.
+    @f}
+    In other words, on the Neumann part of the boundary we can
+    prescribe values for the total stress:
+    @f{eqnarray*}
+      \textbf{n}\cdot [p \textbf{1} - \varepsilon(\textbf{u})]
+      = 
+      \textbf g_N \qquad\qquad \textrm{on}\ \Gamma_N.
+    @f}
+
+</ol>
+
+
+<h2>Linear solver and preconditioning issues</h2>
 
 For this program, we have to solve the following system resulting from
 discretization of the Stokes equations:
@@ -57,7 +235,14 @@ Here, the situation is pretty much exactly the opposite. The difference stems
 from the fact that the matrix at the heart of the Schur complement does not
 stem from the identity operator but from a variant of the Laplace operator,
 $-\textrm{div} \eta \nabla^s$ (where $\nabla^s$ is the symmetric gradient)
-acting on a vector field. This has two consequences:
+acting on a vector field. In the investigation of this issue
+we largely follow the paper D. Silvester and A. Wathen:
+"Fast iterative solution of stabilised Stokes systems part II. Using
+general block preconditioners." (SIAM J. Numer. Anal., 31 (1994),
+pp. 1352-1367), which is available online <a
+href="http://siamdl.aip.org/getabs/servlet/GetabsServlet?prog=normal&id=SJNAAM000031000005001352000001&idtype=cvips&gifs=Yes" target="_top">here</a>.
+Principally, the difference in the matrix at the heart of the Schur
+complement has two consequences:
 
 <ol>
 <li>
@@ -158,4 +343,6 @@ computed using reasonable time and memory resources.
 
 SO WHAT TO DO HERE?
 
+
 </ol>
+
