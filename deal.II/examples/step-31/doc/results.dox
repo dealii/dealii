@@ -1,2 +1,83 @@
 <a name="Results"></a>
 <h1>Results</h1>
+
+
+Output in 3d:
+@code
+Refinement cycle 0
+   Number of active cells: 32
+   Number of degrees of freedom: 1356 (1275+81)
+   Assembling...
+   Computing preconditioner...
+   Solving...
+   13 CG Schur complement iterations for pressure.
+
+Refinement cycle 1
+   Number of active cells: 144
+   Number of degrees of freedom: 5088 (4827+261)
+   Assembling...
+   Computing preconditioner...
+   Solving...
+   14 CG Schur complement iterations for pressure.
+
+Refinement cycle 2
+   Number of active cells: 704
+   Number of degrees of freedom: 22406 (21351+1055)
+   Assembling...
+   Computing preconditioner...
+   Solving...
+   14 CG Schur complement iterations for pressure.
+
+Refinement cycle 3
+   Number of active cells: 3168
+   Number of degrees of freedom: 93176 (89043+4133)
+   Assembling...
+   Computing preconditioner...
+   Solving...
+   15 CG Schur complement iterations for pressure.
+
+Refinement cycle 4
+   Number of active cells: 11456
+   Number of degrees of freedom: 327808 (313659+14149)
+   Assembling...
+   Computing preconditioner...
+   Solving...
+   15 CG Schur complement iterations for pressure.
+
+Refinement cycle 5
+   Number of active cells: 45056
+   Number of degrees of freedom: 1254464 (1201371+53093)
+   Assembling...
+   Computing preconditioner...
+   Solving...
+   14 CG Schur complement iterations for pressure.
+
+Refinement cycle 6
+   Number of active cells: 170720
+   Number of degrees of freedom: 4625150 (4432407+192743)
+   Assembling...
+   Computing preconditioner...
+   Solving...
+   15 CG Schur complement iterations for pressure.
+@endcode
+
+Compute times for each iteration alone: seconds, seconds, 1 minute, 8
+minutes, 33 minutes, 3h37, 24h55
+
+Pictures
+
+@image html step-31.3d.mesh-0.png
+
+@image html step-31.3d.mesh-1.png
+
+@image html step-31.3d.mesh-2.png
+
+@image html step-31.3d.mesh-3.png
+
+@image html step-31.3d.mesh-4.png
+
+@image html step-31.3d.mesh-5.png
+
+@image html step-31.3d.mesh-6.png
+
+@image html step-31.3d.solution.png
