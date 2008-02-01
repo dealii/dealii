@@ -176,14 +176,118 @@ possibilities for imposing boundary conditions:
       = 
       \textbf g_N \qquad\qquad \textrm{on}\ \Gamma_N.
     @f}
+    If the boundary is subdivided into Dirichlet and Neumann parts
+    $\Gamma_D,\Gamma_N$, this then leads to the following weak form:
+    @f{eqnarray*}
+      (\varepsilon(\mathrm v),\varepsilon(\textbf{u}))_{\Omega}
+      - (\textrm{div}\; \textbf{v}, p)_{\Omega}
+      -
+      (q,\textrm{div}\; \textbf{u})_{\Omega}
+      =
+      (\textbf{v}, \textbf{f})_\Omega
+      -
+      (\textbf{v}, \textbf g_N)_{\Gamma_N}.
+    @f}
+    
+    
+<li>Robin-type boundary conditions: Robin boundary conditions are a mixture of
+    Dirichlet and Neumann boundary conditions. They would read 
+    @f{eqnarray*}
+      \textbf{n}\cdot [p \textbf{1} - \varepsilon(\textbf{u})]
+      = 
+      \textbf S \textbf u \qquad\qquad \textrm{on}\ \Gamma_R,
+    @f}
+    with a rank-2 tensor (matrix) $\textbf S$. The associated weak form is
+    @f{eqnarray*}
+      (\varepsilon(\mathrm v),\varepsilon(\textbf{u}))_{\Omega}
+      - (\textrm{div}\; \textbf{v}, p)_{\Omega}
+      -
+      (q,\textrm{div}\; \textbf{u})_{\Omega}
+      +
+      (\textbf S \textbf u, \textbf{v})_{\Gamma_N}
+      =
+      (\textbf{v}, \textbf{f})_\Omega.
+    @f}
 
+<li>Partial boundary conditions: It is possible to combine Dirichlet and
+    Neumann boundary conditions by only enforcing each of them for certain
+    components of the velocity. For example, one way to impose artificial
+    boundary conditions is to require that the flow is perpendicular to the
+    boundary, i.e. the tangential component $\textbf u_{\textbf t}=(\textbf
+    1-\textbf n\otimes\textbf n)\textbf u$ be zero, thereby constraining
+    $dim-1$ components of the velocity. The remaining component can be
+    constrained by requiring that the normal stress be zero, yielding the
+    following set of boundary conditions:
+    @f{eqnarray*}
+      \textbf u_{\textbf t} &=& 0,
+      \\
+      \textbf n \cdot \left(\textbf{n}\cdot [p \textbf{1} -
+      \varepsilon(\textbf{u})] \right)
+      &=& 
+      0.
+    @f}
 </ol>
+
+Despite this wealth of possibilities, we will only use Dirichlet and
+(homogenous) Neumann boundary conditions in this tutorial program.
+
+
+<h2>Discretization</h2>
+
+As developed above, the weak form of the equations with Dirichlet and Neumann
+boundary conditions on $\Gamma_D$ and $\Gamma_N$ reads like this: find
+$\textbf u\in \textbf V_g = \{\varphi \in H^1(\Omega)^d: \varphi_{\Gamma_D}=\textbf
+g_D\}, p\in Q=L^2(\Omega)$ so that
+@f{eqnarray*}
+  (\varepsilon(\mathrm v),\varepsilon(\textbf{u}))_{\Omega}
+  - (\textrm{div}\; \textbf{v}, p)_{\Omega}
+  -
+  (q,\textrm{div}\; \textbf{u})_{\Omega}
+  =
+  (\textbf{v}, \textbf{f})_\Omega
+  -
+  (\textbf{v}, \textbf g_N)_{\Gamma_N}
+@f}
+for all test functions 
+$\textbf v\in \textbf V_0 = \{\varphi \in H^1(\Omega)^d: \varphi_{\Gamma_D}=0\},q\in
+Q$.
+
+These equations represent a symmetric saddle point problem. It is well known
+that then a solution only exists if the function spaces in which we search for
+a solution have to satisfy certain conditions, typically referred to as the
+Babuska-Brezzi or Ladyzhenskaya-Babuska-Brezzi (LBB) conditions. The function
+spaces above satisfy them. However, when we discretize the equations by
+replacing the continuous variables and test functions by finite element
+functions in finite dimensional spaces $\textbf V_{g,h}\subset \textbf V_g,
+Q_h\subset Q$, we have to make sure that $\textbf V,Q$ also satisfy the LBB
+conditions. This is similar to what we had to do in @ref step_20 "step-20".
+
+For the Stokes equations, there are a number of possible choices to ensure
+that the finite element spaces are compatible with the LBB condition. A simple
+and accurate choice that we will use here is to use $\textbf u_h\in Q_{p+1}^d,
+p_h\in Q_p$, i.e. use elements one order higher for the velocities than for the
+pressures. 
+
+This then leads to the following discrete problem: find $\textbf u_h,p_h$ so
+that
+@f{eqnarray*}
+  (\varepsilon(\mathrm v_h),\varepsilon(\textbf u_h))_{\Omega}
+  - (\textrm{div}\; \textbf{v}_h, p_h)_{\Omega}
+  -
+  (q_h,\textrm{div}\; \textbf{u}_h)_{\Omega}
+  =
+  (\textbf{v}_h, \textbf{f})_\Omega
+  -
+  (\textbf{v}_h, \textbf g_N)_{\Gamma_N}
+@f}
+for all test functions $\textbf v_h, q_h$.
+
 
 
 <h2>Linear solver and preconditioning issues</h2>
 
-For this program, we have to solve the following system resulting from
-discretization of the Stokes equations:
+The weak form of the discrete equations naturally leads to the following
+linear system for the nodal values of the velocity and pressure fields:
 @f{eqnarray*}
   \left(\begin{array}{cc}
     A & B^T \\ B & 0
