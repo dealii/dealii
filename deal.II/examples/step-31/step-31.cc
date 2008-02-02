@@ -24,6 +24,7 @@
 #include <lac/solver_cg.h>
 #include <lac/precondition.h>
 #include <lac/sparse_direct.h>
+#include <lac/sparse_ilu.h>
 
 #include <grid/tria.h>
 #include <grid/grid_generator.h>
@@ -58,6 +59,23 @@
 using namespace dealii;
 
 
+template <int dim>
+struct InnerPreconditioner;
+
+template <>
+struct InnerPreconditioner<2> 
+{
+    typedef SparseDirectUMFPACK type;
+};
+
+
+template <>
+struct InnerPreconditioner<3> 
+{
+    typedef SparseILU<double> type;
+};
+
+
                                  
 template <int dim>
 class StokesProblem 
@@ -87,7 +105,7 @@ class StokesProblem
     BlockVector<double> solution;
     BlockVector<double> system_rhs;
 
-    boost::shared_ptr<SparseDirectUMFPACK> A_preconditioner;
+    boost::shared_ptr<typename InnerPreconditioner<dim>::type> A_preconditioner;
 };
 
 
@@ -266,7 +284,6 @@ double extract_p (const FEValuesBase<dim> &fe_values,
 
 
 
-
 template <class Matrix, class Preconditioner>
 class InverseMatrix : public Subscriptor
 {
@@ -275,7 +292,7 @@ class InverseMatrix : public Subscriptor
 		   const Preconditioner &preconditioner);
 
     void vmult (Vector<double>       &dst,
-                const Vector<double> &src) const;
+		const Vector<double> &src) const;
 
   private:
     const SmartPointer<const Matrix> matrix;
@@ -288,8 +305,8 @@ class InverseMatrix : public Subscriptor
 template <class Matrix, class Preconditioner>
 InverseMatrix<Matrix,Preconditioner>::InverseMatrix (const Matrix &m,
 						     const Preconditioner &preconditioner)
-                :
-                matrix (&m),
+		:
+		matrix (&m),
 		preconditioner (preconditioner)
 {}
 
@@ -321,10 +338,10 @@ class SchurComplement : public Subscriptor
 {
   public:
     SchurComplement (const BlockSparseMatrix<double> &A,
-                     const InverseMatrix<SparseMatrix<double>,Preconditioner> &Minv);
+		     const InverseMatrix<SparseMatrix<double>,Preconditioner> &Minv);
 
     void vmult (Vector<double>       &dst,
-                const Vector<double> &src) const;
+		const Vector<double> &src) const;
 
   private:
     const SmartPointer<const BlockSparseMatrix<double> > system_matrix;
@@ -338,12 +355,12 @@ class SchurComplement : public Subscriptor
 template <class Preconditioner>
 SchurComplement<Preconditioner>::
 SchurComplement (const BlockSparseMatrix<double> &A,
-                 const InverseMatrix<SparseMatrix<double>,Preconditioner> &Minv)
-                :
-                system_matrix (&A),
-                m_inverse (&Minv),
-                tmp1 (A.block(0,0).m()),
-                tmp2 (A.block(0,0).m())
+		 const InverseMatrix<SparseMatrix<double>,Preconditioner> &Minv)
+		:
+		system_matrix (&A),
+		m_inverse (&Minv),
+		tmp1 (A.block(0,0).m()),
+		tmp2 (A.block(0,0).m())
 {}
 
 
@@ -373,8 +390,14 @@ StokesProblem<dim>::StokesProblem (const unsigned int degree)
 
 template <int dim>
 void StokesProblem<dim>::setup_dofs ()
-{  
+{
+				   // release preconditioner since it
+				   // will definitely not be needed
+				   // any more after this point
+  A_preconditioner.reset ();
+  
   dof_handler.distribute_dofs (fe); 
+  DoFRenumbering::Cuthill_McKee (dof_handler);
   DoFRenumbering::component_wise (dof_handler);
 
   hanging_node_constraints.clear ();
@@ -395,23 +418,23 @@ void StokesProblem<dim>::setup_dofs ()
             << " (" << n_u << '+' << n_p <<')'
             << std::endl;
   
-  const unsigned int
-    n_couplings = dof_handler.max_couplings_between_dofs();
-
   system_matrix.clear ();
       
-  sparsity_pattern.reinit (2,2);
-  sparsity_pattern.block(0,0).reinit (n_u, n_u, n_couplings);
-  sparsity_pattern.block(1,0).reinit (n_p, n_u, n_couplings);
-  sparsity_pattern.block(0,1).reinit (n_u, n_p, n_couplings);
-  sparsity_pattern.block(1,1).reinit (n_p, n_p, n_couplings);
-  
-  sparsity_pattern.collect_sizes();    
+  {
+    BlockCompressedSparsityPattern csp;
 
+    csp.reinit (2,2);
+    csp.block(0,0).reinit (n_u, n_u);
+    csp.block(1,0).reinit (n_p, n_u);
+    csp.block(0,1).reinit (n_u, n_p);
+    csp.block(1,1).reinit (n_p, n_p);
   
-  DoFTools::make_sparsity_pattern (dof_handler, sparsity_pattern);
-  hanging_node_constraints.condense (sparsity_pattern);
-  sparsity_pattern.compress();
+    csp.collect_sizes();    
+  
+    DoFTools::make_sparsity_pattern (dof_handler, csp);
+    hanging_node_constraints.condense (csp);
+    sparsity_pattern.copy_from (csp);
+  }
   
   system_matrix.reinit (sparsity_pattern);
                                    
@@ -567,8 +590,9 @@ void StokesProblem<dim>::assemble_system ()
   std::cout << "   Computing preconditioner..." << std::flush;
       
   A_preconditioner
-    = boost::shared_ptr<SparseDirectUMFPACK>(new SparseDirectUMFPACK());
-  A_preconditioner->initialize (system_matrix.block(0,0));
+    = boost::shared_ptr<typename InnerPreconditioner<dim>::type>(new typename InnerPreconditioner<dim>::type());
+  A_preconditioner->initialize (system_matrix.block(0,0),
+				typename InnerPreconditioner<dim>::type::AdditionalData());
 
   std::cout << std::endl;
 }
@@ -578,7 +602,7 @@ void StokesProblem<dim>::assemble_system ()
 template <int dim>
 void StokesProblem<dim>::solve () 
 {
-  const InverseMatrix<SparseMatrix<double>,SparseDirectUMFPACK>
+  const InverseMatrix<SparseMatrix<double>,typename InnerPreconditioner<dim>::type>
     A_inverse (system_matrix.block(0,0), *A_preconditioner);
   Vector<double> tmp (solution.block(0).size());
   Vector<double> schur_rhs (solution.block(1).size());
@@ -588,7 +612,7 @@ void StokesProblem<dim>::solve ()
     system_matrix.block(1,0).vmult (schur_rhs, tmp);
     schur_rhs -= system_rhs.block(1);
 
-    SchurComplement<SparseDirectUMFPACK>
+    SchurComplement<typename InnerPreconditioner<dim>::type>
       schur_complement (system_matrix, A_inverse);
     
     SolverControl solver_control (system_matrix.block(0,0).m(),
@@ -720,7 +744,7 @@ void StokesProblem<dim>::run ()
   
   triangulation.refine_global (4-dim);
 
-  for (unsigned int refinement_cycle = 0; refinement_cycle<9;
+  for (unsigned int refinement_cycle = 0; refinement_cycle<7;
        ++refinement_cycle)
     {
       std::cout << "Refinement cycle " << refinement_cycle << std::endl;
@@ -750,7 +774,7 @@ int main ()
     {
       deallog.depth_console (0);
 
-      StokesProblem<2> flow_problem(1);
+      StokesProblem<3> flow_problem(1);
       flow_problem.run ();
     }
   catch (std::exception &exc)
