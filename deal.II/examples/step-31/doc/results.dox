@@ -2,6 +2,59 @@
 <h1>Results</h1>
 
 
+
+
+
+
+
+
+<TABLE WIDTH="60%" ALIGN="center">
+  <tr>
+    <td ALIGN="center">
+      @image html step-31.2d.mesh-0.png
+    </td>
+
+    <td ALIGN="center">
+      @image html step-31.2d.mesh-1.png
+    </td>
+  </tr>
+
+  <tr>
+    <td ALIGN="center">
+      @image html step-31.2d.mesh-2.png
+    </td>
+
+    <td ALIGN="center">
+      @image html step-31.2d.mesh-3.png
+    </td>
+  </tr>
+
+  <tr>
+    <td ALIGN="center">
+      @image html step-31.2d.mesh-4.png
+    </td>
+
+    <td ALIGN="center">
+      @image html step-31.2d.mesh-5.png
+    </td>
+  </tr>
+
+  <tr>
+    <td ALIGN="center">
+      @image html step-31.2d.mesh-6.png
+    </td>
+
+    <td ALIGN="center">
+    </td>
+  </tr>
+</table>
+
+@image html step-31.2d.solution.png
+
+
+
+
+
 Output in 3d:
 @code
 Refinement cycle 0
@@ -61,23 +114,57 @@ Refinement cycle 6
    15 CG Schur complement iterations for pressure.
 @endcode
 
+Note that the number of (outer) iterations does not increase as we refine the
+mesh. 
+
 Compute times for each iteration alone: seconds, seconds, 1 minute, 8
 minutes, 33 minutes, 3h37, 24h55
 
 Pictures
 
-@image html step-31.3d.mesh-0.png
+<TABLE WIDTH="60%" ALIGN="center">
+  <tr>
+    <td ALIGN="center">
+      @image html step-31.3d.mesh-0.png
+    </td>
 
-@image html step-31.3d.mesh-1.png
+    <td ALIGN="center">
+      @image html step-31.3d.mesh-1.png
+    </td>
+  </tr>
 
-@image html step-31.3d.mesh-2.png
+  <tr>
+    <td ALIGN="center">
+      @image html step-31.3d.mesh-2.png
+    </td>
 
-@image html step-31.3d.mesh-3.png
+    <td ALIGN="center">
+      @image html step-31.3d.mesh-3.png
+    </td>
+  </tr>
 
-@image html step-31.3d.mesh-4.png
+  <tr>
+    <td ALIGN="center">
+      @image html step-31.3d.mesh-4.png
+    </td>
 
-@image html step-31.3d.mesh-5.png
+    <td ALIGN="center">
+      @image html step-31.3d.mesh-5.png
+    </td>
+  </tr>
 
-@image html step-31.3d.mesh-6.png
+  <tr>
+    <td ALIGN="center">
+      @image html step-31.3d.mesh-6.png
+    </td>
+
+    <td ALIGN="center">
+    </td>
+  </tr>
+</table>
 
 @image html step-31.3d.solution.png
+
+
+
+

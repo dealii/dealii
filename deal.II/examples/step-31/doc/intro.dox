@@ -445,8 +445,27 @@ direct solver such as UMFPACK inefficient: only for problem sizes of a
 few 10,000 to maybe 100,000 unknowns can a sparse decomposition be
 computed using reasonable time and memory resources.
 
-SO WHAT TO DO HERE?
-
-
+What we do in that case is to use an incomplete LU decomposition (ILU) as a
+preconditioner, rather than actually computing complete LU factors. As it so
+happens, deal.II has a class that does this: SparseILU. Computing the ILU
+takes a time that only depends on the number of nonzero entries in the sparse
+matrix (or that we are willing to fill in the LU factors, if these should be
+more than the ones in the matrix), but is independent of the bandwidth of the
+matrix. It is therefore an operation that can efficiently also be computed in
+3d. On the other hand, an incomplete LU decomposition, by definition, does not
+represent an exact inverse of the matrix $A$. Consequently, preconditioning
+with the ILU will still require more than one iteration, unlike
+preconditioning with the sparse direct solver. The inner solver will therefore
+take more time when multiplying with the Schur complement, a tradeoff
+unavoidable.
 </ol>
 
+
+<h2>Implementation</h2>
+
+Note anything here that would be particular about this program.
+
+
+<h2>The testcase</h2>
+
+Describe the testcase we are dealing with here.
