@@ -108,8 +108,8 @@ Refinement cycle 6
 Note that the number of (outer) iterations does not increase as we refine the
 mesh. 
 
-Compute times for each iteration alone: seconds, seconds, 1 minute, 8
-minutes, 33 minutes, 3h37, 24h55
+Compute times for each iteration alone: seconds, seconds, 1 minute, 5
+minutes, 29 minutes, 3h12, 21h39
 
 Pictures
 
