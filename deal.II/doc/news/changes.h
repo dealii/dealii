@@ -233,6 +233,13 @@ constraints individually.
 
 <ol> 
 
+  <li> <p>New: The MappingQEulerian class provides an arbitrary order Eulerian
+  mapping where the nodes of a mesh are displaced by a previously computed
+  vector field.
+  <br>
+  (Joshua White 2008/02/05)
+  </p></li>
+
   <li> <p>New: The MappingQ class constructor now takes a parameter that determines
   whether a higher order mapping should also be used for interior cells. By default,
   the higher order mapping is only used for cells on the boundary; cells in the
