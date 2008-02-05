@@ -48,7 +48,7 @@ plot_shape_functions(Mapping<dim>& mapping,
   dof.distribute_dofs(finel);
   typename DoFHandler<dim>::cell_iterator c = dof.begin();
 
-  const unsigned int div = 11;
+  const unsigned int div = 4;
 
   QTrapez<1> q_trapez;
   QIterated<dim> q(q_trapez, div);
