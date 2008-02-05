@@ -233,6 +233,14 @@ constraints individually.
 
 <ol> 
 
+  <li> <p>New: The MappingQ class constructor now takes a parameter that determines
+  whether a higher order mapping should also be used for interior cells. By default,
+  the higher order mapping is only used for cells on the boundary; cells in the
+  interior are bounded by straight edges described by a (bi-, tri-)linear mapping.
+  <br>
+  (WB 2008/02/05)
+  </p></li>
+
   <li> <p>New: The function VectorTools::compute_no_normal_flux_constraints computes
   the constraints that correspond to boundary conditions of the
   form $\vec u \cdot \vec n = 0$. The use of the function is demonstrated in the

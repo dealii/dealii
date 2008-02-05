@@ -2,7 +2,7 @@
 //    $Id$
 //    Version: $Name$
 //
-//    Copyright (C) 2001, 2002, 2003, 2004, 2005, 2006, 2007 by the deal.II authors
+//    Copyright (C) 2001, 2002, 2003, 2004, 2005, 2006, 2007, 2008 by the deal.II authors
 //
 //    This file is subject to QPL and may not be  distributed
 //    without copyright and license information. Please refer
@@ -45,8 +45,30 @@ class MappingQ : public MappingQ1<dim>
 				      * Constructor.  @p p gives the
 				      * degree of mapping polynomials
 				      * on boundary cells.
+				      *
+				      * The second argument determines
+				      * whether the higher order
+				      * mapping should also be used on
+				      * interior cells. If its value
+				      * is <code>false</code> (the
+				      * default), the a lower-order
+				      * mapping is used in the
+				      * interior. This is sufficient
+				      * for most cases where higher
+				      * order mappings are only used
+				      * to better approximate the
+				      * boundary. In that case, cells
+				      * bounded by straight lines are
+				      * acceptable in the
+				      * interior. However, there are
+				      * cases where one would also
+				      * like to use a higher order
+				      * mapping in the interior. The
+				      * MappingQEulerian class is one
+				      * such case.
 				      */
-    MappingQ (const unsigned int p);
+    MappingQ (const unsigned int p,
+	      const bool use_mapping_q_on_all_cells = false);
 
 				     /**
 				      * Copy constructor. Performs a
@@ -512,16 +534,8 @@ class MappingQ : public MappingQ1<dim>
 				      * then @p MappingQ is used on
 				      * all cells, not only on
 				      * boundary cells.
-				      *
-				      * The default value is false.
-				      *
-				      * This flag is kept in the
-				      * implementation to allow a fast
-				      * switch between the two cases,
-				      * as someone might want to do
-				      * some comparative tests.
 				      */
-    static const bool use_mapping_q_on_all_cells = false;
+    const bool use_mapping_q_on_all_cells;
 };
 
 /*@}*/
@@ -530,7 +544,8 @@ class MappingQ : public MappingQ1<dim>
 
 #ifndef DOXYGEN
 
-template<> MappingQ<1>::MappingQ (const unsigned int);
+template<> MappingQ<1>::MappingQ (const unsigned int,
+				  const bool);
 template<> MappingQ<1>::~MappingQ ();
 template<> void MappingQ<1>::compute_shapes_virtual (
   const std::vector<Point<1> > &unit_points,

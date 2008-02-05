@@ -32,16 +32,12 @@
 DEAL_II_NAMESPACE_OPEN
 
 
-template <int dim>
-const bool MappingQ<dim>::use_mapping_q_on_all_cells;
-
-
 template<int dim>
 MappingQ<dim>::InternalData::InternalData (const unsigned int n_shape_functions)
 		:
 		MappingQ1<dim>::InternalData(n_shape_functions),
-				use_mapping_q1_on_current_cell(false),
-				mapping_q1_data(1 << dim)
+                use_mapping_q1_on_current_cell(false),
+		mapping_q1_data(1 << dim)
 {
   this->is_mapping_q1_data=false;
 }
@@ -65,25 +61,28 @@ MappingQ<dim>::InternalData::memory_consumption () const
 // in 1d, it is irrelevant which polynomial degree to use, since all
 // cells are scaled linearly
 template<>
-MappingQ<1>::MappingQ (const unsigned int):
+MappingQ<1>::MappingQ (const unsigned int,
+		       const bool use_mapping_q_on_all_cells):
 		degree(1),
 		n_inner(0),
 		n_outer(0),
 		tensor_pols(0),
 		n_shape_functions(2),
-		renumber(0)
+		renumber(0),
+		use_mapping_q_on_all_cells (false)
 {}
 
 
 template<>
-MappingQ<1>::MappingQ (const MappingQ<1> &):
+MappingQ<1>::MappingQ (const MappingQ<1> &m):
 		MappingQ1<1> (),
 		degree(1),
 		n_inner(0),
 		n_outer(0),
 		tensor_pols(0),
 		n_shape_functions(2),
-		renumber(0)
+		renumber(0),
+		use_mapping_q_on_all_cells (m.use_mapping_q_on_all_cells)
 {}
 
 
@@ -96,7 +95,8 @@ MappingQ<1>::~MappingQ ()
 
 
 template<int dim>
-MappingQ<dim>::MappingQ (const unsigned int p)
+MappingQ<dim>::MappingQ (const unsigned int p,
+			 const bool use_mapping_q_on_all_cells)
                 :
 		degree(p),
 		n_inner(Utilities::fixed_power<dim>(degree-1)),
@@ -104,7 +104,8 @@ MappingQ<dim>::MappingQ (const unsigned int p)
 			:8+12*(degree-1)+6*(degree-1)*(degree-1)),
 		tensor_pols(0),
 		n_shape_functions(Utilities::fixed_power<dim>(degree+1)),
-		renumber(0)
+		renumber(0),
+		use_mapping_q_on_all_cells (use_mapping_q_on_all_cells)
 {
 				   // Construct the tensor product
 				   // polynomials used as shape
@@ -150,14 +151,16 @@ MappingQ<dim>::MappingQ (const unsigned int p)
 
 
 template<int dim>
-MappingQ<dim>::MappingQ (const MappingQ<dim> &mapping):
+MappingQ<dim>::MappingQ (const MappingQ<dim> &mapping)
+		:
 		MappingQ1<dim>(),
-  degree(mapping.degree),
-  n_inner(mapping.n_inner),
-  n_outer(n_outer),
-  tensor_pols(0),
-  n_shape_functions(mapping.n_shape_functions),
-  renumber(mapping.renumber)
+		degree(mapping.degree),
+		n_inner(mapping.n_inner),
+		n_outer(n_outer),
+		tensor_pols(0),
+		n_shape_functions(mapping.n_shape_functions),
+		renumber(mapping.renumber),
+		use_mapping_q_on_all_cells (mapping.use_mapping_q_on_all_cells)
 {
   tensor_pols=new TensorProductPolynomials<dim> (*mapping.tensor_pols);
   laplace_on_quad_vector=mapping.laplace_on_quad_vector;
