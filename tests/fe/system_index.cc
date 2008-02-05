@@ -147,8 +147,8 @@ int
 main()
 {
   std::ofstream logfile ("system_index/output");
-  logfile.precision (PRECISION);
-  logfile.setf(std::ios::fixed);  
+  deallog << std::setprecision(PRECISION);
+  deallog << std::fixed;  
   deallog.attach(logfile);
   deallog.depth_console(0);
   deallog.threshold_double(1.e-10);

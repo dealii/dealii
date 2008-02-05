@@ -2,7 +2,7 @@
 //    $Id: injection_common.cc 12732 2006-03-28 23:15:45Z wolf $
 //    Version: $Name$ 
 //
-//    Copyright (C) 2006, 2007 by the deal.II authors
+//    Copyright (C) 2006, 2007, 2008 by the deal.II authors
 //
 //    This file is subject to QPL and may not be  distributed
 //    without copyright and license information. Please refer
@@ -116,7 +116,7 @@ void do_check (const FiniteElement<dim> &coarse_fe,
 int main ()
 {
   std::ofstream logfile(logname);
-  logfile.precision (3);
+  deallog << std::setprecision (3);
   
   deallog.attach(logfile);
   deallog.depth_console(0);

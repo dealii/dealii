@@ -2,7 +2,7 @@
 //    rtn_2.cc,v 1.3 2003/06/09 16:00:38 wolf Exp
 //    Version: 
 //
-//    Copyright (C) 2003, 2005, 2006 by the deal.II authors
+//    Copyright (C) 2003, 2005, 2006, 2008 by the deal.II authors
 //
 //    This file is subject to QPL and may not be  distributed
 //    without copyright and license information. Please refer
@@ -72,8 +72,7 @@ int
 main()
 {
   std::ofstream logfile ("rtn_2/output");
-  logfile.precision (PRECISION);
-  logfile.setf(std::ios::fixed);  
+  deallog << std::setprecision(PRECISION) << std::fixed;
   deallog.attach(logfile);
   deallog.depth_console(0);
   deallog.threshold_double(1.e-10);

@@ -1,5 +1,5 @@
 // mapping.cc,v 1.19 2004/01/30 09:56:19 hartmann Exp
-// Copyright (C) 2001, 2002, 2003, 2004, 2005, 2006 Ralf Hartmann
+// Copyright (C) 2001, 2002, 2003, 2004, 2005, 2006, 2008 Ralf Hartmann
 //
 // Shows the shape functions implemented and computes the area of cells.
 
@@ -21,8 +21,8 @@
 #include <fe/fe.h>
 #include <vector>
 #include <fstream>
+#include <iomanip>
 #include <string>
-
 #include <sstream>
 
 #define PRECISION 2
@@ -556,7 +556,7 @@ void mapping_test()
 int main()
 {
   std::ofstream logfile ("mapping/output");
-  logfile.precision (PRECISION);
+  deallog << std::setprecision(PRECISION);
   deallog.attach(logfile);
   deallog.depth_console(0);
   deallog.threshold_double(1.e-10);

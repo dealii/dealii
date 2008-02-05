@@ -125,8 +125,8 @@ int
 main()
 {
   std::ofstream logfile ("check_derivatives/output");
-  logfile.precision (2);
-  logfile.setf(std::ios::fixed);  
+  deallog << std::setprecision(2);
+  deallog << std::fixed;  
   deallog.attach(logfile);
   deallog.depth_console(0);
 

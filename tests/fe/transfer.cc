@@ -78,7 +78,7 @@ main()
 {
   std::ofstream logfile("transfer/output");
   deallog.attach(logfile);
-  logfile.precision(3);
+  deallog << std::setprecision(3);
   deallog.depth_console(0);
   deallog.threshold_double(1.e-10);
   

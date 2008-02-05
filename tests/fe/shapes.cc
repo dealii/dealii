@@ -669,8 +669,7 @@ int
 main()
 {
   std::ofstream logfile ("shapes/output");
-  logfile.precision (PRECISION);
-  logfile.setf(std::ios::fixed);
+  deallog << std::setprecision(PRECISION) << std::fixed;
   deallog.attach(logfile);
   deallog.depth_console(0);
   deallog.threshold_double(1.e-10);

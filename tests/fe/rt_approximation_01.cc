@@ -2,7 +2,7 @@
 //    rt_approximation_01.cc,v 1.3 2003/06/09 16:00:38 wolf Exp
 //    Version: 
 //
-//    Copyright (C) 2003, 2005, 2006, 2007 by the deal.II authors
+//    Copyright (C) 2003, 2005, 2006, 2007, 2008 by the deal.II authors
 //
 //    This file is subject to QPL and may not be  distributed
 //    without copyright and license information. Please refer
@@ -431,8 +431,10 @@ double TestProjection (Mapping<2> &mapping,
 
 int main ()
 {
-  logfile.precision (PRECISION);
-  logfile.setf(std::ios::fixed);  
+  deallog << std::setprecision(PRECISION);
+  deallog << std::fixed;
+  logfile << std::setprecision(PRECISION);
+  logfile << std::fixed;
   deallog.attach(logfile);
   deallog.depth_console(0);
   deallog.threshold_double(1.e-10);
