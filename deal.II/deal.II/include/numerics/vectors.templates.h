@@ -2250,6 +2250,11 @@ VectorTools::compute_no_normal_flux_constraints (const DH<dim>         &dof_hand
       if (p == dof_to_normals_map.end())
 	same_dof_range[1] = dof_to_normals_map.end();
 
+      for (unsigned int i=0; i<2; ++i)
+	for (unsigned int d=0; d<dim; ++d)
+	  Assert (same_dof_range[i]->first.dof_indices[d] < dof_handler.n_dofs(),
+		  ExcInternalError());
+
 				       // now compute the reverse mapping: for
 				       // each of the cells that contributed
 				       // to the current set of vector dofs,
