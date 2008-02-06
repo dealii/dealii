@@ -2,7 +2,7 @@
 //    $Id$
 //    Version: $Name$ 
 //
-//    Copyright (C) 2005, 2006, 2007 by the deal.II authors
+//    Copyright (C) 2005, 2006, 2007, 2008 by the deal.II authors
 //
 //    This file is subject to QPL and may not be  distributed
 //    without copyright and license information. Please refer
@@ -732,7 +732,7 @@ run_simulation (LaplaceSolver::Base<dim>                     &solver,
 	};
 
 
-      if (solver.n_dofs() < 20000)
+      if (solver.n_dofs() < 2000)
 	solver.refine_grid ();
       else
 	break;
@@ -800,6 +800,7 @@ int main ()
   try
     {
       logfile.precision(2);
+      deallog << std::setprecision(2);
   
       deallog.attach(logfile);
       deallog.depth_console(0);

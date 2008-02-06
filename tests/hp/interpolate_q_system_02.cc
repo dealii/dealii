@@ -2,7 +2,7 @@
 //    $Id$
 //    Version: $Name$ 
 //
-//    Copyright (C) 2006 by the deal.II authors
+//    Copyright (C) 2006, 2008 by the deal.II authors
 //
 //    This file is subject to QPL and may not be  distributed
 //    without copyright and license information. Please refer
@@ -124,6 +124,7 @@ int main ()
 {
   std::ofstream logfile("interpolate_q_system_02/output");
   logfile.precision (3);
+  deallog << std::setprecision(3);
   
   deallog.attach(logfile);
   deallog.depth_console(0);

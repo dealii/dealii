@@ -2,7 +2,7 @@
 //    $Id$
 //    Version: $Name$ 
 //
-//    Copyright (C) 2005, 2006, 2007 by the deal.II authors
+//    Copyright (C) 2005, 2006, 2007, 2008 by the deal.II authors
 //
 //    This file is subject to QPL and may not be  distributed
 //    without copyright and license information. Please refer
@@ -547,7 +547,7 @@ void HelmholtzProblem<dim>::run ()
       data_out.add_data_vector (solution, "solution");
 
       data_out.build_patches ((*fe)[0].degree);
-      data_out.write_gmv (deallog.get_file_stream());
+//      data_out.write_gmv (deallog.get_file_stream());
     }
   
   
@@ -657,6 +657,7 @@ void HelmholtzProblem<dim>::run ()
 int main () 
 {
   logfile.precision(2);
+  deallog << std::setprecision(2);
   
   deallog.attach(logfile);
   deallog.depth_console(0);
