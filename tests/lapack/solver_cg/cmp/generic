@@ -71,5 +71,3 @@ DEAL:ssor:cg::Condition number estimate: 5.715
 DEAL:ssor:cg::Condition number estimate: 5.718
 DEAL:ssor:cg::Convergence step 8 value 0.0005816
 DEAL:ssor:cg:: 0.1457 0.3791 0.4599 0.5650 0.6652 0.7548 0.8330
-DEAL::GrowingVectorMemory:Overall allocated vectors: 32
-DEAL::GrowingVectorMemory:Maximum allocated vectors: 4
