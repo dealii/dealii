@@ -751,28 +751,53 @@ class VectorTools
 				      * so the function throws an
 				      * exception in that case.
 				      *
-				      * The second argument of this function
-				      * denotes the first vector component in
-				      * the finite element that corresponds to
-				      * the vector function that you want to
-				      * constrain. For example, if we were
-				      * solving a Stokes equation in 2d and
-				      * the finite element had components
+				      * The second argument of this
+				      * function denotes the first
+				      * vector component in the finite
+				      * element that corresponds to
+				      * the vector function that you
+				      * want to constrain. For
+				      * example, if we were solving a
+				      * Stokes equation in 2d and the
+				      * finite element had components
 				      * $(u,v,p)$, then @p
-				      * first_vector_component would be
-				      * zero. On the other hand, if we solved
-				      * the Maxwell equations in 3d and the
-				      * finite element has components
-				      * $(E_x,E_y,E_z,B_x,B_y,B_z)$ and we
-				      * want the boundary condition $\vec
-				      * n\cdot \vec B=0$, then @p
-				      * first_vector_component would be
-				      * 3. Vectors are implicitly assumed to
-				      * have exactly <code>dim</code>
-				      * components that are ordered in the
-				      * same way as we usually order the
-				      * coordinate directions, i.e. $x$-,
-				      * $y$-, and finally $z$-component.
+				      * first_vector_component would
+				      * be zero. On the other hand, if
+				      * we solved the Maxwell
+				      * equations in 3d and the finite
+				      * element has components
+				      * $(E_x,E_y,E_z,B_x,B_y,B_z)$
+				      * and we want the boundary
+				      * condition $\vec n\cdot \vec
+				      * B=0$, then @p
+				      * first_vector_component would
+				      * be 3. Vectors are implicitly
+				      * assumed to have exactly
+				      * <code>dim</code> components
+				      * that are ordered in the same
+				      * way as we usually order the
+				      * coordinate directions,
+				      * i.e. $x$-, $y$-, and finally
+				      * $z$-component. The function
+				      * assumes, but can't check, that
+				      * the vector components in the
+				      * range
+				      * <code>[first_vector_component,first_vector_component+dim)</code>
+				      * come from the same base finite
+				      * element. For example, in the
+				      * Stokes example above, it would
+				      * not make sense to use a
+				      * <code>FESystem@<dim@>(FE_Q@<dim@>(2),
+				      * 1, FE_Q@<dim@>(1), dim)</code>
+				      * (note that the first velocity
+				      * vector component is a $Q_2$
+				      * element, whereas all the other
+				      * ones are $Q_1$ elements) as
+				      * there would be points on the
+				      * boundary where the
+				      * $x$-velocity is defined but no
+				      * corresponding $y$- or
+				      * $z$-velocities.
 				      *
 				      * The third argument denotes the set of
 				      * boundary indicators on which the
