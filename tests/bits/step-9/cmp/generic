@@ -85,7 +85,7 @@ DEAL::Cycle 1:
 DEAL::   Number of active cells:       43
 DEAL::   Number of degrees of freedom: 66
 DEAL:Bicgstab::Starting value 0.69
-DEAL:Bicgstab::Convergence step 34 value 0
+DEAL:Bicgstab::Convergence step 35 value 0
 %!PS-Adobe-2.0 EPSF-1.2
 %%Title: deal.II Output
 %%Creator: the deal.II library
