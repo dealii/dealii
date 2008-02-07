@@ -58,8 +58,8 @@ SupportQuadrature (const unsigned int map_degree)
 				   // on the unit cell in lexicographic order.
 				   // for this purpose we can use an interated
 				   // trapezoidal quadrature rule.
-
-  QIterated<dim> q_iterated(QTrapez<1>(),map_degree);
+  QTrapez<1> q1d;
+  QIterated<dim> q_iterated(q1d,map_degree);
   const unsigned int n_q_points = q_iterated.n_quadrature_points;
 
 				   // we then need to define a renumbering 
