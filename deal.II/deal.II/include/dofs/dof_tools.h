@@ -2,7 +2,7 @@
 //    $Id$
 //    Version: $Name$
 //
-//    Copyright (C) 1999, 2000, 2001, 2002, 2003, 2004, 2005, 2006, 2007 by the deal.II authors
+//    Copyright (C) 1999, 2000, 2001, 2002, 2003, 2004, 2005, 2006, 2007, 2008 by the deal.II authors
 //
 //    This file is subject to QPL and may not be  distributed
 //    without copyright and license information. Please refer
@@ -1201,7 +1201,7 @@ class DoFTools
     template <int dim>
     static void
     count_dofs_per_block (const DoFHandler<dim>&     dof_handler,
-			  std::vector<unsigned int>& dofs_per_component,
+			  std::vector<unsigned int>& dofs_per_block,
 			  std::vector<unsigned int>  target_block
 			  = std::vector<unsigned int>());
     

@@ -309,7 +309,8 @@ class PointerMatrixAux : public PointerMatrixBase<VECTOR>
 
 				     /**
 				      * Assign a new VectorMemory
-				     object for getting auxiliary vectors.
+				      * object for getting auxiliary
+				      * vectors.
 				      */
     void set_memory(VectorMemory<VECTOR>* mem);
     
