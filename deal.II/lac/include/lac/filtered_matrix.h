@@ -2,7 +2,7 @@
 //    $Id$
 //    Version: $Name$
 //
-//    Copyright (C) 2001, 2002, 2003, 2004, 2005, 2006, 2007 by the deal.II authors
+//    Copyright (C) 2001, 2002, 2003, 2004, 2005, 2006, 2007, 2008 by the deal.II authors
 //
 //    This file is subject to QPL and may not be  distributed
 //    without copyright and license information. Please refer
@@ -72,7 +72,7 @@ template <typename number> class Vector;
  *
  *                     // initialize filtered matrix with
  *                     // matrix and boundary value constraints
- *   FilteredMatrix<SparseMatrix<double> > filtered_A (A);
+ *   FilteredMatrix<Vector<double> > filtered_A (A);
  *   filtered_A.add_constraints (boundary_values);
  *
  *                     // set up a linear solver
@@ -81,14 +81,16 @@ template <typename number> class Vector;
  *   SolverCG<Vector<double> > solver (control, mem);
  *
  *                     // set up a preconditioner object
- *   PreconditionJacobi<FilteredMatrix<SparseMatrix<double> > > prec;
+ *   PreconditionJacobi<SparseMatrix<double> > prec;
  *   prec.initialize (filtered_A, 1.2);
+ *   FilteredMatrix<Vector<double> > filtered_prec (prec);
+ *   filtered_prec.add_constraints (boundary_values);
  *
  *                     // compute modification of right hand side
  *   filtered_A.apply_constraints (b, true);
  *
  *                     // solve for solution vector x
- *   solver.solve (filtered_A, x, b, prec);
+ *   solver.solve (filtered_A, x, b, filtered_prec);
  * @endverbatim
  *
  * <h3>Connection to other classes</h3>
@@ -101,7 +103,7 @@ template <typename number> class Vector;
  * hand side and one set of boundary values since the modification of
  * the right hand side depends on the original matrix.
  *
- * While this is fine (and the recommended way) in cases where only
+ * While this is a feasible method in cases where only
  * one solution of the linear system is required, for example in
  * solving linear stationary systems, one would often like to have the
  * ability to solve multiply with the same matrix in nonlinear
@@ -194,16 +196,9 @@ template <typename number> class Vector;
  * The functions that operate as a matrix and do not change the
  * internal state of this object are synchronised and thus
  * threadsafe. You need not serialize calls to @p vmult or
- * @p residual therefore. Because these functions require the use of
- * a temporary, they block mutual execution, however. It is necessary
- * to allocate this temporary vector in class space since otherwise we
- * would have to allocate such a vector each time one of the member
- * functions is called (which may be very often for slowly converging
- * linear systems), which would be a serious performance
- * bottleneck. If you don't want this serialization of operations, you
- * have to use several objects of this type.
+ * @p residual therefore.
  *
- * @author Wolfgang Bangerth 2001, Luca Heltai 2006, Guido Kanschat 2007
+ * @author Wolfgang Bangerth 2001, Luca Heltai 2006, Guido Kanschat 2007, 2008
  */
 template <class VECTOR>
 class FilteredMatrix : public Subscriptor
@@ -641,28 +636,6 @@ class FilteredMatrix : public Subscriptor
 				      * fixed.
 				      */
     std::vector<IndexValuePair> constraints;
-
-				     /**
-				      * Vector to be used as temporary
-				      * storage. Since memory
-				      * allocation is expensive, we do
-				      * not want to allocate temporary
-				      * vectors in each call to
-				      * matrix-vector function, so we
-				      * rather allocate it only once
-				      * and then reuse it over and
-				      * over again. Note that in a
-				      * multithreaded environment, we
-				      * have to synchronise access to
-				      * this vector.
-				      */
-    mutable VECTOR tmp_vector;
-
-				     /**
-				      * Mutex used to synchronise use
-				      * of the temporary vector.
-				      */
-    mutable Threads::ThreadMutex tmp_mutex;
     
 				     /**
 				      * Do the pre-filtering step,
@@ -963,18 +936,23 @@ FilteredMatrix<VECTOR>::
 apply_constraints (VECTOR     &v,
 		   const bool  /* matrix_is_symmetric */) const
 {
-    tmp_vector.reinit(v);
-    const_index_value_iterator       i = constraints.begin();
-    const const_index_value_iterator e = constraints.end();
-    for (; i!=e; ++i)
-	tmp_vector(i->first) = -i->second;
-
-    // This vmult is without bc, to get the rhs correction in a correct way.
-    matrix->vmult_add(v, tmp_vector);
-
-    // finally set constrained entries themselves
-    for (i=constraints.begin(); i!=e; ++i)
-	v(i->first) = i->second;
+  GrowingVectorMemory<VECTOR> mem;
+  VECTOR* tmp_vector = mem.alloc();
+  tmp_vector->reinit(v);
+  const_index_value_iterator       i = constraints.begin();
+  const const_index_value_iterator e = constraints.end();
+  for (; i!=e; ++i)
+    (*tmp_vector)(i->first) = -i->second;
+  
+				   // This vmult is without bc, to get
+				   // the rhs correction in a correct
+				   // way.
+  matrix->vmult_add(v, *tmp_vector);
+  mem.free(tmp_vector);
+				   // finally set constrained
+				   // entries themselves
+  for (i=constraints.begin(); i!=e; ++i)
+    v(i->first) = i->second;
 }
 
 
@@ -1017,16 +995,16 @@ FilteredMatrix<VECTOR>::vmult (VECTOR& dst, const VECTOR& src) const
 {
   if (!expect_constrained_source)
     {
-      tmp_mutex.acquire ();
+      GrowingVectorMemory<VECTOR> mem;
+      VECTOR* tmp_vector = mem.alloc();
 				       // first copy over src vector and
 				       // pre-filter
-      tmp_vector.reinit(src, true);
-      tmp_vector = src;
-      pre_filter (tmp_vector);
+      tmp_vector->reinit(src, true);
+      *tmp_vector = src;
+      pre_filter (*tmp_vector);
 				       // then let matrix do its work
-      matrix->vmult (dst, tmp_vector);
-				       // tmp_vector now no more needed
-      tmp_mutex.release ();
+      matrix->vmult (dst, *tmp_vector);
+      mem.free(tmp_vector);
     }
   else
     {
@@ -1046,16 +1024,16 @@ FilteredMatrix<VECTOR>::Tvmult (VECTOR& dst, const VECTOR& src) const
 {
   if (!expect_constrained_source)
     {
-      tmp_mutex.acquire ();
+      GrowingVectorMemory<VECTOR> mem;
+      VECTOR* tmp_vector = mem.alloc();
 				       // first copy over src vector and
 				       // pre-filter
-      tmp_vector.reinit(src, true);
-      tmp_vector = src;
-      pre_filter (tmp_vector);
+      tmp_vector->reinit(src, true);
+      *tmp_vector = src;
+      pre_filter (*tmp_vector);
 				       // then let matrix do its work
-      matrix->Tvmult (dst, tmp_vector);
-				       // tmp_vector now no more needed
-      tmp_mutex.release ();
+      matrix->Tvmult (dst, *tmp_vector);
+      mem.free(tmp_vector);
     }
   else
     {
@@ -1075,16 +1053,16 @@ FilteredMatrix<VECTOR>::vmult_add (VECTOR& dst, const VECTOR& src) const
 {
   if (!expect_constrained_source)
     {
-      tmp_mutex.acquire ();
+      GrowingVectorMemory<VECTOR> mem;
+      VECTOR* tmp_vector = mem.alloc();
 				       // first copy over src vector and
 				       // pre-filter
-      tmp_vector.reinit(src, true);
-      tmp_vector = src;
-      pre_filter (tmp_vector);
+      tmp_vector->reinit(src, true);
+      *tmp_vector = src;
+      pre_filter (*tmp_vector);
 				       // then let matrix do its work
-      matrix->vmult_add (dst, tmp_vector);
-				       // tmp_vector now no more needed
-      tmp_mutex.release ();
+      matrix->vmult_add (dst, *tmp_vector);
+      mem.free(tmp_vector);
     }
   else
     {
@@ -1104,16 +1082,16 @@ FilteredMatrix<VECTOR>::Tvmult_add (VECTOR& dst, const VECTOR& src) const
 {
   if (!expect_constrained_source)
     {
-      tmp_mutex.acquire ();
+      GrowingVectorMemory<VECTOR> mem;
+      VECTOR* tmp_vector = mem.alloc();
 				       // first copy over src vector and
 				       // pre-filter
-      tmp_vector.reinit(src, true);
-      tmp_vector = src;
-      pre_filter (tmp_vector);
+      tmp_vector->reinit(src, true);
+      *tmp_vector = src;
+      pre_filter (*tmp_vector);
 				       // then let matrix do its work
-      matrix->Tvmult_add (dst, tmp_vector);
-				       // tmp_vector now no more needed
-      tmp_mutex.release ();
+      matrix->Tvmult_add (dst, *tmp_vector);
+      mem.free(tmp_vector);
     }
   else
     {
@@ -1132,15 +1110,10 @@ unsigned int
 FilteredMatrix<VECTOR>::memory_consumption () const
 {
     return (MemoryConsumption::memory_consumption (matrix) +
-	    MemoryConsumption::memory_consumption (constraints) +
-	    MemoryConsumption::memory_consumption (tmp_vector));
+	    MemoryConsumption::memory_consumption (constraints));
 }
 
 
-
-
-
-/*----------------------------   filtered_matrix.h     ---------------------------*/
 
 DEAL_II_NAMESPACE_CLOSE
 
