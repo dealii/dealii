@@ -73,7 +73,9 @@ tests_x = block_matrices \
 	union_triangulation \
 	create_* \
 	line_coarsening_3d \
-	no_flux_*
+	no_flux_* \
+	rt_hessian \
+	rt_covariant
 
 # from above list of regular expressions, generate the real set of
 # tests
