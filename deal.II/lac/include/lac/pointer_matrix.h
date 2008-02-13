@@ -554,7 +554,7 @@ template <typename number> class TridiagonalMatrix;
  */
 template <typename numberv>
 PointerMatrixBase<Vector<numberv> >*
-new_pointer_matrix_base(IdentityMatrix& matrix, const Vector<numberv>&, const char* name = "PointerMatrix")
+new_pointer_matrix_base(const IdentityMatrix& matrix, const Vector<numberv>&, const char* name = "PointerMatrix")
 {
   return new PointerMatrix<IdentityMatrix, Vector<numberv> >(&matrix, name);
 }
@@ -568,7 +568,7 @@ new_pointer_matrix_base(IdentityMatrix& matrix, const Vector<numberv>&, const ch
  */
 template <typename numberv, typename numberm>
 PointerMatrixBase<Vector<numberv> >*
-new_pointer_matrix_base(FullMatrix<numberm>& matrix, const Vector<numberv>&, const char* name = "PointerMatrix")
+new_pointer_matrix_base(const FullMatrix<numberm>& matrix, const Vector<numberv>&, const char* name = "PointerMatrix")
 {
   return new PointerMatrix<FullMatrix<numberm>, Vector<numberv> >(&matrix, name);
 }
@@ -582,7 +582,7 @@ new_pointer_matrix_base(FullMatrix<numberm>& matrix, const Vector<numberv>&, con
  */
 template <typename numberv, typename numberm>
 PointerMatrixBase<Vector<numberv> >*
-new_pointer_matrix_base(LAPACKFullMatrix<numberm>& matrix, const Vector<numberv>&, const char* name = "PointerMatrix")
+new_pointer_matrix_base(const LAPACKFullMatrix<numberm>& matrix, const Vector<numberv>&, const char* name = "PointerMatrix")
 {
   return new PointerMatrix<LAPACKFullMatrix<numberm>, Vector<numberv> >(&matrix, name);
 }
@@ -596,7 +596,7 @@ new_pointer_matrix_base(LAPACKFullMatrix<numberm>& matrix, const Vector<numberv>
  */
 template <typename numberv, typename numberm>
 PointerMatrixBase<Vector<numberv> >*
-new_pointer_matrix_base(SparseMatrix<numberm>& matrix, const Vector<numberv>&, const char* name = "PointerMatrix")
+new_pointer_matrix_base(const SparseMatrix<numberm>& matrix, const Vector<numberv>&, const char* name = "PointerMatrix")
 {
   return new PointerMatrix<SparseMatrix<numberm>, Vector<numberv> >(&matrix, name);
 }
@@ -610,7 +610,7 @@ new_pointer_matrix_base(SparseMatrix<numberm>& matrix, const Vector<numberv>&, c
  */
 template <class VECTOR, typename numberm>
 PointerMatrixBase<VECTOR>*
-new_pointer_matrix_base(BlockSparseMatrix<numberm>& matrix, const VECTOR&, const char* name = "PointerMatrix")
+new_pointer_matrix_base(const BlockSparseMatrix<numberm>& matrix, const VECTOR&, const char* name = "PointerMatrix")
 {
   return new PointerMatrix<BlockSparseMatrix<numberm>, VECTOR>(&matrix, name);
 }
@@ -624,7 +624,7 @@ new_pointer_matrix_base(BlockSparseMatrix<numberm>& matrix, const VECTOR&, const
  */
 template <typename numberv, typename numberm>
 PointerMatrixBase<Vector<numberv> >*
-new_pointer_matrix_base(SparseMatrixEZ<numberm>& matrix, const Vector<numberv>&, const char* name = "PointerMatrix")
+new_pointer_matrix_base(const SparseMatrixEZ<numberm>& matrix, const Vector<numberv>&, const char* name = "PointerMatrix")
 {
   return new PointerMatrix<SparseMatrixEZ<numberm>, Vector<numberv> >(&matrix, name);
 }
@@ -638,7 +638,7 @@ new_pointer_matrix_base(SparseMatrixEZ<numberm>& matrix, const Vector<numberv>&,
  */
 template <class VECTOR, typename numberm>
 PointerMatrixBase<VECTOR>*
-new_pointer_matrix_base(BlockSparseMatrixEZ<numberm>& matrix, const VECTOR&, const char* name = "PointerMatrix")
+new_pointer_matrix_base(const BlockSparseMatrixEZ<numberm>& matrix, const VECTOR&, const char* name = "PointerMatrix")
 {
   return new PointerMatrix<BlockSparseMatrixEZ<numberm>, VECTOR>(&matrix, name);
 }
@@ -652,7 +652,7 @@ new_pointer_matrix_base(BlockSparseMatrixEZ<numberm>& matrix, const VECTOR&, con
  */
 template <typename numberv, typename numberm>
 PointerMatrixBase<BlockVector<numberv> >*
-new_pointer_matrix_base(BlockMatrixArray<numberm>& matrix, const BlockVector<numberv>&, const char* name = "PointerMatrix")
+new_pointer_matrix_base(const BlockMatrixArray<numberm>& matrix, const BlockVector<numberv>&, const char* name = "PointerMatrix")
 {
   return new PointerMatrix<BlockMatrixArray<numberm>, BlockVector<numberv> >(&matrix, name);
 }
@@ -666,7 +666,7 @@ new_pointer_matrix_base(BlockMatrixArray<numberm>& matrix, const BlockVector<num
  */
 template <typename numberv, typename numberm>
 PointerMatrixBase<Vector<numberv> >*
-new_pointer_matrix_base(TridiagonalMatrix<numberm>& matrix, const Vector<numberv>&, const char* name = "PointerMatrix")
+new_pointer_matrix_base(const TridiagonalMatrix<numberm>& matrix, const Vector<numberv>&, const char* name = "PointerMatrix")
 {
   return new PointerMatrix<TridiagonalMatrix<numberm>, Vector<numberv> >(&matrix, name);
 }
