@@ -27,6 +27,7 @@
 DEAL_II_NAMESPACE_OPEN
 
 template <typename number> class Vector;
+template <class VECTOR> class FilteredMatrixBlock;
 
 
 /*! @addtogroup Matrix2
@@ -347,7 +348,7 @@ class FilteredMatrix : public Subscriptor
 				      * Default constructor. You will
 				      * have to set the matrix to be
 				      * used later using
-				      * set_referenced_matrix().
+				      * initialize().
 				      */
     FilteredMatrix ();
 
@@ -478,30 +479,21 @@ class FilteredMatrix : public Subscriptor
 
 				     /**
 				      * Matrix-vector multiplication:
-				      * let $dst = M*src$ with $M$
-				      * being this matrix. (This
-				      * matrix is the filtered one to
-				      * which we store a reference.)
+				      * this operation performs
+				      * pre_filter(), multiplication
+				      * with the stored matrix and
+				      * post_filter() in that order.
 				      */
     void vmult (VECTOR       &dst,
 		const VECTOR &src) const;
     
 				     /**
 				      * Matrix-vector multiplication:
-				      * let $dst = M^T*src$ with $M$
-				      * being this matrix. This
-				      * function does the same as
-				      * vmult() but takes the
-				      * transposed matrix. (This
-				      * matrix is the filtered one to
-				      * which we store a reference.)
-				      *
-				      * Because we need to use a
-				      * temporary variable and since
-				      * we only allocate that each
-				      * time the matrix changed, this
-				      * function only works for square
-				      * matrices.
+				      * this operation performs
+				      * pre_filter(), transposed
+				      * multiplication with the stored
+				      * matrix and post_filter() in
+				      * that order.
 				      */
     void Tvmult (VECTOR       &dst,
 		 const VECTOR &src) const;
@@ -523,13 +515,6 @@ class FilteredMatrix : public Subscriptor
     
 				     /**
 				      * Adding transpose matrix-vector multiplication:
-				      *
-				      * Because we need to use a
-				      * temporary variable and since
-				      * we only allocate that each
-				      * time the matrix changed, this
-				      * function only works for
-				      * quadratic matrices.
 				      *
 				      * @note The result vector of
 				      * this multiplication will have
@@ -658,6 +643,11 @@ class FilteredMatrix : public Subscriptor
 		      VECTOR       &out) const;
     
     friend class Accessor;
+				     /**
+				      * FilteredMatrixBlock accesses
+				      * pre_filter() and post_filter().
+				      */
+    friend class FilteredMatrixBlock<VECTOR>;
 };
 
 /*@}*/
@@ -842,10 +832,10 @@ inline
 FilteredMatrix<VECTOR>::FilteredMatrix (const FilteredMatrix &fm)
 		:
 		Subscriptor(),
+		expect_constrained_source(fm.expect_constrained_source),
+		matrix(fm.matrix),
 		constraints (fm.constraints)
-{
-  initialize (*fm.matrix, fm.expect_constrained_source);
-}
+{}
 
 
 
@@ -932,9 +922,9 @@ FilteredMatrix<VECTOR>::clear ()
 template <class VECTOR>
 inline
 void
-FilteredMatrix<VECTOR>::
-apply_constraints (VECTOR     &v,
-		   const bool  /* matrix_is_symmetric */) const
+FilteredMatrix<VECTOR>::apply_constraints (
+  VECTOR     &v,
+  const bool  /* matrix_is_symmetric */) const
 {
   GrowingVectorMemory<VECTOR> mem;
   VECTOR* tmp_vector = mem.alloc();
