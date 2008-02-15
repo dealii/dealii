@@ -31,21 +31,21 @@ std::ofstream logfile("grid_hyper_shell/output");
 
 
 template<int dim>
-void check (double r1, double r2, unsigned int n, bool log)
+void check (double r1, double r2, unsigned int n, bool)
 {
   Point<dim> center;
   Triangulation<dim> tria;
-  GridGenerator::hyper_shell (tria, center, r1, r2, n);
+  GridGenerator::hyper_shell (tria, center, r1, r2, n, true);
   static const HyperShellBoundary<dim> boundary(center);
   tria.set_boundary(0, boundary);
 
   tria.refine_global(2);
   
   GridOut grid_out;
-  if (log)
-    grid_out.write_eps (tria, logfile);
-  else
-    grid_out.write_dx (tria, std::cout);
+  GridOutFlags::DX flags;
+  flags.write_faces = true;
+  grid_out.set_flags(flags);
+  grid_out.write_dx (tria, logfile);
 }
 
 
