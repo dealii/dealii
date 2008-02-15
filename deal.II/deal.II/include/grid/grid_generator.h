@@ -2,7 +2,7 @@
 //    $Id$
 //    Version: $Name$
 //
-//    Copyright (C) 1999, 2000, 2001, 2002, 2003, 2004, 2005, 2006, 2007 by the deal.II authors
+//    Copyright (C) 1999, 2000, 2001, 2002, 2003, 2004, 2005, 2006, 2007, 2008 by the deal.II authors
 //
 //    This file is subject to QPL and may not be  distributed
 //    without copyright and license information. Please refer
@@ -46,7 +46,7 @@ template <typename number> class SparseMatrix;
  * @ingroup grid
  * @author Wolfgang Bangerth, Ralf Hartmann, Guido Kanschat, Stefan
  * Nauber, Joerg Weimar, Yaqi Wang, Luca Heltai, 1998, 1999, 2000, 2001, 2002,
- * 2003, 2006, 2007.
+ * 2003, 2006, 2007, 2008.
  */
 class GridGenerator
 {
@@ -491,6 +491,13 @@ class GridGenerator
 				      * <tt>inner_radius</tt> and
 				      * <tt>outer_radius</tt>.
 				      *
+				      * If the flag @p colorize is @p
+				      * true, then the outer boundary
+				      * will have the id 1, while the
+				      * inner boundary has id zero. If
+				      * the flag is @p false, both
+				      * have id zero.
+				      *
 				      * In 2D, the number
 				      * <tt>n_cells</tt> of elements
 				      * for this initial triangulation
@@ -526,7 +533,8 @@ class GridGenerator
 			     const Point<dim>     &center,
 			     const double        inner_radius,
 			     const double        outer_radius,
-			     const unsigned int  n_cells = 0);
+			     const unsigned int  n_cells = 0,
+			     bool colorize = false);
     
 				     /**
 				      * Produce a half hyper-shell,

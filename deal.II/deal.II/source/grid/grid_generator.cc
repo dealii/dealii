@@ -2,7 +2,7 @@
 //    $Id$
 //    Version: $Name$
 //
-//    Copyright (C) 1999, 2000, 2001, 2002, 2003, 2004, 2005, 2006, 2007 by the deal.II authors
+//    Copyright (C) 1999, 2000, 2001, 2002, 2003, 2004, 2005, 2006, 2007, 2008 by the deal.II authors
 //
 //    This file is subject to QPL and may not be  distributed
 //    without copyright and license information. Please refer
@@ -1161,7 +1161,8 @@ void GridGenerator::hyper_shell (Triangulation<dim> &,
 				 const Point<dim> &,
 				 const double,
 				 const double,
-				 const unsigned int)
+				 const unsigned int,
+				 const bool)
 {
   Assert (false, ExcNotImplemented());
 }
@@ -1394,7 +1395,8 @@ void GridGenerator::hyper_shell (Triangulation<dim>   &tria,
 				 const Point<dim>     &center,
 				 const double        inner_radius,
 				 const double        outer_radius,
-				 const unsigned int  n_cells)
+				 const unsigned int  n_cells,
+				 const bool colorize)
 {
   Assert ((inner_radius > 0) && (inner_radius < outer_radius),
 	  ExcInvalidRadii ());
@@ -1447,6 +1449,29 @@ void GridGenerator::hyper_shell (Triangulation<dim>   &tria,
   
   tria.create_triangulation (
     vertices, cells, SubCellData());
+
+  if (colorize)
+    colorize_hyper_shell(tria, center, inner_radius, outer_radius);
+}
+
+
+template<int dim>
+void
+GridGenerator::colorize_hyper_shell (
+  Triangulation<dim>& tria,
+  const Point<dim>&, const double, const double)
+{
+				   // Inspite of receiving geometrical
+				   // data, we do this only based on
+				   // topology.
+
+				   // For the mesh based on  cube,
+				   // this is highly irregular
+  for (typename Triangulation<dim>::cell_iterator cell = tria.begin();
+       cell != tria.end(); ++cell)
+    {
+      cell->face(2)->set_boundary_indicator(1);
+    }
 }
 
 
@@ -2100,7 +2125,8 @@ void GridGenerator::hyper_shell (Triangulation<dim>& tria,
 				 const Point<dim>& p,
 				 const double inner_radius,
 				 const double outer_radius,
-				 const unsigned int n)
+				 const unsigned int n,
+				 const bool colorize)
 {
   Assert ((inner_radius > 0) && (inner_radius < outer_radius),
 	  ExcInvalidRadii ());
@@ -2184,7 +2210,43 @@ void GridGenerator::hyper_shell (Triangulation<dim>& tria,
     }
   
   tria.create_triangulation (vertices, cells,
-			     SubCellData());       // no boundary information
+			     SubCellData());       // no boundary
+						   // information
+  
+  if (colorize)
+    colorize_hyper_shell(tria, p, inner_radius, outer_radius);
+}
+
+
+template<int dim>
+void
+GridGenerator::colorize_hyper_shell (
+  Triangulation<dim>& tria,
+  const Point<dim>&, const double, const double)
+{
+				   // Inspite of receiving geometrical
+				   // data, we do this only based on
+				   // topology.
+
+				   // For the mesh based on  cube,
+				   // this is highly irregular
+  if (tria.n_cells() == 6)
+    {
+      typename Triangulation<dim>::cell_iterator cell = tria.begin();
+      cell->face(4)->set_boundary_indicator(1);
+      (++cell)->face(2)->set_boundary_indicator(1);
+      (++cell)->face(2)->set_boundary_indicator(1);
+      (++cell)->face(0)->set_boundary_indicator(1);
+      (++cell)->face(2)->set_boundary_indicator(1);
+      (++cell)->face(0)->set_boundary_indicator(1);      
+    }
+  else
+				     // For higher polyhedra, this is regular.
+    {
+      for (typename Triangulation<dim>::cell_iterator cell = tria.begin();
+	   cell != tria.end(); ++cell)
+	cell->face(5)->set_boundary_indicator(1);
+    }
 }
 
 
@@ -2615,38 +2677,6 @@ void GridGenerator::hyper_cube_with_cylindrical_hole(Triangulation<dim> &triangu
 #endif
 
 
-#if deal_II_dimension != 1
-
-// Empty implementation for 1d is above
-template <int dim>
-void
-GridGenerator::colorize_hyper_shell(
-  Triangulation<dim>& tria,
-  const Point<dim>& center,
-  const double inner_radius,
-  const double outer_radius)
-{
-  double divide = .5*(inner_radius+outer_radius);
-  divide *= divide;
-  
-  for (typename Triangulation<dim>::cell_iterator it = tria.begin();
-       it != tria.end(); ++it)
-    for (unsigned int f=0;f<GeometryInfo<dim>::faces_per_cell;++f)
-      if (it->at_boundary(f))
-	{
-					   // Take first vertex of
-					   // boundary face
-	  Point<dim> p = it->face(f)->vertex(0);
-	  p -= center;
-	  if (p.square() > divide)
-	    it->face(f)->set_boundary_indicator(1);
-	}
-}
-
-
-#endif
-
-
 // explicit instantiations
 template void
 GridGenerator::hyper_cube<deal_II_dimension> (
@@ -2708,7 +2738,7 @@ GridGenerator::hyper_cube_slit (
 template void
 GridGenerator::hyper_shell (
   Triangulation<deal_II_dimension>&,
-  const Point<deal_II_dimension>&, double, double, unsigned int);
+  const Point<deal_II_dimension>&, double, double, unsigned int, bool);
 
 
 template void
