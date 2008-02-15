@@ -233,6 +233,14 @@ constraints individually.
 
 <ol> 
 
+  <li> <p>New: There is now a FEFaceValuesBase::get_face_index function which
+  returns the index of the face selected the last time the reinit() function
+  was called.
+
+  <br>
+  (RH 2008/02/15)
+  </p></li>
+
   <li> <p>New: The MappingQEulerian class provides an arbitrary order Eulerian
   mapping where the nodes of a mesh are displaced by a previously computed
   vector field.
