@@ -2078,6 +2078,13 @@ class FEFaceValuesBase : public FEValuesBase<dim>
     const std::vector<Tensor<1,dim> > & get_boundary_forms () const;
 
 				     /**
+				      * Return the index of the face
+				      * selected the last time the
+				      * reinit() function was called.
+				      */
+    unsigned int get_face_index() const;
+
+				     /**
 				      * Return a reference to the copy
 				      * of the quadrature formula
 				      * stored by this object.
@@ -2092,6 +2099,14 @@ class FEFaceValuesBase : public FEValuesBase<dim>
     unsigned int memory_consumption () const;
     
   protected:
+
+				     /**
+				      * Index of the face selected the
+				      * last time the reinit()
+				      * function was called.
+				      */
+    unsigned int present_face_index;
+    
 				     /**
 				      * Store a copy of the quadrature
 				      * formula here.
@@ -2963,6 +2978,14 @@ FEFaceValuesBase<dim>::normal_vector (const unsigned int i) const
   return this->normal_vectors[i];
 }
 
+
+template <int dim>
+inline
+unsigned int
+FEFaceValuesBase<dim>::get_face_index () const
+{
+  return present_face_index;
+}
 
 
 /*------------------------ Inline functions: FE*FaceValues --------------------*/

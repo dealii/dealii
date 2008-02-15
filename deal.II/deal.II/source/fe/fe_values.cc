@@ -1540,6 +1540,9 @@ void FEFaceValues<dim>::reinit (const typename DoFHandler<dim>::cell_iterator &c
     (new typename FEValuesBase<dim>::template
      CellIterator<typename DoFHandler<dim>::cell_iterator> (cell));
 
+				   // set the present face index
+  this->present_face_index=cell->face_index(face_no);
+  
                                    // this was the part of the work
                                    // that is dependent on the actual
                                    // data type of the iterator. now
@@ -1575,6 +1578,9 @@ void FEFaceValues<dim>::reinit (const typename hp::DoFHandler<dim>::cell_iterato
     (new typename FEValuesBase<dim>::template
      CellIterator<typename hp::DoFHandler<dim>::cell_iterator> (cell));
 
+				   // set the present face index
+  this->present_face_index=cell->face_index(face_no);
+
                                    // this was the part of the work
                                    // that is dependent on the actual
                                    // data type of the iterator. now
@@ -1608,6 +1614,9 @@ void FEFaceValues<dim>::reinit (const typename MGDoFHandler<dim>::cell_iterator 
     (new typename FEValuesBase<dim>::template
      CellIterator<typename MGDoFHandler<dim>::cell_iterator> (cell));
 
+				   // set the present face index
+  this->present_face_index=cell->face_index(face_no);
+
                                    // this was the part of the work
                                    // that is dependent on the actual
                                    // data type of the iterator. now
@@ -1631,6 +1640,9 @@ void FEFaceValues<dim>::reinit (const typename Triangulation<dim>::cell_iterator
                                    // destruction of this class
   this->present_cell.reset 
     (new typename FEValuesBase<dim>::TriaCellIterator (cell));
+
+				   // set the present face index
+  this->present_face_index=cell->face_index(face_no);
 
                                    // this was the part of the work
                                    // that is dependent on the actual
@@ -1765,6 +1777,13 @@ void FESubfaceValues<dim>::reinit (const typename DoFHandler<dim>::cell_iterator
           ExcMessage ("You can't use subface data for cells that are "
                       "already refined. Iterate over their children "
                       "instead in these cases."));
+
+				   // set the present face index
+  unsigned int real_subface_no=subface_no;
+  if (dim==3)
+    real_subface_no=GeometryInfo<dim>::standard_to_real_face_vertex(
+      subface_no, cell->face_orientation(face_no), cell->face_flip(face_no), cell->face_rotation(face_no));
+  this->present_face_index=cell->face(face_no)->child_index(real_subface_no);
   
                                    // set new cell. auto_ptr will take
                                    // care that old object gets
@@ -1816,6 +1835,13 @@ void FESubfaceValues<dim>::reinit (const typename hp::DoFHandler<dim>::cell_iter
     (new typename FEValuesBase<dim>::template
      CellIterator<typename hp::DoFHandler<dim>::cell_iterator> (cell));
 
+				   // set the present face index
+  unsigned int real_subface_no=subface_no;
+  if (dim==3)
+    real_subface_no=GeometryInfo<dim>::standard_to_real_face_vertex(
+      subface_no, cell->face_orientation(face_no), cell->face_flip(face_no), cell->face_rotation(face_no));
+  this->present_face_index=cell->face(face_no)->child_index(real_subface_no);
+
                                    // this was the part of the work
                                    // that is dependent on the actual
                                    // data type of the iterator. now
@@ -1851,6 +1877,13 @@ void FESubfaceValues<dim>::reinit (const typename MGDoFHandler<dim>::cell_iterat
     (new typename FEValuesBase<dim>::template
      CellIterator<typename MGDoFHandler<dim>::cell_iterator> (cell));
 
+				   // set the present face index
+  unsigned int real_subface_no=subface_no;
+  if (dim==3)
+    real_subface_no=GeometryInfo<dim>::standard_to_real_face_vertex(
+      subface_no, cell->face_orientation(face_no), cell->face_flip(face_no), cell->face_rotation(face_no));
+  this->present_face_index=cell->face(face_no)->child_index(real_subface_no);
+
                                    // this was the part of the work
                                    // that is dependent on the actual
                                    // data type of the iterator. now
@@ -1878,6 +1911,13 @@ void FESubfaceValues<dim>::reinit (const typename Triangulation<dim>::cell_itera
                                    // destruction of this class
   this->present_cell.reset 
     (new typename FEValuesBase<dim>::TriaCellIterator (cell));
+
+				   // set the present face index
+  unsigned int real_subface_no=subface_no;
+  if (dim==3)
+    real_subface_no=GeometryInfo<dim>::standard_to_real_face_vertex(
+      subface_no, cell->face_orientation(face_no), cell->face_flip(face_no), cell->face_rotation(face_no));
+  this->present_face_index=cell->face(face_no)->child_index(real_subface_no);
 
                                    // this was the part of the work
                                    // that is dependent on the actual
