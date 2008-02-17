@@ -236,7 +236,6 @@ constraints individually.
   <li> <p>New: There is now a FEFaceValuesBase::get_face_index function which
   returns the index of the face selected the last time the reinit() function
   was called.
-
   <br>
   (RH 2008/02/15)
   </p></li>
