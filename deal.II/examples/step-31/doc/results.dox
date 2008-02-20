@@ -1,12 +1,75 @@
 <a name="Results"></a>
 <h1>Results</h1>
 
+<h3>Output of the program and graphical visualization</h3>
 
+<h4>2D calculations</h4>
 
+If we run the program in two dimensions, we get the following output:
+@code
+examples/step-31> make run
+============================ Remaking Makefile.dep
+==============optimized===== step-31.cc
+============================ Linking step-31
+============================ Running step-31
+Refinement cycle 0
+   Number of active cells: 64
+   Number of degrees of freedom: 679 (594+85)
+   Assembling...
+   Computing preconditioner...
+   Solving...  11 outer CG Schur complement iterations for pressure
 
+Refinement cycle 1
+   Number of active cells: 160
+   Number of degrees of freedom: 1683 (1482+201)
+   Assembling...
+   Computing preconditioner...
+   Solving...  11 outer CG Schur complement iterations for pressure
 
+Refinement cycle 2
+   Number of active cells: 376
+   Number of degrees of freedom: 3813 (3370+443)
+   Assembling...
+   Computing preconditioner...
+   Solving...  11 outer CG Schur complement iterations for pressure
 
+Refinement cycle 3
+   Number of active cells: 880
+   Number of degrees of freedom: 8723 (7722+1001)
+   Assembling...
+   Computing preconditioner...
+   Solving...  11 outer CG Schur complement iterations for pressure
 
+Refinement cycle 4
+   Number of active cells: 2008
+   Number of degrees of freedom: 19383 (17186+2197)
+   Assembling...
+   Computing preconditioner...
+   Solving...  11 outer CG Schur complement iterations for pressure
+
+Refinement cycle 5
+   Number of active cells: 4288
+   Number of degrees of freedom: 40855 (36250+4605)
+   Assembling...
+   Computing preconditioner...
+   Solving...  11 outer CG Schur complement iterations for pressure
+
+Refinement cycle 6
+   Number of active cells: 8896
+   Number of degrees of freedom: 83885 (74474+9411)
+   Assembling...
+   Computing preconditioner...
+   Solving...  11 outer CG Schur complement iterations for pressure
+@endcode
+Note that the number of (outer) iterations does not increase as we refine the
+mesh. 
+
+In the images below, we show the grids for the first six steps in the program. 
+Note how the grid is refined in regions where the solution rapidly changes: On
+the upper boundary, we have Dirichlet boundary conditions that are -1 in the
+left half of the line and 1 in the right one, so there is an aprupt change at 
+x=0. Likewise, there are changes from Dirichlet to Neumann data in the two upper
+corners, so the solution changes there as well.
 
 <TABLE WIDTH="60%" ALIGN="center">
   <tr>
@@ -42,71 +105,61 @@
 
 @image html step-31.2d.solution.png
 
-
-
-
-
-Output in 3d:
+<h4>3D calculations</h4>
+The program now run in 3d:
 @code
 Refinement cycle 0
    Number of active cells: 32
    Number of degrees of freedom: 1356 (1275+81)
    Assembling...
    Computing preconditioner...
-   Solving...
-   13 CG Schur complement iterations for pressure.
+   Solving...  13 outer CG Schur complement iterations for pressure.
 
 Refinement cycle 1
    Number of active cells: 144
    Number of degrees of freedom: 5088 (4827+261)
    Assembling...
    Computing preconditioner...
-   Solving...
-   14 CG Schur complement iterations for pressure.
+   Solving...  14 outer CG Schur complement iterations for pressure.
 
 Refinement cycle 2
    Number of active cells: 704
    Number of degrees of freedom: 22406 (21351+1055)
    Assembling...
    Computing preconditioner...
-   Solving...
-   14 CG Schur complement iterations for pressure.
+   Solving...  14 outer CG Schur complement iterations for pressure.
 
 Refinement cycle 3
    Number of active cells: 3168
    Number of degrees of freedom: 93176 (89043+4133)
    Assembling...
    Computing preconditioner...
-   Solving...
-   15 CG Schur complement iterations for pressure.
+   Solving...  15 outer CG Schur complement iterations for pressure.
 
 Refinement cycle 4
    Number of active cells: 11456
    Number of degrees of freedom: 327808 (313659+14149)
    Assembling...
    Computing preconditioner...
-   Solving...
-   15 CG Schur complement iterations for pressure.
+   Solving...  15 outer CG Schur complement iterations for pressure.
 
 Refinement cycle 5
    Number of active cells: 45056
    Number of degrees of freedom: 1254464 (1201371+53093)
    Assembling...
    Computing preconditioner...
-   Solving...
-   14 CG Schur complement iterations for pressure.
+   Solving...  14 outer CG Schur complement iterations for pressure.
 
 Refinement cycle 6
    Number of active cells: 170720
    Number of degrees of freedom: 4625150 (4432407+192743)
    Assembling...
    Computing preconditioner...
-   Solving...
-   15 CG Schur complement iterations for pressure.
+   Solving...  15 outer CG Schur complement iterations for pressure.
 @endcode
 
-Note that the number of (outer) iterations does not increase as we refine the
-mesh. 
+Note again that the number of iterations does not increase as we refine 
+the mesh. 
 
 Compute times for each iteration alone: seconds, seconds, 1 minute, 5
 minutes, 29 minutes, 3h12, 21h39
