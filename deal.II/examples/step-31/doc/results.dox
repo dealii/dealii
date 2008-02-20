@@ -209,6 +209,55 @@ Pictures
 
 @image html step-31.3d.solution.png
 
+<h3>Sparsity pattern</h3>
+As mentioned when generating the sparsity pattern, it is useful to have a look
+at the location of the nonzero elements. We first start off with a simple dof
+renumbering by components (i.e., without using Cuthill_McKee) after the first
+refinement in two dimensions. In order to generate such an output, you would
+have to insert a piece of code like the following in the end of the setup step.
+Note that it is not possible to directly output a BlockSparsityPattern, so we
+need to generate some temporary objects that will be released again in order to
+not slow down the program.
+@code
+  {
+    SparsityPattern full_sparsity;
+    CompressedSparsityPattern csp (dof_handler.n_dofs(),
+                                   dof_handler.n_dofs());
+    DoFTools::make_sparsity_pattern(dof_handler, csp);
+    hanging_node_constraints.condense (csp);
+    full_sparsity.copy_from(csp);
+    std::ofstream out ("sparsity_pattern.gpl");
+    full_sparsity.print_gnuplot(out);
+  }
+@endcode
 
+@image html step-31.2d.sparsity-nor.png
 
+It is clearly visible that the dofs are spread over the almost the whole matrix.
+This makes the preconditioning by ILU unefficient: ILU generates a Gaussian
+elimination (LU decomposition) without fill-in, which means that more fill-ins 
+will result in a worse approximation to the full decomposition.
 
+In this program, we have thus chosen a better renumbering of components. A
+renumbering with Cuthill_McKee yields the following output. 
+
+@image html step-31.2d.sparsity-ren.png
+
+It is clearly visible that the situation is much better now. Most of the
+elements are now concentrated around the diagonal for the (0,0) block in the
+matrix. Similar effects are also visible for the other blocks. In this case, the
+ILU decomposition will be much closer to the full LU decomposition, which
+improves the quality of the preconditioner. It is also worthwile to note that
+the sparse direct solver UMFPACK does some internal renumbering of the equations 
+that leads to a similar pattern as the one we got from Cuthill_McKee.
+
+Finally, we want to have a closer
+look at a sparsity pattern in 3D. We now show only the (0,0) block of the
+matrix, again after one adaptive refinement. Apart from the fact that the matrix
+has more rows and columns, it is also visible that there are many more entries
+in the matrix. Moreover, even for the optimized renumbering, there will be a
+considerable amount of fill-in elements. This illustrates why UMFPACK is not a
+good choice in 3D - there will be need for many new entries that eventually
+won't fit into the physical memory (RAM).
+
+@image html step-31.3d.sparsity_uu-ren.png
