@@ -1080,8 +1080,9 @@ void StokesProblem<dim>::solve ()
   
     std::cout << "  "
               << solver_control.last_step()
-              << " outer CG iterations for p "
-              << std::flush;    
+              << " outer CG Schur complement iterations for pressure"
+              << std::flush
+              << std::endl;    
   }
     
                     // As in step-20, we finally need to
@@ -1210,7 +1211,7 @@ void StokesProblem<dim>::run ()
 {
                     // We start off with a rectangle of
                     // size 4 x 1 (x 1), placed in R^2/R^3
-                    // as (-2,2)x(-1:0) or (-2,2)x(0,1)x(-1,1),
+                    // as (-2,2)x(-1,0) or (-2,2)x(0,1)x(-1,1),
                     // respectively. It is natural to start 
                     // with equal mesh size in each direction,
                     // so we subdivide the initial rectangle
@@ -1277,7 +1278,7 @@ void StokesProblem<dim>::run ()
       
       output_results (refinement_cycle);
 
-      std::cout << std::endl << std::endl;
+      std::cout << std::endl;
     }
 }
 
@@ -1295,7 +1296,7 @@ int main ()
     {
       deallog.depth_console (0);
 
-      StokesProblem<3> flow_problem(1);
+      StokesProblem<2> flow_problem(1);
       flow_problem.run ();
     }
   catch (std::exception &exc)
