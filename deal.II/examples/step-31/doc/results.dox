@@ -61,15 +61,17 @@ Refinement cycle 6
    Computing preconditioner...
    Solving...  11 outer CG Schur complement iterations for pressure
 @endcode
+
 Note that the number of (outer) iterations does not increase as we refine the
 mesh. 
 
-In the images below, we show the grids for the first six steps in the program. 
-Note how the grid is refined in regions where the solution rapidly changes: On
-the upper boundary, we have Dirichlet boundary conditions that are -1 in the
+In the images below, we show the grids for the first six refinement steps in the
+program. 
+Obersve how the grid is refined in regions where the solution rapidly changes: 
+On the upper boundary, we have Dirichlet boundary conditions that are -1 in the
 left half of the line and 1 in the right one, so there is an aprupt change at 
 x=0. Likewise, there are changes from Dirichlet to Neumann data in the two upper
-corners, so the solution changes there as well.
+corners, so there is need for refinement there as well.
 
 <TABLE WIDTH="60%" ALIGN="center">
   <tr>
@@ -164,7 +166,7 @@ the mesh.
 Compute times for each iteration alone: seconds, seconds, 1 minute, 5
 minutes, 29 minutes, 3h12, 21h39
 
-Pictures
+The grids generated during the solution look as follow:
 
 <TABLE WIDTH="60%" ALIGN="center">
   <tr>
@@ -207,6 +209,8 @@ Pictures
   </tr>
 </table>
 
+Let's have a look at the solution as well.
+
 @image html step-31.3d.solution.png
 
 <h3>Sparsity pattern</h3>
@@ -234,17 +238,19 @@ not slow down the program.
 @image html step-31.2d.sparsity-nor.png
 
 It is clearly visible that the dofs are spread over the almost the whole matrix.
-This makes the preconditioning by ILU unefficient: ILU generates a Gaussian
-elimination (LU decomposition) without fill-in, which means that more fill-ins 
-will result in a worse approximation to the full decomposition.
+This makes the preconditioning by ILU inefficient: ILU generates a Gaussian
+elimination (LU decomposition) without fill-in element, which means that more 
+fill-ins left out will result in a worse approximation to the full 
+decomposition.
 
-In this program, we have thus chosen a better renumbering of components. A
-renumbering with Cuthill_McKee yields the following output. 
+In this program, we have thus chosen a more advanced renumbering of components.
+The renumbering with Cuthill_McKee and grouping the components into velocity
+and pressure yields the following output. 
 
 @image html step-31.2d.sparsity-ren.png
 
-It is clearly visible that the situation is much better now. Most of the
-elements are now concentrated around the diagonal for the (0,0) block in the
+It is apparent that the situation has improved a lot. Most of the
+elements are now concentrated around the diagonal in the (0,0) block in the
 matrix. Similar effects are also visible for the other blocks. In this case, the
 ILU decomposition will be much closer to the full LU decomposition, which
 improves the quality of the preconditioner. It is also worthwile to note that
@@ -252,12 +258,333 @@ the sparse direct solver UMFPACK does some internal renumbering of the equations
 that leads to a similar pattern as the one we got from Cuthill_McKee.
 
 Finally, we want to have a closer
-look at a sparsity pattern in 3D. We now show only the (0,0) block of the
+look at a sparsity pattern in 3D. We show only the (0,0) block of the
 matrix, again after one adaptive refinement. Apart from the fact that the matrix
-has more rows and columns, it is also visible that there are many more entries
+size has increased, it is also visible that there are many more entries
 in the matrix. Moreover, even for the optimized renumbering, there will be a
-considerable amount of fill-in elements. This illustrates why UMFPACK is not a
-good choice in 3D - there will be need for many new entries that eventually
-won't fit into the physical memory (RAM).
+considerable amount of tentative fill-in elements. This illustrates why UMFPACK 
+is not a good choice in 3D - there will be need for many new entries that
+ eventually won't fit into the physical memory (RAM).
 
 @image html step-31.3d.sparsity_uu-ren.png
+
+<h2>Possible Extensions</h2>
+
+<h3>Improved linear solver</h3>
+
+We have seen in the section of computational results that the number of outer
+iterations does not depend on the mesh size, which is optimal in a sense of
+scalability. This is however only partly true, since we did not look at the
+number of iterations in the inner preconditioner. Of course, this is
+unproblematic in the 2D case where we precondition with a direct solver and the
+vmult operation of the inverse matrix structure will converge in one single CG
+step, but this changes in 3D where we need to apply the ILU preconditioner.
+There, the number of required step basically doubles with half the element size,
+so the work gets more and more for larger systems. For the 3D results obtained
+above, each vmult operation involves approx. 14, 23, 36, 59, 72, 101 etc. inner 
+CG iterations. (On the other hand, the number of iterations for applying the 
+inverse
+pressure mass matrix is always about 10-11.) To summarize, most work is spent on
+creating the same matrix inverse over and over again. It is a natural question
+to ask whether we can do that any better and avoid inverting the matrix several
+times.
+  
+The answer is, of course, that we can do that in a few other (most of the time
+better) ways.
+
+The first way would be to choose a preconditioner that makes CG
+for the (0,0) matrix converge in a mesh-independent number of iterations around
+10 to 20. We have seen such a canditate in step-16: multigrid.
+
+<h4>Block Schur complement preconditioner</h4>
+But even in this situation there would still be need for the repeated solution
+of the same linear system. The question is how this can be avoided. If we stay
+with the calculation of the Schur complement, there is no other possibility.
+The alternative is to attack the block system at one time and use an approximate
+Schur complement as an efficient preconditioner. The basic attempt is as
+follows: If we find a block preconditioner $\mathcal P$ such that the matrix
+@f{eqnarray*}
+  \mathcal P^{-1}\left(\begin{array}{cc}
+    A & B^T \\ B & 0
+  \end{array}\right)
+@f}
+is simple, then an iterative solver with that preconditioner will converge in a
+few iterations. Using the Schur complement $S = B A^{-1} B^T$, one finds that
+@f{eqnarray*}
+  \mathcal P^{-1}\left(\begin{array}{cc}
+    A & B^T \\ B & 0
+  \end{array}\right) 
+  = 
+  \left(\begin{array}{cc}
+    A^{-1} & 0 \\ S^{-1} B A^{-1} & -S^{-1}
+  \end{array}\right)\cdot \left(\begin{array}{cc}
+    A & B^T \\ B & 0
+  \end{array}\right) 
+  = 
+  \left(\begin{array}{cc}
+    I & A^{-1} B^T \\ 0 & 0
+  \end{array}\right),
+@f}
+see also the paper by Silvester and Wathen referenced to in the introduction. In
+this case, a Krylov-based iterative method will converge in two steps, since
+there are only two distinct eigenvalues to this matrix. Though, it is not
+possible to use CG since the block matrix is not positive definite (it has
+indeed both positive and negative eigenvalues, i.e. it is indefinite). Instead
+one has to choose e.g. the iterative solver GMRES, which is more expensive
+per iteration (more inner products to be calculated), but is applicable also to
+indefinite (and non-symmetric) matrices.
+
+Since $\mathcal P$ is aimed to be a preconditioner only, we can also use
+approximations to the Schur complement $S$ and the matrix $A$. This is what an
+improved solver for the Stokes system is going to look like: The Schur
+complement will be approximated by the pressure mass matrix $M_p$, and we use a
+preconditioner to $A$ (without an InverseMatrix class around it) to approximate 
+A. This is however partly compensated by the fact that we need to perform the
+solver iterations on the full block system instead of the smaller pressure
+space.
+
+An implementation of such a solver could look like this:
+
+First the class for the block Schur complement preconditioner, which implements
+a vmult operation for block vectors.
+@code
+template <class Preconditioner>
+class BlockSchurPreconditioner : public Subscriptor
+{
+  public:
+    BlockSchurPreconditioner (const BlockSparseMatrix<double>           &S,
+          const InverseMatrix<SparseMatrix<double>,PreconditionSSOR<> > &Mpinv,
+          const Preconditioner &Apreconditioner);
+
+  void vmult (BlockVector<double>       &dst,
+              const BlockVector<double> &src) const;
+
+  private:
+    const SmartPointer<const BlockSparseMatrix<double> > system_matrix;
+    const SmartPointer<const InverseMatrix<SparseMatrix<double>, 
+                       PreconditionSSOR<> > > m_inverse;
+    const Preconditioner &a_preconditioner;
+    
+    mutable BlockVector<double> tmp;
+
+};
+
+template <class Preconditioner>
+BlockSchurPreconditioner<Preconditioner>::BlockSchurPreconditioner(
+          const BlockSparseMatrix<double>                               &S,
+          const InverseMatrix<SparseMatrix<double>,PreconditionSSOR<> > &Mpinv,
+          const Preconditioner &Apreconditioner
+          )
+                :
+                system_matrix           (&S),
+                m_inverse               (&Mpinv),
+                a_preconditioner        (Apreconditioner),
+                tmp                     (2)
+{
+        // We have to initialize the <code>BlockVector@</code>
+        // tmp to the correct sizes in the respective blocks
+    tmp.block(0).reinit(S.block(0,0).m());
+    tmp.block(1).reinit(S.block(1,1).m());
+    tmp.collect_sizes();
+}
+
+        // Now the interesting function, the multiplication of
+        // the preconditioner with a BlockVector. 
+template <class Preconditioner>
+void BlockSchurPreconditioner<Preconditioner>::vmult (
+                                     BlockVector<double>       &dst,
+                                     const BlockVector<double> &src) const
+{
+        // This is going to be a left preconditioner for the Schur complement
+        // to be used with the CG or GMRES method
+        // Form u_new = F^{-1} u
+  a_preconditioner.vmult (dst.block(0), src.block(0));
+        // Form tmp3 = - B u_new + p (<code>SparseMatrix::residual</code>
+        // does precisely this)
+  system_matrix->block(1,0).residual(tmp.block(1), 
+                                     dst.block(0), src.block(1));
+        // Change sign in tmp3
+  tmp.block(1) *= -1;
+        // Multiply by Greens function (Schur complement-like) precond
+  m_inverse->vmult (dst.block(1), tmp.block(1));
+}
+@endcode
+
+The actual solver call can be realized as
+
+@code
+      SparseMatrix<double> pressure_mass_matrix;
+      pressure_mass_matrix.reinit(sparsity_pattern.block(1,1));
+      pressure_mass_matrix.copy_from(system_matrix.block(1,1));
+      system_matrix.block(1,1) = 0;
+            
+      PreconditionSSOR<> pmass_preconditioner;
+      pmass_preconditioner.initialize (pressure_mass_matrix, 1.2);
+      
+      InverseMatrix<SparseMatrix<double>,PreconditionSSOR<> >
+        m_inverse (pressure_mass_matrix, pmass_preconditioner);
+        
+      BlockSchurPreconditioner<typename InnerPreconditioner<dim>::type> 
+        preconditioner (system_matrix, m_inverse, *A_preconditioner);
+      
+      SolverControl solver_control (system_matrix.m(),
+                                    1e-6*system_rhs.l2_norm());
+      
+      SolverGMRES<BlockVector<double> > gmres(solver_control);
+      
+      gmres.solve(system_matrix, alternative_solution, system_rhs,
+                  preconditioner);
+      
+      hanging_node_constraints.distribute (alternative_solution);
+      
+      std::cout << " "
+                << solver_control.last_step()
+                << " block GMRES iterations";
+@endcode
+
+Obviously, one needs to add the include file <lac/solver_gmres.h> in order to
+make this run. We call the solver with a BlockVector template in order to enable
+GMRES to operate on block vectors and matrices.
+Note also that we need to zero the (1,1) block from the system
+matrix (we saved the pressure mass matrix there which is not part of the
+problem) after we copied to information to another matrix.
+
+Using the timer class, we collected some statistics that compare the runtime of
+the block solver with the one used in the problem implementation above. Besides
+the solution of the two systems we also check if the solutions to the two
+systems are close to each other, i.e. we calculate the infinity norm of the
+vector difference.
+
+Let's first see the results in 2D:
+@code
+Refinement cycle 0
+   Number of active cells: 64
+   Number of degrees of freedom: 679 (594+85) [0.025624 s] 
+   Assembling... [0.052874 s]
+   Computing preconditioner... [0.016394 s]
+   Solving...
+      Schur complement: 11 outer CG iterations for p  [0.028722 s]
+      Block Schur preconditioner: 11 GMRES iterations [0.027471 s]
+   max difference l_infty in the two solution vectors: 6.20426e-06
+
+Refinement cycle 1
+   Number of active cells: 160
+   Number of degrees of freedom: 1683 (1482+201) [0.07247 s] 
+   Assembling... [0.129607 s]
+   Computing preconditioner... [0.045196 s]
+   Solving...
+      Schur complement: 11 outer CG iterations for p  [0.074961 s]
+      Block Schur preconditioner: 12 GMRES iterations [0.080309 s]
+   max difference l_infty in the two solution vectors: 1.48144e-06
+
+Refinement cycle 2
+   Number of active cells: 376
+   Number of degrees of freedom: 3813 (3370+443) [0.168264 s] 
+   Assembling... [0.298043 s]
+   Computing preconditioner... [0.122656 s]
+   Solving...
+      Schur complement: 11 outer CG iterations for p  [0.19247 s]
+      Block Schur preconditioner: 12 GMRES iterations [0.211514 s]
+   max difference l_infty in the two solution vectors: 4.30711e-06
+
+Refinement cycle 3
+   Number of active cells: 880
+   Number of degrees of freedom: 8723 (7722+1001) [0.390052 s] 
+   Assembling... [0.694365 s]
+   Computing preconditioner... [0.315401 s]
+   Solving...
+      Schur complement: 11 outer CG iterations for p  [0.54384 s]
+      Block Schur preconditioner: 12 GMRES iterations [0.588273 s]
+   max difference l_infty in the two solution vectors: 1.03471e-05
+
+Refinement cycle 4
+   Number of active cells: 2008
+   Number of degrees of freedom: 19383 (17186+2197) [0.874274 s] 
+   Assembling... [1.58498 s]
+   Computing preconditioner... [0.813296 s]
+   Solving...
+      Schur complement: 11 outer CG iterations for p  [1.22453 s]
+      Block Schur preconditioner: 13 GMRES iterations [1.45711 s]
+   max difference l_infty in the two solution vectors: 4.53216e-05
+
+Refinement cycle 5
+   Number of active cells: 4288
+   Number of degrees of freedom: 40855 (36250+4605) [1.85269 s] 
+   Assembling... [3.36536 s]
+   Computing preconditioner... [1.93873 s]
+   Solving...
+      Schur complement: 11 outer CG iterations for p  [3.39201 s]
+      Block Schur preconditioner: 13 GMRES iterations [3.77069 s]
+   max difference l_infty in the two solution vectors: 0.000291127
+
+Refinement cycle 6
+   Number of active cells: 8896
+   Number of degrees of freedom: 83885 (74474+9411) [3.85563 s] 
+   Assembling... [6.9564 s]
+   Computing preconditioner... [4.8595 s]
+   Solving...
+      Schur complement: 11 outer CG iterations for p  [7.69326 s]
+      Block Schur preconditioner: 13 GMRES iterations [8.62034 s]
+   max difference l_infty in the two solution vectors: 0.000245764
+@endcode
+We see that the runtime for solution using the block Schur complement 
+preconditioner is higher than the one with the Schur complement directly. The
+reason is simple: We used a direct solve as preconditioner here - so there won't
+be any gain by avoiding the inner iterations (indeed, we see that slightly more
+iterations are needed).
+
+The picture changes of course in 3D:
+
+@code
+Refinement cycle 0
+   Number of active cells: 32
+   Number of degrees of freedom: 1356 (1275+81) [0.344441 s] 
+   Assembling... [1.38754 s]
+   Computing preconditioner... [1.29145 s]
+   Solving...
+      Schur complement: 13 outer CG iterations for p  [0.609626 s]
+      Block Schur preconditioner: 24 GMRES iterations [0.107059 s]
+   max difference l_infty in the two solution vectors: 1.60165e-05
+
+Refinement cycle 1
+   Number of active cells: 144
+   Number of degrees of freedom: 5088 (4827+261) [2.21296 s] 
+   Assembling... [6.28298 s]
+   Computing preconditioner... [7.78238 s]
+   Solving...
+      Schur complement: 14 outer CG iterations for p  [5.98275 s]
+      Block Schur preconditioner: 44 GMRES iterations [0.979435 s]
+   max difference l_infty in the two solution vectors: 2.00892e-05
+
+Refinement cycle 2
+   Number of active cells: 704
+   Number of degrees of freedom: 22406 (21351+1055) [12.2284 s] 
+   Assembling... [30.8002 s]
+   Computing preconditioner... [42.131 s]
+   Solving...
+      Schur complement: 14 outer CG iterations for p  [45.1115 s]
+      Block Schur preconditioner: 83 GMRES iterations [9.04946 s]
+   max difference l_infty in the two solution vectors: 3.06288e-05
+
+Refinement cycle 3
+   Number of active cells: 3168
+   Number of degrees of freedom: 93176 (89043+4133) [54.9067 s] 
+   Assembling... [137.506 s]
+   Computing preconditioner... [192.36 s]
+   Solving...
+      Schur complement: 15 outer CG iterations for p  [371.85 s]
+      Block Schur preconditioner: 204 GMRES iterations [110.316 s]
+   max difference l_infty in the two solution vectors: 8.92999e-05
+@endcode
+
+Here, the block preconditioned solver is clearly superior to the Schur
+complement, even though the advantage gets less for more mesh points. The reason
+for the decreasing advantage is that the mass matrix is still inverted
+iteratively, so that it is inverted more and more time if the block GMRES
+solver uses more iterations.
+
+<h4>Not using block matrices and vectors</h4>
+Another possibility that can be taken into account is to not set up a block
+system, but rather solve the system of velocity and pressure all-at once. The
+alternatives are direct solve with UMFPACK (2D) or GMRES with ILU
+preconditioning (3D).

@@ -508,21 +508,21 @@ void InverseMatrix<Matrix,Preconditioner>::vmult (Vector<double>       &dst,
                     // <code>InverseMatrix</code> 
                     // now contains the second template
                     // parameter from preconditioning as above,
-                    // which effects the <code>SmartPointer@</code>
+                    // which effects the <code>SmartPointer</code>
                     // object <code>m_inverse</code> as well.
 template <class Preconditioner>
 class SchurComplement : public Subscriptor
 {
   public:
     SchurComplement (const BlockSparseMatrix<double> &A,
-             const InverseMatrix<SparseMatrix<double>,Preconditioner> &Minv);
+             const InverseMatrix<SparseMatrix<double>, Preconditioner> &Minv);
 
     void vmult (Vector<double>       &dst,
         const Vector<double> &src) const;
 
   private:
     const SmartPointer<const BlockSparseMatrix<double> > system_matrix;
-    const SmartPointer<const InverseMatrix<SparseMatrix<double>,Preconditioner> > m_inverse;
+    const SmartPointer<const InverseMatrix<SparseMatrix<double>, Preconditioner> > m_inverse;
     
     mutable Vector<double> tmp1, tmp2;
 };
@@ -572,7 +572,7 @@ void SchurComplement<Preconditioner>::vmult (Vector<double>       &dst,
                     // in a way that the approximation of the
                     // PDE solution remains well-behaved (problems
                     // arise if grids are too unstructered),
-                    // see the discussion of
+                    // see the documentation of
                     // <code>Triangulation::MeshSmoothing</code>
                     // for details.
 template <int dim>
@@ -598,7 +598,7 @@ void StokesProblem<dim>::setup_dofs ()
                    // Release preconditioner from
                    // previous steps since it
                    // will definitely not be needed
-                   // any more after this point
+                   // any more after this point.
   A_preconditioner.reset ();
   
   dof_handler.distribute_dofs (fe); 
@@ -610,10 +610,10 @@ void StokesProblem<dim>::setup_dofs ()
                     // of velocity and pressure shall be as in
                     // step-20. This is done in two steps. First,
                     // all dofs are renumbered by 
-                    // <code>DoFRenumbering::Cuthill_McKee@</code>,
+                    // <code>DoFRenumbering::Cuthill_McKee</code>,
                     // and then we renumber once again by 
                     // components. Since 
-                    // <code>DoFRenumbering::component_wise@</code>
+                    // <code>DoFRenumbering::component_wise</code>
                     // does not touch the renumbering within 
                     // the individual blocks, the basic
                     // renumbering from Cuthill-McKee remains.
@@ -638,7 +638,7 @@ void StokesProblem<dim>::setup_dofs ()
                     // the dof handler.
   hanging_node_constraints.clear ();
   DoFTools::make_hanging_node_constraints (dof_handler,
-                       hanging_node_constraints);
+                                           hanging_node_constraints);
   hanging_node_constraints.close ();
 
                     // In analogy to step-20, we count
@@ -647,9 +647,9 @@ void StokesProblem<dim>::setup_dofs ()
                     // there, but we want to operate on
                     // the block structure we used already for 
                     // the renumbering: The function 
-                    // <code>DoFTools::count_dofs_per_block@</code>
+                    // <code>DoFTools::count_dofs_per_block</code>
                     // does the same as 
-                    // <code>DoFTools::count_dofs_per_component@</code>,
+                    // <code>DoFTools::count_dofs_per_component</code>,
                     // but now grouped as velocity and 
                     // pressure block via <code>block_component</code>.
   std::vector<unsigned int> dofs_per_block (2);
@@ -665,8 +665,10 @@ void StokesProblem<dim>::setup_dofs ()
             << " (" << n_u << '+' << n_p << ')'
             << std::endl;
 
-                    // Clear the system matrix prior to
-                    // generating the entries.
+                    // Release the memory previously attached
+                    // to the system matrix and untie it
+                    // from the old sparsity pattern prior to
+                    // generating the current data structure.
   system_matrix.clear ();
       
                     // The next task is to allocate a
@@ -675,20 +677,20 @@ void StokesProblem<dim>::setup_dofs ()
                     // this in the same way as in step-20, 
                     // though, there is a major reason
                     // not to do so. In 3D, the function
-                    // <code>max_couplings_between_dofs@</code>
+                    // <code>DoFTools::max_couplings_between_dofs</code>
                     // yields a very large number for the
                     // coupling between the individual dofs,
                     // so that the memory initially provided
-                    // in the <code>reinit</code> of
-                    // the matrix is far too much - so 
+                    // for the creation of the sparsity pattern
+                    // of the matrix is far too much - so 
                     // much actually that it won't even fit
                     // into the physical memory of most
                     // systems already for moderately-sized 3D
-                    // problems. See also the discussing in
+                    // problems. See also the discussion in
                     // step-18.
                     // Instead, we use a temporary object of
                     // the class
-                    // <code>BlockCompressedSparsityPattern</code>,
+                    // BlockCompressedSparsityPattern,
                     // which is a block version of the
                     // compressed sparsity patterns from
                     // step-11 and step-18. All this is done
@@ -713,6 +715,9 @@ void StokesProblem<dim>::setup_dofs ()
     sparsity_pattern.copy_from (csp);
   }
   
+  std::ofstream out ("sparsity_pattern.gpl");
+  sparsity_pattern.block(0,0).print_gnuplot(out);
+
                     // Finally, the system matrix,
                     // solution and right hand side are 
                     // created from the block
@@ -785,13 +790,13 @@ void StokesProblem<dim>::assemble_system ()
 
   const RightHandSide<dim>          right_hand_side;
   std::vector<Vector<double> >      rhs_values (n_q_points,
-	  				                            Vector<double>(dim+1));
+                                                Vector<double>(dim+1));
 
                     // This starts the loop over all
                     // cells. With the abbreviations
                     // <code>extract_u</code> etc. 
-                    // introduced above, it is very
-                    // clear what is going on.
+                    // introduced above, it is 
+                    // evident what is going on.
   typename DoFHandler<dim>::active_cell_iterator
     cell = dof_handler.begin_active(),
     endc = dof_handler.end();
@@ -819,7 +824,7 @@ void StokesProblem<dim>::assemble_system ()
             const double        phi_j_p      = extract_p (fe_values, j, q);
               
             
-                    // Note how we write the 
+                    // Note the way we write the 
                     // contributions
                     // <code> phi_i_p * phi_j_p </code>,
                     // yielding a pressure mass matrix,
@@ -830,8 +835,8 @@ void StokesProblem<dim>::assemble_system ()
                     // They won't be mixed up, since
                     // <code>phi_i_p * phi_j_p</code>
                     // is only non-zero when all the
-                    // other terms vanish and the other
-                    // way around.
+                    // other terms vanish (and the other
+                    // way around).
             local_matrix(i,j) += (scalar_product(phi_i_grads_u, phi_j_grads_u)
                       - div_phi_i_u * phi_j_p
                       - phi_i_p * div_phi_j_u
@@ -847,7 +852,7 @@ void StokesProblem<dim>::assemble_system ()
       }
       
                     // Here we add the contributions from
-                    // Neumann (pressure) boundary conditions.
+                    // Neumann (pressure) boundary conditions
                     // at faces on the domain boundary that
                     // have the boundary flag "0", i.e. those
                     // that are not subject to Dirichlet
@@ -920,8 +925,8 @@ void StokesProblem<dim>::assemble_system ()
                     // To this end, we use a 
                     // <code>component_mask</code> that
                     // filters away the pressure 
-                    // componenent, so that the condensation
-                    // is performed only on
+                    // component, so that the condensation
+                    // is performed on
                     // velocity dofs.
   hanging_node_constraints.condense (system_matrix);
   hanging_node_constraints.condense (system_rhs);  
@@ -931,15 +936,15 @@ void StokesProblem<dim>::assemble_system ()
     std::vector<bool> component_mask (dim+1, true);
     component_mask[dim] = false;
     VectorTools::interpolate_boundary_values (dof_handler,
-                          1,
-                          BoundaryValues<dim>(),
-                          boundary_values,
-                          component_mask);
+                                              1,
+                                              BoundaryValues<dim>(),
+                                              boundary_values,
+                                              component_mask);
 
     MatrixTools::apply_boundary_values (boundary_values,
-                    system_matrix,
-                    solution,
-                    system_rhs);
+                                        system_matrix,
+                                        solution,
+                                        system_rhs);
   }
   
                     // Before we're going to solve 
@@ -994,7 +999,7 @@ void StokesProblem<dim>::solve ()
   
                     // This is as in step-20. We generate
                     // the right hand side 
-                    // B A^{-1} F Ð G for the
+                    // B A^{-1} F  Ð  G for the
                     // Schur complement and an object
                     // that represents the respective
                     // linear operation B A^{-1} B^T,
@@ -1018,7 +1023,7 @@ void StokesProblem<dim>::solve ()
     SolverCG<>    cg (solver_control);
     
                     // Now to the preconditioner to the
-                    // Schur complement. As derived in the
+                    // Schur complement. As explained in the
                     // introduction, the preconditioning
                     // is done by a mass matrix in the
                     // pressure variable. 
@@ -1037,12 +1042,12 @@ void StokesProblem<dim>::solve ()
                     // In this case, we have to invert
                     // the pressure mass matrix. As it 
                     // already turned out in earlier tutorial
-                    // program, the inversion of a mass
+                    // programs, the inversion of a mass
                     // matrix is a rather cheap and
                     // straight-forward operation (compared
                     // to, e.g., a Laplace matrix). The CG
-                    // method with simple preconditioning
-                    // with SSOR converges in 10-20 steps,
+                    // method with SSOR preconditioning
+                    // converges in 10-20 steps,
                     // independently on the mesh size.
                     // This is precisely what we do here:
                     // We choose an SSOR preconditioner
@@ -1050,7 +1055,8 @@ void StokesProblem<dim>::solve ()
                     // to the InverseMatrix object via
                     // the corresponding template parameter.
                     // A CG solver is then called within
-                    // the vmult operation.
+                    // the vmult operation of the inverse
+                    // matrix.
     PreconditionSSOR<> preconditioner;
     preconditioner.initialize (system_matrix.block(1,1), 1.2);
   
@@ -1074,8 +1080,8 @@ void StokesProblem<dim>::solve ()
                      // After this first solution step,
                      // the hanging node constraints have
                      // to be distributed to the solution -
-                     // that a consistent pressure field
-                     // is achieved.
+                     // in order to achieve a consistent 
+                     // pressure field.
     hanging_node_constraints.distribute (solution);
   
     std::cout << "  "
@@ -1087,10 +1093,10 @@ void StokesProblem<dim>::solve ()
     
                     // As in step-20, we finally need to
                     // solve for the velocity equation
-                    // with the solution of the pressure
-                    // equation at hand. We do not perform
-                    // any direct solution of a linear 
-                    // system, but only need to
+                    // where we plug in the the solution 
+                    // to the pressure equation. This involves 
+                    // only objects we already know - so
+                    // we simply
                     // multiply p by B^T, subtract the 
                     // right hand side and multiply
                     // by the inverse of A.
@@ -1125,7 +1131,7 @@ void StokesProblem<dim>::solve ()
                     // and which scalars, we need to
                     // add that information as well -
                     // achieved by the 
-                    // <code>DataComponentInterpretation@</code>
+                    // <code>DataComponentInterpretation</code>
                     // class.
                     // The rest of the function is 
                     // then the same as in step-20.
@@ -1237,16 +1243,17 @@ void StokesProblem<dim>::run ()
                     // the example description above for
                     // details.
   for (typename Triangulation<dim>::active_cell_iterator
-     cell = triangulation.begin_active();
+       cell = triangulation.begin_active();
        cell != triangulation.end(); ++cell)
     for (unsigned int f=0; f<GeometryInfo<dim>::faces_per_cell; ++f)
       if (cell->face(f)->center()[dim-1] == 0)
-    {
-      cell->face(f)->set_boundary_indicator(1);
-      
-    /*for (unsigned int e=0; e<GeometryInfo<dim>::lines_per_face; ++e)
-      cell->face(f)->line(e)->set_boundary_indicator (1);*/
-    }
+      {
+        cell->face(f)->set_boundary_indicator(1);
+        /*
+        for (unsigned int e=0; e<GeometryInfo<dim>::lines_per_face; ++e)
+          cell->face(f)->line(e)->set_boundary_indicator (1);
+        */
+      }
   
   
                     // We employ an initial refinement before
@@ -1296,7 +1303,7 @@ int main ()
     {
       deallog.depth_console (0);
 
-      StokesProblem<2> flow_problem(1);
+      StokesProblem<3> flow_problem(1);
       flow_problem.run ();
     }
   catch (std::exception &exc)
