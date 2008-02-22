@@ -370,8 +370,10 @@ class DoFRenumbering
     static void
     component_wise (MGDoFHandler<dim>&               dof_handler,
 		    const std::vector<unsigned int>& target_component = std::vector<unsigned int>());
+
     
-				     /**
+  protected:
+    				     /**
 				      * Computes the renumbering
 				      * vector needed by the
 				      * component_wise()
@@ -386,8 +388,8 @@ class DoFRenumbering
 			    ITERATOR& start,
 			    const ENDITERATOR& end,
 			    const std::vector<unsigned int> &target_component);
-    
-				     /**
+  public:
+    				     /**
 				      * Cell-wise renumbering for DG
 				      * elements.  This function takes
 				      * the ordered set of cells in
