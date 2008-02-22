@@ -1,4 +1,4 @@
-//----------------------------  symmetric_tensor_21.cc  ---------------------------
+//----------------------------  symmetric_tensor_22.cc  ---------------------------
 //    $Id$
 //    Version: $Name$ 
 //
@@ -9,9 +9,9 @@
 //    to the file deal.II/doc/license.html for the  text  and
 //    further information on this license.
 //
-//----------------------------  symmetric_tensor_21.cc  ---------------------------
+//----------------------------  symmetric_tensor_22.cc  ---------------------------
 
-// check SymmetricTensor<4,dim>::operator= (double)
+// check operator<< for SymmetricTensor<2,dim> and SymmetricTensor<4,dim>
 
 #include "../tests.h"
 #include <base/symmetric_tensor.h>
@@ -22,22 +22,30 @@
 
 int main ()
 {
-  std::ofstream logfile("symmetric_tensor_21/output");
+  std::ofstream logfile("symmetric_tensor_22/output");
   deallog << std::setprecision(3);
   deallog.attach(logfile);
   deallog.depth_console(0);
   deallog.threshold_double(1.e-10);
+
+  {
+    const unsigned int dim=2;
+    SymmetricTensor<2,dim> t;
+    t[0][0] = 1;
+    t[1][1] = 2;
+    t[0][1] = 3;
+
+    deallog << t << std::endl;
+  }
   
-  const unsigned int dim=3;
-  SymmetricTensor<4,dim> t;
-  t[0][0][0][0] = t[1][0][1][0] = t[1][1][1][1]
-                = t[2][2][2][2] = t[2][0][2][0] = 3;
+  {
+    const unsigned int dim=3;
+    SymmetricTensor<4,dim> t;
+    t[0][0][0][0] = t[1][0][1][0] = t[1][1][1][1]
+		  = t[2][2][2][2] = t[2][0][2][0] = 3;
 
-  deallog << t.norm() << std::endl;
-  t = 0;
-  deallog << t.norm() << std::endl;
-
-  Assert (t.norm() == 0, ExcInternalError());
+    deallog << t << std::endl;
+  }
   
   deallog << "OK" << std::endl;
 }

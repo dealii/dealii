@@ -130,6 +130,18 @@ inconvenience this causes.
 
 <ol>
 
+<li> <p> New: The SymmetricTensor class now has a constructor that creates
+an object from an array consisting its independent components.
+<br>
+(WB 2008/02/21)
+</p> </li>
+
+<li> <p> New: There are now output operators (i.e. <code>operator@<@<</code>)
+for the SymmetricTensor class. 
+<br>
+(WB 2008/02/12)
+</p> </li>
+
 <li> <p> Improved: LogStream is now thread safe and output lines from different
 threads are separated now. Additionally, a function LogStream::log_thread_id()
 has been added to log the id of the thread printing the message. The semantics

@@ -2,7 +2,7 @@
 //    $Id$
 //    Version: $Name$
 //
-//    Copyright (C) 2005, 2006 by the deal.II authors
+//    Copyright (C) 2005, 2006, 2008 by the deal.II authors
 //
 //    This file is subject to QPL and may not be  distributed
 //    without copyright and license information. Please refer
@@ -214,6 +214,14 @@ namespace internal
         static const unsigned int
         n_rank2_components = (dim*dim + dim)/2;
 
+                                         /**
+                                          * Number of independent components of a
+                                          * symmetric tensor of rank 4.
+                                          */
+	static const unsigned int
+	n_independent_components = (n_rank2_components *
+				    StorageType<2,dim>::n_independent_components);
+	
                                          /**
                                           * Declare the type in which we
                                           * actually store the data. Symmetric
@@ -619,6 +627,18 @@ class SymmetricTensor
 				      * data types.
 				      */
     static const unsigned int dimension = dim;
+
+				     /**
+				      * An integer denoting the number of
+				      * independent components that fully
+				      * describe a symmetric tensor. In $d$
+				      * space dimensions, this number equals
+				      * $\frac 12 (d^2+d)$ for symmetric
+				      * tensors of rank 2.
+				      */
+    static const unsigned int n_independent_components
+    = internal::SymmetricTensorAccessors::StorageType<rank,dim>::
+      n_independent_components;
     
                                      /**
                                       * Default constructor. Creates a zero
@@ -646,6 +666,21 @@ class SymmetricTensor
                                       */
     SymmetricTensor (const Tensor<2,dim> &t);
 
+				     /**
+				      * A constructor that creates a symmetric
+				      * tensor from an array holding its
+				      * independent elements. Using this
+				      * constructor assumes that the caller
+				      * knows the order in which elements are
+				      * stored in symmetric tensors; its use
+				      * is therefore discouraged.
+				      *
+				      * This constructor is currently inly
+				      * implemented for symmetric tensors of
+				      * rank 2.
+				      */
+    SymmetricTensor (const double (&array) [n_independent_components]);
+    
 				     /**
 				      *  Assignment operator.
 				      */
@@ -1016,6 +1051,14 @@ SymmetricTensor<2,3>::SymmetricTensor (const Tensor<2,3> &t)
   data[4] = t[0][2];
   data[5] = t[1][2];
 }
+
+
+template <int rank, int dim>
+inline
+SymmetricTensor<rank,dim>::SymmetricTensor (const double (&array) [n_independent_components])
+		:
+		data (array)
+{}
 
 
 template <int rank, int dim>
@@ -2663,6 +2706,64 @@ double_contract (SymmetricTensor<2,3> &tmp,
 		  2 * s[0][1] * t[0][1][i][j] +
 		  2 * s[0][2] * t[0][2][i][j] +
 		  2 * s[1][2] * t[1][2][i][j];
+}
+
+
+
+/**
+ * Output operator for symmetric tensors of rank 2. Print the elements
+ * consecutively, with a space in between, two spaces between rank 1
+ * subtensors, three between rank 2 and so on. No special amends are made to
+ * represents the symmetry in the output, for example by outputting only the
+ * unique entries.
+ *
+ * @relates SymmetricTensor
+ */
+template <int dim>
+inline
+std::ostream & operator << (std::ostream &out,
+			    const SymmetricTensor<2,dim> &t)
+{
+				   //make out lives a bit simpler by outputing
+				   //the tensor through the operator for the
+				   //general Tensor class
+  Tensor<2,dim> tt;
+  
+  for (unsigned int i=0; i<dim; ++i)
+    for (unsigned int j=0; j<dim; ++j)
+      tt[i][j] = t[i][j];
+
+  return out << tt;
+}
+
+
+
+/**
+ * Output operator for symmetric tensors of rank 4. Print the elements
+ * consecutively, with a space in between, two spaces between rank 1
+ * subtensors, three between rank 2 and so on. No special amends are made to
+ * represents the symmetry in the output, for example by outputting only the
+ * unique entries.
+ *
+ * @relates SymmetricTensor
+ */
+template <int dim>
+inline
+std::ostream & operator << (std::ostream &out,
+			    const SymmetricTensor<4,dim> &t)
+{
+				   //make out lives a bit simpler by outputing
+				   //the tensor through the operator for the
+				   //general Tensor class
+  Tensor<4,dim> tt;
+  
+  for (unsigned int i=0; i<dim; ++i)
+    for (unsigned int j=0; j<dim; ++j)
+      for (unsigned int k=0; k<dim; ++k)
+	for (unsigned int l=0; l<dim; ++l)
+	  tt[i][j][k][l] = t[i][j][k][l];
+
+  return out << tt;
 }
 
 
