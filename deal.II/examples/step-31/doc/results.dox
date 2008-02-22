@@ -214,33 +214,36 @@ Let's have a look at the solution as well.
 @image html step-31.3d.solution.png
 
 <h3>Sparsity pattern</h3>
-As mentioned when generating the sparsity pattern, it is useful to have a look
-at the location of the nonzero elements. We first start off with a simple dof
+As explained during the generation of the sparsity pattern, it is important to
+have the distribution of nonzero elements in the stiffness matrix in mind.
+
+We first start off with a simple dof
 renumbering by components (i.e., without using Cuthill_McKee) after the first
-refinement in two dimensions. In order to generate such an output, you would
-have to insert a piece of code like the following in the end of the setup step.
+adaptive refinement in two dimensions.
+In order to generate such an output, you have to insert a piece of code like the
+following in the end of the setup step.
 Note that it is not possible to directly output a BlockSparsityPattern, so we
 need to generate some temporary objects that will be released again in order to
 not slow down the program.
 @code
   {
-    SparsityPattern full_sparsity;
+    SparsityPattern complete_sparsity_pattern;
     CompressedSparsityPattern csp (dof_handler.n_dofs(),
                                    dof_handler.n_dofs());
     DoFTools::make_sparsity_pattern(dof_handler, csp);
     hanging_node_constraints.condense (csp);
-    full_sparsity.copy_from(csp);
+    complete_sparsity_pattern.copy_from(csp);
     std::ofstream out ("sparsity_pattern.gpl");
-    full_sparsity.print_gnuplot(out);
+    complete_sparsity_pattern.print_gnuplot(out);
   }
 @endcode
 
 @image html step-31.2d.sparsity-nor.png
 
-It is clearly visible that the dofs are spread over the almost the whole matrix.
-This makes the preconditioning by ILU inefficient: ILU generates a Gaussian
-elimination (LU decomposition) without fill-in element, which means that more 
-fill-ins left out will result in a worse approximation to the full 
+It is clearly visible that the dofs are spread over almost the whole matrix.
+This makes preconditioning by ILU inefficient: ILU generates a Gaussian
+elimination (LU decomposition) without fill-in elements, which means that more 
+tentative fill-ins left out will result in a worse approximation of the complete 
 decomposition.
 
 In this program, we have thus chosen a more advanced renumbering of components.
@@ -255,7 +258,8 @@ matrix. Similar effects are also visible for the other blocks. In this case, the
 ILU decomposition will be much closer to the full LU decomposition, which
 improves the quality of the preconditioner. It is also worthwile to note that
 the sparse direct solver UMFPACK does some internal renumbering of the equations 
-that leads to a similar pattern as the one we got from Cuthill_McKee.
+before actually generating a sparse LU decomposition that leads to a 
+similar pattern as the one we got from Cuthill_McKee.
 
 Finally, we want to have a closer
 look at a sparsity pattern in 3D. We show only the (0,0) block of the
@@ -263,7 +267,7 @@ matrix, again after one adaptive refinement. Apart from the fact that the matrix
 size has increased, it is also visible that there are many more entries
 in the matrix. Moreover, even for the optimized renumbering, there will be a
 considerable amount of tentative fill-in elements. This illustrates why UMFPACK 
-is not a good choice in 3D - there will be need for many new entries that
+is not a good choice in 3D - a full decomposition needs many new entries that
  eventually won't fit into the physical memory (RAM).
 
 @image html step-31.3d.sparsity_uu-ren.png
@@ -275,7 +279,8 @@ is not a good choice in 3D - there will be need for many new entries that
 We have seen in the section of computational results that the number of outer
 iterations does not depend on the mesh size, which is optimal in a sense of
 scalability. This is however only partly true, since we did not look at the
-number of iterations in the inner preconditioner. Of course, this is
+number of iterations for the inner iterations, i.e. generating the inverse of
+the matrix $A$ and the mass matrix $M_p$. Of course, this is
 unproblematic in the 2D case where we precondition with a direct solver and the
 vmult operation of the inverse matrix structure will converge in one single CG
 step, but this changes in 3D where we need to apply the ILU preconditioner.
@@ -283,35 +288,35 @@ There, the number of required step basically doubles with half the element size,
 so the work gets more and more for larger systems. For the 3D results obtained
 above, each vmult operation involves approx. 14, 23, 36, 59, 72, 101 etc. inner 
 CG iterations. (On the other hand, the number of iterations for applying the 
-inverse
-pressure mass matrix is always about 10-11.) To summarize, most work is spent on
+inverse pressure mass matrix is always about 10-11.)
+To summarize, most work is spent on
 creating the same matrix inverse over and over again. It is a natural question
-to ask whether we can do that any better and avoid inverting the matrix several
-times.
+to ask whether we can do that any better and avoid inverting the same 
+(complicated) matrix several times.
   
 The answer is, of course, that we can do that in a few other (most of the time
 better) ways.
 
 The first way would be to choose a preconditioner that makes CG
-for the (0,0) matrix converge in a mesh-independent number of iterations around
-10 to 20. We have seen such a canditate in step-16: multigrid.
+for the (0,0) matrix converge in a mesh-independent number of iterations, say
+10 to 30. We have seen such a canditate in @ref step_16 "step-16": multigrid.
 
 <h4>Block Schur complement preconditioner</h4>
 But even in this situation there would still be need for the repeated solution
-of the same linear system. The question is how this can be avoided. If we stay
-with the calculation of the Schur complement, there is no other possibility.
+of the same linear system. The question is how this can be avoided. If we
+persist in calculating the Schur complement, there is no other possibility.
 The alternative is to attack the block system at one time and use an approximate
 Schur complement as an efficient preconditioner. The basic attempt is as
-follows: If we find a block preconditioner $\mathcal P$ such that the matrix
+follows: If we find a block preconditioner $P$ such that the matrix
 @f{eqnarray*}
-  \mathcal P^{-1}\left(\begin{array}{cc}
+  P^{-1}\left(\begin{array}{cc}
     A & B^T \\ B & 0
   \end{array}\right)
 @f}
 is simple, then an iterative solver with that preconditioner will converge in a
 few iterations. Using the Schur complement $S = B A^{-1} B^T$, one finds that
 @f{eqnarray*}
-  \mathcal P^{-1}\left(\begin{array}{cc}
+  P^{-1}\left(\begin{array}{cc}
     A & B^T \\ B & 0
   \end{array}\right) 
   = 
@@ -327,26 +332,29 @@ few iterations. Using the Schur complement $S = B A^{-1} B^T$, one finds that
 @f}
 see also the paper by Silvester and Wathen referenced to in the introduction. In
 this case, a Krylov-based iterative method will converge in two steps, since
-there are only two distinct eigenvalues to this matrix. Though, it is not
-possible to use CG since the block matrix is not positive definite (it has
+there are only two distinct eigenvalues 0 and 1 of this matrix. Though, it is
+not possible to use CG since the block matrix is not positive definite (it has
 indeed both positive and negative eigenvalues, i.e. it is indefinite). Instead
 one has to choose e.g. the iterative solver GMRES, which is more expensive
 per iteration (more inner products to be calculated), but is applicable also to
 indefinite (and non-symmetric) matrices.
 
-Since $\mathcal P$ is aimed to be a preconditioner only, we can also use
-approximations to the Schur complement $S$ and the matrix $A$. This is what an
-improved solver for the Stokes system is going to look like: The Schur
+Since $P$ is aimed to be a preconditioner only, we shall only use
+approximations to the Schur complement $S$ and the matrix $A$. So an
+improved solver for the Stokes system is going to look like the following: 
+The Schur
 complement will be approximated by the pressure mass matrix $M_p$, and we use a
 preconditioner to $A$ (without an InverseMatrix class around it) to approximate 
-A. This is however partly compensated by the fact that we need to perform the
-solver iterations on the full block system instead of the smaller pressure
-space.
+$A$. The advantage of this approach is however partly compensated by the fact 
+that we need to perform the solver iterations on the full block system i
+nstead of the smaller pressure space.
 
 An implementation of such a solver could look like this:
 
 First the class for the block Schur complement preconditioner, which implements
-a vmult operation for block vectors.
+a vmult operation of the preconditioner for block vectors. Note that the
+preconditioner $P$ described above is implemented by three successive
+operations.
 @code
 template <class Preconditioner>
 class BlockSchurPreconditioner : public Subscriptor
@@ -395,22 +403,22 @@ void BlockSchurPreconditioner<Preconditioner>::vmult (
                                      BlockVector<double>       &dst,
                                      const BlockVector<double> &src) const
 {
-        // This is going to be a left preconditioner for the Schur complement
-        // to be used with the CG or GMRES method
-        // Form u_new = F^{-1} u
+        // Form u_new = A^{-1} u
   a_preconditioner.vmult (dst.block(0), src.block(0));
-        // Form tmp3 = - B u_new + p (<code>SparseMatrix::residual</code>
+        // Form tmp.block(1) = - B u_new + p 
+        // (<code>SparseMatrix::residual</code>
         // does precisely this)
   system_matrix->block(1,0).residual(tmp.block(1), 
                                      dst.block(0), src.block(1));
-        // Change sign in tmp3
+        // Change sign in tmp.block(1)
   tmp.block(1) *= -1;
-        // Multiply by Greens function (Schur complement-like) precond
+        // Multiply by approximate Schur complement 
+        // (i.e. a pressure mass matrix)
   m_inverse->vmult (dst.block(1), tmp.block(1));
 }
 @endcode
 
-The actual solver call can be realized as
+The actual solver call can be realized as follows.
 
 @code
       SparseMatrix<double> pressure_mass_matrix;
@@ -432,21 +440,22 @@ The actual solver call can be realized as
       
       SolverGMRES<BlockVector<double> > gmres(solver_control);
       
-      gmres.solve(system_matrix, alternative_solution, system_rhs,
+      gmres.solve(system_matrix, solution, system_rhs,
                   preconditioner);
       
-      hanging_node_constraints.distribute (alternative_solution);
+      hanging_node_constraints.distribute (solution);
       
       std::cout << " "
                 << solver_control.last_step()
                 << " block GMRES iterations";
 @endcode
 
-Obviously, one needs to add the include file <lac/solver_gmres.h> in order to
-make this run. We call the solver with a BlockVector template in order to enable
+Obviously, one needs to add the include file @ref SolverGMRES 
+"<lac/solver_gmres.h>" in order to make this run. 
+We call the solver with a BlockVector template in order to enable
 GMRES to operate on block vectors and matrices.
-Note also that we need to zero the (1,1) block from the system
-matrix (we saved the pressure mass matrix there which is not part of the
+Note also that we need to set the (1,1) block in the system
+matrix to zero (we saved the pressure mass matrix there which is not part of the
 problem) after we copied to information to another matrix.
 
 Using the timer class, we collected some statistics that compare the runtime of
@@ -527,13 +536,14 @@ Refinement cycle 6
       Block Schur preconditioner: 13 GMRES iterations [8.62034 s]
    max difference l_infty in the two solution vectors: 0.000245764
 @endcode
+
 We see that the runtime for solution using the block Schur complement 
 preconditioner is higher than the one with the Schur complement directly. The
 reason is simple: We used a direct solve as preconditioner here - so there won't
 be any gain by avoiding the inner iterations (indeed, we see that slightly more
 iterations are needed).
 
-The picture changes of course in 3D:
+The picture of course changes in 3D:
 
 @code
 Refinement cycle 0
@@ -580,11 +590,11 @@ Refinement cycle 3
 Here, the block preconditioned solver is clearly superior to the Schur
 complement, even though the advantage gets less for more mesh points. The reason
 for the decreasing advantage is that the mass matrix is still inverted
-iteratively, so that it is inverted more and more time if the block GMRES
+iteratively, so that it is inverted more and more times when the block GMRES
 solver uses more iterations.
 
-<h4>Not using block matrices and vectors</h4>
+<h4>No block matrices and vectors</h4>
 Another possibility that can be taken into account is to not set up a block
-system, but rather solve the system of velocity and pressure all-at once. The
+system, but rather solve the system of velocity and pressure all at once. The
 alternatives are direct solve with UMFPACK (2D) or GMRES with ILU
 preconditioning (3D).
