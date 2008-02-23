@@ -215,6 +215,13 @@ an integer id of the current thread.
 
 <ol>
 
+<li> Fixed: The PETScWrappers::MatrixBase::clear_row and
+PETScWrappers::MatrixBase::clear_rows functions had a memory leak that made
+PETSc become progressively slower over time. This is now fixed.
+<br>
+(Daniel Goldberg 2008/2/20)
+</li>
+
 <li> Improved: All GrowingVectorMemory objects that have the same template
 argument will access the same memory pool. Therefore, it is now not a
 crime any more to just create a memory pool and discard later. Furthermore,

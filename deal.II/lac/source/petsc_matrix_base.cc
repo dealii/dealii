@@ -214,7 +214,6 @@ namespace PETScWrappers
 
                                      // now set all the entries of this row to
                                      // zero
-    IS index_set;
 #if (PETSC_VERSION_MAJOR <= 2) && \
     ((PETSC_VERSION_MINOR < 2) ||  \
      ((PETSC_VERSION_MINOR == 2) && (PETSC_VERSION_SUBMINOR == 0)))
@@ -222,6 +221,8 @@ namespace PETScWrappers
 #else
     const PetscInt petsc_row = row;
 #endif
+    
+    IS index_set;
     ISCreateGeneral (get_mpi_communicator(), 1, &petsc_row, &index_set);
     
 #if (PETSC_VERSION_MAJOR <= 2) && (PETSC_VERSION_MINOR <= 2)
@@ -234,6 +235,8 @@ namespace PETScWrappers
     
     AssertThrow (ierr == 0, ExcPETScError(ierr));
 
+    ISDestroy (index_set);
+    
     compress ();
   }
 
@@ -247,7 +250,6 @@ namespace PETScWrappers
 
                                      // now set all the entries of these rows
                                      // to zero
-    IS index_set;
 #if (PETSC_VERSION_MAJOR <= 2) && \
     ((PETSC_VERSION_MINOR < 2) ||  \
      ((PETSC_VERSION_MINOR == 2) && (PETSC_VERSION_SUBMINOR == 0)))
@@ -259,6 +261,7 @@ namespace PETScWrappers
                                      // call the functions. note that we have
                                      // to call them even if #rows is empty,
                                      // since this is a collective operation
+    IS index_set;
     ISCreateGeneral (get_mpi_communicator(), rows.size(),
                      &petsc_rows[0], &index_set);
     
@@ -272,6 +275,8 @@ namespace PETScWrappers
     
     AssertThrow (ierr == 0, ExcPETScError(ierr));
 
+    ISDestroy (index_set);
+    
     compress ();
   }
   
