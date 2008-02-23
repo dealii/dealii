@@ -249,8 +249,8 @@ class RightHandSide : public Function<dim>
 
 template <int dim>
 double
-RightHandSide<dim>::value (const Point<dim>  &p,
-                           const unsigned int component) const 
+RightHandSide<dim>::value (const Point<dim>  &/*p*/,
+                           const unsigned int /*component*/) const 
 {
   return 0;
 }
@@ -265,120 +265,6 @@ RightHandSide<dim>::vector_value (const Point<dim> &p,
     values(c) = RightHandSide<dim>::value (p, c);
 }
 
-
-
-                        // @sect3{extract_u and friends}
-
-                    // The next four functions are needed for
-                    // the assembly of the system matrix and 
-                    // the right hand side. They are very similar
-                    // to the ones used in step-20, except
-                    // that we are going to use Q(p+1)Qp elements
-                    // instead of divergence-free Raviart-Thomas
-                    // elements, which simplifies this procedure.
-                    // The only function that is new is 
-                    // <code>extract_grad_s_u</code>, which 
-                    // gets the symmetric gradient of u.
-                    // As discussed in the introduction, this
-                    // is a second-rank tensor, formed by
-                    // contributions from the gradient and its
-                    // transpose.
-template <int dim>
-Tensor<1,dim>
-extract_u (const FEValuesBase<dim> &fe_values,
-           const unsigned int i,
-           const unsigned int q)
-{
-  Tensor<1,dim> tmp;
-
-  const unsigned int component
-    = fe_values.get_fe().system_to_component_index(i).first;
-
-  if (component < dim)
-    tmp[component] = fe_values.shape_value (i,q);
-
-  return tmp;
-}
-
-
-
-template <int dim>
-double
-extract_div_u (const FEValuesBase<dim> &fe_values,
-               const unsigned int i,
-               const unsigned int q)
-{
-  const unsigned int component
-    = fe_values.get_fe().system_to_component_index(i).first;
-
-  if (component < dim)
-    return fe_values.shape_grad (i,q)[component];
-  else
-    return 0;
-}
-
-
-template <int dim>
-Tensor<2,dim>
-extract_grad_s_u (const FEValuesBase<dim> &fe_values,
-		  const unsigned int i,
-		  const unsigned int q)
-{
-  Tensor<2,dim> tmp;
-
-  const unsigned int component
-    = fe_values.get_fe().system_to_component_index(i).first;
-  
-  if (component < dim)
-    {
-      const Tensor<1,dim> grad_phi_over_2 = fe_values.shape_grad (i,q) / 2;
-      
-      for (unsigned int e=0; e<dim; ++e)
-	tmp[component][e] += grad_phi_over_2[e];
-      for (unsigned int d=0; d<dim; ++d)
-	tmp[d][component] += grad_phi_over_2[d];
-    }
-  
-  return tmp;
-}
-
-
-  
-template <int dim>
-double extract_p (const FEValuesBase<dim> &fe_values,
-                  const unsigned int i,
-                  const unsigned int q)
-{
-  const unsigned int component
-    = fe_values.get_fe().system_to_component_index(i).first;
-
-  if (component == dim)
-    return fe_values.shape_value (i,q);
-  else
-    return 0;
-}
-
-                        // @sect4{Inner product of second-rank tensors}
-                        
-                    // In the assembly process, we will need
-                    // to form inner products of second-rank 
-                    // tensors. The way how to do this was
-                    // discussed in the introduction - just
-                    // take the sum of the product of the
-                    // individual entries.
-template <int dim>
-double
-scalar_product (const Tensor<2,dim> &a,
-                const Tensor<2,dim> &b)
-{
-  double tmp = 0;
-  for (unsigned int i=0; i<dim; ++i)
-    for (unsigned int j=0; j<dim; ++j)
-      tmp += a[i][j] * b[i][j];
-  return tmp;
-}
-
- 
 
                         // @sect3{Linear solvers and preconditioners}
                         
@@ -746,7 +632,6 @@ void StokesProblem<dim>::setup_dofs ()
                     // hand side, and global
                     // numbers of the degrees of freedom
                     // for the present cell.
-
 template <int dim>
 void StokesProblem<dim>::assemble_system () 
 {
@@ -787,10 +672,17 @@ void StokesProblem<dim>::assemble_system ()
   const PressureBoundaryValues<dim> pressure_boundary_values;
   
   std::vector<double>               boundary_values (n_face_q_points);
-
+  
   const RightHandSide<dim>          right_hand_side;
   std::vector<Vector<double> >      rhs_values (n_q_points,
                                                 Vector<double>(dim+1));
+
+				   // Next, we need two objects that work as
+				   // extractors for the FEValues
+				   // object. Their use is explained in detail
+				   // in the report on @ref vector_valued :
+  const FEValuesExtractors::Vector velocities (0);
+  const FEValuesExtractors::Scalar pressure (dim);
 
                     // This starts the loop over all
                     // cells. With the abbreviations
@@ -810,20 +702,21 @@ void StokesProblem<dim>::assemble_system ()
                                         rhs_values);
       
       for (unsigned int q=0; q<n_q_points; ++q)
-      {
-        for (unsigned int i=0; i<dofs_per_cell; ++i)
-        {
-	      const Tensor<2,dim> phi_i_grads_u= extract_grad_s_u (fe_values, i, q);
-	      const double        div_phi_i_u  = extract_div_u (fe_values, i, q);
-	      const double        phi_i_p      = extract_p (fe_values, i, q);
+	{
+	  for (unsigned int i=0; i<dofs_per_cell; ++i)
+	    {
+	      const SymmetricTensor<2,dim>
+		phi_i_grads_u = fe_values[velocities].symmetric_gradient (i, q);
+	      const Tensor<1,dim> phi_i_u       = fe_values[velocities].value (i, q);
+	      const double        div_phi_i_u   = fe_values[velocities].divergence (i, q);
+	      const double        phi_i_p       = fe_values[pressure].value (i, q);
           
           for (unsigned int j=0; j<dofs_per_cell; ++j)
           {
-            const Tensor<2,dim> phi_j_grads_u= extract_grad_s_u (fe_values, j, q);
-            const double        div_phi_j_u  = extract_div_u (fe_values, j, q);
-            const double        phi_j_p      = extract_p (fe_values, j, q);
-              
-            
+		  const SymmetricTensor<2,dim>
+		    phi_j_grads_u = fe_values[velocities].symmetric_gradient (j, q);
+		  const double        div_phi_j_u   = fe_values[velocities].divergence (j, q);
+		  const double        phi_j_p       = fe_values[pressure].value (j, q);
                     // Note the way we write the 
                     // contributions
                     // <code> phi_i_p * phi_j_p </code>,
@@ -837,11 +730,20 @@ void StokesProblem<dim>::assemble_system ()
                     // is only non-zero when all the
                     // other terms vanish (and the other
                     // way around).
-            local_matrix(i,j) += (scalar_product(phi_i_grads_u, phi_j_grads_u)
+						   //
+						   // Note also that operator*
+						   // is overloaded for
+						   // symmetric tensors,
+						   // yielding the scalar
+						   // product between the two
+						   // tensors in the first
+						   // line:
+            local_matrix(i,j) += (phi_i_grads_u * phi_j_grads_u
                       - div_phi_i_u * phi_j_p
                       - phi_i_p * div_phi_j_u
                       + phi_i_p * phi_j_p)
                          * fe_values.JxW(q);     
+
           }
           const unsigned int component_i =
             fe.system_to_component_index(i).first;
@@ -871,15 +773,15 @@ void StokesProblem<dim>::assemble_system ()
 
             for (unsigned int q=0; q<n_face_q_points; ++q)
               for (unsigned int i=0; i<dofs_per_cell; ++i)
-              {
-                const Tensor<1,dim>
-                  phi_i_u = extract_u (fe_face_values, i, q);
-                
-                local_rhs(i) += -(phi_i_u *
-                                  fe_face_values.normal_vector(q) *
-                                  boundary_values[q] *
-                                  fe_face_values.JxW(q));
-              }
+                {
+                  const Tensor<1,dim>
+                    phi_i_u = fe_face_values[velocities].value (i, q);
+
+                  local_rhs(i) += -(phi_i_u *
+                                    fe_face_values.normal_vector(q) *
+                                    boundary_values[q] *
+                                    fe_face_values.JxW(q));
+                }
           }
 
                     // The final step is, as usual,

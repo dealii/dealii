@@ -92,6 +92,9 @@ mixing over time scales of many million years, a time scale much
 shorter than for the same amount of heat to be distributed by thermal
 conductivity. 
 
+The equations covered here fall into the class of vector-valued problems. A
+toplevel overview of this topic can be found in the @ref vector_valued module.
+
 
 <h2>%Boundary and initial conditions</h2>
 
@@ -263,119 +266,6 @@ temperature field using the just computed velocity field.
 
 
 
-
-@code
-template <int dim>
-Tensor<1,dim>
-extract_u (const FEValuesBase<dim> &fe_values,
-           const unsigned int i,
-           const unsigned int q)
-{
-  Tensor<1,dim> tmp;
-
-  const unsigned int component
-    = fe_values.get_fe().system_to_component_index(i).first;
-
-  if (component < dim)
-    tmp[component] = fe_values.shape_value (i,q);
-
-  return tmp;
-}
-
-
-
-template <int dim>
-double
-extract_div_u (const FEValuesBase<dim> &fe_values,
-               const unsigned int i,
-               const unsigned int q)
-{
-  const unsigned int component
-    = fe_values.get_fe().system_to_component_index(i).first;
-
-  if (component < dim)
-    return fe_values.shape_grad (i,q)[component];
-  else
-    return 0;
-}
-
-
-
-template <int dim>
-Tensor<2,dim>
-extract_grad_s_u (const FEValuesBase<dim> &fe_values,
-		  const unsigned int i,
-		  const unsigned int q)
-{
-  Tensor<2,dim> tmp;
-
-  const unsigned int component
-    = fe_values.get_fe().system_to_component_index(i).first;
-  
-  if (component < dim)
-    {
-      const Tensor<1,dim> grad_phi_over_2 = fe_values.shape_grad (i,q) / 2;
-      
-      for (unsigned int e=0; e<dim; ++e)
-	tmp[component][e] += grad_phi_over_2[e];
-      for (unsigned int d=0; d<dim; ++d)
-	tmp[d][component] += grad_phi_over_2[d];
-    }
-  
-  return tmp;
-}
-
-
-  
-template <int dim>
-double extract_p (const FEValuesBase<dim> &fe_values,
-                  const unsigned int i,
-                  const unsigned int q)
-{
-  const unsigned int component
-    = fe_values.get_fe().system_to_component_index(i).first;
-
-  if (component == dim)
-    return fe_values.shape_value (i,q);
-  else
-    return 0;
-}
-
-
-
-template <int dim>
-double extract_T (const FEValuesBase<dim> &fe_values,
-                  const unsigned int i,
-                  const unsigned int q)
-{
-  const unsigned int component
-    = fe_values.get_fe().system_to_component_index(i).first;
-
-  if (component == dim+1)
-    return fe_values.shape_value (i,q);
-  else
-    return 0;
-}
-
-
-
-template <int dim>
-Tensor<1,dim>
-extract_grad_T (const FEValuesBase<dim> &fe_values,
-                const unsigned int i,
-                const unsigned int q)
-{
-  Tensor<1,dim> tmp;
-
-  const unsigned int component
-    = fe_values.get_fe().system_to_component_index(i).first;
-
-  if (component == dim+1)
-    tmp = fe_values.shape_grad (i,q);
-
-  return tmp;
-}
-@endcode
 
 @code
   {

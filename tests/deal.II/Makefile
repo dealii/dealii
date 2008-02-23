@@ -74,6 +74,7 @@ tests_x = block_matrices \
 	create_* \
 	line_coarsening_3d \
 	no_flux_* \
+	fe_values_view_* \
 	rt_hessian \
 	rt_covariant
 

@@ -24,6 +24,9 @@ We are going to extend this tutorial program in @ref step_21 "step-21" to
 solve not only the mixed Laplace equation, but add another equation that
 describes the transport of a mixture of two fluids.
 
+The equations covered here fall into the class of vector-valued problems. A
+toplevel overview of this topic can be found in the @ref vector_valued module.
+
 
 <h3>Formulation, weak form, and discrete problem</h3>
 
@@ -202,90 +205,84 @@ This is, at best, tedious, error prone, and not dimension independent. There
 are obvious ways to make things dimension independent, but in the end, the
 code is simply not pretty. What would be much nicer is if we could simply
 extract the ${\mathbf u}$ and $p$ components of a shape function $x_h^i$. In the
-program we do that, by writing functions like this one:
+program we do that in the following way:
 @code
-template <int dim>
-Tensor<1,dim>
-extract_u (const FEValuesBase<dim> &fe_values,
-           const unsigned int i,
-           const unsigned int q)
-{
-  Tensor<1,dim> tmp;
+  const FEValuesExtractors::Vector velocities (0);
+  const FEValuesExtractors::Scalar pressure (dim);
 
-  for (unsigned int d=0; d<dim; ++d)
-    tmp[d] = fe_values.shape_value_component (i,q,d);
+  ...
 
-  return tmp;
-}
+  for (unsigned int q=0; q<n_q_points; ++q) 
+    for (unsigned int i=0; i<dofs_per_cell; ++i)
+      for (unsigned int j=0; j<dofs_per_cell; ++j)
+        local_matrix(i,j) += (fe_values[velocities].value (i, q) *
+ 		              k_inverse_values[q] *
+                              fe_values[velocities].value (j, q)
+                              -
+                              fe_values[velocities].divergence (i, q) *
+                              fe_values[pressure].value (j, q)
+                              -
+                              fe_values[pressure].value (i, q) *
+                              fe_values[velocities].divergence (j, q)) *
+                              fe_values.JxW(q);
 @endcode
+This is, in fact, not only the first term of the bilinear form, but the
+whole thing (sans boundary contributions).
 
-What this function does is, given an <code>fe_values</code> object, to extract
+What this piece of code does is, given an <code>fe_values</code> object, to extract
 the values of the first $dim$ components of shape function <code>i</code> at
 quadrature points <code>q</code>, that is the velocity components of that shape
 function. Put differently, if we write shape functions $x_h^i$ as the tuple
 $\{{\mathbf u}_h^i,p_h^i\}$, then the function returns the velocity part of this
 tuple. Note that the velocity is of course a <code>dim</code>-dimensional tensor, and
-that the function returns a corresponding object.
+that the function returns a corresponding object. Similarly, where we
+subscript with the pressure extractor, we extract the scalar pressure
+component. The whole mechanism is described in more detail in the 
+@ref vector_valued module.
 
-Likewise, we have a function that extracts the pressure component of a shape
-function:
-@code
-template <int dim>
-double extract_p (const FEValuesBase<dim> &fe_values,
-                  const unsigned int i,
-                  const unsigned int q)
-{
-  return fe_values.shape_value_component (i,q,dim);
-}
-@endcode
-Finally, the bilinear form contains terms involving the gradients of the
-velocity component of shape functions. To be more precise, we are not really
-interested in the full gradient, but only the divergence of the velocity
-components, i.e. ${\textrm{div}}\ {\mathbf u}_h^i = \sum_{d=0}^{dim-1}
-\frac{\partial}{\partial x_d} ({\mathbf u}_h^i)_d$. Here's a function that returns
-this quantity:
-@code
-template <int dim>
-double
-extract_div_u (const FEValuesBase<dim> &fe_values,
-               const unsigned int i,
-               const unsigned int q)
-{
-  double divergence = 0;
-  for (unsigned int d=0; d<dim; ++d)
-    divergence += fe_values.shape_grad_component (i,q,d)[d];
+In practice, it turns out that we can do a bit better if we evaluate the shape
+functions, their gradients and divergences only once per outermost loop, and
+store the result, as this saves us a few otherwise repeated computations.
+The final result then looks like this, working in every space dimension:
 
-  return divergence;
-}
-@endcode
-
-With these three functions, all of which are completely dimension independent
-and will therefore also work in 3d, assembling the local matrix and right hand
-side contributions becomes a charm:
 @code
-for (unsigned int q=0; q<n_q_points; ++q) 
-  for (unsigned int i=0; i<dofs_per_cell; ++i)
+  typename DoFHandler<dim>::active_cell_iterator
+    cell = dof_handler.begin_active(),
+    endc = dof_handler.end();
+  for (; cell!=endc; ++cell)
     {
-      const Tensor<1,dim> phi_i_u = extract_u (fe_values, i, q);
-      const double div_phi_i_u    = extract_div_u (fe_values, i, q);
-      const double phi_i_p        = extract_p (fe_values, i, q);
-           
-      for (unsigned int j=0; j<dofs_per_cell; ++j)
-        {
-          const Tensor<1,dim> phi_j_u = extract_u (fe_values, j, q);
-          const double div_phi_j_u    = extract_div_u (fe_values, j, q);
-          const double phi_j_p        = extract_p (fe_values, j, q);
-               
-          local_matrix(i,j) += (phi_i_u * k_inverse_values[q] * phi_j_u
-                                - div_phi_i_u * phi_j_p
-                                - phi_i_p * div_phi_j_u)
-                               * fe_values.JxW(q);
-        }
+      fe_values.reinit (cell);
+      local_matrix = 0;
+      local_rhs = 0;
 
-      local_rhs(i) += -(phi_i_p *
-                        rhs_values[q] *
-                        fe_values.JxW(q));
-    }
+      right_hand_side.value_list (fe_values.get_quadrature_points(),
+                                  rhs_values);
+      k_inverse.value_list (fe_values.get_quadrature_points(),
+                            k_inverse_values);
+      
+      for (unsigned int q=0; q<n_q_points; ++q) 
+        for (unsigned int i=0; i<dofs_per_cell; ++i)
+          {
+            const Tensor<1,dim> phi_i_u     = fe_values[velocities].value (i, q);
+            const double        div_phi_i_u = fe_values[velocities].divergence (i, q);
+            const double        phi_i_p     = fe_values[pressure].value (i, q);
+            
+            for (unsigned int j=0; j<dofs_per_cell; ++j)
+              {
+		const Tensor<1,dim> phi_j_u     = fe_values[velocities].value (j, q);
+		const double        div_phi_j_u = fe_values[velocities].divergence (j, q);
+		const double        phi_j_p     = fe_values[pressure].value (j, q);
+                
+                local_matrix(i,j) += (phi_i_u * k_inverse_values[q] * phi_j_u
+                                      - div_phi_i_u * phi_j_p
+                                      - phi_i_p * div_phi_j_u) *
+                                     fe_values.JxW(q);
+              }
+
+            local_rhs(i) += -phi_i_p *
+                            rhs_values[q] *
+                            fe_values.JxW(q);
+          }
 @endcode
 This very closely resembles the form in which we have originally written down
 the bilinear form and right hand side.
@@ -294,40 +291,29 @@ There is one final term that we have to take care of: the right hand side
 contained the term $(g,{\mathbf v}\cdot {\mathbf n})_{\partial\Omega}$, constituting the
 weak enforcement of pressure boundary conditions. We have already seen in
 @ref step_7 "step-7" how to deal with face integrals: essentially exactly the same as with
-domain integrals, except that we have to use the <code>FEFaceValues</code> class
+domain integrals, except that we have to use the FEFaceValues class
 instead of <code>FEValues</code>. To compute the boundary term we then simply have
-to loop over all boundary faces and integrate there. If you look closely at
-the definitions of the <code>extract_*</code> functions above, you will realize
-that it isn't even necessary to write new functions that extract the velocity
-and pressure components of shape functions from <code>FEFaceValues</code> objects:
-both <code>FEValues</code> and <code>FEFaceValues</code> are derived from a common
-base class, <code>FEValuesBase</code>, and the extraction functions above can
-therefore deal with both in exactly the same way. Assembling the missing
-boundary term then takes on the following form:
+to loop over all boundary faces and integrate there. The mechanism works in
+the same way as above, i.e. the extractor classes also work on FEFaceValues objects:
 @code
-for (unsigned int face_no=0;
-     face_no<GeometryInfo<dim>::faces_per_cell;
-     ++face_no)
-  if (cell->at_boundary(face_no))
-    {
-      fe_face_values.reinit (cell, face_no);
-    
-      pressure_boundary_values
-        .value_list (fe_face_values.get_quadrature_points(),
-                     boundary_values);
+      for (unsigned int face_no=0;
+	   face_no<GeometryInfo<dim>::faces_per_cell;
+	   ++face_no)
+	if (cell->at_boundary(face_no))
+	  {
+	    fe_face_values.reinit (cell, face_no);
+	    
+	    pressure_boundary_values
+	      .value_list (fe_face_values.get_quadrature_points(),
+			   boundary_values);
 
-      for (unsigned int q=0; q<n_face_q_points; ++q) 
-        for (unsigned int i=0; i<dofs_per_cell; ++i)
-          {
-            const Tensor<1,dim>
-              phi_i_u = extract_u (fe_face_values, i, q);
-                
-            local_rhs(i) += -(phi_i_u *
-                              fe_face_values.normal_vector(q) *
-                              boundary_values[q] *
-                              fe_face_values.JxW(q));
-        }
-  }
+	    for (unsigned int q=0; q<n_face_q_points; ++q) 
+	      for (unsigned int i=0; i<dofs_per_cell; ++i)
+		local_rhs(i) += -(fe_face_values[velocities].value (i, q) *
+				  fe_face_values.normal_vector(q) *
+				  boundary_values[q] *
+				  fe_face_values.JxW(q));
+	  }
 @endcode
 
 You will find the exact same code as above in the sources for the present

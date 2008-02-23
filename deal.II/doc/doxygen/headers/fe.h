@@ -2,7 +2,7 @@
 //    $Id$
 //    Version: $Name$
 //
-//    Copyright (C) 2003, 2005, 2006, 2007 by the deal.II authors
+//    Copyright (C) 2003, 2005, 2006, 2007, 2008 by the deal.II authors
 //
 //    This file is subject to QPL and may not be  distributed
 //    without copyright and license information. Please refer
@@ -67,7 +67,7 @@
  *
  * The classes in this module are used when one wants to assemble matrices or
  * vectors. They link finite elements, quadrature objects, and mappins: the
- * finite element classes describes a finite element space on a unit cell
+ * finite element classes describe a finite element space on a unit cell
  * (i.e. the unit line segment, square, or cube <tt>[0,1]^d</tt>), the
  * quadrature classes describe where quadrature points are located and what
  * weight they have, and the mapping classes describe how to map a point from
@@ -80,7 +80,10 @@
  * functionality as the FEValues class does for cells. Finally, the
  * FESubfaceValues class offers the possibility to ingrate on parts of faces
  * if the neighboring cell is refined and the present cell shares only a part
- * of its face with the neighboring cell.
+ * of its face with the neighboring cell. If vector-valued elements are used,
+ * the FEValues and related classes allow access to all vector components; if
+ * one wants to pick individual components, there are extractor classes that
+ * make this task simpler, as described in the @ref vector_valued module.
  *
  * The last member of this group, the UpdateFlags enumeration, is used as an
  * optimization: instead of letting the FEValues class compute every possible
@@ -89,8 +92,8 @@
  * UpdateFlags enumeration is used to offer symbolic names denoting what you
  * want the FEValues class to compute.
  * 
- * All these classes are used in all tutorial programs from step-3 onward, and
- * are described there in significant detail.
+ * All these classes are used in all @ref Tutorial "tutorial programs" from
+ * step-3 onward, and are described there in significant detail.
  *
  * The actual workings of the FEValues class and friends is
  * complicated because it has to be general yet efficient. The page on

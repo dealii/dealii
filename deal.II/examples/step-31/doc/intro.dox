@@ -29,6 +29,9 @@ To be well-posed, we will have to add boundary conditions to the
 equations. What boundary conditions are readily possible here will
 become clear once we discuss the weak form of the equations.
 
+The equations covered here fall into the class of vector-valued problems. A
+toplevel overview of this topic can be found in the @ref vector_valued module.
+
 
 <h2>Weak form</h2>
 

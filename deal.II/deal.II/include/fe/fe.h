@@ -2,7 +2,7 @@
 //    $Id$
 //    Version: $Name$
 //
-//    Copyright (C) 1998, 1999, 2000, 2001, 2002, 2003, 2004, 2005, 2006, 2007 by the deal.II authors
+//    Copyright (C) 1998, 1999, 2000, 2001, 2002, 2003, 2004, 2005, 2006, 2007, 2008 by the deal.II authors
 //
 //    This file is subject to QPL and may not be  distributed
 //    without copyright and license information. Please refer
@@ -2684,7 +2684,12 @@ FiniteElement<dim>::is_primitive (const unsigned int i) const
 				   // std::vector<bool> is) is
 				   // probably more expensive than
 				   // just comparing against 1
-  return (n_nonzero_components_table[i] == 1);
+				   //
+				   // for good measure, short circuit the test
+				   // if the entire FE is primitive
+  return ((cached_primitivity == true)
+	  ||
+	  (n_nonzero_components_table[i] == 1));
 }
 
 

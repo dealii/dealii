@@ -109,6 +109,15 @@ inconvenience this causes.
   (Moritz Allmaras, 2007/10/31)
   </p>
 
+  <li> <p>New: A significantly simpler way to code the assembly of linear
+  systems for problems with more than one solution variable has been
+  implemented. This is explained in detail in the report on @ref vector_valued
+  and tutorial programs @ref step_20 "step-20" and @ref step_21 "step-21"
+  have been converted as well.
+  <br>
+  (WB, 2008/02/23)
+  </p>
+
   <li> <p>Improved: On Mac OS X, the operating system provides for
   "frameworks", which are essentially collections of shared libraries.
   We now link with the "Accelerate" framework (from Mac OS X 10.4

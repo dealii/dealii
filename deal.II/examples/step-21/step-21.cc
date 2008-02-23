@@ -495,80 +495,6 @@ double f_saturation (const double S,
 
 
 
-                                 // @sect3{extract_u and friends}
-
-                                 // More tools: We need methods to extract the
-                                 // velocity, pressure, and saturation
-                                 // components of finite element shape
-                                 // functions. These functions here are
-                                 // completely analogous to the ones we have
-                                 // already used in step-20:
-template <int dim>
-Tensor<1,dim>
-extract_u (const FEValuesBase<dim> &fe_values,
-           const unsigned int i,
-           const unsigned int q)
-{
-  Tensor<1,dim> tmp;
-
-  for (unsigned int d=0; d<dim; ++d)
-    tmp[d] = fe_values.shape_value_component (i,q,d);
-
-  return tmp;
-}
-
-
-
-template <int dim>
-double
-extract_div_u (const FEValuesBase<dim> &fe_values,
-               const unsigned int i,
-               const unsigned int q)
-{
-  double divergence = 0;
-  for (unsigned int d=0; d<dim; ++d)
-    divergence += fe_values.shape_grad_component (i,q,d)[d];
-
-  return divergence;
-}
-
-
-  
-template <int dim>
-double extract_p (const FEValuesBase<dim> &fe_values,
-                  const unsigned int i,
-                  const unsigned int q)
-{
-  return fe_values.shape_value_component (i,q,dim);
-}
-
-
-
-template <int dim>
-double extract_s (const FEValuesBase<dim> &fe_values,
-                  const unsigned int i,
-                  const unsigned int q)
-{
-  return fe_values.shape_value_component (i,q,dim+1);
-}
-
-
-
-template <int dim>
-Tensor<1,dim>
-extract_grad_s (const FEValuesBase<dim> &fe_values,
-                const unsigned int i,
-                const unsigned int q)
-{
-  Tensor<1,dim> tmp;
-  for (unsigned int d=0; d<dim; ++d)
-    tmp[d] = fe_values.shape_grad_component (i,q,dim+1)[d];
-
-  return tmp;
-}
-
-
-
                                  // @sect3{Linear solvers and preconditioners}
 
                                  // The linear solvers we use are also
@@ -855,7 +781,11 @@ void TwoPhaseFlowProblem<dim>::assemble_system ()
   std::vector<Vector<double> >      old_solution_values(n_q_points, Vector<double>(dim+2));
   std::vector<std::vector<Tensor<1,dim> > >  old_solution_grads(n_q_points,
                                                                 std::vector<Tensor<1,dim> > (dim+2));
-  
+
+  const FEValuesExtractors::Vector velocities (0);
+  const FEValuesExtractors::Scalar pressure (dim);
+  const FEValuesExtractors::Scalar saturation (dim+1);
+
   typename DoFHandler<dim>::active_cell_iterator
     cell = dof_handler.begin_active(),
     endc = dof_handler.end();
@@ -908,18 +838,18 @@ void TwoPhaseFlowProblem<dim>::assemble_system ()
           {
             const double old_s = old_solution_values[q](dim+1);
 
-            const Tensor<1,dim> phi_i_u      = extract_u (fe_values, i, q);
-            const double        div_phi_i_u  = extract_div_u (fe_values, i, q);
-            const double        phi_i_p      = extract_p (fe_values, i, q);
-            const double        phi_i_s      = extract_s (fe_values, i, q); 
-            const Tensor<1,dim> grad_phi_i_s = extract_grad_s(fe_values, i, q);
+            const Tensor<1,dim> phi_i_u      = fe_values[velocities].value (i, q);
+            const double        div_phi_i_u  = fe_values[velocities].divergence (i, q);
+            const double        phi_i_p      = fe_values[pressure].value (i, q);
+            const double        phi_i_s      = fe_values[saturation].value (i, q); 
+            const Tensor<1,dim> grad_phi_i_s = fe_values[saturation].gradient(i, q);
             
             for (unsigned int j=0; j<dofs_per_cell; ++j)
               {
-                const Tensor<1,dim> phi_j_u     = extract_u (fe_values, j, q);
-                const double        div_phi_j_u = extract_div_u (fe_values, j, q);
-                const double        phi_j_p     = extract_p (fe_values, j, q);
-                const double        phi_j_s     = extract_s (fe_values, j, q);
+                const Tensor<1,dim> phi_j_u     = fe_values[velocities].value (j, q);
+                const double        div_phi_j_u = fe_values[velocities].divergence (j, q);
+                const double        phi_j_p     = fe_values[pressure].value (j, q);
+                const double        phi_j_s     = fe_values[saturation].value (j, q);
                 
                 local_matrix(i,j) += (phi_i_u * k_inverse_values[q] *
                                       mobility_inverse(old_s,viscosity) * phi_j_u
@@ -952,7 +882,7 @@ void TwoPhaseFlowProblem<dim>::assemble_system ()
               for (unsigned int i=0; i<dofs_per_cell; ++i)
                 {
                   const Tensor<1,dim>
-                    phi_i_u = extract_u (fe_face_values, i, q);
+                    phi_i_u = fe_face_values[velocities].value (i, q);
 
                   local_rhs(i) += -(phi_i_u *
                                     fe_face_values.normal_vector(q) *
@@ -1023,6 +953,8 @@ void TwoPhaseFlowProblem<dim>::assemble_rhs_S ()
   std::vector<unsigned int> local_dof_indices (dofs_per_cell);
 
   SaturationBoundaryValues<dim> saturation_boundary_values;
+
+  const FEValuesExtractors::Scalar saturation (dim+1);
   
   typename DoFHandler<dim>::active_cell_iterator
     cell = dof_handler.begin_active(),
@@ -1049,8 +981,8 @@ void TwoPhaseFlowProblem<dim>::assemble_rhs_S ()
             for (unsigned int d=0; d<dim; ++d)
               present_u[d] = present_solution_values[q](d);
 
-            const double        phi_i_s      = extract_s(fe_values, i, q);
-            const Tensor<1,dim> grad_phi_i_s = extract_grad_s(fe_values, i, q);
+            const double        phi_i_s      = fe_values[saturation].value (i, q);
+            const Tensor<1,dim> grad_phi_i_s = fe_values[saturation].gradient (i, q);
                      
             local_rhs(i) += (time_step *
                              f_saturation(old_s,viscosity) *
@@ -1128,7 +1060,7 @@ void TwoPhaseFlowProblem<dim>::assemble_rhs_S ()
                                               :
                                               neighbor_saturation[q]),
                                              viscosity) *
-                                extract_s(fe_face_values,i,q) *
+                                fe_face_values[saturation].value (i,q) *
                                 fe_face_values.JxW(q);
             }
         }

@@ -44,7 +44,6 @@
 #include <fe/fe_system.h>
 #include <fe/fe_values.h>
 #include <fe/mapping_q1.h>
-#include <fe/mapping_c1.h>
 
 #include <numerics/vectors.h>
 #include <numerics/matrices.h>
@@ -227,122 +226,6 @@ RightHandSide<dim>::vector_value (const Point<dim> &p,
 {
   for (unsigned int c=0; c<this->n_components; ++c)
     values(c) = RightHandSide<dim>::value (p, c);
-}
-
-
-
-
-
-
-template <int dim>
-Tensor<1,dim>
-extract_u (const FEValuesBase<dim> &fe_values,
-           const unsigned int i,
-           const unsigned int q)
-{
-  Tensor<1,dim> tmp;
-
-  const unsigned int component
-    = fe_values.get_fe().system_to_component_index(i).first;
-
-  if (component < dim)
-    tmp[component] = fe_values.shape_value (i,q);
-
-  return tmp;
-}
-
-
-
-template <int dim>
-double
-extract_div_u (const FEValuesBase<dim> &fe_values,
-               const unsigned int i,
-               const unsigned int q)
-{
-  const unsigned int component
-    = fe_values.get_fe().system_to_component_index(i).first;
-
-  if (component < dim)
-    return fe_values.shape_grad (i,q)[component];
-  else
-    return 0;
-}
-
-
-
-template <int dim>
-Tensor<2,dim>
-extract_grad_s_u (const FEValuesBase<dim> &fe_values,
-		  const unsigned int i,
-		  const unsigned int q)
-{
-  Tensor<2,dim> tmp;
-
-  const unsigned int component
-    = fe_values.get_fe().system_to_component_index(i).first;
-  
-  if (component < dim)
-    {
-      const Tensor<1,dim> grad_phi_over_2 = fe_values.shape_grad (i,q) / 2;
-      
-      for (unsigned int e=0; e<dim; ++e)
-	tmp[component][e] += grad_phi_over_2[e];
-      for (unsigned int d=0; d<dim; ++d)
-	tmp[d][component] += grad_phi_over_2[d];
-    }
-  
-  return tmp;
-}
-
-
-  
-template <int dim>
-double extract_p (const FEValuesBase<dim> &fe_values,
-                  const unsigned int i,
-                  const unsigned int q)
-{
-  const unsigned int component
-    = fe_values.get_fe().system_to_component_index(i).first;
-
-  if (component == dim)
-    return fe_values.shape_value (i,q);
-  else
-    return 0;
-}
-
-
-
-template <int dim>
-double extract_T (const FEValuesBase<dim> &fe_values,
-                  const unsigned int i,
-                  const unsigned int q)
-{
-  const unsigned int component
-    = fe_values.get_fe().system_to_component_index(i).first;
-
-  if (component == dim+1)
-    return fe_values.shape_value (i,q);
-  else
-    return 0;
-}
-
-
-
-template <int dim>
-Tensor<1,dim>
-extract_grad_T (const FEValuesBase<dim> &fe_values,
-                const unsigned int i,
-                const unsigned int q)
-{
-  Tensor<1,dim> tmp;
-
-  const unsigned int component
-    = fe_values.get_fe().system_to_component_index(i).first;
-
-  if (component == dim+1)
-    tmp = fe_values.shape_grad (i,q);
-
-  return tmp;
 }
 
 
@@ -534,19 +417,6 @@ void BoussinesqFlowProblem<dim>::setup_dofs (const bool setup_matrices)
 }
 
 
-template <int dim>
-double
-scalar_product (const Tensor<2,dim> &a,
-		const Tensor<2,dim> &b)
-{
-  double tmp = 0;
-  for (unsigned int i=0; i<dim; ++i)
-    for (unsigned int j=0; j<dim; ++j)
-      tmp += a[i][j] * b[i][j];
-  return tmp;
-}
-
-
 
 template <int dim>
 void BoussinesqFlowProblem<dim>::assemble_system () 
@@ -592,6 +462,10 @@ void BoussinesqFlowProblem<dim>::assemble_system ()
 
   const double Raleigh_number = 10;
   
+  const FEValuesExtractors::Vector velocities (0);
+  const FEValuesExtractors::Scalar pressure (dim);
+  const FEValuesExtractors::Scalar temperature (dim+1);
+
   typename DoFHandler<dim>::active_cell_iterator
     cell = dof_handler.begin_active(),
     endc = dof_handler.end();
@@ -610,24 +484,27 @@ void BoussinesqFlowProblem<dim>::assemble_system ()
 	  for (unsigned int i=0; i<dofs_per_cell; ++i)
 	    {
 
-	      const Tensor<1,dim> phi_i_u      = extract_u (fe_values, i, q);
+	      const Tensor<1,dim> phi_i_u = fe_values[velocities].value (i, q);
 
 	      if (rebuild_matrices)
 		{
-		  const Tensor<2,dim> phi_i_grads_u= extract_grad_s_u (fe_values, i, q);
-		  const double        div_phi_i_u  = extract_div_u (fe_values, i, q);
-		  const double        phi_i_p      = extract_p (fe_values, i, q);
-		  const double        phi_i_T      = extract_T (fe_values, i, q); 
-		  const Tensor<1,dim> grad_phi_i_T = extract_grad_T(fe_values, i, q);
+		  const SymmetricTensor<2,dim>
+		    phi_i_grads_u = fe_values[velocities].symmetric_gradient (i, q);
+		  const Tensor<1,dim> phi_i_u       = fe_values[velocities].value (i, q);
+		  const double        div_phi_i_u   = fe_values[velocities].divergence (i, q);
+		  const double        phi_i_p       = fe_values[pressure].value (i, q);
+		  const double        phi_i_T       = fe_values[temperature].value (i, q); 
+		  const Tensor<1,dim> grad_phi_i_T  = fe_values[temperature].gradient(i, q);
             
 		  for (unsigned int j=0; j<dofs_per_cell; ++j)
 		    {
-		      const Tensor<2,dim> phi_j_grads_u     = extract_grad_s_u (fe_values, j, q);
-		      const double        div_phi_j_u = extract_div_u (fe_values, j, q);
-		      const double        phi_j_p     = extract_p (fe_values, j, q);
-		      const double        phi_j_T     = extract_T (fe_values, j, q);
+		      const SymmetricTensor<2,dim>
+			phi_j_grads_u = fe_values[velocities].symmetric_gradient (j, q);
+		      const double        div_phi_j_u = fe_values[velocities].divergence (j, q);
+		      const double        phi_j_p     = fe_values[pressure].value (j, q);
+		      const double        phi_j_T     = fe_values[temperature].value (j, q);
                 
-		      local_matrix(i,j) += (scalar_product(phi_i_grads_u, phi_j_grads_u)
+		      local_matrix(i,j) += (phi_i_grads_u * phi_j_grads_u
 					    - div_phi_i_u * phi_j_p
 					    - phi_i_p * div_phi_j_u
 					    + phi_i_p * phi_j_p
@@ -660,7 +537,7 @@ void BoussinesqFlowProblem<dim>::assemble_system ()
               for (unsigned int i=0; i<dofs_per_cell; ++i)
                 {
                   const Tensor<1,dim>
-                    phi_i_u = extract_u (fe_face_values, i, q);
+                    phi_i_u = fe_face_values[velocities].value (i, q);
 
                   local_rhs(i) += -(phi_i_u *
                                     fe_face_values.normal_vector(q) *
@@ -791,6 +668,7 @@ void BoussinesqFlowProblem<dim>::assemble_rhs_T ()
   std::vector<unsigned int> local_dof_indices (dofs_per_cell);
 
   TemperatureBoundaryValues<dim> temperature_boundary_values;
+  const FEValuesExtractors::Scalar temperature (dim+1);
   
   typename DoFHandler<dim>::active_cell_iterator
     cell = dof_handler.begin_active(),
@@ -817,8 +695,8 @@ void BoussinesqFlowProblem<dim>::assemble_rhs_T ()
             for (unsigned int d=0; d<dim; ++d)
               present_div_u += present_solution_grads[q][d][d];	    
 	    
-            const double        phi_i_T      = extract_T(fe_values, i, q);
-            const Tensor<1,dim> grad_phi_i_T = extract_grad_T(fe_values, i, q);
+            const double        phi_i_T      = fe_values[temperature].value (i, q);
+            const Tensor<1,dim> grad_phi_i_T = fe_values[temperature].gradient (i, q);
 
 	    const Point<dim> p = fe_values.quadrature_point(q);
 	    
@@ -901,7 +779,7 @@ void BoussinesqFlowProblem<dim>::assemble_rhs_T ()
 				   old_solution_values_face[q](dim+1)
 				   :
 				   neighbor_temperature[q]) *
-				  extract_T(fe_face_values,i,q) *
+				  fe_face_values[temperature].value (i,q) *
 				  fe_face_values.JxW(q);
 	      }
 	  }
@@ -954,7 +832,7 @@ void BoussinesqFlowProblem<dim>::assemble_rhs_T ()
 					 old_solution_values_face[q](dim+1)
 					 :
 					 neighbor_temperature[q]) *
-					extract_T(fe_face_values,i,q) *
+					fe_face_values[temperature].value (i,q) *
 					fe_face_values.JxW(q);
 		    }
 		}
@@ -1014,7 +892,7 @@ void BoussinesqFlowProblem<dim>::assemble_rhs_T ()
 				     old_solution_values_face[q](dim+1)
 				     :
 				     neighbor_temperature[q]) *
-				    extract_T(fe_face_values,i,q) *
+				    fe_face_values[temperature].value (i,q) *
 				    fe_face_values.JxW(q);
 		}
 	    }      
@@ -1348,7 +1226,7 @@ void BoussinesqFlowProblem<dim>::run ()
 	if (timestep_number % 10 == 0)
 	  refine_mesh ();
     }
-  while (time <= 500);
+  while (time <= 5);
 }
 
     

@@ -10,6 +10,11 @@ equation. This is therefore also the first time-dependent tutorial
 program (besides the somewhat strange time-dependence of @ref step_18
 "step-18").  
 
+The equations covered here are an extension of the material already covered in
+@ref step_20 "step-20". In particular, they fall into the class of
+vector-valued problems. A toplevel overview of this topic can be found in the
+@ref vector_valued module.
+
 
 <h2>The two phase flow problem</h2>
 

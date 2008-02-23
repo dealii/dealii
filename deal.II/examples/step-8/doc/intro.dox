@@ -4,7 +4,8 @@
 
 In real life, most partial differential equations are really systems
 of equations. Accordingly, the solutions are usually
-vector-valued. The deal.II library supports such problems, and we will show
+vector-valued. The deal.II library supports such problems (see the
+extensive documentation in the @ref vector_valued module), and we will show
 that that is mostly rather simple. The only more complicated problems
 are in assembling matrix and right hand side, but these are easily
 understood as well. 
@@ -56,7 +57,7 @@ and the respective bilinear form is then
   \sum_{i,j}
   \left(
     \mu \partial_i u_j, \partial_i v_j
-  \right)_\Omega,
+  \right)_\Omega
   +
   \sum_{i,j}
   \left(
@@ -74,7 +75,7 @@ or also writing the first term a sum over components:
   \sum_{k,l}
   \left(
     \mu \partial_i u_j, \partial_i v_j
-  \right)_\Omega,
+  \right)_\Omega
   +
   \sum_{i,j}
   \left(
@@ -83,17 +84,27 @@ or also writing the first term a sum over components:
 @f]
 
 
-How do we now assemble the matrix for such an equation? The first thing we
-need is some knowledge about how the shape functions work in the case of
-vector-valued finite elements. Basically, this comes down to the following:
+How do we now assemble the matrix for such an equation? A very long answer
+with a number of different alternatives is given in the documentation of the
+@ref vector_valued module. Historically, the solution shown below was the only
+one available in the early years of the library. It turns out to also be the
+fastest. On the other hand, if a few per cent of compute time do not matter,
+there are simpler and probably more intuitive ways to assemble the linear
+system than the one discussed below but that weren't available until several
+years after this tutorial program was first written; if you are interested in
+them, take a look at the @ref vector_valued module.
+
+Let us go back to the question of how to assemble the linear system. The first
+thing we need is some knowledge about how the shape functions work in the case
+of vector-valued finite elements. Basically, this comes down to the following:
 let $n$ be the number of shape functions for the scalar finite element of
 which we build the vector element (for example, we will use bilinear functions
 for each component of the vector-valued finite element, so the scalar finite
-element is the <code>FE_Q(1)</code> element which we have used in previous examples
-already, and $n=4$ in two space dimensions). Further, let $N$ be the number of
-shape functions for the vector element; in two space dimensions, we need $n$
-shape functions for each component of the vector, so $N=2n$. Then, the $i$th
-shape function of the vector element has the form
+element is the <code>FE_Q(1)</code> element which we have used in previous
+examples already, and $n=4$ in two space dimensions). Further, let $N$ be the
+number of shape functions for the vector element; in two space dimensions, we
+need $n$ shape functions for each component of the vector, so $N=2n$. Then,
+the $i$th shape function of the vector element has the form
 @f[
   \Phi_i({\mathbf x}) = \varphi_{base(i)}({\mathbf x})\ {\mathbf e}_{comp(i)},
 @f]
@@ -311,13 +322,13 @@ Likewise, the contribution of cell $K$ to the right hand side vector is
 This is the form in which we will implement the local stiffness matrix and
 right hand side vectors.
 
-As a final note: in the @ref step_17 "step-17" example program, we will revisit the elastic
-problem laid out here, and will show how to solve it in parallel on a cluster
-of computers. The resulting program will thus be able to solve this problem to
-significantly higher accuracy, and more efficiently if this is
-required. In addition, in @ref step_20 "step-20", @ref step_21 "step-21", and
-@ref step_22 "step-22", we will revisit some 
-vector-valued problems and show a few techniques that may make it
+As a final note: in the @ref step_17 "step-17" example program, we will
+revisit the elastic problem laid out here, and will show how to solve it in
+parallel on a cluster of computers. The resulting program will thus be able to
+solve this problem to significantly higher accuracy, and more efficiently if
+this is required. In addition, in @ref step_20 "step-20", @ref step_21
+"step-21", as well as a few other of the later tutorial programs, we will
+revisit some vector-valued problems and show a few techniques that may make it
 simpler to actually go through all the stuff shown above, with
-<code>FiniteElement::system_to_component_index</code> etc.
+FiniteElement::system_to_component_index etc.
 

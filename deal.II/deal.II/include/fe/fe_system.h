@@ -2,7 +2,7 @@
 //    $Id$
 //    Version: $Name$
 //
-//    Copyright (C) 1999, 2000, 2001, 2002, 2003, 2004, 2005, 2006, 2007 by the deal.II authors
+//    Copyright (C) 1999, 2000, 2001, 2002, 2003, 2004, 2005, 2006, 2007, 2008 by the deal.II authors
 //
 //    This file is subject to QPL and may not be  distributed
 //    without copyright and license information. Please refer
@@ -25,11 +25,14 @@
 DEAL_II_NAMESPACE_OPEN
 
 /**
- * This class provides an interface to group several elements together
- * into one. To the outside world, the resulting object looks just
- * like a usual finite element object, which is composed of several
- * other finite elements that are possibly of different type. The
- * result is then a vector-valued finite element.
+ * This class provides an interface to group several elements together into
+ * one. To the outside world, the resulting object looks just like a usual
+ * finite element object, which is composed of several other finite elements
+ * that are possibly of different type. The result is then a vector-valued
+ * finite element. Vector valued elements are discussed in a number of
+ * tutorial programs, for example @ref step_8 "step-8", @ref step_20
+ * "step-20", @ref step_21 "step-21", and in particular in the @ref vector_valued
+ * module.
  *
  * The overall numbering of degrees of freedom is as follows: for each
  * subobject (vertex, line, quad, or hex), the degrees of freedom are
@@ -70,7 +73,7 @@ DEAL_II_NAMESPACE_OPEN
  * multiplicity. The number of blocks of the system is simply the sum
  * of all multiplicities.
  *
- * @ingroup febase fe
+ * @ingroup febase fe vector_valued
  * 
  * @author Wolfgang Bangerth, Guido Kanschat, 1999, 2002, 2003, 2006, Ralf Hartmann 2001.
  */

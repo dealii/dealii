@@ -2,7 +2,7 @@
 //    $Id$
 //    Version: $Name$
 //
-//    Copyright (C) 2005, 2006, 2007 by the deal.II authors
+//    Copyright (C) 2005, 2006, 2007, 2008 by the deal.II authors
 //
 //    This file is subject to QPL and may not be  distributed
 //    without copyright and license information. Please refer
@@ -29,8 +29,10 @@
  * <dd>Blocks were introduced in BlockVector,
  * BlockSparseMatrix and related classes. These are used to reflect the
  * structure of a PDE system in linear algebra, in particular allowing
- * for modular solvers. In DoFHandler, this block structure is
- * prepared by DoFRenumbering::block_wise().
+ * for modular solvers for problems with multiple solution components.
+ * How to implement this is described in more detail in the
+ * @ref vector_valued report and the tutorial programs referenced
+ * therein.
  *
  * Originally, this concept was intermixed with the idea of the vector
  * @ref GlossComponent "component". Since the introduction of
