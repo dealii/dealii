@@ -846,7 +846,7 @@ void StokesProblem<dim>::assemble_system ()
 				   // matrix. As mentioned above, this depends
 				   // on the spatial dimension. Since this
 				   // handled automatically by the template
-				   // <code><dim></code> in
+				   // <code>dim</code> in
 				   // <code>InnerPreconditioner</code>, we
 				   // don't have to manually intervene at this
 				   // point any further.
