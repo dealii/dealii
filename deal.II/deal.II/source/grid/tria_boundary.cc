@@ -2,7 +2,7 @@
 //    $Id$
 //    Version: $Name$
 //
-//    Copyright (C) 1998, 1999, 2000, 2001, 2002, 2003, 2004, 2005, 2006 by the deal.II authors
+//    Copyright (C) 1998, 1999, 2000, 2001, 2002, 2003, 2004, 2005, 2006, 2008 by the deal.II authors
 //
 //    This file is subject to QPL and may not be  distributed
 //    without copyright and license information. Please refer
@@ -61,6 +61,71 @@ get_intermediate_points_on_quad (const typename Triangulation<dim>::quad_iterato
 {
   Assert (false, ExcPureFunctionCalled());
 }
+
+#if deal_II_dimension == 1
+
+template <>
+Point<1>
+Boundary<1>::
+get_new_point_on_face (const Triangulation<1>::face_iterator &) const
+{
+  Assert (false, ExcImpossibleInDim(1));
+  return Point<1>();
+}
+
+template <>
+void
+Boundary<1>::
+get_intermediate_points_on_face (const Triangulation<1>::face_iterator &,
+				 std::vector<Point<1> > &) const
+{
+  Assert (false, ExcImpossibleInDim(1));
+}
+
+#endif
+
+#if deal_II_dimension == 2
+
+template <>
+Point<2>
+Boundary<2>::
+get_new_point_on_face (const Triangulation<2>::face_iterator &face) const
+{
+  return get_new_point_on_line(face);
+}
+
+template <>
+void
+Boundary<2>::
+get_intermediate_points_on_face (const Triangulation<2>::face_iterator &face,
+				 std::vector<Point<2> > &points) const
+{
+  get_intermediate_points_on_line(face, points);
+}
+
+#endif
+
+
+#if deal_II_dimension == 3
+
+template <>
+Point<3>
+Boundary<3>::
+get_new_point_on_face (const Triangulation<3>::face_iterator &face) const
+{
+  return get_new_point_on_quad(face);
+}
+
+template <>
+void
+Boundary<3>::
+get_intermediate_points_on_face (const Triangulation<3>::face_iterator &face,
+				 std::vector<Point<3> > &points) const
+{
+  get_intermediate_points_on_quad(face, points);
+}
+
+#endif
 
 
 

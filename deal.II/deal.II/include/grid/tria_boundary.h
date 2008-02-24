@@ -2,7 +2,7 @@
 //    $Id$
 //    Version: $Name$
 //
-//    Copyright (C) 1998, 1999, 2000, 2001, 2002, 2003, 2004, 2005, 2006, 2007 by the deal.II authors
+//    Copyright (C) 1998, 1999, 2000, 2001, 2002, 2003, 2004, 2005, 2006, 2007, 2008 by the deal.II authors
 //
 //    This file is subject to QPL and may not be  distributed
 //    without copyright and license information. Please refer
@@ -73,7 +73,7 @@ template <int dim> class Triangulation;
  *   around a given center point.
  *
  * @ingroup boundary
- *   @author Wolfgang Bangerth, 1999, 2001, Ralf Hartmann, 2001
+ *   @author Wolfgang Bangerth, 1999, 2001, Ralf Hartmann, 2001, 2008
  */
 template <int dim>
 class Boundary : public Subscriptor
@@ -156,6 +156,21 @@ class Boundary : public Subscriptor
     get_new_point_on_quad (const typename Triangulation<dim>::quad_iterator &quad) const;
 
 				     /**
+				      * Depending on <tt>dim=2</tt> or
+				      * <tt>dim=3</tt> this function
+				      * calls the
+				      * get_new_point_on_line or the
+				      * get_new_point_on_quad
+				      * function. It throws an
+				      * exception for
+				      * <tt>dim=1</tt>. This wrapper
+				      * allows dimension independent
+				      * programming.
+				      */
+    Point<dim>
+    get_new_point_on_face (const typename Triangulation<dim>::face_iterator &face) const;
+
+				     /**
 				      * Return equally spaced
 				      * intermediate points on a line.
                                       *
@@ -215,6 +230,23 @@ class Boundary : public Subscriptor
 				      */
     virtual void
     get_intermediate_points_on_quad (const typename Triangulation<dim>::quad_iterator &quad,
+				     std::vector<Point<dim> > &points) const;
+
+				     /**
+				      * Depending on <tt>dim=2</tt> or
+				      * <tt>dim=3</tt> this function
+				      * calls the
+				      * get_intermediate_points_on_line
+				      * or the
+				      * get_intermediate_points_on_quad
+				      * function. It throws an
+				      * exception for
+				      * <tt>dim=1</tt>. This wrapper
+				      * allows dimension independent
+				      * programming.
+				      */
+    void
+    get_intermediate_points_on_face (const typename Triangulation<dim>::face_iterator &face,
 				     std::vector<Point<dim> > &points) const;
 
 				     /**
@@ -362,6 +394,39 @@ class StraightBoundary : public Boundary<dim>
 /* -------------- declaration of explicit specializations ------------- */
 
 #ifndef DOXYGEN
+
+template <>
+Point<1>
+Boundary<1>::
+get_new_point_on_face (const Triangulation<1>::face_iterator &) const;
+
+template <>
+Point<2>
+Boundary<2>::
+get_new_point_on_face (const Triangulation<2>::face_iterator &) const;
+
+template <>
+Point<3>
+Boundary<3>::
+get_new_point_on_face (const Triangulation<3>::face_iterator &) const;
+
+template <>
+void
+Boundary<1>::
+get_intermediate_points_on_face (const Triangulation<1>::face_iterator &,
+				 std::vector<Point<1> > &) const;
+
+template <>
+void
+Boundary<2>::
+get_intermediate_points_on_face (const Triangulation<2>::face_iterator &,
+				 std::vector<Point<2> > &) const;
+
+template <>
+void
+Boundary<3>::
+get_intermediate_points_on_face (const Triangulation<3>::face_iterator &,
+				 std::vector<Point<3> > &) const;
 
 template <>
 void
