@@ -261,6 +261,13 @@ constraints individually.
 
 <ol> 
 
+  <li> <p>New: The new Boundary::get_new_point_on_face and
+  get_intermediate_points_on_face functions offer an dimension independent
+  interface to this class.
+  <br>
+  (RH 2008/02/24)
+  </p></li>
+
   <li> <p>New: There is now a FEFaceValuesBase::get_face_index function which
   returns the index of the face selected the last time the reinit() function
   was called.
