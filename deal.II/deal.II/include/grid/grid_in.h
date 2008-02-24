@@ -2,7 +2,7 @@
 //    $Id$
 //    Version: $Name$
 //
-//    Copyright (C) 1999, 2000, 2001, 2002, 2003, 2004, 2005, 2006, 2007 by the deal.II authors
+//    Copyright (C) 1999, 2000, 2001, 2002, 2003, 2004, 2005, 2006, 2007, 2008 by the deal.II authors
 //
 //    This file is subject to QPL and may not be  distributed
 //    without copyright and license information. Please refer
@@ -376,56 +376,12 @@ class GridIn
 		    << "1 Line (2 nodes, 1 edge).\n"
 		    << "3 Quadrilateral (4 nodes, 4 edges).\n"
 		    << "5 Hexahedron (8 nodes, 12 edges, 6 faces).");
-  private:
+  protected:
 				     /**
 				      * Store address of the triangulation to
 				      * be fed with the data read in.
 				      */
     SmartPointer<Triangulation<dim> > tria;
-
-				     /**
-				      * Skip empty lines in the input
-				      * stream, i.e. lines that
-				      * contain either nothing or only
-				      * whitespace.
-				      */
-    static void skip_empty_lines (std::istream &in);
-    
-				     /**
-				      * Skip lines of comment that
-				      * start with the indicated
-				      * character (e.g. <tt>#</tt>)
-				      * following the point where the
-				      * given input stream presently
-				      * is. After the call to this
-				      * function, the stream is at the
-				      * start of the first line after
-				      * the comment lines, or at the
-				      * same position as before if
-				      * there were no lines of
-				      * comments.
-				      */
-    static void skip_comment_lines (std::istream    &in,
-				    const char  comment_start);
-
-				     /**
-				      * This function does the nasty work (due
-				      * to very lax conventions and different
-				      * versions of the tecplot format) of
-				      * extracting the important parameters from
-				      * a tecplot header, contained in the
-				      * string @p header. The other variables
-				      * are output variables, their value has no
-				      * influence on the function execution..
-				      */
-    static void parse_tecplot_header(std::string   &header,
-				     std::vector<unsigned int> &tecplot2deal,
-				     unsigned int  &n_vars,
-				     unsigned int  &n_vertices,
-				     unsigned int  &n_cells,
-				     std::vector<unsigned int> &IJK,
-				     bool          &structured,
-				     bool          &blocked);
     
 				     /**
 				      * This function can write the
@@ -474,7 +430,53 @@ class GridIn
 				      */
     static void debug_output_grid (const std::vector<CellData<dim> > &cells,
 				   const std::vector<Point<dim> >    &vertices,
-				   std::ostream                               &out);
+				   std::ostream &out);
+
+  private:
+
+				     /**
+				      * Skip empty lines in the input
+				      * stream, i.e. lines that
+				      * contain either nothing or only
+				      * whitespace.
+				      */
+    static void skip_empty_lines (std::istream &in);
+    
+				     /**
+				      * Skip lines of comment that
+				      * start with the indicated
+				      * character (e.g. <tt>#</tt>)
+				      * following the point where the
+				      * given input stream presently
+				      * is. After the call to this
+				      * function, the stream is at the
+				      * start of the first line after
+				      * the comment lines, or at the
+				      * same position as before if
+				      * there were no lines of
+				      * comments.
+				      */
+    static void skip_comment_lines (std::istream    &in,
+				    const char  comment_start);
+
+				     /**
+				      * This function does the nasty work (due
+				      * to very lax conventions and different
+				      * versions of the tecplot format) of
+				      * extracting the important parameters from
+				      * a tecplot header, contained in the
+				      * string @p header. The other variables
+				      * are output variables, their value has no
+				      * influence on the function execution..
+				      */
+    static void parse_tecplot_header(std::string   &header,
+				     std::vector<unsigned int> &tecplot2deal,
+				     unsigned int  &n_vars,
+				     unsigned int  &n_vertices,
+				     unsigned int  &n_cells,
+				     std::vector<unsigned int> &IJK,
+				     bool          &structured,
+				     bool          &blocked);
     
 				     /**
 				      * Input format used by read() if
