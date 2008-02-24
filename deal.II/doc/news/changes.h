@@ -261,9 +261,15 @@ constraints individually.
 
 <ol> 
 
+  <li> <p>Improved: The tria pointer and the debug_output_grid function in GridIn
+  are changed from private to protected to be accessible in derived classes.
+  <br>
+  (RH 2008/02/24)
+  </p></li>
+
   <li> <p>New: The new Boundary::get_new_point_on_face and
   get_intermediate_points_on_face functions offer an dimension independent
-  interface to this class.
+  interface to the Boundary class.
   <br>
   (RH 2008/02/24)
   </p></li>
