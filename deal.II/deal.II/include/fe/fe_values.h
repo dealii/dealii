@@ -361,7 +361,7 @@ namespace FEValuesViews
 					* $\phi_i$ represents the
 					* <code>dim</code> components selected
 					* from the FEValuesBase object, and
-					* $x_q$ is the location of the $q$th
+					* $x_q$ is the location of the $q$-th
 					* quadrature point.
 					*/
       symmetric_gradient_type
