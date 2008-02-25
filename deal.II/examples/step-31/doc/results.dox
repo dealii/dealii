@@ -5,7 +5,8 @@
 
 <h4>2D calculations</h4>
 
-If we run the program in two dimensions, we get the following output:
+Running the program with the space dimension set to 2 in
+<code>main()</code> yields the following output:
 @code
 examples/step-31> make run
 ============================ Remaking Makefile.dep
@@ -61,17 +62,25 @@ Refinement cycle 6
    Computing preconditioner...
    Solving...  11 outer CG Schur complement iterations for pressure
 @endcode
+The entire computation above takes about 30 seconds on a reasonably
+quick (for 2007 standards) machine.
 
-Note that the number of (outer) iterations does not increase as we refine the
-mesh. 
+What we see immediately from this is that the number of (outer)
+iterations does not increase as we refine the mesh. This confirms the
+statement in the introduction that preconditioning the Schur
+complement with the mass matrix indeed yields a matrix spectrally
+equivalent to the identity matrix (i.e. with eigenvalues bounded above
+and below independently of the mesh size or the relative sizes of
+cells). In other words, the mass matrix and the Schur complement are
+spectrally equivalent.
 
-In the images below, we show the grids for the first six refinement steps in the
-program. 
-Obersve how the grid is refined in regions where the solution rapidly changes: 
-On the upper boundary, we have Dirichlet boundary conditions that are -1 in the
-left half of the line and 1 in the right one, so there is an aprupt change at 
-x=0. Likewise, there are changes from Dirichlet to Neumann data in the two upper
-corners, so there is need for refinement there as well.
+In the images below, we show the grids for the first six refinement
+steps in the program.  Observe how the grid is refined in regions
+where the solution rapidly changes: On the upper boundary, we have
+Dirichlet boundary conditions that are -1 in the left half of the line
+and 1 in the right one, so there is an aprupt change at $x=0$. Likewise,
+there are changes from Dirichlet to Neumann data in the two upper
+corners, so there is need for refinement there as well:
 
 <TABLE WIDTH="60%" ALIGN="center">
   <tr>
@@ -105,10 +114,25 @@ corners, so there is need for refinement there as well.
   </tr>
 </table>
 
+Finally, following is a plot of the flow field. It shows fluid
+transported along with the moving upper boundary and being replaced by
+material coming from below:
+
 @image html step-31.2d.solution.png
 
+This plot uses the capability of VTK-based visualization programs (in
+this case of VisIt) to show vector data; this is the result of us
+declaring the velocity components of the finite element in use to be a
+set of vector components, rather than independent scalar components in
+the <code>StokesProblem@<dim@>::output_results</code> function of this
+tutorial program.
+
+
+
 <h4>3D calculations</h4>
-The program now run in 3d:
+
+In 3d, the screen output of the program looks like this:
+
 @code
 Refinement cycle 0
    Number of active cells: 32
@@ -160,13 +184,24 @@ Refinement cycle 6
    Solving...  15 outer CG Schur complement iterations for pressure.
 @endcode
 
-Note again that the number of iterations does not increase as we refine 
-the mesh. 
+Again, we see that the number of outer iterations does not increase as
+we refine the mesh. Nevertheless, the compute time increases
+significantly: for each of the iterations above separately, it takes a
+few seconds, a few seconds, 1min, 5min, 29min, 3h12min, and 21h39min
+for the finest level with more than 4.5 million unknowns. This
+superlinear (in the number of unknowns) increase is due to first the
+superlinear number of operations to compute the ILU decomposition, and
+secondly the fact
+that our inner solver is not ${\cal O}(N)$: a simple experiment shows
+that as we keep refining the mesh, the average number of
+ILU-preconditioned CG iterations to invert the velocity-velocity block
+$A$ increases from 12, 22, 35, 55, .....
 
-Compute times for each iteration alone: seconds, seconds, 1 minute, 5
-minutes, 29 minutes, 3h12, 21h39
+We will address the question of how possibly to improve our solver <a
+href="improved-solver">below</a>.
 
-The grids generated during the solution look as follow:
+As for the graphical output, the grids generated during the solution
+look as follow: 
 
 <TABLE WIDTH="60%" ALIGN="center">
   <tr>
@@ -209,22 +244,40 @@ The grids generated during the solution look as follow:
   </tr>
 </table>
 
-Let's have a look at the solution as well.
+Again, they show essentially the location of singularities introduced
+by boundary conditions. The vector field computed makes for an
+interesting graph:
 
 @image html step-31.3d.solution.png
 
-<h3>Sparsity pattern</h3>
-As explained during the generation of the sparsity pattern, it is important to
-have the distribution of nonzero elements in the stiffness matrix in mind.
+The isocountours shown here as well are those of the pressure
+variable, showing the singularity at the point of discontinuous
+velocity boundary conditions.
 
-We first start off with a simple dof
-renumbering by components (i.e., without using Cuthill_McKee) after the first
-adaptive refinement in two dimensions.
-In order to generate such an output, you have to insert a piece of code like the
-following in the end of the setup step.
-Note that it is not possible to directly output a BlockSparsityPattern, so we
-need to generate some temporary objects that will be released again in order to
-not slow down the program.
+
+
+<h3>Sparsity pattern</h3>
+
+As explained during the generation of the sparsity pattern, it is
+important to have the numbering of degrees of freedom in mind when
+using preconditioners like incomplete LU decompositions. This is most
+conveniently visualized using the distribution of nonzero elements in
+the stiffness matrix.
+
+If we don't do anything special to renumber degrees of freedom (i.e.,
+without using DoFRenumbering::Cuthill_McKee, but with using
+DoFRenumbering::component_wise to ensure that degrees of freedom are
+appropriately sorted into their corresponding blocks of the matrix and
+vector), then we get the following image after the first adaptive
+refinement in two dimensions:
+
+@image html step-31.2d.sparsity-nor.png
+
+In order to generate such a graph, you have to insert a piece of
+code like the following to the end of the setup step.  Note that it is
+not possible to directly output a BlockSparsityPattern, so we need to
+generate some temporary objects that will be released again in order
+to not slow down the program.
 @code
   {
     SparsityPattern complete_sparsity_pattern;
@@ -238,7 +291,7 @@ not slow down the program.
   }
 @endcode
 
-@image html step-31.2d.sparsity-nor.png
+
 
 It is clearly visible that the dofs are spread over almost the whole matrix.
 This makes preconditioning by ILU inefficient: ILU generates a Gaussian
@@ -272,9 +325,12 @@ is not a good choice in 3D - a full decomposition needs many new entries that
 
 @image html step-31.3d.sparsity_uu-ren.png
 
+
 <h2>Possible Extensions</h2>
 
+<a name="improved-solver">
 <h3>Improved linear solver</h3>
+</a>
 
 We have seen in the section of computational results that the number of outer
 iterations does not depend on the mesh size, which is optimal in a sense of
