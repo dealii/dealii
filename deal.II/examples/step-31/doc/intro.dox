@@ -1,6 +1,8 @@
 <a name="Intro"></a>
 <h1>Introduction</h1>
 
+(This program was contributed by Martin Kronbichler and Wolfgang Bangerth.)
+
 This program deals with the Stokes system of equations which reads as
 follows in their non-dimensionalized form:
 @f{eqnarray*}
@@ -12,7 +14,7 @@ where $\textbf u$ denotes the velocity of a fluid, $p$ is its
 pressure, $\textbf f$ are external forces, and
 $\varepsilon(\textbf{u})= \nabla^s{\textbf{u}}= \frac 12 \left[
 (\nabla \textbf{u}) + (\nabla \textbf{u})^T\right]$  is the
-rankd-2 tensor of symmetrized gradients; a component-wise definition
+rank-2 tensor of symmetrized gradients; a component-wise definition
 of it is $\varepsilon(\textbf{u})_{ij}=\frac
 12\left(\frac{\partial u_i}{\partial x_j} + \frac{\partial u_j}{\partial x_i}\right)$.
 
@@ -21,7 +23,7 @@ slow-moving, viscous fluid such as honey, rocks in the earth mantle,
 or other cases where inertia does not play a significant role. If a
 fluid is moving fast enough that inertia forces are significant
 compared to viscous friction, the Stokes equations are no longer
-valid; taking into account interia effects then leads to the
+valid; taking into account inertia effects then leads to the
 nonlinear Navier-Stokes equations. However, in this tutorial program,
 we will focus on the simpler Stokes system.
 
@@ -65,7 +67,7 @@ which has to hold for all test functions $\phi = \left({\textbf v
 \atop q}\right)$.
 
 In practice, one wants to impose as little regularity on the pressure
-variable; consequently, we integrate by parts the second term:
+variable as possible; consequently, we integrate by parts the second term:
 @f{eqnarray*}
   (\mathrm v, -\textrm{div}\; \varepsilon(\textbf{u}))_{\Omega}
   - (\textrm{div}\; \textbf{v}, p)_{\Omega}
@@ -111,11 +113,21 @@ above as follows:
   =
   (\textbf{v}, \textbf{f})_\Omega,
 @f}
+We will deal with the boundary terms in the next section, but it is already
+clear from the domain terms
+@f{eqnarray*}
+  (\varepsilon(\mathrm v),\varepsilon(\textbf{u}))_{\Omega}
+  - (\textrm{div}\; \textbf{v}, p)_{\Omega}
+  -
+  (q,\textrm{div}\; \textbf{u})_{\Omega}
+@f}
+of the bilinear form that the Stokes equations yield a symmetric bilinear
+form, and consequently a symmetric (if indefinite) system matrix.
 
 
 <h2>%Boundary conditions</h2>
 
-The weak form just presented immediately presents us with different
+The weak form just derived immediately presents us with different
 possibilities for imposing boundary conditions:
 <ol>
 <li>Dirichlet velocity boundary conditions: On a part
@@ -138,7 +150,10 @@ possibilities for imposing boundary conditions:
     In other words, as usual, strongly imposed boundary values do not
     appear in the weak form.
  
-<li>Neumann-type boundary conditions: On the rest of the boundary
+    It is noteworthy that if we impose Dirichlet boundary values on the entire
+    boundary, then the pressure is only determined up to a constant.
+
+<li>Neumann-type or natural boundary conditions: On the rest of the boundary
     $\Gamma_N=\partial\Omega\backslash\Gamma_D$, let us re-write the
     boundary terms as follows:
     @f{eqnarray*}
@@ -207,7 +222,7 @@ possibilities for imposing boundary conditions:
       -
       (q,\textrm{div}\; \textbf{u})_{\Omega}
       +
-      (\textbf S \textbf u, \textbf{v})_{\Gamma_N}
+      (\textbf S \textbf u, \textbf{v})_{\Gamma_R}
       =
       (\textbf{v}, \textbf{f})_\Omega.
     @f}
@@ -218,8 +233,8 @@ possibilities for imposing boundary conditions:
     boundary conditions is to require that the flow is perpendicular to the
     boundary, i.e. the tangential component $\textbf u_{\textbf t}=(\textbf
     1-\textbf n\otimes\textbf n)\textbf u$ be zero, thereby constraining
-    $dim-1$ components of the velocity. The remaining component can be
-    constrained by requiring that the normal stress be zero, yielding the
+    <code>dim</code>-1 components of the velocity. The remaining component can
+    be constrained by requiring that the normal stress be zero, yielding the
     following set of boundary conditions:
     @f{eqnarray*}
       \textbf u_{\textbf t} &=& 0,
@@ -262,7 +277,7 @@ Babuska-Brezzi or Ladyzhenskaya-Babuska-Brezzi (LBB) conditions. The function
 spaces above satisfy them. However, when we discretize the equations by
 replacing the continuous variables and test functions by finite element
 functions in finite dimensional spaces $\textbf V_{g,h}\subset \textbf V_g,
-Q_h\subset Q$, we have to make sure that $\textbf V,Q$ also satisfy the LBB
+Q_h\subset Q$, we have to make sure that $\textbf V_h,Q_h$ also satisfy the LBB
 conditions. This is similar to what we had to do in @ref step_20 "step-20".
 
 For the Stokes equations, there are a number of possible choices to ensure
@@ -283,7 +298,10 @@ that
   -
   (\textbf{v}_h, \textbf g_N)_{\Gamma_N}
 @f}
-for all test functions $\textbf v_h, q_h$.
+for all test functions $\textbf v_h, q_h$. Assembling the linear system
+associated with this problem follows the same lines used in @ref step_20
+"step-20", @ref step_21 "step-21", and explained in detail in the @ref
+vector_valued module.
 
 
 
@@ -295,11 +313,11 @@ linear system for the nodal values of the velocity and pressure fields:
   \left(\begin{array}{cc}
     A & B^T \\ B & 0
   \end{array}\right)
-  \left(\begin{array}{cc}
+  \left(\begin{array}{c}
     U \\ P
   \end{array}\right)
   =
-  \left(\begin{array}{cc}
+  \left(\begin{array}{c}
     F \\ G
   \end{array}\right),
 @f}
@@ -325,9 +343,9 @@ to precondition the Schur complement $B^TM^{-1}B$, which was spectrally
 equivalent to the Laplace operator on the pressure space (because $B$
 represents the gradient operator, $B^T$ its adjoint $-\textrm{div}$, and $M$
 the identity (up to the material parameter $K^{-1}$), so $B^TM^{-1}B$ is
-something like $-\textrm{div} 1 \nabla = -\Delta$). Consequently, the matrix
-is badly conditioned for small mesh sizes and we had to come up with
-an elaborate preconditioning scheme for the Schur complement.
+something like $-\textrm{div} \mathbf 1 \nabla = -\Delta$). Consequently, the
+matrix is badly conditioned for small mesh sizes and we had to come up with an
+elaborate preconditioning scheme for the Schur complement.
 
 <li>
 Second, every time we multiplied with $B^TM^{-1}B$ we had to solve with the
@@ -341,7 +359,7 @@ preconditioning the outer solver for $B^TM^{-1}B$ was complicated.
 Here, the situation is pretty much exactly the opposite. The difference stems
 from the fact that the matrix at the heart of the Schur complement does not
 stem from the identity operator but from a variant of the Laplace operator,
-$-\textrm{div} \eta \nabla^s$ (where $\nabla^s$ is the symmetric gradient)
+$-\textrm{div} \nabla^s$ (where $\nabla^s$ is the symmetric gradient)
 acting on a vector field. In the investigation of this issue
 we largely follow the paper D. Silvester and A. Wathen:
 "Fast iterative solution of stabilised Stokes systems part II. Using
@@ -353,23 +371,25 @@ complement has two consequences:
 
 <ol>
 <li>
-First, it makes the outer preconditioner simple: the
-Schur complement corresponds to the operator $-\textrm{div} (-\textrm{div}
-\eta \nabla^s)^{-1} \nabla$ on the pressure space; forgetting about the
-viscosity $\eta$ and ignoring the fact that we deal with symmetric gradients
-instead of the regular one, the Schur complement is something like
-$-\textrm{div} (-\textrm{div} \nabla)^{-1} \nabla = -\textrm{div}
-(-\Delta)^{-1} \nabla$, which even if not mathematically entirely concise, is
-spectrally equivalent to the identity operator. It turns out that it isn't
-easy to solve this Schur complement in a straight forward way with the CG
-method: using no preconditioner, the condition number of the Schur complement
-matrix depends on the size ratios of the largest to the smallest cells, and
-one still needs on the order of 50-100 CG iterations. However, there is a
-simple cure: precondition with the mass matrix on the pressure space and we
-get down to a number between 5-15 CG iterations, pretty much independently of
-the structure of the mesh (take a look at the <a
-href="#Results">results section</a> of this program to see that indeed
-the number of CG iterations does not change as we refine the mesh).  
+First, it makes the outer preconditioner simple: the Schur complement
+corresponds to the operator $-\textrm{div} (-\textrm{div} \nabla^s)^{-1}
+\nabla$ on the pressure space; forgetting about the fact that we deal with
+symmetric gradients instead of the regular one, the Schur complement is
+something like $-\textrm{div} (-\textrm{div} \nabla)^{-1} \nabla =
+-\textrm{div} (-\Delta)^{-1} \nabla$, which even if not mathematically
+entirely concise, is spectrally equivalent to the identity operator (a
+heuristic argument would be to commute the operators into
+$-\textrm{div}(-\Delta)^{-1} \nabla = -\textrm{div}\nabla(-\Delta)^{-1} =
+-\Delta(-\Delta)^{-1} = \mathbf 1$). It turns out that it isn't easy to solve
+this Schur complement in a straightforward way with the CG method, however:
+using no preconditioner, the condition number of the Schur complement matrix
+depends on the size ratios of the largest to the smallest cells, and one still
+needs on the order of 50-100 CG iterations. However, there is a simple cure:
+precondition with the mass matrix on the pressure space and we get down to a
+number between 5-15 CG iterations, pretty much independently of the structure
+of the mesh (take a look at the <a href="#Results">results section</a> of this
+program to see that indeed the number of CG iterations does not change as we
+refine the mesh).
 
 So all we need in addition to what we already have is the mass matrix on the
 pressure variables. We could do that by building this matrix on the
@@ -411,11 +431,11 @@ every time we multiply with the Schur complement, we had to solve a
 linear system $M_uz=y$; this isn't too complicated there, however,
 since the mass matrix $M_u$ on the pressure space is well-conditioned.
 
+
 On the other hand, for the Stokes equation we consider here, the Schur
 complement is $B^TA^{-1}B$ where the matrix $A$ is related to the
 Laplace operator (it is, in fact, the matrix corresponding to the
-bilinear form $(\nabla^s \varphi_i, \nabla^s\varphi_j)$ where
-$\nabla^s$ is the symmetrized gradient of a vector field). Thus,
+bilinear form $(\nabla^s \varphi_i, \nabla^s\varphi_j)$). Thus,
 solving with $A$ is a lot more complicated: the matrix is badly
 conditioned and we know that we need many iterations unless we have a
 very good preconditioner. What is worse, we have to solve with $A$
@@ -433,12 +453,17 @@ switch when configuring the deal.II library, see the <a
 href="../../readme.html#optional-software">ReadMe file</a> for
 instructions. With this, the inner solver converges in one iteration.
 
-In 2d, we can do this sort of thing because even reasonably large
-problems rarely have more than a few 100,000 unknowns with
-relatively few nonzero entries per row. Furthermore, the bandwidth of
-matrices in 2d is ${\cal O}(\sqrt{N})$ and therefore moderate. For
-such matrices, sparse factor can be computed in a matter of a few
-seconds.
+In 2d, we can do this sort of thing because even reasonably large problems
+rarely have more than a few 100,000 unknowns with relatively few nonzero
+entries per row. Furthermore, the bandwidth of matrices in 2d is ${\cal
+O}(\sqrt{N})$ and therefore moderate. For such matrices, sparse factors can be
+computed in a matter of a few seconds. (As a point of reference, computing the
+sparse factors of a matrix of size $N$ and bandwidth $B$ takes ${\cal
+O}(NB^2)$ operations. In 2d, this is ${\cal O}(N^2)$; though this is a higher
+complexity than, for example, assembling the linear system which takes ${\cal
+O}(N)$, the constant for computing the decomposition is so small that it
+doesn't become the dominating factor in the entire program until we get to
+very large numbers of unknowns in the high 100,000s or more.)
 
 The situation changes in 3d, because there we quickly have many more
 unknowns and the bandwidth of matrices (which determines the number of
@@ -463,12 +488,77 @@ take more time when multiplying with the Schur complement, a tradeoff
 unavoidable.
 </ol>
 
+In the program below, we will make use of the fact that the SparseILU and
+SparseDirectUMFPACK classes have a very similar interface and can be used
+interchangeably. All that we need is a switch class that, depending on the
+dimension, provides a type that is either of the two classes mentioned
+above. This is how we do that:
+@code
+template <int dim>
+struct InnerPreconditioner;
 
-<h2>Implementation</h2>
+template <>
+struct InnerPreconditioner<2> 
+{
+    typedef SparseDirectUMFPACK type;
+};
 
-Note anything here that would be particular about this program.
+template <>
+struct InnerPreconditioner<3> 
+{
+    typedef SparseILU<double> type;
+};
+@endcode
+
+From hereon, we can refer to the type <code>typename
+InnerPreconditioner@<dim@>::type</code> and automatically get the correct
+preconditioner class. Because of the similarity of the interfaces of the two
+classes, we will be able to use them interchangeably using the same syntax in
+all places.
 
 
 <h2>The testcase</h2>
 
-Describe the testcase we are dealing with here.
+The domain, right hand side and boundary conditions we implement below relate
+to a problem in geophysics: there, one wants to compute the flow field of
+magma in the earth's interior under a mid-ocean rift. Rifts are places where
+two continental plates are very slowly drifting apart (a few centimeters per
+year at most), leaving a crack in the earth crust that is filled from below
+with magma. Without trying to be entirely realistic, we model this situation
+by solving the following set of equations and boundary conditions on the
+domain $\Omega=[-2,2]\times[0,1]\times[-1,0]$:
+@f{eqnarray*}
+  -\textrm{div}\; \varepsilon(\textbf{u}) + \nabla p &=& 0,
+  \\
+  -\textrm{div}\; \textbf{u} &=& 0,
+  \\
+  \mathbf u &=&   \left(\begin{array}{c}
+    -1 \\ 0 \\0
+  \end{array}\right)
+  \qquad\qquad \textrm{at}\ z=0, x<0,
+  \\
+  \mathbf u &=&   \left(\begin{array}{c}
+    +1 \\ 0 \\0
+  \end{array}\right)
+  \qquad\qquad \textrm{at}\ z=0, x>0,
+  \\
+  \mathbf u &=&   \left(\begin{array}{c}
+    0 \\ 0 \\0
+  \end{array}\right)
+  \qquad\qquad \textrm{at}\ z=0, x=0,
+@f}
+and using natural boundary conditions $\textbf{n}\cdot [p \textbf{1} -
+\varepsilon(\textbf{u})] = 0$ everywhere else. In other words, at the
+left part of the top surface we prescribe that the fluid moves with the
+continental plate to the left at speed $-1$, that it moves to the right on the
+right part of the top surface, and impose natural flow conditions everywhere
+else. If we are in 2d, the description is essentially the same, with the
+exception that we omit the second component of all vectors stated above.
+
+As will become apparent in the <a href="#Results">results section</a>, the
+flow field will pull material from below and move it to the left and right
+ends of the domain, as expected. The discontinuity of velocity boundary
+conditions will produce a singularity in the pressure at the center of the top
+surface that sucks material all the way to the top surface to fill the gap
+left by the outward motion of material at this location.
+
