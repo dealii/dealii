@@ -463,7 +463,7 @@ O}(NB^2)$ operations. In 2d, this is ${\cal O}(N^2)$; though this is a higher
 complexity than, for example, assembling the linear system which takes ${\cal
 O}(N)$, the constant for computing the decomposition is so small that it
 doesn't become the dominating factor in the entire program until we get to
-very large numbers of unknowns in the high 100,000s or more.)
+very large %numbers of unknowns in the high 100,000s or more.)
 
 The situation changes in 3d, because there we quickly have many more
 unknowns and the bandwidth of matrices (which determines the number of
