@@ -2,7 +2,7 @@
 //    $Id$
 //    Version: $Name$
 //
-//    Copyright (C) 2001, 2002, 2003, 2004, 2005, 2006, 2007 by the deal.II authors
+//    Copyright (C) 2001, 2002, 2003, 2004, 2005, 2006, 2007, 2008 by the deal.II authors
 //
 //    This file is subject to QPL and may not be  distributed
 //    without copyright and license information. Please refer
@@ -1011,7 +1011,8 @@ class SparseDirectMA47 : public Subscriptor
  * MultiFrontal method and direct sparse LU factorization. Matrices
  * may have symmetric or unsymmetrix sparsity patterns, and may have
  * unsymmetric entries. The use of this class is explained in the @ref
- * step_29 "step-29" tutorial program.
+ * step_29 "step-29" and @ref
+ * step_31 "step-31" tutorial programs.
  *
  * This matrix class implements the usual interface of
  * preconditioners, that is a function initialize(const
