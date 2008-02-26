@@ -771,69 +771,27 @@ void MixedLaplaceProblem<dim>::assemble_system ()
                                  // Wouldn't it be nice if we could
                                  // avoid this, and allocate vectors
                                  // only once? In fact, deal.II offers
-                                 // a way to do exactly this. What all
+                                 // a way to do exactly this and we
+                                 // don't even have to do anything
+                                 // special about it (so this comment
+                                 // is purely educational). What all
                                  // the linear solvers do is not to
-                                 // allocate memory using <code>new</code> and
-                                 // <code>delete</code>, but rather to allocate
-                                 // them from an object derived from
-                                 // the <code>VectorMemory</code> class (see
-                                 // the module on Vector memory
+                                 // allocate memory using
+                                 // <code>new</code> and
+                                 // <code>delete</code>, but rather to
+                                 // allocate them from an object
+                                 // derived from the
+                                 // <code>VectorMemory</code> class
+                                 // (see the module on Vector memory
                                  // management in the API reference
                                  // manual). By default, the linear
                                  // solvers use a derived class
-                                 // <code>GrowingVectorMemory</code> that,
-                                 // ever time a vector is requested,
-                                 // allocates one from its internal
-                                 // pool.
-                                 //
-                                 // On the other hand, for the present
-                                 // case, we would like to have a
-                                 // vector memory object that
-                                 // allocates vectors when asked by a
-                                 // linear solver, but when the linear
-                                 // solver returns the vectors, the
-                                 // vector memory object holds on to
-                                 // them for later requests by linear
-                                 // solvers. The
-                                 // <code>GrowingVectorMemory</code> class does
-                                 // exactly this: when asked by a
-                                 // linear solver for a vector, it
-                                 // first looks whether it has unused
-                                 // ones in its pool and if so offers
-                                 // this vector. If it doesn't, it
-                                 // simply grows its pool. Vectors are
-                                 // only returned to the C++ runtime
-                                 // memory system once the
-                                 // <code>GrowingVectorMemory</code> object is
-                                 // destroyed itself.
-                                 //
-                                 // What we therefore need to do is
-                                 // have the present matrix have an
-                                 // object of type
-                                 // <code>GrowingVectorMemory</code> as a
-                                 // member variable and use it
-                                 // whenever we create a linear solver
-                                 // object. There is a slight
-                                 // complication here: Since the
-                                 // <code>vmult</code> function is marked as
-                                 // <code>const</code> (it doesn't change the
-                                 // state of the object, after all,
-                                 // and simply operates on its
-                                 // arguments), it can only pass an
-                                 // unchanging vector memory object to
-                                 // the solvers. The solvers, however,
-                                 // do change the state of the vector
-                                 // memory object, even though this
-                                 // has no impact on the actual state
-                                 // of the inverse matrix object. The
-                                 // compiler would therefore flag any
-                                 // such attempt as an error, if we
-                                 // didn't make use of a rarely used
-                                 // feature of C++: we mark the
-                                 // variable as <code>mutable</code>. What this
-                                 // does is to allow us to change a
-                                 // member variable even from a
-                                 // <code>const</code> member function.
+                                 // <code>GrowingVectorMemory</code>
+                                 // that, every time a vector is
+                                 // requested, allocates one from a
+                                 // pool that is shared by all
+                                 // <code>GrowingVectorMemory</code>
+                                 // objects.
 template <class Matrix>
 class InverseMatrix : public Subscriptor
 {
@@ -845,9 +803,6 @@ class InverseMatrix : public Subscriptor
 
   private:
     const SmartPointer<const Matrix> matrix;
-//TODO: GrowingVectorMemory is now the default and it can be created
-//where needed. Adjust documentation and implementation here
-    mutable GrowingVectorMemory<> vector_memory;    
 };
 
 
@@ -861,10 +816,7 @@ InverseMatrix<Matrix>::InverseMatrix (const Matrix &m)
                                  // Here now is the function that
                                  // implements multiplication with the
                                  // inverse matrix by calling a CG
-                                 // solver. Note how we pass the
-                                 // vector memory object discussed
-                                 // above to the linear solver. Note
-                                 // also that we set the solution
+                                 // solver. Note that we set the solution
                                  // vector to zero before starting the
                                  // solve, since we do not want to use
                                  // the possible previous and unknown
@@ -876,7 +828,7 @@ void InverseMatrix<Matrix>::vmult (Vector<double>       &dst,
                                    const Vector<double> &src) const
 {
   SolverControl solver_control (src.size(), 1e-8*src.l2_norm());
-  SolverCG<> cg (solver_control, vector_memory);
+  SolverCG<>    cg (solver_control);
 
   dst = 0;
   
