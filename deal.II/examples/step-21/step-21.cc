@@ -527,9 +527,8 @@ template <class Matrix>
 void InverseMatrix<Matrix>::vmult (Vector<double>       &dst,
                                    const Vector<double> &src) const
 {
-  SolverControl         solver_control (src.size(), 1e-8*src.l2_norm());
-  GrowingVectorMemory<> vector_memory;    
-  SolverCG<>            cg (solver_control, vector_memory);
+  SolverControl solver_control (src.size(), 1e-8*src.l2_norm());
+  SolverCG<>    cg (solver_control, vector_memory);
 
   dst = 0;
   
