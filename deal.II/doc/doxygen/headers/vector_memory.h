@@ -20,5 +20,8 @@
  * all use an object of the base class VectorMemory to get their auxiliary
  * vectors.
  *
+ * Some discussion on this topic can be found in the discussion of the
+ * InverseMatrix class in @ref step_20 "step-20".
+ *
  * @ingroup LAC
  */
