@@ -675,11 +675,19 @@ class SymmetricTensor
 				      * stored in symmetric tensors; its use
 				      * is therefore discouraged.
 				      *
-				      * This constructor is currently inly
+				      * This constructor is currently only
 				      * implemented for symmetric tensors of
 				      * rank 2.
+				      *
+				      * The size of the array passed
+				      * is equal to
+				      * SymmetricTensor<rank,dim>::n_independent_component;
+				      * the reason for using the
+				      * object from the internal
+				      * namespace is to work around
+				      * bugs in some older compilers.
 				      */
-    SymmetricTensor (const double (&array) [n_independent_components]);
+    SymmetricTensor (const double (&array) [internal::SymmetricTensorAccessors::StorageType<rank,dim>::n_independent_components]);
     
 				     /**
 				      *  Assignment operator.
@@ -1055,7 +1063,7 @@ SymmetricTensor<2,3>::SymmetricTensor (const Tensor<2,3> &t)
 
 template <int rank, int dim>
 inline
-SymmetricTensor<rank,dim>::SymmetricTensor (const double (&array) [n_independent_components])
+SymmetricTensor<rank,dim>::SymmetricTensor (const double (&array) [internal::SymmetricTensorAccessors::StorageType<rank,dim>::n_independent_components])
 		:
 		data (array)
 {}
