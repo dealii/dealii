@@ -2,7 +2,7 @@
 //    $Id$
 //    Version: $Name$
 //
-//    Copyright (C) 2003, 2004, 2005, 2006, 2007 by the deal.II authors
+//    Copyright (C) 2003, 2004, 2005, 2006, 2007, 2008 by the deal.II authors
 //
 //    This file is subject to QPL and may not be  distributed
 //    without copyright and license information. Please refer
@@ -307,10 +307,11 @@ class DoFRenumbering
 				      * component more than once is
 				      * possible and results in a
 				      * blocking of several components
-				      * into one.  If you omit this
-				      * argument, the same order as
-				      * given by the finite element is
-				      * used.
+				      * into one. This is discussed in
+				      * @ref step_31 "step-31". If you
+				      * omit this argument, the same
+				      * order as given by the finite
+				      * element is used.
 				      *
 				      * If one of the base finite
 				      * elements from which the global
