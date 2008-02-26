@@ -262,7 +262,7 @@ void InverseMatrix<Matrix,Preconditioner>::vmult (Vector<double>       &dst,
 						  const Vector<double> &src) const
 {
   SolverControl solver_control (src.size(), 1e-6*src.l2_norm());
-  SolverCG<> cg (solver_control, vector_memory);
+  SolverCG<> cg (solver_control);
 
   dst = 0;
 
