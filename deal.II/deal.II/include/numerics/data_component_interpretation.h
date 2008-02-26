@@ -2,7 +2,7 @@
 //    $Id: data_out.h 15313 2007-10-14 01:28:54Z bangerth $
 //    Version: $Name$
 //
-//    Copyright (C) 2007 by the deal.II authors
+//    Copyright (C) 2007, 2008 by the deal.II authors
 //
 //    This file is subject to QPL and may not be  distributed
 //    without copyright and license information. Please refer
@@ -32,9 +32,9 @@ namespace DataComponentInterpretation
 				    * vector-valued data set mean. For
 				    * example, if one has a finite element
 				    * for the Stokes equations in 2d,
-				    * representing components (u,v,p), one
+				    * representing components $(u,v,p)$, one
 				    * would like to indicate that the first
-				    * two, u and v, represent a logical
+				    * two, $u$ and $v$, represent a logical
 				    * vector so that later on when we
 				    * generate graphical output we can hand
 				    * them off to a visualization program
@@ -48,7 +48,7 @@ namespace DataComponentInterpretation
 				    * DataOut_DoFData::add_data_vector
 				    * functions, this can be achieved.
 				    *
-				    * See the @ref step_22 "step-22" tutorial
+				    * See the @ref step_31 "step-31" tutorial
 				    * program for an example on how this
 				    * information can be used in practice.
 				    *

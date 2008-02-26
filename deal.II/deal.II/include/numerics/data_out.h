@@ -2,7 +2,7 @@
 //    $Id$
 //    Version: $Name$
 //
-//    Copyright (C) 1999, 2000, 2001, 2002, 2003, 2004, 2005, 2006, 2007 by the deal.II authors
+//    Copyright (C) 1999, 2000, 2001, 2002, 2003, 2004, 2005, 2006, 2007, 2008 by the deal.II authors
 //
 //    This file is subject to QPL and may not be  distributed
 //    without copyright and license information. Please refer
@@ -97,7 +97,7 @@ template <int> class FEValuesBase;
  * is logically an independent scalar field, or whether some of them together
  * form logically a vector-field (see the
  * DataComponentInterpretation::DataComponentInterpretation enum, and the @ref
- * step_22 "step-22" tutorial program).
+ * step_31 "step-31" tutorial program).
  *
  * It should be noted that this class does not copy the vector given to it through
  * the add_data_vector() functions, for memory consumption reasons. It only
