@@ -268,26 +268,17 @@ If we don't do anything special to renumber degrees of freedom (i.e.,
 without using DoFRenumbering::Cuthill_McKee, but with using
 DoFRenumbering::component_wise to ensure that degrees of freedom are
 appropriately sorted into their corresponding blocks of the matrix and
-vector), then we get the following image after the first adaptive
+vector, then we get the following image after the first adaptive
 refinement in two dimensions:
 
 @image html step-31.2d.sparsity-nor.png
 
 In order to generate such a graph, you have to insert a piece of
-code like the following to the end of the setup step.  Note that it is
-not possible to directly output a BlockSparsityPattern, so we need to
-generate some temporary objects that will be released again in order
-to not slow down the program.
+code like the following to the end of the setup step. 
 @code
   {
-    SparsityPattern complete_sparsity_pattern;
-    CompressedSparsityPattern csp (dof_handler.n_dofs(),
-                                   dof_handler.n_dofs());
-    DoFTools::make_sparsity_pattern(dof_handler, csp);
-    hanging_node_constraints.condense (csp);
-    complete_sparsity_pattern.copy_from(csp);
     std::ofstream out ("sparsity_pattern.gpl");
-    complete_sparsity_pattern.print_gnuplot(out);
+    sparsity_pattern.print_gnuplot(out);
   }
 @endcode
 
@@ -402,9 +393,13 @@ in the introduction. In
 this case, a Krylov-based iterative method will converge in two steps, since
 there are only two distinct eigenvalues 0 and 1 of this matrix. The resulting
 preconditioned matrix can not be solved using CG since it is neither positive
-definite not symmetric. However, the iterative solver GMRES, which is more expensive
-per iteration (more inner products to be calculated) is applicable to this
-sort of matrices.
+definite not symmetric. On the other hand, the iterative solver BiCGStab, which 
+is more expensive per iteration (more inner products are to be calculated) is 
+applicable to this sort of matrices. (One could also think of using GMRES, but
+that solver has the disadvantage that it needs all Krylov basis vectors in each
+iteration - which are many if we need hundreds of iterations. Deal.II does not
+use more than 30 by default, so the basis is rebuild after that - which however
+leads to slow convergence.)
 
 Since $P$ is aimed to be a preconditioner only, we shall only use
 approximations to the Schur complement $S$ and the matrix $A$. So an improved
@@ -418,36 +413,36 @@ full block system instead of the smaller pressure space.
 An implementation of such a solver could look like this:
 
 First the class for the block Schur complement preconditioner, which implements
-a <code>vmult</code> operation of the preconditioner for block vectors. Note that the
-preconditioner $P$ described above is implemented by three successive
+a <code>vmult</code> operation of the preconditioner for block vectors. Note
+that the preconditioner $P$ described above is implemented by three successive
 operations.
 @code
-template <class Preconditioner>
+template <class PreconditionerA, class PreconditionerMp>
 class BlockSchurPreconditioner : public Subscriptor
 {
   public:
-    BlockSchurPreconditioner (const BlockSparseMatrix<double>           &S,
-          const InverseMatrix<SparseMatrix<double>,PreconditionSSOR<> > &Mpinv,
-          const Preconditioner &Apreconditioner);
+    BlockSchurPreconditioner (const BlockSparseMatrix<double>         &S,
+          const InverseMatrix<SparseMatrix<double>,PreconditionerMp>  &Mpinv,
+          const PreconditionerA &Apreconditioner);
 
-    void vmult (BlockVector<double>       &dst,
-                const BlockVector<double> &src) const;
+  void vmult (BlockVector<double>       &dst,
+              const BlockVector<double> &src) const;
 
   private:
     const SmartPointer<const BlockSparseMatrix<double> > system_matrix;
     const SmartPointer<const InverseMatrix<SparseMatrix<double>, 
-                       PreconditionSSOR<> > > m_inverse;
-    const Preconditioner &a_preconditioner;
+                       PreconditionerMp > > m_inverse;
+    const PreconditionerA &a_preconditioner;
     
     mutable BlockVector<double> tmp;
 
 };
 
-template <class Preconditioner>
-BlockSchurPreconditioner<Preconditioner>::BlockSchurPreconditioner(
-          const BlockSparseMatrix<double>                               &S,
-          const InverseMatrix<SparseMatrix<double>,PreconditionSSOR<> > &Mpinv,
-          const Preconditioner &Apreconditioner
+template <class PreconditionerA, class PreconditionerMp>
+BlockSchurPreconditioner<PreconditionerA, PreconditionerMp>::BlockSchurPreconditioner(
+          const BlockSparseMatrix<double>                            &S,
+          const InverseMatrix<SparseMatrix<double>,PreconditionerMp> &Mpinv,
+          const PreconditionerA &Apreconditioner
           )
                 :
                 system_matrix           (&S),
@@ -455,7 +450,7 @@ BlockSchurPreconditioner<Preconditioner>::BlockSchurPreconditioner(
                 a_preconditioner        (Apreconditioner),
                 tmp                     (2)
 {
-        // We have to initialize the BlockVector
+        // We have to initialize the <code>BlockVector@</code>
         // tmp to the correct sizes in the respective blocks
     tmp.block(0).reinit(S.block(0,0).m());
     tmp.block(1).reinit(S.block(1,1).m());
@@ -464,15 +459,16 @@ BlockSchurPreconditioner<Preconditioner>::BlockSchurPreconditioner(
 
         // Now the interesting function, the multiplication of
         // the preconditioner with a BlockVector. 
-template <class Preconditioner>
-void BlockSchurPreconditioner<Preconditioner>::vmult (
+template <class PreconditionerA, class PreconditionerMp>
+void BlockSchurPreconditioner<PreconditionerA, PreconditionerMp>::vmult (
                                      BlockVector<double>       &dst,
                                      const BlockVector<double> &src) const
 {
         // Form u_new = A^{-1} u
   a_preconditioner.vmult (dst.block(0), src.block(0));
         // Form tmp.block(1) = - B u_new + p 
-        // (SparseMatrix::residual does precisely this)
+        // (<code>SparseMatrix::residual</code>
+        // does precisely this)
   system_matrix->block(1,0).residual(tmp.block(1), 
                                      dst.block(0), src.block(1));
         // Change sign in tmp.block(1)
@@ -490,38 +486,43 @@ The actual solver call can be realized as follows:
       pressure_mass_matrix.reinit(sparsity_pattern.block(1,1));
       pressure_mass_matrix.copy_from(system_matrix.block(1,1));
       system_matrix.block(1,1) = 0;
-            
-      PreconditionSSOR<> pmass_preconditioner;
-      pmass_preconditioner.initialize (pressure_mass_matrix, 1.2);
+
+      SparseILU<double> pmass_preconditioner;
+      pmass_preconditioner.initialize (pressure_mass_matrix, 
+        SparseILU<double>::AdditionalData());
       
-      InverseMatrix<SparseMatrix<double>,PreconditionSSOR<> >
+      InverseMatrix<SparseMatrix<double>,SparseILU<double> >
         m_inverse (pressure_mass_matrix, pmass_preconditioner);
-        
-      BlockSchurPreconditioner<typename InnerPreconditioner<dim>::type> 
+
+      BlockSchurPreconditioner<typename InnerPreconditioner<dim>::type,
+                               SparseILU<double> > 
         preconditioner (system_matrix, m_inverse, *A_preconditioner);
       
       SolverControl solver_control (system_matrix.m(),
-                                    1e-6*system_rhs.l2_norm());
+                                    1e-8*system_rhs.l2_norm());
       
-      SolverGMRES<BlockVector<double> > gmres(solver_control);
+      SolverBicgstab<BlockVector<double> > bicgstab(solver_control);
       
-      gmres.solve(system_matrix, solution, system_rhs,
-                  preconditioner);
+      bicgstab.solve(system_matrix, solution, system_rhs,
+                     preconditioner);
       
+                         // Produce a constistent solution field
       hanging_node_constraints.distribute (solution);
       
       std::cout << " "
                 << solver_control.last_step()
-                << " block GMRES iterations";
+                << " block BiCGStab iterations";
 @endcode
 
-Obviously, one needs to add the include file @ref SolverGMRES 
-"<lac/solver_gmres.h>" in order to make this run. 
+Obviously, one needs to add the include file @ref SolverBicgstab 
+"<lac/solver_bicgstab.h>" in order to make this run.
 We call the solver with a BlockVector template in order to enable
-GMRES to operate on block vectors and matrices.
+BiCGStab to operate on block vectors and matrices.
 Note also that we need to set the (1,1) block in the system
 matrix to zero (we saved the pressure mass matrix there which is not part of the
-problem) after we copied the information to another matrix.
+problem) after we copied the information to another matrix. Additionally, we
+chose a slightly more stringent tolerance for BiCGStab since we consider the
+whole system and not some subblocks.
 
 Using the Timer class, we can collect some statistics that compare the runtime
 of the block solver with the one used in the problem implementation above (on
@@ -534,130 +535,136 @@ Let's first see the results in 2D:
 @code
 Refinement cycle 0
    Number of active cells: 64
-   Number of degrees of freedom: 679 (594+85) [0.025624 s] 
-   Assembling... [0.052874 s]
-   Computing preconditioner... [0.016394 s]
+   Number of degrees of freedom: 679 (594+85) [0.013907 s] 
+   Assembling... [0.036652 s]
+   Computing preconditioner... [0.007464 s]
    Solving...
-      Schur complement: 11 outer CG iterations for p  [0.028722 s]
-      Block Schur preconditioner: 11 GMRES iterations [0.027471 s]
-   max difference l_infty in the two solution vectors: 6.20426e-06
+      Schur complement:  11 outer CG iterations for p      [0.012651 s]
+      Block Schur preconditioner:    8 BiCGStab iterations [0.013988 s]
+   max difference l_infty between solution vectors: 7.90877e-07
 
 Refinement cycle 1
    Number of active cells: 160
-   Number of degrees of freedom: 1683 (1482+201) [0.07247 s] 
-   Assembling... [0.129607 s]
-   Computing preconditioner... [0.045196 s]
+   Number of degrees of freedom: 1683 (1482+201) [0.032847 s] 
+   Assembling... [0.089153 s]
+   Computing preconditioner... [0.020322 s]
    Solving...
-      Schur complement: 11 outer CG iterations for p  [0.074961 s]
-      Block Schur preconditioner: 12 GMRES iterations [0.080309 s]
-   max difference l_infty in the two solution vectors: 1.48144e-06
+      Schur complement:  11 outer CG iterations for p      [0.033447 s]
+      Block Schur preconditioner:    8 BiCGStab iterations [0.039152 s]
+   max difference l_infty between solution vectors: 1.91232e-06
 
 Refinement cycle 2
    Number of active cells: 376
-   Number of degrees of freedom: 3813 (3370+443) [0.168264 s] 
-   Assembling... [0.298043 s]
-   Computing preconditioner... [0.122656 s]
+   Number of degrees of freedom: 3813 (3370+443) [0.075853 s] 
+   Assembling... [0.207106 s]
+   Computing preconditioner... [0.056309 s]
    Solving...
-      Schur complement: 11 outer CG iterations for p  [0.19247 s]
-      Block Schur preconditioner: 12 GMRES iterations [0.211514 s]
-   max difference l_infty in the two solution vectors: 4.30711e-06
+      Schur complement:  11 outer CG iterations for p      [0.109884 s]
+      Block Schur preconditioner:    8 BiCGStab iterations [0.124498 s]
+   max difference l_infty between solution vectors: 6.68936e-06
 
 Refinement cycle 3
    Number of active cells: 880
-   Number of degrees of freedom: 8723 (7722+1001) [0.390052 s] 
-   Assembling... [0.694365 s]
-   Computing preconditioner... [0.315401 s]
+   Number of degrees of freedom: 8723 (7722+1001) [0.17642 s] 
+   Assembling... [0.484385 s]
+   Computing preconditioner... [0.152472 s]
    Solving...
-      Schur complement: 11 outer CG iterations for p  [0.54384 s]
-      Block Schur preconditioner: 12 GMRES iterations [0.588273 s]
-   max difference l_infty in the two solution vectors: 1.03471e-05
+      Schur complement:  11 outer CG iterations for p      [0.338477 s]
+      Block Schur preconditioner:    8 BiCGStab iterations [0.382371 s]
+   max difference l_infty between solution vectors: 1.01301e-05
 
 Refinement cycle 4
    Number of active cells: 2008
-   Number of degrees of freedom: 19383 (17186+2197) [0.874274 s] 
-   Assembling... [1.58498 s]
-   Computing preconditioner... [0.813296 s]
+   Number of degrees of freedom: 19383 (17186+2197) [0.398735 s] 
+   Assembling... [1.10472 s]
+   Computing preconditioner... [0.420046 s]
    Solving...
-      Schur complement: 11 outer CG iterations for p  [1.22453 s]
-      Block Schur preconditioner: 13 GMRES iterations [1.45711 s]
-   max difference l_infty in the two solution vectors: 4.53216e-05
+      Schur complement:  11 outer CG iterations for p      [0.835033 s]
+      Block Schur preconditioner:    8 BiCGStab iterations [1.00724 s]
+   max difference l_infty between solution vectors: 3.2143e-05
 
 Refinement cycle 5
    Number of active cells: 4288
-   Number of degrees of freedom: 40855 (36250+4605) [1.85269 s] 
-   Assembling... [3.36536 s]
-   Computing preconditioner... [1.93873 s]
+   Number of degrees of freedom: 40855 (36250+4605) [0.844131 s] 
+   Assembling... [2.34257 s]
+   Computing preconditioner... [1.00229 s]
    Solving...
-      Schur complement: 11 outer CG iterations for p  [3.39201 s]
-      Block Schur preconditioner: 13 GMRES iterations [3.77069 s]
-   max difference l_infty in the two solution vectors: 0.000291127
+      Schur complement:  11 outer CG iterations for p      [1.9538 s]
+      Block Schur preconditioner:    8 BiCGStab iterations [2.39038 s]
+   max difference l_infty between solution vectors: 8.46393e-05
 
 Refinement cycle 6
    Number of active cells: 8896
-   Number of degrees of freedom: 83885 (74474+9411) [3.85563 s] 
-   Assembling... [6.9564 s]
-   Computing preconditioner... [4.8595 s]
+   Number of degrees of freedom: 83885 (74474+9411) [1.76458 s] 
+   Assembling... [4.88486 s]
+   Computing preconditioner... [2.32077 s]
    Solving...
-      Schur complement: 11 outer CG iterations for p  [7.69326 s]
-      Block Schur preconditioner: 13 GMRES iterations [8.62034 s]
-   max difference l_infty in the two solution vectors: 0.000245764
+      Schur complement:  11 outer CG iterations for p      [4.2994 s]
+      Block Schur preconditioner:    7 BiCGStab iterations [4.48932 s]
+   max difference l_infty between solution vectors: 0.000244068
 @endcode
 
-We see that the runtime for solution using the block Schur complement
-preconditioner is higher than the one with the Schur complement directly. The
+We see that there is no huge difference in the solution time between
+the block Schur complement preconditioner solver and 
+the actual Schur complement. The
 reason is simple: we used a direct solve as preconditioner for the latter - so
-there won't be any gain by avoiding the inner iterations (indeed, we see that
-slightly more iterations are needed).
+there won't be any gain by avoiding the inner iterations. We see that the number
+of iterations has decreased a bit for BiCGStab, but one step is more expensive
+here and so there is no gain.
+
 
 The picture of course changes in 3D:
 
 @code
 Refinement cycle 0
    Number of active cells: 32
-   Number of degrees of freedom: 1356 (1275+81) [0.344441 s] 
-   Assembling... [1.38754 s]
-   Computing preconditioner... [1.29145 s]
+   Number of degrees of freedom: 1356 (1275+81) [0.162387 s] 
+   Assembling... [0.867126 s]
+   Computing preconditioner... [0.599154 s]
    Solving...
-      Schur complement: 13 outer CG iterations for p  [0.609626 s]
-      Block Schur preconditioner: 24 GMRES iterations [0.107059 s]
-   max difference l_infty in the two solution vectors: 1.60165e-05
+      Schur complement:  13 outer CG iterations for p      [0.269857 s]
+      Block Schur preconditioner:   16 BiCGStab iterations [0.059217 s]
+   max difference l_infty between solution vectors: 1.10398e-05
 
 Refinement cycle 1
    Number of active cells: 144
-   Number of degrees of freedom: 5088 (4827+261) [2.21296 s] 
-   Assembling... [6.28298 s]
-   Computing preconditioner... [7.78238 s]
+   Number of degrees of freedom: 5088 (4827+261) [1.01979 s] 
+   Assembling... [3.88896 s]
+   Computing preconditioner... [3.56172 s]
    Solving...
-      Schur complement: 14 outer CG iterations for p  [5.98275 s]
-      Block Schur preconditioner: 44 GMRES iterations [0.979435 s]
-   max difference l_infty in the two solution vectors: 2.00892e-05
+      Schur complement:  14 outer CG iterations for p      [5.37291 s]
+      Block Schur preconditioner:   28 BiCGStab iterations [1.07732 s]
+   max difference l_infty between solution vectors: 2.55495e-05
 
 Refinement cycle 2
    Number of active cells: 704
-   Number of degrees of freedom: 22406 (21351+1055) [12.2284 s] 
-   Assembling... [30.8002 s]
-   Computing preconditioner... [42.131 s]
+   Number of degrees of freedom: 22406 (21351+1055) [5.64807 s] 
+   Assembling... [19.0596 s]
+   Computing preconditioner... [18.7171 s]
    Solving...
-      Schur complement: 14 outer CG iterations for p  [45.1115 s]
-      Block Schur preconditioner: 83 GMRES iterations [9.04946 s]
-   max difference l_infty in the two solution vectors: 3.06288e-05
+      Schur complement:  14 outer CG iterations for p      [43.0203 s]
+      Block Schur preconditioner:   53 BiCGStab iterations [10.3121 s]
+   max difference l_infty between solution vectors: 4.11953e-05
 
 Refinement cycle 3
    Number of active cells: 3168
-   Number of degrees of freedom: 93176 (89043+4133) [54.9067 s] 
-   Assembling... [137.506 s]
-   Computing preconditioner... [192.36 s]
+   Number of degrees of freedom: 93176 (89043+4133) [25.135 s] 
+   Assembling... [85.175 s]
+   Computing preconditioner... [87.0619 s]
    Solving...
-      Schur complement: 15 outer CG iterations for p  [371.85 s]
-      Block Schur preconditioner: 204 GMRES iterations [110.316 s]
-   max difference l_infty in the two solution vectors: 8.92999e-05
+      Schur complement:  15 outer CG iterations for p      [319.224 s]
+      Block Schur preconditioner:  118 BiCGStab iterations [104.231 s]
+   max difference l_infty between solution vectors: 7.74303e-05
 @endcode
 
 Here, the block preconditioned solver is clearly superior to the Schur
-complement, even though the advantage gets less for more mesh points. The reason
-for the decreasing advantage is that the mass matrix is still inverted
-iteratively, so that it is inverted more and more times when the block GMRES
-solver uses more iterations.
+complement, even though the advantage gets less for more mesh points. There are 
+two reason for that. The first one is that it is still necessary to invert the
+mass matrix iteratively, which means more work if we need more (outer)
+iterations. The second reason is related to the solver: BiCGStab scales slightly
+worse with the size of the problem than the iterator for the CG solver build
+into the Schur complement. Nonetheless, the improvement by a factor of 3-4 is
+quite impressive.
 
 <h4>No block matrices and vectors</h4>
 Another possibility that can be taken into account is to not set up a block
