@@ -499,7 +499,7 @@ The actual solver call can be realized as follows:
         preconditioner (system_matrix, m_inverse, *A_preconditioner);
       
       SolverControl solver_control (system_matrix.m(),
-                                    1e-8*system_rhs.l2_norm());
+                                    1e-7*system_rhs.l2_norm());
       
       SolverBicgstab<BlockVector<double> > bicgstab(solver_control);
       
@@ -521,8 +521,8 @@ BiCGStab to operate on block vectors and matrices.
 Note also that we need to set the (1,1) block in the system
 matrix to zero (we saved the pressure mass matrix there which is not part of the
 problem) after we copied the information to another matrix. Additionally, we
-chose a slightly more stringent tolerance for BiCGStab since we consider the
-whole system and not some subblocks.
+chose a slightly more stringent residual threshold for BiCGStab since we 
+consider the whole system and not some subblocks.
 
 Using the Timer class, we can collect some statistics that compare the runtime
 of the block solver with the one used in the problem implementation above (on
@@ -535,82 +535,82 @@ Let's first see the results in 2D:
 @code
 Refinement cycle 0
    Number of active cells: 64
-   Number of degrees of freedom: 679 (594+85) [0.013907 s] 
-   Assembling... [0.036652 s]
-   Computing preconditioner... [0.007464 s]
+   Number of degrees of freedom: 679 (594+85) [0.008999 s] 
+   Assembling... [0.019997 s]
+   Computing preconditioner... [0.003999 s]
    Solving...
-      Schur complement:  11 outer CG iterations for p      [0.012651 s]
-      Block Schur preconditioner:    8 BiCGStab iterations [0.013988 s]
-   max difference l_infty between solution vectors: 7.90877e-07
+      Schur complement:  11 outer CG iterations for p      [0.010999 s]
+      Block Schur preconditioner:    7 BiCGStab iterations [0.010998 s]
+   max difference l_infty between solution vectors: 1.92446e-06
 
 Refinement cycle 1
    Number of active cells: 160
-   Number of degrees of freedom: 1683 (1482+201) [0.032847 s] 
-   Assembling... [0.089153 s]
-   Computing preconditioner... [0.020322 s]
+   Number of degrees of freedom: 1683 (1482+201) [0.024996 s] 
+   Assembling... [0.050992 s]
+   Computing preconditioner... [0.015998 s]
    Solving...
-      Schur complement:  11 outer CG iterations for p      [0.033447 s]
-      Block Schur preconditioner:    8 BiCGStab iterations [0.039152 s]
-   max difference l_infty between solution vectors: 1.91232e-06
+      Schur complement:  11 outer CG iterations for p      [0.035994 s]
+      Block Schur preconditioner:    7 BiCGStab iterations [0.036995 s]
+   max difference l_infty between solution vectors: 1.67894e-05
 
 Refinement cycle 2
    Number of active cells: 376
-   Number of degrees of freedom: 3813 (3370+443) [0.075853 s] 
-   Assembling... [0.207106 s]
-   Computing preconditioner... [0.056309 s]
+   Number of degrees of freedom: 3813 (3370+443) [0.060991 s] 
+   Assembling... [0.120981 s]
+   Computing preconditioner... [0.050993 s]
    Solving...
-      Schur complement:  11 outer CG iterations for p      [0.109884 s]
-      Block Schur preconditioner:    8 BiCGStab iterations [0.124498 s]
-   max difference l_infty between solution vectors: 6.68936e-06
+      Schur complement:  11 outer CG iterations for p      [0.112983 s]
+      Block Schur preconditioner:    7 BiCGStab iterations [0.134979 s]
+   max difference l_infty between solution vectors: 7.37143e-06
 
 Refinement cycle 3
    Number of active cells: 880
-   Number of degrees of freedom: 8723 (7722+1001) [0.17642 s] 
-   Assembling... [0.484385 s]
-   Computing preconditioner... [0.152472 s]
+   Number of degrees of freedom: 8723 (7722+1001) [0.144978 s] 
+   Assembling... [0.280957 s]
+   Computing preconditioner... [0.136979 s]
    Solving...
-      Schur complement:  11 outer CG iterations for p      [0.338477 s]
-      Block Schur preconditioner:    8 BiCGStab iterations [0.382371 s]
-   max difference l_infty between solution vectors: 1.01301e-05
+      Schur complement:  11 outer CG iterations for p      [0.302954 s]
+      Block Schur preconditioner:    7 BiCGStab iterations [0.318952 s]
+   max difference l_infty between solution vectors: 4.8361e-05
 
 Refinement cycle 4
    Number of active cells: 2008
-   Number of degrees of freedom: 19383 (17186+2197) [0.398735 s] 
-   Assembling... [1.10472 s]
-   Computing preconditioner... [0.420046 s]
+   Number of degrees of freedom: 19383 (17186+2197) [0.334949 s] 
+   Assembling... [0.632904 s]
+   Computing preconditioner... [0.413937 s]
    Solving...
-      Schur complement:  11 outer CG iterations for p      [0.835033 s]
-      Block Schur preconditioner:    8 BiCGStab iterations [1.00724 s]
-   max difference l_infty between solution vectors: 3.2143e-05
+      Schur complement:  11 outer CG iterations for p      [0.784881 s]
+      Block Schur preconditioner:    6 BiCGStab iterations [0.677897 s]
+   max difference l_infty between solution vectors: 0.00148456
 
 Refinement cycle 5
    Number of active cells: 4288
-   Number of degrees of freedom: 40855 (36250+4605) [0.844131 s] 
-   Assembling... [2.34257 s]
-   Computing preconditioner... [1.00229 s]
+   Number of degrees of freedom: 40855 (36250+4605) [0.740888 s] 
+   Assembling... [1.37579 s]
+   Computing preconditioner... [1.24881 s]
    Solving...
-      Schur complement:  11 outer CG iterations for p      [1.9538 s]
-      Block Schur preconditioner:    8 BiCGStab iterations [2.39038 s]
-   max difference l_infty between solution vectors: 8.46393e-05
+      Schur complement:  11 outer CG iterations for p      [1.71474 s]
+      Block Schur preconditioner:    6 BiCGStab iterations [1.54177 s]
+   max difference l_infty between solution vectors: 0.00327885
 
 Refinement cycle 6
    Number of active cells: 8896
-   Number of degrees of freedom: 83885 (74474+9411) [1.76458 s] 
-   Assembling... [4.88486 s]
-   Computing preconditioner... [2.32077 s]
+   Number of degrees of freedom: 83885 (74474+9411) [1.55676 s] 
+   Assembling... [2.83357 s]
+   Computing preconditioner... [3.98739 s]
    Solving...
-      Schur complement:  11 outer CG iterations for p      [4.2994 s]
-      Block Schur preconditioner:    7 BiCGStab iterations [4.48932 s]
-   max difference l_infty between solution vectors: 0.000244068
+      Schur complement:  11 outer CG iterations for p      [3.89441 s]
+      Block Schur preconditioner:    6 BiCGStab iterations [3.44148 s]
+   max difference l_infty between solution vectors: 0.00206783
 @endcode
 
 We see that there is no huge difference in the solution time between
 the block Schur complement preconditioner solver and 
 the actual Schur complement. The
 reason is simple: we used a direct solve as preconditioner for the latter - so
-there won't be any gain by avoiding the inner iterations. We see that the number
-of iterations has decreased a bit for BiCGStab, but one step is more expensive
-here and so there is no gain.
+there won't be any substantial gain by avoiding the inner iterations. We see
+that the number of iterations has decreased a bit for BiCGStab, but one step
+is more expensive here and so there is no gain.
 
 
 The picture of course changes in 3D:
@@ -618,43 +618,43 @@ The picture of course changes in 3D:
 @code
 Refinement cycle 0
    Number of active cells: 32
-   Number of degrees of freedom: 1356 (1275+81) [0.162387 s] 
-   Assembling... [0.867126 s]
-   Computing preconditioner... [0.599154 s]
+   Number of degrees of freedom: 1356 (1275+81) [0.097986 s] 
+   Assembling... [0.544917 s]
+   Computing preconditioner... [0.360945 s]
    Solving...
-      Schur complement:  13 outer CG iterations for p      [0.269857 s]
-      Block Schur preconditioner:   16 BiCGStab iterations [0.059217 s]
-   max difference l_infty between solution vectors: 1.10398e-05
+      Schur complement:  13 outer CG iterations for p      [0.498924 s]
+      Block Schur preconditioner:   14 BiCGStab iterations [0.086987 s]
+   max difference l_infty between solution vectors: 1.10714e-05
 
 Refinement cycle 1
    Number of active cells: 144
-   Number of degrees of freedom: 5088 (4827+261) [1.01979 s] 
-   Assembling... [3.88896 s]
-   Computing preconditioner... [3.56172 s]
+   Number of degrees of freedom: 5088 (4827+261) [0.680897 s] 
+   Assembling... [2.51262 s]
+   Computing preconditioner... [2.21066 s]
    Solving...
-      Schur complement:  14 outer CG iterations for p      [5.37291 s]
-      Block Schur preconditioner:   28 BiCGStab iterations [1.07732 s]
-   max difference l_infty between solution vectors: 2.55495e-05
+      Schur complement:  14 outer CG iterations for p      [4.18136 s]
+      Block Schur preconditioner:   24 BiCGStab iterations [0.715891 s]
+   max difference l_infty between solution vectors: 3.40352e-05
 
 Refinement cycle 2
    Number of active cells: 704
-   Number of degrees of freedom: 22406 (21351+1055) [5.64807 s] 
-   Assembling... [19.0596 s]
-   Computing preconditioner... [18.7171 s]
+   Number of degrees of freedom: 22406 (21351+1055) [3.84742 s] 
+   Assembling... [12.1971 s]
+   Computing preconditioner... [12.2261 s]
    Solving...
-      Schur complement:  14 outer CG iterations for p      [43.0203 s]
-      Block Schur preconditioner:   53 BiCGStab iterations [10.3121 s]
-   max difference l_infty between solution vectors: 4.11953e-05
+      Schur complement:  14 outer CG iterations for p      [32.613 s]
+      Block Schur preconditioner:   46 BiCGStab iterations [6.82996 s]
+   max difference l_infty between solution vectors: 5.26257e-05
 
 Refinement cycle 3
    Number of active cells: 3168
-   Number of degrees of freedom: 93176 (89043+4133) [25.135 s] 
-   Assembling... [85.175 s]
-   Computing preconditioner... [87.0619 s]
+   Number of degrees of freedom: 93176 (89043+4133) [18.2822 s] 
+   Assembling... [54.7917 s]
+   Computing preconditioner... [56.5694 s]
    Solving...
-      Schur complement:  15 outer CG iterations for p      [319.224 s]
-      Block Schur preconditioner:  118 BiCGStab iterations [104.231 s]
-   max difference l_infty between solution vectors: 7.74303e-05
+      Schur complement:  15 outer CG iterations for p      [299.282 s]
+      Block Schur preconditioner:   90 BiCGStab iterations [69.3994 s]
+   max difference l_infty between solution vectors: 0.000137409
 @endcode
 
 Here, the block preconditioned solver is clearly superior to the Schur
@@ -663,7 +663,7 @@ two reason for that. The first one is that it is still necessary to invert the
 mass matrix iteratively, which means more work if we need more (outer)
 iterations. The second reason is related to the solver: BiCGStab scales slightly
 worse with the size of the problem than the iterator for the CG solver build
-into the Schur complement. Nonetheless, the improvement by a factor of 3-4 is
+into the Schur complement. Nonetheless, the improvement by a factor of 4-5 is
 quite impressive.
 
 <h4>No block matrices and vectors</h4>
