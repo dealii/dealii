@@ -78,16 +78,15 @@ using namespace dealii;
 				 // as a template parameter. See step-4 for
 				 // details on templates.  We are not going to
 				 // create any preconditioner object here, all
-				 // we do is to create a data structure that
-				 // holds the information on it so we can
-				 // write our program in a
-				 // dimension-independent way.
+				 // we do is to create class that holds a
+				 // local typedef determining the
+				 // preconditioner class so we can write our
+				 // program in a dimension-independent way.
 template <int dim>
 struct InnerPreconditioner;
 
 				 // In 2D, we are going to use a sparse direct
-				 // solve as preconditioner. The syntax is 
-				 // known from step-29.
+				 // solver as preconditioner:
 template <>
 struct InnerPreconditioner<2> 
 {
@@ -95,7 +94,7 @@ struct InnerPreconditioner<2>
 };
 
 				 // And the ILU preconditioning in 3D, called
-				 // by <code>SparseILU@<double></code>.
+				 // by SparseILU:
 template <>
 struct InnerPreconditioner<3> 
 {
@@ -109,7 +108,7 @@ struct InnerPreconditioner<3>
 				 // main class and the data types are the same
 				 // as used there. In this example we also use
 				 // adaptive grid refinement, which is handled
-				 // in complete analogy to step-6.
+				 // in complete analogy to step-6:
 template <int dim>
 class StokesProblem 
 {
@@ -140,10 +139,27 @@ class StokesProblem
 
 				     // This one is new: We shall use a
 				     // so-called shared pointer structure to
-				     // access the preconditioner. This
-				     // provides flexibility when using the
-				     // object that the pointer refers to, as
-				     // e.g. the reset option.
+				     // access the preconditioner. Shared
+				     // pointers are essentially just a
+				     // convenient form of pointers. Several
+				     // shared pointers can point to the same
+				     // object (just like regular pointers),
+				     // but when the last shared pointer
+				     // object to point to a preconditioner
+				     // object is deleted (for example if a
+				     // shared pointer object goes out of
+				     // scope, if the class of which it is a
+				     // member is destroyed, or if the pointer
+				     // is assigned a different preconditioner
+				     // object) then the preconditioner object
+				     // pointed to is also destroyed. This
+				     // ensures that we don't have to manually
+				     // track in how many places a
+				     // preconditioner object is still
+				     // referenced, it can never create a
+				     // memory leak, and can never produce a
+				     // dangling pointer to an already
+				     // destroyed object:
     boost::shared_ptr<typename InnerPreconditioner<dim>::type> A_preconditioner;
 };
 
@@ -151,9 +167,9 @@ class StokesProblem
 
 				 // As in step-20 and most other example
 				 // programs, the next task is to define the
-				 // parameter functions for the PDE: For the
+				 // data for the PDE: For the
 				 // Stokes problem, we are going to use
-				 // pressure boundary values at some portion
+				 // natural boundary values at some portion
 				 // of the boundary (Neumann-type), and
 				 // boundary conditions on the velocity
 				 // (Dirichlet type) on the rest of the
@@ -171,27 +187,6 @@ class StokesProblem
 				 // Given the problem described in the 
 				 // introduction, we know which values to 
 				 // set for the respective functions.
-template <int dim>
-class PressureBoundaryValues : public Function<dim> 
-{
-  public:
-    PressureBoundaryValues () : Function<dim>(1) {}
-    
-    virtual double value (const Point<dim>   &p,
-                          const unsigned int  component = 0) const;
-};
-
-
-template <int dim>
-double
-PressureBoundaryValues<dim>::value (const Point<dim>  &/*p*/,
-                                    const unsigned int /*component*/) const 
-{
-  return 0;
-}
-
-
-
 template <int dim>
 class BoundaryValues : public Function<dim> 
 {
@@ -645,23 +640,11 @@ void StokesProblem<dim>::assemble_system ()
   const unsigned int   dofs_per_cell   = fe.dofs_per_cell;
   
   const unsigned int   n_q_points      = quadrature_formula.size();
-  const unsigned int   n_face_q_points = face_quadrature_formula.size();
 
   FullMatrix<double>   local_matrix (dofs_per_cell, dofs_per_cell);
   Vector<double>       local_rhs (dofs_per_cell);
 
   std::vector<unsigned int> local_dof_indices (dofs_per_cell);
-  
-				   // As usual, we create objects that
-				   // hold the functions for the right 
-				   // hand side and Neumann boundary
-				   // function, and, additionally,
-				   // an array that holds the respective
-				   // function values at the quadrature
-				   // points.
-  const PressureBoundaryValues<dim> pressure_boundary_values;
-  
-  std::vector<double>               boundary_values (n_face_q_points);
   
   const RightHandSide<dim>          right_hand_side;
   std::vector<Vector<double> >      rhs_values (n_q_points,
@@ -745,38 +728,7 @@ void StokesProblem<dim>::assemble_system ()
 			      rhs_values[q](component_i) *
 			      fe_values.JxW(q);
 	    }
-	}
-      
-				       // Here we add the contributions from
-				       // Neumann (pressure) boundary
-				       // conditions at faces on the domain
-				       // boundary that have the boundary flag
-				       // "0", i.e. those that are not subject
-				       // to Dirichlet conditions.
-      for (unsigned int face_no=0;
-           face_no<GeometryInfo<dim>::faces_per_cell;
-           ++face_no)
-        if (cell->at_boundary(face_no) && 
-            (cell->face(face_no)->boundary_indicator() == 0))
-          {
-            fe_face_values.reinit (cell, face_no);
-            
-            pressure_boundary_values
-              .value_list (fe_face_values.get_quadrature_points(),
-                           boundary_values);
-
-            for (unsigned int q=0; q<n_face_q_points; ++q)
-              for (unsigned int i=0; i<dofs_per_cell; ++i)
-                {
-                  const Tensor<1,dim>
-                    phi_i_u = fe_face_values[velocities].value (i, q);
-
-                  local_rhs(i) += -(phi_i_u *
-                                    fe_face_values.normal_vector(q) *
-                                    boundary_values[q] *
-                                    fe_face_values.JxW(q));
-                }
-          }
+	}      
 
 				       // The final step is, as usual, the
 				       // transfer of the local contributions
