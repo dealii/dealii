@@ -338,6 +338,17 @@ class BlockSparsityPatternBase : public Subscriptor
 				      */
     void print (std::ostream &out) const;
 
+				     /**
+				      * Print the sparsity of the matrix
+				      * in a format that <tt>gnuplot</tt> understands
+				      * and which can be used to plot the
+				      * sparsity pattern in a graphical
+				      * way. This is the same functionality
+                      * implemented for usual Sparsity
+                      * patterns, see @ref SparsityPattern.
+				      */
+    void print_gnuplot (std::ostream &out) const;
+
       				     /** @addtogroup Exceptions
 				      * @{ */
 

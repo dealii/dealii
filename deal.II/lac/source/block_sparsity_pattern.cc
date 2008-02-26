@@ -265,6 +265,31 @@ BlockSparsityPatternBase<SparsityPatternBase>::print(std::ostream& out) const
 }
 
 
+template <class SparsityPatternBase>
+void
+BlockSparsityPatternBase<SparsityPatternBase>::print_gnuplot(std::ostream &out) const
+{
+  unsigned int k=0;
+  for (unsigned int ib=0;ib<n_block_rows();++ib)
+    {
+      for (unsigned int i=0;i<block(ib,0).n_rows();++i)
+	{
+	  unsigned int l=0;
+	  for (unsigned int jb=0;jb<n_block_cols();++jb)
+	    {
+	      const SparsityPatternBase& b = block(ib,jb);
+	      for (unsigned int j=0;j<b.n_cols();++j)
+		if (b.exists(i,j))
+		  out << l+j << " " << -static_cast<signed int>(i+k) << std::endl;;
+	      l += b.n_cols();
+	    }
+	}
+      k += block(ib,0).n_rows();
+    }
+}
+
+
+
 
 // Remark: The following explicit instantiations needed to be moved to
 // this place here to work around a problem with gcc3.3 on Apple MacOSX.

@@ -215,6 +215,13 @@ an integer id of the current thread.
 
 <ol>
 
+<li> New: The functionality print_gnuplot is now also available for sparsity
+patterns derived from the class BlockSparsityPatternBase, e.g. for
+BlockSparsityPattern in the same way as for general sparsity patterns.
+<br>
+(Martin Kronbichler 2008/2/26)
+</li>
+
 <li> Fixed: The PETScWrappers::MatrixBase::clear_row and
 PETScWrappers::MatrixBase::clear_rows functions had a memory leak that made
 PETSc become progressively slower over time. This is now fixed.
