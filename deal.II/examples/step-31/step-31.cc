@@ -932,20 +932,28 @@ void StokesProblem<dim>::solve ()
 				     // matrix is a rather cheap and
 				     // straight-forward operation (compared
 				     // to, e.g., a Laplace matrix). The CG
-				     // method with SSOR preconditioning
-				     // converges in 10-20 steps,
+				     // method with ILU preconditioning
+				     // converges in 5-10 steps,
 				     // independently on the mesh size.  This
 				     // is precisely what we do here: We
-				     // choose an SSOR preconditioner with
-				     // parameter 1.2 and take it along to the
+				     // choose another ILU preconditioner 
+                     // and take it along to the
 				     // InverseMatrix object via the
 				     // corresponding template parameter.  A
 				     // CG solver is then called within the
 				     // vmult operation of the inverse matrix.
-    PreconditionSSOR<> preconditioner;
-    preconditioner.initialize (system_matrix.block(1,1), 1.2);
+                     //
+                     // An alternative that is cheaper to build,
+                     // but needs more iterations afterwards,
+                     // would be to choose a SSOR preconditioner
+                     // with factor 1.2. It needs about twice 
+                     // the number of iterations, but the costs
+                     // for its generation are almost neglible.
+    SparseILU<double> preconditioner;
+    preconditioner.initialize (system_matrix.block(1,1), 
+      SparseILU<double>::AdditionalData());
   
-    InverseMatrix<SparseMatrix<double>,PreconditionSSOR<> >
+    InverseMatrix<SparseMatrix<double>,SparseILU<double> >
       m_inverse (system_matrix.block(1,1), preconditioner);
     
 				     // With the Schur complement and
