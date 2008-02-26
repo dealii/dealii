@@ -244,8 +244,6 @@ class InverseMatrix : public Subscriptor
   private:
     const SmartPointer<const Matrix> matrix;
     const Preconditioner &preconditioner;
-
-    mutable GrowingVectorMemory<> vector_memory;    
 };
 
 

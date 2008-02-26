@@ -14,7 +14,7 @@ target = $(basename $(shell echo step-*.cc))
 # run-time checking of parameters and internal states is performed, so
 # you should set this value to `on' while you develop your program,
 # and to `off' when running production computations.
-debug-mode = on
+debug-mode = off
 
 
 # As third field, we need to give the path to the top-level deal.II
@@ -96,9 +96,10 @@ $(target) : $(libraries)
 # useful if you want to call the executable with arguments which do
 # not change frequently. You may then want to add them to the
 # following rule:
-run: $(target)
+run: $(target) UMFPACK-check
 	@echo ============================ Running $<
 	@./$(target)$(EXEEXT)
+
 
 
 # As a last rule to the `make' program, we define what to do when
@@ -123,10 +124,21 @@ clean:
 	@$(CXX) $(CXXFLAGS.o) -c $< -o $@
 
 
+# A rule made to ensure that UMFPACK is indeed configured
+ifeq ($(USE_CONTRIB_UMFPACK),yes)
+UMFPACK-check:
+else
+UMFPACK-check:
+	@echo "This program can only be run if deal.II is configured with UMFPACK support"
+	@false
+endif
+
+
+
 # The following statement tells make that the rules `run' and `clean'
 # are not expected to produce files of the same name as Makefile rules
 # usually do.
-.PHONY: run clean
+.PHONY: run clean UMFPACK-check
 
 
 # Finally there is a rule which you normally need not care much about:
