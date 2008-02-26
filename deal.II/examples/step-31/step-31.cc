@@ -15,7 +15,7 @@
 				 // @sect3{Include files}
                         
 				 // As usual, we start by including 
-				 // some well-known files. 
+				 // some well-known files:
 #include <base/quadrature_lib.h>
 #include <base/logstream.h>
 #include <base/function.h>
@@ -51,21 +51,21 @@
 #include <numerics/data_out.h>
 #include <numerics/error_estimator.h>
 
-				 // As in step-29, we include the libary for
-				 // the sparse direct solver UMFPACK.
+				 // Then we need to include the header file
+				 // for the sparse direct solver UMFPACK:
 #include <lac/sparse_direct.h>
 
 				 // This includes the libary for the 
 				 // incomplete LU factorization that will 
-				 // be used as a preconditioner in 3D.
+				 // be used as a preconditioner in 3D:
 #include <lac/sparse_ilu.h>
 
 				 // This is C++:
 #include <fstream>
 #include <sstream>
 
-				 // As in all programs, the namespace is set
-				 // to dealii.
+				 // As in all programs, the namespace dealii
+				 // in included:
 using namespace dealii;
 
 				 // @sect3{Defining the inner preconditioner type}
