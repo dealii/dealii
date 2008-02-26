@@ -2,7 +2,7 @@
 //    $Id$
 //    Version: $Name$
 //
-//    Copyright (C) 1998, 1999, 2000, 2001, 2002, 2003, 2004, 2005, 2006, 2007 by the deal.II authors
+//    Copyright (C) 1998, 1999, 2000, 2001, 2002, 2003, 2004, 2005, 2006, 2007, 2008 by the deal.II authors
 //
 //    This file is subject to QPL and may not be  distributed
 //    without copyright and license information. Please refer
@@ -858,13 +858,6 @@ class TriaObjectAccessor :  public TriaAccessor<celldim,dim>
 				      * object.  If the return value
 				      * is 255, then this line is in
 				      * the interior of the domain.
-				      *
-				      * Since boundary data is only
-				      * useful for structures with a
-				      * dimension less than the
-				      * dimension of a cell, this
-				      * function issues an error if
-				      * <tt>dim<4</tt>.
 				      */
     unsigned char boundary_indicator () const;
 
@@ -872,6 +865,22 @@ class TriaObjectAccessor :  public TriaAccessor<celldim,dim>
 				      * Set the boundary indicator.
 				      * The same applies as for the
 				      * <tt>boundary_indicator()</tt>
+				      * function.
+				      *
+				      * Note that it only sets the
+				      * boundary object of the current
+				      * object itself, not the
+				      * indicators of the ones that
+				      * bound it. For example, in 3d,
+				      * if this function is called on
+				      * a face, then the boundary
+				      * indicator of the 4 edges that
+				      * bound the face remain
+				      * unchanged. If you want to set
+				      * the boundary indicators of
+				      * face and edges at the same
+				      * time, use the
+				      * set_all_boundary_indicators()
 				      * function.
 				      *
 				      * Caution: Never set the
@@ -887,6 +896,24 @@ class TriaObjectAccessor :  public TriaAccessor<celldim,dim>
 				      */
     void set_boundary_indicator (const unsigned char) const;
 
+				     /**
+				      * Do as set_boundary_indicator()
+				      * but also set the boundary
+				      * indicators of the objects that
+				      * bound the current object. For
+				      * example, in 3d, if
+				      * set_boundary_indicator() is
+				      * called on a face, then the
+				      * boundary indicator of the 4
+				      * edges that bound the face
+				      * remain unchanged. On the other
+				      * hand, the boundary indicators
+				      * of face and edges are all set
+				      * at the same time using the
+				      * current function.
+				      */
+    void set_all_boundary_indicators (const unsigned char) const;
+    
 				     /**
 				      * Return whether this object is
 				      * at the boundary. This is
@@ -1566,6 +1593,24 @@ class TriaObjectAccessor<1, dim> :  public TriaAccessor<1,dim>
     void set_boundary_indicator (const unsigned char) const;
 
 				     /**
+				      * Do as set_boundary_indicator()
+				      * but also set the boundary
+				      * indicators of the objects that
+				      * bound the current object. For
+				      * example, in 3d, if
+				      * set_boundary_indicator() is
+				      * called on a face, then the
+				      * boundary indicator of the 4
+				      * edges that bound the face
+				      * remain unchanged. On the other
+				      * hand, the boundary indicators
+				      * of face and edges are all set
+				      * at the same time using the
+				      * current function.
+				      */
+    void set_all_boundary_indicators (const unsigned char) const;
+
+				     /**
 				      * Return whether this line is at
 				      * the boundary. This is checked
 				      * via the the boundary indicator
@@ -2184,6 +2229,22 @@ class TriaObjectAccessor<2, dim> :  public TriaAccessor<2,dim>
 				      * <tt>boundary_indicator()</tt>
 				      * function.
 				      *
+				      * Note that it only sets the
+				      * boundary object of the current
+				      * object itself, not the
+				      * indicators of the ones that
+				      * bound it. For example, in 3d,
+				      * if this function is called on
+				      * a face, then the boundary
+				      * indicator of the 4 edges that
+				      * bound the face remain
+				      * unchanged. If you want to set
+				      * the boundary indicators of
+				      * face and edges at the same
+				      * time, use the
+				      * set_all_boundary_indicators()
+				      * function.
+				      *
 				      * You should be careful with
 				      * this function and especially
 				      * never try to set the boundary
@@ -2198,6 +2259,24 @@ class TriaObjectAccessor<2, dim> :  public TriaAccessor<2,dim>
 				      * indicators other than 255.
 				      */
     void set_boundary_indicator (const unsigned char) const;
+
+				     /**
+				      * Do as set_boundary_indicator()
+				      * but also set the boundary
+				      * indicators of the objects that
+				      * bound the current object. For
+				      * example, in 3d, if
+				      * set_boundary_indicator() is
+				      * called on a face, then the
+				      * boundary indicator of the 4
+				      * edges that bound the face
+				      * remain unchanged. On the other
+				      * hand, the boundary indicators
+				      * of face and edges are all set
+				      * at the same time using the
+				      * current function.
+				      */
+    void set_all_boundary_indicators (const unsigned char) const;
 
 				     /**
 				      * Return whether this quad is at
@@ -2857,6 +2936,22 @@ class TriaObjectAccessor<3, dim> :  public TriaAccessor<3,dim>
 				      * <tt>boundary_indicator()</tt>
 				      * function.
 				      *
+				      * Note that it only sets the
+				      * boundary object of the current
+				      * object itself, not the
+				      * indicators of the ones that
+				      * bound it. For example, in 3d,
+				      * if this function is called on
+				      * a face, then the boundary
+				      * indicator of the 4 edges that
+				      * bound the face remain
+				      * unchanged. If you want to set
+				      * the boundary indicators of
+				      * face and edges at the same
+				      * time, use the
+				      * set_all_boundary_indicators()
+				      * function.
+				      *
 				      * You should be careful with
 				      * this function and especially
 				      * never try to set the boundary
@@ -2871,6 +2966,24 @@ class TriaObjectAccessor<3, dim> :  public TriaAccessor<3,dim>
 				      * indicators other than 255.
 				      */
     void set_boundary_indicator (const unsigned char) const;
+
+				     /**
+				      * Do as set_boundary_indicator()
+				      * but also set the boundary
+				      * indicators of the objects that
+				      * bound the current object. For
+				      * example, in 3d, if
+				      * set_boundary_indicator() is
+				      * called on a face, then the
+				      * boundary indicator of the 4
+				      * edges that bound the face
+				      * remain unchanged. On the other
+				      * hand, the boundary indicators
+				      * of face and edges are all set
+				      * at the same time using the
+				      * current function.
+				      */
+    void set_all_boundary_indicators (const unsigned char) const;
 
 				     /**
 				      * Return whether this hex is at

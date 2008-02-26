@@ -2,7 +2,7 @@
 //    $Id$
 //    Version: $Name$
 //
-//    Copyright (C) 1998, 1999, 2000, 2001, 2002, 2003, 2004, 2005, 2006, 2007 by the deal.II authors
+//    Copyright (C) 1998, 1999, 2000, 2001, 2002, 2003, 2004, 2005, 2006, 2007, 2008 by the deal.II authors
 //
 //    This file is subject to QPL and may not be  distributed
 //    without copyright and license information. Please refer
@@ -262,6 +262,14 @@ void TriaObjectAccessor<1, dim>::set_boundary_indicator (const unsigned char bou
   Assert (used(), TriaAccessorExceptions::ExcCellNotUsed());
 
   objects().material_id[this->present_index] = boundary_ind;
+}
+
+
+
+template <int dim>
+void TriaObjectAccessor<1, dim>::set_all_boundary_indicators (const unsigned char boundary_ind) const
+{
+  set_boundary_indicator (boundary_ind);
 }
 
 
@@ -569,6 +577,17 @@ void TriaObjectAccessor<2, dim>::set_boundary_indicator (const unsigned char bou
   Assert (used(), TriaAccessorExceptions::ExcCellNotUsed());
 
   objects().material_id[this->present_index] = boundary_ind;
+}
+
+
+
+template <int dim>
+void TriaObjectAccessor<2, dim>::set_all_boundary_indicators (const unsigned char boundary_ind) const
+{
+  set_boundary_indicator (boundary_ind);
+
+  for (unsigned int i=0; i<4; ++i)
+    this->line(i)->set_boundary_indicator (boundary_ind);
 }
 
 
@@ -1092,6 +1111,14 @@ unsigned char TriaObjectAccessor<3, dim>::boundary_indicator () const
 
 template <int dim>
 void TriaObjectAccessor<3, dim>::set_boundary_indicator (const unsigned char) const
+{
+  Assert (false, ExcImpossibleInDim(dim));
+}
+
+
+
+template <int dim>
+void TriaObjectAccessor<3, dim>::set_all_boundary_indicators (const unsigned char) const
 {
   Assert (false, ExcImpossibleInDim(dim));
 }

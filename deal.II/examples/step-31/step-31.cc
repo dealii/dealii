@@ -1163,13 +1163,7 @@ void StokesProblem<dim>::run ()
        cell != triangulation.end(); ++cell)
     for (unsigned int f=0; f<GeometryInfo<dim>::faces_per_cell; ++f)
       if (cell->face(f)->center()[dim-1] == 0)
-	{
-	  cell->face(f)->set_boundary_indicator(1);
-					   /*
-					     for (unsigned int e=0; e<GeometryInfo<dim>::lines_per_face; ++e)
-					     cell->face(f)->line(e)->set_boundary_indicator (1);
-					   */
-	}
+	cell->face(f)->set_all_boundary_indicators(1);
   
   
 				   // We then apply an initial

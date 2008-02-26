@@ -260,6 +260,16 @@ constraints individually.
 <h3>deal.II</h3>
 
 <ol> 
+  <li> <p>New: The new TriaObjectAccessor::set_all_boundary_indicators function
+  does not only set the boundary indicator of the current object but of all that
+  bound it as well. For example, in 3d, if TriaObjectAccessor::set_boundary_indicator
+  is called on a face, then the boundary indicator of the 4 edges that bound the face
+  remain unchanged. On the other hand, the boundary indicators of face and edges are
+  all set at the same time using the new function.
+  <br>
+  (WB 2008/02/26)
+  </p></li>
+
 
   <li> <p>Improved: The tria pointer and the debug_output_grid function in GridIn
   are changed from private to protected to be accessible in derived classes.
