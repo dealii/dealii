@@ -359,14 +359,7 @@ void InverseMatrix<Matrix,Preconditioner>::vmult (Vector<double>       &dst,
 
   dst = 0;
 
-  try
-    {
-      cg.solve (*matrix, dst, src, preconditioner);
-    }
-  catch (std::exception &e)
-    {
-      Assert (false, ExcMessage(e.what()));
-    }
+  cg.solve (*matrix, dst, src, preconditioner);
 }
 
 
