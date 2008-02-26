@@ -594,9 +594,6 @@ void StokesProblem<dim>::setup_dofs ()
     sparsity_pattern.copy_from (csp);
   }
   
-  std::ofstream out ("sparsity_pattern.gpl");
-  sparsity_pattern.block(0,0).print_gnuplot(out);
-
 				   // Finally, the system matrix,
 				   // solution and right hand side are 
 				   // created from the block
