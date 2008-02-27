@@ -11,10 +11,10 @@ vertex of the grid:
 @image html step-8.vectors.png
 
 
-You can clearly see the sources of x-displacement around x=0.5 and
-x=-0.5, and of y-displacement at the origin. In this example, we have
+You can clearly see the sources of $x$-displacement around $x=0.5$ and
+$x=-0.5$, and of $y$-displacement at the origin. In this example, we have
 used the GMV program to produce a vector plot by telling it that the
-two solution components, x-displacement and y-displacement, are in
+two solution components, $x$-displacement and $y$-displacement, are in
 fact not two independent scalar fields, but the components of a vector
 field. Depending on what graphical file format we use, we could as
 well have specified this in the program already and then written into
@@ -28,7 +28,7 @@ The next image shows the final grid after eight steps of refinement:
 
 
 
-Finally, the x-displacement and y-displacement are displayed separately:
+Finally, the $x$-displacement and $y$-displacement are displayed separately:
 
 
 
@@ -46,8 +46,8 @@ Finally, the x-displacement and y-displacement are displayed separately:
 
 
 It should be noted that intuitively one would have expected the
-solution to be symmetric about the x- and y-axes since the x- and
-y-forces are symmetric with respect to these axes. However, the force
+solution to be symmetric about the $x$- and $y$-axes since the $x$- and
+$y$-forces are symmetric with respect to these axes. However, the force
 considered as a vector is not symmetric and consequently neither is
 the solution.
 
