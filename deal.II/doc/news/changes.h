@@ -214,6 +214,12 @@ an integer id of the current thread.
 <h3>lac</h3>
 
 <ol>
+<li> Fixed: The implementation of SparseILU::vmult very needlessly called
+SparseMatrix::vmult just to throw away the (nonsensical) result away
+immediately. This is now fixed.
+<br>
+(WB 2008/2/27)
+</li>
 
 <li> New: The functionality print_gnuplot is now also available for sparsity
 patterns derived from the class BlockSparsityPatternBase, e.g. for

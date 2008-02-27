@@ -1,5 +1,5 @@
 //---------------------------------------------------------------------------
-//    Copyright (C) 1999, 2000, 2001, 2002, 2003, 2004, 2005, 2006 by the deal.II authors
+//    Copyright (C) 1999, 2000, 2001, 2002, 2003, 2004, 2005, 2006, 2008 by the deal.II authors
 //    by the deal.II authors and Stephen "Cheffo" Kolaroff
 //
 //    This file is subject to QPL and may not be  distributed
@@ -179,8 +179,6 @@ template <typename somenumber>
 void SparseILU<number>::vmult (Vector<somenumber>       &dst,
                                const Vector<somenumber> &src) const 
 {
-  SparseLUDecomposition<number>::vmult (dst, src);
-
   Assert (dst.size() == src.size(), ExcDimensionMismatch(dst.size(), src.size()));
   Assert (dst.size() == this->m(), ExcDimensionMismatch(dst.size(), this->m()));
   
@@ -213,7 +211,7 @@ void SparseILU<number>::vmult (Vector<somenumber>       &dst,
       
       for (const unsigned int * col=rowstart; col!=first_after_diagonal; ++col)
 	dst(row) -= this->global_entry (col-column_numbers) * dst(*col);
-    };
+    }
 
 				   // now the backward solve. same
 				   // procedure, but we need not set
@@ -238,7 +236,7 @@ void SparseILU<number>::vmult (Vector<somenumber>       &dst,
 				       // note that the diagonal element
 				       // was stored inverted
       dst(row) *= this->diag_element(row);
-    };
+    }
 }
 
 
@@ -247,8 +245,6 @@ template <typename somenumber>
 void SparseILU<number>::Tvmult (Vector<somenumber>       &dst,
 				const Vector<somenumber> &src) const 
 {
-  SparseLUDecomposition<number>::Tvmult (dst, src);
-
   Assert (dst.size() == src.size(), ExcDimensionMismatch(dst.size(), src.size()));
   Assert (dst.size() == this->m(), ExcDimensionMismatch(dst.size(), this->m()));
   
@@ -284,7 +280,7 @@ void SparseILU<number>::Tvmult (Vector<somenumber>       &dst,
       
       for (const unsigned int * col=first_after_diagonal; col!=rowend; ++col)
 	tmp(*col) += this->global_entry (col-column_numbers) * dst(row);
-    };
+    }
 
 				   // now the backward solve. same
 				   // procedure, but we need not set
@@ -308,7 +304,7 @@ void SparseILU<number>::Tvmult (Vector<somenumber>       &dst,
       
       for (const unsigned int * col=rowstart; col!=first_after_diagonal; ++col)
 	tmp(*col) += this->global_entry (col-column_numbers) * dst(row);
-    };
+    }
 }
 
 
