@@ -2,7 +2,7 @@
 //    $Id$
 //    Version: $Name$
 //
-//    Copyright (C) 2000, 2001, 2002, 2003, 2004, 2005, 2006, 2007 by the deal.II authors
+//    Copyright (C) 2000, 2001, 2002, 2003, 2004, 2005, 2006, 2007, 2008 by the deal.II authors
 //
 //    This file is subject to QPL and may not be  distributed
 //    without copyright and license information. Please refer
@@ -344,8 +344,8 @@ class BlockSparsityPatternBase : public Subscriptor
 				      * and which can be used to plot the
 				      * sparsity pattern in a graphical
 				      * way. This is the same functionality
-                      * implemented for usual Sparsity
-                      * patterns, see @ref SparsityPattern.
+				      * implemented for usual sparsity
+				      * patterns, see @ref SparsityPattern.
 				      */
     void print_gnuplot (std::ostream &out) const;
 
