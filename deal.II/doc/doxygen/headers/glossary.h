@@ -198,8 +198,9 @@
  * elements as well as vector-valued elements assembled via the
  * FESystem class from other primitive (for example scalar) elements
  * as shown in @ref step_8 "step-8", @ref step_29 "step_29" or @ref
- * step_22 "step-22". On the other hand, the FE_RaviartThomas and
- * FE_Nedelec classes provide non-primitive finite elements because
+ * step_22 "step-22". On the other hand, the FE_RaviartThomas class used
+ * in @ref step_20 "step-20" and @ref step_21 "step-21", or the
+ * FE_Nedelec class provide non-primitive finite elements because
  * there each vector-value shape function may have several non-zero
  * components.</dd>
  *

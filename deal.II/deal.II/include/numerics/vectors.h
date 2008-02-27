@@ -746,7 +746,7 @@ class VectorTools
 				      *
 				      * The use of this function is
 				      * explained in more detail in
-				      * @ref step_22 "step-22". It
+				      * @ref step_31 "step-31". It
 				      * doesn't make much sense in 1d,
 				      * so the function throws an
 				      * exception in that case.

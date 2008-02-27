@@ -359,8 +359,8 @@
  * </ul>
  * Other examples of using extractors and views are shown in tutorial programs
  * @ref step_21 "step-21",
- * @ref step_31 "step-31",
- * @ref step_22 "step-22" and a few other programs.
+ * @ref step_22 "step-22",
+ * @ref step_31 "step-31" and a few other programs.
  *
  *
  * @anchor VVAlternative

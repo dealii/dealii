@@ -308,7 +308,7 @@ class DoFRenumbering
 				      * possible and results in a
 				      * blocking of several components
 				      * into one. This is discussed in
-				      * @ref step_31 "step-31". If you
+				      * @ref step_22 "step-22". If you
 				      * omit this argument, the same
 				      * order as given by the finite
 				      * element is used.
