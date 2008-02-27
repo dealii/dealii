@@ -62,7 +62,8 @@ MappingQ<dim>::InternalData::memory_consumption () const
 // cells are scaled linearly
 template<>
 MappingQ<1>::MappingQ (const unsigned int,
-		       const bool use_mapping_q_on_all_cells):
+		       const bool /*use_mapping_q_on_all_cells*/)
+		:
 		degree(1),
 		n_inner(0),
 		n_outer(0),
