@@ -1,5 +1,5 @@
 //---------------------------------------------------------------------------
-//    Copyright (C) 1999, 2000, 2001, 2002, 2003, 2004, 2005, 2006 by the deal.II authors
+//    Copyright (C) 1999, 2000, 2001, 2002, 2003, 2004, 2005, 2006, 2008 by the deal.II authors
 //    by the deal.II authors and Stephen "Cheffo" Kolaroff
 //
 //    This file is subject to QPL and may not be  distributed
@@ -51,7 +51,8 @@ DEAL_II_NAMESPACE_OPEN
  * <h3>Usage and state management</h3>
  *
  * Refer to SparseLUDecomposition documentation for suggested
- * usage and state management.
+ * usage and state management. This class is used in the @ref
+ * step_22 "step-22" tutorial program.
  *
  * @note Instantiations for this template are provided for <tt>@<float@> and
  * @<double@></tt>; others can be generated in application programs (see the
