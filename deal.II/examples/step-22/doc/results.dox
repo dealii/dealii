@@ -198,7 +198,7 @@ ILU-preconditioned CG iterations to invert the velocity-velocity block
 $A$ increases.
 
 We will address the question of how possibly to improve our solver <a
-href="improved-solver">below</a>.
+href="#improved-solver">below</a>.
 
 As for the graphical output, the grids generated during the solution
 look as follow: 
