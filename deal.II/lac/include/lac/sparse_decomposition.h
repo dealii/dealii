@@ -295,7 +295,9 @@ class SparseLUDecomposition : protected SparseMatrix<number>,
 				      *
 				      * After this function is called
 				      * the preconditioner is ready to
-				      * be used (vmult).
+				      * be used (using the
+				      * <code>vmult</code> function of
+				      * derived classes).
 				      */
     template <typename somenumber>
     void initialize (const SparseMatrix<somenumber> &matrix,
@@ -304,8 +306,10 @@ class SparseLUDecomposition : protected SparseMatrix<number>,
 				     /**
 				      * This method is deprecated,
 				      * and left for backward
-				      * compability. It will be removed
+				      * compatibility. It will be removed
 				      * in later versions.
+				      *
+				      * @deprecated
 				      */
     void reinit (const SparsityPattern &sparsity);
 
@@ -314,6 +318,8 @@ class SparseLUDecomposition : protected SparseMatrix<number>,
 				      * and left for backward
 				      * compability. It will be removed
 				      * in later versions.
+				      *
+				      * @deprecated
 				      */
     template <typename somenumber>
     void decompose (const SparseMatrix<somenumber> &matrix,
@@ -324,6 +330,8 @@ class SparseLUDecomposition : protected SparseMatrix<number>,
 				      * and left for backward
 				      * compability. It will be removed
 				      * in later versions.
+				      *
+				      * @deprecated
                                       */ 
     virtual bool is_decomposed () const;	
 
