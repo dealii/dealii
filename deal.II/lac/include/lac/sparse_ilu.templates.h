@@ -75,14 +75,14 @@ void SparseILU<number>::decompose (const SparseMatrix<somenumber> &matrix,
   (indices=0..N-1)
   
   for i=1..N-1
-  a[i-1,i-1] = a[i-1,i-1]^{-1}
+    a[i-1,i-1] = a[i-1,i-1]^{-1}
 
-  for k=0..i-1
-  a[i,k] = a[i,k] * a[k,k]
+    for k=0..i-1
+      a[i,k] = a[i,k] * a[k,k]
 
-  for j=k+1..N-1
-  if (a[i,j] exists & a[k,j] exists)
-  a[i,j] -= a[i,k] * a[k,j]
+      for j=k+1..N-1
+        if (a[i,j] exists & a[k,j] exists)
+          a[i,j] -= a[i,k] * a[k,j]
 */
 
 
@@ -97,7 +97,7 @@ void SparseILU<number>::decompose (const SparseMatrix<somenumber> &matrix,
 				       // and since it makes the backward
 				       // step when applying the decomposition
 				       // significantly faster
-      AssertThrow((this->global_entry(rowstart_indices[row-1]) !=0),
+      AssertThrow((this->global_entry(rowstart_indices[row-1]) != 0),
 		  ExcDivideByZero());
       
       this->global_entry (rowstart_indices[row-1])
@@ -138,6 +138,10 @@ void SparseILU<number>::decompose (const SparseMatrix<somenumber> &matrix,
 	       j<&column_numbers[rowstart_indices[row+1]];
 	       ++j)
 	    {
+					       // get the locations of
+					       // entries ij and kj in
+					       // the matrix. note that k<i, k<j
+	      
 //TODO:[WB] make code faster by using the following comment	      
 					       // note: this inner loop could
 					       // be made considerably faster
