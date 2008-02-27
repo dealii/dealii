@@ -975,7 +975,9 @@ void UltrasoundProblem<dim>::assemble_system ()
 					       // vector valued
 					       // elements, take a
 					       // look at step-8 or
-					       // step-22, where these
+					       // the @ref
+					       // vector_valued
+					       // module, where these
 					       // topics are explained
 					       // in depth.
 	      if (fe.system_to_component_index(i).first == 
