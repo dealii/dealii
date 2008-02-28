@@ -14,7 +14,7 @@ target = $(basename $(shell echo step-*.cc))
 # run-time checking of parameters and internal states is performed, so
 # you should set this value to `on' while you develop your program,
 # and to `off' when running production computations.
-debug-mode = off
+debug-mode = on
 
 
 # As third field, we need to give the path to the top-level deal.II
@@ -30,7 +30,7 @@ D = ../../
 # shall be deleted when calling `make clean'. Object and backup files,
 # executables and the like are removed anyway. Here, we give a list of
 # files in the various output formats that deal.II supports.
-clean-up-files = *gmv *gnuplot *gpl *eps *pov *vtk *out
+clean-up-files = *gmv *gnuplot *gpl *eps *pov *vtk
 
 
 
