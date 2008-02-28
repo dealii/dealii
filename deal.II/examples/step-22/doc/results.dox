@@ -62,6 +62,7 @@ Refinement cycle 6
    Computing preconditioner...
    Solving...  11 outer CG Schur complement iterations for pressure
 @endcode
+
 The entire computation above takes about 30 seconds on a reasonably
 quick (for 2007 standards) machine.
 
@@ -325,8 +326,8 @@ is not a good choice in 3D - a full decomposition needs many new entries that
 
 We have seen in the section of computational results that the number of outer
 iterations does not depend on the mesh size, which is optimal in a sense of
-scalability. This is however only partly true, since we did not look at the
-number of iterations for the inner iterations, i.e. generating the inverse of
+scalability. This does, however, not apply to the solver as a whole:
+we did not look the number of inner iterations when generating the inverse of
 the matrix $A$ and the mass matrix $M_p$. Of course, this is unproblematic in
 the 2D case where we precondition with a direct solver and the
 <code>vmult</code> operation of the inverse matrix structure will converge in
@@ -337,8 +338,8 @@ the 3D results obtained above, each <code>vmult</code> operation involves
 on average approximately 14, 23, 36, 59, 72, 101, ... inner CG iterations in
 the refinement steps shown above. (On the other hand,
 the number of iterations for applying the inverse pressure mass matrix is
-always about 10-11.)  To summarize, most work is spent on solving linear
-systems with the same
+always about 5-6, both in two and three dimensions.)  To summarize, most work 
+is spent on solving linear systems with the same
 matrix $A$ over and over again. It is a natural question to ask whether we
 can do that better.
   
@@ -389,21 +390,26 @@ would appear to be a good choice since
   \end{array}\right).
 @f}
 This is the approach taken by the paper by Silvester and Wathen referenced to
-in the introduction. In 
-this case, a Krylov-based iterative method will converge in two steps, since
-there are only two distinct eigenvalues 0 and 1 of this matrix. The resulting
+in the introduction. In this case, a Krylov-based iterative method would 
+converge in two steps if exact inverses of $A$ and $S$ were applied, since
+there are only two distinct eigenvalues 0 and 1 of the matrix. The resulting
 preconditioned matrix can not be solved using CG since it is neither positive
-definite not symmetric. On the other hand, the iterative solver BiCGStab, which 
-is more expensive per iteration (more inner products are to be calculated) is 
+definite nor symmetric. On the other hand, the iterative solver BiCGStab, which 
+is more expensive per iteration (two matrix-vector products instead of one and
+more inner products are to be calculated) is 
 applicable to this sort of matrices. (One could also think of using GMRES, but
-that solver has the disadvantage that it needs all Krylov basis vectors in each
-iteration - which are many if we need hundreds of iterations. Deal.II does not
+that solver has the disadvantage that it needs to work on all Krylov basis  
+in vectors each iteration - since we apply it together with an ILU 
+preconditioning, we would need hundreds of iterations and, hence, vectors to
+store and operate on. Deal.II does not
 use more than 30 by default, so the basis is rebuild after that - which however
-leads to slow convergence.)
+leads to slower convergence.)
 
 Since $P$ is aimed to be a preconditioner only, we shall only use
-approximations to the Schur complement $S$ and the matrix $A$. So an improved
-solver for the Stokes system is going to look like the following: The Schur
+approximations to the inverse of the Schur complement $S$ and the matrix $A$. 
+
+Hence, an improved solver for the Stokes system is going to look like the 
+following: The Schur
 complement will be approximated by the pressure mass matrix $M_p$, and we use
 a preconditioner to $A$ (without an InverseMatrix class around it) to
 approximate $A^{-1}$. The advantage of this approach is however partly
@@ -434,7 +440,7 @@ class BlockSchurPreconditioner : public Subscriptor
                        PreconditionerMp > > m_inverse;
     const PreconditionerA &a_preconditioner;
     
-    mutable BlockVector<double> tmp;
+    mutable Vector<double> tmp;
 
 };
 
@@ -448,14 +454,8 @@ BlockSchurPreconditioner<PreconditionerA, PreconditionerMp>::BlockSchurPrecondit
                 system_matrix           (&S),
                 m_inverse               (&Mpinv),
                 a_preconditioner        (Apreconditioner),
-                tmp                     (2)
-{
-        // We have to initialize the <code>BlockVector@</code>
-        // tmp to the correct sizes in the respective blocks
-    tmp.block(0).reinit(S.block(0,0).m());
-    tmp.block(1).reinit(S.block(1,1).m());
-    tmp.collect_sizes();
-}
+                tmp                     (S.block(1,1).m())
+{}
 
         // Now the interesting function, the multiplication of
         // the preconditioner with a BlockVector. 
@@ -466,16 +466,15 @@ void BlockSchurPreconditioner<PreconditionerA, PreconditionerMp>::vmult (
 {
         // Form u_new = A^{-1} u
   a_preconditioner.vmult (dst.block(0), src.block(0));
-        // Form tmp.block(1) = - B u_new + p 
+        // Form tmp = - B u_new + p 
         // (<code>SparseMatrix::residual</code>
         // does precisely this)
-  system_matrix->block(1,0).residual(tmp.block(1), 
-                                     dst.block(0), src.block(1));
-        // Change sign in tmp.block(1)
-  tmp.block(1) *= -1;
+  system_matrix->block(1,0).residual(tmp, dst.block(0), src.block(1));
+        // Change sign in tmp
+  tmp *= -1;
         // Multiply by approximate Schur complement 
         // (i.e. a pressure mass matrix)
-  m_inverse->vmult (dst.block(1), tmp.block(1));
+  m_inverse->vmult (dst.block(1), tmp);
 }
 @endcode
 
@@ -506,7 +505,6 @@ The actual solver call can be realized as follows:
       bicgstab.solve(system_matrix, solution, system_rhs,
                      preconditioner);
       
-                         // Produce a constistent solution field
       hanging_node_constraints.distribute (solution);
       
       std::cout << " "
@@ -524,11 +522,12 @@ problem) after we copied the information to another matrix. Additionally, we
 chose a slightly more stringent residual threshold for BiCGStab since we 
 consider the whole system and not some subblocks.
 
-Using the Timer class, we can collect some statistics that compare the runtime
-of the block solver with the one used in the problem implementation above (on
+Using the Timer class, we collect some statistics that compare the runtime
+of the block solver with the one from the problem implementation above (on
 a different machine than the one for which timings were reported
 above). Besides the solution of the two systems we also check if the solutions
-to the two systems are close to each other, i.e. we calculate the infinity
+to the two systems are close to each other (i.e. this solver gives indeed the
+same solution as before) and we calculate the infinity
 norm of the vector difference.
 
 Let's first see the results in 2D:
@@ -610,7 +609,7 @@ the actual Schur complement. The
 reason is simple: we used a direct solve as preconditioner for the latter - so
 there won't be any substantial gain by avoiding the inner iterations. We see
 that the number of iterations has decreased a bit for BiCGStab, but one step
-is more expensive here and so there is no gain.
+is more expensive here, so that the solution time is pretty much the same.
 
 
 The picture of course changes in 3D:
@@ -655,16 +654,29 @@ Refinement cycle 3
       Schur complement:  15 outer CG iterations for p      [299.282 s]
       Block Schur preconditioner:   90 BiCGStab iterations [69.3994 s]
    max difference l_infty between solution vectors: 0.000137409
+   
+Refinement cycle 4
+   Number of active cells: 11456
+   Number of degrees of freedom: 327808 (313659+14149) [135.536 s]
+   Assembling... [195.769 s]
+   Computing preconditioner... [197.189 s]
+   Solving...
+      Schur complement:  15 outer CG iterations for p      [1780.94 s]
+      Block Schur preconditioner:  259 BiCGStab iterations [1047.42 s]
+   max difference l_infty between solution vectors: 0.000124763
 @endcode
 
 Here, the block preconditioned solver is clearly superior to the Schur
-complement, even though the advantage gets less for more mesh points. There are 
+complement, but the advantage gets less for more mesh points. There are 
 two reason for that. The first one is that it is still necessary to invert the
 mass matrix iteratively, which means more work if we need more (outer)
-iterations. The second reason is related to the solver: BiCGStab scales slightly
-worse with the size of the problem than the iterator for the CG solver build
-into the Schur complement. Nonetheless, the improvement by a factor of 4-5 is
-quite impressive.
+iterations. The second and more important reason is related to the solver: 
+BiCGStab scales worse with the problem size than the iterator for the CG solver 
+used for generating the inverse matrix $A^{-1}$ for the Schur complement. For 
+very large problem sizes, i.e. refinement cycles 5 and 6, the alternative solver
+is even worse than the original Schur complement due to this effect.
+Nonetheless, the improvement by a factor of 4-5 for moderate problem sizes
+is quite impressive.
 
 <h4>No block matrices and vectors</h4>
 Another possibility that can be taken into account is to not set up a block
