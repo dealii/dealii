@@ -218,7 +218,8 @@ an integer id of the current thread.
 inefficient in that it accessed random elements of the matrix in its
 inner loop. It has been replaced by the algorithm given in the book
 by Yves Saad: "Iterative methods for sparse linear systems", second
-edition, in section 10.3.2.
+edition, in section 10.3.2. The code is now about 8 times faster than
+before.
 <br>
 (WB 2008/2/29)
 </li>
