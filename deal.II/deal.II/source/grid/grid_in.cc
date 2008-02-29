@@ -772,7 +772,7 @@ void GridIn<2>::read_netcdf (const std::string &filename)
   AssertThrow(false, ExcNeedsNetCDF());
 #else
   const unsigned int dim=2;
-  const bool output=true;
+  const bool output=false;
   Assert (tria != 0, ExcNoTriangulationSelected());
 				   // this function assumes the TAU
 				   // grid format.
