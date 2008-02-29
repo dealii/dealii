@@ -1783,8 +1783,10 @@ void FESubfaceValues<dim>::reinit (const typename DoFHandler<dim>::cell_iterator
   if (dim==3)
     real_subface_no=GeometryInfo<dim>::standard_to_real_face_vertex(
       subface_no, cell->face_orientation(face_no), cell->face_flip(face_no), cell->face_rotation(face_no));
-  this->present_face_index=cell->face(face_no)->child_index(real_subface_no);
-  
+  if (cell->face(face_no)->has_children())
+    this->present_face_index=cell->face(face_no)->child_index(real_subface_no);
+  else
+    this->present_face_index=cell->face_index(face_no);
                                    // set new cell. auto_ptr will take
                                    // care that old object gets
                                    // destroyed and also that this
