@@ -79,7 +79,7 @@ namespace
 
   static const char* tecplot_cell_type[4] =
   {
-	"", "", "quadrilateral", "brick"
+	"", "lineseg", "quadrilateral", "brick"
   };
 
 #ifdef DEAL_II_HAVE_TECPLOT
@@ -3237,13 +3237,8 @@ void DataOutBase::write_tecplot (const std::vector<Patch<dim,spacedim> > &patche
     
     out << '\n';
     
-    if (dim > 1)
-      {
-	out << "zone f=feblock, n=" << n_nodes << ", e=" << n_cells
-	    << ", et=" << tecplot_cell_type[dim] << '\n';
-      }
-    else
-      out << "zone f=block, I=" << n_nodes << '\n';
+    out << "zone f=feblock, n=" << n_nodes << ", e=" << n_cells
+	<< ", et=" << tecplot_cell_type[dim] << '\n';
   }
 
   
