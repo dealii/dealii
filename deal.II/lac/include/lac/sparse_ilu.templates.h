@@ -20,6 +20,7 @@
 #include <algorithm>
 #include <cmath>
 
+
 DEAL_II_NAMESPACE_OPEN
 
 template <typename number>
@@ -66,113 +67,99 @@ void SparseILU<number>::decompose (const SparseMatrix<somenumber> &matrix,
   if (strengthen_diagonal>0)
     this->strengthen_diagonal_impl();
 
-  const SparsityPattern             &sparsity = this->get_sparsity_pattern();
-  const std::size_t  * const rowstart_indices = sparsity.get_rowstart_indices();
-  const unsigned int * const column_numbers   = sparsity.get_column_numbers();
+				   // in the following, we implement
+				   // algorithm 10.4 in the book by
+				   // Saad by translating in essence
+				   // the algorithm given at the end
+				   // of section 10.3.2, using the
+				   // names of variables used there
+  const SparsityPattern     &sparsity = this->get_sparsity_pattern();
+  const std::size_t  * const ia       = sparsity.get_rowstart_indices();
+  const unsigned int * const ja       = sparsity.get_column_numbers();
+
+  number * luval = &this->global_entry (0);
+
+  const unsigned int N = this->m();
   
-/*
-  PSEUDO-ALGORITHM
-  (indices=0..N-1)
+  std::vector<unsigned int> iw (N, numbers::invalid_unsigned_int);
   
-  for i=1..N-1
-    a[i-1,i-1] = a[i-1,i-1]^{-1}
-
-    for k=0..i-1
-      a[i,k] = a[i,k] * a[k,k]
-
-      for j=k+1..N-1
-        if (a[i,j] exists & a[k,j] exists)
-          a[i,j] -= a[i,k] * a[k,j]
-*/
-
-
-				   // i := row
-  for (unsigned int row=1; row<this->m(); ++row)
+  for (unsigned int k=0; k<N; ++k)
     {
-				       // invert diagonal element of the
-				       // previous row. this is a hack,
-				       // which is possible since this
-				       // element is not needed any more
-				       // in the process of decomposition
-				       // and since it makes the backward
-				       // step when applying the decomposition
-				       // significantly faster
-      AssertThrow((this->global_entry(rowstart_indices[row-1]) != 0),
-		  ExcDivideByZero());
+      const unsigned int j1 = ia[k],
+			 j2 = ia[k+1]-1;
       
-      this->global_entry (rowstart_indices[row-1])
-	= 1./this->global_entry (rowstart_indices[row-1]);
+      for (unsigned int j=j1; j<=j2; ++j)
+	iw[ja[j]] = j;
 
-				       // let k run over all lower-left
-				       // elements of row i; skip
-				       // diagonal element at start
-      const unsigned int * first_of_row
-	= &column_numbers[rowstart_indices[row]+1];
-      const unsigned int * first_after_diagonal = this->prebuilt_lower_bound[row];
+				       // the algorithm in the book
+				       // works on the elements of row
+				       // k left of the
+				       // diagonal. however, since we
+				       // store the diagonal element
+				       // at the first position, start
+				       // at the element after the
+				       // diagonal and run as long as
+				       // we don't walk into the right
+				       // half
+      unsigned int j = j1+1;
 
-				       // k := *col_ptr
-      for (const unsigned int * col_ptr = first_of_row;
-           col_ptr!=first_after_diagonal; ++col_ptr)
-	{
-	  const unsigned int global_index_ik = col_ptr-column_numbers;
-	  this->global_entry(global_index_ik) *= this->diag_element(*col_ptr);
+      label_150:
+      
+      unsigned int jrow = ja[j];
+      if (jrow >= k)
+	goto label_200;
 
-					   // now do the inner loop over
-					   // j. note that we need to do
-					   // it in the right order, i.e.
-					   // taking into account that the
-					   // columns are sorted within each
-					   // row correctly, but excluding
-					   // the main diagonal entry
-                                           //
-                                           // the explicit use of operator()
-                                           // works around a bug in some gcc
-                                           // versions (see PR 18803)
-	  const int global_index_ki = sparsity.operator()(*col_ptr,row);
+				       // actual computations:
+      {
+	number t1 = luval[j] * luval[ia[jrow]];
+	luval[j] = t1;
 
-	  if (global_index_ki != -1)
-	    this->diag_element(row) -= this->global_entry(global_index_ik) *
-				       this->global_entry(global_index_ki);
+					 // jj runs from just right of
+					 // the diagonal to the end of
+					 // the row
+	unsigned int jj = ia[jrow]+1;
+	while (ja[jj] < jrow)
+	  ++jj;
+	for (; jj<ia[jrow+1]; ++jj)
+	  {
+	    const unsigned int jw = iw[ja[jj]];
+	    if (jw != numbers::invalid_unsigned_int)
+	      luval[jw] -= t1 * luval[jj];
+	  }
 
-	  for (const unsigned int * j = col_ptr+1;
-	       j<&column_numbers[rowstart_indices[row+1]];
-	       ++j)
-	    {
-					       // get the locations of
-					       // entries ij and kj in
-					       // the matrix. note that k<i, k<j
-	      
-//TODO:[WB] make code faster by using the following comment	      
-					       // note: this inner loop could
-					       // be made considerably faster
-					       // if we consulted the row
-					       // with number *col_ptr,
-					       // instead of always asking
-					       // sparsity(*col_ptr,*j),
-					       // since we traverse this
-					       // row linearly. I just didn't
-					       // have the time to figure out
-					       // the details.
-                                               //
-                                               // the explicit use of
-                                               // operator() works around a
-                                               // bug in some gcc versions
-                                               // (see PR 18803)
-       	      const int global_index_ij = j - &column_numbers[0],
-			global_index_kj = sparsity.operator()(*col_ptr,*j);
-	      if ((global_index_ij != -1) &&
-		  (global_index_kj != -1))
-		this->global_entry(global_index_ij) -= this->global_entry(global_index_ik) *
-						       this->global_entry(global_index_kj);
-	    };
-	};
-    };
+	++j;
+	if (j<=j2)
+	  goto label_150;
+      }
 
-				   // Here the very last diagonal
-				   // element still has to be inverted
-				   // because the for-loop doesn't do
-				   // it...
-  this->diag_element(this->m()-1) = 1./this->diag_element(this->m()-1);
+      label_200:
+
+				       // in the book there is an
+				       // assertion that we have hit
+				       // the diagonal element,
+				       // i.e. that jrow==k. however,
+				       // we store the diagonal
+				       // element at the front, so
+				       // jrow must actually be larger
+				       // than k or j is already in
+				       // the next row
+      Assert ((jrow > k) || (j==ia[k+1]), ExcInternalError());
+
+				       // now we have to deal with the
+				       // diagonal element. in the
+				       // book it is located at
+				       // position 'j', but here we
+				       // use the convention of
+				       // storing the diagonal element
+				       // first, so instead of j we
+				       // use uptr[k]=ia[k]
+      Assert (luval[ia[k]] != 0, ExcInternalError());
+      
+      luval[ia[k]] = 1./luval[ia[k]];
+	    
+      for (unsigned int j=j1; j<=j2; ++j)
+	iw[ja[j]] = numbers::invalid_unsigned_int;
+    }
 }
 
 

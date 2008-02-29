@@ -214,6 +214,15 @@ an integer id of the current thread.
 <h3>lac</h3>
 
 <ol>
+<li> Fixed: The implementation of SparseILU::decompose was rather
+inefficient in that it accessed random elements of the matrix in its
+inner loop. It has been replaced by the algorithm given in the book
+by Yves Saad: "Iterative methods for sparse linear systems", second
+edition, in section 10.3.2.
+<br>
+(WB 2008/2/29)
+</li>
+
 <li> Fixed: The implementation of SparseILU::vmult very needlessly called
 SparseMatrix::vmult just to throw away the (nonsensical) result away
 immediately. This is now fixed.

@@ -31,21 +31,9 @@ DEAL_II_NAMESPACE_OPEN
  * in the decomposition that do not fit into the sparsity structure of this
  * object are discarded.
  *
- * The algorithm used by this class is as follows (indices run from @p 0
- * to @p N-1):
- * @verbatim
- * copy original matrix into a[i,j]
- * 
- * for i=1..N-1
- *   a[i-1,i-1] = a[i-1,i-1]^{-1}
- *
- *   for k=0..i-1
- *     a[i,k] = a[i,k] * a[k,k]
- *
- *     for j=k+1..N-1
- *      if (a[i,j] exists & a[k,j] exists)
- *        a[i,j] -= a[i,k] * a[k,j]
- * @endverbatim
+ * The algorithm used by this class is essentially a copy of the
+ * algorithm given in the book Y. Saad: "Iterative methods for sparse
+ * linear systems", second edition, in section 10.3.2.
  *
  * 
  * <h3>Usage and state management</h3>
@@ -58,8 +46,7 @@ DEAL_II_NAMESPACE_OPEN
  * @<double@></tt>; others can be generated in application programs (see the
  * section on @ref Instantiations in the manual).
  * 
- * @author Wolfgang Bangerth, 1999, based on a similar implementation
- * by Malte Braack; unified interface: Ralf Hartmann
+ * @author Wolfgang Bangerth, 2008; unified interface: Ralf Hartmann
  */
 template <typename number>
 class SparseILU : public SparseLUDecomposition<number>
