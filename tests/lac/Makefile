@@ -1,6 +1,6 @@
 ############################################################
 # $Id$
-# Copyright (C) 2000, 2001, 2002, 2003, 2004, 2005, 2006, 2007 by the deal.II authors
+# Copyright (C) 2000, 2001, 2002, 2003, 2004, 2005, 2006, 2007, 2008 by the deal.II authors
 ############################################################
 
 ############################################################
@@ -39,8 +39,7 @@ tests_x = vector-vector vector_memory \
 	solver \
 	eigen \
 	filtered_matrix \
-	sparse_ilu \
-	sparse_ilu_t \
+	sparse_ilu* \
 	lapack_fill \
 	block_minres \
 	identity_matrix* \
