@@ -76,10 +76,10 @@ int main()
 	}
 
       deallog << "Matrix A:" << std::endl;
-      A.print_formatted (deallog.get_file_stream());
+      A.print_formatted (deallog.get_file_stream(), 3, false);
   
       deallog << "Matrix A^{-1}:" << std::endl;
-      inverse.print_formatted (deallog.get_file_stream());
+      inverse.print_formatted (deallog.get_file_stream(), 3, false);
 
       deallog << std::endl;
     }
