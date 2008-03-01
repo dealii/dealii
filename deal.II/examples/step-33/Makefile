@@ -1,4 +1,4 @@
-# $Id: Makefile 14008 2006-10-17 04:05:33Z bangerth $
+# $Id: Makefile 11779 2005-11-23 15:54:25Z wolf $
 
 
 # For the small projects Makefile, you basically need to fill in only
@@ -44,6 +44,25 @@ clean-up-files = *gmv *gnuplot *gpl *eps *pov
 # deal.II top level directory and to include the file with the global
 # settings
 include $D/common/Make.global_options
+
+################################################################ 
+# This example program will only work if Trilinos is installed. If this
+# is not the case, then simply redefine the main targets to to nothing
+ifneq ($(USE_CONTRIB_TRILINOS),yes)
+default run clean:
+	@echo
+	@echo "===========================================================" 
+	@echo "=   This program cannot be compiled without Trilinos. Make   ="
+	@echo "=   sure you have Trilinos installed and detected during     ="
+	@echo "=   configuration of deal.II                              ="
+	@echo "==========================================================="
+	@echo
+
+else
+#
+################################################################
+
+
 
 
 # Since the whole project consists of only one file, we need not
@@ -152,3 +171,4 @@ Makefile.dep: $(target).cc Makefile \
 include Makefile.dep
 
 
+endif  # CONTRIB_USE_TRILINOS
