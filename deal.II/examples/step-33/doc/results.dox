@@ -1,0 +1,134 @@
+<h1>Results</h1>
+
+We run the problem with the mesh slide.inp and the following input deck:
+@verbatim
+# Listing of Parameters
+# ---------------------
+
+# The input grid 
+set mesh=slide.inp
+
+# Stabilization parameter
+set diffusion power = 2.0
+
+# Scaled value for gravity.  Positive means gravity points down.
+set gravity = 1.0
+
+# Boundary conditions
+# We may specify boundary conditions for up to MAX_BD boundaries.
+# Your .inp file should have these boundaries designated.
+#
+subsection boundary_1
+  set no penetration = true # reflective boundary condition
+end
+
+subsection boundary_2
+# outflow boundary
+  #set w_3 = pressure
+  #set w_3 value = 1.5 - y
+end
+
+subsection boundary_3
+  set no penetration = true # reflective
+  #set w_3 = pressure
+  #set w_3 value = 1.0
+end
+subsection boundary_4
+  set no penetration = true #reflective
+end
+
+# Initial Conditions
+# We set the initial conditions of the conservative variables.  These lines
+# are passed to the expression parsing function.  You should use x,y,z for
+# the coordinate variables.
+#
+subsection initial condition
+  set w_0 value = 0
+  set w_1 value = 0
+  set w_2 value   = 10*(x<-0.7)*(y> 0.3)*(y< 0.45) + (1-(x<-0.7)*(y> 0.3)*(y< 0.45))*1.0
+  set w_3 value = (1.5-(1.0*1.0*y))/0.4
+end
+
+# Time stepping control
+#
+subsection time stepping
+  set final time = 10.0 # simulation end time
+  set time step  = 0.02 # simulation time step
+end
+
+subsection linear solver
+  set output         = quiet
+  set method         = gmres
+  set ilut fill      = 1.5
+  set ilut drop tolerance = 1e-6
+  set ilut absolute tolerance = 1e-6
+  set ilut relative tolerance = 1.0
+end
+
+# Output frequency.
+# You may wish to set this > time step if you dont want output at every step
+subsection output
+  set step = 0.01
+end
+
+# Refinement control
+subsection refinement
+  set refinement = shock # none only other option
+  set shock value = 1.5
+  set shock levels = 1 # how many levels of refinement to allow
+end
+
+# Flux parameters
+subsection flux
+ set stab = mesh
+ #set stab value = 1.0
+end
+@endverbatim
+
+When we run the program, we get the following kind of output:
+@code
+T=3.14,    Number of active cells:       2617
+   Number of degrees of freedom: 11184
+NonLin Res:       Lin Iter     Lin Res
+______________________________________
+* 1.684e-02        0007        1.84e-13
+* 4.414e-05        0006        3.82e-15
+* 1.750e-09        0006        1.56e-19
+* 6.831e-16        0000        1.56e-19
+max_df:124
+T=3.16,    Number of active cells:       2626
+   Number of degrees of freedom: 11220
+NonLin Res:       Lin Iter     Lin Res
+______________________________________
+* 1.673e-02        0007        9.64e-14
+* 4.230e-05        0006        3.83e-15
+* 8.748e-10        0006        7.67e-20
+* 6.804e-16        0000        7.67e-20
+max_df:124
+T=3.18,    Number of active cells:       2644
+   Number of degrees of freedom: 11296
+NonLin Res:       Lin Iter     Lin Res
+______________________________________
+* 1.674e-02        0007        9.29e-14
+* 3.306e-05        0007        8.07e-17
+* 4.660e-10        0006        4.05e-20
+* 6.898e-16        0000        4.05e-20
+max_df:128
+T=3.2,    Number of active cells:       2647
+   Number of degrees of freedom: 11312
+NonLin Res:       Lin Iter     Lin Res
+______________________________________
+...
+@endcode
+
+This output reports the progress of the Newton iterations and the time stepping.
+
+@image html step-33.slide.gif
+
+As we see, the heavy mass of fluid is drawn down the slope by gravity, where it collides
+with the ski lodge and is flung into the air!  Hopefully everyone escapes!
+
+@image html step-33.slide_adapt.gif
+
+The adaptivity follows and preceeds the flow pattern, based on this heuristic refinement scheme.
+

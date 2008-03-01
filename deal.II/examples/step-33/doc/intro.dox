@@ -1,0 +1,152 @@
+<a name="Intro"></a> <h1>Introduction</h1>
+
+This program was written for fun by David Neckels (NCAR) while working
+at Sandia (on the Wyoming Express bus to and from Corrales each day).
+The main purpose was to better understand Euler flow.  
+The code solves the basic Euler equations of gas dynamics, by using a
+fully implicit Newton iteration (inspired by Sandia's Aria code).  The
+code may be configured by an input deck to run different simulations
+on different meshes, with differing boundary conditions.
+
+The program also uses the Trilinos linear solvers (Aztec/Amesos) and
+an automatic differentiation package, Sacado.
+
+<h2>Euler flow</h2>
+
+The equations for a compressible, inviscid gas (the Euler equations) are
+a basic system of conservation laws, in spatial dimension $d$, 
+@f[
+\partial_t \mathbf{w} + \nabla \cdot \mathbf{F}(\mathbf{w}) = \mathbf{0},
+@f]
+with $\mathbf{w}=(\rho,\rho v_1,\dots,\rho v_d, E)^{\top}$ for $v_i$ equal to the
+flow velocity in spatial direction $i$, $\rho$ equal to the fluid density, and
+$E$ the energy of the gas.  The flux matrix (or system of flux functions)
+are defined such that the entire system of equations are
+@f{eqnarray*}
+  \partial_t \rho + \sum_{s=1}^d \frac{\partial(\rho v_s)}{\partial x_s} &=& 0  \\
+  \partial_t (\rho v_i) + \sum_{s=1}^d \frac{\partial(\rho v_i v_s + \delta_{is} p)}{\partial x_s} &=& 0, i=1,\dots,d \\
+  \partial_t E + \sum_{s=1}^d \frac{\partial((E+p)v_s)}{\partial x_s} &=& 0 \\
+  p = (\gamma -1)(E-\frac{1}{2} \rho |v|^2).
+@f}
+
+For air, $\gamma=1.4$.
+
+<h2>Discretization</h2>
+
+We choose a finite element space $V_h$, and integrate our conservation law against
+our (vector) test function $\mathbf{v} \in V_h$.  We integrate by parts and approximate the
+boundary flux with a <i> numerical </i> flux $\mathbf{H}$,
+@f{eqnarray*}
+\int_{\Omega} (\partial_t \mathbf{w}, \mathbf{v}) + (\nabla \cdot \mathbf{F}(\mathbf{w}), \mathbf{v}) & \approx & \\
+\int_{\Omega} (\partial_t \mathbf{w}, \mathbf{v}) + (\mathbf{F}(\mathbf{w}), \nabla \mathbf{v}) + h^{\eta}(\nabla \mathbf{w} , \nabla \mathbf{v}) + \int_{\partial \Omega} (\mathbf{H}(\mathbf{w}^+, \mathbf{w}^-, \mathbf{n}), \mathbf{v}^+),
+@f}
+where $+$ is the interior trace of a function, and $-$ represents the outer trace.
+The diffusion term $h^{\eta}(\nabla \mathbf{w} , \nabla \mathbf{v})$ is introduced strictly for stability,
+ where $h$ is the mesh size and $\eta$ is a parameter prescribing how much diffusion to add.
+Depending on the boundary condition, we prescribe the outer trace $\mathbf{w}^-$,
+<ul>
+<li> inflow boundary: $\mathbf{w}^-$ is prescribed to be the desired value.  
+<li> supersonic outflow boundary: $\mathbf{w}^- = \mathbf{w}^+$
+<li> subsonic outflow boundary: $\mathbf{w}^- = \mathbf{w}^+$ except that the energy variable
+is modified to support a prescribed pressure $p_o$, i.e. 
+$\mathbf{w}^- =(\rho^+, \rho v_1^+, \dots, \rho v_d^+, p_o/(\gamma -1) + 0.5 \rho |\mathbf{v}^+|^2)$
+<li> reflective boundary: we set $\mathbf{w}^-$ so that $(\mathbf{v}^+ + \mathbf{v}^-) \cdot \mathbf{n} = 0$ and
+$\rho^- = \rho^+,E^-=E^+$.
+</ul>
+
+For more information, please consult Ralf Hartmann's thesis TODO:Ref.
+
+
+Our full discretization is thus
+@f{eqnarray*}
+R(\mathbf{W}_{n+1}) = \\
+\int_{\Omega} (\frac{\mathbf{w}_{n+1} - \mathbf{w}_n}{\delta t}, \mathbf{v}) + \int_{\Omega} (\mathbf{F}(\tilde{\mathbf{w}}), \mathbf{v}) +  h^{\eta}(\nabla \mathbf{w} , \nabla \mathbf{v}) + \int_{\partial \Omega} (\mathbf{H}(\tilde{\mathbf{w}^+}), \mathbf{w}^-((\tilde{\mathbf{w}^+})), \mathbf{n}), \mathbf{v}) & = & 0
+@f}
+where $\tilde{\mathbf{w}} = \theta \mathbf{w}_{n+1} + (1-\theta) \mathbf{w}_n$ for $0 \leq \theta \leq 1$ and
+$\mathbf{w}_i = \sum_k \mathbf{W}_i^k \mathbf{\phi}_k$.
+
+We choose the Lax-Friedrich's flux, 
+$\mathbf{H}(\mathbf{a},\mathbf{b},\mathbf{n}) = \frac{1}{2}(\mathbf{F}(\mathbf{a})\cdot \mathbf{n} + \mathbf{F}(\mathbf{b})\cdot \mathbf{n} + \alpha (\mathbf{a} - \mathbf{b}))$.
+
+We solve the nonlinear system by a Newton iteration, i.e. by iterating
+@f{eqnarray*}
+\partial R(\mathbf{W}^k) \delta \mathbf{W} & = & - R(\mathbf{W}^{k}) \\
+\mathbf{W}^{k+1} &=& \mathbf{W}^k + \delta \mathbf{W},
+@f}
+until $|R(\mathbf{W}^k)|$ (the residual) is sufficiently small.
+
+<h2> Auto-Differentiation </h2>
+
+Since computing the Jacobian $\partial R$ is a terrible beast, we use an automatic differentiation package,
+Sacado, to do this.  Sacado is a C++ type that supports basic arithmetic operators and functions
+such as <code> sqrt, sin, cos, pow,  </code> etc.  One declares a collection Sacado type and then declares
+some of this collection as degrees of freedom.  These variables are used in an algorithm, and as the variables
+are used, their sensitivities with respect to these degrees of freedom are continuously updated.
+One can imagine that for the full Jacobian, this could be prohibitively expensive.  However, we do
+not use the Sacado type for the entire computation, but only element by element.  The author has
+used this approach side by side with a hand coded Jacobian for the Incompressible Navier-Stokes problem
+and found the Sacado approach to be just as fast as using a hand coded Jacobian.  Since using the
+auto-differentiation requires only that one code the Residual $R(\mathbf{W})$, ensuring code correctness
+and maintaining code becomes tremendously more simple.  We show a very simple Sacado example:
+
+@code
+#include <Sacado.hpp>
+
+typedef Sacado::Fad::DFad<double> fad_double;
+
+main() {
+
+  fad_double a,b,c;
+
+  a.diff(0,2);  // Set a to be dof 0, in a 2-dof system.
+
+  b.diff(1,2);  // Set b to be dof 1, in a 2-dof system.
+
+  a = 1; b = 2;
+
+  c = 2*a+cos(a*b);
+
+  double *derivs = c.fastAccessDx(0); // Access derivatives
+
+  std::cout << "dc/da = " << derivs[0] << ", dc/db=" << derivs[1] << std::endl;
+
+}
+@endcode
+
+It should be noted that Sacado provides more auto-differentation capabilities than the small subset
+that I use in this program.  However, if one understands the example above, they will understand
+how I use Sacado in this Euler flow program.
+
+<h2> Trilinos solvers </h2>
+The program uses either the Aztec iterative solvers, or the Amesos direct solver, as provided by
+the Trilinos package.  This package is inherently designed to be used in a parallel program, however,
+it may be used in serial just as easily, as is done here.  The Epetra package is the basic
+vector/matrix library upon which the solvers are built.  This very powerful package can be used
+to describe the parallel distribution of a vector, and to define sparse matrices that operate
+on these vectors.  Please view the commented code for more details on how these solvers are used
+within the example.
+
+<h2> Adaptivity </h2>
+The example uses an ad-hoc refinement indicator that shows some usefullness in shock-type problems, and
+in the downhill flow example included.  We refine according to the squared gradient of the density.  
+Hanging nodes are handled by using computing the numerical flux across cells that are of differing
+refinement levels.  In this way, the example combines the continuous and DG methodologies.
+
+Further, we enforce a maximum number of refinement levels to keep refinement under check.  It is the
+author's experience that adaptivity in a time dependent problem, refinement can easily lead the simulation to
+a screeching halt if care is not taken.  The amount of refinement is
+limited in the example by letting the user specify the
+maximum level of refinement that will be present anywhere in the mesh.  In this way, refinement
+tends not to slow the simulation to a halt.  This, of course, is purely a heuristic strategy, and
+if the author's advisor heard about it, the author would likely be exiled forever from the finite
+ element error estimation community.
+
+<h2> Input Deck </h2>
+
+We use an input file deck to drive the simulation.  In this way, we can alter the boundary conditions
+and other important properties of the simulation without having to recompile.  For more information on 
+the format, look at the results section, where we describe an example file in more detail.
+
+
+
+
