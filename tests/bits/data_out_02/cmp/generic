@@ -84,7 +84,7 @@ endgmv
 # For a description of the Tecplot format see the Tecplot documentation.
 #
 Variables="x", "node_data", "cell_data"
-zone f=block, I=6
+zone f=feblock, n=6, e=3, et=lineseg
 0.50
 1.0
 0.0
@@ -3135,7 +3135,7 @@ endgmv
 # For a description of the Tecplot format see the Tecplot documentation.
 #
 Variables="x", "node_data", "cell_data"
-zone f=block, I=6
+zone f=feblock, n=6, e=3, et=lineseg
 0.50
 1.0
 0.0
@@ -6186,7 +6186,7 @@ endgmv
 # For a description of the Tecplot format see the Tecplot documentation.
 #
 Variables="x", "node_data", "cell_data"
-zone f=block, I=6
+zone f=feblock, n=6, e=3, et=lineseg
 0.50
 1.0
 0.0
@@ -9237,7 +9237,7 @@ endgmv
 # For a description of the Tecplot format see the Tecplot documentation.
 #
 Variables="x", "node_data", "cell_data"
-zone f=block, I=6
+zone f=feblock, n=6, e=3, et=lineseg
 0.50
 1.0
 0.0
@@ -12288,7 +12288,7 @@ endgmv
 # For a description of the Tecplot format see the Tecplot documentation.
 #
 Variables="x", "node_data", "cell_data"
-zone f=block, I=6
+zone f=feblock, n=6, e=3, et=lineseg
 0.50
 1.0
 0.0
@@ -15339,7 +15339,7 @@ endgmv
 # For a description of the Tecplot format see the Tecplot documentation.
 #
 Variables="x", "node_data", "cell_data"
-zone f=block, I=6
+zone f=feblock, n=6, e=3, et=lineseg
 0.50
 1.0
 0.0
