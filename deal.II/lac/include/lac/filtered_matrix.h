@@ -83,7 +83,7 @@ template <class VECTOR> class FilteredMatrixBlock;
  *
  *                     // set up a preconditioner object
  *   PreconditionJacobi<SparseMatrix<double> > prec;
- *   prec.initialize (filtered_A, 1.2);
+ *   prec.initialize (A, 1.2);
  *   FilteredMatrix<Vector<double> > filtered_prec (prec);
  *   filtered_prec.add_constraints (boundary_values);
  *
