@@ -126,7 +126,8 @@ void Flux(std::vector<std::vector<number> >  &flux,
                                // Pressure is a dependent variable: $p = 
                                // (\gamma - 1)(E-\frac{1}{2} \rho |v|^2)$.
     number rho_normVsqr;
-    for (int d0 = 0; d0 < dim; d0++) rho_normVsqr += W[d0]*W[d0];
+    for (unsigned int d0 = 0; d0 < dim; d0++)
+      rho_normVsqr += W[d0]*W[d0];
                                // Since W are $\rho v$, we get a $\rho^2$ in the
                                // numerator, so dividing a $\rho$ out gives the desired $ \rho |v|^2$.
     rho_normVsqr /= W[DENS_IDX];
@@ -135,8 +136,8 @@ void Flux(std::vector<std::vector<number> >  &flux,
 
                                // We compute the momentum terms.  We divide by the
                                // density here to get $v_i \rho v_j$
-    for (int d = 0; d < dim; d++) {
-      for (int d1 = 0; d1 < dim; d1++) {
+    for (unsigned int d = 0; d < dim; d++) {
+      for (unsigned int d1 = 0; d1 < dim; d1++) {
         flux[d][d1] = W[d]*W[d1]/W[DENS_IDX];
       }
                               // The pressure contribution, along the diagonal:
@@ -162,10 +163,10 @@ void LFNumFlux(
             const std::vector<std::vector<number> > &Wminus,
             double alpha)
 {
-  int n_q_points = points.size();
+  const unsigned int n_q_points = points.size();
 
                              // We evaluate the flux at each of the quadrature points.
-  for (int q = 0; q < n_q_points; q++) {
+  for (unsigned int q = 0; q < n_q_points; q++) {
     std::vector<std::vector<fad_double> > iflux(N_COMP,
                                 std::vector<fad_double>(dim, 0));
     std::vector<std::vector<fad_double> > oflux(N_COMP,
@@ -174,9 +175,9 @@ void LFNumFlux(
     Flux<number, dim>(iflux, points[q], Wplus[q]);
     Flux<number, dim>(oflux, points[q], Wminus[q]);
 
-    for (int di = 0; di < N_COMP; di++) {
+    for (unsigned int di = 0; di < N_COMP; di++) {
       nflux[q][di] = 0;
-      for (int d = 0; d < dim; d++) {
+      for (unsigned int d = 0; d < dim; d++) {
         nflux[q][di] += 0.5*(iflux[di][d] + oflux[di][d])*normals[q](d);
       }
         nflux[q][di] += 0.5*alpha*(Wplus[q][di] - Wminus[q][di]);
@@ -466,8 +467,8 @@ class ConsLaw
                                     // How often to create an output file.
     double output_step;
 
-    Epetra_CrsMatrix   *Matrix;
     Epetra_Map         *Map;
+    Epetra_CrsMatrix   *Matrix;
     Vector<double>      indicator;
  
                                    // Crank-Nicolson value
@@ -516,8 +517,8 @@ void ConsLaw<dim>::assemble_cell_term(
                                  // for this row, we will query for the sensitivities
                                  // to this variable and add them into the Jacobian.
   fad_double F_i;
-  int dofs_per_cell = fe_v.dofs_per_cell;
-  int n_q_points = fe_v.n_quadrature_points;
+  unsigned int dofs_per_cell = fe_v.dofs_per_cell;
+  unsigned int n_q_points = fe_v.n_quadrature_points;
 
                                  // We will define the dofs on this cell in these fad variables.
   std::vector<fad_double> DOF(dofs_per_cell);
@@ -555,7 +556,7 @@ void ConsLaw<dim>::assemble_cell_term(
                                   // calculations that reference these variables (either
                                   // directly or indirectly) will accumulate sensitivies
                                   // with respect to these dofs.
-  for (int in = 0; in < dofs_per_cell; in++) {
+  for (unsigned int in = 0; in < dofs_per_cell; in++) {
       DOF[in] = nlsolution(dofs[in]);
       DOF[in].diff(in, dofs_per_cell);
   }
@@ -566,16 +567,16 @@ void ConsLaw<dim>::assemble_cell_term(
                                   // but since we don't want to make the entire solution vector
                                   // fad types, only the local cell variables, we explicitly
                                   // code this loop;
-  for (int q = 0; q < n_q_points; q++) {
-    for (int di = 0; di < get_n_components(); di++) {
+  for (unsigned int q = 0; q < n_q_points; q++) {
+    for (unsigned int di = 0; di < get_n_components(); di++) {
       W[q][di] = 0;
       Wl[q][di] = 0;
       Wcn[q][di] = 0;
-      for (int d = 0; d < dim; d++) {
+      for (unsigned int d = 0; d < dim; d++) {
         Wgrads[q][di][d] = 0;
       }
     }
-    for (int sf = 0; sf < dofs_per_cell; sf++) {
+    for (unsigned int sf = 0; sf < dofs_per_cell; sf++) {
      int di = fe_v.get_fe().system_to_component_index(sf).first;
      W[q][di] +=
                 DOF[sf]*fe_v.shape_value_component(sf, q, di);
@@ -584,7 +585,7 @@ void ConsLaw<dim>::assemble_cell_term(
      Wcn[q][di] +=
                 (theta*DOF[sf]+(1-theta)*solution(dofs[sf]))*fe_v.shape_value_component(sf, q, di);
 
-     for (int d = 0; d < dim; d++) {
+     for (unsigned int d = 0; d < dim; d++) {
        Wgrads[q][di][d] += DOF[sf]*
                  fe_v.shape_grad_component(sf, q, di)[d];
      } // for d
@@ -634,7 +635,7 @@ void ConsLaw<dim>::assemble_cell_term(
           fad_double fdotgv = 0;
 
                                     // Integrate the flux times gradient of the test function
-          for (int d = 0; d < dim; d++) 
+          for (unsigned int d = 0; d < dim; d++) 
             fdotgv += flux[point][component_i][d]*fe_v.shape_grad_component(i, point, component_i)[d];
            
           F_i -= fdotgv*JxW[point];
@@ -646,7 +647,7 @@ void ConsLaw<dim>::assemble_cell_term(
 
                                    // Stabilization (cell wise diffusion)
           fad_double guv = 0;
-          for (int d = 0; d < dim; d++) {
+          for (unsigned int d = 0; d < dim; d++) {
             guv += fe_v.shape_grad_component(i, point, component_i)[d]*
                       Wgrads[point][component_i][d];
           }
@@ -721,25 +722,25 @@ void ConsLaw<dim>::assemble_face_term(
                                   // them.
   int ndofs = (boundary < 0 ? dofs_per_cell + ndofs_per_cell : dofs_per_cell);
                                   // Set the local DOFS.
-  for (int in = 0; in < dofs_per_cell; in++) {
+  for (unsigned int in = 0; in < dofs_per_cell; in++) {
       DOF[in] = nlsolution(dofs[in]);
       DOF[in].diff(in, ndofs);
   }
                                   // If present, set the neighbor dofs.
   if (boundary < 0)
-  for (int in = 0; in < ndofs_per_cell; in++) {
+  for (unsigned int in = 0; in < ndofs_per_cell; in++) {
       DOF[in+dofs_per_cell] = nlsolution(dofs_neighbor[in]);
       DOF[in+dofs_per_cell].diff(in+dofs_per_cell, ndofs);
   }
 
                                   // Set the values of the local conservative variables.
                                   // Initialize all variables to zero.
-  for (int q = 0; q < n_q_points; q++) {
-    for (int di = 0; di < get_n_components(); di++) {
+  for (unsigned int q = 0; q < n_q_points; q++) {
+    for (unsigned int di = 0; di < get_n_components(); di++) {
            Wplus[q][di] = 0;
            Wminus[q][di] = 0;
     }
-    for (int sf = 0; sf < dofs_per_cell; sf++) {
+    for (unsigned int sf = 0; sf < dofs_per_cell; sf++) {
      int di = fe_v.get_fe().system_to_component_index(sf).first;
      Wplus[q][di] +=
                 (theta*DOF[sf]+(1.0-theta)*solution(dofs[sf]))*fe_v.shape_value_component(sf, q, di);
@@ -750,7 +751,7 @@ void ConsLaw<dim>::assemble_face_term(
                                  // the exterior trace as a function of the other
                                  // cell degrees of freedom.
     if (boundary < 0) {
-      for (int sf = 0; sf < ndofs_per_cell; sf++) {
+      for (unsigned int sf = 0; sf < ndofs_per_cell; sf++) {
        int di = fe_v_neighbor.get_fe().system_to_component_index(sf).first;
        Wminus[q][di] +=
                 (theta*DOF[sf+dofs_per_cell]+(1.0-theta)*solution(dofs_neighbor[sf]))*
@@ -780,8 +781,8 @@ void ConsLaw<dim>::assemble_face_term(
 
                              // We loop the quadrature points, and we treat each
                              // component individualy.
-     for (int q = 0; q < n_q_points; q++) {
-      for (int di = 0; di < get_n_components(); di++) {
+     for (unsigned int q = 0; q < n_q_points; q++) {
+      for (unsigned int di = 0; di < get_n_components(); di++) {
 
                              // An inflow/dirichlet type of boundary condition
         if (bme->second.first[di] == INFLOW_BC) {
@@ -801,7 +802,7 @@ void ConsLaw<dim>::assemble_face_term(
           dens = bme->second.first[DENS_IDX] == INFLOW_BC ? bvals[q](DENS_IDX) :
                  Wplus[q][DENS_IDX];
 
-          for (int d=0; d < dim; d++) {
+          for (unsigned int d=0; d < dim; d++) {
             if (bme->second.first[d] == INFLOW_BC)
               rho_vel_sqr += bvals[q](d)*bvals[q](d);
             else
@@ -825,7 +826,7 @@ void ConsLaw<dim>::assemble_face_term(
                             // normal.  This creates sensitivies of across
                             // the velocity components.
           fad_double vdotn = 0;
-          for (int d = 0; d < dim; d++) {
+          for (unsigned int d = 0; d < dim; d++) {
             vdotn += Wplus[q][d]*normals[q](d);
           }
 
@@ -975,9 +976,6 @@ void ConsLaw<dim>::assemble_system (double &res_norm)
 
 				   // Now we start the loop over all
 				   // active cells.
-  int fdofs_per_cell = fe_v.dofs_per_cell;
-  int fn_q_points = face_quadrature.n_quadrature_points;
-
   unsigned int cell_no = 0;
   for (;cell!=endc; ++cell, ++cell_no) 
     {
@@ -1144,9 +1142,9 @@ ConsLaw<dim>::ConsLaw ()
                 T(0),
                 dT(0.05),
                 TF(10),
+                is_stationary(false),
                 Map(NULL),
                 Matrix(NULL),
-                is_stationary(false),
                 theta(0.5)
 {}
 
@@ -1228,9 +1226,9 @@ void ConsLaw<dim>::setup_system ()
                                    // one knows ahead of time the maxiumum number of
                                    // columns in any row entry.  We traverse the sparsity
                                    // to discover this.
-  int cur_row = 0;
-  int cur_col = 0;
-  int max_df = -1;
+  unsigned int cur_row = 0;
+  unsigned int cur_col = 0;
+  unsigned int max_df = -1;
   for (SparsityPattern::iterator s_i = sparsity_pattern.begin(); 
        s_i != sparsity_pattern.end(); s_i++) {
     if (s_i->row() != cur_row) {
@@ -1431,11 +1429,11 @@ void ConsLaw<dim>::postprocess() {
 
     const std::vector<double> &JxW = fe_v.get_JxW_values ();
 
-    for (int q = 0; q < fe_v.get_fe().base_element(0).n_dofs_per_cell(); q++) {
+    for (unsigned int q = 0; q < fe_v.get_fe().base_element(0).n_dofs_per_cell(); q++) {
       unsigned int didx = fe_v.get_fe().component_to_system_index(DENS_IDX, q);
       unsigned int eidx = fe_v.get_fe().component_to_system_index(ENERGY_IDX, q);
       double rho_normVsqr = 0;
-      for (int d = 0; d < dim; d++) {
+      for (unsigned int d = 0; d < dim; d++) {
         unsigned int vidx = fe_v.get_fe().component_to_system_index(d, q);
         ppsolution(dofs[vidx]) = solution(dofs[vidx])/solution(dofs[didx]);
         rho_normVsqr += solution(dofs[vidx])*solution(dofs[vidx]);
@@ -1450,7 +1448,7 @@ void ConsLaw<dim>::postprocess() {
         ppsolution(dofs[didx]) = solution(dofs[didx]);
       } else {
         double ng = 0;
-        for (int i = 0; i < dim; i++) ng += dU[q][DENS_IDX][i]*dU[q][DENS_IDX][i];
+        for (unsigned int i = 0; i < dim; i++) ng += dU[q][DENS_IDX][i]*dU[q][DENS_IDX][i];
         ng = std::sqrt(ng);
         ppsolution(dofs[didx]) = ng;
       }
@@ -1473,8 +1471,8 @@ void ConsLaw<dim>::estimate() {
 			     | update_q_points
 			     | update_JxW_values;
 
- QGauss<dim>  quadrature_formula(1);
- int n_q_points = quadrature_formula.n_quadrature_points;
+  QGauss<dim>  quadrature_formula(1);
+  unsigned int n_q_points = quadrature_formula.n_quadrature_points;
 
 
   FEValues<dim> fe_v (
@@ -1495,9 +1493,9 @@ void ConsLaw<dim>::estimate() {
     fe_v.get_function_grads(predictor, dU);
 
     indicator(cell_no) = 0;
-    for (int q = 0; q < n_q_points; q++) {
+    for (unsigned int q = 0; q < n_q_points; q++) {
       double ng = 0;
-      for (int d = 0; d < dim; d++) ng += dU[q][DENS_IDX][d]*dU[q][DENS_IDX][d];
+      for (unsigned int d = 0; d < dim; d++) ng += dU[q][DENS_IDX][d]*dU[q][DENS_IDX][d];
 
       indicator(cell_no) += std::log(1+std::sqrt(ng));
       
@@ -1650,7 +1648,7 @@ void ConsLaw<dim>::declare_parameters() {
 
 
                                   // Declare the boundary parameters
-  for (int b = 0; b < MAX_BD; b++) {
+  for (unsigned int b = 0; b < MAX_BD; b++) {
     char bd[512];
     std::sprintf(bd, "boundary_%d", b);
     prm.enter_subsection(bd);
@@ -1659,7 +1657,7 @@ void ConsLaw<dim>::declare_parameters() {
                        "<true|false>");
                                   // declare a slot for each of the conservative
                                   // variables.
-    for (int di = 0; di < N_COMP; di++) {
+    for (unsigned int di = 0; di < N_COMP; di++) {
       char var[512];
       std::sprintf(var, "w_%d", di);
       prm.declare_entry(var, "outflow",
@@ -1679,7 +1677,7 @@ void ConsLaw<dim>::declare_parameters() {
 
                                 // Initial condition block.
   prm.enter_subsection("initial condition");
-    for (int di = 0; di < N_COMP; di++) {
+    for (unsigned int di = 0; di < N_COMP; di++) {
       char var[512];
       std::sprintf(var, "w_%d", di);
       
@@ -1799,7 +1797,7 @@ void ConsLaw<dim>::load_parameters(const char *infile){
   prm.leave_subsection();
 
                    // The boundary info
-  for (int b = 0; b < MAX_BD; b++) {
+  for (unsigned int b = 0; b < MAX_BD; b++) {
     std::vector<bc_type> flags(N_COMP, OUTFLOW_BC);
 
                    // Define a parser for every boundary, though it may be
@@ -1812,7 +1810,7 @@ void ConsLaw<dim>::load_parameters(const char *infile){
     const std::string &nopen = prm.get("no penetration");
 
                     // Determine how each component is handled.
-    for (int di = 0; di < N_COMP; di++) {
+    for (unsigned int di = 0; di < N_COMP; di++) {
       char var[512];
       std::sprintf(var, "w_%d", di);
       std::string btype = prm.get(var);
@@ -1838,7 +1836,7 @@ void ConsLaw<dim>::load_parameters(const char *infile){
 
                      // Initial conditions.
    prm.enter_subsection("initial condition");
-    for (int di = 0; di < N_COMP; di++) {
+    for (unsigned int di = 0; di < N_COMP; di++) {
       char var[512];
 
       std::sprintf(var, "w_%d value", di);
@@ -1957,7 +1955,7 @@ void ConsLaw<dim>::run ()
                           // estimate, refine, and repeat until
                           // happy.
   if (refinement_params.refine != refinement_params_type::NONE)
-  for (int i = 0; i < refinement_params.shock_levels; i++) {
+  for (unsigned int i = 0; i < refinement_params.shock_levels; i++) {
     estimate();
     refine_grid();
     setup_system();
@@ -1995,8 +1993,8 @@ void ConsLaw<dim>::run ()
       std::cout << "NonLin Res:       Lin Iter     Lin Res" << std::endl;
       std::cout << "______________________________________" << std::endl;
 
-      int max_nonlin = 7;
-      int nonlin_iter = 0;
+      const unsigned int max_nonlin = 7;
+      unsigned int nonlin_iter = 0;
       double lin_res;
 
                              // <h6>Newton iteration</h6>
@@ -2029,7 +2027,10 @@ void ConsLaw<dim>::run ()
         std::printf("%-16.3e %04d        %-5.2e\n",
               res_norm, lin_iter, lin_res);
 
-        nonlin_iter++;
+        ++nonlin_iter;
+
+	AssertThrow (nonlin_iter <= max_nonlin,
+		     ExcMessage ("No convergence in nonlinear solver"));
       } 
 
                            // Various post convergence tasks.
