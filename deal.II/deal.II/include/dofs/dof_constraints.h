@@ -683,6 +683,26 @@ class ConstraintMatrix : public Subscriptor
 				      * Same function as above, but
 				      * condenses square compressed
 				      * sparsity patterns.
+				      *
+				      * Given the data structure used
+				      * by CompressedSparsityPattern,
+				      * this function becomes
+				      * quadratic in the number of
+				      * degrees of freedom for large
+				      * problems and can dominate
+				      * setting up linear systems when
+				      * several hundred thousand or
+				      * millions of unknowns are
+				      * involved and for problems with
+				      * many nonzero elements per row
+				      * (for example for vector-valued
+				      * problems or hp finite
+				      * elements). In this case, it is
+				      * advisable to use the
+				      * CompressedSetSparsityPattern
+				      * class instead, see for example
+				      * @ref step_27 "step-27" and
+				      * @ref step_31 "step-31".
 				      */
     void condense (CompressedSparsityPattern &sparsity) const;
 
@@ -698,6 +718,26 @@ class ConstraintMatrix : public Subscriptor
 				      * Same function as above, but
 				      * condenses square compressed
 				      * sparsity patterns.
+				      *
+				      * Given the data structure used
+				      * by BlockCompressedSparsityPattern,
+				      * this function becomes
+				      * quadratic in the number of
+				      * degrees of freedom for large
+				      * problems and can dominate
+				      * setting up linear systems when
+				      * several hundred thousand or
+				      * millions of unknowns are
+				      * involved and for problems with
+				      * many nonzero elements per row
+				      * (for example for vector-valued
+				      * problems or hp finite
+				      * elements). In this case, it is
+				      * advisable to use the
+				      * BlockCompressedSetSparsityPattern
+				      * class instead, see for example
+				      * @ref step_27 "step-27" and
+				      * @ref step_31 "step-31".
 				      */
     void condense (BlockCompressedSparsityPattern &sparsity) const;
 
