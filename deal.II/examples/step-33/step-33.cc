@@ -1295,18 +1295,13 @@ void ConsLaw<dim>::solve (Vector<double> &dsolution, int &niter, double &lin_res
   if (solver_params.SOLVER == solver_params_type::DIRECT) {
    
                                  // Setup for solving with
-                                 // Amesos.
+                                 // Amesos. Other solvers are
+                                 // available and may be selected by
+                                 // changing th string given to the
+                                 // <code>Create</code> function.
      Epetra_LinearProblem prob;
      prob.SetOperator(Matrix);
-     Amesos_BaseSolver *solver;
-     Amesos Factory;
-
-                                 // Other solvers are available
-                                 // and may be selected by changing this
-                                 // string.
-     char *stype = "Amesos_Klu";
-
-     solver = Factory.Create(stype, prob);
+     Amesos_BaseSolver *solver = Amesos().Create ("Amesos_Klu", prob);
 
      Assert (solver != NULL, ExcInternalError());
 

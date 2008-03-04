@@ -5255,7 +5255,7 @@ AC_DEFUN(DEAL_II_CONFIGURE_TRILINOS, dnl
         fi
      ])
 
-  dnl If we have found PETSc, determine and set additional pieces of data
+  dnl If we have found Trilinos, determine and set additional pieces of data
   if test "$USE_CONTRIB_TRILINOS" = "yes" ; then
     AC_DEFINE(DEAL_II_USE_TRILINOS, 1,
               [Defined if a Trilinos installation was found and is going
@@ -5281,7 +5281,8 @@ AC_DEFUN(DEAL_II_CONFIGURE_TRILINOS, dnl
 
 dnl ------------------------------------------------------------
 dnl Check whether the installed version of Trilinos uses shared
-dnl or static libs, or both
+dnl or static libs, or both. Produce an error if this doesn't
+dnl match the kind of libraries we produce here
 dnl
 dnl Usage: DEAL_II_CHECK_TRILINOS_SHARED_STATIC
 dnl
@@ -5310,6 +5311,19 @@ AC_DEFUN(DEAL_II_CHECK_TRILINOS_SHARED_STATIC, dnl
   if test "x${DEAL_II_TRILINOS_SHARED}${DEAL_II_TRILINOS_STATIC}" = "x" ; then
     AC_MSG_ERROR([Unable to determine whether Trilinos uses shared or
                   static libraries.])
+  fi
+
+
+  dnl Now make sure the Trilinos libs are of the same kind as the ones we
+  dnl produce here
+  if test "x$enableshared" = "xyes" -a "x$DEAL_II_TRILINOS_SHARED" != "xyes" ; then
+    AC_MSG_ERROR([When building deal.II with shared libraries, Trilinos also
+                  needs to be built with shared libraries])
+  fi
+
+  if test "x$enableshared" = "xno" -a "x$DEAL_II_TRILINOS_STATIC" != "xyes" ; then
+    AC_MSG_ERROR([When building deal.II with shared libraries, Trilinos also
+                  needs to be built with shared libraries])
   fi
 ])
 
