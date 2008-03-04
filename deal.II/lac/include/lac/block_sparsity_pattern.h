@@ -675,6 +675,8 @@ typedef BlockCompressedSparsityPattern CompressedBlockSparsityPattern;
  * BlockCompressedSetSparsityPattern) are interface-compatible it is
  * frequently worth checking which version is more efficient.
  *
+ * This class is used in @ref step_31 "step-31".
+ *
  * @author Wolfgang Bangerth, 2007
  */
 class BlockCompressedSetSparsityPattern : public BlockSparsityPatternBase<CompressedSetSparsityPattern>
