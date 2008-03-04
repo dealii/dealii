@@ -11849,6 +11849,22 @@ if test "x$with_petsc" != "x" -a "x$with_petsc" != "xno" ; then
 fi
 
 
+if test "x$with_trilinos" != "x" -a "x$with_trilinos" != "xno" ; then
+  if test "x$enableshared" = "xno" ; then
+    if test "x$with_blas" = "x" -o "x$with_blas" = "xno"; then
+      with_blas="yes"
+    fi
+    if test "x$with_lapack" = "x" -o "x$with_lapack" = "xno"; then
+      with_lapack="yes"
+    fi
+  fi
+fi
+
+
+
+
+
+
 
 # Check whether --with-blas was given.
 if test "${with_blas+set}" = set; then

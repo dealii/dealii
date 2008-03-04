@@ -455,6 +455,23 @@ if test "x$with_petsc" != "x" -a "x$with_petsc" != "xno" ; then
   esac
 fi
 
+
+dnl The same holds for Trilinos, which needs not only BLAS but also LAPACK
+if test "x$with_trilinos" != "x" -a "x$with_trilinos" != "xno" ; then
+  if test "x$enableshared" = "xno" ; then
+    if test "x$with_blas" = "x" -o "x$with_blas" = "xno"; then
+      with_blas="yes"
+    fi
+    if test "x$with_lapack" = "x" -o "x$with_lapack" = "xno"; then
+      with_lapack="yes"
+    fi
+  fi
+fi
+
+
+
+
+
 dnl -------------------------------------------------------------
 dnl Actually include libraries here. Check for the libraries
 dnl    requiring FORTRAN support first.
