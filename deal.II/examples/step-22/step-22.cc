@@ -335,8 +335,7 @@ InverseMatrix<Matrix,Preconditioner>::InverseMatrix (const Matrix &m,
 
 
 				 // This is the implementation of the 
-				 // <code>vmult</code> function. We note 
-				 // two things: 
+				 // <code>vmult</code> function.
                     
 				 // Note that we use a rather large
 				 // tolerance for the solver
