@@ -199,6 +199,15 @@ endif
 
 ifeq ($(USE_CONTRIB_TRILINOS),yes)
   INCLUDE += -I$(include-path-trilinos)
+
+  ifeq ($(enable-shared),yes)
+    lib-contrib-trilinos = $(shell echo $(DEAL_II_TRILINOS_DIR)/lib/*$(shared-lib-suffix))
+  else
+    lib-contrib-trilinos = $(shell echo $(DEAL_II_TRILINOS_DIR)/lib/*$(static-lib-suffix))
+  endif
+
+  lib-lac.g += $(lib-contrib-trilinos)
+  lib-lac.o += $(lib-contrib-trilinos)
 endif
 
 ifeq ($(USE_CONTRIB_METIS),yes)
