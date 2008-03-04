@@ -536,12 +536,20 @@ class BlockSparsityPattern : public BlockSparsityPatternBase<SparsityPattern>
  *
  * This class is an example of the "dynamic" type of @ref Sparsity.
  *
+ * <b>Note:</b> This class inherits the same tradeoffs regarding its
+ * efficiency as CompressedSparsityPattern and as opposed to
+ * CompressedSetSparsity. Since the two classes (and consequently
+ * BlockCompressedSparsityPattern and
+ * BlockCompressedSetSparsityPattern) are interface-compatible it is
+ * frequently worth checking which version is more efficient.
+ *
  * <b>Note:</b> This class used to be called
  * CompressedBlockSparsityPattern. However, since it's a block wrapper around
  * the CompressedSparsityPattern class, this is a misnomer and the class has
  * been renamed.
  *
  * <h3>Example</h3>
+ *
  * Usage of this class is very similar to CompressedSparsityPattern,
  * but since the use of block indices causes some additional
  * complications, we give a short example.
@@ -659,6 +667,13 @@ typedef BlockCompressedSparsityPattern CompressedBlockSparsityPattern;
  * the documentation of the BlockCompressedSparsityPattern for examples.
  *
  * This class is an example of the "dynamic" type of @ref Sparsity.
+ *
+ * <b>Note:</b> This class inherits the same tradeoffs regarding its
+ * efficiency as CompressedSparsityPattern and as opposed to
+ * CompressedSetSparsity. Since the two classes (and consequently
+ * BlockCompressedSparsityPattern and
+ * BlockCompressedSetSparsityPattern) are interface-compatible it is
+ * frequently worth checking which version is more efficient.
  *
  * @author Wolfgang Bangerth, 2007
  */

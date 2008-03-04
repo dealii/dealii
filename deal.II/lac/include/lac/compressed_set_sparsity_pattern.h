@@ -2,7 +2,7 @@
 //    $Id: compressed_sparsity_pattern.h 14038 2006-10-23 02:46:34Z bangerth $
 //    Version: $Name$
 //
-//    Copyright (C) 2001, 2002, 2003, 2004, 2005, 2006, 2007 by the deal.II authors
+//    Copyright (C) 2001, 2002, 2003, 2004, 2005, 2006, 2007, 2008 by the deal.II authors
 //
 //    This file is subject to QPL and may not be  distributed
 //    without copyright and license information. Please refer
@@ -50,8 +50,9 @@ template <typename number> class SparseMatrix;
  * of sparsity patterns can be found in the documentation of the @ref Sparsity
  * module.
  *
- * This class is an example of the "dynamic" type of @ref Sparsity. It is
- * discussed in the @ref step_27 "step-27" tutorial program.
+ * This class is an example of the "dynamic" type of @ref Sparsity. It
+ * is discussed in the @ref step_27 "step-27" and @ref step_31
+ * "step-31" tutorial programs.
  *
  * <h3>Interface</h3>
  *
@@ -84,15 +85,18 @@ template <typename number> class SparseMatrix;
  * This class is a variation of the CompressedSparsityPattern class.
  * Instead of using sorted vectors together with a caching algorithm
  * for storing the column indices of nonzero entries, the std::set
- * container is used. This solution might not be the fastest in
- * all situations, but seems to work much better than the
- * CompressedSparsityPattern in the context of hp-adaptivity.
- * On the other hand, a benchmark where nonzero entries were randomly inserted
- * into the sparsity pattern revealed that this class is slower
- * by a factor 4-6 in this situation. Hence, currently the suggestion
- * is to carefully analyze which of the CompressedSparsityPattern
- * classes works best in a certain setting. An algorithm which
- * performs equally well in all situations still has to be found.
+ * container is used. This solution might not be the fastest in all
+ * situations, but seems to work much better than the
+ * CompressedSparsityPattern in the context of hp-adaptivity (see for
+ * example @ref step_27 "step-27"), or generally when there are many
+ * nonzero entries in each row of a matrix (see @ref step_31
+ * "step-31").  On the other hand, a benchmark where nonzero entries
+ * were randomly inserted into the sparsity pattern revealed that this
+ * class is slower by a factor 4-6 in this situation. Hence, currently
+ * the suggestion is to carefully analyze which of the
+ * CompressedSparsityPattern classes works best in a certain
+ * setting. An algorithm which performs equally well in all situations
+ * still has to be found.
  *
  *
  * @author Oliver Kayser-Herold, 2007

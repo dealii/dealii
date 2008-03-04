@@ -2,7 +2,7 @@
 //    $Id$
 //    Version: $Name$
 //
-//    Copyright (C) 2001, 2002, 2003, 2004, 2005, 2006, 2007 by the deal.II authors
+//    Copyright (C) 2001, 2002, 2003, 2004, 2005, 2006, 2007, 2008 by the deal.II authors
 //
 //    This file is subject to QPL and may not be  distributed
 //    without copyright and license information. Please refer
@@ -79,10 +79,11 @@ template <typename number> class SparseMatrix;
  *
  * <h3>Notes</h3>
  *
- * A variation of this class is the CompressedSetSparsityPattern class that
- * appears to be more efficient in some situations, in particular when using
- * hp finite elements. See for example the @ref step_27 "step-27" tutorial
- * program.
+ * A variation of this class is the CompressedSetSparsityPattern class
+ * that appears to be more efficient in some situations, in particular
+ * when using hp finite elements or, more generally, in cases with
+ * many nonzero entries. See for example the @ref step_27 "step-27"
+ * and @ref step_31 "step-31" tutorial programs.
  *
  * @author Wolfgang Bangerth, 2001
  */
