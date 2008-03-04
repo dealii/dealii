@@ -1589,19 +1589,21 @@ void ConsLaw<dim>::output_results (const unsigned int cycle) const
 
   DataOut<dim> data_out;
   data_out.attach_dof_handler (dof_handler);
-  std::vector<std::string> solution_names;
+  std::vector<std::string> solution_names (dim, "velocity");
+  solution_names.push_back ("density");
+  solution_names.push_back ("pressure");
 
-                         // Rename the output with the physical variable
-                         // names.  Send the post-processed values.
-  solution_names.clear();
-  for (int i = 0; i < dim; i++) {
-    char buf[512];
-    std::sprintf(buf, "v_%d", i);
-    solution_names.push_back (buf);	    
-  }
-  solution_names.push_back("density");
-  solution_names.push_back("pressure");
-  data_out.add_data_vector (ppsolution, solution_names);
+  std::vector<DataComponentInterpretation::DataComponentInterpretation>
+    data_component_interpretation
+    (dim, DataComponentInterpretation::component_is_part_of_vector);
+  data_component_interpretation
+    .push_back (DataComponentInterpretation::component_is_scalar);
+  data_component_interpretation
+    .push_back (DataComponentInterpretation::component_is_scalar);
+  
+  data_out.add_data_vector (ppsolution, solution_names,
+			    DataOut<dim>::type_dof_data,
+			    data_component_interpretation);
 
   data_out.add_data_vector (indicator, "error");
   data_out.build_patches ();
