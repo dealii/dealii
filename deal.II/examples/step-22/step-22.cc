@@ -581,37 +581,92 @@ void StokesProblem<dim>::setup_dofs ()
 				   // sparsity pattern for the system
 				   // matrix we will create. We could
 				   // do this in the same way as in
-				   // step-20, though there is a major
-				   // reason not to do so. In 3D, the
-				   // function
-				   // <code>DoFTools::max_couplings_between_dofs</code>
-				   // yields a conservative, large
-				   // number for the coupling between
-				   // the individual dofs, so that the
-				   // memory initially provided for
-				   // the creation of the sparsity
-				   // pattern of the matrix is far too
-				   // much -- so much actually that
-				   // the initial sparsity pattern
-				   // won't even fit into the physical
-				   // memory of most systems already
-				   // for moderately-sized 3D
-				   // problems, see also the
-				   // discussion in step-18.  Instead,
-				   // we use a temporary object of the
-				   // class
-				   // BlockCompressedSparsityPattern,
-				   // which is a block version of the
-				   // compressed sparsity patterns
-				   // from step-11 and step-18. All
-				   // this is done inside a new scope,
-				   // which means that the memory of
+				   // step-20, i.e. directly build an
+				   // object of type SparsityPattern
+				   // through
+				   // DoFTools::make_sparsity_pattern. However,
+				   // there is a major reason not to
+				   // do so: In 3D, the function
+				   // DoFTools::max_couplings_between_dofs
+				   // yields a conservative but rather
+				   // large number for the coupling
+				   // between the individual dofs, so
+				   // that the memory initially
+				   // provided for the creation of the
+				   // sparsity pattern of the matrix
+				   // is far too much -- so much
+				   // actually that the initial
+				   // sparsity pattern won't even fit
+				   // into the physical memory of most
+				   // systems already for
+				   // moderately-sized 3D problems,
+				   // see also the discussion in
+				   // step-18.  Instead, we first
+				   // build a temporary object that
+				   // uses a different data structure
+				   // that doesn't require allocating
+				   // more memory than necessary but
+				   // isn't suitable for use as a
+				   // basis of SparseMatrix or
+				   // BlockSparseMatrix objects; in a
+				   // second step we then copy this
+				   // object into an object of
+				   // BlockSparsityPattern. This is
+				   // entirely analgous to what we
+				   // already did in step-11 and
+				   // step-18.
+				   //
+				   // There is one snag again here,
+				   // though: just as in step-27, it
+				   // turns out that using the
+				   // CompressedSparsityPattern (or
+				   // the block version
+				   // BlockCompressedSparsityPattern
+				   // we would use here) turns out to
+				   // have a bottleneck that makes the
+				   // algorithm to build the sparsity
+				   // pattern be quadratic in the
+				   // number of degrees of
+				   // freedom. This doesn't become
+				   // noticable until we get well into
+				   // the range of several 100,000
+				   // degrees of freedom, but
+				   // eventually dominates the setup
+				   // of the linear system when we get
+				   // to more than a million degrees
+				   // of freedom. This is due to the
+				   // data structures used in the
+				   // CompressedSparsityPattern class,
+				   // nothing that can easily be
+				   // changed. Fortunately, there is
+				   // an easy solution, as already
+				   // pointed out in step-27: the
+				   // CompressedSetSparsityPattern
+				   // class (and its block variant
+				   // BlockCompressedSetSparsityPattern)
+				   // has exactly the same interface,
+				   // uses a different internal data
+				   // structure, is slightly slower
+				   // for smaller numbers of degrees
+				   // of freedom (but there we don't
+				   // care that much anyway) but is
+				   // linear in the number of degrees
+				   // of freedom and therefore much
+				   // more efficient for large
+				   // problems.
+				   //
+				   // Consequently, this is the class
+				   // that we will use for our
+				   // intermediate sparsity
+				   // representation. All this is done
+				   // inside a new scope, which means
+				   // that the memory of
 				   // <code>csp</code> will be
 				   // released once the information
 				   // has been copied to
 				   // <code>sparsity_pattern</code>.
   {
-    BlockCompressedSparsityPattern csp (2,2);
+    BlockCompressedSetSparsityPattern csp (2,2);
 
     csp.block(0,0).reinit (n_u, n_u);
     csp.block(1,0).reinit (n_p, n_u);
