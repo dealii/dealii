@@ -17,14 +17,10 @@
  
                                   // <h4>Include files</h4>
 
-                                  // Aztecoo require mpi (even though we run on only
-                                  // one processor in this example).
-#include <mpi.h>
-
                                  // Here we have the necessary TRILINOS includes.
                                  //
                                  // Epetra is the basic trilinos vector/matrix library.
-#include <Epetra_MpiComm.h>
+#include <Epetra_SerialComm.h>
 #include <Epetra_Map.h>
 #include <Epetra_CrsGraph.h>
 #include <Epetra_CrsMatrix.h>
@@ -86,13 +82,15 @@
                                 // Introduce the dealii library into the current namespace.
 using namespace dealii;
 
+#define DIMENSION 2
+
                                 // We define a shorter name for the automatic differentiation
                                 // type.
 typedef Sacado::Fad::DFad<double> fad_double;
 typedef unsigned int UInt;
                                 // The Epetra library requires a 'communicator', which describes
                                 // the layout of a parallel (or serial) set of processors.
-Epetra_MpiComm *Comm;
+Epetra_SerialComm *Comm;
 
                                 // <h4>Flux function definition</h4>
                                 // Here we define the flux function for this system of conservation
@@ -1936,10 +1934,9 @@ void ConsLaw<dim>::run ()
   GridIn<dim> grid_in;
   grid_in.attach_triangulation(triangulation);
   std::cout << "Opening mesh <" << mesh << ">" << std::endl;
-  std::ifstream input_file(mesh.c_str(), std::ios::in);
+  std::ifstream input_file(mesh.c_str());
 
-  Assert (infile,
-	  ExcFileNotOpen());
+  Assert (input_file, ExcFileNotOpen(mesh.c_str()));
 
   grid_in.read_ucd(input_file);   
   input_file.close();
@@ -2067,8 +2064,7 @@ void ConsLaw<dim>::run ()
 int main (int argc, char *argv[]) 
 {
 
-  MPI_Init(&argc, &argv);
-  Comm = new Epetra_MpiComm(MPI_COMM_WORLD);
+  Comm = new Epetra_SerialComm();
 
   if (argc != 2) {
     std::cout << "Usage:" << argv[0] << " infile" << std::endl;
