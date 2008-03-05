@@ -4,7 +4,7 @@
 (This program was contributed by Martin Kronbichler and Wolfgang Bangerth.)
 
 This program deals with the Stokes system of equations which reads as
-follows in their non-dimensionalized form:
+follows in non-dimensionalized form:
 @f{eqnarray*}
   -\textrm{div}\; \varepsilon(\textbf{u}) + \nabla p &=& \textbf{f},
   \\
@@ -151,7 +151,9 @@ possibilities for imposing boundary conditions:
     appear in the weak form.
  
     It is noteworthy that if we impose Dirichlet boundary values on the entire
-    boundary, then the pressure is only determined up to a constant.
+    boundary, then the pressure is only determined up to a constant. An
+    algorithmic realization of that would use similar tools as have been seen in
+    step-11.
 
 <li>Neumann-type or natural boundary conditions: On the rest of the boundary
     $\Gamma_N=\partial\Omega\backslash\Gamma_D$, let us re-write the
@@ -273,8 +275,8 @@ Q$.
 These equations represent a symmetric saddle point problem. It is well known
 that then a solution only exists if the function spaces in which we search for
 a solution have to satisfy certain conditions, typically referred to as the
-Babuska-Brezzi or Ladyzhenskaya-Babuska-Brezzi (LBB) conditions. The function
-spaces above satisfy them. However, when we discretize the equations by
+Babuska-Brezzi or Ladyzhenskaya-Babuska-Brezzi (LBB) conditions. The continuous
+function spaces above satisfy them. However, when we discretize the equations by
 replacing the continuous variables and test functions by finite element
 functions in finite dimensional spaces $\textbf V_{g,h}\subset \textbf V_g,
 Q_h\subset Q$, we have to make sure that $\textbf V_h,Q_h$ also satisfy the LBB
@@ -376,12 +378,12 @@ corresponds to the operator $-\textrm{div} (-\textrm{div} \nabla^s)^{-1}
 \nabla$ on the pressure space; forgetting about the fact that we deal with
 symmetric gradients instead of the regular one, the Schur complement is
 something like $-\textrm{div} (-\textrm{div} \nabla)^{-1} \nabla =
--\textrm{div} (-\Delta)^{-1} \nabla$, which even if not mathematically
+-\textrm{div} (-\Delta)^{-1} \nabla$, which, even if not mathematically
 entirely concise, is spectrally equivalent to the identity operator (a
 heuristic argument would be to commute the operators into
 $-\textrm{div}(-\Delta)^{-1} \nabla = -\textrm{div}\nabla(-\Delta)^{-1} =
 -\Delta(-\Delta)^{-1} = \mathbf 1$). It turns out that it isn't easy to solve
-this Schur complement in a straightforward way with the CG method, however:
+this Schur complement in a straightforward way with the CG method:
 using no preconditioner, the condition number of the Schur complement matrix
 depends on the size ratios of the largest to the smallest cells, and one still
 needs on the order of 50-100 CG iterations. However, there is a simple cure:
@@ -427,7 +429,7 @@ While the outer preconditioner has become simpler compared to the
 mixed Laplace case discussed in @ref step_20 "step-20", the issue of
 the inner solver has become more complicated. In the mixed Laplace
 discretization, the Schur complement has the form $B^TM^{-1}B$. Thus,
-every time we multiply with the Schur complement, we had to solve a
+every time we multiplied with the Schur complement, we had to solve a
 linear system $M_uz=y$; this isn't too complicated there, however,
 since the mass matrix $M_u$ on the pressure space is well-conditioned.
 
@@ -467,7 +469,7 @@ very large %numbers of unknowns in the high 100,000s or more.)
 
 The situation changes in 3d, because there we quickly have many more
 unknowns and the bandwidth of matrices (which determines the number of
-nonzero entries in sparse LU factors) is ${\cal O}(N^{2/3)$, and there
+nonzero entries in sparse LU factors) is ${\cal O}(N^{2/3})$, and there
 are many more entries per row as well. This makes using a sparse
 direct solver such as UMFPACK inefficient: only for problem sizes of a
 few 10,000 to maybe 100,000 unknowns can a sparse decomposition be
@@ -523,8 +525,8 @@ The domain, right hand side and boundary conditions we implement below relate
 to a problem in geophysics: there, one wants to compute the flow field of
 magma in the earth's interior under a mid-ocean rift. Rifts are places where
 two continental plates are very slowly drifting apart (a few centimeters per
-year at most), leaving a crack in the earth crust that is filled from below
-with magma. Without trying to be entirely realistic, we model this situation
+year at most), leaving a crack in the earth crust that is filled with magma
+from below. Without trying to be entirely realistic, we model this situation
 by solving the following set of equations and boundary conditions on the
 domain $\Omega=[-2,2]\times[0,1]\times[-1,0]$:
 @f{eqnarray*}

@@ -190,9 +190,7 @@ we refine the mesh. Nevertheless, the compute time increases
 significantly: for each of the iterations above separately, it takes a
 few seconds, a few seconds, 1min, 5min, 29min, 3h12min, and 21h39min
 for the finest level with more than 4.5 million unknowns. This
-superlinear (in the number of unknowns) increase is due to first the
-superlinear number of operations to compute the ILU decomposition, and
-secondly the fact
+superlinear (in the number of unknowns) increase is due to the fact
 that our inner solver is not ${\cal O}(N)$: a simple experiment shows
 that as we keep refining the mesh, the average number of
 ILU-preconditioned CG iterations to invert the velocity-velocity block
@@ -325,31 +323,31 @@ is not a good choice in 3D - a full decomposition needs many new entries that
 
 We have seen in the section of computational results that the number of outer
 iterations does not depend on the mesh size, which is optimal in a sense of
-scalability. This does, however, not apply to the solver as a whole:
-we did not look at the number of inner iterations when generating the inverse of
+scalability. This does, however, not apply to the solver as a whole, as
+mentioned above:
+We did not look at the number of inner iterations when generating the inverse of
 the matrix $A$ and the mass matrix $M_p$. Of course, this is unproblematic in
 the 2D case where we precondition $A$ with a direct solver and the
 <code>vmult</code> operation of the inverse matrix structure will converge in
-one single CG step, but this changes in 3D where we need to apply the ILU
+one single CG step, but this changes in 3D where we only use an ILU
 preconditioner.  There, the number of required preconditioned CG steps to
-invert $A$ increases as the mesh is refined. For 
-the 3D results obtained above, each <code>vmult</code> operation involves
-on average approximately 14, 23, 36, 59, 72, 101, ... inner CG iterations in
-the refinement steps shown above. (On the other hand,
+invert $A$ increases as the mesh is refined, and each <code>vmult</code> 
+operation involves on average approximately 14, 23, 36, 59, 72, 101, ... inner
+CG iterations in the refinement steps shown above. (On the other hand,
 the number of iterations for applying the inverse pressure mass matrix is
 always about 5-6, both in two and three dimensions.)  To summarize, most work 
 is spent on solving linear systems with the same matrix $A$ over and over again.
-What makes this appear even worse is the fact that we 
+What makes this look even worse is the fact that we 
 actually invert a matrix that is about 95 precent the size of the total system
 matrix and stands for 85 precent of the non-zero entries in the sparsity
 pattern. Hence, the natural question is whether it is reasonable to solve a
-system with matrix $A$ about 15 times when calculating the solution to the
-block system.
+linear system with matrix $A$ for about 15 times when calculating the solution 
+to the block system.
   
 The answer is, of course, that we can do that in a few other (most of the time
 better) ways.
 Nevertheless, it has to be remarked that an indefinite system as the one
-resulting from the discretization of the Stokes problem puts indeed much higher
+at hand puts indeed much higher
 demands on the linear algebra than standard elliptic problems as we have seen
 in the early tutorial programs. The improvements are still rather 
 unsatisfactory, if one compares with an elliptic problem of similar size.
@@ -368,7 +366,7 @@ can be avoided. If we persist in calculating the Schur complement, there is no
 other possibility.
 
 The alternative is to attack the block system at one time and use an approximate
-Schur complement as an efficient preconditioner. The basic idea is as
+Schur complement as efficient preconditioner. The basic idea is as
 follows: If we find a block preconditioner $P$ such that the matrix
 @f{eqnarray*}
   P^{-1}\left(\begin{array}{cc}
@@ -382,9 +380,7 @@ few iterations. Using the Schur complement $S = B A^{-1} B^T$, one finds that
   = 
   \left(\begin{array}{cc}
     A^{-1} & 0 \\ S^{-1} B A^{-1} & -S^{-1}
-  \end{array}\right)\cdot \left(\begin{array}{cc}
-    A & B^T \\ B & 0
-  \end{array}\right) 
+  \end{array}\right)
 @f}
 would appear to be a good choice since
 @f{eqnarray*}
@@ -405,18 +401,17 @@ would appear to be a good choice since
 This is the approach taken by the paper by Silvester and Wathen referenced to
 in the introduction. In this case, a Krylov-based iterative method would 
 converge in two steps if exact inverses of $A$ and $S$ were applied, since
-there are only two distinct eigenvalues 0 and 1 of the matrix. We shall discuss
-below which solver is adequate for this problem.
+there are only two distinct eigenvalues 0 and 1 of the matrix. Below, we will
+discuss the choice of an adequate solver for this problem. First, we are going
+to have a closer look at the implementation of the preconditioner.
 
-Since $P$ is aimed to be a preconditioner only, we shall only use
-approximations to the inverse of the Schur complement $S$ and the matrix $A$.
-
-Hence, an improved solver for the Stokes system is going to look like the 
-following: The Schur
+Since $P$ is aimed to be a preconditioner only, we shall use approximations to 
+the inverse of the Schur complement $S$ and the matrix $A$. Hence, the Schur
 complement will be approximated by the pressure mass matrix $M_p$, and we use
-a preconditioner to $A$ (without an InverseMatrix class around it) to
-approximate $A^{-1}$. This two-component system builds a preconditioner for
-the block system. Here comes the class that implements the block Schur
+a preconditioner to $A$ (without an InverseMatrix class around it) for
+approximating $A^{-1}$.
+
+Here comes the class that implements the block Schur
 complement preconditioner. The <code>vmult</code> operation for block vectors
 according to the derivation above can be specified by three successive
 operations:
@@ -476,8 +471,8 @@ void BlockSchurPreconditioner<PreconditionerA, PreconditionerMp>::vmult (
 }
 @endcode
 
-Since we act on the whole block system now, we also have to live with one
-disadvantage, though: we need to perform the solver iterations on
+Since we act on the whole block system now, we have to live with one
+disadvantage: we need to perform the solver iterations on
 the full block system instead of the smaller pressure space.
 
 Now we turn to the question which solver we should use for the block
@@ -487,8 +482,8 @@ be solved with CG since it is neither positive definite nor symmetric.
 The deal.II libraries implement several solvers that are appropriate for the
 problem at hand. One choice is the solver @ref SolverBicgstab "BiCGStab", which
 was used for the solution of the unsymmetric advection problem in step-9. The
-second option, the one we are going to choose, is @ref SolverGMRES "GMRES
-(generalized minimum residual)". Both methods have their advantages - there
+second option, the one we are going to choose, is @ref SolverGMRES "GMRES"
+(generalized minimum residual). Both methods have their pros and cons - there
 are problems where one of the two candidates clearly outperforms the other, and 
 vice versa.
 <a href="http://en.wikipedia.org/wiki/GMRES#Comparison_with_other_solvers">Wikipedia</a>'s 
@@ -501,13 +496,16 @@ to perform hundreds of iterations on the block system for large problem sizes
 (we won't beat CG!). Actually, this disfavors GMRES: During the GMRES
 iterations, a basis of Krylov vectors is successively build up and some
 operations are performed on these vectors. The more vectors are in this basis, 
-the more operations and memory will be needed. To not let these demands grow
-excessively, deal.II limits the size of the basis to 30 vectors by default.
+the more operations and memory will be needed. The number of operations scales
+as ${\cal O}(n + k^2)$ and memory as ${\cal O}(kn)$, where $k$ is the number of 
+vectors in the Krylov basis and $n$ the size of the (block) matrix.
+To not let these demands grow excessively, deal.II limits the size $k$ of the
+basis to 30 vectors by default.
 Then, the basis is rebuilt. This implementation of the GMRES method is called
-GMRES(k), where $k$ is 30 in our case. What we have gained by this restriction, 
-namely bounded operations and memory requirements, will be compensated by
+GMRES(k), with default $k=30$. What we have gained by this restriction, 
+namely a bound on operations and memory requirements, will be compensated by
 the fact that we use an incomplete basis - this will increase the number of
-required iterations.
+required iterations. 
 
 BiCGStab, on the other hand, won't get slower when many iterations are needed
 (one iteration uses only results from one preceeding step and
@@ -518,24 +516,25 @@ this problem: The preconditioner applies the inverse of the pressure
 mass matrix by using the InverseMatrix class. Since the application of the
 inverse matrix to a vector is done only in approximative way (an exact inverse
 is too expensive), this will also affect the solver. In the case of BiCGStab, 
-the Krylov vectors will not be orthogonal due to this perturbation. While
+the Krylov vectors will not be orthogonal due to that perturbation. While
 this is uncritical for a small number of steps (up to about 50), it ruins the
 performance of the solver when these perturbations have grown to a significant
 magnitude in the coarse of iterations.
 
-Some experiments with BiCGStab have been performed and it was found to
-be faster than GMRES up to refinement cycle 3 (in 3D), but became very slow 
+We did some experiments with BiCGStab and found it to
+be faster than GMRES up to refinement cycle 3 (in 3D), but it became very slow 
 for cycles 5 and 6 (even slower than the original Schur complement), so the
 solver is useless in this situation. Choosing a sharper tolerance for the
 inverse matrix class (<code>1e-10*src.l2_norm()</code> instead of 
 <code>1e-6*src.l2_norm()</code>) made BiCGStab perform well also for cycle 4, 
-but did not change the failure on the very large systems.
+but did not change the failure on the very large problems.
 
 GMRES is of course also effected by the approximate inverses, but it is not as
 sensitive to orthogonality and retains a relatively good performance also for
 large sizes, see the results below.
 
-With this said, we turn to the realization of the solver call with GMRES:
+With this said, we turn to the realization of the solver call with GMRES with 
+$k=80$ temporary vectors:
 
 @code
       SparseMatrix<double> pressure_mass_matrix;
@@ -556,8 +555,12 @@ With this said, we turn to the realization of the solver call with GMRES:
       
       SolverControl solver_control (system_matrix.m(),
                                     1e-6*system_rhs.l2_norm());
+      GrowingVectorMemory<BlockVector<double> > vector_memory;
+      SolverGMRES<BlockVector<double> >::AdditionalData gmres_data;
+      gmres_data.max_n_tmp_vectors = 80;
       
-      SolverGMRES<BlockVector<double> > gmres(solver_control);
+      SolverGMRES<BlockVector<double> > gmres(solver_control, vector_memory,
+                                              gmres_data);
       
       gmres.solve(system_matrix, solution, system_rhs,
                   preconditioner);
@@ -731,8 +734,8 @@ Refinement cycle 5
 @endcode
 
 Here, the block preconditioned solver is clearly superior to the Schur
-complement, but the advantage gets less for more mesh points. This was expected 
-- see the discussion above. It is still necessary to invert the
+complement, but the advantage gets less for more mesh points. This was expected
+from the discussion above. It is still necessary to invert the
 mass matrix iteratively, which means more work if we need more (outer)
 iterations. It is also apparent that GMRES scales worse with the problem size
 than CG (as explained above).
