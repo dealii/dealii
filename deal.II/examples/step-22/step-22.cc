@@ -349,8 +349,8 @@ InverseMatrix<Matrix,Preconditioner>::InverseMatrix (const Matrix &m,
 				 // only use this class as a
 				 // preconditioner for the Schur
 				 // complement, but also when forming
-				 // the inverse of the Laplace matrix
-				 // - which has to be accurate in
+				 // the inverse of the Laplace matrix -
+				 // which needs to be accurate in
 				 // order to obtain a solution to the
 				 // right problem.
 template <class Matrix, class Preconditioner>
@@ -622,8 +622,8 @@ void StokesProblem<dim>::setup_dofs ()
 				   // CompressedSparsityPattern (or
 				   // the block version
 				   // BlockCompressedSparsityPattern
-				   // we would use here) turns out to
-				   // have a bottleneck that makes the
+				   // we would use here)
+				   // has a bottleneck that makes the
 				   // algorithm to build the sparsity
 				   // pattern be quadratic in the
 				   // number of degrees of
