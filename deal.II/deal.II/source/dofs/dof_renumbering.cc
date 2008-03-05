@@ -208,6 +208,26 @@ Cuthill_McKee (DH&              dof_handler,
 	       const bool       reversed_numbering,
 	       const bool       use_constraints)
 {
+  std::vector<unsigned int> renumbering(dof_handler.n_dofs(),
+					DH::invalid_dof_index);
+  compute_Cuthill_McKee(renumbering, dof_handler, reversed_numbering,
+			use_constraints);
+
+				   // actually perform renumbering;
+				   // this is dimension specific and
+				   // thus needs an own function
+  dof_handler.renumber_dofs (renumbering);
+}
+
+
+template <class DH>
+void
+DoFRenumbering::boost::
+compute_Cuthill_McKee (std::vector<unsigned int>& new_dof_indices,
+		       const DH        &dof_handler,
+		       const bool       reversed_numbering,
+		       const bool       use_constraints)
+{
   types::Graph
     graph(dof_handler.n_dofs());
   types::property_map<types::Graph,types::vertex_degree_t>::type
@@ -230,11 +250,12 @@ Cuthill_McKee (DH&              dof_handler,
 				    get(::boost::vertex_color, graph),
 				    make_degree_map(graph));
     
-  std::vector<unsigned int> perm(num_vertices(graph));
   for (types::size_type c = 0; c != inv_perm.size(); ++c)
-    perm[index_map[inv_perm[c]]] = c;
+    new_dof_indices[index_map[inv_perm[c]]] = c;
 
-  dof_handler.renumber_dofs (perm);
+  Assert (std::find (new_dof_indices.begin(), new_dof_indices.end(),
+		     DH::invalid_dof_index) == new_dof_indices.end(),
+	  ExcInternalError());
 }
 
 
@@ -1619,7 +1640,15 @@ compute_subdomain_wise (std::vector<unsigned int> &new_dof_indices,
 
 
 // explicit instantiations
-template void DoFRenumbering::boost::Cuthill_McKee (DoFHandler<deal_II_dimension> &, bool, bool);
+//TODO[WB]: also implement the following boost functions for hp DoFHandlers etc.
+template
+void
+DoFRenumbering::boost::Cuthill_McKee (DoFHandler<deal_II_dimension> &, bool, bool);
+
+template
+void
+DoFRenumbering::boost::compute_Cuthill_McKee (std::vector<unsigned int> &,
+					      const DoFHandler<deal_II_dimension> &, bool, bool);
 
 
 template
