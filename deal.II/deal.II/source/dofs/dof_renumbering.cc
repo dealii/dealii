@@ -2,7 +2,7 @@
 //    $id$
 //    Version: $name$
 //
-//    Copyright (C) 1999, 2000, 2001, 2002, 2003, 2004, 2005, 2006, 2007 by the deal.II authors
+//    Copyright (C) 1999, 2000, 2001, 2002, 2003, 2004, 2005, 2006, 2007, 2008 by the deal.II authors
 //
 //    This file is subject to QPL and may not be  distributed
 //    without copyright and license information. Please refer
@@ -34,6 +34,13 @@
 #include <multigrid/mg_dof_handler.h>
 #include <multigrid/mg_dof_accessor.h>
 #include <multigrid/mg_tools.h>
+
+#include <boost/config.hpp>
+#include <boost/graph/adjacency_list.hpp>
+#include <boost/graph/cuthill_mckee_ordering.hpp>
+#include "boost/graph/minimum_degree_ordering.hpp"
+#include <boost/graph/properties.hpp>
+#include <boost/graph/bandwidth.hpp>
 
 #include <vector>
 #include <map>
@@ -140,6 +147,98 @@ struct CompareDownstream
     const Point<dim> dir;
 };
 
+
+namespace types
+{
+  using namespace boost;
+  using namespace std;
+
+  typedef vecS x;
+    
+  typedef adjacency_list<vecS, vecS, undirectedS, 
+			 property<vertex_color_t, default_color_type,
+				  property<vertex_degree_t,int> > > Graph;
+  typedef graph_traits<Graph>::vertex_descriptor Vertex;
+  typedef graph_traits<Graph>::vertices_size_type size_type;
+
+  typedef std::pair<size_type, size_type> Pair;
+}
+  
+
+namespace
+{
+  template <class DH>
+  void create_graph (const DH                                                       &dof_handler,
+		     const bool                                                      use_constraints,
+		     types::Graph                                                   &graph,
+		     types::property_map<types::Graph,types::vertex_degree_t>::type &graph_degree)
+  {
+    Assert (use_constraints == false, ExcNotImplemented());
+    
+    std::vector<unsigned int> dofs_on_this_cell;
+    dofs_on_this_cell.reserve (DoFTools::max_dofs_per_cell(dof_handler));
+    typename DH::active_cell_iterator cell = dof_handler.begin_active(),
+				      endc = dof_handler.end();
+    for (; cell!=endc; ++cell) 
+      {
+	const unsigned int dofs_per_cell = cell->get_fe().dofs_per_cell;
+	dofs_on_this_cell.resize (dofs_per_cell);
+	cell->get_dof_indices (dofs_on_this_cell);
+
+	for (unsigned int i=0; i<dofs_per_cell; ++i)
+	  for (unsigned int j=0; j<dofs_per_cell; ++j)
+	    add_edge(dofs_on_this_cell[i], dofs_on_this_cell[j], graph);
+      }
+
+
+    types::graph_traits<types::Graph>::vertex_iterator ui, ui_end;
+
+    graph_degree = get(boost::vertex_degree, graph);
+    for (boost::tie(ui, ui_end) = vertices(graph); ui != ui_end; ++ui)
+      graph_degree[*ui] = degree(*ui, graph);
+
+  }
+}
+
+  
+template <class DH>
+void
+DoFRenumbering::boost::
+Cuthill_McKee (DH&              dof_handler,
+	       const bool       reversed_numbering,
+	       const bool       use_constraints)
+{
+  types::Graph
+    graph(dof_handler.n_dofs());
+  types::property_map<types::Graph,types::vertex_degree_t>::type
+    graph_degree;
+
+  create_graph (dof_handler, use_constraints, graph, graph_degree);
+    
+  types::property_map<types::Graph, types::vertex_index_t>::type
+    index_map = get(::boost::vertex_index, graph);
+
+
+  std::vector<types::Vertex> inv_perm(num_vertices(graph));
+
+  if (reversed_numbering == false)
+    ::boost::cuthill_mckee_ordering(graph, inv_perm.rbegin(),
+				    get(::boost::vertex_color, graph),
+				    make_degree_map(graph));
+  else
+    ::boost::cuthill_mckee_ordering(graph, inv_perm.begin(),
+				    get(::boost::vertex_color, graph),
+				    make_degree_map(graph));
+    
+  std::vector<unsigned int> perm(num_vertices(graph));
+  for (types::size_type c = 0; c != inv_perm.size(); ++c)
+    perm[index_map[inv_perm[c]]] = c;
+
+  dof_handler.renumber_dofs (perm);
+}
+
+
+  
 
 
 template <class DH>
@@ -1520,6 +1619,9 @@ compute_subdomain_wise (std::vector<unsigned int> &new_dof_indices,
 
 
 // explicit instantiations
+template void DoFRenumbering::boost::Cuthill_McKee (DoFHandler<deal_II_dimension> &, bool, bool);
+
+
 template
 void DoFRenumbering::Cuthill_McKee<DoFHandler<deal_II_dimension> >
 (DoFHandler<deal_II_dimension>&,

@@ -214,6 +214,59 @@ class DoFRenumbering
 {
   public:
 				     /**
+				      * A namespace for the
+				      * implementation of some
+				      * renumbering algorithms based
+				      * on algorithms implemented in
+				      * the Boost Graph Library (BGL)
+				      * by Jeremy Siek and others.
+				      *
+				      * While often slight slower to
+				      * compute, the algorithms using
+				      * often lead to matrices with
+				      * smaller bandwidths and sparse
+				      * ILUs based on this numbering
+				      * are therefore more efficient.
+				      */
+    class boost
+    {
+      public:
+					 /**
+					  * Renumber the degrees of
+					  * freedom according to the
+					  * Cuthill-McKee method,
+					  * eventually using the reverse
+					  * numbering scheme.
+					  *
+					  * See the general
+					  * documentation of the
+					  * parent class for details
+					  * on the different methods.
+					  */
+	template <class DH>
+	static void 
+	Cuthill_McKee (DH&                              dof_handler,
+		       const bool                       reversed_numbering = false,
+		       const bool                       use_constraints    = false);
+
+					 /**
+					  * Computes the renumbering
+					  * vector needed by the
+					  * Cuthill_McKee() function. Does
+					  * not perform the renumbering on
+					  * the DoFHandler dofs but
+					  * returns the renumbering
+					  * vector.
+					  */    
+	template <class DH>
+	static void
+	compute_Cuthill_McKee (std::vector<unsigned int>& new_dof_indices,
+			       const DH&,
+			       const bool reversed_numbering = false,
+			       const bool use_constraints    = false);
+    };
+    
+				     /**
 				      * Renumber the degrees of
 				      * freedom according to the
 				      * Cuthill-McKee method,
