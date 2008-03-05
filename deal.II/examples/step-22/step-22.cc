@@ -481,7 +481,7 @@ StokesProblem<dim>::StokesProblem (const unsigned int degree)
 				 // the sparse matrix from its
 				 // sparsity pattern object.
 				 //
-				 // We the procedd with distributing
+				 // We then proceed with distributing
 				 // degrees of freedom and renumbering
 				 // them: In order to make the ILU
 				 // preconditioner (in 3D) work
