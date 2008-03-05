@@ -221,7 +221,7 @@ class DoFRenumbering
 				      * the Boost Graph Library (BGL)
 				      * by Jeremy Siek and others.
 				      *
-				      * While often slight slower to
+				      * While often slighty slower to
 				      * compute, the algorithms using
 				      * often lead to matrices with
 				      * smaller bandwidths and sparse
@@ -261,6 +261,40 @@ class DoFRenumbering
 	template <class DH>
 	static void
 	compute_Cuthill_McKee (std::vector<unsigned int>& new_dof_indices,
+			       const DH&,
+			       const bool reversed_numbering = false,
+			       const bool use_constraints    = false);
+
+					 /**
+					  * Renumber the degrees of
+					  * freedom based on the BOOST
+					  * implementation of the King
+					  * algorithm. This often
+					  * results in slightly larger
+					  * (by a few percent)
+					  * bandwidths than the
+					  * Cuthill-McKee algorithm,
+					  * but sparse ILUs are often
+					  * slightly (also by a few
+					  * percent) better
+					  * preconditioners.
+					  */
+	template <class DH>
+	static void 
+	king_ordering (DH&                              dof_handler,
+		       const bool                       reversed_numbering = false,
+		       const bool                       use_constraints    = false);
+
+					 /**
+					  * Compute the renumbering
+					  * for the King algorithm but
+					  * do not actually renumber
+					  * the degrees of freedom in
+					  * the DoF handler argument.
+					  */
+	template <class DH>
+	static void
+	compute_king_ordering (std::vector<unsigned int>& new_dof_indices,
 			       const DH&,
 			       const bool reversed_numbering = false,
 			       const bool use_constraints    = false);

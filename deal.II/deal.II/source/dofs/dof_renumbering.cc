@@ -38,7 +38,7 @@
 #include <boost/config.hpp>
 #include <boost/graph/adjacency_list.hpp>
 #include <boost/graph/cuthill_mckee_ordering.hpp>
-#include "boost/graph/minimum_degree_ordering.hpp"
+#include <boost/graph/king_ordering.hpp>
 #include <boost/graph/properties.hpp>
 #include <boost/graph/bandwidth.hpp>
 
@@ -249,6 +249,61 @@ compute_Cuthill_McKee (std::vector<unsigned int>& new_dof_indices,
     ::boost::cuthill_mckee_ordering(graph, inv_perm.begin(),
 				    get(::boost::vertex_color, graph),
 				    make_degree_map(graph));
+    
+  for (types::size_type c = 0; c != inv_perm.size(); ++c)
+    new_dof_indices[index_map[inv_perm[c]]] = c;
+
+  Assert (std::find (new_dof_indices.begin(), new_dof_indices.end(),
+		     DH::invalid_dof_index) == new_dof_indices.end(),
+	  ExcInternalError());
+}
+
+
+
+template <class DH>
+void
+DoFRenumbering::boost::
+king_ordering (DH&              dof_handler,
+	       const bool       reversed_numbering,
+	       const bool       use_constraints)
+{
+  std::vector<unsigned int> renumbering(dof_handler.n_dofs(),
+					DH::invalid_dof_index);
+  compute_king_ordering(renumbering, dof_handler, reversed_numbering,
+			use_constraints);
+
+				   // actually perform renumbering;
+				   // this is dimension specific and
+				   // thus needs an own function
+  dof_handler.renumber_dofs (renumbering);
+}
+
+
+template <class DH>
+void
+DoFRenumbering::boost::
+compute_king_ordering (std::vector<unsigned int>& new_dof_indices,
+		       const DH        &dof_handler,
+		       const bool       reversed_numbering,
+		       const bool       use_constraints)
+{
+  types::Graph
+    graph(dof_handler.n_dofs());
+  types::property_map<types::Graph,types::vertex_degree_t>::type
+    graph_degree;
+
+  create_graph (dof_handler, use_constraints, graph, graph_degree);
+    
+  types::property_map<types::Graph, types::vertex_index_t>::type
+    index_map = get(::boost::vertex_index, graph);
+
+
+  std::vector<types::Vertex> inv_perm(num_vertices(graph));
+
+  if (reversed_numbering == false)
+    ::boost::king_ordering(graph, inv_perm.rbegin());
+  else
+    ::boost::king_ordering(graph, inv_perm.begin());
     
   for (types::size_type c = 0; c != inv_perm.size(); ++c)
     new_dof_indices[index_map[inv_perm[c]]] = c;
@@ -1650,6 +1705,17 @@ void
 DoFRenumbering::boost::compute_Cuthill_McKee (std::vector<unsigned int> &,
 					      const DoFHandler<deal_II_dimension> &, bool, bool);
 
+template
+void
+DoFRenumbering::boost::king_ordering (DoFHandler<deal_II_dimension> &, bool, bool);
+
+template
+void
+DoFRenumbering::boost::compute_king_ordering (std::vector<unsigned int> &,
+					      const DoFHandler<deal_II_dimension> &, bool, bool);
+
+
+// non-boost functions:
 
 template
 void DoFRenumbering::Cuthill_McKee<DoFHandler<deal_II_dimension> >
