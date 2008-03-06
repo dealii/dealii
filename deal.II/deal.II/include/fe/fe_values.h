@@ -3422,59 +3422,57 @@ namespace FEValuesViews
 	  nonzero_component
 	  = fe_values->fe->system_to_component_index(shape_function).first;
 	
-	if ((nonzero_component >= first_vector_component)
-	    &&
-	    (nonzero_component < first_vector_component + 2))
+					 // first get the one component of
+					 // the nonsymmetrized gradient
+					 // that is not zero
+	const Tensor<1,2> &grad
+	  = fe_values->shape_gradients[fe_values->
+				       shape_function_to_row_table[shape_function]][q_point];
+
+					 // then form a symmetric tensor
+					 // out of it. note that access to
+					 // individual elements of a
+					 // SymmetricTensor object is
+					 // fairly slow. if we implemented
+					 // the following in the naive
+					 // way, we would therefore incur
+					 // a very significant penalty: a
+					 // preliminary version of the
+					 // Stokes tutorial program would
+					 // slow down from 17 to 23
+					 // seconds because of this single
+					 // function!
+					 //
+					 // consequently, we try to be a
+					 // bit smarter by already laying
+					 // out the data in the right
+					 // format and creating a
+					 // symmetric tensor of it
+	switch (nonzero_component - first_vector_component)
 	  {
-					     // first get the one component of
-					     // the nonsymmetrized gradient
-					     // that is not zero
-	    const Tensor<1,2> grad
-	      = fe_values->shape_gradients[fe_values->
-					   shape_function_to_row_table[shape_function]][q_point];
+	    case 0:
+	    {
+	      const double array[symmetric_gradient_type::n_independent_components]
+		= { grad[0], 0, grad[1]/2 };
+	      return symmetric_gradient_type(array);
+	    }
 
-					     // then form a symmetric tensor
-					     // out of it. note that access to
-					     // individual elements of a
-					     // SymmetricTensor object is
-					     // fairly slow. if we implemented
-					     // the following in the naive
-					     // way, we would therefore incur
-					     // a very significant penalty: a
-					     // preliminary version of the
-					     // Stokes tutorial program would
-					     // slow down from 17 to 23
-					     // seconds because of this single
-					     // function!
-					     //
-					     // consequently, we try to be a
-					     // bit smarter by already laying
-					     // out the data in the right
-					     // format and creating a
-					     // symmetric tensor of it
-	    switch (nonzero_component - first_vector_component)
-	      {
-		case 0:
-		{
-		  const double array[symmetric_gradient_type::n_independent_components]
-		    = { grad[0], 0, grad[1]/2 };
-		  return symmetric_gradient_type(array);
-		}
+	    case 1:
+	    {
+	      const double array[symmetric_gradient_type::n_independent_components]
+		= { 0, grad[1], grad[0]/2 };
+	      return symmetric_gradient_type(array);
+	    }
 
-		case 1:
-		{
-		  const double array[symmetric_gradient_type::n_independent_components]
-		    = { 0, grad[1], grad[0]/2 };
-		  return symmetric_gradient_type(array);
-		}
-
-		default:
-		      Assert (false, ExcInternalError());
-		      return symmetric_gradient_type();
-	      }
+	    default:
+						   // not a shape
+						   // function that
+						   // shared in the
+						   // components of
+						   // the selected
+						   // vector
+		  return symmetric_gradient_type();
 	  }
-	else
-	  return symmetric_gradient_type();
       }
     else
       {
@@ -3504,66 +3502,66 @@ namespace FEValuesViews
 	  nonzero_component
 	  = fe_values->fe->system_to_component_index(shape_function).first;
 	
-	if ((nonzero_component >= first_vector_component)
-	    &&
-	    (nonzero_component < first_vector_component + 3))
+					 // first get the one component of
+					 // the nonsymmetrized gradient
+					 // that is not zero
+	const Tensor<1,3> &grad
+	  = fe_values->shape_gradients[fe_values->
+				       shape_function_to_row_table[shape_function]][q_point];
+
+					 // then form a symmetric
+					 // tensor out of it. note
+					 // that access to individual
+					 // elements of a
+					 // SymmetricTensor object is
+					 // fairly slow. if we
+					 // implemented the following
+					 // in the naive way, we would
+					 // therefore incur a very
+					 // significant penalty: a
+					 // preliminary version of the
+					 // Stokes tutorial program
+					 // would slow down from 17 to
+					 // 23 seconds because of this
+					 // single function!
+					 //
+					 // consequently, we try to be
+					 // a bit smarter by already
+					 // laying out the data in the
+					 // right format and creating
+					 // a symmetric tensor of it
+	switch (nonzero_component-first_vector_component)
 	  {
-					     // first get the one component of
-					     // the nonsymmetrized gradient
-					     // that is not zero
-	    const Tensor<1,3> grad
-	      = fe_values->shape_gradients[fe_values->
-					   shape_function_to_row_table[shape_function]][q_point];
+	    case 0:
+	    {
+	      const double array[symmetric_gradient_type::n_independent_components]
+		= { grad[0], 0, 0, grad[1]/2 , grad[2]/2, 0};
+	      return symmetric_gradient_type(array);
+	    }
 
-					     // then form a symmetric tensor
-					     // out of it. note that access to
-					     // individual elements of a
-					     // SymmetricTensor object is
-					     // fairly slow. if we implemented
-					     // the following in the naive
-					     // way, we would therefore incur
-					     // a very significant penalty: a
-					     // preliminary version of the
-					     // Stokes tutorial program would
-					     // slow down from 17 to 23
-					     // seconds because of this single
-					     // function!
-					     //
-					     // consequently, we try to be a
-					     // bit smarter by already laying
-					     // out the data in the right
-					     // format and creating a
-					     // symmetric tensor of it
-	    switch (nonzero_component - first_vector_component)
-	      {
-		case 0:
-		{
-		  const double array[symmetric_gradient_type::n_independent_components]
-		    = { grad[0], 0, 0, grad[1]/2 , grad[2]/2, 0};
-		  return symmetric_gradient_type(array);
-		}
+	    case 1:
+	    {
+	      const double array[symmetric_gradient_type::n_independent_components]
+		= { 0, grad[1], 0, grad[0]/2, 0, grad[2]/2 };
+	      return symmetric_gradient_type(array);
+	    }
 
-		case 1:
-		{
-		  const double array[symmetric_gradient_type::n_independent_components]
-		    = { 0, grad[1], 0, grad[0]/2, 0, grad[2]/2 };
-		  return symmetric_gradient_type(array);
-		}
+	    case 2:
+	    {
+	      const double array[symmetric_gradient_type::n_independent_components]
+		= { 0, 0, grad[2], 0, grad[0]/2, grad[1]/2 };
+	      return symmetric_gradient_type(array);
+	    }
 
-		case 2:
-		{
-		  const double array[symmetric_gradient_type::n_independent_components]
-		    = { 0, 0, grad[2], 0, grad[0]/2, grad[1]/2 };
-		  return symmetric_gradient_type(array);
-		}
-
-		default:
-		      Assert (false, ExcInternalError());
-		      return symmetric_gradient_type();
-	      }
+	    default:
+						   // not a shape
+						   // function that
+						   // shared in the
+						   // components of
+						   // the selected
+						   // vector
+		  return symmetric_gradient_type();
 	  }
-	else
-	  return symmetric_gradient_type();
       }
     else
       {
