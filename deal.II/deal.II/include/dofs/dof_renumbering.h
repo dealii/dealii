@@ -298,6 +298,42 @@ class DoFRenumbering
 			       const DH&,
 			       const bool reversed_numbering = false,
 			       const bool use_constraints    = false);
+
+					 /**
+					  * Renumber the degrees of
+					  * freedom based on the BOOST
+					  * implementation of the
+					  * minimum degree
+					  * algorithm. This often
+					  * results in slightly larger
+					  * (by a few percent)
+					  * bandwidths than the
+					  * Cuthill-McKee algorithm,
+					  * but sparse ILUs are often
+					  * slightly (also by a few
+					  * percent) better
+					  * preconditioners.
+					  */
+	template <class DH>
+	static void 
+	minimum_degree (DH&                              dof_handler,
+			const bool                       reversed_numbering = false,
+			const bool                       use_constraints    = false);
+
+					 /**
+					  * Compute the renumbering
+					  * for the minimum degree
+					  * algorithm but do not
+					  * actually renumber the
+					  * degrees of freedom in the
+					  * DoF handler argument.
+					  */
+	template <class DH>
+	static void
+	compute_minimum_degree (std::vector<unsigned int>& new_dof_indices,
+				const DH&,
+				const bool reversed_numbering = false,
+				const bool use_constraints    = false);
     };
     
 				     /**

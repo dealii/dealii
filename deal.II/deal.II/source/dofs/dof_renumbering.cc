@@ -39,6 +39,7 @@
 #include <boost/graph/adjacency_list.hpp>
 #include <boost/graph/cuthill_mckee_ordering.hpp>
 #include <boost/graph/king_ordering.hpp>
+#include <boost/graph/minimum_degree_ordering.hpp>
 #include <boost/graph/properties.hpp>
 #include <boost/graph/bandwidth.hpp>
 
@@ -311,6 +312,126 @@ compute_king_ordering (std::vector<unsigned int>& new_dof_indices,
   Assert (std::find (new_dof_indices.begin(), new_dof_indices.end(),
 		     DH::invalid_dof_index) == new_dof_indices.end(),
 	  ExcInternalError());
+}
+
+
+
+template <class DH>
+void
+DoFRenumbering::boost::
+minimum_degree (DH&              dof_handler,
+		const bool       reversed_numbering,
+		const bool       use_constraints)
+{
+  std::vector<unsigned int> renumbering(dof_handler.n_dofs(),
+					DH::invalid_dof_index);
+  compute_minimum_degree(renumbering, dof_handler, reversed_numbering,
+			 use_constraints);
+
+				   // actually perform renumbering;
+				   // this is dimension specific and
+				   // thus needs an own function
+  dof_handler.renumber_dofs (renumbering);
+}
+
+
+template <class DH>
+void
+DoFRenumbering::boost::
+compute_minimum_degree (std::vector<unsigned int>& new_dof_indices,
+			const DH        &dof_handler,
+			const bool       reversed_numbering,
+			const bool       use_constraints)
+{
+  Assert (use_constraints == false, ExcNotImplemented());
+
+				   // the following code is pretty
+				   // much a verbatim copy of the
+				   // sample code for the
+				   // minimum_degree_ordering manual
+				   // page from the BOOST Graph
+				   // Library
+  using namespace boost;
+
+  int delta = 0;
+
+  typedef double Type;
+
+				   // must be BGL directed graph now
+  typedef adjacency_list<vecS, vecS, directedS>  Graph;
+  typedef graph_traits<Graph>::vertex_descriptor Vertex;
+
+  int n = dof_handler.n_dofs();
+
+  Graph G(n);
+
+  std::vector<unsigned int> dofs_on_this_cell;
+
+  typename DH::active_cell_iterator cell = dof_handler.begin_active(),
+				    endc = dof_handler.end();
+
+  for (; cell!=endc; ++cell)
+    {
+
+      const unsigned int dofs_per_cell = cell->get_fe().dofs_per_cell;
+
+      dofs_on_this_cell.resize (dofs_per_cell);
+
+      cell->get_dof_indices (dofs_on_this_cell);
+      for (unsigned int i=0; i<dofs_per_cell; ++i)
+	for (unsigned int j=0; j<dofs_per_cell; ++j)
+	  if (dofs_on_this_cell[i] > dofs_on_this_cell[j])
+	    {
+	      add_edge (dofs_on_this_cell[i], dofs_on_this_cell[j], G);
+	      add_edge (dofs_on_this_cell[j], dofs_on_this_cell[i], G);
+	    }
+    }
+  
+  
+  typedef std::vector<int> Vector;
+
+
+  Vector inverse_perm(n, 0);
+
+  Vector perm(n, 0);
+
+
+  Vector supernode_sizes(n, 1);
+				   // init has to be 1
+
+  ::boost::property_map<Graph, vertex_index_t>::type
+    id = get(vertex_index, G);
+
+
+  Vector degree(n, 0);
+
+
+    minimum_degree_ordering
+      (G,
+       make_iterator_property_map(&degree[0], id, degree[0]),
+       &inverse_perm[0],
+       &perm[0],
+       make_iterator_property_map(&supernode_sizes[0], id, supernode_sizes[0]),
+       delta, id);
+
+
+    for (int i=0; i<n; ++i)
+      {
+	Assert (std::find (perm.begin(), perm.end(), i)
+		!= inverse_perm.end(),
+		ExcInternalError());
+	Assert (std::find (inverse_perm.begin(), inverse_perm.end(), i)
+		!= inverse_perm.end(),
+		ExcInternalError());
+	Assert (inverse_perm[perm[i]] == i, ExcInternalError());
+      }
+
+    if (reversed_numbering == true)
+      std::copy (perm.begin(), perm.end(),
+		 new_dof_indices.begin());
+    else
+      std::copy (inverse_perm.begin(), inverse_perm.end(),
+		 new_dof_indices.begin());
 }
 
 
@@ -1713,6 +1834,15 @@ template
 void
 DoFRenumbering::boost::compute_king_ordering (std::vector<unsigned int> &,
 					      const DoFHandler<deal_II_dimension> &, bool, bool);
+
+template
+void
+DoFRenumbering::boost::minimum_degree (DoFHandler<deal_II_dimension> &, bool, bool);
+
+template
+void
+DoFRenumbering::boost::compute_minimum_degree (std::vector<unsigned int> &,
+					       const DoFHandler<deal_II_dimension> &, bool, bool);
 
 
 // non-boost functions:
