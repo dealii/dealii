@@ -201,14 +201,69 @@ DEAL_II_NAMESPACE_OPEN
  * standard library to do its work.
  *
  *
+ * <h3>A comparison of reordering strategies</h3>
+ *
+ * <table>
+ * <tr>
+ *   <td>
+ *     @image html "reorder_sparsity_step_31_original.png"
+ *   </td>
+ *   <td>
+ *     @image html "reorder_sparsity_step_31_random.png"
+ *   </td>
+ *   <td>
+ *     @image html "reorder_sparsity_step_31_deal_cmk.png"
+ *   </td>
+ *   <td>
+ *     @image html "reorder_sparsity_step_31_boost_cmk.png"
+ *   </td>
+ *   <td>
+ *     @image html "reorder_sparsity_step_31_boost_king.png"
+ *   </td>
+ *   <td>
+ *     @image html "reorder_sparsity_step_31_boost_md.png"
+ *   </td>
+ * </tr>
+ * <tr>
+ *   <td>
+ *     Enumeration as produced by deal.II's DoFHandler::distribute_dofs function
+ *   </td>
+ *   <td>
+ *     Random enumeration as produced by applying DoFRenumbering::random
+ *     after calling DoFHandler::distribute_dofs.
+ *   </td>
+ *   <td>
+ *     Cuthill-McKee enumeration as produced by calling the deal.II implementation
+ *     of the algorithm provided by DoFRenumbering::Cuthill_McKee
+ *     after DoFHandler::distribute_dofs.
+ *   </td>
+ *   <td>
+ *     Cuthill-McKee enumeration as produced by calling the BOOST implementation
+ *     of the algorithm provided by DoFRenumbering::boost::Cuthill_McKee
+ *     after DoFHandler::distribute_dofs.
+ *   </td>
+ *   <td>
+ *     King enumeration as produced by calling the BOOST implementation
+ *     of the algorithm provided by DoFRenumbering::boost::king_ordering
+ *     after DoFHandler::distribute_dofs.
+ *   </td>
+ *   <td>
+ *     Minimum degree enumeration as produced by calling the BOOST implementation
+ *     of the algorithm provided by DoFRenumbering::boost::minimum_degree
+ *     after DoFHandler::distribute_dofs.
+ *   </td>
+ * </tr>
+ * </table>
+ *
+ *
  * <h3>Multigrid DoF numbering</h3>
  *
- * Most algorithms also work on multigrid degree of freedom
+ * Most of the algorithms listed above also work on multigrid degree of freedom
  * numberings. Refer to the actual function declarations to get more
  * information on this.
  *
  * @ingroup dofs
- * @author Wolfgang Bangerth, Guido Kanschat, 1998, 1999, 2000, 2004, 2007
+ * @author Wolfgang Bangerth, Guido Kanschat, 1998, 1999, 2000, 2004, 2007, 2008
  */
 class DoFRenumbering 
 {
@@ -242,6 +297,14 @@ class DoFRenumbering
 					  * documentation of the
 					  * parent class for details
 					  * on the different methods.
+					  *
+					  * As an example of the
+					  * results of this algorithm,
+					  * take a look at the
+					  * comparison of various
+					  * algorithms in the
+					  * documentation of the
+					  * DoFRenumbering namespace.
 					  */
 	template <class DH>
 	static void 
@@ -278,6 +341,14 @@ class DoFRenumbering
 					  * slightly (also by a few
 					  * percent) better
 					  * preconditioners.
+					  *
+					  * As an example of the
+					  * results of this algorithm,
+					  * take a look at the
+					  * comparison of various
+					  * algorithms in the
+					  * documentation of the
+					  * DoFRenumbering namespace.
 					  */
 	template <class DH>
 	static void 
@@ -304,15 +375,25 @@ class DoFRenumbering
 					  * freedom based on the BOOST
 					  * implementation of the
 					  * minimum degree
-					  * algorithm. This often
-					  * results in slightly larger
-					  * (by a few percent)
-					  * bandwidths than the
+					  * algorithm. Unlike the
 					  * Cuthill-McKee algorithm,
-					  * but sparse ILUs are often
-					  * slightly (also by a few
-					  * percent) better
-					  * preconditioners.
+					  * this algorithm does not
+					  * attempt to minimize the
+					  * bandwidth of a matrix but
+					  * to minimize the amount of
+					  * fill-in when doing an LU
+					  * decomposition. It may
+					  * sometimes yield better
+					  * ILUs because of this
+					  * property.
+					  *
+					  * As an example of the
+					  * results of this algorithm,
+					  * take a look at the
+					  * comparison of various
+					  * algorithms in the
+					  * documentation of the
+					  * DoFRenumbering namespace.
 					  */
 	template <class DH>
 	static void 
@@ -346,6 +427,13 @@ class DoFRenumbering
 				      * See the general documentation
 				      * of this class for details on
 				      * the different methods.
+				      *
+				      * As an example of the results
+				      * of this algorithm, take a look
+				      * at the comparison of various
+				      * algorithms in the
+				      * documentation of the
+				      * DoFRenumbering namespace.
 				      */
     template <class DH>
     static void 
