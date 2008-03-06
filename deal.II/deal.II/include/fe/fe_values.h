@@ -227,10 +227,10 @@ namespace FEValuesViews
       
     private:
 				       /**
-					* A pointer to the FEValuesBase object
+					* A reference to the FEValuesBase object
 					* we operator on.
 					*/
-      const SmartPointer<const FEValuesBase<dim> > fe_values;
+      const FEValuesBase<dim> &fe_values;
 
 				       /**
 					* The single scalar component this
@@ -393,10 +393,10 @@ namespace FEValuesViews
       
     private:
 				       /**
-					* A pointer to the FEValuesBase object
+					* A reference to the FEValuesBase object
 					* we operator on.
 					*/
-      const SmartPointer<const FEValuesBase<dim> > fe_values;
+      const FEValuesBase<dim> &fe_values;
 
 				       /**
 					* The first component of the vector
@@ -2927,11 +2927,11 @@ namespace FEValuesViews
   Scalar<dim>::Scalar (const FEValuesBase<dim> &fe_values,
 		       const unsigned int       component)
 		  :
-		  fe_values (&fe_values),
+		  fe_values (fe_values),
 		  component (component)
   {
-    Assert (component < this->fe_values->fe->n_components(),
-	    ExcIndexRange(component, 0, this->fe_values->fe->n_components()));
+    Assert (component < fe_values.fe->n_components(),
+	    ExcIndexRange(component, 0, fe_values.fe->n_components()));
   }
 
 
@@ -2942,9 +2942,9 @@ namespace FEValuesViews
   Scalar<dim>::value (const unsigned int shape_function,
 		      const unsigned int q_point) const
   {
-    Assert (shape_function < fe_values->fe->dofs_per_cell,
-	    ExcIndexRange (shape_function, 0, fe_values->fe->dofs_per_cell));
-    Assert (fe_values->update_flags & update_values,
+    Assert (shape_function < fe_values.fe->dofs_per_cell,
+	    ExcIndexRange (shape_function, 0, fe_values.fe->dofs_per_cell));
+    Assert (fe_values.update_flags & update_values,
 	    typename FEValuesBase<dim>::ExcAccessToUninitializedField());    
 
 				     // an adaptation of the
@@ -2957,28 +2957,28 @@ namespace FEValuesViews
 				     // assertions since they are already
 				     // taken care of in the constructor of
 				     // this class
-    if (fe_values->fe->is_primitive() ||
-	fe_values->fe->is_primitive(shape_function))
+    if (fe_values.fe->is_primitive() ||
+	fe_values.fe->is_primitive(shape_function))
       {
 	if (component ==
-	    fe_values->fe->system_to_component_index(shape_function).first)
-	  return fe_values->shape_values(fe_values->shape_function_to_row_table[shape_function],q_point);
+	    fe_values.fe->system_to_component_index(shape_function).first)
+	  return fe_values.shape_values(fe_values.shape_function_to_row_table[shape_function],q_point);
 	else
 	  return 0;
       }
     else
       {
-	if (fe_values->fe->get_nonzero_components(shape_function)[component] == false)
+	if (fe_values.fe->get_nonzero_components(shape_function)[component] == false)
 	  return 0;
 
 	const unsigned int
-	  row = (fe_values->shape_function_to_row_table[shape_function]
+	  row = (fe_values.shape_function_to_row_table[shape_function]
 		 +
-		 std::count (fe_values->fe->get_nonzero_components(shape_function).begin(),
-			     fe_values->fe->get_nonzero_components(shape_function).begin()+
+		 std::count (fe_values.fe->get_nonzero_components(shape_function).begin(),
+			     fe_values.fe->get_nonzero_components(shape_function).begin()+
 			     component,
 			     true));
-	return fe_values->shape_values(row, q_point);
+	return fe_values.shape_values(row, q_point);
       }
   }
 
@@ -2990,9 +2990,9 @@ namespace FEValuesViews
   Scalar<dim>::gradient (const unsigned int shape_function,
 			 const unsigned int q_point) const
   {
-    Assert (shape_function < fe_values->fe->dofs_per_cell,
-	    ExcIndexRange (shape_function, 0, fe_values->fe->dofs_per_cell));
-    Assert (fe_values->update_flags & update_gradients,
+    Assert (shape_function < fe_values.fe->dofs_per_cell,
+	    ExcIndexRange (shape_function, 0, fe_values.fe->dofs_per_cell));
+    Assert (fe_values.update_flags & update_gradients,
 	    typename FEValuesBase<dim>::ExcAccessToUninitializedField());    
 
 				     // an adaptation of the
@@ -3004,29 +3004,29 @@ namespace FEValuesViews
 				     // we can do away with the assertions
 				     // since they are already taken care of
 				     // in the constructor of this class
-    if (fe_values->fe->is_primitive() ||
-	fe_values->fe->is_primitive(shape_function))
+    if (fe_values.fe->is_primitive() ||
+	fe_values.fe->is_primitive(shape_function))
       {
 	if (component ==
-	    fe_values->fe->system_to_component_index(shape_function).first)
-	  return fe_values->shape_gradients[fe_values->
+	    fe_values.fe->system_to_component_index(shape_function).first)
+	  return fe_values.shape_gradients[fe_values.
 					    shape_function_to_row_table[shape_function]][q_point];
 	else
 	  return gradient_type();
       }
     else
       {
-	if (fe_values->fe->get_nonzero_components(shape_function)[component] == false)
+	if (fe_values.fe->get_nonzero_components(shape_function)[component] == false)
 	  return gradient_type();
 
 	const unsigned int
-	  row = (fe_values->shape_function_to_row_table[shape_function]
+	  row = (fe_values.shape_function_to_row_table[shape_function]
 		 +
-		 std::count (fe_values->fe->get_nonzero_components(shape_function).begin(),
-			     fe_values->fe->get_nonzero_components(shape_function).begin()+
+		 std::count (fe_values.fe->get_nonzero_components(shape_function).begin(),
+			     fe_values.fe->get_nonzero_components(shape_function).begin()+
 			     component,
 			     true));
-	return fe_values->shape_gradients[row][q_point];
+	return fe_values.shape_gradients[row][q_point];
       }
   }
 
@@ -3038,9 +3038,9 @@ namespace FEValuesViews
   Scalar<dim>::hessian (const unsigned int shape_function,
 			const unsigned int q_point) const
   {
-    Assert (shape_function < fe_values->fe->dofs_per_cell,
-	    ExcIndexRange (shape_function, 0, fe_values->fe->dofs_per_cell));
-    Assert (fe_values->update_flags & update_hessians,
+    Assert (shape_function < fe_values.fe->dofs_per_cell,
+	    ExcIndexRange (shape_function, 0, fe_values.fe->dofs_per_cell));
+    Assert (fe_values.update_flags & update_hessians,
 	    typename FEValuesBase<dim>::ExcAccessToUninitializedField());    
 
 				     // an adaptation of the
@@ -3052,29 +3052,29 @@ namespace FEValuesViews
 				     // we can do away with the assertions
 				     // since they are already taken care of
 				     // in the constructor of this class
-    if (fe_values->fe->is_primitive() ||
-	fe_values->fe->is_primitive(shape_function))
+    if (fe_values.fe->is_primitive() ||
+	fe_values.fe->is_primitive(shape_function))
       {
 	if (component ==
-	    fe_values->fe->system_to_component_index(shape_function).first)
-	  return fe_values->shape_hessians[fe_values->
+	    fe_values.fe->system_to_component_index(shape_function).first)
+	  return fe_values.shape_hessians[fe_values.
 					   shape_function_to_row_table[shape_function]][q_point];
 	else
 	  return hessian_type();
       }
     else
       {
-	if (fe_values->fe->get_nonzero_components(shape_function)[component] == false)
+	if (fe_values.fe->get_nonzero_components(shape_function)[component] == false)
 	  return hessian_type();
 
 	const unsigned int
-	  row = (fe_values->shape_function_to_row_table[shape_function]
+	  row = (fe_values.shape_function_to_row_table[shape_function]
 		 +
-		 std::count (fe_values->fe->get_nonzero_components(shape_function).begin(),
-			     fe_values->fe->get_nonzero_components(shape_function).begin()+
+		 std::count (fe_values.fe->get_nonzero_components(shape_function).begin(),
+			     fe_values.fe->get_nonzero_components(shape_function).begin()+
 			     component,
 			     true));
-	return fe_values->shape_hessians[row][q_point];
+	return fe_values.shape_hessians[row][q_point];
       }
   }
 
@@ -3085,12 +3085,12 @@ namespace FEValuesViews
   Vector<dim>::Vector (const FEValuesBase<dim> &fe_values,
 		       const unsigned int       first_vector_component)
 		  :
-		  fe_values (&fe_values),
+		  fe_values (fe_values),
 		  first_vector_component (first_vector_component)
   {
-    Assert (first_vector_component+dim-1 < this->fe_values->fe->n_components(),
+    Assert (first_vector_component+dim-1 < this->fe_values.fe->n_components(),
 	    ExcIndexRange(first_vector_component+dim-1, 0,
-			  this->fe_values->fe->n_components()));
+			  this->fe_values.fe->n_components()));
   }
 
 
@@ -3101,9 +3101,9 @@ namespace FEValuesViews
   Vector<dim>::value (const unsigned int shape_function,
 		      const unsigned int q_point) const
   {
-    Assert (shape_function < fe_values->fe->dofs_per_cell,
-	    ExcIndexRange (shape_function, 0, fe_values->fe->dofs_per_cell));
-    Assert (fe_values->update_flags & update_values,
+    Assert (shape_function < fe_values.fe->dofs_per_cell,
+	    ExcIndexRange (shape_function, 0, fe_values.fe->dofs_per_cell));
+    Assert (fe_values.update_flags & update_values,
 	    typename FEValuesBase<dim>::ExcAccessToUninitializedField());    
 
 				     // compared to the scalar case above, we
@@ -3112,8 +3112,8 @@ namespace FEValuesViews
 				     // range of components
     value_type return_value;
     
-    if (fe_values->fe->is_primitive() ||
-	fe_values->fe->is_primitive(shape_function))
+    if (fe_values.fe->is_primitive() ||
+	fe_values.fe->is_primitive(shape_function))
       {
 					 // if this is a primitive shape
 					 // function then at most one element
@@ -3121,34 +3121,34 @@ namespace FEValuesViews
 					 // nonzero. find out if indeed one is
 	const unsigned int
 	  nonzero_component
-	  = fe_values->fe->system_to_component_index(shape_function).first;
+	  = fe_values.fe->system_to_component_index(shape_function).first;
 	
 	if ((nonzero_component >= first_vector_component)
 	    &&
 	    (nonzero_component < first_vector_component + dim))
 	  return_value[nonzero_component - first_vector_component]
-	    = fe_values->shape_values(fe_values->
+	    = fe_values.shape_values(fe_values.
 				      shape_function_to_row_table[shape_function],
 				      q_point);
       }
     else
       {
 	unsigned int
-	  row = (fe_values->shape_function_to_row_table[shape_function]
+	  row = (fe_values.shape_function_to_row_table[shape_function]
 		 +
-		 std::count (fe_values->fe->get_nonzero_components(shape_function).begin(),
-			     fe_values->fe->get_nonzero_components(shape_function).begin() +
+		 std::count (fe_values.fe->get_nonzero_components(shape_function).begin(),
+			     fe_values.fe->get_nonzero_components(shape_function).begin() +
 			     first_vector_component,
 			     true));
 	for (unsigned int d=0; d<dim; ++d)
-	  if (fe_values->fe->get_nonzero_components(shape_function)[first_vector_component+d] ==
+	  if (fe_values.fe->get_nonzero_components(shape_function)[first_vector_component+d] ==
 	      true)
 	    {
-	      return_value[d] = fe_values->shape_values(row, q_point);
+	      return_value[d] = fe_values.shape_values(row, q_point);
 
 	      if ((d != dim-1)
 		  &&
-		  (fe_values->fe->get_nonzero_components(shape_function)[first_vector_component+d]
+		  (fe_values.fe->get_nonzero_components(shape_function)[first_vector_component+d]
 		   == true))
 		++row;
 	    }
@@ -3167,45 +3167,45 @@ namespace FEValuesViews
   {
 				     // this function works like in the case
 				     // above    
-    Assert (shape_function < fe_values->fe->dofs_per_cell,
-	    ExcIndexRange (shape_function, 0, fe_values->fe->dofs_per_cell));
-    Assert (fe_values->update_flags & update_gradients,
+    Assert (shape_function < fe_values.fe->dofs_per_cell,
+	    ExcIndexRange (shape_function, 0, fe_values.fe->dofs_per_cell));
+    Assert (fe_values.update_flags & update_gradients,
 	    typename FEValuesBase<dim>::ExcAccessToUninitializedField());    
 
     gradient_type return_value;
     
-    if (fe_values->fe->is_primitive() ||
-	fe_values->fe->is_primitive(shape_function))
+    if (fe_values.fe->is_primitive() ||
+	fe_values.fe->is_primitive(shape_function))
       {
 	const unsigned int
 	  nonzero_component
-	  = fe_values->fe->system_to_component_index(shape_function).first;
+	  = fe_values.fe->system_to_component_index(shape_function).first;
 	
 	if ((nonzero_component >= first_vector_component)
 	    &&
 	    (nonzero_component < first_vector_component + dim))
 	  return_value[nonzero_component - first_vector_component]
-	    = fe_values->shape_gradients[fe_values->
+	    = fe_values.shape_gradients[fe_values.
 					 shape_function_to_row_table[shape_function]][q_point];
       }
     else
       {
 	unsigned int
-	  row = (fe_values->shape_function_to_row_table[shape_function]
+	  row = (fe_values.shape_function_to_row_table[shape_function]
 		 +
-		 std::count (fe_values->fe->get_nonzero_components(shape_function).begin(),
-			     fe_values->fe->get_nonzero_components(shape_function).begin() +
+		 std::count (fe_values.fe->get_nonzero_components(shape_function).begin(),
+			     fe_values.fe->get_nonzero_components(shape_function).begin() +
 			     first_vector_component,
 			     true));
 	for (unsigned int d=0; d<dim; ++d)
-	  if (fe_values->fe->get_nonzero_components(shape_function)[first_vector_component+d] ==
+	  if (fe_values.fe->get_nonzero_components(shape_function)[first_vector_component+d] ==
 	      true)
 	    {
-	      return_value[d] = fe_values->shape_gradients[row][q_point];
+	      return_value[d] = fe_values.shape_gradients[row][q_point];
 
 	      if ((d != dim-1)
 		  &&
-		  (fe_values->fe->get_nonzero_components(shape_function)[first_vector_component+d]
+		  (fe_values.fe->get_nonzero_components(shape_function)[first_vector_component+d]
 		   == true))
 		++row;
 	    }
@@ -3224,23 +3224,23 @@ namespace FEValuesViews
   {
 				     // this function works like in the case
 				     // above    
-    Assert (shape_function < fe_values->fe->dofs_per_cell,
-	    ExcIndexRange (shape_function, 0, fe_values->fe->dofs_per_cell));
-    Assert (fe_values->update_flags & update_gradients,
+    Assert (shape_function < fe_values.fe->dofs_per_cell,
+	    ExcIndexRange (shape_function, 0, fe_values.fe->dofs_per_cell));
+    Assert (fe_values.update_flags & update_gradients,
 	    typename FEValuesBase<dim>::ExcAccessToUninitializedField());    
 
-    if (fe_values->fe->is_primitive() ||
-	fe_values->fe->is_primitive(shape_function))
+    if (fe_values.fe->is_primitive() ||
+	fe_values.fe->is_primitive(shape_function))
       {
 	const unsigned int
 	  nonzero_component
-	  = fe_values->fe->system_to_component_index(shape_function).first;
+	  = fe_values.fe->system_to_component_index(shape_function).first;
 	
 	if ((nonzero_component >= first_vector_component)
 	    &&
 	    (nonzero_component < first_vector_component + dim))
 	  return
-	    fe_values->shape_gradients[fe_values->
+	    fe_values.shape_gradients[fe_values.
 				       shape_function_to_row_table[shape_function]][q_point]
 	    [nonzero_component - first_vector_component];
 	else
@@ -3249,23 +3249,23 @@ namespace FEValuesViews
     else
       {
 	unsigned int
-	  row = (fe_values->shape_function_to_row_table[shape_function]
+	  row = (fe_values.shape_function_to_row_table[shape_function]
 		 +
-		 std::count (fe_values->fe->get_nonzero_components(shape_function).begin(),
-			     fe_values->fe->get_nonzero_components(shape_function).begin() +
+		 std::count (fe_values.fe->get_nonzero_components(shape_function).begin(),
+			     fe_values.fe->get_nonzero_components(shape_function).begin() +
 			     first_vector_component,
 			     true));
 
 	double div = 0;
 	for (unsigned int d=0; d<dim; ++d)
-	  if (fe_values->fe->get_nonzero_components(shape_function)[first_vector_component+d] ==
+	  if (fe_values.fe->get_nonzero_components(shape_function)[first_vector_component+d] ==
 	      true)
 	    {
-	      div += fe_values->shape_gradients[row][q_point][d];
+	      div += fe_values.shape_gradients[row][q_point][d];
 
 	      if ((d != dim-1)
 		  &&
-		  (fe_values->fe->get_nonzero_components(shape_function)[first_vector_component+d]
+		  (fe_values.fe->get_nonzero_components(shape_function)[first_vector_component+d]
 		   == true))
 		++row;
 	    }
@@ -3283,45 +3283,45 @@ namespace FEValuesViews
   {
 				     // this function works like in the case
 				     // above    
-    Assert (shape_function < fe_values->fe->dofs_per_cell,
-	    ExcIndexRange (shape_function, 0, fe_values->fe->dofs_per_cell));
-    Assert (fe_values->update_flags & update_hessians,
+    Assert (shape_function < fe_values.fe->dofs_per_cell,
+	    ExcIndexRange (shape_function, 0, fe_values.fe->dofs_per_cell));
+    Assert (fe_values.update_flags & update_hessians,
 	    typename FEValuesBase<dim>::ExcAccessToUninitializedField());    
 
     hessian_type return_value;
     
-    if (fe_values->fe->is_primitive() ||
-	fe_values->fe->is_primitive(shape_function))
+    if (fe_values.fe->is_primitive() ||
+	fe_values.fe->is_primitive(shape_function))
       {
 	const unsigned int
 	  nonzero_component
-	  = fe_values->fe->system_to_component_index(shape_function).first;
+	  = fe_values.fe->system_to_component_index(shape_function).first;
 	
 	if ((nonzero_component >= first_vector_component)
 	    &&
 	    (nonzero_component < first_vector_component + dim))
 	  return_value[nonzero_component - first_vector_component]
-	    = fe_values->shape_hessians[fe_values->
+	    = fe_values.shape_hessians[fe_values.
 					shape_function_to_row_table[shape_function]][q_point];
       }
     else
       {
 	unsigned int
-	  row = (fe_values->shape_function_to_row_table[shape_function]
+	  row = (fe_values.shape_function_to_row_table[shape_function]
 		 +
-		 std::count (fe_values->fe->get_nonzero_components(shape_function).begin(),
-			     fe_values->fe->get_nonzero_components(shape_function).begin() +
+		 std::count (fe_values.fe->get_nonzero_components(shape_function).begin(),
+			     fe_values.fe->get_nonzero_components(shape_function).begin() +
 			     first_vector_component,
 			     true));
 	for (unsigned int d=0; d<dim; ++d)
-	  if (fe_values->fe->get_nonzero_components(shape_function)[first_vector_component+d] ==
+	  if (fe_values.fe->get_nonzero_components(shape_function)[first_vector_component+d] ==
 	      true)
 	    {
-	      return_value[d] = fe_values->shape_hessians[row][q_point];
+	      return_value[d] = fe_values.shape_hessians[row][q_point];
 
 	      if ((d != dim-1)
 		  &&
-		  (fe_values->fe->get_nonzero_components(shape_function)[first_vector_component+d]
+		  (fe_values.fe->get_nonzero_components(shape_function)[first_vector_component+d]
 		   == true))
 		++row;
 	    }
@@ -3347,17 +3347,17 @@ namespace FEValuesViews
   {
 				     // this function works like in the case
 				     // above    
-    Assert (shape_function < fe_values->fe->dofs_per_cell,
-	    ExcIndexRange (shape_function, 0, fe_values->fe->dofs_per_cell));
-    Assert (fe_values->update_flags & update_gradients,
+    Assert (shape_function < fe_values.fe->dofs_per_cell,
+	    ExcIndexRange (shape_function, 0, fe_values.fe->dofs_per_cell));
+    Assert (fe_values.update_flags & update_gradients,
 	    FEValuesBase<1>::ExcAccessToUninitializedField());    
 
-    if (fe_values->fe->is_primitive() ||
-	fe_values->fe->is_primitive(shape_function))
+    if (fe_values.fe->is_primitive() ||
+	fe_values.fe->is_primitive(shape_function))
       {
 	const unsigned int
 	  nonzero_component
-	  = fe_values->fe->system_to_component_index(shape_function).first;
+	  = fe_values.fe->system_to_component_index(shape_function).first;
 	
 	if (nonzero_component == first_vector_component)
 	  {
@@ -3365,7 +3365,7 @@ namespace FEValuesViews
 					     // the nonsymmetrized gradient
 					     // that is not zero
 	    const Tensor<1,1> grad
-	      = fe_values->shape_gradients[fe_values->
+	      = fe_values.shape_gradients[fe_values.
 					   shape_function_to_row_table[shape_function]][q_point];
 
 					     // then form a symmetric tensor
@@ -3410,23 +3410,23 @@ namespace FEValuesViews
   {
 				     // this function works like in the case
 				     // above    
-    Assert (shape_function < fe_values->fe->dofs_per_cell,
-	    ExcIndexRange (shape_function, 0, fe_values->fe->dofs_per_cell));
-    Assert (fe_values->update_flags & update_gradients,
+    Assert (shape_function < fe_values.fe->dofs_per_cell,
+	    ExcIndexRange (shape_function, 0, fe_values.fe->dofs_per_cell));
+    Assert (fe_values.update_flags & update_gradients,
 	    FEValuesBase<2>::ExcAccessToUninitializedField());    
 
-    if (fe_values->fe->is_primitive() ||
-	fe_values->fe->is_primitive(shape_function))
+    if (fe_values.fe->is_primitive() ||
+	fe_values.fe->is_primitive(shape_function))
       {
 	const unsigned int
 	  nonzero_component
-	  = fe_values->fe->system_to_component_index(shape_function).first;
+	  = fe_values.fe->system_to_component_index(shape_function).first;
 	
 					 // first get the one component of
 					 // the nonsymmetrized gradient
 					 // that is not zero
 	const Tensor<1,2> &grad
-	  = fe_values->shape_gradients[fe_values->
+	  = fe_values.shape_gradients[fe_values.
 				       shape_function_to_row_table[shape_function]][q_point];
 
 					 // then form a symmetric tensor
@@ -3490,23 +3490,23 @@ namespace FEValuesViews
   {
 				     // this function works like in the case
 				     // above    
-    Assert (shape_function < fe_values->fe->dofs_per_cell,
-	    ExcIndexRange (shape_function, 0, fe_values->fe->dofs_per_cell));
-    Assert (fe_values->update_flags & update_gradients,
+    Assert (shape_function < fe_values.fe->dofs_per_cell,
+	    ExcIndexRange (shape_function, 0, fe_values.fe->dofs_per_cell));
+    Assert (fe_values.update_flags & update_gradients,
 	    FEValuesBase<3>::ExcAccessToUninitializedField());    
 
-    if (fe_values->fe->is_primitive() ||
-	fe_values->fe->is_primitive(shape_function))
+    if (fe_values.fe->is_primitive() ||
+	fe_values.fe->is_primitive(shape_function))
       {
 	const unsigned int
 	  nonzero_component
-	  = fe_values->fe->system_to_component_index(shape_function).first;
+	  = fe_values.fe->system_to_component_index(shape_function).first;
 	
 					 // first get the one component of
 					 // the nonsymmetrized gradient
 					 // that is not zero
 	const Tensor<1,3> &grad
-	  = fe_values->shape_gradients[fe_values->
+	  = fe_values.shape_gradients[fe_values.
 				       shape_function_to_row_table[shape_function]][q_point];
 
 					 // then form a symmetric
