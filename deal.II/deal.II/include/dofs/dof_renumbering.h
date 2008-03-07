@@ -310,7 +310,8 @@ DEAL_II_NAMESPACE_OPEN
  *     testcase outlined above, and a runtime of 5min03s. Although the number
  *     of iterations is only slightly less than with BOOST's Cuthill-McKee
  *     implementation, runtime is significantly less. This, again, may be due
- *     to cache effects.
+ *     to cache effects. As a consequence, this is the algorithm best suited
+ *     to the testcase, and is in fact used in @ref step_22 "step-22".
  *   </td>
  *   <td>
  *     Minimum degree enumeration as produced by calling the BOOST implementation
@@ -454,6 +455,9 @@ class DoFRenumbering
 					  * algorithms in the
 					  * documentation of the
 					  * DoFRenumbering namespace.
+					  *
+					  * This algorithm is used in
+					  * @ref step_22 "step-22".
 					  */
 	template <class DH>
 	static void 
