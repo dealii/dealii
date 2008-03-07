@@ -231,7 +231,11 @@ DEAL_II_NAMESPACE_OPEN
  * consequently the better the renumbering of degrees of freedom is
  * suited for this task. We also state the run-time of the program, in
  * part determined by the number of iterations needed, for the first 4
- * cycles on one of our machines.
+ * cycles on one of our machines. Note that the reported times
+ * correspond to the run time of the entire program, not just the
+ * affected solver; if a program runs twice as fast with one
+ * particular ordering than with another one, then this means that the
+ * actual solver is actually several times faster.
  *
  * <table>
  * <tr>
