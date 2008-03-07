@@ -352,10 +352,18 @@ class DoFRenumbering
 				      *
 				      * While often slighty slower to
 				      * compute, the algorithms using
-				      * often lead to matrices with
-				      * smaller bandwidths and sparse
-				      * ILUs based on this numbering
-				      * are therefore more efficient.
+				      * BOOST often lead to matrices
+				      * with smaller bandwidths and
+				      * sparse ILUs based on this
+				      * numbering are therefore more
+				      * efficient.
+				      *
+				      * For a comparison of these
+				      * algorithms with the ones
+				      * defined in DoFRenumbering, see
+				      * the comparison section in the
+				      * documentation of the
+				      * DoFRenumbering namespace.
 				      */
     class boost
     {
