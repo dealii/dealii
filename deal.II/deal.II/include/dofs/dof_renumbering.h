@@ -203,6 +203,36 @@ DEAL_II_NAMESPACE_OPEN
  *
  * <h3>A comparison of reordering strategies</h3>
  *
+ * As a benchmark of comparison, let us consider what the different
+ * sparsity patterns produced by the various algorithms when using the
+ * $Q_2^d\times Q_1$ element combination typically employed in the
+ * discretization of Stokes equations, when used on the mesh obtained
+ * in @ref step_22 "step-22" after one adaptive mesh refinement in
+ * 3d. The space dimension together with the coupled finite element
+ * leads to a rather dense system matrix with, on average around 180
+ * nonzero entries per row. After applying each of the reordering
+ * strategies shown below, the degrees of freedom are also sorted
+ * using DoFRenumbering::component_wise into velocity and pressure
+ * groups; this produces the $2\times 2$ block structure seen below
+ * with the large velocity-velocity block at top left, small
+ * pressure-pressure block at bottom right, and coupling blocks at top
+ * right and bottom left.
+ *
+ * The goal of reordering strategies is to improve the
+ * preconditioner. In @ref step_22 "step-22" we use a SparseILU to
+ * preconditioner for the velocity-velocity block at the top left. The
+ * quality of the preconditioner can then be measured by the number of
+ * CG iterations required to solve a linear system with this
+ * block. For some of the reordering strategies below we record this
+ * number for adaptive refinement cycle 3, with 93176 degrees of
+ * freedom; because we solve several linear systems with the same
+ * matrix in the Schur complement, the average number of iterations is
+ * reported. The lower the number the better the preconditioner and
+ * consequently the better the renumbering of degrees of freedom is
+ * suited for this task. We also state the run-time of the program, in
+ * part determined by the number of iterations needed, for the first 4
+ * cycles on one of our machines.
+ *
  * <table>
  * <tr>
  *   <td>
@@ -214,6 +244,41 @@ DEAL_II_NAMESPACE_OPEN
  *   <td>
  *     @image html "reorder_sparsity_step_31_deal_cmk.png"
  *   </td>
+ * </tr>
+ * <tr>
+ *   <td>
+ *     Enumeration as produced by deal.II's DoFHandler::distribute_dofs function
+ *     and no further reordering apart from the component-wise one.
+ *
+ *     With this renumbering, we needed an average of 92.2 iterations for the
+ *     testcase outlined above, and a runtime of 7min53s.
+ *   </td>
+ *   <td>
+ *     Random enumeration as produced by applying DoFRenumbering::random
+ *     after calling DoFHandler::distribute_dofs. This enumeration produces
+ *     nonzero entries in matrices pretty much everywhere, appearing here as
+ *     an entirely unstructured matrix.
+ *
+ *     With this renumbering, we needed an average of 71 iterations for the
+ *     testcase outlined above, and a runtime of 10min55s. The longer runtime
+ *     despite less iterations compared to the default ordering may be due to
+ *     the fact that computing and applying the ILU requires us to jump back
+ *     and forth all through memory due to the lack of localization of
+ *     matrix entries around the diagonal; this then leads to many cache
+ *     misses and consequently bad timings.
+ *   </td>
+ *   <td>
+ *     Cuthill-McKee enumeration as produced by calling the deal.II implementation
+ *     of the algorithm provided by DoFRenumbering::Cuthill_McKee
+ *     after DoFHandler::distribute_dofs.
+ *
+ *     With this renumbering, we needed an average of 57.3 iterations for the
+ *     testcase outlined above, and a runtime of 6min10s.
+ *   </td>
+ *   </td>
+ * </tr>
+ *
+ * <tr>
  *   <td>
  *     @image html "reorder_sparsity_step_31_boost_cmk.png"
  *   </td>
@@ -226,31 +291,40 @@ DEAL_II_NAMESPACE_OPEN
  * </tr>
  * <tr>
  *   <td>
- *     Enumeration as produced by deal.II's DoFHandler::distribute_dofs function
- *   </td>
- *   <td>
- *     Random enumeration as produced by applying DoFRenumbering::random
- *     after calling DoFHandler::distribute_dofs.
- *   </td>
- *   <td>
- *     Cuthill-McKee enumeration as produced by calling the deal.II implementation
- *     of the algorithm provided by DoFRenumbering::Cuthill_McKee
- *     after DoFHandler::distribute_dofs.
- *   </td>
- *   <td>
  *     Cuthill-McKee enumeration as produced by calling the BOOST implementation
  *     of the algorithm provided by DoFRenumbering::boost::Cuthill_McKee
  *     after DoFHandler::distribute_dofs.
+ *
+ *     With this renumbering, we needed an average of 51.7 iterations for the
+ *     testcase outlined above, and a runtime of 5min52s.
  *   </td>
  *   <td>
  *     King enumeration as produced by calling the BOOST implementation
  *     of the algorithm provided by DoFRenumbering::boost::king_ordering
- *     after DoFHandler::distribute_dofs.
+ *     after DoFHandler::distribute_dofs. The sparsity pattern appears
+ *     denser than with BOOST's Cuthill-McKee algorithm; however, this is
+ *     only an illusion: the number of nonzero entries is the same, they are
+ *     simply not as well clustered.
+ *
+ *     With this renumbering, we needed an average of 51.0 iterations for the
+ *     testcase outlined above, and a runtime of 5min03s. Although the number
+ *     of iterations is only slightly less than with BOOST's Cuthill-McKee
+ *     implementation, runtime is significantly less. This, again, may be due
+ *     to cache effects.
  *   </td>
  *   <td>
  *     Minimum degree enumeration as produced by calling the BOOST implementation
  *     of the algorithm provided by DoFRenumbering::boost::minimum_degree
- *     after DoFHandler::distribute_dofs.
+ *     after DoFHandler::distribute_dofs. The minimum degree algorithm does not
+ *     attempt to minimize the bandwidth of a matrix but to minimize the amount
+ *     of fill-in a LU decomposition would produce, i.e. the number of places in
+ *     the matrix that would be occupied by elements of an LU decompisition that
+ *     are not already occupied by elements of the original matrix. The resulting
+ *     sparsity pattern obviously has an entirely different structure than the
+ *     ones produced by algorithms trying to minimize the bandwidth.
+ *
+ *     With this renumbering, we needed an average of 58.9 iterations for the
+ *     testcase outlined above, and a runtime of 6min11s.
  *   </td>
  * </tr>
  * </table>
