@@ -564,3 +564,78 @@ conditions will produce a singularity in the pressure at the center of the top
 surface that sucks material all the way to the top surface to fill the gap
 left by the outward motion of material at this location.
 
+
+<h2>Implementation</h2>
+
+The program developed below has seen a lot of TLC. We have run it over
+and over under profiling tools (mainly <a
+href="http://www.valgrind.org/">valgrind</a>'s cachegrind and
+callgrind tools, as well as the KDE <a
+href="http://kcachegrind.sourceforge.net/">KCachegrind</a> program for
+visualization) to see where the bottlenecks are. This has paid off:
+through this effort, the program has become almost twice as fast when
+considering the runtime of the refinement cycles zero through three,
+reducing the overall number of CPU instructions executed from
+869,574,060,348 to 474,507,755,764. For higher refinement levels, the
+gain is probably even larger since some algorithms that are not ${\cal
+O}(N)$ have been eliminated.
+
+Essentially, there are currently two algorithms in the program that do
+not scale linearly with the number of degrees of freedom: renumbering
+of degrees of freedom, and the linear solver. As for the first, while
+reordering degrees of freedom may not scale linearly, it is an
+indispensible part of the overall algorithm as it greatly improves the
+quality of the sparse ILU, easily making up for the time spent on
+computing the renumbering; graphs and timings to demonstrate this are
+shown in the documentation of the DoFRenumbering namespace, also
+underlining the choice of the King reordering algorithm chosen below.
+
+As for the linear solver: as mentioned above, our implementation here
+uses a Schur complement formulation. This is not necessarily the very
+best choice but demonstrates various important techniques available in
+deal.II. The question of which solver is best is again discussed in
+the <a href="#improved-solver">section on improved solvers in the
+results part</a> of this program, along with code showing alternative
+solvers and a comparison of their results.
+
+Apart from this, many other algorithms have been tested and improved
+during the creation of this program. For example, in building the
+sparsity pattern, we originally used a BlockCompressedSparsityPattern
+object; however, its data structures are poorly adapted for the large
+numbers of nonzero entries per row created by our discretization in
+3d, leading to a quadratic behavior. Replacing it with a
+BlockCompressedSetSparsityPattern removed this bottleneck at the price
+of some more memory consumption, by using a better adapted data
+structure. Likewise, the implementation of the decomposition step in
+the SparseILU class was very inefficient and has been replaced by one
+that is about 10 times faster. Small improvements were applied here
+and there.
+
+A profile of where the program spends it time in refinement cycles
+zero through three in 3d is shown here:
+
+@image html step-22.profile-3.png
+
+As can be seen, at this refinement level approximately half of the
+time is spent on matrix assembly and sparse ILU computation (left
+half), one third on the actual solver (the SparseILU::vmult calls in
+the center right), and the rest on other things. For higher refinement
+levels, the greenesh boxes at the center right representing the solver
+as well as the blue box at the top right representing the reordering
+algorithm are going to grow at the expense of the other parts of the
+program, since they don't scale linearly. The fact that at this
+moderate refinement level (3168 cells and 93176 degrees of freedom)
+matrix assembly requires about half the compute time may therefore not
+be of such importance. 
+
+As a final point, and as a point of reference, the following picture
+also shows how the profile looked at an early stage of optimizing this
+program: 
+
+@image html step-22.profile-3.original.png
+
+As mentioned above, the runtime of this version was about twice as
+long as for the first profile, with the SparseILU decomposition taking
+up about 30% of the run time, and operations on the ill-suited
+CompressedSparsityPattern about 10%. Both these bottlenecks have since
+been completely removed.
