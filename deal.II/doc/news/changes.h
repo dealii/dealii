@@ -283,6 +283,21 @@ constraints individually.
 <h3>deal.II</h3>
 
 <ol> 
+  <li> <p>New: There is now a namespace DoFRenumbering::boost that contains the
+  implementation of interfaces to three reordering strategies provided by the
+  Boost Graph Library, namely DoFRenumbering::boost::Cuthill_McKee,
+  DoFRenumbering::boost::king_ordering, and DoFRenumbering::boost::minimum_degree.
+  <br>
+  (WB 2008/03/07)
+  </p></li>
+
+  <li> <p>Changed: The DoFRenumbering class has been converted into a namespace.
+  Since all its members were static, this hasn't changed anything fundamental
+  and use of the functions therein should work in exactly the same way as before.
+  <br>
+  (WB 2008/03/07)
+  </p></li>
+
   <li> <p>New: The new TriaObjectAccessor::set_all_boundary_indicators function
   does not only set the boundary indicator of the current object but of all that
   bound it as well. For example, in 3d, if TriaObjectAccessor::set_boundary_indicator
@@ -293,8 +308,7 @@ constraints individually.
   (WB 2008/02/26)
   </p></li>
 
-
-  <li> <p>Improved: The tria pointer and the debug_output_grid function in GridIn
+  <li> <p>Improved: The tria pointer and the GridIn::debug_output_grid function
   are changed from private to protected to be accessible in derived classes.
   <br>
   (RH 2008/02/24)
