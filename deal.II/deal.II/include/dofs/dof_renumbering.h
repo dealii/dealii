@@ -327,6 +327,29 @@ DEAL_II_NAMESPACE_OPEN
  *     testcase outlined above, and a runtime of 6min11s.
  *   </td>
  * </tr>
+ *
+ * <tr>
+ *   <td>
+ *     @image html "reorder_sparsity_step_31_downstream.png"
+ *   </td>
+ *   <td>
+ *   </td>
+ *   <td>
+ *   </td>
+ * </tr>
+ * <tr>
+ *   <td>
+ *     Downstream enumeration using DoFRenumbering::downstream using a
+ *     direction that points diagonally through the domain.
+ *
+ *     With this renumbering, we needed an average of 90.5 iterations for the
+ *     testcase outlined above, and a runtime of 7min05s.
+ *   </td>
+ *   <td>
+ *   </td>
+ *   <td>
+ *   </td>
+ * </tr>
  * </table>
  *
  *
