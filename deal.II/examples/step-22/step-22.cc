@@ -485,24 +485,50 @@ StokesProblem<dim>::StokesProblem (const unsigned int degree)
 				 // degrees of freedom and renumbering
 				 // them: In order to make the ILU
 				 // preconditioner (in 3D) work
-				 // efficiently, the degrees of
-				 // freedom are renumbered using the
-				 // Cuthill-McKee algorithm as this
-				 // reduces the bandwidth of the
-				 // matrix. On the other hand, we need
-				 // to preserve the block structure of
-				 // velocity and pressure already seen
-				 // in in step-20 and step-21. This is
-				 // done in two steps: First, all dofs
-				 // are renumbered by
-				 // <code>DoFRenumbering::Cuthill_McKee</code>,
-				 // and then we renumber once again by
+				 // efficiently, it is important to
+				 // enumerate the degrees of freedom
+				 // in such a way that it reduces the
+				 // bandwidth of the matrix, or maybe
+				 // more importantly: in such a way
+				 // that the ILU is as close as
+				 // possible to a real LU
+				 // decomposition. On the other hand,
+				 // we need to preserve the block
+				 // structure of velocity and pressure
+				 // already seen in in step-20 and
+				 // step-21. This is done in two
+				 // steps: First, all dofs are
+				 // renumbered to improve the ILU and
+				 // then we renumber once again by
 				 // components. Since
 				 // <code>DoFRenumbering::component_wise</code>
 				 // does not touch the renumbering
 				 // within the individual blocks, the
-				 // basic renumbering from
-				 // Cuthill-McKee remains.
+				 // basic renumbering from the first
+				 // step remains. As for how the
+				 // renumber degrees of freedom to
+				 // improve the ILU: deal.II has a
+				 // number of algorithms that attempt
+				 // to find orderings to improve ILUs,
+				 // or reduce the bandwidth of
+				 // matrices, or optimize some other
+				 // aspect. The DoFRenumbering
+				 // namespace shows a comparison of
+				 // the results we obtain with several
+				 // of these algorithms based on the
+				 // testcase discussed here in this
+				 // tutorial program. It turns out
+				 // that not the traditional
+				 // Cuthill-McKee algorithm already
+				 // used in some of the previous
+				 // tutorial programs is the best, but
+				 // the King ordering. deal.II
+				 // implements them by interfacing
+				 // with the Boost Graph Library,
+				 // which is part of the deal.II
+				 // distribution. The call to use it
+				 // below is
+				 // DoFRenumbering::boost::king_ordering.
 				 //
 				 // There is one more change compared
 				 // to previous tutorial programs:
@@ -538,7 +564,7 @@ void StokesProblem<dim>::setup_dofs ()
   system_matrix.clear ();
   
   dof_handler.distribute_dofs (fe);  
-  DoFRenumbering::Cuthill_McKee (dof_handler);
+  DoFRenumbering::boost::king_ordering (dof_handler);
 
   std::vector<unsigned int> block_component (dim+1,0);
   block_component[dim] = 1;
