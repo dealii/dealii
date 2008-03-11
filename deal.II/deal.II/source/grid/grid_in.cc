@@ -2,7 +2,7 @@
 //    $Id$
 //    Version: $Name$
 //
-//    Copyright (C) 1999, 2000, 2001, 2002, 2003, 2004, 2005, 2006, 2007 by the deal.II authors
+//    Copyright (C) 1999, 2000, 2001, 2002, 2003, 2004, 2005, 2006, 2007, 2008 by the deal.II authors
 //
 //    This file is subject to QPL and may not be  distributed
 //    without copyright and license information. Please refer
@@ -1133,7 +1133,7 @@ void GridIn<3>::read_netcdf (const std::string &filename)
   std::vector<std::vector<double> > point_values(
     3, std::vector<double> (n_vertices));
 				   // we switch y and z
-  const bool switch_y_z=true;
+  const bool switch_y_z=false;
   points_xc->get(&*point_values[0].begin(), n_vertices);
   if (switch_y_z)
     {
@@ -1235,8 +1235,7 @@ void GridIn<3>::read_netcdf (const std::string &filename)
     }
 
   GridTools::delete_unused_vertices(vertices, cells, subcelldata);
-  if (switch_y_z)
-    GridReordering<dim>::invert_all_cells_of_negative_grid (vertices, cells);
+  GridReordering<dim>::invert_all_cells_of_negative_grid (vertices, cells);
   GridReordering<dim>::reorder_cells (cells);
   tria->create_triangulation_compatibility (vertices, cells, subcelldata);  
 #endif
