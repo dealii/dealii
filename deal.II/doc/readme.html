@@ -5,7 +5,7 @@
   <title>The deal.II Readme</title>
   <link href="screen.css" rel="StyleSheet">
   <meta name="author" content="the deal.II authors <authors @ dealii.org>">
-  <meta name="copyright" content="Copyright (C) 1999, 2000, 2001, 2002, 2003, 2004, 2005, 2006, 2007 by the deal.II authors">
+  <meta name="copyright" content="Copyright (C) 1999, 2000, 2001, 2002, 2003, 2004, 2005, 2006, 2007, 2008 by the deal.II authors">
   <meta name="date" content="$Date$">
   <meta name="svn_id" content="$Id$">
   <meta name="keywords" content="deal.II">
@@ -552,22 +552,17 @@
     <dd>
       <acronym>deal.II</acronym> can interface to the <a
       href="http://www.mcs.anl.gov/petsc/" target="_top">PETSc</a>
-      library. PETSc's main strength is to provide lots of functions for
-      linear algebra, among several other things. It comes with
+      library. PETSc's provides lots of functions for
+      linear algebra, among other things, for example
       implementations of a variety of linear solvers, as well as various
-      different sparse and dense matrix and vector formats, for which
+      different sparse and dense matrix and vector formats.
       <acronym>deal.II</acronym> has wrapper classes that provide almost the
       same interfaces as the built-in <acronym>deal.II</acronym> linear
       algebra classes. The main advantage of PETSc is the variety of its
       algorithms, and that all of them can work in a parallel setting,
       i.e. matrices and vectors can be distributed across a cluster of
-      computers that communicate via MPI. This makes PETSc the choice of
-      linear algrebra implementations for very large problems that do not fit
-      into a single computer's memory or have run-times that are too long for
-      a single computer. At present, our interfaces are only wrappers for
-      vector and matrix formats, as well as to their solver and preconditioner
-      classes. However, we plan to extend this to a tighter coupling in the
-      future.
+      computers that communicate via MPI, providing <acronym>deal.II</acronym>
+      with parallel computing capabilities.
       </p>
 
       <p>
@@ -581,11 +576,12 @@
       compiled. If these environment variables are set, then
       <acronym>deal.II</acronym> will pick them up during configuration, and
       store them. It will then also recognize that PETSc shall be used, and
-      enable the wrapper classes (they are disabled by default, if PETSc is
-      unavailable). However, you can override the values of these environment
-      variablaes by using the <code>--with-petsc=DIR</code> and
-      <code>--with-mpi-arch=ARCH</code> switches to
-      <code>./configure</code>. If you do have a PETSc installation
+      enable the wrapper classes. The
+      <code>--with-petsc=DIR</code> and
+      <code>--with-petsc-arch=ARCH</code> switches to
+      <code>./configure</code> can be used to override the values
+      of <code>PETSC_DIR</code> and <code>PETSC_ARCH</code> or if these
+      environment variables are not set at all. If you do have a PETSc installation
       and have set the <code>PETSC_DIR</code> and
       <code>PETSC_ARCH</code> environment variables but do not wish
       <acronym>deal.II</acronym> to be configured for PETSc use, you
@@ -611,6 +607,33 @@
       this posting to the mailing list</a>. 
       </p>
     </dd>
+
+
+    <a name="trilinos"></a>
+    <dt>Trilinos</dt>
+    <dd>
+      <p>
+      <acronym>deal.II</acronym> can also interface to the <a
+      href="http://trilinos.sandia.gov" target="_top">Trilinos</a> software
+      library. Trilinos, like PETSc, provides a large number of linear algebra
+      and other classes that can be used on sequential or parallel
+      computers. It is written in C++ and considered more modern than PETSc.
+      </p>
+
+      <p>
+      As with our <href="#petsc">PETSc support</a>, <acronym>deal.II</acronym>
+      has wrappers that allow Trilinos linear algebra classes to be used with
+      the same interface as <acronym>deal.II</acronym> classes. These
+      interfaces can be enabled by setting the <code>TRILINOS_DIR</code>
+      environment variable to the path to an existing Trilinos installation,
+      or using the <code>--enable-trilinos=/path/to/trilinos</code> switch of
+      the <code>./configure</code> script. The Trilinos installation needs to
+      provide the same kind of libraries that <acronym>deal.II</acronym> is
+      configured for, i.e. if you want deal.II to use shared libraries, then
+      Trilinos needs to use shared libraries as well.
+      </p>
+    </dd>
+
 
     <a name="metis"></a>
     <dt>Metis</dt>
