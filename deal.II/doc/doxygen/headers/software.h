@@ -2,7 +2,7 @@
 //    $Id$
 //    Version: $Name$
 //
-//    Copyright (C) 2005, 2006, 2007 by the deal.II authors
+//    Copyright (C) 2005, 2006, 2007, 2008 by the deal.II authors
 //
 //    This file is subject to QPL and may not be  distributed
 //    without copyright and license information. Please refer
@@ -100,9 +100,27 @@
  * namespace, that allow the use of PETSc in much the same way as deal.II's
  * own linear algebra classes are used. The use of these wrappers is explained
  * in the step-17 and step-18 example programs, as well as in the @ref
- * PETScWrappers module.
+ * PETScWrappers module. The <a href="../../readme.html">ReadMe</a> file
+ * explains how to configure deal.II to use PETSc.
  *
  * PETSc can be obtained from http://www.mcs.anl.gov/petsc/.
+ *
+ *
+ * @subsection SoftwareTrilinos Trilinos
+ *
+ * Trilinos, like @ref SoftwarePETSc, is a library that supports, among other
+ * things of interest to numerical computations, a large number of linear
+ * algebra data structures and algorithms. It, too, can work on parallel
+ * clusters.
+ *
+ * Currently, we do not have wrapper classes that make Trilinos objects look
+ * like deal.II objects. However, our Makefiles are setup so that programs
+ * using Trilinos classes are automatically linked against the Trilinos
+ * libraries, and header files are found automatically. The <a
+ * href="../../readme.html">ReadMe</a> file explains how to configure deal.II
+ * to use this feature.
+ *
+ * Trilinos can be obtained from http://trilinos.sandia.org.
  *
  *
  * @subsection SoftwareMETIS METIS
