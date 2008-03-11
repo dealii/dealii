@@ -621,13 +621,16 @@
       </p>
 
       <p>
-      As with our <href="#petsc">PETSc support</a>, <acronym>deal.II</acronym>
-      has wrappers that allow Trilinos linear algebra classes to be used with
-      the same interface as <acronym>deal.II</acronym> classes. These
-      interfaces can be enabled by setting the <code>TRILINOS_DIR</code>
+      Unlike with <href="#petsc">PETSc support</a>, <acronym>deal.II</acronym>
+      does not currently have wrappers that allow Trilinos linear algebra
+      classes to be used with 
+      the same interface as <acronym>deal.II</acronym> classes, though we hope
+      to have them in the future. However, our Makefiles are set up so that if
+      Trilinos use is configured in, header files are automatically found and
+      libraries are linked with. To do so, set the <code>TRILINOS_DIR</code>
       environment variable to the path to an existing Trilinos installation,
-      or using the <code>--enable-trilinos=/path/to/trilinos</code> switch of
-      the <code>./configure</code> script. The Trilinos installation needs to
+      or use the <code>--enable-trilinos=/path/to/trilinos</code> switch of
+      the deal.II <code>./configure</code> script. The Trilinos installation needs to
       provide the same kind of libraries that <acronym>deal.II</acronym> is
       configured for, i.e. if you want deal.II to use shared libraries, then
       Trilinos needs to use shared libraries as well.
