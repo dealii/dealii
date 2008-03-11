@@ -1470,9 +1470,11 @@ DataOutBase::GmvFlags::memory_consumption () const
 
 
 DataOutBase::TecplotFlags::
-TecplotFlags (const char* tecplot_binary_file_name)
+TecplotFlags (const char* tecplot_binary_file_name,
+	      const char* zone_name)
                 :
-                tecplot_binary_file_name(tecplot_binary_file_name)
+                tecplot_binary_file_name(tecplot_binary_file_name),
+		zone_name(zone_name)
 {}
 
 
@@ -3236,8 +3238,12 @@ void DataOutBase::write_tecplot (const std::vector<Patch<dim,spacedim> > &patche
       out << ", \"" << data_names[data_set] << "\"";
     
     out << '\n';
+
+    out << "zone ";
+    if (flags.zone_name)
+      out << "t=\"" << flags.zone_name << "\" ";
     
-    out << "zone f=feblock, n=" << n_nodes << ", e=" << n_cells
+    out << "f=feblock, n=" << n_nodes << ", e=" << n_cells
 	<< ", et=" << tecplot_cell_type[dim] << '\n';
   }
 

@@ -2,7 +2,7 @@
 //    $Id$
 //    Version: $Name$
 //
-//    Copyright (C) 1999, 2000, 2001, 2002, 2003, 2004, 2005, 2006, 2007 by the deal.II authors
+//    Copyright (C) 1999, 2000, 2001, 2002, 2003, 2004, 2005, 2006, 2007, 2008 by the deal.II authors
 //
 //    This file is subject to QPL and may not be  distributed
 //    without copyright and license information. Please refer
@@ -1128,11 +1128,19 @@ class DataOutBase
 					  * produced.
 					  */
         const char* tecplot_binary_file_name;
-      
+
+					 /**
+					  * Tecplot allows to assign
+					  * names to zones. This
+					  * variable stores this name.
+					  */
+	const char* zone_name;
+	
 	                                 /**
 	                                  * Constructor
 	                                  **/
-	TecplotFlags (const char* tecplot_binary_file_name = NULL);
+	TecplotFlags (const char* tecplot_binary_file_name = NULL,
+		      const char* zone_name = NULL);
       
 					 /**
 					  * Declare all flags with name
