@@ -64,7 +64,7 @@ so-called pressure equation:
 @f{eqnarray*}
 - \nabla \cdot (\mathbf{K}\lambda(S) \nabla p)= q.
 @f}
-Here, $q$ is th sum source term, and
+Here, $q$ is the sum source term, and
 @f[
   \lambda(S) = \frac{k_{rw}(S)}{\mu_{w}}+\frac{k_{ro}(S)}{\mu_{o}}
 @f]
@@ -145,8 +145,8 @@ derived above by going back to the first order, mixed formulation. To this
 end, we re-introduce the total velocity $\mathbf u$ and write the equations in
 the following form:
 @f{eqnarray*}
-  \mathbf{u}+\mathbf{K}\lambda(S) \nabla p&=&0 \\
-  \nabla \cdot\mathbf{u} &=& 0 \\
+  \mathbf{u}-\mathbf{K}\lambda(S) \nabla p&=&0 \\
+  \nabla \cdot\mathbf{u} &=& q \\
   S_{t} + \mathbf{u} \cdot \nabla F(S) &=& 0.
 @f}
 This formulation has the additional benefit that we do not have to express the
@@ -155,7 +155,7 @@ of the pressure, but can rather take the primary variable for it. Given the
 saddle point structure of the first two equations and their similarity to the
 mixed Laplace formulation we have introduced in @ref step_20 "step-20", it
 will come as no surprise that we will use a mixed discretization again. 
-
+                                  
 But let's postpone this for a moment. The first business we have with these
 equations is to think about the time discretization. In reservoir simulation,
 there is a rather standard algorithm that we will use here. It first solves
@@ -165,7 +165,7 @@ Explicit Saturation. In a slightly modified form, this algorithm can be
 written as follows: for each time step, solve
 @f{eqnarray*}
   \mathbf{u}^{n+1}+\mathbf{K}\lambda(S^n) \nabla p^{n+1}&=&0 \\
-  \nabla \cdot\mathbf{u}^{n+1} &=& 0 \\
+  \nabla \cdot\mathbf{u}^{n+1} &=& q^{n+1} \\
   \frac {S^{n+1}-S^n}{\triangle t} + \mathbf{u}^{n+1} \cdot \nabla F(S^n) &=& 0,
 @f}
 where $\triangle t$ is the length of a time step. Note how we solve the
@@ -174,14 +174,14 @@ saturation $S^n$, and then do an explicit time step for $S^{n+1}$ that only
 depends on the previously known $S^n$ and the just computed $\mathbf{u}^{n+1}$.
 
 We can then state the problem in weak form as follows, by multiplying each
-equation with test functions $\mathbf v$, $q$, and $\sigma$ and integrating
+equation with test functions $\mathbf v$, $\phi$, and $\sigma$ and integrating
 terms by parts:
 @f{eqnarray*}
   \left((\mathbf{K}\lambda(S^n))^{-1} \mathbf{u}^{n+1},\mathbf v\right)_\Omega -
   (p^{n+1}, \nabla\cdot\mathbf v)_\Omega &=& 
   - (p^{n+1}, \mathbf v)_{\partial\Omega} 
   \\
-  (\nabla \cdot\mathbf{u}^{n+1}, q)_\Omega &=& 0 
+  (\nabla \cdot\mathbf{u}^{n+1}, \phi)_\Omega &=& (q^{n+1},\phi)_\Omega 
 @f}
 Note that in the first term, we have to prescribe the pressure $p^{n+1}$ on
 the boundary $\partial\Omega$ as boundary values for our problem. $\mathbf n$
@@ -201,20 +201,21 @@ For the saturation equation, we obtain after integrating by parts
   &=&
   (S^n,\sigma)_\Omega.
 @f}
-Using the fact that $\nabla \cdot \mathbf{u}^{n+1}=0$, we can rewrite the cell
-term to get an equation as follows:
+Using the fact that $\nabla \cdot \mathbf{u}^{n+1}=q^{n+1}$, we can rewrite the
+cell term to get an equation as follows:
 @f{eqnarray*}
   (S^{n+1}, \sigma)_\Omega
   -
   \triangle t 
   \sum_K
   \left\{
-  \left(F(S^n) \mathbf{u}^{n+1}, \nabla \sigma)\right)_K
+  \left(F(S^n) \mathbf{u}^{n+1}, \nabla \sigma\right)_K
   -
   \left(F(S^n) (\mathbf n \cdot \mathbf{u}^{n+1}), \sigma\right)_{\partial K}
   \right\}
   &=&
-  (S^n,\sigma)_\Omega.
+  (S^n,\sigma)_\Omega + 
+  \triangle t \sum_K  \left(F(S^n), q^{n+1} \sigma\right).
 @f}
 
 

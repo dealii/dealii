@@ -61,8 +61,8 @@ areas of high pressure to areas of low pressure.
 With this second variable, one then finds an alternative version of the
 Laplace equation, called the mixed formulation:
 @f{eqnarray*}
-  K^{-1} {\mathbf u} - \nabla p &=& 0 \qquad {\textrm{in}\ } \Omega, \\
-  -{\textrm{div}}\ {\mathbf u} &=& 0 \qquad {\textrm{in}\ }\Omega, \\
+  K^{-1} {\mathbf u} + \nabla p &=& 0 \qquad {\textrm{in}\ } \Omega, \\
+  -{\textrm{div}}\ {\mathbf u} &=& -f \qquad {\textrm{in}\ }\Omega, \\
   p &=& g \qquad {\textrm{on}\ } \partial\Omega.
 @f}
 
