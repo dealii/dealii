@@ -79,7 +79,7 @@ of course is going to change as the fluids move around.
 The second part of the equations is a therefore description of the
 dynamics of the saturation. We model this as an advected quantity:
 @f{eqnarray*}
-  S_{t} + \mathbf{u} \cdot \nabla F(S) = 0.
+  S_{t} + \mathbf{u} \cdot \nabla F(S) = 0,
 @f}
 where $\mathbf u$ is the total velocity
 @f[
@@ -145,7 +145,7 @@ derived above by going back to the first order, mixed formulation. To this
 end, we re-introduce the total velocity $\mathbf u$ and write the equations in
 the following form:
 @f{eqnarray*}
-  \mathbf{u}-\mathbf{K}\lambda(S) \nabla p&=&0 \\
+  \mathbf{u}+\mathbf{K}\lambda(S) \nabla p&=&0 \\
   \nabla \cdot\mathbf{u} &=& q \\
   S_{t} + \mathbf{u} \cdot \nabla F(S) &=& 0.
 @f}
@@ -215,7 +215,7 @@ cell term to get an equation as follows:
   \right\}
   &=&
   (S^n,\sigma)_\Omega + 
-  \triangle t \sum_K  \left(F(S^n), q^{n+1} \sigma\right).
+  \triangle t \sum_K  \left(F(S^n) q^{n+1}, \sigma\right)_K.
 @f}
 
 
@@ -288,7 +288,7 @@ M^u(S^n)_{ij} &=&
 v_j\right)_\Omega,
 \\
 B_{ij} &=&
-(\nabla \cdot \mathbf v_i, \phi_j)_\Omega,
+-(\nabla \cdot \mathbf v_j, \phi_i)_\Omega,
 \\
 H_{ij} &=&
   -
@@ -305,10 +305,10 @@ M^S_{ij} &=&
 (\phi_i, \phi_j)_\Omega,
 \\
 (F_2)_i &=&
-(q,\phi_i)_\Omega,
+-(q^{n+1},\phi_i)_\Omega,
 \\
 (F_3)_i &=&
-(S^n,\phi_i)_\Omega.
+(S^n,\phi_i)_\Omega +\triangle t \sum_K  \left(F(S^n) q^{n+1}, \phi_i\right)_K.
 @f}
 
 Note the following complication, however: Since the matrix $H_{ij}$

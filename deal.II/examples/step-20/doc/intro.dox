@@ -178,6 +178,7 @@ components. For example, in 2d, the first term could be rewritten like this
    \left((x_h^i)_1, K^{-1}_{11} (x_h^j)_1\right).
 @f}
 If we implemented this, we would get code like this:
+
 @code
   for (unsigned int q=0; q<n_q_points; ++q) 
     for (unsigned int i=0; i<dofs_per_cell; ++i)
@@ -201,11 +202,13 @@ If we implemented this, we would get code like this:
                              *
                              fe_values.JxW(q);
 @endcode
+
 This is, at best, tedious, error prone, and not dimension independent. There
 are obvious ways to make things dimension independent, but in the end, the
 code is simply not pretty. What would be much nicer is if we could simply
 extract the ${\mathbf u}$ and $p$ components of a shape function $x_h^i$. In the
 program we do that in the following way:
+
 @code
   const FEValuesExtractors::Vector velocities (0);
   const FEValuesExtractors::Scalar pressure (dim);
@@ -226,6 +229,7 @@ program we do that in the following way:
                               fe_values[velocities].divergence (j, q)) *
                               fe_values.JxW(q);
 @endcode
+
 This is, in fact, not only the first term of the bilinear form, but the
 whole thing (sans boundary contributions).
 
@@ -284,6 +288,7 @@ The final result then looks like this, working in every space dimension:
                             fe_values.JxW(q);
           }
 @endcode
+
 This very closely resembles the form in which we have originally written down
 the bilinear form and right hand side.
 
@@ -295,6 +300,7 @@ domain integrals, except that we have to use the FEFaceValues class
 instead of <code>FEValues</code>. To compute the boundary term we then simply have
 to loop over all boundary faces and integrate there. The mechanism works in
 the same way as above, i.e. the extractor classes also work on FEFaceValues objects:
+
 @code
       for (unsigned int face_no=0;
 	   face_no<GeometryInfo<dim>::faces_per_cell;
@@ -390,6 +396,7 @@ need, which in fact includes only the ability to perform matrix-vector
 products; we form them by using a CG solve (this of course requires that the
 matrix passed to this class satisfies the requirements of the CG
 solvers). Here are the relevant parts of the code that implements this:
+
 @code
 class InverseMatrix
 {
@@ -414,6 +421,7 @@ void InverseMatrix::vmult (Vector<double>       &dst,
   cg.solve (*matrix, dst, src, PreconditionIdentity());        
 }
 @endcode
+
 Once created, objects of this class can act as matrices: they perform
 matrix-vector multiplications. How this is actually done is irrelevant to the
 outside world.
@@ -422,6 +430,7 @@ Using this class, we can then write a class that implements the Schur
 complement in much the same way: to act as a matrix, it only needs to offer a
 function to perform a matrix-vector multiplication, using the algorithm
 above. Here are again the relevant parts of the code:
+
 @code
 class SchurComplement 
 {
@@ -466,6 +475,7 @@ With all this, we can go ahead and write down the solver we are going to
 use. Essentially, all we need to do is form the right hand sides of the two
 equations defining $P$ and $U$, and then solve them with the Schur complement
 matrix and the mass matrix, respectively:
+
 @code
 template <int dim>
 void MixedLaplaceProblem<dim>::solve () 
@@ -545,6 +555,7 @@ the inverse of its diagonal, which is cheap.
 To implement something like this, let us first generalize the
 <code>InverseMatrix</code> class so that it can work not only with
 <code>SparseMatrix</code> objects, but with any matrix type. This looks like so:
+
 @code
 template <class Matrix>
 class InverseMatrix
@@ -574,12 +585,14 @@ void InverseMatrix<Matrix>::vmult (Vector<double>       &dst,
   cg.solve (*matrix, dst, src, PreconditionIdentity());        
 }
 @endcode
+
 Essentially, the only change we have made is the introduction of a template
 argument that generalizes the use of <code>SparseMatrix</code>.
 
 The next step is to define a class that represents the approximate Schur
 complement. This should look very much like the Schur complement class itself,
 except that it doesn't need the object representing $M^{-1}$ any more:
+
 @code
 class ApproximateSchurComplement : public Subscriptor
 {
@@ -604,12 +617,14 @@ void ApproximateSchurComplement::vmult (Vector<double>       &dst,
   system_matrix->block(1,0).vmult (dst, tmp2);
 }
 @endcode
+
 Note how the <code>vmult</code> function differs in simply doing one Jacobi sweep
 (i.e. multiplying with the inverses of the diagonal) instead of multiplying
 with the full $M^{-1}$.
 
 With all this, we already have the preconditioner: it should be the inverse of
 the approximate Schur complement, i.e. we need code like this:
+
 @code
     ApproximateSchurComplement
       approximate_schur_complement (system_matrix);
@@ -617,10 +632,12 @@ the approximate Schur complement, i.e. we need code like this:
     InverseMatrix<ApproximateSchurComplement>
       preconditioner (approximate_schur_complement)
 @endcode
+
 That's all!
 
 Taken together, the first block of our <code>solve()</code> function will then
 look like this:
+
 @code
     Vector<double> schur_rhs (solution.block(1).size());
 
@@ -644,6 +661,7 @@ look like this:
     cg.solve (schur_complement, solution.block(1), schur_rhs,
               preconditioner);
 @endcode
+
 Note how we pass the so-defined preconditioner to the solver working on the
 Schur complement matrix.
 
