@@ -148,8 +148,13 @@
   -
   (q, \mathrm{div}\ \mathbf u)
   =
-  (q,f).
+  (q,f),
 @f}
+ * where we have defined the scalar product
+ * $(\mathbf v, \mathbf u) = \int_\Omega \mathbf v(x)
+ * \cdot \mathbf u(x) \; dx$, and similarly if both parts of the scalar
+ * product are scalar-valued functions (e.g. the pressure) rather
+ * than vector-valued onces (like the velocity).
  *
  * We get the final form by integrating by part the second term:
 @f{eqnarray*}
