@@ -2,7 +2,7 @@
 //    $Id$
 //    Version: $Name$
 //
-//    Copyright (C) 1998, 1999, 2000, 2001, 2002, 2003, 2004, 2005, 2006, 2007 by the deal.II authors
+//    Copyright (C) 1998, 1999, 2000, 2001, 2002, 2003, 2004, 2005, 2006, 2007, 2008 by the deal.II authors
 //
 //    This file is subject to QPL and may not be  distributed
 //    without copyright and license information. Please refer
@@ -611,6 +611,15 @@ DoFCellAccessor<DoFHandler<deal_II_dimension> >::set_dof_values<PETScWrappers::V
 
 template
 void
+DoFCellAccessor<DoFHandler<deal_II_dimension> >::set_dof_values<PETScWrappers::MPI::Vector,double>
+(const Vector<double> &, PETScWrappers::MPI::Vector&) const;
+template
+void
+DoFCellAccessor<DoFHandler<deal_II_dimension> >::set_dof_values<PETScWrappers::MPI::Vector,float>
+(const Vector<float>&, PETScWrappers::MPI::Vector&) const;
+
+template
+void
 DoFCellAccessor<DoFHandler<deal_II_dimension> >::get_dof_values<PETScWrappers::BlockVector,double>
 (const PETScWrappers::BlockVector &, Vector<double>&) const;
 template
@@ -625,6 +634,15 @@ template
 void
 DoFCellAccessor<DoFHandler<deal_II_dimension> >::set_dof_values<PETScWrappers::BlockVector,float>
 (const Vector<float>&, PETScWrappers::BlockVector&) const;
+
+template
+void
+DoFCellAccessor<DoFHandler<deal_II_dimension> >::set_dof_values<PETScWrappers::MPI::BlockVector,double>
+(const Vector<double> &, PETScWrappers::MPI::BlockVector&) const;
+template
+void
+DoFCellAccessor<DoFHandler<deal_II_dimension> >::set_dof_values<PETScWrappers::MPI::BlockVector,float>
+(const Vector<float>&, PETScWrappers::MPI::BlockVector&) const;
 #endif
 
 
@@ -732,6 +750,11 @@ void
 DoFCellAccessor<DoFHandler<deal_II_dimension> >::
 set_dof_values_by_interpolation<PETScWrappers::Vector,double>
 (const Vector<double>&, PETScWrappers::Vector&) const;
+template
+void
+DoFCellAccessor<DoFHandler<deal_II_dimension> >::
+set_dof_values_by_interpolation<PETScWrappers::MPI::Vector,double>
+(const Vector<double>&, PETScWrappers::MPI::Vector&) const;
 
 template
 void
@@ -743,6 +766,11 @@ void
 DoFCellAccessor<DoFHandler<deal_II_dimension> >::
 set_dof_values_by_interpolation<PETScWrappers::Vector,float>
 (const Vector<float>&, PETScWrappers::Vector&) const;
+template
+void
+DoFCellAccessor<DoFHandler<deal_II_dimension> >::
+set_dof_values_by_interpolation<PETScWrappers::MPI::Vector,float>
+(const Vector<float>&, PETScWrappers::MPI::Vector&) const;
 
 
 template
@@ -755,6 +783,11 @@ void
 DoFCellAccessor<DoFHandler<deal_II_dimension> >::
 set_dof_values_by_interpolation<PETScWrappers::BlockVector,double>
 (const Vector<double>&, PETScWrappers::BlockVector&) const;
+template
+void
+DoFCellAccessor<DoFHandler<deal_II_dimension> >::
+set_dof_values_by_interpolation<PETScWrappers::MPI::BlockVector,double>
+(const Vector<double>&, PETScWrappers::MPI::BlockVector&) const;
 
 template
 void
@@ -766,6 +799,11 @@ void
 DoFCellAccessor<DoFHandler<deal_II_dimension> >::
 set_dof_values_by_interpolation<PETScWrappers::BlockVector,float>
 (const Vector<float>&, PETScWrappers::BlockVector&) const;
+template
+void
+DoFCellAccessor<DoFHandler<deal_II_dimension> >::
+set_dof_values_by_interpolation<PETScWrappers::MPI::BlockVector,float>
+(const Vector<float>&, PETScWrappers::MPI::BlockVector&) const;
 
 #endif
 
