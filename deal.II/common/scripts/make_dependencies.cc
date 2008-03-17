@@ -41,6 +41,7 @@
 #include <set>
 #include <vector>
 #include <cassert>
+#include <cstdlib>
 
                                  // base path for object files,
                                  // including trailing slash if
@@ -150,7 +151,7 @@ void determine_direct_includes (const std::string &file)
 	{
 	  std::cerr << "Include file name empty in file <" << file << "> line: " << std::endl
 		    << line << std::endl;
-	  abort();
+	  std::abort();
 	}
       
                                        // next try to locate the file
