@@ -591,9 +591,18 @@ subdivided_hyper_rectangle(Triangulation<dim>              &tria,
       case 1:
       {
 	double x=0;
-	for (unsigned int i=0; i<=step_sizes[0].size(); ++i)
+	for (unsigned int i=0; ; ++i)
 	  { 
 	    points.push_back (Point<dim> (p1[0]+x));
+
+					     // form partial sums. in
+					     // the last run through
+					     // avoid accessing
+					     // non-existent values
+					     // and exit early instead
+	    if (i == step_sizes[0].size())
+	      break;
+	    
 	    x += step_sizes[0][i];
 	  }
 	break;
@@ -602,15 +611,22 @@ subdivided_hyper_rectangle(Triangulation<dim>              &tria,
       case 2:
       {
 	double y=0;
-	for (unsigned int j=0; j<=step_sizes[1].size(); ++j)
+	for (unsigned int j=0; ; ++j)
 	  {
 	    double x=0;
-	    for (unsigned int i=0; i<=step_sizes[0].size(); ++i)
+	    for (unsigned int i=0; ; ++i)
 	      {
 		points.push_back (Point<dim> (p1[0]+x,
 					      p1[1]+y));
+		if (i == step_sizes[0].size())
+		  break;
+		
 		x += step_sizes[0][i];
 	      }
+	    
+	    if (j == step_sizes[1].size())
+	      break;
+	    
 	    y += step_sizes[1][j];
 	  }
 	break;
@@ -619,21 +635,32 @@ subdivided_hyper_rectangle(Triangulation<dim>              &tria,
       case 3:
       {
 	double z=0;
-	for (unsigned int k=0; k<=step_sizes[2].size(); ++k)
+	for (unsigned int k=0; ; ++k)
 	  {
 	    double y=0;
-	    for (unsigned int j=0; j<=step_sizes[1].size(); ++j)
+	    for (unsigned int j=0; ; ++j)
 	      {
 		double x=0;
-		for (unsigned int i=0; i<=step_sizes[0].size(); ++i)
+		for (unsigned int i=0; ; ++i)
 		  {
 		    points.push_back (Point<dim> (p1[0]+x,
 						  p1[1]+y,
 						  p1[2]+z));
+		    if (i == step_sizes[0].size())
+		      break;
+		    
 		    x += step_sizes[0][i];
 		  }
+
+		if (j == step_sizes[1].size())
+		  break;
+		
 		y += step_sizes[1][j];
 	      }
+	    
+	    if (k == step_sizes[2].size())
+	      break;
+	    
 	    z += step_sizes[2][k];
 	  }
 	break;
