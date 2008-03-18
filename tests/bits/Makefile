@@ -95,7 +95,8 @@ tests_x = grid_generator_?? \
 	  face_orientation_* \
 	  max_n_cells_* \
 	  joa_* \
-	  neighboring_cells_at_two_faces 
+	  neighboring_cells_at_two_faces \
+	  solution_transfer
 
 # tests for the hp branch:
 #	  fe_collection_*
