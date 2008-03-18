@@ -2,7 +2,7 @@
 //    $Id$
 //    Version: $Name$
 //
-//    Copyright (C) 1999, 2000, 2001, 2002, 2003, 2004, 2005, 2006, 2007 by the deal.II authors
+//    Copyright (C) 1999, 2000, 2001, 2002, 2003, 2004, 2005, 2006, 2007, 2008 by the deal.II authors
 //
 //    This file is subject to QPL and may not be  distributed
 //    without copyright and license information. Please refer
@@ -619,7 +619,9 @@ distribute_local_to_global (const Vector<double>            &local_vector,
 					   // the nodes to which it is
 					   // constrained are also
 					   // fixed
-          if (position->line != local_dof_indices[i])
+          if ((position == lines.end())
+	      ||
+	      (position->line != local_dof_indices[i]))
             global_vector(local_dof_indices[i]) += local_vector(i);
           else
 	    {
