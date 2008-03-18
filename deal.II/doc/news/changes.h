@@ -283,6 +283,15 @@ constraints individually.
 <h3>deal.II</h3>
 
 <ol> 
+  <li> <p>Changed: From now on the SolutionTransfer class does not use any user
+  pointers of the underlying Triangulation object. Thus several SolutionTransfer
+  instances with different DoFHandler objects can be used simultaneously. It is
+  no longer necessary to assemble all solution vectors into a new one with a
+  combined DoFHandler.
+  <br>
+  (Tobias Leicht, 2008/03/18)
+  </p></li>
+
   <li> <p>New: There is now a namespace DoFRenumbering::boost that contains the
   implementation of interfaces to three reordering strategies provided by the
   Boost Graph Library, namely DoFRenumbering::boost::Cuthill_McKee,

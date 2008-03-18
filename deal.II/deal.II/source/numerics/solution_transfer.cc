@@ -42,14 +42,19 @@ SolutionTransfer<dim, number>::~SolutionTransfer()
 
 
 template<int dim, typename number>
+SolutionTransfer<dim, number>::Pointerstruct::Pointerstruct():
+		indices_ptr(0),
+		dof_values_ptr(0)
+{}
+
+
+
+template<int dim, typename number>
 void SolutionTransfer<dim, number>::clear ()
 {
-  if (indices_on_cell.size())
-    indices_on_cell.erase(indices_on_cell.begin(), indices_on_cell.end());  
-  if (all_pointerstructs.size())
-    all_pointerstructs.erase(all_pointerstructs.begin(), all_pointerstructs.end());
-  if (dof_values_on_cell.size())
-    dof_values_on_cell.erase(dof_values_on_cell.begin(), dof_values_on_cell.end());
+  indices_on_cell.clear();
+  dof_values_on_cell.clear();
+  cell_map.clear();
 
   prepared_for=none;
 }
@@ -68,8 +73,10 @@ void SolutionTransfer<dim, number>::prepare_for_pure_refinement()
   const unsigned int dofs_per_cell  = dof_handler->get_fe().dofs_per_cell;
   n_dofs_old=dof_handler->n_dofs();
 
-  indices_on_cell=std::vector<std::vector<unsigned int> > (n_active_cells,
-						 std::vector<unsigned int> (dofs_per_cell));
+				   // efficient reallocation of indices_on_cell
+  std::vector<std::vector<unsigned int> > (n_active_cells,
+					   std::vector<unsigned int> (dofs_per_cell))
+    .swap(indices_on_cell);
 
   typename DoFHandler<dim>::cell_iterator cell = dof_handler->begin(),
 					  endc = dof_handler->end();
@@ -86,12 +93,9 @@ void SolutionTransfer<dim, number>::prepare_for_pure_refinement()
 					   // the data vectors and prolonging
 					   // them to the children
 	  cell->get_dof_indices(indices_on_cell[i]);
-	  cell->set_user_pointer(&indices_on_cell[i]);
-
+	  cell_map[std::make_pair(cell->level(),cell->index())].indices_ptr=&indices_on_cell[i];
 	  ++i;	  
 	}
-      else
-	cell->clear_user_pointer();
     }
   prepared_for=pure_refinement;
 }
@@ -116,11 +120,15 @@ SolutionTransfer<dim, number>::refine_interpolate(const Vector<number> &in,
   typename DoFHandler<dim>::cell_iterator cell = dof_handler->begin(),
 					  endc = dof_handler->end();
 
-  std::vector<unsigned int> *indexptr;  
+  typename std::map<std::pair<unsigned int, unsigned int>, Pointerstruct>::const_iterator
+    pointerstruct,
+    cell_map_end=cell_map.end();
 
   for (; cell!=endc; ++cell) 
     {
-      if (cell->user_pointer())
+      pointerstruct=cell_map.find(std::make_pair(cell->level(),cell->index()));
+      
+      if (pointerstruct!=cell_map_end)
 					 // this cell was refined or not
 					 // touched at all, so we can get
 					 // the new values by just setting
@@ -128,9 +136,8 @@ SolutionTransfer<dim, number>::refine_interpolate(const Vector<number> &in,
 					 // which is both done by one
 					 // function
 	{
-	  indexptr=static_cast<std::vector<unsigned int> *>(cell->user_pointer());
 	  for (unsigned int i=0; i<dofs_per_cell; ++i)
-	    local_values(i)=in(indexptr->operator[](i));
+	    local_values(i)=in((*pointerstruct->second.indices_ptr)[i]);
 	  cell->set_dof_values_by_interpolation(local_values, out);
 	}
     }
@@ -201,32 +208,21 @@ prepare_for_coarsening_and_refinement(const std::vector<Vector<number> > &all_in
 				   // allocate the needed memory. initialize
                                    // the following arrays in an efficient
                                    // way, without copying much
-  {  
-    std::vector<std::vector<unsigned int> >
-      tmp(n_cells_to_stay_or_refine,
-          std::vector<unsigned int> (dofs_per_cell));
-    indices_on_cell.swap (tmp);
-  }
-  {
-    std::vector<std::vector<Vector<number> > >
-      tmp(n_coarsen_fathers,
-          std::vector<Vector<number> > (in_size,
-                                        Vector<number> (dofs_per_cell)));
-    dof_values_on_cell.swap (tmp);
-  }
-  {
-    std::vector<Pointerstruct>
-      tmp(n_cells_to_stay_or_refine+n_coarsen_fathers);
-    all_pointerstructs.swap (tmp);
-  }
-
-
+  std::vector<std::vector<unsigned int> >
+    (n_cells_to_stay_or_refine,
+     std::vector<unsigned int> (dofs_per_cell))
+    .swap(indices_on_cell);
+  
+  std::vector<std::vector<Vector<number> > >
+    (n_coarsen_fathers,
+     std::vector<Vector<number> > (in_size,
+				   Vector<number> (dofs_per_cell)))
+    .swap(dof_values_on_cell);
+  
 				   // we need counters for
-				   // the 'to_stay_or_refine' cells 'n_sr',
+				   // the 'to_stay_or_refine' cells 'n_sr' and
 				   // the 'coarsen_fathers' cells 'n_cf',
-				   // and all the cells where a
-				   // @p{Pointerstruct} is needed 'n'
-  unsigned int n_sr=0, n_cf=0, n=0;
+  unsigned int n_sr=0, n_cf=0;
   typename DoFHandler<dim>::cell_iterator cell = dof_handler->begin();  
   for (; cell!=endc; ++cell) 
     {
@@ -237,11 +233,8 @@ prepare_for_coarsening_and_refinement(const std::vector<Vector<number> > &all_in
 					   // dof indices and later
 					   // interpolating to the children
 	  cell->get_dof_indices(indices_on_cell[n_sr]);
-	  all_pointerstructs[n].indices_ptr=&indices_on_cell[n_sr];
-	  all_pointerstructs[n].dof_values_ptr=0;
-	  cell->set_user_pointer(&all_pointerstructs[n]);
+	  cell_map[std::make_pair(cell->level(), cell->index())].indices_ptr=&indices_on_cell[n_sr];
 	  ++n_sr;
-	  ++n;
 	}
       else if (cell->has_children() && cell->child(0)->coarsen_flag_set())
 	{
@@ -260,16 +253,9 @@ prepare_for_coarsening_and_refinement(const std::vector<Vector<number> > &all_in
 	      cell->get_interpolated_dof_values(all_in[j],
 						dof_values_on_cell[n_cf][j]);
 	    }
-	  all_pointerstructs[n].indices_ptr=0;
-	  all_pointerstructs[n].dof_values_ptr=&dof_values_on_cell[n_cf];
-	  cell->set_user_pointer(&all_pointerstructs[n]);    
+	  cell_map[std::make_pair(cell->level(), cell->index())].dof_values_ptr=&dof_values_on_cell[n_cf];
 	  ++n_cf;
-	  ++n;
 	}
-      else
-					 // some cell on the lower levels to
-					 // which nothing will happen
-	cell->clear_user_pointer();
     }
   Assert(n_sr==n_cells_to_stay_or_refine, ExcInternalError());
   Assert(n_cf==n_coarsen_fathers, ExcInternalError());
@@ -311,26 +297,29 @@ interpolate (const std::vector<Vector<number> > &all_in,
   Vector<number> local_values(dofs_per_cell);
   std::vector<unsigned int> dofs(dofs_per_cell);
 
+  typename std::map<std::pair<unsigned int, unsigned int>, Pointerstruct>::const_iterator
+    pointerstruct,
+    cell_map_end=cell_map.end();
+
   typename DoFHandler<dim>::cell_iterator cell = dof_handler->begin(),
 					  endc = dof_handler->end();
   for (; cell!=endc; ++cell) 
     {
-      if (cell->user_pointer())
+      pointerstruct=cell_map.find(std::make_pair(cell->level(),cell->index()));
+      
+      if (pointerstruct!=cell_map_end)
 	{
-	  const Pointerstruct * const structptr
-	    =static_cast<Pointerstruct *>(cell->user_pointer());
-
 	  const std::vector<unsigned int> * const indexptr
-	    =structptr->indices_ptr;
+	    =pointerstruct->second.indices_ptr;
 
 	  const std::vector<Vector<number> > * const valuesptr
-	    =structptr->dof_values_ptr;
+	    =pointerstruct->second.dof_values_ptr;
 
 					   // cell stayed or is
 					   // refined
 	  if (indexptr)
 	    {
-	      Assert (structptr->dof_values_ptr == 0,
+	      Assert (valuesptr == 0,
 		      ExcInternalError());
 	      
 					       // get the values of
@@ -351,7 +340,7 @@ interpolate (const std::vector<Vector<number> > &all_in,
 	  else if (valuesptr)
 	    {
 	      Assert (!cell->has_children(), ExcInternalError());
-	      Assert (structptr->indices_ptr == 0,
+	      Assert (indexptr == 0,
 		      ExcInternalError());
 
 					       // get the local
@@ -398,11 +387,14 @@ template<int dim, typename number>
 unsigned int
 SolutionTransfer<dim, number>::memory_consumption () const
 {
+				   // at the moment we do not include the memory
+				   // consumption of the cell_map as we have no
+				   // real idea about memory consumption of a
+				   // std::map
   return (MemoryConsumption::memory_consumption (dof_handler) +
 	  MemoryConsumption::memory_consumption (n_dofs_old) +
 	  sizeof (prepared_for) +
 	  MemoryConsumption::memory_consumption (indices_on_cell) +
-	  MemoryConsumption::memory_consumption (all_pointerstructs) +
 	  MemoryConsumption::memory_consumption (dof_values_on_cell));
 }
 

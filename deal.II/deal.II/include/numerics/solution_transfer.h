@@ -126,9 +126,6 @@ DEAL_II_NAMESPACE_OPEN
  * For deleting all stored data in @p SolutionTransfer and reinitializing it
  * use the <tt>clear()</tt> function.
  *
- * Note that the @p user_pointer of some cells are used. 
- * Be sure that you don't need them otherwise.
- *
  * The template argument @p number denotes the data type of the vectors you want
  * to transfer.
  *
@@ -142,13 +139,12 @@ DEAL_II_NAMESPACE_OPEN
  * DoFs of the discretisation. If we now refine the grid then the calling of
  * DoFHandler::distribute_dofs() will change at least some of the
  * DoF indices. Hence we need to store the DoF indices of all active cells
- * before the refinement. The @p user_pointer of each active cell
- * is used to point to the vector of these DoF indices of that cell, all other
- * @p user_pointers are cleared. All this is
- * done by prepare_for_pure_refinement().
+ * before the refinement. A pointer for each active cell
+ * is used to point to the vector of these DoF indices of that cell.
+ * This is done by prepare_for_pure_refinement().
  *
  * In the function <tt>refine_interpolate(in,out)</tt> and on each cell where the
- * @p user_pointer is set (i.e. the cells that were active in the original grid)
+ * pointer is set (i.e. the cells that were active in the original grid)
  * we can now access the local values of the solution vector @p in
  * on that cell by using the stored DoF indices. These local values are
  * interpolated and set into the vector @p out that is at the end the
@@ -168,7 +164,7 @@ DEAL_II_NAMESPACE_OPEN
  * the children cells are needed. Hence this interpolation
  * and the storing of the interpolated values of each of the discrete functions
  * that we want to interpolate needs to take place before these children cells
- * are coarsened (and deleted!!). Again the @p user_pointers of the cells are
+ * are coarsened (and deleted!!). Again a pointers for the relevant cells is
  * set to point to these values (see below). 
  * Additionally the DoF indices of the cells
  * that will not be coarsened need to be stored according to the solution
@@ -180,10 +176,10 @@ DEAL_II_NAMESPACE_OPEN
  * As we need two different kinds of pointers (<tt>vector<unsigned int> *</tt> for the Dof
  * indices and <tt>vector<Vector<number> > *</tt> for the interpolated DoF values)
  * we use the @p Pointerstruct that includes both of these pointers and
- * the @p user_pointer of each cell points to these @p Pointerstructs. 
+ * the pointer for each cell points to these @p Pointerstructs. 
  * On each cell only one of the two different pointers is used at one time 
- * hence we could use the
- * <tt>void * user_pointer</tt> as <tt>vector<unsigned int> *</tt> at one time and as 
+ * hence we could use a
+ * <tt>void * pointer</tt> as <tt>vector<unsigned int> *</tt> at one time and as 
  * <tt>vector<Vector<number> > *</tt> at the other but using this @p Pointerstruct
  * in between makes the use of these pointers more safe and gives better
  * possibility to expand their usage.
@@ -194,7 +190,7 @@ DEAL_II_NAMESPACE_OPEN
  * the values of the discrete
  * functions in @p all_out are set to the stored local interpolated values 
  * that are accessible due to the 'vector<Vector<number> > *' pointer in 
- * @p Pointerstruct that is pointed to by the @p user_pointer of that cell.
+ * @p Pointerstruct that is pointed to by the pointer of that cell.
  * It is clear that <tt>interpolate(all_in, all_out)</tt> only can be called with
  * the <tt>vector<Vector<number> > all_in</tt> that previously was the parameter
  * of the <tt>prepare_for_coarsening_and_refinement(all_in)</tt> function. Hence 
@@ -450,6 +446,7 @@ class SolutionTransfer
 				      * 'multiplied' by this structure.
 				      */
     struct Pointerstruct {
+	Pointerstruct();
 	unsigned int memory_consumption () const;
 	
 	std::vector<unsigned int>    *indices_ptr;
@@ -457,15 +454,15 @@ class SolutionTransfer
     };
 
 				     /**
-				      * Vector of all @p Pointerstructs (cf. there).
-				      * It makes it
-				      * easier to delete all these structs
-				      * (without going over all <tt>cell->user_pointer</tt>)
-				      * after they are not used any more, and
-				      * collecting all these structures in a vector
-				      * helps avoiding fraqmentation of the memory.
+				      * Map mapping from level and index of cell
+				      * to the @p Pointerstructs (cf. there).
+				      * This map makes it possible to keep all
+				      * the information needed to transfer the
+				      * solution inside this object rather than
+				      * using user pointers of the Triangulation
+				      * for this purpose.
 				      */
-    std::vector<Pointerstruct> all_pointerstructs;
+    std::map<std::pair<unsigned int, unsigned int>, Pointerstruct> cell_map;
 
 				     /**
 				      * Is used for
