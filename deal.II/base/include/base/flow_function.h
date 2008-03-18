@@ -244,23 +244,23 @@ namespace Functions
     private:
 				       /// The auxiliary function Psi.
       double Psi(double phi) const;
-				       /// The derivative of #Psi
+				       /// The derivative of Psi()
       double Psi_1(double phi) const;
-				       /// The 2nd derivative of #Psi
+				       /// The 2nd derivative of Psi()
       double Psi_2(double phi) const;
-				       /// The 3rd derivative of #Psi
+				       /// The 3rd derivative of Psi()
       double Psi_3(double phi) const;
-				       /// The 4th derivative of #Psi
+				       /// The 4th derivative of Psi()
       double Psi_4(double phi) const;
 				       /// The angle of the reentrant corner
       const double omega;
 				       /// The exponent of the radius
       static const double lambda;
-				       /// Cosine of #lambda times #omega
+				       /// Cosine of lambda times omega
       const double coslo;
-				       /// Auxiliary variable 1+#lambda
+				       /// Auxiliary variable 1+lambda
       const double lp;
-				       /// Auxiliary variable 1-#lambda
+				       /// Auxiliary variable 1-lambda
       const double lm;
   };
   

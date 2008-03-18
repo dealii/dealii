@@ -212,7 +212,7 @@ class GridIn
 				      */
     enum Format
     {
-					   /// Use #default_format stored in this object
+					   /// Use GridIn::default_format stored in this object
 	  Default,
 					   /// Use read_ucd()
 	  ucd,
