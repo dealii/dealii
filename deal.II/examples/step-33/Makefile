@@ -52,8 +52,8 @@ ifneq ($(USE_CONTRIB_TRILINOS),yes)
 default run clean:
 	@echo
 	@echo "===========================================================" 
-	@echo "=   This program cannot be compiled without Trilinos. Make   ="
-	@echo "=   sure you have Trilinos installed and detected during     ="
+	@echo "=   This program cannot be compiled without Trilinos. Make="
+	@echo "=   sure you have Trilinos installed and detected during  ="
 	@echo "=   configuration of deal.II                              ="
 	@echo "==========================================================="
 	@echo
