@@ -137,8 +137,7 @@ template <typename number>
 class SparseLUDecomposition : protected SparseMatrix<number>, 
                               public virtual Subscriptor
 {
-  public:
-
+  protected:
     				     /**
 				      * Constructor. Does nothing.
 				      *
@@ -157,6 +156,7 @@ class SparseLUDecomposition : protected SparseMatrix<number>,
 				      */
     SparseLUDecomposition (const SparsityPattern& sparsity);
 
+  public:
                                      /**
                                       * Destruction. Mark the
                                       * destructor pure to ensure that
