@@ -246,7 +246,10 @@ component. The whole mechanism is described in more detail in the
 
 In practice, it turns out that we can do a bit better if we evaluate the shape
 functions, their gradients and divergences only once per outermost loop, and
-store the result, as this saves us a few otherwise repeated computations.
+store the result, as this saves us a few otherwise repeated computations (it is
+possible to save even more repeated operations by calculating all relevant
+quantities in advance and then only inserting the results in the actual loop,
+see step-22 for a realization of that approach).
 The final result then looks like this, working in every space dimension:
 
 @code

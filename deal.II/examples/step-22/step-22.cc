@@ -517,19 +517,15 @@ StokesProblem<dim>::StokesProblem (const unsigned int degree)
 				 // the results we obtain with several
 				 // of these algorithms based on the
 				 // testcase discussed here in this
-				 // tutorial program. It turns out
-				 // that not the traditional
-				 // Cuthill-McKee algorithm already
-				 // used in some of the previous
-				 // tutorial programs is the best, but
-				 // the King ordering. deal.II
-				 // implements them by interfacing
-				 // with the Boost Graph Library,
-				 // which is part of the deal.II
-				 // distribution. The call to use it
-				 // below is
-				 // DoFRenumbering::boost::king_ordering.
-				 //
+				 // tutorial program. Here, we will
+				 // use the traditional Cuthill-McKee
+				 // algorithm already used in some of
+				 // the previous tutorial programs.
+				 // In the 
+				 // <a href="#improved-ilu">section on improved ILU</a>
+				 // we're going to discuss this issue
+				 // in more detail.
+				 
 				 // There is one more change compared
 				 // to previous tutorial programs:
 				 // There is no reason in sorting the
@@ -564,7 +560,7 @@ void StokesProblem<dim>::setup_dofs ()
   system_matrix.clear ();
   
   dof_handler.distribute_dofs (fe);  
-  DoFRenumbering::boost::king_ordering (dof_handler);
+  DoFRenumbering::Cuthill_McKee (dof_handler);
 
   std::vector<unsigned int> block_component (dim+1,0);
   block_component[dim] = 1;
@@ -774,8 +770,53 @@ void StokesProblem<dim>::assemble_system ()
   const FEValuesExtractors::Vector velocities (0);
   const FEValuesExtractors::Scalar pressure (dim);
 
-				   // We can then start the loop over all
-				   // cells:
+				   // As an extension over step-20
+				   // and step-21, we include a few 
+				   // optimizations that make assembly
+				   // faster for this particular problem.
+				   // The improvements are based on the
+				   // observation that we do a few 
+				   // calculations too many times when
+				   // we do as in step-20: The 
+				   // symmetric gradient actually has
+				   // <code>dofs_per_cell</code>
+				   // different values per quadrature 
+				   // point, but we calculate it 
+				   // <code>dofs_per_cell*dofs_per_cell</code>
+				   // times - for both the loop over
+				   // <code>i</code> and the loop over
+				   // <code>j</code>. So what we're 
+				   // going to do here is to avoid 
+				   // such double calculations by 
+				   // getting a vector of rank-2 
+				   // tensors (and similarly for
+				   // the divergence and the basis
+				   // function value on pressure)
+				   // at the quadrature point prior
+				   // to starting the loop over the
+				   // dofs on the cell. First, we 
+				   // create the respective objects
+				   // that will hold the respective 
+				   // values. Then, we start the
+				   // loop over all cells and the loop
+				   // over the quadrature points, 
+				   // where we first extract these 
+				   // values. There is one more 
+				   // optimization we implement here:
+				   // the local matrix (as well as
+				   // the global one) is going to
+				   // be symmetric, since the all
+				   // the operations involved are
+				   // symmetric with respect to $i$
+				   // and $j$. This is implemented by
+				   // simply running the inner loop
+				   // not to <code>dofs_per_cell</code>,
+				   // but only up to <code>i</code>,
+				   // the index of the outer loop.
+  std::vector<SymmetricTensor<2,dim> > phi_grads_u (dofs_per_cell);
+  std::vector<double>                  div_phi_u   (dofs_per_cell);
+  std::vector<double>                  phi_p       (dofs_per_cell);
+				   
   typename DoFHandler<dim>::active_cell_iterator
     cell = dof_handler.begin_active(),
     endc = dof_handler.end();
@@ -790,25 +831,20 @@ void StokesProblem<dim>::assemble_system ()
       
       for (unsigned int q=0; q<n_q_points; ++q)
 	{
+	  for (unsigned int k=0; k<dofs_per_cell; ++k)
+	    {
+	      phi_grads_u[k] = fe_values[velocities].symmetric_gradient (k, q);
+	      div_phi_u[k]   = fe_values[velocities].divergence (k, q);
+	      phi_p[k]       = fe_values[pressure].value (k, q);
+	    }
 	  for (unsigned int i=0; i<dofs_per_cell; ++i)
 	    {
-	      const SymmetricTensor<2,dim>
-		phi_i_grads_u = fe_values[velocities].symmetric_gradient (i, q);
-	      const Tensor<1,dim> phi_i_u       = fe_values[velocities].value (i, q);
-	      const double        div_phi_i_u   = fe_values[velocities].divergence (i, q);
-	      const double        phi_i_p       = fe_values[pressure].value (i, q);
-          
-	      for (unsigned int j=0; j<dofs_per_cell; ++j)
+	      for (unsigned int j=0; j<=i; ++j)
 		{
-		  const SymmetricTensor<2,dim>
-		    phi_j_grads_u = fe_values[velocities].symmetric_gradient (j, q);
-		  const double        div_phi_j_u   = fe_values[velocities].divergence (j, q);
-		  const double        phi_j_p       = fe_values[pressure].value (j, q);
-
-		  local_matrix(i,j) += (phi_i_grads_u * phi_j_grads_u
-					- div_phi_i_u * phi_j_p
-					- phi_i_p * div_phi_j_u
-					+ phi_i_p * phi_j_p)
+		  local_matrix(i,j) += (phi_grads_u[i] * phi_grads_u[j]
+					- div_phi_u[i] * phi_p[j]
+					- phi_p[i] * div_phi_u[j]
+					+ phi_p[i] * phi_p[j])
 				       * fe_values.JxW(q);     
 
 		}
@@ -854,14 +890,30 @@ void StokesProblem<dim>::assemble_system ()
 				       // terms constituting the pressure mass
 				       // matrix are written into the correct
 				       // position without any further
-				       // interaction:
+				       // interaction. We have to be careful
+				       // about one thing, though. We have
+				       // only build up half of the local
+				       // matrix because of symmetry, but
+				       // we have to save the full system
+				       // matrix in order to use the standard
+				       // functions for the solution. Hence,
+				       // we use the element below the 
+				       // diagonal if we happen to look
+				       // above it.
       cell->get_dof_indices (local_dof_indices);
 
       for (unsigned int i=0; i<dofs_per_cell; ++i)
         for (unsigned int j=0; j<dofs_per_cell; ++j)
-          system_matrix.add (local_dof_indices[i],
-                             local_dof_indices[j],
-                             local_matrix(i,j));
+	  {
+	    if (j <= i)
+	      system_matrix.add (local_dof_indices[i],
+            	               	 local_dof_indices[j],
+				 local_matrix(i,j));
+	    else
+	      system_matrix.add (local_dof_indices[i],
+            	               	 local_dof_indices[j],
+				 local_matrix(j,i));
+	  }
       
       for (unsigned int i=0; i<dofs_per_cell; ++i)
         system_rhs(local_dof_indices[i]) += local_rhs(i);
@@ -1017,18 +1069,18 @@ void StokesProblem<dim>::solve ()
 				     // independently on the mesh size.  This
 				     // is precisely what we do here: We
 				     // choose another ILU preconditioner 
-                     // and take it along to the
+				     // and take it along to the
 				     // InverseMatrix object via the
 				     // corresponding template parameter.  A
 				     // CG solver is then called within the
 				     // vmult operation of the inverse matrix.
-                     //
-                     // An alternative that is cheaper to build,
-                     // but needs more iterations afterwards,
-                     // would be to choose a SSOR preconditioner
-                     // with factor 1.2. It needs about twice 
-                     // the number of iterations, but the costs
-                     // for its generation are almost neglible.
+				     //
+				     // An alternative that is cheaper to build,
+				     // but needs more iterations afterwards,
+				     // would be to choose a SSOR preconditioner
+				     // with factor 1.2. It needs about twice 
+				     // the number of iterations, but the costs
+				     // for its generation are almost neglible.
     SparseILU<double> preconditioner;
     preconditioner.initialize (system_matrix.block(1,1), 
       SparseILU<double>::AdditionalData());

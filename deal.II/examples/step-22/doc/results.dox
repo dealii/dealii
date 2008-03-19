@@ -352,6 +352,27 @@ demands on the linear algebra than standard elliptic problems as we have seen
 in the early tutorial programs. The improvements are still rather 
 unsatisfactory, if one compares with an elliptic problem of similar size.
 
+<a name="improved-ilu">
+<h4>Better ILU decomposition by smart reordering</h4>
+</a>
+A first attempt to improve the speed of the linear solution process is to choose
+a dof reordering that makes the ILU being closer to a full LU decomposition, as
+already mentioned in the in-code comments. The DoFRenumbering namespace compares
+several choices for the renumbering of dofs for the Stokes equations. The best
+result regarding the computing time was found for the King ordering, which is
+accessed through the call DoFRenumbering::boost::king_ordering. With that
+program, the inner solver needs considerably less operations, e.g. about 62 
+inner CG iterations for the inversion of $A$ at cycle 4 compared to about 75 
+iterations with the standard Cuthill_McKee-algorithm. Also, the computing time 
+at cycle 4 decreased from about 20 to 13 minutes for the <code>solve()</code> 
+call. However, the King ordering (and the orderings provided by the
+DoFRenumbering::boost namespace in general) has a serious drawback - it uses
+much more memory than the in-build deal versions, since it acts on abstract
+graphs rather than the geometry provided by the triangulation. In the present
+case, the renumbering takes about 5 times as much memory, which yields an
+infeasible algorithm for the two last cycles in 3D with 1.2 and 4.6 million
+unknowns, respectively.
+
 <h4>Better preconditioner for the inner CG solver</h4>
 The first way to improve the situation would be to choose a preconditioner that 
 makes CG for the (0,0) matrix $A$ converge in a mesh-independent number of 
@@ -592,73 +613,73 @@ Let's first see the results in 2D:
 @code
 Refinement cycle 0
    Number of active cells: 64
-   Number of degrees of freedom: 679 (594+85) [0.022997 s] 
-   Assembling... [0.013998 s]
-   Computing preconditioner... [0.004999 s]
+   Number of degrees of freedom: 679 (594+85) [0.013998 s] 
+   Assembling... [0.004999 s]
+   Computing preconditioner... [0.003999 s]
    Solving...
-      Schur complement:   11 outer CG iterations for p  [0.010998 s]
-      Block Schur preconditioner:   11 GMRES iterations [0.009999 s]
+      Schur complement:   11 outer CG iterations for p  [0.010999 s]
+      Block Schur preconditioner:   11 GMRES iterations [0.009998 s]
    difference l_infty between solution vectors: 3.18714e-06
 
 Refinement cycle 1
    Number of active cells: 160
-   Number of degrees of freedom: 1683 (1482+201) [0.072989 s] 
-   Assembling... [0.034994 s]
-   Computing preconditioner... [0.017998 s]
+   Number of degrees of freedom: 1683 (1482+201) [0.040994 s] 
+   Assembling... [0.013998 s]
+   Computing preconditioner... [0.016997 s]
    Solving...
-      Schur complement:   11 outer CG iterations for p  [0.036994 s]
-      Block Schur preconditioner:   12 GMRES iterations [0.036994 s]
-   difference l_infty between solution vectors: 1.57149e-06
+      Schur complement:   11 outer CG iterations for p  [0.033995 s]
+      Block Schur preconditioner:   12 GMRES iterations [0.035995 s]
+   difference l_infty between solution vectors: 9.32671e-06
 
 Refinement cycle 2
    Number of active cells: 376
-   Number of degrees of freedom: 3813 (3370+443) [0.184972 s] 
-   Assembling... [0.083987 s]
-   Computing preconditioner... [0.054992 s]
+   Number of degrees of freedom: 3813 (3370+443) [0.099985 s] 
+   Assembling... [0.033995 s]
+   Computing preconditioner... [0.052992 s]
    Solving...
-      Schur complement:   11 outer CG iterations for p  [0.115983 s]
-      Block Schur preconditioner:   12 GMRES iterations [0.123981 s]
-   difference l_infty between solution vectors: 4.25998e-06
+      Schur complement:   11 outer CG iterations for p  [0.110983 s]
+      Block Schur preconditioner:   12 GMRES iterations [0.110983 s]
+   difference l_infty between solution vectors: 4.26989e-06
 
 Refinement cycle 3
    Number of active cells: 880
-   Number of degrees of freedom: 8723 (7722+1001) [0.410937 s] 
-   Assembling... [0.19597 s]
-   Computing preconditioner... [0.147978 s]
+   Number of degrees of freedom: 8723 (7722+1001) [0.238963 s] 
+   Assembling... [0.076989 s]
+   Computing preconditioner... [0.141978 s]
    Solving...
-      Schur complement:   11 outer CG iterations for p  [0.324951 s]
-      Block Schur preconditioner:   12 GMRES iterations [0.32495 s]
-   difference l_infty between solution vectors: 1.02911e-05
+      Schur complement:   11 outer CG iterations for p  [0.289956 s]
+      Block Schur preconditioner:   12 GMRES iterations [0.304953 s]
+   difference l_infty between solution vectors: 1.0266e-05
 
 Refinement cycle 4
    Number of active cells: 2008
-   Number of degrees of freedom: 19383 (17186+2197) [0.92086 s] 
-   Assembling... [0.439933 s]
-   Computing preconditioner... [0.465929 s]
+   Number of degrees of freedom: 19383 (17186+2197) [0.561914 s] 
+   Assembling... [0.170974 s]
+   Computing preconditioner... [0.409938 s]
    Solving...
-      Schur complement:   11 outer CG iterations for p  [0.796879 s]
-      Block Schur preconditioner:   13 GMRES iterations [0.896864 s]
-   difference l_infty between solution vectors: 3.12965e-05
+      Schur complement:   11 outer CG iterations for p  [0.740887 s]
+      Block Schur preconditioner:   13 GMRES iterations [0.837873 s]
+   difference l_infty between solution vectors: 3.13139e-05
 
 Refinement cycle 5
    Number of active cells: 4288
-   Number of degrees of freedom: 40855 (36250+4605) [2.08068 s] 
-   Assembling... [0.936857 s]
-   Computing preconditioner... [1.53277 s]
+   Number of degrees of freedom: 40855 (36250+4605) [1.25581 s] 
+   Assembling... [0.353946 s]
+   Computing preconditioner... [1.21681 s]
    Solving...
-      Schur complement:   11 outer CG iterations for p  [1.80873 s]
-      Block Schur preconditioner:   13 GMRES iterations [2.01869 s]
-   difference l_infty between solution vectors: 8.60583e-05
+      Schur complement:   11 outer CG iterations for p  [1.60576 s]
+      Block Schur preconditioner:   13 GMRES iterations [1.84572 s]
+   difference l_infty between solution vectors: 8.59663e-05
 
 Refinement cycle 6
    Number of active cells: 8896
-   Number of degrees of freedom: 83885 (74474+9411) [4.30634 s] 
-   Assembling... [1.93171 s]
-   Computing preconditioner... [4.76627 s]
+   Number of degrees of freedom: 83885 (74474+9411) [2.54961 s] 
+   Assembling... [0.732889 s]
+   Computing preconditioner... [3.9704 s]
    Solving...
-      Schur complement:   11 outer CG iterations for p  [4.02939 s]
-      Block Schur preconditioner:   13 GMRES iterations [4.5883 s]
-   difference l_infty between solution vectors: 0.000225481
+      Schur complement:   11 outer CG iterations for p  [3.70344 s]
+      Block Schur preconditioner:   13 GMRES iterations [4.18436 s]
+   difference l_infty between solution vectors: 0.00022514
 @endcode
 
 We see that there is no huge difference in the solution time between
@@ -669,74 +690,58 @@ there won't be any substantial gain by avoiding the inner iterations. We see
 that the number of iterations has slightly increased for GMRES, but all in all
 the two choices are fairly similar.
 
-The picture of course changes in 3D. For the computing times reported below,
-cycle 5 was run without the memory
-consuming options BlockCompressedSetSparsityPattern and
-DoFRenumbering::boost::king_ordering and Cuthill_McKee numbering and 
-CompressedBlockSparsityPattern instead - calculations from cycle 0-4 with that 
-setup are about 10-30% slower (in the setup_dofs and solver function) than with
-the one standard configuration as above.
+The picture of course changes in 3D:
 
 @code
 Refinement cycle 0
    Number of active cells: 32
-   Number of degrees of freedom: 1356 (1275+81) [0.189971 s] 
-   Assembling... [0.46293 s]
-   Computing preconditioner... [0.055991 s]
+   Number of degrees of freedom: 1356 (1275+81) [0.13498 s] 
+   Assembling... [0.081987 s]
+   Computing preconditioner... [0.056992 s]
    Solving...
-      Schur complement:   13 outer CG iterations for p  [0.307953 s]
-      Block Schur preconditioner:   20 GMRES iterations [0.047993 s]
-   difference l_infty between solution vectors: 1.03218e-05
+      Schur complement:   13 outer CG iterations for p  [0.334949 s]
+      Block Schur preconditioner:   23 GMRES iterations [0.051992 s]
+   difference l_infty between solution vectors: 1.11101e-05
 
 Refinement cycle 1
    Number of active cells: 144
-   Number of degrees of freedom: 5088 (4827+261) [1.05084 s] 
-   Assembling... [2.12268 s]
-   Computing preconditioner... [0.307953 s]
+   Number of degrees of freedom: 5088 (4827+261) [0.739887 s] 
+   Assembling... [0.39494 s]
+   Computing preconditioner... [0.310953 s]
    Solving...
-      Schur complement:   14 outer CG iterations for p  [2.72559 s]
-      Block Schur preconditioner:   37 GMRES iterations [0.422936 s]
-   difference l_infty between solution vectors: 1.17651e-05
+      Schur complement:   14 outer CG iterations for p  [2.74158 s]
+      Block Schur preconditioner:   41 GMRES iterations [0.451931 s]
+   difference l_infty between solution vectors: 2.36202e-05
 
 Refinement cycle 2
    Number of active cells: 704
-   Number of degrees of freedom: 22406 (21351+1055) [5.60815 s] 
-   Assembling... [10.4114 s]
-   Computing preconditioner... [1.59876 s]
+   Number of degrees of freedom: 22406 (21351+1055) [3.90041 s] 
+   Assembling... [1.9877 s]
+   Computing preconditioner... [1.67175 s]
    Solving...
-      Schur complement:   14 outer CG iterations for p  [18.7521 s]
-      Block Schur preconditioner:   62 GMRES iterations [3.76743 s]
-   difference l_infty between solution vectors: 2.46681e-05
+      Schur complement:   14 outer CG iterations for p  [21.7047 s]
+      Block Schur preconditioner:   75 GMRES iterations [4.6303 s]
+   difference l_infty between solution vectors: 3.86168e-05
 
 Refinement cycle 3
    Number of active cells: 3168
-   Number of degrees of freedom: 93176 (89043+4133) [23.6404 s] 
-   Assembling... [46.3899 s]
-   Computing preconditioner... [7.27989 s]
+   Number of degrees of freedom: 93176 (89043+4133) [17.3564 s] 
+   Assembling... [8.67068 s]
+   Computing preconditioner... [7.41487 s]
    Solving...
-      Schur complement:   15 outer CG iterations for p  [205.028 s]
-      Block Schur preconditioner:  130 GMRES iterations [47.8267 s]
-   difference l_infty between solution vectors: 4.91733e-05
+      Schur complement:   15 outer CG iterations for p  [253.15 s]
+      Block Schur preconditioner:  159 GMRES iterations [54.0888 s]
+   difference l_infty between solution vectors: 7.34297e-05
 
 Refinement cycle 4
    Number of active cells: 11456
-   Number of degrees of freedom: 327808 (313659+14149) [93.4108 s] 
-   Assembling... [173.294 s]
-   Computing preconditioner... [27.0479 s]
+   Number of degrees of freedom: 327808 (313659+14149) [73.0609 s] 
+   Assembling... [31.9341 s]
+   Computing preconditioner... [27.6778 s]
    Solving...
-      Schur complement:   15 outer CG iterations for p  [824.465 s]
-      Block Schur preconditioner:  209 GMRES iterations [289.923 s]
-   difference l_infty between solution vectors: 0.000185872
-
-Refinement cycle 5
-   Number of active cells: 45056
-   Number of degrees of freedom: 1254464 (1201371+53093) [2141.82 s]
-   Assembling... [699.713 s]
-   Computing preconditioner... [113.561 s]
-   Solving...
-      Schur complement:   14 outer CG iterations for p  [6461.56 s]
-      Block Schur preconditioner:  557 GMRES iterations [3640.34 s]
-   difference l_infty between solution vectors: 0.000427821
+      Schur complement:   15 outer CG iterations for p  [1190.48 s]
+      Block Schur preconditioner:  292 GMRES iterations [416.802 s]
+   difference l_infty between solution vectors: 0.00019614
 @endcode
 
 Here, the block preconditioned solver is clearly superior to the Schur
@@ -745,6 +750,11 @@ from the discussion above. It is also apparent that GMRES scales worse with the
 problem size than CG (as explained above).
 Nonetheless, the improvement by a factor of 3-5 for moderate problem sizes
 is quite impressive.
+
+<h4>Combining block preconditioner and multigrid</h4>
+An ultimate linear solver for this problem could be imagined as a combination of
+an optimal preconditioner for $A$ (e.g. multigrid) and the block preconditioner
+described above.
 
 <h4>No block matrices and vectors</h4>
 Another possibility that can be taken into account is to not set up a block
