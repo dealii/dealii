@@ -464,10 +464,10 @@ FE_RaviartThomas<dim>::update_each (const UpdateFlags flags) const
                                      | update_contravariant_transformation
                                      | update_cell_JxW_values
                                      | update_JxW_values;
-  //TODO: Set update flags appropriately and figure out, how the second
-  // derivatives for the RT elements can be computed correctly.
   if (flags & update_hessians)
-    out |= update_hessians | update_contravariant_transformation;
+    out |= update_hessians
+	   | update_contravariant_transformation
+	   | update_covariant_transformation;
 
   return out;
 }
