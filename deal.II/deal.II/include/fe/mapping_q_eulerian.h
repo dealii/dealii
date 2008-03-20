@@ -117,6 +117,14 @@ class MappingQEulerian : public MappingQ<dim>
                       const DoFHandler<dim>  &euler_dof_handler);
 
                                      /**
+                                      * Return a pointer to a copy of the
+                                      * present object. The caller of this
+                                      * copy then assumes ownership of it.
+                                      */
+    virtual
+    Mapping<dim> * clone () const;
+
+                                     /**
                                       * Exception
                                       */
 

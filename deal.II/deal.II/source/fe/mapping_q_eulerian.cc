@@ -45,6 +45,18 @@ MappingQEulerian (const unsigned int degree,
 { }
 
 
+
+template <int dim, class EulerVectorType>
+Mapping<dim> *
+MappingQEulerian<dim, EulerVectorType>::clone () const
+{
+  return new MappingQEulerian<dim,EulerVectorType>(this->get_degree(),
+						   euler_vector,
+						   *euler_dof_handler);
+}
+
+
+
 // .... SUPPORT QUADRATURE CONSTRUCTOR
 
 template <int dim, class EulerVectorType>
