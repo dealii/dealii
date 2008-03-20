@@ -859,8 +859,8 @@ void StokesProblem<dim>::assemble_system ()
 				       // Note that in the above
 				       // computation of the local
 				       // matrix contribution we added
-				       // the term <code> phi_i_p *
-				       // phi_j_p </code>, yielding a
+				       // the term <code> phi_p[i] *
+				       // phi_p[j] </code>, yielding a
 				       // pressure mass matrix in the
 				       // $(1,1)$ block of the matrix
 				       // as discussed in the
@@ -868,8 +868,8 @@ void StokesProblem<dim>::assemble_system ()
 				       // only ends up in the $(1,1)$
 				       // block stems from the fact
 				       // that both of the factors in
-				       // <code>phi_i_p *
-				       // phi_j_p</code> are only
+				       // <code>phi_p[i] *
+				       // phi_p[j]</code> are only
 				       // non-zero when all the other
 				       // terms vanish (and the other
 				       // way around).
@@ -885,8 +885,9 @@ void StokesProblem<dim>::assemble_system ()
 				       // The final step is, as usual, the
 				       // transfer of the local contributions
 				       // to the global system matrix. This
-				       // works also in the case of block
-				       // vectors and matrices, and also the
+				       // works in the case of block
+				       // vectors and matrices just the way
+				       // we are used it to be, and also the
 				       // terms constituting the pressure mass
 				       // matrix are written into the correct
 				       // position without any further
@@ -894,12 +895,12 @@ void StokesProblem<dim>::assemble_system ()
 				       // about one thing, though. We have
 				       // only build up half of the local
 				       // matrix because of symmetry, but
-				       // we have to save the full system
+				       // we're going to save the full system
 				       // matrix in order to use the standard
-				       // functions for the solution. Hence,
-				       // we use the element below the 
-				       // diagonal if we happen to look
-				       // above it.
+				       // functions for solution. This is 
+				       // done by flipping the indices in
+				       // case we are pointing into the
+				       // empty part of the local matrix.
       cell->get_dof_indices (local_dof_indices);
 
       for (unsigned int i=0; i<dofs_per_cell; ++i)

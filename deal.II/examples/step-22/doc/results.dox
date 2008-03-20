@@ -374,10 +374,10 @@ infeasible algorithm for the two last cycles in 3D with 1.2 and 4.6 million
 unknowns, respectively.
 
 <h4>Better preconditioner for the inner CG solver</h4>
-The first way to improve the situation would be to choose a preconditioner that 
-makes CG for the (0,0) matrix $A$ converge in a mesh-independent number of 
-iterations, say 10 to 30. We have seen such a canditate in 
-@ref step_16 "step-16": multigrid.
+Another idea to improve the situation even more would be to choose a 
+preconditioner that makes CG for the (0,0) matrix $A$ converge in a 
+mesh-independent number of iterations, say 10 to 30. We have seen such a
+canditate in @ref step_16 "step-16": multigrid.
 
 <h4>Block Schur complement preconditioner</h4>
 But even with a good preconditioner for $A$ at hand, there would still 
