@@ -735,12 +735,12 @@ Refinement cycle 3
 
 Refinement cycle 4
    Number of active cells: 11456
-   Number of degrees of freedom: 327808 (313659+14149) [81.1891 s] 
-   Assembling... [34.9702 s]
-   Computing preconditioner... [29.5338 s]
+   Number of degrees of freedom: 327808 (313659+14149) [77.5688 s] 
+   Assembling... [34.9422 s]
+   Computing preconditioner... [27.9577 s]
    Solving...
-      Schur complement:   15 outer CG iterations for p  [1224.65 s]
-      Block Schur preconditioner:  292 GMRES iterations [462.001 s]
+      Schur complement:   15 outer CG iterations for p  [1040.28 s]
+      Block Schur preconditioner:  292 GMRES iterations [414.738 s]
    difference l_infty between solution vectors: 0.00019614
 
 Refinement cycle 5
