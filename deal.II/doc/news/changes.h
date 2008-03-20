@@ -214,6 +214,12 @@ an integer id of the current thread.
 <h3>lac</h3>
 
 <ol>
+<li> Fixed: The SolverQMRS class could not deal with block vectors
+and block matrices. This is now fixed.
+<br>
+(WB 2008/3/20)
+</li>
+
 <li> Fixed: The implementation of SparseILU::decompose was rather
 inefficient in that it accessed random elements of the matrix in its
 inner loop. It has been replaced by the algorithm given in the book

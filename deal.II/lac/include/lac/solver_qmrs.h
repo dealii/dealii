@@ -2,7 +2,7 @@
 //    $Id$
 //    Version: $Name$
 //
-//    Copyright (C) 1999, 2000, 2001, 2002, 2003, 2004, 2005, 2006, 2007 by the deal.II authors
+//    Copyright (C) 1999, 2000, 2001, 2002, 2003, 2004, 2005, 2006, 2007, 2008 by the deal.II authors
 //
 //    This file is subject to QPL and may not be  distributed
 //    without copyright and license information. Please refer
@@ -270,10 +270,10 @@ SolverQMRS<VECTOR>::solve (const MATRIX         &A,
 				   // resize the vectors, but do not set
 				   // the values since they'd be overwritten
 				   // soon anyway.
-  Vv->reinit(x.size(), true);
-  Vp->reinit(x.size(), true);
-  Vq->reinit(x.size(), true);
-  Vt->reinit(x.size(), true);
+  Vv->reinit(x, true);
+  Vp->reinit(x, true);
+  Vq->reinit(x, true);
+  Vt->reinit(x, true);
 
   step = 0;
   
