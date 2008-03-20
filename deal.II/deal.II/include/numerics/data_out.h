@@ -1114,6 +1114,18 @@ class DataOut : public DataOut_DoFData<DH, DH::dimension>
 				      */
     typedef typename DataOut_DoFData<DH,DH::dimension>::cell_iterator cell_iterator;
     typedef typename DataOut_DoFData<DH,DH::dimension>::active_cell_iterator active_cell_iterator;
+
+				     /**
+				      * Enumeration describing the region of the
+				      * domain in which curved cells shall be
+				      * created.
+				      */
+    enum CurvedCellRegion
+    {
+	  no_curved_cells,
+	  curved_boundary,
+	  curved_inner_cells
+    };
     
     				     /**
 				      * This is the central function
@@ -1153,13 +1165,24 @@ class DataOut : public DataOut_DoFData<DH, DH::dimension>
 				      * points interior of subdivided
 				      * patches which originate from
 				      * cells at the boundary of the
-				      * domain are computed using the
+				      * domain can be computed using the
 				      * mapping, i.e. a higher order
 				      * mapping leads to a
 				      * representation of a curved
 				      * boundary by using more
-				      * subdivisions. The
-				      * mapping argument can also be used
+				      * subdivisions. Some mappings like
+				      * MappingQEulerian result in curved cells
+				      * in the interior of the domain. However,
+				      * there is nor easy way to get this
+				      * information from the Mapping. Thus the
+				      * last argument @p curved_region take one
+				      * of three values resulting in no curved
+				      * cells at all, curved cells at the
+				      * boundary (default) or curved cells in
+				      * the whole domain.
+				      *
+				      * Even for non-curved cells the
+				      * mapping argument can be used
 				      * for the Eulerian mappings (see
 				      * class MappingQ1Eulerian) where
 				      * a mapping is used not only to
@@ -1180,7 +1203,8 @@ class DataOut : public DataOut_DoFData<DH, DH::dimension>
 				      */
     virtual void build_patches (const Mapping<DH::dimension> &mapping,
 				const unsigned int n_subdivisions = 0,
-				const unsigned int n_threads      = multithread_info.n_default_threads);
+				const unsigned int n_threads      = multithread_info.n_default_threads,
+				const CurvedCellRegion curved_region = curved_boundary);
     
 				     /**
 				      * Return the first cell which we
@@ -1270,6 +1294,12 @@ class DataOut : public DataOut_DoFData<DH, DH::dimension>
 				      * once and generates all patches.
 				      */
     void build_some_patches (Data &data);
+
+				     /**
+				      * Store in which region cells shall be
+				      * curved, if a Mapping is provided.
+				      */
+    CurvedCellRegion curved_cell_region;
 };
 
 

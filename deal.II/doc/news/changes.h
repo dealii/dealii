@@ -282,7 +282,16 @@ constraints individually.
 <a name="deal.II"></a>
 <h3>deal.II</h3>
 
-<ol> 
+<ol>
+
+  <li> <p>Extended: DataOut has an extended interface now which enables a user
+  decision, which cells shall be written as curved cells using the provided
+  mapping: none, only cells at the boundary, or all cells. The last choice can
+  be useful when a mapping like MappingQEulerian is employed.
+  <br>
+  (Tobias Leicht, 2008/03/20)
+  </p></li>
+
   <li> <p>Changed: From now on the SolutionTransfer class does not use any user
   pointers of the underlying Triangulation object. Thus several SolutionTransfer
   instances with different DoFHandler objects can be used simultaneously. It is

@@ -647,7 +647,10 @@ void DataOut<dim,DH>::build_some_patches (Data &data)
   const hp::FECollection<DH::dimension>      fe_collection(this->dofs->get_fe());
   const hp::MappingCollection<DH::dimension> mapping_collection(*(data.mapping));
 
-  UpdateFlags update_flags=update_values | update_quadrature_points;
+  UpdateFlags update_flags=update_values;
+  if (curved_cell_region != no_curved_cells)
+    update_flags |= update_quadrature_points;
+  
   for (unsigned int i=0; i<this->dof_data.size(); ++i)
     if (this->dof_data[i]->postprocessor)
       update_flags |= this->dof_data[i]->postprocessor->get_needed_update_flags();
@@ -715,11 +718,18 @@ void DataOut<dim,DH>::build_some_patches (Data &data)
           const FEValues<DH::dimension> &fe_patch_values
             = x_fe_patch_values.get_present_fe_values ();
 	  
-					   // if the cell is at the boundary,
+					   // depending on the requested output
+					   // of curved cells, if necessary
 					   // append the quadrature points to
-					   // the last rows of the
-					   // patch->data member
-	  if (cell->at_boundary())
+					   // the last rows of the patch->data
+					   // member. THis is the case if we
+					   // want to produce curved cells at
+					   // the boundary and this cell
+					   // actually is at the boundary, or
+					   // else if we want to produce curved
+					   // cells everywhere
+	  if (curved_cell_region==curved_inner_cells ||
+	      (curved_cell_region==curved_boundary && cell->at_boundary()))
 	    {
 	      Assert(patch->space_dim==dim, ExcInternalError());
 	      const std::vector<Point<dim> > & q_points=fe_patch_values.get_quadrature_points();
@@ -930,18 +940,26 @@ void DataOut<dim,DH>::build_patches (const unsigned int n_subdivisions,
 				     const unsigned int n_threads_) 
 {
   build_patches (StaticMappingQ1<DH::dimension>::mapping,
-		 n_subdivisions, n_threads_);
+		 n_subdivisions, n_threads_, no_curved_cells);
 }
 
 
 template <int dim, class DH>
 void DataOut<dim,DH>::build_patches (const Mapping<DH::dimension> &mapping,
 				     const unsigned int nnnn_subdivisions,
-				     const unsigned int n_threads_) 
+				     const unsigned int n_threads_,
+				     const CurvedCellRegion curved_region) 
 {
   unsigned int n_subdivisions = (nnnn_subdivisions != 0)
 				? nnnn_subdivisions
 				: this->default_subdivisions;
+				   // store the region in which cells shall be
+				   // curved. If only one subdivision is
+				   // requested then there is no need to do this
+				   // at all
+  curved_cell_region=curved_region;
+  if (n_subdivisions<2)
+    curved_cell_region=no_curved_cells;
   
   Assert (n_subdivisions >= 1,
 	  ExcInvalidNumberOfSubdivisions(n_subdivisions));
