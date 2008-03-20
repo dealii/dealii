@@ -1,10 +1,11 @@
 /**
- * This is the namespace in which everything in deal.II is in. To avoid
- * prefixing every class and function call with dealii::, the @ref Tutorial
+ * This is the namespace in which everything in deal.II is. To avoid prefixing
+ * every class and function call with the namespace name, the @ref Tutorial
  * therefore have a <code>using namespace dealii;</code> at the top of the
  * code.
  *
- * In this documentation, the namespace prefix is suppressed for brevity.
+ * Throughout the documentation, the namespace prefix is suppressed for
+ * brevity.
  */
 namespace dealii
 {
