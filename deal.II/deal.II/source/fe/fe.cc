@@ -73,14 +73,14 @@ InternalDataBase::initialize_2nd (const FiniteElement<dim> *element,
 				       // gradients, not more
       for (unsigned int i=0; i<diff_points.size(); ++i)
 	diff_points[i] = quadrature.point(i) + shift;
-      const Quadrature<dim> plus_quad (diff_points);
+      const Quadrature<dim> plus_quad (diff_points, quadrature.get_weights());
       differences[d] = new FEValues<dim> (mapping, *element,
 					  plus_quad, update_gradients);
 
 				       // now same in minus-direction
       for (unsigned int i=0; i<diff_points.size(); ++i)
 	diff_points[i] = quadrature.point(i) - shift;
-      const Quadrature<dim> minus_quad (diff_points);
+      const Quadrature<dim> minus_quad (diff_points, quadrature.get_weights());
       differences[d+dim] = new FEValues<dim> (mapping, *element,
 					      minus_quad, update_gradients); 
     }
