@@ -1539,9 +1539,6 @@ void FEFaceValues<dim>::reinit (const typename DoFHandler<dim>::cell_iterator &c
   this->present_cell.reset 
     (new typename FEValuesBase<dim>::template
      CellIterator<typename DoFHandler<dim>::cell_iterator> (cell));
-
-				   // set the present face index
-  this->present_face_index=cell->face_index(face_no);
   
                                    // this was the part of the work
                                    // that is dependent on the actual
@@ -1578,9 +1575,6 @@ void FEFaceValues<dim>::reinit (const typename hp::DoFHandler<dim>::cell_iterato
     (new typename FEValuesBase<dim>::template
      CellIterator<typename hp::DoFHandler<dim>::cell_iterator> (cell));
 
-				   // set the present face index
-  this->present_face_index=cell->face_index(face_no);
-
                                    // this was the part of the work
                                    // that is dependent on the actual
                                    // data type of the iterator. now
@@ -1614,9 +1608,6 @@ void FEFaceValues<dim>::reinit (const typename MGDoFHandler<dim>::cell_iterator 
     (new typename FEValuesBase<dim>::template
      CellIterator<typename MGDoFHandler<dim>::cell_iterator> (cell));
 
-				   // set the present face index
-  this->present_face_index=cell->face_index(face_no);
-
                                    // this was the part of the work
                                    // that is dependent on the actual
                                    // data type of the iterator. now
@@ -1641,9 +1632,6 @@ void FEFaceValues<dim>::reinit (const typename Triangulation<dim>::cell_iterator
   this->present_cell.reset 
     (new typename FEValuesBase<dim>::TriaCellIterator (cell));
 
-				   // set the present face index
-  this->present_face_index=cell->face_index(face_no);
-
                                    // this was the part of the work
                                    // that is dependent on the actual
                                    // data type of the iterator. now
@@ -1657,6 +1645,12 @@ void FEFaceValues<dim>::reinit (const typename Triangulation<dim>::cell_iterator
 template <int dim>
 void FEFaceValues<dim>::do_reinit (const unsigned int face_no)
 {
+				   // first of all, set the
+				   // present_face_index (if
+				   // available)
+  const typename Triangulation<dim>::cell_iterator cell=*this->present_cell;
+  this->present_face_index=cell->face_index(face_no);
+  
   this->get_mapping().fill_fe_face_values(*this->present_cell, face_no,
 					  this->quadrature,
 					  *this->mapping_data,
