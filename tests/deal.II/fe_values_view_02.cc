@@ -68,9 +68,11 @@ void test (const Triangulation<dim>& tr,
 			  << fe_values[vec_components].value (i,q) << ' '
 			  << fe_values[vec_components].gradient (i,q) << ' '
 			  << fe_values[vec_components].divergence (i,q) << ' '
-			  << fe_values[vec_components].symmetric_gradient (i,q) << ' '
-			  << fe_values[vec_components].hessian (i,q)
-			  << std::endl;
+			  << fe_values[vec_components].symmetric_gradient (i,q) << std::endl;
+		  for (unsigned int k=0; k<dim; ++k)
+		    for (unsigned int l=0; l<dim; ++l)
+		      deallog << fe_values[vec_components].hessian (i,q)[k][l]
+			      << std::endl;
 		  
 		  for (unsigned int d=0; d<dim; ++d)
 		    {
@@ -130,7 +132,7 @@ int main()
 
   deallog.attach(logfile);
   deallog.depth_console (0);
-  deallog.threshold_double(1.e-12);
+  deallog.threshold_double(1.e-10);
 
   test_hyper_sphere<2>();
   test_hyper_sphere<3>();

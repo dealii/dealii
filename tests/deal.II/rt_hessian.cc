@@ -46,8 +46,10 @@ void test (const Triangulation<dim>& tr,
   FEValues<dim> fe_values (fe, quadrature, update_covariant_transformation | update_hessians);
 
   fe_values.reinit (dof.begin_active());
-  
-  deallog << fe_values.shape_hessian_component (0,0,0) << std::endl;
+
+  for (unsigned int i=0; i<dim; ++i)
+    for (unsigned int j=0; j<dim; ++j)
+      deallog << fe_values.shape_hessian_component (0,0,0)[i][j] << std::endl;
   
 				   // compare the hessian with
 				   // itself. this fails if the
@@ -79,7 +81,7 @@ int main()
 
   deallog.attach(logfile);
   deallog.depth_console (0);
-  deallog.threshold_double(1.e-12);
+  deallog.threshold_double(1.e-10);
 
   test_hyper_sphere<2>();
   test_hyper_sphere<3>();
