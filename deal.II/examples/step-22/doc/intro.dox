@@ -617,23 +617,28 @@ zero through three in 3d is shown here:
 
 @image html step-22.profile-3.png
 
-As can be seen, at this refinement level approximately half of the
-instruction count is spent on matrix assembly and sparse ILU computation (left
-half), one third on the actual solver (the SparseILU::vmult calls in
-the center right), and the rest on other things. Since floating point
+As can be seen, at this refinement level approximately one sixth of the
+instruction count is spent on matrix assembly and sparse ILU
+computation (third quarter from left to right), about one half on the
+actual solver (the SparseILU::vmult calls on
+the left), and the rest on other things. Since floating point
 operations such as in the SparseILU::vmult calls typically take much
 longer than many of the logical operations and table lookups in matrix
 assembly, the fraction of the run time taken up by matrix assembly is
-actually significantly less than half the total, as will become
+actually significantly less than the fraction opf instructions, as will become
 apparent in the comparison we make in the results section.
 
-For higher refinement levels, the greenesh boxes at the center right
-representing the solver as well as the blue box at the top right
-representing the reordering algorithm are going to grow at the expense
-of the other parts of the program, since they don't scale
-linearly. The fact that at this moderate refinement level (3168 cells
-and 93176 degrees of freedom) matrix assembly requires about half the
-instructions may therefore not be of such importance.
+For higher refinement levels, the boxes representing the solver as
+well as the beige box at the top right representing the stemming from
+reordering algorithm are going to grow at the expense of the other
+parts of the program, since they don't scale linearly. The fact that
+at this moderate refinement level (3168 cells and 93176 degrees of
+freedom) the linear solver already makes up more than half the
+instructions is a good sign that most of the algorithms used in this
+program are well-tuned and that major improvements in speeding up the
+program are most likely not to come from hand-optimizing individual
+aspects but by changing solver algorithms. We will address this point
+in the discussion of results below as well.
 
 As a final point, and as a point of reference, the following picture
 also shows how the profile looked at an early stage of optimizing this
@@ -645,4 +650,7 @@ As mentioned above, the runtime of this version was about twice as
 long as for the first profile, with the SparseILU decomposition taking
 up about 30% of the instruction count, and operations on the ill-suited
 CompressedSparsityPattern about 10%. Both these bottlenecks have since
-been completely removed.
+been completely removed with the exception of the use of the
+CompressedSparsityPattern through the DoFRenumbering::Cuthill_McKee
+algorithm. (The latter at least applies as of the time of writing of
+this program; the problem may be solved in the future.)
