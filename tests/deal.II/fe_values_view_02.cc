@@ -46,65 +46,61 @@ void test (const Triangulation<dim>& tr,
   const QGauss<dim> quadrature(2);
   FEValues<dim> fe_values (fe, quadrature,
 			   update_values | update_gradients | update_hessians);
-  for (typename DoFHandler<dim>::active_cell_iterator
-	 cell = dof.begin_active(); cell != dof.end(); ++cell)
-    {
-      fe_values.reinit (cell);
+  fe_values.reinit (dof.begin_active());
   
-      for (unsigned int c=0; c<fe.n_components(); ++c)
-					 // use a vector extractor if there
-					 // are sufficiently many components
-					 // left after the current component
-					 // 'c'
-	if (c+dim <= fe.n_components())
-	  {
-	    FEValuesExtractors::Vector vec_components (c);
+  for (unsigned int c=0; c<fe.n_components(); ++c)
+				     // use a vector extractor if there
+				     // are sufficiently many components
+				     // left after the current component
+				     // 'c'
+    if (c+dim <= fe.n_components())
+      {
+	FEValuesExtractors::Vector vec_components (c);
 
-	    for (unsigned int i=0; i<fe_values.dofs_per_cell; ++i)
-	      for (unsigned int q=0; q<fe_values.n_quadrature_points; ++q)
-		{
-		  deallog << "i=" << i << ", q=" << q << std::endl;
-		  deallog << "   "
-			  << fe_values[vec_components].value (i,q) << ' '
-			  << fe_values[vec_components].gradient (i,q) << ' '
-			  << fe_values[vec_components].divergence (i,q) << ' '
-			  << fe_values[vec_components].symmetric_gradient (i,q) << std::endl;
-		  for (unsigned int k=0; k<dim; ++k)
-		    for (unsigned int l=0; l<dim; ++l)
-		      deallog << fe_values[vec_components].hessian (i,q)[k][l]
-			      << std::endl;
+	for (unsigned int i=0; i<fe_values.dofs_per_cell; ++i)
+	  for (unsigned int q=0; q<fe_values.n_quadrature_points; ++q)
+	    {
+	      deallog << "i=" << i << ", q=" << q << std::endl;
+	      deallog << "   "
+		      << fe_values[vec_components].value (i,q) << ' '
+		      << fe_values[vec_components].gradient (i,q) << ' '
+		      << fe_values[vec_components].divergence (i,q) << ' '
+		      << fe_values[vec_components].symmetric_gradient (i,q) << std::endl;
+	      for (unsigned int k=0; k<dim; ++k)
+		for (unsigned int l=0; l<dim; ++l)
+		  deallog << fe_values[vec_components].hessian (i,q)[k][l]
+			  << std::endl;
 		  
-		  for (unsigned int d=0; d<dim; ++d)
-		    {
-		      Assert (fe_values[vec_components].value (i,q)[d]
-			      ==
-			      fe_values.shape_value_component (i,q,c+d),
-			      ExcInternalError());
-
-		      Assert (fe_values[vec_components].gradient (i,q)[d]
-			      ==
-			      fe_values.shape_grad_component (i,q,c+d),
-			      ExcInternalError());
-
-		      Assert (fe_values[vec_components].symmetric_gradient (i,q)
-			      ==
-			      (fe_values[vec_components].gradient(i,q) +
-			       transpose(fe_values[vec_components].gradient(i,q)))/2,
-			      ExcInternalError());
-		      
-		      Assert (fe_values[vec_components].hessian (i,q)[d]
-			      ==
-			      fe_values.shape_hessian_component (i,q,c+d),
-			      ExcInternalError());
-		    }
-
-		  Assert (fe_values[vec_components].divergence (i,q)
+	      for (unsigned int d=0; d<dim; ++d)
+		{
+		  Assert (fe_values[vec_components].value (i,q)[d]
 			  ==
-			  trace (fe_values[vec_components].gradient (i,q)),
+			  fe_values.shape_value_component (i,q,c+d),
+			  ExcInternalError());
+
+		  Assert (fe_values[vec_components].gradient (i,q)[d]
+			  ==
+			  fe_values.shape_grad_component (i,q,c+d),
+			  ExcInternalError());
+
+		  Assert (fe_values[vec_components].symmetric_gradient (i,q)
+			  ==
+			  (fe_values[vec_components].gradient(i,q) +
+			   transpose(fe_values[vec_components].gradient(i,q)))/2,
+			  ExcInternalError());
+		      
+		  Assert (fe_values[vec_components].hessian (i,q)[d]
+			  ==
+			  fe_values.shape_hessian_component (i,q,c+d),
 			  ExcInternalError());
 		}
-	  }
-    }
+
+	      Assert (fe_values[vec_components].divergence (i,q)
+		      ==
+		      trace (fe_values[vec_components].gradient (i,q)),
+		      ExcInternalError());
+	    }
+      }
 }
 
 
