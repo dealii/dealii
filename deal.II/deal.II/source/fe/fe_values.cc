@@ -1772,15 +1772,6 @@ void FESubfaceValues<dim>::reinit (const typename DoFHandler<dim>::cell_iterator
                       "already refined. Iterate over their children "
                       "instead in these cases."));
 
-				   // set the present face index
-  unsigned int real_subface_no=subface_no;
-  if (dim==3)
-    real_subface_no=GeometryInfo<dim>::standard_to_real_face_vertex(
-      subface_no, cell->face_orientation(face_no), cell->face_flip(face_no), cell->face_rotation(face_no));
-  if (cell->face(face_no)->has_children())
-    this->present_face_index=cell->face(face_no)->child_index(real_subface_no);
-  else
-    this->present_face_index=cell->face_index(face_no);
                                    // set new cell. auto_ptr will take
                                    // care that old object gets
                                    // destroyed and also that this
@@ -1831,13 +1822,6 @@ void FESubfaceValues<dim>::reinit (const typename hp::DoFHandler<dim>::cell_iter
     (new typename FEValuesBase<dim>::template
      CellIterator<typename hp::DoFHandler<dim>::cell_iterator> (cell));
 
-				   // set the present face index
-  unsigned int real_subface_no=subface_no;
-  if (dim==3)
-    real_subface_no=GeometryInfo<dim>::standard_to_real_face_vertex(
-      subface_no, cell->face_orientation(face_no), cell->face_flip(face_no), cell->face_rotation(face_no));
-  this->present_face_index=cell->face(face_no)->child_index(real_subface_no);
-
                                    // this was the part of the work
                                    // that is dependent on the actual
                                    // data type of the iterator. now
@@ -1873,13 +1857,6 @@ void FESubfaceValues<dim>::reinit (const typename MGDoFHandler<dim>::cell_iterat
     (new typename FEValuesBase<dim>::template
      CellIterator<typename MGDoFHandler<dim>::cell_iterator> (cell));
 
-				   // set the present face index
-  unsigned int real_subface_no=subface_no;
-  if (dim==3)
-    real_subface_no=GeometryInfo<dim>::standard_to_real_face_vertex(
-      subface_no, cell->face_orientation(face_no), cell->face_flip(face_no), cell->face_rotation(face_no));
-  this->present_face_index=cell->face(face_no)->child_index(real_subface_no);
-
                                    // this was the part of the work
                                    // that is dependent on the actual
                                    // data type of the iterator. now
@@ -1908,13 +1885,6 @@ void FESubfaceValues<dim>::reinit (const typename Triangulation<dim>::cell_itera
   this->present_cell.reset 
     (new typename FEValuesBase<dim>::TriaCellIterator (cell));
 
-				   // set the present face index
-  unsigned int real_subface_no=subface_no;
-  if (dim==3)
-    real_subface_no=GeometryInfo<dim>::standard_to_real_face_vertex(
-      subface_no, cell->face_orientation(face_no), cell->face_flip(face_no), cell->face_rotation(face_no));
-  this->present_face_index=cell->face(face_no)->child_index(real_subface_no);
-
                                    // this was the part of the work
                                    // that is dependent on the actual
                                    // data type of the iterator. now
@@ -1929,6 +1899,18 @@ template <int dim>
 void FESubfaceValues<dim>::do_reinit (const unsigned int face_no,
                                       const unsigned int subface_no)
 {
+
+				   // set the present face index
+  const typename Triangulation<dim>::cell_iterator cell=*this->present_cell;
+  unsigned int real_subface_no=subface_no;
+  if (dim==3)
+    real_subface_no=GeometryInfo<dim>::standard_to_real_face_vertex(
+      subface_no, cell->face_orientation(face_no), cell->face_flip(face_no), cell->face_rotation(face_no));
+  if (cell->face(face_no)->has_children())
+    this->present_face_index=cell->face(face_no)->child_index(real_subface_no);
+  else
+    this->present_face_index=cell->face_index(face_no);
+
   this->get_mapping().fill_fe_subface_values(*this->present_cell,
                                              face_no, subface_no,
 					     this->quadrature,
