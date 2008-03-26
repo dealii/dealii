@@ -284,7 +284,7 @@ conditions. This is similar to what we had to do in @ref step_20 "step-20".
 
 For the Stokes equations, there are a number of possible choices to ensure
 that the finite element spaces are compatible with the LBB condition. A simple
-and accurate choice that we will use here is to use $\textbf u_h\in Q_{p+1}^d,
+and accurate choice that we will use here is $\textbf u_h\in Q_{p+1}^d,
 p_h\in Q_p$, i.e. use elements one order higher for the velocities than for the
 pressures. 
 
@@ -612,7 +612,7 @@ that is about 10 times faster. Small improvements were applied here
 and there.
 
 A profile of how many CPU instructions are spent at the various
-different places in the the program during refinement cycles
+different places in the program during refinement cycles
 zero through three in 3d is shown here:
 
 @image html step-22.profile-3.png
@@ -625,7 +625,7 @@ the left), and the rest on other things. Since floating point
 operations such as in the SparseILU::vmult calls typically take much
 longer than many of the logical operations and table lookups in matrix
 assembly, the fraction of the run time taken up by matrix assembly is
-actually significantly less than the fraction opf instructions, as will become
+actually significantly less than the fraction of instructions, as will become
 apparent in the comparison we make in the results section.
 
 For higher refinement levels, the boxes representing the solver as
