@@ -447,7 +447,7 @@ constraints individually.
   ability to perform a postprocessing step before a given data
   vector is written to the output. This way, derived variables can be
   written instead of the original data. To this end, there is a new
-  version of <code>DataOut_DoFData::add_data_vector</code> taking a
+  version of DataOut_DoFData::add_data_vector taking a
   data vector and a DataPostprocessor, which performs the actual
   calculation of new data based on the values and possibly derivatives
   of the original data at each point of the patch.
