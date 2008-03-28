@@ -2,7 +2,7 @@
 //    $Id$
 //    Version: $Name$
 //
-//    Copyright (C) 1999, 2000, 2001, 2002, 2003, 2004, 2005, 2006, 2007 by the deal.II authors
+//    Copyright (C) 1999, 2000, 2001, 2002, 2003, 2004, 2005, 2006, 2007, 2008 by the deal.II authors
 //
 //    This file is subject to QPL and may not be  distributed
 //    without copyright and license information. Please refer
@@ -327,7 +327,7 @@ TriaObjectAccessor<1,dim>::has_children () const
 template <int dim>
 inline
 int
-TriaObjectAccessor<1,dim>::child_index (unsigned const int i) const
+TriaObjectAccessor<1,dim>::child_index (const unsigned int i) const
 {
   Assert (i<2, ExcIndexRange(i,0,2));
   Assert (has_children(), TriaAccessorExceptions::ExcCellHasNoChildren());
