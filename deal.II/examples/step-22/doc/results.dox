@@ -315,7 +315,7 @@ is not a good choice in 3D - a full decomposition needs many new entries that
 <h2>Possible Extensions</h2>
 
 <a name="improved-solver">
-<h3>Improved linear solver</h3>
+<h3>Improved linear solver in 3D</h3>
 </a>
 
 We have seen in the section of computational results that the number of outer
@@ -329,7 +329,7 @@ the 2D case where we precondition $A$ with a direct solver and the
 one single CG step, but this changes in 3D where we only use an ILU
 preconditioner.  There, the number of required preconditioned CG steps to
 invert $A$ increases as the mesh is refined, and each <code>vmult</code> 
-operation involves on average approximately 12, 21, 30, 51, 62, ... inner
+operation involves on average approximately 14, 23, 36, 59, 75 and 101 inner
 CG iterations in the refinement steps shown above. (On the other hand,
 the number of iterations for applying the inverse pressure mass matrix is
 always around five, both in two and three dimensions.)  To summarize, most work 
@@ -360,15 +360,15 @@ result regarding the computing time was found for the King ordering, which is
 accessed through the call DoFRenumbering::boost::king_ordering. With that
 program, the inner solver needs considerably less operations, e.g. about 62 
 inner CG iterations for the inversion of $A$ at cycle 4 compared to about 75 
-iterations with the standard Cuthill_McKee-algorithm. Also, the computing time 
-at cycle 4 decreased from about 20 to 13 minutes for the <code>solve()</code> 
+iterations with the standard Cuthill-McKee-algorithm. Also, the computing time 
+at cycle 4 decreased from about 17 to 11 minutes for the <code>solve()</code> 
 call. However, the King ordering (and the orderings provided by the
 DoFRenumbering::boost namespace in general) has a serious drawback - it uses
 much more memory than the in-build deal versions, since it acts on abstract
 graphs rather than the geometry provided by the triangulation. In the present
 case, the renumbering takes about 5 times as much memory, which yields an
-infeasible algorithm for the two last cycles in 3D with 1.2 and 4.6 million
-unknowns, respectively.
+infeasible algorithm for the last cycle in 3D with 1.2 million
+unknowns.
 
 <h4>Better preconditioner for the inner CG solver</h4>
 Another idea to improve the situation even more would be to choose a 
@@ -377,13 +377,13 @@ mesh-independent number of iterations, say 10 to 30. We have seen such a
 canditate in @ref step_16 "step-16": multigrid.
 
 <h4>Block Schur complement preconditioner</h4>
-But even with a good preconditioner for $A$ at hand, there would still 
-be need for the repeated solution of the same linear system (with different 
+But even with a good preconditioner for $A$ at hand, we still 
+need to solve of the same linear system repeatedly (with different 
 right hand sides, though). The approach we are going to discuss here is how this
 can be avoided. If we persist in calculating the Schur complement, there is no 
 other possibility.
 
-The alternative is to attack the block system at one time and use an approximate
+The alternative is to attack the block system at once and use an approximate
 Schur complement as efficient preconditioner. The basic idea is as
 follows: If we find a block preconditioner $P$ such that the matrix
 @f{eqnarray*}
@@ -417,7 +417,8 @@ would appear to be a good choice since
   \end{array}\right).
 @f}
 This is the approach taken by the paper by Silvester and Wathen referenced to
-in the introduction. In this case, a Krylov-based iterative method would 
+in the introduction (with the exception that Silvester and Wathen use right 
+preconditioning). In this case, a Krylov-based iterative method would 
 converge in two steps if exact inverses of $A$ and $S$ were applied, since
 there are only two distinct eigenvalues 0 and 1 of the matrix. Below, we will
 discuss the choice of an adequate solver for this problem. First, we are going
@@ -528,7 +529,7 @@ required iterations.
 BiCGStab, on the other hand, won't get slower when many iterations are needed
 (one iteration uses only results from one preceeding step and
 not all the steps as GMRES). Besides the fact the BiCGStab is more expensive per
-step since two matrix-vector products have to be performed (compared to one for
+step since two matrix-vector products are needed (compared to one for
 CG or GMRES), there is one main reason which makes BiCGStab not appropriate for
 this problem: The preconditioner applies the inverse of the pressure
 mass matrix by using the InverseMatrix class. Since the application of the
@@ -541,7 +542,7 @@ magnitude in the coarse of iterations.
 
 We did some experiments with BiCGStab and found it to
 be faster than GMRES up to refinement cycle 3 (in 3D), but it became very slow 
-for cycles 5 and 6 (even slower than the original Schur complement), so the
+for cycles 4 and 5 (even slower than the original Schur complement), so the
 solver is useless in this situation. Choosing a sharper tolerance for the
 inverse matrix class (<code>1e-10*src.l2_norm()</code> instead of 
 <code>1e-6*src.l2_norm()</code>) made BiCGStab perform well also for cycle 4, 
@@ -599,11 +600,10 @@ matrix to zero (we saved the pressure mass matrix there which is not part of the
 problem) after we copied the information to another matrix.
 
 Using the Timer class, we collect some statistics that compare the runtime
-of the block solver with the one from the problem implementation above (on
-a different machine than the one for which timings were reported
-above). Besides the solution if the two systems we also check if the solutions
+of the block solver with the one from the problem implementation above.
+Besides the solution with the two options we also check if the solutions
 of the two variants are close to each other (i.e. this solver gives indeed the
-same solution as before) and calculate the infinity
+same solution as we had before) and calculate the infinity
 norm of the vector difference.
 
 Let's first see the results in 2D:
@@ -681,9 +681,9 @@ Refinement cycle 6
 
 We see that there is no huge difference in the solution time between
 the block Schur complement preconditioner solver and the Schur 
-complement itself. The is no gain, but no substantial loss, either. The
-reason is simple: we used a direct solve as preconditioner for the latter - so
-there won't be any substantial gain by avoiding the inner iterations. We see
+complement itself. The
+reason is simple: we used a direct solve as preconditioner for $A$ - so
+there is no substantial gain by avoiding the inner iterations. We see
 that the number of iterations has slightly increased for GMRES, but all in all
 the two choices are fairly similar.
 
