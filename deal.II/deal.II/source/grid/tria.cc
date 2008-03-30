@@ -2,7 +2,7 @@
 //    $Id$
 //    Version: $Name$
 //
-//    Copyright (C) 1998, 1999, 2000, 2001, 2002, 2003, 2004, 2005, 2006, 2007 by the deal.II authors
+//    Copyright (C) 1998, 1999, 2000, 2001, 2002, 2003, 2004, 2005, 2006, 2007, 2008 by the deal.II authors
 //
 //    This file is subject to QPL and may not be  distributed
 //    without copyright and license information. Please refer
@@ -4853,7 +4853,7 @@ unsigned int Triangulation<dim>::max_adjacent_cells () const
   unsigned int max_vertex_index = 0;
   for (; cell!=endc; ++cell)
     for (unsigned vertex=0; vertex<GeometryInfo<dim>::vertices_per_cell; ++vertex)
-      if (cell->vertex_index(vertex) > (signed int)max_vertex_index)
+      if (cell->vertex_index(vertex) > max_vertex_index)
 	max_vertex_index = cell->vertex_index(vertex);
 
 				   // store the number of times a cell
@@ -6817,13 +6817,13 @@ Triangulation<3>::execute_refinement ()
 					     // first vertex is the same middle
 					     // vertex.
 	    for (unsigned int i=0; i<24; ++i)
-	      if (lines[i]->vertex_index((i+1)%2)==static_cast<int>(vertex_indices[i/4]))
+	      if (lines[i]->vertex_index((i+1)%2)==vertex_indices[i/4])
 		line_orientation[i]=true;
 	      else
 		{
 						   // it must be the other way
 						   // round then
-		  Assert(lines[i]->vertex_index(i%2)==static_cast<int>(vertex_indices[i/4]),
+		  Assert(lines[i]->vertex_index(i%2)==vertex_indices[i/4],
 			 ExcInternalError());
 		  line_orientation[i]=false;
 		}

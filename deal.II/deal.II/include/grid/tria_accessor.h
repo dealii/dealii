@@ -543,7 +543,7 @@ class TriaObjectAccessor :  public TriaAccessor<celldim,dim>
 				      *  @p DoFAccessor::vertex_dof_index
 				      *  functions.
 				      */ 
-    int vertex_index (const unsigned int i) const;
+    unsigned int vertex_index (const unsigned int i) const;
 
     				     /**
 				      *  Return a reference to the
@@ -1284,7 +1284,7 @@ class TriaObjectAccessor<1, dim> :  public TriaAccessor<1,dim>
 				      *  @p DoFAccessor::vertex_dof_index
 				      *  functions.
 				      */ 
-    int vertex_index (const unsigned int i) const;
+    unsigned int vertex_index (const unsigned int i) const;
 
 				     /**
 				      *  Return a reference to the
@@ -1919,7 +1919,7 @@ class TriaObjectAccessor<2, dim> :  public TriaAccessor<2,dim>
 				      * DoFAccessor::vertex_dof_index
 				      * functions.
 				      */ 
-    int vertex_index (const unsigned int i) const;
+    unsigned int vertex_index (const unsigned int i) const;
 
     				     /**
 				      *  Return a reference to the
@@ -2612,7 +2612,7 @@ class TriaObjectAccessor<3, dim> :  public TriaAccessor<3,dim>
 				      *  @p DoFAccessor::vertex_dof_index
 				      *  functions.
 				      */ 
-    int vertex_index (const unsigned int i) const;
+    unsigned int vertex_index (const unsigned int i) const;
 
     				     /**
 				      *  Return a reference to the

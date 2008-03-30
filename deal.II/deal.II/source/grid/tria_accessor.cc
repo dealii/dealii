@@ -47,7 +47,7 @@ TriaObjectAccessor<1, dim>::set (const internal::Triangulation::TriaObject<1>  &
 
 
 template <int dim>
-int TriaObjectAccessor<1, dim>::vertex_index (const unsigned int i) const
+unsigned int TriaObjectAccessor<1, dim>::vertex_index (const unsigned int i) const
 {
   Assert (i<2, ExcIndexRange(i,0,2));
   return objects().cells[this->present_index].face (i);
@@ -348,7 +348,7 @@ TriaObjectAccessor<2, dim>::set (const internal::Triangulation::TriaObject<2> &q
 
 
 template <int dim>
-int TriaObjectAccessor<2, dim>::vertex_index (const unsigned int corner) const
+unsigned int TriaObjectAccessor<2, dim>::vertex_index (const unsigned int corner) const
 {
   Assert (corner<4, ExcIndexRange(corner,0,4));
 
@@ -889,7 +889,7 @@ TriaObjectAccessor<3, 3>::set (const internal::Triangulation::TriaObject<3> &hex
 
 
 template <int dim>
-int TriaObjectAccessor<3, dim>::vertex_index (const unsigned int corner) const
+unsigned int TriaObjectAccessor<3, dim>::vertex_index (const unsigned int corner) const
 {
   Assert (corner<8, ExcIndexRange(corner,0,8));
 

@@ -2,7 +2,7 @@
 //    $Id$
 //    Version: $Name$
 //
-//    Copyright (C) 2001, 2002, 2003, 2004, 2005, 2006, 2007 by the deal.II authors
+//    Copyright (C) 2001, 2002, 2003, 2004, 2005, 2006, 2007, 2008 by the deal.II authors
 //
 //    This file is subject to QPL and may not be  distributed
 //    without copyright and license information. Please refer
@@ -609,7 +609,7 @@ GridTools::find_cells_adjacent_to_vertex(const Container<dim> &container,
                                    // if the vertex is part of that cell
    for (; cell != endc; ++cell)
       for (unsigned v = 0; v < GeometryInfo<dim>::vertices_per_cell; v++)
-         if (cell->vertex_index(v) == (int)vertex)
+         if (cell->vertex_index(v) == vertex)
             {
                                    // OK, we found a cell that contains
                                    // the particular vertex. We add it
@@ -659,7 +659,7 @@ GridTools::find_cells_adjacent_to_vertex(const Container<dim> &container,
 			     {
 			       bool found = false;
 			       for (unsigned v=0; v<GeometryInfo<dim>::vertices_per_cell; v++)
-                                 if (nb->vertex_index(v) == (int)vertex)
+                                 if (nb->vertex_index(v) == vertex)
 				   {
 				     found = true;
 				     break;
