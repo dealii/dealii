@@ -1791,12 +1791,12 @@ namespace DoFRenumbering
 
 
 
-  template <int dim>
+  template <class DH>
   void
-  subdomain_wise (DoFHandler<dim> &dof_handler)
+  subdomain_wise (DH &dof_handler)
   {
     std::vector<unsigned int> renumbering(dof_handler.n_dofs(),
-					  DoFHandler<dim>::invalid_dof_index);
+					  DH::invalid_dof_index);
     compute_subdomain_wise(renumbering, dof_handler);
 
     dof_handler.renumber_dofs(renumbering);
@@ -1804,10 +1804,10 @@ namespace DoFRenumbering
 
   
 
-  template <int dim>
+  template <class DH>
   void
   compute_subdomain_wise (std::vector<unsigned int> &new_dof_indices,
-			  const DoFHandler<dim>     &dof_handler)
+			  const DH                  &dof_handler)
   {
     const unsigned int n_dofs = dof_handler.n_dofs();
     Assert (new_dof_indices.size() == n_dofs,
@@ -2142,14 +2142,12 @@ namespace DoFRenumbering
    const std::vector<bool> &);
 
   template
-  void subdomain_wise<deal_II_dimension>
+  void subdomain_wise<DoFHandler<deal_II_dimension> >
   (DoFHandler<deal_II_dimension> &);
 
   template
-  void
-  compute_subdomain_wise<deal_II_dimension>
-  (std::vector<unsigned int>&,
-   const DoFHandler<deal_II_dimension> &);
+  void subdomain_wise<hp::DoFHandler<deal_II_dimension> >
+  (hp::DoFHandler<deal_II_dimension> &);
 
   template
   void Cuthill_McKee<deal_II_dimension>

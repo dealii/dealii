@@ -1115,9 +1115,9 @@ namespace DoFRenumbering
 				    * will be in this order also after
 				    * reordering.
 				    */
-  template <int dim>
+  template <class DH>
   void
-  subdomain_wise (DoFHandler<dim> &dof_handler);
+  subdomain_wise (DH &dof_handler);
 
 				   /**
 				    * Computes the renumbering
@@ -1128,10 +1128,10 @@ namespace DoFRenumbering
 				    * DoFHandler dofs but returns
 				    * the renumbering vector.
 				    */   
-  template <int dim>
+  template <class DH>
   void
   compute_subdomain_wise (std::vector<unsigned int> &new_dof_indices,
-			  const DoFHandler<dim>     &dof_handler);
+			  const DH                  &dof_handler);
     
 				   /**
 				    * Exception
