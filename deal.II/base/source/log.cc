@@ -90,7 +90,7 @@ LogStream::operator<< (std::ostream& (*p) (std::ostream&))
 	*std_out << stream.str();
       
       if (file && (prefixes.size() <= file_depth))
-	*file << stream.str();
+	*file << stream.str() << std::flush;
       
 				       // Start a new string
       stream.str("");
