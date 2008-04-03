@@ -201,7 +201,7 @@ DEAL_II_NAMESPACE_OPEN
  * @ingroup numerics
  * @author Ralf Hartmann, 1999
  */
-template<int dim, typename number>
+template<int dim, typename number, class DH=DoFHandler<dim> >
 class SolutionTransfer
 {
   public:
@@ -210,7 +210,7 @@ class SolutionTransfer
 				      * Constructor, takes the current DoFHandler
 				      * as argument.
 				      */
-    SolutionTransfer(const DoFHandler<dim> &dof);
+    SolutionTransfer(const DH &dof);
 
     				     /**
 				      * Destructor
@@ -377,6 +377,11 @@ class SolutionTransfer
 				     /**
 				      * Exception
 				      */
+    DeclException0(ExcNumberOfDoFsPerCellHasChanged);
+
+				     /**
+				      * Exception
+				      */
     DeclException2(ExcWrongVectorSize,
 		   int, int,
 		   << "The size of the vector is " << arg1
@@ -388,7 +393,7 @@ class SolutionTransfer
 				      * Pointer to the degree of freedom handler
 				      * to work with.
 				      */
-    SmartPointer<const DoFHandler<dim> > dof_handler;
+    SmartPointer<const DH> dof_handler;
     
 				     /**
 				      * Stores the number of DoFs before the

@@ -26,31 +26,31 @@ DEAL_II_NAMESPACE_OPEN
 
 
 
-template<int dim, typename number>
-SolutionTransfer<dim, number>::SolutionTransfer(const DoFHandler<dim> &dof):
+template<int dim, typename number, class DH>
+SolutionTransfer<dim, number, DH>::SolutionTransfer(const DH &dof):
 		dof_handler(&dof),
 		n_dofs_old(0),
 		prepared_for(none)
 {}
 
 
-template<int dim, typename number>
-SolutionTransfer<dim, number>::~SolutionTransfer()
+template<int dim, typename number, class DH>
+SolutionTransfer<dim, number, DH>::~SolutionTransfer()
 {
   clear ();
 }
 
 
-template<int dim, typename number>
-SolutionTransfer<dim, number>::Pointerstruct::Pointerstruct():
+template<int dim, typename number, class DH>
+SolutionTransfer<dim, number, DH>::Pointerstruct::Pointerstruct():
 		indices_ptr(0),
 		dof_values_ptr(0)
 {}
 
 
 
-template<int dim, typename number>
-void SolutionTransfer<dim, number>::clear ()
+template<int dim, typename number, class DH>
+void SolutionTransfer<dim, number, DH>::clear ()
 {
   indices_on_cell.clear();
   dof_values_on_cell.clear();
@@ -60,8 +60,8 @@ void SolutionTransfer<dim, number>::clear ()
 }
 
 
-template<int dim, typename number>
-void SolutionTransfer<dim, number>::prepare_for_pure_refinement()
+template<int dim, typename number, class DH>
+void SolutionTransfer<dim, number, DH>::prepare_for_pure_refinement()
 { 
   Assert(prepared_for!=pure_refinement, ExcAlreadyPrepForRef());
   Assert(prepared_for!=coarsening_and_refinement, 
@@ -70,40 +70,34 @@ void SolutionTransfer<dim, number>::prepare_for_pure_refinement()
   clear();
 
   const unsigned int n_active_cells = dof_handler->get_tria().n_active_cells();
-  const unsigned int dofs_per_cell  = dof_handler->get_fe().dofs_per_cell;
   n_dofs_old=dof_handler->n_dofs();
 
 				   // efficient reallocation of indices_on_cell
-  std::vector<std::vector<unsigned int> > (n_active_cells,
-					   std::vector<unsigned int> (dofs_per_cell))
+  std::vector<std::vector<unsigned int> > (n_active_cells)
     .swap(indices_on_cell);
 
-  typename DoFHandler<dim>::cell_iterator cell = dof_handler->begin(),
-					  endc = dof_handler->end();
+  typename DH::active_cell_iterator cell = dof_handler->begin_active(),
+				    endc = dof_handler->end();
 
-  for (unsigned int i=0; cell!=endc; ++cell) 
+  for (unsigned int i=0; cell!=endc; ++cell, ++i) 
     {
-      if (cell->active())
-	{
-					   // on each cell store the indices
-					   // of the dofs. after refining we
-					   // get the values on the children
-					   // by taking these indices, getting
-					   // the respective values out of
-					   // the data vectors and prolonging
-					   // them to the children
-	  cell->get_dof_indices(indices_on_cell[i]);
-	  cell_map[std::make_pair(cell->level(),cell->index())].indices_ptr=&indices_on_cell[i];
-	  ++i;	  
-	}
+      indices_on_cell[i].resize(cell->get_fe().dofs_per_cell);
+				       // on each cell store the indices of the
+				       // dofs. after refining we get the values
+				       // on the children by taking these
+				       // indices, getting the respective values
+				       // out of the data vectors and prolonging
+				       // them to the children
+      cell->get_dof_indices(indices_on_cell[i]);
+      cell_map[std::make_pair(cell->level(),cell->index())].indices_ptr=&indices_on_cell[i];
     }
   prepared_for=pure_refinement;
 }
 
 
-template<int dim, typename number>  
+template<int dim, typename number, class DH>  
 void
-SolutionTransfer<dim, number>::refine_interpolate(const Vector<number> &in,
+SolutionTransfer<dim, number, DH>::refine_interpolate(const Vector<number> &in,
 						  Vector<number>       &out) const
 {
   Assert(prepared_for==pure_refinement, ExcNotPrepared());
@@ -114,11 +108,10 @@ SolutionTransfer<dim, number>::refine_interpolate(const Vector<number> &in,
          ExcMessage ("Vectors cannot be used as input and output"
                      " at the same time!"));
 
-  unsigned int dofs_per_cell=dof_handler->get_fe().dofs_per_cell;  
-  Vector<number> local_values(dofs_per_cell);
+  Vector<number> local_values(0);
 
-  typename DoFHandler<dim>::cell_iterator cell = dof_handler->begin(),
-					  endc = dof_handler->end();
+  typename DH::cell_iterator cell = dof_handler->begin(),
+			     endc = dof_handler->end();
 
   typename std::map<std::pair<unsigned int, unsigned int>, Pointerstruct>::const_iterator
     pointerstruct,
@@ -136,6 +129,18 @@ SolutionTransfer<dim, number>::refine_interpolate(const Vector<number> &in,
 					 // which is both done by one
 					 // function
 	{
+	  const unsigned int dofs_per_cell=cell->get_fe().dofs_per_cell;
+	  local_values.reinit(dofs_per_cell, true); // fast reinit, i.e. the
+						    // entries are not set to 0.
+					   // make sure that the size of the
+					   // stored indices is the same as
+					   // dofs_per_cell. this is kind of a
+					   // test if we use the same fe in the
+					   // hp case. to really do that test we
+					   // would have to store the fe_index
+					   // of all cells
+	  Assert(dofs_per_cell==(*pointerstruct->second.indices_ptr).size(),
+		 ExcNumberOfDoFsPerCellHasChanged());
 	  for (unsigned int i=0; i<dofs_per_cell; ++i)
 	    local_values(i)=in((*pointerstruct->second.indices_ptr)[i]);
 	  cell->set_dof_values_by_interpolation(local_values, out);
@@ -144,8 +149,8 @@ SolutionTransfer<dim, number>::refine_interpolate(const Vector<number> &in,
 }
 
 
-template<int dim, typename number>  
-void SolutionTransfer<dim, number>::refine_interpolate (Vector<number> &vec) const
+template<int dim, typename number, class DH>  
+void SolutionTransfer<dim, number, DH>::refine_interpolate (Vector<number> &vec) const
 {
   Assert(vec.size()==n_dofs_old, ExcWrongVectorSize(vec.size(),n_dofs_old));
 
@@ -156,9 +161,9 @@ void SolutionTransfer<dim, number>::refine_interpolate (Vector<number> &vec) con
 }
 
 
-template<int dim, typename number>
+template<int dim, typename number, class DH>
 void
-SolutionTransfer<dim, number>::
+SolutionTransfer<dim, number, DH>::
 prepare_for_coarsening_and_refinement(const std::vector<Vector<number> > &all_in)
 {
   Assert(prepared_for!=pure_refinement, ExcAlreadyPrepForRef());
@@ -171,7 +176,6 @@ prepare_for_coarsening_and_refinement(const std::vector<Vector<number> > &all_in
   clear();
 
   const unsigned int n_active_cells = dof_handler->get_tria().n_active_cells();
-  const unsigned int dofs_per_cell  = dof_handler->get_fe().dofs_per_cell;
   n_dofs_old=dof_handler->n_dofs();
 
   for (unsigned int i=0; i<in_size; ++i)
@@ -185,7 +189,7 @@ prepare_for_coarsening_and_refinement(const std::vector<Vector<number> > &all_in
 				   // and that'll stay or be refined
   unsigned int n_cells_to_coarsen=0;
   unsigned int n_cells_to_stay_or_refine=0;
-  typename DoFHandler<dim>::active_cell_iterator
+  typename DH::active_cell_iterator
     act_cell = dof_handler->begin_active(),
     endc = dof_handler->end();
   for (; act_cell!=endc; ++act_cell) 
@@ -209,25 +213,25 @@ prepare_for_coarsening_and_refinement(const std::vector<Vector<number> > &all_in
                                    // the following arrays in an efficient
                                    // way, without copying much
   std::vector<std::vector<unsigned int> >
-    (n_cells_to_stay_or_refine,
-     std::vector<unsigned int> (dofs_per_cell))
+    (n_cells_to_stay_or_refine)
     .swap(indices_on_cell);
   
   std::vector<std::vector<Vector<number> > >
     (n_coarsen_fathers,
-     std::vector<Vector<number> > (in_size,
-				   Vector<number> (dofs_per_cell)))
+     std::vector<Vector<number> > (in_size))
     .swap(dof_values_on_cell);
   
 				   // we need counters for
 				   // the 'to_stay_or_refine' cells 'n_sr' and
 				   // the 'coarsen_fathers' cells 'n_cf',
   unsigned int n_sr=0, n_cf=0;
-  typename DoFHandler<dim>::cell_iterator cell = dof_handler->begin();  
+  typename DH::cell_iterator cell = dof_handler->begin();  
   for (; cell!=endc; ++cell) 
     {
       if (cell->active() && !cell->coarsen_flag_set())
 	{
+	  const unsigned int dofs_per_cell=cell->get_fe().dofs_per_cell;
+	  indices_on_cell[n_sr].resize(dofs_per_cell);
 					   // cell will not be coarsened,
 					   // so we get away by storing the
 					   // dof indices and later
@@ -245,7 +249,10 @@ prepare_for_coarsening_and_refinement(const std::vector<Vector<number> > &all_in
 	  for (unsigned int i=1; i<cell->n_children(); ++i)
 	    Assert(cell->child(i)->coarsen_flag_set(),
 		   ExcTriaPrepCoarseningNotCalledBefore());
-	      
+	  const unsigned int dofs_per_cell=cell->get_fe().dofs_per_cell;
+	  std::vector<Vector<number> >(in_size, Vector<number>(dofs_per_cell))
+	    .swap(dof_values_on_cell[n_cf]);
+      
 	  for (unsigned int j=0; j<in_size; ++j)
 	    {
 					       // store the data of each of
@@ -264,17 +271,17 @@ prepare_for_coarsening_and_refinement(const std::vector<Vector<number> > &all_in
 }
 
 
-template<int dim, typename number>
+template<int dim, typename number, class DH>
 void
-SolutionTransfer<dim, number>::prepare_for_coarsening_and_refinement(const Vector<number> &in)
+SolutionTransfer<dim, number, DH>::prepare_for_coarsening_and_refinement(const Vector<number> &in)
 {
   std::vector<Vector<number> > all_in=std::vector<Vector<number> >(1, in);
   prepare_for_coarsening_and_refinement(all_in);
 }
 
 
-template<int dim, typename number>
-void SolutionTransfer<dim, number>::
+template<int dim, typename number, class DH>
+void SolutionTransfer<dim, number, DH>::
 interpolate (const std::vector<Vector<number> > &all_in,
 	     std::vector<Vector<number> >       &all_out) const
 {
@@ -293,16 +300,15 @@ interpolate (const std::vector<Vector<number> > &all_in,
              ExcMessage ("Vectors cannot be used as input and output"
                          " at the same time!"));
 
-  const unsigned int dofs_per_cell=dof_handler->get_fe().dofs_per_cell;  
-  Vector<number> local_values(dofs_per_cell);
-  std::vector<unsigned int> dofs(dofs_per_cell);
+  Vector<number> local_values;
+  std::vector<unsigned int> dofs;
 
   typename std::map<std::pair<unsigned int, unsigned int>, Pointerstruct>::const_iterator
     pointerstruct,
     cell_map_end=cell_map.end();
 
-  typename DoFHandler<dim>::cell_iterator cell = dof_handler->begin(),
-					  endc = dof_handler->end();
+  typename DH::cell_iterator cell = dof_handler->begin(),
+			     endc = dof_handler->end();
   for (; cell!=endc; ++cell) 
     {
       pointerstruct=cell_map.find(std::make_pair(cell->level(),cell->index()));
@@ -315,22 +321,34 @@ interpolate (const std::vector<Vector<number> > &all_in,
 	  const std::vector<Vector<number> > * const valuesptr
 	    =pointerstruct->second.dof_values_ptr;
 
+	  const unsigned int dofs_per_cell=cell->get_fe().dofs_per_cell;
+	  
 					   // cell stayed or is
 					   // refined
 	  if (indexptr)
 	    {
 	      Assert (valuesptr == 0,
 		      ExcInternalError());
-	      
+					       // make sure that the size of the
+					       // stored indices is the same as
+					       // dofs_per_cell. this is kind of
+					       // a test if we use the same fe
+					       // in the hp case. to really do
+					       // that test we would have to
+					       // store the fe_index of all
+					       // cells
+	      Assert(dofs_per_cell==(*indexptr).size(),
+		     ExcNumberOfDoFsPerCellHasChanged());
 					       // get the values of
 					       // each of the input
 					       // data vectors on this
 					       // cell and prolong it
 					       // to its children
+	      local_values.reinit(dofs_per_cell, true);
 	      for (unsigned int j=0; j<size; ++j)
 		{
 		  for (unsigned int i=0; i<dofs_per_cell; ++i)
-		    local_values(i)=all_in[j](indexptr->operator[](i));
+		    local_values(i)=all_in[j]((*indexptr)[i]);
 		  cell->set_dof_values_by_interpolation(local_values,
 							all_out[j]);
 		}
@@ -342,7 +360,7 @@ interpolate (const std::vector<Vector<number> > &all_in,
 	      Assert (!cell->has_children(), ExcInternalError());
 	      Assert (indexptr == 0,
 		      ExcInternalError());
-
+	      dofs.resize(dofs_per_cell);
 					       // get the local
 					       // indices
 	      cell->get_dof_indices(dofs);
@@ -351,8 +369,23 @@ interpolate (const std::vector<Vector<number> > &all_in,
 					       // stored data to the
 					       // new vectors
 	      for (unsigned int j=0; j<size; ++j)
-		for (unsigned int i=0; i<dofs_per_cell; ++i)
-		  all_out[j](dofs[i])=valuesptr->operator[](j)(i);
+		{
+						   // make sure that the size of
+						   // the stored indices is the
+						   // same as
+						   // dofs_per_cell. this is
+						   // kind of a test if we use
+						   // the same fe in the hp
+						   // case. to really do that
+						   // test we would have to
+						   // store the fe_index of all
+						   // cells
+		  Assert(dofs_per_cell==(*valuesptr)[j].size(),
+			 ExcNumberOfDoFsPerCellHasChanged());
+
+		  for (unsigned int i=0; i<dofs_per_cell; ++i)
+		    all_out[j](dofs[i])=(*valuesptr)[j](i);
+		}
 	    }
 					   // undefined status
 	  else
@@ -363,8 +396,8 @@ interpolate (const std::vector<Vector<number> > &all_in,
 
 
 
-template<int dim, typename number>
-void SolutionTransfer<dim, number>::interpolate(const Vector<number> &in,
+template<int dim, typename number, class DH>
+void SolutionTransfer<dim, number, DH>::interpolate(const Vector<number> &in,
 						Vector<number>       &out) const
 {
   Assert (in.size()==n_dofs_old,
@@ -383,9 +416,9 @@ void SolutionTransfer<dim, number>::interpolate(const Vector<number> &in,
 
 
 
-template<int dim, typename number>
+template<int dim, typename number, class DH>
 unsigned int
-SolutionTransfer<dim, number>::memory_consumption () const
+SolutionTransfer<dim, number, DH>::memory_consumption () const
 {
 				   // at the moment we do not include the memory
 				   // consumption of the cell_map as we have no
@@ -400,17 +433,19 @@ SolutionTransfer<dim, number>::memory_consumption () const
 
 
 
-template<int dim, typename number>
+template<int dim, typename number, class DH>
 unsigned int
-SolutionTransfer<dim, number>::Pointerstruct::memory_consumption () const
+SolutionTransfer<dim, number, DH>::Pointerstruct::memory_consumption () const
 {
   return sizeof(*this);
 }
 
 
 
-template class SolutionTransfer<deal_II_dimension, float>;
-template class SolutionTransfer<deal_II_dimension, double>;
+template class SolutionTransfer<deal_II_dimension, float, DoFHandler<deal_II_dimension> >;
+template class SolutionTransfer<deal_II_dimension, double, DoFHandler<deal_II_dimension> >;
+template class SolutionTransfer<deal_II_dimension, float, hp::DoFHandler<deal_II_dimension> >;
+template class SolutionTransfer<deal_II_dimension, double, hp::DoFHandler<deal_II_dimension> >;
 
 /*----------------------------   solution_transfer.cc     ----------------------*/
 

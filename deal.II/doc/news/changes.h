@@ -290,6 +290,13 @@ constraints individually.
 
 <ol>
 
+  <li> <p>Extendend: SolutionTransfer has an additional template parameters DH
+  for the dof handler class to use, which defaults to DoFHandler. However, an
+  instantiation is also provided for hp::DoFHandler.
+  <br>
+  (Tobias Leicht, 2008/04/03)
+  </p></li>
+
   <li> <p>Extended: DataOut has an extended interface now which enables a user
   decision, which cells shall be written as curved cells using the provided
   mapping: none, only cells at the boundary, or all cells. The last choice can
