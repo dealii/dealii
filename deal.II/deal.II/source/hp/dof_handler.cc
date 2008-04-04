@@ -2,7 +2,7 @@
 //    $Id$
 //    Version: $Name$
 //
-//    Copyright (C) 2003, 2004, 2006, 2007 by the deal.II authors
+//    Copyright (C) 2003, 2004, 2006, 2007, 2008 by the deal.II authors
 //
 //    This file is subject to QPL and may not be  distributed
 //    without copyright and license information. Please refer
@@ -2378,9 +2378,11 @@ namespace hp
 	      const unsigned int fe_index_1 = line->nth_active_fe_index (f),
 				 fe_index_2 = line->nth_active_fe_index (g);
 	      
-	      if ((*finite_elements)[fe_index_1].dofs_per_line
-		  ==
-		  (*finite_elements)[fe_index_2].dofs_per_line)
+	      if (((*finite_elements)[fe_index_1].dofs_per_line
+		   ==
+		   (*finite_elements)[fe_index_2].dofs_per_line)
+		  &&
+		  ((*finite_elements)[fe_index_1].dofs_per_line > 0))
 		{
 		  internal::hp::ensure_existence_of_dof_identities<dim,1>
 		    ((*finite_elements)[fe_index_1],
