@@ -290,6 +290,11 @@ constraints individually.
 
 <ol>
 
+  <li> <p>New: The FE_RaviartThomasNodal now supports hp functionality.
+  <br>
+  (Zhu Liang, 2008/04/04)
+  </p></li>
+
   <li> <p>Improved: The StraightBoundary object Triangulation::straight_boundary
   is now made public. This allows to use Triangulation::straight_boundary instead
   of recreating a StraightBoundary object when needed.

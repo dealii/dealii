@@ -2,7 +2,7 @@
 //    $Id$
 //    Version: $Name$
 //
-//    Copyright (C) 2003, 2004, 2005, 2006, 2007 by the deal.II authors
+//    Copyright (C) 2003, 2004, 2005, 2006, 2007, 2008 by the deal.II authors
 //
 //    This file is subject to QPL and may not be  distributed
 //    without copyright and license information. Please refer
@@ -382,7 +382,7 @@ class FE_RaviartThomas
  * FiniteElementData<dim>::degree is higher by one than the
  * constructor argument!
  * 
- * @author Guido Kanschat, 2005
+ * @author Guido Kanschat, 2005, Zhu Liang, 2008
  */
 template <int dim>
 class FE_RaviartThomasNodal
@@ -417,8 +417,30 @@ class FE_RaviartThomasNodal
     virtual void interpolate(
       std::vector<double>& local_dofs,
       const VectorSlice<const std::vector<std::vector<double> > >& values) const;
+
+       
+    virtual void get_face_interpolation_matrix (const FiniteElement<dim> &source,
+						FullMatrix<double>       &matrix) const;
+
+    virtual void get_subface_interpolation_matrix (const FiniteElement<dim> &source,
+						   const unsigned int        subface,
+						   FullMatrix<double>       &matrix) const;
+    virtual bool hp_constraints_are_implemented () const;
+    
+    virtual std::vector<std::pair<unsigned int, unsigned int> >
+    hp_vertex_dof_identities (const FiniteElement<dim> &fe_other) const;
+
+    virtual std::vector<std::pair<unsigned int, unsigned int> >
+    hp_line_dof_identities (const FiniteElement<dim> &fe_other) const;
+
+    virtual std::vector<std::pair<unsigned int, unsigned int> >
+    hp_quad_dof_identities (const FiniteElement<dim> &fe_other) const;
+    
+    virtual FiniteElementDomination::Domination
+    compare_for_face_domination (const FiniteElement<dim> &fe_other) const;
+
   private:
-    				     /**
+				     /**
 				      * Only for internal use. Its
 				      * full name is
 				      * @p get_dofs_per_object_vector
@@ -440,7 +462,7 @@ class FE_RaviartThomasNodal
 				      */
     static std::vector<bool>
     get_ria_vector (const unsigned int degree);
-    				     /**
+				     /**
 				      * Initialize the
 				      * FiniteElement<dim>::generalized_support_points
 				      * and FiniteElement<dim>::generalized_face_support_points

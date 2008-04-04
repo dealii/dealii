@@ -25,11 +25,6 @@
 
 #include <sstream>
 
-//TODO: implement the adjust_quad_dof_index_for_face_orientation_table and
-//adjust_line_dof_index_for_line_orientation_table fields, and write tests
-//similar to bits/face_orientation_and_fe_q_*
-
-
 DEAL_II_NAMESPACE_OPEN
 
 
@@ -107,6 +102,10 @@ FE_RaviartThomasNodal<dim>::get_name () const
 				   // this function returns, so they
 				   // have to be kept in synch
 
+				   // note that this->degree is the maximal
+				   // polynomial degree and is thus one higher
+				   // than the argument given to the
+				   // constructor
   std::ostringstream namebuf;  
   namebuf << "FE_RaviartThomasNodal<" << dim << ">(" << this->degree-1 << ")";
 
@@ -227,6 +226,402 @@ FE_RaviartThomasNodal<dim>::interpolate(
 }
 
 
+//TODO: There are tests that check that the following few functions don't produce assertion failures, but none that actually check whether they do the right thing. one example for such a test would be to project a function onto an hp space and make sure that the convergence order is correct with regard to the lowest used polynomial degree
+
+template <int dim>
+bool
+FE_RaviartThomasNodal<dim>::hp_constraints_are_implemented () const
+{
+  return true;
+}
+
+
+template <int dim>
+std::vector<std::pair<unsigned int, unsigned int> >
+FE_RaviartThomasNodal<dim>::
+hp_vertex_dof_identities (const FiniteElement<dim> &fe_other) const
+{
+				   // we can presently only compute these
+				   // identities if both FEs are
+				   // FE_RaviartThomasNodals. in that case, no
+				   // dofs are assigned on the vertex, so we
+				   // shouldn't be getting here at all.
+  if (dynamic_cast<const FE_RaviartThomasNodal<dim>*>(&fe_other)!=0)
+    return std::vector<std::pair<unsigned int, unsigned int> > ();
+  else
+    {
+      Assert(false, ExcNotImplemented());
+      return std::vector<std::pair<unsigned int, unsigned int> > (); 
+    }
+}
+
+
+
+template <int dim>
+std::vector<std::pair<unsigned int, unsigned int> >
+FE_RaviartThomasNodal<dim>::
+hp_line_dof_identities (const FiniteElement<dim> &fe_other) const
+{
+				   // we can presently only compute
+				   // these identities if both FEs are
+				   // FE_RaviartThomasNodals
+  if (const FE_RaviartThomasNodal<dim> *fe_q_other
+      = dynamic_cast<const FE_RaviartThomasNodal<dim>*>(&fe_other))
+    {
+				       // dofs are located on faces; these are
+				       // only lines in 2d
+      if (dim != 2)
+	return std::vector<std::pair<unsigned int, unsigned int> >();
+      
+				       // dofs are located along lines, so two
+				       // dofs are identical only if in the
+				       // following two cases (remember that
+				       // the face support points are Gauss
+				       // points):
+				       //1. this->degree = fe_q_other->degree,
+				       //   in the case, all the dofs on
+				       //   the line are identical
+				       //2. this->degree-1 and fe_q_other->degree-1
+				       //   are both even, i.e. this->dof_per_line
+				       //   and fe_q_other->dof_per_line are both odd,
+				       //   there exists only one point (the middle one)
+				       //   such that dofs are identical on this point
+				       //
+				       // to understand this, note that
+				       // this->degree is the *maximal*
+				       // polynomial degree, and is thus one
+				       // higher than the argument given to
+				       // the constructor
+      const unsigned int p = this->degree-1;
+      const unsigned int q = fe_q_other->degree-1;
+      
+      std::vector<std::pair<unsigned int, unsigned int> > identities;
+
+      if (p==q)
+	for (unsigned int i=0; i<p+1; ++i)
+	  identities.push_back (std::make_pair(i,i));
+
+      else
+	if (p%2==0 && q%2==0)
+	  identities.push_back(std::make_pair(p/2,q/2));
+      
+      return identities;
+    }
+  else
+    {
+      Assert (false, ExcNotImplemented());
+      return std::vector<std::pair<unsigned int, unsigned int> > ();
+    }
+}
+
+
+template <int dim>
+std::vector<std::pair<unsigned int, unsigned int> >
+FE_RaviartThomasNodal<dim>::
+hp_quad_dof_identities (const FiniteElement<dim>        &fe_other) const
+{
+				   // we can presently only compute
+				   // these identities if both FEs are
+				   // FE_RaviartThomasNodals
+  if (const FE_RaviartThomasNodal<dim> *fe_q_other
+      = dynamic_cast<const FE_RaviartThomasNodal<dim>*>(&fe_other))
+    {
+				       // dofs are located on faces; these are
+				       // only quads in 3d
+      if (dim != 3)
+	return std::vector<std::pair<unsigned int, unsigned int> >();
+
+				       // this works exactly like the line
+				       // case above
+      const unsigned int p = this->dofs_per_quad;
+      const unsigned int q = fe_q_other->dofs_per_quad;
+      
+      std::vector<std::pair<unsigned int, unsigned int> > identities;
+
+      if (p==q)
+	for (unsigned int i=0; i<p; ++i)
+	  identities.push_back (std::make_pair(i,i));
+
+      else
+	if (p%2!=0 && q%2!=0)
+	  identities.push_back(std::make_pair(p/2, q/2));
+
+      return identities;
+    }
+  else
+    {
+      Assert (false, ExcNotImplemented());
+      return std::vector<std::pair<unsigned int, unsigned int> > ();
+    }
+}
+
+
+template <int dim>
+FiniteElementDomination::Domination
+FE_RaviartThomasNodal<dim>::
+compare_for_face_domination (const FiniteElement<dim> &fe_other) const
+{
+  if (const FE_RaviartThomasNodal<dim> *fe_q_other
+      = dynamic_cast<const FE_RaviartThomasNodal<dim>*>(&fe_other))
+    {
+      if (this->degree < fe_q_other->degree)
+	return FiniteElementDomination::this_element_dominates;
+      else if (this->degree == fe_q_other->degree)
+	return FiniteElementDomination::either_element_can_dominate;
+      else
+	return FiniteElementDomination::other_element_dominates;
+    }
+  
+  Assert (false, ExcNotImplemented());
+  return FiniteElementDomination::neither_element_dominates;
+}
+
+
+#if deal_II_dimension == 1
+
+template <>
+void
+FE_RaviartThomasNodal<1>::
+get_face_interpolation_matrix (const FiniteElement<1> &/*x_source_fe*/,
+			       FullMatrix<double>     &/*interpolation_matrix*/) const
+{
+  Assert (false,
+	  FiniteElement<1>::
+	  ExcInterpolationNotImplemented ());
+}
+
+
+template <>
+void
+FE_RaviartThomasNodal<1>::
+get_subface_interpolation_matrix (const FiniteElement<1> &/*x_source_fe*/,
+				  const unsigned int      /*subface*/,
+				  FullMatrix<double>     &/*interpolation_matrix*/) const
+{
+  Assert (false,
+	  FiniteElement<1>::
+	  ExcInterpolationNotImplemented ());
+}
+
+#endif
+
+
+#if deal_II_dimension > 1
+
+template <int dim>
+void
+FE_RaviartThomasNodal<dim>::
+get_face_interpolation_matrix (const FiniteElement<dim> &x_source_fe,
+                               FullMatrix<double>       &interpolation_matrix) const
+{
+				   // this is only implemented, if the
+				   // source FE is also a
+				   // RaviartThomasNodal element
+  AssertThrow ((x_source_fe.get_name().find ("FE_RaviartThomasNodal<") == 0)
+	       ||
+	       (dynamic_cast<const FE_RaviartThomasNodal<dim>*>(&x_source_fe) != 0),
+	       typename FiniteElement<dim>::
+	       ExcInterpolationNotImplemented());
+  
+  Assert (interpolation_matrix.n() == this->dofs_per_face,
+	  ExcDimensionMismatch (interpolation_matrix.n(),
+				this->dofs_per_face));
+  Assert (interpolation_matrix.m() == x_source_fe.dofs_per_face,
+	  ExcDimensionMismatch (interpolation_matrix.m(),
+				x_source_fe.dofs_per_face));
+
+				   // ok, source is a RaviartThomasNodal element, so
+				   // we will be able to do the work
+  const FE_RaviartThomasNodal<dim> &source_fe
+    = dynamic_cast<const FE_RaviartThomasNodal<dim>&>(x_source_fe);
+
+				   // Make sure, that the element,
+				   // for which the DoFs should be
+				   // constrained is the one with
+				   // the higher polynomial degree.
+				   // Actually the procedure will work
+				   // also if this assertion is not
+				   // satisfied. But the matrices
+				   // produced in that case might
+				   // lead to problems in the
+				   // hp procedures, which use this
+				   // method.
+  Assert (this->dofs_per_face <= source_fe.dofs_per_face,
+	  typename FiniteElement<dim>::
+	  ExcInterpolationNotImplemented ());
+  
+				   // generate a quadrature
+				   // with the generalized support points.
+				   // This is later based as a
+				   // basis for the QProjector,
+				   // which returns the support
+				   // points on the face.
+  Quadrature<dim-1> quad_face_support (source_fe.get_generalized_face_support_points ());
+  
+				   // Rule of thumb for FP accuracy,
+				   // that can be expected for a
+				   // given polynomial degree.
+				   // This value is used to cut
+				   // off values close to zero.
+  double eps = 2e-13*this->degree*(dim-1);
+  
+				   // compute the interpolation
+				   // matrix by simply taking the
+				   // value at the support points.
+  const Quadrature<dim> face_projection
+    = QProjector<dim>::project_to_face (quad_face_support, 0);
+  
+  for (unsigned int i=0; i<source_fe.dofs_per_face; ++i)
+    {
+      const Point<dim> &p = face_projection.point (i);
+
+      for (unsigned int j=0; j<this->dofs_per_face; ++j)
+	{ 
+	  double matrix_entry
+	    = this->shape_value_component (this->face_to_cell_index(j, 0),
+					   p, 0);
+
+					   // Correct the interpolated
+					   // value. I.e. if it is close
+					   // to 1 or 0, make it exactly
+					   // 1 or 0. Unfortunately, this
+					   // is required to avoid problems
+					   // with higher order elements.
+	  if ( std::fabs(matrix_entry - 1.0) < eps )
+	    matrix_entry = 1.0;
+	  if ( std::fabs(matrix_entry) < eps )
+	    matrix_entry = 0.0;
+
+	  interpolation_matrix(i,j) = matrix_entry;
+	}  
+    }
+
+				   // make sure that the row sum of
+				   // each of the matrices is 1 at
+				   // this point. this must be so
+				   // since the shape functions sum up
+				   // to 1
+  for (unsigned int j=0; j<source_fe.dofs_per_face; ++j)
+    {
+      double sum = 0.;
+
+      for (unsigned int i=0; i<this->dofs_per_face; ++i)
+	sum += interpolation_matrix(j,i);
+
+      Assert (std::fabs(sum-1) < 2e-13*this->degree*(dim-1),
+	      ExcInternalError());
+    }
+}
+
+
+template <int dim>
+void
+FE_RaviartThomasNodal<dim>::
+get_subface_interpolation_matrix (const FiniteElement<dim> &x_source_fe,
+                                  const unsigned int subface,
+				  FullMatrix<double>       &interpolation_matrix) const
+{
+				   // this is only implemented, if the
+				   // source FE is also a
+				   // RaviartThomasNodal element
+  AssertThrow ((x_source_fe.get_name().find ("FE_RaviartThomasNodal<") == 0)
+	       ||
+	       (dynamic_cast<const FE_RaviartThomasNodal<dim>*>(&x_source_fe) != 0),
+	       typename FiniteElement<dim>::
+	       ExcInterpolationNotImplemented());
+  
+  Assert (interpolation_matrix.n() == this->dofs_per_face,
+	  ExcDimensionMismatch (interpolation_matrix.n(),
+				this->dofs_per_face));
+  Assert (interpolation_matrix.m() == x_source_fe.dofs_per_face,
+	  ExcDimensionMismatch (interpolation_matrix.m(),
+				x_source_fe.dofs_per_face));
+
+				   // ok, source is a RaviartThomasNodal element, so
+				   // we will be able to do the work
+  const FE_RaviartThomasNodal<dim> &source_fe
+    = dynamic_cast<const FE_RaviartThomasNodal<dim>&>(x_source_fe);
+
+				   // Make sure, that the element,
+				   // for which the DoFs should be
+				   // constrained is the one with
+				   // the higher polynomial degree.
+				   // Actually the procedure will work
+				   // also if this assertion is not
+				   // satisfied. But the matrices
+				   // produced in that case might
+				   // lead to problems in the
+				   // hp procedures, which use this
+				   // method.
+  Assert (this->dofs_per_face <= source_fe.dofs_per_face,
+	  typename FiniteElement<dim>::
+	  ExcInterpolationNotImplemented ());
+  
+				   // generate a quadrature
+				   // with the generalized support points.
+				   // This is later based as a
+				   // basis for the QProjector,
+				   // which returns the support
+				   // points on the face.
+  Quadrature<dim-1> quad_face_support (source_fe.get_generalized_face_support_points ());
+  
+				   // Rule of thumb for FP accuracy,
+				   // that can be expected for a
+				   // given polynomial degree.
+				   // This value is used to cut
+				   // off values close to zero.
+  double eps = 2e-13*this->degree*(dim-1);
+  
+				   // compute the interpolation
+				   // matrix by simply taking the
+				   // value at the support points.
+
+  const Quadrature<dim> subface_projection
+    = QProjector<dim>::project_to_subface (quad_face_support, 0, subface);
+
+  for (unsigned int i=0; i<source_fe.dofs_per_face; ++i)
+    {
+      const Point<dim> &p = subface_projection.point (i);
+
+      for (unsigned int j=0; j<this->dofs_per_face; ++j)
+	{ 
+	  double matrix_entry
+	    = this->shape_value_component (this->face_to_cell_index(j, 0), p, 0);
+
+					   // Correct the interpolated
+					   // value. I.e. if it is close
+					   // to 1 or 0, make it exactly
+					   // 1 or 0. Unfortunately, this
+					   // is required to avoid problems
+					   // with higher order elements.
+	  if ( std::fabs(matrix_entry - 1.0) < eps )
+	    matrix_entry = 1.0;
+	  if ( std::fabs(matrix_entry) < eps )
+	    matrix_entry = 0.0;
+
+	  interpolation_matrix(i,j) = matrix_entry;
+	}  
+    }
+
+				   // make sure that the row sum of
+				   // each of the matrices is 1 at
+				   // this point. this must be so
+				   // since the shape functions sum up
+				   // to 1
+  for (unsigned int j=0; j<source_fe.dofs_per_face; ++j)
+    {
+      double sum = 0.;
+
+      for (unsigned int i=0; i<this->dofs_per_face; ++i)
+	sum += interpolation_matrix(j,i);
+
+      Assert (std::fabs(sum-1) < 2e-13*this->degree*(dim-1),
+	      ExcInternalError());
+    }
+}
+
+#endif
+
 
 
 #if deal_II_dimension == 1
@@ -330,11 +725,11 @@ FE_RaviartThomasNodal<dim>::initialize_support_points (const unsigned int deg)
 	   k<this->dofs_per_face*GeometryInfo<dim>::faces_per_cell;
 	   ++k)
 	this->generalized_support_points[k] = faces.point(k+QProjector<dim>
-																	  ::DataSetDescriptor::face(0,
-																										 true,
-																										 false,
-																										 false,
-																										 this->dofs_per_face));
+							  ::DataSetDescriptor::face(0,
+										    true,
+										    false,
+										    false,
+										    this->dofs_per_face));
 
       current = this->dofs_per_face*GeometryInfo<dim>::faces_per_cell;
     }
