@@ -2,7 +2,7 @@
 //    $Id$
 //    Version: $Name$
 //
-//    Copyright (C) 1998, 1999, 2000, 2001, 2002, 2003, 2004, 2005, 2006, 2007 by the deal.II authors
+//    Copyright (C) 1998, 1999, 2000, 2001, 2002, 2003, 2004, 2005, 2006, 2007, 2008 by the deal.II authors
 //
 //    This file is subject to QPL and may not be  distributed
 //    without copyright and license information. Please refer
@@ -1141,13 +1141,6 @@ template <int dim>
 class Triangulation : public Subscriptor
 {
   private:
-				     /**
-				      * Default boundary object. This is used
-				      * for those boundaries for which no
-				      * boundary object has been explicitly
-				      * set using set_boundary().
-				      */
-    static const StraightBoundary<dim> straight_boundary;
 
 				     /**
 				      * An internal typedef to make
@@ -1157,6 +1150,13 @@ class Triangulation : public Subscriptor
     typedef internal::Triangulation::Iterators<dim> IteratorSelector;
 		      
   public:
+				     /**
+				      * Default boundary object. This is used
+				      * for those boundaries for which no
+				      * boundary object has been explicitly
+				      * set using set_boundary().
+				      */
+    static const StraightBoundary<dim> straight_boundary;
     
 				     /**
 				      * Declare some symbolic names
