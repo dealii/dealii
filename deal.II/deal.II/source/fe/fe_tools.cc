@@ -40,6 +40,8 @@
 #include <dofs/dof_constraints.h>
 #include <dofs/dof_handler.h>
 #include <dofs/dof_accessor.h>
+#include <dofs/dof_tools.h>
+#include <hp/dof_handler.h>
 
 #include <boost/shared_ptr.hpp>
 
@@ -148,32 +150,6 @@ namespace
 
 namespace 
 {
-  template <int dim>
-  inline
-  unsigned int
-  max_dofs_per_cell (const DoFHandler<dim> &dh) 
-  {
-    return dh.get_fe().dofs_per_cell;
-  }
-
-
-  template <int dim>
-  inline
-  unsigned int
-  max_dofs_per_face (const DoFHandler<dim> &dh) 
-  {
-    return dh.get_fe().dofs_per_face;
-  }
-
-
-  template <int dim>
-  inline
-  unsigned int
-  n_components (const DoFHandler<dim> &dh) 
-  {
-    return dh.get_fe().n_components();
-  }
-
 
                                    // forwarder function for
                                    // FE::get_interpolation_matrix. we
@@ -1016,8 +992,8 @@ FETools::interpolate (const DH1<dim>         &dof1,
                                    // cell, but Vector makes sure that
                                    // this does not lead to
                                    // reallocation of memory
-  Vector<typename OutVector::value_type> u1_local(max_dofs_per_cell(dof1));
-  Vector<typename OutVector::value_type> u2_local(max_dofs_per_cell(dof2));
+  Vector<typename OutVector::value_type> u1_local(DoFTools::max_dofs_per_cell(dof1));
+  Vector<typename OutVector::value_type> u2_local(DoFTools::max_dofs_per_cell(dof2));
 
                                    // have a map for interpolation
                                    // matrices. shared_ptr make sure
@@ -1034,7 +1010,7 @@ FETools::interpolate (const DH1<dim>         &dof1,
 
   std::vector<unsigned int> touch_count(dof2.n_dofs(),0);
   std::vector<unsigned int> dofs;
-  dofs.reserve (max_dofs_per_cell (dof2));
+  dofs.reserve (DoFTools::max_dofs_per_cell (dof2));
   u2 = 0;
 
   for (; cell1!=endc1; ++cell1, ++cell2) 
@@ -1179,8 +1155,8 @@ FETools::back_interpolate(const DH<dim>            &dof1,
   Assert(u1_interpolated.size() == dof1.n_dofs(),
 	 ExcDimensionMismatch(u1_interpolated.size(), dof1.n_dofs()));
   
-  Vector<typename OutVector::value_type> u1_local(max_dofs_per_cell(dof1));
-  Vector<typename OutVector::value_type> u1_int_local(max_dofs_per_cell(dof1));
+  Vector<typename OutVector::value_type> u1_local(DoFTools::max_dofs_per_cell(dof1));
+  Vector<typename OutVector::value_type> u1_int_local(DoFTools::max_dofs_per_cell(dof1));
   
   typename DH<dim>::active_cell_iterator cell = dof1.begin_active(),
                                          endc = dof1.end();
@@ -2101,6 +2077,25 @@ template
 void FETools::extrapolate<deal_II_dimension>
 (const DoFHandler<deal_II_dimension> &, const BlockVector<float> &,
  const DoFHandler<deal_II_dimension> &, const ConstraintMatrix &,
+ Vector<float> &);
+
+template
+void FETools::interpolate<deal_II_dimension>
+(const hp::DoFHandler<deal_II_dimension> &, const Vector<double> &,
+ const hp::DoFHandler<deal_II_dimension> &, Vector<double> &);
+template
+void FETools::interpolate<deal_II_dimension>
+(const hp::DoFHandler<deal_II_dimension> &, const Vector<double> &,
+ const hp::DoFHandler<deal_II_dimension> &, const ConstraintMatrix &,
+ Vector<double> &);
+template
+void FETools::interpolate<deal_II_dimension>
+(const hp::DoFHandler<deal_II_dimension> &, const Vector<float> &,
+ const hp::DoFHandler<deal_II_dimension> &, Vector<float> &);
+template
+void FETools::interpolate<deal_II_dimension>
+(const hp::DoFHandler<deal_II_dimension> &, const Vector<float> &,
+ const hp::DoFHandler<deal_II_dimension> &, const ConstraintMatrix &,
  Vector<float> &);
 
 template FiniteElement<deal_II_dimension> *
