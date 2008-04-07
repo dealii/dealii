@@ -2,7 +2,7 @@
 //    $Id$
 //    Version: $Name$
 //
-//    Copyright (C) 2000, 2001, 2002, 2003, 2004, 2005, 2006, 2007 by the deal.II authors
+//    Copyright (C) 2000, 2001, 2002, 2003, 2004, 2005, 2006, 2007, 2008 by the deal.II authors
 //
 //    This file is subject to QPL and may not be  distributed
 //    without copyright and license information. Please refer
@@ -414,13 +414,14 @@ get_face_interpolation_matrix (const FiniteElement<dim> &x_source_fe,
 				   // compute the interpolation
 				   // matrix by simply taking the
                                    // value at the support points.
+//TODO: Verify that all faces are the same with respect to
+// these support points. Furthermore, check if something has to
+// be done for the face orientation flag in 3D.
+  const Quadrature<dim> face_quadrature
+    = QProjector<dim>::project_to_face (quad_face_support, 0);
   for (unsigned int i=0; i<source_fe.dofs_per_face; ++i)
     {
-      //TODO: Verify that all faces are the same with respect to
-      // these support points. Furthermore, check if something has to
-      // be done for the face orientation flag in 3D.
-      const Point<dim> p
-	= QProjector<dim>::project_to_face (quad_face_support, 0).point (i);
+      const Point<dim> &p = face_quadrature.point (i);
 
       for (unsigned int j=0; j<this->dofs_per_face; ++j)
 	{ 
@@ -505,7 +506,8 @@ get_subface_interpolation_matrix (const FiniteElement<dim> &x_source_fe,
                                    // generate a point on this
                                    // cell and evaluate the
                                    // shape functions there
-  Quadrature<dim-1> quad_face_support (source_fe.get_unit_face_support_points ());
+  const Quadrature<dim-1>
+    quad_face_support (source_fe.get_unit_face_support_points ());
 
 				   // Rule of thumb for FP accuracy,
 				   // that can be expected for a
@@ -517,12 +519,14 @@ get_subface_interpolation_matrix (const FiniteElement<dim> &x_source_fe,
 				   // compute the interpolation
 				   // matrix by simply taking the
                                    // value at the support points.
+//TODO: Verify that all faces are the same with respect to
+// these support points. Furthermore, check if something has to
+// be done for the face orientation flag in 3D.
+  const Quadrature<dim> subface_quadrature
+    = QProjector<dim>::project_to_subface (quad_face_support, 0, subface);
   for (unsigned int i=0; i<source_fe.dofs_per_face; ++i)
     {
-      //TODO: Verify that all faces are the same with respect to
-      // these support points. Furthermore, check if something has to
-      // be done for the face orientation flag in 3D.
-      Point<dim> p = QProjector<dim>::project_to_subface (quad_face_support, 0, subface).point (i);
+      const Point<dim> &p = subface_quadrature.point (i);
 
       for (unsigned int j=0; j<this->dofs_per_face; ++j)
 	{ 
