@@ -426,6 +426,10 @@ class VectorTools
 				      * See the general documentation
 				      * of this class for further
 				      * information.
+				      *
+				      * @todo The @p mapping argument should be
+				      * replaced by a hp::MappingCollection in
+				      * case of a hp::DoFHandler.
 				      */
     template <int dim, class VECTOR, class DH>
     static void interpolate (const Mapping<dim>    &mapping,

@@ -1200,6 +1200,10 @@ class DataOut : public DataOut_DoFData<DH, DH::dimension>
 				      * tracked by an additional
 				      * vector that holds the
 				      * deformation of each vertex.
+				      *
+				      * @todo The @p mapping argument should be
+				      * replaced by a hp::MappingCollection in
+				      * case of a hp::DoFHandler.
 				      */
     virtual void build_patches (const Mapping<DH::dimension> &mapping,
 				const unsigned int n_subdivisions = 0,
