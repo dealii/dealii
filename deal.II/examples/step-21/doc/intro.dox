@@ -426,9 +426,9 @@ boundary conditions for the saturation on the inflow part of the boundary,
 @f]
 On this inflow boundary, we impose the following saturation values:
 @f{eqnarray}
-  S(\mathbf{x},t) = 1 & \textrm{on}\ \Gamma_{in}\cap\{x_1=1\},
+  S(\mathbf{x},t) = 1 & \textrm{on}\ \Gamma_{in}\cap\{x_1=0\},
   \\
-  S(\mathbf{x},t) = 0 & \textrm{on}\ \Gamma_{in}\backslash \{x_1=1\}.
+  S(\mathbf{x},t) = 0 & \textrm{on}\ \Gamma_{in}\backslash \{x_1=0\}.
 @f}
 In other words, we have pure water entering the reservoir at the left, whereas
 the other parts of the boundary are in contact with undisturbed parts of the
