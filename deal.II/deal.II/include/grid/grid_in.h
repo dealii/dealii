@@ -330,7 +330,9 @@ class GridIn
 		    std::string,
 		    << "The identifier <" << arg1 << "> as name of a "
 		    << "part in an UCD input file is unknown or the "
-		    << "respective input routine is not implemented.");
+		    << "respective input routine is not implemented."
+		    << "(Maybe the space dimension of triangulation and "
+		    << "input file do not match?");
 				     /**
 				      * Exception
 				      */
