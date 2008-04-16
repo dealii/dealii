@@ -66,14 +66,19 @@ namespace Utilities
 		     (digits==2 && i>=100)  ||
 		     (digits==3 && i>=1000) ||
 		     (digits==4 && i>=10000)||
-		     (i>=100000)),
+		     (digits==5 && i>=100000)||
+		     (i>=1000000)),
 		  ExcInvalidNumber2StringConversersion(i, digits));
   
     std::string s;
     switch (digits) 
       {
+	case 6:
+	      s += '0' + i/100000;
+	case 5:
+	      s += '0' + (i%100000)/10000;
 	case 4:
-	      s += '0' + i/1000;
+	      s += '0' + (i%10000)/1000;
 	case 3:
 	      s += '0' + (i%1000)/100;
 	case 2:

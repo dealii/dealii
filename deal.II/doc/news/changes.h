@@ -139,6 +139,21 @@ inconvenience this causes.
 
 <ol>
 
+<li> <p>New: ConvergenceTable.evaluate_convergence_rates has been incomplete
+for a long time. I added an implementation for reduction_rate and 
+reduction_rate_lo2 in the case where one specifies a reference column 
+that allows to compute error rates also for local refinement.
+<br>
+(Luca Heltai 2008/04/16)
+</p></li>
+
+<li> <p> Fixed: The Utilities::int_to_string function did not work for 5 or 6
+digits, while its counterpart Utilities::needed_digits does. This is now fixed, 
+and the two are coherent.
+<br>
+(Luca Heltai 2008/04/16)
+</p> </li>
+
 <li> <p> New: The SymmetricTensor class now has a constructor that creates
 an object from an array consisting its independent components.
 <br>
@@ -289,6 +304,12 @@ constraints individually.
 <h3>deal.II</h3>
 
 <ol>
+
+  <li> <p>Fixed: Functions::FEFieldFunction<dim>.set_active_cell was declared
+  inline in the declaration but not in the implementation. This is now fixed. 
+  <br>
+  (Luca Heltai 2008/04/16)
+  </p></li>
 
   <li> <p>New: The FE_RaviartThomasNodal now supports hp functionality.
   <br>

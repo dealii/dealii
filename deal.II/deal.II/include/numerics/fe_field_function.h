@@ -153,7 +153,7 @@ namespace Functions
 					* function. This will speed
 					* things up a little.
 					*/
-      inline void set_active_cell(typename DH::active_cell_iterator &newcell);
+      void set_active_cell(typename DH::active_cell_iterator &newcell);
   
 				       /**
 					* Get ONE vector value at the

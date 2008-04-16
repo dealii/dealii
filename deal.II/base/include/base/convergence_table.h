@@ -104,7 +104,25 @@ class ConvergenceTable: public TableHandler
 				      * the <tt>set_tex_supercaption (...)</tt> function
 				      * of the base class TableHandler.
 				      *
-				      * Still not implemented.
+				      * This method behaves in the following way: 
+				      * 
+				      * If RateMode is reduction_rate, then the computed
+				      * output is 
+				      * \f[ \frac{e_{n-1}/k_{n-1}}{e_n/k_n} \f].
+				      *
+				      * Where \f$k\f$ is the reference column.
+				      *
+				      * If RateMode is reduction_rate_log2, then the 
+				      * computed output is:
+				      * \f[ 
+				      * 2\frac{\log |e_{n-1}/e_{n}|}{\log |k_n/k_{n-1}|} 
+				      * \f].
+				      *
+				      * This is useful, for example, if we use as 
+				      * reference key the number of degrees of freedom. 
+				      * Assuming that the error is proportional to 
+				      * \f$ C (1/\sqrt{k})^r \f$, then this method will 
+				      * produce the rate \f$ r \f$ as a result.
 				      */
     void
     evaluate_convergence_rates (const std::string &data_column_key,

@@ -34,11 +34,16 @@ void ConvergenceTable::evaluate_convergence_rates(const std::string &data_column
     return;
  
   std::vector<TableEntryBase *> &entries=columns[data_column_key].entries;
+  std::vector<TableEntryBase *> &ref_entries=columns[reference_column_key].entries;
   std::string rate_key=data_column_key;
 
   const unsigned int n=entries.size();
+  const unsigned int n_ref=ref_entries.size();
+  Assert(n == n_ref, ExcDimensionMismatch(n, n_ref));
   
   std::vector<double> values(n);
+  std::vector<double> ref_values(n_ref);
+  
   for (unsigned int i=0; i<n; ++i)
     {
       if (dynamic_cast<TableEntry<double>*>(entries[i]) != 0)
@@ -51,6 +56,18 @@ void ConvergenceTable::evaluate_convergence_rates(const std::string &data_column
 	values[i]=dynamic_cast<TableEntry<unsigned int>*>(entries[i])->value();
       else
 	Assert(false, ExcWrongValueType());
+      
+      // And now the reference values.
+      if (dynamic_cast<TableEntry<double>*>(ref_entries[i]) != 0)
+	ref_values[i]=dynamic_cast<TableEntry<double>*>(ref_entries[i])->value();
+      else if (dynamic_cast<TableEntry<float>*>(ref_entries[i]) != 0)
+	ref_values[i]=dynamic_cast<TableEntry<float>*>(ref_entries[i])->value();
+      else if (dynamic_cast<TableEntry<int>*>(ref_entries[i]) != 0)
+	ref_values[i]=dynamic_cast<TableEntry<int>*>(ref_entries[i])->value();
+      else if (dynamic_cast<TableEntry<unsigned int>*>(ref_entries[i]) != 0)
+	ref_values[i]=dynamic_cast<TableEntry<unsigned int>*>(ref_entries[i])->value();
+      else
+	Assert(false, ExcWrongValueType());
     }
   
   switch (rate_mode)
@@ -58,7 +75,25 @@ void ConvergenceTable::evaluate_convergence_rates(const std::string &data_column
       case none:
 	    break;
       case reduction_rate:
+	    rate_key+="red.rate";
+	    Assert(columns.count(rate_key)==0, ExcRateColumnAlreadyExists(rate_key));
+					     // no value available for the
+					     // first row
+	    add_value(rate_key, std::string("-"));
+	    for (unsigned int i=1; i<n; ++i)
+		add_value(rate_key, values[i-1]/values[i] * 
+			            ref_values[i]/ref_values[i-1]);
+	    break;
       case reduction_rate_log2:
+	    rate_key+="red.rate";
+	    Assert(columns.count(rate_key)==0, ExcRateColumnAlreadyExists(rate_key));
+					     // no value available for the
+					     // first row
+	    add_value(rate_key, std::string("-"));
+	    for (unsigned int i=1; i<n; ++i)
+		add_value(rate_key, 2*std::log(std::fabs(values[i-1]/values[i])) /
+			  std::log(std::fabs(ref_values[i]/ref_values[i-1])));
+	    break;
       default:
 	    Assert(false, ExcNotImplemented());  
     }
