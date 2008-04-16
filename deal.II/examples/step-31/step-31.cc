@@ -664,7 +664,7 @@ void BoussinesqFlowProblem<dim>::assemble_system ()
       Mp_preconditioner
 	= boost::shared_ptr<SparseILU<double> >
 		(new SparseILU<double>);
-      Mp_preconditioner->initialize (system_matrix.block(0,0),
+      Mp_preconditioner->initialize (system_matrix.block(1,1),
 				     SparseILU<double>::AdditionalData());
 
       std::cout << std::endl;
