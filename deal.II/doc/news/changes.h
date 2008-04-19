@@ -139,10 +139,11 @@ inconvenience this causes.
 
 <ol>
 
-<li> <p>New: ConvergenceTable.evaluate_convergence_rates has been incomplete
-for a long time. I added an implementation for reduction_rate and 
-reduction_rate_lo2 in the case where one specifies a reference column 
-that allows to compute error rates also for local refinement.
+<li> <p>New: ConvergenceTable::evaluate_convergence_rates has been incomplete
+for a long time. An implementation for reduction_rate and 
+reduction_rate_log2 has been added in the case where one specifies
+a reference column that allows to compute error rates also for local
+refinement.
 <br>
 (Luca Heltai 2008/04/16)
 </p></li>
