@@ -338,24 +338,14 @@ BlockSchurPreconditioner<PreconditionerA, PreconditionerMp>::BlockSchurPrecondit
 {
 }
 
-        // Now the interesting function, the multiplication of
-        // the preconditioner with a BlockVector.
 template <class PreconditionerA, class PreconditionerMp>
 void BlockSchurPreconditioner<PreconditionerA, PreconditionerMp>::vmult (
                                      BlockVector<double>       &dst,
                                      const BlockVector<double> &src) const
 {
-        // Form u_new = A^{-1} u
   a_preconditioner.vmult (dst.block(0), src.block(0));
-        // Form tmp = - B u_new + p
-        // (<code>SparseMatrix::residual</code>
-        // does precisely this)
-  system_matrix->block(1,0).residual(tmp,
-                                     dst.block(0), src.block(1));
-        // Change sign in tmp.block(1)
+  system_matrix->block(1,0).residual(tmp, dst.block(0), src.block(1));
   tmp *= -1;
-        // Multiply by approximate Schur complement
-        // (i.e. a pressure mass matrix)
   m_inverse->vmult (dst.block(1), tmp);
 }
 
@@ -993,6 +983,11 @@ void BoussinesqFlowProblem<dim>::solve ()
 
 				// Define some temporary vectors
 				// for the solution process.
+				// TODO: Can we somhow avoid copying
+				// the vectors back and forth? I.e.
+				// accessing the block vectors in a
+				// similar way as the matrix with the
+				// BlockMatrixArray class?
     std::vector<unsigned int> block_sizes(2);
     block_sizes[0] = solution.block(0).size();
     block_sizes[1] = solution.block(1).size();
