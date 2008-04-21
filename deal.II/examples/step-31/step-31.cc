@@ -501,6 +501,13 @@ void BoussinesqFlowProblem<dim>::assemble_system ()
 
   const double Raleigh_number = 10;
 
+  std::vector<Tensor<1,dim> >          phi_u       (dofs_per_cell);
+  std::vector<SymmetricTensor<2,dim> > phi_grads_u (dofs_per_cell);
+  std::vector<double>                  div_phi_u   (dofs_per_cell);
+  std::vector<double>                  phi_p       (dofs_per_cell);
+  std::vector<double>                  phi_T       (dofs_per_cell);
+  std::vector<Tensor<1,dim> >          grad_phi_T  (dofs_per_cell);
+
   const FEValuesExtractors::Vector velocities (0);
   const FEValuesExtractors::Scalar pressure (dim);
   const FEValuesExtractors::Scalar temperature (dim+1);
@@ -520,47 +527,54 @@ void BoussinesqFlowProblem<dim>::assemble_system ()
 	{
 	  const double old_temperature = old_solution_values[q](dim+1);
 
+				// Extract the basis relevant
+				// terms in the inner products
+				// once in advance as shown
+				// in step-22. This accelerates
+				// the assembly process,
+	  for (unsigned int k=0; k<dofs_per_cell; ++k)
+	    {
+	      phi_u[k] = fe_values[velocities].value (k,q);
+	      if (rebuild_matrices)
+	        {
+		  phi_grads_u[k] = fe_values[velocities].symmetric_gradient(k,q);
+		  div_phi_u[k]   = fe_values[velocities].divergence (k, q);
+		  phi_p[k]       = fe_values[pressure].value (k, q);
+		  phi_T[k]       = fe_values[temperature].value (k, q);
+		  grad_phi_T[k]  = fe_values[temperature].gradient (k, q);
+		}
+	    }
+
 	  for (unsigned int i=0; i<dofs_per_cell; ++i)
 	    {
 
 	      const Tensor<1,dim> phi_i_u = fe_values[velocities].value (i, q);
 
 	      if (rebuild_matrices)
-		{
-		  const SymmetricTensor<2,dim>
-		    phi_i_grads_u = fe_values[velocities].symmetric_gradient (i, q);
-		  const Tensor<1,dim> phi_i_u       = fe_values[velocities].value (i, q);
-		  const double        div_phi_i_u   = fe_values[velocities].divergence (i, q);
-		  const double        phi_i_p       = fe_values[pressure].value (i, q);
-		  const double        phi_i_T       = fe_values[temperature].value (i, q);
-		  const Tensor<1,dim> grad_phi_i_T  = fe_values[temperature].gradient(i, q);
-
-		  for (unsigned int j=0; j<dofs_per_cell; ++j)
-		    {
-		      const SymmetricTensor<2,dim>
-			phi_j_grads_u = fe_values[velocities].symmetric_gradient (j, q);
-		      const double        div_phi_j_u = fe_values[velocities].divergence (j, q);
-		      const double        phi_j_p     = fe_values[pressure].value (j, q);
-		      const double        phi_j_T     = fe_values[temperature].value (j, q);
-
-		      local_matrix(i,j) += (phi_i_grads_u * phi_j_grads_u
-					    - div_phi_i_u * phi_j_p
-					    - phi_i_p * div_phi_j_u
-					    + phi_i_p * phi_j_p
-					    + phi_i_T * phi_j_T)
-					   * fe_values.JxW(q);
-		    }
-		}
+		for (unsigned int j=0; j<dofs_per_cell; ++j)
+		  local_matrix(i,j) += (phi_grads_u[i] * phi_grads_u[j]
+					- div_phi_u[i] * phi_p[j]
+					- phi_p[i] * div_phi_u[j]
+					+ phi_p[i] * phi_p[j]
+					+ phi_T[i] * phi_T[j])
+				       * fe_values.JxW(q);
 
 	      const Point<dim> gravity (0,1);
 
 	      local_rhs(i) += (Raleigh_number *
-			       gravity * phi_i_u * old_temperature)*
+			       gravity * phi_u[i] * old_temperature)*
 			      fe_values.JxW(q);
           }
 	}
 
 
+				// The assembly of the face
+				// cells which enters the
+				// right hand sides cannot
+				// be accelerated with the
+				// above technique, since
+				// all the basis functions are
+				// only evaluated once.
       for (unsigned int face_no=0;
            face_no<GeometryInfo<dim>::faces_per_cell;
            ++face_no)
