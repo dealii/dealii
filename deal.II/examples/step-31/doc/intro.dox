@@ -25,12 +25,18 @@ Boussinesq equations that read as follows:
   -
   \nabla \cdot \kappa \nabla T &=& \gamma.
 @f}
+These equations fall into the class of vector-valued problems (a
+toplevel overview of this topic can be found in the @ref vector_valued module).
 Here, ${\mathbf u}$ is the velocity field, $p$ the pressure, and $T$
 the temperature of the fluid. $\varepsilon ({\mathbf u}) = \frac 12
 [(\nabla{\mathbf u}) + (\nabla {\mathbf u})^T]$ is the symmetric
 gradient of the velocity. As can be seen, velocity and pressure
 solve a Stokes equation describing the motion of an incompressible
-fluid. The forcing term of the fluid motion is the buoyancy of the
+fluid, an equation we have previously considered in @ref step_22 "step-22"; we
+will draw extensively on the experience we have gained in that program, in
+particular with regard to efficient linear Stokes solvers. 
+
+The forcing term of the fluid motion is the buoyancy of the
 fluid, expressed as the product of the Rayleigh number $\mathrm{Ra}$,
 the temperature $T$ and the gravity vector ${\mathbf g}$. (A possibly
 more intuitive formulation would use $\mathrm{Ra} \; (T-\bar T)
@@ -47,15 +53,22 @@ temperature differences by moving around, the third equation states
 how the fluid motion affects the temperature field: it is an advection
 diffusion equation, i.e. the temperature is attached to the fluid
 particles and advected along in the flow field, with an additional
-diffusion (heat conduction) term.
+diffusion (heat conduction) term. In many applications, the diffusion
+coefficient is fairly small, and the temperature equation is in fact
+transport, not diffusion dominated and therefore in character more hyperbolic
+than elliptic; we will have to take this into account when developing a stable
+discretization. 
 
-In these equations, $\eta$ and $\kappa$ denote the viscosity and
-diffusivity coefficients. In the more general case and in many
-physical applications, they may and $\eta$ often will depend on the
-temperature, but we will neglect this dependence for the purpose of
-this tutorial program. The term $\gamma$ on the right hand side
-denotes the heat sources and may be a spatially and temporally varying
-function. 
+In the equations above, the term $\gamma$ on the right hand side denotes the
+heat sources and may be a spatially and temporally varying function.  $\eta$
+and $\kappa$ denote the viscosity and diffusivity coefficients. In the more
+general case, they may and $\eta$ often will depend on the temperature, but we
+will neglect this dependence for the purpose of this tutorial program even
+though it is an important factor in physical applications: Most materials
+become more fluid as the get hotter (i.e. $\eta$ decreases with $T$);
+sometimes, as in the case of rock minerals at temperatures close to their
+melting point, $\eta$ may change by orders of magnitude over the typical range
+of temperatures.
 
 $\mathrm{Ra}$, called the <a
 href="http://en.wikipedia.org/wiki/Rayleigh_number">Rayleigh
@@ -87,26 +100,24 @@ velocities in absolute terms. For example, the Rayleigh number in the
 earth mantle has a Rayleigh number larger than $10^6$. Yet the
 velocities are small: the material is in fact solid rock but it is so
 hot and under pressure that it can flow very slowly, on the order of
-at most a few centimeters per year. Nevertheless, the can lead to
+at most a few centimeters per year. Nevertheless, this can lead to
 mixing over time scales of many million years, a time scale much
 shorter than for the same amount of heat to be distributed by thermal
-conductivity. 
+conductivity and a time scale of relevance to affect the evolution of the
+earth's interior and surface structure.
 
-The equations covered here fall into the class of vector-valued problems. A
-toplevel overview of this topic can be found in the @ref vector_valued module.
 
 
 <h2>%Boundary and initial conditions</h2>
 
-Since the Boussinesq equations are derived under the assumption that
-inertia of the fluid's motion does not play a role, the flow field is
-at each time entirely determined by buoyancy difference at that time,
-not by the flow field at previous times. This is reflected by the fact
-that the first two equations above are the steady state Stokes
-equation. Consequently, we do not need initial conditions for either
-velocities or pressure. On the other hand, the temperature field does
-satisfy an equation with a time derivative, so we need initial
-conditions for $T$.
+Since the Boussinesq equations are derived under the assumption that inertia
+of the fluid's motion does not play a role, the flow field is at each time
+entirely determined by buoyancy difference at that time, not by the flow field
+at previous times. This is reflected by the fact that the first two equations
+above are the steady state Stokes equation that do not contain a time
+derivative. Consequently, we do not need initial conditions for either
+velocities or pressure. On the other hand, the temperature field does satisfy
+an equation with a time derivative, so we need initial conditions for $T$.
 
 As for boundary conditions: if $\kappa>0$ then the temperature
 satisfies a second order differential equation that requires
@@ -138,16 +149,13 @@ where now we have a Stokes system
   -\nabla \cdot \eta \varepsilon ({\mathbf u}) + \nabla p &=& f, \\
   \nabla\cdot \mathbf u &=& 0,
 @f}
-where $\nabla \cdot \varepsilon (\cdot)$ is an operator similar to the
+where $\nabla \cdot \eta \varepsilon (\cdot)$ is an operator similar to the
 Laplacian $\Delta$ applied to a vector field.
 
 Given the similarity to what we have done in @ref step_21 "step-21",
 it may not come as a surprise that we choose a similar approach,
 although we will have to make adjustments for the change in operator
-in the top-left corner of the differential operator. As it will turn
-out, it is actually a lot easier to solve the Stokes problem than it
-is to solve the mixed Laplacian, and we will make full use of this
-fact! 
+in the top-left corner of the differential operator. 
 
 
 <h3>Time stepping</h3>
@@ -187,7 +195,9 @@ field.
 
 Like solving the mixed Laplace equations, solving the Stokes equations
 requires us to choose particular pairs of finite elements for
-velocities and pressure variables. In the current program, we use the
+velocities and pressure variables. Because this has already been discussed in
+@ref step_22 "step-22", we only cover this topic briefly:
+Here, we use the
 stable pair $Q_{p+1}^d \times Q_p, p\ge 1$. These are continuous
 elements, so we can form the weak form of the Stokes equation without
 problem by integrating by parts and substituting continuous functions
@@ -262,53 +272,14 @@ operator splitting where we first solve the Stokes system for the velocities
 and pressures using the old temperature field, and then solve for the new
 temperature field using the just computed velocity field. 
 
+The methods to do so are not new: Solving the linear equations coming from the
+Stokes system has been discussed in great detail in @ref step_22 "step-22". In
+particular, in the results section of that program, we have discussed a number
+of alternative linear solver strategies. We will use the best alternative
+identified there, using a GMRES solver preconditioned by a block matrix
+involving the Schur complement.
 
+XXXXXX more specifically (state matrix, preconditioner) XXXXXXXX
 
-
-
-
-@code
-  {
-    Vector<double> xx(dof_handler.n_dofs());
-    std::vector<bool> p_component (dof_handler.n_dofs());
-    std::vector<bool> p_boundary (dof_handler.n_dofs());
-    std::vector<bool> component_mask (dim+2, false);
-    component_mask[dim] = true;
-    DoFTools::extract_dofs (dof_handler, component_mask, p_component);
-    DoFTools::extract_boundary_dofs (dof_handler, component_mask, p_boundary);
-    
-    QGauss<dim>   quadrature_formula(degree+2); 
-    FEValues<dim> fe_values (fe, quadrature_formula, 
-			     update_values | update_gradients  | update_JxW_values);
-    std::vector<std::vector<Tensor<1,dim> > >  solution_grads(fe_values.n_quadrature_points,
-							      std::vector<Tensor<1,dim> > (dim+2));
-    std::vector<unsigned int> local_dof_indices (fe.dofs_per_cell);
-    
-    typename DoFHandler<dim>::active_cell_iterator
-      cell = dof_handler.begin_active(),
-      endc = dof_handler.end();
-    for (; cell!=endc; ++cell)
-      { 
-	fe_values.reinit (cell);
-	fe_values.get_function_gradients (solution, solution_grads);
-
-	cell->get_dof_indices (local_dof_indices);
-	
-	for (unsigned int q=0; q<fe_values.n_quadrature_points; ++q)
-	  for (unsigned int i=0; i<fe.dofs_per_cell; ++i)
-	    if (p_component[local_dof_indices[i]] == true)
-	      { 
-		double divergence(solution_grads[q][0][0] +
-				  solution_grads[q][1][1]);
-		xx(local_dof_indices[i]) += divergence * fe_values.shape_value(i,q) *
-					    fe_values.JxW(q);
-	      }
-      }
-    hanging_node_constraints.condense (xx);
-    
-    for (unsigned int i=0; i<dof_handler.n_dofs(); ++i)
-      if ((p_component[i] == true) && (hanging_node_constraints.is_constrained(i) == false)
-	  && (p_boundary[i] == false))
-	Assert (std::fabs(xx(i)) < 1e-11, ExcInternalError());
-  }
-@endcode
+For the temperature equation, the problem is even simpler: 
+XXXXXXXXXXX
