@@ -3883,6 +3883,53 @@ AC_DEFUN(DEAL_II_CHECK_EXPLICIT_CONSTRUCTOR_BUG, dnl
 
 
 
+dnl -------------------------------------------------------------
+dnl Check for GCC bug 36052, see
+dnl   http://gcc.gnu.org/bugzilla/show_bug.cgi?id=36052
+dnl 
+dnl Usage: DEAL_II_CHECK_TYPE_QUALIFIER_BUG
+dnl 
+dnl --------------------------------------------------------------
+AC_DEFUN(DEAL_II_CHECK_TYPE_QUALIFIER_BUG, dnl
+[
+  case "$GXX_VERSION" in
+    gcc*)
+      AC_MSG_CHECKING(for warning bug with type qualifiers)
+      AC_LANG(C++)
+      CXXFLAGS="$CXXFLAGSG -Werror"
+      AC_TRY_COMPILE(
+        [
+          struct S {
+              typedef double value_type;
+          };
+    
+          template <typename T> struct Traits {
+              typedef const typename T::value_type dereference_type;
+          };
+    
+          template <class BlockVectorType> struct ConstIterator {
+              typedef typename Traits<BlockVectorType>::dereference_type dereference_type;
+        
+              dereference_type operator * () const  { return 0; }
+          };
+    
+          template class ConstIterator<S>;
+        ],
+        [
+        ],
+        [
+          AC_MSG_RESULT(no)
+        ],
+        [
+          AC_MSG_RESULT(yes)
+          CXXFLAGSG="$CXXFLAGSG -Wno-ignored-qualifiers"
+        ])
+    ;;
+  esac
+])
+
+
+
 
 dnl -------------------------------------------------------------
 dnl In the gcc libstdc++ headers for std::complex, there is 
