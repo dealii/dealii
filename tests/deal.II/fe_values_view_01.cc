@@ -57,8 +57,10 @@ void test (const Triangulation<dim>& tr,
 	  {
 	    deallog << "i=" << i << ", q=" << q << std::endl;
 	    deallog << "   "
-		    << fe_values[single_component].value (i,q) << ' '
-		    << fe_values[single_component].gradient (i,q) << std::endl;
+		    << fe_values[single_component].value (i,q) << ' ';
+	    for (unsigned int k=0; k<dim; ++k)
+	      deallog << fe_values[single_component].gradient (i,q) << ' ';
+	    deallog << std::endl;
 	    for (unsigned int k=0; k<dim; ++k)
 	      for (unsigned int l=0; l<dim; ++l)
 		deallog << fe_values[single_component].hessian (i,q)[k][l] << std::endl;
