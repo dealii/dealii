@@ -30,12 +30,11 @@ inconvenience this causes.
 </p>
 
 <ol>
-  <li> <p>Changed: A few simple PETSc wrappers forhelper functions 
-  <code>MatrixBase::transpose</code>, 
-  <code>MatrixBase::is_symmetric</code>, 
-  <code>MatrixBase::is_hermitian</code>, 
-  <code>MatrixBase::is_hermitian</code>, and
-  <code>MatrixBase::write_ascii</code> have been added.
+  <li> <p>Changed: A few simple PETSc wrappers for helper functions 
+  PETScWrappers::MatrixBase::transpose, 
+  PETScWrappers::MatrixBase::is_symmetric, 
+  PETScWrappers::MatrixBase::is_hermitian, and
+  PETScWrappers::MatrixBase::write_ascii have been added.
   <br>
   (Toby D. Young 2008/04/30)
   </p>
