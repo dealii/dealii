@@ -598,6 +598,48 @@ namespace PETScWrappers
   {
     return matrix;
   }  
+
+  void
+  MatrixBase::transpose () 
+  {
+    int ierr;
+    ierr = MatTranspose(matrix, PETSC_NULL);
+    AssertThrow (ierr == 0, ExcPETScError(ierr));
+  }
+
+  PetscTruth
+  MatrixBase::is_symmetric (const double tolerance) 
+  {
+    PetscTruth truth;
+                                       // First flush PETSc caches
+    compress ();
+    MatIsSymmetric (matrix, tolerance, &truth);
+    return truth;
+  }  
+
+  PetscTruth
+  MatrixBase::is_hermitian () 
+  {
+    PetscTruth truth;
+                                       // First flush PETSc caches
+    compress ();
+    MatIsHermitian (matrix, &truth);
+    return truth;
+  }  
+
+  void
+  MatrixBase::write_ascii ()
+  {
+                                       // First flush PETSc caches
+    compress ();
+
+                                       // Write to screen
+    PetscViewerSetFormat (PETSC_VIEWER_STDOUT_WORLD,
+			  PETSC_VIEWER_ASCII_DEFAULT);
+
+    MatView (matrix,PETSC_VIEWER_STDOUT_WORLD);
+  }
+
 }
 
 DEAL_II_NAMESPACE_CLOSE

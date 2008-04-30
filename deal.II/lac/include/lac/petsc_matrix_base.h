@@ -849,6 +849,33 @@ namespace PETScWrappers
                                         */
       operator const Mat () const;
 
+                                        /**  
+					 * Make an in-place transpose of a 
+					 * matrix.
+					 */
+      void transpose ();
+
+                                        /**  
+					 * Test whether a matrix is symmetric.
+					 * Default tolerance is zero. 
+					 */
+      PetscTruth is_symmetric (const double tol = 0.0);
+
+                                        /** 
+					 * Test whether a matrix is Hermitian, 
+					 * i.e. it is the complex conjugate 
+					 * of its transpose. 
+					 */
+      PetscTruth is_hermitian ();
+
+                                        /* 
+					 * Abstract PETSc object that helps view 
+					 * in ASCII other PETSc objects. Currently
+					 * this function simply writes non-zero 
+					 * elements of a matrix to the terminal. 
+					 */
+      void write_ascii ();
+
                                        /**
                                         * Exception
                                         */

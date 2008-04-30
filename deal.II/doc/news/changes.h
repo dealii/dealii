@@ -30,6 +30,16 @@ inconvenience this causes.
 </p>
 
 <ol>
+  <li> <p>Changed: A few simple PETSc wrappers forhelper functions 
+  <code>MatrixBase::transpose</code>, 
+  <code>MatrixBase::is_symmetric</code>, 
+  <code>MatrixBase::is_hermitian</code>, 
+  <code>MatrixBase::is_hermitian</code>, and
+  <code>MatrixBase::write_ascii</code> have been added.
+  <br>
+  (Toby D. Young 2008/04/30)
+  </p>
+
   <li> <p>Removed: The <code>FullMatrix::add_diag</code> function was removed. It
   offered functionality of questionable use in the first place, and its
   implementation was correct only for matrices of size $3 \times 3$, $4 \times 4$
