@@ -2,7 +2,7 @@
 //    $Id$
 //    Version: $Name$
 //
-//    Copyright (C) 1999, 2000, 2001, 2002, 2003, 2004, 2005, 2006 by the deal.II authors
+//    Copyright (C) 1999, 2000, 2001, 2002, 2003, 2004, 2005, 2006, 2008 by the deal.II authors
 //
 //    This file is subject to QPL and may not be  distributed
 //    without copyright and license information. Please refer
@@ -108,21 +108,21 @@ class ConvergenceTable: public TableHandler
 				      * 
 				      * If RateMode is reduction_rate, then the computed
 				      * output is 
-				      * \f[ \frac{e_{n-1}/k_{n-1}}{e_n/k_n} \f].
+				      * $ \frac{e_{n-1}/k_{n-1}}{e_n/k_n} $.
 				      *
-				      * Where \f$k\f$ is the reference column.
+				      * Where $k$ is the reference column.
 				      *
 				      * If RateMode is reduction_rate_log2, then the 
-				      * computed output is:
-				      * \f[ 
+				      * computed output is
+				      * $
 				      * 2\frac{\log |e_{n-1}/e_{n}|}{\log |k_n/k_{n-1}|} 
-				      * \f].
+				      * $.
 				      *
 				      * This is useful, for example, if we use as 
 				      * reference key the number of degrees of freedom. 
 				      * Assuming that the error is proportional to 
-				      * \f$ C (1/\sqrt{k})^r \f$, then this method will 
-				      * produce the rate \f$ r \f$ as a result.
+				      * $ C (1/\sqrt{k})^r $, then this method will 
+				      * produce the rate $r$ as a result.
 				      */
     void
     evaluate_convergence_rates (const std::string &data_column_key,
