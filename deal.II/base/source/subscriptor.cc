@@ -120,6 +120,11 @@ Subscriptor::~Subscriptor ()
 		    << std::endl;
 	}
     }
+				   // In case we do not abort
+				   // on error, this will tell
+				   // do_unsubscribe below that the
+				   // object is unused now.
+  counter = 0;
 #endif
 }
 
@@ -160,12 +165,16 @@ void Subscriptor::do_unsubscribe (const char* id) const
 {
 #ifdef DEBUG
   Assert (counter>0, ExcNotUsed());
+				   // This is for the case that we do
+				   // not abort after the exception
+  if (counter == 0)
+    return;
+  
   Threads::ThreadMutex::ScopedLock lock (subscription_lock);
   --counter;
   
 #if DEAL_USE_MT == 0
   const char* name = (id != 0) ? id : unknown_subscriber;
-
   map_iterator it = counter_map.find(name);
   Assert (it != counter_map.end(), ExcNoSubscriber(object_info->name(), name));
   Assert (it->second > 0, ExcNoSubscriber(object_info->name(), name));

@@ -2,7 +2,7 @@
 //    $Id$
 //    Version: $Name$ 
 //
-//    Copyright (C) 1998, 1999, 2000, 2001, 2002, 2003, 2004, 2005, 2006 by the deal.II authors
+//    Copyright (C) 1998, 1999, 2000, 2001, 2002, 2003, 2004, 2005, 2006, 2008 by the deal.II authors
 //
 //    This file is subject to QPL and may not be  distributed
 //    without copyright and license information. Please refer
@@ -23,7 +23,13 @@
 #include <base/smartpointer.h>
 #include <base/logstream.h>
 #include <iomanip>
+#include <iostream>
+#include <vector>
 
+// Provide memory for objects of type T such that access to a deleted
+// object does not cause a segmentation fault
+std::vector<char> memory(10000);
+int next = 0;
 
 class Test : public Subscriptor
 {
@@ -47,7 +53,8 @@ int main()
   if (true)
     {
       Test a("A");
-      const Test b("B");
+      const Test& b("B");
+      
       SmartPointer<Test>       r(&a, "Test R");
       SmartPointer<const Test> s(&a, "const Test S");
 //  SmartPointer<Test>       t=&b;    // this one should not work
@@ -74,6 +81,9 @@ int main()
       r = &c;
       Test d("D");
       r = &d;
+				       // Destruction of "Test R" will
+				       // cause a spurious ExcNotUsed
+				       // here, since D was deleted first
     }
 }
 
