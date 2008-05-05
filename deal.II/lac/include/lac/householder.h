@@ -2,7 +2,7 @@
 //    $Id$
 //    Version: $Name$
 //
-//    Copyright (C) 2005, 2006, 2007 by the deal.II authors
+//    Copyright (C) 2005, 2006, 2007, 2008 by the deal.II authors
 //
 //    This file is subject to QPL and may not be  distributed
 //    without copyright and license information. Please refer
@@ -17,6 +17,7 @@
 #include <cmath>
 #include <base/config.h>
 #include <lac/full_matrix.h>
+#include <lac/vector_memory.h>
 
 #include <vector>
 
@@ -182,7 +183,13 @@ Householder<number>::least_squares (Vector<number2>& dst,
 				    const Vector<number2>& src) const
 {
   Assert (!this->empty(), typename FullMatrix<number2>::ExcEmptyMatrix());
-  dst = src;
+  AssertDimension(dst.size(), this->n());
+  AssertDimension(src.size(), this->m());
+  
+  GrowingVectorMemory<Vector<number2> > mem;
+  Vector<number2>* aux = mem.alloc();
+  aux->reinit(src, true);
+  *aux = src;
 				   // m > n, m = src.n, n = dst.n
 
 				   // Multiply Q_n ... Q_2 Q_1 src
@@ -190,20 +197,22 @@ Householder<number>::least_squares (Vector<number2>& dst,
   for (unsigned int j=0;j<this->n();++j)
     {
 				       // sum = v_i^T dst
-      number2 sum = diagonal[j]*dst(j);
+      number2 sum = diagonal[j]* (*aux)(j);
       for (unsigned int i=j+1 ; i<this->m() ; ++i)
-	sum += this->el(i,j)*dst(i);
+	sum += this->el(i,j)*(*aux)(i);
 				       // dst -= v * sum
-      dst(j) -= sum*diagonal[j];
+      (*aux)(j) -= sum*diagonal[j];
       for (unsigned int i=j+1 ; i<this->m() ; ++i)
-	dst(i) -= sum*this->el(i,j);
+	(*aux)(i) -= sum*this->el(i,j);
     }
 				   // Compute norm of residual
   number2 sum = 0.;
   for (unsigned int i=this->n() ; i<this->m() ; ++i)
-    sum += dst(i) * dst(i);
+    sum += (*aux)(i) * (*aux)(i);
 				   // Compute solution
-  this->backward(dst, dst);
+  this->backward(dst, *aux);
+
+  mem.free(aux);
   
   return std::sqrt(sum);
 }
