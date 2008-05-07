@@ -1,5 +1,6 @@
-<a name="Intro"></a> <h1>Introduction</h1>
+<br>
 
+<i>
 This program was written for fun by David Neckels (NCAR) while working
 at Sandia (on the Wyoming Express bus to and from Corrales each day).
 The main purpose was to better understand Euler flow.  
@@ -7,20 +8,32 @@ The code solves the basic Euler equations of gas dynamics, by using a
 fully implicit Newton iteration (inspired by Sandia's Aria code).  The
 code may be configured by an input deck to run different simulations
 on different meshes, with differing boundary conditions.
+</i>
 
-The program also uses the Trilinos linear solvers (Aztec/Amesos) and
-an automatic differentiation package, Sacado, which is also part of Trilinos.
+<b>Note:</b>The program uses the <a
+href="http://trilinos.sandia.gov">Trilinos</a> linear solvers (which
+are part of the Aztec/Amesos package of Trilinos) and an automatic
+differentiation package, Sacado, also part of Trilinos. deal.II must
+be configured to use this package. Refer to the <a
+href="../../readme.html#trilinos">ReadMe</a> file for instructions how to
+do this.
+
+
+
+<a name="Intro"></a> <h1>Introduction</h1>
 
 <h3>Euler flow</h3>
 
-The equations for a compressible, inviscid gas (the Euler equations) are
-a basic system of conservation laws, in spatial dimension $d$, 
+The equations that describe the movement of a compressible, inviscid
+gas (the so-called Euler equations of gas dynamics) are
+a basic system of conservation laws. In spatial dimension $d$ they read
 @f[
 \partial_t \mathbf{w} + \nabla \cdot \mathbf{F}(\mathbf{w}) = \mathbf{0},
 @f]
 with the solution $\mathbf{w}=(\rho,\rho v_1,\ldots,\rho v_d,
-E)^{\top}$ consisting of ${\mathbf v}=(v_1,\ldots v_d)^T$ the
-flow velocity, $\rho$ the fluid density, and
+E)^{\top}$ consisting of $\rho$ the fluid density, ${\mathbf v}=(v_1,\ldots v_d)^T$ the
+flow velocity (and thus $\rho\mathbf v$ being the linear momentum
+density), and 
 $E$ the energy density of the gas.  The flux matrix $\mathbf F$ (or system of flux functions)
 is defined such that the entire system of equations are
 @f{eqnarray*}
@@ -29,6 +42,8 @@ is defined such that the entire system of equations are
   \delta_{is} p)}{\partial x_s} &=& 0, \qquad i=1,\dots,d, \\
   \partial_t E + \sum_{s=1}^d \frac{\partial((E+p)v_s)}{\partial x_s} &=& 0.
 @f}
+These equations describe, respectively, the conservation of mass,
+momentum, and energy.
 The system is closed by a relation that defines the pressure: $p =
 (\gamma -1)(E-\frac{1}{2} \rho |\mathbf v|^2)$. For the constituents
 of air (mainly nitrogen and oxygen) and other diatomic gases, the ratio of
@@ -44,14 +59,14 @@ Discretization happens in the usual way, taking into account that this
 is a hyperbolic problem in the same style as the simple one discussed
 in @ref step_12 "step-12":
 We choose a finite element space $V_h$, and integrate our conservation law against
-our (vector-valued) test function $\mathbf{v} \in V_h$.  We then integrate by parts and approximate the
+our (vector-valued) test function $\mathbf{z} \in V_h$.  We then integrate by parts and approximate the
 boundary flux with a <i> numerical </i> flux $\mathbf{H}$,
 @f{eqnarray*}
-&&\int_{\Omega} (\partial_t \mathbf{w}, \mathbf{v}) + (\nabla \cdot \mathbf{F}(\mathbf{w}), \mathbf{v}) \\
-&\approx &\int_{\Omega} (\partial_t \mathbf{w}, \mathbf{v}) + (\mathbf{F}(\mathbf{w}), \nabla \mathbf{v}) + h^{\eta}(\nabla \mathbf{w} , \nabla \mathbf{v}) + \int_{\partial \Omega} (\mathbf{H}(\mathbf{w}^+, \mathbf{w}^-, \mathbf{n}), \mathbf{v}^+),
+&&\int_{\Omega} (\partial_t \mathbf{w}, \mathbf{z}) + (\nabla \cdot \mathbf{F}(\mathbf{w}), \mathbf{z}) \\
+&\approx &\int_{\Omega} (\partial_t \mathbf{w}, \mathbf{z}) + (\mathbf{F}(\mathbf{w}), \nabla \mathbf{z}) + h^{\eta}(\nabla \mathbf{w} , \nabla \mathbf{z}) + \int_{\partial \Omega} (\mathbf{H}(\mathbf{w}^+, \mathbf{w}^-, \mathbf{n}), \mathbf{z}^+),
 @f}
 where $+$ denotes the interior trace of a function, and $-$ represents the outer trace.
-The diffusion term $h^{\eta}(\nabla \mathbf{w} , \nabla \mathbf{v})$ is introduced strictly for stability,
+The diffusion term $h^{\eta}(\nabla \mathbf{w} , \nabla \mathbf{z})$ is introduced strictly for stability,
  where $h$ is the mesh size and $\eta$ is a parameter prescribing how
  much diffusion to add.
 
@@ -71,31 +86,50 @@ More information on these issues can be found, for example, in Ralf
 Hartmann's PhD thesis ("Adaptive Finite Element Methods for the
 Compressible Euler Equations", PhD thesis, University of Heidelberg, 2002).
 
-
-Our full discretization is thus
+We use a time stepping scheme to substitute the time derivative in the
+above equations. At each time step, our full discretization is thus
+that the residual applied to any test 
+function $\mathbf z$ equals zero:
 @f{eqnarray*}
-R(\mathbf{W}_{n+1}) &=& 
+R(\mathbf{W}_{n+1})(\mathbf z) &=& 
 \int_{\Omega} \left(\frac{\mathbf{w}_{n+1} - \mathbf{w}_n}{\delta t},
-\mathbf{v}\right)
+\mathbf{z}\right)
 + \int_{\Omega} \left(\mathbf{F}(\tilde{\mathbf{w}}),
-\mathbf{v}\right) +  h^{\eta}(\nabla \mathbf{w} , \nabla \mathbf{v}) 
+\mathbf{z}\right) +  h^{\eta}(\nabla \mathbf{w} , \nabla \mathbf{z}) 
 +
 \int_{\partial \Omega} \left(\mathbf{H}(\tilde{\mathbf{w}}^+),
-\mathbf{w}^-((\tilde{\mathbf{w}}^+)), \mathbf{n}), \mathbf{v}\right) 
+\mathbf{w}^-(\tilde{\mathbf{w}}^+), \mathbf{n}), \mathbf{z}\right) 
 \\
 & = & 0
 @f}
 where $\tilde{\mathbf{w}} = \theta \mathbf{w}_{n+1} + (1-\theta) \mathbf{w}_n$ for $0 \leq \theta \leq 1$ and
-$\mathbf{w}_i = \sum_k \mathbf{W}_i^k \mathbf{\phi}_k$.
-In the implementation below, we choose the Lax-Friedrich flux, 
+$\mathbf{w}_i = \sum_k \mathbf{W}_i^k \mathbf{\phi}_k$. Choosing
+$\theta=0$ results in the explicit (forward) Euler scheme, $\theta=1$
+in the stable implicit (backward) Euler scheme, and $\theta=\frac 12$
+in the Crank-Nicolson scheme.
+
+In the implementation below, we choose the Lax-Friedrich flux for the
+function $\mathbf H$, i.e.
 $\mathbf{H}(\mathbf{a},\mathbf{b},\mathbf{n}) = \frac{1}{2}(\mathbf{F}(\mathbf{a})\cdot \mathbf{n} + \mathbf{F}(\mathbf{b})\cdot \mathbf{n} + \alpha (\mathbf{a} - \mathbf{b}))$.
 
-We solve the nonlinear system by a Newton iteration, i.e. by iterating
+With these choices, equating the residual to zero results in a
+nonlinear system of equations which we solve the nonlinear system by a
+Newton iteration, i.e. by iterating 
 @f{eqnarray*}
-\partial R(\mathbf{W}^k) \delta \mathbf{W} & = & - R(\mathbf{W}^{k}) \\
+R'(\mathbf{W}^k,\delta \mathbf{W})(\mathbf z) & = & -
+R(\mathbf{W}^{k})(\mathbf z) \qquad \qquad \forall \mathbg z\in V_h \\
 \mathbf{W}^{k+1} &=& \mathbf{W}^k + \delta \mathbf{W},
 @f}
-until $|R(\mathbf{W}^k)|$ (the residual) is sufficiently small.
+until $|R(\mathbf{W}^k)|$ (the residual) is sufficiently small. By
+testing with the nodal basis of a finite element space instead of all
+$\mathbf z$, we arrive at a linear system for $\delta \mathbf W$:
+@f{eqnarray*}
+\mathbf R'(\mathbf{W}^k)\delta \mathbf{W} & = & -
+\mathbf R(\mathbf{W}^{k}).
+@f}
+This linear system is, in general, neither symmetric nor has any
+particular definiteness properties. We will either use a direct solver
+or Trilinos' GMRES implementation to solve it.
 
 
 <h3> Auto-Differentiation </h3>
