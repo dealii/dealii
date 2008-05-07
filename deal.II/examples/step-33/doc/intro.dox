@@ -63,9 +63,9 @@ our (vector-valued) test function $\mathbf{z} \in V_h$.  We then integrate by pa
 boundary flux with a <i> numerical </i> flux $\mathbf{H}$,
 @f{eqnarray*}
 &&\int_{\Omega} (\partial_t \mathbf{w}, \mathbf{z}) + (\nabla \cdot \mathbf{F}(\mathbf{w}), \mathbf{z}) \\
-&\approx &\int_{\Omega} (\partial_t \mathbf{w}, \mathbf{z}) + (\mathbf{F}(\mathbf{w}), \nabla \mathbf{z}) + h^{\eta}(\nabla \mathbf{w} , \nabla \mathbf{z}) + \int_{\partial \Omega} (\mathbf{H}(\mathbf{w}^+, \mathbf{w}^-, \mathbf{n}), \mathbf{z}^+),
+&\approx &\int_{\Omega} (\partial_t \mathbf{w}, \mathbf{z}) - (\mathbf{F}(\mathbf{w}), \nabla \mathbf{z}) + h^{\eta}(\nabla \mathbf{w} , \nabla \mathbf{z}) + \int_{\partial \Omega} (\mathbf{H}(\mathbf{w}^+, \mathbf{w}^-, \mathbf{n}), \mathbf{z}^+),
 @f}
-where $+$ denotes the interior trace of a function, and $-$ represents the outer trace.
+where a superscript $+$ denotes the interior trace of a function, and $-$ represents the outer trace.
 The diffusion term $h^{\eta}(\nabla \mathbf{w} , \nabla \mathbf{z})$ is introduced strictly for stability,
  where $h$ is the mesh size and $\eta$ is a parameter prescribing how
  much diffusion to add.
@@ -143,19 +143,31 @@ and offers a C++ template class <code>Sacado::Fad::DFad</code>
 differentiation") that supports basic arithmetic operators and
 functions such as <code> sqrt, sin, cos, pow, </code> etc. In order to
 use this feature, one declares a collection of variables of this type
-and then denotes some of this collection as degrees of freedom.  These
+and then denotes some of this collection as degrees of freedom, the rest of
+the variables being functions of the independent variables.  These
 variables are used in an algorithm, and as the variables are used,
 their sensitivities with respect to the degrees of freedom are
-continuously updated.  One can imagine that for the full Jacobian,
-this could be prohibitively expensive.  However, we do not use the
-Sacado type for the entire computation, but only element by element.
-The author has used this approach side by side with a hand coded
-Jacobian for the Incompressible Navier-Stokes problem and found the
-Sacado approach to be just as fast as using a hand coded Jacobian, but
-infinitely simpler and less error prone: Since using the
-auto-differentiation requires only that one code the residual
-$R(\mathbf{W})$, ensuring code correctness and maintaining code
-becomes tremendously more simple.
+continuously updated.  
+
+One can imagine that for the full Jacobian,
+this could be prohibitively expensive: the number of independent variables are
+the $\mathbf W^k$, the dependent variables the elements of the vector $\mathbf
+R(\mathbf W^k)$. Both of these vectors can easily have tens of thousands of
+elements or more.  However, it is important to note that not all elements of
+$\mathbf R$ depend on all elements of $\mathbf W^k$: in fact, an entry in
+$\mathbf R$ only depends on an element of $\mathbf W^k$ if the two
+corresponding shape functions overlap and couple in the weak form. This means
+that it is enough if we do not use the
+Sacado type for the entire matrix computation, but only element by element.
+
+The author has used this approach side by side with a hand coded Jacobian for
+the incompressible Navier-Stokes problem and found the Sacado approach to be
+just as fast as using a hand coded Jacobian, but infinitely simpler and less
+error prone: Since using the auto-differentiation requires only that one code
+the residual $R(\mathbf{W})$, ensuring code correctness and maintaining code
+becomes tremendously more simple -- the Jacobian matrix $\mathbf R'$ is
+computed by essentially the same code that also computes the residual $\mathbf
+R$.
 
 All this said, here's a very simple example showing how Sacado can be
 used:
@@ -226,7 +238,8 @@ if the author's advisor heard about it, the author would likely be exiled foreve
 
 We use an input file deck to drive the simulation.  In this way, we can alter the boundary conditions
 and other important properties of the simulation without having to recompile.  For more information on 
-the format, look at the results section, where we describe an example file in more detail.
+the format, look at the <a href="#Results">results section</a>, where we
+describe an example input file in more detail.
 
 
 
