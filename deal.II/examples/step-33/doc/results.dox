@@ -1,13 +1,15 @@
 <a name="Results"></a>
 <h1>Results</h1>
 
-We run the problem with the mesh slide.inp and the following input deck:
+We run the problem with the mesh <code>slide.inp</code> (this file is in the
+same directory as the source code for this program) and the following input
+deck: 
 @verbatim
 # Listing of Parameters
 # ---------------------
 
 # The input grid 
-set mesh=slide.inp
+set mesh = slide.inp
 
 # Stabilization parameter
 set diffusion power = 2.0
@@ -15,43 +17,45 @@ set diffusion power = 2.0
 # Scaled value for gravity.  Positive means gravity points down.
 set gravity = 1.0
 
+# --------------------------------------------------
 # Boundary conditions
 # We may specify boundary conditions for up to MAX_BD boundaries.
 # Your .inp file should have these boundaries designated.
-#
 subsection boundary_1
   set no penetration = true # reflective boundary condition
 end
 
 subsection boundary_2
-# outflow boundary
-  #set w_3 = pressure
-  #set w_3 value = 1.5 - y
+  # outflow boundary
+  # set w_2 = pressure
+  # set w_2 value = 1.5 - y
 end
 
 subsection boundary_3
   set no penetration = true # reflective
-  #set w_3 = pressure
-  #set w_3 value = 1.0
+  # set w_3 = pressure
+  # set w_3 value = 1.0
 end
+
 subsection boundary_4
   set no penetration = true #reflective
 end
 
+# --------------------------------------------------
 # Initial Conditions
 # We set the initial conditions of the conservative variables.  These lines
 # are passed to the expression parsing function.  You should use x,y,z for
 # the coordinate variables.
-#
+
 subsection initial condition
   set w_0 value = 0
   set w_1 value = 0
-  set w_2 value   = 10*(x<-0.7)*(y> 0.3)*(y< 0.45) + (1-(x<-0.7)*(y> 0.3)*(y< 0.45))*1.0
+  set w_2 value = 10*(x<-0.7)*(y> 0.3)*(y< 0.45) + (1-(x<-0.7)*(y> 0.3)*(y< 0.45))*1.0
   set w_3 value = (1.5-(1.0*1.0*y))/0.4
 end
 
+# --------------------------------------------------
 # Time stepping control
-#
 subsection time stepping
   set final time = 10.0 # simulation end time
   set time step  = 0.02 # simulation time step
@@ -66,12 +70,14 @@ subsection linear solver
   set ilut relative tolerance = 1.0
 end
 
+# --------------------------------------------------
 # Output frequency.
 # You may wish to set this > time step if you dont want output at every step
 subsection output
   set step = 0.01
 end
 
+# --------------------------------------------------
 # Refinement control
 subsection refinement
   set refinement = shock # none only other option
@@ -79,6 +85,7 @@ subsection refinement
   set shock levels = 1 # how many levels of refinement to allow
 end
 
+# --------------------------------------------------
 # Flux parameters
 subsection flux
  set stab = mesh
@@ -124,12 +131,20 @@ ______________________________________
 
 This output reports the progress of the Newton iterations and the time stepping.
 
+The result of running these computations is a bunch of output files that we
+can pass to our visualization program of choice. When we collate them into a
+movie, the results looks like this:
+
 @image html step-33.slide.gif
 
-As we see, the heavy mass of fluid is drawn down the slope by gravity, where it collides
-with the ski lodge and is flung into the air!  Hopefully everyone escapes!
+As we see, the heavy mass of fluid is drawn down the slope by gravity, where
+it collides with the ski lodge and is flung into the air!  Hopefully everyone
+escapes!
+
+We can also visualize the evolution of the adaptively refined grid:
 
 @image html step-33.slide_adapt.gif
 
-The adaptivity follows and preceeds the flow pattern, based on this heuristic refinement scheme.
+The adaptivity follows and preceeds the flow pattern, based on the heuristic
+refinement scheme discussed above.
 
