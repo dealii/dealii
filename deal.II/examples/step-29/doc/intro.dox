@@ -8,7 +8,7 @@ by NSF under grant DMS-0604778.
 
 <b>Note:</b> In order to run this program, deal.II must be configured to use
 the UMFPACK sparse direct solver. Refer to the <a
-href="../../readme.html#optional-software">ReadMe</a> for instructions how to do this.
+href="../../readme.html#umfpack">ReadMe</a> for instructions how to do this.
 
 
 <a name="Intro"></a>
