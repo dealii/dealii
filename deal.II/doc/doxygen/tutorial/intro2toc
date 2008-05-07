@@ -2,7 +2,7 @@
 #    $Id: intro2toc 14782 2007-06-15 16:37:12Z kanschat $
 #    Version: $Name$
 #
-#    Copyright (C) 2006, 2007 by the deal.II authors
+#    Copyright (C) 2006, 2007, 2008 by the deal.II authors
 #
 #    This file is subject to QPL and may not be  distributed
 #    without copyright and license information. Please refer
@@ -49,6 +49,13 @@ while (<>) {
 
         # replace double dashes in comments by &mdash;
 	$text =~ s!--!&mdash;!g;
+
+	# we sometimes escape words with % (as in "%Boundary
+        # conditions") because doxygen would otherwise link the word
+        # to a class name. This isn't necessary in the index because
+        # the text already appears in a hyperref, so get rid of the
+        # percent sign
+	$text =~ s!\%!!g;
 
 	print "        <li><a href=\"#$reftext\">$text</a>\n";
 
