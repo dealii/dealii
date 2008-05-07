@@ -1,7 +1,7 @@
 <a name="Intro"></a>
 <h1>Introduction</h1>
 
-<h2>The Boussinesq equations</h2>
+<h3>The Boussinesq equations</h3>
 
 This program deals with an interesting physical problem: how does a
 fluid (i.e. a liquid or gas) behave if it experiences differences in
@@ -108,7 +108,7 @@ earth's interior and surface structure.
 
 
 
-<h2>%Boundary and initial conditions</h2>
+<h3>%Boundary and initial conditions</h3>
 
 Since the Boussinesq equations are derived under the assumption that inertia
 of the fluid's motion does not play a role, the flow field is at each time
@@ -130,7 +130,7 @@ boundary, or any number of other conditions that are physically
 reasonable. In this program, we will use no normal flux conditions.
 
 
-<h2>Solution approach</h2>
+<h3>Solution approach</h3>
 
 Like the equations solved in @ref step_21 "step-21", we here have a
 system of differential-algebraic equations (DAE): with respect to the time
@@ -158,7 +158,7 @@ although we will have to make adjustments for the change in operator
 in the top-left corner of the differential operator. 
 
 
-<h3>Time stepping</h3>
+<h4>Time stepping</h4>
 
 The structure of the problem as a DAE allows us to use the same
 strategy as we have already used in @ref step_21 "step-21", i.e. we
@@ -191,7 +191,7 @@ advection is treated explicitly using the just-computed velocity
 field. 
 
 
-<h3>Weak form and space discretization</h3>
+<h4>Weak form and space discretization</h4>
 
 Like solving the mixed Laplace equations, solving the Stokes equations
 requires us to choose particular pairs of finite elements for
@@ -264,7 +264,7 @@ divergence-free:
 
 
 
-<h3>Linear solvers</h3>
+<h4>Linear solvers</h4>
 
 As explained above, our approach to solving the joint system for
 velocities/pressure on the one hand and temperature on the other is to use an
