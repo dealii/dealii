@@ -15,7 +15,7 @@
                                   // file.  It uses a standard Galerkin approach
                                   // with weakly applied boundary conditions.
  
-                                  // <h4>Include files</h4>
+                                  // @sect3{Include files}
 
                                  // Here we have the necessary TRILINOS includes.
                                  //
@@ -92,7 +92,7 @@ typedef unsigned int UInt;
                                 // the layout of a parallel (or serial) set of processors.
 Epetra_SerialComm *Comm;
 
-                                // <h4>Flux function definition</h4>
+                                // @sect3{Flux function definition}
                                 // Here we define the flux function for this system of conservation
                                 // laws.  Note: it would be terribly difficult to use this example
                                 // to solve some other system of conservation laws.
@@ -186,7 +186,7 @@ void LFNumFlux(
 
 }
 
-                            // <h4>Initial and side condition parsing</h4>
+                            // @sect3{Initial and side condition parsing}
                             // For the initial condition we use the expression parser function
                             // object.
 template <int dim>
@@ -304,7 +304,7 @@ void SideCondition<dim>::vector_value_list (const std::vector<Point<dim> > &poin
     SideCondition<dim>::vector_value (points[p],
 				      value_list[p]);
 }
-				 // <h4>Conservation Law class</h4>
+				 // @sect3{Conservation Law class}
                            // Here we define a Conservation Law class that helps group
                            // operations and data for our Euler equations into a manageable
                            // entity.  Functions will be described as their definitions appear.
@@ -499,8 +499,8 @@ void ConsLaw<dim>::initialize() {
 
 }
 
-				 // <h4>Assembly</h4>
-				 // <h5>Function: assemble_cell_term</h5>
+				 // @sect3{Assembly}
+				 // @sect4{Function: assemble_cell_term}
 				 //
                                  // Assembles the cell term, adding minus the residual
                                  // to the right hand side, and adding in the Jacobian
@@ -677,7 +677,7 @@ void ConsLaw<dim>::assemble_cell_term(
 
       } // for i
 }
-                                   // <h5>Function: assemble_face_term</h5>
+                                   // @sect4{Function: assemble_face_term}
                                    // These are either
                                    // boundary terms or terms across differing 
                                    // levels of refinement.  In the first case,
@@ -888,7 +888,7 @@ void ConsLaw<dim>::assemble_face_term(
       } 
 
 }
-                                 // <h5>Assembling the whole system</h5>
+                                 // @sect4{Assembling the whole system}
                                  // Now we put all of the assembly pieces together
                                  // in a routine that dispatches the correct
                                  // piece for each cell/face.  We keep track of
@@ -1163,7 +1163,7 @@ ConsLaw<dim>::~ConsLaw ()
   delete fe_ptr;
 }
 
-                        // <h4>Initialize System</h4>
+                        // @sect3{Initialize System}
                         // Sizes all of the vectors and sets up the
                         // sparsity patter.  This function is called at
                         // the very beginning of a simulation.  The function
@@ -1188,7 +1188,7 @@ void ConsLaw<dim>::initialize_system ()
   indicator.reinit(triangulation.n_active_cells());
 }
 
-                                  // <h4>Setup System</h4>
+                                  // @sect3{Setup System}
                                   // We call this function to build the sparsity
                                   // and the matrix.
 template <int dim>
@@ -1273,7 +1273,7 @@ void ConsLaw<dim>::setup_system ()
 
 }
 
-                                 // <h4>Solving the linear system</h4>
+                                 // @sect3{Solving the linear system}
                                  // Actually solve the linear system, using either
                                  // Aztec of Amesos.
 template <int dim>
@@ -1373,7 +1373,7 @@ void ConsLaw<dim>::solve (Vector<double> &dsolution, int &niter, double &lin_res
   }
 }
 
-                                 // <h4>Postprocessing and Output</h4>
+                                 // @sect3{Postprocessing and Output}
                                  // Recover the physical variables from the conservative
                                  // variables so that output will be (perhaps) more
                                  // meaningfull.
@@ -1610,7 +1610,7 @@ void ConsLaw<dim>::output_results (const unsigned int cycle) const
   output.close();
 }
 
-                                   // <h4>Parsing the Input Deck</h4>
+                                   // @sect3{Parsing the Input Deck}
                                    // Declare the parameters for the
                                    // input deck.  We assume a certain
                                    // maximum number of boundaries and process
@@ -1923,7 +1923,7 @@ void ConsLaw<dim>::compute_predictor() {
   predictor.sadd(3/2.0, -1/2.0, solution);
 }
 
-                          // <h4>Run the simulation</h4>
+                          // @sect3{Run the simulation}
 			  // Contains the initialization
                           // the time loop, and the inner Newton iteration.
 template <int dim>
@@ -1968,7 +1968,7 @@ void ConsLaw<dim>::run ()
                            // Determine when we will output next.
   double next_output = T + output_step;
 
-                           // <h5>Main time stepping loop</h5>
+                           // @sect4{Main time stepping loop}
   predictor = solution;
   while(T < TF)
     {
@@ -1997,7 +1997,7 @@ void ConsLaw<dim>::run ()
       unsigned int nonlin_iter = 0;
       double lin_res;
 
-                             // <h6>Newton iteration</h6>
+                             // @sect5{Newton iteration}
       nlsolution = predictor;
       while (!nonlin_done) {
         lin_iter = 0;
