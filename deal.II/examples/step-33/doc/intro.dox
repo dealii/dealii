@@ -11,7 +11,7 @@ on different meshes, with differing boundary conditions.
 The program also uses the Trilinos linear solvers (Aztec/Amesos) and
 an automatic differentiation package, Sacado, which is also part of Trilinos.
 
-<h2>Euler flow</h2>
+<h3>Euler flow</h3>
 
 The equations for a compressible, inviscid gas (the Euler equations) are
 a basic system of conservation laws, in spatial dimension $d$, 
@@ -38,7 +38,7 @@ This problem obviously falls into the class of vector-valued
 problem. A general overview of how to deal with these problems in
 deal.II can be found in the @ref vector_valued module.
 
-<h2>Discretization</h2>
+<h3>Discretization</h3>
 
 Discretization happens in the usual way, taking into account that this
 is a hyperbolic problem in the same style as the simple one discussed
@@ -98,7 +98,7 @@ We solve the nonlinear system by a Newton iteration, i.e. by iterating
 until $|R(\mathbf{W}^k)|$ (the residual) is sufficiently small.
 
 
-<h2> Auto-Differentiation </h2>
+<h3> Auto-Differentiation </h3>
 
 Since computing the Jacobian $\partial R$ is a terrible beast, we use an automatic differentiation package,
 Sacado, to do this.  Sacado is a package within the <a
@@ -154,7 +154,7 @@ It should be noted that Sacado provides more auto-differentation capabilities th
 used in this program.  However, understanding the example above is
 enough to understand the use of Sacado in this Euler flow program.
 
-<h2> Trilinos solvers </h2>
+<h3> Trilinos solvers </h3>
 The program uses either the Aztec iterative solvers, or the Amesos
 sparse direct solver, both provided by
 the Trilinos package.  This package is inherently designed to be used in a parallel program, however,
@@ -164,7 +164,7 @@ to describe the parallel distribution of a vector, and to define sparse matrices
 on these vectors.  Please view the commented code for more details on how these solvers are used
 within the example.
 
-<h2> Adaptivity </h2>
+<h3> Adaptivity </h3>
 The example uses an ad-hoc refinement indicator that shows some usefulness in shock-type problems, and
 in the downhill flow example included.  We refine according to the squared gradient of the density.  
 Hanging nodes are handled by computing the numerical flux across cells that are of differing
@@ -184,7 +184,7 @@ tends not to slow the simulation to a halt.  This, of course, is purely a heuris
 if the author's advisor heard about it, the author would likely be exiled forever from the finite
  element error estimation community.
 
-<h2> Input Deck </h2>
+<h3> Input Deck </h3>
 
 We use an input file deck to drive the simulation.  In this way, we can alter the boundary conditions
 and other important properties of the simulation without having to recompile.  For more information on 
