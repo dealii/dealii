@@ -16,7 +16,7 @@ vector-valued problems. A toplevel overview of this topic can be found in the
 @ref vector_valued module.
 
 
-<h2>The two phase flow problem</h2>
+<h3>The two phase flow problem</h3>
 
 Modeling of two phase flow in porous media is important for both
 environmental remediation and the management of petroleum and groundwater
@@ -138,7 +138,7 @@ category. We will see that the different character of the two equations
 will inform our discretization strategy for the two equations.
 
 
-<h2>Time discretization</h2>
+<h3>Time discretization</h3>
 
 In the reservoir simulation community, it is common to solve the equations
 derived above by going back to the first order, mixed formulation. To this
@@ -220,7 +220,7 @@ cell term to get an equation as follows:
 
 
 
-<h2>Space discretization</h2>
+<h3>Space discretization</h3>
 
 In each time step, we then apply the mixed finite method of @ref step_20
 "step-20" to the velocity and pressure. To be well-posed, we choose
@@ -251,7 +251,7 @@ cell. Some more context on discontinuous element techniques and evaluation of
 fluxes can also be found in @ref step_12 "step-12".
 
 
-<h2>Linear solvers</h2>
+<h3>Linear solvers</h3>
 
 The linear solvers used in this program are a straightforward extension of the
 ones used in @ref step_20 "step-20". Essentially, we simply have to extend
@@ -341,7 +341,7 @@ its content, i.e. all three of its block components, into the variable
 <code>old_solution</code> for use in the next time step.
 
 
-<h2>Choosing a time step</h2>
+<h3>Choosing a time step</h3>
 
 A general rule of thumb in hyperbolic transport equations like the equation we
 have to solve for the saturation equation is that if we use an explicit time
@@ -380,7 +380,7 @@ step_23 "step-23" and @ref step_24 "step-24" where we solve the time dependent
 wave equation, another hyperbolic problem.
 
 
-<h2>The test case</h2>
+<h3>The test case</h3>
 
 For simplicity, this program assumes that there is no source, $q=0$, and that
 the heterogeneous porous medium is isotropic $\mathbf{K}(\mathbf{x}) =
