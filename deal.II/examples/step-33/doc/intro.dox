@@ -134,24 +134,28 @@ or Trilinos' GMRES implementation to solve it.
 
 <h3> Auto-Differentiation </h3>
 
-Since computing the Jacobian $\partial R$ is a terrible beast, we use an automatic differentiation package,
-Sacado, to do this.  Sacado is a package within the <a
+Since computing the Jacobian matrix $\mathbf R'(\mathbf W^k)$ is a
+terrible beast, we use an automatic differentiation package, Sacado,
+to do this.  Sacado is a package within the <a
 href="http://trilinos.sandia.gov" target="_top">Trilinos</a> framework
 and offers a C++ template class <code>Sacado::Fad::DFad</code>
 (<code>Fad</code> standing for "floating point automatic
 differentiation") that supports basic arithmetic operators and
-functions such as <code> sqrt, sin, cos, pow,  </code> etc. In order
-to use this feature, one
-declares a collection of variables of this type and then denotes
-some of this collection as degrees of freedom.  These variables are used in an algorithm, and as the variables
-are used, their sensitivities with respect to the degrees of freedom are continuously updated.
-One can imagine that for the full Jacobian, this could be prohibitively expensive.  However, we do
-not use the Sacado type for the entire computation, but only element by element.  The author has
-used this approach side by side with a hand coded Jacobian for the Incompressible Navier-Stokes problem
-and found the Sacado approach to be just as fast as using a hand coded
-Jacobian, but infinitely simpler and less error prone:  Since using the
-auto-differentiation requires only that one code the residual $R(\mathbf{W})$, ensuring code correctness
-and maintaining code becomes tremendously more simple.
+functions such as <code> sqrt, sin, cos, pow, </code> etc. In order to
+use this feature, one declares a collection of variables of this type
+and then denotes some of this collection as degrees of freedom.  These
+variables are used in an algorithm, and as the variables are used,
+their sensitivities with respect to the degrees of freedom are
+continuously updated.  One can imagine that for the full Jacobian,
+this could be prohibitively expensive.  However, we do not use the
+Sacado type for the entire computation, but only element by element.
+The author has used this approach side by side with a hand coded
+Jacobian for the Incompressible Navier-Stokes problem and found the
+Sacado approach to be just as fast as using a hand coded Jacobian, but
+infinitely simpler and less error prone: Since using the
+auto-differentiation requires only that one code the residual
+$R(\mathbf{W})$, ensuring code correctness and maintaining code
+becomes tremendously more simple.
 
 All this said, here's a very simple example showing how Sacado can be
 used:
