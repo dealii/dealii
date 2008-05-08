@@ -1223,37 +1223,28 @@ void ConsLaw<dim>::setup_system ()
   Map  = new Epetra_Map(dof_handler.n_dofs(), 0, *Comm);
 
                                    // Epetra can build a more efficient matrix if
-                                   // one knows ahead of time the maxiumum number of
-                                   // columns in any row entry.  We traverse the sparsity
-                                   // to discover this.
-  unsigned int cur_row = 0;
-  unsigned int cur_col = 0;
-  unsigned int max_df = -1;
-  for (SparsityPattern::iterator s_i = sparsity_pattern.begin(); 
-       s_i != sparsity_pattern.end(); s_i++) {
-    if (s_i->row() != cur_row) {
-      cur_col = 0;
-      cur_row = s_i->row();
-    }
-    cur_col++;
-   if (cur_col >= max_df) max_df = cur_col;
-  }
+                                   // one knows ahead of time the maximum number of
+                                   // columns in any row entry
+  std::vector<int> row_lengths (dof_handler.n_dofs());
+  for (unsigned int i=0; i<dof_handler.n_dofs(); ++i)
+    row_lengths[i] = sparsity_pattern.row_length (i);
 
-  if (cur_col >= max_df) max_df = cur_col;
-  std::cout << "max_df:" << max_df << std::endl;
-
-                                  // Now we build the matrix, using the constructor
-                                  // that optimizes with the <code> max_df </code> variable.
+                                  // Now we build the matrix, using
+                                  // the constructor that optimizes
+                                  // with the existing lengths per row
+                                  // variable.
   if (Matrix) delete Matrix;
-  Matrix = new Epetra_CrsMatrix(Copy, *Map, max_df+1, true);
+  Matrix = new Epetra_CrsMatrix(Copy, *Map, &row_lengths[0], true);
 
                                  // We add the sparsity pattern to the matrix by
                                  // inserting zeros.
-  std::vector<double> vals(max_df, 0);
-  std::vector<int> row_indices(max_df);
+  const unsigned int max_nonzero_entries = *std::max_element (row_lengths.begin(),
+							      row_lengths.end());
+  std::vector<double> vals(max_nonzero_entries, 0);
+  std::vector<int> row_indices(max_nonzero_entries);
  
-  cur_row = 0;
-  cur_col = 0;
+  unsigned int cur_row = 0;
+  unsigned int cur_col = 0;
   for (SparsityPattern::iterator s_i = sparsity_pattern.begin(); 
      s_i != sparsity_pattern.end(); s_i++) {
     if (s_i->row() != cur_row) {
