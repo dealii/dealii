@@ -119,7 +119,7 @@ const double GAMMA = 1.4;
                                 // point.
 template <typename number, int dim>
 void Flux(std::vector<std::vector<number> >  &flux, 
-          const Point<dim> &point, 
+          const Point<dim> &/*point*/,
           const std::vector<number> &W)
 {
 
@@ -509,7 +509,7 @@ template <int dim>
 void ConsLaw<dim>::assemble_cell_term(
   const FEValues<dim> &fe_v,
   std::vector<unsigned int> &dofs,
-  unsigned int cell_no
+  unsigned int /*cell_no*/
   ) 
 {
                                  // The residual for each row (i) will be accumulating 
@@ -1426,8 +1426,6 @@ void ConsLaw<dim>::postprocess() {
     fe_v_unit.get_function_values(solution, U);
     fe_v_unit.get_function_grads(solution, dU);
     fe_v.get_function_values(solution, UU);
-
-    const std::vector<double> &JxW = fe_v.get_JxW_values ();
 
     for (unsigned int q = 0; q < fe_v.get_fe().base_element(0).n_dofs_per_cell(); q++) {
       unsigned int didx = fe_v.get_fe().component_to_system_index(DENS_IDX, q);
