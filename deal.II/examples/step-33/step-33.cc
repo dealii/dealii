@@ -500,7 +500,7 @@ void ConsLaw<dim>::initialize() {
 }
 
 				 // @sect3{Assembly}
-				 // @sect4{Function: assemble_cell_term}
+				 // @sect4{%Function: assemble_cell_term}
 				 //
                                  // Assembles the cell term, adding minus the residual
                                  // to the right hand side, and adding in the Jacobian
@@ -677,7 +677,7 @@ void ConsLaw<dim>::assemble_cell_term(
 
       } // for i
 }
-                                   // @sect4{Function: assemble_face_term}
+                                   // @sect4{%Function: assemble_face_term}
                                    // These are either
                                    // boundary terms or terms across differing 
                                    // levels of refinement.  In the first case,
