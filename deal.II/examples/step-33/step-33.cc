@@ -1,9 +1,10 @@
-/* step-12.cc,v 1.33 2005/08/08 16:41:40 wolf Exp */
-/* Author: David Neckels, Boulder Colorado 2007  */
-/*    step-12.cc,v 1.33 2005/08/08 16:41:40 wolf Exp       */
-/*    Version: Version-5-2-0                                          */
+/* $Id$ */
+/* Author: David Neckels, Boulder, Colorado, 2007, 2008 */
+
+/*    $Id$       */
+/*    Version: $Name$                                          */
 /*                                                                */
-/*    Copyright (C) 2001, 2002, 2003, 2004, 2005, 2008 by the deal.II authors */
+/*    Copyright (C) 2007, 2008 by the deal.II authors and David Neckels */
 /*                                                                */
 /*    This file is subject to QPL and may not be  distributed     */
 /*    without copyright and license information. Please refer     */
