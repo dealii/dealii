@@ -93,7 +93,6 @@
 				 // namespace:
 using namespace dealii;
 
-#define DIMENSION 2
 
 				 // @sect3{Flux function definition}
 
@@ -115,10 +114,25 @@ using namespace dealii;
 				 // introduce using a template parameter:
 namespace EulerEquations
 {
-				   // We define the number of components in
-				   // the system.  Euler's has one entry for
-				   // momenta in each spatial direction, plus
-				   // the energy and density components.
+				   // First a few inline functions that
+				   // describe the various components of our
+				   // solution vector in a generic way. This
+				   // includes the number of components in the
+				   // system (Euler's equations have one entry
+				   // for momenta in each spatial direction,
+				   // plus the energy and density components,
+				   // for a total of <code>dim+2</code>
+				   // components), as well as functions that
+				   // describe the index within the solution
+				   // vector of the first momentum component,
+				   // the density component, and the energy
+				   // density component. Note that all these
+				   // numbers depend on the space dimension;
+				   // defining them in a generic way (rather
+				   // than by implicit convention) makes our
+				   // code more flexible and makes it easier
+				   // to later extend it, for example by
+				   // adding more components to the equations.
   template <int dim>
   inline
   unsigned int n_components ()
@@ -126,19 +140,19 @@ namespace EulerEquations
     return dim + 2;
   }
 
+  template <int dim>
+  inline
+  unsigned int first_momentum_component ()
+  {
+    return 0;
+  }
 
-				 // Define a handle to the density and energy
-				 // indices.  We have arrange the momenta to
-				 // be first, then density, and, lastly,
-				 // energy.
   template <int dim>
   inline
   unsigned int density_component ()
   {
     return dim;
   }
-
-
 
   template <int dim>
   inline
@@ -148,8 +162,12 @@ namespace EulerEquations
   }
   
 
-				   // The gas constant.  This value is
-				   // representative of air.
+				   // Next, we define the gas constant.  This
+				   // value is representative of a gas that
+				   // consists of molecules composed of two
+				   // atoms, such as air which consists up to
+				   // small traces almost entirely of $N_2$
+				   // and $O_2$.
   const double gas_gamma = 1.4;
 }
 
@@ -169,7 +187,7 @@ using namespace EulerEquations;
 				 // exactly like the Euler equations one is
 				 // used to seeing.  We evaluate the flux at a
 				 // single quadrature point.
-template <typename number, int dim>
+template <int dim, typename number>
 void Flux(std::vector<std::vector<number> >  &flux, 
           const Point<dim> &/*point*/,
           const std::vector<number> &W)
@@ -2113,7 +2131,7 @@ int main (int argc, char *argv[])
   }
   try
     {
-      ConsLaw<DIMENSION> cons;
+      ConsLaw<2> cons;
       cons.declare_parameters();
       cons.load_parameters(argv[1]);
       cons.run ();
