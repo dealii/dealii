@@ -13,32 +13,9 @@
 
 				 // @sect3{Include files}
 
-                                 // Here we have the necessary TRILINOS includes.
-                                 //
-                                 // Epetra is the basic trilinos vector/matrix library.
-#include <Epetra_SerialComm.h>
-#include <Epetra_Map.h>
-#include <Epetra_CrsGraph.h>
-#include <Epetra_CrsMatrix.h>
-#include <Epetra_Vector.h>
-                                 // Teuchos is a Trilinos utility library that is used
-                                 // to set parameters within the Aztec solver library.
-#include "Teuchos_ParameterList.hpp"
-                                 // Aztec is the iterative solver library.
-#include <AztecOO.h>
-#include <AztecOO_Operator.h>
-#define HAVE_IFPACK_TEUCHOS
-#include <Ifpack.h>
-
-                                 // Amesos is a direct solver package within Trilinos.
-#include <Amesos.h>
-                                 // Sacado is the automatic differentiation package, which
-                                 // is used to find the jacobian for a fully implicit Newton
-                                 // iteration.
-#include <Sacado.hpp>
-
-                                 // A standard set of dealii includes.  Nothing special to
-                                 // comment on here.
+                                 // First a standard set of deal.II
+                                 // includes. Nothing special to comment on
+                                 // here:
 #include <base/quadrature_lib.h>
 #include <base/function.h>
 #include <base/parameter_handler.h>
@@ -56,63 +33,142 @@
 #include <grid/tria_iterator.h>
 #include <grid/grid_in.h>
 
-#include <fe/fe_values.h>
-#include <fe/fe_system.h>
-
 #include <dofs/dof_handler.h>
 #include <dofs/dof_accessor.h>
 #include <dofs/dof_tools.h>
+
+#include <fe/fe_values.h>
+#include <fe/fe_system.h>
+#include <fe/mapping_q1.h>
+#include <fe/fe_q.h>
 
 #include <numerics/data_out.h>
 #include <numerics/vectors.h>
 #include <numerics/solution_transfer.h>
 
-#include <fe/mapping_q1.h>
-#include <fe/fe_q.h>
-#include <numerics/derivative_approximation.h>
+                                 // Then, as mentioned in the introduction, we
+                                 // use various Trilinos packages as linear
+                                 // solvers as well as for automatic
+                                 // differentiation. These are in the
+                                 // following include files.
+                                 //
+                                 // In particular, Epetra is the basic
+                                 // trilinos vector/matrix library and comes
+                                 // with several header files pertaining to
+                                 // individual aspects of it that will become
+                                 // clear later on:
+#include <Epetra_SerialComm.h>
+#include <Epetra_Map.h>
+#include <Epetra_CrsGraph.h>
+#include <Epetra_CrsMatrix.h>
+#include <Epetra_Vector.h>
+                                 // Next, Teuchos is a Trilinos utility
+                                 // library that is used to set parameters
+                                 // within the Aztec solver library:
+#include <Teuchos_ParameterList.hpp>
+
+                                 // Aztec itself is the iterative solver
+                                 // library:
+#include <AztecOO.h>
+#include <AztecOO_Operator.h>
+
+                                 // Amesos is a direct solver package within
+                                 // Trilinos:
+#include <Amesos.h>
+
+                                 // Finally, Sacado is the automatic
+                                 // differentiation package, which is used to
+                                 // find the Jacobian for a fully implicit
+                                 // Newton iteration:
+#include <Sacado.hpp>
+
+
 				 // And this again is C++:
 #include <iostream>
 #include <fstream>
 #include <vector>
 
-				 // Introduce the dealii library into the current namespace.
+				 // To end this section, introduce everythin
+				 // in the dealii library into the current
+				 // namespace:
 using namespace dealii;
 
 #define DIMENSION 2
 
-				 // We define a shorter name for the automatic differentiation
-				 // type.
-typedef Sacado::Fad::DFad<double> fad_double;
-typedef unsigned int UInt;
-				 // The Epetra library requires a 'communicator', which describes
-				 // the layout of a parallel (or serial) set of processors.
-Epetra_SerialComm *Comm;
-
 				 // @sect3{Flux function definition}
-				 // Here we define the flux function for this system of conservation
-				 // laws.  Note: it would be terribly difficult to use this example
-				 // to solve some other system of conservation laws.
-				 //
-				 // We define the number of components in the system.  Euler's has
-				 // one entry for momenta in each spatial direction, plus the energy
-				 // and density components.
-#define N_COMP (2 + DIMENSION)
-				 // Define a handle to the density and energy indices.  We have arrange
-				 // the momenta to be first, then density, and, lastly, energy.
-#define DENS_IDX DIMENSION
-#define ENERGY_IDX (DIMENSION+1)
 
-				 // The gas constant.  This value is representative of air.
-const double GAMMA = 1.4;
-				 // We define the flux functions as one large matrix.  Each row of this
-				 // matrix represents a scalar conservation law for the component in
-				 // that row.  We template the numerical type of the flux function
-				 // so that we may use the automatic differentiation type here.
-				 // The flux functions are defined in terms of the
-				 // conserved variables $\rho w_0, \dots, \rho w_{d-1}, \rho, E$,
-				 // so they do not look exactly like the Euler equations one is
-				 // used to seeing.  We evaluate the flux at a single quadrature
-				 // point.
+				 // Here we define the flux function for this
+				 // particular system of conservation laws,
+				 // the Euler equations for gas dynamics. We
+				 // group all this into a structure that
+				 // defines everything that has to do with the
+				 // flux. All members of this structures are
+				 // static, i.e. the structure has no actual
+				 // state specified by instance member
+				 // variables. The better way to do this,
+				 // rather than a structure with all static
+				 // members would be to use a namespace -- but
+				 // namespaces can't be templatized and we
+				 // want some of the member variables of the
+				 // structure to depend on the space
+				 // dimension, which we in our usual way
+				 // introduce using a template parameter:
+namespace EulerEquations
+{
+				   // We define the number of components in
+				   // the system.  Euler's has one entry for
+				   // momenta in each spatial direction, plus
+				   // the energy and density components.
+  template <int dim>
+  inline
+  unsigned int n_components ()
+  {
+    return dim + 2;
+  }
+
+
+				 // Define a handle to the density and energy
+				 // indices.  We have arrange the momenta to
+				 // be first, then density, and, lastly,
+				 // energy.
+  template <int dim>
+  inline
+  unsigned int density_component ()
+  {
+    return dim;
+  }
+
+
+
+  template <int dim>
+  inline
+  unsigned int energy_component ()
+  {
+    return dim+1;
+  }
+  
+
+				   // The gas constant.  This value is
+				   // representative of air.
+  const double gas_gamma = 1.4;
+}
+
+using namespace EulerEquations;
+
+
+				 // We define the flux functions as one large
+				 // matrix.  Each row of this matrix
+				 // represents a scalar conservation law for
+				 // the component in that row.  We template
+				 // the numerical type of the flux function so
+				 // that we may use the automatic
+				 // differentiation type here.  The flux
+				 // functions are defined in terms of the
+				 // conserved variables $\rho w_0, \dots, \rho
+				 // w_{d-1}, \rho, E$, so they do not look
+				 // exactly like the Euler equations one is
+				 // used to seeing.  We evaluate the flux at a
+				 // single quadrature point.
 template <typename number, int dim>
 void Flux(std::vector<std::vector<number> >  &flux, 
           const Point<dim> &/*point*/,
@@ -120,29 +176,29 @@ void Flux(std::vector<std::vector<number> >  &flux,
 {
 
 				   // Pressure is a dependent variable: $p = 
-				   // (\gamma - 1)(E-\frac{1}{2} \rho |v|^2)$.
+				   // (\gas_gamma - 1)(E-\frac{1}{2} \rho |v|^2)$.
   number rho_normVsqr;
   for (unsigned int d0 = 0; d0 < dim; d0++)
     rho_normVsqr += W[d0]*W[d0];
 				   // Since W are $\rho v$, we get a $\rho^2$ in the
 				   // numerator, so dividing a $\rho$ out gives the desired $ \rho |v|^2$.
-  rho_normVsqr /= W[DENS_IDX];
+  rho_normVsqr /= W[density_component<dim>()];
 
-  number pressure = (GAMMA-1.0)*(W[ENERGY_IDX] - number(0.5)*(rho_normVsqr));
+  number pressure = (gas_gamma-1.0)*(W[energy_component<dim>()] - number(0.5)*(rho_normVsqr));
 
 				   // We compute the momentum terms.  We divide by the
 				   // density here to get $v_i \rho v_j$
   for (unsigned int d = 0; d < dim; d++) {
     for (unsigned int d1 = 0; d1 < dim; d1++) {
-      flux[d][d1] = W[d]*W[d1]/W[DENS_IDX];
+      flux[d][d1] = W[d]*W[d1]/W[density_component<dim>()];
     }
 				     // The pressure contribution, along the diagonal:
     flux[d][d] += pressure;
 				     // Advection/conservation of density:
-    flux[DENS_IDX][d] = W[d]; 
+    flux[density_component<dim>()][d] = W[d]; 
 				     // And, lastly, conservation of energy.
-    flux[ENERGY_IDX][d] = W[d]/W[DENS_IDX]*
-			  (W[ENERGY_IDX] + pressure); // energy
+    flux[energy_component<dim>()][d] = W[d]/W[density_component<dim>()]*
+			  (W[energy_component<dim>()] + pressure); // energy
   }
 }
 
@@ -152,7 +208,7 @@ void Flux(std::vector<std::vector<number> >  &flux,
 				 // $\alpha$.
 template <typename number, int dim>
 void LFNumFlux(
-  std::vector<std::vector<fad_double> > &nflux,
+  std::vector<std::vector<Sacado::Fad::DFad<double> > > &nflux,
   const std::vector<Point<dim> > &points, 
   const std::vector<Point<dim> > &normals,
   const std::vector<std::vector<number> > &Wplus,
@@ -163,15 +219,15 @@ void LFNumFlux(
 
 				   // We evaluate the flux at each of the quadrature points.
   for (unsigned int q = 0; q < n_q_points; q++) {
-    std::vector<std::vector<fad_double> > iflux(N_COMP,
-						std::vector<fad_double>(dim, 0));
-    std::vector<std::vector<fad_double> > oflux(N_COMP,
-						std::vector<fad_double>(dim, 0));
+    std::vector<std::vector<Sacado::Fad::DFad<double> > > iflux(n_components<dim>(),
+						std::vector<Sacado::Fad::DFad<double> >(dim, 0));
+    std::vector<std::vector<Sacado::Fad::DFad<double> > > oflux(n_components<dim>(),
+						std::vector<Sacado::Fad::DFad<double> >(dim, 0));
 
     Flux<number, dim>(iflux, points[q], Wplus[q]);
     Flux<number, dim>(oflux, points[q], Wminus[q]);
 
-    for (unsigned int di = 0; di < N_COMP; di++) {
+    for (unsigned int di = 0; di < n_components<dim>(); di++) {
       nflux[q][di] = 0;
       for (unsigned int d = 0; d < dim; d++) {
         nflux[q][di] += 0.5*(iflux[di][d] + oflux[di][d])*normals[q](d);
@@ -211,8 +267,8 @@ class InitialCondition :  public FunctionParser<dim>
 
 template <int dim>
 InitialCondition<dim>::InitialCondition () :
-		FunctionParser<dim> (N_COMP),
-                expressions(N_COMP, "0.0")
+		FunctionParser<dim> (n_components<dim>()),
+                expressions(n_components<dim>(), "0.0")
 {}
 
 				 // Here we set up x,y,z as the variables that one should use in the input
@@ -353,6 +409,8 @@ class ConsLaw
                                      // The solution to the linear problem during the Newton iteration
     Vector<double>       dsolution;
     Vector<double>       right_hand_side;
+
+    Epetra_SerialComm    communicator;
     
   public:
 
@@ -369,8 +427,6 @@ class ConsLaw
       std::vector<unsigned int> &dofs_neighbor,
       int boundary = -1
     );
-
-    unsigned int get_n_components() const { return N_COMP;}
 
   private:
 				     // T = current time, dT = time step, TF = final time.
@@ -512,36 +568,36 @@ void ConsLaw<dim>::assemble_cell_term(
 				   // into this fad variable.  At the end of the assembly
 				   // for this row, we will query for the sensitivities
 				   // to this variable and add them into the Jacobian.
-  fad_double F_i;
+  Sacado::Fad::DFad<double> F_i;
   unsigned int dofs_per_cell = fe_v.dofs_per_cell;
   unsigned int n_q_points = fe_v.n_quadrature_points;
 
 				   // We will define the dofs on this cell in these fad variables.
-  std::vector<fad_double> DOF(dofs_per_cell);
+  std::vector<Sacado::Fad::DFad<double> > DOF(dofs_per_cell);
 
 				   // Values of the conservative variables at the quadrature points.
-  std::vector<std::vector<fad_double > > W (n_q_points,
-					    std::vector<fad_double >(get_n_components()));
+  std::vector<std::vector<Sacado::Fad::DFad<double> > > W (n_q_points,
+					    std::vector<Sacado::Fad::DFad<double> >(n_components<dim>()));
 
 				   // Values at the last time step of the conservative variables.
 				   // Note that these do not use fad variables, since they do
 				   // not depend on the 'variables to be sought'=DOFS.
   std::vector<std::vector<double > > Wl (n_q_points,
-					 std::vector<double >(get_n_components()));
+					 std::vector<double >(n_components<dim>()));
 
 				   // Here we will hold the averaged values of the conservative
 				   // variables that we will linearize around (cn=Crank Nicholson).
-  std::vector<std::vector<fad_double > > Wcn (n_q_points,
-					      std::vector<fad_double >(get_n_components()));
+  std::vector<std::vector<Sacado::Fad::DFad<double> > > Wcn (n_q_points,
+					      std::vector<Sacado::Fad::DFad<double> >(n_components<dim>()));
 
 				   // Gradients of the current variables.  It is a
 				   // bit of a shame that we have to compute these; we almost don't.
 				   // The nice thing about a simple conservation law is that the
 				   // the flux doesn't generally involve any gradients.  We do
 				   // need these, however, for the diffusion stabilization. 
-  std::vector<std::vector<std::vector<fad_double> > > Wgrads (n_q_points,
-							      std::vector<std::vector<fad_double> >(get_n_components(),
-												    std::vector<fad_double>(dim)));
+  std::vector<std::vector<std::vector<Sacado::Fad::DFad<double> > > > Wgrads (n_q_points,
+							      std::vector<std::vector<Sacado::Fad::DFad<double> > >(n_components<dim>(),
+												    std::vector<Sacado::Fad::DFad<double> >(dim)));
 
 
   const std::vector<double> &JxW = fe_v.get_JxW_values ();
@@ -564,7 +620,7 @@ void ConsLaw<dim>::assemble_cell_term(
 				   // fad types, only the local cell variables, we explicitly
 				   // code this loop;
   for (unsigned int q = 0; q < n_q_points; q++) {
-    for (unsigned int di = 0; di < get_n_components(); di++) {
+    for (unsigned int di = 0; di < n_components<dim>(); di++) {
       W[q][di] = 0;
       Wl[q][di] = 0;
       Wcn[q][di] = 0;
@@ -596,12 +652,12 @@ void ConsLaw<dim>::assemble_cell_term(
                                    // this could be done in a better way, since this
                                    // could be a rather large object, but for now it 
                                    // seems to work just fine.
-  std::vector<std::vector<std::vector<fad_double> > > flux(n_q_points, 
-							   std::vector<std::vector<fad_double> >(get_n_components(),
-												 std::vector<fad_double>(dim, 0)));
+  std::vector<std::vector<std::vector<Sacado::Fad::DFad<double> > > > flux(n_q_points, 
+							   std::vector<std::vector<Sacado::Fad::DFad<double> > >(n_components<dim>(),
+												 std::vector<Sacado::Fad::DFad<double> >(dim, 0)));
 
   for (unsigned int q=0; q < n_q_points; ++q) {
-    Flux<fad_double, dim>(flux[q], fe_v.get_quadrature_points()[q], Wcn[q]);
+    Flux<Sacado::Fad::DFad<double>, dim>(flux[q], fe_v.get_quadrature_points()[q], Wcn[q]);
   }
 
 				   // We now have all of the function values/grads/fluxes,
@@ -628,7 +684,7 @@ void ConsLaw<dim>::assemble_cell_term(
 				       // Loop quadrature points.
       for (unsigned int point=0; point<fe_v.n_quadrature_points; ++point) {
 
-	fad_double fdotgv = 0;
+	Sacado::Fad::DFad<double> fdotgv = 0;
 
 					 // Integrate the flux times gradient of the test function
 	for (unsigned int d = 0; d < dim; d++) 
@@ -637,12 +693,12 @@ void ConsLaw<dim>::assemble_cell_term(
 	F_i -= fdotgv*JxW[point];
 
 					 // The mass term (if the simulation is non-stationary).
-	fad_double delta_t= 1.0/dT*(W[point][component_i] - Wl[point][component_i]);
+	Sacado::Fad::DFad<double> delta_t= 1.0/dT*(W[point][component_i] - Wl[point][component_i]);
 	if (!is_stationary) F_i += delta_t*
 				   fe_v.shape_value_component(i, point, component_i)*JxW[point];
 
 					 // Stabilization (cell wise diffusion)
-	fad_double guv = 0;
+	Sacado::Fad::DFad<double> guv = 0;
 	for (unsigned int d = 0; d < dim; d++) {
 	  guv += fe_v.shape_grad_component(i, point, component_i)[d]*
 		 Wgrads[point][component_i][d];
@@ -654,9 +710,9 @@ void ConsLaw<dim>::assemble_cell_term(
 					 // equation and into the vertical component of the 
 					 // velocity.
 	if (component_i == dim - 1) {
-	  F_i += gravity*Wcn[point][DENS_IDX]*fe_v.shape_value_component(i,point, component_i)*JxW[point];
-	} else if (component_i == ENERGY_IDX) {
-	  F_i += gravity*Wcn[point][DENS_IDX]*Wcn[point][dim-1]*
+	  F_i += gravity*Wcn[point][density_component<dim>()]*fe_v.shape_value_component(i,point, component_i)*JxW[point];
+	} else if (component_i == energy_component<dim>()) {
+	  F_i += gravity*Wcn[point][density_component<dim>()]*Wcn[point][dim-1]*
 		 fe_v.shape_value_component(i,point, component_i)*JxW[point];
 	}
       } // for q
@@ -690,7 +746,7 @@ void ConsLaw<dim>::assemble_face_term(
   int boundary
 ) 
 {
-  fad_double F_i;
+  Sacado::Fad::DFad<double> F_i;
   const unsigned int n_q_points = fe_v.n_quadrature_points;
   const unsigned int dofs_per_cell = fe_v.get_fe().dofs_per_cell;
   const unsigned int ndofs_per_cell = fe_v_neighbor.get_fe().dofs_per_cell;
@@ -698,14 +754,14 @@ void ConsLaw<dim>::assemble_face_term(
 	 ExcDimensionMismatch(dofs_per_cell, ndofs_per_cell));
 
 				   // As above, the fad degrees of freedom
-  std::vector<fad_double> DOF(dofs_per_cell+ndofs_per_cell);
+  std::vector<Sacado::Fad::DFad<double> > DOF(dofs_per_cell+ndofs_per_cell);
 
 				   // The conservative variables for this cell,
 				   // and for 
-  std::vector<std::vector<fad_double > > Wplus (n_q_points,
-						std::vector<fad_double >(get_n_components()));
-  std::vector<std::vector<fad_double > > Wminus (n_q_points,
-						 std::vector<fad_double >(get_n_components()));
+  std::vector<std::vector<Sacado::Fad::DFad<double> > > Wplus (n_q_points,
+						std::vector<Sacado::Fad::DFad<double> >(n_components<dim>()));
+  std::vector<std::vector<Sacado::Fad::DFad<double> > > Wminus (n_q_points,
+						 std::vector<Sacado::Fad::DFad<double> >(n_components<dim>()));
 
 
   const std::vector<double> &JxW = fe_v.get_JxW_values ();
@@ -732,7 +788,7 @@ void ConsLaw<dim>::assemble_face_term(
 				   // Set the values of the local conservative variables.
 				   // Initialize all variables to zero.
   for (unsigned int q = 0; q < n_q_points; q++) {
-    for (unsigned int di = 0; di < get_n_components(); di++) {
+    for (unsigned int di = 0; di < n_components<dim>(); di++) {
       Wplus[q][di] = 0;
       Wminus[q][di] = 0;
     }
@@ -772,13 +828,13 @@ void ConsLaw<dim>::assemble_face_term(
 				     // and implicit values.  If a particular component is not
 				     // prescribed, the values evaluate to zero and are
 				     // ignored, below.
-    std::vector<Vector<double> > bvals(n_q_points, Vector<double>(N_COMP));
+    std::vector<Vector<double> > bvals(n_q_points, Vector<double>(n_components<dim>()));
     bme->second.second->vector_value_list(fe_v.get_quadrature_points(), bvals);
 
 				     // We loop the quadrature points, and we treat each
 				     // component individualy.
     for (unsigned int q = 0; q < n_q_points; q++) {
-      for (unsigned int di = 0; di < get_n_components(); di++) {
+      for (unsigned int di = 0; di < n_components<dim>(); di++) {
 
 					 // An inflow/dirichlet type of boundary condition
         if (bme->second.first[di] == INFLOW_BC) {
@@ -792,11 +848,11 @@ void ConsLaw<dim>::assemble_face_term(
 					   // type boundary condition, we get sensitivities of
 					   // energy to velocity and density (unless these
 					   // are also prescribed.
-          fad_double rho_vel_sqr = 0;
-          fad_double dens;
+          Sacado::Fad::DFad<double> rho_vel_sqr = 0;
+          Sacado::Fad::DFad<double> dens;
           
-          dens = bme->second.first[DENS_IDX] == INFLOW_BC ? bvals[q](DENS_IDX) :
-                 Wplus[q][DENS_IDX];
+          dens = bme->second.first[density_component<dim>()] == INFLOW_BC ? bvals[q](density_component<dim>()) :
+                 Wplus[q][density_component<dim>()];
 
           for (unsigned int d=0; d < dim; d++) {
             if (bme->second.first[d] == INFLOW_BC)
@@ -807,7 +863,7 @@ void ConsLaw<dim>::assemble_face_term(
           rho_vel_sqr /= dens;
 					   // Finally set the energy value as determined by the
 					   // prescribed pressure and the other variables.
-          Wminus[q][di] = bvals[q](di)/(GAMMA-1.0) +
+          Wminus[q][di] = bvals[q](di)/(gas_gamma-1.0) +
 			  0.5*rho_vel_sqr;
 
         } else if (bme->second.first[di] == OUTFLOW_BC) {
@@ -821,7 +877,7 @@ void ConsLaw<dim>::assemble_face_term(
 					   // of the velocities is orthogonal to the surface
 					   // normal.  This creates sensitivies of across
 					   // the velocity components.
-          fad_double vdotn = 0;
+          Sacado::Fad::DFad<double> vdotn = 0;
           for (unsigned int d = 0; d < dim; d++) {
             vdotn += Wplus[q][d]*normals[q](d);
           }
@@ -834,7 +890,7 @@ void ConsLaw<dim>::assemble_face_term(
    
 				   // Determine the Lax-Friedrich's stability parameter,
 				   // and evaluate the numerical flux function at the quadrature points
-  std::vector<std::vector<fad_double> > nflux(n_q_points, std::vector<fad_double>(get_n_components(), 0));
+  std::vector<std::vector<Sacado::Fad::DFad<double> > > nflux(n_q_points, std::vector<Sacado::Fad::DFad<double> >(n_components<dim>(), 0));
   double alpha = 1;
 
   switch(flux_params.LF_stab) {
@@ -846,7 +902,7 @@ void ConsLaw<dim>::assemble_face_term(
 	  break;
   }
 
-  LFNumFlux<fad_double, dim>(nflux, fe_v.get_quadrature_points(), normals, Wplus, Wminus,
+  LFNumFlux<Sacado::Fad::DFad<double>, dim>(nflux, fe_v.get_quadrature_points(), normals, Wplus, Wminus,
 			     alpha);
 
 				   // Now assemble the face term
@@ -1141,14 +1197,14 @@ ConsLaw<dim>::ConsLaw ()
                 is_stationary(false),
                 Map(NULL),
                 Matrix(NULL),
-                theta(0.5)
+                theta(0.5) 
 {}
 
 				 // At one time this example could work for both DG and
 				 // continuous finite elements.  The choice was made here.
 template <int dim>
 void ConsLaw<dim>::build_fe() {
-  fe_ptr = new FESystem<dim>(FE_Q<dim>(1), N_COMP);
+  fe_ptr = new FESystem<dim>(FE_Q<dim>(1), n_components<dim>());
 }
 
 				 // Bye bye Conservation law.
@@ -1216,7 +1272,7 @@ void ConsLaw<dim>::setup_system ()
                                    // but is needed.  In parallel, this would desribe
                                    // the parallel dof layout.
   if (Map) delete Map;
-  Map  = new Epetra_Map(dof_handler.n_dofs(), 0, *Comm);
+  Map  = new Epetra_Map(dof_handler.n_dofs(), 0, communicator);
 
                                    // Epetra can build a more efficient matrix if
                                    // one knows ahead of time the maximum number of
@@ -1262,7 +1318,7 @@ void ConsLaw<dim>::setup_system ()
 
                                  // @sect3{Solving the linear system}
                                  // Actually solve the linear system, using either
-                                 // Aztec of Amesos.
+                                 // Aztec or Amesos.
 template <int dim>
 void ConsLaw<dim>::solve (Vector<double> &dsolution, int &niter, double &lin_residual) 
 {
@@ -1394,11 +1450,11 @@ void ConsLaw<dim>::postprocess() {
     mapping, *fe_ptr, unit_support, update_flags1);
 
   std::vector<Vector<double> > U(n_uq_points,
-                                 Vector<double>(get_n_components()));
+                                 Vector<double>(n_components<dim>()));
   std::vector<Vector<double> > UU(n_q_points,
-				  Vector<double>(get_n_components()));
+				  Vector<double>(n_components<dim>()));
   std::vector<std::vector<Tensor<1,dim> > > dU(n_uq_points,
-					       std::vector<Tensor<1,dim> >(get_n_components()));
+					       std::vector<Tensor<1,dim> >(n_components<dim>()));
   
   typename DoFHandler<dim>::active_cell_iterator
     cell = dof_handler.begin_active(),
@@ -1415,8 +1471,8 @@ void ConsLaw<dim>::postprocess() {
     fe_v.get_function_values(solution, UU);
 
     for (unsigned int q = 0; q < fe_v.get_fe().base_element(0).n_dofs_per_cell(); q++) {
-      unsigned int didx = fe_v.get_fe().component_to_system_index(DENS_IDX, q);
-      unsigned int eidx = fe_v.get_fe().component_to_system_index(ENERGY_IDX, q);
+      unsigned int didx = fe_v.get_fe().component_to_system_index(density_component<dim>(), q);
+      unsigned int eidx = fe_v.get_fe().component_to_system_index(energy_component<dim>(), q);
       double rho_normVsqr = 0;
       for (unsigned int d = 0; d < dim; d++) {
         unsigned int vidx = fe_v.get_fe().component_to_system_index(d, q);
@@ -1425,7 +1481,7 @@ void ConsLaw<dim>::postprocess() {
       }
       rho_normVsqr /= solution(dofs[didx]);
 				       // Pressure
-      ppsolution(dofs[eidx]) = (GAMMA-1.0)*(solution(dofs[eidx]) - 0.5*rho_normVsqr);
+      ppsolution(dofs[eidx]) = (gas_gamma-1.0)*(solution(dofs[eidx]) - 0.5*rho_normVsqr);
 
 				       // Either output density or gradient squared of density,
 				       // depending on what the user wants.
@@ -1433,7 +1489,7 @@ void ConsLaw<dim>::postprocess() {
         ppsolution(dofs[didx]) = solution(dofs[didx]);
       } else {
         double ng = 0;
-        for (unsigned int i = 0; i < dim; i++) ng += dU[q][DENS_IDX][i]*dU[q][DENS_IDX][i];
+        for (unsigned int i = 0; i < dim; i++) ng += dU[q][density_component<dim>()][i]*dU[q][density_component<dim>()][i];
         ng = std::sqrt(ng);
         ppsolution(dofs[didx]) = ng;
       }
@@ -1464,9 +1520,9 @@ void ConsLaw<dim>::estimate() {
     mapping, *fe_ptr, quadrature_formula, update_flags);
 
   std::vector<Vector<double> > U(n_q_points,
-                                 Vector<double>(get_n_components()));
+                                 Vector<double>(n_components<dim>()));
   std::vector<std::vector<Tensor<1,dim> > > dU(n_q_points,
-					       std::vector<Tensor<1,dim> >(get_n_components()));
+					       std::vector<Tensor<1,dim> >(n_components<dim>()));
   
   typename DoFHandler<dim>::active_cell_iterator
     cell = dof_handler.begin_active(),
@@ -1480,7 +1536,7 @@ void ConsLaw<dim>::estimate() {
     indicator(cell_no) = 0;
     for (unsigned int q = 0; q < n_q_points; q++) {
       double ng = 0;
-      for (unsigned int d = 0; d < dim; d++) ng += dU[q][DENS_IDX][d]*dU[q][DENS_IDX][d];
+      for (unsigned int d = 0; d < dim; d++) ng += dU[q][density_component<dim>()][d]*dU[q][density_component<dim>()][d];
 
       indicator(cell_no) += std::log(1+std::sqrt(ng));
       
@@ -1604,7 +1660,7 @@ void ConsLaw<dim>::output_results (const unsigned int cycle) const
 				 // leave a detailed explanation of these 
 				 // parameters to our description of the input
 				 // sample file.
-const UInt MAX_BD = 10;
+const unsigned int MAX_BD = 10;
 template <int dim>
 void ConsLaw<dim>::declare_parameters() {
 
@@ -1642,7 +1698,7 @@ void ConsLaw<dim>::declare_parameters() {
 		      "<true|false>");
 				     // declare a slot for each of the conservative
 				     // variables.
-    for (unsigned int di = 0; di < N_COMP; di++) {
+    for (unsigned int di = 0; di < n_components<dim>(); di++) {
       char var[512];
       std::sprintf(var, "w_%d", di);
       prm.declare_entry(var, "outflow",
@@ -1662,7 +1718,7 @@ void ConsLaw<dim>::declare_parameters() {
 
 				   // Initial condition block.
   prm.enter_subsection("initial condition");
-  for (unsigned int di = 0; di < N_COMP; di++) {
+  for (unsigned int di = 0; di < n_components<dim>(); di++) {
     char var[512];
     std::sprintf(var, "w_%d", di);
       
@@ -1783,11 +1839,11 @@ void ConsLaw<dim>::load_parameters(const char *infile){
 
 				   // The boundary info
   for (unsigned int b = 0; b < MAX_BD; b++) {
-    std::vector<bc_type> flags(N_COMP, OUTFLOW_BC);
+    std::vector<bc_type> flags(n_components<dim>(), OUTFLOW_BC);
 
 				     // Define a parser for every boundary, though it may be
 				     // unused.
-    SideCondition<dim> *sd = new SideCondition<dim>(N_COMP);
+    SideCondition<dim> *sd = new SideCondition<dim>(n_components<dim>());
     char bd[512];
     std::sprintf(bd, "boundary_%d", b);
     prm.enter_subsection(bd);
@@ -1795,7 +1851,7 @@ void ConsLaw<dim>::load_parameters(const char *infile){
     const std::string &nopen = prm.get("no penetration");
 
 				     // Determine how each component is handled.
-    for (unsigned int di = 0; di < N_COMP; di++) {
+    for (unsigned int di = 0; di < n_components<dim>(); di++) {
       char var[512];
       std::sprintf(var, "w_%d", di);
       std::string btype = prm.get(var);
@@ -1821,7 +1877,7 @@ void ConsLaw<dim>::load_parameters(const char *infile){
 
 				   // Initial conditions.
   prm.enter_subsection("initial condition");
-  for (unsigned int di = 0; di < N_COMP; di++) {
+  for (unsigned int di = 0; di < n_components<dim>(); di++) {
     char var[512];
 
     std::sprintf(var, "w_%d value", di);
@@ -2051,9 +2107,6 @@ void ConsLaw<dim>::run ()
 				 // need not to be commented on.
 int main (int argc, char *argv[]) 
 {
-
-  Comm = new Epetra_SerialComm();
-
   if (argc != 2) {
     std::cout << "Usage:" << argv[0] << " infile" << std::endl;
     std::exit(1);
