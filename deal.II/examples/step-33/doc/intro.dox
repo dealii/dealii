@@ -34,16 +34,21 @@ with the solution $\mathbf{w}=(\rho v_1,\ldots,\rho v_d,\rho,
 E)^{\top}$ consisting of $\rho$ the fluid density, ${\mathbf v}=(v_1,\ldots v_d)^T$ the
 flow velocity (and thus $\rho\mathbf v$ being the linear momentum
 density), and 
-$E$ the energy density of the gas.  The flux matrix $\mathbf F$ (or system of flux functions)
+$E$ the energy density of the gas. We interpret the equations above as
+$\partial_t \mathbf{w}_i + \nabla \cdot \mathbf{F}_i(\mathbf{w}) = 0$, $i=1,\ldots,dim+2$.
+
+For the Euler equations, the flux matrix $\mathbf F$ (or system of flux functions)
 is defined as (shown here for the case $d=3$)
 @f{eqnarray*}
   \mathbf F
   =
   \left(
   \begin{array}{ccc}
-    \rho v_1^2+p & \rho v_2v_1  & \rho v_3v_1  & \rho v_1 & (E+p)v_1 \\
-    \rho v_1v_2  & \rho v_2^2+p & \rho v_3v_2  & \rho v_2 & (E+p)v_2 \\
-    \rho v_1v_3  & \rho v_2v_3  & \rho v_3^2+p & \rho v_3 & (E+p)v_3
+    \rho v_1^2+p & \rho v_2v_1  & \rho v_3v_1 \\
+    \rho v_1v_2  & \rho v_2^2+p & \rho v_3v_2 \\
+    \rho v_1v_3  & \rho v_2v_3  & \rho v_3^2+p \\
+    \rho v_1 & \rho v_2 & \rho v_3 \\
+    (E+p) v_1 & (E+p) v_2 & (E+p) v_3
   \end{array}
   \right),
 @f}
