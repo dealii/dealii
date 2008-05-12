@@ -30,20 +30,32 @@ a basic system of conservation laws. In spatial dimension $d$ they read
 @f[
 \partial_t \mathbf{w} + \nabla \cdot \mathbf{F}(\mathbf{w}) = \mathbf{0},
 @f]
-with the solution $\mathbf{w}=(\rho,\rho v_1,\ldots,\rho v_d,
+with the solution $\mathbf{w}=(\rho v_1,\ldots,\rho v_d,\rho,
 E)^{\top}$ consisting of $\rho$ the fluid density, ${\mathbf v}=(v_1,\ldots v_d)^T$ the
 flow velocity (and thus $\rho\mathbf v$ being the linear momentum
 density), and 
 $E$ the energy density of the gas.  The flux matrix $\mathbf F$ (or system of flux functions)
-is defined such that the entire system of equations are
+is defined as (shown here for the case $d=3$)
+@f{eqnarray*}
+  \mathbf F
+  =
+  \left(
+  \begin{array}{ccc}
+    \rho v_1^2+p & \rho v_2v_1  & \rho v_3v_1  & \rho v_1 & (E+p)v_1 \\
+    \rho v_1v_2  & \rho v_2^2+p & \rho v_3v_2  & \rho v_2 & (E+p)v_2 \\
+    \rho v_1v_3  & \rho v_2v_3  & \rho v_3^2+p & \rho v_3 & (E+p)v_3
+  \end{array}
+  \right),
+@f}
+such that the entire system of equations reads:
 @f{eqnarray*}
   \partial_t \rho + \sum_{s=1}^d \frac{\partial(\rho v_s)}{\partial x_s} &=& 0,  \\
   \partial_t (\rho v_i) + \sum_{s=1}^d \frac{\partial(\rho v_i v_s +
   \delta_{is} p)}{\partial x_s} &=& 0, \qquad i=1,\dots,d, \\
   \partial_t E + \sum_{s=1}^d \frac{\partial((E+p)v_s)}{\partial x_s} &=& 0.
 @f}
-These equations describe, respectively, the conservation of mass,
-momentum, and energy.
+These equations describe, respectively, the conservation of momentum,
+mass, and energy.
 The system is closed by a relation that defines the pressure: $p =
 (\gamma -1)(E-\frac{1}{2} \rho |\mathbf v|^2)$. For the constituents
 of air (mainly nitrogen and oxygen) and other diatomic gases, the ratio of

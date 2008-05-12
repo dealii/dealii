@@ -157,54 +157,80 @@ struct EulerEquations
 				   // and $O_2$.
     static const double gas_gamma;
 
-				     // We define the flux function $F(W)$ as one large
-				     // matrix.  Each row of this matrix
-				     // represents a scalar conservation law for
-				     // the component in that row.  We templatize
-				     // the numerical type of the flux function so
+				     // We define the flux function
+				     // $F(W)$ as one large matrix.
+				     // Each row of this matrix
+				     // represents a scalar
+				     // conservation law for the
+				     // component in that row.  The
+				     // exact form of this matrix is
+				     // given in the introduction.
+				     //
+				     // We templatize the numerical
+				     // type of the flux function so
 				     // that we may use the automatic
-				     // differentiation type here.  The flux
-				     // functions are defined in terms of the
-				     // conserved variables $\rho w_0, \dots, \rho
-				     // w_{d-1}, \rho, E$, so they do not look
-				     // exactly like the Euler equations one is
-				     // used to seeing.  We evaluate the flux at a
-				     // single quadrature point.
+				     // differentiation type here.
+				     // The flux functions are defined
+				     // in terms of the conserved
+				     // variables $\rho w_0, \dots,
+				     // \rho w_{d-1}, \rho, E$, so
+				     // they do not look exactly like
+				     // the Euler equations one is
+				     // used to seeing.  We evaluate
+				     // the flux at a single
+				     // quadrature point.
     template <typename number>
     static
-    void flux_matrix(number (&flux)[n_components][dim],
-		     const std::vector<number> &W)
+    void flux_matrix (const std::vector<number> &W,
+		      number (&flux)[n_components][dim])
       {
-
-					 // Pressure is a dependent variable: $p = 
-					 // (\gas_gamma - 1)(E-\frac{1}{2} \rho |v|^2)$.
-	number rho_normVsqr;
+					 // First compute the pressure
+					 // that appears in the flux
+					 // matrix, based on the
+					 // energy density and the
+					 // kinetic energy $\frac 12
+					 // \rho |\mathbf v|^2 =
+					 // \frac{|\rho \mathbf
+					 // v|^2}{2\rho}$ (note that
+					 // the independent variables
+					 // contain the momentum
+					 // components $\rho v_i$, not
+					 // the velocities $v_i$):
+	number kinetic_energy = 0;
 	for (unsigned int d=0; d<dim; ++d)
-	  rho_normVsqr += W[d]*W[d];
-					 // Since W are $\rho v$, we
-					 // get a $\rho^2$ in the
-					 // numerator, so dividing a
-					 // $\rho$ out gives the
-					 // desired $ \rho |v|^2$.
-	rho_normVsqr /= W[density_component];
+	  kinetic_energy += W[first_momentum_component+d] *
+			    W[first_momentum_component+d];
+	kinetic_energy *= 1./(2 * W[density_component]);
+	
+	const number pressure = (gas_gamma-1.0)*(W[energy_component] - kinetic_energy);
 
-	number pressure = (gas_gamma-1.0)*(W[energy_component] - number(0.5)*(rho_normVsqr));
-
-					 // We compute the momentum terms.  We divide by the
-					 // density here to get $v_i \rho v_j$
-	for (unsigned int d = 0; d < dim; d++)
+					 // Then compute the first
+					 // <code>dim</code> columns
+					 // of the matrix that
+					 // correspond to the momentum
+					 // terms:
+	for (unsigned int d=0; d<dim; ++d)
 	  {
-	    for (unsigned int d1 = 0; d1 < dim; d1++)
-	      flux[d][d1] = W[d]*W[d1]/W[density_component];
+	    for (unsigned int e=0; e<dim; ++e)
+	      flux[first_momentum_component+d][e] = W[first_momentum_component+d] *
+						    W[first_momentum_component+e] /
+						    W[density_component];
 	  
-					     // The pressure contribution, along the diagonal:
-	    flux[d][d] += pressure;
-					     // Advection/conservation of density:
-	    flux[density_component][d] = W[d]; 
-					     // And, lastly, conservation of energy.
-	    flux[energy_component][d] = W[d]/W[density_component]*
-					(W[energy_component] + pressure); // energy
+	    flux[first_momentum_component+d][d] += pressure;
 	  }
+	
+					 // Then the terms for the
+					 // density (i.e. mass
+					 // conservation):
+	for (unsigned int d=0; d<dim; ++d)
+	  flux[density_component][d] = W[first_momentum_component+d]; 
+
+					 // And, lastly, conservation
+					 // of energy:
+	for (unsigned int d=0; d<dim; ++d)
+	  flux[energy_component][d] = W[first_momentum_component+d] /
+				      W[density_component] *
+				      (W[energy_component] + pressure);
       }
 
 
@@ -214,32 +240,25 @@ struct EulerEquations
 				     // $\alpha$.
     template <typename number>
     static
-    void LFNumFlux(std::vector<std::vector<Sacado::Fad::DFad<double> > > &nflux,
-		   const std::vector<Point<dim> > &points, 
-		   const std::vector<Point<dim> > &normals,
-		   const std::vector<std::vector<number> > &Wplus,
-		   const std::vector<std::vector<number> > &Wminus,
-		   double alpha)
+    void numerical_normal_flux(const Point<dim> &normal,
+			       const std::vector<number> &Wplus,
+			       const std::vector<number> &Wminus,
+			       const double alpha,
+			       Sacado::Fad::DFad<double> (&normal_flux)[n_components])
       {
-	const unsigned int n_q_points = points.size();
-      
-					 // We evaluate the flux at each of the quadrature points.
-	for (unsigned int q = 0; q < n_q_points; q++)
+	Sacado::Fad::DFad<double> iflux[n_components][dim];
+	Sacado::Fad::DFad<double> oflux[n_components][dim];
+	  
+	flux_matrix(Wplus, iflux);
+	flux_matrix(Wminus, oflux);
+	  
+	for (unsigned int di=0; di<n_components; ++di)
 	  {
-	    Sacado::Fad::DFad<double> iflux[n_components][dim];
-	    Sacado::Fad::DFad<double> oflux[n_components][dim];
-	  
-	    flux_matrix(iflux, Wplus[q]);
-	    flux_matrix(oflux, Wminus[q]);
-	  
-	    for (unsigned int di=0; di<n_components; ++di)
-	      {
-		nflux[q][di] = 0;
-		for (unsigned int d=0; d<dim; ++d) 
-		  nflux[q][di] += 0.5*(iflux[di][d] + oflux[di][d])*normals[q](d);
+	    normal_flux[di] = 0;
+	    for (unsigned int d=0; d<dim; ++d) 
+	      normal_flux[di] += 0.5*(iflux[di][d] + oflux[di][d]) * normal(d);
 	      
-		nflux[q][di] += 0.5*alpha*(Wplus[q][di] - Wminus[q][di]);
-	      }
+	    normal_flux[di] += 0.5*alpha*(Wplus[di] - Wminus[di]);
 	  }
     }
 };
@@ -662,7 +681,7 @@ void ConsLaw<dim>::assemble_cell_term(
   FluxMatrix *flux = new FluxMatrix[n_q_points];
   
   for (unsigned int q=0; q < n_q_points; ++q)
-    EulerEquations<dim>::flux_matrix(flux[q], Wcn[q]);
+    EulerEquations<dim>::flux_matrix(Wcn[q], flux[q]);
   
 
 				   // We now have all of the function values/grads/fluxes,
@@ -900,7 +919,9 @@ void ConsLaw<dim>::assemble_face_term(
    
 				   // Determine the Lax-Friedrich's stability parameter,
 				   // and evaluate the numerical flux function at the quadrature points
-  std::vector<std::vector<Sacado::Fad::DFad<double> > > nflux(n_q_points, std::vector<Sacado::Fad::DFad<double> >(EulerEquations<dim>::n_components, 0));
+  typedef Sacado::Fad::DFad<double> NormalFlux[EulerEquations<dim>::n_components];
+  NormalFlux *normal_fluxes = new NormalFlux[n_q_points];
+
   double alpha = 1;
 
   switch(flux_params.LF_stab) {
@@ -912,43 +933,46 @@ void ConsLaw<dim>::assemble_face_term(
 	  break;
   }
 
-  EulerEquations<dim>::LFNumFlux(nflux, fe_v.get_quadrature_points(), normals, Wplus, Wminus,
-			     alpha);
+  for (unsigned int q=0; q<n_q_points; ++q)
+    EulerEquations<dim>::numerical_normal_flux(normals[q], Wplus[q], Wminus[q], alpha,
+					       normal_fluxes[q]);
 
 				   // Now assemble the face term
-  for (unsigned int i=0; i<fe_v.dofs_per_cell; ++i) {
-    if (!fe_v.get_fe().has_support_on_face(i, face_no)) continue;
-    F_i = 0;
-    for (unsigned int point=0; point<n_q_points; ++point)
-      {
-	const unsigned int
-	  component_i = fe_v.get_fe().system_to_component_index(i).first;
+  for (unsigned int i=0; i<fe_v.dofs_per_cell; ++i)
+    {
+      if (!fe_v.get_fe().has_support_on_face(i, face_no))
+	continue;
+      
+      F_i = 0;
+      for (unsigned int point=0; point<n_q_points; ++point)
+	{
+	  const unsigned int
+	    component_i = fe_v.get_fe().system_to_component_index(i).first;
+	  
+	  F_i += normal_fluxes[point][component_i] *
+		 fe_v.shape_value_component(i, point, component_i) *
+		 fe_v.JxW(point);
+	} 
 
-	F_i += nflux[point][component_i]*fe_v.shape_value_component(i, point, component_i)*fe_v.JxW(point);
+				       // Retrieve a pointer to the jacobian.
+      double *values = &(F_i.fastAccessDx(0));
+      Assert (values != 0, ExcInternalError());
 
-      } 
-
-				     // Retrieve a pointer to the jacobian.
-    double *values = &(F_i.fastAccessDx(0));
-
-				     // Honestly, I forget why this can happen, but 
-				     // for some reason it can!!
-    if (!values) continue;
-
-				     // Update the matrix.  Depending on whether there
-				     // is/isn't a neighboring cell, we add more/less
-				     // entries.
-    Matrix->SumIntoGlobalValues(dofs[i],
-				dofs_per_cell, &values[0], reinterpret_cast<int*>(&dofs[0]));
-    if (boundary < 0) {
+				       // Update the matrix.  Depending on whether there
+				       // is/isn't a neighboring cell, we add more/less
+				       // entries.
       Matrix->SumIntoGlobalValues(dofs[i],
-				  dofs_per_cell, &values[dofs_per_cell], reinterpret_cast<int*>(&dofs_neighbor[0]));
+				  dofs_per_cell, &values[0], reinterpret_cast<int*>(&dofs[0]));
+      if (boundary < 0) {
+	Matrix->SumIntoGlobalValues(dofs[i],
+				    dofs_per_cell, &values[dofs_per_cell], reinterpret_cast<int*>(&dofs_neighbor[0]));
+      }
+
+				       // And add into the residual
+      right_hand_side(dofs[i]) -= F_i.val();
     }
 
-				     // And add into the residual
-    right_hand_side(dofs[i]) -= F_i.val();
-  } 
-
+  delete[] normal_fluxes;
 }
                                  // @sect4{Assembling the whole system}
                                  // Now we put all of the assembly pieces together
