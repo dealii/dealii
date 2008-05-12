@@ -2,7 +2,7 @@
 //    $Id$
 //    Version: $Name$
 //
-//    Copyright (C) 1999, 2000, 2001, 2002, 2003, 2005, 2006 by the deal.II authors
+//    Copyright (C) 1999, 2000, 2001, 2002, 2003, 2005, 2006, 2008 by the deal.II authors
 //
 //    This file is subject to QPL and may not be  distributed
 //    without copyright and license information. Please refer
@@ -106,9 +106,11 @@ namespace GridOutFlags
 
   
   Gnuplot::Gnuplot (const bool write_cell_numbers,
-		    const unsigned int n_boundary_face_points) :
+		    const unsigned int n_boundary_face_points,
+		    const bool         curved_inner_cells) :
 		  write_cell_numbers (write_cell_numbers),
-		  n_boundary_face_points(n_boundary_face_points)
+		  n_boundary_face_points(n_boundary_face_points),
+		  curved_inner_cells(curved_inner_cells)
   {}
 
   

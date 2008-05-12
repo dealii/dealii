@@ -2,7 +2,7 @@
 //    $Id$
 //    Version: $Name$
 //
-//    Copyright (C) 1999, 2000, 2001, 2002, 2003, 2004, 2005, 2006, 2007 by the deal.II authors
+//    Copyright (C) 1999, 2000, 2001, 2002, 2003, 2004, 2005, 2006, 2007, 2008 by the deal.II authors
 //
 //    This file is subject to QPL and may not be  distributed
 //    without copyright and license information. Please refer
@@ -1020,7 +1020,8 @@ void GridOut::write_gnuplot (
       if (gnuplot_flags.write_cell_numbers)
 	out << "# cell " << cell << '\n';
 
-      if (mapping==0 || !cell->at_boundary())
+      if (mapping==0 ||
+	  (!cell->at_boundary() && !gnuplot_flags.curved_inner_cells))
 	{
 					   // write out the four sides
 					   // of this cell by putting
@@ -1051,7 +1052,7 @@ void GridOut::write_gnuplot (
 	    {
 	      const typename Triangulation<dim>::face_iterator
 		face = cell->face(face_no);
-	      if (face->at_boundary())
+	      if (face->at_boundary() || gnuplot_flags.curved_inner_cells)
 		{
 						   // compute offset
 						   // of quadrature
@@ -1149,7 +1150,8 @@ void GridOut::write_gnuplot (const Triangulation<dim> &tria,
       if (gnuplot_flags.write_cell_numbers)
 	out << "# cell " << cell << '\n';
 
-      if (mapping==0 || n_points==2 || !cell->has_boundary_lines())
+      if (mapping==0 || n_points==2 ||
+	  (!cell->has_boundary_lines() && !gnuplot_flags.curved_inner_cells))
 	{
 					   // front face
 	  out << cell->vertex(0)
@@ -1265,7 +1267,7 @@ void GridOut::write_gnuplot (const Triangulation<dim> &tria,
 
 		      const Point<dim> &v0=line->vertex(0),
 				       &v1=line->vertex(1);
-		      if (line->at_boundary())
+		      if (line->at_boundary() || gnuplot_flags.curved_inner_cells)
 			{
 							   // transform_real_to_unit_cell
 							   // could be
