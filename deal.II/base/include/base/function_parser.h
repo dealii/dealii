@@ -384,7 +384,19 @@ class FunctionParser : public Function<dim>
                      const ConstMap    &constants,
                      const bool time_dependent = false,
                      const bool use_degrees = false);
-  
+
+				     /**
+				      * A function that returns
+				      * default names for variables,
+				      * to be used in the first
+				      * argument of the initialize()
+				      * functions: it returns "x" in
+				      * 1d, "x,y" in 2d, and "x,y,z"
+				      * in 3d.
+				      */
+    static
+    std::string
+    default_variable_names ();
 
 				     /**
 				      * Return the value of the
@@ -458,6 +470,27 @@ class FunctionParser : public Function<dim>
                                       */
     unsigned int n_vars;
 };
+
+
+template <int dim>
+std::string
+FunctionParser<dim>::default_variable_names ()
+{
+  switch (dim)
+    {
+      case 1:
+	    return "x";
+      case 2:
+	    return "x,y";
+      case 3:
+	    return "x,y,z";
+      default:
+	    Assert (false, ExcNotImplemented());
+    }
+  return "";
+}
+
+	    
 
 DEAL_II_NAMESPACE_CLOSE
 

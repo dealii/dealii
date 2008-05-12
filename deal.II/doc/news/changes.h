@@ -147,6 +147,12 @@ inconvenience this causes.
 <h3>base</h3>
 
 <ol>
+<li> <p> New: The FunctionParser::default_variable_names() function returns
+default names for variables in the given space dimension. For example, in
+2d, this would be "x,y".
+<br>
+(WB 2008/05/12)
+</p> </li>
 
 <li> <p>New: ConvergenceTable::evaluate_convergence_rates has been incomplete
 for a long time. An implementation for reduction_rate and 
