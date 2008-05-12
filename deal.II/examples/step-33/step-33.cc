@@ -242,8 +242,8 @@ void LFNumFlux(
     std::vector<std::vector<Sacado::Fad::DFad<double> > > oflux(n_components<dim>(),
 						std::vector<Sacado::Fad::DFad<double> >(dim, 0));
 
-    Flux<number, dim>(iflux, points[q], Wplus[q]);
-    Flux<number, dim>(oflux, points[q], Wminus[q]);
+    Flux(iflux, points[q], Wplus[q]);
+    Flux(oflux, points[q], Wminus[q]);
 
     for (unsigned int di = 0; di < n_components<dim>(); di++) {
       nflux[q][di] = 0;
@@ -675,7 +675,7 @@ void ConsLaw<dim>::assemble_cell_term(
 												 std::vector<Sacado::Fad::DFad<double> >(dim, 0)));
 
   for (unsigned int q=0; q < n_q_points; ++q) {
-    Flux<Sacado::Fad::DFad<double>, dim>(flux[q], fe_v.get_quadrature_points()[q], Wcn[q]);
+    Flux(flux[q], fe_v.get_quadrature_points()[q], Wcn[q]);
   }
 
 				   // We now have all of the function values/grads/fluxes,
