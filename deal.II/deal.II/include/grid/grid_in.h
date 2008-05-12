@@ -278,7 +278,41 @@ class GridIn
     void read_xda (std::istream &in);
     
     				     /**
-				      * Read grid data from an msh file.
+				      * Read grid data from an msh
+				      * file.
+				      *
+				      * The text file read consists of
+				      * two blocks. The first lists
+				      * the positions of the mesh
+				      * nodes and has the format
+				      *
+				      * @pre
+				      * $NOD
+				      * <n>
+				      * 1 <x1> <y1> <z1>
+				      * 2 <x2> <y2> <z2>
+				      * ...
+				      * n <xn> <yn> <zn>
+				      * $ENDNOD
+				      *
+				      * The second block lists the
+				      * connectivity and material id's
+				      * of the cells and faces. It is
+				      * enclosed by <tt>$ELM</tt> and
+				      * <tt>$ENDELM</tt>
+				      * keywords. deal.II can handle
+				      * elements which are lines,
+				      * quadrilaterals or hexahedra
+				      * only. For convenience, element
+				      * type 15 (points) are ignored.
+				      *
+				      * @note The input function of
+				      * deal.II does not distinguish
+				      * between newline and other
+				      * whitespace. Therefore, deal.II
+				      * will be able to read files in
+				      * a slightly more general format
+				      * than Gmsh.
 				      */
     void read_msh (std::istream &in);
     
@@ -377,7 +411,8 @@ class GridIn
 		    << "ELM-TYPE\n"
 		    << "1 Line (2 nodes, 1 edge).\n"
 		    << "3 Quadrilateral (4 nodes, 4 edges).\n"
-		    << "5 Hexahedron (8 nodes, 12 edges, 6 faces).");
+		    << "5 Hexahedron (8 nodes, 12 edges, 6 faces)."
+		    << "15 Point (1 node, ignored when read)");
   protected:
 				     /**
 				      * Store address of the triangulation to

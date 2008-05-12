@@ -556,7 +556,7 @@ void GridIn<dim>::read_msh (std::istream &in)
   unsigned int dummy;
   std::string line;
   
-  getline(in, line);
+  in >> line;
 
   AssertThrow (line=="$NOD",
 	       ExcInvalidGMSHInput(line));
@@ -583,18 +583,15 @@ void GridIn<dim>::read_msh (std::istream &in)
 				       // store mapping;
       vertex_indices[vertex_number] = vertex;
     };
-  
-				   // This is needed to flush the last
-				   // new line
-  getline (in, line);
-  
-				   // Now read in next bit
-  getline (in, line);
+
+				   // Assert we reached the end of the block
+  in >> line;
   AssertThrow (line=="$ENDNOD",
 	       ExcInvalidGMSHInput(line));
 
   
-  getline (in, line);
+				   // Now read in next bit
+  in >> line;
   AssertThrow (line=="$ELM",
 	       ExcInvalidGMSHInput(line));
 
@@ -729,10 +726,19 @@ void GridIn<dim>::read_msh (std::istream &in)
 	      
 	    }
 	  else
-					     // cannot read this
-	    AssertThrow (false, ExcGmshUnsupportedGeometry(cell_type));
+	    if (cell_type == 15)
+	      {
+						 // Ignore vertices
+	      }
+	    else
+					       // cannot read this
+	      AssertThrow (false, ExcGmshUnsupportedGeometry(cell_type));
     };
 
+				   // Assert we reached the end of the block
+  in >> line;
+  AssertThrow (line=="$ENDELM",
+	       ExcInvalidGMSHInput(line));
   
 				   // check that no forbidden arrays are used
   Assert (subcelldata.check_consistency(dim), ExcInternalError());
