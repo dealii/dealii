@@ -213,6 +213,7 @@ struct EulerEquations
 				     // is the basic Lax-Friedrich's flux with a stabilization parameter
 				     // $\alpha$.
     template <typename number>
+    static
     void LFNumFlux(std::vector<std::vector<Sacado::Fad::DFad<double> > > &nflux,
 		   const std::vector<Point<dim> > &points, 
 		   const std::vector<Point<dim> > &normals,
@@ -280,8 +281,8 @@ class InitialCondition :  public FunctionParser<dim>
 
 template <int dim>
 InitialCondition<dim>::InitialCondition () :
-		FunctionParser<dim> (n_components<dim>()),
-                expressions(n_components<dim>(), "0.0")
+		FunctionParser<dim> (EulerEquations<dim>::n_components),
+                expressions(EulerEquations<dim>::n_components, "0.0")
 {}
 
 				 // Here we set up x,y,z as the variables that one should use in the input
@@ -577,11 +578,6 @@ void ConsLaw<dim>::assemble_cell_term(
   unsigned int /*cell_no*/
 ) 
 {
-				   // The residual for each row (i) will be accumulating 
-				   // into this fad variable.  At the end of the assembly
-				   // for this row, we will query for the sensitivities
-				   // to this variable and add them into the Jacobian.
-  Sacado::Fad::DFad<double> F_i;
   unsigned int dofs_per_cell = fe_v.dofs_per_cell;
   unsigned int n_q_points = fe_v.n_quadrature_points;
 
@@ -590,18 +586,18 @@ void ConsLaw<dim>::assemble_cell_term(
 
 				   // Values of the conservative variables at the quadrature points.
   std::vector<std::vector<Sacado::Fad::DFad<double> > > W (n_q_points,
-					    std::vector<Sacado::Fad::DFad<double> >(n_components<dim>()));
+					    std::vector<Sacado::Fad::DFad<double> >(EulerEquations<dim>::n_components));
 
 				   // Values at the last time step of the conservative variables.
 				   // Note that these do not use fad variables, since they do
 				   // not depend on the 'variables to be sought'=DOFS.
   std::vector<std::vector<double > > Wl (n_q_points,
-					 std::vector<double >(n_components<dim>()));
+					 std::vector<double >(EulerEquations<dim>::n_components));
 
 				   // Here we will hold the averaged values of the conservative
 				   // variables that we will linearize around (cn=Crank Nicholson).
   std::vector<std::vector<Sacado::Fad::DFad<double> > > Wcn (n_q_points,
-					      std::vector<Sacado::Fad::DFad<double> >(n_components<dim>()));
+					      std::vector<Sacado::Fad::DFad<double> >(EulerEquations<dim>::n_components));
 
 				   // Gradients of the current variables.  It is a
 				   // bit of a shame that we have to compute these; we almost don't.
@@ -609,13 +605,10 @@ void ConsLaw<dim>::assemble_cell_term(
 				   // the flux doesn't generally involve any gradients.  We do
 				   // need these, however, for the diffusion stabilization. 
   std::vector<std::vector<std::vector<Sacado::Fad::DFad<double> > > > Wgrads (n_q_points,
-							      std::vector<std::vector<Sacado::Fad::DFad<double> > >(n_components<dim>(),
+							      std::vector<std::vector<Sacado::Fad::DFad<double> > >(EulerEquations<dim>::n_components,
 												    std::vector<Sacado::Fad::DFad<double> >(dim)));
 
 
-  const std::vector<double> &JxW = fe_v.get_JxW_values ();
-
-  
 				   // Here is the magical point where we declare a subset
 				   // of the fad variables as degrees of freedom.  All 
 				   // calculations that reference these variables (either
@@ -633,7 +626,7 @@ void ConsLaw<dim>::assemble_cell_term(
 				   // fad types, only the local cell variables, we explicitly
 				   // code this loop;
   for (unsigned int q = 0; q < n_q_points; q++) {
-    for (unsigned int di = 0; di < n_components<dim>(); di++) {
+    for (unsigned int di = 0; di < EulerEquations<dim>::n_components; di++) {
       W[q][di] = 0;
       Wl[q][di] = 0;
       Wcn[q][di] = 0;
@@ -666,10 +659,10 @@ void ConsLaw<dim>::assemble_cell_term(
                                    // could be a rather large object, but for now it 
                                    // seems to work just fine.
   typedef Sacado::Fad::DFad<double> FluxMatrix[EulerEquations<dim>::n_components][dim];
-  std::vector<FluxMatrix> flux(n_q_points);
-
+  FluxMatrix *flux = new FluxMatrix[n_q_points];
+  
   for (unsigned int q=0; q < n_q_points; ++q)
-    flux_matrix(flux[q], Wcn[q]);
+    EulerEquations<dim>::flux_matrix(flux[q], Wcn[q]);
   
 
 				   // We now have all of the function values/grads/fluxes,
@@ -689,57 +682,63 @@ void ConsLaw<dim>::assemble_cell_term(
       const unsigned int
 	component_i = fe_v.get_fe().system_to_component_index(i).first;
 
-				       // Initialize the fad residual to zero (removes
-				       // any previous sensitivities.
-      F_i = 0;
+				       // The residual for each row (i) will be accumulating 
+				       // into this fad variable.  At the end of the assembly
+				       // for this row, we will query for the sensitivities
+				       // to this variable and add them into the Jacobian.
+      Sacado::Fad::DFad<double> F_i;
 
-				       // Loop quadrature points.
-      for (unsigned int point=0; point<fe_v.n_quadrature_points; ++point) {
+      for (unsigned int point=0; point<fe_v.n_quadrature_points; ++point)
+	{
+					   // Integrate the flux times gradient of the test function
+	  for (unsigned int d=0; d<dim; d++) 
+	    F_i -= flux[point][component_i][d] *
+		   fe_v.shape_grad_component(i, point, component_i)[d] *
+		   fe_v.JxW(point);
 
-	Sacado::Fad::DFad<double> fdotgv = 0;
+					   // The mass term (if the simulation is non-stationary).
+	  if (!is_stationary)
+	    F_i += 1.0/dT*(W[point][component_i] - Wl[point][component_i]) *
+		   fe_v.shape_value_component(i, point, component_i) *
+		   fe_v.JxW(point);
 
-					 // Integrate the flux times gradient of the test function
-	for (unsigned int d = 0; d < dim; d++) 
-	  fdotgv += flux[point][component_i][d]*fe_v.shape_grad_component(i, point, component_i)[d];
-           
-	F_i -= fdotgv*JxW[point];
-
-					 // The mass term (if the simulation is non-stationary).
-	Sacado::Fad::DFad<double> delta_t= 1.0/dT*(W[point][component_i] - Wl[point][component_i]);
-	if (!is_stationary) F_i += delta_t*
-				   fe_v.shape_value_component(i, point, component_i)*JxW[point];
-
-					 // Stabilization (cell wise diffusion)
-	Sacado::Fad::DFad<double> guv = 0;
-	for (unsigned int d = 0; d < dim; d++) {
-	  guv += fe_v.shape_grad_component(i, point, component_i)[d]*
-		 Wgrads[point][component_i][d];
-	}
-
-	F_i += 1.0*std::pow(cell_diameter, diffusion_power)*guv*JxW[point];
+					   // Stabilization (cell wise diffusion)
+	  for (unsigned int d = 0; d < dim; d++)
+	    F_i += 1.0*std::pow(cell_diameter, diffusion_power) *
+		   fe_v.shape_grad_component(i, point, component_i)[d] *
+		   Wgrads[point][component_i][d] *
+		   fe_v.JxW(point);
           
-					 // The gravity component only enters into the energy 
-					 // equation and into the vertical component of the 
-					 // velocity.
-	if (component_i == dim - 1) {
-	  F_i += gravity*Wcn[point][density_component<dim>()]*fe_v.shape_value_component(i,point, component_i)*JxW[point];
-	} else if (component_i == energy_component<dim>()) {
-	  F_i += gravity*Wcn[point][density_component<dim>()]*Wcn[point][dim-1]*
-		 fe_v.shape_value_component(i,point, component_i)*JxW[point];
+					   // The gravity component only enters into the energy 
+					   // equation and into the vertical component of the 
+					   // velocity.
+	  if (component_i == dim - 1)
+	    F_i += gravity *
+		   Wcn[point][EulerEquations<dim>::density_component] *
+		   fe_v.shape_value_component(i,point, component_i) *
+		   fe_v.JxW(point);
+	  else if (component_i == EulerEquations<dim>::energy_component)
+	    F_i += gravity *
+		   Wcn[point][EulerEquations<dim>::density_component] *
+		   Wcn[point][dim-1] *
+		   fe_v.shape_value_component(i,point, component_i) *
+		   fe_v.JxW(point);
 	}
-      } // for q
 
 				       // Here we gain access to the array of sensitivities
 				       // of the residual.  We then sum these into the
 				       // Epetra matrix.
       double *values = &(F_i.fastAccessDx(0));
       Matrix->SumIntoGlobalValues(dofs[i],
-				  dofs_per_cell, &values[0], reinterpret_cast<int*>(&dofs[0]));
+				  dofs_per_cell,
+				  values,
+				  reinterpret_cast<int*>(&dofs[0]));
  
 				       // Add minus the residual to the right hand side.
       right_hand_side(dofs[i]) -= F_i.val();
+    }
 
-    } // for i
+  delete[] flux;
 }
 				 // @sect4{%Function: assemble_face_term}
 				 // These are either
@@ -771,12 +770,11 @@ void ConsLaw<dim>::assemble_face_term(
 				   // The conservative variables for this cell,
 				   // and for 
   std::vector<std::vector<Sacado::Fad::DFad<double> > > Wplus (n_q_points,
-						std::vector<Sacado::Fad::DFad<double> >(n_components<dim>()));
+						std::vector<Sacado::Fad::DFad<double> >(EulerEquations<dim>::n_components));
   std::vector<std::vector<Sacado::Fad::DFad<double> > > Wminus (n_q_points,
-						 std::vector<Sacado::Fad::DFad<double> >(n_components<dim>()));
+						 std::vector<Sacado::Fad::DFad<double> >(EulerEquations<dim>::n_components));
 
 
-  const std::vector<double> &JxW = fe_v.get_JxW_values ();
   const std::vector<Point<dim> > &normals = fe_v.get_normal_vectors ();
 
 
@@ -800,7 +798,7 @@ void ConsLaw<dim>::assemble_face_term(
 				   // Set the values of the local conservative variables.
 				   // Initialize all variables to zero.
   for (unsigned int q = 0; q < n_q_points; q++) {
-    for (unsigned int di = 0; di < n_components<dim>(); di++) {
+    for (unsigned int di = 0; di < EulerEquations<dim>::n_components; di++) {
       Wplus[q][di] = 0;
       Wminus[q][di] = 0;
     }
@@ -840,13 +838,13 @@ void ConsLaw<dim>::assemble_face_term(
 				     // and implicit values.  If a particular component is not
 				     // prescribed, the values evaluate to zero and are
 				     // ignored, below.
-    std::vector<Vector<double> > bvals(n_q_points, Vector<double>(n_components<dim>()));
+    std::vector<Vector<double> > bvals(n_q_points, Vector<double>(EulerEquations<dim>::n_components));
     bme->second.second->vector_value_list(fe_v.get_quadrature_points(), bvals);
 
 				     // We loop the quadrature points, and we treat each
 				     // component individualy.
     for (unsigned int q = 0; q < n_q_points; q++) {
-      for (unsigned int di = 0; di < n_components<dim>(); di++) {
+      for (unsigned int di = 0; di < EulerEquations<dim>::n_components; di++) {
 
 					 // An inflow/dirichlet type of boundary condition
         if (bme->second.first[di] == INFLOW_BC) {
@@ -863,8 +861,8 @@ void ConsLaw<dim>::assemble_face_term(
           Sacado::Fad::DFad<double> rho_vel_sqr = 0;
           Sacado::Fad::DFad<double> dens;
           
-          dens = bme->second.first[density_component<dim>()] == INFLOW_BC ? bvals[q](density_component<dim>()) :
-                 Wplus[q][density_component<dim>()];
+          dens = bme->second.first[EulerEquations<dim>::density_component] == INFLOW_BC ? bvals[q](EulerEquations<dim>::density_component) :
+                 Wplus[q][EulerEquations<dim>::density_component];
 
           for (unsigned int d=0; d < dim; d++) {
             if (bme->second.first[d] == INFLOW_BC)
@@ -875,7 +873,7 @@ void ConsLaw<dim>::assemble_face_term(
           rho_vel_sqr /= dens;
 					   // Finally set the energy value as determined by the
 					   // prescribed pressure and the other variables.
-          Wminus[q][di] = bvals[q](di)/(gas_gamma-1.0) +
+          Wminus[q][di] = bvals[q](di)/(EulerEquations<dim>::gas_gamma-1.0) +
 			  0.5*rho_vel_sqr;
 
         } else if (bme->second.first[di] == OUTFLOW_BC) {
@@ -902,7 +900,7 @@ void ConsLaw<dim>::assemble_face_term(
    
 				   // Determine the Lax-Friedrich's stability parameter,
 				   // and evaluate the numerical flux function at the quadrature points
-  std::vector<std::vector<Sacado::Fad::DFad<double> > > nflux(n_q_points, std::vector<Sacado::Fad::DFad<double> >(n_components<dim>(), 0));
+  std::vector<std::vector<Sacado::Fad::DFad<double> > > nflux(n_q_points, std::vector<Sacado::Fad::DFad<double> >(EulerEquations<dim>::n_components, 0));
   double alpha = 1;
 
   switch(flux_params.LF_stab) {
@@ -914,7 +912,7 @@ void ConsLaw<dim>::assemble_face_term(
 	  break;
   }
 
-  LFNumFlux<Sacado::Fad::DFad<double>, dim>(nflux, fe_v.get_quadrature_points(), normals, Wplus, Wminus,
+  EulerEquations<dim>::LFNumFlux(nflux, fe_v.get_quadrature_points(), normals, Wplus, Wminus,
 			     alpha);
 
 				   // Now assemble the face term
@@ -926,7 +924,7 @@ void ConsLaw<dim>::assemble_face_term(
 	const unsigned int
 	  component_i = fe_v.get_fe().system_to_component_index(i).first;
 
-	F_i += nflux[point][component_i]*fe_v.shape_value_component(i, point, component_i)*JxW[point];
+	F_i += nflux[point][component_i]*fe_v.shape_value_component(i, point, component_i)*fe_v.JxW(point);
 
       } 
 
@@ -1216,7 +1214,7 @@ ConsLaw<dim>::ConsLaw ()
 				 // continuous finite elements.  The choice was made here.
 template <int dim>
 void ConsLaw<dim>::build_fe() {
-  fe_ptr = new FESystem<dim>(FE_Q<dim>(1), n_components<dim>());
+  fe_ptr = new FESystem<dim>(FE_Q<dim>(1), EulerEquations<dim>::n_components);
 }
 
 				 // Bye bye Conservation law.
@@ -1462,11 +1460,11 @@ void ConsLaw<dim>::postprocess() {
     mapping, *fe_ptr, unit_support, update_flags1);
 
   std::vector<Vector<double> > U(n_uq_points,
-                                 Vector<double>(n_components<dim>()));
+                                 Vector<double>(EulerEquations<dim>::n_components));
   std::vector<Vector<double> > UU(n_q_points,
-				  Vector<double>(n_components<dim>()));
+				  Vector<double>(EulerEquations<dim>::n_components));
   std::vector<std::vector<Tensor<1,dim> > > dU(n_uq_points,
-					       std::vector<Tensor<1,dim> >(n_components<dim>()));
+					       std::vector<Tensor<1,dim> >(EulerEquations<dim>::n_components));
   
   typename DoFHandler<dim>::active_cell_iterator
     cell = dof_handler.begin_active(),
@@ -1483,8 +1481,8 @@ void ConsLaw<dim>::postprocess() {
     fe_v.get_function_values(solution, UU);
 
     for (unsigned int q = 0; q < fe_v.get_fe().base_element(0).n_dofs_per_cell(); q++) {
-      unsigned int didx = fe_v.get_fe().component_to_system_index(density_component<dim>(), q);
-      unsigned int eidx = fe_v.get_fe().component_to_system_index(energy_component<dim>(), q);
+      unsigned int didx = fe_v.get_fe().component_to_system_index(EulerEquations<dim>::density_component, q);
+      unsigned int eidx = fe_v.get_fe().component_to_system_index(EulerEquations<dim>::energy_component, q);
       double rho_normVsqr = 0;
       for (unsigned int d = 0; d < dim; d++) {
         unsigned int vidx = fe_v.get_fe().component_to_system_index(d, q);
@@ -1493,7 +1491,7 @@ void ConsLaw<dim>::postprocess() {
       }
       rho_normVsqr /= solution(dofs[didx]);
 				       // Pressure
-      ppsolution(dofs[eidx]) = (gas_gamma-1.0)*(solution(dofs[eidx]) - 0.5*rho_normVsqr);
+      ppsolution(dofs[eidx]) = (EulerEquations<dim>::gas_gamma-1.0)*(solution(dofs[eidx]) - 0.5*rho_normVsqr);
 
 				       // Either output density or gradient squared of density,
 				       // depending on what the user wants.
@@ -1501,7 +1499,7 @@ void ConsLaw<dim>::postprocess() {
         ppsolution(dofs[didx]) = solution(dofs[didx]);
       } else {
         double ng = 0;
-        for (unsigned int i = 0; i < dim; i++) ng += dU[q][density_component<dim>()][i]*dU[q][density_component<dim>()][i];
+        for (unsigned int i = 0; i < dim; i++) ng += dU[q][EulerEquations<dim>::density_component][i]*dU[q][EulerEquations<dim>::density_component][i];
         ng = std::sqrt(ng);
         ppsolution(dofs[didx]) = ng;
       }
@@ -1532,9 +1530,9 @@ void ConsLaw<dim>::estimate() {
     mapping, *fe_ptr, quadrature_formula, update_flags);
 
   std::vector<Vector<double> > U(n_q_points,
-                                 Vector<double>(n_components<dim>()));
+                                 Vector<double>(EulerEquations<dim>::n_components));
   std::vector<std::vector<Tensor<1,dim> > > dU(n_q_points,
-					       std::vector<Tensor<1,dim> >(n_components<dim>()));
+					       std::vector<Tensor<1,dim> >(EulerEquations<dim>::n_components));
   
   typename DoFHandler<dim>::active_cell_iterator
     cell = dof_handler.begin_active(),
@@ -1548,7 +1546,7 @@ void ConsLaw<dim>::estimate() {
     indicator(cell_no) = 0;
     for (unsigned int q = 0; q < n_q_points; q++) {
       double ng = 0;
-      for (unsigned int d = 0; d < dim; d++) ng += dU[q][density_component<dim>()][d]*dU[q][density_component<dim>()][d];
+      for (unsigned int d = 0; d < dim; d++) ng += dU[q][EulerEquations<dim>::density_component][d]*dU[q][EulerEquations<dim>::density_component][d];
 
       indicator(cell_no) += std::log(1+std::sqrt(ng));
       
@@ -1710,7 +1708,7 @@ void ConsLaw<dim>::declare_parameters() {
 		      "<true|false>");
 				     // declare a slot for each of the conservative
 				     // variables.
-    for (unsigned int di = 0; di < n_components<dim>(); di++) {
+    for (unsigned int di = 0; di < EulerEquations<dim>::n_components; di++) {
       char var[512];
       std::sprintf(var, "w_%d", di);
       prm.declare_entry(var, "outflow",
@@ -1730,7 +1728,7 @@ void ConsLaw<dim>::declare_parameters() {
 
 				   // Initial condition block.
   prm.enter_subsection("initial condition");
-  for (unsigned int di = 0; di < n_components<dim>(); di++) {
+  for (unsigned int di = 0; di < EulerEquations<dim>::n_components; di++) {
     char var[512];
     std::sprintf(var, "w_%d", di);
       
@@ -1851,11 +1849,11 @@ void ConsLaw<dim>::load_parameters(const char *infile){
 
 				   // The boundary info
   for (unsigned int b = 0; b < MAX_BD; b++) {
-    std::vector<bc_type> flags(n_components<dim>(), OUTFLOW_BC);
+    std::vector<bc_type> flags(EulerEquations<dim>::n_components, OUTFLOW_BC);
 
 				     // Define a parser for every boundary, though it may be
 				     // unused.
-    SideCondition<dim> *sd = new SideCondition<dim>(n_components<dim>());
+    SideCondition<dim> *sd = new SideCondition<dim>(EulerEquations<dim>::n_components);
     char bd[512];
     std::sprintf(bd, "boundary_%d", b);
     prm.enter_subsection(bd);
@@ -1863,7 +1861,7 @@ void ConsLaw<dim>::load_parameters(const char *infile){
     const std::string &nopen = prm.get("no penetration");
 
 				     // Determine how each component is handled.
-    for (unsigned int di = 0; di < n_components<dim>(); di++) {
+    for (unsigned int di = 0; di < EulerEquations<dim>::n_components; di++) {
       char var[512];
       std::sprintf(var, "w_%d", di);
       std::string btype = prm.get(var);
@@ -1889,7 +1887,7 @@ void ConsLaw<dim>::load_parameters(const char *infile){
 
 				   // Initial conditions.
   prm.enter_subsection("initial condition");
-  for (unsigned int di = 0; di < n_components<dim>(); di++) {
+  for (unsigned int di = 0; di < EulerEquations<dim>::n_components; di++) {
     char var[512];
 
     std::sprintf(var, "w_%d value", di);
