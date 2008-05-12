@@ -112,9 +112,10 @@ using namespace dealii;
 				 // structure to depend on the space
 				 // dimension, which we in our usual way
 				 // introduce using a template parameter:
-namespace EulerEquations
+template <int dim>
+struct EulerEquations
 {
-				   // First a few inline functions that
+				   // First a few variables that
 				   // describe the various components of our
 				   // solution vector in a generic way. This
 				   // includes the number of components in the
@@ -127,134 +128,128 @@ namespace EulerEquations
 				   // vector of the first momentum component,
 				   // the density component, and the energy
 				   // density component. Note that all these
-				   // numbers depend on the space dimension;
+				   // %numbers depend on the space dimension;
 				   // defining them in a generic way (rather
 				   // than by implicit convention) makes our
 				   // code more flexible and makes it easier
 				   // to later extend it, for example by
 				   // adding more components to the equations.
-  template <int dim>
-  inline
-  unsigned int n_components ()
-  {
-    return dim + 2;
-  }
+    static const unsigned int n_components             = dim + 2;
+    static const unsigned int first_momentum_component = 0;
+    static const unsigned int density_component        = dim;
+    static const unsigned int energy_component         = dim+1;
 
-  template <int dim>
-  inline
-  unsigned int first_momentum_component ()
-  {
-    return 0;
-  }
-
-  template <int dim>
-  inline
-  unsigned int density_component ()
-  {
-    return dim;
-  }
-
-  template <int dim>
-  inline
-  unsigned int energy_component ()
-  {
-    return dim+1;
-  }
-  
-
-				   // Next, we define the gas constant.  This
-				   // value is representative of a gas that
-				   // consists of molecules composed of two
-				   // atoms, such as air which consists up to
-				   // small traces almost entirely of $N_2$
+				   // Next, we define the gas
+				   // constant. We will set it to 1.4
+				   // in its definition immediately
+				   // following the declaration of
+				   // this class (unlike integer
+				   // variables, like the ones above,
+				   // static const floating point
+				   // member variables cannot be
+				   // initialized within the class
+				   // declaration in C++). This value
+				   // of 1.4 is representative of a
+				   // gas that consists of molecules
+				   // composed of two atoms, such as
+				   // air which consists up to small
+				   // traces almost entirely of $N_2$
 				   // and $O_2$.
-  const double gas_gamma = 1.4;
-}
+    static const double gas_gamma;
 
-using namespace EulerEquations;
+				     // We define the flux function $F(W)$ as one large
+				     // matrix.  Each row of this matrix
+				     // represents a scalar conservation law for
+				     // the component in that row.  We templatize
+				     // the numerical type of the flux function so
+				     // that we may use the automatic
+				     // differentiation type here.  The flux
+				     // functions are defined in terms of the
+				     // conserved variables $\rho w_0, \dots, \rho
+				     // w_{d-1}, \rho, E$, so they do not look
+				     // exactly like the Euler equations one is
+				     // used to seeing.  We evaluate the flux at a
+				     // single quadrature point.
+    template <typename number>
+    static
+    void flux_matrix(number (&flux)[n_components][dim],
+		     const std::vector<number> &W)
+      {
 
+					 // Pressure is a dependent variable: $p = 
+					 // (\gas_gamma - 1)(E-\frac{1}{2} \rho |v|^2)$.
+	number rho_normVsqr;
+	for (unsigned int d=0; d<dim; ++d)
+	  rho_normVsqr += W[d]*W[d];
+					 // Since W are $\rho v$, we
+					 // get a $\rho^2$ in the
+					 // numerator, so dividing a
+					 // $\rho$ out gives the
+					 // desired $ \rho |v|^2$.
+	rho_normVsqr /= W[density_component];
 
-				 // We define the flux functions as one large
-				 // matrix.  Each row of this matrix
-				 // represents a scalar conservation law for
-				 // the component in that row.  We template
-				 // the numerical type of the flux function so
-				 // that we may use the automatic
-				 // differentiation type here.  The flux
-				 // functions are defined in terms of the
-				 // conserved variables $\rho w_0, \dots, \rho
-				 // w_{d-1}, \rho, E$, so they do not look
-				 // exactly like the Euler equations one is
-				 // used to seeing.  We evaluate the flux at a
-				 // single quadrature point.
-template <int dim, typename number>
-void Flux(std::vector<std::vector<number> >  &flux, 
-          const Point<dim> &/*point*/,
-          const std::vector<number> &W)
-{
+	number pressure = (gas_gamma-1.0)*(W[energy_component] - number(0.5)*(rho_normVsqr));
 
-				   // Pressure is a dependent variable: $p = 
-				   // (\gas_gamma - 1)(E-\frac{1}{2} \rho |v|^2)$.
-  number rho_normVsqr;
-  for (unsigned int d0 = 0; d0 < dim; d0++)
-    rho_normVsqr += W[d0]*W[d0];
-				   // Since W are $\rho v$, we get a $\rho^2$ in the
-				   // numerator, so dividing a $\rho$ out gives the desired $ \rho |v|^2$.
-  rho_normVsqr /= W[density_component<dim>()];
-
-  number pressure = (gas_gamma-1.0)*(W[energy_component<dim>()] - number(0.5)*(rho_normVsqr));
-
-				   // We compute the momentum terms.  We divide by the
-				   // density here to get $v_i \rho v_j$
-  for (unsigned int d = 0; d < dim; d++) {
-    for (unsigned int d1 = 0; d1 < dim; d1++) {
-      flux[d][d1] = W[d]*W[d1]/W[density_component<dim>()];
-    }
-				     // The pressure contribution, along the diagonal:
-    flux[d][d] += pressure;
-				     // Advection/conservation of density:
-    flux[density_component<dim>()][d] = W[d]; 
-				     // And, lastly, conservation of energy.
-    flux[energy_component<dim>()][d] = W[d]/W[density_component<dim>()]*
-			  (W[energy_component<dim>()] + pressure); // energy
-  }
-}
-
-				 // On the boundaries of the domain and across `hanging nodes` we use
-				 // a numerical flux function to enforce boundary conditions.  This routine
-				 // is the basic Lax-Friedrich's flux with a stabilization parameter
-				 // $\alpha$.
-template <typename number, int dim>
-void LFNumFlux(
-  std::vector<std::vector<Sacado::Fad::DFad<double> > > &nflux,
-  const std::vector<Point<dim> > &points, 
-  const std::vector<Point<dim> > &normals,
-  const std::vector<std::vector<number> > &Wplus,
-  const std::vector<std::vector<number> > &Wminus,
-  double alpha)
-{
-  const unsigned int n_q_points = points.size();
-
-				   // We evaluate the flux at each of the quadrature points.
-  for (unsigned int q = 0; q < n_q_points; q++) {
-    std::vector<std::vector<Sacado::Fad::DFad<double> > > iflux(n_components<dim>(),
-						std::vector<Sacado::Fad::DFad<double> >(dim, 0));
-    std::vector<std::vector<Sacado::Fad::DFad<double> > > oflux(n_components<dim>(),
-						std::vector<Sacado::Fad::DFad<double> >(dim, 0));
-
-    Flux(iflux, points[q], Wplus[q]);
-    Flux(oflux, points[q], Wminus[q]);
-
-    for (unsigned int di = 0; di < n_components<dim>(); di++) {
-      nflux[q][di] = 0;
-      for (unsigned int d = 0; d < dim; d++) {
-        nflux[q][di] += 0.5*(iflux[di][d] + oflux[di][d])*normals[q](d);
+					 // We compute the momentum terms.  We divide by the
+					 // density here to get $v_i \rho v_j$
+	for (unsigned int d = 0; d < dim; d++)
+	  {
+	    for (unsigned int d1 = 0; d1 < dim; d1++)
+	      flux[d][d1] = W[d]*W[d1]/W[density_component];
+	  
+					     // The pressure contribution, along the diagonal:
+	    flux[d][d] += pressure;
+					     // Advection/conservation of density:
+	    flux[density_component][d] = W[d]; 
+					     // And, lastly, conservation of energy.
+	    flux[energy_component][d] = W[d]/W[density_component]*
+					(W[energy_component] + pressure); // energy
+	  }
       }
-      nflux[q][di] += 0.5*alpha*(Wplus[q][di] - Wminus[q][di]);
-    }
-  }
 
-}
+
+				     // On the boundaries of the domain and across hanging nodes we use
+				     // a numerical flux function to enforce boundary conditions.  This routine
+				     // is the basic Lax-Friedrich's flux with a stabilization parameter
+				     // $\alpha$.
+    template <typename number>
+    void LFNumFlux(std::vector<std::vector<Sacado::Fad::DFad<double> > > &nflux,
+		   const std::vector<Point<dim> > &points, 
+		   const std::vector<Point<dim> > &normals,
+		   const std::vector<std::vector<number> > &Wplus,
+		   const std::vector<std::vector<number> > &Wminus,
+		   double alpha)
+      {
+	const unsigned int n_q_points = points.size();
+      
+					 // We evaluate the flux at each of the quadrature points.
+	for (unsigned int q = 0; q < n_q_points; q++)
+	  {
+	    Sacado::Fad::DFad<double> iflux[n_components][dim];
+	    Sacado::Fad::DFad<double> oflux[n_components][dim];
+	  
+	    flux_matrix(iflux, Wplus[q]);
+	    flux_matrix(oflux, Wminus[q]);
+	  
+	    for (unsigned int di=0; di<n_components; ++di)
+	      {
+		nflux[q][di] = 0;
+		for (unsigned int d=0; d<dim; ++d) 
+		  nflux[q][di] += 0.5*(iflux[di][d] + oflux[di][d])*normals[q](d);
+	      
+		nflux[q][di] += 0.5*alpha*(Wplus[q][di] - Wminus[q][di]);
+	      }
+	  }
+    }
+};
+    
+
+template <int dim>
+const double EulerEquations<dim>::gas_gamma = 1.4;
+
+
+
+
 
 				 // @sect3{Initial and side condition parsing}
 				 // For the initial condition we use the expression parser function
@@ -670,13 +665,12 @@ void ConsLaw<dim>::assemble_cell_term(
                                    // this could be done in a better way, since this
                                    // could be a rather large object, but for now it 
                                    // seems to work just fine.
-  std::vector<std::vector<std::vector<Sacado::Fad::DFad<double> > > > flux(n_q_points, 
-							   std::vector<std::vector<Sacado::Fad::DFad<double> > >(n_components<dim>(),
-												 std::vector<Sacado::Fad::DFad<double> >(dim, 0)));
+  typedef Sacado::Fad::DFad<double> FluxMatrix[EulerEquations<dim>::n_components][dim];
+  std::vector<FluxMatrix> flux(n_q_points);
 
-  for (unsigned int q=0; q < n_q_points; ++q) {
-    Flux(flux[q], fe_v.get_quadrature_points()[q], Wcn[q]);
-  }
+  for (unsigned int q=0; q < n_q_points; ++q)
+    flux_matrix(flux[q], Wcn[q]);
+  
 
 				   // We now have all of the function values/grads/fluxes,
 				   // so perform the assembly.  We have an outer loop
