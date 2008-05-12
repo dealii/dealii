@@ -1817,12 +1817,13 @@ void ConsLaw<dim>::load_parameters(const char *infile){
 				   // Initial conditions.
   prm.enter_subsection("initial condition");
   {
-    std::vector<std::string> expressions;
+    std::vector<std::string> expressions (EulerEquations<dim>::n_components,
+					  "0.0");
     for (unsigned int di = 0; di < EulerEquations<dim>::n_components; di++)
       {
 	char var[512];
 	std::sprintf(var, "w_%d value", di);
-	expressions.push_back (prm.get(var));
+	expressions[di] = prm.get(var);
       }
     initial_conditions.initialize (FunctionParser<dim>::default_variable_names(),
 				   expressions,
