@@ -164,7 +164,21 @@ struct EulerEquations
 				     // conservation law for the
 				     // component in that row.  The
 				     // exact form of this matrix is
-				     // given in the introduction.
+				     // given in the
+				     // introduction. Note that we
+				     // know the size of the matrix:
+				     // it has as many rows as the
+				     // system has components, and
+				     // <code>dim</code> columns;
+				     // rather than using a FullMatrix
+				     // object for such a matrix
+				     // (which has a variable number
+				     // of rows and columns and must
+				     // therefore allocate memory on
+				     // the heap each time such a
+				     // matrix is created), we use a
+				     // rectangular array of numbers
+				     // right away.
 				     //
 				     // We templatize the numerical
 				     // type of the flux function so
@@ -176,9 +190,7 @@ struct EulerEquations
 				     // \rho w_{d-1}, \rho, E$, so
 				     // they do not look exactly like
 				     // the Euler equations one is
-				     // used to seeing.  We evaluate
-				     // the flux at a single
-				     // quadrature point.
+				     // used to seeing.
     template <typename number>
     static
     void flux_matrix (const std::vector<number> &W,
@@ -221,12 +233,12 @@ struct EulerEquations
 	
 					 // Then the terms for the
 					 // density (i.e. mass
-					 // conservation):
+					 // conservation), and,
+					 // lastly, conservation of
+					 // energy:
 	for (unsigned int d=0; d<dim; ++d)
 	  flux[density_component][d] = W[first_momentum_component+d]; 
 
-					 // And, lastly, conservation
-					 // of energy:
 	for (unsigned int d=0; d<dim; ++d)
 	  flux[energy_component][d] = W[first_momentum_component+d] /
 				      W[density_component] *
@@ -275,9 +287,13 @@ const double EulerEquations<dim>::gas_gamma = 1.4;
 
 
 				 // @sect3{Conservation Law class}
-				 // Here we define a Conservation Law class that helps group
-				 // operations and data for our Euler equations into a manageable
-				 // entity.  Functions will be described as their definitions appear.
+
+				 // Here we define a Conservation Law
+				 // class that helps group operations
+				 // and data for our Euler equations
+				 // into a manageable entity.  Member
+				 // functions will be described as
+				 // their definitions appear.
 template <int dim>
 class ConsLaw
 {
