@@ -251,12 +251,21 @@ tends not to slow the simulation to a halt.  This, of course, is purely a heuris
 if the author's advisor heard about it, the author would likely be exiled forever from the finite
  element error estimation community.
 
-<h3> Input Deck </h3>
+<h3>Input deck, initial and boundary conditions</h3>
 
 We use an input file deck to drive the simulation.  In this way, we can alter the boundary conditions
 and other important properties of the simulation without having to recompile.  For more information on 
 the format, look at the <a href="#Results">results section</a>, where we
 describe an example input file in more detail.
+
+In previous example programs, we have usually hard-coded the initial
+and boundary conditions. In this program, we instead use the
+expression parser class FunctionParser so that we can specify a
+generic expression in the input file and have it parsed at run time &mdash;
+this way, we can change initial conditions without the need to
+recompile the program. Consequently, no classes named
+InitialConditions or BoundaryConditions will be declared in the
+program below.
 
 
 

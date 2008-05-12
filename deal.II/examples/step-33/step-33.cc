@@ -234,13 +234,19 @@ struct EulerEquations
       }
 
 
-				     // On the boundaries of the domain and across hanging nodes we use
-				     // a numerical flux function to enforce boundary conditions.  This routine
-				     // is the basic Lax-Friedrich's flux with a stabilization parameter
-				     // $\alpha$.
+				     // On the boundaries of the
+				     // domain and across hanging
+				     // nodes we use a numerical flux
+				     // function to enforce boundary
+				     // conditions.  This routine is
+				     // the basic Lax-Friedrich's flux
+				     // with a stabilization parameter
+				     // $\alpha$. It's form has also
+				     // been given already in the
+				     // introduction:
     template <typename number>
     static
-    void numerical_normal_flux(const Point<dim> &normal,
+    void numerical_normal_flux(const Point<dim>          &normal,
 			       const std::vector<number> &Wplus,
 			       const std::vector<number> &Wminus,
 			       const double alpha,
@@ -268,127 +274,6 @@ template <int dim>
 const double EulerEquations<dim>::gas_gamma = 1.4;
 
 
-
-
-
-				 // @sect3{Initial and side condition parsing}
-				 // For the initial condition we use the expression parser function
-				 // object.
-template <int dim>
-class InitialCondition :  public FunctionParser<dim> 
-{
-  public:
-    InitialCondition ();
-    
-				     // This function should be called after parsing, but before using
-				     // the object.  It formalizes the expressions and initializes the
-				     // function parser with the appropriate expressions.
-    void Init();
-
-				     // During parsing we call this function as the initial condition
-				     // for one of the $\mathbf{w}$ variables is encountered.
-
-    void set_ic(int _row, std::string &expr) {
-      expressions[_row] = expr;
-    }
-
-    virtual void vector_value_list (const std::vector<Point<dim> > &points,
-				    std::vector<Vector<double> >   &value_list) const;
-  private:
-    std::vector<std::string> expressions;
-};
-
-template <int dim>
-InitialCondition<dim>::InitialCondition () :
-		FunctionParser<dim> (EulerEquations<dim>::n_components),
-                expressions(EulerEquations<dim>::n_components, "0.0")
-{}
-
-				 // Here we set up x,y,z as the variables that one should use in the input
-				 // deck to describe their initial condition.
-template<int dim>
-void InitialCondition<dim>::Init() {
-  std::map<std::string, double> constants;
-  constants["M_PI"] =  M_PI;
-  std::string variables = (dim == 2 ? "x,y" : "x,y,z");
-
-  FunctionParser<dim>::initialize(variables, expressions, constants);
-
-}
-
-template <int dim>
-void InitialCondition<dim>::vector_value_list (const std::vector<Point<dim> > &points,
-					       std::vector<Vector<double> >   &value_list) const 
-{
-  const unsigned int n_points = points.size();
-
-  Assert (value_list.size() == n_points, 
-	  ExcDimensionMismatch (value_list.size(), n_points));
-
-  for (unsigned int p=0; p<n_points; ++p)
-    InitialCondition<dim>::vector_value (points[p],
-					 value_list[p]);
-}
-
-				 // As above, we use the expression function parser for boundary conditions.
-template <int dim>
-class SideCondition :  public FunctionParser<dim> 
-{
-  public:
-    SideCondition (int ncomp);
-    ~SideCondition ();
-
-				     // As above.
-    void Init();
-				     // As above.
-    void set_coeff_row(int _row_n, std::string &expr);
-    
-    virtual void vector_value_list (const std::vector<Point<dim> > &points,
-				    std::vector<Vector<double> >   &value_list) const;
-  private:
-    std::vector<std::string> expressions;
-};
-
-template <int dim>
-SideCondition<dim>::SideCondition (int ncomp) :
-		FunctionParser<dim> (ncomp),
-                expressions(ncomp, "0.0")
-{
-}
-template <int dim>
-void SideCondition<dim>::set_coeff_row (int _row_n, std::string &expr) 
-{
-  expressions[_row_n] = expr;
-}
-
-template <int dim>
-void SideCondition<dim>::Init() {
-  std::map<std::string, double> constants;
-  constants["M_PI"] =  M_PI;
-  std::string variables = (dim == 2 ? "x,y" : "x,y,z");
-
-  FunctionParser<dim>::initialize(variables, expressions, constants);
-
-}
-
-template <int dim>
-SideCondition<dim>::~SideCondition () 
-{
-}
-
-template <int dim>
-void SideCondition<dim>::vector_value_list (const std::vector<Point<dim> > &points,
-					    std::vector<Vector<double> >   &value_list) const 
-{
-  const unsigned int n_points = points.size();
-
-  Assert (value_list.size() == n_points, 
-	  ExcDimensionMismatch (value_list.size(), n_points));
-
-  for (unsigned int p=0; p<n_points; ++p)
-    SideCondition<dim>::vector_value (points[p],
-				      value_list[p]);
-}
 				 // @sect3{Conservation Law class}
 				 // Here we define a Conservation Law class that helps group
 				 // operations and data for our Euler equations into a manageable
@@ -470,7 +355,7 @@ class ConsLaw
     ParameterHandler prm;
 				     // Name of the mesh to read in.
     string mesh;
-    InitialCondition<dim> ic;
+    FunctionParser<dim> initial_conditions;
 
 				     // Enums for the various supported boundary conditions.
     typedef enum {INFLOW_BC = 1, OUTFLOW_BC=2, NO_PENETRATION_BC=3, PRESSURE_BC=4} bc_type;
@@ -578,10 +463,8 @@ void ConsLaw<dim>::add_boundary(unsigned int bd,
 template <int dim>
 void ConsLaw<dim>::initialize() {
   VectorTools::interpolate(dof_handler,
-                           ic, solution);
-  VectorTools::interpolate(dof_handler,
-                           ic, nlsolution);
-
+                           initial_conditions, solution);
+  nlsolution = solution;
 }
 
 				 // @sect3{Assembly}
@@ -1228,6 +1111,7 @@ ConsLaw<dim>::ConsLaw ()
                 T(0),
                 dT(0.05),
                 TF(10),
+		initial_conditions (EulerEquations<dim>::n_components),
                 is_stationary(false),
                 Map(NULL),
                 Matrix(NULL),
@@ -1877,12 +1761,15 @@ void ConsLaw<dim>::load_parameters(const char *infile){
 
 				     // Define a parser for every boundary, though it may be
 				     // unused.
-    SideCondition<dim> *sd = new SideCondition<dim>(EulerEquations<dim>::n_components);
+    FunctionParser<dim> *sd = new FunctionParser<dim>(EulerEquations<dim>::n_components);
+
+    std::vector<std::string> expressions(EulerEquations<dim>::n_components, "0.0");
+    
     char bd[512];
     std::sprintf(bd, "boundary_%d", b);
     prm.enter_subsection(bd);
 
-    const std::string &nopen = prm.get("no penetration");
+    const std::string nopen = prm.get("no penetration");
 
 				     // Determine how each component is handled.
     for (unsigned int di = 0; di < EulerEquations<dim>::n_components; di++) {
@@ -1896,29 +1783,35 @@ void ConsLaw<dim>::load_parameters(const char *infile){
         flags[di] = NO_PENETRATION_BC;
       } else if (btype == "inflow") {
         flags[di] = INFLOW_BC;
-        sd->set_coeff_row(di, var_value);  
+        expressions[di] = var_value;
       } else if (btype == "pressure") {
         flags[di] = PRESSURE_BC;
-        sd->set_coeff_row(di, var_value);  
+        expressions[di] = var_value;
       }
     } 
     prm.leave_subsection();
 
 				     // Add the boundary condition to the law.
-    sd->Init();
+    sd->initialize (FunctionParser<dim>::default_variable_names(),
+		    expressions,
+		    std::map<std::string, double>());
     add_boundary(b, flags, sd);
   }
 
 				   // Initial conditions.
   prm.enter_subsection("initial condition");
-  for (unsigned int di = 0; di < EulerEquations<dim>::n_components; di++) {
-    char var[512];
-
-    std::sprintf(var, "w_%d value", di);
-    std::string var_value = prm.get(var);
-    ic.set_ic(di, var_value);  
+  {
+    std::vector<std::string> expressions;
+    for (unsigned int di = 0; di < EulerEquations<dim>::n_components; di++)
+      {
+	char var[512];
+	std::sprintf(var, "w_%d value", di);
+	expressions.push_back (prm.get(var));
+      }
+    initial_conditions.initialize (FunctionParser<dim>::default_variable_names(),
+				   expressions,
+				   std::map<std::string, double>());
   }
-  ic.Init();
   prm.leave_subsection();
 
 				   // The linear solver.
@@ -2138,13 +2031,18 @@ void ConsLaw<dim>::run ()
 
 				 // The following ``main'' function is
 				 // similar to previous examples and
-				 // need not to be commented on.
+				 // need not to be commented on. Note
+				 // that the program aborts if no
+				 // input file name is given on the
+				 // command line.
 int main (int argc, char *argv[]) 
 {
-  if (argc != 2) {
-    std::cout << "Usage:" << argv[0] << " infile" << std::endl;
-    std::exit(1);
-  }
+  if (argc != 2)
+    {
+      std::cout << "Usage:" << argv[0] << " infile" << std::endl;
+      std::exit(1);
+    }
+  
   try
     {
       ConsLaw<2> cons;
