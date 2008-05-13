@@ -2,7 +2,7 @@
 //    $Id$
 //    Version: $Name$
 //
-//    Copyright (C) 1999, 2000, 2001, 2002, 2003, 2004, 2005, 2006, 2007 by the deal.II authors
+//    Copyright (C) 1999, 2000, 2001, 2002, 2003, 2004, 2005, 2006, 2007, 2008 by the deal.II authors
 //
 //    This file is subject to QPL and may not be  distributed
 //    without copyright and license information. Please refer
@@ -1124,10 +1124,13 @@ MGTools::make_boundary_list(
                                    // immediately
   if (function_map.size() == 0)
     return;
-  
-  const unsigned int        n_components = DoFTools::n_components(dof);
-  const bool                fe_is_system = (n_components != 1);
 
+  const unsigned int n_components = DoFTools::n_components(dof);
+  const unsigned int n_levels = dof.get_tria().n_levels();
+  const bool          fe_is_system = (n_components != 1);
+  
+  AssertDimension (boundary_indices.size(), n_levels);
+  
 //    for (typename FunctionMap<dim>::type::const_iterator i=function_map.begin();
 //         i!=function_map.end(); ++i)
 //      Assert (n_components == i->second->n_components,

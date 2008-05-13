@@ -2,7 +2,7 @@
 //    $Id$
 //    Version: $Name$
 //
-//    Copyright (C) 2005, 2006, 2007 by the deal.II authors
+//    Copyright (C) 2005, 2006, 2007, 2008 by the deal.II authors
 //
 //    This file is subject to QPL and may not be  distributed
 //    without copyright and license information. Please refer
@@ -227,13 +227,15 @@ class MGTools
 				      * but since the multilevel
 				      * method does not have its own
 				      * right hand side, the function
-				      * values are igneored.
+				      * values are ignored.
 				      *
 				      * @arg <tt>boundary_indices</tt>
-				      * is a vector which contains
-				      * for each level all indices of
+				      * is a vector which on return
+				      * contains all indices of
 				      * boundary constraint degrees of
-				      * freedom.
+				      * freedom for each level. Its
+				      * length has to match the number
+				      * of levels.
 				      */
     template <int dim>
     static void make_boundary_list(
