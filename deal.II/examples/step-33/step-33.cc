@@ -306,7 +306,6 @@ class ConsLaw
     void load_parameters(const char *);
     
   private:
-    void build_fe();
     void setup_system ();
     void initialize_system ();
     void assemble_system (double &res_norm);
@@ -323,7 +322,7 @@ class ConsLaw
     const MappingQ1<dim> mapping;
     
     
-    FESystem<dim>        *fe_ptr;
+    FESystem<dim>        fe;
 
     DoFHandler<dim>      dof_handler;
 
@@ -348,10 +347,8 @@ class ConsLaw
     
   public:
 
-    void assemble_cell_term(const FEValues<dim>& fe_v,
-                            std::vector<unsigned int> &dofs,
-                            unsigned int cell_no
-    );
+    void assemble_cell_term (const FEValues<dim>             &fe_v,
+			     const std::vector<unsigned int> &dofs);
     
     void assemble_face_term(
       int face_no,
@@ -490,11 +487,8 @@ void ConsLaw<dim>::initialize() {
                                  // to the right hand side, and adding in the Jacobian
                                  // contributions.
 template <int dim>
-void ConsLaw<dim>::assemble_cell_term(
-  const FEValues<dim> &fe_v,
-  std::vector<unsigned int> &dofs,
-  unsigned int /*cell_no*/
-) 
+void ConsLaw<dim>::assemble_cell_term (const FEValues<dim>             &fe_v,
+				       const std::vector<unsigned int> &dofs) 
 {
   unsigned int dofs_per_cell = fe_v.dofs_per_cell;
   unsigned int n_q_points = fe_v.n_quadrature_points;
@@ -650,7 +644,7 @@ void ConsLaw<dim>::assemble_cell_term(
       Matrix->SumIntoGlobalValues(dofs[i],
 				  dofs_per_cell,
 				  values,
-				  reinterpret_cast<int*>(&dofs[0]));
+				  reinterpret_cast<int*>(const_cast<unsigned int*>(&dofs[0])));
  
 				       // Add minus the residual to the right hand side.
       right_hand_side(dofs[i]) -= F_i.val();
@@ -881,7 +875,6 @@ void ConsLaw<dim>::assemble_face_term(
 template <int dim>
 void ConsLaw<dim>::assemble_system (double &res_norm) 
 {
-  FESystem<dim> &fe = *fe_ptr;
   const unsigned int dofs_per_cell = dof_handler.get_fe().dofs_per_cell;
 
 				   // We track the dofs on this cell and (if necessary)
@@ -976,8 +969,7 @@ void ConsLaw<dim>::assemble_system (double &res_norm)
       cell_diameter = cell->diameter();
 
       assemble_cell_term(fe_v,
-                         dofs,
-                         cell_no);
+                         dofs);
 
                                        // We use the DG style loop through faces
                                        // to determine if we need to apply a
@@ -1120,7 +1112,7 @@ template <int dim>
 ConsLaw<dim>::ConsLaw ()
 		:
 		mapping (),
-                fe_ptr(NULL),
+                fe (FE_Q<dim>(1), EulerEquations<dim>::n_components),
 		dof_handler (triangulation),
 		quadrature (2),
 		face_quadrature (2),
@@ -1134,19 +1126,12 @@ ConsLaw<dim>::ConsLaw ()
                 theta(0.5) 
 {}
 
-				 // At one time this example could work for both DG and
-				 // continuous finite elements.  The choice was made here.
-template <int dim>
-void ConsLaw<dim>::build_fe() {
-  fe_ptr = new FESystem<dim>(FE_Q<dim>(1), EulerEquations<dim>::n_components);
-}
 
 				 // Bye bye Conservation law.
 template <int dim>
 ConsLaw<dim>::~ConsLaw () 
 {
   dof_handler.clear ();
-  delete fe_ptr;
 }
 
 				 // @sect3{Initialize System}
@@ -1162,7 +1147,7 @@ void ConsLaw<dim>::initialize_system ()
 				   // First we need to distribute the
 				   // DoFs.
   dof_handler.clear();
-  dof_handler.distribute_dofs (*fe_ptr);
+  dof_handler.distribute_dofs (fe);
   
                                    // Size all of the fields.
   solution.reinit (dof_handler.n_dofs());
@@ -1192,7 +1177,7 @@ void ConsLaw<dim>::setup_system ()
   sparsity_pattern.reinit (dof_handler.n_dofs(),
 			   dof_handler.n_dofs(),
 			   (GeometryInfo<dim>::faces_per_cell
-			    *GeometryInfo<dim>::subfaces_per_face+1)*fe_ptr->dofs_per_cell);
+			    *GeometryInfo<dim>::subfaces_per_face+1)*fe.dofs_per_cell);
   
                                    // Since the continuous sparsity pattern is
                                    // a subset of the DG one, and since we need
@@ -1369,7 +1354,7 @@ void ConsLaw<dim>::postprocess() {
 
   QGauss<dim>  quadrature_formula(4);
 
-  const std::vector<Point<dim> > &us = fe_ptr->base_element(0).get_unit_support_points();
+  const std::vector<Point<dim> > &us = fe.base_element(0).get_unit_support_points();
 
 
   Quadrature<dim>  unit_support(us);
@@ -1378,10 +1363,10 @@ void ConsLaw<dim>::postprocess() {
   int n_uq_points = unit_support.n_quadrature_points;
 
   FEValues<dim> fe_v (
-    mapping, *fe_ptr, quadrature_formula, update_flags);
+    mapping, fe, quadrature_formula, update_flags);
 
   FEValues<dim> fe_v_unit (
-    mapping, *fe_ptr, unit_support, update_flags1);
+    mapping, fe, unit_support, update_flags1);
 
   std::vector<Vector<double> > U(n_uq_points,
                                  Vector<double>(EulerEquations<dim>::n_components));
@@ -1451,7 +1436,7 @@ void ConsLaw<dim>::estimate() {
 
 
   FEValues<dim> fe_v (
-    mapping, *fe_ptr, quadrature_formula, update_flags);
+    mapping, fe, quadrature_formula, update_flags);
 
   std::vector<Vector<double> > U(n_q_points,
                                  Vector<double>(EulerEquations<dim>::n_components));
@@ -1522,7 +1507,7 @@ void ConsLaw<dim>::refine_grid ()
   triangulation.execute_coarsening_and_refinement ();
 
   dof_handler.clear();
-  dof_handler.distribute_dofs (*fe_ptr);
+  dof_handler.distribute_dofs (fe);
 
   {
     Vector<double> new_solution(1);
@@ -1926,8 +1911,6 @@ void ConsLaw<dim>::run ()
   grid_in.read_ucd(input_file);   
   input_file.close();
   
-  build_fe();
-
   unsigned int nstep = 0;
   
 				   // Initialize fields and matrices.
