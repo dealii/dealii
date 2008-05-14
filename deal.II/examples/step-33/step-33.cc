@@ -20,6 +20,7 @@
 #include <base/function.h>
 #include <base/parameter_handler.h>
 #include <base/function_parser.h>
+#include <base/utilities.h>
 
 #include <lac/vector.h>
 #include <lac/sparse_matrix.h>
@@ -286,6 +287,287 @@ template <int dim>
 const double EulerEquations<dim>::gas_gamma = 1.4;
 
 
+namespace Parameters
+{
+				   // An object to store parameter information
+				   // about the Aztec solver.
+  struct Solver 
+  {
+      int LIN_OUTPUT;
+      enum solver_type { GMRES = 0, DIRECT = 1};
+      solver_type SOLVER;
+      
+      enum  output_type { QUIET = 0, VERBOSE = 1 };
+      output_type OUTPUT;
+				       // Linear residual tolerance.
+      double RES;
+      int MAX_ITERS;
+				       // We use the ILUT preconditioner.
+				       // This is similar to the ILU.  FILL is
+				       // the number of extra entries to add
+				       // when forming the ILU decomposition.
+      double ILUT_FILL;
+				       // When forming the preconditioner, for
+				       // certain problems bad conditioning
+				       // (or just bad luck) can cause the
+				       // preconditioner to be very poorly
+				       // conditioned.  Hence it can help to
+				       // add diagonal perturbations to the
+				       // original matrix and form the
+				       // preconditioner for this slightly
+				       // better matrix.  ATOL is an absolute
+				       // perturbation that is added to the
+				       // diagonal before forming the prec,
+				       // and RTOL is a scaling factor $rtol
+				       // >= 1$.
+      double ILUT_ATOL;
+      double ILUT_RTOL;
+				       // The ILUT will drop any values that
+				       // have magnitude less than this value.
+				       // This is a way to manage the amount
+				       // of memory used by this
+				       // preconditioner.
+      double ILUT_DROP;
+
+      static void declare_parameters (ParameterHandler &prm);
+      void parse_parameters (ParameterHandler &prm);
+  };
+
+
+
+  void Solver::declare_parameters (ParameterHandler &prm)
+  {
+    prm.enter_subsection("linear solver");
+    {
+      prm.declare_entry("output", "quiet",
+			Patterns::Selection(
+			  "quiet|verbose"),
+			"<quiet|verbose>");
+      prm.declare_entry("method", "gmres",
+			Patterns::Selection(
+			  "gmres|direct"),
+			"<gmres|direct>");
+      prm.declare_entry("residual", "1e-10",
+			Patterns::Double(),
+			"linear solver residual");
+      prm.declare_entry("max iters", "300",
+			Patterns::Integer(),
+			"maximum solver iterations");
+      prm.declare_entry("ilut fill", "2",
+			Patterns::Double(),
+			"ilut preconditioner fill");
+      prm.declare_entry("ilut absolute tolerance", "1e-9",
+			Patterns::Double(),
+			"ilut preconditioner tolerance");
+      prm.declare_entry("ilut relative tolerance", "1.1",
+			Patterns::Double(),
+			"rel tol");
+      prm.declare_entry("ilut drop tolerance", "1e-10",
+			Patterns::Double(),
+			"ilut drop tol");
+    }
+    prm.leave_subsection();
+  }
+  
+    
+
+  
+  void Solver::parse_parameters (ParameterHandler &prm)
+  {
+    prm.enter_subsection("linear solver");
+    {
+      const std::string op = prm.get("output");
+      if (op == "verbose")
+	OUTPUT = Parameters::Solver::VERBOSE;
+      if (op == "quiet")
+	OUTPUT = Parameters::Solver::QUIET;
+    
+      const std::string sv = prm.get("method");
+      if (sv == "direct") 
+	SOLVER = Parameters::Solver::DIRECT;
+      else if (sv == "gmres")
+	SOLVER = Parameters::Solver::GMRES;
+
+      RES       = prm.get_double("residual");
+      MAX_ITERS = prm.get_integer("max iters");
+      ILUT_FILL = prm.get_double("ilut fill");
+      ILUT_ATOL = prm.get_double("ilut absolute tolerance");
+      ILUT_RTOL = prm.get_double("ilut relative tolerance");
+      ILUT_DROP = prm.get_double("ilut drop tolerance");
+      RES = prm.get_double("residual");
+    }
+    prm.leave_subsection();  
+  }
+  
+
+  
+  struct Refinement
+  {
+      enum refine_type { NONE = 0, FIXED_NUMBER = 1, SHOCK = 2};
+      double high_frac;
+      double low_frac;
+      refine_type refine;
+      double high_frac_sav;
+      double max_cells;
+      double shock_val;
+      double shock_levels;
+
+      static void declare_parameters (ParameterHandler &prm);
+      void parse_parameters (ParameterHandler &prm);
+  };
+
+
+
+  void Refinement::declare_parameters (ParameterHandler &prm)
+  {
+
+    prm.enter_subsection("refinement");
+    {
+      prm.declare_entry("refinement", "none",
+			Patterns::Selection(
+			  "none|fixed number|shock"),
+			"<on|off>");
+      prm.declare_entry("refinement fraction", "0.1",
+			Patterns::Double(),
+			"Fraction of high refinement");
+      prm.declare_entry("unrefinement fraction", "0.1",
+			Patterns::Double(),
+			"Fraction of low unrefinement");
+      prm.declare_entry("max elements", "1000000",
+			Patterns::Double(),
+			"maximum number of elements");
+      prm.declare_entry("shock value", "4.0",
+			Patterns::Double(),
+			"value for shock indicator");
+      prm.declare_entry("shock levels", "3.0",
+			Patterns::Double(),
+			"number of shock refinement levels");
+    }
+    prm.leave_subsection();
+  }
+  
+
+  void Refinement::parse_parameters (ParameterHandler &prm)
+  {
+  
+				     // And refiement.
+    prm.enter_subsection("refinement");
+    {
+      const std::string ref = prm.get("refinement");
+      if (ref == "none") 
+	refine = NONE;
+      else if (ref == "fixed number") 
+	refine = FIXED_NUMBER;
+      else if (ref == "shock") 
+	refine = SHOCK;
+      else
+	high_frac = prm.get_double("refinement fraction");
+    
+      high_frac_sav = high_frac;
+      low_frac = prm.get_double("unrefinement fraction");
+      max_cells = prm.get_double("max elements");
+      shock_val = prm.get_double("shock value");
+      shock_levels = prm.get_double("shock levels");
+    }
+    prm.leave_subsection();
+  }
+  
+
+
+  struct Flux
+  {
+      typedef enum {CONSTANT=1,MESH=2} LF_stab_type;
+      LF_stab_type LF_stab;
+				     // The user can set the stabilization
+				     // parameter $\alpha$ in the
+				     // Lax-Friedrich's flux.
+      double LF_stab_value;
+
+      static void declare_parameters (ParameterHandler &prm);
+      void parse_parameters (ParameterHandler &prm);
+  };
+
+
+  void Flux::declare_parameters (ParameterHandler &prm)
+  {
+    prm.enter_subsection("flux");
+    {
+      prm.declare_entry("stab", "alpha",
+			Patterns::Selection(
+			  "alpha|constant|mesh"),
+			"<alpha|constant|mesh>");
+      prm.declare_entry("stab value", "1",
+			Patterns::Double(),
+			"alpha stabilization");
+    }
+    prm.leave_subsection();  
+  }
+  
+  
+  void Flux::parse_parameters (ParameterHandler &prm)
+  {
+    prm.enter_subsection("flux");
+    {
+      const std::string stab = prm.get("stab");
+      if (stab == "constant") 
+	LF_stab = CONSTANT;
+      else if (stab == "mesh ") 
+	LF_stab = MESH;
+  
+      LF_stab_value = prm.get_double("stab value");
+    }
+    prm.leave_subsection();
+  }
+
+
+
+  struct Output
+  {
+				       // If true, we output the squared
+				       // gradient of the density instead of
+				       // density.  Using this one can create
+				       // shock plots.
+      bool schlieren_plot;
+				       // How often to create an output file.
+      double output_step;
+
+      static void declare_parameters (ParameterHandler &prm);
+      void parse_parameters (ParameterHandler &prm);
+  };
+
+
+
+  void Output::declare_parameters (ParameterHandler &prm)
+  {
+    prm.enter_subsection("output");
+    {  
+      prm.declare_entry("density", "standard",
+			Patterns::Selection(
+			  "standard|schlieren"),
+			"<standard|schlieren>");
+      prm.declare_entry("step", "-1",
+			Patterns::Double(),
+			"output once per this period");
+    }
+    prm.leave_subsection();
+  }
+  
+
+
+  void Output::parse_parameters (ParameterHandler &prm)
+  {
+    prm.enter_subsection("output");
+    {
+      schlieren_plot = (prm.get("density") == "schlieren" ? true : false);
+      output_step = prm.get_double("step");
+    }
+    prm.leave_subsection();
+  }
+}
+
+  
+      
+
 				 // @sect3{Conservation Law class}
 
 				 // Here we define a Conservation Law
@@ -313,10 +595,11 @@ class ConsLaw
     void refine_grid ();
     void output_results (const unsigned int cycle) const;
     void initialize();
-    void zero_matrix();
     void estimate();
     void postprocess();
     void compute_predictor();
+
+    static const unsigned int max_n_boundaries = 10;
     
     Triangulation<dim>   triangulation;
     const MappingQ1<dim> mapping;
@@ -380,75 +663,16 @@ class ConsLaw
     typedef typename std::map<unsigned int, std::pair<std::vector<bc_type>, Function<dim>*> > bdry_map_type;
     bdry_map_type bdry_map;
 
-    void add_boundary(unsigned int bd, std::vector<bc_type>& flags, Function<dim> *bf);
-
-				     // An object to store parameter information about the Aztec solver.
-    typedef struct {
-	int LIN_OUTPUT;
-	typedef enum { GMRES = 0, DIRECT = 1} solver_type;
-	solver_type SOLVER;
-	typedef enum { QUIET = 0, VERBOSE = 1 } output_type;
-	output_type OUTPUT;
-					 // Linear residual tolerance.
-	double RES;
-	int MAX_ITERS;
-					 // We use the ILUT preconditioner.  This is similar
-					 // to the ILU.  FILL is the number of extra entries
-					 // to add when forming the ILU decomposition.
-	double ILUT_FILL;
-					 // When forming the preconditioner, for certain problems
-					 // bad conditioning (or just bad luck) can cause the
-					 // preconditioner to be very poorly conditioned.  Hence
-					 // it can help to add diagonal perturbations to the
-					 // original matrix and form the preconditioner for this
-					 // slightly better matrix.  ATOL is an absolute perturbation
-					 // that is added to the diagonal before forming the
-					 // prec, and RTOL is a scaling factor $rtol >= 1$.
-	double ILUT_ATOL;
-	double ILUT_RTOL;
-					 // The ILUT will drop any values that have magnitude less
-					 // than this value.  This is a way to
-					 // manage the amount of memory used by this preconditioner.
-	double ILUT_DROP;
-    } solver_params_type;
-
-    solver_params_type solver_params;
-
-				     // Some refinement parameters.
-    typedef struct {
-	typedef enum { NONE = 0, FIXED_NUMBER = 1, SHOCK = 2} refine_type;
-	double high_frac;
-	double low_frac;
-	refine_type refine;
-	double high_frac_sav;
-	double max_cells;
-	double shock_val;
-	double shock_levels;
-    } refinement_params_type;
-
-    refinement_params_type refinement_params;
-
-				     // The user can set the stabilization parameter $\alpha$ 
-				     // in the Lax-Friedrich's flux.  
-    typedef struct {
-	typedef enum {CONSTANT=1,MESH=2} LF_stab_type;
-	LF_stab_type LF_stab;
-	double LF_stab_value;
-    } flux_params_type;
-
-    flux_params_type flux_params;
+    Parameters::Solver     solver_params;
+    Parameters::Refinement refinement_params;
+    Parameters::Flux       flux_params;
+    Parameters::Output     output_params;
 
     bool is_stationary;
 
 				     // Power for the mesh stabilization term.
     double diffusion_power;
     double gravity;
-				     // If true, we output the squared gradient of the
-				     // density instead of density.  Using this one can
-				     // create shock plots.
-    bool schlieren_plot;
-				     // How often to create an output file.
-    double output_step;
 
     Epetra_Map         *Map;
     Epetra_CrsMatrix   *Matrix;
@@ -460,14 +684,31 @@ class ConsLaw
 };
 
 
-				 // Asign a row of the conservation law a specified
-				 // boundary type and (possibly) function.
+				 // Create a conservation law with some defaults.
 template <int dim>
-void ConsLaw<dim>::add_boundary(unsigned int bd,
-				std::vector<bc_type> &flags, Function<dim> *bf) {
+ConsLaw<dim>::ConsLaw ()
+		:
+		mapping (),
+                fe (FE_Q<dim>(1), EulerEquations<dim>::n_components),
+		dof_handler (triangulation),
+		quadrature (2),
+		face_quadrature (2),
+                T(0),
+                dT(0.05),
+                TF(10),
+		initial_conditions (EulerEquations<dim>::n_components),
+                is_stationary(false),
+                Map(NULL),
+                Matrix(NULL),
+                theta(0.5) 
+{}
 
-  std::pair<std::vector<bc_type>, Function<dim> *> entry(flags, bf);
-  bdry_map[bd] = entry;
+
+				 // Bye bye Conservation law.
+template <int dim>
+ConsLaw<dim>::~ConsLaw () 
+{
+  dof_handler.clear ();
 }
 
 
@@ -818,10 +1059,10 @@ void ConsLaw<dim>::assemble_face_term(
   double alpha = 1;
 
   switch(flux_params.LF_stab) {
-    case flux_params_type::CONSTANT:
+    case Parameters::Flux::CONSTANT:
 	  alpha = flux_params.LF_stab_value;
 	  break;
-    case flux_params_type::MESH:
+    case Parameters::Flux::MESH:
 	  alpha = face_diameter/(2.0*dT);
 	  break;
   }
@@ -1107,33 +1348,6 @@ void ConsLaw<dim>::assemble_system (double &res_norm)
     
 }
 
-				 // Create a conservation law with some defaults.
-template <int dim>
-ConsLaw<dim>::ConsLaw ()
-		:
-		mapping (),
-                fe (FE_Q<dim>(1), EulerEquations<dim>::n_components),
-		dof_handler (triangulation),
-		quadrature (2),
-		face_quadrature (2),
-                T(0),
-                dT(0.05),
-                TF(10),
-		initial_conditions (EulerEquations<dim>::n_components),
-                is_stationary(false),
-                Map(NULL),
-                Matrix(NULL),
-                theta(0.5) 
-{}
-
-
-				 // Bye bye Conservation law.
-template <int dim>
-ConsLaw<dim>::~ConsLaw () 
-{
-  dof_handler.clear ();
-}
-
 				 // @sect3{Initialize System}
 				 // Sizes all of the vectors and sets up the
 				 // sparsity patter.  This function is called at
@@ -1250,7 +1464,7 @@ void ConsLaw<dim>::solve (Vector<double> &dsolution, int &niter, double &lin_res
   Epetra_Vector b(View, *Map, right_hand_side.begin());
 
 				   // The Direct option selects the Amesos solver.
-  if (solver_params.SOLVER == solver_params_type::DIRECT) {
+  if (solver_params.SOLVER == Parameters::Solver::DIRECT) {
    
 				     // Setup for solving with
 				     // Amesos. Other solvers are
@@ -1268,12 +1482,12 @@ void ConsLaw<dim>::solve (Vector<double> &dsolution, int &niter, double &lin_res
 				     // out the sparsity patterns, and then the
 				     // numerical part actually performs Gaussian
 				     // elimination or whatever the approach is.
-    if (solver_params.OUTPUT == solver_params_type::VERBOSE)
+    if (solver_params.OUTPUT == Parameters::Solver::VERBOSE)
       std::cout << "Starting Symbolic fact\n" << std::flush;
 
     solver->SymbolicFactorization();
 
-    if (solver_params.OUTPUT == solver_params_type::VERBOSE)
+    if (solver_params.OUTPUT == Parameters::Solver::VERBOSE)
       std::cout << "Starting Numeric fact\n" << std::flush;
 
     solver->NumericFactorization();
@@ -1284,7 +1498,7 @@ void ConsLaw<dim>::solve (Vector<double> &dsolution, int &niter, double &lin_res
     prob.SetRHS(&b);
     prob.SetLHS(&x);
 				     // And finally solve the problem.
-    if (solver_params.OUTPUT == solver_params_type::VERBOSE)
+    if (solver_params.OUTPUT == Parameters::Solver::VERBOSE)
       std::cout << "Starting solve\n" << std::flush;
     solver->Solve();
     niter = 0;
@@ -1294,16 +1508,16 @@ void ConsLaw<dim>::solve (Vector<double> &dsolution, int &niter, double &lin_res
 				     // for us.
     delete solver;
 
-  } else if (solver_params.SOLVER == solver_params_type::GMRES) {
+  } else if (solver_params.SOLVER == Parameters::Solver::GMRES) {
 
 				     // For the iterative solvers, we use Aztec.
     AztecOO Solver;
 
 				     // Select the appropriate level of verbosity.
-    if (solver_params.OUTPUT == solver_params_type::QUIET)
+    if (solver_params.OUTPUT == Parameters::Solver::QUIET)
       Solver.SetAztecOption(AZ_output, AZ_none);
 
-    if (solver_params.OUTPUT == solver_params_type::VERBOSE)
+    if (solver_params.OUTPUT == Parameters::Solver::VERBOSE)
       Solver.SetAztecOption(AZ_output, AZ_all);
 
 				     // Select gmres.  Other solvers are available.
@@ -1402,16 +1616,18 @@ void ConsLaw<dim>::postprocess() {
 				       // Pressure
       ppsolution(dofs[eidx]) = (EulerEquations<dim>::gas_gamma-1.0)*(solution(dofs[eidx]) - 0.5*rho_normVsqr);
 
-				       // Either output density or gradient squared of density,
-				       // depending on what the user wants.
-      if (!schlieren_plot) {
+				       // Either output density or gradient
+				       // squared of density, depending on
+				       // what the user wants.
+      if (output_params.schlieren_plot == false)
         ppsolution(dofs[didx]) = solution(dofs[didx]);
-      } else {
-        double ng = 0;
-        for (unsigned int i = 0; i < dim; i++) ng += dU[q][EulerEquations<dim>::density_component][i]*dU[q][EulerEquations<dim>::density_component][i];
-        ng = std::sqrt(ng);
-        ppsolution(dofs[didx]) = ng;
-      }
+      else
+	{
+	  double ng = 0;
+	  for (unsigned int i = 0; i < dim; i++) ng += dU[q][EulerEquations<dim>::density_component][i]*dU[q][EulerEquations<dim>::density_component][i];
+	  ng = std::sqrt(ng);
+	  ppsolution(dofs[didx]) = ng;
+	}
     }
 
   } // cell
@@ -1579,11 +1795,10 @@ void ConsLaw<dim>::output_results (const unsigned int cycle) const
 				 // leave a detailed explanation of these 
 				 // parameters to our description of the input
 				 // sample file.
-const unsigned int MAX_BD = 10;
 template <int dim>
 void ConsLaw<dim>::declare_parameters() {
 
-                                   // Global scope parameters/
+                                   // Global scope parameters
   prm.declare_entry("mesh", "grid.inp",
                     Patterns::Anything(),
                     "intput file");
@@ -1608,7 +1823,7 @@ void ConsLaw<dim>::declare_parameters() {
 
 
 				   // Declare the boundary parameters
-  for (unsigned int b = 0; b < MAX_BD; b++) {
+  for (unsigned int b = 0; b < max_n_boundaries; b++) {
     char bd[512];
     std::sprintf(bd, "boundary_%d", b);
     prm.enter_subsection(bd);
@@ -1650,88 +1865,18 @@ void ConsLaw<dim>::declare_parameters() {
   prm.leave_subsection();
 
 				   // The linear solver block.
-  prm.enter_subsection("linear solver");
-  prm.declare_entry("output", "quiet",
-		    Patterns::Selection(
-		      "quiet|verbose"),
-		    "<quiet|verbose>");
-  prm.declare_entry("method", "gmres",
-		    Patterns::Selection(
-		      "gmres|direct"),
-		    "<gmres|direct>");
-  prm.declare_entry("residual", "1e-10",
-		    Patterns::Double(),
-		    "linear solver residual");
-  prm.declare_entry("max iters", "300",
-		    Patterns::Double(),
-		    "maximum solver iterations");
-  prm.declare_entry("ilut fill", "2",
-		    Patterns::Double(),
-		    "ilut preconditioner fill");
-  prm.declare_entry("ilut absolute tolerance", "1e-9",
-		    Patterns::Double(),
-		    "ilut preconditioner tolerance");
-  prm.declare_entry("ilut relative tolerance", "1.1",
-		    Patterns::Double(),
-		    "rel tol");
-  prm.declare_entry("ilut drop tolerance", "1e-10",
-		    Patterns::Double(),
-		    "ilut drop tol");
-  prm.leave_subsection();
-
-
-				   // A refinement controller block.
-  prm.enter_subsection("refinement");
-  prm.declare_entry("refinement", "none",
-		    Patterns::Selection(
-		      "none|fixed number|shock"),
-		    "<on|off>");
-  prm.declare_entry("refinement fraction", "0.1",
-		    Patterns::Double(),
-		    "Fraction of high refinement");
-  prm.declare_entry("unrefinement fraction", "0.1",
-		    Patterns::Double(),
-		    "Fraction of low unrefinement");
-  prm.declare_entry("max elements", "1000000",
-		    Patterns::Double(),
-		    "maximum number of elements");
-  prm.declare_entry("shock value", "4.0",
-		    Patterns::Double(),
-		    "value for shock indicator");
-  prm.declare_entry("shock levels", "3.0",
-		    Patterns::Double(),
-		    "number of shock refinement levels");
-  prm.leave_subsection();
-
-				   // Output control.
-  prm.enter_subsection("output");
-  prm.declare_entry("density", "standard",
-		    Patterns::Selection(
-		      "standard|schlieren"),
-		    "<standard|schlieren>");
-  prm.declare_entry("step", "-1",
-		    Patterns::Double(),
-		    "output once per this period");
-  prm.leave_subsection();
-
-				   // Flux control
-  prm.enter_subsection("flux");
-  prm.declare_entry("stab", "alpha",
-		    Patterns::Selection(
-		      "alpha|constant|mesh"),
-		    "<alpha|constant|mesh>");
-  prm.declare_entry("stab value", "1",
-		    Patterns::Double(),
-		    "alpha stabilization");
-  prm.leave_subsection();
-
-
+  Parameters::Solver::declare_parameters (prm);
+  Parameters::Refinement::declare_parameters (prm);
+  Parameters::Flux::declare_parameters (prm);
+  Parameters::Output::declare_parameters (prm);
 }
 
-				 // Code to actually parse an input file.  This function
-				 // matches the declarations above.
+				 // Code to actually parse an input file.
+				 // This function matches the declarations
+				 // above.
 template <int dim>
-void ConsLaw<dim>::load_parameters(const char *infile){
+void ConsLaw<dim>::load_parameters(const char *infile)
+{
 
   prm.read_input(infile);
 
@@ -1744,60 +1889,74 @@ void ConsLaw<dim>::load_parameters(const char *infile){
 
 				   // The time stepping.
   prm.enter_subsection("time stepping");
-  dT = prm.get_double("time step");
-  std::cout << "dT=" << dT << std::endl;
-  if (dT == 0) {
-    is_stationary = true;
-    dT = 1.0;
-    TF = 1.0;
-    std::cout << "Stationary mode" << std::endl;
+  {
+    dT = prm.get_double("time step");
+    if (dT == 0)
+      {
+	is_stationary = true;
+	dT = 1.0;
+	TF = 1.0;
+	std::cout << "Stationary mode" << std::endl;
+      }
+    TF = prm.get_double("final time");
+
+    std::cout << "dT=" << dT << std::endl;
+    std::cout << "TF=" << TF << std::endl;
   }
-  TF = prm.get_double("final time");
-  std::cout << "TF=" << TF << std::endl;
   prm.leave_subsection();
 
 				   // The boundary info
-  for (unsigned int b = 0; b < MAX_BD; b++) {
-    std::vector<bc_type> flags(EulerEquations<dim>::n_components, OUTFLOW_BC);
+  for (unsigned int b = 0; b < max_n_boundaries; ++b)
+    {
+      prm.enter_subsection("boundary_" + Utilities::int_to_string(b));
+      {
+	std::vector<bc_type> flags(EulerEquations<dim>::n_components,
+				   OUTFLOW_BC);
 
-				     // Define a parser for every boundary, though it may be
-				     // unused.
-    FunctionParser<dim> *sd = new FunctionParser<dim>(EulerEquations<dim>::n_components);
+					 // Define a parser for every boundary,
+					 // though it may be unused.
+	FunctionParser<dim> *sd
+	  = new FunctionParser<dim>(EulerEquations<dim>::n_components);
 
-    std::vector<std::string> expressions(EulerEquations<dim>::n_components, "0.0");
+	std::vector<std::string> expressions(EulerEquations<dim>::n_components,
+					     "0.0");
     
-    char bd[512];
-    std::sprintf(bd, "boundary_%d", b);
-    prm.enter_subsection(bd);
+	const std::string nopen = prm.get("no penetration");
 
-    const std::string nopen = prm.get("no penetration");
+					 // Determine how each component is
+					 // handled.
+	for (unsigned int di=0; di<EulerEquations<dim>::n_components; ++di)
+	  {
+	    const std::string btype
+	      = prm.get("w_" + Utilities::int_to_string(di));
+	    const std::string var_value
+	      = prm.get("w_" + Utilities::int_to_string(di) +
+			" value");
 
-				     // Determine how each component is handled.
-    for (unsigned int di = 0; di < EulerEquations<dim>::n_components; di++) {
-      char var[512];
-      std::sprintf(var, "w_%d", di);
-      std::string btype = prm.get(var);
-      std::sprintf(var, "w_%d value", di);
-      std::string var_value = prm.get(var);
+	    if (di < dim && nopen == "true")
+	      flags[di] = NO_PENETRATION_BC;
+	    else if (btype == "inflow")
+	      {
+		flags[di] = INFLOW_BC;
+		expressions[di] = var_value;
+	      }
+	    else if (btype == "pressure")
+	      {
+		flags[di] = PRESSURE_BC;
+		expressions[di] = var_value;
+	      }
+	  }
 
-      if (di < dim && nopen == "true") {
-        flags[di] = NO_PENETRATION_BC;
-      } else if (btype == "inflow") {
-        flags[di] = INFLOW_BC;
-        expressions[di] = var_value;
-      } else if (btype == "pressure") {
-        flags[di] = PRESSURE_BC;
-        expressions[di] = var_value;
+
+					 // Add the boundary condition to the
+					 // law.
+	sd->initialize (FunctionParser<dim>::default_variable_names(),
+			expressions,
+			std::map<std::string, double>());
+	bdry_map[b] = std::make_pair (flags, sd);
       }
-    } 
-    prm.leave_subsection();
-
-				     // Add the boundary condition to the law.
-    sd->initialize (FunctionParser<dim>::default_variable_names(),
-		    expressions,
-		    std::map<std::string, double>());
-    add_boundary(b, flags, sd);
-  }
+      prm.leave_subsection();
+    }
 
 				   // Initial conditions.
   prm.enter_subsection("initial condition");
@@ -1805,87 +1964,28 @@ void ConsLaw<dim>::load_parameters(const char *infile){
     std::vector<std::string> expressions (EulerEquations<dim>::n_components,
 					  "0.0");
     for (unsigned int di = 0; di < EulerEquations<dim>::n_components; di++)
-      {
-	char var[512];
-	std::sprintf(var, "w_%d value", di);
-	expressions[di] = prm.get(var);
-      }
+      expressions[di] = prm.get("w_" + Utilities::int_to_string(di) +
+				" value");
     initial_conditions.initialize (FunctionParser<dim>::default_variable_names(),
 				   expressions,
 				   std::map<std::string, double>());
   }
   prm.leave_subsection();
 
-				   // The linear solver.
-  prm.enter_subsection("linear solver");
-  const std::string &op = prm.get("output");
-  if (op == "verbose") solver_params.OUTPUT = solver_params_type::VERBOSE;
-  if (op == "quiet") solver_params.OUTPUT = solver_params_type::QUIET;
-  const std::string &sv = prm.get("method");
-  if (sv == "direct") {
-    solver_params.SOLVER = solver_params_type::DIRECT;
-  } else if (sv == "gmres") {
-    solver_params.SOLVER = solver_params_type::GMRES;
-  } 
-
-  solver_params.RES = prm.get_double("residual");
-  solver_params.MAX_ITERS = (int) prm.get_double("max iters");
-  solver_params.ILUT_FILL = prm.get_double("ilut fill");
-  solver_params.ILUT_ATOL = prm.get_double("ilut absolute tolerance");
-  solver_params.ILUT_RTOL = prm.get_double("ilut relative tolerance");
-  solver_params.ILUT_DROP = prm.get_double("ilut drop tolerance");
-  solver_params.RES = prm.get_double("residual");
-  prm.leave_subsection();
-
-
-				   // And refiement.
-  prm.enter_subsection("refinement");
-  const std::string &ref = prm.get("refinement");
-  if (ref == "none") {
-    refinement_params.refine = refinement_params_type::NONE;
-  } else if (ref == "fixed number") {
-    refinement_params.refine = refinement_params_type::FIXED_NUMBER;
-  } else if (ref == "shock") {
-    refinement_params.refine = refinement_params_type::SHOCK;
-  } else
-    refinement_params.high_frac = prm.get_double("refinement fraction");
-  refinement_params.high_frac_sav = refinement_params.high_frac;
-  refinement_params.low_frac = prm.get_double("unrefinement fraction");
-  refinement_params.max_cells = prm.get_double("max elements");
-  refinement_params.shock_val = prm.get_double("shock value");
-  refinement_params.shock_levels = prm.get_double("shock levels");
-  prm.leave_subsection();
-    
-				   // Output control.
-  prm.enter_subsection("output");
-  const std::string &dens = prm.get("density");
-  schlieren_plot = dens == "schlieren" ? true : false;
-  output_step = prm.get_double("step");
-  prm.leave_subsection();
-
-				   // Flux control.
-  prm.enter_subsection("flux");
-  const std::string &stab = prm.get("stab");
-  if (stab == "constant") {
-    flux_params.LF_stab = flux_params_type::CONSTANT;
-  } else if (stab == "mesh ") {
-    flux_params.LF_stab = flux_params_type::MESH;
-  }
-  flux_params.LF_stab_value = prm.get_double("stab value");
-  prm.leave_subsection();
-
-
+  solver_params.parse_parameters (prm);
+  refinement_params.parse_parameters (prm);
+  flux_params.parse_parameters (prm);
+  output_params.parse_parameters (prm);
 }
 
-template<int dim>
-void ConsLaw<dim>::zero_matrix() {
-  Matrix->PutScalar(0); Matrix->FillComplete();
-}
 
-				 // We use a predictor to try and make adaptivity
-				 // work better.  The idea is to try and refine ahead
-				 // of a front, rather than stepping into a coarse
-				 // set of elements and smearing the solution.  This
+
+
+				 // We use a predictor to try and make
+				 // adaptivity work better.  The idea is to
+				 // try and refine ahead of a front, rather
+				 // than stepping into a coarse set of
+				 // elements and smearing the solution.  This
 				 // simple time extrapolator does the job.
 template<int dim>
 void ConsLaw<dim>::compute_predictor() {
@@ -1922,7 +2022,7 @@ void ConsLaw<dim>::run ()
 				   // Initial refinement.  We apply the ic,
 				   // estimate, refine, and repeat until
 				   // happy.
-  if (refinement_params.refine != refinement_params_type::NONE)
+  if (refinement_params.refine != Parameters::Refinement::NONE)
     for (unsigned int i = 0; i < refinement_params.shock_levels; i++) {
       estimate();
       refine_grid();
@@ -1934,7 +2034,7 @@ void ConsLaw<dim>::run ()
   output_results (nstep);
 
 				   // Determine when we will output next.
-  double next_output = T + output_step;
+  double next_output = T + output_params.output_step;
 
 				   // @sect4{Main time stepping loop}
   predictor = solution;
@@ -1969,7 +2069,10 @@ void ConsLaw<dim>::run ()
       nlsolution = predictor;
       while (!nonlin_done) {
         lin_iter = 0;
-        zero_matrix();
+
+	Matrix->PutScalar(0);
+	Matrix->FillComplete();
+	
         right_hand_side = 0;
         assemble_system (res_norm);
 					 // Flash a star to the screen so one can
@@ -2014,15 +2117,15 @@ void ConsLaw<dim>::run ()
       T += dT;
 
 				       // Output if it is time.
-      if (output_step < 0) {
+      if (output_params.output_step < 0) {
         output_results (++nstep);
       } else if (T >= next_output) {
         output_results (++nstep);
-        next_output += output_step;
+        next_output += output_params.output_step;
       }
 
 				       // Refine, if refinement is selected.
-      if (refinement_params.refine != refinement_params_type::NONE) {
+      if (refinement_params.refine != Parameters::Refinement::NONE) {
         refine_grid();
         setup_system();
       }
