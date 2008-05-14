@@ -3,6 +3,9 @@
 # make sure we can just write $...$ for formulas.
 s/\$/\@f\$/g;
 
+# however, undo that change if the dollar sign was escaped with a backslash
+s/\\\@f\$/\$/g;
+
 # we don't let doxygen put everything into a namespace
 # dealii. consequently, doxygen can't link references that contain an
 # explicit dealii:: qualification. remove it and replace it by the
