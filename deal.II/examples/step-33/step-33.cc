@@ -286,48 +286,121 @@ struct EulerEquations
 template <int dim>
 const double EulerEquations<dim>::gas_gamma = 1.4;
 
+				 // @sect3{Run time parameter handling}
 
+				 // Our next job is to define a few
+				 // classes that will contain run-time
+				 // parameters (for example solver
+				 // tolerances, number of iterations,
+				 // stabilization parameter, and the
+				 // like). One could do this in the
+				 // main class, but we separate it
+				 // from that one to make the program
+				 // more modular and easier to read:
+				 // Everything that has to do with
+				 // run-time parameters will be in the
+				 // following namespace, whereas the
+				 // program logic is in the main
+				 // class.
+				 //
+				 // We will split the run-time
+				 // parameters into a few separate
+				 // structures, which we will all put
+				 // into a namespace
+				 // <code>Parameters</code>. Of these
+				 // classes, there are a few that
+				 // group the parameters for
+				 // individual groups, such as for
+				 // solvers, mesh refinement, or
+				 // output. Each of these classes have
+				 // functions
+				 // <code>declare_parameters()</code>
+				 // and
+				 // <code>parse_parameters()</code>
+				 // that declare parameter subsections
+				 // and entries in a ParameterHandler
+				 // object, and retrieve actual
+				 // parameter values from such an
+				 // object, respectively. These
+				 // classes declare all their
+				 // parameters in subsections of the
+				 // ParameterHandler.
+				 //
+				 // The final class of the following
+				 // namespace combines all the
+				 // previous classes by deriving from
+				 // them and taking care of a few more
+				 // entries at the top level of the
+				 // input file, as well as a few odd
+				 // other entries in subsections that
+				 // are too short to warrent a
+				 // structure by themselves.
 namespace Parameters
 {
-				   // An object to store parameter information
-				   // about the Aztec solver.
+
+				   // @sect3{The Parameters::Solver class}
+				   //
+				   // The first of these classes deals
+				   // with parameters for the linear
+				   // inner solver. It offers
+				   // parameters that indicate which
+				   // solver to use (GMRES as a solver
+				   // for general non-symmetric
+				   // indefinite systems, or a sparse
+				   // direct solver), the amount of
+				   // output to be produced, as well
+				   // as various parameters that tweak
+				   // the thresholded incomplete LU
+				   // decomposition (ILUT) that we use
+				   // as a preconditioner for GMRES.
+				   //
+				   // In particular, the ILUT takes
+				   // the following parameters:
+				   // -ilut_fill: the number of extra
+				   //  entries to add when forming the ILU
+				   //  decomposition
+				   // -ilut_atol, ilut_rtol: When
+				   //  forming the preconditioner, for
+				   //  certain problems bad conditioning
+				   //  (or just bad luck) can cause the
+				   //  preconditioner to be very poorly
+				   //  conditioned.  Hence it can help to
+				   //  add diagonal perturbations to the
+				   //  original matrix and form the
+				   //  preconditioner for this slightly
+				   //  better matrix.  ATOL is an absolute
+				   //  perturbation that is added to the
+				   //  diagonal before forming the prec,
+				   //  and RTOL is a scaling factor $rtol
+				   //  >= 1$.
+				   // -ilut_drop: The ILUT will
+				   //  drop any values that
+				   //  have magnitude less than this value.
+				   //  This is a way to manage the amount
+				   //  of memory used by this
+				   //  preconditioner.
+				   //
+				   // The meaning of each parameter is
+				   // also briefly described in the
+				   // third argument of the
+				   // ParameterHandler::declare_entry
+				   // call in
+				   // <code>declare_parameters()</code>.
   struct Solver 
   {
-      int LIN_OUTPUT;
-      enum solver_type { GMRES = 0, DIRECT = 1};
-      solver_type SOLVER;
+      enum SolverType { gmres, direct };
+      SolverType solver;
       
-      enum  output_type { QUIET = 0, VERBOSE = 1 };
-      output_type OUTPUT;
-				       // Linear residual tolerance.
-      double RES;
-      int MAX_ITERS;
-				       // We use the ILUT preconditioner.
-				       // This is similar to the ILU.  FILL is
-				       // the number of extra entries to add
-				       // when forming the ILU decomposition.
-      double ILUT_FILL;
-				       // When forming the preconditioner, for
-				       // certain problems bad conditioning
-				       // (or just bad luck) can cause the
-				       // preconditioner to be very poorly
-				       // conditioned.  Hence it can help to
-				       // add diagonal perturbations to the
-				       // original matrix and form the
-				       // preconditioner for this slightly
-				       // better matrix.  ATOL is an absolute
-				       // perturbation that is added to the
-				       // diagonal before forming the prec,
-				       // and RTOL is a scaling factor $rtol
-				       // >= 1$.
-      double ILUT_ATOL;
-      double ILUT_RTOL;
-				       // The ILUT will drop any values that
-				       // have magnitude less than this value.
-				       // This is a way to manage the amount
-				       // of memory used by this
-				       // preconditioner.
-      double ILUT_DROP;
+      enum  OutputType { quiet, verbose };
+      OutputType output;
+
+      double linear_residual;
+      int max_iterations;
+
+      double ilut_fill;
+      double ilut_atol;
+      double ilut_rtol;
+      double ilut_drop;
 
       static void declare_parameters (ParameterHandler &prm);
       void parse_parameters (ParameterHandler &prm);
@@ -340,31 +413,31 @@ namespace Parameters
     prm.enter_subsection("linear solver");
     {
       prm.declare_entry("output", "quiet",
-			Patterns::Selection(
-			  "quiet|verbose"),
-			"<quiet|verbose>");
+			Patterns::Selection("quiet|verbose"),
+			"State whether output from solver runs should be printed. "
+			"Choices are <quiet|verbose>.");
       prm.declare_entry("method", "gmres",
-			Patterns::Selection(
-			  "gmres|direct"),
-			"<gmres|direct>");
+			Patterns::Selection("gmres|direct"),
+			"The kind of solver for the linear system. "
+			"Choices are <gmres|direct>.");
       prm.declare_entry("residual", "1e-10",
 			Patterns::Double(),
-			"linear solver residual");
+			"Linear solver residual");
       prm.declare_entry("max iters", "300",
 			Patterns::Integer(),
-			"maximum solver iterations");
+			"Maximum solver iterations");
       prm.declare_entry("ilut fill", "2",
 			Patterns::Double(),
-			"ilut preconditioner fill");
+			"Ilut preconditioner fill");
       prm.declare_entry("ilut absolute tolerance", "1e-9",
 			Patterns::Double(),
-			"ilut preconditioner tolerance");
+			"Ilut preconditioner tolerance");
       prm.declare_entry("ilut relative tolerance", "1.1",
 			Patterns::Double(),
-			"rel tol");
+			"Ilut relative tolerance");
       prm.declare_entry("ilut drop tolerance", "1e-10",
 			Patterns::Double(),
-			"ilut drop tol");
+			"Ilut drop tolerance");
     }
     prm.leave_subsection();
   }
@@ -378,23 +451,22 @@ namespace Parameters
     {
       const std::string op = prm.get("output");
       if (op == "verbose")
-	OUTPUT = Parameters::Solver::VERBOSE;
+	output = verbose;
       if (op == "quiet")
-	OUTPUT = Parameters::Solver::QUIET;
+	output = quiet;
     
       const std::string sv = prm.get("method");
       if (sv == "direct") 
-	SOLVER = Parameters::Solver::DIRECT;
+	solver = direct;
       else if (sv == "gmres")
-	SOLVER = Parameters::Solver::GMRES;
+	solver = gmres;
 
-      RES       = prm.get_double("residual");
-      MAX_ITERS = prm.get_integer("max iters");
-      ILUT_FILL = prm.get_double("ilut fill");
-      ILUT_ATOL = prm.get_double("ilut absolute tolerance");
-      ILUT_RTOL = prm.get_double("ilut relative tolerance");
-      ILUT_DROP = prm.get_double("ilut drop tolerance");
-      RES = prm.get_double("residual");
+      linear_residual = prm.get_double("residual");
+      max_iterations  = prm.get_integer("max iters");
+      ilut_fill       = prm.get_double("ilut fill");
+      ilut_atol       = prm.get_double("ilut absolute tolerance");
+      ilut_rtol       = prm.get_double("ilut relative tolerance");
+      ilut_drop       = prm.get_double("ilut drop tolerance");
     }
     prm.leave_subsection();  
   }
@@ -1464,7 +1536,7 @@ void ConsLaw<dim>::solve (Vector<double> &dsolution, int &niter, double &lin_res
   Epetra_Vector b(View, *Map, right_hand_side.begin());
 
 				   // The Direct option selects the Amesos solver.
-  if (solver_params.SOLVER == Parameters::Solver::DIRECT) {
+  if (solver_params.solver == Parameters::Solver::direct) {
    
 				     // Setup for solving with
 				     // Amesos. Other solvers are
@@ -1482,12 +1554,12 @@ void ConsLaw<dim>::solve (Vector<double> &dsolution, int &niter, double &lin_res
 				     // out the sparsity patterns, and then the
 				     // numerical part actually performs Gaussian
 				     // elimination or whatever the approach is.
-    if (solver_params.OUTPUT == Parameters::Solver::VERBOSE)
+    if (solver_params.output == Parameters::Solver::verbose)
       std::cout << "Starting Symbolic fact\n" << std::flush;
 
     solver->SymbolicFactorization();
 
-    if (solver_params.OUTPUT == Parameters::Solver::VERBOSE)
+    if (solver_params.output == Parameters::Solver::verbose)
       std::cout << "Starting Numeric fact\n" << std::flush;
 
     solver->NumericFactorization();
@@ -1498,7 +1570,7 @@ void ConsLaw<dim>::solve (Vector<double> &dsolution, int &niter, double &lin_res
     prob.SetRHS(&b);
     prob.SetLHS(&x);
 				     // And finally solve the problem.
-    if (solver_params.OUTPUT == Parameters::Solver::VERBOSE)
+    if (solver_params.output == Parameters::Solver::verbose)
       std::cout << "Starting solve\n" << std::flush;
     solver->Solve();
     niter = 0;
@@ -1508,16 +1580,16 @@ void ConsLaw<dim>::solve (Vector<double> &dsolution, int &niter, double &lin_res
 				     // for us.
     delete solver;
 
-  } else if (solver_params.SOLVER == Parameters::Solver::GMRES) {
+  } else if (solver_params.solver == Parameters::Solver::gmres) {
 
 				     // For the iterative solvers, we use Aztec.
     AztecOO Solver;
 
 				     // Select the appropriate level of verbosity.
-    if (solver_params.OUTPUT == Parameters::Solver::QUIET)
+    if (solver_params.output == Parameters::Solver::quiet)
       Solver.SetAztecOption(AZ_output, AZ_none);
 
-    if (solver_params.OUTPUT == Parameters::Solver::VERBOSE)
+    if (solver_params.output == Parameters::Solver::verbose)
       Solver.SetAztecOption(AZ_output, AZ_all);
 
 				     // Select gmres.  Other solvers are available.
@@ -1529,21 +1601,21 @@ void ConsLaw<dim>::solve (Vector<double> &dsolution, int &niter, double &lin_res
 				     // why, but we must pretend like we are in parallel
 				     // using domain decomposition or the preconditioner
 				     // refuses to activate.
-    Solver.SetAztecOption(AZ_precond, AZ_dom_decomp);
+    Solver.SetAztecOption(AZ_precond,         AZ_dom_decomp);
     Solver.SetAztecOption(AZ_subdomain_solve, AZ_ilut);
-    Solver.SetAztecOption(AZ_overlap, 0);
-    Solver.SetAztecOption(AZ_reorder, 0);
+    Solver.SetAztecOption(AZ_overlap,         0);
+    Solver.SetAztecOption(AZ_reorder,         0);
 
 				     // ILUT parameters as described above.
-    Solver.SetAztecParam(AZ_drop, solver_params.ILUT_DROP);
-    Solver.SetAztecParam(AZ_ilut_fill, solver_params.ILUT_FILL);
-    Solver.SetAztecParam(AZ_athresh, solver_params.ILUT_ATOL);
-    Solver.SetAztecParam(AZ_rthresh, solver_params.ILUT_RTOL);
+    Solver.SetAztecParam(AZ_drop,      solver_params.ilut_drop);
+    Solver.SetAztecParam(AZ_ilut_fill, solver_params.ilut_fill);
+    Solver.SetAztecParam(AZ_athresh,   solver_params.ilut_atol);
+    Solver.SetAztecParam(AZ_rthresh,   solver_params.ilut_rtol);
     Solver.SetUserMatrix(Matrix);
 
 				     // Run the solver iteration.  Collect the number
 				     // of iterations and the residual.
-    Solver.Iterate(solver_params.MAX_ITERS, solver_params.RES);
+    Solver.Iterate(solver_params.max_iterations, solver_params.linear_residual);
     niter = Solver.NumIters();
     lin_residual = Solver.TrueResidual();
   }
@@ -1852,15 +1924,12 @@ void ConsLaw<dim>::declare_parameters() {
 
 				   // Initial condition block.
   prm.enter_subsection("initial condition");
-  for (unsigned int di = 0; di < EulerEquations<dim>::n_components; di++) {
-    char var[512];
-    std::sprintf(var, "w_%d", di);
-      
-				     // for dirichlet, a function in x,y,z
-    std::sprintf(var, "w_%d value", di);
-    prm.declare_entry(var, "0.0",
-		      Patterns::Anything(),
-		      "expression in x,y,z");
+  {
+    for (unsigned int di = 0; di < EulerEquations<dim>::n_components; di++)
+      prm.declare_entry("w_" + Utilities::int_to_string(di) + " value",
+			"0.0",
+			Patterns::Anything(),
+			"expression in x,y,z");
   }
   prm.leave_subsection();
 
