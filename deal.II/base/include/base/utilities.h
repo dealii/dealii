@@ -2,7 +2,7 @@
 //    $Id$
 //    Version: $Name$
 //
-//    Copyright (C) 2005, 2006, 2007 by the deal.II authors
+//    Copyright (C) 2005, 2006, 2007, 2008 by the deal.II authors
 //
 //    This file is subject to QPL and may not be  distributed
 //    without copyright and license information. Please refer
@@ -45,6 +45,12 @@ namespace Utilities
                                     * Convert a number @p i to a string, with
                                     * as many digits as given to fill with
                                     * leading zeros.
+				    *
+				    * If the second parameter is left at its
+				    * default value, the number is not padded
+				    * with leading zeros. The result is then
+				    * the same as of the standard C function
+				    * <code>itoa()</code> had been called.
                                     */
   std::string
   int_to_string (const unsigned int i,
