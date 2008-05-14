@@ -286,20 +286,21 @@ class GridIn
 				      * the positions of the mesh
 				      * nodes and has the format
 				      *
-				      * @pre
-				      * $NOD
-				      * <n>
-				      * 1 <x1> <y1> <z1>
-				      * 2 <x2> <y2> <z2>
+				      * <code><pre>
+				      * \$NOD
+				      * @<n@>
+				      * 1 @<x1@> @<y1@> @<z1@>
+				      * 2 @<x2@> @<y2@> @<z2@>
 				      * ...
-				      * n <xn> <yn> <zn>
-				      * $ENDNOD
+				      * n @<xn@> @<yn@> @<zn@>
+				      * \$ENDNOD
+				      * </pre></code>
 				      *
 				      * The second block lists the
 				      * connectivity and material id's
 				      * of the cells and faces. It is
-				      * enclosed by <tt>$ELM</tt> and
-				      * <tt>$ENDELM</tt>
+				      * enclosed by <tt>\$ELM</tt> and
+				      * <tt>\$ENDELM</tt>
 				      * keywords. deal.II can handle
 				      * elements which are lines,
 				      * quadrilaterals or hexahedra
