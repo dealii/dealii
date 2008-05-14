@@ -338,7 +338,7 @@ const double EulerEquations<dim>::gas_gamma = 1.4;
 namespace Parameters
 {
 
-				   // @sect3{The Parameters::Solver class}
+				   // @sect4{The Parameters::Solver class}
 				   //
 				   // The first of these classes deals
 				   // with parameters for the linear
@@ -356,29 +356,29 @@ namespace Parameters
 				   //
 				   // In particular, the ILUT takes
 				   // the following parameters:
-				   // -ilut_fill: the number of extra
-				   //  entries to add when forming the ILU
-				   //  decomposition
-				   // -ilut_atol, ilut_rtol: When
-				   //  forming the preconditioner, for
-				   //  certain problems bad conditioning
-				   //  (or just bad luck) can cause the
-				   //  preconditioner to be very poorly
-				   //  conditioned.  Hence it can help to
-				   //  add diagonal perturbations to the
-				   //  original matrix and form the
-				   //  preconditioner for this slightly
-				   //  better matrix.  ATOL is an absolute
-				   //  perturbation that is added to the
-				   //  diagonal before forming the prec,
-				   //  and RTOL is a scaling factor $rtol
-				   //  >= 1$.
-				   // -ilut_drop: The ILUT will
-				   //  drop any values that
-				   //  have magnitude less than this value.
-				   //  This is a way to manage the amount
-				   //  of memory used by this
-				   //  preconditioner.
+				   // - ilut_fill: the number of extra
+				   //   entries to add when forming the ILU
+				   //   decomposition
+				   // - ilut_atol, ilut_rtol: When
+				   //   forming the preconditioner, for
+				   //   certain problems bad conditioning
+				   //   (or just bad luck) can cause the
+				   //   preconditioner to be very poorly
+				   //   conditioned.  Hence it can help to
+				   //   add diagonal perturbations to the
+				   //   original matrix and form the
+				   //   preconditioner for this slightly
+				   //   better matrix.  ATOL is an absolute
+				   //   perturbation that is added to the
+				   //   diagonal before forming the prec,
+				   //   and RTOL is a scaling factor $rtol
+				   //   >= 1$.
+				   // - ilut_drop: The ILUT will
+				   //   drop any values that
+				   //   have magnitude less than this value.
+				   //   This is a way to manage the amount
+				   //   of memory used by this
+				   //   preconditioner.
 				   //
 				   // The meaning of each parameter is
 				   // also briefly described in the
