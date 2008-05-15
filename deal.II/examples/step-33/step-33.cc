@@ -1687,34 +1687,40 @@ void ConsLaw<dim>::postprocess() {
     fe_v_unit.get_function_grads(solution, dU);
     fe_v.get_function_values(solution, UU);
 
-    for (unsigned int q = 0; q < fe_v.get_fe().base_element(0).n_dofs_per_cell(); q++) {
-      unsigned int didx = fe_v.get_fe().component_to_system_index(EulerEquations<dim>::density_component, q);
-      unsigned int eidx = fe_v.get_fe().component_to_system_index(EulerEquations<dim>::energy_component, q);
-      double rho_normVsqr = 0;
-      for (unsigned int d = 0; d < dim; d++) {
-        unsigned int vidx = fe_v.get_fe().component_to_system_index(d, q);
-        ppsolution(dofs[vidx]) = solution(dofs[vidx])/solution(dofs[didx]);
-        rho_normVsqr += solution(dofs[vidx])*solution(dofs[vidx]);
-      }
-      rho_normVsqr /= solution(dofs[didx]);
-				       // Pressure
-      ppsolution(dofs[eidx]) = (EulerEquations<dim>::gas_gamma-1.0)*(solution(dofs[eidx]) - 0.5*rho_normVsqr);
+    for (unsigned int q = 0; q < fe_v.get_fe().base_element(0).n_dofs_per_cell(); q++)
+      {
+	unsigned int didx
+	  = fe_v.get_fe().component_to_system_index(EulerEquations<dim>::density_component, q);
+	unsigned int eidx
+	  = fe_v.get_fe().component_to_system_index(EulerEquations<dim>::energy_component, q);
+	double rho_normVsqr = 0;
+	for (unsigned int d = 0; d < dim; d++)
+	  {
+	    unsigned int vidx = fe_v.get_fe().component_to_system_index(d, q);
+	    ppsolution(dofs[vidx]) = solution(dofs[vidx])/solution(dofs[didx]);
+	    rho_normVsqr += solution(dofs[vidx])*solution(dofs[vidx]);
+	  }
+	rho_normVsqr /= solution(dofs[didx]);
+					 // Pressure
+	ppsolution(dofs[eidx])
+	  = (EulerEquations<dim>::gas_gamma-1.0)*(solution(dofs[eidx]) - 0.5*rho_normVsqr);
 
-				       // Either output density or gradient
-				       // squared of density, depending on
-				       // what the user wants.
+					 // Either output density or gradient
+					 // squared of density, depending on
+					 // what the user wants.
 //TODO: if schlieren plot then simply use a postprocessor      
-      if (output_params.schlieren_plot == false)
-        ppsolution(dofs[didx]) = solution(dofs[didx]);
-      else
-	{
-	  double ng = 0;
-	  for (unsigned int i = 0; i < dim; i++) ng += dU[q][EulerEquations<dim>::density_component][i]*dU[q][EulerEquations<dim>::density_component][i];
-	  ng = std::sqrt(ng);
-	  ppsolution(dofs[didx]) = ng;
-	}
-    }
-
+	if (output_params.schlieren_plot == false)
+	  ppsolution(dofs[didx]) = solution(dofs[didx]);
+	else
+	  {
+	    double ng = 0;
+	    for (unsigned int i = 0; i < dim; i++)
+	      ng += dU[q][EulerEquations<dim>::density_component][i]*dU[q][EulerEquations<dim>::density_component][i];
+	    ng = std::sqrt(ng);
+	    ppsolution(dofs[didx]) = ng;
+	  }
+      }
+    
   } // cell
 
 }
