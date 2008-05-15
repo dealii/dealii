@@ -125,9 +125,14 @@ $\theta=0$ results in the explicit (forward) Euler scheme, $\theta=1$
 in the stable implicit (backward) Euler scheme, and $\theta=\frac 12$
 in the Crank-Nicolson scheme.
 
-In the implementation below, we choose the Lax-Friedrich flux for the
-function $\mathbf H$, i.e.
-$\mathbf{H}(\mathbf{a},\mathbf{b},\mathbf{n}) = \frac{1}{2}(\mathbf{F}(\mathbf{a})\cdot \mathbf{n} + \mathbf{F}(\mathbf{b})\cdot \mathbf{n} + \alpha (\mathbf{a} - \mathbf{b}))$.
+In the implementation below, we choose the Lax-Friedrichs flux for the
+function $\mathbf H$, i.e.  $\mathbf{H}(\mathbf{a},\mathbf{b},\mathbf{n}) =
+\frac{1}{2}(\mathbf{F}(\mathbf{a})\cdot \mathbf{n} +
+\mathbf{F}(\mathbf{b})\cdot \mathbf{n} + \alpha (\mathbf{a} - \mathbf{b}))$,
+where $\alpha$ is either a fixed number specified in the input file, or where
+$\alpha$ is a mesh dependent value. In the latter case, it is chosen as
+$\frac{h}{2\delta T}$ with $h$ the diameter of the face to which the flux is
+applied, and $\delta T$ the current time step.
 
 With these choices, equating the residual to zero results in a
 nonlinear system of equations which we solve the nonlinear system by a

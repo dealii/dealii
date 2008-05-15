@@ -338,7 +338,7 @@ const double EulerEquations<dim>::gas_gamma = 1.4;
 namespace Parameters
 {
 
-				   // @sect4{The Parameters::Solver class}
+				   // @sect4{Parameters::Solver}
 				   //
 				   // The first of these classes deals
 				   // with parameters for the linear
@@ -473,14 +473,17 @@ namespace Parameters
   
 
   
+				   // @sect4{Parameters::Refinement}
+				   //
+				   // Similarly, here are a few parameters
+				   // that determine how the mesh is to be
+				   // refined (and if it is to be refined at
+				   // all). For what exactly the shock
+				   // parameters do, see the mesh refinement
+				   // functions further down.
   struct Refinement
   {
-      enum refine_type { NONE = 0, FIXED_NUMBER = 1, SHOCK = 2};
-      double high_frac;
-      double low_frac;
-      refine_type refine;
-      double high_frac_sav;
-      double max_cells;
+      bool do_refine;
       double shock_val;
       double shock_levels;
 
@@ -495,10 +498,9 @@ namespace Parameters
 
     prm.enter_subsection("refinement");
     {
-      prm.declare_entry("refinement", "none",
-			Patterns::Selection(
-			  "none|fixed number|shock"),
-			"<on|off>");
+      prm.declare_entry("refinement", "true",
+			Patterns::Bool(),
+			"Whether to perform mesh refinement or not");
       prm.declare_entry("refinement fraction", "0.1",
 			Patterns::Double(),
 			"Fraction of high refinement");
@@ -521,39 +523,42 @@ namespace Parameters
 
   void Refinement::parse_parameters (ParameterHandler &prm)
   {
-  
-				     // And refiement.
     prm.enter_subsection("refinement");
     {
-      const std::string ref = prm.get("refinement");
-      if (ref == "none") 
-	refine = NONE;
-      else if (ref == "fixed number") 
-	refine = FIXED_NUMBER;
-      else if (ref == "shock") 
-	refine = SHOCK;
-      else
-	high_frac = prm.get_double("refinement fraction");
-    
-      high_frac_sav = high_frac;
-      low_frac = prm.get_double("unrefinement fraction");
-      max_cells = prm.get_double("max elements");
-      shock_val = prm.get_double("shock value");
-      shock_levels = prm.get_double("shock levels");
+      do_refine     = prm.get_bool ("refinement");
+      shock_val     = prm.get_double("shock value");
+      shock_levels  = prm.get_double("shock levels");
     }
     prm.leave_subsection();
   }
   
 
 
+				   // @sect4{Parameters::Flux}
+				   //
+				   // Next a section on flux modifications to
+				   // make it more stable. In particular, two
+				   // options are offered to stabilize the
+				   // Lax-Friedrichs flux: either choose
+				   // $\mathbf{H}(\mathbf{a},\mathbf{b},\mathbf{n})
+				   // =
+				   // \frac{1}{2}(\mathbf{F}(\mathbf{a})\cdot
+				   // \mathbf{n} + \mathbf{F}(\mathbf{b})\cdot
+				   // \mathbf{n} + \alpha (\mathbf{a} -
+				   // \mathbf{b}))$ where $\alpha$ is either a
+				   // fixed number specified in the input
+				   // file, or where $\alpha$ is a mesh
+				   // dependent value. In the latter case, it
+				   // is chosen as $\frac{h}{2\delta T}$ with
+				   // $h$ the diameter of the face to which
+				   // the flux is applied, and $\delta T$ 
+				   // the current time step.
   struct Flux
   {
-      typedef enum {CONSTANT=1,MESH=2} LF_stab_type;
-      LF_stab_type LF_stab;
-				     // The user can set the stabilization
-				     // parameter $\alpha$ in the
-				     // Lax-Friedrich's flux.
-      double LF_stab_value;
+      enum StabilizationKind { constant, mesh_dependent };
+      StabilizationKind stabilization_kind;
+      
+      double stabilization_value;
 
       static void declare_parameters (ParameterHandler &prm);
       void parse_parameters (ParameterHandler &prm);
@@ -564,10 +569,10 @@ namespace Parameters
   {
     prm.enter_subsection("flux");
     {
-      prm.declare_entry("stab", "alpha",
-			Patterns::Selection(
-			  "alpha|constant|mesh"),
-			"<alpha|constant|mesh>");
+      prm.declare_entry("stab", "mesh",
+			Patterns::Selection("constant|mesh"),
+			"Whether to use a constant stabilization parameter or "
+			"a mesh-dependent one");
       prm.declare_entry("stab value", "1",
 			Patterns::Double(),
 			"alpha stabilization");
@@ -582,25 +587,29 @@ namespace Parameters
     {
       const std::string stab = prm.get("stab");
       if (stab == "constant") 
-	LF_stab = CONSTANT;
+	stabilization_kind = constant;
       else if (stab == "mesh ") 
-	LF_stab = MESH;
+	stabilization_kind = mesh_dependent;
   
-      LF_stab_value = prm.get_double("stab value");
+      stabilization_value = prm.get_double("stab value");
     }
     prm.leave_subsection();
   }
 
 
 
+				   // @sect4{Parameters::Output}
+				   //
+				   // Then a section on output parameters. We
+				   // offer to produce Schlieren plots (the
+				   // squared gradient of the density, a tool
+				   // to visualize shock fronts), and a time
+				   // interval between graphical output in
+				   // case we don't want an output file every
+				   // time step.
   struct Output
   {
-				       // If true, we output the squared
-				       // gradient of the density instead of
-				       // density.  Using this one can create
-				       // shock plots.
       bool schlieren_plot;
-				       // How often to create an output file.
       double output_step;
 
       static void declare_parameters (ParameterHandler &prm);
@@ -613,13 +622,12 @@ namespace Parameters
   {
     prm.enter_subsection("output");
     {  
-      prm.declare_entry("density", "standard",
-			Patterns::Selection(
-			  "standard|schlieren"),
-			"<standard|schlieren>");
+      prm.declare_entry("schlieren plot", "true",
+			Patterns::Bool (),
+			"Whether or not to produce schlieren plots");
       prm.declare_entry("step", "-1",
 			Patterns::Double(),
-			"output once per this period");
+			"Output once per this period");
     }
     prm.leave_subsection();
   }
@@ -630,7 +638,7 @@ namespace Parameters
   {
     prm.enter_subsection("output");
     {
-      schlieren_plot = (prm.get("density") == "schlieren" ? true : false);
+      schlieren_plot = prm.get_bool("schlieren plot");
       output_step = prm.get_double("step");
     }
     prm.leave_subsection();
@@ -1128,16 +1136,20 @@ void ConsLaw<dim>::assemble_face_term(
   typedef Sacado::Fad::DFad<double> NormalFlux[EulerEquations<dim>::n_components];
   NormalFlux *normal_fluxes = new NormalFlux[n_q_points];
 
-  double alpha = 1;
+  double alpha;
 
-  switch(flux_params.LF_stab) {
-    case Parameters::Flux::CONSTANT:
-	  alpha = flux_params.LF_stab_value;
-	  break;
-    case Parameters::Flux::MESH:
-	  alpha = face_diameter/(2.0*dT);
-	  break;
-  }
+  switch(flux_params.stabilization_kind)
+    {
+      case Parameters::Flux::constant:
+	    alpha = flux_params.stabilization_value;
+	    break;
+      case Parameters::Flux::mesh_dependent:
+	    alpha = face_diameter/(2.0*dT);
+	    break;
+      default:
+	    Assert (false, ExcNotImplemented());
+	    alpha = 1;
+    }
 
   for (unsigned int q=0; q<n_q_points; ++q)
     EulerEquations<dim>::numerical_normal_flux(normals[q], Wplus[q], Wminus[q], alpha,
@@ -1691,6 +1703,7 @@ void ConsLaw<dim>::postprocess() {
 				       // Either output density or gradient
 				       // squared of density, depending on
 				       // what the user wants.
+//TODO: if schlieren plot then simply use a postprocessor      
       if (output_params.schlieren_plot == false)
         ppsolution(dofs[didx]) = solution(dofs[didx]);
       else
@@ -2091,14 +2104,15 @@ void ConsLaw<dim>::run ()
 				   // Initial refinement.  We apply the ic,
 				   // estimate, refine, and repeat until
 				   // happy.
-  if (refinement_params.refine != Parameters::Refinement::NONE)
-    for (unsigned int i = 0; i < refinement_params.shock_levels; i++) {
-      estimate();
-      refine_grid();
-      setup_system();
-      initialize(); 
-      predictor = solution;
-    }
+  if (refinement_params.do_refine == true)
+    for (unsigned int i = 0; i < refinement_params.shock_levels; i++)
+      {
+	estimate();
+	refine_grid();
+	setup_system();
+	initialize(); 
+	predictor = solution;
+      }
   postprocess();
   output_results (nstep);
 
@@ -2194,10 +2208,11 @@ void ConsLaw<dim>::run ()
       }
 
 				       // Refine, if refinement is selected.
-      if (refinement_params.refine != Parameters::Refinement::NONE) {
-        refine_grid();
-        setup_system();
-      }
+      if (refinement_params.do_refine == true)
+	{
+	  refine_grid();
+	  setup_system();
+	}
     }
 }
 

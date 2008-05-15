@@ -71,16 +71,16 @@ subsection linear solver
 end
 
 # --------------------------------------------------
-# Output frequency.
-# You may wish to set this > time step if you dont want output at every step
+# Output frequency and kind
 subsection output
+  set schlieren plot = true
   set step = 0.01
 end
 
 # --------------------------------------------------
 # Refinement control
 subsection refinement
-  set refinement = shock # none only other option
+  set refinement = true
   set shock value = 1.5
   set shock levels = 1 # how many levels of refinement to allow
 end
