@@ -110,7 +110,14 @@ inconvenience this causes.
 <h3>General</h3>
 
 <ol>
-  <li> <p>New: @ref step_29 "step-29" demonstrates how problems involving
+
+<li> <p>Improved: @ref step_16 "step-16" has been updated to show the
+use of Multigrid with Dirichlet boundary conditions.
+<br>
+(GK, 2007/05/13)
+</p>
+
+<li> <p>New: @ref step_29 "step-29" demonstrates how problems involving
   complex numbers can be implemented by viewing real and imaginary parts
   of a complex-valued solution as the two components of a vector-valued
   function. 
