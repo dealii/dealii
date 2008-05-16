@@ -2,7 +2,7 @@
 //    $Id$
 //    Version: $Name$
 //
-//    Copyright (C) 2007 by the deal.II authors
+//    Copyright (C) 2007, 2008 by the deal.II authors
 //
 //    This file is subject to QPL and may not be  distributed
 //    without copyright and license information. Please refer
@@ -33,10 +33,11 @@ DEAL_II_NAMESPACE_OPEN
  * and possibly the first and second derivates of the solution. Examples are
  * the calculation Mach numbers from velocity and density in supersonic flow
  * computations, or the computation of the magnitude of a complex-valued
- * solution as demonstrated in @ref step_29 "step-29".  This class offers the
- * interface to perform such postprocessing. Given the values and derivatives
- * of the solution at those points where we want to generated output, the
- * functions of this class can be overloaded to compute new quantities.
+ * solution as demonstrated in @ref step_29 "step-29". Other uses are shown in
+ * @ref step_33 "step-33". This class offers the interface to perform such
+ * postprocessing. Given the values and derivatives of the solution at those
+ * points where we want to generated output, the functions of this class can
+ * be overloaded to compute new quantities.
  *
  * A data vector and an object of a derived class can be given to the
  * <tt>DataOut::add_data_vector</tt> function, which will write the derived
