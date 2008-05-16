@@ -129,10 +129,17 @@ void LaplaceProblem<dim>::setup_system ()
 {
   mg_dof_handler.distribute_dofs (fe);
 
-  std::cout << "   Number of degrees of freedom: "
-	    << mg_dof_handler.n_dofs()
-	    << std::endl;
-
+				   // Here we output not only the
+				   // degrees of freedom on the finest
+				   // level, but also in the
+				   // multilevel structure
+  deallog << "Number of degrees of freedom: "
+	  << mg_dof_handler.n_dofs();
+  for (unsigned int l=0;l<triangulation.n_levels();++l)
+    deallog << "   " << 'L' << l << ": "
+	    << mg_dof_handler.n_dofs(l);
+  deallog  << std::endl;
+  
   sparsity_pattern.reinit (mg_dof_handler.n_dofs(),
 			   mg_dof_handler.n_dofs(),
 			   mg_dof_handler.max_couplings_between_dofs());
@@ -244,11 +251,9 @@ void LaplaceProblem<dim>::assemble_system ()
 	for (unsigned int i=0; i<dofs_per_cell; ++i)
 	  {
 	    for (unsigned int j=0; j<dofs_per_cell; ++j)
-	      cell_matrix(i,j) += ((fe_values.shape_grad(i,q_point)
-				    * fe_values.shape_grad(j,q_point))
-				    + fe_values.shape_value(i,q_point)
-				    * fe_values.shape_value(j,q_point))
-				   * fe_values.JxW(q_point);
+	      cell_matrix(i,j) += (fe_values.shape_grad(i,q_point)
+				   * fe_values.shape_grad(j,q_point))
+				  * fe_values.JxW(q_point);
 
 					     // For the right hand
 					     // side, a constant value
@@ -270,16 +275,23 @@ void LaplaceProblem<dim>::assemble_system ()
 	};
     };
 
-				   // Again use zero boundary values:
-//   std::map@<unsigned int,double@> boundary_values;
-//   VectorTools::interpolate_boundary_values (mg_dof_handler,
-// 					    0,
-// 					    ZeroFunction@<dim@>(),
-// 					    boundary_values);
-//   MatrixTools::apply_boundary_values (boundary_values,
-// 				      system_matrix,
-// 				      solution,
-// 				      system_rhs);
+				   // The Dirichlet boundary
+				   // conditions on the finest level
+				   // are handled as usual.
+  std::map<unsigned int,double> boundary_values;  
+  
+  VectorTools::interpolate_boundary_values (mg_dof_handler,
+					    0,
+					    ZeroFunction<dim>(),
+					    boundary_values);
+ 
+  
+  MatrixTools::apply_boundary_values (boundary_values,
+				      system_matrix,
+				      solution,
+				      system_rhs);
+  
+
 }
 
 
@@ -329,12 +341,10 @@ void LaplaceProblem<dim>::assemble_multigrid ()
 	for (unsigned int i=0; i<dofs_per_cell; ++i)
 	  {
 	    for (unsigned int j=0; j<dofs_per_cell; ++j)
-	      cell_matrix(i,j) += ((fe_values.shape_grad(i,q_point)
-				    * fe_values.shape_grad(j,q_point))
-				   + fe_values.shape_value(i,q_point)
-				   * fe_values.shape_value(j,q_point))
+	      cell_matrix(i,j) += (fe_values.shape_grad(i,q_point)
+				   * fe_values.shape_grad(j,q_point))
 				  * fe_values.JxW(q_point);
-	  };
+	  }
 
 
 				       // Oops! This is a tiny
@@ -356,19 +366,47 @@ void LaplaceProblem<dim>::assemble_multigrid ()
 	    mg_matrices[level].add (local_dof_indices[i],
                                     local_dof_indices[j],
                                     cell_matrix(i,j));
-	};
-    };
+	}
+    }
 
-				   // Again use zero boundary values:
-//   std::map@<unsigned int,double@> boundary_values;
-//   VectorTools::interpolate_boundary_values (mg_dof_handler,
-// 					    0,
-// 					    ZeroFunction@<dim@>(),
-// 					    boundary_values);
-//   MatrixTools::apply_boundary_values (boundary_values,
-// 				      system_matrix,
-// 				      solution,
-// 				      system_rhs);
+				   // Now we have to eliminate the
+				   // boundary nodes on all
+				   // levels. This is done exactly in
+				   // the same fashion as on the
+				   // finest level. Therefore, we need
+				   // a function map first. On the
+				   // other hand, since we use
+				   // multigrid only as a
+				   // preconditioner, we always use
+				   // homogeneous boundary conditions
+				   // and the ZeroFunction will be
+				   // sufficient in all cases; using a
+				   // different function here would
+				   // not hurt on the other hand,
+				   // since the values are ignored.
+
+  typename FunctionMap<dim>::type      dirichlet_boundary;
+  ZeroFunction<dim>                    homogeneous_dirichlet_bc (1);
+  dirichlet_boundary[0] = &homogeneous_dirichlet_bc;
+  
+				   // Next we generate the set of
+				   // dof indices to be eliminated on
+				   // each level.
+  std::vector<std::set<unsigned int> > boundary_indices(triangulation.n_levels());
+  MGTools::make_boundary_list (mg_dof_handler,
+			       dirichlet_boundary,
+			       boundary_indices);
+
+				   // And finally we eliminate these
+				   // degrees of freedom from every
+				   // matrix in the multilevel hierarchy.
+ const unsigned int nlevels = triangulation.n_levels();
+ for (unsigned int level=0;level<nlevels;++level)
+   {
+     MGTools::apply_boundary_values(boundary_indices[level],
+				    mg_matrices[level],
+				    true);
+   }
 }
 
 
@@ -463,10 +501,6 @@ void LaplaceProblem<dim>::solve ()
   
   cg.solve (system_matrix, solution, system_rhs,
 	    preconditioner);
-
-  std::cout << "   " << solver_control.last_step()
-	    << " CG iterations needed to obtain convergence."
-	    << std::endl;
 }
 
 
@@ -505,7 +539,7 @@ void LaplaceProblem<dim>::run ()
 {
   for (unsigned int cycle=0; cycle<6; ++cycle)
     {
-      std::cout << "Cycle " << cycle << ':' << std::endl;
+      deallog << "Cycle " << cycle << std::endl;
 
       if (cycle == 0)
 	{
@@ -518,18 +552,6 @@ void LaplaceProblem<dim>::run ()
 				       // the grid once globally.
       else
 	triangulation.refine_global (1);
-
-				       // Write some output and do all
-				       // the things that we have
-				       // already seen in the previous
-				       // examples.
-      std::cout << "   Number of active cells: "
-		<< triangulation.n_active_cells()
-		<< std::endl
-		<< "   Total number of cells: "
-		<< triangulation.n_cells()
-		<< std::endl;
-
       setup_system ();
       assemble_system ();
       assemble_multigrid ();
@@ -546,8 +568,6 @@ void LaplaceProblem<dim>::run ()
 				 // further.
 int main () 
 {
-  deallog.depth_console (0);
-
   LaplaceProblem<2> laplace_problem_2d;
   laplace_problem_2d.run ();
   
