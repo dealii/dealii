@@ -158,6 +158,67 @@ struct EulerEquations
 				   // and $O_2$.
     static const double gas_gamma;
 
+    
+				     // In the following, we will need to
+				     // compute the kinetic energy and the
+				     // pressure from a vector of conserved
+				     // variables. This we can do based on the
+				     // energy density and the kinetic energy
+				     // $\frac 12 \rho |\mathbf v|^2 =
+				     // \frac{|\rho \mathbf v|^2}{2\rho}$
+				     // (note that the independent variables
+				     // contain the momentum components $\rho
+				     // v_i$, not the velocities $v_i$).
+				     //
+				     // There is one slight problem: We will
+				     // need to call the following functions
+				     // with input arguments of type
+				     // <code>std::vector@<number@></code> and
+				     // <code>Vector@<number@></code>. The
+				     // problem is that the former has an
+				     // access operator
+				     // <code>operator[]</code> whereas the
+				     // latter, for historical reasons, has
+				     // <code>operator()</code>. We wouldn't
+				     // be able to write the function in a
+				     // generic way if we were to use one or
+				     // the other of these. Fortunately, we
+				     // can use the following trick: instead
+				     // of writing <code>v[i]</code> or
+				     // <code>v(i)</code>, we can use
+				     // <code>*(v.begin() + i)</code>, i.e. we
+				     // generate an iterator that points to
+				     // the <code>i</code>th element, and then
+				     // dereference it. This works for both
+				     // kinds of vectors -- not the prettiest
+				     // solution, but one that works.
+    template <typename number, typename InputVector>
+    static
+    number
+    compute_kinetic_energy (const InputVector &W)
+      {
+	number kinetic_energy = 0;
+	for (unsigned int d=0; d<dim; ++d)
+	  kinetic_energy += *(W.begin()+first_momentum_component+d) *
+			    *(W.begin()+first_momentum_component+d);
+	kinetic_energy *= 1./(2 * *(W.begin() + density_component));
+
+	return kinetic_energy;
+      }
+
+
+    template <typename number, typename InputVector>
+    static
+    number
+    compute_pressure (const InputVector &W)
+      {
+	return ((gas_gamma-1.0) *
+		(*(W.begin() + energy_component) -
+		 compute_kinetic_energy<number>(W)));
+      }	
+    
+
+    
 				     // We define the flux function
 				     // $F(W)$ as one large matrix.
 				     // Each row of this matrix
@@ -197,37 +258,21 @@ struct EulerEquations
     void flux_matrix (const std::vector<number> &W,
 		      number (&flux)[n_components][dim])
       {
-					 // First compute the pressure
-					 // that appears in the flux
-					 // matrix, based on the
-					 // energy density and the
-					 // kinetic energy $\frac 12
-					 // \rho |\mathbf v|^2 =
-					 // \frac{|\rho \mathbf
-					 // v|^2}{2\rho}$ (note that
-					 // the independent variables
-					 // contain the momentum
-					 // components $\rho v_i$, not
-					 // the velocities $v_i$):
-	number kinetic_energy = 0;
-	for (unsigned int d=0; d<dim; ++d)
-	  kinetic_energy += W[first_momentum_component+d] *
-			    W[first_momentum_component+d];
-	kinetic_energy *= 1./(2 * W[density_component]);
+					 // First compute the pressure that
+					 // appears in the flux matrix, and
+					 // then compute the first
+					 // <code>dim</code> columns of the
+					 // matrix that correspond to the
+					 // momentum terms:
+	const number pressure = compute_pressure<number> (W);
 	
-	const number pressure = (gas_gamma-1.0)*(W[energy_component] - kinetic_energy);
-
-					 // Then compute the first
-					 // <code>dim</code> columns
-					 // of the matrix that
-					 // correspond to the momentum
-					 // terms:
 	for (unsigned int d=0; d<dim; ++d)
 	  {
 	    for (unsigned int e=0; e<dim; ++e)
-	      flux[first_momentum_component+d][e] = W[first_momentum_component+d] *
-						    W[first_momentum_component+e] /
-						    W[density_component];
+	      flux[first_momentum_component+d][e]
+		= W[first_momentum_component+d] *
+		W[first_momentum_component+e] /
+		W[density_component];
 	  
 	    flux[first_momentum_component+d][d] += pressure;
 	  }
@@ -280,11 +325,275 @@ struct EulerEquations
 	    normal_flux[di] += 0.5*alpha*(Wplus[di] - Wminus[di]);
 	  }
     }
+
+    
+				     // Finally, we declare a class that
+				     // implements a postprocessing of data
+				     // components. The problem this class
+				     // solves is that the variables in the
+				     // formulation of the Euler equations we
+				     // use are in conservative rather than
+				     // physical form: they are momentum
+				     // densities $\mathbf m=\rho\mathbf v$,
+				     // density $\rho$, and energy density
+				     // $E$. What we would like to also put
+				     // into our output file are velocities
+				     // $\mathbf v=\frac{\mathbf m}{\rho}$ and
+				     // pressure $p=(\gamma-1)(E-\frac{1}{2}
+				     // \rho |\mathbf v|^2)$.
+				     //
+				     // In addition, we would like to add the
+				     // possibility to generate schlieren
+				     // plots. Schlieren plots are a way to
+				     // visualize shocks and other sharp
+				     // interfaces. The word "schlieren" a
+				     // German word that may be translated as
+				     // "striae" -- it may be simpler to
+				     // explain it by an example, however:
+				     // schlieren is what you see when you,
+				     // for example, pour highly concentrated
+				     // alcohol, or a transparent saline
+				     // solution into water; the two have the
+				     // same color, but they have different
+				     // refractive indices and so before they
+				     // are fully mixed light goes through the
+				     // mixture along bent rays that lead to
+				     // brightness variations if you look at
+				     // it. That's "schlieren". A similar
+				     // effect happens in compressible flow
+				     // due because the refractive index
+				     // depends on the pressure (and therefore
+				     // the density) of the gas.
+				     //
+				     // The origin of the word refers to
+				     // two-dimensional projections of a
+				     // three-dimensional volume (we see a 2d
+				     // picture of the 3d fluid). In
+				     // computational fluid dynamics, we can
+				     // get an idea of this effect by
+				     // considering what causes it: density
+				     // variations. Schlieren plots are
+				     // therefore produced by plotting
+				     // $s=|\nabla \rho|^2$; obviously, $s$ is
+				     // large in shocks and at other highly
+				     // dynamic places. If so desired by the
+				     // user (by specifying this in the input
+				     // file), we would like to generate these
+				     // schlieren plots in addition to the
+				     // other derived quantities listed above.
+				     //
+				     // The implementation of the algorithms
+				     // to compute derived quantities from the
+				     // ones that solve our problem, and to
+				     // output them into data file, rests on
+				     // the DataPostprocessor class. It has
+				     // extensive documentation, and other
+				     // uses of the class can also be found in
+				     // step-29. We therefore refrain from
+				     // extensive comments.
+    class Postprocessor : public DataPostprocessor<dim>
+    {
+      public:
+	Postprocessor (const bool do_schlieren_plot);
+	
+	virtual
+	void
+	compute_derived_quantities_vector (const std::vector<Vector<double> >              &uh,
+					   const std::vector<std::vector<Tensor<1,dim> > > &duh,
+					   const std::vector<std::vector<Tensor<2,dim> > > &dduh,
+					   const std::vector<Point<dim> >                  &normals,
+					   std::vector<Vector<double> >                    &computed_quantities) const;
+
+	virtual std::vector<std::string> get_names () const;
+    
+	virtual
+	std::vector<DataComponentInterpretation::DataComponentInterpretation>
+	get_data_component_interpretation () const;
+    
+	virtual UpdateFlags get_needed_update_flags () const;
+
+	virtual unsigned int n_output_variables() const;
+
+      private:
+	const bool do_schlieren_plot;
+    };
 };
     
 
 template <int dim>
 const double EulerEquations<dim>::gas_gamma = 1.4;
+
+
+
+template <int dim>
+EulerEquations<dim>::Postprocessor::
+Postprocessor (const bool do_schlieren_plot)
+		:
+		do_schlieren_plot (do_schlieren_plot)
+{}
+
+
+				 // This is the only function worth commenting
+				 // on. When generating graphical output, the
+				 // DataOut and related classes will call this
+				 // function on each cell, with values,
+				 // gradients, hessians, and normal vectors
+				 // (in case we're working on faces) at each
+				 // quadrature point. Note that the data at
+				 // each quadrature point is itself
+				 // vector-valued, namely the conserved
+				 // variables. What we're going to do here is
+				 // to compute the quantities we're interested
+				 // in at each quadrature point. Note that for
+				 // this we can ignore the hessians ("dduh")
+				 // and normal vectors; to avoid compiler
+				 // warnings about unused variables, we
+				 // comment out their names.
+template <int dim>
+void
+EulerEquations<dim>::Postprocessor::
+compute_derived_quantities_vector (const std::vector<Vector<double> >              &uh,
+				   const std::vector<std::vector<Tensor<1,dim> > > &duh,
+				   const std::vector<std::vector<Tensor<2,dim> > > &/*dduh*/,
+				   const std::vector<Point<dim> >                  &/*normals*/,
+				   std::vector<Vector<double> >                    &computed_quantities) const
+{
+				   // At the beginning of the function, let us
+				   // make sure that all variables have the
+				   // correct sizes, so that we can access
+				   // individual vector elements without
+				   // having to wonder whether we might read
+				   // or write invalid elements; we also check
+				   // that the <code>duh</code> vector only
+				   // contains data if we really need it (the
+				   // system knows about this because we say
+				   // so in the
+				   // <code>get_needed_update_flags()</code>
+				   // function below). For the inner vectors,
+				   // we check that at least the first element
+				   // of the outer vector has the correct
+				   // inner size:
+  const unsigned int n_quadrature_points = uh.size();
+
+  if (do_schlieren_plot == true)
+    Assert (duh.size() == n_quadrature_points,
+	    ExcInternalError())
+  else
+    Assert (duh.size() == 0,
+	    ExcInternalError());
+
+  Assert (computed_quantities.size() == n_quadrature_points,
+	  ExcInternalError());
+
+  Assert (uh[0].size() == n_components,
+	  ExcInternalError());
+
+  if (do_schlieren_plot == true)
+    Assert (computed_quantities[0].size() == dim+2,
+	    ExcInternalError())
+  else
+    Assert (computed_quantities[0].size() == dim+1,
+	    ExcInternalError());
+
+				   // Then loop over all quadrature points and
+				   // do our work there. The code should be
+				   // pretty self-explanatory. The order of
+				   // output variables is first
+				   // <code>dim</code> velocities, then the
+				   // pressure, and if so desired the
+				   // schlieren plot. Note that we try to be
+				   // generic about the order of variables in
+				   // the input vector, using the
+				   // <code>first_momentum_component</code>
+				   // and <code>density_component</code>
+				   // information:
+  for (unsigned int q=0; q<n_quadrature_points; ++q)
+    {
+      const double density = uh[q](density_component);
+      const double energy  = uh[q](energy_component);
+
+      for (unsigned int d=0; d<dim; ++d)
+	computed_quantities[q](d)
+	  = uh[q](first_momentum_component+d) / density;
+
+      computed_quantities[q](dim) = compute_pressure<double> (uh[q]);
+
+      if (do_schlieren_plot == true)
+	computed_quantities[q](dim+1) = duh[q][density_component] *
+					duh[q][density_component];
+    }
+}
+
+
+template <int dim>
+std::vector<std::string>
+EulerEquations<dim>::Postprocessor::
+get_names () const
+{
+  std::vector<std::string> names;
+  for (unsigned int d=0; d<dim; ++d)
+    names.push_back ("velocity");
+  names.push_back ("pressure");
+
+  if (do_schlieren_plot == true)
+    names.push_back ("schlieren_plot");
+
+  return names;
+}
+
+
+template <int dim>
+std::vector<DataComponentInterpretation::DataComponentInterpretation>
+EulerEquations<dim>::Postprocessor::
+get_data_component_interpretation () const
+{
+  std::vector<DataComponentInterpretation::DataComponentInterpretation>
+    interpretation;
+
+  for (unsigned int d=0; d<dim; ++d)
+    interpretation.push_back (DataComponentInterpretation::
+			      component_is_part_of_vector);
+
+  interpretation.push_back (DataComponentInterpretation::
+			    component_is_scalar);
+
+  if (do_schlieren_plot == true)
+    interpretation.push_back (DataComponentInterpretation::
+			      component_is_scalar);
+
+  return interpretation;
+}
+
+
+
+template <int dim>
+UpdateFlags
+EulerEquations<dim>::Postprocessor::
+get_needed_update_flags () const
+{
+  if (do_schlieren_plot == true)  
+    return update_values | update_gradients;
+  else
+    return update_values;
+}
+
+
+
+template <int dim>
+unsigned int
+EulerEquations<dim>::Postprocessor::
+n_output_variables () const
+{
+  if (do_schlieren_plot == true)
+    return dim+2;
+  else
+    return dim+1;
+}
+
+
+template class EulerEquations<2>::Postprocessor;
+
+
 
 				 // @sect3{Run time parameter handling}
 
@@ -588,8 +897,10 @@ namespace Parameters
       const std::string stab = prm.get("stab");
       if (stab == "constant") 
 	stabilization_kind = constant;
-      else if (stab == "mesh ") 
+      else if (stab == "mesh") 
 	stabilization_kind = mesh_dependent;
+      else
+	AssertThrow (false, ExcNotImplemented());
   
       stabilization_value = prm.get_double("stab value");
     }
@@ -1633,10 +1944,10 @@ void ConsLaw<dim>::solve (Vector<double> &dsolution, int &niter, double &lin_res
   }
 }
 
-                                 // @sect3{Postprocessing and Output}
-                                 // Recover the physical variables from the conservative
-                                 // variables so that output will be (perhaps) more
-                                 // meaningfull.
+                                 // @sect3{Postprocessing and Output} Recover
+                                 // the physical variables from the
+                                 // conservative variables so that output will
+                                 // be (perhaps) more meaningfull.
 template <int dim>
 void ConsLaw<dim>::postprocess() {
   const unsigned int dofs_per_cell = dof_handler.get_fe().dofs_per_cell;
