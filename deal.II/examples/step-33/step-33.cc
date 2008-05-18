@@ -95,7 +95,7 @@
 using namespace dealii;
 
 
-				 // @sect3{Flux function definition}
+				 // @sect3{Euler equation specifics}
 
 				 // Here we define the flux function for this
 				 // particular system of conservation laws,
@@ -591,10 +591,6 @@ n_output_variables () const
 }
 
 
-template class EulerEquations<2>::Postprocessor;
-
-
-
 				 // @sect3{Run time parameter handling}
 
 				 // Our next job is to define a few
@@ -987,7 +983,6 @@ class ConsLaw
     void output_results (const unsigned int cycle) const;
     void initialize();
     void estimate();
-    void postprocess();
     void compute_predictor();
 
     static const unsigned int max_n_boundaries = 10;
@@ -1011,8 +1006,6 @@ class ConsLaw
                                      // An estimate of the next time value; used for adaptivity and as a
                                      // guess for the next Newton iteration.
     Vector<double>       predictor;
-                                     // Values after post-processing (used to output the physical variables).
-    Vector<double>       ppsolution;
                                      // The solution to the linear problem during the Newton iteration
     Vector<double>       dsolution;
     Vector<double>       right_hand_side;
@@ -1762,7 +1755,6 @@ void ConsLaw<dim>::initialize_system ()
   solution.reinit (dof_handler.n_dofs());
   nlsolution.reinit (dof_handler.n_dofs());
   predictor.reinit (dof_handler.n_dofs());
-  ppsolution.reinit (dof_handler.n_dofs());
   dsolution.reinit (dof_handler.n_dofs());
   right_hand_side.reinit (dof_handler.n_dofs());
   indicator.reinit(triangulation.n_active_cells());
@@ -1944,98 +1936,6 @@ void ConsLaw<dim>::solve (Vector<double> &dsolution, int &niter, double &lin_res
   }
 }
 
-                                 // @sect3{Postprocessing and Output} Recover
-                                 // the physical variables from the
-                                 // conservative variables so that output will
-                                 // be (perhaps) more meaningfull.
-template <int dim>
-void ConsLaw<dim>::postprocess() {
-  const unsigned int dofs_per_cell = dof_handler.get_fe().dofs_per_cell;
-  std::vector<unsigned int> dofs (dofs_per_cell);
-  UpdateFlags update_flags = update_values
-			     | update_gradients
-			     | update_q_points
-			     | update_JxW_values;
-  UpdateFlags update_flags1 = update_values
-			      | update_gradients
-			      | update_q_points
-			      | update_JxW_values;
-
-  QGauss<dim>  quadrature_formula(4);
-
-  const std::vector<Point<dim> > &us = fe.base_element(0).get_unit_support_points();
-
-
-  Quadrature<dim>  unit_support(us);
-
-  int n_q_points = quadrature_formula.n_quadrature_points;
-  int n_uq_points = unit_support.n_quadrature_points;
-
-  FEValues<dim> fe_v (
-    mapping, fe, quadrature_formula, update_flags);
-
-  FEValues<dim> fe_v_unit (
-    mapping, fe, unit_support, update_flags1);
-
-  std::vector<Vector<double> > U(n_uq_points,
-                                 Vector<double>(EulerEquations<dim>::n_components));
-  std::vector<Vector<double> > UU(n_q_points,
-				  Vector<double>(EulerEquations<dim>::n_components));
-  std::vector<std::vector<Tensor<1,dim> > > dU(n_uq_points,
-					       std::vector<Tensor<1,dim> >(EulerEquations<dim>::n_components));
-  
-  typename DoFHandler<dim>::active_cell_iterator
-    cell = dof_handler.begin_active(),
-    endc = dof_handler.end();
-
-				   // Loop the cells
-  for (unsigned int cell_no=0; cell!=endc; ++cell, ++cell_no) {
-    cell->get_dof_indices (dofs);
-    fe_v_unit.reinit(cell);
-    fe_v.reinit(cell);
-
-    fe_v_unit.get_function_values(solution, U);
-    fe_v_unit.get_function_grads(solution, dU);
-    fe_v.get_function_values(solution, UU);
-
-    for (unsigned int q = 0; q < fe_v.get_fe().base_element(0).n_dofs_per_cell(); q++)
-      {
-	unsigned int didx
-	  = fe_v.get_fe().component_to_system_index(EulerEquations<dim>::density_component, q);
-	unsigned int eidx
-	  = fe_v.get_fe().component_to_system_index(EulerEquations<dim>::energy_component, q);
-	double rho_normVsqr = 0;
-	for (unsigned int d = 0; d < dim; d++)
-	  {
-	    unsigned int vidx = fe_v.get_fe().component_to_system_index(d, q);
-	    ppsolution(dofs[vidx]) = solution(dofs[vidx])/solution(dofs[didx]);
-	    rho_normVsqr += solution(dofs[vidx])*solution(dofs[vidx]);
-	  }
-	rho_normVsqr /= solution(dofs[didx]);
-					 // Pressure
-	ppsolution(dofs[eidx])
-	  = (EulerEquations<dim>::gas_gamma-1.0)*(solution(dofs[eidx]) - 0.5*rho_normVsqr);
-
-					 // Either output density or gradient
-					 // squared of density, depending on
-					 // what the user wants.
-//TODO: if schlieren plot then simply use a postprocessor      
-	if (output_params.schlieren_plot == false)
-	  ppsolution(dofs[didx]) = solution(dofs[didx]);
-	else
-	  {
-	    double ng = 0;
-	    for (unsigned int i = 0; i < dim; i++)
-	      ng += dU[q][EulerEquations<dim>::density_component][i]*dU[q][EulerEquations<dim>::density_component][i];
-	    ng = std::sqrt(ng);
-	    ppsolution(dofs[didx]) = ng;
-	  }
-      }
-    
-  } // cell
-
-}
-
 				 // Loop and assign a value for refinement.  We
 				 // simply use the density squared, which selects
 				 // shocks with some success.
@@ -2147,7 +2047,6 @@ void ConsLaw<dim>::refine_grid ()
 
 				   // resize these vectors for the new grid.
   nlsolution.reinit(dof_handler.n_dofs());
-  ppsolution.reinit(dof_handler.n_dofs());
   nlsolution = solution;
   dsolution.reinit (dof_handler.n_dofs());
   right_hand_side.reinit (dof_handler.n_dofs());
@@ -2159,15 +2058,16 @@ void ConsLaw<dim>::refine_grid ()
 template <int dim>
 void ConsLaw<dim>::output_results (const unsigned int cycle) const
 {
-  char filename[512];
-  std::sprintf(filename, "solution-%03d.vtk", cycle);
-  std::ofstream output (filename);
+  std::string filename = "solution-" +
+			 Utilities::int_to_string (cycle, 3) +
+			 ".vtk";
+  std::ofstream output (filename.c_str());
 
   DataOut<dim> data_out;
   data_out.attach_dof_handler (dof_handler);
-  std::vector<std::string> solution_names (dim, "velocity");
+  std::vector<std::string> solution_names (dim, "momentum");
   solution_names.push_back ("density");
-  solution_names.push_back ("pressure");
+  solution_names.push_back ("energy_density");
 
   std::vector<DataComponentInterpretation::DataComponentInterpretation>
     data_component_interpretation
@@ -2177,15 +2077,18 @@ void ConsLaw<dim>::output_results (const unsigned int cycle) const
   data_component_interpretation
     .push_back (DataComponentInterpretation::component_is_scalar);
   
-  data_out.add_data_vector (ppsolution, solution_names,
+  data_out.add_data_vector (solution, solution_names,
 			    DataOut<dim>::type_dof_data,
 			    data_component_interpretation);
 
+  typename EulerEquations<dim>::Postprocessor 
+    postprocessor (output_params.schlieren_plot);
+  data_out.add_data_vector (solution, postprocessor);
+
   data_out.add_data_vector (indicator, "error");
+  
   data_out.build_patches ();
   data_out.write_vtk (output);
-
-  output.close();
 }
 
 				 // @sect3{Parsing the Input Deck}
@@ -2430,7 +2333,7 @@ void ConsLaw<dim>::run ()
 	initialize(); 
 	predictor = solution;
       }
-  postprocess();
+
   output_results (nstep);
 
 				   // Determine when we will output next.
@@ -2509,10 +2412,7 @@ void ConsLaw<dim>::run ()
 
       solution = nlsolution;
 
-
       estimate();
-
-      postprocess();
 
       T += dT;
 
