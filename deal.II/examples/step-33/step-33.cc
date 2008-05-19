@@ -1097,6 +1097,7 @@ namespace Parameters
       double gravity;
 
       double time_step, final_time;
+      double theta;
       bool is_stationary;
 
       std::string mesh_filename;
@@ -1143,11 +1144,16 @@ namespace Parameters
     prm.enter_subsection("time stepping");
     {
       prm.declare_entry("time step", "0.1",
-			Patterns::Double(),
+			Patterns::Double(0),
 			"simulation time step");
       prm.declare_entry("final time", "10.0",
-			Patterns::Double(),
+			Patterns::Double(0),
 			"simulation end time");
+      prm.declare_entry("theta scheme value", "0.5",
+			Patterns::Double(0,1),
+			"value for theta that interpolated between explicit "
+			"Euler (theta=0), Crank-Nicolson (theta=0.5), and "
+			"implicit Euler (theta=1).");
     }
     prm.leave_subsection();
 
@@ -1216,6 +1222,7 @@ namespace Parameters
 	is_stationary = false;
       
       final_time = prm.get_double("final time");
+      theta = prm.get_double("theta scheme value");
     }
     prm.leave_subsection();
 
@@ -1283,101 +1290,143 @@ namespace Parameters
 
 				 // @sect3{Conservation Law class}
 
-				 // Here we define a Conservation Law
-				 // class that helps group operations
-				 // and data for our Euler equations
-				 // into a manageable entity.  Member
-				 // functions will be described as
-				 // their definitions appear.
+				 // Here finally comes the class that
+				 // actually does something with all
+				 // the Euler equation and parameter
+				 // specifics we've defined above. The
+				 // public interface is pretty much
+				 // the same as always (the
+				 // constructor now takes the name of
+				 // a file from which to read
+				 // parameters, which is passed on the
+				 // command line). The private
+				 // function interface is also pretty
+				 // similar to the usual arrangement,
+				 // with the
+				 // <code>assemble_system</code>
+				 // function split into three parts:
+				 // one that contains the main loop
+				 // over all cells and that then calls
+				 // the other two for integrals over
+				 // cells and faces, respectively.
 template <int dim>
-class ConsLaw
+class ConservationLaw
 {
   public:
-    ConsLaw (const char *input_filename);
-    ~ConsLaw ();
+    ConservationLaw (const char *input_filename);
+    ~ConservationLaw ();
 
     void run ();
     
   private:
     void setup_system ();
-    void initialize_system ();
-    void assemble_system (double &res_norm);
-    void solve (Vector<double> &solution, int &, double &);
-    void refine_grid ();
-    void output_results (const unsigned int cycle) const;
-    void initialize();
-    void estimate();
-    void compute_predictor();
 
-    Triangulation<dim>   triangulation;
-    const MappingQ1<dim> mapping;
-    
-    
-    FESystem<dim>        fe;
-
-    DoFHandler<dim>      dof_handler;
-
-    SparsityPattern      sparsity_pattern;
-    const QGauss<dim>   quadrature;
-    const QGauss<dim-1> face_quadrature;
-    
-                                     // The actual solution to the Euler equation
-    Vector<double>       solution;
-                                     // The current value of the solution during the Newton iteration
-    Vector<double>       nlsolution;
-                                     // An estimate of the next time value; used for adaptivity and as a
-                                     // guess for the next Newton iteration.
-    Vector<double>       predictor;
-                                     // The solution to the linear problem during the Newton iteration
-    Vector<double>       dsolution;
-    Vector<double>       right_hand_side;
-
-    Epetra_SerialComm    communicator;
-    
-  public:
+    void assemble_system ();
 
     void assemble_cell_term (const FEValues<dim>             &fe_v,
 			     const std::vector<unsigned int> &dofs);
     
-    void assemble_face_term(
-      int face_no,
-      const FEFaceValuesBase<dim>& fe_v,
-      const FEFaceValuesBase<dim>& fe_v_neighbor,
-      std::vector<unsigned int> &dofs,
-      std::vector<unsigned int> &dofs_neighbor,
-      const bool external_face,
-      const unsigned int boundary_id);
+    void assemble_face_term(const unsigned int           face_no,
+			    const FEFaceValuesBase<dim> &fe_v,
+			    const FEFaceValuesBase<dim> &fe_v_neighbor,
+			    const std::vector<unsigned int>   &dofs,
+			    const std::vector<unsigned int>   &dofs_neighbor,
+			    const bool                   external_face,
+			    const unsigned int           boundary_id,
+			    const double                 face_diameter);
 
-  private:
-    double T;
-    double face_diameter;
-    double cell_diameter;
+    std::pair<unsigned int, double> solve (Vector<double> &solution);
 
-    Parameters::AllParameters<dim> parameters;
+    void refine_grid ();
+
+    void output_results () const;
+
+    void compute_refinement_indicator ();
+
+
+				     // The first few member variables
+				     // are also rather standard. Note
+				     // that we define a mapping
+				     // object to be used throughout
+				     // the program when assembling
+				     // terms (we will hand it to
+				     // every FEValues and
+				     // FEFaceValues object); the
+				     // mapping we use is just the
+				     // standard $Q_1$ mapping --
+				     // nothing fancy, in other words
+				     // -- but declaring one here and
+				     // using it throughout the
+				     // program will make it simpler
+				     // later on to change it if that
+				     // should become necessary. This
+				     // is, in fact, rather pertinent:
+				     // it is known that for
+				     // transsonic simulations with
+				     // the Euler equations,
+				     // computations do not converge
+				     // even as $h\rightarrow 0$ if
+				     // the boundary approximation is
+				     // not of sufficiently high
+				     // order.
+    Triangulation<dim>   triangulation;
+    const MappingQ1<dim> mapping;    
+    
+    const FESystem<dim>  fe;
+    DoFHandler<dim>      dof_handler;
+
+    SparsityPattern      sparsity_pattern;
+    const QGauss<dim>    quadrature;
+    const QGauss<dim-1>  face_quadrature;
+    
+                                     // Next come a number of data
+                                     // vectors that correspond to the
+                                     // solution of the previous time
+                                     // step
+                                     // (<code>old_solution</code>),
+                                     // the best guess of the current
+                                     // solution
+                                     // (<code>current_solution</code>;
+                                     // we say <i>guess</i> because
+                                     // the Newton iteration to
+                                     // compute it may not have
+                                     // converged yet, whereas
+                                     // <code>old_solution</code>
+                                     // refers to the fully converged
+                                     // final result of the previous
+                                     // time step), and a predictor
+                                     // for the solution at the next
+                                     // time step, computed by
+                                     // extrapolating the current and
+                                     // previous solution one time
+                                     // step into the future:
+    Vector<double>       old_solution;
+    Vector<double>       current_solution;
+    Vector<double>       predictor;
+
+    Vector<double>       right_hand_side;
+
+    Epetra_SerialComm    communicator;
 
     Epetra_Map         *Map;
     Epetra_CrsMatrix   *Matrix;
     Vector<double>      indicator;
  
-				     // Crank-Nicolson value
-    const double        theta; 
-
+    Parameters::AllParameters<dim> parameters;
 };
 
 
 				 // Create a conservation law with some defaults.
 template <int dim>
-ConsLaw<dim>::ConsLaw (const char *input_filename)
+ConservationLaw<dim>::ConservationLaw (const char *input_filename)
 		:
 		mapping (),
                 fe (FE_Q<dim>(1), EulerEquations<dim>::n_components),
 		dof_handler (triangulation),
 		quadrature (2),
 		face_quadrature (2),
-                T(0),
                 Map(NULL),
-                Matrix(NULL),
-                theta(0.5) 
+                Matrix(NULL)
 {
   ParameterHandler prm;
   Parameters::AllParameters<dim>::declare_parameters (prm);
@@ -1389,20 +1438,11 @@ ConsLaw<dim>::ConsLaw (const char *input_filename)
 
 				 // Bye bye Conservation law.
 template <int dim>
-ConsLaw<dim>::~ConsLaw () 
+ConservationLaw<dim>::~ConservationLaw () 
 {
   dof_handler.clear ();
 }
 
-
-				 // Apply the initialial condition.  Simultaneously
-				 // initialize the non-linear solution.
-template <int dim>
-void ConsLaw<dim>::initialize() {
-  VectorTools::interpolate(dof_handler,
-                           parameters.initial_conditions, solution);
-  nlsolution = solution;
-}
 
 				 // @sect3{Assembly}
 				 // @sect4{%Function: assemble_cell_term}
@@ -1411,8 +1451,8 @@ void ConsLaw<dim>::initialize() {
                                  // to the right hand side, and adding in the Jacobian
                                  // contributions.
 template <int dim>
-void ConsLaw<dim>::assemble_cell_term (const FEValues<dim>             &fe_v,
-				       const std::vector<unsigned int> &dofs) 
+void ConservationLaw<dim>::assemble_cell_term (const FEValues<dim>             &fe_v,
+					       const std::vector<unsigned int> &dofs) 
 {
   unsigned int dofs_per_cell = fe_v.dofs_per_cell;
   unsigned int n_q_points = fe_v.n_quadrature_points;
@@ -1451,14 +1491,14 @@ void ConsLaw<dim>::assemble_cell_term (const FEValues<dim>             &fe_v,
 				   // directly or indirectly) will accumulate sensitivies
 				   // with respect to these dofs.
   for (unsigned int in = 0; in < dofs_per_cell; in++) {
-    DOF[in] = nlsolution(dofs[in]);
+    DOF[in] = current_solution(dofs[in]);
     DOF[in].diff(in, dofs_per_cell);
   }
 
 				   // Here we compute the shape function values and gradients
 				   // at the quadrature points.  Ideally, we could call into 
 				   // something like get_function_values, get_function_grads,
-				   // but since we don't want to make the entire solution vector
+				   // but since we don't want to make the entire old_solution vector
 				   // fad types, only the local cell variables, we explicitly
 				   // code this loop;
   for (unsigned int q = 0; q < n_q_points; q++) {
@@ -1475,9 +1515,9 @@ void ConsLaw<dim>::assemble_cell_term (const FEValues<dim>             &fe_v,
       W[q][di] +=
 	DOF[sf]*fe_v.shape_value_component(sf, q, di);
       Wl[q][di] +=
-	solution(dofs[sf])*fe_v.shape_value_component(sf, q, di);
+	old_solution(dofs[sf])*fe_v.shape_value_component(sf, q, di);
       Wcn[q][di] +=
-	(theta*DOF[sf]+(1-theta)*solution(dofs[sf]))*fe_v.shape_value_component(sf, q, di);
+	(parameters.theta*DOF[sf]+(1-parameters.theta)*old_solution(dofs[sf]))*fe_v.shape_value_component(sf, q, di);
 
       for (unsigned int d = 0; d < dim; d++) {
 	Wgrads[q][di][d] += DOF[sf]*
@@ -1541,7 +1581,7 @@ void ConsLaw<dim>::assemble_cell_term (const FEValues<dim>             &fe_v,
 	  
 					   // Stabilization (cell wise diffusion)
 	  for (unsigned int d = 0; d < dim; d++)
-	    F_i += 1.0*std::pow(cell_diameter, parameters.diffusion_power) *
+	    F_i += 1.0*std::pow(fe_v.get_cell()->diameter(), parameters.diffusion_power) *
 		   fe_v.shape_grad_component(i, point, component_i)[d] *
 		   Wgrads[point][component_i][d] *
 		   fe_v.JxW(point);
@@ -1583,15 +1623,15 @@ void ConsLaw<dim>::assemble_cell_term (const FEValues<dim>             &fe_v,
 				 // The int boundary < 0 if not at a boundary,
 				 // otherwise it is the boundary indicator.
 template <int dim>
-void ConsLaw<dim>::assemble_face_term(
-  int face_no,
-  const FEFaceValuesBase<dim>& fe_v,
-  const FEFaceValuesBase<dim>& fe_v_neighbor,      
-  std::vector<unsigned int> &dofs,
-  std::vector<unsigned int> &dofs_neighbor,
-  const bool external_face,
-  const unsigned int boundary_id
-) 
+void
+ConservationLaw<dim>::assemble_face_term(const unsigned int           face_no,
+					 const FEFaceValuesBase<dim> &fe_v,
+					 const FEFaceValuesBase<dim> &fe_v_neighbor,
+					 const std::vector<unsigned int>   &dofs,
+					 const std::vector<unsigned int>   &dofs_neighbor,
+					 const bool                   external_face,
+					 const unsigned int           boundary_id,
+					 const double                 face_diameter) 
 {
   Sacado::Fad::DFad<double> F_i;
   const unsigned int n_q_points = fe_v.n_quadrature_points;
@@ -1622,13 +1662,13 @@ void ConsLaw<dim>::assemble_face_term(
   int ndofs = (external_face == false ? dofs_per_cell + ndofs_per_cell : dofs_per_cell);
 				   // Set the local DOFS.
   for (unsigned int in = 0; in < dofs_per_cell; in++) {
-    DOF[in] = nlsolution(dofs[in]);
+    DOF[in] = current_solution(dofs[in]);
     DOF[in].diff(in, ndofs);
   }
 				   // If present, set the neighbor dofs.
   if (external_face == false)
     for (unsigned int in = 0; in < ndofs_per_cell; in++) {
-      DOF[in+dofs_per_cell] = nlsolution(dofs_neighbor[in]);
+      DOF[in+dofs_per_cell] = current_solution(dofs_neighbor[in]);
       DOF[in+dofs_per_cell].diff(in+dofs_per_cell, ndofs);
     }
 
@@ -1642,7 +1682,7 @@ void ConsLaw<dim>::assemble_face_term(
     for (unsigned int sf = 0; sf < dofs_per_cell; sf++) {
       int di = fe_v.get_fe().system_to_component_index(sf).first;
       Wplus[q][di] +=
-	(theta*DOF[sf]+(1.0-theta)*solution(dofs[sf]))*fe_v.shape_value_component(sf, q, di);
+	(parameters.theta*DOF[sf]+(1.0-parameters.theta)*old_solution(dofs[sf]))*fe_v.shape_value_component(sf, q, di);
     }
 
 
@@ -1653,7 +1693,7 @@ void ConsLaw<dim>::assemble_face_term(
       for (unsigned int sf = 0; sf < ndofs_per_cell; sf++) {
 	int di = fe_v_neighbor.get_fe().system_to_component_index(sf).first;
 	Wminus[q][di] +=
-	  (theta*DOF[sf+dofs_per_cell]+(1.0-theta)*solution(dofs_neighbor[sf]))*
+	  (parameters.theta*DOF[sf+dofs_per_cell]+(1.0-parameters.theta)*old_solution(dofs_neighbor[sf]))*
 	  fe_v_neighbor.shape_value_component(sf, q, di);
       }
     } 
@@ -1798,13 +1838,15 @@ void ConsLaw<dim>::assemble_face_term(
 				       // is/isn't a neighboring cell, we add more/less
 				       // entries.
       Matrix->SumIntoGlobalValues(dofs[i],
-				  dofs_per_cell, &values[0], reinterpret_cast<int*>(&dofs[0]));
+				  dofs_per_cell,
+				  &values[0],
+				  reinterpret_cast<int*>(const_cast<unsigned int*>(&dofs[0])));
       
       if (external_face == false)
 	Matrix->SumIntoGlobalValues(dofs[i],
 				    dofs_per_cell,
 				    &values[dofs_per_cell],
-				    reinterpret_cast<int*>(&dofs_neighbor[0]));
+				    reinterpret_cast<int*>(const_cast<unsigned int*>(&dofs_neighbor[0])));
       
 
 				       // And add into the residual
@@ -1819,7 +1861,7 @@ void ConsLaw<dim>::assemble_face_term(
                                  // piece for each cell/face.  We keep track of
                                  // the norm of the resdual for the Newton iteration.
 template <int dim>
-void ConsLaw<dim>::assemble_system (double &res_norm) 
+void ConservationLaw<dim>::assemble_system ()
 {
   const unsigned int dofs_per_cell = dof_handler.get_fe().dofs_per_cell;
 
@@ -1912,10 +1954,7 @@ void ConsLaw<dim>::assemble_system (double &res_norm)
                                        // asssemble the cell term.
       cell->get_dof_indices (dofs);
 
-      cell_diameter = cell->diameter();
-
-      assemble_cell_term(fe_v,
-                         dofs);
+      assemble_cell_term(fe_v, dofs);
 
                                        // We use the DG style loop through faces
                                        // to determine if we need to apply a
@@ -1926,7 +1965,6 @@ void ConsLaw<dim>::assemble_system (double &res_norm)
 					   // First we set the face
 					   // iterator
 	  typename DoFHandler<dim>::face_iterator face=cell->face(face_no);
-          face_diameter = face->diameter();
 	  
 	  if (face->at_boundary())
 	    {
@@ -1941,13 +1979,13 @@ void ConsLaw<dim>::assemble_system (double &res_norm)
 					       // terms.  We send the same
                                                // fe_v and dofs as described
                                                // in the assembly routine.
-	      assemble_face_term(
-		face_no, fe_v_face,
-		fe_v_face,
-		dofs,
-		dofs,
-		true,
-		face->boundary_indicator());
+	      assemble_face_term(face_no, fe_v_face,
+				 fe_v_face,
+				 dofs,
+				 dofs,
+				 true,
+				 face->boundary_indicator(),
+				 face->diameter());
 	    }
 	  else
 	    {
@@ -1977,8 +2015,6 @@ void ConsLaw<dim>::assemble_system (double &res_norm)
                         neighbor_child
                         = cell->neighbor_child_on_subface (face_no, subface_no);
 
-                      face_diameter = neighbor_child->diameter();  // working on subface
-		      
 		      Assert (neighbor_child->face(neighbor2) == face->child(subface_no),
 			      ExcInternalError());
 		      Assert (!neighbor_child->has_children(), ExcInternalError());
@@ -1989,14 +2025,13 @@ void ConsLaw<dim>::assemble_system (double &res_norm)
 
 						       // Assemble as if we are working with
 						       // a DG element.
-		      assemble_face_term(
-			face_no, fe_v_subface,
-			fe_v_face_neighbor,
-			dofs,
-			dofs_neighbor,
-			false,
-			numbers::invalid_unsigned_int);
-		      
+		      assemble_face_term(face_no, fe_v_subface,
+					 fe_v_face_neighbor,
+					 dofs,
+					 dofs_neighbor,
+					 false,
+					 numbers::invalid_unsigned_int,
+					 neighbor_child->diameter());		      
 		    }
 						   // End of ``if
 						   // (face->has_children())''
@@ -2031,14 +2066,13 @@ void ConsLaw<dim>::assemble_system (double &res_norm)
 		      fe_v_subface_neighbor.reinit (neighbor, neighbor_face_no,
 						    neighbor_subface_no);
 		      
-		      assemble_face_term(
-			face_no, fe_v_face,
-			fe_v_subface_neighbor,
-			dofs,
-			dofs_neighbor,
-			false,
-			numbers::invalid_unsigned_int);
-
+		      assemble_face_term(face_no, fe_v_face,
+					 fe_v_subface_neighbor,
+					 dofs,
+					 dofs_neighbor,
+					 false,
+					 numbers::invalid_unsigned_int,
+					 face->diameter());
 		    }
 
 		} 
@@ -2052,42 +2086,13 @@ void ConsLaw<dim>::assemble_system (double &res_norm)
 
 				   // Notify Epetra that the matrix is done.
   Matrix->FillComplete();
-  
-
-				   // Compute the nonlinear residual.
-  res_norm = right_hand_side.l2_norm();
-    
-}
-
-				 // @sect3{Initialize System}
-				 // Sizes all of the vectors and sets up the
-				 // sparsity patter.  This function is called at
-				 // the very beginning of a simulation.  The function
-				 // <code> setup_system </code> repeats some of these
-				 // chores and is called after adaptivity in leiu
-				 // of this function.
-template <int dim>
-void ConsLaw<dim>::initialize_system ()
-{
-				   // First we need to distribute the
-				   // DoFs.
-  dof_handler.clear();
-  dof_handler.distribute_dofs (fe);
-  
-                                   // Size all of the fields.
-  solution.reinit (dof_handler.n_dofs());
-  nlsolution.reinit (dof_handler.n_dofs());
-  predictor.reinit (dof_handler.n_dofs());
-  dsolution.reinit (dof_handler.n_dofs());
-  right_hand_side.reinit (dof_handler.n_dofs());
-  indicator.reinit(triangulation.n_active_cells());
 }
 
 				 // @sect3{Setup System}
 				 // We call this function to build the sparsity
 				 // and the matrix.
 template <int dim>
-void ConsLaw<dim>::setup_system ()
+void ConservationLaw<dim>::setup_system ()
 {
 
 				   // The DoFs of a cell are coupled
@@ -2163,14 +2168,15 @@ void ConsLaw<dim>::setup_system ()
                                  // Actually solve the linear system, using either
                                  // Aztec or Amesos.
 template <int dim>
-void ConsLaw<dim>::solve (Vector<double> &dsolution, int &niter, double &lin_residual) 
+std::pair<unsigned int, double>
+ConservationLaw<dim>::solve (Vector<double> &newton_update) 
 {
 
 				   // We must hand the solvers Epetra vectors.
 				   // Luckily, they support the concept of a 
 				   // 'view', so we just send in a pointer to our
 				   // dealii vectors.
-  Epetra_Vector x(View, *Map, dsolution.begin());
+  Epetra_Vector x(View, *Map, newton_update.begin());
   Epetra_Vector b(View, *Map, right_hand_side.begin());
 
 				   // The Direct option selects the Amesos solver.
@@ -2211,14 +2217,14 @@ void ConsLaw<dim>::solve (Vector<double> &dsolution, int &niter, double &lin_res
     if (parameters.output == Parameters::Solver::verbose)
       std::cout << "Starting solve\n" << std::flush;
     solver->Solve();
-    niter = 0;
-    lin_residual = 0;
-
 				     // We must free the solver that was created
 				     // for us.
     delete solver;
 
-  } else if (parameters.solver == Parameters::Solver::gmres) {
+    return std::make_pair<unsigned int, double> (0, 0);
+  }
+  else if (parameters.solver == Parameters::Solver::gmres)
+    {
 
 				     // For the iterative solvers, we use Aztec.
     AztecOO Solver;
@@ -2254,17 +2260,21 @@ void ConsLaw<dim>::solve (Vector<double> &dsolution, int &niter, double &lin_res
 				     // Run the solver iteration.  Collect the number
 				     // of iterations and the residual.
     Solver.Iterate(parameters.max_iterations, parameters.linear_residual);
-    niter = Solver.NumIters();
-    lin_residual = Solver.TrueResidual();
+
+    return std::make_pair<unsigned int, double> (Solver.NumIters(),
+						 Solver.TrueResidual());
   }
+
+  Assert (false, ExcNotImplemented());
+  return std::make_pair<unsigned int, double> (0,0);
 }
 
 				 // Loop and assign a value for refinement.  We
 				 // simply use the density squared, which selects
 				 // shocks with some success.
 template <int dim>
-void ConsLaw<dim>::estimate() {
-  
+void ConservationLaw<dim>::compute_refinement_indicator ()
+{  
   const unsigned int dofs_per_cell = dof_handler.get_fe().dofs_per_cell;
   std::vector<unsigned int> dofs (dofs_per_cell);
   UpdateFlags update_flags = update_values
@@ -2307,7 +2317,7 @@ void ConsLaw<dim>::estimate() {
 }
 
 template <int dim>
-void ConsLaw<dim>::refine_grid ()
+void ConservationLaw<dim>::refine_grid ()
 {
 
   SolutionTransfer<dim, double> soltrans(dof_handler);
@@ -2334,12 +2344,12 @@ void ConsLaw<dim>::refine_grid ()
     }
   }
 
-				   // The following code prolongs the solution
+				   // The following code prolongs the old_solution
 				   // to the new grid and carries out the refinement.
   std::vector<Vector<double> > interp_in;
   std::vector<Vector<double> > interp_out;
 
-  interp_in.push_back(solution);
+  interp_in.push_back(old_solution);
   interp_in.push_back(predictor);
 
   triangulation.prepare_coarsening_and_refinement();
@@ -2351,44 +2361,45 @@ void ConsLaw<dim>::refine_grid ()
   dof_handler.distribute_dofs (fe);
 
   {
-    Vector<double> new_solution(1);
+    Vector<double> new_old_solution(1);
     Vector<double> new_predictor(1);
 
-    interp_out.push_back(new_solution);
+    interp_out.push_back(new_old_solution);
     interp_out.push_back(new_predictor);
     interp_out[0].reinit(dof_handler.n_dofs());
     interp_out[1].reinit(dof_handler.n_dofs());
   }
 
   soltrans.interpolate(interp_in, interp_out);
-  
-				   // Let the vector delete a very small vector
-  solution.reinit(1);
-  predictor.reinit(1);
-  solution.swap(interp_out[0]);
-  predictor.swap(interp_out[1]);
+
+  old_solution.reinit (interp_out[0].size());
+  old_solution = interp_out[0];
+
+  predictor.reinit (interp_out[1].size());
+  predictor = interp_out[1];
 
 				   // resize these vectors for the new grid.
-  nlsolution.reinit(dof_handler.n_dofs());
-  nlsolution = solution;
-  dsolution.reinit (dof_handler.n_dofs());
+  current_solution.reinit(dof_handler.n_dofs());
+  current_solution = old_solution;
   right_hand_side.reinit (dof_handler.n_dofs());
 
   indicator.reinit(triangulation.n_active_cells());
 
 }
 
+
+
 template <int dim>
-void ConsLaw<dim>::output_results (const unsigned int cycle) const
+void ConservationLaw<dim>::output_results () const
 {
   typename EulerEquations<dim>::Postprocessor 
     postprocessor (parameters.schlieren_plot);
 
   DataOut<dim> data_out;
   data_out.attach_dof_handler (dof_handler);
-  std::vector<std::string> solution_names (dim, "momentum");
-  solution_names.push_back ("density");
-  solution_names.push_back ("energy_density");
+  std::vector<std::string> old_solution_names (dim, "momentum");
+  old_solution_names.push_back ("density");
+  old_solution_names.push_back ("energy_density");
 
   std::vector<DataComponentInterpretation::DataComponentInterpretation>
     data_component_interpretation
@@ -2398,43 +2409,34 @@ void ConsLaw<dim>::output_results (const unsigned int cycle) const
   data_component_interpretation
     .push_back (DataComponentInterpretation::component_is_scalar);
   
-  data_out.add_data_vector (solution, solution_names,
+  data_out.add_data_vector (old_solution, old_solution_names,
 			    DataOut<dim>::type_dof_data,
 			    data_component_interpretation);
 
-  data_out.add_data_vector (solution, postprocessor);
+  data_out.add_data_vector (old_solution, postprocessor);
 
   data_out.add_data_vector (indicator, "error");
   
   data_out.build_patches ();
 
-  std::string filename = "solution-" +
-			 Utilities::int_to_string (cycle, 3) +
+  static unsigned int output_file_number = 0;
+  std::string filename = "old_solution-" +
+			 Utilities::int_to_string (output_file_number, 3) +
 			 ".vtk";
   std::ofstream output (filename.c_str());
   data_out.write_vtk (output);
+
+  ++output_file_number;
 }
 
 
 
-
-				 // We use a predictor to try and make
-				 // adaptivity work better.  The idea is to
-				 // try and refine ahead of a front, rather
-				 // than stepping into a coarse set of
-				 // elements and smearing the solution.  This
-				 // simple time extrapolator does the job.
-template<int dim>
-void ConsLaw<dim>::compute_predictor() {
-  predictor = nlsolution;
-  predictor.sadd(3/2.0, -1/2.0, solution);
-}
 
 				 // @sect3{Run the simulation}
 				 // Contains the initialization
 				 // the time loop, and the inner Newton iteration.
 template <int dim>
-void ConsLaw<dim>::run () 
+void ConservationLaw<dim>::run () 
 {
 
 				   // Open and load the mesh.
@@ -2448,13 +2450,25 @@ void ConsLaw<dim>::run ()
     grid_in.read_ucd(input_file);   
   }
   
-  unsigned int nstep = 0;
-  
 				   // Initialize fields and matrices.
-  initialize_system (); 
+				   // First we need to distribute the
+				   // DoFs.
+  dof_handler.clear();
+  dof_handler.distribute_dofs (fe);
+  
+                                   // Size all of the fields.
+  old_solution.reinit (dof_handler.n_dofs());
+  current_solution.reinit (dof_handler.n_dofs());
+  predictor.reinit (dof_handler.n_dofs());
+  right_hand_side.reinit (dof_handler.n_dofs());
+  indicator.reinit(triangulation.n_active_cells());
+
   setup_system();
-  initialize(); 
-  predictor = solution;
+
+  VectorTools::interpolate(dof_handler,
+                           parameters.initial_conditions, old_solution);
+  current_solution = old_solution;
+  predictor = old_solution;
 
 				   // Initial refinement.  We apply the ic,
 				   // estimate, refine, and repeat until
@@ -2462,23 +2476,28 @@ void ConsLaw<dim>::run ()
   if (parameters.do_refine == true)
     for (unsigned int i = 0; i < parameters.shock_levels; i++)
       {
-	estimate();
+	compute_refinement_indicator();
 	refine_grid();
 	setup_system();
-	initialize(); 
-	predictor = solution;
+
+	VectorTools::interpolate(dof_handler,
+				 parameters.initial_conditions, old_solution);
+	current_solution = old_solution;
+	predictor = old_solution;
       }
 
-  output_results (nstep);
+  output_results ();
 
 				   // Determine when we will output next.
-  double next_output = T + parameters.output_step;
+  double time = 0;
+  double next_output = time + parameters.output_step;
 
 				   // @sect4{Main time stepping loop}
-  predictor = solution;
-  while (T < parameters.final_time)
+  predictor = old_solution;
+  Vector<double> newton_update (dof_handler.n_dofs());
+  while (time < parameters.final_time)
     {
-      std::cout << "T=" << T << ", ";
+      std::cout << "T=" << time << ", ";
 
 
       std::cout << "   Number of active cells:       "
@@ -2491,8 +2510,6 @@ void ConsLaw<dim>::run ()
 		<< std::endl;
 
       bool nonlin_done = false;
-      double res_norm;
-      int lin_iter;
 
 				       // Print some relevant information during the
 				       // Newton iteration.
@@ -2501,40 +2518,45 @@ void ConsLaw<dim>::run ()
 
       const unsigned int max_nonlin = 7;
       unsigned int nonlin_iter = 0;
-      double lin_res;
 
 				       // @sect5{Newton iteration}
-      nlsolution = predictor;
+      current_solution = predictor;
       while (!nonlin_done) {
-        lin_iter = 0;
-
 	Matrix->PutScalar(0);
 	Matrix->FillComplete();
 	
         right_hand_side = 0;
-        assemble_system (res_norm);
+        assemble_system ();
+	
 					 // Flash a star to the screen so one can
 					 // know when the assembly has stopped and the linear
-					 // solution is starting.
+					 // old_solution is starting.
         std::cout << "* " << std::flush;
 
 					 // Test against a (hardcoded) nonlinear tolderance.
 					 // Do not solve the linear system at the last step 
 					 // (since it would be a waste).
                       
-        if (fabs(res_norm) < 1e-10) {
-          nonlin_done = true;
-        } else {
+	const double res_norm = right_hand_side.l2_norm();
+        if (std::fabs(res_norm) < 1e-10)
+	  {
+	    nonlin_done = true;
+	    std::printf("%-16.3e (converged)\n", res_norm);
+	  }
+	else
+	  {
 					   // Solve the linear system and update with the
 					   // delta.
-	  dsolution = 0;
-	  solve (dsolution, lin_iter, lin_res);
-	  nlsolution.add(1.0, dsolution);
-        }
+	    newton_update = 0;
 
-					 // Print the residuals.
-        std::printf("%-16.3e %04d        %-5.2e\n",
-		    res_norm, lin_iter, lin_res);
+	    std::pair<unsigned int, double> convergence
+	      = solve (newton_update);
+	    
+	    current_solution.add(1.0, newton_update);
+	    
+	    std::printf("%-16.3e %04d        %-5.2e\n",
+			res_norm, convergence.first, convergence.second);
+	  }
 
         ++nonlin_iter;
 
@@ -2543,27 +2565,38 @@ void ConsLaw<dim>::run ()
       } 
 
 				       // Various post convergence tasks.
-      compute_predictor();
 
-      solution = nlsolution;
+				       // We use a predictor to try and make
+				       // adaptivity work better.  The idea is to
+				       // try and refine ahead of a front, rather
+				       // than stepping into a coarse set of
+				       // elements and smearing the old_solution.  This
+				       // simple time extrapolator does the job.
+      predictor = current_solution;
+      predictor.sadd(3/2.0, -1/2.0, old_solution);
 
-      estimate();
+      old_solution = current_solution;
 
-      T += parameters.time_step;
+      compute_refinement_indicator();
+
+      time += parameters.time_step;
 
 				       // Output if it is time.
-      if (parameters.output_step < 0) {
-        output_results (++nstep);
-      } else if (T >= next_output) {
-        output_results (++nstep);
-        next_output += parameters.output_step;
-      }
+      if (parameters.output_step < 0)
+	output_results ();
+      else if (time >= next_output)
+	{
+	  output_results ();
+	  next_output += parameters.output_step;
+	}
 
 				       // Refine, if refinement is selected.
       if (parameters.do_refine == true)
 	{
 	  refine_grid();
 	  setup_system();
+
+	  newton_update.reinit (dof_handler.n_dofs());
 	}
     }
 }
@@ -2584,7 +2617,7 @@ int main (int argc, char *argv[])
   
   try
     {
-      ConsLaw<2> cons (argv[1]);
+      ConservationLaw<2> cons (argv[1]);
       cons.run ();
     }
   catch (std::exception &exc)
