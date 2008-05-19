@@ -84,10 +84,16 @@
 #include <Sacado.hpp>
 
 
-				 // And this again is C++:
+				 // And this again is C++ as well as two
+				 // include files from the BOOST library that
+				 // provide us with counted pointers and
+				 // arrays of fixed size:
 #include <iostream>
 #include <fstream>
 #include <vector>
+
+#include <boost/shared_ptr.hpp>
+#include <boost/array.hpp>
 
 				 // To end this section, introduce everythin
 				 // in the dealii library into the current
@@ -640,6 +646,25 @@ n_output_variables () const
 				 // other entries in subsections that
 				 // are too short to warrent a
 				 // structure by themselves.
+				 //
+				 // It is worth pointing out one thing here:
+				 // None of the classes below have a
+				 // constructor that would initialize the
+				 // various member variables. This isn't a
+				 // problem, however, since we will read all
+				 // variables declared in these classes from
+				 // the input file (or indirectly: a
+				 // ParameterHandler object will read it from
+				 // there, and we will get the values from
+				 // this object), and they will be initialized
+				 // this way. In case a certain variable is
+				 // not specified at all in the input file,
+				 // this isn't a problem either: The
+				 // ParameterHandler class will in this case
+				 // simply take the default value that was
+				 // specified when declaring an entry in the
+				 // <code>declare_parameters()</code>
+				 // functions of the classes below.
 namespace Parameters
 {
 
@@ -950,6 +975,286 @@ namespace Parameters
     }
     prm.leave_subsection();
   }
+
+
+
+				   // @sect4{Parameters::AllParameters}
+				   //
+				   // Finally the class that brings it all
+				   // together. It declares a number of
+				   // parameters itself, mostly ones at the
+				   // top level of the parameter file as well
+				   // as several in section too small to
+				   // warrant their own classes. It also
+				   // contains everything that is actually
+				   // space dimension dependent, like initial
+				   // or boundary conditions.
+				   //
+				   // Since this class is derived from all the
+				   // ones above, the
+				   // <code>declare_parameters()</code> and
+				   // <code>parse_parameters()</code>
+				   // functions call the respective functions
+				   // of the base classes as well.
+				   //
+				   // Note that this class also handles the
+				   // declaration of initial and boundary
+				   // conditions specified in the input
+				   // file. To this end, in both cases, there
+				   // are entries like "w_0 value" which
+				   // represent an expression in terms of
+				   // $x,y,z$ that describe the initial or
+				   // boundary condition as a formula that
+				   // will later be parsed by the
+				   // FunctionParser class. Similar
+				   // expressions exist for "w_1", "w_2", etc,
+				   // denoting the <code>dim+2</code>
+				   // conserved variables of the Euler
+				   // system. Similarly, we allow up to
+				   // <code>max_n_boundaries</code> boundary
+				   // indicators to be used in the input file,
+				   // and each of these boundary indicators
+				   // can be associated with an inflow,
+				   // outflow, or pressure boundary condition,
+				   // with inhomogenous boundary conditions
+				   // being specified for each component and
+				   // each boundary indicator separately.
+  template <int dim>
+  struct AllParameters : public Solver,
+			 public Refinement,
+			 public Flux,
+			 public Output
+  {
+      static const unsigned int max_n_boundaries = 10;
+
+      enum BoundaryKind
+      {
+	    inflow_boundary,
+	    outflow_boundary,
+	    no_penetration_boundary,
+	    pressure_boundary
+      };
+
+      AllParameters ();
+      
+      double diffusion_power;
+      double gravity;
+
+      double time_step, final_time;
+
+      bool is_stationary;
+				       // Name of the mesh to read in.
+      std::string mesh;
+
+      FunctionParser<dim> initial_conditions;
+
+				       // For each boundary we store a map
+				       // from boundary # to the type of
+				       // boundary condition.  If the boundary
+				       // condition is prescribed, we store a
+				       // pointer to a function object that
+				       // will hold the expression for that
+				       // boundary condition.
+      typedef
+      std::map<unsigned int,
+	       std::pair<boost::array<BoundaryKind,
+				      EulerEquations<dim>::n_components>,
+			 boost::shared_ptr<FunctionParser<dim> > > >
+      BoundaryConditions;
+      
+      BoundaryConditions boundary_conditions;
+      
+      static void declare_parameters (ParameterHandler &prm);
+      void parse_parameters (ParameterHandler &prm);
+  };
+
+
+
+  template <int dim>
+  AllParameters<dim>::AllParameters ():
+		  initial_conditions (EulerEquations<dim>::n_components)
+  {}
+  
+
+  template <int dim>
+  void
+  AllParameters<dim>::declare_parameters (ParameterHandler &prm)
+  {
+    prm.declare_entry("mesh", "grid.inp",
+		      Patterns::Anything(),
+		      "intput file");
+
+    prm.declare_entry("diffusion power", "2.0",
+		      Patterns::Double(),
+		      "power of mesh size for diffusion");
+
+    prm.declare_entry("gravity", "0.0",
+		      Patterns::Double(),
+		      "gravity forcing");
+
+				     // Time stepping block
+    prm.enter_subsection("time stepping");
+    {
+      prm.declare_entry("time step", "0.1",
+			Patterns::Double(),
+			"simulation time step");
+      prm.declare_entry("final time", "10.0",
+			Patterns::Double(),
+			"simulation end time");
+    }
+    prm.leave_subsection();
+
+
+    for (unsigned int b=0; b<max_n_boundaries; ++b)
+      {
+	prm.enter_subsection("boundary_" +
+			     Utilities::int_to_string(b));
+	{
+	  prm.declare_entry("no penetration", "false",
+			    Patterns::Bool(),
+			    "Whether the names boundary is allows gas to "
+			    "penetrate or is a rigid wall");
+
+	  for (unsigned int di=0; di<EulerEquations<dim>::n_components; ++di)
+	    {
+	      prm.declare_entry("w_" + Utilities::int_to_string(di),
+				"outflow",
+				Patterns::Selection("inflow|outflow|pressure"),
+				"<inflow|outflow|pressure>");
+      
+	      prm.declare_entry("w_" + Utilities::int_to_string(di) +
+				" value", "0.0",
+				Patterns::Anything(),
+				"expression in x,y,z");
+	    }
+	}
+	prm.leave_subsection();
+      }
+
+    prm.enter_subsection("initial condition");
+    {
+      for (unsigned int di=0; di<EulerEquations<dim>::n_components; ++di)
+	prm.declare_entry("w_" + Utilities::int_to_string(di) + " value",
+			  "0.0",
+			  Patterns::Anything(),
+			  "expression in x,y,z");
+    }
+    prm.leave_subsection();
+
+    Parameters::Solver::declare_parameters (prm);
+    Parameters::Refinement::declare_parameters (prm);
+    Parameters::Flux::declare_parameters (prm);
+    Parameters::Output::declare_parameters (prm);
+  }
+
+
+  template <int dim>
+  void
+  AllParameters<dim>::parse_parameters (ParameterHandler &prm)
+  {
+    mesh = prm.get("mesh");
+    diffusion_power = prm.get_double("diffusion power");
+    gravity = prm.get_double("gravity");
+
+				     // The time stepping.
+    prm.enter_subsection("time stepping");
+    {
+      time_step = prm.get_double("time step");
+      if (time_step == 0)
+	{
+	  is_stationary = true;
+	  time_step = 1.0;
+	  final_time = 1.0;
+	  std::cout << "Stationary mode" << std::endl;
+	}
+      else
+	is_stationary = false;
+      
+      final_time = prm.get_double("final time");
+
+      std::cout << "time_step=" << time_step << std::endl;
+      std::cout << "final_time=" << final_time << std::endl;
+    }
+    prm.leave_subsection();
+
+				     // The boundary info
+    for (unsigned int boundary_id=0; boundary_id<max_n_boundaries;
+	 ++boundary_id)
+      {
+	prm.enter_subsection("boundary_" + Utilities::int_to_string(boundary_id));
+	{
+	  boost::array<BoundaryKind, EulerEquations<dim>::n_components> flags;
+
+					   // Define a parser for every boundary,
+					   // though it may be unused.
+	  FunctionParser<dim> *sd
+	    = new FunctionParser<dim>(EulerEquations<dim>::n_components);
+
+	  std::vector<std::string>
+	    expressions(EulerEquations<dim>::n_components, "0.0");
+    
+	  const bool nopen = prm.get_bool("no penetration");
+
+					   // Determine how each component is
+					   // handled.
+	  for (unsigned int di=0; di<EulerEquations<dim>::n_components; ++di)
+	    {
+	      const std::string boundary_type
+		= prm.get("w_" + Utilities::int_to_string(di));
+	      const std::string var_value
+		= prm.get("w_" + Utilities::int_to_string(di) +
+			  " value");
+
+	      if (di < dim && nopen)
+		flags[di] = no_penetration_boundary;
+	      else if (boundary_type == "inflow")
+		{
+		  flags[di] = inflow_boundary;
+		  expressions[di] = var_value;
+		}
+	      else if (boundary_type == "pressure")
+		{
+		  flags[di] = pressure_boundary;
+		  expressions[di] = var_value;
+		}
+	      else if (boundary_type == "outflow")
+		flags[di] = outflow_boundary;
+	      else
+		AssertThrow (false, ExcNotImplemented());
+	    }
+
+
+					   // Add the boundary condition to the
+					   // law.
+	  sd->initialize (FunctionParser<dim>::default_variable_names(),
+			  expressions,
+			  std::map<std::string, double>());
+	  boundary_conditions[boundary_id] = std::make_pair (flags, sd);
+	}
+	prm.leave_subsection();
+      }
+
+				     // Initial conditions.
+    prm.enter_subsection("initial condition");
+    {
+      std::vector<std::string> expressions (EulerEquations<dim>::n_components,
+					    "0.0");
+      for (unsigned int di = 0; di < EulerEquations<dim>::n_components; di++)
+	expressions[di] = prm.get("w_" + Utilities::int_to_string(di) +
+				  " value");
+      initial_conditions.initialize (FunctionParser<dim>::default_variable_names(),
+				     expressions,
+				     std::map<std::string, double>());
+    }
+    prm.leave_subsection();
+
+    Parameters::Solver::parse_parameters (prm);
+    Parameters::Refinement::parse_parameters (prm);
+    Parameters::Flux::parse_parameters (prm);
+    Parameters::Output::parse_parameters (prm);
+  }
+  
+  
 }
 
   
@@ -967,12 +1272,10 @@ template <int dim>
 class ConsLaw
 {
   public:
-    ConsLaw ();
+    ConsLaw (const char *input_filename);
     ~ConsLaw ();
 
     void run ();
-    void declare_parameters();
-    void load_parameters(const char *);
     
   private:
     void setup_system ();
@@ -985,8 +1288,6 @@ class ConsLaw
     void estimate();
     void compute_predictor();
 
-    static const unsigned int max_n_boundaries = 10;
-    
     Triangulation<dim>   triangulation;
     const MappingQ1<dim> mapping;
     
@@ -1027,36 +1328,11 @@ class ConsLaw
     );
 
   private:
-				     // T = current time, dT = time step, TF = final time.
-    double T, dT, TF;
+    double T;
     double face_diameter;
     double cell_diameter;
-				     // An object to handle parsing the input deck.
-    ParameterHandler prm;
-				     // Name of the mesh to read in.
-    string mesh;
-    FunctionParser<dim> initial_conditions;
 
-				     // Enums for the various supported boundary conditions.
-    typedef enum {INFLOW_BC = 1, OUTFLOW_BC=2, NO_PENETRATION_BC=3, PRESSURE_BC=4} bc_type;
-
-				     // For each boundary we store a map from boundary # to the type
-				     // of boundary condition.  If the boundary condition is prescribed,
-				     // we store a pointer to a function object that will hold the expression
-				     // for that boundary condition.
-    typedef typename std::map<unsigned int, std::pair<std::vector<bc_type>, Function<dim>*> > bdry_map_type;
-    bdry_map_type bdry_map;
-
-    Parameters::Solver     solver_params;
-    Parameters::Refinement refinement_params;
-    Parameters::Flux       flux_params;
-    Parameters::Output     output_params;
-
-    bool is_stationary;
-
-				     // Power for the mesh stabilization term.
-    double diffusion_power;
-    double gravity;
+    Parameters::AllParameters<dim> parameters;
 
     Epetra_Map         *Map;
     Epetra_CrsMatrix   *Matrix;
@@ -1070,7 +1346,7 @@ class ConsLaw
 
 				 // Create a conservation law with some defaults.
 template <int dim>
-ConsLaw<dim>::ConsLaw ()
+ConsLaw<dim>::ConsLaw (const char *input_filename)
 		:
 		mapping (),
                 fe (FE_Q<dim>(1), EulerEquations<dim>::n_components),
@@ -1078,14 +1354,16 @@ ConsLaw<dim>::ConsLaw ()
 		quadrature (2),
 		face_quadrature (2),
                 T(0),
-                dT(0.05),
-                TF(10),
-		initial_conditions (EulerEquations<dim>::n_components),
-                is_stationary(false),
                 Map(NULL),
                 Matrix(NULL),
                 theta(0.5) 
-{}
+{
+  ParameterHandler prm;
+  Parameters::AllParameters<dim>::declare_parameters (prm);
+
+  prm.read_input (input_filename);
+  parameters.parse_parameters (prm);
+}
 
 
 				 // Bye bye Conservation law.
@@ -1101,7 +1379,7 @@ ConsLaw<dim>::~ConsLaw ()
 template <int dim>
 void ConsLaw<dim>::initialize() {
   VectorTools::interpolate(dof_handler,
-                           initial_conditions, solution);
+                           parameters.initial_conditions, solution);
   nlsolution = solution;
 }
 
@@ -1234,14 +1512,15 @@ void ConsLaw<dim>::assemble_cell_term (const FEValues<dim>             &fe_v,
 		   fe_v.JxW(point);
 
 					   // The mass term (if the simulation is non-stationary).
-	  if (!is_stationary)
-	    F_i += 1.0/dT*(W[point][component_i] - Wl[point][component_i]) *
+	  if (parameters.is_stationary == false)
+	    F_i += 1.0 / parameters.time_step *
+		   (W[point][component_i] - Wl[point][component_i]) *
 		   fe_v.shape_value_component(i, point, component_i) *
 		   fe_v.JxW(point);
-
+	  
 					   // Stabilization (cell wise diffusion)
 	  for (unsigned int d = 0; d < dim; d++)
-	    F_i += 1.0*std::pow(cell_diameter, diffusion_power) *
+	    F_i += 1.0*std::pow(cell_diameter, parameters.diffusion_power) *
 		   fe_v.shape_grad_component(i, point, component_i)[d] *
 		   Wgrads[point][component_i][d] *
 		   fe_v.JxW(point);
@@ -1250,12 +1529,12 @@ void ConsLaw<dim>::assemble_cell_term (const FEValues<dim>             &fe_v,
 					   // equation and into the vertical component of the 
 					   // velocity.
 	  if (component_i == dim - 1)
-	    F_i += gravity *
+	    F_i += parameters.gravity *
 		   Wcn[point][EulerEquations<dim>::density_component] *
 		   fe_v.shape_value_component(i,point, component_i) *
 		   fe_v.JxW(point);
 	  else if (component_i == EulerEquations<dim>::energy_component)
-	    F_i += gravity *
+	    F_i += parameters.gravity *
 		   Wcn[point][EulerEquations<dim>::density_component] *
 		   Wcn[point][dim-1] *
 		   fe_v.shape_value_component(i,point, component_i) *
@@ -1270,8 +1549,6 @@ void ConsLaw<dim>::assemble_cell_term (const FEValues<dim>             &fe_v,
 				  dofs_per_cell,
 				  values,
 				  reinterpret_cast<int*>(const_cast<unsigned int*>(&dofs[0])));
- 
-				       // Add minus the residual to the right hand side.
       right_hand_side(dofs[i]) -= F_i.val();
     }
 
@@ -1367,8 +1644,8 @@ void ConsLaw<dim>::assemble_face_term(
 				   // difficult to manage without fad!!!
   if (boundary >= 0) {
 				     // Get the boundary descriptor.
-    typename bdry_map_type::iterator bme = bdry_map.find(boundary);
-    assert(bme != bdry_map.end());
+    typename Parameters::AllParameters<dim>::BoundaryConditions::iterator bme = parameters.boundary_conditions.find(boundary);
+    assert(bme != parameters.boundary_conditions.end());
 
 				     // Evaluate the function object.  This is a bit
 				     // tricky; a given boundary might have both prescribed
@@ -1384,9 +1661,9 @@ void ConsLaw<dim>::assemble_face_term(
       for (unsigned int di = 0; di < EulerEquations<dim>::n_components; di++) {
 
 					 // An inflow/dirichlet type of boundary condition
-        if (bme->second.first[di] == INFLOW_BC) {
+        if (bme->second.first[di] == Parameters::AllParameters<dim>::inflow_boundary) {
           Wminus[q][di] = bvals[q](di);
-        } else if (bme->second.first[di] == PRESSURE_BC) {
+        } else if (bme->second.first[di] == Parameters::AllParameters<dim>::pressure_boundary) {
 					   // A prescribed pressure boundary condition.  This boundary
 					   // condition is complicated by the fact that even though
 					   // the pressure is prescribed, we really are setting
@@ -1398,11 +1675,11 @@ void ConsLaw<dim>::assemble_face_term(
           Sacado::Fad::DFad<double> rho_vel_sqr = 0;
           Sacado::Fad::DFad<double> dens;
           
-          dens = bme->second.first[EulerEquations<dim>::density_component] == INFLOW_BC ? bvals[q](EulerEquations<dim>::density_component) :
+          dens = bme->second.first[EulerEquations<dim>::density_component] == Parameters::AllParameters<dim>::inflow_boundary ? bvals[q](EulerEquations<dim>::density_component) :
                  Wplus[q][EulerEquations<dim>::density_component];
 
           for (unsigned int d=0; d < dim; d++) {
-            if (bme->second.first[d] == INFLOW_BC)
+            if (bme->second.first[d] == Parameters::AllParameters<dim>::inflow_boundary)
               rho_vel_sqr += bvals[q](d)*bvals[q](d);
             else
               rho_vel_sqr += Wplus[q][d]*Wplus[q][d];
@@ -1413,7 +1690,7 @@ void ConsLaw<dim>::assemble_face_term(
           Wminus[q][di] = bvals[q](di)/(EulerEquations<dim>::gas_gamma-1.0) +
 			  0.5*rho_vel_sqr;
 
-        } else if (bme->second.first[di] == OUTFLOW_BC) {
+        } else if (bme->second.first[di] == Parameters::AllParameters<dim>::outflow_boundary) {
 					   // A free/outflow boundary, very simple.
           Wminus[q][di] = Wplus[q][di];
 
@@ -1442,13 +1719,13 @@ void ConsLaw<dim>::assemble_face_term(
 
   double alpha;
 
-  switch(flux_params.stabilization_kind)
+  switch(parameters.stabilization_kind)
     {
       case Parameters::Flux::constant:
-	    alpha = flux_params.stabilization_value;
+	    alpha = parameters.stabilization_value;
 	    break;
       case Parameters::Flux::mesh_dependent:
-	    alpha = face_diameter/(2.0*dT);
+	    alpha = face_diameter/(2.0*parameters.time_step);
 	    break;
       default:
 	    Assert (false, ExcNotImplemented());
@@ -1730,6 +2007,7 @@ void ConsLaw<dim>::assemble_system (double &res_norm)
 
 				   // Notify Epetra that the matrix is done.
   Matrix->FillComplete();
+  
 
 				   // Compute the nonlinear residual.
   res_norm = right_hand_side.l2_norm();
@@ -1805,7 +2083,8 @@ void ConsLaw<dim>::setup_system ()
 				   // the constructor that optimizes
 				   // with the existing lengths per row
 				   // variable.
-  if (Matrix) delete Matrix;
+  if (Matrix != 0)
+    delete Matrix;
   Matrix = new Epetra_CrsMatrix(Copy, *Map, &row_lengths[0], true);
 
 				   // We add the sparsity pattern to the matrix by
@@ -1833,7 +2112,6 @@ void ConsLaw<dim>::setup_system ()
 				   // filling a matrix.  It typically does some parallel
 				   // bookeeping; perhaps more.
   Matrix->FillComplete();
-
 }
 
                                  // @sect3{Solving the linear system}
@@ -1851,7 +2129,7 @@ void ConsLaw<dim>::solve (Vector<double> &dsolution, int &niter, double &lin_res
   Epetra_Vector b(View, *Map, right_hand_side.begin());
 
 				   // The Direct option selects the Amesos solver.
-  if (solver_params.solver == Parameters::Solver::direct) {
+  if (parameters.solver == Parameters::Solver::direct) {
    
 				     // Setup for solving with
 				     // Amesos. Other solvers are
@@ -1869,12 +2147,12 @@ void ConsLaw<dim>::solve (Vector<double> &dsolution, int &niter, double &lin_res
 				     // out the sparsity patterns, and then the
 				     // numerical part actually performs Gaussian
 				     // elimination or whatever the approach is.
-    if (solver_params.output == Parameters::Solver::verbose)
+    if (parameters.output == Parameters::Solver::verbose)
       std::cout << "Starting Symbolic fact\n" << std::flush;
 
     solver->SymbolicFactorization();
 
-    if (solver_params.output == Parameters::Solver::verbose)
+    if (parameters.output == Parameters::Solver::verbose)
       std::cout << "Starting Numeric fact\n" << std::flush;
 
     solver->NumericFactorization();
@@ -1885,7 +2163,7 @@ void ConsLaw<dim>::solve (Vector<double> &dsolution, int &niter, double &lin_res
     prob.SetRHS(&b);
     prob.SetLHS(&x);
 				     // And finally solve the problem.
-    if (solver_params.output == Parameters::Solver::verbose)
+    if (parameters.output == Parameters::Solver::verbose)
       std::cout << "Starting solve\n" << std::flush;
     solver->Solve();
     niter = 0;
@@ -1895,16 +2173,16 @@ void ConsLaw<dim>::solve (Vector<double> &dsolution, int &niter, double &lin_res
 				     // for us.
     delete solver;
 
-  } else if (solver_params.solver == Parameters::Solver::gmres) {
+  } else if (parameters.solver == Parameters::Solver::gmres) {
 
 				     // For the iterative solvers, we use Aztec.
     AztecOO Solver;
 
 				     // Select the appropriate level of verbosity.
-    if (solver_params.output == Parameters::Solver::quiet)
+    if (parameters.output == Parameters::Solver::quiet)
       Solver.SetAztecOption(AZ_output, AZ_none);
 
-    if (solver_params.output == Parameters::Solver::verbose)
+    if (parameters.output == Parameters::Solver::verbose)
       Solver.SetAztecOption(AZ_output, AZ_all);
 
 				     // Select gmres.  Other solvers are available.
@@ -1922,15 +2200,15 @@ void ConsLaw<dim>::solve (Vector<double> &dsolution, int &niter, double &lin_res
     Solver.SetAztecOption(AZ_reorder,         0);
 
 				     // ILUT parameters as described above.
-    Solver.SetAztecParam(AZ_drop,      solver_params.ilut_drop);
-    Solver.SetAztecParam(AZ_ilut_fill, solver_params.ilut_fill);
-    Solver.SetAztecParam(AZ_athresh,   solver_params.ilut_atol);
-    Solver.SetAztecParam(AZ_rthresh,   solver_params.ilut_rtol);
+    Solver.SetAztecParam(AZ_drop,      parameters.ilut_drop);
+    Solver.SetAztecParam(AZ_ilut_fill, parameters.ilut_fill);
+    Solver.SetAztecParam(AZ_athresh,   parameters.ilut_atol);
+    Solver.SetAztecParam(AZ_rthresh,   parameters.ilut_rtol);
     Solver.SetUserMatrix(Matrix);
 
 				     // Run the solver iteration.  Collect the number
 				     // of iterations and the residual.
-    Solver.Iterate(solver_params.max_iterations, solver_params.linear_residual);
+    Solver.Iterate(parameters.max_iterations, parameters.linear_residual);
     niter = Solver.NumIters();
     lin_residual = Solver.TrueResidual();
   }
@@ -2001,12 +2279,12 @@ void ConsLaw<dim>::refine_grid ()
   for (unsigned int cell_no=0; cell!=endc; ++cell, ++cell_no) {
     cell->clear_coarsen_flag();
     cell->clear_refine_flag();
-    if (cell->level() < refinement_params.shock_levels &&
-        std::fabs(indicator(cell_no)) > refinement_params.shock_val ) {
+    if (cell->level() < parameters.shock_levels &&
+        std::fabs(indicator(cell_no)) > parameters.shock_val ) {
       cell->set_refine_flag();
     } else {
       if (cell->level() > 0 &&
-	  std::fabs(indicator(cell_no)) < 0.75*refinement_params.shock_val)
+	  std::fabs(indicator(cell_no)) < 0.75*parameters.shock_val)
 	cell->set_coarsen_flag();
     }
   }
@@ -2058,10 +2336,8 @@ void ConsLaw<dim>::refine_grid ()
 template <int dim>
 void ConsLaw<dim>::output_results (const unsigned int cycle) const
 {
-  std::string filename = "solution-" +
-			 Utilities::int_to_string (cycle, 3) +
-			 ".vtk";
-  std::ofstream output (filename.c_str());
+  typename EulerEquations<dim>::Postprocessor 
+    postprocessor (parameters.schlieren_plot);
 
   DataOut<dim> data_out;
   data_out.attach_dof_handler (dof_handler);
@@ -2081,203 +2357,17 @@ void ConsLaw<dim>::output_results (const unsigned int cycle) const
 			    DataOut<dim>::type_dof_data,
 			    data_component_interpretation);
 
-  typename EulerEquations<dim>::Postprocessor 
-    postprocessor (output_params.schlieren_plot);
   data_out.add_data_vector (solution, postprocessor);
 
   data_out.add_data_vector (indicator, "error");
   
   data_out.build_patches ();
+
+  std::string filename = "solution-" +
+			 Utilities::int_to_string (cycle, 3) +
+			 ".vtk";
+  std::ofstream output (filename.c_str());
   data_out.write_vtk (output);
-}
-
-				 // @sect3{Parsing the Input Deck}
-				 // Declare the parameters for the
-				 // input deck.  We assume a certain
-				 // maximum number of boundaries and process
-				 // any boundary the user supplies up to
-				 // that maximum number.  We
-				 // leave a detailed explanation of these 
-				 // parameters to our description of the input
-				 // sample file.
-template <int dim>
-void ConsLaw<dim>::declare_parameters() {
-
-                                   // Global scope parameters
-  prm.declare_entry("mesh", "grid.inp",
-                    Patterns::Anything(),
-                    "intput file");
-
-  prm.declare_entry("diffusion power", "2.0",
-		    Patterns::Double(),
-		    "power of mesh size for diffusion");
-
-  prm.declare_entry("gravity", "0.0",
-		    Patterns::Double(),
-		    "gravity forcing");
-
-                                   // Time stepping block
-  prm.enter_subsection("time stepping");
-  prm.declare_entry("time step", "0.1",
-		    Patterns::Double(),
-		    "simulation time step");
-  prm.declare_entry("final time", "10.0",
-		    Patterns::Double(),
-		    "simulation end time");
-  prm.leave_subsection();
-
-
-				   // Declare the boundary parameters
-  for (unsigned int b = 0; b < max_n_boundaries; b++) {
-    char bd[512];
-    std::sprintf(bd, "boundary_%d", b);
-    prm.enter_subsection(bd);
-    prm.declare_entry("no penetration", "false",
-		      Patterns::Selection("true|false"),
-		      "<true|false>");
-				     // declare a slot for each of the conservative
-				     // variables.
-    for (unsigned int di = 0; di < EulerEquations<dim>::n_components; di++) {
-      char var[512];
-      std::sprintf(var, "w_%d", di);
-      prm.declare_entry(var, "outflow",
-			Patterns::Selection(
-			  "inflow|outflow|pressure"),
-			"<inflow|outflow|pressure>");
-      
-				       // for dirichlet, a function in x,y,z
-      std::sprintf(var, "w_%d value", di);
-      prm.declare_entry(var, "0.0",
-			Patterns::Anything(),
-			"expression in x,y,z");
-    }
-
-    prm.leave_subsection();
-  }
-
-				   // Initial condition block.
-  prm.enter_subsection("initial condition");
-  {
-    for (unsigned int di = 0; di < EulerEquations<dim>::n_components; di++)
-      prm.declare_entry("w_" + Utilities::int_to_string(di) + " value",
-			"0.0",
-			Patterns::Anything(),
-			"expression in x,y,z");
-  }
-  prm.leave_subsection();
-
-				   // The linear solver block.
-  Parameters::Solver::declare_parameters (prm);
-  Parameters::Refinement::declare_parameters (prm);
-  Parameters::Flux::declare_parameters (prm);
-  Parameters::Output::declare_parameters (prm);
-}
-
-				 // Code to actually parse an input file.
-				 // This function matches the declarations
-				 // above.
-template <int dim>
-void ConsLaw<dim>::load_parameters(const char *infile)
-{
-
-  prm.read_input(infile);
-
-				   // The global parameters.
-  mesh = prm.get("mesh");
-
-  diffusion_power = prm.get_double("diffusion power");
-
-  gravity = prm.get_double("gravity");
-
-				   // The time stepping.
-  prm.enter_subsection("time stepping");
-  {
-    dT = prm.get_double("time step");
-    if (dT == 0)
-      {
-	is_stationary = true;
-	dT = 1.0;
-	TF = 1.0;
-	std::cout << "Stationary mode" << std::endl;
-      }
-    TF = prm.get_double("final time");
-
-    std::cout << "dT=" << dT << std::endl;
-    std::cout << "TF=" << TF << std::endl;
-  }
-  prm.leave_subsection();
-
-				   // The boundary info
-  for (unsigned int b = 0; b < max_n_boundaries; ++b)
-    {
-      prm.enter_subsection("boundary_" + Utilities::int_to_string(b));
-      {
-	std::vector<bc_type> flags(EulerEquations<dim>::n_components,
-				   OUTFLOW_BC);
-
-					 // Define a parser for every boundary,
-					 // though it may be unused.
-	FunctionParser<dim> *sd
-	  = new FunctionParser<dim>(EulerEquations<dim>::n_components);
-
-	std::vector<std::string> expressions(EulerEquations<dim>::n_components,
-					     "0.0");
-    
-	const std::string nopen = prm.get("no penetration");
-
-					 // Determine how each component is
-					 // handled.
-	for (unsigned int di=0; di<EulerEquations<dim>::n_components; ++di)
-	  {
-	    const std::string btype
-	      = prm.get("w_" + Utilities::int_to_string(di));
-	    const std::string var_value
-	      = prm.get("w_" + Utilities::int_to_string(di) +
-			" value");
-
-	    if (di < dim && nopen == "true")
-	      flags[di] = NO_PENETRATION_BC;
-	    else if (btype == "inflow")
-	      {
-		flags[di] = INFLOW_BC;
-		expressions[di] = var_value;
-	      }
-	    else if (btype == "pressure")
-	      {
-		flags[di] = PRESSURE_BC;
-		expressions[di] = var_value;
-	      }
-	  }
-
-
-					 // Add the boundary condition to the
-					 // law.
-	sd->initialize (FunctionParser<dim>::default_variable_names(),
-			expressions,
-			std::map<std::string, double>());
-	bdry_map[b] = std::make_pair (flags, sd);
-      }
-      prm.leave_subsection();
-    }
-
-				   // Initial conditions.
-  prm.enter_subsection("initial condition");
-  {
-    std::vector<std::string> expressions (EulerEquations<dim>::n_components,
-					  "0.0");
-    for (unsigned int di = 0; di < EulerEquations<dim>::n_components; di++)
-      expressions[di] = prm.get("w_" + Utilities::int_to_string(di) +
-				" value");
-    initial_conditions.initialize (FunctionParser<dim>::default_variable_names(),
-				   expressions,
-				   std::map<std::string, double>());
-  }
-  prm.leave_subsection();
-
-  solver_params.parse_parameters (prm);
-  refinement_params.parse_parameters (prm);
-  flux_params.parse_parameters (prm);
-  output_params.parse_parameters (prm);
 }
 
 
@@ -2305,10 +2395,10 @@ void ConsLaw<dim>::run ()
 				   // Open and load the mesh.
   GridIn<dim> grid_in;
   grid_in.attach_triangulation(triangulation);
-  std::cout << "Opening mesh <" << mesh << ">" << std::endl;
-  std::ifstream input_file(mesh.c_str());
+  std::cout << "Opening mesh <" << parameters.mesh << ">" << std::endl;
+  std::ifstream input_file(parameters.mesh.c_str());
 
-  Assert (input_file, ExcFileNotOpen(mesh.c_str()));
+  Assert (input_file, ExcFileNotOpen(parameters.mesh.c_str()));
 
   grid_in.read_ucd(input_file);   
   input_file.close();
@@ -2324,8 +2414,8 @@ void ConsLaw<dim>::run ()
 				   // Initial refinement.  We apply the ic,
 				   // estimate, refine, and repeat until
 				   // happy.
-  if (refinement_params.do_refine == true)
-    for (unsigned int i = 0; i < refinement_params.shock_levels; i++)
+  if (parameters.do_refine == true)
+    for (unsigned int i = 0; i < parameters.shock_levels; i++)
       {
 	estimate();
 	refine_grid();
@@ -2337,11 +2427,11 @@ void ConsLaw<dim>::run ()
   output_results (nstep);
 
 				   // Determine when we will output next.
-  double next_output = T + output_params.output_step;
+  double next_output = T + parameters.output_step;
 
 				   // @sect4{Main time stepping loop}
   predictor = solution;
-  while(T < TF)
+  while (T < parameters.final_time)
     {
       std::cout << "T=" << T << ", ";
 
@@ -2414,18 +2504,18 @@ void ConsLaw<dim>::run ()
 
       estimate();
 
-      T += dT;
+      T += parameters.time_step;
 
 				       // Output if it is time.
-      if (output_params.output_step < 0) {
+      if (parameters.output_step < 0) {
         output_results (++nstep);
       } else if (T >= next_output) {
         output_results (++nstep);
-        next_output += output_params.output_step;
+        next_output += parameters.output_step;
       }
 
 				       // Refine, if refinement is selected.
-      if (refinement_params.do_refine == true)
+      if (parameters.do_refine == true)
 	{
 	  refine_grid();
 	  setup_system();
@@ -2449,9 +2539,7 @@ int main (int argc, char *argv[])
   
   try
     {
-      ConsLaw<2> cons;
-      cons.declare_parameters();
-      cons.load_parameters(argv[1]);
+      ConsLaw<2> cons (argv[1]);
       cons.run ();
     }
   catch (std::exception &exc)
