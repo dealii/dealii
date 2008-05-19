@@ -1020,49 +1020,51 @@ namespace Parameters
 				   // being specified for each component and
 				   // each boundary indicator separately.
 				   //
-				   // The data structure used to store the
-				   // boundary indicators is a bit
+				   // The data structure used to store
+				   // the boundary indicators is a bit
 				   // complicated. It is an array of
-				   // <code>max_n_boundaries</code> elements
-				   // indicating the range of boundary
-				   // indicators that will be accepted. For
-				   // each entry in this array, we store a
-				   // pair of data: first, an array of size
-				   // <code>n_components</code> that for each
-				   // component of the solution vector
-				   // indicates whether it is an inflow,
-				   // outflow, or other kind of boundary, and
-				   // second a FunctionParser object that
-				   // describes all components of the solution
-				   // vector for this boundary id at once.
+				   // <code>max_n_boundaries</code>
+				   // elements indicating the range of
+				   // boundary indicators that will be
+				   // accepted. For each entry in this
+				   // array, we store a pair of data
+				   // in the
+				   // <code>BoundaryCondition</code>
+				   // structure: first, an array of
+				   // size <code>n_components</code>
+				   // that for each component of the
+				   // solution vector indicates
+				   // whether it is an inflow,
+				   // outflow, or other kind of
+				   // boundary, and second a
+				   // FunctionParser object that
+				   // describes all components of the
+				   // solution vector for this
+				   // boundary id at once.
 				   //
-				   // The data structure is made a bit more
-				   // inconvenient by the fact that C++ has no
-				   // way to initialize arrays in
-				   // constructors. Now, we need to tell the
-				   // function parser object at construction
-				   // time how many vector components it is to
-				   // describe. Since this can't be done in
-				   // the constructor of this class, what we
-				   // do is not to have the second part of the
-				   // array elements be a FunctionParser
-				   // object, but a pointer to one, and
-				   // initialize the pointer in the
-				   // <code>parser_parameters()</code>
-				   // function below. In order to avoid
-				   // writing a destructor for this class that
-				   // later releases this memory again, we use
-				   // the <code>boost::shared_ptr</code> class
-				   // instead that will make sure that memory
-				   // is released whenever the object pointed
-				   // to is not used anywhere any more.
+				   // The
+				   // <code>BoundaryCondition</code>
+				   // structure requires a constructor
+				   // since we need to tell the
+				   // function parser object at
+				   // construction time how many
+				   // vector components it is to
+				   // describe. This initialization
+				   // can therefore not wait till we
+				   // actually set the formulas the
+				   // FunctionParser object represents
+				   // later in
+				   // <code>AllParameters::parse_parameters()</code>
 				   //
-				   // For the same reason of having to tell
-				   // Function objects their vector size at
-				   // construction time, we have to have a
-				   // constructor of this class that at least
-				   // initializes the other FunctionParser
-				   // object, i.e. the one describing initial
+				   // For the same reason of having to
+				   // tell Function objects their
+				   // vector size at construction
+				   // time, we have to have a
+				   // constructor of the
+				   // <code>AllParameters</code> class
+				   // that at least initializes the
+				   // other FunctionParser object,
+				   // i.e. the one describing initial
 				   // conditions.
   template <int dim>
   struct AllParameters : public Solver,
@@ -1080,6 +1082,15 @@ namespace Parameters
 	    pressure_boundary
       };
 
+      struct BoundaryConditions
+      {
+	  BoundaryKind        kind[EulerEquations<dim>::n_components];
+	  FunctionParser<dim> values;
+
+	  BoundaryConditions ();
+      };
+      
+      
       AllParameters ();
       
       double diffusion_power;
@@ -1091,15 +1102,19 @@ namespace Parameters
       std::string mesh_filename;
 
       FunctionParser<dim> initial_conditions;
-
-      std::pair<BoundaryKind[EulerEquations<dim>::n_components],
-		boost::shared_ptr<FunctionParser<dim> > >
-      boundary_conditions[max_n_boundaries];
+      BoundaryConditions  boundary_conditions[max_n_boundaries];
       
       static void declare_parameters (ParameterHandler &prm);
       void parse_parameters (ParameterHandler &prm);
   };
 
+
+
+  template <int dim>
+  AllParameters<dim>::BoundaryConditions::BoundaryConditions ()
+		  :
+		  values (EulerEquations<dim>::n_components)
+  {}
 
 
   template <int dim>
@@ -1144,7 +1159,7 @@ namespace Parameters
 	{
 	  prm.declare_entry("no penetration", "false",
 			    Patterns::Bool(),
-			    "Whether the names boundary is allows gas to "
+			    "whether the named boundary allows gas to "
 			    "penetrate or is a rigid wall");
 
 	  for (unsigned int di=0; di<EulerEquations<dim>::n_components; ++di)
@@ -1210,54 +1225,39 @@ namespace Parameters
 	prm.enter_subsection("boundary_" +
 			     Utilities::int_to_string(boundary_id));
 	{
-	  boundary_conditions[boundary_id].second
-	    = boost::shared_ptr<FunctionParser<dim> > (
-	      new FunctionParser<dim>(EulerEquations<dim>::n_components));
-
 	  std::vector<std::string>
 	    expressions(EulerEquations<dim>::n_components, "0.0");
     
-	  const bool nopen = prm.get_bool("no penetration");
+	  const bool no_penetration = prm.get_bool("no penetration");
 
-					   // Determine how each component is
-					   // handled.
 	  for (unsigned int di=0; di<EulerEquations<dim>::n_components; ++di)
 	    {
 	      const std::string boundary_type
 		= prm.get("w_" + Utilities::int_to_string(di));
-	      const std::string var_value
-		= prm.get("w_" + Utilities::int_to_string(di) +
-			  " value");
 
-	      if (di < dim && nopen)
-		boundary_conditions[boundary_id].first[di] = no_penetration_boundary;
+	      if ((di < dim) && (no_penetration == true))
+		boundary_conditions[boundary_id].kind[di] = no_penetration_boundary;
 	      else if (boundary_type == "inflow")
-		{
-		  boundary_conditions[boundary_id].first[di] = inflow_boundary;
-		  expressions[di] = var_value;
-		}
+		boundary_conditions[boundary_id].kind[di] = inflow_boundary;
 	      else if (boundary_type == "pressure")
-		{
-		  boundary_conditions[boundary_id].first[di] = pressure_boundary;
-		  expressions[di] = var_value;
-		}
+		boundary_conditions[boundary_id].kind[di] = pressure_boundary;
 	      else if (boundary_type == "outflow")
-		boundary_conditions[boundary_id].first[di] = outflow_boundary;
+		boundary_conditions[boundary_id].kind[di] = outflow_boundary;
 	      else
 		AssertThrow (false, ExcNotImplemented());
+
+	      expressions[di] = prm.get("w_" + Utilities::int_to_string(di) +
+					" value");	      
 	    }
 
-
-					   // Add the boundary condition to the
-					   // law.
-	  boundary_conditions[boundary_id].second->initialize (FunctionParser<dim>::default_variable_names(),
-			  expressions,
-			  std::map<std::string, double>());
+	  boundary_conditions[boundary_id].values
+	    .initialize (FunctionParser<dim>::default_variable_names(),
+			 expressions,
+			 std::map<std::string, double>());
 	}
 	prm.leave_subsection();
       }
 
-				     // Initial conditions.
     prm.enter_subsection("initial condition");
     {
       std::vector<std::string> expressions (EulerEquations<dim>::n_components,
@@ -1275,9 +1275,7 @@ namespace Parameters
     Parameters::Refinement::parse_parameters (prm);
     Parameters::Flux::parse_parameters (prm);
     Parameters::Output::parse_parameters (prm);
-  }
-  
-  
+  }  
 }
 
   
@@ -1683,7 +1681,7 @@ void ConsLaw<dim>::assemble_face_term(
 				     // not prescribed, the values evaluate to
 				     // zero and are ignored, below.
     std::vector<Vector<double> > bvals(n_q_points, Vector<double>(EulerEquations<dim>::n_components));
-    parameters.boundary_conditions[boundary_id].second->vector_value_list(fe_v.get_quadrature_points(), bvals);
+    parameters.boundary_conditions[boundary_id].values.vector_value_list(fe_v.get_quadrature_points(), bvals);
 
 				     // We loop the quadrature points, and we treat each
 				     // component individualy.
@@ -1691,9 +1689,9 @@ void ConsLaw<dim>::assemble_face_term(
       for (unsigned int di = 0; di < EulerEquations<dim>::n_components; di++) {
 
 					 // An inflow/dirichlet type of boundary condition
-        if (parameters.boundary_conditions[boundary_id].first[di] == Parameters::AllParameters<dim>::inflow_boundary) {
+        if (parameters.boundary_conditions[boundary_id].kind[di] == Parameters::AllParameters<dim>::inflow_boundary) {
           Wminus[q][di] = bvals[q](di);
-        } else if (parameters.boundary_conditions[boundary_id].first[di] == Parameters::AllParameters<dim>::pressure_boundary) {
+        } else if (parameters.boundary_conditions[boundary_id].kind[di] == Parameters::AllParameters<dim>::pressure_boundary) {
 					   // A prescribed pressure boundary
 					   // condition.  This boundary
 					   // condition is complicated by the
@@ -1711,11 +1709,11 @@ void ConsLaw<dim>::assemble_face_term(
           Sacado::Fad::DFad<double> rho_vel_sqr = 0;
           Sacado::Fad::DFad<double> dens;
           
-          dens = parameters.boundary_conditions[boundary_id].first[EulerEquations<dim>::density_component] == Parameters::AllParameters<dim>::inflow_boundary ? bvals[q](EulerEquations<dim>::density_component) :
+          dens = parameters.boundary_conditions[boundary_id].kind[EulerEquations<dim>::density_component] == Parameters::AllParameters<dim>::inflow_boundary ? bvals[q](EulerEquations<dim>::density_component) :
                  Wplus[q][EulerEquations<dim>::density_component];
 
           for (unsigned int d=0; d < dim; d++) {
-            if (parameters.boundary_conditions[boundary_id].first[d] == Parameters::AllParameters<dim>::inflow_boundary)
+            if (parameters.boundary_conditions[boundary_id].kind[d] == Parameters::AllParameters<dim>::inflow_boundary)
               rho_vel_sqr += bvals[q](d)*bvals[q](d);
             else
               rho_vel_sqr += Wplus[q][d]*Wplus[q][d];
@@ -1726,7 +1724,7 @@ void ConsLaw<dim>::assemble_face_term(
           Wminus[q][di] = bvals[q](di)/(EulerEquations<dim>::gas_gamma-1.0) +
 			  0.5*rho_vel_sqr;
 
-        } else if (parameters.boundary_conditions[boundary_id].first[di] == Parameters::AllParameters<dim>::outflow_boundary) {
+        } else if (parameters.boundary_conditions[boundary_id].kind[di] == Parameters::AllParameters<dim>::outflow_boundary) {
 					   // A free/outflow boundary, very simple.
           Wminus[q][di] = Wplus[q][di];
 
