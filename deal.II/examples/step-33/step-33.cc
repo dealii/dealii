@@ -1041,7 +1041,6 @@ namespace Parameters
       double gravity;
 
       double time_step, final_time;
-
       bool is_stationary;
 				       // Name of the mesh to read in.
       std::string mesh;
@@ -1071,7 +1070,8 @@ namespace Parameters
 
 
   template <int dim>
-  AllParameters<dim>::AllParameters ():
+  AllParameters<dim>::AllParameters ()
+		  :
 		  initial_conditions (EulerEquations<dim>::n_components)
   {}
   
