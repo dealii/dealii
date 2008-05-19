@@ -84,16 +84,11 @@
 #include <Sacado.hpp>
 
 
-				 // And this again is C++ as well as two
-				 // include files from the BOOST library that
-				 // provide us with counted pointers and
-				 // arrays of fixed size:
+				 // And this again is C++:
 #include <iostream>
 #include <fstream>
 #include <vector>
-
-#include <boost/shared_ptr.hpp>
-#include <boost/array.hpp>
+#include <memory>
 
 				 // To end this section, introduce everythin
 				 // in the dealii library into the current
@@ -122,7 +117,7 @@ using namespace dealii;
 template <int dim>
 struct EulerEquations
 {
-				   // First a few variables that
+				     // First a few variables that
 				   // describe the various components of our
 				   // solution vector in a generic way. This
 				   // includes the number of components in the
@@ -146,6 +141,50 @@ struct EulerEquations
     static const unsigned int density_component        = dim;
     static const unsigned int energy_component         = dim+1;
 
+				     // When generating graphical
+				     // output way down in this
+				     // program, we need to specify
+				     // the names of the solution
+				     // variables as well as how the
+				     // various components group into
+				     // vector and scalar fields. We
+				     // could describe this there, but
+				     // in order to keep things that
+				     // have to do with the Euler
+				     // equation localized here and
+				     // the rest of the program as
+				     // generic as possible, we
+				     // provide this sort of
+				     // information in the following
+				     // two functions:
+    static
+    std::vector<std::string>
+    component_names ()
+      {
+	std::vector<std::string> names (dim, "momentum");
+	names.push_back ("density");
+	names.push_back ("energy_density");
+
+	return names;
+      }
+
+
+    static
+    std::vector<DataComponentInterpretation::DataComponentInterpretation>
+    component_interpretation ()
+      {
+	std::vector<DataComponentInterpretation::DataComponentInterpretation>
+	  data_component_interpretation
+	  (dim, DataComponentInterpretation::component_is_part_of_vector);
+	data_component_interpretation
+	  .push_back (DataComponentInterpretation::component_is_scalar);
+	data_component_interpretation
+	  .push_back (DataComponentInterpretation::component_is_scalar);
+	
+	return data_component_interpretation;
+      }
+    
+    
 				   // Next, we define the gas
 				   // constant. We will set it to 1.4
 				   // in its definition immediately
@@ -222,9 +261,8 @@ struct EulerEquations
 		(*(W.begin() + energy_component) -
 		 compute_kinetic_energy<number>(W)));
       }	
-    
 
-    
+
 				     // We define the flux function
 				     // $F(W)$ as one large matrix.
 				     // Each row of this matrix
@@ -554,11 +592,8 @@ EulerEquations<dim>::Postprocessor::
 get_data_component_interpretation () const
 {
   std::vector<DataComponentInterpretation::DataComponentInterpretation>
-    interpretation;
-
-  for (unsigned int d=0; d<dim; ++d)
-    interpretation.push_back (DataComponentInterpretation::
-			      component_is_part_of_vector);
+    interpretation (dim,
+		    DataComponentInterpretation::component_is_part_of_vector);
 
   interpretation.push_back (DataComponentInterpretation::
 			    component_is_scalar);
@@ -1337,11 +1372,11 @@ class ConservationLaw
 
     std::pair<unsigned int, double> solve (Vector<double> &solution);
 
-    void refine_grid ();
+    void compute_refinement_indicators (Vector<double> &indicator) const;
+    void refine_grid (const Vector<double> &indicator);
 
     void output_results () const;
 
-    void compute_refinement_indicator ();
 
 
 				     // The first few member variables
@@ -1406,11 +1441,59 @@ class ConservationLaw
 
     Vector<double>       right_hand_side;
 
-    Epetra_SerialComm    communicator;
-
-    Epetra_Map         *Map;
-    Epetra_CrsMatrix   *Matrix;
-    Vector<double>      indicator;
+				     // This final set of member
+				     // variables (except for the
+				     // object holding all run-time
+				     // parameters at the very bottom)
+				     // deals with the interface we
+				     // have in this program to the
+				     // Trilinos library that provides
+				     // us with linear solvers.
+				     //
+				     // Trilinos is designed to be a
+				     // library that also runs in
+				     // parallel on distributed memory
+				     // systems, so matrices and
+				     // vectors need two things: (i) a
+				     // communicator object that
+				     // facilitates sending messages
+				     // to remote machines, and (ii) a
+				     // description which elements of
+				     // a vector or matrix reside
+				     // locally on a machine and which
+				     // are stored remotely.
+				     //
+				     // We do not actually run the
+				     // current program in parallel,
+				     // and so the objects we use here
+				     // are pretty much dummy objects
+				     // for this purpose: the
+				     // communicator below represents
+				     // a system that includes only a
+				     // single machine, and the index
+				     // map encodes that all elements
+				     // are stored
+				     // locally. Nevertheless, we need
+				     // them.
+				     //
+				     // Furthermore, we need a matrix
+				     // object for the system matrix
+				     // to be used in each Newton
+				     // step. Note that map and matrix
+				     // need to be updated for their
+				     // sizes whenever we refine the
+				     // mesh. In Trilinos, this is
+				     // easiest done by simply
+				     // deleting the previous object
+				     // and creating a new one. To
+				     // minimize hassle and avoid
+				     // memory leaks, we use a
+				     // <code>std::auto_ptr</code>
+				     // instead of a plain pointer for
+				     // this.
+    Epetra_SerialComm                   communicator;
+    std::auto_ptr<Epetra_Map>       Map;
+    std::auto_ptr<Epetra_CrsMatrix> Matrix;
  
     Parameters::AllParameters<dim> parameters;
 };
@@ -1424,9 +1507,7 @@ ConservationLaw<dim>::ConservationLaw (const char *input_filename)
                 fe (FE_Q<dim>(1), EulerEquations<dim>::n_components),
 		dof_handler (triangulation),
 		quadrature (2),
-		face_quadrature (2),
-                Map(NULL),
-                Matrix(NULL)
+		face_quadrature (2)
 {
   ParameterHandler prm;
   Parameters::AllParameters<dim>::declare_parameters (prm);
@@ -2119,8 +2200,7 @@ void ConservationLaw<dim>::setup_system ()
                                    // Rebuild the map.  In serial this doesn't do much,
                                    // but is needed.  In parallel, this would desribe
                                    // the parallel dof layout.
-  if (Map) delete Map;
-  Map  = new Epetra_Map(dof_handler.n_dofs(), 0, communicator);
+  Map.reset (new Epetra_Map(dof_handler.n_dofs(), 0, communicator));
 
                                    // Epetra can build a more efficient matrix if
                                    // one knows ahead of time the maximum number of
@@ -2133,9 +2213,7 @@ void ConservationLaw<dim>::setup_system ()
 				   // the constructor that optimizes
 				   // with the existing lengths per row
 				   // variable.
-  if (Matrix != 0)
-    delete Matrix;
-  Matrix = new Epetra_CrsMatrix(Copy, *Map, &row_lengths[0], true);
+  Matrix.reset (new Epetra_CrsMatrix(Copy, *Map, &row_lengths[0], true));
 
 				   // We add the sparsity pattern to the matrix by
 				   // inserting zeros.
@@ -2188,7 +2266,7 @@ ConservationLaw<dim>::solve (Vector<double> &newton_update)
 				     // changing th string given to the
 				     // <code>Create</code> function.
     Epetra_LinearProblem prob;
-    prob.SetOperator(Matrix);
+    prob.SetOperator(Matrix.get());
     Amesos_BaseSolver *solver = Amesos().Create ("Amesos_Klu", prob);
 
     Assert (solver != NULL, ExcInternalError());
@@ -2255,7 +2333,7 @@ ConservationLaw<dim>::solve (Vector<double> &newton_update)
     Solver.SetAztecParam(AZ_ilut_fill, parameters.ilut_fill);
     Solver.SetAztecParam(AZ_athresh,   parameters.ilut_atol);
     Solver.SetAztecParam(AZ_rthresh,   parameters.ilut_rtol);
-    Solver.SetUserMatrix(Matrix);
+    Solver.SetUserMatrix(Matrix.get());
 
 				     // Run the solver iteration.  Collect the number
 				     // of iterations and the residual.
@@ -2273,7 +2351,9 @@ ConservationLaw<dim>::solve (Vector<double> &newton_update)
 				 // simply use the density squared, which selects
 				 // shocks with some success.
 template <int dim>
-void ConservationLaw<dim>::compute_refinement_indicator ()
+void
+ConservationLaw<dim>::
+compute_refinement_indicators (Vector<double> &refinement_indicators) const
 {  
   const unsigned int dofs_per_cell = dof_handler.get_fe().dofs_per_cell;
   std::vector<unsigned int> dofs (dofs_per_cell);
@@ -2303,21 +2383,21 @@ void ConservationLaw<dim>::compute_refinement_indicator ()
     fe_v.get_function_values(predictor, U);
     fe_v.get_function_grads(predictor, dU);
 
-    indicator(cell_no) = 0;
+    refinement_indicators(cell_no) = 0;
     for (unsigned int q = 0; q < n_q_points; q++) {
       double ng = 0;
       for (unsigned int d = 0; d < dim; d++) ng += dU[q][EulerEquations<dim>::density_component][d]*dU[q][EulerEquations<dim>::density_component][d];
 
-      indicator(cell_no) += std::log(1+std::sqrt(ng));
+      refinement_indicators(cell_no) += std::log(1+std::sqrt(ng));
       
     } 
-    indicator(cell_no) /= n_q_points;
+    refinement_indicators(cell_no) /= n_q_points;
 
   } 
 }
 
 template <int dim>
-void ConservationLaw<dim>::refine_grid ()
+void ConservationLaw<dim>::refine_grid (const Vector<double> &refinement_indicators)
 {
 
   SolutionTransfer<dim, double> soltrans(dof_handler);
@@ -2335,11 +2415,11 @@ void ConservationLaw<dim>::refine_grid ()
     cell->clear_coarsen_flag();
     cell->clear_refine_flag();
     if (cell->level() < parameters.shock_levels &&
-        std::fabs(indicator(cell_no)) > parameters.shock_val ) {
+        std::fabs(refinement_indicators(cell_no)) > parameters.shock_val ) {
       cell->set_refine_flag();
     } else {
       if (cell->level() > 0 &&
-	  std::fabs(indicator(cell_no)) < 0.75*parameters.shock_val)
+	  std::fabs(refinement_indicators(cell_no)) < 0.75*parameters.shock_val)
 	cell->set_coarsen_flag();
     }
   }
@@ -2382,9 +2462,6 @@ void ConservationLaw<dim>::refine_grid ()
   current_solution.reinit(dof_handler.n_dofs());
   current_solution = old_solution;
   right_hand_side.reinit (dof_handler.n_dofs());
-
-  indicator.reinit(triangulation.n_active_cells());
-
 }
 
 
@@ -2397,26 +2474,14 @@ void ConservationLaw<dim>::output_results () const
 
   DataOut<dim> data_out;
   data_out.attach_dof_handler (dof_handler);
-  std::vector<std::string> old_solution_names (dim, "momentum");
-  old_solution_names.push_back ("density");
-  old_solution_names.push_back ("energy_density");
-
-  std::vector<DataComponentInterpretation::DataComponentInterpretation>
-    data_component_interpretation
-    (dim, DataComponentInterpretation::component_is_part_of_vector);
-  data_component_interpretation
-    .push_back (DataComponentInterpretation::component_is_scalar);
-  data_component_interpretation
-    .push_back (DataComponentInterpretation::component_is_scalar);
   
-  data_out.add_data_vector (old_solution, old_solution_names,
+  data_out.add_data_vector (old_solution,
+			    EulerEquations<dim>::component_names (),
 			    DataOut<dim>::type_dof_data,
-			    data_component_interpretation);
+			    EulerEquations<dim>::component_interpretation ());
 
   data_out.add_data_vector (old_solution, postprocessor);
 
-  data_out.add_data_vector (indicator, "error");
-  
   data_out.build_patches ();
 
   static unsigned int output_file_number = 0;
@@ -2461,7 +2526,6 @@ void ConservationLaw<dim>::run ()
   current_solution.reinit (dof_handler.n_dofs());
   predictor.reinit (dof_handler.n_dofs());
   right_hand_side.reinit (dof_handler.n_dofs());
-  indicator.reinit(triangulation.n_active_cells());
 
   setup_system();
 
@@ -2476,8 +2540,9 @@ void ConservationLaw<dim>::run ()
   if (parameters.do_refine == true)
     for (unsigned int i = 0; i < parameters.shock_levels; i++)
       {
-	compute_refinement_indicator();
-	refine_grid();
+	Vector<double> refinement_indicators (triangulation.n_active_cells());
+	compute_refinement_indicators(refinement_indicators);
+	refine_grid(refinement_indicators);
 	setup_system();
 
 	VectorTools::interpolate(dof_handler,
@@ -2577,7 +2642,8 @@ void ConservationLaw<dim>::run ()
 
       old_solution = current_solution;
 
-      compute_refinement_indicator();
+      Vector<double> refinement_indicators (triangulation.n_active_cells());
+      compute_refinement_indicators(refinement_indicators);
 
       time += parameters.time_step;
 
@@ -2593,7 +2659,7 @@ void ConservationLaw<dim>::run ()
 				       // Refine, if refinement is selected.
       if (parameters.do_refine == true)
 	{
-	  refine_grid();
+	  refine_grid(refinement_indicators);
 	  setup_system();
 
 	  newton_update.reinit (dof_handler.n_dofs());
