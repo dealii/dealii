@@ -23,8 +23,7 @@
 #include <base/utilities.h>
 
 #include <lac/vector.h>
-#include <lac/sparse_matrix.h>
-#include <lac/vector_memory.h>
+#include <lac/compressed_sparsity_pattern.h>
 
 #include <grid/tria.h>
 #include <grid/grid_generator.h>
@@ -118,24 +117,24 @@ template <int dim>
 struct EulerEquations
 {
 				     // First a few variables that
-				   // describe the various components of our
-				   // solution vector in a generic way. This
-				   // includes the number of components in the
-				   // system (Euler's equations have one entry
-				   // for momenta in each spatial direction,
-				   // plus the energy and density components,
-				   // for a total of <code>dim+2</code>
-				   // components), as well as functions that
-				   // describe the index within the solution
-				   // vector of the first momentum component,
-				   // the density component, and the energy
-				   // density component. Note that all these
-				   // %numbers depend on the space dimension;
-				   // defining them in a generic way (rather
-				   // than by implicit convention) makes our
-				   // code more flexible and makes it easier
-				   // to later extend it, for example by
-				   // adding more components to the equations.
+				     // describe the various components of our
+				     // solution vector in a generic way. This
+				     // includes the number of components in the
+				     // system (Euler's equations have one entry
+				     // for momenta in each spatial direction,
+				     // plus the energy and density components,
+				     // for a total of <code>dim+2</code>
+				     // components), as well as functions that
+				     // describe the index within the solution
+				     // vector of the first momentum component,
+				     // the density component, and the energy
+				     // density component. Note that all these
+				     // %numbers depend on the space dimension;
+				     // defining them in a generic way (rather
+				     // than by implicit convention) makes our
+				     // code more flexible and makes it easier
+				     // to later extend it, for example by
+				     // adding more components to the equations.
     static const unsigned int n_components             = dim + 2;
     static const unsigned int first_momentum_component = 0;
     static const unsigned int density_component        = dim;
@@ -185,22 +184,22 @@ struct EulerEquations
       }
     
     
-				   // Next, we define the gas
-				   // constant. We will set it to 1.4
-				   // in its definition immediately
-				   // following the declaration of
-				   // this class (unlike integer
-				   // variables, like the ones above,
-				   // static const floating point
-				   // member variables cannot be
-				   // initialized within the class
-				   // declaration in C++). This value
-				   // of 1.4 is representative of a
-				   // gas that consists of molecules
-				   // composed of two atoms, such as
-				   // air which consists up to small
-				   // traces almost entirely of $N_2$
-				   // and $O_2$.
+				     // Next, we define the gas
+				     // constant. We will set it to 1.4
+				     // in its definition immediately
+				     // following the declaration of
+				     // this class (unlike integer
+				     // variables, like the ones above,
+				     // static const floating point
+				     // member variables cannot be
+				     // initialized within the class
+				     // declaration in C++). This value
+				     // of 1.4 is representative of a
+				     // gas that consists of molecules
+				     // composed of two atoms, such as
+				     // air which consists up to small
+				     // traces almost entirely of $N_2$
+				     // and $O_2$.
     static const double gas_gamma;
 
     
@@ -368,7 +367,7 @@ struct EulerEquations
 	      
 	    normal_flux[di] += 0.5*alpha*(Wplus[di] - Wminus[di]);
 	  }
-    }
+      }
 
     
 				     // Finally, we declare a class that
@@ -522,9 +521,9 @@ compute_derived_quantities_vector (const std::vector<Vector<double> >           
   if (do_schlieren_plot == true)
     Assert (duh.size() == n_quadrature_points,
 	    ExcInternalError())
-  else
-    Assert (duh.size() == 0,
-	    ExcInternalError());
+			else
+			  Assert (duh.size() == 0,
+				  ExcInternalError());
 
   Assert (computed_quantities.size() == n_quadrature_points,
 	  ExcInternalError());
@@ -535,9 +534,9 @@ compute_derived_quantities_vector (const std::vector<Vector<double> >           
   if (do_schlieren_plot == true)
     Assert (computed_quantities[0].size() == dim+2,
 	    ExcInternalError())
-  else
-    Assert (computed_quantities[0].size() == dim+1,
-	    ExcInternalError());
+					   else
+					     Assert (computed_quantities[0].size() == dim+1,
+						     ExcInternalError());
 
 				   // Then loop over all quadrature points and
 				   // do our work there. The code should be
@@ -1349,18 +1348,14 @@ class ConservationLaw
 {
   public:
     ConservationLaw (const char *input_filename);
-    ~ConservationLaw ();
-
     void run ();
     
   private:
     void setup_system ();
 
     void assemble_system ();
-
     void assemble_cell_term (const FEValues<dim>             &fe_v,
 			     const std::vector<unsigned int> &dofs);
-    
     void assemble_face_term(const unsigned int           face_no,
 			    const FEFaceValuesBase<dim> &fe_v,
 			    const FEFaceValuesBase<dim> &fe_v_neighbor,
@@ -1410,7 +1405,6 @@ class ConservationLaw
     const FESystem<dim>  fe;
     DoFHandler<dim>      dof_handler;
 
-    SparsityPattern      sparsity_pattern;
     const QGauss<dim>    quadrature;
     const QGauss<dim-1>  face_quadrature;
     
@@ -1491,7 +1485,7 @@ class ConservationLaw
 				     // <code>std::auto_ptr</code>
 				     // instead of a plain pointer for
 				     // this.
-    Epetra_SerialComm                   communicator;
+    Epetra_SerialComm               communicator;
     std::auto_ptr<Epetra_Map>       Map;
     std::auto_ptr<Epetra_CrsMatrix> Matrix;
  
@@ -1499,7 +1493,13 @@ class ConservationLaw
 };
 
 
-				 // Create a conservation law with some defaults.
+				 // @sect4{ConservationLaw::ConservationLaw}
+				 //
+				 // There is nothing much to say about
+				 // the constructor. Essentially, it
+				 // reads the input file and fills the
+				 // parameter object with the parsed
+				 // values:
 template <int dim>
 ConservationLaw<dim>::ConservationLaw (const char *input_filename)
 		:
@@ -1517,16 +1517,328 @@ ConservationLaw<dim>::ConservationLaw (const char *input_filename)
 }
 
 
-				 // Bye bye Conservation law.
+
+				 // @sect4{ConservationLaw::setup_system}
+				 //
+				 // The following function is called
+				 // each time the mesh is
+				 // changed. Essentially what it does
+				 // is to resize the Trilinos
+				 // matrix. In addition to just
+				 // resizing it, it also builds a
+				 // sparsity pattern, initializes the
+				 // row lengths of the matrix with the
+				 // ones from this sparsity pattern,
+				 // and finally puts zero entries into
+				 // the places where nonzero entries
+				 // will later be found. This will
+				 // make subsequent operations on the
+				 // matrix faster, because no new
+				 // memory will need to be allocated:
 template <int dim>
-ConservationLaw<dim>::~ConservationLaw () 
+void ConservationLaw<dim>::setup_system ()
 {
-  dof_handler.clear ();
+  Map.reset (new Epetra_Map(dof_handler.n_dofs(), 0, communicator));
+
+
+				   // Now create a sparsity pattern,
+				   // condense it, and count the
+				   // number of nonzero entries per
+				   // row:
+  CompressedSparsityPattern sparsity_pattern (dof_handler.n_dofs(),
+					      dof_handler.n_dofs());
+  DoFTools::make_sparsity_pattern (dof_handler, sparsity_pattern);
+
+  ConstraintMatrix hanging_node_constraints;
+  DoFTools::make_hanging_node_constraints (dof_handler,
+					   hanging_node_constraints);
+  hanging_node_constraints.close ();
+  
+  hanging_node_constraints.condense (sparsity_pattern);
+  sparsity_pattern.compress();
+  
+  std::vector<int> row_lengths (dof_handler.n_dofs());
+  for (unsigned int i=0; i<dof_handler.n_dofs(); ++i)
+    row_lengths[i] = sparsity_pattern.row_length (i);
+
+				   // Next we build the matrix, using
+				   // the constructor that optimizes
+				   // with the existing lengths per
+				   // row variable. After this, loop
+				   // over the individual rows of the
+				   // deal.II sparsity pattern and
+				   // create entries in the Trilinos
+				   // matrix in the corresponding
+				   // places. At the end, call the
+				   // <code>FillComplete()</code>
+				   // function that indicates that no
+				   // other matrix entries will be
+				   // needed:
+  Matrix.reset (new Epetra_CrsMatrix(Copy, *Map, &row_lengths[0], true));
+
+  const unsigned int max_nonzero_entries
+    = *std::max_element (row_lengths.begin(), row_lengths.end());
+  
+  std::vector<double> values(max_nonzero_entries, 0);
+  std::vector<int> row_indices(max_nonzero_entries);
+  
+  for (unsigned int row=0; row<dof_handler.n_dofs(); ++row)
+    {
+      row_indices.resize (row_lengths[row], 0);
+      values.resize (row_lengths[row], 0.);
+      
+      for (int i=0; i<row_lengths[row]; ++i)
+	row_indices[i] = sparsity_pattern.column_number (row, i);
+      
+      Matrix->InsertGlobalValues(row, row_lengths[row],
+				 &values[0], &row_indices[0]);
+    }
+
+  Matrix->FillComplete();
 }
 
 
-				 // @sect3{Assembly}
-				 // @sect4{%Function: assemble_cell_term}
+				 // @sect4{ConservationLaw::assemble_system}
+				 //
+                                 // This and the following two
+                                 // functions are the meat of this
+                                 // program: They assemble the linear
+                                 // system that results from applying
+                                 // Newton's method to the nonlinear
+                                 // system of conservation
+                                 // equations.
+				 //
+				 // This first function puts all of
+                                 // the assembly pieces together in a
+                                 // routine that dispatches the
+                                 // correct piece for each cell/face.
+                                 // The actual implementation of the
+                                 // assembly on these objects is done
+                                 // in the following functions.
+template <int dim>
+void ConservationLaw<dim>::assemble_system ()
+{
+  const unsigned int dofs_per_cell = dof_handler.get_fe().dofs_per_cell;
+
+				   // We track the dofs on this cell and (if necessary)
+				   // the adjacent cell.
+  std::vector<unsigned int> dofs (dofs_per_cell);
+  std::vector<unsigned int> dofs_neighbor (dofs_per_cell);
+
+				   // First we create the
+				   // ``UpdateFlags'' for the
+				   // ``FEValues'' and the
+				   // ``FEFaceValues'' objects.
+  const UpdateFlags update_flags = update_values
+				   | update_gradients
+				   | update_q_points
+				   | update_JxW_values,
+
+				   // Note, that on faces we do not
+				   // need gradients but we need
+				   // normal vectors.
+	       face_update_flags = update_values
+				   | update_q_points
+				   | update_JxW_values
+				   | update_normal_vectors,
+  
+				   // On the neighboring cell we only
+				   // need the shape values. Given a
+				   // specific face, the quadrature
+				   // points and `JxW values' are the
+				   // same as for the current cells,
+				   // the normal vectors are known to
+				   // be the negative of the normal
+				   // vectors of the current cell.
+      neighbor_face_update_flags = update_values;
+   
+				   // Then we create the ``FEValues''
+				   // object. Note, that since version
+				   // 3.2.0 of deal.II the constructor
+				   // of this class takes a
+				   // ``Mapping'' object as first
+				   // argument. Although the
+				   // constructor without ``Mapping''
+				   // argument is still supported it
+				   // is recommended to use the new
+				   // constructor. This reduces the
+				   // effect of `hidden magic' (the
+				   // old constructor implicitely
+				   // assumes a ``MappingQ1'' mapping)
+				   // and makes it easier to change
+				   // the mapping object later.
+  FEValues<dim> fe_v (mapping, fe, quadrature, update_flags);
+  
+				   // Similarly we create the
+				   // ``FEFaceValues'' and
+				   // ``FESubfaceValues'' objects for
+				   // both, the current and the
+				   // neighboring cell. Within the
+				   // following nested loop over all
+				   // cells and all faces of the cell
+				   // they will be reinited to the
+				   // current cell and the face (and
+				   // subface) number.
+  FEFaceValues<dim>    fe_v_face             (mapping, fe, face_quadrature,
+					      face_update_flags);
+  FESubfaceValues<dim> fe_v_subface          (mapping, fe, face_quadrature,
+					      face_update_flags);
+  FEFaceValues<dim>    fe_v_face_neighbor    (mapping, fe, face_quadrature,
+					      neighbor_face_update_flags);
+  FESubfaceValues<dim> fe_v_subface_neighbor (mapping, fe, face_quadrature,
+					      neighbor_face_update_flags);
+
+				   // Furthermore we need some cell
+				   // iterators.
+  typename DoFHandler<dim>::active_cell_iterator
+    cell = dof_handler.begin_active(),
+    endc = dof_handler.end();
+
+				   // Now we start the loop over all
+				   // active cells.
+  for (; cell!=endc; ++cell) 
+    {
+      
+				       // Now we reinit the ``FEValues''
+				       // object for the current cell
+      fe_v.reinit (cell);
+
+                                       // Collect the local dofs and
+                                       // asssemble the cell term.
+      cell->get_dof_indices (dofs);
+
+      assemble_cell_term(fe_v, dofs);
+
+                                       // We use the DG style loop through faces
+                                       // to determine if we need to apply a
+                                       // 'hanging node' flux calculation or a boundary
+                                       // computation.
+      for (unsigned int face_no=0; face_no<GeometryInfo<dim>::faces_per_cell; ++face_no)
+	{
+	  if (cell->at_boundary(face_no))
+	    {
+					       // We reinit the
+					       // ``FEFaceValues''
+					       // object to the
+					       // current face
+	      fe_v_face.reinit (cell, face_no);
+
+					       // and assemble the
+					       // corresponding face
+					       // terms.  We send the same
+                                               // fe_v and dofs as described
+                                               // in the assembly routine.
+	      assemble_face_term(face_no, fe_v_face,
+				 fe_v_face,
+				 dofs,
+				 dofs,
+				 true,
+				 cell->face(face_no)->boundary_indicator(),
+				 cell->face(face_no)->diameter());
+	    }
+	  else
+	    {
+					       // Now we are not on
+					       // the boundary of the
+					       // domain, therefore
+					       // there must exist a
+					       // neighboring cell.
+	      typename DoFHandler<dim>::cell_iterator neighbor=
+		cell->neighbor(face_no);;
+
+	      if (cell->face(face_no)->has_children())
+		{
+						   // case I: This cell refined compared to neighbor
+
+		  const unsigned int neighbor2=
+		    cell->neighbor_of_neighbor(face_no);
+		  
+		  
+						   // We loop over
+						   // subfaces
+		  for (unsigned int subface_no=0;
+		       subface_no<GeometryInfo<dim>::subfaces_per_face;
+		       ++subface_no)
+		    {
+		      typename DoFHandler<dim>::active_cell_iterator
+                        neighbor_child
+                        = cell->neighbor_child_on_subface (face_no, subface_no);
+
+		      Assert (neighbor_child->face(neighbor2) == face->child(subface_no),
+			      ExcInternalError());
+		      Assert (!neighbor_child->has_children(), ExcInternalError());
+
+		      fe_v_subface.reinit (cell, face_no, subface_no);
+		      fe_v_face_neighbor.reinit (neighbor_child, neighbor2);
+		      neighbor_child->get_dof_indices (dofs_neighbor);
+
+						       // Assemble as if we are working with
+						       // a DG element.
+		      assemble_face_term(face_no, fe_v_subface,
+					 fe_v_face_neighbor,
+					 dofs,
+					 dofs_neighbor,
+					 false,
+					 numbers::invalid_unsigned_int,
+					 neighbor_child->diameter());		      
+		    }
+						   // End of ``if
+						   // (face->has_children())''
+		}
+	      else
+		{
+						   // We have no children, but 
+						   // the neighbor cell may be refine
+						   // compared to use
+		  neighbor->get_dof_indices (dofs_neighbor);
+		  if (neighbor->level() != cell->level()) 
+		    {
+						       // case II: This is refined compared to neighbor
+		      Assert(neighbor->level() < cell->level(), ExcInternalError());
+		      const std::pair<unsigned int, unsigned int> faceno_subfaceno=
+			cell->neighbor_of_coarser_neighbor(face_no);
+		      const unsigned int neighbor_face_no=faceno_subfaceno.first,
+				      neighbor_subface_no=faceno_subfaceno.second;
+
+		      Assert (neighbor->neighbor_child_on_subface (neighbor_face_no,
+                                                                   neighbor_subface_no)
+                              == cell,
+                              ExcInternalError());
+
+						       // Reinit the
+						       // appropriate
+						       // ``FEFaceValues''
+						       // and assemble
+						       // the face
+						       // terms.
+		      fe_v_face.reinit (cell, face_no);
+		      fe_v_subface_neighbor.reinit (neighbor, neighbor_face_no,
+						    neighbor_subface_no);
+		      
+		      assemble_face_term(face_no, fe_v_face,
+					 fe_v_subface_neighbor,
+					 dofs,
+					 dofs_neighbor,
+					 false,
+					 numbers::invalid_unsigned_int,
+					 cell->face(face_no)->diameter());
+		    }
+
+		} 
+					       // End of ``face not at boundary'':
+	    }
+					   // End of loop over all faces:
+	} 
+      
+				       // End iteration through cells.
+    } 
+
+				   // Notify Epetra that the matrix is done.
+  Matrix->FillComplete();
+}
+
+
+				 // @sect4{ConservationLaw::assemble_cell_term}
 				 //
                                  // Assembles the cell term, adding minus the residual
                                  // to the right hand side, and adding in the Jacobian
@@ -1543,7 +1855,7 @@ void ConservationLaw<dim>::assemble_cell_term (const FEValues<dim>             &
 
 				   // Values of the conservative variables at the quadrature points.
   std::vector<std::vector<Sacado::Fad::DFad<double> > > W (n_q_points,
-					    std::vector<Sacado::Fad::DFad<double> >(EulerEquations<dim>::n_components));
+							   std::vector<Sacado::Fad::DFad<double> >(EulerEquations<dim>::n_components));
 
 				   // Values at the last time step of the conservative variables.
 				   // Note that these do not use fad variables, since they do
@@ -1554,7 +1866,7 @@ void ConservationLaw<dim>::assemble_cell_term (const FEValues<dim>             &
 				   // Here we will hold the averaged values of the conservative
 				   // variables that we will linearize around (cn=Crank Nicholson).
   std::vector<std::vector<Sacado::Fad::DFad<double> > > Wcn (n_q_points,
-					      std::vector<Sacado::Fad::DFad<double> >(EulerEquations<dim>::n_components));
+							     std::vector<Sacado::Fad::DFad<double> >(EulerEquations<dim>::n_components));
 
 				   // Gradients of the current variables.  It is a
 				   // bit of a shame that we have to compute these; we almost don't.
@@ -1562,8 +1874,8 @@ void ConservationLaw<dim>::assemble_cell_term (const FEValues<dim>             &
 				   // the flux doesn't generally involve any gradients.  We do
 				   // need these, however, for the diffusion stabilization. 
   std::vector<std::vector<std::vector<Sacado::Fad::DFad<double> > > > Wgrads (n_q_points,
-							      std::vector<std::vector<Sacado::Fad::DFad<double> > >(EulerEquations<dim>::n_components,
-												    std::vector<Sacado::Fad::DFad<double> >(dim)));
+									      std::vector<std::vector<Sacado::Fad::DFad<double> > >(EulerEquations<dim>::n_components,
+																    std::vector<Sacado::Fad::DFad<double> >(dim)));
 
 
 				   // Here is the magical point where we declare a subset
@@ -1696,7 +2008,10 @@ void ConservationLaw<dim>::assemble_cell_term (const FEValues<dim>             &
 
   delete[] flux;
 }
-				 // @sect4{%Function: assemble_face_term}
+
+
+				 // @sect4{ConservationLaw::assemble_face_term}
+				 //
 				 // These are either
 				 // boundary terms or terms across differing 
 				 // levels of refinement.  In the first case,
@@ -1727,9 +2042,9 @@ ConservationLaw<dim>::assemble_face_term(const unsigned int           face_no,
 				   // The conservative variables for this cell,
 				   // and for 
   std::vector<std::vector<Sacado::Fad::DFad<double> > > Wplus (n_q_points,
-						std::vector<Sacado::Fad::DFad<double> >(EulerEquations<dim>::n_components));
+							       std::vector<Sacado::Fad::DFad<double> >(EulerEquations<dim>::n_components));
   std::vector<std::vector<Sacado::Fad::DFad<double> > > Wminus (n_q_points,
-						 std::vector<Sacado::Fad::DFad<double> >(EulerEquations<dim>::n_components));
+								std::vector<Sacado::Fad::DFad<double> >(EulerEquations<dim>::n_components));
 
 
   const std::vector<Point<dim> > &normals = fe_v.get_normal_vectors ();
@@ -1795,80 +2110,80 @@ ConservationLaw<dim>::assemble_face_term(const unsigned int           face_no,
 	      ExcIndexRange (boundary_id, 0,
 			     Parameters::AllParameters<dim>::max_n_boundaries));
 
-				     // Evaluate the function object.  This is
-				     // a bit tricky; a given boundary might
-				     // have both prescribed and implicit
-				     // values.  If a particular component is
-				     // not prescribed, the values evaluate to
-				     // zero and are ignored, below.
-    std::vector<Vector<double> > bvals(n_q_points, Vector<double>(EulerEquations<dim>::n_components));
-    parameters.boundary_conditions[boundary_id].values.vector_value_list(fe_v.get_quadrature_points(), bvals);
+				       // Evaluate the function object.  This is
+				       // a bit tricky; a given boundary might
+				       // have both prescribed and implicit
+				       // values.  If a particular component is
+				       // not prescribed, the values evaluate to
+				       // zero and are ignored, below.
+      std::vector<Vector<double> > bvals(n_q_points, Vector<double>(EulerEquations<dim>::n_components));
+      parameters.boundary_conditions[boundary_id].values.vector_value_list(fe_v.get_quadrature_points(), bvals);
 
-				     // We loop the quadrature points, and we treat each
-				     // component individualy.
-    for (unsigned int q = 0; q < n_q_points; q++) {
-      for (unsigned int di = 0; di < EulerEquations<dim>::n_components; di++) {
+				       // We loop the quadrature points, and we treat each
+				       // component individualy.
+      for (unsigned int q = 0; q < n_q_points; q++) {
+	for (unsigned int di = 0; di < EulerEquations<dim>::n_components; di++) {
 
-					 // An inflow/dirichlet type of boundary condition
-        if (parameters.boundary_conditions[boundary_id].kind[di] == Parameters::AllParameters<dim>::inflow_boundary) {
-          Wminus[q][di] = bvals[q](di);
-        } else if (parameters.boundary_conditions[boundary_id].kind[di] == Parameters::AllParameters<dim>::pressure_boundary) {
-					   // A prescribed pressure boundary
-					   // condition.  This boundary
-					   // condition is complicated by the
-					   // fact that even though the
-					   // pressure is prescribed, we
-					   // really are setting the energy
-					   // index here, which will depend on
-					   // velocity and pressure. So even
-					   // though this seems like a
-					   // dirichlet type boundary
-					   // condition, we get sensitivities
-					   // of energy to velocity and
-					   // density (unless these are also
-					   // prescribed.
-          Sacado::Fad::DFad<double> rho_vel_sqr = 0;
-          Sacado::Fad::DFad<double> dens;
+					   // An inflow/dirichlet type of boundary condition
+	  if (parameters.boundary_conditions[boundary_id].kind[di] == Parameters::AllParameters<dim>::inflow_boundary) {
+	    Wminus[q][di] = bvals[q](di);
+	  } else if (parameters.boundary_conditions[boundary_id].kind[di] == Parameters::AllParameters<dim>::pressure_boundary) {
+					     // A prescribed pressure boundary
+					     // condition.  This boundary
+					     // condition is complicated by the
+					     // fact that even though the
+					     // pressure is prescribed, we
+					     // really are setting the energy
+					     // index here, which will depend on
+					     // velocity and pressure. So even
+					     // though this seems like a
+					     // dirichlet type boundary
+					     // condition, we get sensitivities
+					     // of energy to velocity and
+					     // density (unless these are also
+					     // prescribed.
+	    Sacado::Fad::DFad<double> rho_vel_sqr = 0;
+	    Sacado::Fad::DFad<double> dens;
           
-          dens = parameters.boundary_conditions[boundary_id].kind[EulerEquations<dim>::density_component] == Parameters::AllParameters<dim>::inflow_boundary ? bvals[q](EulerEquations<dim>::density_component) :
-                 Wplus[q][EulerEquations<dim>::density_component];
+	    dens = parameters.boundary_conditions[boundary_id].kind[EulerEquations<dim>::density_component] == Parameters::AllParameters<dim>::inflow_boundary ? bvals[q](EulerEquations<dim>::density_component) :
+		   Wplus[q][EulerEquations<dim>::density_component];
 
-          for (unsigned int d=0; d < dim; d++) {
-            if (parameters.boundary_conditions[boundary_id].kind[d] == Parameters::AllParameters<dim>::inflow_boundary)
-              rho_vel_sqr += bvals[q](d)*bvals[q](d);
-            else
-              rho_vel_sqr += Wplus[q][d]*Wplus[q][d];
-          }
-          rho_vel_sqr /= dens;
-					   // Finally set the energy value as determined by the
-					   // prescribed pressure and the other variables.
-          Wminus[q][di] = bvals[q](di)/(EulerEquations<dim>::gas_gamma-1.0) +
-			  0.5*rho_vel_sqr;
+	    for (unsigned int d=0; d < dim; d++) {
+	      if (parameters.boundary_conditions[boundary_id].kind[d] == Parameters::AllParameters<dim>::inflow_boundary)
+		rho_vel_sqr += bvals[q](d)*bvals[q](d);
+	      else
+		rho_vel_sqr += Wplus[q][d]*Wplus[q][d];
+	    }
+	    rho_vel_sqr /= dens;
+					     // Finally set the energy value as determined by the
+					     // prescribed pressure and the other variables.
+	    Wminus[q][di] = bvals[q](di)/(EulerEquations<dim>::gas_gamma-1.0) +
+			    0.5*rho_vel_sqr;
 
-        } else if (parameters.boundary_conditions[boundary_id].kind[di] == Parameters::AllParameters<dim>::outflow_boundary) {
-					   // A free/outflow boundary, very simple.
-          Wminus[q][di] = Wplus[q][di];
+	  } else if (parameters.boundary_conditions[boundary_id].kind[di] == Parameters::AllParameters<dim>::outflow_boundary) {
+					     // A free/outflow boundary, very simple.
+	    Wminus[q][di] = Wplus[q][di];
 
-        } else { 
-					   // We must be at a no-penetration
-					   // boundary.  We prescribe the
-					   // velocity (we are dealing with a
-					   // particular component here so
-					   // that the average of the
-					   // velocities is orthogonal to the
-					   // surface normal.  This creates
-					   // sensitivies of across the
-					   // velocity components.
-          Sacado::Fad::DFad<double> vdotn = 0;
-          for (unsigned int d = 0; d < dim; d++) {
-            vdotn += Wplus[q][d]*normals[q](d);
-          }
+	  } else { 
+					     // We must be at a no-penetration
+					     // boundary.  We prescribe the
+					     // velocity (we are dealing with a
+					     // particular component here so
+					     // that the average of the
+					     // velocities is orthogonal to the
+					     // surface normal.  This creates
+					     // sensitivies of across the
+					     // velocity components.
+	    Sacado::Fad::DFad<double> vdotn = 0;
+	    for (unsigned int d = 0; d < dim; d++) {
+	      vdotn += Wplus[q][d]*normals[q](d);
+	    }
 
-          Wminus[q][di] = Wplus[q][di] - 2.0*vdotn*normals[q](di);
-        }
-      }
-    } // for q
-  } // b>= 0
+	    Wminus[q][di] = Wplus[q][di] - 2.0*vdotn*normals[q](di);
+	  }
+	}
+      } // for q
+    } // b>= 0
    
 				   // Determine the Lax-Friedrich's stability parameter,
 				   // and evaluate the numerical flux function at the quadrature points
@@ -1936,311 +2251,8 @@ ConservationLaw<dim>::assemble_face_term(const unsigned int           face_no,
 
   delete[] normal_fluxes;
 }
-                                 // @sect4{Assembling the whole system}
-                                 // Now we put all of the assembly pieces together
-                                 // in a routine that dispatches the correct
-                                 // piece for each cell/face.  We keep track of
-                                 // the norm of the resdual for the Newton iteration.
-template <int dim>
-void ConservationLaw<dim>::assemble_system ()
-{
-  const unsigned int dofs_per_cell = dof_handler.get_fe().dofs_per_cell;
 
-				   // We track the dofs on this cell and (if necessary)
-				   // the adjacent cell.
-  std::vector<unsigned int> dofs (dofs_per_cell);
-  std::vector<unsigned int> dofs_neighbor (dofs_per_cell);
 
-				   // First we create the
-				   // ``UpdateFlags'' for the
-				   // ``FEValues'' and the
-				   // ``FEFaceValues'' objects.
-  UpdateFlags update_flags = update_values
-			     | update_gradients
-			     | update_q_points
-			     | update_JxW_values;
-
-				   // Note, that on faces we do not
-				   // need gradients but we need
-				   // normal vectors.
-  UpdateFlags face_update_flags = update_values
-				  | update_q_points
-				  | update_JxW_values
-				  | update_normal_vectors;
-  
-				   // On the neighboring cell we only
-				   // need the shape values. Given a
-				   // specific face, the quadrature
-				   // points and `JxW values' are the
-				   // same as for the current cells,
-				   // the normal vectors are known to
-				   // be the negative of the normal
-				   // vectors of the current cell.
-  UpdateFlags neighbor_face_update_flags = update_values;
-   
-				   // Then we create the ``FEValues''
-				   // object. Note, that since version
-				   // 3.2.0 of deal.II the constructor
-				   // of this class takes a
-				   // ``Mapping'' object as first
-				   // argument. Although the
-				   // constructor without ``Mapping''
-				   // argument is still supported it
-				   // is recommended to use the new
-				   // constructor. This reduces the
-				   // effect of `hidden magic' (the
-				   // old constructor implicitely
-				   // assumes a ``MappingQ1'' mapping)
-				   // and makes it easier to change
-				   // the mapping object later.
-  FEValues<dim> fe_v (
-    mapping, fe, quadrature, update_flags);
-  
-				   // Similarly we create the
-				   // ``FEFaceValues'' and
-				   // ``FESubfaceValues'' objects for
-				   // both, the current and the
-				   // neighboring cell. Within the
-				   // following nested loop over all
-				   // cells and all faces of the cell
-				   // they will be reinited to the
-				   // current cell and the face (and
-				   // subface) number.
-  FEFaceValues<dim> fe_v_face (
-    mapping, fe, face_quadrature, face_update_flags);
-  FESubfaceValues<dim> fe_v_subface (
-    mapping, fe, face_quadrature, face_update_flags);
-  FEFaceValues<dim> fe_v_face_neighbor (
-    mapping, fe, face_quadrature, neighbor_face_update_flags);
-  FESubfaceValues<dim> fe_v_subface_neighbor (
-    mapping, fe, face_quadrature, neighbor_face_update_flags);
-
-				   // Furthermore we need some cell
-				   // iterators.
-  typename DoFHandler<dim>::active_cell_iterator
-    cell = dof_handler.begin_active(),
-    endc = dof_handler.end();
-
-				   // Now we start the loop over all
-				   // active cells.
-  unsigned int cell_no = 0;
-  for (;cell!=endc; ++cell, ++cell_no) 
-    {
-      
-				       // Now we reinit the ``FEValues''
-				       // object for the current cell
-      fe_v.reinit (cell);
-
-                                       // Collect the local dofs and
-                                       // asssemble the cell term.
-      cell->get_dof_indices (dofs);
-
-      assemble_cell_term(fe_v, dofs);
-
-                                       // We use the DG style loop through faces
-                                       // to determine if we need to apply a
-                                       // 'hanging node' flux calculation or a boundary
-                                       // computation.
-      for (unsigned int face_no=0; face_no<GeometryInfo<dim>::faces_per_cell; ++face_no)
-	{
-					   // First we set the face
-					   // iterator
-	  typename DoFHandler<dim>::face_iterator face=cell->face(face_no);
-	  
-	  if (face->at_boundary())
-	    {
-					       // We reinit the
-					       // ``FEFaceValues''
-					       // object to the
-					       // current face
-	      fe_v_face.reinit (cell, face_no);
-
-					       // and assemble the
-					       // corresponding face
-					       // terms.  We send the same
-                                               // fe_v and dofs as described
-                                               // in the assembly routine.
-	      assemble_face_term(face_no, fe_v_face,
-				 fe_v_face,
-				 dofs,
-				 dofs,
-				 true,
-				 face->boundary_indicator(),
-				 face->diameter());
-	    }
-	  else
-	    {
-					       // Now we are not on
-					       // the boundary of the
-					       // domain, therefore
-					       // there must exist a
-					       // neighboring cell.
-	      typename DoFHandler<dim>::cell_iterator neighbor=
-		cell->neighbor(face_no);;
-
-	      if (face->has_children())
-		{
-						   // case I: This cell refined compared to neighbor
-
-		  const unsigned int neighbor2=
-		    cell->neighbor_of_neighbor(face_no);
-		  
-		  
-						   // We loop over
-						   // subfaces
-		  for (unsigned int subface_no=0;
-		       subface_no<GeometryInfo<dim>::subfaces_per_face;
-		       ++subface_no)
-		    {
-		      typename DoFHandler<dim>::active_cell_iterator
-                        neighbor_child
-                        = cell->neighbor_child_on_subface (face_no, subface_no);
-
-		      Assert (neighbor_child->face(neighbor2) == face->child(subface_no),
-			      ExcInternalError());
-		      Assert (!neighbor_child->has_children(), ExcInternalError());
-
-		      fe_v_subface.reinit (cell, face_no, subface_no);
-		      fe_v_face_neighbor.reinit (neighbor_child, neighbor2);
-		      neighbor_child->get_dof_indices (dofs_neighbor);
-
-						       // Assemble as if we are working with
-						       // a DG element.
-		      assemble_face_term(face_no, fe_v_subface,
-					 fe_v_face_neighbor,
-					 dofs,
-					 dofs_neighbor,
-					 false,
-					 numbers::invalid_unsigned_int,
-					 neighbor_child->diameter());		      
-		    }
-						   // End of ``if
-						   // (face->has_children())''
-		}
-	      else
-		{
-						   // We have no children, but 
-						   // the neighbor cell may be refine
-						   // compared to use
-		  neighbor->get_dof_indices (dofs_neighbor);
-		  if (neighbor->level() != cell->level()) 
-		    {
-						       // case II: This is refined compared to neighbor
-		      Assert(neighbor->level() < cell->level(), ExcInternalError());
-		      const std::pair<unsigned int, unsigned int> faceno_subfaceno=
-			cell->neighbor_of_coarser_neighbor(face_no);
-		      const unsigned int neighbor_face_no=faceno_subfaceno.first,
-				      neighbor_subface_no=faceno_subfaceno.second;
-
-		      Assert (neighbor->neighbor_child_on_subface (neighbor_face_no,
-                                                                   neighbor_subface_no)
-                              == cell,
-                              ExcInternalError());
-
-						       // Reinit the
-						       // appropriate
-						       // ``FEFaceValues''
-						       // and assemble
-						       // the face
-						       // terms.
-		      fe_v_face.reinit (cell, face_no);
-		      fe_v_subface_neighbor.reinit (neighbor, neighbor_face_no,
-						    neighbor_subface_no);
-		      
-		      assemble_face_term(face_no, fe_v_face,
-					 fe_v_subface_neighbor,
-					 dofs,
-					 dofs_neighbor,
-					 false,
-					 numbers::invalid_unsigned_int,
-					 face->diameter());
-		    }
-
-		} 
-					       // End of ``face not at boundary'':
-	    }
-					   // End of loop over all faces:
-	} 
-      
-				       // End iteration through cells.
-    } 
-
-				   // Notify Epetra that the matrix is done.
-  Matrix->FillComplete();
-}
-
-				 // @sect3{Setup System}
-				 // We call this function to build the sparsity
-				 // and the matrix.
-template <int dim>
-void ConservationLaw<dim>::setup_system ()
-{
-
-				   // The DoFs of a cell are coupled
-				   // with all DoFs of all neighboring
-				   // cells.  Therefore the maximum
-				   // number of matrix entries per row
-				   // is needed when all neighbors of
-				   // a cell are once more refined
-				   // than the cell under
-				   // consideration.
-  sparsity_pattern.reinit (dof_handler.n_dofs(),
-			   dof_handler.n_dofs(),
-			   (GeometryInfo<dim>::faces_per_cell
-			    *GeometryInfo<dim>::subfaces_per_face+1)*fe.dofs_per_cell);
-  
-                                   // Since the continuous sparsity pattern is
-                                   // a subset of the DG one, and since we need
-                                   // the DG terms for handling hanging nodes, we use
-                                   // the flux pattern.
-  DoFTools::make_flux_sparsity_pattern (dof_handler, sparsity_pattern);
-  
-  sparsity_pattern.compress();
-  
-                                   // Rebuild the map.  In serial this doesn't do much,
-                                   // but is needed.  In parallel, this would desribe
-                                   // the parallel dof layout.
-  Map.reset (new Epetra_Map(dof_handler.n_dofs(), 0, communicator));
-
-                                   // Epetra can build a more efficient matrix if
-                                   // one knows ahead of time the maximum number of
-                                   // columns in any row entry
-  std::vector<int> row_lengths (dof_handler.n_dofs());
-  for (unsigned int i=0; i<dof_handler.n_dofs(); ++i)
-    row_lengths[i] = sparsity_pattern.row_length (i);
-
-				   // Now we build the matrix, using
-				   // the constructor that optimizes
-				   // with the existing lengths per row
-				   // variable.
-  Matrix.reset (new Epetra_CrsMatrix(Copy, *Map, &row_lengths[0], true));
-
-				   // We add the sparsity pattern to the matrix by
-				   // inserting zeros.
-  const unsigned int max_nonzero_entries = *std::max_element (row_lengths.begin(),
-							      row_lengths.end());
-  std::vector<double> vals(max_nonzero_entries, 0);
-  std::vector<int> row_indices(max_nonzero_entries);
- 
-  unsigned int cur_row = 0;
-  unsigned int cur_col = 0;
-  for (SparsityPattern::iterator s_i = sparsity_pattern.begin(); 
-       s_i != sparsity_pattern.end(); s_i++) {
-    if (s_i->row() != cur_row) {
-      Matrix->InsertGlobalValues(cur_row, cur_col, &vals[0], &row_indices[0]);
-      cur_col = 0;
-      cur_row = s_i->row();
-    }
-    row_indices[cur_col++] = s_i->column();
-  }
-				   // The last row.
-  Matrix->InsertGlobalValues(cur_row, cur_col, &vals[0], &row_indices[0]);
-
-				   // Epetra requires this function after building or
-				   // filling a matrix.  It typically does some parallel
-				   // bookeeping; perhaps more.
-  Matrix->FillComplete();
-}
 
                                  // @sect3{Solving the linear system}
                                  // Actually solve the linear system, using either
@@ -2304,44 +2316,44 @@ ConservationLaw<dim>::solve (Vector<double> &newton_update)
   else if (parameters.solver == Parameters::Solver::gmres)
     {
 
-				     // For the iterative solvers, we use Aztec.
-    AztecOO Solver;
+				       // For the iterative solvers, we use Aztec.
+      AztecOO Solver;
 
-				     // Select the appropriate level of verbosity.
-    if (parameters.output == Parameters::Solver::quiet)
-      Solver.SetAztecOption(AZ_output, AZ_none);
+				       // Select the appropriate level of verbosity.
+      if (parameters.output == Parameters::Solver::quiet)
+	Solver.SetAztecOption(AZ_output, AZ_none);
 
-    if (parameters.output == Parameters::Solver::verbose)
-      Solver.SetAztecOption(AZ_output, AZ_all);
+      if (parameters.output == Parameters::Solver::verbose)
+	Solver.SetAztecOption(AZ_output, AZ_all);
 
-				     // Select gmres.  Other solvers are available.
-    Solver.SetAztecOption(AZ_solver, AZ_gmres);
-    Solver.SetRHS(&b);
-    Solver.SetLHS(&x);
+				       // Select gmres.  Other solvers are available.
+      Solver.SetAztecOption(AZ_solver, AZ_gmres);
+      Solver.SetRHS(&b);
+      Solver.SetLHS(&x);
 
-				     // Set up the ILUT preconditioner.  I do not know
-				     // why, but we must pretend like we are in parallel
-				     // using domain decomposition or the preconditioner
-				     // refuses to activate.
-    Solver.SetAztecOption(AZ_precond,         AZ_dom_decomp);
-    Solver.SetAztecOption(AZ_subdomain_solve, AZ_ilut);
-    Solver.SetAztecOption(AZ_overlap,         0);
-    Solver.SetAztecOption(AZ_reorder,         0);
+				       // Set up the ILUT preconditioner.  I do not know
+				       // why, but we must pretend like we are in parallel
+				       // using domain decomposition or the preconditioner
+				       // refuses to activate.
+      Solver.SetAztecOption(AZ_precond,         AZ_dom_decomp);
+      Solver.SetAztecOption(AZ_subdomain_solve, AZ_ilut);
+      Solver.SetAztecOption(AZ_overlap,         0);
+      Solver.SetAztecOption(AZ_reorder,         0);
 
-				     // ILUT parameters as described above.
-    Solver.SetAztecParam(AZ_drop,      parameters.ilut_drop);
-    Solver.SetAztecParam(AZ_ilut_fill, parameters.ilut_fill);
-    Solver.SetAztecParam(AZ_athresh,   parameters.ilut_atol);
-    Solver.SetAztecParam(AZ_rthresh,   parameters.ilut_rtol);
-    Solver.SetUserMatrix(Matrix.get());
+				       // ILUT parameters as described above.
+      Solver.SetAztecParam(AZ_drop,      parameters.ilut_drop);
+      Solver.SetAztecParam(AZ_ilut_fill, parameters.ilut_fill);
+      Solver.SetAztecParam(AZ_athresh,   parameters.ilut_atol);
+      Solver.SetAztecParam(AZ_rthresh,   parameters.ilut_rtol);
+      Solver.SetUserMatrix(Matrix.get());
 
-				     // Run the solver iteration.  Collect the number
-				     // of iterations and the residual.
-    Solver.Iterate(parameters.max_iterations, parameters.linear_residual);
+				       // Run the solver iteration.  Collect the number
+				       // of iterations and the residual.
+      Solver.Iterate(parameters.max_iterations, parameters.linear_residual);
 
-    return std::make_pair<unsigned int, double> (Solver.NumIters(),
-						 Solver.TrueResidual());
-  }
+      return std::make_pair<unsigned int, double> (Solver.NumIters(),
+						   Solver.TrueResidual());
+    }
 
   Assert (false, ExcNotImplemented());
   return std::make_pair<unsigned int, double> (0,0);
@@ -2377,22 +2389,24 @@ compute_refinement_indicators (Vector<double> &refinement_indicators) const
   typename DoFHandler<dim>::active_cell_iterator
     cell = dof_handler.begin_active(),
     endc = dof_handler.end();
-  for (unsigned int cell_no=0; cell!=endc; ++cell, ++cell_no) {
-    fe_v.reinit(cell);
+  for (unsigned int cell_no=0; cell!=endc; ++cell, ++cell_no)
+    {
+      fe_v.reinit(cell);
 
-    fe_v.get_function_values(predictor, U);
-    fe_v.get_function_grads(predictor, dU);
+      fe_v.get_function_values(predictor, U);
+      fe_v.get_function_grads(predictor, dU);
 
-    refinement_indicators(cell_no) = 0;
-    for (unsigned int q = 0; q < n_q_points; q++) {
-      double ng = 0;
-      for (unsigned int d = 0; d < dim; d++) ng += dU[q][EulerEquations<dim>::density_component][d]*dU[q][EulerEquations<dim>::density_component][d];
+      refinement_indicators(cell_no) = 0;
+      for (unsigned int q = 0; q < n_q_points; q++) {
+	double ng = 0;
+	for (unsigned int d = 0; d < dim; d++)
+	  ng += dU[q][EulerEquations<dim>::density_component][d] *
+		dU[q][EulerEquations<dim>::density_component][d];
 
-      refinement_indicators(cell_no) += std::log(1+std::sqrt(ng));
+	refinement_indicators(cell_no) += std::log(1+std::sqrt(ng));
       
-    } 
-    refinement_indicators(cell_no) /= n_q_points;
-
+      } 
+      refinement_indicators(cell_no) /= n_q_points;
   } 
 }
 
@@ -2610,8 +2624,8 @@ void ConservationLaw<dim>::run ()
 	  }
 	else
 	  {
-					   // Solve the linear system and update with the
-					   // delta.
+					     // Solve the linear system and update with the
+					     // delta.
 	    newton_update = 0;
 
 	    std::pair<unsigned int, double> convergence
