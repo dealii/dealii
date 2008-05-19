@@ -3,10 +3,8 @@
 
 
 This example shows the basic usage of the multilevel functions in
-deal.II. It solves the Helmholtz equation with Neumann boundary conditions
-to avoid additional complications due to Dirichlet boundary conditions (there,
-some library functions are missing). Therefore, the solution is the constant
-function with value unity. In all other respects, it is similar to step 5.
+deal.II. It solves the Poisson equation with Dirichlet boundary
+conditions similar to step 5.
 
 
  In order to allow sufficient flexibility in conjunction with systems of
