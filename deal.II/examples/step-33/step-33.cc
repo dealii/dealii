@@ -1019,6 +1019,51 @@ namespace Parameters
 				   // with inhomogenous boundary conditions
 				   // being specified for each component and
 				   // each boundary indicator separately.
+				   //
+				   // The data structure used to store the
+				   // boundary indicators is a bit
+				   // complicated. It is an array of
+				   // <code>max_n_boundaries</code> elements
+				   // indicating the range of boundary
+				   // indicators that will be accepted. For
+				   // each entry in this array, we store a
+				   // pair of data: first, an array of size
+				   // <code>n_components</code> that for each
+				   // component of the solution vector
+				   // indicates whether it is an inflow,
+				   // outflow, or other kind of boundary, and
+				   // second a FunctionParser object that
+				   // describes all components of the solution
+				   // vector for this boundary id at once.
+				   //
+				   // The data structure is made a bit more
+				   // inconvenient by the fact that C++ has no
+				   // way to initialize arrays in
+				   // constructors. Now, we need to tell the
+				   // function parser object at construction
+				   // time how many vector components it is to
+				   // describe. Since this can't be done in
+				   // the constructor of this class, what we
+				   // do is not to have the second part of the
+				   // array elements be a FunctionParser
+				   // object, but a pointer to one, and
+				   // initialize the pointer in the
+				   // <code>parser_parameters()</code>
+				   // function below. In order to avoid
+				   // writing a destructor for this class that
+				   // later releases this memory again, we use
+				   // the <code>boost::shared_ptr</code> class
+				   // instead that will make sure that memory
+				   // is released whenever the object pointed
+				   // to is not used anywhere any more.
+				   //
+				   // For the same reason of having to tell
+				   // Function objects their vector size at
+				   // construction time, we have to have a
+				   // constructor of this class that at least
+				   // initializes the other FunctionParser
+				   // object, i.e. the one describing initial
+				   // conditions.
   template <int dim>
   struct AllParameters : public Solver,
 			 public Refinement,
@@ -1042,26 +1087,14 @@ namespace Parameters
 
       double time_step, final_time;
       bool is_stationary;
-				       // Name of the mesh to read in.
-      std::string mesh;
+
+      std::string mesh_filename;
 
       FunctionParser<dim> initial_conditions;
 
-				       // For each boundary we store a map
-				       // from boundary # to the type of
-				       // boundary condition.  If the boundary
-				       // condition is prescribed, we store a
-				       // pointer to a function object that
-				       // will hold the expression for that
-				       // boundary condition.
-      typedef
-      std::map<unsigned int,
-	       std::pair<boost::array<BoundaryKind,
-				      EulerEquations<dim>::n_components>,
-			 boost::shared_ptr<FunctionParser<dim> > > >
-      BoundaryConditions;
-      
-      BoundaryConditions boundary_conditions;
+      std::pair<BoundaryKind[EulerEquations<dim>::n_components],
+		boost::shared_ptr<FunctionParser<dim> > >
+      boundary_conditions[max_n_boundaries];
       
       static void declare_parameters (ParameterHandler &prm);
       void parse_parameters (ParameterHandler &prm);
@@ -1082,7 +1115,7 @@ namespace Parameters
   {
     prm.declare_entry("mesh", "grid.inp",
 		      Patterns::Anything(),
-		      "intput file");
+		      "intput file name");
 
     prm.declare_entry("diffusion power", "2.0",
 		      Patterns::Double(),
@@ -1092,7 +1125,6 @@ namespace Parameters
 		      Patterns::Double(),
 		      "gravity forcing");
 
-				     // Time stepping block
     prm.enter_subsection("time stepping");
     {
       prm.declare_entry("time step", "0.1",
@@ -1152,11 +1184,10 @@ namespace Parameters
   void
   AllParameters<dim>::parse_parameters (ParameterHandler &prm)
   {
-    mesh = prm.get("mesh");
+    mesh_filename = prm.get("mesh");
     diffusion_power = prm.get_double("diffusion power");
     gravity = prm.get_double("gravity");
 
-				     // The time stepping.
     prm.enter_subsection("time stepping");
     {
       time_step = prm.get_double("time step");
@@ -1165,30 +1196,23 @@ namespace Parameters
 	  is_stationary = true;
 	  time_step = 1.0;
 	  final_time = 1.0;
-	  std::cout << "Stationary mode" << std::endl;
 	}
       else
 	is_stationary = false;
       
       final_time = prm.get_double("final time");
-
-      std::cout << "time_step=" << time_step << std::endl;
-      std::cout << "final_time=" << final_time << std::endl;
     }
     prm.leave_subsection();
 
-				     // The boundary info
     for (unsigned int boundary_id=0; boundary_id<max_n_boundaries;
 	 ++boundary_id)
       {
-	prm.enter_subsection("boundary_" + Utilities::int_to_string(boundary_id));
+	prm.enter_subsection("boundary_" +
+			     Utilities::int_to_string(boundary_id));
 	{
-	  boost::array<BoundaryKind, EulerEquations<dim>::n_components> flags;
-
-					   // Define a parser for every boundary,
-					   // though it may be unused.
-	  FunctionParser<dim> *sd
-	    = new FunctionParser<dim>(EulerEquations<dim>::n_components);
+	  boundary_conditions[boundary_id].second
+	    = boost::shared_ptr<FunctionParser<dim> > (
+	      new FunctionParser<dim>(EulerEquations<dim>::n_components));
 
 	  std::vector<std::string>
 	    expressions(EulerEquations<dim>::n_components, "0.0");
@@ -1206,19 +1230,19 @@ namespace Parameters
 			  " value");
 
 	      if (di < dim && nopen)
-		flags[di] = no_penetration_boundary;
+		boundary_conditions[boundary_id].first[di] = no_penetration_boundary;
 	      else if (boundary_type == "inflow")
 		{
-		  flags[di] = inflow_boundary;
+		  boundary_conditions[boundary_id].first[di] = inflow_boundary;
 		  expressions[di] = var_value;
 		}
 	      else if (boundary_type == "pressure")
 		{
-		  flags[di] = pressure_boundary;
+		  boundary_conditions[boundary_id].first[di] = pressure_boundary;
 		  expressions[di] = var_value;
 		}
 	      else if (boundary_type == "outflow")
-		flags[di] = outflow_boundary;
+		boundary_conditions[boundary_id].first[di] = outflow_boundary;
 	      else
 		AssertThrow (false, ExcNotImplemented());
 	    }
@@ -1226,10 +1250,9 @@ namespace Parameters
 
 					   // Add the boundary condition to the
 					   // law.
-	  sd->initialize (FunctionParser<dim>::default_variable_names(),
+	  boundary_conditions[boundary_id].second->initialize (FunctionParser<dim>::default_variable_names(),
 			  expressions,
 			  std::map<std::string, double>());
-	  boundary_conditions[boundary_id] = std::make_pair (flags, sd);
 	}
 	prm.leave_subsection();
       }
@@ -1324,8 +1347,8 @@ class ConsLaw
       const FEFaceValuesBase<dim>& fe_v_neighbor,
       std::vector<unsigned int> &dofs,
       std::vector<unsigned int> &dofs_neighbor,
-      int boundary = -1
-    );
+      const bool external_face,
+      const unsigned int boundary_id);
 
   private:
     double T;
@@ -1568,7 +1591,8 @@ void ConsLaw<dim>::assemble_face_term(
   const FEFaceValuesBase<dim>& fe_v_neighbor,      
   std::vector<unsigned int> &dofs,
   std::vector<unsigned int> &dofs_neighbor,
-  int boundary
+  const bool external_face,
+  const unsigned int boundary_id
 ) 
 {
   Sacado::Fad::DFad<double> F_i;
@@ -1592,18 +1616,19 @@ void ConsLaw<dim>::assemble_face_term(
   const std::vector<Point<dim> > &normals = fe_v.get_normal_vectors ();
 
 
-				   // If we are at a boundary, then dofs_neighbor are
-				   // the same as dofs, so we do not want to duplicate them.
-				   // If there is a neighbor cell, then we want to include 
-				   // them.
-  int ndofs = (boundary < 0 ? dofs_per_cell + ndofs_per_cell : dofs_per_cell);
+				   // If we are at a boundary, then
+				   // dofs_neighbor are the same as dofs, so
+				   // we do not want to duplicate them.  If
+				   // there is a neighbor cell, then we want
+				   // to include them.
+  int ndofs = (external_face == false ? dofs_per_cell + ndofs_per_cell : dofs_per_cell);
 				   // Set the local DOFS.
   for (unsigned int in = 0; in < dofs_per_cell; in++) {
     DOF[in] = nlsolution(dofs[in]);
     DOF[in].diff(in, ndofs);
   }
 				   // If present, set the neighbor dofs.
-  if (boundary < 0)
+  if (external_face == false)
     for (unsigned int in = 0; in < ndofs_per_cell; in++) {
       DOF[in+dofs_per_cell] = nlsolution(dofs_neighbor[in]);
       DOF[in+dofs_per_cell].diff(in+dofs_per_cell, ndofs);
@@ -1626,7 +1651,7 @@ void ConsLaw<dim>::assemble_face_term(
 				     // If there is a cell across, then initialize
 				     // the exterior trace as a function of the other
 				     // cell degrees of freedom.
-    if (boundary < 0) {
+    if (external_face == false) {
       for (unsigned int sf = 0; sf < ndofs_per_cell; sf++) {
 	int di = fe_v_neighbor.get_fe().system_to_component_index(sf).first;
 	Wminus[q][di] +=
@@ -1636,24 +1661,29 @@ void ConsLaw<dim>::assemble_face_term(
     } 
   } // for q
 
-				   // If this is a boundary, then the values of $W^-$ will
-				   // be either functions of $W^+$, or they will be prescribed.
-				   // This switch sets them appropriately.  Since we are
-				   // using fad variables here, sensitivities will be updated 
-				   // appropriately.  These sensitivities would be tremendously
-				   // difficult to manage without fad!!!
-  if (boundary >= 0) {
-				     // Get the boundary descriptor.
-    typename Parameters::AllParameters<dim>::BoundaryConditions::iterator bme = parameters.boundary_conditions.find(boundary);
-    assert(bme != parameters.boundary_conditions.end());
+				   // If this is a boundary, then the values
+				   // of $W^-$ will be either functions of
+				   // $W^+$, or they will be prescribed.  This
+				   // switch sets them appropriately.  Since
+				   // we are using fad variables here,
+				   // sensitivities will be updated
+				   // appropriately.  These sensitivities
+				   // would be tremendously difficult to
+				   // manage without fad!!!
+  if (external_face == true)
+    {
+      Assert (boundary_id < Parameters::AllParameters<dim>::max_n_boundaries,
+	      ExcIndexRange (boundary_id, 0,
+			     Parameters::AllParameters<dim>::max_n_boundaries));
 
-				     // Evaluate the function object.  This is a bit
-				     // tricky; a given boundary might have both prescribed
-				     // and implicit values.  If a particular component is not
-				     // prescribed, the values evaluate to zero and are
-				     // ignored, below.
+				     // Evaluate the function object.  This is
+				     // a bit tricky; a given boundary might
+				     // have both prescribed and implicit
+				     // values.  If a particular component is
+				     // not prescribed, the values evaluate to
+				     // zero and are ignored, below.
     std::vector<Vector<double> > bvals(n_q_points, Vector<double>(EulerEquations<dim>::n_components));
-    bme->second.second->vector_value_list(fe_v.get_quadrature_points(), bvals);
+    parameters.boundary_conditions[boundary_id].second->vector_value_list(fe_v.get_quadrature_points(), bvals);
 
 				     // We loop the quadrature points, and we treat each
 				     // component individualy.
@@ -1661,25 +1691,31 @@ void ConsLaw<dim>::assemble_face_term(
       for (unsigned int di = 0; di < EulerEquations<dim>::n_components; di++) {
 
 					 // An inflow/dirichlet type of boundary condition
-        if (bme->second.first[di] == Parameters::AllParameters<dim>::inflow_boundary) {
+        if (parameters.boundary_conditions[boundary_id].first[di] == Parameters::AllParameters<dim>::inflow_boundary) {
           Wminus[q][di] = bvals[q](di);
-        } else if (bme->second.first[di] == Parameters::AllParameters<dim>::pressure_boundary) {
-					   // A prescribed pressure boundary condition.  This boundary
-					   // condition is complicated by the fact that even though
-					   // the pressure is prescribed, we really are setting
-					   // the energy index here, which will depend on velocity
-					   // and pressure. So even though this seems like a dirichlet
-					   // type boundary condition, we get sensitivities of
-					   // energy to velocity and density (unless these
-					   // are also prescribed.
+        } else if (parameters.boundary_conditions[boundary_id].first[di] == Parameters::AllParameters<dim>::pressure_boundary) {
+					   // A prescribed pressure boundary
+					   // condition.  This boundary
+					   // condition is complicated by the
+					   // fact that even though the
+					   // pressure is prescribed, we
+					   // really are setting the energy
+					   // index here, which will depend on
+					   // velocity and pressure. So even
+					   // though this seems like a
+					   // dirichlet type boundary
+					   // condition, we get sensitivities
+					   // of energy to velocity and
+					   // density (unless these are also
+					   // prescribed.
           Sacado::Fad::DFad<double> rho_vel_sqr = 0;
           Sacado::Fad::DFad<double> dens;
           
-          dens = bme->second.first[EulerEquations<dim>::density_component] == Parameters::AllParameters<dim>::inflow_boundary ? bvals[q](EulerEquations<dim>::density_component) :
+          dens = parameters.boundary_conditions[boundary_id].first[EulerEquations<dim>::density_component] == Parameters::AllParameters<dim>::inflow_boundary ? bvals[q](EulerEquations<dim>::density_component) :
                  Wplus[q][EulerEquations<dim>::density_component];
 
           for (unsigned int d=0; d < dim; d++) {
-            if (bme->second.first[d] == Parameters::AllParameters<dim>::inflow_boundary)
+            if (parameters.boundary_conditions[boundary_id].first[d] == Parameters::AllParameters<dim>::inflow_boundary)
               rho_vel_sqr += bvals[q](d)*bvals[q](d);
             else
               rho_vel_sqr += Wplus[q][d]*Wplus[q][d];
@@ -1690,17 +1726,20 @@ void ConsLaw<dim>::assemble_face_term(
           Wminus[q][di] = bvals[q](di)/(EulerEquations<dim>::gas_gamma-1.0) +
 			  0.5*rho_vel_sqr;
 
-        } else if (bme->second.first[di] == Parameters::AllParameters<dim>::outflow_boundary) {
+        } else if (parameters.boundary_conditions[boundary_id].first[di] == Parameters::AllParameters<dim>::outflow_boundary) {
 					   // A free/outflow boundary, very simple.
           Wminus[q][di] = Wplus[q][di];
 
         } else { 
-					   // We must be at a no-penetration boundary.  We
-					   // prescribe the velocity (we are dealing with a
-					   // particular component here so that the average
-					   // of the velocities is orthogonal to the surface
-					   // normal.  This creates sensitivies of across
-					   // the velocity components.
+					   // We must be at a no-penetration
+					   // boundary.  We prescribe the
+					   // velocity (we are dealing with a
+					   // particular component here so
+					   // that the average of the
+					   // velocities is orthogonal to the
+					   // surface normal.  This creates
+					   // sensitivies of across the
+					   // velocity components.
           Sacado::Fad::DFad<double> vdotn = 0;
           for (unsigned int d = 0; d < dim; d++) {
             vdotn += Wplus[q][d]*normals[q](d);
@@ -1762,10 +1801,13 @@ void ConsLaw<dim>::assemble_face_term(
 				       // entries.
       Matrix->SumIntoGlobalValues(dofs[i],
 				  dofs_per_cell, &values[0], reinterpret_cast<int*>(&dofs[0]));
-      if (boundary < 0) {
+      
+      if (external_face == false)
 	Matrix->SumIntoGlobalValues(dofs[i],
-				    dofs_per_cell, &values[dofs_per_cell], reinterpret_cast<int*>(&dofs_neighbor[0]));
-      }
+				    dofs_per_cell,
+				    &values[dofs_per_cell],
+				    reinterpret_cast<int*>(&dofs_neighbor[0]));
+      
 
 				       // And add into the residual
       right_hand_side(dofs[i]) -= F_i.val();
@@ -1906,6 +1948,7 @@ void ConsLaw<dim>::assemble_system (double &res_norm)
 		fe_v_face,
 		dofs,
 		dofs,
+		true,
 		face->boundary_indicator());
 	    }
 	  else
@@ -1952,7 +1995,9 @@ void ConsLaw<dim>::assemble_system (double &res_norm)
 			face_no, fe_v_subface,
 			fe_v_face_neighbor,
 			dofs,
-			dofs_neighbor);
+			dofs_neighbor,
+			false,
+			numbers::invalid_unsigned_int);
 		      
 		    }
 						   // End of ``if
@@ -1992,7 +2037,9 @@ void ConsLaw<dim>::assemble_system (double &res_norm)
 			face_no, fe_v_face,
 			fe_v_subface_neighbor,
 			dofs,
-			dofs_neighbor);
+			dofs_neighbor,
+			false,
+			numbers::invalid_unsigned_int);
 
 		    }
 
@@ -2393,15 +2440,15 @@ void ConsLaw<dim>::run ()
 {
 
 				   // Open and load the mesh.
-  GridIn<dim> grid_in;
-  grid_in.attach_triangulation(triangulation);
-  std::cout << "Opening mesh <" << parameters.mesh << ">" << std::endl;
-  std::ifstream input_file(parameters.mesh.c_str());
+  {
+    GridIn<dim> grid_in;
+    grid_in.attach_triangulation(triangulation);
 
-  Assert (input_file, ExcFileNotOpen(parameters.mesh.c_str()));
+    std::ifstream input_file(parameters.mesh_filename.c_str());
+    Assert (input_file, ExcFileNotOpen(parameters.mesh_filename.c_str()));
 
-  grid_in.read_ucd(input_file);   
-  input_file.close();
+    grid_in.read_ucd(input_file);   
+  }
   
   unsigned int nstep = 0;
   
