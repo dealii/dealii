@@ -1764,7 +1764,7 @@ void ConservationLaw<dim>::assemble_system ()
                         neighbor_child
                         = cell->neighbor_child_on_subface (face_no, subface_no);
 
-		      Assert (neighbor_child->face(neighbor2) == face->child(subface_no),
+		      Assert (neighbor_child->face(neighbor2) == cell->face(face_no)->child(subface_no),
 			      ExcInternalError());
 		      Assert (!neighbor_child->has_children(), ExcInternalError());
 
