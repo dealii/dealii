@@ -21,6 +21,7 @@
 #include <base/parameter_handler.h>
 #include <base/function_parser.h>
 #include <base/utilities.h>
+#include <base/conditional_ostream.h>
 
 #include <lac/vector.h>
 #include <lac/compressed_sparsity_pattern.h>
@@ -1650,61 +1651,54 @@ class ConservationLaw
 
     Vector<double>       right_hand_side;
 
-				     // This final set of member
-				     // variables (except for the
-				     // object holding all run-time
-				     // parameters at the very bottom)
-				     // deals with the interface we
-				     // have in this program to the
-				     // Trilinos library that provides
-				     // us with linear solvers.
+				     // This final set of member variables
+				     // (except for the object holding all
+				     // run-time parameters at the very bottom
+				     // and a screen output stream that only
+				     // prints something if verbose output has
+				     // been requested) deals with the
+				     // interface we have in this program to
+				     // the Trilinos library that provides us
+				     // with linear solvers.
 				     //
-				     // Trilinos is designed to be a
-				     // library that also runs in
-				     // parallel on distributed memory
-				     // systems, so matrices and
-				     // vectors need two things: (i) a
-				     // communicator object that
-				     // facilitates sending messages
-				     // to remote machines, and (ii) a
-				     // description which elements of
-				     // a vector or matrix reside
-				     // locally on a machine and which
-				     // are stored remotely.
+				     // Trilinos is designed to be a library
+				     // that also runs in parallel on
+				     // distributed memory systems, so
+				     // matrices and vectors need two things:
+				     // (i) a communicator object that
+				     // facilitates sending messages to remote
+				     // machines, and (ii) a description which
+				     // elements of a vector or matrix reside
+				     // locally on a machine and which are
+				     // stored remotely.
 				     //
-				     // We do not actually run the
-				     // current program in parallel,
-				     // and so the objects we use here
-				     // are pretty much dummy objects
-				     // for this purpose: the
-				     // communicator below represents
-				     // a system that includes only a
-				     // single machine, and the index
-				     // map encodes that all elements
-				     // are stored
-				     // locally. Nevertheless, we need
-				     // them.
+				     // We do not actually run the current
+				     // program in parallel, and so the
+				     // objects we use here are pretty much
+				     // dummy objects for this purpose: the
+				     // communicator below represents a system
+				     // that includes only a single machine,
+				     // and the index map encodes that all
+				     // elements are stored
+				     // locally. Nevertheless, we need them.
 				     //
-				     // Furthermore, we need a matrix
-				     // object for the system matrix
-				     // to be used in each Newton
-				     // step. Note that map and matrix
-				     // need to be updated for their
-				     // sizes whenever we refine the
-				     // mesh. In Trilinos, this is
-				     // easiest done by simply
-				     // deleting the previous object
-				     // and creating a new one. To
-				     // minimize hassle and avoid
-				     // memory leaks, we use a
-				     // <code>std::auto_ptr</code>
-				     // instead of a plain pointer for
-				     // this.
+				     // Furthermore, we need a matrix object
+				     // for the system matrix to be used in
+				     // each Newton step. Note that map and
+				     // matrix need to be updated for their
+				     // sizes whenever we refine the mesh. In
+				     // Trilinos, this is easiest done by
+				     // simply deleting the previous object
+				     // and creating a new one. To minimize
+				     // hassle and avoid memory leaks, we use
+				     // a <code>std::auto_ptr</code> instead
+				     // of a plain pointer for this.
     Epetra_SerialComm               communicator;
     std::auto_ptr<Epetra_Map>       Map;
     std::auto_ptr<Epetra_CrsMatrix> Matrix;
  
-    Parameters::AllParameters<dim> parameters;
+    Parameters::AllParameters<dim>  parameters;
+    ConditionalOStream              verbose_cout;
 };
 
 
@@ -1722,13 +1716,16 @@ ConservationLaw<dim>::ConservationLaw (const char *input_filename)
                 fe (FE_Q<dim>(1), EulerEquations<dim>::n_components),
 		dof_handler (triangulation),
 		quadrature (2),
-		face_quadrature (2)
+		face_quadrature (2),
+		verbose_cout (std::cout, false)
 {
   ParameterHandler prm;
   Parameters::AllParameters<dim>::declare_parameters (prm);
 
   prm.read_input (input_filename);
   parameters.parse_parameters (prm);
+
+  verbose_cout.set_condition (parameters.output == Parameters::Solver::verbose);
 }
 
 
@@ -2619,7 +2616,7 @@ ConservationLaw<dim>::assemble_face_term(const unsigned int           face_no,
 				   // to take into account the sensitivies of
 				   // the residual contributions to the
 				   // degrees of freedom on the neighboring
-				   // cell
+				   // cell:
   std::vector<double> residual_derivatives (dofs_per_cell);
   for (unsigned int i=0; i<fe_v.dofs_per_cell; ++i)
     if (fe_v.get_fe().has_support_on_face(i, face_no) == true)
@@ -2664,111 +2661,122 @@ ConservationLaw<dim>::assemble_face_term(const unsigned int           face_no,
 }
 
 
+                                 // @sect{ConservationLaw::solve}
+                                 //
+				 // Here, we actually solve the linear system,
+                                 // using either of Trilinos' Aztec or Amesos
+                                 // linear solvers. The result of the
+                                 // computation will be written into the
+                                 // argument vector passed to this
+                                 // function. The result is a pair of number
+                                 // of iterations and the final linear
+                                 // residual.
+				 //
+				 // There are a number of practicalities:
+				 // Since we have built our right hand side
+				 // and solution vector as deal.II Vector
+				 // objects (as opposed to the matrix, which
+				 // is a Trilinos object), we must hand the
+				 // solvers Trilinos Epetra vectors.  Luckily,
+				 // they support the concept of a 'view', so
+				 // we just send in a pointer to our deal.II
+				 // vectors.
 
-                                 // @sect3{Solving the linear system}
-                                 // Actually solve the linear system, using either
-                                 // Aztec or Amesos.
 template <int dim>
 std::pair<unsigned int, double>
 ConservationLaw<dim>::solve (Vector<double> &newton_update) 
 {
-
-				   // We must hand the solvers Epetra vectors.
-				   // Luckily, they support the concept of a 
-				   // 'view', so we just send in a pointer to our
-				   // dealii vectors.
   Epetra_Vector x(View, *Map, newton_update.begin());
   Epetra_Vector b(View, *Map, right_hand_side.begin());
 
-				   // The Direct option selects the Amesos solver.
-  if (parameters.solver == Parameters::Solver::direct) {
-   
-				     // Setup for solving with
-				     // Amesos. Other solvers are
-				     // available and may be selected by
-				     // changing th string given to the
-				     // <code>Create</code> function.
-    Epetra_LinearProblem prob;
-    prob.SetOperator(Matrix.get());
-    Amesos_BaseSolver *solver = Amesos().Create ("Amesos_Klu", prob);
-
-    Assert (solver != NULL, ExcInternalError());
-
-				     // There are two parts to the direct solve.
-				     // As I understand, the symbolic part figures
-				     // out the sparsity patterns, and then the
-				     // numerical part actually performs Gaussian
-				     // elimination or whatever the approach is.
-    if (parameters.output == Parameters::Solver::verbose)
-      std::cout << "Starting Symbolic fact\n" << std::flush;
-
-    solver->SymbolicFactorization();
-
-    if (parameters.output == Parameters::Solver::verbose)
-      std::cout << "Starting Numeric fact\n" << std::flush;
-
-    solver->NumericFactorization();
-
-    
-				     // Define the linear problem by setting the
-				     // right hand and left hand sides.
-    prob.SetRHS(&b);
-    prob.SetLHS(&x);
-				     // And finally solve the problem.
-    if (parameters.output == Parameters::Solver::verbose)
-      std::cout << "Starting solve\n" << std::flush;
-    solver->Solve();
-				     // We must free the solver that was created
-				     // for us.
-    delete solver;
-
-    return std::make_pair<unsigned int, double> (0, 0);
-  }
-  else if (parameters.solver == Parameters::Solver::gmres)
+  
+  switch (parameters.solver)
     {
+				       // If the parameter file specified that
+				       // a direct solver shall be used, then
+				       // we'll get here. The process is
+				       // rather straightforward: There are
+				       // two parts to the direct solve.  the
+				       // symbolic part figures out the
+				       // sparsity patterns, and then the
+				       // numerical part actually performs the
+				       // LU decomposition. At the end we have
+				       // to delete the solver object and
+				       // return that no iterations have been
+				       // performed and that the final linear
+				       // residual is zero, absent any better
+				       // information that may be provided
+				       // here:
+      case Parameters::Solver::direct:
+      {
+	Epetra_LinearProblem prob;
+	prob.SetOperator (Matrix.get());
 
-				       // For the iterative solvers, we use Aztec.
-      AztecOO Solver;
+	Amesos_BaseSolver *solver = Amesos().Create ("Amesos_Klu", prob);
+	Assert (solver != NULL, ExcInternalError());
 
-				       // Select the appropriate level of verbosity.
-      if (parameters.output == Parameters::Solver::quiet)
-	Solver.SetAztecOption(AZ_output, AZ_none);
+	verbose_cout << "Starting symbolic factorization" << std::endl;
+	solver->SymbolicFactorization();
 
-      if (parameters.output == Parameters::Solver::verbose)
-	Solver.SetAztecOption(AZ_output, AZ_all);
+	verbose_cout << "Starting numeric factorization" << std::endl;
+	solver->NumericFactorization();
 
-				       // Select gmres.  Other solvers are available.
-      Solver.SetAztecOption(AZ_solver, AZ_gmres);
-      Solver.SetRHS(&b);
-      Solver.SetLHS(&x);
+	prob.SetRHS(&b);
+	prob.SetLHS(&x);
 
-				       // Set up the ILUT preconditioner.  I do not know
-				       // why, but we must pretend like we are in parallel
-				       // using domain decomposition or the preconditioner
-				       // refuses to activate.
-      Solver.SetAztecOption(AZ_precond,         AZ_dom_decomp);
-      Solver.SetAztecOption(AZ_subdomain_solve, AZ_ilut);
-      Solver.SetAztecOption(AZ_overlap,         0);
-      Solver.SetAztecOption(AZ_reorder,         0);
+	verbose_cout << "Starting solve" << std::endl;
+	solver->Solve();
 
-				       // ILUT parameters as described above.
-      Solver.SetAztecParam(AZ_drop,      parameters.ilut_drop);
-      Solver.SetAztecParam(AZ_ilut_fill, parameters.ilut_fill);
-      Solver.SetAztecParam(AZ_athresh,   parameters.ilut_atol);
-      Solver.SetAztecParam(AZ_rthresh,   parameters.ilut_rtol);
-      Solver.SetUserMatrix(Matrix.get());
+	delete solver;
 
-				       // Run the solver iteration.  Collect the number
-				       // of iterations and the residual.
-      Solver.Iterate(parameters.max_iterations, parameters.linear_residual);
+	return std::make_pair<unsigned int, double> (0, 0);
+      }
 
-      return std::make_pair<unsigned int, double> (Solver.NumIters(),
-						   Solver.TrueResidual());
+				       // Likewise, if we are to use an
+				       // iterative solver, we use Aztec's
+				       // GMRES solver. As preconditioner, we
+				       // use ILU-T and set a bunch of options
+				       // that can be changed from the
+				       // parameter file:
+      case Parameters::Solver::gmres:
+      {
+	AztecOO solver;
+	solver.SetAztecOption(AZ_output,
+			      (parameters.output ==
+			       Parameters::Solver::quiet
+			       ?
+			       AZ_none
+			       :
+			       AZ_all));
+	solver.SetAztecOption(AZ_solver, AZ_gmres);
+	solver.SetRHS(&b);
+	solver.SetLHS(&x);
+
+	solver.SetAztecOption(AZ_precond,         AZ_dom_decomp);
+	solver.SetAztecOption(AZ_subdomain_solve, AZ_ilut);
+	solver.SetAztecOption(AZ_overlap,         0);
+	solver.SetAztecOption(AZ_reorder,         0);
+
+	solver.SetAztecParam(AZ_drop,      parameters.ilut_drop);
+	solver.SetAztecParam(AZ_ilut_fill, parameters.ilut_fill);
+	solver.SetAztecParam(AZ_athresh,   parameters.ilut_atol);
+	solver.SetAztecParam(AZ_rthresh,   parameters.ilut_rtol);
+
+	solver.SetUserMatrix(Matrix.get());
+
+	solver.Iterate(parameters.max_iterations, parameters.linear_residual);
+
+	return std::make_pair<unsigned int, double> (solver.NumIters(),
+						     solver.TrueResidual());
+      }
     }
-
+  
   Assert (false, ExcNotImplemented());
   return std::make_pair<unsigned int, double> (0,0);
 }
+
+
+                                 // @sect{ConservationLaw::compute_refinement_indicators}
 
 				 // Loop and assign a value for refinement.  We
 				 // simply use the density squared, which selects
