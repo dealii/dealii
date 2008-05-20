@@ -28,19 +28,21 @@ The equations that describe the movement of a compressible, inviscid
 gas (the so-called Euler equations of gas dynamics) are
 a basic system of conservation laws. In spatial dimension $d$ they read
 @f[
-\partial_t \mathbf{w} + \nabla \cdot \mathbf{F}(\mathbf{w}) = \mathbf{0},
+\partial_t \mathbf{w} + \nabla \cdot \mathbf{F}(\mathbf{w}) =
+\mathbf{G}(\mathbf w),
 @f]
 with the solution $\mathbf{w}=(\rho v_1,\ldots,\rho v_d,\rho,
 E)^{\top}$ consisting of $\rho$ the fluid density, ${\mathbf v}=(v_1,\ldots v_d)^T$ the
 flow velocity (and thus $\rho\mathbf v$ being the linear momentum
 density), and 
 $E$ the energy density of the gas. We interpret the equations above as
-$\partial_t \mathbf{w}_i + \nabla \cdot \mathbf{F}_i(\mathbf{w}) = 0$, $i=1,\ldots,dim+2$.
+$\partial_t \mathbf{w}_i + \nabla \cdot \mathbf{F}_i(\mathbf{w}) = \mathbf
+G_i(\mathbf w)$, $i=1,\ldots,dim+2$.
 
 For the Euler equations, the flux matrix $\mathbf F$ (or system of flux functions)
 is defined as (shown here for the case $d=3$)
 @f{eqnarray*}
-  \mathbf F
+  \mathbf F(\mathbf w)
   =
   \left(
   \begin{array}{ccc}
@@ -52,12 +54,29 @@ is defined as (shown here for the case $d=3$)
   \end{array}
   \right),
 @f}
-such that the entire system of equations reads:
+and we will choose as particular right hand side forcing only the effects of
+gravity, described by
 @f{eqnarray*}
-  \partial_t \rho + \sum_{s=1}^d \frac{\partial(\rho v_s)}{\partial x_s} &=& 0,  \\
+  \mathbf G(\mathbf w)
+  =
+  \left(
+  \begin{array}{c}
+    g_1\rho \\
+    g_2\rho \\
+    g_3\rho \\
+    0 \\
+    \rho \mathbf g \cdot \mathbf v
+  \end{array}
+  \right),
+@f}
+where $\mathbf g=(g_1,g_2,g_3)^T$ denotes the gravity vector.
+With this, the entire system of equations reads:
+@f{eqnarray*}
   \partial_t (\rho v_i) + \sum_{s=1}^d \frac{\partial(\rho v_i v_s +
-  \delta_{is} p)}{\partial x_s} &=& 0, \qquad i=1,\dots,d, \\
-  \partial_t E + \sum_{s=1}^d \frac{\partial((E+p)v_s)}{\partial x_s} &=& 0.
+  \delta_{is} p)}{\partial x_s} &=& g_i \rho, \qquad i=1,\dots,d, \\
+  \partial_t \rho + \sum_{s=1}^d \frac{\partial(\rho v_s)}{\partial x_s} &=& 0,  \\
+  \partial_t E + \sum_{s=1}^d \frac{\partial((E+p)v_s)}{\partial x_s} &=& 
+  \rho \mathbf g \cdot \mathbf v.
 @f}
 These equations describe, respectively, the conservation of momentum,
 mass, and energy.
@@ -113,9 +132,14 @@ R(\mathbf{W}_{n+1})(\mathbf z) &=&
 \mathbf{z}\right)
 - \int_{\Omega} \left(\mathbf{F}(\tilde{\mathbf{w}}),
 \nabla\mathbf{z}\right) +  h^{\eta}(\nabla \mathbf{w} , \nabla \mathbf{z}) 
+\\
+&& \qquad
 +
 \int_{\partial \Omega} \left(\mathbf{H}(\tilde{\mathbf{w}}^+),
 \mathbf{w}^-(\tilde{\mathbf{w}}^+), \mathbf{n}), \mathbf{z}\right) 
+-
+\int_{\partial \Omega} \left(\mathbf{G}(\mathbf{w}),
+\mathbf{z}\right) 
 \\
 & = & 0
 @f}

@@ -298,8 +298,8 @@ struct EulerEquations
 				     // well:
     template <typename InputVector, typename number>
     static
-    void flux_matrix (const InputVector &W,
-		      number (&flux)[n_components][dim])
+    void compute_flux_matrix (const InputVector &W,
+			      number (&flux)[n_components][dim])
       {
 					 // First compute the pressure that
 					 // appears in the flux matrix, and
@@ -356,8 +356,8 @@ struct EulerEquations
 	Sacado::Fad::DFad<double> iflux[n_components][dim];
 	Sacado::Fad::DFad<double> oflux[n_components][dim];
 	  
-	flux_matrix (Wplus, iflux);
-	flux_matrix (Wminus, oflux);
+	compute_flux_matrix (Wplus, iflux);
+	compute_flux_matrix (Wminus, oflux);
 	  
 	for (unsigned int di=0; di<n_components; ++di)
 	  {
@@ -369,6 +369,31 @@ struct EulerEquations
 	  }
       }
 
+
+    template <typename InputVector, typename number>
+    static
+    void compute_forcing_vector (const InputVector &W,
+				 number (&forcing)[n_components])
+      {
+	const double gravity = -1.0;
+
+	for (unsigned int c=0; c<n_components; ++c)
+	  switch (c)
+	    {
+	      case first_momentum_component+dim-1:
+		    forcing[c] = gravity * W[density_component];
+		    break;
+	      case energy_component:
+		    forcing[c] = gravity *
+				 W[density_component] *
+				 W[first_momentum_component+dim-1];
+		    break;
+	      default:
+		    forcing[c] = 0;
+	    }
+      }
+    
+    
     
 				     // Finally, we declare a class that
 				     // implements a postprocessing of data
@@ -1875,6 +1900,8 @@ void ConservationLaw<dim>::assemble_system ()
                                  // \left(\mathbf{F}(\tilde{\mathbf{w}}),
                                  // \nabla\mathbf{z}_i\right)_K +
                                  // h^{\eta}(\nabla \mathbf{w} , \nabla
+                                 // \mathbf{z}_i)_K -
+                                 // (\mathbf{G}(\tilde{\mathbf w}),
                                  // \mathbf{z}_i)_K$ where $\tilde{\mathbf w}$
                                  // is represented by the variable
                                  // <code>W_theta</code>, $\mathbf{z}_i$ is
@@ -2062,18 +2089,26 @@ assemble_cell_term (const FEValues<dim>             &fe_v,
 
 				   // Next, in order to compute the cell
 				   // contributions, we need to evaluate
-				   // $F(\tilde{\mathbf w})$ at all quadrature
+				   // $F(\tilde{\mathbf w})$ and
+				   // $G(\tilde{\mathbf w})$ at all quadrature
 				   // points. To store these, we also need to
 				   // allocate a bit of memory. Note that we
-				   // compute the flux matrices in terms of
-				   // autodifferentiation variables, so that
-				   // the Jacobian contributions can later
-				   // easily be computed from it:
+				   // compute the flux matrices and right hand
+				   // sides in terms of autodifferentiation
+				   // variables, so that the Jacobian
+				   // contributions can later easily be
+				   // computed from it:
   typedef Sacado::Fad::DFad<double> FluxMatrix[EulerEquations<dim>::n_components][dim];
   FluxMatrix *flux = new FluxMatrix[n_q_points];
+
+  typedef Sacado::Fad::DFad<double> ForcingVector[EulerEquations<dim>::n_components];
+  ForcingVector *forcing = new ForcingVector[n_q_points];
   
   for (unsigned int q=0; q<n_q_points; ++q)
-    EulerEquations<dim>::flux_matrix (W_theta[q], flux[q]);
+    {
+      EulerEquations<dim>::compute_flux_matrix (W_theta[q], flux[q]);
+      EulerEquations<dim>::compute_forcing_vector (W_theta[q], forcing[q]);
+    }
   
 
 				   // We now have all of the pieces in place,
@@ -2108,9 +2143,13 @@ assemble_cell_term (const FEValues<dim>             &fe_v,
 				   // \mathbf{w}_{\text{component\_i}}}{\partial
 				   // x_d} , \frac{\partial
 				   // (\mathbf{z}_i)_{\text{component\_i}}}{\partial
-				   // x_d} \right)_K$, where integrals are
-				   // understood to be evaluated through
-				   // summation over quadrature points.
+				   // x_d} \right)_K$
+				   // $-(\mathbf{G}(\tilde{\mathbf{w}}
+				   // )_{\text{component\_i}},
+				   // (\mathbf{z}_i)_{\text{component\_i}})_K$,
+				   // where integrals are understood to be
+				   // evaluated through summation over
+				   // quadrature points.
 				   //
 				   // We initialy sum all contributions of the
 				   // residual in the positive sense, so that
@@ -2143,28 +2182,16 @@ assemble_cell_term (const FEValues<dim>             &fe_v,
 		   fe_v.shape_grad_component(i, point, component_i)[d] *
 		   fe_v.JxW(point);
 
-	  for (unsigned int d = 0; d < dim; d++)
+	  for (unsigned int d=0; d<dim; d++)
 	    F_i += 1.0*std::pow(fe_v.get_cell()->diameter(),
 				parameters.diffusion_power) *
 		   grad_W[point][component_i][d] *
 		   fe_v.shape_grad_component(i, point, component_i)[d] *
 		   fe_v.JxW(point);
-          
-					   // The gravity component only
-					   // enters into the energy equation
-					   // and into the vertical component
-					   // of the velocity.
-	  if (component_i == dim - 1)
-	    F_i += parameters.gravity *
-		   W_theta[point][EulerEquations<dim>::density_component] *
-		   fe_v.shape_value_component(i,point, component_i) *
-		   fe_v.JxW(point);
-	  else if (component_i == EulerEquations<dim>::energy_component)
-	    F_i += parameters.gravity *
-		   W_theta[point][EulerEquations<dim>::density_component] *
-		   W_theta[point][dim-1] *
-		   fe_v.shape_value_component(i,point, component_i) *
-		   fe_v.JxW(point);
+
+	  F_i -= forcing[point][component_i] *
+		 fe_v.shape_value_component(i, point, component_i) *
+		 fe_v.JxW(point);
 	}
 
 				       // At the end of the loop, we have to
