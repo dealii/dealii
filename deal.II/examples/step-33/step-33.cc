@@ -2578,9 +2578,16 @@ ConservationLaw<dim>::assemble_face_term(const unsigned int           face_no,
 					     boundary_values[q],
 					     Wminus[q]);
     }
+
   
-				   // Determine the Lax-Friedrich's stability parameter,
-				   // and evaluate the numerical flux function at the quadrature points
+				   // Now that we have $\mathbf w^+$ and
+				   // $\mathbf w^-$, we can go about computing
+				   // the numerical flux function $\mathbf
+				   // H(\mathbf w^+,\mathbf w^-, \mathbf n)$
+				   // for each quadrature point. Before
+				   // calling the function that does so, we
+				   // also need to determine the
+				   // Lax-Friedrich's stability parameter:
   typedef Sacado::Fad::DFad<double> NormalFlux[EulerEquations<dim>::n_components];
   NormalFlux *normal_fluxes = new NormalFlux[n_q_points];
 
@@ -2604,45 +2611,54 @@ ConservationLaw<dim>::assemble_face_term(const unsigned int           face_no,
 					       Wplus[q], Wminus[q], alpha,
 					       normal_fluxes[q]);
 
-				   // Now assemble the face term
+				   // Now assemble the face term in exactly
+				   // the same way as for the cell
+				   // contributions in the previous
+				   // function. The only difference is that if
+				   // this is an internal face, we also have
+				   // to take into account the sensitivies of
+				   // the residual contributions to the
+				   // degrees of freedom on the neighboring
+				   // cell
+  std::vector<double> residual_derivatives (dofs_per_cell);
   for (unsigned int i=0; i<fe_v.dofs_per_cell; ++i)
-    {
-      if (!fe_v.get_fe().has_support_on_face(i, face_no))
-	continue;
+    if (fe_v.get_fe().has_support_on_face(i, face_no) == true)
+      {
+	Sacado::Fad::DFad<double> F_i = 0;
 
-      Sacado::Fad::DFad<double> F_i = 0;
-      for (unsigned int point=0; point<n_q_points; ++point)
-	{
-	  const unsigned int
-	    component_i = fe_v.get_fe().system_to_component_index(i).first;
+	for (unsigned int point=0; point<n_q_points; ++point)
+	  {
+	    const unsigned int
+	      component_i = fe_v.get_fe().system_to_component_index(i).first;
 	  
-	  F_i += normal_fluxes[point][component_i] *
-		 fe_v.shape_value_component(i, point, component_i) *
-		 fe_v.JxW(point);
-	} 
+	    F_i += normal_fluxes[point][component_i] *
+		   fe_v.shape_value_component(i, point, component_i) *
+		   fe_v.JxW(point);
+	  } 
 
-				       // Retrieve a pointer to the jacobian.
-      double *values = &(F_i.fastAccessDx(0));
-      Assert (values != 0, ExcInternalError());
-
-				       // Update the matrix.  Depending on whether there
-				       // is/isn't a neighboring cell, we add more/less
-				       // entries.
-      Matrix->SumIntoGlobalValues(dof_indices[i],
-				  dofs_per_cell,
-				  &values[0],
-				  reinterpret_cast<int*>(const_cast<unsigned int*>(&dof_indices[0])));
-      
-      if (external_face == false)
+	for (unsigned int k=0; k<dofs_per_cell; ++k)
+	  residual_derivatives[k] = F_i.fastAccessDx(k);
 	Matrix->SumIntoGlobalValues(dof_indices[i],
 				    dofs_per_cell,
-				    &values[dofs_per_cell],
-				    reinterpret_cast<int*>(const_cast<unsigned int*>(&dof_indices_neighbor[0])));
+				    &residual_derivatives[0],
+				    reinterpret_cast<int*>(
+				      const_cast<unsigned int*>(
+					&dof_indices[0])));
       
-
-				       // And add into the residual
-      right_hand_side(dof_indices[i]) -= F_i.val();
-    }
+	if (external_face == false)
+	  {
+	    for (unsigned int k=0; k<dofs_per_cell; ++k)
+	      residual_derivatives[k] = F_i.fastAccessDx(dofs_per_cell+k);
+	    Matrix->SumIntoGlobalValues(dof_indices[i],
+					dofs_per_cell,
+					&residual_derivatives[0],
+					reinterpret_cast<int*>(
+					  const_cast<unsigned int*>(
+					    &dof_indices_neighbor[0])));
+	  }
+	
+	right_hand_side(dof_indices[i]) -= F_i.val();
+      }
 
   delete[] normal_fluxes;
 }
