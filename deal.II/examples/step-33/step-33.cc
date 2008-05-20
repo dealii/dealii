@@ -371,7 +371,7 @@ struct EulerEquations
 
 
 				     // In the same way as describing the flux
-				     // function $\mathbf F(\mathbf w), we
+				     // function $\mathbf F(\mathbf w)$, we
 				     // also need to have a way to describe
 				     // the right hand side forcing term. As
 				     // mentioned in the introduction, we
