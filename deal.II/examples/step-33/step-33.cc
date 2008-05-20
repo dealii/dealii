@@ -83,11 +83,15 @@
 #include <Sacado.hpp>
 
 
-				 // And this again is C++:
+				 // And this again is C++, as well as a header
+				 // file from BOOST that declares a class
+				 // representing an array of fixed size:
 #include <iostream>
 #include <fstream>
 #include <vector>
 #include <memory>
+
+#include <boost/array.hpp>
 
 				 // To end this section, introduce everythin
 				 // in the dealii library into the current
@@ -285,20 +289,16 @@ struct EulerEquations
 				     // rectangular array of numbers
 				     // right away.
 				     //
-				     // We templatize the numerical
-				     // type of the flux function so
-				     // that we may use the automatic
-				     // differentiation type here.
-				     // The flux functions are defined
-				     // in terms of the conserved
-				     // variables $\rho w_0, \dots,
-				     // \rho w_{d-1}, \rho, E$, so
-				     // they do not look exactly like
-				     // the Euler equations one is
-				     // used to seeing.
-    template <typename number>
+				     // We templatize the numerical type of
+				     // the flux function so that we may use
+				     // the automatic differentiation type
+				     // here.  Similarly, we will call the
+				     // function with different input vector
+				     // data types, so we templatize on it as
+				     // well:
+    template <typename InputVector, typename number>
     static
-    void flux_matrix (const std::vector<number> &W,
+    void flux_matrix (const InputVector &W,
 		      number (&flux)[n_components][dim])
       {
 					 // First compute the pressure that
@@ -356,8 +356,8 @@ struct EulerEquations
 	Sacado::Fad::DFad<double> iflux[n_components][dim];
 	Sacado::Fad::DFad<double> oflux[n_components][dim];
 	  
-	flux_matrix(Wplus, iflux);
-	flux_matrix(Wminus, oflux);
+	flux_matrix (Wplus, iflux);
+	flux_matrix (Wminus, oflux);
 	  
 	for (unsigned int di=0; di<n_components; ++di)
 	  {
@@ -1615,70 +1615,47 @@ void ConservationLaw<dim>::setup_system ()
                                  // The actual implementation of the
                                  // assembly on these objects is done
                                  // in the following functions.
+				 //
+				 // At the top of the function we do the usual
+				 // housekeeping: allocate FEValues,
+				 // FEFaceValues, and FESubfaceValues objects
+				 // necessary to do the integrations on cells,
+				 // faces, and subfaces (in case of adjoining
+				 // cells on different refinement
+				 // levels). Note that we don't need all
+				 // information (like values, gradients, or
+				 // real locations of quadrature points) for
+				 // all of these objects, so we only let the
+				 // FEValues classes whatever is actually
+				 // necessary by specifying the minimal set of
+				 // UpdateFlags. For example, when using a
+				 // FEFaceValues object for the neighboring
+				 // cell we only need the shape values: Given
+				 // a specific face, the quadrature points and
+				 // <code>JxW</code> values are the same as
+				 // for the current cells, and the normal
+				 // vectors are known to be the negative of
+				 // the normal vectors of the current cell.
 template <int dim>
 void ConservationLaw<dim>::assemble_system ()
 {
   const unsigned int dofs_per_cell = dof_handler.get_fe().dofs_per_cell;
 
-				   // We track the dofs on this cell and (if necessary)
-				   // the adjacent cell.
-  std::vector<unsigned int> dofs (dofs_per_cell);
-  std::vector<unsigned int> dofs_neighbor (dofs_per_cell);
+  std::vector<unsigned int> dof_indices (dofs_per_cell);
+  std::vector<unsigned int> dof_indices_neighbor (dofs_per_cell);
 
-				   // First we create the
-				   // ``UpdateFlags'' for the
-				   // ``FEValues'' and the
-				   // ``FEFaceValues'' objects.
-  const UpdateFlags update_flags = update_values
-				   | update_gradients
-				   | update_q_points
-				   | update_JxW_values,
-
-				   // Note, that on faces we do not
-				   // need gradients but we need
-				   // normal vectors.
-	       face_update_flags = update_values
-				   | update_q_points
-				   | update_JxW_values
-				   | update_normal_vectors,
-  
-				   // On the neighboring cell we only
-				   // need the shape values. Given a
-				   // specific face, the quadrature
-				   // points and `JxW values' are the
-				   // same as for the current cells,
-				   // the normal vectors are known to
-				   // be the negative of the normal
-				   // vectors of the current cell.
-      neighbor_face_update_flags = update_values;
+  const UpdateFlags update_flags               = update_values
+						 | update_gradients
+						 | update_q_points
+						 | update_JxW_values,
+		    face_update_flags          = update_values
+						 | update_q_points
+						 | update_JxW_values
+						 | update_normal_vectors,
+		    neighbor_face_update_flags = update_values;
    
-				   // Then we create the ``FEValues''
-				   // object. Note, that since version
-				   // 3.2.0 of deal.II the constructor
-				   // of this class takes a
-				   // ``Mapping'' object as first
-				   // argument. Although the
-				   // constructor without ``Mapping''
-				   // argument is still supported it
-				   // is recommended to use the new
-				   // constructor. This reduces the
-				   // effect of `hidden magic' (the
-				   // old constructor implicitely
-				   // assumes a ``MappingQ1'' mapping)
-				   // and makes it easier to change
-				   // the mapping object later.
-  FEValues<dim> fe_v (mapping, fe, quadrature, update_flags);
-  
-				   // Similarly we create the
-				   // ``FEFaceValues'' and
-				   // ``FESubfaceValues'' objects for
-				   // both, the current and the
-				   // neighboring cell. Within the
-				   // following nested loop over all
-				   // cells and all faces of the cell
-				   // they will be reinited to the
-				   // current cell and the face (and
-				   // subface) number.
+  FEValues<dim>        fe_v                  (mapping, fe, quadrature,
+					      update_flags);
   FEFaceValues<dim>    fe_v_face             (mapping, fe, face_quadrature,
 					      face_update_flags);
   FESubfaceValues<dim> fe_v_subface          (mapping, fe, face_quadrature,
@@ -1688,204 +1665,295 @@ void ConservationLaw<dim>::assemble_system ()
   FESubfaceValues<dim> fe_v_subface_neighbor (mapping, fe, face_quadrature,
 					      neighbor_face_update_flags);
 
-				   // Furthermore we need some cell
-				   // iterators.
+				   // Then loop over all cells, initialize the
+				   // FEValues object for the current cell and
+				   // call the function that assembles the
+				   // problem on this cell.
   typename DoFHandler<dim>::active_cell_iterator
     cell = dof_handler.begin_active(),
     endc = dof_handler.end();
-
-				   // Now we start the loop over all
-				   // active cells.
   for (; cell!=endc; ++cell) 
     {
-      
-				       // Now we reinit the ``FEValues''
-				       // object for the current cell
       fe_v.reinit (cell);
+      cell->get_dof_indices (dof_indices);
 
-                                       // Collect the local dofs and
-                                       // asssemble the cell term.
-      cell->get_dof_indices (dofs);
+      assemble_cell_term(fe_v, dof_indices);
 
-      assemble_cell_term(fe_v, dofs);
+				       // Then loop over all the faces of this
+                                       // cell.  If a face is part of the
+                                       // external boundary, then assemble
+                                       // boundary conditions there (the fifth
+                                       // argument to
+                                       // <code>assemble_face_terms</code>
+                                       // indicates whether we are working on
+                                       // an external or internal face; if it
+                                       // is an external face, the fourth
+                                       // argument denoting the degrees of
+                                       // freedom indices of the neighbor is
+                                       // ignores, so we pass an empty
+                                       // vector):
+      for (unsigned int face_no=0; face_no<GeometryInfo<dim>::faces_per_cell;
+	   ++face_no)
+	if (cell->at_boundary(face_no))
+	  {
+	    fe_v_face.reinit (cell, face_no);
+	    assemble_face_term (face_no, fe_v_face,
+				fe_v_face,
+				dof_indices,
+				std::vector<unsigned int>(),
+				true,
+				cell->face(face_no)->boundary_indicator(),
+				cell->face(face_no)->diameter());
+	  }
 
-                                       // We use the DG style loop through faces
-                                       // to determine if we need to apply a
-                                       // 'hanging node' flux calculation or a boundary
-                                       // computation.
-      for (unsigned int face_no=0; face_no<GeometryInfo<dim>::faces_per_cell; ++face_no)
-	{
-	  if (cell->at_boundary(face_no))
-	    {
-					       // We reinit the
-					       // ``FEFaceValues''
-					       // object to the
-					       // current face
-	      fe_v_face.reinit (cell, face_no);
-
-					       // and assemble the
-					       // corresponding face
-					       // terms.  We send the same
-                                               // fe_v and dofs as described
-                                               // in the assembly routine.
-	      assemble_face_term(face_no, fe_v_face,
-				 fe_v_face,
-				 dofs,
-				 dofs,
-				 true,
-				 cell->face(face_no)->boundary_indicator(),
-				 cell->face(face_no)->diameter());
-	    }
-	  else
-	    {
-					       // Now we are not on
-					       // the boundary of the
-					       // domain, therefore
-					       // there must exist a
-					       // neighboring cell.
-	      typename DoFHandler<dim>::cell_iterator neighbor=
-		cell->neighbor(face_no);;
-
-	      if (cell->face(face_no)->has_children())
-		{
-						   // case I: This cell refined compared to neighbor
-
-		  const unsigned int neighbor2=
-		    cell->neighbor_of_neighbor(face_no);
+				       // The alternative is that we are
+				       // dealing with an internal face. There
+				       // are two cases that we need to
+				       // distinguish: that this is a normal
+				       // face between two cells at the same
+				       // refinement level, and that it is a
+				       // face between two cells of the
+				       // different refinement levels.
+				       //
+				       // In the first case, there is nothing
+				       // we need to do: we are using a
+				       // continuous finite element, and face
+				       // terms do not appear in the bilinear
+				       // form in this case. The second case
+				       // usually does not lead to face terms
+				       // either if we enforce hanging node
+				       // constraints strongly (as in all
+				       // previous tutorial programs so far
+				       // whenever we used continuous finite
+				       // elements -- this enforcement is done
+				       // by the ConstraintMatrix class
+				       // together with
+				       // DoFTools::make_hanging_node_constraints). In
+				       // the current program, however, we opt
+				       // to enforce continuity weakly at
+				       // faces between cells of different
+				       // refinement level, for two reasons:
+				       // (i) because we can, and more
+				       // importantly (ii) because we would
+				       // have to thread the automatic
+				       // differentiation we use to compute
+				       // the elements of the Newton matrix
+				       // from the residual through the
+				       // operations of the ConstraintMatrix
+				       // class. This would be possible, but
+				       // is not trivial, and so we choose
+				       // this alternative approach.
+				       //
+				       // What needs to be decided is which
+				       // side of an interface between two
+				       // cells of different refinement level
+				       // we are sitting on.
+				       //
+				       // Let's take the case where the
+				       // neighbor is more refined first. We
+				       // then have to loop over the children
+				       // of the face of the current cell and
+				       // integrate on each of them. We
+				       // sprinkle a couple of assertions into
+				       // the code to ensure that our
+				       // reasoning trying to figure out which
+				       // of the neighbor's children's faces
+				       // coincides with a given subface of
+				       // the current cell's faces is correct
+				       // -- a bit of defensive programming
+				       // never hurts.
+				       //
+				       // We then call the function that
+				       // integrates over faces; since this is
+				       // an internal face, the fifth argument
+				       // is false, and the sixth one is
+				       // ignored so we pass an invalid value
+				       // again:
+	else
+	  {
+	    if (cell->neighbor(face_no)->has_children())
+	      {
+		const unsigned int neighbor2=
+		  cell->neighbor_of_neighbor(face_no);
 		  
-		  
-						   // We loop over
-						   // subfaces
-		  for (unsigned int subface_no=0;
-		       subface_no<GeometryInfo<dim>::subfaces_per_face;
-		       ++subface_no)
-		    {
-		      typename DoFHandler<dim>::active_cell_iterator
-                        neighbor_child
-                        = cell->neighbor_child_on_subface (face_no, subface_no);
+		for (unsigned int subface_no=0;
+		     subface_no<GeometryInfo<dim>::subfaces_per_face;
+		     ++subface_no)
+		  {
+		    const typename DoFHandler<dim>::active_cell_iterator
+		      neighbor_child
+		      = cell->neighbor_child_on_subface (face_no, subface_no);
 
-		      Assert (neighbor_child->face(neighbor2) == cell->face(face_no)->child(subface_no),
-			      ExcInternalError());
-		      Assert (!neighbor_child->has_children(), ExcInternalError());
+		    Assert (neighbor_child->face(neighbor2) ==
+			    cell->face(face_no)->child(subface_no),
+			    ExcInternalError());
+		    Assert (neighbor_child->has_children() == false,
+			    ExcInternalError());
 
-		      fe_v_subface.reinit (cell, face_no, subface_no);
-		      fe_v_face_neighbor.reinit (neighbor_child, neighbor2);
-		      neighbor_child->get_dof_indices (dofs_neighbor);
+		    fe_v_subface.reinit (cell, face_no, subface_no);
+		    fe_v_face_neighbor.reinit (neighbor_child, neighbor2);
 
-						       // Assemble as if we are working with
-						       // a DG element.
-		      assemble_face_term(face_no, fe_v_subface,
-					 fe_v_face_neighbor,
-					 dofs,
-					 dofs_neighbor,
-					 false,
-					 numbers::invalid_unsigned_int,
-					 neighbor_child->diameter());		      
-		    }
-						   // End of ``if
-						   // (face->has_children())''
-		}
-	      else
-		{
-						   // We have no children, but 
-						   // the neighbor cell may be refine
-						   // compared to use
-		  neighbor->get_dof_indices (dofs_neighbor);
-		  if (neighbor->level() != cell->level()) 
-		    {
-						       // case II: This is refined compared to neighbor
-		      Assert(neighbor->level() < cell->level(), ExcInternalError());
-		      const std::pair<unsigned int, unsigned int> faceno_subfaceno=
-			cell->neighbor_of_coarser_neighbor(face_no);
-		      const unsigned int neighbor_face_no=faceno_subfaceno.first,
-				      neighbor_subface_no=faceno_subfaceno.second;
+		    neighbor_child->get_dof_indices (dof_indices_neighbor);
 
-		      Assert (neighbor->neighbor_child_on_subface (neighbor_face_no,
-                                                                   neighbor_subface_no)
-                              == cell,
-                              ExcInternalError());
+		    assemble_face_term(face_no, fe_v_subface,
+				       fe_v_face_neighbor,
+				       dof_indices,
+				       dof_indices_neighbor,
+				       false,
+				       numbers::invalid_unsigned_int,
+				       neighbor_child->diameter());		      
+		  }
+	      }
 
-						       // Reinit the
-						       // appropriate
-						       // ``FEFaceValues''
-						       // and assemble
-						       // the face
-						       // terms.
-		      fe_v_face.reinit (cell, face_no);
-		      fe_v_subface_neighbor.reinit (neighbor, neighbor_face_no,
-						    neighbor_subface_no);
+					     // The other possibility we have
+					     // to care for is if the neighbor
+					     // is coarser than the current
+					     // cell (in particular, because
+					     // of the usual restriction of
+					     // only one hanging node per
+					     // face, the neighbor must be
+					     // exactly one level coarser than
+					     // the current cell, something
+					     // that we check with an
+					     // assertion). Again, we then
+					     // integrate over this interface:
+	    else if (cell->neighbor(face_no)->level() != cell->level())
+	      {
+		const typename DoFHandler<dim>::cell_iterator
+		  neighbor = cell->neighbor(face_no);
+		Assert(neighbor->level() == cell->level()-1,
+		       ExcInternalError());
+
+		neighbor->get_dof_indices (dof_indices_neighbor);
+
+		const std::pair<unsigned int, unsigned int>
+		  faceno_subfaceno = cell->neighbor_of_coarser_neighbor(face_no);
+		const unsigned int neighbor_face_no    = faceno_subfaceno.first,
+				   neighbor_subface_no = faceno_subfaceno.second;
+
+		Assert (neighbor->neighbor_child_on_subface (neighbor_face_no,
+							     neighbor_subface_no)
+			== cell,
+			ExcInternalError());
+
+		fe_v_face.reinit (cell, face_no);
+		fe_v_subface_neighbor.reinit (neighbor,
+					      neighbor_face_no,
+					      neighbor_subface_no);
 		      
-		      assemble_face_term(face_no, fe_v_face,
-					 fe_v_subface_neighbor,
-					 dofs,
-					 dofs_neighbor,
-					 false,
-					 numbers::invalid_unsigned_int,
-					 cell->face(face_no)->diameter());
-		    }
-
-		} 
-					       // End of ``face not at boundary'':
-	    }
-					   // End of loop over all faces:
-	} 
-      
-				       // End iteration through cells.
+		assemble_face_term(face_no, fe_v_face,
+				   fe_v_subface_neighbor,
+				   dof_indices,
+				   dof_indices_neighbor,
+				   false,
+				   numbers::invalid_unsigned_int,
+				   cell->face(face_no)->diameter());
+	      }
+	  }
     } 
 
-				   // Notify Epetra that the matrix is done.
+				   // After all this assembling, notify the
+				   // Trilinos matrix object that the matrix
+				   // is done:
   Matrix->FillComplete();
 }
 
 
 				 // @sect4{ConservationLaw::assemble_cell_term}
 				 //
-                                 // Assembles the cell term, adding minus the residual
-                                 // to the right hand side, and adding in the Jacobian
-                                 // contributions.
+                                 // This function assembles the cell term by
+                                 // computing the cell part of the residual,
+                                 // adding its negative to the right hand side
+                                 // vector, and adding its derivative with
+                                 // respect to the local variables to the
+                                 // Jacobian (i.e. the Newton matrix).
+				 //
+				 // At the top, do the usual housekeeping in
+				 // terms of allocating some local variables
+				 // that we will need later. In particular, we
+				 // will allocate variables that will hold the
+				 // values of the current solution $W_{n+1}^k$
+				 // after the $k$th Newton iteration (variable
+				 // <code>W</code>), the previous time step's
+				 // solution $W_{n}$ (variable
+				 // <code>W_old</code>), as well as the linear
+				 // combination $\theta W_{n+1}^k +
+				 // (1-\theta)W_n$ that results from choosing
+				 // different time stepping schemes (variable
+				 // <code>W_theta</code>).
+				 //
+				 // In addition to these, we need the
+				 // gradients of the current variables.  It is
+				 // a bit of a shame that we have to compute
+				 // these; we almost don't.  The nice thing
+				 // about a simple conservation law is that
+				 // the flux doesn't generally involve any
+				 // gradients.  We do need these, however, for
+				 // the diffusion stabilization.
+				 //
+				 // The actual format in which we store these
+				 // variables requires some
+				 // explanation. First, we need values at each
+				 // quadrature point for each of the
+				 // <code>EulerEquations::n_components</code>
+				 // components of the solution vector. This
+				 // makes for a two-dimensional table for
+				 // which we use deal.II's Table class (this
+				 // is more efficient than
+				 // <code>std::vector@<std::vector@<T@>
+				 // @></code> because it only needs to
+				 // allocate memory once, rather than once for
+				 // each element of the outer
+				 // vector). Similarly, the gradient is a
+				 // three-dimensional table, which the Table
+				 // class also supports.
+				 //
+				 // Secondly, we want to use automatic
+				 // differentiation. To this end, we use the
+				 // Sacado::Fad::DFad template for everything
+				 // that is a computed from the variables with
+				 // respect to which we would like to compute
+				 // derivatives. This includes the current
+				 // solution and gradient at the quadrature
+				 // points (which are linear combinations of
+				 // the degrees of freedom) as well as
+				 // everything that is computed from them such
+				 // as the residual, but not the previous time
+				 // step's solution. These variables are all
+				 // found in the first part of the function:
 template <int dim>
-void ConservationLaw<dim>::assemble_cell_term (const FEValues<dim>             &fe_v,
-					       const std::vector<unsigned int> &dofs) 
+void
+ConservationLaw<dim>::
+assemble_cell_term (const FEValues<dim>             &fe_v,
+		    const std::vector<unsigned int> &dof_indices) 
 {
-  unsigned int dofs_per_cell = fe_v.dofs_per_cell;
-  unsigned int n_q_points = fe_v.n_quadrature_points;
+  const unsigned int dofs_per_cell = fe_v.dofs_per_cell;
+  const unsigned int n_q_points    = fe_v.n_quadrature_points;
 
-				   // We will define the dofs on this cell in these fad variables.
-  std::vector<Sacado::Fad::DFad<double> > DOF(dofs_per_cell);
+  Table<2,Sacado::Fad::DFad<double> >
+    W (n_q_points, EulerEquations<dim>::n_components);
 
-				   // Values of the conservative variables at the quadrature points.
-  std::vector<std::vector<Sacado::Fad::DFad<double> > > W (n_q_points,
-							   std::vector<Sacado::Fad::DFad<double> >(EulerEquations<dim>::n_components));
+  Table<2,double>
+    W_old (n_q_points, EulerEquations<dim>::n_components);
 
-				   // Values at the last time step of the conservative variables.
-				   // Note that these do not use fad variables, since they do
-				   // not depend on the 'variables to be sought'=DOFS.
-  std::vector<std::vector<double > > Wl (n_q_points,
-					 std::vector<double >(EulerEquations<dim>::n_components));
+  std::vector<boost::array<Sacado::Fad::DFad<double>,EulerEquations<dim>::n_components> >
+    W_theta (n_q_points);
 
-				   // Here we will hold the averaged values of the conservative
-				   // variables that we will linearize around (cn=Crank Nicholson).
-  std::vector<std::vector<Sacado::Fad::DFad<double> > > Wcn (n_q_points,
-							     std::vector<Sacado::Fad::DFad<double> >(EulerEquations<dim>::n_components));
+  Table<3,Sacado::Fad::DFad<double> >
+    grad_W (n_q_points, EulerEquations<dim>::n_components, dim);
 
-				   // Gradients of the current variables.  It is a
-				   // bit of a shame that we have to compute these; we almost don't.
-				   // The nice thing about a simple conservation law is that the
-				   // the flux doesn't generally involve any gradients.  We do
-				   // need these, however, for the diffusion stabilization. 
-  std::vector<std::vector<std::vector<Sacado::Fad::DFad<double> > > > Wgrads (n_q_points,
-									      std::vector<std::vector<Sacado::Fad::DFad<double> > >(EulerEquations<dim>::n_components,
-																    std::vector<Sacado::Fad::DFad<double> >(dim)));
-
-
+				   // We will define the dofs on this cell in
+				   // these fad variables.
+  std::vector<Sacado::Fad::DFad<double> > independent_local_dof_values(dofs_per_cell);
+  
 				   // Here is the magical point where we declare a subset
 				   // of the fad variables as degrees of freedom.  All 
 				   // calculations that reference these variables (either
 				   // directly or indirectly) will accumulate sensitivies
 				   // with respect to these dofs.
   for (unsigned int in = 0; in < dofs_per_cell; in++) {
-    DOF[in] = current_solution(dofs[in]);
-    DOF[in].diff(in, dofs_per_cell);
+    independent_local_dof_values[in] = current_solution(dof_indices[in]);
+    independent_local_dof_values[in].diff(in, dofs_per_cell);
   }
 
 				   // Here we compute the shape function values and gradients
@@ -1897,23 +1965,23 @@ void ConservationLaw<dim>::assemble_cell_term (const FEValues<dim>             &
   for (unsigned int q = 0; q < n_q_points; q++) {
     for (unsigned int di = 0; di < EulerEquations<dim>::n_components; di++) {
       W[q][di] = 0;
-      Wl[q][di] = 0;
-      Wcn[q][di] = 0;
+      W_old[q][di] = 0;
+      W_theta[q][di] = 0;
       for (unsigned int d = 0; d < dim; d++) {
-        Wgrads[q][di][d] = 0;
+        grad_W[q][di][d] = 0;
       }
     }
     for (unsigned int sf = 0; sf < dofs_per_cell; sf++) {
       int di = fe_v.get_fe().system_to_component_index(sf).first;
       W[q][di] +=
-	DOF[sf]*fe_v.shape_value_component(sf, q, di);
-      Wl[q][di] +=
-	old_solution(dofs[sf])*fe_v.shape_value_component(sf, q, di);
-      Wcn[q][di] +=
-	(parameters.theta*DOF[sf]+(1-parameters.theta)*old_solution(dofs[sf]))*fe_v.shape_value_component(sf, q, di);
+	independent_local_dof_values[sf]*fe_v.shape_value_component(sf, q, di);
+      W_old[q][di] +=
+	old_solution(dof_indices[sf])*fe_v.shape_value_component(sf, q, di);
+      W_theta[q][di] +=
+	(parameters.theta*independent_local_dof_values[sf]+(1-parameters.theta)*old_solution(dof_indices[sf]))*fe_v.shape_value_component(sf, q, di);
 
       for (unsigned int d = 0; d < dim; d++) {
-	Wgrads[q][di][d] += DOF[sf]*
+	grad_W[q][di][d] += independent_local_dof_values[sf]*
 			    fe_v.shape_grad_component(sf, q, di)[d];
       } // for d
 
@@ -1931,7 +1999,7 @@ void ConservationLaw<dim>::assemble_cell_term (const FEValues<dim>             &
   FluxMatrix *flux = new FluxMatrix[n_q_points];
   
   for (unsigned int q=0; q < n_q_points; ++q)
-    EulerEquations<dim>::flux_matrix(Wcn[q], flux[q]);
+    EulerEquations<dim>::flux_matrix(W_theta[q], flux[q]);
   
 
 				   // We now have all of the function values/grads/fluxes,
@@ -1968,7 +2036,7 @@ void ConservationLaw<dim>::assemble_cell_term (const FEValues<dim>             &
 					   // The mass term (if the simulation is non-stationary).
 	  if (parameters.is_stationary == false)
 	    F_i += 1.0 / parameters.time_step *
-		   (W[point][component_i] - Wl[point][component_i]) *
+		   (W[point][component_i] - W_old[point][component_i]) *
 		   fe_v.shape_value_component(i, point, component_i) *
 		   fe_v.JxW(point);
 	  
@@ -1976,7 +2044,7 @@ void ConservationLaw<dim>::assemble_cell_term (const FEValues<dim>             &
 	  for (unsigned int d = 0; d < dim; d++)
 	    F_i += 1.0*std::pow(fe_v.get_cell()->diameter(), parameters.diffusion_power) *
 		   fe_v.shape_grad_component(i, point, component_i)[d] *
-		   Wgrads[point][component_i][d] *
+		   grad_W[point][component_i][d] *
 		   fe_v.JxW(point);
           
 					   // The gravity component only enters into the energy 
@@ -1984,13 +2052,13 @@ void ConservationLaw<dim>::assemble_cell_term (const FEValues<dim>             &
 					   // velocity.
 	  if (component_i == dim - 1)
 	    F_i += parameters.gravity *
-		   Wcn[point][EulerEquations<dim>::density_component] *
+		   W_theta[point][EulerEquations<dim>::density_component] *
 		   fe_v.shape_value_component(i,point, component_i) *
 		   fe_v.JxW(point);
 	  else if (component_i == EulerEquations<dim>::energy_component)
 	    F_i += parameters.gravity *
-		   Wcn[point][EulerEquations<dim>::density_component] *
-		   Wcn[point][dim-1] *
+		   W_theta[point][EulerEquations<dim>::density_component] *
+		   W_theta[point][dim-1] *
 		   fe_v.shape_value_component(i,point, component_i) *
 		   fe_v.JxW(point);
 	}
@@ -1999,11 +2067,11 @@ void ConservationLaw<dim>::assemble_cell_term (const FEValues<dim>             &
 				       // of the residual.  We then sum these into the
 				       // Epetra matrix.
       double *values = &(F_i.fastAccessDx(0));
-      Matrix->SumIntoGlobalValues(dofs[i],
+      Matrix->SumIntoGlobalValues(dof_indices[i],
 				  dofs_per_cell,
 				  values,
-				  reinterpret_cast<int*>(const_cast<unsigned int*>(&dofs[0])));
-      right_hand_side(dofs[i]) -= F_i.val();
+				  reinterpret_cast<int*>(const_cast<unsigned int*>(&dof_indices[0])));
+      right_hand_side(dof_indices[i]) -= F_i.val();
     }
 
   delete[] flux;
@@ -2023,8 +2091,8 @@ void
 ConservationLaw<dim>::assemble_face_term(const unsigned int           face_no,
 					 const FEFaceValuesBase<dim> &fe_v,
 					 const FEFaceValuesBase<dim> &fe_v_neighbor,
-					 const std::vector<unsigned int>   &dofs,
-					 const std::vector<unsigned int>   &dofs_neighbor,
+					 const std::vector<unsigned int>   &dof_indices,
+					 const std::vector<unsigned int>   &dof_indices_neighbor,
 					 const bool                   external_face,
 					 const unsigned int           boundary_id,
 					 const double                 face_diameter) 
@@ -2037,7 +2105,7 @@ ConservationLaw<dim>::assemble_face_term(const unsigned int           face_no,
 	 ExcDimensionMismatch(dofs_per_cell, ndofs_per_cell));
 
 				   // As above, the fad degrees of freedom
-  std::vector<Sacado::Fad::DFad<double> > DOF(dofs_per_cell+ndofs_per_cell);
+  std::vector<Sacado::Fad::DFad<double> > independent_local_dof_values(dofs_per_cell+ndofs_per_cell);
 
 				   // The conservative variables for this cell,
 				   // and for 
@@ -2056,16 +2124,16 @@ ConservationLaw<dim>::assemble_face_term(const unsigned int           face_no,
 				   // there is a neighbor cell, then we want
 				   // to include them.
   int ndofs = (external_face == false ? dofs_per_cell + ndofs_per_cell : dofs_per_cell);
-				   // Set the local DOFS.
+				   // Set the local independent_local_dof_valuesS.
   for (unsigned int in = 0; in < dofs_per_cell; in++) {
-    DOF[in] = current_solution(dofs[in]);
-    DOF[in].diff(in, ndofs);
+    independent_local_dof_values[in] = current_solution(dof_indices[in]);
+    independent_local_dof_values[in].diff(in, ndofs);
   }
 				   // If present, set the neighbor dofs.
   if (external_face == false)
     for (unsigned int in = 0; in < ndofs_per_cell; in++) {
-      DOF[in+dofs_per_cell] = current_solution(dofs_neighbor[in]);
-      DOF[in+dofs_per_cell].diff(in+dofs_per_cell, ndofs);
+      independent_local_dof_values[in+dofs_per_cell] = current_solution(dof_indices_neighbor[in]);
+      independent_local_dof_values[in+dofs_per_cell].diff(in+dofs_per_cell, ndofs);
     }
 
 				   // Set the values of the local conservative variables.
@@ -2078,7 +2146,7 @@ ConservationLaw<dim>::assemble_face_term(const unsigned int           face_no,
     for (unsigned int sf = 0; sf < dofs_per_cell; sf++) {
       int di = fe_v.get_fe().system_to_component_index(sf).first;
       Wplus[q][di] +=
-	(parameters.theta*DOF[sf]+(1.0-parameters.theta)*old_solution(dofs[sf]))*fe_v.shape_value_component(sf, q, di);
+	(parameters.theta*independent_local_dof_values[sf]+(1.0-parameters.theta)*old_solution(dof_indices[sf]))*fe_v.shape_value_component(sf, q, di);
     }
 
 
@@ -2089,7 +2157,7 @@ ConservationLaw<dim>::assemble_face_term(const unsigned int           face_no,
       for (unsigned int sf = 0; sf < ndofs_per_cell; sf++) {
 	int di = fe_v_neighbor.get_fe().system_to_component_index(sf).first;
 	Wminus[q][di] +=
-	  (parameters.theta*DOF[sf+dofs_per_cell]+(1.0-parameters.theta)*old_solution(dofs_neighbor[sf]))*
+	  (parameters.theta*independent_local_dof_values[sf+dofs_per_cell]+(1.0-parameters.theta)*old_solution(dof_indices_neighbor[sf]))*
 	  fe_v_neighbor.shape_value_component(sf, q, di);
       }
     } 
@@ -2233,20 +2301,20 @@ ConservationLaw<dim>::assemble_face_term(const unsigned int           face_no,
 				       // Update the matrix.  Depending on whether there
 				       // is/isn't a neighboring cell, we add more/less
 				       // entries.
-      Matrix->SumIntoGlobalValues(dofs[i],
+      Matrix->SumIntoGlobalValues(dof_indices[i],
 				  dofs_per_cell,
 				  &values[0],
-				  reinterpret_cast<int*>(const_cast<unsigned int*>(&dofs[0])));
+				  reinterpret_cast<int*>(const_cast<unsigned int*>(&dof_indices[0])));
       
       if (external_face == false)
-	Matrix->SumIntoGlobalValues(dofs[i],
+	Matrix->SumIntoGlobalValues(dof_indices[i],
 				    dofs_per_cell,
 				    &values[dofs_per_cell],
-				    reinterpret_cast<int*>(const_cast<unsigned int*>(&dofs_neighbor[0])));
+				    reinterpret_cast<int*>(const_cast<unsigned int*>(&dof_indices_neighbor[0])));
       
 
 				       // And add into the residual
-      right_hand_side(dofs[i]) -= F_i.val();
+      right_hand_side(dof_indices[i]) -= F_i.val();
     }
 
   delete[] normal_fluxes;
