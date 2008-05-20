@@ -2661,7 +2661,7 @@ ConservationLaw<dim>::assemble_face_term(const unsigned int           face_no,
 }
 
 
-                                 // @sect{ConservationLaw::solve}
+                                 // @sect4{ConservationLaw::solve}
                                  //
 				 // Here, we actually solve the linear system,
                                  // using either of Trilinos' Aztec or Amesos
@@ -2776,7 +2776,7 @@ ConservationLaw<dim>::solve (Vector<double> &newton_update)
 }
 
 
-                                 // @sect{ConservationLaw::compute_refinement_indicators}
+                                 // @sect4{ConservationLaw::compute_refinement_indicators}
 
 				 // Loop and assign a value for refinement.  We
 				 // simply use the density squared, which selects
@@ -2829,44 +2829,57 @@ compute_refinement_indicators (Vector<double> &refinement_indicators) const
   } 
 }
 
+
+
+                                 // @sect4{ConservationLaw::refine_grid}
+
+				 // Here, we use the refinement indicators
+				 // computed before and refine the mesh. At
+				 // the beginning, we loop over all cells and
+				 // mark those that we think should be
+				 // refined:
 template <int dim>
-void ConservationLaw<dim>::refine_grid (const Vector<double> &refinement_indicators)
+void
+ConservationLaw<dim>::refine_grid (const Vector<double> &refinement_indicators)
 {
-
-  SolutionTransfer<dim, double> soltrans(dof_handler);
-
   typename DoFHandler<dim>::active_cell_iterator
     cell = dof_handler.begin_active(),
     endc = dof_handler.end();
 
-				   // Loop cells.  If the indicator
-				   // for the cell matches the refinement criterion,
-				   // refine, else unrefine.  The unrefinement has
-				   // a slight hysterisis to avoid 'flashing' from refined
-				   // to unrefined.
-  for (unsigned int cell_no=0; cell!=endc; ++cell, ++cell_no) {
-    cell->clear_coarsen_flag();
-    cell->clear_refine_flag();
-    if (cell->level() < parameters.shock_levels &&
-        std::fabs(refinement_indicators(cell_no)) > parameters.shock_val ) {
-      cell->set_refine_flag();
-    } else {
-      if (cell->level() > 0 &&
-	  std::fabs(refinement_indicators(cell_no)) < 0.75*parameters.shock_val)
-	cell->set_coarsen_flag();
+  for (unsigned int cell_no=0; cell!=endc; ++cell, ++cell_no)
+    {
+      cell->clear_coarsen_flag();
+      cell->clear_refine_flag();
+
+      if ((cell->level() < parameters.shock_levels) &&
+	  (std::fabs(refinement_indicators(cell_no)) > parameters.shock_val))
+	cell->set_refine_flag();
+      else 
+	if ((cell->level() > 0) &&
+	    (std::fabs(refinement_indicators(cell_no)) < 0.75*parameters.shock_val))
+	  cell->set_coarsen_flag();
     }
-  }
 
-				   // The following code prolongs the old_solution
-				   // to the new grid and carries out the refinement.
-  std::vector<Vector<double> > interp_in;
-  std::vector<Vector<double> > interp_out;
+				   // Then we need to transfer the various
+				   // solution vectors from the old to the new
+				   // grid and carries while we do the
+				   // refinement. The SolutionTransfer class
+				   // is our friend here; it has a fairly
+				   // extensive documentation, including
+				   // examples, so we won't comment much on
+				   // the following code. The last three lines
+				   // simply re-set the sizes of some other
+				   // vectors to the now correct size:
+  std::vector<Vector<double> > transfer_in;
+  std::vector<Vector<double> > transfer_out;
 
-  interp_in.push_back(old_solution);
-  interp_in.push_back(predictor);
+  transfer_in.push_back(old_solution);
+  transfer_in.push_back(predictor);
 
   triangulation.prepare_coarsening_and_refinement();
-  soltrans.prepare_for_coarsening_and_refinement(interp_in);
+  
+  SolutionTransfer<dim, double> soltrans(dof_handler);
+  soltrans.prepare_for_coarsening_and_refinement(transfer_in);
 
   triangulation.execute_coarsening_and_refinement ();
 
@@ -2877,28 +2890,43 @@ void ConservationLaw<dim>::refine_grid (const Vector<double> &refinement_indicat
     Vector<double> new_old_solution(1);
     Vector<double> new_predictor(1);
 
-    interp_out.push_back(new_old_solution);
-    interp_out.push_back(new_predictor);
-    interp_out[0].reinit(dof_handler.n_dofs());
-    interp_out[1].reinit(dof_handler.n_dofs());
+    transfer_out.push_back(new_old_solution);
+    transfer_out.push_back(new_predictor);
+    transfer_out[0].reinit(dof_handler.n_dofs());
+    transfer_out[1].reinit(dof_handler.n_dofs());
   }
 
-  soltrans.interpolate(interp_in, interp_out);
+  soltrans.interpolate(transfer_in, transfer_out);
 
-  old_solution.reinit (interp_out[0].size());
-  old_solution = interp_out[0];
+  old_solution.reinit (transfer_out[0].size());
+  old_solution = transfer_out[0];
 
-  predictor.reinit (interp_out[1].size());
-  predictor = interp_out[1];
+  predictor.reinit (transfer_out[1].size());
+  predictor = transfer_out[1];
 
-				   // resize these vectors for the new grid.
   current_solution.reinit(dof_handler.n_dofs());
   current_solution = old_solution;
   right_hand_side.reinit (dof_handler.n_dofs());
 }
 
 
+                                 // @sect4{ConservationLaw::output_results}
 
+				 // This function now is rather
+				 // straightforward. All the magic, including
+				 // transforming data from conservative
+				 // variables to physical ones has been
+				 // abstracted and moved into the
+				 // EulerEquations class so that it can be
+				 // replaced in case we want to solve some
+				 // other hyperbolic conservation law.
+				 //
+				 // Note that the number of the output file is
+				 // determined by keeping a counter in the
+				 // form of a static variable that is set to
+				 // zero the first time we come to this
+				 // function and is incremented by one at the
+				 // end of each invokation.
 template <int dim>
 void ConservationLaw<dim>::output_results () const
 {
@@ -2908,17 +2936,17 @@ void ConservationLaw<dim>::output_results () const
   DataOut<dim> data_out;
   data_out.attach_dof_handler (dof_handler);
   
-  data_out.add_data_vector (old_solution,
+  data_out.add_data_vector (current_solution,
 			    EulerEquations<dim>::component_names (),
 			    DataOut<dim>::type_dof_data,
 			    EulerEquations<dim>::component_interpretation ());
 
-  data_out.add_data_vector (old_solution, postprocessor);
+  data_out.add_data_vector (current_solution, postprocessor);
 
   data_out.build_patches ();
 
   static unsigned int output_file_number = 0;
-  std::string filename = "old_solution-" +
+  std::string filename = "solution-" +
 			 Utilities::int_to_string (output_file_number, 3) +
 			 ".vtk";
   std::ofstream output (filename.c_str());
@@ -2930,7 +2958,8 @@ void ConservationLaw<dim>::output_results () const
 
 
 
-				 // @sect3{Run the simulation}
+                                 // @sect4{ConservationLaw::run}
+
 				 // Contains the initialization
 				 // the time loop, and the inner Newton iteration.
 template <int dim>
@@ -3099,6 +3128,8 @@ void ConservationLaw<dim>::run ()
 	}
     }
 }
+
+                                 // @sect3{main()}
 
 				 // The following ``main'' function is
 				 // similar to previous examples and
