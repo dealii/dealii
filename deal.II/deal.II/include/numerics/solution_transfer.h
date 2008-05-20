@@ -2,7 +2,7 @@
 //    $Id$
 //    Version: $Name$
 //
-//    Copyright (C) 1999, 2000, 2001, 2002, 2003, 2004, 2005, 2006, 2007 by the deal.II authors
+//    Copyright (C) 1999, 2000, 2001, 2002, 2003, 2004, 2005, 2006, 2007, 2008 by the deal.II authors
 //
 //    This file is subject to QPL and may not be  distributed
 //    without copyright and license information. Please refer
@@ -31,7 +31,8 @@ DEAL_II_NAMESPACE_OPEN
  * Transfers a discrete FE function (like a solution vector) by interpolation
  * while refining and/or coarsening a grid. During interpolation the
  * vector is reinitialized to the new size and filled with the interpolated
- * values.
+ * values. This class is used in the @ref step_15 "step-15" and
+ * @ref step_33 "step-33" tutorial programs.
  * 
  * <h3>Usage</h3>
  *
