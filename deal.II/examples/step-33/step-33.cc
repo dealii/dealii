@@ -370,6 +370,22 @@ struct EulerEquations
       }
 
 
+				     // In the same way as describing the flux
+				     // function $\mathbf F(\mathbf w), we
+				     // also need to have a way to describe
+				     // the right hand side forcing term. As
+				     // mentioned in the introduction, we
+				     // consider only gravity here, which
+				     // leads to the specific form $\mathbf
+				     // G(\mathbf w) = \left( \begin{array}{c}
+				     // g_1\rho \\ g_2\rho \\ g_3\rho \\ 0
+				     // \\ \rho \mathbf g \cdot \mathbf v
+				     // \end{array} \right)$, shown here for
+				     // the 3d case. More specifically, we
+				     // will consider only $\mathbf
+				     // g=(0,0,-1)^T$ in 3d, or $\mathbf
+				     // g=(0,-1)^T$ in 2d. This naturally
+				     // leads to the following function:
     template <typename InputVector, typename number>
     static
     void compute_forcing_vector (const InputVector &W,
