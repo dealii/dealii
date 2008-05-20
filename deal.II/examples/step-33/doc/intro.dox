@@ -111,8 +111,8 @@ function $\mathbf z$ equals zero:
 R(\mathbf{W}_{n+1})(\mathbf z) &=& 
 \int_{\Omega} \left(\frac{\mathbf{w}_{n+1} - \mathbf{w}_n}{\delta t},
 \mathbf{z}\right)
-+ \int_{\Omega} \left(\mathbf{F}(\tilde{\mathbf{w}}),
-\mathbf{z}\right) +  h^{\eta}(\nabla \mathbf{w} , \nabla \mathbf{z}) 
+- \int_{\Omega} \left(\mathbf{F}(\tilde{\mathbf{w}}),
+\nabla\mathbf{z}\right) +  h^{\eta}(\nabla \mathbf{w} , \nabla \mathbf{z}) 
 +
 \int_{\partial \Omega} \left(\mathbf{H}(\tilde{\mathbf{w}}^+),
 \mathbf{w}^-(\tilde{\mathbf{w}}^+), \mathbf{n}), \mathbf{z}\right) 

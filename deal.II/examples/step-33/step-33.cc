@@ -1866,14 +1866,35 @@ void ConservationLaw<dim>::assemble_system ()
                                  // adding its negative to the right hand side
                                  // vector, and adding its derivative with
                                  // respect to the local variables to the
-                                 // Jacobian (i.e. the Newton matrix).
+                                 // Jacobian (i.e. the Newton matrix). Recall
+                                 // that the cell contributions to the
+                                 // residual read $F_i =
+                                 // \left(\frac{\mathbf{w}_{n+1} -
+                                 // \mathbf{w}_n}{\delta
+                                 // t},\mathbf{z}_i\right)_K -
+                                 // \left(\mathbf{F}(\tilde{\mathbf{w}}),
+                                 // \nabla\mathbf{z}_i\right)_K +
+                                 // h^{\eta}(\nabla \mathbf{w} , \nabla
+                                 // \mathbf{z}_i)_K$ where $\tilde{\mathbf w}$
+                                 // is represented by the variable
+                                 // <code>W_theta</code>, $\mathbf{z}_i$ is
+                                 // the $i$th test function, and the scalar
+                                 // product
+                                 // $\left(\mathbf{F}(\tilde{\mathbf{w}}),
+                                 // \nabla\mathbf{z}\right)_K$ is understood
+                                 // as $\int_K
+                                 // \sum_{c=1}^{\text{n\_components}}
+                                 // \sum_{d=1}^{\text{dim}}
+                                 // \mathbf{F}(\tilde{\mathbf{w}})_{cd}
+                                 // \frac{\partial z_c}{x_d}$.
 				 //
-				 // At the top, do the usual housekeeping in
-				 // terms of allocating some local variables
-				 // that we will need later. In particular, we
-				 // will allocate variables that will hold the
-				 // values of the current solution $W_{n+1}^k$
-				 // after the $k$th Newton iteration (variable
+				 // At the top of this function, we do the
+				 // usual housekeeping in terms of allocating
+				 // some local variables that we will need
+				 // later. In particular, we will allocate
+				 // variables that will hold the values of the
+				 // current solution $W_{n+1}^k$ after the
+				 // $k$th Newton iteration (variable
 				 // <code>W</code>), the previous time step's
 				 // solution $W_{n}$ (variable
 				 // <code>W_old</code>), as well as the linear
@@ -1920,7 +1941,10 @@ void ConservationLaw<dim>::assemble_system ()
 				 // everything that is computed from them such
 				 // as the residual, but not the previous time
 				 // step's solution. These variables are all
-				 // found in the first part of the function:
+				 // found in the first part of the function,
+				 // along with a variable that we will use to
+				 // store the derivatives of a single
+				 // component of the residual:
 template <int dim>
 void
 ConservationLaw<dim>::
@@ -1942,6 +1966,8 @@ assemble_cell_term (const FEValues<dim>             &fe_v,
   Table<3,Sacado::Fad::DFad<double> >
     grad_W (n_q_points, EulerEquations<dim>::n_components, dim);
 
+  std::vector<double> residual_derivatives (dofs_per_cell);
+  
 				   // Next, we have to define the independent
 				   // variables that we will try to determine
 				   // by solving a Newton step. These
@@ -2034,33 +2060,68 @@ assemble_cell_term (const FEValues<dim>             &fe_v,
       }
 
 
-				   // Gather the flux values for all components at
-                                   // all of the quadrature points.  This also
-                                   // computes the matrix of sensitivities.  Perhaps
-                                   // this could be done in a better way, since this
-                                   // could be a rather large object, but for now it 
-                                   // seems to work just fine.
+				   // Next, in order to compute the cell
+				   // contributions, we need to evaluate
+				   // $F(\tilde{\mathbf w})$ at all quadrature
+				   // points. To store these, we also need to
+				   // allocate a bit of memory. Note that we
+				   // compute the flux matrices in terms of
+				   // autodifferentiation variables, so that
+				   // the Jacobian contributions can later
+				   // easily be computed from it:
   typedef Sacado::Fad::DFad<double> FluxMatrix[EulerEquations<dim>::n_components][dim];
   FluxMatrix *flux = new FluxMatrix[n_q_points];
   
-  for (unsigned int q=0; q < n_q_points; ++q)
-    EulerEquations<dim>::flux_matrix(W_theta[q], flux[q]);
+  for (unsigned int q=0; q<n_q_points; ++q)
+    EulerEquations<dim>::flux_matrix (W_theta[q], flux[q]);
   
 
-				   // We now have all of the function values/grads/fluxes,
-				   // so perform the assembly.  We have an outer loop
-				   // through the components of the system, and an
-				   // inner loop over the quadrature points, where we
-				   // accumulate contributions to the ith residual.
+				   // We now have all of the pieces in place,
+				   // so perform the assembly.  We have an
+				   // outer loop through the components of the
+				   // system, and an inner loop over the
+				   // quadrature points, where we accumulate
+				   // contributions to the $i$th residual
+				   // $F_i$. The general formula for this
+				   // residual is given in the introduction
+				   // and at the top of this function. We can,
+				   // however, simplify it a bit taking into
+				   // account that the $i$th (vector-valued)
+				   // test function $\mathbf{z}_i$ has in
+				   // reality only a single nonzero component
+				   // (more on this topic can be found in the
+				   // @ref vector_valued module). It will be
+				   // represented by the variable
+				   // <code>component_i</code> below. With
+				   // this, the residual term can be
+				   // re-written as $F_i =
+				   // \left(\frac{(\mathbf{w}_{n+1} -
+				   // \mathbf{w}_n)_{\text{component\_i}}}{\delta
+				   // t},(\mathbf{z}_i)_{\text{component\_i}}\right)_K$
+				   // $- \sum_{d=1}^{\text{dim}}
+				   // \left(\mathbf{F}
+				   // (\tilde{\mathbf{w}})_{\text{component\_i},d},
+				   // \frac{\partial(\mathbf{z}_i)_{\text{component\_i}}}
+				   // {\partial x_d}\right)_K$ $+
+				   // \sum_{d=1}^{\text{dim}} h^{\eta}
+				   // \left(\frac{\partial
+				   // \mathbf{w}_{\text{component\_i}}}{\partial
+				   // x_d} , \frac{\partial
+				   // (\mathbf{z}_i)_{\text{component\_i}}}{\partial
+				   // x_d} \right)_K$, where integrals are
+				   // understood to be evaluated through
+				   // summation over quadrature points.
 				   //
-				   // We initialy sum all contributions of the residual
-				   // in the positive sense, so that we don't need to
-				   // negative the Jacobian entries.  Then, when we sum
-				   // into the <code> right_hand_side </code> vector,
+				   // We initialy sum all contributions of the
+				   // residual in the positive sense, so that
+				   // we don't need to negative the Jacobian
+				   // entries.  Then, when we sum into the
+				   // <code>right_hand_side</code> vector,
 				   // we negate this residual.
   for (unsigned int i=0; i<fe_v.dofs_per_cell; ++i) 
     {
-				       // Find which component this dof contributes to.
+      Sacado::Fad::DFad<double> F_i = 0;
+
       const unsigned int
 	component_i = fe_v.get_fe().system_to_component_index(i).first;
 
@@ -2068,33 +2129,31 @@ assemble_cell_term (const FEValues<dim>             &fe_v,
 				       // into this fad variable.  At the end of the assembly
 				       // for this row, we will query for the sensitivities
 				       // to this variable and add them into the Jacobian.
-      Sacado::Fad::DFad<double> F_i;
 
       for (unsigned int point=0; point<fe_v.n_quadrature_points; ++point)
 	{
-					   // Integrate the flux times gradient of the test function
-	  for (unsigned int d=0; d<dim; d++) 
-	    F_i -= flux[point][component_i][d] *
-		   fe_v.shape_grad_component(i, point, component_i)[d] *
-		   fe_v.JxW(point);
-
-					   // The mass term (if the simulation is non-stationary).
 	  if (parameters.is_stationary == false)
 	    F_i += 1.0 / parameters.time_step *
 		   (W[point][component_i] - W_old[point][component_i]) *
 		   fe_v.shape_value_component(i, point, component_i) *
 		   fe_v.JxW(point);
-	  
-					   // Stabilization (cell wise diffusion)
-	  for (unsigned int d = 0; d < dim; d++)
-	    F_i += 1.0*std::pow(fe_v.get_cell()->diameter(), parameters.diffusion_power) *
+
+	  for (unsigned int d=0; d<dim; d++) 
+	    F_i -= flux[point][component_i][d] *
 		   fe_v.shape_grad_component(i, point, component_i)[d] *
+		   fe_v.JxW(point);
+
+	  for (unsigned int d = 0; d < dim; d++)
+	    F_i += 1.0*std::pow(fe_v.get_cell()->diameter(),
+				parameters.diffusion_power) *
 		   grad_W[point][component_i][d] *
+		   fe_v.shape_grad_component(i, point, component_i)[d] *
 		   fe_v.JxW(point);
           
-					   // The gravity component only enters into the energy 
-					   // equation and into the vertical component of the 
-					   // velocity.
+					   // The gravity component only
+					   // enters into the energy equation
+					   // and into the vertical component
+					   // of the velocity.
 	  if (component_i == dim - 1)
 	    F_i += parameters.gravity *
 		   W_theta[point][EulerEquations<dim>::density_component] *
@@ -2108,14 +2167,51 @@ assemble_cell_term (const FEValues<dim>             &fe_v,
 		   fe_v.JxW(point);
 	}
 
-				       // Here we gain access to the array of sensitivities
-				       // of the residual.  We then sum these into the
-				       // Epetra matrix.
-      double *values = &(F_i.fastAccessDx(0));
+				       // At the end of the loop, we have to
+				       // add the sensitivities to the matrix
+				       // and subtract the residual from the
+				       // right hand side. Trilinos FAD data
+				       // type gives us access to the
+				       // derivatives using
+				       // <code>F_i.fastAccessDx(k)</code>. The
+				       // code to get Trilinos to add elements
+				       // to the matrix is made a bit more
+				       // awkward by the fact that the
+				       // function takes plain pointers as
+				       // arguments. The first one, taking a
+				       // pointer to
+				       // <code>dofs_per_cell</code>
+				       // <code>double</code> values as its
+				       // third argument is easy enough to
+				       // deal with by just taking the address
+				       // of the first element of the
+				       // <code>residual_derivatives</code>
+				       // variable. However, it also wants an
+				       // <code>int*</code> for the column
+				       // numbers to be written to; this is a
+				       // bit more strenuous because in
+				       // deal.II we always use <code>unsigned
+				       // int</code> to represent indices
+				       // (which are, after all, always
+				       // non-negative), and that the
+				       // <code>dof_indices</code> passed to
+				       // this function are a
+				       // <code>const</code> argument. Why
+				       // Trilinos wants this argument
+				       // non-const is unknown, but in any
+				       // case to make it work we have to
+				       // first cast away the constness, and
+				       // then reinterpret all numbers as
+				       // signed integers. Not pretty but
+				       // works:
+      for (unsigned int k=0; k<dofs_per_cell; ++k)
+	residual_derivatives[k] = F_i.fastAccessDx(k);
       Matrix->SumIntoGlobalValues(dof_indices[i],
 				  dofs_per_cell,
-				  values,
-				  reinterpret_cast<int*>(const_cast<unsigned int*>(&dof_indices[0])));
+				  &residual_derivatives[0],
+				  reinterpret_cast<int*>(
+				    const_cast<unsigned int*>(
+				      &dof_indices[0])));
       right_hand_side(dof_indices[i]) -= F_i.val();
     }
 
@@ -2142,7 +2238,6 @@ ConservationLaw<dim>::assemble_face_term(const unsigned int           face_no,
 					 const unsigned int           boundary_id,
 					 const double                 face_diameter) 
 {
-  Sacado::Fad::DFad<double> F_i;
   const unsigned int n_q_points = fe_v.n_quadrature_points;
   const unsigned int dofs_per_cell = fe_v.get_fe().dofs_per_cell;
   const unsigned int ndofs_per_cell = fe_v_neighbor.get_fe().dofs_per_cell;
@@ -2327,8 +2422,8 @@ ConservationLaw<dim>::assemble_face_term(const unsigned int           face_no,
     {
       if (!fe_v.get_fe().has_support_on_face(i, face_no))
 	continue;
-      
-      F_i = 0;
+
+      Sacado::Fad::DFad<double> F_i = 0;
       for (unsigned int point=0; point<n_q_points; ++point)
 	{
 	  const unsigned int
