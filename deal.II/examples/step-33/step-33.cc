@@ -1936,60 +1936,105 @@ assemble_cell_term (const FEValues<dim>             &fe_v,
   Table<2,double>
     W_old (n_q_points, EulerEquations<dim>::n_components);
 
-  std::vector<boost::array<Sacado::Fad::DFad<double>,EulerEquations<dim>::n_components> >
-    W_theta (n_q_points);
-
+  Table<2,Sacado::Fad::DFad<double> >
+    W_theta (n_q_points, EulerEquations<dim>::n_components);
+  
   Table<3,Sacado::Fad::DFad<double> >
     grad_W (n_q_points, EulerEquations<dim>::n_components, dim);
 
-				   // We will define the dofs on this cell in
-				   // these fad variables.
+				   // Next, we have to define the independent
+				   // variables that we will try to determine
+				   // by solving a Newton step. These
+				   // independent variables are the values of
+				   // the local degrees of freedom which we
+				   // extract here:
   std::vector<Sacado::Fad::DFad<double> > independent_local_dof_values(dofs_per_cell);
+  for (unsigned int i=0; i<dofs_per_cell; ++i)
+    independent_local_dof_values[i] = current_solution(dof_indices[i]);
   
-				   // Here is the magical point where we declare a subset
-				   // of the fad variables as degrees of freedom.  All 
-				   // calculations that reference these variables (either
-				   // directly or indirectly) will accumulate sensitivies
-				   // with respect to these dofs.
-  for (unsigned int in = 0; in < dofs_per_cell; in++) {
-    independent_local_dof_values[in] = current_solution(dof_indices[in]);
-    independent_local_dof_values[in].diff(in, dofs_per_cell);
-  }
+				   // The next step incorporates all the
+				   // magic: we declare a subset of the
+				   // autodifferentiation variables as
+				   // independent degrees of freedom, whereas
+				   // all the other ones remain dependent
+				   // functions. These are precisely the local
+				   // degrees of freedom just extracted. All
+				   // calculations that reference them (either
+				   // directly or indirectly) will accumulate
+				   // sensitivies with respect to these
+				   // variables.
+				   //
+				   // In order to mark the variables as
+				   // independent, the following does the
+				   // trick, marking
+				   // <code>independent_local_dof_values[i]</code>
+				   // as the $i$th independent variable out of
+				   // a total of <code>dofs_per_cell</code>:
+  for (unsigned int i=0; i<dofs_per_cell; ++i)
+    independent_local_dof_values[i].diff (i, dofs_per_cell);
 
-				   // Here we compute the shape function values and gradients
-				   // at the quadrature points.  Ideally, we could call into 
-				   // something like get_function_values, get_function_grads,
-				   // but since we don't want to make the entire old_solution vector
-				   // fad types, only the local cell variables, we explicitly
-				   // code this loop;
-  for (unsigned int q = 0; q < n_q_points; q++) {
-    for (unsigned int di = 0; di < EulerEquations<dim>::n_components; di++) {
-      W[q][di] = 0;
-      W_old[q][di] = 0;
-      W_theta[q][di] = 0;
-      for (unsigned int d = 0; d < dim; d++) {
-        grad_W[q][di][d] = 0;
+				   // After all these declarations, let us
+				   // actually compute something. First, the
+				   // values of <code>W</code>,
+				   // <code>W_old</code>,
+				   // <code>W_theta</code>, and
+				   // <code>grad_W</code>, which we can
+				   // compute from the local DoF values by
+				   // using the formula $W(x_q)=\sum_i \mathbf
+				   // W_i \Phi_i(x_q)$, where $\mathbf W_i$ is
+				   // the $i$th entry of the (local part of
+				   // the) solution vector, and $\Phi_i(x_q)$
+				   // the value of the $i$th vector-valued
+				   // shape function evaluated at quadrature
+				   // point $x_q$. The gradient can be
+				   // computed in a similar way.
+				   //
+				   // Ideally, we could compute this
+				   // information using a call into something
+				   // like FEValues::get_function_values and
+				   // FEValues::get_function_grads, but since
+				   // (i) we would have to extend the FEValues
+				   // class for this, and (ii) we don't want
+				   // to make the entire
+				   // <code>old_solution</code> vector fad
+				   // types, only the local cell variables, we
+				   // explicitly code the loop above. Before
+				   // this, we add another loop that
+				   // initializes all the fad variables to
+				   // zero:
+  for (unsigned int q=0; q<n_q_points; ++q)
+    for (unsigned int c=0; c<EulerEquations<dim>::n_components; ++c)
+      {
+	W[q][c]       = 0;
+	W_old[q][c]   = 0;
+	W_theta[q][c] = 0;
+	for (unsigned int d=0; d<dim; ++d)
+	  grad_W[q][c][d] = 0;
       }
-    }
-    for (unsigned int sf = 0; sf < dofs_per_cell; sf++) {
-      int di = fe_v.get_fe().system_to_component_index(sf).first;
-      W[q][di] +=
-	independent_local_dof_values[sf]*fe_v.shape_value_component(sf, q, di);
-      W_old[q][di] +=
-	old_solution(dof_indices[sf])*fe_v.shape_value_component(sf, q, di);
-      W_theta[q][di] +=
-	(parameters.theta*independent_local_dof_values[sf]+(1-parameters.theta)*old_solution(dof_indices[sf]))*fe_v.shape_value_component(sf, q, di);
 
-      for (unsigned int d = 0; d < dim; d++) {
-	grad_W[q][di][d] += independent_local_dof_values[sf]*
-			    fe_v.shape_grad_component(sf, q, di)[d];
-      } // for d
+  for (unsigned int q=0; q<n_q_points; ++q)
+    for (unsigned int i=0; i<dofs_per_cell; ++i)
+      {
+	const unsigned int c = fe_v.get_fe().system_to_component_index(i).first;
+	
+	W[q][c] += independent_local_dof_values[i] *
+		   fe_v.shape_value_component(i, q, c);
+	W_old[q][c] += old_solution(dof_indices[i]) *
+		       fe_v.shape_value_component(i, q, c);
+	W_theta[q][c] += (parameters.theta *
+			  independent_local_dof_values[i]
+			  +
+			  (1-parameters.theta) *
+			  old_solution(dof_indices[i])) *
+			 fe_v.shape_value_component(i, q, c);
+	  
+	for (unsigned int d = 0; d < dim; d++)
+	  grad_W[q][c][d] += independent_local_dof_values[i] *
+			     fe_v.shape_grad_component(i, q, c)[d];
+      }
 
-    }
 
-  } // for q
-
-                                   // Gather the flux values for all components at
+				   // Gather the flux values for all components at
                                    // all of the quadrature points.  This also
                                    // computes the matrix of sensitivities.  Perhaps
                                    // this could be done in a better way, since this
