@@ -14,9 +14,6 @@ set mesh = slide.inp
 # Stabilization parameter
 set diffusion power = 2.0
 
-# Scaled value for gravity.  Positive means gravity points down.
-set gravity = 1.0
-
 # --------------------------------------------------
 # Boundary conditions
 # We may specify boundary conditions for up to MAX_BD boundaries.

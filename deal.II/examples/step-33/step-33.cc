@@ -120,6 +120,8 @@ using namespace dealii;
 template <int dim>
 struct EulerEquations
 {
+				     // @sect4{Component description}
+    
 				     // First a few variables that
 				     // describe the various components of our
 				     // solution vector in a generic way. This
@@ -188,6 +190,8 @@ struct EulerEquations
       }
     
     
+				     // @sect4{Transformations between variables}
+    
 				     // Next, we define the gas
 				     // constant. We will set it to 1.4
 				     // in its definition immediately
@@ -206,7 +210,7 @@ struct EulerEquations
 				     // and $O_2$.
     static const double gas_gamma;
 
-    
+
 				     // In the following, we will need to
 				     // compute the kinetic energy and the
 				     // pressure from a vector of conserved
@@ -266,6 +270,8 @@ struct EulerEquations
       }	
 
 
+				     // @sect4{EulerEquations::compute_flux_matrix}    
+    
 				     // We define the flux function
 				     // $F(W)$ as one large matrix.
 				     // Each row of this matrix
@@ -335,6 +341,8 @@ struct EulerEquations
       }
 
 
+				     // @sect4{EulerEquations::compute_normal_flux}
+
 				     // On the boundaries of the
 				     // domain and across hanging
 				     // nodes we use a numerical flux
@@ -345,12 +353,12 @@ struct EulerEquations
 				     // $\alpha$. It's form has also
 				     // been given already in the
 				     // introduction:
-    template <typename number>
+    template <typename InputVector>
     static
     void numerical_normal_flux(const Point<dim>          &normal,
-			       const std::vector<number> &Wplus,
-			       const std::vector<number> &Wminus,
-			       const double alpha,
+			       const InputVector         &Wplus,
+			       const InputVector         &Wminus,
+			       const double               alpha,
 			       Sacado::Fad::DFad<double> (&normal_flux)[n_components])
       {
 	Sacado::Fad::DFad<double> iflux[n_components][dim];
@@ -363,12 +371,13 @@ struct EulerEquations
 	  {
 	    normal_flux[di] = 0;
 	    for (unsigned int d=0; d<dim; ++d) 
-	      normal_flux[di] += 0.5*(iflux[di][d] + oflux[di][d]) * normal(d);
+	      normal_flux[di] += 0.5*(iflux[di][d] + oflux[di][d]) * normal[d];
 	      
 	    normal_flux[di] += 0.5*alpha*(Wplus[di] - Wminus[di]);
 	  }
       }
 
+				     // @sect4{EulerEquations::compute_forcing_vector}
 
 				     // In the same way as describing the flux
 				     // function $\mathbf F(\mathbf w)$, we
@@ -377,10 +386,10 @@ struct EulerEquations
 				     // mentioned in the introduction, we
 				     // consider only gravity here, which
 				     // leads to the specific form $\mathbf
-				     // G(\mathbf w) = \left( \begin{array}{c}
-				     // g_1\rho \\ g_2\rho \\ g_3\rho \\ 0
-				     // \\ \rho \mathbf g \cdot \mathbf v
-				     // \end{array} \right)$, shown here for
+				     // G(\mathbf w) = \left(
+				     // g_1\rho, g_2\rho, g_3\rho, 0,
+				     // \rho \mathbf g \cdot \mathbf v
+				     // \right)^T$, shown here for
 				     // the 3d case. More specifically, we
 				     // will consider only $\mathbf
 				     // g=(0,0,-1)^T$ in 3d, or $\mathbf
@@ -408,8 +417,181 @@ struct EulerEquations
 		    forcing[c] = 0;
 	    }
       }
+
+
+				     // @sect4{Dealing with boundary conditions}
+
+				     // Another thing we have to deal with is
+				     // boundary conditions. To this end, let
+				     // us first define the kinds of boundary
+				     // conditions we currently know how to
+				     // deal with:
+    enum BoundaryKind
+    {
+	  inflow_boundary,
+	  outflow_boundary,
+	  no_penetration_boundary,
+	  pressure_boundary
+    };
+
+
+				     // The next part is to actually decide
+				     // what to do at each kind of
+				     // boundary. To this end, remember from
+				     // the introduction that boundary
+				     // conditions are specified by choosing a
+				     // value $\mathbf w^-$ on the outside of
+				     // a boundary given an inhomogeneity
+				     // $\mathbf j$ and possibly the
+				     // solution's value $\mathbf w^+$ on the
+				     // inside. Both are then passed to the
+				     // numerical flux $\mathbf
+				     // H(\mathbf{w}^+, \mathbf{w}^-,
+				     // \mathbf{n})$ to define boundary
+				     // contributions to the bilinear form.
+				     //
+				     // Boundary conditions can in some cases
+				     // be specified for each component of the
+				     // solution vector independently. For
+				     // example, if component $c$ is marked
+				     // for inflow, then $w^-_c = j_c$. If it
+				     // is an outflow, then $w^-_c =
+				     // w^+_c$. These two simple cases are
+				     // handled first in the function below.
+				     //
+				     // There is a little snag that makes this
+				     // function unpleasant from a C++
+				     // language viewpoint: The output vector
+				     // <code>Wminus</code> will of course be
+				     // modified, so it shouldn't be a
+				     // <code>const</code> argument. Yet it is
+				     // in the implementation below, and needs
+				     // to be in order to allow the code to
+				     // compile. The reason is that we call
+				     // this function at a place where
+				     // <code>Wminus</code> is of type
+				     // <code>Table@<2,Sacado::Fad::DFad@<double@>
+				     // @></code>, this being 2d table with
+				     // indices representing the quadrature
+				     // point and the vector component,
+				     // respectively. We call this function
+				     // with <code>Wminus[q]</code> as last
+				     // argument; subscripting a 2d table
+				     // yields a temporary accessor object
+				     // representing a 1d vector, just what we
+				     // want here. The problem is that a
+				     // temporary accessor object can't be
+				     // bound to a non-const reference
+				     // argument of a function, as we would
+				     // like here, according to the C++ 1998
+				     // and 2003 standards (something that
+				     // will be fixed with the next standard
+				     // in the form of rvalue references).  We
+				     // get away with making the output
+				     // argument here a constant because it is
+				     // the <i>accessor</i> object that's
+				     // constant, not the table it points to:
+				     // that one can still be written to. The
+				     // hack is unpleasant nevertheless
+				     // because it restricts the kind of data
+				     // types that may be used as template
+				     // argument to this function: a regular
+				     // vector isn't going to do because that
+				     // one can not be written to when marked
+				     // <code>const</code>. With no good
+				     // solution around at the moment, we'll
+				     // go with the pragmatic, even if not
+				     // pretty, solution shown here:
+    template <typename DataVector>
+    static
+    void
+    compute_Wminus (const BoundaryKind  (&boundary_kind)[n_components],
+		    const Point<dim>     &normal_vector,
+		    const DataVector     &Wplus,
+		    const Vector<double> &boundary_values,
+		    const DataVector     &Wminus)
+      {
+	for (unsigned int c = 0; c < n_components; c++)
+	  switch (boundary_kind[c])
+	    {
+	      case inflow_boundary:
+	      {
+		Wminus[c] = boundary_values(c);
+		break;
+	      }
+
+	      case outflow_boundary:
+	      {
+		Wminus[c] = Wplus[c];
+		break;
+	      }	    
+		
+					       // Prescribed pressure boundary
+					       // conditions are a bit more
+					       // complicated by the fact that
+					       // even though the pressure is
+					       // prescribed, we really are
+					       // setting the energy component
+					       // here, which will depend on
+					       // velocity and pressure. So
+					       // even though this seems like
+					       // a Dirichlet type boundary
+					       // condition, we get
+					       // sensitivities of energy to
+					       // velocity and density (unless
+					       // these are also prescribed):
+	      case pressure_boundary:
+	      {
+		const typename DataVector::value_type
+		  density = (boundary_kind[density_component] ==
+			     inflow_boundary
+			     ?
+			     boundary_values(density_component)
+			     :
+			     Wplus[density_component]);
+
+		typename DataVector::value_type kinetic_energy = 0;
+		for (unsigned int d=0; d<dim; ++d)
+		  if (boundary_kind[d] == inflow_boundary)
+		    kinetic_energy += boundary_values(d)*boundary_values(d);
+		  else
+		    kinetic_energy += Wplus[d]*Wplus[d];
+		kinetic_energy *= 1./2./density;
+
+		Wminus[c] = boundary_values(c) / (gas_gamma-1.0) +
+			    kinetic_energy;
+		  
+		break;
+	      }
+
+	      case no_penetration_boundary:
+	      {
+						 // We prescribe the
+						 // velocity (we are dealing with a
+						 // particular component here so
+						 // that the average of the
+						 // velocities is orthogonal to the
+						 // surface normal.  This creates
+						 // sensitivies of across the
+						 // velocity components.
+		Sacado::Fad::DFad<double> vdotn = 0;
+		for (unsigned int d = 0; d < dim; d++) {
+		  vdotn += Wplus[d]*normal_vector[d];
+		}
+
+		Wminus[c] = Wplus[c] - 2.0*vdotn*normal_vector[c];
+		break;
+	      }
+
+	      default:
+		    Assert (false, ExcNotImplemented());
+	    }    
+      }
+
+
     
     
+				     // @sect4{EulerEquations::Postprocessor}
     
 				     // Finally, we declare a class that
 				     // implements a postprocessing of data
@@ -1149,17 +1331,11 @@ namespace Parameters
   {
       static const unsigned int max_n_boundaries = 10;
 
-      enum BoundaryKind
-      {
-	    inflow_boundary,
-	    outflow_boundary,
-	    no_penetration_boundary,
-	    pressure_boundary
-      };
-
       struct BoundaryConditions
       {
-	  BoundaryKind        kind[EulerEquations<dim>::n_components];
+	  typename EulerEquations<dim>::BoundaryKind
+	  kind[EulerEquations<dim>::n_components];
+	  
 	  FunctionParser<dim> values;
 
 	  BoundaryConditions ();
@@ -1169,7 +1345,6 @@ namespace Parameters
       AllParameters ();
       
       double diffusion_power;
-      double gravity;
 
       double time_step, final_time;
       double theta;
@@ -1211,10 +1386,6 @@ namespace Parameters
     prm.declare_entry("diffusion power", "2.0",
 		      Patterns::Double(),
 		      "power of mesh size for diffusion");
-
-    prm.declare_entry("gravity", "0.0",
-		      Patterns::Double(),
-		      "gravity forcing");
 
     prm.enter_subsection("time stepping");
     {
@@ -1282,7 +1453,6 @@ namespace Parameters
   {
     mesh_filename = prm.get("mesh");
     diffusion_power = prm.get_double("diffusion power");
-    gravity = prm.get_double("gravity");
 
     prm.enter_subsection("time stepping");
     {
@@ -1318,13 +1488,17 @@ namespace Parameters
 		= prm.get("w_" + Utilities::int_to_string(di));
 
 	      if ((di < dim) && (no_penetration == true))
-		boundary_conditions[boundary_id].kind[di] = no_penetration_boundary;
+		boundary_conditions[boundary_id].kind[di]
+		  = EulerEquations<dim>::no_penetration_boundary;
 	      else if (boundary_type == "inflow")
-		boundary_conditions[boundary_id].kind[di] = inflow_boundary;
+		boundary_conditions[boundary_id].kind[di]
+		  = EulerEquations<dim>::inflow_boundary;
 	      else if (boundary_type == "pressure")
-		boundary_conditions[boundary_id].kind[di] = pressure_boundary;
+		boundary_conditions[boundary_id].kind[di]
+		  = EulerEquations<dim>::pressure_boundary;
 	      else if (boundary_type == "outflow")
-		boundary_conditions[boundary_id].kind[di] = outflow_boundary;
+		boundary_conditions[boundary_id].kind[di]
+		  = EulerEquations<dim>::outflow_boundary;
 	      else
 		AssertThrow (false, ExcNotImplemented());
 
@@ -1397,14 +1571,14 @@ class ConservationLaw
     void assemble_system ();
     void assemble_cell_term (const FEValues<dim>             &fe_v,
 			     const std::vector<unsigned int> &dofs);
-    void assemble_face_term(const unsigned int           face_no,
-			    const FEFaceValuesBase<dim> &fe_v,
-			    const FEFaceValuesBase<dim> &fe_v_neighbor,
-			    const std::vector<unsigned int>   &dofs,
-			    const std::vector<unsigned int>   &dofs_neighbor,
-			    const bool                   external_face,
-			    const unsigned int           boundary_id,
-			    const double                 face_diameter);
+    void assemble_face_term (const unsigned int           face_no,
+			     const FEFaceValuesBase<dim> &fe_v,
+			     const FEFaceValuesBase<dim> &fe_v_neighbor,
+			     const std::vector<unsigned int>   &dofs,
+			     const std::vector<unsigned int>   &dofs_neighbor,
+			     const bool                   external_face,
+			     const unsigned int           boundary_id,
+			     const double                 face_diameter);
 
     std::pair<unsigned int, double> solve (Vector<double> &solution);
 
@@ -1836,13 +2010,13 @@ void ConservationLaw<dim>::assemble_system ()
 
 		    neighbor_child->get_dof_indices (dof_indices_neighbor);
 
-		    assemble_face_term(face_no, fe_v_subface,
-				       fe_v_face_neighbor,
-				       dof_indices,
-				       dof_indices_neighbor,
-				       false,
-				       numbers::invalid_unsigned_int,
-				       neighbor_child->diameter());		      
+		    assemble_face_term (face_no, fe_v_subface,
+					fe_v_face_neighbor,
+					dof_indices,
+					dof_indices_neighbor,
+					false,
+					numbers::invalid_unsigned_int,
+					neighbor_child->diameter());		      
 		  }
 	      }
 
@@ -1882,13 +2056,13 @@ void ConservationLaw<dim>::assemble_system ()
 					      neighbor_face_no,
 					      neighbor_subface_no);
 		      
-		assemble_face_term(face_no, fe_v_face,
-				   fe_v_subface_neighbor,
-				   dof_indices,
-				   dof_indices_neighbor,
-				   false,
-				   numbers::invalid_unsigned_int,
-				   cell->face(face_no)->diameter());
+		assemble_face_term (face_no, fe_v_face,
+				    fe_v_subface_neighbor,
+				    dof_indices,
+				    dof_indices_neighbor,
+				    false,
+				    numbers::invalid_unsigned_int,
+				    cell->face(face_no)->diameter());
 	      }
 	  }
     } 
@@ -2264,12 +2438,15 @@ assemble_cell_term (const FEValues<dim>             &fe_v,
 
 				 // @sect4{ConservationLaw::assemble_face_term}
 				 //
-				 // These are either
-				 // boundary terms or terms across differing 
-				 // levels of refinement.  In the first case,
-				 // fe_v==fe_v_neighbor and dofs==dofs_neighbor.
-				 // The int boundary < 0 if not at a boundary,
-				 // otherwise it is the boundary indicator.
+				 // Here, we do essentially the same as in the
+				 // previous function. t the top, we introduce
+				 // the independent variables. Because the
+				 // current function is also used if we are
+				 // working on an internal face between two
+				 // cells, the independent variables are not
+				 // only the degrees of freedom on the current
+				 // cell but in the case of an interior face
+				 // also the ones on the neighbor.
 template <int dim>
 void
 ConservationLaw<dim>::assemble_face_term(const unsigned int           face_no,
@@ -2282,160 +2459,126 @@ ConservationLaw<dim>::assemble_face_term(const unsigned int           face_no,
 					 const double                 face_diameter) 
 {
   const unsigned int n_q_points = fe_v.n_quadrature_points;
-  const unsigned int dofs_per_cell = fe_v.get_fe().dofs_per_cell;
-  const unsigned int ndofs_per_cell = fe_v_neighbor.get_fe().dofs_per_cell;
-  Assert(dofs_per_cell == ndofs_per_cell,
-	 ExcDimensionMismatch(dofs_per_cell, ndofs_per_cell));
+  const unsigned int dofs_per_cell = fe_v.dofs_per_cell;
 
-				   // As above, the fad degrees of freedom
-  std::vector<Sacado::Fad::DFad<double> > independent_local_dof_values(dofs_per_cell+ndofs_per_cell);
+  std::vector<Sacado::Fad::DFad<double> >
+    independent_local_dof_values (dofs_per_cell),
+    independent_neighbor_dof_values (external_face == false ?
+				     dofs_per_cell :
+				     0);
 
-				   // The conservative variables for this cell,
-				   // and for 
-  std::vector<std::vector<Sacado::Fad::DFad<double> > > Wplus (n_q_points,
-							       std::vector<Sacado::Fad::DFad<double> >(EulerEquations<dim>::n_components));
-  std::vector<std::vector<Sacado::Fad::DFad<double> > > Wminus (n_q_points,
-								std::vector<Sacado::Fad::DFad<double> >(EulerEquations<dim>::n_components));
+  const unsigned int n_independent_variables = (external_face == false ?
+						2 * dofs_per_cell :
+						dofs_per_cell);
+  
+  for (unsigned int i = 0; i < dofs_per_cell; i++)
+    {
+      independent_local_dof_values[i] = current_solution(dof_indices[i]);
+      independent_local_dof_values[i].diff(i, n_independent_variables);
+    }
 
-
-  const std::vector<Point<dim> > &normals = fe_v.get_normal_vectors ();
-
-
-				   // If we are at a boundary, then
-				   // dofs_neighbor are the same as dofs, so
-				   // we do not want to duplicate them.  If
-				   // there is a neighbor cell, then we want
-				   // to include them.
-  int ndofs = (external_face == false ? dofs_per_cell + ndofs_per_cell : dofs_per_cell);
-				   // Set the local independent_local_dof_valuesS.
-  for (unsigned int in = 0; in < dofs_per_cell; in++) {
-    independent_local_dof_values[in] = current_solution(dof_indices[in]);
-    independent_local_dof_values[in].diff(in, ndofs);
-  }
-				   // If present, set the neighbor dofs.
   if (external_face == false)
-    for (unsigned int in = 0; in < ndofs_per_cell; in++) {
-      independent_local_dof_values[in+dofs_per_cell] = current_solution(dof_indices_neighbor[in]);
-      independent_local_dof_values[in+dofs_per_cell].diff(in+dofs_per_cell, ndofs);
-    }
-
-				   // Set the values of the local conservative variables.
-				   // Initialize all variables to zero.
-  for (unsigned int q = 0; q < n_q_points; q++) {
-    for (unsigned int di = 0; di < EulerEquations<dim>::n_components; di++) {
-      Wplus[q][di] = 0;
-      Wminus[q][di] = 0;
-    }
-    for (unsigned int sf = 0; sf < dofs_per_cell; sf++) {
-      int di = fe_v.get_fe().system_to_component_index(sf).first;
-      Wplus[q][di] +=
-	(parameters.theta*independent_local_dof_values[sf]+(1.0-parameters.theta)*old_solution(dof_indices[sf]))*fe_v.shape_value_component(sf, q, di);
-    }
-
-
-				     // If there is a cell across, then initialize
-				     // the exterior trace as a function of the other
-				     // cell degrees of freedom.
-    if (external_face == false) {
-      for (unsigned int sf = 0; sf < ndofs_per_cell; sf++) {
-	int di = fe_v_neighbor.get_fe().system_to_component_index(sf).first;
-	Wminus[q][di] +=
-	  (parameters.theta*independent_local_dof_values[sf+dofs_per_cell]+(1.0-parameters.theta)*old_solution(dof_indices_neighbor[sf]))*
-	  fe_v_neighbor.shape_value_component(sf, q, di);
+    for (unsigned int i = 0; i < dofs_per_cell; i++)
+      {
+	independent_neighbor_dof_values[i]
+	  = current_solution(dof_indices_neighbor[i]);
+	independent_neighbor_dof_values[i]
+	  .diff(i+dofs_per_cell, n_independent_variables);
       }
-    } 
-  } // for q
 
-				   // If this is a boundary, then the values
+
+				   // Next, we need to define the values of
+				   // the conservative variables $\tilde
+				   // {\mathbf W}$ on this side of the face
+				   // ($\tilde {\mathbf W}^+$) and on the
+				   // opposite side ($\tilde {\mathbf
+				   // W}^-$). The former can be computed in
+				   // exactly the same way as in the previous
+				   // function, but note that the
+				   // <code>fe_v</code> variable now is of
+				   // type FEFaceValues or FESubfaceValues:
+  Table<2,Sacado::Fad::DFad<double> >
+    Wplus (n_q_points, EulerEquations<dim>::n_components),
+    Wminus (n_q_points, EulerEquations<dim>::n_components);
+
+  for (unsigned int q=0; q<n_q_points; ++q)
+    for (unsigned int i=0; i<dofs_per_cell; ++i)
+      {
+	const unsigned int component_i = fe_v.get_fe().system_to_component_index(i).first;
+	Wplus[q][component_i] += (parameters.theta *
+				  independent_local_dof_values[i]
+				  +
+				  (1.0-parameters.theta) *
+				  old_solution(dof_indices[i])) *
+				 fe_v.shape_value_component(i, q, component_i);
+      }
+
+				   // Computing $\tilde {\mathbf W}^-$ is a
+				   // bit more complicated. If this is an
+				   // internal face, we can compute it as
+				   // above by simply using the independent
+				   // variables from the neighbor:
+  if (external_face == false)
+    {
+      for (unsigned int q=0; q<n_q_points; ++q)
+	for (unsigned int i=0; i<dofs_per_cell; ++i)
+	  {
+	    const unsigned int component_i = fe_v_neighbor.get_fe().
+					     system_to_component_index(i).first;
+	    Wminus[q][component_i] += (parameters.theta *
+				       independent_neighbor_dof_values[i]
+				       +
+				       (1.0-parameters.theta) *
+				       old_solution(dof_indices_neighbor[i]))*
+				      fe_v_neighbor.shape_value_component(i, q, component_i);
+	  }
+    }
+				   // On the other hand, if this is an
+				   // external boundary face, then the values
 				   // of $W^-$ will be either functions of
-				   // $W^+$, or they will be prescribed.  This
-				   // switch sets them appropriately.  Since
-				   // we are using fad variables here,
+				   // $W^+$, or they will be prescribed,
+				   // depending on the kind of boundary
+				   // condition imposed here. 
+				   //
+				   // To start the evaluation, let us ensure
+				   // that the boundary id specified for this
+				   // boundary is one for which we actually
+				   // have data in the parameters
+				   // object. Next, we evaluate the function
+				   // object for the inhomogeneity.  This is a
+				   // bit tricky: a given boundary might have
+				   // both prescribed and implicit values.  If
+				   // a particular component is not
+				   // prescribed, the values evaluate to zero
+				   // and are ignored below.
+				   //
+				   // The rest is done by a function that
+				   // actually knows the specifics of Euler
+				   // equation boundary conditions. Note that
+				   // since we are using fad variables here,
 				   // sensitivities will be updated
-				   // appropriately.  These sensitivities
-				   // would be tremendously difficult to
-				   // manage without fad!!!
-  if (external_face == true)
+				   // appropriately, a process that would
+				   // otherwise be tremendously complicated.
+  else
     {
       Assert (boundary_id < Parameters::AllParameters<dim>::max_n_boundaries,
 	      ExcIndexRange (boundary_id, 0,
 			     Parameters::AllParameters<dim>::max_n_boundaries));
 
-				       // Evaluate the function object.  This is
-				       // a bit tricky; a given boundary might
-				       // have both prescribed and implicit
-				       // values.  If a particular component is
-				       // not prescribed, the values evaluate to
-				       // zero and are ignored, below.
-      std::vector<Vector<double> > bvals(n_q_points, Vector<double>(EulerEquations<dim>::n_components));
-      parameters.boundary_conditions[boundary_id].values.vector_value_list(fe_v.get_quadrature_points(), bvals);
+      std::vector<Vector<double> >
+	boundary_values(n_q_points, Vector<double>(EulerEquations<dim>::n_components));
+      parameters.boundary_conditions[boundary_id]
+	.values.vector_value_list(fe_v.get_quadrature_points(),
+				  boundary_values);
 
-				       // We loop the quadrature points, and we treat each
-				       // component individualy.
-      for (unsigned int q = 0; q < n_q_points; q++) {
-	for (unsigned int di = 0; di < EulerEquations<dim>::n_components; di++) {
-
-					   // An inflow/dirichlet type of boundary condition
-	  if (parameters.boundary_conditions[boundary_id].kind[di] == Parameters::AllParameters<dim>::inflow_boundary) {
-	    Wminus[q][di] = bvals[q](di);
-	  } else if (parameters.boundary_conditions[boundary_id].kind[di] == Parameters::AllParameters<dim>::pressure_boundary) {
-					     // A prescribed pressure boundary
-					     // condition.  This boundary
-					     // condition is complicated by the
-					     // fact that even though the
-					     // pressure is prescribed, we
-					     // really are setting the energy
-					     // index here, which will depend on
-					     // velocity and pressure. So even
-					     // though this seems like a
-					     // dirichlet type boundary
-					     // condition, we get sensitivities
-					     // of energy to velocity and
-					     // density (unless these are also
-					     // prescribed.
-	    Sacado::Fad::DFad<double> rho_vel_sqr = 0;
-	    Sacado::Fad::DFad<double> dens;
-          
-	    dens = parameters.boundary_conditions[boundary_id].kind[EulerEquations<dim>::density_component] == Parameters::AllParameters<dim>::inflow_boundary ? bvals[q](EulerEquations<dim>::density_component) :
-		   Wplus[q][EulerEquations<dim>::density_component];
-
-	    for (unsigned int d=0; d < dim; d++) {
-	      if (parameters.boundary_conditions[boundary_id].kind[d] == Parameters::AllParameters<dim>::inflow_boundary)
-		rho_vel_sqr += bvals[q](d)*bvals[q](d);
-	      else
-		rho_vel_sqr += Wplus[q][d]*Wplus[q][d];
-	    }
-	    rho_vel_sqr /= dens;
-					     // Finally set the energy value as determined by the
-					     // prescribed pressure and the other variables.
-	    Wminus[q][di] = bvals[q](di)/(EulerEquations<dim>::gas_gamma-1.0) +
-			    0.5*rho_vel_sqr;
-
-	  } else if (parameters.boundary_conditions[boundary_id].kind[di] == Parameters::AllParameters<dim>::outflow_boundary) {
-					     // A free/outflow boundary, very simple.
-	    Wminus[q][di] = Wplus[q][di];
-
-	  } else { 
-					     // We must be at a no-penetration
-					     // boundary.  We prescribe the
-					     // velocity (we are dealing with a
-					     // particular component here so
-					     // that the average of the
-					     // velocities is orthogonal to the
-					     // surface normal.  This creates
-					     // sensitivies of across the
-					     // velocity components.
-	    Sacado::Fad::DFad<double> vdotn = 0;
-	    for (unsigned int d = 0; d < dim; d++) {
-	      vdotn += Wplus[q][d]*normals[q](d);
-	    }
-
-	    Wminus[q][di] = Wplus[q][di] - 2.0*vdotn*normals[q](di);
-	  }
-	}
-      } // for q
-    } // b>= 0
-   
+      for (unsigned int q = 0; q < n_q_points; q++)
+	EulerEquations<dim>::compute_Wminus (parameters.boundary_conditions[boundary_id].kind,
+					     fe_v.normal_vector(q),
+					     Wplus[q],
+					     boundary_values[q],
+					     Wminus[q]);
+    }
+  
 				   // Determine the Lax-Friedrich's stability parameter,
 				   // and evaluate the numerical flux function at the quadrature points
   typedef Sacado::Fad::DFad<double> NormalFlux[EulerEquations<dim>::n_components];
@@ -2457,7 +2600,8 @@ ConservationLaw<dim>::assemble_face_term(const unsigned int           face_no,
     }
 
   for (unsigned int q=0; q<n_q_points; ++q)
-    EulerEquations<dim>::numerical_normal_flux(normals[q], Wplus[q], Wminus[q], alpha,
+    EulerEquations<dim>::numerical_normal_flux(fe_v.normal_vector(q),
+					       Wplus[q], Wminus[q], alpha,
 					       normal_fluxes[q]);
 
 				   // Now assemble the face term

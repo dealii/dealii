@@ -8,6 +8,11 @@ The code solves the basic Euler equations of gas dynamics, by using a
 fully implicit Newton iteration (inspired by Sandia's Aria code).  The
 code may be configured by an input deck to run different simulations
 on different meshes, with differing boundary conditions.
+<br>
+The original code and documentation was later slightly modified by Wolfgang
+Bangerth to make it more modular and allow replacing the parts that are
+specific to the Euler equations by other hyperbolic conservation laws without
+too much trouble.
 </i>
 
 <b>Note:</b>The program uses the <a
