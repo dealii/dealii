@@ -2,7 +2,7 @@
 //    $Id$
 //    Version: $Name$
 //
-//    Copyright (C) 2002, 2003, 2004, 2005, 2006, 2007 by the deal.II authors
+//    Copyright (C) 2002, 2003, 2004, 2005, 2006, 2007, 2008 by the deal.II authors
 //
 //    This file is subject to QPL and may not be  distributed
 //    without copyright and license information. Please refer
@@ -153,20 +153,6 @@ namespace internal
                                           * various dimensions, and a
                                           * pointer to the subset of
                                           * data we may access.
-                                          *
-                                          * The constructor is made
-                                          * private in order to prevent
-                                          * you having such objects
-                                          * around. The only way to
-                                          * create such objects is via
-                                          * the <tt>Table</tt> class, which
-                                          * only generates them as
-                                          * temporary objects. This
-                                          * guarantees that the accessor
-                                          * objects go out of scope
-                                          * earlier than the mother
-                                          * object, avoid problems with
-                                          * data consistency.
                                           */
         Accessor (const TableType &table,
                   const pointer    data);
@@ -178,15 +164,22 @@ namespace internal
                                           */
         Accessor ();
         
+      public:
+      
                                          /**
-                                          * Copy constructor. Not
-                                          * needed, and invisible, so
-                                          * private.
+                                          * Copy constructor. This constructor
+                                          * is public so that one can pass
+                                          * sub-tables to functions as
+                                          * arguments, as in
+                                          * <code>f(table[i])</code>.
+					  *
+					  * Using this constructor is risky if
+					  * accessors are stored longer than
+					  * the table it points to. Don't do
+					  * this.
                                           */
         Accessor (const Accessor &a);
 
-      public:
-      
                                          /**
                                           * Index operator. Performs a
                                           * range check.
@@ -305,20 +298,26 @@ namespace internal
                   const pointer    data);
 
                                          /**
-                                          * Default constructor. Not
-                                          * needed, and invisible, so
-                                          * private.
+                                          * Default constructor. Not needed,
+                                          * so private.
                                           */
         Accessor ();
 
+      public:	
                                          /**
-                                          * Copy constructor. Not
-                                          * needed, and invisible, so
-                                          * private.
+                                          * Copy constructor. This constructor
+                                          * is public so that one can pass
+                                          * sub-tables to functions as
+                                          * arguments, as in
+                                          * <code>f(table[i])</code>.
+					  *
+					  * Using this constructor is risky if
+					  * accessors are stored longer than
+					  * the table it points to. Don't do
+					  * this.
                                           */
         Accessor (const Accessor &a);
 
-      public:
       
                                          /**
                                           * Index operator. Performs a
@@ -1769,16 +1768,11 @@ namespace internal
 
     template <int N, typename T, bool C, unsigned int P>
     inline
-    Accessor<N,T,C,P>::Accessor (const Accessor &)
+    Accessor<N,T,C,P>::Accessor (const Accessor &a)
                     :
-                    table (*static_cast<const TableType*>(0)),
-                    data (0)
-    {
-                                       // accessor objects are only
-                                       // temporary objects, so should
-                                       // not need to be copied around
-      Assert (false, ExcInternalError());
-    }
+                    table (a.table),
+                    data (a.data)
+    {}
   
 
   
@@ -1853,16 +1847,11 @@ namespace internal
 
     template <int N, typename T, bool C>
     inline
-    Accessor<N,T,C,1>::Accessor (const Accessor &)
+    Accessor<N,T,C,1>::Accessor (const Accessor &a)
                     :
-                    table (*static_cast<const TableType*>(0)),
-                    data (0)
-    {
-                                       // accessor objects are only
-                                       // temporary objects, so should
-                                       // not need to be copied around
-      Assert (false, ExcInternalError());
-    }
+                    table (a.table),
+                    data (a.data)
+    {}
 
 
   
