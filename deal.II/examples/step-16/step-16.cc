@@ -65,7 +65,7 @@
 using namespace dealii;
 
 				 // This class is based on the same
-				 // class in step 5. Remark that we
+				 // class in step-5. Remark that we
 				 // replaced the DoFHandler by
 				 // MGDoFHandler. since this inherits
 				 // from DoFHandler, the new object
@@ -121,7 +121,7 @@ LaplaceProblem<dim>::LaplaceProblem () :
 
 
 
-				 // This is the function of step 5
+				 // This is the function of step-5
 				 // augmented by the setup of the
 				 // multi-level matrices in the end.
 template <int dim>
@@ -506,7 +506,7 @@ void LaplaceProblem<dim>::solve ()
 
 
 				 // Here is the data output, which is
-				 // a simplified version of step 5. We
+				 // a simplified version of step-5. We
 				 // do a standard gnuplot output for
 				 // each grid produced in the
 				 // refinement process.

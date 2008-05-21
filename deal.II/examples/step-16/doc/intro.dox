@@ -4,17 +4,18 @@
 
 This example shows the basic usage of the multilevel functions in
 deal.II. It solves the Poisson equation with Dirichlet boundary
-conditions similar to step 5.
+conditions similar to @ref step_5 "step-5".
 
 
  In order to allow sufficient flexibility in conjunction with systems of
 differential equations and block preconditioners, quite a few different objects
 have to be created before starting the multilevel method. These are
 <ul>
-<li>MGTransfer, the object handling transfer between grids
-<li>MGCoarse, the solver on the coarsest level
-<li>MGSmoother, the smoother on all other levels
-<li>MGMatrix, the matrix object having a special level multiplication, i.e. we
+<li>An the object handling transfer between grids; we use the
+MGTransferPrebuilt class for this;
+<li>The solver on the coarsest level; here, we use MGCoarseGridHouseholder;
+<li>The smoother on all other levels; here the MGSmootherRelaxation class
+<li>And MGMatrix, a class having a special level multiplication, i.e. we
 basically store one matrix per grid level and allow multiplication with it.
 </ul>
 
