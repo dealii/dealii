@@ -2960,13 +2960,23 @@ void ConservationLaw<dim>::output_results () const
 
                                  // @sect4{ConservationLaw::run}
 
-				 // Contains the initialization
-				 // the time loop, and the inner Newton iteration.
+				 // This function contains the top-level logic
+				 // of this program: initialization, the time
+				 // loop, and the inner Newton iteration.
+				 //
+				 // At the beginning, we read the mesh file
+				 // specified by the parameter file, setup the
+				 // DoFHandler and various vectors, and then
+				 // interpolate the given initial conditions
+				 // on this mesh. We then perform a number of
+				 // mesh refinements, based on the initial
+				 // conditions, to obtain a mesh that is
+				 // already well adapted to the starting
+				 // solution. At the end of this process, we
+				 // output the initial solution.
 template <int dim>
 void ConservationLaw<dim>::run () 
 {
-
-				   // Open and load the mesh.
   {
     GridIn<dim> grid_in;
     grid_in.attach_triangulation(triangulation);
@@ -2977,9 +2987,6 @@ void ConservationLaw<dim>::run ()
     grid_in.read_ucd(input_file);   
   }
   
-				   // Initialize fields and matrices.
-				   // First we need to distribute the
-				   // DoFs.
   dof_handler.clear();
   dof_handler.distribute_dofs (fe);
   
@@ -2996,15 +3003,14 @@ void ConservationLaw<dim>::run ()
   current_solution = old_solution;
   predictor = old_solution;
 
-				   // Initial refinement.  We apply the ic,
-				   // estimate, refine, and repeat until
-				   // happy.
   if (parameters.do_refine == true)
-    for (unsigned int i = 0; i < parameters.shock_levels; i++)
+    for (unsigned int i=0; i<parameters.shock_levels; ++i)
       {
 	Vector<double> refinement_indicators (triangulation.n_active_cells());
+
 	compute_refinement_indicators(refinement_indicators);
 	refine_grid(refinement_indicators);
+	
 	setup_system();
 
 	VectorTools::interpolate(dof_handler,
@@ -3015,101 +3021,135 @@ void ConservationLaw<dim>::run ()
 
   output_results ();
 
-				   // Determine when we will output next.
+				   // We then enter into the main time
+				   // stepping loop. At the top we simply
+				   // output some status information so one
+				   // can keep track of where a computation
+				   // is, as well as the header for a table
+				   // that indicates progress of the nonlinear
+				   // inner iteration:
+  Vector<double> newton_update (dof_handler.n_dofs());
+
   double time = 0;
   double next_output = time + parameters.output_step;
 
-				   // @sect4{Main time stepping loop}
   predictor = old_solution;
-  Vector<double> newton_update (dof_handler.n_dofs());
   while (time < parameters.final_time)
     {
-      std::cout << "T=" << time << ", ";
-
-
-      std::cout << "   Number of active cells:       "
+      std::cout << "T=" << time << std::endl
+		<< "   Number of active cells:       "
 		<< triangulation.n_active_cells()
-		<< std::endl;
-
-
-      std::cout << "   Number of degrees of freedom: "
+		<< std::endl
+		<< "   Number of degrees of freedom: "
 		<< dof_handler.n_dofs()
+		<< std::endl
 		<< std::endl;
+      
+      std::cout << "   NonLin Res:       Lin Iter     Lin Res" << std::endl
+		<< "   ______________________________________" << std::endl;
 
-      bool nonlin_done = false;
-
-				       // Print some relevant information during the
-				       // Newton iteration.
-      std::cout << "NonLin Res:       Lin Iter     Lin Res" << std::endl;
-      std::cout << "______________________________________" << std::endl;
-
-      const unsigned int max_nonlin = 7;
+				       // Then comes the inner Newton
+				       // iteration to solve the nonlinear
+				       // problem in each time step. The way
+				       // it works is to reset matrix and
+				       // right hand side to zero, then
+				       // assemble the linear system. If the
+				       // norm of the right hand side is small
+				       // enough, then we declare that the
+				       // Newton iteration has
+				       // converged. Otherwise, we solve the
+				       // linear system, update the current
+				       // solution with the Newton increment,
+				       // and output convergence
+				       // information. At the end, we check
+				       // that the number of Newton iterations
+				       // is not beyond a limit of 10 -- if it
+				       // is, it appears likely that
+				       // iterations are diverging and further
+				       // iterations would do no good. If that
+				       // happens, we throw an exception that
+				       // will be caught in
+				       // <code>main()</code> with status
+				       // information being displayed before
+				       // the program aborts.
+				       //
+				       // Note that the way we write the
+				       // AssertThrow macro below is by and
+				       // large equivalent to writing
+				       // something like <code>if
+				       // (!(nonlin_iter @<= 10)) throw
+				       // ExcMessage ("No convergence in
+				       // nonlinear solver");</code>. The only
+				       // significant difference is that
+				       // AssertThrow also makes sure that the
+				       // exception being thrown carries with
+				       // it information about the location
+				       // (file name and line number) where it
+				       // was generated. This is not overly
+				       // critical here, because there is only
+				       // a single place where this sort of
+				       // exception can happen; however, it is
+				       // generally a very useful tool when
+				       // one wants to find out where an error
+				       // occurred.
       unsigned int nonlin_iter = 0;
-
-				       // @sect5{Newton iteration}
       current_solution = predictor;
-      while (!nonlin_done) {
-	Matrix->PutScalar(0);
-	Matrix->FillComplete();
+      while (true)
+	{
+	  Matrix->PutScalar(0);
+	  Matrix->FillComplete();
 	
-        right_hand_side = 0;
-        assemble_system ();
+	  right_hand_side = 0;
+	  assemble_system ();
 	
-					 // Flash a star to the screen so one can
-					 // know when the assembly has stopped and the linear
-					 // old_solution is starting.
-        std::cout << "* " << std::flush;
+	  const double res_norm = right_hand_side.l2_norm();
+	  if (std::fabs(res_norm) < 1e-10)
+	    {
+	      std::printf("     %-16.3e (converged)\n\n", res_norm);
+	      break;
+	    }
+	  else
+	    {
+	      newton_update = 0;
 
-					 // Test against a (hardcoded) nonlinear tolderance.
-					 // Do not solve the linear system at the last step 
-					 // (since it would be a waste).
-                      
-	const double res_norm = right_hand_side.l2_norm();
-        if (std::fabs(res_norm) < 1e-10)
-	  {
-	    nonlin_done = true;
-	    std::printf("%-16.3e (converged)\n", res_norm);
-	  }
-	else
-	  {
-					     // Solve the linear system and update with the
-					     // delta.
-	    newton_update = 0;
-
-	    std::pair<unsigned int, double> convergence
-	      = solve (newton_update);
+	      std::pair<unsigned int, double> convergence
+		= solve (newton_update);
 	    
-	    current_solution.add(1.0, newton_update);
+	      current_solution += newton_update;
 	    
-	    std::printf("%-16.3e %04d        %-5.2e\n",
-			res_norm, convergence.first, convergence.second);
-	  }
+	      std::printf("     %-16.3e %04d        %-5.2e\n",
+			  res_norm, convergence.first, convergence.second);
+	    }
 
-        ++nonlin_iter;
+	  ++nonlin_iter;
+	  AssertThrow (nonlin_iter <= 10,
+		       ExcMessage ("No convergence in nonlinear solver"));
+	} 
 
-	AssertThrow (nonlin_iter <= max_nonlin,
-		     ExcMessage ("No convergence in nonlinear solver"));
-      } 
-
-				       // Various post convergence tasks.
-
-				       // We use a predictor to try and make
-				       // adaptivity work better.  The idea is to
-				       // try and refine ahead of a front, rather
-				       // than stepping into a coarse set of
-				       // elements and smearing the old_solution.  This
-				       // simple time extrapolator does the job.
-      predictor = current_solution;
-      predictor.sadd(3/2.0, -1/2.0, old_solution);
-
-      old_solution = current_solution;
-
-      Vector<double> refinement_indicators (triangulation.n_active_cells());
-      compute_refinement_indicators(refinement_indicators);
-
+				       // We only get to this point if the
+				       // Newton iteration has converged, so
+				       // do various post convergence tasks
+				       // here:
+				       //
+				       // First, we update the time and
+				       // produce graphical output if so
+				       // desired. Then we update a predictor
+				       // for the solution at the next time
+				       // step by approximating $\mathbf
+				       // w^{n+1}\approx \frac 32 \mathbf w^n
+				       // -\frac 12 \mathbf w^{n-1}$ to try
+				       // and make adaptivity work better.
+				       // The idea is to try and refine ahead
+				       // of a front, rather than stepping
+				       // into a coarse set of elements and
+				       // smearing the old_solution.  This
+				       // simple time extrapolator does the
+				       // job. With this, we then refine the
+				       // mesh if so desired by the user, and
+				       // finally continue on with the next
+				       // time step:
       time += parameters.time_step;
 
-				       // Output if it is time.
       if (parameters.output_step < 0)
 	output_results ();
       else if (time >= next_output)
@@ -3118,9 +3158,16 @@ void ConservationLaw<dim>::run ()
 	  next_output += parameters.output_step;
 	}
 
-				       // Refine, if refinement is selected.
+      predictor = current_solution;
+      predictor.sadd(3/2.0, -1/2.0, old_solution);
+
+      old_solution = current_solution;
+
       if (parameters.do_refine == true)
 	{
+	  Vector<double> refinement_indicators (triangulation.n_active_cells());
+	  compute_refinement_indicators(refinement_indicators);
+
 	  refine_grid(refinement_indicators);
 	  setup_system();
 
