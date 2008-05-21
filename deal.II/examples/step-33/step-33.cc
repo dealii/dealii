@@ -1759,7 +1759,7 @@ void ConservationLaw<dim>::setup_system ()
 				   // row:
   CompressedSparsityPattern sparsity_pattern (dof_handler.n_dofs(),
 					      dof_handler.n_dofs());
-  DoFTools::make_flux_sparsity_pattern (dof_handler, sparsity_pattern);
+  DoFTools::make_sparsity_pattern (dof_handler, sparsity_pattern);
 
   ConstraintMatrix hanging_node_constraints;
   DoFTools::make_hanging_node_constraints (dof_handler,
