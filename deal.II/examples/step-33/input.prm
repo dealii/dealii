@@ -49,6 +49,7 @@ end
 subsection time stepping
   set final time = 10.0 # simulation end time
   set time step  = 0.02 # simulation time step
+  set theta scheme value = 0.5
 end
 
 subsection linear solver
