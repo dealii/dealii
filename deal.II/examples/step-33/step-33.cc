@@ -1760,13 +1760,6 @@ void ConservationLaw<dim>::setup_system ()
   CompressedSparsityPattern sparsity_pattern (dof_handler.n_dofs(),
 					      dof_handler.n_dofs());
   DoFTools::make_sparsity_pattern (dof_handler, sparsity_pattern);
-
-  ConstraintMatrix hanging_node_constraints;
-  DoFTools::make_hanging_node_constraints (dof_handler,
-					   hanging_node_constraints);
-  hanging_node_constraints.close ();
-  
-  hanging_node_constraints.condense (sparsity_pattern);
   sparsity_pattern.compress();
   
   std::vector<int> row_lengths (dof_handler.n_dofs());
@@ -3159,7 +3152,7 @@ void ConservationLaw<dim>::run ()
 	}
 
       predictor = current_solution;
-      predictor.sadd(3/2.0, -1/2.0, old_solution);
+      predictor.sadd (2.0, -1.0, old_solution);
 
       old_solution = current_solution;
 
