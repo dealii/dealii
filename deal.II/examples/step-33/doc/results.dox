@@ -93,41 +93,47 @@ end
 
 When we run the program, we get the following kind of output:
 @code
-T=3.14,    Number of active cells:       2617
-   Number of degrees of freedom: 11184
-NonLin Res:       Lin Iter     Lin Res
-______________________________________
-* 1.684e-02        0007        1.84e-13
-* 4.414e-05        0006        3.82e-15
-* 1.750e-09        0006        1.56e-19
-* 6.831e-16        0000        1.56e-19
-max_df:124
-T=3.16,    Number of active cells:       2626
-   Number of degrees of freedom: 11220
-NonLin Res:       Lin Iter     Lin Res
-______________________________________
-* 1.673e-02        0007        9.64e-14
-* 4.230e-05        0006        3.83e-15
-* 8.748e-10        0006        7.67e-20
-* 6.804e-16        0000        7.67e-20
-max_df:124
-T=3.18,    Number of active cells:       2644
-   Number of degrees of freedom: 11296
-NonLin Res:       Lin Iter     Lin Res
-______________________________________
-* 1.674e-02        0007        9.29e-14
-* 3.306e-05        0007        8.07e-17
-* 4.660e-10        0006        4.05e-20
-* 6.898e-16        0000        4.05e-20
-max_df:128
-T=3.2,    Number of active cells:       2647
-   Number of degrees of freedom: 11312
-NonLin Res:       Lin Iter     Lin Res
-______________________________________
+...
+T=0.08
+   Number of active cells:       1792
+   Number of degrees of freedom: 7656
+
+   NonLin Res     Lin Iter       Lin Res
+   _____________________________________
+   2.424e-02        0008        1.56e-13
+   7.498e-05        0008        1.10e-15
+   8.871e-09        0008        8.58e-20
+   5.998e-16        (converged)
+
+T=0.1
+   Number of active cells:       1798
+   Number of degrees of freedom: 7672
+
+   NonLin Res     Lin Iter       Lin Res
+   _____________________________________
+   2.563e-02        0008        1.95e-13
+   9.165e-05        0008        1.10e-15
+   1.234e-08        0008        8.08e-20
+   9.282e-16        (converged)
+
+T=0.12
+   Number of active cells:       1801
+   Number of degrees of freedom: 7676
+
+   NonLin Res     Lin Iter       Lin Res
+   _____________________________________
+   2.732e-02        0008        1.72e-13
+   1.147e-04        0008        1.15e-15
+   1.952e-08        0008        1.49e-19
+   1.432e-15        (converged)
 ...
 @endcode
 
-This output reports the progress of the Newton iterations and the time stepping.
+This output reports the progress of the Newton iterations and the time
+stepping. Note that our implementation of the Newton iteration indeed shows
+the expected quadratic convergence order: the norm of the nonlinear residual
+in each step is roughly the norm of the previous step squared. This leads to
+the very rapid convergence we can see here.
 
 The result of running these computations is a bunch of output files that we
 can pass to our visualization program of choice. When we collate them into a

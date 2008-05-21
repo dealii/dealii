@@ -180,7 +180,10 @@ $\mathbf z$, we arrive at a linear system for $\delta \mathbf W$:
 @f}
 This linear system is, in general, neither symmetric nor has any
 particular definiteness properties. We will either use a direct solver
-or Trilinos' GMRES implementation to solve it.
+or Trilinos' GMRES implementation to solve it. As will become apparent from
+the <a href="#Results">results shown below</a>, this fully implicit iteration
+converges very rapidly (typically in 3 steps) and with the quadratic
+convergence order expected from a Newton method.
 
 
 <h3> Auto-Differentiation </h3>
