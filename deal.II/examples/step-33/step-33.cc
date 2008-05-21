@@ -3045,7 +3045,7 @@ void ConservationLaw<dim>::run ()
 		<< std::endl
 		<< std::endl;
       
-      std::cout << "   NonLin Res:       Lin Iter     Lin Res" << std::endl
+      std::cout << "   NonLin Res     Lin Iter     Lin Res" << std::endl
 		<< "   ______________________________________" << std::endl;
 
 				       // Then comes the inner Newton
@@ -3105,7 +3105,7 @@ void ConservationLaw<dim>::run ()
 	  const double res_norm = right_hand_side.l2_norm();
 	  if (std::fabs(res_norm) < 1e-10)
 	    {
-	      std::printf("     %-16.3e (converged)\n\n", res_norm);
+	      std::printf("   %-16.3e (converged)\n\n", res_norm);
 	      break;
 	    }
 	  else
@@ -3117,7 +3117,7 @@ void ConservationLaw<dim>::run ()
 	    
 	      current_solution += newton_update;
 	    
-	      std::printf("     %-16.3e %04d        %-5.2e\n",
+	      std::printf("   %-16.3e %04d        %-5.2e\n",
 			  res_norm, convergence.first, convergence.second);
 	    }
 
