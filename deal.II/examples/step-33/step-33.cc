@@ -3045,8 +3045,8 @@ void ConservationLaw<dim>::run ()
 		<< std::endl
 		<< std::endl;
       
-      std::cout << "   NonLin Res     Lin Iter     Lin Res" << std::endl
-		<< "   ______________________________________" << std::endl;
+      std::cout << "   NonLin Res     Lin Iter       Lin Res" << std::endl
+		<< "   _____________________________________" << std::endl;
 
 				       // Then comes the inner Newton
 				       // iteration to solve the nonlinear
