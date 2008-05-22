@@ -2,7 +2,7 @@
 //    $Id$
 //    Version: $Name$
 //
-//    Copyright (C) 1998, 1999, 2000, 2001, 2002, 2003, 2004, 2005, 2006, 2007 by the deal.II authors
+//    Copyright (C) 1998, 1999, 2000, 2001, 2002, 2003, 2004, 2005, 2006, 2007, 2008 by the deal.II authors
 //
 //    This file is subject to QPL and may not be  distributed
 //    without copyright and license information. Please refer
@@ -1086,11 +1086,11 @@ MGDoFHandler<dim>::begin_active_hex (const unsigned int level) const
 
 
 
-				 // We can't ask the respective tria->-function here, as
+				 // We can't ask the respective tria-function here, as
 				 // that would include dereferencing a past-the-end iterator
 				 // which is not allowed. Therefore we have to repeat the
 				 // code from tria.cc
-				 // This is valid for all functions whisch return past the
+				 // This is valid for all functions that return past the
 				 // end iterators, namely all functions end_*()
 template <int dim>
 typename MGDoFHandler<dim>::raw_line_iterator
