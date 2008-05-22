@@ -3124,23 +3124,33 @@ void ConservationLaw<dim>::run ()
 				       // do various post convergence tasks
 				       // here:
 				       //
-				       // First, we update the time and
-				       // produce graphical output if so
-				       // desired. Then we update a predictor
-				       // for the solution at the next time
-				       // step by approximating $\mathbf
-				       // w^{n+1}\approx \frac 32 \mathbf w^n
-				       // -\frac 12 \mathbf w^{n-1}$ to try
-				       // and make adaptivity work better.
-				       // The idea is to try and refine ahead
-				       // of a front, rather than stepping
-				       // into a coarse set of elements and
-				       // smearing the old_solution.  This
-				       // simple time extrapolator does the
-				       // job. With this, we then refine the
-				       // mesh if so desired by the user, and
-				       // finally continue on with the next
-				       // time step:
+				       // First, we update the time
+				       // and produce graphical output
+				       // if so desired. Then we
+				       // update a predictor for the
+				       // solution at the next time
+				       // step by approximating
+				       // $\mathbf w^{n+1}\approx
+				       // \mathbf w^n + \delta t
+				       // \frac{\partial \mathbf
+				       // w}{\partial t} \approx
+				       // \mathbf w^n + \delta t \;
+				       // \frac{\mathbf w^n-\mathbf
+				       // w^{n-1}}{\delta t} = 2
+				       // \mathbf w^n - \mathbf
+				       // w^{n-1}$ to try and make
+				       // adaptivity work better.  The
+				       // idea is to try and refine
+				       // ahead of a front, rather
+				       // than stepping into a coarse
+				       // set of elements and smearing
+				       // the old_solution.  This
+				       // simple time extrapolator
+				       // does the job. With this, we
+				       // then refine the mesh if so
+				       // desired by the user, and
+				       // finally continue on with the
+				       // next time step:
       time += parameters.time_step;
 
       if (parameters.output_step < 0)
