@@ -152,3 +152,74 @@ We can also visualize the evolution of the adaptively refined grid:
 The adaptivity follows and preceeds the flow pattern, based on the heuristic
 refinement scheme discussed above.
 
+
+
+
+<a name="extensions"></a>
+<h3>Possibilities for extensions</h3>
+
+<h4>Adaptive time stepping</h4>
+
+In the computations shown above, we use a fixed time step. This would
+appear sub-optimal: we should take larger steps whenever the problem
+is still solvable with Newton's method in 3 or 4 iterations; certainly
+more importantly we should take smaller steps whenever we can't solve
+the problem at hand any more with Newton's method. The latter is what
+happens to the calculation the screen output of which was shown above:
+@code
+@endcode
+If this happens, it would be nice if we could either (i) detect the
+problem up front and reduce the time step before we even start the
+time step, or (ii) accept the failure at this time step and then
+simply start over from the previous time step trying with a reduced
+step size.
+
+
+<h4>Stabilization</h4>
+
+The numerical scheme we have chosen is not particularly
+stable. Furthermore, it is known how to make it more stable, for
+example by using streamline diffusion or least-squares stabilization
+terms.
+
+
+<h4>Better linear solvers</h4>
+
+While the Newton method as a nonlinear solver appears to work very
+well if the time step is small enough, the linear solver can be
+improved. For example, in the current scheme whenever we use an
+iterative solver, an ILU is computed anew for each Newton step;
+likewise, for the direct solver, an LU decomposition of the Newton
+matrix is computed in each step. This is obviously wasteful: from one
+Newton step to another, and probably also between time steps, the
+Newton matrix does not radically change: an ILU or a sparse LU
+decomposition for one Newton step is probably still a very good
+preconditioner for the next Newton or time step. Avoiding the
+recomputation would therefore be a good way to reduce the amount of
+compute time.
+
+One could drive this a step further: since close to convergence the
+Newton matrix changes only a little bit, one may be able to define a
+quasi-Newton scheme where we only re-compute the residual (i.e. the
+right hand side vector) in each Newton iteration, and re-use the
+Newton matrix. The resulting scheme will likely not be of quadratic
+convergence order, and we have to expect to do a few more nonlinear
+iterations; however, given that we don't have to spend the time to
+build the Newton matrix each time, the resulting scheme may well be
+faster.
+
+
+<h4>Other conservation laws</h4>
+
+Finally, as a direction beyond the immediate solution of the Euler
+equations, this program tries very hard to separate the implementation
+of everything that is specific to the Euler equations into one class
+(the <code>EulerEquation</code> class), and everything that is
+specific to assembling the matrices and vectors, nonlinear and linear
+solvers, and the general top-level logic into another (the
+<code>ConservationLaw</code> class).
+
+By replacing the definitions of flux matrices and numerical fluxes in
+this class, as well as the various other parts defined there, it
+should be possible to apply the <code>ConservationLaw</code> class to
+other hyperbolic conservation laws as well.
