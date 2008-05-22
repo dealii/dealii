@@ -79,6 +79,6 @@ end
 # --------------------------------------------------
 # Flux parameters
 subsection flux
- set stab = mesh
+ set stab = constant
  #set stab value = 1.0
 end
