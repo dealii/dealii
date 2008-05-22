@@ -133,7 +133,9 @@ This output reports the progress of the Newton iterations and the time
 stepping. Note that our implementation of the Newton iteration indeed shows
 the expected quadratic convergence order: the norm of the nonlinear residual
 in each step is roughly the norm of the previous step squared. This leads to
-the very rapid convergence we can see here.
+the very rapid convergence we can see here. This holds at least for
+times up to $t=8.32$ at which time the nonlinear iteration reports a
+lack of convergence; the cause and possible remedies are discussed below.
 
 The result of running these computations is a bunch of output files that we
 can pass to our visualization program of choice. When we collate them into a
@@ -167,12 +169,64 @@ more importantly we should take smaller steps whenever we can't solve
 the problem at hand any more with Newton's method. The latter is what
 happens to the calculation the screen output of which was shown above:
 @code
+...
+
+T=8.3
+   Number of active cells:       2314
+   Number of degrees of freedom: 10264
+
+   NonLin Res     Lin Iter       Lin Res
+   _____________________________________
+   4.069e-02        0018        3.74e-12
+   3.570e-04        0020        6.83e-15
+   8.349e-07        0020        2.51e-17
+   2.858e-11        (converged)
+
+T=8.32
+   Number of active cells:       2320
+   Number of degrees of freedom: 10292
+
+   NonLin Res     Lin Iter       Lin Res
+   _____________________________________
+   5.607e-02        0240        4.36e-12
+   5.807e-04        0300        1.54e-05
+   1.538e-05        0300        1.22e-05
+   1.218e-05        0300        9.15e-06
+   9.146e-06        0300        4.27e-06
+   4.264e-06        0300        3.69e-06
+   3.693e-06        0300        3.31e-06
+   3.308e-06        0300        2.81e-06
+   2.809e-06        0300        2.77e-07
+   2.781e-07        0300        2.33e-07
+   2.328e-07        0300        1.89e-07
+
+
+----------------------------------------------------
+Exception on processing: 
+--------------------------------------------------------
+An error occurred in line <3119> of file <step-33.cc> in function
+    void ConservationLaw<dim>::run() [with int dim = 2]
+The violated condition was: 
+    nonlin_iter <= 10
+The name and call sequence of the exception was:
+    ExcMessage ("No convergence in nonlinear solver")
+Additional Information: 
+No convergence in nonlinear solver
+--------------------------------------------------------
+
+Aborting!
+----------------------------------------------------
 @endcode
-If this happens, it would be nice if we could either (i) detect the
-problem up front and reduce the time step before we even start the
-time step, or (ii) accept the failure at this time step and then
-simply start over from the previous time step trying with a reduced
-step size.
+
+From looking at the graphical output, it isn't immediately clear if
+there is a physical event that triggers this breakdown. However,
+whatever the matter, the solver should certainly not just break down.
+
+If this happens nevertheless, it would be nice if we could either (i)
+detect the problem up front and reduce the time step before we even
+start the time step, or (ii) accept the failure at this time step and
+then simply start over from the previous time step trying with a
+reduced step size.
 
 
 <h4>Stabilization</h4>
