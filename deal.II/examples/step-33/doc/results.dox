@@ -71,14 +71,14 @@ end
 # --------------------------------------------------
 # Output frequency and kind
 subsection output
+  set step           = 0.01
   set schlieren plot = true
-  set step = 0.01
 end
 
 # --------------------------------------------------
 # Refinement control
 subsection refinement
-  set refinement = true
+  set refinement = true # none only other option
   set shock value = 1.5
   set shock levels = 1 # how many levels of refinement to allow
 end
@@ -86,7 +86,7 @@ end
 # --------------------------------------------------
 # Flux parameters
 subsection flux
- set stab = mesh
+ set stab = constant
  #set stab value = 1.0
 end
 @endverbatim
@@ -94,38 +94,38 @@ end
 When we run the program, we get the following kind of output:
 @code
 ...
-T=0.08
-   Number of active cells:       1792
-   Number of degrees of freedom: 7656
-
-   NonLin Res     Lin Iter       Lin Res
-   _____________________________________
-   2.424e-02        0008        1.56e-13
-   7.498e-05        0008        1.10e-15
-   8.871e-09        0008        8.58e-20
-   5.998e-16        (converged)
-
-T=0.1
-   Number of active cells:       1798
-   Number of degrees of freedom: 7672
-
-   NonLin Res     Lin Iter       Lin Res
-   _____________________________________
-   2.563e-02        0008        1.95e-13
-   9.165e-05        0008        1.10e-15
-   1.234e-08        0008        8.08e-20
-   9.282e-16        (converged)
-
-T=0.12
+T=0.14
    Number of active cells:       1801
    Number of degrees of freedom: 7676
 
    NonLin Res     Lin Iter       Lin Res
    _____________________________________
-   2.732e-02        0008        1.72e-13
-   1.147e-04        0008        1.15e-15
-   1.952e-08        0008        1.49e-19
-   1.432e-15        (converged)
+   1.033e-02        0007        7.41e-13
+   4.079e-05        0007        3.24e-15
+   3.475e-09        0008        1.75e-20
+   5.441e-16        (converged)
+
+T=0.16
+   Number of active cells:       1804
+   Number of degrees of freedom: 7684
+
+   NonLin Res     Lin Iter       Lin Res
+   _____________________________________
+   1.116e-02        0007        9.05e-13
+   5.045e-05        0007        4.37e-15
+   4.986e-09        0008        3.80e-20
+   5.720e-16        (converged)
+
+T=0.18
+   Number of active cells:       1807
+   Number of degrees of freedom: 7696
+
+   NonLin Res     Lin Iter       Lin Res
+   _____________________________________
+   1.241e-02        0007        2.82e-13
+   7.053e-05        0007        3.71e-15
+   9.275e-09        0007        3.89e-19
+   6.131e-16        (converged)
 ...
 @endcode
 
