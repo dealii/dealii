@@ -305,5 +305,39 @@ InitialConditions or BoundaryConditions will be declared in the
 program below.
 
 
+<h3>Implementation</h3>
 
+The implementation of this program is split into three essential parts:
+<ul>
+  <li>The <code>EulerEquations</code> class that encapsulates everything that
+  completely describes the specifics of the Euler equations. This includes the
+  flux matrix $\mathbf F(\mathbf W)$, the numerical flux $\mathbf F(\mathbf
+  W^+,\mathbf W^-,\mathbf n)$, the right hand side $\mathbf G(\mathbf W)$,
+  boundary conditions, refinement indicators, postprocessing the output, and
+  similar things that require knowledge of the meaning of the individual
+  components of the solution vectors and the equations.
+
+  <li>A namespace that deals with everything that has to do with run-time
+  parameters. 
+
+  <li>The <code>ConservationLaw</code> class that deals with time stepping,
+  outer nonlinear and inner linear solves, assembling the linear systems, and
+  the top-level logic that drives all this. 
+</ul>
+
+The reason for this approach is that it separates the various concerns in a
+program: the <code>ConservationLaw</code> is written in such a way that it
+would be relatively straightforward to adapt it to a different set of
+equations: One would simply re-implement the members of the
+<code>EulerEquations</code> class for some other hyperbolic equation, or
+augment the existing equations by additional ones (for example by advecting
+additional variables, or my adding chemistry, etc). Such modifications,
+however, would not affect the time stepping, or the nonlinear solvers if
+correctly done, and consequently nothing in the <code>ConservationLaw</code>
+would have to be modified.
+
+Similarly, if we wanted to improve on the linear or nonlinear solvers, or on
+the time stepping scheme (as hinted at at the end of the <a
+href="#Results">results section</a>), then this would not require changes in
+the <code>EulerEquations</code> at all.
 
