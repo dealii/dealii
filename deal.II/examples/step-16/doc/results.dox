@@ -3,7 +3,7 @@
 Since this example solves the same problem as @ref step_5 "step-5", we
 refer to the graphical output there. The only difference between the two is the solver. Let us compare the iteration steps needed to obtain convergence for the two methods:
 <table>
-<tr><th>cells</th><th>step-5</th><th><step-16></th><\tr>
+<tr><th>cells</th><th>step-5</th><th>step-16</th></tr>
 <tr><td>20</td>   <td>13</td> <td>6</td> </tr>
 <tr><td>80</td>   <td>18</td> <td>8</td> </tr>
 <tr><td>320</td>  <td>29</td> <td>9</td> </tr>
