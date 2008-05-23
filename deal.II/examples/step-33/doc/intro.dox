@@ -3,7 +3,7 @@
 <i>
 This program was written for fun by David Neckels (NCAR) while working
 at Sandia (on the Wyoming Express bus to and from Corrales each day).
-The main purpose was to better understand Euler flow.  
+The main purpose was to better understand Euler flow.
 The code solves the basic Euler equations of gas dynamics, by using a
 fully implicit Newton iteration (inspired by Sandia's Aria code).  The
 code may be configured by an input deck to run different simulations
@@ -39,7 +39,7 @@ a basic system of conservation laws. In spatial dimension $d$ they read
 with the solution $\mathbf{w}=(\rho v_1,\ldots,\rho v_d,\rho,
 E)^{\top}$ consisting of $\rho$ the fluid density, ${\mathbf v}=(v_1,\ldots v_d)^T$ the
 flow velocity (and thus $\rho\mathbf v$ being the linear momentum
-density), and 
+density), and
 $E$ the energy density of the gas. We interpret the equations above as
 $\partial_t \mathbf{w}_i + \nabla \cdot \mathbf{F}_i(\mathbf{w}) = \mathbf
 G_i(\mathbf w)$, $i=1,\ldots,dim+2$.
@@ -80,7 +80,7 @@ With this, the entire system of equations reads:
   \partial_t (\rho v_i) + \sum_{s=1}^d \frac{\partial(\rho v_i v_s +
   \delta_{is} p)}{\partial x_s} &=& g_i \rho, \qquad i=1,\dots,d, \\
   \partial_t \rho + \sum_{s=1}^d \frac{\partial(\rho v_s)}{\partial x_s} &=& 0,  \\
-  \partial_t E + \sum_{s=1}^d \frac{\partial((E+p)v_s)}{\partial x_s} &=& 
+  \partial_t E + \sum_{s=1}^d \frac{\partial((E+p)v_s)}{\partial x_s} &=&
   \rho \mathbf g \cdot \mathbf v.
 @f}
 These equations describe, respectively, the conservation of momentum,
@@ -114,10 +114,10 @@ The diffusion term $h^{\eta}(\nabla \mathbf{w} , \nabla \mathbf{z})$ is introduc
 On the boundary, we have to say what the outer trace $\mathbf{w}^-$ is.
 Depending on the boundary condition, we prescribe either of the following:
 <ul>
-<li> Inflow boundary: $\mathbf{w}^-$ is prescribed to be the desired value.  
+<li> Inflow boundary: $\mathbf{w}^-$ is prescribed to be the desired value.
 <li> Supersonic outflow boundary: $\mathbf{w}^- = \mathbf{w}^+$
 <li> Subsonic outflow boundary: $\mathbf{w}^- = \mathbf{w}^+$ except that the energy variable
-is modified to support a prescribed pressure $p_o$, i.e. 
+is modified to support a prescribed pressure $p_o$, i.e.
 $\mathbf{w}^- =(\rho^+, \rho v_1^+, \dots, \rho v_d^+, p_o/(\gamma -1) + 0.5 \rho |\mathbf{v}^+|^2)$
 <li> Reflective boundary: we set $\mathbf{w}^-$ so that $(\mathbf{v}^+ + \mathbf{v}^-) \cdot \mathbf{n} = 0$ and
 $\rho^- = \rho^+,E^-=E^+$.
@@ -129,22 +129,22 @@ Compressible Euler Equations", PhD thesis, University of Heidelberg, 2002).
 
 We use a time stepping scheme to substitute the time derivative in the
 above equations. At each time step, our full discretization is thus
-that the residual applied to any test 
+that the residual applied to any test
 function $\mathbf z$ equals zero:
 @f{eqnarray*}
-R(\mathbf{W}_{n+1})(\mathbf z) &=& 
+R(\mathbf{W}_{n+1})(\mathbf z) &=&
 \int_{\Omega} \left(\frac{\mathbf{w}_{n+1} - \mathbf{w}_n}{\delta t},
 \mathbf{z}\right)
 - \int_{\Omega} \left(\mathbf{F}(\tilde{\mathbf{w}}),
-\nabla\mathbf{z}\right) +  h^{\eta}(\nabla \mathbf{w} , \nabla \mathbf{z}) 
+\nabla\mathbf{z}\right) +  h^{\eta}(\nabla \mathbf{w} , \nabla \mathbf{z})
 \\
 && \qquad
 +
 \int_{\partial \Omega} \left(\mathbf{H}(\tilde{\mathbf{w}}^+),
-\mathbf{w}^-(\tilde{\mathbf{w}}^+), \mathbf{n}), \mathbf{z}\right) 
+\mathbf{w}^-(\tilde{\mathbf{w}}^+), \mathbf{n}), \mathbf{z}\right)
 -
 \int_{\partial \Omega} \left(\mathbf{G}(\mathbf{w}),
-\mathbf{z}\right) 
+\mathbf{z}\right)
 \\
 & = & 0
 @f}
@@ -165,7 +165,7 @@ applied, and $\delta T$ the current time step.
 
 With these choices, equating the residual to zero results in a
 nonlinear system of equations which we solve the nonlinear system by a
-Newton iteration, i.e. by iterating 
+Newton iteration, i.e. by iterating
 @f{eqnarray*}
 R'(\mathbf{W}^k,\delta \mathbf{W})(\mathbf z) & = & -
 R(\mathbf{W}^{k})(\mathbf z) \qquad \qquad \forall \mathbg z\in V_h \\
@@ -201,7 +201,7 @@ and then denotes some of this collection as degrees of freedom, the rest of
 the variables being functions of the independent variables.  These
 variables are used in an algorithm, and as the variables are used,
 their sensitivities with respect to the degrees of freedom are
-continuously updated.  
+continuously updated.
 
 One can imagine that for the full Jacobian,
 this could be prohibitively expensive: the number of independent variables are
@@ -252,7 +252,7 @@ main() {
 @endcode
 
 The output are the derivatives $\frac{\partial c(a,b)}{\partial a},
-\frac{\partial c(a,b)}{\partial b}$ of $c(a,b)=2a+\cos(ab)$ at $a=1,b=2$. 
+\frac{\partial c(a,b)}{\partial b}$ of $c(a,b)=2a+\cos(ab)$ at $a=1,b=2$.
 
 It should be noted that Sacado provides more auto-differentation capabilities than the small subset
 used in this program.  However, understanding the example above is
@@ -270,7 +270,7 @@ within the example.
 
 <h3> Adaptivity </h3>
 The example uses an ad-hoc refinement indicator that shows some usefulness in shock-type problems, and
-in the downhill flow example included.  We refine according to the squared gradient of the density.  
+in the downhill flow example included.  We refine according to the squared gradient of the density.
 Hanging nodes are handled by computing the numerical flux across cells that are of differing
 refinement levels, rather than using the ConstraintMatrix class as in
 all other tutorial programs so far.  In this way, the example combines
@@ -281,7 +281,7 @@ freedom through the automatic differentiation used to compute it.
 Further, we enforce a maximum number of refinement levels to keep refinement under check.  It is the
 author's experience that for adaptivity for a time dependent problem, refinement can easily lead the simulation to
 a screeching halt, because of time step restrictions if the mesh
-becomes to fine in any part of the domain, if care is not taken.  The amount of refinement is
+becomes too fine in any part of the domain, if care is not taken.  The amount of refinement is
 limited in the example by letting the user specify the
 maximum level of refinement that will be present anywhere in the mesh.  In this way, refinement
 tends not to slow the simulation to a halt.  This, of course, is purely a heuristic strategy, and
@@ -291,7 +291,7 @@ if the author's advisor heard about it, the author would likely be exiled foreve
 <h3>Input deck, initial and boundary conditions</h3>
 
 We use an input file deck to drive the simulation.  In this way, we can alter the boundary conditions
-and other important properties of the simulation without having to recompile.  For more information on 
+and other important properties of the simulation without having to recompile.  For more information on
 the format, look at the <a href="#Results">results section</a>, where we
 describe an example input file in more detail.
 
@@ -318,11 +318,11 @@ The implementation of this program is split into three essential parts:
   components of the solution vectors and the equations.
 
   <li>A namespace that deals with everything that has to do with run-time
-  parameters. 
+  parameters.
 
   <li>The <code>ConservationLaw</code> class that deals with time stepping,
   outer nonlinear and inner linear solves, assembling the linear systems, and
-  the top-level logic that drives all this. 
+  the top-level logic that drives all this.
 </ul>
 
 The reason for this approach is that it separates the various concerns in a
@@ -331,7 +331,7 @@ would be relatively straightforward to adapt it to a different set of
 equations: One would simply re-implement the members of the
 <code>EulerEquations</code> class for some other hyperbolic equation, or
 augment the existing equations by additional ones (for example by advecting
-additional variables, or my adding chemistry, etc). Such modifications,
+additional variables, or by adding chemistry, etc). Such modifications,
 however, would not affect the time stepping, or the nonlinear solvers if
 correctly done, and consequently nothing in the <code>ConservationLaw</code>
 would have to be modified.

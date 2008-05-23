@@ -110,7 +110,7 @@ using namespace dealii;
 				 // introduction. We group all this into a
 				 // structure that defines everything that has
 				 // to do with the flux. All members of this
-				 // structures are static, i.e. the structure
+				 // structure are static, i.e. the structure
 				 // has no actual state specified by instance
 				 // member variables. The better way to do
 				 // this, rather than a structure with all
@@ -124,7 +124,7 @@ template <int dim>
 struct EulerEquations
 {
 				     // @sect4{Component description}
-    
+
 				     // First a few variables that
 				     // describe the various components of our
 				     // solution vector in a generic way. This
@@ -188,13 +188,13 @@ struct EulerEquations
 	  .push_back (DataComponentInterpretation::component_is_scalar);
 	data_component_interpretation
 	  .push_back (DataComponentInterpretation::component_is_scalar);
-	
+
 	return data_component_interpretation;
       }
-    
-    
+
+
 				     // @sect4{Transformations between variables}
-    
+
 				     // Next, we define the gas
 				     // constant. We will set it to 1.4
 				     // in its definition immediately
@@ -270,11 +270,11 @@ struct EulerEquations
 	return ((gas_gamma-1.0) *
 		(*(W.begin() + energy_component) -
 		 compute_kinetic_energy<number>(W)));
-      }	
+      }
 
 
-				     // @sect4{EulerEquations::compute_flux_matrix}    
-    
+				     // @sect4{EulerEquations::compute_flux_matrix}
+
 				     // We define the flux function
 				     // $F(W)$ as one large matrix.
 				     // Each row of this matrix
@@ -317,7 +317,7 @@ struct EulerEquations
 					 // matrix that correspond to the
 					 // momentum terms:
 	const number pressure = compute_pressure<number> (W);
-	
+
 	for (unsigned int d=0; d<dim; ++d)
 	  {
 	    for (unsigned int e=0; e<dim; ++e)
@@ -325,17 +325,17 @@ struct EulerEquations
 		= W[first_momentum_component+d] *
 		W[first_momentum_component+e] /
 		W[density_component];
-	  
+
 	    flux[first_momentum_component+d][d] += pressure;
 	  }
-	
+
 					 // Then the terms for the
 					 // density (i.e. mass
 					 // conservation), and,
 					 // lastly, conservation of
 					 // energy:
 	for (unsigned int d=0; d<dim; ++d)
-	  flux[density_component][d] = W[first_momentum_component+d]; 
+	  flux[density_component][d] = W[first_momentum_component+d];
 
 	for (unsigned int d=0; d<dim; ++d)
 	  flux[energy_component][d] = W[first_momentum_component+d] /
@@ -366,16 +366,16 @@ struct EulerEquations
       {
 	Sacado::Fad::DFad<double> iflux[n_components][dim];
 	Sacado::Fad::DFad<double> oflux[n_components][dim];
-	  
+
 	compute_flux_matrix (Wplus, iflux);
 	compute_flux_matrix (Wminus, oflux);
-	  
+
 	for (unsigned int di=0; di<n_components; ++di)
 	  {
 	    normal_flux[di] = 0;
-	    for (unsigned int d=0; d<dim; ++d) 
+	    for (unsigned int d=0; d<dim; ++d)
 	      normal_flux[di] += 0.5*(iflux[di][d] + oflux[di][d]) * normal[d];
-	      
+
 	    normal_flux[di] += 0.5*alpha*(Wplus[di] - Wminus[di]);
 	  }
       }
@@ -527,8 +527,8 @@ struct EulerEquations
 	      {
 		Wminus[c] = Wplus[c];
 		break;
-	      }	    
-		
+	      }
+
 					       // Prescribed pressure boundary
 					       // conditions are a bit more
 					       // complicated by the fact that
@@ -563,7 +563,7 @@ struct EulerEquations
 
 		Wminus[c] = boundary_values(c) / (gas_gamma-1.0) +
 			    kinetic_energy;
-		  
+
 		break;
 	      }
 
@@ -588,7 +588,7 @@ struct EulerEquations
 
 	      default:
 		    Assert (false, ExcNotImplemented());
-	    }    
+	    }
       }
 
 
@@ -622,8 +622,8 @@ struct EulerEquations
     compute_refinement_indicators (const DoFHandler<dim> &dof_handler,
 				   const Mapping<dim>    &mapping,
 				   const Vector<double>  &solution,
-				   Vector<double>        &refinement_indicators) 
-      {  
+				   Vector<double>        &refinement_indicators)
+      {
 	const unsigned int dofs_per_cell = dof_handler.get_fe().dofs_per_cell;
 	std::vector<unsigned int> dofs (dofs_per_cell);
 
@@ -634,7 +634,7 @@ struct EulerEquations
 
 	std::vector<std::vector<Tensor<1,dim> > >
 	  dU (1, std::vector<Tensor<1,dim> >(n_components));
-  
+
 	typename DoFHandler<dim>::active_cell_iterator
 	  cell = dof_handler.begin_active(),
 	  endc = dof_handler.end();
@@ -647,13 +647,13 @@ struct EulerEquations
 	      = std::log(1+
 			 std::sqrt(dU[0][density_component] *
 				   dU[0][density_component]));
-	  } 
+	  }
       }
-    
-    
-    
+
+
+
 				     // @sect4{EulerEquations::Postprocessor}
-    
+
 				     // Finally, we declare a class that
 				     // implements a postprocessing of data
 				     // components. The problem this class
@@ -673,14 +673,14 @@ struct EulerEquations
 				     // possibility to generate schlieren
 				     // plots. Schlieren plots are a way to
 				     // visualize shocks and other sharp
-				     // interfaces. The word "schlieren" a
+				     // interfaces. The word "schlieren" is a
 				     // German word that may be translated as
 				     // "striae" -- it may be simpler to
 				     // explain it by an example, however:
 				     // schlieren is what you see when you,
 				     // for example, pour highly concentrated
 				     // alcohol, or a transparent saline
-				     // solution into water; the two have the
+				     // solution, into water; the two have the
 				     // same color, but they have different
 				     // refractive indices and so before they
 				     // are fully mixed light goes through the
@@ -688,7 +688,7 @@ struct EulerEquations
 				     // brightness variations if you look at
 				     // it. That's "schlieren". A similar
 				     // effect happens in compressible flow
-				     // due because the refractive index
+				     // because the refractive index
 				     // depends on the pressure (and therefore
 				     // the density) of the gas.
 				     //
@@ -722,7 +722,7 @@ struct EulerEquations
     {
       public:
 	Postprocessor (const bool do_schlieren_plot);
-	
+
 	virtual
 	void
 	compute_derived_quantities_vector (const std::vector<Vector<double> >              &uh,
@@ -732,11 +732,11 @@ struct EulerEquations
 					   std::vector<Vector<double> >                    &computed_quantities) const;
 
 	virtual std::vector<std::string> get_names () const;
-    
+
 	virtual
 	std::vector<DataComponentInterpretation::DataComponentInterpretation>
 	get_data_component_interpretation () const;
-    
+
 	virtual UpdateFlags get_needed_update_flags () const;
 
 	virtual unsigned int n_output_variables() const;
@@ -745,7 +745,7 @@ struct EulerEquations
 	const bool do_schlieren_plot;
     };
 };
-    
+
 
 template <int dim>
 const double EulerEquations<dim>::gas_gamma = 1.4;
@@ -895,7 +895,7 @@ UpdateFlags
 EulerEquations<dim>::Postprocessor::
 get_needed_update_flags () const
 {
-  if (do_schlieren_plot == true)  
+  if (do_schlieren_plot == true)
     return update_values | update_gradients;
   else
     return update_values;
@@ -1020,7 +1020,7 @@ namespace Parameters
 				   //   perturbation that is added to the
 				   //   diagonal before forming the prec,
 				   //   and RTOL is a scaling factor $rtol
-				   //   >= 1$.
+				   //   \geq 1$.
 				   // - ilut_drop: The ILUT will
 				   //   drop any values that
 				   //   have magnitude less than this value.
@@ -1034,11 +1034,11 @@ namespace Parameters
 				   // ParameterHandler::declare_entry
 				   // call in
 				   // <code>declare_parameters()</code>.
-  struct Solver 
+  struct Solver
   {
       enum SolverType { gmres, direct };
       SolverType solver;
-      
+
       enum  OutputType { quiet, verbose };
       OutputType output;
 
@@ -1089,10 +1089,10 @@ namespace Parameters
     }
     prm.leave_subsection();
   }
-  
-    
 
-  
+
+
+
   void Solver::parse_parameters (ParameterHandler &prm)
   {
     prm.enter_subsection("linear solver");
@@ -1102,9 +1102,9 @@ namespace Parameters
 	output = verbose;
       if (op == "quiet")
 	output = quiet;
-    
+
       const std::string sv = prm.get("method");
-      if (sv == "direct") 
+      if (sv == "direct")
 	solver = direct;
       else if (sv == "gmres")
 	solver = gmres;
@@ -1116,11 +1116,11 @@ namespace Parameters
       ilut_rtol       = prm.get_double("ilut relative tolerance");
       ilut_drop       = prm.get_double("ilut drop tolerance");
     }
-    prm.leave_subsection();  
+    prm.leave_subsection();
   }
-  
 
-  
+
+
 				   // @sect4{Parameters::Refinement}
 				   //
 				   // Similarly, here are a few parameters
@@ -1167,7 +1167,7 @@ namespace Parameters
     }
     prm.leave_subsection();
   }
-  
+
 
   void Refinement::parse_parameters (ParameterHandler &prm)
   {
@@ -1179,7 +1179,7 @@ namespace Parameters
     }
     prm.leave_subsection();
   }
-  
+
 
 
 				   // @sect4{Parameters::Flux}
@@ -1199,13 +1199,13 @@ namespace Parameters
 				   // dependent value. In the latter case, it
 				   // is chosen as $\frac{h}{2\delta T}$ with
 				   // $h$ the diameter of the face to which
-				   // the flux is applied, and $\delta T$ 
+				   // the flux is applied, and $\delta T$
 				   // the current time step.
   struct Flux
   {
       enum StabilizationKind { constant, mesh_dependent };
       StabilizationKind stabilization_kind;
-      
+
       double stabilization_value;
 
       static void declare_parameters (ParameterHandler &prm);
@@ -1225,22 +1225,22 @@ namespace Parameters
 			Patterns::Double(),
 			"alpha stabilization");
     }
-    prm.leave_subsection();  
+    prm.leave_subsection();
   }
-  
-  
+
+
   void Flux::parse_parameters (ParameterHandler &prm)
   {
     prm.enter_subsection("flux");
     {
       const std::string stab = prm.get("stab");
-      if (stab == "constant") 
+      if (stab == "constant")
 	stabilization_kind = constant;
-      else if (stab == "mesh") 
+      else if (stab == "mesh")
 	stabilization_kind = mesh_dependent;
       else
 	AssertThrow (false, ExcNotImplemented());
-  
+
       stabilization_value = prm.get_double("stab value");
     }
     prm.leave_subsection();
@@ -1271,7 +1271,7 @@ namespace Parameters
   void Output::declare_parameters (ParameterHandler &prm)
   {
     prm.enter_subsection("output");
-    {  
+    {
       prm.declare_entry("schlieren plot", "true",
 			Patterns::Bool (),
 			"Whether or not to produce schlieren plots");
@@ -1281,7 +1281,7 @@ namespace Parameters
     }
     prm.leave_subsection();
   }
-  
+
 
 
   void Output::parse_parameters (ParameterHandler &prm)
@@ -1396,15 +1396,15 @@ namespace Parameters
       {
 	  typename EulerEquations<dim>::BoundaryKind
 	  kind[EulerEquations<dim>::n_components];
-	  
+
 	  FunctionParser<dim> values;
 
 	  BoundaryConditions ();
       };
-      
-      
+
+
       AllParameters ();
-      
+
       double diffusion_power;
 
       double time_step, final_time;
@@ -1415,7 +1415,7 @@ namespace Parameters
 
       FunctionParser<dim> initial_conditions;
       BoundaryConditions  boundary_conditions[max_n_boundaries];
-      
+
       static void declare_parameters (ParameterHandler &prm);
       void parse_parameters (ParameterHandler &prm);
   };
@@ -1434,7 +1434,7 @@ namespace Parameters
 		  :
 		  initial_conditions (EulerEquations<dim>::n_components)
   {}
-  
+
 
   template <int dim>
   void
@@ -1481,7 +1481,7 @@ namespace Parameters
 				"outflow",
 				Patterns::Selection("inflow|outflow|pressure"),
 				"<inflow|outflow|pressure>");
-      
+
 	      prm.declare_entry("w_" + Utilities::int_to_string(di) +
 				" value", "0.0",
 				Patterns::Anything(),
@@ -1526,7 +1526,7 @@ namespace Parameters
 	}
       else
 	is_stationary = false;
-      
+
       final_time = prm.get_double("final time");
       theta = prm.get_double("theta scheme value");
     }
@@ -1540,7 +1540,7 @@ namespace Parameters
 	{
 	  std::vector<std::string>
 	    expressions(EulerEquations<dim>::n_components, "0.0");
-    
+
 	  const bool no_penetration = prm.get_bool("no penetration");
 
 	  for (unsigned int di=0; di<EulerEquations<dim>::n_components; ++di)
@@ -1564,7 +1564,7 @@ namespace Parameters
 		AssertThrow (false, ExcNotImplemented());
 
 	      expressions[di] = prm.get("w_" + Utilities::int_to_string(di) +
-					" value");	      
+					" value");
 	    }
 
 	  boundary_conditions[boundary_id].values
@@ -1592,11 +1592,11 @@ namespace Parameters
     Parameters::Refinement::parse_parameters (prm);
     Parameters::Flux::parse_parameters (prm);
     Parameters::Output::parse_parameters (prm);
-  }  
+  }
 }
 
-  
-      
+
+
 
 				 // @sect3{Conservation law class}
 
@@ -1625,7 +1625,7 @@ class ConservationLaw
   public:
     ConservationLaw (const char *input_filename);
     void run ();
-    
+
   private:
     void setup_system ();
 
@@ -1676,14 +1676,14 @@ class ConservationLaw
 				     // not of sufficiently high
 				     // order.
     Triangulation<dim>   triangulation;
-    const MappingQ1<dim> mapping;    
-    
+    const MappingQ1<dim> mapping;
+
     const FESystem<dim>  fe;
     DoFHandler<dim>      dof_handler;
 
     const QGauss<dim>    quadrature;
     const QGauss<dim-1>  face_quadrature;
-    
+
                                      // Next come a number of data
                                      // vectors that correspond to the
                                      // solution of the previous time
@@ -1756,7 +1756,7 @@ class ConservationLaw
     Epetra_SerialComm               communicator;
     std::auto_ptr<Epetra_Map>       Map;
     std::auto_ptr<Epetra_CrsMatrix> Matrix;
- 
+
     Parameters::AllParameters<dim>  parameters;
     ConditionalOStream              verbose_cout;
 };
@@ -1821,7 +1821,7 @@ void ConservationLaw<dim>::setup_system ()
 					      dof_handler.n_dofs());
   DoFTools::make_sparsity_pattern (dof_handler, sparsity_pattern);
   sparsity_pattern.compress();
-  
+
   std::vector<int> row_lengths (dof_handler.n_dofs());
   for (unsigned int i=0; i<dof_handler.n_dofs(); ++i)
     row_lengths[i] = sparsity_pattern.row_length (i);
@@ -1843,18 +1843,18 @@ void ConservationLaw<dim>::setup_system ()
 
   const unsigned int max_nonzero_entries
     = *std::max_element (row_lengths.begin(), row_lengths.end());
-  
+
   std::vector<double> values(max_nonzero_entries, 0);
   std::vector<int> row_indices(max_nonzero_entries);
-  
+
   for (unsigned int row=0; row<dof_handler.n_dofs(); ++row)
     {
       row_indices.resize (row_lengths[row], 0);
       values.resize (row_lengths[row], 0.);
-      
+
       for (int i=0; i<row_lengths[row]; ++i)
 	row_indices[i] = sparsity_pattern.column_number (row, i);
-      
+
       Matrix->InsertGlobalValues(row, row_lengths[row],
 				 &values[0], &row_indices[0]);
     }
@@ -1918,7 +1918,7 @@ void ConservationLaw<dim>::assemble_system ()
 						 | update_JxW_values
 						 | update_normal_vectors,
 		    neighbor_face_update_flags = update_values;
-   
+
   FEValues<dim>        fe_v                  (mapping, fe, quadrature,
 					      update_flags);
   FEFaceValues<dim>    fe_v_face             (mapping, fe, face_quadrature,
@@ -1937,7 +1937,7 @@ void ConservationLaw<dim>::assemble_system ()
   typename DoFHandler<dim>::active_cell_iterator
     cell = dof_handler.begin_active(),
     endc = dof_handler.end();
-  for (; cell!=endc; ++cell) 
+  for (; cell!=endc; ++cell)
     {
       fe_v.reinit (cell);
       cell->get_dof_indices (dof_indices);
@@ -2040,7 +2040,7 @@ void ConservationLaw<dim>::assemble_system ()
 	      {
 		const unsigned int neighbor2=
 		  cell->neighbor_of_neighbor(face_no);
-		  
+
 		for (unsigned int subface_no=0;
 		     subface_no<GeometryInfo<dim>::subfaces_per_face;
 		     ++subface_no)
@@ -2066,7 +2066,7 @@ void ConservationLaw<dim>::assemble_system ()
 					dof_indices_neighbor,
 					false,
 					numbers::invalid_unsigned_int,
-					neighbor_child->diameter());		      
+					neighbor_child->diameter());
 		  }
 	      }
 
@@ -2105,7 +2105,7 @@ void ConservationLaw<dim>::assemble_system ()
 		fe_v_subface_neighbor.reinit (neighbor,
 					      neighbor_face_no,
 					      neighbor_subface_no);
-		      
+
 		assemble_face_term (face_no, fe_v_face,
 				    fe_v_subface_neighbor,
 				    dof_indices,
@@ -2115,7 +2115,7 @@ void ConservationLaw<dim>::assemble_system ()
 				    cell->face(face_no)->diameter());
 	      }
 	  }
-    } 
+    }
 
 				   // After all this assembling, notify the
 				   // Trilinos matrix object that the matrix
@@ -2216,7 +2216,7 @@ template <int dim>
 void
 ConservationLaw<dim>::
 assemble_cell_term (const FEValues<dim>             &fe_v,
-		    const std::vector<unsigned int> &dof_indices) 
+		    const std::vector<unsigned int> &dof_indices)
 {
   const unsigned int dofs_per_cell = fe_v.dofs_per_cell;
   const unsigned int n_q_points    = fe_v.n_quadrature_points;
@@ -2229,12 +2229,12 @@ assemble_cell_term (const FEValues<dim>             &fe_v,
 
   Table<2,Sacado::Fad::DFad<double> >
     W_theta (n_q_points, EulerEquations<dim>::n_components);
-  
+
   Table<3,Sacado::Fad::DFad<double> >
     grad_W (n_q_points, EulerEquations<dim>::n_components, dim);
 
   std::vector<double> residual_derivatives (dofs_per_cell);
-  
+
 				   // Next, we have to define the independent
 				   // variables that we will try to determine
 				   // by solving a Newton step. These
@@ -2244,7 +2244,7 @@ assemble_cell_term (const FEValues<dim>             &fe_v,
   std::vector<Sacado::Fad::DFad<double> > independent_local_dof_values(dofs_per_cell);
   for (unsigned int i=0; i<dofs_per_cell; ++i)
     independent_local_dof_values[i] = current_solution(dof_indices[i]);
-  
+
 				   // The next step incorporates all the
 				   // magic: we declare a subset of the
 				   // autodifferentiation variables as
@@ -2309,7 +2309,7 @@ assemble_cell_term (const FEValues<dim>             &fe_v,
     for (unsigned int i=0; i<dofs_per_cell; ++i)
       {
 	const unsigned int c = fe_v.get_fe().system_to_component_index(i).first;
-	
+
 	W[q][c] += independent_local_dof_values[i] *
 		   fe_v.shape_value_component(i, q, c);
 	W_old[q][c] += old_solution(dof_indices[i]) *
@@ -2320,7 +2320,7 @@ assemble_cell_term (const FEValues<dim>             &fe_v,
 			  (1-parameters.theta) *
 			  old_solution(dof_indices[i])) *
 			 fe_v.shape_value_component(i, q, c);
-	  
+
 	for (unsigned int d = 0; d < dim; d++)
 	  grad_W[q][c][d] += independent_local_dof_values[i] *
 			     fe_v.shape_grad_component(i, q, c)[d];
@@ -2343,13 +2343,13 @@ assemble_cell_term (const FEValues<dim>             &fe_v,
 
   typedef Sacado::Fad::DFad<double> ForcingVector[EulerEquations<dim>::n_components];
   ForcingVector *forcing = new ForcingVector[n_q_points];
-  
+
   for (unsigned int q=0; q<n_q_points; ++q)
     {
       EulerEquations<dim>::compute_flux_matrix (W_theta[q], flux[q]);
       EulerEquations<dim>::compute_forcing_vector (W_theta[q], forcing[q]);
     }
-  
+
 
 				   // We now have all of the pieces in place,
 				   // so perform the assembly.  We have an
@@ -2397,14 +2397,14 @@ assemble_cell_term (const FEValues<dim>             &fe_v,
 				   // entries.  Then, when we sum into the
 				   // <code>right_hand_side</code> vector,
 				   // we negate this residual.
-  for (unsigned int i=0; i<fe_v.dofs_per_cell; ++i) 
+  for (unsigned int i=0; i<fe_v.dofs_per_cell; ++i)
     {
       Sacado::Fad::DFad<double> F_i = 0;
 
       const unsigned int
 	component_i = fe_v.get_fe().system_to_component_index(i).first;
 
-				       // The residual for each row (i) will be accumulating 
+				       // The residual for each row (i) will be accumulating
 				       // into this fad variable.  At the end of the assembly
 				       // for this row, we will query for the sensitivities
 				       // to this variable and add them into the Jacobian.
@@ -2417,7 +2417,7 @@ assemble_cell_term (const FEValues<dim>             &fe_v,
 		   fe_v.shape_value_component(i, point, component_i) *
 		   fe_v.JxW(point);
 
-	  for (unsigned int d=0; d<dim; d++) 
+	  for (unsigned int d=0; d<dim; d++)
 	    F_i -= flux[point][component_i][d] *
 		   fe_v.shape_grad_component(i, point, component_i)[d] *
 		   fe_v.JxW(point);
@@ -2506,7 +2506,7 @@ ConservationLaw<dim>::assemble_face_term(const unsigned int           face_no,
 					 const std::vector<unsigned int>   &dof_indices_neighbor,
 					 const bool                   external_face,
 					 const unsigned int           boundary_id,
-					 const double                 face_diameter) 
+					 const double                 face_diameter)
 {
   const unsigned int n_q_points = fe_v.n_quadrature_points;
   const unsigned int dofs_per_cell = fe_v.dofs_per_cell;
@@ -2520,7 +2520,7 @@ ConservationLaw<dim>::assemble_face_term(const unsigned int           face_no,
   const unsigned int n_independent_variables = (external_face == false ?
 						2 * dofs_per_cell :
 						dofs_per_cell);
-  
+
   for (unsigned int i = 0; i < dofs_per_cell; i++)
     {
       independent_local_dof_values[i] = current_solution(dof_indices[i]);
@@ -2588,7 +2588,7 @@ ConservationLaw<dim>::assemble_face_term(const unsigned int           face_no,
 				   // of $W^-$ will be either functions of
 				   // $W^+$, or they will be prescribed,
 				   // depending on the kind of boundary
-				   // condition imposed here. 
+				   // condition imposed here.
 				   //
 				   // To start the evaluation, let us ensure
 				   // that the boundary id specified for this
@@ -2629,7 +2629,7 @@ ConservationLaw<dim>::assemble_face_term(const unsigned int           face_no,
 					     Wminus[q]);
     }
 
-  
+
 				   // Now that we have $\mathbf w^+$ and
 				   // $\mathbf w^-$, we can go about computing
 				   // the numerical flux function $\mathbf
@@ -2680,11 +2680,11 @@ ConservationLaw<dim>::assemble_face_term(const unsigned int           face_no,
 	  {
 	    const unsigned int
 	      component_i = fe_v.get_fe().system_to_component_index(i).first;
-	  
+
 	    F_i += normal_fluxes[point][component_i] *
 		   fe_v.shape_value_component(i, point, component_i) *
 		   fe_v.JxW(point);
-	  } 
+	  }
 
 	for (unsigned int k=0; k<dofs_per_cell; ++k)
 	  residual_derivatives[k] = F_i.fastAccessDx(k);
@@ -2694,7 +2694,7 @@ ConservationLaw<dim>::assemble_face_term(const unsigned int           face_no,
 				    reinterpret_cast<int*>(
 				      const_cast<unsigned int*>(
 					&dof_indices[0])));
-      
+
 	if (external_face == false)
 	  {
 	    for (unsigned int k=0; k<dofs_per_cell; ++k)
@@ -2706,7 +2706,7 @@ ConservationLaw<dim>::assemble_face_term(const unsigned int           face_no,
 					  const_cast<unsigned int*>(
 					    &dof_indices_neighbor[0])));
 	  }
-	
+
 	right_hand_side(dof_indices[i]) -= F_i.val();
       }
 
@@ -2737,12 +2737,12 @@ ConservationLaw<dim>::assemble_face_term(const unsigned int           face_no,
 
 template <int dim>
 std::pair<unsigned int, double>
-ConservationLaw<dim>::solve (Vector<double> &newton_update) 
+ConservationLaw<dim>::solve (Vector<double> &newton_update)
 {
   Epetra_Vector x(View, *Map, newton_update.begin());
   Epetra_Vector b(View, *Map, right_hand_side.begin());
 
-  
+
   switch (parameters.solver)
     {
 				       // If the parameter file specified that
@@ -2823,7 +2823,7 @@ ConservationLaw<dim>::solve (Vector<double> &newton_update)
 						     solver.TrueResidual());
       }
     }
-  
+
   Assert (false, ExcNotImplemented());
   return std::make_pair<unsigned int, double> (0,0);
 }
@@ -2874,7 +2874,7 @@ ConservationLaw<dim>::refine_grid (const Vector<double> &refinement_indicators)
       if ((cell->level() < parameters.shock_levels) &&
 	  (std::fabs(refinement_indicators(cell_no)) > parameters.shock_val))
 	cell->set_refine_flag();
-      else 
+      else
 	if ((cell->level() > 0) &&
 	    (std::fabs(refinement_indicators(cell_no)) < 0.75*parameters.shock_val))
 	  cell->set_coarsen_flag();
@@ -2897,7 +2897,7 @@ ConservationLaw<dim>::refine_grid (const Vector<double> &refinement_indicators)
   transfer_in.push_back(predictor);
 
   triangulation.prepare_coarsening_and_refinement();
-  
+
   SolutionTransfer<dim, double> soltrans(dof_handler);
   soltrans.prepare_for_coarsening_and_refinement(transfer_in);
 
@@ -2950,12 +2950,12 @@ ConservationLaw<dim>::refine_grid (const Vector<double> &refinement_indicators)
 template <int dim>
 void ConservationLaw<dim>::output_results () const
 {
-  typename EulerEquations<dim>::Postprocessor 
+  typename EulerEquations<dim>::Postprocessor
     postprocessor (parameters.schlieren_plot);
 
   DataOut<dim> data_out;
   data_out.attach_dof_handler (dof_handler);
-  
+
   data_out.add_data_vector (current_solution,
 			    EulerEquations<dim>::component_names (),
 			    DataOut<dim>::type_dof_data,
@@ -2995,7 +2995,7 @@ void ConservationLaw<dim>::output_results () const
 				 // solution. At the end of this process, we
 				 // output the initial solution.
 template <int dim>
-void ConservationLaw<dim>::run () 
+void ConservationLaw<dim>::run ()
 {
   {
     GridIn<dim> grid_in;
@@ -3004,12 +3004,12 @@ void ConservationLaw<dim>::run ()
     std::ifstream input_file(parameters.mesh_filename.c_str());
     Assert (input_file, ExcFileNotOpen(parameters.mesh_filename.c_str()));
 
-    grid_in.read_ucd(input_file);   
+    grid_in.read_ucd(input_file);
   }
-  
+
   dof_handler.clear();
   dof_handler.distribute_dofs (fe);
-  
+
                                    // Size all of the fields.
   old_solution.reinit (dof_handler.n_dofs());
   current_solution.reinit (dof_handler.n_dofs());
@@ -3030,7 +3030,7 @@ void ConservationLaw<dim>::run ()
 
 	compute_refinement_indicators(refinement_indicators);
 	refine_grid(refinement_indicators);
-	
+
 	setup_system();
 
 	VectorTools::interpolate(dof_handler,
@@ -3064,7 +3064,7 @@ void ConservationLaw<dim>::run ()
 		<< dof_handler.n_dofs()
 		<< std::endl
 		<< std::endl;
-      
+
       std::cout << "   NonLin Res     Lin Iter       Lin Res" << std::endl
 		<< "   _____________________________________" << std::endl;
 
@@ -3118,10 +3118,10 @@ void ConservationLaw<dim>::run ()
 	{
 	  Matrix->PutScalar(0);
 	  Matrix->FillComplete();
-	
+
 	  right_hand_side = 0;
 	  assemble_system ();
-	
+
 	  const double res_norm = right_hand_side.l2_norm();
 	  if (std::fabs(res_norm) < 1e-10)
 	    {
@@ -3134,9 +3134,9 @@ void ConservationLaw<dim>::run ()
 
 	      std::pair<unsigned int, double> convergence
 		= solve (newton_update);
-	    
+
 	      current_solution += newton_update;
-	    
+
 	      std::printf("   %-16.3e %04d        %-5.2e\n",
 			  res_norm, convergence.first, convergence.second);
 	    }
@@ -3144,7 +3144,7 @@ void ConservationLaw<dim>::run ()
 	  ++nonlin_iter;
 	  AssertThrow (nonlin_iter <= 10,
 		       ExcMessage ("No convergence in nonlinear solver"));
-	} 
+	}
 
 				       // We only get to this point if the
 				       // Newton iteration has converged, so
@@ -3214,14 +3214,14 @@ void ConservationLaw<dim>::run ()
 				 // that the program aborts if no
 				 // input file name is given on the
 				 // command line.
-int main (int argc, char *argv[]) 
+int main (int argc, char *argv[])
 {
   if (argc != 2)
     {
       std::cout << "Usage:" << argv[0] << " infile" << std::endl;
       std::exit(1);
     }
-  
+
   try
     {
       ConservationLaw<2> cons (argv[1]);
@@ -3239,7 +3239,7 @@ int main (int argc, char *argv[])
 		<< std::endl;
       return 1;
     }
-  catch (...) 
+  catch (...)
     {
       std::cerr << std::endl << std::endl
 		<< "----------------------------------------------------"
@@ -3250,7 +3250,7 @@ int main (int argc, char *argv[])
 		<< std::endl;
       return 1;
     };
-  
+
   return 0;
 }
 
