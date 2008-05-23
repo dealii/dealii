@@ -2,7 +2,7 @@
 //      $Id$   
 //    Version: $Name$
 //
-//    Copyright (C) 2005, 2006, 2007 by the deal.II authors
+//    Copyright (C) 2005, 2006, 2007, 2008 by the deal.II authors
 //
 //    This file is subject to QPL and may not be  distributed
 //    without copyright and license information. Please refer
@@ -40,10 +40,11 @@ PathSearch::initialize_classes()
   v.push_back(empty);
   v.push_back(std::string(".prm"));
   suffix_lists.insert(map_type(std::string("PARAMETER"), v));
-
-//TODO[GK]: instead of listing by hand here, query the GridIn class which formats it can presently read.
-//[Tobias Leicht]: the problem with this approach is that we would could not link with a base-lib alone
-// (undefined reference problem). we do that in the tests, however.
+  
+				   // We cannot use the GridIn class
+				   // to query the formats, since this
+				   // would require linking with the
+				   // deal.II libraries.
   v.clear();
   v.push_back(empty);
   v.push_back(std::string(".inp"));
