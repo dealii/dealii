@@ -449,8 +449,7 @@ constraints individually.
 
   <li> <p>New: The function VectorTools::compute_no_normal_flux_constraints computes
   the constraints that correspond to boundary conditions of the
-  form $\vec u \cdot \vec n = 0$. The use of the function is demonstrated in the
-  @ref step_31 "step-31" tutorial program.
+  form $\vec u \cdot \vec n = 0$.
   <br>
   (WB 2008/01/23)
   </p></li>
