@@ -918,7 +918,7 @@ class FiniteElement : public Subscriptor,
 				      * interpolation from a given
 				      * element, then they must throw
 				      * an exception of type
-				      * FiniteElement<dim>::ExcInterpolationNotImplemented.
+				      * ExcInterpolationNotImplemented.
 				      */
     virtual void
     get_interpolation_matrix (const FiniteElement<dim> &source,
@@ -950,7 +950,7 @@ class FiniteElement : public Subscriptor,
 				      * interpolation from a given
 				      * element, then they must throw
 				      * an exception of type
-				      * FiniteElement<dim>::ExcInterpolationNotImplemented.
+				      * ExcInterpolationNotImplemented.
 				      */
     virtual void
     get_face_interpolation_matrix (const FiniteElement<dim> &source,
@@ -976,7 +976,7 @@ class FiniteElement : public Subscriptor,
 				      * interpolation from a given
 				      * element, then they must throw
 				      * an exception of type
-				      * FiniteElement<dim>::ExcInterpolationNotImplemented.
+				      * ExcInterpolationNotImplemented.
 				      */
     virtual void
     get_subface_interpolation_matrix (const FiniteElement<dim> &source,
