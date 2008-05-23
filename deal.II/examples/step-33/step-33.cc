@@ -1598,7 +1598,7 @@ namespace Parameters
   
       
 
-				 // @sect3{Conservation Law class}
+				 // @sect3{Conservation law class}
 
 				 // Here finally comes the class that
 				 // actually does something with all
