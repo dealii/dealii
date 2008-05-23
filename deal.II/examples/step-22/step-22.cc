@@ -163,7 +163,7 @@ class StokesProblem
     boost::shared_ptr<typename InnerPreconditioner<dim>::type> A_preconditioner;
 };
 
-				 // @sect3{%Boundary values and right hand side}
+				 // @sect3{Boundary values and right hand side}
 
 				 // As in step-20 and most other
 				 // example programs, the next task is
