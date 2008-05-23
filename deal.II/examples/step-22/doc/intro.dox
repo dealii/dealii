@@ -48,7 +48,7 @@ The equations covered here fall into the class of vector-valued problems. A
 toplevel overview of this topic can be found in the @ref vector_valued module.
 
 
-<h2>Weak form</h2>
+<h3>Weak form</h3>
 
 The weak form of the equations is obtained by writing it in vector
 form as
@@ -138,7 +138,7 @@ of the bilinear form that the Stokes equations yield a symmetric bilinear
 form, and consequently a symmetric (if indefinite) system matrix.
 
 
-<h2>%Boundary conditions</h2>
+<h3>%Boundary conditions</h3>
 
 The weak form just derived immediately presents us with different
 possibilities for imposing boundary conditions:
@@ -265,7 +265,7 @@ Despite this wealth of possibilities, we will only use Dirichlet and
 (homogenous) Neumann boundary conditions in this tutorial program.
 
 
-<h2>Discretization</h2>
+<h3>Discretization</h3>
 
 As developed above, the weak form of the equations with Dirichlet and Neumann
 boundary conditions on $\Gamma_D$ and $\Gamma_N$ reads like this: find
@@ -320,7 +320,7 @@ vector_valued module.
 
 
 
-<h2>Linear solver and preconditioning issues</h2>
+<h3>Linear solver and preconditioning issues</h3>
 
 The weak form of the discrete equations naturally leads to the following
 linear system for the nodal values of the velocity and pressure fields:
@@ -532,7 +532,7 @@ classes, we will be able to use them interchangeably using the same syntax in
 all places.
 
 
-<h2>The testcase</h2>
+<h3>The testcase</h3>
 
 The domain, right hand side and boundary conditions we implement below relate
 to a problem in geophysics: there, one wants to compute the flow field of
@@ -578,7 +578,7 @@ surface that sucks material all the way to the top surface to fill the gap
 left by the outward motion of material at this location.
 
 
-<h2>Implementation</h2>
+<h3>Implementation</h3>
 
 The program developed below has seen a lot of TLC. We have run it over
 and over under profiling tools (mainly <a
