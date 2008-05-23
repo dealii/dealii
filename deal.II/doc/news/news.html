@@ -5,7 +5,7 @@
   <link href="../screen.css" rel="StyleSheet">
   <title>The deal.II news page</title>
   <meta name="author" content="the deal.II authors <authors@dealii.org>">
-  <meta name="copyright" content="Copyright (C) 2000, 2001, 2002, 2003, 2004, 2005, 2006, 2007 by the deal.II authors">
+  <meta name="copyright" content="Copyright (C) 2000, 2001, 2002, 2003, 2004, 2005, 2006, 2007, 2008 by the deal.II authors">
   <meta name="date" content="$Date$">
   <meta name="keywords" content="deal.II">
   <meta name="svn_id" content="$Id$">
@@ -33,11 +33,36 @@
 
     <dl>
       <dt>
-          <strong>2007/10/31: step-29 tutorial added</strong>
+          <strong>2008/05/23: step-33 illustrates the Euler equations</strong> 
       </dt>
       <dd>
-          The step-29 tutorial program explains how problems involving complex 
-          numbers can be treated in <acronym>deal.II</acronym>. In the example, 
+          <a href="../doxygen/deal.II/step_33.html">step-33</a>,
+          a tutorial program written mostly by David Neckels illustrates how
+          the Euler equations of compressible inviscid gas dynamics can be
+          solved. More generally, the program also provides a framework for
+          the solution of arbitrary hyperbolic, nonlinear conservation laws.
+      </dd>
+
+      <dt>
+          <strong>2008/03/28: step-22 demonstrates solving the Stokes
+                  equations</strong> 
+      </dt>
+      <dd>
+          The new <a href="../doxygen/deal.II/step_22.html">step-22</a>
+          tutorial program, written by Martin Kronbichler and Wolfgang
+          Bangerth, shows how to solve, and in particular how to solve
+          efficiently, the Stokes equations that describe viscous
+          incompressible fluid flow.
+      </dd>
+
+      <dt>
+          <strong>2007/10/31: step-29 tutorial program added</strong>
+      </dt>
+      <dd>
+          Contributed by Moritz Allmaras, the <a
+          href="../doxygen/deal.II/step_29.html">step-29</a> tutorial program 
+          explains how problems involving complex numbers can be treated in
+          <acronym>deal.II</acronym>. In the example,  
           the complex-valued solution to a Helmholtz equation is split into 
           real and imaginary parts and a vector-valued finite element field 
           is used to discretize them seperately. The program also demonstrates 
@@ -60,7 +85,8 @@
           <strong>2007/08/09: step-27 demonstrates hp technology</strong>
       </dt>
       <dd>
-          The new step-27 tutorial program finally demonstrates how to use the
+          The new <a href="../doxygen/deal.II/step_27.html">step-27</a>
+          tutorial program finally demonstrates how to use the 
 	  hp finite element technology that has been part of deal.II for some
 	  18 months now. It solves a Laplace equation with hp finite elements
 	  and shows how to set finite element degrees, assemble matrices on
