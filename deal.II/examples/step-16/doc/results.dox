@@ -11,7 +11,10 @@ refer to the graphical output there. The only difference between the two is the 
 <tr><td>5120</td> <td>95</td> <td>9</td> </tr>
 <tr><td>20480</td><td>182</td><td>10</td></tr>
 </table>
-Therefore, whenever possible, mutligrid methods should be used for second order problems.
+This isn't only less iterations than in @ref step_5 "step-5" (each of which
+is, however, much more expensive) but more importantly, the number of
+iterations stays roughly constant under mesh refinement.  Therefore, whenever
+possible, multigrid methods should be used for second order problems.
 
 
 The output produced by this program is the following:
