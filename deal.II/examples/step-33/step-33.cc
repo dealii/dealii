@@ -103,21 +103,23 @@ using namespace dealii;
 				 // @sect3{Euler equation specifics}
 
 				 // Here we define the flux function for this
-				 // particular system of conservation laws,
-				 // the Euler equations for gas dynamics. We
-				 // group all this into a structure that
-				 // defines everything that has to do with the
-				 // flux. All members of this structures are
-				 // static, i.e. the structure has no actual
-				 // state specified by instance member
-				 // variables. The better way to do this,
-				 // rather than a structure with all static
-				 // members would be to use a namespace -- but
-				 // namespaces can't be templatized and we
-				 // want some of the member variables of the
-				 // structure to depend on the space
+				 // particular system of conservation laws, as
+				 // well as pretty much everything else that's
+				 // specific to the Euler equations for gas
+				 // dynamics, for reasons discussed in the
+				 // introduction. We group all this into a
+				 // structure that defines everything that has
+				 // to do with the flux. All members of this
+				 // structures are static, i.e. the structure
+				 // has no actual state specified by instance
+				 // member variables. The better way to do
+				 // this, rather than a structure with all
+				 // static members would be to use a namespace
+				 // -- but namespaces can't be templatized and
+				 // we want some of the member variables of
+				 // the structure to depend on the space
 				 // dimension, which we in our usual way
-				 // introduce using a template parameter:
+				 // introduce using a template parameter.
 template <int dim>
 struct EulerEquations
 {
@@ -356,11 +358,11 @@ struct EulerEquations
 				     // introduction:
     template <typename InputVector>
     static
-    void numerical_normal_flux(const Point<dim>          &normal,
-			       const InputVector         &Wplus,
-			       const InputVector         &Wminus,
-			       const double               alpha,
-			       Sacado::Fad::DFad<double> (&normal_flux)[n_components])
+    void numerical_normal_flux (const Point<dim>          &normal,
+				const InputVector         &Wplus,
+				const InputVector         &Wminus,
+				const double               alpha,
+				Sacado::Fad::DFad<double> (&normal_flux)[n_components])
       {
 	Sacado::Fad::DFad<double> iflux[n_components][dim];
 	Sacado::Fad::DFad<double> oflux[n_components][dim];
@@ -590,6 +592,64 @@ struct EulerEquations
       }
 
 
+				     // @sect4{EulerEquations::compute_refinement_indicators}
+
+				     // In this class, we also want to specify
+				     // how to refine the mesh. The class
+				     // <code>ConservationLaw</code> that will
+				     // use all the information we provide
+				     // here in the <code>EulerEquation</code>
+				     // class is pretty agnostic about the
+				     // particular conservation law it solves:
+				     // as doesn't even really care how many
+				     // components a solution vector
+				     // has. Consequently, it can't know what
+				     // a reasonable refinement indicator
+				     // would be. On the other hand, here we
+				     // do, or at least we can come up with a
+				     // reasonable choice: we simply look at
+				     // the gradient of the density, and
+				     // compute
+				     // $\eta_K=\log\left(1+|\nabla\rho(x_K)|\right)$,
+				     // where $x_K$ is the center of cell $K$.
+				     //
+				     // There are certainly a number of
+				     // equally reasonable refinement
+				     // indicators, but this one does, and it
+				     // is easy to compute:
+    static
+    void
+    compute_refinement_indicators (const DoFHandler<dim> &dof_handler,
+				   const Mapping<dim>    &mapping,
+				   const Vector<double>  &solution,
+				   Vector<double>        &refinement_indicators) 
+      {  
+	const unsigned int dofs_per_cell = dof_handler.get_fe().dofs_per_cell;
+	std::vector<unsigned int> dofs (dofs_per_cell);
+
+	const QMidpoint<dim>  quadrature_formula;
+	const UpdateFlags update_flags = update_gradients;
+	FEValues<dim> fe_v (mapping, dof_handler.get_fe(),
+			    quadrature_formula, update_flags);
+
+	std::vector<std::vector<Tensor<1,dim> > >
+	  dU (1, std::vector<Tensor<1,dim> >(n_components));
+  
+	typename DoFHandler<dim>::active_cell_iterator
+	  cell = dof_handler.begin_active(),
+	  endc = dof_handler.end();
+	for (unsigned int cell_no=0; cell!=endc; ++cell, ++cell_no)
+	  {
+	    fe_v.reinit(cell);
+	    fe_v.get_function_grads (solution, dU);
+
+	    refinement_indicators(cell_no)
+	      = std::log(1+
+			 std::sqrt(dU[0][density_component] *
+				   dU[0][density_component]));
+	  } 
+      }
+    
     
     
 				     // @sect4{EulerEquations::Postprocessor}
@@ -2771,55 +2831,22 @@ ConservationLaw<dim>::solve (Vector<double> &newton_update)
 
                                  // @sect4{ConservationLaw::compute_refinement_indicators}
 
-				 // Loop and assign a value for refinement.  We
-				 // simply use the density squared, which selects
-				 // shocks with some success.
+				 // This function is real simple: We don't
+				 // pretend that we know here what a good
+				 // refinement indicator would be. Rather, we
+				 // assume that the <code>EulerEquation</code>
+				 // class would know about this, and so we
+				 // simply defer to the respective function
+				 // we've implemented there:
 template <int dim>
 void
 ConservationLaw<dim>::
 compute_refinement_indicators (Vector<double> &refinement_indicators) const
-{  
-  const unsigned int dofs_per_cell = dof_handler.get_fe().dofs_per_cell;
-  std::vector<unsigned int> dofs (dofs_per_cell);
-  UpdateFlags update_flags = update_values
-			     | update_gradients
-			     | update_q_points
-			     | update_JxW_values;
-
-  QGauss<dim>  quadrature_formula(1);
-  unsigned int n_q_points = quadrature_formula.n_quadrature_points;
-
-
-  FEValues<dim> fe_v (
-    mapping, fe, quadrature_formula, update_flags);
-
-  std::vector<Vector<double> > U(n_q_points,
-                                 Vector<double>(EulerEquations<dim>::n_components));
-  std::vector<std::vector<Tensor<1,dim> > > dU(n_q_points,
-					       std::vector<Tensor<1,dim> >(EulerEquations<dim>::n_components));
-  
-  typename DoFHandler<dim>::active_cell_iterator
-    cell = dof_handler.begin_active(),
-    endc = dof_handler.end();
-  for (unsigned int cell_no=0; cell!=endc; ++cell, ++cell_no)
-    {
-      fe_v.reinit(cell);
-
-      fe_v.get_function_values(predictor, U);
-      fe_v.get_function_grads(predictor, dU);
-
-      refinement_indicators(cell_no) = 0;
-      for (unsigned int q = 0; q < n_q_points; q++) {
-	double ng = 0;
-	for (unsigned int d = 0; d < dim; d++)
-	  ng += dU[q][EulerEquations<dim>::density_component][d] *
-		dU[q][EulerEquations<dim>::density_component][d];
-
-	refinement_indicators(cell_no) += std::log(1+std::sqrt(ng));
-      
-      } 
-      refinement_indicators(cell_no) /= n_q_points;
-  } 
+{
+  EulerEquations<dim>::compute_refinement_indicators (dof_handler,
+						      mapping,
+						      predictor,
+						      refinement_indicators);
 }
 
 
