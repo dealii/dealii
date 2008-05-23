@@ -30,15 +30,6 @@ inconvenience this causes.
 </p>
 
 <ol>
-  <li> <p>Changed: A few simple PETSc wrappers for helper functions 
-  PETScWrappers::MatrixBase::transpose, 
-  PETScWrappers::MatrixBase::is_symmetric, 
-  PETScWrappers::MatrixBase::is_hermitian, and
-  PETScWrappers::MatrixBase::write_ascii have been added.
-  <br>
-  (Toby D. Young 2008/04/30)
-  </p>
-
   <li> <p>Removed: The <code>FullMatrix::add_diag</code> function was removed. It
   offered functionality of questionable use in the first place, and its
   implementation was correct only for matrices of size $3 \times 3$, $4 \times 4$
@@ -119,6 +110,12 @@ inconvenience this causes.
   (WB, 2008/05/23)
   </p>
 
+<li> <p>Improved: @ref step_16 "step-16" has been updated to show the
+  use of Multigrid with Dirichlet boundary conditions.
+  <br>
+  (GK, 2007/05/13)
+  </p>
+
 <li> <p>New: @ref step_22 "step-22", written by Martin Kronbichler and Wolfgang
      Bangerth, shows how to solve, and in particular how to solve
      efficiently, the Stokes equations that describe viscous
@@ -127,14 +124,8 @@ inconvenience this causes.
   (WB, 2008/03/28)
   </p>  
 
-<li> <p>Improved: @ref step_16 "step-16" has been updated to show the
-  use of Multigrid with Dirichlet boundary conditions.
-  <br>
-  (GK, 2007/05/13)
-  </p>
-
 <li> <p>New: @ref step_29 "step-29" demonstrates how problems involving
-  complex numbers can be implemented by viewing real and imaginary parts
+  complex %numbers can be implemented by viewing real and imaginary parts
   of a complex-valued solution as the two components of a vector-valued
   function. 
   <br>
@@ -269,6 +260,15 @@ an integer id of the current thread.
 <h3>lac</h3>
 
 <ol>
+  <li> <p>Changed: A few simple PETSc wrappers for helper functions 
+  PETScWrappers::MatrixBase::transpose, 
+  PETScWrappers::MatrixBase::is_symmetric, 
+  PETScWrappers::MatrixBase::is_hermitian, and
+  PETScWrappers::MatrixBase::write_ascii have been added.
+  <br>
+  (Toby D. Young 2008/04/30)
+  </p>
+
 <li> Fixed: The SolverQMRS class could not deal with block vectors
 and block matrices. This is now fixed.
 <br>
