@@ -25,6 +25,7 @@
 #include <grid/tria.h>
 #include <grid/tria_accessor.h>
 #include <grid/tria_iterator.h>
+#include <grid/tria_boundary_lib.h>
 #include <grid/grid_generator.h>
 #include <dofs/dof_handler.h>
 #include <dofs/dof_accessor.h>
@@ -544,14 +545,11 @@ void LaplaceProblem<dim>::run ()
       if (cycle == 0)
 	{
 					   // Generate a simple hypercube grid.
-	  GridGenerator::hyper_cube(triangulation);
-	  
+	  GridGenerator::hyper_ball(triangulation);
+	  static const HyperBallBoundary<dim> boundary;
+	  triangulation.set_boundary (0, boundary);
 	}
-				       // If this is not the first
-				       // cycle, then simply refine
-				       // the grid once globally.
-      else
-	triangulation.refine_global (1);
+      triangulation.refine_global (1);
       setup_system ();
       assemble_system ();
       assemble_multigrid ();
