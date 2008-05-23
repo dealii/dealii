@@ -2,7 +2,7 @@
 //    $Id$
 //    Version: $Name$
 //
-//    Copyright (C) 1998, 1999, 2000, 2001, 2002, 2003, 2004, 2005, 2006, 2007 by the deal.II authors
+//    Copyright (C) 1998, 1999, 2000, 2001, 2002, 2003, 2004, 2005, 2006, 2007, 2008 by the deal.II authors
 //
 //    This file is subject to QPL and may not be  distributed
 //    without copyright and license information. Please refer
@@ -1032,14 +1032,22 @@ class MatrixTools : public MatrixCreator
  				      * true) is not presently implemented,
  				      * and probably will never because it is
  				      * too expensive without direct access to
- 				      * the PETSc data structures. A third
- 				      * reason against this function is that
- 				      * it doesn't handle the case where the
- 				      * matrix is distributed across an MPI
- 				      * system.
+ 				      * the PETSc data structures. (This leads
+ 				      * to the situation where the action
+ 				      * indicates by the default value of the
+ 				      * last argument is actually not
+ 				      * implemented; that argument has
+ 				      * <code>true</code> as its default value
+ 				      * to stay consistent with the other
+ 				      * functions of same name in this class.)
+ 				      * A third reason against this function
+ 				      * is that it doesn't handle the case
+ 				      * where the matrix is distributed across
+ 				      * an MPI system.
  				      *
- 				      * However, it is probably necessary in
- 				      * most cases.
+ 				      * This function is used in
+				      * @ref step_17 "step-17" and
+				      * @ref step_18 "step-18".
  				      */
     static void
     apply_boundary_values (const std::map<unsigned int,double> &boundary_values,

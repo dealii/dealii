@@ -2,7 +2,7 @@
 //    $Id$
 //    Version: $Name$
 //
-//    Copyright (C) 2001, 2002, 2003, 2004, 2005, 2006 by the deal.II authors
+//    Copyright (C) 2001, 2002, 2003, 2004, 2005, 2006, 2008 by the deal.II authors
 //
 //    This file is subject to QPL and may not be  distributed
 //    without copyright and license information. Please refer
@@ -38,7 +38,7 @@ MatrixTools::apply_boundary_values (const std::map<unsigned int,double> &boundar
 				    SparseMatrix<number>  &matrix,
 				    Vector<number>   &solution,
 				    Vector<number>   &right_hand_side,
-				    const bool        preserve_symmetry)
+				    const bool        eliminate_columns)
 {
 				   // Require that diagonals are first
 				   // in each row
@@ -131,7 +131,7 @@ MatrixTools::apply_boundary_values (const std::map<unsigned int,double> &boundar
 				       // symmetric, then do a Gauss
 				       // elimination step with the
 				       // present row
-      if (preserve_symmetry)
+      if (eliminate_columns)
 	{
 					   // store the only nonzero entry
 					   // of this line for the Gauss
@@ -204,7 +204,7 @@ MatrixTools::apply_boundary_values (const std::map<unsigned int,double> &boundar
 				    BlockSparseMatrix<number>  &matrix,
 				    BlockVector<number>   &solution,
 				    BlockVector<number>   &right_hand_side,
-				    const bool             preserve_symmetry)
+				    const bool             eliminate_columns)
 {
   const unsigned int blocks = matrix.n_block_rows();
   
@@ -368,7 +368,7 @@ MatrixTools::apply_boundary_values (const std::map<unsigned int,double> &boundar
 				       // present row. this is a
 				       // little more complicated for
 				       // block matrices.
-      if (preserve_symmetry)
+      if (eliminate_columns)
 	{
 					   // store the only nonzero entry
 					   // of this line for the Gauss
@@ -529,9 +529,9 @@ namespace PETScWrappers
                          PETScMatrix      &matrix,
                          PETScVector      &solution,
                          PETScVector      &right_hand_side,
-                         const bool        preserve_symmetry)
+                         const bool        eliminate_columns)
   {
-    Assert (preserve_symmetry == false, ExcNotImplemented());
+    Assert (eliminate_columns == false, ExcNotImplemented());
 
     Assert (matrix.n() == right_hand_side.size(),
             ExcDimensionMismatch(matrix.n(), right_hand_side.size()));
@@ -646,12 +646,12 @@ apply_boundary_values (const std::map<unsigned int,double> &boundary_values,
                        PETScWrappers::SparseMatrix   &matrix,
                        PETScWrappers::Vector   &solution,
                        PETScWrappers::Vector   &right_hand_side,
-                       const bool        preserve_symmetry)
+                       const bool        eliminate_columns)
 {
                                    // simply redirect to the generic function
                                    // used for both petsc matrix types
   PETScWrappers::apply_boundary_values (boundary_values, matrix, solution,
-                                        right_hand_side, preserve_symmetry);
+                                        right_hand_side, eliminate_columns);
 }
 
 
@@ -662,12 +662,12 @@ apply_boundary_values (const std::map<unsigned int,double> &boundary_values,
                        PETScWrappers::MPI::SparseMatrix   &matrix,
                        PETScWrappers::MPI::Vector   &solution,
                        PETScWrappers::MPI::Vector   &right_hand_side,
-                       const bool        preserve_symmetry)
+                       const bool        eliminate_columns)
 {
                                    // simply redirect to the generic function
                                    // used for both petsc matrix types
   PETScWrappers::apply_boundary_values (boundary_values, matrix, solution,
-                                        right_hand_side, preserve_symmetry);
+                                        right_hand_side, eliminate_columns);
 
 				   // compress the matrix once we're done
   matrix.compress ();  
@@ -803,14 +803,14 @@ MatrixTools::apply_boundary_values<double> (const std::map<unsigned int,double> 
 					    SparseMatrix<double>  &matrix,
 					    Vector<double>   &solution,
 					    Vector<double>   &right_hand_side,
-					    const bool        preserve_symmetry);
+					    const bool        eliminate_columns);
 template
 void
 MatrixTools::apply_boundary_values<float> (const std::map<unsigned int,double> &boundary_values,
 					   SparseMatrix<float>  &matrix,
 					   Vector<float>   &solution,
 					   Vector<float>   &right_hand_side,
-					   const bool        preserve_symmetry);
+					   const bool        eliminate_columns);
 
 template
 void
@@ -818,13 +818,13 @@ MatrixTools::apply_boundary_values<double> (const std::map<unsigned int,double> 
 					    BlockSparseMatrix<double>  &matrix,
 					    BlockVector<double>   &solution,
 					    BlockVector<double>   &right_hand_side,
-					    const bool        preserve_symmetry);
+					    const bool        eliminate_columns);
 template
 void
 MatrixTools::apply_boundary_values<float> (const std::map<unsigned int,double> &boundary_values,
 					   BlockSparseMatrix<float>  &matrix,
 					   BlockVector<float>   &solution,
 					   BlockVector<float>   &right_hand_side,
-					   const bool        preserve_symmetry);
+					   const bool        eliminate_columns);
 
 DEAL_II_NAMESPACE_CLOSE
