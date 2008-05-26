@@ -345,6 +345,13 @@ constraints individually.
 
 <ol>
 
+  <li> <p> Improved: GridOutFlags::Gnuplot now takes an additional curved_inner_cells
+  parameter. Similar to curved_inner_cells in DataOut this allows the output of interior
+  cells with curved boundaries. This is useful for MappingQEulerian or similar mappings.
+  <br>
+  (RH 2008/05/12)
+  </p></li>
+
   <li> <p>Fixed: Functions::FEFieldFunction<dim>.set_active_cell was declared
   inline in the declaration but not in the implementation. This is now fixed. 
   <br>
