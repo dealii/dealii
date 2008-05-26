@@ -46,7 +46,7 @@
 
 DEAL_II_NAMESPACE_OPEN
 
-//TODO[RH]: Use StaticMappingQ1 where appropriate
+
 
 template <int dim, class VECTOR, class DH>
 void VectorTools::interpolate (const Mapping<dim>    &mapping,
@@ -248,8 +248,7 @@ void VectorTools::interpolate (const DH              &dof,
 			       VECTOR                &vec)
 {
   Assert (DEAL_II_COMPAT_MAPPING, ExcCompatibility("mapping"));
-  static const MappingQ1<dim> mapping;
-  interpolate(mapping, dof, function, vec);
+  interpolate(StaticMappingQ1<dim>::mapping, dof, function, vec);
 }
 
 
@@ -495,8 +494,7 @@ void VectorTools::project (const DoFHandler<dim>    &dof,
 			   const bool                project_to_boundary_first)
 {
   Assert (DEAL_II_COMPAT_MAPPING, ExcCompatibility("mapping"));
-  static const MappingQ1<dim> mapping;
-  project(mapping, dof, constraints, quadrature, function, vec,
+  project(StaticMappingQ1<dim>::mapping, dof, constraints, quadrature, function, vec,
 	  enforce_zero_boundary, q_boundary, project_to_boundary_first);
 }
 
@@ -1634,8 +1632,7 @@ VectorTools::interpolate_boundary_values (const DH<dim>                 &dof,
 					  const std::vector<bool>       &component_mask)
 {
   Assert (DEAL_II_COMPAT_MAPPING, ExcCompatibility("mapping"));
-  static const MappingQ1<dim> mapping;
-  interpolate_boundary_values(mapping, dof, boundary_component,
+  interpolate_boundary_values(StaticMappingQ1<dim>::mapping, dof, boundary_component,
 			      boundary_function, boundary_values, component_mask);
 }
 
@@ -1649,8 +1646,7 @@ VectorTools::interpolate_boundary_values (const DH<dim>                 &dof,
 					  const std::vector<bool>       &component_mask)
 {
   Assert (DEAL_II_COMPAT_MAPPING, ExcCompatibility("mapping"));
-  static const MappingQ1<dim> mapping;
-  interpolate_boundary_values(mapping, dof, function_map,
+  interpolate_boundary_values(StaticMappingQ1<dim>::mapping, dof, function_map,
 			      boundary_values, component_mask);
 }
 
@@ -1831,8 +1827,7 @@ VectorTools::project_boundary_values (const DoFHandler<dim>    &dof,
 				      std::map<unsigned int,double> &boundary_values)
 {
   Assert (DEAL_II_COMPAT_MAPPING, ExcCompatibility("mapping"));
-  static const MappingQ1<dim> mapping;
-  project_boundary_values(mapping, dof, boundary_functions, q, boundary_values);
+  project_boundary_values(StaticMappingQ1<dim>::mapping, dof, boundary_functions, q, boundary_values);
 }
 
 
@@ -3238,8 +3233,7 @@ VectorTools::compute_mean_value (const DoFHandler<dim> &dof,
 				 const unsigned int     component)
 {
   Assert (DEAL_II_COMPAT_MAPPING, ExcCompatibility("mapping"));
-  static const MappingQ1<dim> mapping;
-  return compute_mean_value(mapping, dof, quadrature, v, component);
+  return compute_mean_value(StaticMappingQ1<dim>::mapping, dof, quadrature, v, component);
 }
 
 DEAL_II_NAMESPACE_CLOSE
