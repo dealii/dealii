@@ -43,7 +43,7 @@ examples/step-3> gnuplot
 
 
 Terminal type set to 'x11'
-gnuplot> set data style lines
+gnuplot> set style data lines
 gnuplot> splot "solution.gpl"
 @endcode
 This produces the picture of the solution below left. Alternatively,

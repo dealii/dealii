@@ -7,7 +7,7 @@ two methods described. Let us first take a look at the generated
 graphics. They are generated in Gnuplot format, and can be viewed with
 the commands
 @code
-set data style lines
+set style data lines
 set size 0.721, 1
 set nokey
 plot [-1:1][-1:1] "ball0_mapping_q1.dat"

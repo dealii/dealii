@@ -22,7 +22,7 @@ examples/step-2> gnuplot
 
 
 Terminal type set to 'x11'
-gnuplot> set data style points
+gnuplot> set style data points
 gnuplot> plot "sparsity_pattern.1"
 @endcode
 
