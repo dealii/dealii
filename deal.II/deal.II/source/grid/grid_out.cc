@@ -1515,7 +1515,6 @@ void GridOut::write_eps (
       {
 					 // curved boundary output
 					 // presently not supported
-					 //TODO:[RH] curved boundaries in eps for 3d	
 	Assert (mapping == 0, ExcNotImplemented());
 
 	typename Triangulation<dim>::active_cell_iterator
