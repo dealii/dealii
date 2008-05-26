@@ -72,7 +72,6 @@ class ConvergenceTable: public TableHandler
 					    * Do not do anything.
 					    */
 	  none,
-//TODO:[RH] This is copied from the original. Should it not be vice versa?  
 					   /**
 					    * Quotient of values in
 					    * the previous row and in
@@ -80,7 +79,13 @@ class ConvergenceTable: public TableHandler
 					    */
 	  reduction_rate,
 					   /**
-					    * Logarithm of #reduction_rate to the base 2.
+					    * Logarithm of
+					    * #reduction_rate to the
+					    * base 2 representing the
+					    * order of convergence
+					    * when halving the grid
+					    * size, e.g. from h to
+					    * h/2.
 					    */
 	  reduction_rate_log2
     };
