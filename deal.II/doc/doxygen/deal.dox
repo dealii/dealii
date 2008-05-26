@@ -10,6 +10,7 @@ INPUT    = headers/ \
 	../../deal.II/include/multigrid \
 	../../deal.II/include/numerics \
 	tutorial/doxygen \
+	../news/6.0.0-vs-6.1.0.h \
 	../news/changes.h
 
 HTML_OUTPUT      = deal.II
