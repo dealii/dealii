@@ -1343,7 +1343,7 @@ class FiniteElement : public Subscriptor,
 				      * Access to base element
 				      * objects. If the element is
 				      * scalar, then
-				      * #base_element(0) is
+				      * <code>base_element(0)</code> is
 				      * @p this.
 				      */
     virtual
