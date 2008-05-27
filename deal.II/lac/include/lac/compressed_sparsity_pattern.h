@@ -83,7 +83,7 @@ template <typename number> class SparseMatrix;
  * that appears to be more efficient in some situations, in particular
  * when using hp finite elements or, more generally, in cases with
  * many nonzero entries. See for example the @ref step_27 "step-27"
- * and @ref step_31 "step-31" tutorial programs.
+ * and @ref step_22 "step-22" tutorial programs.
  *
  * @author Wolfgang Bangerth, 2001
  */
