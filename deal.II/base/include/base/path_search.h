@@ -2,7 +2,7 @@
 //    $Id$
 //    Version: $Name$
 //
-//    Copyright (C) 2005, 2006, 2007 by the deal.II authors
+//    Copyright (C) 2005, 2006, 2007, 2008 by the deal.II authors
 //
 //    This file is subject to QPL and may not be  distributed
 //    without copyright and license information. Please refer
@@ -230,7 +230,7 @@ class PathSearch
     DeclException2(ExcFileNotFound,
 		   std::string, std::string,
 		   << "The file \"" << arg1
-		   << "\"was not found in the path for files of class "
+		   << "\" was not found in the path for files of class "
 		   << arg2);
     
   private:
