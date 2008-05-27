@@ -4529,6 +4529,7 @@ AC_DEFUN(DEAL_II_HAVE_DEMANGLER, dnl
 #include <exception>
 #include <iostream>
 #include <cxxabi.h>
+#include <cstdlib>
 
 struct empty { };
 
