@@ -6,20 +6,17 @@ include Makefile.paths
 include $D/common/Make.global_options
 
 # first define the directories we should work on
-nofail-dirs=base lac fe deal.II multigrid bits hp
-
-ifeq ($(USE_CONTRIB_PETSC),yes)
-  nofail-dirs += petsc
-endif
-
-ifeq ($(USE_CONTRIB_UMFPACK),yes)
-  nofail-dirs += umfpack
-endif
-
-ifneq ($(shell grep 'define HAVE_LIBLAPACK' $D/base/include/base/config.h),)
-  nofail-dirs += lapack
-endif
-
+nofail-dirs = base      \
+              lac       \
+              fe        \
+              deal.II   \
+              multigrid \
+              bits      \
+              hp        \
+	      $(shell if test "$(USE_CONTRIB_PETSC)" = yes ; then echo petsc ; fi) \
+	      $(shell if test "$(USE_CONTRIB_UMFPACK)" = yes ; then echo umfpack ; fi) \
+	      $(shell if grep -q 'define HAVE_LIBLAPACK' $D/base/include/base/config.h ;\
+                then echo umfpack ; fi)
 
 # now define the targets that actually do something
 all: $(addprefix do-,$(nofail-dirs) fail)
