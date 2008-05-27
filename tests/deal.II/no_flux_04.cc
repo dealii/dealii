@@ -93,7 +93,6 @@ void test (const Triangulation<dim>& tr,
 
   cm.distribute (v);
 
-  std::ofstream o("x.vtk");
   DataOut<dim> data_out;
   data_out.attach_dof_handler (dh);
 
@@ -106,7 +105,7 @@ void test (const Triangulation<dim>& tr,
 			    data_component_interpretation);
   data_out.build_patches (fe.degree);
 
-  data_out.write_vtk (o);
+  data_out.write_vtk (deallog.get_file_stream());
 }
 
 
