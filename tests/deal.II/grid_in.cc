@@ -37,7 +37,7 @@ void test1 ()
   Triangulation<dim> tria;
   GridIn<dim> gi;
   gi.attach_triangulation (tria);
-  std::ifstream in ("grid_in_2d.inp");
+  std::ifstream in ("grid_in/2d.inp");
   gi.read_ucd (in);
   
   GridOut grid_out;
@@ -59,7 +59,7 @@ void test2 ()
   Triangulation<dim> tria;
   GridIn<dim> gi;
   gi.attach_triangulation (tria);
-  std::ifstream in ("grid_in_2d.xda");
+  std::ifstream in ("grid_in/2d.xda");
   gi.read_xda (in);
 
   int hash = 0;
@@ -78,7 +78,7 @@ void test3 ()
   Triangulation<dim> tria;
   GridIn<dim> gi;
   gi.attach_triangulation (tria);
-  gi.read ("grid_in_2d.nc");
+  gi.read ("grid_in/2d.nc");
 
   GridOut grid_out;
   std::ofstream gnufile("grid_in_2d.gnuplot");  
