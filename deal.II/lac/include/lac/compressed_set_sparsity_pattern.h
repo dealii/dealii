@@ -51,8 +51,8 @@ template <typename number> class SparseMatrix;
  * module.
  *
  * This class is an example of the "dynamic" type of @ref Sparsity. It
- * is discussed in the @ref step_27 "step-27" and @ref step_31
- * "step-31" tutorial programs.
+ * is discussed in the @ref step_27 "step-27" and @ref step_22
+ * "step-22" tutorial programs.
  *
  * <h3>Interface</h3>
  *
@@ -89,8 +89,8 @@ template <typename number> class SparseMatrix;
  * situations, but seems to work much better than the
  * CompressedSparsityPattern in the context of hp-adaptivity (see for
  * example @ref step_27 "step-27"), or generally when there are many
- * nonzero entries in each row of a matrix (see @ref step_31
- * "step-31").  On the other hand, a benchmark where nonzero entries
+ * nonzero entries in each row of a matrix (see @ref step_22
+ * "step-22").  On the other hand, a benchmark where nonzero entries
  * were randomly inserted into the sparsity pattern revealed that this
  * class is slower by a factor 4-6 in this situation. Hence, currently
  * the suggestion is to carefully analyze which of the
