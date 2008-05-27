@@ -43,9 +43,9 @@ void test (const std::string &infilename)
 
 int main ()
 {
-  test<2> ("grid_tec_1.dat");
-  test<2> ("grid_tec_2.dat");
-  test<2> ("grid_tec_3.dat");
-  test<2> ("grid_tec_4.dat");
+  test<2> ("grid_in_tecplot/1.dat");
+  test<2> ("grid_in_tecplot/2.dat");
+  test<2> ("grid_in_tecplot/3.dat");
+  test<2> ("grid_in_tecplot/4.dat");
 }
 

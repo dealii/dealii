@@ -73,7 +73,7 @@ void test1()
   Triangulation<3> tria;
   GridIn<3> gi;
   gi.attach_triangulation (tria);
-  gi.read ("grid_in_3d_1.nc");
+  gi.read ("grid_in_3d/1.nc");
   
   GridOut grid_out;
   std::ofstream gnufile("square.gnuplot");
