@@ -78,12 +78,12 @@ int main ()
   deallog.depth_console(0);
   deallog.threshold_double(1.e-10);
 
-  test ("grid_in_3d_1.in");
-  test ("grid_in_3d_2.in");
-  test ("grid_in_3d_3.in");
-  test ("grid_in_3d_4.in");
+  test ("grid_in_3d/1.in");
+  test ("grid_in_3d/2.in");
+  test ("grid_in_3d/3.in");
+  test ("grid_in_3d/4.in");
 
-  test ("grid_in_3d_evil_0.in");
-  test ("grid_in_3d_evil_4.in");
+  test ("grid_in_3d/evil_0.in");
+  test ("grid_in_3d/evil_4.in");
 }
 
