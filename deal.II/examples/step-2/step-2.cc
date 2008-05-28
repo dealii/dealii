@@ -2,7 +2,6 @@
 /* Author: Wolfgang Bangerth, University of Heidelberg, 1999 */
 
 /*    $Id$       */
-/*    Version: $Name$                                          */
 /*                                                                */
 /*    Copyright (C) 1999, 2000, 2001, 2002, 2003, 2006 by the deal.II authors */
 /*                                                                */

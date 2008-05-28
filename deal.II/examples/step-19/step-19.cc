@@ -2,7 +2,6 @@
 /* Author: Luca Heltai, Wolfgang Bangerth, 2005 */
 
 /*    $Id$       */
-/*    Version: $Name$                                          */
 /*                                                                */
 /*    Copyright (C) 2005, 2006 by the deal.II authors */
 /*                                                                */

@@ -2,7 +2,6 @@
 /* Author: Wolfgang Bangerth, Texas A&M University, 2008 */
 
 /*    $Id$       */
-/*    Version: $Name$                                          */
 /*                                                                */
 /*    Copyright (C) 2008 by the deal.II authors */
 /*                                                                */

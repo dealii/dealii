@@ -2,7 +2,6 @@
 /* Author: Wolfgang Bangerth and Ralf Hartmann, University of Heidelberg, 2000 */
 
 /*    $Id$       */
-/*    Version: $Name$                                          */
 /*                                                                */
 /*    Copyright (C) 2000, 2001, 2002, 2003, 2004, 2006, 2007, 2008 by the deal.II authors */
 /*                                                                */

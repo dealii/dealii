@@ -2,7 +2,6 @@
 /* Author: Wolfgang Bangerth, University of Texas at Austin, 2000, 2004, 2005 */
 
 /*    $Id$       */
-/*    Version: $Name$                                          */
 /*                                                                */
 /*    Copyright (C) 2000, 2004, 2005, 2006, 2007, 2008 by the deal.II authors */
 /*                                                                */

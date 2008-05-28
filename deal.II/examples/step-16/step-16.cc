@@ -2,7 +2,6 @@
 /* Author: Guido Kanschat, University of Heidelberg, 2003 */
 
 /*    $Id$       */
-/*    Version: $Name$                                          */
 /*                                                                */
 /*    Copyright (C) 2003, 2004, 2005, 2006, 2007, 2008 by the deal.II authors */
 /*                                                                */
