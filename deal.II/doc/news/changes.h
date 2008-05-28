@@ -39,6 +39,16 @@ inconvenience this causes.
 
 <ol>
   <li>
+  <p>
+  Fixed: A missing include file prevented the <code>./configure</code> script
+  from detecting the presence of the demangler with recent versions of the
+  gcc compiler. The result is that backtraces after failed assertions only
+  show the mangles function names, not their plain text equivalent. This is
+  now fixed.
+  <br>
+  (WB 2008/05/27)
+  </p>
+  </li>
 </ol>
 
 
