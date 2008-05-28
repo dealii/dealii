@@ -488,7 +488,7 @@ void BoussinesqFlowProblem<dim>::assemble_system ()
   std::vector<std::vector<Tensor<1,dim> > >  old_solution_grads(n_q_points,
                                                                 std::vector<Tensor<1,dim> > (dim+2));
 
-  const double Raleigh_number = 10;
+  const double Rayleigh_number = 10;
 
   std::vector<Tensor<1,dim> >          phi_u       (dofs_per_cell);
   std::vector<SymmetricTensor<2,dim> > phi_grads_u (dofs_per_cell);
@@ -550,7 +550,7 @@ void BoussinesqFlowProblem<dim>::assemble_system ()
 
 	      const Point<dim> gravity (0,1);
 
-	      local_rhs(i) += (Raleigh_number *
+	      local_rhs(i) += (Rayleigh_number *
 			       gravity * phi_u[i] * old_temperature)*
 			      fe_values.JxW(q);
           }
