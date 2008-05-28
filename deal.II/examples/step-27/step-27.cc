@@ -44,7 +44,7 @@
 				 // SparsityPattern class and the
 				 // CompressedSparsityPattern class already
 				 // discussed in step-11 and step-18. The last
-				 // two provide $hp$ versions of the
+				 // two provide <i>hp</i> versions of the
 				 // DoFHandler and FEValues classes as
 				 // described in the introduction of this
 				 // program.
@@ -263,7 +263,7 @@ void LaplaceProblem<dim>::setup_system ()
 				 // cell. Its main working is as has been
 				 // described in many of the tutorial programs
 				 // before. The significant deviations are the
-				 // ones necessary for $hp$ finite element
+				 // ones necessary for <i>hp</i> finite element
 				 // methods. In particular, that we need to
 				 // use a collection of FEValues object
 				 // (implemented through the hp::FEValues
@@ -369,7 +369,7 @@ void LaplaceProblem<dim>::assemble_system ()
 				   // all we still have to do is to treat
 				   // Dirichlet boundary values
 				   // correctly. This works in exactly the
-				   // same way as for non-$hp$ objects:
+				   // same way as for non-<i>hp</i> objects:
   std::map<unsigned int,double> boundary_values;
   VectorTools::interpolate_boundary_values (dof_handler,
 					    0,
