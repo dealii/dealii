@@ -96,19 +96,22 @@ class ConstraintMatrix;
  *   given function may be, taking into account that a virtual function has
  *   to be called.
  *
- * <li> Projection: compute the $L^2$-projection of the given function
- *   onto the finite element space, i.e. if $f$ is the function to be
- *   projected, compute $f_h\in V_h$ such that $(f_h,v_h)=(f,v_h)$ for
- *   all discrete test functions $v_h$. This is done through the
- *   solution of the linear system of equations $M v = f$ where $M$ is
- *   the mass matrix $m_{ij} = \int_\Omega \phi_i(x) \phi_j(x) dx$ and
- *   $f_i = \int_\Omega f(x) \phi_i(x) dx$. The solution vector $v$ then
- *   is the nodal representation of the projection $f_h$. The project()
- *   functions are used in the @ref step_23 "step-23" tutorial program.
+ * <li> Projection: compute the <i>L</i><sup>2</sup>-projection of the
+ * given function onto the finite element space, i.e. if <i>f</i> is
+ * the function to be projected, compute <i>f<sub>h</sub></i> in
+ * <i>V<sub>h</sub></i> such that
+ * (<i>f<sub>h</sub></i>,<i>v<sub>h</sub></i>)=(<i>f</i>,<i>v<sub>h</sub></i>)$
+ * for all discrete test functions <i>v<sub>h</sub></i>. This is done
+ * through the solution of the linear system of equations <i> M v =
+ * f</i> where <i>M</i> is the mass matrix $m_{ij} = \int_\Omega
+ * \phi_i(x) \phi_j(x) dx$ and $f_i = \int_\Omega f(x) \phi_i(x)
+ * dx$. The solution vector $v$ then is the nodal representation of
+ * the projection <i>f<sub>h</sub></i>. The project() functions are
+ * used in the @ref step_23 "step-23" tutorial program.
  *
  *   In order to get proper results, it be may necessary to treat
  *   boundary conditions right. Below are listed some cases where this
- *   may be needed.  If needed, this is done by $L^2$-projection of
+ *   may be needed.  If needed, this is done by <i>L</i><sup>2</sup>-projection of
  *   the trace of the given function onto the finite element space
  *   restricted to the boundary of the domain, then taking this
  *   information and using it to eliminate the boundary nodes from the
@@ -138,10 +141,10 @@ class ConstraintMatrix;
  *
  *   Obviously, the results of the two schemes for projection are
  *   different.  Usually, when projecting to the boundary first, the
- *   $L^2$-norm of the difference between original
+ *   <i>L</i><sup>2</sup>-norm of the difference between original
  *   function and projection over the whole domain will be larger
  *   (factors of five have been observed) while the
- *   $L^2$-norm of the error integrated over the
+ *   <i>L</i><sup>2</sup>-norm of the error integrated over the
  *   boundary should of course be less. The reverse should also hold
  *   if no projection to the boundary is performed.
  *
@@ -165,17 +168,17 @@ class ConstraintMatrix;
  *   detail may change in the future.
  *
  * <li> Creation of right hand side vectors:
- *   The @p create_right_hand_side function computes the vector
+ *   The create_right_hand_side() function computes the vector
  *   $f_i = \int_\Omega f(x) \phi_i(x) dx$. This is the same as what the
  *   <tt>MatrixCreator::create_*</tt> functions which take a right hand side do,
  *   but without assembling a matrix.
  *
  * <li> Creation of right hand side vectors for point sources:
- *   The @p create_point_source_vector function computes the vector
+ *   The create_point_source_vector() function computes the vector
  *   $f_i = \int_\Omega \delta_0(x-x_0) \phi_i(x) dx$. 
  *
  * <li> Creation of boundary right hand side vectors: The
- *   @p create_boundary_right_hand_side function computes the vector
+ *   create_boundary_right_hand_side() function computes the vector
  *   $f_i = \int_{\partial\Omega} g(x) \phi_i(x) dx$. This is the
  *   right hand side contribution of boundary forces when having
  *   inhomogeneous Neumann boundary values in Laplace's equation or
@@ -184,9 +187,9 @@ class ConstraintMatrix;
  *   integration shall extend.
  *
  * <li> Interpolation of boundary values:
- *   The MatrixTools@p ::apply_boundary_values function takes a list
+ *   The MatrixTools::apply_boundary_values() function takes a list
  *   of boundary nodes and their values. You can get such a list by interpolation
- *   of a boundary function using the @p interpolate_boundary_values function.
+ *   of a boundary function using the interpolate_boundary_values() function.
  *   To use it, you have to
  *   specify a list of pairs of boundary indicators (of type <tt>unsigned char</tt>;
  *   see the section in the documentation of the Triangulation class for more
@@ -200,7 +203,7 @@ class ConstraintMatrix;
  *   Within this function, boundary values are interpolated, i.e. a node is given
  *   the point value of the boundary function. In some cases, it may be necessary
  *   to use the L2-projection of the boundary function or any other method. For
- *   this purpose we refer to the VectorTools@p ::project_boundary_values
+ *   this purpose we refer to the project_boundary_values()
  *   function below.
  *
  *   You should be aware that the boundary function may be evaluated at nodes
@@ -219,24 +222,24 @@ class ConstraintMatrix;
  *   the place of the respective boundary point.
  *
  * <li> Projection of boundary values:
- *   The @p project_boundary_values function acts similar to the
- *   @p interpolate_boundary_values function, apart from the fact that it does
+ *   The project_boundary_values() function acts similar to the
+ *   interpolate_boundary_values() function, apart from the fact that it does
  *   not get the nodal values of boundary nodes by interpolation but rather
- *   through the $L^2$-projection of the trace of the function to the boundary.
+ *   through the <i>L</i><sup>2</sup>-projection of the trace of the function to the boundary.
  *
  *   The projection takes place on all boundary parts with boundary
- *   indicators listed in the map (FunctioMap@p ::FunctionMap)
+ *   indicators listed in the map (FunctioMap::FunctionMap)
  *   of boundary functions. These boundary parts may or may not be
  *   continuous. For these boundary parts, the mass matrix is
  *   assembled using the
- *   MatrixTools@p ::create_boundary_mass_matrix function, as
+ *   MatrixTools::create_boundary_mass_matrix() function, as
  *   well as the appropriate right hand side. Then the resulting
  *   system of equations is solved using a simple CG method (without
  *   preconditioning), which is in most cases sufficient for the
  *   present purpose.
  *
  * <li> Computing errors:
- *   The function @p integrate_difference performs the calculation of
+ *   The function integrate_difference() performs the calculation of
  *   the error between a given (continuous) reference function and the
  *   finite element solution in different norms. The integration is
  *   performed using a given quadrature formula and assumes that the
@@ -256,7 +259,7 @@ class ConstraintMatrix;
  *
  *   Presently, there is the possibility to compute the following values from the
  *   difference, on each cell: @p mean, @p L1_norm, @p L2_norm, @p Linfty_norm,
- *   @p H1_seminorm and @p H1_norm, see @p VectorTools::NormType.
+ *   @p H1_seminorm and @p H1_norm, see VectorTools::NormType.
  *   For the mean difference value, the reference function minus the numerical
  *   solution is computed, not the other way round.
  *
@@ -279,27 +282,27 @@ class ConstraintMatrix;
  *   use of the wrong quadrature formula may show a significantly wrong result
  *   and care should be taken to chose the right formula.
  *
- *   The $H^1$ seminorm is the $L^2$
+ *   The <i>H</i><sup>1</sup> seminorm is the <i>L</i><sup>2</sup>
  *   norm of the gradient of the difference. The square of the full
- *   $H^1$ norm is the sum of the square of seminorm
- *   and the square of the $L^2$ norm.
+ *   <i>H</i><sup>1</sup> norm is the sum of the square of seminorm
+ *   and the square of the <i>L</i><sup>2</sup> norm.
  *
  *   To get the global <i>L<sup>1</sup></i> error, you have to sum up the
  *   entries in @p difference, e.g. using
- *   <tt>Vector<double>::l1_norm</tt> function.  For the global $L^2$
+ *   Vector::l1_norm() function.  For the global <i>L</i><sup>2</sup>
  *   difference, you have to sum up the squares of the entries and
  *   take the root of the sum, e.g. using
- *   <tt>Vector<double>::l2_norm</tt>.  These two operations
- *   represent the $l_1$ and $l_2$ norms of the vectors, but you need
+ *   Vector::l2_norm().  These two operations
+ *   represent the <i>l</i><sub>1</sub> and <i>l</i><sub>2</sub> norms of the vectors, but you need
  *   not take the absolute value of each entry, since the cellwise
  *   norms are already positive.
  *
  *   To get the global mean difference, simply sum up the elements as above.
  *   To get the $L_\infty$ norm, take the maximum of the vector elements, e.g.
- *   using the <tt>Vector<double>::linfty_norm</tt> function.
+ *   using the Vector::linfty_norm() function.
  *
- *   For the global $H^1$ norm and seminorm, the same rule applies as for the
- *   $L^2$ norm: compute the $l_2$ norm of the cell error vector.
+ *   For the global <i>H</i><sup>1</sup> norm and seminorm, the same rule applies as for the
+ *   <i>L</i><sup>2</sup> norm: compute the <i>l</i><sub>2</sub> norm of the cell error vector.
  * </ul>
  *
  * All functions use the finite element given to the DoFHandler object the last
@@ -438,7 +441,7 @@ class VectorTools
 			     VECTOR                &vec);
 
 				     /**
-				      * Calls the @p interpolate
+				      * Calls the @p interpolate()
 				      * function above with
 				      * <tt>mapping=MappingQ1@<dim>@()</tt>.
 				      */
@@ -652,7 +655,7 @@ class VectorTools
 
 				     /**
 				      * Calls the other
-				      * @p interpolate_boundary_values
+				      * interpolate_boundary_values()
 				      * function, see above, with
 				      * <tt>mapping=MappingQ1@<dim@>()</tt>.
 				      */
@@ -668,7 +671,7 @@ class VectorTools
     
 				     /**
 				      * Calls the other
-				      * @p interpolate_boundary_values
+				      * interpolate_boundary_values()
 				      * function, see above, with
 				      * <tt>mapping=MappingQ1@<dim@>()</tt>.
 				      */
@@ -682,7 +685,7 @@ class VectorTools
     
     
 				     /**
-				      * Project @p function to the boundary
+				      * Project a function to the boundary
 				      * of the domain, using the given quadrature
 				      * formula for the faces. If the
 				      * @p boundary_values contained values
@@ -691,29 +694,53 @@ class VectorTools
 				      * of the boundary part to be projected
 				      * on already was in the variable.
 				      *
-				      * It is assumed that the number
-				      * of components of
-				      * @p boundary_function
-				      * matches that of the finite
-				      * element used by @p dof.
+				      * If @p component_mapping is
+				      * empty, it is assumed that the
+				      * number of components of @p
+				      * boundary_function matches that
+				      * of the finite element used by
+				      * @p dof.
 				      *
 				      * In 1d, projection equals
 				      * interpolation. Therefore,
 				      * interpolate_boundary_values is
 				      * called.
 				      *
-				      * See the general documentation of this
-				      * class for further information.
+				      * @arg @p boundary_values: the
+				      * result of this function, a map
+				      * containing all indices of
+				      * degrees of freedom at the
+				      * boundary (as covered by the
+				      * boundary parts in @p
+				      * boundary_functions) and the
+				      * computed dof value for this
+				      * degree of freedom.
+				      *
+				      * @arg @p component_mapping: if
+				      * the components in @p
+				      * boundary_functions and @p dof
+				      * do not coincide, this vector
+				      * allows them to be remapped. If
+				      * the vector is not empty, it
+				      * has to have one entry for each
+				      * component in @p dof. This
+				      * entry is the component number
+				      * in @p boundary_functions that
+				      * should be used for this
+				      * component in @p dof. By
+				      * default, no remapping is
+				      * applied.
 				      */
     template <int dim>
     static void project_boundary_values (const Mapping<dim>       &mapping,
 					 const DoFHandler<dim>    &dof,
 					 const typename FunctionMap<dim>::type &boundary_functions,
 					 const Quadrature<dim-1>  &q,
-					 std::map<unsigned int,double> &boundary_values);
+					 std::map<unsigned int,double> &boundary_values,
+					 std::vector<unsigned int> component_mapping = std::vector<unsigned int>());
 
 				     /**
-				      * Calls the @p project_boundary_values
+				      * Calls the project_boundary_values()
 				      * function, see above, with
 				      * <tt>mapping=MappingQ1@<dim@>()</tt>.
 				      */
@@ -721,7 +748,8 @@ class VectorTools
     static void project_boundary_values (const DoFHandler<dim>    &dof,
 					 const typename FunctionMap<dim>::type &boundary_function,
 					 const Quadrature<dim-1>  &q,
-					 std::map<unsigned int,double> &boundary_values);
+					 std::map<unsigned int,double> &boundary_values,
+					 std::vector<unsigned int> component_mapping = std::vector<unsigned int>());
 
 
 				     /**
@@ -1053,7 +1081,7 @@ class VectorTools
 					Vector<double>        &rhs_vector);
 
 				     /**
-				      * Calls the @p create_right_hand_side
+				      * Calls the create_right_hand_side()
 				      * function, see above, with
 				      * <tt>mapping=MappingQ1@<dim@>()</tt>.
 				      */
@@ -1101,7 +1129,7 @@ class VectorTools
                                            Vector<double>        &rhs_vector);
 
 				     /**
-				      * Calls the @p create_point_source_vector
+				      * Calls the create_point_source_vector()
 				      * function, see above, with
 				      * <tt>mapping=MappingQ1@<dim@>()</tt>.
 				      */
@@ -1155,7 +1183,7 @@ class VectorTools
 
 				     /**
 				      * Calls the
-				      * @p create_boundary_right_hand_side
+				      * create_boundary_right_hand_side()
 				      * function, see above, with
 				      * <tt>mapping=MappingQ1@<dim@>()</tt>.
 				      */
@@ -1179,12 +1207,14 @@ class VectorTools
 						 const std::set<unsigned char> &boundary_indicators = std::set<unsigned char>());
 
 				     /**
-				      * Calls the @p
-				      * create_boundary_right_hand_side
-				      * function, see above, with a single Q1
-				      * mapping as collection. This function
-				      * therefore will only work if the only
-				      * active fe index in use is zero.
+				      * Calls the
+				      * create_boundary_right_hand_side()
+				      * function, see above, with a
+				      * single Q1 mapping as
+				      * collection. This function
+				      * therefore will only work if
+				      * the only active fe index in
+				      * use is zero.
 				      */
     template <int dim>
     static void create_boundary_right_hand_side (const hp::DoFHandler<dim>   &dof,
@@ -1278,7 +1308,7 @@ class VectorTools
 				      const double exponent = 2.);
 
 				     /**
-				      * Calls the @p integrate_difference
+				      * Calls the integrate_difference()
 				      * function, see above, with
 				      * <tt>mapping=MappingQ1@<dim@>()</tt>.
 				      */
@@ -1304,7 +1334,7 @@ class VectorTools
 				      const double exponent = 2.);
 
 				     /**
-				      * Calls the @p integrate_difference
+				      * Calls the integrate_difference()
 				      * function, see above, with
 				      * <tt>mapping=MappingQ1@<dim@>()</tt>.
 				      */
@@ -1530,7 +1560,7 @@ class VectorTools
 				      const unsigned int     component);
 
 				     /**
-				      * Calls the @p compute_mean_value
+				      * Calls the compute_mean_value()
 				      * function, see above, with
 				      * <tt>mapping=MappingQ1@<dim@>()</tt>.
 				      */

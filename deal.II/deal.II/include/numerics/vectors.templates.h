@@ -311,8 +311,9 @@ namespace internal
   {
 #if deal_II_dimension == 1
 
+    template <int dim>
     void
-    interpolate_zero_boundary_values (const dealii::DoFHandler<1>         &dof_handler,
+    interpolate_zero_boundary_values (const dealii::DoFHandler<dim>         &dof_handler,
                                       std::map<unsigned int,double> &boundary_values)
     {
                                        // we only need to find the
@@ -321,7 +322,7 @@ namespace internal
                                        // dof indices. that's easy :-)
       for (unsigned direction=0; direction<2; ++direction)
         {
-          dealii::DoFHandler<1>::cell_iterator
+          typename dealii::DoFHandler<dim>::cell_iterator
               cell = dof_handler.begin(0);
           while (!cell->at_boundary(direction))
             cell = cell->neighbor(direction);
@@ -1660,8 +1661,10 @@ VectorTools::project_boundary_values (const Mapping<dim>       &mapping,
 				      const DoFHandler<dim>    &dof,
 				      const typename FunctionMap<dim>::type &boundary_functions,
 				      const Quadrature<dim-1>  &,
-				      std::map<unsigned int,double> &boundary_values)
+				      std::map<unsigned int,double> &boundary_values,
+				      std::vector<unsigned int> component_mapping)
 {
+  Assert (component_mapping.size() == 0, ExcNotImplemented());
 				   // projection in 1d is equivalent
 				   // to interpolation
   interpolate_boundary_values (mapping, dof, boundary_functions,
@@ -1677,7 +1680,8 @@ VectorTools::project_boundary_values (const Mapping<dim>       &mapping,
 				      const DoFHandler<dim>    &dof,
 				      const typename FunctionMap<dim>::type &boundary_functions,
 				      const Quadrature<dim-1>  &q,
-				      std::map<unsigned int,double> &boundary_values)
+				      std::map<unsigned int,double> &boundary_values,
+				      std::vector<unsigned int> component_mapping)
 {
 //TODO:[?] In VectorTools::project_boundary_values, no condensation of sparsity
 //    structures, matrices and right hand sides or distribution of
@@ -1685,9 +1689,18 @@ VectorTools::project_boundary_values (const Mapping<dim>       &mapping,
 //    there are no constrained nodes on the boundary, but is not
 //    acceptable for higher dimensions. Fix this.
 
-  Assert (dof.get_fe().n_components() == boundary_functions.begin()->second->n_components,
-	  ExcDimensionMismatch(dof.get_fe().n_components(),
-			       boundary_functions.begin()->second->n_components));
+  if (component_mapping.size() == 0)
+    {
+      AssertDimension (dof.get_fe().n_components(), boundary_functions.begin()->second->n_components);
+				       // I still do not see why i
+				       // should create another copy
+				       // here
+      component_mapping.resize(dof.get_fe().n_components());
+      for (unsigned int i= 0 ;i < component_mapping.size() ; ++i)
+	component_mapping[i] = i;
+    }
+  else
+    AssertDimension (dof.get_fe().n_components(), component_mapping.size());
   
   std::vector<unsigned int> dof_to_boundary_mapping;
   std::set<unsigned char> selected_boundary_components;
@@ -1755,7 +1768,8 @@ VectorTools::project_boundary_values (const Mapping<dim>       &mapping,
 
   MatrixCreator::create_boundary_mass_matrix (mapping, dof, q, 
 					      mass_matrix, boundary_functions,
-					      rhs, dof_to_boundary_mapping);
+					      rhs, dof_to_boundary_mapping, (const Function<dim>*) 0,
+					      component_mapping);
 
 				   // For certain weird elements,
 				   // there might be degrees of
@@ -1764,7 +1778,7 @@ VectorTools::project_boundary_values (const Mapping<dim>       &mapping,
 				   // have support there. Let's
 				   // eliminate them here.
 
-//TODO: Maybe we should figure out ith the element really needs this
+//TODO: Maybe we should figure out if the element really needs this
   
   FilteredMatrix<Vector<double> > filtered_mass_matrix(mass_matrix, true);
   FilteredMatrix<Vector<double> > filtered_precondition;
@@ -1824,10 +1838,12 @@ void
 VectorTools::project_boundary_values (const DoFHandler<dim>    &dof,
 				      const typename FunctionMap<dim>::type &boundary_functions,
 				      const Quadrature<dim-1>  &q,
-				      std::map<unsigned int,double> &boundary_values)
+				      std::map<unsigned int,double> &boundary_values,
+				      std::vector<unsigned int> component_mapping)
 {
   Assert (DEAL_II_COMPAT_MAPPING, ExcCompatibility("mapping"));
-  project_boundary_values(StaticMappingQ1<dim>::mapping, dof, boundary_functions, q, boundary_values);
+  project_boundary_values(StaticMappingQ1<dim>::mapping, dof, boundary_functions, q,
+			  boundary_values, component_mapping);
 }
 
 

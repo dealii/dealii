@@ -143,14 +143,14 @@ void VectorTools::project_boundary_values<deal_II_dimension>
  const DoFHandler<deal_II_dimension>  &,
  const FunctionMap<deal_II_dimension>::type &,
  const Quadrature<deal_II_dimension-1>&,
- std::map<unsigned int,double>        &);
+ std::map<unsigned int,double>&, std::vector<unsigned int>);
 
 template
 void VectorTools::project_boundary_values<deal_II_dimension>
 (const DoFHandler<deal_II_dimension>  &,
  const FunctionMap<deal_II_dimension>::type &,
  const Quadrature<deal_II_dimension-1>&,
- std::map<unsigned int,double>        &);
+ std::map<unsigned int,double>&, std::vector<unsigned int>);
 
 
 #if deal_II_dimension != 1

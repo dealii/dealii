@@ -309,9 +309,7 @@ class MatrixCreator
 				     /**
 				      * Assemble the mass matrix and a
 				      * right hand side vector along
-				      * the boundary.  If no
-				      * coefficient is given, it is
-				      * assumed to be constant one.
+				      * the boundary.
 				      *
 				      * The matrix is assumed to
 				      * already be initialized with a
@@ -322,6 +320,26 @@ class MatrixCreator
 				      * If the library is configured
 				      * to use multithreading, this
 				      * function works in parallel.
+				      *
+				      * @arg @p weight: an optional
+				      * weight for the computation of
+				      * the mass matrix. If no weight
+				      * is given, it is set to one.
+				      *
+				      * @arg @p component_mapping: if
+				      * the components in @p
+				      * boundary_functions and @p dof
+				      * do not coincide, this vector
+				      * allows them to be remapped. If
+				      * the vector is not empty, it
+				      * has to have one entry for each
+				      * component in @p dof. This
+				      * entry is the component number
+				      * in @p boundary_functions that
+				      * should be used for this
+				      * component in @p dof. By
+				      * default, no remapping is
+				      * applied.
 				      *
 				      * @todo This function does not
 				      * work for finite elements with
@@ -336,22 +354,9 @@ class MatrixCreator
 				      const typename FunctionMap<dim>::type &boundary_functions,
 				      Vector<double>           &rhs_vector,
 				      std::vector<unsigned int>&dof_to_boundary_mapping,
-				      const Function<dim> * const a = 0);
-
-				     /**
-				      * Same function, but for 1d.
-				      */
-    static
-    void create_boundary_mass_matrix (const Mapping<1>       &mapping,
-				      const DoFHandler<1>    &dof,
-				      const Quadrature<0>    &q,
-				      SparseMatrix<double>   &matrix,
-				      const FunctionMap<1>::type &boundary_functions,
-				      Vector<double>         &rhs_vector,
-				      std::vector<unsigned int>&dof_to_boundary_mapping,
-				      const Function<1> * const a = 0);
-
-
+				      const Function<dim> * const weight = 0,
+				      std::vector<unsigned int> component_mapping = std::vector<unsigned int>());
+    
 				     /**
 				      * Calls the
 				      * create_boundary_mass_matrix()
@@ -366,7 +371,8 @@ class MatrixCreator
 				      const typename FunctionMap<dim>::type        &boundary_functions,
 				      Vector<double>           &rhs_vector,
 				      std::vector<unsigned int>&dof_to_boundary_mapping,
-				      const Function<dim> * const a = 0);
+				      const Function<dim> * const a = 0,
+				      std::vector<unsigned int> component_mapping = std::vector<unsigned int>());
 
 				     /**
 				      * Same function as above, but for hp
@@ -381,21 +387,8 @@ class MatrixCreator
 				      const typename FunctionMap<dim>::type &boundary_functions,
 				      Vector<double>           &rhs_vector,
 				      std::vector<unsigned int>&dof_to_boundary_mapping,
-				      const Function<dim> * const a = 0);
-
-				     /**
-				      * Same function as above, but for hp
-				      * objects.
-				      */
-    static
-    void create_boundary_mass_matrix (const hp::MappingCollection<1>       &mapping,
-				      const hp::DoFHandler<1>    &dof,
-				      const hp::QCollection<0>    &q,
-				      SparseMatrix<double>   &matrix,
-				      const FunctionMap<1>::type &boundary_functions,
-				      Vector<double>         &rhs_vector,
-				      std::vector<unsigned int>&dof_to_boundary_mapping,
-				      const Function<1> * const a = 0);
+				      const Function<dim> * const a = 0,
+				      std::vector<unsigned int> component_mapping = std::vector<unsigned int>());
 
 				     /**
 				      * Same function as above, but for hp
@@ -409,7 +402,8 @@ class MatrixCreator
 				      const typename FunctionMap<dim>::type        &boundary_functions,
 				      Vector<double>           &rhs_vector,
 				      std::vector<unsigned int>&dof_to_boundary_mapping,
-				      const Function<dim> * const a = 0);
+				      const Function<dim> * const a = 0,
+				      std::vector<unsigned int> component_mapping = std::vector<unsigned int>());
 
 				     /**
 				      * Assemble the Laplace
@@ -746,14 +740,15 @@ class MatrixCreator
 				      */
     template <int dim>
     static
-    void create_boundary_mass_matrix_1 (const Mapping<dim>       &mapping,
-					const DoFHandler<dim>    &dof,
-					const Quadrature<dim-1>  &q,
+    void create_boundary_mass_matrix_1 (boost::tuple<const Mapping<dim>&,
+					const DoFHandler<dim>&,
+					const Quadrature<dim-1>&> commons,
 					SparseMatrix<double>     &matrix,
 					const typename FunctionMap<dim>::type        &boundary_functions,
 					Vector<double>           &rhs_vector,
 					std::vector<unsigned int>&dof_to_boundary_mapping,
 					const Function<dim> * const a,
+					const std::vector<unsigned int>& component_mapping,
 					const IteratorRange<DoFHandler<dim> >  range,
 					Threads::ThreadMutex     &mutex);
 
@@ -762,14 +757,15 @@ class MatrixCreator
 				      */
     template <int dim>
     static
-    void create_boundary_mass_matrix_1 (const hp::MappingCollection<dim>       &mapping,
-					const hp::DoFHandler<dim>    &dof,
-					const hp::QCollection<dim-1>  &q,
+    void create_boundary_mass_matrix_1 (boost::tuple<const hp::MappingCollection<dim>&,
+					const hp::DoFHandler<dim>&,
+					const hp::QCollection<dim-1>&> commons,
 					SparseMatrix<double>     &matrix,
 					const typename FunctionMap<dim>::type        &boundary_functions,
 					Vector<double>           &rhs_vector,
 					std::vector<unsigned int>&dof_to_boundary_mapping,
 					const Function<dim> * const a,
+					const std::vector<unsigned int>& component_mapping,
 					const IteratorRange<hp::DoFHandler<dim> >  range,
 					Threads::ThreadMutex     &mutex);
 };

@@ -2,7 +2,7 @@
 //    $Id$
 //    Version: $Name$
 //
-//    Copyright (C) 1998, 1999, 2000, 2001, 2002, 2003, 2004, 2005, 2006, 2007 by the deal.II authors
+//    Copyright (C) 1998, 1999, 2000, 2001, 2002, 2003, 2004, 2005, 2006, 2007, 2008 by the deal.II authors
 //
 //    This file is subject to QPL and may not be  distributed
 //    without copyright and license information. Please refer
@@ -909,14 +909,16 @@ void MatrixCreator::create_mass_matrix (const hp::DoFHandler<dim>    &dof,
 
 #if deal_II_dimension == 1
 
-void MatrixCreator::create_boundary_mass_matrix (const Mapping<1>          &,
-						 const DoFHandler<1>       &,
-						 const Quadrature<0>       &,
-						 SparseMatrix<double>      &,
-						 const FunctionMap<1>::type&,
-						 Vector<double>            &,
-						 std::vector<unsigned int> &,
-						 const Function<1>         * const)
+template <int dim>
+void MatrixCreator::create_boundary_mass_matrix (const Mapping<dim>&,
+						 const DoFHandler<dim>&,
+						 const Quadrature<dim-1>&,
+						 SparseMatrix<double>&,
+						 const typename FunctionMap<dim>::type&,
+						 Vector<double>&,
+						 std::vector<unsigned int>&,
+						 const Function<dim>* const,
+						 std::vector<unsigned int>)
 {
 				   // what would that be in 1d? the
 				   // identity matrix on the boundary
@@ -925,7 +927,7 @@ void MatrixCreator::create_boundary_mass_matrix (const Mapping<1>          &,
 }
 
 
-#endif
+#else
 
 
 
@@ -938,8 +940,33 @@ MatrixCreator::create_boundary_mass_matrix (const Mapping<dim>        &mapping,
 					    const typename FunctionMap<dim>::type         &boundary_functions,
 					    Vector<double>            &rhs_vector,
 					    std::vector<unsigned int> &dof_to_boundary_mapping,
-					    const Function<dim> * const coefficient)
+					    const Function<dim> * const coefficient,
+					    std::vector<unsigned int> component_mapping)
 {
+  const FiniteElement<dim> &fe = dof.get_fe();
+  const unsigned int n_components  = fe.n_components();
+  
+  Assert (matrix.n() == dof.n_boundary_dofs(boundary_functions),
+          ExcInternalError());
+  Assert (matrix.n() == matrix.m(), ExcInternalError());
+  Assert (matrix.n() == rhs_vector.size(), ExcInternalError());
+  Assert (boundary_functions.size() != 0, ExcInternalError());
+  Assert (dof_to_boundary_mapping.size() == dof.n_dofs(),
+	  ExcInternalError());
+  
+  if (component_mapping.size() == 0)
+    {
+      AssertDimension (n_components, boundary_functions.begin()->second->n_components);
+      for (unsigned int i=0;i<n_components;++i)
+	component_mapping.push_back(i);
+    }
+  else
+    AssertDimension (n_components, component_mapping.size());
+  
+  Assert (coefficient ==0 ||
+	  coefficient->n_components==1 ||
+	  coefficient->n_components==n_components, ExcComponentMismatch());
+  
   const unsigned int n_threads = multithread_info.n_default_threads;
   Threads::ThreadGroup<> threads;
 
@@ -953,24 +980,28 @@ MatrixCreator::create_boundary_mass_matrix (const Mapping<dim>        &mapping,
 				   // mutex to synchronise access to
 				   // the matrix
   Threads::ThreadMutex mutex;
+
+  typedef boost::tuple<const Mapping<dim>&,
+    const DoFHandler<dim>&,
+    const Quadrature<dim-1>&> Commons;
   
 				   // then assemble in parallel
   typedef void (*create_boundary_mass_matrix_1_t)
-      (const Mapping<dim>        &mapping,
-       const DoFHandler<dim>     &dof,
-       const Quadrature<dim-1>   &q,
+      (Commons,
        SparseMatrix<double>      &matrix,
        const typename FunctionMap<dim>::type &boundary_functions,
        Vector<double>            &rhs_vector,
        std::vector<unsigned int> &dof_to_boundary_mapping,
        const Function<dim> * const coefficient,
+       const std::vector<unsigned int>& component_mapping,
        const IteratorRange<DoFHandler<dim> >   range,
        Threads::ThreadMutex      &mutex);
   create_boundary_mass_matrix_1_t p = &MatrixCreator::template create_boundary_mass_matrix_1<dim>;
   for (unsigned int thread=0; thread<n_threads; ++thread)
-    threads += Threads::spawn (p)(mapping, dof, q, matrix,
+    threads += Threads::spawn (p)(Commons(mapping, dof, q), matrix,
                                   boundary_functions, rhs_vector,
                                   dof_to_boundary_mapping, coefficient,
+				  component_mapping,
                                   thread_ranges[thread], mutex);
   threads.join_all ();  
 }
@@ -980,34 +1011,30 @@ MatrixCreator::create_boundary_mass_matrix (const Mapping<dim>        &mapping,
 template <int dim>
 void
 MatrixCreator::
-create_boundary_mass_matrix_1 (const Mapping<dim>        &mapping,
-			       const DoFHandler<dim>     &dof,
-			       const Quadrature<dim-1>   &q,
+create_boundary_mass_matrix_1 (boost::tuple<const Mapping<dim>&,
+			       const DoFHandler<dim>&,
+			       const Quadrature<dim-1>&> commons,
 			       SparseMatrix<double>      &matrix,
 			       const typename FunctionMap<dim>::type &boundary_functions,
 			       Vector<double>            &rhs_vector,
 			       std::vector<unsigned int> &dof_to_boundary_mapping,
 			       const Function<dim> * const coefficient,
+			       const std::vector<unsigned int>& component_mapping,
 			       const IteratorRange<DoFHandler<dim> >   range,
 			       Threads::ThreadMutex      &mutex)
 {
+				   // All assertions for this function
+				   // are in the calling function
+				   // before creating threads.
+  const Mapping<dim>& mapping = boost::get<0>(commons);
+  const DoFHandler<dim>& dof = boost::get<1>(commons);
+  const Quadrature<dim-1>& q = boost::get<2>(commons);
+  
   const FiniteElement<dim> &fe = dof.get_fe();
   const unsigned int n_components  = fe.n_components();
+  const unsigned int n_function_components = boundary_functions.begin()->second->n_components;
   const bool         fe_is_system  = (n_components != 1);
-  const bool         fe_is_primitive = fe.is_primitive();
-  
-  Assert (matrix.n() == dof.n_boundary_dofs(boundary_functions),
-          ExcInternalError());
-  Assert (matrix.n() == matrix.m(), ExcInternalError());
-  Assert (matrix.n() == rhs_vector.size(), ExcInternalError());
-  Assert (boundary_functions.size() != 0, ExcInternalError());
-  Assert (dof_to_boundary_mapping.size() == dof.n_dofs(),
-	  ExcInternalError());
-  Assert (n_components == boundary_functions.begin()->second->n_components,
-	  ExcComponentMismatch());
-  Assert (coefficient ==0 ||
-	  coefficient->n_components==1 ||
-	  coefficient->n_components==n_components, ExcComponentMismatch());
+  const bool         fe_is_primitive = fe.is_primitive();  
   
   const unsigned int dofs_per_cell = fe.dofs_per_cell,
 		     dofs_per_face = fe.dofs_per_face;
@@ -1018,6 +1045,7 @@ create_boundary_mass_matrix_1 (const Mapping<dim>        &mapping,
 
   UpdateFlags update_flags = UpdateFlags (update_values     |
 					  update_JxW_values |
+					  update_normal_vectors |
 					  update_quadrature_points);
   FEFaceValues<dim> fe_values (mapping, fe, q, update_flags);
 
@@ -1032,7 +1060,7 @@ create_boundary_mass_matrix_1 (const Mapping<dim>        &mapping,
   
   std::vector<double>          rhs_values_scalar (fe_values.n_quadrature_points);
   std::vector<Vector<double> > rhs_values_system (fe_values.n_quadrature_points,
-						  Vector<double>(n_components));
+						  Vector<double>(n_function_components));
 
   std::vector<unsigned int> dofs (dofs_per_cell);
   std::vector<unsigned int> dofs_on_face_vector (dofs_per_face);
@@ -1085,6 +1113,27 @@ create_boundary_mass_matrix_1 (const Mapping<dim>        &mapping,
 		  for (unsigned int point=0; point<fe_values.n_quadrature_points; ++point)
 		    coefficient_vector_values[point] = coefficient_values[point];
 		}
+
+					       // Special treatment
+					       // for Hdiv and Hcurl
+					       // elements, where only
+					       // the normal or
+					       // tangential component
+					       // should be projected.
+	      std::vector<std::vector<double> > normal_adjustment(fe_values.n_quadrature_points,
+								  std::vector<double>(n_components, 1.));
+	      
+	      for (unsigned int comp = 0;comp<n_components;++comp)
+		{
+		  const FiniteElement<dim>& base = fe.base_element(fe.component_to_base_index(comp).first);
+		  const unsigned int bcomp = fe.component_to_base_index(comp).second;
+		  
+		  if (!base.conforms(FiniteElementData<dim>::H1) &&
+		      base.conforms(FiniteElementData<dim>::Hdiv))
+		    for (unsigned int point=0; point<fe_values.n_quadrature_points; ++point)
+		      normal_adjustment[point][comp] = fe_values.normal_vector(point)(bcomp)
+						       * fe_values.normal_vector(point)(bcomp);
+		}
 	      
 	      for (unsigned int point=0; point<fe_values.n_quadrature_points; ++point)
 		{
@@ -1094,8 +1143,8 @@ create_boundary_mass_matrix_1 (const Mapping<dim>        &mapping,
 		      {
 			for (unsigned int j=0; j<fe_values.dofs_per_cell; ++j)
 			  {
-			    if (fe.system_to_component_index(j).first ==
-				fe.system_to_component_index(i).first)
+			    if (fe.system_to_component_index(j).first
+				== fe.system_to_component_index(i).first)
 			      {
 				cell_matrix(i,j)
 				  += weight
@@ -1105,7 +1154,7 @@ create_boundary_mass_matrix_1 (const Mapping<dim>        &mapping,
 			      }
 			  }
 			cell_vector(i) += fe_values.shape_value(i,point)
-					  * rhs_values_system[point](fe.system_to_component_index(i).first)
+					  * rhs_values_system[point](component_mapping[fe.system_to_component_index(i).first])
 					  * weight;
 		      }
 		    else
@@ -1116,9 +1165,11 @@ create_boundary_mass_matrix_1 (const Mapping<dim>        &mapping,
 			      cell_matrix(i,j)
 				+= fe_values.shape_value_component(j,point,comp)
 				* fe_values.shape_value_component(i,point,comp)
+				* normal_adjustment[point][comp]
 				* weight * coefficient_vector_values[point](comp);
 			    cell_vector(i) += fe_values.shape_value_component(i,point,comp) *
-					      rhs_values_system[point](comp)
+					      rhs_values_system[point](component_mapping[comp])
+					      * normal_adjustment[point][comp]
 					      * weight;
 			  }
 		      }
@@ -1222,6 +1273,7 @@ create_boundary_mass_matrix_1 (const Mapping<dim>        &mapping,
 	}
 }
 
+#endif
 
 template <int dim>
 void MatrixCreator::create_boundary_mass_matrix (const DoFHandler<dim>     &dof,
@@ -1230,25 +1282,29 @@ void MatrixCreator::create_boundary_mass_matrix (const DoFHandler<dim>     &dof,
 						 const typename FunctionMap<dim>::type &rhs,
 						 Vector<double>            &rhs_vector,
 						 std::vector<unsigned int> &dof_to_boundary_mapping,
-						 const Function<dim> * const a)
+						 const Function<dim> * const a,
+						 std::vector<unsigned int> component_mapping)
 {
   Assert (DEAL_II_COMPAT_MAPPING, ExcCompatibility("mapping"));
   create_boundary_mass_matrix(StaticMappingQ1<dim>::mapping, dof, q,
-			      matrix,rhs, rhs_vector, dof_to_boundary_mapping, a);
+			      matrix,rhs, rhs_vector, dof_to_boundary_mapping, a, component_mapping);
 }
 
 
 
 #if deal_II_dimension == 1
 
-void MatrixCreator::create_boundary_mass_matrix (const hp::MappingCollection<1>          &,
-						 const hp::DoFHandler<1>       &,
-						 const hp::QCollection<0>       &,
-						 SparseMatrix<double>      &,
-						 const FunctionMap<1>::type&,
-						 Vector<double>            &,
-						 std::vector<unsigned int> &,
-						 const Function<1>         * const)
+template <int dim>
+void
+MatrixCreator::create_boundary_mass_matrix (const hp::MappingCollection<dim>&,
+					    const hp::DoFHandler<dim>&,
+					    const hp::QCollection<dim-1>&,
+					    SparseMatrix<double>&,
+					    const typename FunctionMap<dim>::type&,
+					    Vector<double>&,
+					    std::vector<unsigned int>&,
+					    const Function<dim>* const,
+					    std::vector<unsigned int>)
 {
 				   // what would that be in 1d? the
 				   // identity matrix on the boundary
@@ -1257,8 +1313,7 @@ void MatrixCreator::create_boundary_mass_matrix (const hp::MappingCollection<1> 
 }
 
 
-#endif
-
+#else
 
 
 template <int dim>
@@ -1270,8 +1325,32 @@ MatrixCreator::create_boundary_mass_matrix (const hp::MappingCollection<dim>    
 					    const typename FunctionMap<dim>::type         &boundary_functions,
 					    Vector<double>            &rhs_vector,
 					    std::vector<unsigned int> &dof_to_boundary_mapping,
-					    const Function<dim> * const coefficient)
+					    const Function<dim> * const coefficient,
+					    std::vector<unsigned int> component_mapping)
 {
+  const hp::FECollection<dim> &fe_collection = dof.get_fe();
+  const unsigned int n_components  = fe_collection.n_components();
+  
+  Assert (matrix.n() == dof.n_boundary_dofs(boundary_functions),
+          ExcInternalError());
+  Assert (matrix.n() == matrix.m(), ExcInternalError());
+  Assert (matrix.n() == rhs_vector.size(), ExcInternalError());
+  Assert (boundary_functions.size() != 0, ExcInternalError());
+  Assert (dof_to_boundary_mapping.size() == dof.n_dofs(),
+	  ExcInternalError());
+  Assert (coefficient ==0 ||
+	  coefficient->n_components==1 ||
+	  coefficient->n_components==n_components, ExcComponentMismatch());
+
+  if (component_mapping.size() == 0)
+    {
+      AssertDimension (n_components, boundary_functions.begin()->second->n_components);
+      for (unsigned int i=0;i<n_components;++i)
+	component_mapping.push_back(i);
+    }
+  else
+    AssertDimension (n_components, component_mapping.size());
+
   const unsigned int n_threads = multithread_info.n_default_threads;
   Threads::ThreadGroup<> threads;
 
@@ -1282,27 +1361,31 @@ MatrixCreator::create_boundary_mass_matrix (const hp::MappingCollection<dim>    
     = Threads::split_range<active_cell_iterator> (dof.begin_active(),
 						  dof.end(), n_threads);
 
+  typedef boost::tuple<const hp::MappingCollection<dim>&,
+    const hp::DoFHandler<dim>&,
+    const hp::QCollection<dim-1>&> Commons;
+  
 				   // mutex to synchronise access to
 				   // the matrix
   Threads::ThreadMutex mutex;
   
 				   // then assemble in parallel
   typedef void (*create_boundary_mass_matrix_1_t)
-      (const hp::MappingCollection<dim>        &mapping,
-       const hp::DoFHandler<dim>     &dof,
-       const hp::QCollection<dim-1>   &q,
+      (Commons,
        SparseMatrix<double>      &matrix,
        const typename FunctionMap<dim>::type &boundary_functions,
        Vector<double>            &rhs_vector,
        std::vector<unsigned int> &dof_to_boundary_mapping,
        const Function<dim> * const coefficient,
+       const std::vector<unsigned int>& component_mapping,
        const IteratorRange<hp::DoFHandler<dim> >   range,
        Threads::ThreadMutex      &mutex);
   create_boundary_mass_matrix_1_t p = &MatrixCreator::template create_boundary_mass_matrix_1<dim>;
   for (unsigned int thread=0; thread<n_threads; ++thread)
-    threads += Threads::spawn (p)(mapping, dof, q, matrix,
+    threads += Threads::spawn (p)(Commons(mapping, dof, q), matrix,
                                   boundary_functions, rhs_vector,
                                   dof_to_boundary_mapping, coefficient,
+				  component_mapping,
                                   thread_ranges[thread], mutex);
   threads.join_all ();  
 }
@@ -1312,33 +1395,25 @@ MatrixCreator::create_boundary_mass_matrix (const hp::MappingCollection<dim>    
 template <int dim>
 void
 MatrixCreator::
-create_boundary_mass_matrix_1 (const hp::MappingCollection<dim>        &mapping,
-			       const hp::DoFHandler<dim>     &dof,
-			       const hp::QCollection<dim-1>   &q,
+create_boundary_mass_matrix_1 (boost::tuple<const hp::MappingCollection<dim>&,
+			       const hp::DoFHandler<dim>&,
+			       const hp::QCollection<dim-1>&> commons,
 			       SparseMatrix<double>      &matrix,
 			       const typename FunctionMap<dim>::type &boundary_functions,
 			       Vector<double>            &rhs_vector,
 			       std::vector<unsigned int> &dof_to_boundary_mapping,
 			       const Function<dim> * const coefficient,
+			       const std::vector<unsigned int>& component_mapping,
 			       const IteratorRange<hp::DoFHandler<dim> >   range,
 			       Threads::ThreadMutex      &mutex)
-{  
+{
+  const hp::MappingCollection<dim>& mapping = boost::get<0>(commons);
+  const hp::DoFHandler<dim>& dof = boost::get<1>(commons);
+  const hp::QCollection<dim-1>& q = boost::get<2>(commons);
   const hp::FECollection<dim> &fe_collection = dof.get_fe();
   const unsigned int n_components  = fe_collection.n_components();
+  const unsigned int n_function_components = boundary_functions.begin()->second->n_components;
   const bool         fe_is_system  = (n_components != 1);
-
-  Assert (matrix.n() == dof.n_boundary_dofs(boundary_functions),
-          ExcInternalError());
-  Assert (matrix.n() == matrix.m(), ExcInternalError());
-  Assert (matrix.n() == rhs_vector.size(), ExcInternalError());
-  Assert (boundary_functions.size() != 0, ExcInternalError());
-  Assert (dof_to_boundary_mapping.size() == dof.n_dofs(),
-	  ExcInternalError());
-  Assert (n_components == boundary_functions.begin()->second->n_components,
-	  ExcComponentMismatch());
-  Assert (coefficient ==0 ||
-	  coefficient->n_components==1 ||
-	  coefficient->n_components==n_components, ExcComponentMismatch());
 #ifdef DEBUG
   if (true)
     {
@@ -1406,7 +1481,7 @@ create_boundary_mass_matrix_1 (const hp::MappingCollection<dim>        &mapping,
 					     // FE has several components
 	    {
 	      rhs_values_system.resize (fe_values.n_quadrature_points,
-					Vector<double>(n_components));
+					Vector<double>(n_function_components));
 	      boundary_functions.find(cell->face(face)->boundary_indicator())
 		->second->vector_value_list (fe_values.get_quadrature_points(),
 					     rhs_values_system);
@@ -1436,7 +1511,7 @@ create_boundary_mass_matrix_1 (const hp::MappingCollection<dim>        &mapping,
 				}
 			      cell_vector(i) += v *
 						rhs_values_system[point](
-						  fe.system_to_component_index(i).first) * weight;
+						  component_mapping[fe.system_to_component_index(i).first]) * weight;
 			    }
 			}
 		    }
@@ -1464,7 +1539,7 @@ create_boundary_mass_matrix_1 (const hp::MappingCollection<dim>        &mapping,
 					(u * v * weight * coefficient_vector_values[point](component_i));
 				    }
 				} 
-			      cell_vector(i) += v * rhs_values_system[point](component_i) * weight;
+			      cell_vector(i) += v * rhs_values_system[point](component_mapping[component_i]) * weight;
 			    }
 			}
 		    }
@@ -1687,6 +1762,7 @@ create_boundary_mass_matrix_1 (const hp::MappingCollection<dim>        &mapping,
 	}
 }
 
+#endif
 
 template <int dim>
 void MatrixCreator::create_boundary_mass_matrix (const hp::DoFHandler<dim>     &dof,
@@ -1695,11 +1771,12 @@ void MatrixCreator::create_boundary_mass_matrix (const hp::DoFHandler<dim>     &
 						 const typename FunctionMap<dim>::type &rhs,
 						 Vector<double>            &rhs_vector,
 						 std::vector<unsigned int> &dof_to_boundary_mapping,
-						 const Function<dim> * const a)
+						 const Function<dim> * const a,
+						 std::vector<unsigned int> component_mapping)
 {
   Assert (DEAL_II_COMPAT_MAPPING, ExcCompatibility("mapping"));
   create_boundary_mass_matrix(hp::StaticMappingQ1<dim>::mapping_collection, dof, q,
-			      matrix,rhs, rhs_vector, dof_to_boundary_mapping, a);
+			      matrix,rhs, rhs_vector, dof_to_boundary_mapping, a, component_mapping);
 }
 
 
@@ -2619,7 +2696,6 @@ void MatrixCreator::create_mass_matrix<deal_II_dimension>
 
 
 
-#if deal_II_dimension != 1
 template
 void
 MatrixCreator::create_boundary_mass_matrix<deal_II_dimension>
@@ -2630,8 +2706,9 @@ MatrixCreator::create_boundary_mass_matrix<deal_II_dimension>
  const FunctionMap<deal_II_dimension>::type         &boundary_functions,
  Vector<double>            &rhs_vector,
  std::vector<unsigned int> &dof_to_boundary_mapping,
- const Function<deal_II_dimension> * const a);
-#endif
+ const Function<deal_II_dimension> * const a,
+ std::vector<unsigned int>);
+
 
 template
 void MatrixCreator::create_boundary_mass_matrix<deal_II_dimension>
@@ -2641,32 +2718,34 @@ void MatrixCreator::create_boundary_mass_matrix<deal_II_dimension>
  const FunctionMap<deal_II_dimension>::type &rhs,
  Vector<double>            &rhs_vector,
  std::vector<unsigned int> &dof_to_boundary_mapping,
- const Function<deal_II_dimension> * const a);
+ const Function<deal_II_dimension> * const a,
+ std::vector<unsigned int>);
 
 
-#if deal_II_dimension != 1
 template
 void
 MatrixCreator::create_boundary_mass_matrix<deal_II_dimension>
-(const hp::MappingCollection<deal_II_dimension>        &mapping,
- const hp::DoFHandler<deal_II_dimension>     &dof,
- const hp::QCollection<deal_II_dimension-1>   &q,
- SparseMatrix<double>      &matrix,
- const FunctionMap<deal_II_dimension>::type         &boundary_functions,
- Vector<double>            &rhs_vector,
- std::vector<unsigned int> &dof_to_boundary_mapping,
- const Function<deal_II_dimension> * const a);
-#endif
+(const hp::MappingCollection<deal_II_dimension>&,
+ const hp::DoFHandler<deal_II_dimension>&,
+ const hp::QCollection<deal_II_dimension-1>&,
+ SparseMatrix<double>&,
+ const FunctionMap<deal_II_dimension>::type&,
+ Vector<double>&,
+ std::vector<unsigned int>&,
+ const Function<deal_II_dimension> * const,
+ std::vector<unsigned int>);
+
 
 template
 void MatrixCreator::create_boundary_mass_matrix<deal_II_dimension>
-(const hp::DoFHandler<deal_II_dimension>     &dof,
- const hp::QCollection<deal_II_dimension-1>   &q,
- SparseMatrix<double>      &matrix,
- const FunctionMap<deal_II_dimension>::type &rhs,
- Vector<double>            &rhs_vector,
- std::vector<unsigned int> &dof_to_boundary_mapping,
- const Function<deal_II_dimension> * const a);
+(const hp::DoFHandler<deal_II_dimension>&,
+ const hp::QCollection<deal_II_dimension-1>&,
+ SparseMatrix<double>&,
+ const FunctionMap<deal_II_dimension>::type&,
+ Vector<double>&,
+ std::vector<unsigned int>&,
+ const Function<deal_II_dimension> * const,
+ std::vector<unsigned int>);
 
 
 
