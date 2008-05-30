@@ -19,15 +19,18 @@
 # options may be
 #   -v for verbose output of diff
 #   -y for side-by-side diff
+#   -R for no recursion
 
 diffout="/dev/null"
 diffopt=""
 result=""
 okname=""
+recurse="true"
 
 for arg in $* ; do
   if test "x$arg" = "x-v" ; then diffout="/dev/stdout" ; fi
   if test "x$arg" = "x-y" ; then diffopt="-y" ; fi
+  if test "x$arg" = "x-R" ; then recurse="false" ; fi
 done
 
 # First, we check if $1/OK exists. If so, it hopefully contains the
@@ -51,6 +54,10 @@ fi
 
 # If this round failed, check all files in this directory
 # If successful, write the name into $1/OK
+if test "recurse" == "true" ; then
+  echo "$result"
+  exit 1;
+fi
 
 for file in `cd $1/cmp ; ls` ; do
   if test "$diffout" != "/dev/null" ; then
