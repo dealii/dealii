@@ -10,8 +10,12 @@
 /*    to the file deal.II/doc/license.html for the  text  and     */
 /*    further information on this license.                        */
 
+				 // @sect3{Include files}
 
-
+				 // We include the functionality
+				 // of these well-known deal.II
+				 // library files and some C++
+				 // header files.
 #include <base/quadrature_lib.h>
 #include <base/logstream.h>
 #include <base/function.h>
@@ -56,9 +60,18 @@
 #include <fstream>
 #include <sstream>
 
+				 // Next, we import all deal.II
+				 // names into global namespace
 using namespace dealii;
 
 
+				 // @sect3{Defining the inner preconditioner type}
+
+				 // This class creates a local typedef that
+				 // specifies the preconditioner we're
+				 // going to use in the code below, depending
+				 // on the space dimension. This
+				 // is in complete analogy to step-22.
 template <int dim>
  struct InnerPreconditioner;
 
@@ -75,6 +88,22 @@ template <int dim>
  };
 
 
+
+				 // @sect3{The <code>BoussinesqFlowProblem</code> class template}
+
+				 // The definition of this class is
+				 // mainly based on the step-22 tutorial
+				 // program. Most of the data types are
+				 // the same as there. However, we
+				 // deal with a time-dependent system now,
+				 // and there is temperature to take care
+				 // of as well, so we need some additional
+				 // function and variable declarations.
+				 // Furthermore, we have a slightly more
+				 // sophisticated solver we are going to
+				 // use, so there is a second pointer
+				 // to a sparse ILU for the pressure
+				 // mass matrix as well.
 template <int dim>
 class BoussinesqFlowProblem
 {
@@ -119,7 +148,44 @@ class BoussinesqFlowProblem
 
 
 
+				 // @sect3{Boundary values, initial values and right hand sides}
 
+				 // Again, the next stage in the program
+				 // is the definition of the various
+				 // boundary conditions, the right hand
+				 // side and the initial condition (remember
+				 // that we're about to solve a time-
+				 // dependent system). The basic strategy
+				 // for this definition is the same as in
+				 // step-22. Regarding the details, though,
+				 // there are some differences.
+
+				 // The first
+				 // thing is that we don't set any boundary
+				 // conditions on the velocity, as is
+				 // explained in the introduction. So
+				 // what is left are two conditions for
+				 // pressure <i>p</i> and temperature
+				 // <i>T</i>.
+
+				 // Secondly, we set the initial
+				 // condition for all problem variables,
+				 // i.e., for <b>u</b>, <i>p</i> and <i>T</i>,
+				 // so the function has <i>dim+2</i>
+				 // components.
+				 // In this case, we choose a very simple
+				 // test case, where everything is zero.
+
+				 // The last definition of this kind
+				 // is the one for the right hand
+				 // side function. Again, it is very
+				 // basic and zero in most of the
+				 // components, except for a source
+				 // of temperature in some isolated
+				 // regions near the bottom of the
+				 // computational domain, as is explained
+				 // in the problem description in the
+				 // introduction.
 template <int dim>
 class PressureBoundaryValues : public Function<dim>
 {
@@ -249,6 +315,34 @@ RightHandSide<dim>::vector_value (const Point<dim> &p,
 
 
 
+				 // @sect3{Linear solvers and preconditioners}
+
+				 // This section introduces some
+				 // objects that are used for the
+				 // Stokes system that we need to
+				 // solve in each time step. The basic
+				 // structure is still the same as
+				 // in step-20, where Schur complement
+				 // based preconditioners and solvers
+				 // have been introduced. The interface
+				 // is the same as in step-22 for
+				 // the Stokes system.
+
+				 // @sect4{The <code>InverseMatrix</code> class template}
+
+				 // This class is an interface to
+				 // calculate the action of an
+				 // "inverted" matrix on a vector
+				 // (using the <code>vmult</code>
+				 // operation)
+				 // in the same way as the corresponding
+				 // function in step-22: when the
+				 // product of an object of this class
+				 // is requested, we solve a linear
+				 // equation system with that matrix
+				 // using the CG method, accelerated
+				 // by a preconditioner of (templated) class
+				 // <code>Preconditioner</code>.
 template <class Matrix, class Preconditioner>
 class InverseMatrix : public Subscriptor
 {
@@ -294,14 +388,15 @@ void InverseMatrix<Matrix,Preconditioner>::vmult (Vector<double>       &dst,
     }
 }
 
+				 // @sect4{Schur complement preconditioner}
 
-				// This is the implementation
-				// of the Schur complement
-				// preconditioner as described
-				// in the section on improved
-				// solvers in step-22. See there
-				// for more explanation of the
-				// method.
+				 // This is the implementation
+				 // of the Schur complement
+				 // preconditioner as described
+				 // in the section on improved
+				 // solvers in step-22. See there
+				 // for more explanation of the
+				 // method.
 template <class PreconditionerA, class PreconditionerMp>
 class BlockSchurPreconditioner : public Subscriptor
 {
@@ -350,6 +445,9 @@ void BlockSchurPreconditioner<PreconditionerA, PreconditionerMp>::vmult (
 
 
 
+				 // @sect3{BoussinesqFlowProblem class implementation}
+
+				 // @sect4{BoussinesqFlowProblem::BoussinesqFlowProblem}
 template <int dim>
 BoussinesqFlowProblem<dim>::BoussinesqFlowProblem (const unsigned int degree)
                 :
