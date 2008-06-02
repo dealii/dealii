@@ -2481,6 +2481,7 @@ assemble_cell_term (const FEValues<dim>             &fe_v,
       right_hand_side(dof_indices[i]) -= F_i.val();
     }
 
+  delete[] forcing;
   delete[] flux;
 }
 

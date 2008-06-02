@@ -40,6 +40,15 @@ inconvenience this causes.
 <ol>
   <li>
   <p>
+  Fixed: The new @ref step_33 "step-33" tutorial program had a place where
+  we didn't release some memory. This is now fixed.
+  <br>
+  (Chih-Che Chueh, WB 2008/06/02)
+  </p>
+  </li>
+
+  <li>
+  <p>
   Fixed: A missing include file prevented the <code>./configure</code> script
   from detecting the presence of the demangler with recent versions of the
   gcc compiler. The result is that backtraces after failed assertions only
