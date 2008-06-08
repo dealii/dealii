@@ -100,7 +100,7 @@ class ConstraintMatrix;
  * given function onto the finite element space, i.e. if <i>f</i> is
  * the function to be projected, compute <i>f<sub>h</sub></i> in
  * <i>V<sub>h</sub></i> such that
- * (<i>f<sub>h</sub></i>,<i>v<sub>h</sub></i>)=(<i>f</i>,<i>v<sub>h</sub></i>)$
+ * (<i>f<sub>h</sub></i>,<i>v<sub>h</sub></i>)=(<i>f</i>,<i>v<sub>h</sub></i>)
  * for all discrete test functions <i>v<sub>h</sub></i>. This is done
  * through the solution of the linear system of equations <i> M v =
  * f</i> where <i>M</i> is the mass matrix $m_{ij} = \int_\Omega
