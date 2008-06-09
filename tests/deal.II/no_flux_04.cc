@@ -93,6 +93,11 @@ void test (const Triangulation<dim>& tr,
 
   cm.distribute (v);
 
+				   // remove small entries
+  for (unsigned int i=0; i<v.size(); ++i)
+    if (std::fabs (v(i)) < 1e-12)
+      v(i) = 0;
+  
   DataOut<dim> data_out;
   data_out.attach_dof_handler (dh);
 
