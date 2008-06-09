@@ -156,6 +156,41 @@ Using such techniques, it can reasonably be expected that the solution process
 will be faster by at least an order of magnitude.
 
 
+<h4>Time stepping</h4>
+
+In the introduction we have identified the time step restriction 
+@f[
+  \triangle t_{n+1} \le \frac h{|\mathbf{u}^{n+1}(\mathbf{x})|}
+@f]
+that has to hold globally, i.e. for all $\mathbf x$. After discretization, we
+satisfy it by choosing
+@f[
+  \triangle t_{n+1} = \frac {\min_K h_K}{\max_{\mathbf{x}}|\mathbf{u}^{n+1}(\mathbf{x})|}.
+@f]
+
+This restriction on the time step is somewhat annoying: the finer we make the
+mesh the smaller the time step; in other words, we get punished twice: each
+time step is more expensive to solve and we have to do more time steps.
+
+This is particularly annoying since the majority of the additional work is
+spent solving the implicit part of the equations, i.e. the pressure-velocity
+system, whereas it is the hyperbolic transport equation for the saturation
+that imposes the time step restriction.
+
+To avoid this bottleneck, people have invented a number of approaches. For
+example, they may only re-compute the pressure-velocity field every few time
+steps (or, if you want, use different time step sizes for the
+pressure/velocity and saturation equations). This keeps the time step
+restriction on the cheap explicit part while it makes the solution of the
+implicit part less frequent. Experiments in this direction are
+certainly worthwhile; one starting point for such an approach is the paper by
+Zhangxin Chen, Guanren Huan and Baoyan Li: </i>An improved IMPES method for
+two-phase flow in porous media</i>, Transport in Porous Media, 54 (2004),
+pp. 361--376. There are certainly many other papers on this topic as well, but
+this one happened to land on our desk a while back.
+
+
+
 <h4>Adaptivity</h4>
 
 Adaptivity would also clearly help. Looking at the movies, one clearly sees

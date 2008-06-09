@@ -385,7 +385,9 @@ anything useful once we have negative saturations or ones larger than one.
 
 Note that we will have similar restrictions on the time step also in @ref
 step_23 "step-23" and @ref step_24 "step-24" where we solve the time dependent
-wave equation, another hyperbolic problem.
+wave equation, another hyperbolic problem. We will also come back to the issue
+of time step choice below in the section on <a href="#extensions">possible
+extensions to this program</a>.
 
 
 <h3>The test case</h3>
