@@ -184,7 +184,7 @@ pressure/velocity and saturation equations). This keeps the time step
 restriction on the cheap explicit part while it makes the solution of the
 implicit part less frequent. Experiments in this direction are
 certainly worthwhile; one starting point for such an approach is the paper by
-Zhangxin Chen, Guanren Huan and Baoyan Li: </i>An improved IMPES method for
+Zhangxin Chen, Guanren Huan and Baoyan Li: <i>An improved IMPES method for
 two-phase flow in porous media</i>, Transport in Porous Media, 54 (2004),
 pp. 361--376. There are certainly many other papers on this topic as well, but
 this one happened to land on our desk a while back.
