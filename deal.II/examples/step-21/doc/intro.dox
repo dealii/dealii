@@ -161,7 +161,13 @@ equations is to think about the time discretization. In reservoir simulation,
 there is a rather standard algorithm that we will use here. It first solves
 the pressure using an implicit equation, then the saturation using an explicit
 time stepping scheme. The algorithm is called IMPES for IMplicit Pressure
-Explicit Saturation. In a slightly modified form, this algorithm can be
+Explicit Saturation and was first proposed a long time ago: by Sheldon et
+al. in 1959 and Stone and Gardner in 1961 (J. W. Sheldon, B. Zondek and
+W. T. Cardwell: <i>One-dimensional, incompressible, non-capillary, two-phase
+fluid flow in a porous medium</i>, Trans. SPE AIME, 216 (1959), pp. 290-296; H.
+L. Stone and A. O. Gardner Jr: <i>Analysis of gas-cap or dissolved-gas
+reservoirs</i>, Trans. SPE AIME, 222 (1961), pp. 92-104). 
+In a slightly modified form, this algorithm can be
 written as follows: for each time step, solve
 @f{eqnarray*}
   \mathbf{u}^{n+1}+\mathbf{K}\lambda(S^n) \nabla p^{n+1}&=&0 \\
@@ -171,7 +177,9 @@ written as follows: for each time step, solve
 where $\triangle t$ is the length of a time step. Note how we solve the
 implicit pressure-velocity system that only depends on the previously computed
 saturation $S^n$, and then do an explicit time step for $S^{n+1}$ that only
-depends on the previously known $S^n$ and the just computed $\mathbf{u}^{n+1}$.
+depends on the previously known $S^n$ and the just computed
+$\mathbf{u}^{n+1}$. This way, we never have to iterate for the nonlinearities
+of the system as we would have if we used a fully implicit method.
 
 We can then state the problem in weak form as follows, by multiplying each
 equation with test functions $\mathbf v$, $\phi$, and $\sigma$ and integrating
