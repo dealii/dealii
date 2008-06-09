@@ -2,7 +2,7 @@
 //    $Id$
 //    Version: $Name$ 
 //
-//    Copyright (C) 2005, 2006 by the deal.II authors
+//    Copyright (C) 2005, 2006, 2008 by the deal.II authors
 //
 //    This file is subject to QPL and may not be  distributed
 //    without copyright and license information. Please refer
@@ -19,8 +19,9 @@
 
 #include <iomanip>
 
-// Compute the maximal difference between local finite element
-// interpolate and given function.
+// Compute the maximal difference between local finite element interpolant and
+// a given polynomial function. If the finite element space is rich enough,
+// then the error should be zero
 
 template <int dim>
 double difference(
