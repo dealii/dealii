@@ -1,5 +1,5 @@
-//----------------------------  mesh_3d_23.cc  ---------------------------
-//    $Id: mesh_3d_23.cc 15662 2008-01-24 05:31:14Z kanschat $
+//----------------------------  mesh_3d_24.cc  ---------------------------
+//    $Id: mesh_3d_24.cc 15662 2008-01-24 05:31:14Z kanschat $
 //    Version: $Name$ 
 //
 //    Copyright (C) 2006, 2008 by Timo Heister and the deal.II authors
@@ -9,12 +9,14 @@
 //    to the file deal.II/doc/license.html for the  text  and
 //    further information on this license.
 //
-//----------------------------  mesh_3d_23.cc  ---------------------------
+//----------------------------  mesh_3d_24.cc  ---------------------------
 
 
-// like mesh_3d_22, but further reduced: when creating output with
-// DataOut using a MappingQ(3) on a mesh with flipped cells, we get
-// bogus output at the interior face.
+// like mesh_3d_22, but even further reduced: take a few points on a
+// line in reference space and see where they are transformed to real
+// space using a MappingQ(3) on a cell with a flipped face. the cell
+// is a cube, so the points should also be mapped to a straight line,
+// but they are not, unfortunately, when this test was written.
 
 #include "../tests.h"
 
@@ -55,7 +57,7 @@
 
 int main ()
 {
-  std::ofstream logfile ("mesh_3d_23/output");
+  std::ofstream logfile ("mesh_3d_24/output");
   deallog.attach(logfile);
   deallog.depth_console(0);
   deallog.threshold_double(1.0e-10);
@@ -67,18 +69,30 @@ int main ()
   grid_in.read_msh (inputStream);
 
   MappingQ<3> mapping(3);
-  FE_Q<3> fe(3);
-  DoFHandler<3> dofh(triangulation);
 
-  dofh.distribute_dofs(fe);
+  Triangulation<3>::active_cell_iterator cell;
+  cell = triangulation.begin_active();
+  ++cell;
 
-  Vector<double> x(dofh.n_dofs());
-  DataOut<3> data_out;
-
-  data_out.attach_dof_handler(dofh);
-  data_out.add_data_vector(x, "u");
-  data_out.build_patches(mapping, 3);
-
-  data_out.write_gnuplot (deallog.get_file_stream());
+  for (unsigned int f=0; f<6; ++f)
+    deallog << "face: " << f
+	    << std::endl
+	    << "  Face orientation status: "
+	    << cell->face_orientation (f)
+	    << std::endl
+	    << "  On boundary: " << cell->at_boundary(f)
+	    << std::endl
+	    << "  Neighbor: "
+	    << (cell->at_boundary(f) ? triangulation.end() : cell->neighbor(f))
+	    << std::endl;
+  
+  for (double x=0; x<=1; x+=1.0/3.0)
+    {
+      const Point<3> p(x, 1./3., 0);
+      deallog << p
+	      << " in unit coordinates maps to real coordinates "
+	      << mapping.transform_unit_to_real_cell(cell,p)
+	      << std::endl;
+    }
 }
 
