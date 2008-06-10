@@ -104,10 +104,9 @@ void test (Triangulation<dim>& triangulation)
 					     error,
 					     QGauss<dim>(q+2),
 					     VectorTools::L2_norm);
-	  std::cout << fe.get_name() << ", P_" << q
-		    << ", rel. error=" << error.l2_norm() / interpolant.l2_norm()
-		    << " " << (((q<=p)&&!(error.l2_norm() < 1e-12*interpolant.l2_norm()))?"ASSERT":"")
-		    << std::endl;
+	  deallog << fe.get_name() << ", P_" << q
+		  << ", rel. error=" << error.l2_norm() / interpolant.l2_norm()
+		  << std::endl;
 	  if (q<=p)
 	    Assert (error.l2_norm() < 1e-12*interpolant.l2_norm(),
 		    ExcInternalError());
@@ -120,27 +119,29 @@ void test (Triangulation<dim>& triangulation)
 
 int main ()
 {
+  std::ofstream logfile ("mesh_3d_22/output");
+  deallog.attach(logfile);
   deallog.depth_console(0);
-  deallog.threshold_double(1.e-10);
+  deallog.threshold_double(1.0e-10);
 
   Triangulation<3> triangulation;
   GridIn<3> grid_in;
   grid_in.attach_triangulation(triangulation);
-  std::ifstream inputStream("mesh_3d_22/mesh");
-  grid_in.read(inputStream);
+  std::ifstream inputStream("mesh_3d_22/mesh.msh");
+  grid_in.read_msh (inputStream);
   test<3>(triangulation);
 
 
 /*  
-  MappingQ<3> mapping(3);
+    MappingQ<3> mapping(3);
 
-  FE_Q<3> fe(3);
-  DoFHandler<3> dofh(triangulation);
+    FE_Q<3> fe(3);
+    DoFHandler<3> dofh(triangulation);
 
 
-  dofh.distribute_dofs(fe);
+    dofh.distribute_dofs(fe);
 
-  {
+    {
     Vector<double> x(dofh.n_dofs());
     DataOut<3> data_out;
 
@@ -150,17 +151,17 @@ int main ()
 
     std::ofstream output("out.gpl");
     data_out.write(output, data_out.parse_output_format("gnuplot"));
-  }
+    }
 
-  Point<3> p;
-  for (double x=0;x<=1;x+=1.0/3.0)
+    Point<3> p;
+    for (double x=0;x<=1;x+=1.0/3.0)
     {
-      p(0)=x;
-      p(1)=1.0/3.0;
-      p(2)=0.0;
+    p(0)=x;
+    p(1)=1.0/3.0;
+    p(2)=0.0;
 
-      Point<3> r=mapping.transform_unit_to_real_cell(++triangulation.begin_active(),p);
-      std::cout << p << " > " << r << std::endl;
+    Point<3> r=mapping.transform_unit_to_real_cell(++triangulation.begin_active(),p);
+    deallog << p << " > " << r << std::endl;
     }
 */
 }
