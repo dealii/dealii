@@ -130,5 +130,39 @@ int main ()
   std::ifstream inputStream("mesh_3d_22/mesh.msh");
   grid_in.read_msh (inputStream);
   test<3>(triangulation);
+
+
+/*  
+    MappingQ<3> mapping(3);
+
+    FE_Q<3> fe(3);
+    DoFHandler<3> dofh(triangulation);
+
+
+    dofh.distribute_dofs(fe);
+
+    {
+    Vector<double> x(dofh.n_dofs());
+    DataOut<3> data_out;
+
+    data_out.attach_dof_handler(dofh);
+    data_out.add_data_vector(x, "u");
+    data_out.build_patches(mapping, 3);
+
+    std::ofstream output("out.gpl");
+    data_out.write(output, data_out.parse_output_format("gnuplot"));
+    }
+
+    Point<3> p;
+    for (double x=0;x<=1;x+=1.0/3.0)
+    {
+    p(0)=x;
+    p(1)=1.0/3.0;
+    p(2)=0.0;
+
+    Point<3> r=mapping.transform_unit_to_real_cell(++triangulation.begin_active(),p);
+    deallog << p << " > " << r << std::endl;
+    }
+*/
 }
 
