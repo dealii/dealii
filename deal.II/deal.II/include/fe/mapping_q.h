@@ -17,6 +17,7 @@
 #include <base/config.h>
 #include <base/table.h>
 #include <fe/mapping_q1.h>
+#include <fe/fe_q.h>
 
 DEAL_II_NAMESPACE_OPEN
 
@@ -536,6 +537,19 @@ class MappingQ : public MappingQ1<dim>
 				      * boundary cells.
 				      */
     const bool use_mapping_q_on_all_cells;
+
+				     /**
+				      * An FE_Q object which is only needed in
+				      * 3D, since it knows how to reorder shape
+				      * functions/DoFs on non-standard
+				      * faces. This is used to reorder support
+				      * points in the same way. We could make
+				      * this a pointer to prevent construction
+				      * in 1D and 2D, but since memory and time
+				      * requirements are not particularly high
+				      * this seems unnecessary at the moment.
+				      */
+    const FE_Q<dim> feq;
 };
 
 /*@}*/

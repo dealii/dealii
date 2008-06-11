@@ -70,7 +70,8 @@ MappingQ<1>::MappingQ (const unsigned int,
 		tensor_pols(0),
 		n_shape_functions(2),
 		renumber(0),
-		use_mapping_q_on_all_cells (false)
+		use_mapping_q_on_all_cells (false),
+		feq(degree)
 {}
 
 
@@ -83,7 +84,8 @@ MappingQ<1>::MappingQ (const MappingQ<1> &m):
 		tensor_pols(0),
 		n_shape_functions(2),
 		renumber(0),
-		use_mapping_q_on_all_cells (m.use_mapping_q_on_all_cells)
+		use_mapping_q_on_all_cells (m.use_mapping_q_on_all_cells),
+		feq(degree)
 {}
 
 
@@ -106,7 +108,8 @@ MappingQ<dim>::MappingQ (const unsigned int p,
 		tensor_pols(0),
 		n_shape_functions(Utilities::fixed_power<dim>(degree+1)),
 		renumber(0),
-		use_mapping_q_on_all_cells (use_mapping_q_on_all_cells)
+		use_mapping_q_on_all_cells (use_mapping_q_on_all_cells),
+		feq(degree)
 {
 				   // Construct the tensor product
 				   // polynomials used as shape
@@ -161,7 +164,8 @@ MappingQ<dim>::MappingQ (const MappingQ<dim> &mapping)
 		tensor_pols(0),
 		n_shape_functions(mapping.n_shape_functions),
 		renumber(mapping.renumber),
-		use_mapping_q_on_all_cells (mapping.use_mapping_q_on_all_cells)
+		use_mapping_q_on_all_cells (mapping.use_mapping_q_on_all_cells),
+		feq(degree)
 {
   tensor_pols=new TensorProductPolynomials<dim> (*mapping.tensor_pols);
   laplace_on_quad_vector=mapping.laplace_on_quad_vector;
@@ -975,7 +979,22 @@ MappingQ<dim>::add_line_support_points (const typename Triangulation<dim>::cell_
 	       &straight_boundary);
 	  
 	  boundary->get_intermediate_points_on_line (line, line_points);
-	  a.insert (a.end(), line_points.begin(), line_points.end());
+	  if (dim==3)
+	    {
+					       // in 3D, lines might be in wrong
+					       // orientation. if so, reverse
+					       // the vector
+	      if (cell->line_orientation(line_no))
+		a.insert (a.end(), line_points.begin(), line_points.end());
+ 	      else
+ 		a.insert (a.end(), line_points.rbegin(), line_points.rend());
+	    }
+	  else
+					     // in 2D, lines always have the
+					     // correct orientation. simply
+					     // append all points
+	    a.insert (a.end(), line_points.begin(), line_points.end());
+	  
 	}
     }
 }
@@ -1019,6 +1038,7 @@ add_quad_support_points(const Triangulation<3>::cell_iterator &cell,
 		 face_flip        = cell->face_flip       (face_no),
 		 face_rotation    = cell->face_rotation   (face_no);
 
+#ifdef DEBUG      
                                        // some sanity checks up front
       for (unsigned int i=0; i<vertices_per_face; ++i)
         Assert(face->vertex_index(i)==cell->vertex_index(
@@ -1036,6 +1056,7 @@ add_quad_support_points(const Triangulation<3>::cell_iterator &cell,
         Assert(face->line(i)==cell->line(GeometryInfo<3>::face_to_cell_lines(
 	  face_no, i, face_orientation, face_flip, face_rotation)),
 	       ExcInternalError());
+#endif
       
 				       // if face at boundary, then
 				       // ask boundary object to
@@ -1045,7 +1066,19 @@ add_quad_support_points(const Triangulation<3>::cell_iterator &cell,
 	{
 	  face->get_triangulation().get_boundary(face->boundary_indicator())
 	    .get_intermediate_points_on_quad (face, quad_points);
-	  a.insert (a.end(), quad_points.begin(), quad_points.end());
+					   // in 3D, the orientation, flip and
+					   // rotation of the face might not
+					   // match what we expect here, namely
+					   // the standard orientation. thus
+					   // reorder points accordingly. since
+					   // a Mapping uses the same shape
+					   // function as an FEQ, we can ask a
+					   // FEQ to do the reordering for us.
+	  for (unsigned int i=0; i<quad_points.size(); ++i)
+	    a.push_back(quad_points[feq.adjust_quad_dof_index_for_face_orientation(i,
+										   face_orientation,
+										   face_flip,
+										   face_rotation)]);
 	}
       else
 	{
@@ -1084,24 +1117,25 @@ add_quad_support_points(const Triangulation<3>::cell_iterator &cell,
 		     ExcDimensionMismatch(b.size(),
                                           vertices_per_face+lines_per_face*(degree-1)));
 	      
-					       // sort the points into b
+					       // sort the points into b. We
+					       // used access from the cell (not
+					       // from the face) to fill b, so
+					       // we can assume a standard face
+					       // orientation. Doing so, the
+					       // calculated points will be in
+					       // standard orientation as well.
               for (unsigned int i=0; i<vertices_per_face; ++i)
-                b[i]=a[GeometryInfo<3>::face_to_cell_vertices(face_no, i,
-							      face_orientation,
-							      face_flip,
-							      face_rotation)];
+                b[i]=a[GeometryInfo<3>::face_to_cell_vertices(face_no, i)];
 		      
               for (unsigned int i=0; i<lines_per_face; ++i)
                 for (unsigned int j=0; j<degree-1; ++j)
                   b[vertices_per_face+i*(degree-1)+j]=
                     a[vertices_per_cell + GeometryInfo<3>::face_to_cell_lines(
-		      face_no, i, face_orientation, face_flip, face_rotation)*(degree-1)+j];
+		      face_no, i)*(degree-1)+j];
 
-					       // Now b includes the
-					       // right order of
-					       // support points on
-					       // the quad to apply
-					       // the laplace vector
+					       // Now b includes the support
+					       // points on the quad and we can
+					       // apply the laplace vector
 	      apply_laplace_vector(laplace_on_quad_vector, b);
 	      Assert(b.size()==4*degree+(degree-1)*(degree-1),
 		     ExcDimensionMismatch(b.size(), 4*degree+(degree-1)*(degree-1)));
@@ -1117,7 +1151,21 @@ add_quad_support_points(const Triangulation<3>::cell_iterator &cell,
 					       // from a straight
 					       // boundary object
 	      straight_boundary.get_intermediate_points_on_quad (face, quad_points);
-	      a.insert (a.end(), quad_points.begin(), quad_points.end());
+					       // in 3D, the orientation, flip
+					       // and rotation of the face might
+					       // not match what we expect here,
+					       // namely the standard
+					       // orientation. thus reorder
+					       // points accordingly. since a
+					       // Mapping uses the same shape
+					       // function as an FEQ, we can ask
+					       // a FEQ to do the reordering for
+					       // us.
+	      for (unsigned int i=0; i<quad_points.size(); ++i)
+		a.push_back(quad_points[feq.adjust_quad_dof_index_for_face_orientation(i,
+										       face_orientation,
+										       face_flip,
+										       face_rotation)]);
 	    }
 	}
     }
