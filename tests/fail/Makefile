@@ -23,7 +23,7 @@ default: run-tests
 
 # all .cc-files are tests by default.
 
-tests = $(basename $(wildcard *.cc))
+tests = $(basename $(wildcard mesh_3d*.cc))
 
 ############################################################
 

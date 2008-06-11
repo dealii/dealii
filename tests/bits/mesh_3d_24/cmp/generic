@@ -1,0 +1,29 @@
+
+DEAL::face: 0
+DEAL::  Face orientation status: 1
+DEAL::  On boundary: 1
+DEAL::  Neighbor: -1.-1
+DEAL::face: 1
+DEAL::  Face orientation status: 1
+DEAL::  On boundary: 1
+DEAL::  Neighbor: -1.-1
+DEAL::face: 2
+DEAL::  Face orientation status: 1
+DEAL::  On boundary: 1
+DEAL::  Neighbor: -1.-1
+DEAL::face: 3
+DEAL::  Face orientation status: 1
+DEAL::  On boundary: 1
+DEAL::  Neighbor: -1.-1
+DEAL::face: 4
+DEAL::  Face orientation status: 0
+DEAL::  On boundary: 0
+DEAL::  Neighbor: 0.0
+DEAL::face: 5
+DEAL::  Face orientation status: 1
+DEAL::  On boundary: 1
+DEAL::  Neighbor: -1.-1
+DEAL::0.00000 0.333333 0.00000 in unit coordinates maps to real coordinates 2.00000 0.400000 0.136667
+DEAL::0.333333 0.333333 0.00000 in unit coordinates maps to real coordinates 1.83333 0.400000 0.136667
+DEAL::0.666667 0.333333 0.00000 in unit coordinates maps to real coordinates 1.66667 0.400000 0.136667
+DEAL::1.00000 0.333333 0.00000 in unit coordinates maps to real coordinates 1.50000 0.400000 0.136667

@@ -1,0 +1,16 @@
+
+DEAL::FE_Q<3>(1), P_0, rel. error=0
+DEAL::FE_Q<3>(1), P_1, rel. error=0
+DEAL::FE_Q<3>(1), P_2, rel. error=0.000611303
+DEAL::FE_Q<3>(1), P_3, rel. error=0.00156450
+DEAL::FE_Q<3>(2), P_0, rel. error=0
+DEAL::FE_Q<3>(2), P_1, rel. error=0
+DEAL::FE_Q<3>(2), P_2, rel. error=0
+DEAL::FE_Q<3>(2), P_3, rel. error=1.15298e-05
+DEAL::FE_Q<3>(2), P_4, rel. error=4.98961e-05
+DEAL::FE_Q<3>(3), P_0, rel. error=0
+DEAL::FE_Q<3>(3), P_1, rel. error=0
+DEAL::FE_Q<3>(3), P_2, rel. error=0
+DEAL::FE_Q<3>(3), P_3, rel. error=0
+DEAL::FE_Q<3>(3), P_4, rel. error=4.74520e-07
+DEAL::FE_Q<3>(3), P_5, rel. error=2.38539e-06
