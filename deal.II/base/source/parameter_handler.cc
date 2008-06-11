@@ -2,7 +2,7 @@
 //    $Id$
 //    Version: $Name$
 //
-//    Copyright (C) 1998, 1999, 2000, 2001, 2002, 2003, 2004, 2005, 2006, 2007 by the deal.II authors
+//    Copyright (C) 1998, 1999, 2000, 2001, 2002, 2003, 2004, 2005, 2006, 2007, 2008 by the deal.II authors
 //
 //    This file is subject to QPL and may not be  distributed
 //    without copyright and license information. Please refer
@@ -744,7 +744,7 @@ long int ParameterHandler::get_integer (const std::string &entry_string) const
   char *endptr;
   long int i = std::strtol (s.c_str(), &endptr, 10);
 				   // assert there was no error
-//  AssertThrow (*endptr == '\0', ExcConversionError(s));
+  AssertThrow (*endptr == '\0', ExcConversionError(s));
 
   return i;
 }
