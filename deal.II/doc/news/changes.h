@@ -85,6 +85,15 @@ inconvenience this causes.
 
 <ol>
   <li>
+  <p>
+  Fixed: When using a higher order mapping of degree at least 3 (i.e.
+  the MappingQ class) on meshes that have cells with non-standard
+  face orientation and that touch the boundary of the domain, then
+  some interpolation points were wrongly computed.
+  <br>
+  (Tobias Leicht, Timo Heister, WB 2008/06/10)
+  </p>
+  </li>
 </ol>
 
 
