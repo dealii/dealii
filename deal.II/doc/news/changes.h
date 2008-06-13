@@ -94,6 +94,16 @@ inconvenience this causes.
   (Tobias Leicht, Timo Heister, WB 2008/06/10)
   </p>
   </li>
+
+  <li>
+  <p>
+  Fixed: The ParameterHandler::get_integer function now throws an
+  exception when called for non-integer parameters. This exception has
+  been commented out some time ago but is now reincluded.
+  <br>
+  (RH 2008/06/11)
+  </p>
+  </li>
 </ol>
 
 
