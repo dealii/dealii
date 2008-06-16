@@ -24,6 +24,7 @@ template <int dim> class FEValues;
 template <int dim> class FEFaceValues;
 template <int dim> class FESubfaceValues;
 template <int dim> class FESystem;
+template <class POLY, int dim> class FE_PolyTensor;
 namespace hp
 {
   template <int dim> class FECollection;
@@ -2473,6 +2474,7 @@ class FiniteElement : public Subscriptor,
     friend class FEFaceValues<dim>;
     friend class FESubfaceValues<dim>;
     template <int dim_> friend class FESystem;
+    template <class POLY, int dim_> friend class FE_PolyTensor;
     friend class hp::FECollection<dim>;
 };
 

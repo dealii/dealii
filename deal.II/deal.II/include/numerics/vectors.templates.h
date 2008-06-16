@@ -1710,7 +1710,7 @@ VectorTools::project_boundary_values (const Mapping<dim>       &mapping,
   
   DoFTools::map_dof_to_boundary_indices (dof, selected_boundary_components,
 					 dof_to_boundary_mapping);
-
+  
 				   // Done if no degrees of freedom on
 				   // the boundary
   if (dof.n_boundary_dofs (boundary_functions) == 0)

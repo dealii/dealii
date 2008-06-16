@@ -119,6 +119,15 @@ FE_PolyTensor<POLY,dim>::FE_PolyTensor (const unsigned int degree,
                 poly_space(POLY(degree))
 {
   cached_point(0) = -1;
+				   // Set up the table converting
+				   // components to base
+				   // components. Since we have only
+				   // one base element, everything
+				   // remains zero except the
+				   // component in the base, which is
+				   // the component itself
+  for (unsigned int comp=0;comp<this->n_components() ;++comp)
+    this->component_to_base_table[comp].first.second = comp;
 }
 
 

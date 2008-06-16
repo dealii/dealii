@@ -953,15 +953,7 @@ MatrixCreator::create_boundary_mass_matrix (const Mapping<dim>        &mapping,
   Assert (boundary_functions.size() != 0, ExcInternalError());
   Assert (dof_to_boundary_mapping.size() == dof.n_dofs(),
 	  ExcInternalError());
-  
-  if (component_mapping.size() == 0)
-    {
-      AssertDimension (n_components, boundary_functions.begin()->second->n_components);
-      for (unsigned int i=0;i<n_components;++i)
-	component_mapping.push_back(i);
-    }
-  else
-    AssertDimension (n_components, component_mapping.size());
+  AssertDimension (n_components, component_mapping.size());
   
   Assert (coefficient ==0 ||
 	  coefficient->n_components==1 ||
