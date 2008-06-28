@@ -2065,7 +2065,7 @@ void ConservationLaw<dim>::assemble_system ()
 					dof_indices_neighbor,
 					false,
 					numbers::invalid_unsigned_int,
-					neighbor_child->diameter());
+					neighbor_child->face(neighbor2)->diameter());
 		  }
 	      }
 

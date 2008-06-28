@@ -40,6 +40,16 @@ inconvenience this causes.
 <ol>
   <li>
   <p>
+  Fixed: In the new @ref step_33 "step-33" tutorial program there was
+  a place where we incorrectly passed the diameter of a cell, rather
+  than a face, to a function. This is now fixed.
+  <br>
+  (Chih-Che Chueh, WB 2008/06/28)
+  </p>
+  </li>
+
+  <li>
+  <p>
   Fixed: The new @ref step_33 "step-33" tutorial program had a place where
   we didn't release some memory. This is now fixed.
   <br>
