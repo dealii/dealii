@@ -12,8 +12,13 @@
 //----------------------------  grid_in_02.cc  ---------------------------
 
 // when reading a particular input file with a mesh, it turns out that
-// there's a cell where we list the same cell as neighbor through two
+// there are two cells where we list the same cell as neighbor through two
 // different faces. this of course can't be
+//
+// the actual cause turned out to be that in each of these 2 cases, the
+// (machine generated) input file had two cells that shared 3 (!) vertices.
+// in each case, one of the two cells has been removed from the input
+// file to fix the testcase.
 
 #include "../tests.h"
 #include <dofs/dof_handler.h>
