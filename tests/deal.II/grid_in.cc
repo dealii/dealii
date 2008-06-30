@@ -56,6 +56,15 @@ void test2 ()
                                    // available, program was killed
                                    // before), with the new one it
                                    // takes less than 8 seconds
+				   //
+				   // note that the input file is no good: it
+				   // contains two pairs of two cells, where
+				   // the two members of each pair share 3
+				   // vertices (in 2d) -- this can of course
+				   // not work properly. it makes the
+				   // grid_in_02 testcase fail when using this
+				   // input file, but grid_in_02/2d.xda is a
+				   // corrected input file.
   Triangulation<dim> tria;
   GridIn<dim> gi;
   gi.attach_triangulation (tria);
