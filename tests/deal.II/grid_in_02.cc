@@ -66,6 +66,7 @@ void test2 ()
 	    Assert (cell->neighbor(e) !=
 		    cell->neighbor(f),
 		    ExcInternalError());
+  deallog << "OK" << std::endl;
 }
 
 
