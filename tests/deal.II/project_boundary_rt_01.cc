@@ -57,13 +57,14 @@ void
 TestFunction<dim>::vector_value_list (const std::vector<Point<dim> > &points,
 				      std::vector<Vector<double> >   &values) const
 {
-  if (degree < 2)
+  for (unsigned int k=0;k<points.size();++k)
     {
-      Assert(false, ExcNotImplemented());
-    }
-  else
-    {
-      for (unsigned int k=0;k<points.size();++k)
+      if (degree < 2)
+	{
+	  for (unsigned int d=0;d<dim;++d)
+	    values[k](d) = points[k](d) - d;
+	}
+      else
 	{
 					   // Base of the function is
 					   // the distance to a
@@ -120,7 +121,7 @@ template<int dim>
 void test_projection (const Triangulation<dim>& tr,
 		      const FiniteElement<dim>& fe)
 {
-  deallog << fe.get_name() << std::endl;
+  deallog << fe.get_name() << std::endl << "Cells: " << tr.n_active_cells() << std::endl;
 
   const unsigned int degree = fe.tensor_degree();
   
@@ -138,9 +139,12 @@ void test_projection (const Triangulation<dim>& tr,
   VectorTools::project_boundary_values(mapping, dof, boundary_map, quadrature,
 				       boundary_constraints);
 
+  deallog << "Constraints: " << boundary_constraints.size() << std::endl;
+  
 				   // Fill a vector with the projected
 				   // boundary values
   Vector<double> u(dof.n_dofs());
+  u = -1.;
   for (typename std::map<unsigned int, double>::const_iterator
 	 i = boundary_constraints.begin(); i != boundary_constraints.end(); ++i)
     u(i->first) = i->second;
@@ -181,6 +185,8 @@ int main()
   deallog.depth_console (0);
   deallog.threshold_double(1.e-12);
 
+  FE_RaviartThomasNodal<2> rt21(1);
+  test_hyper_cube(rt21);
   FE_RaviartThomasNodal<2> rt22(2);
   test_hyper_cube(rt22);
   FE_RaviartThomasNodal<2> rt23(3);
