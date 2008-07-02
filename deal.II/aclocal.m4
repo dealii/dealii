@@ -399,7 +399,7 @@ AC_DEFUN(DEAL_II_SET_CXX_FLAGS, dnl
   dnl First the flags for gcc compilers
   if test "$GXX" = yes ; then
     CXXFLAGSO="$CXXFLAGS -O2 -Wuninitialized -felide-constructors -ftemplate-depth-128"
-    CXXFLAGSG="$CXXFLAGS -DDEBUG -pedantic -Wall -W -Wpointer-arith -Wwrite-strings -Winline -Woverloaded-virtual -Wsynth -Wsign-compare -Wswitch -ftemplate-depth-128"
+    CXXFLAGSG="$CXXFLAGS -DDEBUG -pedantic -Wall -W -Wpointer-arith -Wwrite-strings -Woverloaded-virtual -Wsynth -Wsign-compare -Wswitch -ftemplate-depth-128"
 
     dnl BOOST uses long long, so don't warn about this
     CXXFLAGSG="$CXXFLAGSG -Wno-long-long"
