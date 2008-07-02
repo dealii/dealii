@@ -945,6 +945,10 @@ MatrixCreator::create_boundary_mass_matrix (const Mapping<dim>        &mapping,
 {
   const FiniteElement<dim> &fe = dof.get_fe();
   const unsigned int n_components  = fe.n_components();
+
+  if (component_mapping.size() == 0)
+    for (unsigned int i=0;i<n_components;++i)
+      component_mapping.push_back(i);
   
   Assert (matrix.n() == dof.n_boundary_dofs(boundary_functions),
           ExcInternalError());
