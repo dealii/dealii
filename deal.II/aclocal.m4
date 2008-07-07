@@ -5386,6 +5386,12 @@ AC_DEFUN(DEAL_II_CHECK_TRILINOS_SHARED_STATIC, dnl
     AC_MSG_ERROR([When building deal.II with shared libraries, Trilinos also
                   needs to be built with shared libraries])
   fi
+
+  dnl If we use shared libs (and we've made sure above that Trilinos provides
+  dnl these as well), then set some of the LD_FLAGS and similar
+  if test "x$enableshared" = "xyes" ; then
+    LDFLAGS="$LDFLAGS -L$DEAL_II_TRILINOS_DIR/lib -Wl,-rpath,$DEAL_II_TRILINOS_DIR/lib"
+  fi
 ])
 
 
