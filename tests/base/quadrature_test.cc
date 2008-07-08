@@ -169,7 +169,7 @@ check_faces (const std::vector<Quadrature<dim-1>*>& quadratures, const bool sub)
 	      exact_int = 2 * (sub ? 2:1) / (double) (i+1);
 	      break;
 	    case 3:
-	      exact_int = 3 * (sub ? 32:8) / (double) (i+1)/(i+1);
+	      exact_int = 3 * (sub ? (4+2+2):1)*8 / (double) (i+1)/(i+1);
 	      break;
 	    }
       

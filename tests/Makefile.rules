@@ -10,7 +10,11 @@
 
 normalize = $D/common/scripts/normalize.pl
 
-WORKDIR = $(notdir $(shell pwd))
+# get the path of the current directory so we can prefix every test
+# in the report with it. for the anisotropic branch, prefix everything
+# with x-anisotropic/ so that tests run from the branch will show up
+# in different folders on the webpage.
+WORKDIR = x-anisotropic/$(notdir $(shell pwd))
 
 verbose = off
 

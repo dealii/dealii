@@ -83,7 +83,7 @@ void check_element (const Triangulation<dim> &tr,
                                          // this, _all_ children have
                                          // to be active, not only
                                          // some of them
-        for (unsigned int c=0; c<GeometryInfo<dim>::children_per_cell; ++c)
+        for (unsigned int c=0; c<GeometryInfo<dim>::max_children_per_cell; ++c)
           Assert (cell->child(c)->active(), ExcInternalError());
 
                                          // then restrict and prolongate

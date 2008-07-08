@@ -1,7 +1,7 @@
 
-DEAL:1d::children_per_cell 2
+DEAL:1d::max_children_per_cell 2
 DEAL:1d::faces_per_cell    2
-DEAL:1d::subfaces_per_cell 1
+DEAL:1d::max_children_per_face 1
 DEAL:1d::vertices_per_cell 2
 DEAL:1d::lines_per_cell    1
 DEAL:1d::quads_per_cell    0
@@ -24,9 +24,9 @@ DEAL:1d::face_lines0[false]
 DEAL:1d::face_lines1[true ]
 DEAL:1d::face_lines1[false]
 DEAL:1d::line_vertices0 0 1
-DEAL:2d::children_per_cell 4
+DEAL:2d::max_children_per_cell 4
 DEAL:2d::faces_per_cell    4
-DEAL:2d::subfaces_per_cell 2
+DEAL:2d::max_children_per_face 2
 DEAL:2d::vertices_per_cell 4
 DEAL:2d::lines_per_cell    4
 DEAL:2d::quads_per_cell    1
@@ -66,9 +66,9 @@ DEAL:2d::line_vertices0 0 2
 DEAL:2d::line_vertices1 1 3
 DEAL:2d::line_vertices2 0 1
 DEAL:2d::line_vertices3 2 3
-DEAL:3d::children_per_cell 8
+DEAL:3d::max_children_per_cell 8
 DEAL:3d::faces_per_cell    6
-DEAL:3d::subfaces_per_cell 4
+DEAL:3d::max_children_per_face 4
 DEAL:3d::vertices_per_cell 8
 DEAL:3d::lines_per_cell    12
 DEAL:3d::quads_per_cell    6

@@ -2,7 +2,7 @@
 //    rt_5.cc,v 1.1 2003/06/09 15:59:07 wolf Exp
 //    Version: 
 //
-//    Copyright (C) 2003, 2004, 2005, 2006 by the deal.II authors
+//    Copyright (C) 2003, 2004, 2005, 2006, 2008 by the deal.II authors
 //
 //    This file is subject to QPL and may not be  distributed
 //    without copyright and license information. Please refer
@@ -34,7 +34,7 @@ test(const unsigned int degree)
   
   FE_RaviartThomas<dim> fe_rt(degree);
 
-  for (unsigned int c=0; c<GeometryInfo<dim>::children_per_cell; ++c)
+  for (unsigned int c=0; c<GeometryInfo<dim>::max_children_per_cell; ++c)
     {
       const FullMatrix<double> & m = fe_rt.get_restriction_matrix(c);
 

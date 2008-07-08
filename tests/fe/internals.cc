@@ -90,13 +90,13 @@ check_matrices (FiniteElement<dim>& fe, const char* name)
   deallog << name << '<' << dim << '>' << " constraint " << std::endl;
   print_formatted (fe.constraints(), 7, 10);
 
-  for (unsigned int i=0;i<GeometryInfo<dim>::children_per_cell;++i)
+  for (unsigned int i=0;i<GeometryInfo<dim>::max_children_per_cell;++i)
     {
       deallog << name << '<' << dim << '>' << " restriction " << i << std::endl;
-      if (fe.restriction_is_implemented())
+      if (fe.isotropic_restriction_is_implemented())
 	print_formatted (fe.get_restriction_matrix(i), 3, 6);
       deallog << name << '<' << dim << '>' << " embedding " << i << std::endl;
-      if (fe.prolongation_is_implemented())
+      if (fe.isotropic_prolongation_is_implemented())
 	print_formatted (fe.get_prolongation_matrix(i), 3, 6);
     }
 }

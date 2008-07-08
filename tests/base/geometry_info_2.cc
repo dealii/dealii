@@ -24,12 +24,12 @@
 template <int dim>
 void test ()
 {
-  deallog << "children_per_cell "
-	  << GeometryInfo<dim>::children_per_cell << std::endl;
+  deallog << "max_children_per_cell "
+	  << GeometryInfo<dim>::max_children_per_cell << std::endl;
   deallog << "faces_per_cell    "
 	  << GeometryInfo<dim>::faces_per_cell << std::endl;
-  deallog << "subfaces_per_cell "
-	  << GeometryInfo<dim>::subfaces_per_face << std::endl;
+  deallog << "max_children_per_face "
+	  << GeometryInfo<dim>::max_children_per_face << std::endl;
   deallog << "vertices_per_cell "
 	  <<GeometryInfo<dim>::vertices_per_cell << std::endl;
   deallog << "lines_per_cell    "
@@ -56,14 +56,14 @@ void test ()
   for (unsigned int f=0;f<GeometryInfo<dim>::faces_per_cell;++f)
     {
       deallog << "face_children" << f << "[true ]";
-      for (unsigned int v=0;v < GeometryInfo<dim>::subfaces_per_face;++v)
+      for (unsigned int v=0;v < GeometryInfo<dim>::max_children_per_face;++v)
 	deallog << ' '
-		<< GeometryInfo<dim>::child_cell_on_face(f, v, true);
+		<< GeometryInfo<dim>::child_cell_on_face(RefinementCase<dim>::isotropic_refinement,f, v, true);
       deallog << std::endl;
       deallog << "face_children" << f << "[false]";
-      for (unsigned int v=0;v < GeometryInfo<dim>::subfaces_per_face;++v)
+      for (unsigned int v=0;v < GeometryInfo<dim>::max_children_per_face;++v)
 	deallog << ' '
-		<< GeometryInfo<dim>::child_cell_on_face(f, v, false);
+		<< GeometryInfo<dim>::child_cell_on_face(RefinementCase<dim>::isotropic_refinement,f, v, false);
       deallog << std::endl;
     }
   

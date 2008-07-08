@@ -61,7 +61,7 @@ void test ()
 
       deallog << i << ' ' << p << ' '
 	      << GeometryInfo<dim>::is_inside_unit_cell (p) << std::endl;
-      for (unsigned int c=0; c<GeometryInfo<dim>::children_per_cell; ++c)
+      for (unsigned int c=0; c<GeometryInfo<dim>::max_children_per_cell; ++c)
 	{
 	  const Point<dim> q = GeometryInfo<dim>::cell_to_child_coordinates(p,c);
 	  const Point<dim> pp = GeometryInfo<dim>::child_to_cell_coordinates(q,c);

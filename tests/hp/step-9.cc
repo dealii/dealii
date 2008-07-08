@@ -616,7 +616,7 @@ GradientEstimation::estimate_interval (const hp::DoFHandler<dim> &dof_handler,
 
   std::vector<typename hp::DoFHandler<dim>::active_cell_iterator> active_neighbors;
   active_neighbors.reserve (GeometryInfo<dim>::faces_per_cell *
-			    GeometryInfo<dim>::subfaces_per_face);
+			    GeometryInfo<dim>::max_children_per_face);
 
   for (; cell!=endc; ++cell, ++error_on_this_cell)
     {

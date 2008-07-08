@@ -2,7 +2,7 @@
 //    q_3.cc,v 1.1 2003/05/05 13:49:41 wolf Exp
 //    Version: 
 //
-//    Copyright (C) 2003, 2004, 2005 by the deal.II authors
+//    Copyright (C) 2003, 2004, 2005, 2008 by the deal.II authors
 //
 //    This file is subject to QPL and may not be  distributed
 //    without copyright and license information. Please refer
@@ -37,7 +37,7 @@ test(const unsigned int degree)
   
   FE_Q<dim> fe_q(degree);
 
-  for (unsigned int c=0; c<GeometryInfo<dim>::children_per_cell; ++c)
+  for (unsigned int c=0; c<GeometryInfo<dim>::max_children_per_cell; ++c)
     {
       const FullMatrix<double> & m = fe_q.get_restriction_matrix(c);
 

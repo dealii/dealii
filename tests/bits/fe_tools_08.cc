@@ -43,7 +43,7 @@ check_this (const FiniteElement<dim> &fe1,
     return;
                                    // we need prolongation matrices in
                                    // fe2
-  if (!fe2.restriction_is_implemented())
+  if (!fe2.isotropic_restriction_is_implemented())
     return;
   
   std::auto_ptr<Triangulation<dim> > tria(make_tria<dim>());

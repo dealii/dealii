@@ -383,7 +383,7 @@ void DGMethod<dim>::setup_system ()
   sparsity_pattern.reinit (dof_handler.n_dofs(),
 			   dof_handler.n_dofs(),
 			   (GeometryInfo<dim>::faces_per_cell
-			    *GeometryInfo<dim>::subfaces_per_face+1)*fe.dofs_per_cell);
+			    *GeometryInfo<dim>::max_children_per_face+1)*fe.dofs_per_cell);
   
   DoFTools::make_flux_sparsity_pattern (dof_handler, sparsity_pattern);
   

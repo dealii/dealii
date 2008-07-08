@@ -3,65 +3,65 @@ DEAL::Using mapping with degree 1:
 DEAL::============================
 DEAL:cg::Starting value 1.1
 DEAL:cg::Convergence step 7 value 0
-DEAL:cg::Starting value 0.98
+DEAL:cg::Starting value 1.0
 DEAL:cg::Convergence step 18 value 0
-DEAL:cg::Starting value 0.65
+DEAL:cg::Starting value 0.64
 DEAL:cg::Convergence step 29 value 0
-DEAL:cg::Starting value 0.37
-DEAL:cg::Convergence step 53 value 0
-DEAL:cg::Starting value 0.19
-DEAL:cg::Convergence step 108 value 0
-DEAL:cg::Starting value 0.10
-DEAL:cg::Convergence step 238 value 0
+DEAL:cg::Starting value 0.35
+DEAL:cg::Convergence step 52 value 0
+DEAL:cg::Starting value 0.18
+DEAL:cg::Convergence step 106 value 0
+DEAL:cg::Starting value 0.094
+DEAL:cg::Convergence step 234 value 0
 cells  |u|_1    error   
 5     0.680402 0.572912 
-20    1.085518 0.167796 
-80    1.208980 0.044334 
-320   1.242041 0.011273 
-1280  1.250482 0.002832 
-5120  1.252603 0.000711 
+20    1.088141 0.165173 
+80    1.210142 0.043172 
+320   1.242375 0.010939 
+1280  1.250569 0.002745 
+5120  1.252624 0.000690 
 DEAL::
 DEAL::Using mapping with degree 2:
 DEAL::============================
 DEAL:cg::Starting value 1.3
 DEAL:cg::Convergence step 7 value 0
-DEAL:cg::Starting value 1.0
+DEAL:cg::Starting value 1.1
 DEAL:cg::Convergence step 17 value 0
 DEAL:cg::Starting value 0.65
-DEAL:cg::Convergence step 29 value 0
-DEAL:cg::Starting value 0.37
-DEAL:cg::Convergence step 53 value 0
-DEAL:cg::Starting value 0.19
-DEAL:cg::Convergence step 108 value 0
-DEAL:cg::Starting value 0.10
-DEAL:cg::Convergence step 238 value 0
+DEAL:cg::Convergence step 28 value 0
+DEAL:cg::Starting value 0.35
+DEAL:cg::Convergence step 51 value 0
+DEAL:cg::Starting value 0.18
+DEAL:cg::Convergence step 106 value 0
+DEAL:cg::Starting value 0.094
+DEAL:cg::Convergence step 233 value 0
 cells  |u|_1    error   
 5     1.050963 0.202351 
-20    1.199642 0.053672 
-80    1.239913 0.013401 
-320   1.249987 0.003327 
-1280  1.252485 0.000829 
-5120  1.253106 0.000208 
+20    1.203014 0.050300 
+80    1.241120 0.012194 
+320   1.250318 0.002996 
+1280  1.252572 0.000742 
+5120  1.253127 0.000188 
 DEAL::
 DEAL::Using mapping with degree 3:
 DEAL::============================
 DEAL:cg::Starting value 1.4
 DEAL:cg::Convergence step 7 value 0
-DEAL:cg::Starting value 1.0
+DEAL:cg::Starting value 1.1
 DEAL:cg::Convergence step 17 value 0
 DEAL:cg::Starting value 0.65
-DEAL:cg::Convergence step 29 value 0
-DEAL:cg::Starting value 0.37
-DEAL:cg::Convergence step 53 value 0
-DEAL:cg::Starting value 0.19
-DEAL:cg::Convergence step 108 value 0
-DEAL:cg::Starting value 0.10
-DEAL:cg::Convergence step 238 value 0
+DEAL:cg::Convergence step 28 value 0
+DEAL:cg::Starting value 0.35
+DEAL:cg::Convergence step 51 value 0
+DEAL:cg::Starting value 0.18
+DEAL:cg::Convergence step 106 value 0
+DEAL:cg::Starting value 0.094
+DEAL:cg::Convergence step 233 value 0
 cells  |u|_1    error   
 5     1.086161 0.167153 
-20    1.204349 0.048965 
-80    1.240502 0.012812 
-320   1.250059 0.003255 
-1280  1.252494 0.000820 
-5120  1.253107 0.000207 
+20    1.207309 0.046005 
+80    1.241652 0.011662 
+320   1.250384 0.002931 
+1280  1.252580 0.000734 
+5120  1.253128 0.000186 
 DEAL::

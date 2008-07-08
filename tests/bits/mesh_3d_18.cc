@@ -78,19 +78,22 @@ void test_with_wrong_face_orientation ()
     deallog << "cell->neighbor_child_on_subface(3,1)->face(" << i << ")="
 	    << cell->neighbor_child_on_subface(3,1)->face(i) << std::endl;
 
-				   // The following assertion was originally
-				   // in make_hanging_node_constraints with an
-				   // equality sign and triggered for the mesh
-				   // and cell here at hand. however, if one
-				   // carefully reads the comment for
+				   // The following assertion was originally in
+				   // make_hanging_node_constraints and
+				   // triggered for the mesh and cell here at
+				   // hand. however, if one carefully reads the
+				   // new comment for
 				   // CellAccessor::neighbor_child_on_subface,
-				   // one realizes that it isn't true if
-				   // cell->face_orientation()==false for the
-				   // face we are presently considering. the
-				   // original assertion therefore
-				   // failed. let's make sure we get the
+				   // one realizes that it should be true in any
+				   // case, no matter whether
+				   // cell->face_orientation()==false or not for
+				   // the face we are presently considering. the
+				   // original assertion failed,
+				   // whereas with the new functionality of
+				   // CellAccessor::neighbor_child_on_subface it
+				   // should work. let's make sure we get the
 				   // status we expect.
-  Assert (cell->face(3)->child(1) !=
+  Assert (cell->face(3)->child(1) ==
 	  neighbor_child->face(cell->neighbor_of_neighbor(3)),
 	  ExcInternalError());
 }

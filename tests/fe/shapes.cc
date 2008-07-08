@@ -187,7 +187,7 @@ plot_face_shape_functions(Mapping<dim>& mapping,
 	    }
 	  deallog << std::endl;
 	} else {
-	  for (unsigned int s=0;s<GeometryInfo<dim>::subfaces_per_face; ++s)
+	  for (unsigned int s=0;s<GeometryInfo<dim>::max_children_per_face; ++s)
 	    {
 	      sub.reinit(c, f, s);
 	      

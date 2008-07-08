@@ -1,0 +1,1667 @@
+
+DEAL::2 -> Initial check, cell 0, 15 active cells
+DEAL::2 -> Check 0, 120 active cells
+DEAL::           ... done.
+DEAL::2 -> Check 1, 960 active cells
+DEAL::           ... done.
+DEAL::Check 0, 120 active cells
+DEAL::Check 1, 960 active cells
+DEAL::2 -> Initial check, cell 1, 15 active cells
+DEAL::2 -> Check 0, 120 active cells
+DEAL::           ... done.
+DEAL::2 -> Check 1, 960 active cells
+DEAL::           ... done.
+DEAL::Check 0, 120 active cells
+DEAL::Check 1, 960 active cells
+DEAL::2 -> Initial check, cell 2, 15 active cells
+DEAL::2 -> Check 0, 120 active cells
+DEAL::           ... done.
+DEAL::2 -> Check 1, 960 active cells
+DEAL::           ... done.
+DEAL::Check 0, 120 active cells
+DEAL::Check 1, 960 active cells
+DEAL::2 -> Initial check, cell 3, 15 active cells
+DEAL::2 -> Check 0, 120 active cells
+DEAL::           ... done.
+DEAL::2 -> Check 1, 960 active cells
+DEAL::           ... done.
+DEAL::Check 0, 120 active cells
+DEAL::Check 1, 960 active cells
+DEAL::2 -> Initial check, cell 4, 15 active cells
+DEAL::2 -> Check 0, 120 active cells
+DEAL::           ... done.
+DEAL::2 -> Check 1, 960 active cells
+DEAL::           ... done.
+DEAL::Check 0, 120 active cells
+DEAL::Check 1, 960 active cells
+DEAL::2 -> Initial check, cell 5, 15 active cells
+DEAL::2 -> Check 0, 120 active cells
+DEAL::           ... done.
+DEAL::2 -> Check 1, 960 active cells
+DEAL::           ... done.
+DEAL::Check 0, 120 active cells
+DEAL::Check 1, 960 active cells
+DEAL::2 -> Initial check, cell 6, 15 active cells
+DEAL::2 -> Check 0, 120 active cells
+DEAL::           ... done.
+DEAL::2 -> Check 1, 960 active cells
+DEAL::           ... done.
+DEAL::Check 0, 120 active cells
+DEAL::Check 1, 960 active cells
+DEAL::2 -> Initial check, cell 7, 15 active cells
+DEAL::2 -> Check 0, 120 active cells
+DEAL::           ... done.
+DEAL::2 -> Check 1, 960 active cells
+DEAL::           ... done.
+DEAL::Check 0, 120 active cells
+DEAL::Check 1, 960 active cells
+DEAL::Initial check, cell = 0, ref_case = 1
+DEAL::Check 0, 72 active cells
+DEAL::Check 1, 576 active cells
+DEAL::Check 0, 72 active cells
+DEAL::Check 1, 576 active cells
+DEAL::Initial check, cell = 0, ref_case = 2
+DEAL::Check 0, 72 active cells
+DEAL::Check 1, 576 active cells
+DEAL::Check 0, 72 active cells
+DEAL::Check 1, 576 active cells
+DEAL::Initial check, cell = 0, ref_case = 3
+DEAL::Check 0, 88 active cells
+DEAL::Check 1, 704 active cells
+DEAL::Check 0, 88 active cells
+DEAL::Check 1, 704 active cells
+DEAL::Initial check, cell = 0, ref_case = 4
+DEAL::Check 0, 72 active cells
+DEAL::Check 1, 576 active cells
+DEAL::Check 0, 72 active cells
+DEAL::Check 1, 576 active cells
+DEAL::Initial check, cell = 0, ref_case = 5
+DEAL::Check 0, 88 active cells
+DEAL::Check 1, 704 active cells
+DEAL::Check 0, 88 active cells
+DEAL::Check 1, 704 active cells
+DEAL::Initial check, cell = 0, ref_case = 6
+DEAL::Check 0, 88 active cells
+DEAL::Check 1, 704 active cells
+DEAL::Check 0, 88 active cells
+DEAL::Check 1, 704 active cells
+DEAL::Initial check, cell = 0, ref_case = 7
+DEAL::Check 0, 120 active cells
+DEAL::Check 1, 960 active cells
+DEAL::Check 0, 120 active cells
+DEAL::Check 1, 960 active cells
+DEAL::Initial check, cell = 1, ref_case = 1
+DEAL::Check 0, 72 active cells
+DEAL::Check 1, 576 active cells
+DEAL::Check 0, 72 active cells
+DEAL::Check 1, 576 active cells
+DEAL::Initial check, cell = 1, ref_case = 2
+DEAL::Check 0, 72 active cells
+DEAL::Check 1, 576 active cells
+DEAL::Check 0, 72 active cells
+DEAL::Check 1, 576 active cells
+DEAL::Initial check, cell = 1, ref_case = 3
+DEAL::Check 0, 88 active cells
+DEAL::Check 1, 704 active cells
+DEAL::Check 0, 88 active cells
+DEAL::Check 1, 704 active cells
+DEAL::Initial check, cell = 1, ref_case = 4
+DEAL::Check 0, 72 active cells
+DEAL::Check 1, 576 active cells
+DEAL::Check 0, 72 active cells
+DEAL::Check 1, 576 active cells
+DEAL::Initial check, cell = 1, ref_case = 5
+DEAL::Check 0, 88 active cells
+DEAL::Check 1, 704 active cells
+DEAL::Check 0, 88 active cells
+DEAL::Check 1, 704 active cells
+DEAL::Initial check, cell = 1, ref_case = 6
+DEAL::Check 0, 88 active cells
+DEAL::Check 1, 704 active cells
+DEAL::Check 0, 88 active cells
+DEAL::Check 1, 704 active cells
+DEAL::Initial check, cell = 1, ref_case = 7
+DEAL::Check 0, 120 active cells
+DEAL::Check 1, 960 active cells
+DEAL::Check 0, 120 active cells
+DEAL::Check 1, 960 active cells
+DEAL::Initial check, cell = 2, ref_case = 1
+DEAL::Check 0, 72 active cells
+DEAL::Check 1, 576 active cells
+DEAL::Check 0, 72 active cells
+DEAL::Check 1, 576 active cells
+DEAL::Initial check, cell = 2, ref_case = 2
+DEAL::Check 0, 72 active cells
+DEAL::Check 1, 576 active cells
+DEAL::Check 0, 72 active cells
+DEAL::Check 1, 576 active cells
+DEAL::Initial check, cell = 2, ref_case = 3
+DEAL::Check 0, 88 active cells
+DEAL::Check 1, 704 active cells
+DEAL::Check 0, 88 active cells
+DEAL::Check 1, 704 active cells
+DEAL::Initial check, cell = 2, ref_case = 4
+DEAL::Check 0, 72 active cells
+DEAL::Check 1, 576 active cells
+DEAL::Check 0, 72 active cells
+DEAL::Check 1, 576 active cells
+DEAL::Initial check, cell = 2, ref_case = 5
+DEAL::Check 0, 88 active cells
+DEAL::Check 1, 704 active cells
+DEAL::Check 0, 88 active cells
+DEAL::Check 1, 704 active cells
+DEAL::Initial check, cell = 2, ref_case = 6
+DEAL::Check 0, 88 active cells
+DEAL::Check 1, 704 active cells
+DEAL::Check 0, 88 active cells
+DEAL::Check 1, 704 active cells
+DEAL::Initial check, cell = 2, ref_case = 7
+DEAL::Check 0, 120 active cells
+DEAL::Check 1, 960 active cells
+DEAL::Check 0, 120 active cells
+DEAL::Check 1, 960 active cells
+DEAL::Initial check, cell = 3, ref_case = 1
+DEAL::Check 0, 72 active cells
+DEAL::Check 1, 576 active cells
+DEAL::Check 0, 72 active cells
+DEAL::Check 1, 576 active cells
+DEAL::Initial check, cell = 3, ref_case = 2
+DEAL::Check 0, 72 active cells
+DEAL::Check 1, 576 active cells
+DEAL::Check 0, 72 active cells
+DEAL::Check 1, 576 active cells
+DEAL::Initial check, cell = 3, ref_case = 3
+DEAL::Check 0, 88 active cells
+DEAL::Check 1, 704 active cells
+DEAL::Check 0, 88 active cells
+DEAL::Check 1, 704 active cells
+DEAL::Initial check, cell = 3, ref_case = 4
+DEAL::Check 0, 72 active cells
+DEAL::Check 1, 576 active cells
+DEAL::Check 0, 72 active cells
+DEAL::Check 1, 576 active cells
+DEAL::Initial check, cell = 3, ref_case = 5
+DEAL::Check 0, 88 active cells
+DEAL::Check 1, 704 active cells
+DEAL::Check 0, 88 active cells
+DEAL::Check 1, 704 active cells
+DEAL::Initial check, cell = 3, ref_case = 6
+DEAL::Check 0, 88 active cells
+DEAL::Check 1, 704 active cells
+DEAL::Check 0, 88 active cells
+DEAL::Check 1, 704 active cells
+DEAL::Initial check, cell = 3, ref_case = 7
+DEAL::Check 0, 120 active cells
+DEAL::Check 1, 960 active cells
+DEAL::Check 0, 120 active cells
+DEAL::Check 1, 960 active cells
+DEAL::Initial check, cell = 4, ref_case = 1
+DEAL::Check 0, 72 active cells
+DEAL::Check 1, 576 active cells
+DEAL::Check 0, 72 active cells
+DEAL::Check 1, 576 active cells
+DEAL::Initial check, cell = 4, ref_case = 2
+DEAL::Check 0, 72 active cells
+DEAL::Check 1, 576 active cells
+DEAL::Check 0, 72 active cells
+DEAL::Check 1, 576 active cells
+DEAL::Initial check, cell = 4, ref_case = 3
+DEAL::Check 0, 88 active cells
+DEAL::Check 1, 704 active cells
+DEAL::Check 0, 88 active cells
+DEAL::Check 1, 704 active cells
+DEAL::Initial check, cell = 4, ref_case = 4
+DEAL::Check 0, 72 active cells
+DEAL::Check 1, 576 active cells
+DEAL::Check 0, 72 active cells
+DEAL::Check 1, 576 active cells
+DEAL::Initial check, cell = 4, ref_case = 5
+DEAL::Check 0, 88 active cells
+DEAL::Check 1, 704 active cells
+DEAL::Check 0, 88 active cells
+DEAL::Check 1, 704 active cells
+DEAL::Initial check, cell = 4, ref_case = 6
+DEAL::Check 0, 88 active cells
+DEAL::Check 1, 704 active cells
+DEAL::Check 0, 88 active cells
+DEAL::Check 1, 704 active cells
+DEAL::Initial check, cell = 4, ref_case = 7
+DEAL::Check 0, 120 active cells
+DEAL::Check 1, 960 active cells
+DEAL::Check 0, 120 active cells
+DEAL::Check 1, 960 active cells
+DEAL::Initial check, cell = 5, ref_case = 1
+DEAL::Check 0, 72 active cells
+DEAL::Check 1, 576 active cells
+DEAL::Check 0, 72 active cells
+DEAL::Check 1, 576 active cells
+DEAL::Initial check, cell = 5, ref_case = 2
+DEAL::Check 0, 72 active cells
+DEAL::Check 1, 576 active cells
+DEAL::Check 0, 72 active cells
+DEAL::Check 1, 576 active cells
+DEAL::Initial check, cell = 5, ref_case = 3
+DEAL::Check 0, 88 active cells
+DEAL::Check 1, 704 active cells
+DEAL::Check 0, 88 active cells
+DEAL::Check 1, 704 active cells
+DEAL::Initial check, cell = 5, ref_case = 4
+DEAL::Check 0, 72 active cells
+DEAL::Check 1, 576 active cells
+DEAL::Check 0, 72 active cells
+DEAL::Check 1, 576 active cells
+DEAL::Initial check, cell = 5, ref_case = 5
+DEAL::Check 0, 88 active cells
+DEAL::Check 1, 704 active cells
+DEAL::Check 0, 88 active cells
+DEAL::Check 1, 704 active cells
+DEAL::Initial check, cell = 5, ref_case = 6
+DEAL::Check 0, 88 active cells
+DEAL::Check 1, 704 active cells
+DEAL::Check 0, 88 active cells
+DEAL::Check 1, 704 active cells
+DEAL::Initial check, cell = 5, ref_case = 7
+DEAL::Check 0, 120 active cells
+DEAL::Check 1, 960 active cells
+DEAL::Check 0, 120 active cells
+DEAL::Check 1, 960 active cells
+DEAL::Initial check, cell = 6, ref_case = 1
+DEAL::Check 0, 72 active cells
+DEAL::Check 1, 576 active cells
+DEAL::Check 0, 72 active cells
+DEAL::Check 1, 576 active cells
+DEAL::Initial check, cell = 6, ref_case = 2
+DEAL::Check 0, 72 active cells
+DEAL::Check 1, 576 active cells
+DEAL::Check 0, 72 active cells
+DEAL::Check 1, 576 active cells
+DEAL::Initial check, cell = 6, ref_case = 3
+DEAL::Check 0, 88 active cells
+DEAL::Check 1, 704 active cells
+DEAL::Check 0, 88 active cells
+DEAL::Check 1, 704 active cells
+DEAL::Initial check, cell = 6, ref_case = 4
+DEAL::Check 0, 72 active cells
+DEAL::Check 1, 576 active cells
+DEAL::Check 0, 72 active cells
+DEAL::Check 1, 576 active cells
+DEAL::Initial check, cell = 6, ref_case = 5
+DEAL::Check 0, 88 active cells
+DEAL::Check 1, 704 active cells
+DEAL::Check 0, 88 active cells
+DEAL::Check 1, 704 active cells
+DEAL::Initial check, cell = 6, ref_case = 6
+DEAL::Check 0, 88 active cells
+DEAL::Check 1, 704 active cells
+DEAL::Check 0, 88 active cells
+DEAL::Check 1, 704 active cells
+DEAL::Initial check, cell = 6, ref_case = 7
+DEAL::Check 0, 120 active cells
+DEAL::Check 1, 960 active cells
+DEAL::Check 0, 120 active cells
+DEAL::Check 1, 960 active cells
+DEAL::Initial check, cell = 7, ref_case = 1
+DEAL::Check 0, 72 active cells
+DEAL::Check 1, 576 active cells
+DEAL::Check 0, 72 active cells
+DEAL::Check 1, 576 active cells
+DEAL::Initial check, cell = 7, ref_case = 2
+DEAL::Check 0, 72 active cells
+DEAL::Check 1, 576 active cells
+DEAL::Check 0, 72 active cells
+DEAL::Check 1, 576 active cells
+DEAL::Initial check, cell = 7, ref_case = 3
+DEAL::Check 0, 88 active cells
+DEAL::Check 1, 704 active cells
+DEAL::Check 0, 88 active cells
+DEAL::Check 1, 704 active cells
+DEAL::Initial check, cell = 7, ref_case = 4
+DEAL::Check 0, 72 active cells
+DEAL::Check 1, 576 active cells
+DEAL::Check 0, 72 active cells
+DEAL::Check 1, 576 active cells
+DEAL::Initial check, cell = 7, ref_case = 5
+DEAL::Check 0, 88 active cells
+DEAL::Check 1, 704 active cells
+DEAL::Check 0, 88 active cells
+DEAL::Check 1, 704 active cells
+DEAL::Initial check, cell = 7, ref_case = 6
+DEAL::Check 0, 88 active cells
+DEAL::Check 1, 704 active cells
+DEAL::Check 0, 88 active cells
+DEAL::Check 1, 704 active cells
+DEAL::Initial check, cell = 7, ref_case = 7
+DEAL::Check 0, 120 active cells
+DEAL::Check 1, 960 active cells
+DEAL::Check 0, 120 active cells
+DEAL::Check 1, 960 active cells
+DEAL::Initial check, cell = 0, ref_case = 1
+DEAL::Check 0, 24 active cells
+DEAL::Check 1, 192 active cells
+DEAL::Check 0, 24 active cells
+DEAL::Check 1, 192 active cells
+DEAL::Initial check, cell = 0, ref_case = 2
+DEAL::Check 0, 24 active cells
+DEAL::Check 1, 192 active cells
+DEAL::Check 0, 24 active cells
+DEAL::Check 1, 192 active cells
+DEAL::Initial check, cell = 0, ref_case = 3
+DEAL::Check 0, 40 active cells
+DEAL::Check 1, 320 active cells
+DEAL::Check 0, 40 active cells
+DEAL::Check 1, 320 active cells
+DEAL::Initial check, cell = 0, ref_case = 4
+DEAL::Check 0, 24 active cells
+DEAL::Check 1, 192 active cells
+DEAL::Check 0, 24 active cells
+DEAL::Check 1, 192 active cells
+DEAL::Initial check, cell = 0, ref_case = 5
+DEAL::Check 0, 40 active cells
+DEAL::Check 1, 320 active cells
+DEAL::Check 0, 40 active cells
+DEAL::Check 1, 320 active cells
+DEAL::Initial check, cell = 0, ref_case = 6
+DEAL::Check 0, 40 active cells
+DEAL::Check 1, 320 active cells
+DEAL::Check 0, 40 active cells
+DEAL::Check 1, 320 active cells
+DEAL::Initial check, cell = 0, ref_case = 7
+DEAL::Check 0, 72 active cells
+DEAL::Check 1, 576 active cells
+DEAL::Check 0, 72 active cells
+DEAL::Check 1, 576 active cells
+DEAL::Initial check, cell = 1, ref_case = 1
+DEAL::Check 0, 24 active cells
+DEAL::Check 1, 192 active cells
+DEAL::Check 0, 24 active cells
+DEAL::Check 1, 192 active cells
+DEAL::Initial check, cell = 1, ref_case = 2
+DEAL::Check 0, 24 active cells
+DEAL::Check 1, 192 active cells
+DEAL::Check 0, 24 active cells
+DEAL::Check 1, 192 active cells
+DEAL::Initial check, cell = 1, ref_case = 3
+DEAL::Check 0, 40 active cells
+DEAL::Check 1, 320 active cells
+DEAL::Check 0, 40 active cells
+DEAL::Check 1, 320 active cells
+DEAL::Initial check, cell = 1, ref_case = 4
+DEAL::Check 0, 24 active cells
+DEAL::Check 1, 192 active cells
+DEAL::Check 0, 24 active cells
+DEAL::Check 1, 192 active cells
+DEAL::Initial check, cell = 1, ref_case = 5
+DEAL::Check 0, 40 active cells
+DEAL::Check 1, 320 active cells
+DEAL::Check 0, 40 active cells
+DEAL::Check 1, 320 active cells
+DEAL::Initial check, cell = 1, ref_case = 6
+DEAL::Check 0, 40 active cells
+DEAL::Check 1, 320 active cells
+DEAL::Check 0, 40 active cells
+DEAL::Check 1, 320 active cells
+DEAL::Initial check, cell = 1, ref_case = 7
+DEAL::Check 0, 72 active cells
+DEAL::Check 1, 576 active cells
+DEAL::Check 0, 72 active cells
+DEAL::Check 1, 576 active cells
+DEAL::Initial check, cell = 0, ref_case = 1
+DEAL::Check 0, 32 active cells
+DEAL::Check 1, 256 active cells
+DEAL::Check 0, 32 active cells
+DEAL::Check 1, 256 active cells
+DEAL::Initial check, cell = 0, ref_case = 2
+DEAL::Check 0, 32 active cells
+DEAL::Check 1, 256 active cells
+DEAL::Check 0, 32 active cells
+DEAL::Check 1, 256 active cells
+DEAL::Initial check, cell = 0, ref_case = 3
+DEAL::Check 0, 48 active cells
+DEAL::Check 1, 384 active cells
+DEAL::Check 0, 48 active cells
+DEAL::Check 1, 384 active cells
+DEAL::Initial check, cell = 0, ref_case = 4
+DEAL::Check 0, 32 active cells
+DEAL::Check 1, 256 active cells
+DEAL::Check 0, 32 active cells
+DEAL::Check 1, 256 active cells
+DEAL::Initial check, cell = 0, ref_case = 5
+DEAL::Check 0, 48 active cells
+DEAL::Check 1, 384 active cells
+DEAL::Check 0, 48 active cells
+DEAL::Check 1, 384 active cells
+DEAL::Initial check, cell = 0, ref_case = 6
+DEAL::Check 0, 48 active cells
+DEAL::Check 1, 384 active cells
+DEAL::Check 0, 48 active cells
+DEAL::Check 1, 384 active cells
+DEAL::Initial check, cell = 0, ref_case = 7
+DEAL::Check 0, 80 active cells
+DEAL::Check 1, 640 active cells
+DEAL::Check 0, 80 active cells
+DEAL::Check 1, 640 active cells
+DEAL::Initial check, cell = 1, ref_case = 1
+DEAL::Check 0, 32 active cells
+DEAL::Check 1, 256 active cells
+DEAL::Check 0, 32 active cells
+DEAL::Check 1, 256 active cells
+DEAL::Initial check, cell = 1, ref_case = 2
+DEAL::Check 0, 32 active cells
+DEAL::Check 1, 256 active cells
+DEAL::Check 0, 32 active cells
+DEAL::Check 1, 256 active cells
+DEAL::Initial check, cell = 1, ref_case = 3
+DEAL::Check 0, 48 active cells
+DEAL::Check 1, 384 active cells
+DEAL::Check 0, 48 active cells
+DEAL::Check 1, 384 active cells
+DEAL::Initial check, cell = 1, ref_case = 4
+DEAL::Check 0, 32 active cells
+DEAL::Check 1, 256 active cells
+DEAL::Check 0, 32 active cells
+DEAL::Check 1, 256 active cells
+DEAL::Initial check, cell = 1, ref_case = 5
+DEAL::Check 0, 48 active cells
+DEAL::Check 1, 384 active cells
+DEAL::Check 0, 48 active cells
+DEAL::Check 1, 384 active cells
+DEAL::Initial check, cell = 1, ref_case = 6
+DEAL::Check 0, 48 active cells
+DEAL::Check 1, 384 active cells
+DEAL::Check 0, 48 active cells
+DEAL::Check 1, 384 active cells
+DEAL::Initial check, cell = 1, ref_case = 7
+DEAL::Check 0, 80 active cells
+DEAL::Check 1, 640 active cells
+DEAL::Check 0, 80 active cells
+DEAL::Check 1, 640 active cells
+DEAL::Initial check, cell = 2, ref_case = 1
+DEAL::Check 0, 32 active cells
+DEAL::Check 1, 256 active cells
+DEAL::Check 0, 32 active cells
+DEAL::Check 1, 256 active cells
+DEAL::Initial check, cell = 2, ref_case = 2
+DEAL::Check 0, 32 active cells
+DEAL::Check 1, 256 active cells
+DEAL::Check 0, 32 active cells
+DEAL::Check 1, 256 active cells
+DEAL::Initial check, cell = 2, ref_case = 3
+DEAL::Check 0, 48 active cells
+DEAL::Check 1, 384 active cells
+DEAL::Check 0, 48 active cells
+DEAL::Check 1, 384 active cells
+DEAL::Initial check, cell = 2, ref_case = 4
+DEAL::Check 0, 32 active cells
+DEAL::Check 1, 256 active cells
+DEAL::Check 0, 32 active cells
+DEAL::Check 1, 256 active cells
+DEAL::Initial check, cell = 2, ref_case = 5
+DEAL::Check 0, 48 active cells
+DEAL::Check 1, 384 active cells
+DEAL::Check 0, 48 active cells
+DEAL::Check 1, 384 active cells
+DEAL::Initial check, cell = 2, ref_case = 6
+DEAL::Check 0, 48 active cells
+DEAL::Check 1, 384 active cells
+DEAL::Check 0, 48 active cells
+DEAL::Check 1, 384 active cells
+DEAL::Initial check, cell = 2, ref_case = 7
+DEAL::Check 0, 80 active cells
+DEAL::Check 1, 640 active cells
+DEAL::Check 0, 80 active cells
+DEAL::Check 1, 640 active cells
+DEAL::Initial check, cell = 0, ref_case = 1
+DEAL::Check 0, 64 active cells
+DEAL::Check 1, 512 active cells
+DEAL::Check 0, 64 active cells
+DEAL::Check 1, 512 active cells
+DEAL::Initial check, cell = 0, ref_case = 2
+DEAL::Check 0, 64 active cells
+DEAL::Check 1, 512 active cells
+DEAL::Check 0, 64 active cells
+DEAL::Check 1, 512 active cells
+DEAL::Initial check, cell = 0, ref_case = 3
+DEAL::Check 0, 80 active cells
+DEAL::Check 1, 640 active cells
+DEAL::Check 0, 80 active cells
+DEAL::Check 1, 640 active cells
+DEAL::Initial check, cell = 0, ref_case = 4
+DEAL::Check 0, 64 active cells
+DEAL::Check 1, 512 active cells
+DEAL::Check 0, 64 active cells
+DEAL::Check 1, 512 active cells
+DEAL::Initial check, cell = 0, ref_case = 5
+DEAL::Check 0, 80 active cells
+DEAL::Check 1, 640 active cells
+DEAL::Check 0, 80 active cells
+DEAL::Check 1, 640 active cells
+DEAL::Initial check, cell = 0, ref_case = 6
+DEAL::Check 0, 80 active cells
+DEAL::Check 1, 640 active cells
+DEAL::Check 0, 80 active cells
+DEAL::Check 1, 640 active cells
+DEAL::Initial check, cell = 0, ref_case = 7
+DEAL::Check 0, 112 active cells
+DEAL::Check 1, 896 active cells
+DEAL::Check 0, 112 active cells
+DEAL::Check 1, 896 active cells
+DEAL::Initial check, cell = 1, ref_case = 1
+DEAL::Check 0, 64 active cells
+DEAL::Check 1, 512 active cells
+DEAL::Check 0, 64 active cells
+DEAL::Check 1, 512 active cells
+DEAL::Initial check, cell = 1, ref_case = 2
+DEAL::Check 0, 64 active cells
+DEAL::Check 1, 512 active cells
+DEAL::Check 0, 64 active cells
+DEAL::Check 1, 512 active cells
+DEAL::Initial check, cell = 1, ref_case = 3
+DEAL::Check 0, 80 active cells
+DEAL::Check 1, 640 active cells
+DEAL::Check 0, 80 active cells
+DEAL::Check 1, 640 active cells
+DEAL::Initial check, cell = 1, ref_case = 4
+DEAL::Check 0, 64 active cells
+DEAL::Check 1, 512 active cells
+DEAL::Check 0, 64 active cells
+DEAL::Check 1, 512 active cells
+DEAL::Initial check, cell = 1, ref_case = 5
+DEAL::Check 0, 80 active cells
+DEAL::Check 1, 640 active cells
+DEAL::Check 0, 80 active cells
+DEAL::Check 1, 640 active cells
+DEAL::Initial check, cell = 1, ref_case = 6
+DEAL::Check 0, 80 active cells
+DEAL::Check 1, 640 active cells
+DEAL::Check 0, 80 active cells
+DEAL::Check 1, 640 active cells
+DEAL::Initial check, cell = 1, ref_case = 7
+DEAL::Check 0, 112 active cells
+DEAL::Check 1, 896 active cells
+DEAL::Check 0, 112 active cells
+DEAL::Check 1, 896 active cells
+DEAL::Initial check, cell = 2, ref_case = 1
+DEAL::Check 0, 64 active cells
+DEAL::Check 1, 512 active cells
+DEAL::Check 0, 64 active cells
+DEAL::Check 1, 512 active cells
+DEAL::Initial check, cell = 2, ref_case = 2
+DEAL::Check 0, 64 active cells
+DEAL::Check 1, 512 active cells
+DEAL::Check 0, 64 active cells
+DEAL::Check 1, 512 active cells
+DEAL::Initial check, cell = 2, ref_case = 3
+DEAL::Check 0, 80 active cells
+DEAL::Check 1, 640 active cells
+DEAL::Check 0, 80 active cells
+DEAL::Check 1, 640 active cells
+DEAL::Initial check, cell = 2, ref_case = 4
+DEAL::Check 0, 64 active cells
+DEAL::Check 1, 512 active cells
+DEAL::Check 0, 64 active cells
+DEAL::Check 1, 512 active cells
+DEAL::Initial check, cell = 2, ref_case = 5
+DEAL::Check 0, 80 active cells
+DEAL::Check 1, 640 active cells
+DEAL::Check 0, 80 active cells
+DEAL::Check 1, 640 active cells
+DEAL::Initial check, cell = 2, ref_case = 6
+DEAL::Check 0, 80 active cells
+DEAL::Check 1, 640 active cells
+DEAL::Check 0, 80 active cells
+DEAL::Check 1, 640 active cells
+DEAL::Initial check, cell = 2, ref_case = 7
+DEAL::Check 0, 112 active cells
+DEAL::Check 1, 896 active cells
+DEAL::Check 0, 112 active cells
+DEAL::Check 1, 896 active cells
+DEAL::Initial check, cell = 3, ref_case = 1
+DEAL::Check 0, 64 active cells
+DEAL::Check 1, 512 active cells
+DEAL::Check 0, 64 active cells
+DEAL::Check 1, 512 active cells
+DEAL::Initial check, cell = 3, ref_case = 2
+DEAL::Check 0, 64 active cells
+DEAL::Check 1, 512 active cells
+DEAL::Check 0, 64 active cells
+DEAL::Check 1, 512 active cells
+DEAL::Initial check, cell = 3, ref_case = 3
+DEAL::Check 0, 80 active cells
+DEAL::Check 1, 640 active cells
+DEAL::Check 0, 80 active cells
+DEAL::Check 1, 640 active cells
+DEAL::Initial check, cell = 3, ref_case = 4
+DEAL::Check 0, 64 active cells
+DEAL::Check 1, 512 active cells
+DEAL::Check 0, 64 active cells
+DEAL::Check 1, 512 active cells
+DEAL::Initial check, cell = 3, ref_case = 5
+DEAL::Check 0, 80 active cells
+DEAL::Check 1, 640 active cells
+DEAL::Check 0, 80 active cells
+DEAL::Check 1, 640 active cells
+DEAL::Initial check, cell = 3, ref_case = 6
+DEAL::Check 0, 80 active cells
+DEAL::Check 1, 640 active cells
+DEAL::Check 0, 80 active cells
+DEAL::Check 1, 640 active cells
+DEAL::Initial check, cell = 3, ref_case = 7
+DEAL::Check 0, 112 active cells
+DEAL::Check 1, 896 active cells
+DEAL::Check 0, 112 active cells
+DEAL::Check 1, 896 active cells
+DEAL::Initial check, cell = 4, ref_case = 1
+DEAL::Check 0, 64 active cells
+DEAL::Check 1, 512 active cells
+DEAL::Check 0, 64 active cells
+DEAL::Check 1, 512 active cells
+DEAL::Initial check, cell = 4, ref_case = 2
+DEAL::Check 0, 64 active cells
+DEAL::Check 1, 512 active cells
+DEAL::Check 0, 64 active cells
+DEAL::Check 1, 512 active cells
+DEAL::Initial check, cell = 4, ref_case = 3
+DEAL::Check 0, 80 active cells
+DEAL::Check 1, 640 active cells
+DEAL::Check 0, 80 active cells
+DEAL::Check 1, 640 active cells
+DEAL::Initial check, cell = 4, ref_case = 4
+DEAL::Check 0, 64 active cells
+DEAL::Check 1, 512 active cells
+DEAL::Check 0, 64 active cells
+DEAL::Check 1, 512 active cells
+DEAL::Initial check, cell = 4, ref_case = 5
+DEAL::Check 0, 80 active cells
+DEAL::Check 1, 640 active cells
+DEAL::Check 0, 80 active cells
+DEAL::Check 1, 640 active cells
+DEAL::Initial check, cell = 4, ref_case = 6
+DEAL::Check 0, 80 active cells
+DEAL::Check 1, 640 active cells
+DEAL::Check 0, 80 active cells
+DEAL::Check 1, 640 active cells
+DEAL::Initial check, cell = 4, ref_case = 7
+DEAL::Check 0, 112 active cells
+DEAL::Check 1, 896 active cells
+DEAL::Check 0, 112 active cells
+DEAL::Check 1, 896 active cells
+DEAL::Initial check, cell = 5, ref_case = 1
+DEAL::Check 0, 64 active cells
+DEAL::Check 1, 512 active cells
+DEAL::Check 0, 64 active cells
+DEAL::Check 1, 512 active cells
+DEAL::Initial check, cell = 5, ref_case = 2
+DEAL::Check 0, 64 active cells
+DEAL::Check 1, 512 active cells
+DEAL::Check 0, 64 active cells
+DEAL::Check 1, 512 active cells
+DEAL::Initial check, cell = 5, ref_case = 3
+DEAL::Check 0, 80 active cells
+DEAL::Check 1, 640 active cells
+DEAL::Check 0, 80 active cells
+DEAL::Check 1, 640 active cells
+DEAL::Initial check, cell = 5, ref_case = 4
+DEAL::Check 0, 64 active cells
+DEAL::Check 1, 512 active cells
+DEAL::Check 0, 64 active cells
+DEAL::Check 1, 512 active cells
+DEAL::Initial check, cell = 5, ref_case = 5
+DEAL::Check 0, 80 active cells
+DEAL::Check 1, 640 active cells
+DEAL::Check 0, 80 active cells
+DEAL::Check 1, 640 active cells
+DEAL::Initial check, cell = 5, ref_case = 6
+DEAL::Check 0, 80 active cells
+DEAL::Check 1, 640 active cells
+DEAL::Check 0, 80 active cells
+DEAL::Check 1, 640 active cells
+DEAL::Initial check, cell = 5, ref_case = 7
+DEAL::Check 0, 112 active cells
+DEAL::Check 1, 896 active cells
+DEAL::Check 0, 112 active cells
+DEAL::Check 1, 896 active cells
+DEAL::Initial check, cell = 6, ref_case = 1
+DEAL::Check 0, 64 active cells
+DEAL::Check 1, 512 active cells
+DEAL::Check 0, 64 active cells
+DEAL::Check 1, 512 active cells
+DEAL::Initial check, cell = 6, ref_case = 2
+DEAL::Check 0, 64 active cells
+DEAL::Check 1, 512 active cells
+DEAL::Check 0, 64 active cells
+DEAL::Check 1, 512 active cells
+DEAL::Initial check, cell = 6, ref_case = 3
+DEAL::Check 0, 80 active cells
+DEAL::Check 1, 640 active cells
+DEAL::Check 0, 80 active cells
+DEAL::Check 1, 640 active cells
+DEAL::Initial check, cell = 6, ref_case = 4
+DEAL::Check 0, 64 active cells
+DEAL::Check 1, 512 active cells
+DEAL::Check 0, 64 active cells
+DEAL::Check 1, 512 active cells
+DEAL::Initial check, cell = 6, ref_case = 5
+DEAL::Check 0, 80 active cells
+DEAL::Check 1, 640 active cells
+DEAL::Check 0, 80 active cells
+DEAL::Check 1, 640 active cells
+DEAL::Initial check, cell = 6, ref_case = 6
+DEAL::Check 0, 80 active cells
+DEAL::Check 1, 640 active cells
+DEAL::Check 0, 80 active cells
+DEAL::Check 1, 640 active cells
+DEAL::Initial check, cell = 6, ref_case = 7
+DEAL::Check 0, 112 active cells
+DEAL::Check 1, 896 active cells
+DEAL::Check 0, 112 active cells
+DEAL::Check 1, 896 active cells
+DEAL::Initial check, cell = 0, ref_case = 1
+DEAL::Check 0, 24 active cells
+DEAL::Check 1, 192 active cells
+DEAL::Check 0, 24 active cells
+DEAL::Check 1, 192 active cells
+DEAL::Initial check, cell = 0, ref_case = 2
+DEAL::Check 0, 24 active cells
+DEAL::Check 1, 192 active cells
+DEAL::Check 0, 24 active cells
+DEAL::Check 1, 192 active cells
+DEAL::Initial check, cell = 0, ref_case = 3
+DEAL::Check 0, 40 active cells
+DEAL::Check 1, 320 active cells
+DEAL::Check 0, 40 active cells
+DEAL::Check 1, 320 active cells
+DEAL::Initial check, cell = 0, ref_case = 4
+DEAL::Check 0, 24 active cells
+DEAL::Check 1, 192 active cells
+DEAL::Check 0, 24 active cells
+DEAL::Check 1, 192 active cells
+DEAL::Initial check, cell = 0, ref_case = 5
+DEAL::Check 0, 40 active cells
+DEAL::Check 1, 320 active cells
+DEAL::Check 0, 40 active cells
+DEAL::Check 1, 320 active cells
+DEAL::Initial check, cell = 0, ref_case = 6
+DEAL::Check 0, 40 active cells
+DEAL::Check 1, 320 active cells
+DEAL::Check 0, 40 active cells
+DEAL::Check 1, 320 active cells
+DEAL::Initial check, cell = 0, ref_case = 7
+DEAL::Check 0, 72 active cells
+DEAL::Check 1, 576 active cells
+DEAL::Check 0, 72 active cells
+DEAL::Check 1, 576 active cells
+DEAL::Initial check, cell = 1, ref_case = 1
+DEAL::Check 0, 24 active cells
+DEAL::Check 1, 192 active cells
+DEAL::Check 0, 24 active cells
+DEAL::Check 1, 192 active cells
+DEAL::Initial check, cell = 1, ref_case = 2
+DEAL::Check 0, 24 active cells
+DEAL::Check 1, 192 active cells
+DEAL::Check 0, 24 active cells
+DEAL::Check 1, 192 active cells
+DEAL::Initial check, cell = 1, ref_case = 3
+DEAL::Check 0, 40 active cells
+DEAL::Check 1, 320 active cells
+DEAL::Check 0, 40 active cells
+DEAL::Check 1, 320 active cells
+DEAL::Initial check, cell = 1, ref_case = 4
+DEAL::Check 0, 24 active cells
+DEAL::Check 1, 192 active cells
+DEAL::Check 0, 24 active cells
+DEAL::Check 1, 192 active cells
+DEAL::Initial check, cell = 1, ref_case = 5
+DEAL::Check 0, 40 active cells
+DEAL::Check 1, 320 active cells
+DEAL::Check 0, 40 active cells
+DEAL::Check 1, 320 active cells
+DEAL::Initial check, cell = 1, ref_case = 6
+DEAL::Check 0, 40 active cells
+DEAL::Check 1, 320 active cells
+DEAL::Check 0, 40 active cells
+DEAL::Check 1, 320 active cells
+DEAL::Initial check, cell = 1, ref_case = 7
+DEAL::Check 0, 72 active cells
+DEAL::Check 1, 576 active cells
+DEAL::Check 0, 72 active cells
+DEAL::Check 1, 576 active cells
+DEAL::Initial check, cell = 0, ref_case = 1
+DEAL::Check 0, 24 active cells
+DEAL::Check 1, 192 active cells
+DEAL::Check 0, 24 active cells
+DEAL::Check 1, 192 active cells
+DEAL::Initial check, cell = 0, ref_case = 2
+DEAL::Check 0, 24 active cells
+DEAL::Check 1, 192 active cells
+DEAL::Check 0, 24 active cells
+DEAL::Check 1, 192 active cells
+DEAL::Initial check, cell = 0, ref_case = 3
+DEAL::Check 0, 40 active cells
+DEAL::Check 1, 320 active cells
+DEAL::Check 0, 40 active cells
+DEAL::Check 1, 320 active cells
+DEAL::Initial check, cell = 0, ref_case = 4
+DEAL::Check 0, 24 active cells
+DEAL::Check 1, 192 active cells
+DEAL::Check 0, 24 active cells
+DEAL::Check 1, 192 active cells
+DEAL::Initial check, cell = 0, ref_case = 5
+DEAL::Check 0, 40 active cells
+DEAL::Check 1, 320 active cells
+DEAL::Check 0, 40 active cells
+DEAL::Check 1, 320 active cells
+DEAL::Initial check, cell = 0, ref_case = 6
+DEAL::Check 0, 40 active cells
+DEAL::Check 1, 320 active cells
+DEAL::Check 0, 40 active cells
+DEAL::Check 1, 320 active cells
+DEAL::Initial check, cell = 0, ref_case = 7
+DEAL::Check 0, 72 active cells
+DEAL::Check 1, 576 active cells
+DEAL::Check 0, 72 active cells
+DEAL::Check 1, 576 active cells
+DEAL::Initial check, cell = 1, ref_case = 1
+DEAL::Check 0, 24 active cells
+DEAL::Check 1, 192 active cells
+DEAL::Check 0, 24 active cells
+DEAL::Check 1, 192 active cells
+DEAL::Initial check, cell = 1, ref_case = 2
+DEAL::Check 0, 24 active cells
+DEAL::Check 1, 192 active cells
+DEAL::Check 0, 24 active cells
+DEAL::Check 1, 192 active cells
+DEAL::Initial check, cell = 1, ref_case = 3
+DEAL::Check 0, 40 active cells
+DEAL::Check 1, 320 active cells
+DEAL::Check 0, 40 active cells
+DEAL::Check 1, 320 active cells
+DEAL::Initial check, cell = 1, ref_case = 4
+DEAL::Check 0, 24 active cells
+DEAL::Check 1, 192 active cells
+DEAL::Check 0, 24 active cells
+DEAL::Check 1, 192 active cells
+DEAL::Initial check, cell = 1, ref_case = 5
+DEAL::Check 0, 40 active cells
+DEAL::Check 1, 320 active cells
+DEAL::Check 0, 40 active cells
+DEAL::Check 1, 320 active cells
+DEAL::Initial check, cell = 1, ref_case = 6
+DEAL::Check 0, 40 active cells
+DEAL::Check 1, 320 active cells
+DEAL::Check 0, 40 active cells
+DEAL::Check 1, 320 active cells
+DEAL::Initial check, cell = 1, ref_case = 7
+DEAL::Check 0, 72 active cells
+DEAL::Check 1, 576 active cells
+DEAL::Check 0, 72 active cells
+DEAL::Check 1, 576 active cells
+DEAL::Initial check, cell = 0, ref_case = 1
+DEAL::Check 0, 24 active cells
+DEAL::Check 1, 192 active cells
+DEAL::Check 0, 24 active cells
+DEAL::Check 1, 192 active cells
+DEAL::Initial check, cell = 0, ref_case = 2
+DEAL::Check 0, 24 active cells
+DEAL::Check 1, 192 active cells
+DEAL::Check 0, 24 active cells
+DEAL::Check 1, 192 active cells
+DEAL::Initial check, cell = 0, ref_case = 3
+DEAL::Check 0, 40 active cells
+DEAL::Check 1, 320 active cells
+DEAL::Check 0, 40 active cells
+DEAL::Check 1, 320 active cells
+DEAL::Initial check, cell = 0, ref_case = 4
+DEAL::Check 0, 24 active cells
+DEAL::Check 1, 192 active cells
+DEAL::Check 0, 24 active cells
+DEAL::Check 1, 192 active cells
+DEAL::Initial check, cell = 0, ref_case = 5
+DEAL::Check 0, 40 active cells
+DEAL::Check 1, 320 active cells
+DEAL::Check 0, 40 active cells
+DEAL::Check 1, 320 active cells
+DEAL::Initial check, cell = 0, ref_case = 6
+DEAL::Check 0, 40 active cells
+DEAL::Check 1, 320 active cells
+DEAL::Check 0, 40 active cells
+DEAL::Check 1, 320 active cells
+DEAL::Initial check, cell = 0, ref_case = 7
+DEAL::Check 0, 72 active cells
+DEAL::Check 1, 576 active cells
+DEAL::Check 0, 72 active cells
+DEAL::Check 1, 576 active cells
+DEAL::Initial check, cell = 1, ref_case = 1
+DEAL::Check 0, 24 active cells
+DEAL::Check 1, 192 active cells
+DEAL::Check 0, 24 active cells
+DEAL::Check 1, 192 active cells
+DEAL::Initial check, cell = 1, ref_case = 2
+DEAL::Check 0, 24 active cells
+DEAL::Check 1, 192 active cells
+DEAL::Check 0, 24 active cells
+DEAL::Check 1, 192 active cells
+DEAL::Initial check, cell = 1, ref_case = 3
+DEAL::Check 0, 40 active cells
+DEAL::Check 1, 320 active cells
+DEAL::Check 0, 40 active cells
+DEAL::Check 1, 320 active cells
+DEAL::Initial check, cell = 1, ref_case = 4
+DEAL::Check 0, 24 active cells
+DEAL::Check 1, 192 active cells
+DEAL::Check 0, 24 active cells
+DEAL::Check 1, 192 active cells
+DEAL::Initial check, cell = 1, ref_case = 5
+DEAL::Check 0, 40 active cells
+DEAL::Check 1, 320 active cells
+DEAL::Check 0, 40 active cells
+DEAL::Check 1, 320 active cells
+DEAL::Initial check, cell = 1, ref_case = 6
+DEAL::Check 0, 40 active cells
+DEAL::Check 1, 320 active cells
+DEAL::Check 0, 40 active cells
+DEAL::Check 1, 320 active cells
+DEAL::Initial check, cell = 1, ref_case = 7
+DEAL::Check 0, 72 active cells
+DEAL::Check 1, 576 active cells
+DEAL::Check 0, 72 active cells
+DEAL::Check 1, 576 active cells
+DEAL::Initial check, cell = 0, ref_case = 1
+DEAL::Check 0, 48 active cells
+DEAL::Check 1, 384 active cells
+DEAL::Check 0, 48 active cells
+DEAL::Check 1, 384 active cells
+DEAL::Initial check, cell = 0, ref_case = 2
+DEAL::Check 0, 48 active cells
+DEAL::Check 1, 384 active cells
+DEAL::Check 0, 48 active cells
+DEAL::Check 1, 384 active cells
+DEAL::Initial check, cell = 0, ref_case = 3
+DEAL::Check 0, 64 active cells
+DEAL::Check 1, 512 active cells
+DEAL::Check 0, 64 active cells
+DEAL::Check 1, 512 active cells
+DEAL::Initial check, cell = 0, ref_case = 4
+DEAL::Check 0, 48 active cells
+DEAL::Check 1, 384 active cells
+DEAL::Check 0, 48 active cells
+DEAL::Check 1, 384 active cells
+DEAL::Initial check, cell = 0, ref_case = 5
+DEAL::Check 0, 64 active cells
+DEAL::Check 1, 512 active cells
+DEAL::Check 0, 64 active cells
+DEAL::Check 1, 512 active cells
+DEAL::Initial check, cell = 0, ref_case = 6
+DEAL::Check 0, 64 active cells
+DEAL::Check 1, 512 active cells
+DEAL::Check 0, 64 active cells
+DEAL::Check 1, 512 active cells
+DEAL::Initial check, cell = 0, ref_case = 7
+DEAL::Check 0, 96 active cells
+DEAL::Check 1, 768 active cells
+DEAL::Check 0, 96 active cells
+DEAL::Check 1, 768 active cells
+DEAL::Initial check, cell = 1, ref_case = 1
+DEAL::Check 0, 48 active cells
+DEAL::Check 1, 384 active cells
+DEAL::Check 0, 48 active cells
+DEAL::Check 1, 384 active cells
+DEAL::Initial check, cell = 1, ref_case = 2
+DEAL::Check 0, 48 active cells
+DEAL::Check 1, 384 active cells
+DEAL::Check 0, 48 active cells
+DEAL::Check 1, 384 active cells
+DEAL::Initial check, cell = 1, ref_case = 3
+DEAL::Check 0, 64 active cells
+DEAL::Check 1, 512 active cells
+DEAL::Check 0, 64 active cells
+DEAL::Check 1, 512 active cells
+DEAL::Initial check, cell = 1, ref_case = 4
+DEAL::Check 0, 48 active cells
+DEAL::Check 1, 384 active cells
+DEAL::Check 0, 48 active cells
+DEAL::Check 1, 384 active cells
+DEAL::Initial check, cell = 1, ref_case = 5
+DEAL::Check 0, 64 active cells
+DEAL::Check 1, 512 active cells
+DEAL::Check 0, 64 active cells
+DEAL::Check 1, 512 active cells
+DEAL::Initial check, cell = 1, ref_case = 6
+DEAL::Check 0, 64 active cells
+DEAL::Check 1, 512 active cells
+DEAL::Check 0, 64 active cells
+DEAL::Check 1, 512 active cells
+DEAL::Initial check, cell = 1, ref_case = 7
+DEAL::Check 0, 96 active cells
+DEAL::Check 1, 768 active cells
+DEAL::Check 0, 96 active cells
+DEAL::Check 1, 768 active cells
+DEAL::Initial check, cell = 2, ref_case = 1
+DEAL::Check 0, 48 active cells
+DEAL::Check 1, 384 active cells
+DEAL::Check 0, 48 active cells
+DEAL::Check 1, 384 active cells
+DEAL::Initial check, cell = 2, ref_case = 2
+DEAL::Check 0, 48 active cells
+DEAL::Check 1, 384 active cells
+DEAL::Check 0, 48 active cells
+DEAL::Check 1, 384 active cells
+DEAL::Initial check, cell = 2, ref_case = 3
+DEAL::Check 0, 64 active cells
+DEAL::Check 1, 512 active cells
+DEAL::Check 0, 64 active cells
+DEAL::Check 1, 512 active cells
+DEAL::Initial check, cell = 2, ref_case = 4
+DEAL::Check 0, 48 active cells
+DEAL::Check 1, 384 active cells
+DEAL::Check 0, 48 active cells
+DEAL::Check 1, 384 active cells
+DEAL::Initial check, cell = 2, ref_case = 5
+DEAL::Check 0, 64 active cells
+DEAL::Check 1, 512 active cells
+DEAL::Check 0, 64 active cells
+DEAL::Check 1, 512 active cells
+DEAL::Initial check, cell = 2, ref_case = 6
+DEAL::Check 0, 64 active cells
+DEAL::Check 1, 512 active cells
+DEAL::Check 0, 64 active cells
+DEAL::Check 1, 512 active cells
+DEAL::Initial check, cell = 2, ref_case = 7
+DEAL::Check 0, 96 active cells
+DEAL::Check 1, 768 active cells
+DEAL::Check 0, 96 active cells
+DEAL::Check 1, 768 active cells
+DEAL::Initial check, cell = 3, ref_case = 1
+DEAL::Check 0, 48 active cells
+DEAL::Check 1, 384 active cells
+DEAL::Check 0, 48 active cells
+DEAL::Check 1, 384 active cells
+DEAL::Initial check, cell = 3, ref_case = 2
+DEAL::Check 0, 48 active cells
+DEAL::Check 1, 384 active cells
+DEAL::Check 0, 48 active cells
+DEAL::Check 1, 384 active cells
+DEAL::Initial check, cell = 3, ref_case = 3
+DEAL::Check 0, 64 active cells
+DEAL::Check 1, 512 active cells
+DEAL::Check 0, 64 active cells
+DEAL::Check 1, 512 active cells
+DEAL::Initial check, cell = 3, ref_case = 4
+DEAL::Check 0, 48 active cells
+DEAL::Check 1, 384 active cells
+DEAL::Check 0, 48 active cells
+DEAL::Check 1, 384 active cells
+DEAL::Initial check, cell = 3, ref_case = 5
+DEAL::Check 0, 64 active cells
+DEAL::Check 1, 512 active cells
+DEAL::Check 0, 64 active cells
+DEAL::Check 1, 512 active cells
+DEAL::Initial check, cell = 3, ref_case = 6
+DEAL::Check 0, 64 active cells
+DEAL::Check 1, 512 active cells
+DEAL::Check 0, 64 active cells
+DEAL::Check 1, 512 active cells
+DEAL::Initial check, cell = 3, ref_case = 7
+DEAL::Check 0, 96 active cells
+DEAL::Check 1, 768 active cells
+DEAL::Check 0, 96 active cells
+DEAL::Check 1, 768 active cells
+DEAL::Initial check, cell = 4, ref_case = 1
+DEAL::Check 0, 48 active cells
+DEAL::Check 1, 384 active cells
+DEAL::Check 0, 48 active cells
+DEAL::Check 1, 384 active cells
+DEAL::Initial check, cell = 4, ref_case = 2
+DEAL::Check 0, 48 active cells
+DEAL::Check 1, 384 active cells
+DEAL::Check 0, 48 active cells
+DEAL::Check 1, 384 active cells
+DEAL::Initial check, cell = 4, ref_case = 3
+DEAL::Check 0, 64 active cells
+DEAL::Check 1, 512 active cells
+DEAL::Check 0, 64 active cells
+DEAL::Check 1, 512 active cells
+DEAL::Initial check, cell = 4, ref_case = 4
+DEAL::Check 0, 48 active cells
+DEAL::Check 1, 384 active cells
+DEAL::Check 0, 48 active cells
+DEAL::Check 1, 384 active cells
+DEAL::Initial check, cell = 4, ref_case = 5
+DEAL::Check 0, 64 active cells
+DEAL::Check 1, 512 active cells
+DEAL::Check 0, 64 active cells
+DEAL::Check 1, 512 active cells
+DEAL::Initial check, cell = 4, ref_case = 6
+DEAL::Check 0, 64 active cells
+DEAL::Check 1, 512 active cells
+DEAL::Check 0, 64 active cells
+DEAL::Check 1, 512 active cells
+DEAL::Initial check, cell = 4, ref_case = 7
+DEAL::Check 0, 96 active cells
+DEAL::Check 1, 768 active cells
+DEAL::Check 0, 96 active cells
+DEAL::Check 1, 768 active cells
+DEAL::Initial check, cell = 0, ref_case = 1
+DEAL::Check 0, 48 active cells
+DEAL::Check 1, 384 active cells
+DEAL::Check 0, 48 active cells
+DEAL::Check 1, 384 active cells
+DEAL::Initial check, cell = 0, ref_case = 2
+DEAL::Check 0, 48 active cells
+DEAL::Check 1, 384 active cells
+DEAL::Check 0, 48 active cells
+DEAL::Check 1, 384 active cells
+DEAL::Initial check, cell = 0, ref_case = 3
+DEAL::Check 0, 64 active cells
+DEAL::Check 1, 512 active cells
+DEAL::Check 0, 64 active cells
+DEAL::Check 1, 512 active cells
+DEAL::Initial check, cell = 0, ref_case = 4
+DEAL::Check 0, 48 active cells
+DEAL::Check 1, 384 active cells
+DEAL::Check 0, 48 active cells
+DEAL::Check 1, 384 active cells
+DEAL::Initial check, cell = 0, ref_case = 5
+DEAL::Check 0, 64 active cells
+DEAL::Check 1, 512 active cells
+DEAL::Check 0, 64 active cells
+DEAL::Check 1, 512 active cells
+DEAL::Initial check, cell = 0, ref_case = 6
+DEAL::Check 0, 64 active cells
+DEAL::Check 1, 512 active cells
+DEAL::Check 0, 64 active cells
+DEAL::Check 1, 512 active cells
+DEAL::Initial check, cell = 0, ref_case = 7
+DEAL::Check 0, 96 active cells
+DEAL::Check 1, 768 active cells
+DEAL::Check 0, 96 active cells
+DEAL::Check 1, 768 active cells
+DEAL::Initial check, cell = 1, ref_case = 1
+DEAL::Check 0, 48 active cells
+DEAL::Check 1, 384 active cells
+DEAL::Check 0, 48 active cells
+DEAL::Check 1, 384 active cells
+DEAL::Initial check, cell = 1, ref_case = 2
+DEAL::Check 0, 48 active cells
+DEAL::Check 1, 384 active cells
+DEAL::Check 0, 48 active cells
+DEAL::Check 1, 384 active cells
+DEAL::Initial check, cell = 1, ref_case = 3
+DEAL::Check 0, 64 active cells
+DEAL::Check 1, 512 active cells
+DEAL::Check 0, 64 active cells
+DEAL::Check 1, 512 active cells
+DEAL::Initial check, cell = 1, ref_case = 4
+DEAL::Check 0, 48 active cells
+DEAL::Check 1, 384 active cells
+DEAL::Check 0, 48 active cells
+DEAL::Check 1, 384 active cells
+DEAL::Initial check, cell = 1, ref_case = 5
+DEAL::Check 0, 64 active cells
+DEAL::Check 1, 512 active cells
+DEAL::Check 0, 64 active cells
+DEAL::Check 1, 512 active cells
+DEAL::Initial check, cell = 1, ref_case = 6
+DEAL::Check 0, 64 active cells
+DEAL::Check 1, 512 active cells
+DEAL::Check 0, 64 active cells
+DEAL::Check 1, 512 active cells
+DEAL::Initial check, cell = 1, ref_case = 7
+DEAL::Check 0, 96 active cells
+DEAL::Check 1, 768 active cells
+DEAL::Check 0, 96 active cells
+DEAL::Check 1, 768 active cells
+DEAL::Initial check, cell = 2, ref_case = 1
+DEAL::Check 0, 48 active cells
+DEAL::Check 1, 384 active cells
+DEAL::Check 0, 48 active cells
+DEAL::Check 1, 384 active cells
+DEAL::Initial check, cell = 2, ref_case = 2
+DEAL::Check 0, 48 active cells
+DEAL::Check 1, 384 active cells
+DEAL::Check 0, 48 active cells
+DEAL::Check 1, 384 active cells
+DEAL::Initial check, cell = 2, ref_case = 3
+DEAL::Check 0, 64 active cells
+DEAL::Check 1, 512 active cells
+DEAL::Check 0, 64 active cells
+DEAL::Check 1, 512 active cells
+DEAL::Initial check, cell = 2, ref_case = 4
+DEAL::Check 0, 48 active cells
+DEAL::Check 1, 384 active cells
+DEAL::Check 0, 48 active cells
+DEAL::Check 1, 384 active cells
+DEAL::Initial check, cell = 2, ref_case = 5
+DEAL::Check 0, 64 active cells
+DEAL::Check 1, 512 active cells
+DEAL::Check 0, 64 active cells
+DEAL::Check 1, 512 active cells
+DEAL::Initial check, cell = 2, ref_case = 6
+DEAL::Check 0, 64 active cells
+DEAL::Check 1, 512 active cells
+DEAL::Check 0, 64 active cells
+DEAL::Check 1, 512 active cells
+DEAL::Initial check, cell = 2, ref_case = 7
+DEAL::Check 0, 96 active cells
+DEAL::Check 1, 768 active cells
+DEAL::Check 0, 96 active cells
+DEAL::Check 1, 768 active cells
+DEAL::Initial check, cell = 3, ref_case = 1
+DEAL::Check 0, 48 active cells
+DEAL::Check 1, 384 active cells
+DEAL::Check 0, 48 active cells
+DEAL::Check 1, 384 active cells
+DEAL::Initial check, cell = 3, ref_case = 2
+DEAL::Check 0, 48 active cells
+DEAL::Check 1, 384 active cells
+DEAL::Check 0, 48 active cells
+DEAL::Check 1, 384 active cells
+DEAL::Initial check, cell = 3, ref_case = 3
+DEAL::Check 0, 64 active cells
+DEAL::Check 1, 512 active cells
+DEAL::Check 0, 64 active cells
+DEAL::Check 1, 512 active cells
+DEAL::Initial check, cell = 3, ref_case = 4
+DEAL::Check 0, 48 active cells
+DEAL::Check 1, 384 active cells
+DEAL::Check 0, 48 active cells
+DEAL::Check 1, 384 active cells
+DEAL::Initial check, cell = 3, ref_case = 5
+DEAL::Check 0, 64 active cells
+DEAL::Check 1, 512 active cells
+DEAL::Check 0, 64 active cells
+DEAL::Check 1, 512 active cells
+DEAL::Initial check, cell = 3, ref_case = 6
+DEAL::Check 0, 64 active cells
+DEAL::Check 1, 512 active cells
+DEAL::Check 0, 64 active cells
+DEAL::Check 1, 512 active cells
+DEAL::Initial check, cell = 3, ref_case = 7
+DEAL::Check 0, 96 active cells
+DEAL::Check 1, 768 active cells
+DEAL::Check 0, 96 active cells
+DEAL::Check 1, 768 active cells
+DEAL::Initial check, cell = 4, ref_case = 1
+DEAL::Check 0, 48 active cells
+DEAL::Check 1, 384 active cells
+DEAL::Check 0, 48 active cells
+DEAL::Check 1, 384 active cells
+DEAL::Initial check, cell = 4, ref_case = 2
+DEAL::Check 0, 48 active cells
+DEAL::Check 1, 384 active cells
+DEAL::Check 0, 48 active cells
+DEAL::Check 1, 384 active cells
+DEAL::Initial check, cell = 4, ref_case = 3
+DEAL::Check 0, 64 active cells
+DEAL::Check 1, 512 active cells
+DEAL::Check 0, 64 active cells
+DEAL::Check 1, 512 active cells
+DEAL::Initial check, cell = 4, ref_case = 4
+DEAL::Check 0, 48 active cells
+DEAL::Check 1, 384 active cells
+DEAL::Check 0, 48 active cells
+DEAL::Check 1, 384 active cells
+DEAL::Initial check, cell = 4, ref_case = 5
+DEAL::Check 0, 64 active cells
+DEAL::Check 1, 512 active cells
+DEAL::Check 0, 64 active cells
+DEAL::Check 1, 512 active cells
+DEAL::Initial check, cell = 4, ref_case = 6
+DEAL::Check 0, 64 active cells
+DEAL::Check 1, 512 active cells
+DEAL::Check 0, 64 active cells
+DEAL::Check 1, 512 active cells
+DEAL::Initial check, cell = 4, ref_case = 7
+DEAL::Check 0, 96 active cells
+DEAL::Check 1, 768 active cells
+DEAL::Check 0, 96 active cells
+DEAL::Check 1, 768 active cells
+DEAL::Initial check, cell = 0, ref_case = 1
+DEAL::Check 0, 48 active cells
+DEAL::Check 1, 384 active cells
+DEAL::Check 0, 48 active cells
+DEAL::Check 1, 384 active cells
+DEAL::Initial check, cell = 0, ref_case = 2
+DEAL::Check 0, 48 active cells
+DEAL::Check 1, 384 active cells
+DEAL::Check 0, 48 active cells
+DEAL::Check 1, 384 active cells
+DEAL::Initial check, cell = 0, ref_case = 3
+DEAL::Check 0, 64 active cells
+DEAL::Check 1, 512 active cells
+DEAL::Check 0, 64 active cells
+DEAL::Check 1, 512 active cells
+DEAL::Initial check, cell = 0, ref_case = 4
+DEAL::Check 0, 48 active cells
+DEAL::Check 1, 384 active cells
+DEAL::Check 0, 48 active cells
+DEAL::Check 1, 384 active cells
+DEAL::Initial check, cell = 0, ref_case = 5
+DEAL::Check 0, 64 active cells
+DEAL::Check 1, 512 active cells
+DEAL::Check 0, 64 active cells
+DEAL::Check 1, 512 active cells
+DEAL::Initial check, cell = 0, ref_case = 6
+DEAL::Check 0, 64 active cells
+DEAL::Check 1, 512 active cells
+DEAL::Check 0, 64 active cells
+DEAL::Check 1, 512 active cells
+DEAL::Initial check, cell = 0, ref_case = 7
+DEAL::Check 0, 96 active cells
+DEAL::Check 1, 768 active cells
+DEAL::Check 0, 96 active cells
+DEAL::Check 1, 768 active cells
+DEAL::Initial check, cell = 1, ref_case = 1
+DEAL::Check 0, 48 active cells
+DEAL::Check 1, 384 active cells
+DEAL::Check 0, 48 active cells
+DEAL::Check 1, 384 active cells
+DEAL::Initial check, cell = 1, ref_case = 2
+DEAL::Check 0, 48 active cells
+DEAL::Check 1, 384 active cells
+DEAL::Check 0, 48 active cells
+DEAL::Check 1, 384 active cells
+DEAL::Initial check, cell = 1, ref_case = 3
+DEAL::Check 0, 64 active cells
+DEAL::Check 1, 512 active cells
+DEAL::Check 0, 64 active cells
+DEAL::Check 1, 512 active cells
+DEAL::Initial check, cell = 1, ref_case = 4
+DEAL::Check 0, 48 active cells
+DEAL::Check 1, 384 active cells
+DEAL::Check 0, 48 active cells
+DEAL::Check 1, 384 active cells
+DEAL::Initial check, cell = 1, ref_case = 5
+DEAL::Check 0, 64 active cells
+DEAL::Check 1, 512 active cells
+DEAL::Check 0, 64 active cells
+DEAL::Check 1, 512 active cells
+DEAL::Initial check, cell = 1, ref_case = 6
+DEAL::Check 0, 64 active cells
+DEAL::Check 1, 512 active cells
+DEAL::Check 0, 64 active cells
+DEAL::Check 1, 512 active cells
+DEAL::Initial check, cell = 1, ref_case = 7
+DEAL::Check 0, 96 active cells
+DEAL::Check 1, 768 active cells
+DEAL::Check 0, 96 active cells
+DEAL::Check 1, 768 active cells
+DEAL::Initial check, cell = 2, ref_case = 1
+DEAL::Check 0, 48 active cells
+DEAL::Check 1, 384 active cells
+DEAL::Check 0, 48 active cells
+DEAL::Check 1, 384 active cells
+DEAL::Initial check, cell = 2, ref_case = 2
+DEAL::Check 0, 48 active cells
+DEAL::Check 1, 384 active cells
+DEAL::Check 0, 48 active cells
+DEAL::Check 1, 384 active cells
+DEAL::Initial check, cell = 2, ref_case = 3
+DEAL::Check 0, 64 active cells
+DEAL::Check 1, 512 active cells
+DEAL::Check 0, 64 active cells
+DEAL::Check 1, 512 active cells
+DEAL::Initial check, cell = 2, ref_case = 4
+DEAL::Check 0, 48 active cells
+DEAL::Check 1, 384 active cells
+DEAL::Check 0, 48 active cells
+DEAL::Check 1, 384 active cells
+DEAL::Initial check, cell = 2, ref_case = 5
+DEAL::Check 0, 64 active cells
+DEAL::Check 1, 512 active cells
+DEAL::Check 0, 64 active cells
+DEAL::Check 1, 512 active cells
+DEAL::Initial check, cell = 2, ref_case = 6
+DEAL::Check 0, 64 active cells
+DEAL::Check 1, 512 active cells
+DEAL::Check 0, 64 active cells
+DEAL::Check 1, 512 active cells
+DEAL::Initial check, cell = 2, ref_case = 7
+DEAL::Check 0, 96 active cells
+DEAL::Check 1, 768 active cells
+DEAL::Check 0, 96 active cells
+DEAL::Check 1, 768 active cells
+DEAL::Initial check, cell = 3, ref_case = 1
+DEAL::Check 0, 48 active cells
+DEAL::Check 1, 384 active cells
+DEAL::Check 0, 48 active cells
+DEAL::Check 1, 384 active cells
+DEAL::Initial check, cell = 3, ref_case = 2
+DEAL::Check 0, 48 active cells
+DEAL::Check 1, 384 active cells
+DEAL::Check 0, 48 active cells
+DEAL::Check 1, 384 active cells
+DEAL::Initial check, cell = 3, ref_case = 3
+DEAL::Check 0, 64 active cells
+DEAL::Check 1, 512 active cells
+DEAL::Check 0, 64 active cells
+DEAL::Check 1, 512 active cells
+DEAL::Initial check, cell = 3, ref_case = 4
+DEAL::Check 0, 48 active cells
+DEAL::Check 1, 384 active cells
+DEAL::Check 0, 48 active cells
+DEAL::Check 1, 384 active cells
+DEAL::Initial check, cell = 3, ref_case = 5
+DEAL::Check 0, 64 active cells
+DEAL::Check 1, 512 active cells
+DEAL::Check 0, 64 active cells
+DEAL::Check 1, 512 active cells
+DEAL::Initial check, cell = 3, ref_case = 6
+DEAL::Check 0, 64 active cells
+DEAL::Check 1, 512 active cells
+DEAL::Check 0, 64 active cells
+DEAL::Check 1, 512 active cells
+DEAL::Initial check, cell = 3, ref_case = 7
+DEAL::Check 0, 96 active cells
+DEAL::Check 1, 768 active cells
+DEAL::Check 0, 96 active cells
+DEAL::Check 1, 768 active cells
+DEAL::Initial check, cell = 4, ref_case = 1
+DEAL::Check 0, 48 active cells
+DEAL::Check 1, 384 active cells
+DEAL::Check 0, 48 active cells
+DEAL::Check 1, 384 active cells
+DEAL::Initial check, cell = 4, ref_case = 2
+DEAL::Check 0, 48 active cells
+DEAL::Check 1, 384 active cells
+DEAL::Check 0, 48 active cells
+DEAL::Check 1, 384 active cells
+DEAL::Initial check, cell = 4, ref_case = 3
+DEAL::Check 0, 64 active cells
+DEAL::Check 1, 512 active cells
+DEAL::Check 0, 64 active cells
+DEAL::Check 1, 512 active cells
+DEAL::Initial check, cell = 4, ref_case = 4
+DEAL::Check 0, 48 active cells
+DEAL::Check 1, 384 active cells
+DEAL::Check 0, 48 active cells
+DEAL::Check 1, 384 active cells
+DEAL::Initial check, cell = 4, ref_case = 5
+DEAL::Check 0, 64 active cells
+DEAL::Check 1, 512 active cells
+DEAL::Check 0, 64 active cells
+DEAL::Check 1, 512 active cells
+DEAL::Initial check, cell = 4, ref_case = 6
+DEAL::Check 0, 64 active cells
+DEAL::Check 1, 512 active cells
+DEAL::Check 0, 64 active cells
+DEAL::Check 1, 512 active cells
+DEAL::Initial check, cell = 4, ref_case = 7
+DEAL::Check 0, 96 active cells
+DEAL::Check 1, 768 active cells
+DEAL::Check 0, 96 active cells
+DEAL::Check 1, 768 active cells
+DEAL::Initial check, cell = 0, ref_case = 1
+DEAL::Check 0, 48 active cells
+DEAL::Check 1, 384 active cells
+DEAL::Check 0, 48 active cells
+DEAL::Check 1, 384 active cells
+DEAL::Initial check, cell = 0, ref_case = 2
+DEAL::Check 0, 48 active cells
+DEAL::Check 1, 384 active cells
+DEAL::Check 0, 48 active cells
+DEAL::Check 1, 384 active cells
+DEAL::Initial check, cell = 0, ref_case = 3
+DEAL::Check 0, 64 active cells
+DEAL::Check 1, 512 active cells
+DEAL::Check 0, 64 active cells
+DEAL::Check 1, 512 active cells
+DEAL::Initial check, cell = 0, ref_case = 4
+DEAL::Check 0, 48 active cells
+DEAL::Check 1, 384 active cells
+DEAL::Check 0, 48 active cells
+DEAL::Check 1, 384 active cells
+DEAL::Initial check, cell = 0, ref_case = 5
+DEAL::Check 0, 64 active cells
+DEAL::Check 1, 512 active cells
+DEAL::Check 0, 64 active cells
+DEAL::Check 1, 512 active cells
+DEAL::Initial check, cell = 0, ref_case = 6
+DEAL::Check 0, 64 active cells
+DEAL::Check 1, 512 active cells
+DEAL::Check 0, 64 active cells
+DEAL::Check 1, 512 active cells
+DEAL::Initial check, cell = 0, ref_case = 7
+DEAL::Check 0, 96 active cells
+DEAL::Check 1, 768 active cells
+DEAL::Check 0, 96 active cells
+DEAL::Check 1, 768 active cells
+DEAL::Initial check, cell = 1, ref_case = 1
+DEAL::Check 0, 48 active cells
+DEAL::Check 1, 384 active cells
+DEAL::Check 0, 48 active cells
+DEAL::Check 1, 384 active cells
+DEAL::Initial check, cell = 1, ref_case = 2
+DEAL::Check 0, 48 active cells
+DEAL::Check 1, 384 active cells
+DEAL::Check 0, 48 active cells
+DEAL::Check 1, 384 active cells
+DEAL::Initial check, cell = 1, ref_case = 3
+DEAL::Check 0, 64 active cells
+DEAL::Check 1, 512 active cells
+DEAL::Check 0, 64 active cells
+DEAL::Check 1, 512 active cells
+DEAL::Initial check, cell = 1, ref_case = 4
+DEAL::Check 0, 48 active cells
+DEAL::Check 1, 384 active cells
+DEAL::Check 0, 48 active cells
+DEAL::Check 1, 384 active cells
+DEAL::Initial check, cell = 1, ref_case = 5
+DEAL::Check 0, 64 active cells
+DEAL::Check 1, 512 active cells
+DEAL::Check 0, 64 active cells
+DEAL::Check 1, 512 active cells
+DEAL::Initial check, cell = 1, ref_case = 6
+DEAL::Check 0, 64 active cells
+DEAL::Check 1, 512 active cells
+DEAL::Check 0, 64 active cells
+DEAL::Check 1, 512 active cells
+DEAL::Initial check, cell = 1, ref_case = 7
+DEAL::Check 0, 96 active cells
+DEAL::Check 1, 768 active cells
+DEAL::Check 0, 96 active cells
+DEAL::Check 1, 768 active cells
+DEAL::Initial check, cell = 2, ref_case = 1
+DEAL::Check 0, 48 active cells
+DEAL::Check 1, 384 active cells
+DEAL::Check 0, 48 active cells
+DEAL::Check 1, 384 active cells
+DEAL::Initial check, cell = 2, ref_case = 2
+DEAL::Check 0, 48 active cells
+DEAL::Check 1, 384 active cells
+DEAL::Check 0, 48 active cells
+DEAL::Check 1, 384 active cells
+DEAL::Initial check, cell = 2, ref_case = 3
+DEAL::Check 0, 64 active cells
+DEAL::Check 1, 512 active cells
+DEAL::Check 0, 64 active cells
+DEAL::Check 1, 512 active cells
+DEAL::Initial check, cell = 2, ref_case = 4
+DEAL::Check 0, 48 active cells
+DEAL::Check 1, 384 active cells
+DEAL::Check 0, 48 active cells
+DEAL::Check 1, 384 active cells
+DEAL::Initial check, cell = 2, ref_case = 5
+DEAL::Check 0, 64 active cells
+DEAL::Check 1, 512 active cells
+DEAL::Check 0, 64 active cells
+DEAL::Check 1, 512 active cells
+DEAL::Initial check, cell = 2, ref_case = 6
+DEAL::Check 0, 64 active cells
+DEAL::Check 1, 512 active cells
+DEAL::Check 0, 64 active cells
+DEAL::Check 1, 512 active cells
+DEAL::Initial check, cell = 2, ref_case = 7
+DEAL::Check 0, 96 active cells
+DEAL::Check 1, 768 active cells
+DEAL::Check 0, 96 active cells
+DEAL::Check 1, 768 active cells
+DEAL::Initial check, cell = 3, ref_case = 1
+DEAL::Check 0, 48 active cells
+DEAL::Check 1, 384 active cells
+DEAL::Check 0, 48 active cells
+DEAL::Check 1, 384 active cells
+DEAL::Initial check, cell = 3, ref_case = 2
+DEAL::Check 0, 48 active cells
+DEAL::Check 1, 384 active cells
+DEAL::Check 0, 48 active cells
+DEAL::Check 1, 384 active cells
+DEAL::Initial check, cell = 3, ref_case = 3
+DEAL::Check 0, 64 active cells
+DEAL::Check 1, 512 active cells
+DEAL::Check 0, 64 active cells
+DEAL::Check 1, 512 active cells
+DEAL::Initial check, cell = 3, ref_case = 4
+DEAL::Check 0, 48 active cells
+DEAL::Check 1, 384 active cells
+DEAL::Check 0, 48 active cells
+DEAL::Check 1, 384 active cells
+DEAL::Initial check, cell = 3, ref_case = 5
+DEAL::Check 0, 64 active cells
+DEAL::Check 1, 512 active cells
+DEAL::Check 0, 64 active cells
+DEAL::Check 1, 512 active cells
+DEAL::Initial check, cell = 3, ref_case = 6
+DEAL::Check 0, 64 active cells
+DEAL::Check 1, 512 active cells
+DEAL::Check 0, 64 active cells
+DEAL::Check 1, 512 active cells
+DEAL::Initial check, cell = 3, ref_case = 7
+DEAL::Check 0, 96 active cells
+DEAL::Check 1, 768 active cells
+DEAL::Check 0, 96 active cells
+DEAL::Check 1, 768 active cells
+DEAL::Initial check, cell = 4, ref_case = 1
+DEAL::Check 0, 48 active cells
+DEAL::Check 1, 384 active cells
+DEAL::Check 0, 48 active cells
+DEAL::Check 1, 384 active cells
+DEAL::Initial check, cell = 4, ref_case = 2
+DEAL::Check 0, 48 active cells
+DEAL::Check 1, 384 active cells
+DEAL::Check 0, 48 active cells
+DEAL::Check 1, 384 active cells
+DEAL::Initial check, cell = 4, ref_case = 3
+DEAL::Check 0, 64 active cells
+DEAL::Check 1, 512 active cells
+DEAL::Check 0, 64 active cells
+DEAL::Check 1, 512 active cells
+DEAL::Initial check, cell = 4, ref_case = 4
+DEAL::Check 0, 48 active cells
+DEAL::Check 1, 384 active cells
+DEAL::Check 0, 48 active cells
+DEAL::Check 1, 384 active cells
+DEAL::Initial check, cell = 4, ref_case = 5
+DEAL::Check 0, 64 active cells
+DEAL::Check 1, 512 active cells
+DEAL::Check 0, 64 active cells
+DEAL::Check 1, 512 active cells
+DEAL::Initial check, cell = 4, ref_case = 6
+DEAL::Check 0, 64 active cells
+DEAL::Check 1, 512 active cells
+DEAL::Check 0, 64 active cells
+DEAL::Check 1, 512 active cells
+DEAL::Initial check, cell = 4, ref_case = 7
+DEAL::Check 0, 96 active cells
+DEAL::Check 1, 768 active cells
+DEAL::Check 0, 96 active cells
+DEAL::Check 1, 768 active cells

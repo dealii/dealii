@@ -31,7 +31,7 @@ check_this (const FiniteElement<dim> &fe1,
     return;
 
 				   // check all combinations of fe1 and fe2
-  for (unsigned int subface=0; subface<GeometryInfo<dim>::subfaces_per_face; ++subface)
+  for (unsigned int subface=0; subface<GeometryInfo<dim>::max_children_per_face; ++subface)
     {
       FullMatrix<double> face_constraints;
       try

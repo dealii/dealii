@@ -2,7 +2,7 @@
 //    $Id$
 //    Version: $Name$ 
 //
-//    Copyright (C) 2003, 2004, 2005 by the deal.II authors
+//    Copyright (C) 2003, 2004, 2005, 2007 by the deal.II authors
 //
 //    This file is subject to QPL and may not be  distributed
 //    without copyright and license information. Please refer
@@ -50,39 +50,35 @@ void check_this (Triangulation<3> &tria)
           &&
           cell->neighbor(face_no)->has_children())
         for (unsigned int subface_no=0;
-             subface_no<GeometryInfo<3>::subfaces_per_face;
+             subface_no<GeometryInfo<3>::max_children_per_face;
              ++subface_no)
           {
                                              // get an iterator
                                              // pointing to the cell
                                              // behind the present
                                              // subface
+
+					     // way a) construct it ourselves,
+					     // considering orientation and
+					     // rotation of the face
             const DoFHandler<3>::cell_iterator
               neighbor = cell->neighbor(face_no);
             const unsigned int neighbor_neighbor
               = cell->neighbor_of_neighbor (face_no);
-
-                                             // see whether face and
-                                             // the neighbor's
-                                             // counterface share the
-                                             // same indexing of
-                                             // children. if not so,
-                                             // translate child
-                                             // indices
-            const bool face_orientations_match
-              = (neighbor->face_orientation(neighbor_neighbor) ==
-                 cell->face_orientation(face_no));
-            static const unsigned int subface_translation[4]
-              = { 0, 2, 1, 3 };
             const unsigned int neighbor_child_index
               = (GeometryInfo<3>::
-                 child_cell_on_face(neighbor_neighbor,
-                                    (face_orientations_match ?
-                                     subface_no :
-                                     subface_translation[subface_no])));
+                 child_cell_on_face(RefinementCase<3>::isotropic_refinement,neighbor_neighbor,
+                                    (subface_no),
+				    neighbor->face_orientation(neighbor_neighbor)));
             const DoFHandler<3>::active_cell_iterator neighbor_child
               = neighbor->child(neighbor_child_index);
 
+					     // way b) use the convenient
+					     // function
+					     // neighbor_child_on_subface
+
+					     // make sure, that both ways yield
+					     // the same result
             Assert (neighbor_child ==
                     cell->neighbor_child_on_subface (face_no,
                                                      subface_no),

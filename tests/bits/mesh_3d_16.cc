@@ -73,7 +73,7 @@ void check (Triangulation<3> &tria)
                                        // now same for subface
                                        // integration
       for (unsigned int f=0; f<GeometryInfo<3>::faces_per_cell; ++f)
-        for (unsigned int sf=0; sf<GeometryInfo<3>::subfaces_per_face; ++sf)
+        for (unsigned int sf=0; sf<GeometryInfo<3>::max_children_per_face; ++sf)
         {
           fe_subface_values.reinit (cell, f, sf);
           for (unsigned int q=0; q<q_face.n_quadrature_points; ++q)

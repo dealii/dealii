@@ -2,7 +2,7 @@
 //    $Id$
 //    Version: $Name$ 
 //
-//    Copyright (C) 2003, 2004, 2005 by the deal.II authors
+//    Copyright (C) 2003, 2004, 2005, 2007 by the deal.II authors
 //
 //    This file is subject to QPL and may not be  distributed
 //    without copyright and license information. Please refer
@@ -36,10 +36,10 @@ void check_this (Triangulation<3> &tria)
        cell != tria.end(); ++cell)
     for (unsigned int f=0; f<GeometryInfo<3>::faces_per_cell; ++f)
       if (cell->has_children())
-        for (unsigned int c=0; c<GeometryInfo<3>::subfaces_per_face; ++c)
+        for (unsigned int c=0; c<GeometryInfo<3>::max_children_per_face; ++c)
           {
             Assert (cell->face_orientation(f) ==
-                    cell->child(GeometryInfo<3>::child_cell_on_face(f,c))
+                    cell->child(GeometryInfo<3>::child_cell_on_face(RefinementCase<3>::isotropic_refinement,f,c))
                     ->face_orientation(f),
                     ExcInternalError());
             deallog << "Cell << " << cell

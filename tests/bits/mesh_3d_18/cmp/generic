@@ -2,7 +2,7 @@
 DEAL::cell=0.3
 DEAL::cell->neighbor(3)=0.0
 DEAL::cell->face_orientation(3)=false
-DEAL::cell->neighbor_child_on_subface(3,1)=1.6
+DEAL::cell->neighbor_child_on_subface(3,1)=1.5
 DEAL::cell->neighbor_child_on_subface(3,1)->neighbor(5)=0.3
 DEAL::cell->neighbor_child_on_subface(3,1)->face_orientation(5)=true
 DEAL::cell->face(3)=4
@@ -16,10 +16,10 @@ DEAL::cell->neighbor(3)->face(2)=0
 DEAL::cell->neighbor(3)->face(3)=5
 DEAL::cell->neighbor(3)->face(4)=2
 DEAL::cell->neighbor(3)->face(5)=4
-DEAL::cell->neighbor_child_on_subface(3,1)->face(0)=31
-DEAL::cell->neighbor_child_on_subface(3,1)->face(1)=51
-DEAL::cell->neighbor_child_on_subface(3,1)->face(2)=53
-DEAL::cell->neighbor_child_on_subface(3,1)->face(3)=45
-DEAL::cell->neighbor_child_on_subface(3,1)->face(4)=58
-DEAL::cell->neighbor_child_on_subface(3,1)->face(5)=42
+DEAL::cell->neighbor_child_on_subface(3,1)->face(0)=57
+DEAL::cell->neighbor_child_on_subface(3,1)->face(1)=38
+DEAL::cell->neighbor_child_on_subface(3,1)->face(2)=27
+DEAL::cell->neighbor_child_on_subface(3,1)->face(3)=52
+DEAL::cell->neighbor_child_on_subface(3,1)->face(4)=50
+DEAL::cell->neighbor_child_on_subface(3,1)->face(5)=41
 DEAL::OK

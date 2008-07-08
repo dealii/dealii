@@ -71,7 +71,7 @@ void check_face(Quadrature<1>& q1)
     }
 
   for (unsigned int f=0;f<GeometryInfo<dim>::faces_per_cell;++f)
-    for (unsigned int s=0;s<GeometryInfo<dim>::subfaces_per_face;++s)
+    for (unsigned int s=0;s<GeometryInfo<dim>::max_children_per_face;++s)
       {
 	deallog << "Face " << f << " subface " << s
 		<< std::endl;
@@ -126,7 +126,7 @@ void check_faces (Quadrature<1>& q1)
 
 
   for (unsigned int f=0;f<GeometryInfo<dim>::faces_per_cell;++f)
-    for (unsigned int s=0;s<GeometryInfo<dim>::subfaces_per_face;++s)
+    for (unsigned int s=0;s<GeometryInfo<dim>::max_children_per_face;++s)
       {
 
 	deallog << "Face " << f << " subface " << s

@@ -13,6 +13,7 @@ nofail-dirs = base      \
               multigrid \
               bits      \
               hp        \
+              aniso     \
 	      $(shell if test "$(USE_CONTRIB_PETSC)" = yes ; then echo petsc ; fi) \
 	      $(shell if test "$(USE_CONTRIB_UMFPACK)" = yes ; then echo umfpack ; fi) \
 	      $(shell if grep -q 'define HAVE_LIBLAPACK' $D/base/include/base/config.h ;\

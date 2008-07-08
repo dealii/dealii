@@ -34,9 +34,9 @@ test(const unsigned int degree)
   
   FE_RaviartThomas<dim> fe_rt(degree);
 
-  for (unsigned int c=0; c<GeometryInfo<dim>::children_per_cell; ++c)
+  for (unsigned int c=0; c<GeometryInfo<dim>::max_children_per_cell; ++c)
     {
-      const FullMatrix<double> & m = fe_rt.get_prolongation_matrix(c);
+      const FullMatrix<double> & m = fe_rt.get_prolongation_matrix(c,RefinementCase<dim>::isotropic_refinement);
 
       for (unsigned int i=0; i<m.m(); ++i)
 	{

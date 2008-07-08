@@ -107,6 +107,53 @@ void test_with_hanging_nodes (const hp::FECollection<dim> &fe)
 }
 
 
+// like the previous function, but refine the mesh a number of times randomly
+// (a quarter of all cells is refined in each step)
+template <int dim>
+void test_with_hanging_nodes_random (const hp::FECollection<dim> &fe)
+{
+  Triangulation<dim>     triangulation;
+  GridGenerator::hyper_cube (triangulation);
+  triangulation.refine_global (1);
+
+  for (unsigned int i=0; i<7-dim; ++i)
+    {
+      for (typename Triangulation<dim>::active_cell_iterator
+	     cell = triangulation.begin_active();
+	   cell != triangulation.end();
+	   ++cell)
+	if (rand() % 4 == 0)
+	  cell->set_refine_flag ();
+      triangulation.execute_coarsening_and_refinement ();
+    }
+  
+  do_check (triangulation, fe);
+}
+
+
+
+template <int dim>
+void test_with_hanging_nodes_random_aniso (const hp::FECollection<dim> &fe)
+{
+  Triangulation<dim>     triangulation;
+  GridGenerator::hyper_cube (triangulation);
+  triangulation.refine_global (1);
+
+  for (unsigned int i=0; i<7-dim; ++i)
+    {
+      for (typename Triangulation<dim>::active_cell_iterator
+	     cell = triangulation.begin_active();
+	   cell != triangulation.end();
+	   ++cell)
+	if (rand() % 4 == 0)
+	  cell->set_refine_flag (RefinementCase<dim>(rand() % RefinementCase<dim>::isotropic_refinement + 1));
+      triangulation.execute_coarsening_and_refinement ();
+    }
+  
+  do_check (triangulation, fe);
+}
+  
+
 
 // test with a 3d grid that has cells with face_orientation==false and hanging
 // nodes. this trips up all sorts of pieces of code, for example there was a

@@ -2,7 +2,7 @@
 //    $Id$
 //    Version: $Name$ 
 //
-//    Copyright (C) 2003, 2004, 2005 by the deal.II authors
+//    Copyright (C) 2003, 2004, 2005, 2007 by the deal.II authors
 //
 //    This file is subject to QPL and may not be  distributed
 //    without copyright and license information. Please refer
@@ -44,7 +44,7 @@ void check_this (Triangulation<3> &tria)
           &&
           cell->neighbor(face_no)->has_children())
         for (unsigned int subface_no=0;
-             subface_no<GeometryInfo<3>::subfaces_per_face;
+             subface_no<GeometryInfo<3>::max_children_per_face;
              ++subface_no)
           {
                                              // get an iterator
@@ -61,7 +61,7 @@ void check_this (Triangulation<3> &tria)
               = { 0, 2, 1, 3 };
             const unsigned int neighbor_child_index
               = (GeometryInfo<3>::
-                 child_cell_on_face(neighbor_neighbor,
+                 child_cell_on_face(RefinementCase<3>::isotropic_refinement,neighbor_neighbor,
                                     (orientation_flag ?
                                      subface_no :
                                      subface_translation[subface_no])));

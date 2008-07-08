@@ -79,7 +79,7 @@ void check (const Triangulation<dim> &tria)
                                        // integration
       for (unsigned int f=0; f<GeometryInfo<dim>::faces_per_cell; ++f)
         if (cell->at_boundary(f))
-          for (unsigned int sf=0; sf<GeometryInfo<dim>::subfaces_per_face; ++sf)
+          for (unsigned int sf=0; sf<GeometryInfo<dim>::max_children_per_face; ++sf)
             {
               fe_subface_values.reinit (cell, f, sf);
               for (unsigned int q=0; q<q_face.n_quadrature_points; ++q)

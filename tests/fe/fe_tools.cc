@@ -2,7 +2,7 @@
 //    fe_tools.cc,v 1.1 2003/11/28 15:03:26 guido Exp
 //    Version: 
 //
-//    Copyright (C) 1998, 1999, 2000, 2001, 2002, 2003, 2004, 2005 by the deal.II authors
+//    Copyright (C) 1998, 1999, 2000, 2001, 2002, 2003, 2004, 2005, 2007 by the deal.II authors
 //
 //    This file is subject to QPL and may not be  distributed
 //    without copyright and license information. Please refer
@@ -56,18 +56,28 @@ template<int dim>
 void test_embedding (const FiniteElement<dim>& fe)
 {  
   const unsigned int n = fe.dofs_per_cell;
-  const unsigned int nc= GeometryInfo<dim>::children_per_cell;
+  const unsigned int nc= GeometryInfo<dim>::max_children_per_cell;
   
-  FullMatrix<double> P[nc];
-  for (unsigned int i=0;i<nc;++i)
-    P[i].reinit(n,n);
-  
+  std::vector<std::vector<FullMatrix<double> > > P;
+
+  P.resize(RefinementCase<dim>::isotropic_refinement);
+  for (unsigned int ref=RefinementCase<dim>::cut_x;
+       ref<RefinementCase<dim>::isotropic_refinement+1; ++ref)
+    for (unsigned int c=0;
+	 c<GeometryInfo<dim>::n_children(RefinementCase<dim>(ref));
+	 ++c)
+      {
+	P[ref-1].push_back(FullMatrix<double>());
+	P[ref-1][c].reinit(n,n);
+      }
+
+
   FETools::compute_embedding_matrices(fe, P);
   
   for (unsigned int i=0;i<nc;++i)
     {
       deallog << fe.get_name() << " embedding " << i << std::endl;
-      print_formatted(P[i], 3, 6);
+      print_formatted(P[RefinementCase<dim>::isotropic_refinement-1][i], 3, 6);
     }
 }
 
