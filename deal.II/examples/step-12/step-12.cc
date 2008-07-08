@@ -176,12 +176,9 @@ void Beta<dim>::value_list(const std::vector<Point<dim> > &points,
 
   for (unsigned int i=0; i<points.size(); ++i)
     {
-      const Point<dim> &p=points[i];
-      Point<dim> &beta=values[i];
-
-      beta(0) = -p(1);
-      beta(1) = p(0);
-      beta /= std::sqrt(beta.square());
+      values[i](0) = -points[i](1);
+      values[i](1) = points[i](0);
+      values[i] /= std::sqrt(values[i].square());
     }
 }
 
@@ -657,7 +654,7 @@ void DGMethod<dim>::setup_system ()
   sparsity_pattern.reinit (dof_handler.n_dofs(),
 			   dof_handler.n_dofs(),
 			   (GeometryInfo<dim>::faces_per_cell
-			    *GeometryInfo<dim>::subfaces_per_face+1)*fe.dofs_per_cell);
+			    *GeometryInfo<dim>::max_children_per_face+1)*fe.dofs_per_cell);
   
 				   // For DG discretizations we call
 				   // the function analogue to

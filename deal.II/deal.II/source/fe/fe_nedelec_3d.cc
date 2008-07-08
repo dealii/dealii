@@ -172,7 +172,7 @@ namespace FE_Nedelec_3d
 
 template <>
 const double * const 
-FE_Nedelec<3>::Matrices::embedding[][GeometryInfo<3>::children_per_cell] =
+FE_Nedelec<3>::Matrices::embedding[][GeometryInfo<3>::max_children_per_cell] =
 {
       { FE_Nedelec_3d::q1_into_q1_refined_0, FE_Nedelec_3d::q1_into_q1_refined_1,
 	FE_Nedelec_3d::q1_into_q1_refined_2, FE_Nedelec_3d::q1_into_q1_refined_3,

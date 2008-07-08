@@ -305,16 +305,18 @@ class FETools
 				    const FiniteElement<dim>& fe);
     
 				     /**
-				      * Compute the embedding matrices
-				      * from a coarse cell to
-				      * 2<sup>dim</sup> child
-				      * cells. Each column of the
-				      * resulting matrices contains
-				      * the representation of a coarse
-				      * grid basis functon by the fine
-				      * grid basis; the matrices are
-				      * split such that there is one
-				      * matrix for every child.
+				      * For all possible (isotropic
+				      * and anisotropic) refinement
+				      * cases compute the embedding
+				      * matrices from a coarse cell to
+				      * the child cells. Each column
+				      * of the resulting matrices
+				      * contains the representation of
+				      * a coarse grid basis functon by
+				      * the fine grid basis; the
+				      * matrices are split such that
+				      * there is one matrix for every
+				      * child.
 				      *
 				      * This function computes the
 				      * coarse grid function in a
@@ -328,20 +330,49 @@ class FETools
 				      * the finite element spaces are
 				      * actually nested.
 				      *
+				      * Note, that
+				      * <code>matrices[refinement_case-1][child]</code>
+				      * includes the embedding (or prolongation)
+				      * matrix of child
+				      * <code>child</code> for the
+				      * RefinementCase
+				      * <code>refinement_case</code>. Here,
+				      * we use
+				      * <code>refinement_case-1</code>
+				      * instead of
+				      * <code>refinement_case</code>
+				      * as for
+				      * RefinementCase::no_refinement(=0)
+				      * there are no prolongation
+				      * matrices available.
+				      *
+				      * Typically this function is
+				      * called by the various
+				      * implementations of
+				      * FiniteElement classes in order
+				      * to fill the respective
+				      * FiniteElement::prolongation
+				      * matrices.
+				      *
 				      * @param fe The finite element
 				      * class for which we compute the
-				      * embedding matrices.
-				      * @param matrices A pointer to
-				      * <i>GeometryInfo::children_per_cell=2<sup>dim</sup></i> FullMatrix
-				      * objects. This is the format
-				      * used in FiniteElement,
-				      * where we want to use ths
-				      * function mostly.
+				      * embedding matrices.  @param
+				      * matrices A reference to
+				      * <tt>RefinementCase<dim>::isotropic_refinement</tt>
+				      * vectors of FullMatrix
+				      * objects. Each vector
+				      * corresponds to one
+				      * RefinementCase @p
+				      * refinement_case and is of the
+				      * vector size
+				      * <tt>GeometryInfo<dim>::n_children(refinement_case)</tt>. This
+				      * is the format used in
+				      * FiniteElement, where we want
+				      * to use this function mostly.
 				      */
     template <int dim, typename number>
-    static void
-    compute_embedding_matrices(const FiniteElement<dim> &fe,
-			       FullMatrix<number> (&matrices)[GeometryInfo<dim>::children_per_cell]);
+    static void compute_embedding_matrices(const FiniteElement<dim> &fe,
+					   std::vector<std::vector<FullMatrix<number> > >& matrices);
 
 				     /**
 				      * Compute the embedding matrices
@@ -373,28 +404,61 @@ class FETools
     template<int dim, typename number>
     static void
     compute_face_embedding_matrices(const FiniteElement<dim>& fe,
-				    FullMatrix<number> (&matrices)[GeometryInfo<dim>::subfaces_per_face],
+				    FullMatrix<number> (&matrices)[GeometryInfo<dim>::max_children_per_face],
 				    const unsigned int face_coarse,
 				    const unsigned int face_fine);
 
 				     /**
-				      * Compute the
+				      * For all possible (isotropic
+				      * and anisotropic) refinement
+				      * cases compute the
 				      * <i>L<sup>2</sup></i>-projection
 				      * matrices from the children to
 				      * a coarse cell.
 				      *
-				      * @arg fe The finite element class for
-				      * which we compute the projection
-				      * matrices.  @arg matrices A pointer to
-				      * <tt>GeometryInfo::children_per_cell</tt>=2<sup>dim</sup>
-				      * FullMatrix objects. This is the format
-				      * used in FiniteElement, where we
-				      * want to use this function mostly.
+				      * Note, that
+				      * <code>matrices[refinement_case-1][child]</code>
+				      * includes the projection (or restriction)
+				      * matrix of child
+				      * <code>child</code> for the
+				      * RefinementCase
+				      * <code>refinement_case</code>. Here,
+				      * we use
+				      * <code>refinement_case-1</code>
+				      * instead of
+				      * <code>refinement_case</code>
+				      * as for
+				      * RefinementCase::no_refinement(=0)
+				      * there are no projection
+				      * matrices available.
+				      *
+				      * Typically this function is
+				      * called by the various
+				      * implementations of
+				      * FiniteElement classes in order
+				      * to fill the respective
+				      * FiniteElement::restriction
+				      * matrices.
+				      *
+				      * @arg fe The finite element
+				      * class for which we compute the
+				      * projection matrices.  @arg
+				      * matrices A reference to
+				      * <tt>RefinementCase<dim>::isotropic_refinement</tt>
+				      * vectors of FullMatrix
+				      * objects. Each vector
+				      * corresponds to one
+				      * RefinementCase @p
+				      * refinement_case and is of the
+				      * vector size
+				      * <tt>GeometryInfo<dim>::n_children(refinement_case)</tt>. This
+				      * is the format used in
+				      * FiniteElement, where we want
+				      * to use this function mostly.
 				      */
     template <int dim, typename number>
-    static void
-    compute_projection_matrices(const FiniteElement<dim> &fe,
-				FullMatrix<number> (&matrices)[GeometryInfo<dim>::children_per_cell]);
+    static void compute_projection_matrices(const FiniteElement<dim> &fe,
+					    std::vector<std::vector<FullMatrix<number> > >& matrices);
 
 //TODO:[WB] Replace this documentation by something comprehensible
     

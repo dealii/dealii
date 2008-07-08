@@ -68,11 +68,11 @@ FE_Q_Hierarchical<dim>::FE_Q_Hierarchical (const unsigned int degree)
 				   // @p{interface_constraints} matrices 
 				   // for all dimensions.
   std::vector<FullMatrix<double> >
-    dofs_cell (GeometryInfo<1>::children_per_cell,
+    dofs_cell (GeometryInfo<1>::max_children_per_cell,
 	       FullMatrix<double> (2*this->dofs_per_vertex + this->dofs_per_line,
 				   2*this->dofs_per_vertex + this->dofs_per_line));
   std::vector<FullMatrix<double> >
-    dofs_subcell (GeometryInfo<1>::children_per_cell,
+    dofs_subcell (GeometryInfo<1>::max_children_per_cell,
 		  FullMatrix<double> (2*this->dofs_per_vertex + this->dofs_per_line,
 				      2*this->dofs_per_vertex + this->dofs_per_line));
 				   // build these fields, as they are
@@ -132,7 +132,7 @@ FE_Q_Hierarchical<dim>::build_dofs_cell (std::vector<FullMatrix<double> > &dofs_
 {
   const unsigned int dofs_1d = 2*this->dofs_per_vertex + this->dofs_per_line;
 
-  for (unsigned int c=0; c<GeometryInfo<1>::children_per_cell; ++c)
+  for (unsigned int c=0; c<GeometryInfo<1>::max_children_per_cell; ++c)
     for (unsigned int j=0; j<dofs_1d; ++j)
       for (unsigned int k=0; k<dofs_1d; ++k)
 	{
@@ -210,7 +210,7 @@ initialize_constraints (const std::vector<FullMatrix<double> > &dofs_subcell)
 	for (unsigned int i=0; i<dofs_1d; ++i)
 	  this->interface_constraints(0,i) = dofs_subcell[0](1,i); 
 					 // edge nodes
-	for (unsigned int c=0; c<GeometryInfo<1>::children_per_cell; ++c)
+	for (unsigned int c=0; c<GeometryInfo<1>::max_children_per_cell; ++c)
 	  for (unsigned int i=0; i<dofs_1d; ++i)
 	    for (unsigned int j=2; j<dofs_1d; ++j)
 	      this->interface_constraints(1 + c*(degree-1) + j - 2,i) = 
@@ -329,24 +329,26 @@ FE_Q_Hierarchical<dim>::
 initialize_embedding_and_restriction (const std::vector<FullMatrix<double> > &dofs_cell,
 				      const std::vector<FullMatrix<double> > &dofs_subcell)
 {
+  unsigned int iso=RefinementCase<dim>::isotropic_refinement-1;
+
   const unsigned int dofs_1d = 2*this->dofs_per_vertex + this->dofs_per_line;
   const std::vector<unsigned int> &renumber=
     this->poly_space.get_numbering();
   
-  for (unsigned int c=0; c<GeometryInfo<dim>::children_per_cell; ++c)
+  for (unsigned int c=0; c<GeometryInfo<dim>::max_children_per_cell; ++c)
     {
-      this->prolongation[c].reinit (this->dofs_per_cell, this->dofs_per_cell);
-      this->restriction[c].reinit (this->dofs_per_cell, this->dofs_per_cell);
+      this->prolongation[iso][c].reinit (this->dofs_per_cell, this->dofs_per_cell);
+      this->restriction[iso][c].reinit (this->dofs_per_cell, this->dofs_per_cell);
     }
 
 				   // the 1d case is particularly
 				   // simple, so special case it:
   if (dim==1)
     {
-      for (unsigned int c=0; c<GeometryInfo<dim>::children_per_cell; ++c)
+      for (unsigned int c=0; c<GeometryInfo<dim>::max_children_per_cell; ++c)
 	{
-	  this->prolongation[c].fill (dofs_subcell[c]);
-	  this->restriction[c].fill (dofs_cell[c]);
+	  this->prolongation[iso][c].fill (dofs_subcell[c]);
+	  this->restriction[iso][c].fill (dofs_cell[c]);
 	}
       return;
     }
@@ -367,20 +369,20 @@ initialize_embedding_and_restriction (const std::vector<FullMatrix<double> > &do
 	{
 	  case 2:
 	  {
-	    for (unsigned int c=0; c<GeometryInfo<2>::children_per_cell; ++c)
+	    for (unsigned int c=0; c<GeometryInfo<2>::max_children_per_cell; ++c)
 	      {
 						 // left/right line: 0/1
 		const unsigned int c0 = c%2;
 						 // bottom/top line: 0/1
 		const unsigned int c1 = c/2;
 
-		this->prolongation[c](j,i) = 
+		this->prolongation[iso][c](j,i) = 
 		  dofs_subcell[c0](renumber[j] % dofs_1d,
 				   renumber[i] % dofs_1d) *
 		  dofs_subcell[c1]((renumber[j] - (renumber[j] % dofs_1d)) / dofs_1d,
 				   (renumber[i] - (renumber[i] % dofs_1d)) / dofs_1d);
 
-		this->restriction[c](j,i) = 
+		this->restriction[iso][c](j,i) = 
 		  dofs_cell[c0](renumber[j] % dofs_1d,
 				renumber[i] % dofs_1d) *
 		  dofs_cell[c1]((renumber[j] - (renumber[j] % dofs_1d)) / dofs_1d,
@@ -391,7 +393,7 @@ initialize_embedding_and_restriction (const std::vector<FullMatrix<double> > &do
 	     
 	  case 3:
 	  {
-	    for (unsigned int c=0; c<GeometryInfo<3>::children_per_cell; ++c)
+	    for (unsigned int c=0; c<GeometryInfo<3>::max_children_per_cell; ++c)
 	      {
 						 // left/right face: 0/1
 		const unsigned int c0 = c%2;
@@ -400,7 +402,7 @@ initialize_embedding_and_restriction (const std::vector<FullMatrix<double> > &do
 						 // bottom/top face: 0/1
 		const unsigned int c2 = c/4;
 
-		this->prolongation[c](j,i) = 
+		this->prolongation[iso][c](j,i) = 
 		  dofs_subcell[c0](renumber[j] % dofs_1d,
 				   renumber[i] % dofs_1d) *
 		  dofs_subcell[c1](((renumber[j] - (renumber[j] % dofs_1d)) / dofs_1d) % dofs_1d,
@@ -408,7 +410,7 @@ initialize_embedding_and_restriction (const std::vector<FullMatrix<double> > &do
 		  dofs_subcell[c2](((renumber[j] - (renumber[j] % dofs_1d)) / dofs_1d - (((renumber[j] - (renumber[j] % dofs_1d)) / dofs_1d ) % dofs_1d)) / dofs_1d,
 				   ((renumber[i] - (renumber[i] % dofs_1d)) / dofs_1d - (((renumber[i] - (renumber[i] % dofs_1d)) / dofs_1d ) % dofs_1d)) / dofs_1d);
 
-		this->restriction[c](j,i) = 
+		this->restriction[iso][c](j,i) = 
 		  dofs_cell[c0](renumber[j] % dofs_1d,
 				renumber[i] % dofs_1d) *
 		  dofs_cell[c1](((renumber[j] - (renumber[j] % dofs_1d)) / dofs_1d) % dofs_1d,

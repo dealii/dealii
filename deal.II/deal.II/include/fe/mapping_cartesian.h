@@ -59,7 +59,9 @@ class MappingCartesian : public Mapping<dim>
 		    const Quadrature<dim>& quadrature,
 		    typename Mapping<dim>::InternalDataBase &mapping_data,
 		    std::vector<Point<dim> >        &quadrature_points,
-		    std::vector<double>             &JxW_values) const ;
+		    std::vector<double>             &JxW_values,
+		    std::vector<Tensor<2,dim> >     &jacobians,
+		    std::vector<Tensor<3,dim> >     &jacobian_grads) const ;
 
     virtual void
     fill_fe_face_values (const typename Triangulation<dim>::cell_iterator &cell,

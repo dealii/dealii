@@ -2,7 +2,7 @@
 //    $Id$
 //    Version: $Name$
 //
-//    Copyright (C) 2001, 2002, 2003, 2004, 2005, 2006, 2007 by the deal.II authors
+//    Copyright (C) 2001, 2002, 2003, 2004, 2005, 2006, 2007, 2008 by the deal.II authors
 //
 //    This file is subject to QPL and may not be  distributed
 //    without copyright and license information. Please refer
@@ -148,11 +148,25 @@ MappingCartesian<dim>::compute_fill (const typename Triangulation<dim>::cell_ite
       Assert (face_no+1 < GeometryInfo<dim>::faces_per_cell+1,
 	      ExcIndexRange (face_no, 0, GeometryInfo<dim>::faces_per_cell));
 
-      Assert ((sub_no == invalid_face_number)
-              ||
-              (sub_no+1 < GeometryInfo<dim>::subfaces_per_face+1),
+      				   // We would like to check for
+				   // sub_no < cell->face(face_no)->n_children(),
+				   // but unfortunately the current
+				   // function is also called for
+				   // faces without children (see
+				   // tests/fe/mapping.cc). Therefore,
+				   // we must use following workaround
+				   // of two separate assertions
+#if deal_II_dimension != 1
+      Assert ((sub_no == invalid_face_number) ||
+              cell->face(face_no)->has_children() ||
+              (sub_no+1 < GeometryInfo<dim>::max_children_per_face+1),
               ExcIndexRange (sub_no, 0,
-                             GeometryInfo<dim>::subfaces_per_face));
+                             GeometryInfo<dim>::max_children_per_face));
+      Assert ((sub_no == invalid_face_number) ||
+              !cell->face(face_no)->has_children() ||
+              (sub_no < cell->face(face_no)->n_children()),
+              ExcIndexRange (sub_no, 0, cell->face(face_no)->n_children()));
+#endif
     }
   else
 				     // invalid face number, so
@@ -211,10 +225,11 @@ MappingCartesian<dim>::compute_fill (const typename Triangulation<dim>::cell_ite
 	    :
 					     // called from FESubfaceValues
 	    QProjector<dim>::DataSetDescriptor::subface (face_no, sub_no,
-							  cell->face_orientation(face_no),
-							  cell->face_flip(face_no),
-							  cell->face_rotation(face_no),
-							  quadrature_points.size())
+							 cell->face_orientation(face_no),
+							 cell->face_flip(face_no),
+							 cell->face_rotation(face_no),
+							 quadrature_points.size(),
+							 cell->subface_case(face_no))
 	   ));
 
       for (unsigned int i=0; i<quadrature_points.size(); ++i)
@@ -286,7 +301,9 @@ fill_fe_values (const typename Triangulation<dim>::cell_iterator& cell,
                 const Quadrature<dim>& q, 
                 typename Mapping<dim>::InternalDataBase& mapping_data,
                 std::vector<Point<dim> >& quadrature_points,
-                std::vector<double>& JxW_values) const
+                std::vector<double>& JxW_values,
+		std::vector<Tensor<2,dim> >& jacobians,
+		std::vector<Tensor<3,dim> >& jacobian_grads) const
 {
 				   // convert data object to internal
 				   // data for this class. fails with
@@ -314,6 +331,21 @@ fill_fe_values (const typename Triangulation<dim>::cell_iterator& cell,
       for (unsigned int i=0; i<JxW_values.size();++i)
 	JxW_values[i] = J * q.weight(i);
     }
+				   // "compute" Jacobian at the quadrature
+				   // points, which are all the same
+  if (data.current_update_flags() & update_jacobians)
+    for (unsigned int i=0; i<jacobians.size();++i)
+      {
+	jacobians[i]=Tensor<2,dim>();
+	for (unsigned int j=0; j<dim; ++j)
+	  jacobians[j][j]=data.length[j];
+      }
+				   // "compute" the derivative of the Jacobian
+				   // at the quadrature points, which are all
+				   // zero of course
+  if (data.current_update_flags() & update_jacobian_grads)
+    for (unsigned int i=0; i<jacobian_grads.size();++i)
+      jacobian_grads[i]=Tensor<3,dim>();
 }
 
 
@@ -397,8 +429,24 @@ MappingCartesian<dim>::fill_fe_subface_values (const typename Triangulation<dim>
       J *= data.length[d];
   
   if (data.current_update_flags() & update_JxW_values)
-    for (unsigned int i=0; i<JxW_values.size();++i)
-      JxW_values[i] = J * q.weight(i) / GeometryInfo<dim>::subfaces_per_face;
+    {
+				       // Here,
+				       // cell->face(face_no)->n_children()
+				       // would be the right choice,
+				       // but unfortunately the
+				       // current function is also
+				       // called for faces without
+				       // children (see
+				       // tests/fe/mapping.cc). Add
+				       // following switch to avoid
+				       // diffs in tests/fe/mapping.OK
+      const unsigned int n_subfaces=
+	cell->face(face_no)->has_children() ?
+	cell->face(face_no)->n_children() :
+	GeometryInfo<dim>::max_children_per_face;
+      for (unsigned int i=0; i<JxW_values.size();++i)
+	JxW_values[i] = J * q.weight(i) / n_subfaces;
+    }
 
   if (data.current_update_flags() & update_boundary_forms)
     for (unsigned int i=0; i<boundary_forms.size();++i)

@@ -451,8 +451,7 @@ get_interpolated_dof_values (const InputVector &values,
       for (unsigned int i=0; i<dofs_per_cell; ++i)
         restriction_is_additive[i] = fe.restriction_is_additive(i);
       
-      for (unsigned int child=0; child<GeometryInfo<dim>::children_per_cell;
-	   ++child)
+      for (unsigned int child=0; child<this->n_children(); ++child)
 	{
 					   // get the values from the present
 					   // child, if necessary by
@@ -461,7 +460,7 @@ get_interpolated_dof_values (const InputVector &values,
 							   tmp1);
 					   // interpolate these to the mother
 					   // cell
-	  fe.get_restriction_matrix(child).vmult (tmp2, tmp1);
+	  fe.get_restriction_matrix(child, this->refinement_case()).vmult (tmp2, tmp1);
 
                                            // and add up or set them
                                            // in the output vector
@@ -504,13 +503,13 @@ set_dof_values_by_interpolation (const Vector<number> &local_values,
     {
       Vector<number> tmp(dofs_per_cell);
       
-      for (unsigned int child=0; child<GeometryInfo<dim>::children_per_cell;
-	   ++child)
+      for (unsigned int child=0; child<this->n_children(); ++child)
 	{
 					   // prolong the given data
 					   // to the present cell
-	  this->get_fe().get_prolongation_matrix(child)
+	  this->get_fe().get_prolongation_matrix(child, this->refinement_case())
             .vmult (tmp, local_values);
+	    
 	  this->child(child)->set_dof_values_by_interpolation (tmp, values);
 	}
     }

@@ -518,19 +518,14 @@ DoFTools::make_flux_sparsity_pattern (
 	  if (! cell_face->at_boundary() )
 	    {
 	      typename DH::cell_iterator neighbor = cell->neighbor(face);
-					       // Refinement edges are
-					       // taken care of by
-					       // coarser cells
-	      if (neighbor->level() < cell->level())
-		continue;
 
 	      const unsigned int neighbor_face
-                = cell->neighbor_of_neighbor(face);
+                = cell->neighbor_face_no(face);
 
 	      if (cell_face->has_children())
 		{
 		  for (unsigned int sub_nr = 0;
-		       sub_nr != cell_face->n_children();
+		       sub_nr != cell_face->number_of_children();
 		       ++sub_nr)
 		    {
 		      const typename DH::cell_iterator
@@ -555,7 +550,13 @@ DoFTools::make_flux_sparsity_pattern (
 		}
               else
                 {
-                  const unsigned int n_dofs_on_neighbor
+						   // Refinement edges are
+						   // taken care of by
+						   // coarser cells
+		  if (cell->neighbor_is_coarser(face))
+		    continue;
+		  
+		  const unsigned int n_dofs_on_neighbor
                     = neighbor->get_fe().dofs_per_cell;
                   dofs_on_other_cell.resize (n_dofs_on_neighbor);
 
@@ -736,7 +737,7 @@ DoFTools::make_flux_sparsity_pattern (
 		neighbor = cell->neighbor(face);
 					       // Refinement edges are taken care of
 					       // by coarser cells
-	      if (neighbor->level() < cell->level())
+	      if (cell->neighbor_is_coarser(face))
 		continue;
 	      
 	      typename DH::face_iterator cell_face = cell->face(face);
@@ -1426,7 +1427,7 @@ namespace internal
       get_most_dominating_subface_fe_index (const face_iterator &face)
       {
         unsigned int dominating_subface_no = 0;
-        for (; dominating_subface_no<GeometryInfo<dim>::subfaces_per_face;
+        for (; dominating_subface_no<face->n_children();
              ++dominating_subface_no)
           {
                                              // each of the subfaces
@@ -1447,7 +1448,7 @@ namespace internal
 			
             FiniteElementDomination::Domination
               domination = FiniteElementDomination::either_element_can_dominate;
-            for (unsigned int sf=0; sf<GeometryInfo<dim>::subfaces_per_face; ++sf)
+            for (unsigned int sf=0; sf<face->n_children(); ++sf)
               if (sf != dominating_subface_no)
                 {
                   const FiniteElement<dim> &
@@ -1473,7 +1474,7 @@ namespace internal
 
                                          // check that we have
                                          // found one such subface
-        Assert (dominating_subface_no != GeometryInfo<dim>::subfaces_per_face,
+        Assert (dominating_subface_no < face->n_children(),
                 ExcNotImplemented());
 
                                          // return the finite element
@@ -1721,7 +1722,7 @@ namespace internal
 	      Assert (cell->face(face)->fe_index_is_active(cell->active_fe_index())
 		      == true,
 		      ExcInternalError());
-	      for (unsigned int c=0; c<GeometryInfo<dim>::subfaces_per_face; ++c)
+	      for (unsigned int c=0; c<cell->face(face)->n_children(); ++c)
 		Assert (cell->face(face)->child(c)->n_active_fe_indices() == 1,
 			ExcInternalError());
 
@@ -1730,7 +1731,7 @@ namespace internal
 					       // the case that both
 					       // sides use the same
 					       // fe
-	      for (unsigned int c=0; c<GeometryInfo<dim>::subfaces_per_face; ++c)
+	      for (unsigned int c=0; c<cell->face(face)->n_children(); ++c)
 		Assert (cell->face(face)->child(c)
 			->fe_index_is_active(cell->active_fe_index()) == true,
 			ExcNotImplemented());
@@ -1843,6 +1844,17 @@ namespace internal
 	for (unsigned int face=0; face<GeometryInfo<dim>::faces_per_cell; ++face)
 	  if (cell->face(face)->has_children()) 
 	    {
+					       // first of all, make sure that
+					       // we treat a case which is
+					       // possible, i.e. either no dofs
+					       // on the face at all or no
+					       // anisotropic refinement
+	      if (cell->get_fe().dofs_per_face == 0)
+		continue;
+	      
+	      Assert(cell->face(face)->refinement_case()==RefinementCase<dim-1>::isotropic_refinement,
+		     ExcNotImplemented());
+
 					       // so now we've found a
 					       // face of an active
 					       // cell that has
@@ -1867,7 +1879,7 @@ namespace internal
 	      Assert (cell->face(face)->fe_index_is_active(cell->active_fe_index())
 		      == true,
 		      ExcInternalError());
-	      for (unsigned int c=0; c<GeometryInfo<dim>::subfaces_per_face; ++c)
+	      for (unsigned int c=0; c<cell->face(face)->n_children(); ++c)
 		Assert (cell->face(face)->child(c)->n_active_fe_indices() == 1,
 			ExcInternalError());
 
@@ -1881,7 +1893,7 @@ namespace internal
 					       // this face and the
 					       // children have the
 					       // same fe
-	      for (unsigned int c=0; c<GeometryInfo<dim>::subfaces_per_face; ++c)
+	      for (unsigned int c=0; c<cell->face(face)->n_children(); ++c)
 		{
 		  Assert (cell->face(face)->child(c)
 			  ->fe_index_is_active(cell->active_fe_index()) == true,
@@ -1916,7 +1928,8 @@ namespace internal
 				      fe.dofs_per_quad),
 		n_dofs_on_children = (5*fe.dofs_per_vertex+
 				      12*fe.dofs_per_line+
-				      4*fe.dofs_per_quad);	      
+				      4*fe.dofs_per_quad);
+					       //TODO[TL]: think about this and the following in case of anisotropic refinement
 	      
 	      dofs_on_mother.resize (n_dofs_on_mother);
 	      dofs_on_children.resize (n_dofs_on_children);
@@ -1951,7 +1964,9 @@ namespace internal
 
 					       // assert some consistency
 					       // assumptions
-	      Assert ((this_face->child(0)->vertex_index(3) ==
+					       //TODO[TL]: think about this in case of anisotropic refinement
+	      Assert (dof_handler.get_tria().get_anisotropic_refinement_flag() ||
+		      (this_face->child(0)->vertex_index(3) ==
 		       this_face->child(1)->vertex_index(2)) &&
 		      (this_face->child(0)->vertex_index(3) ==
 		       this_face->child(2)->vertex_index(1)) &&
@@ -2078,7 +2093,7 @@ namespace internal
       Table<3,boost::shared_ptr<FullMatrix<double> > >
         subface_interpolation_matrices (n_finite_elements (dof_handler),
                                         n_finite_elements (dof_handler),
-                                        GeometryInfo<dim>::subfaces_per_face);
+                                        GeometryInfo<dim>::max_children_per_face);
 
 				       // similarly have a cache for
 				       // the matrices that are split
@@ -2115,6 +2130,17 @@ namespace internal
 	for (unsigned int face=0; face<GeometryInfo<dim>::faces_per_cell; ++face)
 	  if (cell->face(face)->has_children()) 
 	    {
+					       // first of all, make sure that
+					       // we treat a case which is
+					       // possible, i.e. either no dofs
+					       // on the face at all or no
+					       // anisotropic refinement
+	      if (cell->get_fe().dofs_per_face == 0)
+		continue;
+	      
+	      Assert(cell->face(face)->refinement_case()==RefinementCase<dim-1>::isotropic_refinement,
+		     ExcNotImplemented());
+	      
 					       // so now we've found a
 					       // face of an active
 					       // cell that has
@@ -2139,7 +2165,7 @@ namespace internal
 	      Assert (cell->face(face)->fe_index_is_active(cell->active_fe_index())
 		      == true,
 		      ExcInternalError());
-	      for (unsigned int c=0; c<GeometryInfo<dim>::subfaces_per_face; ++c)
+	      for (unsigned int c=0; c<cell->face(face)->n_children(); ++c)
 		Assert (cell->face(face)->child(c)->n_active_fe_indices() == 1,
 			ExcInternalError());
 
@@ -2160,7 +2186,7 @@ namespace internal
 		mother_face_dominates = FiniteElementDomination::either_element_can_dominate;
 
               if (DoFHandlerSupportsDifferentP<DH>::value == true)
-                for (unsigned int c=0; c<GeometryInfo<dim>::subfaces_per_face; ++c)
+                for (unsigned int c=0; c<cell->face(face)->number_of_children(); ++c)
                   mother_face_dominates = mother_face_dominates &
                                           (cell->get_fe().compare_for_face_domination
                                            (cell->neighbor_child_on_subface (face, c)->get_fe()));
@@ -2191,7 +2217,7 @@ namespace internal
 		  
 						     // Now create constraint matrix for
 						     // the subfaces and assemble it.
-		    for (unsigned int c=0; c<GeometryInfo<dim>::subfaces_per_face; ++c)
+		    for (unsigned int c=0; c<cell->face(face)->n_children(); ++c)
 		      {
 			const typename DH::active_face_iterator
 			  subface = cell->face(face)->child(c);
@@ -2456,7 +2482,7 @@ namespace internal
 						     // discussed in the
 						     // paper
 		    for (unsigned int sf=0;
-			 sf<GeometryInfo<dim>::subfaces_per_face; ++sf)
+			 sf<cell->face(face)->n_children(); ++sf)
 		      {
 			Assert (cell->face(face)->child(sf)
 				->n_active_fe_indices() == 1,
@@ -2544,8 +2570,8 @@ namespace internal
                   (cell->neighbor(face)->active_fe_index () !=
                    cell->active_fe_index ())
 		  &&
-		  (cell->neighbor(face)->level () ==
-		   cell->level ()))
+		  (!cell->face(face)->has_children() &&
+		   !cell->neighbor_is_coarser(face) ))
 		{		  
 		  const typename DH::cell_iterator neighbor = cell->neighbor (face);
 

@@ -566,14 +566,15 @@ template <int dim>
 void
 FE_Nedelec<dim>::initialize_embedding ()
 {
+  unsigned int iso=RefinementCase<dim>::isotropic_refinement-1;
   if ((degree < Matrices::n_embedding_matrices+1) &&
       (Matrices::embedding[degree-1][0] != 0))
-    for (unsigned int c=0; c<GeometryInfo<dim>::children_per_cell; ++c)
+    for (unsigned int c=0; c<GeometryInfo<dim>::max_children_per_cell; ++c)
       {
                                          // copy
-        this->prolongation[c].reinit (this->dofs_per_cell,
+        this->prolongation[iso][c].reinit (this->dofs_per_cell,
                                       this->dofs_per_cell);
-        this->prolongation[c].fill (Matrices::embedding[degree-1][c]);
+        this->prolongation[iso][c].fill (Matrices::embedding[degree-1][c]);
                                          // and make sure that the row
                                          // sum is 0.5 (for usual
                                          // elements, the row sum must
@@ -587,7 +588,7 @@ FE_Nedelec<dim>::initialize_embedding ()
           {
             double sum = 0;
             for (unsigned int col=0; col<this->dofs_per_cell; ++col)
-              sum += this->prolongation[c](row,col);
+              sum += this->prolongation[iso][c](row,col);
             Assert (std::fabs(sum-.5) < 1e-14,
                     ExcInternalError());
           };
@@ -600,6 +601,7 @@ template <int dim>
 void
 FE_Nedelec<dim>::initialize_restriction ()
 {
+  unsigned int iso=RefinementCase<dim>::isotropic_refinement-1;
   switch (dim)
     {
       case 2:   // 2d
@@ -689,14 +691,14 @@ FE_Nedelec<dim>::initialize_restriction ()
                                                // always, in the
                                                // canonical direction
                                                // of lines
-              for (unsigned int c=0; c<GeometryInfo<dim>::children_per_cell; ++c)
-                this->restriction[c].reinit (this->dofs_per_cell,
-                                             this->dofs_per_cell);
+              for (unsigned int c=0; c<GeometryInfo<dim>::max_children_per_cell; ++c)
+                this->restriction[iso][c].reinit (this->dofs_per_cell,
+						  this->dofs_per_cell);
 	      
-	      this->restriction[0](0,0) = 2.;
-	      this->restriction[1](1,1) = 2.;
-	      this->restriction[0](2,2) = 2.;
-	      this->restriction[2](3,3) = 2.;
+	      this->restriction[iso][0](0,0) = 2.;
+	      this->restriction[iso][1](1,1) = 2.;
+	      this->restriction[iso][0](2,2) = 2.;
+	      this->restriction[iso][2](3,3) = 2.;
 
 	      break;
 	    };
@@ -730,23 +732,23 @@ FE_Nedelec<dim>::initialize_restriction ()
 					       // cell to get at the
 					       // values of each of
 					       // the 12 lines
-              for (unsigned int c=0; c<GeometryInfo<dim>::children_per_cell; ++c)
-                this->restriction[c].reinit (this->dofs_per_cell,
-                                             this->dofs_per_cell);
-	      this->restriction[0](0,0) = 2.;
-	      this->restriction[1](1,1) = 2.;
-	      this->restriction[0](2,2) = 2.;
-	      this->restriction[2](3,3) = 2.;
+              for (unsigned int c=0; c<GeometryInfo<dim>::max_children_per_cell; ++c)
+                this->restriction[iso][c].reinit (this->dofs_per_cell,
+						  this->dofs_per_cell);
+	      this->restriction[iso][0](0,0) = 2.;
+	      this->restriction[iso][1](1,1) = 2.;
+	      this->restriction[iso][0](2,2) = 2.;
+	      this->restriction[iso][2](3,3) = 2.;
               
-	      this->restriction[4](4,4) = 2.;
-	      this->restriction[5](5,5) = 2.;
-	      this->restriction[4](6,6) = 2.;
-	      this->restriction[6](7,7) = 2.;
+	      this->restriction[iso][4](4,4) = 2.;
+	      this->restriction[iso][5](5,5) = 2.;
+	      this->restriction[iso][4](6,6) = 2.;
+	      this->restriction[iso][6](7,7) = 2.;
               
-	      this->restriction[0](8,8) = 2.;
-	      this->restriction[1](9,9) = 2.;
-	      this->restriction[2](10,10) = 2.;
-	      this->restriction[3](11,11) = 2.;
+	      this->restriction[iso][0](8,8) = 2.;
+	      this->restriction[iso][1](9,9) = 2.;
+	      this->restriction[iso][2](10,10) = 2.;
+	      this->restriction[iso][3](11,11) = 2.;
               
 	      break;
 	    };
@@ -1285,7 +1287,8 @@ FE_Nedelec<dim>::fill_fe_subface_values (const Mapping<dim>                   &m
 		cell->face_orientation(face),
 		cell->face_flip(face),
 		cell->face_rotation(face),
-		quadrature.size()));
+		quadrature.size(),
+		cell->subface_case(face)));
 
   				   // get the flags indicating the
 				   // fields that have to be filled
@@ -1307,7 +1310,7 @@ FE_Nedelec<dim>::fill_fe_subface_values (const Mapping<dim>                   &m
   if (flags & update_values)
     {
       Assert (fe_data.shape_values[0].size() ==
- 	      GeometryInfo<dim>::subfaces_per_face *
+ 	      GeometryInfo<dim>::max_children_per_face *
               GeometryInfo<dim>::faces_per_cell *
 	      n_q_points,
              ExcInternalError());
@@ -1339,7 +1342,7 @@ FE_Nedelec<dim>::fill_fe_subface_values (const Mapping<dim>                   &m
     {
       Assert (fe_data.shape_gradients.size() ==
               GeometryInfo<dim>::faces_per_cell *
-	      GeometryInfo<dim>::subfaces_per_face *
+	      GeometryInfo<dim>::max_children_per_face *
 	      n_q_points,
               ExcInternalError());
 

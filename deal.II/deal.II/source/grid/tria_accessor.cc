@@ -31,6 +31,97 @@ template <int structdim,int dim>
 const unsigned int TriaAccessor<structdim,dim>::objectdim;
 
 
+// anonymous namespace with two little helper functions
+namespace{
+				   // given the number of face's child
+				   // (subface_no), return the number of the
+				   // subface concerning the FaceRefineCase of
+				   // the face
+  inline
+  unsigned int translate_subface_no(const TriaIterator<3,TriaObjectAccessor<2, 3> > &face,
+				    const unsigned int                               subface_no)
+  {
+    Assert(face->has_children(), ExcInternalError());
+    Assert(subface_no<face->n_children(), ExcInternalError());
+
+    if(face->child(subface_no)->has_children())
+				       // although the subface is refine, it
+				       // still matches the face of the cell
+				       // invoking the
+				       // neighbor_of_coarser_neighbor
+				       // function. this means that we are
+				       // looking from one cell (anisotropic
+				       // child) to a coarser neighbor which is
+				       // refined stronger than we are
+				       // (isotropically). So we won't be able
+				       // to use the neighbor_child_on_subface
+				       // function anyway, as the neighbor is
+				       // not active. In this case, simply
+				       // return the subface_no.
+      return subface_no;
+    
+    const bool first_child_has_children=face->child(0)->has_children();
+				     // if the first child has children
+				     // (FaceRefineCase case_x1y or case_y1x),
+				     // then the current subface_no needs to be
+				     // 1 and the result of this function is 2,
+				     // else simply return the given number,
+				     // which is 0 or 1 in an anisotropic case
+				     // (case_x, case_y, casex2y or casey2x) or
+				     // 0...3 in an isotropic case (case_xy)
+    return subface_no + first_child_has_children;
+  }
+
+
+  
+				   // given the number of face's child
+				   // (subface_no) and grandchild
+				   // (subsubface_no), return the number of the
+				   // subface concerning the FaceRefineCase of
+				   // the face
+  inline
+  unsigned int translate_subface_no(const TriaIterator<3,TriaObjectAccessor<2, 3> > &face,
+				    const unsigned int                               subface_no,
+				    const unsigned int                               subsubface_no)
+  {
+    Assert(face->has_children(), ExcInternalError());
+				     // the subface must be refined, otherwise
+				     // we would have ended up in the second
+				     // function of this name...
+    Assert(face->child(subface_no)->has_children(), ExcInternalError());
+    Assert(subsubface_no<face->child(subface_no)->n_children(), ExcInternalError());
+				     // This can only be an anisotropic refinement case
+    Assert(face->refinement_case() < RefinementCase<2>::isotropic_refinement,
+	   ExcInternalError());
+    
+    const bool first_child_has_children=face->child(0)->has_children();
+
+    const unsigned int e = deal_II_numbers::invalid_unsigned_int;
+    
+				     // array containing the translation of the
+				     // numbers,
+				     //
+				     // first index: subface_no
+				     // second index: subsubface_no
+				     // third index: does the first subface have children? -> no and yes
+    unsigned int translated_subface_no[2][2][2]
+      =
+      {{{e,0},       // first  subface, first  subsubface, first_child_has_children==no and yes
+	{e,1}},      // first  subface, second subsubface, first_child_has_children==no and yes
+       {{1,2},       // second subface, first  subsubface, first_child_has_children==no and yes
+	{2,3}}};     // second subface, second subsubface, first_child_has_children==no and yes
+    
+    Assert(translated_subface_no[subface_no][subsubface_no][first_child_has_children]!=e,
+	   ExcInternalError());
+
+    return translated_subface_no[subface_no][subsubface_no][first_child_has_children];
+  }
+}
+
+
+
+
+
 /*------------------------ Functions: LineAccessor ---------------------------*/
 
 template <int dim>
@@ -224,9 +315,10 @@ TriaObjectAccessor<1, dim>::recursively_clear_user_index () const
 
 
 template <int dim>
-void TriaObjectAccessor<1, dim>::set_children (const int index) const
+void TriaObjectAccessor<1, dim>::set_children (const unsigned int i, const int index) const
 {
   Assert (used(), TriaAccessorExceptions::ExcCellNotUsed());
+  Assert (i%2==0, TriaAccessorExceptions::ExcSetOnlyEvenChildren(i));
   Assert ((index==-1) ||
 	  (!has_children() && (index>=0)),
 	  TriaAccessorExceptions::ExcCantSetChildren(index));
@@ -239,7 +331,7 @@ void TriaObjectAccessor<1, dim>::set_children (const int index) const
 template <int dim>
 void TriaObjectAccessor<1, dim>::clear_children () const
 {
-  set_children (-1);
+  set_children (0,-1);
 }
 
 
@@ -538,15 +630,18 @@ TriaObjectAccessor<2, dim>::recursively_clear_user_index () const
 
 
 template <int dim>
-void TriaObjectAccessor<2, dim>::set_children (const int index) const
+void TriaObjectAccessor<2, dim>::set_children (const unsigned int i, const int index) const
 {
   Assert (used(),
 	  TriaAccessorExceptions::ExcCellNotUsed());
+  Assert (i%2==0, TriaAccessorExceptions::ExcSetOnlyEvenChildren(i));
   Assert ((index==-1) ||
-	  (!has_children() && (index>=0)),
+	  (i==0 && !has_children() && (index>=0)) ||
+	  (i>0  &&  has_children() && (index>=0) &&
+	   objects().children[2*this->present_index+i/2] == -1),
 	  TriaAccessorExceptions::ExcCantSetChildren(index));
 
-  objects().children[this->present_index] = index;
+  objects().children[2*this->present_index+i/2] = index;
 }
 
 
@@ -554,7 +649,8 @@ void TriaObjectAccessor<2, dim>::set_children (const int index) const
 template <int dim>
 void TriaObjectAccessor<2, dim>::clear_children () const
 {
-  set_children (-1);
+  set_children (0, -1);
+  set_children (2, -1);
 }
 
 
@@ -1079,14 +1175,18 @@ TriaObjectAccessor<3, dim>::recursively_clear_user_index () const
 #if deal_II_dimension == 3
 
 template <>
-void TriaObjectAccessor<3, 3>::set_children (const int index) const
+void TriaObjectAccessor<3,3>::set_children (const unsigned int i, const int index) const
 {
   Assert (used(), TriaAccessorExceptions::ExcCellNotUsed());
+  Assert (i%2==0, TriaAccessorExceptions::ExcSetOnlyEvenChildren(i));
   Assert ((index==-1) ||
-	  (!has_children() && (index>=0)),
+	  (i==0 && !has_children() && (index>=0)) ||
+	  (i>0  &&  has_children() && (index>=0) &&
+	   this->tria->levels[this->present_level]->
+	   cells.children[4*this->present_index+i/2] == -1),
 	  TriaAccessorExceptions::ExcCantSetChildren(index));
 
-  this->tria->levels[this->present_level]->cells.children[this->present_index] = index;
+  this->tria->levels[this->present_level]->cells.children[4*this->present_index+i/2] = index;
 }
 
 #endif
@@ -1095,7 +1195,10 @@ void TriaObjectAccessor<3, 3>::set_children (const int index) const
 template <int dim>
 void TriaObjectAccessor<3, dim>::clear_children () const
 {
-  set_children (-1);
+  set_children (0,-1);
+  set_children (2,-1);
+  set_children (4,-1);
+  set_children (6,-1);
 }
 
 
@@ -2201,12 +2304,8 @@ void CellAccessor<dim>::set_neighbor (const unsigned int i,
 
 
 template <int dim>
-unsigned int CellAccessor<dim>::neighbor_of_neighbor (const unsigned int neighbor) const
+unsigned int CellAccessor<dim>::neighbor_of_neighbor_internal (const unsigned int neighbor) const
 {
-				   // make sure that the neighbor is
-				   // not on a coarser level
-  Assert (neighbor_level(neighbor) == this->present_level,
-	  TriaAccessorExceptions::ExcNeighborIsCoarser());
   Assert (neighbor < GeometryInfo<dim>::faces_per_cell,
 	  TriaAccessorExceptions::ExcInvalidNeighbor(neighbor));
 
@@ -2235,21 +2334,24 @@ unsigned int CellAccessor<dim>::neighbor_of_neighbor (const unsigned int neighbo
     = GeometryInfo<dim>::opposite_face[neighbor];
   
   if (neighbor_cell->face_index (neighbor_guess) == this_face_index)
-      return neighbor_guess;
+    return neighbor_guess;
   else
 				     // if the guess was false, then
 				     // we need to loop over all
 				     // neighbors and find the number
 				     // the hard way
     {
-      for (unsigned int face=0; face<GeometryInfo<dim>::faces_per_cell; ++face)
-	if (neighbor_cell->face_index (face) == this_face_index)
-	  return face;
+      for (unsigned int face_no=0; face_no<GeometryInfo<dim>::faces_per_cell; ++face_no)
+	if (neighbor_cell->face_index (face_no) == this_face_index)
+	  return face_no;
 
-				       // we should never get here,
-				       // since then we did not find
-				       // our way back...
-      Assert (false, ExcInternalError());
+				       // running over all neighbors
+				       // faces we did not find the
+				       // present face. Thereby the
+				       // neighbor must be coarser
+				       // than the present
+				       // cell. Return an invalid
+				       // unsigned int in this case.
       return numbers::invalid_unsigned_int;
     }
 }
@@ -2257,16 +2359,36 @@ unsigned int CellAccessor<dim>::neighbor_of_neighbor (const unsigned int neighbo
 
 
 template <int dim>
+unsigned int CellAccessor<dim>::neighbor_of_neighbor (const unsigned int neighbor) const
+{
+  const unsigned int n2=neighbor_of_neighbor_internal(neighbor);
+  Assert (n2!=numbers::invalid_unsigned_int, TriaAccessorExceptions::ExcNeighborIsCoarser());
+
+  return n2;
+}
+
+
+
+template <int dim>
+bool
+CellAccessor<dim>::neighbor_is_coarser (const unsigned int neighbor) const
+{
+  return neighbor_of_neighbor_internal(neighbor)==numbers::invalid_unsigned_int;
+}
+
+
+# if deal_II_dimension == 2
+
+template <int dim>
 std::pair<unsigned int, unsigned int>
 CellAccessor<dim>::neighbor_of_coarser_neighbor (const unsigned int neighbor) const
 {
-				   // make sure that the neighbor is
-				   // on a coarser level
-  Assert (neighbor_level(neighbor) < this->present_level,
-	  TriaAccessorExceptions::ExcNeighborIsNotCoarser());
   Assert (neighbor < GeometryInfo<dim>::faces_per_cell,
 	  TriaAccessorExceptions::ExcInvalidNeighbor(neighbor));
-  Assert (dim>1, ExcImpossibleInDim(dim));
+				   // make sure that the neighbor is
+				   // on a coarser level
+  Assert (neighbor_is_coarser(neighbor),
+	  TriaAccessorExceptions::ExcNeighborIsNotCoarser());
   
   const int this_face_index=face_index(neighbor);
   const TriaIterator<dim,CellAccessor<dim> > neighbor_cell = this->neighbor(neighbor);
@@ -2279,7 +2401,7 @@ CellAccessor<dim>::neighbor_of_coarser_neighbor (const unsigned int neighbor) co
 				   // we want to know the
 				   // neighbor_of_neighbor if
 				   // neighbor==1 (the right
-				   // neighbor), then we will get 3
+				   // neighbor), then we will get 0
 				   // (the left neighbor) in most
 				   // cases. look up this relationship
 				   // in the table provided by
@@ -2293,15 +2415,7 @@ CellAccessor<dim>::neighbor_of_coarser_neighbor (const unsigned int neighbor) co
   if (face_guess->has_children())
     for (unsigned int subface_no=0; subface_no<face_guess->n_children(); ++subface_no)
       if (face_guess->child_index(subface_no)==this_face_index)
-					 // return the result, but don't forget
-					 // to take care of possible rotation,
-					 // flip and wrong orientation of the
-					 // neighbor's face...
-	return std::make_pair (face_no_guess,
-			       GeometryInfo<dim>::real_to_standard_face_vertex(subface_no,
-									       neighbor_cell->face_orientation(face_no_guess),
-									       neighbor_cell->face_flip(face_no_guess),
-									       neighbor_cell->face_rotation(face_no_guess)));
+	return std::make_pair (face_no_guess, subface_no);
 
 				     // if the guess was false, then
 				     // we need to loop over all faces
@@ -2316,15 +2430,102 @@ CellAccessor<dim>::neighbor_of_coarser_neighbor (const unsigned int neighbor) co
 	  if (face->has_children())
 	    for (unsigned int subface_no=0; subface_no<face->n_children(); ++subface_no)
 	      if (face->child_index(subface_no)==this_face_index)
-						 // return the result, but don't forget
-						 // to take care of possible rotation,
-						 // flip and wrong orientation of the
-						 // neighbor's face...
-		return std::make_pair (face_no,
-				       GeometryInfo<dim>::real_to_standard_face_vertex(subface_no,
-										       neighbor_cell->face_orientation(face_no),
-										       neighbor_cell->face_flip(face_no),
-										       neighbor_cell->face_rotation(face_no)));
+		return std::make_pair (face_no, subface_no);
+	}
+    }
+  
+				   // we should never get here,
+				   // since then we did not find
+				   // our way back...
+  Assert (false, ExcInternalError());
+  return std::make_pair (deal_II_numbers::invalid_unsigned_int,
+			 deal_II_numbers::invalid_unsigned_int);
+}
+
+#endif
+
+#if deal_II_dimension == 3
+
+template <int dim>
+std::pair<unsigned int, unsigned int>
+CellAccessor<dim>::neighbor_of_coarser_neighbor (const unsigned int neighbor) const
+{
+  Assert (neighbor < GeometryInfo<dim>::faces_per_cell,
+	  TriaAccessorExceptions::ExcInvalidNeighbor(neighbor));
+				   // make sure that the neighbor is
+				   // on a coarser level
+  Assert (neighbor_is_coarser(neighbor),
+	  TriaAccessorExceptions::ExcNeighborIsNotCoarser());
+
+  const int this_face_index=face_index(neighbor);
+  const TriaIterator<dim,CellAccessor<dim> > neighbor_cell = this->neighbor(neighbor);
+  
+				   // usually, on regular patches of
+				   // the grid, this cell is just on
+				   // the opposite side of the
+				   // neighbor that the neighbor is of
+				   // this cell. for example in 2d, if
+				   // we want to know the
+				   // neighbor_of_neighbor if
+				   // neighbor==1 (the right
+				   // neighbor), then we will get 0
+				   // (the left neighbor) in most
+				   // cases. look up this relationship
+				   // in the table provided by
+				   // GeometryInfo and try it
+  const unsigned int face_no_guess
+    = GeometryInfo<dim>::opposite_face[neighbor];
+
+  const TriaIterator<dim,TriaObjectAccessor<dim-1, dim> > face_guess
+    =neighbor_cell->face(face_no_guess);
+  
+  if (face_guess->has_children())
+    for (unsigned int subface_no=0; subface_no<face_guess->n_children(); ++subface_no)
+      if (face_guess->child_index(subface_no)==this_face_index)
+					     // call a helper function, that
+					     // translates the current subface
+					     // number to a subface number for
+					     // the current FaceRefineCase
+	return std::make_pair (face_no_guess, translate_subface_no(face_guess, subface_no));
+      else if (face_guess->child(subface_no)->has_children())
+	for (unsigned int subsub_no=0; subsub_no<face_guess->child(subface_no)->n_children(); ++subsub_no)
+	  if (face_guess->child(subface_no)->child_index(subsub_no)==this_face_index)
+					     // call a helper function, that
+					     // translates the current subface
+					     // number and subsubface number to
+					     // a subface number for the current
+					     // FaceRefineCase
+	    return std::make_pair (face_no_guess, translate_subface_no(face_guess, subface_no, subsub_no));
+	  
+  
+
+				     // if the guess was false, then
+				     // we need to loop over all faces
+				     // and subfaces and find the
+				     // number the hard way
+  for (unsigned int face_no=0; face_no<GeometryInfo<dim>::faces_per_cell; ++face_no)
+    {
+      if (face_no!=face_no_guess)
+	{
+	  const TriaIterator<dim,TriaObjectAccessor<dim-1, dim> > face
+	    =neighbor_cell->face(face_no);
+	  if (face->has_children())
+	    for (unsigned int subface_no=0; subface_no<face->n_children(); ++subface_no)
+	      if (face->child_index(subface_no)==this_face_index)
+					     // call a helper function, that
+					     // translates the current subface
+					     // number to a subface number for
+					     // the current FaceRefineCase
+		return std::make_pair (face_no, translate_subface_no(face, subface_no));
+	      else if (face->child(subface_no)->has_children())
+		for (unsigned int subsub_no=0; subsub_no<face->child(subface_no)->n_children(); ++subsub_no)
+		  if (face->child(subface_no)->child_index(subsub_no)==this_face_index)
+					     // call a helper function, that
+					     // translates the current subface
+					     // number and subsubface number to
+					     // a subface number for the current
+					     // FaceRefineCase
+		    return std::make_pair (face_no, translate_subface_no(face, subface_no, subsub_no));
 	}
     }
   
@@ -2335,6 +2536,8 @@ CellAccessor<dim>::neighbor_of_coarser_neighbor (const unsigned int neighbor) co
   return std::make_pair (numbers::invalid_unsigned_int,
 			 numbers::invalid_unsigned_int);
 }
+
+#endif
 
 
 
@@ -2398,17 +2601,33 @@ neighbor_child_on_subface (const unsigned int face,
           ExcMessage ("The present cell must not have children!"));
   Assert (!this->at_boundary(face),
           ExcMessage ("The present cell must have a valid neighbor!"));
-  Assert (this->neighbor(face)->level() == this->level(),
-          ExcMessage ("The neighbor must be on the same level as this cell!"));
   Assert (this->neighbor(face)->has_children() == true,
           ExcMessage ("The neighbor must have children!"));
 
   const unsigned int neighbor_neighbor
     = this->neighbor_of_neighbor (face);
   const unsigned int neighbor_child_index
-    = GeometryInfo<2>::child_cell_on_face(neighbor_neighbor,subface);
+    = GeometryInfo<2>::child_cell_on_face(
+      this->neighbor(face)->refinement_case(),neighbor_neighbor,subface);
 
-  return this->neighbor(face)->child(neighbor_child_index);
+  TriaIterator<2,CellAccessor<2> > sub_neighbor = this->neighbor(face)->child(neighbor_child_index);
+				   // the neighbors child can have children,
+				   // which are not further refined along the
+				   // face under consideration. as we are
+				   // normally interested in one of this
+				   // child's child, search for the right one.
+  while(sub_neighbor->has_children())
+    {
+      Assert ((GeometryInfo<2>::face_refinement_case(sub_neighbor->refinement_case(),
+						     neighbor_neighbor) ==
+	       RefinementCase<2>::no_refinement),
+	      ExcInternalError());
+      sub_neighbor = sub_neighbor->child(GeometryInfo<2>::child_cell_on_face(
+					   sub_neighbor->refinement_case(),neighbor_neighbor,0));
+      
+    }
+  
+  return sub_neighbor;
 }
 
 #endif
@@ -2425,58 +2644,312 @@ neighbor_child_on_subface (const unsigned int face,
           ExcMessage ("The present cell must not have children!"));
   Assert (!this->at_boundary(face),
           ExcMessage ("The present cell must have a valid neighbor!"));
-  Assert (this->neighbor(face)->level() == this->level(),
-          ExcMessage ("The neighbor must be on the same level as this cell!"));
   Assert (this->neighbor(face)->has_children() == true,
           ExcMessage ("The neighbor must have children!"));
-				   // this function returns they neighbor's
+				   // this function returns the neighbor's
 				   // child on a given face and
-				   // subface. However, irrespective of the
-				   // actual face orientation, flip and rotation
-				   // of the cells face it returns that child,
-				   // which is neighboring the subface which
-				   // would be subface number @p subface, if the
-				   // face was in standard orientation. thus,
-				   // our first task is to extract the
-				   // information, which real_subface_no
-				   // corresponds to that for the actual face,
-				   // which might have non-standard orientation,
-				   // flip and rotation.
+				   // subface. 
 
-				   // to this end: the subfaces are numbered
-				   // according to the vertices of the
-				   // face. thus we can use the
-				   // standard_to_real_face_vertex function in
-				   // GeometryInfo<dim> to translate the given
-				   // subface to the real_subface_no
-  unsigned int real_subface_no=GeometryInfo<3>::
-			       standard_to_real_face_vertex(subface,
-							    this->face_orientation(face),
-							    this->face_flip(face),
-							    this->face_rotation(face));
-				   // get the neighbor's number for the given
-				   // face and the neighbor
-  const unsigned int neighbor_neighbor
-    = this->neighbor_of_neighbor (face);
-  const TriaIterator<3,CellAccessor<3> > neighbor=this->neighbor(face);
+				   // we have to consider one other aspect here:
+				   // The face might be refined
+				   // anisotropically. In this case, the subface
+				   // number refers to the following, where we
+				   // look at the face from the current cell,
+				   // thus the subfaces are in standard
+				   // orientation concerning the cell
+				   //
+				   // for isotropic refinement
+				   //
+				   // *---*---*
+				   // | 2 | 3 |
+				   // *---*---*
+				   // | 0 | 1 |
+				   // *---*---*
+				   //
+				   // for 2*anisotropic refinement
+				   // (first cut_y, then cut_x)
+				   //
+				   // *---*---*
+				   // | 2 | 3 |
+				   // *---*---*
+				   // | 0 | 1 |
+				   // *---*---*
+				   //
+				   // for 2*anisotropic refinement
+				   // (first cut_x, then cut_y)
+				   //
+				   // *---*---*
+				   // | 1 | 3 |
+				   // *---*---*
+				   // | 0 | 2 |
+				   // *---*---*
+				   //
+				   // for purely anisotropic refinement:
+				   //
+				   // *---*---*      *-------*
+				   // |   |   |	     |   1   |
+				   // | 0 | 1 |  or  *-------* 
+				   // |   |   |	     |   0   |
+				   // *---*---*	     *-------*
+				   //
+				   // for "mixed" refinement:
+				   //
+				   // *---*---*      *---*---*      *---*---*      *-------*
+				   // |   | 2 |      | 1 |   |      | 1 | 2 |      |   2   |
+				   // | 0 *---*  or  *---* 2 |  or  *---*---*  or  *---*---*
+				   // |   | 1 |      | 0 |   |      |   0   |      | 0 | 1 |
+				   // *---*---*      *---*---*      *-------*      *---*---*
+
+  const Triangulation<3>::face_iterator mother_face=this->face(face);
+  const unsigned int total_children=mother_face->number_of_children();
+  Assert (subface<total_children,ExcIndexRange(subface,0,total_children));
+  Assert(total_children<=GeometryInfo<3>::max_children_per_face, ExcInternalError());
   
-				   // now use the info provided by GeometryInfo
-				   // to extract the neighbors child number
-  const unsigned int neighbor_child_index
-    = GeometryInfo<3>::child_cell_on_face(neighbor_neighbor, real_subface_no,
-					  neighbor->face_orientation(neighbor_neighbor),
-					  neighbor->face_flip(neighbor_neighbor),
-					  neighbor->face_rotation(neighbor_neighbor));
-  const TriaIterator<3,CellAccessor<3> > neighbor_child=
-    neighbor->child(neighbor_child_index);
+  unsigned int neighbor_neighbor;
+  TriaIterator<3,CellAccessor<3> > neighbor_child;
+  const TriaIterator<3,CellAccessor<3> > neighbor=this->neighbor(face);
 
-				   // make sure that the neighbor child cell we
-                                   // have found shares the desired subface.
-  Assert((this->face(face)->child(real_subface_no) ==
-	  neighbor_child->face(neighbor_neighbor)),
-         ExcInternalError());
+  
+  const RefinementCase<2> mother_face_ref_case=mother_face->refinement_case();
+  if (mother_face_ref_case==RefinementCase<2>::cut_xy) // total_children==4
+    {
+				       // this case is quite easy. we are sure,
+				       // that the neighbor is not coarser.
+
+				       // get the neighbor's number for the given
+				       // face and the neighbor
+      neighbor_neighbor
+	= this->neighbor_of_neighbor (face);
+      
+				       // now use the info provided by GeometryInfo
+				       // to extract the neighbors child number
+      const unsigned int neighbor_child_index
+	= GeometryInfo<3>::child_cell_on_face(neighbor->refinement_case(),
+					      neighbor_neighbor, subface,
+					      neighbor->face_orientation(neighbor_neighbor),
+					      neighbor->face_flip(neighbor_neighbor),
+					      neighbor->face_rotation(neighbor_neighbor));
+      neighbor_child=
+	neighbor->child(neighbor_child_index);
+      
+				       // make sure that the neighbor child cell we
+				       // have found shares the desired subface.
+      Assert((this->face(face)->child(subface) ==
+	      neighbor_child->face(neighbor_neighbor)),
+	     ExcInternalError());
+    }
+  else //-> the face is refined anisotropically
+    {
+					   // first of all, we have to find the
+					   // neighbor at one of the anisotropic
+					   // children of the
+					   // mother_face. determine, which of
+					   // these we need.
+	  unsigned int first_child_to_find;
+	  unsigned int neighbor_child_index;
+	  if (total_children==2)
+	    first_child_to_find=subface;
+	  else 
+	    {
+	      first_child_to_find=subface/2;
+	      if (total_children==3 &&
+		  subface==1 &&
+		  !mother_face->child(0)->has_children())
+		first_child_to_find=1;
+	    }
+      if (neighbor_is_coarser(face))
+	{
+	  std::pair<unsigned int, unsigned int> indices=neighbor_of_coarser_neighbor(face);
+	  neighbor_neighbor=indices.first;
+
+	  
+					   // we have to translate our
+					   // subface_index according to the
+					   // RefineCase and subface index of
+					   // the coarser face (our face is an
+					   // anisotropic child of the coarser
+					   // face), 'a' denotes our
+					   // subface_index 0 and 'b' denotes
+					   // our subface_index 1, whereas 0...3
+					   // denote isotropic subfaces of the
+					   // coarser face
+					   //
+					   // cut_x and coarser_subface_index=0
+					   //
+					   // *---*---*
+					   // |b=2|   |
+					   // |   |   |
+					   // |a=0|   |
+					   // *---*---*
+					   //
+					   // cut_x and coarser_subface_index=1
+					   //
+					   // *---*---*
+					   // |   |b=3|
+					   // |   |   |
+					   // |   |a=1|
+					   // *---*---*
+					   //
+					   // cut_y and coarser_subface_index=0
+					   //
+					   // *-------*
+					   // |       |
+					   // *-------*
+					   // |a=0 b=1|
+					   // *-------*
+					   //
+					   // cut_y and coarser_subface_index=1
+					   //
+					   // *-------*
+					   // |a=2 b=3|
+					   // *-------*
+					   // |       |
+					   // *-------*
+	  unsigned int iso_subface;
+ 	  if (neighbor->face(neighbor_neighbor)->refinement_case()==RefinementCase<2>::cut_x)
+ 	    iso_subface=2*first_child_to_find + indices.second;
+ 	  else
+   	    {
+  	      Assert(neighbor->face(neighbor_neighbor)->refinement_case()==RefinementCase<2>::cut_y,
+  		     ExcInternalError());
+  	      iso_subface=first_child_to_find + 2*indices.second;
+  	    }
+	  neighbor_child_index
+	    =GeometryInfo<3>::child_cell_on_face(neighbor->refinement_case(),
+						 neighbor_neighbor,
+						 iso_subface,
+						 neighbor->face_orientation(neighbor_neighbor),
+						 neighbor->face_flip(neighbor_neighbor),
+						 neighbor->face_rotation(neighbor_neighbor));
+	}
+      else //neighbor is not coarser
+	{
+	  neighbor_neighbor=neighbor_of_neighbor(face);
+	  neighbor_child_index
+	    =GeometryInfo<3>::child_cell_on_face(neighbor->refinement_case(),
+						 neighbor_neighbor,
+						 first_child_to_find,
+						 neighbor->face_orientation(neighbor_neighbor),
+						 neighbor->face_flip(neighbor_neighbor),
+						 neighbor->face_rotation(neighbor_neighbor),
+						 mother_face_ref_case);
+	}
+      
+      neighbor_child=neighbor->child(neighbor_child_index);
+				       // it might be, that the neighbor_child
+				       // has children, which are not refined
+				       // along the given subface. go down that
+				       // list and deliver the last of those.
+      while (neighbor_child->has_children() &&
+	     GeometryInfo<3>::face_refinement_case(neighbor_child->refinement_case(),neighbor_neighbor)==RefinementCase<2>::no_refinement)
+	neighbor_child=neighbor_child->child(GeometryInfo<3>::child_cell_on_face(neighbor_child->refinement_case(),
+										 neighbor_neighbor,0));
+
+				       // if there are two total subfaces, we
+				       // are finished. if there are four we
+				       // have to get a child of our current
+				       // neighbor_child. If there are three,
+				       // we have to check which of the two
+				       // possibilities applies.
+      if (total_children==3)
+	{
+	  if (mother_face->child(0)->has_children())
+	    {
+	      if (subface<2)
+		neighbor_child=neighbor_child->child(GeometryInfo<3>::child_cell_on_face(neighbor_child->refinement_case(),
+											 neighbor_neighbor,subface,
+											 neighbor_child->face_orientation(neighbor_neighbor),
+											 neighbor_child->face_flip(neighbor_neighbor),
+											 neighbor_child->face_rotation(neighbor_neighbor),
+											 mother_face->child(0)->refinement_case()));
+	    }
+	  else
+	    {
+	      Assert(mother_face->child(1)->has_children(), ExcInternalError());
+	      if (subface>0)
+		neighbor_child=neighbor_child->child(GeometryInfo<3>::child_cell_on_face(neighbor_child->refinement_case(),
+											 neighbor_neighbor,subface-1,
+											 neighbor_child->face_orientation(neighbor_neighbor),
+											 neighbor_child->face_flip(neighbor_neighbor),
+											 neighbor_child->face_rotation(neighbor_neighbor),
+											 mother_face->child(1)->refinement_case()));
+	    }
+	}
+      else if (total_children==4)
+	{
+	  neighbor_child=neighbor_child->child(GeometryInfo<3>::child_cell_on_face(neighbor_child->refinement_case(),
+										   neighbor_neighbor,subface%2,
+										   neighbor_child->face_orientation(neighbor_neighbor),
+										   neighbor_child->face_flip(neighbor_neighbor),
+										   neighbor_child->face_rotation(neighbor_neighbor),
+										   mother_face->child(subface/2)->refinement_case()));
+	}
+    }
+
+				   // it might be, that the neighbor_child has
+				   // children, which are not refined along the
+				   // given subface. go down that list and
+				   // deliver the last of those.
+  while (neighbor_child->has_children())
+    neighbor_child=neighbor_child->child(GeometryInfo<3>::child_cell_on_face(neighbor_child->refinement_case(),
+									     neighbor_neighbor,0));
+
+#ifdef DEBUG
+				   // check, whether the face neighbor_child
+				   // matches the requested subface
+  Triangulation<3>::face_iterator requested;
+  switch (this->subface_case(face))
+    {
+      case internal::SubfaceCase<3>::case_x:
+      case internal::SubfaceCase<3>::case_y:
+      case internal::SubfaceCase<3>::case_xy:
+	    requested=mother_face->child(subface);
+	    break;
+      case internal::SubfaceCase<3>::case_x1y2y:
+      case internal::SubfaceCase<3>::case_y1x2x:
+	    requested=mother_face->child(subface/2)->child(subface%2);
+	    break;
+
+      case internal::SubfaceCase<3>::case_x1y:
+      case internal::SubfaceCase<3>::case_y1x:
+	    switch (subface)
+	      {
+		case 0:
+		case 1:
+		      requested=mother_face->child(0)->child(subface);
+		      break;
+		case 2:
+		      requested=mother_face->child(1);
+		      break;
+		default:
+		      Assert(false, ExcInternalError());
+	      }
+	    break;
+      case internal::SubfaceCase<3>::case_x2y:
+      case internal::SubfaceCase<3>::case_y2x:
+	    switch (subface)
+	      {
+		case 0:
+		      requested=mother_face->child(0);
+		      break;
+		case 1:
+		case 2:
+		      requested=mother_face->child(1)->child(subface-1);
+		      break;
+		default:
+		      Assert(false, ExcInternalError());
+	      }
+	    break;
+      default:
+	    Assert(false, ExcInternalError());
+	    break;
+    }
+  Assert(requested==neighbor_child->face(neighbor_neighbor),
+	 ExcInternalError());
+#endif
 
   return neighbor_child;
+  
 }
 
 #endif

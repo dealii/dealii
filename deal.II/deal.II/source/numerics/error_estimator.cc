@@ -745,8 +745,10 @@ estimate_some (const hp::MappingCollection<dim>                  &mapping,
 					   // then do the work below
 	  if ((face->has_children() == false) &&
 	      !cell->at_boundary(face_no) &&
-	      (cell->neighbor(face_no)->level() == cell->level()) &&
-	      (cell->neighbor(face_no)->index() < cell->index()))
+	      (!cell->neighbor_is_coarser(face_no) &&
+	       (cell->neighbor(face_no)->index() < cell->index() ||
+		(cell->neighbor(face_no)->index() == cell->index() &&
+		 cell->neighbor(face_no)->level() < cell->level()))))
 	    continue;
 	  
 					   // if we already visited
@@ -766,7 +768,7 @@ estimate_some (const hp::MappingCollection<dim>                  &mapping,
 					   // integrate over the subfaces when
 					   // we visit the coarse cells.
 	  if (cell->at_boundary(face_no) == false)
-	    if (cell->neighbor(face_no)->level() < cell->level())
+	    if (cell->neighbor_is_coarser(face_no))
 	      continue;
 	  
 					   // if this face is part of the

@@ -133,9 +133,19 @@ InterGridMap<GridClass>::set_mapping (const cell_iterator &src_cell,
 				   // if both cells have children, we may
 				   // recurse further into the hierarchy
   if (src_cell->has_children() && dst_cell->has_children())
-    for (unsigned int c=0; c<GeometryInfo<GridClass::dimension>::children_per_cell; ++c)
-      set_mapping (src_cell->child(c),
-		   dst_cell->child(c));
+    {
+      Assert(src_cell->n_children()==
+	     GeometryInfo<GridClass::dimension>::max_children_per_cell,
+	     ExcNotImplemented());
+      Assert(dst_cell->n_children()==
+	     GeometryInfo<GridClass::dimension>::max_children_per_cell,
+	     ExcNotImplemented());
+      Assert(src_cell->refinement_case()==dst_cell->refinement_case(),
+	     ExcNotImplemented());
+      for (unsigned int c=0; c<GeometryInfo<GridClass::dimension>::max_children_per_cell; ++c)
+	set_mapping (src_cell->child(c),
+		     dst_cell->child(c));
+    }
   else
     if (src_cell->has_children() &&
 	!dst_cell->has_children())

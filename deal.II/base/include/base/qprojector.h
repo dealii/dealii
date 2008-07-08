@@ -2,7 +2,7 @@
 //    $Id$
 //    Version: $Name$
 //
-//    Copyright (C) 2005, 2006 by the deal.II authors
+//    Copyright (C) 2005, 2006, 2007, 2008 by the deal.II authors
 //
 //    This file is subject to QPL and may not be  distributed
 //    without copyright and license information. Please refer
@@ -15,6 +15,7 @@
 
 
 #include <base/quadrature.h>
+#include <base/geometry_info.h>
 
 DEAL_II_NAMESPACE_OPEN
 /*!@addtogroup Quadrature */
@@ -107,28 +108,34 @@ class QProjector
 		     const unsigned int      face_no);
 
     				     /**
-				      * Compute the quadrature points
-				      * on the cell if the given
-				      * quadrature formula is used on
-				      * face <tt>face_no</tt>, subface
-				      * number <tt>subface_no</tt>.
+				      * Compute the quadrature points on the
+				      * cell if the given quadrature formula is
+				      * used on face <tt>face_no</tt>, subface
+				      * number <tt>subface_no</tt> corresponding
+				      * to RefineCase::Type
+				      * <tt>ref_case</tt>. The last argument is
+				      * only used in 3D.
 				      *
 				      * @note Only the points are
 				      * transformed. The quadrature
 				      * weights are the same as those
 				      * of the original rule.
 				      */
-    static void project_to_subface (const SubQuadrature &quadrature,
-				    const unsigned int   face_no,
-				    const unsigned int   subface_no,
-				    std::vector<Point<dim> > &q_points);
+    static void project_to_subface (const SubQuadrature       &quadrature,
+				    const unsigned int         face_no,
+				    const unsigned int         subface_no,
+				    std::vector<Point<dim> >  &q_points,
+				    const RefinementCase<dim-1> &ref_case=RefinementCase<dim-1>::isotropic_refinement);
 
 				     /**
-				      * Compute the cell quadrature
-				      * formula corresponding to using
+				      * Compute the cell quadrature formula
+				      * corresponding to using
 				      * <tt>quadrature</tt> on subface
 				      * <tt>subface_no</tt> of face
-				      * <tt>face_no</tt>.
+				      * <tt>face_no</tt> with
+				      * RefinementCase<dim-1>
+				      * <tt>ref_case</tt>. The last argument is
+				      * only used in 3D.
 				      *
 				      * @note Only the points are
 				      * transformed. The quadrature
@@ -136,9 +143,10 @@ class QProjector
 				      * of the original rule.
 				      */
     static Quadrature<dim>
-    project_to_subface (const SubQuadrature &quadrature,
-			const unsigned int      face_no,
-			const unsigned int   subface_no);
+    project_to_subface (const SubQuadrature       &quadrature,
+			const unsigned int         face_no,
+			const unsigned int         subface_no,
+			const RefinementCase<dim-1> &ref_case=RefinementCase<dim-1>::isotropic_refinement);
 
 				     /**
 				      * Take a face quadrature formula
@@ -317,7 +325,7 @@ class QProjector
                                           * ignored if the space dimension
                                           * equals 2.
                                           *
-                                          * The last argument denotes
+                                          * The last but one argument denotes
                                           * the number of quadrature
                                           * points the
                                           * lower-dimensional face
@@ -325,6 +333,10 @@ class QProjector
                                           * one that has been
                                           * projected onto the faces)
                                           * has.
+					  *
+					  * Through the last argument
+					  * anisotropic refinement can be
+					  * respected.
                                           */
         static
         DataSetDescriptor
@@ -333,7 +345,8 @@ class QProjector
                  const bool         face_orientation,
                  const bool         face_flip,
                  const bool         face_rotation,
-                 const unsigned int n_quadrature_points);
+                 const unsigned int n_quadrature_points,
+		 const internal::SubfaceCase<dim> ref_case=internal::SubfaceCase<dim>::case_isotropic);
 
                                          /**
                                           * Conversion operator to an
@@ -438,19 +451,22 @@ void
 QProjector<1>::project_to_subface (const Quadrature<0> &,
                                    const unsigned int,
                                    const unsigned int,
-                                   std::vector<Point<1> > &);
+                                   std::vector<Point<1> > &,
+				   const RefinementCase<0> &);
 template <>
 void
 QProjector<2>::project_to_subface (const Quadrature<1>    &quadrature,
                                    const unsigned int      face_no,
                                    const unsigned int      subface_no,
-                                   std::vector<Point<2> > &q_points);
+                                   std::vector<Point<2> > &q_points,
+				   const RefinementCase<1> &);
 template <>
 void
-QProjector<3>::project_to_subface (const Quadrature<2>    &quadrature,
-                                   const unsigned int      face_no,
-                                   const unsigned int      subface_no,
-                                   std::vector<Point<3> > &q_points);
+QProjector<3>::project_to_subface (const Quadrature<2>       &quadrature,
+                                   const unsigned int         face_no,
+                                   const unsigned int         subface_no,
+                                   std::vector<Point<3> >    &q_points,
+				   const RefinementCase<2> &face_ref_case);
 
 template <>
 Quadrature<1>

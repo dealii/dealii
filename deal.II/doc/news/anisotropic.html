@@ -1,24 +1,13 @@
-<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Frameset//EN"
-   "http://www.w3.org/TR/REC-html40/frameset.dtd">
-<html>
-  <head>
-    <link href="../screen.css" rel="StyleSheet">
-    <title>The deal.II news page</title>
-    <meta name="author" content="the deal.II authors <authors@dealii.org>">
-    <meta name="keywords" content="deal.II"></head>
-    <meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1">
-<body>
-
-
-<h2>Changes between the main branch and the anisotropic branch</h2>
+/**
+ * @page anisotropic_changes Changes between the trunk and branch_anisotropic
 
 <p>
-This is the list of changes between the main subversion branch and the
-anisotropic branch of <acronym>deal.II</acronym> library. It is
-subdivided into changes made to the three sub-libraries <a
-href="#base">base</a>, <a href="#lac">lac</a>, and <a
-href="#deal.II">deal.II</a>, as well as changes to the <a
-href="#general">general infrastructure, documentation, etc</a>.
+This is the list of changes between the subversion trunk and the
+anisotropic branch of the deal.II library. It is subdivided into
+changes made to the three sub-libraries <a href="#base">base</a>, <a
+href="#lac">lac</a>, and <a href="#deal.II">deal.II</a>, as well as
+changes to the <a href="#general">general infrastructure,
+documentation, etc</a>.
 </p>
 
 <p>
@@ -41,43 +30,40 @@ refinement.
 
 <ol>
   <li> <p> 
-       Changed: The <code class="class">FiniteElement&lt;dim&gt;</code>::<code
-		 class="member">get_prolongation_matrix</code> and <code
-		 class="class">FiniteElement&lt;dim&gt;</code>::<code
-		 class="member">get_restriction_matrix</code> functions now have an
-		 additional argument of type <code>RefineCase::Type</code> to enable a
-		 meaningful use of these matrices in case of anisotropic refinement. These
-		 matrices are used for solution transfer and multigrid operations, but
-		 there should be no need to use them in user codes directly. Note, that
-		 the matrices are not fully implemented for all finite elements up to now.
-		 <br> (Tobias Leicht 2006/07/04)
+       Changed: The FiniteElement::get_prolongation_matrix and
+       FiniteElement::get_restriction_matrix functions now have an
+       additional argument of type RefinementCase to enable a
+       meaningful use of these matrices in case of anisotropic
+       refinement. These matrices are used for solution transfer and
+       multigrid operations, but there should be no need to use them
+       in user codes directly. Note, that the matrices are not fully
+       implemented for all finite elements up to now.
+       <br>
+       (Tobias Leicht 2006/07/04)
        </p>
 
   <li> <p>
-       Changed: <code class="class">GeometryInfo</code>::<code
-       class="member">children_per_cell</code> has been replaced by
-       <code class="class">GeometryInfo</code>::<code
-       class="member">max_children_per_cell</code>, which represents
-       the maximum number of children a cell might have, i.e. the
-       number of children in the case of isotropic refinement. But
-       note, that this number will rarely be needed in user codes. In
-       general, the number of children of a cell varies from cell to
-       cell and can be obtained by <code>cell->n_children()</code>,
-       which gives the number of children of a specific
-       <code>cell</code> which is refined iso- or anisotropically.
+       Changed: <code>GeometryInfo::children_per_cell</code> has been
+       replaced by GeometryInfo::max_children_per_cell, which
+       represents the maximum number of children a cell might have,
+       i.e. the number of children in the case of isotropic
+       refinement. But note, that this number will rarely be needed in
+       user codes. In general, the number of children of a cell varies
+       from cell to cell and can be obtained by
+       <code>cell->n_children()</code>, which gives the number of
+       children of a specific <code>cell</code> which is refined iso-
+       or anisotropically.
        <br>
        (RH 2005/02/26)
        </p>
 
   <li> <p>
        Changed: The analogous change applies to the number of children
-       of a face. <code class="class">GeometryInfo</code>::<code
-       class="member">subfaces_per_face</code> has been replaced by
-       <code class="class">GeometryInfo</code>::<code
-       class="member">max_children_per_face</code>, which represents
-       the maximum number of children a face might have, i.e. the
-       number of children in the case of an isotropic refined face.
-       But note, that this number will rarely be needed in user
+       of a face. <code>GeometryInfo::subfaces_per_face</code> has
+       been replaced by GeometryInfo::max_children_per_face, which
+       represents the maximum number of children a face might have,
+       i.e. the number of children in the case of an isotropic refined
+       face.  But note, that this number will rarely be needed in user
        codes. In general, the number of children of a face varies from
        face to face and can be obtained by
        <code>face->n_children()</code>, which gives the number of
@@ -88,15 +74,13 @@ refinement.
        </p>
 
   <li> <p>
-       Changed: The <code class="class">GeometryInfo</code>::<code
-       class="member">child_cell_on_face</code> is generalized to
-       anisotropic refinement and has now an additional
-       <code>RefineCase::Type</code> argument. This function will
-       rarely be used in user codes, as e.g. the neighbor's child at a
-       specific face and subface should be accessed through
+       Changed: The GeometryInfo::child_cell_on_face function is
+       generalized to anisotropic refinement and has now an additional
+       RefinementCase argument. This function will rarely be used in
+       user codes, as e.g. the neighbor's child at a specific face and
+       subface should be accessed through
        <code>cell->neighbor_child_on_subface</code> rather than
-       through the <code class="class">GeometryInfo</code>::<code
-       class="member">child_cell_on_face</code> function.
+       through the GeometryInfo::child_cell_on_face function.
        <br>
        (RH 2005/02/27)
        </p>
@@ -129,55 +113,54 @@ refinement.
 
 <ol>
   <li> <p>
-       New: There is now a new <code
-       class="class">GeometryInfo&lt;dim&gt;</code>::<code
-       class="member">min_cell_refine_case</code> function which returns the
-       <code>RefineCase::Type</code> representing the smallest refinement case
-       of a cell for a given refinement of one of its faces. In 2D for example a
-       cell has to be refined at least with <code>RefineCase::cut_y</code> if
-       the left line (line 0) shall be refined. Another refinement possibility
-       for the cell would be <code>RefineCase::cut_xy</code>, but that is not
-       the minimal case.
+       New: There are now a new
+       GeometryInfo::min_cell_refinement_case_for_face_refinement
+       (resp. GeometryInfo::min_cell_refinement_case_for_line_refinement)
+       function which returns the RefinementCase representing the
+       smallest refinement case of a cell for a given refinement of
+       one of its faces (resp. lines). In 2D for example a cell has to
+       be refined at least with RefinementCase::cut_y if the left line
+       (line 0) shall be refined. Another refinement possibility for
+       the cell would be <code>RefinementCase::cut_xy</code>, but that
+       is not the minimal case.
        <br> 
        (Tobias Leicht 2006/06/28)
        </p>
 
   <li> <p>
-       New: There is now a new <code
-       class="class">GeometryInfo&lt;dim&gt;</code>::<code
-       class="member">line_refine_case</code> function which returns the
-       <code>RefineCase::Type</code> representing the refinement case of a line
-       for a given refinement case of the corresponding cell.
+       New: There is now a new GeometryInfo::line_refinement_case
+       function which returns the RefinementCase representing the
+       refinement case of a line for a given refinement case of the
+       corresponding cell.
        <br> 
        (Tobias Leicht 2006/06/28)
        </p>
 
   <li> <p>
-       New: The new <code class="class">GeometryInfo</code>::<code
-       class="member">n_children(ref_case)</code> function returns the
-       number of children a cell/face has when refined with the
-       <code>RefineCase::Type</code> <code>ref_case</code>.
+       New: The new
+       <tt>GeometryInfo<dim>::n_children(refinement_case)</tt>
+       function returns the number of children a cell/face has when
+       refined with the RefinementCase <tt>refinement_case</tt>.
        <br> 
        (RH 2005/11/07)
        </p>
 
   <li> <p>
-       New: Given a <code>RefineCase::Type</code> of a cell the new
-       <code class="class">GeometryInfo</code>::<code
-       class="member">face_refine_case</code> function returns the
-       <code>RefineCase::Type</code> of a face.  <br> (RH 2005/11/07)
+       New: Given a RefinementCase of a cell the new
+       GeometryInfo::face_refinement_case function returns the
+       RefinementCase of a face.
+       <br>
+       (RH 2005/11/07)
        </p>
 
   <li> <p>
-       New: There is now a new <code
-       class="class">GeometryInfo&lt;dim&gt;</code>::<code
-       class="member">isotropic_refinement</code> variable of type
-       <code>RefineCase::Type</code> representing the isotropic
+       New: There is now a new RefinementCase
+       GeometryInfo::isotropic_refinement representing the isotropic
        refinement case in <code>dim</code> dimensions,
-       i.e. <code>GeometryInfo&lt;1&gt;::isotropic_refinement=RefineCase::cut_x</code>,
-       <code>GeometryInfo&lt;2&gt;::isotropic_refinement=RefineCase::cut_xy</code>
+       i.e. <tt>GeometryInfo<1>::isotropic_refinement=RefinementCase::cut_x</tt>,
+       <tt>GeometryInfo<2>::isotropic_refinement=RefinementCase::cut_xy</tt>
        and
-       <code>GeometryInfo&lt;3&gt;::isotropic_refinement=RefineCase::cut_xyz</code>.
+       <tt>GeometryInfo<3>::isotropic_refinement=RefinementCase::cut_xyz</tt>.
        <br> 
        (RH 2005/03/03)
        </p>
@@ -188,169 +171,119 @@ refinement.
 <a name="lac"></a>
 <h3>lac</h3>
 
-<ol>
-</ol>
-
 
 
 <a name="deal.II"></a>
 <h3>deal.II</h3>
 
 <ol>
-  <li> <p> New: There is now a new <code
-		 class="class">Triangulation&lt;dim&gt;</code>::<code
-		 class="member">prevent_distorted_boundary_cell</code> function which is
-		 only useful in case of anisotropic refinement. At the boundary of the
-		 domain, the new point on the face may be far inside the current cell, if
-		 the boundary has a strong curvature. If we allow anistropic refinement
-		 here, the resulting cell may be strongly distorted, especially if it is
-		 refined again later on. To prevent this problem, this function flags such
-		 cells for isotropic refinement. It is called automatically from <code
-		 class="member">prepare_coarsening_and_refinement</code>. Therefore this
-		 should have no effect on user codes.
-		 <br> 
-		 (Tobias Leicht 2006/08/02)
+  <li> <p>
+       New: There is now a new
+       Triangulation::prevent_distorted_boundary_cells function which
+       only useful in case of anisotropic refinement. At the boundary
+       of the domain, the new point on the face may be far inside the
+       current cell, if the boundary has a strong curvature. If we
+       allow anistropic refinement here, the resulting cell may be
+       strongly distorted, especially if it is refined again later
+       on. To prevent this problem, this function flags such cells for
+       isotropic refinement. It is called automatically from
+       Triangulation::prepare_coarsening_and_refinement. Therefore
+       this should have no effect on user codes.
+       <br>
+       (Tobias Leicht 2006/08/02)
        </p>
 
   <li> <p>
-		 New: There is now a new <code
-       class="class">Triangulation&lt;dim&gt;</code>::<code
-       class="member">tria_post_processing</code> function which is only useful
-		 in case of anisotropic refinement. It is possible, that a cell is refined
-		 only in one direciton and later all the children are refined in another
-		 one. Summing up, this would be the same as isotropic refinement, but with
-		 a higher number of cells, faces and levels involved. Therefore, after the
-		 refinement process, this function is called automatically and catches
-		 cells, for which the described conditions apply. They are coarsened and
-		 refined isotropically again. However, this is really something
-       internal to the library and there should never be the need to use this
-       function in user_codes. Calling <code
-       class="class">Triangulation&lt;dim&gt;</code>::<code
-       class="member">execute_coarsening_and_refinement</code> will be all you
-       need.
-		 <br> 
-		 (Tobias Leicht 2006/06/29)
+       New: There is now a new Triangulation::create_children function
+       which actually sets up the children of a cell and updates the
+       neighbor information. This work has been done in
+       Triangulation::execute_refinement so far. Memory allocation has
+       to be done prior to the function call. However, this is really
+       something internal to the library and there should never be the
+       need to use this function in user_codes. Calling
+       Triangulation::execute_coarsening_and_refinement will be all
+       you need.
+       <br> 
+       (Tobias Leicht 2006/06/29)
        </p>
 
   <li> <p>
-		 Extended: The<code
-       class="class">Triangulation&lt;dim&gt;</code>::<code
-       class="member">delete_children</code> now takes an additional argument
-		 <code>keep_outer_faces</code> of type <code>bool</code> which has a
-		 default value of <code>false</code>. If set to <code>true</code>, the
-		 children of the cells faces are never deleted, even if the neighbor does
-		 not need them. Normally, this would leed to wasted memory, therefore
-		 this should only be done, if they are needed afterwards, e.g. if the cell
-		 is refined again. However, this is really something
-       internal to the library and there should never be the need to use this
-       function in user_codes. Calling <code
-       class="class">Triangulation&lt;dim&gt;</code>::<code
-       class="member">execute_coarsening_and_refinement</code> will be all you
-       need.
-		 <br> 
-		 (Tobias Leicht 2006/06/29)
-       </p>
 
-  <li> <p>
-		 New: There is now a new <code
-       class="class">Triangulation&lt;dim&gt;</code>::<code
-       class="member">create_children</code> function which actually sets up the
-       children of a cell and updates the neighbor information. This work has
-       been done in <code class="class">Triangulation&lt;dim&gt;</code>::<code
-       class="member">execute_refinement</code> so far. Memory allocation has to
-       be done prior to the function call. However, this is really something
-       internal to the library and there should never be the need to use this
-       function in user_codes. Calling <code
-       class="class">Triangulation&lt;dim&gt;</code>::<code
-       class="member">execute_coarsening_and_refinement</code> will be all you
-       need.
-		 <br> 
-		 (Tobias Leicht 2006/06/29)
-       </p>
-
-  <li> <p>
-       New: A part of the functionality of <code
-       class="class">Triangulation&lt;dim&gt;</code>::<code
-       class="member">execute_coarsening</code> has been implemented in a new way
-       and shifted to the new function <code
-		 class="class">Triangulation&lt;dim&gt;</code>::<code
-       class="member">coarsening_allowed</code>. This function decides,
+       New: A part of the functionality of Triangulation::execute_coarsening has been implemented in a new way
+       and shifted to the new function Triangulation::coarsening_allowed. This function decides,
        depending on the refinement situation of all a cells neighbors, if the
        cell may be coarsened, in which case the bool value <code>true</code> is
        returned. This is a functionality which is partly dimension dependend.
-		 <br>	
-		 However, there should never be any reason to use this function in user codes.
+       <br>	
+       However, there should never be any reason to use this function in user codes.
        <br> 
        (Tobias Leicht 2006/06/28)
        </p>
 
   <li> <p>
-       New: There is now a new accessor function <code
-       class="member">coarser_neighbor</code>, which returns a bool value
-       <code>true</code>, if the requested neighbor is a coarser one and
-       <code>false</code> if the neighbor is as refined as the current cell. This new
-       functionality is needed in the internals of the library to decide, if
-       <code>neighbor_of_neighbor</code> or
-       <code>neighbor_of_coarser_neighbor</code> has to be called. This decision
-       is trivial in case of isotropic refinement, where the level of the cell
-       and its neighbor is all the information needed. In case of aniostropic
-       refinement, this new function can be used.
+       New: There is now a new CellAccessor::neighbor_is_coarser function,
+       which returns a bool value <code>true</code>, if the requested
+       neighbor is a coarser one and <code>false</code> if the
+       neighbor is as refined as the current cell. This new
+       functionality is needed in the internals of the library to
+       decide, if <code>neighbor_of_neighbor</code> or
+       <code>neighbor_of_coarser_neighbor</code> has to be
+       called. This decision is trivial in case of isotropic
+       refinement, where the level of the cell and its neighbor is all
+       the information needed. In case of aniostropic refinement, this
+       new function can be used.
        <br> 
        (Tobias Leicht 2006/06/28)
        </p>
 
   <li> <p>
-       New: There is now a new <code
-       class="class">Triangulation&lt;dim&gt;</code>::<code
-       class="member">MeshSmoothing</code>::<code>allow_anisotropic_smoothing</code>
-       smoothing flag for triangulations. An important part of the smoothing
-       process for refinement and coarsen flags is to ensure, that no double
-       refinement takes places at any face. If a cell is refined twice, its
-       neighbor has to be refined at least once. However, technically it is not
-       always necessary to refine the neighbor isotropically, it may be
-       sufficient to choose only one direction for the refinement. While this
-       allows to reduce the number of newly created cells to a minimum, it is incompatible
-       with older versions of the library, as anisotropic refinement takes
-       place, even if all the explicitly set refinement flags ask for
-       isotropic refinement.
-		 <br>
-		 Therefore this functionality is off by default. However, in order to use
+       New: There is now a new
+       <code>Triangulation::MeshSmoothing::allow_anisotropic_smoothing</code>
+       smoothing flag for triangulations. An important part of the
+       smoothing process for refinement and coarsen flags is to
+       ensure, that no double refinement takes places at any face. If
+       a cell is refined twice, its neighbor has to be refined at
+       least once. However, technically it is not always necessary to
+       refine the neighbor isotropically, it may be sufficient to
+       choose only one direction for the refinement. While this allows
+       to reduce the number of newly created cells to a minimum, it is
+       incompatible with older versions of the library, as anisotropic
+       refinement takes place, even if all the explicitly set
+       refinement flags ask for isotropic refinement.
+       <br>
+       Therefore this functionality is off by default. However, in order to use
        the new feature of anisotropic refinement to full extend, this flag should
        be set explicitly.
-		 <br>
-		 Note, that for reasons of backwards compatibility this flag is NOT
-       included in the general
-       <code>MeshSmoothing</code>::<code>maximum_smoothing</code> flag.
+       <br>
+       Note, that for reasons of backwards compatibility this flag is
+       NOT included in the general <code>MeshSmoothing::maximum_smoothing</code>
+       flag.
        <br> 
        (Tobias Leicht 2006/06/28)
        </p>
 
   <li> <p>
-       New: There is now a new <code
-       class="class">TriaObjectAccessor</code>::<code
-       class="member">clear_refine_case</code> function.
+       New: There is now a new
+       TriaObjectAccessor::clear_refinement_case function.
        <br> 
        (RH 2005/12/19)
        </p>
 
   <li> <p>
-       Extended: The <code
-       class="class">CellAccessor&lt;dim&gt;</code>::<code
-       class="member">neighbor_of_neighbor</code> function is now
-       extended to anisotropic refinement.
+       Extended: The CellAccessor::neighbor_of_neighbor function is
+       now extended to anisotropic refinement.
        <br> 
        (RH 2005/12/15)
        </p>
 
   <li> <p>
        Extended (internal): Lines on <code>level>0</code> have always
-       been stored pairwise. In order to allow the creation of
-       single interior lines we now also allow storage of single lines. The
-       <code class="class">TriangulationLevel&lt;1&gt;</code>::<code
-       class="member">reserve_space</code> function now takes an
-       additional <code>n_consecutive_lines</code> parameter which
-       allows to create new single as well as pairs for lines
-       (<code>n_consecutive_lines=1</code> or
+       been stored pairwise. In order to allow the creation of single
+       interior lines we now also allow storage of single lines. The
+       <tt>TriangulationLevel<1>::reserve_space</tt> function
+       now takes an additional <code>n_consecutive_lines</code>
+       parameter which allows to create new single as well as pairs
+       for lines <code>n_consecutive_lines=1</code> or
        <code>n_consecutive_lines=2</code>, respectively.
        <br> 
        (RH 2005/12/15)
@@ -359,18 +292,17 @@ refinement.
   <li> <p>
        Changed: When allowing anisotropic refinement it cannot be
        guaranteed that all children of a cell are stored in
-       consecutive components of the <code>quads.quads</code> or the
-       <code>hexes.hexes</code> vector, respectively. It is only known
-       that children are stored at least in pairs. Therefore, it is
-       not sufficient any more to store the index of the first child
-       of a cell, only. Now the indices of every second child, i.e. of
-       the even numbered children, must be stored.  For this, the
-       <code>cell-></code><code class="member">set_children</code>
-       function now has a new argument representing the number of the
-       child for which the index shall be set. This function can only
-       be called for even numbered children. The same applies to the
-       <code>face-></code><code class="member">set_children</code>
-       function.
+       consecutive components of the TriaLevel::cells vector,
+       respectively. It is only known that children are stored at
+       least in pairs. Therefore, it is not sufficient any more to
+       store the index of the first child of a cell, only. Now the
+       indices of every second child, i.e. of the even numbered
+       children, must be stored.  For this, the
+       TriaObjectAccessor::set_children function for cells now has a
+       new argument representing the number of the child for which the
+       index shall be set. This function can only be called for even
+       numbered children. The same applies to the respective function
+       for faces.
        <br> 
        Finally, we note that these functions are for internal use,
        only.
@@ -379,12 +311,10 @@ refinement.
        </p>
 
   <li> <p>
-       Changed: The <code>cell-></code><code
-       class="member">refine_flag_set</code> function now returns a
-       <code>RefineCase::Type</code> argument instead of a boolean. Be
-       aware, that you now still can ask
-       <code>if(!cell->refine_flag_set())</code> ,
-       <code>if(cell->refine_flag_set()==false)</code> and
+       Changed: The CellAccessor::refine_flag_set function now returns
+       a RefinementCase argument instead of a boolean. Be aware, that
+       you now still can ask <code>if(!cell->refine_flag_set())</code>
+       , <code>if(cell->refine_flag_set()==false)</code> and
        <code>if(cell->refine_flag_set())</code> , but you cannot ask
        <code>if(cell->refine_flag_set()==true)</code> any more.
        <br>
@@ -392,71 +322,64 @@ refinement.
        </p>
 
   <li> <p>
-       Extended: The <code>cell-></code><code
-       class="member">set_refine_flag</code> function now has a new
-       <code>RefineCase::Type</code> argument which defaults to <code
-       class="class">GeometryInfo&lt;dim&gt;</code>::<code
-       class="member">isotropic_refinement</code>.
+       Extended: The CellAccessor::set_refine_flag function now has a
+       new RefinementCase argument which defaults to
+       <tt>GeometryInfo<dim>::isotropic_refinement</tt>.
        <br>
        (RH 2005/03/03)
        </p>
 
   <li> <p>
-       New: There is now a new enum <code>RefineCase::Type</code>
-       defined in <code>geometry_info.h</code>, which allows to
-       describe all possible (anisotropic and isotropic) refinement
-       cases in (1,) 2 and 3 dimensions.
+       New: There is now a new class RefinementCase defined in
+       <code>geometry_info.h</code>, which allows to describe all
+       possible (anisotropic and isotropic) refinement cases in (1,) 2
+       and 3 dimensions.
        <br> 
        (RH 2005/02/26)
        </p>
 
   <li> <p>
-       New: There is now a new <code
-       class="class">TriaObjectAccessor</code>::<code
-       class="member">n_children</code> function which returns the
-       number of children of the cell or face it was invoked for.
+       New: There is now a new TriaObjectAccessor::n_children function
+       which returns the number of children of the cell or face it was
+       invoked for.
        <br> 
        (RH 2005/02/26)
        </p>
 
   <li> <p>
-       New: There is now a new <code
-       class="class">TriaObjectAccessor</code>::<code
-       class="member">refine_case</code> function which returns the
-       <code>RefineCase::Type</code> a cell or face is refined with.
+       New: There is now a new TriaObjectAccessor::refinement_case
+       function which returns the RefinementCase a cell or face is
+       refined with.
        <br> 
        (RH 2005/02/26)
        </p>
 
   <li> <p>
-       New: There is now a new <code
-       class="class">TriaObjectAccessor</code>::<code
-       class="member">set_refine_case</code> function. This function
-       is mainly for internal use (required by <code
-       class="class">Triangulation</code>::<code
-       class="member">execute_coarsening_and_refinement</code>). It is
-       not provided for <code>dim=1</code> as there the refinement
-       case defaults to isotropic refinement.
-       <br> 
+       New (for internal use only): There is now a new
+       TriaObjectAccessor::set_refinement_case function. This function
+       is mainly for internal use (required by
+       Triangulation::execute_coarsening_and_refinement). It is not
+       provided for <code>dim=1</code> as there the refinement case
+       defaults to isotropic refinement.
+       <br>
+       Note, that users should still use the
+       CellAccessor::set_refine_flag function for setting the
+       RefinementCase of cells to be refined within the next
+       Triangulation::execute_coarsening_and_refinement function.
+       <br>
        (RH 2005/02/26)
        </p>
 
   <li> <p>
-       New: New <code>vector&lt;RefineCase::Type&gt;
-       refine_cases</code> vectors have been introduced in <code
-       class="class">TriangulationLevel&lt;2&gt;::QuadsData</code> and
-       <code
-       class="class">TriangulationLevel&lt;3&gt;::HexesData</code>. For
-       memory efficiency (but with a penalty on run-time) they might
-       be replaced by <code>vector&lt;vector&lt;bool&gt; &gt; (dim,
-       vector&lt;bool&gt; (n_quads/n_hexes))</code>, later.
+
+       New: New <code>vector@<RefinementCase@> refinement_cases</code>
+       vectors have been introduced in TriaObjects. For memory
+       efficiency (but with a penalty on run-time) they might be
+       replaced by <code>vector@<vector@<bool@> @> (dim, vector@<bool@>
+       (n_quads/n_hexes))</code>, later.
        <br> 
        (RH 2005/02/26)
        </p>
 </ol>
 
-<hr>
-Last update $Date$
-
-</body>
-</html>
+*/

@@ -108,6 +108,14 @@ MappingQ1<1>::compute_shapes_virtual (const std::vector<Point<1> > &unit_points,
 	  data.derivative(k,0)[0] = -1.;
 	  data.derivative(k,1)[0] = 1.;
 	}
+      if (data.shape_second_derivatives.size()!=0)
+	{
+	  Assert(data.shape_second_derivatives.size()==n_shape_functions*n_points,
+		 ExcInternalError());
+	  data.second_derivative(k,0)[0][0] = 0;
+	  data.second_derivative(k,1)[0][0] = 0;
+	}
+
     }
 }
 
@@ -148,6 +156,27 @@ MappingQ1<2>::compute_shapes_virtual (const std::vector<Point<2> > &unit_points,
 	  data.derivative(k,1)[1] = -x;
 	  data.derivative(k,2)[1] = (1.-x);
 	  data.derivative(k,3)[1] = x;
+	}
+      if (data.shape_second_derivatives.size()!=0)
+	{
+	  Assert(data.shape_second_derivatives.size()==n_shape_functions*n_points,
+		 ExcInternalError());
+	  data.second_derivative(k,0)[0][0] = 0;
+	  data.second_derivative(k,1)[0][0] = 0;
+	  data.second_derivative(k,2)[0][0] = 0;
+	  data.second_derivative(k,3)[0][0] = 0;
+	  data.second_derivative(k,0)[0][1] = 1.;
+	  data.second_derivative(k,1)[0][1] = -1.;
+	  data.second_derivative(k,2)[0][1] = -1.;
+	  data.second_derivative(k,3)[0][1] = 1.;
+	  data.second_derivative(k,0)[1][0] = 1.;
+	  data.second_derivative(k,1)[1][0] = -1.;
+	  data.second_derivative(k,2)[1][0] = -1.;
+	  data.second_derivative(k,3)[1][0] = 1.;
+	  data.second_derivative(k,0)[1][1] = 0;
+	  data.second_derivative(k,1)[1][1] = 0;
+	  data.second_derivative(k,2)[1][1] = 0;
+	  data.second_derivative(k,3)[1][1] = 0;
 	}
     }
 }
@@ -211,6 +240,86 @@ MappingQ1<3>::compute_shapes_virtual (const std::vector<Point<3> > &unit_points,
 	  data.derivative(k,6)[2] = (1.-x)*y;
 	  data.derivative(k,7)[2] = x*y;
 	}
+      if (data.shape_second_derivatives.size()!=0)
+	{
+	  Assert(data.shape_second_derivatives.size()==n_shape_functions*n_points,
+		 ExcInternalError());
+	  data.second_derivative(k,0)[0][0] = 0;
+	  data.second_derivative(k,1)[0][0] = 0;
+	  data.second_derivative(k,2)[0][0] = 0;
+	  data.second_derivative(k,3)[0][0] = 0;
+	  data.second_derivative(k,4)[0][0] = 0;
+	  data.second_derivative(k,5)[0][0] = 0;
+	  data.second_derivative(k,6)[0][0] = 0;
+	  data.second_derivative(k,7)[0][0] = 0;
+	  data.second_derivative(k,0)[1][1] = 0;
+	  data.second_derivative(k,1)[1][1] = 0;
+	  data.second_derivative(k,2)[1][1] = 0;
+	  data.second_derivative(k,3)[1][1] = 0;
+	  data.second_derivative(k,4)[1][1] = 0;
+	  data.second_derivative(k,5)[1][1] = 0;
+	  data.second_derivative(k,6)[1][1] = 0;
+	  data.second_derivative(k,7)[1][1] = 0;
+	  data.second_derivative(k,0)[2][2] = 0;
+	  data.second_derivative(k,1)[2][2] = 0;
+	  data.second_derivative(k,2)[2][2] = 0;
+	  data.second_derivative(k,3)[2][2] = 0;
+	  data.second_derivative(k,4)[2][2] = 0;
+	  data.second_derivative(k,5)[2][2] = 0;
+	  data.second_derivative(k,6)[2][2] = 0;
+	  data.second_derivative(k,7)[2][2] = 0;
+
+	  data.second_derivative(k,0)[0][1] = (1.-z);
+	  data.second_derivative(k,1)[0][1] = -(1.-z);
+	  data.second_derivative(k,2)[0][1] = -(1.-z);
+	  data.second_derivative(k,3)[0][1] = (1.-z);
+	  data.second_derivative(k,4)[0][1] = z;
+	  data.second_derivative(k,5)[0][1] = -z;
+	  data.second_derivative(k,6)[0][1] = -z;
+	  data.second_derivative(k,7)[0][1] = z;
+	  data.second_derivative(k,0)[1][0] = (1.-z);
+	  data.second_derivative(k,1)[1][0] = -(1.-z);
+	  data.second_derivative(k,2)[1][0] = -(1.-z);
+	  data.second_derivative(k,3)[1][0] = (1.-z);
+	  data.second_derivative(k,4)[1][0] = z;
+	  data.second_derivative(k,5)[1][0] = -z;
+	  data.second_derivative(k,6)[1][0] = -z;
+	  data.second_derivative(k,7)[1][0] = z;
+
+	  data.second_derivative(k,0)[0][2] = (1.-y);
+	  data.second_derivative(k,1)[0][2] = -(1.-y);
+	  data.second_derivative(k,2)[0][2] = y;
+	  data.second_derivative(k,3)[0][2] = -y;
+	  data.second_derivative(k,4)[0][2] = -(1.-y);
+	  data.second_derivative(k,5)[0][2] = (1.-y);
+	  data.second_derivative(k,6)[0][2] = -y;
+	  data.second_derivative(k,7)[0][2] = y;
+	  data.second_derivative(k,0)[2][0] = (1.-y);
+	  data.second_derivative(k,1)[2][0] = -(1.-y);
+	  data.second_derivative(k,2)[2][0] = y;
+	  data.second_derivative(k,3)[2][0] = -y;
+	  data.second_derivative(k,4)[2][0] = -(1.-y);
+	  data.second_derivative(k,5)[2][0] = (1.-y);
+	  data.second_derivative(k,6)[2][0] = -y;
+	  data.second_derivative(k,7)[2][0] = y;
+	  
+	  data.second_derivative(k,0)[1][2] = (1.-x);
+	  data.second_derivative(k,1)[1][2] = x;
+	  data.second_derivative(k,2)[1][2] = -(1.-x);
+	  data.second_derivative(k,3)[1][2] = -x;
+	  data.second_derivative(k,4)[1][2] = -(1.-x);
+	  data.second_derivative(k,5)[1][2] = -x;
+	  data.second_derivative(k,6)[1][2] = (1.-x);
+	  data.second_derivative(k,7)[1][2] = x;
+	  data.second_derivative(k,0)[2][1] = (1.-x);
+	  data.second_derivative(k,1)[2][1] = x;
+	  data.second_derivative(k,2)[2][1] = -(1.-x);
+	  data.second_derivative(k,3)[2][1] = -x;
+	  data.second_derivative(k,4)[2][1] = -(1.-x);
+	  data.second_derivative(k,5)[2][1] = -x;
+	  data.second_derivative(k,6)[2][1] = (1.-x);
+	  data.second_derivative(k,7)[2][1] = x;
+	}
     }
 }
 
@@ -232,7 +341,9 @@ MappingQ1<dim>::update_once (const UpdateFlags in) const
 	    | update_contravariant_transformation
 	    | update_JxW_values
 	    | update_boundary_forms
-	    | update_normal_vectors))
+	    | update_normal_vectors
+	    | update_jacobians
+	    | update_jacobian_grads))
     out |= update_transformation_gradients;
 
   return out;
@@ -252,7 +363,9 @@ MappingQ1<dim>::update_each (const UpdateFlags in) const
 				      | update_JxW_values
 				      | update_cell_JxW_values
 				      | update_boundary_forms
-				      | update_normal_vectors));
+				      | update_normal_vectors
+				      | update_jacobians
+				      | update_jacobian_grads));
 
 				   // add a few flags. note that some
 				   // flags appear in both conditions
@@ -280,6 +393,8 @@ MappingQ1<dim>::update_each (const UpdateFlags in) const
   
       if (out & (update_covariant_transformation
 		 | update_JxW_values
+		 | update_jacobians
+		 | update_jacobian_grads
 		 | update_boundary_forms
 		 | update_normal_vectors))
 	out |= update_contravariant_transformation;
@@ -325,6 +440,9 @@ MappingQ1<dim>::compute_data (const UpdateFlags      update_flags,
   if (flags & update_contravariant_transformation)
     data.contravariant.resize(n_original_q_points);
 
+  if (flags & update_jacobian_grads)
+    data.shape_second_derivatives.resize(data.n_shape_functions * n_q_points);
+  
   compute_shapes (q.get_points(), data);
 }
 
@@ -488,14 +606,7 @@ MappingQ1<dim>::compute_fill (const typename Triangulation<dim>::cell_iterator &
 		data.contravariant.end(),
 		Tensor<2,dim>());
     }
-  
-  if (update_flags & update_jacobian_grads)
-    {
-      Assert(false, ExcNotImplemented());
-//      Assert (covariant_grads.size () == n_q_points,
-//	      ExcDimensionMismatch(covariant_grads.size(), n_q_points));
-    }
-  
+
 				   // if necessary, recompute the
 				   // support points of the
 				   // transformation of this cell
@@ -530,10 +641,10 @@ MappingQ1<dim>::compute_fill (const typename Triangulation<dim>::cell_iterator &
       for (unsigned int k=0; k<data.n_shape_functions; ++k)
         for (unsigned int i=0; i<dim; ++i)
           for (unsigned int j=0; j<dim; ++j)
-            data.contravariant[point][i][j]
-              += (data.derivative(point+data_set, k)[j]
-                  *
-                  data.mapping_support_points[k][i]);
+	    data.contravariant[point][i][j]
+	      += (data.derivative(point+data_set, k)[j]
+		  *
+		  data.mapping_support_points[k][i]);
 
 				       // invert contravariant for
 				       // covariant transformation
@@ -564,7 +675,9 @@ MappingQ1<dim>::fill_fe_values (const typename Triangulation<dim>::cell_iterator
 				const Quadrature<dim>                &q,
 				typename Mapping<dim>::InternalDataBase      &mapping_data,
 				std::vector<Point<dim> >                  &quadrature_points,
-				std::vector<double>                       &JxW_values) const
+				std::vector<double>                       &JxW_values,
+				std::vector<Tensor<2,dim> >               &jacobians,
+				std::vector<Tensor<3,dim> >               &jacobian_grads) const
 {
   InternalData *data_ptr = dynamic_cast<InternalData *> (&mapping_data);
   Assert(data_ptr!=0, ExcInternalError());
@@ -589,6 +702,38 @@ MappingQ1<dim>::fill_fe_values (const typename Triangulation<dim>::cell_iterator
 	JxW_values[point]
 	  = determinant(data.contravariant[point])*weights[point];
     }
+
+				   // copy values from InternalData to vector
+				   // given by reference
+  if (update_flags & update_jacobians)
+    {      
+      Assert (jacobians.size() == n_q_points,
+	      ExcDimensionMismatch(jacobians.size(), n_q_points));
+      for (unsigned int point=0; point<n_q_points; ++point)
+	jacobians[point]
+	  = data.contravariant[point];
+    }
+				   // calculate values of the derivatives of the
+				   // Jacobians. do it here, since we only do it
+				   // for cells, not faces.
+  if (update_flags & update_jacobian_grads)
+    {
+      Assert (jacobian_grads.size() == n_q_points,
+	      ExcDimensionMismatch(jacobian_grads.size(), n_q_points));
+      std::fill(jacobian_grads.begin(),
+		jacobian_grads.end(),
+		Tensor<3,dim>());
+
+      for (unsigned int point=0; point<n_q_points; ++point)
+	for (unsigned int k=0; k<data.n_shape_functions; ++k)
+	  for (unsigned int i=0; i<dim; ++i)
+	    for (unsigned int j=0; j<dim; ++j)
+	      for (unsigned int l=0; l<dim; ++l)
+		jacobian_grads[point][i][j][l]
+		  += (data.second_derivative(point+DataSetDescriptor::cell (), k)[j][l]
+		      *
+		      data.mapping_support_points[k][i]);
+    }
 }
 
 
@@ -597,7 +742,7 @@ template <int dim>
 void
 MappingQ1<dim>::compute_fill_face (const typename Triangulation<dim>::cell_iterator &cell,
 				   const unsigned int      face_no,
-				   const bool              is_subface,
+				   const unsigned int      subface_no,
 				   const unsigned int      n_q_points,
 				   const DataSetDescriptor data_set,
 				   const std::vector<double>   &weights,
@@ -675,8 +820,12 @@ MappingQ1<dim>::compute_fill_face (const typename Triangulation<dim>::cell_itera
 	    if (update_flags & update_JxW_values)
 	      {
 		JxW_values[i] = f * weights[i];
-		if (is_subface)
-		  JxW_values[i] /= GeometryInfo<dim>::subfaces_per_face;
+		if (subface_no!=deal_II_numbers::invalid_unsigned_int)
+		  {
+		    const double area_ratio=GeometryInfo<dim>::subface_ratio(
+		      cell->subface_case(face_no), subface_no);
+		    JxW_values[i] *= area_ratio;
+		  }
 	      }
 	    if (update_flags & update_normal_vectors)
               normal_vectors[i] = boundary_forms[i] / f;
@@ -720,7 +869,7 @@ MappingQ1<dim>::fill_fe_face_values (const typename Triangulation<dim>::cell_ite
 
   const unsigned int n_q_points = q.size();
   
-  compute_fill_face (cell, face_no, false,
+  compute_fill_face (cell, face_no, deal_II_numbers::invalid_unsigned_int,
 		     n_q_points,
 		     DataSetDescriptor::face (face_no,
                                               cell->face_orientation(face_no),
@@ -756,13 +905,14 @@ MappingQ1<dim>::fill_fe_subface_values (const typename Triangulation<dim>::cell_
 
   const unsigned int n_q_points = q.size();
   
-  compute_fill_face (cell, face_no, true,
+  compute_fill_face (cell, face_no, sub_no,
 		     n_q_points,
 		     DataSetDescriptor::subface (face_no, sub_no,
 						 cell->face_orientation(face_no),
 						 cell->face_flip(face_no),
 						 cell->face_rotation(face_no),
-						 n_q_points),
+						 n_q_points,
+						 cell->subface_case(face_no)),
 		     q.get_weights(),
 		     data,
 		     quadrature_points,
@@ -779,7 +929,7 @@ template <>
 void
 MappingQ1<1>::compute_fill_face (const Triangulation<1>::cell_iterator &,
 				 const unsigned int,
-				 const bool,
+				 const unsigned int,
 				 const unsigned int,
 				 const DataSetDescriptor,
 				 const std::vector<double> &,

@@ -1311,7 +1311,7 @@ assemble_cross_group_rhs_recursive (const EnergyGroup<dim>                      
                                    // cell that has children replaced
                                    // by one of its children:
   else
-    for (unsigned int child=0; child<GeometryInfo<dim>::children_per_cell;++child)
+    for (unsigned int child=0; child<GeometryInfo<dim>::max_children_per_cell;++child)
       {
 	FullMatrix<double>   new_matrix (fe.dofs_per_cell, fe.dofs_per_cell);
 	fe.get_prolongation_matrix(child).mmult (new_matrix,

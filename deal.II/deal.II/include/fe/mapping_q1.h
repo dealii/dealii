@@ -152,6 +152,22 @@ class MappingQ1 : public Mapping<dim>
 				   const unsigned int shape_nr);
 
 					 /**
+					  * Second derivative of shape
+					  * function in quadrature
+					  * point. See above.
+					  */
+	Tensor<2,dim> second_derivative (const unsigned int qpoint,
+					 const unsigned int shape_nr) const;
+
+					 /**
+					  * Second derivative of shape
+					  * function in quadrature
+					  * point. See above.
+					  */
+	Tensor<2,dim> &second_derivative (const unsigned int qpoint,
+					  const unsigned int shape_nr);
+
+					 /**
 					  * Return an estimate (in
 					  * bytes) or the memory
 					  * consumption of this
@@ -178,6 +194,16 @@ class MappingQ1 : public Mapping<dim>
 	std::vector<Tensor<1,dim> > shape_derivatives;
 	
 					 /**
+					  * Values of shape function
+					  * second derivatives. Access
+					  * by function
+					  * @p second_derivative.
+					  *
+					  * Computed once.
+					  */
+	std::vector<Tensor<2,dim> > shape_second_derivatives;
+	
+					 /**
 					  * Tensors of covariant
 					  * transformation at each of
 					  * the quadrature points. The
@@ -199,7 +225,7 @@ class MappingQ1 : public Mapping<dim>
 					  * contravariant matrix is
 					  * the Jacobian of the
 					  * transformation,
-					  * i.e. $J_ij=dx_i/d\hat x_j$.
+					  * i.e. $J_{ij}=dx_i/d\hat x_j$.
 					  *
 					  * Computed on each cell.
 					  */
@@ -281,7 +307,9 @@ class MappingQ1 : public Mapping<dim>
 		    const Quadrature<dim>& quadrature,
 		    typename Mapping<dim>::InternalDataBase &mapping_data,
 		    typename std::vector<Point<dim> >       &quadrature_points,
-		    std::vector<double>             &JxW_values) const ;
+		    std::vector<double>             &JxW_values,
+		    std::vector<Tensor<2,dim> >     &jacobians,
+		    std::vector<Tensor<3,dim> >     &jacobian_grads) const ;
 
 				     /**
 				      * Implementation of the interface in
@@ -375,7 +403,7 @@ class MappingQ1 : public Mapping<dim>
 				      */
     void compute_fill_face (const typename Triangulation<dim>::cell_iterator &cell,
 			    const unsigned int      face_no,
-			    const bool              is_subface,
+			    const unsigned int      subface_no,
 			    const unsigned int      npts,
 			    const DataSetDescriptor data_set,
 			    const std::vector<double>   &weights,
@@ -652,6 +680,32 @@ MappingQ1<dim>::InternalData::derivative (const unsigned int qpoint,
 }
 
 
+template <int dim>
+inline
+Tensor<2,dim>
+MappingQ1<dim>::InternalData::second_derivative (const unsigned int qpoint,
+						 const unsigned int shape_nr) const
+{
+  Assert(qpoint*n_shape_functions + shape_nr < shape_second_derivatives.size(),
+	 ExcIndexRange(qpoint*n_shape_functions + shape_nr, 0,
+		       shape_second_derivatives.size()));
+  return shape_second_derivatives [qpoint*n_shape_functions + shape_nr];
+}
+
+
+
+template <int dim>
+inline
+Tensor<2,dim> &
+MappingQ1<dim>::InternalData::second_derivative (const unsigned int qpoint,
+						 const unsigned int shape_nr)
+{
+  Assert(qpoint*n_shape_functions + shape_nr < shape_second_derivatives.size(),
+	 ExcIndexRange(qpoint*n_shape_functions + shape_nr, 0,
+		       shape_second_derivatives.size()));
+  return shape_second_derivatives [qpoint*n_shape_functions + shape_nr];
+}
+
 
 
 
@@ -679,7 +733,7 @@ MappingQ1<1>::compute_face_data (const UpdateFlags,
 template <> void MappingQ1<1>::compute_fill_face (
   const Triangulation<1>::cell_iterator &,
   const unsigned int,
-  const bool,
+  const unsigned int,
   const unsigned int,
   const DataSetDescriptor,
   const std::vector<double> &,

@@ -20,6 +20,7 @@
 #include <lac/petsc_vector.h>
 #include <lac/petsc_block_vector.h>
 #include <grid/tria_iterator.h>
+#include <grid/grid_tools.h>
 #include <dofs/dof_accessor.h>
 #include <dofs/dof_handler.h>
 #include <fe/fe.h>
@@ -740,7 +741,7 @@ approximate_cell (const Mapping<dim>                            &mapping,
 				   // active neighbors
   std::vector<typename DH<dim>::active_cell_iterator> active_neighbors;
   active_neighbors.reserve (GeometryInfo<dim>::faces_per_cell *
-			    GeometryInfo<dim>::subfaces_per_face);
+			    GeometryInfo<dim>::max_children_per_face);
 
 				       // vector
 				       // g=sum_i y_i (f(x+y_i)-f(x))/|y_i|
@@ -776,57 +777,8 @@ approximate_cell (const Mapping<dim>                            &mapping,
 				       // first collect all neighbor
 				       // cells in a vector, and then
 				       // collect the data from them
-      active_neighbors.clear ();
-      for (unsigned int n=0; n<GeometryInfo<dim>::faces_per_cell; ++n)
-	if (! cell->at_boundary(n))
-	  {
-	    typename DH<dim>::cell_iterator
-	      neighbor = cell->neighbor(n);
-	    if (neighbor->active())
-	      active_neighbors.push_back (neighbor);
-	    else
-	      {
-						 // check children
-						 // of
-						 // neighbor. note
-						 // that in 1d
-						 // children of
-						 // the neighbor
-						 // may be further
-						 // refined, while
-						 // they can't in
-						 // more than one
-						 // dimension. however,
-						 // in 1d the case
-						 // is simpler
-						 // since we know
-						 // what children
-						 // bound to the
-						 // present cell
-		if (dim == 1)
-		  {
-		    typename DH<dim>::cell_iterator
-		      neighbor_child = neighbor;
-		    while (neighbor_child->has_children())
-		      neighbor_child = neighbor_child->child (n==0 ? 1 : 0);
-		    
-		    Assert (neighbor_child->neighbor(n==0 ? 1 : 0)==cell,
-			    ExcInternalError());
-		    
-		    active_neighbors.push_back (neighbor_child);
-		  }
-		else
-						   // this neighbor has
-						   // children. find out
-						   // which border to the
-						   // present cell
-		  for (unsigned int c=0; c<neighbor->n_children(); ++c)
-		    for (unsigned int f=0; f<GeometryInfo<dim>::faces_per_cell; ++f)
-		      if (neighbor->child(c)->neighbor(f) == cell)
-			  active_neighbors.push_back (neighbor->child(c));
-	      };
-	  };
-
+      GridTools::template get_active_neighbors<DH<dim> >(cell, active_neighbors);
+      
 				       // now loop over all active
 				       // neighbors and collect the
 				       // data we need
@@ -1034,7 +986,6 @@ DerivativeApproximation::
 derivative_norm(const Tensor<3,deal_II_dimension> &derivative);
 
 
-
 // static variables
 // 
 // on AIX, the linker is unhappy about some missing symbols. they
@@ -1047,7 +998,6 @@ DerivativeApproximation::Gradient<deal_II_dimension>::update_flags;
 template
 const UpdateFlags
 DerivativeApproximation::SecondDerivative<deal_II_dimension>::update_flags;
-
 template
 const UpdateFlags
 DerivativeApproximation::ThirdDerivative<deal_II_dimension>::update_flags;

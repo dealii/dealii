@@ -8,6 +8,10 @@ made to the three sub-libraries <a href="#base">base</a>,
 <a href="#lac">lac</a>, and <a href="#deal.II">deal.II</a>, as well as
 changes to the <a href="#general">general infrastructure,
 documentation, etc</a>.
+<br>
+Furthermore, all changes which have been performed en route to
+extending deal.II from isotropic to anisotropic refinement are listed
+in this <a href="anisotropic_changes.html">list</a>.
 </p>
 
 <p>

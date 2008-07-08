@@ -1124,7 +1124,7 @@ FE_Q<3>::initialize_constraints ()
 				       // lines 9-16
       for (unsigned int face=0; face<GeometryInfo<dim-1>::faces_per_cell; ++face)
 	for (unsigned int subface=0;
-	     subface<GeometryInfo<dim-1>::subfaces_per_face; ++subface)
+	     subface<GeometryInfo<dim-1>::max_children_per_face; ++subface)
 	  {
 	    QProjector<dim-1>::project_to_subface(qline, face, subface, p_line);
 	    constraint_points.insert(constraint_points.end(),
@@ -1139,7 +1139,7 @@ FE_Q<3>::initialize_constraints ()
 	  inner_points[i++] = Point<dim-1> (ix*step, iy*step);
       
       for (unsigned int child=0; 
-	   child<GeometryInfo<dim-1>::children_per_cell; ++child)
+	   child<GeometryInfo<dim-1>::max_children_per_cell; ++child)
 	for (unsigned int i=0; i<inner_points.size(); ++i)
 	  constraint_points.push_back (
 	    GeometryInfo<dim-1>::child_to_cell_coordinates(inner_points[i], child));
@@ -1269,6 +1269,8 @@ template <int dim>
 void
 FE_Q<dim>::initialize_embedding ()
 {
+  unsigned int iso=RefinementCase<dim>::isotropic_refinement-1;
+
 				   // compute the interpolation
 				   // matrices in much the same way as
 				   // we do for the constraints. it's
@@ -1282,10 +1284,10 @@ FE_Q<dim>::initialize_embedding ()
   const std::vector<unsigned int> &index_map=
     this->poly_space.get_numbering();
   
-  for (unsigned int child=0; child<GeometryInfo<dim>::children_per_cell; ++child)
-    this->prolongation[child].reinit (this->dofs_per_cell,
-				      this->dofs_per_cell);
-  for (unsigned int child=0; child<GeometryInfo<dim>::children_per_cell; ++child)
+  for (unsigned int child=0; child<GeometryInfo<dim>::max_children_per_cell; ++child)
+    this->prolongation[iso][child].reinit (this->dofs_per_cell,
+					   this->dofs_per_cell);
+  for (unsigned int child=0; child<GeometryInfo<dim>::max_children_per_cell; ++child)
     {
       for (unsigned int j=0; j<this->dofs_per_cell; ++j)
 	{
@@ -1378,15 +1380,15 @@ FE_Q<dim>::initialize_embedding ()
 				       // of the identity matrix and
 				       // its inverse is also its
 				       // transpose
-      subcell_interpolation.Tmmult (this->prolongation[child],
+      subcell_interpolation.Tmmult (this->prolongation[iso][child],
                                     cell_interpolation);
 
 					 // cut off very small values
 					 // here
       for (unsigned int i=0; i<this->dofs_per_cell; ++i)
 	for (unsigned int j=0; j<this->dofs_per_cell; ++j)
-	  if (std::fabs(this->prolongation[child](i,j)) < 2e-13*this->degree*dim)
-	    this->prolongation[child](i,j) = 0.;
+	  if (std::fabs(this->prolongation[iso][child](i,j)) < 2e-13*this->degree*dim)
+	    this->prolongation[iso][child](i,j) = 0.;
 
 				       // and make sure that the row
 				       // sum is 1. this must be so
@@ -1396,7 +1398,7 @@ FE_Q<dim>::initialize_embedding ()
 	{
 	  double sum = 0;
 	  for (unsigned int col=0; col<this->dofs_per_cell; ++col)
-	    sum += this->prolongation[child](row,col);
+	    sum += this->prolongation[iso][child](row,col);
 	  Assert (std::fabs(sum-1.) < 2e-13*this->degree*this->degree*dim,
 		  ExcInternalError());
 	}
@@ -1409,6 +1411,8 @@ template <int dim>
 void
 FE_Q<dim>::initialize_restriction ()
 {
+  unsigned int iso=RefinementCase<dim>::isotropic_refinement-1;
+
                                    // for these Lagrange interpolation
                                    // polynomials, construction of the
                                    // restriction matrices is
@@ -1454,8 +1458,8 @@ FE_Q<dim>::initialize_restriction ()
                                    // one child) by the same value
                                    // (compute on a later child), so
                                    // we don't have to care about this
-  for (unsigned int c=0; c<GeometryInfo<dim>::children_per_cell; ++c)
-    this->restriction[c].reinit (this->dofs_per_cell, this->dofs_per_cell);
+  for (unsigned int c=0; c<GeometryInfo<dim>::max_children_per_cell; ++c)
+    this->restriction[iso][c].reinit (this->dofs_per_cell, this->dofs_per_cell);
   for (unsigned int i=0; i<this->dofs_per_cell; ++i)
     {
       const Point<dim> p_cell
@@ -1487,13 +1491,13 @@ FE_Q<dim>::initialize_restriction ()
                                        // then find the children on
                                        // which the interpolation
                                        // point is located
-      for (unsigned int child=0; child<GeometryInfo<dim>::children_per_cell;
+      for (unsigned int child=0; child<GeometryInfo<dim>::max_children_per_cell;
            ++child)
         {
                                            // first initialize this
                                            // column of the matrix
           for (unsigned int j=0; j<this->dofs_per_cell; ++j)
-            this->restriction[child](mother_dof, j) = 0.;
+            this->restriction[iso][child](mother_dof, j) = 0.;
 
                                            // then check whether this
                                            // interpolation point is
@@ -1528,7 +1532,7 @@ FE_Q<dim>::initialize_restriction ()
                                                // it, set the
                                                // corresponding value
                                                // in the matrix
-              this->restriction[child](mother_dof, child_dof) = 1.;
+              this->restriction[iso][child](mother_dof, child_dof) = 1.;
             }
         }
     }

@@ -16,6 +16,7 @@
 
 #include <base/config.h>
 #include <base/exceptions.h>
+#include <base/geometry_info.h>
 #include <grid/tria_iterator_base.h>
 
 
@@ -68,6 +69,10 @@ namespace TriaAccessorExceptions
 				   /**
 				    * @ingroup Exceptions
 				    */
+  DeclException0 (ExcCellNotActive);
+				   /**
+				    * @ingroup Exceptions
+				    */
   DeclException1 (ExcInvalidNeighbor,
 		  int,
 		  << "Neighbor indices must be between 0 and 2^dim-1, but "
@@ -116,6 +121,13 @@ namespace TriaAccessorExceptions
 				    * @ingroup Exceptions
 				    */
   DeclException0 (ExcFacesHaveNoLevel);
+				   /**
+				    * @ingroup Exceptions
+				    */
+  DeclException1 (ExcSetOnlyEvenChildren,
+		  int,
+		  << "You can only set the child index of an even numbered child."
+		  << "The number of the child given was " << arg1 << ".");    
 }
 
 
@@ -771,6 +783,42 @@ class TriaObjectAccessor :  public TriaAccessor<celldim,dim>
 				      * function.
 				      */
     void recursively_clear_user_index () const;
+
+				     /**
+				      * Return the @p RefinementCase<dim>
+				      * of this cell.
+				      */
+    RefinementCase<celldim> refinement_case() const;
+
+				     /**
+				      * Set the @p RefinementCase<dim> this
+				      * TriaObject is refined with.
+				      * Not defined for
+				      * <tt>celldim=1</tt> as lines
+				      * are always refined resulting
+				      * in 2 children lines (isotropic
+				      * refinement).
+				      *
+				      * You should know quite exactly
+				      * what you are doing if you
+				      * touch this function. It is
+				      * exclusively for internal use
+				      * in the library.
+				      */
+    void set_refinement_case (const RefinementCase<celldim> &ref_case) const;
+
+				     /**
+				      * Clear the RefinementCase<dim> of
+				      * this TriaObject, i.e. reset it
+				      * to RefinementCase<dim>::no_refinement.
+				      *
+				      * You should know quite exactly
+				      * what you are doing if you
+				      * touch this function. It is
+				      * exclusively for internal use
+				      * in the library.
+				      */
+    void clear_refinement_case () const;
 				     /*@}*/
     
 				     /**
@@ -779,6 +827,17 @@ class TriaObjectAccessor :  public TriaAccessor<celldim,dim>
 				      */
     TriaIterator<dim,TriaObjectAccessor<celldim,dim> >
     child (const unsigned int i) const;
+
+				     /**
+				      *  Pointer to the @p object, which is
+				      *  identical to the ith child for
+				      *  isotropic refinement. If the object is
+				      *  refined anisotropically, the returned
+				      *  child will in fact be a grandchild of
+				      *  the object.
+				      */
+    TriaIterator<dim,TriaObjectAccessor<celldim,dim> >
+    isotropic_child (const unsigned int i) const;
 
 				     /**
 				      *  Index of the @p ith child.
@@ -793,17 +852,31 @@ class TriaObjectAccessor :  public TriaAccessor<celldim,dim>
     int child_index (const unsigned int i) const;
 
 				     /**
-				      *  Set the child field. Since we
-				      *  only store the index of the
-				      *  first child (the others
-				      *  follow directly) only one
-				      *  child index is to be
-				      *  given. The level of the child
-				      *  is one level up of the level
-				      *  of the cell to which this
-				      *  iterator points.
+				      *  Index of the @p ith isotropic_child.
+				      *  The level of the (grand-)child is 
+				      *  higher than that of the
+				      *  present cell, if the children
+				      *  of a cell are accessed. The
+				      *  children of faces have no level.
+				      *  If the child does not exist, -1
+				      *  is returned.
 				      */
-    void set_children (const int index) const;
+    int isotropic_child_index (const unsigned int i) const;
+
+				     /**
+				      *  Set the index of the ith
+				      *  child. Since the children
+				      *  come at least in pairs, we
+				      *  need to store the index of
+				      *  only every second child,
+				      *  i.e. of the even numbered
+				      *  children. Make sure, that the
+				      *  index of child i=0 is set
+				      *  first. Calling this function
+				      *  for odd numbered children is
+				      *  not allowed.
+				      */
+    void set_children (const unsigned int i, const int index) const;
 	
 				     /**
 				      *  Clear the child field,
@@ -829,6 +902,22 @@ class TriaObjectAccessor :  public TriaAccessor<celldim,dim>
 				      * <tt>has_children()==true</tt>.
 				      */
     unsigned int n_children() const;
+    
+				     /**
+				      * Return the index of the vertex
+				      * in the middle of this object,
+				      * if it exists. In order to
+				      * exist, the object needs to be
+				      * refined - for 2D and 3D it
+				      * needs to be refined
+				      * isotropically or else the
+				      * anisotropic children have to
+				      * be refined again. If the
+				      * middle vertex does not exist,
+				      * return
+				      * <tt>numbers::invalid_unsigned_int</tt>.
+				      */
+    unsigned int middle_vertex_index() const;
 
 				     /**
 				      * Number of times that this
@@ -985,9 +1074,9 @@ class TriaObjectAccessor :  public TriaAccessor<celldim,dim>
 				      * which are not further
 				      * refined. Thus, if all of the
 				      * eight children of a hex are
-				      * further refined exactly once,
-				      * the returned number will be
-				      * 64, not 80.
+				      * further refined isotropically
+				      * exactly once, the returned
+				      * number will be 64, not 80.
 				      *
 				      * If the present cell is not refined,
 				      * one is returned.
@@ -1423,6 +1512,12 @@ class TriaObjectAccessor<1, dim> :  public TriaAccessor<1,dim>
 				      * <tt>A *a=static_cast<A*>(cell->user_pointer());</tt>.
 				      */
     void * user_pointer () const;
+
+				     /**
+				      * Return the @p RefinementCase<dim>
+				      * of this cell.
+				      */
+    RefinementCase<1> refinement_case() const;
     
 				     /**
 				      * Set the user index
@@ -1479,6 +1574,16 @@ class TriaObjectAccessor<1, dim> :  public TriaAccessor<1,dim>
     child (const unsigned int i) const;
 
 				     /**
+				      *  Pointer to the @p object, which is
+				      *  identical to the ith child for
+				      *  isotropic refinement. For lines this
+				      *  does exactly the same as
+				      *  <tt>child(i)</tt>.
+				      */
+    TriaIterator<dim,TriaObjectAccessor<1,dim> >
+    isotropic_child (const unsigned int i) const;
+
+				     /**
 				      *  Return the index of the
 				      *  @p ith child.  The level of
 				      *  the child is one higher than
@@ -1492,12 +1597,30 @@ class TriaObjectAccessor<1, dim> :  public TriaAccessor<1,dim>
     int child_index (const unsigned int i) const;
 
 				     /**
-				      *  Set the child field. Since we
-				      *  only store the index of the
-				      *  first child (the others
-				      *  follow directly) only one
-				      *  child index is to be
-				      *  given. The level of the child
+				      *  Index of the @p ith isotropic_child.
+				      *  The level of the (grand-)child is 
+				      *  higher than that of the
+				      *  present cell, if the children
+				      *  of a cell are accessed. The
+				      *  children of faces have no level.
+				      *  If the child does not exist, -1
+				      *  is returned.
+				      */
+    int isotropic_child_index (const unsigned int i) const;
+
+				     /**
+				      *  Set the index of the ith
+				      *  child. Since the children
+				      *  come at least in pairs, we
+				      *  need to store the index of
+				      *  only every second child,
+				      *  i.e. of the even numbered
+				      *  children. Make sure, that the
+				      *  index of child i=0 is set
+				      *  first. Calling this function
+				      *  for odd numbered children is
+				      *  not allowed.
+				      *  The level of the child
 				      *  is one level up of the level
 				      *  of the cell to which this
 				      *  iterator points if
@@ -1505,7 +1628,7 @@ class TriaObjectAccessor<1, dim> :  public TriaAccessor<1,dim>
 				      *  Otherwise the line and its children
 				      *  have no level.
 				      */
-    void set_children (const int index) const;
+    void set_children (const unsigned int i, const int index) const;
 	
 				     /**
 				      *  Clear the child field,
@@ -1531,6 +1654,22 @@ class TriaObjectAccessor<1, dim> :  public TriaAccessor<1,dim>
 				      * <tt>has_children()==true</tt>.
 				      */
     unsigned int n_children() const;
+
+				     /**
+				      * Return the index of the vertex
+				      * in the middle of this object,
+				      * if it exists. In order to
+				      * exist, the object needs to be
+				      * refined - for 2D and 3D it
+				      * needs to be refined
+				      * isotropically or else the
+				      * anisotropic children have to
+				      * be refined again. If the
+				      * middle vertex does not exist,
+				      * return
+				      * <tt>numbers::invalid_unsigned_int</tt>.
+				      */
+    unsigned int middle_vertex_index() const;
 
 				     /**
 				      * Return the number of times
@@ -2128,10 +2267,53 @@ class TriaObjectAccessor<2, dim> :  public TriaAccessor<2,dim>
 				      */
     void recursively_clear_user_index () const;
 				     /**
+
+				      * Return the @p RefinementCase<dim>
+				      * of this cell.
+				      */
+    RefinementCase<2> refinement_case() const;
+
+				     /**
+				      * Set the @p RefinementCase<dim> this
+				      * TriaObject is refined with.
+				      *
+				      * You should know quite exactly
+				      * what you are doing if you
+				      * touch this function. It is
+				      * exclusively for internal use
+				      * in the library.
+				      */
+    void set_refinement_case (const RefinementCase<2> &refinement_case) const;
+
+				     /**
+				      * Clear the RefinementCase<dim> of
+				      * this TriaObject, i.e. reset it
+				      * to RefinementCase<dim>::no_refinement.
+				      *
+				      * You should know quite exactly
+				      * what you are doing if you
+				      * touch this function. It is
+				      * exclusively for internal use
+				      * in the library.
+				      */
+    void clear_refinement_case () const;
+
+				     /**
 				      *  Return a pointer to the @p ith
 				      *  child.
 				      */
     TriaIterator<dim,TriaObjectAccessor<2, dim> > child (const unsigned int i) const;
+
+				     /**
+				      *  Pointer to the @p object, which is
+				      *  identical to the ith child for
+				      *  isotropic refinement. If the object is
+				      *  refined anisotropically, the returned
+				      *  child will in fact be a grandchild of
+				      *  the object.
+				      */
+    TriaIterator<dim,TriaObjectAccessor<2,dim> >
+    isotropic_child (const unsigned int i) const;
 
 				     /**
 				      *  Return the index of the
@@ -2147,17 +2329,31 @@ class TriaObjectAccessor<2, dim> :  public TriaAccessor<2,dim>
     int child_index (const unsigned int i) const;
 
 				     /**
-				      *  Set the child field. Since we
-				      *  only store the index of the
-				      *  first child (the others
-				      *  follow directly) only one
-				      *  child index is to be
-				      *  given. The level of the child
-				      *  is one level up of the level
-				      *  of the cell to which this
-				      *  iterator points.
+				      *  Index of the @p ith isotropic_child.
+				      *  The level of the (grand-)child is 
+				      *  higher than that of the
+				      *  present cell, if the children
+				      *  of a cell are accessed. The
+				      *  children of faces have no level.
+				      *  If the child does not exist, -1
+				      *  is returned.
 				      */
-    void set_children (const int index) const;
+    int isotropic_child_index (const unsigned int i) const;
+
+				     /**
+				      *  Set the index of the ith
+				      *  child. Since the children
+				      *  come at least in pairs, we
+				      *  need to store the index of
+				      *  only every second child,
+				      *  i.e. of the even numbered
+				      *  children. Make sure, that the
+				      *  index of child i=0 is set
+				      *  first. Calling this function
+				      *  for odd numbered children is
+				      *  not allowed.
+				      */
+    void set_children (const unsigned int i, const int index) const;
 	
 				     /**
 				      *  Clear the child field,
@@ -2183,6 +2379,22 @@ class TriaObjectAccessor<2, dim> :  public TriaAccessor<2,dim>
 				      * <tt>has_children()==true</tt>.
 				      */
     unsigned int n_children() const;
+
+				     /**
+				      * Return the index of the vertex
+				      * in the middle of this object,
+				      * if it exists. In order to
+				      * exist, the object needs to be
+				      * refined - for 2D and 3D it
+				      * needs to be refined
+				      * isotropically or else the
+				      * anisotropic children have to
+				      * be refined again. If the
+				      * middle vertex does not exist,
+				      * return
+				      * <tt>numbers::invalid_unsigned_int</tt>.
+				      */
+    unsigned int middle_vertex_index() const;
 
 				     /**
 				      * Return the number of times
@@ -2379,9 +2591,10 @@ class TriaObjectAccessor<2, dim> :  public TriaAccessor<2,dim>
 				      * number if quads which are not
 				      * further refined. Thus, if all
 				      * of the four children of a quad
-				      * are further refined exactly
-				      * once, the returned number will
-				      * be 16, not 20.
+				      * are further refined
+				      * isotropically exactly once,
+				      * the returned number will be
+				      * 16, not 20.
 				      *
 				      * If the present cell is not
 				      * refined, one is returned.
@@ -2837,11 +3050,53 @@ class TriaObjectAccessor<3, dim> :  public TriaAccessor<3,dim>
     void recursively_clear_user_index () const;
     
 				     /**
+				      * Return the @p RefinementCase<dim>
+				      * of this cell.
+				      */
+    RefinementCase<3> refinement_case() const;
+
+				     /**
+				      * Set the @p RefinementCase<dim> this
+				      * TriaObject is refined with.
+				      *
+				      * You should know quite exactly
+				      * what you are doing if you
+				      * touch this function. It is
+				      * exclusively for internal use
+				      * in the library.
+				      */
+    void set_refinement_case (const RefinementCase<3> &ref_case) const;
+
+				     /**
+				      * Clear the RefinementCase<dim> of
+				      * this TriaObject, i.e. reset it
+				      * to RefinementCase<dim>::no_refinement.
+				      *
+				      * You should know quite exactly
+				      * what you are doing if you
+				      * touch this function. It is
+				      * exclusively for internal use
+				      * in the library.
+				      */
+    void clear_refinement_case () const;
+
+				     /**
 				      *  Return a pointer to the
 				      *  @p ith child.
 				      */
     TriaIterator<dim,TriaObjectAccessor<3, dim> >
     child (const unsigned int i) const;
+
+				     /**
+				      *  Pointer to the @p object, which is
+				      *  identical to the ith child for
+				      *  isotropic refinement. If the object is
+				      *  refined anisotropically, the returned
+				      *  child will in fact be a grandchild of
+				      *  the object.
+				      */
+    TriaIterator<dim,TriaObjectAccessor<3,dim> >
+    isotropic_child (const unsigned int i) const;
 
 				     /**
 				      *  Return the index of the
@@ -2854,17 +3109,31 @@ class TriaObjectAccessor<3, dim> :  public TriaAccessor<3,dim>
     int child_index (const unsigned int i) const;
 
 				     /**
-				      *  Set the child field. Since we
-				      *  only store the index of the
-				      *  first child (the others
-				      *  follow directly) only one
-				      *  child index is to be
-				      *  given. The level of the child
-				      *  is one level up of the level
-				      *  of the cell to which this
-				      *  iterator points.
+				      *  Index of the @p ith isotropic_child.
+				      *  The level of the (grand-)child is 
+				      *  higher than that of the
+				      *  present cell, if the children
+				      *  of a cell are accessed. The
+				      *  children of faces have no level.
+				      *  If the child does not exist, -1
+				      *  is returned.
 				      */
-    void set_children (const int index) const;
+    int isotropic_child_index (const unsigned int i) const;
+
+				     /**
+				      *  Set the index of the ith
+				      *  child. Since the children
+				      *  come at least in pairs, we
+				      *  need to store the index of
+				      *  only every second child,
+				      *  i.e. of the even numbered
+				      *  children. Make sure, that the
+				      *  index of child i=0 is set
+				      *  first. Calling this function
+				      *  for odd numbered children is
+				      *  not allowed.
+				      */
+    void set_children (const unsigned int i, const int index) const;
 	
 				     /**
 				      *  Clear the child field,
@@ -2890,6 +3159,22 @@ class TriaObjectAccessor<3, dim> :  public TriaAccessor<3,dim>
 				      * <tt>has_children()==true</tt>.
 				      */
     unsigned int n_children() const;
+
+				     /**
+				      * Return the index of the vertex
+				      * in the middle of this object,
+				      * if it exists. In order to
+				      * exist, the object needs to be
+				      * refined - for 2D and 3D it
+				      * needs to be refined
+				      * isotropically or else the
+				      * anisotropic children have to
+				      * be refined again. If the
+				      * middle vertex does not exist,
+				      * return
+				      * <tt>numbers::invalid_unsigned_int</tt>.
+				      */
+    unsigned int middle_vertex_index() const;
 
 				     /**
 				      * Return the number of times
@@ -3068,9 +3353,10 @@ class TriaObjectAccessor<3, dim> :  public TriaAccessor<3,dim>
 				      * number if hexs which are not
 				      * further refined. Thus, if all
 				      * of the eight children of a hex
-				      * are further refined exactly
-				      * once, the returned number will
-				      * be 64, not 80.
+				      * are further refined
+				      * isotropically exactly once,
+				      * the returned number will be
+				      * 64, not 80.
 				      *
 				      * If the present cell is not
 				      * refined, one is returned.
@@ -3345,9 +3631,9 @@ class CellAccessor :  public TriaObjectAccessor<dim,dim>
 				      * Return the how-many'th
 				      * neighbor this cell is of
 				      * <tt>cell->neighbor(neighbor)</tt>,
-				      * i.e. return the number @p n
+				      * i.e. return the @p face_no
 				      * such that
-				      * <tt>cell->neighbor(neighbor)->neighbor(n)==cell</tt>. This
+				      * <tt>cell->neighbor(neighbor)->neighbor(face_no)==cell</tt>. This
 				      * function is the right one if
 				      * you want to know how to get
 				      * back from a neighbor to the
@@ -3355,32 +3641,69 @@ class CellAccessor :  public TriaObjectAccessor<dim,dim>
 				      *
 				      * Note that this operation is
 				      * only useful if the neighbor is
-				      * not on a coarser level than
-				      * the present cell
-				      * (i.e. <tt>cell->neighbor(neighbor)->level()</tt>
-				      * needs to be equal to
-				      * <tt>cell->level()</tt>. Use the
-				      * @p neighbor_of_coarser_neighbor
+				      * not coarser than the present
+				      * cell. If the neighbor is
+				      * coarser this function throws
+				      * an exception. Use the @p
+				      * neighbor_of_coarser_neighbor
 				      * function in that case.
 				      */
     unsigned int neighbor_of_neighbor (const unsigned int neighbor) const;
+
+				     /**
+				      * Return, whether the neighbor
+				      * is coarser then the present
+				      * cell. This is important in
+				      * case of ansiotropic
+				      * refinement where this
+				      * information does not depend on
+				      * the levels of the cells.
+				      *
+				      * Note, that in an anisotropic
+				      * setting, a cell can only be
+				      * coarser than another one at a
+				      * given face, not on a general
+				      * basis. The face of the finer
+				      * cell is contained in the
+				      * corresponding face of the
+				      * coarser cell, the finer face
+				      * is either a child or a
+				      * grandchild of the coarser
+				      * face.
+				      */
+    bool neighbor_is_coarser (const unsigned int neighbor) const;
     
 				     /**
-				      * This function is a
-				      * generalization of the
-				      * @p neighbor_of_neighbor
-				      * function for the case of a
-				      * coarser neighbor. It returns a
-				      * pair of numbers, face_no and
-				      * subface_no, with the following
-				      * property:
+				      * This function is a generalization of the
+				      * @p neighbor_of_neighbor function for the
+				      * case of a coarser neighbor. It returns a
+				      * pair of numbers, face_no and subface_no,
+				      * with the following property, if the
+				      * neighbor is not refined:
 				      * <tt>cell->neighbor(neighbor)->neighbor_child_on_subface(face_no,subface_no)==cell</tt>.
+				      * In 3D, a coarser neighbor can still be
+				      * refined. In that case subface_no denotes the child index of the neighbors face that relates to our face:
+				      * <tt>cell->neighbor(neighbor)->face(face_no)->child(subface_no)==cell->face(neighbor)</tt>.
+				      * This case in 3d and how it can happen
+				      * is discussed in the introduction of the
+				      * @ref step_30 "step-30" tutorial program.
 				      *
 				      * This function is impossible
 				      * for <tt>dim==1</tt>.
 				      */
     std::pair<unsigned int, unsigned int>
     neighbor_of_coarser_neighbor (const unsigned int neighbor) const;
+    
+				     /**
+				      * This function is a generalization of the
+				      * @p neighbor_of_neighbor and the @p
+				      * neighbor_of_coarser_neighbor
+				      * functions. It checks whether the
+				      * neighbor is coarser or not and calls the
+				      * respective function. In both cases, only
+				      * the face_no is returned.
+				      */
+    unsigned int neighbor_face_no (const unsigned int neighbor) const;
     
 				     /**
 				      *  Return whether the @p ith
@@ -3428,24 +3751,66 @@ class CellAccessor :  public TriaObjectAccessor<dim,dim>
     bool has_boundary_lines () const;
 
 				     /**
-				      *  Return whether the refinement
-				      *  flag is set or not.
+				      *  Return the @p
+				      *  RefinementCase<dim> this cell
+				      *  was flagged to be refined
+				      *  with.
 				      */
-    bool refine_flag_set () const;
+    RefinementCase<dim> refine_flag_set () const;
 
 				     /**
-				      *  Flag the cell pointed to fo
+				      *  Flag the cell pointed to for
 				      *  refinement. This function is
 				      *  only allowed for active
 				      *  cells.
 				      */
-    void set_refine_flag () const;
+    void set_refine_flag (const RefinementCase<dim> ref_case = RefinementCase<dim>::isotropic_refinement) const;
 
 				     /**
 				      *  Clear the refinement flag.
 				      */
     void clear_refine_flag () const;
 
+				     /**
+				      *  Modify the refinement flag of the cell
+				      *  to ensure (at least) the given
+				      *  refinement case @p face_refinement_case at
+				      *  face <tt>face_no</tt>, taking into
+				      *  account orientation, flip and rotation
+				      *  of the face. Return, whether the
+				      *  refinement flag had to be
+				      *  modified. This function is only allowed
+				      *  for active cells.
+				      */
+    bool flag_for_face_refinement (const unsigned int face_no,
+				   const RefinementCase<dim-1> &face_refinement_case=RefinementCase<dim-1>::isotropic_refinement) const;
+
+				     /**
+				      *  Modify the refinement flag of the cell
+				      *  to ensure that line <tt>face_no</tt>
+				      *  will be refined. Return, whether the
+				      *  refinement flag had to be
+				      *  modified. This function is only allowed
+				      *  for active cells.
+				      */
+    bool flag_for_line_refinement (const unsigned int line_no) const;
+
+				     /**
+				      * Return the SubfaceCase of face
+				      * <tt>face_no</tt>. Note that this is not
+				      * identical to asking
+				      * <tt>cell->face(face_no)->refinement_case()</tt>
+				      * since the latter returns a RefinementCase<dim-1>
+				      * and thus only considers one
+				      * (anisotropic) refinement, whereas this
+				      * function considers the complete
+				      * refinement situation including possible
+				      * refinement of the face's children. This
+				      * function may only be called for active
+				      * cells in 2d and 3d.
+				      */
+    internal::SubfaceCase<dim> subface_case(const unsigned int face_no) const;
+    
 				     /**
 				      *  Return whether the coarsen flag
 				      *  is set or not.
@@ -3527,7 +3892,7 @@ class CellAccessor :  public TriaObjectAccessor<dim,dim>
                                       * for the index of the
                                       * child.
                                       *
-                                      * However, the function is more
+                                      * However, the situation is more
                                       * complicated in 3d, since there faces may
                                       * have more than one orientation, and we
                                       * have to use @p face_orientation, @p
@@ -3554,8 +3919,7 @@ class CellAccessor :  public TriaObjectAccessor<dim,dim>
                                       * necessarily the @p sf-th child
                                       * of the face of this cell. This
                                       * is so because the @p
-                                      * subface_no parameter to this
-                                      * function corresponds to the
+                                      * subface_no on a cell corresponds to the
                                       * subface with respect to the
                                       * intrinsic ordering of the
                                       * present cell, whereas children
@@ -3572,12 +3936,22 @@ class CellAccessor :  public TriaObjectAccessor<dim,dim>
 				      * of which indicate a non-standard face
 				      * have to be considered.
                                       *
-                                      * Fortunately, this is only very rarely
-                                      * of concern, since one is usually only
-                                      * concerned either in the exact number
-                                      * of a subface, or in the cell that is
-                                      * behind it, not in both at the same
-                                      * time.
+                                      * Fortunately, this is only very rarely of
+                                      * concern, since usually one simply wishes
+                                      * to loop over all finer neighbors at a
+                                      * given face of an active cell. Only in
+                                      * the process of refinement of a
+                                      * Triangulation we want to set neighbor
+                                      * information for both our child cells and
+                                      * the neighbor's children. Since we can
+                                      * respect orientation of faces from our
+                                      * current cell in that case, we do NOT
+                                      * respect face_orientation, face_flip and
+                                      * face_rotation of the present cell within
+                                      * this function, i.e. the returned
+                                      * neighbor's child is behind subface @p
+                                      * subface concerning the intrinsic
+                                      * ordering of the given face.
                                       */
     TriaIterator<dim,CellAccessor<dim> >
     neighbor_child_on_subface (const unsigned int face_no,
@@ -3663,6 +4037,42 @@ class CellAccessor :  public TriaObjectAccessor<dim,dim>
 				      * @ingroup Exceptions
 				      */
     DeclException0 (ExcCellFlaggedForCoarsening);
+    
+  protected:
+    				     /**
+				      * This function assumes that the
+				      * neighbor is not coarser than
+				      * the current cell. In this case
+				      * it returns the
+				      * neighbor_of_neighbor() value.
+				      * If, however, the neighbor is
+				      * coarser this function returns
+				      * an
+				      * <code>invalid_unsigned_int</code>.
+				      *
+				      * This function is not for
+				      * public use. Use the function
+				      * neighbor_of_neighbor() instead
+				      * which throws an exception if
+				      * called for a coarser
+				      * neighbor. If neighbor is
+				      * indeed coarser (you get to
+				      * know this by e.g. the
+				      * neighbor_is_coarser()
+				      * function) then the
+				      * neighbor_of_coarser_neighbor()
+				      * function should be call. If
+				      * you'd like to know only the
+				      * <code>face_no</code> which is
+				      * required to get back from the
+				      * neighbor to the present cell
+				      * then simply use the
+				      * neighbor_face_no() function
+				      * which can be used for coarser
+				      * as well as noncoarser
+				      * neighbors.
+				      */
+    unsigned int neighbor_of_neighbor_internal (const unsigned int neighbor) const;
     
   private:
     

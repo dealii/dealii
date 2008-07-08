@@ -35,6 +35,7 @@
 #include <fe/fe.h>
 #include <fe/fe_update_flags.h>
 #include <fe/mapping.h>
+#include <fe/mapping_q.h>
 #include <multigrid/mg_dof_handler.h>
 #include <multigrid/mg_dof_accessor.h>
 
@@ -556,6 +557,18 @@ class FEValuesData
 				      */
     std::vector<double>       JxW_values;
 
+				     /**
+				      * Array of the Jacobian matrices at the
+				      * quadrature points.
+				      */
+    std::vector<Tensor<2,dim> > jacobians;
+    
+				     /**
+				      * Array of the derivatives of the Jacobian
+				      * matrices at the quadrature points.
+				      */
+    std::vector<Tensor<3,dim> > jacobian_grads;
+    
 				     /**
 				      * Store an array of weights
 				      * times the Jacobi determinant
@@ -1590,6 +1603,36 @@ class FEValuesBase : protected FEValuesData<dim>,
 				      * the values returned by JxW().
 				      */
     const std::vector<double> & get_JxW_values () const;
+    
+				     /**
+				      * Return the Jacobian of the
+				      * transformation at the specified
+				      * quadrature point, i.e.
+				      * $J_{ij}=dx_i/d\hat x_j$
+				      */
+    const Tensor<2,dim> & jacobian (const unsigned int quadrature_point) const;
+
+				     /**
+				      * Pointer to the array holding
+				      * the values returned by jacobian().
+				      */
+    const std::vector<Tensor<2,dim> > & get_jacobians () const;
+
+    				     /**
+				      * Return the second derivative of the
+				      * transformation from unit to real cell,
+				      * i.e. the first derivative of the
+				      * Jacobian, at the specified quadrature
+				      * point, i.e. $G_{ijk}=dJ_{jk}/d\hat x_i$.
+				      */
+    const Tensor<3,dim> & jacobian_grad (const unsigned int quadrature_point) const;
+
+				     /**
+				      * Pointer to the array holding
+				      * the values returned by
+				      * jacobian_grads().
+				      */
+    const std::vector<Tensor<3,dim> > & get_jacobian_grads () const;
     
 				     /**
 				      * Constant reference to the
@@ -3975,6 +4018,28 @@ FEValuesBase<dim>::get_JxW_values () const
 
 template <int dim>
 inline
+const std::vector<Tensor<2,dim> >&
+FEValuesBase<dim>::get_jacobians () const
+{
+  Assert (this->update_flags & update_jacobians, ExcAccessToUninitializedField());
+  return this->jacobians;
+}
+
+
+
+template <int dim>
+inline
+const std::vector<Tensor<3,dim> >&
+FEValuesBase<dim>::get_jacobian_grads () const
+{
+  Assert (this->update_flags & update_jacobian_grads, ExcAccessToUninitializedField());
+  return this->jacobian_grads;
+}
+
+
+
+template <int dim>
+inline
 const Point<dim> &
 FEValuesBase<dim>::quadrature_point (const unsigned int i) const
 {
@@ -3996,6 +4061,32 @@ FEValuesBase<dim>::JxW (const unsigned int i) const
   Assert (i<this->JxW_values.size(), ExcIndexRange(i, 0, this->JxW_values.size()));
   
   return this->JxW_values[i];
+}
+
+
+
+template <int dim>
+inline
+const Tensor<2,dim> &
+FEValuesBase<dim>::jacobian (const unsigned int i) const
+{
+  Assert (this->update_flags & update_jacobians, ExcAccessToUninitializedField());
+  Assert (i<this->jacobians.size(), ExcIndexRange(i, 0, this->jacobians.size()));
+  
+  return this->jacobians[i];
+}
+
+
+
+template <int dim>
+inline
+const Tensor<3,dim> &
+FEValuesBase<dim>::jacobian_grad (const unsigned int i) const
+{
+  Assert (this->update_flags & update_jacobian_grads, ExcAccessToUninitializedField());
+  Assert (i<this->jacobian_grads.size(), ExcIndexRange(i, 0, this->jacobian_grads.size()));
+  
+  return this->jacobian_grads[i];
 }
 
 

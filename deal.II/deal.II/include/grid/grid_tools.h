@@ -2,7 +2,7 @@
 //    $Id$
 //    Version: $Name$
 //
-//    Copyright (C) 2001, 2002, 2003, 2004, 2005, 2006, 2007 by the deal.II authors
+//    Copyright (C) 2001, 2002, 2003, 2004, 2005, 2006, 2007, 2008 by the deal.II authors
 //
 //    This file is subject to QPL and may not be  distributed
 //    without copyright and license information. Please refer
@@ -426,7 +426,16 @@ class GridTools
     static
     std::vector<typename Container::active_cell_iterator>
     get_active_child_cells (const typename Container::cell_iterator &cell);
-    
+
+				     /**
+				      * Extract the active cells around a given
+				      * cell @p cell and return them in the
+				      * vector @p active_neighbors.
+				      */
+    template <class Container>
+    static void
+    get_active_neighbors (const typename Container::active_cell_iterator        &cell,
+			  std::vector<typename Container::active_cell_iterator> &active_neighbors);    
     
                                      /**
                                       * Use the METIS partitioner to generate
@@ -734,7 +743,7 @@ GridTools::get_active_child_cells (const typename DH::cell_iterator& cell)
   if (cell->has_children())
     {
       for (unsigned int child=0;
-	   child<GeometryInfo<DH::dimension>::children_per_cell; ++child)
+	   child<cell->n_children(); ++child)
 	if (cell->child (child)->has_children())
 	  {
 	    const std::vector<typename DH::active_cell_iterator>
@@ -748,6 +757,70 @@ GridTools::get_active_child_cells (const typename DH::cell_iterator& cell)
 
   return child_cells;
 }
+
+
+  
+#if deal_II_dimension == 1
+
+template <class Container>
+void
+GridTools::get_active_neighbors(const typename Container::active_cell_iterator        &cell,
+				std::vector<typename Container::active_cell_iterator> &active_neighbors)
+{
+  active_neighbors.clear ();
+  for (unsigned int n=0; n<GeometryInfo<1>::faces_per_cell; ++n)
+    if (! cell->at_boundary(n))
+      {
+					 // check children of neighbor. note
+					 // that in 1d children of the neighbor
+					 // may be further refined. In 1d the
+					 // case is simple since we know what
+					 // children bound to the present cell
+	typename Container::cell_iterator
+	  neighbor_child = cell->neighbor(n);
+	if (!neighbor_child->active())
+	  {
+	    while (neighbor_child->has_children())
+	      neighbor_child = neighbor_child->child (n==0 ? 1 : 0);
+	
+	    Assert (neighbor_child->neighbor(n==0 ? 1 : 0)==cell,
+		    ExcInternalError());
+	  }
+	active_neighbors.push_back (neighbor_child);
+      }
+}
+
+#else
+
+template <class Container>
+void
+GridTools::get_active_neighbors(const typename Container::active_cell_iterator        &cell,
+				std::vector<typename Container::active_cell_iterator> &active_neighbors)
+{
+  active_neighbors.clear ();
+  for (unsigned int n=0; n<GeometryInfo<Container::dimension>::faces_per_cell; ++n)
+    if (! cell->at_boundary(n))
+      {
+	if (cell->face(n)->has_children())
+					   // this neighbor has children. find
+					   // out which border to the present
+					   // cell
+	  for (unsigned int c=0; c<cell->face(n)->number_of_children(); ++c)
+	    active_neighbors.push_back (cell->neighbor_child_on_subface(n,c));
+	else
+	  {
+					     // the neighbor must be active
+					     // himself
+	    Assert(cell->neighbor(n)->active(), ExcInternalError());
+	    active_neighbors.push_back(cell->neighbor(n));
+	  }
+      }
+}
+
+
+#endif
+
+
 
 
 // declaration of explicit specializations

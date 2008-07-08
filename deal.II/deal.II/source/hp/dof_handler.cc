@@ -3508,30 +3508,25 @@ namespace hp
             {
                                                // ok, face has not been
                                                // visited. so we need to
-                                               // allocate space for
-                                               // it. let's see how much
-                                               // we need: we need one
-                                               // set if a) there is no
-                                               // neighbor behind this
-                                               // face, or b) the
-                                               // neighbor is not on the
-                                               // same level or further
-                                               // refined, or c) the
-                                               // neighbor is on the
-                                               // same level, but
-                                               // happens to have the
-                                               // same active_fe_index:
+                                               // allocate space for it. let's
+                                               // see how much we need: we need
+                                               // one set if a) there is no
+                                               // neighbor behind this face, or
+                                               // b) the neighbor is either
+                                               // coarser or finer than we are,
+                                               // or c) the neighbor is neither
+                                               // coarser nor finer, but has
+                                               // happens to have the same
+                                               // active_fe_index:
               if (cell->at_boundary(face)
                   ||
-                  (cell->neighbor(face)->level() < cell->level())
+                  cell->face(face)->has_children()
                   ||
-                  cell->neighbor(face)->has_children()
-                  ||
-                  ((cell->neighbor(face)->level() == cell->level())
-                   &&
-                   !cell->neighbor(face)->has_children()
-                   &&
-                   (cell->active_fe_index() == cell->neighbor(face)->active_fe_index())))
+		  cell->neighbor_is_coarser(face)
+		  ||
+		  (!cell->at_boundary(face)
+		   &&
+		   (cell->active_fe_index() == cell->neighbor(face)->active_fe_index())))
                                                  // ok, one set of
                                                  // dofs. that makes
                                                  // one index, 1 times
@@ -3593,15 +3588,13 @@ namespace hp
                                                // as before
               if (cell->at_boundary(face)
                   ||
-                  (cell->neighbor(face)->level() < cell->level())
+                  cell->face(face)->has_children()
                   ||
-                  cell->neighbor(face)->has_children()
-                  ||
-                  ((cell->neighbor(face)->level() == cell->level())
-                   &&
-                   !cell->neighbor(face)->has_children()
-                   &&
-                   (cell->active_fe_index() == cell->neighbor(face)->active_fe_index())))
+		  cell->neighbor_is_coarser(face)
+		  ||
+		  (!cell->at_boundary(face)
+		   &&
+		   (cell->active_fe_index() == cell->neighbor(face)->active_fe_index())))
                 {
                   faces
                     ->lines.dof_offsets[cell->face(face)->index()]
@@ -3879,15 +3872,13 @@ namespace hp
                                                // same active_fe_index:
               if (cell->at_boundary(face)
                   ||
-                  (cell->neighbor(face)->level() < cell->level())
+                  cell->face(face)->has_children()
                   ||
-                  cell->neighbor(face)->has_children()
-                  ||
-                  ((cell->neighbor(face)->level() == cell->level())
-                   &&
-                   !cell->neighbor(face)->has_children()
-                   &&
-                   (cell->active_fe_index() == cell->neighbor(face)->active_fe_index())))
+		  cell->neighbor_is_coarser(face)
+		  ||
+		  (!cell->at_boundary(face)
+		   &&
+		   (cell->active_fe_index() == cell->neighbor(face)->active_fe_index())))
                                                  // ok, one set of
                                                  // dofs. that makes
                                                  // one index, 1 times
@@ -3952,15 +3943,13 @@ namespace hp
                                                // as before
               if (cell->at_boundary(face)
                   ||
-                  (cell->neighbor(face)->level() < cell->level())
+                  cell->face(face)->has_children()
                   ||
-                  cell->neighbor(face)->has_children()
-                  ||
-                  ((cell->neighbor(face)->level() == cell->level())
-                   &&
-                   !cell->neighbor(face)->has_children()
-                   &&
-                   (cell->active_fe_index() == cell->neighbor(face)->active_fe_index())))
+		  cell->neighbor_is_coarser(face)
+		  ||
+		  (!cell->at_boundary(face)
+		   &&
+		   (cell->active_fe_index() == cell->neighbor(face)->active_fe_index())))
                 {
                   faces
                     ->quads.dof_offsets[cell->face(face)->index()]
@@ -4323,11 +4312,34 @@ namespace hp
   }
 
 
+
   template <int dim>
-  void DoFHandler<dim>::pre_refinement_notification (const Triangulation<dim> &)
+  void DoFHandler<dim>::pre_refinement_notification (const Triangulation<dim> &tria)
   {
     create_active_fe_table ();
+
+                                     // Remember if the cells have already
+                                     // children. That will make the transfer
+                                     // of the active_fe_index to the finer
+                                     // levels easier.
+    Assert (has_children.size () == 0, ExcInternalError ());
+    for (unsigned int i=0; i<levels.size(); ++i)
+      {
+	const unsigned int cells_on_level = tria.n_raw_cells(i);
+	std::vector<bool> *has_children_level =
+          new std::vector<bool> (cells_on_level);
+
+                                         // Check for each cell, if it has children.
+	std::transform (tria.levels[i]->cells.refinement_cases.begin (),
+			tria.levels[i]->cells.refinement_cases.end (),
+			has_children_level->begin (),
+			std::bind2nd (std::not_equal_to<unsigned char>(),
+				      static_cast<unsigned char>(RefinementCase<dim>::no_refinement)));
+
+	has_children.push_back (has_children_level);
+      }
   }
+
 
 
 #if deal_II_dimension == 1
@@ -4343,11 +4355,16 @@ namespace hp
     Assert (has_children.size () == 0, ExcInternalError ());
     for (unsigned int i=0; i<levels.size(); ++i)
       {
-	const unsigned int lines_on_level = tria.n_raw_lines(i);
+	const unsigned int cells_on_level = tria.n_raw_cells (i);
 	std::vector<bool> *has_children_level =
-          new std::vector<bool> (lines_on_level);
+          new std::vector<bool> (cells_on_level);
 
-                                         // Check for each cell, if it has children.
+                                         // Check for each cell, if it has
+                                         // children. here we cannot use
+                                         // refinement_cases, since it is unused in
+                                         // 1d (as there is only one choice
+                                         // anyway). use the 'children' vector
+                                         // instead
 	std::transform (tria.levels[i]->cells.children.begin (),
 			tria.levels[i]->cells.children.end (),
 			has_children_level->begin (),
@@ -4358,63 +4375,6 @@ namespace hp
   }
 #endif
 
-  
-#if deal_II_dimension == 2
-  template <>
-  void DoFHandler<2>::pre_refinement_notification (const Triangulation<2> &tria)
-  {
-    create_active_fe_table ();
-
-                                     // Remember if the cells have already
-                                     // children. That will make the transfer
-                                     // of the active_fe_index to the finer
-                                     // levels easier.
-    Assert (has_children.size () == 0, ExcInternalError ());
-    for (unsigned int i=0; i<levels.size(); ++i)
-      {
-	const unsigned int quads_on_level = tria.n_raw_quads (i);
-	std::vector<bool> *has_children_level =
-          new std::vector<bool> (quads_on_level);
-
-                                         // Check for each cell, if it has children.
-	std::transform (tria.levels[i]->cells.children.begin (),
-                        tria.levels[i]->cells.children.end (),
-                        has_children_level->begin (),
-                        std::bind2nd (std::not_equal_to<int>(), -1));
-
-	has_children.push_back (has_children_level);
-      }
-  }
-#endif
-
-#if deal_II_dimension == 3
-  template <>
-  void DoFHandler<3>::pre_refinement_notification (const Triangulation<3> &tria)
-  {
-    create_active_fe_table ();
-
-                                     // Remember if the cells have already
-                                     // children. That will make the transfer
-                                     // of the active_fe_index to the finer
-                                     // levels easier.
-    Assert (has_children.size () == 0, ExcInternalError ());
-    for (unsigned int i=0; i<levels.size(); ++i)
-      {
-	const unsigned int hexes_on_level = tria.n_raw_hexs(i);
-	std::vector<bool> *has_children_level =
-          new std::vector<bool> (hexes_on_level);
-
-                                         // Check for each cell, if it
-                                         // has children.
-	std::transform (tria.levels[i]->cells.children.begin (),
-			tria.levels[i]->cells.children.end (),
-			has_children_level->begin (),
-			std::bind2nd (std::not_equal_to<int>(), -1));
-
-	has_children.push_back (has_children_level);
-      }
-  }
-#endif
 
   template <int dim>
   void DoFHandler<dim>::post_refinement_notification (const Triangulation<dim> &tria)

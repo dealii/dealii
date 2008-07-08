@@ -2,7 +2,7 @@
 //    $Id$
 //    Version: $Name$
 //
-//    Copyright (C) 2003, 2004, 2005, 2006, 2007 by the deal.II authors
+//    Copyright (C) 2003, 2004, 2005, 2006, 2007, 2008 by the deal.II authors
 //
 //    This file is subject to QPL and may not be  distributed
 //    without copyright and license information. Please refer
@@ -166,13 +166,15 @@ void MGTransferBlockBase::build_matrices (
 	  {
 	    cell->get_mg_dof_indices (dof_indices_parent);
 
+	    Assert(cell->n_children()==GeometryInfo<dim>::max_children_per_cell,
+		   ExcNotImplemented());
 	    for (unsigned int child=0; child<cell->n_children(); ++child)
 	      {
 						 // set an alias to the
 						 // prolongation matrix for
 						 // this child
 		const FullMatrix<double> &prolongation
-		  = mg_dof.get_fe().get_prolongation_matrix (child);
+		  = mg_dof.get_fe().get_prolongation_matrix (child, cell->refinement_case());
 	    
 		cell->child(child)->get_mg_dof_indices (dof_indices_child);
 
@@ -203,13 +205,15 @@ void MGTransferBlockBase::build_matrices (
 	  {
 	    cell->get_mg_dof_indices (dof_indices_parent);
 
+	    Assert(cell->n_children()==GeometryInfo<dim>::max_children_per_cell,
+		   ExcNotImplemented());
 	    for (unsigned int child=0; child<cell->n_children(); ++child)
 	      {
 						 // set an alias to the
 						 // prolongation matrix for
 						 // this child
 		const FullMatrix<double> &prolongation
-		  = mg_dof.get_fe().get_prolongation_matrix (child);
+		  = mg_dof.get_fe().get_prolongation_matrix (child, cell->refinement_case());
 	    
 		cell->child(child)->get_mg_dof_indices (dof_indices_child);
 

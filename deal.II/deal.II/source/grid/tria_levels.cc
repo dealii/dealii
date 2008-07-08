@@ -39,7 +39,7 @@ namespace internal
           refine_flags.reserve (total_cells);
           refine_flags.insert (refine_flags.end(),
                                total_cells - refine_flags.size(),
-                               false);
+                               RefinementCase<dim>::no_refinement);
       
           coarsen_flags.reserve (total_cells);
           coarsen_flags.insert (coarsen_flags.end(),
@@ -70,8 +70,8 @@ namespace internal
                                        // they may over-allocate by up to
                                        // as many elements as an integer
                                        // has bits
-      Assert (refine_flags.size() <= refine_flags.capacity() + sizeof(int)*8 ||
-              refine_flags.size()<DEAL_II_MIN_BOOL_VECTOR_CAPACITY,
+      Assert (refine_flags.size() <=
+	      refine_flags.capacity()  + DEAL_II_MIN_VECTOR_CAPACITY,
               ExcMemoryWasted ("refine_flags",
                                refine_flags.size(), refine_flags.capacity()));
       Assert (coarsen_flags.size() <= coarsen_flags.capacity() + sizeof(int)*8 ||
@@ -97,10 +97,10 @@ namespace internal
     unsigned int
     TriaLevel<dim>::memory_consumption () const
     {
-      return (MemoryConsumption::memory_consumption (refine_flags) +
-              MemoryConsumption::memory_consumption (coarsen_flags) +
+      return (MemoryConsumption::memory_consumption (coarsen_flags) +
               MemoryConsumption::memory_consumption (neighbors) +
-              MemoryConsumption::memory_consumption (cells));
+              MemoryConsumption::memory_consumption (cells) +
+              MemoryConsumption::memory_consumption (refine_flags));
     }
 
 // This specialization should be only temporary, until the TriaObjects
@@ -123,7 +123,7 @@ namespace internal
           refine_flags.reserve (total_cells);
           refine_flags.insert (refine_flags.end(),
                                total_cells - refine_flags.size(),
-                               false);
+                               RefinementCase<3>::no_refinement);
       
           coarsen_flags.reserve (total_cells);
           coarsen_flags.insert (coarsen_flags.end(),
@@ -153,8 +153,8 @@ namespace internal
                                        // they may over-allocate by up to
                                        // as many elements as an integer
                                        // has bits
-      Assert (refine_flags.size() <= refine_flags.capacity() + sizeof(int)*8 ||
-              refine_flags.size()<DEAL_II_MIN_BOOL_VECTOR_CAPACITY,
+      Assert (refine_flags.size() <=
+	      refine_flags.capacity() + DEAL_II_MIN_VECTOR_CAPACITY,
               ExcMemoryWasted ("refine_flags",
                                refine_flags.size(), refine_flags.capacity()));
       Assert (coarsen_flags.size() <= coarsen_flags.capacity() + sizeof(int)*8 ||
@@ -179,10 +179,10 @@ namespace internal
     unsigned int
     TriaLevel<3>::memory_consumption () const
     {
-      return (MemoryConsumption::memory_consumption (refine_flags) +
-              MemoryConsumption::memory_consumption (coarsen_flags) +
+      return (MemoryConsumption::memory_consumption (coarsen_flags) +
               MemoryConsumption::memory_consumption (neighbors) +
-              MemoryConsumption::memory_consumption (cells));
+              MemoryConsumption::memory_consumption (cells) +
+              MemoryConsumption::memory_consumption (refine_flags));
     }
 
 #endif

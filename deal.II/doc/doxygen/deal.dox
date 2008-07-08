@@ -10,8 +10,9 @@ INPUT    = headers/ \
 	../../deal.II/include/multigrid \
 	../../deal.II/include/numerics \
 	tutorial/doxygen \
+	../news/changes.h \
 	../news/6.0.0-vs-6.1.0.h \
-	../news/changes.h
+	../news/anisotropic.html
 
 HTML_OUTPUT      = deal.II
 LATEX_OUTPUT     = LaTeX/deal.II
@@ -47,5 +48,6 @@ IMAGE_PATH             = images \
 			 ../../examples/step-27/doc \
 			 ../../examples/step-28/doc \
 			 ../../examples/step-29/doc \
+ 			 ../../examples/step-30/doc
 			 ../../examples/step-31/doc \
 			 ../../examples/step-33/doc 

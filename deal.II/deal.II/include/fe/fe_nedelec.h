@@ -350,7 +350,7 @@ class FE_Nedelec : public FiniteElement<dim>
 					  * fields.
 					  */
 	static const double * const
-	embedding[][GeometryInfo<dim>::children_per_cell];
+	embedding[][GeometryInfo<dim>::max_children_per_cell];
 
 					 /**
 					  * Number of elements (first
@@ -678,7 +678,7 @@ FE_Nedelec<3>::shape_grad_grad_component (const unsigned int ,
 #ifndef DEAL_II_MEMBER_VAR_SPECIALIZATION_BUG
 template <> 
 const double * const 
-FE_Nedelec<1>::Matrices::embedding[][GeometryInfo<1>::children_per_cell];
+FE_Nedelec<1>::Matrices::embedding[][GeometryInfo<1>::max_children_per_cell];
 
 template <>
 const unsigned int FE_Nedelec<1>::Matrices::n_embedding_matrices;
@@ -691,7 +691,7 @@ const unsigned int FE_Nedelec<1>::Matrices::n_constraint_matrices;
 
 template <> 
 const double * const 
-FE_Nedelec<2>::Matrices::embedding[][GeometryInfo<2>::children_per_cell];
+FE_Nedelec<2>::Matrices::embedding[][GeometryInfo<2>::max_children_per_cell];
 
 template <>
 const unsigned int FE_Nedelec<2>::Matrices::n_embedding_matrices;
@@ -704,7 +704,7 @@ const unsigned int FE_Nedelec<2>::Matrices::n_constraint_matrices;
 
 template <> 
 const double * const 
-FE_Nedelec<3>::Matrices::embedding[][GeometryInfo<3>::children_per_cell];
+FE_Nedelec<3>::Matrices::embedding[][GeometryInfo<3>::max_children_per_cell];
 
 template <>
 const unsigned int FE_Nedelec<3>::Matrices::n_embedding_matrices;

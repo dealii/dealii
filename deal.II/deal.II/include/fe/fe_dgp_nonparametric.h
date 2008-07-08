@@ -419,7 +419,7 @@ class FE_DGPNonparametric : public FiniteElement<dim>
 					  * polynomial degree starting
 					  * from constant elements
 					  */
-	static const double * const embedding[][GeometryInfo<dim>::children_per_cell];
+	static const double * const embedding[][GeometryInfo<dim>::max_children_per_cell];
 
 					 /**
 					  * Number of elements (first
@@ -436,7 +436,7 @@ class FE_DGPNonparametric : public FiniteElement<dim>
 					  * As @p embedding but for
 					  * projection matrices.
 					  */
-	static const double * const projection_matrices[][GeometryInfo<dim>::children_per_cell];
+	static const double * const projection_matrices[][GeometryInfo<dim>::max_children_per_cell];
 
 					 /**
 					  * As
@@ -614,37 +614,37 @@ class FE_DGPNonparametric : public FiniteElement<dim>
 // compiler allows us to do that (the standard says we must)
 #ifndef DEAL_II_MEMBER_VAR_SPECIALIZATION_BUG
 template <> 
-const double * const FE_DGPNonparametric<1>::Matrices::embedding[][GeometryInfo<1>::children_per_cell];
+const double * const FE_DGPNonparametric<1>::Matrices::embedding[][GeometryInfo<1>::max_children_per_cell];
 
 template <>
 const unsigned int FE_DGPNonparametric<1>::Matrices::n_embedding_matrices;
 
 template <>
-const double * const FE_DGPNonparametric<1>::Matrices::projection_matrices[][GeometryInfo<1>::children_per_cell];
+const double * const FE_DGPNonparametric<1>::Matrices::projection_matrices[][GeometryInfo<1>::max_children_per_cell];
 
 template <>
 const unsigned int FE_DGPNonparametric<1>::Matrices::n_projection_matrices;
 
 template <> 
-const double * const FE_DGPNonparametric<2>::Matrices::embedding[][GeometryInfo<2>::children_per_cell];
+const double * const FE_DGPNonparametric<2>::Matrices::embedding[][GeometryInfo<2>::max_children_per_cell];
 
 template <>
 const unsigned int FE_DGPNonparametric<2>::Matrices::n_embedding_matrices;
 
 template <>
-const double * const FE_DGPNonparametric<2>::Matrices::projection_matrices[][GeometryInfo<2>::children_per_cell];
+const double * const FE_DGPNonparametric<2>::Matrices::projection_matrices[][GeometryInfo<2>::max_children_per_cell];
 
 template <>
 const unsigned int FE_DGPNonparametric<2>::Matrices::n_projection_matrices;
 
 template <> 
-const double * const FE_DGPNonparametric<3>::Matrices::embedding[][GeometryInfo<3>::children_per_cell];
+const double * const FE_DGPNonparametric<3>::Matrices::embedding[][GeometryInfo<3>::max_children_per_cell];
 
 template <>
 const unsigned int FE_DGPNonparametric<3>::Matrices::n_embedding_matrices;
 
 template <>
-const double * const FE_DGPNonparametric<3>::Matrices::projection_matrices[][GeometryInfo<3>::children_per_cell];
+const double * const FE_DGPNonparametric<3>::Matrices::projection_matrices[][GeometryInfo<3>::max_children_per_cell];
 
 template <>
 const unsigned int FE_DGPNonparametric<3>::Matrices::n_projection_matrices;

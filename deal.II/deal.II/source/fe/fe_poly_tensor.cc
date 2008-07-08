@@ -731,7 +731,8 @@ FE_PolyTensor<POLY,dim>::fill_fe_subface_values (
 		   cell->face_orientation(face),
 		   cell->face_flip(face),
 		   cell->face_rotation(face),
-		   n_q_points);
+		   n_q_points,
+		   cell->subface_case(face));
 
   const UpdateFlags flags(fe_data.update_once | fe_data.update_each);
 

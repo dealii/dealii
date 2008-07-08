@@ -2,7 +2,7 @@
 //    $Id$
 //    Version: $Name$
 //
-//    Copyright (C) 2006, 2007 by the deal.II authors
+//    Copyright (C) 2006, 2007, 2008 by the deal.II authors
 //
 //    This file is subject to QPL and may not be  distributed
 //    without copyright and license information. Please refer
@@ -29,6 +29,9 @@ DEAL_II_NAMESPACE_OPEN
 // declares mainly additional data. This would have to be changed in case of a
 // partial specialization.
 
+template <int dim> class Triangulation;
+
+
 namespace internal
 {
   namespace Triangulation
@@ -40,7 +43,7 @@ namespace internal
  * objects additional information is included, namely vectors indicating the
  * children, the used-status, user-flags, material-ids..
  *
- * Objects of these classes are include in the TriaLevel and TriaFaces
+ * Objects of these classes are included in the TriaLevel and TriaFaces
  * classes.
  *
  * @ingroup grid
@@ -63,13 +66,13 @@ namespace internal
 					  */
 	std::vector<G> cells;
 					 /**
-					  *  Index of the first child of an object.
+					  *  Index of the even children of an object.
 					  *  Since when objects are refined, all
 					  *  children are created at the same
 					  *  time, they are appended to the list
-					  *  after each other.
+					  *  at least in pairs after each other.
 					  *  We therefore only store the index
-					  *  of the first child, the others
+					  *  of the even children, the uneven
 					  *  follow immediately afterwards.
 					  *
 					  *  If an object has no children, -1 is
@@ -80,6 +83,19 @@ namespace internal
 					  *  tests for this.
 					  */
 	std::vector<int>  children;
+	
+					 /**
+					  * Store the refinement
+					  * case each of the
+					  * cells is refined
+					  * with. This vector
+					  * might be replaced by
+					  * vector<vector<bool> >
+					  * (dim, vector<bool>
+					  * (n_cells)) which is
+					  * more memory efficient.
+					  */
+	std::vector<RefinementCase<G::dimension> > refinement_cases;
 	
 					 /**
 					  *  Vector storing whether an object is
@@ -132,15 +148,80 @@ namespace internal
 	std::vector<unsigned char> material_id;
 	
                                          /**
-                                          *  Assert that enough space is
-                                          *  allocated to accomodate
-                                          *  <tt>new_objs</tt> new objects.
-                                          *  This function does not only call
-                                          *  <tt>vector::reserve()</tt>, but
-                                          *  does really append the needed
-                                          *  elements.
+                                          *  Assert that enough space
+                                          *  is allocated to
+                                          *  accomodate
+                                          *  <code>new_objs_in_pairs</code>
+                                          *  new objects, stored in
+                                          *  pairs, plus
+                                          *  <code>new_obj_single</code>
+                                          *  stored individually.
+                                          *  This function does not
+                                          *  only call
+                                          *  <code>vector::reserve()</code>,
+                                          *  but does really append
+                                          *  the needed elements.
+					  *
+					  *  In 2D e.g. refined lines have to be
+					  *  stored in pairs, whereas new lines in the
+					  *  interior of refined cells can be stored as
+					  *  single lines.
                                           */
-        void reserve_space (const unsigned int new_objs);
+        void reserve_space (const unsigned int new_objs_in_pairs,
+			    const unsigned int new_objs_single = 0);
+
+					 /**
+					  * Return an iterator to the
+					  * next free slot for a
+					  * single line. Only
+					  * implemented for
+					  * <code>G=TriaObject<1>
+					  * </code>.
+					  */
+	template <int dim>
+	typename dealii::Triangulation<dim>::raw_line_iterator next_free_single_line (const dealii::Triangulation<dim> &tria);
+
+					 /**
+					  * Return an iterator to the
+					  * next free slot for a pair
+					  * of lines. Only implemented
+					  * for <code>G=TriaObject<1>
+					  * </code>.
+					  */
+	template <int dim>
+	typename dealii::Triangulation<dim>::raw_line_iterator next_free_pair_line (const dealii::Triangulation<dim> &tria);
+	
+					 /**
+					  * Return an iterator to the
+					  * next free slot for a
+					  * single quad. Only
+					  * implemented for
+					  * <code>G=TriaObject@<2@>
+					  * </code>.
+					  */
+	template <int dim>
+	typename dealii::Triangulation<dim>::raw_quad_iterator next_free_single_quad (const dealii::Triangulation<dim> &tria);
+
+					 /**
+					  * Return an iterator to the
+					  * next free slot for a pair
+					  * of quads. Only implemented
+					  * for <code>G=TriaObject@<2@>
+					  * </code>.
+					  */
+	template <int dim>
+	typename dealii::Triangulation<dim>::raw_quad_iterator next_free_pair_quad (const dealii::Triangulation<dim> &tria);
+	
+					 /**
+					  * Return an iterator to the
+					  * next free slot for a pair
+					  * of hexes. Only implemented
+					  * for
+					  * <code>G=Hexahedron</code>.
+					  */
+	template <int dim>
+	typename dealii::Triangulation<dim>::raw_hex_iterator next_free_hex (const dealii::Triangulation<dim> &tria,
+									     const unsigned int               level);
 
 					 /**
 					  *  Clear all the data contained in this object.
@@ -149,17 +230,17 @@ namespace internal
 	
 					 /**
 					  * The orientation of the
-					  * face number <tt>face</tt>
+					  * face number <code>face</code>
 					  * of the cell with number
-					  * <tt>cell</tt>. The return
-					  * value is <tt>true</tt>, if
+					  * <code>cell</code>. The return
+					  * value is <code>true</code>, if
 					  * the normal vector points
 					  * the usual way
 					  * (GeometryInfo::unit_normal_orientation)
-					  * and <tt>false</tt> else.
+					  * and <code>false</code> else.
 					  *
 					  * The result is always
-					  * <tt>true</tt> in this
+					  * <code>true</code> in this
 					  * class, but derived classes
 					  * will reimplement this.
 					  *
@@ -211,6 +292,11 @@ namespace internal
 					  */
 	void clear_user_data();
 	
+					 /**
+					  * Clear all user flags.
+					  */
+	void clear_user_flags();
+	
                                          /**
                                           *  Check the memory consistency of the
                                           *  different containers. Should only be
@@ -245,6 +331,14 @@ namespace internal
                         << "The containers have sizes " << arg1 << " and "
                         << arg2 << ", which is not as expected.");
 
+                                         /**
+                                          *  Exception
+                                          */
+        DeclException2 (ExcWrongIterator,
+                        char*, char*,
+                        << "You asked for the next free " << arg1 << "_iterator, "
+                        "but you can only ask for " << arg2 <<"_iterators.");
+
 					 /**
 					  * Triangulation objacts can
 					  * either access a user
@@ -259,6 +353,21 @@ namespace internal
 	DeclException0 (ExcPointerIndexClash);
 	
       protected:
+					 /**
+					  * Counter for next_free_single_* functions
+					  */
+	unsigned int next_free_single;
+
+					 /**
+					  * Counter for next_free_pair_* functions
+					  */
+	unsigned int next_free_pair;
+
+					 /**
+					  * Bool flag for next_free_single_* functions
+					  */
+	bool reverse_order_next_free_single;
+	
 					 /**
 					  * The data type storing user
 					  * pointers or user indices.
@@ -324,14 +433,14 @@ namespace internal
       public:
 					 /**
 					  * The orientation of the
-					  * face number <tt>face</tt>
+					  * face number <code>face</code>
 					  * of the cell with number
-					  * <tt>cell</tt>. The return
-					  * value is <tt>true</tt>, if
+					  * <code>cell</code>. The return
+					  * value is <code>true</code>, if
 					  * the normal vector points
 					  * the usual way
 					  * (GeometryInfo::unit_normal_orientation)
-					  * and <tt>false</tt> if they
+					  * and <code>false</code> if they
 					  * point in opposite
 					  * direction.
 					  */
@@ -378,7 +487,7 @@ namespace internal
 					  * a @p false value.
 					  *
 					  * In effect, this field has
-					  * <tt>6*n_cells</tt> elements,
+					  * <code>6*n_cells</code> elements,
 					  * being the number of cells
 					  * times the six faces each
 					  * has.
@@ -396,9 +505,9 @@ namespace internal
                                          /**
                                           *  Assert that enough space is
                                           *  allocated to accomodate
-                                          *  <tt>new_objs</tt> new objects.
+                                          *  <code>new_objs</code> new objects.
                                           *  This function does not only call
-                                          *  <tt>vector::reserve()</tt>, but
+                                          *  <code>vector::reserve()</code>, but
                                           *  does really append the needed
                                           *  elements.
                                           */
@@ -441,14 +550,14 @@ namespace internal
       public:
 					 /**
 					  * The orientation of the
-					  * face number <tt>face</tt>
+					  * face number <code>face</code>
 					  * of the cell with number
-					  * <tt>cell</tt>. The return
-					  * value is <tt>true</tt>, if
+					  * <code>cell</code>. The return
+					  * value is <code>true</code>, if
 					  * the normal vector points
 					  * the usual way
 					  * (GeometryInfo::unit_normal_orientation)
-					  * and <tt>false</tt> if they
+					  * and <code>false</code> if they
 					  * point in opposite
 					  * direction.
 					  */
@@ -457,7 +566,7 @@ namespace internal
 
 					 /**
 					  * In effect, this field has
-					  * <tt>4*n_quads</tt> elements,
+					  * <code>4*n_quads</code> elements,
 					  * being the number of quads
 					  * times the four lines each
 					  * has.
@@ -465,15 +574,22 @@ namespace internal
 	std::vector<bool> line_orientations;
 
                                          /**
-                                          *  Assert that enough space is
-                                          *  allocated to accomodate
-                                          *  <tt>new_objs</tt> new objects.
-                                          *  This function does not only call
-                                          *  <tt>vector::reserve()</tt>, but
-                                          *  does really append the needed
-                                          *  elements.
+                                          *  Assert that enough space
+                                          *  is allocated to
+                                          *  accomodate
+                                          *  <code>new_quads_in_pairs</code>
+                                          *  new quads, stored in
+                                          *  pairs, plus
+                                          *  <code>new_quads_single</code>
+                                          *  stored individually.
+                                          *  This function does not
+                                          *  only call
+                                          *  <code>vector::reserve()</code>,
+                                          *  but does really append
+                                          *  the needed elements.
                                           */
-        void reserve_space (const unsigned int new_objs);
+        void reserve_space (const unsigned int new_quads_in_pairs,
+			    const unsigned int new_quads_single = 0);
 
 					 /**
 					  *  Clear all the data contained in this object.
@@ -595,6 +711,14 @@ namespace internal
 	user_data[i].p = 0;
     }
 
+
+    template<typename G>
+    inline
+    void TriaObjects<G>::clear_user_flags ()
+    {
+      user_flags.assign(user_flags.size(),false);
+    }
+    
 //----------------------------------------------------------------------//
 
     inline
@@ -626,11 +750,13 @@ namespace internal
 
     template<>
     void
-    TriaObjects<TriaObject<1> >::reserve_space (const unsigned int new_lines);
+    TriaObjects<TriaObject<1> >::reserve_space (const unsigned int new_lines_in_pairs,
+				      const unsigned int new_lines_single);
 
     template<>
     void
-    TriaObjects<TriaObject<2> >::reserve_space (const unsigned int new_quads);
+    TriaObjects<TriaObject<2> >::reserve_space (const unsigned int new_quads_in_pairs,
+				      const unsigned int new_quads_single);
 
     template<>
     void

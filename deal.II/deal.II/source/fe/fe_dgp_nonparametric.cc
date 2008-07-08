@@ -2,7 +2,7 @@
 //    $Id$
 //    Version: $Name$
 //
-//    Copyright (C) 2002, 2003, 2004, 2005, 2006, 2007 by the deal.II authors
+//    Copyright (C) 2002, 2003, 2004, 2005, 2006, 2007, 2008 by the deal.II authors
 //
 //    This file is subject to QPL and may not be  distributed
 //    without copyright and license information. Please refer
@@ -39,12 +39,26 @@ FE_DGPNonparametric<dim>::FE_DGPNonparametric (const unsigned int degree)
                 polynomial_space (Polynomials::Legendre::generate_complete_basis(degree))
 {
   const unsigned int n_dofs = this->dofs_per_cell;
-  for (unsigned int i=0;i<GeometryInfo<dim>::children_per_cell;++i)
+  for (unsigned int ref_case = RefinementCase<dim>::cut_x;
+       ref_case<RefinementCase<dim>::isotropic_refinement+1; ++ref_case)
     {
-      this->prolongation[i].reinit(n_dofs, n_dofs);
-      for (unsigned int j=0;j<n_dofs;++j)
-	this->prolongation[i](j,j) = 1.;
+      if (dim!=2 && ref_case!=RefinementCase<dim>::isotropic_refinement)
+					 // do nothing, as anisotropic
+					 // refinement is not
+					 // implemented so far
+	continue;
+      
+      const unsigned int nc = GeometryInfo<dim>::n_children(RefinementCase<dim>(ref_case));
+      for (unsigned int i=0;i<nc;++i)
+	{
+	  this->prolongation[ref_case-1][i].reinit (n_dofs, n_dofs);
+					   // Fill prolongation matrices with
+					   // embedding operators
+	  for (unsigned int j=0;j<n_dofs;++j)
+	    this->prolongation[ref_case-1][i](j,j) = 1.;
+	}
     }
+
                                    // restriction can be defined
                                    // through projection for
                                    // discontinuous elements, but is
@@ -60,12 +74,13 @@ FE_DGPNonparametric<dim>::FE_DGPNonparametric (const unsigned int degree)
 //      }
 //    else
 //  				     // matrix undefined, set size to zero
-//      for (unsigned int i=0;i<GeometryInfo<dim>::children_per_cell;++i)
+//      for (unsigned int i=0;i<GeometryInfo<dim>::max_children_per_cell;++i)
 //        restriction[i].reinit(0, 0);
                                    // since not implemented, set to
-                                   // "empty"
-  for (unsigned int i=0;i<GeometryInfo<dim>::children_per_cell;++i)
-    this->restriction[i].reinit(0, 0);
+                                   // "empty". however, that is done in the
+                                   // default constructor already, so do nothing
+//  for (unsigned int i=0;i<GeometryInfo<dim>::max_children_per_cell;++i)
+//    this->restriction[i].reinit(0, 0);
 
                                    // note further, that these
                                    // elements have neither support

@@ -1,0 +1,482 @@
+<a name="Intro"></a>
+<h1>Introduction</h1>
+
+
+<h3>Overview</h3>
+
+This example is devoted to <em>anisotropic refinement</em>, which extends to
+possibilities of local refinement. In most parts, this is a modification of the
+@ref step_12 "step-12" tutorial program, we use the same DG method for a linear transport
+equation. This program will cover the following topics:
+<ol>
+  <li> <em>Anisotropic refinement</em>: What is the meaning of anisotropic refinement?
+  <li> <em>Implementation</em>: Necessary modifications of code to work with anisotropically refined meshes.
+  <li> <em>Jump indicator</em>: A simple indicator for anisotropic refinement in
+  the context of DG methods.
+</ol>
+The discretization itself will not be discussed, and neither will
+implementation techniques not specific to anisotropic refinement used
+here. Please refer to @ref step_12 "step-12" for this.
+
+Please note, at the moment of writing this tutorial program, anisotropic
+refinement is only fully implemented for discontinuous Galerkin Finite
+Elements. This may later change (or may already have).
+
+
+<h3>Anisotropic refinement</h3>
+
+All the adaptive processes in the preceding tutorial programs were based on
+<em>isotropic</em> refinement of cells, which cuts all edges in half and forms
+new cells of these split edges (plus some additional edges, faces and vertices,
+of course). In deal.II, <em>anisotropic refinement</em> refers to the process of
+splitting only part of the edges while leaving the others unchanged. Consider a
+simple square cell, for example:
+@code
+  *-------*
+  |       |
+  |       |
+  |       |
+  *-------*
+@endcode 
+After the usual refinement it will consist of four children and look like this:
+@code
+  *---*---*
+  |   |   |
+  *---*---*     RefinementCase<2>::cut_xy
+  |   |   |
+  *---*---*
+@endcode
+The new anisotropic refinement may take two forms: either we can split the edges
+which are parallel to the horizontal x-axis, resulting in these two child cells:
+@code
+  *---*---*
+  |   |   |
+  |   |   |     RefinementCase<2>::cut_x
+  |   |   |
+  *---*---*
+@endcode
+or we can split the two edges which run along the y-axis, resulting again in two
+children, which look that way, however:
+@code
+  *-------*
+  |       |
+  *-------*     RefinementCase<2>::cut_y
+  |       |
+  *-------*
+@endcode
+All refinement cases of cells are described by an enumeration
+RefinementPossibilities::Possibilities, and the above anisotropic
+cases are called @p cut_x and @p cut_y for obvious reasons. The
+isotropic refinement case is called @p cut_xy in 2D and can be
+requested from the GeometryInfo class via
+GeometryInfo<2>::isotropic_refinement.
+
+In 3D, there is a third axis which can be split, the z-axis, and thus we
+have an additional refinement case @p cut_z here. Isotropic refinement will now
+refine a cell along the x-, y- and z-axes and thus be referred to as @p
+cut_xyz. Additional cases @p cut_xy, @p cut_xz and @p cut_yz exist, which refine
+a cell along two of the axes, but not along the third one. Given a hex cell with
+x-axis running to the right, y-axis 'into the page' and z-axis to the top,
+@code
+      *-----------*
+     /           /|
+    /           / |
+   /           /  |
+  *-----------*   |
+  |           |   |
+  |           |   * 
+  |           |  /
+  |           | /
+  |           |/
+  *-----------*
+@endcode 
+we have the isotropic refinement case,
+@code
+      *-----*-----*
+     /     /     /|
+    *-----*-----* |
+   /     /     /| *
+  *-----*-----* |/|
+  |     |     | * |
+  |     |     |/| * 
+  *-----*-----* |/
+  |     |     | *
+  |     |     |/
+  *-----*-----*
+
+     cut_xyz
+@endcode 
+three anisotropic cases which refine only one axis:
+@code
+      *-----*-----*           *-----------*           *-----------*  
+     /     /     /|          /           /|          /           /|  
+    /     /     / |         *-----------* |         /           / |  
+   /     /     /  |        /           /| |        /           /  *  
+  *-----*-----*   |       *-----------* | |       *-----------*  /|  
+  |     |     |   |       |           | | |       |           | / |  
+  |     |     |   *       |           | | *       |           |/  *  
+  |     |     |  /        |           | |/        *-----------*  /   
+  |     |     | /         |           | *         |           | /    
+  |     |     |/          |           |/          |           |/     
+  *-----*-----*           *-----------*           *-----------*      
+								                     	                     
+     cut_x                   cut_y                   cut_z           
+@endcode 
+and three cases which refine two of the three axes:
+@code
+      *-----*-----*           *-----*-----*           *-----------*  
+     /     /     /|          /     /     /|          /           /|  
+    *-----*-----* |         /     /     / |         *-----------* |  
+   /     /     /| |        /     /     /  *        /           /| *  
+  *-----*-----* | |       *-----*-----*  /|       *-----------* |/|  
+  |     |     | | |       |     |     | / |       |           | * |  
+  |     |     | | *       |     |     |/  *       |           |/| *  
+  |     |     | |/        *-----*-----*  /        *-----------* |/   
+  |     |     | *         |     |     | /         |           | *    
+  |     |     |/          |     |     |/          |           |/     
+  *-----*-----*           *-----*-----*           *-----------*      
+								                     	                     
+     cut_xy                  cut_xz                  cut_yz       
+@endcode 
+For 1D problems, anisotropic refinement can make no difference, as there is only
+one coordinate direction for a cell, so it is not possible to split it
+in any other way than isotropically.
+
+<h4>Motivation</h4>
+Adaptive local refinement is used to obtain fine meshes which are well adapted
+to solving the problem at hand efficiently. In short, the size of cells which
+produce a large error is reduced to obtain a better approximation of the
+solution to the problem at hand. However, a lot of problems contain anisotropic
+features. Prominent examples are shocks or boundary layers in compressible
+viscous flows. An efficient mesh approximates these features with cells of higher aspect ratio
+which are oriented according to the mentioned features. Using only isotropic
+refinement, the aspect ratios of the original mesh cells are preserved, as they
+are inherited by the children of a cell. Thus, starting from an isotropic mesh, a
+boundary layer will be refined in order to catch the rapid variation of the flow
+field in the wall normal direction, thus leading to cells with very small edge
+lengths both in normal and tangential direction. Usually, much higher edge
+lengths in tangential direction and thus significantly less cells could be used
+without a significant loss in approximation accuracy. An anisotropic
+refinement process can modify the aspect ratio from mother to child cells by a
+factor of two for each refinement step. In the course of several refinements,
+the aspect ratio of the fine cells can be optimized, saving a considerable
+number of cells and correspondingly degrees of freedom and thus computational
+resources, memory as well as CPU time.
+
+<h3>Implementation</h3>
+
+Most of the time, when we do finite element computations, we only consider one
+cell at a time, for example to calculate cell contributions to the global
+matrix, or to interpolate boundary values. However, sometimes we have to look
+at how cells are related in our algorithms. Relationships between cells come
+in two forms: neighborship and mother-child relationship. For the case of
+isotropic refinement, deal.II uses certain conventions (invariants) for cell
+relationships that are always maintained. For example, a refined cell always
+has exactly $2^{dim}$ children. And (except for the 1d case), two neighboring
+cells may differ by at most one refinement level: they are equally often
+refined or one of them is exactly once more refined, leaving exactly one
+hanging node on the common face. Almost all of the time these invariants are
+only of concern in the internal implementation of the library. However, there
+are cases where knowledge of them is also relevant to an application program.
+
+In the current context, it is worth noting that the kind of mesh refinement
+affects some of the most fundamental assumptions. Consequently, some of the
+usual code found in application programs will need modifications to exploit
+the features of meshes which were created using anisotropic
+refinement. For those interested in how deal.II evolved, it may be of
+interest that the losening of such invariants required some
+incompatible changes. For example, the library used to have a member
+GeometryInfo<dim>::children_per_cell that specified how many children
+a cell has once it is refined. For isotropic refinement, this number
+is equal to $2^{dim}$, as mentioned above. However, for anisotropic refinement, this number
+does not exist, as is can be either two or four in 2D and two, four or eight in
+3D, and the member GeometryInfo<dim>::children_per_cell has
+consequently been removed. It has now been replaced by
+GeometryInfo<dim>::max_children_per_cell which specifies the
+<i>maximum</i> number of children a cell can have. How many children a
+refined cell has was previously available as static informtion, but
+now it depends on the actual refinement state of a cell and can be
+retrieved using the function call <code>cell-@>n_children()</code>,
+a call that works equally well for both isotropic and anisotropic
+refinement. A very similar situation can be found for
+faces and their subfaces: the previously available variable
+GeometryInfo<dim>::subfaces_per_face no 
+longer exists; the pertinent information can now be queried using
+GeometryInfo<dim>::max_children_per_face or <code>face->n_children()</code>,
+depending on the context.
+
+Another important aspect, and the most important one in this tutorial, is
+the treatment of neighbor-relations when assembling jump terms on the
+faces between cells. Looking at the documentation of the
+assemble_system functions in @ref step_12 "step-12" we notice, that we need to decide if a
+neighboring cell is coarser, finer or on the same (refinement) level as our
+current cell. These decisions do not work in the same way for anisotropic
+refinement as the information given by the <em>level</em> of a cell is not
+enough to completely characterize anisotropic cells; for example, are
+the terminal children of a two-dimensional
+cell that is first cut in $x$-direction and whose children are then
+cut in $y$-direction on level 2, or are they on level 1 as they would
+be if the cell would have been refined once isotropically, resulting
+in the same set of finest cells?
+
+After anisotropic refinement, a coarser neighbor is not necessarily
+exactly one level below ours, but can pretty much have any level
+relative to the current one; in fact, it can even be on a higher
+level even though it is coarser. Thus the decisions
+have to be made on a different basis, whereas the intention of the
+decisions stays the same. 
+
+In the following, we will discuss the cases that can happen when we
+want to compute contributions to the matrix (or right hand side) of
+the form 
+@f[
+  \int_{\partial K} \varphi_i(x) \varphi_j(x) \; dx
+@f]
+or similar; remember that we integrate terms like this using the
+FEFaceValues and FESubfaceValues classes. We will also show how to
+write code that works for both isotropic and anisotropic refinement:
+
+<ul>
+  <li> <em>Finer neighbor</em>: If we are on an active cell and want
+  to integrate over a face $f\subset \partial K$, the first
+  possibility is that the neighbor behind this face is more refined,
+  i.e. has children occupying only part of the
+  common face. In this case, the face
+  under consideration has to be a refined one, which can determine by
+  asking <code>if(face->has_children())</code>. If this is true, we need to
+  loop over 
+  all subfaces and get the neighbors' child behind this subface, so that we can
+  reinit an FEFaceValues object with the neighbor and an FESubfaceValues object
+  with our cell and the respective subface. 
+
+  For isotropic refinement, this kind is reasonably simple because we
+  know that an invariant of the isotropically refined adaptive meshes
+  in deal.II is that neighbors can only differ by exactly one
+  refinement level. However, this isn't quite true any more for
+  anisotropically refined meshes, in particular in 3d; there,
+  the active cell we are interested on the other side of $f$ might not
+  actually be a child of our 
+  neighbor, but perhaps a grandchild or even a farther offspring. Fortunately,
+  this complexity is hidden in the internals of the library. All we need to do
+  is call the <code>cell->neighbor_child_on_subface(face_no, subface_no)</code>
+  function. Still, in 3D there are two cases which need special consideration:
+  <ul>
+    <li> If the neighbor is refined more than once anisotropically, it might be
+  that here are not two or four but actually three subfaces to
+  consider. Imagine 
+  the following refinement process of the (two-dimensional) face of
+  the (three-dimensional) neighbor cell we are considering: first the
+  face is refined along x, later on only the left subface is refined along y.
+@code
+   *-------*        *---*---*        *---*---*
+   |       |        |   |   |        |   |   |
+   |       |  --->  |   |   |  --->  *---*   |
+   |       |        |   |   |        |   |   |
+   *-------*        *---*---*        *---*---*
+@endcode
+     Here the number of subfaces is three. It is important to note the subtle
+  differences between <code>face->n_children()</code> and
+  <code>face->number_of_children()</code>. The first function returns the number of
+  immediate children, which would be two for the above example, whereas the
+  second returns the number of active offsprings, which is the correct three in
+  the example above. Using <code>face->number_of_children()</code> works for 
+  isotropic and anisotropic as well as 2D and 3D cases, so it should always be
+  used. It should be noted that if any of the cells behind the two
+  small subfaces on the left side of the rightmost image is further
+  refined, then the current cell (i.e. the side from which we are
+  viewing this common face) is going to be refined as well: this is so
+  because otherwise the invariant of having only one hanging node per
+  edge would be violated.
+
+    <li> It might be, that the neighbor is coarser, but still has children which
+  are finer than our current cell. This situation can occur if two equally
+  coarse cells are refined, where one of the cells has two children at the face
+  under consideration and the other one four. The cells in the next graphic are
+  only separated from each other to show the individual refinement cases. 
+@code
+      *-----------*     *-----------* 
+     /           /|    /           /| 
+    ############# |   +++++++++++++ | 
+   #           ## |  +           ++ * 
+  ############# # | +++++++++++++ +/| 
+  #           # # | +           + + | 
+  #           # # * +           +++ * 
+  #           # #/  +++++++++++++ +/  
+  #           # #   +           + +   
+  #           ##    +           ++    
+  #############     +++++++++++++     
+@endcode 
+
+  Here, the left two cells resulted from an anisotropic bisection of
+  the mother cell in $y$-direction, whereas the right four cells
+  resulted from a simultaneous anisotropic refinement in both the $y$-
+  and $z$-directions. 
+  The left cell marked with # has two finer neighbors marked with +, but the
+  actual neighbor of the left cell is the complete right mother cell, as the
+  two cells marked with + are finer and their direct mother is the one
+  large cell.
+  </ul>
+
+  However, it is comfortable to know, that
+  <code>cell->neighbor_child_on_subface(face_no,subface_no)</code> takes care of
+  these situations by itself, if you loop over the correct number of subfaces,
+  in the above example this is two. The FESubfaceValues<dim>::reinit function
+  takes care of this too, so that the resulting state is always correct. There
+  is one little aspect, however: For reiniting the neighbors FEFaceValues object
+  you need to know the index of the face that points toward the current
+  cell. Usually you assume that the neighbor you get directly is as coarse or as
+  fine as you, if it has children, thus this information can be obtained by the
+  <code>cell->neighbor_of_neighbor(face_no)</code> function. If the neighbor is
+  coarser, however, you would have to use
+  <code>cell->neighbor_of_coarser_neighbor(face_no).first</code> instead. In order
+  to make this easy for you, there is the new
+  <code>cell->neighbor_face_no(face_no)</code> function which does the correct thing
+  for you and returns the desired result.
+
+  <li> <em>Neighbor is as fine as our cell</em>: After we ruled out all cases in
+  which there are finer children, we only need to decide, whether the neighbor
+  is coarser here. For this, there is the
+  <code>cell->coarser_neighbor(face_no)</code> function returning a bool value. In
+  order to get the relevant case of a neighbor of the same coarseness we would
+  use <code>else if (!cell->coarser_neighbor(face_no))</code>. The code inside this
+  block can be left untouched. However, there is one thing to mention here: If
+  we want to use a rule, which cell should assemble certain terms on a given
+  face we might think of the rule presented in @ref step_12 "step-12". We know that we have to
+  leave out the part about comparing our cell's level with that of the neighbor
+  and replace it with the test for a coarser neighbor presented above. However,
+  we also have to consider the possibility that neighboring cells of same
+  coarseness have the same index (on different levels). Thus we have to include
+  the case where the cells have the same index, and give an additional
+  condition, which of the cells should assemble the terms, e.g. we can choose
+  the cell with lower level. The details of this concept can be seen in the
+  implementation below. 
+
+  <li> <em>Coarser neighbor</em>: The remaining case is obvious: If there are no
+  refined neighbors and the neighbor is not as fine as the current cell, then it needs
+  to be coarser. Thus we can leave the old condition phrase, simply using
+  <code>else</code>. The <code>cell->neighbor_of_coarser_neighbor(face_no)</code>
+  function takes care of all the complexity of anisotropic refinement combined
+  with possible non standard face orientation, flip and rotation on general 3D meshes.
+
+</ul>
+
+<h4>Mesh smoothing</h4>
+When a triangulation is refined, cells which were not flagged for refinement may
+be refined nonetheless. This is due to additional smoothing algorithms which are
+either necessary or requested explicitly. In particular, the restriction that there
+be at most one hanging node on each edge frequently forces the refinement of additional
+cells neighboring ones that are already finer and are flagged for
+further refinement.
+
+However, deal.II also implements a number of algorithms that make sure
+that resulting meshes are smoother than just the bare minimum, for
+example ensuring that there are no isolated refined cells surrounded
+by non-refined ones, since the additional degrees of freedom on these
+islands would almost all be constrained by hanging node
+constraints. (See the documentation of the Triangulation class and its
+Triangulation::MeshSmoothing member for more information on mesh
+smoothing.)
+
+Most of the smoothing algorithms that were originally developed for
+the isotropic case have been adapted to work in a very similar
+way for both anisotropic and isotropic refinement. There are two
+algorithms worth mentioning, however:
+<ol>
+  <li> <code>MeshSmoothing::limit_level_difference_at_vertices</code>: In an isotropic environment,
+  this algorithm tries to ensure a good approximation quality by reducing the
+  difference in refinement level of cells meeting at a common vertex. However,
+  there is no clear corresponding concept for anisotropic refinement, thus this
+  algorithm may not be used in combination with anisotropic refinement. This
+  restriction is enforced by an assertion which throws an error as soon as the
+  algorithm is called on a triangulation which has been refined anisotropically.
+
+  <li> <code>MeshSmoothing::allow_anisotropic_smoothing</code>: If refinement is introduced to
+  limit the number of hanging nodes, the additional cells are often not needed
+  to improve the approximation quality. This is especially true for DG
+  methods. If you set the flag <code>allow_anisotropic_smoothing</code> the
+  smoothing algorithm tries to minimize the number of probably unneeded
+  additional cells by using anisotropic refinement for the smoothing. If you set
+  this smoothing flag you might get anisotropically refined cells, even if you
+  never set a single refinement flag to anisotropic refinement. Be aware that
+  you should only use this flag, if your code respects the possibility of
+  anisotropic meshes. Combined with a suitable anisotropic indicator this flag
+  can help save additional cells and thus effort.
+</ol>
+
+
+<h3>Jump indicator</h3>
+
+Using the benefits of anisotropic refinement requires an indicator to catch
+anisotropic features of the solution and exploit them for the refinement
+process. Generally the anisotropic refinement process will consist of several
+steps: 
+<ol>
+  <li> Calculate an error indicator.
+  <li> Use the error indicator to flag cells for refinement, e.g. using a fixed
+  number or fraction of cells. Those cells will be flagged for isotropic
+  refinement automatically.
+  <li> Evaluate a distinct anisotropic indicator only on the flagged cells.
+  <li> Use the anisotropic indicator to set a new, anisotropic refinement flag
+  for cells where this is appropriate, leave the flags unchanged otherwise.
+  <li> Call Triangulation<dim>::execute_coarsening_and_refinement to perform the
+  requested refinement, using the requested isotropic and anisotropic flags.
+</ol>
+This approach is similar to the one we have used in @ref step_27 "step-27" 
+for hp refinement and
+has the great advantage of flexibility: Any error indicator can be
+used in the anisotropic process, i.e. if you have quite involved a posteriori
+goal-oriented error indicators available you can use them as easily as a simple
+Kelly error estimator. The anisotropic part of the refinement process is not
+influenced by this choice. Furthermore, simply leaving out the third and forth
+steps leads to the same isotropic refinement you used to get before any
+anisotropic changes in deal.II or your application program.
+As a last advantage, working only
+on cells flagged for refinement results in a faster evaluation of the
+anisotropic indicator, which can become noticeable on finer meshes with a lot of
+cells if the indicator is quite involved.
+
+Here, we use a very simple approach which is only applicable to DG
+methods. The general idea is quite simple: DG methods allow the discrete
+solution to jump over the faces of a cell, whereas it is smooth within each
+cell. Of course, in the limit we expect that the jumps tend to zero as
+we refine the mesh and approximate the true solution better and better.
+Thus, a large jump
+across a given face indicates that the cell should be refined (at least)
+orthogonal to that face, whereas a small jump does not lead to this
+conclusion. It is possible, of course, that the exact solution is not smooth and
+that it also features a jump. In that case, however, a large jump over one face
+indicates, that this face is more or less parallel to the jump and in the
+vicinity of it, thus again we would expect a refinement orthogonal to the face
+under consideration to be effective.
+
+The proposed indicator calculates the average jump $K_j$, i.e. the mean value of
+the absolute jump $|[u]|$ of the discrete solution $u$ over the two faces
+$f_i^j$, $i=1,2$, $j=1..d$ orthogonal to coordinate direction $j$ on the unit
+cell.
+@f[
+K_j = \frac{\sum_{i=1}^2 \int_{f_i^j}|[u]| dx}{\sum_{i=1}^2 |f_i^j|} .
+@f]
+If the average jump in one direction is larger than the average of the
+jumps in the other directions by a
+certain factor $\kappa$, i.e. if
+$K_i > \kappa \frac 1{d-1} \sum_{j=1, j\neq i}^d K_j$, the cell is refined only along that particular
+direction $i$, otherwise the cell is refined isotropically. 
+
+Such a criterion is easily generalized to systems of equations: the
+absolute value of the jump would be replaced by an appropriate norm of
+the vector-valued jump.
+
+
+
+<h3>The problem</h3>
+
+We solve the linear transport equation presented in @ref step_12 "step-12". The domain is
+extended to cover $[-1,1]\times[0,1]$ in 2D, where the flow field $\beta$ describes a
+counterclockwise quarter circle around the origin in the right half of the
+domain and is parallel to the x-axis in the left part of the domain. The inflow
+boundary is again located at $x=1$ and along the positive part of the x-axis,
+and the boundary conditions are chosen as in @ref step_12 "step-12". Compared to @ref step_12 "step-12" we
+only use the more effective second assembling technique. In order to make
+comparisons more effective, we decided to keep function names like @p
+assemble_system2 even if there is only one of these routines in this tutorial
+program.

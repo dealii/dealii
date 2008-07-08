@@ -21,6 +21,7 @@
 #include <base/geometry_info.h>
 #include <grid/grid_tools.h>
 #include <grid/magic_numbers.h>
+#include <fe/mapping_q1.h>
 #include <lac/vector.h>
 
 #include <algorithm>
@@ -33,6 +34,230 @@
 #include <boost/array.hpp>
 
 DEAL_II_NAMESPACE_OPEN
+
+// anonymous namespace for internal helper functions
+namespace{
+				   // return, wheter a given @p cell will be
+				   // coarsened, which is the case if all
+				   // children are active and have their coarsen
+				   // flag set. In case only part of the coarsen
+				   // flags are set, remove them.
+  template <int dim>
+  bool cell_will_be_coarsened(const TriaIterator<dim, dealii::CellAccessor<dim> > &cell)
+  {
+				     // only cells with children should be
+				     // considered for coarsening
+    
+    if (cell->has_children())
+      {
+	unsigned int children_to_coarsen=0;
+	const unsigned int n_children=cell->n_children();
+    
+	for (unsigned int c=0; c<n_children; ++c)
+	  if (cell->child(c)->active() &&
+	      cell->child(c)->coarsen_flag_set())
+	    ++children_to_coarsen;
+	if (children_to_coarsen==n_children)
+	  return true;
+	else
+	  for (unsigned int c=0; c<n_children; ++c)
+	    if (cell->child(c)->active())
+	      cell->child(c)->clear_coarsen_flag();
+      }
+				     // no children, so no coarsening
+				     // possible. however, no children also
+				     // means that this cell will be in the same
+				     // state as if it had children and was
+				     // coarsened. So, what should we return -
+				     // false or true?
+				     // make sure we do not have to do this at
+				     // all...
+    Assert(cell->has_children(), ExcInternalError());
+				     // ... and then simply return false 
+    return false;
+  }
+
+
+				   // return, whether the face @p face_no of the
+				   // given @p cell will be refined after the
+				   // current refinement step, considering
+				   // refine and coarsen flags and considering
+				   // only those refinemnts that will be caused
+				   // by the neighboring cell.
+
+				   // this function is used on both active cells
+				   // and cells with children. on cells with
+				   // children it also of interest to know 'how'
+				   // the face will be refined. thus there is an
+				   // additional third argument @p
+				   // expected_face_ref_case returning just
+				   // that. be aware, that this vriable will
+				   // only contain useful information if this
+				   // function is called for an active cell.
+				   //
+				   // thus, this is an internal function, users
+				   // should call one of the two alternatives
+				   // following below.
+  template <int dim>
+  bool face_will_be_refined_by_neighbor_internal(const TriaIterator<dim, dealii::CellAccessor<dim> > &cell,
+						 const unsigned int                                   face_no,
+						 RefinementCase<dim-1>                                    &expected_face_ref_case)
+  {
+				     // first of all: set the default value for
+				     // expected_face_ref_case, which is no
+				     // refinement at all
+    expected_face_ref_case=RefinementCase<dim-1>::no_refinement;
+    
+    const typename Triangulation<dim>::cell_iterator neighbor=cell->neighbor(face_no);
+
+				     // If we are at the boundary, there is no
+				     // neighbor which could refine the face
+    if (neighbor.state()!=IteratorState::valid)
+      return false;
+    
+    if (neighbor->has_children())
+				     // if the neighbor is refined, he may be
+				     // coarsened. if so, then it won't refine
+				     // the face, no matter what else happens
+      if (cell_will_be_coarsened(neighbor))
+	return false;
+      else
+					 // if the neighor is refined, then he
+					 // is also refined at our current
+					 // face. He will stay so without
+					 // coarsening, so return true in that
+					 // case.
+	{
+	  expected_face_ref_case=cell->face(face_no)->refinement_case();
+	  return true;
+	}
+    
+				     // now, the neighbor is not refined, but
+				     // perhaps he will be
+    const RefinementCase<dim> nb_ref_flag=neighbor->refine_flag_set();
+    if (nb_ref_flag)
+      {
+					 // now we need to know, which of the
+					 // neighbors faces points towards us
+	const unsigned int neighbor_neighbor=cell->neighbor_face_no(face_no);
+					 // check, whether the cell will be
+					 // refined in a way that refines our
+					 // face
+	const RefinementCase<dim-1> face_ref_case=
+	  GeometryInfo<dim>::face_refinement_case(nb_ref_flag,
+						  neighbor_neighbor,
+						  neighbor->face_orientation(neighbor_neighbor),
+						  neighbor->face_flip(neighbor_neighbor),
+						  neighbor->face_rotation(neighbor_neighbor));
+	if (face_ref_case != RefinementCase<dim-1>::no_refinement)
+	  {
+	    const typename Triangulation<dim>::face_iterator neighbor_face=neighbor->face(neighbor_neighbor);
+	    const int this_face_index=cell->face_index(face_no);
+
+					     // there are still two basic
+					     // possibilities here: the neighbor
+					     // might be coarser or as coarse
+					     // as we are
+	    if (neighbor_face->index()==this_face_index)
+					       // the neighbor is as coarse as
+					       // we are and will be refined at
+					       // the face of consideration, so
+					       // return true
+	      {
+		expected_face_ref_case = face_ref_case;
+		return true;
+	      }
+	    else
+	      {
+		
+						 // the neighbor is coarser.
+						 // this is the most complicated
+						 // case. It might be, that the
+						 // neighbor's face will be
+						 // refined, but that we will
+						 // not see this, as we are
+						 // refined in a similar way.
+
+						 // so, the neighbor's face must
+						 // have children. check, if our
+						 // cell's face is one of these
+						 // (it could also be a
+						 // grand_child)
+		for (unsigned int c=0; c<neighbor_face->n_children(); ++c)
+		  if (neighbor_face->child_index(c)==this_face_index)
+						     // if the flagged refine
+						     // case of the face is a
+						     // subset or the same as
+						     // the current refine case,
+						     // then the face, as seen
+						     // from our cell, won't be
+						     // refined by the neighbor
+		    if ((neighbor_face->refinement_case() | face_ref_case)
+			== neighbor_face->refinement_case())
+		      return false;
+		    else
+		      {
+							 // if we are active, we
+							 // must be an
+							 // anisotropic child
+							 // and the coming
+							 // face_ref_case is
+							 // isotropic. Thus,
+							 // from our cell we
+							 // will see exactly the
+							 // opposite refine case
+							 // that the face has
+							 // now...
+			Assert(face_ref_case==RefinementCase<dim-1>::isotropic_refinement, ExcInternalError());
+			expected_face_ref_case = ~neighbor_face->refinement_case();
+			return true;
+		      }
+		
+						 // so, obviously we were not
+						 // one of the children, but a
+						 // grandchild. This is only
+						 // possible in 3d.
+		Assert(dim==3, ExcInternalError());
+						 // In that case, however, no
+						 // matter what the neighbor
+						 // does, he won't be finer
+						 // after the next refinement
+						 // step.
+		return false;
+	      }
+	  }// if face will be refined
+      }// if neighbor is flagged for refinement
+
+				     // no cases left, so the neighbor will not
+				     // refine the face
+    return false;
+  }
+
+				   // verison of above function for both active
+				   // and non-active cells
+  template <int dim>
+  bool face_will_be_refined_by_neighbor(const TriaIterator<dim, dealii::CellAccessor<dim> > &cell,
+					const unsigned int                                   face_no)
+  {
+    RefinementCase<dim-1> dummy = RefinementCase<dim-1>::no_refinement;
+    return face_will_be_refined_by_neighbor_internal(cell, face_no, dummy);
+  }
+
+				   // version of above function for active cells
+				   // only. Additionally returning the refine
+				   // case (to come) of the face under
+				   // consideration
+  template <int dim>
+  bool face_will_be_refined_by_neighbor(const TriaActiveIterator<dim, dealii::CellAccessor<dim> > &cell,
+					const unsigned int                                         face_no,
+					RefinementCase<dim-1>                                          &expected_face_ref_case)
+  {
+    return face_will_be_refined_by_neighbor_internal(cell, face_no,
+						     expected_face_ref_case);
+  }
+  
+}// end of anonymous namespace
+
 
 template <int dim>
 const StraightBoundary<dim>
@@ -50,6 +275,7 @@ template <int dim>
 Triangulation<dim>::Triangulation (const MeshSmoothing smooth_grid) :
 		Subscriptor (),
 		faces(NULL),
+		anisotropic_refinement(false),
 		smooth_grid(smooth_grid)
 {
 				   // set default boundary for all
@@ -234,9 +460,10 @@ void Triangulation<dim>::copy_triangulation (const Triangulation<dim> &old_tria)
   
   
 				   // copy normal elements
-  vertices      = old_tria.vertices;
-  vertices_used = old_tria.vertices_used;
-  smooth_grid   = old_tria.smooth_grid;
+  vertices               = old_tria.vertices;
+  vertices_used          = old_tria.vertices_used;
+  anisotropic_refinement = old_tria.anisotropic_refinement;
+  smooth_grid            = old_tria.smooth_grid;
   
   faces         = new internal::Triangulation::TriaFaces<dim>(*old_tria.faces);
 
@@ -309,7 +536,7 @@ void Triangulation<1>::create_triangulation (const std::vector<Point<1> >    &v,
 				   // reserve enough space
   levels.push_back (new internal::Triangulation::TriaLevel<dim>);
   levels[0]->reserve_space (cells.size(), dim);
-  levels[0]->cells.reserve_space (cells.size());
+  levels[0]->cells.reserve_space (0,cells.size());
   
 				   // make up cells
   raw_line_iterator next_free_line = begin_raw_line ();
@@ -593,8 +820,8 @@ void Triangulation<2>::create_triangulation (const std::vector<Point<2> >    &v,
   levels.push_back (new internal::Triangulation::TriaLevel<dim>);
   faces = new internal::Triangulation::TriaFaces<dim>;
   levels[0]->reserve_space (cells.size(), dim);
-  faces->lines.reserve_space (needed_lines.size());
-  levels[0]->cells.reserve_space (cells.size());
+  faces->lines.reserve_space (0,needed_lines.size());
+  levels[0]->cells.reserve_space (0,cells.size());
 
 				   // make up lines
   if (true) 
@@ -1017,7 +1244,7 @@ Triangulation<3>::create_triangulation (const std::vector<Point<3> >    &v,
   levels.push_back (new internal::Triangulation::TriaLevel<dim>);
   faces = new internal::Triangulation::TriaFaces<dim>;
   levels[0]->reserve_space (cells.size(), dim);
-  faces->lines.reserve_space (needed_lines.size());
+  faces->lines.reserve_space (0,needed_lines.size());
 
 				   // make up lines
   if (true) 
@@ -1197,7 +1424,7 @@ Triangulation<3>::create_triangulation (const std::vector<Point<3> >    &v,
 				   // the arrays of the Triangulation
 				   //
 				   // first reserve enough space
-  faces->quads.reserve_space (needed_quads.size());
+  faces->quads.reserve_space (0,needed_quads.size());
   
   if (true) 
     {
@@ -2018,12 +2245,14 @@ void Triangulation<dim>::refine_global (const unsigned int times)
 template <int dim>
 void Triangulation<dim>::save_refine_flags (std::vector<bool> &v) const
 {
-  v.resize (n_active_cells(), false);
+  v.resize (dim*n_active_cells(), false);
   std::vector<bool>::iterator  i = v.begin();
   active_cell_iterator cell = begin_active(),
 		       endc = end();
-  for (; cell!=endc; ++cell, ++i)
-    *i = cell->refine_flag_set();
+  for (; cell!=endc; ++cell)
+    for (unsigned int j=0; j<dim; ++j,++i)
+      if (cell->refine_flag_set() & (1<<j) )
+ 	*i = true;
 }
 
 
@@ -2053,16 +2282,25 @@ void Triangulation<dim>::load_refine_flags (std::istream &in)
 template <int dim>
 void Triangulation<dim>::load_refine_flags (const std::vector<bool> &v)
 {
-  AssertThrow (v.size() == n_active_cells(), ExcGridReadError());
+  AssertThrow (v.size() == dim*n_active_cells(), ExcGridReadError());
   
   active_cell_iterator cell = begin_active(),
 		       endc = end();
   std::vector<bool>::const_iterator i = v.begin();
-  for (; cell!=endc; ++cell, ++i)
-    if (*i == true)
-      cell->set_refine_flag();
-    else
-      cell->clear_refine_flag();
+   for (; cell!=endc; ++cell)
+     {
+       unsigned int ref_case=0;
+       
+       for(unsigned int j=0; j<dim; ++j, ++i)
+	 if (*i == true)
+	   ref_case+=1<<j;
+       Assert(ref_case<RefinementCase<dim>::isotropic_refinement+1,
+	      ExcGridReadError());
+       if (ref_case>0)
+	 cell->set_refine_flag(RefinementCase<dim>(ref_case));
+       else
+	 cell->clear_refine_flag();
+     }
 }
 
 
@@ -2118,6 +2356,13 @@ void Triangulation<dim>::load_coarsen_flags (const std::vector<bool> &v)
 }
 
 
+template <int dim>
+bool Triangulation<dim>::get_anisotropic_refinement_flag() const
+{
+  return anisotropic_refinement;
+}
+
+
 #if deal_II_dimension == 1
 
 template <>
@@ -2138,9 +2383,10 @@ void Triangulation<1>::clear_user_pointers ()
 
 
 template <>
-void Triangulation<1>::clear_user_flags ()
+void Triangulation<1>::clear_user_flags_line ()
 {
-  clear_user_flags_line();
+  for (unsigned int level=0; level<levels.size(); ++level)
+    levels[level]->cells.clear_user_flags();
 }
 
 
@@ -2150,10 +2396,18 @@ void Triangulation<1>::clear_user_flags_quad ()
 {}
 
 
+
 template <>
 void Triangulation<1>::clear_user_flags_hex ()
 {}
 
+
+
+template <>
+void Triangulation<1>::clear_user_flags ()
+{
+  clear_user_flags_line();
+}
 
 #endif
 
@@ -2179,10 +2433,10 @@ void Triangulation<2>::clear_user_pointers ()
 
 
 template <>
-void Triangulation<2>::clear_user_flags ()
+void Triangulation<2>::clear_user_flags_quad ()
 {
-  clear_user_flags_line ();
-  clear_user_flags_quad ();  
+  for (unsigned int level=0; level<levels.size(); ++level)
+    levels[level]->cells.clear_user_flags();
 }
 
 
@@ -2191,6 +2445,14 @@ template <>
 void Triangulation<2>::clear_user_flags_hex ()
 {}
 
+
+
+template <>
+void Triangulation<2>::clear_user_flags ()
+{
+  clear_user_flags_line ();
+  clear_user_flags_quad ();  
+}
 
 #endif
 
@@ -2217,6 +2479,23 @@ void Triangulation<3>::clear_user_pointers ()
 
 
 template <>
+void Triangulation<3>::clear_user_flags_quad ()
+{
+  faces->quads.clear_user_flags();
+}
+
+
+
+template <>
+void Triangulation<3>::clear_user_flags_hex ()
+{
+  for (unsigned int level=0; level<levels.size(); ++level)
+    levels[level]->cells.clear_user_flags();
+}
+
+
+
+template <>
 void Triangulation<3>::clear_user_flags ()
 {
   clear_user_flags_line ();
@@ -2224,41 +2503,19 @@ void Triangulation<3>::clear_user_flags ()
   clear_user_flags_hex ();
 }
 
-
-
 #endif
 
+
+#if deal_II_dimension > 1
 
 template <int dim>
 void Triangulation<dim>::clear_user_flags_line ()
 {
-  line_iterator line = begin_line(),
-		endl = end_line();
-  for (; line!=endl; ++line)
-    line->clear_user_flag ();
+  faces->lines.clear_user_flags();
 }
 
+#endif
 
-
-template <int dim>
-void Triangulation<dim>::clear_user_flags_quad ()
-{
-  quad_iterator quad = begin_quad(),
-		endq = end_quad();
-  for (; quad!=endq; ++quad)
-    quad->clear_user_flag ();
-}
-
-
-
-template <int dim>
-void Triangulation<dim>::clear_user_flags_hex ()
-{
-  hex_iterator hex  = begin_hex(),
-               endh = end_hex();
-  for (; hex!=endh; ++hex)
-    hex->clear_user_flag ();
-}
 
 
 
@@ -4987,12 +5244,14 @@ Triangulation<1>::execute_refinement ()
 				       // created on that level
       levels[level+1]->reserve_space(
 	used_cells+
-	GeometryInfo<1>::children_per_cell * flagged_cells, 1);
+	GeometryInfo<1>::max_children_per_cell * flagged_cells, 1);
 				       // reserve space for
 				       // 2*flagged_cells new lines on
+				       // the next higher level to be
+				       // stored in pairs
 				       // the next higher level
       levels[level+1]->cells.
-	reserve_space (GeometryInfo<1>::children_per_cell*flagged_cells);
+	reserve_space (GeometryInfo<1>::max_children_per_cell*flagged_cells, 0);
       
       needed_vertices += flagged_cells;
     }
@@ -5068,7 +5327,7 @@ Triangulation<1>::execute_refinement ()
 	    second_child->clear_user_data ();
 
 					     // insert first child
-	    cell->set_children (first_child->index());
+	    cell->set_children (0, first_child->index());
 	    first_child->clear_children ();
 	    first_child->set (internal::Triangulation
                               ::TriaObject<1> (cell->vertex_index(0),
@@ -5212,12 +5471,27 @@ Triangulation<2>::execute_refinement ()
     }
 
 
-				   // first clear user flags for
-				   // lines; we're going to use them
-				   // to flag which lines need
-				   // refinement
+				   // first clear user flags and
+				   // pointers of lines; we're going
+				   // to use them to flag which lines
+				   // need refinement
   for (line_iterator line=begin_line(); line!=end_line(); ++line)
-    line->clear_user_flag();
+    {
+      line->clear_user_flag();
+      line->clear_user_data();
+    }
+				   // running over all cells and lines
+				   // count the number
+				   // n_single_lines of lines
+				   // which can be stored as
+				   // single lines, e.g. inner lines
+  unsigned int n_single_lines=0;
+				   // New lines to be created:
+				   // number lines which are
+				   // stored in pairs (the
+				   // children of lines must be
+				   // stored in pairs)
+  unsigned int n_lines_in_pairs = 0;
 
 				   // check how much space is needed
 				   // on every level we need not check
@@ -5227,7 +5501,6 @@ Triangulation<2>::execute_refinement ()
 				   // - there are, but prepare_refinement
 				   //   added another empty level
   unsigned int needed_vertices = 0;
-  unsigned int needed_lines  = 0;
   for (int level=levels.size()-2; level>=0; --level)
     {
       				       // count number of flagged
@@ -5235,44 +5508,71 @@ Triangulation<2>::execute_refinement ()
       				       // compute how many new
       				       // vertices and new lines will
       				       // be needed
-      unsigned int flagged_cells = 0;
+      unsigned int needed_cells = 0;
+
       active_cell_iterator cell = begin_active(level),
 			   endc = begin_active(level+1);
       for (; cell!=endc; ++cell) 
 	if (cell->refine_flag_set()) 
 	  {
-	    ++flagged_cells;
+	    if (cell->refine_flag_set()==RefinementCase<dim>::cut_xy)
+	      {
+		needed_cells += 4;
+		
+						 // new vertex at
+						 // center of cell is
+						 // needed in any case
+		++needed_vertices;
+						 // the four inner
+						 // lines can be
+						 // stored as singles
+		n_single_lines += 4;
+	      }
+	    else // cut_x || cut_y
+	      {
+						 // set the flag showing that
+						 // anisotropic refinement is
+						 // used for at least one cell
+		anisotropic_refinement=true;
+		
+		needed_cells += 2;
+						 // no vertex at center
+		
+						 // the inner line can
+						 // be stored as
+						 // single
+		n_single_lines += 1;
 
-					     // new vertex at center
-					     // of cell is needed in
-					     // any case
-	    ++needed_vertices;
-					     //	also the four inner
-					     //	lines
-	    needed_lines += 4;
+	      }
 	    
-					     // mark all faces (lines)
-					     // for refinement;
-					     // checking locally
-					     // whether the neighbor
-					     // would also like to
-					     // refine them is rather
-					     // difficult for lines so
-					     // we only flag them and
-					     // after visiting all
-					     // cells, we decide which
-					     // lines need refinement;
+						 // mark all faces
+						 // (lines) for
+						 // refinement;
+						 // checking locally
+						 // whether the
+						 // neighbor would
+						 // also like to
+						 // refine them is
+						 // rather difficult
+						 // for lines so we
+						 // only flag them and
+						 // after visiting all
+						 // cells, we decide
+						 // which lines need
+						 // refinement;
 	    for (unsigned int line_no=0; line_no<GeometryInfo<dim>::faces_per_cell;
 		 ++line_no)
 	      {
-		line_iterator line = cell->line(line_no);
-		
-		if (line->has_children() == false) 
-		  line->set_user_flag ();
+		if (GeometryInfo<dim>::face_refinement_case(
+		      cell->refine_flag_set(), line_no)==RefinementCase<dim>::cut_x)
+		  {
+		    line_iterator line = cell->line(line_no);
+		    if (line->has_children() == false) 
+		      line->set_user_flag ();
+		  }
 	      }
 	  }
 
-      
       
       				       // count number of used cells
       				       // on the next higher level
@@ -5286,16 +5586,16 @@ Triangulation<2>::execute_refinement ()
 				       // used_cells cells already
 				       // existing on the next higher
 				       // level as well as for the
-				       // 4*flagged_cells that will be
+				       // needed_cells that will be
 				       // created on that level
-      levels[level+1]->reserve_space (used_cells+4*flagged_cells, 2);
+      levels[level+1]->reserve_space (used_cells+needed_cells, 2);
 
       				       // reserve space for
-      				       // 4*flagged_cells
+      				       // needed_cells
 				       // new quads on the next higher
 				       // level
       levels[level+1]->cells.
-	reserve_space (4*flagged_cells);
+        reserve_space (needed_cells,0);
     }
 
 				   // now count the lines which
@@ -5304,14 +5604,22 @@ Triangulation<2>::execute_refinement ()
     if (line->user_flag_set())
       {
 	Assert (line->has_children() == false, ExcInternalError());
-	needed_lines    += 2;
-	needed_vertices += 1;
+	n_lines_in_pairs += 2;
+	needed_vertices  += 1;
       }
-
 				   // reserve space for
-				   // needed_lines new lines
+				   // n_lines_in_pairs new lines.
+				   // note, that we can't reserve space
+				   // for the single lines here as well,
+				   // as all the space reserved for lines
+				   // in pairs would be counted as unused
+				   // and we would end up with too little
+				   // space to store all lines. memory
+				   // reservation for n_single_lines can
+				   // only be done AFTER we refined the lines
+				   // of the current cells
   faces->lines.
-    reserve_space (needed_lines);
+    reserve_space (n_lines_in_pairs, 0);
   
 				   // add to needed vertices how many
 				   // vertices are already in use
@@ -5337,16 +5645,16 @@ Triangulation<2>::execute_refinement ()
 				   //  index of next unused vertex
   unsigned int next_unused_vertex = 0;
 
-				   // first for lines
-				   //
-				   // only active objects can be
-				   // refined further
+				   // first the refinement of lines.
+				   // children are stored pairwise
   if (true)
     {
+				       // only active objects can be
+				       // refined further
       active_line_iterator line = begin_active_line(),
 			   endl = end_line();
       raw_line_iterator next_unused_line = begin_raw_line ();
-      
+
       for (; line!=endl; ++line)
 	if (line->user_flag_set())
 	  {
@@ -5371,24 +5679,37 @@ Triangulation<2>::execute_refinement ()
 	  
 					     // now that we created
 					     // the right point, make
-					     // up the two child lines
-					     // (++ takes care of the
-					     // end of the vector)
-	    while (next_unused_line->used() == true)
-	      ++next_unused_line;
-					     // there should always be
-					     // two consecutive unused
+					     // up the two child
+					     // lines.  To this end,
+					     // find a pair of unused
+					     // lines
+	    bool pair_found=false;
+	    for (; next_unused_line!=endl; ++next_unused_line)
+	      if (!next_unused_line->used() &&
+		  !(++next_unused_line)->used())
+		{
+						   // go back to the
+						   // first of the two
+						   // unused lines
+		  --next_unused_line;
+		  pair_found=true;
+		  break;
+		}
+	    Assert (pair_found, ExcInternalError());
+
+					     // there are now two
+					     // consecutive unused
 					     // lines, such that the
 					     // children of a line
 					     // will be consecutive.
 					     // then set the child
 					     // pointer of the present
 					     // line
-	    line->set_children (next_unused_line->index());
+	    line->set_children (0, next_unused_line->index());
 	  
 					     // set the two new lines
-	    raw_line_iterator children[2] = { next_unused_line,
-					      ++next_unused_line };
+	    const raw_line_iterator children[2] = { next_unused_line,
+						    ++next_unused_line };
 					     // some tests; if any of
 					     // the iterators should
 					     // be invalid, then
@@ -5423,420 +5744,55 @@ Triangulation<2>::execute_refinement ()
 	  }
     }
 
+  
 				   // Now set up the new cells
+
+				   // reserve space for inner
+				   // lines (can be stored as
+				   // single lines)
+  faces->lines.
+    reserve_space (0,n_single_lines);
+
+				   // reset next_unused_line, as
+				   // now also single empty places
+				   // in the vector can be used
+  raw_line_iterator next_unused_line = begin_raw_line ();
+				   // dummy argument needed for the call to
+				   // create_children()
+  raw_quad_iterator dummy_quad;
+  
   for (int level=0; level<static_cast<int>(levels.size())-1; ++level) 
     {
       
+				       // Remember: as we don't operate
+				       // on the finest level, begin_*(level+1)
+				       // is allowed
       active_cell_iterator cell = begin_active(level),
 			   endc = begin_active(level+1);
       
-      raw_line_iterator next_unused_line = begin_raw_line ();
       raw_cell_iterator next_unused_cell = begin_raw (level+1);
 
       for (; cell!=endc; ++cell) 
 	if (cell->refine_flag_set()) 
 	  {
-					     // clear refinement flag
-	    cell->clear_refine_flag ();
-
-					     // do some additional
-					     // checks.
-#ifdef DEBUG
-	    for (unsigned int neighbor=0;
-		 neighbor<GeometryInfo<dim>::faces_per_cell; ++neighbor)
-	      if (cell->neighbor(neighbor).state() == IteratorState::valid)
-		Assert (((cell->neighbor(neighbor)->level() == cell->level()) &&
-			 (cell->neighbor(neighbor)->coarsen_flag_set() == false))  ||
-			((cell->neighbor(neighbor)->level() == cell->level()-1) &&
-			 (cell->neighbor(neighbor)->refine_flag_set() == true)),
-			ExcInternalError());
-#endif
+					     // set the user flag to
+					     // indicate, that at least one
+					     // line is at the boundary
 	    
-/* For the refinement process: since we go the levels up from the lowest, there
-   are (unlike above) only two possibilities: a neighbor cell is on the same
-   level or one level up (in both cases, it may or may not be refined later on,
-   but we don't care here).
-   
-   First:
-   Set up an array of the 3x3 vertices, which are distributed on the cell
-   (the array consists of indices into the @p{vertices} std::vector
-   
-   2--7--3
-   |  |  |
-   4--8--5
-   |  |  |
-   0--6--1
-	
-   Second:  
-   Set up an array of the new lines (the array consists of iterator pointers
-   into the lines arrays)
-   
-   .-6-.-7-.         The directions are:  .->-.->-.
-   1   9   3                              ^   ^   ^
-   .-10.11-.                             .->-.->-.
-   0   8   2                              ^   ^   ^
-   .-4-.-5-.                              .->-.->-.
-
-     
-   Third:
-   Set up an array of neighbors:
-   
-   6  7
-   .--.--.
-   1|  |  |3
-   .--.--.
-   0|  |  |2
-   .--.--.
-   4   5
-
-   We need this array for two reasons: first to get the lines which will
-   bound the four subcells (if the neighboring cell is refined, these
-   lines already exist), and second to update neighborship information.
-   Since if a neighbor is not refined, its neighborship record only
-   points to the present, unrefined, cell rather than the children we
-   are presently creating, we only need the neighborship information
-   if the neighbor cells are refined. In all other cases, we store
-   the unrefined neighbor address
-
-   We also need for every neighbor (if refined) which number among its
-   neighbors the present (unrefined) cell has, since that number is to
-   be replaced and because that also is the number of the subline which
-   will be the interface between that neighbor and the to be created cell.
-   We will store this number (between 0 and 3) in the field
-   @p{neighbors_neighbor}.
-
-   It would be sufficient to use the children of the common line to the
-   neighbor, if we only wanted to get the new sublines and the new vertex,
-   but because we need to update the neighborship information of the
-   two refined subcells of the neighbor, we need to search these anyway.
-
-   Convention:
-   The created children are numbered like this:
-
-   .--.--.
-   |2 . 3|
-   .--.--.
-   |0 | 1|
-   .--.--.
-*/
-	    
-					     // find the next unused
-					     // vertex and set it
-					     // appropriately
-	    while (vertices_used[next_unused_vertex] == true)
-	      ++next_unused_vertex;
-	    Assert (next_unused_vertex < vertices.size(),
-		    ExcTooFewVerticesAllocated());
-	    vertices_used[next_unused_vertex] = true;
-
-					     // collect the indices
-					     // all vertices
-	    int new_vertices[9] = {cell->vertex_index(0),
-				   cell->vertex_index(1),
-				   cell->vertex_index(2),
-				   cell->vertex_index(3),
-				   cell->line(0)->child(0)->vertex_index(1),
-				   cell->line(1)->child(0)->vertex_index(1),
-				   cell->line(2)->child(0)->vertex_index(1),
-				   cell->line(3)->child(0)->vertex_index(1),
-				   next_unused_vertex};
-
-					     // new vertex is placed
-					     // at the arithmetic mean
-					     // of all 8 neighboring
-					     // points.
-	    Point<2> new_point(0,0);
-	    for (unsigned int i=0; i<8; ++i)
-	      new_point +=  vertices[new_vertices[i]];
-	    new_point /= 8.0;
-	    
-	    vertices[new_vertices[8]] = new_point;
-
-					     // Now the lines:
-
-					     // lines 0-7 already
-					     // exist, create only the
-					     // four interior lines
-					     // 8-11
-	    raw_line_iterator new_lines[12];
-	    unsigned int l=0;
-	    for (unsigned int face_no=0; face_no<GeometryInfo<dim>::faces_per_cell;
-		 ++face_no)
-	      for (unsigned int child_no=0;
-		   child_no<GeometryInfo<dim>::subfaces_per_face; ++child_no, ++l)
-		new_lines[l]=cell->line(face_no)->child(child_no);
-	    Assert(l==8, ExcInternalError());
-		
-	    for (; l<12; ++l)
-	      {
-		while (next_unused_line->used() == true)
-		  ++next_unused_line;
-		new_lines[l] = next_unused_line;
-		++next_unused_line;
-
-		Assert (new_lines[l]->used() == false,
-                        ExcCellShouldBeUnused());
-	      }
-
-	    new_lines[8] ->set (internal::Triangulation
-                                ::TriaObject<1>(new_vertices[6], new_vertices[8]));
-	    new_lines[9] ->set (internal::Triangulation
-                                ::TriaObject<1>(new_vertices[8], new_vertices[7]));
-	    new_lines[10]->set (internal::Triangulation
-                                ::TriaObject<1>(new_vertices[4], new_vertices[8]));
-	    new_lines[11]->set (internal::Triangulation
-                                ::TriaObject<1>(new_vertices[8], new_vertices[5]));
-	
-	    for (l=8; l<12; ++l)
-	      {
-		new_lines[l]->set_used_flag();
-		new_lines[l]->clear_user_flag();
-		new_lines[l]->clear_user_data();
-		new_lines[l]->clear_children();
-						 // interior line
-		new_lines[l]->set_boundary_indicator(255);
-	      }
-
-					     // Now add the four new
-					     // cells!
-	    
-					     // search for next unused
-					     // cell the four children
-					     // have to be put into
-					     // the array
-					     // consecutively
-	    while (next_unused_cell->used() == true)
-	      ++next_unused_cell;
-
-	    const unsigned int n_children=GeometryInfo<dim>::children_per_cell;
-	    raw_cell_iterator subcells[n_children];
-	    for (unsigned int i=0; i<n_children; ++i) 
-	      {
-		Assert (next_unused_cell->used() == false,
-			ExcCellShouldBeUnused());
-		subcells[i] = next_unused_cell;
-		++next_unused_cell;
-	      }
-
-
-	    cell->set_children (subcells[0]->index());
-
-	    Assert(n_children==4, ExcNotImplemented());
-	    subcells[0]->set (internal::Triangulation
-                              ::TriaObject<2> (new_lines[0]->index(),
-					       new_lines[8]->index(),
-					       new_lines[4]->index(),
-					       new_lines[10]->index()));
-	    subcells[1]->set (internal::Triangulation
-                              ::TriaObject<2> (new_lines[8]->index(),
-					       new_lines[2]->index(),
-					       new_lines[5]->index(),
-					       new_lines[11]->index()));
-	    subcells[2]->set (internal::Triangulation
-                              ::TriaObject<2> (new_lines[1]->index(),
-					       new_lines[9]->index(),
-					       new_lines[10]->index(),
-					       new_lines[6]->index()));
-	    subcells[3]->set (internal::Triangulation
-                              ::TriaObject<2> (new_lines[9]->index(),
-					       new_lines[3]->index(),
-					       new_lines[11]->index(),
-					       new_lines[7]->index()));
-
-	    for (unsigned int i=0; i<n_children; ++i)
-	      {
-		subcells[i]->set_used_flag();
-		subcells[i]->clear_user_flag();
-		subcells[i]->clear_user_data();
-		subcells[i]->clear_children();
-						 // inherit material
-						 // properties		
-		subcells[i]->set_material_id (cell->material_id());
-		subcells[i]->set_subdomain_id (cell->subdomain_id());
-	      }
-	    
-					     // now the only thing
-					     // still to be done is
-					     // setting neighborship
-					     // information.
-					     //
-					     // to do so, first
-					     // collect the iterators
-					     // pointing to the 4x2
-					     // neighbors of this
-					     // cell.
-					     //
-					     // note that in case the
-					     // neighboring cell is
-					     // not refined, the
-					     // neighbor iterators
-					     // point to the common
-					     // mother cell. the same
-					     // applies if there is no
-					     // neighbor: the
-					     // iterators are past the
-					     // end
-	    cell_iterator neighbor_cells[n_children][2];
-	    for (unsigned int face=0; face<GeometryInfo<dim>::faces_per_cell;
-		 ++face)
-	      {
-		const cell_iterator neighbor = cell->neighbor(face);
-
-						 // if no neighbor
-		if (neighbor.state() != IteratorState::valid)
-		  for (unsigned int child_face=0;
-		       child_face<GeometryInfo<dim>::subfaces_per_face;
-		       ++child_face)
-		    neighbor_cells[face][child_face] = neighbor;
-		
-		else
-						   // neighbor exists
-		  {
-						     // neighbor's
-						     // level must not
-						     // be higher
-						     // (else
-						     // something went
-						     // wrong when
-						     // constructing
-						     // either of the
-						     // two cells) and
-						     // not lower
-						     // since then
-						     // this cell
-						     // should not
-						     // have been
-						     // refined.
-		    Assert (neighbor->level() == cell->level(),
-			    ExcInternalError());
-
-						     // now there are
-						     // two
-						     // possibilities:
-						     // either the
-						     // neighbor has
-						     // no children or
-						     // it has
-						     // children. these
-						     // must be
-						     // terminal then.
-		    if (!neighbor->has_children())
-		      for (unsigned int child_face=0;
-			   child_face<GeometryInfo<dim>::subfaces_per_face;
-			   ++child_face)
-			neighbor_cells[face][child_face] = neighbor;
-		    else
-						       // neighbor has
-						       // children
-		      {
-							 // first find
-							 // the face
-							 // of the
-							 // neighbor
-							 // adjacent
-							 // to which
-							 // the
-							 // present
-							 // cell is
-			const unsigned int nb_nb = cell->neighbor_of_neighbor(face);
-			Assert (nb_nb<GeometryInfo<dim>::faces_per_cell,
-				ExcInternalError());
-
-							 // and set
-							 // the
-							 // neighbors
-							 // accordingly
-			for (unsigned int c=0;
-			     c<GeometryInfo<dim>::subfaces_per_face; ++c)
-			  {
-			    neighbor_cells[face][c]
-			      = neighbor->child(GeometryInfo<dim>::
-                                                child_cell_on_face(nb_nb, c));
-			    
-			    Assert (neighbor_cells[face][c].state() ==
-				    IteratorState::valid,
-				    ExcInternalError());
-			    Assert (!neighbor_cells[face][c]->has_children(),
-				    ExcInternalError());
-			  }
-		      }
-		  }
-	      }
-
-					     // now we've got all
-					     // neighbors, so set them
-					     // in the new cells
-	    subcells[0]->set_neighbor (0, neighbor_cells[0][0]);
-	    subcells[0]->set_neighbor (1, subcells[1]);
-	    subcells[0]->set_neighbor (2, neighbor_cells[2][0]);
-	    subcells[0]->set_neighbor (3, subcells[2]);
-
-	    subcells[1]->set_neighbor (0, subcells[0]);
-	    subcells[1]->set_neighbor (1, neighbor_cells[1][0]);
-	    subcells[1]->set_neighbor (2, neighbor_cells[2][1]);
-	    subcells[1]->set_neighbor (3, subcells[3]);
-
-	    subcells[2]->set_neighbor (0, neighbor_cells[0][1]);
-	    subcells[2]->set_neighbor (1, subcells[3]);
-	    subcells[2]->set_neighbor (2, subcells[0]);
-	    subcells[2]->set_neighbor (3, neighbor_cells[3][0]);
-
-	    subcells[3]->set_neighbor (0, subcells[2]);
-	    subcells[3]->set_neighbor (1, neighbor_cells[1][1]);
-	    subcells[3]->set_neighbor (2, subcells[1]);
-	    subcells[3]->set_neighbor (3, neighbor_cells[3][1]);
-
-					     // now we need to set the
-					     // neighbors' neighborship
-					     // information; this is
-					     // only necessary if the
-					     // neighboring cell is
-					     // refined, i.e. is on
-					     // the same level as the
-					     // new children of the
-					     // present cell
-	    for (unsigned int nb=0; nb<GeometryInfo<dim>::faces_per_cell; ++nb)
-	      for (unsigned int subface=0;
-		   subface<GeometryInfo<dim>::subfaces_per_face; ++subface)
-		if ((neighbor_cells[nb][subface].state() ==
-		     IteratorState::valid) &&
-		    (neighbor_cells[nb][subface]->level() ==
-		     cell->level()+1))
-		  {
-						     // ok, the
-						     // neighbor is a
-						     // refined one
-						     // and we need to
-						     // set one of the
-						     // new children
-						     // as its
-						     // neighbor
-		    const cell_iterator neighbor = neighbor_cells[nb][subface];
-
-						     // find which
-						     // neighbor
-						     // pointer is to
-						     // be reset; this
-						     // pointer still
-						     // points to the
-						     // present cell
-		    unsigned int face;
-		    for (face=0; face<GeometryInfo<dim>::faces_per_cell; ++face)
-		      if (neighbor->neighbor(face) == cell)
-			break;
-
-		    Assert (face<GeometryInfo<dim>::faces_per_cell,
-			    ExcInternalError());
-
-		    neighbor->set_neighbor(face, subcells[
-					     GeometryInfo<dim>::child_cell_on_face(nb, subface)]);
-		  }
-
-					     // note that the
-					     // refinement flag was
-					     // already cleared at the
-					     // beginning of this loop
-	    
+					     // TODO[Tobias Leicht] find a
+					     // better place to set this flag,
+					     // so that we do not need so much
+					     // time to check each cell here
+	    if (cell->at_boundary())
+	      cell->set_user_flag();
+ 
+					     // actually set up the children and
+					     // update neighbor information
+	    create_children(next_unused_vertex,
+			    next_unused_line,
+			    dummy_quad,
+			    next_unused_cell,
+			    cell);
 	  }
     }
 
@@ -5905,12 +5861,23 @@ Triangulation<3>::execute_refinement ()
 				   // and lines; we're going to use them
 				   // to flag which lines and quads
 				   // need refinement
+  faces->quads.clear_user_data();
+  
   for (line_iterator line=begin_line(); line!=end_line(); ++line)
     line->clear_user_flag();
   for (quad_iterator quad=begin_quad(); quad!=end_quad(); ++quad)
-    quad->clear_user_flag();
-
-
+    {
+      quad->clear_user_flag();
+    }
+				   // create an array of face refine cases. User
+				   // indices of faces will be set to values
+				   // corresponding with indices in this array.
+  const RefinementCase<dim-1>  face_refinement_cases[4]=
+    {RefinementCase<dim-1>::no_refinement,
+     RefinementCase<dim-1>::cut_x,
+     RefinementCase<dim-1>::cut_y,
+     RefinementCase<dim-1>::cut_xy};
+  
 				   // check how much space is needed
 				   // on every level
 				   // we need not check the highest
@@ -5920,63 +5887,138 @@ Triangulation<3>::execute_refinement ()
 				   // - there are, but prepare_refinement
 				   //   added another empty level which
 				   //   then is the highest level
+
+				   // variables to hold the number of newly to
+				   // be created vertices, lines and quads. as
+				   // these are stored globally, declare them
+				   // outside the loop over al levels. we need
+				   // lines and quads in pairs for refinement of
+				   // old ones and lines and quads, that can be
+				   // stored as single ones, as they are newly
+				   // created in the inside of an existing cell
   unsigned int needed_vertices = 0;
-  unsigned int needed_lines    = 0;
-  unsigned int needed_quads    = 0;
-  int level;
-  for (level=levels.size()-2; level>=0; --level)
+  unsigned int needed_lines_single  = 0;
+  unsigned int needed_quads_single  = 0;
+  unsigned int needed_lines_pair  = 0;
+  unsigned int needed_quads_pair  = 0;
+  for (int level=levels.size()-2; level>=0; --level)
     {
       				       // count number of flagged
       				       // cells on this level and
       				       // compute how many new
       				       // vertices and new lines will
       				       // be needed
-      unsigned int flagged_cells = 0;
-
+      unsigned int new_cells = 0;
       
       active_cell_iterator acell = begin_active(level),
 			   aendc = begin_active(level+1);
       for (; acell!=aendc; ++acell) 
 	if (acell->refine_flag_set()) 
 	  {
-	    ++flagged_cells;
-
-					     // new vertex at center
-					     // of cell is needed in
-					     // any case
-	    ++needed_vertices;
-					     //	also the six inner
-					     //	lines
-	    needed_lines += 6;
-					     // and the 12 inner quads
-	    needed_quads += 12;
+	    RefinementCase<dim> ref_case=acell->refine_flag_set();
 	    
-					     // mark all faces and
-					     // lines for refinement;
+					     // now for interior vertices, lines
+					     // and quads, which are needed in
+					     // any case
+	    if (ref_case==RefinementCase<dim>::cut_x ||
+		ref_case==RefinementCase<dim>::cut_y ||
+		ref_case==RefinementCase<dim>::cut_z)
+	      {
+		++needed_quads_single;
+		new_cells+=2;
+		anisotropic_refinement=true;
+	      }
+	    else if (ref_case==RefinementCase<dim>::cut_xy ||
+		     ref_case==RefinementCase<dim>::cut_xz ||
+		     ref_case==RefinementCase<dim>::cut_yz)
+	      {
+		++needed_lines_single;
+		needed_quads_single += 4;
+		new_cells+=4;
+		anisotropic_refinement=true;
+	      }
+	    else if  (ref_case==RefinementCase<dim>::cut_xyz)
+	      {
+		++needed_vertices;
+		needed_lines_single += 6;
+		needed_quads_single += 12;
+		new_cells+=8;
+	      }
+	    else
+	      {
+						 // we should never get here
+		Assert(false, ExcInternalError());
+	      }
+	    
+					     // mark all faces for refinement;
 					     // checking locally
-					     // whether the neighbor
-					     // would also like to
-					     // refine them is rather
-					     // difficult for lines so
+					     // if and how the neighbor
+					     // would like to
+					     // refine these is
+					     // difficult so
 					     // we only flag them and
 					     // after visiting all
 					     // cells, we decide which
-					     // lines need refinement;
-					     // same for the quads
+					     // faces need which refinement;
 	    for (unsigned int face=0; face<GeometryInfo<dim>::faces_per_cell;
 		 ++face)
 	      {
 		face_iterator aface = acell->face(face);
+						 // get the RefineCase this
+						 // faces has for the given
+						 // RefineCase of the cell
+		RefinementCase<dim-1> face_ref_case=
+		  GeometryInfo<dim>::face_refinement_case(ref_case,
+							  face,
+							  acell->face_orientation(face),
+							  acell->face_flip(face),
+							  acell->face_rotation(face));
+						 // only do something, if this
+						 // face has to be refined
+		if (face_ref_case)
+		  if (face_ref_case==RefinementCase<dim-1>::isotropic_refinement)
+		    {
+		      if (aface->number_of_children()<4)
+						     // we use user_flags to
+						     // denote needed isotropic
+						     // refinement
+			aface->set_user_flag();
+		    }
+		  else if (aface->refinement_case()!=face_ref_case)
+						     // we use user_indices
+						     // to denote needed
+						     // anisotropic
+						     // refinement. note, that
+						     // we can have at most
+						     // one anisotropic
+						     // refinement case for
+						     // this face, as
+						     // otherwise
+						     // prepare_refinement()
+						     // would have changed one
+						     // of the cells to yield
+						     // isotropic refinement
+						     // at this
+						     // face. therefore we set
+						     // the user_index
+						     // uniquely
+		    {
+		      Assert(aface->refinement_case()==RefinementCase<dim-1>::isotropic_refinement ||
+			     aface->refinement_case()==RefinementCase<dim-1>::no_refinement,
+			     ExcInternalError());
+		      aface->set_user_index(face_ref_case);
+		    }
+	      }// for all faces
+	    
+					     // flag all lines, that have to be
+					     // refined
+	    for (unsigned int line=0; line<GeometryInfo<dim>::lines_per_cell; ++line)
+	      if (GeometryInfo<dim>::line_refinement_case(ref_case,line) &&
+		  !acell->line(line)->has_children())
+		acell->line(line)->set_user_flag();
 		
-		if (aface->has_children() == false) 
-		  {
-		    aface->set_user_flag ();
-		    for (unsigned int line=0; line<4; ++line)
-		      if (aface->line(line)->has_children() == false)
-			aface->line(line)->set_user_flag ();
-		  }
-	      }
-	  }
+	  }// if refine_flag set and for all cells on this level
+      
 
 				       // count number of used cells on
 				       // the next higher level
@@ -5992,42 +6034,84 @@ Triangulation<3>::execute_refinement ()
 				       // level as well as for the
 				       // 8*flagged_cells that will be
 				       // created on that level
-      levels[level+1]->reserve_space (used_cells+8*flagged_cells, 3);
+      levels[level+1]->reserve_space (used_cells+new_cells, 3);
       				       // reserve space for
       				       // 8*flagged_cells
 				       // new hexes on the next higher
 				       // level
-      levels[level+1]->cells.reserve_space (8*flagged_cells);
-    }
-
+      levels[level+1]->cells.reserve_space (new_cells);
+    }// for all levels
 				   // now count the quads and
 				   // lines which were flagged for
 				   // refinement
   for (quad_iterator quad=begin_quad(); quad!=end_quad(); ++quad)
-    if (quad->user_flag_set())
-      {
-	Assert (quad->has_children() == false, ExcInternalError());
-	needed_quads    += 4;
-	needed_lines    += 4;
-	needed_vertices += 1;
-      }
+    {
+      if (quad->user_flag_set())
+	{
+					   // isotropic refinement: 1 interior
+					   // vertex, 4 quads and 4 interior
+					   // lines. we store the interior lines
+					   // in pairs in case the face is
+					   // already or will be refined
+					   // anisotropically
+	  needed_quads_pair += 4;
+	  needed_lines_pair += 4;
+	  needed_vertices += 1;
+	}
+      if (quad->user_index())
+	{
+					   // anisotropic refinement: 1 interior
+					   // line and two quads
+	  needed_quads_pair += 2;
+	  needed_lines_single += 1;
+					   // there is a kind of complicated
+					   // situation here which requires our
+					   // attention. if the quad is refined
+					   // isotropcally, two of the interior
+					   // lines will get a new mother line -
+					   // the interior line of our
+					   // anisotropically refined quad. if
+					   // those two lines are not
+					   // consecutive, we cannot do so and
+					   // have to replace them by two lines
+					   // that are consecutive. we try to
+					   // avoid that situation, but it may
+					   // happen nevertheless throug
+					   // repeated refinement and
+					   // coarsening. thus we have to check
+					   // here, as we will need some
+					   // additional space to store those
+					   // new lines in case we need them...
+	  if (quad->has_children())
+	    {
+	      Assert(quad->refinement_case()==RefinementCase<dim-1>::isotropic_refinement, ExcInternalError());
+	      if ((face_refinement_cases[quad->user_index()]==RefinementCase<dim-1>::cut_x
+		   && (quad->child(0)->line_index(1)+1!=quad->child(2)->line_index(1))) ||
+		  (face_refinement_cases[quad->user_index()]==RefinementCase<dim-1>::cut_y
+		   && (quad->child(0)->line_index(3)+1!=quad->child(1)->line_index(3))))
+		needed_lines_pair +=2;
+	    }
+	}
+    }
   
   for (line_iterator line=begin_line(); line!=end_line(); ++line)
     if (line->user_flag_set())
       {
-	Assert (line->has_children() == false, ExcInternalError());
-	needed_lines += 2;
+	needed_lines_pair += 2;
 	needed_vertices += 1;
       }
 
 				   // reserve space for
 				   // needed_lines new lines
+				   // stored in pairs
   faces->lines.
-    reserve_space (needed_lines);
+    reserve_space (needed_lines_pair,needed_lines_single);
 				   // reserve space for
 				   // needed_quads new quads
+				   // stored in pairs
   faces->quads.
-    reserve_space (needed_quads);
+    reserve_space (needed_quads_pair,needed_quads_single);
+
 
 				   // add to needed vertices how many
 				   // vertices are already in use
@@ -6086,14 +6170,13 @@ Triangulation<3>::execute_refinement ()
   unsigned int next_unused_vertex = 0;
 
 				   // first for lines
-				   // only active objects can be
-				   // refined further;
   if (true)
     {
+				       // only active objects can be
+				       // refined further
       active_line_iterator line = begin_active_line(),
 			   endl = end_line();
       raw_line_iterator next_unused_line = begin_raw_line ();
-  
 
       for (; line!=endl; ++line)
 	if (line->user_flag_set())
@@ -6122,9 +6205,11 @@ Triangulation<3>::execute_refinement ()
 					     // up the two child lines
 					     // (++ takes care of the
 					     // end of the vector)
-	    while (next_unused_line->used() == true)
-	      ++next_unused_line;
-					     // there should always be
+	    next_unused_line=faces->lines.next_free_pair_line(*this);
+	    Assert(next_unused_line.state() == IteratorState::valid,
+		   ExcInternalError());
+	    
+					     // now we found
 					     // two consecutive unused
 					     // lines, such that the
 					     // children of a line
@@ -6132,11 +6217,11 @@ Triangulation<3>::execute_refinement ()
 					     // then set the child
 					     // pointer of the present
 					     // line
-	    line->set_children (next_unused_line->index());
+	    line->set_children (0, next_unused_line->index());
 	  
 					     // set the two new lines
-	    raw_line_iterator children[2] = { next_unused_line,
-					      ++next_unused_line };
+	    const raw_line_iterator children[2] = { next_unused_line,
+						    ++next_unused_line };
 					     // some tests; if any of
 					     // the iterators should
 					     // be invalid, then
@@ -6175,279 +6260,850 @@ Triangulation<3>::execute_refinement ()
 				   ///////////////////////////////////////
 				   // now refine marked quads
 				   ///////////////////////////////////////
-				   //
-				   // only active objects can be
-				   // refined further;
-  if (true)
+
+				   // here we encounter several cases:
+
+				   // a) the quad is unrefined and shall be
+				   // refined isotropically
+
+				   // b) the quad is unrefined and shall be
+				   // refined anisotropically
+
+				   // c) the quad is unrefined and shall be
+				   // refined both anisotropically and
+				   // isotropically (this is reduced to case b)
+				   // and then case b) for the children again)
+
+				   // d) the quad is refined anisotropically and
+				   // shall be refined isotropically (this is
+				   // reduced to case b) for the anisotropic
+				   // children)
+
+				   // e) the quad is refined isotropically and
+				   // shall be refined anisotropically (this is
+				   // transformed to case c), however we might
+				   // have to renumber/rename children...)
+
+				   // we need a loop in cases c) and d), as the
+				   // anisotropic children migt have a lower
+				   // index than the mother quad
+  for (unsigned int loop=0; loop<2; ++loop)
     {
-      active_quad_iterator quad = begin_active_quad(),
-			   endq = end_quad();
-      raw_line_iterator next_unused_line = begin_raw_line ();
+				       // usually, only active objects can be
+				       // refined further. however, in cases d)
+				       // and e) that is not true, so we have to
+				       // use 'normal' iterators here
+      quad_iterator quad = begin_quad(),
+		    endq = end_quad();
+      raw_line_iterator next_unused_line = begin_raw_line (),
+				    endl = end_line();
       raw_quad_iterator next_unused_quad = begin_raw_quad ();
-      
+
       for (; quad!=endq; ++quad)
-	if (quad->user_flag_set())
-	  {
-					     // this quad needs to be
-					     // refined
+	{
+	  if (quad->user_index())
+	    {
+	      RefinementCase<dim-1> aniso_quad_ref_case=face_refinement_cases[quad->user_index()];
+					       // there is one unlikely event
+					       // here, where we already have
+					       // refind the face: if the face
+					       // was refined anisotropically
+					       // and we want to refine it
+					       // isotropically, both children
+					       // are flagged for anisotropic
+					       // refinement. however, if those
+					       // children were already flagged
+					       // for anisotropic refinement,
+					       // they might already be
+					       // processed and refined.
+	      if (aniso_quad_ref_case == quad->refinement_case())
+		continue;
+	      
+	      Assert(quad->refinement_case()==RefinementCase<dim>::cut_xy ||
+		     quad->refinement_case()==RefinementCase<dim>::no_refinement,
+		     ExcInternalError());
+	      
+					       // this quad needs to be refined
+					       // anisotropically
+	      Assert(quad->user_index() == RefinementCase<dim>::cut_x ||
+		     quad->user_index() == RefinementCase<dim>::cut_y,
+		     ExcInternalError());
 
-					     // find the next unused
-					     // vertex and set it
-					     // appropriately
-	    while (vertices_used[next_unused_vertex] == true)
-	      ++next_unused_vertex;
-	    Assert (next_unused_vertex < vertices.size(),
-		    ExcTooFewVerticesAllocated());
-	    vertices_used[next_unused_vertex] = true;
-	    
-	    if (quad->at_boundary()) 
-	      vertices[next_unused_vertex]
-		= boundary[quad->boundary_indicator()]->get_new_point_on_quad (quad);
-	    else
-					       // it might be that the
-					       // quad itself is not
-					       // at the boundary, but
-					       // that one of its lines
-					       // actually is. in this
-					       // case, the newly
-					       // created vertices at
-					       // the centers of the
-					       // lines are not
-					       // necessarily the mean
-					       // values of the
-					       // adjacent vertices,
-					       // so do not compute
-					       // the new vertex as
-					       // the mean value of
-					       // the 4 vertices of
-					       // the face, but rather
-					       // as a weighted mean
-					       // value of the 8
-					       // vertices which we
-					       // already have (the
-					       // four old ones, and
-					       // the four ones
-					       // inserted as middle
-					       // points for the four
-					       // lines). summing up
-					       // some more points is
-					       // generally cheaper
-					       // than first asking
-					       // whether one of the
-					       // lines is at the
-					       // boundary
+					       // make the new line interior to
+					       // the quad
+	      raw_line_iterator new_line;
+	      
+	      new_line=faces->lines.next_free_single_line(*this);
+	      Assert (new_line->used() == false,
+		      ExcCellShouldBeUnused());
+
+					       // first collect the
+					       // indices of the vertices:
+					       // *--1--*
+					       // |  |  |
+					       // |  |  |    cut_x
+					       // |  |  |
+					       // *--0--*
 					       //
-					       // note that the exact
-					       // weights are chosen
-					       // such as to minimize
-					       // the distortion of
-					       // the four new quads
-					       // from the optimal
-					       // shape; their
-					       // derivation and
-					       // values is copied
-					       // over from the
-					       // @p{MappingQ::set_laplace_on_vector}
-					       // function
-	      vertices[next_unused_vertex]
-		= (quad->vertex(0) + quad->vertex(1) +
-		   quad->vertex(2) + quad->vertex(3) +
-		   3*(quad->line(0)->child(0)->vertex(1) +
-		      quad->line(1)->child(0)->vertex(1) +
-		      quad->line(2)->child(0)->vertex(1) +
-		      quad->line(3)->child(0)->vertex(1))   ) / 16;
-	  
-					     // now that we created
-					     // the right point, make
-					     // up the four lines
-					     // interior to the quad
-					     // (++ takes care of the
-					     // end of the vector)
-	    raw_line_iterator new_lines[4];
+					       // *-----*
+					       // |     |
+					       // 0-----1    cut_y
+					       // |     |
+					       // *-----*
+	      unsigned int vertex_indices[2];
+	      if (aniso_quad_ref_case==RefinementCase<dim>::cut_x)
+		{
+		  vertex_indices[0]=quad->line(2)->child(0)->vertex_index(1);
+		  vertex_indices[1]=quad->line(3)->child(0)->vertex_index(1);
+		}
+	      else
+		{
+		  vertex_indices[0]=quad->line(0)->child(0)->vertex_index(1);
+		  vertex_indices[1]=quad->line(1)->child(0)->vertex_index(1);
+		}
 
-	    for (unsigned int i=0; i<4; ++i)
-	      {
-		while (next_unused_line->used() == true)
-		  ++next_unused_line;
-		new_lines[i] = next_unused_line;
-		++next_unused_line;
+	      new_line->set (internal::Triangulation::
+			     TriaObject<1>(vertex_indices[0], vertex_indices[1]));
+	      new_line->set_used_flag();
+	      new_line->clear_user_flag();
+	      new_line->clear_user_data();
+	      new_line->clear_children();
+	      new_line->set_boundary_indicator(quad->boundary_indicator());
 
-		Assert (new_lines[i]->used() == false,
-                        ExcCellShouldBeUnused());
-	      }
-
-					     // set the data of the
-					     // four lines.
-					     // first collect the
-					     // indices of the five
-					     // vertices:
-					     // *--3--*
-					     // |  |  |
-					     // 0--4--1
-					     // |  |  |
-					     // *--2--*
-					     // the lines are numbered
-					     // as follows:
-					     // *--*--*
-					     // |  1  |
-					     // *2-*-3*
-					     // |  0  |
-					     // *--*--*
-	    const unsigned int vertex_indices[5]
-	      = { quad->line(0)->child(0)->vertex_index(1),
-		  quad->line(1)->child(0)->vertex_index(1),
-		  quad->line(2)->child(0)->vertex_index(1),
-		  quad->line(3)->child(0)->vertex_index(1),
-		  next_unused_vertex 
-	      };
-	    
-	    new_lines[0]->set (internal::Triangulation
-                               ::TriaObject<1>(vertex_indices[2], vertex_indices[4]));
-	    new_lines[1]->set (internal::Triangulation
-                               ::TriaObject<1>(vertex_indices[4], vertex_indices[3]));
-	    new_lines[2]->set (internal::Triangulation
-                               ::TriaObject<1>(vertex_indices[0], vertex_indices[4]));
-	    new_lines[3]->set (internal::Triangulation
-                               ::TriaObject<1>(vertex_indices[4], vertex_indices[1]));
-
-	    for (unsigned int i=0; i<4; ++i)
-	      {
-		new_lines[i]->set_used_flag();
-		new_lines[i]->clear_user_flag();
-		new_lines[i]->clear_user_data();
-		new_lines[i]->clear_children();
-		new_lines[i]->set_boundary_indicator(quad->boundary_indicator());
-	      }
-
-
-					     // now for the
-					     // quads. again, first
-					     // collect some data
-					     // about the indices of
-					     // the lines, with the
-					     // following numbering:
-					     //   .-6-.-7-.
-					     //   1   9   3
-					     //   .-10.11-.
-					     //   0   8   2
-					     //   .-4-.-5-.
-
-					     // child 0 and 1 of a line are
-					     // switched if the line orientation
-					     // is false. set up a miniature
-					     // table, indicating which child to
-					     // take for line orientations false
-					     // and true. first index: child
-					     // index in standard orientation,
-					     // second index: line orientation
-	    unsigned int index[2][2]=
-	      {{1,0},   // child 0, line_orientation=false and true
-	       {0,1}};  // child 1, line_orientation=false and true
-		    
-	    const unsigned int line_indices[12]
-	      = { quad->line(0)->child(index[0][quad->line_orientation(0)])->index(),
-		  quad->line(0)->child(index[1][quad->line_orientation(0)])->index(),
-		  quad->line(1)->child(index[0][quad->line_orientation(1)])->index(),
-		  quad->line(1)->child(index[1][quad->line_orientation(1)])->index(),
-		  quad->line(2)->child(index[0][quad->line_orientation(2)])->index(),
-		  quad->line(2)->child(index[1][quad->line_orientation(2)])->index(),
-		  quad->line(3)->child(index[0][quad->line_orientation(3)])->index(),
-		  quad->line(3)->child(index[1][quad->line_orientation(3)])->index(),
-		  new_lines[0]->index(),
-		  new_lines[1]->index(),
-		  new_lines[2]->index(),
-		  new_lines[3]->index() 
-	      };
-	    
-					     // find some space for
-					     // the four newly to be
-					     // created quads.  note
-					     // that there should
-					     // always be four
-					     // consecutive free slots
-					     // for them
-	    raw_quad_iterator new_quads[4];
-
-	    while (next_unused_quad->used() == true)
+					       // child 0 and 1 of a line are
+					       // switched if the line
+					       // orientation is false. set up a
+					       // miniature table, indicating
+					       // which child to take for line
+					       // orientations false and
+					       // true. first index: child index
+					       // in standard orientation,
+					       // second index: line orientation
+	      const unsigned int index[2][2]=
+		{{1,0},   // child 0, line_orientation=false and true
+		 {0,1}};  // child 1, line_orientation=false and true
+	      
+					       // find some space (consecutive)
+					       // for the two newly to be
+					       // created quads.
+	      raw_quad_iterator new_quads[2];
+	      
+	      next_unused_quad=faces->quads.next_free_pair_quad(*this);
+	      new_quads[0] = next_unused_quad;
+	      Assert (new_quads[0]->used() == false, ExcCellShouldBeUnused());
+	      
 	      ++next_unused_quad;
+	      new_quads[1] = next_unused_quad;
+	      Assert (new_quads[1]->used() == false, ExcCellShouldBeUnused());
 
-	    new_quads[0] = next_unused_quad;
-	    Assert (new_quads[0]->used() == false, ExcCellShouldBeUnused());
 
-	    ++next_unused_quad;
-	    new_quads[1] = next_unused_quad;
-	    Assert (new_quads[1]->used() == false, ExcCellShouldBeUnused());
+	      if (aniso_quad_ref_case==RefinementCase<dim>::cut_x)
+		{
+		  new_quads[0]->set (internal::Triangulation
+				     ::TriaObject<2>(quad->line_index(0),
+						     new_line->index(),
+						     quad->line(2)->child(index[0][quad->line_orientation(2)])->index(),
+						     quad->line(3)->child(index[0][quad->line_orientation(3)])->index()));
+		  new_quads[1]->set (internal::Triangulation
+				     ::TriaObject<2>(new_line->index(),
+						     quad->line_index(1),
+						     quad->line(2)->child(index[1][quad->line_orientation(2)])->index(),
+						     quad->line(3)->child(index[1][quad->line_orientation(3)])->index()));
+		}
+	      else
+		{
+		  new_quads[0]->set (internal::Triangulation
+				     ::TriaObject<2>(quad->line(0)->child(index[0][quad->line_orientation(0)])->index(),
+						     quad->line(1)->child(index[0][quad->line_orientation(1)])->index(),
+						     quad->line_index(2),
+						     new_line->index()));
+		  new_quads[1]->set (internal::Triangulation
+				     ::TriaObject<2>(quad->line(0)->child(index[1][quad->line_orientation(0)])->index(),
+						     quad->line(1)->child(index[1][quad->line_orientation(1)])->index(),
+						     new_line->index(),
+						     quad->line_index(3)));
+		}
+	      
+	      for (unsigned int i=0; i<2; ++i)
+		{
+		  new_quads[i]->set_used_flag();
+		  new_quads[i]->clear_user_flag();
+		  new_quads[i]->clear_user_data();
+		  new_quads[i]->clear_children();
+		  new_quads[i]->set_boundary_indicator (quad->boundary_indicator());
+						   // set all line orientations to
+						   // true, change this after the
+						   // loop, as we have to consider
+						   // different lines for each
+						   // child
+		  for (unsigned int j=0; j<GeometryInfo<dim>::lines_per_face; ++j)
+		    new_quads[i]->set_line_orientation(j,true);
+		}
+					       // now set the line orientation of
+					       // children of outer lines
+					       // correctly, the lines in the
+					       // interior of the refined quad are
+					       // automatically oriented
+					       // conforming to the standard
+	      new_quads[0]->set_line_orientation(0,quad->line_orientation(0));
+	      new_quads[0]->set_line_orientation(2,quad->line_orientation(2));
+	      new_quads[1]->set_line_orientation(1,quad->line_orientation(1));
+	      new_quads[1]->set_line_orientation(2,quad->line_orientation(3));
+	      if (aniso_quad_ref_case==RefinementCase<dim>::cut_x)
+		{
+		  new_quads[0]->set_line_orientation(3,quad->line_orientation(3));
+		  new_quads[1]->set_line_orientation(2,quad->line_orientation(2));
+		}
+	      else
+		{
+		  new_quads[0]->set_line_orientation(1,quad->line_orientation(1));
+		  new_quads[1]->set_line_orientation(0,quad->line_orientation(0));
+		}
 
-	    ++next_unused_quad;
-	    new_quads[2] = next_unused_quad;
-	    Assert (new_quads[2]->used() == false, ExcCellShouldBeUnused());
+					       // test, whether this face is
+					       // refined isotropically
+					       // already. if so, set the
+					       // correct children pointers.
+	      if (quad->refinement_case()==RefinementCase<dim>::cut_xy)
+		{
+						   // we will put a new
+						   // refinemnt level of
+						   // anisotropic refinement
+						   // between the unrefined and
+						   // isotropically refined quad
+						   // ending up with the same
+						   // fine quads but introducing
+						   // anisotropically refined
+						   // ones as children of the
+						   // unrefined quad and mother
+						   // cells of the original fine
+						   // ones.
 
-	    ++next_unused_quad;
-	    new_quads[3] = next_unused_quad;
-	    Assert (new_quads[3]->used() == false, ExcCellShouldBeUnused());
+						   // this process includes the
+						   // creation of a new middle
+						   // line which we will assign
+						   // as the mother line of two
+						   // of the existing inner
+						   // lines. If those inner
+						   // lines are not consecutive
+						   // in memory, we won't find
+						   // them later on, so we have
+						   // to create new ones instead
+						   // and replace all occurances
+						   // of the old ones with those
+						   // new ones. As this is kind
+						   // of ugly, we hope we don't
+						   // have to do it often...
+		  line_iterator old_child[2];
+		  if (aniso_quad_ref_case==RefinementCase<dim>::cut_x)
+		    {
+		      old_child[0]=quad->child(0)->line(1);
+		      old_child[1]=quad->child(2)->line(1);
+		    }
+		  else
+		    {
+		      Assert(aniso_quad_ref_case==RefinementCase<dim>::cut_y, ExcInternalError());
+		      
+		      old_child[0]=quad->child(0)->line(3);
+		      old_child[1]=quad->child(1)->line(3);
+		    }
+		  
+		  if (old_child[0]->index()+1 != old_child[1]->index())
+		    {
+						       // this is exactly the
+						       // ugly case we taked
+						       // about. so, no
+						       // coimplaining, lets get
+						       // two new lines and copy
+						       // all info
+		      raw_line_iterator new_child[2];
+		      
+		      new_child[0]=new_child[1]=faces->lines.next_free_pair_line(*this);
+		      ++new_child[1];
 
-					     // note these quads as
-					     // children to the
-					     // present one
-	    quad->set_children (new_quads[0]->index());
+		      new_child[0]->set_used_flag();
+		      new_child[1]->set_used_flag();
+		      
+		      const int old_index_0=old_child[0]->index(),
+				old_index_1=old_child[1]->index(),
+				new_index_0=new_child[0]->index(),
+				new_index_1=new_child[1]->index();
 
-	    new_quads[0]->set (internal::Triangulation
-                               ::TriaObject<2> (line_indices[0],
-						line_indices[8],
-						line_indices[4],
-						line_indices[10]));
-	    new_quads[1]->set (internal::Triangulation
-                               ::TriaObject<2> (line_indices[8],
-						line_indices[2],
-						line_indices[5],
-						line_indices[11]));
-	    new_quads[2]->set (internal::Triangulation
-                               ::TriaObject<2> (line_indices[1],
-						line_indices[9],
-						line_indices[10],
-						line_indices[6]));
-	    new_quads[3]->set (internal::Triangulation
-                               ::TriaObject<2> (line_indices[9],
-						line_indices[3],
-						line_indices[11],
-						line_indices[7]));
-	    for (unsigned int i=0; i<4; ++i)
-	      {
-		new_quads[i]->set_used_flag();
-		new_quads[i]->clear_user_flag();
-		new_quads[i]->clear_user_data();
-		new_quads[i]->clear_children();
-		new_quads[i]->set_boundary_indicator (quad->boundary_indicator());
-						 // set all line orientations to
-						 // true, change this after the
-						 // loop, as we have to consider
-						 // different lines for each
-						 // child
-		for (unsigned int j=0; j<GeometryInfo<dim>::lines_per_face; ++j)
-		  new_quads[i]->set_line_orientation(j,true);
-	      }
-					     // now set the line orientation of
-					     // children of outer lines
-					     // correctly, the lines in the
-					     // interior of the refined quad are
-					     // automatically oriented
-					     // conforming to the standard
-	    new_quads[0]->set_line_orientation(0,quad->line_orientation(0));
-	    new_quads[0]->set_line_orientation(2,quad->line_orientation(2));
-	    new_quads[1]->set_line_orientation(1,quad->line_orientation(1));
-	    new_quads[1]->set_line_orientation(2,quad->line_orientation(2));
-	    new_quads[2]->set_line_orientation(0,quad->line_orientation(0));
-	    new_quads[2]->set_line_orientation(3,quad->line_orientation(3));
-	    new_quads[3]->set_line_orientation(1,quad->line_orientation(1));
-	    new_quads[3]->set_line_orientation(3,quad->line_orientation(3));
-				       
+						       // loop over all quads
+						       // and replace the old
+						       // lines
+		      for (unsigned int q=0; q<faces->quads.cells.size(); ++q)
+			for (unsigned int l=0; l<GeometryInfo<dim>::lines_per_face; ++l)
+			    {
+			      const int index=faces->quads.cells[q].face(l);
+			      if (index==old_index_0)
+				faces->quads.cells[q].set_face(l,new_index_0);
+			      else if (index==old_index_1)
+				faces->quads.cells[q].set_face(l,new_index_1);
+			    }
+						       // now we have to copy
+						       // all information of the
+						       // two lines
+		      for (unsigned int i=0; i<2; ++i)
+			{
+			  Assert(!old_child[i]->has_children(), ExcInternalError());
+			  
+  			  new_child[i]->set(internal::Triangulation::TriaObject<1>(old_child[i]->vertex_index(0),
+  										  old_child[i]->vertex_index(1)));
+			  new_child[i]->set_boundary_indicator(old_child[i]->boundary_indicator());
+			  new_child[i]->set_user_index(old_child[i]->user_index());
+			  if (old_child[i]->user_flag_set())
+			    new_child[i]->set_user_flag();
+			  else
+			    new_child[i]->clear_user_flag();
+			  
+			  new_child[i]->clear_children();
+			  
+			  old_child[i]->clear_user_flag();
+			  old_child[i]->clear_user_index();
+			  old_child[i]->clear_used_flag();
+			}
+		    }
+						       // now that we cared
+						       // about the lines, go on
+						       // with the quads
+						       // themselves, where we
+						       // might encounter
+						       // similar situations...
+		  if (aniso_quad_ref_case==RefinementCase<dim>::cut_x)
+		    {
+		      new_line->set_children(0, quad->child(0)->line_index(1));
+		      Assert(new_line->child(1)==quad->child(2)->line(1),
+			     ExcInternalError());
+						       // now evereything is
+						       // quite complicated. we
+						       // have the children
+						       // numbered according to
+						       //
+						       // *---*---*
+						       // |n+2|n+3|
+						       // *---*---*
+						       // | n |n+1|
+						       // *---*---*
+						       //
+						       // from the original
+						       // isotropic
+						       // refinement. we have to
+						       // reorder them as
+						       //
+						       // *---*---*
+						       // |n+1|n+3|
+						       // *---*---*
+						       // | n |n+2|
+						       // *---*---*
+						       //
+						       // such that n and n+1
+						       // are consecutive
+						       // children of m and n+2
+						       // and n+3 are
+						       // consecutive children
+						       // of m+1, where m and
+						       // m+1 are given as in
+						       //
+						       // *---*---*
+						       // |   |   |
+						       // | m |m+1|
+						       // |   |   |
+						       // *---*---*
+						       //
+						       // this is a bit ugly, of
+						       // course: loop over all
+						       // cells on all levels
+						       // and look for faces n+1
+						       // (switch_1) and n+2
+						       // (switch_2).
+		      const quad_iterator switch_1=quad->child(1);
+		      const quad_iterator switch_2=quad->child(2);
+		      const int switch_1_index=switch_1->index();
+		      const int switch_2_index=switch_2->index();
+		      for (unsigned int l=0; l<levels.size(); ++l)
+			for (unsigned int h=0; h<levels[l]->cells.cells.size(); ++h)
+			  for (unsigned int q=0; q<GeometryInfo<dim>::faces_per_cell; ++q)
+			    {
+			      const int index=levels[l]->cells.cells[h].face(q);
+			      if (index==switch_1_index)
+				levels[l]->cells.cells[h].set_face(q,switch_2_index);
+			      else if (index==switch_2_index)
+				levels[l]->cells.cells[h].set_face(q,switch_1_index);
+			    }
+						       // now we have to copy
+						       // all information of the
+						       // two quads
+		      const int switch_1_lines[4]=
+			{switch_1->line_index(0),
+			 switch_1->line_index(1),
+			 switch_1->line_index(2),
+			 switch_1->line_index(3)};
+		      const bool switch_1_line_orientations[4]=
+			{switch_1->line_orientation(0),
+			 switch_1->line_orientation(1),
+			 switch_1->line_orientation(2),
+			 switch_1->line_orientation(3)};
+		      const unsigned char switch_1_boundary_indicator=switch_1->boundary_indicator();
+		      const unsigned int switch_1_user_index=switch_1->user_index();
+		      const bool switch_1_user_flag=switch_1->user_flag_set();
+		      const RefinementCase<dim-1> switch_1_refinement_case=switch_1->refinement_case();
+		      const int switch_1_first_child_pair=(switch_1_refinement_case ? switch_1->child_index(0) : -1);
+		      const int switch_1_second_child_pair=(switch_1_refinement_case==RefinementCase<dim>::cut_xy ? switch_1->child_index(2) : -1);
+
+		      switch_1->set(internal::Triangulation::TriaObject<2>(switch_2->line_index(0),
+									   switch_2->line_index(1),
+									   switch_2->line_index(2),
+									   switch_2->line_index(3)));
+		      switch_1->set_line_orientation(0, switch_2->line_orientation(0));
+		      switch_1->set_line_orientation(1, switch_2->line_orientation(1));
+		      switch_1->set_line_orientation(2, switch_2->line_orientation(2));
+		      switch_1->set_line_orientation(3, switch_2->line_orientation(3));
+		      switch_1->set_boundary_indicator(switch_2->boundary_indicator());
+		      switch_1->set_user_index(switch_2->user_index());
+		      if (switch_2->user_flag_set())
+			switch_1->set_user_flag();
+		      else
+			switch_1->clear_user_flag();
+		      switch_1->clear_refinement_case();
+		      switch_1->set_refinement_case(switch_2->refinement_case());
+		      switch_1->clear_children();
+		      if (switch_2->refinement_case())
+			switch_1->set_children(0, switch_2->child_index(0));
+		      if (switch_2->refinement_case()==RefinementCase<dim>::cut_xy)
+			switch_1->set_children(2, switch_2->child_index(2));
+			
+		      switch_2->set(internal::Triangulation::TriaObject<2>(switch_1_lines[0],
+									   switch_1_lines[1],
+									   switch_1_lines[2],
+									   switch_1_lines[3]));
+		      switch_2->set_line_orientation(0, switch_1_line_orientations[0]);
+		      switch_2->set_line_orientation(1, switch_1_line_orientations[1]);
+		      switch_2->set_line_orientation(2, switch_1_line_orientations[2]);
+		      switch_2->set_line_orientation(3, switch_1_line_orientations[3]);
+		      switch_2->set_boundary_indicator(switch_1_boundary_indicator);
+		      switch_2->set_user_index(switch_1_user_index);
+		      if (switch_1_user_flag)
+			switch_2->set_user_flag();
+		      else
+			switch_2->clear_user_flag();
+		      switch_2->clear_refinement_case();
+		      switch_2->set_refinement_case(switch_1_refinement_case);
+		      switch_2->clear_children();
+		      switch_2->set_children(0, switch_1_first_child_pair);
+		      switch_2->set_children(2, switch_1_second_child_pair);
+
+		      new_quads[0]->set_refinement_case(RefinementCase<2>::cut_y);
+		      new_quads[0]->set_children(0, quad->child_index(0));
+		      new_quads[1]->set_refinement_case(RefinementCase<2>::cut_y);
+		      new_quads[1]->set_children(0, quad->child_index(2));
+		    }
+		  else
+		    {
+		      new_quads[0]->set_refinement_case(RefinementCase<2>::cut_x);
+		      new_quads[0]->set_children(0, quad->child_index(0));
+		      new_quads[1]->set_refinement_case(RefinementCase<2>::cut_x);
+		      new_quads[1]->set_children(0, quad->child_index(2));
+		      new_line->set_children(0, quad->child(0)->line_index(3));
+		      Assert(new_line->child(1)==quad->child(1)->line(3),
+			     ExcInternalError());
+		    }
+		  quad->clear_children();
+		}
+	      
+					       // note these quads as children
+					       // to the present one
+	      quad->set_children (0, new_quads[0]->index());
+
+	      quad->set_refinement_case(aniso_quad_ref_case);
+	      
+					       // finally clear flag
+					       // indicating the need
+					       // for refinement
+	      quad->clear_user_data ();
+	    } // if (anisotropic refinement)
+
+	  if (quad->user_flag_set())
+	    {
+					       // this quad needs to be
+					       // refined isotropically
+
+					       // first of all: we only get here
+					       // in the first run of the loop
+	      Assert(loop==0,ExcInternalError());
+
+					       // find the next unused
+					       // vertex. we'll need this in any
+					       // case
+	      while (vertices_used[next_unused_vertex] == true)
+		++next_unused_vertex;
+	      Assert (next_unused_vertex < vertices.size(),
+		      ExcTooFewVerticesAllocated());
 	    
-					     // finally clear flag
-					     // indicating the need
-					     // for refinement
-	    quad->clear_user_flag ();
-	  }
-    }
+					       // now: if the quad is refined
+					       // anisotropically already, set
+					       // the anisotropic refinement
+					       // flag for both
+					       // children. Additionally, we
+					       // have to refine the inner line,
+					       // as it is an outer line of the
+					       // two (anisotropic) children
+	      const RefinementCase<dim-1> quad_ref_case=quad->refinement_case();
+	    
+	      if (quad_ref_case==RefinementCase<dim>::cut_x ||
+		  quad_ref_case==RefinementCase<dim>::cut_y)
+		{
+						   // set the 'opposite' refine case for children
+		  quad->child(0)->set_user_index(RefinementCase<dim>::cut_xy-quad_ref_case);
+		  quad->child(1)->set_user_index(RefinementCase<dim>::cut_xy-quad_ref_case);
+						   // refine the inner line
+		  line_iterator middle_line;
+		  if (quad_ref_case==RefinementCase<dim>::cut_x)
+		    middle_line=quad->child(0)->line(1);
+		  else
+		    middle_line=quad->child(0)->line(3);
+
+						   // if the face has been
+						   // refined anisotropically in
+						   // the last refinement step
+						   // it might be, that it is
+						   // flagged already and that
+						   // the middle line is thus
+						   // refined already. if not
+						   // create children.
+		  if (!middle_line->has_children())
+		    {
+						       // set the middle vertex
+						       // appropriately. double
+						       // refinement of quads can only
+						       // happen in the interior of
+						       // the domain, so we need not
+						       // care about boundary quads
+						       // here
+		      vertices[next_unused_vertex]
+			= (middle_line->vertex(0) + middle_line->vertex(1)) / 2;
+		      vertices_used[next_unused_vertex] = true;
+		      
+						       // now search a slot for the two
+						       // child lines
+		      next_unused_line=faces->lines.next_free_pair_line(*this);
+		      
+						       // set the child
+						       // pointer of the present
+						       // line
+		      middle_line->set_children (0, next_unused_line->index());
+		      
+						       // set the two new lines
+		      const raw_line_iterator children[2] = { next_unused_line,
+							      ++next_unused_line };
+						       // some tests; if any of
+						       // the iterators should
+						       // be invalid, then
+						       // already dereferencing
+						       // will fail
+		      Assert (children[0]->used() == false, ExcCellShouldBeUnused());
+		      Assert (children[1]->used() == false, ExcCellShouldBeUnused());
+		      
+		      children[0]->set (internal::Triangulation::
+					TriaObject<1>(middle_line->vertex_index(0),
+						      next_unused_vertex));
+		      children[1]->set (internal::Triangulation::
+					TriaObject<1>(next_unused_vertex,
+						      middle_line->vertex_index(1)));
+		      
+		      children[0]->set_used_flag();
+		      children[1]->set_used_flag();
+		      children[0]->clear_children();
+		      children[1]->clear_children();
+		      children[0]->clear_user_data();
+		      children[1]->clear_user_data();
+		      children[0]->clear_user_flag();
+		      children[1]->clear_user_flag();
+		      
+		      children[0]->set_boundary_indicator (middle_line->boundary_indicator());
+		      children[1]->set_boundary_indicator (middle_line->boundary_indicator());
+		    }
+						   // now remove the flag from the
+						   // quad and go to the next
+						   // quad, the actual refinement
+						   // of the quad takes place
+						   // later on in this pass of the
+						   // loop or in the next one
+		  quad->clear_user_flag();
+		  continue;
+		} // if (several refinement cases)
+
+					       // if we got here, we have an
+					       // unrefined quad and have to do
+					       // the usual work like in an purely
+					       // isotropic refinement
+	      Assert(quad_ref_case==RefinementCase<dim>::no_refinement, ExcInternalError());
+
+					       // set the middle vertex
+					       // appropriately
+	      if (quad->at_boundary()) 
+		vertices[next_unused_vertex]
+		  = boundary[quad->boundary_indicator()]->get_new_point_on_quad (quad);
+	      else
+						 // it might be that the
+						 // quad itself is not
+						 // at the boundary, but
+						 // that one of its lines
+						 // actually is. in this
+						 // case, the newly
+						 // created vertices at
+						 // the centers of the
+						 // lines are not
+						 // necessarily the mean
+						 // values of the
+						 // adjacent vertices,
+						 // so do not compute
+						 // the new vertex as
+						 // the mean value of
+						 // the 4 vertices of
+						 // the face, but rather
+						 // as a weighted mean
+						 // value of the 8
+						 // vertices which we
+						 // already have (the
+						 // four old ones, and
+						 // the four ones
+						 // inserted as middle
+						 // points for the four
+						 // lines). summing up
+						 // some more points is
+						 // generally cheaper
+						 // than first asking
+						 // whether one of the
+						 // lines is at the
+						 // boundary
+						 //
+						 // note that the exact
+						 // weights are chosen
+						 // such as to minimize
+						 // the distortion of
+						 // the four new quads
+						 // from the optimal
+						 // shape; their
+						 // derivation and
+						 // values is copied
+						 // over from the
+						 // @p{MappingQ::set_laplace_on_vector}
+						 // function
+		vertices[next_unused_vertex]
+		  = (quad->vertex(0) + quad->vertex(1) +
+		     quad->vertex(2) + quad->vertex(3) +
+		     3*(quad->line(0)->child(0)->vertex(1) +
+			quad->line(1)->child(0)->vertex(1) +
+			quad->line(2)->child(0)->vertex(1) +
+			quad->line(3)->child(0)->vertex(1))   ) / 16;
+
+	      vertices_used[next_unused_vertex] = true;
+
+					       // now that we created
+					       // the right point, make
+					       // up the four lines
+					       // interior to the quad
+					       // (++ takes care of the
+					       // end of the vector)
+	      raw_line_iterator new_lines[4];
+
+	      for (unsigned int i=0; i<4; ++i)
+		{
+		  if (i%2==0)
+						     // search a free pair of
+						     // lines for 0. and 2. line,
+						     // so that two of them end up
+						     // together, which is
+						     // necessary if later on we
+						     // want to refine the quad
+						     // anisotropically and the
+						     // two lines end up as
+						     // children of new line
+		    next_unused_line=faces->lines.next_free_pair_line(*this);
+
+		  new_lines[i] = next_unused_line;
+		  ++next_unused_line;
+
+		  Assert (new_lines[i]->used() == false,
+			  ExcCellShouldBeUnused());
+		}
+
+					       // set the data of the
+					       // four lines.
+					       // first collect the
+					       // indices of the five
+					       // vertices:
+					       // *--3--*
+					       // |  |  |
+					       // 0--4--1
+					       // |  |  |
+					       // *--2--*
+					       // the lines are numbered
+					       // as follows:
+					       // *--*--*
+					       // |  1  |
+					       // *2-*-3*
+					       // |  0  |
+					       // *--*--*
+	    
+	      const unsigned int vertex_indices[5]
+		= { quad->line(0)->child(0)->vertex_index(1),
+		    quad->line(1)->child(0)->vertex_index(1),
+		    quad->line(2)->child(0)->vertex_index(1),
+		    quad->line(3)->child(0)->vertex_index(1),
+		    next_unused_vertex 
+		};
+	      
+	      new_lines[0]->set (internal::Triangulation::
+				 TriaObject<1>(vertex_indices[2], vertex_indices[4]));
+	      new_lines[1]->set (internal::Triangulation::
+				 TriaObject<1>(vertex_indices[4], vertex_indices[3]));
+	      new_lines[2]->set (internal::Triangulation::
+				 TriaObject<1>(vertex_indices[0], vertex_indices[4]));
+	      new_lines[3]->set (internal::Triangulation::
+				 TriaObject<1>(vertex_indices[4], vertex_indices[1]));
+
+	      for (unsigned int i=0; i<4; ++i)
+		{
+		  new_lines[i]->set_used_flag();
+		  new_lines[i]->clear_user_flag();
+		  new_lines[i]->clear_user_data();
+		  new_lines[i]->clear_children();
+		  new_lines[i]->set_boundary_indicator(quad->boundary_indicator());
+		}
+	      
+					       // now for the
+					       // quads. again, first
+					       // collect some data
+					       // about the indices of
+					       // the lines, with the
+					       // following numbering:
+					       //   .-6-.-7-.
+					       //   1   9   3
+					       //   .-10.11-.
+					       //   0   8   2
+					       //   .-4-.-5-.
+
+					       // child 0 and 1 of a line are
+					       // switched if the line orientation
+					       // is false. set up a miniature
+					       // table, indicating which child to
+					       // take for line orientations false
+					       // and true. first index: child
+					       // index in standard orientation,
+					       // second index: line orientation
+	      const unsigned int index[2][2]=
+		{{1,0},   // child 0, line_orientation=false and true
+		 {0,1}};  // child 1, line_orientation=false and true
+		    
+	      const unsigned int line_indices[12]
+		= { quad->line(0)->child(index[0][quad->line_orientation(0)])->index(),
+		    quad->line(0)->child(index[1][quad->line_orientation(0)])->index(),
+		    quad->line(1)->child(index[0][quad->line_orientation(1)])->index(),
+		    quad->line(1)->child(index[1][quad->line_orientation(1)])->index(),
+		    quad->line(2)->child(index[0][quad->line_orientation(2)])->index(),
+		    quad->line(2)->child(index[1][quad->line_orientation(2)])->index(),
+		    quad->line(3)->child(index[0][quad->line_orientation(3)])->index(),
+		    quad->line(3)->child(index[1][quad->line_orientation(3)])->index(),
+		    new_lines[0]->index(),
+		    new_lines[1]->index(),
+		    new_lines[2]->index(),
+		    new_lines[3]->index() 
+		};
+	    
+					       // find some space (consecutive)
+					       // for the first two newly to be
+					       // created quads.
+	      raw_quad_iterator new_quads[4];
+
+	      next_unused_quad=faces->quads.next_free_pair_quad(*this);
+	    
+	      new_quads[0] = next_unused_quad;
+	      Assert (new_quads[0]->used() == false, ExcCellShouldBeUnused());
+
+	      ++next_unused_quad;
+	      new_quads[1] = next_unused_quad;
+	      Assert (new_quads[1]->used() == false, ExcCellShouldBeUnused());
+
+	      next_unused_quad=faces->quads.next_free_pair_quad(*this);
+	      new_quads[2] = next_unused_quad;
+	      Assert (new_quads[2]->used() == false, ExcCellShouldBeUnused());
+
+	      ++next_unused_quad;
+	      new_quads[3] = next_unused_quad;
+	      Assert (new_quads[3]->used() == false, ExcCellShouldBeUnused());
+
+					       // note these quads as
+					       // children to the
+					       // present one
+	      quad->set_children (0, new_quads[0]->index());
+	      quad->set_children (2, new_quads[2]->index());
+	      new_quads[0]->set (internal::Triangulation
+				 ::TriaObject<2>(line_indices[0],
+						 line_indices[8],
+						 line_indices[4],
+						 line_indices[10]));
+	      
+	      quad->set_refinement_case(RefinementCase<2>::cut_xy);
+
+	      new_quads[0]->set (internal::Triangulation
+				 ::TriaObject<2>(line_indices[0],
+						 line_indices[8],
+						 line_indices[4],
+						 line_indices[10]));
+	      new_quads[1]->set (internal::Triangulation
+				 ::TriaObject<2>(line_indices[8],
+						 line_indices[2],
+						 line_indices[5],
+						 line_indices[11]));
+	      new_quads[2]->set (internal::Triangulation
+				 ::TriaObject<2>(line_indices[1],
+						 line_indices[9],
+						 line_indices[10],
+						 line_indices[6]));
+	      new_quads[3]->set (internal::Triangulation
+				 ::TriaObject<2>(line_indices[9],
+						 line_indices[3],
+						 line_indices[11],
+						 line_indices[7]));
+	      for (unsigned int i=0; i<4; ++i)
+		{
+		  new_quads[i]->set_used_flag();
+		  new_quads[i]->clear_user_flag();
+		  new_quads[i]->clear_user_data();
+		  new_quads[i]->clear_children();
+		  new_quads[i]->set_boundary_indicator (quad->boundary_indicator());
+						   // set all line orientations to
+						   // true, change this after the
+						   // loop, as we have to consider
+						   // different lines for each
+						   // child
+		  for (unsigned int j=0; j<GeometryInfo<dim>::lines_per_face; ++j)
+		    new_quads[i]->set_line_orientation(j,true);
+		}
+					       // now set the line orientation of
+					       // children of outer lines
+					       // correctly, the lines in the
+					       // interior of the refined quad are
+					       // automatically oriented
+					       // conforming to the standard
+	      new_quads[0]->set_line_orientation(0,quad->line_orientation(0));
+	      new_quads[0]->set_line_orientation(2,quad->line_orientation(2));
+	      new_quads[1]->set_line_orientation(1,quad->line_orientation(1));
+	      new_quads[1]->set_line_orientation(2,quad->line_orientation(2));
+	      new_quads[2]->set_line_orientation(0,quad->line_orientation(0));
+	      new_quads[2]->set_line_orientation(3,quad->line_orientation(3));
+	      new_quads[3]->set_line_orientation(1,quad->line_orientation(1));
+	      new_quads[3]->set_line_orientation(3,quad->line_orientation(3));
+				       
+					       // finally clear flag
+					       // indicating the need
+					       // for refinement
+	      quad->clear_user_flag ();
+	    } // if (isotropic refinement)
+	} // for all quads
+    } // looped two times over all quads, all quads refined now
 
 				   ///////////////////////////////////
 				   // Now, finally, set up the new
@@ -6469,18 +7125,6 @@ Triangulation<3>::execute_refinement ()
       for (; hex!=endh; ++hex)
 	if (hex->refine_flag_set())
 	  {
-					     // do some additional
-					     // checks.
-#ifdef DEBUG
-	    for (unsigned int neighbor=0;
-		 neighbor<GeometryInfo<dim>::faces_per_cell; ++neighbor)
-	      if (hex->neighbor(neighbor).state() == IteratorState::valid)
-		Assert (((hex->neighbor(neighbor)->level() == hex->level()) &&
-			 (hex->neighbor(neighbor)->coarsen_flag_set() == false))  ||
-			((hex->neighbor(neighbor)->level() == hex->level()-1) &&
-			 (hex->neighbor(neighbor)->refine_flag_set() == true)),
-			ExcInternalError());
-#endif
 					     // this hex needs to be
 					     // refined
 	    
@@ -6491,127 +7135,60 @@ Triangulation<3>::execute_refinement ()
 					     // can't do it anymore
 					     // once the cell has
 					     // children
+	    const RefinementCase<dim> ref_case=hex->refine_flag_set();
 	    hex->clear_refine_flag ();
+	    hex->set_refinement_case(ref_case);
 
-					     // find the next unused
-					     // vertex and set it
-					     // appropriately
-	    while (vertices_used[next_unused_vertex] == true)
-	      ++next_unused_vertex;
-	    Assert (next_unused_vertex < vertices.size(),
-		    ExcTooFewVerticesAllocated());
-	    vertices_used[next_unused_vertex] = true;
-	    
-					     // the new vertex is
-					     // definitely in the
-					     // interior, so we need
-					     // not worry about the
-					     // boundary.  let it be
-					     // the average of the 26
-					     // vertices surrounding
-					     // it. weight these
-					     // vertices in the same
-					     // way as they are
-					     // weighted in the
-					     // @p{MappingQ::set_laplace_on_hex_vector}
-					     // function, and like the
-					     // new vertex at the
-					     // center of the quad is
-					     // weighted (see above)
-	    vertices[next_unused_vertex] = Point<dim>();
-					     // first add corners of hex
-	    for (unsigned int vertex=0;
-		 vertex<GeometryInfo<dim>::vertices_per_cell; ++vertex)
-	      vertices[next_unused_vertex] += hex->vertex(vertex) / 128;
-					     // now add center of lines
-	    for (unsigned int line=0;
-		 line<GeometryInfo<dim>::lines_per_cell; ++line)
-	      vertices[next_unused_vertex] += hex->line(line)->child(0)->vertex(1) *
-					      7./192.;
-					     // finally add centers of
-					     // faces. note that
-					     // vertex 3 of child 0 is an
-					     // invariant with respect
-					     // to the face
-					     // orientation, flip and rotation
-	    for (unsigned int face=0;
-		 face<GeometryInfo<dim>::faces_per_cell; ++face)
-	      vertices[next_unused_vertex] += hex->face(face)->child(0)->vertex(3) *
-					      1./12.;
+					     // depending on the refine case we
+					     // might have to create additional
+					     // vertices, lines and quads
+					     // interior of the hex before the
+					     // actual children can be set up.
 
-					     // now that we created
-					     // the right point, make
-					     // up the six lines
-					     // interior to the hex
-					     // (++ takes care of the
-					     // end of the vector)
-	    raw_line_iterator new_lines[6];
+					     // in a first step: reserve the
+					     // needed space for lines, quads
+					     // and hexes and initialize them
+					     // correctly
 
-	    for (unsigned int i=0; i<6; ++i)
+	    unsigned int n_new_lines=0;
+	    unsigned int n_new_quads=0;
+	    unsigned int n_new_hexes=0;
+	    switch (static_cast<unsigned char> (ref_case))
 	      {
-		while (next_unused_line->used() == true)
-		  ++next_unused_line;
-		new_lines[i] = next_unused_line;
-		++next_unused_line;
-
+		case RefinementCase<dim>::cut_x:
+		case RefinementCase<dim>::cut_y:
+		case RefinementCase<dim>::cut_z:
+		      n_new_lines=0;
+		      n_new_quads=1;
+		      n_new_hexes=2;
+		      break;
+		case RefinementCase<dim>::cut_xy:
+		case RefinementCase<dim>::cut_xz:
+		case RefinementCase<dim>::cut_yz:
+		      n_new_lines=1;
+		      n_new_quads=4;
+		      n_new_hexes=4;
+		      break;
+		case RefinementCase<dim>::cut_xyz:
+		      n_new_lines=6;
+		      n_new_quads=12;
+		      n_new_hexes=8;
+		      break;
+		default:
+		      Assert(false, ExcInternalError());
+		      break;
+	      }
+	    
+					     // find some space for the newly to
+					     // be created interior lines and
+					     // initialize them.
+	    std::vector<raw_line_iterator> new_lines(n_new_lines);
+	    for (unsigned int i=0; i<n_new_lines; ++i)
+	      {
+		new_lines[i] = faces->lines.next_free_single_line(*this);
+		
 		Assert (new_lines[i]->used() == false,
                         ExcCellShouldBeUnused());
-	      }
-
-					     // set the data of the
-					     // six lines.  first
-					     // collect the indices of
-					     // the seven vertices
-					     // (consider the two
-					     // planes to be crossed
-					     // to form the planes
-					     // cutting the hex in two
-					     // vertically and
-					     // horizontally)
-					     //     *--3--*   *--5--*
-					     //    /  /  /    |  |  |
-					     //   0--6--1     0--6--1
-					     //  /  /  /      |  |  |
-					     // *--2--*       *--4--*
-					     // the lines are numbered
-					     // as follows:
-					     //     *--*--*   *--*--*
-					     //    /  1  /    |  5  |
-					     //   *2-*-3*     *2-*-3*
-					     //  /  0  /      |  4  |
-					     // *--*--*       *--*--*
-                                             //
-                                             // note that asking for child 0 and
-                                             // vertex 3 within that is
-                                             // invariant with respect to the
-                                             // face orientation, rotation and
-                                             // flip, so we do not have to ask
-                                             // here
-	    const unsigned int vertex_indices[7]
-	      = { hex->face(0)->child(0)->vertex_index(3),
-		  hex->face(1)->child(0)->vertex_index(3),
-		  hex->face(2)->child(0)->vertex_index(3),
-		  hex->face(3)->child(0)->vertex_index(3),
-		  hex->face(4)->child(0)->vertex_index(3),
-		  hex->face(5)->child(0)->vertex_index(3),
-		  next_unused_vertex 
-	      };
-	    
-	    new_lines[0]->set (internal::Triangulation
-                               ::TriaObject<1>(vertex_indices[2], vertex_indices[6]));
-	    new_lines[1]->set (internal::Triangulation
-                               ::TriaObject<1>(vertex_indices[6], vertex_indices[3]));
-	    new_lines[2]->set (internal::Triangulation
-                               ::TriaObject<1>(vertex_indices[0], vertex_indices[6]));
-	    new_lines[3]->set (internal::Triangulation
-                               ::TriaObject<1>(vertex_indices[6], vertex_indices[1]));
-	    new_lines[4]->set (internal::Triangulation
-                               ::TriaObject<1>(vertex_indices[4], vertex_indices[6]));
-	    new_lines[5]->set (internal::Triangulation
-                               ::TriaObject<1>(vertex_indices[6], vertex_indices[5]));
-
-	    for (unsigned int i=0; i<6; ++i)
-	      {
 		new_lines[i]->set_used_flag();
 		new_lines[i]->clear_user_flag();
 		new_lines[i]->clear_user_data();
@@ -6620,85 +7197,88 @@ Triangulation<3>::execute_refinement ()
 		new_lines[i]->set_boundary_indicator(255);
 	      }
 
+					     // find some space for the newly to
+					     // be created interior quads and
+					     // initialize them.
+	    std::vector<raw_quad_iterator> new_quads(n_new_quads);
+	    for (unsigned int i=0; i<n_new_quads; ++i)
+	      {
+		new_quads[i] = faces->quads.next_free_single_quad(*this);
+		
+		Assert (new_quads[i]->used() == false,
+                        ExcCellShouldBeUnused());
+		new_quads[i]->set_used_flag();
+		new_quads[i]->clear_user_flag();
+		new_quads[i]->clear_user_data();
+		new_quads[i]->clear_children();
+						 // interior quad
+		new_quads[i]->set_boundary_indicator (255);
+						 // set all line orientation
+						 // flags to true by default,
+						 // change this afterwards, if
+						 // necessary
+		for (unsigned int j=0; j<GeometryInfo<dim>::lines_per_face; ++j)
+		  new_quads[i]->set_line_orientation(j,true);
+	      }
 
-					     // now for the
-					     // quads. again, first
-					     // collect some data
-					     // about the indices of
-					     // the lines, with the
-					     // following numbering:
-					     // (note that face 0 and
-					     // 1 each are shown twice
-					     // for better
-					     // readability)
-	    
-					     // face 0: left plane
-					     //       *            *
-					     //      /|           /| 
-					     //     * |          * |
-					     //    /| *         /| *
-					     //   * 1/|        * |3|
-					     //   | * |        | * |
-					     //   |/| *        |2| *
-					     //   * 0/         * |/
-					     //   | *          | *
-					     //   |/           |/ 
-					     //   *            *
-					     // face 1: right plane
-					     //       *            *
-					     //      /|           /| 
-					     //     * |          * |
-					     //    /| *         /| *
-					     //   * 5/|        * |7|
-					     //   | * |        | * |
-					     //   |/| *        |6| *
-					     //   * 4/         * |/
-					     //   | *          | *
-					     //   |/           |/
-					     //   *            *
-					     // face 2: front plane
-					     //   (note: x,y exchanged)
-					     //   *---*---*
-					     //   |   11  |
-					     //   *-8-*-9-*
-					     //   |   10  |
-					     //   *---*---*
-					     // face 3: back plane
-					     //   (note: x,y exchanged)
-					     //   *---*---*
-					     //   |   15  | 
-					     //   *12-*-13*
-					     //   |   14  | 
-					     //   *---*---*
-					     // face 4: bottom plane
-					     //       *---*---*
-					     //      /  17   /
-					     //     *18-*-19*
-					     //    /   16  /
-					     //   *---*---*
-					     // face 5: top plane
-					     //       *---*---*
-					     //      /  21   /
-					     //     *22-*-23*
-					     //    /   20  /
-					     //   *---*---*
-					     // middle planes
-					     //     *---*---*   *---*---*
-					     //    /  25   /    |   29  |
-					     //   *26-*-27*     *26-*-27*
-					     //  /   24  /      |   28  |
-					     // *---*---*       *---*---*
-                                             //
-                                             // this time we have to
-                                             // take into account
-                                             // whether the different
-                                             // faces are oriented
-                                             // correctly or in the
-                                             // opposite direction, so
-                                             // store that up front
+					     // find some space for the newly to
+					     // be created hexes and initialize
+					     // them.
+	    std::vector<raw_hex_iterator> new_hexes(n_new_hexes);
+	    for (unsigned int i=0; i<n_new_hexes; ++i)
+	      {
+		if (i%2==0)
+		  next_unused_hex=levels[level+1]->cells.next_free_hex(*this,level+1);
+		else
+		  ++next_unused_hex;
+		
+		new_hexes[i]=next_unused_hex;
+		
+		Assert (new_hexes[i]->used() == false,
+                        ExcCellShouldBeUnused());
+		new_hexes[i]->set_used_flag();
+		new_hexes[i]->clear_user_flag();
+		new_hexes[i]->clear_user_data();
+		new_hexes[i]->clear_children();
+						 // inherit material
+						 // properties
+		new_hexes[i]->set_material_id (hex->material_id());
+		new_hexes[i]->set_subdomain_id (hex->subdomain_id());
+						 // set the face_orientation
+						 // flag to true for all faces
+						 // initially, as this is the
+						 // default value which is true
+						 // for all faces interior to
+						 // the hex. later on go the
+						 // other way round and reset
+						 // faces that are at the
+						 // boundary of the mother cube
+						 //
+						 // the same is true for the
+						 // face_flip and face_rotation
+						 // flags. however, the latter
+						 // two are set to false by
+						 // default as this is the
+						 // standard value
+		for (unsigned int f=0; f<GeometryInfo<dim>::faces_per_cell; ++f)
+		  {
+		    new_hexes[i]->set_face_orientation(f, true);
+		    new_hexes[i]->set_face_flip(f, false);
+		    new_hexes[i]->set_face_rotation(f, false);
+		  }
+	      }
+					     // note these hexes as
+					     // children to the
+					     // present cell
+	    for (unsigned int i=0; i<n_new_hexes/2; ++i) 
+	      hex->set_children (2*i, new_hexes[2*i]->index());
 
-					     // TODO: shorten this
-	    
+					     // we have to take into account
+                                             // whether the different faces are
+                                             // oriented correctly or in the
+                                             // opposite direction, so store
+                                             // that up front
+
 					     // face_orientation
             const bool f_or[6]
               = { hex->face_orientation (0),
@@ -6726,522 +7306,2411 @@ Triangulation<3>::execute_refinement ()
                   hex->face_rotation (4),
                   hex->face_rotation (5) };
 
-					     // set up a list of line iterators
-					     // first. from this, construct
-					     // lists of line_indices and
-					     // line orientations later on
-	    const raw_line_iterator lines[30]
-	      = {
-		    hex->face(0)->child(GeometryInfo<dim>::standard_to_real_face_vertex(0,f_or[0],f_fl[0],f_ro[0]))
-                    ->line(GeometryInfo<dim>::standard_to_real_face_line(1,f_or[0],f_fl[0],f_ro[0])),        //0
-		    hex->face(0)->child(GeometryInfo<dim>::standard_to_real_face_vertex(3,f_or[0],f_fl[0],f_ro[0]))
-                    ->line(GeometryInfo<dim>::standard_to_real_face_line(0,f_or[0],f_fl[0],f_ro[0])),        //1
-		    hex->face(0)->child(GeometryInfo<dim>::standard_to_real_face_vertex(0,f_or[0],f_fl[0],f_ro[0]))
-                    ->line(GeometryInfo<dim>::standard_to_real_face_line(3,f_or[0],f_fl[0],f_ro[0])),        //2
-		    hex->face(0)->child(GeometryInfo<dim>::standard_to_real_face_vertex(3,f_or[0],f_fl[0],f_ro[0]))
-                    ->line(GeometryInfo<dim>::standard_to_real_face_line(2,f_or[0],f_fl[0],f_ro[0])),        //3
+					     // some commonly used fields which
+					     // have varying size
+	    const unsigned int *vertex_indices=0;
+	    const raw_line_iterator *lines=0;
+	    const unsigned int *line_indices=0;
+	    const bool *line_orientation=0;
+	    const unsigned int *quad_indices=0;
 
-		    hex->face(1)->child(GeometryInfo<dim>::standard_to_real_face_vertex(0,f_or[1],f_fl[1],f_ro[1]))
-                    ->line(GeometryInfo<dim>::standard_to_real_face_line(1,f_or[1],f_fl[1],f_ro[1])),        //4
-		    hex->face(1)->child(GeometryInfo<dim>::standard_to_real_face_vertex(3,f_or[1],f_fl[1],f_ro[1]))
-                    ->line(GeometryInfo<dim>::standard_to_real_face_line(0,f_or[1],f_fl[1],f_ro[1])),        //5
-		    hex->face(1)->child(GeometryInfo<dim>::standard_to_real_face_vertex(0,f_or[1],f_fl[1],f_ro[1]))
-                    ->line(GeometryInfo<dim>::standard_to_real_face_line(3,f_or[1],f_fl[1],f_ro[1])),        //6
-		    hex->face(1)->child(GeometryInfo<dim>::standard_to_real_face_vertex(3,f_or[1],f_fl[1],f_ro[1]))
-                    ->line(GeometryInfo<dim>::standard_to_real_face_line(2,f_or[1],f_fl[1],f_ro[1])),        //7
+					     // little helper table, indicating,
+					     // whether the child with index 0
+					     // or with index 1 can be found at
+					     // the standard origin of an
+					     // anisotropically refined quads in
+					     // real orientation
+					     // index 1: (RefineCase - 1)
+					     // index 2: face_flip
 
-		    hex->face(2)->child(GeometryInfo<dim>::standard_to_real_face_vertex(0,f_or[2],f_fl[2],f_ro[2]))
-                    ->line(GeometryInfo<dim>::standard_to_real_face_line(1,f_or[2],f_fl[2],f_ro[2])),        //8
-		    hex->face(2)->child(GeometryInfo<dim>::standard_to_real_face_vertex(3,f_or[2],f_fl[2],f_ro[2]))
-                    ->line(GeometryInfo<dim>::standard_to_real_face_line(0,f_or[2],f_fl[2],f_ro[2])),        //9
-		    hex->face(2)->child(GeometryInfo<dim>::standard_to_real_face_vertex(0,f_or[2],f_fl[2],f_ro[2]))
-                    ->line(GeometryInfo<dim>::standard_to_real_face_line(3,f_or[2],f_fl[2],f_ro[2])),        //10
-		    hex->face(2)->child(GeometryInfo<dim>::standard_to_real_face_vertex(3,f_or[2],f_fl[2],f_ro[2]))
-                    ->line(GeometryInfo<dim>::standard_to_real_face_line(2,f_or[2],f_fl[2],f_ro[2])),        //11
+					     // index 3: face rotation
+					     // note: face orientation has no influence
+	    const unsigned int child_at_origin[2][2][2]=
+	      { { { 0, 0 },  // RefinementCase<dim>::cut_x, face_flip=false, face_rotation=false and true
+		  { 1, 1 }}, // RefinementCase<dim>::cut_x, face_flip=true,  face_rotation=false and true
+		{ { 0, 1 },  // RefinementCase<dim>::cut_y, face_flip=false, face_rotation=false and true
+		  { 1, 0 }}};// RefinementCase<dim>::cut_y, face_flip=true,  face_rotation=false and true
+	     
+					     ///////////////////////////////////////
+					     //
+					     // in the following we will do the
+					     // same thing for each refinement
+					     // case: create a new vertex (if
+					     // needed), create new interior
+					     // lines (if needed), create new
+					     // interior quads and afterwards
+					     // build the children hexes out of
+					     // these and the existing subfaces
+					     // of the outer quads (which have
+					     // been created above). However,
+					     // even if the steps are quite
+					     // similar, the actual work
+					     // strongly depends on the actual
+					     // refinement case. therefore, we
+					     // use seperate blocks of code for
+					     // each of these cases, which
+					     // hopefully increases the
+					     // readability to some extend.
 
-		    hex->face(3)->child(GeometryInfo<dim>::standard_to_real_face_vertex(0,f_or[3],f_fl[3],f_ro[3]))
-                    ->line(GeometryInfo<dim>::standard_to_real_face_line(1,f_or[3],f_fl[3],f_ro[3])),        //12
-		    hex->face(3)->child(GeometryInfo<dim>::standard_to_real_face_vertex(3,f_or[3],f_fl[3],f_ro[3]))
-                    ->line(GeometryInfo<dim>::standard_to_real_face_line(0,f_or[3],f_fl[3],f_ro[3])),        //13
-		    hex->face(3)->child(GeometryInfo<dim>::standard_to_real_face_vertex(0,f_or[3],f_fl[3],f_ro[3]))
-                    ->line(GeometryInfo<dim>::standard_to_real_face_line(3,f_or[3],f_fl[3],f_ro[3])),        //14
-		    hex->face(3)->child(GeometryInfo<dim>::standard_to_real_face_vertex(3,f_or[3],f_fl[3],f_ro[3]))
-                    ->line(GeometryInfo<dim>::standard_to_real_face_line(2,f_or[3],f_fl[3],f_ro[3])),        //15
-
-		    hex->face(4)->child(GeometryInfo<dim>::standard_to_real_face_vertex(0,f_or[4],f_fl[4],f_ro[4]))
-                    ->line(GeometryInfo<dim>::standard_to_real_face_line(1,f_or[4],f_fl[4],f_ro[4])),        //16
-		    hex->face(4)->child(GeometryInfo<dim>::standard_to_real_face_vertex(3,f_or[4],f_fl[4],f_ro[4]))
-                    ->line(GeometryInfo<dim>::standard_to_real_face_line(0,f_or[4],f_fl[4],f_ro[4])),        //17
-		    hex->face(4)->child(GeometryInfo<dim>::standard_to_real_face_vertex(0,f_or[4],f_fl[4],f_ro[4]))
-                    ->line(GeometryInfo<dim>::standard_to_real_face_line(3,f_or[4],f_fl[4],f_ro[4])),        //18
-		    hex->face(4)->child(GeometryInfo<dim>::standard_to_real_face_vertex(3,f_or[4],f_fl[4],f_ro[4]))
-                    ->line(GeometryInfo<dim>::standard_to_real_face_line(2,f_or[4],f_fl[4],f_ro[4])),        //19
-
-		    hex->face(5)->child(GeometryInfo<dim>::standard_to_real_face_vertex(0,f_or[5],f_fl[5],f_ro[5]))
-                    ->line(GeometryInfo<dim>::standard_to_real_face_line(1,f_or[5],f_fl[5],f_ro[5])),        //20
-		    hex->face(5)->child(GeometryInfo<dim>::standard_to_real_face_vertex(3,f_or[5],f_fl[5],f_ro[5]))
-                    ->line(GeometryInfo<dim>::standard_to_real_face_line(0,f_or[5],f_fl[5],f_ro[5])),        //21
-		    hex->face(5)->child(GeometryInfo<dim>::standard_to_real_face_vertex(0,f_or[5],f_fl[5],f_ro[5]))
-                    ->line(GeometryInfo<dim>::standard_to_real_face_line(3,f_or[5],f_fl[5],f_ro[5])),        //22
-		    hex->face(5)->child(GeometryInfo<dim>::standard_to_real_face_vertex(3,f_or[5],f_fl[5],f_ro[5]))
-                    ->line(GeometryInfo<dim>::standard_to_real_face_line(2,f_or[5],f_fl[5],f_ro[5])),        //23
-
-		    new_lines[0],                       //24
-		    new_lines[1],                       //25
-		    new_lines[2],                       //26
-		    new_lines[3],                       //27
-		    new_lines[4],                       //28
-		    new_lines[5]                        //29
-	      };
-
-	    unsigned int line_indices[30];
-	    for (unsigned int i=0; i<30; ++i)
-	      line_indices[i]=lines[i]->index();
-	    
-					     // the orientation of lines for the
-					     // inner quads is quite tricky. as
-					     // these lines are newly created
-					     // ones and thus have no parents,
-					     // they cannot inherit this
-					     // property. set up an array and
-					     // fill it with the respective
-					     // values
-	    bool line_orientation[30];
-					     // note: for the first 24 lines
-					     // (inner lines of the outer quads)
-					     // the following holds: the second
-					     // vertex of the even lines in
-					     // standard orientation is the
-					     // vertex in the middle of the
-					     // quad, whereas for odd lines the
-					     // first vertex is the same middle
-					     // vertex.
-	    for (unsigned int i=0; i<24; ++i)
-	      if (lines[i]->vertex_index((i+1)%2)==vertex_indices[i/4])
-		line_orientation[i]=true;
-	      else
+	    switch (static_cast<unsigned char> (ref_case))
+	      {
+		case RefinementCase<dim>::cut_x:
 		{
-						   // it must be the other way
-						   // round then
-		  Assert(lines[i]->vertex_index(i%2)==vertex_indices[i/4],
-			 ExcInternalError());
-		  line_orientation[i]=false;
+						   //////////////////////////////
+						   //
+						   //     RefinementCase<dim>::cut_x
+						   //
+						   // the refined cube will look
+						   // like this:
+						   //
+						   //        *----*----*
+						   //       /    /    /|
+						   //      /    /    / |
+						   //     /    /    /  |
+						   //    *----*----*   |
+						   //    |    |    |   |
+						   //    |    |    |   *
+						   //    |    |    |  /
+						   //    |    |    | /
+						   //    |    |    |/
+						   //    *----*----*
+						   // 
+						   // again, first
+						   // collect some data
+						   // about the indices of
+						   // the lines, with the
+						   // following numbering:
+	    
+						   // face 2: front plane
+						   //   (note: x,y exchanged)
+						   //   *---*---*
+						   //   |   |   |
+						   //   |   0   |
+						   //   |   |   |
+						   //   *---*---*
+						   //       m0
+						   // face 3: back plane
+						   //   (note: x,y exchanged)
+						   //       m1
+						   //   *---*---*
+						   //   |   |   | 
+						   //   |   1   |
+						   //   |   |   | 
+						   //   *---*---*
+						   // face 4: bottom plane
+						   //       *---*---*
+						   //      /   /   /
+						   //     /   2   /
+						   //    /   /   /
+						   //   *---*---*
+						   //       m0
+						   // face 5: top plane
+						   //           m1
+						   //       *---*---*
+						   //      /   /   /
+						   //     /   3   /
+						   //    /   /   /
+						   //   *---*---*
+
+						   // set up a list of line iterators
+						   // first. from this, construct
+						   // lists of line_indices and
+						   // line orientations later on
+		  const raw_line_iterator lines_x[4]
+		    = {
+			  hex->face(2)->child(0)
+			  ->line((hex->face(2)->refinement_case() == RefinementCase<dim>::cut_x) ? 1 : 3),        //0
+			  hex->face(3)->child(0)
+			  ->line((hex->face(3)->refinement_case() == RefinementCase<dim>::cut_x) ? 1 : 3),        //1
+			  hex->face(4)->child(0)
+			  ->line((hex->face(4)->refinement_case() == RefinementCase<dim>::cut_x) ? 1 : 3),        //2
+			  hex->face(5)->child(0)
+			  ->line((hex->face(5)->refinement_case() == RefinementCase<dim>::cut_x) ? 1 : 3)         //3
+		    };
+		  
+		  lines=&lines_x[0];
+		  
+		  unsigned int line_indices_x[4];
+		      
+		  for (unsigned int i=0; i<4; ++i)
+		    line_indices_x[i]=lines[i]->index();
+		  line_indices=&line_indices_x[0];
+
+						   // the orientation of lines for the
+						   // inner quads is quite tricky. as
+						   // these lines are newly created
+						   // ones and thus have no parents,
+						   // they cannot inherit this
+						   // property. set up an array and
+						   // fill it with the respective
+						   // values
+		  bool line_orientation_x[4];
+
+						   // the middle vertice marked
+						   // as m0 above is the start
+						   // vertex for lines 0 and 2
+						   // in standard orientation,
+						   // whereas m1 is the end
+						   // vertex of lines 1 and 3 in
+						   // standard orientation
+		  const unsigned int middle_vertices[2]=
+		    {
+			  hex->line(2)->child(0)->vertex_index(1),
+			  hex->line(7)->child(0)->vertex_index(1)
+		    };
+
+		  for (unsigned int i=0; i<4; ++i)
+		    if (lines[i]->vertex_index(i%2)==middle_vertices[i%2])
+		      line_orientation_x[i]=true;
+		    else
+		      {
+							 // it must be the other
+							 // way round then
+			Assert(lines[i]->vertex_index((i+1)%2)==middle_vertices[i%2],
+			       ExcInternalError());
+			line_orientation_x[i]=false;
+		      }
+		  
+		  line_orientation=&line_orientation_x[0];
+
+						   // set up the new quad, line
+						   // numbering is as indicated
+						   // above
+		  new_quads[0]->set (internal::Triangulation
+				     ::TriaObject<2>(line_indices[0],
+						     line_indices[1],
+						     line_indices[2],
+						     line_indices[3]));
+
+		  new_quads[0]->set_line_orientation(0,line_orientation[0]);
+		  new_quads[0]->set_line_orientation(1,line_orientation[1]);
+		  new_quads[0]->set_line_orientation(2,line_orientation[2]);
+		  new_quads[0]->set_line_orientation(3,line_orientation[3]);
+		  
+						   // the quads are
+						   // numbered as follows:
+						   //
+						   // planes in the interior
+						   // of the old hex:
+						   //      *
+						   //     /|
+						   //    / | x         
+						   //   /  | *-------*      *---------*
+						   //  *   | |       |     /         /
+						   //  | 0 | |       |    /         /
+						   //  |   * |       |   /         /
+						   //  |  /  *-------*y *---------*x
+						   //  | /
+						   //  |/
+						   //  *
+						   //
+						   // children of the faces
+						   // of the old hex
+						   //      *---*---*        *---*---*
+						   //     /|   |   |       /   /   /|
+						   //    / |   |   |      / 9 / 10/ |
+						   //   /  | 5 | 6 |     /   /   /  |
+						   //  *   |   |   |    *---*---*   |
+						   //  | 1 *---*---*    |   |   | 2 *
+						   //  |  /   /   /     |   |   |  /
+						   //  | / 7 / 8 /      | 3 | 4 | /
+						   //  |/   /   /       |   |   |/
+						   //  *---*---*        *---*---*
+						   //
+						   // note that we have to
+						   // take care of the
+						   // orientation of
+						   // faces.
+		  const unsigned int quad_indices_x[11]
+		    = {
+			  new_quads[0]->index(),     //0
+			      
+			  hex->face(0)->index(),     //1
+			  
+			  hex->face(1)->index(),     //2
+
+			  hex->face(2)->child_index(  child_at_origin[hex->face(2)->refinement_case()-1][f_fl[2]][f_ro[2]]),  //3
+			  hex->face(2)->child_index(1-child_at_origin[hex->face(2)->refinement_case()-1][f_fl[2]][f_ro[2]]),
+			      
+			  hex->face(3)->child_index(  child_at_origin[hex->face(3)->refinement_case()-1][f_fl[3]][f_ro[3]]),  //5
+			  hex->face(3)->child_index(1-child_at_origin[hex->face(3)->refinement_case()-1][f_fl[3]][f_ro[3]]),
+			      
+			  hex->face(4)->child_index(  child_at_origin[hex->face(4)->refinement_case()-1][f_fl[4]][f_ro[4]]),  //7
+			  hex->face(4)->child_index(1-child_at_origin[hex->face(4)->refinement_case()-1][f_fl[4]][f_ro[4]]),
+			      
+			  hex->face(5)->child_index(  child_at_origin[hex->face(5)->refinement_case()-1][f_fl[5]][f_ro[5]]),  //9
+			  hex->face(5)->child_index(1-child_at_origin[hex->face(5)->refinement_case()-1][f_fl[5]][f_ro[5]])
+			      
+		    };
+		  quad_indices=&quad_indices_x[0];
+
+		  new_hexes[0]->set (internal::Triangulation
+				     ::TriaObject<3>(quad_indices[1],
+						     quad_indices[0],
+						     quad_indices[3],
+						     quad_indices[5],
+						     quad_indices[7],
+						     quad_indices[9]));
+		  new_hexes[1]->set (internal::Triangulation
+				     ::TriaObject<3>(quad_indices[0],
+						     quad_indices[2],
+						     quad_indices[4],
+						     quad_indices[6],
+						     quad_indices[8],
+						     quad_indices[10]));
+		  break;
 		}
-					     // for the last 6 lines the line
-					     // orientation is always true,
-					     // since they were just constructed
-					     // that way
-	    for (unsigned int i=24; i<30; ++i)
-	      line_orientation[i]=true;
-
+		case RefinementCase<dim>::cut_y:
+		{
+						   //////////////////////////////
+						   //
+						   //     RefinementCase<dim>::cut_y
+						   //
+						   // the refined cube will look
+						   // like this:
+						   //
+						   //        *---------*
+						   //       /         /|
+						   //      *---------* |
+						   //     /         /| |
+						   //    *---------* | |
+						   //    |         | | |
+						   //    |         | | *
+						   //    |         | |/
+						   //    |         | *
+						   //    |         |/
+						   //    *---------*
+						   // 
+						   // again, first
+						   // collect some data
+						   // about the indices of
+						   // the lines, with the
+						   // following numbering:
 	    
-					     // find some space for
-					     // the 12 newly to be
-					     // created quads.
-	    raw_quad_iterator new_quads[12];
+						   // face 0: left plane
+						   //       *
+						   //      /| 
+						   //     * |
+						   //    /| |
+						   //   * | |
+						   //   | 0 |
+						   //   | | *
+						   //   | |/ 
+						   //   | *m0
+						   //   |/   
+						   //   *    
+						   // face 1: right plane
+						   //       *
+						   //      /| 
+						   //   m1* |
+						   //    /| |
+						   //   * | |
+						   //   | 1 |
+						   //   | | *
+						   //   | |/ 
+						   //   | *  
+						   //   |/   
+						   //   *    
+						   // face 4: bottom plane
+						   //       *-------*
+						   //      /       /
+						   //   m0*---2---*
+						   //    /       /
+						   //   *-------*
+						   // face 5: top plane
+						   //       *-------*
+						   //      /       /
+						   //     *---3---*m1
+						   //    /       /
+						   //   *-------*
 
-	    for (unsigned int i=0; i<12; ++i)
-	      {
-		while (next_unused_quad->used() == true)
-		  ++next_unused_quad;
-		new_quads[i] = next_unused_quad;
-		++next_unused_quad;
+						   // set up a list of line iterators
+						   // first. from this, construct
+						   // lists of line_indices and
+						   // line orientations later on
+		  const raw_line_iterator lines_y[4]
+		    = {
+			  hex->face(0)->child(0)
+			  ->line((hex->face(0)->refinement_case() == RefinementCase<dim>::cut_x) ? 1 : 3),        //0
+			  hex->face(1)->child(0)
+			  ->line((hex->face(1)->refinement_case() == RefinementCase<dim>::cut_x) ? 1 : 3),        //1
+			  hex->face(4)->child(0)
+			  ->line((hex->face(4)->refinement_case() == RefinementCase<dim>::cut_x) ? 1 : 3),        //2
+			  hex->face(5)->child(0)
+			  ->line((hex->face(5)->refinement_case() == RefinementCase<dim>::cut_x) ? 1 : 3)         //3
+		    };
+		  
+		  lines=&lines_y[0];
+		  
+		  unsigned int line_indices_y[4];
+		      
+		  for (unsigned int i=0; i<4; ++i)
+		    line_indices_y[i]=lines[i]->index();
+		  line_indices=&line_indices_y[0];
 
-		Assert (new_quads[i]->used() == false,
-                        ExcCellShouldBeUnused());
-	      }
+						   // the orientation of lines for the
+						   // inner quads is quite tricky. as
+						   // these lines are newly created
+						   // ones and thus have no parents,
+						   // they cannot inherit this
+						   // property. set up an array and
+						   // fill it with the respective
+						   // values
+		  bool line_orientation_y[4];
 
-					     // set up the 12 quads,
-					     // numbered as follows
-					     // (left quad numbering,
-					     // right line numbering
-					     // extracted from above)
-					     //
-					     //      *          *
-					     //     /|        21|
-					     //    * |        * 15
-					     //  y/|3*      20| *  
-					     //  * |/|      * |/| 
-					     //  |2* |x    11 * 14
-					     //  |/|1*      |/| * 
-					     //  * |/       * |17 
-					     //  |0*       10 *
-					     //  |/         |16
-					     //  *          *
-					     //
-					     //  x
-					     //  *---*---*      *22-*-23*
-					     //  | 5 | 7 |      1  29   5
-					     //  *---*---*      *26-*-27*
-					     //  | 4 | 6 |      0  28   4
-					     //  *---*---*y     *18-*-19*
-					     //
-					     //       y
-					     //      *----*----*      *-12-*-13-*
-					     //     / 10 / 11 /      3   25    7
-					     //    *----*----*      *-26-*-27-*
-					     //   / 8  / 9  /      2   24    6
-					     //  *----*----*x     *--8-*--9-*
+						   // the middle vertice marked
+						   // as m0 above is the start
+						   // vertex for lines 0 and 2
+						   // in standard orientation,
+						   // whereas m1 is the end
+						   // vertex of lines 1 and 3 in
+						   // standard orientation
+		  const unsigned int middle_vertices[2]=
+		    {
+			  hex->line(0)->child(0)->vertex_index(1),
+			  hex->line(5)->child(0)->vertex_index(1)
+		    };
+
+		  for (unsigned int i=0; i<4; ++i)
+		    if (lines[i]->vertex_index(i%2)==middle_vertices[i%2])
+		      line_orientation_y[i]=true;
+		    else
+		      {
+							 // it must be the other way round then
+			Assert(lines[i]->vertex_index((i+1)%2)==middle_vertices[i%2],
+			       ExcInternalError());
+			line_orientation_y[i]=false;
+		      }
+		  
+		  line_orientation=&line_orientation_y[0];
+
+						   // set up the new quad, line
+						   // numbering is as indicated
+						   // above
+		  new_quads[0]->set (internal::Triangulation
+				     ::TriaObject<2>(line_indices[2],
+						     line_indices[3],
+						     line_indices[0],
+						     line_indices[1]));
+
+		  new_quads[0]->set_line_orientation(0,line_orientation[2]);
+		  new_quads[0]->set_line_orientation(1,line_orientation[3]);
+		  new_quads[0]->set_line_orientation(2,line_orientation[0]);
+		  new_quads[0]->set_line_orientation(3,line_orientation[1]);
+
+						   // the quads are
+						   // numbered as follows:
+						   //
+						   // planes in the interior
+						   // of the old hex:
+						   //      *
+						   //     /|
+						   //    / | x         
+						   //   /  | *-------*      *---------*
+						   //  *   | |       |     /         /
+						   //  |   | |   0   |    /         /
+						   //  |   * |       |   /         /
+						   //  |  /  *-------*y *---------*x
+						   //  | /
+						   //  |/
+						   //  *
+						   //
+						   // children of the faces
+						   // of the old hex
+						   //      *-------*        *-------*
+						   //     /|       |       /   10  /|
+						   //    * |       |      *-------* |
+						   //   /| |   6   |     /   9   /| |
+						   //  * |2|       |    *-------* |4|
+						   //  | | *-------*    |       | | *
+						   //  |1|/   8   /     |       |3|/
+						   //  | *-------*      |   5   | *
+						   //  |/   7   /       |       |/
+						   //  *-------*        *-------*
+						   //
+						   // note that we have to
+						   // take care of the
+						   // orientation of
+						   // faces.
+		  const unsigned int quad_indices_y[11]
+		    = {
+			  new_quads[0]->index(),     //0
+			      
+			  hex->face(0)->child_index(  child_at_origin[hex->face(0)->refinement_case()-1][f_fl[0]][f_ro[0]]),  //1
+			  hex->face(0)->child_index(1-child_at_origin[hex->face(0)->refinement_case()-1][f_fl[0]][f_ro[0]]),
+			      
+			  hex->face(1)->child_index(  child_at_origin[hex->face(1)->refinement_case()-1][f_fl[1]][f_ro[1]]),  //3
+			  hex->face(1)->child_index(1-child_at_origin[hex->face(1)->refinement_case()-1][f_fl[1]][f_ro[1]]),
+			      
+			  hex->face(2)->index(),     //5
+			  
+			  hex->face(3)->index(),     //6
+
+			  hex->face(4)->child_index(  child_at_origin[hex->face(4)->refinement_case()-1][f_fl[4]][f_ro[4]]),  //7
+			  hex->face(4)->child_index(1-child_at_origin[hex->face(4)->refinement_case()-1][f_fl[4]][f_ro[4]]),
+			      
+			  hex->face(5)->child_index(  child_at_origin[hex->face(5)->refinement_case()-1][f_fl[5]][f_ro[5]]),  //9
+			  hex->face(5)->child_index(1-child_at_origin[hex->face(5)->refinement_case()-1][f_fl[5]][f_ro[5]])
+			      
+		    };
+		  quad_indices=&quad_indices_y[0];
+
+		  new_hexes[0]->set (internal::Triangulation
+				     ::TriaObject<3>(quad_indices[1],
+						     quad_indices[3],
+						     quad_indices[5],
+						     quad_indices[0],
+						     quad_indices[7],
+						     quad_indices[9]));
+		  new_hexes[1]->set (internal::Triangulation
+				     ::TriaObject<3>(quad_indices[2],
+						     quad_indices[4],
+						     quad_indices[0],
+						     quad_indices[6],
+						     quad_indices[8],
+						     quad_indices[10]));
+		  break;
+		}
+		case RefinementCase<dim>::cut_z:
+		{
+						   //////////////////////////////
+						   //
+						   //     RefinementCase<dim>::cut_z
+						   //
+						   // the refined cube will look
+						   // like this:
+						   //
+						   //        *---------*
+						   //       /         /|
+						   //      /         / |
+						   //     /         /  *
+						   //    *---------*  /|
+						   //    |         | / |
+						   //    |         |/  *
+						   //    *---------*  /
+						   //    |         | /
+						   //    |         |/
+						   //    *---------*
+						   // 
+						   // again, first
+						   // collect some data
+						   // about the indices of
+						   // the lines, with the
+						   // following numbering:
 	    
-	    new_quads[0]->set (internal::Triangulation
-                               ::TriaObject<2> (line_indices[10],
-						line_indices[28],
-						line_indices[16],
-						line_indices[24]));
-	    new_quads[1]->set (internal::Triangulation
-                               ::TriaObject<2> (line_indices[28],
-						line_indices[14],
-						line_indices[17],
-						line_indices[25]));
-	    new_quads[2]->set (internal::Triangulation
-                               ::TriaObject<2> (line_indices[11],
-						line_indices[29],
-						line_indices[24],
-						line_indices[20]));
-	    new_quads[3]->set (internal::Triangulation
-                               ::TriaObject<2> (line_indices[29],
-						line_indices[15],
-						line_indices[25],
-						line_indices[21]));
-	    new_quads[4]->set (internal::Triangulation
-                               ::TriaObject<2> (line_indices[18],
-						line_indices[26],
-						line_indices[0],
-						line_indices[28]));
-	    new_quads[5]->set (internal::Triangulation
-                               ::TriaObject<2> (line_indices[26],
-						line_indices[22],
-						line_indices[1],
-						line_indices[29]));
-	    new_quads[6]->set (internal::Triangulation
-                               ::TriaObject<2> (line_indices[19],
-						line_indices[27],
-						line_indices[28],
-						line_indices[4]));
-	    new_quads[7]->set (internal::Triangulation
-                               ::TriaObject<2> (line_indices[27],
-						line_indices[23],
-						line_indices[29],
-						line_indices[5]));
-	    new_quads[8]->set (internal::Triangulation
-                               ::TriaObject<2> (line_indices[2],
-						line_indices[24],
-						line_indices[8],
-						line_indices[26]));
-	    new_quads[9]->set (internal::Triangulation
-                               ::TriaObject<2> (line_indices[24],
-						line_indices[6],
-						line_indices[9],
-						line_indices[27]));
-	    new_quads[10]->set (internal::Triangulation
-                                ::TriaObject<2> (line_indices[3],
-						 line_indices[25],
-						 line_indices[26],
-						 line_indices[12]));
-	    new_quads[11]->set (internal::Triangulation
-                                ::TriaObject<2> (line_indices[25],
-						 line_indices[7],
-						 line_indices[27],
-						 line_indices[13]));
+						   // face 0: left plane
+						   //       *
+						   //      /| 
+						   //     / |
+						   //    /  *
+						   //   *  /|
+						   //   | 0 |
+						   //   |/  *
+						   // m0*  / 
+						   //   | /  
+						   //   |/   
+						   //   *    
+						   // face 1: right plane
+						   //       *
+						   //      /| 
+						   //     / |
+						   //    /  *m1
+						   //   *  /|
+						   //   | 1 |
+						   //   |/  *
+						   //   *  / 
+						   //   | /  
+						   //   |/   
+						   //   *    
+						   // face 2: front plane
+						   //   (note: x,y exchanged)
+						   //   *-------*
+						   //   |       |
+						   // m0*---2---*
+						   //   |       |
+						   //   *-------*
+						   // face 3: back plane
+						   //   (note: x,y exchanged)
+						   //   *-------*
+						   //   |       | 
+						   //   *---3---*m1
+						   //   |       | 
+						   //   *-------*
 
-					     // set flags
-	    for (unsigned int i=0; i<12; ++i)
-	      {
-		new_quads[i]->set_used_flag();
-		new_quads[i]->clear_user_flag();
-		new_quads[i]->clear_user_data();
-		new_quads[i]->clear_children();
-						 // interior quad
-		new_quads[i]->set_boundary_indicator (255);
-						 // set all line orientation
-						 // flags to true, chnage this
-						 // afterwards, if necessary
-		for (unsigned int j=0; j<GeometryInfo<dim>::lines_per_face; ++j)
-		  new_quads[i]->set_line_orientation(j,true);
-	      }  
-					     // now reset the line_orientation
-					     // flags of outer lines as they
-					     // cannot be set in a loop (at
-					     // least not easily)
-	    new_quads[0]->set_line_orientation(0,line_orientation[10]);
-	    new_quads[0]->set_line_orientation(2,line_orientation[16]);
+						   // set up a list of line iterators
+						   // first. from this, construct
+						   // lists of line_indices and
+						   // line orientations later on
+		  const raw_line_iterator lines_z[4]
+		    = {
+			  hex->face(0)->child(0)
+			  ->line((hex->face(0)->refinement_case() == RefinementCase<dim>::cut_x) ? 1 : 3),        //0
+			  hex->face(1)->child(0)
+			  ->line((hex->face(1)->refinement_case() == RefinementCase<dim>::cut_x) ? 1 : 3),        //1
+			  hex->face(2)->child(0)
+			  ->line((hex->face(2)->refinement_case() == RefinementCase<dim>::cut_x) ? 1 : 3),        //2
+			  hex->face(3)->child(0)
+			  ->line((hex->face(3)->refinement_case() == RefinementCase<dim>::cut_x) ? 1 : 3)         //3
+		    };
+		  
+		  lines=&lines_z[0];
+		  
+		  unsigned int line_indices_z[4];
+		      
+		  for (unsigned int i=0; i<4; ++i)
+		    line_indices_z[i]=lines[i]->index();
+		  line_indices=&line_indices_z[0];
 
-	    new_quads[1]->set_line_orientation(1,line_orientation[14]);
-	    new_quads[1]->set_line_orientation(2,line_orientation[17]);
+						   // the orientation of lines for the
+						   // inner quads is quite tricky. as
+						   // these lines are newly created
+						   // ones and thus have no parents,
+						   // they cannot inherit this
+						   // property. set up an array and
+						   // fill it with the respective
+						   // values
+		  bool line_orientation_z[4];
 
-	    new_quads[2]->set_line_orientation(0,line_orientation[11]);
-	    new_quads[2]->set_line_orientation(3,line_orientation[20]);
+						   // the middle vertex marked
+						   // as m0 above is the start
+						   // vertex for lines 0 and 2
+						   // in standard orientation,
+						   // whereas m1 is the end
+						   // vertex of lines 1 and 3 in
+						   // standard orientation
+		  const unsigned int middle_vertices[2]=
+		    {
+			  hex->line(8)->middle_vertex_index(),
+			  hex->line(11)->middle_vertex_index()
+		    };
 
-	    new_quads[3]->set_line_orientation(1,line_orientation[15]);
-	    new_quads[3]->set_line_orientation(3,line_orientation[21]);
+		  for (unsigned int i=0; i<4; ++i)
+		    if (lines[i]->vertex_index(i%2)==middle_vertices[i%2])
+		      line_orientation_z[i]=true;
+		    else
+		      {
+							 // it must be the other way round then
+			Assert(lines[i]->vertex_index((i+1)%2)==middle_vertices[i%2],
+			       ExcInternalError());
+			line_orientation_z[i]=false;
+		      }
+		  
+		  line_orientation=&line_orientation_z[0];
 
-	    new_quads[4]->set_line_orientation(0,line_orientation[18]);
-	    new_quads[4]->set_line_orientation(2,line_orientation[0]);
+						   // set up the new quad, line
+						   // numbering is as indicated
+						   // above
+		  new_quads[0]->set (internal::Triangulation
+				     ::TriaObject<2>(line_indices[0],
+						     line_indices[1],
+						     line_indices[2],
+						     line_indices[3]));
+		  
+		  new_quads[0]->set_line_orientation(0,line_orientation[0]);
+		  new_quads[0]->set_line_orientation(1,line_orientation[1]);
+		  new_quads[0]->set_line_orientation(2,line_orientation[2]);
+		  new_quads[0]->set_line_orientation(3,line_orientation[3]);
 
-	    new_quads[5]->set_line_orientation(1,line_orientation[22]);
-	    new_quads[5]->set_line_orientation(2,line_orientation[1]);
+						   // the quads are
+						   // numbered as follows:
+						   //
+						   // planes in the interior
+						   // of the old hex:
+						   //      *
+						   //     /|
+						   //    / | x         
+						   //   /  | *-------*      *---------*
+						   //  *   | |       |     /         /
+						   //  |   | |       |    /    0    /
+						   //  |   * |       |   /         /
+						   //  |  /  *-------*y *---------*x
+						   //  | /
+						   //  |/
+						   //  *
+						   //
+						   // children of the faces
+						   // of the old hex
+						   //      *---*---*        *-------*
+						   //     /|   8   |       /       /|
+						   //    / |       |      /   10  / |
+						   //   /  *-------*     /       /  *
+						   //  * 2/|       |    *-------* 4/|
+						   //  | / |   7   |    |   6   | / |
+						   //  |/1 *-------*    |       |/3 *
+						   //  *  /       /     *-------*  /
+						   //  | /   9   /      |       | /
+						   //  |/       /       |   5   |/
+						   //  *-------*        *---*---*
+						   //
+						   // note that we have to
+						   // take care of the
+						   // orientation of
+						   // faces.
+		  const unsigned int quad_indices_z[11]
+		    = {
+			  new_quads[0]->index(),     //0
+			      
+			  hex->face(0)->child_index(  child_at_origin[hex->face(0)->refinement_case()-1][f_fl[0]][f_ro[0]]),  //1
+			  hex->face(0)->child_index(1-child_at_origin[hex->face(0)->refinement_case()-1][f_fl[0]][f_ro[0]]),
+			      
+			  hex->face(1)->child_index(  child_at_origin[hex->face(1)->refinement_case()-1][f_fl[1]][f_ro[1]]),  //3
+			  hex->face(1)->child_index(1-child_at_origin[hex->face(1)->refinement_case()-1][f_fl[1]][f_ro[1]]),
+			      
+			  hex->face(2)->child_index(  child_at_origin[hex->face(2)->refinement_case()-1][f_fl[2]][f_ro[2]]),  //5
+			  hex->face(2)->child_index(1-child_at_origin[hex->face(2)->refinement_case()-1][f_fl[2]][f_ro[2]]),
+			      
+			  hex->face(3)->child_index(  child_at_origin[hex->face(3)->refinement_case()-1][f_fl[3]][f_ro[3]]),  //7
+			  hex->face(3)->child_index(1-child_at_origin[hex->face(3)->refinement_case()-1][f_fl[3]][f_ro[3]]),
+			      
+			  hex->face(4)->index(),     //9
+			  
+			  hex->face(5)->index()      //10
+		    };
+		  quad_indices=&quad_indices_z[0];
 
-	    new_quads[6]->set_line_orientation(0,line_orientation[19]);
-	    new_quads[6]->set_line_orientation(3,line_orientation[4]);
+		  new_hexes[0]->set (internal::Triangulation
+				     ::TriaObject<3>(quad_indices[1],
+						     quad_indices[3],
+						     quad_indices[5],
+						     quad_indices[7],
+						     quad_indices[9],
+						     quad_indices[0]));
+		  new_hexes[1]->set (internal::Triangulation
+				     ::TriaObject<3>(quad_indices[2],
+						     quad_indices[4],
+						     quad_indices[6],
+						     quad_indices[8],
+						     quad_indices[0],
+						     quad_indices[10]));
+		  break;
+		}
+		case RefinementCase<dim>::cut_xy:
+		{
+						   //////////////////////////////
+						   //
+						   //     RefinementCase<dim>::cut_xy
+						   //
+						   // the refined cube will look
+						   // like this:
+						   //
+						   //        *----*----*
+						   //       /    /    /|
+						   //      *----*----* |
+						   //     /    /    /| |
+						   //    *----*----* | |
+						   //    |    |    | | |
+						   //    |    |    | | *
+						   //    |    |    | |/
+						   //    |    |    | *
+						   //    |    |    |/
+						   //    *----*----*
+						   // 
 
-	    new_quads[7]->set_line_orientation(1,line_orientation[23]);
-	    new_quads[7]->set_line_orientation(3,line_orientation[5]);
+						   // first, create the new
+						   // internal line
+		  new_lines[0]->set (internal::Triangulation::
+				     TriaObject<1>(hex->face(4)->middle_vertex_index(),
+						   hex->face(5)->middle_vertex_index()));
 
-	    new_quads[8]->set_line_orientation(0,line_orientation[2]);
-	    new_quads[8]->set_line_orientation(2,line_orientation[8]);
+						   // again, first
+						   // collect some data
+						   // about the indices of
+						   // the lines, with the
+						   // following numbering:
+	    
+						   // face 0: left plane
+						   //       *
+						   //      /| 
+						   //     * |
+						   //    /| |
+						   //   * | |
+						   //   | 0 |
+						   //   | | *
+						   //   | |/ 
+						   //   | *  
+						   //   |/   
+						   //   *    
+						   // face 1: right plane
+						   //       *
+						   //      /| 
+						   //     * |
+						   //    /| |
+						   //   * | |
+						   //   | 1 |
+						   //   | | *
+						   //   | |/ 
+						   //   | *  
+						   //   |/   
+						   //   *    
+						   // face 2: front plane
+						   //   (note: x,y exchanged)
+						   //   *---*---*
+						   //   |   |   |
+						   //   |   2   |
+						   //   |   |   |
+						   //   *-------*
+						   // face 3: back plane
+						   //   (note: x,y exchanged)
+						   //   *---*---*
+						   //   |   |   | 
+						   //   |   3   |
+						   //   |   |   | 
+						   //   *---*---*
+						   // face 4: bottom plane
+						   //       *---*---*
+						   //      /   5   /
+						   //     *-6-*-7-*
+						   //    /   4   /
+						   //   *---*---*
+						   // face 5: top plane
+						   //       *---*---*
+						   //      /   9   /
+						   //     *10-*-11*
+						   //    /   8   /
+						   //   *---*---*
+						   // middle planes
+						   //     *-------*   *---*---*
+						   //    /       /    |   |   |
+						   //   /       /     |   12  |
+						   //  /       /      |   |   |
+						   // *-------*       *---*---*
 
-	    new_quads[9]->set_line_orientation(1,line_orientation[6]);
-	    new_quads[9]->set_line_orientation(2,line_orientation[9]);
+						   // set up a list of line iterators
+						   // first. from this, construct
+						   // lists of line_indices and
+						   // line orientations later on
+		  const raw_line_iterator lines_xy[13]
+		    = {
+			  hex->face(0)->child(0)
+			  ->line((hex->face(0)->refinement_case() == RefinementCase<dim>::cut_x) ? 1 : 3),        //0
+			  hex->face(1)->child(0)
+			  ->line((hex->face(1)->refinement_case() == RefinementCase<dim>::cut_x) ? 1 : 3),        //1
+			  hex->face(2)->child(0)
+			  ->line((hex->face(2)->refinement_case() == RefinementCase<dim>::cut_x) ? 1 : 3),        //2
+			  hex->face(3)->child(0)
+			  ->line((hex->face(3)->refinement_case() == RefinementCase<dim>::cut_x) ? 1 : 3),        //3
 
-	    new_quads[10]->set_line_orientation(0,line_orientation[3]);
-	    new_quads[10]->set_line_orientation(3,line_orientation[12]);
+			  hex->face(4)->isotropic_child(GeometryInfo<dim>::standard_to_real_face_vertex(0,f_or[4],f_fl[4],f_ro[4]))
+			  ->line(GeometryInfo<dim>::standard_to_real_face_line(1,f_or[4],f_fl[4],f_ro[4])),        //4
+			  hex->face(4)->isotropic_child(GeometryInfo<dim>::standard_to_real_face_vertex(3,f_or[4],f_fl[4],f_ro[4]))
+			  ->line(GeometryInfo<dim>::standard_to_real_face_line(0,f_or[4],f_fl[4],f_ro[4])),        //5
+			  hex->face(4)->isotropic_child(GeometryInfo<dim>::standard_to_real_face_vertex(0,f_or[4],f_fl[4],f_ro[4]))
+			  ->line(GeometryInfo<dim>::standard_to_real_face_line(3,f_or[4],f_fl[4],f_ro[4])),        //6
+			  hex->face(4)->isotropic_child(GeometryInfo<dim>::standard_to_real_face_vertex(3,f_or[4],f_fl[4],f_ro[4]))
+			  ->line(GeometryInfo<dim>::standard_to_real_face_line(2,f_or[4],f_fl[4],f_ro[4])),        //7
+			  
+			  hex->face(5)->isotropic_child(GeometryInfo<dim>::standard_to_real_face_vertex(0,f_or[5],f_fl[5],f_ro[5]))
+			  ->line(GeometryInfo<dim>::standard_to_real_face_line(1,f_or[5],f_fl[5],f_ro[5])),        //8
+			  hex->face(5)->isotropic_child(GeometryInfo<dim>::standard_to_real_face_vertex(3,f_or[5],f_fl[5],f_ro[5]))
+			  ->line(GeometryInfo<dim>::standard_to_real_face_line(0,f_or[5],f_fl[5],f_ro[5])),        //9
+			  hex->face(5)->isotropic_child(GeometryInfo<dim>::standard_to_real_face_vertex(0,f_or[5],f_fl[5],f_ro[5]))
+			  ->line(GeometryInfo<dim>::standard_to_real_face_line(3,f_or[5],f_fl[5],f_ro[5])),        //10
+			  hex->face(5)->isotropic_child(GeometryInfo<dim>::standard_to_real_face_vertex(3,f_or[5],f_fl[5],f_ro[5]))
+			  ->line(GeometryInfo<dim>::standard_to_real_face_line(2,f_or[5],f_fl[5],f_ro[5])),        //11
 
-	    new_quads[11]->set_line_orientation(1,line_orientation[7]);
-	    new_quads[11]->set_line_orientation(3,line_orientation[13]);
+			  new_lines[0]                        //12
+		    };
+		  
+		  lines=&lines_xy[0];
+		  
+		  unsigned int line_indices_xy[13];
+		      
+		  for (unsigned int i=0; i<13; ++i)
+		    line_indices_xy[i]=lines[i]->index();
+		  line_indices=&line_indices_xy[0];
 
+						   // the orientation of lines for the
+						   // inner quads is quite tricky. as
+						   // these lines are newly created
+						   // ones and thus have no parents,
+						   // they cannot inherit this
+						   // property. set up an array and
+						   // fill it with the respective
+						   // values
+		  bool line_orientation_xy[13];
 
-					     /////////////////////////////////
-					     // create the eight new hexes
-					     //
-					     // again first collect
-					     // some data.  here, we
-					     // need the indices of a
-					     // whole lotta
-					     // quads. they are
-					     // numbered as follows:
-					     //
-					     // planes in the interior
-					     // of the old hex:
-					     //      *
-					     //     /|
-					     //    * |
-					     //   /|3*  *---*---*      *----*----*
-					     //  * |/|  | 5 | 7 |     / 10 / 11 /
-					     //  |2* |  *---*---*    *----*----*
-					     //  |/|1*  | 4 | 6 |   / 8  / 9  /
-					     //  * |/   *---*---*y *----*----*x
-					     //  |0*
-					     //  |/
-					     //  *
-					     //
-					     // children of the faces
-					     // of the old hex
-					     //      *-------*        *-------*
-					     //     /|25   27|       /34   35/|
-					     //    15|       |      /       /19
-					     //   /  |       |     /32   33/  |
-					     //  *   |24   26|    *-------*18 |
-					     //  1413*-------*    |21   23| 17*
-					     //  |  /30   31/     |       |  /
-					     //  12/       /      |       |16
-					     //  |/28   29/       |20   22|/
-					     //  *-------*        *-------*
+						   // the middle vertices of the
+						   // lines of our bottom face
+		  const unsigned int middle_vertices[4]=
+		    {
+			  hex->line(0)->child(0)->vertex_index(1),
+			  hex->line(1)->child(0)->vertex_index(1),
+			  hex->line(2)->child(0)->vertex_index(1),
+			  hex->line(3)->child(0)->vertex_index(1),
+		    };
+
+						   // note: for lines 0 to 3 the
+						   // orientation of the line
+						   // is 'true', if vertex 0 is
+						   // on the bottom face
+		  for (unsigned int i=0; i<4; ++i)
+		    if (lines[i]->vertex_index(0)==middle_vertices[i])
+		      line_orientation_xy[i]=true;
+		    else
+		      {
+							 // it must be the other way round then
+			Assert(lines[i]->vertex_index(1)==middle_vertices[i],
+			       ExcInternalError());
+			line_orientation_xy[i]=false;
+		      }
+		  
+						   // note: for lines 4 to 11
+						   // (inner lines of the outer quads)
+						   // the following holds: the second
+						   // vertex of the even lines in
+						   // standard orientation is the
+						   // vertex in the middle of the
+						   // quad, whereas for odd lines the
+						   // first vertex is the same middle
+						   // vertex.
+		  for (unsigned int i=4; i<12; ++i)
+		    if (lines[i]->vertex_index((i+1)%2)==hex->face(3+i/4)->middle_vertex_index())
+		      line_orientation_xy[i]=true;
+		    else
+		      {
+							 // it must be the other way
+							 // round then
+			Assert(lines[i]->vertex_index(i%2)==hex->face(3+i/4)->middle_vertex_index(),
+			       ExcInternalError());
+			line_orientation_xy[i]=false;
+		      }
+						   // for the last line the line
+						   // orientation is always true,
+						   // since it was just constructed
+						   // that way
+
+		  line_orientation_xy[12]=true;
+		  line_orientation=&line_orientation_xy[0];
+
+						   // set up the 4 quads,
+						   // numbered as follows
+						   // (left quad numbering,
+						   // right line numbering
+						   // extracted from above)
+						   //
+						   //      *          *
+						   //     /|         9|
+						   //    * |        * |
+						   //  y/| |       8| 3  
+						   //  * |1|      * | | 
+						   //  | | |x     | 12|
+						   //  |0| *      | | * 
+						   //  | |/       2 |5 
+						   //  | *        | *
+						   //  |/         |4
+						   //  *          *
+						   //
+						   //  x
+						   //  *---*---*      *10-*-11*
+						   //  |   |   |      |   |   |
+						   //  | 2 | 3 |      0   12  1 
+						   //  |   |   |      |   |   |
+						   //  *---*---*y     *-6-*-7-*
+		  
+		  new_quads[0]->set (internal::Triangulation
+				     ::TriaObject<2>(line_indices[2],
+						     line_indices[12],
+						     line_indices[4],
+						     line_indices[8]));
+		  new_quads[1]->set (internal::Triangulation
+				     ::TriaObject<2>(line_indices[12],
+						     line_indices[3],
+						     line_indices[5],
+						     line_indices[9]));
+		  new_quads[2]->set (internal::Triangulation
+				     ::TriaObject<2>(line_indices[6],
+						     line_indices[10],
+						     line_indices[0],
+						     line_indices[12]));
+		  new_quads[3]->set (internal::Triangulation
+				     ::TriaObject<2>(line_indices[7],
+						     line_indices[11],
+						     line_indices[12],
+						     line_indices[1]));
+
+		  new_quads[0]->set_line_orientation(0,line_orientation[2]);
+		  new_quads[0]->set_line_orientation(2,line_orientation[4]);
+		  new_quads[0]->set_line_orientation(3,line_orientation[8]);
+		      
+		  new_quads[1]->set_line_orientation(1,line_orientation[3]);
+		  new_quads[1]->set_line_orientation(2,line_orientation[5]);
+		  new_quads[1]->set_line_orientation(3,line_orientation[9]);
+		      
+		  new_quads[2]->set_line_orientation(0,line_orientation[6]);
+		  new_quads[2]->set_line_orientation(1,line_orientation[10]);
+		  new_quads[2]->set_line_orientation(2,line_orientation[0]);
+
+		  new_quads[3]->set_line_orientation(0,line_orientation[7]);
+		  new_quads[3]->set_line_orientation(1,line_orientation[11]);
+		  new_quads[3]->set_line_orientation(3,line_orientation[1]);
+
+						   // the quads are
+						   // numbered as follows:
+						   //
+						   // planes in the interior
+						   // of the old hex:
+						   //      *
+						   //     /|
+						   //    * | x         
+						   //   /| | *---*---*      *---------*
+						   //  * |1| |   |   |     /         /
+						   //  | | | | 2 | 3 |    /         /
+						   //  |0| * |   |   |   /         /
+						   //  | |/  *---*---*y *---------*x
+						   //  | *
+						   //  |/
+						   //  *
+						   //
+						   // children of the faces
+						   // of the old hex
+						   //      *---*---*        *---*---*
+						   //     /|   |   |       /18 / 19/|
+						   //    * |10 | 11|      /---/---* |
+						   //   /| |   |   |     /16 / 17/| |
+						   //  * |5|   |   |    *---*---* |7|
+						   //  | | *---*---*    |   |   | | *
+						   //  |4|/14 / 15/     |   |   |6|/
+						   //  | *---/---/      | 8 | 9 | *
+						   //  |/12 / 13/       |   |   |/
+						   //  *---*---*        *---*---*
+						   //
+						   // note that we have to
+						   // take care of the
+						   // orientation of
+						   // faces.
+		  const unsigned int quad_indices_xy[20]
+		    = {
+			  new_quads[0]->index(),     //0
+			  new_quads[1]->index(),
+			  new_quads[2]->index(),
+			  new_quads[3]->index(),
+			      
+			  hex->face(0)->child_index(  child_at_origin[hex->face(0)->refinement_case()-1][f_fl[0]][f_ro[0]]),  //4
+			  hex->face(0)->child_index(1-child_at_origin[hex->face(0)->refinement_case()-1][f_fl[0]][f_ro[0]]),
+
+			  hex->face(1)->child_index(  child_at_origin[hex->face(1)->refinement_case()-1][f_fl[1]][f_ro[1]]),  //6
+			  hex->face(1)->child_index(1-child_at_origin[hex->face(1)->refinement_case()-1][f_fl[1]][f_ro[1]]),
+			      
+			  hex->face(2)->child_index(  child_at_origin[hex->face(2)->refinement_case()-1][f_fl[2]][f_ro[2]]),  //8
+			  hex->face(2)->child_index(1-child_at_origin[hex->face(2)->refinement_case()-1][f_fl[2]][f_ro[2]]),
+			      
+			  hex->face(3)->child_index(  child_at_origin[hex->face(3)->refinement_case()-1][f_fl[3]][f_ro[3]]),  //10
+			  hex->face(3)->child_index(1-child_at_origin[hex->face(3)->refinement_case()-1][f_fl[3]][f_ro[3]]),
+			      
+			  hex->face(4)->isotropic_child_index(GeometryInfo<dim>::standard_to_real_face_vertex(0,f_or[4],f_fl[4],f_ro[4])),  //12
+			  hex->face(4)->isotropic_child_index(GeometryInfo<dim>::standard_to_real_face_vertex(1,f_or[4],f_fl[4],f_ro[4])),
+			  hex->face(4)->isotropic_child_index(GeometryInfo<dim>::standard_to_real_face_vertex(2,f_or[4],f_fl[4],f_ro[4])),
+			  hex->face(4)->isotropic_child_index(GeometryInfo<dim>::standard_to_real_face_vertex(3,f_or[4],f_fl[4],f_ro[4])),
+			      
+			  hex->face(5)->isotropic_child_index(GeometryInfo<dim>::standard_to_real_face_vertex(0,f_or[5],f_fl[5],f_ro[5])),  //16
+			  hex->face(5)->isotropic_child_index(GeometryInfo<dim>::standard_to_real_face_vertex(1,f_or[5],f_fl[5],f_ro[5])),
+			  hex->face(5)->isotropic_child_index(GeometryInfo<dim>::standard_to_real_face_vertex(2,f_or[5],f_fl[5],f_ro[5])),
+			  hex->face(5)->isotropic_child_index(GeometryInfo<dim>::standard_to_real_face_vertex(3,f_or[5],f_fl[5],f_ro[5]))
+		    };
+		  quad_indices=&quad_indices_xy[0];
+
+		  new_hexes[0]->set (internal::Triangulation
+				     ::TriaObject<3>(quad_indices[4],
+						     quad_indices[0],
+						     quad_indices[8],
+						     quad_indices[2],
+						     quad_indices[12],
+						     quad_indices[16]));
+		  new_hexes[1]->set (internal::Triangulation
+				     ::TriaObject<3>(quad_indices[0],
+						     quad_indices[6],
+						     quad_indices[9],
+						     quad_indices[3],
+						     quad_indices[13],
+						     quad_indices[17]));
+		  new_hexes[2]->set (internal::Triangulation
+				     ::TriaObject<3>(quad_indices[5],
+						     quad_indices[1],
+						     quad_indices[2],
+						     quad_indices[10],
+						     quad_indices[14],
+						     quad_indices[18]));
+		  new_hexes[3]->set (internal::Triangulation
+				     ::TriaObject<3>(quad_indices[1],
+						     quad_indices[7],
+						     quad_indices[3],
+						     quad_indices[11],
+						     quad_indices[15],
+						     quad_indices[19]));
+		  break;
+		}
+		case RefinementCase<dim>::cut_xz:
+		{
+						   //////////////////////////////
+						   //
+						   //     RefinementCase<dim>::cut_xz
+						   //
+						   // the refined cube will look
+						   // like this:
+						   //
+						   //        *----*----*
+						   //       /    /    /|
+						   //      /    /    / |
+						   //     /    /    /  *
+						   //    *----*----*  /|
+						   //    |    |    | / |
+						   //    |    |    |/  *
+						   //    *----*----*  /
+						   //    |    |    | /
+						   //    |    |    |/
+						   //    *----*----*
+						   // 
+
+						   // first, create the new
+						   // internal line
+		  new_lines[0]->set (internal::Triangulation::
+				     TriaObject<1>(hex->face(2)->middle_vertex_index(),
+						   hex->face(3)->middle_vertex_index()));
+
+						   // again, first
+						   // collect some data
+						   // about the indices of
+						   // the lines, with the
+						   // following numbering:
+	    
+						   // face 0: left plane
+						   //       *
+						   //      /| 
+						   //     / |
+						   //    /  *
+						   //   *  /|
+						   //   | 0 |
+						   //   |/  *
+						   //   *  / 
+						   //   | /  
+						   //   |/   
+						   //   *    
+						   // face 1: right plane
+						   //       *
+						   //      /| 
+						   //     / |
+						   //    /  *
+						   //   *  /|
+						   //   | 1 |
+						   //   |/  *
+						   //   *  / 
+						   //   | /  
+						   //   |/   
+						   //   *    
+						   // face 2: front plane
+						   //   (note: x,y exchanged)
+						   //   *---*---*
+						   //   |   5   |
+						   //   *-6-*-7-*
+						   //   |   4   |
+						   //   *---*---*
+						   // face 3: back plane
+						   //   (note: x,y exchanged)
+						   //   *---*---*
+						   //   |   9   | 
+						   //   *10-*-11*
+						   //   |   8   | 
+						   //   *---*---*
+						   // face 4: bottom plane
+						   //       *---*---*
+						   //      /   /   /
+						   //     /   2   /
+						   //    /   /   /
+						   //   *---*---*
+						   // face 5: top plane
+						   //       *---*---*
+						   //      /   /   /
+						   //     /   3   /
+						   //    /   /   /
+						   //   *---*---*
+						   // middle planes
+						   //     *---*---*   *-------*
+						   //    /   /   /    |       |
+						   //   /   12  /     |       |
+						   //  /   /   /      |       |
+						   // *---*---*       *-------*
+
+						   // set up a list of line iterators
+						   // first. from this, construct
+						   // lists of line_indices and
+						   // line orientations later on
+		  const raw_line_iterator lines_xz[13]
+		    = {
+			  hex->face(0)->child(0)
+			  ->line((hex->face(0)->refinement_case() == RefinementCase<dim>::cut_x) ? 1 : 3),        //0
+			  hex->face(1)->child(0)
+			  ->line((hex->face(1)->refinement_case() == RefinementCase<dim>::cut_x) ? 1 : 3),        //1
+			  hex->face(4)->child(0)
+			  ->line((hex->face(4)->refinement_case() == RefinementCase<dim>::cut_x) ? 1 : 3),        //2
+			  hex->face(5)->child(0)
+			  ->line((hex->face(5)->refinement_case() == RefinementCase<dim>::cut_x) ? 1 : 3),        //3
+
+			  hex->face(2)->isotropic_child(GeometryInfo<dim>::standard_to_real_face_vertex(0,f_or[2],f_fl[2],f_ro[2]))
+			  ->line(GeometryInfo<dim>::standard_to_real_face_line(3,f_or[2],f_fl[2],f_ro[2])),        //4
+			  hex->face(2)->isotropic_child(GeometryInfo<dim>::standard_to_real_face_vertex(3,f_or[2],f_fl[2],f_ro[2]))
+			  ->line(GeometryInfo<dim>::standard_to_real_face_line(2,f_or[2],f_fl[2],f_ro[2])),        //5
+			  hex->face(2)->isotropic_child(GeometryInfo<dim>::standard_to_real_face_vertex(0,f_or[2],f_fl[2],f_ro[2]))
+			  ->line(GeometryInfo<dim>::standard_to_real_face_line(1,f_or[2],f_fl[2],f_ro[2])),        //6
+			  hex->face(2)->isotropic_child(GeometryInfo<dim>::standard_to_real_face_vertex(3,f_or[2],f_fl[2],f_ro[2]))
+			  ->line(GeometryInfo<dim>::standard_to_real_face_line(0,f_or[2],f_fl[2],f_ro[2])),        //7
+			  
+			  hex->face(3)->isotropic_child(GeometryInfo<dim>::standard_to_real_face_vertex(0,f_or[3],f_fl[3],f_ro[3]))
+			  ->line(GeometryInfo<dim>::standard_to_real_face_line(3,f_or[3],f_fl[3],f_ro[3])),        //8
+			  hex->face(3)->isotropic_child(GeometryInfo<dim>::standard_to_real_face_vertex(3,f_or[3],f_fl[3],f_ro[3]))
+			  ->line(GeometryInfo<dim>::standard_to_real_face_line(2,f_or[3],f_fl[3],f_ro[3])),        //9
+			  hex->face(3)->isotropic_child(GeometryInfo<dim>::standard_to_real_face_vertex(0,f_or[3],f_fl[3],f_ro[3]))
+			  ->line(GeometryInfo<dim>::standard_to_real_face_line(1,f_or[3],f_fl[3],f_ro[3])),        //10
+			  hex->face(3)->isotropic_child(GeometryInfo<dim>::standard_to_real_face_vertex(3,f_or[3],f_fl[3],f_ro[3]))
+			  ->line(GeometryInfo<dim>::standard_to_real_face_line(0,f_or[3],f_fl[3],f_ro[3])),        //11
+
+			  new_lines[0]                        //12
+		    };
+		  
+		  lines=&lines_xz[0];
+		  
+		  unsigned int line_indices_xz[13];
+		      
+		  for (unsigned int i=0; i<13; ++i)
+		    line_indices_xz[i]=lines[i]->index();
+		  line_indices=&line_indices_xz[0];
+
+						   // the orientation of lines for the
+						   // inner quads is quite tricky. as
+						   // these lines are newly created
+						   // ones and thus have no parents,
+						   // they cannot inherit this
+						   // property. set up an array and
+						   // fill it with the respective
+						   // values
+		  bool line_orientation_xz[13];
+
+						   // the middle vertices of the
+						   // lines of our front face
+		  const unsigned int middle_vertices[4]=
+		    {
+			  hex->line(8)->child(0)->vertex_index(1),
+			  hex->line(9)->child(0)->vertex_index(1),
+			  hex->line(2)->child(0)->vertex_index(1),
+			  hex->line(6)->child(0)->vertex_index(1),
+		    };
+
+						   // note: for lines 0 to 3 the
+						   // orientation of the line
+						   // is 'true', if vertex 0 is
+						   // on the front
+		  for (unsigned int i=0; i<4; ++i)
+		    if (lines[i]->vertex_index(0)==middle_vertices[i])
+		      line_orientation_xz[i]=true;
+		    else
+		      {
+							 // it must be the other way round then
+			Assert(lines[i]->vertex_index(1)==middle_vertices[i],
+			       ExcInternalError());
+			line_orientation_xz[i]=false;
+		      }
+		  
+						   // note: for lines 4 to 11
+						   // (inner lines of the outer quads)
+						   // the following holds: the second
+						   // vertex of the even lines in
+						   // standard orientation is the
+						   // vertex in the middle of the
+						   // quad, whereas for odd lines the
+						   // first vertex is the same middle
+						   // vertex.
+		  for (unsigned int i=4; i<12; ++i)
+		    if (lines[i]->vertex_index((i+1)%2)==hex->face(1+i/4)->middle_vertex_index())
+		      line_orientation_xz[i]=true;
+		    else
+		      {
+							 // it must be the other way
+							 // round then
+			Assert(lines[i]->vertex_index(i%2)==hex->face(1+i/4)->middle_vertex_index(),
+			       ExcInternalError());
+			line_orientation_xz[i]=false;
+		      }
+						   // for the last line the line
+						   // orientation is always true,
+						   // since it was just constructed
+						   // that way
+
+		  line_orientation_xz[12]=true;
+		  line_orientation=&line_orientation_xz[0];
+
+						       // set up the 4 quads,
+						       // numbered as follows
+						       // (left quad numbering,
+						       // right line numbering
+						       // extracted from above),
+						       // the drawings denote
+						       // middle planes
+						       //
+						       //      *          *
+						       //     /|         /|
+						       //    / |        3 9 
+						       //  y/  *       /  *  
+						       //  * 3/|      *  /|
+						       //  | / |x     5 12|8
+						       //  |/  *      |/  * 
+						       //  * 2/       *  /  
+						       //  | /        4 2
+						       //  |/         |/ 
+						       //  *          *
+						       //
+						       //       y
+						       //      *----*----*      *-10-*-11-*
+						       //     /    /    /      /    /    /
+						       //    / 0  /  1 /      0    12   1
+						       //   /    /    /      /    /    /
+						       //  *----*----*x     *--6-*--7-*
+	    
+		  new_quads[0]->set (internal::Triangulation
+				     ::TriaObject<2>(line_indices[0],
+						     line_indices[12],
+						     line_indices[6],
+						     line_indices[10]));
+		  new_quads[1]->set (internal::Triangulation
+				     ::TriaObject<2>(line_indices[12],
+						     line_indices[1],
+						     line_indices[7],
+						     line_indices[11]));
+		  new_quads[2]->set (internal::Triangulation
+				     ::TriaObject<2>(line_indices[4],
+						     line_indices[8],
+						     line_indices[2],
+						     line_indices[12]));
+		  new_quads[3]->set (internal::Triangulation
+				     ::TriaObject<2>(line_indices[5],
+						     line_indices[9],
+						     line_indices[12],
+						     line_indices[3]));
+
+		  new_quads[0]->set_line_orientation(0,line_orientation[0]);
+		  new_quads[0]->set_line_orientation(2,line_orientation[6]);
+		  new_quads[0]->set_line_orientation(3,line_orientation[10]);
+		      
+		  new_quads[1]->set_line_orientation(1,line_orientation[1]);
+		  new_quads[1]->set_line_orientation(2,line_orientation[7]);
+		  new_quads[1]->set_line_orientation(3,line_orientation[11]);
+		      
+		  new_quads[2]->set_line_orientation(0,line_orientation[4]);
+		  new_quads[2]->set_line_orientation(1,line_orientation[8]);
+		  new_quads[2]->set_line_orientation(2,line_orientation[2]);
+
+		  new_quads[3]->set_line_orientation(0,line_orientation[5]);
+		  new_quads[3]->set_line_orientation(1,line_orientation[9]);
+		  new_quads[3]->set_line_orientation(3,line_orientation[3]);
+
+						   // the quads are
+						   // numbered as follows:
+						   //
+						   // planes in the interior
+						   // of the old hex:
+						   //      *
+						   //     /|
+						   //    / | x         
+						   //   /3 * *-------*      *----*----*
+						   //  *  /| |       |     /    /    /
+						   //  | / | |       |    /  0 /  1 /
+						   //  |/  * |       |   /    /    /
+						   //  * 2/  *-------*y *----*----*x
+						   //  | /
+						   //  |/
+						   //  *
+						   //
+						   // children of the faces
+						   // of the old hex
+						   //      *---*---*        *---*---*
+						   //     /|13 | 15|       /   /   /|
+						   //    / |   |   |      /18 / 19/ |
+						   //   /  *---*---*     /   /   /  *
+						   //  * 5/|   |   |    *---*---* 7/|
+						   //  | / |12 | 14|    | 9 | 11| / |
+						   //  |/4 *---*---*    |   |   |/6 *
+						   //  *  /   /   /     *---*---*  /
+						   //  | /16 / 17/      |   |   | /
+						   //  |/   /   /       | 8 | 10|/
+						   //  *---*---*        *---*---*
+						   //
+						   // note that we have to
+						   // take care of the
+						   // orientation of
+						   // faces.
+		  const unsigned int quad_indices_xz[20]
+		    = {
+			  new_quads[0]->index(),     //0
+			  new_quads[1]->index(),
+			  new_quads[2]->index(),
+			  new_quads[3]->index(),
+			      
+			  hex->face(0)->child_index(  child_at_origin[hex->face(0)->refinement_case()-1][f_fl[0]][f_ro[0]]),  //4
+			  hex->face(0)->child_index(1-child_at_origin[hex->face(0)->refinement_case()-1][f_fl[0]][f_ro[0]]),
+
+			  hex->face(1)->child_index(  child_at_origin[hex->face(1)->refinement_case()-1][f_fl[1]][f_ro[1]]),  //6
+			  hex->face(1)->child_index(1-child_at_origin[hex->face(1)->refinement_case()-1][f_fl[1]][f_ro[1]]),
+			      
+			  hex->face(2)->isotropic_child_index(GeometryInfo<dim>::standard_to_real_face_vertex(0,f_or[2],f_fl[2],f_ro[2])),  //8 
+			  hex->face(2)->isotropic_child_index(GeometryInfo<dim>::standard_to_real_face_vertex(1,f_or[2],f_fl[2],f_ro[2])),
+			  hex->face(2)->isotropic_child_index(GeometryInfo<dim>::standard_to_real_face_vertex(2,f_or[2],f_fl[2],f_ro[2])),
+			  hex->face(2)->isotropic_child_index(GeometryInfo<dim>::standard_to_real_face_vertex(3,f_or[2],f_fl[2],f_ro[2])),
+			      
+			  hex->face(3)->isotropic_child_index(GeometryInfo<dim>::standard_to_real_face_vertex(0,f_or[3],f_fl[3],f_ro[3])),  //12
+			  hex->face(3)->isotropic_child_index(GeometryInfo<dim>::standard_to_real_face_vertex(1,f_or[3],f_fl[3],f_ro[3])),
+			  hex->face(3)->isotropic_child_index(GeometryInfo<dim>::standard_to_real_face_vertex(2,f_or[3],f_fl[3],f_ro[3])),
+			  hex->face(3)->isotropic_child_index(GeometryInfo<dim>::standard_to_real_face_vertex(3,f_or[3],f_fl[3],f_ro[3])),
+
+			  hex->face(4)->child_index(  child_at_origin[hex->face(4)->refinement_case()-1][f_fl[4]][f_ro[4]]),  //16
+			  hex->face(4)->child_index(1-child_at_origin[hex->face(4)->refinement_case()-1][f_fl[4]][f_ro[4]]),
+			      
+			  hex->face(5)->child_index(  child_at_origin[hex->face(5)->refinement_case()-1][f_fl[5]][f_ro[5]]),  //18
+			  hex->face(5)->child_index(1-child_at_origin[hex->face(5)->refinement_case()-1][f_fl[5]][f_ro[5]])
+		    };
+		  quad_indices=&quad_indices_xz[0];
+
+						   // due to the exchange of x
+						   // and y for the front and
+						   // back face, we order the
+						   // children according to
+						   //
+						   // *---*---*
+						   // | 1 | 3 |
+						   // *---*---*
+						   // | 0 | 2 |
+						   // *---*---*
+		  new_hexes[0]->set (internal::Triangulation
+				     ::TriaObject<3>(quad_indices[4],
+						     quad_indices[2],
+						     quad_indices[8],
+						     quad_indices[12],
+						     quad_indices[16],
+						     quad_indices[0]));
+		  new_hexes[1]->set (internal::Triangulation
+				     ::TriaObject<3>(quad_indices[5],
+						     quad_indices[3],
+						     quad_indices[9],
+						     quad_indices[13],
+						     quad_indices[0],
+						     quad_indices[18]));
+		  new_hexes[2]->set (internal::Triangulation
+				     ::TriaObject<3>(quad_indices[2],
+						     quad_indices[6],
+						     quad_indices[10],
+						     quad_indices[14],
+						     quad_indices[17],
+						     quad_indices[1]));
+		  new_hexes[3]->set (internal::Triangulation
+				     ::TriaObject<3>(quad_indices[3],
+						     quad_indices[7],
+						     quad_indices[11],
+						     quad_indices[15],
+						     quad_indices[1],
+						     quad_indices[19]));
+		  break;
+		}
+		case RefinementCase<dim>::cut_yz:
+		{
+						   //////////////////////////////
+						   //
+						   //     RefinementCase<dim>::cut_yz
+						   //
+						   // the refined cube will look
+						   // like this:
+						   //
+						   //        *---------*
+						   //       /         /|
+						   //      *---------* |
+						   //     /         /| |
+						   //    *---------* |/|
+						   //    |         | * |
+						   //    |         |/| *
+						   //    *---------* |/
+						   //    |         | *
+						   //    |         |/
+						   //    *---------*
+						   // 
+
+						   // first, create the new
+						   // internal line
+		  new_lines[0]->set (internal::Triangulation::
+				     TriaObject<1>(hex->face(0)->middle_vertex_index(),
+						   hex->face(1)->middle_vertex_index()));
+
+						   // again, first
+						   // collect some data
+						   // about the indices of
+						   // the lines, with the
+						   // following numbering:
+						   // (note that face 0 and
+						   // 1 each are shown twice
+						   // for better
+						   // readability)
+		  
+						   // face 0: left plane
+						   //       *            *
+						   //      /|           /| 
+						   //     * |          * |
+						   //    /| *         /| *
+						   //   * 5/|        * |7|
+						   //   | * |        | * |
+						   //   |/| *        |6| *
+						   //   * 4/         * |/
+						   //   | *          | *
+						   //   |/           |/ 
+						   //   *            *
+						   // face 1: right plane
+						   //       *            *
+						   //      /|           /| 
+						   //     * |          * |
+						   //    /| *         /| *
+						   //   * 9/|        * |11
+						   //   | * |        | * |
+						   //   |/| *        |10 *
+						   //   * 8/         * |/
+						   //   | *          | *
+						   //   |/           |/
+						   //   *            *
+						   // face 2: front plane
+						   //   (note: x,y exchanged)
+						   //   *-------*
+						   //   |       |
+						   //   *---0---*
+						   //   |       |
+						   //   *-------*
+						   // face 3: back plane
+						   //   (note: x,y exchanged)
+						   //   *-------*
+						   //   |       | 
+						   //   *---1---*
+						   //   |       | 
+						   //   *-------*
+						   // face 4: bottom plane
+						   //       *-------*
+						   //      /       /
+						   //     *---2---*
+						   //    /       /
+						   //   *-------*
+						   // face 5: top plane
+						   //       *-------*
+						   //      /       /
+						   //     *---3---*
+						   //    /       /
+						   //   *-------*
+						   // middle planes
+						   //     *-------*   *-------*
+						   //    /       /    |       |
+						   //   *---12--*     |       |
+						   //  /       /      |       |
+						   // *-------*       *-------*
+
+						   // set up a list of line iterators
+						   // first. from this, construct
+						   // lists of line_indices and
+						   // line orientations later on
+		  const raw_line_iterator lines_yz[13]
+		    = {
+			  hex->face(2)->child(0)
+			  ->line((hex->face(2)->refinement_case() == RefinementCase<dim>::cut_x) ? 1 : 3),        //0
+			  hex->face(3)->child(0)
+			  ->line((hex->face(3)->refinement_case() == RefinementCase<dim>::cut_x) ? 1 : 3),        //1
+			  hex->face(4)->child(0)
+			  ->line((hex->face(4)->refinement_case() == RefinementCase<dim>::cut_x) ? 1 : 3),        //2
+			  hex->face(5)->child(0)
+			  ->line((hex->face(5)->refinement_case() == RefinementCase<dim>::cut_x) ? 1 : 3),        //3
+
+			  hex->face(0)->isotropic_child(GeometryInfo<dim>::standard_to_real_face_vertex(0,f_or[0],f_fl[0],f_ro[0]))
+			  ->line(GeometryInfo<dim>::standard_to_real_face_line(1,f_or[0],f_fl[0],f_ro[0])),        //4
+			  hex->face(0)->isotropic_child(GeometryInfo<dim>::standard_to_real_face_vertex(3,f_or[0],f_fl[0],f_ro[0]))
+			  ->line(GeometryInfo<dim>::standard_to_real_face_line(0,f_or[0],f_fl[0],f_ro[0])),        //5
+			  hex->face(0)->isotropic_child(GeometryInfo<dim>::standard_to_real_face_vertex(0,f_or[0],f_fl[0],f_ro[0]))
+			  ->line(GeometryInfo<dim>::standard_to_real_face_line(3,f_or[0],f_fl[0],f_ro[0])),        //6
+			  hex->face(0)->isotropic_child(GeometryInfo<dim>::standard_to_real_face_vertex(3,f_or[0],f_fl[0],f_ro[0]))
+			  ->line(GeometryInfo<dim>::standard_to_real_face_line(2,f_or[0],f_fl[0],f_ro[0])),        //7
+			  
+			  hex->face(1)->isotropic_child(GeometryInfo<dim>::standard_to_real_face_vertex(0,f_or[1],f_fl[1],f_ro[1]))
+			  ->line(GeometryInfo<dim>::standard_to_real_face_line(1,f_or[1],f_fl[1],f_ro[1])),        //8
+			  hex->face(1)->isotropic_child(GeometryInfo<dim>::standard_to_real_face_vertex(3,f_or[1],f_fl[1],f_ro[1]))
+			  ->line(GeometryInfo<dim>::standard_to_real_face_line(0,f_or[1],f_fl[1],f_ro[1])),        //9
+			  hex->face(1)->isotropic_child(GeometryInfo<dim>::standard_to_real_face_vertex(0,f_or[1],f_fl[1],f_ro[1]))
+			  ->line(GeometryInfo<dim>::standard_to_real_face_line(3,f_or[1],f_fl[1],f_ro[1])),        //10
+			  hex->face(1)->isotropic_child(GeometryInfo<dim>::standard_to_real_face_vertex(3,f_or[1],f_fl[1],f_ro[1]))
+			  ->line(GeometryInfo<dim>::standard_to_real_face_line(2,f_or[1],f_fl[1],f_ro[1])),        //11
+
+			  new_lines[0]                        //12
+		    };
+		  
+		  lines=&lines_yz[0];
+		  
+		  unsigned int line_indices_yz[13];
+		      
+		  for (unsigned int i=0; i<13; ++i)
+		    line_indices_yz[i]=lines[i]->index();
+		  line_indices=&line_indices_yz[0];
+
+						   // the orientation of lines for the
+						   // inner quads is quite tricky. as
+						   // these lines are newly created
+						   // ones and thus have no parents,
+						   // they cannot inherit this
+						   // property. set up an array and
+						   // fill it with the respective
+						   // values
+		  bool line_orientation_yz[13];
+
+						   // the middle vertices of the
+						   // lines of our front face
+		  const unsigned int middle_vertices[4]=
+		    {
+			  hex->line(8)->child(0)->vertex_index(1),
+			  hex->line(10)->child(0)->vertex_index(1),
+			  hex->line(0)->child(0)->vertex_index(1),
+			  hex->line(4)->child(0)->vertex_index(1),
+		    };
+
+						   // note: for lines 0 to 3 the
+						   // orientation of the line
+						   // is 'true', if vertex 0 is
+						   // on the front
+		  for (unsigned int i=0; i<4; ++i)
+		    if (lines[i]->vertex_index(0)==middle_vertices[i])
+		      line_orientation_yz[i]=true;
+		    else
+		      {
+							 // it must be the other way round then
+			Assert(lines[i]->vertex_index(1)==middle_vertices[i],
+			       ExcInternalError());
+			line_orientation_yz[i]=false;
+		      }
+		  
+						   // note: for lines 4 to 11
+						   // (inner lines of the outer quads)
+						   // the following holds: the second
+						   // vertex of the even lines in
+						   // standard orientation is the
+						   // vertex in the middle of the
+						   // quad, whereas for odd lines the
+						   // first vertex is the same middle
+						   // vertex.
+		  for (unsigned int i=4; i<12; ++i)
+		    if (lines[i]->vertex_index((i+1)%2)==hex->face(-1+i/4)->middle_vertex_index())
+		      line_orientation_yz[i]=true;
+		    else
+		      {
+							 // it must be the other way
+							 // round then
+			Assert(lines[i]->vertex_index(i%2)==hex->face(-1+i/4)->middle_vertex_index(),
+			       ExcInternalError());
+			line_orientation_yz[i]=false;
+		      }
+						   // for the last line the line
+						   // orientation is always true,
+						   // since it was just constructed
+						   // that way
+
+		  line_orientation_yz[12]=true;
+		  line_orientation=&line_orientation_yz[0];
+
+						   // set up the 4 quads,
+						   // numbered as follows (left
+						   // quad numbering, right line
+						   // numbering extracted from
+						   // above)
+						   //
+						   //  x
+						   //  *-------*      *---3---*
+						   //  |   3   |      5       9
+						   //  *-------*      *---12--*
+						   //  |   2   |      4       8
+						   //  *-------*y     *---2---*
+						   //
+						   //       y
+						   //      *---------*      *----1----*
+						   //     /    1    /      7         11
+						   //    *---------*      *----12---*
+						   //   /    0    /      6         10
+						   //  *---------*x     *----0----*
+	    
+		  new_quads[0]->set (internal::Triangulation
+				     ::TriaObject<2>(line_indices[6],
+						     line_indices[10],
+						     line_indices[0],
+						     line_indices[12]));
+		  new_quads[1]->set (internal::Triangulation
+				     ::TriaObject<2>(line_indices[7],
+						     line_indices[11],
+						     line_indices[12],
+						     line_indices[1]));
+		  new_quads[2]->set (internal::Triangulation
+				     ::TriaObject<2>(line_indices[2],
+						     line_indices[12],
+						     line_indices[4],
+						     line_indices[8]));
+		  new_quads[3]->set (internal::Triangulation
+				     ::TriaObject<2>(line_indices[12],
+						     line_indices[3],
+						     line_indices[5],
+						     line_indices[9]));
+
+		  new_quads[0]->set_line_orientation(0,line_orientation[6]);
+		  new_quads[0]->set_line_orientation(1,line_orientation[10]);
+		  new_quads[0]->set_line_orientation(2,line_orientation[0]);
+		      
+		  new_quads[1]->set_line_orientation(0,line_orientation[7]);
+		  new_quads[1]->set_line_orientation(1,line_orientation[11]);
+		  new_quads[1]->set_line_orientation(3,line_orientation[1]);
+		      
+		  new_quads[2]->set_line_orientation(0,line_orientation[2]);
+		  new_quads[2]->set_line_orientation(2,line_orientation[4]);
+		  new_quads[2]->set_line_orientation(3,line_orientation[8]);
+
+		  new_quads[3]->set_line_orientation(1,line_orientation[3]);
+		  new_quads[3]->set_line_orientation(2,line_orientation[5]);
+		  new_quads[3]->set_line_orientation(3,line_orientation[9]);
+
+						   // the quads are
+						   // numbered as follows:
+						   //
+						   // planes in the interior
+						   // of the old hex:
+						   //      *
+						   //     /|
+						   //    / | x         
+						   //   /  | *-------*      *---------*
+						   //  *   | |   3   |     /    1    /
+						   //  |   | *-------*    *---------*
+						   //  |   * |   2   |   /    0    /
+						   //  |  /  *-------*y *---------*x
+						   //  | /
+						   //  |/
+						   //  *
+						   //
+						   // children of the faces
+						   // of the old hex
+						   //      *-------*        *-------*
+						   //     /|       |       /  19   /|
+						   //    * |  15   |      *-------* |
+						   //   /|7*-------*     /  18   /|11
+						   //  * |/|       |    *-------* |/|
+						   //  |6* |  14   |    |       10* |
+						   //  |/|5*-------*    |  13   |/|9*
+						   //  * |/  17   /     *-------* |/
+						   //  |4*-------*      |       |8*
+						   //  |/  16   /       |  12   |/
+						   //  *-------*        *-------*
+						   //
+						   // note that we have to
+						   // take care of the
+						   // orientation of
+						   // faces.
+		  const unsigned int quad_indices_yz[20]
+		    = {
+			  new_quads[0]->index(),     //0
+			  new_quads[1]->index(),
+			  new_quads[2]->index(),
+			  new_quads[3]->index(),
+			      
+			  hex->face(0)->isotropic_child_index(GeometryInfo<dim>::standard_to_real_face_vertex(0,f_or[0],f_fl[0],f_ro[0])),  //4 
+			  hex->face(0)->isotropic_child_index(GeometryInfo<dim>::standard_to_real_face_vertex(1,f_or[0],f_fl[0],f_ro[0])),
+			  hex->face(0)->isotropic_child_index(GeometryInfo<dim>::standard_to_real_face_vertex(2,f_or[0],f_fl[0],f_ro[0])),
+			  hex->face(0)->isotropic_child_index(GeometryInfo<dim>::standard_to_real_face_vertex(3,f_or[0],f_fl[0],f_ro[0])),
+			      
+			  hex->face(1)->isotropic_child_index(GeometryInfo<dim>::standard_to_real_face_vertex(0,f_or[1],f_fl[1],f_ro[1])),  //8 
+			  hex->face(1)->isotropic_child_index(GeometryInfo<dim>::standard_to_real_face_vertex(1,f_or[1],f_fl[1],f_ro[1])),
+			  hex->face(1)->isotropic_child_index(GeometryInfo<dim>::standard_to_real_face_vertex(2,f_or[1],f_fl[1],f_ro[1])),
+			  hex->face(1)->isotropic_child_index(GeometryInfo<dim>::standard_to_real_face_vertex(3,f_or[1],f_fl[1],f_ro[1])),
+
+			  hex->face(2)->child_index(  child_at_origin[hex->face(2)->refinement_case()-1][f_fl[2]][f_ro[2]]),  //12
+			  hex->face(2)->child_index(1-child_at_origin[hex->face(2)->refinement_case()-1][f_fl[2]][f_ro[2]]),
+
+			  hex->face(3)->child_index(  child_at_origin[hex->face(3)->refinement_case()-1][f_fl[3]][f_ro[3]]),  //14
+			  hex->face(3)->child_index(1-child_at_origin[hex->face(3)->refinement_case()-1][f_fl[3]][f_ro[3]]),
+			      
+			  hex->face(4)->child_index(  child_at_origin[hex->face(4)->refinement_case()-1][f_fl[4]][f_ro[4]]),  //16
+			  hex->face(4)->child_index(1-child_at_origin[hex->face(4)->refinement_case()-1][f_fl[4]][f_ro[4]]),
+			      
+			  hex->face(5)->child_index(  child_at_origin[hex->face(5)->refinement_case()-1][f_fl[5]][f_ro[5]]),  //18
+			  hex->face(5)->child_index(1-child_at_origin[hex->face(5)->refinement_case()-1][f_fl[5]][f_ro[5]])
+		    };
+		  quad_indices=&quad_indices_yz[0];
+
+		  new_hexes[0]->set (internal::Triangulation
+				     ::TriaObject<3>(quad_indices[4],
+						     quad_indices[8],
+						     quad_indices[12],
+						     quad_indices[2],
+						     quad_indices[16],
+						     quad_indices[0]));
+		  new_hexes[1]->set (internal::Triangulation
+				     ::TriaObject<3>(quad_indices[5],
+						     quad_indices[9],
+						     quad_indices[2],
+						     quad_indices[14],
+						     quad_indices[17],
+						     quad_indices[1]));
+		  new_hexes[2]->set (internal::Triangulation
+				     ::TriaObject<3>(quad_indices[6],
+						     quad_indices[10],
+						     quad_indices[13],
+						     quad_indices[3],
+						     quad_indices[0],
+						     quad_indices[18]));
+		  new_hexes[3]->set (internal::Triangulation
+				     ::TriaObject<3>(quad_indices[7],
+						     quad_indices[11],
+						     quad_indices[3],
+						     quad_indices[15],
+						     quad_indices[1],
+						     quad_indices[19]));
+		  break;
+		}
+		case RefinementCase<dim>::cut_xyz:
+		{
+						   //////////////////////////////
+						   //
+						   //     RefinementCase<dim>::cut_xyz
+						   //     isotropic refinement
+						   //
+						   // the refined cube will look
+						   // like this:
+						   //
+						   //        *----*----*
+						   //       /    /    /|
+						   //      *----*----* |
+						   //     /    /    /| *
+						   //    *----*----* |/|
+						   //    |    |    | * |
+						   //    |    |    |/| *
+						   //    *----*----* |/
+						   //    |    |    | *
+						   //    |    |    |/
+						   //    *----*----*
+						   // 
+
+						   // find the next unused
+						   // vertex and set it
+						   // appropriately
+		  while (vertices_used[next_unused_vertex] == true)
+		    ++next_unused_vertex;
+		  Assert (next_unused_vertex < vertices.size(),
+			  ExcTooFewVerticesAllocated());
+		  vertices_used[next_unused_vertex] = true;
+		  
+						   // the new vertex is
+						   // definitely in the
+						   // interior, so we need not
+						   // worry about the boundary.
+						   // let it be the average of
+						   // the 26 vertices
+						   // surrounding it. weight
+						   // these vertices in the same
+						   // way as they are weighted
+						   // in the
+						   // @p{MappingQ::set_laplace_on_hex_vector}
+						   // function, and like the new
+						   // vertex at the center of
+						   // the quad is weighted (see
+						   // above)
+		  vertices[next_unused_vertex] = Point<dim>();
+						   // first add corners of hex
+		  for (unsigned int vertex=0;
+		       vertex<GeometryInfo<dim>::vertices_per_cell; ++vertex)
+		    vertices[next_unused_vertex] += hex->vertex(vertex) / 128;
+						   // now add center of lines
+		  for (unsigned int line=0;
+		       line<GeometryInfo<dim>::lines_per_cell; ++line)
+		    vertices[next_unused_vertex] += hex->line(line)->child(0)->vertex(1) *
+						    7./192.;
+						   // finally add centers of
+						   // faces. note that vertex 3
+						   // of child 0 is an invariant
+						   // with respect to the face
+						   // orientation, flip and
+						   // rotation
+		  for (unsigned int face=0;
+		       face<GeometryInfo<dim>::faces_per_cell; ++face)
+		    vertices[next_unused_vertex] += hex->face(face)->isotropic_child(0)->vertex(3) *
+						    1./12.;
+
+						   // set the data of the
+						   // six lines.  first
+						   // collect the indices of
+						   // the seven vertices
+						   // (consider the two
+						   // planes to be crossed
+						   // to form the planes
+						   // cutting the hex in two
+						   // vertically and
+						   // horizontally)
+						   //     *--3--*   *--5--*
+						   //    /  /  /    |  |  |
+						   //   0--6--1     0--6--1
+						   //  /  /  /      |  |  |
+						   // *--2--*       *--4--*
+						   // the lines are numbered
+						   // as follows:
+						   //     *--*--*   *--*--*
+						   //    /  1  /    |  5  |
+						   //   *2-*-3*     *2-*-3*
+						   //  /  0  /      |  4  |
+						   // *--*--*       *--*--*
+						   //
+		  const unsigned int vertex_indices_xyz[7]
+		    = { hex->face(0)->middle_vertex_index(),
+			hex->face(1)->middle_vertex_index(),
+			hex->face(2)->middle_vertex_index(),
+			hex->face(3)->middle_vertex_index(),
+			hex->face(4)->middle_vertex_index(),
+			hex->face(5)->middle_vertex_index(),
+			next_unused_vertex 
+		    };
+		  vertex_indices=&vertex_indices_xyz[0];
+		      
+		  new_lines[0]->set (internal::Triangulation::
+				     TriaObject<1>(vertex_indices[2], vertex_indices[6]));
+		  new_lines[1]->set (internal::Triangulation::
+				     TriaObject<1>(vertex_indices[6], vertex_indices[3]));
+		  new_lines[2]->set (internal::Triangulation::
+				     TriaObject<1>(vertex_indices[0], vertex_indices[6]));
+		  new_lines[3]->set (internal::Triangulation::
+				     TriaObject<1>(vertex_indices[6], vertex_indices[1]));
+		  new_lines[4]->set (internal::Triangulation::
+				     TriaObject<1>(vertex_indices[4], vertex_indices[6]));
+		  new_lines[5]->set (internal::Triangulation::
+				     TriaObject<1>(vertex_indices[6], vertex_indices[5]));
+
+						   // again, first
+						   // collect some data
+						   // about the indices of
+						   // the lines, with the
+						   // following numbering:
+						   // (note that face 0 and
+						   // 1 each are shown twice
+						   // for better
+						   // readability)
+		  
+						   // face 0: left plane
+						   //       *            *
+						   //      /|           /| 
+						   //     * |          * |
+						   //    /| *         /| *
+						   //   * 1/|        * |3|
+						   //   | * |        | * |
+						   //   |/| *        |2| *
+						   //   * 0/         * |/
+						   //   | *          | *
+						   //   |/           |/ 
+						   //   *            *
+						   // face 1: right plane
+						   //       *            *
+						   //      /|           /| 
+						   //     * |          * |
+						   //    /| *         /| *
+						   //   * 5/|        * |7|
+						   //   | * |        | * |
+						   //   |/| *        |6| *
+						   //   * 4/         * |/
+						   //   | *          | *
+						   //   |/           |/
+						   //   *            *
+						   // face 2: front plane
+						   //   (note: x,y exchanged)
+						   //   *---*---*
+						   //   |   11  |
+						   //   *-8-*-9-*
+						   //   |   10  |
+						   //   *---*---*
+						   // face 3: back plane
+						   //   (note: x,y exchanged)
+						   //   *---*---*
+						   //   |   15  | 
+						   //   *12-*-13*
+						   //   |   14  | 
+						   //   *---*---*
+						   // face 4: bottom plane
+						   //       *---*---*
+						   //      /  17   /
+						   //     *18-*-19*
+						   //    /   16  /
+						   //   *---*---*
+						   // face 5: top plane
+						   //       *---*---*
+						   //      /  21   /
+						   //     *22-*-23*
+						   //    /   20  /
+						   //   *---*---*
+						   // middle planes
+						   //     *---*---*   *---*---*
+						   //    /  25   /    |   29  |
+						   //   *26-*-27*     *26-*-27*
+						   //  /   24  /      |   28  |
+						   // *---*---*       *---*---*
+		  
+						   // set up a list of line iterators
+						   // first. from this, construct
+						   // lists of line_indices and
+						   // line orientations later on
+		  const raw_line_iterator lines_xyz[30]
+		    = {
+			  hex->face(0)->isotropic_child(GeometryInfo<dim>::standard_to_real_face_vertex(0,f_or[0],f_fl[0],f_ro[0]))
+			  ->line(GeometryInfo<dim>::standard_to_real_face_line(1,f_or[0],f_fl[0],f_ro[0])),        //0
+			  hex->face(0)->isotropic_child(GeometryInfo<dim>::standard_to_real_face_vertex(3,f_or[0],f_fl[0],f_ro[0]))
+			  ->line(GeometryInfo<dim>::standard_to_real_face_line(0,f_or[0],f_fl[0],f_ro[0])),        //1
+			  hex->face(0)->isotropic_child(GeometryInfo<dim>::standard_to_real_face_vertex(0,f_or[0],f_fl[0],f_ro[0]))
+			  ->line(GeometryInfo<dim>::standard_to_real_face_line(3,f_or[0],f_fl[0],f_ro[0])),        //2
+			  hex->face(0)->isotropic_child(GeometryInfo<dim>::standard_to_real_face_vertex(3,f_or[0],f_fl[0],f_ro[0]))
+			  ->line(GeometryInfo<dim>::standard_to_real_face_line(2,f_or[0],f_fl[0],f_ro[0])),        //3
+			  
+			  hex->face(1)->isotropic_child(GeometryInfo<dim>::standard_to_real_face_vertex(0,f_or[1],f_fl[1],f_ro[1]))
+			  ->line(GeometryInfo<dim>::standard_to_real_face_line(1,f_or[1],f_fl[1],f_ro[1])),        //4
+			  hex->face(1)->isotropic_child(GeometryInfo<dim>::standard_to_real_face_vertex(3,f_or[1],f_fl[1],f_ro[1]))
+			  ->line(GeometryInfo<dim>::standard_to_real_face_line(0,f_or[1],f_fl[1],f_ro[1])),        //5
+			  hex->face(1)->isotropic_child(GeometryInfo<dim>::standard_to_real_face_vertex(0,f_or[1],f_fl[1],f_ro[1]))
+			  ->line(GeometryInfo<dim>::standard_to_real_face_line(3,f_or[1],f_fl[1],f_ro[1])),        //6
+			  hex->face(1)->isotropic_child(GeometryInfo<dim>::standard_to_real_face_vertex(3,f_or[1],f_fl[1],f_ro[1]))
+			  ->line(GeometryInfo<dim>::standard_to_real_face_line(2,f_or[1],f_fl[1],f_ro[1])),        //7
+			  
+			  hex->face(2)->isotropic_child(GeometryInfo<dim>::standard_to_real_face_vertex(0,f_or[2],f_fl[2],f_ro[2]))
+			  ->line(GeometryInfo<dim>::standard_to_real_face_line(1,f_or[2],f_fl[2],f_ro[2])),        //8
+			  hex->face(2)->isotropic_child(GeometryInfo<dim>::standard_to_real_face_vertex(3,f_or[2],f_fl[2],f_ro[2]))
+			  ->line(GeometryInfo<dim>::standard_to_real_face_line(0,f_or[2],f_fl[2],f_ro[2])),        //9
+			  hex->face(2)->isotropic_child(GeometryInfo<dim>::standard_to_real_face_vertex(0,f_or[2],f_fl[2],f_ro[2]))
+			  ->line(GeometryInfo<dim>::standard_to_real_face_line(3,f_or[2],f_fl[2],f_ro[2])),        //10
+			  hex->face(2)->isotropic_child(GeometryInfo<dim>::standard_to_real_face_vertex(3,f_or[2],f_fl[2],f_ro[2]))
+			  ->line(GeometryInfo<dim>::standard_to_real_face_line(2,f_or[2],f_fl[2],f_ro[2])),        //11
+			  
+			  hex->face(3)->isotropic_child(GeometryInfo<dim>::standard_to_real_face_vertex(0,f_or[3],f_fl[3],f_ro[3]))
+			  ->line(GeometryInfo<dim>::standard_to_real_face_line(1,f_or[3],f_fl[3],f_ro[3])),        //12
+			  hex->face(3)->isotropic_child(GeometryInfo<dim>::standard_to_real_face_vertex(3,f_or[3],f_fl[3],f_ro[3]))
+			  ->line(GeometryInfo<dim>::standard_to_real_face_line(0,f_or[3],f_fl[3],f_ro[3])),        //13
+			  hex->face(3)->isotropic_child(GeometryInfo<dim>::standard_to_real_face_vertex(0,f_or[3],f_fl[3],f_ro[3]))
+			  ->line(GeometryInfo<dim>::standard_to_real_face_line(3,f_or[3],f_fl[3],f_ro[3])),        //14
+			  hex->face(3)->isotropic_child(GeometryInfo<dim>::standard_to_real_face_vertex(3,f_or[3],f_fl[3],f_ro[3]))
+			  ->line(GeometryInfo<dim>::standard_to_real_face_line(2,f_or[3],f_fl[3],f_ro[3])),        //15
+			  
+			  hex->face(4)->isotropic_child(GeometryInfo<dim>::standard_to_real_face_vertex(0,f_or[4],f_fl[4],f_ro[4]))
+			  ->line(GeometryInfo<dim>::standard_to_real_face_line(1,f_or[4],f_fl[4],f_ro[4])),        //16
+			  hex->face(4)->isotropic_child(GeometryInfo<dim>::standard_to_real_face_vertex(3,f_or[4],f_fl[4],f_ro[4]))
+			  ->line(GeometryInfo<dim>::standard_to_real_face_line(0,f_or[4],f_fl[4],f_ro[4])),        //17
+			  hex->face(4)->isotropic_child(GeometryInfo<dim>::standard_to_real_face_vertex(0,f_or[4],f_fl[4],f_ro[4]))
+			  ->line(GeometryInfo<dim>::standard_to_real_face_line(3,f_or[4],f_fl[4],f_ro[4])),        //18
+			  hex->face(4)->isotropic_child(GeometryInfo<dim>::standard_to_real_face_vertex(3,f_or[4],f_fl[4],f_ro[4]))
+			  ->line(GeometryInfo<dim>::standard_to_real_face_line(2,f_or[4],f_fl[4],f_ro[4])),        //19
+			  
+			  hex->face(5)->isotropic_child(GeometryInfo<dim>::standard_to_real_face_vertex(0,f_or[5],f_fl[5],f_ro[5]))
+			  ->line(GeometryInfo<dim>::standard_to_real_face_line(1,f_or[5],f_fl[5],f_ro[5])),        //20
+			  hex->face(5)->isotropic_child(GeometryInfo<dim>::standard_to_real_face_vertex(3,f_or[5],f_fl[5],f_ro[5]))
+			  ->line(GeometryInfo<dim>::standard_to_real_face_line(0,f_or[5],f_fl[5],f_ro[5])),        //21
+			  hex->face(5)->isotropic_child(GeometryInfo<dim>::standard_to_real_face_vertex(0,f_or[5],f_fl[5],f_ro[5]))
+			  ->line(GeometryInfo<dim>::standard_to_real_face_line(3,f_or[5],f_fl[5],f_ro[5])),        //22
+			  hex->face(5)->isotropic_child(GeometryInfo<dim>::standard_to_real_face_vertex(3,f_or[5],f_fl[5],f_ro[5]))
+			  ->line(GeometryInfo<dim>::standard_to_real_face_line(2,f_or[5],f_fl[5],f_ro[5])),        //23
+			  
+			  new_lines[0],                       //24
+			  new_lines[1],                       //25
+			  new_lines[2],                       //26
+			  new_lines[3],                       //27
+			  new_lines[4],                       //28
+			  new_lines[5]                        //29
+		    };
+		  
+		  lines=&lines_xyz[0];
+		  
+		  unsigned int line_indices_xyz[30];
+		  for (unsigned int i=0; i<30; ++i)
+		    line_indices_xyz[i]=lines[i]->index();
+		  line_indices=&line_indices_xyz[0];
+		  
+						   // the orientation of lines for the
+						   // inner quads is quite tricky. as
+						   // these lines are newly created
+						   // ones and thus have no parents,
+						   // they cannot inherit this
+						   // property. set up an array and
+						   // fill it with the respective
+						   // values
+		  bool line_orientation_xyz[30];
+		  
+						   // note: for the first 24 lines
+						   // (inner lines of the outer quads)
+						   // the following holds: the second
+						   // vertex of the even lines in
+						   // standard orientation is the
+						   // vertex in the middle of the
+						   // quad, whereas for odd lines the
+						   // first vertex is the same middle
+						   // vertex.
+						   // DEBUG
+		  face_iterator face_0=hex->face(0);
+		  face_iterator face_0_child_0=face_0->isotropic_child(GeometryInfo<dim>::standard_to_real_face_vertex(0,f_or[0],f_fl[0],f_ro[0]));
+		  line_iterator face_0_child_0_line_1=face_0_child_0
+						      ->line(GeometryInfo<dim>::standard_to_real_face_line(1,f_or[0],f_fl[0],f_ro[0]));
+						   // END DEBUG
+		  for (unsigned int i=0; i<24; ++i)
+		    if (lines[i]->vertex_index((i+1)%2)==vertex_indices[i/4])
+		      line_orientation_xyz[i]=true;
+		    else
+		      {
+							 // it must be the other way
+							 // round then
+			Assert(lines[i]->vertex_index(i%2)==vertex_indices[i/4],
+			       ExcInternalError());
+			line_orientation_xyz[i]=false;
+		      }
+						   // for the last 6 lines the line
+						   // orientation is always true,
+						   // since they were just constructed
+						   // that way
+		  for (unsigned int i=24; i<30; ++i)
+		    line_orientation_xyz[i]=true;
+		  line_orientation=&line_orientation_xyz[0];
+
+						   // set up the 12 quads,
+						   // numbered as follows
+						   // (left quad numbering,
+						   // right line numbering
+						   // extracted from above)
+						   //
+						   //      *          *
+						   //     /|        21|
+						   //    * |        * 15
+						   //  y/|3*      20| *  
+						   //  * |/|      * |/| 
+						   //  |2* |x    11 * 14
+						   //  |/|1*      |/| * 
+						   //  * |/       * |17 
+						   //  |0*       10 *
+						   //  |/         |16
+						   //  *          *
+						   //
+						   //  x
+						   //  *---*---*      *22-*-23*
+						   //  | 5 | 7 |      1  29   5
+						   //  *---*---*      *26-*-27*
+						   //  | 4 | 6 |      0  28   4
+						   //  *---*---*y     *18-*-19*
+						   //
+						   //       y
+						   //      *----*----*      *-12-*-13-*
+						   //     / 10 / 11 /      3   25    7
+						   //    *----*----*      *-26-*-27-*
+						   //   / 8  / 9  /      2   24    6
+						   //  *----*----*x     *--8-*--9-*
+	    
+		  new_quads[0]->set (internal::Triangulation
+				     ::TriaObject<2>(line_indices[10],
+						     line_indices[28],
+						     line_indices[16],
+						     line_indices[24]));
+		  new_quads[1]->set (internal::Triangulation
+				     ::TriaObject<2>(line_indices[28],
+						     line_indices[14],
+						     line_indices[17],
+						     line_indices[25]));
+		  new_quads[2]->set (internal::Triangulation
+				     ::TriaObject<2>(line_indices[11],
+						     line_indices[29],
+						     line_indices[24],
+						     line_indices[20]));
+		  new_quads[3]->set (internal::Triangulation
+				     ::TriaObject<2>(line_indices[29],
+						     line_indices[15],
+						     line_indices[25],
+						     line_indices[21]));
+		  new_quads[4]->set (internal::Triangulation
+				     ::TriaObject<2>(line_indices[18],
+						     line_indices[26],
+						     line_indices[0],
+						     line_indices[28]));
+		  new_quads[5]->set (internal::Triangulation
+				     ::TriaObject<2>(line_indices[26],
+						     line_indices[22],
+						     line_indices[1],
+						     line_indices[29]));
+		  new_quads[6]->set (internal::Triangulation
+				     ::TriaObject<2>(line_indices[19],
+						     line_indices[27],
+						     line_indices[28],
+						     line_indices[4]));
+		  new_quads[7]->set (internal::Triangulation
+				     ::TriaObject<2>(line_indices[27],
+						     line_indices[23],
+						     line_indices[29],
+						     line_indices[5]));
+		  new_quads[8]->set (internal::Triangulation
+				     ::TriaObject<2>(line_indices[2],
+						     line_indices[24],
+						     line_indices[8],
+						     line_indices[26]));
+		  new_quads[9]->set (internal::Triangulation
+				     ::TriaObject<2>(line_indices[24],
+						     line_indices[6],
+						     line_indices[9],
+						     line_indices[27]));
+		  new_quads[10]->set (internal::Triangulation
+				      ::TriaObject<2>(line_indices[3],
+						      line_indices[25],
+						      line_indices[26],
+						      line_indices[12]));
+		  new_quads[11]->set (internal::Triangulation
+				      ::TriaObject<2>(line_indices[25],
+						      line_indices[7],
+						      line_indices[27],
+						      line_indices[13]));
+	    
+						   // now reset the line_orientation
+						   // flags of outer lines as they
+						   // cannot be set in a loop (at
+						   // least not easily)
+		  new_quads[0]->set_line_orientation(0,line_orientation[10]);
+		  new_quads[0]->set_line_orientation(2,line_orientation[16]);
+		      
+		  new_quads[1]->set_line_orientation(1,line_orientation[14]);
+		  new_quads[1]->set_line_orientation(2,line_orientation[17]);
+		      
+		  new_quads[2]->set_line_orientation(0,line_orientation[11]);
+		  new_quads[2]->set_line_orientation(3,line_orientation[20]);
+
+		  new_quads[3]->set_line_orientation(1,line_orientation[15]);
+		  new_quads[3]->set_line_orientation(3,line_orientation[21]);
+		      
+		  new_quads[4]->set_line_orientation(0,line_orientation[18]);
+		  new_quads[4]->set_line_orientation(2,line_orientation[0]);
+		      
+		  new_quads[5]->set_line_orientation(1,line_orientation[22]);
+		  new_quads[5]->set_line_orientation(2,line_orientation[1]);
+		      
+		  new_quads[6]->set_line_orientation(0,line_orientation[19]);
+		  new_quads[6]->set_line_orientation(3,line_orientation[4]);
+		      
+		  new_quads[7]->set_line_orientation(1,line_orientation[23]);
+		  new_quads[7]->set_line_orientation(3,line_orientation[5]);
+		      
+		  new_quads[8]->set_line_orientation(0,line_orientation[2]);
+		  new_quads[8]->set_line_orientation(2,line_orientation[8]);
+		      
+		  new_quads[9]->set_line_orientation(1,line_orientation[6]);
+		  new_quads[9]->set_line_orientation(2,line_orientation[9]);
+		      
+		  new_quads[10]->set_line_orientation(0,line_orientation[3]);
+		  new_quads[10]->set_line_orientation(3,line_orientation[12]);
+		      
+		  new_quads[11]->set_line_orientation(1,line_orientation[7]);
+		  new_quads[11]->set_line_orientation(3,line_orientation[13]);
+
+						   /////////////////////////////////
+						   // create the eight new hexes
+						   //
+						   // again first collect
+						   // some data.  here, we
+						   // need the indices of a
+						   // whole lotta
+						   // quads.
+	    
+						   // the quads are
+						   // numbered as follows:
+						   //
+						   // planes in the interior
+						   // of the old hex:
+						   //      *
+						   //     /|
+						   //    * |
+						   //   /|3*  *---*---*      *----*----*
+						   //  * |/|  | 5 | 7 |     / 10 / 11 /
+						   //  |2* |  *---*---*    *----*----*
+						   //  |/|1*  | 4 | 6 |   / 8  / 9  /
+						   //  * |/   *---*---*y *----*----*x
+						   //  |0*
+						   //  |/
+						   //  *
+						   //
+						   // children of the faces
+						   // of the old hex
+						   //      *-------*        *-------*
+						   //     /|25   27|       /34   35/|
+						   //    15|       |      /       /19
+						   //   /  |       |     /32   33/  |
+						   //  *   |24   26|    *-------*18 |
+						   //  1413*-------*    |21   23| 17*
+						   //  |  /30   31/     |       |  /
+						   //  12/       /      |       |16
+						   //  |/28   29/       |20   22|/
+						   //  *-------*        *-------*
+						   //
+						   // note that we have to
+						   // take care of the
+						   // orientation of
+						   // faces.
+		  const unsigned int quad_indices_xyz[36]
+		    = {
+			  new_quads[0]->index(),     //0
+			  new_quads[1]->index(),
+			  new_quads[2]->index(),
+			  new_quads[3]->index(),
+			  new_quads[4]->index(),
+			  new_quads[5]->index(),
+			  new_quads[6]->index(),
+			  new_quads[7]->index(),
+			  new_quads[8]->index(),
+			  new_quads[9]->index(),
+			  new_quads[10]->index(),
+			  new_quads[11]->index(),    //11
+			      
+			  hex->face(0)->isotropic_child_index(GeometryInfo<dim>::standard_to_real_face_vertex(0,f_or[0],f_fl[0],f_ro[0])),  //12
+			  hex->face(0)->isotropic_child_index(GeometryInfo<dim>::standard_to_real_face_vertex(1,f_or[0],f_fl[0],f_ro[0])),
+			  hex->face(0)->isotropic_child_index(GeometryInfo<dim>::standard_to_real_face_vertex(2,f_or[0],f_fl[0],f_ro[0])),
+			  hex->face(0)->isotropic_child_index(GeometryInfo<dim>::standard_to_real_face_vertex(3,f_or[0],f_fl[0],f_ro[0])),
+
+			  hex->face(1)->isotropic_child_index(GeometryInfo<dim>::standard_to_real_face_vertex(0,f_or[1],f_fl[1],f_ro[1])),  //16
+			  hex->face(1)->isotropic_child_index(GeometryInfo<dim>::standard_to_real_face_vertex(1,f_or[1],f_fl[1],f_ro[1])),
+			  hex->face(1)->isotropic_child_index(GeometryInfo<dim>::standard_to_real_face_vertex(2,f_or[1],f_fl[1],f_ro[1])),
+			  hex->face(1)->isotropic_child_index(GeometryInfo<dim>::standard_to_real_face_vertex(3,f_or[1],f_fl[1],f_ro[1])),
+			      
+			  hex->face(2)->isotropic_child_index(GeometryInfo<dim>::standard_to_real_face_vertex(0,f_or[2],f_fl[2],f_ro[2])),  //20
+			  hex->face(2)->isotropic_child_index(GeometryInfo<dim>::standard_to_real_face_vertex(1,f_or[2],f_fl[2],f_ro[2])),
+			  hex->face(2)->isotropic_child_index(GeometryInfo<dim>::standard_to_real_face_vertex(2,f_or[2],f_fl[2],f_ro[2])),
+			  hex->face(2)->isotropic_child_index(GeometryInfo<dim>::standard_to_real_face_vertex(3,f_or[2],f_fl[2],f_ro[2])),
+			      
+			  hex->face(3)->isotropic_child_index(GeometryInfo<dim>::standard_to_real_face_vertex(0,f_or[3],f_fl[3],f_ro[3])),  //24
+			  hex->face(3)->isotropic_child_index(GeometryInfo<dim>::standard_to_real_face_vertex(1,f_or[3],f_fl[3],f_ro[3])),
+			  hex->face(3)->isotropic_child_index(GeometryInfo<dim>::standard_to_real_face_vertex(2,f_or[3],f_fl[3],f_ro[3])),
+			  hex->face(3)->isotropic_child_index(GeometryInfo<dim>::standard_to_real_face_vertex(3,f_or[3],f_fl[3],f_ro[3])),
+			      
+			  hex->face(4)->isotropic_child_index(GeometryInfo<dim>::standard_to_real_face_vertex(0,f_or[4],f_fl[4],f_ro[4])),  //28
+			  hex->face(4)->isotropic_child_index(GeometryInfo<dim>::standard_to_real_face_vertex(1,f_or[4],f_fl[4],f_ro[4])),
+			  hex->face(4)->isotropic_child_index(GeometryInfo<dim>::standard_to_real_face_vertex(2,f_or[4],f_fl[4],f_ro[4])),
+			  hex->face(4)->isotropic_child_index(GeometryInfo<dim>::standard_to_real_face_vertex(3,f_or[4],f_fl[4],f_ro[4])),
+			      
+			  hex->face(5)->isotropic_child_index(GeometryInfo<dim>::standard_to_real_face_vertex(0,f_or[5],f_fl[5],f_ro[5])),  //32
+			  hex->face(5)->isotropic_child_index(GeometryInfo<dim>::standard_to_real_face_vertex(1,f_or[5],f_fl[5],f_ro[5])),
+			  hex->face(5)->isotropic_child_index(GeometryInfo<dim>::standard_to_real_face_vertex(2,f_or[5],f_fl[5],f_ro[5])),
+			  hex->face(5)->isotropic_child_index(GeometryInfo<dim>::standard_to_real_face_vertex(3,f_or[5],f_fl[5],f_ro[5]))
+		    };
+		  quad_indices=&quad_indices_xyz[0];
+
+						   // bottom children
+		  new_hexes[0]->set (internal::Triangulation
+				     ::TriaObject<3>(quad_indices[12],
+						     quad_indices[0],
+						     quad_indices[20],
+						     quad_indices[4],
+						     quad_indices[28],
+						     quad_indices[8]));
+		  new_hexes[1]->set (internal::Triangulation
+				     ::TriaObject<3>(quad_indices[0],
+						     quad_indices[16],
+						     quad_indices[22],
+						     quad_indices[6],
+						     quad_indices[29],
+						     quad_indices[9]));
+		  new_hexes[2]->set (internal::Triangulation
+				     ::TriaObject<3>(quad_indices[13],
+						     quad_indices[1],
+						     quad_indices[4],
+						     quad_indices[24],
+						     quad_indices[30],
+						     quad_indices[10]));
+		  new_hexes[3]->set (internal::Triangulation
+				     ::TriaObject<3>(quad_indices[1],
+						     quad_indices[17],
+						     quad_indices[6],
+						     quad_indices[26],
+						     quad_indices[31],
+						     quad_indices[11]));
+	    
+						   // top children
+		  new_hexes[4]->set (internal::Triangulation
+				     ::TriaObject<3>(quad_indices[14],
+						     quad_indices[2],
+						     quad_indices[21],
+						     quad_indices[5],
+						     quad_indices[8],
+						     quad_indices[32]));
+		  new_hexes[5]->set (internal::Triangulation
+				     ::TriaObject<3>(quad_indices[2],
+						     quad_indices[18],
+						     quad_indices[23],
+						     quad_indices[7],
+						     quad_indices[9],
+						     quad_indices[33]));
+		  new_hexes[6]->set (internal::Triangulation
+				     ::TriaObject<3>(quad_indices[15],
+						     quad_indices[3],
+						     quad_indices[5],
+						     quad_indices[25],
+						     quad_indices[10],
+						     quad_indices[34]));
+		  new_hexes[7]->set (internal::Triangulation
+				     ::TriaObject<3>(quad_indices[3],
+						     quad_indices[19],
+						     quad_indices[7],
+						     quad_indices[27],
+						     quad_indices[11],
+						     quad_indices[35]));
+		  break;
+		}
+		default:
+						       // all refinement cases
+						       // have been treated,
+						       // there only remains
+						       // RefinementCase<dim>::no_refinement
+						       // as untreated
+						       // enumeration
+						       // value. However, in
+						       // that case we should
+						       // have aborted much
+						       // earlier. thus we
+						       // should never get here
+		      Assert(false, ExcInternalError());
+		      break;
+	      }//switch (ref_case)
+	    
+                                             // and set face orientation
+                                             // flags. note that new faces in
+                                             // the interior of the mother cell
+                                             // always have a correctly oriented
+                                             // face, but the ones on the outer
+                                             // faces will inherit this flag
                                              //
-                                             // note that we have to
-                                             // take care of the
-                                             // orientation of
-                                             // faces.
-					     //
-					     // TODO: simplify this
-	    const unsigned int quad_indices[36]
-	      = {
-		    new_quads[0]->index(),     //0
-		    new_quads[1]->index(),
-		    new_quads[2]->index(),
-		    new_quads[3]->index(),
-		    new_quads[4]->index(),
-		    new_quads[5]->index(),
-		    new_quads[6]->index(),
-		    new_quads[7]->index(),
-		    new_quads[8]->index(),
-		    new_quads[9]->index(),
-		    new_quads[10]->index(),
-		    new_quads[11]->index(),    //11
-
-		    hex->face(0)->child_index(GeometryInfo<dim>::standard_to_real_face_vertex(0,f_or[0],f_fl[0],f_ro[0])),  //12
-		    hex->face(0)->child_index(GeometryInfo<dim>::standard_to_real_face_vertex(1,f_or[0],f_fl[0],f_ro[0])),
-		    hex->face(0)->child_index(GeometryInfo<dim>::standard_to_real_face_vertex(2,f_or[0],f_fl[0],f_ro[0])),
-		    hex->face(0)->child_index(GeometryInfo<dim>::standard_to_real_face_vertex(3,f_or[0],f_fl[0],f_ro[0])),
-
-		    hex->face(1)->child_index(GeometryInfo<dim>::standard_to_real_face_vertex(0,f_or[1],f_fl[1],f_ro[1])),  //16
-		    hex->face(1)->child_index(GeometryInfo<dim>::standard_to_real_face_vertex(1,f_or[1],f_fl[1],f_ro[1])),
-		    hex->face(1)->child_index(GeometryInfo<dim>::standard_to_real_face_vertex(2,f_or[1],f_fl[1],f_ro[1])),
-		    hex->face(1)->child_index(GeometryInfo<dim>::standard_to_real_face_vertex(3,f_or[1],f_fl[1],f_ro[1])),
-
-		    hex->face(2)->child_index(GeometryInfo<dim>::standard_to_real_face_vertex(0,f_or[2],f_fl[2],f_ro[2])),  //20
-		    hex->face(2)->child_index(GeometryInfo<dim>::standard_to_real_face_vertex(1,f_or[2],f_fl[2],f_ro[2])),
-		    hex->face(2)->child_index(GeometryInfo<dim>::standard_to_real_face_vertex(2,f_or[2],f_fl[2],f_ro[2])),
-		    hex->face(2)->child_index(GeometryInfo<dim>::standard_to_real_face_vertex(3,f_or[2],f_fl[2],f_ro[2])),
-
-		    hex->face(3)->child_index(GeometryInfo<dim>::standard_to_real_face_vertex(0,f_or[3],f_fl[3],f_ro[3])),  //24
-		    hex->face(3)->child_index(GeometryInfo<dim>::standard_to_real_face_vertex(1,f_or[3],f_fl[3],f_ro[3])),
-		    hex->face(3)->child_index(GeometryInfo<dim>::standard_to_real_face_vertex(2,f_or[3],f_fl[3],f_ro[3])),
-		    hex->face(3)->child_index(GeometryInfo<dim>::standard_to_real_face_vertex(3,f_or[3],f_fl[3],f_ro[3])),
-
-		    hex->face(4)->child_index(GeometryInfo<dim>::standard_to_real_face_vertex(0,f_or[4],f_fl[4],f_ro[4])),  //28
-		    hex->face(4)->child_index(GeometryInfo<dim>::standard_to_real_face_vertex(1,f_or[4],f_fl[4],f_ro[4])),
-		    hex->face(4)->child_index(GeometryInfo<dim>::standard_to_real_face_vertex(2,f_or[4],f_fl[4],f_ro[4])),
-		    hex->face(4)->child_index(GeometryInfo<dim>::standard_to_real_face_vertex(3,f_or[4],f_fl[4],f_ro[4])),
-
-		    hex->face(5)->child_index(GeometryInfo<dim>::standard_to_real_face_vertex(0,f_or[5],f_fl[5],f_ro[5])),  //32
-		    hex->face(5)->child_index(GeometryInfo<dim>::standard_to_real_face_vertex(1,f_or[5],f_fl[5],f_ro[5])),
-		    hex->face(5)->child_index(GeometryInfo<dim>::standard_to_real_face_vertex(2,f_or[5],f_fl[5],f_ro[5])),
-		    hex->face(5)->child_index(GeometryInfo<dim>::standard_to_real_face_vertex(3,f_or[5],f_fl[5],f_ro[5]))
-	      };
-
-
-					     // find some space for
-					     // the eight newly to be
-					     // created hexes.  note
-					     // that there should
-					     // always be eight
-					     // consecutive free slots
-					     // for them
-	    raw_hex_iterator new_hexes[8];
-
-	    while (next_unused_hex->used() == true)
-	      ++next_unused_hex;
-
-	    for (unsigned int i=0; i<8; ++i)
-	      {
-		new_hexes[i] = next_unused_hex;
-		Assert (new_hexes[i]->used() == false,
-                        ExcCellShouldBeUnused());
-		++next_unused_hex;
-	      }
-
-					     // note these hexes as
-					     // children to the
-					     // present cell
-	    hex->set_children (new_hexes[0]->index());
-
-					     // bottom children
-	    new_hexes[0]->set (internal::Triangulation
-                               ::TriaObject<3>(quad_indices[12],
-					       quad_indices[0],
-					       quad_indices[20],
-					       quad_indices[4],
-					       quad_indices[28],
-					       quad_indices[8]));
-	    new_hexes[1]->set (internal::Triangulation
-                               ::TriaObject<3>(quad_indices[0],
-					       quad_indices[16],
-					       quad_indices[22],
-					       quad_indices[6],
-					       quad_indices[29],
-					       quad_indices[9]));
-	    new_hexes[2]->set (internal::Triangulation
-                               ::TriaObject<3>(quad_indices[13],
-					       quad_indices[1],
-					       quad_indices[4],
-					       quad_indices[24],
-					       quad_indices[30],
-					       quad_indices[10]));
-	    new_hexes[3]->set (internal::Triangulation
-                               ::TriaObject<3>(quad_indices[1],
-					       quad_indices[17],
-					       quad_indices[6],
-					       quad_indices[26],
-					       quad_indices[31],
-					       quad_indices[11]));
-	    
-					     // top children
-	    new_hexes[4]->set (internal::Triangulation
-                               ::TriaObject<3>(quad_indices[14],
-					       quad_indices[2],
-					       quad_indices[21],
-					       quad_indices[5],
-					       quad_indices[8],
-					       quad_indices[32]));
-	    new_hexes[5]->set (internal::Triangulation
-                               ::TriaObject<3>(quad_indices[2],
-					       quad_indices[18],
-					       quad_indices[23],
-					       quad_indices[7],
-					       quad_indices[9],
-					       quad_indices[33]));
-	    new_hexes[6]->set (internal::Triangulation
-                               ::TriaObject<3>(quad_indices[15],
-					       quad_indices[3],
-					       quad_indices[5],
-					       quad_indices[25],
-					       quad_indices[10],
-					       quad_indices[34]));
-	    new_hexes[7]->set (internal::Triangulation
-                               ::TriaObject<3>(quad_indices[3],
-					       quad_indices[19],
-					       quad_indices[7],
-					       quad_indices[27],
-					       quad_indices[11],
-					       quad_indices[35]));
-            
-
-	    for (unsigned int i=0; i<8; ++i)
-	      {
-		new_hexes[i]->set_used_flag();
-		new_hexes[i]->clear_user_flag();
-		new_hexes[i]->clear_user_data();
-		new_hexes[i]->clear_children();
-						 // inherit material
-						 // properties
-		new_hexes[i]->set_material_id (hex->material_id());
-		new_hexes[i]->set_subdomain_id (hex->subdomain_id());
-              }
-            
-                                             // and set face
-                                             // orientation
-                                             // flags. note that
-                                             // new faces in the
-                                             // interior of the
-                                             // mother cell always
-                                             // have a correctly
-                                             // oriented face, but
-                                             // the ones on the
-                                             // outer faces will
-                                             // inherit this flag
-                                             //
-                                             // set the flag to true
-                                             // for all faces
-                                             // initially, then go the
-                                             // other way round and
-                                             // reset faces that are
-                                             // at the boundary of the
-                                             // mother cube
+                                             // the flag have been set to true
+                                             // for all faces initially, now go
+                                             // the other way round and reset
+                                             // faces that are at the boundary
+                                             // of the mother cube
 					     //
 					     // the same is true for the
 					     // face_flip and face_rotation
 					     // flags. however, the latter two
 					     // are set to false by default as
 					     // this is the standard value
-	    for (unsigned int i=0; i<8; ++i)
-              for (unsigned int f=0; f<GeometryInfo<dim>::faces_per_cell; ++f)
-		{
-		  new_hexes[i]->set_face_orientation(f, true);
-		  new_hexes[i]->set_face_flip(f, false);
-		  new_hexes[i]->set_face_rotation(f, false);
-		}
 	    
+					     // loop over all faces and all
+					     // (relevant) subfaces of that in
+					     // order to set the correct values
+					     // for face_orientation, face_flip
+					     // and face_rotation, which are
+					     // inherited from the corresponding
+					     // face of the mother cube
             for (unsigned int f=0; f<GeometryInfo<dim>::faces_per_cell; ++f)
-              for (unsigned int s=0; s<GeometryInfo<dim>::subfaces_per_face; ++s)
+              for (unsigned int s=0;
+		   s<std::max(GeometryInfo<dim-1>::n_children(GeometryInfo<dim>::face_refinement_case(ref_case,f)),
+			      1U);
+		   ++s)
                 {
-		  new_hexes[GeometryInfo<dim>::child_cell_on_face(f,s)]
-		    ->set_face_orientation(f, hex->face_orientation(f));
-		  new_hexes[GeometryInfo<dim>::child_cell_on_face(f,s)]
-		    ->set_face_flip(f, hex->face_flip(f));
-		  new_hexes[GeometryInfo<dim>::child_cell_on_face(f,s)]
-		    ->set_face_rotation(f, hex->face_rotation(f));
+		  const unsigned int current_child
+		    =GeometryInfo<dim>::child_cell_on_face(ref_case,
+							   f,
+							   s,
+							   f_or[f],
+							   f_fl[f],
+							   f_ro[f],
+							   GeometryInfo<dim>::face_refinement_case(ref_case,
+												   f,
+												   f_or[f],
+												   f_fl[f],
+												   f_ro[f]));
+		  new_hexes[current_child]->set_face_orientation (f, f_or[f]);
+		  new_hexes[current_child]->set_face_flip        (f, f_fl[f]);
+		  new_hexes[current_child]->set_face_rotation    (f, f_ro[f]);
 		}
-            
-#ifdef DEBUG
-					     // check consistency
-					     // against
-					     // GeometryInfo<3>::child_cell_on_face
-	    for (unsigned int f=0; f<GeometryInfo<dim>::faces_per_cell; ++f)
-	      for (unsigned int s=0; s<GeometryInfo<dim>::subfaces_per_face; ++s) 
-		Assert(hex->face(f)->child(s)==hex->child(
-			 GeometryInfo<dim>::child_cell_on_face(
-			   f, s, hex->face_orientation(f), hex->face_flip(f), hex->face_rotation(f)))->face(f), ExcInternalError());
-#endif
 
 					     /////////////////////////////////
 					     // now the only thing still
@@ -7249,334 +9718,108 @@ Triangulation<3>::execute_refinement ()
 					     // neighborship
 					     // information.
 					     //
-					     // to do so, first
-					     // collect the iterators
-					     // pointing to the 6x4
-					     // neighbors of this
-					     // cell.
-					     //
-					     // note that in case the
-					     // neighboring cell is
-					     // not refined, the
-					     // neighbor iterators
-					     // point to the common
-					     // mother cell. the same
-					     // applies if there is no
-					     // neighbor: the
-					     // iterators are past the
-					     // end
-	    cell_iterator neighbor_cells[6][4];
-	    for (unsigned int face=0; face<GeometryInfo<dim>::faces_per_cell;
-		 ++face)
+					     // the easiest part is setting the
+					     // inner neighbors, i.e. children
+					     // neighboring other children of
+					     // the same mother cube.
+	    switch (static_cast<unsigned char> (ref_case))
 	      {
-		const cell_iterator neighbor = hex->neighbor(face);
+		case RefinementCase<dim>::cut_x:
+		      new_hexes[0]->set_neighbor(1, new_hexes[1]);
+		      
+		      new_hexes[1]->set_neighbor(0, new_hexes[0]);
+		      break;
+		case RefinementCase<dim>::cut_y:
+		      new_hexes[0]->set_neighbor(3, new_hexes[1]);
 
-						 // if no neighbor
-		if (neighbor.state() != IteratorState::valid)
-		  for (unsigned int child_face=0;
-		       child_face<GeometryInfo<dim>::subfaces_per_face;
-		       ++child_face)
-		    neighbor_cells[face][child_face] = neighbor;
-		
-		else
-						   // neighbor exists
-		  {
-						     // neighbor's
-						     // level must not
-						     // be higher
-						     // (else
-						     // something went
-						     // wrong when
-						     // constructing
-						     // either of the
-						     // two cells) and
-						     // not lower
-						     // since then
-						     // this cell
-						     // should not
-						     // have been
-						     // refined.
-		    Assert (neighbor->level() == hex->level(),
-			    ExcInternalError());
+		      new_hexes[1]->set_neighbor(2, new_hexes[0]);
+		      break;
+		case RefinementCase<dim>::cut_z:
+		      new_hexes[0]->set_neighbor(5, new_hexes[1]);
 
-						     // now there are
-						     // two
-						     // possibilities:
-						     // either the
-						     // neighbor has
-						     // no children or
-						     // it has
-						     // children. these
-						     // must be
-						     // terminal then.
-		    if (!neighbor->has_children())
-		      for (unsigned int child_face=0;
-			   child_face<GeometryInfo<dim>::subfaces_per_face;
-			   ++child_face)
-			neighbor_cells[face][child_face] = neighbor;
-		    else
-						       // neighbor has
-						       // children;
-						       // now it's
-						       // getting
-						       // complicated
-		      {
-							 // first find
-							 // the face
-							 // of the
-							 // neighbor
-							 // adjacent
-							 // to which
-							 // the
-							 // present
-							 // cell is
-			const unsigned int nb_nb = hex->neighbor_of_neighbor(face);
-			Assert (nb_nb<GeometryInfo<dim>::faces_per_cell,
-				ExcInternalError());
+		      new_hexes[1]->set_neighbor(4, new_hexes[0]);
+		      break;
+		case RefinementCase<dim>::cut_xy:
+		      new_hexes[0]->set_neighbor(1, new_hexes[1]);
+		      new_hexes[0]->set_neighbor(3, new_hexes[2]);
 
-							 // now the
-							 // four child
-							 // cells of
-							 // neighbor
-							 // adjacent
-							 // to the
-							 // present
-							 // cell can
-							 // be
-							 // obtained
-							 // by a
-							 // function
-							 // of
-							 // GeometryInfo. however,
-							 // if our face or the
-							 // neighbor's
-							 // face has
-							 // non-standard
-							 // orientation, flip or rotation,
-							 // then we
-							 // run into
-							 // trouble
-							 // and have
-							 // to swap
-							 // subfaces
-							 // to account
-							 // for
-							 // that.
-                                                         //
-							 // it is quite
-							 // difficult to find
-							 // out, which neighbors
-							 // child is adjacent to
-							 // a given child of our
-							 // current cell. it is
-							 // easier to determine
-							 // the children
-							 // adjacent to a given
-							 // subface in both
-							 // cases. here, we
-							 // consider that for
-							 // the neighbor, when
-							 // we set the neighbors
-							 // of our children we
-							 // will consider it for
-							 // the children of our
-							 // current cell.
+		      new_hexes[1]->set_neighbor(0, new_hexes[0]);
+		      new_hexes[1]->set_neighbor(3, new_hexes[3]);
 
-			for (unsigned int c=0;
-			     c<GeometryInfo<dim>::subfaces_per_face; ++c)
-			  {
-			    neighbor_cells[face][c]
-			      = neighbor->child(GeometryInfo<dim>::
-						child_cell_on_face(nb_nb, c,
-								   neighbor->face_orientation(nb_nb),
-								   neighbor->face_flip(nb_nb),
-								   neighbor->face_rotation(nb_nb)));
-			    
-			    Assert (neighbor_cells[face][c].state() ==
-				    IteratorState::valid,
-				    ExcInternalError());
-			    Assert (!neighbor_cells[face][c]->has_children(),
-				    ExcInternalError());
-			  }
-		      }
-		  }
+		      new_hexes[2]->set_neighbor(1, new_hexes[3]);
+		      new_hexes[2]->set_neighbor(2, new_hexes[0]);
+
+		      new_hexes[3]->set_neighbor(0, new_hexes[2]);
+		      new_hexes[3]->set_neighbor(2, new_hexes[1]);
+		      break;
+		case RefinementCase<dim>::cut_xz:
+		      new_hexes[0]->set_neighbor(1, new_hexes[2]);
+		      new_hexes[0]->set_neighbor(5, new_hexes[1]);
+
+		      new_hexes[1]->set_neighbor(1, new_hexes[3]);
+		      new_hexes[1]->set_neighbor(4, new_hexes[0]);
+
+		      new_hexes[2]->set_neighbor(0, new_hexes[0]);
+		      new_hexes[2]->set_neighbor(5, new_hexes[3]);
+
+		      new_hexes[3]->set_neighbor(0, new_hexes[1]);
+		      new_hexes[3]->set_neighbor(4, new_hexes[2]);
+		      break;
+		case RefinementCase<dim>::cut_yz:
+		      new_hexes[0]->set_neighbor(3, new_hexes[1]);
+		      new_hexes[0]->set_neighbor(5, new_hexes[2]);
+
+		      new_hexes[1]->set_neighbor(2, new_hexes[0]);
+		      new_hexes[1]->set_neighbor(5, new_hexes[3]);
+
+		      new_hexes[2]->set_neighbor(3, new_hexes[3]);
+		      new_hexes[2]->set_neighbor(4, new_hexes[0]);
+
+		      new_hexes[3]->set_neighbor(2, new_hexes[2]);
+		      new_hexes[3]->set_neighbor(4, new_hexes[1]);
+		      break;
+		case RefinementCase<dim>::cut_xyz:
+		      new_hexes[0]->set_neighbor(1, new_hexes[1]);
+		      new_hexes[0]->set_neighbor(3, new_hexes[2]);
+		      new_hexes[0]->set_neighbor(5, new_hexes[4]);
+
+		      new_hexes[1]->set_neighbor(0, new_hexes[0]);
+		      new_hexes[1]->set_neighbor(3, new_hexes[3]);
+		      new_hexes[1]->set_neighbor(5, new_hexes[5]);
+
+		      new_hexes[2]->set_neighbor(1, new_hexes[3]);
+		      new_hexes[2]->set_neighbor(2, new_hexes[0]);
+		      new_hexes[2]->set_neighbor(5, new_hexes[6]);
+
+		      new_hexes[3]->set_neighbor(0, new_hexes[2]);
+		      new_hexes[3]->set_neighbor(2, new_hexes[1]);
+		      new_hexes[3]->set_neighbor(5, new_hexes[7]);
+
+		      new_hexes[4]->set_neighbor(1, new_hexes[5]);
+		      new_hexes[4]->set_neighbor(3, new_hexes[6]);
+		      new_hexes[4]->set_neighbor(4, new_hexes[0]);
+
+		      new_hexes[5]->set_neighbor(0, new_hexes[4]);
+		      new_hexes[5]->set_neighbor(3, new_hexes[7]);
+		      new_hexes[5]->set_neighbor(4, new_hexes[1]);
+
+		      new_hexes[6]->set_neighbor(1, new_hexes[7]);
+		      new_hexes[6]->set_neighbor(2, new_hexes[4]);
+		      new_hexes[6]->set_neighbor(4, new_hexes[2]);
+
+		      new_hexes[7]->set_neighbor(0, new_hexes[6]);
+		      new_hexes[7]->set_neighbor(2, new_hexes[5]);
+		      new_hexes[7]->set_neighbor(4, new_hexes[3]);
+		      break;
+		default:
+		      Assert (false, ExcInternalError());
+		      break;
 	      }
-
-					     // now we've got all
-					     // neighbors, so set them
-					     // in the new cells
 	    
-					     // the subface ordering
-					     // is as follows
-					     // face 0 and 1:
-					     //        * 
-					     //       /| 
-					     //      * | 
-					     //    y/|3* 
-					     //    * |/| 
-					     //    |2* |x
-					     //    |/|1* 
-					     //    * |/  
-					     //    |0*   
-					     //    |/    
-					     //    *
-					     // face 2 and 3:
-					     //  x
-					     //  *---*---*
-					     //  | 1 | 3 |
-					     //  *---*---*
-					     //  | 0 | 2 |
-					     //  *---*---*y
-					     // face 4 and 5:
-					     //       y
-					     //      *---*---*
-					     //     / 2 / 3 /
-					     //    *---*---*
-					     //   / 0 / 1 /
-					     //  *---*---*x
-
-					     // Step 1: set all 'outer neighbors'
-	    for (unsigned int face=0; face<GeometryInfo<dim>::faces_per_cell; ++face)
-	      for (unsigned int sub=0; sub<GeometryInfo<dim>::subfaces_per_face; ++sub)
-		new_hexes[GeometryInfo<dim>::
-			  child_cell_on_face(face,sub,
-					     hex->face_orientation(face),
-					     hex->face_flip(face),
-					     hex->face_rotation(face))]
-		  ->set_neighbor(face,neighbor_cells[face][sub]);
-					     // Step 2: set all 'inner
-					     // neighbors', i.e. neighbors that
-					     // are itself children of our
-					     // current cell
-
-					     // TODO: do we really want to test
-					     // (assert) this static information
-					     // for each cell?
-	    new_hexes[0]->set_neighbor (1, new_hexes[1]);
-	    new_hexes[0]->set_neighbor (3, new_hexes[2]);
-	    new_hexes[0]->set_neighbor (5, new_hexes[4]);
-	    Assert(GeometryInfo<dim>::child_cell_on_face(0,0)==0, ExcInternalError());
-	    Assert(GeometryInfo<dim>::child_cell_on_face(2,0)==0, ExcInternalError());
-	    Assert(GeometryInfo<dim>::child_cell_on_face(4,0)==0, ExcInternalError());
-
-	    new_hexes[1]->set_neighbor (0, new_hexes[0]);
-	    new_hexes[1]->set_neighbor (3, new_hexes[3]);
-	    new_hexes[1]->set_neighbor (5, new_hexes[5]);
-	    Assert(GeometryInfo<dim>::child_cell_on_face(1,0)==1, ExcInternalError());
-	    Assert(GeometryInfo<dim>::child_cell_on_face(2,2)==1, ExcInternalError());
-	    Assert(GeometryInfo<dim>::child_cell_on_face(4,1)==1, ExcInternalError());
-
-	    new_hexes[2]->set_neighbor (1, new_hexes[3]);
-	    new_hexes[2]->set_neighbor (2, new_hexes[0]);
-	    new_hexes[2]->set_neighbor (5, new_hexes[6]);
-	    Assert(GeometryInfo<dim>::child_cell_on_face(0,1)==2, ExcInternalError());
-	    Assert(GeometryInfo<dim>::child_cell_on_face(3,0)==2, ExcInternalError());
-	    Assert(GeometryInfo<dim>::child_cell_on_face(4,2)==2, ExcInternalError());
-
-	    new_hexes[3]->set_neighbor (0, new_hexes[2]);
-	    new_hexes[3]->set_neighbor (2, new_hexes[1]);
-	    new_hexes[3]->set_neighbor (5, new_hexes[7]);
-	    Assert(GeometryInfo<dim>::child_cell_on_face(1,1)==3, ExcInternalError());
-	    Assert(GeometryInfo<dim>::child_cell_on_face(3,2)==3, ExcInternalError());
-	    Assert(GeometryInfo<dim>::child_cell_on_face(4,3)==3, ExcInternalError());
-
-	    new_hexes[4]->set_neighbor (1, new_hexes[5]);
-	    new_hexes[4]->set_neighbor (3, new_hexes[6]);
-	    new_hexes[4]->set_neighbor (4, new_hexes[0]);
-	    Assert(GeometryInfo<dim>::child_cell_on_face(0,2)==4, ExcInternalError());
-	    Assert(GeometryInfo<dim>::child_cell_on_face(2,1)==4, ExcInternalError());
-	    Assert(GeometryInfo<dim>::child_cell_on_face(5,0)==4, ExcInternalError());
-
-	    new_hexes[5]->set_neighbor (0, new_hexes[4]);
-	    new_hexes[5]->set_neighbor (3, new_hexes[7]);
-	    new_hexes[5]->set_neighbor (4, new_hexes[1]);
-	    Assert(GeometryInfo<dim>::child_cell_on_face(1,2)==5, ExcInternalError());
-	    Assert(GeometryInfo<dim>::child_cell_on_face(2,3)==5, ExcInternalError());
-	    Assert(GeometryInfo<dim>::child_cell_on_face(5,1)==5, ExcInternalError());
-
-	    new_hexes[6]->set_neighbor (1, new_hexes[7]);
-	    new_hexes[6]->set_neighbor (2, new_hexes[4]);
-	    new_hexes[6]->set_neighbor (4, new_hexes[2]);
-	    Assert(GeometryInfo<dim>::child_cell_on_face(0,3)==6, ExcInternalError());
-	    Assert(GeometryInfo<dim>::child_cell_on_face(3,1)==6, ExcInternalError());
-	    Assert(GeometryInfo<dim>::child_cell_on_face(5,2)==6, ExcInternalError());
-
-	    new_hexes[7]->set_neighbor (0, new_hexes[6]);
-	    new_hexes[7]->set_neighbor (2, new_hexes[5]);
-	    new_hexes[7]->set_neighbor (4, new_hexes[3]);
-	    Assert(GeometryInfo<dim>::child_cell_on_face(1,3)==7, ExcInternalError());
-	    Assert(GeometryInfo<dim>::child_cell_on_face(3,3)==7, ExcInternalError());
-	    Assert(GeometryInfo<dim>::child_cell_on_face(5,3)==7, ExcInternalError());
-
-
-					     // now we need to set the
-					     // neighbors' neighborship
-					     // information; this is
-					     // only necessary if the
-					     // neighboring cell is
-					     // refined, i.e. is on
-					     // the same level as the
-					     // new children of the
-					     // present cell
-	    for (unsigned int nb=0; nb<GeometryInfo<dim>::faces_per_cell; ++nb)
-	      for (unsigned int subface=0;
-		   subface<GeometryInfo<dim>::subfaces_per_face; ++subface)
-		if ((neighbor_cells[nb][subface].state() ==
-		     IteratorState::valid) &&
-		    (neighbor_cells[nb][subface]->level() ==
-		     hex->level()+1))
-		  {
-						     // ok, the
-						     // neighbor is a
-						     // refined one
-						     // and we need to
-						     // set one of the
-						     // new children
-						     // as its
-						     // neighbor
-		    const cell_iterator neighbor = neighbor_cells[nb][subface];
-
-						     // find which
-						     // neighbor
-						     // pointer is to
-						     // be reset; this
-						     // pointer still
-						     // points to the
-						     // present cell
-		    unsigned int face;
-		    for (face=0; face<GeometryInfo<dim>::faces_per_cell; ++face)
-		      if (neighbor->neighbor(face) == hex)
-			break;
-
-		    Assert (face<GeometryInfo<dim>::faces_per_cell,
-			    ExcInternalError());
-						     // check, that the face we
-						     // found is consistent with
-						     // the information obtained
-						     // by the
-						     // neighbor_of_neighbor()
-						     // function
-		    Assert (face==hex->neighbor_of_neighbor(nb),
-			    ExcInternalError());
-
-                                                     // then figure out which of the new
-                                                     // cells points to this neighbor.
-						     //
-                                                     // We have considered
-                                                     // face-orientation, -flip
-                                                     // and -rotation issues in
-                                                     // the construction of the
-                                                     // neighbor_cells array,
-                                                     // now we have to consider
-                                                     // it for this cell as
-                                                     // well.
-		    int c = GeometryInfo<dim>::child_cell_on_face(nb,subface,
-								  hex->face_orientation(nb),
-								  hex->face_flip(nb),
-								  hex->face_rotation(nb));
-		    neighbor->set_neighbor(face,new_hexes[c]);
-		  }
-
+					     // it's a bit more complicated for
+					     // outer neighbors. Leave this to a
+					     // separate function
+	    update_neighbors(hex, true);
 
 					     // note that the
 					     // refinement flag was
@@ -7585,6 +9828,15 @@ Triangulation<3>::execute_refinement ()
 	  }
     }
 
+				   // clear user data on quads. we used some of
+				   // this data to indicate anisotropic
+				   // refinemnt cases on faces. all data should
+				   // be cleared by now, but the information
+				   // whether we used indices or pointers is
+				   // still present. reset it now to enable the
+				   // user to use whichever he likes later on.
+  faces->quads.clear_user_data();
+  
 				   // re-compute number of lines and
 				   // quads
   update_number_cache ();
@@ -7617,9 +9869,19 @@ Triangulation<3>::execute_refinement ()
 		endc = end();
   while (cell != endc)
     Assert (!(cell++)->refine_flag_set(), ExcInternalError ());
+
+  cell_iterator testcell=begin(),
+		      ec=end();
+  for (;testcell!=ec; ++testcell)
+    {
+      std::set<unsigned int> verts;
+      for (unsigned int f=0; f<GeometryInfo<dim>::faces_per_cell; ++f)
+	for (unsigned int v=0; v<GeometryInfo<dim-1>::vertices_per_cell; ++v)
+	  verts.insert(testcell->face(f)->vertex_index(v));
+      Assert (verts.size()==GeometryInfo<dim>::vertices_per_cell, ExcInternalError());
+    }
 #endif
 }
-
 
 #endif
 
@@ -7633,9 +9895,13 @@ void Triangulation<dim>::execute_coarsening ()
 				   // is used later on to decide which lines can
 				   // be deleted after coarsening a cell. in
 				   // other dimensions it will be ignored
-  std::vector<unsigned int> cell_count(0);
+  std::vector<unsigned int> line_cell_count(0);
+  std::vector<unsigned int> quad_cell_count(0);
   if (dim==3)
-    count_cells_at_line(cell_count);
+    {
+      count_cells_at_line(line_cell_count);
+      count_cells_at_quad(quad_cell_count);
+    }
   
   				   // loop over all cells. Flag all
   				   // cells of which all children are
@@ -7649,7 +9915,7 @@ void Triangulation<dim>::execute_coarsening ()
 				   // used, to avoid confusion and because
 				   // non-active cells can't be flagged for
 				   // coarsening. Note that because of the
-				   // effects of @p{prepare_coarsening}, of a
+				   // effects of @p{fix_coarsen_flags}, of a
 				   // cell either all or no children must
 				   // be flagged for coarsening, so it is
 				   // ok to only check the first child
@@ -7662,8 +9928,7 @@ void Triangulation<dim>::execute_coarsening ()
       if (cell->child(0)->coarsen_flag_set())
 	{
 	  cell->set_user_flag();
-	  for (unsigned int child=0;
-	       child<GeometryInfo<dim>::children_per_cell; ++child)
+	  for (unsigned int child=0; child<cell->n_children(); ++child)
 	    {
 	      Assert (cell->child(child)->coarsen_flag_set(),
 		      ExcInternalError());
@@ -7693,7 +9958,7 @@ void Triangulation<dim>::execute_coarsening ()
 					 // use a separate function,
 					 // since this is dimension
 					 // specific
-	delete_children (cell, cell_count);
+	delete_children (cell, line_cell_count, quad_cell_count);
 
   				   // re-compute number of lines and
   				   // quads
@@ -7707,6 +9972,93 @@ void Triangulation<dim>::execute_coarsening ()
     Assert (cell->user_flag_set() == false, ExcInternalError());
 #endif
 }
+
+
+
+#if deal_II_dimension == 1
+
+template<>
+void
+Triangulation<1>::prevent_distorted_boundary_cells ()
+{}
+
+#else
+
+template<int dim>
+void
+Triangulation<dim>::prevent_distorted_boundary_cells ()
+{
+  for (cell_iterator cell=begin(); cell!=end(); ++cell)
+    if (cell->at_boundary() &&
+	cell->refine_flag_set() &&
+	cell->refine_flag_set()!=RefinementCase<dim>::isotropic_refinement)
+      {
+					 // The cell is at the boundary
+					 // and it is flagged for
+					 // anisotropic
+					 // refinement. Therefore, we have
+					 // a closer look
+	const RefinementCase<dim> ref_case=cell->refine_flag_set();
+	for (unsigned int face_no=0;
+	     face_no<GeometryInfo<dim>::faces_per_cell;
+	     ++face_no)
+	  if (cell->face(face_no)->at_boundary())
+	    {
+					       // this is the critical
+					       // face at the boundary.
+	      if (GeometryInfo<dim>::face_refinement_case(ref_case,face_no)
+		  !=RefinementCase<dim-1>::isotropic_refinement)
+		{
+						   // up to now, we do not
+						   // want to refine this
+						   // cell along the face
+						   // under consideration
+						   // here.
+		  face_iterator face=cell->face(face_no);
+						   // the new point on the
+						   // boundary would be
+						   // this one.
+		  Point<dim> new_bound=boundary[face->boundary_indicator()]
+				       ->get_new_point_on_face (face);
+						   // to check it,
+						   // transform to the
+						   // unit cell with
+						   // Q1Mapping
+		  Point<dim> new_unit=StaticMappingQ1<dim>::mapping.
+				      transform_real_to_unit_cell(cell,
+								  new_bound);
+						   // Now, we have to
+						   // calculate the
+						   // distance from the
+						   // face in the unit
+						   // cell.
+ 			
+						   // take the correct
+						   // coordinate direction (0
+						   // for faces 0 and 1, 1 for
+						   // faces 2 and 3, 2 for faces
+						   // 4 and 5) and substract the
+						   // correct boundary value of
+						   // the face (0 for faces 0,
+						   // 2, and 4; 1 for faces 1, 3
+						   // and 5)
+		  double dist=fabs(new_unit[face_no/2] - face_no%2);
+						   // compare this with
+						   // the empirical value
+						   // allowed. if it is
+						   // too big, flag the
+						   // cell for isotropic
+						   // refinement
+		  const double allowed=0.25;
+ 			
+		  if (dist>allowed)
+		    cell->flag_for_face_refinement(face_no);
+		}//if flagged for anistropic refinement
+	    }//if (cell->face(face)->at_boundary())
+      }//for all cells
+}
+#endif      
+
 
 
 template <int dim>
@@ -7726,6 +10078,11 @@ void Triangulation<3>::prepare_refinement_dim_dependent ()
 				   // which lines will be refined
   clear_user_flags_line();
 
+				   // also clear flags on hexes, since we need
+				   // them to mark those cells which are to be
+				   // coarsened
+  clear_user_flags_hex();
+
 				   // variable to store whether the
 				   // mesh was changed in the present
 				   // loop and in the whole process
@@ -7743,16 +10100,30 @@ void Triangulation<3>::prepare_refinement_dim_dependent ()
       fix_coarsen_flags ();
 
       
-				       // flag those lines that will
-				       // be refined
-      for (active_cell_iterator cell=begin_active(); cell!=end(); ++cell)
+				       // flag those lines that are refined and
+				       // will not be coarsened and those that
+				       // will be refined
+      for (cell_iterator cell=begin(); cell!=end(); ++cell)
 	if (cell->refine_flag_set())
-	  for (unsigned int line=0; line<GeometryInfo<dim>::lines_per_cell; ++line)
-					     // if the line is not yet
-					     // refined, it will be in
-					     // the process
-	    if (!cell->line(line)->has_children())
-	      cell->line(line)->set_user_flag();
+	  {
+	    for (unsigned int line=0; line<GeometryInfo<dim>::lines_per_cell; ++line)
+	      if (GeometryInfo<dim>::line_refinement_case(cell->refine_flag_set(), line)
+		  ==RefinementCase<dim>::cut_x)
+						 // flag a line, that will be
+						 // refined
+		cell->line(line)->set_user_flag();
+	  }
+	else if(cell->has_children() && !cell->child(0)->coarsen_flag_set())
+	  {
+	    for (unsigned int line=0; line<GeometryInfo<dim>::lines_per_cell; ++line)
+	      if (GeometryInfo<dim>::line_refinement_case(cell->refinement_case(), line)
+		  ==RefinementCase<dim>::cut_x)
+						 // flag a line, that is refined
+						 // and will stay so
+		cell->line(line)->set_user_flag();
+	  }
+	else if(cell->has_children() && cell->child(0)->coarsen_flag_set())
+	  cell->set_user_flag();
 
 
 				       // now check whether there are
@@ -7792,14 +10163,33 @@ void Triangulation<3>::prepare_refinement_dim_dependent ()
 			    ExcInternalError());
 		    
 		    if (cell->line(line)->child(c)->user_flag_set () &&
-			!cell->refine_flag_set())
+			(GeometryInfo<dim>::line_refinement_case(cell->refine_flag_set(),
+								 line)
+			 ==RefinementCase<dim>::no_refinement))
 		      {
 							 // tag this
 							 // cell for
 							 // refinement
 			cell->clear_coarsen_flag ();
-			cell->set_refine_flag();
+							 // if anisotropic
+							 // coarsening is
+							 // allowed: extend the
+							 // refine_flag in the
+							 // needed direction,
+							 // else set refine_flag
+							 // (isotropic)
+			if (smooth_grid & allow_anisotropic_smoothing)
+			  cell->flag_for_line_refinement(line);
+			else
+			  cell->set_refine_flag();
 			
+			for (unsigned int l=0; l<GeometryInfo<dim>::lines_per_cell; ++l)
+			  if (GeometryInfo<dim>::line_refinement_case(cell->refine_flag_set(), line)
+			      ==RefinementCase<dim>::cut_x)
+							     // flag a line,
+							     // that will be
+							     // refined
+			    cell->line(l)->set_user_flag();
 							 // note that
 							 // we have
 							 // changed
@@ -7815,7 +10205,10 @@ void Triangulation<3>::prepare_refinement_dim_dependent ()
 							 // refinement
 			for (unsigned int line=0;
 			     line<GeometryInfo<dim>::lines_per_cell; ++line)
-			  if (!cell->line(line)->has_children())
+			  if (!cell->line(line)->has_children() &&
+			      (GeometryInfo<dim>::line_refinement_case(cell->refine_flag_set(),
+								       line)
+			       !=RefinementCase<dim>::no_refinement))
 			    cell->line(line)->set_user_flag();
 			
 			break;
@@ -7835,154 +10228,131 @@ void Triangulation<3>::prepare_refinement_dim_dependent ()
 				       // if any of the lines will be
 				       // refined, then we may not
 				       // coarsen the present cell
-      for (active_cell_iterator cell=last_active(); cell!=end(); --cell)
+				       // similarly, if any of the lines
+				       // *is* already refined, we may
+				       // not coarsen the current
+				       // cell. however, there's a
+				       // catch: if the line is refined,
+				       // but the cell behind it is
+				       // going to be coarsened, then
+				       // the situation changes. if we
+				       // forget this second condition,
+				       // the refine_and_coarsen_3d test
+				       // will start to fail. note that
+				       // to know which cells are going
+				       // to be coarsened, the call for
+				       // fix_coarsen_flags above is
+				       // necessary
+      for (cell_iterator cell=last(); cell!=end(); --cell)
 	{
-	  if (cell->coarsen_flag_set())
+	  if (cell->user_flag_set())
 	    for (unsigned int line=0; line<GeometryInfo<dim>::lines_per_cell; ++line)
-	      {
-		if (cell->line(line)->user_flag_set())
-		  {
-		    cell->clear_coarsen_flag ();
-		    mesh_changed = true;
-		
-		    goto next_cell;
-		  }
-
-						 // similarly, if any of the lines
-						 // *is* already refined, we may
-						 // not coarsen the current
-						 // cell. however, there's a
-						 // catch: if the line is refined,
-						 // but the cell behind it is
-						 // going to be coarsened, then
-						 // the situation changes. if we
-						 // forget this second condition,
-						 // the refine_and_coarsen_3d test
-						 // will start to fail. note that
-						 // to know which cells are going
-						 // to be coarsened, the call for
-						 // fix_coarsen_flags above is
-						 // necessary
-						 //
-						 // the problem is that finding
-						 // all cells that are behind an
-						 // edge in 3d is somewhat of a
-						 // pain and worst of all
-						 // introduces a quadratic
-						 // behavior in this algorithm. on
-						 // the other hand, not many cells
-						 // have their coarsen flag set
-						 // usually, and fixing
-						 // refine_and_coarsen_3d is a
-						 // somewhat important case
-		if (cell->line(line)->has_children())
-		  {
-		    bool cant_be_coarsened = false;
-
-						     // loop over all cells of this
-						     // level to find neighbors of
-						     // this cell and edge
-		    for (cell_iterator edge_neighbor=begin(cell->level());
-			 ((cant_be_coarsened == false)
-			  &&
-			  (edge_neighbor != end(cell->level())));
-			 ++edge_neighbor)
-		      if (edge_neighbor != cell)
-			for (unsigned int e=0; e<GeometryInfo<dim>::lines_per_cell; ++e)
-			  if (edge_neighbor->line(e) == cell->line(line))
-			    {
-							       // this is a cell
-							       // that is adjacent
-							       // to the present
-							       // cell across this
-							       // edge. so treat
-							       // it, but only if
-							       // it is actually
-							       // refined or will
-							       // be refined
-			      if (! (edge_neighbor->has_children()
-				     ||
-				     (!edge_neighbor->has_children() &&
-				      edge_neighbor->refine_flag_set())))
-				break;
-
-							       // figure out if
-							       // the neighbor is
-							       // going to be
-							       // coarsened. as a
-							       // post-condition
-							       // of the call to
-							       // fix_coarsen_flags(),
-							       // either all
-							       // children of a
-							       // cell must be
-							       // flagged for
-							       // coarsening, or
-							       // none may. above
-							       // we delete some
-							       // coarsen flags,
-							       // and in the next
-							       // call to
-							       // fix_coarsen_flags()
-							       // the flags to all
-							       // siblings will be
-							       // removed. we will
-							       // check here if
-							       // still all
-							       // children have
-							       // that flag set
-			      unsigned int n_children_flagged = 0;
-			      for (unsigned int c=0; c<GeometryInfo<dim>::children_per_cell; ++c)
-				if ((edge_neighbor->child(c)->has_children() == false)
-				    &&
-				    edge_neighbor->child(c)->coarsen_flag_set())
-				  ++n_children_flagged;
-			  
-							       // now, if not all
-							       // children are
-							       // flagged, then
-							       // the neighboring
-							       // cell isn't going
-							       // to be
-							       // coarsened. that
-							       // means that the
-							       // common edge
-							       // isn't going to
-							       // be coarsened and
-							       // that we can't
-							       // coarsen the
-							       // present cell
-			      if (n_children_flagged !=
-				  GeometryInfo<dim>::children_per_cell)
-				cant_be_coarsened = true;
-
-
-							       // neighbor was
-							       // found. no reason
-							       // to keep looping
-							       // over edges of
-							       // the possible
-							       // edge_neighbor
-			      break;
-			    }
-
-		    if (cant_be_coarsened == true)
-		      {
-			cell->clear_coarsen_flag ();
-			mesh_changed = true;
-
-			goto next_cell;
-		      }
-		  }
-	      }
-	  next_cell:
-	  ;
+	      if (cell->line(line)->has_children() &&
+		  (cell->line(line)->child(0)->user_flag_set() ||
+		   cell->line(line)->child(1)->user_flag_set()))
+		{
+		  for (unsigned int c=0; c<cell->n_children(); ++c)
+		    cell->child(c)->clear_coarsen_flag ();
+		  cell->clear_user_flag();
+		  for (unsigned int l=0; l<GeometryInfo<dim>::lines_per_cell; ++l)
+		    if (GeometryInfo<dim>::line_refinement_case(cell->refinement_case(), l)
+			==RefinementCase<dim>::cut_x)
+						 // flag a line, that is refined
+						 // and will stay so
+		      cell->line(l)->set_user_flag();
+		  mesh_changed = true;
+		  break;
+		}
 	}
     }
   while (mesh_changed == true);
 }
 
 #endif
+
+
+
+#if deal_II_dimension == 1
+template<>
+bool
+Triangulation<1>::coarsening_allowed(cell_iterator&)
+{
+				   // in 1D the difference in refinement
+				   // level is not limited for neighboring
+				   // cells, so we simply return true
+  return true;
+}
+#endif
+
+
+template<int dim>
+bool
+Triangulation<dim>::coarsening_allowed(cell_iterator& cell)
+{
+  const RefinementCase<dim> ref_case = cell->refinement_case();
+  for (unsigned int n=0; n<GeometryInfo<dim>::faces_per_cell; ++n)
+    {
+				       // if the cell is not refined
+				       // along that face, coarsening
+				       // will not change anything, so
+				       // do nothing. the same applies,
+				       // if the face is at the boandary 
+      const RefinementCase<dim-1> face_ref_case =
+	GeometryInfo<dim>::face_refinement_case(cell->refinement_case(), n);
+		
+      unsigned int n_subfaces = GeometryInfo<dim-1>
+				::n_children(face_ref_case);
+				      
+      if (n_subfaces == 0 || cell->face(n)->at_boundary())
+	continue;
+      for (unsigned int c=0; c<n_subfaces; ++c)
+	{
+	  const cell_iterator child = cell->child(GeometryInfo<dim>::
+						  child_cell_on_face(ref_case,
+								     n,c));
+		  
+	  const cell_iterator child_neighbor = child->neighbor(n);
+	  if (!child->neighbor_is_coarser(n))
+					     // in 2d, if the child's neighbor
+					     // is coarser, then it has no
+					     // children. however, in 3d it
+					     // might be otherwise. consider
+					     // for example, that our face
+					     // might be refined with cut_x,
+					     // but the neighbor is refined
+					     // with cut_xy at that face. then
+					     // the neighbor pointers of the
+					     // children of our cell will point
+					     // to the common neighbor cell,
+					     // not to its children. what we
+					     // really want to know in the
+					     // following is, wether the
+					     // neighbor cell is refined twice
+					     // with reference to our cell.
+					     // that only has to be asked, if
+					     // the child's neighbor is not a
+					     // coarser one.
+	    if ((child_neighbor->has_children() &&
+		 !child_neighbor->user_flag_set())||
+						 // neighbor has children, which
+						 // are further refined along
+						 // the face, otherwise
+						 // something went wrong in the
+						 // contruction of neighbor
+						 // pointers.  then only allow
+						 // coarsening if this neighbor
+						 // will be coarsened as well
+						 // (user_pointer is set).  the
+						 // same applies, if the
+						 // neighbors children are not
+						 // refined but will be after
+						 // refinement
+		child_neighbor->refine_flag_set())
+	      return false;
+	}
+    }
+  return true;
+}
 
 
 template <int dim>
@@ -8009,30 +10379,29 @@ void Triangulation<dim>::fix_coarsen_flags ()
 				   // turned into user flags of the
 				   // mother cell if coarsening is
 				   // possible or deleted
-				   // otherwise. Coarsen flags of
+				   // otherwise.
+  clear_user_flags ();
+				   // Coarsen flags of
 				   // cells with no mother cell,
 				   // i.e. on the coarsest level are
 				   // deleted explicitly.
-  clear_user_flags ();
-      
+  active_cell_iterator acell = begin_active(0),
+			end_ac = end_active(0);
+  for (; acell!=end_ac; ++acell)
+    acell->clear_coarsen_flag();
+  
   cell_iterator cell = begin(),
 		endc = end();
   for (; cell!=endc; ++cell) 
     {
 				       // nothing to do if we are
-				       // already on the finest level;
-				       // if we are on the coarsest
-				       // level, delete coarsen flag
-				       // since no coarsening possible
+				       // already on the finest level
       if (cell->active()) 
-	{
-	  if (cell->level() == 0)
-	    cell->clear_coarsen_flag();
-	  continue;
-	}
-	  
-      unsigned int flagged_children = 0;
-      for (unsigned int child=0; child<GeometryInfo<dim>::children_per_cell; ++child)
+	continue;
+
+      const unsigned int n_children=cell->n_children();
+      unsigned int flagged_children=0;
+      for (unsigned int child=0; child<n_children; ++child)
 	if (cell->child(child)->active() &&
 	    cell->child(child)->coarsen_flag_set()) 
 	  {
@@ -8045,7 +10414,7 @@ void Triangulation<dim>::fix_coarsen_flags ()
 				       // flag this cell for
 				       // coarsening if all children
 				       // were flagged
-      if (flagged_children == GeometryInfo<dim>::children_per_cell)
+      if (flagged_children == n_children)
 	cell->set_user_flag();
     }
       
@@ -8083,80 +10452,57 @@ void Triangulation<dim>::fix_coarsen_flags ()
 				   // to be sure that these flags are final
   for (cell=last(); cell!=endc; --cell)
     if (cell->user_flag_set())
-      {
-	bool coarsening_allowed = true;
-
-	if (dim > 1)
+				       // if allowed: flag the
+				       // children for coarsening
+      if (coarsening_allowed(cell))
+	for (unsigned int c=0; c<cell->n_children(); ++c)
 	  {
-	    for (unsigned int c=0;
-		 (c<GeometryInfo<dim>::children_per_cell) && (coarsening_allowed==true);
-		 ++c)
-	      for (unsigned int n=0; n<GeometryInfo<dim>::faces_per_cell; ++n)
-		{
-		  const cell_iterator child_neighbor = cell->child(c)->neighbor(n);
-		  if ((child_neighbor.state() == IteratorState::valid)
-		      &&
-		      (child_neighbor->level()==cell->level()+1)
-		      &&
-		      ((child_neighbor->has_children()
-			&&
-			!child_neighbor->user_flag_set())
-		       ||
-		       (child_neighbor->has_children()
-			&&
-			child_neighbor->refine_flag_set())))
-		    {
-		      coarsening_allowed = false;
-		      break;
-		    }
-		}
+	    Assert (cell->child(c)->refine_flag_set()==false,
+		    ExcInternalError());
+	    
+	    cell->child(c)->set_coarsen_flag();
 	  }
-	
-					 // if allowed: tag the
-					 // children for coarsening
-	if (coarsening_allowed)
-	  for (unsigned int c=0; c<GeometryInfo<dim>::children_per_cell; ++c)
-	    {
-	      Assert (cell->child(c)->refine_flag_set()==false,
-		      ExcInternalError());
-	      
-	      cell->child(c)->set_coarsen_flag();
-	    }
-      }
-
+  
 				   // clear all user flags again, now that we
 				   // don't need them any more
   clear_user_flags ();
 }
 
 
+#if deal_II_dimension == 1
+
+template <>
+bool Triangulation<1>::prepare_coarsening_and_refinement ()
+{
+				   // save the flags to determine
+				   // whether something was changed in
+				   // the course of this function
+  std::vector<bool> flags_before;
+  save_coarsen_flags (flags_before);
+
+				   // do nothing in 1d, except setting
+				   // the coarsening flags correctly
+  fix_coarsen_flags ();
+  
+  std::vector<bool> flags_after;
+  save_coarsen_flags (flags_after);
+  
+  return (flags_before != flags_after);
+}
+
+#endif
+
+
 
 template <int dim>
 bool Triangulation<dim>::prepare_coarsening_and_refinement ()
 {
-      
 				   // save the flags to determine
 				   // whether something was changed in
 				   // the course of this function
   std::vector<bool> flags_before[2];
   save_coarsen_flags (flags_before[0]);
   save_refine_flags (flags_before[1]);
-
-				   // do nothing in 1d, except setting
-				   // the coarsening flags correctly
-  if (dim == 1)
-    {
-      fix_coarsen_flags ();
-
-      std::vector<bool> flags_after[2];
-      save_coarsen_flags (flags_after[0]);
-      save_refine_flags (flags_after[1]);
-
-      return ((flags_before[0] != flags_after[0]) ||
-	      (flags_before[1] != flags_after[1]));
-    }
-
-				   // for all other dimensions
 
 				   // save the flags at the outset of
 				   // each loop. we do so in order to
@@ -8227,6 +10573,9 @@ bool Triangulation<dim>::prepare_coarsening_and_refinement ()
 				   //    clear all coarsen flags on level 1
 				   //    to avoid level 0 cells being
 				   //    created by coarsening.
+				   //    As coarsen flags will never be added,
+				   //    this can be done once and for all
+				   //    before the actual loop starts.
 				   // 1/ do not coarsen a cell if
 				   //    'most of the neighbors' will be
 				   //    refined after the step. This is
@@ -8255,7 +10604,7 @@ bool Triangulation<dim>::prepare_coarsening_and_refinement ()
 				   //    need to be refined. This step
 				   //    only sets refinement flags and does
 				   //    not set coarsening flags.
-				   //    If the path_level_1 flag is set, then
+				   //    If the patch_level_1 flag is set, then
 				   //    eliminate_unrefined_islands,
 				   //    eliminate_refined_inner_islands and
 				   //    eliminate_refined_boundary_islands will
@@ -8298,29 +10647,29 @@ bool Triangulation<dim>::prepare_coarsening_and_refinement ()
 				   // refinement for which some
 				   // neighbors are more refined or
 				   // will be refined.
+
+				   //////////////////////////////////////
+				   // STEP 0:
+				   //    Only if coarsest_level_1 or
+				   //    patch_level_1 is set:
+				   //    clear all coarsen flags on level 1
+				   //    to avoid level 0 cells being
+				   //    created by coarsening.
+  if (((smooth_grid & coarsest_level_1) ||
+       (smooth_grid & patch_level_1)) && n_levels()>=2)
+    {
+      active_cell_iterator
+	cell=begin_active(1),
+	endc=end_active(1);
+      
+      for (; cell!=endc; ++cell)
+	cell->clear_coarsen_flag();
+    }
+
+  
   bool mesh_changed_in_this_loop = false;
   do
     {
-
-      				       //////////////////////////////////////
-				       // STEP 0:
-				       //    Only if coarsest_level_1 or
-				       //    patch_level_1 is set:
-				       //    clear all coarsen flags on level 1
-				       //    to avoid level 0 cells being
-				       //    created by coarsening.
-      if (((smooth_grid & coarsest_level_1) ||
-	   (smooth_grid & patch_level_1)) && n_levels()>=2)
-	{
-	  typename Triangulation<dim>::active_cell_iterator
-	    cell=begin_active(1),
-	    endc=end_active(1);
-	  
-	  for (; cell!=endc; ++cell)
-	    cell->clear_coarsen_flag();
-	}
-
-
 				       //////////////////////////////////////
 				       // STEP 1:
 				       //    do not coarsen a cell if 'most of
@@ -8339,33 +10688,16 @@ bool Triangulation<dim>::prepare_coarsening_and_refinement ()
 	    {
 	      if (!cell->active())
 		{
-						   // count the children whose
-						   // coarsen_flags are set
-		  unsigned int n_childrens_coarsen_flags_set=0;
-		  for (unsigned int c=0;
-		       c<GeometryInfo<dim>::children_per_cell; ++c)
-		    if (cell->child(c)->active() &&
-			cell->child(c)->coarsen_flag_set())
-		      ++n_childrens_coarsen_flags_set;
-
-						   // only do
-						   // something if all
-						   // children are
-						   // flagged for
-						   // coarsening since
-						   // only then are
-						   // they coarsened
-						   // anyway.
-		  if (n_childrens_coarsen_flags_set==
-		      GeometryInfo<dim>::children_per_cell)
+						   // only do something if this
+						   // cell will be coarsened
+		  if (cell_will_be_coarsened(cell))
 		    {
 		      unsigned int n_neighbors=0;
-						       // count all
-						       // neighbors
-						       // that will be
-						       // refined
-						       // after the
-						       // next step
+						       // count all neighbors
+						       // that will be refined
+						       // along the face of our
+						       // cell after the next
+						       // step
 		      unsigned int count=0;
 		      for (unsigned int n=0;
 			   n<GeometryInfo<dim>::faces_per_cell; ++n)
@@ -8374,46 +10706,29 @@ bool Triangulation<dim>::prepare_coarsening_and_refinement ()
 			  if (neighbor.state() == IteratorState::valid)
 			    {
 			      ++n_neighbors;
-
-			      bool not_active_neighbor_will_be_coarsened=false;
-			      unsigned int
-				n_neighbors_childrens_coarsen_flags_set=0;
-			      if (!neighbor->active())
-				{
-				  for (unsigned int c=0;
-				       c<GeometryInfo<dim>::children_per_cell; ++c)
-				    if (neighbor->child(c)->active() &&
-					neighbor->child(c)->coarsen_flag_set())
-				      ++n_neighbors_childrens_coarsen_flags_set;
-
-				  if (n_neighbors_childrens_coarsen_flags_set
-				      ==GeometryInfo<dim>::children_per_cell)
-				    not_active_neighbor_will_be_coarsened=true;
-				}
-
-
-			      if ((neighbor->active() &&
-				   neighbor->refine_flag_set()) ||
-				  !not_active_neighbor_will_be_coarsened)
+			      if (face_will_be_refined_by_neighbor(cell,n))
 				++count;
 			    }
 			}
-		      
-		      if ((dim==1 && count==n_neighbors) ||
-			  (dim>1 && (count==n_neighbors ||
-				     (count>=n_neighbors-1 &&
-				      n_neighbors==
-				      GeometryInfo<dim>::faces_per_cell))))
-			for (unsigned int c=0;
-			     c<GeometryInfo<dim>::children_per_cell; ++c)
+						       // clear coarsen flags if
+						       // either all existing
+						       // neighbors will be
+						       // refined or all but one
+						       // will be and the cell
+						       // is in the interior of
+						       // the domain
+		      if (count==n_neighbors ||
+			  (count>=n_neighbors-1 &&
+			   n_neighbors==
+			   GeometryInfo<dim>::faces_per_cell))
+			for (unsigned int c=0; c<cell->n_children(); ++c)
 			  cell->child(c)->clear_coarsen_flag();
 		    }
-		  
 		}  // if (!cell->active())
 	    }  // for (all cells)
 	} // if (smooth_grid & ...)
 
-
+      
 				       //////////////////////////////////////
 				       // STEP 2:
 				       //    eliminate refined islands in the
@@ -8450,7 +10765,7 @@ bool Triangulation<dim>::prepare_coarsening_and_refinement ()
 						 // active
 		bool all_children_active = true;
 		if (!cell->active())
-		  for (unsigned int c=0; c<GeometryInfo<dim>::children_per_cell; ++c)
+		  for (unsigned int c=0; c<cell->n_children(); ++c)
 		    if (!cell->child(c)->active()) 
 		      {
 			all_children_active = false;
@@ -8482,31 +10797,13 @@ bool Triangulation<dim>::prepare_coarsening_and_refinement ()
 		      {
 			const cell_iterator neighbor = cell->neighbor(n);
 			if (neighbor.state() == IteratorState::valid)
+			{
 			  ++total_neighbors;
 
-			if (neighbor.state() == IteratorState::valid)
-			  {
-			    if ((neighbor->active() &&
-				 !neighbor->refine_flag_set()) ||
-				(neighbor->level() == cell->level()-1))
-			      ++unrefined_neighbors;
-			    else
-			      if (!neighbor->active())
-								 // maybe this cell's
-								 // children will be
-								 // coarsened
-				{
-				  unsigned int tagged_children = 0;
-				  for (unsigned int c=0;
-				       c<GeometryInfo<dim>::children_per_cell;
-				       ++c)
-				    if (neighbor->child(c)->coarsen_flag_set())
-				      ++tagged_children;
-				  if (tagged_children ==
-				      GeometryInfo<dim>::children_per_cell)
-				    ++unrefined_neighbors;
-				}
-			  }
+			  if (!face_will_be_refined_by_neighbor(cell,n))
+			    ++unrefined_neighbors;
+			}
+			
 		      }
 		    
 						     // if all
@@ -8549,17 +10846,14 @@ bool Triangulation<dim>::prepare_coarsening_and_refinement ()
 			  (smooth_grid & eliminate_refined_boundary_islands)) )
 			&&
 			(total_neighbors != 0))
-		      {
-			if (!cell->active())
-			  for (unsigned int c=0;
-			       c<GeometryInfo<dim>::children_per_cell; ++c)
-			    {
-			      cell->child(c)->clear_refine_flag ();
-			      cell->child(c)->set_coarsen_flag ();
-			    }
-			else
-			  cell->clear_refine_flag();
-		      }
+		      if (!cell->active())
+			for (unsigned int c=0; c<cell->n_children(); ++c)
+			  {
+			    cell->child(c)->clear_refine_flag ();
+			    cell->child(c)->set_coarsen_flag ();
+			  }
+		      else 
+			cell->clear_refine_flag();
 		  }
 	      }
 	}
@@ -8568,8 +10862,18 @@ bool Triangulation<dim>::prepare_coarsening_and_refinement ()
 				       // STEP 3:
 				       //    limit the level difference of
 				       //    neighboring cells at each vertex.
-      if (smooth_grid & limit_level_difference_at_vertices) 
+				       //
+				       //    in case of anisotropic refinement
+				       //    this does not make sense. as soon
+				       //    as one cell is anisotropically
+				       //    refined, an Assertion is
+				       //    thrown. therefore we can ignore
+				       //    this problem later on
+      if (smooth_grid & limit_level_difference_at_vertices)
 	{
+	  Assert(!anisotropic_refinement,
+		 ExcMessage("In case of anisotropic refinement the limit_level_difference_at_vertices flag for mesh smoothing must not be set!"));
+	  
 					   // store highest level one
 					   // of the cells adjacent to
 					   // a vertex belongs to
@@ -8641,45 +10945,157 @@ bool Triangulation<dim>::prepare_coarsening_and_refinement ()
 	  for (; cell!=endc; ++cell) 
 	    {
 					       // if cell is already
-					       // flagged for
+					       // flagged for (isotropic)
 					       // refinement: nothing
 					       // to do anymore
-	      if (cell->refine_flag_set())
+	      if (cell->refine_flag_set()==RefinementCase<dim>::isotropic_refinement)
 		continue;
-		  
-	      unsigned int refined_neighbors = 0,
-			 unrefined_neighbors = 0;
-	      for (unsigned int face=0; face<GeometryInfo<dim>::faces_per_cell; ++face)
-		if (!cell->at_boundary(face))
-		  {
-						     // neighbor may
-						     // only be on the
-						     // same level or
-						     // one level
-						     // below because
-						     // of the
-						     // regularisation
-						     // above
-		    Assert ((cell->neighbor_level(face)==cell->level()) ||
-			    (cell->neighbor_level(face)==cell->level()-1),
-			    ExcInternalError());
-		    if ((cell->neighbor_level(face) == cell->level()) &&
-			(cell->neighbor(face)->refine_flag_set() ||
-			 cell->neighbor(face)->has_children()))
-		      ++refined_neighbors;
-		    else
-		      ++unrefined_neighbors;
-		  }
 
-	      if (unrefined_neighbors < refined_neighbors)
+					       // now we provide two
+					       // algorithms. the first one is
+					       // the standard one, coming from
+					       // the time, where only isotropic
+					       // refinement was possible. it
+					       // simply counts the neighbors
+					       // that are or will be refined
+					       // and compares to the number of
+					       // other ones. the second one
+					       // does this check independently
+					       // for each direction: if all
+					       // neighbors in one direction
+					       // (normally two, at the boundary
+					       // only one) are refined, the
+					       // current cell is flagged to be
+					       // refined in an according
+					       // direction.
+	      
+	      if (!(smooth_grid & allow_anisotropic_smoothing))
 		{
-		  if (cell->coarsen_flag_set())
-		    cell->clear_coarsen_flag();
-		  cell->set_refine_flag ();
-		}
-	    }
-	}
+						   // use first algorithm
+		  unsigned int refined_neighbors = 0,
+			     unrefined_neighbors = 0;
+		  for (unsigned int face=0; face<GeometryInfo<dim>::faces_per_cell; ++face)
+		    if (!cell->at_boundary(face))
+		      {
+			if (face_will_be_refined_by_neighbor(cell,face)) 
+			  ++refined_neighbors;
+			else
+			  ++unrefined_neighbors;
+		      }
 
+		  if (unrefined_neighbors < refined_neighbors)
+		    {
+		      if (cell->coarsen_flag_set())
+			cell->clear_coarsen_flag();
+		      cell->set_refine_flag ();
+		    }
+		}
+	      else
+		{ 
+						   // variable to store the cell
+						   // refine case needed to
+						   // fulfill all smoothing
+						   // requirements
+		  RefinementCase<dim> smoothing_cell_refinement_case=RefinementCase<dim>::no_refinement;
+		  
+						   // use second algorithm, do
+						   // the check individually for
+						   // each direction
+		  for (unsigned int face_pair=0; face_pair<GeometryInfo<dim>::faces_per_cell/2; ++face_pair)
+		    {
+						       // variable to store the
+						       // cell refine case
+						       // needed to refine at
+						       // the current face pair
+						       // in the same way as the
+						       // neighbors do...
+		      RefinementCase<dim> directional_cell_refinement_case=RefinementCase<dim>::isotropic_refinement;
+		      
+		      for (unsigned int face_index=0; face_index<2; ++face_index)
+			{
+			  unsigned int face=2*face_pair+face_index;
+							   // variable to store
+							   // the refine case
+							   // (to come) of the
+							   // face under
+							   // consideration
+			  RefinementCase<dim-1> expected_face_ref_case=RefinementCase<dim-1>::no_refinement;
+			  
+			  if (cell->neighbor(face).state() == IteratorState::valid)
+			    face_will_be_refined_by_neighbor(cell,face,expected_face_ref_case);
+							   // now extract which
+							   // refine case would
+							   // be necessary to
+							   // achive the same
+							   // face
+							   // refinement. set
+							   // the intersection
+							   // with other
+							   // requirements for
+							   // the same
+							   // direction.
+
+							   // note: using the
+							   // intersection is
+							   // not an obvious
+							   // decision, we could
+							   // also argue that it
+							   // is more natural to
+							   // use the
+							   // union. however,
+							   // intersection is
+							   // the less
+							   // aggressive tactic
+							   // and favours a
+							   // smaller number of
+							   // refined cells over
+							   // an intensive
+							   // smoothing. this
+							   // way we try not to
+							   // loose too much of
+							   // the effort we put
+							   // in anisotropic
+							   // refinement
+							   // indicators due to
+							   // overly aggressive
+							   // smoothing...
+			  directional_cell_refinement_case = directional_cell_refinement_case &
+							 GeometryInfo<dim>::min_cell_refinement_case_for_face_refinement(
+							   expected_face_ref_case,
+							   face,
+							   cell->face_orientation(face),
+							   cell->face_flip(face),
+							   cell->face_rotation(face));
+			}//for both face indices
+						       // if both requirements
+						       // sum up to something
+						       // useful, add this to
+						       // the refine case for
+						       // smoothing. note: if
+						       // directional_cell_refinement_case
+						       // is isotropic still,
+						       // then something went
+						       // wrong...
+		      Assert(directional_cell_refinement_case < RefinementCase<dim>::isotropic_refinement,
+			     ExcInternalError());
+		      smoothing_cell_refinement_case = smoothing_cell_refinement_case |
+						   directional_cell_refinement_case;
+		    }//for all face_pairs
+						   // no we collected
+						   // contributions from all
+						   // directions. combine the
+						   // new flags with the
+						   // existing refine case, but
+						   // only if smoothing is
+						   // required
+		  if (smoothing_cell_refinement_case)
+		    {
+		      cell->clear_coarsen_flag();
+		      cell->set_refine_flag(cell->refine_flag_set() | smoothing_cell_refinement_case);
+		    }
+		}//else -> allow_anisotropic_smoothing 
+	    }// for all cells
+	}
 
 				       /////////////////////////////////
 				       // STEP 5:
@@ -8731,13 +11147,14 @@ bool Triangulation<dim>::prepare_coarsening_and_refinement ()
 					   // set_refine_flag and
 					   // clear_coarsen_flag of
 					   // all children.
-	  unsigned int n_children=GeometryInfo<dim>::children_per_cell;
 	  for (cell_iterator cell = begin(); cell != end(); ++cell)
 	    if (!cell->active() && cell->child(0)->active())
 	      {
+		const unsigned int n_children=cell->n_children();
+		
 						 // cell is found to
 						 // be a patch
-		bool any_refine_flag_set=false;
+		RefinementCase<dim> combined_ref_case = RefinementCase<dim>::no_refinement;
 		for (unsigned int i=0; i<n_children; ++i)
 		  {
 		    cell_iterator child=cell->child(i);
@@ -8748,21 +11165,21 @@ bool Triangulation<dim>::prepare_coarsening_and_refinement ()
 						     // i.e. no child
 						     // is refined.
 		    Assert(child->active(), ExcInternalError());
+						     // combine the refine cases
+						     // of all children
+		    combined_ref_case=combined_ref_case |
+				      child->refine_flag_set();
 		    
-		    if (child->refine_flag_set())
-		      {
-			any_refine_flag_set=true;
-			break;
-		      }
+		    
 		  }
-		if (any_refine_flag_set)
+		if (combined_ref_case != RefinementCase<dim>::no_refinement)
 		  {
 		    for (unsigned int i=0; i<n_children; ++i)
 		      {
 			cell_iterator child=cell->child(i);
 
 			child->clear_coarsen_flag();
-			child->set_refine_flag();
+			child->set_refine_flag(combined_ref_case);
 		      }
 		  }
 	      }
@@ -8782,6 +11199,8 @@ bool Triangulation<dim>::prepare_coarsening_and_refinement ()
 		!cell->child(0)->active() &&
 		cell->child(0)->child(0)->active())
 	      {
+		const unsigned int n_children=cell->n_children();
+		unsigned int n_grandchildren=0;		
 						 // count all coarsen
 						 // flags of the
 						 // grandchildren.
@@ -8811,7 +11230,9 @@ bool Triangulation<dim>::prepare_coarsening_and_refinement ()
 							 // child is
 							 // found to
 							 // be a patch
-			for (unsigned int cc=0; cc<n_children; ++cc)
+			const unsigned int nn_children=child->n_children();
+			n_grandchildren += nn_children;
+			for (unsigned int cc=0; cc<nn_children; ++cc)
 			  {
 			    cell_iterator grand_child=child->child(cc);
 							     // check
@@ -8826,7 +11247,7 @@ bool Triangulation<dim>::prepare_coarsening_and_refinement ()
 		      }
 		  }
 		
-		if (n_coarsen_flags!=n_children*n_children)
+		if (n_coarsen_flags!=n_grandchildren)
 		  {
 						     // clear all
 						     // grandchildren's
@@ -8838,7 +11259,8 @@ bool Triangulation<dim>::prepare_coarsening_and_refinement ()
 		    
 			if (child->child(0)->active())
 			  {
-			    for (unsigned int cc=0; cc<n_children; ++cc)
+			    const unsigned int nn_children=child->n_children();
+			    for (unsigned int cc=0; cc<nn_children; ++cc)
 			      {
 				cell_iterator grand_child=child->child(cc);
 				Assert(grand_child->active(), ExcInternalError());
@@ -8850,50 +11272,404 @@ bool Triangulation<dim>::prepare_coarsening_and_refinement ()
 		  }
 	      }
 	}
+
+ 				       //////////////////////////////////
+ 				       //
+ 				       //  at the boundary we could end up with
+ 				       //  cells with negative volume or at
+ 				       //  least with a part, that is negative,
+ 				       //  if the cell is refined
+ 				       //  anisotropically. we have to check,
+ 				       //  whether that can happen
       
-      
+      prevent_distorted_boundary_cells();
 
 				       /////////////////////////////////
 				       // STEP 6:
 				       //    take care of the requirement that no
 				       //    double refinement is done at each face
-      for (active_cell_iterator cell = last_active(); cell != end(); --cell)
-	if (cell->refine_flag_set() == true) 
-	  {
-					     // loop over neighbors of cell
-	    for (unsigned int i=0; i<GeometryInfo<dim>::faces_per_cell; ++i)
-	      if (cell->neighbor(i).state() == IteratorState::valid)
-		{
-						   // regularisation?
-		  if ((cell->neighbor_level(i) == cell->level()-1)
-		      &&
-		      (cell->neighbor(i)->refine_flag_set() == false))
-		    {
-		      cell->neighbor(i)->clear_coarsen_flag();
-		      cell->neighbor(i)->set_refine_flag();
-		    }
-		  else
-		    if ((cell->neighbor_level(i) == cell->level())
-			&&
-			(cell->neighbor(i)->coarsen_flag_set() == true))
-						       // if this cell will
-						       // be refined and the
-						       // neighbor may or may
-						       // not be coarsened
-						       // (depending on whether
-						       // all children of its
-						       // mother cell are tagged
-						       // for coarsening), then
-						       // disallow coarsening.
-						       // to do so, it suffices
-						       // to delete the coarsen
-						       // flag from one child,
-						       // namely our present
-						       // neighbor
-		      cell->neighbor(i)->clear_coarsen_flag ();
-		}
-	  }
+				       //
+				       //    in case of anisotropic refinement
+				       //    it is only likely, but not sure,
+				       //    that the cells, which are more
+				       //    refined along a certain face common
+				       //    to two cells are on a higher
+				       //    level. therefore we cannot be sure,
+				       //    that the requirement of no double
+				       //    refinement is fulfilled after a
+				       //    single pass of the following
+				       //    actions. We could just wait for the
+				       //    next global loop. when this
+				       //    function terminates, the
+				       //    requirement will be
+				       //    fullfilled. However, it might be
+				       //    faster to insert an inner loop
+				       //    here.
+      bool changed = true;
+      while (changed)
+	{
+	  changed=false;
+	  active_cell_iterator cell=last_active(),
+			       endc=end();
+	  
+	  for (; cell != endc; --cell)
+	    if (cell->refine_flag_set()) 
+	      {
+						 // loop over neighbors of cell
+		for (unsigned int i=0; i<GeometryInfo<dim>::faces_per_cell; ++i)
+		  {
+						     // only do something if the
+						     // face is not at the boundary
+						     // and if the face will be
+						     // refined with the RefineCase
+						     // currently flagged for
+		    if (cell->neighbor(i).state() == IteratorState::valid &&
+			(GeometryInfo<dim>::face_refinement_case(cell->refine_flag_set(),
+								 i)
+			 != RefinementCase<dim>::no_refinement))
+		      
+						       // 1) if the neighbor has
+						       // children: nothing to
+						       // worry about.
+						       // 2) if the neighbor is
+						       // active and a coarser
+						       // one, ensure, that its
+						       // refine_flag is set
+						       // 3) if the neighbor is
+						       // active and as
+						       // refined along the face
+						       // as our current cell,
+						       // make sure, that no
+						       // coarsen_flag is set. if
+						       // we remove the coarsen
+						       // flag of our neighbor,
+						       // fix_coarsen_flags() makes
+						       // sure, that the mother
+						       // cell will not be
+						       // coarsened
+		      if (cell->neighbor(i)->active())
+			{
+			  if (cell->neighbor_is_coarser(i))
+			    {
+			      if (cell->neighbor(i)->coarsen_flag_set())
+				cell->neighbor(i)->clear_coarsen_flag();
+							       // we'll set the
+							       // refine flag
+							       // for this
+							       // neighbor
+							       // below. we
+							       // note, that we
+							       // have changed
+							       // something by
+							       // setting the
+							       // changed flag
+							       // to true. We do
+							       // not need to do
+							       // so, if we just
+							       // removed the
+							       // coarsen flag,
+							       // as the changed
+							       // flag only
+							       // indicates the
+							       // need to re-run
+							       // the inner
+							       // loop. however,
+							       // we only loop
+							       // over cells
+							       // flagged for
+							       // refinement
+							       // here, so
+							       // nothing to
+							       // worry about if
+							       // we remove
+							       // coarsen flags
 
+			      if (dim==2)
+				if (smooth_grid & allow_anisotropic_smoothing)
+				  changed=cell->neighbor(i)->flag_for_face_refinement(cell->neighbor_of_coarser_neighbor(i).first,
+										      RefinementCase<dim-1>::cut_x);
+				else
+				  {
+				    if (!cell->neighbor(i)->refine_flag_set())
+				      changed=true;
+				    cell->neighbor(i)->set_refine_flag();
+				  }
+			      else //i.e. if (dim==3)
+				{
+// ugly situations might arise here, consider the following situation, which
+// shows neighboring cells at the common face, where the upper right element is
+// coarser at the given face. Now the upper child element of the lower left
+// wants to refine according to cut_z, such that there is a 'horizontal'
+// refinement of the face marked with #####
+//   
+//                            /               /
+//                           /               /
+//                          *---------------*
+//                          |               |
+//                          |               |
+//                          |               |
+//                          |               |
+//                          |               |
+//                          |               | /
+//                          |               |/
+//                          *---------------*
+//   
+//   
+//     *---------------*
+//    /|              /|
+//   / |     #####   / |
+//     |               |
+//     *---------------*
+//    /|              /|
+//   / |             / |
+//     |               |
+//     *---------------*
+//    /               /
+//   /               /
+//
+// this introduces too many hanging nodes and the neighboring (coarser) cell
+// (upper right) has to be refined. If it is only refined according to cut_z,
+// then everything is ok:
+//   
+//                            /               /
+//                           /               /
+//                          *---------------*
+//                          |               |
+//                          |               | /
+//                          |               |/
+//                          *---------------*
+//                          |               |
+//                          |               | /
+//                          |               |/
+//                          *---------------*
+//   
+//   
+//     *---------------*
+//    /|              /|
+//   / *---------------*
+//    /|              /|
+//     *---------------*
+//    /|              /|
+//   / |             / |
+//     |               |
+//     *---------------*
+//    /               /
+//   /               /
+//
+// if however the cell wants to refine itself in an other way, or if we disallow
+// anisotropic smoothing, then simply refining the neighbor isotropically is not
+// going to work, since this introduces a refinement of face ##### with both
+// cut_x and cut_y, which is not possible:
+//
+//                            /       /       /
+//                           /       /       /
+//                          *-------*-------*
+//                          |       |       |
+//                          |       |       | /
+//                          |       |       |/
+//                          *-------*-------*
+//                          |       |       |
+//                          |       |       | /
+//                          |       |       |/
+//                          *-------*-------*
+//   
+//   
+//     *---------------*
+//    /|              /|
+//   / *---------------*
+//    /|              /|
+//     *---------------*
+//    /|              /|
+//   / |             / |
+//     |               |
+//     *---------------*
+//    /               /
+//   /               /
+//
+// thus, in this case we also need to refine our current cell in the new
+// direction:
+//
+//                            /       /       /
+//                           /       /       /
+//                          *-------*-------*
+//                          |       |       |
+//                          |       |       | /
+//                          |       |       |/
+//                          *-------*-------*
+//                          |       |       |
+//                          |       |       | /
+//                          |       |       |/
+//                          *-------*-------*
+//   
+//   
+//     *-------*-------*
+//    /|      /|      /|
+//   / *-------*-------*
+//    /|      /|      /|
+//     *-------*-------*
+//    /|      /       /|
+//   / |             / |
+//     |               |
+//     *---------------*
+//    /               /
+//   /               /
+
+				  std::pair<unsigned int, unsigned int> nb_indices
+				    =cell->neighbor_of_coarser_neighbor(i);
+				  unsigned int refined_along_x=0,
+					       refined_along_y=0,
+					 to_be_refined_along_x=0,
+					 to_be_refined_along_y=0;
+
+				  const int this_face_index=cell->face_index(i);
+				  
+// step 1: detect, along which axis the face is currently refined
+				  if ((this_face_index
+				       == cell->neighbor(i)->face(nb_indices.first)->child_index(0)) ||
+				      (this_face_index
+				       == cell->neighbor(i)->face(nb_indices.first)->child_index(1)))
+				    {
+								       // this
+								       // might
+								       // be an
+								       // anisotropic
+								       // child. get
+								       // the
+								       // face
+								       // refine
+								       // case
+								       // of the
+								       // neighbors
+								       // face
+								       // and
+								       // count
+								       // refinements
+								       // in x
+								       // and y
+								       // direction.
+				      RefinementCase<dim-1> frc=cell->neighbor(i)->face(nb_indices.first)->refinement_case();
+				      if (frc & RefinementCase<dim>::cut_x)
+					++refined_along_x;
+				      if (frc & RefinementCase<dim>::cut_y)
+					++refined_along_y;
+				    }
+				  else
+								     // this has
+								     // to be an
+								     // isotropic
+								     // child
+				    {
+				      ++refined_along_x;
+				      ++refined_along_y;
+				    }
+// step 2: detect, along which axis the face has to be refined given the current
+// refine flag
+				  RefinementCase<dim-1> flagged_frc=
+				    GeometryInfo<dim>::face_refinement_case(cell->refine_flag_set(),
+									    i,
+									    cell->face_orientation(i),
+									    cell->face_flip(i),
+									    cell->face_rotation(i));
+				  if (flagged_frc & RefinementCase<dim>::cut_x)
+				    ++to_be_refined_along_x;
+				  if (flagged_frc & RefinementCase<dim>::cut_y)
+				    ++to_be_refined_along_y;
+				  
+// step 3: set the refine flag of the (coarser and active) neighbor. 
+				  if ((smooth_grid & allow_anisotropic_smoothing) ||
+				      cell->neighbor(i)->refine_flag_set())
+				    {
+				      if (refined_along_x + to_be_refined_along_x > 1)
+					changed |= cell->neighbor(i)->flag_for_face_refinement(nb_indices.first,
+											       RefinementCase<dim-1>::cut_axis(0));
+				      if (refined_along_y + to_be_refined_along_y > 1)
+					changed |= cell->neighbor(i)->flag_for_face_refinement(nb_indices.first,
+											       RefinementCase<dim-1>::cut_axis(1));
+				    }
+				  else
+				    {
+				      if (cell->neighbor(i)->refine_flag_set()!=RefinementCase<dim>::isotropic_refinement)
+					changed=true;
+				      cell->neighbor(i)->set_refine_flag();
+				    }
+				  
+// step 4: if necessary (see above) add to the refine flag of the current cell
+				  cell_iterator nb=cell->neighbor(i);
+				  RefinementCase<dim-1> nb_frc
+				    = GeometryInfo<dim>::face_refinement_case(nb->refine_flag_set(),
+									      nb_indices.first,
+									      nb->face_orientation(nb_indices.first),
+									      nb->face_flip(nb_indices.first),
+									      nb->face_rotation(nb_indices.first));
+				  if ((nb_frc & RefinementCase<dim>::cut_x) &&
+				      !(refined_along_x || to_be_refined_along_x))
+				    changed |= cell->flag_for_face_refinement(i,RefinementCase<dim-1>::cut_axis(0));
+				  if ((nb_frc & RefinementCase<dim>::cut_y) &&
+				      !(refined_along_y || to_be_refined_along_y))
+				    changed |= cell->flag_for_face_refinement(i,RefinementCase<dim-1>::cut_axis(1));
+				}
+			    }// if neighbor is coarser
+			  else // -> now the neighbor is not coarser
+			    {
+			      cell->neighbor(i)->clear_coarsen_flag();
+			      const unsigned int nb_nb=cell->neighbor_of_neighbor(i);
+			      const cell_iterator neighbor=cell->neighbor(i);
+			      RefinementCase<dim-1> face_ref_case=
+				GeometryInfo<dim>::face_refinement_case(neighbor->refine_flag_set(),
+									nb_nb,
+									neighbor->face_orientation(nb_nb),
+									neighbor->face_flip(nb_nb),
+									neighbor->face_rotation(nb_nb));
+			      RefinementCase<dim-1> needed_face_ref_case
+				=GeometryInfo<dim>::face_refinement_case(cell->refine_flag_set(),
+									 i,
+									 cell->face_orientation(i),
+									 cell->face_flip(i),
+									 cell->face_rotation(i));
+							       // if the
+							       // neighbor wants
+ 							       // to refine the
+							       // face with
+							       // cut_x and we
+							       // want cut_y or
+							       // vice versa, we
+							       // have to refine
+							       // isotropically
+							       // at the given
+							       // face
+			      if ((face_ref_case==RefinementCase<dim>::cut_x && needed_face_ref_case==RefinementCase<dim>::cut_y) ||
+				  (face_ref_case==RefinementCase<dim>::cut_y && needed_face_ref_case==RefinementCase<dim>::cut_x))
+				{
+				  changed=cell->flag_for_face_refinement(i, face_ref_case);
+				  neighbor->flag_for_face_refinement(nb_nb, needed_face_ref_case);
+				}
+			    }
+			}
+		      else //-> the neighbor is not active
+			{
+			  RefinementCase<dim-1> face_ref_case = cell->face(i)->refinement_case(),
+					 needed_face_ref_case = GeometryInfo<dim>::face_refinement_case(cell->refine_flag_set(),
+													i,
+													cell->face_orientation(i),
+													cell->face_flip(i),
+													cell->face_rotation(i));
+							   // if the face is
+							   // refined with cut_x
+							   // and we want cut_y
+							   // or vice versa, we
+							   // have to refine
+							   // isotropically at
+							   // the given face
+			  if ((face_ref_case==RefinementCase<dim>::cut_x && needed_face_ref_case==RefinementCase<dim>::cut_y) ||
+			      (face_ref_case==RefinementCase<dim>::cut_y && needed_face_ref_case==RefinementCase<dim>::cut_x))
+			    changed=cell->flag_for_face_refinement(i, face_ref_case);
+			}
+		    
+			
+		  }
+	      }
+	}
+ 
 				       //////////////////////////////////////
 				       // STEP 7:
 				       //    take care that no double refinement
@@ -8907,7 +11683,6 @@ bool Triangulation<dim>::prepare_coarsening_and_refinement ()
 				       //    cell are either flagged for coarsening
 				       //    or none of the children is
       fix_coarsen_flags ();
-
 				       // get the refinement and coarsening
 				       // flags
       std::vector<bool> flags_after_loop[2];
@@ -8922,8 +11697,8 @@ bool Triangulation<dim>::prepare_coarsening_and_refinement ()
 
 				       // set the flags for the next loop
 				       // already
-      flags_before_loop[0] = flags_after_loop[0];
-      flags_before_loop[1] = flags_after_loop[1];
+      flags_before_loop[0].swap(flags_after_loop[0]);
+      flags_before_loop[1].swap(flags_after_loop[1]);
     }
   while (mesh_changed_in_this_loop);
 
@@ -8942,24 +11717,51 @@ bool Triangulation<dim>::prepare_coarsening_and_refinement ()
 #if deal_II_dimension == 3
 
 template <>
-void Triangulation<3>::count_cells_at_line (std::vector<unsigned int> &cell_count)
+void Triangulation<3>::count_cells_at_line (std::vector<unsigned int> &line_cell_count)
 {
-  cell_count.clear();
-  cell_count.resize(n_raw_lines(),0);
+  line_cell_count.clear();
+  line_cell_count.resize(n_raw_lines(),0);
   cell_iterator cell=begin(),
 		endc=end();
   for (; cell!=endc; ++cell)
     for (unsigned int l=0; l<GeometryInfo<3>::lines_per_cell; ++l)
-      ++cell_count[cell->line_index(l)];
+      ++line_cell_count[cell->line_index(l)];
 }
 
 #else
 
 template <int dim>
-void Triangulation<dim>::count_cells_at_line (std::vector<unsigned int> &cell_count)
+void Triangulation<dim>::count_cells_at_line (std::vector<unsigned int> &line_cell_count)
 {
   Assert(false, ExcNotImplemented());
-  cell_count.clear();
+  line_cell_count.clear();
+}
+
+#endif
+
+
+
+#if deal_II_dimension == 3
+
+template <>
+void Triangulation<3>::count_cells_at_quad (std::vector<unsigned int> &quad_cell_count)
+{
+  quad_cell_count.clear();
+  quad_cell_count.resize(n_raw_quads(),0);
+  cell_iterator cell=begin(),
+		endc=end();
+  for (; cell!=endc; ++cell)
+    for (unsigned int q=0; q<GeometryInfo<3>::faces_per_cell; ++q)
+      ++quad_cell_count[cell->quad_index(q)];
+}
+
+#else
+
+template <int dim>
+void Triangulation<dim>::count_cells_at_quad (std::vector<unsigned int> &quad_cell_count)
+{
+  Assert(false, ExcNotImplemented());
+  quad_cell_count.clear();
 }
 
 #endif
@@ -8970,9 +11772,9 @@ void Triangulation<dim>::count_cells_at_line (std::vector<unsigned int> &cell_co
 
 template <>
 void Triangulation<1>::delete_children (cell_iterator &cell,
+					std::vector<unsigned int> &,
 					std::vector<unsigned int> &)
 {
-  const unsigned int dim=1;
 				   // first we need to reset the
 				   // neighbor pointers of the
 				   // neighbors of this cell's
@@ -9043,15 +11845,14 @@ void Triangulation<1>::delete_children (cell_iterator &cell,
 
 				   // delete the vertex which will not
 				   // be needed anymore. This vertex
-				   // is the second of the second line
-				   // of the first child
+				   // is the second of the first child
   vertices_used[cell->child(0)->vertex_index(1)] = false;
 
 				   // invalidate children.  clear user
 				   // pointers, to avoid that they may
 				   // appear at unwanted places later
 				   // on...
-  for (unsigned int child=0; child<GeometryInfo<dim>::children_per_cell; ++child)
+  for (unsigned int child=0; child<cell->n_children(); ++child)
     {
       cell->child(child)->clear_user_data();
       cell->child(child)->clear_user_flag();
@@ -9060,7 +11861,7 @@ void Triangulation<1>::delete_children (cell_iterator &cell,
 
 
 				   // delete pointer to children
-  cell->set_children (-1);
+  cell->clear_children ();
   cell->clear_user_flag();
 }
 
@@ -9071,122 +11872,185 @@ void Triangulation<1>::delete_children (cell_iterator &cell,
 
 template <>
 void Triangulation<2>::delete_children (cell_iterator &cell,
+					std::vector<unsigned int> &,
 					std::vector<unsigned int> &)
 {
   const unsigned int dim=2;
-				   // first we need to reset the
-				   // neighbor pointers of the
-				   // neighbors of this cell's
-				   // children to this cell. This is
-				   // different for one dimension,
-				   // since there neighbors can have a
-				   // refinement level differing from
-				   // that of this cell's children by
-				   // more than one level.  For two or
-				   // more dimensions, the neighbors
-				   // of the children may only be on
-				   // the same level or on the level
-				   // of this cell (the case that the
-				   // neighbors are more refined than
-				   // the children was eliminated in
-				   // @p{prepare_coarsening}
-  for (unsigned int child=0; child<GeometryInfo<dim>::children_per_cell; ++child)
-    for (unsigned int n=0; n<GeometryInfo<dim>::faces_per_cell;
-	 ++n)
-      {
-	const cell_iterator neighbor = cell->child(child)->neighbor(n);
-					 // do nothing if at boundary
-	if (neighbor.state() != IteratorState::valid)
-	  continue;
-	
-	Assert ((neighbor->level()==cell->level()) ||
-		(neighbor->level()==cell->level()+1),
-		ExcInternalError());
-	
-					 // if the neighbor's level is
-					 // the same as that of
-					 // @p{cell}, then it's
-					 // neighbor pointers points
-					 // to this cell rather than
-					 // to this cell's child. In
-					 // that case we need not do
-					 // anything.  If the neighbor
-					 // is refined as often as are
-					 // the children, we need to
-					 // reset those neigbor
-					 // pointers that point to the
-					 // child of this cell; when
-					 // resetting the neighbor
-					 // pointers of neighbors of
-					 // one of the children, we
-					 // will also reset the
-					 // neighbor pointers other
-					 // children to the present
-					 // cell, but this does no
-					 // harm since we delete the
-					 // children afterwards anyway
-	if (neighbor->level() == cell->level()+1)
-	  for (unsigned int neighbor_neighbor=0;
-	       neighbor_neighbor<GeometryInfo<dim>::faces_per_cell;
-	       ++neighbor_neighbor)
-	    if (neighbor->neighbor(neighbor_neighbor) == cell->child(child))
-	      neighbor->set_neighbor(neighbor_neighbor, cell);
-      }
+  const RefinementCase<dim> ref_case=cell->refinement_case();
 
+  for (unsigned int face_no=0; face_no<GeometryInfo<dim>::faces_per_cell; ++face_no)
+    if (!cell->at_boundary(face_no))
+      {
+	if (GeometryInfo<dim>::face_refinement_case(ref_case, face_no)
+	    ==RefinementCase<dim>::no_refinement)
+	  cell->set_neighbor(face_no,cell->child(face_no%2)->neighbor(face_no));
+	
+	cell_iterator neighbor=cell->neighbor(face_no);
+	
+					 // it is possible that the neighbor is
+					 // coarser if it has already been
+					 // coarsened earlier in this cycle. for
+					 // anisotropic refinement that can
+					 // happen, even if the neighbor is on a
+					 // higher level.
+	
+					 // it is also possible, that the
+					 // neighbor information of cell was not
+					 // the best information currently
+					 // available. however, the neighbor
+					 // information now set should be
+					 // accurate, as we have taken the
+					 // pointer from one of our children, if
+					 // that could be mor accurate and these
+					 // children can't be further refined.
+	
+					 // if the neighbor is coarser, do
+					 // nothing: we won't have to reset our
+					 // pointer of course and the coarser
+					 // neighbor does not point to this cell
+	if (cell->neighbor_is_coarser(face_no))
+	  {
+	    Assert(neighbor->active(),
+		   ExcInternalError());
+	    continue;
+	  }
+	
+	const unsigned int nb_nb=cell->neighbor_of_neighbor(face_no);
+	neighbor->set_neighbor(nb_nb, cell);
+					 // go down the list of children which
+					 // are not refined along the face (if
+					 // any)
+	while (neighbor->has_children() &&
+	       (GeometryInfo<dim>::face_refinement_case(neighbor->refinement_case(), nb_nb)
+		==RefinementCase<dim>::no_refinement))
+	  {
+	    neighbor=neighbor->child(GeometryInfo<dim>
+				     ::child_cell_on_face(neighbor->refinement_case(),
+							  nb_nb,
+							  0));
+	    neighbor->set_neighbor(nb_nb, cell);
+	  }
+		
+					 // now we can safely set the cells
+					 // neighbor
+	cell->set_neighbor(face_no,neighbor);
+			   
+					 // if there are still children, they
+					 // have to be refined along the face
+					 // currently under consideration
+	if (neighbor->has_children())
+	      {
+		unsigned int n_subfaces=GeometryInfo<dim-1>::n_children(
+		  GeometryInfo<dim>::face_refinement_case(neighbor->refinement_case(), nb_nb));
+		Assert (n_subfaces>0, ExcInternalError());
+		
+		for (unsigned int i=0; i<n_subfaces; ++i)
+		  {
+		    cell_iterator neighbor_child=neighbor->child(
+		      GeometryInfo<dim>::child_cell_on_face(neighbor->refinement_case(),
+							    nb_nb, i));
+		    neighbor_child->set_neighbor(nb_nb, cell);
+						     // once again, this
+						     // neighbor_child can be
+						     // refined several times,
+						     // as long as this
+						     // refinement is not along
+						     // the current subface. if
+						     // there are children
+						     // refined along the
+						     // subface they will be
+						     // coarsened away later in
+						     // this process, so we
+						     // don't care about them
+						     // here
+		    while (neighbor_child->has_children() &&
+			   (GeometryInfo<dim>::face_refinement_case(neighbor_child->refinement_case(),
+								    nb_nb)
+			    == RefinementCase<dim>::no_refinement))
+		      {
+			neighbor_child=neighbor_child
+				       ->child(GeometryInfo<dim>
+					       ::child_cell_on_face(neighbor_child->refinement_case(),
+								    nb_nb,
+								    0));
+			neighbor_child->set_neighbor(nb_nb, cell);
+		      }
+		  }
+	      }
+      }
 				   // delete the vertex which will not
 				   // be needed anymore. This vertex
 				   // is the second of the second line
-				   // of the first child
-  vertices_used[cell->child(0)->line(1)->vertex_index(1)] = false;
-
-				   // clear user pointers, to avoid
-				   // that they may appear at unwanted
-				   // places later on...
-  cell->child(0)->line(1)->clear_user_data();
-  cell->child(0)->line(3)->clear_user_data();
-  cell->child(3)->line(0)->clear_user_data();
-  cell->child(3)->line(2)->clear_user_data();
-  
-				   // same for user flags
-  cell->child(0)->line(1)->clear_user_flag();
-  cell->child(0)->line(3)->clear_user_flag();
-  cell->child(3)->line(0)->clear_user_flag();
-  cell->child(3)->line(2)->clear_user_flag();
-  
-				   // delete the four interior lines
-  cell->child(0)->line(1)->clear_used_flag();
-  cell->child(0)->line(3)->clear_used_flag();
-  cell->child(3)->line(0)->clear_used_flag();
-  cell->child(3)->line(2)->clear_used_flag();
-
-				   // for the four faces: if the
-				   // neighbor does not itself need
-				   // the subfaces, delete them. note
-				   // that since dim>1 the level of a
-				   // neighbor is either one less or
-				   // the same as that of cell
+				   // of the first child, if the cell
+				   // is refined with cut_xy, else there
+				   // is no inner vertex.
+				   // additionally delete unneeded inner
+				   // lines
+  if (ref_case==RefinementCase<dim>::cut_xy)
+    {
+      vertices_used[cell->child(0)->line(1)->vertex_index(1)] = false;
+      
+				       // clear user pointers, to
+				       // avoid that they may appear
+				       // at unwanted places later
+				       // on...
+      cell->child(0)->line(1)->clear_user_data();
+      cell->child(0)->line(3)->clear_user_data();
+      cell->child(3)->line(0)->clear_user_data();
+      cell->child(3)->line(2)->clear_user_data();
+      
+				       // same for user flags
+      cell->child(0)->line(1)->clear_user_flag();
+      cell->child(0)->line(3)->clear_user_flag();
+      cell->child(3)->line(0)->clear_user_flag();
+      cell->child(3)->line(2)->clear_user_flag();
+      
+				       // delete the four interior
+				       // lines
+      cell->child(0)->line(1)->clear_used_flag();
+      cell->child(0)->line(3)->clear_used_flag();
+      cell->child(3)->line(0)->clear_used_flag();
+      cell->child(3)->line(2)->clear_used_flag();
+    }
+  else
+    {
+      unsigned int inner_face_no=ref_case==RefinementCase<dim>::cut_x ? 1 : 3;
+				 
+				       // the inner line will not be
+				       // used any more
+      cell->child(0)->line(inner_face_no)->clear_user_data();
+      cell->child(0)->line(inner_face_no)->clear_user_flag();
+      cell->child(0)->line(inner_face_no)->clear_used_flag();
+    }
+				   
+				   // if the neighbor does not need
+				   // the subfaces, delete them.  in case of
+				   // anisotropic refinement we can't just
+				   // ask the neighbor's level here to
+				   // assure, that he is not refined along
+				   // the face
   for (unsigned int face=0; face<GeometryInfo<dim>::faces_per_cell; ++face) 
-    if ((cell->neighbor(face).state() != IteratorState::valid) ||
-	(cell->neighbor(face)->level() == cell->level()-1) ||
-	((cell->neighbor(face)->level() == cell->level()) &&
-	 !cell->neighbor(face)->has_children()))
+    if (((cell->neighbor(face).state() != IteratorState::valid) ||
+	 (!cell->neighbor(face)->has_children())) &&
+	(GeometryInfo<dim>::face_refinement_case(ref_case,face)
+	 !=RefinementCase<dim>::no_refinement))
       {
+	line_iterator line=cell->face(face);
 					 // delete middle vertex
-	vertices_used[cell->face(face)->child(0)->vertex_index(1)] = false;
+	vertices_used[line->child(0)->vertex_index(1)] = false;
 					 // delete the two subfaces
 	for (unsigned int subface=0;
-	     subface<GeometryInfo<dim>::subfaces_per_face; ++subface)
+	     subface<line->n_children(); ++subface)
 	  {
-	    cell->face(face)->child(subface)->clear_user_data ();
-	    cell->face(face)->child(subface)->clear_user_flag ();
-	    cell->face(face)->child(subface)->clear_used_flag ();
+	    line->child(subface)->clear_user_data ();
+	    line->child(subface)->clear_user_flag ();
+	    line->child(subface)->clear_used_flag ();
 	  }
 	
-	cell->face(face)->clear_children();
+	line->clear_children();
       }
-  
 				   // invalidate children
-  for (unsigned int child=0; child<GeometryInfo<dim>::children_per_cell; ++child)
+  for (unsigned int child=0; child<cell->n_children(); ++child)
     {
       cell->child(child)->clear_user_data();
       cell->child(child)->clear_user_flag();
@@ -9195,7 +12059,8 @@ void Triangulation<2>::delete_children (cell_iterator &cell,
 
 
 				   // delete pointer to children
-  cell->set_children (-1);
+  cell->clear_children ();
+  cell->clear_refinement_case();
   cell->clear_user_flag();
 }
 
@@ -9207,173 +12072,122 @@ void Triangulation<2>::delete_children (cell_iterator &cell,
 
 template <>
 void Triangulation<3>::delete_children (cell_iterator &cell,
-					std::vector<unsigned int> &cell_count)
+					std::vector<unsigned int> &line_cell_count,
+					std::vector<unsigned int> &quad_cell_count)
 {
   const unsigned int dim=3;
-  Assert(cell_count.size()==n_raw_lines(), ExcInternalError());
-  
-				   // first we need to reset the
-				   // neighbor pointers of the
-				   // neighbors of this cell's
-				   // children to this cell. This is
-				   // different for one dimension,
-				   // since there neighbors can have a
-				   // refinement level differing from
-				   // that of this cell's children by
-				   // more than one level.  For two or
-				   // more dimensions, the neighbors
-				   // of the children may only be on
-				   // the same level or on the level
-				   // of this cell (the case that the
-				   // neighbors are more refined than
-				   // the children was eliminated in
-				   // @p{prepare_coarsening}
-  for (unsigned int child=0; child<GeometryInfo<dim>::children_per_cell; ++child)
-    for (unsigned int n=0; n<GeometryInfo<dim>::faces_per_cell; ++n)
-      {
-	const cell_iterator neighbor = cell->child(child)->neighbor(n);
-					 // do nothing if at boundary
-	if (neighbor.state() != IteratorState::valid)
-	  continue;
-	
-	Assert ((neighbor->level()==cell->level()) ||
-		(neighbor->level()==cell->level()+1),
-		ExcInternalError());
-	
-					 // if the neighbor's level is
-					 // the same as that of
-					 // @p{cell}, then it's
-					 // neighbor pointers points
-					 // to this cell rather than
-					 // to this cell's child. In
-					 // that case we need not do
-					 // anything.  If the neighbor
-					 // is refined as often as are
-					 // the children, we need to
-					 // reset those neigbor
-					 // pointers that point to the
-					 // child of this cell; when
-					 // resetting the neighbor
-					 // pointers of neighbors of
-					 // one of the children, we
-					 // will also reset the
-					 // neighbor pointers other
-					 // children to the present
-					 // cell, but this does no
-					 // harm since we delete the
-					 // children afterwards anyway
-	if (neighbor->level() == cell->level()+1)
-	  for (unsigned int neighbor_neighbor=0;
-	       neighbor_neighbor<GeometryInfo<dim>::faces_per_cell;
-	       ++neighbor_neighbor)
-	    if (neighbor->neighbor(neighbor_neighbor) == cell->child(child))
-	      neighbor->set_neighbor(neighbor_neighbor, cell);
-      }
+  Assert(line_cell_count.size()==n_raw_lines(), ExcInternalError());
+  Assert(quad_cell_count.size()==n_raw_quads(), ExcInternalError());
 
-				   // delete the vertex which will not
-				   // be needed anymore. This vertex
-				   // is the vertex at the heart of
-				   // this cell, which is the sixth of
-				   // the first child
-  vertices_used[cell->child(0)->vertex_index(7)] = false;
+				   // first of all, we store the RefineCase of
+				   // this cell
+  const RefinementCase<dim> ref_case=cell->refinement_case();
+				   // vectors to hold all lines and quads which
+				   // may be deleted
+  std::vector<line_iterator> lines_to_delete(0);
+  std::vector<quad_iterator> quads_to_delete(0);
+  lines_to_delete.reserve(12*2+6*4+6);
+  quads_to_delete.reserve(6*4+12);
+  
+				   // now we decrease the counters for lines and
+				   // quads contained in the child cells
+  for (unsigned int c=0; c<cell->n_children(); ++c)
+    {
+      cell_iterator child=cell->child(c);
+      for (unsigned int l=0; l<GeometryInfo<dim>::lines_per_cell; ++l)
+	--line_cell_count[child->line_index(l)];
+      for (unsigned int f=0; f<GeometryInfo<dim>::faces_per_cell; ++f)
+	--quad_cell_count[child->quad_index(f)];
+    }
+  
+				   // first we need to reset the neighbor
+				   // pointers of the neighbors from this cell's
+				   // children to this cell. This is done by a
+				   // seperate function.
+  update_neighbors(cell, false);
 
 				   ///////////////////////////////////////
-				   // delete interior quads and lines
+				   // delete interior quads and lines and the
+				   // interior vertex, depending on the
+				   // refinement case of the cell
 				   //
-				   // first set up a list of these
-				   // line's and quad's indices
-  const quad_iterator interior_quads[12]
-    = {  cell->child(0)->face(1),
-	 cell->child(2)->face(1),
-	 cell->child(4)->face(1),
-	 cell->child(6)->face(1),
-
-	 cell->child(0)->face(3),
-	 cell->child(1)->face(3),
-	 cell->child(4)->face(3),
-	 cell->child(5)->face(3),
-
-	 cell->child(0)->face(5),
-	 cell->child(1)->face(5),
-	 cell->child(2)->face(5),
-	 cell->child(3)->face(5) 
-    };
-
-  const line_iterator interior_lines[6]
-    = {  cell->child(0)->line(5),
-	 cell->child(0)->line(7),
-	 cell->child(0)->line(11),
-
-	 cell->child(7)->line(0),
-	 cell->child(7)->line(2),
-	 cell->child(7)->line(8),
-    };
-
-  				   // clear user pointers, to avoid that
-				   // they may appear at unwanted places
-				   // later on...
-				   // same for user flags, then finally
-				   // delete thes quads and lines
-  for (unsigned int q=0; q<12; ++q)
+				   // for append quads and lines: only append
+				   // them to the list of objects to be deleted
+  
+  switch (static_cast<unsigned char> (ref_case))
     {
-      interior_quads[q]->clear_user_data();
-      interior_quads[q]->clear_user_flag();
-      interior_quads[q]->clear_used_flag();
+      case RefinementCase<dim>::cut_x:
+	    quads_to_delete.push_back(cell->child(0)->face(1));
+	    break;
+      case RefinementCase<dim>::cut_y:
+	    quads_to_delete.push_back(cell->child(0)->face(3));
+	    break;
+      case RefinementCase<dim>::cut_z:
+	    quads_to_delete.push_back(cell->child(0)->face(5));
+	    break;
+      case RefinementCase<dim>::cut_xy:
+	    quads_to_delete.push_back(cell->child(0)->face(1));
+	    quads_to_delete.push_back(cell->child(0)->face(3));
+	    quads_to_delete.push_back(cell->child(3)->face(0));
+	    quads_to_delete.push_back(cell->child(3)->face(2));
+
+	    lines_to_delete.push_back(cell->child(0)->line(11));
+	    break;
+      case RefinementCase<dim>::cut_xz:
+	    quads_to_delete.push_back(cell->child(0)->face(1));
+	    quads_to_delete.push_back(cell->child(0)->face(5));
+	    quads_to_delete.push_back(cell->child(3)->face(0));
+	    quads_to_delete.push_back(cell->child(3)->face(4));
+
+	    lines_to_delete.push_back(cell->child(0)->line(5));
+	    break;
+      case RefinementCase<dim>::cut_yz:
+	    quads_to_delete.push_back(cell->child(0)->face(3));
+	    quads_to_delete.push_back(cell->child(0)->face(5));
+	    quads_to_delete.push_back(cell->child(3)->face(2));
+	    quads_to_delete.push_back(cell->child(3)->face(4));
+
+	    lines_to_delete.push_back(cell->child(0)->line(7));
+	    break;
+      case RefinementCase<dim>::cut_xyz:
+	    quads_to_delete.push_back(cell->child(0)->face(1));
+	    quads_to_delete.push_back(cell->child(2)->face(1));
+	    quads_to_delete.push_back(cell->child(4)->face(1));
+	    quads_to_delete.push_back(cell->child(6)->face(1));
+	    
+	    quads_to_delete.push_back(cell->child(0)->face(3));
+	    quads_to_delete.push_back(cell->child(1)->face(3));
+	    quads_to_delete.push_back(cell->child(4)->face(3));
+	    quads_to_delete.push_back(cell->child(5)->face(3));
+	    
+	    quads_to_delete.push_back(cell->child(0)->face(5));
+	    quads_to_delete.push_back(cell->child(1)->face(5));
+	    quads_to_delete.push_back(cell->child(2)->face(5));
+	    quads_to_delete.push_back(cell->child(3)->face(5)); 
+	    
+	    lines_to_delete.push_back(cell->child(0)->line(5));
+	    lines_to_delete.push_back(cell->child(0)->line(7));
+	    lines_to_delete.push_back(cell->child(0)->line(11));
+	    lines_to_delete.push_back(cell->child(7)->line(0));
+	    lines_to_delete.push_back(cell->child(7)->line(2));
+	    lines_to_delete.push_back(cell->child(7)->line(8));
+					     // delete the vertex which will not
+					     // be needed anymore. This vertex
+					     // is the vertex at the heart of
+					     // this cell, which is the sixth of
+					     // the first child
+	    vertices_used[cell->child(0)->vertex_index(7)] = false;
+	    break;
+      default:
+					     // only remaining case is
+					     // no_refinement, thus an error
+	    Assert(false, ExcInternalError());
+	    break;
     }
-
-  for (unsigned int l=0; l<6; ++l)
-    {
-      interior_lines[l]->clear_user_data();
-      interior_lines[l]->clear_user_flag();
-      interior_lines[l]->clear_used_flag();
-    }
-
-				   // for the six faces: if the
-				   // neighbor does not itself need
-				   // the subfaces, delete them. note
-				   // that since dim>1 the level of a
-				   // neighbor is either one less or
-				   // the same as that of cell
-  for (unsigned int face=0; face<GeometryInfo<dim>::faces_per_cell; ++face) 
-    if ((cell->neighbor(face).state() != IteratorState::valid) ||
-	(cell->neighbor(face)->level() == cell->level()-1) ||
-	((cell->neighbor(face)->level() == cell->level()) &&
-	 !cell->neighbor(face)->has_children()))
-      {
-	quad_iterator quad = cell->face(face);
-	
-					 // delete middle vertex
-	vertices_used[quad->child(0)->vertex_index(3)] = false;
-
-	const line_iterator interior_lines[4]
-	  = { quad->child(0)->line(1),
-	      quad->child(0)->line(3),
-	      quad->child(3)->line(0),
-	      quad->child(3)->line(2) 
-	  };
-
-					 // delete interior lines
-	for (unsigned int l=0; l<4; ++l)
-	  {
-	    interior_lines[l]->clear_user_data ();
-	    interior_lines[l]->clear_user_flag ();
-	    interior_lines[l]->clear_used_flag ();
-	  }
-	
-					 // delete the four subfaces
-	for (unsigned int subface=0;
-	     subface<GeometryInfo<dim>::subfaces_per_face; ++subface)
-	  {
-	    quad->child(subface)->clear_user_data ();
-	    quad->child(subface)->clear_user_flag ();
-	    quad->child(subface)->clear_used_flag ();
-	  }
-	
-	quad->clear_children();
-      }
+  
 
 				   // invalidate children
-  for (unsigned int child=0; child<GeometryInfo<dim>::children_per_cell; ++child)
+  for (unsigned int child=0; child<cell->n_children(); ++child)
     {
       cell->child(child)->clear_user_data();
       cell->child(child)->clear_user_flag();
@@ -9394,66 +12208,1137 @@ void Triangulation<3>::delete_children (cell_iterator &cell,
 
 				   // delete pointer to children
   cell->clear_children ();
+  cell->clear_refinement_case ();
   cell->clear_user_flag();
 
-				   // now there still are the 12 lines of this
-				   // hex which are refined and which may need
-				   // coarsening. As we got the number of cells
-				   // containing this line, we can simply use
-				   // that information here.
+				   // so far we only looked at inner quads,
+				   // lines and vertices. Now we have to
+				   // consider outer ones as well. here, we have
+				   // to check, whether there are other cells
+				   // still needing these objects. oherwise we
+				   // can delete them. first for quads (and
+				   // their inner lines).
+  
+  for (unsigned int quad_no=0; quad_no<GeometryInfo<dim>::faces_per_cell; ++quad_no)
+    {
+      quad_iterator quad=cell->face(quad_no);
 
-				   // if in debug mode: make sure that
-				   // none of the lines of this cell
-				   // is twice refined; else, deleting
-				   // this cell's children will result
-				   // in an invalid state. also check
-				   // that each of the lines for which
-				   // we consider deleting the
-				   // children in fact has children
-				   // (the bits/coarsening_3d test
-				   // tripped over this initially)
-  for (unsigned int line_no=0; line_no<12; ++line_no)
+      Assert((GeometryInfo<dim>::face_refinement_case(ref_case,quad_no) && quad->has_children()) ||
+	     GeometryInfo<dim>::face_refinement_case(ref_case,quad_no)==RefinementCase<dim>::no_refinement,
+	     ExcInternalError());
+
+      switch (static_cast<unsigned char> (quad->refinement_case()))
+	{
+	  case RefinementCase<dim>::no_refinement:
+						 // nothing to do as the quad
+						 // is not refined
+		break;
+	  case RefinementCase<dim>::cut_x:
+	  case RefinementCase<dim>::cut_y:
+	  {
+					     // if one of the cell counters is
+					     // zero, the other has to be as
+					     // well
+	    Assert((quad_cell_count[quad->child_index(0)] == 0 &&
+		    quad_cell_count[quad->child_index(1)] == 0) ||
+		   (quad_cell_count[quad->child_index(0)] > 0 &&
+		    quad_cell_count[quad->child_index(1)] > 0),
+		   ExcInternalError());
+					     // it might be, that the quad is
+					     // refined twice anisotropically,
+					     // first check, whether we may
+					     // delete possible grand_children
+	    unsigned int deleted_grandchildren=0;
+	    unsigned int number_of_child_refinements=0;
+	    
+	    for (unsigned int c=0; c<2; ++c)
+	      if (quad->child(c)->has_children())
+		{
+		  ++number_of_child_refinements;
+						   // if one of the cell counters is
+						   // zero, the other has to be as
+						   // well
+		  Assert((quad_cell_count[quad->child(c)->child_index(0)] == 0 &&
+			  quad_cell_count[quad->child(c)->child_index(1)] == 0) ||
+			 (quad_cell_count[quad->child(c)->child_index(0)] > 0 &&
+			  quad_cell_count[quad->child(c)->child_index(1)] > 0),
+			 ExcInternalError());
+		  if (quad_cell_count[quad->child(c)->child_index(0)]==0)
+		    {
+						       // Assert, that the two
+						       // anisotropic
+						       // refinements add up to
+						       // isotropic refinement
+		      Assert(quad->refinement_case()+quad->child(c)->refinement_case()==RefinementCase<dim>::cut_xy,
+			     ExcInternalError());
+						       // we may delete the
+						       // quad's children and
+						       // the inner line as no
+						       // cell references them
+						       // anymore
+		      quads_to_delete.push_back(quad->child(c)->child(0));
+		      quads_to_delete.push_back(quad->child(c)->child(1));
+  		      if (quad->child(c)->refinement_case()==RefinementCase<dim>::cut_x)
+  			lines_to_delete.push_back(quad->child(c)->child(0)->line(1));
+  		      else
+  			lines_to_delete.push_back(quad->child(c)->child(0)->line(3));
+		      quad->child(c)->clear_children();
+		      quad->child(c)->clear_refinement_case();
+		      ++deleted_grandchildren;
+		    }
+		}
+					     // if no grandchildren are left, we
+					     // may as well delete the
+					     // refinement of the inner line
+					     // between our children and the
+					     // corresponding vertex
+	    if (number_of_child_refinements>0 &&
+		deleted_grandchildren==number_of_child_refinements)
+	      {
+		line_iterator middle_line;
+		if (quad->refinement_case()==RefinementCase<dim>::cut_x)
+		  middle_line=quad->child(0)->line(1);
+		else
+		  middle_line=quad->child(0)->line(3);
+
+		lines_to_delete.push_back(middle_line->child(0));
+		lines_to_delete.push_back(middle_line->child(1));
+		vertices_used[middle_line->middle_vertex_index()]=false;
+		middle_line->clear_children();
+	      }
+
+					     // now consider the direct children
+					     // of the given quad
+	    if (quad_cell_count[quad->child_index(0)]==0)
+	      {
+						 // we may delete the quad's
+						 // children and the inner line
+						 // as no cell references them
+						 // anymore
+		quads_to_delete.push_back(quad->child(0));
+		quads_to_delete.push_back(quad->child(1));
+ 		if (quad->refinement_case()==RefinementCase<dim>::cut_x)
+ 		  lines_to_delete.push_back(quad->child(0)->line(1));
+ 		else
+ 		  lines_to_delete.push_back(quad->child(0)->line(3));
+
+						 // if the counters just dropped
+						 // to zero, otherwise the
+						 // children would have been
+						 // deleted earlier, then this
+						 // cell's children must have
+						 // contained the anisotropic
+						 // quad children. thus, if
+						 // those have again anisotropic
+						 // children, which are in
+						 // effect isotropic children of
+						 // the original quad, those are
+						 // still needed by a
+						 // neighboring cell and we
+						 // cannot delete them. instead,
+						 // we have to reset this quad's
+						 // refine case to isotropic and
+						 // set the children
+						 // accordingly.
+		if (quad->child(0)->has_children())
+		  if (quad->refinement_case()==RefinementCase<dim>::cut_x)
+		    {
+						       // now evereything is
+						       // quite complicated. we
+						       // have the children
+						       // numbered according to
+						       //
+						       // *---*---*
+						       // |n+1|m+1|
+						       // *---*---*
+						       // | n | m |
+						       // *---*---*
+						       //
+						       // from the original
+						       // anisotropic
+						       // refinement. we have to
+						       // reorder them as
+						       //
+						       // *---*---*
+						       // | m |m+1|
+						       // *---*---*
+						       // | n |n+1|
+						       // *---*---*
+						       //
+						       // for isotropic refinement.
+						       //
+						       // this is a bit ugly, of
+						       // course: loop over all
+						       // cells on all levels
+						       // and look for faces n+1
+						       // (switch_1) and m
+						       // (switch_2).
+		      const quad_iterator switch_1=quad->child(0)->child(1);
+		      const quad_iterator switch_2=quad->child(1)->child(0);
+
+		      Assert(!switch_1->has_children(), ExcInternalError());
+		      Assert(!switch_2->has_children(), ExcInternalError());
+		      
+		      const int switch_1_index=switch_1->index();
+		      const int switch_2_index=switch_2->index();
+		      for (unsigned int l=0; l<levels.size(); ++l)
+			for (unsigned int h=0; h<levels[l]->cells.cells.size(); ++h)
+			  for (unsigned int q=0; q<GeometryInfo<dim>::faces_per_cell; ++q)
+			    {
+			      const int index=levels[l]->cells.cells[h].face(q);
+			      if (index==switch_1_index)
+				levels[l]->cells.cells[h].set_face(q,switch_2_index);
+			      else if (index==switch_2_index)
+				levels[l]->cells.cells[h].set_face(q,switch_1_index);
+			    }
+						       // now we have to copy
+						       // all information of the
+						       // two quads
+		      const int switch_1_lines[4]=
+			{switch_1->line_index(0),
+			 switch_1->line_index(1),
+			 switch_1->line_index(2),
+			 switch_1->line_index(3)};
+		      const bool switch_1_line_orientations[4]=
+			{switch_1->line_orientation(0),
+			 switch_1->line_orientation(1),
+			 switch_1->line_orientation(2),
+			 switch_1->line_orientation(3)};
+		      const unsigned char switch_1_boundary_indicator=switch_1->boundary_indicator();
+		      const unsigned int switch_1_user_index=switch_1->user_index();
+		      const bool switch_1_user_flag=switch_1->user_flag_set();
+
+		      switch_1->set(internal::Triangulation::TriaObject<2>(switch_2->line_index(0),
+									   switch_2->line_index(1),
+									   switch_2->line_index(2),
+									   switch_2->line_index(3)));
+		      switch_1->set_line_orientation(0, switch_2->line_orientation(0));
+		      switch_1->set_line_orientation(1, switch_2->line_orientation(1));
+		      switch_1->set_line_orientation(2, switch_2->line_orientation(2));
+		      switch_1->set_line_orientation(3, switch_2->line_orientation(3));
+		      switch_1->set_boundary_indicator(switch_2->boundary_indicator());
+		      switch_1->set_user_index(switch_2->user_index());
+		      if (switch_2->user_flag_set())
+			switch_1->set_user_flag();
+		      else
+			switch_1->clear_user_flag();
+
+		      switch_2->set(internal::Triangulation::TriaObject<2>(switch_1_lines[0],
+									   switch_1_lines[1],
+									   switch_1_lines[2],
+									   switch_1_lines[3]));
+		      switch_2->set_line_orientation(0, switch_1_line_orientations[0]);
+		      switch_2->set_line_orientation(1, switch_1_line_orientations[1]);
+		      switch_2->set_line_orientation(2, switch_1_line_orientations[2]);
+		      switch_2->set_line_orientation(3, switch_1_line_orientations[3]);
+		      switch_2->set_boundary_indicator(switch_1_boundary_indicator);
+		      switch_2->set_user_index(switch_1_user_index);
+		      if (switch_1_user_flag)
+			switch_2->set_user_flag();
+		      else
+			switch_2->clear_user_flag();
+
+		      const unsigned int child_0=quad->child(0)->child_index(0);
+		      const unsigned int child_2=quad->child(1)->child_index(0);
+		      quad->clear_children();
+		      quad->clear_refinement_case();
+		      quad->set_refinement_case(RefinementCase<2>::cut_xy);
+		      quad->set_children(0,child_0);
+		      quad->set_children(2,child_2);
+		      std::swap(quad_cell_count[child_0+1],quad_cell_count[child_2]);
+		    }
+		  else
+		    {
+						       // the face was refined
+						       // with cut_y, thus the
+						       // children are already
+						       // in correct order. we
+						       // only have to set them
+						       // correctly, deleting
+						       // the indirection of two
+						       // anisotropic refinement
+						       // and going directly
+						       // from the quad to
+						       // isotropic children
+		      const unsigned int child_0=quad->child(0)->child_index(0);
+		      const unsigned int child_2=quad->child(1)->child_index(0);
+		      quad->clear_children();
+		      quad->clear_refinement_case();
+		      quad->set_refinement_case(RefinementCase<2>::cut_xy);
+		      quad->set_children(0,child_0);
+		      quad->set_children(2,child_2);		     
+		    }
+		else
+		  {
+		    quad->clear_children();
+		    quad->clear_refinement_case();
+		  }
+		
+		
+	      }
+	    break;
+	  }
+	  case RefinementCase<dim>::cut_xy:
+	  {
+					     // if one of the cell counters is
+					     // zero, the others have to be as
+					     // well
+
+	    Assert((quad_cell_count[quad->child_index(0)] == 0 &&
+		    quad_cell_count[quad->child_index(1)] == 0 &&
+		    quad_cell_count[quad->child_index(2)] == 0 &&
+		    quad_cell_count[quad->child_index(3)] == 0) ||
+		   (quad_cell_count[quad->child_index(0)] > 0 &&
+		    quad_cell_count[quad->child_index(1)] > 0 &&
+		    quad_cell_count[quad->child_index(2)] > 0 &&
+		    quad_cell_count[quad->child_index(3)] > 0),
+		   ExcInternalError());
+      
+	    if (quad_cell_count[quad->child_index(0)]==0)
+	      {
+						 // we may delete the quad's
+						 // children, the inner lines
+						 // and the middle vertex as no
+						 // cell references them anymore
+		lines_to_delete.push_back(quad->child(0)->line(1));
+		lines_to_delete.push_back(quad->child(3)->line(0));
+		lines_to_delete.push_back(quad->child(0)->line(3));
+		lines_to_delete.push_back(quad->child(3)->line(2));
+
+		for (unsigned int child=0; child<quad->n_children(); ++child)
+		  quads_to_delete.push_back(quad->child(child));
+		
+		vertices_used[quad->child(0)->vertex_index(3)] = false;
+		
+		quad->clear_children();
+		quad->clear_refinement_case();
+	      }
+	  }
+	  break;
+	  default:
+		Assert(false, ExcInternalError());
+		break;
+	}
+      
+    }
+
+				   // now we repeat a similar procedure for the
+				   // outer lines of this cell.
+  
+				   // if in debug mode: check that each of the
+				   // lines for which we consider deleting the
+				   // children in fact has children (the
+				   // bits/coarsening_3d test tripped over this
+				   // initially)
+  for (unsigned int line_no=0; line_no<GeometryInfo<dim>::lines_per_cell; ++line_no)
     {
       line_iterator line=cell->line(line_no);
-      
-      Assert (line->has_children(),
-              ExcInternalError());
-      for (unsigned int c=0; c<2; ++c)
-	{
-	  Assert (!line->child(c)->has_children(),
-		  ExcInternalError());
-					   // decrease the number of cells
-					   // referencing this line by one, as
-					   // one of those was one of our former
-					   // children
-	  --cell_count[line->child_index(c)];
-	}
-				       // the cell counters for both
-				       // line_children have to be the same
-      Assert(cell_count[line->child_index(0)] ==
-	     cell_count[line->child_index(1)],
+
+      Assert((GeometryInfo<dim>::line_refinement_case(ref_case,line_no) && line->has_children()) ||
+	     GeometryInfo<dim>::line_refinement_case(ref_case,line_no)==RefinementCase<dim>::no_refinement,
 	     ExcInternalError());
       
-      if (cell_count[line->child_index(0)]==0)
+      if (line->has_children())
 	{
-					   // we may delete the line's children
-					   // and the middle vertex as no cell
-					   // references them anymore
-	  vertices_used[line->child(0)->vertex_index(1)] = false;
-		
-	  for (unsigned int child=0; child<2; ++child)
+					   // if one of the cell counters is
+					   // zero, the other has to be as well
+
+	  Assert((line_cell_count[line->child_index(0)] == 0 &&
+		  line_cell_count[line->child_index(1)] == 0) ||
+		 (line_cell_count[line->child_index(0)] > 0 &&
+		  line_cell_count[line->child_index(1)] > 0),
+		 ExcInternalError());
+      
+	  if (line_cell_count[line->child_index(0)]==0)
 	    {
-	      line->child(child)->clear_user_data();
-	      line->child(child)->clear_user_flag();
-	      line->child(child)->clear_used_flag();
+	      for (unsigned int c=0; c<2; ++c)
+		Assert (!line->child(c)->has_children(),
+			ExcInternalError());
+	      
+					       // we may delete the line's
+					       // children and the middle vertex
+					       // as no cell references them
+					       // anymore
+	      vertices_used[line->child(0)->vertex_index(1)] = false;
+	      
+	      lines_to_delete.push_back(line->child(0));
+	      lines_to_delete.push_back(line->child(1));
+	      
+	      line->clear_children();
 	    }
-		
-	  line->clear_children();
 	}
+    }
+
+				   // finally, delete unneeded quads and lines
+  
+				   // clear user pointers, to avoid that
+				   // they may appear at unwanted places
+				   // later on...
+				   // same for user flags, then finally
+				   // delete the quads and lines
+  std::vector<line_iterator>::iterator line=lines_to_delete.begin(),
+				    endline=lines_to_delete.end();
+  for (; line!=endline; ++line)
+    {
+      (*line)->clear_user_data();
+      (*line)->clear_user_flag();
+      (*line)->clear_used_flag();
+    }
+
+  std::vector<quad_iterator>::iterator quad=quads_to_delete.begin(),
+				    endquad=quads_to_delete.end();
+  for (; quad!=endquad; ++quad)
+    {
+      (*quad)->clear_user_data();
+      (*quad)->clear_children();
+      (*quad)->clear_refinement_case();
+      (*quad)->clear_user_flag();
+      (*quad)->clear_used_flag();
     }
 }
 
 #endif
+
+
+
+#if deal_II_dimension == 2
+template<>
+void Triangulation<2>::create_children (unsigned int &next_unused_vertex,
+					raw_line_iterator &next_unused_line,
+					raw_quad_iterator &,
+					raw_cell_iterator &next_unused_cell,
+					cell_iterator &cell)
+{
+  const unsigned int dim=2;
+				 // clear refinement flag
+  const RefinementCase<dim> ref_case=cell->refine_flag_set();
+  cell->clear_refine_flag ();
+
+/* For the refinement process: since we go the levels up from the lowest, there
+   are (unlike above) only two possibilities: a neighbor cell is on the same
+   level or one level up (in both cases, it may or may not be refined later on,
+   but we don't care here).
+   
+   First:
+   Set up an array of the 3x3 vertices, which are distributed on the cell
+   (the array consists of indices into the @p{vertices} std::vector
+   
+   2--7--3
+   |  |  |
+   4--8--5
+   |  |  |
+   0--6--1
+
+   note: in case of cut_x or cut_y not all these vertices are needed for the new
+   cells
+	
+   Second:  
+   Set up an array of the new lines (the array consists of iterator pointers
+   into the lines arrays)
+   
+   .-6-.-7-.         The directions are:  .->-.->-.
+   1   9   3                              ^   ^   ^
+   .-10.11-.                             .->-.->-.
+   0   8   2                              ^   ^   ^
+   .-4-.-5-.                              .->-.->-.
+
+   cut_x:   
+   .-4-.-5-. 
+   |   |   | 
+   0   6   1 
+   |   |   | 
+   .-2-.-3-.
+   
+   cut_y:
+   .---5---. 
+   1       3 
+   .---6---. 
+   0       2 
+   .---4---. 
+
+     
+   Third:
+   Set up an array of neighbors:
+   
+   6  7
+   .--.--.
+   1|  |  |3
+   .--.--.
+   0|  |  |2
+   .--.--.
+   4   5
+
+   We need this array for two reasons: first to get the lines which will
+   bound the four subcells (if the neighboring cell is refined, these
+   lines already exist), and second to update neighborship information.
+   Since if a neighbor is not refined, its neighborship record only
+   points to the present, unrefined, cell rather than the children we
+   are presently creating, we only need the neighborship information
+   if the neighbor cells are refined. In all other cases, we store
+   the unrefined neighbor address
+
+   We also need for every neighbor (if refined) which number among its
+   neighbors the present (unrefined) cell has, since that number is to
+   be replaced and because that also is the number of the subline which
+   will be the interface between that neighbor and the to be created cell.
+   We will store this number (between 0 and 3) in the field
+   @p{neighbors_neighbor}.
+
+   It would be sufficient to use the children of the common line to the
+   neighbor, if we only wanted to get the new sublines and the new vertex,
+   but because we need to update the neighborship information of the
+   two refined subcells of the neighbor, we need to search these anyway.
+
+   Convention:
+   The created children are numbered like this:
+
+   .--.--.
+   |2 . 3|
+   .--.--.
+   |0 | 1|
+   .--.--.
+*/
+
+				   // collect the indices
+				   // all vertices
+				   //   2--7--3
+				   //   |  |  |
+				   //   4--8--5
+				   //   |  |  |
+				   //   0--6--1
+  int new_vertices[9];
+  for (unsigned int vertex_no=0; vertex_no<4; ++vertex_no)
+    new_vertices[vertex_no]=cell->vertex_index(vertex_no);
+  for (unsigned int line_no=0; line_no<4; ++line_no)
+    if (cell->line(line_no)->has_children())
+      new_vertices[4+line_no]=cell->line(line_no)->child(0)->vertex_index(1);
+	    
+  if (ref_case==RefinementCase<dim>::cut_xy)
+    {
+				       // find the next
+				       // unused vertex and
+				       // set it
+				       // appropriately
+      while (vertices_used[next_unused_vertex] == true)
+	++next_unused_vertex;
+      Assert (next_unused_vertex < vertices.size(),
+	      ExcTooFewVerticesAllocated());
+      vertices_used[next_unused_vertex] = true;
+
+      new_vertices[8]=next_unused_vertex;
+		
+				       // new vertex is
+				       // placed at the
+				       // arithmetic mean of
+				       // all 8 neighboring
+				       // points.
+      Point<2> new_point(0,0);
+      for (unsigned int i=0; i<8; ++i)
+	new_point +=  vertices[new_vertices[i]];
+      new_point /= 8.0;
+		
+      vertices[new_vertices[8]] = new_point;
+    
+
+				       // if the user_flag is set, i.e. if the
+				       // cell is at the boundary, use a
+				       // different calculation of the middle
+				       // vertex here. this is of advantage, if
+				       // the boundary is strongly curved and
+				       // the cell has a high aspect ratio. this
+				       // can happen for example, if it was
+				       // refined anisotropically before.
+      if (cell->user_flag_set())
+	{
+					   // first reset the user_flag
+	  cell->clear_user_flag();
+					   // the user flag indicates: at least
+					   // one face is at the boundary. if it
+					   // is only one, set the new middle
+					   // vertex in a different way to avoid
+					   // some mis-shaped elements if the
+					   // new point on the boundary is not
+					   // where we expect it, especially if
+					   // it is to far inside the current
+					   // cell
+	  unsigned int bound_face=GeometryInfo<dim>::faces_per_cell;
+	  for (unsigned int face=0; face<GeometryInfo<dim>::faces_per_cell; ++face)
+	    if (cell->face(face)->at_boundary())
+	      if (bound_face == GeometryInfo<dim>::faces_per_cell)
+						 // no boundary face found so
+						 // far, so set it now
+		bound_face=face;
+	      else
+						 // there is another boundary
+						 // face, so reset bound_face to
+						 // invalid value as a flag to
+						 // do nothing in the following
+		bound_face=GeometryInfo<dim>::faces_per_cell+1;
+      
+	  if (bound_face<GeometryInfo<dim>::faces_per_cell)
+					     // reset the cell's middle vertex
+					     // to the middle of the straight
+					     // connection between the new
+					     // points on this face and on the
+					     // opposite face
+	    vertices[new_vertices[8]]=0.5*(cell->face(bound_face)
+					   ->child(0)->vertex(1)+
+					   cell->face(GeometryInfo<dim>
+						      ::opposite_face[bound_face])
+					   ->child(0)->vertex(1));
+	}
+    }
+  
+  
+				   // Now the lines:
+  raw_line_iterator new_lines[12];
+  unsigned int lmin=8;
+  unsigned int lmax=12;
+  if (ref_case!=RefinementCase<dim>::cut_xy)
+    {
+      lmin=6;
+      lmax=7;
+    }
+	    
+  for (unsigned int l=lmin; l<lmax; ++l)
+    {
+      while (next_unused_line->used() == true)
+	++next_unused_line;
+      new_lines[l] = next_unused_line;
+      ++next_unused_line;
+
+      Assert (new_lines[l]->used() == false,
+	      ExcCellShouldBeUnused());
+    }
+	    
+  if (ref_case==RefinementCase<dim>::cut_xy)
+    {
+				       //   .-6-.-7-.   
+				       //   1   9   3 
+				       //   .-10.11-. 
+				       //   0   8   2 
+				       //   .-4-.-5-. 
+
+				       // lines 0-7 already
+				       // exist, create only
+				       // the four interior
+				       // lines 8-11
+      unsigned int l=0;
+      for (unsigned int face_no=0; face_no<GeometryInfo<dim>::faces_per_cell; ++face_no)
+	for (unsigned int c=0; c<2; ++c, ++l)
+	  new_lines[l]=cell->line(face_no)->child(c);
+      Assert(l==8, ExcInternalError());
+
+      new_lines[8] ->set (internal::Triangulation::
+			  TriaObject<1>(new_vertices[6], new_vertices[8]));
+      new_lines[9] ->set (internal::Triangulation::
+			  TriaObject<1>(new_vertices[8], new_vertices[7]));
+      new_lines[10]->set (internal::Triangulation::
+			  TriaObject<1>(new_vertices[4], new_vertices[8]));
+      new_lines[11]->set (internal::Triangulation::
+			  TriaObject<1>(new_vertices[8], new_vertices[5]));
+    }
+  else if (ref_case==RefinementCase<dim>::cut_x)
+    {
+				       //   .-4-.-5-. 
+				       //   |   |   | 
+				       //   0   6   1 
+				       //   |   |   | 
+				       //   .-2-.-3-.
+      new_lines[0]=cell->line(0);
+      new_lines[1]=cell->line(1);
+      new_lines[2]=cell->line(2)->child(0);
+      new_lines[3]=cell->line(2)->child(1);
+      new_lines[4]=cell->line(3)->child(0);
+      new_lines[5]=cell->line(3)->child(1);
+      new_lines[6]->set (internal::Triangulation::
+			 TriaObject<1>(new_vertices[6], new_vertices[7]));
+    }
+  else
+    {
+      Assert(ref_case==RefinementCase<dim>::cut_y, ExcInternalError());
+				       //   .---5---. 
+				       //   1       3 
+				       //   .---6---. 
+				       //   0       2 
+				       //   .---4---.
+      new_lines[0]=cell->line(0)->child(0);
+      new_lines[1]=cell->line(0)->child(1);
+      new_lines[2]=cell->line(1)->child(0);
+      new_lines[3]=cell->line(1)->child(1);
+      new_lines[4]=cell->line(2);
+      new_lines[5]=cell->line(3);
+      new_lines[6]->set (internal::Triangulation::
+			 TriaObject<1>(new_vertices[4], new_vertices[5]));
+    }
+
+  for (unsigned int l=lmin; l<lmax; ++l)
+    {
+      new_lines[l]->set_used_flag();
+      new_lines[l]->clear_user_flag();
+      new_lines[l]->clear_user_data();
+      new_lines[l]->clear_children();
+				       // interior line
+      new_lines[l]->set_boundary_indicator(255);
+    }
+
+				   // Now add the four (two)
+				   // new cells!
+  raw_cell_iterator subcells[GeometryInfo<dim>::max_children_per_cell];
+  while (next_unused_cell->used() == true)
+    ++next_unused_cell;
+	    
+  const unsigned int n_children=
+    GeometryInfo<dim>::n_children(ref_case);
+  for (unsigned int i=0; i<n_children; ++i) 
+    {
+      Assert (next_unused_cell->used() == false,
+	      ExcCellShouldBeUnused());
+      subcells[i] = next_unused_cell;
+      ++next_unused_cell;
+      if (i%2==1 && i<n_children-1)
+	while (next_unused_cell->used() == true)
+	  ++next_unused_cell;
+    }
+
+  if (ref_case==RefinementCase<dim>::cut_xy)
+    {
+				       // children:
+				       //   .--.--.
+				       //   |2 . 3|
+				       //   .--.--.
+				       //   |0 | 1|
+				       //   .--.--.
+				       // lines:
+				       //   .-6-.-7-.   
+				       //   1   9   3 
+				       //   .-10.11-. 
+				       //   0   8   2 
+				       //   .-4-.-5-. 
+      subcells[0]->set (internal::Triangulation::
+			TriaObject<2>(new_lines[0]->index(),
+				      new_lines[8]->index(),
+				      new_lines[4]->index(),
+				      new_lines[10]->index()));
+      subcells[1]->set (internal::Triangulation::
+			TriaObject<2>(new_lines[8]->index(),
+				      new_lines[2]->index(),
+				      new_lines[5]->index(),
+				      new_lines[11]->index()));
+      subcells[2]->set (internal::Triangulation::
+			TriaObject<2>(new_lines[1]->index(),
+				      new_lines[9]->index(),
+				      new_lines[10]->index(),
+				      new_lines[6]->index()));
+      subcells[3]->set (internal::Triangulation::
+			TriaObject<2>(new_lines[9]->index(),
+				      new_lines[3]->index(),
+				      new_lines[11]->index(),
+				      new_lines[7]->index()));
+    }
+  else if (ref_case==RefinementCase<dim>::cut_x)
+    {
+				       // children:
+				       //   .--.--.
+				       //   |  .  |
+				       //   .0 . 1.
+				       //   |  |  |
+				       //   .--.--.
+				       // lines:
+				       //   .-4-.-5-. 
+				       //   |   |   | 
+				       //   0   6   1 
+				       //   |   |   | 
+				       //   .-2-.-3-.
+      subcells[0]->set (internal::Triangulation::
+			TriaObject<2>(new_lines[0]->index(),
+				      new_lines[6]->index(),
+				      new_lines[2]->index(),
+				      new_lines[4]->index()));
+      subcells[1]->set (internal::Triangulation::
+			TriaObject<2>(new_lines[6]->index(),
+				      new_lines[1]->index(),
+				      new_lines[3]->index(),
+				      new_lines[5]->index()));
+    }
+  else
+    {
+      Assert(ref_case==RefinementCase<dim>::cut_y, ExcInternalError());
+				       // children:
+				       //   .-----.
+				       //   |  1  |
+				       //   .-----.
+				       //   |  0  |
+				       //   .-----.
+				       // lines:
+				       //   .---5---. 
+				       //   1       3 
+				       //   .---6---. 
+				       //   0       2 
+				       //   .---4---.
+      subcells[0]->set (internal::Triangulation::
+			TriaObject<2>(new_lines[0]->index(),
+				      new_lines[2]->index(),
+				      new_lines[4]->index(),
+				      new_lines[6]->index()));
+      subcells[1]->set (internal::Triangulation::
+			TriaObject<2>(new_lines[1]->index(),
+				      new_lines[3]->index(),
+				      new_lines[6]->index(),
+				      new_lines[5]->index()));
+    }
+	    
+
+  for (unsigned int i=0; i<n_children; ++i)
+    {
+      subcells[i]->set_used_flag();
+      subcells[i]->clear_refine_flag();		
+      subcells[i]->clear_user_flag();
+      subcells[i]->clear_user_data();
+      subcells[i]->clear_children();
+				       // inherit material
+				       // properties		
+      subcells[i]->set_material_id (cell->material_id());
+      subcells[i]->set_subdomain_id (cell->subdomain_id());
+    }
+	    
+				   // now the only thing
+				   // still to be done is
+				   // setting neighborship
+				   // information.
+				   //
+				   // we have to do that for
+				   // all children of our
+				   // current cell. if the
+				   // neighbor is a refined
+				   // one or if we use anisotropic
+				   // refinement and there is only
+				   // one child of the current cell
+				   // adjacent to a certain face,
+				   // we also have to reset the
+				   // neighbors neighbor pointers.
+				   // In earlier versions of the
+				   // library these tasks were done one
+				   // after the other. here we combine
+				   // these steps, as otherwise we
+				   // would have to gather the same
+				   // information on the refinement
+				   // situation along a certain face
+				   // twice. As this is a more
+				   // complicated task for anisotropic
+				   // refinement, we prefer to do it
+				   // only once.
+				   //
+				   // note that in case the
+				   // neighboring cell is
+				   // not refined along the
+				   // common face, the
+				   // neighbor iterators
+				   // point to the common
+				   // mother cell. the same
+				   // applies if there is no
+				   // neighbor: the
+				   // iterators are past the
+				   // end
+  cell_iterator nb_children[GeometryInfo<dim>::max_children_per_face],
+    nb_child,
+    children[GeometryInfo<dim>::faces_per_cell][GeometryInfo<dim>::max_children_per_face];
+
+				   // first, set up an array of our current
+				   // children / subcells. for all faces and
+				   // subfaces store the info, which subcell is
+				   // adjacent to that subface
+  for (unsigned int face=0; face<GeometryInfo<dim>::faces_per_cell; ++face)
+    for (unsigned int c=0; c<GeometryInfo<dim>::max_children_per_face; ++c)
+      children[face][c]=subcells[GeometryInfo<dim>::child_cell_on_face(ref_case,
+								       face,c)];
+
+
+  for (unsigned int face=0; face<GeometryInfo<dim>::faces_per_cell;
+       ++face)
+    {
+      const cell_iterator neighbor=cell->neighbor(face);
+      const RefinementCase<dim-1> face_ref_case=GeometryInfo<dim>::face_refinement_case(ref_case,face);
+      const unsigned int n_subfaces=std::max(GeometryInfo<dim-1>::n_children(face_ref_case),
+					     static_cast<unsigned int>(1));
+		
+						      
+						      
+				       // if no neighbor set invalid pointer for
+				       // all children adjacent to that face
+      if (neighbor.state() != IteratorState::valid)
+	for (unsigned int c=0; c<n_subfaces; ++c)
+	  children[face][c]
+	    ->set_neighbor(face,neighbor);
+      
+      else
+					 // neighbor exists
+	{
+					   // now there are two possibilities:
+					   // either the neighbor is not refined
+					   // along the common face or it is
+					   // refined along the common face once,
+					   // this must be terminal then
+					   // (otherwise something went wrong in
+					   // prepare_refinement_and_coarsening()).
+					   // however, if at any time the neighbor
+					   // has children, which are not refined
+					   // along the face currently under
+					   // consideration, one of these children
+					   // would have been set as the neighbor
+					   // of our current cell. therefore the
+					   // question wether the neighbor is
+					   // refined along the common face is
+					   // equivalent to the question, wether
+					   // the neighbor has children.  if our
+					   // current cell is not refined along
+					   // the face face_no, then we have to
+					   // set the current neighbor as the new
+					   // neighbor, even if the neighbor is
+					   // further refined
+	  if (!neighbor->has_children())
+	    {
+					       // if the neighbor has no children,
+					       // set the neighbor-pointer of all
+					       // children to this neighbor cell
+	      for (unsigned int c=0; c<n_subfaces; ++c)
+		children[face][c]
+		  ->set_neighbor(face,neighbor);
+					       // if the current cell is not
+					       // refined along the face we have
+					       // to update the neighbors neighbor
+					       // pointer. we have to do this only,
+					       // if the neighbor is not coarser
+	      if (n_subfaces==1 && !cell->neighbor_is_coarser(face))
+		{
+		  const unsigned int nb_nb = cell->neighbor_of_neighbor(face);
+		  neighbor->set_neighbor(nb_nb, children[face][0]);
+		}
+	    }
+	  else
+	    {
+					       // neighbor has children
+	      const unsigned int nb_nb = cell->neighbor_of_neighbor(face);
+	      const RefinementCase<dim> nb_ref_case = neighbor->refinement_case();
+	      const RefinementCase<dim-1> nb_face_ref_case = GeometryInfo<dim>::face_refinement_case(nb_ref_case,
+												     nb_nb);
+	      const unsigned int nb_n_subfaces = std::max(GeometryInfo<dim-1>::
+							  n_children(nb_face_ref_case),
+							  static_cast<unsigned int>(1));
+			
+	      for (unsigned int c=0; c<GeometryInfo<dim>::max_children_per_face; ++c)
+		{
+		  nb_child=neighbor->child(GeometryInfo<dim>::
+					   child_cell_on_face(nb_ref_case,
+							      nb_nb,
+							      c));
+						   // there could be an unknown
+						   // number of refinements for
+						   // nb_child that do
+						   // not refine the common
+						   // face.
+
+						   // consider for example the
+						   // following case, where the
+						   // lower cell has been refined
+						   // in this step into c1 and c2.
+
+						   //  ---------------
+						   // |       |       |
+						   // |       |  n2.1 |
+						   // |       |       |
+						   // |  n1    -------
+						   // |       |       |
+						   // |       |  n2.2 |   
+						   // |       |       |
+						   //  ---------------
+						   // |       |       |
+						   // |       |       |
+						   // |       |       |
+						   // |  c1   |  c2   |
+						   // |       |       |
+						   // |       |       |
+						   //  ---------------
+		
+						   // the neighbor of cell c was
+						   // the whole of cell n. what we
+						   // have done so far is setting
+						   // the right neighbor
+						   // information for cells c1 and
+						   // n1 as well as c2 and n2,
+						   // where n2 is the mother cell
+						   // of n2.1 and n2.2. however,
+						   // n2 is further refined and we
+						   // would have to set n2.2 as
+						   // neighbor of child c2 and
+						   // vice versa. this is specific
+						   // to anisotropic refinement.
+	    
+						   // note that n2.2 could be
+						   // further refined with cut_y
+						   // (if n1 was also refined with
+						   // cut_y). 
+			    			    
+						   // go down that list to
+						   // the end. note, that nb_nb
+						   // stays constant, for all
+						   // children of a cell have
+						   // their faces in the same
+						   // direction and orientation as
+						   // the mother cell
+		  while(nb_child->has_children()
+			&& (GeometryInfo<dim>::face_refinement_case(nb_child->refinement_case(),
+								    nb_nb)
+			    == RefinementCase<dim>::no_refinement))
+						     // nb_child has children
+						     // which are not refined at
+						     // the current (sub)face,
+						     // therefore one of these
+						     // children is the true
+						     // neighbor of our cell
+		    nb_child = nb_child
+			       ->child(GeometryInfo<dim>::
+				       child_cell_on_face(nb_child->refinement_case(),
+							  nb_nb,
+							  0));
+						   // there's one more possibility
+						   // here, if the current cell is
+						   // refined along the face: the
+						   // last child found above could
+						   // still be refined once along
+						   // the common face, e.g. n1 or
+						   // n2.2 in the above picture
+						   // could be refined with
+						   // cut_x. this refinement leeds
+						   // to an inreased number of
+						   // hanging nodes. therefore it
+						   // was introduced in this
+						   // refinement cycle and the
+						   // additional hanging nodes
+						   // will be removed now, as the
+						   // current cell is also
+						   // refined. this temporaray
+						   // effect can occur during
+						   // anisotropic refinement, as
+						   // it is possible there, that a
+						   // coarser cell (along the face
+						   // between the cells) is on a
+						   // higher level and therefore
+						   // refined after the already
+						   // refined neighbor.
+		  if (nb_child->has_children())
+		    {
+						       // This is only valid, if
+						       // the current cell is
+						       // refined along the face
+						       // considered here
+		      Assert(n_subfaces > 1, ExcInternalError());
+		      for (unsigned int sub=0;
+			   sub<GeometryInfo<dim>::max_children_per_face; ++sub)
+			{
+							   // collect all the
+							   // children of nb_child
+							   // and set their
+							   // neighbor
+							   // pointers. we will
+							   // care for our own
+							   // children later on
+			  nb_children[sub]=nb_child->
+					   child(GeometryInfo<dim>::
+						 child_cell_on_face(nb_child->refinement_case(),
+								    nb_nb, sub));
+			  nb_children[sub]->set_neighbor(nb_nb, children[face][c]);
+			}
+		    }
+			    
+			    
+						   // now set the neighbor
+						   // pointers of the neighbor's
+						   // children.
+		  nb_child->set_neighbor(nb_nb, children[face][c]);
+						   // if this cell is as refined
+						   // as the neighbor, set the
+						   // neighbor pointers of the
+						   // subcells to the
+						   // corresponting
+						   // neighbor_child. else, set
+						   // the neighbor pointers to the
+						   // common neighbor mother cell
+		  if (nb_n_subfaces==n_subfaces)
+		    children[face][c]->set_neighbor(face,nb_child);
+		  else
+		    children[face][c]->set_neighbor(face,neighbor);
+		}
+	    }
+	}	    
+    }
+				   // by now, all the outer neighbors have been
+				   // set, the inner neighbors have to be
+				   // considered in the following
+
+  if (ref_case==RefinementCase<dim>::cut_xy)
+    {
+				       // children:
+				       //   .--.--.
+				       //   |2 . 3|
+				       //   .--.--.
+				       //   |0 | 1|
+				       //   .--.--.
+      subcells[0]->set_neighbor (1, subcells[1]);
+      subcells[0]->set_neighbor (3, subcells[2]);
+		
+      subcells[1]->set_neighbor (0, subcells[0]);
+      subcells[1]->set_neighbor (3, subcells[3]);
+		
+      subcells[2]->set_neighbor (1, subcells[3]);
+      subcells[2]->set_neighbor (2, subcells[0]);
+		
+      subcells[3]->set_neighbor (0, subcells[2]);
+      subcells[3]->set_neighbor (2, subcells[1]);
+    }
+  else if (ref_case==RefinementCase<dim>::cut_x)
+    {
+				       // children:
+				       //   .--.--.
+				       //   |  .  |
+				       //   .0 . 1.
+				       //   |  |  |
+				       //   .--.--.
+      subcells[0]->set_neighbor (1, subcells[1]);
+		
+      subcells[1]->set_neighbor (0, subcells[0]);
+    }
+  else
+    {
+      Assert(ref_case==RefinementCase<dim>::cut_y, ExcInternalError());
+				       // children:
+				       //   .-----.
+				       //   |  1  |
+				       //   .-----.
+				       //   |  0  |
+				       //   .-----.
+      subcells[0]->set_neighbor (3, subcells[1]);
+		
+      subcells[1]->set_neighbor (2, subcells[0]);
+    }
+	    
+	    
+
+				   // set child index for
+				   // even children children
+				   // i=0,2 (0)
+  for (unsigned int i=0; i<n_children/2; ++i)
+    cell->set_children (2*i, subcells[2*i]->index());
+				   // set the refine case
+  cell->set_refinement_case(ref_case);	    
+
+				   // note that the
+				   // refinement flag was
+				   // already cleared at the
+				   // beginning of this function	    
+}
+#endif
+
 
 
 template <int dim>
@@ -9868,6 +13753,339 @@ Triangulation<dim>::remove_refinement_listener (RefinementListener &listener) co
   Assert (p != refinement_listeners.end (), ExcInternalError ());
   refinement_listeners.erase (p);
 }
+
+#if deal_II_dimension == 3
+
+template<>
+void
+Triangulation<3>::update_neighbors(cell_iterator &cell,
+				   bool refining)
+{
+  const unsigned int dim=3;
+  
+  Assert(cell->has_children(),
+	 ExcMessage("Only cells with children can ask for an update of neighbor information."));
+
+  const RefinementCase<dim> ref_case=cell->refinement_case();
+  
+				   // visit each face in turn
+  for (unsigned int f=0; f<GeometryInfo<dim>::faces_per_cell; ++f)
+    {
+      cell_iterator neighbor=cell->neighbor(f);
+				       // as default: set all children neighbors
+				       // to the cell's neighbor first, if we
+				       // are to set neighbors after refining.
+      if (refining)
+	for (unsigned int c=0; c<GeometryInfo<dim>::max_children_per_face; ++c)
+	  cell->child(GeometryInfo<dim>::child_cell_on_face(ref_case,f,c))
+	    ->set_neighbor(f, neighbor);
+      else
+					 // in this case, if we are refined
+					 // anisotropically in a way that does
+					 // not refine the current face, then
+					 // set our child's neighbor as our
+					 // neighbor (the child's neighbor might
+					 // be more current...).
+	if (GeometryInfo<dim>::face_refinement_case(cell->refinement_case(), f) == RefinementCase<dim>::no_refinement)
+	  {
+	    const active_cell_iterator child_on_this_face=cell->child(GeometryInfo<dim>::child_cell_on_face(cell->refinement_case(),
+													    f,
+													    cell->face_orientation(f),
+													    cell->face_flip(f),
+													    cell->face_rotation(f),
+													    RefinementCase<dim>::no_refinement));
+	    neighbor=child_on_this_face->neighbor(f);
+	    cell->set_neighbor(f, child_on_this_face->neighbor(f));
+	  }
+		
+      if (neighbor.state()!=IteratorState::valid)
+					 // the neighbor is at the
+					 // boundary, so simply copy
+					 // this to all children at
+					 // this face. As this has
+					 // been done already, there
+					 // is nothing more to do here
+	{}
+      else if (neighbor->active())
+	{
+		    
+					   // the neighbor is active,
+					   // so it cannot be refined
+					   // along the given face. We
+					   // have to set the neighbor
+					   // of our children to this
+					   // neighbor. This has been
+					   // done already. If our
+					   // face is not refined AND
+					   // if the neighbor is not
+					   // coarser we also have to
+					   // adjust the neighbor's
+					   // neighborship info.
+	  if ((GeometryInfo<dim>::face_refinement_case(ref_case,f) == RefinementCase<dim>::no_refinement) && !cell->neighbor_is_coarser(f))
+	    if (refining)
+	      neighbor->set_neighbor(cell->neighbor_of_neighbor(f),
+				     cell->child(GeometryInfo<dim>::child_cell_on_face(ref_case,f,0)));
+	    else
+	      neighbor->set_neighbor(cell->neighbor_of_neighbor(f),
+				     cell);
+						    
+	}// else if (neighbor->active())
+      else
+	{
+	  const bool f_or=cell->face_orientation(f);
+	  const bool f_fl=cell->face_flip(f);
+	  const bool f_ro=cell->face_rotation(f);
+	  
+					   // now the neighbor has children, so
+					   // it is kind of complicated.
+	  const RefinementCase<dim-1> our_face_ref_case
+	    =GeometryInfo<dim>::face_refinement_case(ref_case,f,f_or,f_fl,f_ro);
+	  const RefinementCase<dim-1> face_ref_case
+	    =cell->face(f)->refinement_case();
+		    
+	  switch (static_cast<unsigned char> (face_ref_case))
+	    {
+	      case RefinementCase<dim>::no_refinement:
+						     // in this case neither our
+						     // cell nor the neighbor is
+						     // refined along face
+						     // f. however, the above
+						     // case should have caught
+						     // this situation, as the
+						     // neighbor has to be
+						     // active then.
+		    Assert (false, ExcInternalError());
+		    break;
+	      case RefinementCase<dim>::cut_x:
+	      case RefinementCase<dim>::cut_y:
+	      case RefinementCase<dim>::cut_xy:
+	      {
+			  
+						 // this is really tricky and
+						 // originally there were some
+						 // 800 lines of code which were
+						 // still buggy. thus we use a
+						 // different kind of approach
+						 // here: we create a map of our
+						 // child cells at the given
+						 // face with the (sub)face as
+						 // key. Then create a
+						 // corresponding (multi-)map of
+						 // the neighbor and its
+						 // children. As a third
+						 // ingredient, we need a map
+						 // pointing us from a face to
+						 // its parent.
+		const unsigned int nb_nb=cell->neighbor_face_no(f);
+			  
+		std::map<face_iterator,cell_iterator> our_children;
+						 // we only need to fill this
+						 // map, if the cell was just
+						 // refined. after coarsening,
+						 // we should use our own cell
+						 // instead
+		if (refining)
+		  for (unsigned int c=0; c<std::max(GeometryInfo<dim-1>::n_children(our_face_ref_case),1U); ++c)
+		    {
+		      cell_iterator child=
+			cell->child(GeometryInfo<dim>::child_cell_on_face(ref_case,
+									  f,c,
+									  f_or,
+									  f_fl,
+									  f_ro,
+									  our_face_ref_case));
+		      our_children.insert(std::make_pair(child->face(f),child));
+		    }
+		else
+		  our_children.insert(std::make_pair(cell->face(f),cell));
+			  
+		std::map<face_iterator,face_iterator> parents;
+		for (unsigned int face_child=0; face_child<neighbor->face(nb_nb)->n_children(); ++face_child)
+		  parents.insert(std::make_pair(neighbor->face(nb_nb)->child(face_child),neighbor->face(nb_nb)));
+		bool inserted=true;
+		while (inserted)
+		  {
+		    inserted=false;
+		    std::map<face_iterator,face_iterator>::iterator cur_face=parents.begin();
+		    for (;cur_face!=parents.end(); ++cur_face)
+		      if (cur_face->first->has_children())
+			for (unsigned int fc=0; fc<cur_face->first->n_children(); ++fc)
+			  if (parents.find(cur_face->first->child(fc))==parents.end())
+			    {
+			      parents.insert(std::make_pair(cur_face->first->child(fc),cur_face->first));
+			      inserted=true;
+			    }
+		  }
+			  
+		const bool nb_f_or=neighbor->face_orientation(nb_nb);
+		const bool nb_f_fl=neighbor->face_flip(nb_nb);
+		const bool nb_f_ro=neighbor->face_rotation(nb_nb);
+			  
+		std::multimap<face_iterator,cell_iterator> nb_children;
+		nb_children.insert(std::make_pair(neighbor->face(nb_nb),neighbor));
+			  
+		int current_level=neighbor->level();
+		inserted=true;
+		while (inserted)
+		  {
+		    inserted=false;
+		    std::multimap<face_iterator,cell_iterator>::iterator it=nb_children.begin();
+		    for (;it!=nb_children.end(); ++it)
+						       // only treat
+						       // untreated
+						       // cells,
+						       // i.e. those
+						       // with
+						       // level()==current_level
+		      if (it->second->level()==current_level &&
+			  it->second->has_children())
+			{
+			  RefinementCase<dim-1> nb_face_ref_case
+			    =GeometryInfo<dim>::face_refinement_case(it->second->refinement_case(),
+								     nb_nb,
+								     nb_f_or,
+								     nb_f_fl,
+								     nb_f_ro);
+			  for (unsigned int c=0; c<std::max(GeometryInfo<dim-1>::n_children(nb_face_ref_case),1U); ++c)
+			    {
+			      cell_iterator child=
+				it->second->child(GeometryInfo<dim>::child_cell_on_face(it->second->refinement_case(),
+											nb_nb,c,
+											nb_f_or,
+											nb_f_fl,
+											nb_f_ro,
+											nb_face_ref_case));
+			      nb_children.insert(std::make_pair(child->face(nb_nb),child));
+			      inserted=true;
+			    }
+			}
+		    ++current_level;
+		  }
+
+						 // now loop over all of our
+						 // children and set their
+						 // neighbor, if available. only
+						 // necessary, if we are
+						 // refining.
+
+						 // declare some iterator which
+						 // are needed in any case
+		std::map<face_iterator,cell_iterator>::iterator our_it=our_children.begin(),
+							    end_our_it=our_children.end();
+		std::multimap <face_iterator,cell_iterator>::iterator nb_it, end_nb_it;
+		
+		if (refining)
+		  {
+		    for (; our_it!=end_our_it; ++our_it)
+		      {
+			face_iterator parent_face=our_it->first;
+			bool further_parents=true;
+			
+			while(further_parents &&
+			      nb_children.find(parent_face)==nb_children.end())
+			  {
+			    if (parents.find(parent_face)==parents.end())
+			      further_parents=false;
+			    parent_face=parents.find(parent_face)->second;
+			  }
+			      
+			if (further_parents)
+							   // we found a
+							   // corresponding
+							   // neighbor_child. if
+							   // not, do nothing,
+							   // as the default
+							   // neighbor set above
+							   // is correct.
+			  {
+			    nb_it=nb_children.lower_bound(parent_face);
+			    end_nb_it=nb_children.upper_bound(parent_face);
+			    
+							     // advance to
+							     // the last
+							     // child at
+							     // the given
+							     // face, as
+							     // this is on
+							     // the
+							     // highest
+							     // level and
+							     // thus the
+							     // finest one
+							     // possible
+			    for (; nb_it!=end_nb_it; ++nb_it)
+			      our_it->second->set_neighbor(f, nb_it->second);
+			  }
+		      }
+		  }
+		
+						 // now do the same for the
+						 // neighbor and its
+						 // children. this is also
+						 // necessary if we are
+						 // coarsening
+		nb_it=nb_children.begin();
+		end_nb_it=nb_children.end();
+			  
+		for (; nb_it!=end_nb_it; ++nb_it)
+		  {
+		    face_iterator parent_face=nb_it->first;
+		    bool further_parents=true;
+		    
+		    while(further_parents &&
+			  our_children.find(parent_face)==our_children.end())
+		      {
+			if (parents.find(parent_face)==parents.end())
+			  further_parents=false;
+			parent_face=parents.find(parent_face)->second;
+		      }
+		    
+		    if (further_parents)
+						       // we found a
+						       // corresponding
+						       // child. if
+						       // not, do
+						       // nothing, as
+						       // the old
+						       // neighbor is
+						       // still
+						       // correct.
+		      {
+							 // here, we
+							 // only have
+							 // one child
+							 // at any
+							 // given
+							 // face, so
+							 // we do not
+							 // need a
+							 // loop.
+			our_it=our_children.find(parent_face);
+			nb_it->second->set_neighbor(nb_nb, our_it->second);
+		      }
+		  }
+		break;
+	      }
+	      default:
+		    Assert(false, ExcInternalError());
+		    break;
+	    }// switch (our_face_ref_case)
+		    
+	}// else -> neighbor has children
+    }// for all faces
+}
+
+#else
+
+template<int dim>
+void
+Triangulation<dim>::update_neighbors(cell_iterator &,
+				     bool)
+{
+  Assert(false, ExcNotImplemented());
+}
+
+#endif
 
 
 // explicit instantiations

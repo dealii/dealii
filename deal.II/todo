@@ -1,0 +1,144 @@
+1[DONE]  rename RefineCase -> RefinementCase
+
+2[DONE] rename FaceRefineCase -> FaceRefinementCase
+
+3[DONE] move FaceRefinementCase into internal namespace
+ [2,3:DONE:  FaceRefineCase has been renamed to internal::SubfaceCase which
+   is now derived from internal::SubfacePossibilities in analogy to
+   RefinementCase and RefinementPossibilities]
+
+4[DONE] move global anisotropic_refinement parameter to Triangulation,
+  throw exceptions when aniso data is required but not implemented
+
+5 one or two tests on aniso for continuous FE in 2d.
+
+6 make the DG tests in tests/aniso/ work
+
+7[DONE] add docu to FaceRefinementFlags.
+  "R: I think it is already there! W: What I meant is that the
+  documentation about which cases occur is there, but the explanation
+  why it is these cases and exactly these is missing. This was the
+  question about invariants. If you could add a couple of sentences that
+  would be helpful.
+
+8[DONE] modify FaceRefinementFlags according to the changes in RefinementFlags
+
+9[DONE] add some docu to the neighbor_is_coarser function like
+  "T: In an anisotropic setting, a cell con only be coarser than another
+   one at a given face, not on a general basis. The face of the finer
+cell is contained in the corresponding face of the coarser cell, the
+finer face is either a child or a grandchild of the coarser face. Of
+coarse we could try to add some sentences explaining this. By the way:
+consider two cells neighboring cells on an initial grid. We can NOT
+refine the cells in a way that one cell refines a face with cut_x and
+the neighboring one refines the same face with
+cut_y. Triangulation<dim>::prepare_coarsening_and_refinement() takes
+care of this situation and ensures that each face of a refined cell is
+completely contained in a single face of neighboring cells."
+
+10[DONE] setup a (doxygen) module for anisotropic, it should
+  "W: list the relevant classes, links to step-30, and links to a
+paper reference of the relevant algorithms. If we had a module
+anisotropic, we could for example list the RefinementCase and
+GeometryInfo, the Triangulation. Note, that classes can be part
+of several modules so the module would list everything that is related to
+anisotropic refinement"
+
+11[DONE] Swap arguments to FE::get_{restriction,prolongation}_matrix and
+give the refinement flag a default value to keep things compatible.
+
+12[DONE] Document FiniteElement::restriction and FiniteElement::prolongation
+indices and layout
+
+13[DONE] Modify documentation for changed FETools functions:
+   FETools::compute_{embedding,projection}_matrices
+
+14[DONE] Move the code that initializes the sizes of the
+FiniteElement::restriction and FiniteElement::prolongation members
+from individual FE implementations to a function in the base class,
+since it is always the same.
+
+15[DONE] doc/news/anisotropic.html:
+	I guess you started this file before we switched to using doxygen for
+	the changes file: It is no longer necessary to do things like 
+	<code class="class">CLASS</code> :: <code
+	class="member">MEMBER</code>. Since we run the changes.h file through
+	doxygen, it will automatically be linked to the right function if you
+	omit all the HTML stuff. Simply use the style in changes.h
+
+16[DONE] deal.II/source/grid/tria.cc:
+	In this file, you now have code like this:
+	------------------------------
+	+		  Point<dim> new_bound=boundary[face->boundary_indicator()]
+	+#if deal_II_dimension == 2
+	+				       ->get_new_point_on_line (face);
+	+#else
+	+				       ->get_new_point_on_quad (face);
+	+#endif
+	------------------------------
+	We've tried to avoid this because we always thought that eventually we
+	may want to go to a scheme where each file is only compiled once for
+	all space dimensions at the same time, by simply deleting all the #if
+	deal_II_dimension lines. This isn't going to work here. Would you mind
+	changing this somehow? I guess one way might be to give the Boundary
+	base class a method get_new_point_on_face and let it call either of
+	the two functions above. 
+
+16a[DONE] As a sidenote: this (and a great number of other) variables could well
+	have been made const, to allow the compiler to optimize and make it
+	clear to the reader that no further assignments are happening below.
+
+17 changes to Mapping*, FEValuesBase:
+	Can these be committed separately? I forgot what we said about the
+	name jacobian_grad -- I think we should settle on 'hessian' as unified
+	by Guido a while back. Are there any testcases that test the new
+	functionality?
+
+18[DONE] deal.II/include/fe/fe.h:
+	Add a comment to restriction_is_implemented() that it tests the stronger
+	requirement that the element does not only implement isotropic
+	restriction as tested by the isotropic_restriction_is_implemented()
+	function, but also anisotropic. Same for prolongation.
+
+19[DONE] deal.II/include/numerics/derivative_approximation.h:
+	The new function get_active_neighbors() would appear to be generally
+	useful. Could it be moved into the GridTools class? There are already
+	a few similar functions there.
+19a     Could be committed separately.
+
+20 deal.II/include/grid/tria_accessor.h:
+20a[DONE] The new function neighbor_is_coarser_internal() returns two values,
+	one as return value and one as reference argument. I find this
+	weird. Please let it return either a std::pair<...>
+   [20a DONE: The neighbor_is_coarser_internal has been replaced by a
+        new neighbor_of_coarser_internal function with simple interface]
+
+20b[DONE] In the functions flag_for_*_refinement(), make input arguments const.
+
+20c[DONE] iso_set_children(): please spell it out as "isotropic". We'll forget
+	what "iso" stood for once the anisotropic work has become normal for
+	us. Same for iso_child() etc.
+
+20d[DONE] middle_vertex_index(): please make it return an unsigned int and
+	return numbers::invalid_unsigned_int in case of an error. This is how
+	we do it all through the library.
+
+20e[DONE] there are several refine_case, clear_refine_case, set_refine_case
+	functions. please rename them to use refinement_case instead of
+	refine_case to match the name of the argument type.
+
+21[DONE] deal.II/include/grid/tria_accessor.templates.h:
+	many of the new functions in this file take input arguments that they
+	don't change but which are not marked as 'const'. please fix, they're
+	easy to find by searching for "(unsigned" or "(Refinement" for example.
+
+22[DONE] deal.II/include/grid/tria_levels.h:
+	please rename fields to refinement_case from refine_case. it would be
+	useful to also grep for any other occurrences of refine_case anywhere
+	left over.
+
+23[DONE] deal.II/include/grid/tria_objects.h:
+	in the documentation, use <code>...</code> instead of
+	<tt>...</tt>. More importantly, however, if you use a template
+	argument <dim> or <2> inside such a block, it needs to be written as
+	@<2@>

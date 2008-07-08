@@ -75,17 +75,18 @@ FE_ABF<dim>::FE_ABF (const unsigned int deg)
 				   // will be the correct ones, not
 				   // the raw shape functions anymore.
   
-
-				   // initialize the various matrices
-  for (unsigned int i=0; i<GeometryInfo<dim>::children_per_cell; ++i)
-    {
-      this->prolongation[i].reinit (n_dofs, n_dofs);
-      this->restriction[i].reinit (n_dofs, n_dofs);
-    }
-
+				   // Reinit the vectors of
+				   // restriction and prolongation
+				   // matrices to the right sizes.
+				   // Restriction only for isotropic
+				   // refinement
+  this->reinit_restriction_and_prolongation_matrices(true);
+				   // Fill prolongation matrices with embedding operators
   FETools::compute_embedding_matrices (*this, this->prolongation);
+
   initialize_restriction ();
 
+				   // TODO[TL]: for anisotropic refinement we will probably need a table of submatrices with an array for each refine case
   std::vector<FullMatrix<double> >
     face_embeddings(1<<(dim-1), FullMatrix<double>(this->dofs_per_face,
 						   this->dofs_per_face));
@@ -338,8 +339,9 @@ template <int dim>
 void
 FE_ABF<dim>::initialize_restriction()
 {
-  for (unsigned int i=0;i<GeometryInfo<dim>::children_per_cell;++i)
-    this->restriction[i].reinit(0,0);
+  unsigned int iso=RefinementCase<dim>::isotropic_refinement-1;
+  for (unsigned int i=0;i<GeometryInfo<dim>::max_children_per_cell;++i)
+    this->restriction[iso][i].reinit(0,0);
 }
 
 #else
@@ -358,6 +360,7 @@ template <int dim>
 void
 FE_ABF<dim>::initialize_restriction()
 {
+  unsigned int iso=RefinementCase<dim>::isotropic_refinement-1;
   QGauss<dim-1> q_base (rt_order+1);
   const unsigned int n_face_points = q_base.size();
 				   // First, compute interpolation on
@@ -380,7 +383,7 @@ FE_ABF<dim>::initialize_restriction()
 	    = this->shape_value_component(i, q_face.point(k),
 					  GeometryInfo<dim>::unit_normal_direction[face]);
 
-      for (unsigned int sub=0;sub<GeometryInfo<dim>::subfaces_per_face;++sub)
+      for (unsigned int sub=0;sub<GeometryInfo<dim>::max_children_per_face;++sub)
 	{
 					   // The weight fuctions for
 					   // the coarse face are
@@ -389,7 +392,8 @@ FE_ABF<dim>::initialize_restriction()
 	  Quadrature<dim> q_sub
 	    = QProjector<dim>::project_to_subface(q_base, face, sub);
 	  const unsigned int child
-	    = GeometryInfo<dim>::child_cell_on_face(face, sub);
+	    = GeometryInfo<dim>::child_cell_on_face(
+	      RefinementCase<dim>::isotropic_refinement, face, sub);
 	  
 					   // On a certain face, we must
 					   // compute the moments of ALL
@@ -412,7 +416,7 @@ FE_ABF<dim>::initialize_restriction()
 						   // subcell are NOT
 						   // transformed, so we
 						   // have to do it here.
-		  this->restriction[child](face*this->dofs_per_face+i_face,
+		  this->restriction[iso][child](face*this->dofs_per_face+i_face,
 				     i_child)
 		    += Utilities::fixed_power<dim-1>(.5) * q_sub.weight(k)
 		    * cached_values(i_child, k)
@@ -452,7 +456,7 @@ FE_ABF<dim>::initialize_restriction()
       for (unsigned int d=0;d<dim;++d)
 	cached_values(i,k,d) = this->shape_value_component(i, q_cell.point(k), d);
   
-  for (unsigned int child=0;child<GeometryInfo<dim>::children_per_cell;++child)
+  for (unsigned int child=0;child<GeometryInfo<dim>::max_children_per_cell;++child)
     {
       Quadrature<dim> q_sub = QProjector<dim>::project_to_child(q_cell, child);
       
@@ -461,7 +465,7 @@ FE_ABF<dim>::initialize_restriction()
 	  for (unsigned int d=0;d<dim;++d)
 	    for (unsigned int i_weight=0;i_weight<polynomials[d]->n();++i_weight)
 	      {
-		this->restriction[child](start_cell_dofs+i_weight*dim+d,
+		this->restriction[iso][child](start_cell_dofs+i_weight*dim+d,
 				   i_child)
 		  += q_sub.weight(k)
 		  * cached_values(i_child, k, d)

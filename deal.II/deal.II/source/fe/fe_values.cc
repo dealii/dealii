@@ -308,6 +308,12 @@ FEValuesData<dim>::initialize (const unsigned int        n_quadrature_points,
   if (flags & update_JxW_values)
     this->JxW_values.resize(n_quadrature_points);
 
+  if (flags & update_jacobians)
+    this->jacobians.resize(n_quadrature_points);
+
+  if (flags & update_jacobian_grads)
+    this->jacobian_grads.resize(n_quadrature_points);
+
   if (flags & update_boundary_forms)
     this->boundary_forms.resize(n_quadrature_points);
 
@@ -1378,7 +1384,9 @@ void FEValues<dim>::do_reinit ()
 				     quadrature,
 				     *this->mapping_data,
 				     this->quadrature_points,
-				     this->JxW_values);
+				     this->JxW_values,
+				     this->jacobians,
+				     this->jacobian_grads);
   
   this->get_fe().fill_fe_values(this->get_mapping(),
 				*this->present_cell,
@@ -1761,11 +1769,11 @@ void FESubfaceValues<dim>::reinit (const typename DoFHandler<dim>::cell_iterator
 				   // we must use following workaround
 				   // of two separate assertions
   Assert (cell->face(face_no)->has_children() ||
-	  subface_no < GeometryInfo<dim>::subfaces_per_face,
-	  ExcIndexRange (subface_no, 0, GeometryInfo<dim>::subfaces_per_face));
+	  subface_no < GeometryInfo<dim>::max_children_per_face,
+	  ExcIndexRange (subface_no, 0, GeometryInfo<dim>::max_children_per_face));
   Assert (!cell->face(face_no)->has_children() ||
-	  subface_no < cell->face(face_no)->n_children(),
-	  ExcIndexRange (subface_no, 0, cell->face(face_no)->n_children()));
+	  subface_no < cell->face(face_no)->number_of_children(),
+	  ExcIndexRange (subface_no, 0, cell->face(face_no)->number_of_children()));
 
   Assert (cell->has_children() == false,
           ExcMessage ("You can't use subface data for cells that are "
@@ -1806,8 +1814,8 @@ void FESubfaceValues<dim>::reinit (const typename hp::DoFHandler<dim>::cell_iter
 	  typename FEValuesBase<dim>::ExcFEDontMatch());
   Assert (face_no < GeometryInfo<dim>::faces_per_cell,
 	  ExcIndexRange (face_no, 0, GeometryInfo<dim>::faces_per_cell));
-  Assert (subface_no < cell->face(face_no)->n_children(),
-	  ExcIndexRange (subface_no, 0, cell->face(face_no)->n_children()));
+  Assert (subface_no < cell->face(face_no)->number_of_children(),
+	  ExcIndexRange (subface_no, 0, cell->face(face_no)->number_of_children()));
   Assert (cell->has_children() == false,
           ExcMessage ("You can't use subface data for cells that are "
                       "already refined. Iterate over their children "
@@ -1841,8 +1849,8 @@ void FESubfaceValues<dim>::reinit (const typename MGDoFHandler<dim>::cell_iterat
 	   typename FEValuesBase<dim>::ExcFEDontMatch());
   Assert (face_no < GeometryInfo<dim>::faces_per_cell,
 	  ExcIndexRange (face_no, 0, GeometryInfo<dim>::faces_per_cell));
-  Assert (subface_no < cell->face(face_no)->n_children(),
-	  ExcIndexRange (subface_no, 0, cell->face(face_no)->n_children()));
+  Assert (subface_no < cell->face(face_no)->number_of_children(),
+	  ExcIndexRange (subface_no, 0, cell->face(face_no)->number_of_children()));
   Assert (cell->has_children() == false,
           ExcMessage ("You can't use subface data for cells that are "
                       "already refined. Iterate over their children "
@@ -1899,18 +1907,77 @@ template <int dim>
 void FESubfaceValues<dim>::do_reinit (const unsigned int face_no,
                                       const unsigned int subface_no)
 {
-
-				   // set the present face index
+				   // first of all, set the present_face_index
+				   // (if available)
   const typename Triangulation<dim>::cell_iterator cell=*this->present_cell;
-  unsigned int real_subface_no=subface_no;
-  if (dim==3)
-    real_subface_no=GeometryInfo<dim>::standard_to_real_face_vertex(
-      subface_no, cell->face_orientation(face_no), cell->face_flip(face_no), cell->face_rotation(face_no));
-  if (cell->face(face_no)->has_children())
-    this->present_face_index=cell->face(face_no)->child_index(real_subface_no);
-  else
-    this->present_face_index=cell->face_index(face_no);
 
+  if (!cell->face(face_no)->has_children())
+				     // no subfaces at all, so set
+				     // present_face_index to this face rather
+				     // than any subface
+    this->present_face_index=cell->face_index(face_no);
+  else
+    if (dim!=3)
+      this->present_face_index=cell->face(face_no)->child_index(subface_no);
+    else
+      {
+					 // this is the same logic we use in
+					 // cell->neighbor_child_on_subface(). See
+					 // there for an explanation of the
+					 // different cases
+	unsigned int subface_index=numbers::invalid_unsigned_int;
+	switch (cell->subface_case(face_no))
+	  {
+	    case internal::SubfaceCase<3>::case_x:
+	    case internal::SubfaceCase<3>::case_y:
+	    case internal::SubfaceCase<3>::case_xy:
+		  subface_index=cell->face(face_no)->child_index(subface_no);
+		  break;
+	    case internal::SubfaceCase<3>::case_x1y2y:
+	    case internal::SubfaceCase<3>::case_y1x2x:
+		  subface_index=cell->face(face_no)->child(subface_no/2)->child_index(subface_no%2);
+		  break;
+	    case internal::SubfaceCase<3>::case_x1y:
+	    case internal::SubfaceCase<3>::case_y1x:
+		  switch (subface_no)
+		    {
+		      case 0:
+		      case 1:
+			    subface_index=cell->face(face_no)->child(0)->child_index(subface_no);
+			    break;
+		      case 2:
+			    subface_index=cell->face(face_no)->child_index(1);
+			    break;
+		      default:
+			    Assert(false, ExcInternalError());
+		    }
+		  break;
+	    case internal::SubfaceCase<3>::case_x2y:
+	    case internal::SubfaceCase<3>::case_y2x:
+		  switch (subface_no)
+		    {
+		      case 0:
+			    subface_index=cell->face(face_no)->child_index(0);
+			    break;
+		      case 1:
+		      case 2:
+			    subface_index=cell->face(face_no)->child(1)->child_index(subface_no-1);
+			    break;
+		      default:
+			    Assert(false, ExcInternalError());
+		    }
+		  break;
+	    default:
+		  Assert(false, ExcInternalError());
+		  break;
+	  }
+	Assert(subface_index!=numbers::invalid_unsigned_int,
+	       ExcInternalError());
+	this->present_face_index=subface_index;
+      }
+  
+				   // now ask the mapping and the finite element
+				   // to do the actual work
   this->get_mapping().fill_fe_subface_values(*this->present_cell,
                                              face_no, subface_no,
 					     this->quadrature,

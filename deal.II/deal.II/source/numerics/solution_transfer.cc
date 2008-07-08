@@ -201,13 +201,16 @@ prepare_for_coarsening_and_refinement(const std::vector<Vector<number> > &all_in
     }
   Assert((n_cells_to_coarsen+n_cells_to_stay_or_refine)==n_active_cells,
 	 ExcInternalError());
-  Assert(n_cells_to_coarsen%GeometryInfo<dim>::children_per_cell==0,
-	 ExcInternalError());
-  Assert(n_cells_to_coarsen%GeometryInfo<dim>::children_per_cell==0,
-	 ExcTriaPrepCoarseningNotCalledBefore());
+
+  unsigned int n_coarsen_fathers=0;
+  typename DH::cell_iterator
+    cell=dof_handler->begin();
+  for (; cell!=endc; ++cell)
+    if (!cell->active() && cell->child(0)->coarsen_flag_set())
+      ++n_coarsen_fathers;
   
-  const unsigned int n_coarsen_fathers = n_cells_to_coarsen /
-					 GeometryInfo<dim>::children_per_cell;
+  if (n_cells_to_coarsen)
+    Assert(n_cells_to_coarsen>=2*n_coarsen_fathers, ExcInternalError());
 
 				   // allocate the needed memory. initialize
                                    // the following arrays in an efficient
@@ -225,7 +228,7 @@ prepare_for_coarsening_and_refinement(const std::vector<Vector<number> > &all_in
 				   // the 'to_stay_or_refine' cells 'n_sr' and
 				   // the 'coarsen_fathers' cells 'n_cf',
   unsigned int n_sr=0, n_cf=0;
-  typename DH::cell_iterator cell = dof_handler->begin();  
+  cell = dof_handler->begin();  
   for (; cell!=endc; ++cell) 
     {
       if (cell->active() && !cell->coarsen_flag_set())

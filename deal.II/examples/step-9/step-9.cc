@@ -1645,7 +1645,7 @@ GradientEstimation::estimate_interval (const DoFHandler<dim> &dof_handler,
 				   // neighbors is computed here.
   std::vector<typename DoFHandler<dim>::active_cell_iterator> active_neighbors;
   active_neighbors.reserve (GeometryInfo<dim>::faces_per_cell *
-			    GeometryInfo<dim>::subfaces_per_face);
+			    GeometryInfo<dim>::max_children_per_face);
 
 				   // Well then, after all these
 				   // preliminaries, lets start the

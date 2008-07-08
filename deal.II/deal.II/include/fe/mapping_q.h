@@ -231,7 +231,9 @@ class MappingQ : public MappingQ1<dim>
 		    const Quadrature<dim>                &quadrature,
 		    typename Mapping<dim>::InternalDataBase &mapping_data,
 		    typename std::vector<Point<dim> >             &quadrature_points,
-		    std::vector<double>                  &JxW_values) const ;
+		    std::vector<double>                  &JxW_values,
+		    std::vector<Tensor<2,dim> >          &jacobians,
+		    std::vector<Tensor<3,dim> >          &jacobian_grads) const ;
 
 				     /**
 				      * Implementation of the interface in

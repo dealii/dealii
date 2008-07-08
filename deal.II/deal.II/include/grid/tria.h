@@ -724,6 +724,14 @@ namespace internal
  *     @p limit_level_difference_at_vertices, situations as the above one are
  *     eliminated by also marking the lower left cell for refinement.
  *
+ *     In case of anisotropic refinement, the level of a cell is not linked to
+ *     the refinement of a cell as directly as in case of isotropic
+ *     refinement. Furthermore, a cell can be strongly refined in one direction
+ *     and not or at least much less refined in another. Therefore, it is very
+ *     difficult to decide, which cases should be excluded from the refinement
+ *     process. As a consequence, when using anisotropic refinement, the @p
+ *     limit_level_difference_at_vertices flag must not be set.
+ *
  *   <li> @p eliminate_unrefined_islands:
  *     Single cells which are not refined and are surrounded by cells which are
  *     refined usually also lead to a sharp decline in approximation properties
@@ -819,6 +827,32 @@ namespace internal
  *   <li> @p maximum_smoothing:
  *     This flag includes all the above ones and therefore combines all
  *     smoothing algorithms implemented.
+ *
+ *   <li> @p allow_anisotropic_smoothing: 
+ *     This flag is not included in @p maximum_smoothing. The flag is
+ *     concerned with the following case: consider the case that an
+ *     unrefined and a refined cell share a common face and that one
+ *     of the children of the refined cell along the common face is
+ *     flagged for further refinement. In that case, the resulting
+ *     mesh would have more than one hanging node along one or more of
+ *     the edges of the triangulation, a situation that is not
+ *     allowed. Consequently, in order to perform the refinement, the
+ *     coarser of the two original cells is also going to be refined.
+ *
+ *     However, in many cases it is sufficient to refine the coarser
+ *     of the two original cells in an anisotropic way to avoid the
+ *     case of multiple hanging vertices on a single edge. Doing only
+ *     the minimal anisotropic refinement can save cells and degrees
+ *     of freedom. By specifying this flag, the library can produce
+ *     these anisotropic refinements.
+ *
+ *     The flag is not included by default since it may lead to
+ *     anisotropically refined meshes even though no cell has ever
+ *     been refined anisotropically explicitly by a user command. This
+ *     surprising fact may lead to programs that do the wrong thing
+ *     since they are not written for the additional cases that can
+ *     happen with anisotropic meshes, see the discussion in the
+ *     introduction to @ref step_30 "step-30".
  *
  *   <li> @p none:
  *     Select no smoothing at all.
@@ -1134,7 +1168,7 @@ namespace internal
  *   object, you should be well aware that you might involuntarily alter the
  *   data stored in the triangulation.
  *
- * @ingroup grid
+ * @ingroup grid aniso
  * @author Wolfgang Bangerth, 1998; Ralf Hartmann, 2005
  */
 template <int dim>
@@ -1172,6 +1206,8 @@ class Triangulation : public Subscriptor
 	  eliminate_unrefined_islands        = 0x2,
 	  patch_level_1                      = 0x4,
 	  coarsest_level_1                   = 0x8,
+
+	  allow_anisotropic_smoothing        = 0x10,
 	  
 	  eliminate_refined_inner_islands    = 0x100,
 	  eliminate_refined_boundary_islands = 0x200,
@@ -1183,7 +1219,7 @@ class Triangulation : public Subscriptor
 						eliminate_refined_boundary_islands |
 						do_not_produce_unrefined_islands),
 	  
-	  maximum_smoothing                  = 0xffff
+	  maximum_smoothing                  = 0xffff ^ allow_anisotropic_smoothing
     };
     
 
@@ -1735,6 +1771,12 @@ class Triangulation : public Subscriptor
 				      */
     void load_coarsen_flags (const std::vector<bool> &v);
 
+				     /**
+				      * Return whether this triangulation has
+				      * ever undergone anisotropic (as opposed
+				      * to only isotropic) refinement.
+				      */
+    bool get_anisotropic_refinement_flag() const;
     				     /*@}*/
 
 
@@ -3053,6 +3095,23 @@ class Triangulation : public Subscriptor
     void execute_coarsening ();
 
 				     /**
+				      * Actually refine a cell, i.e. create its
+				      * children. The faces of the cell have to
+				      * be refined already, whereas the inner
+				      * lines in 2D or lines and quads in 3D
+				      * will be created in this
+				      * function. Therefore iterator pointers
+				      * into the vectors of lines, quads and
+				      * cells have to be passed, which point at
+				      * (or "before") the reserved space.
+				      */
+    void create_children (unsigned int &next_unused_vertex,
+			  raw_line_iterator &next_unused_line,
+			  raw_quad_iterator &next_unused_quad,
+			  raw_cell_iterator &next_unused_cell,
+			  cell_iterator &cell);
+
+				     /**
 				      * Actually delete a cell, or rather all
 				      * its children, which is the main step for
 				      * the coarsening process.  This is the
@@ -3064,20 +3123,53 @@ class Triangulation : public Subscriptor
 				      * decide whether a refined line may be
 				      * coarsened or not in 3D. In 1D and 2D
 				      * this argument is not needed and thus
-				      * ignored.
+				      * ignored. The same applies for the last
+				      * argument and quads instead of lines.
 				      */
     void delete_children (cell_iterator &cell,
-			  std::vector<unsigned int> &cell_count);
+			  std::vector<unsigned int> &line_cell_count,
+			  std::vector<unsigned int> &quad_cell_count);
 
 				     /**
-				      * Fill the vector @p cell_count needed by
-				      * @p delete_children with the number of
-				      * cells containing a given line. As this
-				      * is only needed in 3D, it is only
-				      * implemented there and throws an
+				      * Set the neighbor information of all
+				      * outer neighbor of all children of the
+				      * given cell <tt>cell</tt>, if
+				      * <tt>refining=true</tt>. In this
+				      * constellation the function is called
+				      * after the creation of children in @p
+				      * execute_refinement. If
+				      * <tt>refining=false</tt>, it is assumed,
+				      * that the given cell is just coarsened,
+				      * i.e. that its children are about to be
+				      * deleted, thus they do not need new
+				      * neighbor information.
+				      *
+				      * In both cases, the neighbor information
+				      * of the cell's neighbors are updated, if
+				      * necessary.
+				      */
+    void update_neighbors (cell_iterator &cell,
+			   bool refining);
+    
+				     /**
+				      * Fill the vector @p line_cell_count
+				      * needed by @p delete_children with the
+				      * number of cells containing a given
+				      * line. As this is only needed in 3D, it
+				      * is only implemented there and throws an
 				      * exception otherwise.
 				      */
-    void count_cells_at_line (std::vector<unsigned int> &cell_count);
+    void count_cells_at_line (std::vector<unsigned int> &line_cell_count);
+
+				     /**
+				      * Fill the vector @p quad_cell_count
+				      * needed by @p delete_children with the
+				      * number of cells containing a given
+				      * quad. As this is only needed in 3D, it
+				      * is only implemented there and throws an
+				      * exception otherwise.
+				      */
+    void count_cells_at_quad (std::vector<unsigned int> &quad_cell_count);
 
 				     /**
 				      * Some dimension dependent stuff for
@@ -3099,11 +3191,35 @@ class Triangulation : public Subscriptor
     void prepare_refinement_dim_dependent ();
 
 				     /**
+				      * At the boundary of the domain, the new
+				      * point on the face may be far inside the
+				      * current cell, if the boundary has a
+				      * strong curvature. If we allow anisotropic
+				      * refinement here, the resulting cell may
+				      * be strongly distorted. To prevent this,
+				      * this function flags such cells for
+				      * isotropic refinement. It is called
+				      * automatically from
+				      * prepare_coarsening_and_refinement().
+				      */
+    void prevent_distorted_boundary_cells ();
+
+				     /**
 				      * Make sure that either all or none of
 				      * the children of a cell are tagged for
 				      * coarsening.
 				      */
     void fix_coarsen_flags ();
+    
+				     /**
+				      * Helper function for
+				      * @p fix_coarsen_flags. Return wether 
+				      * coarsening of this cell is allowed.
+				      * Coarsening can be forbidden if the
+				      * neighboring cells are or will be
+				      * refined twice along the common face. 
+				      */
+    bool coarsening_allowed (cell_iterator& cell);
 
 				     /**
 				      * Re-compute the number of
@@ -3176,6 +3292,13 @@ class Triangulation : public Subscriptor
 				      *  associated with a boundary.
 				      */
     SmartPointer<const Boundary<dim> > boundary[255];
+
+				     /**
+				      * Flag indicating whether
+				      * anisotropic refinement took
+				      * place.
+				      */
+    bool                             anisotropic_refinement;
 
 				     /**
 				      *  Do some smoothing in the process
@@ -3276,6 +3399,7 @@ template <> void Triangulation<2>::clear_user_pointers ();
 template <> void Triangulation<2>::clear_user_flags ();
 template <> void Triangulation<3>::clear_user_pointers ();
 template <> void Triangulation<3>::clear_user_flags ();
+template <> void Triangulation<1>::clear_user_flags_line ();
 template <> void Triangulation<1>::clear_user_flags_quad ();
 template <> void Triangulation<1>::save_user_flags_quad (std::ostream &) const;
 template <> void Triangulation<1>::save_user_flags_quad (std::vector<bool> &) const;
@@ -3286,11 +3410,14 @@ template <> void Triangulation<1>::save_user_flags_hex (std::ostream &) const;
 template <> void Triangulation<1>::save_user_flags_hex (std::vector<bool> &) const;
 template <> void Triangulation<1>::load_user_flags_hex (std::istream &);
 template <> void Triangulation<1>::load_user_flags_hex (const std::vector<bool> &);
+template <> void Triangulation<2>::clear_user_flags_quad ();
 template <> void Triangulation<2>::clear_user_flags_hex ();
 template <> void Triangulation<2>::save_user_flags_hex (std::ostream &) const;
 template <> void Triangulation<2>::save_user_flags_hex (std::vector<bool> &) const;
 template <> void Triangulation<2>::load_user_flags_hex (std::istream &);
 template <> void Triangulation<2>::load_user_flags_hex (const std::vector<bool> &);
+template <> void Triangulation<3>::clear_user_flags_quad ();
+template <> void Triangulation<3>::clear_user_flags_hex ();
 template <> Triangulation<1>::raw_cell_iterator Triangulation<1>::begin_raw (const unsigned int level) const;
 template <> Triangulation<1>::active_cell_iterator Triangulation<1>::begin_active (const unsigned int level) const;
 template <> Triangulation<1>::raw_cell_iterator Triangulation<1>::last_raw () const;
@@ -3385,10 +3512,25 @@ template <> void Triangulation<1>::execute_refinement ();
 template <> void Triangulation<2>::execute_refinement ();
 template <> void Triangulation<3>::execute_refinement ();
 template <> void Triangulation<3>::prepare_refinement_dim_dependent ();
-template <> void Triangulation<1>::delete_children (cell_iterator &cell, std::vector<unsigned int> &);
-template <> void Triangulation<2>::delete_children (cell_iterator &cell, std::vector<unsigned int> &);
-template <> void Triangulation<3>::delete_children (cell_iterator &cell, std::vector<unsigned int> &cell_count);
-template <> void Triangulation<3>::count_cells_at_line (std::vector<unsigned int> &cell_count);
+template <> void Triangulation<1>::delete_children (cell_iterator &cell,
+						    std::vector<unsigned int> &,
+						    std::vector<unsigned int> &);
+template <> void Triangulation<2>::delete_children (cell_iterator &cell,
+						    std::vector<unsigned int> &,
+						    std::vector<unsigned int> &);
+template <> void Triangulation<3>::delete_children (cell_iterator &cell,
+						    std::vector<unsigned int> &line_cell_count,
+						    std::vector<unsigned int> &quad_cell_count);
+template <> void Triangulation<2>::create_children (unsigned int &next_unused_vertex,
+						    raw_line_iterator &next_unused_line,
+						    raw_quad_iterator &next_unused_quad,
+						    raw_cell_iterator &next_unused_cell,
+						    cell_iterator &cell);
+template <> void Triangulation<3>::update_neighbors (cell_iterator &cell,
+						     bool refining);
+template <> void Triangulation<3>::count_cells_at_line (std::vector<unsigned int> &line_cell_count);
+template <> void Triangulation<3>::count_cells_at_quad (std::vector<unsigned int> &quad_cell_count);
+template <> void Triangulation<1>::prevent_distorted_boundary_cells ();
 template <> void Triangulation<1>::update_number_cache_quads ();
 template <> void Triangulation<1>::update_number_cache_hexes ();
 template <> void Triangulation<2>::update_number_cache_hexes ();

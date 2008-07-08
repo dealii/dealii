@@ -216,8 +216,14 @@ MappingQ<dim>::compute_shapes_virtual (const std::vector<Point<dim> > &unit_poin
       grads.resize(n_shape_functions);
     }
   
-				   // dummy variable of size 0
+//				   // dummy variable of size 0
   std::vector<Tensor<2,dim> > grad2;
+  if (data.shape_second_derivatives.size()!=0)
+    {
+      Assert(data.shape_second_derivatives.size()==n_shape_functions*n_points,
+	     ExcInternalError());
+      grad2.resize(n_shape_functions);
+    }
 
   
   if (data.shape_values.size()!=0 || data.shape_derivatives.size()!=0)
@@ -232,6 +238,10 @@ MappingQ<dim>::compute_shapes_virtual (const std::vector<Point<dim> > &unit_poin
 	if (data.shape_derivatives.size()!=0)
 	  for (unsigned int i=0; i<n_shape_functions; ++i)
 	    data.derivative(point,renumber[i]) = grads[i];
+
+      	if (data.shape_second_derivatives.size()!=0)
+	  for (unsigned int i=0; i<n_shape_functions; ++i)
+	    data.second_derivative(point,renumber[i]) = grad2[i];
       }
 }
 
@@ -295,7 +305,9 @@ MappingQ<dim>::fill_fe_values (const typename Triangulation<dim>::cell_iterator 
 			       const Quadrature<dim>                &q,
 			       typename Mapping<dim>::InternalDataBase       &mapping_data,
 			       std::vector<Point<dim> >             &quadrature_points,
-			       std::vector<double>                  &JxW_values) const
+			       std::vector<double>                  &JxW_values,
+			       std::vector<Tensor<2,dim> >          &jacobians,
+			       std::vector<Tensor<3,dim> >          &jacobian_grads) const
 {
 				   // convert data object to internal
 				   // data for this class. fails with
@@ -321,7 +333,8 @@ MappingQ<dim>::fill_fe_values (const typename Triangulation<dim>::cell_iterator 
     p_data=&data;
   
   MappingQ1<dim>::fill_fe_values(cell, q, *p_data,
-				 quadrature_points, JxW_values);
+				 quadrature_points, JxW_values,
+				 jacobians, jacobian_grads);
 }
 
 
@@ -371,7 +384,7 @@ MappingQ<dim>::fill_fe_face_values (const typename Triangulation<dim>::cell_iter
     p_data=&data;
 
   const unsigned int n_q_points=q.size();
-  this->compute_fill_face (cell, face_no, false,
+  this->compute_fill_face (cell, face_no, deal_II_numbers::invalid_unsigned_int,
                            n_q_points,
                            QProjector<dim>::DataSetDescriptor::
                            face (face_no,
@@ -435,7 +448,7 @@ MappingQ<dim>::fill_fe_subface_values (const typename Triangulation<dim>::cell_i
     p_data=&data;
 
   const unsigned int n_q_points=q.size();
-  this->compute_fill_face (cell, face_no, true,
+  this->compute_fill_face (cell, face_no, sub_no,
                            n_q_points,
                            QProjector<dim>::DataSetDescriptor::
                            subface (face_no, sub_no,

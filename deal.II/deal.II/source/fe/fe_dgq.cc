@@ -137,17 +137,15 @@ FE_DGQ<dim>::FE_DGQ (const unsigned int degree)
 		  std::vector<std::vector<bool> >(FiniteElementData<dim>(
 		    get_dpo_vector(degree),1, degree).dofs_per_cell, std::vector<bool>(1,true)))
 {
+				   // Reinit the vectors of
+				   // restriction and prolongation
+				   // matrices to the right sizes
+  this->reinit_restriction_and_prolongation_matrices();
 				   // Fill prolongation matrices with embedding operators
-  for (unsigned int i=0; i<GeometryInfo<dim>::children_per_cell; ++i)
-    this->prolongation[i].reinit (this->dofs_per_cell,
-				  this->dofs_per_cell);
   FETools::compute_embedding_matrices (*this, this->prolongation);
 				   // Fill restriction matrices with L2-projection
-  for (unsigned int i=0; i<GeometryInfo<dim>::children_per_cell; ++i)
-    this->restriction[i].reinit (this->dofs_per_cell,
-				  this->dofs_per_cell);
   FETools::compute_projection_matrices (*this, this->restriction);
-  
+			      
   
 				   // finally fill in support points
   if (degree == 0)
@@ -201,17 +199,16 @@ FE_DGQ<dim>::FE_DGQ (const Quadrature<1>& points)
 		  std::vector<std::vector<bool> >(FiniteElementData<dim>(
 		    get_dpo_vector(points.size()-1),1, points.size()-1).dofs_per_cell, std::vector<bool>(1,true)))
 {
-  for (unsigned int i=0; i<GeometryInfo<dim>::children_per_cell; ++i)
-    this->prolongation[i].reinit (this->dofs_per_cell,
-				  this->dofs_per_cell);
+				   // Reinit the vectors of
+				   // restriction and prolongation
+				   // matrices to the right sizes
+  this->reinit_restriction_and_prolongation_matrices();
+				   // Fill prolongation matrices with embedding operators
   FETools::compute_embedding_matrices (*this, this->prolongation);
 				   // Fill restriction matrices with L2-projection
-  for (unsigned int i=0; i<GeometryInfo<dim>::children_per_cell; ++i)
-    this->restriction[i].reinit (this->dofs_per_cell,
-				  this->dofs_per_cell);
   FETools::compute_projection_matrices (*this, this->restriction);
   
-				   // Compute support points, whivh
+				   // Compute support points, which
 				   // are the tensor product of the
 				   // Lagrange interpolation points in
 				   // the constructor.

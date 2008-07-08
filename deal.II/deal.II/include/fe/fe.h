@@ -14,7 +14,9 @@
 #define __deal2__fe_h
 
 #include <base/config.h>
+#include <base/geometry_info.h>
 #include <fe/fe_base.h>
+
 
 DEAL_II_NAMESPACE_OPEN
 
@@ -303,7 +305,7 @@ namespace hp
   for (unsigned int i=0; i<GeometryInfo<dim>::children_per_cell; ++i)
     this->prolongation[i].reinit (this->dofs_per_cell,
 				  this->dofs_per_cell);
-  FETools::compute_embedding_matrices (*this, &this->prolongation[0]);
+  FETools::compute_embedding_matrices (*this, this->prolongation);
  * @endcode
  *
  * <h5>Computing the #restriction matrices for error estimators</h5>
@@ -672,11 +674,18 @@ class FiniteElement : public Subscriptor,
 				      * If projection matrices are not
 				      * implemented in the derived
 				      * finite element class, this
-				      * function aborts with
-				      * ExcProjectionVoid.
+				      * function aborts with 
+				      * ExcProjectionVoid. You can
+				      * check whether this is the case
+				      * by calling the
+				      * restriction_is_implemented()
+				      * or the
+				      * isotropic_restriction_is_implemented()
+				      * function.
 				      */
     const FullMatrix<double> &
-    get_restriction_matrix (const unsigned int child) const;
+    get_restriction_matrix (const unsigned int child,
+			    const RefinementCase<dim> &refinement_case=RefinementCase<dim>::isotropic_refinement) const;
 
 				     /**
 				      * Embedding matrix between grids.
@@ -725,10 +734,14 @@ class FiniteElement : public Subscriptor,
 				      * ExcEmbeddingVoid. You can
 				      * check whether this is the case
 				      * by calling the
-				      * prolongation_is_implemented().
+				      * prolongation_is_implemented()
+				      * or the
+				      * isotropic_prolongation_is_implemented()
+				      * function.
 				      */
     const FullMatrix<double> &
-    get_prolongation_matrix (const unsigned int child) const;
+    get_prolongation_matrix (const unsigned int child,
+			     const RefinementCase<dim> &refinement_case=RefinementCase<dim>::isotropic_refinement) const;
 
                                      /**
                                       * Return whether this element implements
@@ -737,6 +750,18 @@ class FiniteElement : public Subscriptor,
                                       * the get_prolongation_matrix()
                                       * function will generate an error or
                                       * not.
+				      *
+				      * Note, that this function
+				      * returns <code>true</code> only
+				      * if the prolongation matrices of
+				      * the isotropic and all
+				      * anisotropic refinement cases
+				      * are implemented. If you are
+				      * interested in the prolongation
+				      * matrices for isotropic
+				      * refinement only, use the
+				      * isotropic_prolongation_is_implemented
+				      * function instead.
                                       *
                                       * This function is mostly here in order
                                       * to allow us to write more efficient
@@ -760,11 +785,51 @@ class FiniteElement : public Subscriptor,
 
                                      /**
                                       * Return whether this element implements
+                                      * its prolongation matrices for isotropic
+                                      * children. The return value also
+                                      * indicates whether a call to the @p
+                                      * get_prolongation_matrix function will
+                                      * generate an error or not.
+                                      *
+                                      * This function is mostly here in order
+                                      * to allow us to write more efficient
+                                      * test programs which we run on all
+                                      * kinds of weird elements, and for which
+                                      * we simply need to exclude certain
+                                      * tests in case something is not
+                                      * implemented. It will in general
+                                      * probably not be a great help in
+                                      * applications, since there is not much
+                                      * one can do if one needs these features
+                                      * and they are not implemented. This
+                                      * function could be used to check
+                                      * whether a call to
+                                      * <tt>get_prolongation_matrix()</tt> will
+                                      * succeed; however, one then still needs
+                                      * to cope with the lack of information
+                                      * this just expresses.
+                                      */
+    bool isotropic_prolongation_is_implemented () const;
+
+                                     /**
+                                      * Return whether this element implements
                                       * its restriction matrices. The return
                                       * value also indicates whether a call to
                                       * the get_restriction_matrix()
                                       * function will generate an error or
                                       * not.
+				      *
+				      * Note, that this function
+				      * returns <code>true</code> only
+				      * if the restriction matrices of
+				      * the isotropic and all
+				      * anisotropic refinement cases
+				      * are implemented. If you are
+				      * interested in the restriction
+				      * matrices for isotropic
+				      * refinement only, use the
+				      * isotropic_restriction_is_implemented
+				      * function instead.
                                       *
                                       * This function is mostly here in order
                                       * to allow us to write more efficient
@@ -785,6 +850,35 @@ class FiniteElement : public Subscriptor,
                                       * this just expresses.
                                       */
     bool restriction_is_implemented () const;
+
+                                     /**
+                                      * Return whether this element implements
+                                      * its restriction matrices for isotropic
+                                      * children. The return value also
+                                      * indicates whether a call to the @p
+                                      * get_restriction_matrix function will
+                                      * generate an error or not.
+                                      *
+                                      * This function is mostly here in order
+                                      * to allow us to write more efficient
+                                      * test programs which we run on all
+                                      * kinds of weird elements, and for which
+                                      * we simply need to exclude certain
+                                      * tests in case something is not
+                                      * implemented. It will in general
+                                      * probably not be a great help in
+                                      * applications, since there is not much
+                                      * one can do if one needs these features
+                                      * and they are not implemented. This
+                                      * function could be used to check
+                                      * whether a call to
+                                      * <tt>get_restriction_matrix()</tt> will
+                                      * succeed; however, one then still needs
+                                      * to cope with the lack of information
+                                      * this just expresses.
+                                      */
+    bool isotropic_restriction_is_implemented () const;
+    
 
 				     /**
 				      * Access the
@@ -826,7 +920,7 @@ class FiniteElement : public Subscriptor,
 				      * succeed or generate the
 				      * exception.
 				      */
-    const FullMatrix<double> & constraints () const;
+    const FullMatrix<double> & constraints (const internal::SubfaceCase<dim> &subface_case=internal::SubfaceCase<dim>::case_isotropic) const;
 
                                      /**
                                       * Return whether this element
@@ -858,7 +952,7 @@ class FiniteElement : public Subscriptor,
                                       * the lack of information this
                                       * just expresses.
                                       */
-    bool constraints_are_implemented () const;
+    bool constraints_are_implemented (const internal::SubfaceCase<dim> &subface_case=internal::SubfaceCase<dim>::case_isotropic) const;
 
 
                                      /**
@@ -1866,6 +1960,41 @@ class FiniteElement : public Subscriptor,
     DeclException0 (ExcJacobiDeterminantHasWrongSign);
     
   protected:
+
+				     /**
+				      * Reinit the vectors of
+				      * restriction and prolongation
+				      * matrices to the right sizes:
+				      * For every refinement case,
+				      * except for
+				      * RefinementCase::no_refinement,
+				      * and for every child of that
+				      * refinement case the space of
+				      * one restriction and
+				      * prolongation matrix is
+				      * allocated, see the
+				      * documentation of the
+				      * restriction and prolongation
+				      * vectors for more detail on the
+				      * actual vector sizes.
+				      *
+				      * @param
+				      * isotropic_restriction_only:
+				      * only the restriction matrices
+				      * required for isotropic
+				      * refinement are reinited to the
+				      * right size.
+				      * @param
+				      * isotropic_prolongation_only:
+				      * only the prolongation matrices
+				      * required for isotropic
+				      * refinement are reinited to the
+				      * right size.
+				      */
+    void reinit_restriction_and_prolongation_matrices(const bool isotropic_restriction_only=false,
+						      const bool isotropic_prolongation_only=false);
+    
+    
 				     /**
 				      * Store whether all shape
 				      * functions are primitive. Since
@@ -1878,7 +2007,7 @@ class FiniteElement : public Subscriptor,
     const bool cached_primitivity;
 
  				     /**
-				      * Array of projection
+				      * Vector of projection
 				      * matrices. See
 				      * get_restriction_matrix()
 				      * above. The constructor
@@ -1886,11 +2015,27 @@ class FiniteElement : public Subscriptor,
 				      * zero dimensions, which can be
 				      * changed by derived classes
 				      * implementing them.
+				      *
+				      * Note, that
+				      * <code>restriction[refinement_case-1][child]</code>
+				      * includes the restriction
+				      * matrix of child
+				      * <code>child</code> for the
+				      * RefinementCase
+				      * <code>refinement_case</code>. Here,
+				      * we use
+				      * <code>refinement_case-1</code>
+				      * instead of
+				      * <code>refinement_case</code>
+				      * as for
+				      * RefinementCase::no_refinement(=0)
+				      * there are no restriction
+				      * matrices available.
 				      */
-    FullMatrix<double> restriction[GeometryInfo<dim>::children_per_cell];
+    std::vector<std::vector<FullMatrix<double> > > restriction;
 
     				     /**
-				      * Array of embedding
+				      * Vector of embedding
 				      * matrices. See
 				      * <tt>get_prolongation_matrix()</tt>
 				      * above. The constructor
@@ -1898,8 +2043,24 @@ class FiniteElement : public Subscriptor,
 				      * zero dimensions, which can be
 				      * changed by derived classes
 				      * implementing them.
+				      *
+				      * Note, that
+				      * <code>prolongation[refinement_case-1][child]</code>
+				      * includes the prolongation
+				      * matrix of child
+				      * <code>child</code> for the
+				      * RefinementCase
+				      * <code>refinement_case</code>. Here,
+				      * we use
+				      * <code>refinement_case-1</code>
+				      * instead of
+				      * <code>refinement_case</code>
+				      * as for
+				      * RefinementCase::no_refinement(=0)
+				      * there are no prolongation
+				      * matrices available.
 				      */
-    FullMatrix<double> prolongation[GeometryInfo<dim>::children_per_cell];
+    std::vector<std::vector<FullMatrix<double> > > prolongation;
 
    				     /**
 				      * Specify the constraints which

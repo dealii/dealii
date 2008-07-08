@@ -352,7 +352,8 @@ FE_Poly<POLY,dim>::fill_fe_subface_values (const Mapping<dim>                   
 		   cell->face_orientation(face),
 		   cell->face_flip(face),
 		   cell->face_rotation(face),
-		   quadrature.size());
+		   quadrature.size(),
+		   cell->subface_case(face));
 
   const UpdateFlags flags(fe_data.update_once | fe_data.update_each);
 

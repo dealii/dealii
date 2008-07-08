@@ -2,7 +2,7 @@
 //    $Id$
 //    Version: $Name$
 //
-//    Copyright (C) 2004, 2005, 2006, 2007 by the deal.II authors
+//    Copyright (C) 2004, 2005, 2006, 2007, 2008 by the deal.II authors
 //
 //    This file is subject to QPL and may not be  distributed
 //    without copyright and license information. Please refer
@@ -129,16 +129,13 @@ FE_DGPMonomial<dim>::FE_DGPMonomial (const unsigned int degree)
 				   // DG doesn't have constraints, so
 				   // leave them empty
 
-				   // initialize the interpolation
-				   // matrices
-  for (unsigned int i=0; i<GeometryInfo<dim>::children_per_cell; ++i)
-    this->prolongation[i].reinit (this->dofs_per_cell,
-				  this->dofs_per_cell);
+				   // Reinit the vectors of
+				   // restriction and prolongation
+				   // matrices to the right sizes
+  this->reinit_restriction_and_prolongation_matrices();
+				   // Fill prolongation matrices with embedding operators
   FETools::compute_embedding_matrices (*this, this->prolongation);
 				   // Fill restriction matrices with L2-projection
-  for (unsigned int i=0; i<GeometryInfo<dim>::children_per_cell; ++i)
-    this->restriction[i].reinit (this->dofs_per_cell,
-				  this->dofs_per_cell);
   FETools::compute_projection_matrices (*this, this->restriction);
 }
 

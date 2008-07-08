@@ -311,7 +311,7 @@ class FE_DGP : public FE_Poly<PolynomialSpace<dim>,dim>
 					  * As @p embedding but for
 					  * projection matrices.
 					  */
-	static const double * const projection_matrices[][GeometryInfo<dim>::children_per_cell];
+	static const double * const projection_matrices[][GeometryInfo<dim>::max_children_per_cell];
 
 					 /**
 					  * As
@@ -356,19 +356,19 @@ class FE_DGP : public FE_Poly<PolynomialSpace<dim>,dim>
 // compiler allows us to do that (the standard says we must)
 #ifndef DEAL_II_MEMBER_VAR_SPECIALIZATION_BUG
 template <>
-const double * const FE_DGP<1>::Matrices::projection_matrices[][GeometryInfo<1>::children_per_cell];
+const double * const FE_DGP<1>::Matrices::projection_matrices[][GeometryInfo<1>::max_children_per_cell];
 
 template <>
 const unsigned int FE_DGP<1>::Matrices::n_projection_matrices;
 
 template <>
-const double * const FE_DGP<2>::Matrices::projection_matrices[][GeometryInfo<2>::children_per_cell];
+const double * const FE_DGP<2>::Matrices::projection_matrices[][GeometryInfo<2>::max_children_per_cell];
 
 template <>
 const unsigned int FE_DGP<2>::Matrices::n_projection_matrices;
 
 template <>
-const double * const FE_DGP<3>::Matrices::projection_matrices[][GeometryInfo<3>::children_per_cell];
+const double * const FE_DGP<3>::Matrices::projection_matrices[][GeometryInfo<3>::max_children_per_cell];
 
 template <>
 const unsigned int FE_DGP<3>::Matrices::n_projection_matrices;

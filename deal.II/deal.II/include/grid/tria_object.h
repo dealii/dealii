@@ -38,6 +38,8 @@ namespace internal
     class TriaObject
     {
       public:
+	static const unsigned int dimension = structdim;
+	
 					 /**
 					  * Default constructor,
 					  * setting all face indices

@@ -25,7 +25,7 @@ DEAL_II_NAMESPACE_OPEN
 
 template <>
 const double * const
-FE_Nedelec<1>::Matrices::embedding[][GeometryInfo<1>::children_per_cell] =
+FE_Nedelec<1>::Matrices::embedding[][GeometryInfo<1>::max_children_per_cell] =
 {{0}};
 
 

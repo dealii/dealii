@@ -68,19 +68,29 @@ FE_RaviartThomasNodal<dim>::FE_RaviartThomasNodal (const unsigned int deg)
 				   // will be the correct ones, not
 				   // the raw shape functions anymore.
   
-  for (unsigned int i=0; i<GeometryInfo<dim>::children_per_cell; ++i)
-    this->prolongation[i].reinit (this->dofs_per_cell,
-				  this->dofs_per_cell);
+				   // Reinit the vectors of
+				   // prolongation matrices to the
+				   // right sizes. There are no
+				   // restriction matrices implemented
+  for (unsigned int ref_case=RefinementCase<dim>::cut_x;
+       ref_case<RefinementCase<dim>::isotropic_refinement+1; ++ref_case)
+    {
+      const unsigned int nc = GeometryInfo<dim>::n_children(RefinementCase<dim>(ref_case));
+
+      for (unsigned int i=0;i<nc;++i)
+	this->prolongation[ref_case-1][i].reinit (n_dofs, n_dofs);
+    }
+				   // Fill prolongation matrices with embedding operators
   FETools::compute_embedding_matrices (*this, this->prolongation);
-  
-  FullMatrix<double> face_embeddings[GeometryInfo<dim>::subfaces_per_face];
-  for (unsigned int i=0; i<GeometryInfo<dim>::subfaces_per_face; ++i)
+				   // TODO[TL]: for anisotropic refinement we will probably need a table of submatrices with an array for each refine case
+  FullMatrix<double> face_embeddings[GeometryInfo<dim>::max_children_per_face];
+  for (unsigned int i=0; i<GeometryInfo<dim>::max_children_per_face; ++i)
     face_embeddings[i].reinit (this->dofs_per_face, this->dofs_per_face);
   FETools::compute_face_embedding_matrices(*this, face_embeddings, 0, 0);
   this->interface_constraints.reinit((1<<(dim-1)) * this->dofs_per_face,
 				     this->dofs_per_face);
   unsigned int target_row=0;
-  for (unsigned int d=0;d<GeometryInfo<dim>::subfaces_per_face;++d)
+  for (unsigned int d=0;d<GeometryInfo<dim>::max_children_per_face;++d)
     for (unsigned int i=0;i<face_embeddings[d].m();++i)
       {
 	for (unsigned int j=0;j<face_embeddings[d].n();++j)

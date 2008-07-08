@@ -311,6 +311,19 @@ TriaObjectAccessor<1,dim>::clear_user_flag () const
 }
 
 
+template <int dim>
+inline
+RefinementCase<1>
+TriaObjectAccessor<1, dim>::refinement_case() const
+{
+  Assert (this->state() == IteratorState::valid,
+	  TriaAccessorExceptions::ExcDereferenceInvalidObject());
+
+  return objects().children[this->present_index] != -1 ?
+    RefinementCase<1>::cut_x : RefinementCase<1>::no_refinement;
+}
+
+
 
 template <int dim>
 inline
@@ -338,6 +351,16 @@ TriaObjectAccessor<1,dim>::child_index (const unsigned int i) const
 
 template <int dim>
 inline
+int
+TriaObjectAccessor<1,dim>::isotropic_child_index (const unsigned int i) const
+{
+  return child_index(i);
+}
+
+
+
+template <int dim>
+inline
 TriaIterator<dim,TriaObjectAccessor<1,dim> >
 TriaObjectAccessor<1,dim>::child (const unsigned int i) const
 {
@@ -358,11 +381,34 @@ TriaObjectAccessor<1,dim>::child (const unsigned int i) const
 
 template <int dim>
 inline
+TriaIterator<dim,TriaObjectAccessor<1,dim> >
+TriaObjectAccessor<1,dim>::isotropic_child (const unsigned int i) const
+{
+				   // no anisotropic refinement in 1D
+  return child(i);
+}
+
+
+
+template <int dim>
+inline
 unsigned int
 TriaObjectAccessor<1,dim>::n_children () const
 {
   Assert (has_children()==true, TriaAccessorExceptions::ExcCellHasNoChildren());
-  return GeometryInfo<1>::children_per_cell;
+  return GeometryInfo<1>::max_children_per_cell;
+}
+
+
+
+template <int dim>
+inline
+unsigned int
+TriaObjectAccessor<1,dim>::middle_vertex_index () const
+{
+  if (has_children())
+    return child(0)->vertex_index(1);
+  return numbers::invalid_unsigned_int;
 }
 
 
@@ -432,7 +478,7 @@ TriaObjectAccessor<1,dim>::operator ++ ()
 				   // has no level)
   if (this->present_index
       >=
-      static_cast<int>(this->tria->faces->lines.cells.size()))
+      static_cast<int>(objects().cells.size()))
     this->present_index = -1;
 }
 
@@ -623,12 +669,61 @@ TriaObjectAccessor<2,dim>::line_index (const unsigned int i) const
 
 template <int dim>
 inline
+RefinementCase<2>
+TriaObjectAccessor<2, dim>::refinement_case () const
+{
+  Assert (this->state() == IteratorState::valid,
+	  TriaAccessorExceptions::ExcDereferenceInvalidObject());
+  Assert (static_cast<unsigned int> (this->present_index) <
+	  objects().refinement_cases.size(),
+	  ExcIndexRange(this->present_index, 0,
+			objects().refinement_cases.size()));
+
+  return objects().refinement_cases[this->present_index];
+}
+
+
+
+template <int dim>
+inline
+void
+TriaObjectAccessor<2, dim>::set_refinement_case (const RefinementCase<2> &refinement_case) const
+{
+  Assert (this->state() == IteratorState::valid,
+	  TriaAccessorExceptions::ExcDereferenceInvalidObject());
+  Assert (static_cast<unsigned int> (this->present_index) <
+	  objects().refinement_cases.size(),
+	  ExcIndexRange(this->present_index, 0,
+			objects().refinement_cases.size()));
+
+  objects().refinement_cases[this->present_index] = refinement_case;
+}
+
+
+template <int dim>
+inline
+void
+TriaObjectAccessor<2, dim>::clear_refinement_case () const
+{
+  Assert (this->state() == IteratorState::valid,
+	  TriaAccessorExceptions::ExcDereferenceInvalidObject());
+  Assert (static_cast<unsigned int> (this->present_index) <
+	  objects().refinement_cases.size(),
+	  ExcIndexRange(this->present_index, 0,
+			objects().refinement_cases.size()));
+
+  objects().refinement_cases[this->present_index] = RefinementCase<2>::no_refinement;
+}
+
+
+template <int dim>
+inline
 bool
 TriaObjectAccessor<2,dim>::has_children () const
 {
   Assert (this->state() == IteratorState::valid,
 	  TriaAccessorExceptions::ExcDereferenceInvalidObject());
-  return (objects().children[this->present_index] != -1);
+  return (objects().children[2*this->present_index] != -1);
 }
 
 
@@ -639,7 +734,43 @@ int TriaObjectAccessor<2,dim>::child_index (const unsigned int i) const
 {
   Assert (i<4, ExcIndexRange(i,0,4));
   Assert (has_children(), TriaAccessorExceptions::ExcCellHasNoChildren());
-  return objects().children[this->present_index]+i;
+  return objects().children[2*this->present_index+i/2]+i%2;
+}
+
+
+
+template <int dim>
+inline
+int TriaObjectAccessor<2,dim>::isotropic_child_index (const unsigned int i) const
+{
+  switch (static_cast<unsigned char> (refinement_case()))
+    {
+      case RefinementCase<dim>::cut_x:
+					     // this cell is refined with cut_x,
+					     // so the child has to be refined
+					     // with cut_y
+ 	    if(child(i%2)->refinement_case()==RefinementCase<dim>::cut_y)
+	      return child(i%2)->child_index(i/2);
+	    else
+	     Assert(false, ExcMessage("This cell has no grandchildren equivalent to isotropic refinement"));
+	    break;
+      case RefinementCase<dim>::cut_y:
+					     // this cell is refined with cut_y,
+					     // so the child has to be refined
+					     // with cut_x
+ 	    if (child(i/2)->refinement_case()==RefinementCase<dim>::cut_x)
+	      return child(i/2)->child_index(i%2);
+	    else
+	      Assert(false, ExcMessage("This cell has no grandchildren equivalent to isotropic refinement"));
+	    break;
+      case RefinementCase<dim>::cut_xy:
+	    return child_index(i);
+	    break;
+      default:
+	    Assert(false, TriaAccessorExceptions::ExcCellHasNoChildren());
+	    break;
+    }
+  return -1;
 }
 
 
@@ -666,11 +797,73 @@ TriaObjectAccessor<2,dim>::child (const unsigned int i) const
 
 template <int dim>
 inline
+TriaIterator<dim,TriaObjectAccessor<2,dim> >
+TriaObjectAccessor<2,dim>::isotropic_child (const unsigned int i) const
+{
+  switch (static_cast<unsigned char> (refinement_case()))
+    {
+      case RefinementCase<dim>::cut_x:
+					     // this cell is refined with cut_x,
+					     // so the child has to be refined
+					     // with cut_y
+ 	    Assert(child(i%2)->refinement_case()==RefinementCase<dim>::cut_y,
+ 		   ExcMessage("This cell has no grandchildren equivalent to isotropic refinement"));
+	    return child(i%2)->child(i/2);
+	    break;
+      case RefinementCase<dim>::cut_y:
+					     // this cell is refined with cut_y,
+					     // so the child has to be refined
+					     // with cut_x
+ 	    Assert(child(i/2)->refinement_case()==RefinementCase<dim>::cut_x,
+ 		   ExcMessage("This cell has no grandchildren equivalent to isotropic refinement"));
+	    return child(i/2)->child(i%2);
+	    break;
+      default:
+ 	    Assert(refinement_case()==RefinementCase<dim>::cut_xy,
+ 		   TriaAccessorExceptions::ExcCellHasNoChildren());
+	    break;
+    }
+  return child(i);
+}
+
+
+
+template <int dim>
+inline
 unsigned int
 TriaObjectAccessor<2,dim>::n_children () const
 {
   Assert (has_children()==true, TriaAccessorExceptions::ExcCellHasNoChildren());
-  return GeometryInfo<2>::children_per_cell;
+  Assert (static_cast<unsigned int> (this->present_index) <
+	  objects().refinement_cases.size(),
+	  ExcIndexRange(this->present_index, 0,
+			objects().refinement_cases.size()));
+
+  return GeometryInfo<2>::n_children(refinement_case());
+}
+
+
+
+template <int dim>
+inline
+unsigned int
+TriaObjectAccessor<2,dim>::middle_vertex_index () const
+{
+  switch (static_cast<unsigned char> (refinement_case()))
+    {
+      case RefinementCase<dim>::cut_x:
+	    return child(0)->line(1)->middle_vertex_index();
+	    break;
+      case RefinementCase<dim>::cut_y:
+	    return child(0)->line(3)->middle_vertex_index();
+	    break;
+      case RefinementCase<dim>::cut_xy:
+	    return child(0)->vertex_index(3);
+	    break;
+      default:
+	    break;
+    }
+  return numbers::invalid_unsigned_int;
 }
 
 
@@ -990,12 +1183,65 @@ TriaObjectAccessor<3,3>::quad_index (const unsigned int i) const
 
 template <>
 inline
+RefinementCase<3>
+TriaObjectAccessor<3, 3>::refinement_case () const
+{
+  Assert (this->state() == IteratorState::valid,
+	  TriaAccessorExceptions::ExcDereferenceInvalidObject());
+  Assert (static_cast<unsigned int> (this->present_index) <
+	  this->tria->levels[this->present_level]->cells.refinement_cases.size(),
+	  ExcIndexRange(this->present_index, 0,
+			this->tria->levels[this->present_level]->
+			cells.refinement_cases.size()));
+
+  return this->tria->levels[this->present_level]->cells.refinement_cases[this->present_index];
+}
+
+
+
+template <>
+inline
+void
+TriaObjectAccessor<3, 3>::set_refinement_case (const RefinementCase<3> &refinement_case) const
+{
+  Assert (static_cast<unsigned int> (this->present_index) <
+	  this->tria->levels[this->present_level]->cells.refinement_cases.size(),
+	  ExcIndexRange(this->present_index, 0,
+			this->tria->levels[this->present_level]->
+			cells.refinement_cases.size()));
+
+  this->tria->levels[this->present_level]->
+    cells.refinement_cases[this->present_index] = refinement_case;
+}
+
+
+template <>
+inline
+void
+TriaObjectAccessor<3, 3>::clear_refinement_case () const
+{
+  Assert (this->state() == IteratorState::valid,
+	  TriaAccessorExceptions::ExcDereferenceInvalidObject());
+  Assert (static_cast<unsigned int> (this->present_index) <
+	  this->tria->levels[this->present_level]->cells.refinement_cases.size(),
+	  ExcIndexRange(this->present_index, 0,
+			this->tria->levels[this->present_level]->
+			cells.refinement_cases.size()));
+
+  this->tria->levels[this->present_level]->
+    cells.refinement_cases[this->present_index] = RefinementCase<3>::no_refinement;
+}
+
+
+
+template<>
+inline
 bool
 TriaObjectAccessor<3,3>::has_children () const
 {
   Assert (this->state() == IteratorState::valid,
 	  TriaAccessorExceptions::ExcDereferenceInvalidObject());
-    return (this->tria->levels[this->present_level]->cells.children[this->present_index] != -1);
+    return (this->tria->levels[this->present_level]->cells.children[4*this->present_index] != -1);
 }
 
 
@@ -1005,7 +1251,17 @@ int TriaObjectAccessor<3,3>::child_index (const unsigned int i) const
 {
   Assert (i<8, ExcIndexRange(i,0,8));
   Assert (has_children(), TriaAccessorExceptions::ExcCellHasNoChildren());
-    return this->tria->levels[this->present_level]->cells.children[this->present_index]+i;
+  return this->tria->levels[this->present_level]->cells.children[4*this->present_index+i/2]+i%2;
+}
+
+
+
+template <>
+inline
+int TriaObjectAccessor<3,3>::isotropic_child_index (const unsigned int i) const
+{
+  AssertThrow(false, ExcNotImplemented());
+  return child_index(i);
 }
 
 
@@ -1029,14 +1285,68 @@ TriaObjectAccessor<3,3>::child (const unsigned int i) const
 
 
 
+template <>
+inline
+TriaIterator<3,TriaObjectAccessor<3,3> >
+TriaObjectAccessor<3,3>::isotropic_child (const unsigned int i) const
+{
+  AssertThrow(false, ExcNotImplemented());
+  return child(i);
+}
+
+
+
+template <>
+inline
+unsigned int
+TriaObjectAccessor<3,3>::n_children () const
+{
+  Assert (has_children()==true, TriaAccessorExceptions::ExcCellHasNoChildren());
+  Assert (static_cast<unsigned int> (this->present_index) <
+	  this->tria->levels[this->present_level]->cells.refinement_cases.size(),
+	  ExcIndexRange(this->present_index, 0,
+			this->tria->levels[this->present_level]->
+			cells.refinement_cases.size()));
+
+  return GeometryInfo<3>::n_children(refinement_case());
+}
+
+
+
 template <int dim>
 inline
 unsigned int
-TriaObjectAccessor<3,dim>::n_children () const
+TriaObjectAccessor<3,dim>::middle_vertex_index () const
 {
-  Assert (has_children()==true, TriaAccessorExceptions::ExcCellHasNoChildren());
-  return GeometryInfo<3>::children_per_cell;
+  switch (static_cast<unsigned char> (refinement_case()))
+    {
+      case RefinementCase<dim>::cut_x:
+	    return child(0)->quad(1)->middle_vertex_index();
+	    break;
+      case RefinementCase<dim>::cut_y:
+	    return child(0)->quad(3)->middle_vertex_index();
+	    break;
+      case RefinementCase<dim>::cut_z:
+	    return child(0)->quad(5)->middle_vertex_index();
+	    break;
+      case RefinementCase<dim>::cut_xy:
+	    return child(0)->line(11)->middle_vertex_index();
+	    break;
+      case RefinementCase<dim>::cut_xz:
+	    return child(0)->line(5)->middle_vertex_index();
+	    break;
+      case RefinementCase<dim>::cut_yz:
+	    return child(0)->line(7)->middle_vertex_index();
+	    break;
+      case RefinementCase<dim>::cut_xyz:
+	    return child(0)->vertex_index(7);
+	    break;
+      default:
+	    break;
+    }
+  return numbers::invalid_unsigned_int;
 }
+
 
 
 template <int dim>
@@ -1360,7 +1670,7 @@ CellAccessor<dim>::neighbor_level (const unsigned int i) const
 
 template <int dim>
 inline
-bool
+RefinementCase<dim>
 CellAccessor<dim>::refine_flag_set () const
 {
   Assert (this->used(), TriaAccessorExceptions::ExcCellNotUsed());
@@ -1371,7 +1681,7 @@ CellAccessor<dim>::refine_flag_set () const
 				   // flag is not cleared).
   Assert (this->active() ||  !this->tria->levels[this->present_level]->refine_flags[this->present_index],
 	  ExcRefineCellNotActive());
-  return this->tria->levels[this->present_level]->refine_flags[this->present_index];
+  return RefinementCase<dim>(this->tria->levels[this->present_level]->refine_flags[this->present_index]);
 }
 
 
@@ -1379,13 +1689,13 @@ CellAccessor<dim>::refine_flag_set () const
 template <int dim>
 inline
 void
-CellAccessor<dim>::set_refine_flag () const
+CellAccessor<dim>::set_refine_flag (const RefinementCase<dim> refinement_case) const
 {
   Assert (this->used() && this->active(), ExcRefineCellNotActive());
   Assert (!coarsen_flag_set(),
 	  ExcCellFlaggedForCoarsening());
   
-  this->tria->levels[this->present_level]->refine_flags[this->present_index] = true;
+  this->tria->levels[this->present_level]->refine_flags[this->present_index] = refinement_case;
 }
 
 
@@ -1396,7 +1706,165 @@ void
 CellAccessor<dim>::clear_refine_flag () const
 {
   Assert (this->used() && this->active(), ExcRefineCellNotActive());
-  this->tria->levels[this->present_level]->refine_flags[this->present_index] = false;
+  this->tria->levels[this->present_level]->refine_flags[this->present_index] =
+    RefinementCase<dim>::no_refinement;
+}
+
+
+
+template <int dim>
+inline
+bool
+CellAccessor<dim>::flag_for_face_refinement (const unsigned int face_no,
+					     const RefinementCase<dim-1> &face_refinement_case) const
+{
+  Assert (dim>1, ExcImpossibleInDim(dim));
+  Assert (face_no<GeometryInfo<dim>::faces_per_cell,
+	  ExcIndexRange(face_no,0,GeometryInfo<dim>::faces_per_cell));
+  Assert (face_refinement_case < RefinementCase<dim>::isotropic_refinement+1,
+	  ExcIndexRange(face_refinement_case,0,RefinementCase<dim>::isotropic_refinement+1));
+			    
+                                   // the new refinement case is a combination
+				   // of the minimum required one for the given
+				   // face refinement and the already existing
+				   // flagged refinement case
+  RefinementCase<dim> old_ref_case = refine_flag_set();
+  RefinementCase<dim>		    
+    new_ref_case = (old_ref_case
+		    | GeometryInfo<dim>::min_cell_refinement_case_for_face_refinement(face_refinement_case,
+										      face_no,
+										      this->face_orientation(face_no),
+										      this->face_flip(face_no),
+										      this->face_rotation(face_no)));
+  set_refine_flag(new_ref_case);
+				   // return, whether we had to change the
+				   // refinement flag
+  return new_ref_case != old_ref_case;
+}
+
+
+
+template <int dim>
+inline
+bool
+CellAccessor<dim>::flag_for_line_refinement (const unsigned int line_no) const
+{
+  Assert (dim>1, ExcImpossibleInDim(dim));
+  Assert (line_no<GeometryInfo<dim>::lines_per_cell,
+	  ExcIndexRange(line_no,0,GeometryInfo<dim>::lines_per_cell));
+
+				   // the new refinement case is a combination
+				   // of the minimum required one for the given
+				   // line refinement and the already existing
+				   // flagged refinement case
+  RefinementCase<dim> old_ref_case=refine_flag_set(),
+		   new_ref_case=old_ref_case
+				| GeometryInfo<dim>::min_cell_refinement_case_for_line_refinement(line_no);
+  set_refine_flag(new_ref_case);
+				   // return, whether we had to change the
+				   // refinement flag
+  return new_ref_case != old_ref_case;
+}
+
+
+
+template <>
+inline
+internal::SubfaceCase<1>
+CellAccessor<1>::subface_case(const unsigned int) const
+{
+  Assert(false, ExcImpossibleInDim(1));
+  return internal::SubfaceCase<1>::case_none;
+}
+
+
+
+template <>
+inline
+internal::SubfaceCase<2>
+CellAccessor<2>::subface_case(const unsigned int face_no) const
+{
+  Assert(active(), TriaAccessorExceptions::ExcCellNotActive());
+  Assert(face_no<GeometryInfo<2>::faces_per_cell,
+	 ExcIndexRange(face_no,0,GeometryInfo<2>::faces_per_cell));
+  return (face(face_no)->has_children()) ? internal::SubfaceCase<2>::case_x : internal::SubfaceCase<2>::case_none;
+}
+
+
+
+template <>
+inline
+internal::SubfaceCase<3>
+CellAccessor<3>::subface_case(const unsigned int face_no) const
+{
+  Assert(active(), TriaAccessorExceptions::ExcCellNotActive());
+  Assert(face_no<GeometryInfo<3>::faces_per_cell,
+	 ExcIndexRange(face_no,0,GeometryInfo<3>::faces_per_cell));
+  switch (static_cast<unsigned char> (face(face_no)->refinement_case()))
+    {
+      case RefinementCase<3>::no_refinement:
+	    return internal::SubfaceCase<3>::case_none;
+	    break;
+      case RefinementCase<3>::cut_x:
+	    if (face(face_no)->child(0)->has_children())
+	      {
+ 		Assert(face(face_no)->child(0)->refinement_case()==RefinementCase<3>::cut_y,
+ 		       ExcInternalError());
+		if (face(face_no)->child(1)->has_children())
+		  {
+ 		    Assert(face(face_no)->child(1)->refinement_case()==RefinementCase<3>::cut_y,
+ 			   ExcInternalError());
+		    return internal::SubfaceCase<3>::case_x1y2y;								 
+		  }
+		else
+		  return internal::SubfaceCase<3>::case_x1y;
+	      }
+	    else
+	      {
+		if (face(face_no)->child(1)->has_children())
+		  {
+  		    Assert(face(face_no)->child(1)->refinement_case()==RefinementCase<3>::cut_y,
+  			   ExcInternalError());
+		    return internal::SubfaceCase<3>::case_x2y;
+		  }
+		else
+		  return internal::SubfaceCase<3>::case_x;
+	      }
+	    break;
+      case RefinementCase<3>::cut_y:
+	    if (face(face_no)->child(0)->has_children())
+	      {
+ 		Assert(face(face_no)->child(0)->refinement_case()==RefinementCase<3>::cut_x,
+ 		       ExcInternalError());
+		if (face(face_no)->child(1)->has_children())
+		  {
+ 		    Assert(face(face_no)->child(1)->refinement_case()==RefinementCase<3>::cut_x,
+ 			   ExcInternalError());
+		    return internal::SubfaceCase<3>::case_y1x2x;								 
+		  }
+		else
+		  return internal::SubfaceCase<3>::case_y1x;
+	      }
+	    else
+	      {
+		if (face(face_no)->child(1)->has_children())
+		  {
+  		    Assert(face(face_no)->child(1)->refinement_case()==RefinementCase<3>::cut_x,
+  			   ExcInternalError());
+		    return internal::SubfaceCase<3>::case_y2x;
+		  }
+		else
+		  return internal::SubfaceCase<3>::case_y;
+	      }
+	    break;
+      case RefinementCase<3>::cut_xy:
+	    return internal::SubfaceCase<3>::case_xy;
+	    break;
+      default:
+	    Assert(false, ExcInternalError());
+    }
+				   // we should never get here
+  return internal::SubfaceCase<3>::case_none;
 }
 
 
@@ -1481,6 +1949,28 @@ bool
 CellAccessor<dim>::active () const
 {
   return !this->has_children();
+}
+
+
+
+template <int dim>
+inline
+unsigned int
+CellAccessor<dim>::neighbor_face_no (const unsigned int neighbor) const
+{
+  if (dim==1)
+    return neighbor_of_neighbor(neighbor);
+  else
+    {
+      const unsigned int n2=neighbor_of_neighbor_internal(neighbor);
+      if (n2!=numbers::invalid_unsigned_int)
+					 // return this value as the
+					 // neighbor is not coarser
+	return n2;
+      else	
+					 // the neighbor is coarser
+	return neighbor_of_coarser_neighbor(neighbor).first;
+    }
 }
 
 DEAL_II_NAMESPACE_CLOSE

@@ -2,7 +2,7 @@
 //    $Id$
 //    Version: $Name$
 //
-//    Copyright (C) 1998, 1999, 2000, 2001, 2002, 2003, 2005, 2006, 2007 by the deal.II authors
+//    Copyright (C) 1998, 1999, 2000, 2001, 2002, 2003, 2005, 2006, 2007, 2008 by the deal.II authors
 //
 //    This file is subject to QPL and may not be  distributed
 //    without copyright and license information. Please refer
@@ -522,7 +522,8 @@ void
 QProjector<1>::project_to_subface (const Quadrature<0> &,
                                    const unsigned int,
                                    const unsigned int,
-                                   std::vector<Point<1> > &)
+                                   std::vector<Point<1> > &,
+				   const RefinementCase<0> &)
 {
   Assert(false, ExcNotImplemented());
 }
@@ -534,7 +535,8 @@ void
 QProjector<2>::project_to_subface (const Quadrature<1>    &quadrature,
                                    const unsigned int      face_no,
                                    const unsigned int      subface_no,
-                                   std::vector<Point<2> > &q_points)
+                                   std::vector<Point<2> > &q_points,
+				   const RefinementCase<1> &)
 {
   const unsigned int dim=2;
   Assert (face_no<2*dim, ExcIndexRange (face_no, 0, 2*dim));
@@ -612,7 +614,8 @@ void
 QProjector<3>::project_to_subface (const Quadrature<2>    &quadrature,
                                    const unsigned int      face_no,
                                    const unsigned int      subface_no,
-                                   std::vector<Point<3> > &q_points)
+                                   std::vector<Point<3> > &q_points,
+				   const RefinementCase<2> &ref_case)
 {
   const unsigned int dim=3;
   Assert (face_no<2*dim, ExcIndexRange (face_no, 0, 2*dim));
@@ -620,151 +623,76 @@ QProjector<3>::project_to_subface (const Quadrature<2>    &quadrature,
   Assert (q_points.size() == quadrature.size(),
 	  ExcDimensionMismatch (q_points.size(), quadrature.size()));
 
-
-				   // for all faces and subfaces:
-				   // first project onto the first
-				   // subface of each face, then move
-				   // it to the right place
+				   // one coordinate is at a const value. for
+				   // faces 0, 2 and 4 this value is 0.0, for
+				   // faces 1, 3 and 5 it is 1.0
+  double const_value=face_no%2;
+				   // local 2d coordinates are xi and eta,
+				   // global 3d coordinates are x, y and
+				   // z. those have to be mapped. the following
+				   // indices tell, which global coordinate
+				   // (0->x, 1->y, 2->z) corresponds to which
+				   // local one
+  unsigned int xi_index   = deal_II_numbers::invalid_unsigned_int,
+	      eta_index   = deal_II_numbers::invalid_unsigned_int,
+	      const_index = face_no/2;
+				   // the xi and eta values have to be scaled
+				   // (by factor 0.5 or factor 1.0) depending on
+				   // the refinement case and translated (by 0.0
+				   // or 0.5) depending on the refinement case
+				   // and subface_no.
+  double xi_scale=1.0,
+    eta_scale=1.0,
+    xi_translation=0.0,
+    eta_translation=0.0;
+				   // set the index mapping between local and
+				   // global coordinates
+  switch(face_no/2)
+    {
+      case 0:
+	    xi_index=1;
+	    eta_index=2;
+	    break;
+      case 1:
+	    xi_index=2;
+	    eta_index=0;
+	    break;
+      case 2:
+	    xi_index=0;
+	    eta_index=1;
+	    break;
+    }
+				   // set the scale and translation parameter
+				   // for individual subfaces
+  switch((unsigned char)ref_case)
+    {
+      case RefinementCase<dim-1>::cut_x:
+	    xi_scale=0.5;
+	    xi_translation=subface_no%2 * 0.5;
+	    break;
+      case RefinementCase<dim-1>::cut_y:
+	    eta_scale=0.5;
+	    eta_translation=subface_no%2 * 0.5;
+	    break;
+      case RefinementCase<dim-1>::cut_xy:
+	    xi_scale= 0.5;
+	    eta_scale=0.5;
+	    xi_translation =subface_no%2 * 0.5;
+	    eta_translation=subface_no/2 * 0.5;
+	    break;
+      default:
+	    Assert(false,ExcInternalError());
+	    break;
+    }
+				   // finally, compute the scaled, translated,
+				   // projected quadrature points
   for (unsigned int p=0; p<quadrature.size(); ++p)
-    switch (face_no)
-      {
-	case 0:
-	      q_points[p] = Point<dim>(0,
-				       quadrature.point(p)(0)/2,
-				       quadrature.point(p)(1)/2);
-	      switch (subface_no) 
-		{
-		  case 0:
-			break;
-		  case 1:
-			q_points[p][1] += 1./2.;
-			break;
-		  case 2:
-			q_points[p][2] += 1./2.;
-			break;
-		  case 3:
-			q_points[p][1] += 1./2.;
-			q_points[p][2] += 1./2.;
-			break;
-		  default:
-			Assert (false, ExcInternalError());
-		};
-	      break;	   
-	case 1:
-	      q_points[p] = Point<dim>(1,
-				       quadrature.point(p)(0)/2,
-				       quadrature.point(p)(1)/2);
-	      switch (subface_no) 
-		{
-		  case 0:
-			break;
-		  case 1:
-			q_points[p][1] += 1./2.;
-			break;
-		  case 2:
-			q_points[p][2] += 1./2.;
-			break;
-		  case 3:
-			q_points[p][1] += 1./2.;
-			q_points[p][2] += 1./2.;
-			break;
-		  default:
-			Assert (false, ExcInternalError());
-		};
-	      break;	   
-	case 2:
-	      q_points[p] = Point<dim>(quadrature.point(p)(1)/2,
-				       0,
-				       quadrature.point(p)(0)/2);
-	      switch (subface_no) 
-		{
-		  case 0:
-			break;
-		  case 1:
-			q_points[p][2] += 1./2.;
-			break;
-		  case 2:
-			q_points[p][0] += 1./2.;
-			break;
-		  case 3:
-			q_points[p][0] += 1./2.;
-			q_points[p][2] += 1./2.;
-			break;
-		  default:
-			Assert (false, ExcInternalError());
-		};
-	      break;
-	case 3:
-	      q_points[p] = Point<dim>(quadrature.point(p)(1)/2,
-				       1,
-				       quadrature.point(p)(0)/2);
-	      switch (subface_no) 
-		{
-		  case 0:
-			break;
-		  case 1:
-			q_points[p][2] += 1./2.;
-			break;
-		  case 2:
-			q_points[p][0] += 1./2.;
-			break;
-		  case 3:
-			q_points[p][0] += 1./2.;
-			q_points[p][2] += 1./2.;
-			break;
-		  default:
-			Assert (false, ExcInternalError());
-		};
-	      break;
-	case 4:
-	      q_points[p] = Point<dim>(quadrature.point(p)(0)/2,
-				       quadrature.point(p)(1)/2,
-				       0);
-	      switch (subface_no) 
-		{
-		  case 0:
-			break;
-		  case 1:
-			q_points[p][0] += 1./2.;
-			break;
-		  case 2:
-			q_points[p][1] += 1./2.;
-			break;
-		  case 3:
-			q_points[p][0] += 1./2.;
-			q_points[p][1] += 1./2.;
-			break;
-		  default:
-			Assert (false, ExcInternalError());
-		};
-	      break;
-	case 5:
-	      q_points[p] = Point<dim>(quadrature.point(p)(0)/2,
-				       quadrature.point(p)(1)/2,
-				       1);
-	      switch (subface_no) 
-		{
-		  case 0:
-			break;
-		  case 1:
-			q_points[p][0] += 1./2.;
-			break;
-		  case 2:
-			q_points[p][1] += 1./2.;
-			break;
-		  case 3:
-			q_points[p][0] += 1./2.;
-			q_points[p][1] += 1./2.;
-			break;
-		  default:
-			Assert (false, ExcInternalError());
-		};
-	      break;
-	default:
-	      Assert (false, ExcInternalError());
-      };
+    {
+      q_points[p][xi_index]    = xi_scale  * quadrature.point(p)(0) + xi_translation;
+      q_points[p][eta_index]   = eta_scale * quadrature.point(p)(1) + eta_translation;
+      q_points[p][const_index] = const_value;
+    }
 }
-
 
 
 template <>
@@ -899,7 +827,7 @@ QProjector<2>::project_to_all_subfaces (const SubQuadrature &quadrature)
   
   const unsigned int n_points          = quadrature.size(),
 		     n_faces           = GeometryInfo<dim>::faces_per_cell,
-		     subfaces_per_face = GeometryInfo<dim>::subfaces_per_face;
+		     subfaces_per_face = GeometryInfo<dim>::max_children_per_face;
   
 				   // first fix quadrature points
   std::vector<Point<dim> > q_points;
@@ -940,7 +868,6 @@ Quadrature<3>
 QProjector<3>::project_to_all_subfaces (const SubQuadrature &quadrature)
 {
   const unsigned int dim = 3;
-  
   SubQuadrature q_reflected=reflect (quadrature);
   SubQuadrature q[8]=
     {quadrature,
@@ -954,15 +881,15 @@ QProjector<3>::project_to_all_subfaces (const SubQuadrature &quadrature)
 
   const unsigned int n_points          = quadrature.size(),
 		     n_faces           = GeometryInfo<dim>::faces_per_cell,
-		     subfaces_per_face = GeometryInfo<dim>::subfaces_per_face;
+	       total_subfaces_per_face = 2 + 2 + 4;
   
 				   // first fix quadrature points
   std::vector<Point<dim> > q_points;
-  q_points.reserve (n_points * n_faces * subfaces_per_face * 8);
+  q_points.reserve (n_points * n_faces * total_subfaces_per_face * 8);
   std::vector <Point<dim> > help(n_points);
   
   std::vector<double> weights;
-  weights.reserve (n_points * n_faces * subfaces_per_face * 8);
+  weights.reserve (n_points * n_faces * total_subfaces_per_face * 8);
 
 				   // do the following for all possible
 				   // mutations of a face (mutation==0
@@ -973,24 +900,31 @@ QProjector<3>::project_to_all_subfaces (const SubQuadrature &quadrature)
 				       // project to each face and copy
 				       // results
       for (unsigned int face=0; face<n_faces; ++face)
-	for (unsigned int subface=0; subface<subfaces_per_face; ++subface)
-	  {
-	    project_to_subface(q[mutation], face, subface, help);
-	    std::copy (help.begin(), help.end(),
-		       std::back_inserter (q_points));
-	  }
+	for (unsigned int ref_case=RefinementCase<dim-1>::cut_xy;
+	     ref_case>=RefinementCase<dim-1>::cut_x;
+	     --ref_case)
+	  for (unsigned int subface=0; subface<GeometryInfo<dim-1>::n_children(RefinementCase<dim-1>(ref_case)); ++subface)
+	    {
+	      project_to_subface(q[mutation], face, subface, help,
+				 RefinementCase<dim-1>(ref_case));
+	      std::copy (help.begin(), help.end(),
+			 std::back_inserter (q_points));
+	    }
 
 				       // next copy over weights
       for (unsigned int face=0; face<n_faces; ++face)
-	for (unsigned int subface=0; subface<subfaces_per_face; ++subface)
-	  std::copy (q[mutation].get_weights().begin(),
-		     q[mutation].get_weights().end(),
-		     std::back_inserter (weights));
+	for (unsigned int ref_case=RefinementCase<dim-1>::cut_xy;
+	     ref_case>=RefinementCase<dim-1>::cut_x;
+	     --ref_case)
+	  for (unsigned int subface=0; subface<GeometryInfo<dim-1>::n_children(RefinementCase<dim-1>(ref_case)); ++subface)
+	    std::copy (q[mutation].get_weights().begin(),
+		       q[mutation].get_weights().end(),
+		       std::back_inserter (weights));
     }
   
-  Assert (q_points.size() == n_points * n_faces * subfaces_per_face * 8,
+  Assert (q_points.size() == n_points * n_faces * total_subfaces_per_face * 8,
           ExcInternalError());
-  Assert (weights.size() == n_points * n_faces * subfaces_per_face * 8,
+  Assert (weights.size() == n_points * n_faces * total_subfaces_per_face * 8,
           ExcInternalError());  
   
   return Quadrature<dim>(q_points, weights);
@@ -998,13 +932,14 @@ QProjector<3>::project_to_all_subfaces (const SubQuadrature &quadrature)
 
 
 
+// This function is not used in the library
 template <int dim>
 Quadrature<dim>
 QProjector<dim>::project_to_child (const Quadrature<dim>    &quadrature,
 				   const unsigned int        child_no)
 {
-  Assert (child_no < GeometryInfo<dim>::children_per_cell,
-	  ExcIndexRange (child_no, 0, GeometryInfo<dim>::children_per_cell));
+  Assert (child_no < GeometryInfo<dim>::max_children_per_cell,
+	  ExcIndexRange (child_no, 0, GeometryInfo<dim>::max_children_per_cell));
   
   const unsigned int n_q_points = quadrature.size();
 
@@ -1018,7 +953,7 @@ QProjector<dim>::project_to_child (const Quadrature<dim>    &quadrature,
 				   // scale them
   std::vector<double> weights = quadrature.get_weights ();
   for (unsigned int i=0; i<n_q_points; ++i)
-    weights[i] *= (1./GeometryInfo<dim>::children_per_cell);
+    weights[i] *= (1./GeometryInfo<dim>::max_children_per_cell);
 
   return Quadrature<dim> (q_points, weights);
 }
@@ -1115,28 +1050,88 @@ face (const unsigned int face_no,
 
 
 
-template <int dim>
-typename QProjector<dim>::DataSetDescriptor
-QProjector<dim>::DataSetDescriptor::
+template <>
+QProjector<1>::DataSetDescriptor
+QProjector<1>::DataSetDescriptor::
+subface (const unsigned int,
+         const unsigned int,
+         const bool,
+         const bool,
+         const bool,
+         const unsigned int,
+	 const internal::SubfaceCase<1>)
+{
+  Assert (false, ExcInternalError());
+  return deal_II_numbers::invalid_unsigned_int;
+}
+
+
+
+template <>
+QProjector<2>::DataSetDescriptor
+QProjector<2>::DataSetDescriptor::
+subface (const unsigned int face_no,
+         const unsigned int subface_no,
+         const bool,
+         const bool,
+         const bool,
+         const unsigned int n_quadrature_points,
+	 const internal::SubfaceCase<2>)
+{
+  Assert (face_no < GeometryInfo<2>::faces_per_cell,
+          ExcInternalError());
+  Assert (subface_no < GeometryInfo<2>::max_children_per_face,
+          ExcInternalError());  
+
+  return ((face_no * GeometryInfo<2>::max_children_per_face +
+	   subface_no)
+	  * n_quadrature_points);
+}
+
+
+template <>
+QProjector<3>::DataSetDescriptor
+QProjector<3>::DataSetDescriptor::
 subface (const unsigned int face_no,
          const unsigned int subface_no,
          const bool         face_orientation,
          const bool         face_flip,
          const bool         face_rotation,
-         const unsigned int n_quadrature_points)
+         const unsigned int n_quadrature_points,
+	 const internal::SubfaceCase<3> ref_case)
 {
-  Assert (dim != 1, ExcInternalError());
+  const unsigned int dim = 3;
+  
   Assert (face_no < GeometryInfo<dim>::faces_per_cell,
           ExcInternalError());
-                                   // the trick with +1 prevents that we get a
-                                   // warning in 1d
-  Assert (subface_no+1 < GeometryInfo<dim>::subfaces_per_face+1,
-          ExcInternalError());
+  Assert (subface_no < GeometryInfo<dim>::max_children_per_face,
+          ExcInternalError());  
+
+				   // As the quadrature points created by
+				   // QProjector are on subfaces in their
+				   // "standard location" we have to use a
+				   // permutation of the equivalent subface
+				   // number in order to respect face
+				   // orientation, flip and rotation. The
+				   // information we need here is exactly the
+				   // same as the
+				   // GeometryInfo<3>::child_cell_on_face info
+				   // for the bottom face (face 4) of a hex, as
+				   // on this the RefineCase of the cell matches
+				   // that of the face and the subfaces are
+				   // numbered in the same way as the child
+				   // cells.
   
 				   // in 3d, we have to account for faces that
 				   // have non-standard face orientation, flip
 				   // and rotation. thus, we have to store
 				   // _eight_ data sets per face or subface
+				   // already for the isotropic
+				   // case. Additionally, we have three
+				   // different refinement cases, resulting in
+				   // <tt>4 + 2 + 2 = 8</tt> differnt subfaces
+				   // for each face.
+  const unsigned int total_subfaces_per_face=8;
   
 				   // set up a table with the according offsets
 				   // for non-standard orientation, first index:
@@ -1153,39 +1148,207 @@ subface (const unsigned int face_no,
 				   // a face in standard orientation. therefore
 				   // we use the offsets 4,5,6,7,0,1,2,3 here to
 				   // stick to that (implicit) convention
-  static const unsigned int offset[2][2][2]=
+  static const unsigned int orientation_offset[2][2][2]=
     {{
 					   // face_orientation=false; face_flip=false; face_rotation=false and true
-	  {4*GeometryInfo<dim>::faces_per_cell*GeometryInfo<dim>::subfaces_per_face,
-	   5*GeometryInfo<dim>::faces_per_cell*GeometryInfo<dim>::subfaces_per_face},
+	  {4*GeometryInfo<dim>::faces_per_cell*total_subfaces_per_face,
+	   5*GeometryInfo<dim>::faces_per_cell*total_subfaces_per_face},
 					   // face_orientation=false; face_flip=true;  face_rotation=false and true
-	  {6*GeometryInfo<dim>::faces_per_cell*GeometryInfo<dim>::subfaces_per_face,
-	   7*GeometryInfo<dim>::faces_per_cell*GeometryInfo<dim>::subfaces_per_face}},   
+	  {6*GeometryInfo<dim>::faces_per_cell*total_subfaces_per_face,
+	   7*GeometryInfo<dim>::faces_per_cell*total_subfaces_per_face}},   
      {
 					    // face_orientation=true;  face_flip=false; face_rotation=false and true
-	   {0*GeometryInfo<dim>::faces_per_cell*GeometryInfo<dim>::subfaces_per_face,
-	    1*GeometryInfo<dim>::faces_per_cell*GeometryInfo<dim>::subfaces_per_face},
+	   {0*GeometryInfo<dim>::faces_per_cell*total_subfaces_per_face,
+	    1*GeometryInfo<dim>::faces_per_cell*total_subfaces_per_face},
 					    // face_orientation=true;  face_flip=true;  face_rotation=false and true
-	   {2*GeometryInfo<dim>::faces_per_cell*GeometryInfo<dim>::subfaces_per_face,
-	    3*GeometryInfo<dim>::faces_per_cell*GeometryInfo<dim>::subfaces_per_face}}};
-  
-  switch (dim)
+	   {2*GeometryInfo<dim>::faces_per_cell*total_subfaces_per_face,
+	    3*GeometryInfo<dim>::faces_per_cell*total_subfaces_per_face}}};
+
+				   // set up a table with the offsets for a
+				   // given refinement case respecting the
+				   // corresponding number of subfaces. the
+				   // index corresponds to (RefineCase::Type - 1)
+
+				   // note, that normally we should use the
+				   // obvious offsets 0,2,6. However, prior to
+				   // the implementation of anisotropic
+				   // refinement, in many places of the library
+				   // the convention was used, that the first
+				   // dataset with offset 0 corresponds to a
+				   // standard (isotropic) face
+				   // refinement. therefore we use the offsets
+				   // 6,4,0 here to stick to that (implicit)
+				   // convention
+  static const unsigned int ref_case_offset[3]=
     {
-      case 1:
-      case 2:
-            return ((face_no * GeometryInfo<dim>::subfaces_per_face +
-                     subface_no)
-                    * n_quadrature_points);
-      case 3:
-            return (((face_no * GeometryInfo<dim>::subfaces_per_face +
-                      subface_no)
-                     + offset[face_orientation][face_flip][face_rotation]
-                     )
-                    * n_quadrature_points);
-      default:
-            Assert (false, ExcInternalError());
-    }
-  return numbers::invalid_unsigned_int;              
+	  6,  //cut_x
+	  4,  //cut_y
+	  0   //cut_xy
+    };
+
+
+				   // for each subface of a given FaceRefineCase
+				   // there is a corresponding equivalent
+				   // subface number of one of the "standard"
+				   // RefineCases (cut_x, cut_y, cut_xy). Map
+				   // the given values to those equivalent
+				   // ones.
+
+				   // first, define an invalid number
+  static const unsigned int e = deal_II_numbers::invalid_unsigned_int;
+  
+  static const RefinementCase<dim-1>
+    equivalent_refine_case[internal::SubfaceCase<dim>::case_isotropic+1][GeometryInfo<3>::max_children_per_face]
+    =
+    {
+					   // case_none. there should be only
+					   // invalid values here. However, as
+					   // this function is also called (in
+					   // tests) for cells which have no
+					   // refined faces, use isotropic
+					   // refinement instead
+	  {RefinementCase<dim-1>::cut_xy,
+	   RefinementCase<dim-1>::cut_xy,
+	   RefinementCase<dim-1>::cut_xy,
+	   RefinementCase<dim-1>::cut_xy},
+					   // case_x
+	  {RefinementCase<dim-1>::cut_x,
+	   RefinementCase<dim-1>::cut_x,
+	   RefinementCase<dim-1>::no_refinement,
+	   RefinementCase<dim-1>::no_refinement},
+					   // case_x1y
+	  {RefinementCase<dim-1>::cut_xy,
+	   RefinementCase<dim-1>::cut_xy,
+	   RefinementCase<dim-1>::cut_x,
+	   RefinementCase<dim-1>::no_refinement},
+					   // case_x2y
+	  {RefinementCase<dim-1>::cut_x,
+	   RefinementCase<dim-1>::cut_xy,
+	   RefinementCase<dim-1>::cut_xy,
+	   RefinementCase<dim-1>::no_refinement},
+					   // case_x1y2y
+	  {RefinementCase<dim-1>::cut_xy,
+	   RefinementCase<dim-1>::cut_xy,
+	   RefinementCase<dim-1>::cut_xy,
+	   RefinementCase<dim-1>::cut_xy},
+					   // case_y
+	  {RefinementCase<dim-1>::cut_y,
+	   RefinementCase<dim-1>::cut_y,
+	   RefinementCase<dim-1>::no_refinement,
+	   RefinementCase<dim-1>::no_refinement},
+					   // case_y1x
+	  {RefinementCase<dim-1>::cut_xy,
+	   RefinementCase<dim-1>::cut_xy,
+	   RefinementCase<dim-1>::cut_y,
+	   RefinementCase<dim-1>::no_refinement},
+					   // case_y2x
+	  {RefinementCase<dim-1>::cut_y,
+	   RefinementCase<dim-1>::cut_xy,
+	   RefinementCase<dim-1>::cut_xy,
+	   RefinementCase<dim-1>::no_refinement},
+					   // case_y1x2x
+	  {RefinementCase<dim-1>::cut_xy,
+	   RefinementCase<dim-1>::cut_xy,
+	   RefinementCase<dim-1>::cut_xy,
+	   RefinementCase<dim-1>::cut_xy},
+					   // case_xy (case_isotropic)
+	  {RefinementCase<dim-1>::cut_xy,
+	   RefinementCase<dim-1>::cut_xy,
+	   RefinementCase<dim-1>::cut_xy,
+	   RefinementCase<dim-1>::cut_xy}
+    };
+
+  static const unsigned int
+    equivalent_subface_number[internal::SubfaceCase<dim>::case_isotropic+1][GeometryInfo<3>::max_children_per_face]
+    =
+    {
+					   // case_none, see above
+	  {0,1,2,3},
+					   // case_x
+	  {0,1,e,e},
+					   // case_x1y
+	  {0,2,1,e},
+					   // case_x2y
+	  {0,1,3,e},
+					   // case_x1y2y
+	  {0,2,1,3},
+					   // case_y
+	  {0,1,e,e},
+					   // case_y1x
+	  {0,1,1,e},
+					   // case_y2x
+	  {0,2,3,e},
+					   // case_y1x2x
+	  {0,1,2,3},
+					   // case_xy (case_isotropic)
+	  {0,1,2,3}
+    };
+  
+				   // If face-orientation or face_rotation are
+				   // non-standard, cut_x and cut_y have to be
+				   // exchanged.
+  static const RefinementCase<dim-1> ref_case_permutation[4]
+    ={RefinementCase<dim-1>::no_refinement,
+      RefinementCase<dim-1>::cut_y,
+      RefinementCase<dim-1>::cut_x,
+      RefinementCase<dim-1>::cut_xy};
+
+				   // set a corresponding (equivalent)
+				   // RefineCase and subface number
+  const RefinementCase<dim-1> equ_ref_case=equivalent_refine_case[ref_case][subface_no];
+  const unsigned int equ_subface_no=equivalent_subface_number[ref_case][subface_no];
+				   // make sure, that we got a valid subface and RefineCase 
+  Assert(equ_ref_case!=RefinementCase<dim>::no_refinement, ExcInternalError());
+  Assert(equ_subface_no!=e, ExcInternalError());
+				   // now, finally respect non-standard faces
+  const RefinementCase<dim-1>
+    final_ref_case = (face_orientation==face_rotation
+		      ?
+		      ref_case_permutation[equ_ref_case]
+		      :
+		      equ_ref_case);
+	
+				   // what we have now is the number of
+				   // the subface in the natural
+				   // orientation of the *face*. what we
+				   // need to know is the number of the
+				   // subface concerning the standard face
+				   // orientation as seen from the *cell*.
+
+				   // this mapping is not trivial, but we
+				   // have done exactly this stuff in the
+				   // child_cell_on_face function. in
+				   // order to reduce the amount of code
+				   // as well as to make maintaining the
+				   // functionality easier we want to
+				   // reuse that information. So we note
+				   // that on the bottom face (face 4) of
+				   // a hex cell the local x and y
+				   // coordinates of the face and the cell
+				   // coincide, thus also the refinement
+				   // case of the face corresponds to the
+				   // refinement case of the cell
+				   // (ignoring cell refinement along the
+				   // z direction). Using this knowledge
+				   // we can (ab)use the
+				   // child_cell_on_face function to do
+				   // exactly the transformation we are in
+				   // need of now
+  const unsigned int
+    final_subface_no = GeometryInfo<dim>::child_cell_on_face(RefinementCase<dim>(final_ref_case),
+							     4,
+							     equ_subface_no,
+							     face_orientation,
+							     face_flip,
+							     face_rotation,
+							     equ_ref_case);
+	
+  return (((face_no * total_subfaces_per_face
+	    + ref_case_offset[final_ref_case-1]
+	    + final_subface_no)
+	   + orientation_offset[face_orientation][face_flip][face_rotation]
+	  )
+	  * n_quadrature_points);
 }
 
 
@@ -1227,12 +1390,13 @@ QProjector<dim>::project_to_face(const SubQuadrature &quadrature,
 
 template <int dim>
 Quadrature<dim>
-QProjector<dim>::project_to_subface(const SubQuadrature &quadrature,
-				    const unsigned int face_no,
-				    const unsigned int subface_no)
+QProjector<dim>::project_to_subface(const SubQuadrature       &quadrature,
+				    const unsigned int         face_no,
+				    const unsigned int         subface_no,
+				    const RefinementCase<dim-1> &ref_case)
 {
   std::vector<Point<dim> > points(quadrature.size());
-  project_to_subface(quadrature, face_no, subface_no, points);
+  project_to_subface(quadrature, face_no, subface_no, points, ref_case);
   return Quadrature<dim>(points, quadrature.get_weights());
 }
 

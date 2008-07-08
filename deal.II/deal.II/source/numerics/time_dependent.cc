@@ -2,7 +2,7 @@
 //    $Id$
 //    Version: $Name$
 //
-//    Copyright (C) 1999, 2000, 2001, 2002, 2003, 2005, 2006 by the deal.II authors
+//    Copyright (C) 1999, 2000, 2001, 2002, 2003, 2005, 2006, 2008 by the deal.II authors
 //
 //    This file is subject to QPL and may not be  distributed
 //    without copyright and license information. Please refer
@@ -859,17 +859,19 @@ void TimeStepBase_Tria<dim>::refine_grid (const RefinementData refinement_data)
 					 // new. but since we loop over flagged
 					 // cells, we have to subtract 3/4 of
 					 // a cell for each flagged cell
+	Assert(!tria->get_anisotropic_refinement_flag(), ExcNotImplemented());
+	Assert(!previous_tria->get_anisotropic_refinement_flag(), ExcNotImplemented());
 	double previous_cells = previous_tria->n_active_cells();
 	typename Triangulation<dim>::active_cell_iterator cell, endc;
 	cell = previous_tria->begin_active();
 	endc = previous_tria->end();
 	for (; cell!=endc; ++cell)
 	  if (cell->refine_flag_set())
-	    previous_cells += (GeometryInfo<dim>::children_per_cell-1);
+	    previous_cells += (GeometryInfo<dim>::max_children_per_cell-1);
 	  else
 	    if (cell->coarsen_flag_set())
-	      previous_cells -= (GeometryInfo<dim>::children_per_cell-1) /
-				GeometryInfo<dim>::children_per_cell;
+	      previous_cells -= (GeometryInfo<dim>::max_children_per_cell-1) /
+				GeometryInfo<dim>::max_children_per_cell;
 	    
 					 // @p{previous_cells} now gives the
 					 // number of cells which would result
@@ -892,11 +894,11 @@ void TimeStepBase_Tria<dim>::refine_grid (const RefinementData refinement_data)
 	endc = tria->end();
 	for (; cell!=endc; ++cell)
 	  if (cell->refine_flag_set())
-	    estimated_cells += (GeometryInfo<dim>::children_per_cell-1);
+	    estimated_cells += (GeometryInfo<dim>::max_children_per_cell-1);
 	  else
 	    if (cell->coarsen_flag_set())
-	      estimated_cells -= (GeometryInfo<dim>::children_per_cell-1) /
-				 GeometryInfo<dim>::children_per_cell;
+	      estimated_cells -= (GeometryInfo<dim>::max_children_per_cell-1) /
+				 GeometryInfo<dim>::max_children_per_cell;
 
 					 // calculate the allowed delta in
 					 // cell numbers; be more lenient
@@ -960,7 +962,7 @@ void TimeStepBase_Tria<dim>::refine_grid (const RefinementData refinement_data)
 						 // cells tagged for refinement
 
 		for (unsigned int i=0; i<delta_cells;
-		     i += GeometryInfo<dim>::children_per_cell-1)
+		     i += GeometryInfo<dim>::max_children_per_cell-1)
 		  if (p_refinement_threshold != sorted_criteria.end())
 		    ++p_refinement_threshold;
 		  else
@@ -1021,7 +1023,7 @@ void TimeStepBase_Tria<dim>::refine_grid (const RefinementData refinement_data)
 					       // of sorted_criteria, which is
 					       // sorted in ascending order
 	      for (unsigned int i=0; i<delta_cells;
-		   i += (GeometryInfo<dim>::children_per_cell-1))
+		   i += (GeometryInfo<dim>::max_children_per_cell-1))
 		if (p_refinement_threshold != p_coarsening_threshold)
 		  --refinement_threshold;
 		else

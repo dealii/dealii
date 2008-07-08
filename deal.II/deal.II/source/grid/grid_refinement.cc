@@ -205,26 +205,36 @@ GridRefinement::refine_and_coarsen_fixed_number (Triangulation<dim> &tria,
 				       // refining cells and instead try to
 				       // only coarsen as many as it would
 				       // take to get to the target
+      
+				       // as we have no information on cells
+				       // being refined isotropically or
+				       // anisotropically, assume isotropic
+				       // refinement here, though that may
+				       // result in a worse approximation
       refine_cells  = 0;
       coarsen_cells = (tria.n_active_cells() - max_n_cells) *
-		      GeometryInfo<dim>::children_per_cell /
-		      (GeometryInfo<dim>::children_per_cell - 1);
+		      GeometryInfo<dim>::max_children_per_cell /
+		      (GeometryInfo<dim>::max_children_per_cell - 1);
     }
 				   // otherwise, see if we would exceed the
 				   // maximum desired number of cells with the
 				   // number of cells that are likely going to
 				   // result from refinement. here, each cell
 				   // to be refined is replaced by
-				   // C=GeometryInfo<dim>::children_per_cell
+				   // C=GeometryInfo<dim>::max_children_per_cell
 				   // new cells, i.e. there will be C-1 more
 				   // cells than before. similarly, C cells
 				   // will be replaced by 1
+
+				   // again, this is true for isotropically
+				   // refined cells. we take this as an
+				   // approximation of a mixed refinement.
   else if (static_cast<unsigned int>
 	   (tria.n_active_cells()
-	    + refine_cells * (GeometryInfo<dim>::children_per_cell - 1)
+	    + refine_cells * (GeometryInfo<dim>::max_children_per_cell - 1)
 	    - (coarsen_cells *
-	       (GeometryInfo<dim>::children_per_cell - 1) /
-	       GeometryInfo<dim>::children_per_cell))
+	       (GeometryInfo<dim>::max_children_per_cell - 1) /
+	       GeometryInfo<dim>::max_children_per_cell))
 	   >
 	   max_n_cells)
     {
@@ -241,10 +251,10 @@ GridRefinement::refine_and_coarsen_fixed_number (Triangulation<dim> &tria,
 	1. *
 	(max_n_cells - tria.n_active_cells())
 	/
-	(refine_cells * (GeometryInfo<dim>::children_per_cell - 1)
+	(refine_cells * (GeometryInfo<dim>::max_children_per_cell - 1)
 	 - (coarsen_cells *
-	    (GeometryInfo<dim>::children_per_cell - 1) /
-	    GeometryInfo<dim>::children_per_cell));
+	    (GeometryInfo<dim>::max_children_per_cell - 1) /
+	    GeometryInfo<dim>::max_children_per_cell));
       refine_cells  = static_cast<int> (refine_cells * alpha);
       coarsen_cells = static_cast<int> (coarsen_cells * alpha);
     }
@@ -325,16 +335,22 @@ GridRefinement::refine_and_coarsen_fixed_fraction (Triangulation<dim> &tria,
 				   // over the limit and if so use a function
 				   // that knows how to deal with this
 				   // situation
+
+				   // note, that at this point, we have no
+				   // information about anisotropically refined
+				   // cells, thus use the situation of purely
+				   // isotropic refinement as guess for a mixed
+				   // refinemnt as well.
   {
     const unsigned int refine_cells  = pp - tmp.begin(),
 		       coarsen_cells = tmp.end() - qq;
 
     if (static_cast<unsigned int>
 	(tria.n_active_cells()
-	 + refine_cells * (GeometryInfo<dim>::children_per_cell - 1)
+	 + refine_cells * (GeometryInfo<dim>::max_children_per_cell - 1)
 	 - (coarsen_cells *
-	    (GeometryInfo<dim>::children_per_cell - 1) /
-	    GeometryInfo<dim>::children_per_cell))
+	    (GeometryInfo<dim>::max_children_per_cell - 1) /
+	    GeometryInfo<dim>::max_children_per_cell))
 	>
 	max_n_cells)
       {

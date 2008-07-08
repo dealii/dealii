@@ -984,10 +984,21 @@ compute_fill (const Mapping<dim>                   &mapping,
     {
       unsigned int offset = 0;
       if (face_no != invalid_face_number)
-	offset = (sub_no == invalid_face_number)
-		 ? face_no * n_q_points
-		 :(face_no * GeometryInfo<dim>::subfaces_per_face
-		   + sub_no) * n_q_points;
+	if (sub_no == invalid_face_number)
+	  offset=QProjector<dim>::DataSetDescriptor
+		 ::face(face_no,
+			cell->face_orientation(face_no),
+			cell->face_flip(face_no),
+			cell->face_rotation(face_no),
+			n_q_points);
+	else
+	  offset=QProjector<dim>::DataSetDescriptor
+		 ::subface(face_no, sub_no,
+			   cell->face_orientation(face_no),
+			   cell->face_flip(face_no),
+			   cell->face_rotation(face_no),
+			   n_q_points,
+			   cell->subface_case(face_no));
       this->compute_2nd (mapping, cell, offset, mapping_data, fe_data, data);
     }
 }
@@ -1633,93 +1644,100 @@ void FESystem<dim>::initialize ()
 {
   build_cell_tables();
   build_face_tables();
-  
-				   // Check if some of the matrices of
-				   // the base elements are void.
-  bool do_restriction = true;
-  bool do_prolongation = true;
 
-  for (unsigned int i=0; i<n_base_elements(); ++i)
+  for (unsigned int ref_case=RefinementCase<dim>::cut_x;
+       ref_case<RefinementCase<dim>::isotropic_refinement+1;
+       ++ref_case)
     {
-      if (base_element(i).restriction[0].n() == 0)
-	do_restriction = false;
-      if (base_element(i).prolongation[0].n() == 0)
-	do_prolongation = false;
-    }
+				       // Check if some of the matrices of
+				       // the base elements are void.
+				       // repeat this check for each RefineCase
+      bool do_restriction = true;
+      bool do_prolongation = true;
+
+      for (unsigned int i=0; i<n_base_elements(); ++i)
+	{
+	  if (base_element(i).restriction[ref_case-1][0].n() == 0)
+	    do_restriction = false;
+	  if (base_element(i).prolongation[ref_case-1][0].n() == 0)
+	    do_prolongation = false;
+	}
   
-				   // if we did not encounter void
-				   // matrices, initialize the
-				   // respective matrix sizes
-  if (do_restriction)
-    for (unsigned int i=0;i<GeometryInfo<dim>::children_per_cell;++i)
-      this->restriction[i].reinit(this->dofs_per_cell,
-                                  this->dofs_per_cell);
-  if (do_prolongation)
-    for (unsigned int i=0;i<GeometryInfo<dim>::children_per_cell;++i)
-      this->prolongation[i].reinit(this->dofs_per_cell,
-                                   this->dofs_per_cell);
+				       // if we did not encounter void
+				       // matrices, initialize the
+				       // respective matrix sizes
+      if (do_restriction)
+	for (unsigned int i=0;i<GeometryInfo<dim>::n_children(RefinementCase<dim>(ref_case));++i)
+	  this->restriction[ref_case-1][i].reinit(this->dofs_per_cell,
+						  this->dofs_per_cell);
+      if (do_prolongation)
+	for (unsigned int i=0;i<GeometryInfo<dim>::n_children(RefinementCase<dim>(ref_case));++i)
+	  this->prolongation[ref_case-1][i].reinit(this->dofs_per_cell,
+						   this->dofs_per_cell);
 	
-				   // distribute the matrices of the
-				   // base finite elements to the
-				   // matrices of this object. for
-				   // this, loop over all degrees of
-				   // freedom and take the respective
-				   // entry of the underlying base
-				   // element.
-				   //
-				   // note that we by definition of a
-				   // base element, they are
-				   // independent, i.e. do not
-				   // couple. only DoFs that belong to
-				   // the same instance of a base
-				   // element may couple
-  for (unsigned int i=0; i<this->dofs_per_cell; ++i)
-    for (unsigned int j=0; j<this->dofs_per_cell; ++j)
-      {
-					 // first find out to which
-					 // base element indices i and
-					 // j belong, and which
-					 // instance thereof in case
-					 // the base element has a
-					 // multiplicity greater than
-					 // one. if they should not
-					 // happen to belong to the
-					 // same instance of a base
-					 // element, then they cannot
-					 // couple, so go on with the
-					 // next index
-	if (this->system_to_base_table[i].first !=
-	    this->system_to_base_table[j].first)
-	  continue;
-
-					 // so get the common base
-					 // element and the indices
-					 // therein:
-	const unsigned int
-	  base = this->system_to_base_table[i].first.first;
-
-	const unsigned int
-	  base_index_i = this->system_to_base_table[i].second,
-	  base_index_j = this->system_to_base_table[j].second;
-
-					 // if we are sure that DoFs i
-					 // and j may couple, then
-					 // copy entries of the
-					 // matrices:
-	for (unsigned int child=0; child<GeometryInfo<dim>::children_per_cell; ++child)
+				       // distribute the matrices of the
+				       // base finite elements to the
+				       // matrices of this object. for
+				       // this, loop over all degrees of
+				       // freedom and take the respective
+				       // entry of the underlying base
+				       // element.
+				       //
+				       // note that we by definition of a
+				       // base element, they are
+				       // independent, i.e. do not
+				       // couple. only DoFs that belong to
+				       // the same instance of a base
+				       // element may couple
+      for (unsigned int i=0; i<this->dofs_per_cell; ++i)
+	for (unsigned int j=0; j<this->dofs_per_cell; ++j)
 	  {
-	    if (do_restriction)
-	      this->restriction[child] (i,j)
-		= (base_element(base)
-                   .get_restriction_matrix(child)(base_index_i,base_index_j));
-	    
-	    if (do_prolongation)
-	      this->prolongation[child] (i,j)
-		= (base_element(base)
-                   .get_prolongation_matrix(child)(base_index_i,base_index_j));
-	  };
-      };
+					     // first find out to which
+					     // base element indices i and
+					     // j belong, and which
+					     // instance thereof in case
+					     // the base element has a
+					     // multiplicity greater than
+					     // one. if they should not
+					     // happen to belong to the
+					     // same instance of a base
+					     // element, then they cannot
+					     // couple, so go on with the
+					     // next index
+	    if (this->system_to_base_table[i].first !=
+		this->system_to_base_table[j].first)
+	      continue;
 
+					     // so get the common base
+					     // element and the indices
+					     // therein:
+	    const unsigned int
+	      base = this->system_to_base_table[i].first.first;
+
+	    const unsigned int
+	      base_index_i = this->system_to_base_table[i].second,
+	      base_index_j = this->system_to_base_table[j].second;
+
+					     // if we are sure that DoFs i
+					     // and j may couple, then
+					     // copy entries of the
+					     // matrices:
+	    for (unsigned int child=0; child<GeometryInfo<dim>::n_children(RefinementCase<dim>(ref_case)); ++child)
+	      {
+		if (do_restriction)
+		  this->restriction[ref_case-1][child] (i,j)
+		    = (base_element(base)
+		       .get_restriction_matrix(child, RefinementCase<dim>(ref_case))(
+			 base_index_i,base_index_j));
+	    
+		if (do_prolongation)
+		  this->prolongation[ref_case-1][child] (i,j)
+		    = (base_element(base)
+		       .get_prolongation_matrix(child, RefinementCase<dim>(ref_case))(
+			 base_index_i,base_index_j));
+	      };
+	  };
+    }
 				   // now set up the interface constraints.
 				   // this is kind'o hairy, so don't try
 				   // to do it dimension independent

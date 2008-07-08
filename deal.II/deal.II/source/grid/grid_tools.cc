@@ -950,8 +950,6 @@ GridTools::get_finest_common_cells (const Container &mesh_1,
           ExcMessage ("The two containers must be represent triangulations that "
                       "have the same coarse meshes"));
 
-  const unsigned int dim = Container::dimension;
-
                                    // the algorithm goes as follows:
                                    // first, we fill a list with pairs
                                    // of iterators common to the two
@@ -994,7 +992,9 @@ GridTools::get_finest_common_cells (const Container &mesh_1,
           &&
           cell_pair->second->has_children())
         {
-          for (unsigned int c=0; c<GeometryInfo<dim>::children_per_cell; ++c)
+	  Assert(cell_pair->first->refinement_case()==
+		 cell_pair->second->refinement_case(), ExcNotImplemented());
+          for (unsigned int c=0; c<cell_pair->first->n_children(); ++c)
             cell_list.push_back (std::make_pair (cell_pair->first->child(c),
                                                  cell_pair->second->child(c)));
 
@@ -1016,13 +1016,17 @@ GridTools::get_finest_common_cells (const Container &mesh_1,
         ++cell_pair;
     }
 
-                                   // just to make sure everything is
-                                   // ok, validate that all pairs have
-                                   // at least one active iterator
+                                   // just to make sure everything is ok,
+                                   // validate that all pairs have at least one
+                                   // active iterator or have different
+                                   // refinement_cases
   for (cell_pair = cell_list.begin(); cell_pair != cell_list.end(); ++cell_pair)
-    Assert (!cell_pair->first->has_children()
+    Assert (cell_pair->first->active()
             ||
-            !cell_pair->second->has_children(),
+            cell_pair->second->active()
+	    ||
+	    (cell_pair->first->refinement_case()
+	     != cell_pair->second->refinement_case()),
             ExcInternalError());
 
   return cell_list;

@@ -2,7 +2,7 @@
 //    $Id$
 //    Version: $Name$
 //
-//    Copyright (C) 1998, 1999, 2000, 2001, 2002, 2003, 2004, 2005, 2006, 2007 by the deal.II authors
+//    Copyright (C) 1998, 1999, 2000, 2001, 2002, 2003, 2004, 2005, 2006, 2007, 2008 by the deal.II authors
 //
 //    This file is subject to QPL and may not be  distributed
 //    without copyright and license information. Please refer
@@ -20,6 +20,736 @@
 
 DEAL_II_NAMESPACE_OPEN
 
+
+
+/**
+ * A class that provides possible choices for isotropic and
+ * anisotropic refinement flags in the current space dimension.
+ *
+ * This general template is unused except in some weird template
+ * constructs. Actual is made, however, of the specializations
+ * <code>RefinementPossibilities@<1@></code>,
+ * <code>RefinementPossibilities@<2@></code>, and
+ * <code>RefinementPossibilities@<3@></code>.
+ *
+ * @ingroup aniso
+ * @author Ralf Hartmann, 2005, Wolfgang Bangerth, 2007
+ */
+template <int dim>
+struct RefinementPossibilities
+{
+				     /**
+				      * Possible values for refinement
+				      * cases in the current
+				      * dimension.
+				      *
+				      * Note the construction of the
+				      * values: the lowest bit
+				      * describes a cut of the x-axis,
+				      * the second to lowest bit
+				      * corresponds to a cut of the
+				      * y-axis and the third to lowest
+				      * bit corresponds to a cut of
+				      * the z-axis. Thus, the
+				      * following relations hold
+				      * (among others):
+				      *
+				      * @code
+				      * cut_xy  == cut_x  | cut_y
+				      * cut_xyz == cut_xy | cut_xz
+				      * cut_x   == cut_xy & cut_xz
+				      * @endcode
+				      *
+				      * Only those cuts that are
+				      * reasonable in a given space
+				      * dimension are offered, of
+				      * course.
+				      *
+				      * In addition, the tag
+				      * <code>isotropic_refinement</code>
+				      * denotes isotropic refinement
+				      * in the space dimension
+				      * selected by the template
+				      * argument of this class.
+				      */
+    enum Possibilities
+    {
+	  no_refinement= 0,
+
+	  isotropic_refinement = static_cast<unsigned char>(-1)
+    };
+};
+
+
+
+/**
+ * A class that provides possible choices for isotropic and
+ * anisotropic refinement flags in the current space dimension.
+ *
+ * This specialization is used for <code>dim=1</code>, where it offers
+ * refinement in x-direction.
+ *
+ * @ingroup aniso
+ * @author Ralf Hartmann, 2005, Wolfgang Bangerth, 2007
+ */
+template <>
+struct RefinementPossibilities<1>
+{
+				     /**
+				      * Possible values for refinement
+				      * cases in the current
+				      * dimension.
+				      *
+				      * Note the construction of the
+				      * values: the lowest bit
+				      * describes a cut of the x-axis,
+				      * the second to lowest bit
+				      * corresponds to a cut of the
+				      * y-axis and the third to lowest
+				      * bit corresponds to a cut of
+				      * the z-axis. Thus, the
+				      * following relations hold
+				      * (among others):
+				      *
+				      * @code
+				      * cut_xy  == cut_x  | cut_y
+				      * cut_xyz == cut_xy | cut_xz
+				      * cut_x   == cut_xy & cut_xz
+				      * @endcode
+				      *
+				      * Only those cuts that are
+				      * reasonable in a given space
+				      * dimension are offered, of
+				      * course.
+				      *
+				      * In addition, the tag
+				      * <code>isotropic_refinement</code>
+				      * denotes isotropic refinement
+				      * in the space dimension
+				      * selected by the template
+				      * argument of this class.
+				      */
+    enum Possibilities
+    {
+	  no_refinement= 0,
+	  cut_x        = 1,
+
+	  isotropic_refinement = cut_x
+    };
+};
+
+
+
+/**
+ * A class that provides possible choices for isotropic and
+ * anisotropic refinement flags in the current space dimension.
+ *
+ * This specialization is used for <code>dim=2</code>, where it offers
+ * refinement in x- and y-direction separately, as well as isotropic
+ * refinement in both directions at the same time.
+ *
+ * @ingroup aniso
+ * @author Ralf Hartmann, 2005, Wolfgang Bangerth, 2007
+ */
+template <>
+struct RefinementPossibilities<2>
+{
+				     /**
+				      * Possible values for refinement
+				      * cases in the current
+				      * dimension.
+				      *
+				      * Note the construction of the
+				      * values: the lowest bit
+				      * describes a cut of the x-axis,
+				      * the second to lowest bit
+				      * corresponds to a cut of the
+				      * y-axis and the third to lowest
+				      * bit corresponds to a cut of
+				      * the z-axis. Thus, the
+				      * following relations hold
+				      * (among others):
+				      *
+				      * @code
+				      * cut_xy  == cut_x  | cut_y
+				      * cut_xyz == cut_xy | cut_xz
+				      * cut_x   == cut_xy & cut_xz
+				      * @endcode
+				      *
+				      * Only those cuts that are
+				      * reasonable in a given space
+				      * dimension are offered, of
+				      * course.
+				      *
+				      * In addition, the tag
+				      * <code>isotropic_refinement</code>
+				      * denotes isotropic refinement
+				      * in the space dimension
+				      * selected by the template
+				      * argument of this class.
+				      */
+    enum Possibilities
+    {
+	  no_refinement= 0,
+	  cut_x        = 1,
+	  cut_y        = 2,
+	  cut_xy       = cut_x | cut_y,
+
+	  isotropic_refinement = cut_xy
+    };
+};
+
+
+
+/**
+ * A class that provides possible choices for isotropic and
+ * anisotropic refinement flags in the current space dimension.
+ *
+ * This specialization is used for <code>dim=3</code>, where it offers
+ * refinement in x-, y- and z-direction separately, as well as
+ * combinations of these and isotropic refinement in all directions at
+ * the same time.
+ *
+ * @ingroup aniso
+ * @author Ralf Hartmann, 2005, Wolfgang Bangerth, 2007
+ */
+template <>
+struct RefinementPossibilities<3>
+{
+				     /**
+				      * Possible values for refinement
+				      * cases in the current
+				      * dimension.
+				      *
+				      * Note the construction of the
+				      * values: the lowest bit
+				      * describes a cut of the x-axis,
+				      * the second to lowest bit
+				      * corresponds to a cut of the
+				      * y-axis and the third to lowest
+				      * bit corresponds to a cut of
+				      * the z-axis. Thus, the
+				      * following relations hold
+				      * (among others):
+				      *
+				      * @code
+				      * cut_xy  == cut_x  | cut_y
+				      * cut_xyz == cut_xy | cut_xz
+				      * cut_x   == cut_xy & cut_xz
+				      * @endcode
+				      *
+				      * Only those cuts that are
+				      * reasonable in a given space
+				      * dimension are offered, of
+				      * course.
+				      *
+				      * In addition, the tag
+				      * <code>isotropic_refinement</code>
+				      * denotes isotropic refinement
+				      * in the space dimension
+				      * selected by the template
+				      * argument of this class.
+				      */
+    enum Possibilities
+    {
+	  no_refinement= 0,
+	  cut_x        = 1,
+	  cut_y        = 2,
+	  cut_xy       = cut_x | cut_y,
+	  cut_z        = 4,
+	  cut_xz       = cut_x | cut_z,
+	  cut_yz       = cut_y | cut_z,
+	  cut_xyz      = cut_x | cut_y | cut_z,
+
+	  isotropic_refinement = cut_xyz
+    };
+};
+
+
+
+/**
+ * A class storing the possible anisotropic and isotropic refinement
+ * cases of an object with <code>dim</code> dimensions (for example,
+ * for a line <code>dim=1</code> in whatever space dimension we are,
+ * for a quad <code>dim=2</code>, etc.). Possible values of this class
+ * are the ones listed in the enumeration declared within the class.
+ *
+ * @ingroup aniso
+ * @author Ralf Hartmann, 2005, Wolfgang Bangerth, 2007
+ */
+template <int dim>
+class RefinementCase : public RefinementPossibilities<dim>
+{
+  public:
+				     /**
+				      * Constructor. Take and store a
+				      * value indicating a particular
+				      * refinement from the list of
+				      * possible refinements specified
+				      * in the base class.
+				      */
+   RefinementCase (const typename RefinementPossibilities<dim>::Possibilities refinement_case);
+
+				     /**
+				      * Constructor. Take and store a
+				      * value indicating a particular
+				      * refinement as a bit field. To
+				      * avoid implicit conversions to
+				      * and from integral values, this
+				      * constructor is marked as
+				      * explicit.
+				      */
+   explicit RefinementCase (const unsigned char refinement_case);
+    
+				     /**
+				      * Return the numeric value
+				      * stored by this class. While
+				      * the presence of this operator
+				      * might seem dangerous, it is
+				      * useful in cases where one
+				      * would like to have code like
+				      * <tt>switch
+				      * (refinement_flag)... case
+				      * RefinementCase<dim>::cut_x:
+				      * ... </tt>, which can be
+				      * written as <code>switch
+				      * (static_cast@<unsigned
+				      * char@>(refinement_flag)</code>. Another
+				      * application is to use an
+				      * object of the current type as
+				      * an index into an array;
+				      * however, this use is
+				      * deprecated as it assumes a
+				      * certain mapping from the
+				      * symbolic flags defined in the
+				      * RefinementPossibilities base
+				      * class to actual numerical
+				      * values (the array indices).
+				      */
+    operator unsigned char () const;
+
+				     /**
+				      * Return the union of the
+				      * refinement flags represented
+				      * by the current object and the
+				      * one given as argument.
+				      */
+    RefinementCase operator | (const RefinementCase &r) const;
+    
+				     /**
+				      * Return the intersection of the
+				      * refinement flags represented
+				      * by the current object and the
+				      * one given as argument.
+				      */
+    RefinementCase operator & (const RefinementCase &r) const;
+
+				     /**
+				      * Return the negation of the
+				      * refinement flags represented
+				      * by the current object. For
+				      * example, in 2d, if the current
+				      * object holds the flag
+				      * <code>cut_x</code>, then the
+				      * returned value will be
+				      * <code>cut_y</code>; if the
+				      * current value is
+				      * <code>isotropic_refinement</code>
+				      * then the result will be
+				      * <code>no_refinement</code>;
+				      * etc.
+				      */
+    RefinementCase operator ~ () const;
+
+
+				     /**
+				      * Return the flag that
+				      * corresponds to cutting a cell
+				      * along the axis given as
+				      * argument. For example, if
+				      * <code>i=0</code> then the
+				      * returned value is
+				      * <tt>RefinementPossibilities<dim>::cut_x</tt>.
+				      */
+    static
+    RefinementCase cut_axis (const unsigned int i);
+    
+				     /**
+				      * Return the amount of memory
+				      * occupied by an object of this
+				      * type.
+				      */
+    static unsigned int memory_consumption ();
+
+				     /**
+				      * Exception.
+				      */
+    DeclException1 (ExcInvalidRefinementCase,
+		    int,
+		    << "The refinement flags given (" << arg1 << ") contain set bits that do not "
+		    << "make sense for the space dimension of the object to which they are applied.");
+    
+  private:
+				     /**
+				      * Store the refinement case as a
+				      * bit field with as many bits as
+				      * are necessary in any given
+				      * dimension.
+				      */
+    unsigned char value : (dim > 0 ? dim : 1);
+};
+
+
+
+namespace internal
+{
+
+
+/**
+ * A class that provides all possible situations a face (in the
+ * current space dimension @p dim) might be subdivided into
+ * subfaces. For <code>dim=1</code> and <code>dim=2</code> they
+ * correspond to the cases given in
+ * <code>RefinementPossibilities@<dim-1@></code>. However,
+ * <code>SubfacePossibilities@<3@></code> includes the refinement
+ * cases of <code>RefinementPossibilities@<2@></code>, but
+ * additionally some subface possibilities a face might be subdivided
+ * into which occur through repeated anisotropic refinement steps
+ * performed on one of two neighboring cells.
+ *
+ * This general template is unused except in some weird template
+ * constructs. Actual is made, however, of the specializations
+ * <code>SubfacePossibilities@<1@></code>,
+ * <code>SubfacePossibilities@<2@></code> and
+ * <code>SubfacePossibilities@<3@></code>.
+ *
+ * @ingroup aniso
+ * @author Tobias Leicht 2007, Ralf Hartmann, 2008
+ */
+  template <int dim>
+  struct SubfacePossibilities
+  {
+				       /**
+					* Possible cases of faces
+					* being subdivided into
+					* subface.
+					*/
+      enum Possibilities
+      {
+	    case_none = 0,
+
+	    case_isotropic = static_cast<unsigned char>(-1)
+      };
+  };
+
+
+/**
+ * A class that provides all possible situations a face (in the
+ * current space dimension @p dim) might be subdivided into
+ * subfaces.
+ *
+ * For <code>dim=0</code> we provide a dummy implementation only.
+ *
+ * @ingroup aniso
+ * @author Ralf Hartmann, 2008
+ */
+  template <>
+  struct SubfacePossibilities<0>
+  {
+				       /**
+					* Possible cases of faces
+					* being subdivided into
+					* subface.
+					*
+					* Dummy implementation.
+					*/
+      enum Possibilities
+      {
+	    case_none = 0,
+
+	    case_isotropic = case_none
+      };
+  };
+
+
+
+/**
+ * A class that provides all possible situations a face (in the
+ * current space dimension @p dim) might be subdivided into
+ * subfaces.
+ *
+ * For <code>dim=1</code> there are no faces. Thereby, there are no
+ * subface possibilities.
+ *
+ * @ingroup aniso
+ * @author Ralf Hartmann, 2008
+ */
+  template <>
+  struct SubfacePossibilities<1>
+  {
+				       /**
+					* Possible cases of faces
+					* being subdivided into
+					* subface.
+					*
+					* In 1d there are no faces,
+					* thus no subface
+					* possibilities.
+					*/
+      enum Possibilities
+      {
+	    case_none = 0,
+
+	    case_isotropic = case_none
+      };
+  };
+
+
+
+/**
+ * A class that provides all possible situations a face (in the
+ * current space dimension @p dim) might be subdivided into
+ * subfaces.
+ *
+ * This specialization is used for <code>dim=2</code>, where it offers
+ * the following possibilities: a face (line) being refined
+ * (<code>case_x</code>) or not refined (<code>case_no</code>).
+ *
+ * @ingroup aniso
+ * @author Ralf Hartmann, 2008
+ */
+  template <>
+  struct SubfacePossibilities<2>
+  {
+				       /**
+					* Possible cases of faces
+					* being subdivided into
+					* subface.
+					*
+					* In 2d there are following
+					* possibilities: a face (line)
+					* being refined *
+					* (<code>case_x</code>) or not
+					* refined
+					* (<code>case_no</code>).
+				       */
+      enum Possibilities
+      {
+	    case_none = 0,
+	    case_x    = 1,
+
+	    case_isotropic = case_x
+      };
+  };
+
+
+
+/**
+ * A class that provides all possible situations a face (in the
+ * current space dimension @p dim) might be subdivided into
+ * subfaces.
+ *
+ * This specialization is used for dim=3, where it offers following
+ * possibilities: a face (quad) being refined in x- or y-direction (in
+ * the face-intern coordinate system) separately, (<code>case_x</code>
+ * or (<code>case_y</code>), and in both directions
+ * (<code>case_x</code> which corresponds to
+ * (<code>case_isotropic</code>). Additionally, it offers the
+ * possibilities a face can have through repeated anisotropic
+ * refinement steps performed on one of the two neighboring cells.  It
+ * might be possible for example, that a face (quad) is refined with
+ * <code>cut_x</code> and afterwards the left child is again refined
+ * with <code>cut_y</code>, so that there are three active
+ * subfaces. Note, however, that only refinement cases are allowed
+ * such that each line on a face between two hexes has not more than
+ * one hanging node. Furthermore, it is not allowed that two
+ * neighboring hexes are refined such that one of the hexes refines
+ * the common face with <code>cut_x</code> and the other hex refines
+ * that face with <code>cut_y</code>. In fact,
+ * Triangulation::prepare_coarsening_and_refinement takes care of this
+ * situation and ensures that each face of a refined cell is
+ * completely contained in a single face of neighboring cells.
+ *
+ * The following drawings explain the SubfacePossibilities and give
+ * the corresponding subface numbers:
+ * @code
+
+ *-------*
+ |       |
+ |   0   |    case_none
+ |       |
+ *-------*
+ 
+ *---*---*
+ |   |   |
+ | 0 | 1 |    case_x
+ |   |   |
+ *---*---*
+ 
+ *---*---*
+ | 1 |   |
+ *---* 2 |    case_x1y
+ | 0 |   |
+ *---*---*
+ 
+ *---*---*
+ |   | 2 |
+ | 0 *---*    case_x2y
+ |   | 1 |
+ *---*---*
+ 
+ *---*---*
+ | 1 | 3 |
+ *---*---*    case_x1y2y   (successive refinement: first cut_x, then cut_y for both children)
+ | 0 | 2 |
+ *---*---*
+ 
+ *-------*
+ |   1   |
+ *-------*    case_y
+ |   0   |
+ *-------*
+ 
+ *-------*
+ |   2   |
+ *---*---*    case_y1x
+ | 0 | 1 |
+ *---*---*
+ 
+ *---*---*
+ | 1 | 2 |
+ *---*---*    case_y2x
+ |   0   |
+ *-------*
+ 
+ *---*---*
+ | 2 | 3 |
+ *---*---*    case_y1x2x   (successive refinement: first cut_y, then cut_x for both children)
+ | 0 | 1 |
+ *---+---*
+ 
+ *---*---*
+ | 2 | 3 |
+ *---*---*    case_xy      (one isotropic refinement step)
+ | 0 | 1 |
+ *---*---*
+
+ * @endcode
+ *
+ * @ingroup aniso
+ * @author Tobias Leicht 2007, Ralf Hartmann, 2008
+ */
+  template <>
+  struct SubfacePossibilities<3>
+  {
+				       /**
+					* Possible cases of faces
+					* being subdivided into
+					* subface.
+					*
+					* See documentation to the
+					* SubfacePossibilities<3> for
+					* more details on the subface
+					* possibilities.
+					*/
+      enum Possibilities
+      {
+	    case_none  = 0,
+	    case_x     = 1,
+	    case_x1y   = 2,
+	    case_x2y   = 3,
+	    case_x1y2y = 4,
+	    case_y     = 5,
+	    case_y1x   = 6,
+	    case_y2x   = 7,
+	    case_y1x2x = 8,
+	    case_xy    = 9,
+
+	    case_isotropic = case_xy
+      };
+  };
+
+
+
+
+/**
+ * A class that provides all possible cases a face (in the
+ * current space dimension @p dim) might be subdivided into
+ * subfaces.
+ *
+ * @ingroup aniso
+ * @author Ralf Hartmann, 2008
+ */
+  template <int dim>
+  class SubfaceCase : public SubfacePossibilities<dim>
+  {
+    public:
+				       /**
+					* Constructor. Take and store
+					* a value indicating a
+					* particular subface
+					* possibility in the list of
+					* possible situations
+					* specified in the base class.
+					*/
+      SubfaceCase (const typename SubfacePossibilities<dim>::Possibilities subface_possibility);
+    
+				       /**
+					* Return the numeric value
+					* stored by this class. While
+					* the presence of this operator
+					* might seem dangerous, it is
+					* useful in cases where one
+					* would like to have code like
+					* <code>switch
+					* (subface_case)... case
+					* SubfaceCase@<dim@>::case_x:
+					* ... </code>, which can be
+					* written as <code>switch
+					* (static_cast@<unsigned
+					* char@>(subface_case)</code>. Another
+					* application is to use an
+					* object of the current type as
+					* an index into an array;
+					* however, this use is
+					* deprecated as it assumes a
+					* certain mapping from the
+					* symbolic flags defined in the
+					* SubfacePossibilities
+					* base class to actual numerical
+					* values (the array indices).
+					*/
+      operator unsigned char () const;
+    
+				       /**
+					* Return the amount of memory
+					* occupied by an object of this
+					* type.
+					*/
+      static unsigned int memory_consumption ();
+
+				       /**
+					* Exception.
+					*/
+      DeclException1 (ExcInvalidSubfaceCase,
+		      int,
+		      << "The subface case given (" << arg1 << ") does not make sense "
+		      << "for the space dimension of the object to which they are applied.");
+    
+    private:
+				       /**
+					* Store the refinement case as a
+					* bit field with as many bits as
+					* are necessary in any given
+					* dimension.
+					*/
+      unsigned char value : (dim == 3 ? 4 : 1);
+  };
+  
+} // namespace internal
+
+
+
 template <int dim> class GeometryInfo;
 
 
@@ -35,35 +765,50 @@ template <int dim> class GeometryInfo;
  * This class contains as static members information on vertices and
  * faces of a @p dim-dimensional grid cell. The interface is the same
  * for all dimensions. If a value is of no use in a low dimensional
- * cell, it is (correctly) set to zero, e.g. #subfaces_per_face in
+ * cell, it is (correctly) set to zero, e.g. #max_children_per_face in
  * 1d.
  *
  * This information should always replace hard-coded numbers of
  * vertices, neighbors and so on, since it can be used dimension
  * independently.
  *
- * @ingroup grid geomprimitives
+ * @ingroup grid geomprimitives aniso
  * @author Wolfgang Bangerth, 1998
  */
 template <>
 struct GeometryInfo<0> 
 {
 
-				     /**
-				      * Number of children a cell has.
-				      */
-    static const unsigned int children_per_cell = 1;
+                                     /**
+                                      * Maximum number of children of
+                                      * a cell, i.e. the number of
+                                      * children of an isotropically
+                                      * refined cell.
+				      *
+				      * If a cell is refined
+				      * anisotropically, the actual
+				      * number of children may be less
+				      * than the value given here.
+                                      */
+    static const unsigned int max_children_per_cell = 1;
 
 				     /**
 				      * Number of faces a cell has.
 				      */
     static const unsigned int faces_per_cell    = 0;
 
-				     /**
-				      * Number of children each face has
-				      * when the adjacent cell is refined.
-				      */
-    static const unsigned int subfaces_per_face = 0;
+                                     /**
+                                      * Maximum number of children of
+                                      * a refined face, i.e. the
+                                      * number of children of an
+                                      * isotropically refined face.
+				      *
+				      * If a cell is refined
+				      * anisotropically, the actual
+				      * number of children may be less
+				      * than the value given here.
+                                      */
+    static const unsigned int max_children_per_face = 0;
 
 				     /**
 				      * Number of vertices a cell has.
@@ -451,19 +1196,20 @@ struct GeometryInfo<0>
  *
  * <h4>Children</h4>
  *
- * The eight children of a cell are numbered according to the vertices they
- * are adjacent to:
+ * The eight children of an isotropically refined cell are numbered according to
+ * the vertices they are adjacent to:
  * @verbatim
- *       *-------*        *-------*
- *      /| 6   7 |       / 6   7 /|
- *     /6|       |      /       /7|
- *    /  |       |     / 4   5 /  |
- *   *   | 2   3 |    *-------*5 3|
- *   |4 2*-------*    | 4   5 |   *
- *   |  / 2   3 /     |       |  /
- *   |0/       /      |       |1/
- *   |/0    1 /       | 0   1 |/
- *   *-------*        *-------*
+ *       *----*----*        *----*----*
+ *      /| 6  |  7 |       / 6  /  7 /|
+ *     *6|    |    |      *----*----*7|
+ *    /| *----*----*     / 4  /  5 /| *
+ *   * |/|    |    |    *----*----* |/|
+ *   |4* | 2  |  3 |    | 4  |  5 |5*3|
+ *   |/|2*----*----*    |    |    |/| *
+ *   * |/ 2  /  3 /     *----*----* |/
+ *   |0*----*----*      |    |    |1*
+ *   |/0   /  1 /       | 0  |  1 |/
+ *   *----*----*        *----*----*
  * @endverbatim
  *
  * Taking into account the orientation of the faces, the following
@@ -503,6 +1249,107 @@ struct GeometryInfo<0>
  * orientation as additional argument to
  * <tt>GeometryInfo<3>::child_cell_on_face</tt>).
  *
+ * For anisotropic refinement, the child cells can not be numbered according to
+ * adjacent vertices, thus the following conventions are used:
+ * @verbatim
+ *            RefinementCase<3>::cut_x
+ *
+ *       *----*----*        *----*----*
+ *      /|    |    |       /    /    /|
+ *     / |    |    |      / 0  /  1 / |
+ *    /  | 0  |  1 |     /    /    /  |
+ *   *   |    |    |    *----*----*   |
+ *   | 0 |    |    |    |    |    | 1 |
+ *   |   *----*----*    |    |    |   *
+ *   |  /    /    /     | 0  | 1  |  /
+ *   | / 0  /  1 /      |    |    | /
+ *   |/    /    /       |    |    |/
+ *   *----*----*        *----*----*
+ * @endverbatim
+ *
+ * @verbatim
+ *            RefinementCase<3>::cut_y
+ *
+ *       *---------*        *---------*
+ *      /|         |       /    1    /|
+ *     * |         |      *---------* |
+ *    /| |    1    |     /    0    /| |
+ *   * |1|         |    *---------* |1|
+ *   | | |         |    |         | | |
+ *   |0| *---------*    |         |0| *
+ *   | |/    1    /     |    0    | |/
+ *   | *---------*      |         | *
+ *   |/    0    /       |         |/
+ *   *---------*        *---------*
+ * @endverbatim
+ *
+ * @verbatim
+ *            RefinementCase<3>::cut_z
+ *
+ *       *---------*        *---------*
+ *      /|    1    |       /         /|
+ *     / |         |      /    1    / |
+ *    /  *---------*     /         /  *
+ *   * 1/|         |    *---------* 1/|
+ *   | / |    0    |    |    1    | / |
+ *   |/  *---------*    |         |/  *
+ *   * 0/         /     *---------* 0/
+ *   | /    0    /      |         | /
+ *   |/         /       |    0    |/
+ *   *---------*        *---------*
+ * @endverbatim
+ *
+ * @verbatim
+ *            RefinementCase<3>::cut_xy
+ *
+ *       *----*----*        *----*----*
+ *      /|    |    |       / 2  /  3 /|
+ *     * |    |    |      *----*----* |
+ *    /| | 2  |  3 |     / 0  /  1 /| |
+ *   * |2|    |    |    *----*----* |3|
+ *   | | |    |    |    |    |    | | |
+ *   |0| *----*----*    |    |    |1| *
+ *   | |/ 2  /  3 /     | 0  |  1 | |/
+ *   | *----*----*      |    |    | *
+ *   |/ 0  /  1 /       |    |    |/
+ *   *----*----*        *----*----*
+ * @endverbatim
+ *
+ * @verbatim
+ *            RefinementCase<3>::cut_xz
+ *
+ *       *----*----*        *----*----*
+ *      /| 1  |  3 |       /    /    /|
+ *     / |    |    |      / 1  /  3 / |
+ *    /  *----*----*     /    /    /  *
+ *   * 1/|    |    |    *----*----* 3/|
+ *   | / | 0  |  2 |    | 1  |  3 | / |
+ *   |/  *----*----*    |    |    |/  *
+ *   * 0/    /    /     *----*----* 2/
+ *   | / 0  /  2 /      |    |    | /
+ *   |/    /    /       | 0  |  2 |/
+ *   *----*----*        *----*----*
+ * @endverbatim
+ *
+ * @verbatim
+ *            RefinementCase<3>::cut_yz
+ *
+ *       *---------*        *---------*
+ *      /|    3    |       /    3    /|
+ *     * |         |      *---------* |
+ *    /|3*---------*     /    2    /|3*
+ *   * |/|         |    *---------* |/|
+ *   |2* |    1    |    |    2    |2* |
+ *   |/|1*---------*    |         |/|1*
+ *   * |/    1    /     *---------* |/
+ *   |0*---------*      |         |0*
+ *   |/    0    /       |    0    |/
+ *   *---------*        *---------*
+ * @endverbatim
+ *
+ * This information can also be obtained by the
+ * <tt>GeometryInfo<3>::child_cell_on_face</tt> function.
+ *
  * <h4>Coordinate systems</h4>
  *
  * We define the following coordinate system for the explicit coordinates of
@@ -539,28 +1386,43 @@ struct GeometryInfo<0>
  * and there is a specialization for dim=0 (see the section on @ref
  * Instantiations in the manual).
  *
- * @ingroup grid geomprimitives
+ * @ingroup grid geomprimitives aniso
  * @author Wolfgang Bangerth, 1998, Ralf Hartmann, 2005, Tobias Leicht, 2007
  */
 template <int dim>
 struct GeometryInfo
 {
     
-				     /**
-				      * Number of children of a refined cell.
-				      */
-    static const unsigned int children_per_cell = 1 << dim;
+                                     /**
+                                      * Maximum number of children of
+                                      * a refined cell, i.e. the
+                                      * number of children of an
+                                      * isotropically refined cell.
+				      *
+				      * If a cell is refined
+				      * anisotropically, the actual
+				      * number of children may be less
+				      * than the value given here.
+                                      */
+    static const unsigned int max_children_per_cell = 1 << dim;
 
 				     /**
 				      * Number of faces of a cell.
 				      */
     static const unsigned int faces_per_cell = 2 * dim;
 
-				     /**
-				      * Number of children each face has
-				      * when the adjacent cell is refined.
-				      */
-    static const unsigned int subfaces_per_face = GeometryInfo<dim-1>::children_per_cell;
+                                     /**
+                                      * Maximum number of children of
+                                      * a refined face, i.e. the
+                                      * number of children of an
+                                      * isotropically refined face.
+				      *
+				      * If a cell is refined
+				      * anisotropically, the actual
+				      * number of children may be less
+				      * than the value given here.
+                                      */
+    static const unsigned int max_children_per_face = GeometryInfo<dim-1>::max_children_per_cell;
 
 				     /**
 				      * Number of vertices of a cell.
@@ -672,7 +1534,6 @@ struct GeometryInfo
 				      */
     static const unsigned int dx_to_deal[vertices_per_cell];
 
-
                                      /**
 				      * This field stores for each vertex
                                       * to which faces it belongs. In any
@@ -684,7 +1545,88 @@ struct GeometryInfo
                                       * the vertex belongs
                                       */
     static const unsigned int vertex_to_face[vertices_per_cell][dim];
-   
+ 
+				     /**
+				      * Return the number of children
+				      * of a cell (or face) refined
+				      * with <tt>ref_case</tt>.
+				      */
+    static unsigned int n_children(const RefinementCase<dim> &refinement_case);
+
+				     /**
+				      * Return the number of subfaces
+				      * of a face refined according to
+				      * internal::SubfaceCase
+				      * @p face_ref_case.
+				      */
+    static unsigned int n_subfaces(const internal::SubfaceCase<dim> &subface_case);
+
+				     /**
+				      * Given a face on the reference
+				      * element with a
+				      * <code>internal::SubfaceCase@<dim@></code>
+				      * @p face_refinement_case this
+				      * function returns the ratio
+				      * between the area of the @p
+				      * subface_no th subface and the
+				      * area(=1) of the face.
+				      *
+				      * E.g. for
+				      * <code>internal::SubfaceCase@<3@>::cut_xy</code>
+				      * the ratio is 1/4 for each of
+				      * the subfaces.
+				      */
+    static double subface_ratio(const internal::SubfaceCase<dim> &subface_case,
+				const unsigned int subface_no);
+
+				     /**
+				      * Given a cell refined with the
+				      * <code>RefinementCase</code>
+				      * @p cell_refinement_case
+				      * return the
+				      * <code>SubfaceCase</code> of
+				      * the @p face_no th face.
+				      */
+    static RefinementCase<dim-1> face_refinement_case(
+      const RefinementCase<dim> &cell_refinement_case,
+      const unsigned int face_no,
+      const bool face_orientation = true,
+      const bool face_flip        = false,
+      const bool face_rotation    = false);
+
+				     /**
+				      * Given the SubfaceCase @p
+				      * face_refinement_case of the @p
+				      * face_no th face, return the
+				      * smallest RefinementCase of the
+				      * cell, which corresponds to
+				      * that refinement of the face.
+				      */
+    static RefinementCase<dim> min_cell_refinement_case_for_face_refinement(
+      const RefinementCase<dim-1> &face_refinement_case,
+      const unsigned int face_no,
+      const bool face_orientation = true,
+      const bool face_flip        = false,
+      const bool face_rotation    = false);
+
+				     /**
+				      * Given a cell refined with the
+				      * RefinementCase @p
+				      * cell_refinement_case return
+				      * the RefinementCase of the @p
+				      * line_no th face.
+				      */
+    static RefinementCase<1> line_refinement_case(const RefinementCase<dim> &cell_refinement_case,
+						  const unsigned int line_no);
+
+				     /**
+				      * Return the minimal / smallest
+				      * RefinementCase of the cell, which
+				      * ensures refinement of line
+				      * @p line_no.
+				      */
+    static RefinementCase<dim> min_cell_refinement_case_for_line_refinement(const unsigned int line_no);
+
                                      /**
 				      * This field stores which child
 				      * cells are adjacent to a
@@ -740,12 +1682,23 @@ struct GeometryInfo
 				      * face orientations is explained in this
 				      * @ref GlossFaceOrientation "glossary"
 				      * entry.
+				      *
+				      * In the case of anisotropically refined
+				      * cells and faces, the @p RefineCase of
+				      * the face, <tt>face_ref_case</tt>,
+				      * might have an influence on 
+				      * which child is behind which given
+				      * subface, thus this is an additional
+				      * argument, defaulting to isotropic
+				      * refinement of the face.
 				      */
-    static unsigned int child_cell_on_face (const unsigned int face,
+    static unsigned int child_cell_on_face (const RefinementCase<dim> &ref_case,
+					    const unsigned int face,
 					    const unsigned int subface,
 					    const bool face_orientation = true,
 					    const bool face_flip        = false,
-					    const bool face_rotation    = false);
+					    const bool face_rotation    = false,
+					    const RefinementCase<dim-1> &face_refinement_case = RefinementCase<dim-1>::isotropic_refinement);
     
 				     /**
 				      * Map line vertex number to cell
@@ -921,7 +1874,7 @@ struct GeometryInfo
 				      * children, return any one of
 				      * their indices. The result is
 				      * always less than
-				      * GeometryInfo<dimension>::children_per_cell.
+				      * GeometryInfo<dimension>::max_children_per_cell.
 				      *
 				      * The order of child cells is described
 				      * the general documentation of this
@@ -944,7 +1897,7 @@ struct GeometryInfo
 				      * child.
 				      */
     static Point<dim> cell_to_child_coordinates (const Point<dim>    &p,
-						 const unsigned int child_index);
+						 const unsigned int   child_index);
 
 				     /**
 				      * The reverse function to the
@@ -1076,6 +2029,14 @@ struct GeometryInfo
 		    double,
 		    << "The coordinates must satisfy 0 <= x_i <= 1, "
 		    << "but here we have x_i=" << arg1);
+            
+                                     /**
+                                      * Exception
+                                      */
+    DeclException3 (ExcInvalidSubface,
+                    int, int, int,
+                    << "RefinementCase<dim> " << arg1 << ": face " << arg2
+                    << " has no subface " << arg3);
 };
 
 
@@ -1115,6 +2076,165 @@ const unsigned int GeometryInfo<4>::opposite_face[faces_per_cell];
 
 
 /* -------------- inline functions ------------- */
+
+namespace internal
+{
+
+  template <int dim>
+  inline
+  SubfaceCase<dim>::SubfaceCase (const typename SubfacePossibilities<dim>::Possibilities subface_possibility)
+		  :
+		  value (subface_possibility)
+  {}
+  
+  
+  template <int dim>
+  inline
+  SubfaceCase<dim>::operator unsigned char () const
+  {
+    return value;
+  }
+  
+  
+} // namespace internal
+  
+
+template <int dim>
+inline
+RefinementCase<dim>
+RefinementCase<dim>::cut_axis (const unsigned int)
+{
+  Assert (false, ExcInternalError());
+  return static_cast<unsigned char>(-1);
+}
+
+
+template <>
+inline
+RefinementCase<1>
+RefinementCase<1>::cut_axis (const unsigned int i)
+{
+  const unsigned int dim = 1;
+  Assert (i < dim, ExcIndexRange(i, 0, dim));
+
+  static const RefinementCase options[dim] = { cut_x };
+  return options[i];
+}
+
+
+
+template <>
+inline
+RefinementCase<2>
+RefinementCase<2>::cut_axis (const unsigned int i)
+{
+  const unsigned int dim = 2;
+  Assert (i < dim, ExcIndexRange(i, 0, dim));
+
+  static const RefinementCase options[dim] = { cut_x, cut_y };
+  return options[i];
+}
+
+
+
+template <>
+inline
+RefinementCase<3>
+RefinementCase<3>::cut_axis (const unsigned int i)
+{
+  const unsigned int dim = 3;
+  Assert (i < dim, ExcIndexRange(i, 0, dim));
+
+  static const RefinementCase options[dim] = { cut_x, cut_y, cut_z };
+  return options[i];
+}
+
+
+
+template <int dim>
+inline
+RefinementCase<dim>::RefinementCase (const typename RefinementPossibilities<dim>::Possibilities refinement_case)
+		:
+		value (refinement_case)
+{
+				   // check that only those bits of
+				   // the given argument are set that
+				   // make sense for a given space
+				   // dimension
+  Assert ((refinement_case & RefinementPossibilities<dim>::isotropic_refinement) ==
+	  refinement_case,
+	  ExcInvalidRefinementCase (refinement_case));
+}
+
+
+
+template <int dim>
+inline
+RefinementCase<dim>::RefinementCase (const unsigned char refinement_case)
+		:
+		value (refinement_case)
+{
+				   // check that only those bits of
+				   // the given argument are set that
+				   // make sense for a given space
+				   // dimension
+  Assert ((refinement_case & RefinementPossibilities<dim>::isotropic_refinement) ==
+	  refinement_case,
+	  ExcInvalidRefinementCase (refinement_case));
+}
+
+
+
+template <int dim>
+inline
+RefinementCase<dim>::operator unsigned char () const
+{
+  return value;
+}
+
+
+
+template <int dim>
+inline
+RefinementCase<dim>
+RefinementCase<dim>::operator | (const RefinementCase<dim> &r) const
+{
+  return RefinementCase<dim>(value | r.value);
+}
+
+
+
+template <int dim>
+inline
+RefinementCase<dim>
+RefinementCase<dim>::operator & (const RefinementCase<dim> &r) const
+{
+  return RefinementCase<dim>(value & r.value);
+}
+
+
+
+template <int dim>
+inline
+RefinementCase<dim>
+RefinementCase<dim>::operator ~ () const
+{
+  return RefinementCase<dim>((~value) & RefinementPossibilities<dim>::isotropic_refinement);
+}
+
+
+
+
+template <int dim>
+inline
+unsigned int
+RefinementCase<dim>::memory_consumption ()
+{
+  return sizeof(RefinementCase<dim>);
+}
+
+
+
 
 
 template <>
@@ -1232,8 +2352,8 @@ Point<dim>
 GeometryInfo<dim>::cell_to_child_coordinates (const Point<dim>    &p,
 					      const unsigned int child_index)
 {
-  Assert (child_index < GeometryInfo<dim>::children_per_cell,
-	  ExcIndexRange (child_index, 0, GeometryInfo<dim>::children_per_cell));
+  Assert (child_index < GeometryInfo<dim>::max_children_per_cell,
+	  ExcIndexRange (child_index, 0, GeometryInfo<dim>::max_children_per_cell));
 
   return 2*p - unit_cell_vertex(child_index);
 }
@@ -1246,8 +2366,8 @@ Point<dim>
 GeometryInfo<dim>::child_to_cell_coordinates (const Point<dim>    &p,
 					      const unsigned int child_index)
 {
-  Assert (child_index < GeometryInfo<dim>::children_per_cell,
-	  ExcIndexRange (child_index, 0, GeometryInfo<dim>::children_per_cell));
+  Assert (child_index < GeometryInfo<dim>::max_children_per_cell,
+	  ExcIndexRange (child_index, 0, GeometryInfo<dim>::max_children_per_cell));
 
   return (p + unit_cell_vertex(child_index))/2;
 }
@@ -1319,6 +2439,7 @@ GeometryInfo<3>::is_inside_unit_cell (const Point<3> &p,
 	 (p[1] >= l) && (p[1] <= u) &&
 	 (p[2] >= l) && (p[2] <= u);
 }
+
 
 #endif // DOXYGEN
 DEAL_II_NAMESPACE_CLOSE

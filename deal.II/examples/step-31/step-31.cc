@@ -944,7 +944,7 @@ void BoussinesqFlowProblem<dim>::assemble_rhs_T ()
 					       // refined. loop over
 					       // all sub faces
 	      for (unsigned int subface_no=0;
-		   subface_no<GeometryInfo<dim>::subfaces_per_face;
+		   subface_no<GeometryInfo<dim>::max_children_per_face;
 		   ++subface_no)
 		{
 		  fe_subface_values.reinit (cell, face_no, subface_no);

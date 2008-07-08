@@ -51,18 +51,24 @@ namespace internal
     class TriaLevel
     {
       public:
-                                         /**
-                                          *  Flags for the cells whether they are
-                                          *  to be refined or not. The meaning
-                                          *  what a cell is, is dimension specific,
-                                          *  therefore also the length of this
-                                          *  vector depends on the dimension: in
-                                          *  one dimension, the length of this
-                                          *  vector equals the length of the
-                                          *  @p lines vector, in two dimensions
-                                          *  that of the @p quads vector, etc.
-                                          */
-        std::vector<bool> refine_flags;
+					 /**
+					  *  @p RefinementCase<dim>::Type flags
+					  *  for the cells to be
+					  *  refined with or not
+					  *  (RefinementCase<dim>::no_refinement). The
+					  *  meaning what a cell is,
+					  *  is dimension specific,
+					  *  therefore also the length
+					  *  of this vector depends on
+					  *  the dimension: in one
+					  *  dimension, the length of
+					  *  this vector equals the
+					  *  length of the @p lines
+					  *  vector, in two dimensions
+					  *  that of the @p quads
+					  *  vector, etc.
+					  */
+	std::vector<unsigned char> refine_flags;
 
                                          /**
                                           * Same meaning as the one above, but
@@ -204,7 +210,7 @@ namespace internal
     class TriaLevel<3>
     {
       public:
-        std::vector<bool> refine_flags;
+        std::vector<unsigned char> refine_flags;
         std::vector<bool> coarsen_flags;
         std::vector<std::pair<int,int> > neighbors;
         std::vector<unsigned int> subdomain_ids;

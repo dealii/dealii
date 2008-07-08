@@ -472,7 +472,7 @@ class Mapping : public Subscriptor
 				      * filled have to have the
 				      * correct size.
 				      *
-				      * Values are split into three
+				      * Values are split into two
 				      * groups: first,
 				      * @p quadrature_points and
 				      * @p JxW_values are
@@ -484,18 +484,18 @@ class Mapping : public Subscriptor
 				      * matrices needed to transform
 				      * vector-valued functions,
 				      * namely
-				      * @p covariant_transformation,
-				      * @p contravariant_transformation and the 
-				      * derivatives
-				      * @p covariant_grads.
-				      *
+				      * @p jacobians
+				      * and the derivatives
+				      * @p jacobian_grads.
 				      */
     virtual void
     fill_fe_values (const typename Triangulation<dim>::cell_iterator &cell,
 		    const Quadrature<dim>                         &quadrature,
 		    InternalDataBase                              &internal,
 		    std::vector<Point<dim> >                      &quadrature_points,
-		    std::vector<double>                           &JxW_values) const = 0;
+		    std::vector<double>                           &JxW_values,
+		    std::vector<Tensor<2,dim> >                   &jacobians,
+		    std::vector<Tensor<3,dim> >                   &jacobian_grads) const = 0;
 
 				     /**
 				      * Performs the same as @p fill_fe_values

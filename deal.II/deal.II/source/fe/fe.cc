@@ -208,6 +208,24 @@ FiniteElement<dim>::FiniteElement (
 				   // changed by constructor of
 				   // derived class.
   first_block_of_base_table.resize(1,0);
+
+				   // initialize the restriction and
+				   // prolongation matrices. the default
+				   // contructur of FullMatrix<dim> initializes
+				   // them with size zero
+  prolongation.resize(RefinementCase<dim>::isotropic_refinement);
+  restriction.resize(RefinementCase<dim>::isotropic_refinement);
+  for (unsigned int ref=RefinementCase<dim>::cut_x;
+       ref<RefinementCase<dim>::isotropic_refinement+1; ++ref)
+    {
+      prolongation[ref-1].resize (GeometryInfo<dim>::
+				  n_children(RefinementCase<dim>(ref)),
+				  FullMatrix<double>());
+      restriction[ref-1].resize (GeometryInfo<dim>::
+				  n_children(RefinementCase<dim>(ref)),
+				  FullMatrix<double>());
+    }
+
   adjust_quad_dof_index_for_face_orientation_table.fill(0);
 }
 
@@ -288,26 +306,71 @@ FiniteElement<dim>::shape_grad_grad_component (const unsigned int,
 }
 
 
+
+template <int dim>
+void
+FiniteElement<dim>::reinit_restriction_and_prolongation_matrices (
+  const bool isotropic_restriction_only,
+  const bool isotropic_prolongation_only)
+{
+  for (unsigned int ref_case=RefinementCase<dim>::cut_x;
+       ref_case<RefinementCase<dim>::isotropic_refinement+1; ++ref_case)
+    {
+      const unsigned int nc = GeometryInfo<dim>::n_children(RefinementCase<dim>(ref_case));
+      
+      for (unsigned int i=0; i<nc; ++i)
+	{
+	  if (!isotropic_restriction_only || ref_case==RefinementCase<dim>::isotropic_refinement)
+	    this->restriction[ref_case-1][i].reinit (this->dofs_per_cell,
+						     this->dofs_per_cell);
+	  if (!isotropic_prolongation_only || ref_case==RefinementCase<dim>::isotropic_refinement)
+	    this->prolongation[ref_case-1][i].reinit (this->dofs_per_cell,
+						      this->dofs_per_cell);
+	}
+    }
+}
+
+
 template <int dim>
 const FullMatrix<double> &
-FiniteElement<dim>::get_restriction_matrix (const unsigned int child) const
+FiniteElement<dim>::get_restriction_matrix (const unsigned int child,
+					    const RefinementCase<dim> &refinement_case) const
 {
-  Assert (child<GeometryInfo<dim>::children_per_cell,
-	  ExcIndexRange(child, 0, GeometryInfo<dim>::children_per_cell));
-  Assert (restriction[child].n() != 0, ExcProjectionVoid());
-  return restriction[child];
+  Assert (refinement_case<RefinementCase<dim>::isotropic_refinement+1,
+	  ExcIndexRange(refinement_case,0,RefinementCase<dim>::isotropic_refinement+1));
+  Assert (refinement_case!=RefinementCase<dim>::no_refinement,
+	  ExcMessage("Restriction matrices are only available for refined cells!"));
+  Assert (child<GeometryInfo<dim>::n_children(RefinementCase<dim>(refinement_case)),
+	  ExcIndexRange(child,0,GeometryInfo<dim>::n_children(RefinementCase<dim>(refinement_case))));
+				   // we use refinement_case-1 here. the -1 takes care
+				   // of the origin of the vector, as for
+				   // RefinementCase<dim>::no_refinement (=0) there is no
+				   // data available and so the vector indices
+				   // are shifted
+  Assert (restriction[refinement_case-1][child].n() != 0, ExcProjectionVoid());
+  return restriction[refinement_case-1][child];
 }
 
 
 
 template <int dim>
 const FullMatrix<double> &
-FiniteElement<dim>::get_prolongation_matrix (const unsigned int child) const
+FiniteElement<dim>::get_prolongation_matrix (const unsigned int child,
+					     const RefinementCase<dim> &refinement_case) const
 {
-  Assert (child<GeometryInfo<dim>::children_per_cell,
-	  ExcIndexRange(child, 0, GeometryInfo<dim>::children_per_cell));
-  Assert (prolongation[child].n() != 0, ExcEmbeddingVoid());
-  return prolongation[child];
+  Assert (refinement_case<RefinementCase<dim>::isotropic_refinement+1,
+	  ExcIndexRange(refinement_case,0,RefinementCase<dim>::isotropic_refinement+1));
+  Assert (refinement_case!=RefinementCase<dim>::no_refinement,
+	  ExcMessage("Prolongation matrices are only available for refined cells!"));
+  Assert (child<GeometryInfo<dim>::n_children(RefinementCase<dim>(refinement_case)),
+	  ExcIndexRange(child,0,GeometryInfo<dim>::n_children(RefinementCase<dim>(refinement_case))));
+				   // we use refinement_case-1 here. the -1 takes care
+				   // of the origin of the vector, as for
+				   // RefinementCase::no_refinement (=0) there is no
+				   // data available and so the vector indices
+				   // are shifted
+  Assert (prolongation[refinement_case-1][child].n() != 0, ExcEmbeddingVoid());
+  return prolongation[refinement_case-1][child];
 }
 
 
@@ -403,18 +466,21 @@ template <int dim>
 bool
 FiniteElement<dim>::prolongation_is_implemented () const
 {
-  for (unsigned int c=0; c<GeometryInfo<dim>::children_per_cell; ++c)
-    {
-      Assert ((prolongation[c].m() == this->dofs_per_cell) ||
-              (prolongation[c].m() == 0),
-              ExcInternalError());
-      Assert ((prolongation[c].n() == this->dofs_per_cell) ||
-              (prolongation[c].n() == 0),
-              ExcInternalError());
-      if ((prolongation[c].m() == 0) ||
-          (prolongation[c].n() == 0))
-        return false;
-    }
+  for (unsigned int ref_case=RefinementCase<dim>::cut_x;
+       ref_case<RefinementCase<dim>::isotropic_refinement+1; ++ref_case)
+    for (unsigned int c=0;
+	 c<GeometryInfo<dim>::n_children(RefinementCase<dim>(ref_case)); ++c)
+      {
+	Assert ((prolongation[ref_case-1][c].m() == this->dofs_per_cell) ||
+		(prolongation[ref_case-1][c].m() == 0),
+		ExcInternalError());
+	Assert ((prolongation[ref_case-1][c].n() == this->dofs_per_cell) ||
+		(prolongation[ref_case-1][c].n() == 0),
+		ExcInternalError());
+	if ((prolongation[ref_case-1][c].m() == 0) ||
+	    (prolongation[ref_case-1][c].n() == 0))
+	  return false;
+       }
   return true;
 }
 
@@ -424,17 +490,44 @@ template <int dim>
 bool
 FiniteElement<dim>::restriction_is_implemented () const
 {
-  for (unsigned int c=0; c<GeometryInfo<dim>::children_per_cell; ++c)
+  for (unsigned int ref_case=RefinementCase<dim>::cut_x;
+       ref_case<RefinementCase<dim>::isotropic_refinement+1; ++ref_case)
+    for (unsigned int c=0;
+	 c<GeometryInfo<dim>::n_children(RefinementCase<dim>(ref_case)); ++c)
+      {
+	Assert ((restriction[ref_case-1][c].m() == this->dofs_per_cell) ||
+		(restriction[ref_case-1][c].m() == 0),
+		ExcInternalError());
+	Assert ((restriction[ref_case-1][c].n() == this->dofs_per_cell) ||
+		(restriction[ref_case-1][c].n() == 0),
+		ExcInternalError());
+	if ((restriction[ref_case-1][c].m() == 0) ||
+	    (restriction[ref_case-1][c].n() == 0))
+	  return false;
+       }
+  return true;
+}
+
+
+
+template <int dim>
+bool
+FiniteElement<dim>::isotropic_prolongation_is_implemented () const
+{
+  const RefinementCase<dim> ref_case=RefinementCase<dim>::isotropic_refinement;
+  
+  for (unsigned int c=0;
+       c<GeometryInfo<dim>::n_children(RefinementCase<dim>(ref_case)); ++c)
     {
-      Assert ((restriction[c].m() == this->dofs_per_cell) ||
-              (restriction[c].m() == 0),
-              ExcInternalError());
-      Assert ((restriction[c].n() == this->dofs_per_cell) ||
-              (restriction[c].n() == 0),
-              ExcInternalError());
-      if ((restriction[c].m() == 0) ||
-          (restriction[c].n() == 0))
-        return false;
+      Assert ((prolongation[ref_case-1][c].m() == this->dofs_per_cell) ||
+	      (prolongation[ref_case-1][c].m() == 0),
+	      ExcInternalError());
+      Assert ((prolongation[ref_case-1][c].n() == this->dofs_per_cell) ||
+	      (prolongation[ref_case-1][c].n() == 0),
+	      ExcInternalError());
+      if ((prolongation[ref_case-1][c].m() == 0) ||
+	  (prolongation[ref_case-1][c].n() == 0))
+	return false;
     }
   return true;
 }
@@ -443,9 +536,36 @@ FiniteElement<dim>::restriction_is_implemented () const
 
 template <int dim>
 bool
-FiniteElement<dim>::constraints_are_implemented () const
+FiniteElement<dim>::isotropic_restriction_is_implemented () const
 {
-  return (this->dofs_per_face  == 0) || (interface_constraints.m() != 0);
+  const RefinementCase<dim> ref_case = RefinementCase<dim>::isotropic_refinement;
+
+  for (unsigned int c=0;
+       c<GeometryInfo<dim>::n_children(RefinementCase<dim>(ref_case)); ++c)
+    {
+      Assert ((restriction[ref_case-1][c].m() == this->dofs_per_cell) ||
+	      (restriction[ref_case-1][c].m() == 0),
+	      ExcInternalError());
+      Assert ((restriction[ref_case-1][c].n() == this->dofs_per_cell) ||
+	      (restriction[ref_case-1][c].n() == 0),
+	      ExcInternalError());
+      if ((restriction[ref_case-1][c].m() == 0) ||
+	  (restriction[ref_case-1][c].n() == 0))
+	return false;
+    }
+  return true;
+}
+
+
+
+template <int dim>
+bool
+FiniteElement<dim>::constraints_are_implemented (const internal::SubfaceCase<dim> &subface_case) const
+{
+  if (subface_case==internal::SubfaceCase<dim>::case_isotropic)
+    return (this->dofs_per_face  == 0) || (interface_constraints.m() != 0);
+  else
+    return false;
 }
 
 
@@ -461,8 +581,9 @@ FiniteElement<dim>::hp_constraints_are_implemented () const
 
 template <int dim>
 const FullMatrix<double> &
-FiniteElement<dim>::constraints () const
+FiniteElement<dim>::constraints (const internal::SubfaceCase<dim> &subface_case) const
 {
+  Assert (subface_case==internal::SubfaceCase<dim>::case_isotropic, ExcConstraintsVoid());
   Assert ((this->dofs_per_face  == 0) || (interface_constraints.m() != 0),
           ExcConstraintsVoid());
   
@@ -815,12 +936,8 @@ unsigned int
 FiniteElement<dim>::memory_consumption () const
 {
   return (sizeof(FiniteElementData<dim>) +
-	  MemoryConsumption::
-	  memory_consumption<FullMatrix<double>, sizeof(restriction)/sizeof(restriction[0])>
-	  (restriction)+
-	  MemoryConsumption::memory_consumption
-	  <FullMatrix<double>, sizeof(prolongation)/sizeof(prolongation[0])>
-	  (prolongation) +
+	  MemoryConsumption::memory_consumption (restriction)+
+	  MemoryConsumption::memory_consumption (prolongation) +
 	  MemoryConsumption::memory_consumption (interface_constraints) +
 	  MemoryConsumption::memory_consumption (system_to_component_table) +
 	  MemoryConsumption::memory_consumption (face_system_to_component_table) +
