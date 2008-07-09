@@ -1,7 +1,7 @@
 ######################################################################
 # Makefile.rules,v 1.11 2001/04/24 13:18:09 wolf Exp
 #
-# Copyright (C) 2001, 2002, 2003, 2004, 2005, 2006, 2007, the deal.II authors
+# Copyright (C) 2001, 2002, 2003, 2004, 2005, 2006, 2007, 2008, the deal.II authors
 #
 # Common make rules for test files. To be included by the Makefiles
 # in the subdirectories.
@@ -14,7 +14,7 @@ normalize = $D/common/scripts/normalize.pl
 # in the report with it. for the anisotropic branch, prefix everything
 # with x-anisotropic/ so that tests run from the branch will show up
 # in different folders on the webpage.
-WORKDIR = x-anisotropic/$(notdir $(shell pwd))
+WORKDIR = $(notdir $(shell pwd))
 
 verbose = off
 
