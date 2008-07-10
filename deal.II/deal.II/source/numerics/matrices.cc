@@ -952,7 +952,10 @@ MatrixCreator::create_boundary_mass_matrix (const Mapping<dim>        &mapping,
   Assert (matrix.n() == rhs_vector.size(), ExcInternalError());
   Assert (boundary_functions.size() != 0, ExcInternalError());
   Assert (dof_to_boundary_mapping.size() == dof.n_dofs(),
-	  ExcInternalError());
+	  ExcInternalError());  
+  Assert (coefficient ==0 ||
+	  coefficient->n_components==1 ||
+	  coefficient->n_components==n_components, ExcComponentMismatch());
 
   if (component_mapping.size() == 0)
     {
@@ -962,10 +965,6 @@ MatrixCreator::create_boundary_mass_matrix (const Mapping<dim>        &mapping,
     }
   else
     AssertDimension (n_components, component_mapping.size());
-  
-  Assert (coefficient ==0 ||
-	  coefficient->n_components==1 ||
-	  coefficient->n_components==n_components, ExcComponentMismatch());
   
   const unsigned int n_threads = multithread_info.n_default_threads;
   Threads::ThreadGroup<> threads;
