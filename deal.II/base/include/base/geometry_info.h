@@ -2199,7 +2199,7 @@ inline
 RefinementCase<dim>
 RefinementCase<dim>::operator | (const RefinementCase<dim> &r) const
 {
-  return RefinementCase<dim>(value | r.value);
+  return RefinementCase<dim>(static_cast<unsigned char> (value | r.value));
 }
 
 
@@ -2209,7 +2209,7 @@ inline
 RefinementCase<dim>
 RefinementCase<dim>::operator & (const RefinementCase<dim> &r) const
 {
-  return RefinementCase<dim>(value & r.value);
+  return RefinementCase<dim>(static_cast<unsigned char> (value & r.value));
 }
 
 
@@ -2219,7 +2219,8 @@ inline
 RefinementCase<dim>
 RefinementCase<dim>::operator ~ () const
 {
-  return RefinementCase<dim>((~value) & RefinementPossibilities<dim>::isotropic_refinement);
+  return RefinementCase<dim>(static_cast<unsigned char> (
+			       (~value) & RefinementPossibilities<dim>::isotropic_refinement));
 }
 
 

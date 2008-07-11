@@ -8891,13 +8891,13 @@ Triangulation<3>::execute_refinement ()
 						   // first vertex is the same middle
 						   // vertex.
 		  for (unsigned int i=4; i<12; ++i)
-		    if (lines[i]->vertex_index((i+1)%2)==hex->face(-1+i/4)->middle_vertex_index())
+		    if (lines[i]->vertex_index((i+1)%2)==hex->face(i/4-1)->middle_vertex_index())
 		      line_orientation_yz[i]=true;
 		    else
 		      {
 							 // it must be the other way
 							 // round then
-			Assert(lines[i]->vertex_index(i%2)==hex->face(-1+i/4)->middle_vertex_index(),
+			Assert(lines[i]->vertex_index(i%2)==hex->face(i/4-1)->middle_vertex_index(),
 			       ExcInternalError());
 			line_orientation_yz[i]=false;
 		      }
