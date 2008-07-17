@@ -599,7 +599,12 @@ GridTools::find_cells_adjacent_to_vertex(const Container<dim> &container,
    Assert(get_tria(container).get_used_vertices()[vertex],
           ExcVertexNotUsed(vertex));
 
-   std::vector<typename Container<dim>::active_cell_iterator> adjacent_cells;
+				  // We use a set instead of a vector
+				  // to ensure that cells are inserted only 
+				  // once. A bug in the previous version 
+				  // prevented some cases to be 
+				  // treated correctly
+   std::set<typename Container<dim>::active_cell_iterator> adj_cells_set;
    
    typename Container<dim>::active_cell_iterator
       cell = container.begin_active(),
@@ -614,7 +619,7 @@ GridTools::find_cells_adjacent_to_vertex(const Container<dim> &container,
                                    // OK, we found a cell that contains
                                    // the particular vertex. We add it
                                    // to the list.
-               adjacent_cells.push_back(cell);
+               adj_cells_set.insert(cell);
 
                                    // Now we need to make sure that the
                                    // vertex is not a locally refined
@@ -665,32 +670,25 @@ GridTools::find_cells_adjacent_to_vertex(const Container<dim> &container,
 				     break;
 				   }
 			       if (!found)
-							  // The
-							  // coarser
-							  // cell
-							  // needs to
-							  // be added
-							  // only
-							  // once. In
-							  // order to
-							  // do so, we
-							  // add it
-							  // only if
-							  // the
-							  // current
-							  // cell face
-							  // is child
-							  // zero of
-							  // its face.
-				 if(cell->neighbor_of_coarser_neighbor(face).second == 0)
-				   adjacent_cells.push_back(nb);
+				   adj_cells_set.insert(nb);
 			     }
 		       }
                   }
                
                break;
             }
+   
+   std::vector<typename Container<dim>::active_cell_iterator> adjacent_cells;
 
+					// We now produce the output vector
+					// from the set that we assembled above.
+   typename std::set<typename Container<dim>::active_cell_iterator>::iterator 
+       it = adj_cells_set.begin(), 
+       endit = adj_cells_set.end();
+   for(; it != endit; ++it) 
+       adjacent_cells.push_back(*it);
+   
+   
    Assert(adjacent_cells.size() > 0, ExcInternalError());
    
    return adjacent_cells;
