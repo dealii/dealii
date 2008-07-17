@@ -13337,7 +13337,7 @@ echo "$as_me: error: When building deal.II with shared libraries, Trilinos also
   fi
 
       if test "x$enableshared" = "xyes" ; then
-    LDFLAGS="$LDFLAGS -L$DEAL_II_TRILINOS_DIR/lib -Wl,-rpath,$DEAL_II_TRILINOS_DIR/lib"
+    LDFLAGS="$LDFLAGS -L$DEAL_II_TRILINOS_DIR/lib"
   fi
 
 
