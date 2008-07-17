@@ -395,8 +395,7 @@ inline
 unsigned int
 TriaObjectAccessor<1,dim>::n_children () const
 {
-  Assert (has_children()==true, TriaAccessorExceptions::ExcCellHasNoChildren());
-  return GeometryInfo<1>::max_children_per_cell;
+  return (has_children() ? GeometryInfo<1>::max_children_per_cell : 0);
 }
 
 
@@ -833,12 +832,10 @@ inline
 unsigned int
 TriaObjectAccessor<2,dim>::n_children () const
 {
-  Assert (has_children()==true, TriaAccessorExceptions::ExcCellHasNoChildren());
   Assert (static_cast<unsigned int> (this->present_index) <
 	  objects().refinement_cases.size(),
 	  ExcIndexRange(this->present_index, 0,
 			objects().refinement_cases.size()));
-
   return GeometryInfo<2>::n_children(refinement_case());
 }
 
@@ -1301,7 +1298,6 @@ inline
 unsigned int
 TriaObjectAccessor<3,3>::n_children () const
 {
-  Assert (has_children()==true, TriaAccessorExceptions::ExcCellHasNoChildren());
   Assert (static_cast<unsigned int> (this->present_index) <
 	  this->tria->levels[this->present_level]->cells.refinement_cases.size(),
 	  ExcIndexRange(this->present_index, 0,

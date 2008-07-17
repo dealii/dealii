@@ -894,12 +894,9 @@ class TriaObjectAccessor :  public TriaAccessor<celldim,dim>
 
 				     /**
 				      * Return the number of immediate
-				      * children of this object.
-				      *
-				      * An assertion assures that this
-				      * function can only be called
-				      * for TriaObjects with
-				      * <tt>has_children()==true</tt>.
+				      * children of this object. The
+				      * number of children of an
+				      * unrefined cell is zero.
 				      */
     unsigned int n_children() const;
     
@@ -1647,11 +1644,6 @@ class TriaObjectAccessor<1, dim> :  public TriaAccessor<1,dim>
 				     /**
 				      * Return the number of immediate
 				      * children of this object.
-				      *
-				      * An assertion assures that this
-				      * function can only be called
-				      * for TriaObjects with
-				      * <tt>has_children()==true</tt>.
 				      */
     unsigned int n_children() const;
 
@@ -2372,11 +2364,6 @@ class TriaObjectAccessor<2, dim> :  public TriaAccessor<2,dim>
 				     /**
 				      * Return the number of immediate
 				      * children of this object.
-				      *
-				      * An assertion assures that this
-				      * function can only be called
-				      * for TriaObjects with
-				      * <tt>has_children()==true</tt>.
 				      */
     unsigned int n_children() const;
 
@@ -3152,11 +3139,6 @@ class TriaObjectAccessor<3, dim> :  public TriaAccessor<3,dim>
 				     /**
 				      * Return the number of immediate
 				      * children of this object.
-				      *
-				      * An assertion assures that this
-				      * function can only be called
-				      * for TriaObjects with
-				      * <tt>has_children()==true</tt>.
 				      */
     unsigned int n_children() const;
 
