@@ -2,7 +2,7 @@
 //    $Id$
 //    Version: $Name$
 //
-//    Copyright (C) 2000, 2001, 2002, 2003, 2004, 2005, 2006, 2007 by the deal.II authors
+//    Copyright (C) 2000, 2001, 2002, 2003, 2004, 2005, 2006, 2007, 2008 by the deal.II authors
 //
 //    This file is subject to QPL and may not be  distributed
 //    without copyright and license information. Please refer
@@ -24,6 +24,7 @@
 DEAL_II_NAMESPACE_OPEN
 
 class SparsityPattern;
+class ChunkSparsityPattern;
 template <typename number> class FullMatrix;
 template <typename number> class SparseMatrix;
 template <class VECTOR> class VectorSlice;
@@ -148,6 +149,42 @@ namespace internals
 	    len = half;
 	}
     }
+
+
+				     /**
+				      * Helper function to get the
+				      * column index from a
+				      * dereferenced iterator in the
+				      * copy_from() function, if
+				      * the inner iterator type points
+				      * to plain unsigned integers.
+				      */
+    unsigned int
+    get_column_index_from_iterator (const unsigned int i);
+    
+				     /**
+				      * Helper function to get the
+				      * column index from a
+				      * dereferenced iterator in the
+				      * copy_from() function, if
+				      * the inner iterator type points
+				      * to pairs of unsigned integers
+				      * and some other value.
+				      */
+    template <typename value>
+    unsigned int
+    get_column_index_from_iterator (const std::pair<unsigned int, value> &i);
+
+				     /**
+				      * Likewise, but sometimes needed
+				      * for certain types of
+				      * containers that make the first
+				      * element of the pair constant
+				      * (such as <tt>std::map</tt>).
+				      */
+    template <typename value>
+    unsigned int
+    get_column_index_from_iterator (const std::pair<const unsigned int, value> &i);
     
   }
   
@@ -1069,10 +1106,12 @@ class SparsityPattern : public Subscriptor
 				     /**
 				      * Compute the bandwidth of the matrix
 				      * represented by this structure. The
-				      * bandwidth is the maximum of
-				      * $|i-j|$ for which the index pair
-				      * $(i,j)$ represents a nonzero entry
-				      * of the matrix.
+				      * bandwidth is the maximum of $|i-j|$
+				      * for which the index pair $(i,j)$
+				      * represents a nonzero entry of the
+				      * matrix. Consequently, the maximum
+				      * bandwidth a $n\times m$ matrix can
+				      * have is $\max\{n-1,m-1\}$.
 				      */
     unsigned int bandwidth () const;
 
@@ -1556,49 +1595,15 @@ class SparsityPattern : public Subscriptor
 				      * Is special treatment of
 				      * diagonals enabled?
 				      */
-    bool diagonal_optimized;
-    
-				     /**
-				      * Helper function to get the
-				      * column index from a
-				      * dereferenced iterator in the
-				      * copy_from() function, if
-				      * the inner iterator type points
-				      * to plain unsigned integers.
-				      */
-    static
-    unsigned int
-    get_column_index_from_iterator (const unsigned int i);
-    
-				     /**
-				      * Helper function to get the
-				      * column index from a
-				      * dereferenced iterator in the
-				      * copy_from() function, if
-				      * the inner iterator type points
-				      * to pairs of unsigned integers
-				      * and some other value.
-				      */
-    template <typename value>
-    unsigned int
-    get_column_index_from_iterator (const std::pair<unsigned int, value> &i);
-
-				     /**
-				      * Likewise, but sometimes needed
-				      * for certain types of
-				      * containers that make the first
-				      * element of the pair constant
-				      * (such as <tt>std::map</tt>).
-				      */
-    template <typename value>
-    unsigned int
-    get_column_index_from_iterator (const std::pair<const unsigned int, value> &i);
+    bool diagonal_optimized;    
     
 				     /**
 				      * Make all sparse matrices
 				      * friends of this class.
 				      */
     template <typename number> friend class SparseMatrix;
+
+    friend class ChunkSparsityPattern;
 };
 
 
@@ -1946,34 +1951,37 @@ SparsityPattern::n_nonzero_elements () const
 
 
 
-inline
-unsigned int
-SparsityPattern::
-get_column_index_from_iterator (const unsigned int i)
+namespace internal
 {
-  return i;
-}
+  namespace SparsityPatternTools
+  {
+    inline
+    unsigned int
+    get_column_index_from_iterator (const unsigned int i)
+    {
+      return i;
+    }
 
 
 
-template <typename value>
-inline
-unsigned int
-SparsityPattern::
-get_column_index_from_iterator (const std::pair<unsigned int, value> &i)
-{
-  return i.first;
-}
+    template <typename value>
+    inline
+    unsigned int
+    get_column_index_from_iterator (const std::pair<unsigned int, value> &i)
+    {
+      return i.first;
+    }
 
 
 
-template <typename value>
-inline
-unsigned int
-SparsityPattern::
-get_column_index_from_iterator (const std::pair<const unsigned int, value> &i)
-{
-  return i.first;
+    template <typename value>
+    inline
+    unsigned int
+    get_column_index_from_iterator (const std::pair<const unsigned int, value> &i)
+    {
+      return i.first;
+    }
+  }
 }
 
 
@@ -2025,7 +2033,8 @@ SparsityPattern::copy_from (const unsigned int    n_rows,
       const inner_iterator end_of_row = i->end();
       for (inner_iterator j=i->begin(); j!=end_of_row; ++j)
 	{
-	  const unsigned int col = get_column_index_from_iterator(*j);
+	  const unsigned int col
+	    = internal::SparsityPatternTools::get_column_index_from_iterator(*j);
 	  Assert (col < n_cols, ExcInvalidIndex(col,n_cols));
 	  
 	  if ((col!=row) || !is_square)
