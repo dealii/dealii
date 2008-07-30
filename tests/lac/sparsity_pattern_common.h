@@ -32,11 +32,31 @@
 const unsigned int N = 15;
 
 
+// reinitialize sparsity patterns for 5-point star
+void do_reinit (SparsityPattern &sp)
+{
+  sp.reinit((N-1)*(N-1), (N-1)*(N-1), 5);
+}
+
+
+void do_reinit (CompressedSparsityPattern &sp)
+{
+  sp.reinit((N-1)*(N-1), (N-1)*(N-1));
+}
+
+
+void do_reinit (CompressedSetSparsityPattern &sp)
+{
+  sp.reinit((N-1)*(N-1), (N-1)*(N-1));
+}
+
+
+
 template <typename SP>
 void build_sparsity (SP &sparsity_pattern)
 {
 				   // generate usual 5-point sparsity pattern
-  sparsity_pattern.reinit((N-1)*(N-1), (N-1)*(N-1), 5);
+  do_reinit (sparsity_pattern);
   FDMatrix(N,N).five_point_structure (sparsity_pattern);
   sparsity_pattern.compress ();
 
@@ -179,7 +199,7 @@ void
 do_copy_from (const FullMatrix<double> &sparsity,
 	      SparsityPattern &sp4)
 {
-  sp4.copy_from (sparsity);
+  sp4.copy_from (sparsity, false);
 }
 
 
@@ -271,7 +291,7 @@ void copy_from_3 ()
 template <typename SP>
 void copy_from_4 ()
 {
-  const unsigned int M = 25;
+  const unsigned int M = (N-1)*(N-1);
   FullMatrix<double> sparsity_pattern(M,M);
   for (unsigned int i=0; i<M; ++i)
     for (unsigned int j=0; j<M; ++j)
@@ -279,12 +299,15 @@ void copy_from_4 ()
 	sparsity_pattern (i,j) = 1;
 
   SP sp4;
+  do_reinit (sp4);
   do_copy_from (sparsity_pattern, sp4);
 
 				   // now check for equivalence of original
 				   // and copy
   Assert (sp4.n_nonzero_elements() ==
-	  static_cast<unsigned int>(sparsity_pattern.frobenius_norm()),
+	  static_cast<unsigned int>(sparsity_pattern.frobenius_norm() *
+				    sparsity_pattern.frobenius_norm()
+				    + 0.5),
 	  ExcInternalError());
   
   for (unsigned int i=0; i<M; ++i)
