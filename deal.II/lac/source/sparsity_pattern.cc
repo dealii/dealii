@@ -2,7 +2,7 @@
 //    $Id$
 //    Version: $Name$
 //
-//    Copyright (C) 2000, 2001, 2002, 2003, 2004, 2005, 2006, 2007 by the deal.II authors
+//    Copyright (C) 2000, 2001, 2002, 2003, 2004, 2005, 2006, 2007, 2008 by the deal.II authors
 //
 //    This file is subject to QPL and may not be  distributed
 //    without copyright and license information. Please refer
@@ -653,13 +653,23 @@ template <typename number>
 void SparsityPattern::copy_from (const FullMatrix<number> &matrix,
 				 const bool optimize_diag)
 {
-				   // first init with the number of
-				   // entries per row
+				   // first init with the number of entries
+				   // per row. if optimize_diag is set then we
+				   // also have to allocate memory for the
+				   // diagonal entry, unless we have already
+				   // counted it
   std::vector<unsigned int> entries_per_row (matrix.m(), 0);
   for (unsigned int row=0; row<matrix.m(); ++row)
-    for (unsigned int col=0; col<matrix.n(); ++col)
-      if (matrix(row,col) != 0)
+    {
+      for (unsigned int col=0; col<matrix.n(); ++col)
+	if (matrix(row,col) != 0)
+	  ++entries_per_row[row];
+      if ((optimize_diag == true)
+	  &&
+	  (matrix(row,row) == 0))
 	++entries_per_row[row];
+    }
+  
   reinit (matrix.m(), matrix.n(), entries_per_row, optimize_diag);
 
 				   // now set entries
