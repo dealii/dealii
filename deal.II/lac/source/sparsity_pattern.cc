@@ -657,7 +657,7 @@ void SparsityPattern::copy_from (const FullMatrix<number> &matrix,
 				   // per row. if optimize_diag is set then we
 				   // also have to allocate memory for the
 				   // diagonal entry, unless we have already
-				   // counted it
+				   // counted it or the matrix isn't square
   std::vector<unsigned int> entries_per_row (matrix.m(), 0);
   for (unsigned int row=0; row<matrix.m(); ++row)
     {
@@ -666,7 +666,9 @@ void SparsityPattern::copy_from (const FullMatrix<number> &matrix,
 	  ++entries_per_row[row];
       if ((optimize_diag == true)
 	  &&
-	  (matrix(row,row) == 0))
+	  (matrix(row,row) == 0)
+	  &&
+	  (matrix.m() == matrix.n()))
 	++entries_per_row[row];
     }
   
