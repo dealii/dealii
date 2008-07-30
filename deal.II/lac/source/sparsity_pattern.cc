@@ -935,6 +935,9 @@ void
 SparsityPattern::print_gnuplot (std::ostream &out) const
 {
   Assert ((rowstart!=0) && (colnums!=0), ExcEmptyObject());  
+
+  AssertThrow (out, ExcIO());
+  
   for (unsigned int i=0; i<rows; ++i)
     for (unsigned int j=rowstart[i]; j<rowstart[i+1]; ++j)
       if (colnums[j] != invalid_entry)
