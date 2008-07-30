@@ -19,6 +19,7 @@
 #include <lac/sparsity_pattern.h>
 #include <lac/compressed_sparsity_pattern.h>
 #include <lac/compressed_set_sparsity_pattern.h>
+#include <lac/chunk_sparsity_pattern.h>
 #include <lac/full_matrix.h>
 #include "testmatrix.h"
 #include <fstream>
@@ -30,12 +31,19 @@
 
 
 const unsigned int N = 15;
+unsigned int chunk_size = 1;
 
 
 // reinitialize sparsity patterns for 5-point star
 void do_reinit (SparsityPattern &sp)
 {
   sp.reinit((N-1)*(N-1), (N-1)*(N-1), 5);
+}
+
+
+void do_reinit (ChunkSparsityPattern &sp)
+{
+  sp.reinit((N-1)*(N-1), (N-1)*(N-1), 5, chunk_size);
 }
 
 
@@ -76,6 +84,8 @@ void row_length ()
   
   for (unsigned int i=0; i<sparsity_pattern.n_rows(); ++i)
     deallog << sparsity_pattern.row_length(i) << std::endl;
+
+  deallog << "OK" << std::endl;
 }
 
 
@@ -86,6 +96,8 @@ void print_gnuplot ()
   build_sparsity (sparsity_pattern);
 
   sparsity_pattern.print_gnuplot(deallog.get_file_stream());
+
+  deallog << "OK" << std::endl;
 }
 
 
@@ -97,6 +109,8 @@ void print ()
   build_sparsity (sparsity_pattern);
 
   sparsity_pattern.print(deallog.get_file_stream());
+
+  deallog << "OK" << std::endl;
 }
 
 
@@ -117,6 +131,8 @@ void copy_with_offdiagonals_1 ()
   for (unsigned int i=0; i<sp2.n_rows(); ++i)
     deallog << sp2.row_length(i) << std::endl;
   sp2.print_gnuplot(deallog.get_file_stream());
+
+  deallog << "OK" << std::endl;
 }
 
 
@@ -142,6 +158,8 @@ void copy_with_offdiagonals_2 ()
   for (unsigned int i=0; i<sp3.n_rows(); ++i)
     deallog << sp3.row_length(i) << std::endl;
   sp3.print_gnuplot(deallog.get_file_stream());
+
+  deallog << "OK" << std::endl;
 }
 
 
@@ -240,6 +258,8 @@ void copy_from_1 ()
 			sparsity_pattern.matrix_position(i).second)
 	    == true,
 	    ExcInternalError());
+
+  deallog << "OK" << std::endl;
 }
 
 
@@ -262,6 +282,8 @@ void copy_from_2 ()
     for (unsigned int j=0; j<sparsity_pattern.n_cols(); ++j)
       Assert (sparsity_pattern.exists(i,j) == sp4.exists (i,j),
 	      ExcInternalError());
+
+  deallog << "OK" << std::endl;
 }
 
 
@@ -284,6 +306,8 @@ void copy_from_3 ()
     for (unsigned int j=0; j<sparsity_pattern.n_cols(); ++j)
       Assert (sparsity_pattern.exists(i,j) == sp4.exists (i,j),
 	      ExcInternalError());
+
+  deallog << "OK" << std::endl;
 }
 
 
@@ -316,6 +340,8 @@ void copy_from_4 ()
 	Assert (sp4.exists (i,j)
 		== true,
 		ExcInternalError());
+
+  deallog << "OK" << std::endl;
 }
 
 
@@ -340,6 +366,8 @@ void matrix_position ()
 	Assert (sparsity_pattern.matrix_position(sparsity_pattern(row,col)) ==
 		std::make_pair(row,col),
 		ExcInternalError());
+
+  deallog << "OK" << std::endl;
 }
 
   
@@ -369,17 +397,12 @@ void block_read_write ()
 	  << (sparsity_pattern.is_compressed() ^ sp5.is_compressed()) << ' '
 	  << std::endl;
   
-  for (unsigned int row=0; row<sparsity_pattern.n_rows(); ++row)
-    {
-      const unsigned int
-        *sparsity_pattern_p=sparsity_pattern.get_column_numbers()+sparsity_pattern.get_rowstart_indices()[row];
-      const unsigned int
-        *sp5_p=sp5.get_column_numbers()+sp5.get_rowstart_indices()[row];
-      for (; sparsity_pattern_p != (sparsity_pattern.get_column_numbers() +
-				    sparsity_pattern.get_rowstart_indices()[row+1]);
-           ++sparsity_pattern_p, ++sp5_p)
-	Assert (*sparsity_pattern_p == *sp5_p, ExcInternalError());
-    }
+  for (unsigned int i=0; i<sparsity_pattern.n_rows(); ++i)
+    for (unsigned int j=0; j<sparsity_pattern.n_cols(); ++j)
+      Assert (sparsity_pattern.exists(i,j) == sp5.exists (i,j),
+	      ExcInternalError());
+
+  deallog << "OK" << std::endl;
 }
 
   
