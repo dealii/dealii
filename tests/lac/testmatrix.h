@@ -25,12 +25,14 @@ class FDMatrix
 				     /**
 				      * Generate the matrix structure.
 				      */
-    void five_point_structure(SparsityPattern& structure) const;
+    template <typename SP>
+    void five_point_structure(SP& structure) const;
     
 				     /**
 				      * Generate the matrix structure.
 				      */
-    void nine_point_structure(SparsityPattern& structure) const;
+    template <typename SP>
+    void nine_point_structure(SP& structure) const;
     
 				     /**
 				      * Fill the matrix with values.
@@ -76,9 +78,10 @@ FDMatrix::FDMatrix(unsigned int nx, unsigned int ny)
 
 
 
+template <typename SP>
 inline
 void
-FDMatrix::five_point_structure(SparsityPattern& structure) const
+FDMatrix::five_point_structure(SP& structure) const
 {
   for(unsigned int i=0;i<=ny-2;i++)
     {
@@ -113,9 +116,10 @@ FDMatrix::five_point_structure(SparsityPattern& structure) const
 
 
 
+template <typename SP>
 inline
 void
-FDMatrix::nine_point_structure(SparsityPattern& structure) const
+FDMatrix::nine_point_structure(SP& structure) const
 {
   for(unsigned int i=0;i<=ny-2;i++)
     {

@@ -26,6 +26,7 @@ tests_x = vector-vector vector_memory \
 	tridiagonal_matrix \
 	tridiagonal_matrix_sym \
 	sparsity_pattern \
+	sparsity_pattern_* \
 	sparse_matrices matrices \
 	block_sparsity_pattern_01 \
 	block_indices \
