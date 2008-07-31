@@ -1,5 +1,5 @@
 //---------------------------------------------------------------------------
-//    $Id: sparse_matrix_ez.double.cc 14038 2006-10-23 02:46:34Z bangerth $
+//    $Id$
 //    Version: $Name$
 //
 //    Copyright (C) 2007 by the deal.II authors
