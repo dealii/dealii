@@ -519,6 +519,11 @@ class ChunkSparsityPattern : public Subscriptor
                  const unsigned int j) const;
 
 				     /**
+				      * Number of entries in a specific row.
+				      */
+    unsigned int row_length (const unsigned int row) const;
+
+				     /**
 				      * Compute the bandwidth of the matrix
 				      * represented by this structure. The
 				      * bandwidth is the maximum of $|i-j|$
@@ -844,7 +849,46 @@ ChunkSparsityPattern::copy_from (const unsigned int    n_rows,
   Assert (static_cast<unsigned int>(std::distance (begin, end)) == n_rows,
 	  ExcIteratorRange (std::distance (begin, end), n_rows));
 
-  Assert (false, ExcNotImplemented());
+				   // first determine row lengths for
+				   // each row. if the matrix is
+				   // quadratic, then we might have to
+				   // add an additional entry for the
+				   // diagonal, if that is not yet
+				   // present. as we have to call
+				   // compress anyway later on, don't
+				   // bother to check whether that
+				   // diagonal entry is in a certain
+				   // row or not
+  const bool is_square = optimize_diag && (n_rows == n_cols);
+  std::vector<unsigned int> row_lengths;
+  row_lengths.reserve(n_rows);
+  for (ForwardIterator i=begin; i!=end; ++i)
+    row_lengths.push_back (std::distance (i->begin(), i->end())
+			   +
+			   (is_square ? 1 : 0));
+  reinit (n_rows, n_cols, row_lengths, chunk_size, is_square);
+
+				   // now enter all the elements into
+				   // the matrix
+  unsigned int row = 0;
+  typedef typename std::iterator_traits<ForwardIterator>::value_type::const_iterator inner_iterator;
+  for (ForwardIterator i=begin; i!=end; ++i, ++row)
+    {
+      const inner_iterator end_of_row = i->end();
+      for (inner_iterator j=i->begin(); j!=end_of_row; ++j)
+	{
+	  const unsigned int col
+	    = internal::SparsityPatternTools::get_column_index_from_iterator(*j);
+	  Assert (col < n_cols, ExcInvalidIndex(col,n_cols));
+
+	  add (row, col);
+	}
+    }
+
+				   // finally compress
+				   // everything. this also sorts the
+				   // entries within each row
+  compress ();
 }
 
 
