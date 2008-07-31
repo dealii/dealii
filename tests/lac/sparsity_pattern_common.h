@@ -31,6 +31,9 @@
 
 
 const unsigned int N = 15;
+
+// chunk size to be used for ChunkSparsityPattern. may be overwritten in
+// main()
 unsigned int chunk_size = 1;
 
 
@@ -114,6 +117,18 @@ void print ()
 }
 
 
+template <typename SP>
+void copy_with_offdiagonals_check (SP &sp2)
+{
+  deallog << sp2.n_rows() << " " << sp2.n_cols() << " "
+	  << sp2.bandwidth() << " " << sp2.n_nonzero_elements()
+	  << std::endl;
+  for (unsigned int i=0; i<sp2.n_rows(); ++i)
+    deallog << sp2.row_length(i) << std::endl;
+  sp2.print_gnuplot(deallog.get_file_stream());
+}
+
+
 
 template <typename SP>
 void copy_with_offdiagonals_1 ()
@@ -125,13 +140,19 @@ void copy_with_offdiagonals_1 ()
 				   // off-diagonals
   SP sp2(sparsity_pattern, 10, 2);
   sp2.compress ();
-  deallog << sp2.n_rows() << " " << sp2.n_cols() << " "
-	  << sp2.bandwidth() << " " << sp2.n_nonzero_elements()
-	  << std::endl;
-  for (unsigned int i=0; i<sp2.n_rows(); ++i)
-    deallog << sp2.row_length(i) << std::endl;
-  sp2.print_gnuplot(deallog.get_file_stream());
 
+  copy_with_offdiagonals_check (sp2);
+
+  deallog << "OK" << std::endl;
+}
+
+
+
+template <>
+void copy_with_offdiagonals_1<ChunkSparsityPattern> ()
+{
+				   // this sparsity pattern doesn't have this
+				   // function
   deallog << "OK" << std::endl;
 }
 
@@ -152,13 +173,18 @@ void copy_with_offdiagonals_2 ()
     sp3.add (0,i);
   sp3.symmetrize ();
   sp3.compress ();
-  deallog << sp3.n_rows() << " " << sp3.n_cols() << " "
-	  << sp3.bandwidth() << " " << sp3.n_nonzero_elements()
-	  << std::endl;
-  for (unsigned int i=0; i<sp3.n_rows(); ++i)
-    deallog << sp3.row_length(i) << std::endl;
-  sp3.print_gnuplot(deallog.get_file_stream());
 
+  copy_with_offdiagonals_check (sp3);
+
+  deallog << "OK" << std::endl;
+}
+
+
+template <>
+void copy_with_offdiagonals_2<ChunkSparsityPattern> ()
+{
+				   // this sparsity pattern doesn't have this
+				   // function
   deallog << "OK" << std::endl;
 }
 
@@ -170,6 +196,17 @@ do_copy_from (const std::list<std::set<unsigned int,std::greater<unsigned int> >
 {
   sp4.copy_from ((N-1)*(N-1), (N-1)*(N-1),
 		 sparsity.begin(), sparsity.end());
+}
+
+
+
+void
+do_copy_from (const std::list<std::set<unsigned int,std::greater<unsigned int> > > &sparsity,
+	      ChunkSparsityPattern &sp4)
+{
+  sp4.copy_from ((N-1)*(N-1), (N-1)*(N-1), 
+		 sparsity.begin(), sparsity.end(),
+		 chunk_size);
 }
 
 
@@ -193,9 +230,10 @@ do_copy_from (const CompressedSparsityPattern &sparsity,
 }
 
 
+template <typename SP>
 void
 do_copy_from (const CompressedSetSparsityPattern &sparsity,
-	      SparsityPattern &sp4)
+	      SP &sp4)
 {
   std::list<std::set<unsigned int,std::greater<unsigned int> > > sparsity_x;
   for (unsigned int i=0; i<sparsity.n_rows(); ++i)
@@ -213,12 +251,22 @@ do_copy_from (const CompressedSetSparsityPattern &sparsity,
 
 
 
+template <typename SP>
 void
 do_copy_from (const FullMatrix<double> &sparsity,
-	      SparsityPattern &sp4)
+	      SP &sp4)
 {
   sp4.copy_from (sparsity, false);
 }
+
+
+void
+do_copy_from (const FullMatrix<double> &sparsity,
+	      ChunkSparsityPattern &sp4)
+{
+  sp4.copy_from (sparsity, chunk_size, false);
+}
+
 
 
 
@@ -249,15 +297,26 @@ void copy_from_1 ()
   do_copy_from (sparsity, sp4);
 
 				   // now check for equivalence of original
-				   // and copy
-  Assert (sparsity_pattern.n_nonzero_elements() ==
-	  sp4.n_nonzero_elements(),
-	  ExcInternalError());
-  for (unsigned int i=0; i<sparsity_pattern.n_nonzero_elements(); ++i)
-    Assert (sp4.exists (sparsity_pattern.matrix_position(i).first,
-			sparsity_pattern.matrix_position(i).second)
-	    == true,
+				   // and copy if both only store explicitly
+				   // added elements. otherwise, check that
+				   // the presence of an element in the source
+				   // implies an element in the copy
+  if ((sparsity_pattern.stores_only_added_elements() == true)
+      &&
+      (sp4.stores_only_added_elements() == true))
+    Assert (sparsity_pattern.n_nonzero_elements() ==
+	    sp4.n_nonzero_elements(),
 	    ExcInternalError());
+  for (unsigned int i=0; i<sparsity_pattern.n_rows(); ++i)
+    for (unsigned int j=0; j<sparsity_pattern.n_cols(); ++j)
+      if ((sparsity_pattern.stores_only_added_elements() == true)
+	  &&
+	  (sp4.stores_only_added_elements() == true))
+	Assert (sparsity_pattern.exists(i,j) == sp4.exists (i,j),
+		ExcInternalError())
+      else
+	if (sparsity_pattern.exists(i,j))
+	  Assert (sp4.exists (i,j), ExcInternalError());
 
   deallog << "OK" << std::endl;
 }
@@ -274,14 +333,26 @@ void copy_from_2 ()
   do_copy_from (sparsity_pattern, sp4);
 
 				   // now check for equivalence of original
-				   // and copy
-  Assert (sparsity_pattern.n_nonzero_elements() ==
-	  sp4.n_nonzero_elements(),
-	  ExcInternalError());
+				   // and copy if both only store explicitly
+				   // added elements. otherwise, check that
+				   // the presence of an element in the source
+				   // implies an element in the copy
+  if ((sparsity_pattern.stores_only_added_elements() == true)
+      &&
+      (sp4.stores_only_added_elements() == true))
+    Assert (sparsity_pattern.n_nonzero_elements() ==
+	    sp4.n_nonzero_elements(),
+	    ExcInternalError());
   for (unsigned int i=0; i<sparsity_pattern.n_rows(); ++i)
     for (unsigned int j=0; j<sparsity_pattern.n_cols(); ++j)
-      Assert (sparsity_pattern.exists(i,j) == sp4.exists (i,j),
-	      ExcInternalError());
+      if ((sparsity_pattern.stores_only_added_elements() == true)
+	  &&
+	  (sp4.stores_only_added_elements() == true))
+	Assert (sparsity_pattern.exists(i,j) == sp4.exists (i,j),
+		ExcInternalError())
+      else
+	if (sparsity_pattern.exists(i,j))
+	  Assert (sp4.exists (i,j), ExcInternalError());
 
   deallog << "OK" << std::endl;
 }
@@ -298,14 +369,26 @@ void copy_from_3 ()
   do_copy_from (sparsity_pattern, sp4);
 
 				   // now check for equivalence of original
-				   // and copy
-  Assert (sparsity_pattern.n_nonzero_elements() ==
-	  sp4.n_nonzero_elements(),
-	  ExcInternalError());
+				   // and copy if both only store explicitly
+				   // added elements. otherwise, check that
+				   // the presence of an element in the source
+				   // implies an element in the copy
+  if ((sparsity_pattern.stores_only_added_elements() == true)
+      &&
+      (sp4.stores_only_added_elements() == true))
+    Assert (sparsity_pattern.n_nonzero_elements() ==
+	    sp4.n_nonzero_elements(),
+	    ExcInternalError());
   for (unsigned int i=0; i<sparsity_pattern.n_rows(); ++i)
     for (unsigned int j=0; j<sparsity_pattern.n_cols(); ++j)
-      Assert (sparsity_pattern.exists(i,j) == sp4.exists (i,j),
-	      ExcInternalError());
+      if ((sparsity_pattern.stores_only_added_elements() == true)
+	  &&
+	  (sp4.stores_only_added_elements() == true))
+	Assert (sparsity_pattern.exists(i,j) == sp4.exists (i,j),
+		ExcInternalError())
+      else
+	if (sparsity_pattern.exists(i,j))
+	  Assert (sp4.exists (i,j), ExcInternalError());
 
   deallog << "OK" << std::endl;
 }
@@ -328,12 +411,19 @@ void copy_from_4 ()
 
 				   // now check for equivalence of original
 				   // and copy
-  Assert (sp4.n_nonzero_elements() ==
-	  static_cast<unsigned int>(sparsity_pattern.frobenius_norm() *
-				    sparsity_pattern.frobenius_norm()
-				    + 0.5),
-	  ExcInternalError());
-  
+  if (sp4.stores_only_added_elements() == true)
+    Assert (sp4.n_nonzero_elements() ==
+	    static_cast<unsigned int>(sparsity_pattern.frobenius_norm() *
+				      sparsity_pattern.frobenius_norm()
+				      + 0.5),
+	    ExcInternalError())
+  else
+    Assert (sp4.n_nonzero_elements() >=
+	    static_cast<unsigned int>(sparsity_pattern.frobenius_norm() *
+				      sparsity_pattern.frobenius_norm()
+				      + 0.5),
+	    ExcInternalError());
+
   for (unsigned int i=0; i<M; ++i)
     for (unsigned int j=0; j<M; ++j)
       if (std::abs((int)(i-j)) == 3)
@@ -367,6 +457,14 @@ void matrix_position ()
 		std::make_pair(row,col),
 		ExcInternalError());
 
+  deallog << "OK" << std::endl;
+}
+
+
+template <>
+void matrix_position<ChunkSparsityPattern> ()
+{
+				   // this class doesn't have that function
   deallog << "OK" << std::endl;
 }
 
