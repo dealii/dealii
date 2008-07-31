@@ -850,16 +850,6 @@ ChunkSparsityPattern::optimize_diagonal () const
 }
 
 
-inline
-unsigned int
-ChunkSparsityPattern::n_nonzero_elements () const
-{
-  return (sparsity_pattern.n_nonzero_elements() *
-	  chunk_size *
-	  chunk_size);
-}
-
-
 
 template <typename ForwardIterator>
 void
