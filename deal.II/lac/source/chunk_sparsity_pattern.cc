@@ -22,7 +22,7 @@ DEAL_II_NAMESPACE_OPEN
 
 ChunkSparsityPattern::ChunkSparsityPattern ()
 {
-  reinit (0,0,0,0);
+  reinit (0,0,0,1);
 }
 
 
@@ -47,6 +47,8 @@ ChunkSparsityPattern::ChunkSparsityPattern (const unsigned int m,
 					    const unsigned int chunk_size,
 					    const bool optimize_diag)
 {
+  Assert (chunk_size > 0, ExcInvalidNumber (chunk_size));
+
   reinit (m,n,max_per_row, chunk_size, optimize_diag);
 }
 
@@ -59,6 +61,8 @@ ChunkSparsityPattern::ChunkSparsityPattern (
   const unsigned int chunk_size,
   const bool optimize_diag) 
 {
+  Assert (chunk_size > 0, ExcInvalidNumber (chunk_size));
+
   reinit (m, n, row_lengths, chunk_size, optimize_diag);
 }
 
@@ -79,6 +83,8 @@ ChunkSparsityPattern::ChunkSparsityPattern (
   const unsigned int chunk_size,
   const bool optimize_diag) 
 {
+  Assert (chunk_size > 0, ExcInvalidNumber (chunk_size));
+
   reinit (m, m, row_lengths, chunk_size, optimize_diag);
 }
 
@@ -111,6 +117,8 @@ ChunkSparsityPattern::reinit (const unsigned int m,
 			      const unsigned int chunk_size,
 			      const bool optimize_diag)
 {
+  Assert (chunk_size > 0, ExcInvalidNumber (chunk_size));
+
 				   // simply map this function to the
 				   // other @p{reinit} function
   const std::vector<unsigned int> row_lengths (m, max_per_row);
@@ -128,7 +136,8 @@ ChunkSparsityPattern::reinit (
   const bool optimize_diag)
 {
   Assert (row_lengths.size() == m, ExcInvalidNumber (m));
-	  
+  Assert (chunk_size > 0, ExcInvalidNumber (chunk_size));  
+  
   rows = m;
   cols = n;
 
@@ -177,6 +186,8 @@ ChunkSparsityPattern::copy_from (const CompressedSparsityPattern &csp,
 				 const unsigned int chunk_size,
 				 const bool         optimize_diag) 
 {
+  Assert (chunk_size > 0, ExcInvalidNumber (chunk_size));
+
 				   // count number of entries per row, then
 				   // initialize the underlying sparsity
 				   // pattern
@@ -205,6 +216,8 @@ ChunkSparsityPattern::copy_from (const CompressedSetSparsityPattern &csp,
 				 const unsigned int chunk_size,
 				 const bool         optimize_diag) 
 {
+  Assert (chunk_size > 0, ExcInvalidNumber (chunk_size));
+
 				   // count number of entries per row, then
 				   // initialize the underlying sparsity
 				   // pattern
@@ -242,6 +255,8 @@ void ChunkSparsityPattern::copy_from (const FullMatrix<number> &matrix,
 				      const unsigned int chunk_size,
 				      const bool         optimize_diag)
 {
+  Assert (chunk_size > 0, ExcInvalidNumber (chunk_size));
+
 				   // count number of entries per row, then
 				   // initialize the underlying sparsity
 				   // pattern
@@ -274,6 +289,8 @@ ChunkSparsityPattern::reinit (
   const unsigned int chunk_size,
   const bool optimize_diag)
 {
+  Assert (chunk_size > 0, ExcInvalidNumber (chunk_size));
+
   reinit(m, n, make_slice(row_lengths), chunk_size, optimize_diag);
 }
 
@@ -319,6 +336,16 @@ ChunkSparsityPattern::exists (const unsigned int i,
 
 
 
+unsigned int
+ChunkSparsityPattern::row_length (const unsigned int i) const
+{
+  Assert (i<rows, ExcIndexRange(i,0,rows));
+
+  return sparsity_pattern.row_length (i/chunk_size) * chunk_size;
+}
+
+
+
 void
 ChunkSparsityPattern::symmetrize () 
 {
@@ -335,17 +362,58 @@ ChunkSparsityPattern::symmetrize ()
 
 
 void
-ChunkSparsityPattern::print (std::ostream &/*out*/) const
+ChunkSparsityPattern::print (std::ostream &out) const
 {
-  Assert (false, ExcNotImplemented());
+  Assert ((sparsity_pattern.rowstart!=0) && (sparsity_pattern.colnums!=0),
+	  ExcEmptyObject());  
+
+  AssertThrow (out, ExcIO());
+
+  for (unsigned int i=0; i<sparsity_pattern.rows; ++i)
+    for (unsigned int d=0; d<chunk_size; ++d)
+      {
+	out << '[' << i*chunk_size+d;
+	for (unsigned int j=sparsity_pattern.rowstart[i];
+	     j<sparsity_pattern.rowstart[i+1]; ++j)
+	  if (sparsity_pattern.colnums[j] != sparsity_pattern.invalid_entry)
+	    for (unsigned int e=0; e<chunk_size; ++e)
+	      out << ',' << sparsity_pattern.colnums[j]*chunk_size+e;
+	out << ']' << std::endl;
+      }
+  
+  AssertThrow (out, ExcIO());
 }
 
 
 
 void
-ChunkSparsityPattern::print_gnuplot (std::ostream &/*out*/) const
+ChunkSparsityPattern::print_gnuplot (std::ostream &out) const
 {
-  Assert (false, ExcNotImplemented());
+  Assert ((sparsity_pattern.rowstart!=0) &&
+	  (sparsity_pattern.colnums!=0), ExcEmptyObject());
+
+  AssertThrow (out, ExcIO());
+  
+				   // for each entry in the underlying
+				   // sparsity pattern, repeat everything
+				   // chunk_size x chunk_size times
+  for (unsigned int i=0; i<sparsity_pattern.rows; ++i)
+    for (unsigned int j=sparsity_pattern.rowstart[i];
+	 j<sparsity_pattern.rowstart[i+1]; ++j)
+      if (sparsity_pattern.colnums[j] != sparsity_pattern.invalid_entry)
+	for (unsigned int d=0; d<chunk_size; ++d)
+	  for (unsigned int e=0; e<chunk_size; ++e)
+					     // while matrix entries are
+					     // usually written (i,j), with i
+					     // vertical and j horizontal,
+					     // gnuplot output is x-y, that is
+					     // we have to exchange the order
+					     // of output
+	    out << sparsity_pattern.colnums[j]*chunk_size+d << " "
+		<< -static_cast<signed int>(i*chunk_size+e)
+		<< std::endl;
+
+  AssertThrow (out, ExcIO());
 }
 
 
