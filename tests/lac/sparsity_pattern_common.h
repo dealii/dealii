@@ -518,6 +518,15 @@ void matrix_position<CompressedSparsityPattern> ()
 
 
 
+template <>
+void matrix_position<CompressedSetSparsityPattern> ()
+{
+				   // this class doesn't have that function
+  deallog << "OK" << std::endl;
+}
+
+
+
 template <typename SP>
 void block_read_write ()
 {
@@ -554,6 +563,16 @@ void block_read_write ()
 
 template <>
 void block_read_write<CompressedSparsityPattern> ()
+{
+				   // not implemented for this sparsity
+				   // pattern
+  deallog << "OK" << std::endl;
+}
+
+
+
+template <>
+void block_read_write<CompressedSetSparsityPattern> ()
 {
 				   // not implemented for this sparsity
 				   // pattern
