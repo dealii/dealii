@@ -28,6 +28,7 @@ tests_x = vector-vector vector_memory \
 	sparsity_pattern \
 	sparsity_pattern_* \
 	chunk_sparsity_pattern_* \
+	compressed_sparsity_pattern_* \
 	sparse_matrices matrices \
 	block_sparsity_pattern_01 \
 	block_indices \
