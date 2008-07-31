@@ -158,6 +158,26 @@ void copy_with_offdiagonals_1<ChunkSparsityPattern> ()
 
 
 
+template <>
+void copy_with_offdiagonals_1<CompressedSparsityPattern> ()
+{
+				   // this sparsity pattern doesn't have this
+				   // function
+  deallog << "OK" << std::endl;
+}
+
+
+
+template <>
+void copy_with_offdiagonals_1<CompressedSetSparsityPattern> ()
+{
+				   // this sparsity pattern doesn't have this
+				   // function
+  deallog << "OK" << std::endl;
+}
+
+
+
 template <typename SP>
 void copy_with_offdiagonals_2 ()
 {
@@ -182,6 +202,26 @@ void copy_with_offdiagonals_2 ()
 
 template <>
 void copy_with_offdiagonals_2<ChunkSparsityPattern> ()
+{
+				   // this sparsity pattern doesn't have this
+				   // function
+  deallog << "OK" << std::endl;
+}
+
+
+
+template <>
+void copy_with_offdiagonals_2<CompressedSparsityPattern> ()
+{
+				   // this sparsity pattern doesn't have this
+				   // function
+  deallog << "OK" << std::endl;
+}
+
+
+
+template <>
+void copy_with_offdiagonals_2<CompressedSetSparsityPattern> ()
 {
 				   // this sparsity pattern doesn't have this
 				   // function
@@ -469,6 +509,15 @@ void matrix_position<ChunkSparsityPattern> ()
 }
 
   
+template <>
+void matrix_position<CompressedSparsityPattern> ()
+{
+				   // this class doesn't have that function
+  deallog << "OK" << std::endl;
+}
+
+
+
 template <typename SP>
 void block_read_write ()
 {
@@ -491,8 +540,6 @@ void block_read_write ()
 				   // sparsity_pattern and sp5
   deallog << sparsity_pattern.n_rows() - sp5.n_rows() << ' '
 	  << sparsity_pattern.n_cols() - sp5.n_cols() << ' '
-	  << (sparsity_pattern.is_compressed() ^ sp5.is_compressed()) << ' '
-	  << (sparsity_pattern.is_compressed() ^ sp5.is_compressed()) << ' '
 	  << std::endl;
   
   for (unsigned int i=0; i<sparsity_pattern.n_rows(); ++i)
@@ -503,5 +550,15 @@ void block_read_write ()
   deallog << "OK" << std::endl;
 }
 
-  
+
+
+template <>
+void block_read_write<CompressedSparsityPattern> ()
+{
+				   // not implemented for this sparsity
+				   // pattern
+  deallog << "OK" << std::endl;
+}
+
+
   
