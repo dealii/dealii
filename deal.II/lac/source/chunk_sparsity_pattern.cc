@@ -1,5 +1,5 @@
 //---------------------------------------------------------------------------
-//    $Id: chunk_sparsity_pattern.cc 14783 2007-06-18 14:52:01Z bangerth $
+//    $Id$
 //    Version: $Name$
 //
 //    Copyright (C) 2008 by the deal.II authors
