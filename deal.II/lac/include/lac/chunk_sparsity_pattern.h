@@ -39,7 +39,7 @@ DEAL_II_NAMESPACE_OPEN
  *
  * It uses the compressed row storage (CSR) format to store data.
  *
- * @author Wolfgang Bangerth, Guido Kanschat and others
+ * @author Wolfgang Bangerth, 2008
  */
 class ChunkSparsityPattern : public Subscriptor
 {
@@ -464,6 +464,13 @@ class ChunkSparsityPattern : public Subscriptor
     bool empty () const;
 
 				     /**
+				      * Return the chunk size given as
+				      * argument when constructing this
+				      * object.
+				      */
+    unsigned int get_chunk_size () const;
+    
+				     /**
 				      * Return the maximum number of entries per
 				      * row. Before compression, this equals the
 				      * number given to the constructor, while
@@ -832,6 +839,16 @@ ChunkSparsityPattern::n_cols () const
 {
   return cols;
 }
+
+
+
+inline
+unsigned int
+ChunkSparsityPattern::get_chunk_size () const
+{
+  return chunk_size;
+}
+
 
 
 inline
