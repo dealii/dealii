@@ -2,7 +2,7 @@
 //    $Id$
 //    Version: $Name$
 //
-//    Copyright (C) 2001, 2002, 2003, 2004, 2005, 2006 by the deal.II authors
+//    Copyright (C) 2001, 2002, 2003, 2004, 2005, 2006, 2008 by the deal.II authors
 //
 //    This file is subject to QPL and may not be  distributed
 //    without copyright and license information. Please refer
@@ -330,6 +330,29 @@ CompressedSparsityPattern::symmetrize ()
 
 
 void
+CompressedSparsityPattern::print (std::ostream &out) const
+{ 
+  for (unsigned int row=0; row<rows; ++row)
+    {
+      if (lines[row].cache_entries != 0)
+	lines[row].flush_cache ();
+
+      out << row << ' ';
+      
+      for (std::vector<unsigned int>::const_iterator
+             j=lines[row].entries.begin();
+           j != lines[row].entries.end(); ++j)
+        out << *j << ' ';
+
+      out << std::endl;
+    }
+
+  AssertThrow (out, ExcIO());
+}
+
+
+
+void
 CompressedSparsityPattern::print_gnuplot (std::ostream &out) const
 { 
   for (unsigned int row=0; row<rows; ++row)
@@ -345,8 +368,7 @@ CompressedSparsityPattern::print_gnuplot (std::ostream &out) const
                                          // x-y, that is we have to exchange
                                          // the order of output
         out << *j << " " << -static_cast<signed int>(row) << std::endl;
-    }
-      
+    }      
 
   AssertThrow (out, ExcIO());
 }

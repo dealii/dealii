@@ -201,10 +201,19 @@ inconvenience this causes.
 <ol>
   <li>
   <p>
+  Fixed: There is now a function CompressedSparsityPattern::print, in analogy
+  to SparsityPattern::print
+  <br>
+  (WB 2008/07/31)
+  <li>
+
+  <li>
+  <p>
   Fixed: The FullMatrix::copy_from(FullMatrix,bool) function had a bug
   that resulted in an exception being triggered whenever the given matrix
   had rows where the diagonal element is zero and the second parameter
   to the function was set to <code>true</code>. This is now fixed.
+  <br>
   (WB 2008/07/30)
   <li>
 </ol>
