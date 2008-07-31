@@ -150,8 +150,8 @@ ChunkSparsityPattern::reinit (
 				   // (n/chunk_size). rounding up in integer
 				   // arithmetic equals
 				   // ((m+chunk_size-1)/chunk_size):
-  const unsigned int m_chunks = (m+chunk_size) / chunk_size,
-		     n_chunks = (n+chunk_size) / chunk_size;  
+  const unsigned int m_chunks = (m+chunk_size-1) / chunk_size,
+		     n_chunks = (n+chunk_size-1) / chunk_size;  
 
 				   // compute the maximum number of chunks in
 				   // each row. the passed array denotes the
