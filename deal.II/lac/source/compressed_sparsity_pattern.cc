@@ -337,12 +337,12 @@ CompressedSparsityPattern::print (std::ostream &out) const
       if (lines[row].cache_entries != 0)
 	lines[row].flush_cache ();
 
-      out << '[' << row << ' ';
+      out << '[' << row;
       
       for (std::vector<unsigned int>::const_iterator
              j=lines[row].entries.begin();
            j != lines[row].entries.end(); ++j)
-        out << *j << ' ';
+        out << ',' << *j;
 
       out << ']' << std::endl;
     }

@@ -172,12 +172,12 @@ CompressedSetSparsityPattern::print (std::ostream &out) const
 
   for (unsigned int row=0; row<rows; ++row)
     {
-      out << '[' << row << ' ';
+      out << '[' << row;
       
       for (std::set<unsigned int>::const_iterator
              j=lines[row].entries.begin();
            j != lines[row].entries.end(); ++j)
-        out << *j << ' ';
+        out << ',' << *j;
 
       out << ']' << std::endl;
     }
