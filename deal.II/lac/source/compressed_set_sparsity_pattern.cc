@@ -2,7 +2,7 @@
 //    $Id: compressed_sparsity_pattern.cc 14038 2006-10-23 02:46:34Z bangerth $
 //    Version: $Name$
 //
-//    Copyright (C) 2001, 2002, 2003, 2004, 2005, 2006 by the deal.II authors
+//    Copyright (C) 2001, 2002, 2003, 2004, 2005, 2006, 2008 by the deal.II authors
 //
 //    This file is subject to QPL and may not be  distributed
 //    without copyright and license information. Please refer
@@ -166,8 +166,32 @@ CompressedSetSparsityPattern::symmetrize ()
 
 
 void
+CompressedSetSparsityPattern::print (std::ostream &out) const
+{ 
+  AssertThrow (out, ExcIO());
+
+  for (unsigned int row=0; row<rows; ++row)
+    {
+      out << '[' << row << ' ';
+      
+      for (std::set<unsigned int>::const_iterator
+             j=lines[row].entries.begin();
+           j != lines[row].entries.end(); ++j)
+        out << *j << ' ';
+
+      out << ']' << std::endl;
+    }
+
+  AssertThrow (out, ExcIO());
+}
+
+
+
+void
 CompressedSetSparsityPattern::print_gnuplot (std::ostream &out) const
 { 
+  AssertThrow (out, ExcIO());
+
   for (unsigned int row=0; row<rows; ++row)
     {
       for (std::set<unsigned int>::const_iterator

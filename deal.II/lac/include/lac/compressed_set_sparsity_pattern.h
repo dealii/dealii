@@ -235,6 +235,17 @@ class CompressedSetSparsityPattern : public Subscriptor
     void symmetrize ();
     
 				     /**
+				      * Print the sparsity of the
+				      * matrix. The output consists of
+				      * one line per row of the format
+				      * <tt>[i,j1,j2,j3,...]</tt>. <i>i</i>
+				      * is the row number and
+				      * <i>jn</i> are the allocated
+				      * columns in this row.
+				      */
+    void print (std::ostream &out) const;
+
+				     /**
 				      * Print the sparsity of the matrix in a
 				      * format that @p gnuplot understands and
 				      * which can be used to plot the sparsity

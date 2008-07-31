@@ -201,8 +201,9 @@ inconvenience this causes.
 <ol>
   <li>
   <p>
-  Fixed: There is now a function CompressedSparsityPattern::print, in analogy
-  to SparsityPattern::print
+  Fixed: There are now functions CompressedSparsityPattern::print and
+  CompressedSetSparsityPattern::print, in analogy
+  to SparsityPattern::print .
   <br>
   (WB 2008/07/31)
   <li>
