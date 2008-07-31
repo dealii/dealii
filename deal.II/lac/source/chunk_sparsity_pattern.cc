@@ -436,6 +436,18 @@ ChunkSparsityPattern::bandwidth () const
 }
 
 
+
+bool
+ChunkSparsityPattern::stores_only_added_elements () const
+{
+  if (chunk_size == 1)
+    return sparsity_pattern.stores_only_added_elements ();
+  else
+    return false;
+}
+
+
+
 void
 ChunkSparsityPattern::block_write (std::ostream &out) const 
 {

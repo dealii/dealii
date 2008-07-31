@@ -275,10 +275,29 @@ class CompressedSparsityPattern : public Subscriptor
 
 				     /**
 				      * Return the number of nonzero elements
-				      * allocated through this sparsity pattern.
+				      * allocated through this sparsity
+				      * pattern.
 				      */
     unsigned int n_nonzero_elements () const;
 
+				     /**
+				      * Return whether this object stores only
+				      * those entries that have been added
+				      * explicitly, or if the sparsity pattern
+				      * contains elements that have been added
+				      * through other means (implicitly) while
+				      * building it. For the current class,
+				      * the result is always true.
+				      *
+				      * This function mainly serves the
+				      * purpose of describing the current
+				      * class in cases where several kinds of
+				      * sparsity patterns can be passed as
+				      * template arguments.
+				      */
+    static
+    bool stores_only_added_elements ();
+    
   private:
 				     /**
 				      * Number of rows that this sparsity
@@ -495,6 +514,15 @@ CompressedSparsityPattern::column_number (const unsigned int row,
   if (lines[row].cache_entries != 0)
     lines[row].flush_cache ();
   return lines[row].entries[index];
+}
+
+
+
+inline
+bool
+CompressedSparsityPattern::stores_only_added_elements ()
+{
+  return true;
 }
 
 

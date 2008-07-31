@@ -591,6 +591,30 @@ class ChunkSparsityPattern : public Subscriptor
                                       */
     bool optimize_diagonal () const;
 
+				     /**
+				      * Return whether this object stores only
+				      * those entries that have been added
+				      * explicitly, or if the sparsity pattern
+				      * contains elements that have been added
+				      * through other means (implicitly) while
+				      * building it. For the current class,
+				      * the result is false because we store
+				      * entire chunks, not individual
+				      * elements, and adding one entry to the
+				      * sparsity pattern requires also adding
+				      * all the other elements of a chunk. The
+				      * only exception is if
+				      * <code>chunk_size==1</code>, the
+				      * sparsity pattern is nonsymmetric or
+				      * optimize_diag has been set to false.
+				      *
+				      * This function mainly serves the
+				      * purpose of describing the current
+				      * class in cases where several kinds of
+				      * sparsity patterns can be passed as
+				      * template arguments.
+				      */
+    bool stores_only_added_elements () const;
     
 				     /**
 				      * Write the data of this object

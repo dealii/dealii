@@ -1170,6 +1170,26 @@ class SparsityPattern : public Subscriptor
 				      * the diagonal storage optimization.
                                       */
     bool optimize_diagonal () const;
+
+				     /**
+				      * Return whether this object stores only
+				      * those entries that have been added
+				      * explicitly, or if the sparsity pattern
+				      * contains elements that have been added
+				      * through other means (implicitly) while
+				      * building it. For the current class,
+				      * the result is true iff optimize_diag
+				      * in the constructor or reinit() calls
+				      * has been set to false, or if the
+				      * represented matrix is not square.
+				      *
+				      * This function mainly serves the
+				      * purpose of describing the current
+				      * class in cases where several kinds of
+				      * sparsity patterns can be passed as
+				      * template arguments.
+				      */
+    bool stores_only_added_elements () const;
     
                                      /**
                                       * Use the METIS partitioner to generate
@@ -1900,6 +1920,19 @@ bool
 SparsityPattern::optimize_diagonal () const
 {
   return diagonal_optimized;
+}
+
+
+inline
+bool
+SparsityPattern::stores_only_added_elements () const
+{
+  if ((diagonal_optimized == true)
+      &&
+      (n_cols() == n_rows()))
+    return false;
+  else
+    return true;
 }
 
 
