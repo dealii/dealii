@@ -116,21 +116,23 @@ namespace{
       return false;
     
     if (neighbor->has_children())
-				     // if the neighbor is refined, he may be
-				     // coarsened. if so, then it won't refine
-				     // the face, no matter what else happens
-      if (cell_will_be_coarsened(neighbor))
-	return false;
-      else
-					 // if the neighor is refined, then he
-					 // is also refined at our current
-					 // face. He will stay so without
-					 // coarsening, so return true in that
-					 // case.
-	{
-	  expected_face_ref_case=cell->face(face_no)->refinement_case();
-	  return true;
-	}
+      {
+					 // if the neighbor is refined, he may be
+					 // coarsened. if so, then it won't refine
+					 // the face, no matter what else happens
+	if (cell_will_be_coarsened(neighbor))
+	  return false;
+	else
+					   // if the neighor is refined, then he
+					   // is also refined at our current
+					   // face. He will stay so without
+					   // coarsening, so return true in that
+					   // case.
+	  {
+	    expected_face_ref_case=cell->face(face_no)->refinement_case();
+	    return true;
+	  }
+      }
     
 				     // now, the neighbor is not refined, but
 				     // perhaps he will be
@@ -185,33 +187,35 @@ namespace{
 						 // grand_child)
 		for (unsigned int c=0; c<neighbor_face->n_children(); ++c)
 		  if (neighbor_face->child_index(c)==this_face_index)
-						     // if the flagged refine
-						     // case of the face is a
-						     // subset or the same as
-						     // the current refine case,
-						     // then the face, as seen
-						     // from our cell, won't be
-						     // refined by the neighbor
-		    if ((neighbor_face->refinement_case() | face_ref_case)
-			== neighbor_face->refinement_case())
-		      return false;
-		    else
-		      {
-							 // if we are active, we
-							 // must be an
-							 // anisotropic child
-							 // and the coming
-							 // face_ref_case is
-							 // isotropic. Thus,
-							 // from our cell we
-							 // will see exactly the
-							 // opposite refine case
-							 // that the face has
-							 // now...
-			Assert(face_ref_case==RefinementCase<dim-1>::isotropic_refinement, ExcInternalError());
-			expected_face_ref_case = ~neighbor_face->refinement_case();
-			return true;
-		      }
+		    {
+						       // if the flagged refine
+						       // case of the face is a
+						       // subset or the same as
+						       // the current refine case,
+						       // then the face, as seen
+						       // from our cell, won't be
+						       // refined by the neighbor
+		      if ((neighbor_face->refinement_case() | face_ref_case)
+			  == neighbor_face->refinement_case())
+			return false;
+		      else
+			{
+							   // if we are active, we
+							   // must be an
+							   // anisotropic child
+							   // and the coming
+							   // face_ref_case is
+							   // isotropic. Thus,
+							   // from our cell we
+							   // will see exactly the
+							   // opposite refine case
+							   // that the face has
+							   // now...
+			  Assert(face_ref_case==RefinementCase<dim-1>::isotropic_refinement, ExcInternalError());
+			  expected_face_ref_case = ~neighbor_face->refinement_case();
+			  return true;
+			}
+		    }
 		
 						 // so, obviously we were not
 						 // one of the children, but a
@@ -10846,14 +10850,16 @@ bool Triangulation<dim>::prepare_coarsening_and_refinement ()
 			  (smooth_grid & eliminate_refined_boundary_islands)) )
 			&&
 			(total_neighbors != 0))
-		      if (!cell->active())
-			for (unsigned int c=0; c<cell->n_children(); ++c)
-			  {
-			    cell->child(c)->clear_refine_flag ();
-			    cell->child(c)->set_coarsen_flag ();
-			  }
-		      else 
-			cell->clear_refine_flag();
+		      {
+			if (!cell->active())
+			  for (unsigned int c=0; c<cell->n_children(); ++c)
+			    {
+			      cell->child(c)->clear_refine_flag ();
+			      cell->child(c)->set_coarsen_flag ();
+			    }
+			else 
+			  cell->clear_refine_flag();
+		      }
 		  }
 	      }
 	}
@@ -11385,15 +11391,17 @@ bool Triangulation<dim>::prepare_coarsening_and_refinement ()
 							       // coarsen flags
 
 			      if (dim==2)
-				if (smooth_grid & allow_anisotropic_smoothing)
-				  changed=cell->neighbor(i)->flag_for_face_refinement(cell->neighbor_of_coarser_neighbor(i).first,
-										      RefinementCase<dim-1>::cut_x);
-				else
-				  {
-				    if (!cell->neighbor(i)->refine_flag_set())
-				      changed=true;
-				    cell->neighbor(i)->set_refine_flag();
-				  }
+				{
+				  if (smooth_grid & allow_anisotropic_smoothing)
+				    changed=cell->neighbor(i)->flag_for_face_refinement(cell->neighbor_of_coarser_neighbor(i).first,
+											RefinementCase<dim-1>::cut_x);
+				  else
+				    {
+				      if (!cell->neighbor(i)->refine_flag_set())
+					changed=true;
+				      cell->neighbor(i)->set_refine_flag();
+				    }
+				}
 			      else //i.e. if (dim==3)
 				{
 // ugly situations might arise here, consider the following situation, which
