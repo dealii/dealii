@@ -984,21 +984,24 @@ compute_fill (const Mapping<dim>                   &mapping,
     {
       unsigned int offset = 0;
       if (face_no != invalid_face_number)
-	if (sub_no == invalid_face_number)
-	  offset=QProjector<dim>::DataSetDescriptor
-		 ::face(face_no,
-			cell->face_orientation(face_no),
-			cell->face_flip(face_no),
-			cell->face_rotation(face_no),
-			n_q_points);
-	else
-	  offset=QProjector<dim>::DataSetDescriptor
-		 ::subface(face_no, sub_no,
-			   cell->face_orientation(face_no),
-			   cell->face_flip(face_no),
-			   cell->face_rotation(face_no),
-			   n_q_points,
-			   cell->subface_case(face_no));
+	{
+	  if (sub_no == invalid_face_number)
+	    offset=QProjector<dim>::DataSetDescriptor
+		   ::face(face_no,
+			  cell->face_orientation(face_no),
+			  cell->face_flip(face_no),
+			  cell->face_rotation(face_no),
+			  n_q_points);
+	  else
+	    offset=QProjector<dim>::DataSetDescriptor
+		   ::subface(face_no, sub_no,
+			     cell->face_orientation(face_no),
+			     cell->face_flip(face_no),
+			     cell->face_rotation(face_no),
+			     n_q_points,
+			     cell->subface_case(face_no));
+	}
+      
       this->compute_2nd (mapping, cell, offset, mapping_data, fe_data, data);
     }
 }
