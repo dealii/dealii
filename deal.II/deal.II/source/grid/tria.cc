@@ -5980,38 +5980,40 @@ Triangulation<3>::execute_refinement ()
 						 // only do something, if this
 						 // face has to be refined
 		if (face_ref_case)
-		  if (face_ref_case==RefinementCase<dim-1>::isotropic_refinement)
-		    {
-		      if (aface->number_of_children()<4)
-						     // we use user_flags to
-						     // denote needed isotropic
-						     // refinement
-			aface->set_user_flag();
-		    }
-		  else if (aface->refinement_case()!=face_ref_case)
-						     // we use user_indices
-						     // to denote needed
-						     // anisotropic
-						     // refinement. note, that
-						     // we can have at most
-						     // one anisotropic
-						     // refinement case for
-						     // this face, as
-						     // otherwise
-						     // prepare_refinement()
-						     // would have changed one
-						     // of the cells to yield
-						     // isotropic refinement
-						     // at this
-						     // face. therefore we set
-						     // the user_index
-						     // uniquely
-		    {
-		      Assert(aface->refinement_case()==RefinementCase<dim-1>::isotropic_refinement ||
-			     aface->refinement_case()==RefinementCase<dim-1>::no_refinement,
-			     ExcInternalError());
-		      aface->set_user_index(face_ref_case);
-		    }
+		  {
+		    if (face_ref_case==RefinementCase<dim-1>::isotropic_refinement)
+		      {
+			if (aface->number_of_children()<4)
+							   // we use user_flags to
+							   // denote needed isotropic
+							   // refinement
+			  aface->set_user_flag();
+		      }
+		    else if (aface->refinement_case()!=face_ref_case)
+						       // we use user_indices
+						       // to denote needed
+						       // anisotropic
+						       // refinement. note, that
+						       // we can have at most
+						       // one anisotropic
+						       // refinement case for
+						       // this face, as
+						       // otherwise
+						       // prepare_refinement()
+						       // would have changed one
+						       // of the cells to yield
+						       // isotropic refinement
+						       // at this
+						       // face. therefore we set
+						       // the user_index
+						       // uniquely
+		      {
+			Assert(aface->refinement_case()==RefinementCase<dim-1>::isotropic_refinement ||
+			       aface->refinement_case()==RefinementCase<dim-1>::no_refinement,
+			       ExcInternalError());
+						       aface->set_user_index(face_ref_case);
+		      }
+		  }
 	      }// for all faces
 	    
 					     // flag all lines, that have to be
@@ -11333,77 +11335,77 @@ bool Triangulation<dim>::prepare_coarsening_and_refinement ()
 			(GeometryInfo<dim>::face_refinement_case(cell->refine_flag_set(),
 								 i)
 			 != RefinementCase<dim>::no_refinement))
-		      
-						       // 1) if the neighbor has
-						       // children: nothing to
-						       // worry about.
-						       // 2) if the neighbor is
-						       // active and a coarser
-						       // one, ensure, that its
-						       // refine_flag is set
-						       // 3) if the neighbor is
-						       // active and as
-						       // refined along the face
-						       // as our current cell,
-						       // make sure, that no
-						       // coarsen_flag is set. if
-						       // we remove the coarsen
-						       // flag of our neighbor,
-						       // fix_coarsen_flags() makes
-						       // sure, that the mother
-						       // cell will not be
-						       // coarsened
-		      if (cell->neighbor(i)->active())
-			{
-			  if (cell->neighbor_is_coarser(i))
-			    {
-			      if (cell->neighbor(i)->coarsen_flag_set())
-				cell->neighbor(i)->clear_coarsen_flag();
-							       // we'll set the
-							       // refine flag
-							       // for this
-							       // neighbor
-							       // below. we
-							       // note, that we
-							       // have changed
-							       // something by
-							       // setting the
-							       // changed flag
-							       // to true. We do
-							       // not need to do
-							       // so, if we just
-							       // removed the
-							       // coarsen flag,
-							       // as the changed
-							       // flag only
-							       // indicates the
-							       // need to re-run
-							       // the inner
-							       // loop. however,
-							       // we only loop
-							       // over cells
-							       // flagged for
-							       // refinement
-							       // here, so
-							       // nothing to
-							       // worry about if
-							       // we remove
-							       // coarsen flags
+		      {
+							 // 1) if the neighbor has
+							 // children: nothing to
+							 // worry about.
+							 // 2) if the neighbor is
+							 // active and a coarser
+							 // one, ensure, that its
+							 // refine_flag is set
+							 // 3) if the neighbor is
+							 // active and as
+							 // refined along the face
+							 // as our current cell,
+							 // make sure, that no
+							 // coarsen_flag is set. if
+							 // we remove the coarsen
+							 // flag of our neighbor,
+							 // fix_coarsen_flags() makes
+							 // sure, that the mother
+							 // cell will not be
+							 // coarsened
+			if (cell->neighbor(i)->active())
+			  {
+			    if (cell->neighbor_is_coarser(i))
+			      {
+				if (cell->neighbor(i)->coarsen_flag_set())
+				  cell->neighbor(i)->clear_coarsen_flag();
+								 // we'll set the
+								 // refine flag
+								 // for this
+								 // neighbor
+								 // below. we
+								 // note, that we
+								 // have changed
+								 // something by
+								 // setting the
+								 // changed flag
+								 // to true. We do
+								 // not need to do
+								 // so, if we just
+								 // removed the
+								 // coarsen flag,
+								 // as the changed
+								 // flag only
+								 // indicates the
+								 // need to re-run
+								 // the inner
+								 // loop. however,
+								 // we only loop
+								 // over cells
+								 // flagged for
+								 // refinement
+								 // here, so
+								 // nothing to
+								 // worry about if
+								 // we remove
+								 // coarsen flags
 
-			      if (dim==2)
-				{
-				  if (smooth_grid & allow_anisotropic_smoothing)
-				    changed=cell->neighbor(i)->flag_for_face_refinement(cell->neighbor_of_coarser_neighbor(i).first,
-											RefinementCase<dim-1>::cut_x);
-				  else
-				    {
-				      if (!cell->neighbor(i)->refine_flag_set())
-					changed=true;
-				      cell->neighbor(i)->set_refine_flag();
-				    }
-				}
-			      else //i.e. if (dim==3)
-				{
+				if (dim==2)
+				  {
+				    if (smooth_grid & allow_anisotropic_smoothing)
+				      changed=cell->neighbor(i)->flag_for_face_refinement(cell->neighbor_of_coarser_neighbor(i).first,
+											  RefinementCase<dim-1>::cut_x);
+				    else
+				      {
+					if (!cell->neighbor(i)->refine_flag_set())
+					  changed=true;
+					cell->neighbor(i)->set_refine_flag();
+				      }
+				  }
+				else //i.e. if (dim==3)
+				  {
 // ugly situations might arise here, consider the following situation, which
 // shows neighboring cells at the common face, where the upper right element is
 // coarser at the given face. Now the upper child element of the lower left
@@ -11522,158 +11524,157 @@ bool Triangulation<dim>::prepare_coarsening_and_refinement ()
 //    /               /
 //   /               /
 
-				  std::pair<unsigned int, unsigned int> nb_indices
-				    =cell->neighbor_of_coarser_neighbor(i);
-				  unsigned int refined_along_x=0,
-					       refined_along_y=0,
-					 to_be_refined_along_x=0,
-					 to_be_refined_along_y=0;
+				    std::pair<unsigned int, unsigned int> nb_indices
+				      =cell->neighbor_of_coarser_neighbor(i);
+				    unsigned int refined_along_x=0,
+						 refined_along_y=0,
+					   to_be_refined_along_x=0,
+					   to_be_refined_along_y=0;
 
-				  const int this_face_index=cell->face_index(i);
+				    const int this_face_index=cell->face_index(i);
 				  
 // step 1: detect, along which axis the face is currently refined
-				  if ((this_face_index
-				       == cell->neighbor(i)->face(nb_indices.first)->child_index(0)) ||
-				      (this_face_index
-				       == cell->neighbor(i)->face(nb_indices.first)->child_index(1)))
-				    {
-								       // this
-								       // might
-								       // be an
-								       // anisotropic
-								       // child. get
-								       // the
-								       // face
-								       // refine
-								       // case
-								       // of the
-								       // neighbors
-								       // face
-								       // and
-								       // count
-								       // refinements
-								       // in x
-								       // and y
-								       // direction.
-				      RefinementCase<dim-1> frc=cell->neighbor(i)->face(nb_indices.first)->refinement_case();
-				      if (frc & RefinementCase<dim>::cut_x)
+				    if ((this_face_index
+					 == cell->neighbor(i)->face(nb_indices.first)->child_index(0)) ||
+					(this_face_index
+					 == cell->neighbor(i)->face(nb_indices.first)->child_index(1)))
+				      {
+									 // this
+									 // might
+									 // be an
+									 // anisotropic
+									 // child. get
+									 // the
+									 // face
+									 // refine
+									 // case
+									 // of the
+									 // neighbors
+									 // face
+									 // and
+									 // count
+									 // refinements
+									 // in x
+									 // and y
+									 // direction.
+					RefinementCase<dim-1> frc=cell->neighbor(i)->face(nb_indices.first)->refinement_case();
+					if (frc & RefinementCase<dim>::cut_x)
+					  ++refined_along_x;
+					if (frc & RefinementCase<dim>::cut_y)
+					  ++refined_along_y;
+				      }
+				    else
+								       // this has
+								       // to be an
+								       // isotropic
+								       // child
+				      {
 					++refined_along_x;
-				      if (frc & RefinementCase<dim>::cut_y)
 					++refined_along_y;
-				    }
-				  else
-								     // this has
-								     // to be an
-								     // isotropic
-								     // child
-				    {
-				      ++refined_along_x;
-				      ++refined_along_y;
-				    }
+				      }
 // step 2: detect, along which axis the face has to be refined given the current
 // refine flag
-				  RefinementCase<dim-1> flagged_frc=
-				    GeometryInfo<dim>::face_refinement_case(cell->refine_flag_set(),
-									    i,
-									    cell->face_orientation(i),
-									    cell->face_flip(i),
-									    cell->face_rotation(i));
-				  if (flagged_frc & RefinementCase<dim>::cut_x)
-				    ++to_be_refined_along_x;
-				  if (flagged_frc & RefinementCase<dim>::cut_y)
-				    ++to_be_refined_along_y;
+				    RefinementCase<dim-1> flagged_frc=
+				      GeometryInfo<dim>::face_refinement_case(cell->refine_flag_set(),
+									      i,
+									      cell->face_orientation(i),
+									      cell->face_flip(i),
+									      cell->face_rotation(i));
+				    if (flagged_frc & RefinementCase<dim>::cut_x)
+				      ++to_be_refined_along_x;
+				    if (flagged_frc & RefinementCase<dim>::cut_y)
+				      ++to_be_refined_along_y;
 				  
 // step 3: set the refine flag of the (coarser and active) neighbor. 
-				  if ((smooth_grid & allow_anisotropic_smoothing) ||
-				      cell->neighbor(i)->refine_flag_set())
-				    {
-				      if (refined_along_x + to_be_refined_along_x > 1)
-					changed |= cell->neighbor(i)->flag_for_face_refinement(nb_indices.first,
-											       RefinementCase<dim-1>::cut_axis(0));
-				      if (refined_along_y + to_be_refined_along_y > 1)
-					changed |= cell->neighbor(i)->flag_for_face_refinement(nb_indices.first,
-											       RefinementCase<dim-1>::cut_axis(1));
-				    }
-				  else
-				    {
-				      if (cell->neighbor(i)->refine_flag_set()!=RefinementCase<dim>::isotropic_refinement)
-					changed=true;
-				      cell->neighbor(i)->set_refine_flag();
-				    }
+				    if ((smooth_grid & allow_anisotropic_smoothing) ||
+					cell->neighbor(i)->refine_flag_set())
+				      {
+					if (refined_along_x + to_be_refined_along_x > 1)
+					  changed |= cell->neighbor(i)->flag_for_face_refinement(nb_indices.first,
+												 RefinementCase<dim-1>::cut_axis(0));
+					if (refined_along_y + to_be_refined_along_y > 1)
+					  changed |= cell->neighbor(i)->flag_for_face_refinement(nb_indices.first,
+												 RefinementCase<dim-1>::cut_axis(1));
+				      }
+				    else
+				      {
+					if (cell->neighbor(i)->refine_flag_set()!=RefinementCase<dim>::isotropic_refinement)
+					  changed=true;
+					cell->neighbor(i)->set_refine_flag();
+				      }
 				  
 // step 4: if necessary (see above) add to the refine flag of the current cell
-				  cell_iterator nb=cell->neighbor(i);
-				  RefinementCase<dim-1> nb_frc
-				    = GeometryInfo<dim>::face_refinement_case(nb->refine_flag_set(),
-									      nb_indices.first,
-									      nb->face_orientation(nb_indices.first),
-									      nb->face_flip(nb_indices.first),
-									      nb->face_rotation(nb_indices.first));
-				  if ((nb_frc & RefinementCase<dim>::cut_x) &&
-				      !(refined_along_x || to_be_refined_along_x))
-				    changed |= cell->flag_for_face_refinement(i,RefinementCase<dim-1>::cut_axis(0));
-				  if ((nb_frc & RefinementCase<dim>::cut_y) &&
-				      !(refined_along_y || to_be_refined_along_y))
-				    changed |= cell->flag_for_face_refinement(i,RefinementCase<dim-1>::cut_axis(1));
-				}
-			    }// if neighbor is coarser
-			  else // -> now the neighbor is not coarser
-			    {
-			      cell->neighbor(i)->clear_coarsen_flag();
-			      const unsigned int nb_nb=cell->neighbor_of_neighbor(i);
-			      const cell_iterator neighbor=cell->neighbor(i);
-			      RefinementCase<dim-1> face_ref_case=
-				GeometryInfo<dim>::face_refinement_case(neighbor->refine_flag_set(),
-									nb_nb,
-									neighbor->face_orientation(nb_nb),
-									neighbor->face_flip(nb_nb),
-									neighbor->face_rotation(nb_nb));
-			      RefinementCase<dim-1> needed_face_ref_case
-				=GeometryInfo<dim>::face_refinement_case(cell->refine_flag_set(),
-									 i,
-									 cell->face_orientation(i),
-									 cell->face_flip(i),
-									 cell->face_rotation(i));
-							       // if the
-							       // neighbor wants
- 							       // to refine the
-							       // face with
-							       // cut_x and we
-							       // want cut_y or
-							       // vice versa, we
-							       // have to refine
-							       // isotropically
-							       // at the given
-							       // face
-			      if ((face_ref_case==RefinementCase<dim>::cut_x && needed_face_ref_case==RefinementCase<dim>::cut_y) ||
-				  (face_ref_case==RefinementCase<dim>::cut_y && needed_face_ref_case==RefinementCase<dim>::cut_x))
-				{
-				  changed=cell->flag_for_face_refinement(i, face_ref_case);
-				  neighbor->flag_for_face_refinement(nb_nb, needed_face_ref_case);
-				}
-			    }
-			}
-		      else //-> the neighbor is not active
-			{
-			  RefinementCase<dim-1> face_ref_case = cell->face(i)->refinement_case(),
-					 needed_face_ref_case = GeometryInfo<dim>::face_refinement_case(cell->refine_flag_set(),
-													i,
-													cell->face_orientation(i),
-													cell->face_flip(i),
-													cell->face_rotation(i));
-							   // if the face is
-							   // refined with cut_x
-							   // and we want cut_y
-							   // or vice versa, we
-							   // have to refine
-							   // isotropically at
-							   // the given face
-			  if ((face_ref_case==RefinementCase<dim>::cut_x && needed_face_ref_case==RefinementCase<dim>::cut_y) ||
-			      (face_ref_case==RefinementCase<dim>::cut_y && needed_face_ref_case==RefinementCase<dim>::cut_x))
-			    changed=cell->flag_for_face_refinement(i, face_ref_case);
-			}
-		    
-			
+				    cell_iterator nb=cell->neighbor(i);
+				    RefinementCase<dim-1> nb_frc
+				      = GeometryInfo<dim>::face_refinement_case(nb->refine_flag_set(),
+										nb_indices.first,
+										nb->face_orientation(nb_indices.first),
+										nb->face_flip(nb_indices.first),
+										nb->face_rotation(nb_indices.first));
+				    if ((nb_frc & RefinementCase<dim>::cut_x) &&
+					!(refined_along_x || to_be_refined_along_x))
+				      changed |= cell->flag_for_face_refinement(i,RefinementCase<dim-1>::cut_axis(0));
+				    if ((nb_frc & RefinementCase<dim>::cut_y) &&
+					!(refined_along_y || to_be_refined_along_y))
+				      changed |= cell->flag_for_face_refinement(i,RefinementCase<dim-1>::cut_axis(1));
+				  }
+			      }// if neighbor is coarser
+			    else // -> now the neighbor is not coarser
+			      {
+				cell->neighbor(i)->clear_coarsen_flag();
+				const unsigned int nb_nb=cell->neighbor_of_neighbor(i);
+				const cell_iterator neighbor=cell->neighbor(i);
+				RefinementCase<dim-1> face_ref_case=
+				  GeometryInfo<dim>::face_refinement_case(neighbor->refine_flag_set(),
+									  nb_nb,
+									  neighbor->face_orientation(nb_nb),
+									  neighbor->face_flip(nb_nb),
+									  neighbor->face_rotation(nb_nb));
+				RefinementCase<dim-1> needed_face_ref_case
+				  =GeometryInfo<dim>::face_refinement_case(cell->refine_flag_set(),
+									   i,
+									   cell->face_orientation(i),
+									   cell->face_flip(i),
+									   cell->face_rotation(i));
+								 // if the
+								 // neighbor wants
+								 // to refine the
+								 // face with
+								 // cut_x and we
+								 // want cut_y or
+								 // vice versa, we
+								 // have to refine
+								 // isotropically
+								 // at the given
+								 // face
+				if ((face_ref_case==RefinementCase<dim>::cut_x && needed_face_ref_case==RefinementCase<dim>::cut_y) ||
+				    (face_ref_case==RefinementCase<dim>::cut_y && needed_face_ref_case==RefinementCase<dim>::cut_x))
+				  {
+				    changed=cell->flag_for_face_refinement(i, face_ref_case);
+				    neighbor->flag_for_face_refinement(nb_nb, needed_face_ref_case);
+				  }
+			      }
+			  }
+			else //-> the neighbor is not active
+			  {
+			    RefinementCase<dim-1> face_ref_case = cell->face(i)->refinement_case(),
+					   needed_face_ref_case = GeometryInfo<dim>::face_refinement_case(cell->refine_flag_set(),
+													  i,
+													  cell->face_orientation(i),
+													  cell->face_flip(i),
+													  cell->face_rotation(i));
+							     // if the face is
+							     // refined with cut_x
+							     // and we want cut_y
+							     // or vice versa, we
+							     // have to refine
+							     // isotropically at
+							     // the given face
+			    if ((face_ref_case==RefinementCase<dim>::cut_x && needed_face_ref_case==RefinementCase<dim>::cut_y) ||
+				(face_ref_case==RefinementCase<dim>::cut_y && needed_face_ref_case==RefinementCase<dim>::cut_x))
+			      changed=cell->flag_for_face_refinement(i, face_ref_case);
+			  }
+		      }
 		  }
 	      }
 	}
@@ -12772,17 +12773,19 @@ void Triangulation<2>::create_children (unsigned int &next_unused_vertex,
 	  unsigned int bound_face=GeometryInfo<dim>::faces_per_cell;
 	  for (unsigned int face=0; face<GeometryInfo<dim>::faces_per_cell; ++face)
 	    if (cell->face(face)->at_boundary())
-	      if (bound_face == GeometryInfo<dim>::faces_per_cell)
-						 // no boundary face found so
-						 // far, so set it now
-		bound_face=face;
-	      else
-						 // there is another boundary
-						 // face, so reset bound_face to
-						 // invalid value as a flag to
-						 // do nothing in the following
-		bound_face=GeometryInfo<dim>::faces_per_cell+1;
-      
+	      {
+		if (bound_face == GeometryInfo<dim>::faces_per_cell)
+						   // no boundary face found so
+						   // far, so set it now
+		  bound_face=face;
+		else
+						   // there is another boundary
+						   // face, so reset bound_face to
+						   // invalid value as a flag to
+						   // do nothing in the following
+		  bound_face=GeometryInfo<dim>::faces_per_cell+1;
+	      }
+	  
 	  if (bound_face<GeometryInfo<dim>::faces_per_cell)
 					     // reset the cell's middle vertex
 					     // to the middle of the straight
@@ -13830,13 +13833,14 @@ Triangulation<3>::update_neighbors(cell_iterator &cell,
 					   // adjust the neighbor's
 					   // neighborship info.
 	  if ((GeometryInfo<dim>::face_refinement_case(ref_case,f) == RefinementCase<dim>::no_refinement) && !cell->neighbor_is_coarser(f))
-	    if (refining)
-	      neighbor->set_neighbor(cell->neighbor_of_neighbor(f),
-				     cell->child(GeometryInfo<dim>::child_cell_on_face(ref_case,f,0)));
-	    else
-	      neighbor->set_neighbor(cell->neighbor_of_neighbor(f),
-				     cell);
-						    
+	    {
+	      if (refining)
+		neighbor->set_neighbor(cell->neighbor_of_neighbor(f),
+				       cell->child(GeometryInfo<dim>::child_cell_on_face(ref_case,f,0)));
+	      else
+		neighbor->set_neighbor(cell->neighbor_of_neighbor(f),
+				       cell);
+	    }				    
 	}// else if (neighbor->active())
       else
 	{
