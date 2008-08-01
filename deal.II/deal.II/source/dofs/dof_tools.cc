@@ -1966,12 +1966,12 @@ namespace internal
 					       // assumptions
 					       //TODO[TL]: think about this in case of anisotropic refinement
 	      Assert (dof_handler.get_tria().get_anisotropic_refinement_flag() ||
-		      (this_face->child(0)->vertex_index(3) ==
-		       this_face->child(1)->vertex_index(2)) &&
-		      (this_face->child(0)->vertex_index(3) ==
-		       this_face->child(2)->vertex_index(1)) &&
-		      (this_face->child(0)->vertex_index(3) ==
-		       this_face->child(3)->vertex_index(0)),
+		      ((this_face->child(0)->vertex_index(3) ==
+			this_face->child(1)->vertex_index(2)) &&
+		       (this_face->child(0)->vertex_index(3) ==
+			this_face->child(2)->vertex_index(1)) &&
+		       (this_face->child(0)->vertex_index(3) ==
+			this_face->child(3)->vertex_index(0))),
 		      ExcInternalError());
 	      for (unsigned int dof=0; dof!=fe.dofs_per_vertex; ++dof)
 		dofs_on_children[next_index++]
