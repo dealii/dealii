@@ -27,6 +27,9 @@
 DEAL_II_NAMESPACE_OPEN
 
 
+template <typename> class ChunkSparseMatrix;
+
+
 /*! @addtogroup Sparsity
  *@{
  */
@@ -44,6 +47,33 @@ DEAL_II_NAMESPACE_OPEN
 class ChunkSparsityPattern : public Subscriptor
 {
   public:
+    
+				     /**
+				      * Define a value which is used
+				      * to indicate that a certain
+				      * value in the #colnums array
+				      * is unused, i.e. does not
+				      * represent a certain column
+				      * number index.
+				      *
+				      * Indices with this invalid
+				      * value are used to insert new
+				      * entries to the sparsity
+				      * pattern using the add() member
+				      * function, and are removed when
+				      * calling compress().
+				      *
+				      * You should not assume that the
+				      * variable declared here has a
+				      * certain value. The
+				      * initialization is given here
+				      * only to enable the compiler to
+				      * perform some optimizations,
+				      * but the actual value of the
+				      * variable may change over time.
+				      */
+    static const unsigned int invalid_entry = SparsityPattern::invalid_entry;
+
 				     /**
 				      * Initialize the matrix empty,
 				      * that is with no memory
@@ -816,6 +846,12 @@ class ChunkSparsityPattern : public Subscriptor
 				      * chunk_size by chunk_size.
 				      */
     SparsityPattern sparsity_pattern;
+
+				     /**
+				      * Make all the chunk sparse matrix kinds
+				      * friends.
+				      */
+    template <typename> friend class ChunkSparseMatrix;
 };
 
 
