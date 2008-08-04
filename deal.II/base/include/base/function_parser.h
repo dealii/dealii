@@ -38,7 +38,7 @@ template <typename> class Vector;
 /**
  * This class implements a function object that gets its value by parsing a
  * string describing this function. It is a wrapper class for the fparser
- * library (see http://www.students.tut.fi/~warp/FunctionParser/). This class
+ * library (see http://warp.povusers.org/FunctionParse/). This class
  * lets you evaluate strings such as "sqrt(1-x^2+y^2)" for given values of
  * 'x' and 'y'. Some of the information contained here is copied verbatim
  * from the fparser.txt file that comes with the fparser library. Please refer
@@ -75,7 +75,7 @@ template <typename> class Vector;
  			    constants); 
   @endverbatim
  * 
- * See http://www.students.tut.fi/~warp/FunctionParser/ for an
+ * See http://warp.povusers.org/FunctionParse/ for an
  * explanation on how the underlying library works. 
  *
  
