@@ -136,6 +136,15 @@ inconvenience this causes.
 <ol>
   <li>
   <p>
+  Fixed: A misplaced <code>#include</code> directive prevented the file
+  <code>base/source/data_out_base.cc</code> from being compilable by
+  the PGI C++ compiler. This is now fixed.
+  <br> 
+  (WB 2008/08/05)
+  </p>
+
+  <li>
+  <p>
   New: There are now a new
   GeometryInfo::min_cell_refinement_case_for_face_refinement
   (resp. GeometryInfo::min_cell_refinement_case_for_line_refinement)

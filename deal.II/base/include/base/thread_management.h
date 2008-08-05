@@ -26,13 +26,15 @@
 #include <boost/tuple/tuple.hpp>
 #include <boost/shared_ptr.hpp>
 
-DEAL_II_NAMESPACE_OPEN
 #if DEAL_II_USE_MT == 1
 #  if defined(DEAL_II_USE_MT_POSIX)
 #    include <pthread.h>
 #  endif
 #endif
 
+
+
+DEAL_II_NAMESPACE_OPEN
 
 
 /**
