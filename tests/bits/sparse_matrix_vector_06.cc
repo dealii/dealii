@@ -35,7 +35,7 @@ void test (Vector<double> &v)
                                    // then create a matrix from that
   SparseMatrix<double> m(sp);
   for (unsigned int i=0; i<m.m(); ++i)
-    for (unsigned int j=0; j<m.m(); ++j)
+    for (unsigned int j=0; j<m.n(); ++j)
         m.set (i,j, i+2*j);
 
   for (unsigned int i=0; i<v.size(); ++i)
@@ -52,7 +52,7 @@ void test (Vector<double> &v)
 
   double result = 0;
   for (unsigned int i=0; i<m.m(); ++i)
-    for (unsigned int j=0; j<m.m(); ++j)
+    for (unsigned int j=0; j<m.n(); ++j)
       result += (i+2*j)*j*i;
 
   Assert (s == result, ExcInternalError());

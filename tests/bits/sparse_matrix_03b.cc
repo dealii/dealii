@@ -38,19 +38,19 @@ void test ()
   
                                    // first set a few entries
   for (unsigned int i=0; i<m.m(); ++i)
-    for (unsigned int j=0; j<m.m(); ++j)
+    for (unsigned int j=0; j<m.n(); ++j)
       if ((i+2*j+1) % 3 == 0)
         m.set (i,j, i*j*.5+.5);
                                    // then add the same elements again
   for (unsigned int i=0; i<m.m(); ++i)
-    for (unsigned int j=0; j<m.m(); ++j)
+    for (unsigned int j=0; j<m.n(); ++j)
       if ((i+2*j+1) % 3 == 0)
         m.add (i,j, i*j*.5+.5);
   
                                    // then make sure we retrieve the correct
                                    // ones
   for (unsigned int i=0; i<m.m(); ++i)
-    for (unsigned int j=0; j<m.m(); ++j)
+    for (unsigned int j=0; j<m.n(); ++j)
       if ((i+2*j+1) % 3 == 0)
         {
           Assert (m(i,j) == 2*(i*j*.5+.5), ExcInternalError());

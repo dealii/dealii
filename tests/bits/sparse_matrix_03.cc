@@ -35,7 +35,7 @@ void test ()
   
                                    // first set a few entries
   for (unsigned int i=0; i<m.m(); ++i)
-    for (unsigned int j=0; j<m.m(); ++j)
+    for (unsigned int j=0; j<m.n(); ++j)
       if ((i+2*j+1) % 3 == 0)
         {
           if (i*j % 2 == 0)
@@ -46,7 +46,7 @@ void test ()
   
                                    // then make sure we retrieve the same ones
   for (unsigned int i=0; i<m.m(); ++i)
-    for (unsigned int j=0; j<m.m(); ++j)
+    for (unsigned int j=0; j<m.n(); ++j)
       if ((i+2*j+1) % 3 == 0)
         {
           Assert (m(i,j) == i*j*.5+.5, ExcInternalError());
