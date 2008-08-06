@@ -1622,6 +1622,7 @@ class SparsityPattern : public Subscriptor
 				      * friends of this class.
 				      */
     template <typename number> friend class SparseMatrix;
+    template <typename number> friend class ChunkSparseMatrix;
 
     friend class ChunkSparsityPattern;
 };
