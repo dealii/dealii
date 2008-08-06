@@ -878,7 +878,7 @@ partition_triangulation (const unsigned int  n_partitions,
 				   // now compress the so-built connectivity
 				   // pattern and restore user indices
   cell_connectivity.compress ();
-  triangulation.save_user_indices (saved_user_indices);
+  triangulation.load_user_indices (saved_user_indices);
   
 				   // finally defer to the other function for
 				   // partitioning and assigning subdomain ids
