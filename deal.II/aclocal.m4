@@ -5624,7 +5624,9 @@ AC_DEFUN(DEAL_II_WITH_BOOST, dnl
 [
   if test "x$1" != "xyes" ; then
     BOOST_INCLUDE_DIR="-I$1"
-    BOOST_LIB_DIR="$LD_PATH_OPTION$1/lib"
+    if test "$LD_PATH_OPTION" != "no" ; then
+      BOOST_LIB_DIR="$LD_PATH_OPTION$1/lib"
+    fi
   else
     BOOST_INCLUDE_DIR=''
     BOOST_LIB_DIR=''
