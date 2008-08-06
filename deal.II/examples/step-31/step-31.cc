@@ -102,7 +102,7 @@ template <int dim>
 				 // Furthermore, we have a slightly more
 				 // sophisticated solver we are going to
 				 // use, so there is a second pointer
-				 // to a sparse ILU for the pressure
+				 // to a sparse ILU for a pressure
 				 // mass matrix as well.
 template <int dim>
 class BoussinesqFlowProblem
@@ -148,10 +148,11 @@ class BoussinesqFlowProblem
 
 
 
-				 // @sect3{Boundary values, initial values and right hand sides}
+				 // @sect3{Equation data}
 
 				 // Again, the next stage in the program
-				 // is the definition of the various
+				 // is the definition of the equation 
+				 // data, that is, the various
 				 // boundary conditions, the right hand
 				 // side and the initial condition (remember
 				 // that we're about to solve a time-
@@ -168,7 +169,7 @@ class BoussinesqFlowProblem
 				 // pressure <i>p</i> and temperature
 				 // <i>T</i>.
 
-				 // Secondly, we set the initial
+				 // Secondly, we set an initial
 				 // condition for all problem variables,
 				 // i.e., for <b>u</b>, <i>p</i> and <i>T</i>,
 				 // so the function has <i>dim+2</i>
@@ -178,7 +179,8 @@ class BoussinesqFlowProblem
 
 				 // The last definition of this kind
 				 // is the one for the right hand
-				 // side function. Again, it is very
+				 // side function. Again, the content
+				 // of the function is very
 				 // basic and zero in most of the
 				 // components, except for a source
 				 // of temperature in some isolated
@@ -319,14 +321,14 @@ RightHandSide<dim>::vector_value (const Point<dim> &p,
 
 				 // This section introduces some
 				 // objects that are used for the
+				 // solution of the linear equations of
 				 // Stokes system that we need to
 				 // solve in each time step. The basic
 				 // structure is still the same as
 				 // in step-20, where Schur complement
 				 // based preconditioners and solvers
-				 // have been introduced. The interface
-				 // is the same as in step-22 for
-				 // the Stokes system.
+				 // have been introduced, with the 
+				 // actual interface taken from step-22.
 
 				 // @sect4{The <code>InverseMatrix</code> class template}
 
@@ -394,9 +396,97 @@ void InverseMatrix<Matrix,Preconditioner>::vmult (Vector<double>       &dst,
 				 // of the Schur complement
 				 // preconditioner as described
 				 // in the section on improved
-				 // solvers in step-22. See there
-				 // for more explanation of the
-				 // method.
+				 // solvers in step-22.
+				 // 
+				 // The basic 
+				 // concept of the preconditioner is 
+				 // different to the solution 
+				 // strategy used in step-20 and 
+				 // step-22. There, the Schur
+				 // complement was used for a 
+				 // two-stage solution of the linear
+				 // system. Recall that the process
+				 // in the Schur complement solver is
+				 // a Gaussian elimination of
+				 // a 2x2 block matrix, where each
+				 // block is solved iteratively. 
+				 // Here, the idea is to let 
+				 // an iterative solver act on the
+				 // whole system, and to use 
+				 // a Schur complement for 
+				 // preconditioning. As usual when
+				 // dealing with preconditioners, we
+				 // don't intend to exacly set up a 
+				 // Schur complement, but rather use
+				 // a good approximation to the
+				 // Schur complement for the purpose of
+				 // preconditioning.
+				 // 
+				 // So the question is how we can
+				 // obtain a good preconditioner.
+				 // Let's have a look at the 
+				 // preconditioner matrix <i>P</i>
+				 // acting on the block system, built
+				 // as
+				 // @f{eqnarray*}
+				 //   P^{-1}
+				 //   = 
+				 //   \left(\begin{array}{cc}
+				 //     A^{-1} & 0 \\ S^{-1} B A^{-1} & -S^{-1}
+				 //   \end{array}\right)
+				 // @f}
+				 // using the Schur complement 
+				 // $S = B A^{-1} B^T$. If we apply
+				 // this matrix in the solution of 
+				 // a linear system, convergence of
+				 // an iterative Krylov-based solver
+				 // will be governed by the matrix
+				 // @f{eqnarray*}
+				 //   P^{-1}\left(\begin{array}{cc}
+				 //     A & B^T \\ B & 0
+				 //   \end{array}\right) 
+ 				 //  = 
+				 //   \left(\begin{array}{cc}
+				 //     I & A^{-1} B^T \\ 0 & 0
+				 //   \end{array}\right),
+				 // @f}
+				 // which turns out to be very simple.
+				 // A GMRES solver based on exact
+				 // matrices would converge in two
+				 // iterations, since there are
+				 // only two distinct eigenvalues.
+				 // Such a preconditioner for the
+				 // blocked Stokes system has been 
+				 // proposed by Silvester and Wathen,
+				 // Fast iterative solution of 
+				 // stabilised Stokes systems part II. 
+				 // Using general block preconditioners.
+				 // (SIAM J. Numer. Anal., 31 (1994),
+				 // pp. 1352-1367).
+				 // 
+				 // The deal.II users who have already
+				 // gone through the step-20 and step-22 
+				 // tutorials can certainly imagine
+				 // how we're going to implement this.
+				 // We replace the inverse matrices
+				 // in $P^{-1}$ using the InverseMatrix
+				 // class, and the inverse Schur 
+				 // complement will be approximated
+				 // by the pressure mass matrix $M_p$.
+				 // Having this in mind, we define a
+				 // preconditioner class with a 
+				 // <code>vmult</code> functionality,
+				 // which is all we need for the
+				 // interaction with the usual solver
+				 // functions further below in the
+				 // program code.
+				 // 
+				 // First the declarations. These
+				 // are similar to the definition of
+				 // the Schur complement in step-20,
+				 // with the difference that we need
+				 // some more preconditioners in
+				 // the constructor.
 template <class PreconditionerA, class PreconditionerMp>
 class BlockSchurPreconditioner : public Subscriptor
 {
@@ -432,6 +522,26 @@ BlockSchurPreconditioner<PreconditionerA, PreconditionerMp>::BlockSchurPrecondit
 {
 }
 
+
+				 // This is the <code>vmult</code>
+				 // function. We implement
+				 // the action of $P^{-1}$ as described
+				 // above in three successive steps.
+				 // The first step multiplies
+				 // the velocity vector by a 
+				 // preconditioner of the matrix <i>A</i>.
+				 // The resuling velocity vector
+				 // is then multiplied by $B$ and
+				 // subtracted from the pressure.
+				 // This second step only acts on 
+				 // the pressure vector and is 
+				 // accomplished by the command
+				 // SparseMatrix::residual. Next, 
+				 // we change the sign in the 
+				 // temporary pressure vector and
+				 // finally multiply by the pressure
+				 // mass matrix to get the final
+				 // pressure vector.
 template <class PreconditionerA, class PreconditionerMp>
 void BlockSchurPreconditioner<PreconditionerA, PreconditionerMp>::vmult (
                                      BlockVector<double>       &dst,
@@ -448,6 +558,19 @@ void BlockSchurPreconditioner<PreconditionerA, PreconditionerMp>::vmult (
 				 // @sect3{BoussinesqFlowProblem class implementation}
 
 				 // @sect4{BoussinesqFlowProblem::BoussinesqFlowProblem}
+				 // 
+				 // The constructor of this class is
+				 // an extension of the constructor
+				 // in step-22. We need to include 
+				 // the temperature in the definition
+				 // of the finite element. As discussed
+				 // in the introduction, we are going 
+				 // to use discontinuous elements 
+				 // of one degree less than for pressure
+				 // there. Moreover, we initialize
+				 // the time stepping as well as the
+				 // options for the matrix assembly 
+				 // and preconditioning.
 template <int dim>
 BoussinesqFlowProblem<dim>::BoussinesqFlowProblem (const unsigned int degree)
                 :
@@ -463,7 +586,7 @@ BoussinesqFlowProblem<dim>::BoussinesqFlowProblem (const unsigned int degree)
 
 
 
-
+				 // @sect4{BoussinesqFlowProblem::setup_dofs}
 template <int dim>
 void BoussinesqFlowProblem<dim>::setup_dofs (const bool setup_matrices)
 {
@@ -544,6 +667,7 @@ void BoussinesqFlowProblem<dim>::setup_dofs (const bool setup_matrices)
 
 
 
+				 // @sect4{BoussinesqFlowProblem::assemble_system}
 template <int dim>
 void BoussinesqFlowProblem<dim>::assemble_system ()
 {
@@ -780,7 +904,7 @@ void BoussinesqFlowProblem<dim>::assemble_system ()
 
 
 
-
+				 // @sect4{BoussinesqFlowProblem::assemble_rhs_T}
 template <int dim>
 void BoussinesqFlowProblem<dim>::assemble_rhs_T ()
 {
@@ -1060,6 +1184,7 @@ void BoussinesqFlowProblem<dim>::assemble_rhs_T ()
 
 
 
+				 // @sect4{BoussinesqFlowProblem::solve}
 template <int dim>
 void BoussinesqFlowProblem<dim>::solve ()
 {
@@ -1081,7 +1206,7 @@ void BoussinesqFlowProblem<dim>::solve ()
 				// Define some temporary vectors
 				// for the solution process.
 				// TODO: Can we somhow avoid copying
-				// the vectors back and forth? I.e.
+				// these vectors back and forth? I.e.
 				// accessing the block vectors in a
 				// similar way as the matrix with the
 				// BlockMatrixArray class?
@@ -1161,6 +1286,7 @@ void BoussinesqFlowProblem<dim>::solve ()
 
 
 
+				 // @sect4{BoussinesqFlowProblem::output_results}
 template <int dim>
 void BoussinesqFlowProblem<dim>::output_results ()  const
 {
@@ -1197,9 +1323,9 @@ void BoussinesqFlowProblem<dim>::output_results ()  const
 
 
 
+				 // @sect4{BoussinesqFlowProblem::refine_mesh}
 template <int dim>
-void
-BoussinesqFlowProblem<dim>::refine_mesh ()
+void BoussinesqFlowProblem<dim>::refine_mesh ()
 {
   Vector<float> estimated_error_per_cell (triangulation.n_active_cells());
 
@@ -1244,9 +1370,9 @@ BoussinesqFlowProblem<dim>::refine_mesh ()
 
 
 
+				 // @sect4{BoussinesqFlowProblem::get_maximal_velocity}
 template <int dim>
-double
-BoussinesqFlowProblem<dim>::get_maximal_velocity () const
+double BoussinesqFlowProblem<dim>::get_maximal_velocity () const
 {
   QGauss<dim>   quadrature_formula(degree+2);
   const unsigned int   n_q_points
@@ -1282,6 +1408,7 @@ BoussinesqFlowProblem<dim>::get_maximal_velocity () const
 
 
 
+				 // @sect4{BoussinesqFlowProblem::run}
 template <int dim>
 void BoussinesqFlowProblem<dim>::run ()
 {
@@ -1387,6 +1514,7 @@ void BoussinesqFlowProblem<dim>::run ()
 
 
 
+				 // @sect3{The <code>main</code> function}
 int main ()
 {
   try
