@@ -262,7 +262,7 @@ TriaObjectAccessor<1, dim>::recursively_clear_user_pointer () const
 
 
 template <int dim>
-void TriaObjectAccessor<1, dim>::set_user_index (unsigned int p) const
+void TriaObjectAccessor<1, dim>::set_user_index (const unsigned int p) const
 {
   Assert (used(), TriaAccessorExceptions::ExcCellNotUsed());
   objects().user_index(this->present_index) = p;
@@ -290,7 +290,7 @@ unsigned int TriaObjectAccessor<1, dim>::user_index () const
 
 template <int dim>
 void
-TriaObjectAccessor<1, dim>::recursively_set_user_index (unsigned int p) const
+TriaObjectAccessor<1, dim>::recursively_set_user_index (const unsigned int p) const
 {
   set_user_index (p);
 
@@ -577,7 +577,7 @@ TriaObjectAccessor<2, dim>::recursively_clear_user_pointer () const
 
 
 template <int dim>
-void TriaObjectAccessor<2, dim>::set_user_index (unsigned int p) const
+void TriaObjectAccessor<2, dim>::set_user_index (const unsigned int p) const
 {
   Assert (used(), TriaAccessorExceptions::ExcCellNotUsed());
   objects().user_index(this->present_index) = p;
@@ -605,7 +605,7 @@ unsigned int  TriaObjectAccessor<2, dim>::user_index () const
 
 template <int dim>
 void
-TriaObjectAccessor<2, dim>::recursively_set_user_index (unsigned int p) const
+TriaObjectAccessor<2, dim>::recursively_set_user_index (const unsigned int p) const
 {
   set_user_index (p);
 
@@ -1097,7 +1097,7 @@ void * TriaObjectAccessor<3, 3>::user_pointer () const
 
 
 template <>
-void TriaObjectAccessor<3, 3>::set_user_index (unsigned int p) const
+void TriaObjectAccessor<3, 3>::set_user_index (const unsigned int p) const
 {
   Assert (used(), TriaAccessorExceptions::ExcCellNotUsed());
   this->tria->levels[this->present_level]->cells.user_index(this->present_index) = p;
@@ -1149,7 +1149,7 @@ TriaObjectAccessor<3, dim>::recursively_clear_user_pointer () const
 
 template <int dim>
 void
-TriaObjectAccessor<3, dim>::recursively_set_user_index (unsigned int p) const
+TriaObjectAccessor<3, dim>::recursively_set_user_index (const unsigned int p) const
 {
   set_user_index (p);
 
