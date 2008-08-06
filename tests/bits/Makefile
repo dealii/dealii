@@ -1,6 +1,6 @@
 ############################################################
 # Makefile,v 1.15 2002/06/13 12:51:13 hartmann Exp
-# Copyright (C) 2000, 2001, 2002, 2003, 2004, 2005, 2006, 2007 by the deal.II authors
+# Copyright (C) 2000, 2001, 2002, 2003, 2004, 2005, 2006, 2007, 2008 by the deal.II authors
 ############################################################
 
 ############################################################
@@ -63,6 +63,7 @@ tests_x = grid_generator_?? \
           find_cell_* \
           sparsity_pattern_* \
           sparse_matrix_* \
+          chunk_sparse_matrix_* \
 	  full_matrix_vector_* \
 	  solver_* \
 	  deal_solver_* \

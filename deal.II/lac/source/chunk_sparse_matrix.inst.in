@@ -1,0 +1,225 @@
+//----------------------------  sparse_matrix.inst.in  ---------------------------
+//    $Id: sparse_matrix_matrix.in.h 15011 2007-08-22 16:59:41Z kanschat $
+//    Version: $Name$
+//
+//    Copyright (C) 1998, 1999, 2000, 2001, 2002, 2003, 2006, 2007, 2008 by the deal.II authors
+//
+//    This file is subject to QPL and may not be  distributed
+//    without copyright and license information. Please refer
+//    to the file deal.II/doc/license.html for the  text  and
+//    further information on this license.
+//
+//----------------------------  sparse_matrix.inst.in  ---------------------------
+
+
+// real instantiations
+
+for (S : REAL_SCALARS)
+  {
+    template class ChunkSparseMatrix<S>;
+  }
+
+
+
+for (S1, S2 : REAL_SCALARS)
+  {
+    template ChunkSparseMatrix<S1> &
+      ChunkSparseMatrix<S1>::copy_from<S2> (const ChunkSparseMatrix<S2> &);
+
+    template 
+      void ChunkSparseMatrix<S1>::copy_from<S2> (const FullMatrix<S2> &);
+
+    template void ChunkSparseMatrix<S1>::add<S2> (const S1,
+					     const ChunkSparseMatrix<S2> &);
+  }
+
+
+for (S1, S2 : REAL_SCALARS)
+  {
+    template S2
+      ChunkSparseMatrix<S1>::
+      matrix_norm_square<S2> (const Vector<S2> &) const;
+
+    template S2
+      ChunkSparseMatrix<S1>::
+      matrix_scalar_product<S2> (const Vector<S2> &,
+				 const Vector<S2> &) const;
+
+    template S2 ChunkSparseMatrix<S1>::
+      residual<S2> (Vector<S2> &,
+		    const Vector<S2> &,
+		    const Vector<S2> &) const;
+
+    template void ChunkSparseMatrix<S1>::
+      precondition_SSOR<S2> (Vector<S2> &,
+			     const Vector<S2> &,
+			     const S1) const;
+
+    template void ChunkSparseMatrix<S1>::
+      precondition_SOR<S2> (Vector<S2> &,
+			    const Vector<S2> &,
+			    const S1) const;
+
+    template void ChunkSparseMatrix<S1>::
+      precondition_TSOR<S2> (Vector<S2> &,
+			     const Vector<S2> &,
+			     const S1) const;
+
+    template void ChunkSparseMatrix<S1>::
+      precondition_Jacobi<S2> (Vector<S2> &,
+			       const Vector<S2> &,
+			       const S1) const;
+
+    template void ChunkSparseMatrix<S1>::
+      SOR<S2> (Vector<S2> &,
+	       const S1) const;
+    template void ChunkSparseMatrix<S1>::
+      TSOR<S2> (Vector<S2> &,
+		const S1) const;
+    template void ChunkSparseMatrix<S1>::
+      SSOR<S2> (Vector<S2> &,
+		const S1) const;
+    template void ChunkSparseMatrix<S1>::
+      PSOR<S2> (Vector<S2> &,
+		const std::vector<unsigned int>&,
+		const std::vector<unsigned int>&,
+		const S1) const;
+    template void ChunkSparseMatrix<S1>::
+      TPSOR<S2> (Vector<S2> &,
+		 const std::vector<unsigned int>&,
+		 const std::vector<unsigned int>&,
+		 const S1) const;
+    template void ChunkSparseMatrix<S1>::
+      SOR_step<S2> (Vector<S2> &,
+		    const Vector<S2> &,
+		    const S1) const;
+    template void ChunkSparseMatrix<S1>::
+      TSOR_step<S2> (Vector<S2> &,
+		     const Vector<S2> &,
+		     const S1) const;
+    template void ChunkSparseMatrix<S1>::
+      SSOR_step<S2> (Vector<S2> &,
+		     const Vector<S2> &, 
+		     const S1) const;
+  }
+
+
+for (S1, S2, S3 : REAL_SCALARS;
+     V1, V2     : DEAL_II_VEC_TEMPLATES)
+  {
+    template void ChunkSparseMatrix<S1>::
+      vmult (V1<S2> &, const V2<S3> &) const;
+    template void ChunkSparseMatrix<S1>::
+      Tvmult (V1<S2> &, const V2<S3> &) const;
+    template void ChunkSparseMatrix<S1>::
+      vmult_add (V1<S2> &, const V2<S3> &) const;
+    template void ChunkSparseMatrix<S1>::
+      Tvmult_add (V1<S2> &, const V2<S3> &) const;
+  }
+
+
+
+// complex instantiations
+
+// for (S : COMPLEX_SCALARS)
+//   {
+//     template class ChunkSparseMatrix<S>;
+//   }
+
+
+
+// for (S1, S2 : COMPLEX_SCALARS)
+//   {
+//     template ChunkSparseMatrix<S1> &
+//       ChunkSparseMatrix<S1>::copy_from<S2> (const ChunkSparseMatrix<S2> &);
+
+//     template 
+//       void ChunkSparseMatrix<S1>::copy_from<S2> (const FullMatrix<S2> &);
+
+//     template void ChunkSparseMatrix<S1>::add<S2> (const S1,
+// 					     const ChunkSparseMatrix<S2> &);
+//   }
+
+
+// for (S1, S2 : COMPLEX_SCALARS)
+//   {
+//     template S2
+//       ChunkSparseMatrix<S1>::
+//       matrix_norm_square<S2> (const Vector<S2> &) const;
+
+//     template S2
+//       ChunkSparseMatrix<S1>::
+//       matrix_scalar_product<S2> (const Vector<S2> &,
+// 				 const Vector<S2> &) const;
+
+//     template S2 ChunkSparseMatrix<S1>::
+//       residual<S2> (Vector<S2> &,
+// 		    const Vector<S2> &,
+// 		    const Vector<S2> &) const;
+
+//     template void ChunkSparseMatrix<S1>::
+//       precondition_SSOR<S2> (Vector<S2> &,
+// 			     const Vector<S2> &,
+// 			     const S1) const;
+
+//     template void ChunkSparseMatrix<S1>::
+//       precondition_SOR<S2> (Vector<S2> &,
+// 			    const Vector<S2> &,
+// 			    const S1) const;
+
+//     template void ChunkSparseMatrix<S1>::
+//       precondition_TSOR<S2> (Vector<S2> &,
+// 			     const Vector<S2> &,
+// 			     const S1) const;
+
+//     template void ChunkSparseMatrix<S1>::
+//       precondition_Jacobi<S2> (Vector<S2> &,
+// 			       const Vector<S2> &,
+// 			       const S1) const;
+
+//     template void ChunkSparseMatrix<S1>::
+//       SOR<S2> (Vector<S2> &,
+// 	       const S1) const;
+//     template void ChunkSparseMatrix<S1>::
+//       TSOR<S2> (Vector<S2> &,
+// 		const S1) const;
+//     template void ChunkSparseMatrix<S1>::
+//       SSOR<S2> (Vector<S2> &,
+// 		const S1) const;
+//     template void ChunkSparseMatrix<S1>::
+//       PSOR<S2> (Vector<S2> &,
+// 		const std::vector<unsigned int>&,
+// 		const std::vector<unsigned int>&,
+// 		const S1) const;
+//     template void ChunkSparseMatrix<S1>::
+//       TPSOR<S2> (Vector<S2> &,
+// 		 const std::vector<unsigned int>&,
+// 		 const std::vector<unsigned int>&,
+// 		 const S1) const;
+//     template void ChunkSparseMatrix<S1>::
+//       SOR_step<S2> (Vector<S2> &,
+// 		    const Vector<S2> &,
+// 		    const S1) const;
+//     template void ChunkSparseMatrix<S1>::
+//       TSOR_step<S2> (Vector<S2> &,
+// 		     const Vector<S2> &,
+// 		     const S1) const;
+//     template void ChunkSparseMatrix<S1>::
+//       SSOR_step<S2> (Vector<S2> &,
+// 		     const Vector<S2> &, 
+// 		     const S1) const;
+//   }
+
+
+// for (S1, S2, S3 : COMPLEX_SCALARS;
+//      V1, V2     : DEAL_II_VEC_TEMPLATES)
+//   {
+//     template void ChunkSparseMatrix<S1>::
+//       vmult (V1<S2> &, const V2<S3> &) const;
+//     template void ChunkSparseMatrix<S1>::
+//       Tvmult (V1<S2> &, const V2<S3> &) const;
+//     template void ChunkSparseMatrix<S1>::
+//       vmult_add (V1<S2> &, const V2<S3> &) const;
+//     template void ChunkSparseMatrix<S1>::
+//       Tvmult_add (V1<S2> &, const V2<S3> &) const;
+//   }
