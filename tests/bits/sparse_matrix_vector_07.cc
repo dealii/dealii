@@ -2,7 +2,7 @@
 //    sparse_matrix_vector_07.cc,v 1.5 2004/02/26 17:25:45 wolf Exp
 //    Version:  
 //
-//    Copyright (C) 2004, 2005 by the deal.II authors
+//    Copyright (C) 2004, 2005, 2008 by the deal.II authors
 //
 //    This file is subject to QPL and may not be  distributed
 //    without copyright and license information. Please refer
@@ -12,7 +12,7 @@
 //----------------------------  sparse_matrix_vector_07.cc  ---------------------------
 
 
-// check SparseMatrix::matrix_norm_square
+// check SparseMatrix::residual
 
 #include "../tests.h"
 #include <lac/vector.h>
