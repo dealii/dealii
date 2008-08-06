@@ -841,14 +841,19 @@ partition_triangulation (const unsigned int  n_partitions,
                                    // cells with their neighbors, and then
                                    // passing this graph off to METIS.
 				   //
-				   // as built in this function, we only
-				   // consider face neighbors, which leads to
-				   // a fixed number of entries per row (don't
-				   // forget that each cell couples with
-				   // itself)
+				   // as built in this function, we
+				   // only consider face neighbors,
+				   // which leads to a fixed number of
+				   // entries per row (don't forget
+				   // that each cell couples with
+				   // itself, and that neighbors can
+				   // be refined)
   SparsityPattern cell_connectivity (triangulation.n_active_cells(),
 				     triangulation.n_active_cells(),
-				     GeometryInfo<dim>::faces_per_cell+1);
+				     GeometryInfo<dim>::faces_per_cell
+				     * GeometryInfo<dim>::max_children_per_face
+				     +
+				     1);
 
 				   // next we have to build a mapping from the
 				   // list of cells to their indices. for
@@ -861,8 +866,22 @@ partition_triangulation (const unsigned int  n_partitions,
        cell != triangulation.end(); ++cell, ++index)
     cell->set_user_index (index);
 
-				   // next loop over all cells and their
-				   // neighbors to build the sparsity pattern
+				   // next loop over all cells and
+				   // their neighbors to build the
+				   // sparsity pattern. note that it's
+				   // a bit hard to enter all the
+				   // connections when a neighbor has
+				   // children since we would need to
+				   // find out which of its children
+				   // is adjacent to the current
+				   // cell. this problem can be
+				   // omitted if we only do something
+				   // if the neighbor has no children
+				   // -- in that case it is either on
+				   // the same or a coarser level than
+				   // we are. in return, we have to
+				   // add entries in both directions
+				   // for both cells
   index = 0;
   for (typename Triangulation<dim>::active_cell_iterator
          cell = triangulation.begin_active();
@@ -870,9 +889,15 @@ partition_triangulation (const unsigned int  n_partitions,
     {
       cell_connectivity.add (index, index);
       for (unsigned int f=0; f<GeometryInfo<dim>::faces_per_cell; ++f)
-	if (cell->at_boundary(f) == false)
-	  cell_connectivity.add (index,
-				 cell->neighbor(f)->user_index());
+	if ((cell->at_boundary(f) == false)
+	    &&
+	    (cell->neighbor(f)->has_children() == false))
+	  {
+	    cell_connectivity.add (index,
+				   cell->neighbor(f)->user_index());
+	    cell_connectivity.add (cell->neighbor(f)->user_index(),
+				   index);
+	  }
     }
   
 				   // now compress the so-built connectivity
