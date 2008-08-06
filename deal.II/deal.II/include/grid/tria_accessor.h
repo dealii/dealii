@@ -741,7 +741,7 @@ class TriaObjectAccessor :  public TriaAccessor<celldim,dim>
 				      * Set the user index
 				      * to @p p.
 				      */
-    void set_user_index (unsigned int p) const;
+    void set_user_index (const unsigned int p) const;
     
 				     /**
 				      * Reset the user index to 0.
@@ -772,7 +772,7 @@ class TriaObjectAccessor :  public TriaAccessor<celldim,dim>
 				      * the user index of all finer
 				      * levels of the triangulation.
 				      */
-    void recursively_set_user_index (unsigned int p) const;
+    void recursively_set_user_index (const unsigned int p) const;
 
 				     /**
 				      * Clear the user index of this
@@ -1520,7 +1520,7 @@ class TriaObjectAccessor<1, dim> :  public TriaAccessor<1,dim>
 				      * Set the user index
 				      * to @p p.
 				      */
-    void set_user_index (unsigned int p) const;
+    void set_user_index (const unsigned int p) const;
     
 				     /**
 				      * Reset the user index to 0.
@@ -1551,7 +1551,7 @@ class TriaObjectAccessor<1, dim> :  public TriaAccessor<1,dim>
 				      * the user index of all finer
 				      * levels of the triangulation.
 				      */
-    void recursively_set_user_index (unsigned int p) const;
+    void recursively_set_user_index (const unsigned int p) const;
 
 				     /**
 				      * Clear the user index of this
@@ -2216,7 +2216,7 @@ class TriaObjectAccessor<2, dim> :  public TriaAccessor<2,dim>
 				      * Set the user index
 				      * to @p p.
 				      */
-    void set_user_index (unsigned int p) const;
+    void set_user_index (const unsigned int p) const;
     
 				     /**
 				      * Reset the user index to 0.
@@ -2247,7 +2247,7 @@ class TriaObjectAccessor<2, dim> :  public TriaAccessor<2,dim>
 				      * the user index of all finer
 				      * levels of the triangulation.
 				      */
-    void recursively_set_user_index (unsigned int p) const;
+    void recursively_set_user_index (const unsigned int p) const;
 
 				     /**
 				      * Clear the user index of this
@@ -2993,7 +2993,7 @@ class TriaObjectAccessor<3, dim> :  public TriaAccessor<3,dim>
 				      * Set the user index
 				      * to @p p.
 				      */
-    void set_user_index (unsigned int p) const;
+    void set_user_index (const unsigned int p) const;
     
 				     /**
 				      * Reset the user index to 0.
@@ -3024,7 +3024,7 @@ class TriaObjectAccessor<3, dim> :  public TriaAccessor<3,dim>
 				      * the user index of all finer
 				      * levels of the triangulation.
 				      */
-    void recursively_set_user_index (unsigned int p) const;
+    void recursively_set_user_index (const unsigned int p) const;
 
 				     /**
 				      * Clear the user index of this
