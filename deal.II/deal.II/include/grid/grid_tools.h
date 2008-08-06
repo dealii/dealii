@@ -33,6 +33,8 @@ namespace hp
   template <int> class MappingCollection;
 }
 
+class SparsityPattern;
+
 
 /**
  * This class is a collection of algorithms working on triangulations,
@@ -446,7 +448,7 @@ class GridTools
                                       * values between zero and
                                       * @p n_partitions-1. You can access the
                                       * subdomain id of a cell by using
-                                      * <tt>cell->subdomain_id()</tt>.
+                                      * <tt>cell-@>subdomain_id()</tt>.
                                       *
                                       * This function will generate an error
                                       * if METIS is not installed unless
@@ -461,6 +463,88 @@ class GridTools
     static
     void partition_triangulation (const unsigned int  n_partitions,
                                   Triangulation<dim> &triangulation);
+
+				     /**
+				      * This function does the same as the
+				      * previous one, i.e. it partitions a
+				      * triangulation using METIS into a
+				      * number of subdomains identified by the
+				      * <code>cell-@>subdomain_id()</code>
+				      * flag.
+				      *
+				      * The difference to the previous
+				      * function is the second argument, a
+				      * sparsity pattern that represents the
+				      * connectivity pattern between cells.
+				      *
+				      * While the function above builds it
+				      * directly from the triangulation by
+				      * considering which cells neighbor each
+				      * other, this function can take a more
+				      * refined connectivity graph. The
+				      * sparsity pattern needs to be of size
+				      * $N\times N$, where $N$ is the number
+				      * of active cells in the
+				      * triangulation. If the sparsity pattern
+				      * contains an entry at position $(i,j)$,
+				      * then this means that cells $i$ and $j$
+				      * (in the order in which they are
+				      * traversed by active cell iterators)
+				      * are to be considered connected; METIS
+				      * will then try to partition the domain
+				      * in such a way that (i) the subdomains
+				      * are of roughly equal size, and (ii) a
+				      * minimal number of connections are
+				      * broken.
+				      *
+				      * This function is mainly useful in
+				      * cases where connections between cells
+				      * exist that are not present in the
+				      * triangulation alone (otherwise the
+				      * previous function would be the simpler
+				      * one to use). Such connections may
+				      * include that certain parts of the
+				      * boundary of a domain are coupled
+				      * through symmetric boundary conditions
+				      * or integrals (e.g. friction contact
+				      * between the two sides of a crack in
+				      * the domain), or if a numerical scheme
+				      * is used that not only connects
+				      * immediate neighbors but a larger
+				      * neighborhood of cells (e.g. when
+				      * solving integral equations).
+				      *
+				      * In addition, this function may be
+				      * useful in cases where the default
+				      * sparsity pattern is not entirely
+				      * sufficient. This can happen because
+				      * the default is to just consider face
+				      * neighbors, not neighboring cells that
+				      * are connected by edges or
+				      * vertices. While the latter couple when
+				      * using continuous finite elements, they
+				      * are typically still closely connected
+				      * in the neighborship graph, and METIS
+				      * will not usually cut important
+				      * connections in this case. However, if
+				      * there are vertices in the mesh where
+				      * many cells (many more than the common
+				      * 4 or 6 in 2d and 3d, respectively)
+				      * come together, then there will be a
+				      * significant number of cells that are
+				      * connected across a vertex, but several
+				      * degrees removed in the connectivity
+				      * graph built only using face
+				      * neighbors. In a case like this, METIS
+				      * may sometimes make bad decisions and
+				      * you may want to build your own
+				      * connectivity graph.
+				      */
+    template <int dim>
+    static
+    void partition_triangulation (const unsigned int     n_partitions,
+				  const SparsityPattern &cell_connection_graph,
+                                  Triangulation<dim>    &triangulation);
     
                                      /**
                                       * For each active cell, return in the

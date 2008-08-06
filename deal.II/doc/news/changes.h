@@ -236,16 +236,26 @@ inconvenience this causes.
 <ol>
   <li>
   <p>
+  New: There is a second GridTools::partition_triangulation
+  function that takes a cell connectivity pattern as argument, rather
+  than computing it itself as the existing function. Use cases are
+  discussed in the documentation of the new function.
+  (WB 2008/08/06)
+  <li>
+
+  <li>
+  <p>
   Fixed: GridTools::find_cells_adjacent_to_vertex had a bug that 
   prevented its correct functioning in three dimensions. Some 
   cases were left out due to uncorrect assumptions on the various 
   refinement possibilities.
+  <br>
   (Luca Heltai 2008/07/17)
   <li>
 
   <p>
   New: There is now a new
-  Triangulation::prevent_distorted_boundary_cells function which
+  Triangulation::prevent_distorted_boundary_cells function which is
   only useful in case of anisotropic refinement. At the boundary
   of the domain, the new point on the face may be far inside the
   current cell, if the boundary has a strong curvature. If we

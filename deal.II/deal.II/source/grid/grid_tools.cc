@@ -839,61 +839,94 @@ partition_triangulation (const unsigned int  n_partitions,
                                    // we decompose the domain by first
                                    // generating the connection graph of all
                                    // cells with their neighbors, and then
-                                   // passing this graph off to METIS. To make
-                                   // things a little simpler and more
-                                   // general, we let the function
-                                   // DoFTools:make_flux_sparsity_pattern
-                                   // function generate the connection graph
-                                   // for us and reuse the SparsityPattern
-                                   // data structure for the connection
-                                   // graph. The connection structure of the
-                                   // mesh is obtained by using a fake
-                                   // piecewise constant finite element
-                                   //
-                                   // Since in 3d the generation of a
-                                   // sparsity pattern can be expensive, we
-                                   // take the detour of the compressed
-                                   // sparsity pattern, which is a little
-                                   // slower but more efficient in terms of
-                                   // memory
-  FE_DGQ<dim> fake_q0(0);
-  DoFHandler<dim> dof_handler (triangulation);
-  dof_handler.distribute_dofs (fake_q0);
-  Assert (dof_handler.n_dofs() == triangulation.n_active_cells(),
-          ExcInternalError());
+                                   // passing this graph off to METIS.
+				   //
+				   // as built in this function, we only
+				   // consider face neighbors, which leads to
+				   // a fixed number of entries per row (don't
+				   // forget that each cell couples with
+				   // itself)
+  SparsityPattern cell_connectivity (triangulation.n_active_cells(),
+				     triangulation.n_active_cells(),
+				     GeometryInfo<dim>::faces_per_cell+1);
+
+				   // next we have to build a mapping from the
+				   // list of cells to their indices. for
+				   // this, use the user_index field
+  std::vector<unsigned int> saved_user_indices;
+  triangulation.save_user_indices (saved_user_indices);
+  unsigned int index = 0;
+  for (typename Triangulation<dim>::active_cell_iterator
+         cell = triangulation.begin_active();
+       cell != triangulation.end(); ++cell, ++index)
+    cell->set_user_index (index);
+
+				   // next loop over all cells and their
+				   // neighbors to build the sparsity pattern
+  index = 0;
+  for (typename Triangulation<dim>::active_cell_iterator
+         cell = triangulation.begin_active();
+       cell != triangulation.end(); ++cell, ++index)
+    {
+      cell_connectivity.add (index, index);
+      for (unsigned int f=0; f<GeometryInfo<dim>::faces_per_cell; ++f)
+	if (cell->at_boundary(f) == false)
+	  cell_connectivity.add (index,
+				 cell->neighbor(f)->user_index());
+    }
   
-  CompressedSparsityPattern csp (dof_handler.n_dofs(),
-                                 dof_handler.n_dofs());
-  DoFTools::make_flux_sparsity_pattern (dof_handler, csp);
+				   // now compress the so-built connectivity
+				   // pattern and restore user indices
+  cell_connectivity.compress ();
+  triangulation.save_user_indices (saved_user_indices);
   
-  SparsityPattern sparsity_pattern;
-  sparsity_pattern.copy_from (csp);
+				   // finally defer to the other function for
+				   // partitioning and assigning subdomain ids
+  partition_triangulation (n_partitions,
+			   cell_connectivity,
+			   triangulation);
+}
+
+
+
+template <int dim>
+void
+GridTools::
+partition_triangulation (const unsigned int     n_partitions,
+			 const SparsityPattern &cell_connection_graph,
+                         Triangulation<dim>    &triangulation)
+{
+  Assert (n_partitions > 0, ExcInvalidNumberOfPartitions(n_partitions));
+  Assert (cell_connection_graph.n_rows() == triangulation.n_active_cells(),
+	  ExcMessage ("Connectivity graph has wrong size"));
+  Assert (cell_connection_graph.n_cols() == triangulation.n_active_cells(),
+	  ExcMessage ("Connectivity graph has wrong size"));  
+  
+                                   // check for an easy return
+  if (n_partitions == 1)
+    {
+      for (typename Triangulation<dim>::active_cell_iterator
+             cell = triangulation.begin_active();
+           cell != triangulation.end(); ++cell)
+        cell->set_subdomain_id (0);
+      return;
+    }
 
                                    // partition this connection graph and get
                                    // back a vector of indices, one per degree
                                    // of freedom (which is associated with a
                                    // cell)
   std::vector<unsigned int> partition_indices (triangulation.n_active_cells());
-  sparsity_pattern.partition (n_partitions,  partition_indices);
+  cell_connection_graph.partition (n_partitions,  partition_indices);
 
                                    // finally loop over all cells and set the
-                                   // subdomain ids. for this, get the DoF
-                                   // index of each cell and extract the
-                                   // subdomain id from the vector obtained
-                                   // above
+                                   // subdomain ids
   std::vector<unsigned int> dof_indices(1);
-  for (typename DoFHandler<dim>::active_cell_iterator
-         cell = dof_handler.begin_active();
-       cell != dof_handler.end(); ++cell)
-    {
-      cell->get_dof_indices(dof_indices);
-      Assert (dof_indices[0] < triangulation.n_active_cells(),
-              ExcInternalError());
-      Assert (partition_indices[dof_indices[0]] < n_partitions,
-              ExcInternalError());
-      
-      cell->set_subdomain_id (partition_indices[dof_indices[0]]);
-    }
+  unsigned int index = 0;
+  for (typename Triangulation<dim>::active_cell_iterator
+         cell = triangulation.begin_active();
+       cell != triangulation.end(); ++cell, ++index)
+    cell->set_subdomain_id (partition_indices[index]);
 }
 
 
@@ -1276,6 +1309,12 @@ GridTools::find_active_cell_around_point (const hp::MappingCollection<deal_II_di
 template
 void
 GridTools::partition_triangulation (const unsigned int,
+                                    Triangulation<deal_II_dimension> &);
+
+template
+void
+GridTools::partition_triangulation (const unsigned int,
+				    const SparsityPattern &,
                                     Triangulation<deal_II_dimension> &);
 
 template
