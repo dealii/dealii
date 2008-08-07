@@ -177,17 +177,7 @@ class BoussinesqFlowProblem
 				 // In this case, we choose a very simple
 				 // test case, where everything is zero.
 
-				 // The last definition of this kind
-				 // is the one for the right hand
-				 // side function. Again, the content
-				 // of the function is very
-				 // basic and zero in most of the
-				 // components, except for a source
-				 // of temperature in some isolated
-				 // regions near the bottom of the
-				 // computational domain, as is explained
-				 // in the problem description in the
-				 // introduction.
+				 // @sect4{Boundary values}
 template <int dim>
 class PressureBoundaryValues : public Function<dim>
 {
@@ -236,7 +226,7 @@ TemperatureBoundaryValues<dim>::value (const Point<dim> &p,
 
 
 
-
+				 // @sect4{Initial values}
 template <int dim>
 class InitialValues : public Function<dim>
 {
@@ -271,6 +261,19 @@ InitialValues<dim>::vector_value (const Point<dim> &p,
 
 
 
+				 // @sect4{Right hand side}
+				 // 
+				 // The last definition of this kind
+				 // is the one for the right hand
+				 // side function. Again, the content
+				 // of the function is very
+				 // basic and zero in most of the
+				 // components, except for a source
+				 // of temperature in some isolated
+				 // regions near the bottom of the
+				 // computational domain, as is explained
+				 // in the problem description in the
+				 // introduction.
 template <int dim>
 class RightHandSide : public Function<dim>
 {
@@ -587,11 +590,55 @@ BoussinesqFlowProblem<dim>::BoussinesqFlowProblem (const unsigned int degree)
 
 
 				 // @sect4{BoussinesqFlowProblem::setup_dofs}
+				 // 
+				 // This function does the same as
+				 // in most other tutorial programs. 
+				 // As a slight difference, the 
+				 // program is called with a 
+				 // parameter <code>setup_matrices</code>
+				 // that decides whether to 
+				 // recreate the sparsity pattern
+				 // and the associated stiffness
+				 // matrix.
+				 // 
+				 // The body starts by assigning dofs on 
+				 // basis of the chosen finite element,
+				 // and then renumbers the dofs 
+				 // first using the Cuthill_McKee
+				 // algorithm (to generate a good
+				 // quality ILU during the linear
+				 // solution process) and then group
+				 // components of velocity, pressure
+				 // and temperature together. This 
+				 // happens in complete analogy to
+				 // step-22.
+				 // 
+				 // We then proceed with the generation
+				 // of the hanging node constraints
+				 // that arise from adaptive grid
+				 // refinement. Next we impose
+				 // the no-flux boundary conditions
+				 // $\vec{u}\cdot \vec{n}=0$ by adding
+				 // a respective constraint to the
+				 // hanging node constraints
+				 // matrix. The second parameter in 
+				 // the function describes the first 
+				 // of the velocity components
+				 // in the total dof vector, which is 
+				 // zero here. The parameter 
+				 // <code>no_normal_flux_boundaries</code>
+				 // sets the no flux b.c. to those
+				 // boundaries with boundary indicator
+				 // zero.
 template <int dim>
 void BoussinesqFlowProblem<dim>::setup_dofs (const bool setup_matrices)
 {
   dof_handler.distribute_dofs (fe);
-  DoFRenumbering::component_wise (dof_handler);
+  DoFRenumbering::Cuthill_McKee (dof_handler);
+  std::vector<unsigned int> block_component (dim+2,0);
+  block_component[dim] = 1;
+  block_component[dim+1] = 2;
+  DoFRenumbering::component_wise (dof_handler, block_component);
 
   hanging_node_constraints.clear ();
   DoFTools::make_hanging_node_constraints (dof_handler,
@@ -603,11 +650,25 @@ void BoussinesqFlowProblem<dim>::setup_dofs (const bool setup_matrices)
 						   hanging_node_constraints);
   hanging_node_constraints.close ();
 
-  std::vector<unsigned int> dofs_per_component (dim+2);
-  DoFTools::count_dofs_per_component (dof_handler, dofs_per_component);
-  const unsigned int n_u = dofs_per_component[0] * dim,
-                     n_p = dofs_per_component[dim],
-                     n_T = dofs_per_component[dim+1];
+				 // The next step is, as usual, 
+				 // to write some information
+				 // to the screen. The information
+				 // that is most interesting during
+				 // the calculations is the
+				 // number of degrees of freedom
+				 // in the individual components,
+				 // so we count them. The function 
+				 // to do this is the same as the
+				 // one used in step-22, which 
+				 // uses the grouping of all
+				 // velocity components into
+				 // one block as introduced
+				 // above.
+  std::vector<unsigned int> dofs_per_block (3);
+  DoFTools::count_dofs_per_block (dof_handler, dofs_per_block, block_component);  
+  const unsigned int n_u = dofs_per_block[0],
+                     n_p = dofs_per_block[1],
+		     n_T = dofs_per_block[2];
 
   std::cout << "Number of active cells: "
             << triangulation.n_active_cells()
@@ -618,34 +679,91 @@ void BoussinesqFlowProblem<dim>::setup_dofs (const bool setup_matrices)
             << std::endl
             << std::endl;
 
-  const unsigned int
-    n_couplings = dof_handler.max_couplings_between_dofs();
-
+				 // The next step is to 
+				 // create the sparsity 
+				 // pattern for the system matrix 
+				 // based on the Boussinesq 
+				 // system. As in step-22, 
+				 // we choose to create the
+				 // pattern not as in the
+				 // first tutorial programs,
+				 // but by using the blocked
+				 // version of 
+				 // CompressedSetSparsityPattern.
+				 // The reason for doing this 
+				 // is mainly a memory issue,
+				 // that is, the basic procedures
+				 // consume too much memory
+				 // when used in three spatial
+				 // dimensions as we intend
+				 // to do for this program.
+				 // 
+				 // So, in case we need
+				 // to recreate the matrices,
+				 // we first release the
+				 // stiffness matrix from the
+				 // sparsity pattern and then
+				 // set up an object of the 
+				 // BlockCompressedSetSparsityPattern
+				 // consisting of three blocks. 
+				 // Each of these blocks is
+				 // initialized with the
+				 // respective number of 
+				 // degrees of freedom. 
+				 // Once the blocks are 
+				 // created, the overall size
+				 // of the sparsity pattern
+				 // is initiated by invoking 
+				 // the <code>collect_sizes()</code>
+				 // command, and then the
+				 // sparsity pattern can be
+				 // filled with information.
+				 // Then, the hanging
+				 // node constraints are applied
+				 // to the temporary sparsity
+				 // pattern, which is finally
+				 // then completed and copied
+				 // into the general sparsity
+				 // pattern structure.
+				 // 
+				 // After these actions, we 
+				 // need to reassign the 
+				 // system matrix structure to
+				 // the sparsity pattern.
   if (setup_matrices == true)
     {
       system_matrix.clear ();
 
-      sparsity_pattern.reinit (3,3);
-      sparsity_pattern.block(0,0).reinit (n_u, n_u, n_couplings);
-      sparsity_pattern.block(1,0).reinit (n_p, n_u, n_couplings);
-      sparsity_pattern.block(2,0).reinit (n_T, n_u, n_couplings);
-      sparsity_pattern.block(0,1).reinit (n_u, n_p, n_couplings);
-      sparsity_pattern.block(1,1).reinit (n_p, n_p, n_couplings);
-      sparsity_pattern.block(2,1).reinit (n_T, n_p, n_couplings);
-      sparsity_pattern.block(0,2).reinit (n_u, n_T, n_couplings);
-      sparsity_pattern.block(1,2).reinit (n_p, n_T, n_couplings);
-      sparsity_pattern.block(2,2).reinit (n_T, n_T, n_couplings);
-
-      sparsity_pattern.collect_sizes();
-
-
-      DoFTools::make_sparsity_pattern (dof_handler, sparsity_pattern);
-      hanging_node_constraints.condense (sparsity_pattern);
-      sparsity_pattern.compress();
+      BlockCompressedSetSparsityPattern csp (3,3);
+ 
+      csp.block(0,0).reinit (n_u, n_u);
+      csp.block(0,1).reinit (n_u, n_p);
+      csp.block(0,2).reinit (n_u, n_T);
+      csp.block(1,0).reinit (n_p, n_u);
+      csp.block(1,1).reinit (n_p, n_p);
+      csp.block(1,2).reinit (n_p, n_T);
+      csp.block(2,0).reinit (n_T, n_u);
+      csp.block(2,1).reinit (n_T, n_p);
+      csp.block(2,2).reinit (n_T, n_T);
+      
+      csp.collect_sizes ();
+      
+      DoFTools::make_sparsity_pattern (dof_handler, csp);
+      hanging_node_constraints.condense (csp);
+      sparsity_pattern.copy_from (csp);
 
       system_matrix.reinit (sparsity_pattern);
     }
 
+				 // As last action in this function,
+				 // we need to set the vectors
+				 // for the solution, the old 
+				 // solution (required for 
+				 // time stepping) and the system
+				 // right hand side to the 
+				 // three-block structure given
+				 // by velocity, pressure and
+				 // temperature.
   solution.reinit (3);
   solution.block(0).reinit (n_u);
   solution.block(1).reinit (n_p);
@@ -668,6 +786,73 @@ void BoussinesqFlowProblem<dim>::setup_dofs (const bool setup_matrices)
 
 
 				 // @sect4{BoussinesqFlowProblem::assemble_system}
+				 // 
+				 // The assembly of the Boussinesq 
+				 // system is acutally a two-step
+				 // procedure. One is to create
+				 // the Stokes system matrix and
+				 // right hand side for the 
+				 // velocity-pressure system as
+				 // well as the mass matrix for
+				 // temperature, and
+				 // the second is to create the
+				 // rhight hand side for the temperature
+				 // dofs. The reason for doing this
+				 // in two steps is simply that 
+				 // the time stepping we have chosen
+				 // needs the result from the Stokes
+				 // system at the current time step
+				 // for building the right hand
+				 // side of the temperature equation.
+				 // 
+				 // This function does the 
+				 // first of these two tasks.
+				 // There are two different situations
+				 // for calling this function. The
+				 // first one is when we reset the
+				 // mesh, and both the matrix and
+				 // the right hand side have to
+				 // be generated. The second situation
+				 // only sets up the right hand
+				 // side. The reason for having 
+				 // two different accesses is that
+				 // the matrix of the Stokes system
+				 // does not change in time unless
+				 // the mesh is changed, so we can
+				 // save a considerable amount of
+				 // work by doing the full assembly
+				 // only when it is needed.
+				 // 
+				 // Regarding the technical details
+				 // of implementation, not much has
+				 // changed from step-22. We reset
+				 // matrix and vector, create 
+				 // a quadrature formula on the 
+				 // cells and one on cell faces
+				 // (for implementing Neumann 
+				 // boundary conditions). Then,
+				 // we create a respective
+				 // FEValues object for both the 
+				 // cell and the face integration.
+				 // For the the update flags of
+				 // the first, we perform the
+				 // calculations of basis function
+				 // derivatives only in
+				 // case of a full assembly, since
+				 // they are not needed otherwise,
+				 // which makes the call of
+				 // the FEValues::reinit function
+				 // further down in the program 
+				 // more efficient.
+				 // 
+				 // The declarations proceed 
+				 // with some shortcuts for 
+				 // array sizes, the creation of
+				 // the local matrix and right 
+				 // hand side as well as the
+				 // vector for the indices of
+				 // the local dofs compared to
+				 // the global system.
 template <int dim>
 void BoussinesqFlowProblem<dim>::assemble_system ()
 {
@@ -689,8 +874,10 @@ void BoussinesqFlowProblem<dim>::assemble_system ()
 			    :
 			    UpdateFlags(0)));
   FEFaceValues<dim> fe_face_values (fe, face_quadrature_formula,
-                                    update_values    | update_normal_vectors |
-                                    update_quadrature_points  | update_JxW_values);
+				    update_values    | 
+				    update_normal_vectors |
+				    update_quadrature_points  | 
+				    update_JxW_values);
 
   const unsigned int   dofs_per_cell   = fe.dofs_per_cell;
 
@@ -702,13 +889,43 @@ void BoussinesqFlowProblem<dim>::assemble_system ()
 
   std::vector<unsigned int> local_dof_indices (dofs_per_cell);
 
+				 // These few declarations provide
+				 // the structures for the evaluation
+				 // of inhomogeneous Neumann boundary
+				 // conditions from the function
+				 // declaration made above.
+				 // The vector <code>old_solution_values</code>
+				 // evaluates the solution 
+				 // at the old time level, since
+				 // the temperature from the
+				 // old time level enters the 
+				 // Stokes system as a source
+				 // term in the momentum equation.
+				 // 
+				 // Then, we create a variable
+				 // to hold the Rayleigh number,
+				 // the measure of buoyancy.
+				 // 
+				 // The set of vectors we create
+				 // next hold the evaluations of
+				 // the basis functions that will
+				 // be used for creating the
+				 // matrices. This gives faster
+				 // access to that data, which
+				 // increases the performance
+				 // of the assembly. See step-22 
+				 // for details.
+				 // 
+				 // The last few declarations 
+				 // are used to extract the 
+				 // individual blocks (velocity,
+				 // pressure, temperature) from
+				 // the total FE system.
   const PressureBoundaryValues<dim> pressure_boundary_values;
-
   std::vector<double>               boundary_values (n_face_q_points);
 
-  std::vector<Vector<double> >      old_solution_values(n_q_points, Vector<double>(dim+2));
-  std::vector<std::vector<Tensor<1,dim> > >  old_solution_grads(n_q_points,
-                                                                std::vector<Tensor<1,dim> > (dim+2));
+  std::vector<Vector<double> >      old_solution_values(n_q_points,
+							Vector<double>(dim+2));
 
   const double Rayleigh_number = 10;
 
@@ -723,6 +940,19 @@ void BoussinesqFlowProblem<dim>::assemble_system ()
   const FEValuesExtractors::Scalar pressure (dim);
   const FEValuesExtractors::Scalar temperature (dim+1);
 
+				 // Now starts the loop over
+				 // all cells in the problem.
+				 // The first commands are all
+				 // very familiar, doing the
+				 // evaluations of the element
+				 // basis functions, resetting
+				 // the local arrays and 
+				 // getting the values of the
+				 // old solution at the
+				 // quadrature point. Then we
+				 // are ready to loop over
+				 // the quadrature points 
+				 // on the cell.
   typename DoFHandler<dim>::active_cell_iterator
     cell = dof_handler.begin_active(),
     endc = dof_handler.end();
@@ -741,8 +971,28 @@ void BoussinesqFlowProblem<dim>::assemble_system ()
 				// Extract the basis relevant
 				// terms in the inner products
 				// once in advance as shown
-				// in step-22. This accelerates
-				// the assembly process,
+				// in step-22 in order to 
+				// accelerate assembly.
+				// 
+				// Once this is done, we 
+				// start the loop over the
+				// rows and columns of the
+				// local matrix and feed
+				// the matrix with the relevant
+				// products. The right hand
+				// side is filled with the 
+				// forcing term driven by
+				// temperature in direction
+				// of gravity (which is 
+				// vertical in our example).
+				// Note that the right hand 
+				// side term is always generated,
+				// whereas the matrix 
+				// contributions are only
+				// updated when it is 
+				// requested by the
+				// <code>rebuild_matrices</code>
+				// flag.
 	  for (unsigned int k=0; k<dofs_per_cell; ++k)
 	    {
 	      phi_u[k] = fe_values[velocities].value (k,q);
@@ -770,7 +1020,8 @@ void BoussinesqFlowProblem<dim>::assemble_system ()
 					+ phi_T[i] * phi_T[j])
 				       * fe_values.JxW(q);
 
-	      const Point<dim> gravity (0,1);
+	      const Point<dim> gravity = ( (dim == 2) ? (Point<dim> (0,1)) : 
+						        (Point<dim> (0,1,0)) );
 
 	      local_rhs(i) += (Rayleigh_number *
 			       gravity * phi_u[i] * old_temperature)*
@@ -778,14 +1029,18 @@ void BoussinesqFlowProblem<dim>::assemble_system ()
           }
 	}
 
-
-				// The assembly of the face
-				// cells which enters the
-				// right hand sides cannot
-				// be accelerated with the
-				// above technique, since
-				// all the basis functions are
-				// only evaluated once.
+				 // Next follows the assembly 
+				 // of the face terms, result
+				 // from Neumann boundary 
+				 // conditions. Since these
+				 // terms only enter the right
+				 // hand side vector and not
+				 // the matrix, there is no
+				 // substantial benefit from
+				 // extracting the data 
+				 // before using it, so 
+				 // we remain in the lines 
+				 // of step-20 at this point.
       for (unsigned int face_no=0;
            face_no<GeometryInfo<dim>::faces_per_cell;
            ++face_no)
@@ -810,6 +1065,16 @@ void BoussinesqFlowProblem<dim>::assemble_system ()
                 }
           }
 
+				 // The last step in the loop 
+				 // over all cells is to
+				 // enter the local contributions
+				 // into the global matrix and 
+				 // vector structures to the
+				 // positions specified in 
+				 // <code>local_dof_indices</code>.
+				 // Again, we only add the 
+				 // matrix data when it is 
+				 // requested.
       cell->get_dof_indices (local_dof_indices);
 
       if (rebuild_matrices == true)
@@ -825,6 +1090,13 @@ void BoussinesqFlowProblem<dim>::assemble_system ()
         system_rhs(local_dof_indices[i]) += local_rhs(i);
     }
 
+				 // Back at the outermost
+				 // level of this function,
+				 // we continue the work
+				 // by condensing hanging
+				 // node constraints to the
+				 // right hand side and, 
+				 // possibly, to the matrix.
   if (rebuild_matrices == true)
     hanging_node_constraints.condense (system_matrix);
 
@@ -866,6 +1138,33 @@ void BoussinesqFlowProblem<dim>::assemble_system ()
 // 					  system_rhs);
     }
 
+				 // This last step of the assembly
+				 // function sets up the preconditioners
+				 // used for the solution of the
+				 // system. We are going to use an
+				 // ILU preconditioner for the
+				 // velocity block (to be used
+				 // by BlockSchurPreconditioner class)
+				 // as well as an ILU preconditioner
+				 // for the inversion of the 
+				 // pressure mass matrix. Recall that
+				 // the velocity-velocity block sits
+				 // at position (0,0) in the 
+				 // global system matrix, and
+				 // the pressure mass matrix in
+				 // (1,1). The 
+				 // storage of these objects is
+				 // as in step-22, that is, we
+				 // include them using a 
+				 // shared pointer structure from the
+				 // boost library.
+				 // 
+				 // When all work is done, we 
+				 // change the flags 
+				 // <code>rebuild_preconditioner</code>
+				 // and 
+				 // <code>rebuild_matrices</code>
+				 // to false.
   if (rebuild_preconditioner == true)
     {
       Assert (rebuild_matrices == true,
@@ -874,18 +1173,12 @@ void BoussinesqFlowProblem<dim>::assemble_system ()
 
       std::cout << "   Rebuilding preconditioner..." << std::flush;
 
-				// Rebuild the preconditioner
-				// for the velocity-velocity
-				// block (0,0)
-      A_preconditioner
+     A_preconditioner
 	= boost::shared_ptr<typename InnerPreconditioner<dim>::type>
 		(new typename InnerPreconditioner<dim>::type());
       A_preconditioner->initialize (system_matrix.block(0,0),
 		typename InnerPreconditioner<dim>::type::AdditionalData());
 
-				// Rebuild the preconditioner
-				// for the pressure-pressure
-				// block (1,1)
       Mp_preconditioner
 	= boost::shared_ptr<SparseILU<double> >
 		(new SparseILU<double>);
@@ -905,6 +1198,28 @@ void BoussinesqFlowProblem<dim>::assemble_system ()
 
 
 				 // @sect4{BoussinesqFlowProblem::assemble_rhs_T}
+				 // 
+				 // This function does the second
+				 // part of the assembly work, the
+				 // creation of the velocity-dependent
+				 // right hand side of the
+				 // temperature equation. The 
+				 // declarations in this function
+				 // are pretty much the same as the
+				 // ones used in the other 
+				 // assembly routine, except that we
+				 // restrict ourselves to vectors
+				 // this time. Though, we need to
+				 // perform more face integrals 
+				 // at this point, induced by the
+				 // use of discontinuous elements for 
+				 // the temperature (just
+				 // as it was in the first DG 
+				 // example in step-12) in combination
+				 // with adaptive grid refinement
+				 // and subfaces. The update 
+				 // flags at face level are the 
+				 // same as in step-12.
 template <int dim>
 void BoussinesqFlowProblem<dim>::assemble_rhs_T ()
 {
@@ -914,10 +1229,12 @@ void BoussinesqFlowProblem<dim>::assemble_rhs_T ()
                            update_values    | update_gradients |
                            update_quadrature_points  | update_JxW_values);
   FEFaceValues<dim> fe_face_values (fe, face_quadrature_formula,
-                                    update_values    | update_normal_vectors |
-                                    update_quadrature_points  | update_JxW_values);
+				    update_values    | update_normal_vectors |
+				    update_quadrature_points  |
+				    update_JxW_values);
   FESubfaceValues<dim> fe_subface_values (fe, face_quadrature_formula,
-					  update_values    | update_normal_vectors |
+					  update_values | 
+					  update_normal_vectors |
 					  update_JxW_values);
   FEFaceValues<dim> fe_face_values_neighbor (fe, face_quadrature_formula,
                                              update_values);
@@ -930,24 +1247,52 @@ void BoussinesqFlowProblem<dim>::assemble_rhs_T ()
 
   Vector<double>       local_rhs (dofs_per_cell);
 
-  std::vector<Vector<double> > old_solution_values(n_q_points, Vector<double>(dim+2));
+  std::vector<unsigned int> local_dof_indices (dofs_per_cell);
 
-  std::vector<Vector<double> > old_solution_values_face(n_face_q_points, Vector<double>(dim+2));
-  std::vector<Vector<double> > old_solution_values_face_neighbor(n_face_q_points, Vector<double>(dim+2));
-  std::vector<Vector<double> > present_solution_values(n_q_points, Vector<double>(dim+2));
-  std::vector<Vector<double> > present_solution_values_face(n_face_q_points, Vector<double>(dim+2));
+				 // Here comes the declaration
+				 // of vectors to hold the old
+				 // and present solution values
+				 // and gradients
+				 // for both the cell as well as faces
+				 // to the cell. Next comes the
+				 // declaration of an object
+				 // to hold the temperature 
+				 // boundary values and a
+				 // well-known extractor for
+				 // accessing the temperature
+				 // part of the FE system.
+  std::vector<Vector<double> > old_solution_values(n_q_points,
+						   Vector<double>(dim+2));
 
-  std::vector<std::vector<Tensor<1,dim> > >
-    present_solution_grads(n_q_points,
-			   std::vector<Tensor<1,dim> >(dim+2));
+  std::vector<Vector<double> > old_solution_values_face(n_face_q_points, 
+							Vector<double>(dim+2));
+  std::vector<Vector<double> > old_solution_values_face_neighbor (
+							n_face_q_points,
+							Vector<double>(dim+2));
+  std::vector<Vector<double> > present_solution_values (n_q_points, 
+							Vector<double>(dim+2));
+  std::vector<Vector<double> > present_solution_values_face(
+							n_face_q_points, 
+							Vector<double>(dim+2));
 
+  std::vector<std::vector<Tensor<1,dim> > >  present_solution_grads(
+				  n_q_points,
+				  std::vector<Tensor<1,dim> >(dim+2));
 
   std::vector<double> neighbor_temperature (n_face_q_points);
-  std::vector<unsigned int> local_dof_indices (dofs_per_cell);
 
   TemperatureBoundaryValues<dim> temperature_boundary_values;
   const FEValuesExtractors::Scalar temperature (dim+1);
 
+				 // Now, let's start the loop
+				 // over all cells in the
+				 // triangulation. The first
+				 // actions within the loop
+				 // are, as usual, the evaluation
+				 // of the FE basis functions 
+				 // and the old and present
+				 // solution at the quadrature 
+				 // points.
   typename DoFHandler<dim>::active_cell_iterator
     cell = dof_handler.begin_active(),
     endc = dof_handler.end();
@@ -1244,6 +1589,11 @@ void BoussinesqFlowProblem<dim>::solve ()
 				// Produce a constistent solution field
     hanging_node_constraints.distribute (up);
 
+    std::cout << "   "
+              << solver_control.last_step()
+              << " GMRES iterations for Stokes subsystem."
+              << std::endl;
+	      
     solution.block(0) = up.block(0);
     solution.block(1) = up.block(1);
   }
@@ -1255,15 +1605,15 @@ void BoussinesqFlowProblem<dim>::solve ()
   {
 
     SolverControl solver_control (system_matrix.block(2,2).m(),
-                                  1e-8*system_rhs.block(2).l2_norm());
+				  1e-8*system_rhs.block(2).l2_norm());
     SolverCG<>   cg (solver_control);
     PreconditionJacobi<> preconditioner;
     preconditioner.initialize (system_matrix.block(2,2));
 
     try
       {
-	cg.solve (system_matrix.block(2,2), solution.block(2), system_rhs.block(2),
-		  preconditioner);
+	cg.solve (system_matrix.block(2,2), solution.block(2),
+		  system_rhs.block(2), preconditioner);
       }
     catch (...)
       {
@@ -1509,7 +1859,7 @@ void BoussinesqFlowProblem<dim>::run ()
 	if (timestep_number % 10 == 0)
 	  refine_mesh ();
     }
-  while (time <= 5);
+  while (time <= 50);
 }
 
 
