@@ -485,7 +485,7 @@ at the weak form of the discretized equations:
 for all discrete test functions $\tau_h$. This then results in a
 matrix equation of form
 @f{eqnarray*}
-  \left(\frac 32 M+k_n A\right) T_h^n = F(U_h^n,T_h^{n-1},T_h^{n-2}),
+  \left(\frac 32 M+k_n A_T\right) T_h^n = F(U_h^n,T_h^{n-1},T_h^{n-2}),
 @f}
 which given the structure of matrix on the left (the sum of two
 positive definite matrices) is easily solved using the Conjugate
