@@ -312,10 +312,10 @@ is not a good choice in 3D - a full decomposition needs many new entries that
 
 
 
-<h2>Possible Extensions</h2>
+<h3>Possible Extensions</h3>
 
 <a name="improved-solver">
-<h3>Improved linear solver in 3D</h3>
+<h4>Improved linear solver in 3D</h4>
 </a>
 
 We have seen in the section of computational results that the number of outer
@@ -350,7 +350,7 @@ in the early tutorial programs. The improvements are still rather
 unsatisfactory, if one compares with an elliptic problem of similar size.
 
 <a name="improved-ilu">
-<h4>Better ILU decomposition by smart reordering</h4>
+<h5>Better ILU decomposition by smart reordering</h5>
 </a>
 A first attempt to improve the speed of the linear solution process is to choose
 a dof reordering that makes the ILU being closer to a full LU decomposition, as
@@ -370,13 +370,13 @@ case, the renumbering takes about 5 times as much memory, which yields an
 infeasible algorithm for the last cycle in 3D with 1.2 million
 unknowns.
 
-<h4>Better preconditioner for the inner CG solver</h4>
+<h5>Better preconditioner for the inner CG solver</h5>
 Another idea to improve the situation even more would be to choose a 
 preconditioner that makes CG for the (0,0) matrix $A$ converge in a 
 mesh-independent number of iterations, say 10 to 30. We have seen such a
 canditate in @ref step_16 "step-16": multigrid.
 
-<h4>Block Schur complement preconditioner</h4>
+<h5>Block Schur complement preconditioner</h5>
 But even with a good preconditioner for $A$ at hand, we still 
 need to solve of the same linear system repeatedly (with different 
 right hand sides, though). The approach we are going to discuss here is how this
@@ -758,12 +758,12 @@ problem size than CG (as explained above).
 Nonetheless, the improvement by a factor of 3-5 for moderate problem sizes
 is quite impressive.
 
-<h4>Combining block preconditioner and multigrid</h4>
+<h5>Combining block preconditioner and multigrid</h5>
 An ultimate linear solver for this problem could be imagined as a combination of
 an optimal preconditioner for $A$ (e.g. multigrid) and the block preconditioner
 described above.
 
-<h4>No block matrices and vectors</h4>
+<h5>No block matrices and vectors</h5>
 Another possibility that can be taken into account is to not set up a block
 system, but rather solve the system of velocity and pressure all at once. The
 options are direct solve with UMFPACK (2D) or GMRES with ILU
