@@ -501,14 +501,68 @@ operator splitting where we first solve the Stokes system for the velocities
 and pressures using the old temperature field, and then solve for the new
 temperature field using the just computed velocity field. 
 
-The methods to do so are not new: Solving the linear equations coming from the
-Stokes system has been discussed in great detail in @ref step_22 "step-22". In
-particular, in the results section of that program, we have discussed a number
-of alternative linear solver strategies. We will use the best alternative
-identified there, using a GMRES solver preconditioned by a block matrix
-involving the Schur complement.
 
-XXXXXX more specifically (state matrix, preconditioner) XXXXXXXX
+<h5>Linear solvers for the Stokes problem</h5>
 
-For the temperature equation, the problem is even simpler: 
-XXXXXXXXXXX
+Solving the linear equations coming from the Stokes system has been
+discussed in great detail in @ref step_22 "step-22". In particular, in
+the results section of that program, we have discussed a number of
+alternative linear solver strategies that turned out to be more
+efficient than the original approach. The best alternative
+identified there we to use a GMRES solver preconditioned by a block
+matrix involving the Schur complement. Specifically, the Stokes
+operator leads to a block structured matrix
+@f{eqnarray*}
+  \left(\begin{array}{cc}
+    A & B^T \\ B & 0
+  \end{array}\right)
+@f}
+and as discussed there a good preconditioner is
+@f{eqnarray*}
+  P^{-1}
+  = 
+  \left(\begin{array}{cc}
+    A^{-1} & 0 \\ S^{-1} B A^{-1} & -S^{-1}
+  \end{array}\right)
+@f}
+where $S$ is the Schur complement of the Stokes operator
+$S=B^TA^{-1}B$. Of course, this preconditioner is not useful because we
+can't form the various inverses of matrices, but we can use the
+following as a preconditioner:
+@f{eqnarray*}
+  \tilde P^{-1}
+  = 
+  \left(\begin{array}{cc}
+    \tilde A^{-1} & 0 \\ \tilde S^{-1} B \tilde A^{-1} & -\tilde S^{-1}
+  \end{array}\right)
+@f}
+where $\tilde A^{-1},\tilde S^{-1}$ are approximations to the inverse
+matrices. In particular, it turned out that $S$ is spectrally
+equivalent to the mass matrix and consequently replacing $\tilde
+S^{-1}$ by a CG solver applied to the mass matrix on the pressure
+space was a good choice.
+
+It was more complicated to come up with a good replacement $\tilde
+A^{-1}$, which corresponds to the discretized symmetric Laplacian of
+the vector-valued velocity field, i.e. 
+$A_{ij} = (\varepsilon {\mathbf v}_i, \eta \varepsilon ({\mathbf
+v}_j))$.
+In @ref step_22 "step-22" we used a sparse LU decomposition (using the
+SparseDirectUMFPACK class) of $A$ for $\tilde A^{-1}$ &mdash; the
+perfect preconditioner &mdash; in 2d, but for 3d memory and compute
+time is not usually sufficient to actually compute this decomposition;
+consequently, we only use an incomplete LU decomposition (ILU, using
+the SparseILU class) in 3d.
+
+For this program, we would like to go a bit further. To this end, note
+that the symmetrized bilinear form on vector fields, 
+$(\varepsilon {\mathbf v}_i, \eta \varepsilon ({\mathbf v}_j))$
+is not too far away from the nonsymmetrized version,
+$(\nabla {\mathbf v}_i, \eta \nabla ({\mathbf v}_j))$. The latter,
+however, has the advantage that the <code>dim</code> vector components
+of the test functions are not mixed, i.e. the resulting matrix is
+block-diagonal: one block for each vector component, and each of these
+blocks is equal to the Laplace matrix for this vector component.
+
+
+<h5>Linear solvers for the temperature equation</h5>
