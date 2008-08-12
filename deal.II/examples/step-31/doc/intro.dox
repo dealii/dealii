@@ -192,27 +192,80 @@ ${\mathbf u}^n$. In contrast to @ref step_21 "step-21", we'll use a
 higher order time stepping scheme here, namely the Backward
 Differentiation Formula scheme of order 2 (BDF-2 in short) that
 replaces the time derivative $\frac{\partial T}{\partial t}$ by the
-term $\frac{\frac 32 T^{n}-2T^{n-1}+\frac 12 T^{n-2}}{k_n}$ where
-$k_n$ is the current time step.
+term $\frac{\frac 32 T^{n}-2T^{n-1}+\frac 12 T^{n-2}}{k}$ where
+$k$ is the time step size.
 @f{eqnarray*}
   \frac 32 T^n
   -
-  k_n\nabla \cdot \kappa \nabla T^n 
+  k\nabla \cdot \kappa \nabla T^n 
   &=& 
   2 T^{n-1}
   -
   \frac 12 T^{n-2}
   -
-  k_n{\mathbf u}^n \cdot \nabla T^{n-1}
+  k{\mathbf u}^n \cdot \nabla (2T^{n-1}-T^{n-2})
   +
-  k_n\gamma.
+  k\gamma.
 @f}
 Note how the temperature equation is
 solved semi-explicitly: diffusion is treated implicitly whereas
 advection is treated explicitly using the just-computed velocity
-field. We will have to modify the equation some more (by adding
-stabilization terms) later on, but the general principle remains the
-same. As a final remark we note that the choice of a higher order time
+field but only previously computed temperature fields; that said, the
+temperature terms appearing in the advection term are forward
+projected to the current time:
+$T^n \approx T^{n-1} + k_n
+\frac{\partial T}{\partial t} \approx T^{n-1} + k_n
+\frac{T^{n-1}-T^{n-2}}{k_n} = 2T^{n-1}-T^{n-2}$. In other words, the
+temperature fields we use in the explicit right hand side are first
+order approximations of the current temperature field &mdash; not
+quite an explicit time stepping scheme, but by character not too far
+away either.
+
+In reality, of course, the time step is limited by a
+Courant-Friedrichs-Lewy (CFL) condition just like it was in 
+@ref step_21 "step-21". In particular this means that the time step
+size $k$ may change from time step to time step, and that we have to
+modify the above formula slightly. If $k_n,k_{n-1}$ are the time steps
+sizes of the current and previous time step, then we use the
+approximations 
+$\frac{\partial T}{\partial t} \approx
+ \frac 1{k_n}
+ \left(
+       \frac{2k_n+k_{n-1}}{k_n+k_{n-1}} T^{n} 
+       -
+       \frac{k_n+k_{n-1}}{k_{n-1}}T^{n-1} 
+       +
+       \frac{k_n^2}{k_{n-1}(k_n+k_{n-1})} T^{n-2}
+ \right)$
+and
+$T^n \approx 
+   T^{n-1} + k_n \frac{\partial T}{\partial t} 
+   \approx
+   T^{n-1} + k_n
+   \frac{T^{n-1}-T^{n-2}}{k_{n-1}}
+   =
+   \left(1+\frac{k_n}{k_{n-1}}\right)T^{n-1}-\frac{k_n}{k_{n-1}}T^{n-2}$,
+and above equation is generalized as follows:
+@f{eqnarray*}
+  \frac{2k_n+k_{n-1}}{k_n+k_{n-1}} T^n
+  -
+  k_n\nabla \cdot \kappa \nabla T^n 
+  &=& 
+  \frac{k_n+k_{n-1}}{k_{n-1}} T^{n-1}
+  -
+  \frac{k_n^2}{k_{n-1}(k_n+k_{n-1})} T^{n-2}
+  -
+  k_n{\mathbf u}^n \cdot \nabla \left[
+    \left(1+\frac{k_n}{k_{n-1}}\right)T^{n-1}-\frac{k_n}{k_{n-1}}T^{n-2}
+  \right]
+  +
+  k_n\gamma.
+@f}
+That's not an easy to read equation, but will provide us with the
+desired higher order accuracy. As a consistency check, it is easy to
+verify that it reduces to the same equation as above if $k_n=k_{n-1}$.
+
+As a final remark we note that the choice of a higher order time
 stepping scheme of course forces us to keep more time steps in memory;
 in particular, we here will need to have $T^{n-2}$ around, a vector
 that we could previously discard. This seems like a nuisance that we
@@ -413,11 +466,11 @@ simple method to stabilize an equation, and even less so if we realize
 that $\nu(T)$ is non-differentiable in $T$. However, there is no
 reason to despair: we still have to discretize in time and we can
 treat the term explicitly. Using the BDF-2 scheme introduced above,
-this yields
+this yields for the simpler case of uniform time steps of size $k$:
 @f{eqnarray*}
   \frac 32 T^n
   -
-  k_n\nabla \cdot \kappa \nabla T^n 
+  k\nabla \cdot \kappa \nabla T^n 
   &=& 
   2 T^{n-1}
   -
@@ -425,7 +478,7 @@ this yields
   \\
   &&
   +
-  k_n\nabla \cdot 
+  k\nabla \cdot 
   \left[
     \nu_\alpha\left(\frac 12 T^{n-1}+\frac 12 T^{n-2}\right) 
     \ \nabla (2T^{n-1}-T^{n-2})
@@ -433,59 +486,94 @@ this yields
   \\
   &&
   -
-  k_n{\mathbf u}^n \cdot \nabla (2T^{n-1}-T^{n-2})
+  k{\mathbf u}^n \cdot \nabla (2T^{n-1}-T^{n-2})
   \\
   &&
   +
-  k_n\gamma.
+  k\gamma.
 @f}
 On the left side of this equation remains the term from the time
 derivative and the original (physical) diffusion which we treat
 implicitly (this is actually a nice term: the matrices that result
 from the left hand side are the mass matrix and a multiple of the
 Laplace matrix &mdash; both are positive definite and if the time step
-size $k_n$ is small, the sum is simple to invert). On the right hand
+size $k$ is small, the sum is simple to invert). On the right hand
 side, the terms in the first line result from the time derivative; in
 the second line is the artificial diffusion where we calculate the
 viscosity $\nu_\alpha$ using the temperature field at time $t_{n-\frac
 32}$ using $\frac 12 (T^{n-1}+T^{n-2})$; the third line contains the
-advection term, and the fourth the sources. Note that for 
-artificial diffusion and advection operate on an extrapolated
-temperature at the current time: $T^n \approx T^{n-1} + k_n
-\frac{\partial T}{\partial t} \approx T^{n-1} + k_n
-\frac{T^{n-1}-T^{n-2}}{k_n} = 2T^{n-1}-T^{n-2}$. In other words, the
-temperature fields we use in the explicit right hand side are first
-order approximations of the current temperature field &mdash; not
-quite an explicit time stepping scheme, but by character not too far
-away either.
+advection term, and the fourth the sources. Note that the
+artificial diffusion operates on the extrapolated
+temperature at the current time in the same way as we have discussed
+the advection works in the section on time stepping.
+
+The form for non-uniform time steps that we will have to use in
+reality is a bit more complicated (which is why we showed the simpler
+form above first) and reads:
+@f{eqnarray*}
+  \frac{2k_n+k_{n-1}}{k_n+k_{n-1}} T^n
+  -
+  k_n\nabla \cdot \kappa \nabla T^n 
+  &=& 
+  \frac{k_n+k_{n-1}}{k_{n-1}} T^{n-1}
+  -
+  \frac{k_n^2}{k_{n-1}(k_n+k_{n-1})} T^{n-2}
+  \\
+  &&
+  +
+  k_n\nabla \cdot 
+  \left[
+    \nu_\alpha\left(\frac 12 T^{n-1}+\frac 12 T^{n-2}\right) 
+    \ \nabla  \left[
+    \left(1+\frac{k_n}{k_{n-1}}\right)T^{n-1}-\frac{k_n}{k_{n-1}}T^{n-2}
+  \right]
+  \right]
+  \\
+  &&
+  -
+  k_n{\mathbf u}^n \cdot \nabla \left[
+    \left(1+\frac{k_n}{k_{n-1}}\right)T^{n-1}-\frac{k_n}{k_{n-1}}T^{n-2}
+  \right]
+  \\
+  &&
+  +
+  k_n\gamma.
+@f}
 
 After settling all these issues, the weak form follows naturally from
 the strong form shown in the last equation, and we immediately arrive
 at the weak form of the discretized equations:
 @f{eqnarray*}
-  \frac 32 (\tau_h,T_h^n)
+  \frac{2k_n+k_{n-1}}{k_n+k_{n-1}} (\tau_h,T_h^n)
   +
   k_n (\nabla \tau_h, \kappa \nabla T_h^n)
   &=& 
-  \left(\tau_h,2 T_h^{n-1}
+  \biggl(\tau_h, 
+  \frac{k_n+k_{n-1}}{k_{n-1}} T_h^{n-1}
   -
-  \frac 12 T_h^{n-2}
+  \frac{k_n^2}{k_{n-1}(k_n+k_{n-1})} T_h^{n-2}
+  \\
+  &&\qquad\qquad
   -
-  k_n{\mathbf u}_h^n \cdot \nabla (2T_h^{n-1}-T_h^{n-2})
+  k_n{\mathbf u}_h^n \cdot \nabla \left[
+    \left(1+\frac{k_n}{k_{n-1}}\right)T^{n-1}-\frac{k_n}{k_{n-1}}T^{n-2}
+  \right]
   +
-  k_n\gamma \right)
+  k_n\gamma \biggr)
   \\
   &&
   -
   k_n \left(\nabla \tau_h, 
     \nu_\alpha\left(\frac 12 T_h^{n-1}+\frac 12 T_h^{n-2}\right) 
-    \ \nabla (2T_h^{n-1}-T_h^{n-2})
+    \ \nabla \left[
+    \left(1+\frac{k_n}{k_{n-1}}\right)T^{n-1}-\frac{k_n}{k_{n-1}}T^{n-2}
+  \right]
   \right)
 @f}
 for all discrete test functions $\tau_h$. This then results in a
 matrix equation of form
 @f{eqnarray*}
-  \left(\frac 32 M+k_n A_T\right) T_h^n = F(U_h^n,T_h^{n-1},T_h^{n-2}),
+  \left( \frac{2k_n+k_{n-1}}{k_n+k_{n-1}} M+k_n A_T\right) T_h^n = F(U_h^n,T_h^{n-1},T_h^{n-2}),
 @f}
 which given the structure of matrix on the left (the sum of two
 positive definite matrices) is easily solved using the Conjugate
