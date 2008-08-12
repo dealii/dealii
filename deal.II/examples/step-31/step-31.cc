@@ -60,6 +60,17 @@
 #include <fstream>
 #include <sstream>
 
+                                 // This is Trilinos
+#include <Epetra_SerialComm.h>
+#include <Epetra_Map.h>
+#include <Epetra_CrsGraph.h>
+#include <Epetra_CrsMatrix.h>
+#include <Epetra_Vector.h>
+#include <Teuchos_ParameterList.hpp>
+#include <Amesos.h>
+#include <ml_include.h>
+#include <ml_MultiLevelPreconditioner.h>
+
 				 // Next, we import all deal.II
 				 // names into global namespace
 using namespace dealii;
@@ -73,19 +84,264 @@ using namespace dealii;
 				 // on the space dimension. This
 				 // is in complete analogy to step-22.
 template <int dim>
- struct InnerPreconditioner;
+struct InnerPreconditioner;
 
- template <>
- struct InnerPreconditioner<2>
- {
-     typedef SparseDirectUMFPACK type;
- };
+template <>
+struct InnerPreconditioner<2>
+{
+    typedef SparseDirectUMFPACK type;
+};
 
- template <>
- struct InnerPreconditioner<3>
- {
-     typedef SparseILU<double> type;
- };
+template <>
+struct InnerPreconditioner<3>
+{
+    typedef SparseILU<double> type;
+};
+
+
+
+				 // This implements an AMG
+				 // preconditioner based on the
+				 // Trilinos ML implementation.
+				 // What this class does is twofold.
+				 // When the constructor of the class
+				 // is invoked, a ML preconditioner
+				 // object is created based on the
+				 // DoFHandler and matrix
+				 // that we want the preconditioner to
+				 // be based on. A call of
+				 // the respective <code>vmult</code>
+				 // function does call the respective
+				 // operation in the Trilinos package,
+				 // where it is called 
+				 // <code>ApplyInverse</code>.
+ 
+				 // There are a few pecularities in
+				 // the constructor. Since the
+				 // Trilinos objects we want to use are
+				 // heavily dependent on Epetra objects,
+				 // the fundamental construction
+				 // routines for vectors and 
+				 // matrices in Trilinos, we do a 
+				 // copy of our deal.II preconditioner
+				 // matrix to a Epetra matrix. This 
+				 // is of course not optimal, but for
+				 // the time being there is no direct
+				 // support for our data interface.
+				 // When doing this time-consuming 
+				 // operation, we can still profit 
+				 // from the fact that some of the
+				 // entries in the preconditioner matrix
+				 // are zero and hence can be 
+				 // neglected.
+template <int dim>
+class TrilinosAmgPreconditioner : public Subscriptor
+{
+  public:
+    TrilinosAmgPreconditioner (
+	  const DoFHandler<dim>      &DofHandler,
+	  const SparseMatrix<double> &PreconditionerMatrix,
+	  const bool                 VectorValuedProblem);
+
+  void vmult (Vector<double>       &dst,
+              const Vector<double> &src) const;
+
+  private:
+    const DoFHandler<dim>      *dof_handler;
+    const SparseMatrix<double> *preconditioner_matrix;
+    const SparsityPattern      *sparsity_pattern;
+
+    const unsigned int n_u;
+    
+    const bool vector_valued_problem;
+    
+    ML_Epetra::MultiLevelPreconditioner* ml_precond;
+    
+    Epetra_SerialComm  communicator;
+    std::auto_ptr<Epetra_Map>       Map;
+    std::auto_ptr<Epetra_CrsMatrix> Matrix;
+};
+
+
+template <int dim>
+TrilinosAmgPreconditioner<dim>::TrilinosAmgPreconditioner(
+		const DoFHandler<dim>       &DofHandler,
+		const SparseMatrix<double>  &PreconditionerMatrix,
+		const bool                  VectorValuedProblem
+		)
+		:
+		dof_handler           (&DofHandler),
+		preconditioner_matrix (&PreconditionerMatrix),
+		sparsity_pattern      (&preconditioner_matrix->get_sparsity_pattern()),
+		n_u                   (preconditioner_matrix->m()),
+		vector_valued_problem (VectorValuedProblem)
+{
+  
+				 // Init Epetra Matrix, avoid 
+				 // storing the nonzero elements.
+  {
+    Map.reset (new Epetra_Map(n_u, 0, communicator));
+    
+    std::vector<int> row_lengths (n_u);
+    for (unsigned int row=0; row<n_u; ++row)
+      {
+	const unsigned int temporary_row_length = 
+	    sparsity_pattern->row_length (row);
+	unsigned int local_length = 0;
+	for (unsigned int col=0; col<temporary_row_length; ++col)
+	  {
+	    unsigned int col_index = sparsity_pattern->column_number (row, col);
+	    if (std::abs((*preconditioner_matrix) (row, col_index)) > 1e-15)
+	      local_length += 1;
+	  }
+	row_lengths[row] = local_length;
+      }
+  
+    Matrix.reset (new Epetra_CrsMatrix(Copy, *Map, &row_lengths[0], true));
+  
+    const unsigned int max_nonzero_entries
+      = *std::max_element (row_lengths.begin(), row_lengths.end());
+  
+    std::vector<double> values(max_nonzero_entries, 0);
+    std::vector<int> row_indices(max_nonzero_entries);
+  
+    for (unsigned int row=0; row<n_u; ++row)
+      {
+	const unsigned int temporary_row_length = 
+	    sparsity_pattern->row_length (row);
+	
+	row_indices.resize (row_lengths[row], 0);
+	values.resize (row_lengths[row], 0.);
+  
+	int col_counter = 0;
+	for (unsigned int col=0; col<temporary_row_length; ++col)
+	  {
+	    unsigned int col_index = sparsity_pattern->column_number (row, col);
+	    if (std::abs((*preconditioner_matrix) (row, col_index)) > 1e-15)
+	      {
+		row_indices[col_counter] = 
+		    sparsity_pattern->column_number (row, col);
+		values[col_counter] = 
+		    (*preconditioner_matrix) (row, row_indices[col_counter]);
+		++col_counter;
+	      }
+	    Assert (col_counter == row_lengths[row],
+		    ExcMessage("Filtering out zeros could not "
+			       "be successfully finished!"));
+	  }
+  
+	Matrix->InsertGlobalValues(row, row_lengths[row],
+				   &values[0], &row_indices[0]);
+      }
+      
+    Matrix->FillComplete();
+  }
+  
+				 // And now build the AMG
+				 // preconditioner.
+  const bool output_amg_info = false;
+  Teuchos::ParameterList MLList;
+  
+				 // set default values for 
+				 // smoothed aggregation in MLList,
+				 // the standard choice for elliptic
+				 // (Laplace-type) problems
+  ML_Epetra::SetDefaults("SA",MLList);
+  
+  if (output_amg_info)
+    MLList.set("ML output", 10);
+  else
+    MLList.set("ML output", 0);
+  
+				 // modify some AMG parameters from default to
+				 // get better performance on FE induced Laplace
+				 // type matrices
+  MLList.set("max levels",10);
+  MLList.set("increasing or decreasing", "increasing");
+  MLList.set("aggregation: type", "Uncoupled");
+  MLList.set("smoother: type", "symmetric Gauss-Seidel");
+  MLList.set("smoother: sweeps", 1);
+  MLList.set("smoother: damping factor", 4./3.);
+  MLList.set("smoother: pre or post", "both");
+  MLList.set("coarse: type","Amesos-KLU");
+  
+				 // Build null space, i.e. build dim vectors
+				 // of ones in each velocity component.
+  if (vector_valued_problem)
+    {
+      std::vector<double> null_vectors (dim * n_u, 0.);
+      {
+	unsigned int n_ud = n_u/dim;
+	Assert (n_ud * dim == n_u,
+	    ExcMessage("Cannot find portions of single velocity components!"));
+	
+	std::vector<bool> velocity_d_dofs (dof_handler->n_dofs(), false);
+	std::vector<bool> velocity_mask (dim + 2, false);
+	for (unsigned int d=0; d<dim; d++)
+	  {
+	    velocity_mask[d] = true;
+	    DoFTools::extract_dofs(*dof_handler, velocity_mask, 
+				    velocity_d_dofs);
+	    velocity_mask[d] = false;
+	    
+	    unsigned int counter = 0;
+	    for (unsigned int i=0; i<dof_handler->n_dofs(); ++i)
+	      {
+		if (velocity_d_dofs[i])
+		  {
+		    Assert(i < n_u,
+			    ExcMessage("Could not correctly locate velocity "
+				      "dofs in velocity system!"));
+		    null_vectors [d* n_u + i] = 1.;
+		    ++counter;
+		  }
+	      }
+	    Assert (counter == n_ud,
+		    ExcMessage("Failed to extract correct components "
+				"that should consitute null space!"));
+	  }
+	MLList.set("null space: dimension", dim);
+	MLList.set("null space: vectors", &null_vectors[0]);
+	MLList.set("null space: type", "pre-computed");
+      }
+    }
+	
+  ml_precond = new ML_Epetra::MultiLevelPreconditioner(*Matrix, MLList, true);
+
+  if (output_amg_info)
+    ml_precond->PrintUnused(0);
+}
+
+				 // For the implementation of the
+				 // <code>vmult</code> function we
+				 // note that invoking a call of 
+				 // the Trilinos preconditioner 
+				 // requires us to use Epetra vectors
+				 // as well. Luckily, it is sufficient
+				 // to provide a view, i.e., feed 
+				 // Trilinos with a pointer to the
+				 // data, so we avoid copying the
+				 // content of the vectors during
+				 // the iteration. In the declaration
+				 // of the right hand side, we need
+				 // to cast the source vector (that
+				 // is <code>const</code> in all deal.II 
+				 // calls) to non-constant value, as
+				 // this is the way Trilinos wants to
+				 // have them.
+template <int dim>
+void TrilinosAmgPreconditioner<dim>::vmult (Vector<double>       &dst,
+					    const Vector<double> &src) const
+{
+  Epetra_Vector LHS (View, *Map, dst.begin());
+  Epetra_Vector RHS (View, *Map, const_cast<double*>(src.begin()));
+  
+  int res = ml_precond->ApplyInverse (RHS, LHS);
+  
+  Assert (res == 0,
+	  ExcMessage ("Trilinos AMG MultiLevel preconditioner returned "
+		      "errorneously!"));
+}
 
 
 
@@ -140,7 +396,8 @@ class BoussinesqFlowProblem
     BlockVector<double> old_solution;
     BlockVector<double> system_rhs;
 
-    boost::shared_ptr<typename InnerPreconditioner<dim>::type> A_preconditioner;
+    //boost::shared_ptr<typename InnerPreconditioner<dim>::type> A_preconditioner;
+    boost::shared_ptr<TrilinosAmgPreconditioner<dim> >  Amg_preconditioner;
     boost::shared_ptr<SparseILU<double> > Mp_preconditioner;
 
     bool rebuild_matrices;
@@ -727,6 +984,14 @@ void BoussinesqFlowProblem<dim>::setup_dofs (const bool setup_matrices)
 				 // then completed and copied
 				 // into the general sparsity
 				 // pattern structure.
+  
+				 // Observe that we use a 
+				 // coupling argument for 
+				 // telling the function
+				 // <code>make_sparsity_pattern</code>
+				 // which components actually
+				 // will hold data and which 
+				 // we're going to neglect.
 				 // 
 				 // After these actions, we 
 				 // need to reassign the 
@@ -751,14 +1016,23 @@ void BoussinesqFlowProblem<dim>::setup_dofs (const bool setup_matrices)
       
       csp.collect_sizes ();
 
-				       // TODO: only build entries
-				       // that we really need
-      DoFTools::make_sparsity_pattern (dof_handler, csp);
+      Table<2,DoFTools::Coupling> coupling (dim+2, dim+2);
+      
+      for (unsigned int component = 0; component<dim+2; ++component)
+	for (unsigned int component2 = 0; component2<dim+2; ++component2)
+	  coupling[component][component2] = DoFTools::always;
+      
+      for (unsigned int component = 0; component<dim+1; ++component)
+	{
+	  coupling[dim+1][component] = DoFTools::none;
+	  coupling[component][dim+1] = DoFTools::none;
+	}
+      
+      DoFTools::make_sparsity_pattern (dof_handler, coupling, csp);
       hanging_node_constraints.condense (csp);
       sparsity_pattern.copy_from (csp);
 
       system_matrix.reinit (sparsity_pattern);
-      preconditioner_matrix.reinit (sparsity_pattern);
     }
 
 				 // As last action in this function,
@@ -1155,9 +1429,10 @@ void BoussinesqFlowProblem<dim>::assemble_system ()
 	{
 	  for (unsigned int i=0; i<dofs_per_cell; ++i)
 	    for (unsigned int j=0; j<dofs_per_cell; ++j)
-	      system_matrix.add (local_dof_indices[i],
-				 local_dof_indices[j],
-				 local_matrix(i,j));
+	      if (std::abs(local_matrix(i,j)) > 1e-20)
+		system_matrix.add (local_dof_indices[i],
+				   local_dof_indices[j],
+				   local_matrix(i,j));
 	}
 
       for (unsigned int i=0; i<dofs_per_cell; ++i)
@@ -1246,20 +1521,33 @@ void BoussinesqFlowProblem<dim>::assemble_system ()
 			  "without a rebuilt matrix!"));
 
       std::cout << "   Rebuilding preconditioner..." << std::flush;
-
-      assemble_preconditioner ();      
       
-      A_preconditioner
+      preconditioner_matrix.reinit (sparsity_pattern);
+      assemble_preconditioner ();
+      
+      /*A_preconditioner
 	= boost::shared_ptr<typename InnerPreconditioner<dim>::type>
 		(new typename InnerPreconditioner<dim>::type());
       A_preconditioner->initialize (preconditioner_matrix.block(0,0),
-		typename InnerPreconditioner<dim>::type::AdditionalData());
+		typename InnerPreconditioner<dim>::type::AdditionalData());*/
+      
+      Amg_preconditioner = 
+	boost::shared_ptr<TrilinosAmgPreconditioner<dim> >
+	  (new TrilinosAmgPreconditioner<dim>(dof_handler,
+					      preconditioner_matrix.block(0,0),
+					      true));
 
       Mp_preconditioner
 	= boost::shared_ptr<SparseILU<double> >
 		(new SparseILU<double>);
       Mp_preconditioner->initialize (system_matrix.block(1,1),
 				     SparseILU<double>::AdditionalData());
+      
+				 // Throw away the preconditioner
+				 // matrix since everything has been
+				 // copied to the Epetra objects
+				 // of the preconditioner.
+      preconditioner_matrix.clear ();
 
       std::cout << std::endl;
 
@@ -1626,7 +1914,7 @@ void BoussinesqFlowProblem<dim>::solve ()
 
 				// Define some temporary vectors
 				// for the solution process.
-				// TODO: Can we somhow avoid copying
+				// TODO: Can we somehow avoid copying
 				// these vectors back and forth? I.e.
 				// accessing the block vectors in a
 				// similar way as the matrix with the
@@ -1647,20 +1935,21 @@ void BoussinesqFlowProblem<dim>::solve ()
       mp_inverse (system_matrix.block(1,1), *Mp_preconditioner);
 
 				// Set up block Schur preconditioner
-    BlockSchurPreconditioner<typename InnerPreconditioner<dim>::type,
+    /*BlockSchurPreconditioner<typename InnerPreconditioner<dim>::type,
                            SparseILU<double> >
-      preconditioner (system_matrix, mp_inverse, *A_preconditioner);
+      preconditioner (system_matrix, mp_inverse, *A_preconditioner);*/
+    BlockSchurPreconditioner<TrilinosAmgPreconditioner<dim>, SparseILU<double> >
+      preconditioner (system_matrix, mp_inverse, *Amg_preconditioner);
 
 				// Set up GMRES solver and
 				// solve.
     SolverControl solver_control (system_matrix.m(),
-                                    1e-6*system_rhs.l2_norm());
+				  1e-6*system_rhs.l2_norm());
 
     SolverGMRES<BlockVector<double> > gmres(solver_control,
 			SolverGMRES<BlockVector<double> >::AdditionalData(100));
 
-    gmres.solve(stokes_submatrix, up, up_rhs,
-                preconditioner);
+    gmres.solve(stokes_submatrix, up, up_rhs, preconditioner);
 
 				// Produce a constistent solution field
     hanging_node_constraints.distribute (up);
@@ -1849,7 +2138,7 @@ void BoussinesqFlowProblem<dim>::run ()
 
 	GridGenerator::hyper_cube (triangulation);
 
-	triangulation.refine_global (6);
+	triangulation.refine_global (6); 
 
 	break;
       }
