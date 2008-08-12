@@ -115,7 +115,7 @@ $(target) : $(libraries)
 # useful if you want to call the executable with arguments which do
 # not change frequently. You may then want to add them to the
 # following rule:
-run: $(target) UMFPACK-check
+run: $(target)
 	@echo ============================ Running $<
 	@./$(target)$(EXEEXT)
 
