@@ -1046,7 +1046,6 @@ ChunkSparseMatrix<number>::frobenius_norm () const
 				   // padding elements are zero, so we can add
 				   // them up as well
   real_type norm_sqr = 0;
-  const unsigned int n_rows = m();
   for (const number *ptr = &val[0]; ptr != &val[max_len]; ++ptr)
     norm_sqr +=  numbers::NumberTraits<number>::abs_square(*ptr);
 
