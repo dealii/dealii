@@ -51,7 +51,7 @@ class ChunkSparsityPattern : public Subscriptor
 				     /**
 				      * Define a value which is used
 				      * to indicate that a certain
-				      * value in the #colnums array
+				      * value in the colnums array
 				      * is unused, i.e. does not
 				      * represent a certain column
 				      * number index.
