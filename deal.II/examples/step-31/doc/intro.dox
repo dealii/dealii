@@ -651,13 +651,14 @@ $(\nabla {\mathbf v}_i, \eta \nabla {\mathbf v}_j)
   (\partial_k ({\mathbf v}_i)_l, \eta \partial_k ({\mathbf v}_j)_l)
 $. The latter,
 however, has the advantage that the <code>dim</code> vector components
-of the test functions are not mixed, i.e. the resulting matrix is
-block-diagonal: one block for each vector component, and each of these
-blocks is equal to the Laplace matrix for this vector component. So assuming
-we order degrees of freedom in such a way that first all $x$-components of the
-velocity are numbered, then the $y$-components, and then the $z$-components,
-then the matrix $\hat A$ that is associated with this slightly different
-bilinear form has the form
+of the test functions are not coupled (well, almost, see below),
+i.e. the resulting matrix is block-diagonal: one block for each vector
+component, and each of these blocks is equal to the Laplace matrix for
+this vector component. So assuming we order degrees of freedom in such
+a way that first all $x$-components of the velocity are numbered, then
+the $y$-components, and then the $z$-components, then the matrix $\hat
+A$ that is associated with this slightly different bilinear form has
+the form
 @f{eqnarray*}
   \hat A =
   \left(\begin{array}{ccc}
@@ -666,7 +667,8 @@ bilinear form has the form
 @f}
 where $A_s$ is a Laplace matrix of size equal to the number of shape functions
 associated with each component of the vector-valued velocity. With this
-matrix, we can now define our preconditioner for the velocity matrix $A$:
+matrix, one could be tempted to define our preconditioner for the
+velocity matrix $A$ as follows:
 @f{eqnarray*}
   \tilde A^{-1} =
   \left(\begin{array}{ccc}
@@ -677,6 +679,34 @@ matrix, we can now define our preconditioner for the velocity matrix $A$:
 @f}
 where $\tilde A_s^{-1}$ is a preconditioner for the Laplace matrix &mdash;
 something where we know very well how to build good preconditioner! 
+
+In reality, the story is not quite as simple: To make the matrix
+$\tilde A$ definite, we need to make the individual blocks $\tilde
+A_s$ definite by applying boundary conditions. One can try to do so by
+applying Dirichlet boundary conditions all around the boundary, and
+then the so-defined preconditioner $\tilde A^{-1}$ turns out to be a
+good preconditioner for $A$ if the latter matrix results from a Stokes
+problem where we also have Dirichlet boundary conditions on the
+velocity components all around the domain, i.e. if we enforce $\mathbf
+u=0$. 
+
+Unfortunately, this "if" is an "if and only if": in the program below
+we will want to use no-flux boundary conditions of the form $\mathbf u
+\cdot \mathbf n = 0$ (i.e. flow parallel to the boundary is allowed,
+but no flux through the boundary). In this case, it turns out that the
+block diagonal matrix defined above is not a good preconditioner
+because it neglects the coupling of components at the boundary. A
+better way to do things is therefore if we build the matrix $\hat A$
+as the vector Laplace matrix $\hat A_{ij} = (\nabla {\mathbf v}_i,
+\eta \nabla {\mathbf v}_j)$ and then apply the same boundary condition
+as we applied to $A$. If this is Dirichlet boundary conditions all
+around the domain, the $\hat A$ will decouple to three diagonal blocks
+as above, and if the boundary conditions are of the form $\mathbf u
+\cdot \mathbf n = 0$ then this will introduce a coupling of degrees of
+freedom at the boundary but only there. This, in fact, turns out to be
+a much better preconditioner than the one introduced above, and has
+almost all the benefits of what we hoped to get.
+
 
 To sum this whole story up, we can observe:
 <ul>
@@ -691,20 +721,19 @@ To sum this whole story up, we can observe:
   at the time of this writing, Algebraic Multigrid (AMG) algorithms are very
   well developed for scalar problems, but not so for vector problems.
 
-  <li>In building this preconditioner, we will have to build up the matrix
-  $\hat A$ and its preconditioner. While this means that we have to store an
-  additional matrix we didn't need before, the preconditioner $\tilde
-  A_s^{-1}$ is likely going to need much less memory than storing a
-  preconditioner for the coupled matrix $A$. This is because the matrix $A_s$
-  has only a third of the rows of $A$, and in addition has only a third of the
-  entries per row. Storing the matrix is therefore relatively cheap, and we
-  can expect that storing the preconditioner $\tilde A_s$ will also be much
-  cheaper. 
-
-  <li>Finally, applying the block diagonal preconditioner can be parallelized:
-  we can use <code>dim</code> threads, each of which takes a part of the
-  incoming vector, multiplies it with the preconditioner, and writes the
-  result into the outgoing vector again.
+  <li>In building this preconditioner, we will have to build up the
+  matrix $\hat A$ and its preconditioner. While this means that we
+  have to store an additional matrix we didn't need before, the
+  preconditioner $\tilde A_s^{-1}$ is likely going to need much less
+  memory than storing a preconditioner for the coupled matrix
+  $A$. This is because the matrix $A_s$ has only a third of the
+  entries per row for all rows corresponding to interior degrees of
+  freedom, and contains coupling between vector components only on
+  those parts of the boundary where the boundary conditions introduce
+  such a coupling. Storing the matrix is therefore comparatively
+  cheap, and we can expect that computing and storing the
+  preconditioner $\tilde A_s$ will also be much cheaper compared to
+  doing so for the fully coupled matrix.
 </ul>
 
 
