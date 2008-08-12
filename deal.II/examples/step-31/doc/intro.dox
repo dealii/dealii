@@ -558,11 +558,67 @@ For this program, we would like to go a bit further. To this end, note
 that the symmetrized bilinear form on vector fields, 
 $(\varepsilon {\mathbf v}_i, \eta \varepsilon ({\mathbf v}_j))$
 is not too far away from the nonsymmetrized version,
-$(\nabla {\mathbf v}_i, \eta \nabla ({\mathbf v}_j))$. The latter,
+$(\nabla {\mathbf v}_i, \eta \nabla {\mathbf v}_j)
+= \sum_{k,l=1}^d 
+  (\partial_k ({\mathbf v}_i)_l, \eta \partial_k ({\mathbf v}_j)_l)
+$. The latter,
 however, has the advantage that the <code>dim</code> vector components
 of the test functions are not mixed, i.e. the resulting matrix is
 block-diagonal: one block for each vector component, and each of these
-blocks is equal to the Laplace matrix for this vector component.
+blocks is equal to the Laplace matrix for this vector component. So assuming
+we order degrees of freedom in such a way that first all $x$-components of the
+velocity are numbered, then the $y$-components, and then the $z$-components,
+then the matrix $\hat A$ that is associated with this slightly different
+bilinear form has the form
+@f{eqnarray*}
+  \hat A =
+  \left(\begin{array}{ccc}
+    A_s & 0 & 0 \\ 0 & A_s & 0 \\ 0 & 0 & A_s
+  \end{array}\right)
+@f}
+where $A_s$ is a Laplace matrix of size equal to the number of shape functions
+associated with each component of the vector-valued velocity. With this
+matrix, we can now define our preconditioner for the velocity matrix $A$:
+@f{eqnarray*}
+  \tilde A^{-1} =
+  \left(\begin{array}{ccc}
+    \tilde A_s^{-1} & 0 & 0 \\
+    0 & \tilde A_s^{-1} & 0 \\ 
+    0 & 0 & \tilde A_s^{-1}
+  \end{array}\right),
+@f}
+where $\tilde A_s^{-1}$ is a preconditioner for the Laplace matrix &mdash;
+something where we know very well how to build good preconditioner! 
+
+To sum this whole story up, we can observe:
+<ul>
+  <li> Compared to building a preconditioner from the original matrix $A$
+  resulting from the symmetric gradient as we did in @ref step_22 "step-22",
+  we have to expect that the preconditioner based on the Laplace bilinear form
+  performs worse since it does not take into account the coupling between
+  vector components.
+
+  <li>On the other hand, preconditioners for the Laplace matrix are typically
+  more mature and perform better than ones for vector problems. For example,
+  at the time of this writing, Algebraic Multigrid (AMG) algorithms are very
+  well developed for scalar problems, but not so for vector problems.
+
+  <li>In building this preconditioner, we will have to build up the matrix
+  $\hat A$ and its preconditioner. While this means that we have to store an
+  additional matrix we didn't need before, the preconditioner $\tilde
+  A_s^{-1}$ is likely going to need much less memory than storing a
+  preconditioner for the coupled matrix $A$. This is because the matrix $A_s$
+  has only a third of the rows of $A$, and in addition has only a third of the
+  entries per row. Storing the matrix is therefore relatively cheap, and we
+  can expect that storing the preconditioner $\tilde A_s$ will also be much
+  cheaper. 
+
+  <li>Finally, applying the block diagonal preconditioner can be parallelized:
+  we can use <code>dim</code> threads, each of which takes a part of the
+  incoming vector, multiplies it with the preconditioner, and writes the
+  result into the outgoing vector again.
+</ul>
+
 
 
 <h5>Linear solvers for the temperature equation</h5>
