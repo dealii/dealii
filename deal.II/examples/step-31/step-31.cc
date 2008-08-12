@@ -33,7 +33,6 @@
 
 #include <grid/tria.h>
 #include <grid/grid_generator.h>
-#include <grid/intergrid_map.h>
 #include <grid/tria_accessor.h>
 #include <grid/tria_iterator.h>
 #include <grid/tria_boundary_lib.h>
@@ -124,24 +123,14 @@ class BoussinesqFlowProblem
     const unsigned int   degree;
 
     Triangulation<dim>   triangulation;
-
     FESystem<dim>        fe;
     DoFHandler<dim>      dof_handler;
 
-    FE_Q<dim>            scalar_velocity_fe;
-    DoFHandler<dim>      scalar_velocity_dof_handler;
-
     ConstraintMatrix     hanging_node_constraints;
-    ConstraintMatrix     scalar_velocity_hanging_node_constraints;
 
     BlockSparsityPattern      sparsity_pattern;
     BlockSparseMatrix<double> system_matrix;
 
-    SparsityPattern      scalar_velocity_sparsity_pattern;
-    SparseMatrix<double> scalar_velocity_system_matrix;
-    std::vector<unsigned int> scalar_to_vector_velocities[dim];
-    
-    
     double time_step;
     unsigned int timestep_number;
 
@@ -593,8 +582,6 @@ BoussinesqFlowProblem<dim>::BoussinesqFlowProblem (const unsigned int degree)
                     FE_Q<dim>(degree), 1,
                     FE_DGQ<dim>(degree-1), 1),
                 dof_handler (triangulation),
-		scalar_velocity_fe (degree+1),
-		scalar_velocity_dof_handler (triangulation),
                 time_step (0),
 		rebuild_matrices (true),
 		rebuild_preconditioner (true)
@@ -692,18 +679,6 @@ void BoussinesqFlowProblem<dim>::setup_dofs (const bool setup_matrices)
             << std::endl
             << std::endl;
 
-
-				   // also initialize the DoFHandler
-				   // for the scalar version of the
-				   // Laplace equation on the velocity
-				   // variables
-  scalar_velocity_dof_handler.distribute_dofs (scalar_velocity_fe);
-  DoFRenumbering::Cuthill_McKee (scalar_velocity_dof_handler);
-  scalar_velocity_hanging_node_constraints.clear ();
-  DoFTools::make_hanging_node_constraints (scalar_velocity_dof_handler,
-					   scalar_velocity_hanging_node_constraints);
-  scalar_velocity_hanging_node_constraints.close ();
-
 				 // The next step is to 
 				 // create the sparsity 
 				 // pattern for the system matrix 
@@ -757,79 +732,28 @@ void BoussinesqFlowProblem<dim>::setup_dofs (const bool setup_matrices)
 				 // the sparsity pattern.
   if (setup_matrices == true)
     {
-      {
-	system_matrix.clear ();
+      system_matrix.clear ();
 
-	BlockCompressedSetSparsityPattern csp (3,3);
+      BlockCompressedSetSparsityPattern csp (3,3);
  
-	csp.block(0,0).reinit (n_u, n_u);
-	csp.block(0,1).reinit (n_u, n_p);
-	csp.block(0,2).reinit (n_u, n_T);
-	csp.block(1,0).reinit (n_p, n_u);
-	csp.block(1,1).reinit (n_p, n_p);
-	csp.block(1,2).reinit (n_p, n_T);
-	csp.block(2,0).reinit (n_T, n_u);
-	csp.block(2,1).reinit (n_T, n_p);
-	csp.block(2,2).reinit (n_T, n_T);
+      csp.block(0,0).reinit (n_u, n_u);
+      csp.block(0,1).reinit (n_u, n_p);
+      csp.block(0,2).reinit (n_u, n_T);
+      csp.block(1,0).reinit (n_p, n_u);
+      csp.block(1,1).reinit (n_p, n_p);
+      csp.block(1,2).reinit (n_p, n_T);
+      csp.block(2,0).reinit (n_T, n_u);
+      csp.block(2,1).reinit (n_T, n_p);
+      csp.block(2,2).reinit (n_T, n_T);
       
-	csp.collect_sizes ();
+      csp.collect_sizes ();
       
-	DoFTools::make_sparsity_pattern (dof_handler, csp);
-	hanging_node_constraints.condense (csp);
-	sparsity_pattern.copy_from (csp);
+      DoFTools::make_sparsity_pattern (dof_handler, csp);
+      hanging_node_constraints.condense (csp);
+      sparsity_pattern.copy_from (csp);
 
-	system_matrix.reinit (sparsity_pattern);
-      }
-      
-      {
-	scalar_velocity_system_matrix.clear ();
-
-	CompressedSetSparsityPattern csp (scalar_velocity_dof_handler.n_dofs(),
-					  scalar_velocity_dof_handler.n_dofs());      
-	DoFTools::make_sparsity_pattern (scalar_velocity_dof_handler, csp);
-	scalar_velocity_hanging_node_constraints.condense (csp);
-	scalar_velocity_sparsity_pattern.copy_from (csp);
-
-	scalar_velocity_system_matrix.reinit (scalar_velocity_sparsity_pattern);
-      }
+      system_matrix.reinit (sparsity_pattern);
     }
-  
-  {
-    InterGridMap<DoFHandler<dim> > scalar_to_vector;
-    scalar_to_vector.make_mapping (scalar_velocity_dof_handler,
-				   dof_handler);
-    std::vector<unsigned int>
-      cell_dof_indices (fe.dofs_per_cell),
-      scalar_velocity_cell_dof_indices (scalar_velocity_fe.dofs_per_cell);
-  
-    for (unsigned int component=0; component<dim; ++component)
-      {
-	scalar_to_vector_velocities[component].resize (scalar_velocity_dof_handler.n_dofs());
-	std::fill (scalar_to_vector_velocities[component].begin(),
-		   scalar_to_vector_velocities[component].end(),
-		   numbers::invalid_unsigned_int);
-
-	for (typename DoFHandler<dim>::active_cell_iterator
-	       cell = scalar_velocity_dof_handler.begin_active();
-	     cell != scalar_velocity_dof_handler.end();
-	     ++cell)
-	  {
-	    cell->get_dof_indices (scalar_velocity_cell_dof_indices);
-	    scalar_to_vector[cell]->get_dof_indices (cell_dof_indices);
-
-	    for (unsigned int i=0; i<scalar_velocity_fe.dofs_per_cell; ++i)
-	      scalar_to_vector_velocities[component][scalar_velocity_cell_dof_indices[i]]
-		= cell_dof_indices[fe.component_to_system_index(component, i)];
-	  }
-
-	Assert (std::find (scalar_to_vector_velocities[component].begin(),
-			   scalar_to_vector_velocities[component].end(),
-			   numbers::invalid_unsigned_int)
-		== scalar_to_vector_velocities[component].end(),
-		ExcInternalError());
-      }
-  }
-  
 
 				 // As last action in this function,
 				 // we need to set the vectors
@@ -1249,25 +1173,7 @@ void BoussinesqFlowProblem<dim>::assemble_system ()
 
       std::cout << "   Rebuilding preconditioner..." << std::flush;
 
-      MatrixTools::create_laplace_matrix (scalar_velocity_dof_handler,
-					  QGauss<dim> (degree+1),
-					  scalar_velocity_system_matrix);
-      scalar_velocity_hanging_node_constraints.condense (scalar_velocity_system_matrix);
-      {
-	std::map<unsigned int,double> boundary_values;
-	VectorTools::interpolate_boundary_values (scalar_velocity_dof_handler,
-						  0,
-						  ZeroFunction<dim>(),
-						  boundary_values);
-	Vector<double> dummy (scalar_velocity_dof_handler.n_dofs());
-	MatrixTools::apply_boundary_values (boundary_values,
-					    scalar_velocity_system_matrix,
-					    dummy,
-					    dummy);
-      }
-      
-      
-      A_preconditioner
+     A_preconditioner
 	= boost::shared_ptr<typename InnerPreconditioner<dim>::type>
 		(new typename InnerPreconditioner<dim>::type());
       A_preconditioner->initialize (system_matrix.block(0,0),
