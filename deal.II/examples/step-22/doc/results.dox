@@ -347,7 +347,10 @@ Nevertheless, it has to be remarked that an indefinite system as the one
 at hand puts indeed much higher
 demands on the linear algebra than standard elliptic problems as we have seen
 in the early tutorial programs. The improvements are still rather 
-unsatisfactory, if one compares with an elliptic problem of similar size.
+unsatisfactory, if one compares with an elliptic problem of similar
+size. Either way, we will introduce below a number of improvements to the
+linear solver, a discussion that we will re-consider again with additional
+options in the @ref step_31 "step-31" program.
 
 <a name="improved-ilu">
 <h5>Better ILU decomposition by smart reordering</h5>
