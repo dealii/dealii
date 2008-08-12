@@ -113,6 +113,7 @@ class BoussinesqFlowProblem
 
   private:
     void setup_dofs (const bool setup_matrices);
+    void assemble_preconditioner ();
     void assemble_system ();
     void assemble_rhs_T ();
     double get_maximal_velocity () const;
@@ -130,6 +131,7 @@ class BoussinesqFlowProblem
 
     BlockSparsityPattern      sparsity_pattern;
     BlockSparseMatrix<double> system_matrix;
+    BlockSparseMatrix<double> preconditioner_matrix;
 
     double time_step;
     unsigned int timestep_number;
@@ -733,6 +735,7 @@ void BoussinesqFlowProblem<dim>::setup_dofs (const bool setup_matrices)
   if (setup_matrices == true)
     {
       system_matrix.clear ();
+      preconditioner_matrix.clear ();
 
       BlockCompressedSetSparsityPattern csp (3,3);
  
@@ -747,12 +750,15 @@ void BoussinesqFlowProblem<dim>::setup_dofs (const bool setup_matrices)
       csp.block(2,2).reinit (n_T, n_T);
       
       csp.collect_sizes ();
-      
+
+				       // TODO: only build entries
+				       // that we really need
       DoFTools::make_sparsity_pattern (dof_handler, csp);
       hanging_node_constraints.condense (csp);
       sparsity_pattern.copy_from (csp);
 
       system_matrix.reinit (sparsity_pattern);
+      preconditioner_matrix.reinit (sparsity_pattern);
     }
 
 				 // As last action in this function,
@@ -781,6 +787,74 @@ void BoussinesqFlowProblem<dim>::setup_dofs (const bool setup_matrices)
   system_rhs.block(1).reinit (n_p);
   system_rhs.block(2).reinit (n_T);
   system_rhs.collect_sizes ();
+}
+
+
+
+template <int dim>
+double scalar_product (const Tensor<2,dim> &t1,
+		       const Tensor<2,dim> &t2)
+{
+  double s = 0;
+  for (unsigned int i=0; i<dim; ++i)
+    for (unsigned int j=0; j<dim; ++j)
+      s += t1[i][j] * t2[i][j];
+  return s;
+}
+
+
+template <int dim>
+void
+BoussinesqFlowProblem<dim>::assemble_preconditioner ()
+{
+  preconditioner_matrix = 0;
+
+  QGauss<dim>   quadrature_formula(degree+2);
+  QGauss<dim-1> face_quadrature_formula(degree+2);
+
+  FEValues<dim> fe_values (fe, quadrature_formula,
+			   update_JxW_values |
+			   update_gradients);
+  const unsigned int   dofs_per_cell   = fe.dofs_per_cell;
+
+  const unsigned int   n_q_points      = quadrature_formula.size();
+
+  FullMatrix<double>   local_matrix (dofs_per_cell, dofs_per_cell);
+  std::vector<unsigned int> local_dof_indices (dofs_per_cell);
+
+  std::vector<Tensor<2,dim> > phi_grad_u (dofs_per_cell);
+
+  const FEValuesExtractors::Vector velocities (0);
+
+  typename DoFHandler<dim>::active_cell_iterator
+    cell = dof_handler.begin_active(),
+    endc = dof_handler.end();
+  for (; cell!=endc; ++cell)
+    {
+      fe_values.reinit (cell);
+      local_matrix = 0;
+
+      for (unsigned int q=0; q<n_q_points; ++q)
+	{
+	  for (unsigned int k=0; k<dofs_per_cell; ++k)
+	    phi_grad_u[k] = fe_values[velocities].gradient(k,q);
+
+	  for (unsigned int i=0; i<dofs_per_cell; ++i)
+	    for (unsigned int j=0; j<dofs_per_cell; ++j)
+	      local_matrix(i,j) += scalar_product (phi_grad_u[i], phi_grad_u[j])
+				   * fe_values.JxW(q);
+	}
+
+      cell->get_dof_indices (local_dof_indices);
+
+      for (unsigned int i=0; i<dofs_per_cell; ++i)
+	for (unsigned int j=0; j<dofs_per_cell; ++j)
+	  preconditioner_matrix.add (local_dof_indices[i],
+				     local_dof_indices[j],
+				     local_matrix(i,j));
+    }
+  
+  hanging_node_constraints.condense (preconditioner_matrix);
 }
 
 
@@ -1173,10 +1247,12 @@ void BoussinesqFlowProblem<dim>::assemble_system ()
 
       std::cout << "   Rebuilding preconditioner..." << std::flush;
 
-     A_preconditioner
+      assemble_preconditioner ();      
+      
+      A_preconditioner
 	= boost::shared_ptr<typename InnerPreconditioner<dim>::type>
 		(new typename InnerPreconditioner<dim>::type());
-      A_preconditioner->initialize (system_matrix.block(0,0),
+      A_preconditioner->initialize (preconditioner_matrix.block(0,0),
 		typename InnerPreconditioner<dim>::type::AdditionalData());
 
       Mp_preconditioner
