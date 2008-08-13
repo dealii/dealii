@@ -225,10 +225,10 @@ TrilinosAmgPreconditioner<dim>::TrilinosAmgPreconditioner(
 		    (*preconditioner_matrix) (row, row_indices[col_counter]);
 		++col_counter;
 	      }
-	    Assert (col_counter == row_lengths[row],
-		    ExcMessage("Filtering out zeros could not "
-			       "be successfully finished!"));
 	  }
+	Assert (col_counter == row_lengths[row],
+		ExcMessage("Filtering out zeros could not "
+			   "be successfully finished!"));
   
 	Matrix->InsertGlobalValues(row, row_lengths[row],
 				   &values[0], &row_indices[0]);
@@ -2138,7 +2138,7 @@ void BoussinesqFlowProblem<dim>::run ()
 
 	GridGenerator::hyper_cube (triangulation);
 
-	triangulation.refine_global (6); 
+	triangulation.refine_global (6);
 
 	break;
       }
