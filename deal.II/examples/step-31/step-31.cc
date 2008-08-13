@@ -1033,6 +1033,7 @@ void BoussinesqFlowProblem<dim>::setup_dofs (const bool setup_matrices)
       sparsity_pattern.copy_from (csp);
 
       system_matrix.reinit (sparsity_pattern);
+      preconditioner_matrix.reinit (sparsity_pattern);
     }
 
 				 // As last action in this function,
@@ -1088,6 +1089,7 @@ BoussinesqFlowProblem<dim>::assemble_preconditioner ()
 
   FEValues<dim> fe_values (fe, quadrature_formula,
 			   update_JxW_values |
+			   update_values |
 			   update_gradients);
   const unsigned int   dofs_per_cell   = fe.dofs_per_cell;
 
@@ -1097,8 +1099,10 @@ BoussinesqFlowProblem<dim>::assemble_preconditioner ()
   std::vector<unsigned int> local_dof_indices (dofs_per_cell);
 
   std::vector<Tensor<2,dim> > phi_grad_u (dofs_per_cell);
+  std::vector<double>         phi_p      (dofs_per_cell);
 
   const FEValuesExtractors::Vector velocities (0);
+  const FEValuesExtractors::Scalar pressure (dim);
 
   typename DoFHandler<dim>::active_cell_iterator
     cell = dof_handler.begin_active(),
@@ -1111,11 +1115,16 @@ BoussinesqFlowProblem<dim>::assemble_preconditioner ()
       for (unsigned int q=0; q<n_q_points; ++q)
 	{
 	  for (unsigned int k=0; k<dofs_per_cell; ++k)
-	    phi_grad_u[k] = fe_values[velocities].gradient(k,q);
-
+	    {
+	      phi_grad_u[k] = fe_values[velocities].gradient(k,q);
+	      phi_p[k]      = fe_values[pressure].value (k, q);
+	    }
+	  
 	  for (unsigned int i=0; i<dofs_per_cell; ++i)
 	    for (unsigned int j=0; j<dofs_per_cell; ++j)
-	      local_matrix(i,j) += scalar_product (phi_grad_u[i], phi_grad_u[j])
+	      local_matrix(i,j) += (scalar_product (phi_grad_u[i], phi_grad_u[j])
+				    +
+				    phi_p[i] * phi_p[j])
 				   * fe_values.JxW(q);
 	}
 
@@ -1364,7 +1373,6 @@ void BoussinesqFlowProblem<dim>::assemble_system ()
 		  local_matrix(i,j) += (phi_grads_u[i] * phi_grads_u[j]
 					- div_phi_u[i] * phi_p[j]
 					- phi_p[i] * div_phi_u[j]
-					+ phi_p[i] * phi_p[j]
 					+ phi_T[i] * phi_T[j])
 				       * fe_values.JxW(q);
 
@@ -1522,7 +1530,6 @@ void BoussinesqFlowProblem<dim>::assemble_system ()
 
       std::cout << "   Rebuilding preconditioner..." << std::flush;
       
-      preconditioner_matrix.reinit (sparsity_pattern);
       assemble_preconditioner ();
       
       /*A_preconditioner
@@ -1537,18 +1544,17 @@ void BoussinesqFlowProblem<dim>::assemble_system ()
 					      preconditioner_matrix.block(0,0),
 					      true));
 
+				       // TODO: we could throw away the (0,0)
+				       // block here since things have been
+				       // copied over to Trilinos. we need to
+				       // keep the (1,1) block, though
+      
       Mp_preconditioner
 	= boost::shared_ptr<SparseILU<double> >
 		(new SparseILU<double>);
-      Mp_preconditioner->initialize (system_matrix.block(1,1),
+      Mp_preconditioner->initialize (preconditioner_matrix.block(1,1),
 				     SparseILU<double>::AdditionalData());
       
-				 // Throw away the preconditioner
-				 // matrix since everything has been
-				 // copied to the Epetra objects
-				 // of the preconditioner.
-      preconditioner_matrix.clear ();
-
       std::cout << std::endl;
 
       rebuild_preconditioner = false;
@@ -1932,7 +1938,7 @@ void BoussinesqFlowProblem<dim>::solve ()
 				// Set up inverse matrix for
 				// pressure mass matrix
     InverseMatrix<SparseMatrix<double>,SparseILU<double> >
-      mp_inverse (system_matrix.block(1,1), *Mp_preconditioner);
+      mp_inverse (preconditioner_matrix.block(1,1), *Mp_preconditioner);
 
 				// Set up block Schur preconditioner
     /*BlockSchurPreconditioner<typename InnerPreconditioner<dim>::type,
@@ -2138,7 +2144,7 @@ void BoussinesqFlowProblem<dim>::run ()
 
 	GridGenerator::hyper_cube (triangulation);
 
-	triangulation.refine_global (6);
+	triangulation.refine_global (4);
 
 	break;
       }
@@ -2224,7 +2230,7 @@ void BoussinesqFlowProblem<dim>::run ()
 	if (timestep_number % 10 == 0)
 	  refine_mesh ();
     }
-  while (time <= 50);
+  while (time <= 10);
 }
 
 
