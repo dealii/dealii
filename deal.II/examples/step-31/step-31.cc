@@ -177,8 +177,20 @@ TrilinosAmgPreconditioner<dim>::TrilinosAmgPreconditioner(
 		vector_valued_problem (VectorValuedProblem)
 {
   
-				 // Init Epetra Matrix, avoid 
-				 // storing the nonzero elements.
+				 // Init Epetra Matrix. Even though we build
+				 // up the sparsity pattern to only include
+				 // those entries that actually couple, there
+				 // are quite a number of entries in the
+				 // sparse matrix that are actually zero
+				 // (these are at rows or columns that
+				 // correspond to degrees of freedom that are
+				 // either constrained by hanging nodes or by
+				 // boundary values). We avoid copying these
+				 // nonzero elements to the Trilinos matrix to
+				 // keep the preconditioner as compact as
+				 // possible. While this increases the number
+				 // of outer iterations by a tiny bit but
+				 // makes the overall scheme faster.
   {
     Map.reset (new Epetra_Map(n_u, 0, communicator));
     
