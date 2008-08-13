@@ -138,22 +138,16 @@ template <int dim>
 class TrilinosAmgPreconditioner : public Subscriptor
 {
   public:
-    TrilinosAmgPreconditioner (
-	  const DoFHandler<dim>      &DofHandler,
-	  const SparseMatrix<double> &PreconditionerMatrix,
-	  const bool                 VectorValuedProblem);
+    TrilinosAmgPreconditioner ();
+    
+    void initialize (const SparseMatrix<double> &preconditioner_matrix,
+		     const DoFHandler<dim>      &dof_handler,
+		     const std::vector<bool>    &precondition_components);
 
-  void vmult (Vector<double>       &dst,
-              const Vector<double> &src) const;
+    void vmult (Vector<double>       &dst,
+		const Vector<double> &src) const;
 
   private:
-    const DoFHandler<dim>      *dof_handler;
-    const SparseMatrix<double> *preconditioner_matrix;
-    const SparsityPattern      *sparsity_pattern;
-
-    const unsigned int n_u;
-    
-    const bool vector_valued_problem;
     
     ML_Epetra::MultiLevelPreconditioner* ml_precond;
     
@@ -164,33 +158,22 @@ class TrilinosAmgPreconditioner : public Subscriptor
 
 
 template <int dim>
-TrilinosAmgPreconditioner<dim>::TrilinosAmgPreconditioner(
-		const DoFHandler<dim>       &DofHandler,
-		const SparseMatrix<double>  &PreconditionerMatrix,
-		const bool                  VectorValuedProblem
+TrilinosAmgPreconditioner<dim>::TrilinosAmgPreconditioner ()
+{}
+
+template <int dim>
+void TrilinosAmgPreconditioner<dim>::initialize (
+		const SparseMatrix<double>  &preconditioner_matrix,
+		const DoFHandler<dim>       &dof_handler,
+		const std::vector<bool>     &precondition_components
 		)
-		:
-		dof_handler           (&DofHandler),
-		preconditioner_matrix (&PreconditionerMatrix),
-		sparsity_pattern      (&preconditioner_matrix->get_sparsity_pattern()),
-		n_u                   (preconditioner_matrix->m()),
-		vector_valued_problem (VectorValuedProblem)
 {
+  unsigned int n_u = preconditioner_matrix.m();
+  const SparsityPattern *sparsity_pattern = 
+      &(preconditioner_matrix.get_sparsity_pattern());
   
-				 // Init Epetra Matrix. Even though we build
-				 // up the sparsity pattern to only include
-				 // those entries that actually couple, there
-				 // are quite a number of entries in the
-				 // sparse matrix that are actually zero
-				 // (these are at rows or columns that
-				 // correspond to degrees of freedom that are
-				 // either constrained by hanging nodes or by
-				 // boundary values). We avoid copying these
-				 // nonzero elements to the Trilinos matrix to
-				 // keep the preconditioner as compact as
-				 // possible. While this increases the number
-				 // of outer iterations by a tiny bit but
-				 // makes the overall scheme faster.
+				 // Init Epetra Matrix, avoid 
+				 // storing the nonzero elements.
   {
     Map.reset (new Epetra_Map(n_u, 0, communicator));
     
@@ -203,7 +186,7 @@ TrilinosAmgPreconditioner<dim>::TrilinosAmgPreconditioner(
 	for (unsigned int col=0; col<temporary_row_length; ++col)
 	  {
 	    unsigned int col_index = sparsity_pattern->column_number (row, col);
-	    if (std::abs((*preconditioner_matrix) (row, col_index)) > 1e-15)
+	    if (std::abs(preconditioner_matrix (row, col_index)) > 1e-13)
 	      local_length += 1;
 	  }
 	row_lengths[row] = local_length;
@@ -225,22 +208,22 @@ TrilinosAmgPreconditioner<dim>::TrilinosAmgPreconditioner(
 	row_indices.resize (row_lengths[row], 0);
 	values.resize (row_lengths[row], 0.);
   
-	int col_counter = 0;
+	unsigned int col_counter = 0;
 	for (unsigned int col=0; col<temporary_row_length; ++col)
 	  {
 	    unsigned int col_index = sparsity_pattern->column_number (row, col);
-	    if (std::abs((*preconditioner_matrix) (row, col_index)) > 1e-15)
+	    if (std::abs(preconditioner_matrix (row, col_index)) > 1e-13)
 	      {
 		row_indices[col_counter] = 
 		    sparsity_pattern->column_number (row, col);
 		values[col_counter] = 
-		    (*preconditioner_matrix) (row, row_indices[col_counter]);
+		    preconditioner_matrix (row, row_indices[col_counter]);
 		++col_counter;
 	      }
 	  }
 	Assert (col_counter == row_lengths[row],
 		ExcMessage("Filtering out zeros could not "
-			   "be successfully finished!"));
+			    "be successfully finished!"));
   
 	Matrix->InsertGlobalValues(row, row_lengths[row],
 				   &values[0], &row_indices[0]);
@@ -270,52 +253,80 @@ TrilinosAmgPreconditioner<dim>::TrilinosAmgPreconditioner(
 				 // type matrices
   MLList.set("max levels",10);
   MLList.set("increasing or decreasing", "increasing");
-  MLList.set("aggregation: type", "Uncoupled");
-  MLList.set("smoother: type", "symmetric Gauss-Seidel");
-  MLList.set("smoother: sweeps", 1);
+  MLList.set("aggregation: type", "MIS");
+  MLList.set("smoother: type", "Chebyshev");
+  MLList.set("smoother: sweeps", 4);
   MLList.set("smoother: damping factor", 4./3.);
   MLList.set("smoother: pre or post", "both");
   MLList.set("coarse: type","Amesos-KLU");
   
-				 // Build null space, i.e. build dim vectors
+  unsigned int n_total_components = precondition_components.size();
+  Assert (n_total_components == dof_handler.get_fe().n_components(),
+	  ExcDimensionMismatch (n_total_components,
+				dof_handler.get_fe().n_components() ) );
+  
+  unsigned int n_precondition_components = 0;
+  for (unsigned int counter = 0; counter < n_total_components; ++counter)
+    n_precondition_components += precondition_components[counter];
+  
+				 // Build null space, i.e. build
+				 // n_preconditioner_components vectors
 				 // of ones in each velocity component.
-  if (vector_valued_problem)
+  std::vector<double> null_vectors (n_precondition_components * n_u, 0.);
+    
+  if (n_precondition_components > 1)
     {
-      std::vector<double> null_vectors (dim * n_u, 0.);
-      {
-	unsigned int n_ud = n_u/dim;
-	Assert (n_ud * dim == n_u,
-	    ExcMessage("Cannot find portions of single velocity components!"));
-	
-	std::vector<bool> velocity_d_dofs (dof_handler->n_dofs(), false);
-	std::vector<bool> velocity_mask (dim + 2, false);
-	for (unsigned int d=0; d<dim; d++)
-	  {
-	    velocity_mask[d] = true;
-	    DoFTools::extract_dofs(*dof_handler, velocity_mask, 
-				    velocity_d_dofs);
-	    velocity_mask[d] = false;
-	    
-	    unsigned int counter = 0;
-	    for (unsigned int i=0; i<dof_handler->n_dofs(); ++i)
-	      {
-		if (velocity_d_dofs[i])
-		  {
-		    Assert(i < n_u,
-			    ExcMessage("Could not correctly locate velocity "
-				      "dofs in velocity system!"));
-		    null_vectors [d* n_u + i] = 1.;
-		    ++counter;
-		  }
-	      }
-	    Assert (counter == n_ud,
-		    ExcMessage("Failed to extract correct components "
-				"that should consitute null space!"));
-	  }
-	MLList.set("null space: dimension", dim);
-	MLList.set("null space: vectors", &null_vectors[0]);
-	MLList.set("null space: type", "pre-computed");
-      }
+				// TODO: is this n_ud really necessary?
+				// Or does it just bring new difficulties
+				// and confusion into play and limits
+				// the usability?
+      unsigned int n_ud = n_u/n_precondition_components;
+      Assert (n_ud * n_precondition_components == n_u,
+	      ExcMessage("Cannot detect single problem components! "
+			 "No. dofs not the same in all components!"));
+      
+      std::vector<bool> precondition_dof_list (dof_handler.n_dofs(), false);
+      std::vector<bool> precondition_mask (n_total_components, false);
+      unsigned int d = 0;
+      
+      for (unsigned int component=0; component < n_total_components; 
+	    component++)
+	{
+	  if (precondition_components[component])
+	    {
+	      precondition_mask[component] = true;
+	      DoFTools::extract_dofs (dof_handler, precondition_mask, 
+				      precondition_dof_list);
+	      precondition_mask[component] = false;
+
+				// TODO: The current implementation 
+				// assumes that we are working on 
+				// the first components of a system when
+				// writing into the null vector.
+				// Change this to the general case,
+				// probably use something similar as
+				// for block vectors.
+	      unsigned int counter = 0;
+	      for (unsigned int i=0; i<dof_handler.n_dofs(); ++i)
+		{
+		  if (precondition_dof_list[i])
+		    {
+		      Assert(i < n_u,
+			     ExcMessage("Could not correctly locate "
+					"preconditioner dofs in system!"));
+		      null_vectors [d * n_u + i] = 1.;
+		      ++counter;
+		    }
+		}
+	      Assert (counter == n_ud,
+		      ExcMessage("Failed to extract correct components "
+				  "that should consitute null space!"));
+	      ++d;
+	    }
+	}
+      MLList.set("null space: dimension", int(n_precondition_components));
+      MLList.set("null space: vectors", &null_vectors[0]);
+      MLList.set("null space: type", "pre-computed");
     }
 	
   ml_precond = new ML_Epetra::MultiLevelPreconditioner(*Matrix, MLList, true);
@@ -1056,7 +1067,7 @@ void BoussinesqFlowProblem<dim>::setup_dofs (const bool setup_matrices)
 		= {{ 1, 1,   1,  0 },
 		   { 1, 1,   1,  0 },
 		 
-		   { 1, 1,   1,  0 },
+		   { 1, 1,   0,  0 },
 
 		   { 0, 0,   0,  1 }};
 	      for (unsigned int c=0; c<dim+2; ++c)
@@ -1681,9 +1692,15 @@ void BoussinesqFlowProblem<dim>::assemble_system ()
       
       Amg_preconditioner = 
 	boost::shared_ptr<TrilinosAmgPreconditioner<dim> >
-	  (new TrilinosAmgPreconditioner<dim>(dof_handler,
-					      preconditioner_matrix.block(0,0),
-					      true));
+	  (new TrilinosAmgPreconditioner<dim>());
+      
+      std::vector<bool> prec_comp(dof_handler.get_fe().n_components(), false);
+      for (unsigned int component=0; component < dim; ++component)
+	prec_comp[component] = true;
+	
+      Amg_preconditioner->initialize(preconditioner_matrix.block(0,0),
+				     dof_handler,
+				     prec_comp);
 
 				       // TODO: we could throw away the (0,0)
 				       // block here since things have been
@@ -2285,7 +2302,7 @@ void BoussinesqFlowProblem<dim>::run ()
 
 	GridGenerator::hyper_cube (triangulation);
 
-	triangulation.refine_global (4);
+	triangulation.refine_global (6); 
 
 	break;
       }
