@@ -1801,7 +1801,7 @@ void BoussinesqFlowProblem<dim>::assemble_rhs_T ()
 							n_face_q_points, 
 							Vector<double>(dim+2));
 
-  std::vector<std::vector<Tensor<1,dim> > >  present_solution_grads(
+  std::vector<std::vector<Tensor<1,dim> > >  old_solution_grads(
 				  n_q_points,
 				  std::vector<Tensor<1,dim> >(dim+2));
 
@@ -1829,35 +1829,26 @@ void BoussinesqFlowProblem<dim>::assemble_rhs_T ()
       fe_values.reinit (cell);
 
       fe_values.get_function_values (old_solution, old_solution_values);
+      fe_values.get_function_gradients (old_solution, old_solution_grads);
       fe_values.get_function_values (solution, present_solution_values);
-      fe_values.get_function_gradients (solution, present_solution_grads);
 
       for (unsigned int q=0; q<n_q_points; ++q)
         for (unsigned int i=0; i<dofs_per_cell; ++i)
           {
-            const double old_T = old_solution_values[q](dim+1);
+            const double        old_T      = old_solution_values[q](dim+1);
+	    const Tensor<1,dim> old_grad_T = old_solution_grads[q][dim+1];
+	    
             Tensor<1,dim> present_u;
             for (unsigned int d=0; d<dim; ++d)
               present_u[d] = present_solution_values[q](d);
 
-	    double present_div_u = 0;
-            for (unsigned int d=0; d<dim; ++d)
-              present_div_u += present_solution_grads[q][d][d];
-
-            const double        phi_i_T      = fe_values[temperature].value (i, q);
-            const Tensor<1,dim> grad_phi_i_T = fe_values[temperature].gradient (i, q);
-
+            const double     phi_i_T      = fe_values[temperature].value (i, q);
 	    const Point<dim> p = fe_values.quadrature_point(q);
 
-            local_rhs(i) += (time_step *
-                             old_T *
-                             (present_u *
-			      grad_phi_i_T
-			      +
-			      present_div_u *
-			      phi_i_T)
-                             +
-                             old_T * phi_i_T
+            local_rhs(i) += (old_T * phi_i_T
+			     -
+			     time_step *
+                             present_u * old_grad_T * phi_i_T
 			     +
 			     time_step *
 			     RightHandSide<dim>().value (p, dim+1)
