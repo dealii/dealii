@@ -566,16 +566,27 @@ double
 RightHandSide<dim>::value (const Point<dim>  &p,
                            const unsigned int component) const
 {
+				   // the right hand side only acts on the
+				   // temperature component
   if (component == dim+1)
-    return ((p.distance (Point<dim>(.3,.1)) < 1./32)
-	    ||
-	    (p.distance (Point<dim>(.45,.1)) < 1./32)
-	    ||
-	    (p.distance (Point<dim>(.75,.1)) < 1./32)
-	    ?
-	    1
-	    :
-	    0);
+    {
+      static const Point<dim> source_centers[3]
+	= { (dim == 2 ? Point<dim>(.3,.1) : Point<dim>(.3,.5,.1)),
+	    (dim == 2 ? Point<dim>(.45,.1) : Point<dim>(.45,.5,.1)),
+	    (dim == 2 ? Point<dim>(.75,.1) : Point<dim>(.75,.5,.1)) };
+      static const double source_radius
+	= (dim == 2 ? 1./32 : 1./8);
+      
+      return ((source_centers[0].distance (p) < source_radius)
+	      ||
+	      (source_centers[1].distance (p) < source_radius)
+	      ||
+	      (source_centers[2].distance (p) < source_radius)
+	      ?
+	      1
+	      :
+	      0);
+    }
   else
     return 0;
 }
