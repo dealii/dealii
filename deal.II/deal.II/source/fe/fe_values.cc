@@ -1150,6 +1150,9 @@ FEValuesBase<dim>::memory_consumption () const
 	  MemoryConsumption::memory_consumption (this->shape_gradients) +
 	  MemoryConsumption::memory_consumption (this->shape_hessians) +
 	  MemoryConsumption::memory_consumption (this->JxW_values) +
+	  MemoryConsumption::memory_consumption (this->jacobians) +
+	  MemoryConsumption::memory_consumption (this->jacobian_grads) +
+	  MemoryConsumption::memory_consumption (this->inverse_jacobians) +
 	  MemoryConsumption::memory_consumption (this->quadrature_points) +
 	  MemoryConsumption::memory_consumption (this->normal_vectors) +
 	  MemoryConsumption::memory_consumption (this->boundary_forms) +
