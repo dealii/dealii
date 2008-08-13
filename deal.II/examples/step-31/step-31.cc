@@ -387,6 +387,8 @@ class BoussinesqFlowProblem
 
     BlockSparsityPattern      sparsity_pattern;
     BlockSparseMatrix<double> system_matrix;
+
+    BlockSparsityPattern      preconditioner_sparsity_pattern;
     BlockSparseMatrix<double> preconditioner_matrix;
 
     double time_step;
@@ -999,81 +1001,157 @@ void BoussinesqFlowProblem<dim>::setup_dofs (const bool setup_matrices)
 				 // the sparsity pattern.
   if (setup_matrices == true)
     {
-      system_matrix.clear ();
-      preconditioner_matrix.clear ();
+      {
+	system_matrix.clear ();
 
-      BlockCompressedSetSparsityPattern csp (3,3);
+	BlockCompressedSetSparsityPattern csp (3,3);
  
-      csp.block(0,0).reinit (n_u, n_u);
-      csp.block(0,1).reinit (n_u, n_p);
-      csp.block(0,2).reinit (n_u, n_T);
-      csp.block(1,0).reinit (n_p, n_u);
-      csp.block(1,1).reinit (n_p, n_p);
-      csp.block(1,2).reinit (n_p, n_T);
-      csp.block(2,0).reinit (n_T, n_u);
-      csp.block(2,1).reinit (n_T, n_p);
-      csp.block(2,2).reinit (n_T, n_T);
+	csp.block(0,0).reinit (n_u, n_u);
+	csp.block(0,1).reinit (n_u, n_p);
+	csp.block(0,2).reinit (n_u, n_T);
+	csp.block(1,0).reinit (n_p, n_u);
+	csp.block(1,1).reinit (n_p, n_p);
+	csp.block(1,2).reinit (n_p, n_T);
+	csp.block(2,0).reinit (n_T, n_u);
+	csp.block(2,1).reinit (n_T, n_p);
+	csp.block(2,2).reinit (n_T, n_T);
       
-      csp.collect_sizes ();
+	csp.collect_sizes ();
 
-      Table<2,DoFTools::Coupling> coupling (dim+2, dim+2);
+	Table<2,DoFTools::Coupling> coupling (dim+2, dim+2);
 
-				       // build the sparsity pattern. note
-				       // that all dim velocities couple with
-				       // each other and with the pressures,
-				       // but that not all of the other
-				       // components couple:
-      switch (dim)
-	{
-	  case 2:
+					 // build the sparsity pattern. note
+					 // that all dim velocities couple with
+					 // each other and with the pressures,
+					 // but that not all of the other
+					 // components couple:
+	switch (dim)
 	  {
-	    static const bool coupling_matrix[4][4]
-	      = {{ 1, 1,   1,  0 },
-		 { 1, 1,   1,  0 },
+	    case 2:
+	    {
+	      static const bool coupling_matrix[4][4]
+		= {{ 1, 1,   1,  0 },
+		   { 1, 1,   1,  0 },
 		 
-		 { 1, 1,   1,  0 },
+		   { 1, 1,   1,  0 },
 
-		 { 0, 0,   0,  1 }};
-	    for (unsigned int c=0; c<dim+2; ++c)
-	      for (unsigned int d=0; d<dim+2; ++d)
-		if (coupling_matrix[c][d] == true)
-		  coupling[c][d] = DoFTools::always;
-		else
-		  coupling[c][d] = DoFTools::none;
+		   { 0, 0,   0,  1 }};
+	      for (unsigned int c=0; c<dim+2; ++c)
+		for (unsigned int d=0; d<dim+2; ++d)
+		  if (coupling_matrix[c][d] == true)
+		    coupling[c][d] = DoFTools::always;
+		  else
+		    coupling[c][d] = DoFTools::none;
 
-	    break;
-	  }
+	      break;
+	    }
 
-	  case 3:
-	  {
-	    static const bool coupling_matrix[5][5]
-	      = {{ 1, 1, 1,   1,  0 },
-		 { 1, 1, 1,   1,  0 },
-		 { 1, 1, 1,   1,  0 },
+	    case 3:
+	    {
+	      static const bool coupling_matrix[5][5]
+		= {{ 1, 1, 1,   1,  0 },
+		   { 1, 1, 1,   1,  0 },
+		   { 1, 1, 1,   1,  0 },
 		 
-		 { 1, 1, 1,   0,  0 },
+		   { 1, 1, 1,   0,  0 },
 
-		 { 0, 0, 0,   0,  1 }};
-	    for (unsigned int c=0; c<dim+2; ++c)
-	      for (unsigned int d=0; d<dim+2; ++d)
-		if (coupling_matrix[c][d] == true)
-		  coupling[c][d] = DoFTools::always;
-		else
-		  coupling[c][d] = DoFTools::none;
+		   { 0, 0, 0,   0,  1 }};
+	      for (unsigned int c=0; c<dim+2; ++c)
+		for (unsigned int d=0; d<dim+2; ++d)
+		  if (coupling_matrix[c][d] == true)
+		    coupling[c][d] = DoFTools::always;
+		  else
+		    coupling[c][d] = DoFTools::none;
 
-	    break;
-	  }
+	      break;
+	    }
 
-	  default:
-		Assert (false, ExcNotImplemented());
-	} 
+	    default:
+		  Assert (false, ExcNotImplemented());
+	  } 
       
-      DoFTools::make_sparsity_pattern (dof_handler, coupling, csp);
-      hanging_node_constraints.condense (csp);
-      sparsity_pattern.copy_from (csp);
+	DoFTools::make_sparsity_pattern (dof_handler, coupling, csp);
+	hanging_node_constraints.condense (csp);
+	sparsity_pattern.copy_from (csp);
 
-      system_matrix.reinit (sparsity_pattern);
-      preconditioner_matrix.reinit (sparsity_pattern);
+	system_matrix.reinit (sparsity_pattern);
+      }
+
+      {
+	preconditioner_matrix.clear ();
+
+	BlockCompressedSetSparsityPattern csp (3,3);
+ 
+	csp.block(0,0).reinit (n_u, n_u);
+	csp.block(0,1).reinit (n_u, n_p);
+	csp.block(0,2).reinit (n_u, n_T);
+	csp.block(1,0).reinit (n_p, n_u);
+	csp.block(1,1).reinit (n_p, n_p);
+	csp.block(1,2).reinit (n_p, n_T);
+	csp.block(2,0).reinit (n_T, n_u);
+	csp.block(2,1).reinit (n_T, n_p);
+	csp.block(2,2).reinit (n_T, n_T);
+      
+	csp.collect_sizes ();
+
+	Table<2,DoFTools::Coupling> coupling (dim+2, dim+2);
+
+					 // build the sparsity pattern. note
+					 // that all dim velocities couple with
+					 // each other and with the pressures,
+					 // but that not all of the other
+					 // components couple:
+	switch (dim)
+	  {
+	    case 2:
+	    {
+	      static const bool coupling_matrix[4][4]
+		= {{ 1, 0,   0,  0 },
+		   { 0, 1,   0,  0 },
+		 
+		   { 0, 0,   1,  0 },
+
+		   { 0, 0,   0,  0 }};
+	      for (unsigned int c=0; c<dim+2; ++c)
+		for (unsigned int d=0; d<dim+2; ++d)
+		  if (coupling_matrix[c][d] == true)
+		    coupling[c][d] = DoFTools::always;
+		  else
+		    coupling[c][d] = DoFTools::none;
+
+	      break;
+	    }
+
+	    case 3:
+	    {
+	      static const bool coupling_matrix[5][5]
+		= {{ 1, 0, 0,   0,  0 },
+		   { 0, 1, 0,   0,  0 },
+		   { 0, 0, 1,   0,  0 },
+		 
+		   { 0, 0, 0,   1,  0 },
+
+		   { 0, 0, 0,   0,  0 }};
+	      for (unsigned int c=0; c<dim+2; ++c)
+		for (unsigned int d=0; d<dim+2; ++d)
+		  if (coupling_matrix[c][d] == true)
+		    coupling[c][d] = DoFTools::always;
+		  else
+		    coupling[c][d] = DoFTools::none;
+
+	      break;
+	    }
+
+	    default:
+		  Assert (false, ExcNotImplemented());
+	  } 
+      
+	DoFTools::make_sparsity_pattern (dof_handler, coupling, csp);
+	hanging_node_constraints.condense (csp);
+	preconditioner_sparsity_pattern.copy_from (csp);
+
+	preconditioner_matrix.reinit (preconditioner_sparsity_pattern);
+      }
     }
 
 				 // As last action in this function,
