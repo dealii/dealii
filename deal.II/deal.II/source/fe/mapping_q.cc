@@ -307,7 +307,8 @@ MappingQ<dim>::fill_fe_values (const typename Triangulation<dim>::cell_iterator 
 			       std::vector<Point<dim> >             &quadrature_points,
 			       std::vector<double>                  &JxW_values,
 			       std::vector<Tensor<2,dim> >          &jacobians,
-			       std::vector<Tensor<3,dim> >          &jacobian_grads) const
+			       std::vector<Tensor<3,dim> >          &jacobian_grads,
+			       std::vector<Tensor<2,dim> >          &inverse_jacobians) const
 {
 				   // convert data object to internal
 				   // data for this class. fails with
@@ -334,7 +335,7 @@ MappingQ<dim>::fill_fe_values (const typename Triangulation<dim>::cell_iterator 
   
   MappingQ1<dim>::fill_fe_values(cell, q, *p_data,
 				 quadrature_points, JxW_values,
-				 jacobians, jacobian_grads);
+				 jacobians, jacobian_grads, inverse_jacobians);
 }
 
 

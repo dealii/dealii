@@ -233,7 +233,8 @@ class MappingQ : public MappingQ1<dim>
 		    typename std::vector<Point<dim> >             &quadrature_points,
 		    std::vector<double>                  &JxW_values,
 		    std::vector<Tensor<2,dim> >          &jacobians,
-		    std::vector<Tensor<3,dim> >          &jacobian_grads) const ;
+		    std::vector<Tensor<3,dim> >          &jacobian_grads,
+		    std::vector<Tensor<2,dim> >          &inverse_jacobians) const ;
 
 				     /**
 				      * Implementation of the interface in

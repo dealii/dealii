@@ -484,9 +484,11 @@ class Mapping : public Subscriptor
 				      * matrices needed to transform
 				      * vector-valued functions,
 				      * namely
-				      * @p jacobians
-				      * and the derivatives
-				      * @p jacobian_grads.
+				      * @p jacobians,
+				      * the derivatives
+				      * @p jacobian_grads,
+				      * and the inverse operations in
+				      * @p inverse_jacobians.
 				      */
     virtual void
     fill_fe_values (const typename Triangulation<dim>::cell_iterator &cell,
@@ -495,7 +497,8 @@ class Mapping : public Subscriptor
 		    std::vector<Point<dim> >                      &quadrature_points,
 		    std::vector<double>                           &JxW_values,
 		    std::vector<Tensor<2,dim> >                   &jacobians,
-		    std::vector<Tensor<3,dim> >                   &jacobian_grads) const = 0;
+		    std::vector<Tensor<3,dim> >                   &jacobian_grads,
+		    std::vector<Tensor<2,dim> >                   &inverse_jacobians) const = 0;
 
 				     /**
 				      * Performs the same as @p fill_fe_values

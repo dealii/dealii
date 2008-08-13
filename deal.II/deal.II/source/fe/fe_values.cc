@@ -314,6 +314,9 @@ FEValuesData<dim>::initialize (const unsigned int        n_quadrature_points,
   if (flags & update_jacobian_grads)
     this->jacobian_grads.resize(n_quadrature_points);
 
+  if (flags & update_inverse_jacobians)
+    this->inverse_jacobians.resize(n_quadrature_points);
+
   if (flags & update_boundary_forms)
     this->boundary_forms.resize(n_quadrature_points);
 
@@ -1386,7 +1389,8 @@ void FEValues<dim>::do_reinit ()
 				     this->quadrature_points,
 				     this->JxW_values,
 				     this->jacobians,
-				     this->jacobian_grads);
+				     this->jacobian_grads,
+				     this->inverse_jacobians);
   
   this->get_fe().fill_fe_values(this->get_mapping(),
 				*this->present_cell,

@@ -303,7 +303,8 @@ fill_fe_values (const typename Triangulation<dim>::cell_iterator& cell,
                 std::vector<Point<dim> >& quadrature_points,
                 std::vector<double>& JxW_values,
 		std::vector<Tensor<2,dim> >& jacobians,
-		std::vector<Tensor<3,dim> >& jacobian_grads) const
+		std::vector<Tensor<3,dim> >& jacobian_grads,
+		std::vector<Tensor<2,dim> >& inverse_jacobians) const
 {
 				   // convert data object to internal
 				   // data for this class. fails with
@@ -346,6 +347,16 @@ fill_fe_values (const typename Triangulation<dim>::cell_iterator& cell,
   if (data.current_update_flags() & update_jacobian_grads)
     for (unsigned int i=0; i<jacobian_grads.size();++i)
       jacobian_grads[i]=Tensor<3,dim>();
+				   // "compute" inverse Jacobian at the 
+				   // quadrature points, which are all 
+				   // the same
+  if (data.current_update_flags() & update_inverse_jacobians)
+    for (unsigned int i=0; i<inverse_jacobians.size();++i)
+      {
+	inverse_jacobians[i]=Tensor<2,dim>();
+	for (unsigned int j=0; j<dim; ++j)
+	  inverse_jacobians[j][j]=1./data.length[j];
+      }
 }
 
 

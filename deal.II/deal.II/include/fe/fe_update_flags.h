@@ -165,6 +165,15 @@ enum UpdateFlags
 					* transformation.
 					*/
       update_jacobian_grads               = 0x0100,
+				       //! Volume element
+				       /**
+					* Compute the inverse 
+				        * Jacobian of the
+					* transformation from the
+					* reference cell to the real
+					* cell.
+					*/
+      update_inverse_jacobians            = 0x0200,
 				       //! Covariant transformation
 				       /**
 					* Compute all values the
@@ -174,9 +183,9 @@ enum UpdateFlags
 					* mappings like
 					* MappingCartesian this may be
 					* simpler than
-					* #update_jacobians.
+					* #update_inverse_jacobians.
 					*/
-      update_covariant_transformation     = 0x0200,
+      update_covariant_transformation     = 0x0400,
 				       //! Contravariant transformation
 				       /**
 					* Compute all values the
@@ -188,14 +197,14 @@ enum UpdateFlags
 					* simpler than
 					* #update_jacobians.
 					*/
-      update_contravariant_transformation = 0x0400,
+      update_contravariant_transformation = 0x0800,
 				       //! Shape function values of transformation
 				       /**
 					* Compute the shape function
 					* values of the transformation
 					* defined by the Mapping.
 					*/
-      update_transformation_values        = 0x0800,
+      update_transformation_values        = 0x1000,
 				       //! Shape function gradients of transformation
 				       /**
 					* Compute the shape function
@@ -203,7 +212,7 @@ enum UpdateFlags
 					* transformation defined by
 					* the Mapping.
 					*/
-      update_transformation_gradients     = 0x1000,
+      update_transformation_gradients     = 0x2000,
 
 				       /**
 					* Compute the JxW values
@@ -214,25 +223,25 @@ enum UpdateFlags
 					* is used in conjunction with
 					* H_div subspaces like RT and ABF.
 					*/
-      update_cell_JxW_values              = 0x2000,
+      update_cell_JxW_values              = 0x4000,
 				       /**
 					* Update the location of the
 					* mapped generalized support
 					* points of the element.
 					*/
-      update_support_points               = 0x4000,
+      update_support_points               = 0x8000,
 				       /**
 					* Update the Jacobian of the
 					* mapping in generalized
 					* support points.
 					*/
-      update_support_jacobians            = 0x8000,
+      update_support_jacobians            = 0x10000,
 				       /**
 					* Update the inverse Jacobian
 					* of the mapping in
 					* generalized support points.
 					*/
-      update_support_inverse_jacobians    = 0x10000,
+      update_support_inverse_jacobians    = 0x20000,
 				       /**
 					* @deprecated Update
 					* quadrature points

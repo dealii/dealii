@@ -343,7 +343,8 @@ MappingQ1<dim>::update_once (const UpdateFlags in) const
 	    | update_boundary_forms
 	    | update_normal_vectors
 	    | update_jacobians
-	    | update_jacobian_grads))
+	    | update_jacobian_grads
+	    | update_inverse_jacobians))
     out |= update_transformation_gradients;
 
   return out;
@@ -365,7 +366,8 @@ MappingQ1<dim>::update_each (const UpdateFlags in) const
 				      | update_boundary_forms
 				      | update_normal_vectors
 				      | update_jacobians
-				      | update_jacobian_grads));
+				      | update_jacobian_grads
+				      | update_inverse_jacobians));
 
 				   // add a few flags. note that some
 				   // flags appear in both conditions
@@ -373,10 +375,10 @@ MappingQ1<dim>::update_each (const UpdateFlags in) const
 				   // operations. this leads to some
 				   // circular logic. the only way to
 				   // treat this is to iterate. since
-				   // there are 3 if-clauses in the
+				   // there are 4 if-clauses in the
 				   // loop, it will take at most 3
 				   // iterations to converge. do them:
-  for (unsigned int i=0; i<3; ++i)
+  for (unsigned int i=0; i<4; ++i)
     {
 				       // The following is a little incorrect:
 				       // If not applied on a face,
@@ -398,6 +400,9 @@ MappingQ1<dim>::update_each (const UpdateFlags in) const
 		 | update_boundary_forms
 		 | update_normal_vectors))
 	out |= update_contravariant_transformation;
+      
+      if (out & (update_inverse_jacobians))
+	out |= update_covariant_transformation;
 
 				       // The contravariant transformation
 				       // is a Piola transformation, which
@@ -672,12 +677,13 @@ MappingQ1<dim>::compute_mapping_support_points(
 template <int dim>
 void
 MappingQ1<dim>::fill_fe_values (const typename Triangulation<dim>::cell_iterator &cell,
-				const Quadrature<dim>                &q,
-				typename Mapping<dim>::InternalDataBase      &mapping_data,
+				const Quadrature<dim>                     &q,
+				typename Mapping<dim>::InternalDataBase   &mapping_data,
 				std::vector<Point<dim> >                  &quadrature_points,
 				std::vector<double>                       &JxW_values,
 				std::vector<Tensor<2,dim> >               &jacobians,
-				std::vector<Tensor<3,dim> >               &jacobian_grads) const
+				std::vector<Tensor<3,dim> >               &jacobian_grads,
+				std::vector<Tensor<2,dim> >               &inverse_jacobians) const
 {
   InternalData *data_ptr = dynamic_cast<InternalData *> (&mapping_data);
   Assert(data_ptr!=0, ExcInternalError());
@@ -733,6 +739,16 @@ MappingQ1<dim>::fill_fe_values (const typename Triangulation<dim>::cell_iterator
 		  += (data.second_derivative(point+DataSetDescriptor::cell (), k)[j][l]
 		      *
 		      data.mapping_support_points[k][i]);
+    }
+				   // copy values from InternalData to vector
+				   // given by reference
+  if (update_flags & update_inverse_jacobians)
+    {      
+      Assert (inverse_jacobians.size() == n_q_points,
+	      ExcDimensionMismatch(inverse_jacobians.size(), n_q_points));
+      for (unsigned int point=0; point<n_q_points; ++point)
+	inverse_jacobians[point]
+	  = transpose(data.covariant[point]);
     }
 }
 

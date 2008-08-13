@@ -562,13 +562,19 @@ class FEValuesData
 				      * quadrature points.
 				      */
     std::vector<Tensor<2,dim> > jacobians;
-    
+
 				     /**
 				      * Array of the derivatives of the Jacobian
 				      * matrices at the quadrature points.
 				      */
     std::vector<Tensor<3,dim> > jacobian_grads;
-    
+
+				     /**
+				      * Array of the inverse Jacobian matrices 
+				      * at the quadrature points.
+				      */
+    std::vector<Tensor<2,dim> > inverse_jacobians;
+
 				     /**
 				      * Store an array of weights
 				      * times the Jacobi determinant
@@ -1633,7 +1639,22 @@ class FEValuesBase : protected FEValuesData<dim>,
 				      * jacobian_grads().
 				      */
     const std::vector<Tensor<3,dim> > & get_jacobian_grads () const;
-    
+
+				     /**
+				      * Return the inverse Jacobian of the
+				      * transformation at the specified
+				      * quadrature point, i.e.
+				      * $J_{ij}=d\hat x_i/dx_j$
+				      */
+    const Tensor<2,dim> & inverse_jacobian (const unsigned int quadrature_point) const;
+
+				     /**
+				      * Pointer to the array holding
+				      * the values returned by 
+				      * inverse_jacobian().
+				      */
+    const std::vector<Tensor<2,dim> > & get_inverse_jacobians () const;
+
 				     /**
 				      * Constant reference to the
 				      * selected mapping object.
@@ -4040,6 +4061,17 @@ FEValuesBase<dim>::get_jacobian_grads () const
 
 template <int dim>
 inline
+const std::vector<Tensor<2,dim> >&
+FEValuesBase<dim>::get_inverse_jacobians () const
+{
+  Assert (this->update_flags & update_inverse_jacobians, ExcAccessToUninitializedField());
+  return this->inverse_jacobians;
+}
+
+
+
+template <int dim>
+inline
 const Point<dim> &
 FEValuesBase<dim>::quadrature_point (const unsigned int i) const
 {
@@ -4087,6 +4119,19 @@ FEValuesBase<dim>::jacobian_grad (const unsigned int i) const
   Assert (i<this->jacobian_grads.size(), ExcIndexRange(i, 0, this->jacobian_grads.size()));
   
   return this->jacobian_grads[i];
+}
+
+
+
+template <int dim>
+inline
+const Tensor<2,dim> &
+FEValuesBase<dim>::inverse_jacobian (const unsigned int i) const
+{
+  Assert (this->update_flags & update_inverse_jacobians, ExcAccessToUninitializedField());
+  Assert (i<this->inverse_jacobians.size(), ExcIndexRange(i, 0, this->inverse_jacobians.size()));
+  
+  return this->inverse_jacobians[i];
 }
 
 
