@@ -67,7 +67,6 @@
 #include <Epetra_CrsMatrix.h>
 #include <Epetra_Vector.h>
 #include <Teuchos_ParameterList.hpp>
-#include <Amesos.h>
 #include <ml_include.h>
 #include <ml_MultiLevelPreconditioner.h>
 
@@ -1589,10 +1588,9 @@ void BoussinesqFlowProblem<dim>::assemble_system ()
 	{
 	  for (unsigned int i=0; i<dofs_per_cell; ++i)
 	    for (unsigned int j=0; j<dofs_per_cell; ++j)
-	      if (std::abs(local_matrix(i,j)) > 1e-20)
-		system_matrix.add (local_dof_indices[i],
-				   local_dof_indices[j],
-				   local_matrix(i,j));
+	      system_matrix.add (local_dof_indices[i],
+				 local_dof_indices[j],
+				 local_matrix(i,j));
 	}
 
       for (unsigned int i=0; i<dofs_per_cell; ++i)
