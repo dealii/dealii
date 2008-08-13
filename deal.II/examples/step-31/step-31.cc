@@ -220,7 +220,7 @@ void TrilinosAmgPreconditioner<dim>::initialize (
 		++col_counter;
 	      }
 	  }
-	Assert (col_counter == row_lengths[row],
+	Assert (col_counter == static_cast<unsigned int>(row_lengths[row]),
 		ExcMessage("Filtering out zeros could not "
 			    "be successfully finished!"));
   
