@@ -1450,8 +1450,6 @@ void BoussinesqFlowProblem<dim>::assemble_system ()
   std::vector<SymmetricTensor<2,dim> > grads_phi_u (dofs_per_cell);
   std::vector<double>                  div_phi_u   (dofs_per_cell);
   std::vector<double>                  phi_p       (dofs_per_cell);
-  std::vector<double>                  phi_T       (dofs_per_cell);
-  std::vector<Tensor<1,dim> >          grad_phi_T  (dofs_per_cell);
 
   const FEValuesExtractors::Vector velocities (0);
   const FEValuesExtractors::Scalar pressure (dim);
@@ -1518,8 +1516,6 @@ void BoussinesqFlowProblem<dim>::assemble_system ()
 		  grads_phi_u[k] = fe_values[velocities].symmetric_gradient(k,q);
 		  div_phi_u[k]   = fe_values[velocities].divergence (k, q);
 		  phi_p[k]       = fe_values[pressure].value (k, q);
-		  phi_T[k]       = fe_values[temperature].value (k, q);
-		  grad_phi_T[k]  = fe_values[temperature].gradient (k, q);
 		}
 	    }
 
@@ -1527,27 +1523,22 @@ void BoussinesqFlowProblem<dim>::assemble_system ()
 	    {
 	      const Tensor<1,dim> phi_i_u = fe_values[velocities].value (i, q);
 
-					       // define viscosity and
-					       // diffusion. for the
-					       // latter, take the
-					       // maximum of what we
-					       // really want and the
-					       // minimal amount of
-					       // diffusion
-					       // (determined
-					       // impirically) to keep
-					       // the scheme stable
-	      const double eta   = 1,
-			   kappa = std::max (5e-4 * cell->diameter(),
-					     1e-6);
-	      
+					       // define viscosity
+	      const double eta = 1;
+
+					       // build Stokes part of
+					       // the matrix. we have
+					       // to rebuild the
+					       // temperature part of
+					       // it in each time step
+					       // due to the fact that
+					       // it depends on the
+					       // time step size
 	      if (rebuild_matrices)
 		for (unsigned int j=0; j<dofs_per_cell; ++j)
 		  local_matrix(i,j) += (eta * grads_phi_u[i] * grads_phi_u[j]
 					- div_phi_u[i] * phi_p[j]
-					- phi_p[i] * div_phi_u[j]
-					+ phi_T[i] * phi_T[j]
-					+ kappa * grad_phi_T[i] * grad_phi_T[j])
+					- phi_p[i] * div_phi_u[j])
 				       * fe_values.JxW(q);
 
 	      const Point<dim> gravity = ( (dim == 2) ? (Point<dim> (0,1)) : 
@@ -1775,7 +1766,8 @@ void BoussinesqFlowProblem<dim>::assemble_rhs_T ()
 				   // TODO: right now, always do explicit
 				   // Euler
   const bool is_first_timestep = (timestep_number == 0 ? true : true);
-  
+
+  system_matrix.block(2,2) = 0;
   
   QGauss<dim>   quadrature_formula(degree+2);
   QGauss<dim-1> face_quadrature_formula(degree+2);
@@ -1788,6 +1780,7 @@ void BoussinesqFlowProblem<dim>::assemble_rhs_T ()
   const unsigned int   n_face_q_points = face_quadrature_formula.size();
 
   Vector<double>       local_rhs (dofs_per_cell);
+  FullMatrix<double>   local_matrix (dofs_per_cell, dofs_per_cell);
 
   std::vector<unsigned int> local_dof_indices (dofs_per_cell);
 
@@ -1816,6 +1809,9 @@ void BoussinesqFlowProblem<dim>::assemble_rhs_T ()
   TemperatureBoundaryValues<dim> temperature_boundary_values;
   const FEValuesExtractors::Scalar temperature (dim+1);
 
+  std::vector<double>                  phi_T       (dofs_per_cell);
+  std::vector<Tensor<1,dim> >          grad_phi_T  (dofs_per_cell);
+  
 				 // Now, let's start the loop
 				 // over all cells in the
 				 // triangulation. The first
@@ -1838,6 +1834,35 @@ void BoussinesqFlowProblem<dim>::assemble_rhs_T ()
       fe_values.get_function_gradients (old_solution, old_solution_grads);
       fe_values.get_function_values (solution, present_solution_values);
 
+				       // build matrix contributions
+      local_matrix = 0;
+
+				       // define diffusion. take the
+				       // maximum of what we really
+				       // want and the minimal amount
+				       // of diffusion (determined
+				       // impirically) to keep the
+				       // scheme stable
+      const double kappa = std::max (5e-4 * cell->diameter(),
+				     1e-6);
+
+      for (unsigned int q=0; q<n_q_points; ++q)
+	{
+	  for (unsigned int k=0; k<dofs_per_cell; ++k)
+	    {
+	      grad_phi_T[k] = fe_values[temperature].gradient(k,q);
+	      phi_T[k]      = fe_values[temperature].value (k, q);
+	    }
+	  
+	  for (unsigned int i=0; i<dofs_per_cell; ++i)
+	    for (unsigned int j=0; j<dofs_per_cell; ++j)
+	      local_matrix(i,j) += (phi_T[i] * phi_T[j]
+				    + kappa * grad_phi_T[i] * grad_phi_T[j])
+				   * fe_values.JxW(q);
+	}
+      
+      
+				       // build rhs contributions
       for (unsigned int q=0; q<n_q_points; ++q)
         for (unsigned int i=0; i<dofs_per_cell; ++i)
           {
@@ -1864,6 +1889,13 @@ void BoussinesqFlowProblem<dim>::assemble_rhs_T ()
           }
 
       cell->get_dof_indices (local_dof_indices);
+
+      for (unsigned int i=0; i<dofs_per_cell; ++i)
+	for (unsigned int j=0; j<dofs_per_cell; ++j)
+	  system_matrix.add (local_dof_indices[i],
+			     local_dof_indices[j],
+			     local_matrix(i,j));
+
       for (unsigned int i=0; i<dofs_per_cell; ++i)
         system_rhs(local_dof_indices[i]) += local_rhs(i);
     }
