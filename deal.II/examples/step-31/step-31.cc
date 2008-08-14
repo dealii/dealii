@@ -1843,8 +1843,8 @@ void BoussinesqFlowProblem<dim>::assemble_rhs_T ()
 				       // of diffusion (determined
 				       // impirically) to keep the
 				       // scheme stable
-      const double kappa = std::max (5e-4 * cell->diameter(),
-				     1e-6);
+      const double kappa = std::max (5e-3 * cell->diameter(),
+				     1e-5);
 
       for (unsigned int q=0; q<n_q_points; ++q)
 	{
@@ -1857,33 +1857,40 @@ void BoussinesqFlowProblem<dim>::assemble_rhs_T ()
 	  const Point<dim> p = fe_values.quadrature_point(q);
 	  const double gamma = RightHandSide<dim>().value (p, dim+1);
 	  
-	  
-	  for (unsigned int i=0; i<dofs_per_cell; ++i)
-	    for (unsigned int j=0; j<dofs_per_cell; ++j)
-	      local_matrix(i,j) += (phi_T[i] * phi_T[j]
-				    + kappa * grad_phi_T[i] * grad_phi_T[j])
-				   * fe_values.JxW(q);
-      
-				       // build rhs contributions
-	  for (unsigned int i=0; i<dofs_per_cell; ++i)
+
+	  if (use_bdf2_scheme == true)
 	    {
-	      const double        old_T      = old_solution_values[q](dim+1);
-	      const Tensor<1,dim> old_grad_T = old_solution_grads[q][dim+1];
+	      Assert (false, ExcNotImplemented());
+	    }
+	  else
+	    {
+	      for (unsigned int i=0; i<dofs_per_cell; ++i)
+		for (unsigned int j=0; j<dofs_per_cell; ++j)
+		  local_matrix(i,j) += (phi_T[i] * phi_T[j]
+					+ kappa * time_step * grad_phi_T[i] * grad_phi_T[j])
+				       * fe_values.JxW(q);
+      
+					       // build rhs contributions
+	      for (unsigned int i=0; i<dofs_per_cell; ++i)
+		{
+		  const double        old_T      = old_solution_values[q](dim+1);
+		  const Tensor<1,dim> old_grad_T = old_solution_grads[q][dim+1];
 	    
-	      Tensor<1,dim> present_u;
-	      for (unsigned int d=0; d<dim; ++d)
-		present_u[d] = present_solution_values[q](d);
+		  Tensor<1,dim> present_u;
+		  for (unsigned int d=0; d<dim; ++d)
+		    present_u[d] = present_solution_values[q](d);
 
 
-	      local_rhs(i) += (old_T * phi_T[i]
-			       -
-			       time_step *
-			       present_u * old_grad_T * phi_T[i]
-			       +
-			       time_step *
-			       gamma * phi_T[i])
-			      *
-			      fe_values.JxW(q);
+		  local_rhs(i) += (old_T * phi_T[i]
+				   -
+				   time_step *
+				   present_u * old_grad_T * phi_T[i]
+				   +
+				   time_step *
+				   gamma * phi_T[i])
+				  *
+				  fe_values.JxW(q);
+		}
 	    }
 	}
       
