@@ -138,8 +138,11 @@ class TrilinosAmgPreconditioner : public Subscriptor
     TrilinosAmgPreconditioner ();
     
     void initialize (const SparseMatrix<double> &preconditioner_matrix,
-		     const DoFHandler<dim>      &dof_handler,
-		     const std::vector<bool>    &precondition_components);
+		     const std::vector<double>  &null_space,
+		     const unsigned int          null_space_dimension,
+		     const bool                  higher_order_elements,
+		     const bool                  elliptic,
+		     const bool                  output_details);
 
     void vmult (Vector<double>       &dst,
 		const Vector<double> &src) const;
@@ -160,9 +163,12 @@ TrilinosAmgPreconditioner<dim>::TrilinosAmgPreconditioner ()
 
 template <int dim>
 void TrilinosAmgPreconditioner<dim>::initialize (
-		const SparseMatrix<double>  &preconditioner_matrix,
-		const DoFHandler<dim>       &dof_handler,
-		const std::vector<bool>     &precondition_components
+		const SparseMatrix<double> &preconditioner_matrix,
+		const std::vector<double>  &null_space,
+		const unsigned int          null_space_dimension,
+		const bool                  elliptic,
+		const bool                  higher_order_elements,
+		const bool                  output_details
 		)
 {
   unsigned int n_u = preconditioner_matrix.m();
@@ -229,106 +235,52 @@ void TrilinosAmgPreconditioner<dim>::initialize (
     Matrix->FillComplete();
   }
   
-				 // And now build the AMG
-				 // preconditioner.
-  const bool output_amg_info = false;
+				 // Build the AMG preconditioner.
   Teuchos::ParameterList MLList;
   
-				 // set default values for 
-				 // smoothed aggregation in MLList,
-				 // the standard choice for elliptic
-				 // (Laplace-type) problems
-  ML_Epetra::SetDefaults("SA",MLList);
+				 // The implementation is able
+				 // to distinguish between
+				 // matrices from elliptic problems
+				 // and convection dominated 
+				 // problems. We use the standard
+				 // options for elliptic problems,
+				 // except that we use a 
+				 // Chebyshev smoother instead
+				 // of a symmetric Gauss-Seidel
+				 // smoother. For most elliptic 
+				 // problems, Chebyshev is better
+				 // than Gauss-Seidel (SSOR).
+  if (elliptic)
+    {
+      ML_Epetra::SetDefaults("SA",MLList);
+      MLList.set("smoother: type", "Chebyshev");
+      MLList.set("smoother: sweeps", 4);
+    }
+  else
+    ML_Epetra::SetDefaults("NSSA",MLList);
   
-  if (output_amg_info)
+  if (output_details)
     MLList.set("ML output", 10);
   else
     MLList.set("ML output", 0);
   
-				 // modify some AMG parameters from default to
-				 // get better performance on FE induced Laplace
-				 // type matrices
-  MLList.set("max levels",10);
-  MLList.set("increasing or decreasing", "increasing");
-  MLList.set("aggregation: type", "MIS");
-  MLList.set("smoother: type", "Chebyshev");
-  MLList.set("smoother: sweeps", 4);
-  MLList.set("smoother: damping factor", 4./3.);
-  MLList.set("smoother: pre or post", "both");
-  MLList.set("coarse: type","Amesos-KLU");
+  if (higher_order_elements)
+    MLList.set("aggregation: type", "MIS");
   
-  unsigned int n_total_components = precondition_components.size();
-  Assert (n_total_components == dof_handler.get_fe().n_components(),
-	  ExcDimensionMismatch (n_total_components,
-				dof_handler.get_fe().n_components() ) );
+  Assert (n_u * null_space_dimension == null_space.size(),
+	  ExcDimensionMismatch(n_u * null_space_dimension,
+			       null_space.size()));
   
-  unsigned int n_precondition_components = 0;
-  for (unsigned int counter = 0; counter < n_total_components; ++counter)
-    n_precondition_components += precondition_components[counter];
-  
-				 // Build null space, i.e. build
-				 // n_preconditioner_components vectors
-				 // of ones in each velocity component.
-  std::vector<double> null_vectors (n_precondition_components * n_u, 0.);
-    
-  if (n_precondition_components > 1)
+  if (null_space_dimension > 1)
     {
-				// TODO: is this n_ud really necessary?
-				// Or does it just bring new difficulties
-				// and confusion into play and limits
-				// the usability?
-      unsigned int n_ud = n_u/n_precondition_components;
-      Assert (n_ud * n_precondition_components == n_u,
-	      ExcMessage("Cannot detect single problem components! "
-			 "No. dofs not the same in all components!"));
-      
-      std::vector<bool> precondition_dof_list (dof_handler.n_dofs(), false);
-      std::vector<bool> precondition_mask (n_total_components, false);
-      unsigned int d = 0;
-      
-      for (unsigned int component=0; component < n_total_components; 
-	    component++)
-	{
-	  if (precondition_components[component])
-	    {
-	      precondition_mask[component] = true;
-	      DoFTools::extract_dofs (dof_handler, precondition_mask, 
-				      precondition_dof_list);
-	      precondition_mask[component] = false;
-
-				// TODO: The current implementation 
-				// assumes that we are working on 
-				// the first components of a system when
-				// writing into the null vector.
-				// Change this to the general case,
-				// probably use something similar as
-				// for block vectors.
-	      unsigned int counter = 0;
-	      for (unsigned int i=0; i<dof_handler.n_dofs(); ++i)
-		{
-		  if (precondition_dof_list[i])
-		    {
-		      Assert(i < n_u,
-			     ExcMessage("Could not correctly locate "
-					"preconditioner dofs in system!"));
-		      null_vectors [d * n_u + i] = 1.;
-		      ++counter;
-		    }
-		}
-	      Assert (counter == n_ud,
-		      ExcMessage("Failed to extract correct components "
-				  "that should consitute null space!"));
-	      ++d;
-	    }
-	}
-      MLList.set("null space: dimension", int(n_precondition_components));
-      MLList.set("null space: vectors", &null_vectors[0]);
       MLList.set("null space: type", "pre-computed");
+      MLList.set("null space: dimension", int(null_space_dimension));
+      MLList.set("null space: vectors", (double *)&null_space[0]);
     }
-	
+  
   ml_precond = new ML_Epetra::MultiLevelPreconditioner(*Matrix, MLList, true);
 
-  if (output_amg_info)
+  if (output_details)
     ml_precond->PrintUnused(0);
 }
 
@@ -1706,13 +1658,44 @@ void BoussinesqFlowProblem<dim>::assemble_system ()
 	boost::shared_ptr<TrilinosAmgPreconditioner<dim> >
 	  (new TrilinosAmgPreconditioner<dim>());
       
-      std::vector<bool> prec_comp(dof_handler.get_fe().n_components(), false);
-      for (unsigned int component=0; component < dim; ++component)
-	prec_comp[component] = true;
+      const unsigned int n_u = preconditioner_matrix.block(0,0).m();
+      std::vector<double> null_space (dim * n_u, 0.);
+      
+      std::vector<bool> precondition_dof_list (dof_handler.n_dofs(), false);
+      std::vector<bool> precondition_mask (dim + 2, false);
+      
+      for (unsigned int component=0; component < dim; component++)
+	{
+	  precondition_mask[component] = true;
+	  DoFTools::extract_dofs (dof_handler, precondition_mask, 
+				  precondition_dof_list);
+	  precondition_mask[component] = false;
+
+				// TODO: The current implementation 
+				// assumes that we are working on 
+				// the first components of a system when
+				// writing into the null vector.
+				// Change this to the general case,
+				// probably use something similar as
+				// for block vectors.
+	  unsigned int counter = 0;
+	  for (unsigned int i=0; i<dof_handler.n_dofs(); ++i)
+	    {
+	      if (precondition_dof_list[i])
+		{
+		  Assert(i < n_u,
+			 ExcMessage("Could not correctly locate "
+				    "preconditioner dofs in system!"));
+		  null_space [component * n_u + i] = 1.;
+		  ++counter;
+		}
+	    }
+	  Assert (counter == n_u / dim,
+		  ExcDimensionMismatch(counter, n_u / dim));
+	}
 	
       Amg_preconditioner->initialize(preconditioner_matrix.block(0,0),
-				     dof_handler,
-				     prec_comp);
+				     null_space, dim, true, true, false);
 
 				       // TODO: we could throw away the (0,0)
 				       // block here since things have been
