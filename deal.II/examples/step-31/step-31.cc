@@ -1542,7 +1542,7 @@ void BoussinesqFlowProblem<dim>::assemble_system ()
 				       * fe_values.JxW(q);
 
 	      const Point<dim> gravity = ( (dim == 2) ? (Point<dim> (0,1)) : 
-						        (Point<dim> (0,1,0)) );
+						        (Point<dim> (0,0,1)) );
 
 	      local_rhs(i) += (Rayleigh_number *
 			       gravity * phi_u[i] * old_temperature)*
@@ -2334,13 +2334,15 @@ void BoussinesqFlowProblem<dim>::run ()
 
       case 3:
       {
-	GridGenerator::hyper_shell (triangulation,
-				    Point<dim>(), 0.5, 1.0);
+// 	GridGenerator::hyper_shell (triangulation,
+// 				    Point<dim>(), 0.5, 1.0);
 
-	static HyperShellBoundary<dim> boundary;
-	triangulation.set_boundary (0, boundary);
+// 	static HyperShellBoundary<dim> boundary;
+// 	triangulation.set_boundary (0, boundary);
 
-	triangulation.refine_global (2);
+	GridGenerator::hyper_cube (triangulation);
+
+	triangulation.refine_global (3);
 
 	break;
       }
