@@ -41,7 +41,7 @@ Boussinesq equations that read as follows:
 @f}
 These equations fall into the class of vector-valued problems (a
 toplevel overview of this topic can be found in the @ref vector_valued module).
-Here, ${\mathbf u}$ is the velocity field, $p$ the pressure, and $T$
+Here, <b>u</b> is the velocity field, <i>p</i> the pressure, and <i>T</i>
 the temperature of the fluid. $\varepsilon ({\mathbf u}) = \frac 12
 [(\nabla{\mathbf u}) + (\nabla {\mathbf u})^T]$ is the symmetric
 gradient of the velocity. As can be seen, velocity and pressure
@@ -52,7 +52,7 @@ particular with regard to efficient linear Stokes solvers.
 
 The forcing term of the fluid motion is the buoyancy of the
 fluid, expressed as the product of the Rayleigh number $\mathrm{Ra}$,
-the temperature $T$ and the gravity vector ${\mathbf g}$. (A possibly
+the temperature <i>T</i> and the gravity vector ${\mathbf g}$. (A possibly
 more intuitive formulation would use $\mathrm{Ra} \; (T-\bar T)
 \mathbf{g}$ as right hand side where $\bar T$ is the average
 temperature, and the right hand side then describes the forces due to
@@ -74,23 +74,22 @@ than elliptic; we will have to take this into account when developing a stable
 discretization. 
 
 In the equations above, the term $\gamma$ on the right hand side denotes the
-heat sources and may be a spatially and temporally varying function.  $\eta$
-and $\kappa$ denote the viscosity and diffusivity coefficients. In the more
-general case, they may and $\eta$ often will depend on the temperature, but we
-will neglect this dependence for the purpose of this tutorial program even
-though it is an important factor in physical applications: Most materials
-become more fluid as the get hotter (i.e. $\eta$ decreases with $T$);
+heat sources and may be a spatially and temporally varying function. $\eta$
+and $\kappa$ denote the viscosity and diffusivity coefficients, which we assume
+constant for this tutorial program. The more general case when $\eta$ depends on
+the temperature is an important factor in physical applications: Most materials
+become more fluid as they get hotter (i.e., $\eta$ decreases with <i>T</i>);
 sometimes, as in the case of rock minerals at temperatures close to their
 melting point, $\eta$ may change by orders of magnitude over the typical range
 of temperatures.
 
 $\mathrm{Ra}$, called the <a
 href="http://en.wikipedia.org/wiki/Rayleigh_number">Rayleigh
-number</a> is a dimensionless number that describes the ratio of heat
+number</a>, is a dimensionless number that describes the ratio of heat
 transport due to convection induced by buoyancy changes from
 temperature differences, and of heat transport due to thermal
 diffusion. A small Rayleigh number implies that buoyancy is not strong
-relative to viscosity and fluid motion $\mathbf u$ is slow enough so
+relative to viscosity and fluid motion <b>u</b> is slow enough so
 that heat diffusion $\kappa\Delta T$ is the dominant heat transport
 term. On the other hand, a fluid with a high Rayleigh number will show
 vigorous convection that dominates heat conduction. 
@@ -99,7 +98,7 @@ For most fluids for which we are interested in computing thermal
 convection, the Rayleigh number is very large, often $10^6$ or
 larger. From the structure of the equations, we see that this will
 lead to large pressure differences and large velocities. Consequently,
-the convection term in the convection-diffusion equation for $T$ will
+the convection term in the convection-diffusion equation for <i>T</i> will
 also be very large and an accurate solution of this equation will
 require us to choose small time steps. Problems with large Rayleigh
 numbers are therefore hard to solve numerically for similar reasons
@@ -131,13 +130,13 @@ at previous times. This is reflected by the fact that the first two equations
 above are the steady state Stokes equation that do not contain a time
 derivative. Consequently, we do not need initial conditions for either
 velocities or pressure. On the other hand, the temperature field does satisfy
-an equation with a time derivative, so we need initial conditions for $T$.
+an equation with a time derivative, so we need initial conditions for <i>T</i>.
 
 As for boundary conditions: if $\kappa>0$ then the temperature
 satisfies a second order differential equation that requires
 temperature data all around the boundary for all times. Similarly, the
 velocity field requires us to pose boundary conditions. These may be
-no-slip no-flux conditions $\mathbf u=0$ on $\partial\Omega$ if the
+no-slip no-flux conditions <b>u</b>=0 on $\partial\Omega$ if the
 fluid sticks to the boundary, or no normal flux conditions $\mathbf n
 \cdot \mathbf u = 0$ if the fluid can flow along but not across the
 boundary, or any number of other conditions that are physically
@@ -149,7 +148,7 @@ reasonable. In this program, we will use no normal flux conditions.
 Like the equations solved in @ref step_21 "step-21", we here have a
 system of differential-algebraic equations (DAE): with respect to the time
 variable, only the temperature equation is a differential equation
-whereas the Stokes system for $\mathbf u$ and $p$ has no
+whereas the Stokes system for <b>u</b> and <i>p</i> has no
 time-derivatives and is therefore of the sort of an algebraic
 constraint that has to hold at each time instant. The main difference
 to @ref step_21 "step-21" is that the algebraic constraint there was a
@@ -179,7 +178,7 @@ strategy as we have already used in @ref step_21 "step-21", i.e. we
 use a time lag scheme: first solve the Stokes equations for velocity and
 pressure using the temperature field from the previous time step, then
 with the new velocities update the temperature field for the current
-time step. In other words, in time step $n$ we first solve the Stokes
+time step. In other words, in time step <i>n</i> we first solve the Stokes
 system
 @f{eqnarray*}
   -\nabla \cdot \eta \varepsilon ({\mathbf u}^n) + \nabla p^n &=& 
@@ -189,11 +188,14 @@ system
 @f}
 and then the temperature equation with the so-computed velocity field 
 ${\mathbf u}^n$. In contrast to @ref step_21 "step-21", we'll use a
-higher order time stepping scheme here, namely the Backward
-Differentiation Formula scheme of order 2 (BDF-2 in short) that
-replaces the time derivative $\frac{\partial T}{\partial t}$ by the
-term $\frac{\frac 32 T^{n}-2T^{n-1}+\frac 12 T^{n-2}}{k}$ where
-$k$ is the time step size.
+higher order time stepping scheme here, namely the <a 
+href="http://en.wikipedia.org/wiki/Backward_differentiation_formula">Backward
+Differentiation Formula scheme of order 2 (BDF-2 in short)</a> that
+replaces the time derivative $\frac{\partial T}{\partial t}$ by the (one-sided)
+difference quotient $\frac{\frac 32 T^{n}-2T^{n-1}+\frac 12 T^{n-2}}{k}$ with
+<i>k</i> the time step size.
+
+This gives the discretized-in-time temperature equation
 @f{eqnarray*}
   \frac 32 T^n
   -
@@ -210,21 +212,26 @@ $k$ is the time step size.
 Note how the temperature equation is
 solved semi-explicitly: diffusion is treated implicitly whereas
 advection is treated explicitly using the just-computed velocity
-field but only previously computed temperature fields; that said, the
+field but only previously computed temperature fields. The
 temperature terms appearing in the advection term are forward
 projected to the current time:
 $T^n \approx T^{n-1} + k_n
 \frac{\partial T}{\partial t} \approx T^{n-1} + k_n
-\frac{T^{n-1}-T^{n-2}}{k_n} = 2T^{n-1}-T^{n-2}$. In other words, the
+\frac{T^{n-1}-T^{n-2}}{k_n} = 2T^{n-1}-T^{n-2}$. We need this projection
+for maintaining the order of accuracy of the BDF-2 scheme. In other words, the
 temperature fields we use in the explicit right hand side are first
 order approximations of the current temperature field &mdash; not
 quite an explicit time stepping scheme, but by character not too far
 away either.
 
-In reality, of course, the time step is limited by a
-Courant-Friedrichs-Lewy (CFL) condition just like it was in 
-@ref step_21 "step-21". In particular this means that the time step
-size $k$ may change from time step to time step, and that we have to
+The introduction of the temperature extrapolation limits the time step
+by a <a href="http://en.wikipedia.org/wiki/Courant–Friedrichs–Lewy_condition">
+Courant-Friedrichs-Lewy (CFL) condition</a> just like it was in 
+@ref step_21 "step-21". (We wouldn't have had that stability condition if
+we treated the advection term implicitly since the BDF-2 scheme is A-stable, 
+at the price that we needed to build a new temperature matrix at each time 
+step.) In particular this CFL condition means that the time step
+size <i>k</i> may change from time step to time step, and that we have to
 modify the above formula slightly. If $k_n,k_{n-1}$ are the time steps
 sizes of the current and previous time step, then we use the
 approximations 
@@ -297,10 +304,10 @@ by their discrete counterparts:
   (q_h, \nabla \cdot {\mathbf u}^n_h) &=& 0,
 @f}
 for all test functions $\mathbf v_h, q_h$. The first term of the first
-equation is considered as the scalar product between tensors, i.e.
+equation is considered as the inner product between tensors, i.e.
 $(\nabla {\mathbf v}_h, \eta \varepsilon ({\mathbf u}^n_h))_\Omega
  = \int_\Omega \sum_{i,j=1}^d [\nabla {\mathbf v}_h]_{ij}
-           \eta [\varepsilon ({\mathbf u}^n_h)]_{ij}$.
+           \eta [\varepsilon ({\mathbf u}^n_h)]_{ij}\, dx$.
 Because the second tensor in this product is symmetric, the
 anti-symmetric component of $\nabla {\mathbf v}_h$ plays no role and
 it leads to the entirely same form if we use the symmetric gradient of
@@ -322,7 +329,7 @@ This is exactly the same as what we already discussed in
 
 <h4>Stabilization, weak form and space discretization for the temperature equation</h4>
 
-The more interesting question is what we do with the temperature
+The more interesting question is what to do with the temperature
 advection-diffusion equation. By default, not all discretizations of
 this equation are equally stable unless we either do something like
 upwinding, stabilization, or all of this. One way to achieve this is
@@ -362,7 +369,7 @@ to something like
 @f}
 where $\nu(T)$ is an addition viscosity (diffusion) term that only
 acts in the vicinity of shocks and other discontinuities. $\nu(T)$ is
-chosen in such a way that if $T$ satisfies the original equations, the
+chosen in such a way that if <i>T</i> satisfies the original equations, the
 additional viscosity is zero.
 
 To achieve this, the literature contains a number of approaches. We
@@ -445,28 +452,21 @@ Computations by Guermond and Popov have shown that this form of
 stabilization actually performs much better than most of the other
 stabilization schemes that are around (for example streamline
 diffusion, to name only the simplest one). Furthermore, for $\alpha\in
-[1,2)$ they can also show that it produces better convergence orders
+[1,2)$ they can even prove that it produces better convergence orders
 for the linear transport equation than for example streamline
-diffusion. For $\alpha=2$, no theoretical results are available
-currently, but numerical tests indicate that it produces results that
-are much better than for $\alpha=1$.
+diffusion. For $\alpha=2$, no theoretical results are currently
+available, but numerical tests indicate that the results
+are considerably better than for $\alpha=1$.
 
 A more practical question is how to introduce this artificial
-diffusion into the equations we would like to solve. To this end note
-that the equations now have the form
-@f{eqnarray*}
-  \frac{\partial T}{\partial t}
-  +
-  {\mathbf u} \cdot \nabla T
-  -
-  \nabla \cdot (\kappa+\nu(T)) \nabla T &=& \gamma,
-@f}
-and are consequently nonlinear in $T$ &mdash; not what one desires from a
+diffusion into the equations we would like to solve. Note that the
+numerical viscosity $\nu(T)$ is temperature-dependent, so the equation
+we want to solve is nonlinear in <i>T</i> &mdash; not what one desires from a
 simple method to stabilize an equation, and even less so if we realize
-that $\nu(T)$ is non-differentiable in $T$. However, there is no
+that $\nu(T)$ is non-differentiable in <i>T</i>. However, there is no
 reason to despair: we still have to discretize in time and we can
 treat the term explicitly. Using the BDF-2 scheme introduced above,
-this yields for the simpler case of uniform time steps of size $k$:
+this yields for the simpler case of uniform time steps of size <i>k</i>:
 @f{eqnarray*}
   \frac 32 T^n
   -
