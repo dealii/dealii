@@ -735,20 +735,14 @@ void StokesProblem<dim>::assemble_system ()
   system_matrix=0;
   system_rhs=0;
   
-  QGauss<dim>   quadrature_formula(degree+2); 
-  QGauss<dim-1> face_quadrature_formula(degree+2);
+  QGauss<dim>   quadrature_formula(degree+2);
 
   FEValues<dim> fe_values (fe, quadrature_formula,
                            update_values    |
                            update_quadrature_points  |
                            update_JxW_values |
                            update_gradients);
-  FEFaceValues<dim> fe_face_values (fe, face_quadrature_formula, 
-                                    update_values    | 
-                                    update_normal_vectors |
-                                    update_quadrature_points  |
-                                    update_JxW_values);
-
+  
   const unsigned int   dofs_per_cell   = fe.dofs_per_cell;
   
   const unsigned int   n_q_points      = quadrature_formula.size();
