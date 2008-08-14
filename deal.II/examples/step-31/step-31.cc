@@ -62,7 +62,6 @@
                                  // This is Trilinos
 #include <Epetra_SerialComm.h>
 #include <Epetra_Map.h>
-#include <Epetra_CrsGraph.h>
 #include <Epetra_CrsMatrix.h>
 #include <Epetra_Vector.h>
 #include <Teuchos_ParameterList.hpp>
@@ -394,6 +393,7 @@ class BoussinesqFlowProblem
     void assemble_system ();
     void assemble_rhs_T ();
     double get_maximal_velocity () const;
+    double get_maximal_temperature () const;
     void solve ();
     void output_results () const;
     void refine_mesh ();
@@ -1736,6 +1736,68 @@ void BoussinesqFlowProblem<dim>::assemble_system ()
 
 
 
+template <int dim>
+double compute_viscosity(
+	const std::vector<Vector<double> >              present_solution,
+	const std::vector<Vector<double> >              old_solution,
+	const std::vector<Vector<double> >              old_old_solution,
+	const std::vector<std::vector<Tensor<1,dim> > > old_solution_grads,
+	const std::vector<std::vector<Tensor<1,dim> > > old_old_solution_grads,
+	const std::vector<std::vector<Tensor<2,dim> > > old_solution_hessians,
+	const std::vector<std::vector<Tensor<2,dim> > > old_old_solution_hessians,
+	const std::vector<double>                       gamma_values,
+	const double                                    kappa,
+	const double                                    beta,
+	const double                                    global_u_infty,
+	const double                                    global_T_infty,
+	const double                                    global_Omega_diameter,
+	const double                                    cell_diameter,
+	const double                                    alpha,
+	const double                                    old_time_step
+	)
+{
+  unsigned int n_q_points = old_solution.size();
+  
+				 // Stage 1: calculate residual
+  std::vector<double> residual (n_q_points);
+  std::vector<double> velocity_norms (n_q_points);
+  
+  for (unsigned int q=0; q < n_q_points; ++q)
+    {
+      const double dT_dt = (old_solution[q](dim+1) - old_old_solution[q](dim+1))
+			    / old_time_step;
+      double u_grad_T = 0.;
+      for (unsigned int d=0; d<dim; ++d)
+	u_grad_T += present_solution[q](d)*(old_solution_grads[q][dim+1][d] +
+					    old_old_solution_grads[q][dim+1][d]);
+      u_grad_T *= 0.5;
+      
+      double kappa_Delta_T = 0.;
+      for (unsigned int d=0; d<dim; ++d)
+	kappa_Delta_T += old_solution_hessians[q][dim+1][d][d] + 
+			 old_old_solution_hessians[q][dim+1][d][d];
+      kappa_Delta_T *= 0.5 * kappa;
+      
+      residual[q] = dT_dt + u_grad_T - kappa_Delta_T - gamma_values[q];
+      residual[q] *= std::pow(old_solution[q](dim+1)+old_old_solution[q](dim+1),
+			      alpha-1.);
+      
+      for (unsigned int d=0; d<dim; ++d)
+	velocity_norms[q] += present_solution[q](d) * present_solution[q](d);
+    }
+  
+  const double residual_cell_max = *std::max_element(residual.begin(),
+						     residual.end());
+  const double velocity_cell_max = 
+      std::sqrt(*std::max_element(velocity_norms.begin(),velocity_norms.end()));
+  const double global_scaling = global_u_infty * global_T_infty /
+      std::pow(global_Omega_diameter, alpha - 2.);
+  
+  return beta * velocity_cell_max * std::min (cell_diameter, 
+      std::pow(cell_diameter,alpha) * residual_cell_max / global_scaling);
+}
+
+
 
 				 // @sect4{BoussinesqFlowProblem::assemble_rhs_T}
 				 // 
@@ -1771,11 +1833,11 @@ void BoussinesqFlowProblem<dim>::assemble_rhs_T ()
   QGauss<dim-1> face_quadrature_formula(degree+2);
   FEValues<dim> fe_values (fe, quadrature_formula,
                            update_values    | update_gradients |
+			   update_hessians |
                            update_quadrature_points  | update_JxW_values);
 
   const unsigned int   dofs_per_cell   = fe.dofs_per_cell;
   const unsigned int   n_q_points      = quadrature_formula.size();
-  const unsigned int   n_face_q_points = face_quadrature_formula.size();
 
   Vector<double>       local_rhs (dofs_per_cell);
   FullMatrix<double>   local_matrix (dofs_per_cell, dofs_per_cell);
@@ -1806,19 +1868,31 @@ void BoussinesqFlowProblem<dim>::assemble_rhs_T ()
   std::vector<std::vector<Tensor<1,dim> > >
     old_old_solution_grads(n_q_points,
 			   std::vector<Tensor<1,dim> >(dim+2));
+  std::vector<std::vector<Tensor<2,dim> > > old_solution_hessians(
+				  n_q_points,
+				  std::vector<Tensor<2,dim> >(dim+2));
+  std::vector<std::vector<Tensor<2,dim> > > old_old_solution_hessians(
+				  n_q_points,
+				  std::vector<Tensor<2,dim> >(dim+2));
 
   TemperatureBoundaryValues<dim> temperature_boundary_values;
+  RightHandSide<dim> right_hand_side;
+  std::vector<double> gamma_values (n_q_points);
 
   const FEValuesExtractors::Scalar temperature (dim+1);
 
   std::vector<double>                  phi_T       (dofs_per_cell);
   std::vector<Tensor<1,dim> >          grad_phi_T  (dofs_per_cell);
+  
+  const double global_u_infty = get_maximal_velocity();
+  const double global_T_infty = get_maximal_temperature();
+  const double global_Omega_diameter = 2.; // to be modified later.
 
 				 // Now, let's start the loop
 				 // over all cells in the
 				 // triangulation. The first
 				 // actions within the loop
-				 // are, as usual, the evaluation
+				 // are, 0as usual, the evaluation
 				 // of the FE basis functions 
 				 // and the old and present
 				 // solution at the quadrature 
@@ -1839,6 +1913,11 @@ void BoussinesqFlowProblem<dim>::assemble_rhs_T ()
       fe_values.get_function_gradients (old_solution, old_solution_grads);
       fe_values.get_function_gradients (old_old_solution, old_old_solution_grads);
       
+      fe_values.get_function_hessians (old_solution, old_solution_hessians);
+      fe_values.get_function_hessians (old_old_solution, old_old_solution_hessians);
+      
+      right_hand_side.value_list (fe_values.get_quadrature_points(),
+				  gamma_values, dim+1);
 
 				       // build matrix contributions
       local_matrix = 0;
@@ -1852,8 +1931,13 @@ void BoussinesqFlowProblem<dim>::assemble_rhs_T ()
       const double kappa = std::max (5e-3 * cell->diameter(),
 				     1e-5);
 
-      const double artificial_diffusion = 0;
-      
+      const double artificial_diffusion = 
+	  compute_viscosity (present_solution_values, old_solution_values,
+	  old_old_solution_values, old_solution_grads, old_old_solution_grads,
+	  old_solution_hessians, old_old_solution_hessians, gamma_values,
+	  kappa, /* beta = */ 1., global_u_infty, global_T_infty,
+	  global_Omega_diameter, cell->diameter(), /* alpha = */ 1.,
+	  old_time_step);
       
       for (unsigned int q=0; q<n_q_points; ++q)
 	{
@@ -1862,9 +1946,6 @@ void BoussinesqFlowProblem<dim>::assemble_rhs_T ()
 	      grad_phi_T[k] = fe_values[temperature].gradient(k,q);
 	      phi_T[k]      = fe_values[temperature].value (k, q);
 	    }
-
-	  const Point<dim> p = fe_values.quadrature_point(q);
-	  const double gamma = RightHandSide<dim>().value (p, dim+1);
 
 	  const double        old_T      = old_solution_values[q](dim+1);
 	  const double        old_old_T  = old_old_solution_values[q](dim+1);
@@ -1912,7 +1993,7 @@ void BoussinesqFlowProblem<dim>::assemble_rhs_T ()
 				 grad_phi_T[i]
 				 +
 				 time_step *
-				 gamma * phi_T[i])
+				 gamma_values[q] * phi_T[i])
 				*
 				fe_values.JxW(q);
 	    }
@@ -1937,7 +2018,7 @@ void BoussinesqFlowProblem<dim>::assemble_rhs_T ()
 				 old_grad_T * grad_phi_T[i]
 				 +
 				 time_step *
-				 gamma * phi_T[i])
+				 gamma_values[q] * phi_T[i])
 				*
 				fe_values.JxW(q);
 	    }
@@ -2185,6 +2266,48 @@ double BoussinesqFlowProblem<dim>::get_maximal_velocity () const
     }
 
   return max_velocity;
+}
+
+
+
+
+				 // @sect4{BoussinesqFlowProblem::get_maximal_velocity}
+template <int dim>
+double BoussinesqFlowProblem<dim>::get_maximal_temperature () const
+{
+  QGauss<dim>   quadrature_formula(degree+2);
+  const unsigned int   n_q_points
+    = quadrature_formula.size();
+
+  FEValues<dim> fe_values (fe, quadrature_formula,
+                           update_values);
+  std::vector<Vector<double> > old_solution_values(n_q_points,
+						   Vector<double>(dim+2));
+  std::vector<Vector<double> > old_old_solution_values(n_q_points,
+						       Vector<double>(dim+2));
+  double max_temperature = 0;
+
+  typename DoFHandler<dim>::active_cell_iterator
+    cell = dof_handler.begin_active(),
+    endc = dof_handler.end();
+  for (; cell!=endc; ++cell)
+    {
+      fe_values.reinit (cell);
+      fe_values.get_function_values (old_solution, old_solution_values);
+      fe_values.get_function_values (old_old_solution, old_old_solution_values);
+
+      for (unsigned int q=0; q<n_q_points; ++q)
+        {
+          double temperature = 
+		(1. + time_step/old_time_step) * old_solution_values[q](dim+1)-
+		time_step/old_time_step * old_old_solution_values[q](dim+1);
+
+          max_temperature = std::max (max_temperature,
+				      temperature);
+        }
+    }
+
+  return max_temperature;
 }
 
 
