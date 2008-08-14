@@ -413,10 +413,12 @@ class BoussinesqFlowProblem
     BlockSparseMatrix<double> preconditioner_matrix;
 
     double time_step;
+    double old_time_step;
     unsigned int timestep_number;
 
     BlockVector<double> solution;
     BlockVector<double> old_solution;
+    BlockVector<double> old_old_solution;
     BlockVector<double> system_rhs;
 
     //boost::shared_ptr<typename InnerPreconditioner<dim>::type> A_preconditioner;
@@ -876,6 +878,8 @@ BoussinesqFlowProblem<dim>::BoussinesqFlowProblem (const unsigned int degree)
                     FE_Q<dim>(degree), 1),
                 dof_handler (triangulation),
                 time_step (0),
+		old_time_step (0),
+		timestep_number (0),
 		rebuild_matrices (true),
 		rebuild_preconditioner (true)
 {}
@@ -1207,6 +1211,12 @@ void BoussinesqFlowProblem<dim>::setup_dofs (const bool setup_matrices)
   old_solution.block(2).reinit (n_T);
   old_solution.collect_sizes ();
 
+  old_old_solution.reinit (3);
+  old_old_solution.block(0).reinit (n_u);
+  old_old_solution.block(1).reinit (n_p);
+  old_old_solution.block(2).reinit (n_T);
+  old_old_solution.collect_sizes ();
+  
   system_rhs.reinit (3);
   system_rhs.block(0).reinit (n_u);
   system_rhs.block(1).reinit (n_p);
@@ -1762,23 +1772,16 @@ void BoussinesqFlowProblem<dim>::assemble_system ()
 template <int dim>
 void BoussinesqFlowProblem<dim>::assemble_rhs_T ()
 {
+				   // TODO: right now, always do explicit
+				   // Euler
+  const bool is_first_timestep = (timestep_number == 0 ? true : true);
+  
+  
   QGauss<dim>   quadrature_formula(degree+2);
   QGauss<dim-1> face_quadrature_formula(degree+2);
   FEValues<dim> fe_values (fe, quadrature_formula,
                            update_values    | update_gradients |
                            update_quadrature_points  | update_JxW_values);
-  FEFaceValues<dim> fe_face_values (fe, face_quadrature_formula,
-				    update_values    | update_normal_vectors |
-				    update_quadrature_points  |
-				    update_JxW_values);
-  FESubfaceValues<dim> fe_subface_values (fe, face_quadrature_formula,
-					  update_values | 
-					  update_normal_vectors |
-					  update_JxW_values);
-  FEFaceValues<dim> fe_face_values_neighbor (fe, face_quadrature_formula,
-                                             update_values);
-  FESubfaceValues<dim> fe_subface_values_neighbor (fe, face_quadrature_formula,
-						   update_values);
 
   const unsigned int   dofs_per_cell   = fe.dofs_per_cell;
   const unsigned int   n_q_points      = quadrature_formula.size();
@@ -1802,18 +1805,8 @@ void BoussinesqFlowProblem<dim>::assemble_rhs_T ()
 				 // part of the FE system.
   std::vector<Vector<double> > old_solution_values(n_q_points,
 						   Vector<double>(dim+2));
-
-  std::vector<Vector<double> > old_solution_values_face(n_face_q_points, 
-							Vector<double>(dim+2));
-  std::vector<Vector<double> > old_solution_values_face_neighbor (
-							n_face_q_points,
-							Vector<double>(dim+2));
   std::vector<Vector<double> > present_solution_values (n_q_points, 
 							Vector<double>(dim+2));
-  std::vector<Vector<double> > present_solution_values_face(
-							n_face_q_points, 
-							Vector<double>(dim+2));
-
   std::vector<std::vector<Tensor<1,dim> > >  old_solution_grads(
 				  n_q_points,
 				  std::vector<Tensor<1,dim> >(dim+2));
@@ -1869,45 +1862,6 @@ void BoussinesqFlowProblem<dim>::assemble_rhs_T ()
                             *
                             fe_values.JxW(q);
           }
-
-      for (unsigned int face_no=0; face_no<GeometryInfo<dim>::faces_per_cell;
-           ++face_no)
-        if (cell->at_boundary(face_no))
-	  {
-	    fe_face_values.reinit (cell, face_no);
-
-	    fe_face_values.get_function_values (old_solution,
-						old_solution_values_face);
-	    fe_face_values.get_function_values (solution,
-						present_solution_values_face);
-
-	    temperature_boundary_values
-	      .value_list (fe_face_values.get_quadrature_points(),
-			   neighbor_temperature);
-
-	    for (unsigned int q=0; q<n_face_q_points; ++q)
-	      {
-		Tensor<1,dim> present_u_face;
-		for (unsigned int d=0; d<dim; ++d)
-		  present_u_face[d] = present_solution_values_face[q](d);
-
-		const double normal_flux = present_u_face *
-					   fe_face_values.normal_vector(q);
-
-		const bool is_outflow_q_point = (normal_flux >= 0);
-
-		for (unsigned int i=0; i<dofs_per_cell; ++i)
-		  local_rhs(i) -= time_step *
-				  normal_flux *
-				  (is_outflow_q_point == true
-				   ?
-				   old_solution_values_face[q](dim+1)
-				   :
-				   neighbor_temperature[q]) *
-				  fe_face_values[temperature].value (i,q) *
-				  fe_face_values.JxW(q);
-	      }
-	  }
 
       cell->get_dof_indices (local_dof_indices);
       for (unsigned int i=0; i<dofs_per_cell; ++i)
@@ -1987,7 +1941,12 @@ void BoussinesqFlowProblem<dim>::solve ()
     solution.block(0) = up.block(0);
     solution.block(1) = up.block(1);
   }
-				   // for DGQ1 needs to be /15
+
+				   // TODO: determine limit of stability for
+				   // the time step (whether it needs to be /4
+				   // or whether we could get away with a
+				   // bigger time step)
+  old_time_step = time_step;    
   time_step = GridTools::minimal_cell_diameter(triangulation) /
               std::max (get_maximal_velocity(), .05) / 4;
 
@@ -2000,15 +1959,8 @@ void BoussinesqFlowProblem<dim>::solve ()
     PreconditionSSOR<> preconditioner;
     preconditioner.initialize (system_matrix.block(2,2), 1.2);
 
-    try
-      {
-	cg.solve (system_matrix.block(2,2), solution.block(2),
-		  system_rhs.block(2), preconditioner);
-      }
-    catch (...)
-      {
-	abort ();
-      }
+    cg.solve (system_matrix.block(2,2), solution.block(2),
+	      system_rhs.block(2), preconditioner);
 
 				     // produce a consistent temperature field
     hanging_node_constraints.distribute (solution);
@@ -2094,6 +2046,8 @@ void BoussinesqFlowProblem<dim>::refine_mesh ()
   Vector<double> x_old_solution (dof_handler.n_dofs());
   x_old_solution = old_solution;
 
+  Assert (false, ExcMessage ("Need to do the same for old_old_solution"));
+  
   soltrans.prepare_for_coarsening_and_refinement(x_old_solution);
 
   triangulation.execute_coarsening_and_refinement ();
@@ -2241,7 +2195,8 @@ void BoussinesqFlowProblem<dim>::run ()
       time += time_step;
       ++timestep_number;
 
-      old_solution = solution;
+      old_old_solution = old_solution;
+      old_solution     = solution;
 
       std::cout << std::endl;
 
