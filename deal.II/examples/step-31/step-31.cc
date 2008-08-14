@@ -73,29 +73,7 @@
 using namespace dealii;
 
 
-				 // @sect3{Defining the inner preconditioner type}
-
-				 // This class creates a local typedef that
-				 // specifies the preconditioner we're
-				 // going to use in the code below, depending
-				 // on the space dimension. This
-				 // is in complete analogy to step-22.
-template <int dim>
-struct InnerPreconditioner;
-
-template <>
-struct InnerPreconditioner<2>
-{
-    typedef SparseDirectUMFPACK type;
-};
-
-template <>
-struct InnerPreconditioner<3>
-{
-    typedef SparseILU<double> type;
-};
-
-
+				 // @sect3{Defining the AMG preconditioner}
 
 				 // This implements an AMG
 				 // preconditioner based on the
@@ -131,11 +109,10 @@ struct InnerPreconditioner<3>
 				 // entries in the preconditioner matrix
 				 // are zero and hence can be 
 				 // neglected.
-template <int dim>
-class TrilinosAmgPreconditioner : public Subscriptor
+class PreconditionerTrilinosAmg : public Subscriptor
 {
   public:
-    TrilinosAmgPreconditioner ();
+    PreconditionerTrilinosAmg ();
     
     void initialize (const SparseMatrix<double> &preconditioner_matrix,
 		     const std::vector<double>  &null_space,
@@ -157,12 +134,10 @@ class TrilinosAmgPreconditioner : public Subscriptor
 };
 
 
-template <int dim>
-TrilinosAmgPreconditioner<dim>::TrilinosAmgPreconditioner ()
+PreconditionerTrilinosAmg::PreconditionerTrilinosAmg ()
 {}
 
-template <int dim>
-void TrilinosAmgPreconditioner<dim>::initialize (
+void PreconditionerTrilinosAmg::initialize (
 		const SparseMatrix<double> &preconditioner_matrix,
 		const std::vector<double>  &null_space,
 		const unsigned int          null_space_dimension,
@@ -257,7 +232,11 @@ void TrilinosAmgPreconditioner<dim>::initialize (
       MLList.set("smoother: sweeps", 4);
     }
   else
-    ML_Epetra::SetDefaults("NSSA",MLList);
+    {
+      ML_Epetra::SetDefaults("NSSA",MLList);
+      MLList.set("aggregation: type", "Uncoupled");
+      MLList.set("aggregation: block scaling", true);
+    }
   
   if (output_details)
     MLList.set("ML output", 10);
@@ -301,8 +280,7 @@ void TrilinosAmgPreconditioner<dim>::initialize (
 				 // calls) to non-constant value, as
 				 // this is the way Trilinos wants to
 				 // have them.
-template <int dim>
-void TrilinosAmgPreconditioner<dim>::vmult (Vector<double>       &dst,
+void PreconditionerTrilinosAmg::vmult (Vector<double>       &dst,
 					    const Vector<double> &src) const
 {
   Epetra_Vector LHS (View, *Map, dst.begin());
@@ -373,8 +351,7 @@ class BoussinesqFlowProblem
     BlockVector<double> old_old_solution;
     BlockVector<double> system_rhs;
 
-    //boost::shared_ptr<typename InnerPreconditioner<dim>::type> A_preconditioner;
-    boost::shared_ptr<TrilinosAmgPreconditioner<dim> >  Amg_preconditioner;
+    boost::shared_ptr<PreconditionerTrilinosAmg>  Amg_preconditioner;
     boost::shared_ptr<SparseILU<double> > Mp_preconditioner;
 
     bool rebuild_matrices;
@@ -1654,9 +1631,8 @@ void BoussinesqFlowProblem<dim>::assemble_system ()
       A_preconditioner->initialize (preconditioner_matrix.block(0,0),
 		typename InnerPreconditioner<dim>::type::AdditionalData());*/
       
-      Amg_preconditioner = 
-	boost::shared_ptr<TrilinosAmgPreconditioner<dim> >
-	  (new TrilinosAmgPreconditioner<dim>());
+      Amg_preconditioner = boost::shared_ptr<PreconditionerTrilinosAmg>
+					(new PreconditionerTrilinosAmg());
       
       const unsigned int n_u = preconditioner_matrix.block(0,0).m();
       std::vector<double> null_space (dim * n_u, 0.);
@@ -2068,7 +2044,7 @@ void BoussinesqFlowProblem<dim>::solve ()
     /*BlockSchurPreconditioner<typename InnerPreconditioner<dim>::type,
                            SparseILU<double> >
       preconditioner (system_matrix, mp_inverse, *A_preconditioner);*/
-    BlockSchurPreconditioner<TrilinosAmgPreconditioner<dim>, SparseILU<double> >
+    BlockSchurPreconditioner<PreconditionerTrilinosAmg, SparseILU<double> >
       preconditioner (system_matrix, mp_inverse, *Amg_preconditioner);
 
 				// Set up GMRES solver and
