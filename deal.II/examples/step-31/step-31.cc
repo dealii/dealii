@@ -325,7 +325,6 @@ class BoussinesqFlowProblem
     double get_maximal_velocity () const;
     double get_maximal_temperature () const;
     void solve ();
-    void test (Vector<float> &) const;
     void output_results () const;
     void refine_mesh ();
 
@@ -2004,83 +2003,6 @@ void BoussinesqFlowProblem<dim>::assemble_rhs_T ()
 
 
 
-template <int dim>
-void
-BoussinesqFlowProblem<dim>::test (Vector<float> &viscosity) const
-{
-  QGauss<dim>   quadrature_formula(degree+2);
-  FEValues<dim> fe_values (fe, quadrature_formula,
-                           update_values    | update_gradients |
-			   update_hessians |
-                           update_quadrature_points  | update_JxW_values);
-
-  const unsigned int   n_q_points      = quadrature_formula.size();
-
-  std::vector<Vector<double> > present_solution_values (n_q_points, 
-							Vector<double>(dim+2));
-  std::vector<Vector<double> > old_solution_values(n_q_points,
-						   Vector<double>(dim+2));
-  std::vector<Vector<double> > old_old_solution_values(n_q_points,
-						       Vector<double>(dim+2));
-  std::vector<std::vector<Tensor<1,dim> > >
-    old_solution_grads(n_q_points,
-		       std::vector<Tensor<1,dim> >(dim+2));
-  std::vector<std::vector<Tensor<1,dim> > >
-    old_old_solution_grads(n_q_points,
-			   std::vector<Tensor<1,dim> >(dim+2));
-  std::vector<std::vector<Tensor<2,dim> > > old_solution_hessians(
-				  n_q_points,
-				  std::vector<Tensor<2,dim> >(dim+2));
-  std::vector<std::vector<Tensor<2,dim> > > old_old_solution_hessians(
-				  n_q_points,
-				  std::vector<Tensor<2,dim> >(dim+2));
-  RightHandSide<dim> right_hand_side;
-  std::vector<double> gamma_values (n_q_points);
-
-  const FEValuesExtractors::Scalar temperature (dim+1);
-
-  const double global_u_infty = get_maximal_velocity();
-  const double global_T_infty = get_maximal_temperature();
-  const double global_Omega_diameter = GridTools::diameter (triangulation);
-
-  typename DoFHandler<dim>::active_cell_iterator
-    cell = dof_handler.begin_active(),
-    endc = dof_handler.end();
-
-  for (unsigned int index=0; cell!=endc; ++cell, ++index)
-    {
-      fe_values.reinit (cell);
-
-      fe_values.get_function_values (solution, present_solution_values);
-      fe_values.get_function_values (old_solution, old_solution_values);
-      fe_values.get_function_values (old_old_solution, old_old_solution_values);
-
-      fe_values.get_function_gradients (old_solution, old_solution_grads);
-      fe_values.get_function_gradients (old_old_solution, old_old_solution_grads);
-      
-      fe_values.get_function_hessians (old_solution, old_solution_hessians);
-      fe_values.get_function_hessians (old_old_solution, old_old_solution_hessians);
-      
-      const double kappa = 1e-6;
-      right_hand_side.value_list (fe_values.get_quadrature_points(),
-				  gamma_values, dim+1);
-
-      viscosity(index) = 
-	(timestep_number == 0
-	 ?
-	 5e-3 * cell->diameter()
-	 :
-	 compute_viscosity (present_solution_values, old_solution_values,
-			    old_old_solution_values, old_solution_grads, old_old_solution_grads,
-			    old_solution_hessians, old_old_solution_hessians, gamma_values,
-			    kappa, global_u_infty, global_T_infty,
-			    global_Omega_diameter, cell->diameter(),
-			    old_time_step));
-    }
-}
-
-
-
 
 				 // @sect4{BoussinesqFlowProblem::solve}
 template <int dim>
@@ -2199,9 +2121,6 @@ void BoussinesqFlowProblem<dim>::output_results ()  const
   solution_names.push_back ("p");
   solution_names.push_back ("T");
 
-  Vector<float> viscosity (triangulation.n_active_cells());
-  test (viscosity);
-  
   DataOut<dim> data_out;
 
   data_out.attach_dof_handler (dof_handler);
@@ -2216,9 +2135,6 @@ void BoussinesqFlowProblem<dim>::output_results ()  const
   data_out.add_data_vector (solution, solution_names,
 			    DataOut<dim>::type_dof_data,
 			    data_component_interpretation);
-
-  data_out.add_data_vector (viscosity, "viscosity");
-  
   data_out.build_patches ();
 
   std::ostringstream filename;
