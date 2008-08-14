@@ -1763,9 +1763,7 @@ void BoussinesqFlowProblem<dim>::assemble_system ()
 template <int dim>
 void BoussinesqFlowProblem<dim>::assemble_rhs_T ()
 {
-				   // TODO: right now, always do explicit
-				   // Euler
-  const bool use_bdf2_scheme = (timestep_number == 0 ? true : false);
+  const bool use_bdf2_scheme = (timestep_number != 0);
 
   system_matrix.block(2,2) = 0;
   
