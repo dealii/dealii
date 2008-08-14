@@ -1903,6 +1903,13 @@ void BoussinesqFlowProblem<dim>::assemble_rhs_T ()
 				  -
 				  time_step / old_time_step * old_old_grad_T) *
 				 phi_T[i]
+				 -
+				 time_step *
+				 artificial_diffusion *
+				 ((1+time_step/old_time_step) * old_grad_T
+				  -
+				  time_step / old_time_step * old_old_grad_T) *
+				 grad_phi_T[i]
 				 +
 				 time_step *
 				 gamma * phi_T[i])
@@ -1924,6 +1931,10 @@ void BoussinesqFlowProblem<dim>::assemble_rhs_T ()
 				 -
 				 time_step *
 				 present_u * old_grad_T * phi_T[i]
+				 -
+				 time_step *
+				 artificial_diffusion *
+				 old_grad_T * grad_phi_T[i]
 				 +
 				 time_step *
 				 gamma * phi_T[i])
