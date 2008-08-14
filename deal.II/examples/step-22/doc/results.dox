@@ -516,7 +516,7 @@ J.W. Demmel (Applied Numerical Linear Algebra, SIAM, 1997, section 6.6.6).
 For our specific problem with the ILU preconditioner for $A$, we certainly need
 to perform hundreds of iterations on the block system for large problem sizes
 (we won't beat CG!). Actually, this disfavors GMRES: During the GMRES
-iterations, a basis of Krylov vectors is successively build up and some
+iterations, a basis of Krylov vectors is successively built up and some
 operations are performed on these vectors. The more vectors are in this basis, 
 the more operations and memory will be needed. The number of operations scales
 as ${\cal O}(n + k^2)$ and memory as ${\cal O}(kn)$, where $k$ is the number of 
