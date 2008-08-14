@@ -1765,7 +1765,7 @@ void BoussinesqFlowProblem<dim>::assemble_rhs_T ()
 {
 				   // TODO: right now, always do explicit
 				   // Euler
-  const bool use_bdf2_scheme = (timestep_number == 0 ? false : false);
+  const bool use_bdf2_scheme = (timestep_number == 0 ? true : false);
 
   system_matrix.block(2,2) = 0;
   
@@ -1796,22 +1796,26 @@ void BoussinesqFlowProblem<dim>::assemble_rhs_T ()
 				 // well-known extractor for
 				 // accessing the temperature
 				 // part of the FE system.
-  std::vector<Vector<double> > old_solution_values(n_q_points,
-						   Vector<double>(dim+2));
   std::vector<Vector<double> > present_solution_values (n_q_points, 
 							Vector<double>(dim+2));
-  std::vector<std::vector<Tensor<1,dim> > >  old_solution_grads(
-				  n_q_points,
-				  std::vector<Tensor<1,dim> >(dim+2));
-
-  std::vector<double> neighbor_temperature (n_face_q_points);
+  std::vector<Vector<double> > old_solution_values(n_q_points,
+						   Vector<double>(dim+2));
+  std::vector<Vector<double> > old_old_solution_values(n_q_points,
+						       Vector<double>(dim+2));
+  std::vector<std::vector<Tensor<1,dim> > >
+    old_solution_grads(n_q_points,
+		       std::vector<Tensor<1,dim> >(dim+2));
+  std::vector<std::vector<Tensor<1,dim> > >
+    old_old_solution_grads(n_q_points,
+			   std::vector<Tensor<1,dim> >(dim+2));
 
   TemperatureBoundaryValues<dim> temperature_boundary_values;
+
   const FEValuesExtractors::Scalar temperature (dim+1);
 
   std::vector<double>                  phi_T       (dofs_per_cell);
   std::vector<Tensor<1,dim> >          grad_phi_T  (dofs_per_cell);
-  
+
 				 // Now, let's start the loop
 				 // over all cells in the
 				 // triangulation. The first
@@ -1830,9 +1834,13 @@ void BoussinesqFlowProblem<dim>::assemble_rhs_T ()
       local_rhs = 0;
       fe_values.reinit (cell);
 
-      fe_values.get_function_values (old_solution, old_solution_values);
-      fe_values.get_function_gradients (old_solution, old_solution_grads);
       fe_values.get_function_values (solution, present_solution_values);
+      fe_values.get_function_values (old_solution, old_solution_values);
+      fe_values.get_function_values (old_old_solution, old_old_solution_values);
+
+      fe_values.get_function_gradients (old_solution, old_solution_grads);
+      fe_values.get_function_gradients (old_old_solution, old_old_solution_grads);
+      
 
 				       // build matrix contributions
       local_matrix = 0;
@@ -1846,6 +1854,9 @@ void BoussinesqFlowProblem<dim>::assemble_rhs_T ()
       const double kappa = std::max (5e-3 * cell->diameter(),
 				     1e-5);
 
+      const double artificial_diffusion = 0;
+      
+      
       for (unsigned int q=0; q<n_q_points; ++q)
 	{
 	  for (unsigned int k=0; k<dofs_per_cell; ++k)
@@ -1856,41 +1867,70 @@ void BoussinesqFlowProblem<dim>::assemble_rhs_T ()
 
 	  const Point<dim> p = fe_values.quadrature_point(q);
 	  const double gamma = RightHandSide<dim>().value (p, dim+1);
+
+	  const double        old_T      = old_solution_values[q](dim+1);
+	  const double        old_old_T  = old_old_solution_values[q](dim+1);
+
+	  const Tensor<1,dim> old_grad_T     = old_solution_grads[q][dim+1];
+	  const Tensor<1,dim> old_old_grad_T = old_old_solution_grads[q][dim+1];
+
 	  
+	  Tensor<1,dim> present_u;
+	  for (unsigned int d=0; d<dim; ++d)
+	    present_u[d] = present_solution_values[q](d);	  
 
 	  if (use_bdf2_scheme == true)
 	    {
-	      Assert (false, ExcNotImplemented());
+	      for (unsigned int i=0; i<dofs_per_cell; ++i)
+		for (unsigned int j=0; j<dofs_per_cell; ++j)
+		  local_matrix(i,j) += ((2*time_step + old_time_step) /
+					(time_step + old_time_step) *
+					phi_T[i] * phi_T[j]
+					+
+					time_step *
+					kappa * grad_phi_T[i] * grad_phi_T[j])
+				       * fe_values.JxW(q);
+
+	      for (unsigned int i=0; i<dofs_per_cell; ++i)
+		local_rhs(i) += ((time_step + old_time_step) / old_time_step *
+				 old_T * phi_T[i]
+				 -
+				 (time_step * time_step) /
+				 (old_time_step * (time_step + old_time_step)) *
+				 old_old_T * phi_T[i]
+				 -
+				 time_step *
+				 present_u *
+				 ((1+time_step/old_time_step) * old_grad_T
+				  -
+				  time_step / old_time_step * old_old_grad_T) *
+				 phi_T[i]
+				 +
+				 time_step *
+				 gamma * phi_T[i])
+				*
+				fe_values.JxW(q);
 	    }
 	  else
 	    {
 	      for (unsigned int i=0; i<dofs_per_cell; ++i)
 		for (unsigned int j=0; j<dofs_per_cell; ++j)
 		  local_matrix(i,j) += (phi_T[i] * phi_T[j]
-					+ kappa * time_step * grad_phi_T[i] * grad_phi_T[j])
+					+
+					time_step *
+					kappa * grad_phi_T[i] * grad_phi_T[j])
 				       * fe_values.JxW(q);
       
-					       // build rhs contributions
 	      for (unsigned int i=0; i<dofs_per_cell; ++i)
-		{
-		  const double        old_T      = old_solution_values[q](dim+1);
-		  const Tensor<1,dim> old_grad_T = old_solution_grads[q][dim+1];
-	    
-		  Tensor<1,dim> present_u;
-		  for (unsigned int d=0; d<dim; ++d)
-		    present_u[d] = present_solution_values[q](d);
-
-
-		  local_rhs(i) += (old_T * phi_T[i]
-				   -
-				   time_step *
-				   present_u * old_grad_T * phi_T[i]
-				   +
-				   time_step *
-				   gamma * phi_T[i])
-				  *
-				  fe_values.JxW(q);
-		}
+		local_rhs(i) += (old_T * phi_T[i]
+				 -
+				 time_step *
+				 present_u * old_grad_T * phi_T[i]
+				 +
+				 time_step *
+				 gamma * phi_T[i])
+				*
+				fe_values.JxW(q);
 	    }
 	}
       
