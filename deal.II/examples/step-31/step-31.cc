@@ -1765,7 +1765,7 @@ void BoussinesqFlowProblem<dim>::assemble_rhs_T ()
 {
 				   // TODO: right now, always do explicit
 				   // Euler
-  const bool is_first_timestep = (timestep_number == 0 ? true : true);
+  const bool use_bdf2_scheme = (timestep_number == 0 ? false : false);
 
   system_matrix.block(2,2) = 0;
   
@@ -1853,41 +1853,40 @@ void BoussinesqFlowProblem<dim>::assemble_rhs_T ()
 	      grad_phi_T[k] = fe_values[temperature].gradient(k,q);
 	      phi_T[k]      = fe_values[temperature].value (k, q);
 	    }
+
+	  const Point<dim> p = fe_values.quadrature_point(q);
+	  const double gamma = RightHandSide<dim>().value (p, dim+1);
+	  
 	  
 	  for (unsigned int i=0; i<dofs_per_cell; ++i)
 	    for (unsigned int j=0; j<dofs_per_cell; ++j)
 	      local_matrix(i,j) += (phi_T[i] * phi_T[j]
 				    + kappa * grad_phi_T[i] * grad_phi_T[j])
 				   * fe_values.JxW(q);
-	}
-      
       
 				       // build rhs contributions
-      for (unsigned int q=0; q<n_q_points; ++q)
-        for (unsigned int i=0; i<dofs_per_cell; ++i)
-          {
-            const double        old_T      = old_solution_values[q](dim+1);
-	    const Tensor<1,dim> old_grad_T = old_solution_grads[q][dim+1];
+	  for (unsigned int i=0; i<dofs_per_cell; ++i)
+	    {
+	      const double        old_T      = old_solution_values[q](dim+1);
+	      const Tensor<1,dim> old_grad_T = old_solution_grads[q][dim+1];
 	    
-            Tensor<1,dim> present_u;
-            for (unsigned int d=0; d<dim; ++d)
-              present_u[d] = present_solution_values[q](d);
+	      Tensor<1,dim> present_u;
+	      for (unsigned int d=0; d<dim; ++d)
+		present_u[d] = present_solution_values[q](d);
 
-            const double     phi_i_T      = fe_values[temperature].value (i, q);
-	    const Point<dim> p = fe_values.quadrature_point(q);
 
-            local_rhs(i) += (old_T * phi_i_T
-			     -
-			     time_step *
-                             present_u * old_grad_T * phi_i_T
-			     +
-			     time_step *
-			     RightHandSide<dim>().value (p, dim+1)
-			     * phi_i_T)
-                            *
-                            fe_values.JxW(q);
-          }
-
+	      local_rhs(i) += (old_T * phi_T[i]
+			       -
+			       time_step *
+			       present_u * old_grad_T * phi_T[i]
+			       +
+			       time_step *
+			       gamma * phi_T[i])
+			      *
+			      fe_values.JxW(q);
+	    }
+	}
+      
       cell->get_dof_indices (local_dof_indices);
 
       for (unsigned int i=0; i<dofs_per_cell; ++i)
