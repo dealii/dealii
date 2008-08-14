@@ -325,6 +325,7 @@ class BoussinesqFlowProblem
     double get_maximal_velocity () const;
     double get_maximal_temperature () const;
     void solve ();
+    void test (Vector<float> &) const;
     void output_results () const;
     void refine_mesh ();
 
@@ -1706,20 +1707,24 @@ double compute_viscosity(
 	const std::vector<std::vector<Tensor<2,dim> > > old_old_solution_hessians,
 	const std::vector<double>                       gamma_values,
 	const double                                    kappa,
-	const double                                    beta,
 	const double                                    global_u_infty,
 	const double                                    global_T_infty,
 	const double                                    global_Omega_diameter,
 	const double                                    cell_diameter,
-	const double                                    alpha,
 	const double                                    old_time_step
 	)
 {
-  unsigned int n_q_points = old_solution.size();
+  const double beta = 0.1;
+  const double alpha = 1;
+  
+  if (global_u_infty == 0)
+    return 5e-3 * cell_diameter;
+  
+  const unsigned int n_q_points = old_solution.size();
   
 				 // Stage 1: calculate residual
-  std::vector<double> residual (n_q_points);
-  std::vector<double> velocity_norms (n_q_points);
+  double max_residual = 0;
+  double max_velocity = 0;
   
   for (unsigned int q=0; q < n_q_points; ++q)
     {
@@ -1727,33 +1732,35 @@ double compute_viscosity(
 			    / old_time_step;
       double u_grad_T = 0.;
       for (unsigned int d=0; d<dim; ++d)
-	u_grad_T += present_solution[q](d)*(old_solution_grads[q][dim+1][d] +
-					    old_old_solution_grads[q][dim+1][d]);
-      u_grad_T *= 0.5;
+	u_grad_T += present_solution[q](d)*((old_solution_grads[q][dim+1][d] +
+					     old_old_solution_grads[q][dim+1][d]) / 2);
       
-      double kappa_Delta_T = 0.;
+      const double kappa_Delta_T = kappa
+				   * (trace(old_solution_hessians[q][dim+1]) +
+				      trace(old_old_solution_hessians[q][dim+1])) / 2;
+
+      const double residual
+	= std::abs((dT_dt + u_grad_T - kappa_Delta_T - gamma_values[q]) *
+		   std::pow((old_solution[q](dim+1)+old_old_solution[q](dim+1)) / 2,
+			    alpha-1.));
+
+      max_residual = std::max (residual, max_residual);
+
+      double velocity_squared = 0;
       for (unsigned int d=0; d<dim; ++d)
-	kappa_Delta_T += old_solution_hessians[q][dim+1][d][d] + 
-			 old_old_solution_hessians[q][dim+1][d][d];
-      kappa_Delta_T *= 0.5 * kappa;
-      
-      residual[q] = dT_dt + u_grad_T - kappa_Delta_T - gamma_values[q];
-      residual[q] *= std::pow(old_solution[q](dim+1)+old_old_solution[q](dim+1),
-			      alpha-1.);
-      
-      for (unsigned int d=0; d<dim; ++d)
-	velocity_norms[q] += present_solution[q](d) * present_solution[q](d);
+	velocity_squared += present_solution[q](d) * present_solution[q](d);
+
+      max_velocity = std::max (std::sqrt (velocity_squared),
+			       max_velocity);
     }
   
-  const double residual_cell_max = *std::max_element(residual.begin(),
-						     residual.end());
-  const double velocity_cell_max = 
-      std::sqrt(*std::max_element(velocity_norms.begin(),velocity_norms.end()));
   const double global_scaling = global_u_infty * global_T_infty /
       std::pow(global_Omega_diameter, alpha - 2.);
   
-  return beta * velocity_cell_max * std::min (cell_diameter, 
-      std::pow(cell_diameter,alpha) * residual_cell_max / global_scaling);
+  return (beta *
+	  max_velocity *
+	  std::min (cell_diameter,
+		    std::pow(cell_diameter,alpha) * max_residual / global_scaling));
 }
 
 
@@ -1845,7 +1852,7 @@ void BoussinesqFlowProblem<dim>::assemble_rhs_T ()
   
   const double global_u_infty = get_maximal_velocity();
   const double global_T_infty = get_maximal_temperature();
-  const double global_Omega_diameter = 2.; // to be modified later.
+  const double global_Omega_diameter = GridTools::diameter (triangulation);
 
 				 // Now, let's start the loop
 				 // over all cells in the
@@ -1863,6 +1870,8 @@ void BoussinesqFlowProblem<dim>::assemble_rhs_T ()
   for (; cell!=endc; ++cell)
     {
       local_rhs = 0;
+      local_matrix = 0;
+
       fe_values.reinit (cell);
 
       fe_values.get_function_values (solution, present_solution_values);
@@ -1879,7 +1888,6 @@ void BoussinesqFlowProblem<dim>::assemble_rhs_T ()
 				  gamma_values, dim+1);
 
 				       // build matrix contributions
-      local_matrix = 0;
 
 				       // define diffusion. take the
 				       // maximum of what we really
@@ -1887,16 +1895,14 @@ void BoussinesqFlowProblem<dim>::assemble_rhs_T ()
 				       // of diffusion (determined
 				       // impirically) to keep the
 				       // scheme stable
-      const double kappa = std::max (5e-3 * cell->diameter(),
-				     1e-5);
-
-      const double artificial_diffusion = 
-	  compute_viscosity (present_solution_values, old_solution_values,
-	  old_old_solution_values, old_solution_grads, old_old_solution_grads,
-	  old_solution_hessians, old_old_solution_hessians, gamma_values,
-	  kappa, /* beta = */ 1., global_u_infty, global_T_infty,
-	  global_Omega_diameter, cell->diameter(), /* alpha = */ 1.,
-	  old_time_step);
+      const double kappa = 1e-6;
+      const double nu = 
+	compute_viscosity (present_solution_values, old_solution_values,
+			   old_old_solution_values, old_solution_grads, old_old_solution_grads,
+			   old_solution_hessians, old_old_solution_hessians, gamma_values,
+			   kappa, global_u_infty, global_T_infty,
+			   global_Omega_diameter, cell->diameter(),
+			   old_time_step);
       
       for (unsigned int q=0; q<n_q_points; ++q)
 	{
@@ -1945,7 +1951,7 @@ void BoussinesqFlowProblem<dim>::assemble_rhs_T ()
 				 phi_T[i]
 				 -
 				 time_step *
-				 artificial_diffusion *
+				 nu *
 				 ((1+time_step/old_time_step) * old_grad_T
 				  -
 				  time_step / old_time_step * old_old_grad_T) *
@@ -1973,7 +1979,7 @@ void BoussinesqFlowProblem<dim>::assemble_rhs_T ()
 				 present_u * old_grad_T * phi_T[i]
 				 -
 				 time_step *
-				 artificial_diffusion *
+				 nu *
 				 old_grad_T * grad_phi_T[i]
 				 +
 				 time_step *
@@ -1993,6 +1999,83 @@ void BoussinesqFlowProblem<dim>::assemble_rhs_T ()
 
       for (unsigned int i=0; i<dofs_per_cell; ++i)
         system_rhs(local_dof_indices[i]) += local_rhs(i);
+    }
+}
+
+
+
+template <int dim>
+void
+BoussinesqFlowProblem<dim>::test (Vector<float> &viscosity) const
+{
+  QGauss<dim>   quadrature_formula(degree+2);
+  FEValues<dim> fe_values (fe, quadrature_formula,
+                           update_values    | update_gradients |
+			   update_hessians |
+                           update_quadrature_points  | update_JxW_values);
+
+  const unsigned int   n_q_points      = quadrature_formula.size();
+
+  std::vector<Vector<double> > present_solution_values (n_q_points, 
+							Vector<double>(dim+2));
+  std::vector<Vector<double> > old_solution_values(n_q_points,
+						   Vector<double>(dim+2));
+  std::vector<Vector<double> > old_old_solution_values(n_q_points,
+						       Vector<double>(dim+2));
+  std::vector<std::vector<Tensor<1,dim> > >
+    old_solution_grads(n_q_points,
+		       std::vector<Tensor<1,dim> >(dim+2));
+  std::vector<std::vector<Tensor<1,dim> > >
+    old_old_solution_grads(n_q_points,
+			   std::vector<Tensor<1,dim> >(dim+2));
+  std::vector<std::vector<Tensor<2,dim> > > old_solution_hessians(
+				  n_q_points,
+				  std::vector<Tensor<2,dim> >(dim+2));
+  std::vector<std::vector<Tensor<2,dim> > > old_old_solution_hessians(
+				  n_q_points,
+				  std::vector<Tensor<2,dim> >(dim+2));
+  RightHandSide<dim> right_hand_side;
+  std::vector<double> gamma_values (n_q_points);
+
+  const FEValuesExtractors::Scalar temperature (dim+1);
+
+  const double global_u_infty = get_maximal_velocity();
+  const double global_T_infty = get_maximal_temperature();
+  const double global_Omega_diameter = GridTools::diameter (triangulation);
+
+  typename DoFHandler<dim>::active_cell_iterator
+    cell = dof_handler.begin_active(),
+    endc = dof_handler.end();
+
+  for (unsigned int index=0; cell!=endc; ++cell, ++index)
+    {
+      fe_values.reinit (cell);
+
+      fe_values.get_function_values (solution, present_solution_values);
+      fe_values.get_function_values (old_solution, old_solution_values);
+      fe_values.get_function_values (old_old_solution, old_old_solution_values);
+
+      fe_values.get_function_gradients (old_solution, old_solution_grads);
+      fe_values.get_function_gradients (old_old_solution, old_old_solution_grads);
+      
+      fe_values.get_function_hessians (old_solution, old_solution_hessians);
+      fe_values.get_function_hessians (old_old_solution, old_old_solution_hessians);
+      
+      const double kappa = 1e-6;
+      right_hand_side.value_list (fe_values.get_quadrature_points(),
+				  gamma_values, dim+1);
+
+      viscosity(index) = 
+	(timestep_number == 0
+	 ?
+	 5e-3 * cell->diameter()
+	 :
+	 compute_viscosity (present_solution_values, old_solution_values,
+			    old_old_solution_values, old_solution_grads, old_old_solution_grads,
+			    old_solution_hessians, old_old_solution_hessians, gamma_values,
+			    kappa, global_u_infty, global_T_infty,
+			    global_Omega_diameter, cell->diameter(),
+			    old_time_step));
     }
 }
 
@@ -2116,6 +2199,9 @@ void BoussinesqFlowProblem<dim>::output_results ()  const
   solution_names.push_back ("p");
   solution_names.push_back ("T");
 
+  Vector<float> viscosity (triangulation.n_active_cells());
+  test (viscosity);
+  
   DataOut<dim> data_out;
 
   data_out.attach_dof_handler (dof_handler);
@@ -2131,6 +2217,8 @@ void BoussinesqFlowProblem<dim>::output_results ()  const
 			    DataOut<dim>::type_dof_data,
 			    data_component_interpretation);
 
+  data_out.add_data_vector (viscosity, "viscosity");
+  
   data_out.build_patches ();
 
   std::ostringstream filename;
