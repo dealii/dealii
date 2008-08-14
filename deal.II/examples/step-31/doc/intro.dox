@@ -688,7 +688,7 @@ component, and each of these blocks is equal to the Laplace matrix for
 this vector component. So assuming we order degrees of freedom in such
 a way that first all <i>x</i>-components of the velocity are numbered, then
 the <i>y</i>-components, and then the <i>z</i>-components, then the matrix
-$\hatA$ that is associated with this slightly different bilinear form has
+$\hat A$ that is associated with this slightly different bilinear form has
 the form
 @f{eqnarray*}
   \hat A =
