@@ -52,7 +52,7 @@ particular with regard to efficient linear Stokes solvers.
 
 The forcing term of the fluid motion is the buoyancy of the
 fluid, expressed as the product of the Rayleigh number $\mathrm{Ra}$,
-the temperature <i>T</i> and the gravity vector ${\mathbf g}$. (A possibly
+the temperature <i>T</i> and the gravity vector <b>g</b>. (A possibly
 more intuitive formulation would use $\mathrm{Ra} \; (T-\bar T)
 \mathbf{g}$ as right hand side where $\bar T$ is the average
 temperature, and the right hand side then describes the forces due to
@@ -465,7 +465,39 @@ we want to solve is nonlinear in <i>T</i> &mdash; not what one desires from a
 simple method to stabilize an equation, and even less so if we realize
 that $\nu(T)$ is non-differentiable in <i>T</i>. However, there is no
 reason to despair: we still have to discretize in time and we can
-treat the term explicitly. Using the BDF-2 scheme introduced above,
+treat the term explicitly.
+
+In the definition of the stabilization parameter, we approximate the time
+derivative by $\frac{\partial T}{\partial t} \approx 
+\frac{T^{n-1}-T^{n-2}}{k^{n-1}}$. This approximation makes only use
+of available time data and this is the reason why we need to store data of two 
+previous time steps (which enabled us to use the BDF-2 scheme without
+additional storage cost). We could now simply evaluate the rest of the
+terms at $t_{n-1}$, but then the discrete residual would be nothing else than
+a backward Euler approximation, which is only first order accurate. So, in
+case of smooth solutions, the residual would be still of the order <i>h</i>, 
+despite the second order time accuracy in the outer BDF-2 scheme and the 
+spatial FE discretization. This is certainly not what we want to have
+(in fact, we desired to have small residuals in regions where the solution
+behaves nicely), so a bit more care is needed. The key to this problem
+is to observe that the first derivative as we constructed it is actually 
+centered at $t_{n-\frac{3}{2}}$. We get the desired second order accurate
+residual calculation if we evaluate all spatial terms at $t_{n-\frac{3}{2}}$
+by using the approximation $\frac 12 T^{n-1}+\frac 12 T^{n-2}$, which means
+that we calculate the nonlinear viscosity as a function of this
+intermediate temperature, $\nu_\alpha = 
+\nu_\alpha\left(\frac 12 T^{n-1}+\frac 12 T^{n-2}\right)$. Note that this
+evaluation of the residual is nothing else than a Crank-Nicholson scheme,
+so we can be sure that now everything is alright. One might wonder whether
+it is a problem that the numerical viscosity now is not evaluated at 
+time <i>n</i> (as opposed to the rest of the equation). However, this offset
+is uncritical: For smooth solutions, $\nu_\alpha$ will vary continuously,
+so the error in time offset is <i>k</i> times smaller than the nonlinear
+viscosity itself, i.e., it is a small higher order contribution that is 
+left out. That's fine because the term itself is already at the level of
+discretization error in smooth regions.
+
+Using the BDF-2 scheme introduced above,
 this yields for the simpler case of uniform time steps of size <i>k</i>:
 @f{eqnarray*}
   \frac 32 T^n
@@ -497,11 +529,10 @@ derivative and the original (physical) diffusion which we treat
 implicitly (this is actually a nice term: the matrices that result
 from the left hand side are the mass matrix and a multiple of the
 Laplace matrix &mdash; both are positive definite and if the time step
-size $k$ is small, the sum is simple to invert). On the right hand
+size <i>k</i> is small, the sum is simple to invert). On the right hand
 side, the terms in the first line result from the time derivative; in
-the second line is the artificial diffusion where we calculate the
-viscosity $\nu_\alpha$ using the temperature field at time $t_{n-\frac
-32}$ using $\frac 12 (T^{n-1}+T^{n-2})$; the third line contains the
+the second line is the artificial diffusion at time $t_{n-\frac
+32}$; the third line contains the
 advection term, and the fourth the sources. Note that the
 artificial diffusion operates on the extrapolated
 temperature at the current time in the same way as we have discussed
@@ -613,7 +644,7 @@ and as discussed there a good preconditioner is
     A^{-1} & 0 \\ S^{-1} B A^{-1} & -S^{-1}
   \end{array}\right)
 @f}
-where $S$ is the Schur complement of the Stokes operator
+where <i>S</i> is the Schur complement of the Stokes operator
 $S=B^TA^{-1}B$. Of course, this preconditioner is not useful because we
 can't form the various inverses of matrices, but we can use the
 following as a preconditioner:
@@ -625,7 +656,7 @@ following as a preconditioner:
   \end{array}\right)
 @f}
 where $\tilde A^{-1},\tilde S^{-1}$ are approximations to the inverse
-matrices. In particular, it turned out that $S$ is spectrally
+matrices. In particular, it turned out that <i>S</i> is spectrally
 equivalent to the mass matrix and consequently replacing $\tilde
 S^{-1}$ by a CG solver applied to the mass matrix on the pressure
 space was a good choice.
@@ -636,7 +667,7 @@ the vector-valued velocity field, i.e.
 $A_{ij} = (\varepsilon {\mathbf v}_i, \eta \varepsilon ({\mathbf
 v}_j))$.
 In @ref step_22 "step-22" we used a sparse LU decomposition (using the
-SparseDirectUMFPACK class) of $A$ for $\tilde A^{-1}$ &mdash; the
+SparseDirectUMFPACK class) of <i>A</i> for $\tilde A^{-1}$ &mdash; the
 perfect preconditioner &mdash; in 2d, but for 3d memory and compute
 time is not usually sufficient to actually compute this decomposition;
 consequently, we only use an incomplete LU decomposition (ILU, using
@@ -655,9 +686,9 @@ of the test functions are not coupled (well, almost, see below),
 i.e. the resulting matrix is block-diagonal: one block for each vector
 component, and each of these blocks is equal to the Laplace matrix for
 this vector component. So assuming we order degrees of freedom in such
-a way that first all $x$-components of the velocity are numbered, then
-the $y$-components, and then the $z$-components, then the matrix $\hat
-A$ that is associated with this slightly different bilinear form has
+a way that first all <i>x</i>-components of the velocity are numbered, then
+the <i>y</i>-components, and then the <i>z</i>-components, then the matrix
+$\hatA$ that is associated with this slightly different bilinear form has
 the form
 @f{eqnarray*}
   \hat A =
@@ -678,17 +709,16 @@ velocity matrix $A$ as follows:
   \end{array}\right),
 @f}
 where $\tilde A_s^{-1}$ is a preconditioner for the Laplace matrix &mdash;
-something where we know very well how to build good preconditioner! 
+something where we know very well how to build good preconditioners! 
 
 In reality, the story is not quite as simple: To make the matrix
 $\tilde A$ definite, we need to make the individual blocks $\tilde
 A_s$ definite by applying boundary conditions. One can try to do so by
 applying Dirichlet boundary conditions all around the boundary, and
 then the so-defined preconditioner $\tilde A^{-1}$ turns out to be a
-good preconditioner for $A$ if the latter matrix results from a Stokes
+good preconditioner for <i>A</i> if the latter matrix results from a Stokes
 problem where we also have Dirichlet boundary conditions on the
-velocity components all around the domain, i.e. if we enforce $\mathbf
-u=0$. 
+velocity components all around the domain, i.e. if we enforce <b>u</b>=0. 
 
 Unfortunately, this "if" is an "if and only if": in the program below
 we will want to use no-flux boundary conditions of the form $\mathbf u
@@ -699,7 +729,7 @@ because it neglects the coupling of components at the boundary. A
 better way to do things is therefore if we build the matrix $\hat A$
 as the vector Laplace matrix $\hat A_{ij} = (\nabla {\mathbf v}_i,
 \eta \nabla {\mathbf v}_j)$ and then apply the same boundary condition
-as we applied to $A$. If this is Dirichlet boundary conditions all
+as we applied to <i>A</i>. If this is Dirichlet boundary conditions all
 around the domain, the $\hat A$ will decouple to three diagonal blocks
 as above, and if the boundary conditions are of the form $\mathbf u
 \cdot \mathbf n = 0$ then this will introduce a coupling of degrees of
@@ -710,7 +740,7 @@ almost all the benefits of what we hoped to get.
 
 To sum this whole story up, we can observe:
 <ul>
-  <li> Compared to building a preconditioner from the original matrix $A$
+  <li> Compared to building a preconditioner from the original matrix <i>S</i>
   resulting from the symmetric gradient as we did in @ref step_22 "step-22",
   we have to expect that the preconditioner based on the Laplace bilinear form
   performs worse since it does not take into account the coupling between
@@ -726,7 +756,7 @@ To sum this whole story up, we can observe:
   have to store an additional matrix we didn't need before, the
   preconditioner $\tilde A_s^{-1}$ is likely going to need much less
   memory than storing a preconditioner for the coupled matrix
-  $A$. This is because the matrix $A_s$ has only a third of the
+  <i>A</i>. This is because the matrix $A_s$ has only a third of the
   entries per row for all rows corresponding to interior degrees of
   freedom, and contains coupling between vector components only on
   those parts of the boundary where the boundary conditions introduce
