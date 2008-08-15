@@ -1804,11 +1804,11 @@ CellAccessor<3>::subface_case(const unsigned int face_no) const
       case RefinementCase<3>::cut_x:
 	    if (face(face_no)->child(0)->has_children())
 	      {
- 		Assert(face(face_no)->child(0)->refinement_case()==RefinementCase<3>::cut_y,
+ 		Assert(face(face_no)->child(0)->refinement_case()==RefinementCase<2>::cut_y,
  		       ExcInternalError());
 		if (face(face_no)->child(1)->has_children())
 		  {
- 		    Assert(face(face_no)->child(1)->refinement_case()==RefinementCase<3>::cut_y,
+ 		    Assert(face(face_no)->child(1)->refinement_case()==RefinementCase<2>::cut_y,
  			   ExcInternalError());
 		    return internal::SubfaceCase<3>::case_x1y2y;								 
 		  }
@@ -1819,7 +1819,7 @@ CellAccessor<3>::subface_case(const unsigned int face_no) const
 	      {
 		if (face(face_no)->child(1)->has_children())
 		  {
-  		    Assert(face(face_no)->child(1)->refinement_case()==RefinementCase<3>::cut_y,
+  		    Assert(face(face_no)->child(1)->refinement_case()==RefinementCase<2>::cut_y,
   			   ExcInternalError());
 		    return internal::SubfaceCase<3>::case_x2y;
 		  }
@@ -1830,11 +1830,11 @@ CellAccessor<3>::subface_case(const unsigned int face_no) const
       case RefinementCase<3>::cut_y:
 	    if (face(face_no)->child(0)->has_children())
 	      {
- 		Assert(face(face_no)->child(0)->refinement_case()==RefinementCase<3>::cut_x,
+ 		Assert(face(face_no)->child(0)->refinement_case()==RefinementCase<2>::cut_x,
  		       ExcInternalError());
 		if (face(face_no)->child(1)->has_children())
 		  {
- 		    Assert(face(face_no)->child(1)->refinement_case()==RefinementCase<3>::cut_x,
+ 		    Assert(face(face_no)->child(1)->refinement_case()==RefinementCase<2>::cut_x,
  			   ExcInternalError());
 		    return internal::SubfaceCase<3>::case_y1x2x;								 
 		  }
@@ -1845,7 +1845,7 @@ CellAccessor<3>::subface_case(const unsigned int face_no) const
 	      {
 		if (face(face_no)->child(1)->has_children())
 		  {
-  		    Assert(face(face_no)->child(1)->refinement_case()==RefinementCase<3>::cut_x,
+  		    Assert(face(face_no)->child(1)->refinement_case()==RefinementCase<2>::cut_x,
   			   ExcInternalError());
 		    return internal::SubfaceCase<3>::case_y2x;
 		  }
