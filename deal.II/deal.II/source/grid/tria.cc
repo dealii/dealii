@@ -7425,13 +7425,13 @@ Triangulation<3>::execute_refinement ()
 		  const raw_line_iterator lines_x[4]
 		    = {
 			  hex->face(2)->child(0)
-			  ->line((hex->face(2)->refinement_case() == RefinementCase<1>::cut_x) ? 1 : 3),        //0
+			  ->line((hex->face(2)->refinement_case() == RefinementCase<2>::cut_x) ? 1 : 3),        //0
 			  hex->face(3)->child(0)
-			  ->line((hex->face(3)->refinement_case() == RefinementCase<1>::cut_x) ? 1 : 3),        //1
+			  ->line((hex->face(3)->refinement_case() == RefinementCase<2>::cut_x) ? 1 : 3),        //1
 			  hex->face(4)->child(0)
-			  ->line((hex->face(4)->refinement_case() == RefinementCase<1>::cut_x) ? 1 : 3),        //2
+			  ->line((hex->face(4)->refinement_case() == RefinementCase<2>::cut_x) ? 1 : 3),        //2
 			  hex->face(5)->child(0)
-			  ->line((hex->face(5)->refinement_case() == RefinementCase<1>::cut_x) ? 1 : 3)         //3
+			  ->line((hex->face(5)->refinement_case() == RefinementCase<2>::cut_x) ? 1 : 3)         //3
 		    };
 		  
 		  lines=&lines_x[0];
@@ -7637,13 +7637,13 @@ Triangulation<3>::execute_refinement ()
 		  const raw_line_iterator lines_y[4]
 		    = {
 			  hex->face(0)->child(0)
-			  ->line((hex->face(0)->refinement_case() == RefinementCase<1>::cut_x) ? 1 : 3),        //0
+			  ->line((hex->face(0)->refinement_case() == RefinementCase<2>::cut_x) ? 1 : 3),        //0
 			  hex->face(1)->child(0)
-			  ->line((hex->face(1)->refinement_case() == RefinementCase<1>::cut_x) ? 1 : 3),        //1
+			  ->line((hex->face(1)->refinement_case() == RefinementCase<2>::cut_x) ? 1 : 3),        //1
 			  hex->face(4)->child(0)
-			  ->line((hex->face(4)->refinement_case() == RefinementCase<1>::cut_x) ? 1 : 3),        //2
+			  ->line((hex->face(4)->refinement_case() == RefinementCase<2>::cut_x) ? 1 : 3),        //2
 			  hex->face(5)->child(0)
-			  ->line((hex->face(5)->refinement_case() == RefinementCase<1>::cut_x) ? 1 : 3)         //3
+			  ->line((hex->face(5)->refinement_case() == RefinementCase<2>::cut_x) ? 1 : 3)         //3
 		    };
 		  
 		  lines=&lines_y[0];
@@ -7850,13 +7850,13 @@ Triangulation<3>::execute_refinement ()
 		  const raw_line_iterator lines_z[4]
 		    = {
 			  hex->face(0)->child(0)
-			  ->line((hex->face(0)->refinement_case() == RefinementCase<1>::cut_x) ? 1 : 3),        //0
+			  ->line((hex->face(0)->refinement_case() == RefinementCase<2>::cut_x) ? 1 : 3),        //0
 			  hex->face(1)->child(0)
-			  ->line((hex->face(1)->refinement_case() == RefinementCase<1>::cut_x) ? 1 : 3),        //1
+			  ->line((hex->face(1)->refinement_case() == RefinementCase<2>::cut_x) ? 1 : 3),        //1
 			  hex->face(2)->child(0)
-			  ->line((hex->face(2)->refinement_case() == RefinementCase<1>::cut_x) ? 1 : 3),        //2
+			  ->line((hex->face(2)->refinement_case() == RefinementCase<2>::cut_x) ? 1 : 3),        //2
 			  hex->face(3)->child(0)
-			  ->line((hex->face(3)->refinement_case() == RefinementCase<1>::cut_x) ? 1 : 3)         //3
+			  ->line((hex->face(3)->refinement_case() == RefinementCase<2>::cut_x) ? 1 : 3)         //3
 		    };
 		  
 		  lines=&lines_z[0];
@@ -8088,13 +8088,13 @@ Triangulation<3>::execute_refinement ()
 		  const raw_line_iterator lines_xy[13]
 		    = {
 			  hex->face(0)->child(0)
-			  ->line((hex->face(0)->refinement_case() == RefinementCase<1>::cut_x) ? 1 : 3),        //0
+			  ->line((hex->face(0)->refinement_case() == RefinementCase<2>::cut_x) ? 1 : 3),        //0
 			  hex->face(1)->child(0)
-			  ->line((hex->face(1)->refinement_case() == RefinementCase<1>::cut_x) ? 1 : 3),        //1
+			  ->line((hex->face(1)->refinement_case() == RefinementCase<2>::cut_x) ? 1 : 3),        //1
 			  hex->face(2)->child(0)
-			  ->line((hex->face(2)->refinement_case() == RefinementCase<1>::cut_x) ? 1 : 3),        //2
+			  ->line((hex->face(2)->refinement_case() == RefinementCase<2>::cut_x) ? 1 : 3),        //2
 			  hex->face(3)->child(0)
-			  ->line((hex->face(3)->refinement_case() == RefinementCase<1>::cut_x) ? 1 : 3),        //3
+			  ->line((hex->face(3)->refinement_case() == RefinementCase<2>::cut_x) ? 1 : 3),        //3
 
 			  hex->face(4)->isotropic_child(GeometryInfo<dim>::standard_to_real_face_vertex(0,f_or[4],f_fl[4],f_ro[4]))
 			  ->line(GeometryInfo<dim>::standard_to_real_face_line(1,f_or[4],f_fl[4],f_ro[4])),        //4
@@ -8443,13 +8443,13 @@ Triangulation<3>::execute_refinement ()
 		  const raw_line_iterator lines_xz[13]
 		    = {
 			  hex->face(0)->child(0)
-			  ->line((hex->face(0)->refinement_case() == RefinementCase<1>::cut_x) ? 1 : 3),        //0
+			  ->line((hex->face(0)->refinement_case() == RefinementCase<2>::cut_x) ? 1 : 3),        //0
 			  hex->face(1)->child(0)
-			  ->line((hex->face(1)->refinement_case() == RefinementCase<1>::cut_x) ? 1 : 3),        //1
+			  ->line((hex->face(1)->refinement_case() == RefinementCase<2>::cut_x) ? 1 : 3),        //1
 			  hex->face(4)->child(0)
-			  ->line((hex->face(4)->refinement_case() == RefinementCase<1>::cut_x) ? 1 : 3),        //2
+			  ->line((hex->face(4)->refinement_case() == RefinementCase<2>::cut_x) ? 1 : 3),        //2
 			  hex->face(5)->child(0)
-			  ->line((hex->face(5)->refinement_case() == RefinementCase<1>::cut_x) ? 1 : 3),        //3
+			  ->line((hex->face(5)->refinement_case() == RefinementCase<2>::cut_x) ? 1 : 3),        //3
 
 			  hex->face(2)->isotropic_child(GeometryInfo<dim>::standard_to_real_face_vertex(0,f_or[2],f_fl[2],f_ro[2]))
 			  ->line(GeometryInfo<dim>::standard_to_real_face_line(3,f_or[2],f_fl[2],f_ro[2])),        //4
@@ -8815,13 +8815,13 @@ Triangulation<3>::execute_refinement ()
 		  const raw_line_iterator lines_yz[13]
 		    = {
 			  hex->face(2)->child(0)
-			  ->line((hex->face(2)->refinement_case() == RefinementCase<1>::cut_x) ? 1 : 3),        //0
+			  ->line((hex->face(2)->refinement_case() == RefinementCase<2>::cut_x) ? 1 : 3),        //0
 			  hex->face(3)->child(0)
-			  ->line((hex->face(3)->refinement_case() == RefinementCase<1>::cut_x) ? 1 : 3),        //1
+			  ->line((hex->face(3)->refinement_case() == RefinementCase<2>::cut_x) ? 1 : 3),        //1
 			  hex->face(4)->child(0)
-			  ->line((hex->face(4)->refinement_case() == RefinementCase<1>::cut_x) ? 1 : 3),        //2
+			  ->line((hex->face(4)->refinement_case() == RefinementCase<2>::cut_x) ? 1 : 3),        //2
 			  hex->face(5)->child(0)
-			  ->line((hex->face(5)->refinement_case() == RefinementCase<1>::cut_x) ? 1 : 3),        //3
+			  ->line((hex->face(5)->refinement_case() == RefinementCase<2>::cut_x) ? 1 : 3),        //3
 
 			  hex->face(0)->isotropic_child(GeometryInfo<dim>::standard_to_real_face_vertex(0,f_or[0],f_fl[0],f_ro[0]))
 			  ->line(GeometryInfo<dim>::standard_to_real_face_line(1,f_or[0],f_fl[0],f_ro[0])),        //4
