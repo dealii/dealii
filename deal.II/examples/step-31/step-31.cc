@@ -1174,8 +1174,6 @@ BoussinesqFlowProblem<dim>::assemble_preconditioner ()
   preconditioner_matrix = 0;
 
   QGauss<dim>   quadrature_formula(degree+2);
-  QGauss<dim-1> face_quadrature_formula(degree+2);
-
   FEValues<dim> fe_values (fe, quadrature_formula,
 			   update_JxW_values |
 			   update_values |
@@ -1795,7 +1793,6 @@ void BoussinesqFlowProblem<dim>::assemble_rhs_T ()
   system_matrix.block(2,2) = 0;
   
   QGauss<dim>   quadrature_formula(degree+2);
-  QGauss<dim-1> face_quadrature_formula(degree+2);
   FEValues<dim> fe_values (fe, quadrature_formula,
                            update_values    | update_gradients |
 			   update_hessians |
@@ -2135,7 +2132,7 @@ void BoussinesqFlowProblem<dim>::output_results ()  const
   data_out.add_data_vector (solution, solution_names,
 			    DataOut<dim>::type_dof_data,
 			    data_component_interpretation);
-  data_out.build_patches ();
+  data_out.build_patches (degree);
 
   std::ostringstream filename;
   filename << "solution-" << Utilities::int_to_string(timestep_number, 4) << ".vtk";
