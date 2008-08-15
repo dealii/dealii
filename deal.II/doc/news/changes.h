@@ -215,7 +215,7 @@ inconvenience this causes.
   to SparsityPattern::print .
   <br>
   (WB 2008/07/31)
-  <li>
+  </p>
 
   <li>
   <p>
@@ -225,7 +225,7 @@ inconvenience this causes.
   to the function was set to <code>true</code>. This is now fixed.
   <br>
   (WB 2008/07/30)
-  <li>
+  </p>
 </ol>
 
 
@@ -236,12 +236,22 @@ inconvenience this causes.
 <ol>
   <li>
   <p>
+  New: It is now possible to get the inverse of the Jacobian
+  matrix from the transformation form the real to the unit cell by
+  using FEValues::inverse_jacobian.
+  <br>
+  (Martin Kronbichler 2008/08/13)
+  </p>
+  
+  <li>
+  <p>
   New: There is a second GridTools::partition_triangulation
   function that takes a cell connectivity pattern as argument, rather
   than computing it itself as the existing function. Use cases are
   discussed in the documentation of the new function.
+  <br>
   (WB 2008/08/06)
-  <li>
+  </p>
 
   <li>
   <p>
@@ -251,7 +261,7 @@ inconvenience this causes.
   refinement possibilities.
   <br>
   (Luca Heltai 2008/07/17)
-  <li>
+  </p>
 
   <p>
   New: There is now a new
