@@ -137,7 +137,7 @@ namespace{
 				     // now, the neighbor is not refined, but
 				     // perhaps he will be
     const RefinementCase<dim> nb_ref_flag=neighbor->refine_flag_set();
-    if (nb_ref_flag)
+    if (nb_ref_flag != RefinementCase<dim>::no_refinement)
       {
 					 // now we need to know, which of the
 					 // neighbors faces points towards us
@@ -5568,7 +5568,7 @@ Triangulation<2>::execute_refinement ()
 		 ++line_no)
 	      {
 		if (GeometryInfo<dim>::face_refinement_case(
-		      cell->refine_flag_set(), line_no)==RefinementCase<dim>::cut_x)
+		      cell->refine_flag_set(), line_no)==RefinementCase<1>::cut_x)
 		  {
 		    line_iterator line = cell->line(line_no);
 		    if (line->has_children() == false) 
@@ -6011,7 +6011,7 @@ Triangulation<3>::execute_refinement ()
 			Assert(aface->refinement_case()==RefinementCase<dim-1>::isotropic_refinement ||
 			       aface->refinement_case()==RefinementCase<dim-1>::no_refinement,
 			       ExcInternalError());
-						       aface->set_user_index(face_ref_case);
+			aface->set_user_index(face_ref_case);
 		      }
 		  }
 	      }// for all faces
@@ -6325,14 +6325,14 @@ Triangulation<3>::execute_refinement ()
 	      if (aniso_quad_ref_case == quad->refinement_case())
 		continue;
 	      
-	      Assert(quad->refinement_case()==RefinementCase<dim>::cut_xy ||
-		     quad->refinement_case()==RefinementCase<dim>::no_refinement,
+	      Assert(quad->refinement_case()==RefinementCase<dim-1>::cut_xy ||
+		     quad->refinement_case()==RefinementCase<dim-1>::no_refinement,
 		     ExcInternalError());
 	      
 					       // this quad needs to be refined
 					       // anisotropically
-	      Assert(quad->user_index() == RefinementCase<dim>::cut_x ||
-		     quad->user_index() == RefinementCase<dim>::cut_y,
+	      Assert(quad->user_index() == RefinementCase<dim-1>::cut_x ||
+		     quad->user_index() == RefinementCase<dim-1>::cut_y,
 		     ExcInternalError());
 
 					       // make the new line interior to
@@ -6357,7 +6357,7 @@ Triangulation<3>::execute_refinement ()
 					       // |     |
 					       // *-----*
 	      unsigned int vertex_indices[2];
-	      if (aniso_quad_ref_case==RefinementCase<dim>::cut_x)
+	      if (aniso_quad_ref_case==RefinementCase<dim-1>::cut_x)
 		{
 		  vertex_indices[0]=quad->line(2)->child(0)->vertex_index(1);
 		  vertex_indices[1]=quad->line(3)->child(0)->vertex_index(1);
@@ -6403,7 +6403,7 @@ Triangulation<3>::execute_refinement ()
 	      Assert (new_quads[1]->used() == false, ExcCellShouldBeUnused());
 
 
-	      if (aniso_quad_ref_case==RefinementCase<dim>::cut_x)
+	      if (aniso_quad_ref_case==RefinementCase<dim-1>::cut_x)
 		{
 		  new_quads[0]->set (internal::Triangulation
 				     ::TriaObject<2>(quad->line_index(0),
@@ -6455,7 +6455,7 @@ Triangulation<3>::execute_refinement ()
 	      new_quads[0]->set_line_orientation(2,quad->line_orientation(2));
 	      new_quads[1]->set_line_orientation(1,quad->line_orientation(1));
 	      new_quads[1]->set_line_orientation(2,quad->line_orientation(3));
-	      if (aniso_quad_ref_case==RefinementCase<dim>::cut_x)
+	      if (aniso_quad_ref_case==RefinementCase<dim-1>::cut_x)
 		{
 		  new_quads[0]->set_line_orientation(3,quad->line_orientation(3));
 		  new_quads[1]->set_line_orientation(2,quad->line_orientation(2));
@@ -6470,7 +6470,7 @@ Triangulation<3>::execute_refinement ()
 					       // refined isotropically
 					       // already. if so, set the
 					       // correct children pointers.
-	      if (quad->refinement_case()==RefinementCase<dim>::cut_xy)
+	      if (quad->refinement_case()==RefinementCase<dim-1>::cut_xy)
 		{
 						   // we will put a new
 						   // refinemnt level of
@@ -6501,14 +6501,14 @@ Triangulation<3>::execute_refinement ()
 						   // of ugly, we hope we don't
 						   // have to do it often...
 		  line_iterator old_child[2];
-		  if (aniso_quad_ref_case==RefinementCase<dim>::cut_x)
+		  if (aniso_quad_ref_case==RefinementCase<dim-1>::cut_x)
 		    {
 		      old_child[0]=quad->child(0)->line(1);
 		      old_child[1]=quad->child(2)->line(1);
 		    }
 		  else
 		    {
-		      Assert(aniso_quad_ref_case==RefinementCase<dim>::cut_y, ExcInternalError());
+		      Assert(aniso_quad_ref_case==RefinementCase<dim-1>::cut_y, ExcInternalError());
 		      
 		      old_child[0]=quad->child(0)->line(3);
 		      old_child[1]=quad->child(1)->line(3);
@@ -6576,7 +6576,7 @@ Triangulation<3>::execute_refinement ()
 						       // themselves, where we
 						       // might encounter
 						       // similar situations...
-		  if (aniso_quad_ref_case==RefinementCase<dim>::cut_x)
+		  if (aniso_quad_ref_case==RefinementCase<dim-1>::cut_x)
 		    {
 		      new_line->set_children(0, quad->child(0)->line_index(1));
 		      Assert(new_line->child(1)==quad->child(2)->line(1),
@@ -6655,7 +6655,7 @@ Triangulation<3>::execute_refinement ()
 		      const bool switch_1_user_flag=switch_1->user_flag_set();
 		      const RefinementCase<dim-1> switch_1_refinement_case=switch_1->refinement_case();
 		      const int switch_1_first_child_pair=(switch_1_refinement_case ? switch_1->child_index(0) : -1);
-		      const int switch_1_second_child_pair=(switch_1_refinement_case==RefinementCase<dim>::cut_xy ? switch_1->child_index(2) : -1);
+		      const int switch_1_second_child_pair=(switch_1_refinement_case==RefinementCase<dim-1>::cut_xy ? switch_1->child_index(2) : -1);
 
 		      switch_1->set(internal::Triangulation::TriaObject<2>(switch_2->line_index(0),
 									   switch_2->line_index(1),
@@ -6676,7 +6676,7 @@ Triangulation<3>::execute_refinement ()
 		      switch_1->clear_children();
 		      if (switch_2->refinement_case())
 			switch_1->set_children(0, switch_2->child_index(0));
-		      if (switch_2->refinement_case()==RefinementCase<dim>::cut_xy)
+		      if (switch_2->refinement_case()==RefinementCase<dim-1>::cut_xy)
 			switch_1->set_children(2, switch_2->child_index(2));
 			
 		      switch_2->set(internal::Triangulation::TriaObject<2>(switch_1_lines[0],
@@ -6756,15 +6756,15 @@ Triangulation<3>::execute_refinement ()
 					       // two (anisotropic) children
 	      const RefinementCase<dim-1> quad_ref_case=quad->refinement_case();
 	    
-	      if (quad_ref_case==RefinementCase<dim>::cut_x ||
-		  quad_ref_case==RefinementCase<dim>::cut_y)
+	      if (quad_ref_case==RefinementCase<dim-1>::cut_x ||
+		  quad_ref_case==RefinementCase<dim-1>::cut_y)
 		{
 						   // set the 'opposite' refine case for children
-		  quad->child(0)->set_user_index(RefinementCase<dim>::cut_xy-quad_ref_case);
-		  quad->child(1)->set_user_index(RefinementCase<dim>::cut_xy-quad_ref_case);
+		  quad->child(0)->set_user_index(RefinementCase<dim-1>::cut_xy-quad_ref_case);
+		  quad->child(1)->set_user_index(RefinementCase<dim-1>::cut_xy-quad_ref_case);
 						   // refine the inner line
 		  line_iterator middle_line;
-		  if (quad_ref_case==RefinementCase<dim>::cut_x)
+		  if (quad_ref_case==RefinementCase<dim-1>::cut_x)
 		    middle_line=quad->child(0)->line(1);
 		  else
 		    middle_line=quad->child(0)->line(3);
@@ -6843,7 +6843,7 @@ Triangulation<3>::execute_refinement ()
 					       // unrefined quad and have to do
 					       // the usual work like in an purely
 					       // isotropic refinement
-	      Assert(quad_ref_case==RefinementCase<dim>::no_refinement, ExcInternalError());
+	      Assert(quad_ref_case==RefinementCase<dim-1>::no_refinement, ExcInternalError());
 
 					       // set the middle vertex
 					       // appropriately
@@ -7159,7 +7159,7 @@ Triangulation<3>::execute_refinement ()
 	    unsigned int n_new_lines=0;
 	    unsigned int n_new_quads=0;
 	    unsigned int n_new_hexes=0;
-	    switch (static_cast<unsigned char> (ref_case))
+	    switch (ref_case)
 	      {
 		case RefinementCase<dim>::cut_x:
 		case RefinementCase<dim>::cut_y:
@@ -7358,7 +7358,7 @@ Triangulation<3>::execute_refinement ()
 					     // hopefully increases the
 					     // readability to some extend.
 
-	    switch (static_cast<unsigned char> (ref_case))
+	    switch (ref_case)
 	      {
 		case RefinementCase<dim>::cut_x:
 		{
@@ -7425,13 +7425,13 @@ Triangulation<3>::execute_refinement ()
 		  const raw_line_iterator lines_x[4]
 		    = {
 			  hex->face(2)->child(0)
-			  ->line((hex->face(2)->refinement_case() == RefinementCase<dim>::cut_x) ? 1 : 3),        //0
+			  ->line((hex->face(2)->refinement_case() == RefinementCase<1>::cut_x) ? 1 : 3),        //0
 			  hex->face(3)->child(0)
-			  ->line((hex->face(3)->refinement_case() == RefinementCase<dim>::cut_x) ? 1 : 3),        //1
+			  ->line((hex->face(3)->refinement_case() == RefinementCase<1>::cut_x) ? 1 : 3),        //1
 			  hex->face(4)->child(0)
-			  ->line((hex->face(4)->refinement_case() == RefinementCase<dim>::cut_x) ? 1 : 3),        //2
+			  ->line((hex->face(4)->refinement_case() == RefinementCase<1>::cut_x) ? 1 : 3),        //2
 			  hex->face(5)->child(0)
-			  ->line((hex->face(5)->refinement_case() == RefinementCase<dim>::cut_x) ? 1 : 3)         //3
+			  ->line((hex->face(5)->refinement_case() == RefinementCase<1>::cut_x) ? 1 : 3)         //3
 		    };
 		  
 		  lines=&lines_x[0];
@@ -7637,13 +7637,13 @@ Triangulation<3>::execute_refinement ()
 		  const raw_line_iterator lines_y[4]
 		    = {
 			  hex->face(0)->child(0)
-			  ->line((hex->face(0)->refinement_case() == RefinementCase<dim>::cut_x) ? 1 : 3),        //0
+			  ->line((hex->face(0)->refinement_case() == RefinementCase<1>::cut_x) ? 1 : 3),        //0
 			  hex->face(1)->child(0)
-			  ->line((hex->face(1)->refinement_case() == RefinementCase<dim>::cut_x) ? 1 : 3),        //1
+			  ->line((hex->face(1)->refinement_case() == RefinementCase<1>::cut_x) ? 1 : 3),        //1
 			  hex->face(4)->child(0)
-			  ->line((hex->face(4)->refinement_case() == RefinementCase<dim>::cut_x) ? 1 : 3),        //2
+			  ->line((hex->face(4)->refinement_case() == RefinementCase<1>::cut_x) ? 1 : 3),        //2
 			  hex->face(5)->child(0)
-			  ->line((hex->face(5)->refinement_case() == RefinementCase<dim>::cut_x) ? 1 : 3)         //3
+			  ->line((hex->face(5)->refinement_case() == RefinementCase<1>::cut_x) ? 1 : 3)         //3
 		    };
 		  
 		  lines=&lines_y[0];
@@ -7850,13 +7850,13 @@ Triangulation<3>::execute_refinement ()
 		  const raw_line_iterator lines_z[4]
 		    = {
 			  hex->face(0)->child(0)
-			  ->line((hex->face(0)->refinement_case() == RefinementCase<dim>::cut_x) ? 1 : 3),        //0
+			  ->line((hex->face(0)->refinement_case() == RefinementCase<1>::cut_x) ? 1 : 3),        //0
 			  hex->face(1)->child(0)
-			  ->line((hex->face(1)->refinement_case() == RefinementCase<dim>::cut_x) ? 1 : 3),        //1
+			  ->line((hex->face(1)->refinement_case() == RefinementCase<1>::cut_x) ? 1 : 3),        //1
 			  hex->face(2)->child(0)
-			  ->line((hex->face(2)->refinement_case() == RefinementCase<dim>::cut_x) ? 1 : 3),        //2
+			  ->line((hex->face(2)->refinement_case() == RefinementCase<1>::cut_x) ? 1 : 3),        //2
 			  hex->face(3)->child(0)
-			  ->line((hex->face(3)->refinement_case() == RefinementCase<dim>::cut_x) ? 1 : 3)         //3
+			  ->line((hex->face(3)->refinement_case() == RefinementCase<1>::cut_x) ? 1 : 3)         //3
 		    };
 		  
 		  lines=&lines_z[0];
@@ -8088,13 +8088,13 @@ Triangulation<3>::execute_refinement ()
 		  const raw_line_iterator lines_xy[13]
 		    = {
 			  hex->face(0)->child(0)
-			  ->line((hex->face(0)->refinement_case() == RefinementCase<dim>::cut_x) ? 1 : 3),        //0
+			  ->line((hex->face(0)->refinement_case() == RefinementCase<1>::cut_x) ? 1 : 3),        //0
 			  hex->face(1)->child(0)
-			  ->line((hex->face(1)->refinement_case() == RefinementCase<dim>::cut_x) ? 1 : 3),        //1
+			  ->line((hex->face(1)->refinement_case() == RefinementCase<1>::cut_x) ? 1 : 3),        //1
 			  hex->face(2)->child(0)
-			  ->line((hex->face(2)->refinement_case() == RefinementCase<dim>::cut_x) ? 1 : 3),        //2
+			  ->line((hex->face(2)->refinement_case() == RefinementCase<1>::cut_x) ? 1 : 3),        //2
 			  hex->face(3)->child(0)
-			  ->line((hex->face(3)->refinement_case() == RefinementCase<dim>::cut_x) ? 1 : 3),        //3
+			  ->line((hex->face(3)->refinement_case() == RefinementCase<1>::cut_x) ? 1 : 3),        //3
 
 			  hex->face(4)->isotropic_child(GeometryInfo<dim>::standard_to_real_face_vertex(0,f_or[4],f_fl[4],f_ro[4]))
 			  ->line(GeometryInfo<dim>::standard_to_real_face_line(1,f_or[4],f_fl[4],f_ro[4])),        //4
@@ -8443,13 +8443,13 @@ Triangulation<3>::execute_refinement ()
 		  const raw_line_iterator lines_xz[13]
 		    = {
 			  hex->face(0)->child(0)
-			  ->line((hex->face(0)->refinement_case() == RefinementCase<dim>::cut_x) ? 1 : 3),        //0
+			  ->line((hex->face(0)->refinement_case() == RefinementCase<1>::cut_x) ? 1 : 3),        //0
 			  hex->face(1)->child(0)
-			  ->line((hex->face(1)->refinement_case() == RefinementCase<dim>::cut_x) ? 1 : 3),        //1
+			  ->line((hex->face(1)->refinement_case() == RefinementCase<1>::cut_x) ? 1 : 3),        //1
 			  hex->face(4)->child(0)
-			  ->line((hex->face(4)->refinement_case() == RefinementCase<dim>::cut_x) ? 1 : 3),        //2
+			  ->line((hex->face(4)->refinement_case() == RefinementCase<1>::cut_x) ? 1 : 3),        //2
 			  hex->face(5)->child(0)
-			  ->line((hex->face(5)->refinement_case() == RefinementCase<dim>::cut_x) ? 1 : 3),        //3
+			  ->line((hex->face(5)->refinement_case() == RefinementCase<1>::cut_x) ? 1 : 3),        //3
 
 			  hex->face(2)->isotropic_child(GeometryInfo<dim>::standard_to_real_face_vertex(0,f_or[2],f_fl[2],f_ro[2]))
 			  ->line(GeometryInfo<dim>::standard_to_real_face_line(3,f_or[2],f_fl[2],f_ro[2])),        //4
@@ -8815,13 +8815,13 @@ Triangulation<3>::execute_refinement ()
 		  const raw_line_iterator lines_yz[13]
 		    = {
 			  hex->face(2)->child(0)
-			  ->line((hex->face(2)->refinement_case() == RefinementCase<dim>::cut_x) ? 1 : 3),        //0
+			  ->line((hex->face(2)->refinement_case() == RefinementCase<1>::cut_x) ? 1 : 3),        //0
 			  hex->face(3)->child(0)
-			  ->line((hex->face(3)->refinement_case() == RefinementCase<dim>::cut_x) ? 1 : 3),        //1
+			  ->line((hex->face(3)->refinement_case() == RefinementCase<1>::cut_x) ? 1 : 3),        //1
 			  hex->face(4)->child(0)
-			  ->line((hex->face(4)->refinement_case() == RefinementCase<dim>::cut_x) ? 1 : 3),        //2
+			  ->line((hex->face(4)->refinement_case() == RefinementCase<1>::cut_x) ? 1 : 3),        //2
 			  hex->face(5)->child(0)
-			  ->line((hex->face(5)->refinement_case() == RefinementCase<dim>::cut_x) ? 1 : 3),        //3
+			  ->line((hex->face(5)->refinement_case() == RefinementCase<1>::cut_x) ? 1 : 3),        //3
 
 			  hex->face(0)->isotropic_child(GeometryInfo<dim>::standard_to_real_face_vertex(0,f_or[0],f_fl[0],f_ro[0]))
 			  ->line(GeometryInfo<dim>::standard_to_real_face_line(1,f_or[0],f_fl[0],f_ro[0])),        //4
@@ -9728,7 +9728,7 @@ Triangulation<3>::execute_refinement ()
 					     // inner neighbors, i.e. children
 					     // neighboring other children of
 					     // the same mother cube.
-	    switch (static_cast<unsigned char> (ref_case))
+	    switch (ref_case)
 	      {
 		case RefinementCase<dim>::cut_x:
 		      new_hexes[0]->set_neighbor(1, new_hexes[1]);
@@ -10114,7 +10114,7 @@ void Triangulation<3>::prepare_refinement_dim_dependent ()
 	  {
 	    for (unsigned int line=0; line<GeometryInfo<dim>::lines_per_cell; ++line)
 	      if (GeometryInfo<dim>::line_refinement_case(cell->refine_flag_set(), line)
-		  ==RefinementCase<dim>::cut_x)
+		  ==RefinementCase<1>::cut_x)
 						 // flag a line, that will be
 						 // refined
 		cell->line(line)->set_user_flag();
@@ -10123,7 +10123,7 @@ void Triangulation<3>::prepare_refinement_dim_dependent ()
 	  {
 	    for (unsigned int line=0; line<GeometryInfo<dim>::lines_per_cell; ++line)
 	      if (GeometryInfo<dim>::line_refinement_case(cell->refinement_case(), line)
-		  ==RefinementCase<dim>::cut_x)
+		  ==RefinementCase<1>::cut_x)
 						 // flag a line, that is refined
 						 // and will stay so
 		cell->line(line)->set_user_flag();
@@ -10171,7 +10171,7 @@ void Triangulation<3>::prepare_refinement_dim_dependent ()
 		    if (cell->line(line)->child(c)->user_flag_set () &&
 			(GeometryInfo<dim>::line_refinement_case(cell->refine_flag_set(),
 								 line)
-			 ==RefinementCase<dim>::no_refinement))
+			 ==RefinementCase<1>::no_refinement))
 		      {
 							 // tag this
 							 // cell for
@@ -10191,7 +10191,7 @@ void Triangulation<3>::prepare_refinement_dim_dependent ()
 			
 			for (unsigned int l=0; l<GeometryInfo<dim>::lines_per_cell; ++l)
 			  if (GeometryInfo<dim>::line_refinement_case(cell->refine_flag_set(), line)
-			      ==RefinementCase<dim>::cut_x)
+			      ==RefinementCase<1>::cut_x)
 							     // flag a line,
 							     // that will be
 							     // refined
@@ -10214,7 +10214,7 @@ void Triangulation<3>::prepare_refinement_dim_dependent ()
 			  if (!cell->line(line)->has_children() &&
 			      (GeometryInfo<dim>::line_refinement_case(cell->refine_flag_set(),
 								       line)
-			       !=RefinementCase<dim>::no_refinement))
+			       !=RefinementCase<1>::no_refinement))
 			    cell->line(line)->set_user_flag();
 			
 			break;
@@ -10262,7 +10262,7 @@ void Triangulation<3>::prepare_refinement_dim_dependent ()
 		  cell->clear_user_flag();
 		  for (unsigned int l=0; l<GeometryInfo<dim>::lines_per_cell; ++l)
 		    if (GeometryInfo<dim>::line_refinement_case(cell->refinement_case(), l)
-			==RefinementCase<dim>::cut_x)
+			==RefinementCase<1>::cut_x)
 						 // flag a line, that is refined
 						 // and will stay so
 		      cell->line(l)->set_user_flag();
@@ -11334,7 +11334,7 @@ bool Triangulation<dim>::prepare_coarsening_and_refinement ()
 		    if (cell->neighbor(i).state() == IteratorState::valid &&
 			(GeometryInfo<dim>::face_refinement_case(cell->refine_flag_set(),
 								 i)
-			 != RefinementCase<dim>::no_refinement))
+			 != RefinementCase<dim-1>::no_refinement))
 		      {
 							 // 1) if the neighbor has
 							 // children: nothing to
@@ -11891,7 +11891,7 @@ void Triangulation<2>::delete_children (cell_iterator &cell,
     if (!cell->at_boundary(face_no))
       {
 	if (GeometryInfo<dim>::face_refinement_case(ref_case, face_no)
-	    ==RefinementCase<dim>::no_refinement)
+	    ==RefinementCase<1>::no_refinement)
 	  cell->set_neighbor(face_no,cell->child(face_no%2)->neighbor(face_no));
 	
 	cell_iterator neighbor=cell->neighbor(face_no);
@@ -11931,7 +11931,7 @@ void Triangulation<2>::delete_children (cell_iterator &cell,
 					 // any)
 	while (neighbor->has_children() &&
 	       (GeometryInfo<dim>::face_refinement_case(neighbor->refinement_case(), nb_nb)
-		==RefinementCase<dim>::no_refinement))
+		==RefinementCase<dim-1>::no_refinement))
 	  {
 	    neighbor=neighbor->child(GeometryInfo<dim>
 				     ::child_cell_on_face(neighbor->refinement_case(),
@@ -11975,7 +11975,7 @@ void Triangulation<2>::delete_children (cell_iterator &cell,
 		    while (neighbor_child->has_children() &&
 			   (GeometryInfo<dim>::face_refinement_case(neighbor_child->refinement_case(),
 								    nb_nb)
-			    == RefinementCase<dim>::no_refinement))
+			    == RefinementCase<dim-1>::no_refinement))
 		      {
 			neighbor_child=neighbor_child
 				       ->child(GeometryInfo<dim>
@@ -12042,7 +12042,7 @@ void Triangulation<2>::delete_children (cell_iterator &cell,
     if (((cell->neighbor(face).state() != IteratorState::valid) ||
 	 (!cell->neighbor(face)->has_children())) &&
 	(GeometryInfo<dim>::face_refinement_case(ref_case,face)
-	 !=RefinementCase<dim>::no_refinement))
+	 !=RefinementCase<dim-1>::no_refinement))
       {
 	line_iterator line=cell->face(face);
 					 // delete middle vertex
@@ -12123,7 +12123,7 @@ void Triangulation<3>::delete_children (cell_iterator &cell,
 				   // for append quads and lines: only append
 				   // them to the list of objects to be deleted
   
-  switch (static_cast<unsigned char> (ref_case))
+  switch (ref_case)
     {
       case RefinementCase<dim>::cut_x:
 	    quads_to_delete.push_back(cell->child(0)->face(1));
@@ -12233,17 +12233,17 @@ void Triangulation<3>::delete_children (cell_iterator &cell,
       quad_iterator quad=cell->face(quad_no);
 
       Assert((GeometryInfo<dim>::face_refinement_case(ref_case,quad_no) && quad->has_children()) ||
-	     GeometryInfo<dim>::face_refinement_case(ref_case,quad_no)==RefinementCase<dim>::no_refinement,
+	     GeometryInfo<dim>::face_refinement_case(ref_case,quad_no)==RefinementCase<dim-1>::no_refinement,
 	     ExcInternalError());
 
-      switch (static_cast<unsigned char> (quad->refinement_case()))
+      switch (quad->refinement_case())
 	{
-	  case RefinementCase<dim>::no_refinement:
+	  case RefinementCase<dim-1>::no_refinement:
 						 // nothing to do as the quad
 						 // is not refined
 		break;
-	  case RefinementCase<dim>::cut_x:
-	  case RefinementCase<dim>::cut_y:
+	  case RefinementCase<dim-1>::cut_x:
+	  case RefinementCase<dim-1>::cut_y:
 	  {
 					     // if one of the cell counters is
 					     // zero, the other has to be as
@@ -12287,7 +12287,7 @@ void Triangulation<3>::delete_children (cell_iterator &cell,
 						       // anymore
 		      quads_to_delete.push_back(quad->child(c)->child(0));
 		      quads_to_delete.push_back(quad->child(c)->child(1));
-  		      if (quad->child(c)->refinement_case()==RefinementCase<dim>::cut_x)
+  		      if (quad->child(c)->refinement_case()==RefinementCase<2>::cut_x)
   			lines_to_delete.push_back(quad->child(c)->child(0)->line(1));
   		      else
   			lines_to_delete.push_back(quad->child(c)->child(0)->line(3));
@@ -12305,7 +12305,7 @@ void Triangulation<3>::delete_children (cell_iterator &cell,
 		deleted_grandchildren==number_of_child_refinements)
 	      {
 		line_iterator middle_line;
-		if (quad->refinement_case()==RefinementCase<dim>::cut_x)
+		if (quad->refinement_case()==RefinementCase<2>::cut_x)
 		  middle_line=quad->child(0)->line(1);
 		else
 		  middle_line=quad->child(0)->line(3);
@@ -12326,7 +12326,7 @@ void Triangulation<3>::delete_children (cell_iterator &cell,
 						 // anymore
 		quads_to_delete.push_back(quad->child(0));
 		quads_to_delete.push_back(quad->child(1));
- 		if (quad->refinement_case()==RefinementCase<dim>::cut_x)
+ 		if (quad->refinement_case()==RefinementCase<2>::cut_x)
  		  lines_to_delete.push_back(quad->child(0)->line(1));
  		else
  		  lines_to_delete.push_back(quad->child(0)->line(3));
@@ -12350,7 +12350,7 @@ void Triangulation<3>::delete_children (cell_iterator &cell,
 						 // set the children
 						 // accordingly.
 		if (quad->child(0)->has_children())
-		  if (quad->refinement_case()==RefinementCase<dim>::cut_x)
+		  if (quad->refinement_case()==RefinementCase<2>::cut_x)
 		    {
 						       // now evereything is
 						       // quite complicated. we
@@ -12487,7 +12487,7 @@ void Triangulation<3>::delete_children (cell_iterator &cell,
 	      }
 	    break;
 	  }
-	  case RefinementCase<dim>::cut_xy:
+	  case RefinementCase<dim-1>::cut_xy:
 	  {
 					     // if one of the cell counters is
 					     // zero, the others have to be as
@@ -12524,6 +12524,7 @@ void Triangulation<3>::delete_children (cell_iterator &cell,
 	      }
 	  }
 	  break;
+
 	  default:
 		Assert(false, ExcInternalError());
 		break;
@@ -12544,7 +12545,7 @@ void Triangulation<3>::delete_children (cell_iterator &cell,
       line_iterator line=cell->line(line_no);
 
       Assert((GeometryInfo<dim>::line_refinement_case(ref_case,line_no) && line->has_children()) ||
-	     GeometryInfo<dim>::line_refinement_case(ref_case,line_no)==RefinementCase<dim>::no_refinement,
+	     GeometryInfo<dim>::line_refinement_case(ref_case,line_no)==RefinementCase<1>::no_refinement,
 	     ExcInternalError());
       
       if (line->has_children())
@@ -13200,7 +13201,7 @@ void Triangulation<2>::create_children (unsigned int &next_unused_vertex,
 		  while(nb_child->has_children()
 			&& (GeometryInfo<dim>::face_refinement_case(nb_child->refinement_case(),
 								    nb_nb)
-			    == RefinementCase<dim>::no_refinement))
+			    == RefinementCase<dim-1>::no_refinement))
 						     // nb_child has children
 						     // which are not refined at
 						     // the current (sub)face,
@@ -13797,7 +13798,7 @@ Triangulation<3>::update_neighbors(cell_iterator &cell,
 					 // set our child's neighbor as our
 					 // neighbor (the child's neighbor might
 					 // be more current...).
-	if (GeometryInfo<dim>::face_refinement_case(cell->refinement_case(), f) == RefinementCase<dim>::no_refinement)
+	if (GeometryInfo<dim>::face_refinement_case(cell->refinement_case(), f) == RefinementCase<dim-1>::no_refinement)
 	  {
 	    const active_cell_iterator child_on_this_face=cell->child(GeometryInfo<dim>::child_cell_on_face(cell->refinement_case(),
 													    f,
@@ -13832,7 +13833,7 @@ Triangulation<3>::update_neighbors(cell_iterator &cell,
 					   // coarser we also have to
 					   // adjust the neighbor's
 					   // neighborship info.
-	  if ((GeometryInfo<dim>::face_refinement_case(ref_case,f) == RefinementCase<dim>::no_refinement) && !cell->neighbor_is_coarser(f))
+	  if ((GeometryInfo<dim>::face_refinement_case(ref_case,f) == RefinementCase<dim-1>::no_refinement) && !cell->neighbor_is_coarser(f))
 	    {
 	      if (refining)
 		neighbor->set_neighbor(cell->neighbor_of_neighbor(f),
@@ -13855,7 +13856,7 @@ Triangulation<3>::update_neighbors(cell_iterator &cell,
 	  const RefinementCase<dim-1> face_ref_case
 	    =cell->face(f)->refinement_case();
 		    
-	  switch (static_cast<unsigned char> (face_ref_case))
+	  switch (face_ref_case)
 	    {
 	      case RefinementCase<dim>::no_refinement:
 						     // in this case neither our
