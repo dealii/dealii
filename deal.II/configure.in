@@ -108,11 +108,13 @@ dnl Next determine which C++ compiler we have here and set compilation
 dnl flags accordingly. Note that for historical reasons the name and
 dnl version of the compiler is written to the variable GXX_VERSION.
 DEAL_II_DETERMINE_CXX_BRAND
+DEAL_II_DETERMINE_IF_SUPPORTS_MPI
 DEAL_II_SET_CXX_FLAGS
 DEAL_II_SET_CXX_DEBUG_FLAG
 
 AC_SUBST(GXX_VERSION)
 AC_SUBST(GXX_VERSION_DETAILED)
+AC_SUBST(DEAL_II_COMPILER_SUPPORTS_MPI)
 AC_SUBST(CXXFLAGSG)
 AC_SUBST(CXXFLAGSO)
 AC_SUBST(CXXFLAGSPIC)

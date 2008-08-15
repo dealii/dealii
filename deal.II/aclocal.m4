@@ -377,6 +377,33 @@ AC_DEFUN(DEAL_II_DETERMINE_CXX_BRAND, dnl
 
 
 
+dnl -------------------------------------------------------------
+dnl See whether the compiler we have has MPI build in (e.g. if it
+dnl is actually mpiCC, etc)
+dnl
+dnl Usage: DEAL_II_DETERMINE_IF_SUPPORTS_MPI
+dnl
+dnl -------------------------------------------------------------
+AC_DEFUN(DEAL_II_DETERMINE_IF_SUPPORTS_MPI, dnl
+[
+  AC_MSG_CHECKING(if the compiler is built for MPI)
+  AC_TRY_COMPILE(
+        [
+          #include <mpi.h>
+        ],
+        [;],
+        [
+          AC_MSG_RESULT(yes)
+	  AC_DEFINE(DEAL_II_COMPILER_SUPPORTS_MPI, 1,
+                    [Defined if the compiler supports including <mpi.h>])
+        ],
+        [
+          AC_MSG_RESULT(no)
+        ])
+])
+
+
+
 
 
 dnl -------------------------------------------------------------

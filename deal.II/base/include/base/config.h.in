@@ -70,6 +70,9 @@
    */
 #undef DEAL_II_COMPAT_MAPPING
 
+/* Defined if the compiler supports including <mpi.h> */
+#undef DEAL_II_COMPILER_SUPPORTS_MPI
+
 /* disable the function parser in contrib */
 #undef DEAL_II_DISABLE_PARSER
 

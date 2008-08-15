@@ -136,6 +136,17 @@ inconvenience this causes.
 <ol>
   <li>
   <p>
+  New: If the compiler allows to do <code>\#include @<mpi.h@></code>, then
+  the flag <code>DEAL_II_COMPILER_SUPPORTS_MPI</code> is now set in
+  <code>base/include/base/config.h</code>. This also fixes a problem in
+  <code>base/include/base/utilities.h</code> if a compiler capable of
+  including <code>mpi.h</code> was used but not PETSc.
+  <br> 
+  (WB 2008/08/15)
+  </p>
+
+  <li>
+  <p>
   Fixed: A misplaced <code>\#include</code> directive prevented the file
   <code>base/source/data_out_base.cc</code> from being compilable by
   the PGI C++ compiler. This is now fixed.

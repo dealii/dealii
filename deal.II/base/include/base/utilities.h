@@ -20,9 +20,8 @@
 #include <utility>
 #include <string>
 
-#ifdef DEAL_II_USE_PETSC
-#include <petscvec.h>
-
+#ifdef DEAL_II_COMPILER_SUPPORTS_MPI
+#include <mpi.h>
 #else
 typedef int MPI_Comm;
 #endif
@@ -202,12 +201,6 @@ namespace Utilities
 				      * Return the number of MPI processes
 				      * there exist. If this is a sequential
 				      * job, it returns 1.
-				      *
-				      * This function will only work if you
-				      * also configured the library to use
-				      * PETSc. If your program uses MPI but
-				      * not PETSc, then this function is
-				      * likely not going to work.
 				      */
     unsigned int get_n_mpi_processes (const MPI_Comm &mpi_communicator);
 
