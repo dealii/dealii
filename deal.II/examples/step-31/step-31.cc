@@ -2287,7 +2287,7 @@ void BoussinesqFlowProblem<dim>::run ()
 
 	GridGenerator::hyper_cube (triangulation);
 
-	triangulation.refine_global (4);
+	triangulation.refine_global (6);
 
 	break;
       }
