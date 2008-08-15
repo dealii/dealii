@@ -36,7 +36,7 @@ clean-up-files = *gmv *gnuplot *gpl *eps *pov
 
 #
 #
-# Usually, you will not need to change something beyond this point.
+# Usually, you will not need to change anything beyond this point.
 #
 #
 # The next statement tell the `make' program where to find the
