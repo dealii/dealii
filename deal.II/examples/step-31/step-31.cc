@@ -53,7 +53,7 @@
 #include <numerics/vectors.h>
 #include <numerics/matrices.h>
 #include <numerics/data_out.h>
-#include <numerics/derivative_approximation.h>
+#include <numerics/error_estimator.h>
 #include <numerics/solution_transfer.h>
 
 #include <fstream>
@@ -318,7 +318,7 @@ class BoussinesqFlowProblem
     void run ();
 
   private:
-    void setup_dofs (const bool setup_matrices);
+    void setup_dofs ();
     void assemble_preconditioner ();
     void assemble_system ();
     void assemble_rhs_T ();
@@ -326,7 +326,7 @@ class BoussinesqFlowProblem
     double get_maximal_temperature () const;
     void solve ();
     void output_results () const;
-    void refine_mesh ();
+    void refine_mesh (const unsigned int max_grid_level);
 
     const unsigned int   degree;
 
@@ -802,6 +802,7 @@ template <int dim>
 BoussinesqFlowProblem<dim>::BoussinesqFlowProblem (const unsigned int degree)
                 :
                 degree (degree),
+		triangulation (Triangulation<dim>::maximum_smoothing),
                 fe (FE_Q<dim>(degree+1), dim,
                     FE_Q<dim>(degree), 1,
                     FE_Q<dim>(degree), 1),
@@ -857,7 +858,7 @@ BoussinesqFlowProblem<dim>::BoussinesqFlowProblem (const unsigned int degree)
 				 // boundaries with boundary indicator
 				 // zero.
 template <int dim>
-void BoussinesqFlowProblem<dim>::setup_dofs (const bool setup_matrices)
+void BoussinesqFlowProblem<dim>::setup_dofs ()
 {
   dof_handler.distribute_dofs (fe);
   DoFRenumbering::Cuthill_McKee (dof_handler);
@@ -865,16 +866,6 @@ void BoussinesqFlowProblem<dim>::setup_dofs (const bool setup_matrices)
   block_component[dim] = 1;
   block_component[dim+1] = 2;
   DoFRenumbering::component_wise (dof_handler, block_component);
-
-  hanging_node_constraints.clear ();
-  DoFTools::make_hanging_node_constraints (dof_handler,
-					   hanging_node_constraints);
-  std::set<unsigned char> no_normal_flux_boundaries;
-  no_normal_flux_boundaries.insert (0);
-  VectorTools::compute_no_normal_flux_constraints (dof_handler, 0,
-						   no_normal_flux_boundaries,
-						   hanging_node_constraints);
-  hanging_node_constraints.close ();
 
 				 // The next step is, as usual, 
 				 // to write some information
@@ -898,6 +889,9 @@ void BoussinesqFlowProblem<dim>::setup_dofs (const bool setup_matrices)
 
   std::cout << "Number of active cells: "
             << triangulation.n_active_cells()
+	    << " (on "
+	    << triangulation.n_levels()
+	    << " levels)"
             << std::endl
             << "Number of degrees of freedom: "
             << dof_handler.n_dofs()
@@ -905,6 +899,17 @@ void BoussinesqFlowProblem<dim>::setup_dofs (const bool setup_matrices)
             << std::endl
             << std::endl;
 
+  hanging_node_constraints.clear ();
+  DoFTools::make_hanging_node_constraints (dof_handler,
+					   hanging_node_constraints);
+  std::set<unsigned char> no_normal_flux_boundaries;
+  no_normal_flux_boundaries.insert (0);
+  VectorTools::compute_no_normal_flux_constraints (dof_handler, 0,
+						   no_normal_flux_boundaries,
+						   hanging_node_constraints);
+  hanging_node_constraints.close ();
+
+  
 				 // The next step is to 
 				 // create the sparsity 
 				 // pattern for the system matrix 
@@ -964,160 +969,159 @@ void BoussinesqFlowProblem<dim>::setup_dofs (const bool setup_matrices)
 				 // need to reassign the 
 				 // system matrix structure to
 				 // the sparsity pattern.
-  if (setup_matrices == true)
-    {
-      {
-	system_matrix.clear ();
+  {
+    system_matrix.clear ();
 
-	BlockCompressedSetSparsityPattern csp (3,3);
+    BlockCompressedSetSparsityPattern csp (3,3);
  
-	csp.block(0,0).reinit (n_u, n_u);
-	csp.block(0,1).reinit (n_u, n_p);
-	csp.block(0,2).reinit (n_u, n_T);
-	csp.block(1,0).reinit (n_p, n_u);
-	csp.block(1,1).reinit (n_p, n_p);
-	csp.block(1,2).reinit (n_p, n_T);
-	csp.block(2,0).reinit (n_T, n_u);
-	csp.block(2,1).reinit (n_T, n_p);
-	csp.block(2,2).reinit (n_T, n_T);
+    csp.block(0,0).reinit (n_u, n_u);
+    csp.block(0,1).reinit (n_u, n_p);
+    csp.block(0,2).reinit (n_u, n_T);
+    csp.block(1,0).reinit (n_p, n_u);
+    csp.block(1,1).reinit (n_p, n_p);
+    csp.block(1,2).reinit (n_p, n_T);
+    csp.block(2,0).reinit (n_T, n_u);
+    csp.block(2,1).reinit (n_T, n_p);
+    csp.block(2,2).reinit (n_T, n_T);
       
-	csp.collect_sizes ();
+    csp.collect_sizes ();
 
-	Table<2,DoFTools::Coupling> coupling (dim+2, dim+2);
+    Table<2,DoFTools::Coupling> coupling (dim+2, dim+2);
 
-					 // build the sparsity pattern. note
-					 // that all dim velocities couple with
-					 // each other and with the pressures,
-					 // but that not all of the other
-					 // components couple:
-	switch (dim)
-	  {
-	    case 2:
-	    {
-	      static const bool coupling_matrix[4][4]
-		= {{ 1, 1,   1,  0 },
-		   { 1, 1,   1,  0 },
-		 
-		   { 1, 1,   0,  0 },
-
-		   { 0, 0,   0,  1 }};
-	      for (unsigned int c=0; c<dim+2; ++c)
-		for (unsigned int d=0; d<dim+2; ++d)
-		  if (coupling_matrix[c][d] == true)
-		    coupling[c][d] = DoFTools::always;
-		  else
-		    coupling[c][d] = DoFTools::none;
-
-	      break;
-	    }
-
-	    case 3:
-	    {
-	      static const bool coupling_matrix[5][5]
-		= {{ 1, 1, 1,   1,  0 },
-		   { 1, 1, 1,   1,  0 },
-		   { 1, 1, 1,   1,  0 },
-		 
-		   { 1, 1, 1,   0,  0 },
-
-		   { 0, 0, 0,   0,  1 }};
-	      for (unsigned int c=0; c<dim+2; ++c)
-		for (unsigned int d=0; d<dim+2; ++d)
-		  if (coupling_matrix[c][d] == true)
-		    coupling[c][d] = DoFTools::always;
-		  else
-		    coupling[c][d] = DoFTools::none;
-
-	      break;
-	    }
-
-	    default:
-		  Assert (false, ExcNotImplemented());
-	  } 
-      
-	DoFTools::make_sparsity_pattern (dof_handler, coupling, csp);
-	hanging_node_constraints.condense (csp);
-	sparsity_pattern.copy_from (csp);
-
-	system_matrix.reinit (sparsity_pattern);
-      }
-
+				     // build the sparsity pattern. note
+				     // that all dim velocities couple with
+				     // each other and with the pressures,
+				     // but that not all of the other
+				     // components couple:
+    switch (dim)
       {
-	preconditioner_matrix.clear ();
+	case 2:
+	{
+	  static const bool coupling_matrix[4][4]
+	    = {{ 1, 1,   1,  0 },
+	       { 1, 1,   1,  0 },
+		 
+	       { 1, 1,   0,  0 },
 
-	BlockCompressedSetSparsityPattern csp (3,3);
+	       { 0, 0,   0,  1 }};
+	  for (unsigned int c=0; c<dim+2; ++c)
+	    for (unsigned int d=0; d<dim+2; ++d)
+	      if (coupling_matrix[c][d] == true)
+		coupling[c][d] = DoFTools::always;
+	      else
+		coupling[c][d] = DoFTools::none;
+
+	  break;
+	}
+
+	case 3:
+	{
+	  static const bool coupling_matrix[5][5]
+	    = {{ 1, 1, 1,   1,  0 },
+	       { 1, 1, 1,   1,  0 },
+	       { 1, 1, 1,   1,  0 },
+		 
+	       { 1, 1, 1,   0,  0 },
+
+	       { 0, 0, 0,   0,  1 }};
+	  for (unsigned int c=0; c<dim+2; ++c)
+	    for (unsigned int d=0; d<dim+2; ++d)
+	      if (coupling_matrix[c][d] == true)
+		coupling[c][d] = DoFTools::always;
+	      else
+		coupling[c][d] = DoFTools::none;
+
+	  break;
+	}
+
+	default:
+	      Assert (false, ExcNotImplemented());
+      } 
+      
+    DoFTools::make_sparsity_pattern (dof_handler, coupling, csp);
+    hanging_node_constraints.condense (csp);
+    sparsity_pattern.copy_from (csp);
+
+    system_matrix.reinit (sparsity_pattern);
+  }
+
+  {
+    Amg_preconditioner.reset ();
+    Mp_preconditioner.reset ();
+    preconditioner_matrix.clear ();
+
+    BlockCompressedSetSparsityPattern csp (3,3);
  
-	csp.block(0,0).reinit (n_u, n_u);
-	csp.block(0,1).reinit (n_u, n_p);
-	csp.block(0,2).reinit (n_u, n_T);
-	csp.block(1,0).reinit (n_p, n_u);
-	csp.block(1,1).reinit (n_p, n_p);
-	csp.block(1,2).reinit (n_p, n_T);
-	csp.block(2,0).reinit (n_T, n_u);
-	csp.block(2,1).reinit (n_T, n_p);
-	csp.block(2,2).reinit (n_T, n_T);
+    csp.block(0,0).reinit (n_u, n_u);
+    csp.block(0,1).reinit (n_u, n_p);
+    csp.block(0,2).reinit (n_u, n_T);
+    csp.block(1,0).reinit (n_p, n_u);
+    csp.block(1,1).reinit (n_p, n_p);
+    csp.block(1,2).reinit (n_p, n_T);
+    csp.block(2,0).reinit (n_T, n_u);
+    csp.block(2,1).reinit (n_T, n_p);
+    csp.block(2,2).reinit (n_T, n_T);
       
-	csp.collect_sizes ();
+    csp.collect_sizes ();
 
-	Table<2,DoFTools::Coupling> coupling (dim+2, dim+2);
+    Table<2,DoFTools::Coupling> coupling (dim+2, dim+2);
 
-					 // build the sparsity pattern. note
-					 // that all dim velocities couple with
-					 // each other and with the pressures,
-					 // but that not all of the other
-					 // components couple:
-	switch (dim)
-	  {
-	    case 2:
-	    {
-	      static const bool coupling_matrix[4][4]
-		= {{ 1, 0,   0,  0 },
-		   { 0, 1,   0,  0 },
+				     // build the sparsity pattern. note
+				     // that all dim velocities couple with
+				     // each other and with the pressures,
+				     // but that not all of the other
+				     // components couple:
+    switch (dim)
+      {
+	case 2:
+	{
+	  static const bool coupling_matrix[4][4]
+	    = {{ 1, 0,   0,  0 },
+	       { 0, 1,   0,  0 },
 		 
-		   { 0, 0,   1,  0 },
+	       { 0, 0,   1,  0 },
 
-		   { 0, 0,   0,  0 }};
-	      for (unsigned int c=0; c<dim+2; ++c)
-		for (unsigned int d=0; d<dim+2; ++d)
-		  if (coupling_matrix[c][d] == true)
-		    coupling[c][d] = DoFTools::always;
-		  else
-		    coupling[c][d] = DoFTools::none;
+	       { 0, 0,   0,  0 }};
+	  for (unsigned int c=0; c<dim+2; ++c)
+	    for (unsigned int d=0; d<dim+2; ++d)
+	      if (coupling_matrix[c][d] == true)
+		coupling[c][d] = DoFTools::always;
+	      else
+		coupling[c][d] = DoFTools::none;
 
-	      break;
-	    }
+	  break;
+	}
 
-	    case 3:
-	    {
-	      static const bool coupling_matrix[5][5]
-		= {{ 1, 0, 0,   0,  0 },
-		   { 0, 1, 0,   0,  0 },
-		   { 0, 0, 1,   0,  0 },
+	case 3:
+	{
+	  static const bool coupling_matrix[5][5]
+	    = {{ 1, 0, 0,   0,  0 },
+	       { 0, 1, 0,   0,  0 },
+	       { 0, 0, 1,   0,  0 },
 		 
-		   { 0, 0, 0,   1,  0 },
+	       { 0, 0, 0,   1,  0 },
 
-		   { 0, 0, 0,   0,  0 }};
-	      for (unsigned int c=0; c<dim+2; ++c)
-		for (unsigned int d=0; d<dim+2; ++d)
-		  if (coupling_matrix[c][d] == true)
-		    coupling[c][d] = DoFTools::always;
-		  else
-		    coupling[c][d] = DoFTools::none;
+	       { 0, 0, 0,   0,  0 }};
+	  for (unsigned int c=0; c<dim+2; ++c)
+	    for (unsigned int d=0; d<dim+2; ++d)
+	      if (coupling_matrix[c][d] == true)
+		coupling[c][d] = DoFTools::always;
+	      else
+		coupling[c][d] = DoFTools::none;
 
-	      break;
-	    }
+	  break;
+	}
 
-	    default:
-		  Assert (false, ExcNotImplemented());
-	  } 
+	default:
+	      Assert (false, ExcNotImplemented());
+      } 
       
-	DoFTools::make_sparsity_pattern (dof_handler, coupling, csp);
-	hanging_node_constraints.condense (csp);
-	preconditioner_sparsity_pattern.copy_from (csp);
+    DoFTools::make_sparsity_pattern (dof_handler, coupling, csp);
+    hanging_node_constraints.condense (csp);
+    preconditioner_sparsity_pattern.copy_from (csp);
 
-	preconditioner_matrix.reinit (preconditioner_sparsity_pattern);
-      }
-    }
+    preconditioner_matrix.reinit (preconditioner_sparsity_pattern);
+  }
 
 				 // As last action in this function,
 				 // we need to set the vectors
@@ -1623,12 +1627,6 @@ void BoussinesqFlowProblem<dim>::assemble_system ()
       
       assemble_preconditioner ();
       
-      /*A_preconditioner
-	= boost::shared_ptr<typename InnerPreconditioner<dim>::type>
-		(new typename InnerPreconditioner<dim>::type());
-      A_preconditioner->initialize (preconditioner_matrix.block(0,0),
-		typename InnerPreconditioner<dim>::type::AdditionalData());*/
-      
       Amg_preconditioner = boost::shared_ptr<PreconditionerTrilinosAmg>
 					(new PreconditionerTrilinosAmg());
       
@@ -2059,9 +2057,6 @@ void BoussinesqFlowProblem<dim>::solve ()
 
     gmres.solve(stokes_submatrix, up, up_rhs, preconditioner);
 
-				// Produce a constistent solution field
-    hanging_node_constraints.distribute (up);
-
     std::cout << "   "
               << solver_control.last_step()
               << " GMRES iterations for Stokes subsystem."
@@ -2069,6 +2064,15 @@ void BoussinesqFlowProblem<dim>::solve ()
 	      
     solution.block(0) = up.block(0);
     solution.block(1) = up.block(1);
+
+				// Produce a constistent solution
+				// field (we can't do this on the 'up'
+				// vector since it does not have the
+				// temperature component, but
+				// hanging_node_constraints has
+				// constraints also for the
+				// temperature vector)
+    hanging_node_constraints.distribute (solution);
   }
 
 				   // TODO: determine limit of stability for
@@ -2145,49 +2149,56 @@ void BoussinesqFlowProblem<dim>::output_results ()  const
 
 				 // @sect4{BoussinesqFlowProblem::refine_mesh}
 template <int dim>
-void BoussinesqFlowProblem<dim>::refine_mesh ()
+void BoussinesqFlowProblem<dim>::refine_mesh (const unsigned int max_grid_level)
 {
   Vector<float> estimated_error_per_cell (triangulation.n_active_cells());
 
-//TODO do this better
-  DerivativeApproximation::approximate_gradient (dof_handler,
-						 old_solution,
-						 estimated_error_per_cell,
-						 dim+1);
-
-  typename Triangulation<dim>::active_cell_iterator
-    cell = triangulation.begin_active(),
-    endc = triangulation.end();
-  for (unsigned int cell_index=0; cell!=endc; ++cell, ++cell_index)
-    estimated_error_per_cell(cell_index) *= cell->diameter();
+  std::vector<bool> component_mask (dim+2, false);
+  component_mask[dim+1] = true;
+  KellyErrorEstimator<dim>::estimate (dof_handler,
+				      QGauss<dim-1>(3),
+				      typename FunctionMap<dim>::type(),
+				      solution,
+				      estimated_error_per_cell,
+				      component_mask);
 
   GridRefinement::refine_and_coarsen_fixed_fraction (triangulation,
 						     estimated_error_per_cell,
-						     0.3, 0.03,
-						     static_cast<unsigned int>
-						     (triangulation.n_active_cells()*1.1));
-
+						     0.8, 0.1);
+  if (triangulation.n_levels() > max_grid_level) 
+    for (typename Triangulation<dim>::active_cell_iterator
+	   cell = triangulation.begin_active(max_grid_level);
+	 cell != triangulation.end(); ++cell)
+      if ((cell->has_children() == false)
+	  &&
+	  (cell->refine_flag_set() == true))
+	cell->clear_refine_flag ();
+  
   SolutionTransfer<dim, double> soltrans(dof_handler);
 
   triangulation.prepare_coarsening_and_refinement();
 
-  Vector<double> x_old_solution (dof_handler.n_dofs());
-  x_old_solution = old_solution;
+  std::vector<Vector<double> > x_solution (2);
+  x_solution[0].reinit (dof_handler.n_dofs());
+  x_solution[0] = solution;
+  x_solution[1].reinit (dof_handler.n_dofs());
+  x_solution[1] = old_solution;
 
-  Assert (false, ExcMessage ("Need to do the same for old_old_solution"));
-  
-  soltrans.prepare_for_coarsening_and_refinement(x_old_solution);
+  soltrans.prepare_for_coarsening_and_refinement(x_solution);
 
   triangulation.execute_coarsening_and_refinement ();
-  setup_dofs (true);
+  setup_dofs ();
 
-  Vector<double> tmp (dof_handler.n_dofs());
-  soltrans.interpolate(x_old_solution, tmp);
+  std::vector<Vector<double> > tmp (2);
+  tmp[0].reinit (dof_handler.n_dofs());
+  tmp[1].reinit (dof_handler.n_dofs());
+  soltrans.interpolate(x_solution, tmp);
 
   rebuild_matrices       = true;
   rebuild_preconditioner = true;
 
-  old_solution = tmp;
+  solution = tmp[0];
+  old_solution = tmp[0];
 }
 
 
@@ -2276,76 +2287,25 @@ double BoussinesqFlowProblem<dim>::get_maximal_temperature () const
 template <int dim>
 void BoussinesqFlowProblem<dim>::run ()
 {
-  switch (dim)
-    {
-      case 2:
-      {
-// 	GridGenerator::hyper_ball (triangulation);
+  const unsigned int initial_refinement = (dim == 2 ? 4 : 3);
+  const unsigned int n_pre_refinement_steps = 4;
 
-// 	static const HyperBallBoundary<dim> boundary;
-// 	triangulation.set_boundary (0, boundary);
+  
+  GridGenerator::hyper_cube (triangulation);
+  triangulation.refine_global (initial_refinement);
 
-	GridGenerator::hyper_cube (triangulation);
+  setup_dofs();
 
-	triangulation.refine_global (6);
+  unsigned int       pre_refinement_step    = 0;
+  
+  start_time_iteration:
 
-	break;
-      }
-
-      case 3:
-      {
-// 	GridGenerator::hyper_shell (triangulation,
-// 				    Point<dim>(), 0.5, 1.0);
-
-// 	static HyperShellBoundary<dim> boundary;
-// 	triangulation.set_boundary (0, boundary);
-
-	GridGenerator::hyper_cube (triangulation);
-
-	triangulation.refine_global (3);
-
-	break;
-      }
-
-      default:
-	    Assert (false, ExcNotImplemented());
-    }
-
-
-  const bool do_adaptivity = false;
-
-  if (do_adaptivity)
-    {
-      setup_dofs(false);
-
-      VectorTools::project (dof_handler,
-			    hanging_node_constraints,
-			    QGauss<dim>(degree+2),
-			    InitialValues<dim>(),
-			    old_solution);
-
-      for (unsigned int pre_refinement=0; pre_refinement<4-dim; ++pre_refinement)
-	{
-	  refine_mesh ();
-
-	  VectorTools::project (dof_handler,
-				hanging_node_constraints,
-				QGauss<dim>(degree+2),
-				InitialValues<dim>(),
-				old_solution);
-	}
-    }
-  else
-    {
-      setup_dofs(true);
-
-      VectorTools::project (dof_handler,
-			    hanging_node_constraints,
-			    QGauss<dim>(degree+2),
-			    InitialValues<dim>(),
-			    old_solution);
-    }
-
+  VectorTools::project (dof_handler,
+			hanging_node_constraints,
+			QGauss<dim>(degree+2),
+			InitialValues<dim>(),
+			old_solution);
+  
   timestep_number = 0;
   double time = 0;
 
@@ -2364,17 +2324,24 @@ void BoussinesqFlowProblem<dim>::run ()
 
       output_results ();
 
+      std::cout << std::endl;
+      
+      if ((timestep_number == 0) &&
+	  (pre_refinement_step < n_pre_refinement_steps))
+	{
+	  refine_mesh (initial_refinement + n_pre_refinement_steps);
+	  ++pre_refinement_step;
+	  goto start_time_iteration;
+	}
+      else
+	if ((timestep_number > 0) && (timestep_number % 5 == 0))
+	  refine_mesh (initial_refinement + n_pre_refinement_steps);
+
       time += time_step;
       ++timestep_number;
 
       old_old_solution = old_solution;
-      old_solution     = solution;
-
-      std::cout << std::endl;
-
-      if (do_adaptivity)
-	if (timestep_number % 10 == 0)
-	  refine_mesh ();
+      old_solution     = solution;      
     }
   while (time <= 10);
 }
