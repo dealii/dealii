@@ -34,7 +34,7 @@ D = ../../deal.II
 
 #
 #
-# Usually, you will not need to change something beyond this point.
+# Usually, you will not need to change anything beyond this point.
 #
 #
 # This tells `make' where to find the global settings and rules:
