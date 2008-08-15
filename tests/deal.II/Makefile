@@ -71,6 +71,7 @@ tests_x = block_matrices \
 	minimal_cell_diameter \
 	maximal_cell_diameter \
 	union_triangulation \
+	refine_flag_set \
 	create_* \
 	line_coarsening_3d \
 	no_flux_* \
