@@ -236,6 +236,16 @@ inconvenience this causes.
 <ol>
   <li>
   <p>
+  Fixed: Using the ConstraintMatrix class, when a degree of freedom was
+  constrained against another DoF, and that other DoF was constrained to
+  be equal to zero (i.e. the trivial linear combination of a third set of
+  degrees of freedom), an exception resulted. This is now fixed.
+  <br>
+  (WB 2008/08/15)
+  </p>
+
+  <li>
+  <p>
   New: It is now possible to get the inverse of the Jacobian
   matrix from the transformation form the real to the unit cell by
   using FEValues::inverse_jacobian.

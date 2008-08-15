@@ -207,19 +207,9 @@ void ConstraintMatrix::close ()
 						 // constrained:
 		chained_constraint_replaced = true;
 		
-						 // replace
-						 // it by its
-						 // expansion; we do
-						 // that by
-						 // overwriting the
-						 // entry by the first
-						 // entry of the
-						 // expansion and
-						 // adding the
-						 // remaining ones to
-						 // the end, where we
-						 // will later process
-						 // them once more
+						 // look up the chain
+						 // of constraints for
+						 // this entry
 		const unsigned int dof_index = line->entries[entry].first;
 		const double       weight = line->entries[entry].second;
 
@@ -239,28 +229,73 @@ void ConstraintMatrix::close ()
 		  constrained_line = std::lower_bound (lines.begin(),
 						       lines.end(),
 						       test_line);
-		Assert (constrained_line->entries.size() > 0,
-			ExcInternalError());
 
-		for (unsigned int i=0; i<constrained_line->entries.size(); ++i)
-		  Assert (dof_index != constrained_line->entries[i].first,
-			  ExcMessage ("Cycle in constraints detected!"));
+						 // now we have to
+						 // replace an entry
+						 // by its
+						 // expansion. we do
+						 // that by
+						 // overwriting the
+						 // entry by the first
+						 // entry of the
+						 // expansion and
+						 // adding the
+						 // remaining ones to
+						 // the end, where we
+						 // will later process
+						 // them once more
+						 //
+						 // we can of course
+						 // only do that if
+						 // the DoF that we
+						 // are currently
+						 // handle is
+						 // constrained by a
+						 // linear combination
+						 // of other dofs:
+		if (constrained_line->entries.size() > 0)
+		  {
+		    for (unsigned int i=0; i<constrained_line->entries.size(); ++i)
+		      Assert (dof_index != constrained_line->entries[i].first,
+			      ExcMessage ("Cycle in constraints detected!"));
 
-						 // replace first
-						 // entry, then tack
-						 // the rest to the
-						 // end of the list
-		line->entries[entry] =
-		  std::make_pair (constrained_line->entries[0].first,
-				  constrained_line->entries[0].second *
-				  weight);
+						     // replace first
+						     // entry, then tack
+						     // the rest to the
+						     // end of the list
+		    line->entries[entry] =
+		      std::make_pair (constrained_line->entries[0].first,
+				      constrained_line->entries[0].second *
+				      weight);
 		
-		for (unsigned int i=1; i<constrained_line->entries.size(); ++i)
-		  line->entries
-		    .push_back (std::make_pair (constrained_line->entries[i].first,
-						constrained_line->entries[i].second *
-						weight));
-
+		    for (unsigned int i=1; i<constrained_line->entries.size(); ++i)
+		      line->entries
+			.push_back (std::make_pair (constrained_line->entries[i].first,
+						    constrained_line->entries[i].second *
+						    weight));
+		  }
+		else
+						   // the DoF that we
+						   // encountered is
+						   // not constrained
+						   // by a linear
+						   // combination of
+						   // other dofs but
+						   // is equal to zero
+						   // (i.e. its chain
+						   // of entries is
+						   // empty). in that
+						   // case, we can't
+						   // just overwrite
+						   // the current
+						   // entry, but we
+						   // have to actually
+						   // eliminate it
+		  {
+		    line->entries.erase (line->entries.begin()+entry);
+		  }
+		    
+		
 						 // now that we're
 						 // here, do not
 						 // increase index by
@@ -270,7 +305,12 @@ void ConstraintMatrix::close ()
 						 // entry because we
 						 // have replaced the
 						 // present entry by
-						 // another one
+						 // another one, or
+						 // because we have
+						 // deleted it and
+						 // shifted all
+						 // following ones one
+						 // forward
 	      }
 	    else
 					       // entry not further
