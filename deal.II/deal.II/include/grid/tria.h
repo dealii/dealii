@@ -816,6 +816,15 @@ namespace internal
  *     after creation of the triangulation. It follows that active
  *     cells on level 1 may not be coarsenend.
  *
+ *     The main use of this flag is to ensure that each cell has at least one
+ *     neighbor in each coordinate direction (i.e. each cell has at least a
+ *     left or right, and at least an upper or lower neighbor in 2d). This is
+ *     a necessary precondition for some algorihms that compute finite
+ *     differences between cells. The DerivativeApproximation class is one of
+ *     these algorithms that require that a triangulation is coarsest_level_1
+ *     unless all cells already have at least one neighbor in each coordinate
+ *     direction on the coarsest level.
+ *
  *   <li> @p smoothing_on_refinement:
  *     This flag sums up all smoothing algorithms which may be performed upon
  *     refinement by flagging some more cells for refinement.
