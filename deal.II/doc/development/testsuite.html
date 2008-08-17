@@ -147,7 +147,7 @@
     To run the testsuite, go into your deal.II directory and do this:
     <pre>
        cd /path/to/deal.II
-       subversion checkout http://wolfgang.math.tamu.edu/svn/public/deal.II/trunk/tests
+       svn checkout http://wolfgang.math.tamu.edu/svn/public/deal.II/trunk/tests
     </pre>
     This should generate a <code>tests/</code> directory parallel to
     the <code>base/</code>, <code>lac/</code>, etc directories. Then
@@ -525,11 +525,11 @@ testname/cmp/generic
     file, and to commit them together with the changed Makefile, like
     so:
     <pre>
-      subversion add bits/my_new_test.cc 
-      subversion add bits/my_new_test
-      subversion add bits/my_new_test/cmp
-      subversion add bits/my_new_test/cmp/generic
-      subversion commit -m "New test" bits/my_new_test* bits/Makefile
+      svn add bits/my_new_test.cc 
+      svn add bits/my_new_test
+      svn add bits/my_new_test/cmp
+      svn add bits/my_new_test/cmp/generic
+      svn commit -m "New test" bits/my_new_test* bits/Makefile
     </pre>
     If you don't have subversion write access, talk to us on the mailing
     list; writing testcases is a worthy and laudable task, and we would
