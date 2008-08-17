@@ -387,7 +387,7 @@ dnl -------------------------------------------------------------
 AC_DEFUN(DEAL_II_DETERMINE_IF_SUPPORTS_MPI, dnl
 [
   AC_MSG_CHECKING(if the compiler is built for MPI)
-  AC_TRY_COMPILE(
+  AC_TRY_LINK(
         [
           #include <mpi.h>
         ],
