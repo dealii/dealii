@@ -10604,7 +10604,7 @@ bool Triangulation<dim>::prepare_coarsening_and_refinement ()
 				   // 5/ ensure patch level 1. Then the
 				   //    triangulation consists of patches,
 				   //    i.e. of cells that are
-				   //    refined once. It follows that if
+				   //    refined once. It follows that if at
 				   //    least one of the children of a cell
 				   //    is or will be refined than all children
 				   //    need to be refined. This step
