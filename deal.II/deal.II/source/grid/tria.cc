@@ -36,14 +36,36 @@
 DEAL_II_NAMESPACE_OPEN
 
 // anonymous namespace for internal helper functions
-namespace{
+namespace
+{
+				   // return whether the given cell is
+				   // patch_level_1, i.e. determine
+				   // whether either all or none of
+				   // its children are further
+				   // refined. this function can only
+				   // be called for non-active cells.
+  template <int dim>
+  bool cell_is_patch_level_1 (const TriaIterator<dim, dealii::CellAccessor<dim> > &cell)
+  {
+    Assert (cell->active() == false, ExcInternalError());
+
+    unsigned int n_active_children = 0;
+    for (unsigned int i=0; i<cell->n_children(); ++i)
+      if (cell->child(i)->active())
+	++n_active_children;
+
+    return (n_active_children == 0) || (n_active_children == cell->n_children());
+  }
+  
+    
+  
 				   // return, wheter a given @p cell will be
 				   // coarsened, which is the case if all
 				   // children are active and have their coarsen
 				   // flag set. In case only part of the coarsen
 				   // flags are set, remove them.
   template <int dim>
-  bool cell_will_be_coarsened(const TriaIterator<dim, dealii::CellAccessor<dim> > &cell)
+  bool cell_will_be_coarsened (const TriaIterator<dim, dealii::CellAccessor<dim> > &cell)
   {
 				     // only cells with children should be
 				     // considered for coarsening
@@ -11158,16 +11180,18 @@ bool Triangulation<dim>::prepare_coarsening_and_refinement ()
 	  for (cell_iterator cell = begin(); cell != end(); ++cell)
 	    if (!cell->active())
 	      {
-		bool n_active_children = 0;
-		for (unsigned int i=0; i<cell->n_children(); ++i)
-		  if (cell->child(i)->active())
-		    ++n_active_children;
-
-						 // if none of the
+						 // ensure the
+						 // invariant. we can
+						 // then check whether
+						 // all of its
 						 // children are
-						 // active, continue
-						 // with next cell
-		if (n_active_children == 0)
+						 // further refined or
+						 // not by simply
+						 // looking at the
+						 // first child
+		Assert (cell_is_patch_level_1(cell),
+			ExcInternalError());
+		if (cell->child(0)->has_children() == true)
 		  continue;
 		
 						 // cell is found to
@@ -11175,9 +11199,6 @@ bool Triangulation<dim>::prepare_coarsening_and_refinement ()
 						 // combine the refine
 						 // cases of all
 						 // children
-		Assert (n_active_children == cell->n_children(),
-			ExcInternalError());
-
 		RefinementCase<dim> combined_ref_case = RefinementCase<dim>::no_refinement;
 		for (unsigned int i=0; i<cell->n_children(); ++i)
 		  combined_ref_case = combined_ref_case |
