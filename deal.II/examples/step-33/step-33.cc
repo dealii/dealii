@@ -836,7 +836,6 @@ compute_derived_quantities_vector (const std::vector<Vector<double> >           
   for (unsigned int q=0; q<n_quadrature_points; ++q)
     {
       const double density = uh[q](density_component);
-      const double energy  = uh[q](energy_component);
 
       for (unsigned int d=0; d<dim; ++d)
 	computed_quantities[q](d)
@@ -2041,7 +2040,7 @@ void ConservationLaw<dim>::assemble_system ()
 		  cell->neighbor_of_neighbor(face_no);
 
 		for (unsigned int subface_no=0;
-		     subface_no<GeometryInfo<dim>::subfaces_per_face;
+		     subface_no < cell->face(face_no)->n_children();
 		     ++subface_no)
 		  {
 		    const typename DoFHandler<dim>::active_cell_iterator
