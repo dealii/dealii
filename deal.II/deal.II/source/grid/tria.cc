@@ -11156,40 +11156,40 @@ bool Triangulation<dim>::prepare_coarsening_and_refinement ()
 					   // clear_coarsen_flag of
 					   // all children.
 	  for (cell_iterator cell = begin(); cell != end(); ++cell)
-	    if (!cell->active() && cell->child(0)->active())
+	    if (!cell->active())
 	      {
-		const unsigned int n_children=cell->n_children();
+		bool n_active_children = 0;
+		for (unsigned int i=0; i<cell->n_children(); ++i)
+		  if (cell->child(i)->active())
+		    ++n_active_children;
+
+						 // if none of the
+						 // children are
+						 // active, continue
+						 // with next cell
+		if (n_active_children == 0)
+		  continue;
 		
 						 // cell is found to
-						 // be a patch
-		RefinementCase<dim> combined_ref_case = RefinementCase<dim>::no_refinement;
-		for (unsigned int i=0; i<n_children; ++i)
-		  {
-		    cell_iterator child=cell->child(i);
-						     // check
-						     // consistency:
-						     // cell is really
-						     // a patch,
-						     // i.e. no child
-						     // is refined.
-		    Assert(child->active(), ExcInternalError());
-						     // combine the refine cases
-						     // of all children
-		    combined_ref_case=combined_ref_case |
-				      child->refine_flag_set();
-		    
-		    
-		  }
-		if (combined_ref_case != RefinementCase<dim>::no_refinement)
-		  {
-		    for (unsigned int i=0; i<n_children; ++i)
-		      {
-			cell_iterator child=cell->child(i);
+						 // be a patch.
+						 // combine the refine
+						 // cases of all
+						 // children
+		Assert (n_active_children == cell->n_children(),
+			ExcInternalError());
 
-			child->clear_coarsen_flag();
-			child->set_refine_flag(combined_ref_case);
-		      }
-		  }
+		RefinementCase<dim> combined_ref_case = RefinementCase<dim>::no_refinement;
+		for (unsigned int i=0; i<cell->n_children(); ++i)
+		  combined_ref_case = combined_ref_case |
+				      cell->child(i)->refine_flag_set();
+		if (combined_ref_case != RefinementCase<dim>::no_refinement)
+		  for (unsigned int i=0; i<cell->n_children(); ++i)
+		    {
+		      cell_iterator child = cell->child(i);
+		      
+		      child->clear_coarsen_flag();
+		      child->set_refine_flag(combined_ref_case);
+		    }
 	      }
 
 					   // Loop over all patches of
