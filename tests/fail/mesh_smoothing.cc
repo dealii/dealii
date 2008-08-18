@@ -29,6 +29,7 @@ char logname[] = "mesh_smoothing/output";
 
 #include <fstream>
 #include <iostream>
+#include <cstring>
 
 #include <fe/fe_q.h>
 #include <grid/grid_out.h>
