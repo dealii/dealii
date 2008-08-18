@@ -2169,9 +2169,7 @@ void BoussinesqFlowProblem<dim>::refine_mesh (const unsigned int max_grid_level)
     for (typename Triangulation<dim>::active_cell_iterator
 	   cell = triangulation.begin_active(max_grid_level);
 	 cell != triangulation.end(); ++cell)
-      if ((cell->has_children() == false)
-	  &&
-	  (cell->refine_flag_set() == true))
+      if (cell->has_children() == false)
 	cell->clear_refine_flag ();
   
   SolutionTransfer<dim, double> soltrans(dof_handler);
