@@ -1,4 +1,4 @@
-//----------------------------  mesh_smoothing.cc  ---------------------------
+//----------------------------  mesh_smoothing_01.cc  ---------------------------
 //    $Id$
 //    Version: $Name$ 
 //
@@ -9,13 +9,16 @@
 //    to the file deal.II/doc/license.html for the  text  and
 //    further information on this license.
 //
-//----------------------------  mesh_smoothing.cc  ---------------------------
+//----------------------------  mesh_smoothing_01.cc  ---------------------------
 
 
 // something went wrong with smoothing a mesh when a particular set of
 // cells were set to be refined. found in step-31
+//
+// a redux is in mesh_smoothing_02
 
-char logname[] = "mesh_smoothing/output";
+
+char logname[] = "mesh_smoothing_01/output";
 
 
 #include "../tests.h"
@@ -31,13 +34,6 @@ char logname[] = "mesh_smoothing/output";
 #include <iostream>
 #include <cstring>
 
-#include <fe/fe_q.h>
-#include <grid/grid_out.h>
-#include <dofs/dof_constraints.h>
-#include <grid/grid_refinement.h>
-#include <numerics/error_estimator.h>
-
-#include <complex>
 
 				 // Finally, this is as in previous
 				 // programs:
