@@ -77,7 +77,26 @@ void test ()
   for (unsigned int i=0; i<4; ++i)
     triangulation.begin(1)->child(i)->set_refine_flag ();
   triangulation.execute_coarsening_and_refinement ();
-      
+
+  deallog << "n_active_cells = " << triangulation.n_active_cells()
+	  << std::endl;
+
+
+  for (Triangulation<2>::cell_iterator
+	 cell = triangulation.begin();
+       cell != triangulation.end(); ++cell)
+    {
+      deallog << "Cell = " << cell
+	      << (cell->active() ? " is active " : " is not active ");
+      if (!cell->active())
+	{
+	  deallog << "and has children: ";
+	  for (unsigned int i=0; i<4; ++i)
+	    deallog << cell->child(i) << ' ';
+	}
+      deallog << std::endl;
+    }
+  
 				       // now flag everything for coarsening
 				       // again
   for (Triangulation<2>::active_cell_iterator
@@ -85,7 +104,9 @@ void test ()
        cell != triangulation.end(); ++cell)
     cell->set_coarsen_flag ();
   triangulation.execute_coarsening_and_refinement ();
-  
+
+  deallog << "n_active_cells = " << triangulation.n_active_cells()
+	  << std::endl;
   
   for (Triangulation<2>::cell_iterator
 	 cell = triangulation.begin();
