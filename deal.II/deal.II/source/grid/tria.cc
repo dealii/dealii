@@ -11213,93 +11213,162 @@ bool Triangulation<dim>::prepare_coarsening_and_refinement ()
 		    }
 	      }
 
-					   // Loop over all patches of
-					   // level 2, i.e. over all
-					   // cells whose
-					   // grandchildren are all
-					   // active.  Coarsen the
-					   // children (and remove the
+					   // The code above dealt
+					   // with the case where we
+					   // may get a
+					   // non-patch_level_1 mesh
+					   // from refinement. Now
+					   // also deal with the case
+					   // where we could get such
+					   // a mesh by coarsening.
+					   // Coarsen the children
+					   // (and remove the
 					   // grandchildren) only if
 					   // all cell->grandchild(i)
-	                                   //       ->coarsen_flag_set()
+					   //   ->coarsen_flag_set()
 					   // are set.
-	  for (cell_iterator cell = begin(); cell != end(); ++cell)	    
-	    if (!cell->active() &&
-		!cell->child(0)->active() &&
-		cell->child(0)->child(0)->active())
-	      {
-		const unsigned int n_children=cell->n_children();
-		unsigned int n_grandchildren=0;		
-						 // count all coarsen
-						 // flags of the
-						 // grandchildren.
-		unsigned int n_coarsen_flags=0;
-						 // cell is not a
-						 // patch (of level 1)
-						 // as it has a
-						 // grandchild.  Is
-						 // cell a patch of
-						 // level 2??
-						 // Therefore: find
-						 // out whether all
-						 // cell->child(i) are
-						 // patches
+					   //
+					   // for a case where this is
+					   // a bit tricky, take a
+					   // look at the
+					   // mesh_smoothing_0[12]
+					   // testcases
+	  for (cell_iterator cell = begin(); cell != end(); ++cell)
+	    {
+					       // check if this cell
+					       // has active
+					       // grandchildren. note
+					       // that we know that it
+					       // is patch_level_1,
+					       // i.e. if one of its
+					       // children is active
+					       // then so are all, and
+					       // it isn't going to
+					       // have any
+					       // grandchildren at
+					       // all:
+	      if (cell->active()
+		  ||
+		  cell->child(0)->active())
+		continue;
+
+					       // cell is not active,
+					       // and so are none of
+					       // its children. check
+					       // the
+					       // grandchildren. note
+					       // that the children
+					       // are also
+					       // patch_level_1, and
+					       // so we only ever need
+					       // to check their first
+					       // child
+	      const unsigned int n_children=cell->n_children();
+	      bool has_active_grandchildren = false;
+
+	      for (unsigned int i=0; i<n_children; ++i)
+		if (cell->child(i)->child(0)->active())
+		  {
+		    has_active_grandchildren = true;
+		    break;
+		  }
+
+	      if (has_active_grandchildren == false)
+		continue;
+	      
+
+					       // ok, there are active
+					       // grandchildren. see
+					       // if either all or
+					       // none of them are
+					       // flagged for
+					       // coarsening
+	      unsigned int n_grandchildren=0;		
+					       // count all coarsen
+					       // flags of the
+					       // grandchildren.
+	      unsigned int n_coarsen_flags=0;
+					       // cell is not a
+					       // patch (of level 1)
+					       // as it has a
+					       // grandchild.  Is
+					       // cell a patch of
+					       // level 2??
+					       // Therefore: find
+					       // out whether all
+					       // cell->child(i) are
+					       // patches
+	      for (unsigned int c=0; c<n_children; ++c)
+		{
+						   // get at the
+						   // child. by
+						   // assumption
+						   // (A), and the
+						   // check by which
+						   // we got here,
+						   // the child is
+						   // not active
+		  cell_iterator child=cell->child(c);
+
+		  const unsigned int nn_children=child->n_children();
+		  n_grandchildren += nn_children;
+
+						   // if child is
+						   // found to be a
+						   // patch of
+						   // active cells
+						   // itself, then
+						   // add up how
+						   // many of its
+						   // children are
+						   // supposed to be
+						   // coarsened
+		  if (child->child(0)->active())
+		    for (unsigned int cc=0; cc<nn_children; ++cc)
+		      if (child->child(cc)->coarsen_flag_set())
+			++n_coarsen_flags;
+		}
+
+					       // if not all
+					       // grandchildren are
+					       // supposed to be
+					       // coarsened
+					       // (e.g. because some
+					       // simply don't have
+					       // the flag set, or
+					       // because they are not
+					       // active and therefore
+					       // cannot carry the
+					       // flag), then remove
+					       // the coarsen flag
+					       // from all of the
+					       // active
+					       // grandchildren. note
+					       // that there may be
+					       // coarsen flags on the
+					       // grandgrandchildren
+					       // -- we don't clear
+					       // them here, but we'll
+					       // get to them in later
+					       // iterations if
+					       // necessary
+					       //
+					       // there is nothing
+					       // we have to do if
+					       // no coarsen flags
+					       // have been set at
+					       // all
+	      if ((n_coarsen_flags != n_grandchildren)
+		  &&
+		  (n_coarsen_flags > 0))
 		for (unsigned int c=0; c<n_children; ++c)
 		  {
-		    cell_iterator child=cell->child(c);
-						     // check
-						     // consistency:
-						     // cell is not a
-						     // patch of level
-						     // 1.
-		    Assert(!child->active(), ExcInternalError());
-		    
+		    const cell_iterator child = cell->child(c);
 		    if (child->child(0)->active())
-		      {
-							 // child is
-							 // found to
-							 // be a patch
-			const unsigned int nn_children=child->n_children();
-			n_grandchildren += nn_children;
-			for (unsigned int cc=0; cc<nn_children; ++cc)
-			  {
-			    cell_iterator grand_child=child->child(cc);
-							     // check
-							     // consistency:
-							     // child is
-							     // a patch
-			    Assert(grand_child->active(), ExcInternalError());
-
-			    if (grand_child->coarsen_flag_set())
-			      ++n_coarsen_flags;
-			  }
-		      }
+		      for (unsigned int cc=0; cc<child->n_children(); ++cc)
+			child->child(cc)->clear_coarsen_flag();
 		  }
-		
-		if (n_coarsen_flags!=n_grandchildren)
-		  {
-						     // clear all
-						     // grandchildren's
-						     // coarsen_flags
-		    for (unsigned int c=0; c<n_children; ++c)
-		      {
-			cell_iterator child=cell->child(c);
-			Assert(!child->active(), ExcInternalError());
-		    
-			if (child->child(0)->active())
-			  {
-			    const unsigned int nn_children=child->n_children();
-			    for (unsigned int cc=0; cc<nn_children; ++cc)
-			      {
-				cell_iterator grand_child=child->child(cc);
-				Assert(grand_child->active(), ExcInternalError());
-				
-				grand_child->clear_coarsen_flag();
-			      }
-			  }
-		      } 
-		  }
-	      }
+	    }
 	}
 
  				       //////////////////////////////////
