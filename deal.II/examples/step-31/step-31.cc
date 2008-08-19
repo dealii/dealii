@@ -2104,6 +2104,7 @@ void BoussinesqFlowProblem<dim>::solve ()
     SolverGMRES<BlockVector<double> > gmres(solver_control,
 					    SolverGMRES<BlockVector<double> >::AdditionalData(100));
 
+    stokes_solution = 0;
     gmres.solve(stokes_matrix, stokes_solution, stokes_rhs, preconditioner);
 
     std::cout << "   "
