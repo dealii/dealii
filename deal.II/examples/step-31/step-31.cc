@@ -323,6 +323,7 @@ class BoussinesqFlowProblem
     void build_stokes_preconditioner ();
     void assemble_stokes_system ();
     void assemble_temperature_system ();
+    void assemble_temperature_matrix ();
     double get_maximal_velocity () const;
     double get_maximal_temperature () const;
     void solve ();
@@ -352,6 +353,8 @@ class BoussinesqFlowProblem
     ConstraintMatrix          temperature_constraints;
     
     SparsityPattern           temperature_sparsity_pattern;
+    SparseMatrix<double>      temperature_mass_matrix;
+    SparseMatrix<double>      temperature_stiffness_matrix;
     SparseMatrix<double>      temperature_matrix;
 
     Vector<double>            temperature_solution;
@@ -367,8 +370,9 @@ class BoussinesqFlowProblem
     boost::shared_ptr<PreconditionerTrilinosAmg>  Amg_preconditioner;
     boost::shared_ptr<SparseILU<double> > Mp_preconditioner;
 
-    bool rebuild_matrices;
-    bool rebuild_preconditioner;
+    bool rebuild_stokes_matrix;
+    bool rebuild_temperature_matrix;
+    bool rebuild_stokes_preconditioner;
 };
 
 
@@ -818,8 +822,9 @@ BoussinesqFlowProblem<dim>::BoussinesqFlowProblem (const unsigned int degree)
                 time_step (0),
 		old_time_step (0),
 		timestep_number (0),
-		rebuild_matrices (true),
-		rebuild_preconditioner (true)
+		rebuild_stokes_matrix (true),
+		rebuild_temperature_matrix (true),
+		rebuild_stokes_preconditioner (true)
 {}
 
 
@@ -1115,6 +1120,8 @@ void BoussinesqFlowProblem<dim>::setup_dofs ()
   }
 
   {
+    temperature_mass_matrix.clear ();
+    temperature_stiffness_matrix.clear ();
     temperature_matrix.clear ();
 
     CompressedSetSparsityPattern csp (n_T, n_T);      
@@ -1123,6 +1130,8 @@ void BoussinesqFlowProblem<dim>::setup_dofs ()
     temperature_sparsity_pattern.copy_from (csp);
 
     temperature_matrix.reinit (temperature_sparsity_pattern);
+    temperature_mass_matrix.reinit (temperature_sparsity_pattern);
+    temperature_stiffness_matrix.reinit (temperature_sparsity_pattern);
   }
     
       
@@ -1233,6 +1242,9 @@ template <int dim>
 void
 BoussinesqFlowProblem<dim>::build_stokes_preconditioner ()
 {
+  if (rebuild_stokes_preconditioner == false)
+    return;
+  
   std::cout << "   Rebuilding Stokes preconditioner..." << std::flush;
       
 
@@ -1256,13 +1268,6 @@ BoussinesqFlowProblem<dim>::build_stokes_preconditioner ()
 				   // include them using a 
 				   // shared pointer structure from the
 				   // boost library.
-				   // 
-				   // When all work is done, we 
-				   // change the flags 
-				   // <code>rebuild_preconditioner</code>
-				   // and 
-				   // <code>rebuild_matrices</code>
-				   // to false.
   assemble_stokes_preconditioner ();
       
   Amg_preconditioner = boost::shared_ptr<PreconditionerTrilinosAmg>
@@ -1319,7 +1324,7 @@ BoussinesqFlowProblem<dim>::build_stokes_preconditioner ()
       
   std::cout << std::endl;
 
-  rebuild_preconditioner = false;
+  rebuild_stokes_preconditioner = false;
 }
 
 
@@ -1397,7 +1402,7 @@ void BoussinesqFlowProblem<dim>::assemble_stokes_system ()
 {
   std::cout << "   Assembling..." << std::flush;
 
-  if (rebuild_matrices == true)
+  if (rebuild_stokes_matrix == true)
     stokes_matrix=0;
 
   stokes_rhs=0;
@@ -1409,7 +1414,7 @@ void BoussinesqFlowProblem<dim>::assemble_stokes_system ()
 				  update_values    |
 				  update_quadrature_points  |
 				  update_JxW_values |
-				  (rebuild_matrices == true
+				  (rebuild_stokes_matrix == true
 				   ?
 				   update_gradients
 				   :
@@ -1542,7 +1547,7 @@ void BoussinesqFlowProblem<dim>::assemble_stokes_system ()
 	  for (unsigned int k=0; k<dofs_per_cell; ++k)
 	    {
 	      phi_u[k] = stokes_fe_values[velocities].value (k,q);
-	      if (rebuild_matrices)
+	      if (rebuild_stokes_matrix)
 	        {
 		  grads_phi_u[k] = stokes_fe_values[velocities].symmetric_gradient(k,q);
 		  div_phi_u[k]   = stokes_fe_values[velocities].divergence (k, q);
@@ -1552,7 +1557,7 @@ void BoussinesqFlowProblem<dim>::assemble_stokes_system ()
 
 					   // define viscosity
 	  const double eta = 1;
-	  if (rebuild_matrices)
+	  if (rebuild_stokes_matrix)
 	    for (unsigned int i=0; i<dofs_per_cell; ++i)
 	      for (unsigned int j=0; j<dofs_per_cell; ++j)
 		local_matrix(i,j) += (eta * grads_phi_u[i] * grads_phi_u[j]
@@ -1617,7 +1622,7 @@ void BoussinesqFlowProblem<dim>::assemble_stokes_system ()
 				       // requested.
       cell->get_dof_indices (local_dof_indices);
 
-      if (rebuild_matrices == true)
+      if (rebuild_stokes_matrix == true)
 	for (unsigned int i=0; i<dofs_per_cell; ++i)
 	  for (unsigned int j=0; j<dofs_per_cell; ++j)
 	    stokes_matrix.add (local_dof_indices[i],
@@ -1637,10 +1642,11 @@ void BoussinesqFlowProblem<dim>::assemble_stokes_system ()
 				   // possibly, to the matrix.
   stokes_constraints.condense (stokes_rhs);
 
-  if (rebuild_matrices == true)
+  if (rebuild_stokes_matrix == true)
     {
       stokes_constraints.condense (stokes_matrix);
-
+      rebuild_stokes_matrix = false;
+      
 //       std::map<unsigned int,double> boundary_values;
 
 //       typename DoFHandler<dim>::active_cell_iterator
@@ -1674,8 +1680,6 @@ void BoussinesqFlowProblem<dim>::assemble_stokes_system ()
 // 					  solution,
 // 					  system_rhs);
     }
-
-  rebuild_matrices = false;
 
   std::cout << std::endl;
 }
@@ -1772,11 +1776,112 @@ double compute_viscosity(
 				 // flags at face level are the 
 				 // same as in step-12.
 template <int dim>
+void BoussinesqFlowProblem<dim>::assemble_temperature_matrix ()
+{
+  if (rebuild_temperature_matrix == false)
+    return;
+  
+  temperature_mass_matrix = 0;
+  temperature_stiffness_matrix = 0;
+  
+  QGauss<dim>   quadrature_formula(temperature_degree+2);
+  FEValues<dim> temperature_fe_values (temperature_fe, quadrature_formula,
+				       update_values    | update_gradients |
+				       update_JxW_values);
+
+  const unsigned int   dofs_per_cell   = temperature_fe.dofs_per_cell;
+  const unsigned int   n_q_points      = quadrature_formula.size();
+
+  FullMatrix<double>   local_mass_matrix (dofs_per_cell, dofs_per_cell);
+  FullMatrix<double>   local_stiffness_matrix (dofs_per_cell, dofs_per_cell);
+
+  std::vector<unsigned int> local_dof_indices (dofs_per_cell);
+
+  std::vector<double> gamma_values (n_q_points);
+
+  std::vector<double>                  phi_T       (dofs_per_cell);
+  std::vector<Tensor<1,dim> >          grad_phi_T  (dofs_per_cell);
+
+				   // Now, let's start the loop
+				   // over all cells in the
+				   // triangulation. The first
+				   // actions within the loop
+				   // are, 0as usual, the evaluation
+				   // of the FE basis functions 
+				   // and the old and present
+				   // solution at the quadrature 
+				   // points.
+  typename DoFHandler<dim>::active_cell_iterator
+    cell = temperature_dof_handler.begin_active(),
+    endc = temperature_dof_handler.end();
+  for (; cell!=endc; ++cell)
+    {
+      local_mass_matrix = 0;
+      local_stiffness_matrix = 0;
+
+      temperature_fe_values.reinit (cell);
+      
+      const double kappa = 1e-6;
+
+      for (unsigned int q=0; q<n_q_points; ++q)
+	{
+	  for (unsigned int k=0; k<dofs_per_cell; ++k)
+	    {
+	      grad_phi_T[k] = temperature_fe_values.shape_grad (k,q);
+	      phi_T[k]      = temperature_fe_values.shape_value (k, q);
+	    }
+	  
+	  for (unsigned int i=0; i<dofs_per_cell; ++i)
+	    for (unsigned int j=0; j<dofs_per_cell; ++j)
+	      {
+		local_mass_matrix(i,j) += phi_T[i] * phi_T[j]
+					  * temperature_fe_values.JxW(q);
+		local_stiffness_matrix(i,j) += kappa * grad_phi_T[i] * grad_phi_T[j]
+					       * temperature_fe_values.JxW(q);
+	      }
+	}
+      
+      cell->get_dof_indices (local_dof_indices);
+
+      for (unsigned int i=0; i<dofs_per_cell; ++i)
+	for (unsigned int j=0; j<dofs_per_cell; ++j)
+	  {
+	    temperature_mass_matrix.add (local_dof_indices[i],
+					 local_dof_indices[j],
+					 local_mass_matrix(i,j));
+	    temperature_stiffness_matrix.add (local_dof_indices[i],
+					      local_dof_indices[j],
+					      local_stiffness_matrix(i,j));
+	  }
+    }
+
+  temperature_constraints.condense (temperature_mass_matrix);
+  temperature_constraints.condense (temperature_stiffness_matrix);
+  
+  rebuild_temperature_matrix = false;
+}
+
+
+
+
+template <int dim>
 void BoussinesqFlowProblem<dim>::assemble_temperature_system ()
 {
   const bool use_bdf2_scheme = (timestep_number != 0);
 
-  temperature_matrix = 0;
+  if (use_bdf2_scheme == true)
+    {
+      temperature_matrix.copy_from (temperature_mass_matrix);
+      temperature_matrix *= (2*time_step + old_time_step) /
+			    (time_step + old_time_step);
+      temperature_matrix.add (time_step, temperature_stiffness_matrix);
+    }
+  else
+    {
+      temperature_matrix.copy_from (temperature_mass_matrix);
+      temperature_matrix.add (time_step, temperature_stiffness_matrix);
+    }
+  
   temperature_rhs = 0;
   
   QGauss<dim>   quadrature_formula(temperature_degree+2);
@@ -1848,7 +1953,6 @@ void BoussinesqFlowProblem<dim>::assemble_temperature_system ()
   for (; cell!=endc; ++cell, ++stokes_cell)
     {
       local_rhs = 0;
-      local_matrix = 0;
 
       temperature_fe_values.reinit (cell);
       stokes_fe_values.reinit (stokes_cell);
@@ -1911,16 +2015,6 @@ void BoussinesqFlowProblem<dim>::assemble_temperature_system ()
 	  if (use_bdf2_scheme == true)
 	    {
 	      for (unsigned int i=0; i<dofs_per_cell; ++i)
-		for (unsigned int j=0; j<dofs_per_cell; ++j)
-		  local_matrix(i,j) += ((2*time_step + old_time_step) /
-					(time_step + old_time_step) *
-					phi_T[i] * phi_T[j]
-					+
-					time_step *
-					kappa * grad_phi_T[i] * grad_phi_T[j])
-				       * temperature_fe_values.JxW(q);
-
-	      for (unsigned int i=0; i<dofs_per_cell; ++i)
 		local_rhs(i) += ((time_step + old_time_step) / old_time_step *
 				 old_T * phi_T[i]
 				 -
@@ -1950,14 +2044,6 @@ void BoussinesqFlowProblem<dim>::assemble_temperature_system ()
 	  else
 	    {
 	      for (unsigned int i=0; i<dofs_per_cell; ++i)
-		for (unsigned int j=0; j<dofs_per_cell; ++j)
-		  local_matrix(i,j) += (phi_T[i] * phi_T[j]
-					+
-					time_step *
-					kappa * grad_phi_T[i] * grad_phi_T[j])
-				       * temperature_fe_values.JxW(q);
-      
-	      for (unsigned int i=0; i<dofs_per_cell; ++i)
 		local_rhs(i) += (old_T * phi_T[i]
 				 -
 				 time_step *
@@ -1977,14 +2063,10 @@ void BoussinesqFlowProblem<dim>::assemble_temperature_system ()
       cell->get_dof_indices (local_dof_indices);
 
       for (unsigned int i=0; i<dofs_per_cell; ++i)
-	for (unsigned int j=0; j<dofs_per_cell; ++j)
-	  temperature_matrix.add (local_dof_indices[i],
-				  local_dof_indices[j],
-				  local_matrix(i,j));
-
-      for (unsigned int i=0; i<dofs_per_cell; ++i)
         temperature_rhs(local_dof_indices[i]) += local_rhs(i);
     }
+
+  temperature_constraints.condense (temperature_rhs);
 }
 
 
@@ -2210,8 +2292,9 @@ void BoussinesqFlowProblem<dim>::refine_mesh (const unsigned int max_grid_level)
   temperature_solution = tmp[0];
   old_temperature_solution = tmp[1];
 
-  rebuild_matrices       = true;
-  rebuild_preconditioner = true;
+  rebuild_stokes_matrix         = true;
+  rebuild_temperature_matrix    = true;
+  rebuild_stokes_preconditioner = true;
 }
 
 
@@ -2328,9 +2411,8 @@ void BoussinesqFlowProblem<dim>::run ()
                 << std::endl;
 
       assemble_stokes_system ();
-
-      if (rebuild_preconditioner == true)
-	build_stokes_preconditioner ();
+      build_stokes_preconditioner ();
+      assemble_temperature_matrix ();
 
       solve ();
 
