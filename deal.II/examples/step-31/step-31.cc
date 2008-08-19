@@ -2206,8 +2206,7 @@ void BoussinesqFlowProblem<dim>::refine_mesh (const unsigned int max_grid_level)
   soltrans.interpolate(x_solution, tmp);
 
   temperature_solution = tmp[0];
-				   //TODO: this should be [1]!!!!!!!
-  old_temperature_solution = tmp[0];
+  old_temperature_solution = tmp[1];
 
   rebuild_matrices       = true;
   rebuild_preconditioner = true;
