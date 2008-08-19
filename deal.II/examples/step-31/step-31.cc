@@ -2083,34 +2083,82 @@ void BoussinesqFlowProblem<dim>::output_results ()  const
   if (timestep_number % 10 != 0)
     return;
 
-//TODO!!  
-//  Assert (false, ExcNotImplemented());
+  const FESystem<dim> joint_fe (stokes_fe, 1,
+				temperature_fe, 1);
+  DoFHandler<dim> joint_dof_handler (triangulation);
+  joint_dof_handler.distribute_dofs (joint_fe);
+  Assert (joint_dof_handler.n_dofs() ==
+	  stokes_dof_handler.n_dofs() + temperature_dof_handler.n_dofs(),
+	  ExcInternalError());
   
-//   std::vector<std::string> solution_names (dim, "velocity");
-//   solution_names.push_back ("p");
-//   solution_names.push_back ("T");
+  Vector<double> joint_solution (joint_dof_handler.n_dofs());
 
-//   DataOut<dim> data_out;
+  {
+    std::vector<unsigned int> local_joint_dof_indices (joint_fe.dofs_per_cell);
+    std::vector<unsigned int> local_stokes_dof_indices (stokes_fe.dofs_per_cell);
+    std::vector<unsigned int> local_temperature_dof_indices (temperature_fe.dofs_per_cell);
+    
+    typename DoFHandler<dim>::active_cell_iterator
+      joint_cell       = joint_dof_handler.begin_active(),
+      joint_endc       = joint_dof_handler.end(),
+      stokes_cell      = stokes_dof_handler.begin_active(),
+      temperature_cell = temperature_dof_handler.begin_active();
+    for (; joint_cell!=joint_endc; ++joint_cell, ++stokes_cell, ++temperature_cell)
+      {
+	joint_cell->get_dof_indices (local_joint_dof_indices);
+	stokes_cell->get_dof_indices (local_stokes_dof_indices);
+	temperature_cell->get_dof_indices (local_temperature_dof_indices);
 
-//   data_out.attach_dof_handler (dof_handler);
+	for (unsigned int i=0; i<joint_fe.dofs_per_cell; ++i)
+	  if (joint_fe.system_to_base_index(i).first.first == 0)
+	    {
+	      Assert (joint_fe.system_to_base_index(i).second
+		      <
+		      local_stokes_dof_indices.size(),
+		      ExcInternalError());
+	      joint_solution(local_joint_dof_indices[i])
+		= stokes_solution(local_stokes_dof_indices[joint_fe.system_to_base_index(i).second]);
+	    }
+	  else
+	    {
+	      Assert (joint_fe.system_to_base_index(i).first.first == 1,
+		      ExcInternalError());
+	      Assert (joint_fe.system_to_base_index(i).second
+		      <
+		      local_stokes_dof_indices.size(),
+		      ExcInternalError());
+	      joint_solution(local_joint_dof_indices[i])
+		= temperature_solution(local_temperature_dof_indices[joint_fe.system_to_base_index(i).second]);
+	    }
+      }
+  }
+  
+  
+  std::vector<std::string> joint_solution_names (dim, "velocity");
+  joint_solution_names.push_back ("p");
+  joint_solution_names.push_back ("T");
 
-//   std::vector<DataComponentInterpretation::DataComponentInterpretation>
-//     data_component_interpretation
-//     (dim+2, DataComponentInterpretation::component_is_scalar);
-//   for (unsigned int i=0; i<dim; ++i)
-//     data_component_interpretation[i]
-//       = DataComponentInterpretation::component_is_part_of_vector;
+  DataOut<dim> data_out;
 
-//   data_out.add_data_vector (solution, solution_names,
-// 			    DataOut<dim>::type_dof_data,
-// 			    data_component_interpretation);
-//   data_out.build_patches (degree);
+  data_out.attach_dof_handler (joint_dof_handler);
 
-//   std::ostringstream filename;
-//   filename << "solution-" << Utilities::int_to_string(timestep_number, 4) << ".vtk";
+  std::vector<DataComponentInterpretation::DataComponentInterpretation>
+    data_component_interpretation
+    (dim+2, DataComponentInterpretation::component_is_scalar);
+  for (unsigned int i=0; i<dim; ++i)
+    data_component_interpretation[i]
+      = DataComponentInterpretation::component_is_part_of_vector;
 
-//   std::ofstream output (filename.str().c_str());
-//   data_out.write_vtk (output);
+  data_out.add_data_vector (joint_solution, joint_solution_names,
+			    DataOut<dim>::type_dof_data,
+			    data_component_interpretation);
+  data_out.build_patches (degree);
+
+  std::ostringstream filename;
+  filename << "solution-" << Utilities::int_to_string(timestep_number, 4) << ".vtk";
+
+  std::ofstream output (filename.str().c_str());
+  data_out.write_vtk (output);
 }
 
 
@@ -2306,7 +2354,7 @@ void BoussinesqFlowProblem<dim>::run ()
       old_old_temperature_solution = old_temperature_solution;
       old_temperature_solution     = temperature_solution;      
     }
-  while (time <= 10);
+  while (time <= 100);
 }
 
 
