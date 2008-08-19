@@ -331,7 +331,8 @@ class BoussinesqFlowProblem
 
     Triangulation<dim>        triangulation;
 
-    const unsigned int        degree;
+    const unsigned int        stokes_degree;
+    const unsigned int        temperature_degree;
     
     FESystem<dim>             stokes_fe;
     DoFHandler<dim>           stokes_dof_handler;
@@ -807,11 +808,12 @@ template <int dim>
 BoussinesqFlowProblem<dim>::BoussinesqFlowProblem (const unsigned int degree)
                 :
 		triangulation (Triangulation<dim>::maximum_smoothing),
-                degree (degree),
-                stokes_fe (FE_Q<dim>(degree+1), dim,
-			   FE_Q<dim>(degree), 1),
+                stokes_degree (degree),
+		temperature_degree (degree),
+                stokes_fe (FE_Q<dim>(stokes_degree+1), dim,
+			   FE_Q<dim>(stokes_degree), 1),
 		stokes_dof_handler (triangulation),
-		temperature_fe (degree),
+		temperature_fe (temperature_degree),
                 temperature_dof_handler (triangulation),
                 time_step (0),
 		old_time_step (0),
@@ -1171,7 +1173,7 @@ BoussinesqFlowProblem<dim>::assemble_stokes_preconditioner ()
 {
   stokes_preconditioner_matrix = 0;
 
-  QGauss<dim>   quadrature_formula(degree+2);
+  QGauss<dim>   quadrature_formula(stokes_degree+2);
   FEValues<dim> stokes_fe_values (stokes_fe, quadrature_formula,
 				  update_JxW_values |
 				  update_values |
@@ -1400,8 +1402,8 @@ void BoussinesqFlowProblem<dim>::assemble_stokes_system ()
 
   stokes_rhs=0;
 
-  QGauss<dim>   quadrature_formula(degree+2);
-  QGauss<dim-1> face_quadrature_formula(degree+2);
+  QGauss<dim>   quadrature_formula(stokes_degree+2);
+  QGauss<dim-1> face_quadrature_formula(stokes_degree+2);
 
   FEValues<dim> stokes_fe_values (stokes_fe, quadrature_formula,
 				  update_values    |
@@ -1777,7 +1779,7 @@ void BoussinesqFlowProblem<dim>::assemble_temperature_system ()
   temperature_matrix = 0;
   temperature_rhs = 0;
   
-  QGauss<dim>   quadrature_formula(degree+2);
+  QGauss<dim>   quadrature_formula(temperature_degree+2);
   FEValues<dim> temperature_fe_values (temperature_fe, quadrature_formula,
 				       update_values    | update_gradients |
 				       update_hessians |
@@ -2152,7 +2154,7 @@ void BoussinesqFlowProblem<dim>::output_results ()  const
   data_out.add_data_vector (joint_solution, joint_solution_names,
 			    DataOut<dim>::type_dof_data,
 			    data_component_interpretation);
-  data_out.build_patches (degree);
+  data_out.build_patches (std::max(stokes_degree, temperature_degree));
 
   std::ostringstream filename;
   filename << "solution-" << Utilities::int_to_string(timestep_number, 4) << ".vtk";
@@ -2170,7 +2172,7 @@ void BoussinesqFlowProblem<dim>::refine_mesh (const unsigned int max_grid_level)
   Vector<float> estimated_error_per_cell (triangulation.n_active_cells());
 
   KellyErrorEstimator<dim>::estimate (temperature_dof_handler,
-				      QGauss<dim-1>(degree+1),
+				      QGauss<dim-1>(temperature_degree+1),
 				      typename FunctionMap<dim>::type(),
 				      temperature_solution,
 				      estimated_error_per_cell);
@@ -2218,7 +2220,7 @@ void BoussinesqFlowProblem<dim>::refine_mesh (const unsigned int max_grid_level)
 template <int dim>
 double BoussinesqFlowProblem<dim>::get_maximal_velocity () const
 {
-  QGauss<dim>   quadrature_formula(degree+2);
+  QGauss<dim>   quadrature_formula(stokes_degree+2);
   const unsigned int   n_q_points
     = quadrature_formula.size();
 
@@ -2257,7 +2259,7 @@ double BoussinesqFlowProblem<dim>::get_maximal_velocity () const
 template <int dim>
 double BoussinesqFlowProblem<dim>::get_maximal_temperature () const
 {
-  QGauss<dim>   quadrature_formula(degree+2);
+  QGauss<dim>   quadrature_formula(temperature_degree+2);
   const unsigned int   n_q_points = quadrature_formula.size();
 
   FEValues<dim> fe_values (temperature_fe, quadrature_formula,
@@ -2311,7 +2313,7 @@ void BoussinesqFlowProblem<dim>::run ()
 
   VectorTools::project (temperature_dof_handler,
 			temperature_constraints,
-			QGauss<dim>(degree+2),
+			QGauss<dim>(temperature_degree+2),
 			TemperatureInitialValues<dim>(),
 			old_temperature_solution);
   
