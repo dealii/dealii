@@ -19,10 +19,10 @@ California Institute of Technology.
 
 This program deals with an interesting physical problem: how does a
 fluid (i.e. a liquid or gas) behave if it experiences differences in
-buoyance caused by temperature differences? It is clear that those
+buoyancy caused by temperature differences? It is clear that those
 parts of the fluid that are hotter (and therefore lighter) are going
 to rise up and those that are cooler (and denser) are going to sink
-down against gravity.
+down with gravity.
 
 In cases where the fluid moves slowly enough such that inertia effects
 can be neglected, the equations that describe such behavior are the
@@ -134,13 +134,18 @@ an equation with a time derivative, so we need initial conditions for <i>T</i>.
 
 As for boundary conditions: if $\kappa>0$ then the temperature
 satisfies a second order differential equation that requires
-temperature data all around the boundary for all times. Similarly, the
-velocity field requires us to pose boundary conditions. These may be
-no-slip no-flux conditions <b>u</b>=0 on $\partial\Omega$ if the
-fluid sticks to the boundary, or no normal flux conditions $\mathbf n
-\cdot \mathbf u = 0$ if the fluid can flow along but not across the
-boundary, or any number of other conditions that are physically
-reasonable. In this program, we will use no normal flux conditions.
+boundary data all around the boundary for all times. These can either be a
+prescribed boundary temperature $T|_{\partial\Omega}=T_b$ (Dirichlet boundary
+conditions), or a prescribed thermal flux $\mathbf{n}\cdot\kappa\nabla
+T|_{\partial\Omega}=\phi$; in this program, we will use an insulated boundary
+condition, i.e. prescribe no thermal flux: $\phi=0$. 
+
+Similarly, the velocity field requires us to pose boundary conditions. These
+may be no-slip no-flux conditions <b>u</b>=0 on $\partial\Omega$ if the fluid
+sticks to the boundary, or no normal flux conditions $\mathbf n \cdot \mathbf
+u = 0$ if the fluid can flow along but not across the boundary, or any number
+of other conditions that are physically reasonable. In this program, we will
+use no normal flux conditions.
 
 
 <h3>Solution approach</h3>
@@ -601,7 +606,11 @@ at the weak form of the discretized equations:
   \right]
   \right)
 @f}
-for all discrete test functions $\tau_h$. This then results in a
+for all discrete test functions $\tau_h$. Here, the diffusion term has been
+integrated by parts, and we have used that we will impose no thermal flux,
+$\mathbf{n}\cdot\kappa\nabla T|_{\partial\Omega}=0$.
+
+This then results in a
 matrix equation of form
 @f{eqnarray*}
   \left( \frac{2k_n+k_{n-1}}{k_n+k_{n-1}} M+k_n A_T\right) T_h^n = F(U_h^n,T_h^{n-1},T_h^{n-2}),
@@ -769,3 +778,16 @@ To sum this whole story up, we can observe:
 
 
 <h5>Linear solvers for the temperature equation</h5>
+
+This is the easy part: The matrix for the temperature equation has the form
+$\alpha M + \beta A$, where $M,A$ are mass and stiffness matrices on the
+temperature space, and $\alpha,\beta$ are constants related the time stepping
+scheme and the current and previous time step. This being the sum of a
+symmetric positive definite and a symmetric positive semidefinite matrix, the
+result is also symmetric positive definite. Furthermore, $\frac\beta\alpha$ is
+a number proportional to the time step, and so becomes small whenever the mesh
+is fine, damping the effect of the then ill-conditioned stiffness matrix.
+
+As a consequence, inverting this matrix with the Conjugate Gradient algorithm,
+using a simple preconditioner, is trivial and very cheap compared to inverting
+the Stokes matrix.
