@@ -791,3 +791,103 @@ is fine, damping the effect of the then ill-conditioned stiffness matrix.
 As a consequence, inverting this matrix with the Conjugate Gradient algorithm,
 using a simple preconditioner, is trivial and very cheap compared to inverting
 the Stokes matrix.
+
+
+
+<h3>Implementation details</h3>
+
+One of the things worth explaining up front about the program below is the use
+of two different DoFHandler objects. If one looks at the structure of the
+equations above and the scheme for their solution, one realizes that there is
+little commonality that keeps the Stokes part and the temperature part
+together. In all previous tutorial programs in which we have discussed @ref
+vector_valued "vector-valued problems" we have always only used a single
+finite element with several vector components, and a single DoFHandler object.
+Sometimes, we have substructured the resulting matrix into blocks to
+facilitate particular solver schemes; this was, for example, the case in the
+@ref step_22 "step-22" program for the Stokes equations upon which the current
+program is based.
+
+We could of course do the same here. The linear system that we would get would
+look like this:
+@f{eqnarray*}
+  \left(\begin{array}{ccc}
+    A & B^T & 0 \\ B & 0 &0 \\ C & 0 & K
+  \end{array}\right)
+  \left(\begin{array}{ccc}
+    U^n \\ P^n \\ T^n
+  \end{array}\right)
+  =
+  \left(\begin{array}{ccc}
+    F_U(T^{n-1}) \\ 0 \\ F_T(U^n,T^{n-1},T^{n-1})
+  \end{array}\right).
+@f}
+The problem with this is: We never use the whole matrix at the same time. In
+fact, it never really exists at the same time: As explained above, $K$ and
+$F_T$ depend on the already computed solution $U^n$, in the first case through
+the time step (that depends on $U^n$ because it has to satisfy a CFL
+condition). So we can only assemble it once we've already solved the top left
+$2\times 2$ block Stokes system, and once we've moved on to the temperature
+equation we don't need the Stokes part any more. Furthermore, we don't
+actually build the matrix $C$: Because by the time we get to the temperature
+equation we already know $U^n$, and because we have to assemble the right hand
+side $F_T$ at this time anyway, we simply move the term $CU^n$ to the right
+hand side and assemble it along with all the other terms there. What this
+means is that there does not remain a part of the matrix where temperature
+variables and Stokes variables couple, and so a global enumeration of all
+degrees of freedom is no longer important: It is enough if we have an
+enumeration of all Stokes degrees of freedom, and of all temperature degrees
+of freedom independently.
+
+In essence, there is consequently not much use in putting <i>everything</i>
+into a block matrix (though there are of course the same good reasons to do so
+for the $2\times 2$ Stokes part), or, for that matter, in putting everything
+into the same DoFHandler object.
+
+But are there <i>downsides</i> to doing so? These exist, though they may not
+be obvious at first. The main problem is that if we need to create one global
+finite element that contains velocity, pressure, and temperature shape
+functions, and use this to initialize the DoFHandler. But we also use this
+finite element object to initialize all FEValues or FEFaceValues objects that
+we use. This may not appear to be that big a deal, but imagine what happens
+when, for example, we evaluate the residual
+$
+  R_\alpha(T)
+  =
+  \left(
+  \frac{\partial T}{\partial t}
+  +
+  {\mathbf u} \cdot \nabla T
+  -
+  \nabla \cdot \kappa \nabla T - \gamma
+  \right)
+  T^{\alpha-1}
+$
+that we need to compute the artificial viscosity $\nu_\alpha(T)|_K$.  For
+this, we need the Laplacian of the temperature, which we compute using the
+tensor of second derivatives (Hessians) of the shape functions (we have to
+give the <code>update_hessians</code> flag to the FEValues object for
+this). Now, if we have a finite that contains the shape functions for
+velocities, pressures, and temperatures, that means that we have to compute
+the Hessians of <i>all</i> shape functions, including the many higher order
+shape functions for the velocities. That's a lot of computations that we don't
+need, and indeed if one were to do that (as we had in an early version of the
+program), assembling the right hand side took about a quarter of the overall
+compute time.
+
+So what we will do is to use two different finite element objects, one for the
+Stokes components and one for the temperatures. With this come two different
+DoFHandlers, two sparsity patterns and two matrices for the Stokes and
+temperature parts, etc. And whenever we have to assemble something that
+contains both temperature and Stokes shape functions (in particular the right
+hand sides of Stokes and temperature equations), then we use two FEValues
+objects initialized with two cell iterators that we walk in parallel through
+the two DoFHandler objects associated with the same Triangulation object; for
+these two FEValues objects, we use of course the same quadrature objects so
+that we can iterate over the same set of quadrature points, but each FEValues
+object will get update flags only according to what it actually needs to
+compute. In particular, when we compute the residual as above, we only ask for
+the values of the Stokes shape functions, but also the Hessians of the
+temperature shape functions &mdash; much cheaper indeed, and as it turns out:
+assembling the right hand side of the temperature equation is now a component
+of the program that is hardly measurable.
