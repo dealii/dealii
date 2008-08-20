@@ -1181,15 +1181,10 @@ BoussinesqFlowProblem<dim>::assemble_stokes_preconditioner ()
 	}
 
       cell->get_dof_indices (local_dof_indices);
-
-      for (unsigned int i=0; i<dofs_per_cell; ++i)
-	for (unsigned int j=0; j<dofs_per_cell; ++j)
-	  stokes_preconditioner_matrix.add (local_dof_indices[i],
-					    local_dof_indices[j],
-					    local_matrix(i,j));
+      stokes_constraints.distribute_local_to_global (local_matrix,
+						     local_dof_indices,
+						     stokes_preconditioner_matrix);
     }
-  
-  stokes_constraints.condense (stokes_preconditioner_matrix);
 }
 
 
@@ -1578,63 +1573,16 @@ void BoussinesqFlowProblem<dim>::assemble_stokes_system ()
       cell->get_dof_indices (local_dof_indices);
 
       if (rebuild_stokes_matrix == true)
-	for (unsigned int i=0; i<dofs_per_cell; ++i)
-	  for (unsigned int j=0; j<dofs_per_cell; ++j)
-	    stokes_matrix.add (local_dof_indices[i],
-			       local_dof_indices[j],
-			       local_matrix(i,j));
+	stokes_constraints.distribute_local_to_global (local_matrix,
+						       local_dof_indices,
+						       stokes_matrix);
 
-      for (unsigned int i=0; i<dofs_per_cell; ++i)
-        stokes_rhs(local_dof_indices[i]) += local_rhs(i);
+      stokes_constraints.distribute_local_to_global (local_rhs,
+						     local_dof_indices,
+						     stokes_rhs);
     }
 
-				   // Back at the outermost
-				   // level of this function,
-				   // we continue the work
-				   // by condensing hanging
-				   // node constraints to the
-				   // right hand side and, 
-				   // possibly, to the matrix.
-  stokes_constraints.condense (stokes_rhs);
-
-  if (rebuild_stokes_matrix == true)
-    {
-      stokes_constraints.condense (stokes_matrix);
-      rebuild_stokes_matrix = false;
-      
-//       std::map<unsigned int,double> boundary_values;
-
-//       typename DoFHandler<dim>::active_cell_iterator
-// 	cell = dof_handler.begin_active(),
-// 	emdc = dof_handler.end();
-//       for (; cell!=endc; ++cell)
-// 	for (unsigned int v=0; v<GeometryInfo<dim>::vertices_per_cell; ++v)
-// 	  if (cell->vertex(v).distance(dim == 2
-// 				       ?
-// 				       Point<dim>(0,-1)
-// 				       :
-// 				       Point<dim>(0,0,-1)) < 1e-6)
-// 	    {
-// 	      std::cout << "Found cell and vertex: " << cell << ' '
-// 			<< v << std::endl;
-
-// 	      boundary_values[cell->vertex_dof_index(v,0)] = 0;
-// 	      break;
-// 	    }
-
-//      std::vector<bool> component_mask (dim+2, true);
-//       component_mask[dim] = component_mask[dim+1] = false;
-//       VectorTools::interpolate_boundary_values (dof_handler,
-// 						0,
-// 						ZeroFunction<dim>(dim+2),
-// 						boundary_values,
-// 						component_mask);
-
-//       MatrixTools::apply_boundary_values (boundary_values,
-// 					  stokes_matrix,
-// 					  solution,
-// 					  system_rhs);
-    }
+  rebuild_stokes_matrix = false;
 
   std::cout << std::endl;
 }
@@ -1799,20 +1747,13 @@ void BoussinesqFlowProblem<dim>::assemble_temperature_matrix ()
       
       cell->get_dof_indices (local_dof_indices);
 
-      for (unsigned int i=0; i<dofs_per_cell; ++i)
-	for (unsigned int j=0; j<dofs_per_cell; ++j)
-	  {
-	    temperature_mass_matrix.add (local_dof_indices[i],
-					 local_dof_indices[j],
-					 local_mass_matrix(i,j));
-	    temperature_stiffness_matrix.add (local_dof_indices[i],
-					      local_dof_indices[j],
-					      local_stiffness_matrix(i,j));
-	  }
+      temperature_constraints.distribute_local_to_global (local_mass_matrix,
+							  local_dof_indices,
+							  temperature_mass_matrix);
+      temperature_constraints.distribute_local_to_global (local_stiffness_matrix,
+							  local_dof_indices,
+							  temperature_stiffness_matrix);
     }
-
-  temperature_constraints.condense (temperature_mass_matrix);
-  temperature_constraints.condense (temperature_stiffness_matrix);
   
   rebuild_temperature_matrices = false;
 }
@@ -2017,12 +1958,10 @@ void BoussinesqFlowProblem<dim>::assemble_temperature_system ()
 	}
       
       cell->get_dof_indices (local_dof_indices);
-
-      for (unsigned int i=0; i<dofs_per_cell; ++i)
-        temperature_rhs(local_dof_indices[i]) += local_rhs(i);
+      temperature_constraints.distribute_local_to_global (local_rhs,
+							  local_dof_indices,
+							  temperature_rhs);
     }
-
-  temperature_constraints.condense (temperature_rhs);
 }
 
 
