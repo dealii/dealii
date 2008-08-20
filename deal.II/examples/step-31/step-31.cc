@@ -126,7 +126,7 @@ class PreconditionerTrilinosAmg : public Subscriptor
 
   private:
     
-    ML_Epetra::MultiLevelPreconditioner* ml_precond;
+    boost::shared_ptr<ML_Epetra::MultiLevelPreconditioner> ml_precond;
     
     Epetra_SerialComm  communicator;
     std::auto_ptr<Epetra_Map>       Map;
@@ -257,7 +257,8 @@ void PreconditionerTrilinosAmg::initialize (
       MLList.set("null space: vectors", (double *)&null_space[0]);
     }
   
-  ml_precond = new ML_Epetra::MultiLevelPreconditioner(*Matrix, MLList, true);
+  ml_precond = boost::shared_ptr<ML_Epetra::MultiLevelPreconditioner>
+	       (new ML_Epetra::MultiLevelPreconditioner(*Matrix, MLList, true));
 
   if (output_details)
     ml_precond->PrintUnused(0);
