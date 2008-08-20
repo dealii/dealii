@@ -2023,7 +2023,7 @@ void BoussinesqFlowProblem<dim>::solve ()
 				   // bigger time step)
   old_time_step = time_step;    
   time_step = GridTools::minimal_cell_diameter(triangulation) /
-              std::max (get_maximal_velocity(), .05) / 4;
+              std::max (get_maximal_velocity(), .01) / 4;
   
   temperature_solution = old_temperature_solution;
 
