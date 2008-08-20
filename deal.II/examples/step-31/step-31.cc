@@ -1146,18 +1146,6 @@ void BoussinesqFlowProblem<dim>::setup_dofs ()
 
 
 template <int dim>
-double scalar_product (const Tensor<2,dim> &t1,
-		       const Tensor<2,dim> &t2)
-{
-  double s = 0;
-  for (unsigned int i=0; i<dim; ++i)
-    for (unsigned int j=0; j<dim; ++j)
-      s += t1[i][j] * t2[i][j];
-  return s;
-}
-
-
-template <int dim>
 void
 BoussinesqFlowProblem<dim>::assemble_stokes_preconditioner ()
 {
