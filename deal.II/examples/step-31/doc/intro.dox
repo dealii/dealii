@@ -438,8 +438,11 @@ reveals that it is unitless and therefore independent of scaling) and
 $c(\mathbf{u},T)$ is a normalization constant that must have units
 $\frac{m^{\alpha-1}K^\alpha}{s}$. We will choose it as
 $c(\mathbf{u},T) = 
- \|\mathbf{u}\|_{L^\infty(\Omega)} \|T\|_{L^\infty(\Omega)} 
- |\textrm{diam}(\Omega)|^{\alpha-2}$.
+ \|\mathbf{u}\|_{L^\infty(\Omega)} \ \mathrm{var}(T)
+ \ |\mathrm{diam}(\Omega)|^{\alpha-2}$,
+where $\mathrm{var}(T)=\max_\Omega T - \min_\Omega T$ is the range of present
+temperature values (remember that buoyancy is driven by temperature
+variations, not the absolute temperature).
 To understand why this method works consider this: If on a particular
 cell $K$ the temperature field is smooth, then we expect the residual
 to be small there (in fact to be on the order of ${\cal O}(h_K)$) and

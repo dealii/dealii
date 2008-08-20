@@ -325,7 +325,7 @@ class BoussinesqFlowProblem
     void assemble_temperature_system ();
     void assemble_temperature_matrix ();
     double get_maximal_velocity () const;
-    double get_maximal_temperature () const;
+    std::pair<double,double> get_extrapolated_temperature_range () const;
     void solve ();
     void output_results () const;
     void refine_mesh (const unsigned int max_grid_level);
@@ -1699,7 +1699,7 @@ double compute_viscosity(
   const std::vector<double>          &gamma_values,
   const double                        kappa,
   const double                        global_u_infty,
-  const double                        global_T_infty,
+  const double                        global_T_variation,
   const double                        global_Omega_diameter,
   const double                        cell_diameter,
   const double                        old_time_step
@@ -1741,7 +1741,7 @@ double compute_viscosity(
       max_velocity = std::max (std::sqrt (u*u), max_velocity);
     }
   
-  const double global_scaling = global_u_infty * global_T_infty /
+  const double global_scaling = global_u_infty * global_T_variation /
 				std::pow(global_Omega_diameter, alpha - 2.);
 
   return (beta *
@@ -1932,7 +1932,8 @@ void BoussinesqFlowProblem<dim>::assemble_temperature_system ()
   std::vector<Tensor<1,dim> >          grad_phi_T  (dofs_per_cell);
   
   const double global_u_infty = get_maximal_velocity();
-  const double global_T_infty = get_maximal_temperature();
+  const std::pair<double,double>
+    global_T_range = get_extrapolated_temperature_range();
   const double global_Omega_diameter = GridTools::diameter (triangulation);
 
 				   // Now, let's start the loop
@@ -1989,7 +1990,8 @@ void BoussinesqFlowProblem<dim>::assemble_temperature_system ()
 			     old_old_temperature_hessians,
 			     present_stokes_values,
 			     gamma_values,
-			     kappa, global_u_infty, global_T_infty,
+			     kappa, global_u_infty,
+			     global_T_range.second - global_T_range.first,
 			     global_Omega_diameter, cell->diameter(),
 			     old_time_step);
       
@@ -2339,9 +2341,10 @@ double BoussinesqFlowProblem<dim>::get_maximal_velocity () const
 
 
 
-				 // @sect4{BoussinesqFlowProblem::get_maximal_velocity}
+				 // @sect4{BoussinesqFlowProblem::get_extrapolated_temperature_range}
 template <int dim>
-double BoussinesqFlowProblem<dim>::get_maximal_temperature () const
+std::pair<double,double>
+BoussinesqFlowProblem<dim>::get_extrapolated_temperature_range () const
 {
   QGauss<dim>   quadrature_formula(temperature_degree+2);
   const unsigned int   n_q_points = quadrature_formula.size();
@@ -2351,7 +2354,12 @@ double BoussinesqFlowProblem<dim>::get_maximal_temperature () const
   std::vector<double> old_temperature_values(n_q_points);
   std::vector<double> old_old_temperature_values(n_q_points);
   
-  double max_temperature = 0;
+  double min_temperature = (1. + time_step/old_time_step) *
+			   old_temperature_solution.linfty_norm()
+			   +
+			   time_step/old_time_step *
+			   old_old_temperature_solution.linfty_norm(),
+	 max_temperature = -min_temperature;
 
   typename DoFHandler<dim>::active_cell_iterator
     cell = temperature_dof_handler.begin_active(),
@@ -2364,16 +2372,16 @@ double BoussinesqFlowProblem<dim>::get_maximal_temperature () const
 
       for (unsigned int q=0; q<n_q_points; ++q)
         {
-          double temperature = 
+          const double temperature = 
 	    (1. + time_step/old_time_step) * old_temperature_values[q]-
 	    time_step/old_time_step * old_old_temperature_values[q];
 
-          max_temperature = std::max (max_temperature,
-				      temperature);
+          min_temperature = std::min (min_temperature, temperature);
+	  max_temperature = std::max (max_temperature, temperature);
         }
     }
 
-  return max_temperature;
+  return std::make_pair(min_temperature, max_temperature);
 }
 
 
