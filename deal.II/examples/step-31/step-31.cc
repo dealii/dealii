@@ -127,7 +127,7 @@ class PreconditionerTrilinosAmg : public Subscriptor
 
   private:
     
-    boost::shared_ptr<ML_Epetra::MultiLevelPreconditioner> ml_precond;
+    boost::shared_ptr<ML_Epetra::MultiLevelPreconditioner> multigrid_operator;
     
     Epetra_SerialComm  communicator;
     boost::shared_ptr<Epetra_Map>       Map;
@@ -148,15 +148,18 @@ void PreconditionerTrilinosAmg::initialize (
 		const double                drop_tolerance
 		)
 {
-  const unsigned int n_u = matrix.m();
+  Assert (drop_tolerance >= 0,
+	  ExcMessage ("Drop tolerance must be a non-negative number."));
+  
+  const unsigned int n_rows = matrix.m();
   const SparsityPattern *sparsity_pattern = &(matrix.get_sparsity_pattern());
   
 				 // Init Epetra Matrix, avoid 
 				 // storing the nonzero elements.
   {
-    Map.reset (new Epetra_Map(n_u, 0, communicator));
+    Map.reset (new Epetra_Map(n_rows, 0, communicator));
     
-    std::vector<int> row_lengths (n_u);
+    std::vector<int> row_lengths (n_rows);
     for (SparseMatrix<double>::const_iterator p = matrix.begin();
 	 p != matrix.end(); ++p)
       if (std::abs(p->value()) > drop_tolerance)
@@ -170,7 +173,7 @@ void PreconditionerTrilinosAmg::initialize (
     std::vector<double> values(max_nonzero_entries, 0);
     std::vector<int> row_indices(max_nonzero_entries);
   
-    for (unsigned int row=0; row<n_u; ++row)
+    for (unsigned int row=0; row<n_rows; ++row)
       {
 	unsigned int index = 0;
 	for (SparseMatrix<double>::const_iterator p = matrix.begin(row);
@@ -194,7 +197,7 @@ void PreconditionerTrilinosAmg::initialize (
   }
   
 				 // Build the AMG preconditioner.
-  Teuchos::ParameterList MLList;
+  Teuchos::ParameterList parameter_list;
   
 				 // The implementation is able
 				 // to distinguish between
@@ -210,41 +213,41 @@ void PreconditionerTrilinosAmg::initialize (
 				 // than Gauss-Seidel (SSOR).
   if (elliptic)
     {
-      ML_Epetra::SetDefaults("SA",MLList);
-      MLList.set("smoother: type", "Chebyshev");
-      MLList.set("smoother: sweeps", 4);
+      ML_Epetra::SetDefaults("SA",parameter_list);
+      parameter_list.set("smoother: type", "Chebyshev");
+      parameter_list.set("smoother: sweeps", 4);
     }
   else
     {
-      ML_Epetra::SetDefaults("NSSA",MLList);
-      MLList.set("aggregation: type", "Uncoupled");
-      MLList.set("aggregation: block scaling", true);
+      ML_Epetra::SetDefaults("NSSA",parameter_list);
+      parameter_list.set("aggregation: type", "Uncoupled");
+      parameter_list.set("aggregation: block scaling", true);
     }
   
   if (output_details)
-    MLList.set("ML output", 10);
+    parameter_list.set("ML output", 10);
   else
-    MLList.set("ML output", 0);
+    parameter_list.set("ML output", 0);
   
   if (higher_order_elements)
-    MLList.set("aggregation: type", "MIS");
+    parameter_list.set("aggregation: type", "MIS");
   
-  Assert (n_u * null_space_dimension == null_space.size(),
-	  ExcDimensionMismatch(n_u * null_space_dimension,
+  Assert (n_rows * null_space_dimension == null_space.size(),
+	  ExcDimensionMismatch(n_rows * null_space_dimension,
 			       null_space.size()));
   
   if (null_space_dimension > 1)
     {
-      MLList.set("null space: type", "pre-computed");
-      MLList.set("null space: dimension", int(null_space_dimension));
-      MLList.set("null space: vectors", (double *)&null_space[0]);
+      parameter_list.set("null space: type", "pre-computed");
+      parameter_list.set("null space: dimension", int(null_space_dimension));
+      parameter_list.set("null space: vectors", (double *)&null_space[0]);
     }
   
-  ml_precond = boost::shared_ptr<ML_Epetra::MultiLevelPreconditioner>
-	       (new ML_Epetra::MultiLevelPreconditioner(*Matrix, MLList, true));
+  multigrid_operator = boost::shared_ptr<ML_Epetra::MultiLevelPreconditioner>
+	       (new ML_Epetra::MultiLevelPreconditioner(*Matrix, parameter_list, true));
 
   if (output_details)
-    ml_precond->PrintUnused(0);
+    multigrid_operator->PrintUnused(0);
 }
 
 				 // For the implementation of the
@@ -270,11 +273,11 @@ void PreconditionerTrilinosAmg::vmult (Vector<double>       &dst,
   Epetra_Vector LHS (View, *Map, dst.begin());
   Epetra_Vector RHS (View, *Map, const_cast<double*>(src.begin()));
   
-  int res = ml_precond->ApplyInverse (RHS, LHS);
+  const int res = multigrid_operator->ApplyInverse (RHS, LHS);
   
   Assert (res == 0,
 	  ExcMessage ("Trilinos AMG MultiLevel preconditioner returned "
-		      "errorneously!"));
+		      "with an error!"));
 }
 
 
