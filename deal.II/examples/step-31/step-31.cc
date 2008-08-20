@@ -114,7 +114,7 @@ class PreconditionerTrilinosAmg : public Subscriptor
   public:
     PreconditionerTrilinosAmg ();
     
-    void initialize (const SparseMatrix<double> &preconditioner_matrix,
+    void initialize (const SparseMatrix<double> &matrix,
 		     const std::vector<double>  &null_space,
 		     const unsigned int          null_space_dimension,
 		     const bool                  higher_order_elements,
@@ -129,8 +129,8 @@ class PreconditionerTrilinosAmg : public Subscriptor
     boost::shared_ptr<ML_Epetra::MultiLevelPreconditioner> ml_precond;
     
     Epetra_SerialComm  communicator;
-    std::auto_ptr<Epetra_Map>       Map;
-    std::auto_ptr<Epetra_CrsMatrix> Matrix;
+    boost::shared_ptr<Epetra_Map>       Map;
+    boost::shared_ptr<Epetra_CrsMatrix> Matrix;
 };
 
 
@@ -138,7 +138,7 @@ PreconditionerTrilinosAmg::PreconditionerTrilinosAmg ()
 {}
 
 void PreconditionerTrilinosAmg::initialize (
-		const SparseMatrix<double> &preconditioner_matrix,
+		const SparseMatrix<double> &matrix,
 		const std::vector<double>  &null_space,
 		const unsigned int          null_space_dimension,
 		const bool                  elliptic,
@@ -146,9 +146,8 @@ void PreconditionerTrilinosAmg::initialize (
 		const bool                  output_details
 		)
 {
-  unsigned int n_u = preconditioner_matrix.m();
-  const SparsityPattern *sparsity_pattern = 
-      &(preconditioner_matrix.get_sparsity_pattern());
+  const unsigned int n_u = matrix.m();
+  const SparsityPattern *sparsity_pattern = &(matrix.get_sparsity_pattern());
   
 				 // Init Epetra Matrix, avoid 
 				 // storing the nonzero elements.
@@ -156,19 +155,10 @@ void PreconditionerTrilinosAmg::initialize (
     Map.reset (new Epetra_Map(n_u, 0, communicator));
     
     std::vector<int> row_lengths (n_u);
-    for (unsigned int row=0; row<n_u; ++row)
-      {
-	const unsigned int temporary_row_length = 
-	    sparsity_pattern->row_length (row);
-	unsigned int local_length = 0;
-	for (unsigned int col=0; col<temporary_row_length; ++col)
-	  {
-	    unsigned int col_index = sparsity_pattern->column_number (row, col);
-	    if (std::abs(preconditioner_matrix (row, col_index)) > 1e-13)
-	      local_length += 1;
-	  }
-	row_lengths[row] = local_length;
-      }
+    for (SparseMatrix<double>::const_iterator p = matrix.begin();
+	 p != matrix.end(); ++p)
+      if (std::abs(p->value()) > 1e-13)
+	++row_lengths[p->row()];
   
     Matrix.reset (new Epetra_CrsMatrix(Copy, *Map, &row_lengths[0], true));
   
@@ -190,12 +180,12 @@ void PreconditionerTrilinosAmg::initialize (
 	for (unsigned int col=0; col<temporary_row_length; ++col)
 	  {
 	    unsigned int col_index = sparsity_pattern->column_number (row, col);
-	    if (std::abs(preconditioner_matrix (row, col_index)) > 1e-13)
+	    if (std::abs(matrix (row, col_index)) > 1e-13)
 	      {
 		row_indices[col_counter] = 
 		    sparsity_pattern->column_number (row, col);
 		values[col_counter] = 
-		    preconditioner_matrix (row, row_indices[col_counter]);
+		    matrix (row, row_indices[col_counter]);
 		++col_counter;
 	      }
 	  }
