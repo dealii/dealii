@@ -119,7 +119,8 @@ class PreconditionerTrilinosAmg : public Subscriptor
 		     const unsigned int          null_space_dimension,
 		     const bool                  higher_order_elements,
 		     const bool                  elliptic,
-		     const bool                  output_details);
+		     const bool                  output_details,
+		     const double                drop_tolerance = 1e-13);
 
     void vmult (Vector<double>       &dst,
 		const Vector<double> &src) const;
@@ -143,7 +144,8 @@ void PreconditionerTrilinosAmg::initialize (
 		const unsigned int          null_space_dimension,
 		const bool                  elliptic,
 		const bool                  higher_order_elements,
-		const bool                  output_details
+		const bool                  output_details,
+		const double                drop_tolerance
 		)
 {
   const unsigned int n_u = matrix.m();
@@ -157,7 +159,7 @@ void PreconditionerTrilinosAmg::initialize (
     std::vector<int> row_lengths (n_u);
     for (SparseMatrix<double>::const_iterator p = matrix.begin();
 	 p != matrix.end(); ++p)
-      if (std::abs(p->value()) > 1e-13)
+      if (std::abs(p->value()) > drop_tolerance)
 	++row_lengths[p->row()];
   
     Matrix.reset (new Epetra_CrsMatrix(Copy, *Map, &row_lengths[0], true));
@@ -173,7 +175,7 @@ void PreconditionerTrilinosAmg::initialize (
 	unsigned int index = 0;
 	for (SparseMatrix<double>::const_iterator p = matrix.begin(row);
 	     p != matrix.end(row); ++p)
-	  if (std::abs(p->value()) > 1e-13)
+	  if (std::abs(p->value()) > drop_tolerance)
 	    {
 	      row_indices[index] = p->column();
 	      values[index]      = p->value();
