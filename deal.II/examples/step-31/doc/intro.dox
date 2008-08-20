@@ -894,3 +894,18 @@ the values of the Stokes shape functions, but also the Hessians of the
 temperature shape functions &mdash; much cheaper indeed, and as it turns out:
 assembling the right hand side of the temperature equation is now a component
 of the program that is hardly measurable.
+
+With these changes, timing the program yields that only the following
+operations are relevant for the overall run time: 
+<ul>
+  <li>Solving the Stokes system: 72% of the run time.
+  <li>Assembling the Stokes preconditioner and computing the algebraic
+      multigrid hierarchy using the Trilinos ML package: 11% of the
+      run time.
+  <li>The function <code>BoussinesqFlowProblem::setup_dofs</code>: 7%
+      of overall run time.
+  <li>Assembling the Stokes and temperature right hand side vectors as
+      well as assembling the matrices: 7%.
+</ul>
+In essence this means that all bottlenecks apart from the algebraic
+multigrid have been removed.
