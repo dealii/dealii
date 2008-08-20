@@ -170,26 +170,17 @@ void PreconditionerTrilinosAmg::initialize (
   
     for (unsigned int row=0; row<n_u; ++row)
       {
-	const unsigned int temporary_row_length = 
-	    sparsity_pattern->row_length (row);
-	
-	row_indices.resize (row_lengths[row], 0);
-	values.resize (row_lengths[row], 0.);
-  
-	unsigned int col_counter = 0;
-	for (unsigned int col=0; col<temporary_row_length; ++col)
-	  {
-	    unsigned int col_index = sparsity_pattern->column_number (row, col);
-	    if (std::abs(matrix (row, col_index)) > 1e-13)
-	      {
-		row_indices[col_counter] = 
-		    sparsity_pattern->column_number (row, col);
-		values[col_counter] = 
-		    matrix (row, row_indices[col_counter]);
-		++col_counter;
-	      }
-	  }
-	Assert (col_counter == static_cast<unsigned int>(row_lengths[row]),
+	unsigned int index = 0;
+	for (SparseMatrix<double>::const_iterator p = matrix.begin(row);
+	     p != matrix.end(row); ++p)
+	  if (std::abs(p->value()) > 1e-13)
+	    {
+	      row_indices[index] = p->column();
+	      values[index]      = p->value();
+	      ++index;
+	    }
+
+	Assert (index == static_cast<unsigned int>(row_lengths[row]),
 		ExcMessage("Filtering out zeros could not "
 			    "be successfully finished!"));
   
