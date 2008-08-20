@@ -294,6 +294,162 @@ void PreconditionerTrilinosAmg::vmult (Vector<double>       &dst,
 }
 
 
+				 // @sect3{Equation data}
+
+				 // Again, the next stage in the program
+				 // is the definition of the equation 
+				 // data, that is, the various
+				 // boundary conditions, the right hand
+				 // side and the initial condition (remember
+				 // that we're about to solve a time-
+				 // dependent system). The basic strategy
+				 // for this definition is the same as in
+				 // step-22. Regarding the details, though,
+				 // there are some differences.
+
+				 // The first
+				 // thing is that we don't set any boundary
+				 // conditions on the velocity, as is
+				 // explained in the introduction. So
+				 // what is left are two conditions for
+				 // pressure <i>p</i> and temperature
+				 // <i>T</i>.
+
+				 // Secondly, we set an initial
+				 // condition for all problem variables,
+				 // i.e., for <b>u</b>, <i>p</i> and <i>T</i>,
+				 // so the function has <i>dim+2</i>
+				 // components.
+				 // In this case, we choose a very simple
+				 // test case, where everything is zero.
+
+				 // @sect4{Boundary values}
+namespace EquationData
+{
+				   // define viscosity
+  const double eta = 1;
+  const double kappa = 1e-6;
+
+  template <int dim>
+  class PressureBoundaryValues : public Function<dim>
+  {
+    public:
+      PressureBoundaryValues () : Function<dim>(1) {}
+
+      virtual double value (const Point<dim>   &p,
+			    const unsigned int  component = 0) const;
+  };
+
+
+  template <int dim>
+  double
+  PressureBoundaryValues<dim>::value (const Point<dim>  &/*p*/,
+				      const unsigned int /*component*/) const
+  {
+    return 0;
+  }
+
+
+
+
+
+				   // @sect4{Initial values}
+  template <int dim>
+  class TemperatureInitialValues : public Function<dim>
+  {
+    public:
+      TemperatureInitialValues () : Function<dim>(1) {}
+
+      virtual double value (const Point<dim>   &p,
+			    const unsigned int  component = 0) const;
+
+      virtual void vector_value (const Point<dim> &p,
+				 Vector<double>   &value) const;
+  };
+
+
+  template <int dim>
+  double
+  TemperatureInitialValues<dim>::value (const Point<dim>  &,
+					const unsigned int) const
+  {
+    return 0;
+  }
+
+
+  template <int dim>
+  void
+  TemperatureInitialValues<dim>::vector_value (const Point<dim> &p,
+					       Vector<double>   &values) const
+  {
+    for (unsigned int c=0; c<this->n_components; ++c)
+      values(c) = TemperatureInitialValues<dim>::value (p, c);
+  }
+
+
+
+				   // @sect4{Right hand side}
+				   // 
+				   // The last definition of this kind
+				   // is the one for the right hand
+				   // side function. Again, the content
+				   // of the function is very
+				   // basic and zero in most of the
+				   // components, except for a source
+				   // of temperature in some isolated
+				   // regions near the bottom of the
+				   // computational domain, as is explained
+				   // in the problem description in the
+				   // introduction.
+  template <int dim>
+  class TemperatureRightHandSide : public Function<dim>
+  {
+    public:
+      TemperatureRightHandSide () : Function<dim>(1) {}
+
+      virtual double value (const Point<dim>   &p,
+			    const unsigned int  component = 0) const;
+
+      virtual void vector_value (const Point<dim> &p,
+				 Vector<double>   &value) const;
+  };
+
+
+  template <int dim>
+  double
+  TemperatureRightHandSide<dim>::value (const Point<dim>  &p,
+					const unsigned int /*component*/) const
+  {
+    static const Point<dim> source_centers[3]
+      = { (dim == 2 ? Point<dim>(.3,.1) : Point<dim>(.3,.5,.1)),
+	  (dim == 2 ? Point<dim>(.45,.1) : Point<dim>(.45,.5,.1)),
+	  (dim == 2 ? Point<dim>(.75,.1) : Point<dim>(.75,.5,.1)) };
+    static const double source_radius
+      = (dim == 2 ? 1./32 : 1./8);
+      
+    return ((source_centers[0].distance (p) < source_radius)
+	    ||
+	    (source_centers[1].distance (p) < source_radius)
+	    ||
+	    (source_centers[2].distance (p) < source_radius)
+	    ?
+	    1
+	    :
+	    0);
+  }
+
+
+  template <int dim>
+  void
+  TemperatureRightHandSide<dim>::vector_value (const Point<dim> &p,
+					       Vector<double>   &values) const
+  {
+    for (unsigned int c=0; c<this->n_components; ++c)
+      values(c) = TemperatureRightHandSide<dim>::value (p, c);
+  }
+}
+
+
 
 				 // @sect3{The <code>BoussinesqFlowProblem</code> class template}
 
@@ -371,185 +527,10 @@ class BoussinesqFlowProblem
     boost::shared_ptr<SparseILU<double> > Mp_preconditioner;
 
     bool rebuild_stokes_matrix;
-    bool rebuild_temperature_matrix;
+    bool rebuild_temperature_matrices;
     bool rebuild_stokes_preconditioner;
 };
 
-
-
-
-				 // @sect3{Equation data}
-
-				 // Again, the next stage in the program
-				 // is the definition of the equation 
-				 // data, that is, the various
-				 // boundary conditions, the right hand
-				 // side and the initial condition (remember
-				 // that we're about to solve a time-
-				 // dependent system). The basic strategy
-				 // for this definition is the same as in
-				 // step-22. Regarding the details, though,
-				 // there are some differences.
-
-				 // The first
-				 // thing is that we don't set any boundary
-				 // conditions on the velocity, as is
-				 // explained in the introduction. So
-				 // what is left are two conditions for
-				 // pressure <i>p</i> and temperature
-				 // <i>T</i>.
-
-				 // Secondly, we set an initial
-				 // condition for all problem variables,
-				 // i.e., for <b>u</b>, <i>p</i> and <i>T</i>,
-				 // so the function has <i>dim+2</i>
-				 // components.
-				 // In this case, we choose a very simple
-				 // test case, where everything is zero.
-
-				 // @sect4{Boundary values}
-template <int dim>
-class PressureBoundaryValues : public Function<dim>
-{
-  public:
-    PressureBoundaryValues () : Function<dim>(1) {}
-
-    virtual double value (const Point<dim>   &p,
-                          const unsigned int  component = 0) const;
-};
-
-
-template <int dim>
-double
-PressureBoundaryValues<dim>::value (const Point<dim>  &/*p*/,
-                                    const unsigned int /*component*/) const
-{
-  return 0;
-}
-
-
-
-template <int dim>
-class TemperatureBoundaryValues : public Function<dim>
-{
-  public:
-    TemperatureBoundaryValues () : Function<dim>(1) {}
-
-    virtual double value (const Point<dim>   &p,
-                          const unsigned int  component = 0) const;
-};
-
-
-
-template <int dim>
-double
-TemperatureBoundaryValues<dim>::value (const Point<dim> &p,
-                                      const unsigned int /*component*/) const
-{
-//TODO: leftover from olden times. replace by something sensible once we have
-//diffusion in the temperature field
-  if (p[0] == 0)
-    return 1;
-  else
-    return 0;
-}
-
-
-
-				 // @sect4{Initial values}
-template <int dim>
-class TemperatureInitialValues : public Function<dim>
-{
-  public:
-    TemperatureInitialValues () : Function<dim>(1) {}
-
-    virtual double value (const Point<dim>   &p,
-                          const unsigned int  component = 0) const;
-
-    virtual void vector_value (const Point<dim> &p,
-                               Vector<double>   &value) const;
-};
-
-
-template <int dim>
-double
-TemperatureInitialValues<dim>::value (const Point<dim>  &,
-                           const unsigned int) const
-{
-  return 0;
-}
-
-
-template <int dim>
-void
-TemperatureInitialValues<dim>::vector_value (const Point<dim> &p,
-                                  Vector<double>   &values) const
-{
-  for (unsigned int c=0; c<this->n_components; ++c)
-    values(c) = TemperatureInitialValues<dim>::value (p, c);
-}
-
-
-
-				 // @sect4{Right hand side}
-				 // 
-				 // The last definition of this kind
-				 // is the one for the right hand
-				 // side function. Again, the content
-				 // of the function is very
-				 // basic and zero in most of the
-				 // components, except for a source
-				 // of temperature in some isolated
-				 // regions near the bottom of the
-				 // computational domain, as is explained
-				 // in the problem description in the
-				 // introduction.
-template <int dim>
-class TemperatureRightHandSide : public Function<dim>
-{
-  public:
-    TemperatureRightHandSide () : Function<dim>(1) {}
-
-    virtual double value (const Point<dim>   &p,
-                          const unsigned int  component = 0) const;
-
-    virtual void vector_value (const Point<dim> &p,
-                               Vector<double>   &value) const;
-};
-
-
-template <int dim>
-double
-TemperatureRightHandSide<dim>::value (const Point<dim>  &p,
-				      const unsigned int /*component*/) const
-{
-  static const Point<dim> source_centers[3]
-    = { (dim == 2 ? Point<dim>(.3,.1) : Point<dim>(.3,.5,.1)),
-	(dim == 2 ? Point<dim>(.45,.1) : Point<dim>(.45,.5,.1)),
-	(dim == 2 ? Point<dim>(.75,.1) : Point<dim>(.75,.5,.1)) };
-  static const double source_radius
-    = (dim == 2 ? 1./32 : 1./8);
-      
-  return ((source_centers[0].distance (p) < source_radius)
-	  ||
-	  (source_centers[1].distance (p) < source_radius)
-	  ||
-	  (source_centers[2].distance (p) < source_radius)
-	  ?
-	  1
-	  :
-	  0);
-}
-
-
-template <int dim>
-void
-TemperatureRightHandSide<dim>::vector_value (const Point<dim> &p,
-					     Vector<double>   &values) const
-{
-  for (unsigned int c=0; c<this->n_components; ++c)
-    values(c) = TemperatureRightHandSide<dim>::value (p, c);
-}
 
 
 
@@ -823,7 +804,7 @@ BoussinesqFlowProblem<dim>::BoussinesqFlowProblem (const unsigned int degree)
 		old_time_step (0),
 		timestep_number (0),
 		rebuild_stokes_matrix (true),
-		rebuild_temperature_matrix (true),
+		rebuild_temperature_matrices (true),
 		rebuild_stokes_preconditioner (true)
 {}
 
@@ -1471,7 +1452,7 @@ void BoussinesqFlowProblem<dim>::assemble_stokes_system ()
 				   // individual blocks (velocity,
 				   // pressure, temperature) from
 				   // the total FE system.
-  const PressureBoundaryValues<dim> pressure_boundary_values;
+  const EquationData::PressureBoundaryValues<dim> pressure_boundary_values;
   std::vector<double>               boundary_values (n_face_q_points);
 
   std::vector<double>               old_temperature_values(n_q_points);
@@ -1555,12 +1536,11 @@ void BoussinesqFlowProblem<dim>::assemble_stokes_system ()
 		}
 	    }
 
-					   // define viscosity
-	  const double eta = 1;
 	  if (rebuild_stokes_matrix)
 	    for (unsigned int i=0; i<dofs_per_cell; ++i)
 	      for (unsigned int j=0; j<dofs_per_cell; ++j)
-		local_matrix(i,j) += (eta * grads_phi_u[i] * grads_phi_u[j]
+		local_matrix(i,j) += (EquationData::eta *
+				      grads_phi_u[i] * grads_phi_u[j]
 				      - div_phi_u[i] * phi_p[j]
 				      - phi_p[i] * div_phi_u[j])
 				     * stokes_fe_values.JxW(q);
@@ -1697,7 +1677,6 @@ double compute_viscosity(
   const std::vector<Tensor<2,dim> >  &old_old_temperature_hessians,
   const std::vector<Vector<double> > &present_stokes_values,
   const std::vector<double>          &gamma_values,
-  const double                        kappa,
   const double                        global_u_infty,
   const double                        global_T_variation,
   const double                        global_Omega_diameter,
@@ -1728,7 +1707,7 @@ double compute_viscosity(
       const double u_grad_T = u * (old_temperature_grads[q] +
 				   old_old_temperature_grads[q]) / 2;
       
-      const double kappa_Delta_T = kappa
+      const double kappa_Delta_T = EquationData::kappa
 				   * (trace(old_temperature_hessians[q]) +
 				      trace(old_old_temperature_hessians[q])) / 2;
 
@@ -1778,7 +1757,7 @@ double compute_viscosity(
 template <int dim>
 void BoussinesqFlowProblem<dim>::assemble_temperature_matrix ()
 {
-  if (rebuild_temperature_matrix == false)
+  if (rebuild_temperature_matrices == false)
     return;
   
   temperature_mass_matrix = 0;
@@ -1821,8 +1800,6 @@ void BoussinesqFlowProblem<dim>::assemble_temperature_matrix ()
 
       temperature_fe_values.reinit (cell);
       
-      const double kappa = 1e-6;
-
       for (unsigned int q=0; q<n_q_points; ++q)
 	{
 	  for (unsigned int k=0; k<dofs_per_cell; ++k)
@@ -1834,10 +1811,14 @@ void BoussinesqFlowProblem<dim>::assemble_temperature_matrix ()
 	  for (unsigned int i=0; i<dofs_per_cell; ++i)
 	    for (unsigned int j=0; j<dofs_per_cell; ++j)
 	      {
-		local_mass_matrix(i,j) += phi_T[i] * phi_T[j]
-					  * temperature_fe_values.JxW(q);
-		local_stiffness_matrix(i,j) += kappa * grad_phi_T[i] * grad_phi_T[j]
-					       * temperature_fe_values.JxW(q);
+		local_mass_matrix(i,j)
+		  += (phi_T[i] * phi_T[j]
+		      *
+		      temperature_fe_values.JxW(q));
+		local_stiffness_matrix(i,j)
+		  += (EquationData::kappa * grad_phi_T[i] * grad_phi_T[j]
+		      *
+		      temperature_fe_values.JxW(q));
 	      }
 	}
       
@@ -1858,7 +1839,7 @@ void BoussinesqFlowProblem<dim>::assemble_temperature_matrix ()
   temperature_constraints.condense (temperature_mass_matrix);
   temperature_constraints.condense (temperature_stiffness_matrix);
   
-  rebuild_temperature_matrix = false;
+  rebuild_temperature_matrices = false;
 }
 
 
@@ -1924,8 +1905,7 @@ void BoussinesqFlowProblem<dim>::assemble_temperature_system ()
   std::vector<Tensor<2,dim> > old_old_temperature_hessians(n_q_points);
 
   
-  TemperatureBoundaryValues<dim> temperature_boundary_values;
-  TemperatureRightHandSide<dim>  temperature_right_hand_side;
+  EquationData::TemperatureRightHandSide<dim>  temperature_right_hand_side;
   std::vector<double> gamma_values (n_q_points);
 
   std::vector<double>                  phi_T       (dofs_per_cell);
@@ -1980,7 +1960,6 @@ void BoussinesqFlowProblem<dim>::assemble_temperature_system ()
 				       // of diffusion (determined
 				       // impirically) to keep the
 				       // scheme stable
-      const double kappa = 1e-6;
       const double nu
 	= compute_viscosity (old_temperature_values,
 			     old_old_temperature_values,
@@ -1990,7 +1969,7 @@ void BoussinesqFlowProblem<dim>::assemble_temperature_system ()
 			     old_old_temperature_hessians,
 			     present_stokes_values,
 			     gamma_values,
-			     kappa, global_u_infty,
+			     global_u_infty,
 			     global_T_range.second - global_T_range.first,
 			     global_Omega_diameter, cell->diameter(),
 			     old_time_step);
@@ -2269,19 +2248,17 @@ void BoussinesqFlowProblem<dim>::refine_mesh (const unsigned int max_grid_level)
     for (typename Triangulation<dim>::active_cell_iterator
 	   cell = triangulation.begin_active(max_grid_level);
 	 cell != triangulation.end(); ++cell)
-      if (cell->has_children() == false)
-	cell->clear_refine_flag ();
+      cell->clear_refine_flag ();
   
-  SolutionTransfer<dim, double> soltrans(temperature_dof_handler);
-
-  triangulation.prepare_coarsening_and_refinement();
-
   std::vector<Vector<double> > x_solution (2);
   x_solution[0].reinit (temperature_dof_handler.n_dofs());
   x_solution[0] = temperature_solution;
   x_solution[1].reinit (temperature_dof_handler.n_dofs());
   x_solution[1] = old_temperature_solution;
 
+  SolutionTransfer<dim, double> soltrans(temperature_dof_handler);
+
+  triangulation.prepare_coarsening_and_refinement();
   soltrans.prepare_for_coarsening_and_refinement(x_solution);
 
   triangulation.execute_coarsening_and_refinement ();
@@ -2296,7 +2273,7 @@ void BoussinesqFlowProblem<dim>::refine_mesh (const unsigned int max_grid_level)
   old_temperature_solution = tmp[1];
 
   rebuild_stokes_matrix         = true;
-  rebuild_temperature_matrix    = true;
+  rebuild_temperature_matrices  = true;
   rebuild_stokes_preconditioner = true;
 }
 
@@ -2306,12 +2283,10 @@ void BoussinesqFlowProblem<dim>::refine_mesh (const unsigned int max_grid_level)
 template <int dim>
 double BoussinesqFlowProblem<dim>::get_maximal_velocity () const
 {
-  QGauss<dim>   quadrature_formula(stokes_degree+2);
-  const unsigned int   n_q_points
-    = quadrature_formula.size();
+  const QGauss<dim>  quadrature_formula(stokes_degree+2);
+  const unsigned int n_q_points = quadrature_formula.size();
 
-  FEValues<dim> fe_values (stokes_fe, quadrature_formula,
-                           update_values);
+  FEValues<dim> fe_values (stokes_fe, quadrature_formula, update_values);
   std::vector<Vector<double> > stokes_values(n_q_points,
 					     Vector<double>(dim+1));
   double max_velocity = 0;
@@ -2330,8 +2305,7 @@ double BoussinesqFlowProblem<dim>::get_maximal_velocity () const
           for (unsigned int i=0; i<dim; ++i)
             velocity[i] = stokes_values[q](i);
 
-          max_velocity = std::max (max_velocity,
-                                   velocity.norm());
+          max_velocity = std::max (max_velocity, velocity.norm());
         }
     }
 
@@ -2406,7 +2380,7 @@ void BoussinesqFlowProblem<dim>::run ()
   VectorTools::project (temperature_dof_handler,
 			temperature_constraints,
 			QGauss<dim>(temperature_degree+2),
-			TemperatureInitialValues<dim>(),
+			EquationData::TemperatureInitialValues<dim>(),
 			old_temperature_solution);
   
   timestep_number = 0;
