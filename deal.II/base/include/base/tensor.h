@@ -2,7 +2,7 @@
 //    $Id$
 //    Version: $Name$
 //
-//    Copyright (C) 1998, 1999, 2000, 2001, 2002, 2003, 2004, 2005, 2006 by the deal.II authors
+//    Copyright (C) 1998, 1999, 2000, 2001, 2002, 2003, 2004, 2005, 2006, 2008 by the deal.II authors
 //
 //    This file is subject to QPL and may not be  distributed
 //    without copyright and license information. Please refer
@@ -1290,6 +1290,31 @@ cross_product (Tensor<1,dim>       &dst,
   dst[0] = src1[1]*src2[2] - src1[2]*src2[1];
   dst[1] = src1[2]*src2[0] - src1[0]*src2[2];
   dst[2] = src1[0]*src2[1] - src1[1]*src2[0];
+}
+
+
+
+/**
+ * Compute the scalar product $a:b=\sum_{i,j} a_{ij}b_{ij}$ between two
+ * tensors $a,b$ of rank 2. We don't use <code>operator*</code> for this
+ * operation since the product between two tensors is usually assumed to be
+ * the contraction over the last index of the first tensor and the first index
+ * of the second tensor, for example $(a\cdot b)_{ij}=\sum_k a_{ik}b_{kj}$.
+ *
+ * @relates Tensor
+ * @author Wolfgang Bangerth, 2008
+ */
+template <int dim>
+inline
+double
+scalar_product (const Tensor<2,dim> &t1,
+		const Tensor<2,dim> &t2)
+{
+  double s = 0;
+  for (unsigned int i=0; i<dim; ++i)
+    for (unsigned int j=0; j<dim; ++j)
+      s += t1[i][j] * t2[i][j];
+  return s;
 }
 
 

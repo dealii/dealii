@@ -136,8 +136,17 @@ inconvenience this causes.
 <ol>
   <li>
   <p>
+  New: There is a new function scalar_product(const Tensor<2,dim> &,
+  const Tensor<2,dim> &) that computes the scalar product
+  $a:b=\sum_{i,j} a_{ij}b_{ij}$ between two tensors of rank 2.
+  <br> 
+  (WB 2008/08/15)
+  </p>
+
+  <li>
+  <p>
   New: If the compiler allows to do <code>\#include @<mpi.h@></code>, then
-  the flag <code>DEAL_II_COMPILER_SUPPORTS_MPI</code> is now set in
+  the preprocessor flag <code>DEAL_II_COMPILER_SUPPORTS_MPI</code> is now set in
   <code>base/include/base/config.h</code>. This also fixes a problem in
   <code>base/include/base/utilities.h</code> if a compiler capable of
   including <code>mpi.h</code> was used but not PETSc.
