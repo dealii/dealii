@@ -1,5 +1,5 @@
 //---------------------------------------------------------------------------
-//    $Id: Trilinos_vector_base.h 15453 2008-01-29 1:00:00Z marquez $
+//    $Id$
 //    Version: $Name$
 //
 //    Copyright (C) 2008 by the deal.II authors

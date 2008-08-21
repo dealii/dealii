@@ -1,5 +1,5 @@
 //---------------------------------------------------------------------------
-//    $Id: trilinos_matrix_base.cc 16014 2008-04-30 16:18:03Z young $
+//    $Id$
 //    Version: $Name$
 //
 //    Copyright (C) 2004, 2005, 2006, 2008 by the deal.II authors
