@@ -302,7 +302,7 @@ namespace TrilinosWrappers
     if (row_map.SameAs(col_map))
       ierr = matrix->GlobalAssemble ();
     else
-      ierr = matrix->GlobalAssemble (row_map, col_map);
+      ierr = matrix->GlobalAssemble (col_map, row_map);
     
     AssertThrow (ierr == 0, ExcTrilinosError(ierr));
 
@@ -343,7 +343,7 @@ namespace TrilinosWrappers
 	if (row_map.SameAs(col_map))
 	  ierr = matrix->GlobalAssemble (false);
 	else
-	  ierr = matrix->GlobalAssemble(row_map, col_map, false);
+	  ierr = matrix->GlobalAssemble(col_map, row_map, false);
 	
         AssertThrow (ierr == 0, ExcTrilinosError(ierr));
 	last_action = Insert;
@@ -378,7 +378,7 @@ namespace TrilinosWrappers
 	if (row_map.SameAs(col_map))
 	  ierr = matrix->GlobalAssemble (false);
 	else
-	  ierr = matrix->GlobalAssemble(row_map, col_map, false);
+	  ierr = matrix->GlobalAssemble(col_map, row_map, false);
         
 	AssertThrow (ierr == 0, ExcTrilinosError(ierr));
 
