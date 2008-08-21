@@ -235,7 +235,9 @@ Courant-Friedrichs-Lewy (CFL) condition</a> just like it was in
 @ref step_21 "step-21". (We wouldn't have had that stability condition if
 we treated the advection term implicitly since the BDF-2 scheme is A-stable, 
 at the price that we needed to build a new temperature matrix at each time 
-step.) In particular this CFL condition means that the time step
+step.) We will discuss the exact choice of time step in the <a
+href="#Results">results section</a>, but for the moment of importance is that 
+this CFL condition means that the time step
 size <i>k</i> may change from time step to time step, and that we have to
 modify the above formula slightly. If $k_n,k_{n-1}$ are the time steps
 sizes of the current and previous time step, then we use the
@@ -434,16 +436,17 @@ follows:
 @f}
 
 Here, $\beta$ is a stabilization constant (a dimensional analysis
-reveals that it is unitless and therefore independent of scaling) and
+reveals that it is unitless and therefore independent of scaling; we will
+discuss its choice in the <a href="#Results">results section</a>) and
 $c(\mathbf{u},T)$ is a normalization constant that must have units
 $\frac{m^{\alpha-1}K^\alpha}{s}$. We will choose it as
 $c(\mathbf{u},T) = 
- \|\mathbf{u}\|_{L^\infty(\Omega)} \ \mathrm{var}(T)
+ c_R\ \|\mathbf{u}\|_{L^\infty(\Omega)} \ \mathrm{var}(T)
  \ |\mathrm{diam}(\Omega)|^{\alpha-2}$,
 where $\mathrm{var}(T)=\max_\Omega T - \min_\Omega T$ is the range of present
 temperature values (remember that buoyancy is driven by temperature
-variations, not the absolute temperature).
-To understand why this method works consider this: If on a particular
+variations, not the absolute temperature) and $c_R$ is a dimensionless
+constant. To understand why this method works consider this: If on a particular
 cell $K$ the temperature field is smooth, then we expect the residual
 to be small there (in fact to be on the order of ${\cal O}(h_K)$) and
 the stabilization term that injects artificial diffusion will there be

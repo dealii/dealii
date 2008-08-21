@@ -4,8 +4,146 @@
 
 <h3> Numerical experiments to determine optimal parameters </h3>
 
-q1 vs q2 for temperature
-q1/q1 stokes
+The program as is has three parameters that we don't have much of a
+theoretical handle on how to choose in an optimal way. These are:
+<ul>
+  <li>The time step must satisfy a CFL condition
+      $k\le \min_K \frac{c_kh_K}{\|\mathbf{u}\|_{L^\infty(K)}}$. Here, $c_k$ is 
+      dimensionless, but what is the right value?
+  <li>In the computation of the artificial viscosity,
+@f{eqnarray*}
+  \nu_\alpha(T)|_K
+  =
+  \beta
+  \|\mathbf{u}\|_{L^\infty(K)}
+  \min\left\{
+    h_K,
+    h_K^\alpha
+    \frac{\|R_\alpha(T)\|_{L^\infty(K)}}{c(\mathbf{u},T)}
+  \right\},
+@f}
+      with $c(\mathbf{u},T) = 
+      c_R\ \|\mathbf{u}\|_{L^\infty(\Omega)} \ \mathrm{var}(T)
+      \ |\mathrm{diam}(\Omega)|^{\alpha-2}$.
+      Here, the choice of the dimensionless numbers $\beta,c_R$ is of
+      interest.
+</ul>
+In all of these cases, we will have to expect that the correct choice of each
+value depends on that of the others, and most likely also on the space
+dimension and polynomial degree of the finite element used for the
+temperature. Below we'll discuss a few numerical experiments to choose
+constants. 
+
+
+<h5> Choosing <i>c<sub>k</sub></i> and &beta; </h5>
+
+These two constants are definitely linked in some way. The reason is easy to
+see: In the case of a pure advection problem, 
+$\frac{\partial T}{\partial t} + \mathbf{u}\cdot\nabla T = \gamma$, any
+explicit scheme has to satisfy a CFL condition of the form 
+$k\le \min_K \frac{c_k^a h_K}{\|\mathbf{u}\|_{L^\infty(K)}}$. On the other hand,
+for a pure diffusion problem, 
+$\frac{\partial T}{\partial t} + \nu \Delta T = \gamma$,
+explicit schemes need to satisfy a condition
+$k\le \min_K \frac{c_k^d h_K^2}{\nu}$. So given the form of $\nu$ above, an
+advection diffusion problem like the one we have to solve here will result in
+a condition of the form
+$
+k\le \min_K \min \left\{
+  \frac{c_k^a h_K}{\|\mathbf{u}\|_{L^\infty(K)}},
+  \frac{c_k^d h_K^2}{\beta \|mathbf{u}\|_{L^\infty(K)} h_K}\right\}
+  =
+  \min_K \left( \min \left\{
+  c_k^a,
+  \frac{c_k^d}{\beta}\right\}
+  \frac{h_K}{\|\mathbf{u}\|_{L^\infty(K)}} \right)
+$.
+It follows that we have to face the fact that we might want to choose $\beta$
+larger to improve the stability of the numerical scheme (by increasing the
+amount of artificial diffusion), but we have to pay a price in the form of
+smaller, and consequently more time steps. In practice, one would therefore
+like to choose $\beta$ as small as possible to keep the transport problem
+sufficiently stabilized while at the same time trying to choose the time step
+as large as possible to reduce the overall amount of work.
+
+The find the right balance, the only way is to do a few computational
+experiments. Here's what we did: We modified the program slightly to allow
+less mesh refinement (so we don't always have to wait that long) and to choose 
+$
+  \nu(T)|_K
+  =
+  \beta
+  \|\mathbf{u}\|_{L^\infty(K)} h_K
+$ to eliminate the effect of of the constant $c_R$. We then run the program
+for different values $c_k,\beta$ and observe maximal and minimal temperatures
+in the domain. What we expect to see is this: If we choose the time step too
+big (i.e. choose a $c_k$ bigger than theoretically allowed) then we will get
+exponential growth of the temperature. If we choose $\beta$ too small, then
+the transport stabilization becomes insufficient and the solution will show
+significant oscillations but not exponential growth. Here is what we get for
+$\beta=0.01, \beta=0.1$, and $\beta=0.5$, different choices of $c_k$, and
+bilinear elements (<code>temperature_degree=1</code>) in 2d:
+
+<table align="center" border="1" cellspacing="3" cellpadding="3">
+  <tr>
+    <td>
+        @image html "step-33.timestep.q1.beta=0.01.png" "" width=4cm
+    </td>
+    <td>
+        @image html "step-33.timestep.q1.beta=0.03.png" "" width=4cm
+    </td>
+  </tr>
+
+  <tr>
+    <td>
+        @image html "step-33.timestep.q1.beta=0.1.png" "" width=4cm
+    </td>
+    <td>
+        @image html "step-33.timestep.q1.beta=0.5.png" "" width=4cm
+    </td>
+  </tr>
+</table>
+
+The way to interpret these graphs goes like this: for $\beta=0.01$ and
+$c_k=\frac 12,\frac 14$, we see exponential growth or at least large
+variations, but if we choose 
+$k=\frac 18\frac{h_K}{\|\mathbf{u}\|_{L^\infty(K)}}$ 
+or smaller, then the scheme is 
+stable though a bit wobbly. For more artificial diffusion, we can choose 
+$k=\frac 13\frac{h_K}{\|\mathbf{u}\|_{L^\infty(K)}}$ 
+or smaller for $\beta=0.1$, and again need
+$k=\frac 1{15}\frac{h_K}{\|\mathbf{u}\|_{L^\infty(K)}}$ 
+for $\beta=0.5$ (this time because much diffusion requires a small time
+step). 
+
+So how to choose? If we were simply interested in a large time step, then we
+would go with $\beta=...$ and
+$k=\frac 13\frac{h_K}{\|\mathbf{u}\|_{L^\infty(K)}}$.
+On the other hand, we're also interested in accuracy and here it may be of
+interest to actually investigate what these curves show. To this end note that
+we start with a zero temperature and that our sources are positive &mdash; so
+we would intuitively expect that the temperature can never drop below
+zero. But it does, a consequence of Gibb's phenomenon when using continuous
+elements to approximate a discontinuous solution. We can therefore see that
+choosing $\beta$ too small is bad: too little artificial diffusion leads to
+over- and undershoots that aren't diffused away. On the other hand, for large
+$\beta$, the minimum temperature drops below zero at the beginning but then
+quickly diffuses back to zero. 
+
+On the other hand, let's also look at the maximum temperature. Watching the
+movie of the solution, we see that initially the fluid is at rest. The source
+keeps heating the same volume of fluid whose temperature increases linearly at
+the beginning until its buoyancy is able to move it upwards. The hottest part
+of the fluid is therefore transported away from the solution and fluid taking
+its place is heated for only a short time before being moved out of the source
+region, therefore remaining cooler than the initial bubble. If $\kappa=0$
+(in the program it is nonzero but very small) then the hottest part of the
+fluid should be advected along with the flow with its temperature
+constant. That's what we can see in the graphs with the smallest $\beta$: Once
+the maximum temperature is reached, it hardly changes any more. On the other
+hand, the larger the artificial diffusion, the more the hot spot is
+diffused. Note that for this criterion, the time step size does not play a
+significant role.
 
 
 <h3> Possible extensions </h3>
