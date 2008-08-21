@@ -59,10 +59,6 @@
 #include <fstream>
 #include <sstream>
 
-#ifdef DEAL_II_COMPILER_SUPPORT_MPI
-#include <mpi.h>
-#endif
-
                                  // This is Trilinos
 
 				 // Next, we import all deal.II
