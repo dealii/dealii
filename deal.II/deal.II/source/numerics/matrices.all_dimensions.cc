@@ -26,6 +26,11 @@
 #  include <lac/petsc_vector.h>
 #endif
 
+#ifdef DEAL_II_USE_TRILINOS
+#  include <lac/trilinos_sparse_matrix.h>
+#  include <lac/trilinos_vector.h>
+#endif
+
 #include <algorithm>
 
 DEAL_II_NAMESPACE_OPEN
@@ -675,6 +680,148 @@ apply_boundary_values (const std::map<unsigned int,double> &boundary_values,
 
 
 #endif
+
+
+
+#ifdef DEAL_II_USE_TRILINOS
+
+namespace TrilinosWrappers
+{
+  template <typename TrilinosMatrix, typename TrilinosVector>
+  void
+  apply_boundary_values (const std::map<unsigned int,double> &boundary_values,
+                         TrilinosMatrix      &matrix,
+                         TrilinosVector      &solution,
+                         TrilinosVector      &right_hand_side,
+                         const bool        eliminate_columns)
+  {
+    Assert (eliminate_columns == false, ExcNotImplemented());
+
+    Assert (matrix.n() == right_hand_side.size(),
+            ExcDimensionMismatch(matrix.n(), right_hand_side.size()));
+    Assert (matrix.n() == solution.size(),
+            ExcDimensionMismatch(matrix.n(), solution.size()));
+
+                                     // if no boundary values are to be applied
+                                     // simply return
+    if (boundary_values.size() == 0)
+      return;
+
+    const std::pair<unsigned int, unsigned int> local_range
+      = matrix.local_range();
+    Assert (local_range == right_hand_side.local_range(),
+            ExcInternalError());
+    Assert (local_range == solution.local_range(),
+            ExcInternalError());
+    
+
+                                     // we have to read and write from this
+                                     // matrix (in this order). this will only
+                                     // work if we compress the matrix first,
+                                     // done here
+    matrix.compress ();
+
+                                     // determine the first nonzero diagonal
+                                     // entry from within the part of the
+                                     // matrix that we can see. if we can't
+                                     // find such an entry, take one
+    TrilinosScalar average_nonzero_diagonal_entry = 1;
+    for (unsigned int i=local_range.first; i<local_range.second; ++i)
+      if (matrix.diag_element(i) != 0)
+        {
+          average_nonzero_diagonal_entry = std::fabs(matrix.diag_element(i));
+          break;
+        }
+
+                                     // figure out which rows of the matrix we
+                                     // have to eliminate on this processor
+    std::vector<unsigned int> constrained_rows;
+    for (std::map<unsigned int,double>::const_iterator
+           dof  = boundary_values.begin();
+         dof != boundary_values.end();
+         ++dof)
+      if ((dof->first >= local_range.first) &&
+          (dof->first < local_range.second))
+        constrained_rows.push_back (dof->first);
+
+                                     // then eliminate these rows and set
+                                     // their diagonal entry to what we have
+                                     // determined above. note that for trilinos
+                                     // matrices interleaving read with write
+                                     // operations is very expensive. thus, we
+                                     // here always replace the diagonal
+                                     // element, rather than first checking
+                                     // whether it is nonzero and in that case
+                                     // preserving it. this is different from
+                                     // the case of deal.II sparse matrices
+                                     // treated in the other functions.
+//TODO: clear_row is not currently implemented for Trilinos    
+    Assert (false, ExcInternalError());
+//    matrix.clear_rows (constrained_rows, average_nonzero_diagonal_entry);
+
+                                     // the next thing is to set right hand
+                                     // side to the wanted value. there's one
+                                     // drawback: if we write to individual
+                                     // vector elements, then we have to do
+                                     // that on all processors. however, some
+                                     // processors may not need to set
+                                     // anything because their chunk of
+                                     // matrix/rhs do not contain any boundary
+                                     // nodes. therefore, rather than using
+                                     // individual calls, we use one call for
+                                     // all elements, thereby making sure that
+                                     // all processors call this function,
+                                     // even if some only have an empty set of
+                                     // elements to set
+    right_hand_side.compress ();
+    solution.compress ();
+
+    std::vector<unsigned int> indices;
+    std::vector<TrilinosScalar>  solution_values;
+    for (std::map<unsigned int,double>::const_iterator
+           dof  = boundary_values.begin();
+         dof != boundary_values.end();
+         ++dof)
+      if ((dof->first >= local_range.first) &&
+          (dof->first < local_range.second))
+        {
+          indices.push_back (dof->first);
+          solution_values.push_back (dof->second);
+        }
+    solution.set (indices, solution_values);
+
+                                     // now also set appropriate values for
+                                     // the rhs
+    for (unsigned int i=0; i<solution_values.size(); ++i)
+      solution_values[i] *= average_nonzero_diagonal_entry;
+
+    right_hand_side.set (indices, solution_values);
+
+                                     // clean up
+    matrix.compress ();
+    solution.compress ();
+    right_hand_side.compress ();
+  }
+}
+
+
+
+void
+MatrixTools::
+apply_boundary_values (const std::map<unsigned int,double> &boundary_values,
+                       TrilinosWrappers::SparseMatrix   &matrix,
+                       TrilinosWrappers::Vector   &solution,
+                       TrilinosWrappers::Vector   &right_hand_side,
+                       const bool        eliminate_columns)
+{
+                                   // simply redirect to the generic function
+                                   // used for both trilinos matrix types
+  TrilinosWrappers::apply_boundary_values (boundary_values, matrix, solution,
+                                        right_hand_side, eliminate_columns);
+}
+
+#endif
+
 
 
 void

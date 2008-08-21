@@ -16,6 +16,7 @@
 #include <lac/block_vector.h>
 #include <lac/petsc_vector.h>
 #include <lac/petsc_block_vector.h>
+#include <lac/trilinos_vector.h>
 #include <lac/sparse_matrix.h>
 
 #include <dofs/dof_accessor.h>
@@ -646,6 +647,45 @@ DoFCellAccessor<DoFHandler<deal_II_dimension> >::set_dof_values<PETScWrappers::M
 
 
 
+#ifdef DEAL_II_USE_TRILINOS
+template
+void
+DoFCellAccessor<DoFHandler<deal_II_dimension> >::get_dof_values<TrilinosWrappers::Vector,double>
+(const TrilinosWrappers::Vector &, Vector<double>&) const;
+template
+void
+DoFCellAccessor<DoFHandler<deal_II_dimension> >::get_dof_values<TrilinosWrappers::Vector,float>
+(const TrilinosWrappers::Vector &, Vector<float>&) const;
+template
+void
+DoFCellAccessor<DoFHandler<deal_II_dimension> >::set_dof_values<TrilinosWrappers::Vector,double>
+(const Vector<double> &, TrilinosWrappers::Vector&) const;
+template
+void
+DoFCellAccessor<DoFHandler<deal_II_dimension> >::set_dof_values<TrilinosWrappers::Vector,float>
+(const Vector<float>&, TrilinosWrappers::Vector&) const;
+
+// template
+// void
+// DoFCellAccessor<DoFHandler<deal_II_dimension> >::get_dof_values<TrilinosWrappers::BlockVector,double>
+// (const TrilinosWrappers::BlockVector &, Vector<double>&) const;
+// template
+// void
+// DoFCellAccessor<DoFHandler<deal_II_dimension> >::get_dof_values<TrilinosWrappers::BlockVector,float>
+// (const TrilinosWrappers::BlockVector &, Vector<float>&) const;
+// template
+// void
+// DoFCellAccessor<DoFHandler<deal_II_dimension> >::set_dof_values<TrilinosWrappers::BlockVector,double>
+// (const Vector<double> &, TrilinosWrappers::BlockVector&) const;
+// template
+// void
+// DoFCellAccessor<DoFHandler<deal_II_dimension> >::set_dof_values<TrilinosWrappers::BlockVector,float>
+// (const Vector<float>&, TrilinosWrappers::BlockVector&) const;
+
+#endif
+
+
+
 template
 void
 DoFCellAccessor<DoFHandler<deal_II_dimension> >::
@@ -807,6 +847,58 @@ set_dof_values_by_interpolation<PETScWrappers::MPI::BlockVector,float>
 #endif
 
 
+// for Trilinos vectors
+#if DEAL_II_USE_TRILINOS
+template
+void
+DoFCellAccessor<DoFHandler<deal_II_dimension> >::
+get_interpolated_dof_values<TrilinosWrappers::Vector,double>
+(const TrilinosWrappers::Vector&, Vector<double>&) const;
+template
+void
+DoFCellAccessor<DoFHandler<deal_II_dimension> >::
+set_dof_values_by_interpolation<TrilinosWrappers::Vector,double>
+(const Vector<double>&, TrilinosWrappers::Vector&) const;
+
+template
+void
+DoFCellAccessor<DoFHandler<deal_II_dimension> >::
+get_interpolated_dof_values<TrilinosWrappers::Vector,float>
+(const TrilinosWrappers::Vector&, Vector<float>&) const;
+template
+void
+DoFCellAccessor<DoFHandler<deal_II_dimension> >::
+set_dof_values_by_interpolation<TrilinosWrappers::Vector,float>
+(const Vector<float>&, TrilinosWrappers::Vector&) const;
+
+
+// template
+// void
+// DoFCellAccessor<DoFHandler<deal_II_dimension> >::
+// get_interpolated_dof_values<TrilinosWrappers::BlockVector,double>
+// (const TrilinosWrappers::BlockVector&, Vector<double>&) const;
+// template
+// void
+// DoFCellAccessor<DoFHandler<deal_II_dimension> >::
+// set_dof_values_by_interpolation<TrilinosWrappers::BlockVector,double>
+// (const Vector<double>&, TrilinosWrappers::BlockVector&) const;
+// template
+
+// template
+// void
+// DoFCellAccessor<DoFHandler<deal_II_dimension> >::
+// get_interpolated_dof_values<TrilinosWrappers::BlockVector,float>
+// (const TrilinosWrappers::BlockVector&, Vector<float>&) const;
+// template
+// void
+// DoFCellAccessor<DoFHandler<deal_II_dimension> >::
+// set_dof_values_by_interpolation<TrilinosWrappers::BlockVector,float>
+// (const Vector<float>&, TrilinosWrappers::BlockVector&) const;
+// template
+
+#endif
+
+
 #if deal_II_dimension == 1
 template class DoFAccessor<1, DoFHandler<1> >;
 template class DoFObjectAccessor<1, DoFHandler<1> >;
@@ -957,6 +1049,44 @@ DoFCellAccessor<hp::DoFHandler<deal_II_dimension> >::set_dof_values<PETScWrapper
 (const Vector<float>&, PETScWrappers::BlockVector&) const;
 #endif
 
+// for Trilinos vectors
+#ifdef DEAL_II_USE_TRILINOS
+template
+void
+DoFCellAccessor<hp::DoFHandler<deal_II_dimension> >::get_dof_values<TrilinosWrappers::Vector,double>
+(const TrilinosWrappers::Vector &, Vector<double>&) const;
+template
+void
+DoFCellAccessor<hp::DoFHandler<deal_II_dimension> >::get_dof_values<TrilinosWrappers::Vector,float>
+(const TrilinosWrappers::Vector &, Vector<float>&) const;
+template
+void
+DoFCellAccessor<hp::DoFHandler<deal_II_dimension> >::set_dof_values<TrilinosWrappers::Vector,double>
+(const Vector<double> &, TrilinosWrappers::Vector&) const;
+template
+void
+DoFCellAccessor<hp::DoFHandler<deal_II_dimension> >::set_dof_values<TrilinosWrappers::Vector,float>
+(const Vector<float>&, TrilinosWrappers::Vector&) const;
+
+// template
+// void
+// DoFCellAccessor<hp::DoFHandler<deal_II_dimension> >::get_dof_values<TrilinosWrappers::BlockVector,double>
+// (const TrilinosWrappers::BlockVector &, Vector<double>&) const;
+// template
+// void
+// DoFCellAccessor<hp::DoFHandler<deal_II_dimension> >::get_dof_values<TrilinosWrappers::BlockVector,float>
+// (const TrilinosWrappers::BlockVector &, Vector<float>&) const;
+// template
+// void
+// DoFCellAccessor<hp::DoFHandler<deal_II_dimension> >::set_dof_values<TrilinosWrappers::BlockVector,double>
+// (const Vector<double> &, TrilinosWrappers::BlockVector&) const;
+// template
+// void
+// DoFCellAccessor<hp::DoFHandler<deal_II_dimension> >::set_dof_values<TrilinosWrappers::BlockVector,float>
+// (const Vector<float>&, TrilinosWrappers::BlockVector&) const;
+#endif
+
+
 
 template
 void
@@ -1095,6 +1225,55 @@ void
 DoFCellAccessor<hp::DoFHandler<deal_II_dimension> >::
 set_dof_values_by_interpolation<PETScWrappers::BlockVector,float>
 (const Vector<float>&, PETScWrappers::BlockVector&) const;
+#endif
+
+
+// for Trilinos vectors
+#ifdef DEAL_II_USE_TRILINOS
+template
+void
+DoFCellAccessor<hp::DoFHandler<deal_II_dimension> >::
+get_interpolated_dof_values<TrilinosWrappers::Vector,double>
+(const TrilinosWrappers::Vector&, Vector<double>&) const;
+template
+void
+DoFCellAccessor<hp::DoFHandler<deal_II_dimension> >::
+set_dof_values_by_interpolation<TrilinosWrappers::Vector,double>
+(const Vector<double>&, TrilinosWrappers::Vector&) const;
+
+template
+void
+DoFCellAccessor<hp::DoFHandler<deal_II_dimension> >::
+get_interpolated_dof_values<TrilinosWrappers::Vector,float>
+(const TrilinosWrappers::Vector&, Vector<float>&) const;
+template
+void
+DoFCellAccessor<hp::DoFHandler<deal_II_dimension> >::
+set_dof_values_by_interpolation<TrilinosWrappers::Vector,float>
+(const Vector<float>&, TrilinosWrappers::Vector&) const;
+
+
+// template
+// void
+// DoFCellAccessor<hp::DoFHandler<deal_II_dimension> >::
+// get_interpolated_dof_values<TrilinosWrappers::BlockVector,double>
+// (const TrilinosWrappers::BlockVector&, Vector<double>&) const;
+// template
+// void
+// DoFCellAccessor<hp::DoFHandler<deal_II_dimension> >::
+// set_dof_values_by_interpolation<TrilinosWrappers::BlockVector,double>
+// (const Vector<double>&, TrilinosWrappers::BlockVector&) const;
+
+// template
+// void
+// DoFCellAccessor<hp::DoFHandler<deal_II_dimension> >::
+// get_interpolated_dof_values<TrilinosWrappers::BlockVector,float>
+// (const TrilinosWrappers::BlockVector&, Vector<float>&) const;
+// template
+// void
+// DoFCellAccessor<hp::DoFHandler<deal_II_dimension> >::
+// set_dof_values_by_interpolation<TrilinosWrappers::BlockVector,float>
+// (const Vector<float>&, TrilinosWrappers::BlockVector&) const;
 #endif
 
 

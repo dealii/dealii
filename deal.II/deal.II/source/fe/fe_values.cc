@@ -18,13 +18,11 @@
 #include <lac/block_vector.h>
 #include <lac/petsc_vector.h>
 #include <lac/petsc_block_vector.h>
+#include <lac/trilinos_vector.h>
 #include <grid/tria_iterator.h>
 #include <grid/tria_accessor.h>
 #include <grid/tria_boundary.h>
 #include <dofs/dof_accessor.h>
-#include <lac/vector.h>
-#include <lac/block_vector.h>
-#include <lac/petsc_vector.h>
 #include <fe/mapping_q1.h>
 #include <fe/fe_values.h>
 #include <fe/fe.h>
@@ -144,6 +142,32 @@ get_interpolated_dof_values (const PETScWrappers::BlockVector &in,
 
 #endif
 
+#ifdef DEAL_II_USE_TRILINOS
+
+template <int dim>
+template <typename CI>
+void
+FEValuesBase<dim>::CellIterator<CI>::
+get_interpolated_dof_values (const TrilinosWrappers::Vector &in,
+                             Vector<TrilinosScalar>         &out) const
+{
+  cell->get_interpolated_dof_values (in, out);
+}
+
+
+
+// template <int dim>
+// template <typename CI>
+// void
+// FEValuesBase<dim>::CellIterator<CI>::
+// get_interpolated_dof_values (const TrilinosWrappers::BlockVector &in,
+//                              Vector<TrilinosScalar>              &out) const
+// {
+//   cell->get_interpolated_dof_values (in, out);
+// }
+
+#endif
+
 
 /* ---------------- FEValuesBase<dim>::TriaCellIterator --------- */
 
@@ -249,6 +273,30 @@ get_interpolated_dof_values (const PETScWrappers::BlockVector &,
 {
   Assert (false, ExcMessage (message_string));
 }
+
+#endif
+
+#ifdef DEAL_II_USE_TRILINOS
+
+template <int dim>
+void
+FEValuesBase<dim>::TriaCellIterator::
+get_interpolated_dof_values (const TrilinosWrappers::Vector &,
+                             Vector<TrilinosScalar>         &) const
+{
+  Assert (false, ExcMessage (message_string));
+}
+
+
+
+// template <int dim>
+// void
+// FEValuesBase<dim>::TriaCellIterator::
+// get_interpolated_dof_values (const TrilinosWrappers::BlockVector &,
+//                              Vector<TrilinosScalar>              &) const
+// {
+//   Assert (false, ExcMessage (message_string));
+// }
 
 #endif
 
@@ -2055,5 +2103,15 @@ DEAL_II_NAMESPACE_CLOSE
 #define IN PETScWrappers::BlockVector
 #include "fe_values.instance.h"
 #undef IN
+#endif
+
+#ifdef DEAL_II_USE_TRILINOS
+#define IN TrilinosWrappers::Vector
+#include "fe_values.instance.h"
+#undef IN
+
+// #define IN TrilinosWrappers::BlockVector
+// #include "fe_values.instance.h"
+// #undef IN
 #endif
 

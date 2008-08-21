@@ -2,7 +2,7 @@
 //    $Id$
 //    Version: $Name$
 //
-//    Copyright (C) 1998, 1999, 2000, 2001, 2002, 2003, 2004, 2005, 2006, 2007 by the deal.II authors
+//    Copyright (C) 1998, 1999, 2000, 2001, 2002, 2003, 2004, 2005, 2006, 2007, 2008 by the deal.II authors
 //
 //    This file is subject to QPL and may not be  distributed
 //    without copyright and license information. Please refer
@@ -1072,16 +1072,19 @@ class DoFCellAccessor :  public DoFObjectAccessor<DH::dimension,DH>
 				      * function is only callable for
 				      * active cells.
 				      *
-				      * The input vector may be either a
-				      * <tt>Vector<float></tt>,
+				      * The input vector may be either
+				      * a <tt>Vector<float></tt>,
 				      * Vector<double>, or a
 				      * BlockVector<double>, or a
-				      * PETSc vector if deal.II is compiled to
-				      * support PETSc. It is in the
-				      * responsibility of the caller to assure
-				      * that the types of the numbers stored
-				      * in input and output vectors are
-				      * compatible and with similar accuracy.
+				      * PETSc or Trilinos vector if
+				      * deal.II is compiled to support
+				      * these libraries. It is in the
+				      * responsibility of the caller
+				      * to assure that the types of
+				      * the numbers stored in input
+				      * and output vectors are
+				      * compatible and with similar
+				      * accuracy.
 				      */
     template <class InputVector, typename number>
     void get_dof_values (const InputVector &values,
@@ -1115,7 +1118,7 @@ class DoFCellAccessor :  public DoFObjectAccessor<DH::dimension,DH>
 				      * Vector<double>, or a
 				      * BlockVector<double>, or a
 				      * PETSc vector if deal.II is compiled to
-				      * support PETSc. It is in the
+				      * support these libraries. It is in the
 				      * responsibility of the caller to assure
 				      * that the types of the numbers stored
 				      * in input and output vectors are
@@ -1244,7 +1247,7 @@ class DoFCellAccessor :  public DoFObjectAccessor<DH::dimension,DH>
 				      * Vector<double>, or a
 				      * BlockVector<double>, or a
 				      * PETSc vector if deal.II is compiled to
-				      * support PETSc. It is in the
+				      * support these libraries. It is in the
 				      * responsibility of the caller to assure
 				      * that the types of the numbers stored
 				      * in input and output vectors are

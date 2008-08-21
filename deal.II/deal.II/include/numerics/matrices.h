@@ -60,6 +60,14 @@ namespace PETScWrappers
 }
 #endif
 
+#ifdef DEAL_II_USE_TRILINOS
+namespace TrilinosWrappers
+{
+  class SparseMatrix;
+  class Vector;
+}
+#endif
+
 
 /**
  * This class provides functions that assemble certain standard matrices for a
@@ -1096,6 +1104,52 @@ class MatrixTools : public MatrixCreator
 			   const bool             eliminate_columns = true);
 #endif
 
+#ifdef DEAL_II_USE_TRILINOS
+				     /**
+				      * Apply dirichlet boundary conditions to
+				      * the system matrix and vectors as
+				      * described in the general
+				      * documentation. This function works on
+				      * the classes that are used to wrap
+				      * Trilinos objects.
+				      * 
+ 				      * Note that this function is not very
+ 				      * efficient: it needs to alternatingly
+ 				      * read and write into the matrix, a
+ 				      * situation that Trilinos does not handle
+ 				      * too well. In addition, we only get rid
+ 				      * of rows corresponding to boundary
+ 				      * nodes, but the corresponding case of
+ 				      * deleting the respective columns
+ 				      * (i.e. if @p eliminate_columns is @p
+ 				      * true) is not presently implemented,
+ 				      * and probably will never because it is
+ 				      * too expensive without direct access to
+ 				      * the Trilinos data structures. (This leads
+ 				      * to the situation where the action
+ 				      * indicates by the default value of the
+ 				      * last argument is actually not
+ 				      * implemented; that argument has
+ 				      * <code>true</code> as its default value
+ 				      * to stay consistent with the other
+ 				      * functions of same name in this class.)
+ 				      * A third reason against this function
+ 				      * is that it doesn't handle the case
+ 				      * where the matrix is distributed across
+ 				      * an MPI system.
+ 				      *
+ 				      * This function is used in
+				      * @ref step_17 "step-17" and
+				      * @ref step_18 "step-18".
+ 				      */
+    static void
+    apply_boundary_values (const std::map<unsigned int,double> &boundary_values,
+			   TrilinosWrappers::SparseMatrix  &matrix,
+			   TrilinosWrappers::Vector  &solution,
+			   TrilinosWrappers::Vector  &right_hand_side,
+			   const bool             eliminate_columns = true);
+#endif
+    
                                      /**
                                       * Rather than applying boundary
                                       * values to the global matrix
@@ -1124,6 +1178,7 @@ class MatrixTools : public MatrixCreator
                                       * access to the sparse matrix is
                                       * expensive (e.g. for block
                                       * sparse matrices, or for PETSc
+                                      * or trilinos
                                       * matrices). However, it doesn't
                                       * work as expected if there are
                                       * also hanging nodes to be

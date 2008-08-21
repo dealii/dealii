@@ -178,17 +178,18 @@ class BlockIndices;
  * arguments refer to the first possibility above, those taking only one do
  * their job in-place and refer to the second possibility.
  *
- * The condensation functions exist for different argument types. The in-place
- * functions (i.e. those following the second way) exist for arguments of type
- * SparsityPattern, SparseMatrix and BlockSparseMatrix. Note that there are no
- * versions for arguments of type PETScWrappers::SparseMatrix() or any of the
- * other PETSc matrix wrapper classes. This is due to the fact that it is
- * relatively hard to get a representation of the sparsity structure of PETSc
- * matrices, and to modify them; this holds in particular, if the matrix is
- * actually distributed across a cluster of computers. If you want to use
- * PETSc matrices, you can either copy an already condensed deal.II matrix, or
- * build the PETSc matrix in the already condensed form, see the discussion
- * below.
+ * The condensation functions exist for different argument types. The
+ * in-place functions (i.e. those following the second way) exist for
+ * arguments of type SparsityPattern, SparseMatrix and
+ * BlockSparseMatrix. Note that there are no versions for arguments of
+ * type PETScWrappers::SparseMatrix() or any of the other PETSc or
+ * Trilinos matrix wrapper classes. This is due to the fact that it is
+ * relatively hard to get a representation of the sparsity structure
+ * of PETSc matrices, and to modify them; this holds in particular, if
+ * the matrix is actually distributed across a cluster of
+ * computers. If you want to use PETSc matrices, you can either copy
+ * an already condensed deal.II matrix, or build the PETSc matrix in
+ * the already condensed form, see the discussion below.
  * 
  * 
  * <h5>Condensing vectors</h5>
@@ -199,10 +200,11 @@ class BlockIndices;
  * object has been condensed, further condensation operations don't change it
  * any more.
  *
- * In contrast to the matrix condensation functions, the vector condensation
- * functions exist in variants for PETSc vectors. However, using them is
- * typically expensive, and should be avoided. You should use the same
- * techniques as mentioned above to avoid their use.
+ * In contrast to the matrix condensation functions, the vector
+ * condensation functions exist in variants for PETSc and Trilinos
+ * vectors. However, using them is typically expensive, and should be
+ * avoided. You should use the same techniques as mentioned above to
+ * avoid their use.
  *
  * 
  * <h3>Avoiding explicit condensation</h3>
@@ -219,12 +221,13 @@ class BlockIndices;
  * paper". This is the case discussed in the hp tutorial program,
  * @ref step_27 "step-27", as well as in @ref step_31 "step-31".
  *
- * <li>There may not be a condense()
- * function for the matrix you use (this is, for example, the case
- * for the PETSc wrapper classes, where we have no access to the underlying
- * representation of the matrix, and therefore cannot efficiently implement
- * the condense() operation). This is the case discussed in
- * @ref step_17 "step-17" and @ref step_18 "step-18".
+ * <li>
+ * There may not be a condense() function for the matrix you use
+ * (this is, for example, the case for the PETSc and Trilinos wrapper
+ * classes, where we have no access to the underlying representation
+ * of the matrix, and therefore cannot efficiently implement the
+ * condense() operation). This is the case discussed in @ref step_17
+ * "step-17" and @ref step_18 "step-18".
  * </ul>
  *
  * In this case, one possibility is to distribute local entries to the final
@@ -790,11 +793,12 @@ class ConstraintMatrix : public Subscriptor
 				      * @p condensed be zero.
 				      *
 				      * The @p VectorType may be a
-				      * Vector<float>,
-				      * Vector<double>,
-				      * BlockVector<tt><...></tt>, a PETSc
-				      * vector wrapper class, or any other
-				      * type having the same interface.
+				      * Vector<float>, Vector<double>,
+				      * BlockVector<tt><...></tt>, a
+				      * PETSc or Trilinos vector
+				      * wrapper class, or any other
+				      * type having the same
+				      * interface.
 				      */
     template <class VectorType>
     void condense (const VectorType &uncondensed,
@@ -802,12 +806,14 @@ class ConstraintMatrix : public Subscriptor
 
 				     /**
 				      * Condense the given vector
-				      * in-place. The @p VectorType may be a
-				      * Vector<float>,
+				      * in-place. The @p VectorType
+				      * may be a Vector<float>,
 				      * Vector<double>,
-				      * BlockVector<tt><...></tt>, a PETSc
-				      * vector wrapper class, or any other
-				      * type having the same interface.
+				      * BlockVector<tt><...></tt>, a
+				      * PETSc or Trilinos vector
+				      * wrapper class, or any other
+				      * type having the same
+				      * interface.
 				      */
     template <class VectorType>
     void condense (VectorType &vec) const;
@@ -1016,14 +1022,16 @@ class ConstraintMatrix : public Subscriptor
 				 const bool                       keep_constrained_entries = true) const;
 
 				     /**
-				      * Delete hanging nodes in a vector.
-				      * Sets all hanging node values to
-				      * zero. The @p VectorType may be a
-				      * Vector<float>,
-				      * Vector<double>,
-				      * BlockVector<tt><...></tt>, a PETSc
-				      * vector wrapper class, or any other
-				      * type having the same interface.
+				      * Delete hanging nodes in a
+				      * vector.  Sets all hanging node
+				      * values to zero. The @p
+				      * VectorType may be a
+				      * Vector<float>, Vector<double>,
+				      * BlockVector<tt><...></tt>, a
+				      * PETSc or Trilinos vector
+				      * wrapper class, or any other
+				      * type having the same
+				      * interface.
 				      */
     template <class VectorType>
     void set_zero (VectorType &vec) const;
@@ -1053,24 +1061,27 @@ class ConstraintMatrix : public Subscriptor
 				      * @p condense.
 				      *
 				      * The @p VectorType may be a
-				      * Vector<float>,
-				      * Vector<double>,
-				      * BlockVector<tt><...></tt>, a PETSc
-				      * vector wrapper class, or any other
-				      * type having the same interface.
+				      * Vector<float>, Vector<double>,
+				      * BlockVector<tt><...></tt>, a
+				      * PETSc or Trilinos vector
+				      * wrapper class, or any other
+				      * type having the same
+				      * interface.
 				      */
     template <class VectorType>
     void distribute (const VectorType &condensed,
 		     VectorType       &uncondensed) const;
 
 				     /**
-				      * Re-distribute the elements of the
-				      * vector in-place. The @p VectorType
-				      * may be a Vector<float>,
-				      * Vector<double>,
-				      * BlockVector<tt><...></tt>, a PETSc
-				      * vector wrapper class, or any other
-				      * type having the same interface.
+				      * Re-distribute the elements of
+				      * the vector in-place. The @p
+				      * VectorType may be a
+				      * Vector<float>, Vector<double>,
+				      * BlockVector<tt><...></tt>, a
+				      * PETSc or Trilinos vector
+				      * wrapper class, or any other
+				      * type having the same
+				      * interface.
 				      */
     template <class VectorType>
     void distribute (VectorType &vec) const;

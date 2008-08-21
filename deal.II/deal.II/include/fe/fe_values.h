@@ -27,6 +27,7 @@
 #include <lac/block_vector.h>
 #include <lac/petsc_vector.h>
 #include <lac/petsc_block_vector.h>
+#include <lac/trilinos_vector.h>
 #include <grid/tria.h>
 #include <grid/tria_iterator.h>
 #include <dofs/dof_handler.h>
@@ -1125,15 +1126,18 @@ class FEValuesBase : protected FEValuesData<dim>,
 				      * <tt>values</tt> object already has the
 				      * correct size. 
 				      *
-				      * The actual data type of the input
-				      * vector may be either a Vector&lt;T&gt;,
-				      * BlockVector&lt;T&gt;, or one of the
-				      * sequential PETSc vector wrapper classes. It
-				      * represents a global vector of
-				      * DoF values associated with the
-				      * DofHandler object with
-				      * which this FEValues
-				      * object was last initialized.
+				      * The actual data type of the
+				      * input vector may be either a
+				      * Vector&lt;T&gt;,
+				      * BlockVector&lt;T&gt;, or one
+				      * of the sequential PETSc or
+				      * Trilinos vector wrapper
+				      * classes. It represents a
+				      * global vector of DoF values
+				      * associated with the DofHandler
+				      * object with which this
+				      * FEValues object was last
+				      * initialized.
 				      */
     template <class InputVector, typename number>
     void get_function_values (const InputVector& fe_function,
@@ -1149,15 +1153,18 @@ class FEValuesBase : protected FEValuesData<dim>,
 				      * applied to multi-component
 				      * elements.
 				      *
-				      * The actual data type of the input
-				      * vector may be either a Vector&lt;T&gt;,
-				      * BlockVector&lt;T&gt;, or one of the
-				      * sequential PETSc vector wrapper classes. It
-				      * represents a global vector of
-				      * DoF values associated with the
-				      * DofHandler object with
-				      * which this FEValues
-				      * object was last initialized.
+				      * The actual data type of the
+				      * input vector may be either a
+				      * Vector&lt;T&gt;,
+				      * BlockVector&lt;T&gt;, or one
+				      * of the sequential PETSc or
+				      * Trilinos vector wrapper
+				      * classes. It represents a
+				      * global vector of DoF values
+				      * associated with the DofHandler
+				      * object with which this
+				      * FEValues object was last
+				      * initialized.
 				      */
     template <class InputVector, typename number>
     void get_function_values (const InputVector       &fe_function,
@@ -1328,15 +1335,18 @@ class FEValuesBase : protected FEValuesData<dim>,
 				      * @p gradients object already has the
 				      * right size.
 				      *
-				      * The actual data type of the input
-				      * vector may be either a Vector&lt;T&gt;,
-				      * BlockVector&lt;T&gt;, or one of the
-				      * sequential PETSc vector wrapper classes. It
-				      * represents a global vector of
-				      * DoF values associated with the
-				      * DofHandler object with
-				      * which this FEValues
-				      * object was last initialized.
+				      * The actual data type of the
+				      * input vector may be either a
+				      * Vector&lt;T&gt;,
+				      * BlockVector&lt;T&gt;, or one
+				      * of the sequential PETSc or
+				      * Trilinos vector wrapper
+				      * classes. It represents a
+				      * global vector of DoF values
+				      * associated with the DofHandler
+				      * object with which this
+				      * FEValues object was last
+				      * initialized.
 				      *
 				      * The output are the gradients
 				      * of the function represented by
@@ -1375,15 +1385,18 @@ class FEValuesBase : protected FEValuesData<dim>,
 				      * but applied to multi-component
 				      * elements.
 				      *
-				      * The actual data type of the input
-				      * vector may be either a Vector&lt;T&gt;,
-				      * BlockVector&lt;T&gt;, or one of the
-				      * sequential PETSc vector wrapper classes. It
-				      * represents a global vector of
-				      * DoF values associated with the
-				      * DofHandler object with
-				      * which this FEValues
-				      * object was last initialized.
+				      * The actual data type of the
+				      * input vector may be either a
+				      * Vector&lt;T&gt;,
+				      * BlockVector&lt;T&gt;, or one
+				      * of the sequential PETSc or
+				      * Trilinos vector wrapper
+				      * classes. It represents a
+				      * global vector of DoF values
+				      * associated with the DofHandler
+				      * object with which this
+				      * FEValues object was last
+				      * initialized.
 				      *
 				      * The output are the gradients
 				      * of the function represented by
@@ -1466,15 +1479,18 @@ class FEValuesBase : protected FEValuesData<dim>,
 				      * get_function_hessians()
 				      * function.
 				      * 
-				      * The actual data type of the input
-				      * vector may be either a Vector&lt;T&gt;,
-				      * BlockVector&lt;T&gt;, or one of the
-				      * sequential PETSc vector wrapper classes..It
-				      * represents a global vector of
-				      * DoF values associated with the
-				      * DofHandler object with
-				      * which this FEValues
-				      * object was last initialized.
+				      * The actual data type of the
+				      * input vector may be either a
+				      * Vector&lt;T&gt;,
+				      * BlockVector&lt;T&gt;, or one
+				      * of the sequential PETSc or
+				      * Trilinos vector wrapper
+				      * classes..It represents a
+				      * global vector of DoF values
+				      * associated with the DofHandler
+				      * object with which this
+				      * FEValues object was last
+				      * initialized.
 				      *
 				      * The output are the second derivatives
 				      * of the function represented by
@@ -1504,15 +1520,18 @@ class FEValuesBase : protected FEValuesData<dim>,
 				      * name, but applies to
 				      * vector-valued finite elements.
 				      *
-				      * The actual data type of the input
-				      * vector may be either a Vector&lt;T&gt;,
-				      * BlockVector&lt;T&gt;, or one of the
-				      * sequential PETSc vector wrapper classes. It
-				      * represents a global vector of
-				      * DoF values associated with the
-				      * DofHandler object with
-				      * which this FEValues
-				      * object was last initialized.
+				      * The actual data type of the
+				      * input vector may be either a
+				      * Vector&lt;T&gt;,
+				      * BlockVector&lt;T&gt;, or one
+				      * of the sequential PETSc or
+				      * Trilinos vector wrapper
+				      * classes. It represents a
+				      * global vector of DoF values
+				      * associated with the DofHandler
+				      * object with which this
+				      * FEValues object was last
+				      * initialized.
 				      *
 				      * The output are the second derivatives
 				      * of the function represented by
@@ -1895,6 +1914,30 @@ class FEValuesBase : protected FEValuesData<dim>,
         get_interpolated_dof_values (const PETScWrappers::BlockVector &in,
                                      Vector<PetscScalar>              &out) const = 0;
 #endif
+
+#ifdef DEAL_II_USE_TRILINOS
+                                         /**
+                                          * Call
+                                          * @p get_interpolated_dof_values
+                                          * of the iterator with the
+                                          * given arguments.
+                                          */
+        virtual
+        void
+        get_interpolated_dof_values (const TrilinosWrappers::Vector &in,
+                                     Vector<TrilinosScalar>         &out) const = 0;
+
+//                                          /**
+//                                           * Call
+//                                           * @p get_interpolated_dof_values
+//                                           * of the iterator with the
+//                                           * given arguments.
+//                                           */
+//         virtual
+//         void
+//         get_interpolated_dof_values (const TrilinosWrappers::BlockVector &in,
+//                                      Vector<TrilinosScalar>              &out) const = 0;
+#endif
     };
 
 
@@ -2013,6 +2056,31 @@ class FEValuesBase : protected FEValuesData<dim>,
         get_interpolated_dof_values (const PETScWrappers::BlockVector &in,
                                      Vector<PetscScalar>              &out) const;
 #endif
+
+#ifdef DEAL_II_USE_TRILINOS
+                                         /**
+                                          * Call
+                                          * @p get_interpolated_dof_values
+                                          * of the iterator with the
+                                          * given arguments.
+                                          */
+        virtual
+        void
+        get_interpolated_dof_values (const TrilinosWrappers::Vector &in,
+                                     Vector<TrilinosScalar>         &out) const;
+
+//                                          /**
+//                                           * Call
+//                                           * @p get_interpolated_dof_values
+//                                           * of the iterator with the
+//                                           * given arguments.
+//                                           */
+//         virtual
+//         void
+//         get_interpolated_dof_values (const TrilinosWrappers::BlockVector &in,
+//                                      Vector<TrilinosScalar>              &out) const;
+#endif
+
       private:
                                          /**
                                           * Copy of the iterator which
@@ -2175,6 +2243,31 @@ class FEValuesBase : protected FEValuesData<dim>,
         get_interpolated_dof_values (const PETScWrappers::BlockVector &in,
                                      Vector<PetscScalar>              &out) const;
 #endif
+
+#ifdef DEAL_II_USE_TRILINOS
+                                         /**
+                                          * Call
+                                          * @p get_interpolated_dof_values
+                                          * of the iterator with the
+                                          * given arguments.
+                                          */
+        virtual
+        void
+        get_interpolated_dof_values (const TrilinosWrappers::Vector &in,
+                                     Vector<TrilinosScalar>         &out) const;
+
+//                                          /**
+//                                           * Call
+//                                           * @p get_interpolated_dof_values
+//                                           * of the iterator with the
+//                                           * given arguments.
+//                                           */
+//         virtual
+//         void
+//         get_interpolated_dof_values (const TrilinosWrappers::BlockVector &in,
+//                                      Vector<TrilinosScalar>              &out) const;
+#endif
+
       private:
                                          /**
                                           * Copy of the iterator which
