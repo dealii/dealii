@@ -700,7 +700,7 @@ template <int dim>
 class BoussinesqFlowProblem
 {
   public:
-    BoussinesqFlowProblem (const unsigned int degree);
+    BoussinesqFlowProblem ();
     void run ();
 
   private:
@@ -792,7 +792,7 @@ class BoussinesqFlowProblem
 				 // options for the matrix assembly 
 				 // and preconditioning.
 template <int dim>
-BoussinesqFlowProblem<dim>::BoussinesqFlowProblem (const unsigned int degree)
+BoussinesqFlowProblem<dim>::BoussinesqFlowProblem ()
                 :
 		triangulation (Triangulation<dim>::maximum_smoothing),
 
@@ -2362,7 +2362,7 @@ int main ()
     {
       deallog.depth_console (0);
 
-      BoussinesqFlowProblem<2> flow_problem(1);
+      BoussinesqFlowProblem<2> flow_problem;
       flow_problem.run ();
     }
   catch (std::exception &exc)
