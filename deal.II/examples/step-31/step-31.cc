@@ -768,8 +768,8 @@ class BoussinesqFlowProblem
     double old_time_step;
     unsigned int timestep_number;
 
-    boost::shared_ptr<LinearSolversPreconditionerTrilinosAmg>  Amg_preconditioner;
-    boost::shared_ptr<SparseILU<double> >                      Mp_preconditioner;
+    boost::shared_ptr<PreconditionerTrilinosAmg>  Amg_preconditioner;
+    boost::shared_ptr<SparseILU<double> >         Mp_preconditioner;
 
     bool rebuild_stokes_matrix;
     bool rebuild_temperature_matrices;
@@ -2082,14 +2082,15 @@ void BoussinesqFlowProblem<dim>::solve ()
   {
 				     // Set up inverse matrix for
 				     // pressure mass matrix
-    InverseMatrix<SparseMatrix<double>,SparseILU<double> >
+    LinearSolvers::InverseMatrix<SparseMatrix<double>,SparseILU<double> >
       mp_inverse (stokes_preconditioner_matrix.block(1,1), *Mp_preconditioner);
 
 				     // Set up block Schur preconditioner
 				     /*BlockSchurPreconditioner<typename InnerPreconditioner<dim>::type,
 				       SparseILU<double> >
 				       preconditioner (stokes_matrix, mp_inverse, *A_preconditioner);*/
-    BlockSchurPreconditioner<PreconditionerTrilinosAmg, SparseILU<double> >
+    LinearSolvers::BlockSchurPreconditioner<PreconditionerTrilinosAmg,
+                                            SparseILU<double> >
       preconditioner (stokes_matrix, mp_inverse, *Amg_preconditioner);
 
 				     // Set up GMRES solver and
