@@ -29,7 +29,7 @@
 #include <lac/precondition.h>
 #include <lac/sparse_direct.h>
 #include <lac/sparse_ilu.h>
-#include <lac/block_matrix_array.h>
+#include <lac/trilinos_precondition_amg.h>
 
 #include <grid/tria.h>
 #include <grid/grid_generator.h>
@@ -60,13 +60,6 @@
 #include <sstream>
 
                                  // This is Trilinos
-#include <Epetra_SerialComm.h>
-#include <Epetra_Map.h>
-#include <Epetra_CrsMatrix.h>
-#include <Epetra_Vector.h>
-#include <Teuchos_ParameterList.hpp>
-#include <ml_include.h>
-#include <ml_MultiLevelPreconditioner.h>
 
 				 // Next, we import all deal.II
 				 // names into global namespace
@@ -74,211 +67,6 @@ using namespace dealii;
 
 
 				 // @sect3{Defining the AMG preconditioner}
-
-				 // This implements an AMG
-				 // preconditioner based on the
-				 // Trilinos ML implementation.
-				 // What this class does is twofold.
-				 // When the constructor of the class
-				 // is invoked, a ML preconditioner
-				 // object is created based on the
-				 // DoFHandler and matrix
-				 // that we want the preconditioner to
-				 // be based on. A call of
-				 // the respective <code>vmult</code>
-				 // function does call the respective
-				 // operation in the Trilinos package,
-				 // where it is called 
-				 // <code>ApplyInverse</code>.
- 
-				 // There are a few pecularities in
-				 // the constructor. Since the
-				 // Trilinos objects we want to use are
-				 // heavily dependent on Epetra objects,
-				 // the fundamental construction
-				 // routines for vectors and 
-				 // matrices in Trilinos, we do a 
-				 // copy of our deal.II preconditioner
-				 // matrix to a Epetra matrix. This 
-				 // is of course not optimal, but for
-				 // the time being there is no direct
-				 // support for our data interface.
-				 // When doing this time-consuming 
-				 // operation, we can still profit 
-				 // from the fact that some of the
-				 // entries in the preconditioner matrix
-				 // are zero and hence can be 
-				 // neglected.
-class PreconditionerTrilinosAmg : public Subscriptor
-{
-  public:
-    PreconditionerTrilinosAmg ();
-    
-    void initialize (const SparseMatrix<double> &matrix,
-		     const std::vector<double>  &null_space,
-		     const unsigned int          null_space_dimension,
-		     const bool                  higher_order_elements,
-		     const bool                  elliptic,
-		     const bool                  output_details,
-		     const double                drop_tolerance = 1e-13);
-
-    void vmult (Vector<double>       &dst,
-		const Vector<double> &src) const;
-
-  private:
-    
-    boost::shared_ptr<ML_Epetra::MultiLevelPreconditioner> multigrid_operator;
-    
-    Epetra_SerialComm  communicator;
-    boost::shared_ptr<Epetra_Map>       Map;
-    boost::shared_ptr<Epetra_CrsMatrix> Matrix;
-};
-
-
-PreconditionerTrilinosAmg::PreconditionerTrilinosAmg ()
-{}
-
-void PreconditionerTrilinosAmg::initialize (
-		const SparseMatrix<double> &matrix,
-		const std::vector<double>  &null_space,
-		const unsigned int          null_space_dimension,
-		const bool                  elliptic,
-		const bool                  higher_order_elements,
-		const bool                  output_details,
-		const double                drop_tolerance
-		)
-{
-  Assert (drop_tolerance >= 0,
-	  ExcMessage ("Drop tolerance must be a non-negative number."));
-  
-  const unsigned int n_rows = matrix.m();
-  const SparsityPattern *sparsity_pattern = &(matrix.get_sparsity_pattern());
-  
-				 // Init Epetra Matrix, avoid 
-				 // storing the nonzero elements.
-  {
-    Map.reset (new Epetra_Map(n_rows, 0, communicator));
-    
-    std::vector<int> row_lengths (n_rows);
-    for (SparseMatrix<double>::const_iterator p = matrix.begin();
-	 p != matrix.end(); ++p)
-      if (std::abs(p->value()) > drop_tolerance)
-	++row_lengths[p->row()];
-  
-    Matrix.reset (new Epetra_CrsMatrix(Copy, *Map, &row_lengths[0], true));
-  
-    const unsigned int max_nonzero_entries
-      = *std::max_element (row_lengths.begin(), row_lengths.end());
-  
-    std::vector<double> values(max_nonzero_entries, 0);
-    std::vector<int> row_indices(max_nonzero_entries);
-  
-    for (unsigned int row=0; row<n_rows; ++row)
-      {
-	unsigned int index = 0;
-	for (SparseMatrix<double>::const_iterator p = matrix.begin(row);
-	     p != matrix.end(row); ++p)
-	  if (std::abs(p->value()) > drop_tolerance)
-	    {
-	      row_indices[index] = p->column();
-	      values[index]      = p->value();
-	      ++index;
-	    }
-
-	Assert (index == static_cast<unsigned int>(row_lengths[row]),
-		ExcMessage("Filtering out zeros could not "
-			    "be successfully finished!"));
-  
-	Matrix->InsertGlobalValues(row, row_lengths[row],
-				   &values[0], &row_indices[0]);
-      }
-      
-    Matrix->FillComplete();
-  }
-  
-				 // Build the AMG preconditioner.
-  Teuchos::ParameterList parameter_list;
-  
-				 // The implementation is able
-				 // to distinguish between
-				 // matrices from elliptic problems
-				 // and convection dominated 
-				 // problems. We use the standard
-				 // options for elliptic problems,
-				 // except that we use a 
-				 // Chebyshev smoother instead
-				 // of a symmetric Gauss-Seidel
-				 // smoother. For most elliptic 
-				 // problems, Chebyshev is better
-				 // than Gauss-Seidel (SSOR).
-  if (elliptic)
-    {
-      ML_Epetra::SetDefaults("SA",parameter_list);
-      parameter_list.set("smoother: type", "Chebyshev");
-      parameter_list.set("smoother: sweeps", 4);
-    }
-  else
-    {
-      ML_Epetra::SetDefaults("NSSA",parameter_list);
-      parameter_list.set("aggregation: type", "Uncoupled");
-      parameter_list.set("aggregation: block scaling", true);
-    }
-  
-  if (output_details)
-    parameter_list.set("ML output", 10);
-  else
-    parameter_list.set("ML output", 0);
-  
-  if (higher_order_elements)
-    parameter_list.set("aggregation: type", "MIS");
-  
-  Assert (n_rows * null_space_dimension == null_space.size(),
-	  ExcDimensionMismatch(n_rows * null_space_dimension,
-			       null_space.size()));
-  
-  if (null_space_dimension > 1)
-    {
-      parameter_list.set("null space: type", "pre-computed");
-      parameter_list.set("null space: dimension", int(null_space_dimension));
-      parameter_list.set("null space: vectors", (double *)&null_space[0]);
-    }
-  
-  multigrid_operator = boost::shared_ptr<ML_Epetra::MultiLevelPreconditioner>
-	       (new ML_Epetra::MultiLevelPreconditioner(*Matrix, parameter_list, true));
-
-  if (output_details)
-    multigrid_operator->PrintUnused(0);
-}
-
-				 // For the implementation of the
-				 // <code>vmult</code> function we
-				 // note that invoking a call of 
-				 // the Trilinos preconditioner 
-				 // requires us to use Epetra vectors
-				 // as well. Luckily, it is sufficient
-				 // to provide a view, i.e., feed 
-				 // Trilinos with a pointer to the
-				 // data, so we avoid copying the
-				 // content of the vectors during
-				 // the iteration. In the declaration
-				 // of the right hand side, we need
-				 // to cast the source vector (that
-				 // is <code>const</code> in all deal.II 
-				 // calls) to non-constant value, as
-				 // this is the way Trilinos wants to
-				 // have them.
-void PreconditionerTrilinosAmg::vmult (Vector<double>       &dst,
-					    const Vector<double> &src) const
-{
-  Epetra_Vector LHS (View, *Map, dst.begin());
-  Epetra_Vector RHS (View, *Map, const_cast<double*>(src.begin()));
-  
-  const int res = multigrid_operator->ApplyInverse (RHS, LHS);
-  
-  Assert (res == 0,
-	  ExcMessage ("Trilinos AMG MultiLevel preconditioner returned "
-		      "with an error!"));
-}
 
 
 				 // @sect3{Equation data}
@@ -768,7 +556,7 @@ class BoussinesqFlowProblem
     double old_time_step;
     unsigned int timestep_number;
 
-    boost::shared_ptr<PreconditionerTrilinosAmg>  Amg_preconditioner;
+    boost::shared_ptr<TrilinosWrappers::PreconditionAMG>  Amg_preconditioner;
     boost::shared_ptr<SparseILU<double> >         Mp_preconditioner;
 
     bool rebuild_stokes_matrix;
@@ -1386,8 +1174,8 @@ BoussinesqFlowProblem<dim>::build_stokes_preconditioner ()
 				   // boost library.
   assemble_stokes_preconditioner ();
       
-  Amg_preconditioner = boost::shared_ptr<PreconditionerTrilinosAmg>
-		       (new PreconditionerTrilinosAmg());
+  Amg_preconditioner = boost::shared_ptr<TrilinosWrappers::PreconditionAMG>
+		       (new TrilinosWrappers::PreconditionAMG());
       
   const unsigned int n_u = stokes_preconditioner_matrix.block(0,0).m();
   std::vector<double> null_space (dim * n_u, 0.);
@@ -2089,7 +1877,7 @@ void BoussinesqFlowProblem<dim>::solve ()
 				     /*BlockSchurPreconditioner<typename InnerPreconditioner<dim>::type,
 				       SparseILU<double> >
 				       preconditioner (stokes_matrix, mp_inverse, *A_preconditioner);*/
-    LinearSolvers::BlockSchurPreconditioner<PreconditionerTrilinosAmg,
+    LinearSolvers::BlockSchurPreconditioner<TrilinosWrappers::PreconditionAMG,
                                             SparseILU<double> >
       preconditioner (stokes_matrix, mp_inverse, *Amg_preconditioner);
 

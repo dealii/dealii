@@ -71,11 +71,11 @@ namespace TrilinosWrappers
 				   // entries in the preconditioner matrix
 				   // are zero and hence can be 
 				   // neglected.
-  class PreconditionerTrilinosAmg : public Subscriptor
+  class PreconditionAMG : public Subscriptor
   {
     public:
-      PreconditionerTrilinosAmg ();
-      ~PreconditionerTrilinosAmg ();
+      PreconditionAMG ();
+      ~PreconditionAMG ();
     
       void initialize (const dealii::SparseMatrix<double> &matrix,
 		       const std::vector<double>  &null_space,

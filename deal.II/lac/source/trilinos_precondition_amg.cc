@@ -12,7 +12,7 @@
 //---------------------------------------------------------------------------
 
 
-#include <lac/trilinos_preconditioner_amg.h>
+#include <lac/trilinos_precondition_amg.h>
 #include <lac/vector.h>
 #include <lac/sparse_matrix.h>
 
@@ -33,10 +33,15 @@ DEAL_II_NAMESPACE_OPEN
 namespace TrilinosWrappers
 {
 
-  PreconditionerTrilinosAmg::PreconditionerTrilinosAmg ()
+  PreconditionAMG::PreconditionAMG ()
   {}
 
-  void PreconditionerTrilinosAmg::initialize (
+
+  PreconditionAMG::~PreconditionAMG ()
+  {}
+
+  
+  void PreconditionAMG::initialize (
     const dealii::SparseMatrix<double> &matrix,
     const std::vector<double>  &null_space,
     const unsigned int          null_space_dimension,
@@ -165,8 +170,8 @@ namespace TrilinosWrappers
 				   // calls) to non-constant value, as
 				   // this is the way Trilinos wants to
 				   // have them.
-  void PreconditionerTrilinosAmg::vmult (dealii::Vector<double>       &dst,
-					 const dealii::Vector<double> &src) const
+  void PreconditionAMG::vmult (dealii::Vector<double>       &dst,
+			       const dealii::Vector<double> &src) const
   {
     Epetra_Vector LHS (View, *Map, dst.begin());
     Epetra_Vector RHS (View, *Map, const_cast<double*>(src.begin()));
