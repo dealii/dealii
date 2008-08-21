@@ -31,9 +31,10 @@ DEAL_II_NAMESPACE_OPEN
 namespace TrilinosWrappers
 {
 
-  PreconditionAMG::PreconditionAMG () :
+  PreconditionAMG::PreconditionAMG () 
 #ifdef DEAL_II_COMPILER_SUPPORTS_MPI
-    communicator (MPI_COMM_WORLD)
+    :
+      communicator (MPI_COMM_WORLD)
 #endif
   {}
 
