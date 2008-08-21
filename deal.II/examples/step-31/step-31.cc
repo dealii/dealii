@@ -2144,7 +2144,10 @@ void BoussinesqFlowProblem<dim>::solve ()
               << solver_control.last_step()
               << " CG iterations for temperature."
               << std::endl;
-    std::cout << "   Max temperature: "
+    std::cout << "   Temperature range: "
+	      << *std::min_element (temperature_solution.begin(),
+				    temperature_solution.end())
+	      << ' '
 	      << *std::max_element (temperature_solution.begin(),
 				    temperature_solution.end())
 	      << std::endl;
@@ -2229,7 +2232,7 @@ void BoussinesqFlowProblem<dim>::output_results ()  const
   data_out.add_data_vector (joint_solution, joint_solution_names,
 			    DataOut<dim>::type_dof_data,
 			    data_component_interpretation);
-  data_out.build_patches (std::max(stokes_degree, temperature_degree));
+  data_out.build_patches (std::min(stokes_degree, temperature_degree));
 
   std::ostringstream filename;
   filename << "solution-" << Utilities::int_to_string(timestep_number, 4) << ".vtk";
