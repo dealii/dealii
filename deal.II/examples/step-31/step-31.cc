@@ -716,19 +716,21 @@ class BoussinesqFlowProblem
     void output_results () const;
     void refine_mesh (const unsigned int max_grid_level);
 
-    static void compute_viscosity(const std::vector<double>          &old_temperature,
-				  const std::vector<double>          &old_old_temperature,
-				  const std::vector<Tensor<1,dim> >  &old_temperature_grads,
-				  const std::vector<Tensor<1,dim> >  &old_old_temperature_grads,
-				  const std::vector<Tensor<2,dim> >  &old_temperature_hessians,
-				  const std::vector<Tensor<2,dim> >  &old_old_temperature_hessians,
-				  const std::vector<Vector<double> > &present_stokes_values,
-				  const std::vector<double>          &gamma_values,
-				  const double                        global_u_infty,
-				  const double                        global_T_variation,
-				  const double                        global_Omega_diameter,
-				  const double                        cell_diameter,
-				  const double                        old_time_step);
+    static
+    double
+    compute_viscosity(const std::vector<double>          &old_temperature,
+		      const std::vector<double>          &old_old_temperature,
+		      const std::vector<Tensor<1,dim> >  &old_temperature_grads,
+		      const std::vector<Tensor<1,dim> >  &old_old_temperature_grads,
+		      const std::vector<Tensor<2,dim> >  &old_temperature_hessians,
+		      const std::vector<Tensor<2,dim> >  &old_old_temperature_hessians,
+		      const std::vector<Vector<double> > &present_stokes_values,
+		      const std::vector<double>          &gamma_values,
+		      const double                        global_u_infty,
+		      const double                        global_T_variation,
+		      const double                        global_Omega_diameter,
+		      const double                        cell_diameter,
+		      const double                        old_time_step);
 
     Triangulation<dim>        triangulation;
 
