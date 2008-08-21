@@ -52,6 +52,16 @@ namespace LACExceptions
 		  << "An error with error number " << arg1
 		  << " occured while calling a PETSc function");
   
+				   /**
+				    * An error of a Trilinos function was
+				    * encountered. Check the Trilinos
+				    * documentation for details.
+				    */
+  DeclException1 (ExcTrilinosError,
+		  int,
+		  << "An error with error number " << arg1
+		  << " occured while calling a Trilinos function");
+  
 				   //@}
 }
 
