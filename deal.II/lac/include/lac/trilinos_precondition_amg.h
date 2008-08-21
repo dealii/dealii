@@ -22,6 +22,12 @@
 
 
 #ifdef DEAL_II_USE_TRILINOS
+#ifdef DEAL_II_COMPILER_SUPPORTS_MPI
+#  include <Epetra_MpiComm.h>
+#  include <mpi.h>
+#else
+#  include <Epetra_SerialComm.h>
+#endif
 
 // some forward declarations
 namespace ML_Epetra
@@ -105,7 +111,11 @@ namespace TrilinosWrappers
 					*/
       boost::shared_ptr<ML_Epetra::MultiLevelPreconditioner> multigrid_operator;
 
+#ifdef DEAL_II_COMPILER_SUPPORTS_MPI
+      Epetra_MpiComm     communicator;
+#else
       Epetra_SerialComm  communicator;
+#endif
       boost::shared_ptr<Epetra_Map>       Map;
 
 				       /**

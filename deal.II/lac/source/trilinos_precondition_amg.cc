@@ -16,7 +16,9 @@
 #include <lac/vector.h>
 #include <lac/sparse_matrix.h>
 
-#include <Epetra_SerialComm.h>
+
+#ifdef DEAL_II_USE_TRILINOS
+
 #include <Epetra_Map.h>
 #include <Epetra_CrsMatrix.h>
 #include <Epetra_Vector.h>
@@ -24,16 +26,15 @@
 #include <ml_include.h>
 #include <ml_MultiLevelPreconditioner.h>
 
-
-
-#ifdef DEAL_II_USE_TRILINOS
-
 DEAL_II_NAMESPACE_OPEN
 
 namespace TrilinosWrappers
 {
 
-  PreconditionAMG::PreconditionAMG ()
+  PreconditionAMG::PreconditionAMG () :
+#ifdef DEAL_II_COMPILER_SUPPORTS_MPI
+    communicator (MPI_COMM_WORLD)
+#endif
   {}
 
 
@@ -57,7 +58,6 @@ namespace TrilinosWrappers
 	    ExcMessage ("Drop tolerance must be a non-negative number."));
   
     const unsigned int n_rows = matrix.m();
-    const SparsityPattern *sparsity_pattern = &(matrix.get_sparsity_pattern());
   
 				     // Init Epetra Matrix, avoid 
 				     // storing the nonzero elements.
