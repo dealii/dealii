@@ -217,7 +217,7 @@ class BlockIndices;
  * typically the case for 3d, or high polynomial degree computations, as well
  * as for hp finite element methods, see for example the @ref hp_paper "hp
  * paper". This is the case discussed in the hp tutorial program,
- * @ref step_27 "step-27".
+ * @ref step_27 "step-27", as well as in @ref step_31 "step-31".
  *
  * <li>There may not be a condense()
  * function for the matrix you use (this is, for example, the case
