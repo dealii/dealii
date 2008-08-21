@@ -437,6 +437,249 @@ namespace EquationData
 }
 
 
+namespace LinearSolvers
+{
+
+
+
+				   // @sect3{Linear solvers and preconditioners}
+
+				   // This section introduces some
+				   // objects that are used for the
+				   // solution of the linear equations of
+				   // Stokes system that we need to
+				   // solve in each time step. The basic
+				   // structure is still the same as
+				   // in step-20, where Schur complement
+				   // based preconditioners and solvers
+				   // have been introduced, with the 
+				   // actual interface taken from step-22.
+
+				   // @sect4{The <code>InverseMatrix</code> class template}
+
+				   // This class is an interface to
+				   // calculate the action of an
+				   // "inverted" matrix on a vector
+				   // (using the <code>vmult</code>
+				   // operation)
+				   // in the same way as the corresponding
+				   // function in step-22: when the
+				   // product of an object of this class
+				   // is requested, we solve a linear
+				   // equation system with that matrix
+				   // using the CG method, accelerated
+				   // by a preconditioner of (templated) class
+				   // <code>Preconditioner</code>.
+  template <class Matrix, class Preconditioner>
+  class InverseMatrix : public Subscriptor
+  {
+    public:
+      InverseMatrix (const Matrix         &m,
+		     const Preconditioner &preconditioner);
+
+      void vmult (Vector<double>       &dst,
+		  const Vector<double> &src) const;
+
+    private:
+      const SmartPointer<const Matrix> matrix;
+      const Preconditioner &preconditioner;
+  };
+
+
+  template <class Matrix, class Preconditioner>
+  InverseMatrix<Matrix,Preconditioner>::InverseMatrix (const Matrix &m,
+						       const Preconditioner &preconditioner)
+		  :
+		  matrix (&m),
+		  preconditioner (preconditioner)
+  {}
+
+
+
+  template <class Matrix, class Preconditioner>
+  void InverseMatrix<Matrix,Preconditioner>::vmult (Vector<double>       &dst,
+						    const Vector<double> &src) const
+  {
+    SolverControl solver_control (src.size(), 1e-6*src.l2_norm());
+    SolverCG<> cg (solver_control);
+
+    dst = 0;
+
+    try
+      {
+	cg.solve (*matrix, dst, src, preconditioner);
+      }
+    catch (std::exception &e)
+      {
+	Assert (false, ExcMessage(e.what()));
+      }
+  }
+
+				   // @sect4{Schur complement preconditioner}
+
+				   // This is the implementation
+				   // of the Schur complement
+				   // preconditioner as described
+				   // in the section on improved
+				   // solvers in step-22.
+				   // 
+				   // The basic 
+				   // concept of the preconditioner is 
+				   // different to the solution 
+				   // strategy used in step-20 and 
+				   // step-22. There, the Schur
+				   // complement was used for a 
+				   // two-stage solution of the linear
+				   // system. Recall that the process
+				   // in the Schur complement solver is
+				   // a Gaussian elimination of
+				   // a 2x2 block matrix, where each
+				   // block is solved iteratively. 
+				   // Here, the idea is to let 
+				   // an iterative solver act on the
+				   // whole system, and to use 
+				   // a Schur complement for 
+				   // preconditioning. As usual when
+				   // dealing with preconditioners, we
+				   // don't intend to exacly set up a 
+				   // Schur complement, but rather use
+				   // a good approximation to the
+				   // Schur complement for the purpose of
+				   // preconditioning.
+				   // 
+				   // So the question is how we can
+				   // obtain a good preconditioner.
+				   // Let's have a look at the 
+				   // preconditioner matrix <i>P</i>
+				   // acting on the block system, built
+				   // as
+				   // @f{eqnarray*}
+				   //   P^{-1}
+				   //   = 
+				   //   \left(\begin{array}{cc}
+				   //     A^{-1} & 0 \\ S^{-1} B A^{-1} & -S^{-1}
+				   //   \end{array}\right)
+				   // @f}
+				   // using the Schur complement 
+				   // $S = B A^{-1} B^T$. If we apply
+				   // this matrix in the solution of 
+				   // a linear system, convergence of
+				   // an iterative Krylov-based solver
+				   // will be governed by the matrix
+				   // @f{eqnarray*}
+				   //   P^{-1}\left(\begin{array}{cc}
+				   //     A & B^T \\ B & 0
+				   //   \end{array}\right) 
+				   //  = 
+				   //   \left(\begin{array}{cc}
+				   //     I & A^{-1} B^T \\ 0 & 0
+				   //   \end{array}\right),
+				   // @f}
+				   // which turns out to be very simple.
+				   // A GMRES solver based on exact
+				   // matrices would converge in two
+				   // iterations, since there are
+				   // only two distinct eigenvalues.
+				   // Such a preconditioner for the
+				   // blocked Stokes system has been 
+				   // proposed by Silvester and Wathen,
+				   // Fast iterative solution of 
+				   // stabilised Stokes systems part II. 
+				   // Using general block preconditioners.
+				   // (SIAM J. Numer. Anal., 31 (1994),
+				   // pp. 1352-1367).
+				   // 
+				   // The deal.II users who have already
+				   // gone through the step-20 and step-22 
+				   // tutorials can certainly imagine
+				   // how we're going to implement this.
+				   // We replace the inverse matrices
+				   // in $P^{-1}$ using the InverseMatrix
+				   // class, and the inverse Schur 
+				   // complement will be approximated
+				   // by the pressure mass matrix $M_p$.
+				   // Having this in mind, we define a
+				   // preconditioner class with a 
+				   // <code>vmult</code> functionality,
+				   // which is all we need for the
+				   // interaction with the usual solver
+				   // functions further below in the
+				   // program code.
+				   // 
+				   // First the declarations. These
+				   // are similar to the definition of
+				   // the Schur complement in step-20,
+				   // with the difference that we need
+				   // some more preconditioners in
+				   // the constructor.
+  template <class PreconditionerA, class PreconditionerMp>
+  class BlockSchurPreconditioner : public Subscriptor
+  {
+    public:
+      BlockSchurPreconditioner (const BlockSparseMatrix<double>         &S,
+				const InverseMatrix<SparseMatrix<double>,PreconditionerMp>  &Mpinv,
+				const PreconditionerA                   &Apreconditioner);
+
+      void vmult (BlockVector<double>       &dst,
+		  const BlockVector<double> &src) const;
+
+    private:
+      const SmartPointer<const BlockSparseMatrix<double> > stokes_matrix;
+      const SmartPointer<const InverseMatrix<SparseMatrix<double>,
+					     PreconditionerMp > > m_inverse;
+const PreconditionerA &a_preconditioner;
+
+mutable Vector<double> tmp;
+
+};
+
+
+
+  template <class PreconditionerA, class PreconditionerMp>
+  BlockSchurPreconditioner<PreconditionerA, PreconditionerMp>::
+  BlockSchurPreconditioner(const BlockSparseMatrix<double>                            &S,
+			   const InverseMatrix<SparseMatrix<double>,PreconditionerMp> &Mpinv,
+			   const PreconditionerA                                      &Apreconditioner)
+		  :
+		  stokes_matrix           (&S),
+		  m_inverse               (&Mpinv),
+		  a_preconditioner        (Apreconditioner),
+		  tmp                     (S.block(1,1).m())
+  {}
+
+
+				   // This is the <code>vmult</code>
+				   // function. We implement
+				   // the action of $P^{-1}$ as described
+				   // above in three successive steps.
+				   // The first step multiplies
+				   // the velocity vector by a 
+				   // preconditioner of the matrix <i>A</i>.
+				   // The resuling velocity vector
+				   // is then multiplied by $B$ and
+				   // subtracted from the pressure.
+				   // This second step only acts on 
+				   // the pressure vector and is 
+				   // accomplished by the command
+				   // SparseMatrix::residual. Next, 
+				   // we change the sign in the 
+				   // temporary pressure vector and
+				   // finally multiply by the pressure
+				   // mass matrix to get the final
+				   // pressure vector.
+  template <class PreconditionerA, class PreconditionerMp>
+  void BlockSchurPreconditioner<PreconditionerA, PreconditionerMp>::vmult (
+    BlockVector<double>       &dst,
+    const BlockVector<double> &src) const
+  {
+    a_preconditioner.vmult (dst.block(0), src.block(0));
+    stokes_matrix->block(1,0).residual(tmp, dst.block(0), src.block(1));
+    tmp *= -1;
+    m_inverse->vmult (dst.block(1), tmp);
+  }
+}
+
+
 
 				 // @sect3{The <code>BoussinesqFlowProblem</code> class template}
 
@@ -472,6 +715,20 @@ class BoussinesqFlowProblem
     void solve ();
     void output_results () const;
     void refine_mesh (const unsigned int max_grid_level);
+
+    static void compute_viscosity(const std::vector<double>          &old_temperature,
+				  const std::vector<double>          &old_old_temperature,
+				  const std::vector<Tensor<1,dim> >  &old_temperature_grads,
+				  const std::vector<Tensor<1,dim> >  &old_old_temperature_grads,
+				  const std::vector<Tensor<2,dim> >  &old_temperature_hessians,
+				  const std::vector<Tensor<2,dim> >  &old_old_temperature_hessians,
+				  const std::vector<Vector<double> > &present_stokes_values,
+				  const std::vector<double>          &gamma_values,
+				  const double                        global_u_infty,
+				  const double                        global_T_variation,
+				  const double                        global_Omega_diameter,
+				  const double                        cell_diameter,
+				  const double                        old_time_step);
 
     Triangulation<dim>        triangulation;
 
@@ -509,254 +766,13 @@ class BoussinesqFlowProblem
     double old_time_step;
     unsigned int timestep_number;
 
-    boost::shared_ptr<PreconditionerTrilinosAmg>  Amg_preconditioner;
-    boost::shared_ptr<SparseILU<double> > Mp_preconditioner;
+    boost::shared_ptr<LinearSolversPreconditionerTrilinosAmg>  Amg_preconditioner;
+    boost::shared_ptr<SparseILU<double> >                      Mp_preconditioner;
 
     bool rebuild_stokes_matrix;
     bool rebuild_temperature_matrices;
     bool rebuild_stokes_preconditioner;
 };
-
-
-
-
-
-				 // @sect3{Linear solvers and preconditioners}
-
-				 // This section introduces some
-				 // objects that are used for the
-				 // solution of the linear equations of
-				 // Stokes system that we need to
-				 // solve in each time step. The basic
-				 // structure is still the same as
-				 // in step-20, where Schur complement
-				 // based preconditioners and solvers
-				 // have been introduced, with the 
-				 // actual interface taken from step-22.
-
-				 // @sect4{The <code>InverseMatrix</code> class template}
-
-				 // This class is an interface to
-				 // calculate the action of an
-				 // "inverted" matrix on a vector
-				 // (using the <code>vmult</code>
-				 // operation)
-				 // in the same way as the corresponding
-				 // function in step-22: when the
-				 // product of an object of this class
-				 // is requested, we solve a linear
-				 // equation system with that matrix
-				 // using the CG method, accelerated
-				 // by a preconditioner of (templated) class
-				 // <code>Preconditioner</code>.
-template <class Matrix, class Preconditioner>
-class InverseMatrix : public Subscriptor
-{
-  public:
-    InverseMatrix (const Matrix         &m,
-		   const Preconditioner &preconditioner);
-
-    void vmult (Vector<double>       &dst,
-                const Vector<double> &src) const;
-
-  private:
-    const SmartPointer<const Matrix> matrix;
-    const Preconditioner &preconditioner;
-};
-
-
-template <class Matrix, class Preconditioner>
-InverseMatrix<Matrix,Preconditioner>::InverseMatrix (const Matrix &m,
-						     const Preconditioner &preconditioner)
-                :
-                matrix (&m),
-		preconditioner (preconditioner)
-{}
-
-
-
-template <class Matrix, class Preconditioner>
-void InverseMatrix<Matrix,Preconditioner>::vmult (Vector<double>       &dst,
-						  const Vector<double> &src) const
-{
-  SolverControl solver_control (src.size(), 1e-6*src.l2_norm());
-  SolverCG<> cg (solver_control);
-
-  dst = 0;
-
-  try
-    {
-      cg.solve (*matrix, dst, src, preconditioner);
-    }
-  catch (std::exception &e)
-    {
-      Assert (false, ExcMessage(e.what()));
-    }
-}
-
-				 // @sect4{Schur complement preconditioner}
-
-				 // This is the implementation
-				 // of the Schur complement
-				 // preconditioner as described
-				 // in the section on improved
-				 // solvers in step-22.
-				 // 
-				 // The basic 
-				 // concept of the preconditioner is 
-				 // different to the solution 
-				 // strategy used in step-20 and 
-				 // step-22. There, the Schur
-				 // complement was used for a 
-				 // two-stage solution of the linear
-				 // system. Recall that the process
-				 // in the Schur complement solver is
-				 // a Gaussian elimination of
-				 // a 2x2 block matrix, where each
-				 // block is solved iteratively. 
-				 // Here, the idea is to let 
-				 // an iterative solver act on the
-				 // whole system, and to use 
-				 // a Schur complement for 
-				 // preconditioning. As usual when
-				 // dealing with preconditioners, we
-				 // don't intend to exacly set up a 
-				 // Schur complement, but rather use
-				 // a good approximation to the
-				 // Schur complement for the purpose of
-				 // preconditioning.
-				 // 
-				 // So the question is how we can
-				 // obtain a good preconditioner.
-				 // Let's have a look at the 
-				 // preconditioner matrix <i>P</i>
-				 // acting on the block system, built
-				 // as
-				 // @f{eqnarray*}
-				 //   P^{-1}
-				 //   = 
-				 //   \left(\begin{array}{cc}
-				 //     A^{-1} & 0 \\ S^{-1} B A^{-1} & -S^{-1}
-				 //   \end{array}\right)
-				 // @f}
-				 // using the Schur complement 
-				 // $S = B A^{-1} B^T$. If we apply
-				 // this matrix in the solution of 
-				 // a linear system, convergence of
-				 // an iterative Krylov-based solver
-				 // will be governed by the matrix
-				 // @f{eqnarray*}
-				 //   P^{-1}\left(\begin{array}{cc}
-				 //     A & B^T \\ B & 0
-				 //   \end{array}\right) 
- 				 //  = 
-				 //   \left(\begin{array}{cc}
-				 //     I & A^{-1} B^T \\ 0 & 0
-				 //   \end{array}\right),
-				 // @f}
-				 // which turns out to be very simple.
-				 // A GMRES solver based on exact
-				 // matrices would converge in two
-				 // iterations, since there are
-				 // only two distinct eigenvalues.
-				 // Such a preconditioner for the
-				 // blocked Stokes system has been 
-				 // proposed by Silvester and Wathen,
-				 // Fast iterative solution of 
-				 // stabilised Stokes systems part II. 
-				 // Using general block preconditioners.
-				 // (SIAM J. Numer. Anal., 31 (1994),
-				 // pp. 1352-1367).
-				 // 
-				 // The deal.II users who have already
-				 // gone through the step-20 and step-22 
-				 // tutorials can certainly imagine
-				 // how we're going to implement this.
-				 // We replace the inverse matrices
-				 // in $P^{-1}$ using the InverseMatrix
-				 // class, and the inverse Schur 
-				 // complement will be approximated
-				 // by the pressure mass matrix $M_p$.
-				 // Having this in mind, we define a
-				 // preconditioner class with a 
-				 // <code>vmult</code> functionality,
-				 // which is all we need for the
-				 // interaction with the usual solver
-				 // functions further below in the
-				 // program code.
-				 // 
-				 // First the declarations. These
-				 // are similar to the definition of
-				 // the Schur complement in step-20,
-				 // with the difference that we need
-				 // some more preconditioners in
-				 // the constructor.
-template <class PreconditionerA, class PreconditionerMp>
-class BlockSchurPreconditioner : public Subscriptor
-{
-  public:
-    BlockSchurPreconditioner (const BlockSparseMatrix<double>         &S,
-          const InverseMatrix<SparseMatrix<double>,PreconditionerMp>  &Mpinv,
-          const PreconditionerA &Apreconditioner);
-
-  void vmult (BlockVector<double>       &dst,
-              const BlockVector<double> &src) const;
-
-  private:
-    const SmartPointer<const BlockSparseMatrix<double> > stokes_matrix;
-    const SmartPointer<const InverseMatrix<SparseMatrix<double>,
-                       PreconditionerMp > > m_inverse;
-    const PreconditionerA &a_preconditioner;
-
-    mutable Vector<double> tmp;
-
-};
-
-template <class PreconditionerA, class PreconditionerMp>
-BlockSchurPreconditioner<PreconditionerA, PreconditionerMp>::BlockSchurPreconditioner(
-          const BlockSparseMatrix<double>                            &S,
-          const InverseMatrix<SparseMatrix<double>,PreconditionerMp> &Mpinv,
-          const PreconditionerA &Apreconditioner
-          )
-                :
-                stokes_matrix           (&S),
-                m_inverse               (&Mpinv),
-                a_preconditioner        (Apreconditioner),
-                tmp                     (S.block(1,1).m())
-{
-}
-
-
-				 // This is the <code>vmult</code>
-				 // function. We implement
-				 // the action of $P^{-1}$ as described
-				 // above in three successive steps.
-				 // The first step multiplies
-				 // the velocity vector by a 
-				 // preconditioner of the matrix <i>A</i>.
-				 // The resuling velocity vector
-				 // is then multiplied by $B$ and
-				 // subtracted from the pressure.
-				 // This second step only acts on 
-				 // the pressure vector and is 
-				 // accomplished by the command
-				 // SparseMatrix::residual. Next, 
-				 // we change the sign in the 
-				 // temporary pressure vector and
-				 // finally multiply by the pressure
-				 // mass matrix to get the final
-				 // pressure vector.
-template <class PreconditionerA, class PreconditionerMp>
-void BlockSchurPreconditioner<PreconditionerA, PreconditionerMp>::vmult (
-                                     BlockVector<double>       &dst,
-                                     const BlockVector<double> &src) const
-{
-  a_preconditioner.vmult (dst.block(0), src.block(0));
-  stokes_matrix->block(1,0).residual(tmp, dst.block(0), src.block(1));
-  tmp *= -1;
-  m_inverse->vmult (dst.block(1), tmp);
-}
-
 
 
 				 // @sect3{BoussinesqFlowProblem class implementation}
@@ -796,6 +812,151 @@ BoussinesqFlowProblem<dim>::BoussinesqFlowProblem (const unsigned int degree)
 		rebuild_temperature_matrices (true),
 		rebuild_stokes_preconditioner (true)
 {}
+
+
+
+				 // @sect4{BoussinesqFlowProblem::get_maximal_velocity}
+template <int dim>
+double BoussinesqFlowProblem<dim>::get_maximal_velocity () const
+{
+  const QGauss<dim>  quadrature_formula(stokes_degree+2);
+  const unsigned int n_q_points = quadrature_formula.size();
+
+  FEValues<dim> fe_values (stokes_fe, quadrature_formula, update_values);
+  std::vector<Vector<double> > stokes_values(n_q_points,
+					     Vector<double>(dim+1));
+  double max_velocity = 0;
+
+  typename DoFHandler<dim>::active_cell_iterator
+    cell = stokes_dof_handler.begin_active(),
+    endc = stokes_dof_handler.end();
+  for (; cell!=endc; ++cell)
+    {
+      fe_values.reinit (cell);
+      fe_values.get_function_values (stokes_solution, stokes_values);
+
+      for (unsigned int q=0; q<n_q_points; ++q)
+        {
+          Tensor<1,dim> velocity;
+          for (unsigned int i=0; i<dim; ++i)
+            velocity[i] = stokes_values[q](i);
+
+          max_velocity = std::max (max_velocity, velocity.norm());
+        }
+    }
+
+  return max_velocity;
+}
+
+
+
+
+				 // @sect4{BoussinesqFlowProblem::get_extrapolated_temperature_range}
+template <int dim>
+std::pair<double,double>
+BoussinesqFlowProblem<dim>::get_extrapolated_temperature_range () const
+{
+  QGauss<dim>   quadrature_formula(temperature_degree+2);
+  const unsigned int   n_q_points = quadrature_formula.size();
+
+  FEValues<dim> fe_values (temperature_fe, quadrature_formula,
+                           update_values);
+  std::vector<double> old_temperature_values(n_q_points);
+  std::vector<double> old_old_temperature_values(n_q_points);
+  
+  double min_temperature = (1. + time_step/old_time_step) *
+			   old_temperature_solution.linfty_norm()
+			   +
+			   time_step/old_time_step *
+			   old_old_temperature_solution.linfty_norm(),
+	 max_temperature = -min_temperature;
+
+  typename DoFHandler<dim>::active_cell_iterator
+    cell = temperature_dof_handler.begin_active(),
+    endc = temperature_dof_handler.end();
+  for (; cell!=endc; ++cell)
+    {
+      fe_values.reinit (cell);
+      fe_values.get_function_values (old_temperature_solution, old_temperature_values);
+      fe_values.get_function_values (old_old_temperature_solution, old_old_temperature_values);
+
+      for (unsigned int q=0; q<n_q_points; ++q)
+        {
+          const double temperature = 
+	    (1. + time_step/old_time_step) * old_temperature_values[q]-
+	    time_step/old_time_step * old_old_temperature_values[q];
+
+          min_temperature = std::min (min_temperature, temperature);
+	  max_temperature = std::max (max_temperature, temperature);
+        }
+    }
+
+  return std::make_pair(min_temperature, max_temperature);
+}
+
+
+
+template <int dim>
+double
+BoussinesqFlowProblem<dim>::
+compute_viscosity(const std::vector<double>          &old_temperature,
+		  const std::vector<double>          &old_old_temperature,
+		  const std::vector<Tensor<1,dim> >  &old_temperature_grads,
+		  const std::vector<Tensor<1,dim> >  &old_old_temperature_grads,
+		  const std::vector<Tensor<2,dim> >  &old_temperature_hessians,
+		  const std::vector<Tensor<2,dim> >  &old_old_temperature_hessians,
+		  const std::vector<Vector<double> > &present_stokes_values,
+		  const std::vector<double>          &gamma_values,
+		  const double                        global_u_infty,
+		  const double                        global_T_variation,
+		  const double                        global_Omega_diameter,
+		  const double                        cell_diameter,
+		  const double                        old_time_step)
+{
+  const double beta = 0.03;
+  const double alpha = 1;
+  
+  if (global_u_infty == 0)
+    return 5e-3 * cell_diameter;
+  
+  const unsigned int n_q_points = old_temperature.size();
+  
+				   // Stage 1: calculate residual
+  double max_residual = 0;
+  double max_velocity = 0;
+  
+  for (unsigned int q=0; q < n_q_points; ++q)
+    {
+      Tensor<1,dim> u;
+      for (unsigned int d=0; d<dim; ++d)
+	u[d] = present_stokes_values[q](d);
+      
+      const double dT_dt = (old_temperature[q] - old_old_temperature[q])
+			   / old_time_step;
+      const double u_grad_T = u * (old_temperature_grads[q] +
+				   old_old_temperature_grads[q]) / 2;
+      
+      const double kappa_Delta_T = EquationData::kappa
+				   * (trace(old_temperature_hessians[q]) +
+				      trace(old_old_temperature_hessians[q])) / 2;
+
+      const double residual
+	= std::abs((dT_dt + u_grad_T - kappa_Delta_T - gamma_values[q]) *
+		   std::pow((old_temperature[q]+old_old_temperature[q]) / 2,
+			    alpha-1.));
+
+      max_residual = std::max (residual,        max_residual);
+      max_velocity = std::max (std::sqrt (u*u), max_velocity);
+    }
+  
+  const double global_scaling = global_u_infty * global_T_variation /
+				std::pow(global_Omega_diameter, alpha - 2.);
+
+  return (beta *
+	  max_velocity *
+	  std::min (cell_diameter,
+		    std::pow(cell_diameter,alpha) * max_residual / global_scaling));
+}
 
 
 
@@ -1269,9 +1430,8 @@ BoussinesqFlowProblem<dim>::build_stokes_preconditioner ()
 				   // copied over to Trilinos. we need to
 				   // keep the (1,1) block, though
       
-  Mp_preconditioner
-    = boost::shared_ptr<SparseILU<double> >
-    (new SparseILU<double>);
+  Mp_preconditioner = boost::shared_ptr<SparseILU<double> >
+		      (new SparseILU<double>);
   Mp_preconditioner->initialize (stokes_preconditioner_matrix.block(1,1),
 				 SparseILU<double>::AdditionalData());
       
@@ -1592,68 +1752,6 @@ void BoussinesqFlowProblem<dim>::assemble_stokes_system ()
 
 
 
-template <int dim>
-double compute_viscosity(
-  const std::vector<double>          &old_temperature,
-  const std::vector<double>          &old_old_temperature,
-  const std::vector<Tensor<1,dim> >  &old_temperature_grads,
-  const std::vector<Tensor<1,dim> >  &old_old_temperature_grads,
-  const std::vector<Tensor<2,dim> >  &old_temperature_hessians,
-  const std::vector<Tensor<2,dim> >  &old_old_temperature_hessians,
-  const std::vector<Vector<double> > &present_stokes_values,
-  const std::vector<double>          &gamma_values,
-  const double                        global_u_infty,
-  const double                        global_T_variation,
-  const double                        global_Omega_diameter,
-  const double                        cell_diameter,
-  const double                        old_time_step
-)
-{
-  const double beta = 0.03;
-  const double alpha = 1;
-  
-  if (global_u_infty == 0)
-    return 5e-3 * cell_diameter;
-  
-  const unsigned int n_q_points = old_temperature.size();
-  
-				   // Stage 1: calculate residual
-  double max_residual = 0;
-  double max_velocity = 0;
-  
-  for (unsigned int q=0; q < n_q_points; ++q)
-    {
-      Tensor<1,dim> u;
-      for (unsigned int d=0; d<dim; ++d)
-	u[d] = present_stokes_values[q](d);
-      
-      const double dT_dt = (old_temperature[q] - old_old_temperature[q])
-			   / old_time_step;
-      const double u_grad_T = u * (old_temperature_grads[q] +
-				   old_old_temperature_grads[q]) / 2;
-      
-      const double kappa_Delta_T = EquationData::kappa
-				   * (trace(old_temperature_hessians[q]) +
-				      trace(old_old_temperature_hessians[q])) / 2;
-
-      const double residual
-	= std::abs((dT_dt + u_grad_T - kappa_Delta_T - gamma_values[q]) *
-		   std::pow((old_temperature[q]+old_old_temperature[q]) / 2,
-			    alpha-1.));
-
-      max_residual = std::max (residual,        max_residual);
-      max_velocity = std::max (std::sqrt (u*u), max_velocity);
-    }
-  
-  const double global_scaling = global_u_infty * global_T_variation /
-				std::pow(global_Omega_diameter, alpha - 2.);
-
-  return (beta *
-	  max_velocity *
-	  std::min (cell_diameter,
-		    std::pow(cell_diameter,alpha) * max_residual / global_scaling));
-}
-
 
 
 				 // @sect4{BoussinesqFlowProblem::assemble_temperature_system}
@@ -1856,28 +1954,27 @@ void BoussinesqFlowProblem<dim>::assemble_temperature_system ()
       temperature_fe_values.reinit (cell);
       stokes_fe_values.reinit (stokes_cell);
 
-      temperature_fe_values.get_function_values (old_temperature_solution, old_temperature_values);
-      temperature_fe_values.get_function_values (old_old_temperature_solution, old_old_temperature_values);
+      temperature_fe_values.get_function_values (old_temperature_solution,
+						 old_temperature_values);
+      temperature_fe_values.get_function_values (old_old_temperature_solution,
+						 old_old_temperature_values);
 
-      temperature_fe_values.get_function_gradients (old_temperature_solution, old_temperature_grads);
-      temperature_fe_values.get_function_gradients (old_old_temperature_solution, old_old_temperature_grads);
+      temperature_fe_values.get_function_gradients (old_temperature_solution,
+						    old_temperature_grads);
+      temperature_fe_values.get_function_gradients (old_old_temperature_solution,
+						    old_old_temperature_grads);
       
-      temperature_fe_values.get_function_hessians (old_temperature_solution, old_temperature_hessians);
-      temperature_fe_values.get_function_hessians (old_old_temperature_solution, old_old_temperature_hessians);
+      temperature_fe_values.get_function_hessians (old_temperature_solution,
+						   old_temperature_hessians);
+      temperature_fe_values.get_function_hessians (old_old_temperature_solution,
+						   old_old_temperature_hessians);
       
       temperature_right_hand_side.value_list (temperature_fe_values.get_quadrature_points(),
 					      gamma_values);
 
-      stokes_fe_values.get_function_values (stokes_solution, present_stokes_values);
+      stokes_fe_values.get_function_values (stokes_solution,
+					    present_stokes_values);
       
-				       // build matrix contributions
-
-				       // define diffusion. take the
-				       // maximum of what we really
-				       // want and the minimal amount
-				       // of diffusion (determined
-				       // impirically) to keep the
-				       // scheme stable
       const double nu
 	= compute_viscosity (old_temperature_values,
 			     old_old_temperature_values,
@@ -2189,87 +2286,6 @@ void BoussinesqFlowProblem<dim>::refine_mesh (const unsigned int max_grid_level)
   rebuild_stokes_matrix         = true;
   rebuild_temperature_matrices  = true;
   rebuild_stokes_preconditioner = true;
-}
-
-
-
-				 // @sect4{BoussinesqFlowProblem::get_maximal_velocity}
-template <int dim>
-double BoussinesqFlowProblem<dim>::get_maximal_velocity () const
-{
-  const QGauss<dim>  quadrature_formula(stokes_degree+2);
-  const unsigned int n_q_points = quadrature_formula.size();
-
-  FEValues<dim> fe_values (stokes_fe, quadrature_formula, update_values);
-  std::vector<Vector<double> > stokes_values(n_q_points,
-					     Vector<double>(dim+1));
-  double max_velocity = 0;
-
-  typename DoFHandler<dim>::active_cell_iterator
-    cell = stokes_dof_handler.begin_active(),
-    endc = stokes_dof_handler.end();
-  for (; cell!=endc; ++cell)
-    {
-      fe_values.reinit (cell);
-      fe_values.get_function_values (stokes_solution, stokes_values);
-
-      for (unsigned int q=0; q<n_q_points; ++q)
-        {
-          Tensor<1,dim> velocity;
-          for (unsigned int i=0; i<dim; ++i)
-            velocity[i] = stokes_values[q](i);
-
-          max_velocity = std::max (max_velocity, velocity.norm());
-        }
-    }
-
-  return max_velocity;
-}
-
-
-
-
-				 // @sect4{BoussinesqFlowProblem::get_extrapolated_temperature_range}
-template <int dim>
-std::pair<double,double>
-BoussinesqFlowProblem<dim>::get_extrapolated_temperature_range () const
-{
-  QGauss<dim>   quadrature_formula(temperature_degree+2);
-  const unsigned int   n_q_points = quadrature_formula.size();
-
-  FEValues<dim> fe_values (temperature_fe, quadrature_formula,
-                           update_values);
-  std::vector<double> old_temperature_values(n_q_points);
-  std::vector<double> old_old_temperature_values(n_q_points);
-  
-  double min_temperature = (1. + time_step/old_time_step) *
-			   old_temperature_solution.linfty_norm()
-			   +
-			   time_step/old_time_step *
-			   old_old_temperature_solution.linfty_norm(),
-	 max_temperature = -min_temperature;
-
-  typename DoFHandler<dim>::active_cell_iterator
-    cell = temperature_dof_handler.begin_active(),
-    endc = temperature_dof_handler.end();
-  for (; cell!=endc; ++cell)
-    {
-      fe_values.reinit (cell);
-      fe_values.get_function_values (old_temperature_solution, old_temperature_values);
-      fe_values.get_function_values (old_old_temperature_solution, old_old_temperature_values);
-
-      for (unsigned int q=0; q<n_q_points; ++q)
-        {
-          const double temperature = 
-	    (1. + time_step/old_time_step) * old_temperature_values[q]-
-	    time_step/old_time_step * old_old_temperature_values[q];
-
-          min_temperature = std::min (min_temperature, temperature);
-	  max_temperature = std::max (max_temperature, temperature);
-        }
-    }
-
-  return std::make_pair(min_temperature, max_temperature);
 }
 
 
