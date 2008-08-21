@@ -37,19 +37,21 @@ namespace TrilinosWrappers
   {}
 
 
+  
   PreconditionAMG::~PreconditionAMG ()
   {}
 
   
-  void PreconditionAMG::initialize (
-    const dealii::SparseMatrix<double> &matrix,
-    const std::vector<double>  &null_space,
-    const unsigned int          null_space_dimension,
-    const bool                  elliptic,
-    const bool                  higher_order_elements,
-    const bool                  output_details,
-    const double                drop_tolerance
-  )
+  
+  void
+  PreconditionAMG::
+  initialize (const dealii::SparseMatrix<double> &matrix,
+	      const std::vector<double>  &null_space,
+	      const unsigned int          null_space_dimension,
+	      const bool                  elliptic,
+	      const bool                  higher_order_elements,
+	      const bool                  output_details,
+	      const double                drop_tolerance)
   {
     Assert (drop_tolerance >= 0,
 	    ExcMessage ("Drop tolerance must be a non-negative number."));
