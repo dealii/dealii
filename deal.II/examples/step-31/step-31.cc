@@ -59,6 +59,10 @@
 #include <fstream>
 #include <sstream>
 
+#ifdef DEAL_II_COMPILER_SUPPORT_MPI
+#include <mpi.h>
+#endif
+
                                  // This is Trilinos
 
 				 // Next, we import all deal.II
@@ -2150,8 +2154,12 @@ void BoussinesqFlowProblem<dim>::run ()
 
 
 				 // @sect3{The <code>main</code> function}
-int main ()
+int main (int argc, char *argv[])
 {
+#ifdef DEAL_II_COMPILER_SUPPORTS_MPI
+  MPI_Init (&argc,&argv);
+#endif
+  
   try
     {
       deallog.depth_console (0);
@@ -2183,6 +2191,10 @@ int main ()
                 << std::endl;
       return 1;
     }
+    
+#ifdef DEAL_II_COMPILER_SUPPORTS_MPI
+  MPI_Finalize();
+#endif
 
   return 0;
 }
