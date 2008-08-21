@@ -101,6 +101,20 @@ namespace TrilinosWrappers
 
 
   void
+  Vector::reinit (const Vector &v)
+  {
+    vector.reset();
+    
+    if (!map.SameAs(v.map))
+      map = v.map;
+    
+    vector = std::auto_ptr<Epetra_FEVector> (new Epetra_FEVector(*v.vector));
+    last_action = Insert;
+  }
+
+
+
+  void
   Vector::clear ()
   {
                                      // When we clear the matrix,

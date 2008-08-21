@@ -377,6 +377,13 @@ namespace TrilinosWrappers
 				        */
       void reinit (const Epetra_Map &input_map);
 
+				       /** 
+				        * Reinit functionality. This function
+				        * copies the vector v to the current
+				        * one.
+				        */
+      void reinit (const Vector &v);
+
                                        /**
                                         * Release all memory and return
                                         * to a state just like after
@@ -416,6 +423,12 @@ namespace TrilinosWrappers
                                         * be disallowed in the future.
                                         */
       Vector & operator = (const TrilinosScalar s);
+
+                                       /**
+                                        * Copy the given vector. Resize the
+                                        * present vector if necessary.
+                                        */
+      Vector & operator = (const Vector &v);
 
                                        /**
                                         * Test for equality. This function
@@ -971,6 +984,19 @@ namespace TrilinosWrappers
     std::pair<unsigned int, unsigned int> range = local_range();
 
     return ((index >= range.first) && (index <  range.second));
+  }
+
+
+
+  inline
+  Vector &
+  Vector::operator = (const Vector &v)
+  {
+				    // if the vectors have different sizes,
+				    // then first resize the present one
+    reinit (v);
+    
+    return *this;
   }
 
 
