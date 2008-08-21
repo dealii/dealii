@@ -476,8 +476,6 @@ class BoussinesqFlowProblem
     Triangulation<dim>        triangulation;
 
     const unsigned int        stokes_degree;
-    const unsigned int        temperature_degree;
-    
     FESystem<dim>             stokes_fe;
     DoFHandler<dim>           stokes_dof_handler;
     ConstraintMatrix          stokes_constraints;
@@ -491,6 +489,7 @@ class BoussinesqFlowProblem
     BlockVector<double>       stokes_rhs;
 
     
+    const unsigned int        temperature_degree;    
     FE_Q<dim>                 temperature_fe;
     DoFHandler<dim>           temperature_dof_handler;
     ConstraintMatrix          temperature_constraints;
@@ -780,13 +779,16 @@ template <int dim>
 BoussinesqFlowProblem<dim>::BoussinesqFlowProblem (const unsigned int degree)
                 :
 		triangulation (Triangulation<dim>::maximum_smoothing),
-                stokes_degree (degree),
-		temperature_degree (degree),
+
+                stokes_degree (1),
                 stokes_fe (FE_Q<dim>(stokes_degree+1), dim,
 			   FE_Q<dim>(stokes_degree), 1),
 		stokes_dof_handler (triangulation),
+
+		temperature_degree (2),
 		temperature_fe (temperature_degree),
                 temperature_dof_handler (triangulation),
+
                 time_step (0),
 		old_time_step (0),
 		timestep_number (0),
@@ -1607,7 +1609,7 @@ double compute_viscosity(
   const double                        old_time_step
 )
 {
-  const double beta = 0.1;
+  const double beta = 0.03;
   const double alpha = 1;
   
   if (global_u_infty == 0)
@@ -2017,13 +2019,11 @@ void BoussinesqFlowProblem<dim>::solve ()
     stokes_constraints.distribute (stokes_solution);
   }
 
-				   // TODO: determine limit of stability for
-				   // the time step (whether it needs to be /4
-				   // or whether we could get away with a
-				   // bigger time step)
   old_time_step = time_step;    
-  time_step = GridTools::minimal_cell_diameter(triangulation) /
-              std::max (get_maximal_velocity(), .01) / 4;
+  time_step = 1./4. /
+	      temperature_degree *
+	      GridTools::minimal_cell_diameter(triangulation) /
+              std::max (get_maximal_velocity(), .01);
   
   temperature_solution = old_temperature_solution;
 

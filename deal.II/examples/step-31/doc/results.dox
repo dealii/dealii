@@ -35,7 +35,7 @@ temperature. Below we'll discuss a few numerical experiments to choose
 constants. 
 
 
-<h5> Choosing <i>c<sub>k</sub></i> and &beta; </h5>
+<h4> Choosing <i>c<sub>k</sub></i> and &beta; </h4>
 
 These two constants are definitely linked in some way. The reason is easy to
 see: In the case of a pure advection problem, 
@@ -80,7 +80,12 @@ in the domain. What we expect to see is this: If we choose the time step too
 big (i.e. choose a $c_k$ bigger than theoretically allowed) then we will get
 exponential growth of the temperature. If we choose $\beta$ too small, then
 the transport stabilization becomes insufficient and the solution will show
-significant oscillations but not exponential growth. Here is what we get for
+significant oscillations but not exponential growth. 
+
+
+<h5>Results for Q<sub>1</sub> elements</h5>
+
+Here is what we get for
 $\beta=0.01, \beta=0.1$, and $\beta=0.5$, different choices of $c_k$, and
 bilinear elements (<code>temperature_degree=1</code>) in 2d:
 
@@ -110,6 +115,8 @@ variations, but if we choose
 $k=\frac 18\frac{h_K}{\|\mathbf{u}\|_{L^\infty(K)}}$ 
 or smaller, then the scheme is 
 stable though a bit wobbly. For more artificial diffusion, we can choose 
+$k=\frac 14\frac{h_K}{\|\mathbf{u}\|_{L^\infty(K)}}$ 
+or smaller for $\beta=0.03$,
 $k=\frac 13\frac{h_K}{\|\mathbf{u}\|_{L^\infty(K)}}$ 
 or smaller for $\beta=0.1$, and again need
 $k=\frac 1{15}\frac{h_K}{\|\mathbf{u}\|_{L^\infty(K)}}$ 
@@ -117,7 +124,7 @@ for $\beta=0.5$ (this time because much diffusion requires a small time
 step). 
 
 So how to choose? If we were simply interested in a large time step, then we
-would go with $\beta=...$ and
+would go with $\beta=0.1$ and
 $k=\frac 13\frac{h_K}{\|\mathbf{u}\|_{L^\infty(K)}}$.
 On the other hand, we're also interested in accuracy and here it may be of
 interest to actually investigate what these curves show. To this end note that
@@ -144,6 +151,74 @@ the maximum temperature is reached, it hardly changes any more. On the other
 hand, the larger the artificial diffusion, the more the hot spot is
 diffused. Note that for this criterion, the time step size does not play a
 significant role.
+
+So to sum up, likely the best choice would appear to be $\beta=0.03$
+and $k=\frac 14\frac{h_K}{\|\mathbf{u}\|_{L^\infty(K)}}$. The curve is
+a bit wobbly, but overall pictures looks pretty reasonable with the
+exception of some over and undershoots close to the start time due to
+Gibb's phenomenon.
+
+
+<h5>Results for Q<sub>2</sub> elements</h5>
+
+One can repeat the same sequence of experiments for higher order
+elements as well. Here are the graphs for bi-quadratic shape functions
+(<code>temperature_degree=2</code>) for the temperature, while we
+retain the $Q_2/Q_1$ stable Taylor-Hood element for the Stokes system:
+
+<table align="center" border="1" cellspacing="3" cellpadding="3">
+  <tr>
+    <td>
+        @image html "step-33.timestep.q2.beta=0.01.png" "" width=4cm
+    </td>
+    <td>
+        @image html "step-33.timestep.q2.beta=0.03.png" "" width=4cm
+    </td>
+  </tr>
+
+  <tr>
+    <td>
+        @image html "step-33.timestep.q2.beta=0.1.png" "" width=4cm
+    </td>
+  </tr>
+</table>
+
+Again, small values of $\beta$ lead to less diffusion but we have to
+choose the time step very small to keep things under control. Too
+large values of $\beta$ make for more diffusion, but again require
+small time steps. The best value would appear to be $\beta=0.03$, as
+for the $Q_1$ element, and the we have to choose 
+$k=\frac 18\frac{h_K}{\|\mathbf{u}\|_{L^\infty(K)}}$ &mdash; exactly
+half the size for the $Q_1$ element, a fact that may not be surprising
+if we state the CFL condition as the requirement that the time step be
+small enough so that the distance transport advects in each time step
+is no longer than one <i>grid point</i> away (which for $Q_1$ elements
+is $h_K$, but for $Q_2$ elements is $h_K/2$).
+
+
+<h5>Conclusions</h5>
+
+Concluding, $\beta=0.03$ appears to be a good choice for the
+stabilization parameter, and then 
+$k=\frac 14 \frac 1{q_T}\frac{h_K}{\|\mathbf{u}\|_{L^\infty(K)}}$
+is an appropriate time step, where $q_T$ is the polynomial degree of
+the temperature shape functions (in the program, this corresponds to
+the variable <code>temperature_degree</code>).
+
+As for the question of whether to use $Q_1$ or $Q_2$ elements for the
+temperature, the following considerations may be useful: First,
+solving the temperature equation is hardly a factor in the overall
+scheme since almost the entire compute time goes into solving the
+Stokes system in each time step. Higher order elements for the
+temperature equation are therefore not a significant drawback. On the
+other hand, if one compares the size of the over- and undershoots the
+solution produces due to the discontinuous source description, one
+notices that for the choice of $\beta$ and $k$ as above, the $Q_1$
+solution dips down to around $-0.47$, whereas the $Q_2$ solution only
+goes to $-0.13$ (remember that the exact solution should never become
+negative at all. This means that the $Q_2$ solution is significantly
+more accurate; the program therefore uses these higher order elements,
+despite the penalty we pay in terms of smaller time steps.
 
 
 <h3> Possible extensions </h3>
