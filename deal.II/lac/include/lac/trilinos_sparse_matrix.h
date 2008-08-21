@@ -337,29 +337,52 @@ namespace TrilinosWrappers
 		    const std::vector<unsigned int> &n_entries_per_row);
 
                                        /**
+                                        * This function is similar to the
+				        * one above, but it now takes two
+				        * different Epetra maps for rows
+				        * and columns. This interface is
+				        * meant to be used for generating
+				        * rectangular matrices, where one
+				        * map specifies the parallel 
+				        * distribution of rows and the other
+				        * the one of the columns. This is
+				        * in contrast to the first 
+				        * constructor, where the same map
+				        * is used for both the number of 
+				        * rows and the number of columns.
+				        * The number
+				        * of columns per row is specified
+				        * by the maximum number of entries.
+                                        */
+      SparseMatrix (const Epetra_Map   &InputRowMap,
+		    const Epetra_Map   &InputColMap,
+		    const unsigned int  n_max_entries_per_row);
+
+                                       /**
+                                        * This function is similar to the
+				        * one above, but it now takes two
+				        * different Epetra maps for rows
+				        * and columns. This interface is
+				        * meant to be used for generating
+				        * rectangular matrices, where one
+				        * map specifies the parallel 
+				        * distribution of rows and the other
+				        * the one of the columns. The 
+				        * vector n_entries_per_row specifies
+				        * the number of entries in each 
+				        * row of the newly generated matrix.
+                                        */
+      SparseMatrix (const Epetra_Map                &InputRowMap,
+		    const Epetra_Map                &InputColMap,
+		    const std::vector<unsigned int> &n_entries_per_row);
+
+                                       /**
                                         * Destructor. Made virtual so that one
                                         * can use pointers to this class.
                                         */
       virtual ~SparseMatrix ();
-                                       /**
-                                        * This operator assigns a scalar to a
-                                        * matrix. Since this does usually not
-                                        * make much sense (should we set all
-                                        * matrix entries to this value? Only
-                                        * the nonzero entries of the sparsity
-                                        * pattern?), this operation is only
-                                        * allowed if the actual value to be
-                                        * assigned is zero. This operator only
-                                        * exists to allow for the obvious
-                                        * notation <tt>matrix=0</tt>, which
-                                        * sets all elements of the matrix to
-                                        * zero, but keeps the sparsity pattern
-                                        * previously used.
-                                        */
-      SparseMatrix &
-      operator = (const double d);
-
-                                       /**
+                                       
+				       /**
                                         * This function initializes the
 				        * Trilinos matrix by attaching all
 				        * the elements to the sparsity
@@ -396,6 +419,19 @@ namespace TrilinosWrappers
       void reinit (const Epetra_Map                &input_map,
 		   const CompressedSparsityPattern &sparsity_pattern);
 
+				       /**
+                                        * This function is similar to the
+				        * other initialization function above,
+				        * but now also reassigns the matrix 
+				        * rows and columns according to 
+				        * two user-supplied Epetra maps.
+				        * To be used e.g. for rectangular 
+				        * matrices after remeshing.
+                                        */
+      void reinit (const Epetra_Map                &input_row_map,
+		   const Epetra_Map                &input_col_map,
+		   const CompressedSparsityPattern &sparsity_pattern);
+
                                        /**
                                         * Release all memory and return
                                         * to a state just like after
@@ -403,6 +439,24 @@ namespace TrilinosWrappers
                                         * constructor.
                                         */
       void clear ();
+
+                                       /**
+                                        * This operator assigns a scalar to a
+                                        * matrix. Since this does usually not
+                                        * make much sense (should we set all
+                                        * matrix entries to this value? Only
+                                        * the nonzero entries of the sparsity
+                                        * pattern?), this operation is only
+                                        * allowed if the actual value to be
+                                        * assigned is zero. This operator only
+                                        * exists to allow for the obvious
+                                        * notation <tt>matrix=0</tt>, which
+                                        * sets all elements of the matrix to
+                                        * zero, but keeps the sparsity pattern
+                                        * previously used.
+                                        */
+      SparseMatrix &
+      operator = (const double d);
 
                                        /**
                                         * Set the element (<i>i,j</i>)
@@ -929,7 +983,7 @@ namespace TrilinosWrappers
                                        /**
                                         * Exception
                                         */
-      DeclException4 (ExcAccessToNonlocalElement,
+      DeclException4 (ExcAccessToNonLocalElement,
 		      int, int, int, int,
 		      << "You tried to access element (" << arg1
 		      << "/" << arg2 << ")"
@@ -938,11 +992,33 @@ namespace TrilinosWrappers
 		      << " are stored locally and can be accessed.");
 
                                        /**
-                                        * The Epetra Trilinos mapping that
+                                        * Exception
+                                        */
+      DeclException2 (ExcAccessToNonPresentElement,
+		      int, int,
+		      << "You tried to access element (" << arg1
+		      << "/" << arg2 << ")"
+		      << " of a sparse matrix, but it appears to not "
+		      << " exist in the Trilinos sparsity pattern.");
+
+                                       /**
+				        * Epetra Trilinos mapping of the 
+				        * matrix rows that
+				        * assigns parts of the matrix to
+				        * the individual processes.
+				        * TODO: is it possible to only use
+				        * a pointer?
+				        */
+      Epetra_Map row_map;
+
+                                       /**
+                                        * Pointer to the user-supplied 
+				        * Epetra Trilinos mapping of the 
+				        * matrix columns that
 				        * assigns parts of the matrix to
 				        * the individual processes.
 				        */
-      Epetra_Map map;
+      Epetra_Map col_map;
 
                                        /**
                                         * A sparse matrix object in
@@ -1040,7 +1116,7 @@ namespace TrilinosWrappers
 
     inline
     const_iterator::
-    const_iterator(const SparseMatrix   *matrix,
+    const_iterator(const SparseMatrix *matrix,
                    const unsigned int  row,
                    const unsigned int  index)
                     :

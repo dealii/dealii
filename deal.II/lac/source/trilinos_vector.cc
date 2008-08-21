@@ -37,7 +37,7 @@ namespace TrilinosWrappers
 
       AssertThrow ((static_cast<signed int>(index) >= vector.map.MinMyGID()) &&
 		   (static_cast<signed int>(index) <= vector.map.MaxMyGID()),
-		   ExcAccessToNonlocalElement (index, vector.map.MinMyGID(),
+		   ExcAccessToNonLocalElement (index, vector.map.MinMyGID(),
 					       vector.map.MaxMyGID()-1));
       return *(*(vector.vector))[index];
     }

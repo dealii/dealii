@@ -162,7 +162,7 @@ namespace TrilinosWrappers
                                          /**
                                           * Exception
                                           */
-        DeclException3 (ExcAccessToNonlocalElement,
+        DeclException3 (ExcAccessToNonLocalElement,
                         int, int, int,
                         << "You tried to access element " << arg1
                         << " of a distributed vector, but only elements "
@@ -824,12 +824,6 @@ namespace TrilinosWrappers
                                         * the communicator and data distribution
 				        * object common to all
                                         * Trilinos objects used by deal.II.
-				        * TODO: we probably only need a pointer
-				        * to the map, since the information
-				        * is provided from outside and there
-				        * is no need to copy the map. 
-				        * Especially not when we have many
-				        * vectors based on the same map.
                                         */
       Epetra_Map map;
 
