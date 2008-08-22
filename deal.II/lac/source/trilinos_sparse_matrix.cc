@@ -194,6 +194,14 @@ namespace TrilinosWrappers
     Assert (matrix->NumGlobalRows() == (int)sparsity_pattern.n_rows(),
 	    ExcDimensionMismatch (matrix->NumGlobalRows(),
 				  sparsity_pattern.n_rows()));
+    
+				 // Trilinos seems to have a bug for
+				 // rectangular matrices at this point,
+				 // so do not check for consistent 
+				 // column numbers here.
+//    Assert (matrix->NumGlobalCols() == (int)sparsity_pattern.n_cols(),
+//	    ExcDimensionMismatch (matrix->NumGlobalCols(),
+//				  sparsity_pattern.n_cols()));
 
     std::vector<int> n_entries_per_row(n_rows);
     
@@ -216,6 +224,7 @@ namespace TrilinosWrappers
     unsigned int n_rows = sparsity_pattern.n_rows();
     matrix.reset();
     row_map = input_map;
+    col_map = row_map;
     
     Assert (input_map.NumGlobalElements() == (int)sparsity_pattern.n_rows(),
 	    ExcDimensionMismatch (input_map.NumGlobalElements(),
@@ -266,6 +275,15 @@ namespace TrilinosWrappers
     matrix = std::auto_ptr<Epetra_FECrsMatrix>
 	      (new Epetra_FECrsMatrix(Copy, row_map, col_map,
 	                              &n_entries_per_row[0], true));
+      
+//      Assert (matrix->NumGlobalCols() == col_map.NumGlobalElements(),
+//	      ExcInternalError());
+//      Assert (matrix->NumGlobalRows() == row_map.NumGlobalElements(),
+//	      ExcInternalError());
+//      Assert (matrix->NumGlobalCols() == sparsity_pattern.n_cols(),
+//	      ExcInternalError());
+//      Assert (matrix->NumGlobalRows() == sparsity_pattern.n_rows(),
+//	      ExcInternalError());
     
     const unsigned int n_max_entries_per_row = *std::max_element (
 		    &n_entries_per_row[0], &n_entries_per_row[n_rows-1]);
