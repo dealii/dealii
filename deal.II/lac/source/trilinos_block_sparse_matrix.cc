@@ -97,6 +97,7 @@ namespace TrilinosWrappers
   void
   BlockSparseMatrix::collect_sizes ()
   {
+    compress();
     BaseClass::collect_sizes ();
   }
   

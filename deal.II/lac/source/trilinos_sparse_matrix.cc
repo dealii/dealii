@@ -275,15 +275,6 @@ namespace TrilinosWrappers
     matrix = std::auto_ptr<Epetra_FECrsMatrix>
 	      (new Epetra_FECrsMatrix(Copy, row_map, col_map,
 	                              &n_entries_per_row[0], true));
-      
-//      Assert (matrix->NumGlobalCols() == col_map.NumGlobalElements(),
-//	      ExcInternalError());
-//      Assert (matrix->NumGlobalRows() == row_map.NumGlobalElements(),
-//	      ExcInternalError());
-//      Assert (matrix->NumGlobalCols() == sparsity_pattern.n_cols(),
-//	      ExcInternalError());
-//      Assert (matrix->NumGlobalRows() == sparsity_pattern.n_rows(),
-//	      ExcInternalError());
     
     const unsigned int n_max_entries_per_row = *std::max_element (
 		    &n_entries_per_row[0], &n_entries_per_row[n_rows-1]);

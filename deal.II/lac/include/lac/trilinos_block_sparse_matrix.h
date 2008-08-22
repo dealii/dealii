@@ -182,14 +182,13 @@ namespace TrilinosWrappers
 				       /** 
 					* This function calls the compress()
 				        * command of all matrices after 
-				        * the sparsity pattern has been 
-				        * generated or the assembly is 
+				        * the assembly is 
 				        * completed. Note that all MPI
 				        * processes need to call this 
-				        * command (in contrast to sparsity
-				        * pattern generation, which is 
-				        * probably only called on one 
-				        * single process) before any 
+				        * command (whereas the individual 
+				        * assembly routines will most probably
+				        * only be called on each processor
+				        * individually) before any 
 				        * can complete it.
 				        */
       void compress ();
@@ -204,7 +203,10 @@ namespace TrilinosWrappers
                                         * subobjects. You *must* call
                                         * this function each time after
                                         * you have changed the size of
-                                        * the sub-objects.
+                                        * the sub-objects. Note that 
+				        * this is a collective 
+				        * operation, i.e., it needs to
+				        * be called on all MPI processes.
                                         */
       void collect_sizes ();
 
