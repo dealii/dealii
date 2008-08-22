@@ -39,7 +39,8 @@ namespace TrilinosWrappers
 		   (static_cast<signed int>(index) <= vector.map.MaxMyGID()),
 		   ExcAccessToNonLocalElement (index, vector.map.MinMyGID(),
 					       vector.map.MaxMyGID()-1));
-      return *(*(vector.vector))[index];
+
+      return (*(vector.vector))[0][index];
     }
   }
 
