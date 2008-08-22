@@ -16,7 +16,8 @@
 
 #include <base/config.h>
 #include <base/subscriptor.h>
-#include <lac/compressed_sparsity_pattern.h>
+#include <lac/sparsity_pattern.h>
+#include <lac/sparse_matrix.h>
 #include <lac/exceptions.h>
 #include <lac/trilinos_vector.h>
 
@@ -414,8 +415,8 @@ namespace TrilinosWrappers
 				        * not directly available, use one of the
 				        * other reinit functions.
                                         */
-      void reinit (const CompressedSparsityPattern &sparsity_pattern,
-		   const unsigned int               n_max_entries_per_row);
+      void reinit (const SparsityPattern  &sparsity_pattern,
+		   const unsigned int      n_max_entries_per_row);
 
                                        /**
                                         * This function initializes the
@@ -426,7 +427,22 @@ namespace TrilinosWrappers
 				        * of nonzeros from the sparsity
 				        * pattern internally.
                                         */
-      void reinit (const CompressedSparsityPattern &sparsity_pattern);
+      void reinit (const SparsityPattern &sparsity_pattern);
+
+                                       /**
+                                        * This function initializes the
+				        * Trilinos matrix using the deal.II
+				        * sparse matrix and the entries stored
+				        * therein. It uses a threshold 
+				        * to copy only elements whose 
+				        * modulus is larger than the 
+				        * threshold (so zeros in the 
+				        * deal.II matrix can be filtered
+				        * away).
+                                        */
+      void reinit (const Epetra_Map                     &input_map,
+		   const ::dealii::SparseMatrix<double> &deal_ii_sparse_matrix,
+		   const double                          drop_tolerance=1e-15);
 
 				       /**
                                         * This function is similar to the
@@ -437,8 +453,8 @@ namespace TrilinosWrappers
 				        * when the matrix structure changes,
 				        * e.g. when the grid is refined.
                                         */
-      void reinit (const Epetra_Map                &input_map,
-		   const CompressedSparsityPattern &sparsity_pattern);
+      void reinit (const Epetra_Map       &input_map,
+		   const SparsityPattern  &sparsity_pattern);
 
 				       /**
                                         * This function is similar to the
@@ -449,9 +465,9 @@ namespace TrilinosWrappers
 				        * To be used e.g. for rectangular 
 				        * matrices after remeshing.
                                         */
-      void reinit (const Epetra_Map                &input_row_map,
-		   const Epetra_Map                &input_col_map,
-		   const CompressedSparsityPattern &sparsity_pattern);
+      void reinit (const Epetra_Map       &input_row_map,
+		   const Epetra_Map       &input_col_map,
+		   const SparsityPattern  &sparsity_pattern);
 
                                        /**
                                         * Release all memory and return

@@ -13,14 +13,10 @@
 
 
 #include <lac/trilinos_precondition_amg.h>
-#include <lac/vector.h>
-#include <lac/sparse_matrix.h>
-
 
 #ifdef DEAL_II_USE_TRILINOS
 
 #include <Epetra_Map.h>
-#include <Epetra_CrsMatrix.h>
 #include <Epetra_Vector.h>
 #include <Teuchos_ParameterList.hpp>
 #include <ml_include.h>
@@ -43,80 +39,30 @@ namespace TrilinosWrappers
   PreconditionAMG::~PreconditionAMG ()
   {}
 
-  
-  
+
+
   void
   PreconditionAMG::
-  initialize (const dealii::SparseMatrix<double> &matrix,
-	      const std::vector<double>  &null_space,
-	      const unsigned int          null_space_dimension,
-	      const bool                  elliptic,
-	      const bool                  higher_order_elements,
-	      const bool                  output_details,
-	      const double                drop_tolerance)
+  initialize (const SparseMatrix        &matrix,
+	      const std::vector<double> &null_space,
+	      const unsigned int         null_space_dimension,
+	      const bool                 elliptic,
+	      const bool                 higher_order_elements,
+	      const bool                 output_details)
   {
-    Assert (drop_tolerance >= 0,
-	    ExcMessage ("Drop tolerance must be a non-negative number."));
-  
     const unsigned int n_rows = matrix.m();
-  
-				     // Init Epetra Matrix, avoid 
-				     // storing the nonzero elements.
-    {
-      Map.reset (new Epetra_Map(n_rows, 0, communicator));
     
-      std::vector<int> row_lengths (n_rows);
-      for (dealii::SparseMatrix<double>::const_iterator p = matrix.begin();
-	   p != matrix.end(); ++p)
-	if (std::abs(p->value()) > drop_tolerance)
-	  ++row_lengths[p->row()];
-  
-      Matrix.reset (new Epetra_CrsMatrix(Copy, *Map, &row_lengths[0], true));
-  
-      const unsigned int max_nonzero_entries
-	= *std::max_element (row_lengths.begin(), row_lengths.end());
-  
-      std::vector<double> values(max_nonzero_entries, 0);
-      std::vector<int> row_indices(max_nonzero_entries);
-  
-      for (unsigned int row=0; row<n_rows; ++row)
-	{
-	  unsigned int index = 0;
-	  for (dealii::SparseMatrix<double>::const_iterator p = matrix.begin(row);
-	       p != matrix.end(row); ++p)
-	    if (std::abs(p->value()) > drop_tolerance)
-	      {
-		row_indices[index] = p->column();
-		values[index]      = p->value();
-		++index;
-	      }
+    if (!Matrix)
+      {
+	Matrix = boost::shared_ptr<SparseMatrix>
+			  (const_cast<SparseMatrix*>(&matrix));
+	Map = boost::shared_ptr<Epetra_Map>
+			  (const_cast<Epetra_Map*>(&matrix.row_map));
+      }
 
-	  Assert (index == static_cast<unsigned int>(row_lengths[row]),
-		  ExcMessage("Filtering out zeros could not "
-			     "be successfully finished!"));
-  
-	  Matrix->InsertGlobalValues(row, row_lengths[row],
-				     &values[0], &row_indices[0]);
-	}
-      
-      Matrix->FillComplete();
-    }
-  
 				     // Build the AMG preconditioner.
     Teuchos::ParameterList parameter_list;
   
-				     // The implementation is able
-				     // to distinguish between
-				     // matrices from elliptic problems
-				     // and convection dominated 
-				     // problems. We use the standard
-				     // options for elliptic problems,
-				     // except that we use a 
-				     // Chebyshev smoother instead
-				     // of a symmetric Gauss-Seidel
-				     // smoother. For most elliptic 
-				     // problems, Chebyshev is better
-				     // than Gauss-Seidel (SSOR).
     if (elliptic)
       {
 	ML_Epetra::SetDefaults("SA",parameter_list);
@@ -148,20 +94,67 @@ namespace TrilinosWrappers
 	parameter_list.set("null space: dimension", int(null_space_dimension));
 	parameter_list.set("null space: vectors", (double *)&null_space[0]);
       }
-  
+
     multigrid_operator = boost::shared_ptr<ML_Epetra::MultiLevelPreconditioner>
-			 (new ML_Epetra::MultiLevelPreconditioner(*Matrix, parameter_list, true));
+			 (new ML_Epetra::MultiLevelPreconditioner(
+				      *matrix.matrix, parameter_list, true));
 
     if (output_details)
       multigrid_operator->PrintUnused(0);
   }
+
+
+
+  void
+  PreconditionAMG::
+  initialize (const dealii::SparseMatrix<double> &deal_ii_sparse_matrix,
+	      const std::vector<double>  &null_space,
+	      const unsigned int          null_space_dimension,
+	      const bool                  elliptic,
+	      const bool                  higher_order_elements,
+	      const bool                  output_details)
+  {
+    const unsigned int n_rows = deal_ii_sparse_matrix.m();
+  
+				     // Init Epetra Matrix, avoid 
+				     // storing the nonzero elements.
+
+    Map.reset (new Epetra_Map(n_rows, 0, communicator));
+
+    Matrix.reset();
+    Matrix = boost::shared_ptr<SparseMatrix> (new SparseMatrix());
+
+    Matrix->reinit (*Map, deal_ii_sparse_matrix);
+    Matrix->compress();
+
+    initialize (*Matrix, null_space, null_space_dimension, elliptic,
+	        higher_order_elements, output_details);
+  }
+  
+  
+  void PreconditionAMG::
+  reinit ()
+  {
+    multigrid_operator->ReComputePreconditioner();
+  }
+  
+  
+  
+  void PreconditionAMG::vmult (Vector        &dst,
+			       const Vector  &src) const
+  {
+    const int ierr = multigrid_operator->ApplyInverse (*src.vector, *dst.vector);
+
+    Assert (ierr == 0, ExcTrilinosError(ierr));
+  }
+
 
 				   // For the implementation of the
 				   // <code>vmult</code> function we
 				   // note that invoking a call of 
 				   // the Trilinos preconditioner 
 				   // requires us to use Epetra vectors
-				   // as well. Luckily, it is sufficient
+				   // as well. It is faster
 				   // to provide a view, i.e., feed 
 				   // Trilinos with a pointer to the
 				   // data, so we avoid copying the
@@ -176,6 +169,15 @@ namespace TrilinosWrappers
   void PreconditionAMG::vmult (dealii::Vector<double>       &dst,
 			       const dealii::Vector<double> &src) const
   {
+    Assert (Map->SameAs(Matrix->row_map),
+	    ExcMessage("The sparse matrix given to the preconditioner uses "
+		       "a map that is not compatible. Check ML preconditioner "
+		       "setup."));
+    Assert (Map->SameAs(Matrix->col_map),
+	    ExcMessage("The sparse matrix given to the preconditioner uses "
+		       "a map that is not compatible. Check ML preconditioner "
+		       "setup."));
+    
     Epetra_Vector LHS (View, *Map, dst.begin());
     Epetra_Vector RHS (View, *Map, const_cast<double*>(src.begin()));
   

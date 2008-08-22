@@ -147,8 +147,8 @@ namespace TrilinosWrappers
 
   
   void
-  SparseMatrix::reinit (const CompressedSparsityPattern &sparsity_pattern,
-		        const unsigned int               n_max_entries_per_row)
+  SparseMatrix::reinit (const SparsityPattern &sparsity_pattern,
+		        const unsigned int     n_max_entries_per_row)
   {
 
     unsigned int n_rows = sparsity_pattern.n_rows();
@@ -187,14 +187,14 @@ namespace TrilinosWrappers
 
 
   void
-  SparseMatrix::reinit (const CompressedSparsityPattern &sparsity_pattern)
+  SparseMatrix::reinit (const SparsityPattern &sparsity_pattern)
   {
     unsigned int n_rows = sparsity_pattern.n_rows();
-    
+
     Assert (matrix->NumGlobalRows() == (int)sparsity_pattern.n_rows(),
 	    ExcDimensionMismatch (matrix->NumGlobalRows(),
 				  sparsity_pattern.n_rows()));
-    
+
 				 // Trilinos seems to have a bug for
 				 // rectangular matrices at this point,
 				 // so do not check for consistent 
@@ -204,10 +204,10 @@ namespace TrilinosWrappers
 //				  sparsity_pattern.n_cols()));
 
     std::vector<int> n_entries_per_row(n_rows);
-    
+
     for (unsigned int row=0; row<n_rows; ++row)
       n_entries_per_row[(int)row] = sparsity_pattern.row_length(row);
-    
+
     const unsigned int n_max_entries_per_row = *std::max_element (
 		    &n_entries_per_row[0], &n_entries_per_row[n_rows-1]);
 
@@ -217,30 +217,31 @@ namespace TrilinosWrappers
 
 
   void
-  SparseMatrix::reinit (const Epetra_Map                &input_map,
-		        const CompressedSparsityPattern &sparsity_pattern)
+  SparseMatrix::reinit (const Epetra_Map       &input_map,
+		        const SparsityPattern  &sparsity_pattern)
   {
+    matrix.reset();
 
     unsigned int n_rows = sparsity_pattern.n_rows();
-    matrix.reset();
-    row_map = input_map;
-    col_map = row_map;
-    
+
     Assert (input_map.NumGlobalElements() == (int)sparsity_pattern.n_rows(),
 	    ExcDimensionMismatch (input_map.NumGlobalElements(),
 				  sparsity_pattern.n_rows()));
     Assert (input_map.NumGlobalElements() == (int)sparsity_pattern.n_cols(),
 	    ExcDimensionMismatch (input_map.NumGlobalElements(),
 				  sparsity_pattern.n_cols()));
-    
+
+    row_map = input_map;
+    col_map = row_map;
+
     std::vector<int> n_entries_per_row(n_rows);
-    
+
     for (unsigned int row=0; row<n_rows; ++row)
       n_entries_per_row[(int)row] = sparsity_pattern.row_length(row);
-    
+
     matrix = std::auto_ptr<Epetra_FECrsMatrix> (new Epetra_FECrsMatrix (
 				Copy, row_map, &n_entries_per_row[0], true));
-    
+
     const unsigned int n_max_entries_per_row = *std::max_element (
 		    &n_entries_per_row[0], &n_entries_per_row[n_rows-1]);
 
@@ -250,36 +251,94 @@ namespace TrilinosWrappers
 
 
   void
-  SparseMatrix::reinit (const Epetra_Map                &input_row_map,
-			const Epetra_Map                &input_col_map,
-		        const CompressedSparsityPattern &sparsity_pattern)
+  SparseMatrix::reinit (const Epetra_Map       &input_row_map,
+			const Epetra_Map       &input_col_map,
+		        const SparsityPattern  &sparsity_pattern)
   {
+    matrix.reset();
 
     unsigned int n_rows = sparsity_pattern.n_rows();
-    matrix.reset();
-    row_map = input_row_map;
-    col_map = input_col_map;
-    
+
     Assert (input_row_map.NumGlobalElements() == (int)sparsity_pattern.n_rows(),
 	    ExcDimensionMismatch (input_row_map.NumGlobalElements(),
 				  sparsity_pattern.n_rows()));
     Assert (input_col_map.NumGlobalElements() == (int)sparsity_pattern.n_cols(),
 	    ExcDimensionMismatch (input_col_map.NumGlobalElements(),
 				  sparsity_pattern.n_cols()));
-    
+
+    row_map = input_row_map;
+    col_map = input_col_map;
+
     std::vector<int> n_entries_per_row(n_rows);
-    
+
     for (unsigned int row=0; row<n_rows; ++row)
       n_entries_per_row[(int)row] = sparsity_pattern.row_length(row);
-    
+
     matrix = std::auto_ptr<Epetra_FECrsMatrix>
 	      (new Epetra_FECrsMatrix(Copy, row_map, col_map,
 	                              &n_entries_per_row[0], true));
-    
+
     const unsigned int n_max_entries_per_row = *std::max_element (
 		    &n_entries_per_row[0], &n_entries_per_row[n_rows-1]);
 
     reinit (sparsity_pattern, n_max_entries_per_row);
+  }
+
+
+
+  void
+  SparseMatrix::reinit (const Epetra_Map                     &input_map,
+			const ::dealii::SparseMatrix<double> &deal_ii_sparse_matrix,
+		        const double                          drop_tolerance)
+  {
+    matrix.reset();
+
+    unsigned int n_rows = deal_ii_sparse_matrix.m();
+
+    Assert (input_map.NumGlobalElements() == (int)n_rows,
+	    ExcDimensionMismatch (input_map.NumGlobalElements(),
+				  n_rows));
+    Assert (input_map.NumGlobalElements() == (int)deal_ii_sparse_matrix.n(),
+	    ExcDimensionMismatch (input_map.NumGlobalElements(),
+				  deal_ii_sparse_matrix.n()));
+    
+    row_map = input_map;
+    col_map = row_map;
+
+    std::vector<int> n_entries_per_row(n_rows);
+
+    for (unsigned int row=0; row<n_rows; ++row)
+      n_entries_per_row[(int)row] = 
+	  deal_ii_sparse_matrix.get_sparsity_pattern().row_length(row);
+
+    matrix = std::auto_ptr<Epetra_FECrsMatrix>
+	      (new Epetra_FECrsMatrix(Copy, row_map, col_map,
+	                              &n_entries_per_row[0], true));
+    
+    std::vector<double> values;
+    std::vector<int> row_indices;
+
+    for (unsigned int row=0; row<n_rows; ++row)
+      {
+	values.resize (n_entries_per_row[row],0.);
+	row_indices.resize (n_entries_per_row[row],-1);
+	
+	unsigned int index = 0;
+	for (dealii::SparseMatrix<double>::const_iterator  
+	      p  = deal_ii_sparse_matrix.begin(row);
+	      p != deal_ii_sparse_matrix.end(row); ++p)
+	  if (std::abs(p->value()) > drop_tolerance)
+	    {
+	      row_indices[index] = p->column();
+	      values[index]      = p->value();
+	      ++index;
+	    }
+	const int n_row_entries = index;
+
+	matrix->InsertGlobalValues(row, n_row_entries,
+				   &values[0], &row_indices[0]);
+      }
+
   }
 
 

@@ -15,8 +15,11 @@
 
 
 #include <base/config.h>
+#include <lac/exceptions.h>
 #include <lac/trilinos_vector.h>
 #include <lac/trilinos_sparse_matrix.h>
+#include <lac/vector.h>
+#include <lac/sparse_matrix.h>
 
 #include <boost/shared_ptr.hpp>
 
@@ -24,7 +27,6 @@
 #ifdef DEAL_II_USE_TRILINOS
 #ifdef DEAL_II_COMPILER_SUPPORTS_MPI
 #  include <Epetra_MpiComm.h>
-#  include <mpi.h>
 #else
 #  include <Epetra_SerialComm.h>
 #endif
@@ -65,6 +67,12 @@ namespace TrilinosWrappers
  * fact that some of the entries in the preconditioner matrix are zero
  * and hence can be neglected.
  *
+ * The implementation is able to distinguish between matrices from 
+ * elliptic problems and convection dominated problems. We use the standard
+ * options provided by Trilinos ML for elliptic problems, except that we use a 
+ * Chebyshev smoother instead of a symmetric Gauss-Seidel smoother. 
+ * For most elliptic problems, Chebyshev is better than Gauss-Seidel (SSOR).
+ *
  * @author Martin Kronbichler, 2008
  */
   class PreconditionAMG : public Subscriptor
@@ -84,15 +92,59 @@ namespace TrilinosWrappers
 					* Let Trilinos compute a
 					* multilevel hierarchy for the
 					* solution of a linear system
-					* with the given matrix.
+					* with the given matrix. The
+					* function uses the matrix 
+				        * format specified in
+				        * TrilinosWrappers::SparseMatrix.
+					*/
+      void initialize (const SparseMatrix        &matrix,
+		       const std::vector<double> &null_space,
+		       const unsigned int         null_space_dimension,
+		       const bool                 higher_order_elements,
+		       const bool                 elliptic,
+		       const bool                 output_details);
+
+				       /**
+					* Let Trilinos compute a
+					* multilevel hierarchy for the
+					* solution of a linear system
+					* with the given matrix. This
+				        * function takes a deal.ii matrix
+				        * and copies the content into a
+				        * Trilinos matrix, so the function
+				        * can be considered rather 
+				        * inefficient.
 					*/
       void initialize (const dealii::SparseMatrix<double> &matrix,
 		       const std::vector<double>  &null_space,
 		       const unsigned int          null_space_dimension,
 		       const bool                  higher_order_elements,
 		       const bool                  elliptic,
-		       const bool                  output_details,
-		       const double                drop_tolerance = 1e-13);
+		       const bool                  output_details);
+
+				       /**
+					* This function can be used 
+				        * for a faster recalculation of
+				        * the preconditioner construction 
+				        * when the matrix entries 
+				        * underlying the preconditioner 
+				        * have changed, 
+				        * but the matrix sparsity pattern
+				        * has remained the same. What this
+				        * function does is to take the 
+				        * already generated coarsening 
+				        * structure, compute the AMG 
+				        * prolongation and restriction 
+				        * according to a smoothed aggregation
+				        * strategy and then builds the whole
+				        * multilevel hiearchy. This function
+				        * can be considerably faster in that
+				        * case, since the coarsening pattern
+				        * is usually the most difficult thing
+				        * to do when setting up the
+				        * AMG ML preconditioner.
+					*/
+      void reinit ();
 
 				       /**
 					* Multiply the source vector
@@ -100,6 +152,15 @@ namespace TrilinosWrappers
 					* represented by this object,
 					* and return it in the
 					* destination vector.
+					*/
+      void vmult (Vector        &dst,
+		  const Vector  &src) const;
+
+				       /**
+					* Do the same as before, but 
+				        * now use deal.II vectors instead
+				        * of the ones provided in the
+				        * Trilinos wrapper class.
 					*/
       void vmult (dealii::Vector<double>       &dst,
 		  const dealii::Vector<double> &src) const;
@@ -122,7 +183,7 @@ namespace TrilinosWrappers
 					* A copy of the deal.II matrix
 					* into Trilinos format.
 					*/
-      boost::shared_ptr<Epetra_CrsMatrix> Matrix;
+      boost::shared_ptr<SparseMatrix> Matrix;
   };
 }
 
