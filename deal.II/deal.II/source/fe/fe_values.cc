@@ -156,15 +156,15 @@ get_interpolated_dof_values (const TrilinosWrappers::Vector &in,
 
 
 
-// template <int dim>
-// template <typename CI>
-// void
-// FEValuesBase<dim>::CellIterator<CI>::
-// get_interpolated_dof_values (const TrilinosWrappers::BlockVector &in,
-//                              Vector<TrilinosScalar>              &out) const
-// {
-//   cell->get_interpolated_dof_values (in, out);
-// }
+template <int dim>
+template <typename CI>
+void
+FEValuesBase<dim>::CellIterator<CI>::
+get_interpolated_dof_values (const TrilinosWrappers::BlockVector &in,
+                             Vector<TrilinosScalar>              &out) const
+{
+  cell->get_interpolated_dof_values (in, out);
+}
 
 #endif
 
@@ -289,14 +289,14 @@ get_interpolated_dof_values (const TrilinosWrappers::Vector &,
 
 
 
-// template <int dim>
-// void
-// FEValuesBase<dim>::TriaCellIterator::
-// get_interpolated_dof_values (const TrilinosWrappers::BlockVector &,
-//                              Vector<TrilinosScalar>              &) const
-// {
-//   Assert (false, ExcMessage (message_string));
-// }
+template <int dim>
+void
+FEValuesBase<dim>::TriaCellIterator::
+get_interpolated_dof_values (const TrilinosWrappers::BlockVector &,
+                             Vector<TrilinosScalar>              &) const
+{
+  Assert (false, ExcMessage (message_string));
+}
 
 #endif
 
@@ -2110,8 +2110,8 @@ DEAL_II_NAMESPACE_CLOSE
 #include "fe_values.instance.h"
 #undef IN
 
-// #define IN TrilinosWrappers::BlockVector
-// #include "fe_values.instance.h"
-// #undef IN
+#define IN TrilinosWrappers::BlockVector
+#include "fe_values.instance.h"
+#undef IN
 #endif
 

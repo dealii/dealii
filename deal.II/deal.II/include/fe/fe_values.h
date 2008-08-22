@@ -28,6 +28,7 @@
 #include <lac/petsc_vector.h>
 #include <lac/petsc_block_vector.h>
 #include <lac/trilinos_vector.h>
+#include <lac/trilinos_block_vector.h>
 #include <grid/tria.h>
 #include <grid/tria_iterator.h>
 #include <dofs/dof_handler.h>
@@ -1927,16 +1928,16 @@ class FEValuesBase : protected FEValuesData<dim>,
         get_interpolated_dof_values (const TrilinosWrappers::Vector &in,
                                      Vector<TrilinosScalar>         &out) const = 0;
 
-//                                          /**
-//                                           * Call
-//                                           * @p get_interpolated_dof_values
-//                                           * of the iterator with the
-//                                           * given arguments.
-//                                           */
-//         virtual
-//         void
-//         get_interpolated_dof_values (const TrilinosWrappers::BlockVector &in,
-//                                      Vector<TrilinosScalar>              &out) const = 0;
+                                         /**
+                                          * Call
+                                          * @p get_interpolated_dof_values
+                                          * of the iterator with the
+                                          * given arguments.
+                                          */
+        virtual
+        void
+        get_interpolated_dof_values (const TrilinosWrappers::BlockVector &in,
+                                     Vector<TrilinosScalar>              &out) const = 0;
 #endif
     };
 
@@ -2069,16 +2070,16 @@ class FEValuesBase : protected FEValuesData<dim>,
         get_interpolated_dof_values (const TrilinosWrappers::Vector &in,
                                      Vector<TrilinosScalar>         &out) const;
 
-//                                          /**
-//                                           * Call
-//                                           * @p get_interpolated_dof_values
-//                                           * of the iterator with the
-//                                           * given arguments.
-//                                           */
-//         virtual
-//         void
-//         get_interpolated_dof_values (const TrilinosWrappers::BlockVector &in,
-//                                      Vector<TrilinosScalar>              &out) const;
+                                         /**
+                                          * Call
+                                          * @p get_interpolated_dof_values
+                                          * of the iterator with the
+                                          * given arguments.
+                                          */
+        virtual
+        void
+        get_interpolated_dof_values (const TrilinosWrappers::BlockVector &in,
+                                     Vector<TrilinosScalar>              &out) const;
 #endif
 
       private:
@@ -2256,16 +2257,16 @@ class FEValuesBase : protected FEValuesData<dim>,
         get_interpolated_dof_values (const TrilinosWrappers::Vector &in,
                                      Vector<TrilinosScalar>         &out) const;
 
-//                                          /**
-//                                           * Call
-//                                           * @p get_interpolated_dof_values
-//                                           * of the iterator with the
-//                                           * given arguments.
-//                                           */
-//         virtual
-//         void
-//         get_interpolated_dof_values (const TrilinosWrappers::BlockVector &in,
-//                                      Vector<TrilinosScalar>              &out) const;
+                                         /**
+                                          * Call
+                                          * @p get_interpolated_dof_values
+                                          * of the iterator with the
+                                          * given arguments.
+                                          */
+        virtual
+        void
+        get_interpolated_dof_values (const TrilinosWrappers::BlockVector &in,
+                                     Vector<TrilinosScalar>              &out) const;
 #endif
 
       private:
