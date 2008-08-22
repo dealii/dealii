@@ -703,7 +703,7 @@ compute_viscosity(const std::vector<double>          &old_temperature,
 		  const double                        cell_diameter,
 		  const double                        old_time_step)
 {
-  const double beta = 0.03;
+  const double beta = 0.015 * dim;
   const double alpha = 1;
   
   if (global_u_infty == 0)
@@ -1908,7 +1908,7 @@ void BoussinesqFlowProblem<dim>::solve ()
   }
 
   old_time_step = time_step;    
-  time_step = 1./4. /
+  time_step = 1./(std::sqrt(2.)*dim*std::sqrt(1.*dim)) /
 	      temperature_degree *
 	      GridTools::minimal_cell_diameter(triangulation) /
               std::max (get_maximal_velocity(), .01);
