@@ -19,6 +19,8 @@
 #include <lac/petsc_block_vector.h>
 #include <lac/petsc_parallel_vector.h>
 #include <lac/petsc_parallel_block_vector.h>
+#include <lac/trilinos_vector.h>
+#include <lac/trilinos_block_vector.h>
 
 DEAL_II_NAMESPACE_OPEN
 
@@ -98,6 +100,14 @@ Threads::ThreadMutex GrowingVectorMemory<VECTOR>::mutex;
     
     template class VectorMemory<PETScWrappers::MPI::BlockVector>;
     template class GrowingVectorMemory<PETScWrappers::MPI::BlockVector>;
+#endif
+
+#ifdef DEAL_II_USE_TRILINOS
+    template class VectorMemory<TrilinosWrappers::Vector>;
+    template class GrowingVectorMemory<TrilinosWrappers::Vector>;
+    
+    template class VectorMemory<TrilinosWrappers::BlockVector>;
+    template class GrowingVectorMemory<TrilinosWrappers::BlockVector>;
 #endif
 
 DEAL_II_NAMESPACE_CLOSE

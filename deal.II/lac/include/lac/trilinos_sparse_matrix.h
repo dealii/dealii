@@ -442,7 +442,7 @@ namespace TrilinosWrappers
                                         */
       void reinit (const Epetra_Map                     &input_map,
 		   const ::dealii::SparseMatrix<double> &deal_ii_sparse_matrix,
-		   const double                          drop_tolerance=1e-15);
+		   const double                          drop_tolerance=1e-13);
 
 				       /**
                                         * This function is similar to the

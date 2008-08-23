@@ -44,21 +44,13 @@ namespace TrilinosWrappers
   void
   PreconditionAMG::
   initialize (const SparseMatrix        &matrix,
-	      const std::vector<double> &null_space,
-	      const unsigned int         null_space_dimension,
 	      const bool                 elliptic,
 	      const bool                 higher_order_elements,
+	      const std::vector<double> &null_space,
+	      const unsigned int         null_space_dimension,
 	      const bool                 output_details)
   {
     const unsigned int n_rows = matrix.m();
-    
-    if (!Matrix)
-      {
-	Matrix = boost::shared_ptr<SparseMatrix>
-			  (const_cast<SparseMatrix*>(&matrix));
-	Map = boost::shared_ptr<Epetra_Map>
-			  (const_cast<Epetra_Map*>(&matrix.row_map));
-      }
 
 				     // Build the AMG preconditioner.
     Teuchos::ParameterList parameter_list;
@@ -76,6 +68,8 @@ namespace TrilinosWrappers
 	parameter_list.set("aggregation: block scaling", true);
       }
   
+    parameter_list.set("aggregation: threshold", 1e-12);
+    
     if (output_details)
       parameter_list.set("ML output", 10);
     else
@@ -84,12 +78,12 @@ namespace TrilinosWrappers
     if (higher_order_elements)
       parameter_list.set("aggregation: type", "MIS");
   
-    Assert (n_rows * null_space_dimension == null_space.size(),
-	    ExcDimensionMismatch(n_rows * null_space_dimension,
-				 null_space.size()));
-  
     if (null_space_dimension > 1)
       {
+	Assert (n_rows * null_space_dimension == null_space.size(),
+		ExcDimensionMismatch(n_rows * null_space_dimension,
+				    null_space.size()));
+  
 	parameter_list.set("null space: type", "pre-computed");
 	parameter_list.set("null space: dimension", int(null_space_dimension));
 	parameter_list.set("null space: vectors", (double *)&null_space[0]);
@@ -108,10 +102,10 @@ namespace TrilinosWrappers
   void
   PreconditionAMG::
   initialize (const dealii::SparseMatrix<double> &deal_ii_sparse_matrix,
-	      const std::vector<double>  &null_space,
-	      const unsigned int          null_space_dimension,
 	      const bool                  elliptic,
 	      const bool                  higher_order_elements,
+	      const std::vector<double>  &null_space,
+	      const unsigned int          null_space_dimension,
 	      const bool                  output_details)
   {
     const unsigned int n_rows = deal_ii_sparse_matrix.m();
@@ -127,8 +121,8 @@ namespace TrilinosWrappers
     Matrix->reinit (*Map, deal_ii_sparse_matrix);
     Matrix->compress();
 
-    initialize (*Matrix, null_space, null_space_dimension, elliptic,
-	        higher_order_elements, output_details);
+    initialize (*Matrix, elliptic, higher_order_elements, null_space,
+		null_space_dimension,  output_details);
   }
   
   
@@ -143,7 +137,8 @@ namespace TrilinosWrappers
   void PreconditionAMG::vmult (Vector        &dst,
 			       const Vector  &src) const
   {
-    const int ierr = multigrid_operator->ApplyInverse (*src.vector, *dst.vector);
+    const int ierr = multigrid_operator->ApplyInverse (*src.vector,
+						       *dst.vector);
 
     Assert (ierr == 0, ExcTrilinosError(ierr));
   }
@@ -178,8 +173,10 @@ namespace TrilinosWrappers
 		       "a map that is not compatible. Check ML preconditioner "
 		       "setup."));
     
-    Epetra_Vector LHS (View, *Map, dst.begin());
-    Epetra_Vector RHS (View, *Map, const_cast<double*>(src.begin()));
+    Epetra_Vector LHS (View, multigrid_operator->OperatorDomainMap(),
+		       dst.begin());
+    Epetra_Vector RHS (View, multigrid_operator->OperatorDomainMap(),
+		       const_cast<double*>(src.begin()));
   
     const int res = multigrid_operator->ApplyInverse (RHS, LHS);
   

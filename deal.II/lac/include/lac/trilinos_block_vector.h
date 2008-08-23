@@ -255,7 +255,7 @@ namespace TrilinosWrappers
 
 
     inline
-    BlockVector::BlockVector (const unsigned int num_blocks = 0)
+    BlockVector::BlockVector (const unsigned int num_blocks)
     {
       reinit (num_blocks);
     }

@@ -359,10 +359,14 @@ namespace TrilinosWrappers
                                        /**
                                         * Copy constructor. Sets the dimension
                                         * to that of the given vector and uses
-				        * the map of that vector, and
-                                        * copies all elements.
+				        * the map of that vector, but
+                                        * does not copies any element. Instead,
+				        * the memory will remain untouched
+				        * in case <tt>fast</tt> is false and
+				        * initialized with zero otherwise.
                                         */
-      Vector (const Vector &v);
+      Vector (const Vector &v, 
+	      const bool    fast = false);
 
                                        /**
                                         * Destructor
@@ -382,7 +386,8 @@ namespace TrilinosWrappers
 				        * copies the vector v to the current
 				        * one.
 				        */
-      void reinit (const Vector &v);
+      void reinit (const Vector &v,
+		   const bool    fast = false);
 
                                        /**
                                         * Release all memory and return
@@ -813,6 +818,13 @@ namespace TrilinosWrappers
       void swap (Vector &v);
 
 				       /**
+					* Estimate for the memory
+					* consumption (not implemented
+					* for this class).
+					*/
+      unsigned int memory_consumption () const;
+
+				       /**
 					* Exception
 					*/
       DeclException1 (ExcTrilinosError,
@@ -994,7 +1006,16 @@ namespace TrilinosWrappers
   {
 				    // if the vectors have different sizes,
 				    // then first resize the present one
-    reinit (v);
+    if (!map.SameAs(v.map))
+      {
+	map = v.map;
+	  vector = std::auto_ptr<Epetra_FEVector> 
+			(new Epetra_FEVector(*v.vector));
+      }
+    else
+      *vector = *v.vector;
+	  
+    last_action = Insert;
     
     return *this;
   }

@@ -51,6 +51,7 @@ namespace TrilinosWrappers
   }
 
 
+
   void
   BlockSparseMatrix::
   reinit (const unsigned int n_block_rows,
@@ -85,7 +86,31 @@ namespace TrilinosWrappers
         }
   }
 
-  
+
+
+  void
+  BlockSparseMatrix::
+  reinit (const std::vector<Epetra_Map> &input_maps,
+	  const BlockSparsityPattern    &block_sparsity_pattern)
+  {
+    const unsigned int n_block_rows = input_maps.size();
+    
+				     // Call the other reinit function ...
+    reinit (n_block_rows, n_block_rows);
+	
+				     // ... and now assign the correct
+				     // blocks.
+
+    for (unsigned int r=0; r<this->n_block_rows(); ++r)
+      for (unsigned int c=0; c<this->n_block_cols(); ++c)
+        {
+          this->block(r,c).reinit(input_maps[r],input_maps[c],
+				  block_sparsity_pattern.block(r,c));
+        }
+  }
+
+
+
   void
   BlockSparseMatrix::compress()
   {

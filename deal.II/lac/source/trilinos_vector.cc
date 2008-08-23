@@ -74,11 +74,12 @@ namespace TrilinosWrappers
   {}
   
   
-  Vector::Vector (const Vector &v)
+  Vector::Vector (const Vector &v,
+		  const bool    fast)
                   :
 		  map (v.map),
 		  vector(std::auto_ptr<Epetra_FEVector> 
-			 (new Epetra_FEVector(*(v.vector)))),
+			 (new Epetra_FEVector(v.map,!fast))),
                   last_action (Insert)
   {}
   
@@ -102,14 +103,15 @@ namespace TrilinosWrappers
 
 
   void
-  Vector::reinit (const Vector &v)
+  Vector::reinit (const Vector &v,
+		  const bool    fast)
   {
     vector.reset();
     
     if (!map.SameAs(v.map))
       map = v.map;
     
-    vector = std::auto_ptr<Epetra_FEVector> (new Epetra_FEVector(*v.vector));
+    vector = std::auto_ptr<Epetra_FEVector> (new Epetra_FEVector(v.map,!fast));
     last_action = Insert;
   }
 
@@ -792,6 +794,14 @@ namespace TrilinosWrappers
     tmp = v.vector;
     v.vector = vector;
     vector = tmp;
+  }
+
+
+  unsigned int
+  Vector::memory_consumption () const
+  {
+    AssertThrow(false, ExcNotImplemented() );
+    return 0;
   }
 
 }

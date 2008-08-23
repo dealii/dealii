@@ -17,6 +17,7 @@
 #include <base/config.h>
 #include <base/table.h>
 #include <lac/block_matrix_base.h>
+#include <lac/block_sparsity_pattern.h>
 #include <lac/trilinos_sparse_matrix.h>
 #include <lac/trilinos_block_vector.h>
 #include <lac/exceptions.h>
@@ -177,7 +178,8 @@ namespace TrilinosWrappers
 				        * assumes that a quadratic block
 				        * matrix is generated.
                                         */
-      //void reinit (const std::vector<Epetra_Map> &input_maps);
+      void reinit (const std::vector<Epetra_Map> &input_maps,
+		   const BlockSparsityPattern    &block_sparsity_pattern);
 
 				       /** 
 					* This function calls the compress()
