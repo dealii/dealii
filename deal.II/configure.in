@@ -365,9 +365,12 @@ AC_ARG_ENABLE(parser,
                               to switch off support for the function parser
 			      in the contrib directory.]),
 	      [ enableparser=$enableval
-	        AC_MSG_RESULT(Function parser disabled)
 	        if test "x$enableval" = "xno" ; then
-		AC_DEFINE(DEAL_II_DISABLE_PARSER,1,[disable the function parser in contrib])
+ 	          AC_MSG_RESULT(Function parser disabled)
+		  AC_DEFINE(DEAL_II_DISABLE_PARSER, 1,
+                            [disable the function parser in contrib])
+                else
+ 	          AC_MSG_RESULT(Function parser enabled)
 		fi],
 	      enableparser=yes)
 
