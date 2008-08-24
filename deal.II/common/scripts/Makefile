@@ -29,7 +29,7 @@ make_dependencies : make_dependencies.cc $D/common/Make.global_options
 
 expand_instantiations : expand_instantiations.cc $D/common/Make.global_options
 	@echo ============================ Compiling $@
-	@$(CXX) $(CXXFLAGS.g) $(LDFLAGS) $< -o $@
+	@$(CXX) $(CXXFLAGS.o) $(LDFLAGS) $< -o $@
 
 clean:
 	-rm -f make_dependencies
