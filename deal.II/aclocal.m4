@@ -391,7 +391,9 @@ AC_DEFUN(DEAL_II_DETERMINE_IF_SUPPORTS_MPI, dnl
         [
           #include <mpi.h>
         ],
-        [;],
+        [
+	  MPI_Init (&argc,&argv);
+	],
         [
           AC_MSG_RESULT(yes)
 	  AC_DEFINE(DEAL_II_COMPILER_SUPPORTS_MPI, 1,
