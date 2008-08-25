@@ -2088,8 +2088,8 @@ void BoussinesqFlowProblem<dim>::refine_mesh (const unsigned int max_grid_level)
 template <int dim>
 void BoussinesqFlowProblem<dim>::run ()
 {
-  const unsigned int initial_refinement = (dim == 2 ? 4 : 3);
-  const unsigned int n_pre_refinement_steps = 4;
+  const unsigned int initial_refinement = (dim == 2 ? 4 : 2);
+  const unsigned int n_pre_refinement_steps = (dim == 2 ? 4 : 3);
 
   
   GridGenerator::hyper_cube (triangulation);
