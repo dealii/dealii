@@ -1213,7 +1213,7 @@ BoussinesqFlowProblem<dim>::build_stokes_preconditioner ()
     }
 	
   Amg_preconditioner->initialize(stokes_preconditioner_matrix.block(0,0),
-				 null_space, dim, true, true, false);
+				 true, true, null_space, dim, false);
 
 				   // TODO: we could throw away the (0,0)
 				   // block here since things have been
