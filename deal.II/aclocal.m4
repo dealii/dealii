@@ -1883,8 +1883,10 @@ AC_DEFUN(DEAL_II_SET_MULTITHREADING_FLAGS, dnl
 	    ;;
 
         intel_icc*)
-            CXXFLAGSG="$CXXFLAGSG"  
-            CXXFLAGSO="$CXXFLAGSO"
+	    LDFLAGS="$LDFLAGS -lpthread"
+	    ;;
+
+	portland_group*)
 	    LDFLAGS="$LDFLAGS -lpthread"
 	    ;;
 
