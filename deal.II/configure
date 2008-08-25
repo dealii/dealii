@@ -3895,7 +3895,7 @@ int
 main ()
 {
 
-	  MPI_Init (&argc,&argv);
+	  MPI_Init (0,0);
 
   ;
   return 0;

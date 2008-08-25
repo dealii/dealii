@@ -392,7 +392,7 @@ AC_DEFUN(DEAL_II_DETERMINE_IF_SUPPORTS_MPI, dnl
           #include <mpi.h>
         ],
         [
-	  MPI_Init (&argc,&argv);
+	  MPI_Init (0,0);
 	],
         [
           AC_MSG_RESULT(yes)
