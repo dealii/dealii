@@ -19,6 +19,8 @@
 #include <lac/block_vector.h>
 #include <lac/petsc_vector.h>
 #include <lac/petsc_block_vector.h>
+#include <lac/trilinos_vector.h>
+#include <lac/trilinos_block_vector.h>
 #include <grid/tria_iterator.h>
 #include <base/geometry_info.h>
 #include <dofs/dof_handler.h>
@@ -1665,6 +1667,14 @@ INSTANTIATE(PETScWrappers::BlockVector,DoFHandler<deal_II_dimension>);
 
 INSTANTIATE(PETScWrappers::Vector,hp::DoFHandler<deal_II_dimension>);
 INSTANTIATE(PETScWrappers::BlockVector,hp::DoFHandler<deal_II_dimension>);
+#endif
+
+#ifdef DEAL_II_USE_TRILINOS
+INSTANTIATE(TrilinosWrappers::Vector,DoFHandler<deal_II_dimension>);
+INSTANTIATE(TrilinosWrappers::BlockVector,DoFHandler<deal_II_dimension>);
+
+INSTANTIATE(TrilinosWrappers::Vector,hp::DoFHandler<deal_II_dimension>);
+INSTANTIATE(TrilinosWrappers::BlockVector,hp::DoFHandler<deal_II_dimension>);
 #endif
 
 #undef INSTANTIATE
