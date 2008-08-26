@@ -195,10 +195,14 @@ namespace TrilinosWrappers
 	    ExcDimensionMismatch (matrix->NumGlobalRows(),
 				  sparsity_pattern.n_rows()));
 
-				 // Trilinos seems to have a bug for
-				 // rectangular matrices at this point,
-				 // so do not check for consistent 
-				 // column numbers here.
+				     // Trilinos seems to have a bug for
+				     // rectangular matrices at this point,
+				     // so do not check for consistent 
+				     // column numbers here.
+				     //
+				     // this bug is filed in the Sandia
+				     // bugzilla under #4123 and should be
+				     // fixed for version 9.0
 //    Assert (matrix->NumGlobalCols() == (int)sparsity_pattern.n_cols(),
 //	    ExcDimensionMismatch (matrix->NumGlobalCols(),
 //				  sparsity_pattern.n_cols()));
