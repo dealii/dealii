@@ -195,14 +195,10 @@ namespace TrilinosWrappers
 	    ExcDimensionMismatch (matrix->NumGlobalRows(),
 				  sparsity_pattern.n_rows()));
 
-				     // Trilinos seems to have a bug for
-				     // rectangular matrices at this point,
-				     // so do not check for consistent 
-				     // column numbers here.
-				     //
-				     // this bug is filed in the Sandia
-				     // bugzilla under #4123 and should be
-				     // fixed for version 9.0
+				 // Trilinos seems to have a bug for
+				 // rectangular matrices at this point,
+				 // so do not check for consistent 
+				 // column numbers here.
 //    Assert (matrix->NumGlobalCols() == (int)sparsity_pattern.n_cols(),
 //	    ExcDimensionMismatch (matrix->NumGlobalCols(),
 //				  sparsity_pattern.n_cols()));
@@ -331,7 +327,7 @@ namespace TrilinosWrappers
 	for (dealii::SparseMatrix<double>::const_iterator  
 	      p  = deal_ii_sparse_matrix.begin(row);
 	      p != deal_ii_sparse_matrix.end(row); ++p)
-	  if (std::abs(p->value()) > drop_tolerance)
+	  if (std::fabs(p->value()) > drop_tolerance)
 	    {
 	      row_indices[index] = p->column();
 	      values[index]      = p->value();
@@ -461,7 +457,7 @@ namespace TrilinosWrappers
                                      // case to be consistent with the MPI
                                      // communication model (see the
                                      // comments in the documentation of
-                                     // TrilinosWrappers::MPI::Vector), but we
+                                     // TrilinosWrappers::Vector), but we
                                      // can save some work if the addend is
                                      // zero
     if (value == 0)
@@ -480,6 +476,52 @@ namespace TrilinosWrappers
 
 
 
+  void
+  SparseMatrix::clear_row (const unsigned int   row,
+			   const TrilinosScalar new_diag_value)
+  {
+    Assert (matrix->Filled()==true,
+	    ExcMessage("Matrix must be compressed before invoking clear_row."));
+
+				     // Only do this on the rows
+				     // owned locally on this processor.
+    int local_row = matrix->LRID(row);
+    if (local_row >= 0)
+      {
+	TrilinosScalar *values;
+	int *col_indices;
+	int num_entries;
+	const int ierr = matrix->ExtractMyRowView(local_row, num_entries,
+						  values, col_indices);
+	
+	Assert (ierr == 0,
+	        ExcTrilinosError(ierr));
+	
+	int* diag_find = std::find(col_indices,col_indices+num_entries, 
+				   local_row);
+	int diag_index = (int)(diag_find - col_indices);
+
+	for (int j=0; j<num_entries; ++j)
+	  if (diag_index != col_indices[j])
+	   values[j] = 0.;
+
+	if (diag_find && std::fabs(values[diag_index]) > 0.)
+	  values[diag_index] = new_diag_value;
+      }
+  }
+
+
+
+  void
+  SparseMatrix::clear_rows (const std::vector<unsigned int> &rows,
+			    const TrilinosScalar             new_diag_value)
+  {
+    for (unsigned int row=0; row<rows.size(); ++row)
+      clear_row(rows[row], new_diag_value);
+  }
+
+
+
   TrilinosScalar
   SparseMatrix::el (const unsigned int i,
 		    const unsigned int j) const
@@ -488,7 +530,7 @@ namespace TrilinosWrappers
                                       // the matrix.
     int trilinos_i = matrix->LRID(i), trilinos_j = matrix->LRID(j);
     TrilinosScalar value = 0.;
-    
+
                                       // If the data is not on the
                                       // present processor, we can't
                                       // continue.
@@ -525,16 +567,17 @@ namespace TrilinosWrappers
 				      // Search the index where we
 				      // look for the value, and then
 				      // finally get it.
-      int* index = std::find(&col_indices[0],&col_indices[0] + nnz_present,
-			     trilinos_j);
+      
+      int* el_find = std::find(&col_indices[0],&col_indices[0] + nnz_present,
+			       trilinos_j);
+      
+      int el_index = (int)(el_find - col_indices);
 
-      int position;
-      if (!index)
+      if (!el_find)
 	value = 0;
       else
 	{
-	  position = (int)(index - &(col_indices[0]));
-	  value = values[position];
+	  value = values[el_index];
 	}
     }
 
@@ -548,8 +591,6 @@ namespace TrilinosWrappers
   {
     Assert (m() == n(), ExcNotQuadratic());
 
-                                     // this doesn't seem to work any
-                                     // different than any other element
     return el(i,i);
   }
 
@@ -589,7 +630,7 @@ namespace TrilinosWrappers
   {
     int begin, end;
     begin = matrix->RowMap().MinMyGID();
-    end = matrix->RowMap().MaxMyGID();
+    end = matrix->RowMap().MaxMyGID()+1;
     
     return std::make_pair (begin, end);
   }
@@ -827,10 +868,34 @@ namespace TrilinosWrappers
     return false;
   }  
 
+
+
   void
   SparseMatrix::write_ascii ()
   {
     Assert (false, ExcNotImplemented());
+  }
+
+
+
+				   // As of now, no particularly neat
+				   // ouput is generated in case of 
+				   // multiple processors.
+  void SparseMatrix::print (std::ostream &out) const
+  {
+    double * values;
+    int * indices;
+    int num_entries;
+  
+    for (int i=0; i<matrix->NumMyRows(); ++i)
+      {
+        matrix->ExtractMyRowView (i, num_entries, values, indices);
+	for (int j=0; j<num_entries; ++j)
+	  out << "(" << i << "," << indices[matrix->GRID(j)] << ") " 
+	      << values[j] << std::endl;
+      }
+  
+    AssertThrow (out, ExcIO());
   }
 
 }

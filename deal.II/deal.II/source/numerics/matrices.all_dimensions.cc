@@ -746,18 +746,11 @@ namespace TrilinosWrappers
 
                                      // then eliminate these rows and set
                                      // their diagonal entry to what we have
-                                     // determined above. note that for trilinos
-                                     // matrices interleaving read with write
-                                     // operations is very expensive. thus, we
-                                     // here always replace the diagonal
-                                     // element, rather than first checking
-                                     // whether it is nonzero and in that case
-                                     // preserving it. this is different from
-                                     // the case of deal.II sparse matrices
-                                     // treated in the other functions.
-//TODO: clear_row is not currently implemented for Trilinos    
-    Assert (false, ExcInternalError());
-//    matrix.clear_rows (constrained_rows, average_nonzero_diagonal_entry);
+                                     // determined above. if the value already
+                                     // is nonzero, it will be preserved, 
+                                     // in accordance with the basic 
+                                     // matrix classes in deal.II.
+    matrix.clear_rows (constrained_rows, average_nonzero_diagonal_entry);
 
                                      // the next thing is to set right hand
                                      // side to the wanted value. there's one

@@ -770,6 +770,13 @@ namespace TrilinosWrappers
       void ratio (const Vector &a,
                   const Vector &b);
 
+				     /**
+				      *  Output of vector in user-defined
+				      *  format in analogy to the 
+				      *  dealii::Vector<number> class.
+				      */
+    void print (const char* format = 0) const;
+
                                        /**
                                         * Print to a
                                         * stream. @p precision denotes
@@ -900,7 +907,7 @@ namespace TrilinosWrappers
  *
  * @ingroup TrilinosWrappers
  * @relates TrilinosWrappers::Vector
- * @author Wolfgang Bangerth, 2004
+ * @author Martin Kronbichler, Wolfgang Bangerth, 2008
  */
   inline
   void swap (Vector &u, Vector &v)

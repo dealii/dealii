@@ -207,7 +207,7 @@ namespace TrilinosWrappers
   {
     int begin, end;
     begin = vector->Map().MinMyGID();
-    end = vector->Map().MaxMyGID();
+    end = vector->Map().MaxMyGID()+1;
     return std::make_pair (begin, end);
   }
 
@@ -520,17 +520,14 @@ namespace TrilinosWrappers
 	    ExcMessage("The given value is not finite but "
 		       "either infinite or Not A Number (NaN)"));
 
-    std::vector<TrilinosScalar> list (size(), s);
+    unsigned int n_local = local_size();
+    int ierr;
 
-    int* index = new int[size()];
-    for (unsigned int i=0; i<size(); i++)
-      index[i]=i;
-    
-    const int ierr = vector->SumIntoGlobalValues(size(), index, &list[0]);
-
-    delete[] index;
-    
-    AssertThrow (ierr == 0, ExcTrilinosError(ierr));
+    for (unsigned int i=0; i<n_local; i++)
+      {
+	ierr = vector->SumIntoMyValue(i,0,s);
+        AssertThrow (ierr == 0, ExcTrilinosError(ierr));
+      }
   }
 
 
@@ -545,14 +542,14 @@ namespace TrilinosWrappers
 
   void
   Vector::add (const TrilinosScalar a,
-                   const Vector     &v)
+	       const Vector        &v)
   {
 
     Assert (numbers::is_finite(a),
 	    ExcMessage("The given value is not finite but "
 		       "either infinite or Not A Number (NaN)"));
 
-    const int ierr = vector->Update(a, *(v.vector), 1);
+    const int ierr = vector->Update(a, *(v.vector), 1.);
     AssertThrow (ierr == 0, ExcTrilinosError(ierr));
   }
 
@@ -560,9 +557,9 @@ namespace TrilinosWrappers
 
   void
   Vector::add (const TrilinosScalar a,
-                   const Vector &v,
-                   const TrilinosScalar b,
-                   const Vector &w)
+	       const Vector        &v,
+	       const TrilinosScalar b,
+	       const Vector        &w)
   {
 
     Assert (numbers::is_finite(a),
@@ -572,7 +569,7 @@ namespace TrilinosWrappers
 	    ExcMessage("The given value is not finite but "
 		       "either infinite or Not A Number (NaN)"));
 
-    const int ierr = vector->Update(a, *(v.vector), b, *(w.vector), 1.0);
+    const int ierr = vector->Update(a, *(v.vector), b, *(w.vector), 1.);
 
     AssertThrow (ierr == 0, ExcTrilinosError(ierr));
   }
@@ -581,14 +578,14 @@ namespace TrilinosWrappers
 
   void
   Vector::sadd (const TrilinosScalar s,
-                    const Vector &v)
+		const Vector        &v)
   {
 
     Assert (numbers::is_finite(s),
 	    ExcMessage("The given value is not finite but "
 		       "either infinite or Not A Number (NaN)"));
 
-    const int ierr = vector->Update(1.0, *(v.vector), s);
+    const int ierr = vector->Update(1., *(v.vector), s);
 
     AssertThrow (ierr == 0, ExcTrilinosError(ierr));
   }
@@ -597,8 +594,8 @@ namespace TrilinosWrappers
 
   void
   Vector::sadd (const TrilinosScalar s,
-                    const TrilinosScalar a,
-                    const Vector     &v)
+		const TrilinosScalar a,
+		const Vector        &v)
   {
 
     Assert (numbers::is_finite(s),
@@ -617,10 +614,10 @@ namespace TrilinosWrappers
 
   void
   Vector::sadd (const TrilinosScalar s,
-                    const TrilinosScalar a,
-                    const Vector     &v,
-                    const TrilinosScalar b,
-                    const Vector     &w)
+		const TrilinosScalar a,
+		const Vector        &v,
+		const TrilinosScalar b,
+		const Vector        &w)
   {
 
     Assert (numbers::is_finite(s),
@@ -642,12 +639,12 @@ namespace TrilinosWrappers
 
   void
   Vector::sadd (const TrilinosScalar s,
-                    const TrilinosScalar a,
-                    const Vector     &v,
-                    const TrilinosScalar b,
-                    const Vector     &w,
-                    const TrilinosScalar c,
-                    const Vector     &x)
+		const TrilinosScalar a,
+		const Vector        &v,
+		const TrilinosScalar b,
+		const Vector        &w,
+		const TrilinosScalar c,
+		const Vector        &x)
   {
 
     Assert (numbers::is_finite(s),
@@ -663,12 +660,13 @@ namespace TrilinosWrappers
 	    ExcMessage("The given value is not finite but "
 		       "either infinite or Not A Number (NaN)"));
 
-                                     // Update member can only input two other vectors so
+                                     // Update member can only input 
+				     // two other vectors so
                                      // do it in two steps
     const int ierr = vector->Update(a, *(v.vector), b, *(w.vector), s);
     AssertThrow (ierr == 0, ExcTrilinosError(ierr));
-    
-    const int jerr = vector->Update(c, *(x.vector), 1.0);
+
+    const int jerr = vector->Update(c, *(x.vector), 1.);
     AssertThrow (jerr == 0, ExcTrilinosError(jerr));
   }
 
@@ -692,11 +690,10 @@ namespace TrilinosWrappers
 	    ExcMessage("The given value is not finite but "
 		       "either infinite or Not A Number (NaN)"));
 
-    Assert (size() == v.size(),
-            ExcDimensionMismatch (size(), v.size()));
-
-    const int ierr = vector->Update(a, *(v.vector), 0.0);
-    AssertThrow (ierr == 0, ExcTrilinosError(ierr));
+    *vector = *v.vector;
+    map = v.map;
+    
+    *this *= a;
   }
 
 
@@ -715,15 +712,12 @@ namespace TrilinosWrappers
 	    ExcMessage("The given value is not finite but "
 		       "either infinite or Not A Number (NaN)"));
 
-    Assert (size() == v.size(),
-            ExcDimensionMismatch (size(), v.size()));
+    Assert (v.size() == w.size(),
+            ExcDimensionMismatch (v.size(), w.size()));
 
-    Assert (size() == w.size(),
-            ExcDimensionMismatch (size(), w.size()));
-
-    const int ierr = vector->Update(a, *(v.vector), b, *(w.vector), 0.0);
-    AssertThrow (ierr == 0, ExcTrilinosError(ierr));
-
+    *vector = *v.vector;
+    map = v.map;
+    sadd (a, b, w);
   }
 
 
@@ -732,8 +726,8 @@ namespace TrilinosWrappers
   Vector::ratio (const Vector &v,
 		 const Vector &w)
   {
-    Assert (size() == v.size(),
-            ExcDimensionMismatch (size(), v.size()));
+    Assert (v.size() == w.size(),
+            ExcDimensionMismatch (v.size(), w.size()));
 
     Assert (size() == w.size(),
             ExcDimensionMismatch (size(), w.size()));
@@ -742,6 +736,28 @@ namespace TrilinosWrappers
 						*(v.vector), 0.0);
 
     AssertThrow (ierr == 0, ExcTrilinosError(ierr));
+  }
+
+
+  
+				     // TODO: up to now only local data
+                                     // printed out! Find a way to neatly
+				     // output distributed data...
+  void
+  Vector::print (const char *format) const
+  {
+    Assert (vector->GlobalLength()!=0, ExcEmptyObject());
+    
+    for (unsigned int j=0; j<size(); ++j)
+      {
+        double t = (*vector)[0][j];
+
+	if (format != 0)
+          std::printf (format, t);
+        else
+          std::printf (" %5.2f", double(t));
+      }
+    std::printf ("\n");
   }
 
 
@@ -757,7 +773,8 @@ namespace TrilinosWrappers
                                      // get a representation of the vector and
                                      // loop over all the elements 
                                      // TODO: up to now only local data
-                                     // printed out!
+                                     // printed out! Find a way to neatly
+				     // output distributed data...
     TrilinosScalar *val;
     int leading_dimension;
     int ierr = vector->ExtractView (&val, &leading_dimension);
@@ -790,10 +807,10 @@ namespace TrilinosWrappers
                                     // Just swap the pointers to the 
                                     // two Epetra vectors that hold all
                                     // the data.
-    std::auto_ptr<Epetra_FEVector> tmp;
-    tmp = v.vector;
-    v.vector = vector;
-    vector = tmp;
+    Vector *p_v = &v, *p_this = this;
+    Vector* tmp = p_v;
+    p_v = p_this;
+    p_this = tmp;
   }
 
 

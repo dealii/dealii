@@ -175,7 +175,7 @@ namespace TrilinosWrappers
     
     Epetra_Vector LHS (View, multigrid_operator->OperatorDomainMap(),
 		       dst.begin());
-    Epetra_Vector RHS (View, multigrid_operator->OperatorDomainMap(),
+    Epetra_Vector RHS (View, multigrid_operator->OperatorRangeMap(),
 		       const_cast<double*>(src.begin()));
   
     const int res = multigrid_operator->ApplyInverse (RHS, LHS);

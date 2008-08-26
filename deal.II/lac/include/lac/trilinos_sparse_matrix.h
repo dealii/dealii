@@ -478,6 +478,21 @@ namespace TrilinosWrappers
       void clear ();
 
                                        /**
+                                        * Trilinos matrices store their own
+                                        * sparsity patterns. So, in analogy to
+                                        * our own SparsityPattern class,
+                                        * this function compresses the
+                                        * sparsity pattern and allows the
+                                        * resulting matrix to be used in all
+                                        * other operations where before only
+                                        * assembly functions were
+                                        * allowed. This function must
+                                        * therefore be called once you have
+                                        * assembled the matrix.
+                                        */
+      void compress ();
+
+                                       /**
                                         * This operator assigns a scalar to a
                                         * matrix. Since this does usually not
                                         * make much sense (should we set all
@@ -545,7 +560,10 @@ namespace TrilinosWrappers
                                         * pattern, though (but retains
                                         * the allocated memory in case
                                         * new entries are again added
-                                        * later).
+                                        * later). Note that this
+				        * is a global operation, so this
+				        * needs to be done on all 
+				        * MPI processes.
                                         *
                                         * This operation is used in
                                         * eliminating constraints (e.g. due to
@@ -554,7 +572,7 @@ namespace TrilinosWrappers
                                         * the matrix without having to read
                                         * entries (such as the locations of
                                         * non-zero elements) from it --
-                                        * without this operation, removing
+                                        * without this o peration, removing
                                         * constraints on parallel matrices is
                                         * a rather complicated procedure.
                                         *
@@ -563,8 +581,8 @@ namespace TrilinosWrappers
                                         * to a value different from zero. The
                                         * default is to set it to zero.
                                         */
-     // void clear_row (const unsigned int row,
-     //                 const TrilinosScalar  new_diag_value = 0);
+      void clear_row (const unsigned int   row,
+                      const TrilinosScalar new_diag_value = 0);
 
                                        /**
                                         * Same as clear_row(), except that it
@@ -579,24 +597,9 @@ namespace TrilinosWrappers
                                         * the diagonal entries, you have to
                                         * set them by hand.
                                         */
-     // void clear_rows (const std::vector<unsigned int> &rows,
-     //                  const TrilinosScalar                new_diag_value = 0);
-      
-                                       /**
-                                        * Trilinos matrices store their own
-                                        * sparsity patterns. So, in analogy to
-                                        * our own SparsityPattern class,
-                                        * this function compresses the
-                                        * sparsity pattern and allows the
-                                        * resulting matrix to be used in all
-                                        * other operations where before only
-                                        * assembly functions were
-                                        * allowed. This function must
-                                        * therefore be called once you have
-                                        * assembled the matrix.
-                                        */
-      void compress ();
-      
+      void clear_rows (const std::vector<unsigned int> &rows,
+                       const TrilinosScalar             new_diag_value = 0);
+
                                        /**
                                         * Return the value of the entry
                                         * (<i>i,j</i>).  This may be an
@@ -998,6 +1001,15 @@ namespace TrilinosWrappers
 					 */
       void write_ascii ();
       
+				     /**
+				      * Print the matrix to the given
+				      * stream, using the format
+				      * <tt>(line,col) value</tt>,
+				      * i.e. one nonzero entry of the
+				      * matrix per line.
+				      */
+    void print (std::ostream &out) const;
+    
                                         // TODO: Write an overloading
                                         // of the operator << for output.
                                         // Since the underlying Trilinos 
