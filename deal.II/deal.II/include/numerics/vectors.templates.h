@@ -480,7 +480,8 @@ void VectorTools::project (const Mapping<dim>       &mapping,
                                    // and that wouldn't necessarily go
                                    // together with the matrix and
                                    // other functions
-  std::copy (vec.begin(), vec.end(), vec_result.begin());
+  for (unsigned int i=0; i<vec.size(); ++i)
+    vec_result(i) = vec(i);
 }
 
 
