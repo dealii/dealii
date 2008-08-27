@@ -17,6 +17,7 @@
 #include <base/config.h>
 #include <base/table.h>
 #include <lac/block_matrix_base.h>
+#include <lac/block_sparse_matrix.h>
 #include <lac/block_sparsity_pattern.h>
 #include <lac/trilinos_sparse_matrix.h>
 #include <lac/trilinos_block_vector.h>
@@ -180,6 +181,21 @@ namespace TrilinosWrappers
                                         */
       void reinit (const std::vector<Epetra_Map> &input_maps,
 		   const BlockSparsityPattern    &block_sparsity_pattern);
+
+                                       /**
+                                        * This function initializes the
+				        * Trilinos matrix using the deal.II
+				        * sparse matrix and the entries stored
+				        * therein. It uses a threshold 
+				        * to copy only elements whose 
+				        * modulus is larger than the 
+				        * threshold (so zeros in the 
+				        * deal.II matrix can be filtered
+				        * away).
+                                        */
+      void reinit (const std::vector<Epetra_Map>             &input_maps,
+		   const ::dealii::BlockSparseMatrix<double> &deal_ii_sparse_matrix,
+		   const double                               drop_tolerance=1e-13);
 
 				       /** 
 					* This function calls the compress()

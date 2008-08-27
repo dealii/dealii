@@ -22,8 +22,8 @@ namespace TrilinosWrappers
 {
   BlockSparseMatrix::BlockSparseMatrix ()
   {}
-  
-  
+
+
 
   BlockSparseMatrix::~BlockSparseMatrix ()
   {}
@@ -94,18 +94,55 @@ namespace TrilinosWrappers
 	  const BlockSparsityPattern    &block_sparsity_pattern)
   {
     const unsigned int n_block_rows = input_maps.size();
-    
-				     // Call the other reinit function ...
+
+    Assert (n_block_rows == block_sparsity_pattern.n_block_rows(),
+	    ExcDimensionMismatch (n_block_rows,
+				  block_sparsity_pattern.n_block_rows()));
+    Assert (n_block_rows == block_sparsity_pattern.n_block_cols(),
+	    ExcDimensionMismatch (n_block_rows,
+				  block_sparsity_pattern.n_block_cols()));
+
+				     // Call the other basic reinit function ...
     reinit (n_block_rows, n_block_rows);
 	
-				     // ... and now assign the correct
-				     // blocks.
-
+				     // ... and then assign the correct
+				     // data to the blocks.
     for (unsigned int r=0; r<this->n_block_rows(); ++r)
       for (unsigned int c=0; c<this->n_block_cols(); ++c)
         {
           this->block(r,c).reinit(input_maps[r],input_maps[c],
 				  block_sparsity_pattern.block(r,c));
+        }
+  }
+
+
+
+  void
+  BlockSparseMatrix::
+  reinit (const std::vector<Epetra_Map>             &input_maps,
+	  const ::dealii::BlockSparseMatrix<double> &dealii_block_sparse_matrix,
+	  const double                               drop_tolerance)
+  {
+    const unsigned int n_block_rows = input_maps.size();
+    
+    Assert (n_block_rows == dealii_block_sparse_matrix.n_block_rows(),
+	    ExcDimensionMismatch (n_block_rows,
+				  dealii_block_sparse_matrix.n_block_rows()));
+    Assert (n_block_rows == dealii_block_sparse_matrix.n_block_cols(),
+	    ExcDimensionMismatch (n_block_rows,
+				  dealii_block_sparse_matrix.n_block_cols()));
+
+				     // Call the other basic reinit function ...
+    reinit (n_block_rows, n_block_rows);
+	
+				     // ... and then assign the correct
+				     // data to the blocks.
+    for (unsigned int r=0; r<this->n_block_rows(); ++r)
+      for (unsigned int c=0; c<this->n_block_cols(); ++c)
+        {
+          this->block(r,c).reinit(input_maps[r],input_maps[c],
+				  dealii_block_sparse_matrix.block(r,c),
+				  drop_tolerance);
         }
   }
 

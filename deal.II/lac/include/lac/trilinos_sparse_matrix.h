@@ -264,22 +264,23 @@ namespace TrilinosWrappers
  * This class implements a wrapper to use the Trilinos distributed sparse matrix
  * class Epetra_FECrsMatrix. This is precisely the kind of matrix we deal with
  * all the time - we most likely get it from some assembly process, where also
- * entries not locally owned might need to written and hence need to be
- * forwarded to the owner. This class is designed to be used in a distributed
+ * entries not locally owned might need to be written and hence need to be
+ * forwarded to the owner process. 
+ * This class is designed to be used in a distributed
  * memory architecture with an MPI compiler on the bottom, but works equally
  * well also for serial processes. The only requirement for this class to
- * work is that Trilinos is installed with the respective compiler as a
- * basis.
+ * work is that Trilinos has been installed with the same compiler as is used
+ * for generating deal.II.
  *
  * The interface of this class is modeled after the existing
  * SparseMatrix class in deal.II. It has almost the same member
  * functions, and is often exchangable. However, since Trilinos only supports a
- * single scalar type (double), it is
- * not templated, and only works with doubles.
+ * single scalar type (double), it is not templated, and only works with
+ * doubles.
  *
  * Note that Trilinos only guarantees that operations do what you expect if the
- * functions @p GlobalAssemble  has been called
- * after matrix assembly. Therefore, you need to call
+ * functions @p GlobalAssemble  has been called after matrix assembly. 
+ * Therefore, you need to call
  * SparseMatrix::compress() before you actually use the matrix. This also
  * calls @p FillComplete that compresses the storage format for sparse
  * matrices by discarding unused elements. Trilinos allows to continue with
@@ -336,7 +337,16 @@ namespace TrilinosWrappers
                                        /**
                                         * Constructor using an Epetra_Map
 				        * and a maximum number of nonzero
-				        * matrix entries.
+				        * matrix entries. Note that this
+				        * number does not need to be exact,
+				        * and it is even allowed that 
+				        * the actual matrix structure 
+				        * has more nonzero entries than
+				        * specified in the constructor.
+				        * However it is still advantageous to
+				        * provide good estimates here since
+				        * this will considerably increase
+				        * the performance of the matrix.
                                         */
       SparseMatrix (const Epetra_Map   &InputMap,
 		    const unsigned int  n_max_entries_per_row);
@@ -403,53 +413,33 @@ namespace TrilinosWrappers
                                         * can use pointers to this class.
                                         */
       virtual ~SparseMatrix ();
-                                       
-				       /**
-                                        * This function initializes the
-				        * Trilinos matrix by attaching all
-				        * the elements to the sparsity
-				        * pattern provided as deal argument.
-				        * This function uses a user-
-				        * provided maximum number of 
-				        * elements per row. If that is
-				        * not directly available, use one of the
-				        * other reinit functions.
-                                        */
-      void reinit (const SparsityPattern  &sparsity_pattern,
-		   const unsigned int      n_max_entries_per_row);
 
                                        /**
                                         * This function initializes the
-				        * Trilinos matrix by attaching all
-				        * the elements to the sparsity
-				        * pattern provided as deal argument,
-				        * now calculating the maximum number
-				        * of nonzeros from the sparsity
-				        * pattern internally.
+				        * Trilinos matrix with a deal.II
+				        * sparsity pattern, i.e. it 
+				        * makes the Trilinos Epetra
+				        * matrix know the position of
+				        * nonzero entries according to
+				        * the sparsity pattern. Note that,
+				        * when using this function, the
+				        * matrix must already be initialized
+				        * with a suitable Epetra_Map that
+				        * describes the distribution of 
+				        * the matrix among the MPI 
+				        * processes. Otherwise, an
+				        * error will be thrown.
                                         */
       void reinit (const SparsityPattern &sparsity_pattern);
 
-                                       /**
-                                        * This function initializes the
-				        * Trilinos matrix using the deal.II
-				        * sparse matrix and the entries stored
-				        * therein. It uses a threshold 
-				        * to copy only elements whose 
-				        * modulus is larger than the 
-				        * threshold (so zeros in the 
-				        * deal.II matrix can be filtered
-				        * away).
-                                        */
-      void reinit (const Epetra_Map                     &input_map,
-		   const ::dealii::SparseMatrix<double> &deal_ii_sparse_matrix,
-		   const double                          drop_tolerance=1e-13);
-
 				       /**
-                                        * This function is similar to the
-				        * other initialization function above,
-				        * but now also reassigns the matrix 
-				        * rows according to a user-supplied
-				        * Epetra map. This might be used
+                                        * This function is initializes the
+				        * Trilinos Epetra matrix according
+				        * to the specified sparsity_pattern,
+				        * and also reassigns the matrix 
+				        * rows to different processes 
+				        * according to a user-supplied
+				        * Epetra map. This might be useful
 				        * when the matrix structure changes,
 				        * e.g. when the grid is refined.
                                         */
@@ -462,12 +452,42 @@ namespace TrilinosWrappers
 				        * but now also reassigns the matrix 
 				        * rows and columns according to 
 				        * two user-supplied Epetra maps.
-				        * To be used e.g. for rectangular 
-				        * matrices after remeshing.
+				        * To be used for rectangular 
+				        * matrices.
                                         */
       void reinit (const Epetra_Map       &input_row_map,
 		   const Epetra_Map       &input_col_map,
 		   const SparsityPattern  &sparsity_pattern);
+
+				       /**
+                                        * This function initializes the
+				        * Trilinos matrix using the deal.II
+				        * sparse matrix and the entries stored
+				        * therein. It uses a threshold 
+				        * to copy only elements with 
+				        * modulus larger than the 
+				        * threshold (so zeros in the 
+				        * deal.II matrix can be filtered
+				        * away).
+                                        */
+      void reinit (const Epetra_Map                     &input_map,
+		   const ::dealii::SparseMatrix<double> &dealii_sparse_matrix,
+		   const double                          drop_tolerance=1e-13);
+
+ 				       /**
+                                        * This function is similar to the
+				        * other initialization function with 
+				        * deal.II sparse matrix input above,
+				        * but now takes Epetra maps for both
+				        * the rows and the columns of the
+				        * matrix.
+				        * To be used for rectangular 
+				        * matrices.
+                                        */
+      void reinit (const Epetra_Map                      &input_row_map,
+		   const Epetra_Map                      &input_col_map,
+		   const ::dealii::SparseMatrix<double>  &dealii_sparse_matrix,
+		   const double                           drop_tolerance=1e-13);
 
                                        /**
                                         * Release all memory and return
