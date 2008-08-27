@@ -29,6 +29,7 @@
 #include <lac/precondition.h>
 #include <lac/sparse_direct.h>
 #include <lac/sparse_ilu.h>
+#include <lac/trilinos_sparse_matrix.h>
 #include <lac/trilinos_precondition_amg.h>
 
 #include <grid/tria.h>
@@ -58,6 +59,10 @@
 
 #include <fstream>
 #include <sstream>
+
+
+//TODO: Put into the class itself
+Epetra_SerialComm comm_serial;
 
                                  // This is Trilinos
 
@@ -540,16 +545,16 @@ class BoussinesqFlowProblem
     FE_Q<dim>                 temperature_fe;
     DoFHandler<dim>           temperature_dof_handler;
     ConstraintMatrix          temperature_constraints;
-    
-    SparsityPattern           temperature_sparsity_pattern;
-    SparseMatrix<double>      temperature_mass_matrix;
-    SparseMatrix<double>      temperature_stiffness_matrix;
-    SparseMatrix<double>      temperature_matrix;
 
-    Vector<double>            temperature_solution;
-    Vector<double>            old_temperature_solution;
-    Vector<double>            old_old_temperature_solution;
-    Vector<double>            temperature_rhs;
+    SparsityPattern           temperature_sparsity_pattern;
+    TrilinosWrappers::SparseMatrix      temperature_mass_matrix;
+    TrilinosWrappers::SparseMatrix      temperature_stiffness_matrix;
+    TrilinosWrappers::SparseMatrix      temperature_matrix;
+
+    TrilinosWrappers::Vector            temperature_solution;
+    TrilinosWrappers::Vector            old_temperature_solution;
+    TrilinosWrappers::Vector            old_old_temperature_solution;
+    TrilinosWrappers::Vector            temperature_rhs;
 
 
     double time_step;
@@ -1050,9 +1055,11 @@ void BoussinesqFlowProblem<dim>::setup_dofs ()
     temperature_constraints.condense (csp);
     temperature_sparsity_pattern.copy_from (csp);
 
-    temperature_matrix.reinit (temperature_sparsity_pattern);
-    temperature_mass_matrix.reinit (temperature_sparsity_pattern);
-    temperature_stiffness_matrix.reinit (temperature_sparsity_pattern);
+//TODO: Put into the class itself    
+    Epetra_Map map (n_T, 0, comm_serial);
+    temperature_matrix.reinit (map, temperature_sparsity_pattern);
+    temperature_mass_matrix.reinit (map, temperature_sparsity_pattern);
+    temperature_stiffness_matrix.reinit (map, temperature_sparsity_pattern);
   }
     
       
@@ -1076,11 +1083,13 @@ void BoussinesqFlowProblem<dim>::setup_dofs ()
   stokes_rhs.block(1).reinit (n_p);
   stokes_rhs.collect_sizes ();
   
-  temperature_solution.reinit (n_T);
-  old_temperature_solution.reinit (n_T);
-  old_old_temperature_solution.reinit (n_T);
+//TODO: Put into the class itself    
+  Epetra_Map map (n_T, 0, comm_serial);
+  temperature_solution.reinit (map);
+  old_temperature_solution.reinit (map);
+  old_old_temperature_solution.reinit (map);
 
-  temperature_rhs.reinit (n_T);
+  temperature_rhs.reinit (map);
 }
 
 
@@ -1921,12 +1930,11 @@ void BoussinesqFlowProblem<dim>::solve ()
 
     SolverControl solver_control (temperature_matrix.m(),
 				  1e-8*temperature_rhs.l2_norm());
-    SolverCG<>   cg (solver_control);
-    PreconditionSSOR<> preconditioner;
-    preconditioner.initialize (temperature_matrix, 1.2);
+    SolverCG<TrilinosWrappers::Vector>   cg (solver_control);
 
+//TODO: Need to do something about this!    
     cg.solve (temperature_matrix, temperature_solution,
-	      temperature_rhs, preconditioner);
+	      temperature_rhs, PreconditionIdentity());
 
 				     // produce a consistent temperature field
     temperature_constraints.distribute (temperature_solution);
@@ -1935,12 +1943,19 @@ void BoussinesqFlowProblem<dim>::solve ()
               << solver_control.last_step()
               << " CG iterations for temperature."
               << std::endl;
+
+    double min_temperature = temperature_solution(0),
+	   max_temperature = temperature_solution(0);
+    for (unsigned int i=0; i<temperature_solution.size(); ++i)
+      {
+	min_temperature = std::min<double> (min_temperature,
+					    temperature_solution(i));
+	max_temperature = std::max<double> (max_temperature,
+					    temperature_solution(i));
+      }
+    
     std::cout << "   Temperature range: "
-	      << *std::min_element (temperature_solution.begin(),
-				    temperature_solution.end())
-	      << ' '
-	      << *std::max_element (temperature_solution.begin(),
-				    temperature_solution.end())
+	      << min_temperature << ' ' << max_temperature
 	      << std::endl;
   }
 }
@@ -2055,13 +2070,13 @@ void BoussinesqFlowProblem<dim>::refine_mesh (const unsigned int max_grid_level)
 	 cell != triangulation.end(); ++cell)
       cell->clear_refine_flag ();
   
-  std::vector<Vector<double> > x_solution (2);
-  x_solution[0].reinit (temperature_dof_handler.n_dofs());
+  std::vector<TrilinosWrappers::Vector> x_solution (2);
+  x_solution[0].reinit (temperature_solution);
   x_solution[0] = temperature_solution;
-  x_solution[1].reinit (temperature_dof_handler.n_dofs());
+  x_solution[1].reinit (temperature_solution);
   x_solution[1] = old_temperature_solution;
 
-  SolutionTransfer<dim, double> soltrans(temperature_dof_handler);
+  SolutionTransfer<dim,TrilinosWrappers::Vector> soltrans(temperature_dof_handler);
 
   triangulation.prepare_coarsening_and_refinement();
   soltrans.prepare_for_coarsening_and_refinement(x_solution);
@@ -2069,9 +2084,9 @@ void BoussinesqFlowProblem<dim>::refine_mesh (const unsigned int max_grid_level)
   triangulation.execute_coarsening_and_refinement ();
   setup_dofs ();
 
-  std::vector<Vector<double> > tmp (2);
-  tmp[0].reinit (temperature_dof_handler.n_dofs());
-  tmp[1].reinit (temperature_dof_handler.n_dofs());
+  std::vector<TrilinosWrappers::Vector> tmp (2);
+  tmp[0].reinit (temperature_solution);
+  tmp[1].reinit (temperature_solution);
   soltrans.interpolate(x_solution, tmp);
 
   temperature_solution = tmp[0];
@@ -2154,6 +2169,9 @@ int main (int argc, char *argv[])
 {
 #ifdef DEAL_II_COMPILER_SUPPORTS_MPI
   MPI_Init (&argc,&argv);
+#else
+  (void)argc;
+  (void)argv;
 #endif
   
   try
