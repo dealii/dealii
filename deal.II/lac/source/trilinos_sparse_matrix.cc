@@ -792,6 +792,54 @@ namespace TrilinosWrappers
 
 
 
+  void
+  SparseMatrix::add (const TrilinosScalar  factor,
+		     const SparseMatrix   &rhs)
+  {
+    Assert (rhs.m() == m(), ExcDimensionMismatch (rhs.m(), m()));
+    Assert (rhs.n() == n(), ExcDimensionMismatch (rhs.n(), n()));
+    
+				     // I bet that there must be a better way
+				     // to do this but it has not been found:
+				     // currently, we simply go through each
+				     // row of the argument matrix, copy it,
+				     // scale it, and add it to the current
+				     // matrix. that's probably not the most
+				     // efficient way to do things.
+    const std::pair<unsigned int, unsigned int>
+      local_range = rhs.local_range();
+
+    unsigned int max_row_length = 0;
+    for (unsigned int row=local_range.first;
+	 row < local_range.second; ++row)
+      max_row_length
+	= std::max (max_row_length,
+		    static_cast<unsigned int>(rhs.matrix->NumGlobalEntries(row)));
+    
+    std::vector<int>    column_indices (max_row_length);
+    std::vector<double> values (max_row_length);
+    
+    for (unsigned int row=local_range.first;
+	 row < local_range.second; ++row)
+      {
+	int n_entries;
+	rhs.matrix->ExtractGlobalRowCopy (row, max_row_length,
+					  n_entries,
+					  &values[0],
+					  &column_indices[0]);
+	for (int i=0; i<n_entries; ++i)
+	  values[i] *= factor;
+
+	matrix->SumIntoGlobalValues (row, n_entries,
+				     &values[0],
+				     &column_indices[0]);
+      }
+
+    compress ();
+  }
+  
+
+
 				  // TODO: Currently this only flips
 				  // a flag that tells Trilinos that
 				  // any application should be done with

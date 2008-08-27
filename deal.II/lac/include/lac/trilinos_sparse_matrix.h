@@ -954,6 +954,15 @@ namespace TrilinosWrappers
 			       const Vector &x,
 			       const Vector &b) const;
 
+				       /**
+					* Add <tt>matrix</tt> scaled by
+					* <tt>factor</tt> to this matrix,
+					* i.e. the matrix <tt>factor*matrix</tt>
+					* is added to <tt>this</tt>.
+					*/
+      void add (const TrilinosScalar  factor,
+		const SparseMatrix   &matrix);
+
                                        /**
                                         * STL-like iterator with the
                                         * first entry.
@@ -1021,14 +1030,14 @@ namespace TrilinosWrappers
 					 */
       void write_ascii ();
       
-				     /**
-				      * Print the matrix to the given
-				      * stream, using the format
-				      * <tt>(line,col) value</tt>,
-				      * i.e. one nonzero entry of the
-				      * matrix per line.
-				      */
-    void print (std::ostream &out) const;
+				       /**
+					* Print the matrix to the given
+					* stream, using the format
+					* <tt>(line,col) value</tt>,
+					* i.e. one nonzero entry of the
+					* matrix per line.
+					*/
+      void print (std::ostream &out) const;
     
                                         // TODO: Write an overloading
                                         // of the operator << for output.
