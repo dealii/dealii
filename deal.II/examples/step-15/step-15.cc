@@ -1171,7 +1171,7 @@ void MinimizationProblem<1>::refine_grid ()
                                    // a <code>SolutionTransfer</code> object with the
                                    // present <code>DoFHandler</code> and attach the
                                    // solution vector to it:
-  SolutionTransfer<dim,double> solution_transfer(dof_handler);
+  SolutionTransfer<dim> solution_transfer(dof_handler);
   solution_transfer.prepare_for_coarsening_and_refinement (present_solution);
 
                                    // Then we do the actual refinement, and

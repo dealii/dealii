@@ -2,7 +2,7 @@
 //    $Id$
 //    Version: $Name$
 //
-//    Copyright (C) 1999, 2000, 2001, 2002, 2003, 2004, 2005, 2006 by the deal.II authors
+//    Copyright (C) 1999, 2000, 2001, 2002, 2003, 2004, 2005, 2006, 2008 by the deal.II authors
 //
 //    This file is subject to QPL and may not be  distributed
 //    without copyright and license information. Please refer
@@ -20,37 +20,42 @@
 #include <grid/tria_iterator.h>
 #include <fe/fe.h>
 #include <lac/vector.h>
+#include <lac/petsc_vector.h>
+#include <lac/trilinos_vector.h>
+#include <lac/block_vector.h>
+#include <lac/petsc_block_vector.h>
+#include <lac/trilinos_block_vector.h>
 #include <numerics/solution_transfer.h>
 
 DEAL_II_NAMESPACE_OPEN
 
 
 
-template<int dim, typename number, class DH>
-SolutionTransfer<dim, number, DH>::SolutionTransfer(const DH &dof):
+template<int dim, typename VectorType, class DH>
+SolutionTransfer<dim, VectorType, DH>::SolutionTransfer(const DH &dof):
 		dof_handler(&dof),
 		n_dofs_old(0),
 		prepared_for(none)
 {}
 
 
-template<int dim, typename number, class DH>
-SolutionTransfer<dim, number, DH>::~SolutionTransfer()
+template<int dim, typename VectorType, class DH>
+SolutionTransfer<dim, VectorType, DH>::~SolutionTransfer()
 {
   clear ();
 }
 
 
-template<int dim, typename number, class DH>
-SolutionTransfer<dim, number, DH>::Pointerstruct::Pointerstruct():
+template<int dim, typename VectorType, class DH>
+SolutionTransfer<dim, VectorType, DH>::Pointerstruct::Pointerstruct():
 		indices_ptr(0),
 		dof_values_ptr(0)
 {}
 
 
 
-template<int dim, typename number, class DH>
-void SolutionTransfer<dim, number, DH>::clear ()
+template<int dim, typename VectorType, class DH>
+void SolutionTransfer<dim, VectorType, DH>::clear ()
 {
   indices_on_cell.clear();
   dof_values_on_cell.clear();
@@ -60,8 +65,8 @@ void SolutionTransfer<dim, number, DH>::clear ()
 }
 
 
-template<int dim, typename number, class DH>
-void SolutionTransfer<dim, number, DH>::prepare_for_pure_refinement()
+template<int dim, typename VectorType, class DH>
+void SolutionTransfer<dim, VectorType, DH>::prepare_for_pure_refinement()
 { 
   Assert(prepared_for!=pure_refinement, ExcAlreadyPrepForRef());
   Assert(prepared_for!=coarsening_and_refinement, 
@@ -95,10 +100,10 @@ void SolutionTransfer<dim, number, DH>::prepare_for_pure_refinement()
 }
 
 
-template<int dim, typename number, class DH>  
+template<int dim, typename VectorType, class DH>  
 void
-SolutionTransfer<dim, number, DH>::refine_interpolate(const Vector<number> &in,
-						  Vector<number>       &out) const
+SolutionTransfer<dim, VectorType, DH>::refine_interpolate(const VectorType &in,
+						  VectorType       &out) const
 {
   Assert(prepared_for==pure_refinement, ExcNotPrepared());
   Assert(in.size()==n_dofs_old, ExcWrongVectorSize(in.size(),n_dofs_old));
@@ -108,7 +113,7 @@ SolutionTransfer<dim, number, DH>::refine_interpolate(const Vector<number> &in,
          ExcMessage ("Vectors cannot be used as input and output"
                      " at the same time!"));
 
-  Vector<number> local_values(0);
+  Vector<typename VectorType::value_type> local_values(0);
 
   typename DH::cell_iterator cell = dof_handler->begin(),
 			     endc = dof_handler->end();
@@ -149,22 +154,10 @@ SolutionTransfer<dim, number, DH>::refine_interpolate(const Vector<number> &in,
 }
 
 
-template<int dim, typename number, class DH>  
-void SolutionTransfer<dim, number, DH>::refine_interpolate (Vector<number> &vec) const
-{
-  Assert(vec.size()==n_dofs_old, ExcWrongVectorSize(vec.size(),n_dofs_old));
-
-  Vector<number> vec_old(vec);
-  vec.reinit(dof_handler->n_dofs());
-  
-  refine_interpolate(vec_old, vec);
-}
-
-
-template<int dim, typename number, class DH>
+template<int dim, typename VectorType, class DH>
 void
-SolutionTransfer<dim, number, DH>::
-prepare_for_coarsening_and_refinement(const std::vector<Vector<number> > &all_in)
+SolutionTransfer<dim, VectorType, DH>::
+prepare_for_coarsening_and_refinement(const std::vector<VectorType> &all_in)
 {
   Assert(prepared_for!=pure_refinement, ExcAlreadyPrepForRef());
   Assert(!prepared_for!=coarsening_and_refinement, 
@@ -219,9 +212,9 @@ prepare_for_coarsening_and_refinement(const std::vector<Vector<number> > &all_in
     (n_cells_to_stay_or_refine)
     .swap(indices_on_cell);
   
-  std::vector<std::vector<Vector<number> > >
+  std::vector<std::vector<Vector<typename VectorType::value_type> > >
     (n_coarsen_fathers,
-     std::vector<Vector<number> > (in_size))
+     std::vector<Vector<typename VectorType::value_type> > (in_size))
     .swap(dof_values_on_cell);
   
 				   // we need counters for
@@ -246,14 +239,16 @@ prepare_for_coarsening_and_refinement(const std::vector<Vector<number> > &all_in
       else if (cell->has_children() && cell->child(0)->coarsen_flag_set())
 	{
 					   // note that if one child has the
-					   // coaresen flag, then all should
+					   // coarsen flag, then all should
 					   // have if Tria::prepare_* has
 					   // worked correctly
 	  for (unsigned int i=1; i<cell->n_children(); ++i)
 	    Assert(cell->child(i)->coarsen_flag_set(),
 		   ExcTriaPrepCoarseningNotCalledBefore());
 	  const unsigned int dofs_per_cell=cell->get_fe().dofs_per_cell;
-	  std::vector<Vector<number> >(in_size, Vector<number>(dofs_per_cell))
+
+	  std::vector<Vector<typename VectorType::value_type> >(in_size,
+								Vector<typename VectorType::value_type>(dofs_per_cell))
 	    .swap(dof_values_on_cell[n_cf]);
       
 	  for (unsigned int j=0; j<in_size; ++j)
@@ -274,19 +269,19 @@ prepare_for_coarsening_and_refinement(const std::vector<Vector<number> > &all_in
 }
 
 
-template<int dim, typename number, class DH>
+template<int dim, typename VectorType, class DH>
 void
-SolutionTransfer<dim, number, DH>::prepare_for_coarsening_and_refinement(const Vector<number> &in)
+SolutionTransfer<dim, VectorType, DH>::prepare_for_coarsening_and_refinement(const VectorType &in)
 {
-  std::vector<Vector<number> > all_in=std::vector<Vector<number> >(1, in);
+  std::vector<VectorType> all_in=std::vector<VectorType>(1, in);
   prepare_for_coarsening_and_refinement(all_in);
 }
 
 
-template<int dim, typename number, class DH>
-void SolutionTransfer<dim, number, DH>::
-interpolate (const std::vector<Vector<number> > &all_in,
-	     std::vector<Vector<number> >       &all_out) const
+template<int dim, typename VectorType, class DH>
+void SolutionTransfer<dim, VectorType, DH>::
+interpolate (const std::vector<VectorType> &all_in,
+	     std::vector<VectorType>       &all_out) const
 {
   Assert(prepared_for==coarsening_and_refinement, ExcNotPrepared());
   const unsigned int size=all_in.size();
@@ -303,7 +298,7 @@ interpolate (const std::vector<Vector<number> > &all_in,
              ExcMessage ("Vectors cannot be used as input and output"
                          " at the same time!"));
 
-  Vector<number> local_values;
+  Vector<typename VectorType::value_type> local_values;
   std::vector<unsigned int> dofs;
 
   typename std::map<std::pair<unsigned int, unsigned int>, Pointerstruct>::const_iterator
@@ -321,7 +316,7 @@ interpolate (const std::vector<Vector<number> > &all_in,
 	  const std::vector<unsigned int> * const indexptr
 	    =pointerstruct->second.indices_ptr;
 
-	  const std::vector<Vector<number> > * const valuesptr
+	  const std::vector<Vector<typename VectorType::value_type> > * const valuesptr
 	    =pointerstruct->second.dof_values_ptr;
 
 	  const unsigned int dofs_per_cell=cell->get_fe().dofs_per_cell;
@@ -399,18 +394,18 @@ interpolate (const std::vector<Vector<number> > &all_in,
 
 
 
-template<int dim, typename number, class DH>
-void SolutionTransfer<dim, number, DH>::interpolate(const Vector<number> &in,
-						Vector<number>       &out) const
+template<int dim, typename VectorType, class DH>
+void SolutionTransfer<dim, VectorType, DH>::interpolate(const VectorType &in,
+						VectorType       &out) const
 {
   Assert (in.size()==n_dofs_old,
 	  ExcWrongVectorSize(in.size(), n_dofs_old));
   Assert (out.size()==dof_handler->n_dofs(),
 	  ExcWrongVectorSize(out.size(), dof_handler->n_dofs()));
 
-  std::vector<Vector<number> > all_in(1);
+  std::vector<VectorType> all_in(1);
   all_in[0] = in;
-  std::vector<Vector<number> > all_out(1);
+  std::vector<VectorType> all_out(1);
   all_out[0] = out;
   interpolate(all_in,
 	      all_out);
@@ -419,9 +414,9 @@ void SolutionTransfer<dim, number, DH>::interpolate(const Vector<number> &in,
 
 
 
-template<int dim, typename number, class DH>
+template<int dim, typename VectorType, class DH>
 unsigned int
-SolutionTransfer<dim, number, DH>::memory_consumption () const
+SolutionTransfer<dim, VectorType, DH>::memory_consumption () const
 {
 				   // at the moment we do not include the memory
 				   // consumption of the cell_map as we have no
@@ -436,19 +431,41 @@ SolutionTransfer<dim, number, DH>::memory_consumption () const
 
 
 
-template<int dim, typename number, class DH>
+template<int dim, typename VectorType, class DH>
 unsigned int
-SolutionTransfer<dim, number, DH>::Pointerstruct::memory_consumption () const
+SolutionTransfer<dim, VectorType, DH>::Pointerstruct::memory_consumption () const
 {
   return sizeof(*this);
 }
 
 
 
-template class SolutionTransfer<deal_II_dimension, float, DoFHandler<deal_II_dimension> >;
-template class SolutionTransfer<deal_II_dimension, double, DoFHandler<deal_II_dimension> >;
-template class SolutionTransfer<deal_II_dimension, float, hp::DoFHandler<deal_II_dimension> >;
-template class SolutionTransfer<deal_II_dimension, double, hp::DoFHandler<deal_II_dimension> >;
+template class SolutionTransfer<deal_II_dimension, Vector<float>, DoFHandler<deal_II_dimension> >;
+template class SolutionTransfer<deal_II_dimension, Vector<double>, DoFHandler<deal_II_dimension> >;
+template class SolutionTransfer<deal_II_dimension, Vector<float>, hp::DoFHandler<deal_II_dimension> >;
+template class SolutionTransfer<deal_II_dimension, Vector<double>, hp::DoFHandler<deal_II_dimension> >;
+
+template class SolutionTransfer<deal_II_dimension, BlockVector<float>, DoFHandler<deal_II_dimension> >;
+template class SolutionTransfer<deal_II_dimension, BlockVector<double>, DoFHandler<deal_II_dimension> >;
+template class SolutionTransfer<deal_II_dimension, BlockVector<float>, hp::DoFHandler<deal_II_dimension> >;
+template class SolutionTransfer<deal_II_dimension, BlockVector<double>, hp::DoFHandler<deal_II_dimension> >;
+
+
+#ifdef DEAL_II_USE_PETSC
+template class SolutionTransfer<deal_II_dimension, PETScWrappers::Vector, DoFHandler<deal_II_dimension> >;
+template class SolutionTransfer<deal_II_dimension, PETScWrappers::Vector, hp::DoFHandler<deal_II_dimension> >;
+
+template class SolutionTransfer<deal_II_dimension, PETScWrappers::BlockVector, DoFHandler<deal_II_dimension> >;
+template class SolutionTransfer<deal_II_dimension, PETScWrappers::BlockVector, hp::DoFHandler<deal_II_dimension> >;
+#endif
+
+#ifdef DEAL_II_USE_TRILINOS
+template class SolutionTransfer<deal_II_dimension, TrilinosWrappers::Vector, DoFHandler<deal_II_dimension> >;
+template class SolutionTransfer<deal_II_dimension, TrilinosWrappers::Vector, hp::DoFHandler<deal_II_dimension> >;
+
+template class SolutionTransfer<deal_II_dimension, TrilinosWrappers::BlockVector, DoFHandler<deal_II_dimension> >;
+template class SolutionTransfer<deal_II_dimension, TrilinosWrappers::BlockVector, hp::DoFHandler<deal_II_dimension> >;
+#endif
 
 /*----------------------------   solution_transfer.cc     ----------------------*/
 

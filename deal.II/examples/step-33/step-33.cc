@@ -2879,16 +2879,19 @@ ConservationLaw<dim>::refine_grid (const Vector<double> &refinement_indicators)
 	  cell->set_coarsen_flag();
     }
 
-				   // Then we need to transfer the various
-				   // solution vectors from the old to the new
-				   // grid and carries while we do the
-				   // refinement. The SolutionTransfer class
-				   // is our friend here; it has a fairly
-				   // extensive documentation, including
-				   // examples, so we won't comment much on
-				   // the following code. The last three lines
-				   // simply re-set the sizes of some other
-				   // vectors to the now correct size:
+				   // Then we need to transfer the
+				   // various solution vectors from
+				   // the old to the new grid while we
+				   // do the refinement. The
+				   // SolutionTransfer class is our
+				   // friend here; it has a fairly
+				   // extensive documentation,
+				   // including examples, so we won't
+				   // comment much on the following
+				   // code. The last three lines
+				   // simply re-set the sizes of some
+				   // other vectors to the now correct
+				   // size:
   std::vector<Vector<double> > transfer_in;
   std::vector<Vector<double> > transfer_out;
 
@@ -2897,7 +2900,7 @@ ConservationLaw<dim>::refine_grid (const Vector<double> &refinement_indicators)
 
   triangulation.prepare_coarsening_and_refinement();
 
-  SolutionTransfer<dim, double> soltrans(dof_handler);
+  SolutionTransfer<dim> soltrans(dof_handler);
   soltrans.prepare_for_coarsening_and_refinement(transfer_in);
 
   triangulation.execute_coarsening_and_refinement ();

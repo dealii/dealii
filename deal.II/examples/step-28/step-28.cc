@@ -1468,7 +1468,7 @@ void EnergyGroup<dim>::refine_grid (const Vector<float> &error_indicators,
     else if (error_indicators(cell_index) < coarsen_threshold)
       cell->set_coarsen_flag ();
       
-  SolutionTransfer<dim, double> soltrans(dof_handler);
+  SolutionTransfer<dim> soltrans(dof_handler);
 
   triangulation.prepare_coarsening_and_refinement();
   soltrans.prepare_for_coarsening_and_refinement(solution);

@@ -32,6 +32,22 @@ inconvenience this causes.
 <ol>
   <li>
   <p> 
+  Changed: The SolutionTransfer class used to take a type as second
+  template argument that denoted the scalar upon which Vector objects
+  were built, in order to allow interpolating Vector@<float@> objects,
+  for example. This argument has now been changed to a vector type,
+  and been given a default of Vector@<double@>; however, one can
+  now also pass in BlockVector objects, or objects of type
+  PETScWrappers::Vector, etc. On the downside, the old
+  SolutionTransfer::refine_interpolate function with only a single
+  argument has been deleted since there is no reliable way to resize
+  a vector unless it is a plain Vector@<double@>.
+  <br>
+  (WB 2008/08/28)
+  </p>
+
+  <li>
+  <p> 
   Changed: The FiniteElement::get_prolongation_matrix and
   FiniteElement::get_restriction_matrix functions now have an
   additional argument of type RefinementCase to enable a
@@ -43,7 +59,7 @@ inconvenience this causes.
   <br>
   (Tobias Leicht 2008/07/08 as of branch_anisotropic at 2006/07/04)
   </p>
-
+  
   <li>
   <p>
   Changed: <code>GeometryInfo::children_per_cell</code> has been

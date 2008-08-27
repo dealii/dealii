@@ -60,13 +60,7 @@ DEAL_II_NAMESPACE_OPEN
  * dof_handler->distribute_dofs (fe);
  * @endverbatim
  *
- * Then there are three different possibilities of how to proceed. Either
- * @verbatim
- *                                     // resize and interpolate a solution
- *                                     // vector `in-place'
- * soltrans.refine_interpolate(solution);
- * @endverbatim
- * or, when the old solution vector is still needed,
+ * Then to proceed do
  * @verbatim
  *                                     // take a copy of the solution vector
  * Vector<double> solution_old(solution);
@@ -89,6 +83,8 @@ DEAL_II_NAMESPACE_OPEN
  * vector<Vector<double> > solutions(n_vectors, Vector<double> (n));
  * soltrans.refine_interpolate(solutions_old, solutions);
  * @endverbatim
+ * This is used in several of the tutorial programs, for example
+ * @ref step_31 "step-31".
  *
  * <li> If the grid will be refined AND coarsened
  * then use @p SolutionTransfer as follows
@@ -151,7 +147,7 @@ DEAL_II_NAMESPACE_OPEN
  * interpolated and set into the vector @p out that is at the end the
  * discrete function @p in interpolated on the refined mesh.
  *
- * The <tt>refine_interpolate(in,out)</tt> function can be called multiply for
+ * The <tt>refine_interpolate(in,out)</tt> function can be called multiple times for
  * arbitrary many discrete functions (solution vectors) on the original grid. 
  *
  * <li> Solution transfer while coarsening and refinement. After 
@@ -202,7 +198,7 @@ DEAL_II_NAMESPACE_OPEN
  * @ingroup numerics
  * @author Ralf Hartmann, 1999
  */
-template<int dim, typename number, class DH=DoFHandler<dim> >
+template<int dim, typename VectorType=Vector<double>, class DH=DoFHandler<dim> >
 class SolutionTransfer
 {
   public:
@@ -246,14 +242,14 @@ class SolutionTransfer
 				      * onto the new (refined and/or
 				      * coarsenend) grid.
 				      */
-    void prepare_for_coarsening_and_refinement (const std::vector<Vector<number> > &all_in);
+    void prepare_for_coarsening_and_refinement (const std::vector<VectorType> &all_in);
     
 				     /**
 				      * Same as previous function
 				      * but for only one discrete function
 				      * to be interpolated.
 				      */
-    void prepare_for_coarsening_and_refinement (const Vector<number> &in);
+    void prepare_for_coarsening_and_refinement (const VectorType &in);
 		      
 				     /**
 				      * This function
@@ -273,17 +269,8 @@ class SolutionTransfer
 				      * allowed. e.g. for interpolating several
 				      * functions.
 				      */
-    void refine_interpolate (const Vector<number> &in,
-			     Vector<number> &out) const;
-    
-				     /**
-				      * Same as <tt>interpolate(in,out)</tt>
-				      * but it interpolates
-				      * just 'in-place'. Therefore @p vec will be
-				      * reinitialized to the new needed vector
-				      * dimension.
-				      */
-    void refine_interpolate (Vector<number> &vec) const;
+    void refine_interpolate (const VectorType &in,
+			     VectorType &out) const;
       
 				     /**
 				      * This function
@@ -319,8 +306,8 @@ class SolutionTransfer
 				      * (@p n_dofs_refined). Otherwise
 				      * an assertion will be thrown.
 				      */
-    void interpolate (const std::vector<Vector<number> >&all_in,
-		      std::vector<Vector<number> >      &all_out) const;
+    void interpolate (const std::vector<VectorType>&all_in,
+		      std::vector<VectorType>      &all_out) const;
       
 				     /**
 				      * Same as the previous function.
@@ -335,8 +322,8 @@ class SolutionTransfer
 				      * in one step by using
 				      * <tt>interpolate (all_in, all_out)</tt>
 				      */
-    void interpolate (const Vector<number> &in,
-		      Vector<number>       &out) const;
+    void interpolate (const VectorType &in,
+		      VectorType       &out) const;
 
     				     /**
 				      * Determine an estimate for the
@@ -456,7 +443,7 @@ class SolutionTransfer
 	unsigned int memory_consumption () const;
 	
 	std::vector<unsigned int>    *indices_ptr;
-	std::vector<Vector<number> > *dof_values_ptr;
+	std::vector<Vector<typename VectorType::value_type> > *dof_values_ptr;
     };
 
 				     /**
@@ -477,7 +464,7 @@ class SolutionTransfer
 				      * of all cells that'll be coarsened
 				      * will be stored in this vector.
 				      */
-    std::vector<std::vector<Vector<number> > > dof_values_on_cell;
+    std::vector<std::vector<Vector<typename VectorType::value_type> > > dof_values_on_cell;
 };
 
 
