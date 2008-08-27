@@ -414,6 +414,16 @@ namespace TrilinosWrappers
                                         */
       virtual ~SparseMatrix ();
 
+				       /**
+					* Copy the given matrix to this
+					* one.
+					*
+					* The function returns a reference to
+					* <tt>*this</tt>.
+					*/
+      SparseMatrix &
+      copy_from (const SparseMatrix &source);
+
                                        /**
                                         * This function initializes the
 				        * Trilinos matrix with a deal.II

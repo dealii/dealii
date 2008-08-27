@@ -146,6 +146,15 @@ namespace TrilinosWrappers
 
 
 
+  SparseMatrix &
+  SparseMatrix::copy_from (const SparseMatrix &m)
+  {
+    *matrix = *m.matrix;
+    return *this;
+  }
+  
+
+
   void
   SparseMatrix::reinit (const SparsityPattern &sparsity_pattern)
   {
