@@ -692,6 +692,8 @@ namespace TrilinosWrappers
   SparseMatrix &
   SparseMatrix::operator /= (const TrilinosScalar a)
   {
+    Assert (a !=0, ExcDivideByZero());
+
     const TrilinosScalar factor = 1./a;
 
     const int ierr = matrix->Scale (factor);
