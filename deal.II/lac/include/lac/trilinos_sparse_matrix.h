@@ -459,6 +459,13 @@ namespace TrilinosWrappers
 		   const Epetra_Map       &input_col_map,
 		   const SparsityPattern  &sparsity_pattern);
 
+				       /** 
+				        * This function copies the 
+				        * content in <tt>sparse_matrix</tt>
+				        * to the current matrix.
+				        */
+      void reinit (const SparseMatrix &sparse_matrix);
+
 				       /**
                                         * This function initializes the
 				        * Trilinos matrix using the deal.II
