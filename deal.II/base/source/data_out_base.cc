@@ -34,6 +34,7 @@
 #include <base/thread_management.h>
 #include <base/memory_consumption.h>
 
+#include <cstring>
 #include <algorithm>
 #include <iomanip>
 #include <ctime>
