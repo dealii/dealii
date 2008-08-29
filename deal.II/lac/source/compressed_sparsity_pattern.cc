@@ -35,7 +35,7 @@ const unsigned int CompressedSparsityPattern::Line::cache_size;
 
 // Therefore, we require now, that the caller checks if this function
 // is necessary and only calls it, if it is actually used. Since it is
-// it called less often, it is removed from the inlined section.
+// called less often, it is removed from the inlined section.
 void
 CompressedSparsityPattern::Line::flush_cache () const
 {
@@ -136,44 +136,52 @@ CompressedSparsityPattern::Line::flush_cache () const
       }
 
                                        // then allocate new memory and merge
-                                       // arrays
-      std::vector<unsigned int> new_entries;
-      new_entries.reserve (n_new_entries);
-      unsigned int cache_position = 0;
-      unsigned int entry_position = 0;
-      while ((entry_position<entries.size()) && (cache_position<cache_entries))
-        if (entries[entry_position] < cache[cache_position])
-          {
-            new_entries.push_back (entries[entry_position]);
-            ++entry_position;
-          }
-        else if (entries[entry_position] == cache[cache_position])
-          {
-            new_entries.push_back (entries[entry_position]);
-            ++entry_position;
-            ++cache_position;
-          }
-        else
-          {
-            new_entries.push_back (cache[cache_position]);
-            ++cache_position;
-          }
+                                       // arrays, if there are any entries at
+                                       // all that need to be merged
+      Assert (n_new_entries >= entries.size(),
+	      ExcInternalError());
+      if (n_new_entries > entries.size())
+	{
+	  std::vector<unsigned int> new_entries;
+	  new_entries.reserve (n_new_entries);
+	  unsigned int cache_position = 0;
+	  unsigned int entry_position = 0;
+	  while ((entry_position<entries.size()) &&
+		 (cache_position<cache_entries))
+	    if (entries[entry_position] < cache[cache_position])
+	      {
+		new_entries.push_back (entries[entry_position]);
+		++entry_position;
+	      }
+	    else if (entries[entry_position] == cache[cache_position])
+	      {
+		new_entries.push_back (entries[entry_position]);
+		++entry_position;
+		++cache_position;
+	      }
+	    else
+	      {
+		new_entries.push_back (cache[cache_position]);
+		++cache_position;
+	      }
 
-                                       // copy remaining elements from the
-                                       // array that we haven't finished. note
-                                       // that at most one of the following
-                                       // loops will run at all
-      for (; entry_position < entries.size(); ++entry_position)
-        new_entries.push_back (entries[entry_position]);
-      for (; cache_position < cache_entries; ++cache_position)
-        new_entries.push_back (cache[cache_position]);
+					   // copy remaining elements from the
+					   // array that we haven't
+					   // finished. note that at most one
+					   // of the following loops will run
+					   // at all
+	  for (; entry_position < entries.size(); ++entry_position)
+	    new_entries.push_back (entries[entry_position]);
+	  for (; cache_position < cache_entries; ++cache_position)
+	    new_entries.push_back (cache[cache_position]);
       
-      Assert (new_entries.size() == n_new_entries,
-              ExcInternalError());
+	  Assert (new_entries.size() == n_new_entries,
+		  ExcInternalError());
 
-                                       // finally swap old and new array, and
-                                       // set cache size to zero
-      new_entries.swap (entries);
+					   // finally swap old and new array,
+					   // and set cache size to zero
+	  new_entries.swap (entries);
+	}
     }
   
   cache_entries = 0;

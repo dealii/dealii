@@ -246,6 +246,14 @@ inconvenience this causes.
 <ol>
   <li>
   <p>
+  Improved: The CompressedSparsityPattern can now elide some operations
+  upon entering entries that may have been added before already.
+  <br>
+  (Timo Heister, WB 2008/08/28)
+  </p>
+
+  <li>
+  <p>
   Fixed: There are now functions CompressedSparsityPattern::print and
   CompressedSetSparsityPattern::print, in analogy
   to SparsityPattern::print .
