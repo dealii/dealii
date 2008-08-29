@@ -26,6 +26,8 @@ DEAL_II_NAMESPACE_OPEN
 template <typename number> class SparseMatrix;
 
 
+//TODO[WB]: Unify implementation with the CompressedSetSparsityPattern since really all that's different is the Line structure in the two classes. We should have a templatized base class that simply gets the particular Line structure from a derived class.
+
 /*! @addtogroup Sparsity
  *@{
  */
