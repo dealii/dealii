@@ -122,7 +122,7 @@
  * tricky points that have to be considered for hp finite elements using continuous
  * elements.
  *
- * The paper is submitted to the ACM Transactions on Mathematical Software (TOMS).
+ * The paper is accepted for publication in ACM Transactions on Mathematical Software (TOMS).
  * It is available as Technical Report ISC-07-04-MATH from the
  * <a href="http://www.isc.tamu.edu/publications-reports/technical_reports">Institute
  * for Scientific Computation, Texas A&amp;M University</a>, and also
