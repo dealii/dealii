@@ -21,6 +21,7 @@
 #include <grid/tria_iterator.h>
 #include <fe/mapping.h>
 
+#include <cstring>
 #include <iomanip>
 #include <algorithm>
 #include <list>
