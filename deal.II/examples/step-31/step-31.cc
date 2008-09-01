@@ -1191,7 +1191,7 @@ BoussinesqFlowProblem<dim>::build_stokes_preconditioner ()
 
   std::vector<double> null_space;
   std::vector<bool>  velocity_components (dim+1,true);
-  velocity[dim] = false;
+  velocity_components[dim] = false;
   DoFTools::extract_constant_modes (stokes_dof_handler, velocity_components, 
 				    null_space);
   Amg_preconditioner->initialize(stokes_preconditioner_matrix.block(0,0),
