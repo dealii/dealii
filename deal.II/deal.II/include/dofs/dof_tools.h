@@ -1009,6 +1009,70 @@ class DoFTools
 			    std::vector<bool>  &selected_dofs);
 
 				     /**
+				      * Extract a vector that 
+				      * represents the constant
+				      * modes of the DoFHandler
+				      * for the components 
+				      * chosen by <tt>component_select</tt>.
+				      * The constant modes on a
+				      * discretization are the 
+				      * null space of a Laplace
+				      * operator on the selected
+				      * components with Neumann
+				      * boundary conditions 
+				      * applied. The null space is
+				      * a necessary ingredient for
+				      * obtaining a good AMG
+				      * preconditioner when using
+				      * the class 
+				      * TrilinosWrappers::PreconditionAMG.
+				      * Since the ML AMG package
+				      * only works on algebraic
+				      * properties of the respective
+				      * matrix, it has no chance 
+				      * to detect whether the matrix
+				      * comes from a scalar or a
+				      * vector valued problem. However,
+				      * a near null space supplies
+				      * exactly the needed information
+				      * about these components.
+				      * The null space will consist
+				      * of as many vectors as there
+				      * are true arguments in 
+				      * <tt>component_select</tt>, 
+				      * say <tt>d</tt>,
+				      * each of which will be one
+				      * in one component and 
+				      * zero in all others. We store
+				      * the null space contiguously
+				      * in the output vector
+				      * <tt>constant_modes</tt>
+				      * to enable the internal 
+				      * Trilinos structures the 
+				      * access to it. This means that
+				      * the length of the vector 
+				      * will be <tt>d</tt> times
+				      * the number of degrees of
+				      * freedom in the selected 
+				      * components. Note that any
+				      * matrix associated with this
+				      * null space must have been
+				      * constructed from the 
+				      * same argument as in
+				      * <tt>component_select</tt>.
+				      * 
+				      * The main reason for this
+				      * program is the use of the
+				      * null space with the
+				      * AMG preconditioner.
+				      */
+    template <class DH>
+    static void
+    extract_constant_modes (const DH                &dof_handler,
+			    const std::vector<bool> &component_select,
+			    std::vector<double>     &constant_modes);
+
+				     /**
 				      * For each active cell of a DoFHandler
 				      * or hp::DoFHandler, extract the active
 				      * finite element index and fill the

@@ -1188,42 +1188,12 @@ BoussinesqFlowProblem<dim>::build_stokes_preconditioner ()
       
   Amg_preconditioner = boost::shared_ptr<TrilinosWrappers::PreconditionAMG>
 		       (new TrilinosWrappers::PreconditionAMG());
-      
-  const unsigned int n_u = stokes_preconditioner_matrix.block(0,0).m();
-  std::vector<double> null_space (dim * n_u, 0.);
-      
-  std::vector<bool> precondition_dof_list (stokes_dof_handler.n_dofs(), false);
-      
-  for (unsigned int component=0; component < dim; ++component)
-    {
-      std::vector<bool> precondition_mask (dim + 1, false);
-      precondition_mask[component] = true;
-      DoFTools::extract_dofs (stokes_dof_handler, precondition_mask, 
-			      precondition_dof_list);
 
-				       // TODO: The current implementation 
-				       // assumes that we are working on 
-				       // the first components of a system when
-				       // writing into the null vector.
-				       // Change this to the general case,
-				       // probably use something similar as
-				       // for block vectors.
-      unsigned int counter = 0;
-      for (unsigned int i=0; i<stokes_dof_handler.n_dofs(); ++i)
-	{
-	  if (precondition_dof_list[i])
-	    {
-	      Assert(i < n_u,
-		     ExcMessage("Could not correctly locate "
-				"preconditioner dofs in system!"));
-	      null_space [component * n_u + i] = 1.;
-	      ++counter;
-	    }
-	}
-      Assert (counter == n_u / dim,
-	      ExcDimensionMismatch(counter, n_u / dim));
-    }
-	
+  std::vector<double> null_space;
+  std::vector<bool>  velocity_components (dim+1,true);
+  velocity[dim] = false;
+  DoFTools::extract_constant_modes (stokes_dof_handler, velocity_components, 
+				    null_space);
   Amg_preconditioner->initialize(stokes_preconditioner_matrix.block(0,0),
 				 true, true, null_space, dim, false);
 
