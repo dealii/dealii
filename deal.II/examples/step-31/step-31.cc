@@ -57,6 +57,9 @@
 #include <numerics/error_estimator.h>
 #include <numerics/solution_transfer.h>
 
+#include <Epetra_SerialComm.h>
+#include <Epetra_Map.h>
+
 #include <fstream>
 #include <sstream>
 
