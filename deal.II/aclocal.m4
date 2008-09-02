@@ -5159,11 +5159,19 @@ AC_DEFUN(DEAL_II_CONFIGURE_PETSC, dnl
     DEAL_II_CONFIGURE_PETSC_ARCH
     DEAL_II_CONFIGURE_PETSC_MPIUNI_LIB
 
+    DEAL_II_EXPAND_PETSC_VECTOR="PETScWrappers::Vector"
+    DEAL_II_EXPAND_PETSC_BLOCKVECTOR="PETScWrappers::BlockVector"
+
     dnl Finally set with_petsc if this hasn't happened yet
     if test "x$with_petsc" = "x" ; then
       with_petsc="yes"
     fi
   fi
+
+  dnl Make sure that the right values for Trilinos vectors are written into
+  dnl common/template-arguments.in
+  AC_SUBST(DEAL_II_EXPAND_PETSC_VECTOR)
+  AC_SUBST(DEAL_II_EXPAND_PETSC_BLOCKVECTOR)
 ])
 
 
@@ -5362,11 +5370,19 @@ AC_DEFUN(DEAL_II_CONFIGURE_TRILINOS, dnl
 
     DEAL_II_CHECK_TRILINOS_SHARED_STATIC
 
+    DEAL_II_EXPAND_TRILINOS_VECTOR="TrilinosWrappers::Vector"
+    DEAL_II_EXPAND_TRILINOS_BLOCKVECTOR="TrilinosWrappers::BlockVector"
+
     dnl Finally set with_trilinos if this hasn't happened yet
     if test "x$with_trilinos" = "x" ; then
       with_trilinos="yes"
     fi
   fi
+
+  dnl Make sure that the right values for Trilinos vectors are written into
+  dnl common/template-arguments.in
+  AC_SUBST(DEAL_II_EXPAND_TRILINOS_VECTOR)
+  AC_SUBST(DEAL_II_EXPAND_TRILINOS_BLOCKVECTOR)
 ])
 
 

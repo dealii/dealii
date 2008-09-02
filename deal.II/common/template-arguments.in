@@ -7,5 +7,15 @@ DEAL_II_VEC_TEMPLATES := { Vector; BlockVector }
 
 SERIAL_VECTORS := { Vector<double>;
                     Vector<float> ;
+		    Vector<long double>;
+
 	            BlockVector<double>;
-                    BlockVector<float> }
+                    BlockVector<float>;
+                    BlockVector<long double>;
+
+		    @DEAL_II_EXPAND_TRILINOS_VECTOR@;
+		    @DEAL_II_EXPAND_PETSC_VECTOR@;
+
+		    @DEAL_II_EXPAND_TRILINOS_BLOCKVECTOR@;
+		    @DEAL_II_EXPAND_PETSC_BLOCKVECTOR@;
+                  }

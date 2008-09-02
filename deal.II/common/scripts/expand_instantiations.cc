@@ -154,6 +154,21 @@ split_string_list (const std::string &s,
 
 
 
+// return the given list but without empty entries
+std::list<std::string>
+delete_empty_entries (const std::list<std::string> &list)
+{
+  std::list<std::string> return_list;
+  for (std::list<std::string>::const_iterator i = list.begin();
+       i != list.end(); ++i)
+    if (*i != "")
+      return_list.push_back (*i);
+
+  return return_list;
+}
+
+
+
 // determine whether a given substring at position #pos and length #length in
 // the string #text is a real token, i.e. not just part of another word
 bool is_real_token (const std::string &text,
@@ -259,7 +274,18 @@ void read_expansion_lists (const std::string &filename)
       whole_file.erase (0, 1);
       skip_space (whole_file);
 
-      expansion_lists[name] = split_string_list (expansion, ';');
+				       // assign but remove empty entries;
+				       // this may happen if an expansion list
+				       // ends in a semicolon (then we get an
+				       // empty entry at the end), or if there
+				       // are multiple semicolons after each
+				       // other (this may happen if, for
+				       // example, we have "Vector<double>;
+				       // TRILINOS_VECTOR;" and if
+				       // TRILINOS_VECTOR is an empty
+				       // expansion after running ./configure)
+      expansion_lists[name]
+	= delete_empty_entries (split_string_list (expansion, ';'));
     }
 }
 

@@ -705,7 +705,8 @@ process_files="common/Make.global_options
                doc/doxygen/options.136
 	       doc/doxygen/header.html
 	       doc/doxygen/header.136
-               doc/doxygen/header.tex"
+               doc/doxygen/header.tex
+               common/template-arguments"
 AC_OUTPUT($process_files)
 
 dnl    Autoconf has the annoying habit to simply define PACKAGE_NAME in
