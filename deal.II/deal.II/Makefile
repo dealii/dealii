@@ -75,7 +75,7 @@ $(LIBDIR)/3d/%.$(OBJEXT) :
 	@echo "=====deal.II====3d====optimized==$(MT)== $(<:source/%=%)"
 	@$(CXX) $(CXXFLAGS.o) -Ddeal_II_dimension=3 -c $< -o $@
 
-source/%.inst : source/%.inst.in
+source/%.inst : source/%.inst.in $D/common/template-arguments
 	@echo "=====deal.II========================= $(@F)"
 	@$D/common/scripts/expand_instantiations $D/common/template-arguments < $< > $@
 
@@ -179,9 +179,6 @@ $(LIBDIR)/libdeal_II_3d$(shared-lib-suffix): $(o-files-3d)
 	@$(SHLIBLD) $(LDFLAGS) $(SHLIBFLAGS) -o $@ $(o-files-3d) $(deplibs.o)
 
 
-
-x:
-	echo $(inst-files)
 
 # Rule to generate the dependency file. This file is
 # automagically remade whenever needed, i.e. whenever
