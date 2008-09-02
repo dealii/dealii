@@ -97,12 +97,11 @@ namespace TrilinosWrappers
 				        * format specified in
 				        * TrilinosWrappers::SparseMatrix.
 					*/
-      void initialize (const SparseMatrix        &matrix,
-		       const bool                 elliptic = true,
-		       const bool                 higher_order_elements = false,
-		       const std::vector<double> &null_space = std::vector<double>(),
-		       const unsigned int         null_space_dimension = 1,
-		       const bool                 output_details = false);
+      void initialize (const SparseMatrix                    &matrix,
+		       const bool                             elliptic = true,
+		       const bool                             higher_order_elements = false,
+		       const std::vector<std::vector<bool> > &null_space = std::vector<std::vector<bool> > (),
+		       const bool                            output_details = false);
 
 				       /**
 					* Let Trilinos compute a
@@ -115,12 +114,11 @@ namespace TrilinosWrappers
 				        * can be considered rather 
 				        * inefficient.
 					*/
-      void initialize (const dealii::SparseMatrix<double> &matrix,
-		       const bool                 elliptic = true,
-		       const bool                 higher_order_elements = false,
-		       const std::vector<double> &null_space = std::vector<double>(),
-		       const unsigned int         null_space_dimension = 1,
-		       const bool                 output_details = false);
+      void initialize (const ::dealii::SparseMatrix<double>  &deal_ii_sparse_matrix,
+		       const bool                             elliptic = true,
+		       const bool                             higher_order_elements = false,
+		       const std::vector<std::vector<bool> > &null_space = std::vector<std::vector<bool> > (),
+		       const bool                            output_details = false);
 
 				       /**
 					* This function can be used 

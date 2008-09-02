@@ -43,14 +43,14 @@ namespace TrilinosWrappers
 
   void
   PreconditionAMG::
-  initialize (const SparseMatrix        &matrix,
-	      const bool                 elliptic,
-	      const bool                 higher_order_elements,
-	      const std::vector<double> &null_space,
-	      const unsigned int         null_space_dimension,
-	      const bool                 output_details)
+  initialize (const SparseMatrix                    &matrix,
+	      const bool                             elliptic,
+	      const bool                             higher_order_elements,
+	      const std::vector<std::vector<bool> > &null_space,
+	      const bool                             output_details)
   {
     const unsigned int n_rows = matrix.m();
+    const unsigned int null_space_dimension = null_space.size();
 
 				     // Build the AMG preconditioner.
     Teuchos::ParameterList parameter_list;
@@ -68,7 +68,7 @@ namespace TrilinosWrappers
 	parameter_list.set("aggregation: block scaling", true);
       }
   
-    parameter_list.set("aggregation: threshold", 1e-12);
+    parameter_list.set("aggregation: threshold", 1e-8);
     
     if (output_details)
       parameter_list.set("ML output", 10);
@@ -77,16 +77,26 @@ namespace TrilinosWrappers
   
     if (higher_order_elements)
       parameter_list.set("aggregation: type", "MIS");
+    
+    std::vector<double> null_space_modes;
   
     if (null_space_dimension > 1)
       {
-	Assert (n_rows * null_space_dimension == null_space.size(),
-		ExcDimensionMismatch(n_rows * null_space_dimension,
-				    null_space.size()));
+	Assert (n_rows == null_space[0].size(),
+		ExcDimensionMismatch(n_rows,
+				     null_space[0].size()));
+	
+				 // Reshape null space as a contiguous
+				 // vector of doubles so that Trilinos
+				 // can read from it.
+	null_space_modes.resize (n_rows * null_space_dimension, 0.);
+	for (unsigned int d=0; d<null_space_dimension; ++d)
+	  for (unsigned int row=0; row<n_rows; ++row)
+	    null_space_modes[d*n_rows + row] = (double)null_space[d][row];
   
 	parameter_list.set("null space: type", "pre-computed");
 	parameter_list.set("null space: dimension", int(null_space_dimension));
-	parameter_list.set("null space: vectors", (double *)&null_space[0]);
+	parameter_list.set("null space: vectors", &null_space_modes[0]);
       }
 
     multigrid_operator = boost::shared_ptr<ML_Epetra::MultiLevelPreconditioner>
@@ -101,12 +111,11 @@ namespace TrilinosWrappers
 
   void
   PreconditionAMG::
-  initialize (const dealii::SparseMatrix<double> &deal_ii_sparse_matrix,
-	      const bool                  elliptic,
-	      const bool                  higher_order_elements,
-	      const std::vector<double>  &null_space,
-	      const unsigned int          null_space_dimension,
-	      const bool                  output_details)
+  initialize (const ::dealii::SparseMatrix<double>  &deal_ii_sparse_matrix,
+	      const bool                             elliptic,
+	      const bool                             higher_order_elements,
+	      const std::vector<std::vector<bool> > &null_space,
+	      const bool                             output_details)
   {
     const unsigned int n_rows = deal_ii_sparse_matrix.m();
   
@@ -122,7 +131,7 @@ namespace TrilinosWrappers
     Matrix->compress();
 
     initialize (*Matrix, elliptic, higher_order_elements, null_space,
-		null_space_dimension,  output_details);
+		output_details);
   }
   
   

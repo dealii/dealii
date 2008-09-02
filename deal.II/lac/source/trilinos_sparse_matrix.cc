@@ -254,6 +254,18 @@ namespace TrilinosWrappers
 
 
   void
+  SparseMatrix::reinit (const SparseMatrix &sparse_matrix)
+  {
+    matrix.reset();
+    row_map = sparse_matrix.row_map;
+    col_map = sparse_matrix.col_map;
+    matrix = std::auto_ptr<Epetra_FECrsMatrix>(new Epetra_FECrsMatrix(
+			      *sparse_matrix.matrix));
+  }
+
+
+
+  void
   SparseMatrix::reinit (const Epetra_Map                     &input_map,
 			const ::dealii::SparseMatrix<double> &dealii_sparse_matrix,
 			const double                          drop_tolerance)
@@ -480,10 +492,10 @@ namespace TrilinosWrappers
 	int diag_index = (int)(diag_find - col_indices);
 
 	for (int j=0; j<num_entries; ++j)
-	  if (diag_index != col_indices[j])
+	  if (diag_index != j)
 	    values[j] = 0.;
 
-	if (diag_find && std::fabs(values[diag_index]) > 0.)
+	if (diag_find && std::fabs(values[diag_index]) == 0.)
 	  values[diag_index] = new_diag_value;
       }
   }
@@ -714,9 +726,14 @@ namespace TrilinosWrappers
 
   void
   SparseMatrix::vmult (Vector       &dst,
-		      const Vector &src) const
+		       const Vector &src) const
   {
     Assert (&src != &dst, ExcSourceEqualsDestination());
+    
+    Assert (col_map.SameAs(dst.map),
+	    ExcMessage ("Column map of matrix does not fit with vector map!"));
+    Assert (row_map.SameAs(src.map),
+	    ExcMessage ("Row map of matrix does not fit with vector map!"));
 
     if (!matrix->Filled())
       matrix->FillComplete();
@@ -732,6 +749,11 @@ namespace TrilinosWrappers
 			const Vector &src) const
   {
     Assert (&src != &dst, ExcSourceEqualsDestination());
+
+    Assert (row_map.SameAs(dst.map),
+	    ExcMessage ("Row map of matrix does not fit with vector map!"));
+    Assert (col_map.SameAs(src.map),
+	    ExcMessage ("Column map of matrix does not fit with vector map!"));
 
     if (!matrix->Filled())
       matrix->FillComplete();

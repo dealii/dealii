@@ -1189,13 +1189,13 @@ BoussinesqFlowProblem<dim>::build_stokes_preconditioner ()
   Amg_preconditioner = boost::shared_ptr<TrilinosWrappers::PreconditionAMG>
 		       (new TrilinosWrappers::PreconditionAMG());
 
-  std::vector<double> null_space;
+  std::vector<std::vector<bool> > null_space;
   std::vector<bool>  velocity_components (dim+1,true);
   velocity_components[dim] = false;
   DoFTools::extract_constant_modes (stokes_dof_handler, velocity_components, 
 				    null_space);
   Amg_preconditioner->initialize(stokes_preconditioner_matrix.block(0,0),
-				 true, true, null_space, dim, false);
+				 true, true, null_space, false);
 
 				   // TODO: we could throw away the (0,0)
 				   // block here since things have been

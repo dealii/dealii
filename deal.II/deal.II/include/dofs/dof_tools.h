@@ -1040,26 +1040,24 @@ class DoFTools
 				      * of as many vectors as there
 				      * are true arguments in 
 				      * <tt>component_select</tt>, 
-				      * say <tt>d</tt>,
 				      * each of which will be one
 				      * in one component and 
-				      * zero in all others. We store
-				      * the null space contiguously
-				      * in the output vector
-				      * <tt>constant_modes</tt>
-				      * to enable the internal 
-				      * Trilinos structures the 
-				      * access to it. This means that
-				      * the length of the vector 
-				      * will be <tt>d</tt> times
-				      * the number of degrees of
+				      * zero in all others. We store 
+				      * this object in a vector of 
+				      * vectors, where the outer 
+				      * vector is of the size of 
+				      * the number of selected 
+				      * components, and each inner
+				      * vector has as many components
+				      * as there are degrees of 
 				      * freedom in the selected 
 				      * components. Note that any
 				      * matrix associated with this
 				      * null space must have been
-				      * constructed from the 
-				      * same argument as in
-				      * <tt>component_select</tt>.
+				      * constructed using the 
+				      * same
+				      * <tt>component_select</tt>
+				      * argument.
 				      * 
 				      * The main reason for this
 				      * program is the use of the
@@ -1068,9 +1066,9 @@ class DoFTools
 				      */
     template <class DH>
     static void
-    extract_constant_modes (const DH                &dof_handler,
-			    const std::vector<bool> &component_select,
-			    std::vector<double>     &constant_modes);
+    extract_constant_modes (const DH                        &dof_handler,
+			    const std::vector<bool>         &component_select,
+			    std::vector<std::vector<bool> > &constant_modes);
 
 				     /**
 				      * For each active cell of a DoFHandler

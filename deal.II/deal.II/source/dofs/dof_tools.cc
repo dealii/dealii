@@ -3615,9 +3615,9 @@ DoFTools::extract_subdomain_dofs (const DH           &dof_handler,
 
 template <class DH>
 void
-DoFTools::extract_constant_modes (const DH                &dof_handler,
-				  const std::vector<bool> &component_select,
-				  std::vector<double>     &constant_modes)
+DoFTools::extract_constant_modes (const DH                        &dof_handler,
+				  const std::vector<bool>         &component_select,
+				  std::vector<std::vector<bool> > &constant_modes)
 {
   const unsigned int n_components = dof_handler.get_fe().n_components();
   Assert (n_components == component_select.size(),
@@ -3642,7 +3642,7 @@ DoFTools::extract_constant_modes (const DH                &dof_handler,
   std::vector<bool> temporary_dof_list (dof_handler.n_dofs(), false);
   extract_dofs (dof_handler, component_select, selection_dof_list);
 
-  constant_modes.resize (n_components_selected * n_u, 0.);
+  constant_modes.resize (n_components_selected, std::vector<bool>(n_u, false));
   
   for (unsigned int component=0, component_used=0; 
        component < n_components; ++component, ++component_used)
@@ -3655,12 +3655,15 @@ DoFTools::extract_constant_modes (const DH                &dof_handler,
 	unsigned int counter = 0;
 	for (unsigned int i=0; i<dof_handler.n_dofs(); ++i)
 	{
-	  if (temporary_dof_list[i])
-	    {
-	      constant_modes [component * n_u + counter] = 1.;
-	    }
 	  if (selection_dof_list[i])
-	    ++counter;
+	    {
+	      if (temporary_dof_list[i])
+		constant_modes [component][counter] = true;
+	      else
+		constant_modes [component][counter] = false;
+
+	      ++counter;
+	    }
 	}
       }
 }
@@ -5608,7 +5611,7 @@ void
 DoFTools::extract_constant_modes<DoFHandler<deal_II_dimension> >
 (const DoFHandler<deal_II_dimension> &dof_handler,
  const std::vector<bool> &selected_components,
- std::vector<double>     &constant_modes);
+ std::vector<std::vector<bool> > &constant_modes);
 
 template
 void
