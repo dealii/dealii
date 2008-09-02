@@ -1878,6 +1878,17 @@ class FEValuesBase : protected FEValuesData<dim>,
                                           */
         virtual
         void
+        get_interpolated_dof_values (const Vector<long double> &in,
+                                     Vector<long double>       &out) const = 0;
+
+                                         /**
+                                          * Call
+                                          * @p get_interpolated_dof_values
+                                          * of the iterator with the
+                                          * given arguments.
+                                          */
+        virtual
+        void
         get_interpolated_dof_values (const BlockVector<double> &in,
                                      Vector<double>       &out) const = 0;
 
@@ -1891,6 +1902,17 @@ class FEValuesBase : protected FEValuesData<dim>,
         void
         get_interpolated_dof_values (const BlockVector<float> &in,
                                      Vector<float>       &out) const = 0;
+
+                                         /**
+                                          * Call
+                                          * @p get_interpolated_dof_values
+                                          * of the iterator with the
+                                          * given arguments.
+                                          */
+        virtual
+        void
+        get_interpolated_dof_values (const BlockVector<long double> &in,
+                                     Vector<long double>       &out) const = 0;
 
 #ifdef DEAL_II_USE_PETSC
                                          /**
@@ -2020,6 +2042,17 @@ class FEValuesBase : protected FEValuesData<dim>,
                                           */
         virtual
         void
+        get_interpolated_dof_values (const Vector<long double> &in,
+                                     Vector<long double>       &out) const;
+
+                                         /**
+                                          * Call
+                                          * @p get_interpolated_dof_values
+                                          * of the iterator with the
+                                          * given arguments.
+                                          */
+        virtual
+        void
         get_interpolated_dof_values (const BlockVector<double> &in,
                                      Vector<double>       &out) const;
 
@@ -2033,6 +2066,17 @@ class FEValuesBase : protected FEValuesData<dim>,
         void
         get_interpolated_dof_values (const BlockVector<float> &in,
                                      Vector<float>       &out) const;
+
+                                         /**
+                                          * Call
+                                          * @p get_interpolated_dof_values
+                                          * of the iterator with the
+                                          * given arguments.
+                                          */
+        virtual
+        void
+        get_interpolated_dof_values (const BlockVector<long double> &in,
+                                     Vector<long double>       &out) const;
 
 #ifdef DEAL_II_USE_PETSC
                                          /**
@@ -2198,6 +2242,17 @@ class FEValuesBase : protected FEValuesData<dim>,
                                      Vector<float>       &out) const;
 
                                          /**
+                                          * Call
+                                          * @p get_interpolated_dof_values
+                                          * of the iterator with the
+                                          * given arguments.
+                                          */
+        virtual
+        void
+        get_interpolated_dof_values (const Vector<long double> &in,
+                                     Vector<long double>       &out) const;
+
+                                         /**
                                           * Implement the respective
                                           * function of the base
                                           * class. Since this is not
@@ -2220,6 +2275,17 @@ class FEValuesBase : protected FEValuesData<dim>,
         void
         get_interpolated_dof_values (const BlockVector<float> &in,
                                      Vector<float>       &out) const;
+
+                                         /**
+                                          * Call
+                                          * @p get_interpolated_dof_values
+                                          * of the iterator with the
+                                          * given arguments.
+                                          */
+        virtual
+        void
+        get_interpolated_dof_values (const BlockVector<long double> &in,
+                                     Vector<long double>       &out) const;
 
 #ifdef DEAL_II_USE_PETSC
                                          /**

@@ -1,0 +1,57 @@
+//---------------------------------------------------------------------------
+//    $Id: dof_accessor.cc 16656 2008-08-22 19:39:29Z bangerth $
+//    Version: $Name$
+//
+//    Copyright (C) 1998, 1999, 2000, 2001, 2002, 2003, 2004, 2005, 2006, 2007, 2008 by the deal.II authors
+//
+//    This file is subject to QPL and may not be  distributed
+//    without copyright and license information. Please refer
+//    to the file deal.II/doc/license.html for the  text  and
+//    further information on this license.
+//
+//---------------------------------------------------------------------------
+
+
+for (VEC : SERIAL_VECTORS; SCALAR : REAL_SCALARS)
+  {  
+    template
+      void
+      DoFCellAccessor<DoFHandler<deal_II_dimension> >::get_dof_values
+      (const VEC&, Vector<SCALAR>&) const;
+    template
+      void
+      DoFCellAccessor<DoFHandler<deal_II_dimension> >::set_dof_values
+      (const Vector<SCALAR>&, VEC&) const;
+
+    template
+      void
+      DoFCellAccessor<DoFHandler<deal_II_dimension> >::get_interpolated_dof_values
+      (const VEC&, Vector<SCALAR>&) const;
+    template
+      void
+      DoFCellAccessor<DoFHandler<deal_II_dimension> >::set_dof_values_by_interpolation
+      (const Vector<SCALAR>&, VEC&) const;
+  }
+
+
+for (VEC : SERIAL_VECTORS; SCALAR : REAL_SCALARS)
+  {  
+    template
+      void
+      DoFCellAccessor<hp::DoFHandler<deal_II_dimension> >::get_dof_values
+      (const VEC&, Vector<SCALAR>&) const;
+    template
+      void
+      DoFCellAccessor<hp::DoFHandler<deal_II_dimension> >::set_dof_values
+      (const Vector<SCALAR>&, VEC&) const;
+
+    template
+      void
+      DoFCellAccessor<hp::DoFHandler<deal_II_dimension> >::get_interpolated_dof_values
+      (const VEC&, Vector<SCALAR>&) const;
+    template
+      void
+      DoFCellAccessor<hp::DoFHandler<deal_II_dimension> >::set_dof_values_by_interpolation
+      (const Vector<SCALAR>&, VEC&) const;
+  }
+

@@ -97,6 +97,17 @@ template <int dim>
 template <typename CI>
 void
 FEValuesBase<dim>::CellIterator<CI>::
+get_interpolated_dof_values (const Vector<long double> &in,
+                             Vector<long double>       &out) const
+{
+  cell->get_interpolated_dof_values (in, out);
+}
+
+
+template <int dim>
+template <typename CI>
+void
+FEValuesBase<dim>::CellIterator<CI>::
 get_interpolated_dof_values (const BlockVector<double> &in,
                              Vector<double>            &out) const
 {
@@ -110,6 +121,17 @@ void
 FEValuesBase<dim>::CellIterator<CI>::
 get_interpolated_dof_values (const BlockVector<float> &in,
                              Vector<float>            &out) const
+{
+  cell->get_interpolated_dof_values (in, out);
+}
+
+
+template <int dim>
+template <typename CI>
+void
+FEValuesBase<dim>::CellIterator<CI>::
+get_interpolated_dof_values (const BlockVector<long double> &in,
+                             Vector<long double>            &out) const
 {
   cell->get_interpolated_dof_values (in, out);
 }
@@ -233,6 +255,16 @@ get_interpolated_dof_values (const Vector<float> &,
 template <int dim>
 void
 FEValuesBase<dim>::TriaCellIterator::
+get_interpolated_dof_values (const Vector<long double> &,
+                             Vector<long double>       &) const
+{
+  Assert (false, ExcMessage (message_string));
+}
+
+
+template <int dim>
+void
+FEValuesBase<dim>::TriaCellIterator::
 get_interpolated_dof_values (const BlockVector<double> &,
                              Vector<double>            &) const
 {
@@ -246,6 +278,16 @@ void
 FEValuesBase<dim>::TriaCellIterator::
 get_interpolated_dof_values (const BlockVector<float> &,
                              Vector<float>            &) const
+{
+  Assert (false, ExcMessage (message_string));
+}
+
+
+template <int dim>
+void
+FEValuesBase<dim>::TriaCellIterator::
+get_interpolated_dof_values (const BlockVector<long double> &,
+                             Vector<long double>            &) const
 {
   Assert (false, ExcMessage (message_string));
 }
@@ -2072,46 +2114,12 @@ template class FEFaceValues<deal_II_dimension>;
 template class FESubfaceValues<deal_II_dimension>;
 #endif
 
-DEAL_II_NAMESPACE_CLOSE
 
 //---------------------------------------------------------------------------
 
 // Instantiations are in a different file using the macro IN for the vector type.
 // This way, we avoid code reduplication
 
-#define IN Vector<double>
-#include "fe_values.instance.h"
-#undef IN
+#include "fe_values.inst"
 
-#define IN BlockVector<double>
-#include "fe_values.instance.h"
-#undef IN
-
-#define IN Vector<float>
-#include "fe_values.instance.h"
-#undef IN
-
-#define IN BlockVector<float>
-#include "fe_values.instance.h"
-#undef IN
-
-#ifdef DEAL_II_USE_PETSC
-#define IN PETScWrappers::Vector
-#include "fe_values.instance.h"
-#undef IN
-
-#define IN PETScWrappers::BlockVector
-#include "fe_values.instance.h"
-#undef IN
-#endif
-
-#ifdef DEAL_II_USE_TRILINOS
-#define IN TrilinosWrappers::Vector
-#include "fe_values.instance.h"
-#undef IN
-
-#define IN TrilinosWrappers::BlockVector
-#include "fe_values.instance.h"
-#undef IN
-#endif
-
+DEAL_II_NAMESPACE_CLOSE
