@@ -171,7 +171,8 @@ namespace TrilinosWrappers
                                           * since they may be routed to
                                           * the wrong block.
                                           */
-        void reinit (const BlockVector &V);
+        void reinit (const BlockVector &V,
+		     const bool fast=false);
 
                                          /**
                                           * Change the number of blocks to
@@ -328,14 +329,15 @@ namespace TrilinosWrappers
 
     inline
     void
-    BlockVector::reinit (const BlockVector& v)
+    BlockVector::reinit (const BlockVector& v,
+			 const bool fast)
     {
       this->block_indices = v.get_block_indices();
       if (this->components.size() != this->n_blocks())
         this->components.resize(this->n_blocks());
   
       for (unsigned int i=0;i<this->n_blocks();++i)
-        block(i).reinit(v.block(i));
+        block(i).reinit(v.block(i), fast);
     }
 
 

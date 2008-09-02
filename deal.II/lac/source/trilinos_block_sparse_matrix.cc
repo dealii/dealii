@@ -156,16 +156,31 @@ namespace TrilinosWrappers
 	this->block(r,c).compress();
   }
 
+
+
   void
   BlockSparseMatrix::collect_sizes ()
   {
     compress();
     BaseClass::collect_sizes ();
   }
-  
+
+
+
+  unsigned int
+  BlockSparseMatrix::n_nonzero_elements () const
+  {
+    unsigned int n_nonzero = 0;
+    for (unsigned int rows = 0; rows<this->n_block_rows(); ++rows)
+      for (unsigned int cols = 0; cols<this->n_block_cols(); ++cols)
+	n_nonzero += this->block(rows,cols).n_nonzero_elements();
+
+    return n_nonzero;
+  }
+
 }
 
-  
+
 DEAL_II_NAMESPACE_CLOSE
 
 #endif

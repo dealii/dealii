@@ -65,6 +65,8 @@ namespace TrilinosWrappers
 {
   class SparseMatrix;
   class Vector;
+  class BlockSparseMatrix;
+  class BlockVector;
 }
 #endif
 
@@ -1137,10 +1139,6 @@ class MatrixTools : public MatrixCreator
  				      * is that it doesn't handle the case
  				      * where the matrix is distributed across
  				      * an MPI system.
- 				      *
- 				      * This function is used in
-				      * @ref step_17 "step-17" and
-				      * @ref step_18 "step-18".
  				      */
     static void
     apply_boundary_values (const std::map<unsigned int,double> &boundary_values,
@@ -1148,6 +1146,18 @@ class MatrixTools : public MatrixCreator
 			   TrilinosWrappers::Vector  &solution,
 			   TrilinosWrappers::Vector  &right_hand_side,
 			   const bool             eliminate_columns = true);
+    
+				     /**
+				      * This function does the same as
+				      * the one above, except now working
+				      * on block structures.
+				      */
+    static void
+    apply_boundary_values (const std::map<unsigned int,double> &boundary_values,
+			   TrilinosWrappers::BlockSparseMatrix  &matrix,
+			   TrilinosWrappers::BlockVector  &solution,
+			   TrilinosWrappers::BlockVector  &right_hand_side,
+			   const bool                eliminate_columns = true);
 #endif
     
                                      /**

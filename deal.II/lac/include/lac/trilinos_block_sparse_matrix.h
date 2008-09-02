@@ -229,6 +229,13 @@ namespace TrilinosWrappers
       void collect_sizes ();
 
                                        /**
+                                        * Return the number of nonzero
+                                        * elements of this
+                                        * matrix. 
+                                        */
+      unsigned int n_nonzero_elements () const;
+
+                                       /**
                                         * Matrix-vector multiplication:
                                         * let $dst = M*src$ with $M$
                                         * being this matrix.

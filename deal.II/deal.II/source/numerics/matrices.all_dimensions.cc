@@ -29,6 +29,8 @@
 #ifdef DEAL_II_USE_TRILINOS
 #  include <lac/trilinos_sparse_matrix.h>
 #  include <lac/trilinos_vector.h>
+#  include <lac/trilinos_block_sparse_matrix.h>
+#  include <lac/trilinos_block_vector.h>
 #endif
 
 #include <algorithm>
@@ -700,7 +702,7 @@ namespace TrilinosWrappers
     Assert (matrix.n() == right_hand_side.size(),
             ExcDimensionMismatch(matrix.n(), right_hand_side.size()));
     Assert (matrix.n() == solution.size(),
-            ExcDimensionMismatch(matrix.n(), solution.size()));
+            ExcDimensionMismatch(matrix.m(), solution.size()));
 
                                      // if no boundary values are to be applied
                                      // simply return
@@ -713,7 +715,6 @@ namespace TrilinosWrappers
             ExcInternalError());
     Assert (local_range == solution.local_range(),
             ExcInternalError());
-    
 
                                      // we have to read and write from this
                                      // matrix (in this order). this will only
@@ -786,7 +787,7 @@ namespace TrilinosWrappers
                                      // now also set appropriate values for
                                      // the rhs
     for (unsigned int i=0; i<solution_values.size(); ++i)
-      solution_values[i] *= average_nonzero_diagonal_entry;
+      solution_values[i] *= matrix.diag_element(i);
 
     right_hand_side.set (indices, solution_values);
 
@@ -811,6 +812,81 @@ apply_boundary_values (const std::map<unsigned int,double> &boundary_values,
                                    // used for both trilinos matrix types
   TrilinosWrappers::apply_boundary_values (boundary_values, matrix, solution,
                                         right_hand_side, eliminate_columns);
+}
+
+void
+MatrixTools::
+apply_boundary_values (const std::map<unsigned int,double>  &boundary_values,
+                       TrilinosWrappers::BlockSparseMatrix  &matrix,
+                       TrilinosWrappers::BlockVector        &solution,
+                       TrilinosWrappers::BlockVector        &right_hand_side,
+                       const bool                            eliminate_columns)
+{
+  Assert (matrix.n() == right_hand_side.size(),
+	  ExcDimensionMismatch(matrix.n(), right_hand_side.size()));
+  Assert (matrix.n() == solution.size(),
+	  ExcDimensionMismatch(matrix.n(), solution.size()));
+  Assert (matrix.n_block_rows() == matrix.n_block_cols(),
+	  ExcNotQuadratic());
+  
+  const unsigned int n_blocks = matrix.n_block_rows();
+
+  matrix.compress();
+
+				   // We need to find the subdivision
+				   // into blocks for the boundary values.
+				   // To this end, generate a vector of
+				   // maps with the respective indices.
+  std::vector<std::map<unsigned int,double> > block_boundary_values(n_blocks);
+  {
+    int offset = 0, block=0;
+    for (std::map<unsigned int,double>::const_iterator
+	    dof  = boundary_values.begin();
+	  dof != boundary_values.end();
+	  ++dof)
+      {
+	if (dof->first >= matrix.block(block,0).m() + offset)
+	  {
+	    offset += matrix.block(block,0).m();
+	    block++;
+	  }
+	const unsigned int index = dof->first - offset;
+	block_boundary_values[block].insert(std::pair<unsigned int, double> (index,dof->second));
+      }
+  }
+  
+				   // Now call the non-block variants on
+				   // the diagonal subblocks and the
+				   // solution/rhs.
+  for (unsigned int block=0; block<n_blocks; ++block)
+    TrilinosWrappers::apply_boundary_values(block_boundary_values[block],
+					    matrix.block(block,block),
+					    solution.block(block),
+					    right_hand_side.block(block),
+					    eliminate_columns);
+  
+				   // Finally, we need to do something 
+				   // about the off-diagonal matrices. This
+				   // is luckily not difficult. Just clear
+				   // the whole row.
+  for (unsigned int block_m=0; block_m<n_blocks; ++block_m)
+    {
+      const std::pair<unsigned int, unsigned int> local_range
+	= matrix.block(block_m,0).local_range();
+      
+      std::vector<unsigned int> constrained_rows;
+      for (std::map<unsigned int,double>::const_iterator
+	    dof  = block_boundary_values[block_m].begin();
+	  dof != block_boundary_values[block_m].end();
+	  ++dof)
+	if ((dof->first >= local_range.first) &&
+	    (dof->first < local_range.second))
+	  constrained_rows.push_back (dof->first);
+  
+      for (unsigned int block_n=0; block_n<n_blocks; ++block_n)
+	if (block_m != block_n)
+	  matrix.block(block_m,block_n).clear_rows(constrained_rows);
+    }
 }
 
 #endif

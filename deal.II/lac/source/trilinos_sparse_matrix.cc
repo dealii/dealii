@@ -492,10 +492,10 @@ namespace TrilinosWrappers
 	int diag_index = (int)(diag_find - col_indices);
 
 	for (int j=0; j<num_entries; ++j)
-	  if (diag_index != j)
+	  if (diag_index != j || new_diag_value == 0)
 	    values[j] = 0.;
 
-	if (diag_find && std::fabs(values[diag_index]) == 0.)
+	if (diag_find && std::fabs(values[diag_index]) == 0 && new_diag_value!=0)
 	  values[diag_index] = new_diag_value;
       }
   }
@@ -730,9 +730,9 @@ namespace TrilinosWrappers
   {
     Assert (&src != &dst, ExcSourceEqualsDestination());
     
-    Assert (col_map.SameAs(dst.map),
+    Assert (col_map.SameAs(src.map),
 	    ExcMessage ("Column map of matrix does not fit with vector map!"));
-    Assert (row_map.SameAs(src.map),
+    Assert (row_map.SameAs(dst.map),
 	    ExcMessage ("Row map of matrix does not fit with vector map!"));
 
     if (!matrix->Filled())
@@ -750,9 +750,9 @@ namespace TrilinosWrappers
   {
     Assert (&src != &dst, ExcSourceEqualsDestination());
 
-    Assert (row_map.SameAs(dst.map),
+    Assert (row_map.SameAs(src.map),
 	    ExcMessage ("Row map of matrix does not fit with vector map!"));
-    Assert (col_map.SameAs(src.map),
+    Assert (col_map.SameAs(dst.map),
 	    ExcMessage ("Column map of matrix does not fit with vector map!"));
 
     if (!matrix->Filled())
