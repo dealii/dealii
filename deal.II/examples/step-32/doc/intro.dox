@@ -1,0 +1,914 @@
+<br>
+
+<i>This program was contributed by Martin Kronbichler and Wolfgang
+Bangerth. 
+<br>
+This material is based upon work partly supported by the National
+Science Foundation under Award No. EAR-0426271 and The California Institute of 
+Technology. Any opinions, findings, and conclusions or recommendations
+expressed in this publication are those of the author and do not
+necessarily reflect the views of the National Science Foundation or of The
+California Institute of Technology.
+</i>
+
+
+<a name="Intro"></a>
+<h1>Introduction</h1>
+
+<h3>The Boussinesq equations</h3>
+
+This program deals with an interesting physical problem: how does a
+fluid (i.e. a liquid or gas) behave if it experiences differences in
+buoyancy caused by temperature differences? It is clear that those
+parts of the fluid that are hotter (and therefore lighter) are going
+to rise up and those that are cooler (and denser) are going to sink
+down with gravity.
+
+In cases where the fluid moves slowly enough such that inertia effects
+can be neglected, the equations that describe such behavior are the
+Boussinesq equations that read as follows:
+@f{eqnarray*}
+  -\nabla \cdot \eta \varepsilon ({\mathbf u}) + \nabla p &=& 
+  \mathrm{Ra} \; T \mathbf{g},
+  \\
+  \nabla \cdot {\mathbf u} &=& 0,
+  \\
+  \frac{\partial T}{\partial t}
+  +
+  {\mathbf u} \cdot \nabla T
+  -
+  \nabla \cdot \kappa \nabla T &=& \gamma.
+@f}
+These equations fall into the class of vector-valued problems (a
+toplevel overview of this topic can be found in the @ref vector_valued module).
+Here, <b>u</b> is the velocity field, <i>p</i> the pressure, and <i>T</i>
+the temperature of the fluid. $\varepsilon ({\mathbf u}) = \frac 12
+[(\nabla{\mathbf u}) + (\nabla {\mathbf u})^T]$ is the symmetric
+gradient of the velocity. As can be seen, velocity and pressure
+solve a Stokes equation describing the motion of an incompressible
+fluid, an equation we have previously considered in @ref step_22 "step-22"; we
+will draw extensively on the experience we have gained in that program, in
+particular with regard to efficient linear Stokes solvers. 
+
+The forcing term of the fluid motion is the buoyancy of the
+fluid, expressed as the product of the Rayleigh number $\mathrm{Ra}$,
+the temperature <i>T</i> and the gravity vector <b>g</b>. (A possibly
+more intuitive formulation would use $\mathrm{Ra} \; (T-\bar T)
+\mathbf{g}$ as right hand side where $\bar T$ is the average
+temperature, and the right hand side then describes the forces due to
+local deviations from the average density; this formulation is
+entirely equivalent if the gravity vector results from a gravity
+potential $\phi$, i.e. $\mathbf{g}=-\nabla\phi$, and yields the exact
+same solution except for the pressure which will now be $p+\mathrm{Ra}
+\;\bar T \phi$.)
+
+While the first two equations describe how the fluid reacts to
+temperature differences by moving around, the third equation states
+how the fluid motion affects the temperature field: it is an advection
+diffusion equation, i.e. the temperature is attached to the fluid
+particles and advected along in the flow field, with an additional
+diffusion (heat conduction) term. In many applications, the diffusion
+coefficient is fairly small, and the temperature equation is in fact
+transport, not diffusion dominated and therefore in character more hyperbolic
+than elliptic; we will have to take this into account when developing a stable
+discretization. 
+
+In the equations above, the term $\gamma$ on the right hand side denotes the
+heat sources and may be a spatially and temporally varying function. $\eta$
+and $\kappa$ denote the viscosity and diffusivity coefficients, which we assume
+constant for this tutorial program. The more general case when $\eta$ depends on
+the temperature is an important factor in physical applications: Most materials
+become more fluid as they get hotter (i.e., $\eta$ decreases with <i>T</i>);
+sometimes, as in the case of rock minerals at temperatures close to their
+melting point, $\eta$ may change by orders of magnitude over the typical range
+of temperatures.
+
+$\mathrm{Ra}$, called the <a
+href="http://en.wikipedia.org/wiki/Rayleigh_number">Rayleigh
+number</a>, is a dimensionless number that describes the ratio of heat
+transport due to convection induced by buoyancy changes from
+temperature differences, and of heat transport due to thermal
+diffusion. A small Rayleigh number implies that buoyancy is not strong
+relative to viscosity and fluid motion <b>u</b> is slow enough so
+that heat diffusion $\kappa\Delta T$ is the dominant heat transport
+term. On the other hand, a fluid with a high Rayleigh number will show
+vigorous convection that dominates heat conduction. 
+
+For most fluids for which we are interested in computing thermal
+convection, the Rayleigh number is very large, often $10^6$ or
+larger. From the structure of the equations, we see that this will
+lead to large pressure differences and large velocities. Consequently,
+the convection term in the convection-diffusion equation for <i>T</i> will
+also be very large and an accurate solution of this equation will
+require us to choose small time steps. Problems with large Rayleigh
+numbers are therefore hard to solve numerically for similar reasons
+that make solving the <a
+href="http://en.wikipedia.org/wiki/Navier-stokes_equations">Navier-Stokes
+equations</a> hard to solve when the <a
+href="http://en.wikipedia.org/wiki/Reynolds_number">Reynolds number
+$\mathrm{Re}$</a> is large.
+
+Note that a large Rayleigh number does not necessarily involve large
+velocities in absolute terms. For example, the Rayleigh number in the
+earth mantle has a Rayleigh number larger than $10^6$. Yet the
+velocities are small: the material is in fact solid rock but it is so
+hot and under pressure that it can flow very slowly, on the order of
+at most a few centimeters per year. Nevertheless, this can lead to
+mixing over time scales of many million years, a time scale much
+shorter than for the same amount of heat to be distributed by thermal
+conductivity and a time scale of relevance to affect the evolution of the
+earth's interior and surface structure.
+
+
+
+<h3>%Boundary and initial conditions</h3>
+
+Since the Boussinesq equations are derived under the assumption that inertia
+of the fluid's motion does not play a role, the flow field is at each time
+entirely determined by buoyancy difference at that time, not by the flow field
+at previous times. This is reflected by the fact that the first two equations
+above are the steady state Stokes equation that do not contain a time
+derivative. Consequently, we do not need initial conditions for either
+velocities or pressure. On the other hand, the temperature field does satisfy
+an equation with a time derivative, so we need initial conditions for <i>T</i>.
+
+As for boundary conditions: if $\kappa>0$ then the temperature
+satisfies a second order differential equation that requires
+boundary data all around the boundary for all times. These can either be a
+prescribed boundary temperature $T|_{\partial\Omega}=T_b$ (Dirichlet boundary
+conditions), or a prescribed thermal flux $\mathbf{n}\cdot\kappa\nabla
+T|_{\partial\Omega}=\phi$; in this program, we will use an insulated boundary
+condition, i.e. prescribe no thermal flux: $\phi=0$. 
+
+Similarly, the velocity field requires us to pose boundary conditions. These
+may be no-slip no-flux conditions <b>u</b>=0 on $\partial\Omega$ if the fluid
+sticks to the boundary, or no normal flux conditions $\mathbf n \cdot \mathbf
+u = 0$ if the fluid can flow along but not across the boundary, or any number
+of other conditions that are physically reasonable. In this program, we will
+use no normal flux conditions.
+
+
+<h3>Solution approach</h3>
+
+Like the equations solved in @ref step_21 "step-21", we here have a
+system of differential-algebraic equations (DAE): with respect to the time
+variable, only the temperature equation is a differential equation
+whereas the Stokes system for <b>u</b> and <i>p</i> has no
+time-derivatives and is therefore of the sort of an algebraic
+constraint that has to hold at each time instant. The main difference
+to @ref step_21 "step-21" is that the algebraic constraint there was a
+mixed Laplace system of the form
+@f{eqnarray*}
+  \mathbf u + {\mathbf K}\lambda \nabla p &=& 0, \\
+  \nabla\cdot \mathbf u &=& f,
+@f}
+where now we have a Stokes system
+@f{eqnarray*}
+  -\nabla \cdot \eta \varepsilon ({\mathbf u}) + \nabla p &=& f, \\
+  \nabla\cdot \mathbf u &=& 0,
+@f}
+where $\nabla \cdot \eta \varepsilon (\cdot)$ is an operator similar to the
+Laplacian $\Delta$ applied to a vector field.
+
+Given the similarity to what we have done in @ref step_21 "step-21",
+it may not come as a surprise that we choose a similar approach,
+although we will have to make adjustments for the change in operator
+in the top-left corner of the differential operator. 
+
+
+<h4>Time stepping</h4>
+
+The structure of the problem as a DAE allows us to use the same
+strategy as we have already used in @ref step_21 "step-21", i.e. we
+use a time lag scheme: first solve the Stokes equations for velocity and
+pressure using the temperature field from the previous time step, then
+with the new velocities update the temperature field for the current
+time step. In other words, in time step <i>n</i> we first solve the Stokes
+system
+@f{eqnarray*}
+  -\nabla \cdot \eta \varepsilon ({\mathbf u}^n) + \nabla p^n &=& 
+  \mathrm{Ra} \; T^{n-1} \mathbf{g},
+  \\
+  \nabla \cdot {\mathbf u}^n &=& 0,
+@f}
+and then the temperature equation with the so-computed velocity field 
+${\mathbf u}^n$. In contrast to @ref step_21 "step-21", we'll use a
+higher order time stepping scheme here, namely the <a 
+href="http://en.wikipedia.org/wiki/Backward_differentiation_formula">Backward
+Differentiation Formula scheme of order 2 (BDF-2 in short)</a> that
+replaces the time derivative $\frac{\partial T}{\partial t}$ by the (one-sided)
+difference quotient $\frac{\frac 32 T^{n}-2T^{n-1}+\frac 12 T^{n-2}}{k}$ with
+<i>k</i> the time step size.
+
+This gives the discretized-in-time temperature equation
+@f{eqnarray*}
+  \frac 32 T^n
+  -
+  k\nabla \cdot \kappa \nabla T^n 
+  &=& 
+  2 T^{n-1}
+  -
+  \frac 12 T^{n-2}
+  -
+  k{\mathbf u}^n \cdot \nabla (2T^{n-1}-T^{n-2})
+  +
+  k\gamma.
+@f}
+Note how the temperature equation is
+solved semi-explicitly: diffusion is treated implicitly whereas
+advection is treated explicitly using the just-computed velocity
+field but only previously computed temperature fields. The
+temperature terms appearing in the advection term are forward
+projected to the current time:
+$T^n \approx T^{n-1} + k_n
+\frac{\partial T}{\partial t} \approx T^{n-1} + k_n
+\frac{T^{n-1}-T^{n-2}}{k_n} = 2T^{n-1}-T^{n-2}$. We need this projection
+for maintaining the order of accuracy of the BDF-2 scheme. In other words, the
+temperature fields we use in the explicit right hand side are first
+order approximations of the current temperature field &mdash; not
+quite an explicit time stepping scheme, but by character not too far
+away either.
+
+The introduction of the temperature extrapolation limits the time step
+by a <a href="http://en.wikipedia.org/wiki/Courant–Friedrichs–Lewy_condition">
+Courant-Friedrichs-Lewy (CFL) condition</a> just like it was in 
+@ref step_21 "step-21". (We wouldn't have had that stability condition if
+we treated the advection term implicitly since the BDF-2 scheme is A-stable, 
+at the price that we needed to build a new temperature matrix at each time 
+step.) We will discuss the exact choice of time step in the <a
+href="#Results">results section</a>, but for the moment of importance is that 
+this CFL condition means that the time step
+size <i>k</i> may change from time step to time step, and that we have to
+modify the above formula slightly. If $k_n,k_{n-1}$ are the time steps
+sizes of the current and previous time step, then we use the
+approximations 
+$\frac{\partial T}{\partial t} \approx
+ \frac 1{k_n}
+ \left(
+       \frac{2k_n+k_{n-1}}{k_n+k_{n-1}} T^{n} 
+       -
+       \frac{k_n+k_{n-1}}{k_{n-1}}T^{n-1} 
+       +
+       \frac{k_n^2}{k_{n-1}(k_n+k_{n-1})} T^{n-2}
+ \right)$
+and
+$T^n \approx 
+   T^{n-1} + k_n \frac{\partial T}{\partial t} 
+   \approx
+   T^{n-1} + k_n
+   \frac{T^{n-1}-T^{n-2}}{k_{n-1}}
+   =
+   \left(1+\frac{k_n}{k_{n-1}}\right)T^{n-1}-\frac{k_n}{k_{n-1}}T^{n-2}$,
+and above equation is generalized as follows:
+@f{eqnarray*}
+  \frac{2k_n+k_{n-1}}{k_n+k_{n-1}} T^n
+  -
+  k_n\nabla \cdot \kappa \nabla T^n 
+  &=& 
+  \frac{k_n+k_{n-1}}{k_{n-1}} T^{n-1}
+  -
+  \frac{k_n^2}{k_{n-1}(k_n+k_{n-1})} T^{n-2}
+  -
+  k_n{\mathbf u}^n \cdot \nabla \left[
+    \left(1+\frac{k_n}{k_{n-1}}\right)T^{n-1}-\frac{k_n}{k_{n-1}}T^{n-2}
+  \right]
+  +
+  k_n\gamma.
+@f}
+That's not an easy to read equation, but will provide us with the
+desired higher order accuracy. As a consistency check, it is easy to
+verify that it reduces to the same equation as above if $k_n=k_{n-1}$.
+
+As a final remark we note that the choice of a higher order time
+stepping scheme of course forces us to keep more time steps in memory;
+in particular, we here will need to have $T^{n-2}$ around, a vector
+that we could previously discard. This seems like a nuisance that we
+were able to avoid previously by using only a first order time
+stepping scheme, but as we will see below when discussing the topic of
+stabilization, we will need this vector anyway and so keeping it
+around for time discretization is essentially for free and gives us
+the opportunity to use a higher order scheme.
+
+
+<h4>Weak form and space discretization for the Stokes part</h4>
+
+Like solving the mixed Laplace equations, solving the Stokes equations
+requires us to choose particular pairs of finite elements for
+velocities and pressure variables. Because this has already been discussed in
+@ref step_22 "step-22", we only cover this topic briefly:
+Here, we use the
+stable pair $Q_{p+1}^d \times Q_p, p\ge 1$. These are continuous
+elements, so we can form the weak form of the Stokes equation without
+problem by integrating by parts and substituting continuous functions
+by their discrete counterparts:
+@f{eqnarray*}
+  (\nabla {\mathbf v}_h, \eta \varepsilon ({\mathbf u}^n_h))
+  -
+  (\nabla \cdot {\mathbf v}_h, p^n_h) 
+  &=& 
+  ({\mathbf v}_h, \mathrm{Ra} \; T^{n-1}_h \mathbf{g}),
+  \\
+  (q_h, \nabla \cdot {\mathbf u}^n_h) &=& 0,
+@f}
+for all test functions $\mathbf v_h, q_h$. The first term of the first
+equation is considered as the inner product between tensors, i.e.
+$(\nabla {\mathbf v}_h, \eta \varepsilon ({\mathbf u}^n_h))_\Omega
+ = \int_\Omega \sum_{i,j=1}^d [\nabla {\mathbf v}_h]_{ij}
+           \eta [\varepsilon ({\mathbf u}^n_h)]_{ij}\, dx$.
+Because the second tensor in this product is symmetric, the
+anti-symmetric component of $\nabla {\mathbf v}_h$ plays no role and
+it leads to the entirely same form if we use the symmetric gradient of
+$\mathbf v_h$ instead. Consequently, the formulation we consider and
+that we implement is
+@f{eqnarray*}
+  (\varepsilon({\mathbf v}_h), \eta \varepsilon ({\mathbf u}^n_h))
+  -
+  (\nabla \cdot {\mathbf v}_h, p^n_h) 
+  &=& 
+  ({\mathbf v}_h, \mathrm{Ra} \; T^{n-1}_h \mathbf{g}),
+  \\
+  (q_h, \nabla \cdot {\mathbf u}^n_h) &=& 0.
+@f}
+
+This is exactly the same as what we already discussed in 
+@ref step_22 "step-22" and there is not much more to say about this here.
+
+
+<h4>Stabilization, weak form and space discretization for the temperature equation</h4>
+
+The more interesting question is what to do with the temperature
+advection-diffusion equation. By default, not all discretizations of
+this equation are equally stable unless we either do something like
+upwinding, stabilization, or all of this. One way to achieve this is
+to use discontinuous elements (i.e. the FE_DGQ class that we used, for
+example, in the discretization of the transport equation in 
+@ref step_12 "step-12", or in discretizing the pressure in 
+@ref step_20 "step-20" and @ref step_21 "step-21") and to define a
+flux at the interface between cells that takes into account
+upwinding. If we had a pure advection problem this would probably be
+the simplest way to go. However, here we have some diffusion as well,
+and the discretization of the Laplace operator with discontinuous
+elements is cumbersome because of the significant number of additional
+terms that need to be integrated on each face between
+cells. Discontinuous elements also have the drawback that the use of
+numerical fluxes introduces an additional numerical diffusion that
+acts everywhere, whereas we would really like to minimize the effect
+of numerical diffusion to a minimum and only apply it where it is
+necessary to stabilize the scheme.
+
+A better alternative is therefore to add some nonlinear viscosity to
+the model. Essentially, what this does is to transform the temperature
+equation from the form 
+@f{eqnarray*}
+  \frac{\partial T}{\partial t}
+  +
+  {\mathbf u} \cdot \nabla T
+  -
+  \nabla \cdot \kappa \nabla T &=& \gamma
+@f}
+to something like
+@f{eqnarray*}
+  \frac{\partial T}{\partial t}
+  +
+  {\mathbf u} \cdot \nabla T
+  -
+  \nabla \cdot (\kappa+\nu(T)) \nabla T &=& \gamma,
+@f}
+where $\nu(T)$ is an addition viscosity (diffusion) term that only
+acts in the vicinity of shocks and other discontinuities. $\nu(T)$ is
+chosen in such a way that if <i>T</i> satisfies the original equations, the
+additional viscosity is zero.
+
+To achieve this, the literature contains a number of approaches. We
+will here follow one developed by Guermond and Popov that builds on a
+suitably defined residual and a limiting procedure for the additional
+viscosity. To this end, let us define a residual $R_\alpha(T)$ as follows:
+@f{eqnarray*}
+  R_\alpha(T)
+  =
+  \left(
+  \frac{\partial T}{\partial t}
+  +
+  {\mathbf u} \cdot \nabla T
+  -
+  \nabla \cdot \kappa \nabla T - \gamma
+  \right)
+  T^{\alpha-1}
+@f}
+where we will later choose the stabilization exponent $\alpha$ from
+within the range $[1,2]$. Note that $R_\alpha(T)$ will be zero if $T$
+satisfies the temperature equation, since then the term in parentheses
+will be zero. Multiplying terms out, we get the following, entirely
+equivalent form:
+@f{eqnarray*}
+  R_\alpha(T)
+  =
+  \frac 1\alpha
+  \frac{\partial (T^\alpha)}{\partial t}
+  +
+  \frac 1\alpha
+  {\mathbf u} \cdot \nabla (T^\alpha)
+  -
+  \frac 1\alpha
+  \nabla \cdot \kappa \nabla (T^\alpha)
+  +
+  \kappa(\alpha-1)
+  T^{\alpha-2} |\nabla T|^\alpha
+  - 
+  \gamma
+  T^{\alpha-1}
+@f}
+
+With this residual, we can now define the artificial viscosity as
+a piecewise constant function defined on each cell $K$ with diameter
+$h_K$ separately as
+follows:
+@f{eqnarray*}
+  \nu_\alpha(T)|_K
+  =
+  \beta
+  \|\mathbf{u}\|_{L^\infty(K)}
+  \min\left\{
+    h_K,
+    h_K^\alpha
+    \frac{\|R_\alpha(T)\|_{L^\infty(K)}}{c(\mathbf{u},T)}
+  \right\}
+@f}
+
+Here, $\beta$ is a stabilization constant (a dimensional analysis
+reveals that it is unitless and therefore independent of scaling; we will
+discuss its choice in the <a href="#Results">results section</a>) and
+$c(\mathbf{u},T)$ is a normalization constant that must have units
+$\frac{m^{\alpha-1}K^\alpha}{s}$. We will choose it as
+$c(\mathbf{u},T) = 
+ c_R\ \|\mathbf{u}\|_{L^\infty(\Omega)} \ \mathrm{var}(T)
+ \ |\mathrm{diam}(\Omega)|^{\alpha-2}$,
+where $\mathrm{var}(T)=\max_\Omega T - \min_\Omega T$ is the range of present
+temperature values (remember that buoyancy is driven by temperature
+variations, not the absolute temperature) and $c_R$ is a dimensionless
+constant. To understand why this method works consider this: If on a particular
+cell $K$ the temperature field is smooth, then we expect the residual
+to be small there (in fact to be on the order of ${\cal O}(h_K)$) and
+the stabilization term that injects artificial diffusion will there be
+of size $h_K^{\alpha+1}$ &mdash; i.e. rather small, just as we hope it to
+be when no additional diffusion is necessary. On the other hand, if we
+are on or close to a discontinuity of the temperature field, then the
+residual will be large; the minimum operation in the definition of
+$\nu_\alpha(T)$ will then ensure that the stabilization has size $h_K$
+&mdash; the optimal amount of artificial viscosity to ensure stability of
+the scheme.
+
+It is certainly a good questions whether this scheme really works?
+Computations by Guermond and Popov have shown that this form of
+stabilization actually performs much better than most of the other
+stabilization schemes that are around (for example streamline
+diffusion, to name only the simplest one). Furthermore, for $\alpha\in
+[1,2)$ they can even prove that it produces better convergence orders
+for the linear transport equation than for example streamline
+diffusion. For $\alpha=2$, no theoretical results are currently
+available, but numerical tests indicate that the results
+are considerably better than for $\alpha=1$.
+
+A more practical question is how to introduce this artificial
+diffusion into the equations we would like to solve. Note that the
+numerical viscosity $\nu(T)$ is temperature-dependent, so the equation
+we want to solve is nonlinear in <i>T</i> &mdash; not what one desires from a
+simple method to stabilize an equation, and even less so if we realize
+that $\nu(T)$ is non-differentiable in <i>T</i>. However, there is no
+reason to despair: we still have to discretize in time and we can
+treat the term explicitly.
+
+In the definition of the stabilization parameter, we approximate the time
+derivative by $\frac{\partial T}{\partial t} \approx 
+\frac{T^{n-1}-T^{n-2}}{k^{n-1}}$. This approximation makes only use
+of available time data and this is the reason why we need to store data of two 
+previous time steps (which enabled us to use the BDF-2 scheme without
+additional storage cost). We could now simply evaluate the rest of the
+terms at $t_{n-1}$, but then the discrete residual would be nothing else than
+a backward Euler approximation, which is only first order accurate. So, in
+case of smooth solutions, the residual would be still of the order <i>h</i>, 
+despite the second order time accuracy in the outer BDF-2 scheme and the 
+spatial FE discretization. This is certainly not what we want to have
+(in fact, we desired to have small residuals in regions where the solution
+behaves nicely), so a bit more care is needed. The key to this problem
+is to observe that the first derivative as we constructed it is actually 
+centered at $t_{n-\frac{3}{2}}$. We get the desired second order accurate
+residual calculation if we evaluate all spatial terms at $t_{n-\frac{3}{2}}$
+by using the approximation $\frac 12 T^{n-1}+\frac 12 T^{n-2}$, which means
+that we calculate the nonlinear viscosity as a function of this
+intermediate temperature, $\nu_\alpha = 
+\nu_\alpha\left(\frac 12 T^{n-1}+\frac 12 T^{n-2}\right)$. Note that this
+evaluation of the residual is nothing else than a Crank-Nicholson scheme,
+so we can be sure that now everything is alright. One might wonder whether
+it is a problem that the numerical viscosity now is not evaluated at 
+time <i>n</i> (as opposed to the rest of the equation). However, this offset
+is uncritical: For smooth solutions, $\nu_\alpha$ will vary continuously,
+so the error in time offset is <i>k</i> times smaller than the nonlinear
+viscosity itself, i.e., it is a small higher order contribution that is 
+left out. That's fine because the term itself is already at the level of
+discretization error in smooth regions.
+
+Using the BDF-2 scheme introduced above,
+this yields for the simpler case of uniform time steps of size <i>k</i>:
+@f{eqnarray*}
+  \frac 32 T^n
+  -
+  k\nabla \cdot \kappa \nabla T^n 
+  &=& 
+  2 T^{n-1}
+  -
+  \frac 12 T^{n-2}
+  \\
+  &&
+  +
+  k\nabla \cdot 
+  \left[
+    \nu_\alpha\left(\frac 12 T^{n-1}+\frac 12 T^{n-2}\right) 
+    \ \nabla (2T^{n-1}-T^{n-2})
+  \right]
+  \\
+  &&
+  -
+  k{\mathbf u}^n \cdot \nabla (2T^{n-1}-T^{n-2})
+  \\
+  &&
+  +
+  k\gamma.
+@f}
+On the left side of this equation remains the term from the time
+derivative and the original (physical) diffusion which we treat
+implicitly (this is actually a nice term: the matrices that result
+from the left hand side are the mass matrix and a multiple of the
+Laplace matrix &mdash; both are positive definite and if the time step
+size <i>k</i> is small, the sum is simple to invert). On the right hand
+side, the terms in the first line result from the time derivative; in
+the second line is the artificial diffusion at time $t_{n-\frac
+32}$; the third line contains the
+advection term, and the fourth the sources. Note that the
+artificial diffusion operates on the extrapolated
+temperature at the current time in the same way as we have discussed
+the advection works in the section on time stepping.
+
+The form for non-uniform time steps that we will have to use in
+reality is a bit more complicated (which is why we showed the simpler
+form above first) and reads:
+@f{eqnarray*}
+  \frac{2k_n+k_{n-1}}{k_n+k_{n-1}} T^n
+  -
+  k_n\nabla \cdot \kappa \nabla T^n 
+  &=& 
+  \frac{k_n+k_{n-1}}{k_{n-1}} T^{n-1}
+  -
+  \frac{k_n^2}{k_{n-1}(k_n+k_{n-1})} T^{n-2}
+  \\
+  &&
+  +
+  k_n\nabla \cdot 
+  \left[
+    \nu_\alpha\left(\frac 12 T^{n-1}+\frac 12 T^{n-2}\right) 
+    \ \nabla  \left[
+    \left(1+\frac{k_n}{k_{n-1}}\right)T^{n-1}-\frac{k_n}{k_{n-1}}T^{n-2}
+  \right]
+  \right]
+  \\
+  &&
+  -
+  k_n{\mathbf u}^n \cdot \nabla \left[
+    \left(1+\frac{k_n}{k_{n-1}}\right)T^{n-1}-\frac{k_n}{k_{n-1}}T^{n-2}
+  \right]
+  \\
+  &&
+  +
+  k_n\gamma.
+@f}
+
+After settling all these issues, the weak form follows naturally from
+the strong form shown in the last equation, and we immediately arrive
+at the weak form of the discretized equations:
+@f{eqnarray*}
+  \frac{2k_n+k_{n-1}}{k_n+k_{n-1}} (\tau_h,T_h^n)
+  +
+  k_n (\nabla \tau_h, \kappa \nabla T_h^n)
+  &=& 
+  \biggl(\tau_h, 
+  \frac{k_n+k_{n-1}}{k_{n-1}} T_h^{n-1}
+  -
+  \frac{k_n^2}{k_{n-1}(k_n+k_{n-1})} T_h^{n-2}
+  \\
+  &&\qquad\qquad
+  -
+  k_n{\mathbf u}_h^n \cdot \nabla \left[
+    \left(1+\frac{k_n}{k_{n-1}}\right)T^{n-1}-\frac{k_n}{k_{n-1}}T^{n-2}
+  \right]
+  +
+  k_n\gamma \biggr)
+  \\
+  &&
+  -
+  k_n \left(\nabla \tau_h, 
+    \nu_\alpha\left(\frac 12 T_h^{n-1}+\frac 12 T_h^{n-2}\right) 
+    \ \nabla \left[
+    \left(1+\frac{k_n}{k_{n-1}}\right)T^{n-1}-\frac{k_n}{k_{n-1}}T^{n-2}
+  \right]
+  \right)
+@f}
+for all discrete test functions $\tau_h$. Here, the diffusion term has been
+integrated by parts, and we have used that we will impose no thermal flux,
+$\mathbf{n}\cdot\kappa\nabla T|_{\partial\Omega}=0$.
+
+This then results in a
+matrix equation of form
+@f{eqnarray*}
+  \left( \frac{2k_n+k_{n-1}}{k_n+k_{n-1}} M+k_n A_T\right) T_h^n = F(U_h^n,T_h^{n-1},T_h^{n-2}),
+@f}
+which given the structure of matrix on the left (the sum of two
+positive definite matrices) is easily solved using the Conjugate
+Gradient method.
+
+
+
+<h4>Linear solvers</h4>
+
+As explained above, our approach to solving the joint system for
+velocities/pressure on the one hand and temperature on the other is to use an
+operator splitting where we first solve the Stokes system for the velocities
+and pressures using the old temperature field, and then solve for the new
+temperature field using the just computed velocity field. 
+
+
+<h5>Linear solvers for the Stokes problem</h5>
+
+Solving the linear equations coming from the Stokes system has been
+discussed in great detail in @ref step_22 "step-22". In particular, in
+the results section of that program, we have discussed a number of
+alternative linear solver strategies that turned out to be more
+efficient than the original approach. The best alternative
+identified there we to use a GMRES solver preconditioned by a block
+matrix involving the Schur complement. Specifically, the Stokes
+operator leads to a block structured matrix
+@f{eqnarray*}
+  \left(\begin{array}{cc}
+    A & B^T \\ B & 0
+  \end{array}\right)
+@f}
+and as discussed there a good preconditioner is
+@f{eqnarray*}
+  P^{-1}
+  = 
+  \left(\begin{array}{cc}
+    A^{-1} & 0 \\ S^{-1} B A^{-1} & -S^{-1}
+  \end{array}\right)
+@f}
+where <i>S</i> is the Schur complement of the Stokes operator
+$S=B^TA^{-1}B$. Of course, this preconditioner is not useful because we
+can't form the various inverses of matrices, but we can use the
+following as a preconditioner:
+@f{eqnarray*}
+  \tilde P^{-1}
+  = 
+  \left(\begin{array}{cc}
+    \tilde A^{-1} & 0 \\ \tilde S^{-1} B \tilde A^{-1} & -\tilde S^{-1}
+  \end{array}\right)
+@f}
+where $\tilde A^{-1},\tilde S^{-1}$ are approximations to the inverse
+matrices. In particular, it turned out that <i>S</i> is spectrally
+equivalent to the mass matrix and consequently replacing $\tilde
+S^{-1}$ by a CG solver applied to the mass matrix on the pressure
+space was a good choice.
+
+It was more complicated to come up with a good replacement $\tilde
+A^{-1}$, which corresponds to the discretized symmetric Laplacian of
+the vector-valued velocity field, i.e. 
+$A_{ij} = (\varepsilon {\mathbf v}_i, \eta \varepsilon ({\mathbf
+v}_j))$.
+In @ref step_22 "step-22" we used a sparse LU decomposition (using the
+SparseDirectUMFPACK class) of <i>A</i> for $\tilde A^{-1}$ &mdash; the
+perfect preconditioner &mdash; in 2d, but for 3d memory and compute
+time is not usually sufficient to actually compute this decomposition;
+consequently, we only use an incomplete LU decomposition (ILU, using
+the SparseILU class) in 3d.
+
+For this program, we would like to go a bit further. To this end, note
+that the symmetrized bilinear form on vector fields, 
+$(\varepsilon {\mathbf v}_i, \eta \varepsilon ({\mathbf v}_j))$
+is not too far away from the nonsymmetrized version,
+$(\nabla {\mathbf v}_i, \eta \nabla {\mathbf v}_j)
+= \sum_{k,l=1}^d 
+  (\partial_k ({\mathbf v}_i)_l, \eta \partial_k ({\mathbf v}_j)_l)
+$. The latter,
+however, has the advantage that the <code>dim</code> vector components
+of the test functions are not coupled (well, almost, see below),
+i.e. the resulting matrix is block-diagonal: one block for each vector
+component, and each of these blocks is equal to the Laplace matrix for
+this vector component. So assuming we order degrees of freedom in such
+a way that first all <i>x</i>-components of the velocity are numbered, then
+the <i>y</i>-components, and then the <i>z</i>-components, then the matrix
+$\hat A$ that is associated with this slightly different bilinear form has
+the form
+@f{eqnarray*}
+  \hat A =
+  \left(\begin{array}{ccc}
+    A_s & 0 & 0 \\ 0 & A_s & 0 \\ 0 & 0 & A_s
+  \end{array}\right)
+@f}
+where $A_s$ is a Laplace matrix of size equal to the number of shape functions
+associated with each component of the vector-valued velocity. With this
+matrix, one could be tempted to define our preconditioner for the
+velocity matrix <i>A</i> as follows:
+@f{eqnarray*}
+  \tilde A^{-1} =
+  \left(\begin{array}{ccc}
+    \tilde A_s^{-1} & 0 & 0 \\
+    0 & \tilde A_s^{-1} & 0 \\ 
+    0 & 0 & \tilde A_s^{-1}
+  \end{array}\right),
+@f}
+where $\tilde A_s^{-1}$ is a preconditioner for the Laplace matrix &mdash;
+something where we know very well how to build good preconditioners! 
+
+In reality, the story is not quite as simple: To make the matrix
+$\tilde A$ definite, we need to make the individual blocks $\tilde
+A_s$ definite by applying boundary conditions. One can try to do so by
+applying Dirichlet boundary conditions all around the boundary, and
+then the so-defined preconditioner $\tilde A^{-1}$ turns out to be a
+good preconditioner for <i>A</i> if the latter matrix results from a Stokes
+problem where we also have Dirichlet boundary conditions on the
+velocity components all around the domain, i.e. if we enforce <b>u</b>=0. 
+
+Unfortunately, this "if" is an "if and only if": in the program below
+we will want to use no-flux boundary conditions of the form $\mathbf u
+\cdot \mathbf n = 0$ (i.e. flow parallel to the boundary is allowed,
+but no flux through the boundary). In this case, it turns out that the
+block diagonal matrix defined above is not a good preconditioner
+because it neglects the coupling of components at the boundary. A
+better way to do things is therefore if we build the matrix $\hat A$
+as the vector Laplace matrix $\hat A_{ij} = (\nabla {\mathbf v}_i,
+\eta \nabla {\mathbf v}_j)$ and then apply the same boundary condition
+as we applied to <i>A</i>. If this is Dirichlet boundary conditions all
+around the domain, the $\hat A$ will decouple to three diagonal blocks
+as above, and if the boundary conditions are of the form $\mathbf u
+\cdot \mathbf n = 0$ then this will introduce a coupling of degrees of
+freedom at the boundary but only there. This, in fact, turns out to be
+a much better preconditioner than the one introduced above, and has
+almost all the benefits of what we hoped to get.
+
+
+To sum this whole story up, we can observe:
+<ul>
+  <li> Compared to building a preconditioner from the original matrix <i>A</i>
+  resulting from the symmetric gradient as we did in @ref step_22 "step-22",
+  we have to expect that the preconditioner based on the Laplace bilinear form
+  performs worse since it does not take into account the coupling between
+  vector components.
+
+  <li>On the other hand, preconditioners for the Laplace matrix are typically
+  more mature and perform better than ones for vector problems. For example,
+  at the time of this writing, Algebraic Multigrid (AMG) algorithms are very
+  well developed for scalar problems, but not so for vector problems.
+
+  <li>In building this preconditioner, we will have to build up the
+  matrix $\hat A$ and its preconditioner. While this means that we
+  have to store an additional matrix we didn't need before, the
+  preconditioner $\tilde A_s^{-1}$ is likely going to need much less
+  memory than storing a preconditioner for the coupled matrix
+  <i>A</i>. This is because the matrix $A_s$ has only a third of the
+  entries per row for all rows corresponding to interior degrees of
+  freedom, and contains coupling between vector components only on
+  those parts of the boundary where the boundary conditions introduce
+  such a coupling. Storing the matrix is therefore comparatively
+  cheap, and we can expect that computing and storing the
+  preconditioner $\tilde A_s$ will also be much cheaper compared to
+  doing so for the fully coupled matrix.
+</ul>
+
+
+
+<h5>Linear solvers for the temperature equation</h5>
+
+This is the easy part: The matrix for the temperature equation has the form
+$\alpha M + \beta A$, where $M,A$ are mass and stiffness matrices on the
+temperature space, and $\alpha,\beta$ are constants related the time stepping
+scheme and the current and previous time step. This being the sum of a
+symmetric positive definite and a symmetric positive semidefinite matrix, the
+result is also symmetric positive definite. Furthermore, $\frac\beta\alpha$ is
+a number proportional to the time step, and so becomes small whenever the mesh
+is fine, damping the effect of the then ill-conditioned stiffness matrix.
+
+As a consequence, inverting this matrix with the Conjugate Gradient algorithm,
+using a simple preconditioner, is trivial and very cheap compared to inverting
+the Stokes matrix.
+
+
+
+<h3>Implementation details</h3>
+
+One of the things worth explaining up front about the program below is the use
+of two different DoFHandler objects. If one looks at the structure of the
+equations above and the scheme for their solution, one realizes that there is
+little commonality that keeps the Stokes part and the temperature part
+together. In all previous tutorial programs in which we have discussed @ref
+vector_valued "vector-valued problems" we have always only used a single
+finite element with several vector components, and a single DoFHandler object.
+Sometimes, we have substructured the resulting matrix into blocks to
+facilitate particular solver schemes; this was, for example, the case in the
+@ref step_22 "step-22" program for the Stokes equations upon which the current
+program is based.
+
+We could of course do the same here. The linear system that we would get would
+look like this:
+@f{eqnarray*}
+  \left(\begin{array}{ccc}
+    A & B^T & 0 \\ B & 0 &0 \\ C & 0 & K
+  \end{array}\right)
+  \left(\begin{array}{ccc}
+    U^n \\ P^n \\ T^n
+  \end{array}\right)
+  =
+  \left(\begin{array}{ccc}
+    F_U(T^{n-1}) \\ 0 \\ F_T(U^n,T^{n-1},T^{n-1})
+  \end{array}\right).
+@f}
+The problem with this is: We never use the whole matrix at the same time. In
+fact, it never really exists at the same time: As explained above, $K$ and
+$F_T$ depend on the already computed solution $U^n$, in the first case through
+the time step (that depends on $U^n$ because it has to satisfy a CFL
+condition). So we can only assemble it once we've already solved the top left
+$2\times 2$ block Stokes system, and once we've moved on to the temperature
+equation we don't need the Stokes part any more. Furthermore, we don't
+actually build the matrix $C$: Because by the time we get to the temperature
+equation we already know $U^n$, and because we have to assemble the right hand
+side $F_T$ at this time anyway, we simply move the term $CU^n$ to the right
+hand side and assemble it along with all the other terms there. What this
+means is that there does not remain a part of the matrix where temperature
+variables and Stokes variables couple, and so a global enumeration of all
+degrees of freedom is no longer important: It is enough if we have an
+enumeration of all Stokes degrees of freedom, and of all temperature degrees
+of freedom independently.
+
+In essence, there is consequently not much use in putting <i>everything</i>
+into a block matrix (though there are of course the same good reasons to do so
+for the $2\times 2$ Stokes part), or, for that matter, in putting everything
+into the same DoFHandler object.
+
+But are there <i>downsides</i> to doing so? These exist, though they may not
+be obvious at first. The main problem is that if we need to create one global
+finite element that contains velocity, pressure, and temperature shape
+functions, and use this to initialize the DoFHandler. But we also use this
+finite element object to initialize all FEValues or FEFaceValues objects that
+we use. This may not appear to be that big a deal, but imagine what happens
+when, for example, we evaluate the residual
+$
+  R_\alpha(T)
+  =
+  \left(
+  \frac{\partial T}{\partial t}
+  +
+  {\mathbf u} \cdot \nabla T
+  -
+  \nabla \cdot \kappa \nabla T - \gamma
+  \right)
+  T^{\alpha-1}
+$
+that we need to compute the artificial viscosity $\nu_\alpha(T)|_K$.  For
+this, we need the Laplacian of the temperature, which we compute using the
+tensor of second derivatives (Hessians) of the shape functions (we have to
+give the <code>update_hessians</code> flag to the FEValues object for
+this). Now, if we have a finite that contains the shape functions for
+velocities, pressures, and temperatures, that means that we have to compute
+the Hessians of <i>all</i> shape functions, including the many higher order
+shape functions for the velocities. That's a lot of computations that we don't
+need, and indeed if one were to do that (as we had in an early version of the
+program), assembling the right hand side took about a quarter of the overall
+compute time.
+
+So what we will do is to use two different finite element objects, one for the
+Stokes components and one for the temperatures. With this come two different
+DoFHandlers, two sparsity patterns and two matrices for the Stokes and
+temperature parts, etc. And whenever we have to assemble something that
+contains both temperature and Stokes shape functions (in particular the right
+hand sides of Stokes and temperature equations), then we use two FEValues
+objects initialized with two cell iterators that we walk in parallel through
+the two DoFHandler objects associated with the same Triangulation object; for
+these two FEValues objects, we use of course the same quadrature objects so
+that we can iterate over the same set of quadrature points, but each FEValues
+object will get update flags only according to what it actually needs to
+compute. In particular, when we compute the residual as above, we only ask for
+the values of the Stokes shape functions, but also the Hessians of the
+temperature shape functions &mdash; much cheaper indeed, and as it turns out:
+assembling the right hand side of the temperature equation is now a component
+of the program that is hardly measurable.
+
+With these changes, timing the program yields that only the following
+operations are relevant for the overall run time: 
+<ul>
+  <li>Solving the Stokes system: 72% of the run time.
+  <li>Assembling the Stokes preconditioner and computing the algebraic
+      multigrid hierarchy using the Trilinos ML package: 11% of the
+      run time.
+  <li>The function <code>BoussinesqFlowProblem::setup_dofs</code>: 7%
+      of overall run time.
+  <li>Assembling the Stokes and temperature right hand side vectors as
+      well as assembling the matrices: 7%.
+</ul>
+In essence this means that all bottlenecks apart from the algebraic
+multigrid have been removed.

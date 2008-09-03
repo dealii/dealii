@@ -14,7 +14,7 @@ target = $(basename $(shell echo step-*.cc))
 # run-time checking of parameters and internal states is performed, so
 # you should set this value to `on' while you develop your program,
 # and to `off' when running production computations.
-debug-mode = off
+debug-mode = on
 
 
 # As third field, we need to give the path to the top-level deal.II
@@ -44,6 +44,25 @@ clean-up-files = *gmv *gnuplot *gpl *eps *pov *vtk
 # deal.II top level directory and to include the file with the global
 # settings
 include $D/common/Make.global_options
+
+################################################################ 
+# This example program will only work if Trilinos is installed. If this
+# is not the case, then simply redefine the main targets to to nothing
+ifneq ($(USE_CONTRIB_TRILINOS),yes)
+default run clean:
+	@echo
+	@echo "===========================================================" 
+	@echo "=   This program cannot be compiled without Trilinos. Make="
+	@echo "=   sure you have Trilinos installed and detected during  ="
+	@echo "=   configuration of deal.II                              ="
+	@echo "==========================================================="
+	@echo
+
+else
+#
+################################################################
+
+
 
 
 # Since the whole project consists of only one file, we need not
@@ -101,6 +120,7 @@ run: $(target)
 	@./$(target)$(EXEEXT)
 
 
+
 # As a last rule to the `make' program, we define what to do when
 # cleaning up a directory. This usually involves deleting object files
 # and other automatically created files such as the executable itself,
@@ -123,10 +143,21 @@ clean:
 	@$(CXX) $(CXXFLAGS.o) -c $< -o $@
 
 
+# A rule made to ensure that UMFPACK is indeed configured
+ifeq ($(USE_CONTRIB_UMFPACK),yes)
+UMFPACK-check:
+else
+UMFPACK-check:
+	@echo "This program can only be run if deal.II is configured with UMFPACK support"
+	@false
+endif
+
+
+
 # The following statement tells make that the rules `run' and `clean'
 # are not expected to produce files of the same name as Makefile rules
 # usually do.
-.PHONY: run clean
+.PHONY: run clean UMFPACK-check
 
 
 # Finally there is a rule which you normally need not care much about:
@@ -154,3 +185,4 @@ Makefile.dep: $(target).cc Makefile \
 include Makefile.dep
 
 
+endif  # USE_CONTRIB_TRILINOS

@@ -221,7 +221,10 @@ BoundaryValues<dim>::value (const Point<dim>  &p,
 	  ExcIndexRange (component, 0, this->n_components));
   
   if (component == 0)
-    return (p[0] < 0 ? -1 : (p[0] > 0 ? 1 : 0));
+    if (p[1] < 0)
+      return (p[0] < -0.5 ? -1 : (p[0] > -0.5 ? 1 : 0));
+    else
+      return (p[0] < 0.5 ? -1 : (p[0] > 0.5 ? 1 : 0));      
   return 0;
 }
 
@@ -1201,7 +1204,7 @@ StokesProblem<dim>::output_results (const unsigned int refinement_cycle)  const
            << ".vtk";
 
   std::ofstream output (filename.str().c_str());
-  data_out.write_vtk (output);
+  data_out.write_gmv (output);
 }
 
 
@@ -1272,13 +1275,14 @@ void StokesProblem<dim>::run ()
   {
     std::vector<unsigned int> subdivisions (dim, 1);
     subdivisions[0] = 4;
+    subdivisions[1] = 4;
 
     const Point<dim> bottom_left = (dim == 2 ?
 				    Point<dim>(-2,-1) :
-				    Point<dim>(-2,0,-1));
+				    Point<dim>(-2,-2,-1));
     const Point<dim> top_right   = (dim == 2 ?
 				    Point<dim>(2,0) :
-				    Point<dim>(2,1,0));
+				    Point<dim>(2,2,0));
     
     GridGenerator::subdivided_hyper_rectangle (triangulation,
 					       subdivisions,
