@@ -262,3 +262,9 @@ build-test-do:
 	distclean \
 	build-test build-test-do \
 	TAGS TODO
+
+# mark the following two as phony since they mark two actual files but
+# we don't want to list the full dependencies here. let the sub-makefiles
+# do that
+.PHONY: common/scripts/make_dependencies \
+        common/scripts/expand_instantiations
