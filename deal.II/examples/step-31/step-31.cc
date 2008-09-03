@@ -30,6 +30,7 @@
 #include <lac/sparse_direct.h>
 #include <lac/sparse_ilu.h>
 #include <lac/trilinos_sparse_matrix.h>
+#include <lac/trilinos_precondition.h>
 #include <lac/trilinos_precondition_amg.h>
 
 #include <grid/tria.h>
@@ -1905,9 +1906,11 @@ void BoussinesqFlowProblem<dim>::solve ()
 				  1e-8*temperature_rhs.l2_norm());
     SolverCG<TrilinosWrappers::Vector>   cg (solver_control);
 
-//TODO: Need to do something about this!    
+    TrilinosWrappers::PreconditionSSOR preconditioner (temperature_matrix,
+						       1.2);
     cg.solve (temperature_matrix, temperature_solution,
-	      temperature_rhs, PreconditionIdentity());
+	      temperature_rhs,
+	      preconditioner);
 
 				     // produce a consistent temperature field
     temperature_constraints.distribute (temperature_solution);
