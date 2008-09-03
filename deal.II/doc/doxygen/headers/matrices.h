@@ -143,23 +143,53 @@
  * memory often also takes significant compute time. The tradeoff to avoid
  * excessive memory allocation cannot be avoided, however.
  *
- * In deal.II, the CompressedSparsityPattern and CompressedSetSparsityPattern
- * classes implement this "dynamic" memory scheme. They use different storage
- * schemes and appear to both have use cases where they are better than the
- * respective other. In either case, these classes are typically used in the
- * following way:
+ * The following classes implement this "dynamic" memory scheme in deal.II:
+ * - CompressedSparsityPattern
+ * - CompressedSimpleSparsityPattern
+ * - CompressedSetSparsityPattern
+ *
+ * These classes have different performance characteristics and memory
+ * requirements. Which one is the "best" changes from case to case because
+ * it is dependent on the number of dofs, the number of couplings per dof,
+ * the strategy used to insert and the amount of memory available.
+ *
+ * CompressedSparsityPattern and CompressedSimpleSparsityPattern are very
+ * similar, where CompressedSimpleSparsityPattern trades some memory (requires
+ * up to twice the memory in the worst case) for additional speed which is
+ * noticeable in cases with many nonzero entries. CompressedSetSparsityPattern
+ * on the other hand uses a lot more memory but may perform better in cases with
+ * many nonzero entries per row. See for example the @ref step_27 "step-27"
+ * and @ref step_22 "step-22" tutorial programs.
+ *
+ * As a guideline you should start using CompressedSparsityPattern and try the
+ * other variants if you run into problems. Switching between them should be as
+ * simple as changing the class name because all classes have the same interface
+ * for adding entries.
+ * In either case, these classes are typically used in the following way
+ * (replace the class CompressedSparsityPattern with a different one from above):
  * @verbatim
  * CompressedSparsityPattern compressed_pattern (dof_handler.n_dofs());
  * DoFTools::make_sparsity_pattern (dof_handler,
  *                                  compressed_pattern);
  * constraints.condense (compressed_pattern);
  *
- * SparsityPattern finaly_sparsity_pattern;
+ * SparsityPattern final_sparsity_pattern;
  * final_sparsity_pattern.copy_from (compressed_pattern);
  * @endverbatim
  *
  * The intermediate, compressed sparsity pattern is directly copied into the
  * "compressed" form of the final static pattern.
+ *
+ * <h4>Dynamic block sparsity patterns</h4>
+ *
+ * The following classes implement an array of dynamic sparsity patterns:
+ * - BlockCompressedSparsityPattern
+ * - BlockCompressedSetSparsityPattern
+ * - BlockCompressedSimpleSparsityPattern
+ *
+ * These classes inherit the same tradeoffs regarding their efficiency from
+ * their non-block classes (see above). See their documentation and
+ * @ref step_22 "step-22" for more information.
  *
  * @ingroup Matrices
  */

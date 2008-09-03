@@ -82,6 +82,9 @@ template <typename number> class SparseMatrix;
  *
  * <h3>Notes</h3>
  *
+ * There are several, exchangeable variations of this class, see @ref Sparsity,
+ * section '"Dynamic" or "compressed" sparsity patterns' for more information.
+ *
  * This class is a variation of the CompressedSparsityPattern class.
  * Instead of using sorted vectors together with a caching algorithm
  * for storing the column indices of nonzero entries, the std::set

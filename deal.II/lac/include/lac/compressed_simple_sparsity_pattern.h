@@ -10,8 +10,8 @@
 //    further information on this license.
 //
 //---------------------------------------------------------------------------
-#ifndef __deal2__compressed_sparsity_pattern_h
-#define __deal2__compressed_sparsity_pattern_h
+#ifndef __deal2__compressed_simple_sparsity_pattern_h
+#define __deal2__compressed_simple_sparsity_pattern_h
 
 
 #include <base/config.h>
@@ -25,8 +25,6 @@ DEAL_II_NAMESPACE_OPEN
 
 template <typename number> class SparseMatrix;
 
-
-//TODO[WB]: Unify implementation with the CompressedSetSparsityPattern since really all that's different is the Line structure in the two classes. We should have a templatized base class that simply gets the particular Line structure from a derived class.
 
 /*! @addtogroup Sparsity
  *@{
@@ -67,7 +65,7 @@ template <typename number> class SparseMatrix;
  *
  * Use this class as follows:
  * @verbatim
- * CompressedSparsityPattern compressed_pattern (dof_handler.n_dofs());
+ * CompressedSimpleSparsityPattern compressed_pattern (dof_handler.n_dofs());
  * DoFTools::make_sparsity_pattern (dof_handler,
  *                                  compressed_pattern);
  * constraints.condense (compressed_pattern);
@@ -76,17 +74,15 @@ template <typename number> class SparseMatrix;
  * sp.copy_from (compressed_pattern);
  * @endverbatim
  *
- * See also @ref step_11 "step-11" and @ref step_18 "step-18" for usage
- * patterns.
  *
  * <h3>Notes</h3>
  *
  * There are several, exchangeable variations of this class, see @ref Sparsity,
  * section '"Dynamic" or "compressed" sparsity patterns' for more information.
  *
- * @author Wolfgang Bangerth, 2001
+ * @author Timo Heister, 2008
  */
-class CompressedSparsityPattern : public Subscriptor
+class CompressedSimpleSparsityPattern : public Subscriptor
 {
   public:
 				     /**
@@ -99,8 +95,8 @@ class CompressedSparsityPattern : public Subscriptor
 				      * structure usable by calling
 				      * the reinit() function.
 				      */
-    CompressedSparsityPattern ();
-    
+    CompressedSimpleSparsityPattern ();
+
 				     /**
 				      * Copy constructor. This constructor is
 				      * only allowed to be called if the
@@ -117,21 +113,21 @@ class CompressedSparsityPattern : public Subscriptor
 				      * with @p v a vector of @p
 				      * CompressedSparsityPattern objects.
 				      */
-    CompressedSparsityPattern (const CompressedSparsityPattern &);
+    CompressedSimpleSparsityPattern (const CompressedSimpleSparsityPattern &);
 
 				     /**
 				      * Initialize a rectangular
 				      * matrix with @p m rows and
 				      * @p n columns.
 				      */
-    CompressedSparsityPattern (const unsigned int m,
+    CompressedSimpleSparsityPattern (const unsigned int m,
 			       const unsigned int n);
-    
+
 				     /**
 				      * Initialize a square matrix of
 				      * dimension @p n.
 				      */
-    CompressedSparsityPattern (const unsigned int n);
+    CompressedSimpleSparsityPattern (const unsigned int n);
 
 				     /**
 				      * Copy operator. For this the
@@ -141,8 +137,8 @@ class CompressedSparsityPattern : public Subscriptor
 				      * but the latter only for empty
 				      * objects.
 				      */
-    CompressedSparsityPattern & operator = (const CompressedSparsityPattern &);
-    
+    CompressedSimpleSparsityPattern & operator = (const CompressedSimpleSparsityPattern &);
+
 				     /**
 				      * Reallocate memory and set up
 				      * data structures for a new
@@ -153,7 +149,7 @@ class CompressedSparsityPattern : public Subscriptor
 				      */
     void reinit (const unsigned int m,
 		 const unsigned int n);
-    
+
 				     /**
 				      * Since this object is kept
 				      * compressed at all times anway,
@@ -164,7 +160,7 @@ class CompressedSparsityPattern : public Subscriptor
 				      * SparsityPattern class.
 				      */
     void compress ();
-    
+
 				     /**
 				      * Return whether the object is
 				      * empty. It is empty if no
@@ -187,16 +183,16 @@ class CompressedSparsityPattern : public Subscriptor
 				      * matrix. If the entry already
 				      * exists, nothing bad happens.
 				      */
-    void add (const unsigned int i, 
+    void add (const unsigned int i,
 	      const unsigned int j);
-    
+
 				     /**
 				      * Check if a value at a certain
 				      * position may be non-zero.
 				      */
     bool exists (const unsigned int i,
                  const unsigned int j) const;
-    
+
                                      /**
 				      * Make the sparsity pattern
 				      * symmetric by adding the
@@ -209,16 +205,16 @@ class CompressedSparsityPattern : public Subscriptor
 				      * square matrix.
 				      */
     void symmetrize ();
-    
-				     /**
-				      * Print the sparsity of the
-				      * matrix. The output consists of
-				      * one line per row of the format
-				      * <tt>[i,j1,j2,j3,...]</tt>. <i>i</i>
-				      * is the row number and
-				      * <i>jn</i> are the allocated
-				      * columns in this row.
-				      */
+
+                                     /**
+                                      * Print the sparsity of the
+                                      * matrix. The output consists of
+                                      * one line per row of the format
+                                      * <tt>[i,j1,j2,j3,...]</tt>. <i>i</i>
+                                      * is the row number and
+                                      * <i>jn</i> are the allocated
+                                      * columns in this row.
+                                      */
     void print (std::ostream &out) const;
 
 				     /**
@@ -285,29 +281,30 @@ class CompressedSparsityPattern : public Subscriptor
 
 				     /**
 				      * Return the number of nonzero elements
-				      * allocated through this sparsity
-				      * pattern.
+				      * allocated through this sparsity pattern.
 				      */
     unsigned int n_nonzero_elements () const;
 
-				     /**
-				      * Return whether this object stores only
-				      * those entries that have been added
-				      * explicitly, or if the sparsity pattern
-				      * contains elements that have been added
-				      * through other means (implicitly) while
-				      * building it. For the current class,
-				      * the result is always true.
-				      *
-				      * This function mainly serves the
-				      * purpose of describing the current
-				      * class in cases where several kinds of
-				      * sparsity patterns can be passed as
-				      * template arguments.
-				      */
+                                     /**
+                                      * Return whether this object stores only
+                                      * those entries that have been added
+                                      * explicitly, or if the sparsity pattern
+                                      * contains elements that have been added
+                                      * through other means (implicitly) while
+                                      * building it. For the current class,
+                                      * the result is always true.
+                                      *
+                                      * This function mainly serves the
+                                      * purpose of describing the current
+                                      * class in cases where several kinds of
+                                      * sparsity patterns can be passed as
+                                      * template arguments.
+                                      */
     static
     bool stores_only_added_elements ();
-    
+
+
+
   private:
 				     /**
 				      * Number of rows that this sparsity
@@ -324,87 +321,21 @@ class CompressedSparsityPattern : public Subscriptor
                                      /**
                                       * Store some data for each row
                                       * describing which entries of this row
-                                      * are nonzero. Data is organized as
-                                      * follows: if an entry is added to a
-                                      * row, it is first added to the #cache
-                                      * variable, irrespective of whether an
-                                      * entry with same column number has
-                                      * already been added. Only if the cache
-                                      * is full do we flush it by removing
-                                      * duplicates, removing entries that are
-                                      * already stored in the @p entries
-                                      * array, sorting everything, and merging
-                                      * the two arrays.
-                                      *
-                                      * The reasoning behind this scheme is
-                                      * that memory allocation is expensive,
-                                      * and we only want to do it when really
-                                      * necessary. Previously (in deal.II
-                                      * versions up to 5.0), we used to store
-                                      * the column indices inside a std::set,
-                                      * but this would allocate 20 bytes each
-                                      * time we added an entry. (A std::set
-                                      * based class has later been revived in
-                                      * form of the
-                                      * CompressedSetSparsityPattern class, as
-                                      * this turned out to be more efficient
-                                      * for hp finite element programs such as
-                                      * @ref step_27 "step-27"). Using the
-                                      * present scheme, we only need to
-                                      * allocate memory once for every 8 added
-                                      * entries, and we waste a lot less
-                                      * memory by not using a balanced tree
-                                      * for storing column indices.
-                                      *
-                                      * Since some functions that are @p const
-                                      * need to access the data of this
-                                      * object, but need to flush caches
-                                      * before, the flush_cache() function is
-                                      * marked const, and the data members are
-                                      * marked @p mutable.
-                                      *
-                                      * A small testseries about the size of
-                                      * the cache showed that the run time of
-                                      * a small program just testing the
-                                      * compressed sparsity pattern element
-                                      * insertion routine ran for 3.6 seconds
-                                      * with a cache size of 8, and 4.2
-                                      * seconds with a cache size of 16. We
-                                      * deem even smaller cache sizes
-                                      * undesirable, since they lead to more
-                                      * memory allocations, while larger cache
-                                      * sizes lead to waste of memory. The
-                                      * original version of this class, with
-                                      * one std::set per row took 8.2 seconds
-                                      * on the same program.
+                                      * are nonzero. Data is stored sorted in
+                                      * the @p entries std::vector.
+                                      * The vector per row is dynamically
+                                      * growing upon insertion doubling its
+                                      * memory each time.
                                       */
     struct Line
     {
-      private:
-                                         /**
-                                          * Size of the cache.
-                                          */
-        static const unsigned int cache_size = 8;        
-
       public:
                                          /**
                                           * Storage for the column indices of
-                                          * this row, unless they are still in
-                                          * the cache. This array is always
+                                          * this row. This array is always
                                           * kept sorted.
                                           */
-        mutable std::vector<unsigned int> entries;
-
-                                         /**
-                                          * Cache of entries that have not yet
-                                          * been written to #entries;
-                                          */
-        mutable unsigned int cache[cache_size];
-
-                                         /**
-                                          * Number of entries in the cache.
-                                          */
-        mutable unsigned int cache_entries;
+        std::vector<unsigned int> entries;
 
                                          /**
                                           * Constructor.
@@ -417,14 +348,9 @@ class CompressedSparsityPattern : public Subscriptor
                                           */
         void add (const unsigned int col_num);
 
-                                         /**
-                                          * Flush the cache my merging it with
-                                          * the #entries array.
-                                          */
-        void flush_cache () const;
     };
-    
-        
+
+
 				     /**
 				      * Actual data: store for each
 				      * row the set of nonzero
@@ -439,30 +365,35 @@ class CompressedSparsityPattern : public Subscriptor
 
 inline
 void
-CompressedSparsityPattern::Line::add (const unsigned int j)
+CompressedSimpleSparsityPattern::Line::add (const unsigned int j)
 {
-                                   // first check whether this entry is
-                                   // already in the cache. if so, we can
-                                   // safely return
-  for (unsigned int i=0; i<cache_entries; ++i)
-    if (cache[i] == j)
-      return;
+                /* first check the last element (or if line is still empty) */
+    if ( (entries.size()==0) || ( *(--entries.end()) < j) )
+    {
+        entries.push_back(j);
+        return;
+    }
 
-                                   // if not, see whether there is still some
-                                   // space in the cache. if not, then flush
-                                   // the cache first
-  if (cache_entries == cache_size && cache_entries != 0)
-    flush_cache ();
-  
-  cache[cache_entries] = j;
-  ++cache_entries;
+                   /* do a binary search to find the place where to insert: */
+    std::vector<unsigned int>::iterator it = std::lower_bound(entries.begin(),
+                                                              entries.end(),
+                                                              j);
+
+                        /* If this entry is a duplicate, exit immediately */
+    if (*it == j)
+        return;
+
+                                  /* Insert at the right place in the vector.
+                                          Vector grows automatically to fit
+                                        elements. Always doubles its size.*/
+    entries.insert(it, j);
 }
 
 
 
 inline
 unsigned int
-CompressedSparsityPattern::n_rows () const
+CompressedSimpleSparsityPattern::n_rows () const
 {
   return rows;
 }
@@ -471,7 +402,7 @@ CompressedSparsityPattern::n_rows () const
 
 inline
 unsigned int
-CompressedSparsityPattern::n_cols () const
+CompressedSimpleSparsityPattern::n_cols () const
 {
   return cols;
 }
@@ -480,7 +411,7 @@ CompressedSparsityPattern::n_cols () const
 
 inline
 void
-CompressedSparsityPattern::add (const unsigned int i,
+CompressedSimpleSparsityPattern::add (const unsigned int i,
 				const unsigned int j)
 {
   Assert (i<rows, ExcIndexRange(i, 0, rows));
@@ -492,21 +423,17 @@ CompressedSparsityPattern::add (const unsigned int i,
 
 
 inline
-CompressedSparsityPattern::Line::Line ()
-                :
-                cache_entries (0)
+CompressedSimpleSparsityPattern::Line::Line ()
 {}
 
 
 
 inline
 unsigned int
-CompressedSparsityPattern::row_length (const unsigned int row) const
+CompressedSimpleSparsityPattern::row_length (const unsigned int row) const
 {
   Assert (row < n_rows(), ExcIndexRange (row, 0, n_rows()));
 
-  if (lines[row].cache_entries != 0)
-    lines[row].flush_cache ();
   return lines[row].entries.size();
 }
 
@@ -514,28 +441,23 @@ CompressedSparsityPattern::row_length (const unsigned int row) const
 
 inline
 unsigned int
-CompressedSparsityPattern::column_number (const unsigned int row,
+CompressedSimpleSparsityPattern::column_number (const unsigned int row,
 					  const unsigned int index) const
 {
   Assert (row < n_rows(), ExcIndexRange (row, 0, n_rows()));
   Assert (index < lines[row].entries.size(),
 	  ExcIndexRange (index, 0, lines[row].entries.size()));
 
-  if (lines[row].cache_entries != 0)
-    lines[row].flush_cache ();
   return lines[row].entries[index];
 }
 
 
-
 inline
 bool
-CompressedSparsityPattern::stores_only_added_elements ()
+CompressedSimpleSparsityPattern::stores_only_added_elements ()
 {
   return true;
 }
-
-
 
 
 DEAL_II_NAMESPACE_CLOSE

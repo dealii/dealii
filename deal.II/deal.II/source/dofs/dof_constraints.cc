@@ -19,6 +19,7 @@
 #include <lac/sparsity_pattern.h>
 #include <lac/compressed_sparsity_pattern.h>
 #include <lac/compressed_set_sparsity_pattern.h>
+#include <lac/compressed_simple_sparsity_pattern.h>
 #include <lac/vector.h>
 #include <lac/block_vector.h>
 #include <lac/sparse_matrix.h>
@@ -1810,6 +1811,11 @@ add_entries_local_to_global<CompressedSetSparsityPattern> (const std::vector<uns
 					      const bool) const;
 
 template void ConstraintMatrix::
+add_entries_local_to_global<CompressedSimpleSparsityPattern> (const std::vector<unsigned int> &,
+					      CompressedSimpleSparsityPattern       &,
+					      const bool) const;
+
+template void ConstraintMatrix::
 add_entries_local_to_global<BlockSparsityPattern> (const std::vector<unsigned int> &,
 					      BlockSparsityPattern       &,
 					      const bool) const;
@@ -1822,5 +1828,9 @@ add_entries_local_to_global<BlockCompressedSetSparsityPattern> (const std::vecto
 					      BlockCompressedSetSparsityPattern       &,
 					      const bool) const;
 
+template void ConstraintMatrix::
+add_entries_local_to_global<BlockCompressedSimpleSparsityPattern> (const std::vector<unsigned int> &,
+                                              BlockCompressedSimpleSparsityPattern       &,
+                                              const bool) const;
 
 DEAL_II_NAMESPACE_CLOSE

@@ -31,6 +31,7 @@ template <class VECTOR> class VectorSlice;
 
 class CompressedSparsityPattern;
 class CompressedSetSparsityPattern;
+class CompressedSimpleSparsityPattern;
 
 
 
@@ -931,16 +932,28 @@ class SparsityPattern : public Subscriptor
 		    const bool optimize_diagonal = true);
 
 
+                                     /**
+                                      * Copy data from an object of
+                                      * type
+                                      * CompressedSetSparsityPattern.
+                                      * Previous content of this
+                                      * object is lost, and the
+                                      * sparsity pattern is in
+                                      * compressed mode afterwards.
+                                      */
+    void copy_from (const CompressedSetSparsityPattern &csp,
+                    const bool optimize_diagonal = true);
+
 				     /**
 				      * Copy data from an object of
 				      * type
-				      * CompressedSetSparsityPattern.
+				      * CompressedSimpleSparsityPattern.
 				      * Previous content of this
 				      * object is lost, and the
 				      * sparsity pattern is in
 				      * compressed mode afterwards.
 				      */
-    void copy_from (const CompressedSetSparsityPattern &csp,
+    void copy_from (const CompressedSimpleSparsityPattern &csp,
 		    const bool optimize_diagonal = true);
 
 
