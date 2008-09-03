@@ -1,6 +1,6 @@
-//----------------------------  sparsity_pattern_08.cc  ---------------------------
+//----------------------------  sparsity_pattern_12.cc  ---------------------------
 //    $Id$
-//    Version: $Name$ 
+//    Version: $Name$
 //
 //    Copyright (C) 2008 by the deal.II authors
 //
@@ -9,7 +9,7 @@
 //    to the file deal.II/doc/license.html for the  text  and
 //    further information on this license.
 //
-//----------------------------  sparsity_pattern_08.cc  ---------------------------
+//----------------------------  sparsity_pattern_12.cc  ---------------------------
 
 
 // check SparsityPattern::copy_from
@@ -18,15 +18,15 @@
 
 int main ()
 {
-  std::ofstream logfile("sparsity_pattern_08/output");
+  std::ofstream logfile("sparsity_pattern_12/output");
   logfile.setf(std::ios::fixed);
   deallog << std::setprecision(3);
   deallog.attach(logfile);
   deallog.depth_console(0);
   deallog.threshold_double(1.e-10);
 
-  copy_from_2<SparsityPattern, CompressedSetSparsityPattern> ();
+  copy_from_2<SparsityPattern, CompressedSimpleSparsityPattern> ();
 }
 
-  
-  
+
+

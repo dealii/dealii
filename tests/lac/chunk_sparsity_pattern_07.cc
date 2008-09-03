@@ -29,7 +29,7 @@ int main ()
   for (unsigned int i=0; i<sizeof(chunk_sizes)/sizeof(chunk_sizes[0]); ++i)
     {
       chunk_size = chunk_sizes[i];
-      copy_from_2<ChunkSparsityPattern> ();
+      copy_from_2<ChunkSparsityPattern, CompressedSparsityPattern> ();
     }
 }
 

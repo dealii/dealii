@@ -1,4 +1,4 @@
-//----------------------------  sparsity_pattern_01.cc  ---------------------------
+//---------------------------  sparsity_pattern_common.h  -------------------------
 //    $Id: sparsity_pattern_01.cc 15674 2008-01-24 17:40:56Z kanschat $
 //    Version: $Name$ 
 //
@@ -9,7 +9,8 @@
 //    to the file deal.II/doc/license.html for the  text  and
 //    further information on this license.
 //
-//----------------------------  sparsity_pattern_01.cc  ---------------------------
+//---------------------------  sparsity_pattern_common.h  -------------------------
+
 
 
 // check
@@ -18,6 +19,7 @@
 #include <base/logstream.h>
 #include <lac/sparsity_pattern.h>
 #include <lac/compressed_sparsity_pattern.h>
+#include <lac/compressed_simple_sparsity_pattern.h>
 #include <lac/compressed_set_sparsity_pattern.h>
 #include <lac/chunk_sparsity_pattern.h>
 #include <lac/full_matrix.h>
@@ -55,6 +57,10 @@ void do_reinit (CompressedSparsityPattern &sp)
   sp.reinit((N-1)*(N-1), (N-1)*(N-1));
 }
 
+void do_reinit (CompressedSimpleSparsityPattern &sp)
+{
+  sp.reinit((N-1)*(N-1), (N-1)*(N-1));
+}
 
 void do_reinit (CompressedSetSparsityPattern &sp)
 {
@@ -166,7 +172,13 @@ void copy_with_offdiagonals_1<CompressedSparsityPattern> ()
   deallog << "OK" << std::endl;
 }
 
-
+template <>
+void copy_with_offdiagonals_1<CompressedSimpleSparsityPattern> ()
+{
+                   // this sparsity pattern doesn't have this
+                   // function
+  deallog << "OK" << std::endl;
+}
 
 template <>
 void copy_with_offdiagonals_1<CompressedSetSparsityPattern> ()
@@ -221,6 +233,16 @@ void copy_with_offdiagonals_2<CompressedSparsityPattern> ()
 
 
 template <>
+void copy_with_offdiagonals_2<CompressedSimpleSparsityPattern> ()
+{
+                   // this sparsity pattern doesn't have this
+                   // function
+  deallog << "OK" << std::endl;
+}
+
+
+
+template <>
 void copy_with_offdiagonals_2<CompressedSetSparsityPattern> ()
 {
 				   // this sparsity pattern doesn't have this
@@ -266,6 +288,26 @@ do_copy_from (const CompressedSparsityPattern &sparsity,
 	  sparsity_x.back().insert (j);
     }
   
+  do_copy_from (sparsity_x, sp4);
+}
+
+
+template <typename SP>
+void
+do_copy_from (const CompressedSimpleSparsityPattern &sparsity,
+          SP &sp4)
+{
+  std::list<std::set<unsigned int,std::greater<unsigned int> > > sparsity_x;
+  for (unsigned int i=0; i<sparsity.n_rows(); ++i)
+    {
+      sparsity_x.push_back
+    (std::set<unsigned int,std::greater<unsigned int> >());
+
+      for (unsigned int j=0; j<sparsity.n_cols(); ++j)
+    if (sparsity.exists(i,j))
+      sparsity_x.back().insert (j);
+    }
+
   do_copy_from (sparsity_x, sp4);
 }
 
@@ -363,46 +405,10 @@ void copy_from_1 ()
 
 
 
-template <typename SP>
+template <typename SP, typename CSP>
 void copy_from_2 ()
 {
-  CompressedSparsityPattern sparsity_pattern;
-  build_sparsity (sparsity_pattern);
-
-  SP sp4;
-  do_copy_from (sparsity_pattern, sp4);
-
-				   // now check for equivalence of original
-				   // and copy if both only store explicitly
-				   // added elements. otherwise, check that
-				   // the presence of an element in the source
-				   // implies an element in the copy
-  if ((sparsity_pattern.stores_only_added_elements() == true)
-      &&
-      (sp4.stores_only_added_elements() == true))
-    Assert (sparsity_pattern.n_nonzero_elements() ==
-	    sp4.n_nonzero_elements(),
-	    ExcInternalError());
-  for (unsigned int i=0; i<sparsity_pattern.n_rows(); ++i)
-    for (unsigned int j=0; j<sparsity_pattern.n_cols(); ++j)
-      if ((sparsity_pattern.stores_only_added_elements() == true)
-	  &&
-	  (sp4.stores_only_added_elements() == true))
-	Assert (sparsity_pattern.exists(i,j) == sp4.exists (i,j),
-		ExcInternalError())
-      else
-	if (sparsity_pattern.exists(i,j))
-	  Assert (sp4.exists (i,j), ExcInternalError());
-
-  deallog << "OK" << std::endl;
-}
-
-
-
-template <typename SP>
-void copy_from_3 ()
-{
-  CompressedSetSparsityPattern sparsity_pattern;
+  CSP sparsity_pattern;
   build_sparsity (sparsity_pattern);
 
   SP sp4;
@@ -519,6 +525,15 @@ void matrix_position<CompressedSparsityPattern> ()
 
 
 template <>
+void matrix_position<CompressedSimpleSparsityPattern> ()
+{
+                   // this class doesn't have that function
+  deallog << "OK" << std::endl;
+}
+
+
+
+template <>
 void matrix_position<CompressedSetSparsityPattern> ()
 {
 				   // this class doesn't have that function
@@ -566,6 +581,16 @@ void block_read_write<CompressedSparsityPattern> ()
 {
 				   // not implemented for this sparsity
 				   // pattern
+  deallog << "OK" << std::endl;
+}
+
+
+
+template <>
+void block_read_write<CompressedSimpleSparsityPattern> ()
+{
+                   // not implemented for this sparsity
+                   // pattern
   deallog << "OK" << std::endl;
 }
 
