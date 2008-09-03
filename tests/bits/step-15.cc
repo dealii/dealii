@@ -489,7 +489,7 @@ void MinimizationProblem<1>::refine_grid ()
 						   0.3, 0.03);
   triangulation.prepare_coarsening_and_refinement();
 
-  SolutionTransfer<dim,double> solution_transfer(dof_handler);
+  SolutionTransfer<dim> solution_transfer(dof_handler);
   solution_transfer.prepare_for_coarsening_and_refinement (present_solution);
 
   triangulation.execute_coarsening_and_refinement ();

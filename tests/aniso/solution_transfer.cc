@@ -2,7 +2,7 @@
 //    fe_data_test.cc,v 1.14 2003/11/28 11:52:35 guido Exp
 //    Version: 
 //
-//    Copyright (C) 1998, 1999, 2000, 2001, 2002, 2003, 2005, 2006, 2007 by the deal.II authors
+//    Copyright (C) 1998, 1999, 2000, 2001, 2002, 2003, 2005, 2006, 2007, 2008 by the deal.II authors
 //
 //    This file is subject to QPL and may not be  distributed
 //    without copyright and license information. Please refer
@@ -71,7 +71,7 @@ void transfer(std::ostream &out)
   deallog << "Initial solution" << std::endl << std::endl;
   data_out.write_gnuplot (out);
 
-  SolutionTransfer<dim, double> soltrans(dof_handler);
+  SolutionTransfer<dim> soltrans(dof_handler);
 
 				   // test a): pure refinement
   typename Triangulation<dim>::active_cell_iterator cell=tria.begin_active(),
@@ -93,7 +93,7 @@ void transfer(std::ostream &out)
   data_out.write_gnuplot (out);
 
 				   // test b): with coarsening
-  SolutionTransfer<dim, double> soltrans2(dof_handler);
+  SolutionTransfer<dim> soltrans2(dof_handler);
   cell=tria.begin_active(tria.n_levels()-1);
   endc=tria.end(tria.n_levels()-1);
   for (; cell!=endc; ++cell)

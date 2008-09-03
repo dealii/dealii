@@ -2,7 +2,7 @@
 //    fe_data_test.cc,v 1.14 2003/11/28 11:52:35 guido Exp
 //    Version: 
 //
-//    Copyright (C) 1998, 1999, 2000, 2001, 2002, 2003, 2005, 2006, 2007 by the deal.II authors
+//    Copyright (C) 1998, 1999, 2000, 2001, 2002, 2003, 2005, 2006, 2007, 2008 by the deal.II authors
 //
 //    This file is subject to QPL and may not be  distributed
 //    without copyright and license information. Please refer
@@ -94,8 +94,8 @@ void transfer(std::ostream &out)
   deallog << "Initial solution, FE_DGQ" << std::endl << std::endl;
   dgq_data_out.write_gnuplot (out);
 
-  SolutionTransfer<dim, double> q_soltrans(q_dof_handler);
-  SolutionTransfer<dim, double> dgq_soltrans(dgq_dof_handler);
+  SolutionTransfer<dim> q_soltrans(q_dof_handler);
+  SolutionTransfer<dim> dgq_soltrans(dgq_dof_handler);
 
 				   // test a): pure refinement
   typename Triangulation<dim>::active_cell_iterator cell=tria.begin_active(),

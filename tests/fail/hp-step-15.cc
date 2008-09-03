@@ -2,7 +2,7 @@
 //    $Id$
 //    Version: $Name$ 
 //
-//    Copyright (C) 2005, 2006, 2007 by the deal.II authors
+//    Copyright (C) 2005, 2006, 2007, 2008 by the deal.II authors
 //
 //    This file is subject to QPL and may not be  distributed
 //    without copyright and license information. Please refer
@@ -491,7 +491,7 @@ void MinimizationProblem<1>::refine_grid ()
 						   0.3, 0.03);
   triangulation.prepare_coarsening_and_refinement();
 
-  SolutionTransfer<dim,double> solution_transfer(dof_handler);
+  SolutionTransfer<dim> solution_transfer(dof_handler);
   solution_transfer.prepare_for_coarsening_and_refinement (present_solution);
 
   triangulation.execute_coarsening_and_refinement ();
