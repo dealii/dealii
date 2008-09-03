@@ -766,11 +766,12 @@ namespace TrilinosWrappers
 
   void
   SparseMatrix::vmult_add (Vector       &dst,
-			  const Vector &src) const
+			   const Vector &src) const
   {
     Assert (&src != &dst, ExcSourceEqualsDestination());
 
-    Vector tmp = dst;
+    Vector tmp;
+    tmp = dst;
     vmult (dst, src);
     dst += tmp;
   }
@@ -783,7 +784,8 @@ namespace TrilinosWrappers
   {
     Assert (&src != &dst, ExcSourceEqualsDestination());
 
-    Vector tmp = dst;
+    Vector tmp;
+    tmp = dst;
     vmult (dst, src);
     dst += tmp;
   }

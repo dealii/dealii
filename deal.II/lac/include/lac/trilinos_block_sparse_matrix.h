@@ -250,7 +250,7 @@ namespace TrilinosWrappers
                                         * applicable if the matrix has
                                         * only one block column.
                                         */
-      void vmult (BlockVector          &dst,
+      void vmult (BlockVector  &dst,
                   const Vector &src) const;
 
                                        /**
@@ -260,7 +260,7 @@ namespace TrilinosWrappers
                                         * applicable if the matrix has
                                         * only one block row.
                                         */
-      void vmult (Vector    &dst,
+      void vmult (Vector            &dst,
                   const BlockVector &src) const;
 
                                        /**
@@ -312,7 +312,7 @@ namespace TrilinosWrappers
                                         * only one block.
                                         */
       void Tvmult (Vector       &dst,
-                   const Vector &src) const;    
+                   const Vector &src) const;
 
                                        /**
                                         * Make the clear() function in the

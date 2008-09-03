@@ -309,19 +309,19 @@ namespace TrilinosWrappers
     {
       unsigned int no_blocks = input_maps.size();
       std::vector<unsigned int> block_sizes (no_blocks);
-      
+
       for (unsigned int i=0; i<no_blocks; ++i)
 	{
 	  block_sizes[i] = input_maps[i].NumGlobalElements();
 	}
-      
+
       this->block_indices.reinit (block_sizes);
       if (this->components.size() != this->n_blocks())
         this->components.resize(this->n_blocks());
-  
+
       for (unsigned int i=0; i<this->n_blocks(); ++i)
         this->components[i].reinit(input_maps[i]);
-      
+
       collect_sizes();
     }
 

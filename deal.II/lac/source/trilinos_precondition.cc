@@ -16,11 +16,9 @@
 #include <lac/trilinos_vector.h>
 #include <lac/trilinos_sparse_matrix.h>
 
-#include <Ifpack.h>
-
-
-
 #ifdef DEAL_II_USE_TRILINOS
+
+#include <Ifpack.h>
 
 
 DEAL_II_NAMESPACE_OPEN

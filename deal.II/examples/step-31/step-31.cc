@@ -21,9 +21,9 @@
 #include <base/function.h>
 #include <base/utilities.h>
 
-#include <lac/block_vector.h>
+#include <lac/trilinos_block_vector.h>
 #include <lac/full_matrix.h>
-#include <lac/block_sparse_matrix.h>
+#include <lac/trilinos_block_sparse_matrix.h>
 #include <lac/solver_gmres.h>
 #include <lac/solver_cg.h>
 #include <lac/precondition.h>
@@ -70,9 +70,6 @@
 				 // Next, we import all deal.II
 				 // names into global namespace
 using namespace dealii;
-
-
-				 // @sect3{Defining the AMG preconditioner}
 
 
 				 // @sect3{Equation data}
@@ -231,10 +228,6 @@ namespace EquationData
 }
 
 
-namespace LinearSolvers
-{
-
-
 
 				   // @sect3{Linear solvers and preconditioners}
 
@@ -248,6 +241,8 @@ namespace LinearSolvers
 				   // based preconditioners and solvers
 				   // have been introduced, with the 
 				   // actual interface taken from step-22.
+namespace LinearSolvers
+{
 
 				   // @sect4{The <code>InverseMatrix</code> class template}
 
@@ -271,8 +266,9 @@ namespace LinearSolvers
       InverseMatrix (const Matrix         &m,
 		     const Preconditioner &preconditioner);
 
-      void vmult (Vector<double>       &dst,
-		  const Vector<double> &src) const;
+
+      void vmult (TrilinosWrappers::Vector       &dst,
+		  const TrilinosWrappers::Vector &src) const;
 
     private:
       const SmartPointer<const Matrix> matrix;
@@ -291,11 +287,12 @@ namespace LinearSolvers
 
 
   template <class Matrix, class Preconditioner>
-  void InverseMatrix<Matrix,Preconditioner>::vmult (Vector<double>       &dst,
-						    const Vector<double> &src) const
+  void InverseMatrix<Matrix,Preconditioner>::vmult (
+				TrilinosWrappers::Vector       &dst,
+				const TrilinosWrappers::Vector &src) const
   {
     SolverControl solver_control (src.size(), 1e-6*src.l2_norm());
-    SolverCG<> cg (solver_control);
+    SolverCG<TrilinosWrappers::Vector> cg (solver_control);
 
     dst = 0;
 
@@ -410,35 +407,36 @@ namespace LinearSolvers
   class BlockSchurPreconditioner : public Subscriptor
   {
     public:
-      BlockSchurPreconditioner (const BlockSparseMatrix<double>         &S,
-				const InverseMatrix<SparseMatrix<double>,PreconditionerMp>  &Mpinv,
-				const PreconditionerA                   &Apreconditioner);
+      BlockSchurPreconditioner (
+	const TrilinosWrappers::BlockSparseMatrix     &S,
+	const InverseMatrix<TrilinosWrappers::SparseMatrix,PreconditionerMp>  &Mpinv,
+	const PreconditionerA                         &Apreconditioner);
 
-      void vmult (BlockVector<double>       &dst,
-		  const BlockVector<double> &src) const;
+      void vmult (TrilinosWrappers::BlockVector       &dst,
+		  const TrilinosWrappers::BlockVector &src) const;
 
     private:
-      const SmartPointer<const BlockSparseMatrix<double> > stokes_matrix;
-      const SmartPointer<const InverseMatrix<SparseMatrix<double>,
+      const SmartPointer<const TrilinosWrappers::BlockSparseMatrix> stokes_matrix;
+      const SmartPointer<const InverseMatrix<TrilinosWrappers::SparseMatrix,
 					     PreconditionerMp > > m_inverse;
       const PreconditionerA &a_preconditioner;
 
-      mutable Vector<double> tmp;
+      mutable TrilinosWrappers::Vector tmp;
 
-  };
+};
 
 
 
   template <class PreconditionerA, class PreconditionerMp>
   BlockSchurPreconditioner<PreconditionerA, PreconditionerMp>::
-  BlockSchurPreconditioner(const BlockSparseMatrix<double>                            &S,
-			   const InverseMatrix<SparseMatrix<double>,PreconditionerMp> &Mpinv,
-			   const PreconditionerA                                      &Apreconditioner)
+  BlockSchurPreconditioner(const TrilinosWrappers::BlockSparseMatrix  &S,
+			   const InverseMatrix<TrilinosWrappers::SparseMatrix,PreconditionerMp> &Mpinv,
+			   const PreconditionerA                      &Apreconditioner)
 		  :
 		  stokes_matrix           (&S),
 		  m_inverse               (&Mpinv),
 		  a_preconditioner        (Apreconditioner),
-		  tmp                     (S.block(1,1).m())
+		  tmp                     (stokes_matrix->block(1,1).row_map)
   {}
 
 
@@ -463,8 +461,8 @@ namespace LinearSolvers
 				   // pressure vector.
   template <class PreconditionerA, class PreconditionerMp>
   void BlockSchurPreconditioner<PreconditionerA, PreconditionerMp>::vmult (
-    BlockVector<double>       &dst,
-    const BlockVector<double> &src) const
+    TrilinosWrappers::BlockVector       &dst,
+    const TrilinosWrappers::BlockVector &src) const
   {
     a_preconditioner.vmult (dst.block(0), src.block(0));
     stokes_matrix->block(1,0).residual(tmp, dst.block(0), src.block(1));
@@ -526,30 +524,31 @@ class BoussinesqFlowProblem
 		      const double                        cell_diameter,
 		      const double                        old_time_step);
 
-    
+
     Epetra_SerialComm trilinos_communicator;
-    
-    Triangulation<dim>        triangulation;
 
-    const unsigned int        stokes_degree;
-    FESystem<dim>             stokes_fe;
-    DoFHandler<dim>           stokes_dof_handler;
-    ConstraintMatrix          stokes_constraints;
-    
-    BlockSparsityPattern      stokes_sparsity_pattern;
-    BlockSparseMatrix<double> stokes_matrix;
-    BlockSparsityPattern      stokes_preconditioner_sparsity_pattern;
-    BlockSparseMatrix<double> stokes_preconditioner_matrix;
+    Triangulation<dim>                  triangulation;
 
-    BlockVector<double>       stokes_solution;
-    BlockVector<double>       stokes_rhs;
+    const unsigned int                  stokes_degree;
+    FESystem<dim>                       stokes_fe;
+    DoFHandler<dim>                     stokes_dof_handler;
+    ConstraintMatrix                    stokes_constraints;
 
-    
-    const unsigned int        temperature_degree;    
-    FE_Q<dim>                 temperature_fe;
-    DoFHandler<dim>           temperature_dof_handler;
-    ConstraintMatrix          temperature_constraints;
-    
+    std::vector<Epetra_Map>             stokes_partitioner;
+    BlockSparsityPattern                stokes_sparsity_pattern;
+    TrilinosWrappers::BlockSparseMatrix stokes_matrix;
+    BlockSparsityPattern                stokes_preconditioner_sparsity_pattern;
+    TrilinosWrappers::BlockSparseMatrix stokes_preconditioner_matrix;
+
+    TrilinosWrappers::BlockVector       stokes_solution;
+    TrilinosWrappers::BlockVector       stokes_rhs;
+
+
+    const unsigned int                  temperature_degree;    
+    FE_Q<dim>                           temperature_fe;
+    DoFHandler<dim>                     temperature_dof_handler;
+    ConstraintMatrix                    temperature_constraints;
+
     Epetra_Map                          temperature_partitioner;
     SparsityPattern                     temperature_sparsity_pattern;
     TrilinosWrappers::SparseMatrix      temperature_mass_matrix;
@@ -567,7 +566,7 @@ class BoussinesqFlowProblem
     unsigned int timestep_number;
 
     boost::shared_ptr<TrilinosWrappers::PreconditionAMG>  Amg_preconditioner;
-    boost::shared_ptr<SparseILU<double> >         Mp_preconditioner;
+    boost::shared_ptr<TrilinosWrappers::PreconditionSSOR> Mp_preconditioner;
 
     bool rebuild_stokes_matrix;
     bool rebuild_temperature_matrices;
@@ -606,7 +605,7 @@ BoussinesqFlowProblem<dim>::BoussinesqFlowProblem ()
                 temperature_dof_handler (triangulation),
 
 		temperature_partitioner (0, 0, trilinos_communicator),
-		
+
                 time_step (0),
 		old_time_step (0),
 		timestep_number (0),
@@ -915,6 +914,13 @@ void BoussinesqFlowProblem<dim>::setup_dofs ()
 				 // need to reassign the 
 				 // system matrix structure to
 				 // the sparsity pattern.
+  stokes_partitioner.clear();
+  {
+    Epetra_Map map_u(n_u, 0, trilinos_communicator);
+    stokes_partitioner.push_back (map_u);
+    Epetra_Map map_p(n_p, 0, trilinos_communicator);
+    stokes_partitioner.push_back (map_p);
+  }
   {
     stokes_matrix.clear ();
 
@@ -924,7 +930,7 @@ void BoussinesqFlowProblem<dim>::setup_dofs ()
     csp.block(0,1).reinit (n_u, n_p);
     csp.block(1,0).reinit (n_p, n_u);
     csp.block(1,1).reinit (n_p, n_p);
-      
+
     csp.collect_sizes ();
 
     Table<2,DoFTools::Coupling> coupling (dim+1, dim+1);
@@ -941,12 +947,13 @@ void BoussinesqFlowProblem<dim>::setup_dofs ()
 	  coupling[c][d] = DoFTools::always;
 	else
 	  coupling[c][d] = DoFTools::none;
-      
+
     DoFTools::make_sparsity_pattern (stokes_dof_handler, coupling, csp);
     stokes_constraints.condense (csp);
     stokes_sparsity_pattern.copy_from (csp);
 
-    stokes_matrix.reinit (stokes_sparsity_pattern);
+    stokes_matrix.reinit (stokes_partitioner, stokes_sparsity_pattern);
+    stokes_matrix.collect_sizes();
   }
 
   {
@@ -975,7 +982,9 @@ void BoussinesqFlowProblem<dim>::setup_dofs ()
     stokes_constraints.condense (csp);
     stokes_preconditioner_sparsity_pattern.copy_from (csp);
 
-    stokes_preconditioner_matrix.reinit (stokes_preconditioner_sparsity_pattern);
+    stokes_preconditioner_matrix.reinit (stokes_partitioner,
+					 stokes_preconditioner_sparsity_pattern);
+    stokes_preconditioner_matrix.collect_sizes();
   }
 
   temperature_partitioner = Epetra_Map (n_T, 0, trilinos_communicator);
@@ -996,9 +1005,7 @@ void BoussinesqFlowProblem<dim>::setup_dofs ()
     temperature_stiffness_matrix.reinit (temperature_partitioner,
 					 temperature_sparsity_pattern);
   }
-    
-      
-  
+
 				   // As last action in this function,
 				   // we need to set the vectors
 				   // for the solution, the old 
@@ -1008,16 +1015,9 @@ void BoussinesqFlowProblem<dim>::setup_dofs ()
 				   // three-block structure given
 				   // by velocity, pressure and
 				   // temperature.
-  stokes_solution.reinit (2);
-  stokes_solution.block(0).reinit (n_u);
-  stokes_solution.block(1).reinit (n_p);
-  stokes_solution.collect_sizes ();
+  stokes_solution.reinit (stokes_partitioner);
+  stokes_rhs.reinit (stokes_partitioner);
 
-  stokes_rhs.reinit (2);
-  stokes_rhs.block(0).reinit (n_u);
-  stokes_rhs.block(1).reinit (n_p);
-  stokes_rhs.collect_sizes ();
-  
   temperature_solution.reinit (temperature_partitioner);
   old_temperature_solution.reinit (temperature_partitioner);
   old_old_temperature_solution.reinit (temperature_partitioner);
@@ -1080,6 +1080,7 @@ BoussinesqFlowProblem<dim>::assemble_stokes_preconditioner ()
 						     local_dof_indices,
 						     stokes_preconditioner_matrix);
     }
+  stokes_preconditioner_matrix.compress();
 }
 
 
@@ -1132,11 +1133,10 @@ BoussinesqFlowProblem<dim>::build_stokes_preconditioner ()
 				   // copied over to Trilinos. we need to
 				   // keep the (1,1) block, though
       
-  Mp_preconditioner = boost::shared_ptr<SparseILU<double> >
-		      (new SparseILU<double>);
-  Mp_preconditioner->initialize (stokes_preconditioner_matrix.block(1,1),
-				 SparseILU<double>::AdditionalData());
-      
+  Mp_preconditioner = boost::shared_ptr<TrilinosWrappers::PreconditionSSOR>
+	(new TrilinosWrappers::PreconditionSSOR(
+	   stokes_preconditioner_matrix.block(1,1),1.2));
+
   std::cout << std::endl;
 
   rebuild_stokes_preconditioner = false;
@@ -1445,6 +1445,8 @@ void BoussinesqFlowProblem<dim>::assemble_stokes_system ()
 						     local_dof_indices,
 						     stokes_rhs);
     }
+  stokes_matrix.compress();
+  stokes_rhs.compress();
 
   rebuild_stokes_matrix = false;
 
@@ -1782,24 +1784,21 @@ void BoussinesqFlowProblem<dim>::solve ()
   {
 				     // Set up inverse matrix for
 				     // pressure mass matrix
-    LinearSolvers::InverseMatrix<SparseMatrix<double>,SparseILU<double> >
+    LinearSolvers::InverseMatrix<TrilinosWrappers::SparseMatrix,
+				 TrilinosWrappers::PreconditionSSOR>
       mp_inverse (stokes_preconditioner_matrix.block(1,1), *Mp_preconditioner);
 
-				     // Set up block Schur preconditioner
-				     /*BlockSchurPreconditioner<typename InnerPreconditioner<dim>::type,
-				       SparseILU<double> >
-				       preconditioner (stokes_matrix, mp_inverse, *A_preconditioner);*/
     LinearSolvers::BlockSchurPreconditioner<TrilinosWrappers::PreconditionAMG,
-                                            SparseILU<double> >
+                                            TrilinosWrappers::PreconditionSSOR>
       preconditioner (stokes_matrix, mp_inverse, *Amg_preconditioner);
 
 				     // Set up GMRES solver and
 				     // solve.
-    SolverControl solver_control (stokes_matrix.m(),
+    SolverControl solver_control (20*stokes_matrix.m(),
 				  1e-6*stokes_rhs.l2_norm());
 
-    SolverGMRES<BlockVector<double> > gmres(solver_control,
-					    SolverGMRES<BlockVector<double> >::AdditionalData(100));
+    SolverGMRES<TrilinosWrappers::BlockVector> gmres(solver_control,
+      SolverGMRES<TrilinosWrappers::BlockVector >::AdditionalData(100));
 
     stokes_solution = 0;
     gmres.solve(stokes_matrix, stokes_solution, stokes_rhs, preconditioner);
@@ -2011,7 +2010,7 @@ void BoussinesqFlowProblem<dim>::run ()
   const unsigned int initial_refinement = (dim == 2 ? 4 : 2);
   const unsigned int n_pre_refinement_steps = (dim == 2 ? 4 : 3);
 
-  
+
   GridGenerator::hyper_cube (triangulation);
   triangulation.refine_global (initial_refinement);
 
