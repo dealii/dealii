@@ -65,9 +65,6 @@
 #include <sstream>
 
 
-//TODO: Put into the class itself
-Epetra_SerialComm comm_serial;
-
                                  // This is Trilinos
 
 				 // Next, we import all deal.II
@@ -424,11 +421,11 @@ namespace LinearSolvers
       const SmartPointer<const BlockSparseMatrix<double> > stokes_matrix;
       const SmartPointer<const InverseMatrix<SparseMatrix<double>,
 					     PreconditionerMp > > m_inverse;
-const PreconditionerA &a_preconditioner;
+      const PreconditionerA &a_preconditioner;
 
-mutable Vector<double> tmp;
+      mutable Vector<double> tmp;
 
-};
+  };
 
 
 
@@ -529,6 +526,9 @@ class BoussinesqFlowProblem
 		      const double                        cell_diameter,
 		      const double                        old_time_step);
 
+    
+    Epetra_SerialComm trilinos_communicator;
+    
     Triangulation<dim>        triangulation;
 
     const unsigned int        stokes_degree;
@@ -549,8 +549,9 @@ class BoussinesqFlowProblem
     FE_Q<dim>                 temperature_fe;
     DoFHandler<dim>           temperature_dof_handler;
     ConstraintMatrix          temperature_constraints;
-
-    SparsityPattern           temperature_sparsity_pattern;
+    
+    Epetra_Map                          temperature_partitioner;
+    SparsityPattern                     temperature_sparsity_pattern;
     TrilinosWrappers::SparseMatrix      temperature_mass_matrix;
     TrilinosWrappers::SparseMatrix      temperature_stiffness_matrix;
     TrilinosWrappers::SparseMatrix      temperature_matrix;
@@ -604,6 +605,8 @@ BoussinesqFlowProblem<dim>::BoussinesqFlowProblem ()
 		temperature_fe (temperature_degree),
                 temperature_dof_handler (triangulation),
 
+		temperature_partitioner (0, 0, trilinos_communicator),
+		
                 time_step (0),
 		old_time_step (0),
 		timestep_number (0),
@@ -926,51 +929,18 @@ void BoussinesqFlowProblem<dim>::setup_dofs ()
 
     Table<2,DoFTools::Coupling> coupling (dim+1, dim+1);
 
-				     // build the sparsity pattern. note
-				     // that all dim velocities couple with
-				     // each other and with the pressures,
-				     // but that not all of the other
-				     // components couple:
-    switch (dim)
-      {
-	case 2:
-	{
-	  static const bool coupling_matrix[3][3]
-	    = {{ 1, 1,   1},
-	       { 1, 1,   1},
-		 
-	       { 1, 1,   0}};
-	  for (unsigned int c=0; c<dim+1; ++c)
-	    for (unsigned int d=0; d<dim+1; ++d)
-	      if (coupling_matrix[c][d] == true)
-		coupling[c][d] = DoFTools::always;
-	      else
-		coupling[c][d] = DoFTools::none;
-
-	  break;
-	}
-
-	case 3:
-	{
-	  static const bool coupling_matrix[4][4]
-	    = {{ 1, 1, 1,   1},
-	       { 1, 1, 1,   1},
-	       { 1, 1, 1,   1},
-		 
-	       { 1, 1, 1,   0}};
-	  for (unsigned int c=0; c<dim+1; ++c)
-	    for (unsigned int d=0; d<dim+1; ++d)
-	      if (coupling_matrix[c][d] == true)
-		coupling[c][d] = DoFTools::always;
-	      else
-		coupling[c][d] = DoFTools::none;
-
-	  break;
-	}
-
-	default:
-	      Assert (false, ExcNotImplemented());
-      } 
+				     // build the sparsity
+				     // pattern. note that all dim
+				     // velocities couple with each
+				     // other and with the pressures,
+				     // but that there is no
+				     // pressure-pressure coupling:
+    for (unsigned int c=0; c<dim+1; ++c)
+      for (unsigned int d=0; d<dim+1; ++d)
+	if (! ((c==dim) && (d==dim)))
+	  coupling[c][d] = DoFTools::always;
+	else
+	  coupling[c][d] = DoFTools::none;
       
     DoFTools::make_sparsity_pattern (stokes_dof_handler, coupling, csp);
     stokes_constraints.condense (csp);
@@ -978,7 +948,7 @@ void BoussinesqFlowProblem<dim>::setup_dofs ()
 
     stokes_matrix.reinit (stokes_sparsity_pattern);
   }
-  
+
   {
     Amg_preconditioner.reset ();
     Mp_preconditioner.reset ();
@@ -994,53 +964,12 @@ void BoussinesqFlowProblem<dim>::setup_dofs ()
     csp.collect_sizes ();
 
     Table<2,DoFTools::Coupling> coupling (dim+1, dim+1);
-
-				     // build the sparsity pattern. note
-				     // that all dim velocities couple with
-				     // each other and with the pressures,
-				     // but that not all of the other
-				     // components couple:
-    switch (dim)
-      {
-	case 2:
-	{
-	  static const bool coupling_matrix[3][3]
-	    = {{ 1, 0,   0},
-	       { 0, 1,   0},
-		 
-	       { 0, 0,   1}};
-	  for (unsigned int c=0; c<dim+1; ++c)
-	    for (unsigned int d=0; d<dim+1; ++d)
-	      if (coupling_matrix[c][d] == true)
-		coupling[c][d] = DoFTools::always;
-	      else
-		coupling[c][d] = DoFTools::none;
-
-	  break;
-	}
-
-	case 3:
-	{
-	  static const bool coupling_matrix[4][4]
-	    = {{ 1, 0, 0,   0},
-	       { 0, 1, 0,   0},
-	       { 0, 0, 1,   0},
-		 
-	       { 0, 0, 0,   1}};
-	  for (unsigned int c=0; c<dim+1; ++c)
-	    for (unsigned int d=0; d<dim+1; ++d)
-	      if (coupling_matrix[c][d] == true)
-		coupling[c][d] = DoFTools::always;
-	      else
-		coupling[c][d] = DoFTools::none;
-
-	  break;
-	}
-
-	default:
-	      Assert (false, ExcNotImplemented());
-      }
-
+    for (unsigned int c=0; c<dim+1; ++c)
+      for (unsigned int d=0; d<dim+1; ++d)
+	if (c == d)
+	  coupling[c][d] = DoFTools::always;
+	else
+	  coupling[c][d] = DoFTools::none;
 
     DoFTools::make_sparsity_pattern (stokes_dof_handler, coupling, csp);
     stokes_constraints.condense (csp);
@@ -1049,6 +978,7 @@ void BoussinesqFlowProblem<dim>::setup_dofs ()
     stokes_preconditioner_matrix.reinit (stokes_preconditioner_sparsity_pattern);
   }
 
+  temperature_partitioner = Epetra_Map (n_T, 0, trilinos_communicator);
   {
     temperature_mass_matrix.clear ();
     temperature_stiffness_matrix.clear ();
@@ -1059,11 +989,12 @@ void BoussinesqFlowProblem<dim>::setup_dofs ()
     temperature_constraints.condense (csp);
     temperature_sparsity_pattern.copy_from (csp);
 
-//TODO: Put into the class itself    
-    Epetra_Map map (n_T, 0, comm_serial);
-    temperature_matrix.reinit (map, temperature_sparsity_pattern);
-    temperature_mass_matrix.reinit (map, temperature_sparsity_pattern);
-    temperature_stiffness_matrix.reinit (map, temperature_sparsity_pattern);
+    temperature_matrix.reinit (temperature_partitioner,
+			       temperature_sparsity_pattern);
+    temperature_mass_matrix.reinit (temperature_partitioner,
+				    temperature_sparsity_pattern);
+    temperature_stiffness_matrix.reinit (temperature_partitioner,
+					 temperature_sparsity_pattern);
   }
     
       
@@ -1087,13 +1018,11 @@ void BoussinesqFlowProblem<dim>::setup_dofs ()
   stokes_rhs.block(1).reinit (n_p);
   stokes_rhs.collect_sizes ();
   
-//TODO: Put into the class itself    
-  Epetra_Map map (n_T, 0, comm_serial);
-  temperature_solution.reinit (map);
-  old_temperature_solution.reinit (map);
-  old_old_temperature_solution.reinit (map);
+  temperature_solution.reinit (temperature_partitioner);
+  old_temperature_solution.reinit (temperature_partitioner);
+  old_old_temperature_solution.reinit (temperature_partitioner);
 
-  temperature_rhs.reinit (map);
+  temperature_rhs.reinit (temperature_partitioner);
 }
 
 
