@@ -20,6 +20,7 @@
 #include <base/logstream.h>
 #include <base/function.h>
 #include <base/utilities.h>
+#include <base/timer.h>
 
 #include <lac/full_matrix.h>
 #include <lac/solver_gmres.h>
@@ -55,7 +56,11 @@
 #include <numerics/error_estimator.h>
 #include <numerics/solution_transfer.h>
 
-#include <Epetra_SerialComm.h>
+#ifdef DEAL_II_COMPILER_SUPPORTS_MPI
+#  include <Epetra_MpiComm.h>
+#else
+#  include <Epetra_SerialComm.h>
+#endif
 #include <Epetra_Map.h>
 
 #include <fstream>
@@ -520,7 +525,11 @@ class BoussinesqFlowProblem
 		      const double                        old_time_step);
 
 
+#ifdef DEAL_II_COMPILER_SUPPORTS_MPI
+    Epetra_MpiComm                      trilinos_communicator;
+#else
     Epetra_SerialComm                   trilinos_communicator;
+#endif
 
     Triangulation<dim>                  triangulation;
 
@@ -585,6 +594,9 @@ class BoussinesqFlowProblem
 template <int dim>
 BoussinesqFlowProblem<dim>::BoussinesqFlowProblem ()
                 :
+#ifdef DEAL_II_COMPILER_SUPPORTS_MPI
+		trilinos_communicator (MPI_COMM_WORLD),
+#endif
 		triangulation (Triangulation<dim>::maximum_smoothing),
 
                 stokes_degree (1),
@@ -1780,6 +1792,7 @@ void BoussinesqFlowProblem<dim>::solve ()
 				   // be used for the solution of the
 				   // blocked system.
   {
+    Timer computing_timer;
 				     // Set up inverse matrix for
 				     // pressure mass matrix
     LinearSolvers::InverseMatrix<TrilinosWrappers::SparseMatrix,
@@ -1802,7 +1815,8 @@ void BoussinesqFlowProblem<dim>::solve ()
 
     std::cout << "   "
               << solver_control.last_step()
-              << " GMRES iterations for Stokes subsystem."
+              << " GMRES iterations for Stokes subsystem in "
+	      << computing_timer() << " s."
               << std::endl;
 	      
 				     // Produce a constistent solution
