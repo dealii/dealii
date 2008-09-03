@@ -525,7 +525,7 @@ class BoussinesqFlowProblem
 		      const double                        old_time_step);
 
 
-    Epetra_SerialComm trilinos_communicator;
+    Epetra_SerialComm                   trilinos_communicator;
 
     Triangulation<dim>                  triangulation;
 
@@ -535,9 +535,7 @@ class BoussinesqFlowProblem
     ConstraintMatrix                    stokes_constraints;
 
     std::vector<Epetra_Map>             stokes_partitioner;
-    BlockSparsityPattern                stokes_sparsity_pattern;
     TrilinosWrappers::BlockSparseMatrix stokes_matrix;
-    BlockSparsityPattern                stokes_preconditioner_sparsity_pattern;
     TrilinosWrappers::BlockSparseMatrix stokes_preconditioner_matrix;
 
     TrilinosWrappers::BlockVector       stokes_solution;
@@ -550,7 +548,6 @@ class BoussinesqFlowProblem
     ConstraintMatrix                    temperature_constraints;
 
     Epetra_Map                          temperature_partitioner;
-    SparsityPattern                     temperature_sparsity_pattern;
     TrilinosWrappers::SparseMatrix      temperature_mass_matrix;
     TrilinosWrappers::SparseMatrix      temperature_stiffness_matrix;
     TrilinosWrappers::SparseMatrix      temperature_matrix;
@@ -950,6 +947,8 @@ void BoussinesqFlowProblem<dim>::setup_dofs ()
 
     DoFTools::make_sparsity_pattern (stokes_dof_handler, coupling, csp);
     stokes_constraints.condense (csp);
+
+    BlockSparsityPattern stokes_sparsity_pattern;    
     stokes_sparsity_pattern.copy_from (csp);
 
     stokes_matrix.reinit (stokes_partitioner, stokes_sparsity_pattern);
@@ -980,6 +979,8 @@ void BoussinesqFlowProblem<dim>::setup_dofs ()
 
     DoFTools::make_sparsity_pattern (stokes_dof_handler, coupling, csp);
     stokes_constraints.condense (csp);
+    
+    BlockSparsityPattern stokes_preconditioner_sparsity_pattern;
     stokes_preconditioner_sparsity_pattern.copy_from (csp);
 
     stokes_preconditioner_matrix.reinit (stokes_partitioner,
@@ -996,6 +997,8 @@ void BoussinesqFlowProblem<dim>::setup_dofs ()
     CompressedSetSparsityPattern csp (n_T, n_T);      
     DoFTools::make_sparsity_pattern (temperature_dof_handler, csp);
     temperature_constraints.condense (csp);
+
+    SparsityPattern temperature_sparsity_pattern;
     temperature_sparsity_pattern.copy_from (csp);
 
     temperature_matrix.reinit (temperature_partitioner,
