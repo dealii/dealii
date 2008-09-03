@@ -21,15 +21,12 @@
 #include <base/function.h>
 #include <base/utilities.h>
 
-#include <lac/trilinos_block_vector.h>
 #include <lac/full_matrix.h>
-#include <lac/trilinos_block_sparse_matrix.h>
 #include <lac/solver_gmres.h>
 #include <lac/solver_cg.h>
-#include <lac/precondition.h>
-#include <lac/sparse_direct.h>
-#include <lac/sparse_ilu.h>
+#include <lac/trilinos_block_vector.h>
 #include <lac/trilinos_sparse_matrix.h>
+#include <lac/trilinos_block_sparse_matrix.h>
 #include <lac/trilinos_precondition.h>
 #include <lac/trilinos_precondition_amg.h>
 
@@ -64,8 +61,6 @@
 #include <fstream>
 #include <sstream>
 
-
-                                 // This is Trilinos
 
 				 // Next, we import all deal.II
 				 // names into global namespace
@@ -1797,13 +1792,13 @@ void BoussinesqFlowProblem<dim>::solve ()
 
 				     // Set up GMRES solver and
 				     // solve.
-    SolverControl solver_control (20*stokes_matrix.m(),
+    SolverControl solver_control (stokes_matrix.m(),
 				  1e-6*stokes_rhs.l2_norm());
 
     SolverGMRES<TrilinosWrappers::BlockVector> gmres(solver_control,
       SolverGMRES<TrilinosWrappers::BlockVector >::AdditionalData(100));
 
-    stokes_solution = 0;
+    //stokes_solution = 0;
     gmres.solve(stokes_matrix, stokes_solution, stokes_rhs, preconditioner);
 
     std::cout << "   "
