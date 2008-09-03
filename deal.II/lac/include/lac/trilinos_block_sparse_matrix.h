@@ -58,7 +58,7 @@ namespace TrilinosWrappers
  * the same reason as is documented with the BlockSparsityPattern class.
  *
  * @ingroup Matrix1
- * @author Wolfgang Bangerth, 2004
+ * @author Martin Kronbichler, Wolfgang Bangerth, 2008
  */
   class BlockSparseMatrix : public BlockMatrixBase<TrilinosWrappers::SparseMatrix>
   {

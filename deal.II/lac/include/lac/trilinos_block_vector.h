@@ -10,8 +10,8 @@
 //    further information on this license.
 //
 //---------------------------------------------------------------------------
-#ifndef __deal2__trilinos_parallel_block_vector_h
-#define __deal2__trilinos_parallel_block_vector_h
+#ifndef __deal2__trilinos_block_vector_h
+#define __deal2__trilinos_block_vector_h
 
 
 #include <base/config.h>
@@ -24,16 +24,16 @@
 
 DEAL_II_NAMESPACE_OPEN
 
+/*! @addtogroup TrilinosWrappers
+ *@{
+ */
 
 namespace TrilinosWrappers
 {
                                    // forward declaration
   class BlockVector;
-  
-/*! @addtogroup TrilinosWrappers
- *@{
- */
-    
+
+
 /**
  * An implementation of block vectors based on the vector class
  * implemented in TrilinosWrappers. While the base class provides for most of the
@@ -48,6 +48,7 @@ namespace TrilinosWrappers
  * of these blocks to be stored on the local process.
  *
  * @ingroup Vectors
+ * @ingroup TrilinosWrappers
  * @author Martin Kronbichler, Wolfgang Bangerth, 2008
  */
     class BlockVector : public BlockVectorBase<Vector>
@@ -224,8 +225,8 @@ namespace TrilinosWrappers
                                           * <tt>u.swap(v)</tt>, again in analogy
                                           * to standard functions.
                                           */
-        void swap (BlockVector &v);    
-    
+        void swap (BlockVector &v);
+
                                          /**
                                           * Exception
                                           */
@@ -235,8 +236,6 @@ namespace TrilinosWrappers
                                           */
         DeclException0 (ExcNonMatchingBlockVectors);
     };
-
-/*@}*/
 
 /*----------------------- Inline functions ----------------------------------*/
 
@@ -393,7 +392,7 @@ namespace TrilinosWrappers
 /**
  * Global function which overloads the default implementation
  * of the C++ standard library which uses a temporary object. The
- * function simply exchanges the data of the two vectors.
+ * function simply exchanges the data of the two vectors. 
  *
  * @ingroup TrilinosWrappers
  * @relates TrilinosWrappers::BlockVector
@@ -405,8 +404,10 @@ namespace TrilinosWrappers
     {
       u.swap (v);
     }
-    
+
 }
+
+/*@}*/
 
 DEAL_II_NAMESPACE_CLOSE
 

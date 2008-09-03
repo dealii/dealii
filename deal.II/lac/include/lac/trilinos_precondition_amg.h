@@ -43,6 +43,10 @@ class Epetra_CrsMatrix;
 
 DEAL_II_NAMESPACE_OPEN
 
+/*! @addtogroup TrilinosWrappers
+ *@{
+ */
+
 namespace TrilinosWrappers
 {
   
@@ -73,6 +77,8 @@ namespace TrilinosWrappers
  * Chebyshev smoother instead of a symmetric Gauss-Seidel smoother. 
  * For most elliptic problems, Chebyshev is better than Gauss-Seidel (SSOR).
  *
+ * @ingroup TrilinosWrappers
+ * @ingroup Preconditioners
  * @author Martin Kronbichler, 2008
  */
   class PreconditionAMG : public Subscriptor
@@ -187,6 +193,7 @@ namespace TrilinosWrappers
   };
 }
 
+/*@}*/
 
 
 DEAL_II_NAMESPACE_CLOSE

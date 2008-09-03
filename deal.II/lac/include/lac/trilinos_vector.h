@@ -43,12 +43,8 @@ template <typename number> class Vector;
 
 
 /**
- * A namespace in which wrapper classes for Trilinos objects reside.
- *
- * @ingroup TrilinosWrappers
- * @ingroup Vectors
- * @see @ref SoftwareTrilinos
- * @author Martin Kronbichler, Wolfgang Bangerth, 2008
+ * @addtogroup TrilinosWrappers
+ *@{
  */
 namespace TrilinosWrappers
 {
@@ -305,6 +301,8 @@ namespace TrilinosWrappers
  * necessary.
  *
  * @ingroup TrilinosWrappers
+ * @ingroup Vectors
+ * @see @ref SoftwareTrilinos
  * @author Martin Kronbichler, Wolfgang Bangerth, 2008
  */
   class Vector
@@ -901,7 +899,7 @@ namespace TrilinosWrappers
 // ------------------- inline and template functions --------------
 
 /**
- * Global function @p swap which overloads the default implementation
+ * Global function swap which overloads the default implementation
  * of the C standard library which uses a temporary object. The
  * function simply exchanges the data of the two vectors.
  *
@@ -1051,11 +1049,13 @@ namespace TrilinosWrappers
 #endif // DOXYGEN
 }
 
+/*@}*/
+
 DEAL_II_NAMESPACE_CLOSE
 
 #endif // DEAL_II_USE_TRILINOS
 
-/*----------------------------   trilinos_vector_base.h     ---------------------------*/
+/*----------------------------   trilinos_vector.h     ---------------------------*/
 
 #endif
-/*----------------------------   trilinos_vector_base.h     ---------------------------*/
+/*----------------------------   trilinos_vector.h     ---------------------------*/

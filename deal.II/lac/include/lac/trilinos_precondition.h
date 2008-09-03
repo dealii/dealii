@@ -26,12 +26,21 @@ class Ifpack_Preconditioner;
 
 DEAL_II_NAMESPACE_OPEN
 
+/*! @addtogroup TrilinosWrappers
+ *@{
+ */
+
 namespace TrilinosWrappers
 {
+
   class Vector;
   class SparseMatrix;
   
-
+/**  
+ * @ingroup TrilinosWrappers
+ * @ingroup Preconditioners
+ * @author Wolfgang Bangerth, 2008
+ */
   class PreconditionSSOR
   {
     public:
@@ -78,6 +87,7 @@ namespace TrilinosWrappers
 
 }
 
+/*@}*/
 
 
 DEAL_II_NAMESPACE_CLOSE
