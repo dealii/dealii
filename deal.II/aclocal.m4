@@ -1568,8 +1568,18 @@ AC_DEFUN(DEAL_II_SET_F77_FLAGS, dnl
 
 	dnl Make sure we link both possible libraries here. Shame on gfortran!
 	AC_CHECK_LIB(g2c, e_wsfe, [ F77LIBS="$F77LIBS -lg2c" ])
-	dnl TODO: Replace _gfortran_allocate by something really needed
-	AC_CHECK_LIB(gfortran, _gfortran_allocate, [ F77LIBS="$F77LIBS -lgfortran" ])
+
+	dnl Check whether libgfortran contains certain symbols. We used
+	dnl to use _gfortran_allocate but that appears to have disappeared
+	dnl at one point in time so if we can't find it check other symbols
+	dnl till we find one we recognize
+	AC_CHECK_LIB(gfortran, _gfortran_allocate, [found=1])
+        AC_CHECK_LIB(gfortran, _gfortran_st_write_done, [found=1])
+
+	dnl libgfortran appears to exist. Link with it.
+        if test "x$found" = "x1" ; then
+          F77LIBS="$F77LIBS -lgfortran"
+        fi
 	;;
 
     AIXF77)
