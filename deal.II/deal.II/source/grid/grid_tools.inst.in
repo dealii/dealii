@@ -1,0 +1,50 @@
+//---------------------------------------------------------------------------
+//    $Id: grid_tools.cc 16506 2008-08-06 17:49:50Z bangerth $
+//    Version: $Name$
+//
+//    Copyright (C) 2001, 2002, 2003, 2004, 2005, 2006, 2007, 2008 by the deal.II authors
+//
+//    This file is subject to QPL and may not be  distributed
+//    without copyright and license information. Please refer
+//    to the file deal.II/doc/license.html for the  text  and
+//    further information on this license.
+//
+//---------------------------------------------------------------------------
+
+
+
+for (X : TRIANGULATION_AND_DOFHANDLERS)
+{
+  template
+    unsigned int
+    GridTools::find_closest_vertex (const X &,
+				    const Point<deal_II_dimension> &);
+
+  template
+    std::vector<X::active_cell_iterator>
+    GridTools::find_cells_adjacent_to_vertex(const X &,
+					     const unsigned int);
+
+  template
+    X::active_cell_iterator
+    GridTools::find_active_cell_around_point (const X &,
+					      const Point<deal_II_dimension> &p);
+
+  template
+    std::pair<X::active_cell_iterator, Point<deal_II_dimension> >
+    GridTools::find_active_cell_around_point (const Mapping<deal_II_dimension> &,
+					      const X &,
+					      const Point<deal_II_dimension> &);
+
+  template
+    std::list<std::pair<X::cell_iterator, X::cell_iterator> >
+    GridTools::
+    get_finest_common_cells (const X &mesh_1,
+			     const X &mesh_2);
+
+
+  template
+    bool
+    GridTools::have_same_coarse_mesh (const X &mesh_1,
+				      const X &mesh_2);  
+}

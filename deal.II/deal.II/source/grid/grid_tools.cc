@@ -1242,90 +1242,6 @@ void GridTools::scale<deal_II_dimension> (const double,
 					  Triangulation<deal_II_dimension> &);
 
 template
-unsigned int
-GridTools::find_closest_vertex (const Triangulation<deal_II_dimension> &,
-                                const Point<deal_II_dimension> &);
-
-template
-unsigned int
-GridTools::find_closest_vertex (const DoFHandler<deal_II_dimension> &,
-                                const Point<deal_II_dimension> &);
-
-template
-unsigned int
-GridTools::find_closest_vertex (const hp::DoFHandler<deal_II_dimension> &,
-                                const Point<deal_II_dimension> &);
-
-template
-unsigned int
-GridTools::find_closest_vertex (const MGDoFHandler<deal_II_dimension> &,
-                                const Point<deal_II_dimension> &);
-
-template
-std::vector<Triangulation<deal_II_dimension>::active_cell_iterator>
-GridTools::find_cells_adjacent_to_vertex(const Triangulation<deal_II_dimension> &,
-                                         const unsigned int);
-
-template
-std::vector<DoFHandler<deal_II_dimension>::active_cell_iterator>
-GridTools::find_cells_adjacent_to_vertex(const DoFHandler<deal_II_dimension> &,
-                                         const unsigned int);
-
-template
-std::vector<hp::DoFHandler<deal_II_dimension>::active_cell_iterator>
-GridTools::find_cells_adjacent_to_vertex(const hp::DoFHandler<deal_II_dimension> &,
-                                         const unsigned int);
-
-template
-std::vector<MGDoFHandler<deal_II_dimension>::active_cell_iterator>
-GridTools::find_cells_adjacent_to_vertex(const MGDoFHandler<deal_II_dimension> &,
-                                         const unsigned int);
-
-template
-Triangulation<deal_II_dimension>::active_cell_iterator
-GridTools::find_active_cell_around_point (const Triangulation<deal_II_dimension> &,
-                                          const Point<deal_II_dimension> &p);
-
-template
-DoFHandler<deal_II_dimension>::active_cell_iterator
-GridTools::find_active_cell_around_point (const DoFHandler<deal_II_dimension> &,
-                                          const Point<deal_II_dimension> &p);
-
-template
-hp::DoFHandler<deal_II_dimension>::active_cell_iterator
-GridTools::find_active_cell_around_point (const hp::DoFHandler<deal_II_dimension> &,
-                                          const Point<deal_II_dimension> &p);
-
-template
-MGDoFHandler<deal_II_dimension>::active_cell_iterator
-GridTools::find_active_cell_around_point (const MGDoFHandler<deal_II_dimension> &,
-                                          const Point<deal_II_dimension> &p);
-
-template
-std::pair<Triangulation<deal_II_dimension>::active_cell_iterator, Point<deal_II_dimension> >
-GridTools::find_active_cell_around_point (const Mapping<deal_II_dimension> &,
-                                          const Triangulation<deal_II_dimension> &,
-                                          const Point<deal_II_dimension> &);
-
-template
-std::pair<DoFHandler<deal_II_dimension>::active_cell_iterator, Point<deal_II_dimension> >
-GridTools::find_active_cell_around_point (const Mapping<deal_II_dimension> &,
-                                          const DoFHandler<deal_II_dimension> &,
-                                          const Point<deal_II_dimension> &);
-
-template
-std::pair<MGDoFHandler<deal_II_dimension>::active_cell_iterator, Point<deal_II_dimension> >
-GridTools::find_active_cell_around_point (const Mapping<deal_II_dimension> &,
-                                          const MGDoFHandler<deal_II_dimension> &,
-                                          const Point<deal_II_dimension> &);
-
-template
-std::pair<hp::DoFHandler<deal_II_dimension>::active_cell_iterator, Point<deal_II_dimension> >
-GridTools::find_active_cell_around_point (const Mapping<deal_II_dimension> &,
-                                          const hp::DoFHandler<deal_II_dimension> &,
-                                          const Point<deal_II_dimension> &);
-
-template
 std::pair<hp::DoFHandler<deal_II_dimension>::active_cell_iterator, Point<deal_II_dimension> >
 GridTools::find_active_cell_around_point (const hp::MappingCollection<deal_II_dimension> &,
                                           const hp::DoFHandler<deal_II_dimension> &,
@@ -1356,55 +1272,6 @@ count_cells_with_subdomain_association (const Triangulation<deal_II_dimension> &
 
 
 template
-std::list<std::pair<Triangulation<deal_II_dimension>::cell_iterator,
-                    Triangulation<deal_II_dimension>::cell_iterator> >
-GridTools::
-get_finest_common_cells (const Triangulation<deal_II_dimension> &mesh_1,
-                         const Triangulation<deal_II_dimension> &mesh_2);
-
-template
-std::list<std::pair<DoFHandler<deal_II_dimension>::cell_iterator,
-                    DoFHandler<deal_II_dimension>::cell_iterator> >
-GridTools::
-get_finest_common_cells (const DoFHandler<deal_II_dimension> &mesh_1,
-                         const DoFHandler<deal_II_dimension> &mesh_2);
-
-template
-std::list<std::pair<hp::DoFHandler<deal_II_dimension>::cell_iterator,
-                    hp::DoFHandler<deal_II_dimension>::cell_iterator> >
-GridTools::
-get_finest_common_cells (const hp::DoFHandler<deal_II_dimension> &mesh_1,
-                         const hp::DoFHandler<deal_II_dimension> &mesh_2);
-
-template
-std::list<std::pair<MGDoFHandler<deal_II_dimension>::cell_iterator,
-                    MGDoFHandler<deal_II_dimension>::cell_iterator> >
-GridTools::
-get_finest_common_cells (const MGDoFHandler<deal_II_dimension> &mesh_1,
-                         const MGDoFHandler<deal_II_dimension> &mesh_2);
-
-
-template
-bool
-GridTools::have_same_coarse_mesh (const Triangulation<deal_II_dimension> &mesh_1,
-                                  const Triangulation<deal_II_dimension> &mesh_2);
-
-template
-bool
-GridTools::have_same_coarse_mesh (const DoFHandler<deal_II_dimension> &mesh_1,
-                                  const DoFHandler<deal_II_dimension> &mesh_2);
-
-template
-bool
-GridTools::have_same_coarse_mesh (const hp::DoFHandler<deal_II_dimension> &mesh_1,
-                                  const hp::DoFHandler<deal_II_dimension> &mesh_2);
-
-template
-bool
-GridTools::have_same_coarse_mesh (const MGDoFHandler<deal_II_dimension> &mesh_1,
-                                  const MGDoFHandler<deal_II_dimension> &mesh_2);
-
-template
 double
 GridTools::minimal_cell_diameter (const Triangulation<deal_II_dimension> &triangulation);
 
@@ -1417,6 +1284,8 @@ void
 GridTools::create_union_triangulation (const Triangulation<deal_II_dimension> &triangulation_1,
 				       const Triangulation<deal_II_dimension> &triangulation_2,
 				       Triangulation<deal_II_dimension>       &result);
+
+#include "grid_tools.inst"
 
 DEAL_II_NAMESPACE_CLOSE
 

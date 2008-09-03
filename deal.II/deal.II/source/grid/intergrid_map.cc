@@ -2,7 +2,7 @@
 //    $Id$
 //    Version: $Name$
 //
-//    Copyright (C) 1999, 2000, 2001, 2002, 2003, 2004, 2005, 2006 by the deal.II authors
+//    Copyright (C) 1999, 2000, 2001, 2002, 2003, 2004, 2005, 2006, 2008 by the deal.II authors
 //
 //    This file is subject to QPL and may not be  distributed
 //    without copyright and license information. Please refer
@@ -236,11 +236,7 @@ InterGridMap<GridClass>::memory_consumption () const
 
   
 // explicit instantiations
-template class InterGridMap<Triangulation<deal_II_dimension> >;
-template class InterGridMap<DoFHandler<deal_II_dimension> >;
-
-template class InterGridMap<hp::DoFHandler<deal_II_dimension> >;
-template class InterGridMap<MGDoFHandler<deal_II_dimension> >;
+#include "intergrid_map.inst"
 
 DEAL_II_NAMESPACE_CLOSE
 

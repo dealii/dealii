@@ -19,3 +19,12 @@ SERIAL_VECTORS := { Vector<double>;
 		    @DEAL_II_EXPAND_TRILINOS_BLOCKVECTOR@;
 		    @DEAL_II_EXPAND_PETSC_BLOCKVECTOR@;
                   }
+
+DOFHANDLERS := { DoFHandler<deal_II_dimension>;
+                 hp::DoFHandler<deal_II_dimension>;
+		 MGDoFHandler<deal_II_dimension> }
+
+TRIANGULATION_AND_DOFHANDLERS := { Triangulation<deal_II_dimension>;
+                                   DoFHandler<deal_II_dimension>;
+                                   hp::DoFHandler<deal_II_dimension>;
+		                   MGDoFHandler<deal_II_dimension> }
