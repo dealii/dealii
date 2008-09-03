@@ -51,7 +51,7 @@ a condition of the form
 $
 k\le \min_K \min \left\{
   \frac{c_k^a h_K}{\|\mathbf{u}\|_{L^\infty(K)}},
-  \frac{c_k^d h_K^2}{\beta \|mathbf{u}\|_{L^\infty(K)} h_K}\right\}
+  \frac{c_k^d h_K^2}{\beta \|\mathbf{u}\|_{L^\infty(K)} h_K}\right\}
   =
   \min_K \left( \min \left\{
   c_k^a,
@@ -271,5 +271,5 @@ despite the penalty we pay in terms of smaller time steps.
 
 <h3> Possible extensions </h3>
 
-Parallelization -> step-33
+Parallelization -> @ref step_32 "step-32"
 
