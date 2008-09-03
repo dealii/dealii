@@ -1417,66 +1417,57 @@ AC_DEFUN(DEAL_II_DETERMINE_F77_BRAND, dnl
           AC_MSG_RESULT(F77 compiler is egcs-1.1)
           F77_VERSION=egcs1.1
           ;;
-        *2.95*)
+        *version\ 2.95*)
           AC_MSG_RESULT(F77 compiler is gcc-2.95)
   	  F77_VERSION=gcc2.95
   	  ;;
-        *2.96*)
+        *version\ 2.96*)
   	  AC_MSG_RESULT(F77 compiler is gcc-2.96)
   	  F77_VERSION=gcc2.96
   	  ;;
-        *2.97*)
+        *version\ 2.97*)
   	  AC_MSG_RESULT(F77 compiler is gcc-2.97)
   	  F77_VERSION=gcc2.97
   	  ;;
-        *3.0*)
+        *version\ 3.0*)
   	  AC_MSG_RESULT(F77 compiler is gcc-3.0)
   	  F77_VERSION=gcc3.0
   	  ;;
-        *3.1*)
+        *version\ 3.1*)
   	  AC_MSG_RESULT(F77 compiler is gcc-3.1)
   	  F77_VERSION=gcc3.1
   	  ;;
-        *3.2*)
+        *version\ 3.2*)
   	  AC_MSG_RESULT(F77 compiler is gcc-3.2)
   	  F77_VERSION=gcc3.2
   	  ;;
-        *3.3*)
+        *version\ 3.3*)
   	  AC_MSG_RESULT(F77 compiler is gcc-3.3)
   	  F77_VERSION=gcc3.3
   	  ;;
-        *3.4*)
+        *version\ 3.4*)
   	  AC_MSG_RESULT(F77 compiler is gcc-3.4)
   	  F77_VERSION=gcc3.4
   	  ;;
-        *3.5*)
+        *version\ 3.5*)
   	  AC_MSG_RESULT(F77 compiler is gcc-3.5)
   	  F77_VERSION=gcc3.5
   	  ;;
-        *4.0*)
+        *version\ 4.0*)
   	  AC_MSG_RESULT(F77 compiler is gcc-4.0)
   	  F77_VERSION=gcc4.0
   	  ;;
-        *4.1*)
+        *version\ 4.1*)
   	  AC_MSG_RESULT(F77 compiler is gcc-4.1)
   	  F77_VERSION=gcc4.1
   	  ;;
-        *4.2*)
+        *version\ 4.2*)
   	  AC_MSG_RESULT(F77 compiler is gcc-4.2)
   	  F77_VERSION=gcc4.2
   	  ;;
-        *4.3*)
+        *version\ 4.3*)
   	  AC_MSG_RESULT(F77 compiler is gcc-4.3)
   	  F77_VERSION=gcc4.3
-  	  ;;
-        *2.4* | *2.5* | *2.6* | *2.7* | *2.8*)
-  	  dnl These compilers are too old to support a useful subset
-  	  dnl of modern C++, so we don't support them. gcc2.7.2 is 
-	  dnl probably the only one that around on reasonably modern
-	  dnl systems these times, but maybe someone tries to run
-	  dnl deal.II on really old systems?
-  	  AC_MSG_RESULT(F77 compiler is $G77_VERSION_STRING)
-  	  AC_MSG_ERROR(F77 compiler is not supported)
   	  ;;
         *)
   	  AC_MSG_RESULT(F77 compiler is unknown but accepted gcc version)
