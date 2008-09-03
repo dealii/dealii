@@ -92,19 +92,19 @@ bilinear elements (<code>temperature_degree=1</code>) in 2d:
 <table align="center" border="1" cellspacing="3" cellpadding="3">
   <tr>
     <td>
-        @image html "step-33.timestep.q1.beta=0.01.png" "" width=4cm
+        @image html "step-31.timestep.q1.beta=0.01.png" "" width=4cm
     </td>
     <td>
-        @image html "step-33.timestep.q1.beta=0.03.png" "" width=4cm
+        @image html "step-31.timestep.q1.beta=0.03.png" "" width=4cm
     </td>
   </tr>
 
   <tr>
     <td>
-        @image html "step-33.timestep.q1.beta=0.1.png" "" width=4cm
+        @image html "step-31.timestep.q1.beta=0.1.png" "" width=4cm
     </td>
     <td>
-        @image html "step-33.timestep.q1.beta=0.5.png" "" width=4cm
+        @image html "step-31.timestep.q1.beta=0.5.png" "" width=4cm
     </td>
   </tr>
 </table>
@@ -169,16 +169,16 @@ retain the $Q_2/Q_1$ stable Taylor-Hood element for the Stokes system:
 <table align="center" border="1" cellspacing="3" cellpadding="3">
   <tr>
     <td>
-        @image html "step-33.timestep.q2.beta=0.01.png" "" width=4cm
+        @image html "step-31.timestep.q2.beta=0.01.png" "" width=4cm
     </td>
     <td>
-        @image html "step-33.timestep.q2.beta=0.03.png" "" width=4cm
+        @image html "step-31.timestep.q2.beta=0.03.png" "" width=4cm
     </td>
   </tr>
 
   <tr>
     <td>
-        @image html "step-33.timestep.q2.beta=0.1.png" "" width=4cm
+        @image html "step-31.timestep.q2.beta=0.1.png" "" width=4cm
     </td>
   </tr>
 </table>
