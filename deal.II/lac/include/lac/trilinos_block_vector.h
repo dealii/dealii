@@ -291,7 +291,14 @@ namespace TrilinosWrappers
     BlockVector &
     BlockVector::operator = (const BlockVector &v)
     {
-      BaseClass::operator = (v);
+      if (this->n_blocks() != v.n_blocks())
+	reinit(v.n_blocks());
+
+      for (unsigned int i=0; i<this->n_blocks(); ++i)
+	this->block(i) = v.block(i);
+
+      collect_sizes();
+	
       return *this;
     }
 
@@ -338,6 +345,8 @@ namespace TrilinosWrappers
   
       for (unsigned int i=0;i<this->n_blocks();++i)
         block(i).reinit(v.block(i), fast);
+      
+      collect_sizes();
     }
 
 

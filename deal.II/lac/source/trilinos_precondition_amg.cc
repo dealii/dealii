@@ -46,6 +46,7 @@ namespace TrilinosWrappers
   initialize (const SparseMatrix                    &matrix,
 	      const bool                             elliptic,
 	      const bool                             higher_order_elements,
+	      const double                           aggregation_threshold,
 	      const std::vector<std::vector<bool> > &null_space,
 	      const bool                             output_details)
   {
@@ -68,7 +69,7 @@ namespace TrilinosWrappers
 	parameter_list.set("aggregation: block scaling", true);
       }
   
-    parameter_list.set("aggregation: threshold", 1e-8);
+    parameter_list.set("aggregation: threshold", aggregation_threshold);
     
     if (output_details)
       parameter_list.set("ML output", 10);
@@ -114,6 +115,7 @@ namespace TrilinosWrappers
   initialize (const ::dealii::SparseMatrix<double>  &deal_ii_sparse_matrix,
 	      const bool                             elliptic,
 	      const bool                             higher_order_elements,
+	      const double                           aggregation_threshold,
 	      const std::vector<std::vector<bool> > &null_space,
 	      const bool                             output_details)
   {
@@ -130,8 +132,8 @@ namespace TrilinosWrappers
     Matrix->reinit (*Map, deal_ii_sparse_matrix);
     Matrix->compress();
 
-    initialize (*Matrix, elliptic, higher_order_elements, null_space,
-		output_details);
+    initialize (*Matrix, elliptic, higher_order_elements, 
+		aggregation_threshold, null_space, output_details);
   }
   
   

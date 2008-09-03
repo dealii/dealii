@@ -1124,7 +1124,7 @@ BoussinesqFlowProblem<dim>::build_stokes_preconditioner ()
   DoFTools::extract_constant_modes (stokes_dof_handler, velocity_components, 
 				    null_space);
   Amg_preconditioner->initialize(stokes_preconditioner_matrix.block(0,0),
-				 true, true, null_space, false);
+				 true, true, 5e-2, null_space, false);
 
 				   // TODO: we could throw away the (0,0)
 				   // block here since things have been
@@ -1798,7 +1798,6 @@ void BoussinesqFlowProblem<dim>::solve ()
     SolverGMRES<TrilinosWrappers::BlockVector> gmres(solver_control,
       SolverGMRES<TrilinosWrappers::BlockVector >::AdditionalData(100));
 
-    //stokes_solution = 0;
     gmres.solve(stokes_matrix, stokes_solution, stokes_rhs, preconditioner);
 
     std::cout << "   "
@@ -1972,16 +1971,20 @@ void BoussinesqFlowProblem<dim>::refine_mesh (const unsigned int max_grid_level)
 	 cell != triangulation.end(); ++cell)
       cell->clear_refine_flag ();
   
-  std::vector<TrilinosWrappers::Vector> x_solution (2);
-  x_solution[0].reinit (temperature_solution);
-  x_solution[0] = temperature_solution;
-  x_solution[1].reinit (temperature_solution);
-  x_solution[1] = old_temperature_solution;
+  std::vector<TrilinosWrappers::Vector> x_temperature (2);
+  x_temperature[0].reinit (temperature_solution);
+  x_temperature[0] = temperature_solution;
+  x_temperature[1].reinit (temperature_solution);
+  x_temperature[1] = old_temperature_solution;
+  TrilinosWrappers::BlockVector x_stokes(2);
+  x_stokes = stokes_solution;
 
-  SolutionTransfer<dim,TrilinosWrappers::Vector> soltrans(temperature_dof_handler);
+  SolutionTransfer<dim,TrilinosWrappers::Vector> temperature_trans(temperature_dof_handler);
+  SolutionTransfer<dim,TrilinosWrappers::BlockVector> stokes_trans(stokes_dof_handler);
 
   triangulation.prepare_coarsening_and_refinement();
-  soltrans.prepare_for_coarsening_and_refinement(x_solution);
+  temperature_trans.prepare_for_coarsening_and_refinement(x_temperature);
+  stokes_trans.prepare_for_coarsening_and_refinement(x_stokes);
 
   triangulation.execute_coarsening_and_refinement ();
   setup_dofs ();
@@ -1989,10 +1992,12 @@ void BoussinesqFlowProblem<dim>::refine_mesh (const unsigned int max_grid_level)
   std::vector<TrilinosWrappers::Vector> tmp (2);
   tmp[0].reinit (temperature_solution);
   tmp[1].reinit (temperature_solution);
-  soltrans.interpolate(x_solution, tmp);
+  temperature_trans.interpolate(x_temperature, tmp);
 
   temperature_solution = tmp[0];
   old_temperature_solution = tmp[1];
+  
+  stokes_trans.interpolate (x_stokes, stokes_solution);
 
   rebuild_stokes_matrix         = true;
   rebuild_temperature_matrices  = true;

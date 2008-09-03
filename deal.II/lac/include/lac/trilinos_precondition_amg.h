@@ -100,6 +100,7 @@ namespace TrilinosWrappers
       void initialize (const SparseMatrix                    &matrix,
 		       const bool                             elliptic = true,
 		       const bool                             higher_order_elements = false,
+		       const double                           aggregation_threshold = 1e-4,
 		       const std::vector<std::vector<bool> > &null_space = std::vector<std::vector<bool> > (),
 		       const bool                            output_details = false);
 
@@ -117,6 +118,7 @@ namespace TrilinosWrappers
       void initialize (const ::dealii::SparseMatrix<double>  &deal_ii_sparse_matrix,
 		       const bool                             elliptic = true,
 		       const bool                             higher_order_elements = false,
+		       const double                           aggregation_threshold = 1e-4,
 		       const std::vector<std::vector<bool> > &null_space = std::vector<std::vector<bool> > (),
 		       const bool                            output_details = false);
 
