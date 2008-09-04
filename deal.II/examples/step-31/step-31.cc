@@ -435,7 +435,7 @@ namespace LinearSolvers
 		  stokes_matrix           (&S),
 		  m_inverse               (&Mpinv),
 		  a_preconditioner        (Apreconditioner),
-		  tmp                     (stokes_matrix->block(1,1).row_map)
+		  tmp                     (stokes_matrix->block(1,1).matrix->RowMap())
   {}
 
 
