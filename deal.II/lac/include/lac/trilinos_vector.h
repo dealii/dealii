@@ -329,7 +329,7 @@ namespace TrilinosWrappers
       Vector ();
                                        /**
                                         * One of the constructors that
-				        * actually build a vector. This
+				        * actually builds a vector. This
 				        * one requires prior knowledge
                                         * of the size of the vector and
 				        * a communicator from 
@@ -341,16 +341,17 @@ namespace TrilinosWrappers
 				        * from the beginning to the end, 
 				        * so you might want to use some
 				        * more advanced mapping and the
-				        * third constructor with argument
+				        * constructor with argument
 				        * Epetra_Map.
                                         */
       Vector (unsigned int GlobalSize, Epetra_Comm &Comm);
 
                                        /**
-				        * Third constructor. It takes an
+				        * This constructor takes an
 				        * Epetra_Map that already knows how
 				        * to distribute the individual 
-				        * components among the MPI processors.
+				        * components among the MPI processors,
+				        * including the size of the vector.
                                         */
       Vector (const Epetra_Map &InputMap);
 
@@ -358,7 +359,7 @@ namespace TrilinosWrappers
                                         * Copy constructor. Sets the dimension
                                         * to that of the given vector and uses
 				        * the map of that vector, but
-                                        * does not copies any element. Instead,
+                                        * does not copy any element. Instead,
 				        * the memory will remain untouched
 				        * in case <tt>fast</tt> is false and
 				        * initialized with zero otherwise.
@@ -490,8 +491,7 @@ namespace TrilinosWrappers
 					* a pair (i,i+n), where
 					* <tt>n=local_size()</tt>.
 					*/
-      std::pair<unsigned int, unsigned int>
-      local_range () const;
+      std::pair<unsigned int, unsigned int> local_range () const;
 
 				       /**
 					* Return whether @p index is
@@ -545,8 +545,8 @@ namespace TrilinosWrappers
 				        * function takes a deal.II vector
 				        * of values.
 				        */
-      void set (const std::vector<unsigned int>      &indices,
-		const dealii::Vector<TrilinosScalar> &values);
+      void set (const std::vector<unsigned int>        &indices,
+		const ::dealii::Vector<TrilinosScalar> &values);
 
                                        /**
 				        * This collective set operation is
@@ -567,16 +567,30 @@ namespace TrilinosWrappers
 					* stored in @p values to the vector
 					* components specified by @p indices.
                                         */
-      void add (const std::vector<unsigned int> &indices,
-		const std::vector<TrilinosScalar>  &values);
+      void add (const std::vector<unsigned int>   &indices,
+		const std::vector<TrilinosScalar> &values);
 
+				       /**
+				        * This is a second collective add 
+				        * operation. As a difference, this
+				        * function takes a deal.II vector
+				        * of values.
+				        */
+      void add (const std::vector<unsigned int>        &indices,
+		const ::dealii::Vector<TrilinosScalar> &values);
+
+				      /**
+				       * Take an address where n_elements
+				       * are stored contiguously and add
+				       * them into the vector.
+				       */
       void add (const unsigned int    n_elements,
 		const unsigned int   *indices,
 		const TrilinosScalar *values);
 
                                        /**
-                                        * Return the scalar/inner product of two
-                                        * vectors. The vectors must have the
+                                        * Return the scalar (inner) product of
+                                        * two vectors. The vectors must have the
                                         * same size.
                                         */
       TrilinosScalar operator * (const Vector &vec) const;
@@ -673,7 +687,7 @@ namespace TrilinosWrappers
 
                                        /**
                                         * Simple vector addition, equal to the
-                                        * <tt>operator =</tt>.
+                                        * <tt>operator +=</tt>.
                                         */
       void add (const Vector &V);
 
@@ -865,6 +879,7 @@ namespace TrilinosWrappers
       std::auto_ptr<Epetra_FEVector> vector;
 
 
+    private:
                                        /**
                                         * Trilinos doesn't allow to mix additions
                                         * to matrix entries and overwriting

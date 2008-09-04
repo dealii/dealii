@@ -95,7 +95,7 @@ namespace TrilinosWrappers
   {
     vector.reset();
     map = input_map;
-    
+
     vector = std::auto_ptr<Epetra_FEVector> (new Epetra_FEVector(input_map));
     last_action = Insert;
   }
@@ -107,10 +107,10 @@ namespace TrilinosWrappers
 		  const bool    fast)
   {
     vector.reset();
-    
+
     if (!map.SameAs(v.map))
       map = v.map;
-    
+
     vector = std::auto_ptr<Epetra_FEVector> (new Epetra_FEVector(v.map,!fast));
     last_action = Insert;
   }
@@ -151,7 +151,8 @@ namespace TrilinosWrappers
   {
 
     Assert (numbers::is_finite(s),
-	    ExcMessage("The given value is not finite but either infinite or Not A Number (NaN)"));
+	    ExcMessage("The given value is not finite but either "
+		       "infinite or Not A Number (NaN)"));
 
     const int ierr = vector->PutScalar(s);
 
@@ -169,7 +170,8 @@ namespace TrilinosWrappers
             ExcDimensionMismatch(size(), v.size()));
     unsigned int i;
     for (i=0; i<size(); i++) 
-      if ((*(v.vector))[i]!=(*vector)[i]) return false;
+      if ((*(v.vector))[0][i]!=(*vector)[0][i]) return false;
+
     return true;
   }
 
@@ -227,9 +229,10 @@ namespace TrilinosWrappers
       }
     else
       value = (*vector)[0][trilinos_i];
-    
+
     return value;
   }
+
 
 
   void
@@ -237,12 +240,25 @@ namespace TrilinosWrappers
 	       const std::vector<TrilinosScalar>  &values)
   {
     Assert (indices.size() == values.size(),
-	    ExcMessage ("Function called with arguments of different sizes"));
-    
+	    ExcDimensionMismatch(indices.size(),values.size()));
+
     set (indices.size(), &indices[0], &values[0]);
   }
 
-  
+
+
+  void
+  Vector::set (const std::vector<unsigned int>        &indices,
+	       const ::dealii::Vector<TrilinosScalar> &values)
+  {
+    Assert (indices.size() == values.size(),
+	    ExcDimensionMismatch(indices.size(),values.size()));
+
+    set (indices.size(), &indices[0], values.begin());
+  }
+
+
+
   void
   Vector::set (const unsigned int    n_elements,
 	       const unsigned int   *indices,
@@ -261,19 +277,31 @@ namespace TrilinosWrappers
   }
 
 
-  
+
   void
   Vector::add (const std::vector<unsigned int>    &indices,
 	       const std::vector<TrilinosScalar>  &values)
   {
     Assert (indices.size() == values.size(),
-	    ExcMessage ("Function called with arguments of different sizes"));
-    
+	    ExcDimensionMismatch(indices.size(),values.size()));
+
     add (indices.size(), &indices[0], &values[0]);
   }
 
-  
-  
+
+
+  void
+  Vector::add (const std::vector<unsigned int>        &indices,
+	       const ::dealii::Vector<TrilinosScalar> &values)
+  {
+    Assert (indices.size() == values.size(),
+	    ExcDimensionMismatch(indices.size(),values.size()));
+
+    add (indices.size(), &indices[0], values.begin());
+  }
+
+
+
   void
   Vector::add (const unsigned int    n_elements,
 	       const unsigned int   *indices,
@@ -321,11 +349,9 @@ namespace TrilinosWrappers
   TrilinosScalar
   Vector::mean_value () const
   {
-
     TrilinosScalar mean;
-    int ierr;
 
-    ierr = vector->MeanValue (&mean);
+    const int ierr = vector->MeanValue (&mean);
     AssertThrow (ierr == 0, ExcTrilinosError(ierr));
 
     return mean;
