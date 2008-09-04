@@ -1539,7 +1539,6 @@ int main (int argc, char *argv[])
   (void)argv;
 #endif
 
-  sleep (20);
   try
     {
       deallog.depth_console (0);
