@@ -20,7 +20,6 @@
 #include <base/logstream.h>
 #include <base/function.h>
 #include <base/utilities.h>
-#include <base/timer.h>
 
 #include <lac/full_matrix.h>
 #include <lac/solver_gmres.h>
@@ -1792,7 +1791,6 @@ void BoussinesqFlowProblem<dim>::solve ()
 				   // be used for the solution of the
 				   // blocked system.
   {
-    Timer computing_timer;
 				     // Set up inverse matrix for
 				     // pressure mass matrix
     LinearSolvers::InverseMatrix<TrilinosWrappers::SparseMatrix,
@@ -1815,10 +1813,9 @@ void BoussinesqFlowProblem<dim>::solve ()
 
     std::cout << "   "
               << solver_control.last_step()
-              << " GMRES iterations for Stokes subsystem in "
-	      << computing_timer() << " s."
+              << " GMRES iterations for Stokes subsystem."
               << std::endl;
-	      
+
 				     // Produce a constistent solution
 				     // field (we can't do this on the 'up'
 				     // vector since it does not have the
