@@ -83,7 +83,7 @@ namespace TrilinosWrappers
                                           * as to only allow the actual vector
                                           * class to create it.
                                           */
-        VectorReference (Vector  &vector,
+        VectorReference (Vector            &vector,
                          const unsigned int index);
 
       public:
@@ -862,6 +862,7 @@ namespace TrilinosWrappers
 		      << " are stored locally and can be accessed.");
 
 
+    private:
                                        /**
                                         * An Epetra map used to map vector data
                                         * accross multiple processes. This is
@@ -871,16 +872,7 @@ namespace TrilinosWrappers
                                         */
       Epetra_Map map;
 
-                                       /**
-                                        * An Epetra distibuted vector type.
-                                        * Requires an existing Epetra_Map for
-                                        * storing data.
-                                        */
-      std::auto_ptr<Epetra_FEVector> vector;
-
-
-    private:
-                                       /**
+				       /**
                                         * Trilinos doesn't allow to mix additions
                                         * to matrix entries and overwriting
                                         * them (to make synchronisation of
@@ -901,6 +893,17 @@ namespace TrilinosWrappers
 				        * or an insertion.
                                         */
       Epetra_CombineMode last_action;
+
+    public:
+                                       /**
+                                        * An Epetra distibuted vector type.
+                                        * Requires an existing Epetra_Map for
+                                        * storing data.
+				        * TODO: Should become private at some
+				        * point.
+                                        */
+      std::auto_ptr<Epetra_FEVector> vector;
+
 
                                        /**
                                         * Make the reference class a friend.

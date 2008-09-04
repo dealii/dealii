@@ -175,11 +175,11 @@ namespace TrilinosWrappers
   void PreconditionAMG::vmult (dealii::Vector<double>       &dst,
 			       const dealii::Vector<double> &src) const
   {
-    Assert (Map->SameAs(Matrix->row_map),
+    Assert (Map->SameAs(Matrix->matrix->RowMap()),
 	    ExcMessage("The sparse matrix given to the preconditioner uses "
 		       "a map that is not compatible. Check ML preconditioner "
 		       "setup."));
-    Assert (Map->SameAs(Matrix->col_map),
+    Assert (Map->SameAs(Matrix->matrix->RowMap()),
 	    ExcMessage("The sparse matrix given to the preconditioner uses "
 		       "a map that is not compatible. Check ML preconditioner "
 		       "setup."));

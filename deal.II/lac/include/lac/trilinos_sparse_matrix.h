@@ -1093,9 +1093,10 @@ namespace TrilinosWrappers
 		      int, int,
 		      << "You tried to access element (" << arg1
 		      << "/" << arg2 << ")"
-		      << " of a sparse matrix, but it appears to not "
+		      << " of a sparse matrix, but it appears to not"
 		      << " exist in the Trilinos sparsity pattern.");
 
+    private:
                                        /**
 				        * Epetra Trilinos mapping of the 
 				        * matrix rows that
@@ -1115,18 +1116,6 @@ namespace TrilinosWrappers
 				        */
       Epetra_Map col_map;
 
-                                       /**
-                                        * A sparse matrix object in
-                                        * Trilinos to be used for 
-				        * finite element based problems
-				        * which allows for assembling into
-				        * non-local elements. 
-				        * The actual type, a sparse
-                                        * matrix, is set in the constructor.
-                                        */
-      std::auto_ptr<Epetra_FECrsMatrix> matrix;
-
-    protected:
                                        /**
                                         * Trilinos doesn't allow to mix additions
                                         * to matrix entries and overwriting
@@ -1148,6 +1137,19 @@ namespace TrilinosWrappers
 				        * or an insertion.
                                         */
       Epetra_CombineMode last_action;
+
+    public:
+                                       /**
+                                        * A sparse matrix object in
+                                        * Trilinos to be used for 
+				        * finite element based problems
+				        * which allows for assembling into
+				        * non-local elements. 
+				        * The actual type, a sparse
+                                        * matrix, is set in the constructor.
+                                        */
+      std::auto_ptr<Epetra_FECrsMatrix> matrix;
+
   };
 
 

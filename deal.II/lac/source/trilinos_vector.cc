@@ -51,26 +51,26 @@ namespace TrilinosWrappers
 #else
 		  map (0,0,Epetra_SerialComm()),
 #endif
+                  last_action (Insert),
 		  vector(std::auto_ptr<Epetra_FEVector> 
-			 (new Epetra_FEVector(map))),
-                  last_action (Insert)
+			 (new Epetra_FEVector(map)))
   {}
 
   Vector::Vector (unsigned int GlobalSize, Epetra_Comm &Comm)
                   :
 		  map (GlobalSize, 0, Comm),
+                  last_action (Insert),
 		  vector (std::auto_ptr<Epetra_FEVector> 
-			  (new Epetra_FEVector(map))),
-                  last_action (Insert)
+			  (new Epetra_FEVector(map)))
   {}
 
   
   Vector::Vector (const Epetra_Map &InputMap)
                   :
 		  map (InputMap),
+                  last_action (Insert),
 		  vector (std::auto_ptr<Epetra_FEVector> 
-			  (new Epetra_FEVector(map))),
-                  last_action (Insert)
+			  (new Epetra_FEVector(map)))
   {}
   
   
@@ -78,9 +78,9 @@ namespace TrilinosWrappers
 		  const bool    fast)
                   :
 		  map (v.map),
+                  last_action (Insert),
 		  vector(std::auto_ptr<Epetra_FEVector> 
-			 (new Epetra_FEVector(v.map,!fast))),
-                  last_action (Insert)
+			 (new Epetra_FEVector(v.map,!fast)))
   {}
   
 

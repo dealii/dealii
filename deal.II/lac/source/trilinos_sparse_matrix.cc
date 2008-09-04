@@ -85,9 +85,9 @@ namespace TrilinosWrappers
 		  row_map (0, 0, Epetra_SerialComm()),
 #endif
 		  col_map (row_map),
+		  last_action (Insert),
 		  matrix (std::auto_ptr<Epetra_FECrsMatrix>
-				(new Epetra_FECrsMatrix(Copy, row_map, 0))),
-		  last_action (Insert)
+				(new Epetra_FECrsMatrix(Copy, row_map, 0)))
   {}
 
   SparseMatrix::SparseMatrix (const Epetra_Map  &InputMap,
@@ -95,10 +95,10 @@ namespace TrilinosWrappers
 		  :
 		  row_map (InputMap),
 		  col_map (row_map),
+		  last_action (Insert),
 		  matrix (std::auto_ptr<Epetra_FECrsMatrix>
 				(new Epetra_FECrsMatrix(Copy, row_map, 
-					int(n_max_entries_per_row), false))),
-		  last_action (Insert)
+					int(n_max_entries_per_row), false)))
   {}
 
   SparseMatrix::SparseMatrix (const Epetra_Map  &InputMap,
@@ -106,11 +106,11 @@ namespace TrilinosWrappers
 		  :
 		  row_map (InputMap),
 		  col_map (row_map),
+		  last_action (Insert),
 		  matrix (std::auto_ptr<Epetra_FECrsMatrix>
 		    (new Epetra_FECrsMatrix(Copy, row_map, 
 		      (int*)const_cast<unsigned int*>(&(n_entries_per_row[0])),
-		      true))),
-		  last_action (Insert)
+		      true)))
   {}
 
   SparseMatrix::SparseMatrix (const Epetra_Map  &InputRowMap,
@@ -119,10 +119,10 @@ namespace TrilinosWrappers
 		  :
 		  row_map (InputRowMap),
 		  col_map (InputColMap),
+		  last_action (Insert),
 		  matrix (std::auto_ptr<Epetra_FECrsMatrix>
 				(new Epetra_FECrsMatrix(Copy, row_map, col_map, 
-					int(n_max_entries_per_row), false))),
-		  last_action (Insert)
+					int(n_max_entries_per_row), false)))
   {}
 
   SparseMatrix::SparseMatrix (const Epetra_Map  &InputRowMap,
@@ -131,11 +131,11 @@ namespace TrilinosWrappers
 		  :
 		  row_map (InputRowMap),
 		  col_map (InputColMap),
+		  last_action (Insert),
 		  matrix (std::auto_ptr<Epetra_FECrsMatrix>
 		    (new Epetra_FECrsMatrix(Copy, row_map, col_map, 
 		      (int*)const_cast<unsigned int*>(&(n_entries_per_row[0])),
-		      true))),
-		  last_action (Insert)
+		      true)))
   {}
 
 
@@ -160,44 +160,48 @@ namespace TrilinosWrappers
   {
     unsigned int n_rows = sparsity_pattern.n_rows();
 
-    Assert (matrix->NumGlobalRows() == (int)sparsity_pattern.n_rows(),
-	    ExcDimensionMismatch (matrix->NumGlobalRows(),
-				  sparsity_pattern.n_rows()));
-
-				     // Trilinos seems to have a bug for
-				     // rectangular matrices at this point,
-				     // so do not check for consistent 
-				     // column numbers here.
-				     //
-				     //
-				     // this bug is filed in the Sandia
-				     // bugzilla under #4123 and should be
-				     // fixed for version 9.0
-//    Assert (matrix->NumGlobalCols() == (int)sparsity_pattern.n_cols(),
-//	    ExcDimensionMismatch (matrix->NumGlobalCols(),
-//				  sparsity_pattern.n_cols()));
-
-    std::vector<int> n_entries_per_row(n_rows);
-
-    for (unsigned int row=0; row<n_rows; ++row)
-      n_entries_per_row[(int)row] = sparsity_pattern.row_length(row);
-
-    std::vector<double> values;
-    std::vector<int>    row_indices;
-
-    for (unsigned int row=0; row<n_rows; ++row)
+    if (row_map.Comm().MyPID() == 0)
       {
-	const int row_length = sparsity_pattern.row_length(row);
-	row_indices.resize (row_length, 0);
-	values.resize (row_length, 0.);
-	
-	for (int col=0; col< row_length; ++col)
-	  row_indices[col] = sparsity_pattern.column_number (row, col);
-	
-	matrix->InsertGlobalValues(row, row_length,
-				  &values[0], &row_indices[0]);
+	Assert (matrix->NumGlobalRows() == (int)sparsity_pattern.n_rows(),
+		ExcDimensionMismatch (matrix->NumGlobalRows(),
+				      sparsity_pattern.n_rows()));
+    
+					// Trilinos seems to have a bug for
+					// rectangular matrices at this point,
+					// so do not check for consistent 
+					// column numbers here.
+					//
+					//
+					// this bug is filed in the Sandia
+					// bugzilla under #4123 and should be
+					// fixed for version 9.0
+//        Assert (matrix->NumGlobalCols() == (int)sparsity_pattern.n_cols(),
+//		ExcDimensionMismatch (matrix->NumGlobalCols(),
+//				      sparsity_pattern.n_cols()));
+
+	std::vector<int> n_entries_per_row(n_rows);
+    
+	for (unsigned int row=0; row<n_rows; ++row)
+	  n_entries_per_row[(int)row] = sparsity_pattern.row_length(row);
+    
+	std::vector<double> values;
+	std::vector<int>    row_indices;
+    
+	for (unsigned int row=0; row<n_rows; ++row)
+	  {
+	    const int row_length = sparsity_pattern.row_length(row);
+	    row_indices.resize (row_length, 0);
+	    values.resize (row_length, 0.);
+	    
+	    for (int col=0; col< row_length; ++col)
+	      row_indices[col] = sparsity_pattern.column_number (row, col);
+	    
+	    matrix->InsertGlobalValues(row, row_length,
+				      &values[0], &row_indices[0]);
+	  }
       }
 
+    compress();
 				  // In the end, the matrix needs to
 				  // be compressed in order to be
 				  // really ready. However, that is
@@ -229,12 +233,15 @@ namespace TrilinosWrappers
 
     unsigned int n_rows = sparsity_pattern.n_rows();
 
+    if (row_map.Comm().MyPID() == 0)
+    {
     Assert (input_row_map.NumGlobalElements() == (int)sparsity_pattern.n_rows(),
 	    ExcDimensionMismatch (input_row_map.NumGlobalElements(),
 				  sparsity_pattern.n_rows()));
     Assert (input_col_map.NumGlobalElements() == (int)sparsity_pattern.n_cols(),
 	    ExcDimensionMismatch (input_col_map.NumGlobalElements(),
 				  sparsity_pattern.n_cols()));
+    }
 
     row_map = input_row_map;
     col_map = input_col_map;
@@ -326,7 +333,7 @@ namespace TrilinosWrappers
 	const int n_row_entries = index;
 
 	matrix->InsertGlobalValues(row, n_row_entries,
-				  &values[0], &row_indices[0]);
+				   &values[0], &row_indices[0]);
       }
 
   }
@@ -730,9 +737,9 @@ namespace TrilinosWrappers
   {
     Assert (&src != &dst, ExcSourceEqualsDestination());
     
-    Assert (col_map.SameAs(src.map),
+    Assert (col_map.SameAs(src.vector->Map()),
 	    ExcMessage ("Column map of matrix does not fit with vector map!"));
-    Assert (row_map.SameAs(dst.map),
+    Assert (row_map.SameAs(dst.vector->Map()),
 	    ExcMessage ("Row map of matrix does not fit with vector map!"));
 
     if (!matrix->Filled())
@@ -750,9 +757,9 @@ namespace TrilinosWrappers
   {
     Assert (&src != &dst, ExcSourceEqualsDestination());
 
-    Assert (row_map.SameAs(src.map),
+    Assert (row_map.SameAs(src.vector->Map()),
 	    ExcMessage ("Row map of matrix does not fit with vector map!"));
-    Assert (col_map.SameAs(dst.map),
+    Assert (col_map.SameAs(dst.vector->Map()),
 	    ExcMessage ("Column map of matrix does not fit with vector map!"));
 
     if (!matrix->Filled())
@@ -795,7 +802,7 @@ namespace TrilinosWrappers
   TrilinosScalar
   SparseMatrix::matrix_norm_square (const Vector &v) const
   {
-    Vector tmp(v.map);
+    Vector tmp(v,true);
     vmult (tmp, v);
     return tmp*v;
   }
@@ -804,9 +811,9 @@ namespace TrilinosWrappers
 
   TrilinosScalar
   SparseMatrix::matrix_scalar_product (const Vector &u,
-				      const Vector &v) const
+				       const Vector &v) const
   {
-    Vector tmp(v.map);
+    Vector tmp(v,true);
     vmult (tmp, v);
     return u*tmp;
   }

@@ -95,12 +95,15 @@ namespace TrilinosWrappers
   {
     const unsigned int n_block_rows = input_maps.size();
 
-    Assert (n_block_rows == block_sparsity_pattern.n_block_rows(),
-	    ExcDimensionMismatch (n_block_rows,
-				  block_sparsity_pattern.n_block_rows()));
-    Assert (n_block_rows == block_sparsity_pattern.n_block_cols(),
-	    ExcDimensionMismatch (n_block_rows,
-				  block_sparsity_pattern.n_block_cols()));
+    if (input_maps[0].Comm().MyPID()==0)
+      {
+	Assert (n_block_rows == block_sparsity_pattern.n_block_rows(),
+		ExcDimensionMismatch (n_block_rows,
+				      block_sparsity_pattern.n_block_rows()));
+	Assert (n_block_rows == block_sparsity_pattern.n_block_cols(),
+		ExcDimensionMismatch (n_block_rows,
+				      block_sparsity_pattern.n_block_cols()));
+      }
 
 				     // Call the other basic reinit function ...
     reinit (n_block_rows, n_block_rows);
@@ -113,6 +116,8 @@ namespace TrilinosWrappers
           this->block(r,c).reinit(input_maps[r],input_maps[c],
 				  block_sparsity_pattern.block(r,c));
         }
+	
+    collect_sizes();
   }
 
 
@@ -144,6 +149,8 @@ namespace TrilinosWrappers
 				  dealii_block_sparse_matrix.block(r,c),
 				  drop_tolerance);
         }
+
+    collect_sizes();
   }
 
 

@@ -261,9 +261,6 @@ namespace LinearSolvers
       const SmartPointer<const InverseMatrix<TrilinosWrappers::SparseMatrix,
 					     PreconditionerMp > > m_inverse;
       const PreconditionerA &a_preconditioner;
-
-      mutable TrilinosWrappers::Vector tmp;
-
 };
 
 
@@ -276,8 +273,7 @@ namespace LinearSolvers
 		  :
 		  stokes_matrix           (&S),
 		  m_inverse               (&Mpinv),
-		  a_preconditioner        (Apreconditioner),
-		  tmp                     (stokes_matrix->block(1,1).row_map)
+		  a_preconditioner        (Apreconditioner)
   {}
 
   template <class PreconditionerA, class PreconditionerMp>
@@ -286,6 +282,7 @@ namespace LinearSolvers
     const TrilinosWrappers::BlockVector &src) const
   {
     a_preconditioner.vmult (dst.block(0), src.block(0));
+    TrilinosWrappers::Vector tmp (src.block(1), true);
     stokes_matrix->block(1,0).residual(tmp, dst.block(0), src.block(1));
     tmp *= -1;
     m_inverse->vmult (dst.block(1), tmp);
@@ -630,6 +627,8 @@ void BoussinesqFlowProblem<dim>::setup_dofs ()
   {
     stokes_matrix.clear ();
 
+    BlockSparsityPattern stokes_sparsity_pattern (2,2);
+
     if (trilinos_communicator.MyPID() == 0)
       {
 	BlockCompressedSetSparsityPattern csp (2,2);
@@ -653,13 +652,10 @@ void BoussinesqFlowProblem<dim>::setup_dofs ()
 	DoFTools::make_sparsity_pattern (stokes_dof_handler, coupling, csp);
 	stokes_constraints.condense (csp);
 
-	BlockSparsityPattern stokes_sparsity_pattern;
 	stokes_sparsity_pattern.copy_from (csp);
-
-	stokes_matrix.reinit (stokes_partitioner, stokes_sparsity_pattern);
       }
 
-    stokes_matrix.collect_sizes();
+    stokes_matrix.reinit (stokes_partitioner, stokes_sparsity_pattern);
   }
 
   {
@@ -667,6 +663,8 @@ void BoussinesqFlowProblem<dim>::setup_dofs ()
     Mp_preconditioner.reset ();
     stokes_preconditioner_matrix.clear ();
 
+    BlockSparsityPattern stokes_preconditioner_sparsity_pattern (2,2);
+    
     if (trilinos_communicator.MyPID() == 0)
       {
 	BlockCompressedSetSparsityPattern csp (2,2);
@@ -689,15 +687,14 @@ void BoussinesqFlowProblem<dim>::setup_dofs ()
 	DoFTools::make_sparsity_pattern (stokes_dof_handler, coupling, csp);
 	stokes_constraints.condense (csp);
 	
-	BlockSparsityPattern stokes_preconditioner_sparsity_pattern;
 	stokes_preconditioner_sparsity_pattern.copy_from (csp);
-
-	stokes_preconditioner_matrix.reinit (stokes_partitioner,
-				      stokes_preconditioner_sparsity_pattern);
       }
 
-    stokes_preconditioner_matrix.collect_sizes();
+    stokes_preconditioner_matrix.reinit (stokes_partitioner,
+				         stokes_preconditioner_sparsity_pattern);
+
   }
+  std::cout << " bla " << std::flush;
 
   temperature_partitioner = Epetra_Map (n_T, 0, trilinos_communicator);
   {
@@ -705,25 +702,23 @@ void BoussinesqFlowProblem<dim>::setup_dofs ()
     temperature_stiffness_matrix.clear ();
     temperature_matrix.clear ();
 
+    SparsityPattern temperature_sparsity_pattern;
+
     if (trilinos_communicator.MyPID() == 0)
       {
 	CompressedSetSparsityPattern csp (n_T, n_T);
 	DoFTools::make_sparsity_pattern (temperature_dof_handler, csp);
 	temperature_constraints.condense (csp);
 
-	SparsityPattern temperature_sparsity_pattern;
 	temperature_sparsity_pattern.copy_from (csp);
-
-	temperature_matrix.reinit (temperature_partitioner,
-				   temperature_sparsity_pattern);
-	temperature_mass_matrix.reinit (temperature_partitioner,
-					temperature_sparsity_pattern);
-	temperature_stiffness_matrix.reinit (temperature_partitioner,
-					     temperature_sparsity_pattern);
       }
-    temperature_matrix.compress();
-    temperature_mass_matrix.compress();
-    temperature_stiffness_matrix.compress();
+
+    temperature_matrix.reinit (temperature_partitioner,
+				temperature_sparsity_pattern);
+    temperature_mass_matrix.reinit (temperature_partitioner,
+				    temperature_sparsity_pattern);
+    temperature_stiffness_matrix.reinit (temperature_partitioner,
+					  temperature_sparsity_pattern);
   }
 
   stokes_solution.reinit (stokes_partitioner);
@@ -789,8 +784,8 @@ BoussinesqFlowProblem<dim>::assemble_stokes_preconditioner ()
 
 	cell->get_dof_indices (local_dof_indices);
 	stokes_constraints.distribute_local_to_global (local_matrix,
-						      local_dof_indices,
-						      stokes_preconditioner_matrix);
+						       local_dof_indices,
+						       stokes_preconditioner_matrix);
       }
 
   stokes_preconditioner_matrix.compress();
@@ -1529,7 +1524,7 @@ void BoussinesqFlowProblem<dim>::run ()
       old_old_temperature_solution = old_temperature_solution;
       old_temperature_solution     = temperature_solution;      
     }
-  while (time <= 100);
+  while (time <= 1);
 }
 
 
@@ -1544,6 +1539,7 @@ int main (int argc, char *argv[])
   (void)argv;
 #endif
 
+  sleep (20);
   try
     {
       deallog.depth_console (0);
