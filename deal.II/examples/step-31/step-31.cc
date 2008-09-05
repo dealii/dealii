@@ -1,5 +1,6 @@
 /* $Id$ */
-/* Author: Wolfgang Bangerth, Texas A&M University, 2007 */
+/* Author: Martin Kronbichler, University of Uppsala,
+           Wolfgang Bangerth, Texas A&M University 2007, 2008 */
 
 /*    $Id$       */
 /*                                                                */
