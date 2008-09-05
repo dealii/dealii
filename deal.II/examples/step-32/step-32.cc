@@ -572,8 +572,8 @@ void BoussinesqFlowProblem<dim>::setup_dofs ()
   {
     stokes_dof_handler.distribute_dofs (stokes_fe);
     DoFRenumbering::Cuthill_McKee (stokes_dof_handler);
-    DoFRenumbering::component_wise (stokes_dof_handler, stokes_block_component);
     DoFRenumbering::subdomain_wise (stokes_dof_handler);
+    DoFRenumbering::component_wise (stokes_dof_handler, stokes_block_component);
     
     stokes_constraints.clear ();
     DoFTools::make_hanging_node_constraints (stokes_dof_handler,
@@ -605,16 +605,16 @@ void BoussinesqFlowProblem<dim>::setup_dofs ()
 		     n_T = temperature_dof_handler.n_dofs();
 
   pcout << "Number of active cells: "
-       << triangulation.n_active_cells()
-       << " (on "
-       << triangulation.n_levels()
-       << " levels)"
-       << std::endl
-       << "Number of degrees of freedom: "
-       << n_u + n_p + n_T
-       << " (" << n_u << '+' << n_p << '+'<< n_T <<')'
-       << std::endl
-       << std::endl;
+	<< triangulation.n_active_cells()
+	<< " (on "
+	<< triangulation.n_levels()
+	<< " levels)"
+	<< std::endl
+	<< "Number of degrees of freedom: "
+	<< n_u + n_p + n_T
+	<< " (" << n_u << '+' << n_p << '+'<< n_T <<')'
+	<< std::endl
+	<< std::endl;
 
   stokes_partitioner.clear();
   {
@@ -628,7 +628,7 @@ void BoussinesqFlowProblem<dim>::setup_dofs ()
 
     BlockSparsityPattern stokes_sparsity_pattern (2,2);
 
-    if (trilinos_communicator.MyPID() == 0)
+    //if (trilinos_communicator.MyPID() == 0)
       {
 	BlockCompressedSetSparsityPattern csp (2,2);
 
@@ -664,7 +664,7 @@ void BoussinesqFlowProblem<dim>::setup_dofs ()
 
     BlockSparsityPattern stokes_preconditioner_sparsity_pattern (2,2);
     
-    if (trilinos_communicator.MyPID() == 0)
+    //if (trilinos_communicator.MyPID() == 0)
       {
 	BlockCompressedSetSparsityPattern csp (2,2);
 
@@ -693,7 +693,6 @@ void BoussinesqFlowProblem<dim>::setup_dofs ()
 				         stokes_preconditioner_sparsity_pattern);
 
   }
-  std::cout << " bla " << std::flush;
 
   temperature_partitioner = Epetra_Map (n_T, 0, trilinos_communicator);
   {
@@ -703,7 +702,7 @@ void BoussinesqFlowProblem<dim>::setup_dofs ()
 
     SparsityPattern temperature_sparsity_pattern;
 
-    if (trilinos_communicator.MyPID() == 0)
+    //if (trilinos_communicator.MyPID() == 0)
       {
 	CompressedSetSparsityPattern csp (n_T, n_T);
 	DoFTools::make_sparsity_pattern (temperature_dof_handler, csp);
@@ -836,6 +835,8 @@ void BoussinesqFlowProblem<dim>::assemble_stokes_system ()
 
   stokes_rhs=0;
 
+  Vector<double> old_temperatures (old_temperature_solution);
+
   QGauss<dim>   quadrature_formula(stokes_degree+2);
   QGauss<dim-1> face_quadrature_formula(stokes_degree+2);
 
@@ -879,7 +880,7 @@ void BoussinesqFlowProblem<dim>::assemble_stokes_system ()
   std::vector<SymmetricTensor<2,dim> > grads_phi_u (dofs_per_cell);
   std::vector<double>                  div_phi_u   (dofs_per_cell);
   std::vector<double>                  phi_p       (dofs_per_cell);
-
+  
   const FEValuesExtractors::Vector velocities (0);
   const FEValuesExtractors::Scalar pressure (dim);
 
@@ -898,7 +899,7 @@ void BoussinesqFlowProblem<dim>::assemble_stokes_system ()
 	local_matrix = 0;
 	local_rhs = 0;
   
-	temperature_fe_values.get_function_values (old_temperature_solution, 
+	temperature_fe_values.get_function_values (old_temperatures, 
 						   old_temperature_values);
   
 	for (unsigned int q=0; q<n_q_points; ++q)
@@ -1135,9 +1136,9 @@ void BoussinesqFlowProblem<dim>::assemble_temperature_system ()
 	stokes_fe_values.reinit (stokes_cell);
   
 	temperature_fe_values.get_function_values (old_temperature_solution,
-						  old_temperature_values);
+						   old_temperature_values);
 	temperature_fe_values.get_function_values (old_old_temperature_solution,
-						  old_old_temperature_values);
+						   old_old_temperature_values);
   
 	temperature_fe_values.get_function_gradients (old_temperature_solution,
 						      old_temperature_grads);
@@ -1145,9 +1146,9 @@ void BoussinesqFlowProblem<dim>::assemble_temperature_system ()
 						      old_old_temperature_grads);
 	
 	temperature_fe_values.get_function_hessians (old_temperature_solution,
-						    old_temperature_hessians);
+						     old_temperature_hessians);
 	temperature_fe_values.get_function_hessians (old_old_temperature_solution,
-						    old_old_temperature_hessians);
+						     old_old_temperature_hessians);
 	
 	temperature_right_hand_side.value_list (temperature_fe_values.get_quadrature_points(),
 						gamma_values);
@@ -1157,17 +1158,17 @@ void BoussinesqFlowProblem<dim>::assemble_temperature_system ()
 	
 	const double nu
 	  = compute_viscosity (old_temperature_values,
-			      old_old_temperature_values,
-			      old_temperature_grads,
-			      old_old_temperature_grads,
-			      old_temperature_hessians,
-			      old_old_temperature_hessians,
-			      present_stokes_values,
-			      gamma_values,
-			      global_u_infty,
-			      global_T_range.second - global_T_range.first,
-			      global_Omega_diameter, cell->diameter(),
-			      old_time_step);
+			       old_old_temperature_values,
+			       old_temperature_grads,
+			       old_old_temperature_grads,
+			       old_temperature_hessians,
+			       old_old_temperature_hessians,
+			       present_stokes_values,
+			       gamma_values,
+			       global_u_infty,
+			       global_T_range.second - global_T_range.first,
+			       global_Omega_diameter, cell->diameter(),
+			       old_time_step);
 	
 	for (unsigned int q=0; q<n_q_points; ++q)
 	  {
@@ -1192,47 +1193,47 @@ void BoussinesqFlowProblem<dim>::assemble_temperature_system ()
 	      {
 		for (unsigned int i=0; i<dofs_per_cell; ++i)
 		  local_rhs(i) += ((time_step + old_time_step) / old_time_step *
-				  old_T * phi_T[i]
-				  -
-				  (time_step * time_step) /
-				  (old_time_step * (time_step + old_time_step)) *
-				  old_old_T * phi_T[i]
-				  -
-				  time_step *
-				  present_u *
-				  ((1+time_step/old_time_step) * old_grad_T
+				   old_T * phi_T[i]
+				   -
+				   (time_step * time_step) /
+				   (old_time_step * (time_step + old_time_step)) *
+				   old_old_T * phi_T[i]
+				   -
+				   time_step *
+				   present_u *
+				   ((1+time_step/old_time_step) * old_grad_T
 				    -
 				    time_step / old_time_step * old_old_grad_T) *
-				  phi_T[i]
-				  -
-				  time_step *
-				  nu *
-				  ((1+time_step/old_time_step) * old_grad_T
+				   phi_T[i]
+				   -
+				   time_step *
+				   nu *
+				   ((1+time_step/old_time_step) * old_grad_T
 				    -
 				    time_step / old_time_step * old_old_grad_T) *
-				  grad_phi_T[i]
-				  +
-				  time_step *
-				  gamma_values[q] * phi_T[i])
-				  *
-				  temperature_fe_values.JxW(q);
+				   grad_phi_T[i]
+				   +
+				   time_step *
+				   gamma_values[q] * phi_T[i])
+		                  * 
+		                  temperature_fe_values.JxW(q);
 	      }
 	    else
 	      {
 		for (unsigned int i=0; i<dofs_per_cell; ++i)
 		  local_rhs(i) += (old_T * phi_T[i]
-				  -
-				  time_step *
-				  present_u * old_grad_T * phi_T[i]
-				  -
-				  time_step *
-				  nu *
-				  old_grad_T * grad_phi_T[i]
-				  +
-				  time_step *
-				  gamma_values[q] * phi_T[i])
+				   -
+				   time_step *
+				   present_u * old_grad_T * phi_T[i]
+				   -
+				   time_step *
+				   nu *
+				   old_grad_T * grad_phi_T[i]
+				   +
+				   time_step *
+				   gamma_values[q] * phi_T[i])
 				  *
-				  temperature_fe_values.JxW(q);
+		                  temperature_fe_values.JxW(q);
 	      }
 	  }
 	
@@ -1272,9 +1273,9 @@ void BoussinesqFlowProblem<dim>::solve ()
     gmres.solve(stokes_matrix, stokes_solution, stokes_rhs, preconditioner);
 
     pcout << "   "
-	 << solver_control.last_step()
-	 << " GMRES iterations for Stokes subsystem."
-	 << std::endl;
+	  << solver_control.last_step()
+	  << " GMRES iterations for Stokes subsystem."
+	  << std::endl;
 
     stokes_constraints.distribute (stokes_solution);
   }
@@ -1304,9 +1305,9 @@ void BoussinesqFlowProblem<dim>::solve ()
     temperature_constraints.distribute (temperature_solution);
 
     pcout << "   "
-	 << solver_control.last_step()
-	 << " CG iterations for temperature."
-	 << std::endl;
+	  << solver_control.last_step()
+	  << " CG iterations for temperature."
+	  << std::endl;
 
     double min_temperature = temperature_solution(0),
 	   max_temperature = temperature_solution(0);
@@ -1319,8 +1320,8 @@ void BoussinesqFlowProblem<dim>::solve ()
       }
     
     pcout << "   Temperature range: "
-	 << min_temperature << ' ' << max_temperature
-	 << std::endl;
+	  << min_temperature << ' ' << max_temperature
+	  << std::endl;
   }
 }
 

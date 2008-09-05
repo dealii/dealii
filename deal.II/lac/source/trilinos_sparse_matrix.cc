@@ -26,10 +26,10 @@ namespace TrilinosWrappers
     SparseMatrix::const_iterator::Accessor::
     visit_present_row ()
     {
-				      // if we are asked to visit the
-				      // past-the-end line, then simply
-				      // release all our caches and go on
-				      // with life
+				  // if we are asked to visit the
+				  // past-the-end line, then simply
+				  // release all our caches and go on
+				  // with life
       if (this->a_row == matrix->m())
 	{
 	  colnum_cache.reset ();
@@ -38,11 +38,11 @@ namespace TrilinosWrappers
 	  return;
 	}
       
-				      // otherwise first flush Trilinos caches
+				  // otherwise first flush Trilinos caches
       matrix->compress ();
 
-				      // get a representation of the present
-				      // row
+				  // get a representation of the present
+				  // row
       int ncols;
       int colnums = matrix->n();
       TrilinosScalar *values = new TrilinosScalar(colnums);
@@ -52,12 +52,12 @@ namespace TrilinosWrappers
 						  ncols, &(values[0]));
       AssertThrow (ierr == 0, ExcTrilinosError(ierr));
 
-				      // copy it into our caches if the line
-				      // isn't empty. if it is, then we've
-				      // done something wrong, since we
-				      // shouldn't have initialized an
-				      // iterator for an empty line (what
-				      // would it point to?)
+				  // copy it into our caches if the
+				  // line isn't empty. if it is, then
+				  // we've done something wrong, since
+				  // we shouldn't have initialized an
+				  // iterator for an empty line (what
+				  // would it point to?)
       Assert (ncols != 0, ExcInternalError());
       colnum_cache.reset (new std::vector<unsigned int> (colnums,
 							colnums+ncols));
@@ -66,17 +66,17 @@ namespace TrilinosWrappers
   }
 
 
-				      // The constructor is actually the
-				      // only point where we have to check
-				      // whether we build a serial or
-				      // a parallel Trilinos matrix.
-				      // In the end, it does not even
-				      // matter how many threads there
-				      // are, but only if we use an
-				      // MPI compiler or a standard 
-				      // compiler. So, one thread on
-				      // an MPI compiler will still get
-				      // a parallel interface.
+				  // The constructor is actually the
+				  // only point where we have to check
+				  // whether we build a serial or a
+				  // parallel Trilinos matrix.
+				  // Actually, it does not even matter
+				  // how many threads there are, but
+				  // only if we use an MPI compiler or
+				  // a standard compiler. So, even one
+				  // thread on a configuration with
+				  // MPI will still get a parallel
+				  // interface.
   SparseMatrix::SparseMatrix ()
 		  :
 #ifdef DEAL_II_COMPILER_SUPPORTS_MPI
@@ -160,21 +160,28 @@ namespace TrilinosWrappers
   {
     unsigned int n_rows = sparsity_pattern.n_rows();
 
+				  // TODO: As of now, assume that the
+				  // sparsity pattern only sits at the
+				  // zeroth processor (completely), let
+				  // this determine the Trilinos
+				  // sparsity pattern on that
+				  // processor, and only broadcast the
+				  // pattern afterwards.
     if (row_map.Comm().MyPID() == 0)
       {
 	Assert (matrix->NumGlobalRows() == (int)sparsity_pattern.n_rows(),
 		ExcDimensionMismatch (matrix->NumGlobalRows(),
 				      sparsity_pattern.n_rows()));
     
-					// Trilinos seems to have a bug for
-					// rectangular matrices at this point,
-					// so do not check for consistent 
-					// column numbers here.
-					//
-					//
-					// this bug is filed in the Sandia
-					// bugzilla under #4123 and should be
-					// fixed for version 9.0
+				  // Trilinos seems to have a bug for
+				  // rectangular matrices at this point,
+				  // so do not check for consistent 
+				  // column numbers here.
+				  //
+				  //
+				  // this bug is filed in the Sandia
+				  // bugzilla under #4123 and should be
+				  // fixed for version 9.0
 //        Assert (matrix->NumGlobalCols() == (int)sparsity_pattern.n_cols(),
 //		ExcDimensionMismatch (matrix->NumGlobalCols(),
 //				      sparsity_pattern.n_cols()));
@@ -197,21 +204,17 @@ namespace TrilinosWrappers
 	      row_indices[col] = sparsity_pattern.column_number (row, col);
 	    
 	    matrix->InsertGlobalValues(row, row_length,
-				      &values[0], &row_indices[0]);
+				       &values[0], &row_indices[0]);
 	  }
       }
+    
+    last_action = Insert;
 
-    compress();
 				  // In the end, the matrix needs to
 				  // be compressed in order to be
-				  // really ready. However, that is
-				  // a collective operation, so it
-				  // has to be called on all processes
-				  // by the user, whereas this function
-				  // should only be used on one processor
-				  // since our sparsity pattern data
-				  // types are all serial as of now.
-  }
+				  // really ready.
+    compress();
+ }
 
 
 
@@ -219,7 +222,39 @@ namespace TrilinosWrappers
   SparseMatrix::reinit (const Epetra_Map       &input_map,
 			const SparsityPattern  &sparsity_pattern)
   {
-    reinit (input_map, input_map, sparsity_pattern);
+				  // TODO: There seems to be problem
+				  // in Epetra when a quadratic matrix
+				  // is initialized with both row and
+				  // column map. Maybe find something
+				  // more out about this...
+    //reinit (input_map, input_map, sparsity_pattern);
+    matrix.reset();
+
+    unsigned int n_rows = sparsity_pattern.n_rows();
+
+    if (row_map.Comm().MyPID() == 0)
+      {
+	Assert (input_map.NumGlobalElements() == (int)sparsity_pattern.n_rows(),
+		ExcDimensionMismatch (input_map.NumGlobalElements(),
+				      sparsity_pattern.n_rows()));
+	Assert (input_map.NumGlobalElements() == (int)sparsity_pattern.n_cols(),
+		ExcDimensionMismatch (input_map.NumGlobalElements(),
+				      sparsity_pattern.n_cols()));
+      }
+
+    row_map = input_map;
+    col_map = input_map;
+
+    std::vector<int> n_entries_per_row(n_rows);
+
+    for (unsigned int row=0; row<n_rows; ++row)
+      n_entries_per_row[(int)row] = sparsity_pattern.row_length(row);
+
+    matrix = std::auto_ptr<Epetra_FECrsMatrix>
+	      (new Epetra_FECrsMatrix(Copy, row_map, &n_entries_per_row[0], 
+				      false));
+
+    reinit (sparsity_pattern);
   }
 
 
@@ -234,14 +269,14 @@ namespace TrilinosWrappers
     unsigned int n_rows = sparsity_pattern.n_rows();
 
     if (row_map.Comm().MyPID() == 0)
-    {
-    Assert (input_row_map.NumGlobalElements() == (int)sparsity_pattern.n_rows(),
-	    ExcDimensionMismatch (input_row_map.NumGlobalElements(),
-				  sparsity_pattern.n_rows()));
-    Assert (input_col_map.NumGlobalElements() == (int)sparsity_pattern.n_cols(),
-	    ExcDimensionMismatch (input_col_map.NumGlobalElements(),
-				  sparsity_pattern.n_cols()));
-    }
+      {
+	Assert (input_row_map.NumGlobalElements() == (int)sparsity_pattern.n_rows(),
+		ExcDimensionMismatch (input_row_map.NumGlobalElements(),
+				      sparsity_pattern.n_rows()));
+	Assert (input_col_map.NumGlobalElements() == (int)sparsity_pattern.n_cols(),
+		ExcDimensionMismatch (input_col_map.NumGlobalElements(),
+				      sparsity_pattern.n_cols()));
+      }
 
     row_map = input_row_map;
     col_map = input_col_map;
@@ -253,7 +288,7 @@ namespace TrilinosWrappers
 
     matrix = std::auto_ptr<Epetra_FECrsMatrix>
 	      (new Epetra_FECrsMatrix(Copy, row_map, col_map,
-				      &n_entries_per_row[0], true));
+				      &n_entries_per_row[0], false));
 
     reinit (sparsity_pattern);
   }
@@ -267,7 +302,7 @@ namespace TrilinosWrappers
     row_map = sparse_matrix.row_map;
     col_map = sparse_matrix.col_map;
     matrix = std::auto_ptr<Epetra_FECrsMatrix>(new Epetra_FECrsMatrix(
-			      *sparse_matrix.matrix));
+				                   *sparse_matrix.matrix));
   }
 
 
@@ -343,9 +378,9 @@ namespace TrilinosWrappers
   void
   SparseMatrix::clear ()
   {
-				    // When we clear the matrix,
-				    // reset the pointer and 
-				    // generate an empty matrix.
+				  // When we clear the matrix, reset
+				  // the pointer and generate an
+				  // empty matrix.
     matrix.reset();
 #ifdef DEAL_II_COMPILER_SUPPORTS_MPI
     row_map = Epetra_Map (0,0,Epetra_MpiComm(MPI_COMM_WORLD)),
@@ -362,7 +397,7 @@ namespace TrilinosWrappers
   void
   SparseMatrix::compress ()
   {
-				    // flush buffers
+				  // flush buffers
     int ierr;
     if (row_map.SameAs(col_map))
       ierr = matrix->GlobalAssemble ();
@@ -450,13 +485,13 @@ namespace TrilinosWrappers
 	last_action = Add;
       }
 
-				    // we have to do above actions in any
-				    // case to be consistent with the MPI
-				    // communication model (see the
-				    // comments in the documentation of
-				    // TrilinosWrappers::Vector), but we
-				    // can save some work if the addend is
-				    // zero
+				  // we have to do above actions in any
+				  // case to be consistent with the MPI
+				  // communication model (see the
+				  // comments in the documentation of
+				  // TrilinosWrappers::Vector), but we
+				  // can save some work if the addend
+				  // is zero
     if (value == 0)
       return;
 
@@ -480,8 +515,8 @@ namespace TrilinosWrappers
     Assert (matrix->Filled()==true,
 	    ExcMessage("Matrix must be compressed before invoking clear_row."));
 
-				    // Only do this on the rows
-				    // owned locally on this processor.
+				  // Only do this on the rows owned
+				  // locally on this processor.
     int local_row = matrix->LRID(row);
     if (local_row >= 0)
       {

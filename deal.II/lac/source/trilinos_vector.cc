@@ -24,8 +24,7 @@ namespace TrilinosWrappers
 {
   namespace internal
   {
-    VectorReference::operator TrilinosScalar () const // i believe useless with
-                                                      // trilinos
+    VectorReference::operator TrilinosScalar () const
     {
       Assert (index < vector.size(),
               ExcIndexRange (index, 0, vector.size()));
@@ -131,6 +130,7 @@ namespace TrilinosWrappers
 #endif
 
     vector = std::auto_ptr<Epetra_FEVector> (new Epetra_FEVector(map));
+    last_action = Insert;
   }
 
 
