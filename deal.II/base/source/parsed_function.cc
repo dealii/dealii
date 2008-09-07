@@ -2,7 +2,7 @@
 //    $Id: function_parser.h 14594 2007-03-22 20:17:41Z bangerth $
 //    Version: $Name$
 //
-//    Copyright (C) 2007 by the deal.II authors
+//    Copyright (C) 2007, 2008 by the deal.II authors
 //
 //    This file is subject to QPL and may not be  distributed
 //    without copyright and license information. Please refer
@@ -12,6 +12,8 @@
 //---------------------------------------------------------------------------
 #include <base/parsed_function.h>
 #include <base/utilities.h>
+
+#include <cstdio>
 
 DEAL_II_NAMESPACE_OPEN
 
