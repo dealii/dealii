@@ -16,6 +16,28 @@ dnl $Id$
 
 
 dnl -------------------------------------------------------------
+dnl Helper macro to add libpaths to LIBS
+dnl
+dnl
+dnl -------------------------------------------------------------
+AC_DEFUN(DEAL_II_ADD_EXTERNAL_LIBS_AT_TAIL, dnl
+[
+  LIBS="$LIBS $1"
+])
+AC_DEFUN(DEAL_II_ADD_EXTERNAL_LIBS_AT_FRONT, dnl
+[
+  LIBS="$1 $LIBS"
+])
+AC_DEFUN(DEAL_II_EXTERNAL_LIBS_SAVE_VAL, dnl   Not reentrant, of course
+[
+  OLD_LIBS="$LIBS"
+])
+AC_DEFUN(DEAL_II_EXTERNAL_LIBS_RESTORE_VAL, dnl
+[
+  LIBS="$OLD_LIBS"
+])
+
+dnl -------------------------------------------------------------
 dnl Determine the C++ compiler in use. Return the name and possibly
 dnl version of this compiler in GXX_VERSION.
 dnl
@@ -633,7 +655,7 @@ AC_DEFUN(DEAL_II_SET_CXX_FLAGS, dnl
           dnl
           dnl Always link with math library: The -lm option must be at the end of the
           dnl linker command, therefore it cannot be included into LDFLAGS
-          LIBS="$LIBS -lm"
+          DEAL_II_ADD_EXTERNAL_LIBS_AT_TAIL(-lm)
           ;;
   
       intel_icc*)
@@ -1702,7 +1724,7 @@ AC_DEFUN(DEAL_II_CHECK_CPU_OPTIMIZATIONS, dnl
 	      LDFLAGS="$LDFLAGS -maix64"
 
 	      dnl And we must always link with pthreads
-	      LIBS="$LIBS -lpthread"
+	      DEAL_II_ADD_EXTERNAL_LIBS_AT_TAIL(-lpthread)
               ;;
         esac
 	;;
@@ -5007,7 +5029,7 @@ AC_DEFUN(DEAL_II_CONFIGURE_TECPLOT, dnl
   if (test -r "$TECPLOT_LIB") ; then
     AC_DEFINE(DEAL_II_HAVE_TECPLOT, 1,
 	      [Flag indicating whether the library shall be compiled to use the Tecplot interface])
-    LIBS="$TECPLOT_LIB $LIBS"
+    DEAL_II_ADD_EXTERNAL_LIBS_AT_FRONT($TECPLOT_LIB)
   fi
 ])
 
@@ -5056,8 +5078,8 @@ AC_DEFUN(DEAL_II_CONFIGURE_NETCDF, dnl
   dnl if found check for C++ library,
   dnl if successful, HAVE_LIBNETCDF will be set
   AC_CHECK_HEADER(netcdfcpp.h, AC_CHECK_LIB(netcdf, nc_open,
-    [ OLD_LIBS=$LIBS
-      LIBS="-lnetcdf_c++ -lnetcdf $LIBS"
+    [ DEAL_II_EXTERNAL_LIBS_SAVE_VAL()
+      DEAL_II_ADD_EXTERNAL_LIBS_AT_FRONT(-lnetcdf_c++ -lnetcdf)
       AC_MSG_CHECKING([for NcFile::NcFile in -lnetcdf_c++])
       AC_LINK_IFELSE(
       [  AC_LANG_PROGRAM([[#include <netcdfcpp.h>
@@ -5068,7 +5090,7 @@ AC_DEFUN(DEAL_II_CONFIGURE_NETCDF, dnl
         AC_DEFINE(HAVE_LIBNETCDF,1,[Define to 1 if you have the `NetCDF' library (-lnetcdf).])
       ],
       [ AC_MSG_RESULT(no)
-	LIBS=$OLD_LIBS
+	DEAL_II_EXTERNAL_LIBS_RESTORE_VAL()
       ])
     ]))
 ])
@@ -5538,7 +5560,7 @@ AC_DEFUN(DEAL_II_WITH_LAPACK, dnl
   if test "x$1" != "xno" ; then
     if test "x$1" != "xyes" ; then lapack="$1"; else lapack="lapack"; fi
     AC_CHECK_LIB($lapack, dgbsv_,
-      [ LIBS="-l$lapack $LIBS"
+      [ DEAL_II_ADD_EXTERNAL_LIBS_AT_FRONT(-l$lapack)
         AC_DEFINE([HAVE_LIBLAPACK], [1], 
                   [Defined if deal.II was configured with LAPACK support])
       ],
@@ -5641,7 +5663,7 @@ AC_DEFUN(DEAL_II_WITH_BLAS, dnl
       blas="$1"
       AC_CHECK_LIB($blas, daxpy_,
                    [ 
-                     LIBS="-l$blas $LIBS"
+                     DEAL_II_ADD_EXTERNAL_LIBS_AT_FRONT(-l$blas)
                      AC_DEFINE([HAVE_LIBBLAS], [1], 
                                [Defined if deal.II was configured with BLAS support])
                    ],,$F77LIBS)
@@ -5652,7 +5674,7 @@ AC_DEFUN(DEAL_II_WITH_BLAS, dnl
         blas="blas"; 
         AC_CHECK_LIB($blas, daxpy_,
                      [ 
-                       LIBS="-l$blas $LIBS"
+                       DEAL_II_ADD_EXTERNAL_LIBS_AT_FRONT(-l$blas)
                        AC_DEFINE([HAVE_LIBBLAS], [1], 
                                  [Defined if deal.II was configured with BLAS support])
                      ],,$F77LIBS)
@@ -5690,7 +5712,7 @@ AC_DEFUN(DEAL_II_WITH_ZLIB, dnl
   dnl -- We should check for zlib.h, but I could not make AC_CHECK_HEADERS run (GK)
   if test "x$1" != "xyes" ; then
     AC_CHECK_LIB($1, crc32,
-    [ LIBS="-l$1 $LIBS"
+    [ DEAL_II_ADD_EXTERNAL_LIBS_AT_FRONT(-l$1)
       AC_DEFINE(HAVE_LIBZ)
     ])
 dnl    fi
