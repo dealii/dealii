@@ -51,6 +51,19 @@ QGauss<0>::QGauss (const unsigned int)
 
 
 template <>
+QGaussLobatto<0>::QGaussLobatto (const unsigned int)
+                :
+                Quadrature<0> (0)
+{
+                                   // this function has to be provided to
+                                   // avoid certain linker failures, but it
+                                   // should never be called
+  Assert (false, ExcInternalError());
+}
+
+
+
+template <>
 QGauss<1>::QGauss (const unsigned int n)
                 :
                 Quadrature<1> (n)

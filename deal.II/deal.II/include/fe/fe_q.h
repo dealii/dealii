@@ -24,21 +24,23 @@ DEAL_II_NAMESPACE_OPEN
 /*@{*/
 
 /**
- * Implementation of a scalar Lagrange finite element @p Qp that
- * yields the finite element space of continuous, piecewise polynomials
- * of degree @p p in each coordinate direction. This class is realized
- * using tensor product polynomials based on equidistant support
- * points.
+ * Implementation of a scalar Lagrange finite element @p Qp that yields the
+ * finite element space of continuous, piecewise polynomials of degree @p p in
+ * each coordinate direction. This class is realized using tensor product
+ * polynomials based on equidistant or given support points.
  *
- * The constructor of this class takes the degree @p p of this finite
- * element.
+ * The standard constructor of this class takes the degree @p p of this finite
+ * element. Alternatively, it can take a quadrature formula @p points defining
+ * the support points of the Lagrange interpolation in one coordinate direction.
  *
  * <h3>Implementation</h3>
  *
- * The constructor creates a TensorProductPolynomials object
- * that includes the tensor product of @p LagrangeEquidistant
- * polynomials of degree @p p. This @p TensorProductPolynomials
- * object provides all values and derivatives of the shape functions.
+ * The constructor creates a TensorProductPolynomials object that includes the
+ * tensor product of @p LagrangeEquidistant polynomials of degree @p p. This
+ * @p TensorProductPolynomials object provides all values and derivatives of
+ * the shape functions.  In case a quadrature rule is given, the constructure
+ * creates a TensorProductPolynomials object that includes the tensor product
+ * of @p Lagrange polynomials with the support points from @p points.
  *
  * Furthermore the constructor filles the @p interface_constraints,
  * the @p prolongation (embedding) and the @p restriction
@@ -232,7 +234,7 @@ DEAL_II_NAMESPACE_OPEN
  *   @endverbatim
  * </ul>
  *
- * @author Wolfgang Bangerth, 1998, 2003; Guido Kanschat, 2001; Ralf Hartmann, 2001, 2004, 2005; Oliver Kayser-Herold, 2004
+ * @author Wolfgang Bangerth, 1998, 2003; Guido Kanschat, 2001; Ralf Hartmann, 2001, 2004, 2005; Oliver Kayser-Herold, 2004; Katharina Kormann, 2008; Martin Kronbichler, 2008
  */
 template <int dim>
 class FE_Q : public FE_Poly<TensorProductPolynomials<dim>,dim>
@@ -243,7 +245,19 @@ class FE_Q : public FE_Poly<TensorProductPolynomials<dim>,dim>
 				      * polynomials of degree @p p.
 				      */
     FE_Q (const unsigned int p);
-    
+	
+				     /**
+				      * Constructor for tensor product
+				      * polynomials with support points @p
+				      * points based on a one-dimensional
+				      * quadrature formula. The degree of the
+				      * finite element is
+				      * <tt>points.size()-1</tt>.  Note that
+				      * the first point has to be 0 and the
+				      * last one 1.
+				      */
+
+    FE_Q (const Quadrature<1> &points);    
 				     /**
 				      * Return a string that uniquely
 				      * identifies a finite
@@ -494,6 +508,14 @@ class FE_Q : public FE_Poly<TensorProductPolynomials<dim>,dim>
 				      * from the constructor.
 				      */
     void initialize_constraints ();
+	
+					     /**
+				      * Initialize the hanging node
+				      * constraints matrices. Called from the
+				      * constructor in case the finite element
+				      * is based on quadrature points.
+				      */
+    void initialize_constraints (const Quadrature<1> &points);
 
 				     /**
 				      * Initialize the embedding
@@ -517,6 +539,15 @@ class FE_Q : public FE_Poly<TensorProductPolynomials<dim>,dim>
 				      * constructor.
 				      */
     void initialize_unit_support_points ();
+	
+					     /**
+				      * Initialize the @p unit_support_points
+				      * field of the FiniteElement
+				      * class. Called from the constructor in
+				      * case the finite element is based on
+				      * quadrature points.
+				      */
+    void initialize_unit_support_points (const Quadrature<1> &points);
 
 				     /**
 				      * Initialize the
@@ -526,6 +557,15 @@ class FE_Q : public FE_Poly<TensorProductPolynomials<dim>,dim>
 				      * constructor.
 				      */
     void initialize_unit_face_support_points ();
+	
+					     /**
+				      * Initialize the @p
+				      * unit_face_support_points field of the
+				      * FiniteElement class. Called from the
+				      * constructor in case the finite element
+				      * is based on quadrature points.
+				      */
+    void initialize_unit_face_support_points (const Quadrature<1> &points);
 
 				     /**
 				      * Initialize the
@@ -571,13 +611,13 @@ std::vector<unsigned int>
 FE_Q<1>::face_lexicographic_to_hierarchic_numbering (const unsigned int);
 
 template <>
-void FE_Q<1>::initialize_constraints ();
+void FE_Q<1>::initialize_constraints (const Quadrature<1>&);
 
 template <>
-void FE_Q<2>::initialize_constraints ();
+void FE_Q<2>::initialize_constraints (const Quadrature<1>&);
 
 template <>
-void FE_Q<3>::initialize_constraints ();
+void FE_Q<3>::initialize_constraints (const Quadrature<1>&);
 
 
 DEAL_II_NAMESPACE_CLOSE

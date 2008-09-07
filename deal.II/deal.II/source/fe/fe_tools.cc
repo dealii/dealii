@@ -92,6 +92,8 @@ namespace
       = FEFactoryPointer(new FETools::FEFactory<FE_DGPMonomial<deal_II_dimension> >);
     default_map["FE_DGQ"]
       = FEFactoryPointer(new FETools::FEFactory<FE_DGQ<deal_II_dimension> >);
+    default_map["FE_DGQArbitraryNodes"]
+      = FEFactoryPointer(new FETools::FEFactory<FE_DGQ<deal_II_dimension> >);
     default_map["FE_Q"]
       = FEFactoryPointer(new FETools::FEFactory<FE_Q<deal_II_dimension> >);
 
@@ -1751,14 +1753,37 @@ FETools::get_fe_from_name_aux (std::string &name)
 	AssertThrow (fe_name_map.find(name_part) != fe_name_map.end(),
                      ExcInvalidFEName(name));
 					 // Now, just the (degree)
+					 // or (Quadrature<1>(degree+1))
 					 // part should be left.
 	if (name.size() == 0 || name[0] != '(')
 	  throw (std::string("Invalid first character in ") + name);
 	name.erase(0,1);
-	const std::pair<int,unsigned int> tmp
-	  = Utilities::get_integer_at_position (name, 0);
-	name.erase(0, tmp.second+1);
-	return fe_name_map.find(name_part)->second->get(tmp.first);
+	if (name[0] != 'Q')
+	  {
+	    const std::pair<int,unsigned int> tmp
+	      = Utilities::get_integer_at_position (name, 0);
+	    name.erase(0, tmp.second+1);
+	    return fe_name_map.find(name_part)->second->get(tmp.first);
+	  }
+	 else
+	   {
+	     unsigned int position = name.find('(');
+	     const std::string quadrature_name(name, 0, position-1);
+	     name.erase(0,position);
+	     if (quadrature_name.compare("QGaussLobatto") == 0)		
+	       {
+	     	 const std::pair<int,unsigned int> tmp
+	           = Utilities::get_integer_at_position (name, 0);
+	         name.erase(0, tmp.second+1);
+//TODO: Implement a get function taking Quadrature<1> in fe_tools.h.
+	         //return fe_name_map.find(name_part)->second->get(QGaussLobatto<1>(tmp.first));
+		 AssertThrow (false, ExcNotImplemented());
+	       }
+	     else 
+	       {
+		 AssertThrow (false,ExcNotImplemented());
+	       }
+	   }
       }
   
     

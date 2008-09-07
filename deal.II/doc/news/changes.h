@@ -280,6 +280,14 @@ inconvenience this causes.
 <ol>
   <li>
   <p>
+  New: The class FE_Q can now alternatively be constructed based on 
+  support points from a given one-dimensional quadrature rule.
+  <br>
+  (Katharina Kormann, Martin Kronbichler, 2008/09/07)
+  </p> 
+
+  <li>
+  <p>
   Fixed: Using the ConstraintMatrix class, when a degree of freedom was
   constrained against another DoF, and that other DoF was constrained to
   be equal to zero (i.e. the trivial linear combination of a third set of

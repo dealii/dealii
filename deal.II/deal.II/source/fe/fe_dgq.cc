@@ -12,6 +12,7 @@
 //---------------------------------------------------------------------------
 
 #include <base/quadrature.h>
+#include <base/quadrature_lib.h>
 #include <base/template_constraints.h>
 #include <fe/fe_dgq.h>
 #include <fe/fe_tools.h>
@@ -231,7 +232,6 @@ FE_DGQ<dim>::get_name () const
 
   std::ostringstream namebuf;  
   namebuf << "FE_DGQ<" << dim << ">(" << this->degree << ")";
-
   return namebuf.str();
 }
 
@@ -666,8 +666,57 @@ FE_DGQArbitraryNodes<dim>::get_name () const
 				   // FE_DGQArbitraryNodes since
 				   // there is no initialization by
 				   // a degree value.
-  std::ostringstream namebuf;  
-  namebuf << "FE_DGQArbitraryNodes<" << dim << ">(" << this->degree << ")";
+  std::ostringstream namebuf;
+
+  bool type = true;  
+  const unsigned int n_points = this->degree +1;
+  std::vector<double> points(n_points);
+  const unsigned int dofs_per_cell = this->dofs_per_cell;
+  const std::vector<Point<dim> > &unit_support_points = this->unit_support_points;
+  unsigned int index = 0;
+
+				   // Decode the support points
+				   // in one coordinate direction.
+  for (unsigned int j=0;j<dofs_per_cell;j++)
+    {
+      if ((dim>1) ? (unit_support_points[j](1)==0 && 
+	   ((dim>2) ? unit_support_points[j](2)==0: true)) : true)
+	{
+	  points[index++] = unit_support_points[j](0);
+	}
+    }
+  Assert (index == n_points,
+	  ExcMessage ("Could not decode support points in one coordinate direction."));
+
+				  // Check whether the support
+				  // points are equidistant.
+  for(unsigned int j=0;j<n_points;j++)
+    if (std::fabs(points[j] - (double)j/this->degree) > 1e-15)
+      {
+	type = false;
+	break;
+      }
+
+  if (type == true)    
+    namebuf << "FE_DGQ<" << dim << ">(" << this->degree << ")";
+  else
+    {
+
+				  // Check whether the support
+				  // points come from QGaussLobatto.
+      const QGaussLobatto<1> points_gl(n_points);
+      type = true;
+      for(unsigned int j=0;j<n_points;j++)
+	if (points[j] != points_gl.point(j)(0))
+	  {
+	    type = false;
+	    break;
+	  }
+      if(type == true)
+	namebuf << "FE_DGQArbitraryNodes<" << dim << ">(QGaussLobatto(" << this->degree+1 << "))";
+      else
+	namebuf << "FE_DGQArbitraryNodes<" << dim << ">(QUnknownNodes(" << this->degree << "))";
+    }
 
   return namebuf.str();
 }

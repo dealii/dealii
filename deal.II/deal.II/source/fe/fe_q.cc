@@ -16,9 +16,10 @@
 #include <base/template_constraints.h>
 #include <fe/fe_q.h>
 #include <fe/fe_tools.h>
+#include <base/quadrature_lib.h>
 
 #include <vector>
-
+#include <iostream>
 #include <sstream>
 
 DEAL_II_NAMESPACE_OPEN
@@ -210,6 +211,58 @@ FE_Q<dim>::FE_Q (const unsigned int degree)
 
 
 template <int dim>
+FE_Q<dim>::FE_Q (const Quadrature<1> &points)
+		:
+		FE_Poly<TensorProductPolynomials<dim>, dim> (
+		  TensorProductPolynomials<dim>(Polynomials::Lagrange::generate_complete_basis(points.get_points())),
+		  FiniteElementData<dim>(get_dpo_vector(points.n_quadrature_points-1),
+					 1, points.n_quadrature_points-1,
+					 FiniteElementData<dim>::H1),
+		  std::vector<bool> (1, false),
+		  std::vector<std::vector<bool> >(1, std::vector<bool>(1,true))),
+		face_index_map(FE_Q_Helper::invert_numbering(face_lexicographic_to_hierarchic_numbering (points.n_quadrature_points-1)))
+{
+  const unsigned int degree = points.n_quadrature_points-1;
+  
+  Assert (degree > 0,
+          ExcMessage ("This element can only be used for polynomial degrees "
+                      "at least zero"));
+  Assert (points.point(0)(0) == 0,
+	  ExcMessage ("The first support point has to be zero."));
+  Assert (points.point(degree)(0) == 1,
+	  ExcMessage ("The last support point has to be one."));
+  
+  std::vector<unsigned int> renumber (this->dofs_per_cell);
+  FETools::hierarchic_to_lexicographic_numbering (*this, renumber);
+  this->poly_space.set_numbering(renumber);
+  
+				   // finally fill in support points
+				   // on cell and face
+  initialize_unit_support_points (points);
+  initialize_unit_face_support_points (points);
+
+				   // compute constraint, embedding
+				   // and restriction matrices
+  initialize_constraints (points);
+
+				   // Reinit the vectors of
+				   // restriction and prolongation
+				   // matrices to the right sizes
+  this->reinit_restriction_and_prolongation_matrices();
+
+				   // Fill prolongation matrices with
+				   // embedding operators
+  FETools::compute_embedding_matrices (*this, this->prolongation);
+
+				   // Fill restriction matrices with
+				   // L2-projection
+  FETools::compute_projection_matrices (*this, this->restriction);
+  initialize_quad_dof_index_permutation();
+}
+
+
+
+template <int dim>
 std::string
 FE_Q<dim>::get_name () const
 {
@@ -221,8 +274,62 @@ FE_Q<dim>::get_name () const
 				   // have to be kept in synch
   
   std::ostringstream namebuf;  
-  namebuf << "FE_Q<" << dim << ">(" << this->degree << ")";
+  bool type = true;  
+  const unsigned int n_points = this->degree +1;
+  std::vector<double> points(n_points);
+  const unsigned int dofs_per_cell = this->dofs_per_cell;
+  const std::vector<Point<dim> > &unit_support_points = this->unit_support_points;
+  unsigned int index = 0;
 
+				   // Decode the support points
+				   // in one coordinate direction.
+  for (unsigned int j=0;j<dofs_per_cell;j++)
+    {
+      if ((dim>1) ? (unit_support_points[j](1)==0 && 
+	   ((dim>2) ? unit_support_points[j](2)==0: true)) : true)
+	{
+	  if (index == 0)
+	    points[index] = unit_support_points[j](0);
+          else if (index == 1)
+	    points[n_points-1] = unit_support_points[j](0);
+          else
+	    points[index-1] = unit_support_points[j](0);
+
+	  index++;
+	}
+    }
+  Assert (index == n_points,
+	  ExcMessage ("Could not decode support points in one coordinate direction."));
+
+				  // Check whether the support
+				  // points are equidistant.
+  for(unsigned int j=0;j<n_points;j++)
+    if (std::fabs(points[j] - (double)j/this->degree) > 1e-15)
+      {
+	type = false;
+	break;
+      }
+
+  if (type == true)    
+    namebuf << "FE_Q<" << dim << ">(" << this->degree << ")";
+  else
+    {
+
+				  // Check whether the support
+				  // points come from QGaussLobatto.
+      const QGaussLobatto<1> points_gl(n_points);
+      type = true;
+      for(unsigned int j=0;j<n_points;j++)
+	if (points[j] != points_gl.point(j)(0))
+	  {
+	    type = false;
+	    break;
+	  }
+      if(type == true)
+	namebuf << "FE_Q<" << dim << ">(QGaussLobatto(" << this->degree+1 << "))";
+      else
+	namebuf << "FE_Q<" << dim << ">(QUnknownNodes(" << this->degree << "))";
+    }
   return namebuf.str();
 }
 
@@ -241,7 +348,7 @@ template <int dim>
 void
 FE_Q<dim>::
 get_interpolation_matrix (const FiniteElement<dim> &x_source_fe,
-			  FullMatrix<double>           &interpolation_matrix) const
+			  FullMatrix<double>       &interpolation_matrix) const
 {
 				   // this is only implemented, if the
 				   // source FE is also a
@@ -264,9 +371,6 @@ get_interpolation_matrix (const FiniteElement<dim> &x_source_fe,
   const FE_Q<dim> &source_fe
     = dynamic_cast<const FE_Q<dim>&>(x_source_fe);
 
-  const std::vector<unsigned int> &index_map=
-    this->poly_space.get_numbering();
-  
 				   // compute the interpolation
 				   // matrices in much the same way as
 				   // we do for the embedding matrices
@@ -279,12 +383,10 @@ get_interpolation_matrix (const FiniteElement<dim> &x_source_fe,
 			  source_fe.dofs_per_cell);
   for (unsigned int j=0; j<this->dofs_per_cell; ++j)
     {
-                                   // generate a point on this
+                                   // read in a point on this
                                    // cell and evaluate the
                                    // shape functions there
-      const Point<dim>
-	p = FE_Q_Helper::generate_unit_point (index_map[j], this->dofs_per_cell,
-					      dealii::internal::int2type<dim>());
+      const Point<dim> p = this->unit_support_points[j];
       for (unsigned int i=0; i<this->dofs_per_cell; ++i)
         cell_interpolation(j,i) = this->poly_space.compute_value (i, p);
 
@@ -293,7 +395,7 @@ get_interpolation_matrix (const FiniteElement<dim> &x_source_fe,
     }
 
                                    // then compute the
-                                   // interpolation matrix matrix
+                                   // interpolation matrix
                                    // for this coordinate
                                    // direction
   cell_interpolation.gauss_jordan ();
@@ -335,6 +437,7 @@ get_face_interpolation_matrix (const FiniteElement<1> &/*x_source_fe*/,
 	  FiniteElement<1>::
 	  ExcInterpolationNotImplemented ());
 }
+
 
 
 template <>
@@ -424,15 +527,15 @@ get_face_interpolation_matrix (const FiniteElement<dim> &x_source_fe,
       const Point<dim> &p = face_quadrature.point (i);
 
       for (unsigned int j=0; j<this->dofs_per_face; ++j)
-	{ 
+	{
 	  double matrix_entry = this->shape_value (this->face_to_cell_index(j, 0), p);
 
-					   // Correct the interpolated
-					   // value. I.e. if it is close
-					   // to 1 or 0, make it exactly
-					   // 1 or 0. Unfortunately, this
-					   // is required to avoid problems
-					   // with higher order elements.
+				   // Correct the interpolated
+				   // value. I.e. if it is close
+			     	   // to 1 or 0, make it exactly
+			       	   // 1 or 0. Unfortunately, this
+			       	   // is required to avoid problems
+			       	   // with higher order elements.
 	  if (fabs (matrix_entry - 1.0) < eps)
 	    matrix_entry = 1.0;
 	  if (fabs (matrix_entry) < eps)
@@ -460,12 +563,13 @@ get_face_interpolation_matrix (const FiniteElement<dim> &x_source_fe,
 }
 
 
+
 template <int dim>
 void
 FE_Q<dim>::
 get_subface_interpolation_matrix (const FiniteElement<dim> &x_source_fe,
-				  const unsigned int subface,
-				  FullMatrix<double>           &interpolation_matrix) const
+				  const unsigned int        subface,
+				  FullMatrix<double>       &interpolation_matrix) const
 {
 				   // this is only implemented, if the
 				   // source FE is also a
@@ -747,10 +851,41 @@ void FE_Q<dim>::initialize_unit_support_points ()
 }
 
 
+
+template <int dim>
+void FE_Q<dim>::initialize_unit_support_points (const Quadrature<1> &points)
+{
+				   // number of points: (degree+1)^dim
+  unsigned int n = this->degree+1;
+  for (unsigned int i=1; i<dim; ++i)
+    n *= this->degree+1;
+  
+  this->unit_support_points.resize(n);
+
+  const std::vector<unsigned int> &index_map_inverse=
+    this->poly_space.get_numbering_inverse();
+	
+  Quadrature<dim> support_quadrature(points);
+
+  Point<dim> p;
+  
+  for (unsigned int k=0;k<n ;k++)
+    {
+      this->unit_support_points[index_map_inverse[k]] = support_quadrature.point(k);
+    }
+}
+
+
 #if deal_II_dimension == 1
 
 template <>
 void FE_Q<1>::initialize_unit_face_support_points ()
+{
+				   // no faces in 1d, so nothing to do
+}
+
+template <>
+void FE_Q<1>::initialize_unit_face_support_points (const Quadrature<1> &/*points*/)
 {
 				   // no faces in 1d, so nothing to do
 }
@@ -794,12 +929,47 @@ void FE_Q<dim>::initialize_unit_face_support_points ()
 
 
 template <int dim>
+void FE_Q<dim>::initialize_unit_face_support_points (const Quadrature<1> &points)
+{
+  const unsigned int codim = dim-1;
+  
+				   // number of points: (degree+1)^codim
+  unsigned int n = this->degree+1;
+  for (unsigned int i=1; i<codim; ++i)
+    n *= this->degree+1;
+  
+  this->unit_face_support_points.resize(n);
+
+  const std::vector< Point<1> > edge = points.get_points();
+
+  const std::vector<unsigned int> &face_index_map_inverse=
+    FE_Q_Helper::invert_numbering(face_index_map);
+  
+  Point<codim> p;
+  
+  unsigned int k=0;
+  for (unsigned int iz=0; iz <= ((codim>2) ? this->degree : 0) ; ++iz)
+    for (unsigned int iy=0; iy <= ((codim>1) ? this->degree : 0) ; ++iy)
+      for (unsigned int ix=0; ix<=this->degree; ++ix)
+	{
+	  p(0) = edge[ix](0);
+	  if (codim>1)
+	    p(1) = edge[iy](0);
+	  if (codim>2)
+	    p(2) = edge[iz](0);
+	  
+	  this->unit_face_support_points[face_index_map_inverse[k++]] = p;
+	}
+}
+
+
+
+template <int dim>
 void
 FE_Q<dim>::initialize_quad_dof_index_permutation ()
 {
 				   // general template for 1D and 2D, do nothing
 }
-
 
 
 #if deal_II_dimension == 3
@@ -885,6 +1055,7 @@ FE_Q<dim>::get_dpo_vector(const unsigned int deg)
 }
 
 
+
 template <int dim>
 std::vector<unsigned int>
 FE_Q<dim>::face_lexicographic_to_hierarchic_numbering (const unsigned int degree)
@@ -907,22 +1078,35 @@ FE_Q<1>::face_lexicographic_to_hierarchic_numbering (const unsigned int)
 
 #endif
 
+
+
+template <int dim>
+void
+FE_Q<dim>::initialize_constraints ()
+{
+  QTrapez<1> trapez;
+  QIterated<1> points (trapez,this->degree);
+  initialize_constraints (points);
+}
+
+
 #if deal_II_dimension == 1
 
 template <>
 void
-FE_Q<1>::initialize_constraints ()
+FE_Q<1>::initialize_constraints (const Quadrature<1> &/*points*/)
 {
 				   // no constraints in 1d
 }
 
 #endif
 
+
 #if deal_II_dimension == 2
 
 template <>
 void
-FE_Q<2>::initialize_constraints ()
+FE_Q<2>::initialize_constraints (const Quadrature<1> &points)
 {
   const unsigned int dim = 2;
 
@@ -1022,7 +1206,7 @@ FE_Q<2>::initialize_constraints ()
                                    // destination (child) and source (mother)
                                    // dofs.
   const std::vector<Polynomials::Polynomial<double> > polynomials=
-    Polynomials::LagrangeEquidistant::generate_complete_basis(this->degree);
+    Polynomials::Lagrange::generate_complete_basis(points.get_points());
 
   this->interface_constraints
     .TableBase<2,double>::reinit (this->interface_constraints_size());
@@ -1033,16 +1217,16 @@ FE_Q<2>::initialize_constraints ()
 	this->interface_constraints(i,j) = 
 	  polynomials[face_index_map[j]].value (constraint_points[i](0));
 		    
-                                           // if the value is small up
-                                           // to round-off, then
-                                           // simply set it to zero to
-                                           // avoid unwanted fill-in
-                                           // of the constraint
-                                           // matrices (which would
-                                           // then increase the number
-                                           // of other DoFs a
-                                           // constrained DoF would
-                                           // couple to)
+                                   // if the value is small up
+                                   // to round-off, then
+				   // simply set it to zero to
+                                   // avoid unwanted fill-in
+                                   // of the constraint
+                                   // matrices (which would
+                                   // then increase the number
+                                   // of other DoFs a
+                                   // constrained DoF would
+                                   // couple to)
           if (std::fabs(this->interface_constraints(i,j)) < 1e-14)
             this->interface_constraints(i,j) = 0;
       }
@@ -1051,9 +1235,10 @@ FE_Q<2>::initialize_constraints ()
 #endif
 
 #if deal_II_dimension == 3
+
 template <>
 void
-FE_Q<3>::initialize_constraints ()
+FE_Q<3>::initialize_constraints (const Quadrature<1> &points)
 {
   const unsigned int dim = 3;
 
@@ -1148,9 +1333,11 @@ FE_Q<3>::initialize_constraints ()
                                    // Now construct relation between
                                    // destination (child) and source (mother)
                                    // dofs.
-  const unsigned int pnts=(this->degree+1)*(this->degree+1);  
+  const unsigned int pnts=(this->degree+1)*(this->degree+1); 
   const std::vector<Polynomials::Polynomial<double> > polynomial_basis=
-    Polynomials::LagrangeEquidistant::generate_complete_basis(this->degree);
+    Polynomials::Lagrange::generate_complete_basis(points.get_points()); 
+    //const std::vector<Polynomials::Polynomial<double> > polynomial_basis=
+    //Polynomials::LagrangeEquidistant::generate_complete_basis(this->degree);
  
   const TensorProductPolynomials<dim-1> face_polynomials(polynomial_basis);
 
