@@ -83,8 +83,11 @@ void transfer(std::ostream &out)
   soltrans.prepare_for_pure_refinement();
   tria.execute_coarsening_and_refinement();
   dof_handler.distribute_dofs (fe);
-  
-  soltrans.refine_interpolate(solution);
+
+  Vector<double> new_solution (dof_handler.n_dofs());
+  soltrans.refine_interpolate(solution, new_solution);
+  solution.reinit (dof_handler.n_dofs());
+  solution = new_solution;
 
   data_out.clear_data_vectors();
   data_out.add_data_vector (solution, "solution");
