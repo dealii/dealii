@@ -143,7 +143,7 @@ split_string_list (const std::string &s,
 
       skip_space (name);
 
-      while (name[name.length()-1] == ' ')
+      while ((name.size() != 0) && (name[name.length()-1] == ' '))
 	name.erase (name.length()-1, 1);
 
       split_list.push_back (name);
