@@ -24,6 +24,10 @@
 #  include <lac/petsc_parallel_vector.h>
 #endif
 
+#ifdef DEAL_II_USE_TRILINOS
+#  include <lac/trilinos_vector.h>
+#endif
+
 #include <cmath>
 #include <cstring>
 #include <algorithm>
@@ -165,6 +169,32 @@ Vector<Number>::Vector (const PETScWrappers::MPI::Vector &v)
 
 #endif
 
+#ifdef DEAL_II_USE_TRILINOS
+
+template <typename Number>
+Vector<Number>::Vector (const TrilinosWrappers::Vector &v)
+                :
+		Subscriptor(),
+		vec_size(v.size()),
+		max_vec_size(v.size()),
+		val(0)
+{
+  if (vec_size != 0)
+    {
+      val = new Number[max_vec_size];
+      Assert (val != 0, ExcOutOfMemory());
+
+                                       // get a representation of the vector
+                                       // and copy it
+      TrilinosScalar **start_ptr;
+      int ierr = v.vector->ExtractView (&start_ptr);
+      AssertThrow (ierr == 0, ExcTrilinosError(ierr));
+      
+      std::copy (start_ptr[0], start_ptr[0]+vec_size, begin());
+    }
+}
+
+#endif
 
 template <typename Number>
 template <typename Number2>

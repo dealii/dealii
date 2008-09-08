@@ -34,6 +34,13 @@ namespace PETScWrappers
 }
 #endif
 
+#ifdef DEAL_II_USE_TRILINOS
+namespace TrilinosWrappers
+{
+  class Vector;
+}
+#endif
+
 template<typename number> class LAPACKFullMatrix;
 
 template <typename> class BlockVector;
@@ -179,6 +186,26 @@ class Vector : public Subscriptor
                                       * else.
                                       */
     Vector (const PETScWrappers::MPI::Vector &v);
+#endif
+
+#ifdef DEAL_II_USE_TRILINOS
+                                     /**
+                                      * Another copy constructor: copy the
+                                      * values from a Trilinos wrapper
+                                      * vector class. This copy constructor is
+                                      * only available if Trilinos was detected
+                                      * during configuration time.
+				      *
+				      * Note that due to the communication
+                                      * model used in MPI, this operation can
+                                      * only succeed if all processes do it at
+                                      * the same time. I.e., it is not
+                                      * possible for only one process to
+                                      * obtain a copy of a parallel vector
+                                      * while the other jobs do something
+                                      * else.
+                                      */
+    Vector (const TrilinosWrappers::Vector &v);
 #endif
     
 				     /**
