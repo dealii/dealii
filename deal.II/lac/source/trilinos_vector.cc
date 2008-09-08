@@ -38,7 +38,7 @@ namespace TrilinosWrappers
       AssertThrow ((static_cast<signed int>(index) >= vector.map->MinMyGID()) &&
 		   (static_cast<signed int>(index) <= vector.map->MaxMyGID()),
 		   ExcAccessToNonLocalElement (index, vector.map->MinMyGID(),
-					       vector.map->MaxMyGID()-1));
+					       vector.map->MaxMyGID()));
 
       return (*(vector.vector))[0][index];
     }
@@ -226,7 +226,7 @@ namespace TrilinosWrappers
   {
                                         // Extract local indices in
                                         // the vector.
-    int trilinos_i = map->LID(index);
+    int trilinos_i = vector->Map().LID(index);
     TrilinosScalar value = 0.;
     if (trilinos_i == -1 )
       {

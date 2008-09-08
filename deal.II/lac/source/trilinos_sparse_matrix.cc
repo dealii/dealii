@@ -249,9 +249,9 @@ namespace TrilinosWrappers
 				  // is initialized with both row and
 				  // column map. Maybe find something
 				  // more out about this...
-    //reinit (input_map, input_map, sparsity_pattern);
+    reinit (input_map, input_map, sparsity_pattern);
     
-    matrix.reset();   
+    /*    matrix.reset();   
 
     unsigned int n_rows = sparsity_pattern.n_rows();
 
@@ -277,7 +277,7 @@ namespace TrilinosWrappers
 	      (new Epetra_FECrsMatrix(Copy, *row_map, &n_entries_per_row[0], 
 				      false));
 
-    reinit (sparsity_pattern);
+				      reinit (sparsity_pattern);*/
   }
 
 
@@ -420,9 +420,9 @@ namespace TrilinosWrappers
   {
 				  // flush buffers
     int ierr;
-    if (row_map->SameAs(*col_map))
-      ierr = matrix->GlobalAssemble ();
-    else
+    //if (row_map->SameAs(*col_map))
+      //ierr = matrix->GlobalAssemble ();
+    //else
       ierr = matrix->GlobalAssemble (*col_map, *row_map);
     
     AssertThrow (ierr == 0, ExcTrilinosError(ierr));
