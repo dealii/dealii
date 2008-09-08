@@ -51,113 +51,124 @@ namespace TrilinosWrappers
                                    // forward declaration
   class Vector;
 
-				   /**
-				    * @cond internal
-				    */
+				       /**
+					* @cond internal
+					*/
 
 /**
- * A namespace for internal implementation details of the TrilinosWrapper
- * members.
- * @ingroup TrilinosWrappers
+ * A namespace for internal implementation details of the
+ * TrilinosWrapper members.  @ingroup TrilinosWrappers
  */
   namespace internal
   {
-                                     /**
-                                      * This class implements a wrapper for
-				      * accessing the Trilinos vector
-				      * in the same way as we access 
-				      * deal.II objects:
-                                      * it is initialized with a vector and an
-                                      * element within it, and has a
-                                      * conversion operator to extract the
-                                      * scalar value of this element. It also
-                                      * has a variety of assignment operator
-                                      * for writing to this one element.
-				      * @ingroup TrilinosWrappers
-                                      */
+                                       /**
+					* This class implements a
+					* wrapper for accessing the
+					* Trilinos vector in the same
+					* way as we access deal.II
+					* objects: it is initialized
+					* with a vector and an element
+					* within it, and has a
+					* conversion operator to
+					* extract the scalar value of
+					* this element. It also has a
+					* variety of assignment
+					* operator for writing to this
+					* one element.  @ingroup
+					* TrilinosWrappers
+					*/
     class VectorReference
     {
       private:
-                                         /**
-                                          * Constructor. It is made private so
-                                          * as to only allow the actual vector
-                                          * class to create it.
-                                          */
+                                       /**
+					* Constructor. It is made
+					* private so as to only allow
+					* the actual vector class to
+					* create it.
+					*/
         VectorReference (Vector            &vector,
                          const unsigned int index);
 
       public:
-                                         /**
-                                          * This looks like a copy operator,
-                                          * but does something different than
-                                          * usual. In particular, it does not
-                                          * copy the member variables of this
-                                          * reference. Rather, it handles the
-                                          * situation where we have two
-                                          * vectors @p v and @p w, and assign
-                                          * elements like in
-                                          * <tt>v(i)=w(i)</tt>. Here, both
-                                          * left and right hand side of the
-                                          * assignment have data type
-                                          * VectorReference, but what we
-                                          * really mean is to assign the
-                                          * vector elements represented by the
-                                          * two references. This operator
-                                          * implements this operation. Note
-                                          * also that this allows us to make
-                                          * the assignment operator const.
-                                          */
+                                       /**
+					* This looks like a copy
+					* operator, but does something
+					* different than usual. In
+					* particular, it does not copy
+					* the member variables of this
+					* reference. Rather, it
+					* handles the situation where
+					* we have two vectors @p v and
+					* @p w, and assign elements
+					* like in
+					* <tt>v(i)=w(i)</tt>. Here,
+					* both left and right hand
+					* side of the assignment have
+					* data type VectorReference,
+					* but what we really mean is
+					* to assign the vector
+					* elements represented by the
+					* two references. This
+					* operator implements this
+					* operation. Note also that
+					* this allows us to make the
+					* assignment operator const.
+					*/
         const VectorReference & operator = (const VectorReference &r) const;
 
-                                         /**
-                                          * Set the referenced element of the
-                                          * vector to <tt>s</tt>.
-                                          */
+                                       /**
+					* Set the referenced element of the
+					* vector to <tt>s</tt>.
+					*/
         const VectorReference & operator = (const TrilinosScalar &s) const;
 
-                                         /**
-                                          * Add <tt>s</tt> to the referenced
-                                          * element of the vector->
-                                          */
+                                       /**
+					* Add <tt>s</tt> to the
+					* referenced element of the
+					* vector->
+					*/
         const VectorReference & operator += (const TrilinosScalar &s) const;
 
-                                         /**
-                                          * Subtract <tt>s</tt> from the
-                                          * referenced element of the vector->
-                                          */
+                                       /**
+					* Subtract <tt>s</tt> from the
+					* referenced element of the
+					* vector->
+					*/
         const VectorReference & operator -= (const TrilinosScalar &s) const;
 
-                                         /**
-                                          * Multiply the referenced element of
-                                          * the vector by <tt>s</tt>.
-                                          */
+	                               /**
+					* Multiply the referenced
+					* element of the vector by
+					* <tt>s</tt>.
+					*/
         const VectorReference & operator *= (const TrilinosScalar &s) const;
 
-                                         /**
-                                          * Divide the referenced element of
-                                          * the vector by <tt>s</tt>.
-                                          */
+                                       /**
+					* Divide the referenced
+					* element of the vector by
+					* <tt>s</tt>.
+					*/
         const VectorReference & operator /= (const TrilinosScalar &s) const;
 
-                                         /**
-                                          * Convert the reference to an actual
-                                          * value, i.e. return the value of
-                                          * the referenced element of the
-                                          * vector.
-                                          */
+                                       /**
+					* Convert the reference to an
+					* actual value, i.e. return
+					* the value of the referenced
+					* element of the vector.
+					*/
         operator TrilinosScalar () const;
 
-                                         /**
-                                          * Exception
-                                          */
+                                       /**
+					* Exception
+					*/
         DeclException1 (ExcTrilinosError,
                         int,
                         << "An error with error number " << arg1
                         << " occured while calling a Trilinos function");
 
-                                         /**
-                                          * Exception
-                                          */
+                                       /**
+					* Exception
+					*/
         DeclException3 (ExcAccessToNonLocalElement,
                         int, int, int,
                         << "You tried to access element " << arg1
@@ -166,111 +177,116 @@ namespace TrilinosWrappers
                         << " are stored locally and can be accessed.");
 
       private:
-                                         /**
-                                          * Point to the vector we are
-                                          * referencing.
-                                          */
+                                       /**
+					* Point to the vector we are
+					* referencing.
+					*/
         Vector   &vector;
 
-                                         /**
-                                          * Index of the referenced element
-                                          * of the vector.
-                                          */
+                                       /**
+					* Index of the referenced element
+					* of the vector.
+					*/
         const unsigned int  index;
 
-                                         /**
-                                          * Make the vector class a friend, so
-                                          * that it can create objects of the
-                                          * present type.
-                                          */
+                                       /**
+					* Make the vector class a
+					* friend, so that it can
+					* create objects of the
+					* present type.
+					*/
         friend class ::dealii::TrilinosWrappers::Vector;
     };
   }
-                                   /**
-                                    * @endcond
-                                    */
+                                       /**
+					* @endcond
+					*/
 
 
 /** 
- * This class implements a wrapper to use the Trilinos distributed vector
- * class Epetra_FEVector. This is precisely the kind of vector we deal with
- * all the time - we probably get it from some assembly process, where also
- * entries not locally owned might need to written and hence need to be
- * forwarded to the owner. This class is designed to be used in a distributed
- * memory architecture with an MPI compiler on the bottom, but works equally
- * well also for serial processes. The only requirement for this class to
- * work is that Trilinos is installed with the respective compiler as a
- * basis.
+ * This class implements a wrapper to use the Trilinos distributed
+ * vector class Epetra_FEVector. This is precisely the kind of vector
+ * we deal with all the time - we probably get it from some assembly
+ * process, where also entries not locally owned might need to written
+ * and hence need to be forwarded to the owner. This class is designed
+ * to be used in a distributed memory architecture with an MPI
+ * compiler on the bottom, but works equally well also for serial
+ * processes. The only requirement for this class to work is that
+ * Trilinos is installed with the respective compiler as a basis.
  *
  * The interface of this class is modeled after the existing Vector
- * class in deal.II. It has almost the same member functions, and is often
- * exchangable. However, since Trilinos only supports a single scalar type
- * (double), it is not templated, and only works with that type.
+ * class in deal.II. It has almost the same member functions, and is
+ * often exchangable. However, since Trilinos only supports a single
+ * scalar type (double), it is not templated, and only works with that
+ * type.
  *
- * Note that Trilinos only guarantees that operations do what you expect if the
- * function @p GlobalAssemble has been called after vector assembly in order to
- * distribute the data. Therefore, you need to call Vector::compress()
- * before you actually use the vectors.
+ * Note that Trilinos only guarantees that operations do what you
+ * expect if the function @p GlobalAssemble has been called after
+ * vector assembly in order to distribute the data. Therefore, you
+ * need to call Vector::compress() before you actually use the
+ * vectors.
  *
   * <h3>Parallel communication model</h3>
  *
- * The parallel functionality of Trilinos is built on top of the Message Passing
- * Interface (MPI). MPI's communication model is built on collective
- * communications: if one process wants something from another, that other
- * process has to be willing to accept this communication. A process cannot
- * query data from another process by calling a remote function, without that
- * other process expecting such a transaction. The consequence is that most of
- * the operations in the base class of this class have to be called
- * collectively. For example, if you want to compute the l2 norm of a parallel
- * vector, @em all processes across which this vector is shared have to call
- * the @p l2_norm function. If you don't do this, but instead only call the @p
- * l2_norm function on one process, then the following happens: This one
- * process will call one of the collective MPI functions and wait for all the
- * other processes to join in on this. Since the other processes don't call
- * this function, you will either get a time-out on the first process, or,
- * worse, by the time the next a callto a Trilinos function generates an MPI
- * message on the other processes , you will get a cryptic message that only a
- * subset of processes attempted a communication. These bugs can be very hard
- * to figure out, unless you are well-acquainted with the communication model
- * of MPI, and know which functions may generate MPI messages.
+ * The parallel functionality of Trilinos is built on top of the
+ * Message Passing Interface (MPI). MPI's communication model is built
+ * on collective communications: if one process wants something from
+ * another, that other process has to be willing to accept this
+ * communication. A process cannot query data from another process by
+ * calling a remote function, without that other process expecting
+ * such a transaction. The consequence is that most of the operations
+ * in the base class of this class have to be called collectively. For
+ * example, if you want to compute the l2 norm of a parallel vector,
+ * @em all processes across which this vector is shared have to call
+ * the @p l2_norm function. If you don't do this, but instead only
+ * call the @p l2_norm function on one process, then the following
+ * happens: This one process will call one of the collective MPI
+ * functions and wait for all the other processes to join in on
+ * this. Since the other processes don't call this function, you will
+ * either get a time-out on the first process, or, worse, by the time
+ * the next a callto a Trilinos function generates an MPI message on
+ * the other processes , you will get a cryptic message that only a
+ * subset of processes attempted a communication. These bugs can be
+ * very hard to figure out, unless you are well-acquainted with the
+ * communication model of MPI, and know which functions may generate
+ * MPI messages.
  *
- * One particular case, where an MPI message may be generated unexpectedly is
- * discussed below.
+ * One particular case, where an MPI message may be generated
+ * unexpectedly is discussed below.
  *
  * <h3>Accessing individual elements of a vector</h3>
  *
- * Trilinos does allow read access to individual elements of a vector, but in the
- * distributed case only to elements that are stored locally. We implement
- * this through calls like <tt>d=vec(i)</tt>. However, if you access an
- * element outside the locally stored range, an exception is generated.
+ * Trilinos does allow read access to individual elements of a vector,
+ * but in the distributed case only to elements that are stored
+ * locally. We implement this through calls like
+ * <tt>d=vec(i)</tt>. However, if you access an element outside the
+ * locally stored range, an exception is generated.
  *
- * In contrast to read access, Trilinos (and the respective deal.II wrapper
- * classes) allow to write (or add) to individual elements of vectors, even if
- * they are stored on a different process. You can do this writing, for
- * example, <tt>vec(i)=d</tt> or <tt>vec(i)+=d</tt>, or similar
- * operations. There is one catch, however, that may lead to very confusing
- * error messages: Trilinos requires application programs to call the compress()
- * function when they switch from adding, to elements to writing to
- * elements. The reasoning is that all processes might accumulate addition
- * operations to elements, even if multiple processes write to the same
- * elements. By the time we call compress() the next time, all these additions
- * are executed. However, if one process adds to an element, and another
- * overwrites to it, the order of execution would yield non-deterministic
- * behavior if we don't make sure that a synchronisation with compress()
- * happens in between.
+ * In contrast to read access, Trilinos (and the respective deal.II
+ * wrapper classes) allow to write (or add) to individual elements of
+ * vectors, even if they are stored on a different process. You can do
+ * this writing, for example, <tt>vec(i)=d</tt> or <tt>vec(i)+=d</tt>,
+ * or similar operations. There is one catch, however, that may lead
+ * to very confusing error messages: Trilinos requires application
+ * programs to call the compress() function when they switch from
+ * adding, to elements to writing to elements. The reasoning is that
+ * all processes might accumulate addition operations to elements,
+ * even if multiple processes write to the same elements. By the time
+ * we call compress() the next time, all these additions are
+ * executed. However, if one process adds to an element, and another
+ * overwrites to it, the order of execution would yield
+ * non-deterministic behavior if we don't make sure that a
+ * synchronisation with compress() happens in between.
  *
- * In order to make sure these calls to compress() happen at the appropriate
- * time, the deal.II wrappers keep a state variable that store which is the
- * presently allowed operation: additions or writes. If it encounters an
- * operation of the opposite kind, it calls compress() and flips the
- * state. This can sometimes lead to very confusing behavior, in code that may
- * for example look like this:
- * @verbatim
- *   TrilinosWrappers::Vector vector;
- *   ...
- *                   // do some write operations on the vector
- *   for (unsigned int i=0; i<vector->size(); ++i)
- *     vector(i) = i;
+ * In order to make sure these calls to compress() happen at the
+ * appropriate time, the deal.II wrappers keep a state variable that
+ * store which is the presently allowed operation: additions or
+ * writes. If it encounters an operation of the opposite kind, it
+ * calls compress() and flips the state. This can sometimes lead to
+ * very confusing behavior, in code that may for example look like
+ * this: @verbatim TrilinosWrappers::Vector vector; ...  // do some
+ * write operations on the vector for (unsigned int i=0;
+ * i<vector->size(); ++i) vector(i) = i;
  *
  *                   // do some additions to vector elements, but
  *                   // only for some elements
@@ -282,23 +298,24 @@ namespace TrilinosWrappers
  *   const double norm = vector->l2_norm();
  * @endverbatim
  *
- * This code can run into trouble: by the time we see the first addition
- * operation, we need to flush the overwrite buffers for the vector, and the
- * deal.II library will do so by calling compress(). However, it will only do
- * so for all processes that actually do an addition -- if the condition is
- * never true for one of the processes, then this one will not get to the
- * actual compress() call, whereas all the other ones do. This gets us into
- * trouble, since all the other processes hang in the call to flush the write
- * buffers, while the one other process advances to the call to compute the l2
- * norm. At this time, you will get an error that some operation was attempted
- * by only a subset of processes. This behavior may seem surprising, unless
- * you know that write/addition operations on single elements may trigger this
- * behavior.
+ * This code can run into trouble: by the time we see the first
+ * addition operation, we need to flush the overwrite buffers for the
+ * vector, and the deal.II library will do so by calling
+ * compress(). However, it will only do so for all processes that
+ * actually do an addition -- if the condition is never true for one
+ * of the processes, then this one will not get to the actual
+ * compress() call, whereas all the other ones do. This gets us into
+ * trouble, since all the other processes hang in the call to flush
+ * the write buffers, while the one other process advances to the call
+ * to compute the l2 norm. At this time, you will get an error that
+ * some operation was attempted by only a subset of processes. This
+ * behavior may seem surprising, unless you know that write/addition
+ * operations on single elements may trigger this behavior.
  *
- * The problem described here may be avoided by placing additional calls to
- * compress(), or making sure that all processes do the same type of
- * operations at the same time, for example by placing zero additions if
- * necessary.
+ * The problem described here may be avoided by placing additional
+ * calls to compress(), or making sure that all processes do the same
+ * type of operations at the same time, for example by placing zero
+ * additions if necessary.
  *
  * @ingroup TrilinosWrappers
  * @ingroup Vectors
@@ -309,11 +326,13 @@ namespace TrilinosWrappers
   {
     public:
                                        /**
-                                        * Declare some of the standard types
-                                        * used in all containers. These types
-                                        * parallel those in the <tt>C</tt>
-                                        * standard libraries <tt>vector<...></tt>
-                                        * class.
+                                        * Declare some of the standard
+                                        * types used in all
+                                        * containers. These types
+                                        * parallel those in the
+                                        * <tt>C</tt> standard
+                                        * libraries
+                                        * <tt>vector<...></tt> class.
                                         */
       typedef TrilinosScalar            value_type;
       typedef TrilinosScalar            real_type;
@@ -322,47 +341,35 @@ namespace TrilinosWrappers
       typedef const internal::VectorReference const_reference;
 
                                        /**
-                                        * Default constructor. It doesn't do
-                                        * anything, derived classes will have
-                                        * to initialize the data.
+                                        * Default constructor. It
+                                        * doesn't do anything, derived
+                                        * classes will have to
+                                        * initialize the data.
                                         */
       Vector ();
-                                       /**
-                                        * One of the constructors that
-				        * actually builds a vector. This
-				        * one requires prior knowledge
-                                        * of the size of the vector and
-				        * a communicator from 
-                                        * Epetra_CommSerial or Epetra_CommMpi,
-				        * depending on whether we use a 
-				        * serial or parallel MPI-based program.
-				        * This command distributes the
-				        * vector linearly among the processes,
-				        * from the beginning to the end, 
-				        * so you might want to use some
-				        * more advanced mapping and the
-				        * constructor with argument
-				        * Epetra_Map.
-                                        */
-      Vector (unsigned int GlobalSize, Epetra_Comm &Comm);
 
                                        /**
 				        * This constructor takes an
-				        * Epetra_Map that already knows how
-				        * to distribute the individual 
-				        * components among the MPI processors,
-				        * including the size of the vector.
+				        * Epetra_Map that already
+				        * knows how to distribute the
+				        * individual components among
+				        * the MPI processors,
+				        * including the size of the
+				        * vector.
                                         */
       Vector (const Epetra_Map &InputMap);
 
                                        /**
-                                        * Copy constructor. Sets the dimension
-                                        * to that of the given vector and uses
-				        * the map of that vector, but
-                                        * does not copy any element. Instead,
-				        * the memory will remain untouched
-				        * in case <tt>fast</tt> is false and
-				        * initialized with zero otherwise.
+                                        * Copy constructor. Sets the
+                                        * dimension to that of the
+                                        * given vector and uses the
+                                        * map of that vector, but does
+                                        * not copy any
+                                        * element. Instead, the memory
+                                        * will remain untouched in
+                                        * case <tt>fast</tt> is false
+                                        * and initialized with zero
+                                        * otherwise.
                                         */
       Vector (const Vector &v, 
 	      const bool    fast = false);
@@ -673,55 +680,61 @@ namespace TrilinosWrappers
       Vector & operator += (const Vector &V);
 
                                        /**
-                                        * Subtract the given vector from the
-                                        * present one.
+                                        * Subtract the given vector
+                                        * from the present one.
                                         */
       Vector & operator -= (const Vector &V);
 
                                        /**
                                         * Addition of @p s to all
-                                        * components. Note that @p s is a
-                                        * scalar and not a vector.
+                                        * components. Note that @p s
+                                        * is a scalar and not a
+                                        * vector.
                                         */
       void add (const TrilinosScalar s);
 
                                        /**
-                                        * Simple vector addition, equal to the
-                                        * <tt>operator +=</tt>.
+                                        * Simple vector addition,
+                                        * equal to the <tt>operator
+                                        * +=</tt>.
                                         */
       void add (const Vector &V);
 
                                        /**
-                                        * Simple addition of a multiple of a
-                                        * vector, i.e. <tt>*this = a*V</tt>.
+                                        * Simple addition of a
+                                        * multiple of a vector,
+                                        * i.e. <tt>*this = a*V</tt>.
                                         */
       void add (const TrilinosScalar a, const Vector &V);
 
                                        /**
-                                        * Multiple addition of scaled vectors,
-                                        * i.e. <tt>*this = a*V + b*W</tt>.
+                                        * Multiple addition of scaled
+                                        * vectors, i.e. <tt>*this =
+                                        * a*V + b*W</tt>.
                                         */
       void add (const TrilinosScalar a, const Vector &V,
                 const TrilinosScalar b, const Vector &W);
 
                                        /**
-                                        * Scaling and simple vector addition,
-                                        * i.e.
-                                        * <tt>*this = s*(*this) + V</tt>.
+                                        * Scaling and simple vector
+                                        * addition, i.e.  <tt>*this =
+                                        * s*(*this) + V</tt>.
                                         */
       void sadd (const TrilinosScalar s,
                  const Vector        &V);
 
                                        /**
-                                        * Scaling and simple addition, i.e.
-                                        * <tt>*this = s*(*this) + a*V</tt>.
+                                        * Scaling and simple addition,
+                                        * i.e.  <tt>*this = s*(*this)
+                                        * + a*V</tt>.
                                         */
       void sadd (const TrilinosScalar s,
                  const TrilinosScalar a,
                  const Vector        &V);
 
                                        /**
-                                        * Scaling and multiple addition.
+                                        * Scaling and multiple
+                                        * addition.
                                         */
       void sadd (const TrilinosScalar s,
                  const TrilinosScalar a,
@@ -730,8 +743,10 @@ namespace TrilinosWrappers
                  const Vector        &W);
 
                                        /**
-                                        * Scaling and multiple addition.
-                                        * <tt>*this = s*(*this) + a*V + b*W + c*X</tt>.
+                                        * Scaling and multiple
+                                        * addition.  <tt>*this =
+                                        * s*(*this) + a*V + b*W +
+                                        * c*X</tt>.
                                         */
       void sadd (const TrilinosScalar s,
                  const TrilinosScalar a,
@@ -744,64 +759,72 @@ namespace TrilinosWrappers
                                        /**
                                         * Scale each element of this
                                         * vector by the corresponding
-                                        * element in the argument. This
-                                        * function is mostly meant to
-                                        * simulate multiplication (and
-                                        * immediate re-assignment) by a
-                                        * diagonal scaling matrix.
+                                        * element in the
+                                        * argument. This function is
+                                        * mostly meant to simulate
+                                        * multiplication (and
+                                        * immediate re-assignment) by
+                                        * a diagonal scaling matrix.
                                         */
       void scale (const Vector &scaling_factors);
 
                                        /**
-                                        * Assignment <tt>*this = a*V</tt>.
+                                        * Assignment <tt>*this =
+                                        * a*V</tt>.
                                         */
       void equ (const TrilinosScalar a, const Vector &V);
 
                                        /**
-                                        * Assignment <tt>*this = a*V + b*W</tt>.
+                                        * Assignment <tt>*this = a*V +
+                                        * b*W</tt>.
                                         */
       void equ (const TrilinosScalar a, const Vector &V,
                 const TrilinosScalar b, const Vector &W);
 
                                        /**
-                                        * Compute the elementwise ratio of the
-                                        * two given vectors, that is let
-                                        * <tt>this[i] = a[i]/b[i]</tt>. This is
-                                        * useful for example if you want to
-                                        * compute the cellwise ratio of true to
-                                        * estimated error.
+                                        * Compute the elementwise
+                                        * ratio of the two given
+                                        * vectors, that is let
+                                        * <tt>this[i] =
+                                        * a[i]/b[i]</tt>. This is
+                                        * useful for example if you
+                                        * want to compute the cellwise
+                                        * ratio of true to estimated
+                                        * error.
                                         *
                                         * This vector is appropriately
                                         * scaled to hold the result.
                                         *
-                                        * If any of the <tt>b[i]</tt> is
-                                        * zero, the result is
-                                        * undefined. No attempt is made
-                                        * to catch such situations.
+                                        * If any of the <tt>b[i]</tt>
+                                        * is zero, the result is
+                                        * undefined. No attempt is
+                                        * made to catch such
+                                        * situations.
                                         */
       void ratio (const Vector &a,
                   const Vector &b);
 
 				     /**
-				      *  Output of vector in user-defined
-				      *  format in analogy to the 
+				      *  Output of vector in
+				      *  user-defined format in
+				      *  analogy to the
 				      *  dealii::Vector<number> class.
 				      */
     void print (const char* format = 0) const;
 
                                        /**
-                                        * Print to a
-                                        * stream. @p precision denotes
-                                        * the desired precision with
-                                        * which values shall be printed,
-                                        * @p scientific whether
+                                        * Print to a stream. @p
+                                        * precision denotes the
+                                        * desired precision with which
+                                        * values shall be printed, @p
+                                        * scientific whether
                                         * scientific notation shall be
-                                        * used. If @p across is
-                                        * @p true then the vector is
+                                        * used. If @p across is @p
+                                        * true then the vector is
                                         * printed in a line, while if
                                         * @p false then the elements
-                                        * are printed on a separate line
-                                        * each.
+                                        * are printed on a separate
+                                        * line each.
                                         */
       void print (std::ostream       &out,
                   const unsigned int  precision  = 3,
@@ -813,18 +836,18 @@ namespace TrilinosWrappers
                                         * vector and the other vector
                                         * @p v. One could do this
                                         * operation with a temporary
-                                        * variable and copying over the
-                                        * data elements, but this
-                                        * function is significantly more
-                                        * efficient since it only swaps
-                                        * the pointers to the data of
-                                        * the two vectors and therefore
-                                        * does not need to allocate
-                                        * temporary storage and move
-                                        * data around. Note that the 
-				        * vectors need to be of the same
-				        * size and base on the same 
-				        * map.
+                                        * variable and copying over
+                                        * the data elements, but this
+                                        * function is significantly
+                                        * more efficient since it only
+                                        * swaps the pointers to the
+                                        * data of the two vectors and
+                                        * therefore does not need to
+                                        * allocate temporary storage
+                                        * and move data around. Note
+                                        * that the vectors need to be
+                                        * of the same size and base on
+                                        * the same map.
                                         *
                                         * This function is analog to the
                                         * the @p swap function of all C
@@ -864,49 +887,65 @@ namespace TrilinosWrappers
 
     private:
                                        /**
-                                        * An Epetra map used to map vector data
-                                        * accross multiple processes. This is
-                                        * the communicator and data distribution
-				        * object common to all
-                                        * Trilinos objects used by deal.II.
+					* A dummy pointer to an
+					* Epetra_Map to be used for
+					* the default constructor.
+					*/
+      Epetra_Map *dummy_map;
+
+                                       /**
+                                        * A pointer to an Epetra map
+                                        * used to map vector data
+                                        * accross multiple
+                                        * processes. This is the
+                                        * communicator and data
+                                        * distribution object common
+                                        * to all Trilinos objects used
+                                        * by deal.II.
                                         */
-      Epetra_Map map;
+      Epetra_Map *map;
 
 				       /**
-                                        * Trilinos doesn't allow to mix additions
-                                        * to matrix entries and overwriting
-                                        * them (to make synchronisation of
+                                        * Trilinos doesn't allow to
+                                        * mix additions to matrix
+                                        * entries and overwriting them
+                                        * (to make synchronisation of
                                         * parallel computations
-                                        * simpler). The way we do it is to,
-                                        * for each access operation, store
-                                        * whether it is an insertion or an
-                                        * addition. If the previous one was of
-                                        * different type, then we first have
-                                        * to flush the Trilinos buffers;
-                                        * otherwise, we can simply go on.
-				        * Luckily, Trilinos has an object
-				        * for this which does already all
-				        * the parallel communications in
-				        * such a case, so we simply use their
-				        * model, which stores whether the
-				        * last operation was an addition
-				        * or an insertion.
+                                        * simpler). The way we do it
+                                        * is to, for each access
+                                        * operation, store whether it
+                                        * is an insertion or an
+                                        * addition. If the previous
+                                        * one was of different type,
+                                        * then we first have to flush
+                                        * the Trilinos buffers;
+                                        * otherwise, we can simply go
+                                        * on.  Luckily, Trilinos has
+                                        * an object for this which
+                                        * does already all the
+                                        * parallel communications in
+                                        * such a case, so we simply
+                                        * use their model, which
+                                        * stores whether the last
+                                        * operation was an addition or
+                                        * an insertion.
                                         */
       Epetra_CombineMode last_action;
 
     public:
                                        /**
-                                        * An Epetra distibuted vector type.
-                                        * Requires an existing Epetra_Map for
-                                        * storing data.
-				        * TODO: Should become private at some
-				        * point.
+                                        * An Epetra distibuted vector
+                                        * type.  Requires an existing
+                                        * Epetra_Map for storing data.
+                                        * TODO: Should become private
+                                        * at some point.
                                         */
       std::auto_ptr<Epetra_FEVector> vector;
 
 
                                        /**
-                                        * Make the reference class a friend.
+                                        * Make the reference class a
+                                        * friend.
                                         */
       friend class internal::VectorReference;
 
@@ -917,9 +956,9 @@ namespace TrilinosWrappers
 // ------------------- inline and template functions --------------
 
 /**
- * Global function swap which overloads the default implementation
- * of the C standard library which uses a temporary object. The
- * function simply exchanges the data of the two vectors.
+ * Global function swap which overloads the default implementation of
+ * the C standard library which uses a temporary object. The function
+ * simply exchanges the data of the two vectors.
  *
  * @ingroup TrilinosWrappers
  * @relates TrilinosWrappers::Vector
@@ -947,10 +986,10 @@ namespace TrilinosWrappers
     const VectorReference &
     VectorReference::operator = (const VectorReference &r) const
     {
-                                       // as explained in the class
-                                       // documentation, this is not the copy
-                                       // operator. so simply pass on to the
-                                       // "correct" assignment operator
+                                        // as explained in the class
+                                        // documentation, this is not the copy
+                                        // operator. so simply pass on to the
+                                        // "correct" assignment operator
       *this = static_cast<TrilinosScalar> (r);
 
       return *this;
@@ -1029,10 +1068,10 @@ namespace TrilinosWrappers
   {
 				    // if the vectors have different sizes,
 				    // then first resize the present one
-    if (!map.SameAs(v.map))
+    if (! map->SameAs(*v.map))
       {
 	map = v.map;
-	  vector = std::auto_ptr<Epetra_FEVector> 
+	vector = std::auto_ptr<Epetra_FEVector> 
 			(new Epetra_FEVector(*v.vector));
       }
     else

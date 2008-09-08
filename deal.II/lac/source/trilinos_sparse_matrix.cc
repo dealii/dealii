@@ -60,7 +60,7 @@ namespace TrilinosWrappers
 				  // would it point to?)
       Assert (ncols != 0, ExcInternalError());
       colnum_cache.reset (new std::vector<unsigned int> (colnums,
-							colnums+ncols));
+							 colnums+ncols));
       value_cache.reset (new std::vector<TrilinosScalar> (values, values+ncols));
     }
   }
@@ -80,35 +80,46 @@ namespace TrilinosWrappers
   SparseMatrix::SparseMatrix ()
 		  :
 #ifdef DEAL_II_COMPILER_SUPPORTS_MPI
-		  row_map (0, 0, Epetra_MpiComm(MPI_COMM_WORLD)),
+                  dummy_map (new Epetra_Map (0, 0, Epetra_MpiComm(MPI_COMM_WORLD))),
 #else
-		  row_map (0, 0, Epetra_SerialComm()),
+                  dummy_map (new Epetra_Map (0, 0, Epetra_SerialComm())),
 #endif
+		  row_map (const_cast<Epetra_Map*>(dummy_map)),
 		  col_map (row_map),
 		  last_action (Insert),
 		  matrix (std::auto_ptr<Epetra_FECrsMatrix>
-				(new Epetra_FECrsMatrix(Copy, row_map, 0)))
+				(new Epetra_FECrsMatrix(Copy, *row_map, 0)))
   {}
 
   SparseMatrix::SparseMatrix (const Epetra_Map  &InputMap,
 			      const unsigned int n_max_entries_per_row)
 		  :
-		  row_map (InputMap),
+#ifdef DEAL_II_COMPILER_SUPPORTS_MPI
+                  dummy_map (new Epetra_Map (0, 0, Epetra_MpiComm(MPI_COMM_WORLD))),
+#else
+                  dummy_map (new Epetra_Map (0, 0, Epetra_SerialComm())),
+#endif
+                  row_map (const_cast<Epetra_Map*>(&InputMap)),
 		  col_map (row_map),
 		  last_action (Insert),
 		  matrix (std::auto_ptr<Epetra_FECrsMatrix>
-				(new Epetra_FECrsMatrix(Copy, row_map, 
+				(new Epetra_FECrsMatrix(Copy, *row_map, 
 					int(n_max_entries_per_row), false)))
   {}
 
-  SparseMatrix::SparseMatrix (const Epetra_Map  &InputMap,
+  SparseMatrix::SparseMatrix (const Epetra_Map                &InputMap,
 			      const std::vector<unsigned int> &n_entries_per_row)
 		  :
-		  row_map (InputMap),
+#ifdef DEAL_II_COMPILER_SUPPORTS_MPI
+                  dummy_map (new Epetra_Map (0, 0, Epetra_MpiComm(MPI_COMM_WORLD))),
+#else
+                  dummy_map (new Epetra_Map (0, 0, Epetra_SerialComm())),
+#endif
+                  row_map (const_cast<Epetra_Map*>(&InputMap)),
 		  col_map (row_map),
 		  last_action (Insert),
 		  matrix (std::auto_ptr<Epetra_FECrsMatrix>
-		    (new Epetra_FECrsMatrix(Copy, row_map, 
+		    (new Epetra_FECrsMatrix(Copy, *row_map, 
 		      (int*)const_cast<unsigned int*>(&(n_entries_per_row[0])),
 		      true)))
   {}
@@ -117,23 +128,33 @@ namespace TrilinosWrappers
 			      const Epetra_Map  &InputColMap,
 			      const unsigned int n_max_entries_per_row)
 		  :
-		  row_map (InputRowMap),
-		  col_map (InputColMap),
+#ifdef DEAL_II_COMPILER_SUPPORTS_MPI
+                  dummy_map (new Epetra_Map (0, 0, Epetra_MpiComm(MPI_COMM_WORLD))),
+#else
+                  dummy_map (new Epetra_Map (0, 0, Epetra_SerialComm())),
+#endif
+                  row_map (const_cast<Epetra_Map*>(&InputRowMap)),
+                  col_map (const_cast<Epetra_Map*>(&InputColMap)),
 		  last_action (Insert),
 		  matrix (std::auto_ptr<Epetra_FECrsMatrix>
-				(new Epetra_FECrsMatrix(Copy, row_map, col_map, 
+				(new Epetra_FECrsMatrix(Copy, *row_map, *col_map, 
 					int(n_max_entries_per_row), false)))
   {}
 
-  SparseMatrix::SparseMatrix (const Epetra_Map  &InputRowMap,
-			      const Epetra_Map  &InputColMap,
+  SparseMatrix::SparseMatrix (const Epetra_Map                &InputRowMap,
+			      const Epetra_Map                &InputColMap,
 			      const std::vector<unsigned int> &n_entries_per_row)
 		  :
-		  row_map (InputRowMap),
-		  col_map (InputColMap),
+#ifdef DEAL_II_COMPILER_SUPPORTS_MPI
+                  dummy_map (new Epetra_Map (0, 0, Epetra_MpiComm(MPI_COMM_WORLD))),
+#else
+                  dummy_map (new Epetra_Map (0, 0, Epetra_SerialComm())),
+#endif
+                  row_map (const_cast<Epetra_Map*>(&InputRowMap)),
+                  col_map (const_cast<Epetra_Map*>(&InputColMap)),
 		  last_action (Insert),
 		  matrix (std::auto_ptr<Epetra_FECrsMatrix>
-		    (new Epetra_FECrsMatrix(Copy, row_map, col_map, 
+		    (new Epetra_FECrsMatrix(Copy, *row_map, *col_map, 
 		      (int*)const_cast<unsigned int*>(&(n_entries_per_row[0])),
 		      true)))
   {}
@@ -142,6 +163,7 @@ namespace TrilinosWrappers
 
   SparseMatrix::~SparseMatrix ()
   {
+    delete dummy_map;
   }
 
 
@@ -167,7 +189,7 @@ namespace TrilinosWrappers
 				  // sparsity pattern on that
 				  // processor, and only broadcast the
 				  // pattern afterwards.
-    if (row_map.Comm().MyPID() == 0)
+    if (row_map->Comm().MyPID() == 0)
       {
 	Assert (matrix->NumGlobalRows() == (int)sparsity_pattern.n_rows(),
 		ExcDimensionMismatch (matrix->NumGlobalRows(),
@@ -228,11 +250,12 @@ namespace TrilinosWrappers
 				  // column map. Maybe find something
 				  // more out about this...
     //reinit (input_map, input_map, sparsity_pattern);
-    matrix.reset();
+    
+    matrix.reset();   
 
     unsigned int n_rows = sparsity_pattern.n_rows();
 
-    if (row_map.Comm().MyPID() == 0)
+    if (row_map->Comm().MyPID() == 0)
       {
 	Assert (input_map.NumGlobalElements() == (int)sparsity_pattern.n_rows(),
 		ExcDimensionMismatch (input_map.NumGlobalElements(),
@@ -242,8 +265,8 @@ namespace TrilinosWrappers
 				      sparsity_pattern.n_cols()));
       }
 
-    row_map = input_map;
-    col_map = input_map;
+    row_map = const_cast<Epetra_Map*>(&input_map);
+    col_map = row_map;
 
     std::vector<int> n_entries_per_row(n_rows);
 
@@ -251,7 +274,7 @@ namespace TrilinosWrappers
       n_entries_per_row[(int)row] = sparsity_pattern.row_length(row);
 
     matrix = std::auto_ptr<Epetra_FECrsMatrix>
-	      (new Epetra_FECrsMatrix(Copy, row_map, &n_entries_per_row[0], 
+	      (new Epetra_FECrsMatrix(Copy, *row_map, &n_entries_per_row[0], 
 				      false));
 
     reinit (sparsity_pattern);
@@ -268,7 +291,7 @@ namespace TrilinosWrappers
 
     unsigned int n_rows = sparsity_pattern.n_rows();
 
-    if (row_map.Comm().MyPID() == 0)
+    if (input_row_map.Comm().MyPID() == 0)
       {
 	Assert (input_row_map.NumGlobalElements() == (int)sparsity_pattern.n_rows(),
 		ExcDimensionMismatch (input_row_map.NumGlobalElements(),
@@ -278,8 +301,8 @@ namespace TrilinosWrappers
 				      sparsity_pattern.n_cols()));
       }
 
-    row_map = input_row_map;
-    col_map = input_col_map;
+    row_map = const_cast<Epetra_Map*>(&input_row_map);
+    col_map = const_cast<Epetra_Map*>(&input_col_map);
 
     std::vector<int> n_entries_per_row(n_rows);
 
@@ -287,7 +310,7 @@ namespace TrilinosWrappers
       n_entries_per_row[(int)row] = sparsity_pattern.row_length(row);
 
     matrix = std::auto_ptr<Epetra_FECrsMatrix>
-	      (new Epetra_FECrsMatrix(Copy, row_map, col_map,
+	      (new Epetra_FECrsMatrix(Copy, *row_map, *col_map,
 				      &n_entries_per_row[0], false));
 
     reinit (sparsity_pattern);
@@ -334,8 +357,8 @@ namespace TrilinosWrappers
 	    ExcDimensionMismatch (input_col_map.NumGlobalElements(),
 				  dealii_sparse_matrix.n()));
 
-    row_map = input_row_map;
-    col_map = input_col_map;
+    row_map = const_cast<Epetra_Map*>(&input_row_map);
+    col_map = const_cast<Epetra_Map*>(&input_col_map);
 
     std::vector<int> n_entries_per_row(n_rows);
 
@@ -344,7 +367,7 @@ namespace TrilinosWrappers
 	  dealii_sparse_matrix.get_sparsity_pattern().row_length(row);
 
     matrix = std::auto_ptr<Epetra_FECrsMatrix>
-	      (new Epetra_FECrsMatrix(Copy, row_map, col_map,
+	      (new Epetra_FECrsMatrix(Copy, *row_map, *col_map,
 				      &n_entries_per_row[0], true));
 
     std::vector<double> values;
@@ -382,14 +405,12 @@ namespace TrilinosWrappers
 				  // the pointer and generate an
 				  // empty matrix.
     matrix.reset();
-#ifdef DEAL_II_COMPILER_SUPPORTS_MPI
-    row_map = Epetra_Map (0,0,Epetra_MpiComm(MPI_COMM_WORLD)),
-#else
-    row_map = Epetra_Map (0,0,Epetra_SerialComm()),
-#endif
+    
+    row_map = const_cast<Epetra_Map*>(dummy_map);
+    col_map = row_map;
 
     matrix = std::auto_ptr<Epetra_FECrsMatrix> 
-	      (new Epetra_FECrsMatrix(Copy, row_map, 0));
+	      (new Epetra_FECrsMatrix(Copy, *row_map, 0));
   }
 
 
@@ -399,10 +420,10 @@ namespace TrilinosWrappers
   {
 				  // flush buffers
     int ierr;
-    if (row_map.SameAs(col_map))
+    if (row_map->SameAs(*col_map))
       ierr = matrix->GlobalAssemble ();
     else
-      ierr = matrix->GlobalAssemble (col_map, row_map);
+      ierr = matrix->GlobalAssemble (*col_map, *row_map);
     
     AssertThrow (ierr == 0, ExcTrilinosError(ierr));
 
@@ -440,10 +461,10 @@ namespace TrilinosWrappers
     if (last_action == Add)
       {
 	int ierr;
-	if (row_map.SameAs(col_map))
+	if (row_map->SameAs(*col_map))
 	  ierr = matrix->GlobalAssemble (false);
 	else
-	  ierr = matrix->GlobalAssemble(col_map, row_map, false);
+	  ierr = matrix->GlobalAssemble(*col_map, *row_map, false);
 	
 	AssertThrow (ierr == 0, ExcTrilinosError(ierr));
 	last_action = Insert;
@@ -475,10 +496,10 @@ namespace TrilinosWrappers
     if (last_action == Insert)
       {
 	int ierr;
-	if (row_map.SameAs(col_map))
+	if (row_map->SameAs(*col_map))
 	  ierr = matrix->GlobalAssemble (false);
 	else
-	  ierr = matrix->GlobalAssemble(col_map, row_map, false);
+	  ierr = matrix->GlobalAssemble(*col_map, *row_map, false);
 	
 	AssertThrow (ierr == 0, ExcTrilinosError(ierr));
 
@@ -623,6 +644,10 @@ namespace TrilinosWrappers
   {
     Assert (m() == n(), ExcNotQuadratic());
 
+				  // Trilinos doesn't seem to have a
+				  // more efficient way to access the
+				  // diagonal than by just using the
+				  // standard el(i,j) function.
     return el(i,i);
   }
 
@@ -684,14 +709,14 @@ namespace TrilinosWrappers
   {
     Assert (row < m(), ExcInternalError());
 
-				// get a representation of the present
-				// row
+				  // get a representation of the
+				  // present row
     int ncols = -1;
     int local_row = matrix->RowMap().LID(row);
 
-				// on the processor who owns this
-				// row, we'll have a non-negative
-				// value.
+				  // on the processor who owns this
+				  // row, we'll have a non-negative
+				  // value.
     if (local_row >= 0)
       {
 	int ierr = matrix->NumMyRowEntries (local_row, ncols);
@@ -772,9 +797,9 @@ namespace TrilinosWrappers
   {
     Assert (&src != &dst, ExcSourceEqualsDestination());
     
-    Assert (col_map.SameAs(src.vector->Map()),
+    Assert (col_map->SameAs(src.vector->Map()),
 	    ExcMessage ("Column map of matrix does not fit with vector map!"));
-    Assert (row_map.SameAs(dst.vector->Map()),
+    Assert (row_map->SameAs(dst.vector->Map()),
 	    ExcMessage ("Row map of matrix does not fit with vector map!"));
 
     if (!matrix->Filled())
@@ -792,9 +817,9 @@ namespace TrilinosWrappers
   {
     Assert (&src != &dst, ExcSourceEqualsDestination());
 
-    Assert (row_map.SameAs(src.vector->Map()),
+    Assert (row_map->SameAs(src.vector->Map()),
 	    ExcMessage ("Row map of matrix does not fit with vector map!"));
-    Assert (col_map.SameAs(dst.vector->Map()),
+    Assert (col_map->SameAs(dst.vector->Map()),
 	    ExcMessage ("Column map of matrix does not fit with vector map!"));
 
     if (!matrix->Filled())
@@ -876,13 +901,15 @@ namespace TrilinosWrappers
     Assert (rhs.m() == m(), ExcDimensionMismatch (rhs.m(), m()));
     Assert (rhs.n() == n(), ExcDimensionMismatch (rhs.n(), n()));
     
-				     // I bet that there must be a better way
-				     // to do this but it has not been found:
-				     // currently, we simply go through each
-				     // row of the argument matrix, copy it,
-				     // scale it, and add it to the current
-				     // matrix. that's probably not the most
-				     // efficient way to do things.
+				  // I bet that there must be a
+                                  // better way to do this but it
+                                  // has not been found: currently,
+				  // we simply go through each row
+				  // of the argument matrix, copy
+				  // it, scale it, and add it to
+				  // the current matrix. that's
+				  // probably not the most
+				  // efficient way to do things.
     const std::pair<unsigned int, unsigned int>
       local_range = rhs.local_range();
 
@@ -917,11 +944,12 @@ namespace TrilinosWrappers
   
 
 
-				  // TODO: Currently this only flips
-				  // a flag that tells Trilinos that
-				  // any application should be done with
-				  // the transpose. However, the matrix
-				  // structure is not reset.
+				  // TODO: Currently this only flips a
+				  // flag that tells Trilinos that any
+				  // application should be done with
+				  // the transpose. However, the
+				  // matrix structure is not
+				  // reset. Can we leave it like this?
   void
   SparseMatrix::transpose () 
   {
@@ -973,7 +1001,7 @@ namespace TrilinosWrappers
 
 
 				  // As of now, no particularly neat
-				  // ouput is generated in case of 
+				  // ouput is generated in case of
 				  // multiple processors.
   void SparseMatrix::print (std::ostream &out) const
   {

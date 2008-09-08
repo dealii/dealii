@@ -53,7 +53,7 @@ namespace TrilinosWrappers
     const unsigned int n_rows = matrix.m();
     const unsigned int null_space_dimension = null_space.size();
 
-				     // Build the AMG preconditioner.
+				        // Build the AMG preconditioner.
     Teuchos::ParameterList parameter_list;
   
     if (elliptic)
@@ -87,9 +87,10 @@ namespace TrilinosWrappers
 		ExcDimensionMismatch(n_rows,
 				     null_space[0].size()));
 	
-				 // Reshape null space as a contiguous
-				 // vector of doubles so that Trilinos
-				 // can read from it.
+				        // Reshape null space as a
+				        // contiguous vector of
+				        // doubles so that Trilinos
+				        // can read from it.
 	null_space_modes.resize (n_rows * null_space_dimension, 0.);
 	for (unsigned int d=0; d<null_space_dimension; ++d)
 	  for (unsigned int row=0; row<n_rows; ++row)
@@ -121,8 +122,9 @@ namespace TrilinosWrappers
   {
     const unsigned int n_rows = deal_ii_sparse_matrix.m();
   
-				     // Init Epetra Matrix, avoid 
-				     // storing the nonzero elements.
+				        // Init Epetra Matrix, avoid
+				        // storing the nonzero
+				        // elements.
 
     Map.reset (new Epetra_Map(n_rows, 0, communicator));
 
@@ -155,23 +157,27 @@ namespace TrilinosWrappers
   }
 
 
-				   // For the implementation of the
-				   // <code>vmult</code> function we
-				   // note that invoking a call of 
-				   // the Trilinos preconditioner 
-				   // requires us to use Epetra vectors
-				   // as well. It is faster
-				   // to provide a view, i.e., feed 
-				   // Trilinos with a pointer to the
-				   // data, so we avoid copying the
-				   // content of the vectors during
-				   // the iteration. In the declaration
-				   // of the right hand side, we need
-				   // to cast the source vector (that
-				   // is <code>const</code> in all deal.II 
-				   // calls) to non-constant value, as
-				   // this is the way Trilinos wants to
-				   // have them.
+				        // For the implementation of
+				        // the <code>vmult</code>
+				        // function we note that
+				        // invoking a call of the
+				        // Trilinos preconditioner
+				        // requires us to use Epetra
+				        // vectors as well. It is
+				        // faster to provide a view,
+				        // i.e., feed Trilinos with a
+				        // pointer to the data, so we
+				        // avoid copying the content
+				        // of the vectors during the
+				        // iteration. In the
+				        // declaration of the right
+				        // hand side, we need to cast
+				        // the source vector (that is
+				        // <code>const</code> in all
+				        // deal.II calls) to
+				        // non-constant value, as this
+				        // is the way Trilinos wants
+				        // to have them.
   void PreconditionAMG::vmult (dealii::Vector<double>       &dst,
 			       const dealii::Vector<double> &src) const
   {

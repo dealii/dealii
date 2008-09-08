@@ -29,63 +29,74 @@ namespace TrilinosWrappers
       Assert (index < vector.size(),
               ExcIndexRange (index, 0, vector.size()));
 
-                                       // Trilinos allows for vectors to be
-                                       // referenced by the [] or () operators
-                                       // but only () checks index bounds
-                                       // Also, can only get local values
+                                        // Trilinos allows for vectors
+                                        // to be referenced by the []
+                                        // or () operators but only ()
+                                        // checks index bounds Also,
+                                        // can only get local values
 
-      AssertThrow ((static_cast<signed int>(index) >= vector.map.MinMyGID()) &&
-		   (static_cast<signed int>(index) <= vector.map.MaxMyGID()),
-		   ExcAccessToNonLocalElement (index, vector.map.MinMyGID(),
-					       vector.map.MaxMyGID()-1));
+      AssertThrow ((static_cast<signed int>(index) >= vector.map->MinMyGID()) &&
+		   (static_cast<signed int>(index) <= vector.map->MaxMyGID()),
+		   ExcAccessToNonLocalElement (index, vector.map->MinMyGID(),
+					       vector.map->MaxMyGID()-1));
 
       return (*(vector.vector))[0][index];
     }
   }
 
+
+
   Vector::Vector ()
                   :
 #ifdef DEAL_II_COMPILER_SUPPORTS_MPI
-		  map (0,0,Epetra_MpiComm(MPI_COMM_WORLD)),
+                  dummy_map (new Epetra_Map (0,0,Epetra_MpiComm(MPI_COMM_WORLD))),
 #else
-		  map (0,0,Epetra_SerialComm()),
+		  dummy_map (new Epetra_Map (0,0,Epetra_SerialComm())),
 #endif
+		  map (const_cast<Epetra_Map*>(dummy_map)),
                   last_action (Insert),
 		  vector(std::auto_ptr<Epetra_FEVector> 
-			 (new Epetra_FEVector(map)))
+			 (new Epetra_FEVector(*map)))
   {}
 
-  Vector::Vector (unsigned int GlobalSize, Epetra_Comm &Comm)
-                  :
-		  map (GlobalSize, 0, Comm),
-                  last_action (Insert),
-		  vector (std::auto_ptr<Epetra_FEVector> 
-			  (new Epetra_FEVector(map)))
-  {}
 
   
   Vector::Vector (const Epetra_Map &InputMap)
                   :
-		  map (InputMap),
+#ifdef DEAL_II_COMPILER_SUPPORTS_MPI
+                  dummy_map (new Epetra_Map (0,0,Epetra_MpiComm(MPI_COMM_WORLD))),
+#else
+		  dummy_map (new Epetra_Map (0,0,Epetra_SerialComm())),
+#endif
+		  map (const_cast<Epetra_Map*>(&InputMap)),
                   last_action (Insert),
 		  vector (std::auto_ptr<Epetra_FEVector> 
-			  (new Epetra_FEVector(map)))
+			  (new Epetra_FEVector(*map)))
   {}
   
+
   
   Vector::Vector (const Vector &v,
 		  const bool    fast)
                   :
+#ifdef DEAL_II_COMPILER_SUPPORTS_MPI
+                  dummy_map (new Epetra_Map (0,0,Epetra_MpiComm(MPI_COMM_WORLD))),
+#else
+		  dummy_map (new Epetra_Map (0,0,Epetra_SerialComm())),
+#endif
 		  map (v.map),
                   last_action (Insert),
 		  vector(std::auto_ptr<Epetra_FEVector> 
-			 (new Epetra_FEVector(v.map,!fast)))
+			 (new Epetra_FEVector(*map,!fast)))
   {}
   
 
 
   Vector::~Vector ()
-  {}
+  {
+    vector.reset();
+    delete dummy_map;
+  }
 
 
 
@@ -93,9 +104,9 @@ namespace TrilinosWrappers
   Vector::reinit (const Epetra_Map &input_map)
   {
     vector.reset();
-    map = input_map;
+    map = const_cast<Epetra_Map*> (&input_map);
 
-    vector = std::auto_ptr<Epetra_FEVector> (new Epetra_FEVector(input_map));
+    vector = std::auto_ptr<Epetra_FEVector> (new Epetra_FEVector(*map));
     last_action = Insert;
   }
 
@@ -107,10 +118,9 @@ namespace TrilinosWrappers
   {
     vector.reset();
 
-    if (!map.SameAs(v.map))
-      map = v.map;
+    map = v.map;
 
-    vector = std::auto_ptr<Epetra_FEVector> (new Epetra_FEVector(v.map,!fast));
+    vector = std::auto_ptr<Epetra_FEVector> (new Epetra_FEVector(*map,!fast));
     last_action = Insert;
   }
 
@@ -119,17 +129,13 @@ namespace TrilinosWrappers
   void
   Vector::clear ()
   {
-                                     // When we clear the matrix,
-				     // reset the pointer and 
-				     // generate an empty matrix.
+                                     // When we clear the vector,
+				     // reset the pointer and generate
+				     // an empty vector.
     vector.reset();
-#ifdef DEAL_II_COMPILER_SUPPORTS_MPI
-    map = Epetra_Map (0,0,Epetra_MpiComm(MPI_COMM_WORLD)),
-#else
-    map = Epetra_Map (0,0,Epetra_SerialComm()),
-#endif
+    map = dummy_map;
 
-    vector = std::auto_ptr<Epetra_FEVector> (new Epetra_FEVector(map));
+    vector = std::auto_ptr<Epetra_FEVector> (new Epetra_FEVector(*map));
     last_action = Insert;
   }
 
@@ -218,9 +224,9 @@ namespace TrilinosWrappers
   TrilinosScalar
   Vector::el (const unsigned int index) const
   {
-                                      // Extract local indices in
-                                      // the vector.
-    int trilinos_i = map.LID(index);
+                                        // Extract local indices in
+                                        // the vector.
+    int trilinos_i = map->LID(index);
     TrilinosScalar value = 0.;
     if (trilinos_i == -1 )
       {
@@ -388,8 +394,9 @@ namespace TrilinosWrappers
   Vector::real_type
   Vector::lp_norm (const TrilinosScalar p) const
   {
-                                     // get a representation of the vector and
-                                     // loop over all the elements
+                                        // get a representation of the
+                                        // vector and loop over all
+                                        // the elements
     TrilinosScalar *start_ptr;
     int leading_dimension;
     int ierr = vector->ExtractView (&start_ptr, &leading_dimension);
@@ -399,6 +406,7 @@ namespace TrilinosWrappers
     TrilinosScalar sum=0;
 
     const TrilinosScalar * ptr  = start_ptr;
+
                                        // add up elements
     while (ptr != start_ptr+size())
       sum += std::pow(std::fabs(*ptr++), p);
@@ -686,9 +694,9 @@ namespace TrilinosWrappers
 	    ExcMessage("The given value is not finite but "
 		       "either infinite or Not A Number (NaN)"));
 
-                                     // Update member can only input 
-				     // two other vectors so
-                                     // do it in two steps
+                                        // Update member can only
+				        // input two other vectors so
+				        // do it in two steps
     const int ierr = vector->Update(a, *(v.vector), b, *(w.vector), s);
     AssertThrow (ierr == 0, ExcTrilinosError(ierr));
 
@@ -766,9 +774,10 @@ namespace TrilinosWrappers
 
 
   
-				     // TODO: up to now only local data
-                                     // printed out! Find a way to neatly
-				     // output distributed data...
+				        // TODO: up to now only local
+                                        // data printed out! Find a
+                                        // way to neatly output
+                                        // distributed data...
   void
   Vector::print (const char *format) const
   {
@@ -796,11 +805,12 @@ namespace TrilinosWrappers
   {
     AssertThrow (out, ExcIO());
 
-                                     // get a representation of the vector and
-                                     // loop over all the elements 
-                                     // TODO: up to now only local data
-                                     // printed out! Find a way to neatly
-				     // output distributed data...
+                                        // get a representation of the
+                                        // vector and loop over all
+                                        // the elements TODO: up to
+                                        // now only local data printed
+                                        // out! Find a way to neatly
+                                        // output distributed data...
     TrilinosScalar *val;
     int leading_dimension;
     int ierr = vector->ExtractView (&val, &leading_dimension);
@@ -820,8 +830,8 @@ namespace TrilinosWrappers
         out << static_cast<double>(val[i]) << std::endl;
     out << std::endl;
 
-                                     // restore the representation of the
-                                     // vector
+                                        // restore the representation
+                                        // of the vector
     AssertThrow (out, ExcIO());
   }
 
@@ -830,14 +840,15 @@ namespace TrilinosWrappers
   void
   Vector::swap (Vector &v)
   {
-                                    // Just swap the pointers to the 
-                                    // two Epetra vectors that hold all
-                                    // the data.
+                                        // Just swap the pointers to
+                                        // the two Epetra vectors that
+                                        // hold all the data.
     Vector *p_v = &v, *p_this = this;
     Vector* tmp = p_v;
     p_v = p_this;
     p_this = tmp;
   }
+
 
 
   unsigned int
