@@ -35,10 +35,10 @@ namespace TrilinosWrappers
                                         // checks index bounds Also,
                                         // can only get local values
 
-      AssertThrow ((static_cast<signed int>(index) >= vector.map->MinMyGID()) &&
-		   (static_cast<signed int>(index) <= vector.map->MaxMyGID()),
-		   ExcAccessToNonLocalElement (index, vector.map->MinMyGID(),
-					       vector.map->MaxMyGID()));
+      AssertThrow ((static_cast<signed int>(index) >= vector.map.MinMyGID()) &&
+		   (static_cast<signed int>(index) <= vector.map.MaxMyGID()),
+		   ExcAccessToNonLocalElement (index, vector.map.MinMyGID(),
+					       vector.map.MaxMyGID()));
 
       return (*(vector.vector))[0][index];
     }
@@ -49,29 +49,23 @@ namespace TrilinosWrappers
   Vector::Vector ()
                   :
 #ifdef DEAL_II_COMPILER_SUPPORTS_MPI
-                  dummy_map (new Epetra_Map (0,0,Epetra_MpiComm(MPI_COMM_WORLD))),
+                  map (0,0,Epetra_MpiComm(MPI_COMM_WORLD)),
 #else
-		  dummy_map (new Epetra_Map (0,0,Epetra_SerialComm())),
+		  map (0,0,Epetra_SerialComm()),
 #endif
-		  map (const_cast<Epetra_Map*>(dummy_map)),
                   last_action (Insert),
 		  vector(std::auto_ptr<Epetra_FEVector> 
-			 (new Epetra_FEVector(*map)))
+			 (new Epetra_FEVector(map)))
   {}
 
 
   
   Vector::Vector (const Epetra_Map &InputMap)
                   :
-#ifdef DEAL_II_COMPILER_SUPPORTS_MPI
-                  dummy_map (new Epetra_Map (0,0,Epetra_MpiComm(MPI_COMM_WORLD))),
-#else
-		  dummy_map (new Epetra_Map (0,0,Epetra_SerialComm())),
-#endif
-		  map (const_cast<Epetra_Map*>(&InputMap)),
+		  map (InputMap),
                   last_action (Insert),
 		  vector (std::auto_ptr<Epetra_FEVector> 
-			  (new Epetra_FEVector(*map)))
+			  (new Epetra_FEVector(map)))
   {}
   
 
@@ -79,23 +73,16 @@ namespace TrilinosWrappers
   Vector::Vector (const Vector &v,
 		  const bool    fast)
                   :
-#ifdef DEAL_II_COMPILER_SUPPORTS_MPI
-                  dummy_map (new Epetra_Map (0,0,Epetra_MpiComm(MPI_COMM_WORLD))),
-#else
-		  dummy_map (new Epetra_Map (0,0,Epetra_SerialComm())),
-#endif
 		  map (v.map),
                   last_action (Insert),
 		  vector(std::auto_ptr<Epetra_FEVector> 
-			 (new Epetra_FEVector(*map,!fast)))
+			 (new Epetra_FEVector(map,!fast)))
   {}
   
 
 
   Vector::~Vector ()
   {
-    vector.reset();
-    delete dummy_map;
   }
 
 
@@ -104,9 +91,9 @@ namespace TrilinosWrappers
   Vector::reinit (const Epetra_Map &input_map)
   {
     vector.reset();
-    map = const_cast<Epetra_Map*> (&input_map);
+    map = input_map;
 
-    vector = std::auto_ptr<Epetra_FEVector> (new Epetra_FEVector(*map));
+    vector = std::auto_ptr<Epetra_FEVector> (new Epetra_FEVector(map));
     last_action = Insert;
   }
 
@@ -117,10 +104,10 @@ namespace TrilinosWrappers
 		  const bool    fast)
   {
     vector.reset();
+    if (map.SameAs(v.map) == false)
+      map = v.map;
 
-    map = v.map;
-
-    vector = std::auto_ptr<Epetra_FEVector> (new Epetra_FEVector(*map,!fast));
+    vector = std::auto_ptr<Epetra_FEVector> (new Epetra_FEVector(map,!fast));
     last_action = Insert;
   }
 
@@ -133,9 +120,14 @@ namespace TrilinosWrappers
 				     // reset the pointer and generate
 				     // an empty vector.
     vector.reset();
-    map = dummy_map;
 
-    vector = std::auto_ptr<Epetra_FEVector> (new Epetra_FEVector(*map));
+#ifdef DEAL_II_COMPILER_SUPPORTS_MPI
+    map = Epetra_Map (0, 0, Epetra_MpiComm(MPI_COMM_WORLD));
+#else
+    map = Epetra_Map (0, 0, Epetra_SerialComm());
+#endif
+
+    vector = std::auto_ptr<Epetra_FEVector> (new Epetra_FEVector(map));
     last_action = Insert;
   }
 

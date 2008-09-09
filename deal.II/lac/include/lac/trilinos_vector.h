@@ -887,23 +887,15 @@ namespace TrilinosWrappers
 
     private:
                                        /**
-					* A dummy pointer to an
-					* Epetra_Map to be used for
-					* the default constructor.
-					*/
-      Epetra_Map *dummy_map;
-
-                                       /**
-                                        * A pointer to an Epetra map
-                                        * used to map vector data
-                                        * accross multiple
+                                        * The Epetra map used to map
+                                        * vector data accross multiple
                                         * processes. This is the
                                         * communicator and data
                                         * distribution object common
                                         * to all Trilinos objects used
                                         * by deal.II.
                                         */
-      Epetra_Map *map;
+      Epetra_Map map;
 
 				       /**
                                         * Trilinos doesn't allow to
@@ -1068,7 +1060,7 @@ namespace TrilinosWrappers
   {
 				    // if the vectors have different sizes,
 				    // then first resize the present one
-    if (! map->SameAs(*v.map))
+    if (map.SameAs(v.map) == false)
       {
 	map = v.map;
 	vector = std::auto_ptr<Epetra_FEVector> 

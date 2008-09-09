@@ -1191,15 +1191,7 @@ namespace TrilinosWrappers
 
     private:
                                        /**
-					* Dummy pointer that is used
-					* internally in the
-					* constructor for empty
-					* matrices.
-					*/
-      const Epetra_Map *dummy_map;
-
-                                       /**
-				        * Pointer to Epetra Trilinos
+				        * Epetra Trilinos
 				        * mapping of the matrix rows
 				        * that assigns parts of the
 				        * matrix to the individual
@@ -1208,7 +1200,7 @@ namespace TrilinosWrappers
 				        * constructor or in a reinit
 				        * function.
 				        */
-      Epetra_Map *row_map;
+      Epetra_Map row_map;
 
                                        /**
                                         * Pointer to the user-supplied
@@ -1217,7 +1209,7 @@ namespace TrilinosWrappers
 				        * assigns parts of the matrix
 				        * to the individual processes.
 				        */
-      Epetra_Map *col_map;
+      Epetra_Map col_map;
   
                                        /**
                                         * Trilinos doesn't allow to
@@ -1339,9 +1331,10 @@ namespace TrilinosWrappers
 
       ++accessor.a_index;
 
-                                       // if at end of line: do one step, then
-                                       // cycle until we find a row with a
-                                       // nonzero number of entries
+				        // If at end of line: do one
+				        // step, then cycle until we 
+				        // find a row with a nonzero
+				        // number of entries.
       if (accessor.a_index >= accessor.colnum_cache->size())
         {
           accessor.a_index = 0;

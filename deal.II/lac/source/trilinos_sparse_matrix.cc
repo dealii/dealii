@@ -80,46 +80,35 @@ namespace TrilinosWrappers
   SparseMatrix::SparseMatrix ()
 		  :
 #ifdef DEAL_II_COMPILER_SUPPORTS_MPI
-                  dummy_map (new Epetra_Map (0, 0, Epetra_MpiComm(MPI_COMM_WORLD))),
+                  row_map (0, 0, Epetra_MpiComm(MPI_COMM_WORLD)),
 #else
-                  dummy_map (new Epetra_Map (0, 0, Epetra_SerialComm())),
+                  row_map (0, 0, Epetra_SerialComm()),
 #endif
-		  row_map (const_cast<Epetra_Map*>(dummy_map)),
 		  col_map (row_map),
 		  last_action (Insert),
 		  matrix (std::auto_ptr<Epetra_FECrsMatrix>
-				(new Epetra_FECrsMatrix(Copy, *row_map, 0)))
+				(new Epetra_FECrsMatrix(Copy, row_map, 0)))
   {}
 
   SparseMatrix::SparseMatrix (const Epetra_Map  &InputMap,
 			      const unsigned int n_max_entries_per_row)
 		  :
-#ifdef DEAL_II_COMPILER_SUPPORTS_MPI
-                  dummy_map (new Epetra_Map (0, 0, Epetra_MpiComm(MPI_COMM_WORLD))),
-#else
-                  dummy_map (new Epetra_Map (0, 0, Epetra_SerialComm())),
-#endif
-                  row_map (const_cast<Epetra_Map*>(&InputMap)),
+                  row_map (InputMap),
 		  col_map (row_map),
 		  last_action (Insert),
 		  matrix (std::auto_ptr<Epetra_FECrsMatrix>
-				(new Epetra_FECrsMatrix(Copy, *row_map, 
+				(new Epetra_FECrsMatrix(Copy, row_map, 
 					int(n_max_entries_per_row), false)))
   {}
 
   SparseMatrix::SparseMatrix (const Epetra_Map                &InputMap,
 			      const std::vector<unsigned int> &n_entries_per_row)
 		  :
-#ifdef DEAL_II_COMPILER_SUPPORTS_MPI
-                  dummy_map (new Epetra_Map (0, 0, Epetra_MpiComm(MPI_COMM_WORLD))),
-#else
-                  dummy_map (new Epetra_Map (0, 0, Epetra_SerialComm())),
-#endif
-                  row_map (const_cast<Epetra_Map*>(&InputMap)),
+                  row_map (InputMap),
 		  col_map (row_map),
 		  last_action (Insert),
 		  matrix (std::auto_ptr<Epetra_FECrsMatrix>
-		    (new Epetra_FECrsMatrix(Copy, *row_map, 
+		    (new Epetra_FECrsMatrix(Copy, row_map, 
 		      (int*)const_cast<unsigned int*>(&(n_entries_per_row[0])),
 		      true)))
   {}
@@ -128,16 +117,11 @@ namespace TrilinosWrappers
 			      const Epetra_Map  &InputColMap,
 			      const unsigned int n_max_entries_per_row)
 		  :
-#ifdef DEAL_II_COMPILER_SUPPORTS_MPI
-                  dummy_map (new Epetra_Map (0, 0, Epetra_MpiComm(MPI_COMM_WORLD))),
-#else
-                  dummy_map (new Epetra_Map (0, 0, Epetra_SerialComm())),
-#endif
-                  row_map (const_cast<Epetra_Map*>(&InputRowMap)),
-                  col_map (const_cast<Epetra_Map*>(&InputColMap)),
+                  row_map (InputRowMap),
+                  col_map (InputColMap),
 		  last_action (Insert),
 		  matrix (std::auto_ptr<Epetra_FECrsMatrix>
-				(new Epetra_FECrsMatrix(Copy, *row_map, *col_map, 
+				(new Epetra_FECrsMatrix(Copy, row_map, col_map, 
 					int(n_max_entries_per_row), false)))
   {}
 
@@ -145,16 +129,11 @@ namespace TrilinosWrappers
 			      const Epetra_Map                &InputColMap,
 			      const std::vector<unsigned int> &n_entries_per_row)
 		  :
-#ifdef DEAL_II_COMPILER_SUPPORTS_MPI
-                  dummy_map (new Epetra_Map (0, 0, Epetra_MpiComm(MPI_COMM_WORLD))),
-#else
-                  dummy_map (new Epetra_Map (0, 0, Epetra_SerialComm())),
-#endif
-                  row_map (const_cast<Epetra_Map*>(&InputRowMap)),
-                  col_map (const_cast<Epetra_Map*>(&InputColMap)),
+                  row_map (InputRowMap),
+                  col_map (InputColMap),
 		  last_action (Insert),
 		  matrix (std::auto_ptr<Epetra_FECrsMatrix>
-		    (new Epetra_FECrsMatrix(Copy, *row_map, *col_map, 
+		    (new Epetra_FECrsMatrix(Copy, row_map, col_map, 
 		      (int*)const_cast<unsigned int*>(&(n_entries_per_row[0])),
 		      true)))
   {}
@@ -163,7 +142,6 @@ namespace TrilinosWrappers
 
   SparseMatrix::~SparseMatrix ()
   {
-    delete dummy_map;
   }
 
 
@@ -189,7 +167,7 @@ namespace TrilinosWrappers
 				  // sparsity pattern on that
 				  // processor, and only broadcast the
 				  // pattern afterwards.
-    if (row_map->Comm().MyPID() == 0)
+    if (row_map.Comm().MyPID() == 0)
       {
 	Assert (matrix->NumGlobalRows() == (int)sparsity_pattern.n_rows(),
 		ExcDimensionMismatch (matrix->NumGlobalRows(),
@@ -255,7 +233,7 @@ namespace TrilinosWrappers
 
     unsigned int n_rows = sparsity_pattern.n_rows();
 
-    if (row_map->Comm().MyPID() == 0)
+    if (row_map.Comm().MyPID() == 0)
       {
 	Assert (input_map.NumGlobalElements() == (int)sparsity_pattern.n_rows(),
 		ExcDimensionMismatch (input_map.NumGlobalElements(),
@@ -265,7 +243,7 @@ namespace TrilinosWrappers
 				      sparsity_pattern.n_cols()));
       }
 
-    row_map = const_cast<Epetra_Map*>(&input_map);
+    row_map = input_map;
     col_map = row_map;
 
     std::vector<int> n_entries_per_row(n_rows);
@@ -274,7 +252,7 @@ namespace TrilinosWrappers
       n_entries_per_row[(int)row] = sparsity_pattern.row_length(row);
 
     matrix = std::auto_ptr<Epetra_FECrsMatrix>
-	      (new Epetra_FECrsMatrix(Copy, *row_map, &n_entries_per_row[0], 
+	      (new Epetra_FECrsMatrix(Copy, row_map, &n_entries_per_row[0], 
 				      false));
 
 				      reinit (sparsity_pattern);*/
@@ -301,8 +279,8 @@ namespace TrilinosWrappers
 				      sparsity_pattern.n_cols()));
       }
 
-    row_map = const_cast<Epetra_Map*>(&input_row_map);
-    col_map = const_cast<Epetra_Map*>(&input_col_map);
+    row_map = input_row_map;
+    col_map = input_col_map;
 
     std::vector<int> n_entries_per_row(n_rows);
 
@@ -310,7 +288,7 @@ namespace TrilinosWrappers
       n_entries_per_row[(int)row] = sparsity_pattern.row_length(row);
 
     matrix = std::auto_ptr<Epetra_FECrsMatrix>
-	      (new Epetra_FECrsMatrix(Copy, *row_map, *col_map,
+	      (new Epetra_FECrsMatrix(Copy, row_map, col_map,
 				      &n_entries_per_row[0], false));
 
     reinit (sparsity_pattern);
@@ -357,8 +335,8 @@ namespace TrilinosWrappers
 	    ExcDimensionMismatch (input_col_map.NumGlobalElements(),
 				  dealii_sparse_matrix.n()));
 
-    row_map = const_cast<Epetra_Map*>(&input_row_map);
-    col_map = const_cast<Epetra_Map*>(&input_col_map);
+    row_map = input_row_map;
+    col_map = input_col_map;
 
     std::vector<int> n_entries_per_row(n_rows);
 
@@ -367,7 +345,7 @@ namespace TrilinosWrappers
 	  dealii_sparse_matrix.get_sparsity_pattern().row_length(row);
 
     matrix = std::auto_ptr<Epetra_FECrsMatrix>
-	      (new Epetra_FECrsMatrix(Copy, *row_map, *col_map,
+	      (new Epetra_FECrsMatrix(Copy, row_map, col_map,
 				      &n_entries_per_row[0], true));
 
     std::vector<double> values;
@@ -405,12 +383,17 @@ namespace TrilinosWrappers
 				  // the pointer and generate an
 				  // empty matrix.
     matrix.reset();
-    
-    row_map = const_cast<Epetra_Map*>(dummy_map);
+ 
+#ifdef DEAL_II_COMPILER_SUPPORTS_MPI
+    row_map = Epetra_Map (0, 0, Epetra_MpiComm(MPI_COMM_WORLD));
+#else
+    row_map = Epetra_Map (0, 0, Epetra_SerialComm());
+#endif
+
     col_map = row_map;
 
     matrix = std::auto_ptr<Epetra_FECrsMatrix> 
-	      (new Epetra_FECrsMatrix(Copy, *row_map, 0));
+	      (new Epetra_FECrsMatrix(Copy, row_map, 0));
   }
 
 
@@ -420,10 +403,10 @@ namespace TrilinosWrappers
   {
 				  // flush buffers
     int ierr;
-    //if (row_map->SameAs(*col_map))
+    //if (row_map.SameAs(col_map))
       //ierr = matrix->GlobalAssemble ();
     //else
-      ierr = matrix->GlobalAssemble (*col_map, *row_map);
+      ierr = matrix->GlobalAssemble (col_map, row_map);
     
     AssertThrow (ierr == 0, ExcTrilinosError(ierr));
 
@@ -461,10 +444,10 @@ namespace TrilinosWrappers
     if (last_action == Add)
       {
 	int ierr;
-	if (row_map->SameAs(*col_map))
+	if (row_map.SameAs(col_map))
 	  ierr = matrix->GlobalAssemble (false);
 	else
-	  ierr = matrix->GlobalAssemble(*col_map, *row_map, false);
+	  ierr = matrix->GlobalAssemble(col_map, row_map, false);
 	
 	AssertThrow (ierr == 0, ExcTrilinosError(ierr));
 	last_action = Insert;
@@ -496,10 +479,10 @@ namespace TrilinosWrappers
     if (last_action == Insert)
       {
 	int ierr;
-	if (row_map->SameAs(*col_map))
+	if (row_map.SameAs(col_map))
 	  ierr = matrix->GlobalAssemble (false);
 	else
-	  ierr = matrix->GlobalAssemble(*col_map, *row_map, false);
+	  ierr = matrix->GlobalAssemble(col_map, row_map, false);
 	
 	AssertThrow (ierr == 0, ExcTrilinosError(ierr));
 
@@ -797,12 +780,12 @@ namespace TrilinosWrappers
   {
     Assert (&src != &dst, ExcSourceEqualsDestination());
     
-    Assert (col_map->SameAs(src.vector->Map()),
+    Assert (col_map.SameAs(src.vector->Map()) == true,
 	    ExcMessage ("Column map of matrix does not fit with vector map!"));
-    Assert (row_map->SameAs(dst.vector->Map()),
+    Assert (row_map.SameAs(dst.vector->Map()) == true,
 	    ExcMessage ("Row map of matrix does not fit with vector map!"));
 
-    if (!matrix->Filled())
+    if (matrix->Filled() == false)
       matrix->FillComplete();
 
     const int ierr = matrix->Multiply (false, *(src.vector), *(dst.vector));
@@ -817,12 +800,12 @@ namespace TrilinosWrappers
   {
     Assert (&src != &dst, ExcSourceEqualsDestination());
 
-    Assert (row_map->SameAs(src.vector->Map()),
+    Assert (row_map.SameAs(src.vector->Map()) == true,
 	    ExcMessage ("Row map of matrix does not fit with vector map!"));
-    Assert (col_map->SameAs(dst.vector->Map()),
+    Assert (col_map.SameAs(dst.vector->Map()) == true,
 	    ExcMessage ("Column map of matrix does not fit with vector map!"));
 
-    if (!matrix->Filled())
+    if (matrix->Filled() == false)
       matrix->FillComplete();
 
     const int ierr = matrix->Multiply (true, *(src.vector), *(dst.vector));
