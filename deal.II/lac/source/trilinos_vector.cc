@@ -220,10 +220,18 @@ namespace TrilinosWrappers
                                         // the vector.
     int trilinos_i = vector->Map().LID(index);
     TrilinosScalar value = 0.;
+
+				        // If the element is not
+				        // present on the current
+				        // processor, we can't
+				        // continue. Just print out 0.
+
+				        // TODO: Is this reasonable?
     if (trilinos_i == -1 )
       {
-        Assert (false, ExcAccessToNonlocalElement(index, local_range().first,
-						  local_range().second));
+	return 0.;
+        //Assert (false, ExcAccessToNonlocalElement(index, local_range().first,
+	//				  local_range().second));
       }
     else
       value = (*vector)[0][trilinos_i];

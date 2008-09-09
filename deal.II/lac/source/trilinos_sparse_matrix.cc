@@ -186,25 +186,20 @@ namespace TrilinosWrappers
 //		ExcDimensionMismatch (matrix->NumGlobalCols(),
 //				      sparsity_pattern.n_cols()));
 
-	std::vector<int> n_entries_per_row(n_rows);
-    
-	for (unsigned int row=0; row<n_rows; ++row)
-	  n_entries_per_row[(int)row] = sparsity_pattern.row_length(row);
-    
 	std::vector<double> values;
 	std::vector<int>    row_indices;
     
 	for (unsigned int row=0; row<n_rows; ++row)
 	  {
 	    const int row_length = sparsity_pattern.row_length(row);
-	    row_indices.resize (row_length, 0);
+	    row_indices.resize (row_length, -1);
 	    values.resize (row_length, 0.);
 	    
-	    for (int col=0; col< row_length; ++col)
+	    for (int col=0; col < row_length; ++col)
 	      row_indices[col] = sparsity_pattern.column_number (row, col);
 	    
-	    matrix->InsertGlobalValues(row, row_length,
-				       &values[0], &row_indices[0]);
+	    matrix->InsertGlobalValues (row, row_length,
+				        &values[0], &row_indices[0]);
 	  }
       }
     
@@ -222,40 +217,7 @@ namespace TrilinosWrappers
   SparseMatrix::reinit (const Epetra_Map       &input_map,
 			const SparsityPattern  &sparsity_pattern)
   {
-				  // TODO: There seems to be problem
-				  // in Epetra when a quadratic matrix
-				  // is initialized with both row and
-				  // column map. Maybe find something
-				  // more out about this...
     reinit (input_map, input_map, sparsity_pattern);
-    
-    /*    matrix.reset();   
-
-    unsigned int n_rows = sparsity_pattern.n_rows();
-
-    if (row_map.Comm().MyPID() == 0)
-      {
-	Assert (input_map.NumGlobalElements() == (int)sparsity_pattern.n_rows(),
-		ExcDimensionMismatch (input_map.NumGlobalElements(),
-				      sparsity_pattern.n_rows()));
-	Assert (input_map.NumGlobalElements() == (int)sparsity_pattern.n_cols(),
-		ExcDimensionMismatch (input_map.NumGlobalElements(),
-				      sparsity_pattern.n_cols()));
-      }
-
-    row_map = input_map;
-    col_map = row_map;
-
-    std::vector<int> n_entries_per_row(n_rows);
-
-    for (unsigned int row=0; row<n_rows; ++row)
-      n_entries_per_row[(int)row] = sparsity_pattern.row_length(row);
-
-    matrix = std::auto_ptr<Epetra_FECrsMatrix>
-	      (new Epetra_FECrsMatrix(Copy, row_map, &n_entries_per_row[0], 
-				      false));
-
-				      reinit (sparsity_pattern);*/
   }
 
 
@@ -287,9 +249,19 @@ namespace TrilinosWrappers
     for (unsigned int row=0; row<n_rows; ++row)
       n_entries_per_row[(int)row] = sparsity_pattern.row_length(row);
 
-    matrix = std::auto_ptr<Epetra_FECrsMatrix>
-	      (new Epetra_FECrsMatrix(Copy, row_map, col_map,
-				      &n_entries_per_row[0], false));
+				  // TODO: There seems to be problem
+				  // in Epetra when a quadratic matrix
+				  // is initialized with both row and
+				  // column map. Maybe find something
+				  // more out about this...
+    if (row_map.SameAs(col_map) == true)
+      matrix = std::auto_ptr<Epetra_FECrsMatrix>
+	        (new Epetra_FECrsMatrix(Copy, row_map,
+					&n_entries_per_row[0], false));
+    else
+      matrix = std::auto_ptr<Epetra_FECrsMatrix>
+	        (new Epetra_FECrsMatrix(Copy, row_map, col_map,
+					&n_entries_per_row[0], false));
 
     reinit (sparsity_pattern);
   }
@@ -403,9 +375,9 @@ namespace TrilinosWrappers
   {
 				  // flush buffers
     int ierr;
-    //if (row_map.SameAs(col_map))
-      //ierr = matrix->GlobalAssemble ();
-    //else
+    if (row_map.SameAs(col_map))
+      ierr = matrix->GlobalAssemble ();
+    else
       ierr = matrix->GlobalAssemble (col_map, row_map);
     
     AssertThrow (ierr == 0, ExcTrilinosError(ierr));
@@ -569,11 +541,15 @@ namespace TrilinosWrappers
 
 				      // If the data is not on the
 				      // present processor, we can't
-				      // continue.
+				      // continue. Just print out
+				      // zero.
+
+				      // TODO: Is this reasonable?
     if ((trilinos_i == -1 ) || (trilinos_j == -1))
       {
-	Assert (false, ExcAccessToNonLocalElement(i, j, local_range().first,
-						  local_range().second));
+	return 0.;
+	//Assert (false, ExcAccessToNonLocalElement(i, j, local_range().first,
+	//				  local_range().second));
       }
     else
     {
@@ -639,7 +615,7 @@ namespace TrilinosWrappers
   unsigned int
   SparseMatrix::m () const
   {
-    int n_rows = matrix->NumGlobalRows();
+    int n_rows = matrix -> NumGlobalRows();
 
     return n_rows;
   }
@@ -669,8 +645,8 @@ namespace TrilinosWrappers
   SparseMatrix::local_range () const
   {
     int begin, end;
-    begin = matrix->RowMap().MinMyGID();
-    end = matrix->RowMap().MaxMyGID()+1;
+    begin = matrix -> RowMap().MinMyGID();
+    end = matrix -> RowMap().MaxMyGID()+1;
     
     return std::make_pair (begin, end);
   }

@@ -341,10 +341,14 @@ namespace TrilinosWrappers
       typedef const internal::VectorReference const_reference;
 
                                        /**
-                                        * Default constructor. It
-                                        * doesn't do anything, derived
-                                        * classes will have to
-                                        * initialize the data.
+                                        * Default constructor that
+                                        * generates an empty (zero
+                                        * size) vector. The function
+                                        * <tt>reinit()</tt> will have
+                                        * to give the vector the
+                                        * correct size and
+                                        * distribution among processes
+                                        * in case of an MPI run.
                                         */
       Vector ();
 
@@ -353,9 +357,9 @@ namespace TrilinosWrappers
 				        * Epetra_Map that already
 				        * knows how to distribute the
 				        * individual components among
-				        * the MPI processors,
-				        * including the size of the
-				        * vector.
+				        * the MPI processors.  It also
+				        * includes information about
+				        * the size of the vector.
                                         */
       Vector (const Epetra_Map &InputMap);
 
@@ -379,7 +383,7 @@ namespace TrilinosWrappers
                                         */
       virtual ~Vector ();
 
-				       /** 
+				       /**
 				        * Reinit functionality. This function
 				        * destroys the old vector content 
 				        * and generates a new one based on
@@ -387,7 +391,7 @@ namespace TrilinosWrappers
 				        */
       void reinit (const Epetra_Map &input_map);
 
-				       /** 
+				       /**
 				        * Reinit functionality. This function
 				        * copies the vector v to the current
 				        * one.
