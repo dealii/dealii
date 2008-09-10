@@ -1,1 +1,628 @@
+<br>
+
+<i>This program was contributed by Yaqi Wang and Wolfgang
+Bangerth. 
+</i>
+
+<br>
+
+
 <a name="Intro"></a> <h1>Introduction</h1>
+
+
+
+In this example, we intend to solve the multigroup diffusion approximation of
+the neutron transport equation. Essentially, the way to view this is as follows: In a
+nuclear reactor, neutrons are speeding around at different energies, get
+absorbed or scattered, or start a new fission
+event. If viewed at long enough length scales, the movement of neutrons can be
+considered a diffusion process. 
+
+A mathematical description of this would group neutrons into energy bins, and
+consider the balance equations for the neutron fluxes in each of these
+bins, or energy groups. The scattering, absorption, and fission events would
+then be operators within the diffusion equation describing the neutron
+fluxes. Assume we have energy groups $g=1,\ldots,G$, where by convention we
+assume that the neutrons with the highest energy are in group 1 and those with
+the lowest energy in group $G$. Then the neutron flux of each group satisfies the
+following equations:
+@f{eqnarray*}
+\frac 1{v_g}\frac{\partial \phi_g(x,t)}{\partial t}
+&=&
+\nabla \cdot(D_g(x) \nabla \phi_g(x,t))
+-
+\Sigma_{r,g}(x)\phi_g(x,t)
+\\
+&& \qquad
++
+\chi_g\sum_{g'=1}^G\nu\Sigma_{f,g'}(x)\phi_{g'}(x,t)
++
+\sum_{g'\ne g}\Sigma_{s,g'\to g}(x)\phi_{g'}(x,t)
++
+s_{\mathrm{ext},g}(x,t)
+@f}
+augmented by appropriate boundary conditions. Here, $v_g$ is the velocity of
+neutrons within group $g$. In other words, the change in
+time in flux of neutrons in group $g$ is governed by the following
+processes:
+<ul>
+<li> Diffusion $\nabla \cdot(D_g(x) \nabla \phi_g(x,t))$. Here, $D_g$ is the
+  (spatially variable) diffusion coefficient. 
+<li> Absorption $\Sigma_{r,g}(x)\phi_g(x,t)$ (note the
+  negative sign). The coefficient $\Sigma_{r,g}$ is called the <i>removal
+  cross section</i>.
+<li> Nuclear fission $\chi_g\sum_{g'=1}^G\nu\Sigma_{f,g'}(x)\phi_{g'}(x,t)$. 
+  The production of neutrons of energy $g$ is
+  proportional to the flux of neutrons of energy $g'$ times the
+  probability $\Sigma_{f,g'}$ that neutrons of energy $g'$ cause a fission
+  event times the number $\nu$ of neutrons produced in each fission event
+  times the probability that a neutron produced in this event has energy
+  $g$. $\nu\Sigma_{f,g'}$ is called the <i>fission cross section</i> and
+  $\chi_g$ the <i>fission spectrum</i>. We will denote the term
+  $\chi_g\nu\Sigma_{f,g'}$ as the <i>fission distribution cross
+    section</i> in the program.
+<li> Scattering $\sum_{g'\ne g}\Sigma_{s,g'\to g}(x)\phi_{g'}(x,t)$ 
+  of neutrons of energy $g'$ producing neutrons
+  of energy $g$. $\Sigma_{s,g'\to g}$ is called the <i>scattering cross
+    section</i>. The case of elastic, in-group scattering $g'=g$ exists, too, but
+  we subsume this into the removal cross section. The case $g'<g$ is called
+  down-scattering, since a neutron loses energy in such an event. On the
+  other hand, $g'>g$ corresponds to up-scattering: a neutron gains energy in
+  a scattering event from the thermal motion of the atoms surrounding it;
+  up-scattering is therefore only an important process for neutrons with
+  kinetic energies that are already on the same order as the thermal kinetic
+  energy (i.e. in the sub $eV$ range).
+<li> An extraneous source $s_{\mathrm{ext},g}$.
+</ul>
+
+For realistic simulations in reactor analysis, one may want to split the
+continuous spectrum of neutron energies into many energy groups, often up to
+100. However, if neutron energy spectra are known well enough for some type of
+reactor (for example Pressurized Water Reactors, PWR), it is possible to obtain
+satisfactory results with only 2 energy groups. 
+
+In the program shown in this tutorial program, we provide the structure to
+compute with as many energy groups as desired. However, to keep computing
+times moderate and in order to avoid tabulating hundreds of coefficients, we
+only provide the coefficients for above equations for a two-group simulation,
+i.e. $g=1,2$. We do, however, consider a realistic situation by assuming that
+the coefficients are not constant, but rather depend on the materials that are
+assembled into reactor fuel assemblies in rather complicated ways (see
+below). 
+
+
+<h3>The eigenvalue problem</h3>
+
+If we consider all energy groups at once, we may write above equations in the
+following operator form:
+@f{eqnarray*}
+\frac 1v \frac{\partial \phi}{\partial t}
+=
+-L\phi
++
+F\phi
++
+X\phi
++
+s_{\mathrm{ext}},
+@f}
+where $L,F,X$ are sinking, fission, and scattering operators,
+respectively. $L$ here includes both the diffusion and removal terms. Note
+that $L$ is symmetric, whereas $F$ and $X$ are not.
+
+It is well known that this equation admits a stable solution if all
+eigenvalues of the operator $-L+F+X$ are negative. This can be readily seen by
+multiplying the equation by $\phi$ and integrating over the domain, leading to
+@f{eqnarray*}
+  \frac 1{2v} \frac{\partial}{\partial t}  \|\phi\|^2 = ((-L+F+X)\phi,\phi).
+@f}
+Stability means that the solution does not grow, i.e. we want the left hand
+side to be less than zero, which is the case if the eigenvalues of the
+operator on the right are all negative. For obvious reasons, it is
+not very desirable if a nuclear reactor produces neutron fluxes that grow
+exponentially, so eigenvalue analyses are the bread-and-butter of nuclear
+engineers. The main point of the program is therefore to consider the
+eigenvalue problem
+@f{eqnarray*}
+  (L-F-X) \phi = \lambda \phi,
+@f}
+where we want to make sure that all eigenvalues are positive. Note that $L$,
+being the diffusion operator plus the absorption (removal), is positive
+definite; the condition that all eigenvalues are positive therefore means that
+we want to make sure that fission and inter-group scattering are weak enough
+to not shift the spectrum into the negative.
+
+In nuclear engineering, one typically looks at a slightly different
+formulation of the eigenvalue problem. To this end, we do not just multiply
+with $\phi$ and integrate, but rather multiply with $\phi(L-X)^{-1}$. We then
+get the following evolution equation:
+@f{eqnarray*}
+  \frac 1{2v} \frac{\partial}{\partial t}  \|\phi\|^2_{(L-X)^{-1}} = ((L-X)^{-1}(-L+F+X)\phi,\phi).
+@f}
+Stability is the guaranteed if the eigenvalues of the following problem are
+all negative:
+@f{eqnarray*}
+  (L-X)^{-1}(-L+F+X)\phi = \lambda_F \phi,
+@f}
+which is equivalent to the eigenvalue problem
+@f{eqnarray*}
+  (L-X)\phi = \frac 1{\lambda_F+1} F \phi.
+@f}
+The typical formulation in nuclear engineering is to write this as
+@f{eqnarray*}
+  (L-X) \phi = \frac 1{k_{\mathrm{eff}}} F \phi,
+@f}
+where $k_{\mathrm{eff}}=\frac 1{\lambda^F+1}$.
+Intuitively, $k_{\mathrm{eff}}$ is something like the multiplication
+factor for neutrons per typical time scale and should be less than or equal to
+one for stable operation of a reactor: if it is less than one, the chain reaction will
+die down, whereas nuclear bombs for example have a $k$-eigenvalue larger than
+one. A stable reactor should have $k_{\mathrm{eff}}=1$.
+
+[For those who wonder how this can be achieved in practice without
+inadvertently getting slightly larger than one and triggering a nuclear bomb:
+first, fission processes happen on different time scales. While most neutrons
+are releases very quickly after a fission event, a small number of neutrons
+are only released by daughter nuclei after several further decays, up to 10-60
+seconds after the fission was initiated. If one is therefore slightly beyond
+$k_{\mathrm{eff}}=1$, one therefore has many seconds to react until all the
+neutrons created in fission re-enter the fission cycle. Nevertheless, control
+rods in nuclear reactors absorbing neutrons -- and therefore reducing
+$k_{\mathrm{eff}}$ -- are designed in such a way that they are all the way in
+the reactor in at most 2 seconds. 
+
+One therefore has on the order of 10-60 seconds to regulate the nuclear reaction
+if $k_{\mathrm{eff}}$ should be larger than one for some time, as indicated by
+a growing neutron flux. Regulation can be achieved by continuously monitoring
+the neutron flux, and if necessary increase or reduce neutron flux by moving
+neutron-absorbing control rods a few millimeters into or out of the
+reactor. On a longer scale, the water cooling the reactor contains boron, a
+good neutron absorber. Every few hours, boron concentrations are adjusted by
+adding boron or diluting the coolant.
+
+Finally, some of the absorption and scattering reactions have some
+stability built in; for example, higher neutron fluxes result in locally
+higher temperatures, which lowers the density of water and therefore reduces
+the number of scatterers that are necessary to moderate neutrons from high to
+low energies before they can start fission events themselves.]
+
+In this tutorial program, we solve above $k$-eigenvalue problem for two energy
+groups, and we are looking for the largest multiplication factor
+$k_{\mathrm{eff}}$, which is proportional to the inverse of the minimum
+eigenvalue plus one. To solve the eigenvalue problem, we generally
+use a modified version of the <i>inverse power method</i>. The algorithm looks
+like this:
+
+<ol>
+<li> Initialize $\phi_g$ and $k_{\mathrm{eff}}$ with $\phi_g^{(0)}$
+  and $k_{\mathrm{eff}}^{(0)}$ and let $n=1$. 
+
+<li> Define the so-called <i>fission source</i> by
+  @f{eqnarray*}
+    s_f^{(n-1)}(x)
+    =
+    \frac{1}{k_{\mathrm{eff}}^{(n-1)}}
+    \sum_{g'=1}^G\nu\Sigma_{f,g'}(x)\phi_{g'}^{(n-1)}(x).
+  @f}
+
+<li> Solve for all group fluxes $\phi_g,g=1,\ldots,G$ using
+  @f{eqnarray*}
+    -\nabla \cdot D_g\nabla \phi_g^{(n)}
+    +
+    \Sigma_{r,g}\phi_g^{(n)}
+    = 
+    \chi_g s_f^{(n-1)}
+    + 
+    \sum_{g'< g} \Sigma_{s,g'\to g} \phi_{g'}^{(n)}
+    +
+    \sum_{g'> g}\Sigma_{s,g'\to g}\phi_{g'}^{(n-1)}.
+  @f}
+
+<li> Update
+  @f{eqnarray*}
+    k_{\mathrm{eff}}^{(n)}
+    =
+    \sum_{g'=1}^G
+    \int_{\Omega}\nu\Sigma_{f,g'}(x)
+    \phi_{g'}^{(n)}(x)dx.
+  @f}
+
+<li> Compare $k_{\mathrm{eff}}^{(n)}$ with $k_{\mathrm{eff}}^{(n-1)}$.
+  If the change greater than a prescribed tolerance then set $n=n+1$ repeat
+  the iteration starting at step 2, otherwise end the iteration.
+</ol>
+
+Note that in this scheme, we do not solve group fluxes exactly in each power
+iteration, but rather consider previously compute $\phi_{g'}^{(n)}$ only for
+down-scattering events $g'<g$. Up-scattering is only treated by using old
+iterators $\phi_{g'}^{(n-1)}$, in essence assuming that the scattering
+operator is triangular. This is physically motivated since up-scattering does
+not play a too important role in neutron scattering. In addition, practices
+shows that the inverse power iteration is stable even using this
+simplification.
+
+Note also that one can use lots of extrapolation techniques to accelerate the
+power iteration laid out above. However, none of these are implemented in this
+example.
+
+
+<h3>Meshes and mesh refinement</h3>
+
+One may wonder whether it is appropriate to solve for the solutions of the
+individual energy group equations on the same meshes. The question boils down
+to this: will $\phi_g$ and $\phi_{g'}$ have similar smoothness properties? If
+this is the case, then it is appropriate to use the same mesh for the two; a
+typical application could be chemical combustion, where typically the
+concentrations of all or most chemical species change rapidly within the flame
+front. As it turns out, and as will be apparent by looking at the
+graphs shown in the results section of this tutorial program, this isn't the
+case here, however: since the diffusion coefficient is different for different
+energy groups, fast neutrons (in bins with a small group number $g$) have a very
+smooth flux function, whereas slow neutrons (in bins with a large group
+number) are much more affected by the local material properties and have a
+correspondingly rough solution if the coefficient are rough as in the case we
+compute here. Consequently, we will want to use different meshes to compute
+each energy group.
+
+This has two implications that we will have to consider: First, we need to
+find a way to refine the meshes individually. Second, assembling the source
+terms for the inverse power iteration, where we have to integrate solution
+$\phi_{g'}^{(n)}$ defined on mesh $g'$ against the shape functions defined on
+mesh $g$, becomes a much more complicated task.
+
+
+<h4>Mesh refinement</h4>
+
+We use the usual paradigm: solve on a given mesh, then evaluate an error
+indicator for each cell of each mesh we have. Because it is so convenient, we
+again use the a posteriori error estimator by Kelly, Gago, Zienkiewicz
+and Babuska which approximates the error per cell by integrating the jump of
+the gradient of the solution along the faces of each cell. Using this, we
+obtain indicators
+@f{eqnarray*}
+\eta_{g,K}, \qquad g=1,2,\ldots,G,\qquad K\in{\mathbb T}_g,
+@f}
+where ${\mathbb T}_g$ is the triangulation used in the solution of
+$\phi_g$. The question is what to do with this. For one, it is clear that
+refining only those cells with the highest error indicators might lead to bad
+results. To understand this, it is important to realize that $\eta_{g,K}$
+scales with the second derivative of $\phi_g$. In other words, if we have two
+energy groups $g=1,2$ whose solutions are equally smooth but where one is
+larger by a factor of 10,000, for example, then only the cells of that mesh
+will be refined, whereas the mesh for the solution of small magnitude will
+remain coarse. This is probably not what one wants, since we can consider both
+components of the solution equally important.
+
+In essence, we would therefore have to scale $\eta_{g,K}$ by an importance
+factor $z_g$ that says how important it is to resolve $\phi_g$ to any given
+accuracy. Such important factors can be computed using duality techniques
+(see, for example, the step-14 tutorial program, and the
+reference to the book by Bangerth and Rannacher cited there). We won't go
+there, however, and simply assume that all energy groups are equally
+important, and will therefore normalize the error indicators $\eta_{g,K}$ for
+group $g$ by the maximum of the solution $\phi_g$. We then refine the cells
+whose errors satisfy
+@f{eqnarray*}
+  \frac{\eta_{g,K}}{\|\phi_g\|_\infty}
+  >
+  \alpha_1
+  \displaystyle{\max_{\substack{1\le g\le G\\K\in {\mathbb T}_g}}
+    \frac{\eta_{g,K}}{\|\phi_g\|_\infty}}
+@f}
+and coarsen the cells where
+@f{eqnarray*}
+  \frac{\eta_{g,K}}{\|\phi_g\|_\infty}
+  <
+  \alpha_2
+  \displaystyle{\max_{\substack{1\le g\le G\\K\in {\mathbb T}_g}}
+    \frac{\eta_{g,K}}{\|\phi_g\|_\infty}}.
+@f}
+We chose $\alpha_1=0.3$ and $\alpha_2=0.01$ in the code. Note that this will,
+of course, lead to different meshes for the different energy groups.
+
+The strategy above essentially means the following: If for energy group $g$
+there are many cells $K\in {\mathbb T}_g$ on which the error is large, for
+example because the solution is globally very rough, then many cells will be
+above the threshold. On the other hand, if there are a few cells with large
+and many with small errors, for example because the solution is overall rather
+smooth except at a few places, then only the few cells with large errors will
+be refined. Consequently, the strategy allows for meshes that track the global
+smoothness properties of the corresponding solutions rather well.
+
+
+<h4>Assembling terms on different meshes</h4>
+
+As pointed out above, the multigroup refinement strategy results in
+different meshes for the different solutions $\phi_g$. So what's the problem?
+In essence it goes like this: in step 3 of the eigenvalue iteration, we have
+form the weak form for the equation to compute $\phi_g^{(n)}$ as usual by
+multiplication with test functions $\varphi_g^i$ defined on the mesh for
+energy group $g$; in the process, we have to
+compute the right hand side vector that contains terms of the following form:
+@f{eqnarray*}
+  F_i = \int_\Omega f(x) \varphi_g^i(x) \phi_{g'}(x) \ dx,
+@f}
+where $f(x)$ is one of the coefficient functions $\Sigma_{s,g'\to g}$ or
+$\nu\chi_g\Sigma_{f,g'}$ used in the right hand side 
+of eigenvalue equation. The difficulty now is that $\phi_{g'}$ is defined on
+the mesh for energy group $g'$, i.e. it can be expanded as
+$\phi_{g'}(x)=\sum_j\phi_{g'}^j \varphi_{g'}^j(x)$, with basis functions
+$\varphi_{g'}^j(x)$ defined on mesh $g'$. The contribution to the right hand
+side can therefore be written as
+@f{eqnarray*}
+  F_i = \sum_j \left\{\int_\Omega f(x) \varphi_g^i(x) \varphi_{g'}^j(x) 
+  \ dx \right\} \phi_{g'}^j , 
+@f}
+On the other hand, the test functions $\varphi_g^i(x)$ are defined on mesh
+$g$. This means that we can't just split the integral $\Omega$ into integrals
+over the cells of either mesh $g$ or $g'$, since the respectively other basis
+functions may not be defined on these cells.
+
+The solution to this problem lies in the fact that both the meshes for $g$ and
+$g'$ are derived by adaptive refinement from a common coarse mesh. We can
+therefore always find a set of cells, which we denote by ${\mathbb T}_g \cap
+{\mathbb T}_{g'}$, that satisfy the following conditions:
+<ul>
+<li> the union of the cells covers the entire domain, and
+<li> a cell $K \in {\mathbb T}_g \cap {\mathbb T}_{g'}$ is active on at least
+  one of the two meshes.
+</ul>
+A way to construct this set is to take each cell of coarse mesh and do the
+following steps: (i) if the cell is active on either ${\mathbb T}_g$ or
+${\mathbb T}_{g'}$, then add this cell to the set; (ii) otherwise, i.e. if
+this cell has children on both meshes, then do step (i) for each of the
+children of this cell. In fact, deal.II has a function
+GridTools::get_finest_common_cells that computes exactly this set
+of cells that are active on at least one of two meshes.
+
+With this, we can write above integral as follows:
+@f{eqnarray*}
+  F_i 
+  = 
+  \sum_{K \in {\mathbb T}_g \cap {\mathbb T}_{g'}}
+  \sum_j \left\{\int_K f(x) \varphi_g^i(x) \varphi_{g'}^j(x) 
+  \ dx \right\} \phi_{g'}^j.
+@f}
+ In the code, we
+compute the right hand side in the function
+<code>NeutronDiffusionProblem::assemble_rhs</code>, where (among other things) we
+loop over the set of common most refined cells, calling the function
+<code>NeutronDiffusionProblem::assemble_common_cell</code> on each pair of
+these cells.
+
+By construction, there are now three cases to be considered:
+<ul>
+<li>[(i)] The cell $K$ is active on both meshes, i.e. both the basis
+  functions $\varphi_g^i$ as well as $\varphi_{g'}^j$ are defined on $K$.
+<li>[(ii)] The cell $K$ is active on mesh $g$, but not $g'$, i.e. the
+  $\varphi_g^i$  are defined on $K$, whereas the $\varphi_{g'}^j$ are defined
+  on children of $K$.
+<li>[(iii)] The cell $K$ is active on mesh $g'$, but not $g$, with opposite
+  conclusions than in (ii).
+</ul>
+
+To compute the right hand side above, we then need to have different code for
+these three cases, as follows:
+<ol>
+<li> If the cell $K$ is active on both meshes, then we can directly
+  evaluate the integral. In fact, we don't even have to bother with the basis
+  functions $\varphi_{g'}$, since all we need is the values of $\phi_{g'}$ at
+  the quadrature points. We can do this using the
+  FEValues::get_function_values function. This is done directly in
+  the <code>NeutronDiffusionProblem::assemble_common_cell</code> function.
+
+<li> If the cell $K$ is active on mesh $g$, but not $g'$, then the
+  basis functions $\varphi_{g'}^j$ are only defined either on the children
+  $K_c,0\le c<2^{\texttt{dim}}$, or on children of these children if cell $K$
+  is refined more than once more on mesh $g'$.
+
+  Let us assume for a second that $K$ is only once more refined on mesh $g'$
+  than on mesh $g$. Using the fact that we use embedded finite element spaces
+  where each basis function on one mesh can be written as a linear combination
+  of basis functions on the next refined mesh, we can expand the restriction
+  of $\phi_g^i$ to child cell $K_c$ into the basis functions defined on that
+  child cell (i.e. on cells on which the basis functions $\varphi_{g'}^l$ are
+  defined):
+  @f{eqnarray*}
+    \phi_g^i|_{K_c} = B_c^{il} \varphi_{g'}^l|_{K_c}.
+  @f}
+  Here, and in the following, summation over indices appearing twice is
+  implied. The matrix $B_c$ is the matrix that interpolated data from a cell
+  to its $c$-th child.
+
+  Then we can write the contribution of cell $K$ to the right hand side
+  component $F_i$ as
+  @f{eqnarray*}
+    F_i|_K
+    &=&
+    \left\{ \int_K f(x) \varphi_g^i(x) \varphi_{g'}^j(x) 
+    \ dx \right\} \phi_{g'}^j 
+    \\
+    &=&
+    \left\{
+    \sum_{0\le c<2^{\texttt{dim}}}
+    B_c^{il} \int_{K_c} f(x) \varphi_{g'}^l(x) \varphi_{g'}^j(x) 
+    \ dx \right\} \phi_{g'}^j.
+  @f}
+  In matrix notation, this can be written as
+  @f{eqnarray*}
+    F_i|_K
+    =
+    \sum_{0\le c<2^{\texttt{dim}}}
+    F_i|_{K_c},
+    \qquad
+    \qquad
+    F_i|_{K_c} = B_c^{il} M_{K_c}^{lj}  \phi_{g'}^j
+    = (B_c M_{K_c})^{il} \phi_{g'}^j,
+  @f}
+  where $M_{K_c}^{lj}=\int_{K_c} f(x) \varphi_{g'}^l(x) \varphi_{g'}^j(x)$ is
+  the weighted mass matrix on child $c$ of cell $K$.
+  
+  The next question is what happens if a child $K_c$ of $K$ is not
+  active. Then, we have to apply the process recursively, i.e. we have to
+  interpolate the basis functions $\varphi_g^i$ onto child $K_c$ of $K$, then
+  onto child $K_{cc'}$ of that cell, onto child $K_{cc'c''}$ of that one, etc,
+  until we find an active cell. We then have to sum up all the contributions
+  from all the children, grandchildren, etc, of cell $K$, with contributions
+  of the form
+  @f{eqnarray*}
+    F_i|_{K_{cc'}} = (B_cB_{c'} M_{K_{cc'}})^{ij}  \phi_{g'}^j,
+  @f}
+  or
+  @f{eqnarray*}
+    F_i|_{K_{cc'c''}} = (B_c B_{c'} B_{c''}M_{K_{cc'c''}})^{ij}
+    \phi_{g'}^j,
+  @f}
+  etc. We do this process recursively, i.e. if we sit on cell $K$ and see that
+  it has children on grid $g'$, then we call a function
+  <code>assemble_case_2</code> with an identity matrix; the function will
+  multiply it's argument from the left with the prolongation matrix; if the
+  cell has further children, it will call itself with this new matrix,
+  otherwise it will perform the integration.
+
+<li> The last case is where $K$ is active on mesh $g'$ but not mesh
+  $g$. In that case, we have to express basis function $\varphi_{g'}^j$ in
+  terms of the basis functions defined on the children of cell $K$, rather
+  than $\varphi_g^i$ as before. This of course works in exactly the same
+  way. If the children of $K$ are active on mesh $g$, then
+  leading to the expression
+  @f{eqnarray*}
+    F_i|_K
+    &=&
+    \left\{ \int_K f(x) \varphi_g^i(x) \varphi_{g'}^j(x) 
+    \ dx \right\} \phi_{g'}^j 
+    \\
+    &=&
+    \left\{
+    \sum_{0\le c<2^{\texttt{dim}}}
+    \int_{K_c} f(x) \varphi_{g'}^i(x) B_c^{jl} \varphi_{g'}^l(x) 
+    \ dx \right\} \phi_{g'}^j.
+  @f}
+  In matrix notation, this expression now reads as
+  @f{eqnarray*}
+    F_i|_K
+    =
+    \sum_{0\le c<2^{\texttt{dim}}}
+    F_i|_{K_c},
+    \qquad
+    \qquad
+    F_i|_{K_c} = M_{K_c}^{il} B_c^{jl}  \phi_{g'}^j
+    =
+    (M_{K_c} B_c^T)^{ij} \phi_{g'}^j,
+  @f}
+  and correspondingly for cases where cell $K$ is refined more than once on
+  mesh $g$:
+  @f{eqnarray*}
+    F_i|_{K_{cc'}} = (M_{K_{cc'}} B_{c'}^T B_c^T)^{ij}  \phi_{g'}^j,
+  @f}
+  or
+  @f{eqnarray*}
+    F_i|_{K_{cc'c''}} = (M_{K_{cc'c''}} B_{c''}^T B_{c'}^T B_c^T)^{ij}
+    \phi_{g'}^j,
+  @f}
+  etc. In other words, the process works in exactly the same way as before,
+  except that we have to take the transpose of the prolongation matrices and
+  need to multiply it to the mass matrix from the other side. 
+</ol>
+
+
+The expressions for cases (ii) and (iii) can be understood as repeatedly
+interpolating either the left or right basis functions in the scalar product
+$(f \varphi_g^i, \varphi_{g'}^j)_K$ onto child cells, and then finally
+forming the inner product (the mass matrix) on the final cell. To make the
+symmetry in these cases more obvious, we can write them like this: for case
+(ii), we have
+@f{eqnarray*}
+  F_i|_{K_{cc'\cdots c^{(k)}}}
+  = [B_c B_{c'} \cdots B_{c^{(k)}} M_{K_{cc'\cdots c^{(k)}}}]^{ij}
+    \phi_{g'}^j,
+@f}
+whereas for case (iii) we get
+@f{eqnarray*}
+  F_i|_{K_{cc'\cdots c^{(k)}}}
+  = [(B_c B_{c'} \cdots B_{c^{(k)}} M_{K_{cc'\cdots c^{(k)}}})^T]^{ij}
+    \phi_{g'}^j,
+@f}
+
+
+
+<h3>Description of the test case</h3>
+
+A nuclear reactor core is composed of different types of assemblies. An
+assembly is essentially the smallest unit that can be moved in and out of a
+reactor, and is usually rectangular or square. However, assemblies are not
+fixed units, as they are assembled from a complex lattice of different fuel
+rods, control rods, and instrumentation elements that are held in place
+relative to each other by spacers that are permanently attached to the rods.
+To make things more complicated, there are different kinds of assemblies that
+are used at the same time in a reactor, where assemblies differ in the type
+and arrangement of rods they are made up of.
+
+Obviously, the arrangement of assemblies as well as the arrangement of rods
+inside them affect the distribution of neutron fluxes in the reactor (a fact
+that will be obvious by looking at the solution shown below in the results
+sections of this program). Fuel rods, for example, differ from each other in
+the enrichment of U-235 or Pu-239. Control rods, on the other hand, have zero
+fission, but nonzero scattering and absorption cross sections.
+
+This whole arrangement would make the description or spatially dependent
+material parameters very complicated. It will not become much simpler, but we
+will make one approximation: we merge the volume inhabited by each cylindrical
+rod and the surrounding water into volumes of quadratic cross section into
+so-called ``pin cells'' for which homogenized material data are obtained with
+nuclear database and knowledge of neutron spectrum. The homogenization makes
+all material data piecewise constant on the solution domain for a reactor with
+fresh fuel. Spatially dependent material parameters are then looked up for the
+quadratic assembly in which a point is located, and then for the quadratic pin
+cell within this assembly.
+
+In this tutorial program, we simulate a quarter of a reactor consisting of $4
+\times 4$ assemblies. We use symmetry (Neumann) boundary conditions to reduce
+the problem to one quarter of the domain, and consequently only simulate a
+$2\times 2$ set of assemblies. Two of them will be UO${}_2$ fuel, the other
+two of them MOX fuel. Each of these assemblies consists of $17\times 17$ rods
+of different compositions. In total, we therefore create a $34\times 34$
+lattice of rods. To make things simpler later on, we reflect this fact by
+creating a coarse mesh of $34\times 34$ cells (even though the domain is a
+square, for which we would usually use a single cell). In deal.II, each cell
+has a <code>material_id</code> which one may use to associated each cell with a
+particular number identifying the material from which this cell's volume is
+made of; we will use this material ID to identify which of the 8 different
+kinds of rods that are used in this testcase make up a particular cell. Note
+that upon mesh refinement, the children of a cell inherit the material ID,
+making it simple to track the material even after mesh refinement.
+
+The arrangement of the rods will be clearly visible in the images shown in
+the results section. The cross sections for materials and for both energy
+groups are taken from a OECD/NEA benchmark problem. The detailed configuration
+and material data is given in the code.
+
+
+<h3>What the program does (and how it does that)</h3>
+
+As a coarse overview of what exactly the program does, here is the basic
+layout: starting on a coarse mesh that is the same for each energy group, we
+compute inverse eigenvalue iterations to compute the $k$-eigenvalue on a given
+set of meshes. We stop these iterations when the change in the eigenvalue
+drops below a certain tolerance, and then write out the meshes and solutions
+for each energy group for inspection by a graphics program. Because the meshes
+for the solutions are different, we have to generate a separate output file
+for each energy group, rather than being able to add all energy group
+solutions into the same file.
+
+After this, we evaluate the error indicators as explained in one of the sections
+above for each of the meshes, and refine and coarsen the cells of each mesh
+independently. Since the eigenvalue iterations are fairly expensive, we don't
+want to start all over on the new mesh; rather, we use the SolutionTransfer
+class to interpolate the solution on the previous mesh to the next one upon
+mesh refinement. A simple experiment will convince you that this is a lot
+cheaper than if we omitted this step. After doing so, we resume our eigenvalue
+iterations on the next set of meshes.
+
+The program is controlled by a parameter file, using the ParameterHandler
+class already mentioned in the step-19 example program. We will show a
+parameter file in the results section of this section. For the moment suffice
+it to say that it controls the polynomial degree of the finite elements used,
+the number of energy groups (even though all that is presently implemented are
+the coefficients for a 2-group problem), the tolerance where to stop the
+inverse eigenvalue iteration, and the number of refinement cycles we will do.
