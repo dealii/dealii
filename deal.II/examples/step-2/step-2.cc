@@ -3,7 +3,7 @@
 
 /*    $Id$       */
 /*                                                                */
-/*    Copyright (C) 1999, 2000, 2001, 2002, 2003, 2006 by the deal.II authors */
+/*    Copyright (C) 1999, 2000, 2001, 2002, 2003, 2006, 2008 by the deal.II authors */
 /*                                                                */
 /*    This file is subject to QPL and may not be  distributed     */
 /*    without copyright and license information. Please refer     */
@@ -320,15 +320,16 @@ void distribute_dofs (DoFHandler<2> &dof_handler)
 
                                  // @sect3{Renumbering of DoFs}
 
-				 // In the sparsity pattern produced
-				 // above, the nonzero entries
-				 // extended quite far off from the
-				 // diagonal. For some algorithms,
-				 // this is unfavorable, and we will
-				 // show a simple way how to improve
+				 // In the sparsity pattern produced above,
+				 // the nonzero entries extended quite far off
+				 // from the diagonal. For some algorithms,
+				 // for example for incomplete LU
+				 // decompositions or Gauss-Seidel
+				 // preconditioners, this is unfavorable, and
+				 // we will show a simple way how to improve
 				 // this situation.
 				 //
-				 // Remember that for an entry (i,j)
+				 // Remember that for an entry $(i,j)$
 				 // in the matrix to be nonzero, the
 				 // supports of the shape functions i
 				 // and j needed to intersect
@@ -341,7 +342,7 @@ void distribute_dofs (DoFHandler<2> &dof_handler)
 				 // of they were adjacent to each
 				 // other, so in order to have the
 				 // nonzero entries clustered around
-				 // the diagonal (where i equals j),
+				 // the diagonal (where $i$ equals $j$),
 				 // we would like to have adjacent
 				 // shape functions to be numbered
 				 // with indices (DoF numbers) that
@@ -372,7 +373,8 @@ void renumber_dofs (DoFHandler<2> &dof_handler)
 {
   DoFRenumbering::Cuthill_McKee (dof_handler);
   SparsityPattern sparsity_pattern (dof_handler.n_dofs(),
-				    dof_handler.n_dofs());
+				    dof_handler.n_dofs(),
+				    20);
 
   DoFTools::make_sparsity_pattern (dof_handler, sparsity_pattern);
   sparsity_pattern.compress ();
