@@ -168,7 +168,7 @@ nonlinear system of equations which we solve the nonlinear system by a
 Newton iteration, i.e. by iterating
 @f{eqnarray*}
 R'(\mathbf{W}^k,\delta \mathbf{W})(\mathbf z) & = & -
-R(\mathbf{W}^{k})(\mathbf z) \qquad \qquad \forall \mathbg z\in V_h \\
+R(\mathbf{W}^{k})(\mathbf z) \qquad \qquad \forall \mathbf z\in V_h \\
 \mathbf{W}^{k+1} &=& \mathbf{W}^k + \delta \mathbf{W},
 @f}
 until $|R(\mathbf{W}^k)|$ (the residual) is sufficiently small. By
