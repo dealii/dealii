@@ -334,7 +334,9 @@ namespace TrilinosWrappers
       typedef TrilinosScalar value_type;
       
                                        /**
-                                        * Default constructor.
+                                        * Default
+                                        * constructor. Generates an
+                                        * empty (zero-size) matrix.
                                         */
       SparseMatrix ();
 
@@ -491,7 +493,7 @@ namespace TrilinosWrappers
 		   const Epetra_Map       &input_col_map,
 		   const SparsityPattern  &sparsity_pattern);
 
-				       /** 
+				       /**
 				        * This function copies the
 				        * content in
 				        * <tt>sparse_matrix</tt> to
@@ -642,11 +644,12 @@ namespace TrilinosWrappers
                                         * the matrix without having to
                                         * read entries (such as the
                                         * locations of non-zero
-                                        * elements) from it -- without
-                                        * this o peration, removing
-                                        * constraints on parallel
-                                        * matrices is a rather
-                                        * complicated procedure.
+                                        * elements) from it &mdash;
+                                        * without this operation,
+                                        * removing constraints on
+                                        * parallel matrices is a
+                                        * rather complicated
+                                        * procedure.
                                         *
                                         * The second parameter can be
                                         * used to set the diagonal
@@ -683,20 +686,17 @@ namespace TrilinosWrappers
                                         * may be an expensive
                                         * operation and you should
                                         * always take care where to
-                                        * call this function. In
-                                        * contrast to the respective
-                                        * function in the @p
-                                        * SparseMatrix class, we don't
-                                        * throw an exception if the
-                                        * respective entry doesn't
-                                        * exist in the sparsity
-                                        * pattern of this class, since
-                                        * Trilinos does not transmit
-                                        * this information.  On the
-                                        * other hand, an exception
-                                        * will be thrown when the
-                                        * requested element is not
-                                        * saved on the calling
+                                        * call this function. As in
+                                        * the &p SparseMatrix<Number>
+                                        * class, we throw an exception
+                                        * if the respective entry
+                                        * doesn't exist in the
+                                        * sparsity pattern of this
+                                        * class, which is requested
+                                        * from Trilinos. Moreover, an
+                                        * exception will be thrown
+                                        * when the requested element
+                                        * is not saved on the calling
                                         * process.
                                         *
                                         * This function is therefore
@@ -1163,6 +1163,14 @@ namespace TrilinosWrappers
                       << "An error with error number " << arg1
                       << " occured while calling a Trilinos function");
 
+				       /**
+					* Exception
+					*/
+      DeclException2 (ExcInvalidIndex,
+		      int, int,
+		      << "The entry with index <" << arg1 << ',' << arg2
+		      << "> does not exist.");
+
                                        /**
                                         * Exception
                                         */
@@ -1248,6 +1256,9 @@ namespace TrilinosWrappers
                                         * elements.  The actual type,
                                         * a sparse matrix, is set in
                                         * the constructor.
+					*
+					* TODO: This object should
+					* finally become private.
                                         */
       std::auto_ptr<Epetra_FECrsMatrix> matrix;
 
@@ -1285,6 +1296,7 @@ namespace TrilinosWrappers
     }
 
 
+
     inline
     unsigned int
     const_iterator::Accessor::column() const
@@ -1292,6 +1304,7 @@ namespace TrilinosWrappers
       Assert (a_row < matrix->m(), ExcBeyondEndOfMatrix());
       return (*colnum_cache)[a_index];
     }
+
 
 
     inline
@@ -1303,6 +1316,7 @@ namespace TrilinosWrappers
     }
 
 
+
     inline
     TrilinosScalar
     const_iterator::Accessor::value() const
@@ -1310,6 +1324,7 @@ namespace TrilinosWrappers
       Assert (a_row < matrix->m(), ExcBeyondEndOfMatrix());
       return (*value_cache)[a_index];
     }
+
 
 
     inline
@@ -1351,6 +1366,7 @@ namespace TrilinosWrappers
     }
 
 
+
     inline
     const_iterator
     const_iterator::operator++ (int)
@@ -1361,6 +1377,7 @@ namespace TrilinosWrappers
     }
 
 
+
     inline
     const const_iterator::Accessor &
     const_iterator::operator* () const
@@ -1369,12 +1386,14 @@ namespace TrilinosWrappers
     }
 
 
+
     inline
     const const_iterator::Accessor *
     const_iterator::operator-> () const
     {
       return &accessor;
     }
+
 
 
     inline
@@ -1387,6 +1406,7 @@ namespace TrilinosWrappers
     }
 
 
+
     inline
     bool
     const_iterator::
@@ -1394,6 +1414,7 @@ namespace TrilinosWrappers
     {
       return ! (*this == other);
     }
+
 
 
     inline
@@ -1407,17 +1428,8 @@ namespace TrilinosWrappers
     }
     
   }
-  
-  
-  inline
-  TrilinosScalar
-  SparseMatrix::operator() (const unsigned int i,
-                          const unsigned int j) const
-  {
-    return el(i,j);
-  }
+ 
 
-  
 
   inline
   SparseMatrix::const_iterator
@@ -1427,12 +1439,14 @@ namespace TrilinosWrappers
   }
 
 
+
   inline
   SparseMatrix::const_iterator
   SparseMatrix::end() const
   {
     return const_iterator(this, m(), 0);
   }
+
 
 
   inline
@@ -1445,6 +1459,7 @@ namespace TrilinosWrappers
     else
       return end (r);
   }
+
 
 
   inline

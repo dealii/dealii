@@ -376,9 +376,9 @@ namespace TrilinosWrappers
 				  // flush buffers
     int ierr;
     if (row_map.SameAs(col_map))
-      ierr = matrix->GlobalAssemble ();
+      ierr = matrix->GlobalAssemble (true);
     else
-      ierr = matrix->GlobalAssemble (col_map, row_map);
+      ierr = matrix->GlobalAssemble (col_map, row_map, true);
     
     AssertThrow (ierr == 0, ExcTrilinosError(ierr));
 
@@ -531,6 +531,82 @@ namespace TrilinosWrappers
 
 
   TrilinosScalar
+  SparseMatrix::operator() (const unsigned int i,
+			    const unsigned int j) const
+  {
+				      // Extract local indices in
+				      // the matrix.
+    int trilinos_i = matrix->LRID(i), trilinos_j = matrix->LRID(j);
+    TrilinosScalar value = 0.;
+
+				      // If the data is not on the
+				      // present processor, we throw
+				      // an exception. This is on of
+				      // the two tiny differences to
+				      // the el(i,j) call, which does
+				      // not throw any assertions.
+    if ((trilinos_i == -1 ) || (trilinos_j == -1))
+      {
+	Assert (false, ExcAccessToNonLocalElement(i, j, local_range().first,
+						  local_range().second));
+      }
+    else
+      {
+				      // Check whether the matrix 
+				      // already is transformed to
+				      // local indices.
+	if (matrix->Filled() == false)
+	  matrix->FillComplete(true);
+
+				      // Prepare pointers for extraction
+				      // of a view of the row.
+	int nnz_present = matrix->NumMyEntries(trilinos_i);
+	int nnz_extracted;
+	int *col_indices;
+	TrilinosScalar *values;
+
+				      // Generate the view and make
+				      // sure that we have not generated
+				      // an error.
+	int ierr = matrix->ExtractMyRowView(trilinos_i, nnz_extracted,
+					    values, col_indices);
+	Assert (ierr==0, ExcTrilinosError(ierr));
+
+	Assert (nnz_present == nnz_extracted,
+		ExcDimensionMismatch(nnz_present, nnz_extracted));
+
+				      // Search the index where we
+				      // look for the value, and then
+				      // finally get it.
+      
+	int* el_find = std::find(&col_indices[0],&col_indices[0] + nnz_present,
+				 trilinos_j);
+      
+	int el_index = (int)(el_find - col_indices);
+
+				        // This is actually the only
+				        // difference to the el(i,j)
+				        // function, which means that
+				        // we throw an exception in
+				        // this case instead of just
+				        // returning zero for an
+				        // element that is not present
+				        // in the sparsity pattern.
+	if (!el_find)
+	  {
+	    Assert (false, ExcInvalidIndex (i,j));
+	  }
+	else
+	  value = values[el_index];
+
+      }
+
+    return value;
+  }
+
+
+
+  TrilinosScalar
   SparseMatrix::el (const unsigned int i,
 		    const unsigned int j) const
   {
@@ -544,7 +620,9 @@ namespace TrilinosWrappers
 				      // continue. Just print out
 				      // zero.
 
-				      // TODO: Is this reasonable?
+				      // TODO: Is this reasonable? Or
+				      // should we retain the assert
+				      // call?
     if ((trilinos_i == -1 ) || (trilinos_j == -1))
       {
 	return 0.;
@@ -689,7 +767,7 @@ namespace TrilinosWrappers
   TrilinosScalar
   SparseMatrix::l1_norm () const
   {
-    if (!matrix->Filled())
+    if (matrix->Filled() == false)
       matrix->FillComplete();
 
     TrilinosScalar result = matrix->NormOne();
@@ -702,7 +780,7 @@ namespace TrilinosWrappers
   TrilinosScalar
   SparseMatrix::linfty_norm () const
   {
-    if (!matrix->Filled())
+    if (matrix->Filled() == false)
       matrix->FillComplete();
 
     TrilinosScalar result = matrix->NormInf();
@@ -715,7 +793,7 @@ namespace TrilinosWrappers
   TrilinosScalar
   SparseMatrix::frobenius_norm () const
   {
-    if (!matrix->Filled())
+    if (matrix->Filled() == false)
       matrix->FillComplete();
 
     TrilinosScalar result = matrix->NormFrobenius();
