@@ -421,6 +421,8 @@ double BoussinesqFlowProblem<dim>::get_maximal_velocity () const
   const QGauss<dim>  quadrature_formula(stokes_degree+2);
   const unsigned int n_q_points = quadrature_formula.size();
 
+  BlockVector<double> stokes_vector (stokes_solution);
+
   FEValues<dim> fe_values (stokes_fe, quadrature_formula, update_values);
   std::vector<Vector<double> > stokes_values(n_q_points,
 					     Vector<double>(dim+1));
@@ -430,19 +432,20 @@ double BoussinesqFlowProblem<dim>::get_maximal_velocity () const
     cell = stokes_dof_handler.begin_active(),
     endc = stokes_dof_handler.end();
   for (; cell!=endc; ++cell)
-    {
-      fe_values.reinit (cell);
-      fe_values.get_function_values (stokes_solution, stokes_values);
+    if (cell->subdomain_id() == (unsigned int)trilinos_communicator.MyPID())
+      {
+	fe_values.reinit (cell);
+	fe_values.get_function_values (stokes_vector, stokes_values);
 
-      for (unsigned int q=0; q<n_q_points; ++q)
-        {
-          Tensor<1,dim> velocity;
-          for (unsigned int i=0; i<dim; ++i)
-            velocity[i] = stokes_values[q](i);
+	for (unsigned int q=0; q<n_q_points; ++q)
+	  {
+	    Tensor<1,dim> velocity;
+	    for (unsigned int i=0; i<dim; ++i)
+	      velocity[i] = stokes_values[q](i);
 
-          max_velocity = std::max (max_velocity, velocity.norm());
-        }
-    }
+	    max_velocity = std::max (max_velocity, velocity.norm());
+	  }
+      }
 
   return max_velocity;
 }
@@ -463,6 +466,9 @@ BoussinesqFlowProblem<dim>::get_extrapolated_temperature_range () const
   std::vector<double> old_temperature_values(n_q_points);
   std::vector<double> old_old_temperature_values(n_q_points);
   
+  Vector<double> old_temperature_vector (old_temperature_solution);
+  Vector<double> old_old_temperature_vector (old_old_temperature_solution);
+
   double min_temperature = (1. + time_step/old_time_step) *
 			   old_temperature_solution.linfty_norm()
 			   +
@@ -474,21 +480,22 @@ BoussinesqFlowProblem<dim>::get_extrapolated_temperature_range () const
     cell = temperature_dof_handler.begin_active(),
     endc = temperature_dof_handler.end();
   for (; cell!=endc; ++cell)
-    {
-      fe_values.reinit (cell);
-      fe_values.get_function_values (old_temperature_solution, old_temperature_values);
-      fe_values.get_function_values (old_old_temperature_solution, old_old_temperature_values);
+    if (cell->subdomain_id() == (unsigned int)trilinos_communicator.MyPID())
+      {
+	fe_values.reinit (cell);
+	fe_values.get_function_values (old_temperature_vector, old_temperature_values);
+	fe_values.get_function_values (old_old_temperature_vector, old_old_temperature_values);
 
-      for (unsigned int q=0; q<n_q_points; ++q)
-        {
-          const double temperature = 
-	    (1. + time_step/old_time_step) * old_temperature_values[q]-
-	    time_step/old_time_step * old_old_temperature_values[q];
+	for (unsigned int q=0; q<n_q_points; ++q)
+	  {
+	    const double temperature = 
+	      (1. + time_step/old_time_step) * old_temperature_values[q]-
+	      time_step/old_time_step * old_old_temperature_values[q];
 
-          min_temperature = std::min (min_temperature, temperature);
-	  max_temperature = std::max (max_temperature, temperature);
-        }
-    }
+	    min_temperature = std::min (min_temperature, temperature);
+	    max_temperature = std::max (max_temperature, temperature);
+	  }
+      }
 
   return std::make_pair(min_temperature, max_temperature);
 }
@@ -810,6 +817,7 @@ BoussinesqFlowProblem<dim>::build_stokes_preconditioner ()
   velocity_components[dim] = false;
   DoFTools::extract_constant_modes (stokes_dof_handler, velocity_components, 
 				    null_space);
+  
   Amg_preconditioner->initialize(stokes_preconditioner_matrix.block(0,0),
 				 true, true, 5e-2, null_space, false);
 
@@ -834,8 +842,6 @@ void BoussinesqFlowProblem<dim>::assemble_stokes_system ()
     stokes_matrix=0;
 
   stokes_rhs=0;
-
-  Vector<double> old_temperatures (old_temperature_solution);
 
   QGauss<dim>   quadrature_formula(stokes_degree+2);
   QGauss<dim-1> face_quadrature_formula(stokes_degree+2);
@@ -884,6 +890,8 @@ void BoussinesqFlowProblem<dim>::assemble_stokes_system ()
   const FEValuesExtractors::Vector velocities (0);
   const FEValuesExtractors::Scalar pressure (dim);
 
+  Vector<double> old_temperature_vector (old_temperature_solution);
+
   typename DoFHandler<dim>::active_cell_iterator
     cell = stokes_dof_handler.begin_active(),
     endc = stokes_dof_handler.end();
@@ -899,7 +907,7 @@ void BoussinesqFlowProblem<dim>::assemble_stokes_system ()
 	local_matrix = 0;
 	local_rhs = 0;
   
-	temperature_fe_values.get_function_values (old_temperatures, 
+	temperature_fe_values.get_function_values (old_temperature_vector, 
 						   old_temperature_values);
   
 	for (unsigned int q=0; q<n_q_points; ++q)
@@ -968,6 +976,7 @@ void BoussinesqFlowProblem<dim>::assemble_stokes_system ()
 						       local_dof_indices,
 						       stokes_rhs);
       }
+
   stokes_matrix.compress();
   stokes_rhs.compress();
 
@@ -1121,6 +1130,10 @@ void BoussinesqFlowProblem<dim>::assemble_temperature_system ()
     global_T_range = get_extrapolated_temperature_range();
   const double global_Omega_diameter = GridTools::diameter (triangulation);
 
+  Vector<double> old_temperature_vector (old_temperature_solution);
+  Vector<double> old_old_temperature_vector (old_old_temperature_solution);
+  BlockVector<double> stokes_vector (stokes_solution);
+
   typename DoFHandler<dim>::active_cell_iterator
     cell = temperature_dof_handler.begin_active(),
     endc = temperature_dof_handler.end();
@@ -1135,25 +1148,25 @@ void BoussinesqFlowProblem<dim>::assemble_temperature_system ()
 	temperature_fe_values.reinit (cell);
 	stokes_fe_values.reinit (stokes_cell);
   
-	temperature_fe_values.get_function_values (old_temperature_solution,
+	temperature_fe_values.get_function_values (old_temperature_vector,
 						   old_temperature_values);
-	temperature_fe_values.get_function_values (old_old_temperature_solution,
+	temperature_fe_values.get_function_values (old_old_temperature_vector,
 						   old_old_temperature_values);
   
-	temperature_fe_values.get_function_gradients (old_temperature_solution,
+	temperature_fe_values.get_function_gradients (old_temperature_vector,
 						      old_temperature_grads);
-	temperature_fe_values.get_function_gradients (old_old_temperature_solution,
+	temperature_fe_values.get_function_gradients (old_old_temperature_vector,
 						      old_old_temperature_grads);
 	
-	temperature_fe_values.get_function_hessians (old_temperature_solution,
+	temperature_fe_values.get_function_hessians (old_temperature_vector,
 						     old_temperature_hessians);
-	temperature_fe_values.get_function_hessians (old_old_temperature_solution,
+	temperature_fe_values.get_function_hessians (old_old_temperature_vector,
 						     old_old_temperature_hessians);
 	
 	temperature_right_hand_side.value_list (temperature_fe_values.get_quadrature_points(),
 						gamma_values);
   
-	stokes_fe_values.get_function_values (stokes_solution,
+	stokes_fe_values.get_function_values (stokes_vector,
 					      present_stokes_values);
 	
 	const double nu
@@ -1538,6 +1551,8 @@ int main (int argc, char *argv[])
   (void)argc;
   (void)argv;
 #endif
+
+  //sleep (20);
 
   try
     {
