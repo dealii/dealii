@@ -85,7 +85,7 @@ namespace TrilinosWrappers
                   row_map (0, 0, Epetra_SerialComm()),
 #endif
 		  col_map (row_map),
-		  last_action (Insert),
+		  last_action (Zero),
 		  matrix (std::auto_ptr<Epetra_FECrsMatrix>
 				(new Epetra_FECrsMatrix(Copy, row_map, 0)))
   {}
@@ -95,7 +95,7 @@ namespace TrilinosWrappers
 		  :
                   row_map (InputMap),
 		  col_map (row_map),
-		  last_action (Insert),
+		  last_action (Zero),
 		  matrix (std::auto_ptr<Epetra_FECrsMatrix>
 				(new Epetra_FECrsMatrix(Copy, row_map, 
 					int(n_max_entries_per_row), false)))
@@ -106,7 +106,7 @@ namespace TrilinosWrappers
 		  :
                   row_map (InputMap),
 		  col_map (row_map),
-		  last_action (Insert),
+		  last_action (Zero),
 		  matrix (std::auto_ptr<Epetra_FECrsMatrix>
 		    (new Epetra_FECrsMatrix(Copy, row_map, 
 		      (int*)const_cast<unsigned int*>(&(n_entries_per_row[0])),
@@ -119,7 +119,7 @@ namespace TrilinosWrappers
 		  :
                   row_map (InputRowMap),
                   col_map (InputColMap),
-		  last_action (Insert),
+		  last_action (Zero),
 		  matrix (std::auto_ptr<Epetra_FECrsMatrix>
 				(new Epetra_FECrsMatrix(Copy, row_map, col_map, 
 					int(n_max_entries_per_row), false)))
@@ -131,7 +131,7 @@ namespace TrilinosWrappers
 		  :
                   row_map (InputRowMap),
                   col_map (InputColMap),
-		  last_action (Insert),
+		  last_action (Zero),
 		  matrix (std::auto_ptr<Epetra_FECrsMatrix>
 		    (new Epetra_FECrsMatrix(Copy, row_map, col_map, 
 		      (int*)const_cast<unsigned int*>(&(n_entries_per_row[0])),
@@ -167,11 +167,9 @@ namespace TrilinosWrappers
 				  // sparsity pattern on that
 				  // processor, and only broadcast the
 				  // pattern afterwards.
-    if (row_map.Comm().MyPID() == 0)
-      {
-	Assert (matrix->NumGlobalRows() == (int)sparsity_pattern.n_rows(),
-		ExcDimensionMismatch (matrix->NumGlobalRows(),
-				      sparsity_pattern.n_rows()));
+    Assert (matrix->NumGlobalRows() == (int)sparsity_pattern.n_rows(),
+	    ExcDimensionMismatch (matrix->NumGlobalRows(),
+				  sparsity_pattern.n_rows()));
     
 				  // Trilinos seems to have a bug for
 				  // rectangular matrices at this point,
@@ -186,24 +184,24 @@ namespace TrilinosWrappers
 //		ExcDimensionMismatch (matrix->NumGlobalCols(),
 //				      sparsity_pattern.n_cols()));
 
-	std::vector<double> values;
-	std::vector<int>    row_indices;
+    std::vector<double> values;
+    std::vector<int>    row_indices;
     
-	for (unsigned int row=0; row<n_rows; ++row)
-	  {
-	    const int row_length = sparsity_pattern.row_length(row);
-	    row_indices.resize (row_length, -1);
-	    values.resize (row_length, 0.);
-	    
-	    for (int col=0; col < row_length; ++col)
-	      row_indices[col] = sparsity_pattern.column_number (row, col);
-	    
-	    matrix->InsertGlobalValues (row, row_length,
-				        &values[0], &row_indices[0]);
-	  }
-      }
+    for (unsigned int row=0; row<n_rows; ++row)
+      if (row_map.MyGID(row))
+	{
+	  const int row_length = sparsity_pattern.row_length(row);
+	  row_indices.resize (row_length, -1);
+	  values.resize (row_length, 0.);
+
+	  for (int col=0; col < row_length; ++col)
+	    row_indices[col] = sparsity_pattern.column_number (row, col);
+
+	  matrix->InsertGlobalValues (row, row_length,
+				      &values[0], &row_indices[0]);
+	}
     
-    last_action = Insert;
+    last_action = Zero;
 
 				  // In the end, the matrix needs to
 				  // be compressed in order to be
@@ -250,17 +248,19 @@ namespace TrilinosWrappers
       n_entries_per_row[(int)row] = sparsity_pattern.row_length(row);
 
 				  // TODO: There seems to be problem
-				  // in Epetra when a quadratic matrix
-				  // is initialized with both row and
+				  // in Epetra when a matrix is
+				  // initialized with both row and
 				  // column map. Maybe find something
-				  // more out about this...
-    if (row_map.SameAs(col_map) == true)
-      matrix = std::auto_ptr<Epetra_FECrsMatrix>
+				  // more out about this... It could
+				  // be related to the bug #4123. For
+				  // the moment, just ignore the
+				  // column information and generate
+				  // the matrix as if it were
+				  // square. The call to
+				  // GlobalAssemble later will set the
+				  // correct values.
+    matrix = std::auto_ptr<Epetra_FECrsMatrix>
 	        (new Epetra_FECrsMatrix(Copy, row_map,
-					&n_entries_per_row[0], false));
-    else
-      matrix = std::auto_ptr<Epetra_FECrsMatrix>
-	        (new Epetra_FECrsMatrix(Copy, row_map, col_map,
 					&n_entries_per_row[0], false));
 
     reinit (sparsity_pattern);
@@ -316,9 +316,21 @@ namespace TrilinosWrappers
       n_entries_per_row[(int)row] = 
 	  dealii_sparse_matrix.get_sparsity_pattern().row_length(row);
 
+				  // TODO: There seems to be problem
+				  // in Epetra when a matrix is
+				  // initialized with both row and
+				  // column map. Maybe find something
+				  // more out about this... It could
+				  // be related to the bug #4123. For
+				  // the moment, just ignore the
+				  // column information and generate
+				  // the matrix as if it were
+				  // square. The call to
+				  // GlobalAssemble later will set the
+				  // correct values.
     matrix = std::auto_ptr<Epetra_FECrsMatrix>
-	      (new Epetra_FECrsMatrix(Copy, row_map, col_map,
-				      &n_entries_per_row[0], true));
+	        (new Epetra_FECrsMatrix(Copy, row_map,
+					&n_entries_per_row[0], false));
 
     std::vector<double> values;
     std::vector<int> row_indices;
@@ -446,7 +458,7 @@ namespace TrilinosWrappers
 
     Assert (numbers::is_finite(value), 
 	    ExcMessage("The given value is not finite but either "
-		      "infinite or Not A Number (NaN)"));
+		       "infinite or Not A Number (NaN)"));
 
     if (last_action == Insert)
       {
@@ -455,11 +467,11 @@ namespace TrilinosWrappers
 	  ierr = matrix->GlobalAssemble (false);
 	else
 	  ierr = matrix->GlobalAssemble(col_map, row_map, false);
-	
+
 	AssertThrow (ierr == 0, ExcTrilinosError(ierr));
 
 	last_action = Add;
-      }
+    }
 
 				  // we have to do above actions in any
 				  // case to be consistent with the MPI
@@ -478,6 +490,8 @@ namespace TrilinosWrappers
 						  const_cast<double*>(&value), 
 						  &trilinos_j);
 
+    if (ierr > 0)
+      std::cout << ierr << " " << m() << " " << n() << std::endl; 
     AssertThrow (ierr <= 0, ExcAccessToNonPresentElement(i,j));
     AssertThrow (ierr == 0, ExcTrilinosError(ierr));
   }

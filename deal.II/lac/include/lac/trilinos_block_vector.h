@@ -231,6 +231,7 @@ namespace TrilinosWrappers
                                           * Exception
                                           */
         DeclException0 (ExcIteratorRangeDoesNotMatchVectorSize);
+
                                          /**
                                           * Exception
                                           */

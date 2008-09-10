@@ -62,6 +62,24 @@ BlockVector<Number>::BlockVector (const BlockVector<OtherNumber>& v)
 
 #endif
 
+
+#ifdef DEAL_II_USE_TRILINOS
+
+template <typename Number>
+BlockVector<Number>::BlockVector (const TrilinosWrappers::BlockVector &v)
+{
+  this->block_indices = v.get_block_indices();
+  this->components.resize(this->n_blocks());
+
+  for (unsigned int i=0; i<this->n_blocks(); ++i)
+    this->components[i] = v.block(i);
+
+  BaseClass::collect_sizes();
+}
+
+#endif
+
+
 template <typename Number>
 void BlockVector<Number>::reinit (const unsigned int n_bl,
 				  const unsigned int bl_sz,

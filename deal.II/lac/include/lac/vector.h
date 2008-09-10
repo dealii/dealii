@@ -400,6 +400,31 @@ class Vector : public Subscriptor
     operator = (const PETScWrappers::MPI::Vector &v);
 #endif
 
+
+#ifdef DEAL_II_USE_TRILINOS
+				     /**
+				      * Another copy operator: copy
+				      * the values from a (sequential
+				      * or parallel, depending on the
+				      * underlying compiler) Trilinos
+				      * wrapper vector class. This
+				      * operator is only available if
+				      * Trilinos was detected during
+				      * configuration time.
+                                      *
+                                      * Note that due to the communication
+                                      * model used in MPI, this operation can
+                                      * only succeed if all processes do it at
+                                      * the same time. I.e., it is not
+                                      * possible for only one process to
+                                      * obtain a copy of a parallel vector
+                                      * while the other jobs do something
+                                      * else.
+				      */
+    Vector<Number> &
+    operator = (const TrilinosWrappers::Vector &v);
+#endif
+
                                      /**
                                       * Test for equality. This function
                                       * assumes that the present vector and

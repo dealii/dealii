@@ -19,11 +19,21 @@
 #include <lac/vector.h>
 #include <lac/block_indices.h>
 #include <lac/block_vector_base.h>
+#include <lac/trilinos_block_vector.h>
 
 #include <cstdio>
 #include <vector>
 
 DEAL_II_NAMESPACE_OPEN
+
+
+#ifdef DEAL_II_USE_TRILINOS
+namespace TrilinosWrappers
+{
+  class Vector;
+}
+#endif
+
 
 
 /*! @addtogroup Vectors
@@ -129,6 +139,17 @@ class BlockVector : public BlockVectorBase<Vector<Number> >
     BlockVector (const BlockVector<OtherNumber> &v);
 #endif    
 
+
+#ifdef DEAL_II_USE_TRILINOS
+				       /**
+					* A copy constructor taking a
+					* (parallel) Trilinos block
+					* vector and copying it into
+					* the deal.II own format.
+					*/
+    BlockVector (const TrilinosWrappers::BlockVector &v);
+
+#endif
                                      /**
                                       * Constructor. Set the number of
                                       * blocks to
@@ -196,6 +217,15 @@ class BlockVector : public BlockVectorBase<Vector<Number> >
     BlockVector &
     operator= (const Vector<Number> &V);
 
+#ifdef DEAL_II_USE_TRILINOS
+                                     /**
+				      * A copy constructor from a
+				      * Trilinos block vector to a
+				      * deal.II block vector.
+				      */
+    BlockVector &
+    operator= (const TrilinosWrappers::BlockVector &V);
+#endif
                                      /**
 				      * Reinitialize the BlockVector to
 				      * contain <tt>num_blocks</tt> blocks of
@@ -396,6 +426,7 @@ class BlockVector : public BlockVectorBase<Vector<Number> >
 /*----------------------- Inline functions ----------------------------------*/
 
 
+
 template <typename Number>
 template <typename InputIterator>
 BlockVector<Number>::BlockVector (const std::vector<unsigned int> &n,
@@ -466,6 +497,17 @@ BlockVector<Number>::operator = (const BlockVector<Number2> &v)
   return *this;
 }
 
+
+#ifdef DEAL_II_USE_TRILINOS
+template <typename Number>
+inline
+BlockVector<Number> &
+BlockVector<Number>::operator = (const TrilinosWrappers::BlockVector &v)
+{
+  BaseClass::operator = (v);
+  return *this;
+}
+#endif
 
 template <typename Number>
 void BlockVector<Number>::scale (const value_type factor)

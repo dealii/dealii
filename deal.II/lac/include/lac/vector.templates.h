@@ -660,6 +660,30 @@ Vector<Number>::operator = (const PETScWrappers::MPI::Vector &v)
 #endif
 
 
+#ifdef DEAL_II_USE_TRILINOS
+
+template <typename Number>
+Vector<Number> &
+Vector<Number>::operator = (const TrilinosWrappers::Vector &v)
+{
+  if (v.size() != vec_size)
+    reinit (v.size(), true);
+  if (vec_size != 0)
+    {
+                                       // get a representation of the vector
+                                       // and copy it
+      TrilinosScalar **start_ptr;
+      int ierr = v.vector->ExtractView (&start_ptr);
+      AssertThrow (ierr == 0, ExcTrilinosError(ierr));
+      
+      std::copy (start_ptr[0], start_ptr[0]+vec_size, begin());
+    }
+
+  return *this;
+}
+
+#endif
+
 template <typename Number>
 template <typename Number2>
 bool
