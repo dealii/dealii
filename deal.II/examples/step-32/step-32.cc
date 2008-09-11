@@ -123,10 +123,10 @@ namespace EquationData
 
   template <int dim>
   double
-  TemperatureInitialValues<dim>::value (const Point<dim>  &,
+  TemperatureInitialValues<dim>::value (const Point<dim>  &p,
 					const unsigned int) const
   {
-    return 0;
+    return (p.norm() < 0.55+0.02*std::sin(p[0]*20) ? 1 : 0);
   }
 
 
@@ -158,25 +158,10 @@ namespace EquationData
 
   template <int dim>
   double
-  TemperatureRightHandSide<dim>::value (const Point<dim>  &p,
+  TemperatureRightHandSide<dim>::value (const Point<dim>  &,
 					const unsigned int /*component*/) const
   {
-    static const Point<dim> source_centers[3]
-      = { (dim == 2 ? Point<dim>(.3,.1) : Point<dim>(.3,.5,.1)),
-	  (dim == 2 ? Point<dim>(.45,.1) : Point<dim>(.45,.5,.1)),
-	  (dim == 2 ? Point<dim>(.75,.1) : Point<dim>(.75,.5,.1)) };
-    static const double source_radius
-      = (dim == 2 ? 1./32 : 1./8);
-      
-    return ((source_centers[0].distance (p) < source_radius)
-	    ||
-	    (source_centers[1].distance (p) < source_radius)
-	    ||
-	    (source_centers[2].distance (p) < source_radius)
-	    ?
-	    1
-	    :
-	    0);
+    return 0;
   }
 
 
@@ -933,9 +918,10 @@ void BoussinesqFlowProblem<dim>::assemble_stokes_system ()
 					- div_phi_u[i] * phi_p[j]
 					- phi_p[i] * div_phi_u[j])
 				      * stokes_fe_values.JxW(q);
-  
-	    const Point<dim> gravity = ( (dim == 2) ? (Point<dim> (0,1)) : 
-					(Point<dim> (0,0,1)) );
+
+					     // use gravity radially outward
+	    const Point<dim> gravity = stokes_fe_values.quadrature_point(q) /
+				       stokes_fe_values.quadrature_point(q).norm();
 	    for (unsigned int i=0; i<dofs_per_cell; ++i)
 	      local_rhs(i) += (Rayleigh_number *
 			      gravity * phi_u[i] * old_temperature)*
@@ -1297,7 +1283,7 @@ void BoussinesqFlowProblem<dim>::solve ()
   time_step = 1./(std::sqrt(2.)*dim*std::sqrt(1.*dim)) /
 	      temperature_degree *
 	      GridTools::minimal_cell_diameter(triangulation) /
-              std::max (get_maximal_velocity(), .01);
+              std::max (get_maximal_velocity(), 1.e-5);
   
   temperature_solution = old_temperature_solution;
 
@@ -1481,11 +1467,15 @@ void BoussinesqFlowProblem<dim>::refine_mesh (const unsigned int max_grid_level)
 template <int dim>
 void BoussinesqFlowProblem<dim>::run ()
 {
-  const unsigned int initial_refinement = (dim == 2 ? 4 : 2);
+  const unsigned int initial_refinement = (dim == 2 ? 3 : 2);
   const unsigned int n_pre_refinement_steps = (dim == 2 ? 4 : 3);
 
+  GridGenerator::half_hyper_shell (triangulation,
+				   Point<dim>(), 0.5, 1.0);
 
-  GridGenerator::hyper_cube (triangulation);
+  static HalfHyperShellBoundary<dim> boundary;
+  triangulation.set_boundary (0, boundary);
+
   triangulation.refine_global (initial_refinement);
 
   setup_dofs();
