@@ -1116,9 +1116,9 @@ void BoussinesqFlowProblem<dim>::assemble_temperature_system ()
     global_T_range = get_extrapolated_temperature_range();
   const double global_Omega_diameter = GridTools::diameter (triangulation);
 
-  Vector<double> old_temperature_vector (old_temperature_solution);
-  Vector<double> old_old_temperature_vector (old_old_temperature_solution);
-  BlockVector<double> stokes_vector (stokes_solution);
+  const Vector<double> old_temperature_vector (old_temperature_solution);
+  const Vector<double> old_old_temperature_vector (old_old_temperature_solution);
+  const BlockVector<double> stokes_vector (stokes_solution);
 
   typename DoFHandler<dim>::active_cell_iterator
     cell = temperature_dof_handler.begin_active(),
@@ -1276,7 +1276,9 @@ void BoussinesqFlowProblem<dim>::solve ()
 	  << " GMRES iterations for Stokes subsystem."
 	  << std::endl;
 
-    stokes_constraints.distribute (stokes_solution);
+    const BlockVector<double> localized_stokes_solution (stokes_solution);
+    stokes_constraints.distribute (localized_stokes_solution);
+    stokes_solution = localized_stokes_solution;
   }
 
   old_time_step = time_step;    
@@ -1301,27 +1303,28 @@ void BoussinesqFlowProblem<dim>::solve ()
 	      temperature_rhs,
 	      preconditioner);
 
-    temperature_constraints.distribute (temperature_solution);
+    const Vector<double> localized_temperature_solution (temperature_solution);
+    temperature_constraints.distribute (localized_temperature_solution);
+    temperature_solution = localized_temperature_solution;
 
     pcout << "   "
 	  << solver_control.last_step()
 	  << " CG iterations for temperature."
 	  << std::endl;
 
-// the following code doesn't work in parallel, of course
-//     double min_temperature = temperature_solution(0),
-// 	   max_temperature = temperature_solution(0);
-//     for (unsigned int i=0; i<temperature_solution.size(); ++i)
-//       {
-// 	min_temperature = std::min<double> (min_temperature,
-// 					    temperature_solution(i));
-// 	max_temperature = std::max<double> (max_temperature,
-// 					    temperature_solution(i));
-//       }
+    double min_temperature = localized_temperature_solution(0),
+	   max_temperature = localized_temperature_solution(0);
+    for (unsigned int i=0; i<temperature_solution.size(); ++i)
+      {
+	min_temperature = std::min<double> (min_temperature,
+					    localized_temperature_solution(i));
+	max_temperature = std::max<double> (max_temperature,
+					    localized_temperature_solution(i));
+      }
     
-//     pcout << "   Temperature range: "
-// 	  << min_temperature << ' ' << max_temperature
-// 	  << std::endl;
+    pcout << "   Temperature range: "
+	  << min_temperature << ' ' << max_temperature
+	  << std::endl;
   }
 }
 
