@@ -1308,19 +1308,20 @@ void BoussinesqFlowProblem<dim>::solve ()
 	  << " CG iterations for temperature."
 	  << std::endl;
 
-    double min_temperature = temperature_solution(0),
-	   max_temperature = temperature_solution(0);
-    for (unsigned int i=0; i<temperature_solution.size(); ++i)
-      {
-	min_temperature = std::min<double> (min_temperature,
-					    temperature_solution(i));
-	max_temperature = std::max<double> (max_temperature,
-					    temperature_solution(i));
-      }
+// the following code doesn't work in parallel, of course
+//     double min_temperature = temperature_solution(0),
+// 	   max_temperature = temperature_solution(0);
+//     for (unsigned int i=0; i<temperature_solution.size(); ++i)
+//       {
+// 	min_temperature = std::min<double> (min_temperature,
+// 					    temperature_solution(i));
+// 	max_temperature = std::max<double> (max_temperature,
+// 					    temperature_solution(i));
+//       }
     
-    pcout << "   Temperature range: "
-	  << min_temperature << ' ' << max_temperature
-	  << std::endl;
+//     pcout << "   Temperature range: "
+// 	  << min_temperature << ' ' << max_temperature
+// 	  << std::endl;
   }
 }
 
