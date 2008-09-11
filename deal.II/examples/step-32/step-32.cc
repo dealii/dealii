@@ -406,7 +406,7 @@ double BoussinesqFlowProblem<dim>::get_maximal_velocity () const
   const QGauss<dim>  quadrature_formula(stokes_degree+2);
   const unsigned int n_q_points = quadrature_formula.size();
 
-  BlockVector<double> stokes_vector (stokes_solution);
+  BlockVector<double> localized_stokes_solution (stokes_solution);
 
   FEValues<dim> fe_values (stokes_fe, quadrature_formula, update_values);
   std::vector<Vector<double> > stokes_values(n_q_points,
@@ -420,7 +420,7 @@ double BoussinesqFlowProblem<dim>::get_maximal_velocity () const
     if (cell->subdomain_id() == (unsigned int)trilinos_communicator.MyPID())
       {
 	fe_values.reinit (cell);
-	fe_values.get_function_values (stokes_vector, stokes_values);
+	fe_values.get_function_values (localized_stokes_solution, stokes_values);
 
 	for (unsigned int q=0; q<n_q_points; ++q)
 	  {
@@ -451,8 +451,8 @@ BoussinesqFlowProblem<dim>::get_extrapolated_temperature_range () const
   std::vector<double> old_temperature_values(n_q_points);
   std::vector<double> old_old_temperature_values(n_q_points);
   
-  Vector<double> old_temperature_vector (old_temperature_solution);
-  Vector<double> old_old_temperature_vector (old_old_temperature_solution);
+  Vector<double> localized_old_temperature_solution (old_temperature_solution);
+  Vector<double> old_localized_old_temperature_solution (old_old_temperature_solution);
 
   double min_temperature = (1. + time_step/old_time_step) *
 			   old_temperature_solution.linfty_norm()
@@ -468,8 +468,8 @@ BoussinesqFlowProblem<dim>::get_extrapolated_temperature_range () const
     if (cell->subdomain_id() == (unsigned int)trilinos_communicator.MyPID())
       {
 	fe_values.reinit (cell);
-	fe_values.get_function_values (old_temperature_vector, old_temperature_values);
-	fe_values.get_function_values (old_old_temperature_vector, old_old_temperature_values);
+	fe_values.get_function_values (localized_old_temperature_solution, old_temperature_values);
+	fe_values.get_function_values (old_localized_old_temperature_solution, old_old_temperature_values);
 
 	for (unsigned int q=0; q<n_q_points; ++q)
 	  {
@@ -875,7 +875,7 @@ void BoussinesqFlowProblem<dim>::assemble_stokes_system ()
   const FEValuesExtractors::Vector velocities (0);
   const FEValuesExtractors::Scalar pressure (dim);
 
-  Vector<double> old_temperature_vector (old_temperature_solution);
+  Vector<double> localized_old_temperature_solution (old_temperature_solution);
 
   typename DoFHandler<dim>::active_cell_iterator
     cell = stokes_dof_handler.begin_active(),
@@ -892,7 +892,7 @@ void BoussinesqFlowProblem<dim>::assemble_stokes_system ()
 	local_matrix = 0;
 	local_rhs = 0;
   
-	temperature_fe_values.get_function_values (old_temperature_vector, 
+	temperature_fe_values.get_function_values (localized_old_temperature_solution, 
 						   old_temperature_values);
   
 	for (unsigned int q=0; q<n_q_points; ++q)
@@ -1116,9 +1116,9 @@ void BoussinesqFlowProblem<dim>::assemble_temperature_system ()
     global_T_range = get_extrapolated_temperature_range();
   const double global_Omega_diameter = GridTools::diameter (triangulation);
 
-  const Vector<double> old_temperature_vector (old_temperature_solution);
-  const Vector<double> old_old_temperature_vector (old_old_temperature_solution);
-  const BlockVector<double> stokes_vector (stokes_solution);
+  const Vector<double> localized_old_temperature_solution (old_temperature_solution);
+  const Vector<double> localized_old_old_temperature_solution (old_old_temperature_solution);
+  const BlockVector<double> localized_stokes_solution (stokes_solution);
 
   typename DoFHandler<dim>::active_cell_iterator
     cell = temperature_dof_handler.begin_active(),
@@ -1134,25 +1134,25 @@ void BoussinesqFlowProblem<dim>::assemble_temperature_system ()
 	temperature_fe_values.reinit (cell);
 	stokes_fe_values.reinit (stokes_cell);
   
-	temperature_fe_values.get_function_values (old_temperature_vector,
+	temperature_fe_values.get_function_values (localized_old_temperature_solution,
 						   old_temperature_values);
-	temperature_fe_values.get_function_values (old_old_temperature_vector,
+	temperature_fe_values.get_function_values (localized_old_old_temperature_solution,
 						   old_old_temperature_values);
   
-	temperature_fe_values.get_function_gradients (old_temperature_vector,
+	temperature_fe_values.get_function_gradients (localized_old_temperature_solution,
 						      old_temperature_grads);
-	temperature_fe_values.get_function_gradients (old_old_temperature_vector,
+	temperature_fe_values.get_function_gradients (localized_old_old_temperature_solution,
 						      old_old_temperature_grads);
 	
-	temperature_fe_values.get_function_hessians (old_temperature_vector,
+	temperature_fe_values.get_function_hessians (localized_old_temperature_solution,
 						     old_temperature_hessians);
-	temperature_fe_values.get_function_hessians (old_old_temperature_vector,
+	temperature_fe_values.get_function_hessians (localized_old_old_temperature_solution,
 						     old_old_temperature_hessians);
 	
 	temperature_right_hand_side.value_list (temperature_fe_values.get_quadrature_points(),
 						gamma_values);
   
-	stokes_fe_values.get_function_values (stokes_vector,
+	stokes_fe_values.get_function_values (localized_stokes_solution,
 					      present_stokes_values);
 	
 	const double nu
@@ -1276,7 +1276,7 @@ void BoussinesqFlowProblem<dim>::solve ()
 	  << " GMRES iterations for Stokes subsystem."
 	  << std::endl;
 
-    const BlockVector<double> localized_stokes_solution (stokes_solution);
+    BlockVector<double> localized_stokes_solution (stokes_solution);
     stokes_constraints.distribute (localized_stokes_solution);
     stokes_solution = localized_stokes_solution;
   }
@@ -1303,7 +1303,7 @@ void BoussinesqFlowProblem<dim>::solve ()
 	      temperature_rhs,
 	      preconditioner);
 
-    const Vector<double> localized_temperature_solution (temperature_solution);
+    Vector<double> localized_temperature_solution (temperature_solution);
     temperature_constraints.distribute (localized_temperature_solution);
     temperature_solution = localized_temperature_solution;
 
@@ -1346,6 +1346,8 @@ void BoussinesqFlowProblem<dim>::output_results ()  const
 	  ExcInternalError());
   
   Vector<double> joint_solution (joint_dof_handler.n_dofs());
+  BlockVector<double> localized_stokes_solution (stokes_solution);
+  Vector<double> localized_temperature_solution (temperature_solution);
 
   {
     std::vector<unsigned int> local_joint_dof_indices (joint_fe.dofs_per_cell);
@@ -1371,7 +1373,7 @@ void BoussinesqFlowProblem<dim>::output_results ()  const
 		      local_stokes_dof_indices.size(),
 		      ExcInternalError());
 	      joint_solution(local_joint_dof_indices[i])
-		= stokes_solution(local_stokes_dof_indices[joint_fe.system_to_base_index(i).second]);
+		= localized_stokes_solution(local_stokes_dof_indices[joint_fe.system_to_base_index(i).second]);
 	    }
 	  else
 	    {
@@ -1382,7 +1384,7 @@ void BoussinesqFlowProblem<dim>::output_results ()  const
 		      local_stokes_dof_indices.size(),
 		      ExcInternalError());
 	      joint_solution(local_joint_dof_indices[i])
-		= temperature_solution(local_temperature_dof_indices[joint_fe.system_to_base_index(i).second]);
+		= localized_temperature_solution(local_temperature_dof_indices[joint_fe.system_to_base_index(i).second]);
 	    }
       }
   }
@@ -1423,10 +1425,12 @@ void BoussinesqFlowProblem<dim>::refine_mesh (const unsigned int max_grid_level)
 {
   Vector<float> estimated_error_per_cell (triangulation.n_active_cells());
 
+  Vector<double> localized_temperature_solution (temperature_solution);
+
   KellyErrorEstimator<dim>::estimate (temperature_dof_handler,
 				      QGauss<dim-1>(temperature_degree+1),
 				      typename FunctionMap<dim>::type(),
-				      temperature_solution,
+				      localized_temperature_solution,
 				      estimated_error_per_cell);
 
   GridRefinement::refine_and_coarsen_fixed_fraction (triangulation,
@@ -1438,13 +1442,11 @@ void BoussinesqFlowProblem<dim>::refine_mesh (const unsigned int max_grid_level)
 	 cell != triangulation.end(); ++cell)
       cell->clear_refine_flag ();
   
-  std::vector<TrilinosWrappers::Vector> x_solution (2);
-  x_solution[0].reinit (temperature_solution);
+  std::vector<Vector<double> > x_solution (2);
   x_solution[0] = temperature_solution;
-  x_solution[1].reinit (temperature_solution);
   x_solution[1] = old_temperature_solution;
 
-  SolutionTransfer<dim,TrilinosWrappers::Vector> soltrans(temperature_dof_handler);
+  SolutionTransfer<dim,Vector<double> > soltrans(temperature_dof_handler);
 
   triangulation.prepare_coarsening_and_refinement();
   soltrans.prepare_for_coarsening_and_refinement(x_solution);
@@ -1452,9 +1454,9 @@ void BoussinesqFlowProblem<dim>::refine_mesh (const unsigned int max_grid_level)
   triangulation.execute_coarsening_and_refinement ();
   setup_dofs ();
 
-  std::vector<TrilinosWrappers::Vector> tmp (2);
-  tmp[0].reinit (temperature_solution);
-  tmp[1].reinit (temperature_solution);
+  std::vector<Vector<double> > tmp (2);
+  tmp[0] = temperature_solution;
+  tmp[1] = temperature_solution;
   soltrans.interpolate(x_solution, tmp);
 
   temperature_solution = tmp[0];

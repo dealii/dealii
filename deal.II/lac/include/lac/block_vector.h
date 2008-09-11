@@ -31,6 +31,7 @@ DEAL_II_NAMESPACE_OPEN
 namespace TrilinosWrappers
 {
   class Vector;
+  class BlockVector;
 }
 #endif
 

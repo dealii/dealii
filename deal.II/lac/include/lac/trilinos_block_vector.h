@@ -18,11 +18,15 @@
 #include <lac/trilinos_vector.h>
 #include <lac/block_indices.h>
 #include <lac/block_vector_base.h>
+#include <lac/block_vector.h>
 #include <lac/exceptions.h>
 
 #ifdef DEAL_II_USE_TRILINOS
 
 DEAL_II_NAMESPACE_OPEN
+
+                                   // forward declaration
+template <typename Number> class BlockVector;
 
 /*! @addtogroup TrilinosWrappers
  *@{
@@ -36,16 +40,18 @@ namespace TrilinosWrappers
 
 /**
  * An implementation of block vectors based on the vector class
- * implemented in TrilinosWrappers. While the base class provides for most of the
- * interface, this class handles the actual allocation of vectors and provides
- * functions that are specific to the underlying vector type.
+ * implemented in TrilinosWrappers. While the base class provides for
+ * most of the interface, this class handles the actual allocation of
+ * vectors and provides functions that are specific to the underlying
+ * vector type.
  *
- * The model of distribution of data is such that each of the blocks is
- * distributed across all MPI processes named in the MPI communicator. I.e. we
- * don't just distribute the whole vector, but each component. In the
- * constructors and reinit() functions, one therefore not only has to specify
- * the sizes of the individual blocks, but also the number of elements of each
- * of these blocks to be stored on the local process.
+ * The model of distribution of data is such that each of the blocks
+ * is distributed across all MPI processes named in the MPI
+ * communicator. I.e. we don't just distribute the whole vector, but
+ * each component. In the constructors and reinit() functions, one
+ * therefore not only has to specify the sizes of the individual
+ * blocks, but also the number of elements of each of these blocks to
+ * be stored on the local process.
  *
  * @ingroup Vectors
  * @ingroup TrilinosWrappers
@@ -54,22 +60,22 @@ namespace TrilinosWrappers
     class BlockVector : public BlockVectorBase<Vector>
     {
       public:
-                                         /**
-                                          * Typedef the base class for simpler
-                                          * access to its own typedefs.
-                                          */
+                                       /**
+					* Typedef the base class for simpler
+					* access to its own typedefs.
+					*/
         typedef BlockVectorBase<Vector> BaseClass;
     
-                                         /**
-                                          * Typedef the type of the underlying
-                                          * vector.
-                                          */
+                                       /**
+					* Typedef the type of the underlying
+					* vector.
+					*/
         typedef BaseClass::BlockType  BlockType;
 
-                                         /**
-                                          * Import the typedefs from the base
-                                          * class.
-                                          */
+                                       /**
+					* Import the typedefs from the base
+					* class.
+					*/
         typedef BaseClass::value_type      value_type;
         typedef BaseClass::pointer         pointer;
         typedef BaseClass::const_pointer   const_pointer;
@@ -79,58 +85,86 @@ namespace TrilinosWrappers
         typedef BaseClass::iterator        iterator;
         typedef BaseClass::const_iterator  const_iterator;
 
-                                         /**
-                                          * Default constructor. Generate an
-                                          * empty vector without any blocks.
-                                          */
+                                       /**
+					* Default constructor. Generate an
+					* empty vector without any blocks.
+					*/
         BlockVector ();
         
-                                         /**
-                                          * Constructor. Generate a block
-                                          * vector with as many blocks as
-					  * there are entries in Input_Maps.
-					  * Each Epetra_Map already knows
-					  * the distribution of data among
-					  * the MPI processes.
-					 */
+                                       /**
+					* Constructor. Generate a block
+					* vector with as many blocks as
+					* there are entries in Input_Maps.
+					* Each Epetra_Map already knows
+					* the distribution of data among
+					* the MPI processes.
+					*/
         explicit BlockVector (const std::vector<Epetra_Map> &InputMaps);
     
-                                         /**
-                                          * Copy-Constructor. Set all the
-                                          * properties of the parallel vector
-                                          * to those of the given argument and
-                                          * copy the elements.
-                                          */
+                                       /**
+					* Copy-Constructor. Set all the
+					* properties of the parallel vector
+					* to those of the given argument and
+					* copy the elements.
+					*/
         BlockVector (const BlockVector  &V);
     
-                                         /**
-                                          * Creates a block vector consisting
-					  * of <tt>num_blocks</tt> components,
-					  * but there is no content in the
-					  * individual components and the 
-					  * user has to fill appropriate data
-					  * using a reinit of the blocks.
-                                          */
+                                       /**
+					* Creates a block vector
+					* consisting of
+					* <tt>num_blocks</tt>
+					* components, but there is no
+					* content in the individual
+					* components and the user has to
+					* fill appropriate data using a
+					* reinit of the blocks.
+					*/
         BlockVector (const unsigned int num_blocks);
     
-                                         /**
-                                          * Destructor. Clears memory
-                                          */
+                                       /**
+					* Destructor. Clears memory
+					*/
         ~BlockVector ();
 
-                                         /**
-                                          * Copy operator: fill all components
-                                          * of the vector that are locally
-                                          * stored with the given scalar value.
-                                          */
-        BlockVector & operator = (const value_type s);
-
-                                         /**
-                                          * Copy operator for arguments of the
-                                          * same type.
-                                          */
+                                       /**
+					* Copy operator: fill all
+					* components of the vector that
+					* are locally stored with the
+					* given scalar value.
+					*/
         BlockVector &
-        operator= (const BlockVector &V);
+	operator = (const value_type s);
+
+                                       /**
+					* Copy operator for arguments of
+					* the same type.
+					*/
+        BlockVector &
+        operator = (const BlockVector &V);
+
+                                       /**
+					* Another copy function. This
+					* one takes a deal.II block
+					* vector and copies it into a
+					* TrilinosWrappers block
+					* vector. Note that the number
+					* of blocks has to be the same
+					* in the vector as in the input
+					* vector. Use the reinit()
+					* command for resizing the
+					* BlockVector or for changing
+					* the internal structure of the
+					* block components.
+					*
+					* Since Trilinos only works on
+					* doubles, this function is
+					* limited to accept only one
+					* possible number type in the
+					* deal.II vector.
+					*/
+      template <typename Number>
+      BlockVector & 
+      operator = (const ::dealii::BlockVector<Number> &V);
 
                                          /**
                                           * Reinitialize the BlockVector to
@@ -295,10 +329,26 @@ namespace TrilinosWrappers
 	reinit(v.n_blocks());
 
       for (unsigned int i=0; i<this->n_blocks(); ++i)
-	this->block(i) = v.block(i);
+	this->components[i] = v.block(i);
 
       collect_sizes();
 	
+      return *this;
+    }
+
+
+
+    template <typename Number>
+    inline
+    BlockVector &
+    BlockVector::operator = (const ::dealii::BlockVector<Number> &v)
+    {
+      Assert (n_blocks() == v.n_blocks(),
+	      ExcDimensionMismatch(n_blocks(),v.n_blocks()));
+
+      for (unsigned int i=0; i<this->n_blocks(); ++i)
+	this->components[i] = v.block(i);
+
       return *this;
     }
 

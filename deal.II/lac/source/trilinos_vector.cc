@@ -160,6 +160,29 @@ namespace TrilinosWrappers
   }
 
 
+  Vector &
+  Vector::operator = (const ::dealii::Vector<double> &v)
+  {
+    Assert (size() == v.size(),
+	    ExcDimensionMismatch(size(),v.size()));
+
+    const unsigned int n_local_elements = local_size(); 
+    const unsigned int first_local_element = local_range().first;
+
+    std::vector<int> local_indices (n_local_elements);
+    for (unsigned int i=0; i<n_local_elements; ++i)
+      local_indices[i] = map.GID(i);
+
+    const int ierr = vector->ReplaceGlobalValues(n_local_elements, 
+						 &local_indices[0],
+						 v.begin()+first_local_element); 
+
+    Assert (ierr==0, ExcTrilinosError(ierr));
+
+    return *this;
+  }
+
+
 
   bool
   Vector::operator == (const Vector &v) const
