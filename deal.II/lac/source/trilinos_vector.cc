@@ -897,12 +897,16 @@ namespace TrilinosWrappers
 
 
 
-  LocalizedVector::LocalizedVector (const Epetra_LocalMap &InputMap)
+  LocalizedVector::LocalizedVector (const unsigned int n)
                                    :
-		                   map (InputMap),
-				   vector (std::auto_ptr<Epetra_MultiVector> 
-					   (new Epetra_MultiVector(map,1)))
-  {}
+#ifdef DEAL_II_COMPILER_SUPPORTS_MPI
+                                   map ((int)n, 0, Epetra_MpiComm(MPI_COMM_WORLD))
+#else
+				   map ((int)n, 0, Epetra_SerialComm())
+#endif
+  {
+    reinit (n);
+  }
 
 
 
@@ -919,11 +923,39 @@ namespace TrilinosWrappers
 
 
 
+  LocalizedVector::LocalizedVector (const LocalizedVector &v,
+				    const bool             fast)
+                                   :
+                                   map (v.map),
+				   vector (std::auto_ptr<Epetra_MultiVector> 
+					   (new Epetra_MultiVector(map,1,!fast)))
+  {}
+
+
+
+  void
+  LocalizedVector::reinit (unsigned int n)
+  {
+
+    if (map.NumGlobalElements() != (int)n)
+      {
+#ifdef DEAL_II_COMPILER_SUPPORTS_MPI
+	map = Epetra_LocalMap ((int)n, 0, Epetra_MpiComm(MPI_COMM_WORLD));
+#else
+	map = Epetra_LocalMap ((int)n, 0, Epetra_SerialComm());
+#endif
+      }
+
+    vector = std::auto_ptr<Epetra_MultiVector> 
+                      (new Epetra_MultiVector (map,1,true));
+  }
+
   void
   LocalizedVector::reinit (const Vector &v)
   {
     map = Epetra_LocalMap (v.size(),0,v.vector->Comm());
-    vector = std::auto_ptr<Epetra_MultiVector> (new Epetra_MultiVector (map,1,false));
+    vector = std::auto_ptr<Epetra_MultiVector> 
+                      (new Epetra_MultiVector (map,1,false));
     *vector = *v.vector;
   }
 

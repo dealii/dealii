@@ -446,7 +446,7 @@ namespace TrilinosWrappers
                                         * be disallowed in the future.
                                         */
       Vector &
-      operator= (const TrilinosScalar s);
+	operator = (const TrilinosScalar s);
 
                                        /**
                                         * Copy the given vector. Resize
@@ -454,7 +454,7 @@ namespace TrilinosWrappers
                                         * necessary.
                                         */
       Vector &
-      operator= (const Vector &v);
+	operator = (const Vector &v);
 
                                        /**
 					* Another copy function. This
@@ -480,7 +480,7 @@ namespace TrilinosWrappers
 					* deal.II vector.
 					*/
       Vector & 
-      operator= (const ::dealii::Vector<double> &v);
+	operator = (const ::dealii::Vector<double> &v);
 
                                        /**
                                         * Test for equality. This
@@ -555,7 +555,7 @@ namespace TrilinosWrappers
                                         * element, both read and write.
                                         */
       reference
-      operator () (const unsigned int index);
+	operator () (const unsigned int index);
 
                                        /**
                                         * Provide read-only access to an
@@ -564,7 +564,7 @@ namespace TrilinosWrappers
                                         * command.
                                         */
       TrilinosScalar
-      operator () (const unsigned int index) const;
+	operator () (const unsigned int index) const;
 
                                        /**
                                         * Return the value of the vector
@@ -1019,11 +1019,11 @@ namespace TrilinosWrappers
       LocalizedVector ();
 
                                        /**
-				        * This constructor takes an
-				        * Epetra_LocalMap that already knows
-				        * the number of elements in the vector.
+				        * This constructor takes as
+				        * input the number of elements
+				        * in the vector.
                                         */
-      LocalizedVector (const Epetra_LocalMap &InputMap);
+      LocalizedVector (const unsigned int n);
 
                                        /**
 				        * This constructor takes a
@@ -1039,7 +1039,15 @@ namespace TrilinosWrappers
 				        * LocalizedVector based on a
 				        * LocalizedVector input.
                                         */
-      LocalizedVector (const LocalizedVector &V);
+      LocalizedVector (const LocalizedVector &V,
+		       const bool             fast);
+
+                                       /**
+					* Reinit function that resizes
+					* the vector to the size
+					* specified by <tt>n</tt>.
+					*/
+      void reinit (unsigned int n);
 
                                        /**
 					* Reinit function. Takes the
