@@ -763,24 +763,31 @@ void StokesProblem<dim>::assemble_system ()
   const FEValuesExtractors::Vector velocities (0);
   const FEValuesExtractors::Scalar pressure (dim);
 
-				   // As an extension over step-20
-				   // and step-21, we include a few 
+				   // As an extension over step-20 and
+				   // step-21, we include a few
 				   // optimizations that make assembly
-				   // faster for this particular problem.
-				   // The improvements are based on the
-				   // observation that we do a few 
-				   // calculations too many times when
-				   // we do as in step-20: The 
-				   // symmetric gradient actually has
-				   // <code>dofs_per_cell</code>
-				   // different values per quadrature 
-				   // point, but we calculate it 
+				   // much faster for this particular
+				   // problem.  The improvements are
+				   // based on the observation that we
+				   // do a few calculations too many
+				   // times when we do as in step-20:
+				   // The symmetric gradient actually
+				   // has <code>dofs_per_cell</code>
+				   // different values per quadrature
+				   // point, but we extract it
 				   // <code>dofs_per_cell*dofs_per_cell</code>
-				   // times - for both the loop over
-				   // <code>i</code> and the loop over
-				   // <code>j</code>. So what we're 
+				   // times from the FEValues object -
+				   // for both the loop over
+				   // <code>i</code> and the inner
+				   // loop over <code>j</code>. In 3d,
+				   // that means evaluating it
+				   // $89^2=7921$ instead of $89$
+				   // times, a not insignificant
+				   // difference.
+				   //
+				   // So what we're 
 				   // going to do here is to avoid 
-				   // such double calculations by 
+				   // such repeated calculations by 
 				   // getting a vector of rank-2 
 				   // tensors (and similarly for
 				   // the divergence and the basis
@@ -789,7 +796,7 @@ void StokesProblem<dim>::assemble_system ()
 				   // to starting the loop over the
 				   // dofs on the cell. First, we 
 				   // create the respective objects
-				   // that will hold the respective 
+				   // that will hold these
 				   // values. Then, we start the
 				   // loop over all cells and the loop
 				   // over the quadrature points, 
@@ -798,7 +805,7 @@ void StokesProblem<dim>::assemble_system ()
 				   // optimization we implement here:
 				   // the local matrix (as well as
 				   // the global one) is going to
-				   // be symmetric, since the all
+				   // be symmetric, since all
 				   // the operations involved are
 				   // symmetric with respect to $i$
 				   // and $j$. This is implemented by
@@ -830,6 +837,7 @@ void StokesProblem<dim>::assemble_system ()
 	      div_phi_u[k]   = fe_values[velocities].divergence (k, q);
 	      phi_p[k]       = fe_values[pressure].value (k, q);
 	    }
+
 	  for (unsigned int i=0; i<dofs_per_cell; ++i)
 	    {
 	      for (unsigned int j=0; j<=i; ++j)
@@ -841,6 +849,7 @@ void StokesProblem<dim>::assemble_system ()
 				       * fe_values.JxW(q);     
 
 		}
+
 	      const unsigned int component_i =
 		fe.system_to_component_index(i).first;
 	      local_rhs(i) += fe_values.shape_value(i,q) * 
@@ -1315,7 +1324,7 @@ void StokesProblem<dim>::run ()
 				   // setup the degrees of freedom and
 				   // matrices, assemble, solve and
 				   // create output:
-  for (unsigned int refinement_cycle = 0; refinement_cycle<7;
+  for (unsigned int refinement_cycle = 0; refinement_cycle<4;
        ++refinement_cycle)
     {
       std::cout << "Refinement cycle " << refinement_cycle << std::endl;
