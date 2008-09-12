@@ -35,6 +35,8 @@
 #  endif
 #  include "Epetra_FEVector.h"
 #  include "Epetra_Map.h"
+#  include "Epetra_LocalMap.h"
+#  include "Epetra_MultiVector.h"
 
 DEAL_II_NAMESPACE_OPEN
 
@@ -50,6 +52,7 @@ namespace TrilinosWrappers
 {
 				// forward declaration
   class Vector;
+  class LocalizedVector;
 
 				       /**
 					* @cond internal
@@ -322,7 +325,7 @@ namespace TrilinosWrappers
  * @see @ref SoftwareTrilinos
  * @author Martin Kronbichler, Wolfgang Bangerth, 2008
  */
-  class Vector
+  class Vector : public Subscriptor
   {
     public:
                                        /**
@@ -990,6 +993,97 @@ namespace TrilinosWrappers
       friend class internal::VectorReference;
 
   };
+
+
+/**
+ * This class implements a localized version of a Trilinos vector. The
+ * purpose of this class is to provide a copy interface from the
+ * possibly parallel Vector class to a local vector on each processor.
+ *
+ * @ingroup TrilinosWrappers
+ * @ingroup Vectors
+ * @see @ref SoftwareTrilinos
+ * @author Martin Kronbichler, 2008
+ */
+  class LocalizedVector : Vector
+  {
+    public:
+                                       /**
+                                        * Default constructor that
+                                        * generates an empty (zero size)
+                                        * vector. The function
+                                        * <tt>reinit()</tt> will have to
+                                        * give the vector the correct
+                                        * size.
+                                        */
+      LocalizedVector ();
+
+                                       /**
+				        * This constructor takes an
+				        * Epetra_LocalMap that already knows
+				        * the number of elements in the vector.
+                                        */
+      LocalizedVector (const Epetra_LocalMap &InputMap);
+
+                                       /**
+				        * This constructor takes a
+				        * (possibly parallel) Trilinos
+				        * Vector and generates a
+				        * localized version of the whole
+				        * content on each processor.
+                                        */
+      LocalizedVector (const Vector &V);
+
+                                       /**
+				        * This constructor generates a
+				        * LocalizedVector based on a
+				        * LocalizedVector input.
+                                        */
+      LocalizedVector (const LocalizedVector &V);
+
+                                       /**
+					* Reinit function. Takes the
+					* information of a parallel
+					* Trilinos vector and copies
+					* everything to this local
+					* version.
+					*/
+      void reinit (const Vector &V);
+
+                                       /**
+					* Reinit function. Takes the
+					* information of a
+					* LocalizedVector and copies
+					* everything to the calling
+					* vector.
+					*/
+      void reinit (const LocalizedVector &V);
+
+                                       /**
+					* Sets the left hand argument to
+					* the (parallel) Trilinos
+					* Vector. Equivalent to the @p
+					* reinit function.
+					*/
+      LocalizedVector &
+	operator = (const Vector &V);
+
+                                       /**
+					* Copy operator. Copies both the
+					* dimension and the content in
+					* the right hand argument.
+					*/
+      LocalizedVector &
+	operator = (const LocalizedVector &V); 
+
+    private:
+      Epetra_LocalMap map;
+
+    public:
+      std::auto_ptr<Epetra_MultiVector> vector;
+  };
+
+
 
 
 

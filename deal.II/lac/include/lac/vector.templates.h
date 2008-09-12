@@ -184,10 +184,19 @@ Vector<Number>::Vector (const TrilinosWrappers::Vector &v)
       val = new Number[max_vec_size];
       Assert (val != 0, ExcOutOfMemory());
 
+				       // Copy the distributed vector to
+				       // a local one at all
+				       // processors. TODO: There could
+				       // be a better solution than
+				       // this, but it has not yet been
+				       // found.
+      TrilinosWrappers::LocalizedVector localized_vector (v);
+
                                        // get a representation of the vector
                                        // and copy it
       TrilinosScalar **start_ptr;
-      int ierr = v.vector->ExtractView (&start_ptr);
+
+      int ierr = localized_vector.vector->ExtractView (&start_ptr);
       AssertThrow (ierr == 0, ExcTrilinosError(ierr));
       
       std::copy (start_ptr[0], start_ptr[0]+vec_size, begin());

@@ -73,6 +73,7 @@ namespace TrilinosWrappers
   Vector::Vector (const Vector &v,
 		  const bool    fast)
                   :
+                  Subscriptor(),
 		  map (v.map),
                   last_action (Insert),
 		  vector(std::auto_ptr<Epetra_FEVector> 
@@ -879,6 +880,78 @@ namespace TrilinosWrappers
   {
     AssertThrow(false, ExcNotImplemented() );
     return 0;
+  }
+
+
+
+  LocalizedVector::LocalizedVector ()
+                                    :
+#ifdef DEAL_II_COMPILER_SUPPORTS_MPI
+                                   map (0, 0, Epetra_MpiComm(MPI_COMM_WORLD)),
+#else
+				   map (0, 0, Epetra_SerialComm()),
+#endif
+				   vector (std::auto_ptr<Epetra_MultiVector>
+					   (new Epetra_MultiVector(map,1)))
+  {}
+
+
+
+  LocalizedVector::LocalizedVector (const Epetra_LocalMap &InputMap)
+                                   :
+		                   map (InputMap),
+				   vector (std::auto_ptr<Epetra_MultiVector> 
+					   (new Epetra_MultiVector(map,1)))
+  {}
+
+
+
+  LocalizedVector::LocalizedVector (const Vector &v)
+                                   :
+#ifdef DEAL_II_COMPILER_SUPPORTS_MPI
+                                   map (0, 0, Epetra_MpiComm(MPI_COMM_WORLD))
+#else
+				   map (0, 0, Epetra_SerialComm())
+#endif
+  {
+    reinit (v);
+  }
+
+
+
+  void
+  LocalizedVector::reinit (const Vector &v)
+  {
+    map = Epetra_LocalMap (v.size(),0,v.vector->Comm());
+    vector = std::auto_ptr<Epetra_MultiVector> (new Epetra_MultiVector (map,1,false));
+    *vector = *v.vector;
+  }
+
+
+
+  void
+  LocalizedVector::reinit (const LocalizedVector &v)
+  {
+    map = v.map;
+    *vector = *v.vector;
+  }
+
+
+
+  LocalizedVector &
+  LocalizedVector::operator = (const Vector &v)
+  {
+    reinit (v);
+    return *this;
+  }
+
+
+
+  LocalizedVector &
+  LocalizedVector::operator = (const LocalizedVector &v)
+  {
+    reinit (v);
+    return *this;
   }
 
 }

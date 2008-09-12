@@ -110,7 +110,7 @@ namespace TrilinosWrappers
 		  matrix (std::auto_ptr<Epetra_FECrsMatrix>
 		    (new Epetra_FECrsMatrix(Copy, row_map, 
 		      (int*)const_cast<unsigned int*>(&(n_entries_per_row[0])),
-		      true)))
+					    true)))
   {}
 
   SparseMatrix::SparseMatrix (const Epetra_Map  &InputRowMap,
@@ -135,7 +135,7 @@ namespace TrilinosWrappers
 		  matrix (std::auto_ptr<Epetra_FECrsMatrix>
 		    (new Epetra_FECrsMatrix(Copy, row_map, col_map, 
 		      (int*)const_cast<unsigned int*>(&(n_entries_per_row[0])),
-		      true)))
+					    true)))
   {}
 
 
@@ -161,21 +161,19 @@ namespace TrilinosWrappers
     unsigned int n_rows = sparsity_pattern.n_rows();
 
 				  // TODO: As of now, assume that the
-				  // sparsity pattern only sits at the
-				  // zeroth processor (completely), let
-				  // this determine the Trilinos
-				  // sparsity pattern on that
-				  // processor, and only broadcast the
-				  // pattern afterwards.
+				  // sparsity pattern sits at the all
+				  // processors (completely), and let
+				  // each processor set its rows. Since
+				  // this is wasteful, a better solution
+				  // should be found in the future.
     Assert (matrix->NumGlobalRows() == (int)sparsity_pattern.n_rows(),
 	    ExcDimensionMismatch (matrix->NumGlobalRows(),
 				  sparsity_pattern.n_rows()));
     
-				  // Trilinos seems to have a bug for
-				  // rectangular matrices at this point,
-				  // so do not check for consistent 
-				  // column numbers here.
-				  //
+				  // Trilinos has a bug for rectangular
+				  // matrices at this point, so do not
+				  // check for consistent column numbers
+				  // here.
 				  //
 				  // this bug is filed in the Sandia
 				  // bugzilla under #4123 and should be
@@ -261,7 +259,7 @@ namespace TrilinosWrappers
 				  // correct values.
     matrix = std::auto_ptr<Epetra_FECrsMatrix>
 	        (new Epetra_FECrsMatrix(Copy, row_map,
-					&n_entries_per_row[0], false));
+					&n_entries_per_row[0], true));
 
     reinit (sparsity_pattern);
   }
@@ -330,7 +328,7 @@ namespace TrilinosWrappers
 				  // correct values.
     matrix = std::auto_ptr<Epetra_FECrsMatrix>
 	        (new Epetra_FECrsMatrix(Copy, row_map,
-					&n_entries_per_row[0], false));
+					&n_entries_per_row[0], true));
 
     std::vector<double> values;
     std::vector<int> row_indices;
@@ -490,8 +488,6 @@ namespace TrilinosWrappers
 						  const_cast<double*>(&value), 
 						  &trilinos_j);
 
-    if (ierr > 0)
-      std::cout << ierr << " " << m() << " " << n() << std::endl; 
     AssertThrow (ierr <= 0, ExcAccessToNonPresentElement(i,j));
     AssertThrow (ierr == 0, ExcTrilinosError(ierr));
   }
@@ -938,7 +934,7 @@ namespace TrilinosWrappers
   {
     vmult (dst, x);
     dst -= b;
-    dst *= -1;
+    dst *= -1.;
 
     return dst.l2_norm();
   }
@@ -1023,9 +1019,9 @@ namespace TrilinosWrappers
   bool
   SparseMatrix::is_symmetric (const double tolerance) 
   {
-    //bool truth;
-    if (tolerance == 0)
-      Assert (false, ExcNotImplemented());
+    (void)tolerance;
+    
+    Assert (false, ExcNotImplemented());
 
     return false;
   }  
@@ -1035,8 +1031,6 @@ namespace TrilinosWrappers
   bool
   SparseMatrix::is_hermitian () 
   {
-    //bool truth;
-
     Assert (false, ExcNotImplemented());
     return false;
   }  

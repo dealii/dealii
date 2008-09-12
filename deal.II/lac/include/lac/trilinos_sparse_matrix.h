@@ -477,6 +477,12 @@ namespace TrilinosWrappers
 				        * holds the sparsity_pattern
 				        * structure because each
 				        * processor sets its rows.
+					*
+					* This is a
+				        * collective operation that
+				        * needs to be called on all
+				        * processors in order to avoid a
+				        * dead lock.
                                         */
       void reinit (const SparsityPattern &sparsity_pattern);
 
@@ -508,7 +514,14 @@ namespace TrilinosWrappers
 				        * necessary that each processor
 				        * holds the sparsity_pattern
 				        * structure because each
-				        * processor sets its rows.
+				        * processor sets its
+				        * rows.
+					*
+					* This is a
+				        * collective operation that
+				        * needs to be called on all
+				        * processors in order to avoid a
+				        * dead lock.
                                         */
       void reinit (const Epetra_Map       &input_map,
 		   const SparsityPattern  &sparsity_pattern);
@@ -522,6 +535,12 @@ namespace TrilinosWrappers
 				        * user-supplied Epetra maps.
 				        * To be used for rectangular
 				        * matrices.
+					*
+					* This is a
+				        * collective operation that
+				        * needs to be called on all
+				        * processors in order to avoid a
+				        * dead lock.
                                         */
       void reinit (const Epetra_Map       &input_row_map,
 		   const Epetra_Map       &input_col_map,
@@ -532,6 +551,12 @@ namespace TrilinosWrappers
 				        * content in
 				        * <tt>sparse_matrix</tt> to
 				        * the calling matrix.
+					*
+					* This is a
+				        * collective operation that
+				        * needs to be called on all
+				        * processors in order to avoid a
+				        * dead lock.
 				        */
       void reinit (const SparseMatrix &sparse_matrix);
 
@@ -546,6 +571,12 @@ namespace TrilinosWrappers
 				        * threshold (so zeros in the
 				        * deal.II matrix can be
 				        * filtered away).
+					*
+					* This is a
+				        * collective operation that
+				        * needs to be called on all
+				        * processors in order to avoid a
+				        * dead lock.
                                         */
       void reinit (const Epetra_Map                     &input_map,
 		   const ::dealii::SparseMatrix<double> &dealii_sparse_matrix,
@@ -560,6 +591,12 @@ namespace TrilinosWrappers
 				        * the rows and the columns of
 				        * the matrix. Chosen for
 				        * rectangular matrices.
+					*
+					* This is a
+				        * collective operation that
+				        * needs to be called on all
+				        * processors in order to avoid a
+				        * dead lock.
                                         */
       void reinit (const Epetra_Map                      &input_row_map,
 		   const Epetra_Map                      &input_col_map,
@@ -571,6 +608,12 @@ namespace TrilinosWrappers
                                         * return to a state just like
                                         * after having called the
                                         * default constructor.
+					*
+					* This is a
+				        * collective operation that
+				        * needs to be called on all
+				        * processors in order to avoid a
+				        * dead lock.
                                         */
       void clear ();
 
@@ -620,12 +663,14 @@ namespace TrilinosWrappers
                                         * Set the element (<i>i,j</i>)
                                         * to @p value.
 					*
-					* This function adds a new entry
-					* to the matrix if it didn't
-					* exist before, very much in
-					* contrast to the SparseMatrix
-					* class which throws an error if
-					* the entry does not exist.  If
+					* Just as the respective call in
+					* deal.II SparseMatrix<Number>
+					* class (but in contrast to the
+					* situation for PETSc based
+					* matrices), this function
+					* throws an exception if an
+					* entry does not exist in the
+					* sparsity pattern. Moreover, if
 					* <tt>value</tt> is not a finite
 					* number an exception is thrown.
 					*/
@@ -637,16 +682,16 @@ namespace TrilinosWrappers
                                         * Add @p value to the element
                                         * (<i>i,j</i>).
 					*
-					* This function adds a new
-					* entry to the matrix if it
-					* didn't exist before, very
-					* much in contrast to the
-					* SparseMatrix class which
-					* throws an error if the entry
-					* does not exist.  If
-					* <tt>value</tt> is not a
-					* finite number an exception
-					* is thrown.
+					* Just as the respective call in
+					* deal.II SparseMatrix<Number>
+					* class (but in contrast to the
+					* situation for PETSc based
+					* matrices), this function
+					* throws an exception if an
+					* entry does not exist in the
+					* sparsity pattern. Moreover, if
+					* <tt>value</tt> is not a finite
+					* number an exception is thrown.
                                         */
       void add (const unsigned int i,
                 const unsigned int j,
@@ -720,7 +765,7 @@ namespace TrilinosWrappers
                                         * operation and you should
                                         * always take care where to
                                         * call this function. As in
-                                        * the &p SparseMatrix<Number>
+                                        * the deal.II sparse matrix
                                         * class, we throw an exception
                                         * if the respective entry
                                         * doesn't exist in the
@@ -731,10 +776,6 @@ namespace TrilinosWrappers
                                         * when the requested element
                                         * is not saved on the calling
                                         * process.
-                                        *
-                                        * This function is therefore
-                                        * exactly equivalent to the
-                                        * <tt>el()</tt> function.
                                         */
       TrilinosScalar operator () (const unsigned int i,
 				  const unsigned int j) const;
@@ -810,7 +851,7 @@ namespace TrilinosWrappers
 					* <tt>n=local_size()</tt>.
 					*/
       std::pair<unsigned int, unsigned int>
-      local_range () const;
+	local_range () const;
 
 				       /**
 					* Return whether @p index is
@@ -832,31 +873,34 @@ namespace TrilinosWrappers
       unsigned int row_length (const unsigned int row) const;
       
                                        /**
-                                        * Return the l1-norm of the
-                                        * matrix, that is
-                                        * $|M|_1=max_{all columns
-                                        * j}\sum_{all rows i} |M_ij|$,
-                                        * (max. sum of columns).  This
-                                        * is the natural matrix norm
-                                        * that is compatible to the
-                                        * l1-norm for vectors, i.e.
-                                        * $|Mv|_1\leq |M|_1 |v|_1$.
+                                        * Return the
+                                        * <i>l</i><sub>1</sub>-norm of
+                                        * the matrix, that is
+                                        * $|M|_1=\max_{\mathrm{all
+                                        * columns} j}\sum_{\mathrm{all
+                                        * rows} i} |M_{ij}|$, (max. sum
+                                        * of columns).  This is the
+                                        * natural matrix norm that is
+                                        * compatible to the l1-norm for
+                                        * vectors, i.e.  $|Mv|_1\leq
+                                        * |M|_1 |v|_1$.
                                         * (cf. Haemmerlin-Hoffmann:
                                         * Numerische Mathematik)
                                         */
       TrilinosScalar l1_norm () const;
 
                                        /**
-                                        * Return the linfty-norm of
-                                        * the matrix, that is
-                                        * $|M|_infty=max_{all rows
-                                        * i}\sum_{all columns j}
-                                        * |M_ij|$, (max. sum of rows).
-                                        * This is the natural matrix
-                                        * norm that is compatible to
-                                        * the linfty-norm of vectors,
-                                        * i.e.  $|Mv|_infty \leq
-                                        * |M|_infty |v|_infty$.
+                                        * Return the linfty-norm of the
+                                        * matrix, that is
+                                        * $|M|_\infty=\max_{\mathrm{all
+                                        * rows} i}\sum_{\mathrm{all
+                                        * columns} j} |M_{ij}|$,
+                                        * (max. sum of rows).  This is
+                                        * the natural matrix norm that
+                                        * is compatible to the
+                                        * linfty-norm of vectors, i.e.
+                                        * $|Mv|_\infty \leq |M|_\infty
+                                        * |v|_\infty$.
                                         * (cf. Haemmerlin-Hoffmann:
                                         * Numerische Mathematik)
                                         */
@@ -884,22 +928,20 @@ namespace TrilinosWrappers
       SparseMatrix & operator /= (const TrilinosScalar factor);
 
                                        /**
-                                        * Matrix-vector
-                                        * multiplication: let <i>dst =
-                                        * M*src</i> with <i>M</i>
-                                        * being this matrix.
+                                        * Matrix-vector multiplication:
+                                        * let <i>dst = M*src</i> with
+                                        * <i>M</i> being this matrix.
                                         *
                                         * Source and destination must
                                         * not be the same vector.
 					*
-					* Note that both vectors have
-					* to be distributed vectors
+					* Note that both vectors have to
+					* be distributed vectors
 					* generated using the same Map
-					* as was used for the matrix
-					* in case you work on a
-					* distributed memory
-					* architecture, using the
-					* interface of the
+					* as was used for the matrix in
+					* case you work on a distributed
+					* memory architecture, using the
+					* interface in the
 					* TrilinosWrappers::Vector
 					* class.
                                         */
@@ -907,24 +949,23 @@ namespace TrilinosWrappers
                   const Vector &src) const;
 
                                        /**
-                                        * Matrix-vector
-                                        * multiplication: let <i>dst =
+                                        * Matrix-vector multiplication:
+                                        * let <i>dst =
                                         * M<sup>T</sup>*src</i> with
                                         * <i>M</i> being this
-                                        * matrix. This function does
-                                        * the same as vmult() but
-                                        * takes the transposed matrix.
+                                        * matrix. This function does the
+                                        * same as vmult() but takes the
+                                        * transposed matrix.
                                         *
                                         * Source and destination must
                                         * not be the same vector.
 					*
-					* Note that both vectors have
-					* to be distributed vectors
+					* Note that both vectors have to
+					* be distributed vectors
 					* generated using the same Map
-					* as was used for the matrix
-					* in case you work on a
-					* distributed memory
-					* architecture, using the
+					* as was used for the matrix in
+					* case you work on a distributed
+					* memory architecture, using the
 					* interface of the
 					* TrilinosWrappers::Vector
 					* class.
@@ -942,13 +983,12 @@ namespace TrilinosWrappers
                                         * Source and destination must
                                         * not be the same vector.
 					*
-					* Note that both vectors have
-					* to be distributed vectors
+					* Note that both vectors have to
+					* be distributed vectors
 					* generated using the same Map
-					* as was used for the matrix
-					* in case you work on a
-					* distributed memory
-					* architecture, using the
+					* as was used for the matrix in
+					* case you work on a distributed
+					* memory architecture, using the
 					* interface of the
 					* TrilinosWrappers::Vector
 					* class.
@@ -960,22 +1000,21 @@ namespace TrilinosWrappers
                                         * Adding Matrix-vector
                                         * multiplication. Add
                                         * <i>M<sup>T</sup>*src</i> to
-                                        * <i>dst</i> with <i>M</i>
-                                        * being this matrix. This
-                                        * function does the same as
-                                        * vmult_add() but takes the
-                                        * transposed matrix.
+                                        * <i>dst</i> with <i>M</i> being
+                                        * this matrix. This function
+                                        * does the same as vmult_add()
+                                        * but takes the transposed
+                                        * matrix.
                                         *
                                         * Source and destination must
                                         * not be the same vector.
 					*
-					* Note that both vectors have
-					* to be distributed vectors
+					* Note that both vectors have to
+					* be distributed vectors
 					* generated using the same Map
-					* as was used for the matrix
-					* in case you work on a
-					* distributed memory
-					* architecture, using the
+					* as was used for the matrix in
+					* case you work on a distributed
+					* memory architecture, using the
 					* interface of the
 					* TrilinosWrappers::Vector
 					* class.
@@ -984,23 +1023,22 @@ namespace TrilinosWrappers
                        const Vector &src) const;
 
                                        /**
-                                        * Return the square of the
-                                        * norm of the vector $v$ with
-                                        * respect to the norm induced
-                                        * by this matrix,
-                                        * i.e. $\left(v,Mv\right)$. This
-                                        * is useful, e.g. in the
-                                        * finite element context,
-                                        * where the $L_2$ norm of a
-                                        * function equals the matrix
-                                        * norm with respect to the
-                                        * mass matrix of the vector
-                                        * representing the nodal
-                                        * values of the finite element
-                                        * function.
+                                        * Return the square of the norm
+                                        * of the vector $v$ with respect
+                                        * to the norm induced by this
+                                        * matrix, i.e.,
+                                        * $\left(v,Mv\right)$. This is
+                                        * useful, e.g. in the finite
+                                        * element context, where the
+                                        * $L_2$ norm of a function
+                                        * equals the matrix norm with
+                                        * respect to the mass matrix of
+                                        * the vector representing the
+                                        * nodal values of the finite
+                                        * element function.
                                         *
-                                        * Obviously, the matrix needs
-                                        * to be quadratic for this
+                                        * Obviously, the matrix needs to
+                                        * be quadratic for this
                                         * operation.
                                         *
                                         * The implementation of this
@@ -1008,11 +1046,10 @@ namespace TrilinosWrappers
                                         * as the one in the @p
                                         * SparseMatrix class used in
                                         * deal.II (i.e. the original
-                                        * one, not the Trilinos
-                                        * wrapper class) since
-                                        * Trilinos doesn't support
-                                        * this operation and needs a
-                                        * temporary vector.
+                                        * one, not the Trilinos wrapper
+                                        * class) since Trilinos doesn't
+                                        * support this operation and
+                                        * needs a temporary vector.
 					*
 					* Note that both vectors have
 					* to be distributed vectors
