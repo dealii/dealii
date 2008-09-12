@@ -139,7 +139,7 @@ get the following evolution equation:
 @f{eqnarray*}
   \frac 1{2v} \frac{\partial}{\partial t}  \|\phi\|^2_{(L-X)^{-1}} = ((L-X)^{-1}(-L+F+X)\phi,\phi).
 @f}
-Stability is the guaranteed if the eigenvalues of the following problem are
+Stability is then guaranteed if the eigenvalues of the following problem are
 all negative:
 @f{eqnarray*}
   (L-X)^{-1}(-L+F+X)\phi = \lambda_F \phi,
@@ -314,7 +314,7 @@ and coarsen the cells where
   \frac{\eta_{g,K}}{\|\phi_g\|_\infty}
   <
   \alpha_2
-  \displaystyle{\max_{{1\le g\le G \atop K\in {\mathbb T}_g}}
+  \displaystyle{\max_{{1\le g\le G \choose K\in {\mathbb T}_g}}
     \frac{\eta_{g,K}}{\|\phi_g\|_\infty}}.
 @f}
 We chose $\alpha_1=0.3$ and $\alpha_2=0.01$ in the code. Note that this will,
