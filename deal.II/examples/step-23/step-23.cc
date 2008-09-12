@@ -4,7 +4,7 @@
 /*    $Id$       */
 /*    Version: $Name:  $                                          */
 /*                                                                */
-/*    Copyright (C) 2006, 2007 by the deal.II authors */
+/*    Copyright (C) 2006, 2007, 2008 by the deal.II authors */
 /*                                                                */
 /*    This file is subject to QPL and may not be  distributed     */
 /*    without copyright and license information. Please refer     */
@@ -647,13 +647,12 @@ void WaveEquation<dim>::run ()
       forcing_terms = tmp;
       forcing_terms *= theta * time_step;
       
-      system_rhs.add (theta * time_step, forcing_terms);
-
       rhs_function.set_time (time-time_step);
       VectorTools::create_right_hand_side (dof_handler, QGauss<dim>(2),
 					   rhs_function, tmp);
 
       forcing_terms.add ((1-theta) * time_step, tmp);
+
       system_rhs.add (theta * time_step, forcing_terms);
 
 				       // After so constructing the right hand

@@ -114,6 +114,17 @@ inconvenience this causes.
 <ol>
   <li>
   <p>
+  Fixed: In the @ref step_23 "step-23" tutorial program the terms corresponding
+  to the external force were computed incorrectly. The error wasn't visible
+  right away since in the program the right hand side is assumed to be zero.
+  This has now been fixed.
+  <br>
+  (Johan Lorentzon, WB 2008/09/12)
+  </p>
+  </li>
+
+  <li>
+  <p>
   Fixed: In the new @ref step_33 "step-33" tutorial program there was
   a place where we incorrectly passed the diameter of a cell, rather
   than a face, to a function. This is now fixed.
