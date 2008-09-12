@@ -18,6 +18,9 @@
 
 #ifdef DEAL_II_USE_TRILINOS
 
+#include <Epetra_Import.h>
+
+
 DEAL_II_NAMESPACE_OPEN
 
 namespace TrilinosWrappers
@@ -159,6 +162,22 @@ namespace TrilinosWrappers
 
     return *this;
   }
+
+
+
+  Vector &
+  Vector::operator = (const LocalizedVector &v)
+  {
+    Assert (size() == v.size(), ExcDimensionMismatch(size(), v.size()));
+
+    Epetra_Import import_information (map, v.map);
+    const int ierr = vector->Import(*v.vector, import_information, Insert);
+
+    Assert (ierr == 0, ExcTrilinosError(ierr));
+
+    return *this;
+  }
+
 
 
   Vector &
@@ -954,9 +973,14 @@ namespace TrilinosWrappers
   LocalizedVector::reinit (const Vector &v)
   {
     map = Epetra_LocalMap (v.size(),0,v.vector->Comm());
+
+    Epetra_Import import_information (map, v.map);
+
     vector = std::auto_ptr<Epetra_MultiVector> 
                       (new Epetra_MultiVector (map,1,false));
-    *vector = *v.vector;
+
+    int ierr = vector->Import(*v.vector, import_information, Insert);
+    Assert (ierr == 0, ExcTrilinosError(ierr));
   }
 
 

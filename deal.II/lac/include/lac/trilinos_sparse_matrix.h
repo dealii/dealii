@@ -453,7 +453,7 @@ namespace TrilinosWrappers
 					* reference to <tt>*this</tt>.
 					*/
       SparseMatrix &
-      copy_from (const SparseMatrix &source);
+	copy_from (const SparseMatrix &source);
 
                                        /**
                                         * This function initializes
@@ -657,7 +657,7 @@ namespace TrilinosWrappers
                                         * pattern previously used.
                                         */
       SparseMatrix &
-      operator = (const double d);
+	operator = (const double d);
 
                                        /**
                                         * Set the element (<i>i,j</i>)
@@ -876,13 +876,14 @@ namespace TrilinosWrappers
                                         * Return the
                                         * <i>l</i><sub>1</sub>-norm of
                                         * the matrix, that is
-                                        * $|M|_1=\max_{\mathrm{all
-                                        * columns} j}\sum_{\mathrm{all
-                                        * rows} i} |M_{ij}|$, (max. sum
+                                        * $|M|_1=
+					* \max_{\mathrm{all columns } j}
+					* \sum_{\mathrm{all rows } i} 
+					* |M_{ij}|$, (max. sum
                                         * of columns).  This is the
                                         * natural matrix norm that is
                                         * compatible to the l1-norm for
-                                        * vectors, i.e.  $|Mv|_1\leq
+                                        * vectors, i.e.  $|Mv|_1 \leq
                                         * |M|_1 |v|_1$.
                                         * (cf. Haemmerlin-Hoffmann:
                                         * Numerische Mathematik)

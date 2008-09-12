@@ -454,7 +454,23 @@ namespace TrilinosWrappers
                                         * necessary.
                                         */
       Vector &
-	operator = (const Vector &v);
+	operator = (const Vector &V);
+
+                                       /**
+					* Copy operator from a given
+					* localized vector (present on
+					* all processes) in
+					* TrilinosWrappers format to the
+					* current distributed
+					* vector. This function assumes
+					* that the calling vector (left
+					* hand object) already is of the
+					* same size as the right hand
+					* side vector. Otherwise, an
+					* exception will be thrown.
+					*/
+      Vector &
+	operator = (const LocalizedVector &V);
 
                                        /**
 					* Another copy function. This
@@ -991,6 +1007,7 @@ namespace TrilinosWrappers
                                         * friend.
                                         */
       friend class internal::VectorReference;
+      friend class LocalizedVector;
 
   };
 
@@ -1005,7 +1022,7 @@ namespace TrilinosWrappers
  * @see @ref SoftwareTrilinos
  * @author Martin Kronbichler, 2008
  */
-  class LocalizedVector : Vector
+  class LocalizedVector : public Vector
   {
     public:
                                        /**
@@ -1089,6 +1106,8 @@ namespace TrilinosWrappers
 
     public:
       std::auto_ptr<Epetra_MultiVector> vector;
+
+      friend class Vector;
   };
 
 
