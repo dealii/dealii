@@ -771,3 +771,66 @@ Another possibility that can be taken into account is to not set up a block
 system, but rather solve the system of velocity and pressure all at once. The
 options are direct solve with UMFPACK (2D) or GMRES with ILU
 preconditioning (3D). It should be straightforward to try that.
+
+
+
+<h4>More interesting testcases</h4>
+
+The program can of course also serve as a basis to compute the flow in more
+interesting cases. The original motivation to write this program was for it to
+be a starting point for some geophysical flow problems, such as the
+movement of magma under places where continental plates drift apart (for
+example mid-ocean ridges). Of course, in such places, the geometry is more
+complicated than the examples shown above, but it is not hard to accomodate
+for that.
+
+For example, by using the folllowing modification of the boundary values
+function
+<code>
+template <int dim>
+double
+BoundaryValues<dim>::value (const Point<dim>  &p,
+                            const unsigned int component) const
+{
+  Assert (component < this->n_components,
+          ExcIndexRange (component, 0, this->n_components));
+
+  const double x_offset = std::atan(p[1]*4)/3;
+                                                                   
+  if (component == 0)
+    return (p[0] < x_offset ? -1 : (p[0] > x_offset ? 1 : 0));
+  return 0;
+}
+</code>
+and the following way to generate the mesh as the domain
+$[-2,2]\times[-2,2]\times[-1,0]$ 
+<code>
+    std::vector<unsigned int> subdivisions (dim, 1);
+    subdivisions[0] = 4;
+    subdivisions[1] = 4;
+
+    const Point<dim> bottom_left = (dim == 2 ?
+                                    Point<dim>(-2,-1) :
+                                    Point<dim>(-2,-2,-1));
+    const Point<dim> top_right   = (dim == 2 ?
+                                    Point<dim>(2,0) :
+                                    Point<dim>(2,2,0));
+    
+    GridGenerator::subdivided_hyper_rectangle (triangulation,
+                                               subdivisions,
+                                               bottom_left,
+                                               top_right);
+</code>
+then we get images where the the fault line is curved:
+<TABLE WIDTH="60%" ALIGN="center">
+  <tr>
+    <td ALIGN="center">
+      @image html step-22.3d-extension.png
+    </td>
+
+    <td ALIGN="center">
+      @image html step-22.3d-grid-extension.png
+    </td>
+  </tr>
+</table>
+
