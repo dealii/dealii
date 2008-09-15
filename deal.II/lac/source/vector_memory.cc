@@ -55,9 +55,15 @@ Threads::ThreadMutex GrowingVectorMemory<VECTOR>::mutex;
 #ifdef DEAL_II_USE_TRILINOS
     template class VectorMemory<TrilinosWrappers::Vector>;
     template class GrowingVectorMemory<TrilinosWrappers::Vector>;
-    
+
     template class VectorMemory<TrilinosWrappers::BlockVector>;
     template class GrowingVectorMemory<TrilinosWrappers::BlockVector>;
+
+    template class VectorMemory<TrilinosWrappers::MPI::Vector>;
+    template class GrowingVectorMemory<TrilinosWrappers::MPI::Vector>;
+
+    template class VectorMemory<TrilinosWrappers::MPI::BlockVector>;
+    template class GrowingVectorMemory<TrilinosWrappers::MPI::BlockVector>;
 #endif
 
 DEAL_II_NAMESPACE_CLOSE
