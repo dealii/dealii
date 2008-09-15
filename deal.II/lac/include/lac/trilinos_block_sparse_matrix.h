@@ -60,7 +60,7 @@ namespace TrilinosWrappers
  * @ingroup Matrix1
  * @author Martin Kronbichler, Wolfgang Bangerth, 2008
  */
-  class BlockSparseMatrix : public BlockMatrixBase<TrilinosWrappers::SparseMatrix>
+  class BlockSparseMatrix : public BlockMatrixBase<SparseMatrix>
   {
     public:
                                        /**
@@ -240,8 +240,20 @@ namespace TrilinosWrappers
                                         * let $dst = M*src$ with $M$
                                         * being this matrix.
                                         */
+      void vmult (MPI::BlockVector       &dst,
+                  const MPI::BlockVector &src) const;
+
+
+                                       /**
+                                        * Matrix-vector multiplication:
+                                        * let $dst = M*src$ with $M$
+                                        * being this matrix, now applied
+                                        * to localized block vectors
+                                        * (works only when run on one
+                                        * processor).
+                                        */
       void vmult (BlockVector       &dst,
-                  const BlockVector &src) const;
+		  const BlockVector &src) const;
 
                                        /**
                                         * Matrix-vector
@@ -250,8 +262,21 @@ namespace TrilinosWrappers
                                         * applicable if the matrix has
                                         * only one block column.
                                         */
+      void vmult (MPI::BlockVector  &dst,
+                  const MPI::Vector &src) const;
+
+                                       /**
+                                        * Matrix-vector
+                                        * multiplication. Just like the
+                                        * previous function, but only
+                                        * applicable if the matrix has
+                                        * only one block column, now
+                                        * applied to localized vectors
+                                        * (works only when run on one
+                                        * processor).
+                                        */
       void vmult (BlockVector  &dst,
-                  const Vector &src) const;
+		  const Vector &src) const;
 
                                        /**
                                         * Matrix-vector
@@ -260,8 +285,21 @@ namespace TrilinosWrappers
                                         * applicable if the matrix has
                                         * only one block row.
                                         */
+      void vmult (MPI::Vector            &dst,
+		  const MPI::BlockVector &src) const;
+
+                                       /**
+                                        * Matrix-vector
+                                        * multiplication. Just like the
+                                        * previous function, but only
+                                        * applicable if the matrix has
+                                        * only one block row, now
+                                        * applied to localized vectors
+                                        * (works only when run on one
+                                        * processor).
+                                        */
       void vmult (Vector            &dst,
-                  const BlockVector &src) const;
+		  const BlockVector &src) const;
 
                                        /**
                                         * Matrix-vector
@@ -270,9 +308,21 @@ namespace TrilinosWrappers
                                         * applicable if the matrix has
                                         * only one block.
                                         */
+      void vmult (MPI::Vector       &dst,
+                  const MPI::Vector &src) const;
+
+                                       /**
+                                        * Matrix-vector
+                                        * multiplication. Just like the
+                                        * previous function, but only
+                                        * applicable if the matrix has
+                                        * only one block, now applied to
+                                        * localized vectors (works only
+                                        * when run on one processor).
+                                        */
       void vmult (Vector       &dst,
-                  const Vector &src) const;
-    
+		  const Vector &src) const;
+
                                        /**
                                         * Matrix-vector multiplication:
                                         * let $dst = M^T*src$ with $M$
@@ -281,15 +331,42 @@ namespace TrilinosWrappers
                                         * vmult() but takes the
                                         * transposed matrix.
                                         */
+      void Tvmult (MPI::BlockVector       &dst,
+                   const MPI::BlockVector &src) const;
+
+                                       /**
+                                        * Matrix-vector multiplication:
+                                        * let $dst = M^T*src$ with $M$
+                                        * being this matrix. This
+                                        * function does the same as
+                                        * vmult() but takes the
+                                        * transposed matrix, now applied
+                                        * to localized Trilinos vectors
+                                        * (works only when run on one
+                                        * processor).
+                                        */
       void Tvmult (BlockVector       &dst,
                    const BlockVector &src) const;
-  
+
                                        /**
                                         * Matrix-vector
                                         * multiplication. Just like the
                                         * previous function, but only
                                         * applicable if the matrix has
                                         * only one block row.
+                                        */
+      void Tvmult (MPI::BlockVector  &dst,
+                   const MPI::Vector &src) const;
+
+                                       /**
+                                        * Matrix-vector
+                                        * multiplication. Just like the
+                                        * previous function, but only
+                                        * applicable if the matrix has
+                                        * only one block row, now
+                                        * applied to localized Trilinos
+                                        * vectors (works only when run
+                                        * on one processor).
                                         */
       void Tvmult (BlockVector  &dst,
                    const Vector &src) const;
@@ -301,6 +378,19 @@ namespace TrilinosWrappers
                                         * applicable if the matrix has
                                         * only one block column.
                                         */
+      void Tvmult (MPI::Vector    &dst,
+                   const MPI::BlockVector &src) const;
+
+                                       /**
+                                        * Matrix-vector
+                                        * multiplication. Just like the
+                                        * previous function, but only
+                                        * applicable if the matrix has
+                                        * only one block column, now
+                                        * applied to localized Trilinos
+                                        * vectors (works only when run
+                                        * on one processor).
+                                        */
       void Tvmult (Vector    &dst,
                    const BlockVector &src) const;
 
@@ -310,6 +400,19 @@ namespace TrilinosWrappers
                                         * previous function, but only
                                         * applicable if the matrix has
                                         * only one block.
+                                        */
+      void Tvmult (MPI::Vector       &dst,
+                   const MPI::Vector &src) const;
+
+                                       /**
+                                        * Matrix-vector
+                                        * multiplication. Just like the
+                                        * previous function, but only
+                                        * applicable if the matrix has
+                                        * only one block, now applied to
+                                        * localized Trilinos vectors
+                                        * (works only when run on one
+                                        * processor).
                                         */
       void Tvmult (Vector       &dst,
                    const Vector &src) const;
@@ -332,7 +435,8 @@ namespace TrilinosWrappers
                       int, int, int, int,
                       << "The blocks [" << arg1 << ',' << arg2 << "] and ["
                       << arg3 << ',' << arg4 << "] have differing row numbers.");
-                                       /**
+
+				       /**
                                         * Exception
                                         */
       DeclException4 (ExcIncompatibleColNumbers,
@@ -350,10 +454,30 @@ namespace TrilinosWrappers
 
   inline
   void
+  BlockSparseMatrix::vmult (MPI::BlockVector       &dst,
+			    const MPI::BlockVector &src) const
+  {
+    BaseClass::vmult_block_block (dst, src);
+  }
+  
+
+
+  inline
+  void
   BlockSparseMatrix::vmult (BlockVector       &dst,
                             const BlockVector &src) const
   {
     BaseClass::vmult_block_block (dst, src);
+  }
+
+
+
+  inline
+  void
+  BlockSparseMatrix::vmult (MPI::BlockVector  &dst,
+			    const MPI::Vector &src) const
+  {
+    BaseClass::vmult_block_nonblock (dst, src);
   }
   
 
@@ -365,6 +489,16 @@ namespace TrilinosWrappers
   {
     BaseClass::vmult_block_nonblock (dst, src);
   }
+
+
+
+  inline
+  void
+  BlockSparseMatrix::vmult (MPI::Vector            &dst,
+                            const MPI::BlockVector &src) const
+  {
+    BaseClass::vmult_nonblock_block (dst, src);
+  }
   
 
 
@@ -375,7 +509,17 @@ namespace TrilinosWrappers
   {
     BaseClass::vmult_nonblock_block (dst, src);
   }
-  
+
+
+
+  inline
+  void
+  BlockSparseMatrix::vmult (MPI::Vector       &dst,
+			    const MPI::Vector &src) const
+  {
+    BaseClass::vmult_nonblock_nonblock (dst, src);
+  }
+
 
 
   inline
@@ -387,44 +531,85 @@ namespace TrilinosWrappers
   }
 
 
+
   inline
   void
-  BlockSparseMatrix::Tvmult (BlockVector       &dst,
-                            const BlockVector &src) const
+  BlockSparseMatrix::Tvmult (MPI::BlockVector       &dst,
+			     const MPI::BlockVector &src) const
   {
     BaseClass::Tvmult_block_block (dst, src);
   }
-  
+
+
+
+  inline
+  void
+  BlockSparseMatrix::Tvmult (BlockVector       &dst,
+			     const BlockVector &src) const
+  {
+    BaseClass::Tvmult_block_block (dst, src);
+  }
+
+
+
+  inline
+  void
+  BlockSparseMatrix::Tvmult (MPI::BlockVector  &dst,
+			     const MPI::Vector &src) const
+  {
+    BaseClass::Tvmult_block_nonblock (dst, src);
+  }
+
 
 
   inline
   void
   BlockSparseMatrix::Tvmult (BlockVector  &dst,
-                            const Vector &src) const
+			     const Vector &src) const
   {
     BaseClass::Tvmult_block_nonblock (dst, src);
   }
-  
+
+
+
+  inline
+  void
+  BlockSparseMatrix::Tvmult (MPI::Vector            &dst,
+			     const MPI::BlockVector &src) const
+  {
+    BaseClass::Tvmult_nonblock_block (dst, src);
+  }
+
 
 
   inline
   void
   BlockSparseMatrix::Tvmult (Vector            &dst,
-                            const BlockVector &src) const
+			     const BlockVector &src) const
   {
     BaseClass::Tvmult_nonblock_block (dst, src);
   }
-  
+
+
+
+  inline
+  void
+  BlockSparseMatrix::Tvmult (MPI::Vector       &dst,
+			     const MPI::Vector &src) const
+  {
+    BaseClass::Tvmult_nonblock_nonblock (dst, src);
+  }
+
 
 
   inline
   void
   BlockSparseMatrix::Tvmult (Vector       &dst,
-                            const Vector &src) const
+			     const Vector &src) const
   {
     BaseClass::Tvmult_nonblock_nonblock (dst, src);
   }
-  
+
 }
 
 DEAL_II_NAMESPACE_CLOSE

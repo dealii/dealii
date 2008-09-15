@@ -16,7 +16,7 @@
 
 #include <base/config.h>
 #include <lac/exceptions.h>
-#include <lac/trilinos_vector.h>
+#include <lac/trilinos_vector_base.h>
 #include <lac/trilinos_sparse_matrix.h>
 #include <lac/vector.h>
 #include <lac/sparse_matrix.h>
@@ -109,7 +109,7 @@ namespace TrilinosWrappers
 		       const bool                             higher_order_elements = false,
 		       const double                           aggregation_threshold = 1e-4,
 		       const std::vector<std::vector<bool> > &null_space = std::vector<std::vector<bool> > (),
-		       const bool                            output_details = false);
+		       const bool                             output_details = false);
 
 				       /**
 					* Let Trilinos compute a
@@ -164,8 +164,8 @@ namespace TrilinosWrappers
 					* and return it in the
 					* destination vector.
 					*/
-      void vmult (Vector        &dst,
-		  const Vector  &src) const;
+      void vmult (VectorBase        &dst,
+		  const VectorBase  &src) const;
 
 				       /**
 					* Do the same as before, but 

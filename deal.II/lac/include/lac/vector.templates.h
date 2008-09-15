@@ -172,7 +172,7 @@ Vector<Number>::Vector (const PETScWrappers::MPI::Vector &v)
 #ifdef DEAL_II_USE_TRILINOS
 
 template <typename Number>
-Vector<Number>::Vector (const TrilinosWrappers::Vector &v)
+Vector<Number>::Vector (const TrilinosWrappers::MPI::Vector &v)
                 :
 		Subscriptor(),
 		vec_size(v.size()),
@@ -190,13 +190,39 @@ Vector<Number>::Vector (const TrilinosWrappers::Vector &v)
 				       // be a better solution than
 				       // this, but it has not yet been
 				       // found.
-      TrilinosWrappers::LocalizedVector localized_vector (v);
+      TrilinosWrappers::Vector localized_vector (v);
 
                                        // get a representation of the vector
                                        // and copy it
       TrilinosScalar **start_ptr;
 
       int ierr = localized_vector.vector->ExtractView (&start_ptr);
+      AssertThrow (ierr == 0, ExcTrilinosError(ierr));
+      
+      std::copy (start_ptr[0], start_ptr[0]+vec_size, begin());
+    }
+}
+
+
+
+template <typename Number>
+Vector<Number>::Vector (const TrilinosWrappers::Vector &v)
+                :
+		Subscriptor(),
+		vec_size(v.size()),
+		max_vec_size(v.size()),
+		val(0)
+{
+  if (vec_size != 0)
+    {
+      val = new Number[max_vec_size];
+      Assert (val != 0, ExcOutOfMemory());
+
+                                       // get a representation of the vector
+                                       // and copy it
+      TrilinosScalar **start_ptr;
+
+      int ierr = v.vector->ExtractView (&start_ptr);
       AssertThrow (ierr == 0, ExcTrilinosError(ierr));
       
       std::copy (start_ptr[0], start_ptr[0]+vec_size, begin());
@@ -670,6 +696,21 @@ Vector<Number>::operator = (const PETScWrappers::MPI::Vector &v)
 
 
 #ifdef DEAL_II_USE_TRILINOS
+
+template <typename Number>
+Vector<Number> &
+Vector<Number>::operator = (const TrilinosWrappers::MPI::Vector &v)
+{
+				        // Generate a localized version
+				        // of the Trilinos vectors and
+				        // then call the other =
+				        // operator.
+  TrilinosWrappers::Vector localized_vector (v);
+  *this = localized_vector;
+  return *this;
+}
+
+
 
 template <typename Number>
 Vector<Number> &

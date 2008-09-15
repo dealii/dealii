@@ -11,7 +11,7 @@
 //
 //---------------------------------------------------------------------------
 
-#include <lac/trilinos_vector.h>
+#include <lac/trilinos_vector_base.h>
 #include <lac/trilinos_sparse_matrix.h>
 
 #ifdef DEAL_II_USE_TRILINOS
@@ -432,8 +432,10 @@ namespace TrilinosWrappers
 	  ierr = matrix->GlobalAssemble(col_map, row_map, false);
 	
 	AssertThrow (ierr == 0, ExcTrilinosError(ierr));
-	last_action = Insert;
       }
+
+    if (last_action != Insert)
+      last_action = Insert;
 
     int trilinos_i = i;
     int trilinos_j = j;
@@ -467,9 +469,10 @@ namespace TrilinosWrappers
 	  ierr = matrix->GlobalAssemble(col_map, row_map, false);
 
 	AssertThrow (ierr == 0, ExcTrilinosError(ierr));
-
-	last_action = Add;
     }
+
+    if (last_action != Add)
+      last_action = Add;
 
 				  // we have to do above actions in any
 				  // case to be consistent with the MPI
@@ -838,9 +841,10 @@ namespace TrilinosWrappers
   }
 
 
+
   void
-  SparseMatrix::vmult (Vector       &dst,
-		       const Vector &src) const
+  SparseMatrix::vmult (VectorBase       &dst,
+		       const VectorBase &src) const
   {
     Assert (&src != &dst, ExcSourceEqualsDestination());
     
@@ -859,8 +863,8 @@ namespace TrilinosWrappers
 
 
   void
-  SparseMatrix::Tvmult (Vector       &dst,
-			const Vector &src) const
+  SparseMatrix::Tvmult (VectorBase       &dst,
+			const VectorBase &src) const
   {
     Assert (&src != &dst, ExcSourceEqualsDestination());
 
@@ -879,13 +883,12 @@ namespace TrilinosWrappers
 
 
   void
-  SparseMatrix::vmult_add (Vector       &dst,
-			   const Vector &src) const
+  SparseMatrix::vmult_add (VectorBase       &dst,
+			   const VectorBase &src) const
   {
     Assert (&src != &dst, ExcSourceEqualsDestination());
 
-    Vector tmp;
-    tmp = dst;
+    VectorBase tmp(dst);
     vmult (dst, src);
     dst += tmp;
   }
@@ -893,13 +896,12 @@ namespace TrilinosWrappers
 
 
   void
-  SparseMatrix::Tvmult_add (Vector       &dst,
-			    const Vector &src) const
+  SparseMatrix::Tvmult_add (VectorBase       &dst,
+			    const VectorBase &src) const
   {
     Assert (&src != &dst, ExcSourceEqualsDestination());
 
-    Vector tmp;
-    tmp = dst;
+    VectorBase tmp(dst);
     vmult (dst, src);
     dst += tmp;
   }
@@ -907,9 +909,9 @@ namespace TrilinosWrappers
 
 
   TrilinosScalar
-  SparseMatrix::matrix_norm_square (const Vector &v) const
+  SparseMatrix::matrix_norm_square (const VectorBase &v) const
   {
-    Vector tmp(v,true);
+    VectorBase tmp (v);
     vmult (tmp, v);
     return tmp*v;
   }
@@ -917,10 +919,10 @@ namespace TrilinosWrappers
 
 
   TrilinosScalar
-  SparseMatrix::matrix_scalar_product (const Vector &u,
-				       const Vector &v) const
+  SparseMatrix::matrix_scalar_product (const VectorBase &u,
+				       const VectorBase &v) const
   {
-    Vector tmp(v,true);
+    VectorBase tmp (v);
     vmult (tmp, v);
     return u*tmp;
   }
@@ -928,9 +930,9 @@ namespace TrilinosWrappers
 
 
   TrilinosScalar
-  SparseMatrix::residual (Vector       &dst,
-			  const Vector &x,
-			  const Vector &b) const
+  SparseMatrix::residual (VectorBase       &dst,
+			  const VectorBase &x,
+			  const VectorBase &b) const
   {
     vmult (dst, x);
     dst -= b;

@@ -37,6 +37,10 @@ namespace PETScWrappers
 #ifdef DEAL_II_USE_TRILINOS
 namespace TrilinosWrappers
 {
+  namespace MPI
+  {
+    class Vector;
+  }
   class Vector;
 }
 #endif
@@ -190,20 +194,36 @@ class Vector : public Subscriptor
 
 #ifdef DEAL_II_USE_TRILINOS
                                      /**
-                                      * Another copy constructor: copy the
-                                      * values from a Trilinos wrapper
-                                      * vector class. This copy constructor is
-                                      * only available if Trilinos was detected
-                                      * during configuration time.
+                                      * Another copy constructor: copy
+                                      * the values from a Trilinos
+                                      * wrapper vector. This copy
+                                      * constructor is only available if
+                                      * Trilinos was detected during
+                                      * configuration time.
 				      *
-				      * Note that due to the communication
-                                      * model used in MPI, this operation can
-                                      * only succeed if all processes do it at
-                                      * the same time. I.e., it is not
-                                      * possible for only one process to
-                                      * obtain a copy of a parallel vector
-                                      * while the other jobs do something
-                                      * else.
+				      * Note that due to the
+				      * communication model used in MPI,
+				      * this operation can only succeed
+				      * if all processes do it at the
+				      * same time. This means that it is
+				      * not possible for only one
+				      * process to obtain a copy of a
+				      * parallel vector while the other
+				      * jobs do something else. This
+				      * call will rather result in a
+				      * copy of the vector on all
+				      * processors.
+                                      */
+    Vector (const TrilinosWrappers::MPI::Vector &v);
+
+                                     /**
+                                      * Another copy constructor: copy
+                                      * the values from a localized
+                                      * Trilinos wrapper vector. This
+                                      * copy constructor is only
+                                      * available if Trilinos was
+                                      * detected during configuration
+                                      * time.
                                       */
     Vector (const TrilinosWrappers::Vector &v);
 #endif
@@ -371,30 +391,33 @@ class Vector : public Subscriptor
     
 #ifdef DEAL_II_USE_PETSC
                                      /**
-                                      * Another copy operator: copy the values
-                                      * from a sequential PETSc wrapper vector
-                                      * class. This operator is only available
-                                      * if PETSc was detected during
+                                      * Another copy operator: copy the
+                                      * values from a sequential PETSc
+                                      * wrapper vector class. This
+                                      * operator is only available if
+                                      * PETSc was detected during
                                       * configuration time.
                                       */
     Vector<Number> &
     operator = (const PETScWrappers::Vector &v);
 
                                      /**
-                                      * Another copy operator: copy the values
-                                      * from a parallel PETSc wrapper vector
-                                      * class. This operator is only available
-                                      * if PETSc was detected during
+                                      * Another copy operator: copy the
+                                      * values from a parallel PETSc
+                                      * wrapper vector class. This
+                                      * operator is only available if
+                                      * PETSc was detected during
                                       * configuration time.
                                       *
-                                      * Note that due to the communication
-                                      * model used in MPI, this operation can
-                                      * only succeed if all processes do it at
-                                      * the same time. I.e., it is not
+                                      * Note that due to the
+                                      * communication model used in MPI,
+                                      * this operation can only succeed
+                                      * if all processes do it at the
+                                      * same time. I.e., it is not
                                       * possible for only one process to
-                                      * obtain a copy of a parallel vector
-                                      * while the other jobs do something
-                                      * else.
+                                      * obtain a copy of a parallel
+                                      * vector while the other jobs do
+                                      * something else.
                                       */
     Vector<Number> &
     operator = (const PETScWrappers::MPI::Vector &v);
@@ -412,14 +435,27 @@ class Vector : public Subscriptor
 				      * Trilinos was detected during
 				      * configuration time.
                                       *
-                                      * Note that due to the communication
-                                      * model used in MPI, this operation can
-                                      * only succeed if all processes do it at
-                                      * the same time. I.e., it is not
+                                      * Note that due to the
+                                      * communication model used in MPI,
+                                      * this operation can only succeed
+                                      * if all processes do it at the
+                                      * same time. I.e., it is not
                                       * possible for only one process to
-                                      * obtain a copy of a parallel vector
-                                      * while the other jobs do something
-                                      * else.
+                                      * obtain a copy of a parallel
+                                      * vector while the other jobs do
+                                      * something else.
+				      */
+    Vector<Number> &
+    operator = (const TrilinosWrappers::MPI::Vector &v);
+
+				     /**
+				      * Another copy operator: copy the
+				      * values from a sequential
+				      * Trilinos wrapper vector
+				      * class. This operator is only
+				      * available if Trilinos was
+				      * detected during configuration
+				      * time.
 				      */
     Vector<Number> &
     operator = (const TrilinosWrappers::Vector &v);
@@ -427,11 +463,12 @@ class Vector : public Subscriptor
 
                                      /**
                                       * Test for equality. This function
-                                      * assumes that the present vector and
-                                      * the one to compare with have the same
-                                      * size already, since comparing vectors
-                                      * of different sizes makes not much
-                                      * sense anyway.
+                                      * assumes that the present vector
+                                      * and the one to compare with have
+                                      * the same size already, since
+                                      * comparing vectors of different
+                                      * sizes makes not much sense
+                                      * anyway.
                                       */
     template <typename Number2>
     bool operator == (const Vector<Number2> &v) const;

@@ -19,7 +19,7 @@
 #include <lac/sparsity_pattern.h>
 #include <lac/sparse_matrix.h>
 #include <lac/exceptions.h>
-#include <lac/trilinos_vector.h>
+#include <lac/trilinos_vector_base.h>
 
 #include <boost/shared_ptr.hpp>
 #include <vector>
@@ -45,7 +45,7 @@ DEAL_II_NAMESPACE_OPEN
 namespace TrilinosWrappers
 {
                                    // forward declarations
-  class Vector;
+  class VectorBase;
   class SparseMatrix;
 
   namespace MatrixIterators
@@ -943,11 +943,21 @@ namespace TrilinosWrappers
 					* case you work on a distributed
 					* memory architecture, using the
 					* interface in the
-					* TrilinosWrappers::Vector
-					* class.
+					* TrilinosWrappers::VectorBase
+					* class (or one of the two
+					* derived classes Vector and
+					* MPI::Vector).
+					*
+					* In case of a localized Vector,
+					* this function will only work
+					* when running on one processor,
+					* since the matrix object is
+					* inherently
+					* distributed. Otherwise, and
+					* exception will be thrown.
                                         */
-      void vmult (Vector       &dst,
-                  const Vector &src) const;
+      void vmult (VectorBase       &dst,
+                  const VectorBase &src) const;
 
                                        /**
                                         * Matrix-vector multiplication:
@@ -967,12 +977,22 @@ namespace TrilinosWrappers
 					* as was used for the matrix in
 					* case you work on a distributed
 					* memory architecture, using the
-					* interface of the
-					* TrilinosWrappers::Vector
-					* class.
+					* interface in the
+					* TrilinosWrappers::VectorBase
+					* class (or one of the two
+					* derived classes Vector and
+					* MPI::Vector).
+					*
+					* In case of a localized Vector,
+					* this function will only work
+					* when running on one processor,
+					* since the matrix object is
+					* inherently
+					* distributed. Otherwise, and
+					* exception will be thrown.
                                         */
-      void Tvmult (Vector       &dst,
-                   const Vector &src) const;
+      void Tvmult (VectorBase       &dst,
+		   const VectorBase &src) const;
 
                                        /**
                                         * Adding Matrix-vector
@@ -990,12 +1010,22 @@ namespace TrilinosWrappers
 					* as was used for the matrix in
 					* case you work on a distributed
 					* memory architecture, using the
-					* interface of the
-					* TrilinosWrappers::Vector
-					* class.
+					* interface in the
+					* TrilinosWrappers::VectorBase
+					* class (or one of the two
+					* derived classes Vector and
+					* MPI::Vector).
+					*
+					* In case of a localized Vector,
+					* this function will only work
+					* when running on one processor,
+					* since the matrix object is
+					* inherently
+					* distributed. Otherwise, and
+					* exception will be thrown.
                                         */
-      void vmult_add (Vector       &dst,
-                      const Vector &src) const;
+      void vmult_add (VectorBase       &dst,
+                      const VectorBase &src) const;
 
                                        /**
                                         * Adding Matrix-vector
@@ -1016,12 +1046,22 @@ namespace TrilinosWrappers
 					* as was used for the matrix in
 					* case you work on a distributed
 					* memory architecture, using the
-					* interface of the
-					* TrilinosWrappers::Vector
-					* class.
+					* interface in the
+					* TrilinosWrappers::VectorBase
+					* class (or one of the two
+					* derived classes Vector and
+					* MPI::Vector).
+					*
+					* In case of a localized Vector,
+					* this function will only work
+					* when running on one processor,
+					* since the matrix object is
+					* inherently
+					* distributed. Otherwise, and
+					* exception will be thrown.
                                         */
-      void Tvmult_add (Vector       &dst,
-                       const Vector &src) const;
+      void Tvmult_add (VectorBase       &dst,
+                       const VectorBase &src) const;
 
                                        /**
                                         * Return the square of the norm
@@ -1052,18 +1092,27 @@ namespace TrilinosWrappers
                                         * support this operation and
                                         * needs a temporary vector.
 					*
-					* Note that both vectors have
-					* to be distributed vectors
+					* Note that both vectors have to
+					* be distributed vectors
 					* generated using the same Map
-					* as was used for the matrix
-					* in case you work on a
-					* distributed memory
-					* architecture, using the
-					* interface of the
-					* TrilinosWrappers::Vector
-					* class.
+					* as was used for the matrix in
+					* case you work on a distributed
+					* memory architecture, using the
+					* interface in the
+					* TrilinosWrappers::VectorBase
+					* class (or one of the two
+					* derived classes Vector and
+					* MPI::Vector).
+					*
+					* In case of a localized Vector,
+					* this function will only work
+					* when running on one processor,
+					* since the matrix object is
+					* inherently
+					* distributed. Otherwise, and
+					* exception will be thrown.
                                         */
-      TrilinosScalar matrix_norm_square (const Vector &v) const;
+      TrilinosScalar matrix_norm_square (const VectorBase &v) const;
 
                                        /**
                                         * Compute the matrix scalar
@@ -1080,19 +1129,28 @@ namespace TrilinosWrappers
                                         * this operation and needs a
                                         * temporary vector.
 					*
-					* Note that both vectors have
-					* to be distributed vectors
+					* Note that both vectors have to
+					* be distributed vectors
 					* generated using the same Map
-					* as was used for the matrix
-					* in case you work on a
-					* distributed memory
-					* architecture, using the
-					* interface of the
-					* TrilinosWrappers::Vector
-					* class.
+					* as was used for the matrix in
+					* case you work on a distributed
+					* memory architecture, using the
+					* interface in the
+					* TrilinosWrappers::VectorBase
+					* class (or one of the two
+					* derived classes Vector and
+					* MPI::Vector).
+					*
+					* In case of a localized Vector,
+					* this function will only work
+					* when running on one processor,
+					* since the matrix object is
+					* inherently
+					* distributed. Otherwise, and
+					* exception will be thrown.
                                         */
-      TrilinosScalar matrix_scalar_product (const Vector &u,
-					    const Vector &v) const;
+      TrilinosScalar matrix_scalar_product (const VectorBase &u,
+					    const VectorBase &v) const;
 
                                        /**
                                         * Compute the residual of an
@@ -1108,20 +1166,29 @@ namespace TrilinosWrappers
                                         * destination <i>dst</i> must
                                         * not be the same vector.
 					*
-					* Note that both vectors have
-					* to be distributed vectors
+					* Note that both vectors have to
+					* be distributed vectors
 					* generated using the same Map
-					* as was used for the matrix
-					* in case you work on a
-					* distributed memory
-					* architecture, using the
-					* interface of the
-					* TrilinosWrappers::Vector
-					* class.
+					* as was used for the matrix in
+					* case you work on a distributed
+					* memory architecture, using the
+					* interface in the
+					* TrilinosWrappers::VectorBase
+					* class (or one of the two
+					* derived classes Vector and
+					* MPI::Vector).
+					*
+					* In case of a localized Vector,
+					* this function will only work
+					* when running on one processor,
+					* since the matrix object is
+					* inherently
+					* distributed. Otherwise, and
+					* exception will be thrown.
                                         */
-      TrilinosScalar residual (Vector       &dst,
-			       const Vector &x,
-			       const Vector &b) const;
+      TrilinosScalar residual (VectorBase       &dst,
+			       const VectorBase &x,
+			       const VectorBase &b) const;
 
 				       /**
 					* Add <tt>matrix</tt> scaled
@@ -1337,9 +1404,10 @@ namespace TrilinosWrappers
 
 
 
-#ifndef DOXYGEN
 // -------------------------- inline and template functions ----------------------
 
+
+#ifndef DOXYGEN
 
   namespace MatrixIterators
   {

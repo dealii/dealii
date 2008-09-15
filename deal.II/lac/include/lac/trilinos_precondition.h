@@ -33,7 +33,7 @@ DEAL_II_NAMESPACE_OPEN
 namespace TrilinosWrappers
 {
 
-  class Vector;
+  class VectorBase;
   class SparseMatrix;
   
 /**  
@@ -77,8 +77,8 @@ namespace TrilinosWrappers
 				       /**
 					* Apply the preconditioner.
 					*/
-      void vmult (Vector       &dst,
-		  const Vector &src) const;
+      void vmult (VectorBase       &dst,
+		  const VectorBase &src) const;
 
     private:
       boost::shared_ptr<Ifpack_Preconditioner> preconditioner;

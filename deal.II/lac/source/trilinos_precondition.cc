@@ -13,7 +13,7 @@
 
 
 #include <lac/trilinos_precondition.h>
-#include <lac/trilinos_vector.h>
+#include <lac/trilinos_vector_base.h>
 #include <lac/trilinos_sparse_matrix.h>
 
 #ifdef DEAL_II_USE_TRILINOS
@@ -59,8 +59,8 @@ namespace TrilinosWrappers
 
 
   void
-  PreconditionSSOR::vmult (Vector       &dst,
-			   const Vector &src) const
+  PreconditionSSOR::vmult (VectorBase       &dst,
+			   const VectorBase &src) const
   {
     preconditioner->ApplyInverse (*src.vector, *dst.vector);
   }

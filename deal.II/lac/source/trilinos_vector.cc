@@ -25,903 +25,215 @@ DEAL_II_NAMESPACE_OPEN
 
 namespace TrilinosWrappers
 {
-  namespace internal
+  namespace MPI
   {
-    VectorReference::operator TrilinosScalar () const
+
+
+    Vector::Vector ()
+                   :
+#ifdef DEAL_II_COMPILER_SUPPORTS_MPI
+                   map (0,0,Epetra_MpiComm(MPI_COMM_WORLD))
+#else
+		   map (0,0,Epetra_SerialComm())
+#endif
     {
-      Assert (index < vector.size(),
-              ExcIndexRange (index, 0, vector.size()));
-
-                                        // Trilinos allows for vectors
-                                        // to be referenced by the []
-                                        // or () operators but only ()
-                                        // checks index bounds Also,
-                                        // can only get local values
-
-      AssertThrow ((static_cast<signed int>(index) >= vector.map.MinMyGID()) &&
-		   (static_cast<signed int>(index) <= vector.map.MaxMyGID()),
-		   ExcAccessToNonLocalElement (index, vector.map.MinMyGID(),
-					       vector.map.MaxMyGID()));
-
-      return (*(vector.vector))[0][index];
+      last_action = Zero;
+      vector = std::auto_ptr<Epetra_FEVector> (new Epetra_FEVector(map));
     }
-  }
+
+
+  
+    Vector::Vector (const Epetra_Map &InputMap)
+                    :
+		    map (InputMap)
+    {
+      last_action = Zero;
+      vector = std::auto_ptr<Epetra_FEVector> (new Epetra_FEVector(map));
+    }
+  
+
+  
+    Vector::Vector (const Vector &v)
+                    :
+                    VectorBase(),
+		    map (v.map)
+    {
+      last_action = Zero;
+      vector = std::auto_ptr<Epetra_FEVector> (new Epetra_FEVector(*v.vector));
+    }
+
+
+
+    Vector::Vector (const Epetra_Map &InputMap,
+		    const VectorBase &v)
+                    :
+                    VectorBase(),
+		    map (InputMap)
+    {
+      AssertThrow (map.NumGlobalElements() == v.vector->Map().NumGlobalElements(),
+		   ExcDimensionMismatch (map.NumGlobalElements(),
+					 v.vector->Map().NumGlobalElements()));
+
+      last_action = Zero;
+      
+      if (map.SameAs(v.vector->Map()) == true)
+	vector = std::auto_ptr<Epetra_FEVector> (new Epetra_FEVector(*v.vector));
+      else
+	{
+	  vector = std::auto_ptr<Epetra_FEVector> (new Epetra_FEVector(map, false));
+	  reinit (v, false, true);
+	}
+
+    }
+
+
+
+    void
+    Vector::reinit (const Epetra_Map &input_map,
+		    const bool        fast)
+    {
+      vector.reset();
+      map = input_map;
+      
+      vector = std::auto_ptr<Epetra_FEVector> (new Epetra_FEVector(map,!fast));
+      last_action = Zero;
+    }
+
+
+
+    void
+    Vector::reinit (const VectorBase &v,
+		    const bool        fast,
+		    const bool        allow_different_maps)
+    {
+					// In case we do not allow to
+					// have different maps, this
+					// call means that we have to
+					// reset the vector. So clear
+					// the vector, initialize our
+					// map with the map in v, and
+					// generate the vector.
+      if (allow_different_maps == false)
+        {
+	  vector.reset();
+	  if (map.SameAs(v.vector->Map()) == false)
+	    map = Epetra_Map(v.vector->GlobalLength(),0,v.vector->Comm());
+
+	  vector = std::auto_ptr<Epetra_FEVector> (new Epetra_FEVector(map,!fast));
+	  last_action = Zero;
+	}
+
+					// Otherwise, we have to check
+					// that the two vectors are
+					// already of the same size,
+					// create an object for the data
+					// exchange and then insert all
+					// the data.
+      else
+        {
+	  Assert (fast == false,
+		  ExcMessage ("It is not possible to exchange data with the "
+			      "option fast set, which would not write "
+			      "elements."));
+
+	  AssertThrow (size() == v.size(),
+		       ExcDimensionMismatch (size(), v.size()));
+
+	  Epetra_Import data_exchange (vector->Map(), v.vector->Map());
+
+	  const int ierr = vector->Import(*v.vector, data_exchange, Insert);
+	  AssertThrow (ierr == 0, ExcTrilinosError(ierr));
+	}
+
+    }
+
+
+
+    Vector &
+    Vector::operator = (const Vector &v)
+    {
+      if (vector->Map().SameAs(v.vector->Map()) == true)
+	*vector = *v.vector;
+      else
+	{
+	  vector.reset();
+	  map = v.map;
+	  vector = std::auto_ptr<Epetra_FEVector> (new Epetra_FEVector(*v.vector));
+	}
+
+      return *this;
+    }
+
+
+
+    Vector &
+    Vector::operator = (const TrilinosWrappers::Vector &v)
+    {
+      Assert (size() == v.size(), ExcDimensionMismatch(size(), v.size()));
+
+      Epetra_Import data_exchange (vector->Map(), v.vector->Map());
+      const int ierr = vector->Import(*v.vector, data_exchange, Insert);
+
+      AssertThrow (ierr == 0, ExcTrilinosError(ierr));
+
+      return *this;
+    }
+
+
+
+    template <typename Number>
+    Vector &
+    Vector::operator = (const ::dealii::Vector<Number> &v)
+    {
+      Assert (size() == v.size(),
+	      ExcDimensionMismatch(size(), v.size()));
+
+      vector = std::auto_ptr<Epetra_FEVector> (new Epetra_FEVector(map, false));
+      
+      const int min_my_id = map.MinMyGID();
+      const unsigned int size = map.NumMyElements();
+
+      Assert (map.MaxLID() == size-1,
+	      ExcDimensionMismatch(map.MaxLID(), size-1));
+
+      std::vector<int> indices (size);
+      for (unsigned int i=0; i<size; ++i)
+	indices[i] = map.GID(i);
+
+
+      const int ierr = vector->ReplaceGlobalValues(size, 0, v.begin()+min_my_id, 
+						   &indices[0]);
+      AssertThrow (ierr == 0, ExcTrilinosError());
+
+      return *this;
+    }
+
+  } /* end of namespace MPI */
+
 
 
 
   Vector::Vector ()
-                  :
+                 :
 #ifdef DEAL_II_COMPILER_SUPPORTS_MPI
-                  map (0,0,Epetra_MpiComm(MPI_COMM_WORLD)),
+                 map (0, 0, Epetra_MpiComm(MPI_COMM_WORLD))
 #else
-		  map (0,0,Epetra_SerialComm()),
+		 map (0, 0, Epetra_SerialComm())
 #endif
-                  last_action (Insert),
-		  vector(std::auto_ptr<Epetra_FEVector> 
-			 (new Epetra_FEVector(map)))
-  {}
-
-
-  
-  Vector::Vector (const Epetra_Map &InputMap)
-                  :
-		  map (InputMap),
-                  last_action (Insert),
-		  vector (std::auto_ptr<Epetra_FEVector> 
-			  (new Epetra_FEVector(map)))
-  {}
-  
-
-  
-  Vector::Vector (const Vector &v,
-		  const bool    fast)
-                  :
-                  Subscriptor(),
-		  map (v.map),
-                  last_action (Insert),
-		  vector(std::auto_ptr<Epetra_FEVector> 
-			 (new Epetra_FEVector(map,!fast)))
-  {}
-  
-
-
-  Vector::~Vector ()
   {
+    last_action = Zero;
+    vector = std::auto_ptr<Epetra_FEVector>
+	              (new Epetra_FEVector(map,false));
   }
 
 
 
-  void
-  Vector::reinit (const Epetra_Map &input_map)
-  {
-    vector.reset();
-    map = input_map;
-
-    vector = std::auto_ptr<Epetra_FEVector> (new Epetra_FEVector(map));
-    last_action = Insert;
-  }
-
-
-
-  void
-  Vector::reinit (const Vector &v,
-		  const bool    fast)
-  {
-    vector.reset();
-    if (map.SameAs(v.map) == false)
-      map = v.map;
-
-    vector = std::auto_ptr<Epetra_FEVector> (new Epetra_FEVector(map,!fast));
-    last_action = Insert;
-  }
-
-
-
-  void
-  Vector::clear ()
-  {
-                                     // When we clear the vector,
-				     // reset the pointer and generate
-				     // an empty vector.
-    vector.reset();
-
+  Vector::Vector (const unsigned int n)
+                 :
 #ifdef DEAL_II_COMPILER_SUPPORTS_MPI
-    map = Epetra_Map (0, 0, Epetra_MpiComm(MPI_COMM_WORLD));
+                 map ((int)n, 0, Epetra_MpiComm(MPI_COMM_WORLD))
 #else
-    map = Epetra_Map (0, 0, Epetra_SerialComm());
-#endif
-
-    vector = std::auto_ptr<Epetra_FEVector> (new Epetra_FEVector(map));
-    last_action = Insert;
-  }
-
-
-
-  void
-  Vector::compress ()
-  {
-				 // Now pass over the information
-				 // about what we did last to Trilinos.
-    const int ierr = vector->GlobalAssemble(last_action);
-    AssertThrow (ierr == 0, ExcTrilinosError(ierr));
-  }
-
-
-
-  Vector &
-  Vector::operator = (const TrilinosScalar s)
-  {
-
-    Assert (numbers::is_finite(s),
-	    ExcMessage("The given value is not finite but either "
-		       "infinite or Not A Number (NaN)"));
-
-    const int ierr = vector->PutScalar(s);
-
-    AssertThrow (ierr == 0, ExcTrilinosError(ierr));
-
-    return *this;
-  }
-
-
-
-  Vector &
-  Vector::operator = (const LocalizedVector &v)
-  {
-    Assert (size() == v.size(), ExcDimensionMismatch(size(), v.size()));
-
-    Epetra_Import import_information (map, v.map);
-    const int ierr = vector->Import(*v.vector, import_information, Insert);
-
-    Assert (ierr == 0, ExcTrilinosError(ierr));
-
-    return *this;
-  }
-
-
-
-  Vector &
-  Vector::operator = (const ::dealii::Vector<double> &v)
-  {
-    Assert (size() == v.size(),
-	    ExcDimensionMismatch(size(),v.size()));
-
-    const unsigned int n_local_elements = local_size(); 
-    const unsigned int first_local_element = local_range().first;
-
-    std::vector<int> local_indices (n_local_elements);
-    for (unsigned int i=0; i<n_local_elements; ++i)
-      local_indices[i] = map.GID(i);
-
-    const int ierr = vector->ReplaceGlobalValues(n_local_elements, 
-						 &local_indices[0],
-						 v.begin()+first_local_element); 
-
-    Assert (ierr==0, ExcTrilinosError(ierr));
-
-    return *this;
-  }
-
-
-
-  bool
-  Vector::operator == (const Vector &v) const
-  {
-    Assert (size() == v.size(),
-            ExcDimensionMismatch(size(), v.size()));
-    unsigned int i;
-    for (i=0; i<size(); i++) 
-      if ((*(v.vector))[0][i]!=(*vector)[0][i]) return false;
-
-    return true;
-  }
-
-
-
-  bool
-  Vector::operator != (const Vector &v) const
-  {
-    Assert (size() == v.size(),
-            ExcDimensionMismatch(size(), v.size()));
-
-    return (!(*this==v));
-  }
-
-
-
-  unsigned int
-  Vector::size () const
-  {
-    return (unsigned int) vector->Map().NumGlobalElements();
-  }
-
-
-
-  unsigned int
-  Vector::local_size () const
-  {
-    return (unsigned int) vector->Map().NumMyElements();
-  }
-
-
-
-  std::pair<unsigned int, unsigned int>
-  Vector::local_range () const
-  {
-    int begin, end;
-    begin = vector->Map().MinMyGID();
-    end = vector->Map().MaxMyGID()+1;
-    return std::make_pair (begin, end);
-  }
-
-
-
-  TrilinosScalar
-  Vector::el (const unsigned int index) const
-  {
-                                        // Extract local indices in
-                                        // the vector.
-    int trilinos_i = vector->Map().LID(index);
-    TrilinosScalar value = 0.;
-
-				        // If the element is not
-				        // present on the current
-				        // processor, we can't
-				        // continue. Just print out 0.
-
-				        // TODO: Is this reasonable?
-    if (trilinos_i == -1 )
-      {
-	return 0.;
-        //Assert (false, ExcAccessToNonlocalElement(index, local_range().first,
-	//				  local_range().second));
-      }
-    else
-      value = (*vector)[0][trilinos_i];
-
-    return value;
-  }
-
-
-
-  void
-  Vector::set (const std::vector<unsigned int>    &indices,
-	       const std::vector<TrilinosScalar>  &values)
-  {
-    Assert (indices.size() == values.size(),
-	    ExcDimensionMismatch(indices.size(),values.size()));
-
-    set (indices.size(), &indices[0], &values[0]);
-  }
-
-
-
-  void
-  Vector::set (const std::vector<unsigned int>        &indices,
-	       const ::dealii::Vector<TrilinosScalar> &values)
-  {
-    Assert (indices.size() == values.size(),
-	    ExcDimensionMismatch(indices.size(),values.size()));
-
-    set (indices.size(), &indices[0], values.begin());
-  }
-
-
-
-  void
-  Vector::set (const unsigned int    n_elements,
-	       const unsigned int   *indices,
-	       const TrilinosScalar *values)
-  {
-    if (last_action == Add)
-      {
-	vector->GlobalAssemble(Add);
-	last_action = Insert;
-      }
-
-    const int ierr= vector->ReplaceGlobalValues (n_elements, 
-				      (int*)(const_cast<unsigned int*>(indices)), 
-				      const_cast<TrilinosScalar*>(values));
-    AssertThrow (ierr == 0, ExcTrilinosError(ierr));
-  }
-
-
-
-  void
-  Vector::add (const std::vector<unsigned int>    &indices,
-	       const std::vector<TrilinosScalar>  &values)
-  {
-    Assert (indices.size() == values.size(),
-	    ExcDimensionMismatch(indices.size(),values.size()));
-
-    add (indices.size(), &indices[0], &values[0]);
-  }
-
-
-
-  void
-  Vector::add (const std::vector<unsigned int>        &indices,
-	       const ::dealii::Vector<TrilinosScalar> &values)
-  {
-    Assert (indices.size() == values.size(),
-	    ExcDimensionMismatch(indices.size(),values.size()));
-
-    add (indices.size(), &indices[0], values.begin());
-  }
-
-
-
-  void
-  Vector::add (const unsigned int    n_elements,
-	       const unsigned int   *indices,
-	       const TrilinosScalar *values)
-  {
-    if (last_action == Insert)
-      {
-	vector->GlobalAssemble(Insert);
-	last_action = Add;
-      }
-
-    const int ierr= vector->SumIntoGlobalValues (n_elements, 
-				    (int*)(const_cast<unsigned int*>(indices)), 
-				    const_cast<TrilinosScalar*>(values));
-    AssertThrow (ierr == 0, ExcTrilinosError(ierr));
-  }
-
-
-
-  TrilinosScalar
-  Vector::operator * (const Vector &vec) const
-  {
-    Assert (size() == vec.size(),
-            ExcDimensionMismatch(size(), vec.size()));
-
-    TrilinosScalar result;
-
-    const int ierr = vector->Dot(*(vec.vector), &result);
-    AssertThrow (ierr == 0, ExcTrilinosError(ierr));
-
-    return result;
-  }
-
-
-
-  Vector::real_type
-  Vector::norm_sqr () const
-  {
-    const TrilinosScalar d = l2_norm();
-    return d*d;
-  }
-
-
-
-  TrilinosScalar
-  Vector::mean_value () const
-  {
-    TrilinosScalar mean;
-
-    const int ierr = vector->MeanValue (&mean);
-    AssertThrow (ierr == 0, ExcTrilinosError(ierr));
-
-    return mean;
-  }
-
-
-
-  Vector::real_type
-  Vector::l1_norm () const
-  {
-    TrilinosScalar d;
-
-    const int ierr = vector->Norm1 (&d);
-    AssertThrow (ierr == 0, ExcTrilinosError(ierr));
-
-    return d;
-  }
-
-
-
-  Vector::real_type
-  Vector::l2_norm () const
-  {
-    TrilinosScalar d;
-
-    const int ierr = vector->Norm2 (&d);
-    AssertThrow (ierr == 0, ExcTrilinosError(ierr));
-
-    return d;
-  }
-
-
-
-  Vector::real_type
-  Vector::lp_norm (const TrilinosScalar p) const
-  {
-                                        // get a representation of the
-                                        // vector and loop over all
-                                        // the elements
-    TrilinosScalar *start_ptr;
-    int leading_dimension;
-    int ierr = vector->ExtractView (&start_ptr, &leading_dimension);
-    AssertThrow (ierr == 0, ExcTrilinosError(ierr));
-
-    TrilinosScalar norm = 0;
-    TrilinosScalar sum=0;
-
-    const TrilinosScalar * ptr  = start_ptr;
-
-                                       // add up elements
-    while (ptr != start_ptr+size())
-      sum += std::pow(std::fabs(*ptr++), p);
-
-    norm = std::pow(sum, static_cast<TrilinosScalar>(1./p));
-
-    return norm;
-  }
-
-
-
-  Vector::real_type
-  Vector::linfty_norm () const
-  {
-    TrilinosScalar d;
-
-    const int ierr = vector->NormInf (&d);
-    AssertThrow (ierr == 0, ExcTrilinosError(ierr));
-
-    return d;
-  }
-
-
-
-  bool
-  Vector::all_zero () const
-  {
-                                     // get a representation of the vector and
-                                     // loop over all the elements
-    TrilinosScalar *start_ptr;
-    int leading_dimension;
-    int ierr = vector->ExtractView (&start_ptr, &leading_dimension);
-    AssertThrow (ierr == 0, ExcTrilinosError(ierr));
-
-    const TrilinosScalar *ptr  = start_ptr,
-			 *eptr = start_ptr + size();
-    bool flag = true;
-    while (ptr != eptr)
-      {
-        if (*ptr != 0)
-          {
-            flag = false;
-            break;
-          }
-        ++ptr;
-      }
-
-    return flag;
-  }
-
-
-
-  bool
-  Vector::is_non_negative () const
-  {
-                                     // get a representation of the vector and
-                                     // loop over all the elements
-    TrilinosScalar *start_ptr;
-    int leading_dimension;
-    int ierr = vector->ExtractView (&start_ptr, &leading_dimension);
-    AssertThrow (ierr == 0, ExcTrilinosError(ierr));
-
-    const TrilinosScalar *ptr  = start_ptr,
-                         *eptr = start_ptr + size();
-    bool flag = true;
-    while (ptr != eptr)
-      {
-        if (*ptr < 0.0)
-          {
-            flag = false;
-            break;
-          }
-        ++ptr;
-      }
-
-    return flag;
-  }
-
-
-
-  Vector &
-  Vector::operator *= (const TrilinosScalar a)
-  {
-
-    Assert (numbers::is_finite(a),
-	    ExcMessage("The given value is not finite but "
-		       "either infinite or Not A Number (NaN)"));
-
-    const int ierr = vector->Scale(a);
-    Assert (ierr == 0, ExcTrilinosError(ierr));
-
-    return *this;
-  }
-
-
-
-  Vector &
-  Vector::operator /= (const TrilinosScalar a)
-  {
-
-    Assert (numbers::is_finite(a),
-	    ExcMessage("The given value is not finite but "
-		       "either infinite or Not A Number (NaN)"));
-
-    const TrilinosScalar factor = 1./a;
-
-    Assert (numbers::is_finite(factor),
-	    ExcMessage("The given value is not finite but "
-		       "either infinite or Not A Number (NaN)"));
-
-    const int ierr = vector->Scale(factor);
-    Assert (ierr == 0, ExcTrilinosError(ierr));
-
-    return *this;
-  }
-
-
-
-  Vector &
-  Vector::operator += (const Vector &v)
-  {
-    const int ierr = vector->Update (1.0, *(v.vector), 1.0);
-    AssertThrow (ierr == 0, ExcTrilinosError(ierr));
-    return *this;
-  }
-
-
-
-  Vector &
-  Vector::operator -= (const Vector &v)
-  {
-    const int ierr = vector->Update (-1.0, *(v.vector), 1.0);
-    AssertThrow (ierr == 0, ExcTrilinosError(ierr));
-
-    return *this;
-  }
-
-
-
-  void
-  Vector::add (const TrilinosScalar s)
-  {
-
-    Assert (numbers::is_finite(s),
-	    ExcMessage("The given value is not finite but "
-		       "either infinite or Not A Number (NaN)"));
-
-    unsigned int n_local = local_size();
-    int ierr;
-
-    for (unsigned int i=0; i<n_local; i++)
-      {
-	ierr = vector->SumIntoMyValue(i,0,s);
-        AssertThrow (ierr == 0, ExcTrilinosError(ierr));
-      }
-  }
-
-
-
-  void
-  Vector::add (const Vector &v)
-  {
-    *this += v;
-  }
-
-
-
-  void
-  Vector::add (const TrilinosScalar a,
-	       const Vector        &v)
-  {
-
-    Assert (numbers::is_finite(a),
-	    ExcMessage("The given value is not finite but "
-		       "either infinite or Not A Number (NaN)"));
-
-    const int ierr = vector->Update(a, *(v.vector), 1.);
-    AssertThrow (ierr == 0, ExcTrilinosError(ierr));
-  }
-
-
-
-  void
-  Vector::add (const TrilinosScalar a,
-	       const Vector        &v,
-	       const TrilinosScalar b,
-	       const Vector        &w)
-  {
-
-    Assert (numbers::is_finite(a),
-	    ExcMessage("The given value is not finite but "
-		       "either infinite or Not A Number (NaN)"));
-    Assert (numbers::is_finite(b),
-	    ExcMessage("The given value is not finite but "
-		       "either infinite or Not A Number (NaN)"));
-
-    const int ierr = vector->Update(a, *(v.vector), b, *(w.vector), 1.);
-
-    AssertThrow (ierr == 0, ExcTrilinosError(ierr));
-  }
-
-
-
-  void
-  Vector::sadd (const TrilinosScalar s,
-		const Vector        &v)
-  {
-
-    Assert (numbers::is_finite(s),
-	    ExcMessage("The given value is not finite but "
-		       "either infinite or Not A Number (NaN)"));
-
-    const int ierr = vector->Update(1., *(v.vector), s);
-
-    AssertThrow (ierr == 0, ExcTrilinosError(ierr));
-  }
-
-
-
-  void
-  Vector::sadd (const TrilinosScalar s,
-		const TrilinosScalar a,
-		const Vector        &v)
-  {
-
-    Assert (numbers::is_finite(s),
-	    ExcMessage("The given value is not finite but "
-		       "either infinite or Not A Number (NaN)"));
-    Assert (numbers::is_finite(a),
-	    ExcMessage("The given value is not finite but "
-		       "either infinite or Not A Number (NaN)"));
-
-     const int ierr = vector->Update(a, *(v.vector), s);
-
-     AssertThrow(ierr == 0, ExcTrilinosError(ierr));
-  }
-
-
-
-  void
-  Vector::sadd (const TrilinosScalar s,
-		const TrilinosScalar a,
-		const Vector        &v,
-		const TrilinosScalar b,
-		const Vector        &w)
-  {
-
-    Assert (numbers::is_finite(s),
-	    ExcMessage("The given value is not finite but "
-		       "either infinite or Not A Number (NaN)"));
-    Assert (numbers::is_finite(a),
-	    ExcMessage("The given value is not finite but "
-		       "either infinite or Not A Number (NaN)"));
-    Assert (numbers::is_finite(b),
-	    ExcMessage("The given value is not finite but "
-		       "either infinite or Not A Number (NaN)"));
-
-    const int ierr = vector->Update(a, *(v.vector), b, *(w.vector), s);
-
-    AssertThrow (ierr == 0, ExcTrilinosError(ierr));
-  }
-
-
-
-  void
-  Vector::sadd (const TrilinosScalar s,
-		const TrilinosScalar a,
-		const Vector        &v,
-		const TrilinosScalar b,
-		const Vector        &w,
-		const TrilinosScalar c,
-		const Vector        &x)
-  {
-
-    Assert (numbers::is_finite(s),
-	    ExcMessage("The given value is not finite but "
-		       "either infinite or Not A Number (NaN)"));
-    Assert (numbers::is_finite(a),
-	    ExcMessage("The given value is not finite but "
-		       "either infinite or Not A Number (NaN)"));
-    Assert (numbers::is_finite(b),
-	    ExcMessage("The given value is not finite but "
-		       "either infinite or Not A Number (NaN)"));
-    Assert (numbers::is_finite(c),
-	    ExcMessage("The given value is not finite but "
-		       "either infinite or Not A Number (NaN)"));
-
-                                        // Update member can only
-				        // input two other vectors so
-				        // do it in two steps
-    const int ierr = vector->Update(a, *(v.vector), b, *(w.vector), s);
-    AssertThrow (ierr == 0, ExcTrilinosError(ierr));
-
-    const int jerr = vector->Update(c, *(x.vector), 1.);
-    AssertThrow (jerr == 0, ExcTrilinosError(jerr));
-  }
-
-
-
-  void
-  Vector::scale (const Vector &factors)
-  {
-    const int ierr = vector->Multiply (1.0, *(factors.vector), *vector, 0.0);
-    AssertThrow (ierr == 0, ExcTrilinosError(ierr));
-  }
-
-
-
-  void
-  Vector::equ (const TrilinosScalar a,
-	       const Vector        &v)
-  {
-
-    Assert (numbers::is_finite(a),
-	    ExcMessage("The given value is not finite but "
-		       "either infinite or Not A Number (NaN)"));
-
-    *vector = *v.vector;
-    map = v.map;
-    
-    *this *= a;
-  }
-
-
-
-  void
-  Vector::equ (const TrilinosScalar a,
-	       const Vector        &v,
-	       const TrilinosScalar b,
-	       const Vector        &w)
-  {
-
-    Assert (numbers::is_finite(a),
-	    ExcMessage("The given value is not finite but "
-		       "either infinite or Not A Number (NaN)"));
-    Assert (numbers::is_finite(b),
-	    ExcMessage("The given value is not finite but "
-		       "either infinite or Not A Number (NaN)"));
-
-    Assert (v.size() == w.size(),
-            ExcDimensionMismatch (v.size(), w.size()));
-
-    *vector = *v.vector;
-    map = v.map;
-    sadd (a, b, w);
-  }
-
-
-
-  void
-  Vector::ratio (const Vector &v,
-		 const Vector &w)
-  {
-    Assert (v.size() == w.size(),
-            ExcDimensionMismatch (v.size(), w.size()));
-
-    Assert (size() == w.size(),
-            ExcDimensionMismatch (size(), w.size()));
-
-    const int ierr = vector->ReciprocalMultiply(1.0, *(w.vector), 
-						*(v.vector), 0.0);
-
-    AssertThrow (ierr == 0, ExcTrilinosError(ierr));
-  }
-
-
-  
-				        // TODO: up to now only local
-                                        // data printed out! Find a
-                                        // way to neatly output
-                                        // distributed data...
-  void
-  Vector::print (const char *format) const
-  {
-    Assert (vector->GlobalLength()!=0, ExcEmptyObject());
-    
-    for (unsigned int j=0; j<size(); ++j)
-      {
-        double t = (*vector)[0][j];
-
-	if (format != 0)
-          std::printf (format, t);
-        else
-          std::printf (" %5.2f", double(t));
-      }
-    std::printf ("\n");
-  }
-
-
-
-  void
-  Vector::print (std::ostream      &out,
-		 const unsigned int precision,
-		 const bool         scientific,
-		 const bool         across) const
-  {
-    AssertThrow (out, ExcIO());
-
-                                        // get a representation of the
-                                        // vector and loop over all
-                                        // the elements TODO: up to
-                                        // now only local data printed
-                                        // out! Find a way to neatly
-                                        // output distributed data...
-    TrilinosScalar *val;
-    int leading_dimension;
-    int ierr = vector->ExtractView (&val, &leading_dimension);
-
-    AssertThrow (ierr == 0, ExcTrilinosError(ierr));
-    out.precision (precision);
-    if (scientific)
-      out.setf (std::ios::scientific, std::ios::floatfield);
-    else
-      out.setf (std::ios::fixed, std::ios::floatfield);
-
-    if (across)
-      for (unsigned int i=0; i<size(); ++i)
-        out << static_cast<double>(val[i]) << ' ';
-    else
-      for (unsigned int i=0; i<size(); ++i)
-        out << static_cast<double>(val[i]) << std::endl;
-    out << std::endl;
-
-                                        // restore the representation
-                                        // of the vector
-    AssertThrow (out, ExcIO());
-  }
-
-
-
-  void
-  Vector::swap (Vector &v)
-  {
-                                        // Just swap the pointers to
-                                        // the two Epetra vectors that
-                                        // hold all the data.
-    Vector *p_v = &v, *p_this = this;
-    Vector* tmp = p_v;
-    p_v = p_this;
-    p_this = tmp;
-  }
-
-
-
-  unsigned int
-  Vector::memory_consumption () const
-  {
-    AssertThrow(false, ExcNotImplemented() );
-    return 0;
-  }
-
-
-
-  LocalizedVector::LocalizedVector ()
-                                    :
-#ifdef DEAL_II_COMPILER_SUPPORTS_MPI
-                                   map (0, 0, Epetra_MpiComm(MPI_COMM_WORLD)),
-#else
-				   map (0, 0, Epetra_SerialComm()),
-#endif
-				   vector (std::auto_ptr<Epetra_MultiVector>
-					   (new Epetra_MultiVector(map,1)))
-  {}
-
-
-
-  LocalizedVector::LocalizedVector (const unsigned int n)
-                                   :
-#ifdef DEAL_II_COMPILER_SUPPORTS_MPI
-                                   map ((int)n, 0, Epetra_MpiComm(MPI_COMM_WORLD))
-#else
-				   map ((int)n, 0, Epetra_SerialComm())
+		 map ((int)n, 0, Epetra_SerialComm())
 #endif
   {
     reinit (n);
@@ -929,32 +241,37 @@ namespace TrilinosWrappers
 
 
 
-  LocalizedVector::LocalizedVector (const Vector &v)
-                                   :
-#ifdef DEAL_II_COMPILER_SUPPORTS_MPI
-                                   map (0, 0, Epetra_MpiComm(MPI_COMM_WORLD))
-#else
-				   map (0, 0, Epetra_SerialComm())
-#endif
+  Vector::Vector (const Epetra_Map &InputMap)
+                 :
+                 map (InputMap.NumGlobalElements(), 0, InputMap.Comm())
   {
-    reinit (v);
+    last_action = Zero;
+    vector = std::auto_ptr<Epetra_FEVector>
+	              (new Epetra_FEVector(map,true));
   }
 
 
 
-  LocalizedVector::LocalizedVector (const LocalizedVector &v,
-				    const bool             fast)
-                                   :
-                                   map (v.map),
-				   vector (std::auto_ptr<Epetra_MultiVector> 
-					   (new Epetra_MultiVector(map,1,!fast)))
-  {}
+  Vector::Vector (const VectorBase &v)
+                 :
+                 map (v.vector->Map().NumGlobalElements(), 0, v.vector->Comm())
+  {
+    last_action = Zero;
+    vector = std::auto_ptr<Epetra_FEVector> (new Epetra_FEVector(map,false));
+
+    if (vector->Map().SameAs(v.vector->Map()) == true)
+      *vector = *v.vector;
+    else
+      reinit (v, false, true);
+
+  }
 
 
 
   void
-  LocalizedVector::reinit (unsigned int n)
+  Vector::reinit (const unsigned int n)
   {
+    vector.reset();
 
     if (map.NumGlobalElements() != (int)n)
       {
@@ -965,48 +282,131 @@ namespace TrilinosWrappers
 #endif
       }
 
-    vector = std::auto_ptr<Epetra_MultiVector> 
-                      (new Epetra_MultiVector (map,1,true));
-  }
+    last_action = Zero;
 
-  void
-  LocalizedVector::reinit (const Vector &v)
-  {
-    map = Epetra_LocalMap (v.size(),0,v.vector->Comm());
-
-    Epetra_Import import_information (map, v.map);
-
-    vector = std::auto_ptr<Epetra_MultiVector> 
-                      (new Epetra_MultiVector (map,1,false));
-
-    int ierr = vector->Import(*v.vector, import_information, Insert);
-    Assert (ierr == 0, ExcTrilinosError(ierr));
+    vector = std::auto_ptr<Epetra_FEVector> (new Epetra_FEVector (map,true));
   }
 
 
 
   void
-  LocalizedVector::reinit (const LocalizedVector &v)
+  Vector::reinit (const Epetra_Map &input_map,
+                  const bool        fast)
   {
-    map = v.map;
-    *vector = *v.vector;
+    vector.reset();
+
+    if (map.NumGlobalElements() != input_map.NumGlobalElements())
+      {
+	map = Epetra_LocalMap (input_map.NumGlobalElements(),0,
+			       input_map.Comm());
+      }
+
+    last_action = Zero;
+
+    vector = std::auto_ptr<Epetra_FEVector> (new Epetra_FEVector (map, !fast));
   }
 
 
 
-  LocalizedVector &
-  LocalizedVector::operator = (const Vector &v)
+  void
+  Vector::reinit (const VectorBase &v,
+		  const bool        fast,
+		  const bool        allow_different_maps)
   {
-    reinit (v);
+					// In case we do not allow to
+					// have different maps, this
+					// call means that we have to
+					// reset the vector. So clear
+					// the vector, initialize our
+					// map with the map in v, and
+					// generate the vector.
+    if (allow_different_maps == false)
+      {
+	vector.reset();
+	if (map.SameAs(v.vector->Map()) == false)
+	  map = Epetra_LocalMap (v.vector->GlobalLength(),0,v.vector->Comm());
+
+	vector = std::auto_ptr<Epetra_FEVector> (new Epetra_FEVector(map,!fast));
+	last_action = Zero;
+      }
+
+					// Otherwise, we have to check
+					// that the two vectors are
+					// already of the same size,
+					// create an object for the data
+					// exchange and then insert all
+					// the data.
+    else
+      {
+	Assert (fast == false,
+		ExcMessage ("It is not possible to exchange data with the "
+			    "option fast set, which would not write "
+			    "elements."));
+
+	AssertThrow (size() == v.size(),
+		     ExcDimensionMismatch (size(), v.size()));
+
+	Epetra_Import data_exchange (vector->Map(), v.vector->Map());
+
+	const int ierr = vector->Import(*v.vector, data_exchange, Insert);
+	AssertThrow (ierr == 0, ExcTrilinosError(ierr));
+      }
+
+  }
+
+
+
+  Vector &
+  Vector::operator = (const MPI::Vector &v)
+  {
+    if (vector->Map().SameAs(v.vector->Map()) == false)
+      {
+	map = Epetra_LocalMap (v.vector->Map().NumGlobalElements(), 0,
+			       v.vector->Comm());
+	vector = std::auto_ptr<Epetra_FEVector> (new Epetra_FEVector(map,false));
+      }
+
+    reinit (v, false, true);
     return *this;
   }
 
 
 
-  LocalizedVector &
-  LocalizedVector::operator = (const LocalizedVector &v)
+  Vector &
+  Vector::operator = (const Vector &v)
   {
-    reinit (v);
+    if (vector->Map().SameAs(v.vector->Map()) == false)
+      {
+	map = Epetra_LocalMap (v.vector->Map().NumGlobalElements(), 0,
+			       v.vector->Comm());
+	vector = std::auto_ptr<Epetra_FEVector> (new Epetra_FEVector(map,false));
+      }
+
+    *vector = *v.vector;
+
+    return *this;
+  }
+
+
+
+  template <typename Number>
+  Vector &
+  Vector::operator = (const ::dealii::Vector<Number> &v)
+  {
+    if (size() != v.size())
+      {
+	map = LocalMap (v.size(), 0, vector->Comm());
+	vector = std::auto_ptr<Epetra_FEVector> (new Epetra_FEVector(map,false));
+      }
+
+    std::vector<int> indices (v.size());
+    for (unsigned int i=0; i<v.size(); ++i)
+      indices[i] = map.GID(i);
+
+    const int ierr = vector->ReplaceGlobalValues(v.size(), 0, v.begin(), 
+						 &indices[0]);
+    AssertThrow (ierr == 0, ExcTrilinosError());
+
     return *this;
   }
 

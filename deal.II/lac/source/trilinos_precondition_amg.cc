@@ -147,8 +147,8 @@ namespace TrilinosWrappers
   
   
   
-  void PreconditionAMG::vmult (Vector        &dst,
-			       const Vector  &src) const
+  void PreconditionAMG::vmult (VectorBase       &dst,
+			       const VectorBase &src) const
   {
     const int ierr = multigrid_operator->ApplyInverse (*src.vector,
 						       *dst.vector);
