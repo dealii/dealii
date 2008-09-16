@@ -1455,8 +1455,6 @@ void BoussinesqFlowProblem<dim>::assemble_stokes_system ()
 						     local_dof_indices,
 						     stokes_rhs);
     }
-  stokes_matrix.compress();
-  stokes_rhs.compress();
 
   rebuild_stokes_matrix = false;
 
