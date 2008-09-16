@@ -1675,6 +1675,12 @@ INSTANTIATE(TrilinosWrappers::BlockVector,DoFHandler<deal_II_dimension>);
 
 INSTANTIATE(TrilinosWrappers::Vector,hp::DoFHandler<deal_II_dimension>);
 INSTANTIATE(TrilinosWrappers::BlockVector,hp::DoFHandler<deal_II_dimension>);
+
+INSTANTIATE(TrilinosWrappers::MPI::Vector,DoFHandler<deal_II_dimension>);
+INSTANTIATE(TrilinosWrappers::MPI::BlockVector,DoFHandler<deal_II_dimension>);
+
+INSTANTIATE(TrilinosWrappers::MPI::Vector,hp::DoFHandler<deal_II_dimension>);
+INSTANTIATE(TrilinosWrappers::MPI::BlockVector,hp::DoFHandler<deal_II_dimension>);
 #endif
 
 #undef INSTANTIATE

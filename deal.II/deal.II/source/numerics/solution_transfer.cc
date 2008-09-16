@@ -465,6 +465,12 @@ template class SolutionTransfer<deal_II_dimension, TrilinosWrappers::Vector, hp:
 
 template class SolutionTransfer<deal_II_dimension, TrilinosWrappers::BlockVector, DoFHandler<deal_II_dimension> >;
 template class SolutionTransfer<deal_II_dimension, TrilinosWrappers::BlockVector, hp::DoFHandler<deal_II_dimension> >;
+
+template class SolutionTransfer<deal_II_dimension, TrilinosWrappers::MPI::Vector, DoFHandler<deal_II_dimension> >;
+template class SolutionTransfer<deal_II_dimension, TrilinosWrappers::MPI::Vector, hp::DoFHandler<deal_II_dimension> >;
+
+template class SolutionTransfer<deal_II_dimension, TrilinosWrappers::MPI::BlockVector, DoFHandler<deal_II_dimension> >;
+template class SolutionTransfer<deal_II_dimension, TrilinosWrappers::MPI::BlockVector, hp::DoFHandler<deal_II_dimension> >;
 #endif
 
 /*----------------------------   solution_transfer.cc     ----------------------*/

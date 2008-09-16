@@ -199,11 +199,11 @@ namespace TrilinosWrappers
   BlockVector::reinit (const unsigned int num_blocks)
   {
     std::vector<unsigned int> block_sizes (num_blocks, 0);
-    this->block_indices.reinit (block_sizes);
-    if (this->components.size() != this->n_blocks())
-      this->components.resize(this->n_blocks());
+    block_indices.reinit (block_sizes);
+    if (components.size() != n_blocks())
+      components.resize(n_blocks());
   
-    for (unsigned int i=0;i<this->n_blocks();++i)
+    for (unsigned int i=0;i<n_blocks();++i)
       block(i).clear();
   }
 
@@ -238,11 +238,18 @@ namespace TrilinosWrappers
   BlockVector &
   BlockVector::operator = (const BlockVector &v)
   {
-    Assert (n_blocks() == v.n_blocks(),
-	    ExcDimensionMismatch(n_blocks(),v.n_blocks()));
+    if (n_blocks() != v.n_blocks())
+      {
+	std::vector<unsigned int> block_sizes (v.n_blocks(), 0);
+	block_indices.reinit (block_sizes);
+	if (components.size() != n_blocks())
+	  components.resize(n_blocks());
+      }
 
     for (unsigned int i=0; i<this->n_blocks(); ++i)
       this->components[i] = v.block(i);
+
+    collect_sizes();
 
     return *this;
   }

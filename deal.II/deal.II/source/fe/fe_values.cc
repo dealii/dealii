@@ -188,6 +188,30 @@ get_interpolated_dof_values (const TrilinosWrappers::BlockVector &in,
   cell->get_interpolated_dof_values (in, out);
 }
 
+
+
+template <int dim>
+template <typename CI>
+void
+FEValuesBase<dim>::CellIterator<CI>::
+get_interpolated_dof_values (const TrilinosWrappers::MPI::Vector &in,
+                             Vector<TrilinosScalar>              &out) const
+{
+  cell->get_interpolated_dof_values (in, out);
+}
+
+
+
+template <int dim>
+template <typename CI>
+void
+FEValuesBase<dim>::CellIterator<CI>::
+get_interpolated_dof_values (const TrilinosWrappers::MPI::BlockVector &in,
+                             Vector<TrilinosScalar>                   &out) const
+{
+  cell->get_interpolated_dof_values (in, out);
+}
+
 #endif
 
 
@@ -336,6 +360,28 @@ void
 FEValuesBase<dim>::TriaCellIterator::
 get_interpolated_dof_values (const TrilinosWrappers::BlockVector &,
                              Vector<TrilinosScalar>              &) const
+{
+  Assert (false, ExcMessage (message_string));
+}
+
+
+
+template <int dim>
+void
+FEValuesBase<dim>::TriaCellIterator::
+get_interpolated_dof_values (const TrilinosWrappers::MPI::Vector &,
+                             Vector<TrilinosScalar>              &) const
+{
+  Assert (false, ExcMessage (message_string));
+}
+
+
+
+template <int dim>
+void
+FEValuesBase<dim>::TriaCellIterator::
+get_interpolated_dof_values (const TrilinosWrappers::MPI::BlockVector &,
+                             Vector<TrilinosScalar>                   &) const
 {
   Assert (false, ExcMessage (message_string));
 }

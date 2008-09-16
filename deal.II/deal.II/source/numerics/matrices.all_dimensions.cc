@@ -695,7 +695,7 @@ namespace TrilinosWrappers
                          TrilinosMatrix      &matrix,
                          TrilinosVector      &solution,
                          TrilinosVector      &right_hand_side,
-                         const bool        eliminate_columns)
+                         const bool           eliminate_columns)
   {
     Assert (eliminate_columns == false, ExcNotImplemented());
 
@@ -796,6 +796,85 @@ namespace TrilinosWrappers
     solution.compress ();
     right_hand_side.compress ();
   }
+
+
+
+  template <typename TrilinosMatrix, typename TrilinosBlockVector>
+  void
+  apply_block_boundary_values (const std::map<unsigned int,double> &boundary_values,
+			       TrilinosMatrix      &matrix,
+			       TrilinosBlockVector &solution,
+			       TrilinosBlockVector &right_hand_side,
+			       const bool          eliminate_columns)
+  {
+    Assert (matrix.n() == right_hand_side.size(),
+	    ExcDimensionMismatch(matrix.n(), right_hand_side.size()));
+    Assert (matrix.n() == solution.size(),
+	    ExcDimensionMismatch(matrix.n(), solution.size()));
+    Assert (matrix.n_block_rows() == matrix.n_block_cols(),
+	    ExcNotQuadratic());
+  
+    const unsigned int n_blocks = matrix.n_block_rows();
+
+    matrix.compress();
+
+				   // We need to find the subdivision
+				   // into blocks for the boundary values.
+				   // To this end, generate a vector of
+				   // maps with the respective indices.
+    std::vector<std::map<unsigned int,double> > block_boundary_values(n_blocks);
+    {
+      int offset = 0, block=0;
+      for (std::map<unsigned int,double>::const_iterator
+	     dof  = boundary_values.begin();
+	   dof != boundary_values.end();
+	   ++dof)
+	{
+	  if (dof->first >= matrix.block(block,0).m() + offset)
+	    {
+	      offset += matrix.block(block,0).m();
+	      block++;
+	    }
+	  const unsigned int index = dof->first - offset;
+	  block_boundary_values[block].insert(
+	     std::pair<unsigned int, double> (index,dof->second));
+	}
+    }
+  
+				   // Now call the non-block variants on
+				   // the diagonal subblocks and the
+				   // solution/rhs.
+    for (unsigned int block=0; block<n_blocks; ++block)
+      TrilinosWrappers::apply_boundary_values(block_boundary_values[block],
+					      matrix.block(block,block),
+					      solution.block(block),
+					      right_hand_side.block(block),
+					      eliminate_columns);
+  
+				   // Finally, we need to do something 
+				   // about the off-diagonal matrices. This
+				   // is luckily not difficult. Just clear
+				   // the whole row.
+    for (unsigned int block_m=0; block_m<n_blocks; ++block_m)
+      {
+	const std::pair<unsigned int, unsigned int> local_range
+	  = matrix.block(block_m,0).local_range();
+      
+	std::vector<unsigned int> constrained_rows;
+	for (std::map<unsigned int,double>::const_iterator
+	       dof  = block_boundary_values[block_m].begin();
+	     dof != block_boundary_values[block_m].end();
+	     ++dof)
+	  if ((dof->first >= local_range.first) &&
+	      (dof->first < local_range.second))
+	    constrained_rows.push_back (dof->first);
+  
+	for (unsigned int block_n=0; block_n<n_blocks; ++block_n)
+	  if (block_m != block_n)
+	    matrix.block(block_m,block_n).clear_rows(constrained_rows);
+      }
+  }
+
 }
 
 
@@ -804,8 +883,8 @@ void
 MatrixTools::
 apply_boundary_values (const std::map<unsigned int,double> &boundary_values,
                        TrilinosWrappers::SparseMatrix   &matrix,
-                       TrilinosWrappers::Vector   &solution,
-                       TrilinosWrappers::Vector   &right_hand_side,
+                       TrilinosWrappers::Vector         &solution,
+                       TrilinosWrappers::Vector         &right_hand_side,
                        const bool        eliminate_columns)
 {
                                    // simply redirect to the generic function
@@ -813,6 +892,24 @@ apply_boundary_values (const std::map<unsigned int,double> &boundary_values,
   TrilinosWrappers::apply_boundary_values (boundary_values, matrix, solution,
                                         right_hand_side, eliminate_columns);
 }
+
+
+
+void
+MatrixTools::
+apply_boundary_values (const std::map<unsigned int,double> &boundary_values,
+                       TrilinosWrappers::SparseMatrix   &matrix,
+                       TrilinosWrappers::MPI::Vector    &solution,
+                       TrilinosWrappers::MPI::Vector    &right_hand_side,
+                       const bool        eliminate_columns)
+{
+                                   // simply redirect to the generic function
+                                   // used for both trilinos matrix types
+  TrilinosWrappers::apply_boundary_values (boundary_values, matrix, solution,
+					   right_hand_side, eliminate_columns);
+}
+
+
 
 void
 MatrixTools::
@@ -822,71 +919,24 @@ apply_boundary_values (const std::map<unsigned int,double>  &boundary_values,
                        TrilinosWrappers::BlockVector        &right_hand_side,
                        const bool                            eliminate_columns)
 {
-  Assert (matrix.n() == right_hand_side.size(),
-	  ExcDimensionMismatch(matrix.n(), right_hand_side.size()));
-  Assert (matrix.n() == solution.size(),
-	  ExcDimensionMismatch(matrix.n(), solution.size()));
-  Assert (matrix.n_block_rows() == matrix.n_block_cols(),
-	  ExcNotQuadratic());
-  
-  const unsigned int n_blocks = matrix.n_block_rows();
+  TrilinosWrappers::apply_block_boundary_values (boundary_values, matrix, 
+						 solution, right_hand_side, 
+						 eliminate_columns);
+}
 
-  matrix.compress();
 
-				   // We need to find the subdivision
-				   // into blocks for the boundary values.
-				   // To this end, generate a vector of
-				   // maps with the respective indices.
-  std::vector<std::map<unsigned int,double> > block_boundary_values(n_blocks);
-  {
-    int offset = 0, block=0;
-    for (std::map<unsigned int,double>::const_iterator
-	    dof  = boundary_values.begin();
-	  dof != boundary_values.end();
-	  ++dof)
-      {
-	if (dof->first >= matrix.block(block,0).m() + offset)
-	  {
-	    offset += matrix.block(block,0).m();
-	    block++;
-	  }
-	const unsigned int index = dof->first - offset;
-	block_boundary_values[block].insert(std::pair<unsigned int, double> (index,dof->second));
-      }
-  }
-  
-				   // Now call the non-block variants on
-				   // the diagonal subblocks and the
-				   // solution/rhs.
-  for (unsigned int block=0; block<n_blocks; ++block)
-    TrilinosWrappers::apply_boundary_values(block_boundary_values[block],
-					    matrix.block(block,block),
-					    solution.block(block),
-					    right_hand_side.block(block),
-					    eliminate_columns);
-  
-				   // Finally, we need to do something 
-				   // about the off-diagonal matrices. This
-				   // is luckily not difficult. Just clear
-				   // the whole row.
-  for (unsigned int block_m=0; block_m<n_blocks; ++block_m)
-    {
-      const std::pair<unsigned int, unsigned int> local_range
-	= matrix.block(block_m,0).local_range();
-      
-      std::vector<unsigned int> constrained_rows;
-      for (std::map<unsigned int,double>::const_iterator
-	    dof  = block_boundary_values[block_m].begin();
-	  dof != block_boundary_values[block_m].end();
-	  ++dof)
-	if ((dof->first >= local_range.first) &&
-	    (dof->first < local_range.second))
-	  constrained_rows.push_back (dof->first);
-  
-      for (unsigned int block_n=0; block_n<n_blocks; ++block_n)
-	if (block_m != block_n)
-	  matrix.block(block_m,block_n).clear_rows(constrained_rows);
-    }
+
+void
+MatrixTools::
+apply_boundary_values (const std::map<unsigned int,double>  &boundary_values,
+                       TrilinosWrappers::BlockSparseMatrix  &matrix,
+                       TrilinosWrappers::MPI::BlockVector   &solution,
+                       TrilinosWrappers::MPI::BlockVector   &right_hand_side,
+                       const bool                            eliminate_columns)
+{
+  TrilinosWrappers::apply_block_boundary_values (boundary_values, matrix, 
+						 solution, right_hand_side, 
+						 eliminate_columns);
 }
 
 #endif

@@ -1741,6 +1741,8 @@ VECTOR_FUNCTIONS(PETScWrappers::MPI::BlockVector);
 #ifdef DEAL_II_USE_TRILINOS
 VECTOR_FUNCTIONS(TrilinosWrappers::Vector);
 VECTOR_FUNCTIONS(TrilinosWrappers::BlockVector);
+VECTOR_FUNCTIONS(TrilinosWrappers::MPI::Vector);
+VECTOR_FUNCTIONS(TrilinosWrappers::MPI::BlockVector);
 #endif
 
 

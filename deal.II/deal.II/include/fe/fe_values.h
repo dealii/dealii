@@ -1960,6 +1960,28 @@ class FEValuesBase : protected FEValuesData<dim>,
         void
         get_interpolated_dof_values (const TrilinosWrappers::BlockVector &in,
                                      Vector<TrilinosScalar>              &out) const = 0;
+                                         /**
+                                          * Call
+                                          * @p get_interpolated_dof_values
+                                          * of the iterator with the
+                                          * given arguments.
+                                          */
+
+        virtual
+        void
+        get_interpolated_dof_values (const TrilinosWrappers::MPI::Vector &in,
+                                     Vector<TrilinosScalar>              &out) const = 0;
+
+                                         /**
+                                          * Call
+                                          * @p get_interpolated_dof_values
+                                          * of the iterator with the
+                                          * given arguments.
+                                          */
+        virtual
+        void
+        get_interpolated_dof_values (const TrilinosWrappers::MPI::BlockVector &in,
+                                     Vector<TrilinosScalar>                   &out) const = 0;
 #endif
     };
 
@@ -2124,6 +2146,28 @@ class FEValuesBase : protected FEValuesData<dim>,
         void
         get_interpolated_dof_values (const TrilinosWrappers::BlockVector &in,
                                      Vector<TrilinosScalar>              &out) const;
+
+                                         /**
+                                          * Call
+                                          * @p get_interpolated_dof_values
+                                          * of the iterator with the
+                                          * given arguments.
+                                          */
+        virtual
+        void
+        get_interpolated_dof_values (const TrilinosWrappers::MPI::Vector &in,
+                                     Vector<TrilinosScalar>              &out) const;
+
+                                         /**
+                                          * Call
+                                          * @p get_interpolated_dof_values
+                                          * of the iterator with the
+                                          * given arguments.
+                                          */
+        virtual
+        void
+        get_interpolated_dof_values (const TrilinosWrappers::MPI::BlockVector &in,
+                                     Vector<TrilinosScalar>                   &out) const;
 #endif
 
       private:
@@ -2333,6 +2377,28 @@ class FEValuesBase : protected FEValuesData<dim>,
         void
         get_interpolated_dof_values (const TrilinosWrappers::BlockVector &in,
                                      Vector<TrilinosScalar>              &out) const;
+
+                                         /**
+                                          * Call
+                                          * @p get_interpolated_dof_values
+                                          * of the iterator with the
+                                          * given arguments.
+                                          */
+        virtual
+        void
+        get_interpolated_dof_values (const TrilinosWrappers::MPI::Vector &in,
+                                     Vector<TrilinosScalar>              &out) const;
+
+                                         /**
+                                          * Call
+                                          * @p get_interpolated_dof_values
+                                          * of the iterator with the
+                                          * given arguments.
+                                          */
+        virtual
+        void
+        get_interpolated_dof_values (const TrilinosWrappers::MPI::BlockVector &in,
+                                     Vector<TrilinosScalar>                   &out) const;
 #endif
 
       private:
