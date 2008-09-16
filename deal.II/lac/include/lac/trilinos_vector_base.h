@@ -1,5 +1,5 @@
 //---------------------------------------------------------------------------
-//    $Id: trilinos_vector.h 16818 2008-09-12 14:30:24Z kronbichler $
+//    $Id: trilinos_vector_base.h 16818 2008-09-12 14:30:24Z kronbichler $
 //    Version: $Name$
 //
 //    Copyright (C) 2008 by the deal.II authors
@@ -313,9 +313,12 @@ namespace TrilinosWrappers
 					* compress() has already been
 					* called after an operation
 					* requiring data exchange. Does
-					* only return non-false values
+					* only return non-true values
 					* when used in <tt>debug</tt>
-					* mode.
+					* mode, since it is quite
+					* expensive to keep track of all
+					* operations that lead to a
+					* need for compress().
 					*/
       bool is_compressed () const;
 

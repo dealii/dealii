@@ -148,6 +148,14 @@ namespace TrilinosWrappers
 	  operator = (const BlockVector &V);
 
                                        /**
+					* Copy operator for arguments of
+					* the localized Trilinos vector
+					* type.
+					*/
+        BlockVector &
+	  operator = (const ::dealii::TrilinosWrappers::BlockVector &V);
+
+                                       /**
 					* Another copy function. This
 					* one takes a deal.II block
 					* vector and copies it into a
@@ -235,6 +243,22 @@ namespace TrilinosWrappers
 					  */
 	void compress ();
 
+				         /**
+					  * Returns the state of the
+					  * matrix, i.e., whether
+					  * compress() needs to be
+					  * called after an operation
+					  * requiring data
+					  * exchange. Does only return
+					  * non-true values when used in
+					  * <tt>debug</tt> mode, since
+					  * it is quite expensive to
+					  * keep track of all operations
+					  * that lead to the need for
+					  * compress().
+					  */
+	bool is_compressed () const;
+
                                          /**
                                           * Swap the contents of this
                                           * vector and the other vector
@@ -317,6 +341,22 @@ namespace TrilinosWrappers
         this->components[i] = v.components[i];
     }
 
+
+
+    inline
+    bool
+    BlockVector::is_compressed () const
+    {
+      bool compressed = true;
+      for (unsigned int row=0; row<n_blocks(); ++row)
+	if (block(row).is_compressed() == false)
+	  {
+	    compressed = false;
+	    break;
+	  }
+
+      return compressed;
+    }
 
 
 

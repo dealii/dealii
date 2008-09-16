@@ -211,6 +211,21 @@ namespace TrilinosWrappers
 				        */
       void compress ();
 
+				       /**
+					* Returns the state of the
+					* matrix, i.e., whether
+					* compress() needs to be called
+					* after an operation requiring
+					* data exchange. Does only
+					* return non-true values when
+					* used in <tt>debug</tt> mode,
+					* since it is quite expensive to
+					* keep track of all operations
+					* that lead to the need for
+					* compress().
+					*/
+      bool is_compressed () const;
+
                                        /**
                                         * This function collects the
                                         * sizes of the sub-objects and
@@ -221,10 +236,16 @@ namespace TrilinosWrappers
                                         * subobjects. You *must* call
                                         * this function each time after
                                         * you have changed the size of
-                                        * the sub-objects. Note that 
-				        * this is a collective 
-				        * operation, i.e., it needs to
-				        * be called on all MPI processes.
+                                        * the sub-objects. Note that
+                                        * this is a collective
+                                        * operation, i.e., it needs to
+                                        * be called on all MPI
+                                        * processes. This command
+                                        * internally calls the method
+                                        * <tt>compress()</tt>, so you
+                                        * don't need to call that
+                                        * function in case you use
+                                        * <tt>collect_sizes()</tt>.
                                         */
       void collect_sizes ();
 
@@ -451,6 +472,24 @@ namespace TrilinosWrappers
 /*@}*/
 
 // ------------- inline and template functions -----------------
+
+  inline
+  bool
+  BlockSparseMatrix::is_compressed () const
+  {
+    bool compressed = true;
+    for (unsigned int row=0; row<n_block_rows(); ++row)
+      for (unsigned int col=0; col<n_block_cols(); ++col)
+	if (block(row, col).is_compressed() == false)
+	  {
+	    compressed = false;
+	    break;
+	  }
+
+    return compressed;
+  }
+
+
 
   inline
   void

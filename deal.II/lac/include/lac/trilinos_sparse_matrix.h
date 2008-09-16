@@ -638,6 +638,21 @@ namespace TrilinosWrappers
                                         */
       void compress ();
 
+				       /**
+					* Returns the state of the
+					* matrix, i.e., whether
+					* compress() needs to be called
+					* after an operation requiring
+					* data exchange. Does only
+					* return non-true values when
+					* used in <tt>debug</tt> mode,
+					* since it is quite expensive to
+					* keep track of all operations
+					* that lead to the need for
+					* compress().
+					*/
+      bool is_compressed () const;
+
                                        /**
                                         * This operator assigns a scalar
                                         * to a matrix. Since this does
@@ -1384,6 +1399,13 @@ namespace TrilinosWrappers
                                         */
       Epetra_CombineMode last_action;
 
+				       /**
+					* A boolean variable to hold
+					* information on whether the
+					* vector is compressed or not.
+					*/
+      bool compressed;
+
     public:
                                        /**
                                         * A sparse matrix object in
@@ -1631,6 +1653,15 @@ namespace TrilinosWrappers
     
     return ((index >= static_cast<unsigned int>(begin)) &&
             (index < static_cast<unsigned int>(end)));
+  }
+
+
+
+  inline
+  bool
+  SparseMatrix::is_compressed () const
+  {
+    return compressed;
   }
 
 #endif // DOXYGEN      

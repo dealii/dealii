@@ -189,8 +189,8 @@ namespace LinearSolvers
 		     const Preconditioner &preconditioner);
 
 
-      void vmult (TrilinosWrappers::Vector       &dst,
-		  const TrilinosWrappers::Vector &src) const;
+      void vmult (TrilinosWrappers::MPI::Vector       &dst,
+		  const TrilinosWrappers::MPI::Vector &src) const;
 
     private:
       const SmartPointer<const Matrix> matrix;
@@ -210,11 +210,11 @@ namespace LinearSolvers
 
   template <class Matrix, class Preconditioner>
   void InverseMatrix<Matrix,Preconditioner>::vmult (
-				TrilinosWrappers::Vector       &dst,
-				const TrilinosWrappers::Vector &src) const
+				TrilinosWrappers::MPI::Vector       &dst,
+				const TrilinosWrappers::MPI::Vector &src) const
   {
     SolverControl solver_control (src.size(), 1e-6*src.l2_norm());
-    SolverCG<TrilinosWrappers::Vector> cg (solver_control);
+    SolverCG<TrilinosWrappers::MPI::Vector> cg (solver_control);
 
     dst = 0;
 
@@ -228,6 +228,8 @@ namespace LinearSolvers
       }
   }
 
+
+
   template <class PreconditionerA, class PreconditionerMp>
   class BlockSchurPreconditioner : public Subscriptor
   {
@@ -237,14 +239,16 @@ namespace LinearSolvers
 	const InverseMatrix<TrilinosWrappers::SparseMatrix,PreconditionerMp>  &Mpinv,
 	const PreconditionerA                         &Apreconditioner);
 
-      void vmult (TrilinosWrappers::BlockVector       &dst,
-		  const TrilinosWrappers::BlockVector &src) const;
+      void vmult (TrilinosWrappers::MPI::BlockVector       &dst,
+		  const TrilinosWrappers::MPI::BlockVector &src) const;
 
     private:
       const SmartPointer<const TrilinosWrappers::BlockSparseMatrix> stokes_matrix;
       const SmartPointer<const InverseMatrix<TrilinosWrappers::SparseMatrix,
 					     PreconditionerMp > > m_inverse;
       const PreconditionerA &a_preconditioner;
+      mutable TrilinosWrappers::MPI::Vector tmp;
+
 };
 
 
@@ -257,16 +261,18 @@ namespace LinearSolvers
 		  :
 		  stokes_matrix           (&S),
 		  m_inverse               (&Mpinv),
-		  a_preconditioner        (Apreconditioner)
+		  a_preconditioner        (Apreconditioner),
+		  tmp                     (stokes_matrix->block(1,1).matrix->RowMap())
   {}
+
+
 
   template <class PreconditionerA, class PreconditionerMp>
   void BlockSchurPreconditioner<PreconditionerA, PreconditionerMp>::vmult (
-    TrilinosWrappers::BlockVector       &dst,
-    const TrilinosWrappers::BlockVector &src) const
+    TrilinosWrappers::MPI::BlockVector       &dst,
+    const TrilinosWrappers::MPI::BlockVector &src) const
   {
     a_preconditioner.vmult (dst.block(0), src.block(0));
-    TrilinosWrappers::Vector tmp (src.block(1), true);
     stokes_matrix->block(1,0).residual(tmp, dst.block(0), src.block(1));
     tmp *= -1;
     m_inverse->vmult (dst.block(1), tmp);
@@ -332,8 +338,8 @@ class BoussinesqFlowProblem
     TrilinosWrappers::BlockSparseMatrix stokes_matrix;
     TrilinosWrappers::BlockSparseMatrix stokes_preconditioner_matrix;
 
-    TrilinosWrappers::BlockVector       stokes_solution;
-    TrilinosWrappers::BlockVector       stokes_rhs;
+    TrilinosWrappers::MPI::BlockVector  stokes_solution;
+    TrilinosWrappers::MPI::BlockVector  stokes_rhs;
 
 
     const unsigned int                  temperature_degree;    
@@ -346,10 +352,10 @@ class BoussinesqFlowProblem
     TrilinosWrappers::SparseMatrix      temperature_stiffness_matrix;
     TrilinosWrappers::SparseMatrix      temperature_matrix;
 
-    TrilinosWrappers::Vector            temperature_solution;
+    TrilinosWrappers::MPI::Vector       temperature_solution;
     TrilinosWrappers::Vector            old_temperature_solution;
     TrilinosWrappers::Vector            old_old_temperature_solution;
-    TrilinosWrappers::Vector            temperature_rhs;
+    TrilinosWrappers::MPI::Vector       temperature_rhs;
 
 
     double time_step;
@@ -450,16 +456,13 @@ BoussinesqFlowProblem<dim>::get_extrapolated_temperature_range () const
                            update_values);
   std::vector<double> old_temperature_values(n_q_points);
   std::vector<double> old_old_temperature_values(n_q_points);
-  
-  Vector<double> localized_old_temperature_solution (old_temperature_solution);
-  Vector<double> old_localized_old_temperature_solution (old_old_temperature_solution);
 
   double min_temperature = (1. + time_step/old_time_step) *
 			   old_temperature_solution.linfty_norm()
 			   +
 			   time_step/old_time_step *
 			   old_old_temperature_solution.linfty_norm(),
-	 max_temperature = -min_temperature;
+         max_temperature = -min_temperature;
 
   typename DoFHandler<dim>::active_cell_iterator
     cell = temperature_dof_handler.begin_active(),
@@ -468,8 +471,8 @@ BoussinesqFlowProblem<dim>::get_extrapolated_temperature_range () const
     if (cell->subdomain_id() == (unsigned int)trilinos_communicator.MyPID())
       {
 	fe_values.reinit (cell);
-	fe_values.get_function_values (localized_old_temperature_solution, old_temperature_values);
-	fe_values.get_function_values (old_localized_old_temperature_solution, old_old_temperature_values);
+	fe_values.get_function_values (old_temperature_solution, old_temperature_values);
+	fe_values.get_function_values (old_old_temperature_solution, old_old_temperature_values);
 
 	for (unsigned int q=0; q<n_q_points; ++q)
 	  {
@@ -620,31 +623,28 @@ void BoussinesqFlowProblem<dim>::setup_dofs ()
 
     BlockSparsityPattern stokes_sparsity_pattern (2,2);
 
-    //if (trilinos_communicator.MyPID() == 0)
-      {
-	BlockCompressedSetSparsityPattern csp (2,2);
+    BlockCompressedSetSparsityPattern csp (2,2);
 
-	csp.block(0,0).reinit (n_u, n_u);
-	csp.block(0,1).reinit (n_u, n_p);
-	csp.block(1,0).reinit (n_p, n_u);
-	csp.block(1,1).reinit (n_p, n_p);
+    csp.block(0,0).reinit (n_u, n_u);
+    csp.block(0,1).reinit (n_u, n_p);
+    csp.block(1,0).reinit (n_p, n_u);
+    csp.block(1,1).reinit (n_p, n_p);
 
-	csp.collect_sizes ();
+    csp.collect_sizes ();
 
-	Table<2,DoFTools::Coupling> coupling (dim+1, dim+1);
+    Table<2,DoFTools::Coupling> coupling (dim+1, dim+1);
 
-	for (unsigned int c=0; c<dim+1; ++c)
-	  for (unsigned int d=0; d<dim+1; ++d)
-	    if (! ((c==dim) && (d==dim)))
-	      coupling[c][d] = DoFTools::always;
-	    else
-	      coupling[c][d] = DoFTools::none;
+    for (unsigned int c=0; c<dim+1; ++c)
+      for (unsigned int d=0; d<dim+1; ++d)
+	if (! ((c==dim) && (d==dim)))
+	  coupling[c][d] = DoFTools::always;
+	else
+	  coupling[c][d] = DoFTools::none;
 
-	DoFTools::make_sparsity_pattern (stokes_dof_handler, coupling, csp);
-	stokes_constraints.condense (csp);
+    DoFTools::make_sparsity_pattern (stokes_dof_handler, coupling, csp);
+    stokes_constraints.condense (csp);
 
-	stokes_sparsity_pattern.copy_from (csp);
-      }
+    stokes_sparsity_pattern.copy_from (csp);
 
     stokes_matrix.reinit (stokes_partitioner, stokes_sparsity_pattern);
   }
@@ -656,33 +656,30 @@ void BoussinesqFlowProblem<dim>::setup_dofs ()
 
     BlockSparsityPattern stokes_preconditioner_sparsity_pattern (2,2);
     
-    //if (trilinos_communicator.MyPID() == 0)
-      {
-	BlockCompressedSetSparsityPattern csp (2,2);
+    BlockCompressedSetSparsityPattern csp (2,2);
 
-	csp.block(0,0).reinit (n_u, n_u);
-	csp.block(0,1).reinit (n_u, n_p);
-	csp.block(1,0).reinit (n_p, n_u);
-	csp.block(1,1).reinit (n_p, n_p);
-	  
-	csp.collect_sizes ();
+    csp.block(0,0).reinit (n_u, n_u);
+    csp.block(0,1).reinit (n_u, n_p);
+    csp.block(1,0).reinit (n_p, n_u);
+    csp.block(1,1).reinit (n_p, n_p);
+  
+    csp.collect_sizes ();
 
-	Table<2,DoFTools::Coupling> coupling (dim+1, dim+1);
-	for (unsigned int c=0; c<dim+1; ++c)
-	  for (unsigned int d=0; d<dim+1; ++d)
-	    if (c == d)
-	      coupling[c][d] = DoFTools::always;
-	    else
-	      coupling[c][d] = DoFTools::none;
+    Table<2,DoFTools::Coupling> coupling (dim+1, dim+1);
+    for (unsigned int c=0; c<dim+1; ++c)
+      for (unsigned int d=0; d<dim+1; ++d)
+	if (c == d)
+	  coupling[c][d] = DoFTools::always;
+	else
+	  coupling[c][d] = DoFTools::none;
 
-	DoFTools::make_sparsity_pattern (stokes_dof_handler, coupling, csp);
-	stokes_constraints.condense (csp);
-	
-	stokes_preconditioner_sparsity_pattern.copy_from (csp);
-      }
+    DoFTools::make_sparsity_pattern (stokes_dof_handler, coupling, csp);
+    stokes_constraints.condense (csp);
+
+    stokes_preconditioner_sparsity_pattern.copy_from (csp);
 
     stokes_preconditioner_matrix.reinit (stokes_partitioner,
-				         stokes_preconditioner_sparsity_pattern);
+					 stokes_preconditioner_sparsity_pattern);
 
   }
 
@@ -694,21 +691,18 @@ void BoussinesqFlowProblem<dim>::setup_dofs ()
 
     SparsityPattern temperature_sparsity_pattern;
 
-    //if (trilinos_communicator.MyPID() == 0)
-      {
-	CompressedSetSparsityPattern csp (n_T, n_T);
-	DoFTools::make_sparsity_pattern (temperature_dof_handler, csp);
-	temperature_constraints.condense (csp);
+    CompressedSetSparsityPattern csp (n_T, n_T);
+    DoFTools::make_sparsity_pattern (temperature_dof_handler, csp);
+    temperature_constraints.condense (csp);
 
-	temperature_sparsity_pattern.copy_from (csp);
-      }
+    temperature_sparsity_pattern.copy_from (csp);
 
     temperature_matrix.reinit (temperature_partitioner,
-				temperature_sparsity_pattern);
+			       temperature_sparsity_pattern);
     temperature_mass_matrix.reinit (temperature_partitioner,
 				    temperature_sparsity_pattern);
     temperature_stiffness_matrix.reinit (temperature_partitioner,
-					  temperature_sparsity_pattern);
+					 temperature_sparsity_pattern);
   }
 
   stokes_solution.reinit (stokes_partitioner);
@@ -717,7 +711,6 @@ void BoussinesqFlowProblem<dim>::setup_dofs ()
   temperature_solution.reinit (temperature_partitioner);
   old_temperature_solution.reinit (temperature_partitioner);
   old_old_temperature_solution.reinit (temperature_partitioner);
-
   temperature_rhs.reinit (temperature_partitioner);
 }
 
@@ -875,8 +868,6 @@ void BoussinesqFlowProblem<dim>::assemble_stokes_system ()
   const FEValuesExtractors::Vector velocities (0);
   const FEValuesExtractors::Scalar pressure (dim);
 
-  Vector<double> localized_old_temperature_solution (old_temperature_solution);
-
   typename DoFHandler<dim>::active_cell_iterator
     cell = stokes_dof_handler.begin_active(),
     endc = stokes_dof_handler.end();
@@ -892,7 +883,7 @@ void BoussinesqFlowProblem<dim>::assemble_stokes_system ()
 	local_matrix = 0;
 	local_rhs = 0;
   
-	temperature_fe_values.get_function_values (localized_old_temperature_solution, 
+	temperature_fe_values.get_function_values (old_temperature_solution, 
 						   old_temperature_values);
   
 	for (unsigned int q=0; q<n_q_points; ++q)
@@ -1116,9 +1107,7 @@ void BoussinesqFlowProblem<dim>::assemble_temperature_system ()
     global_T_range = get_extrapolated_temperature_range();
   const double global_Omega_diameter = GridTools::diameter (triangulation);
 
-  const Vector<double> localized_old_temperature_solution (old_temperature_solution);
-  const Vector<double> localized_old_old_temperature_solution (old_old_temperature_solution);
-  const BlockVector<double> localized_stokes_solution (stokes_solution);
+  const TrilinosWrappers::BlockVector localized_stokes_solution (stokes_solution);
 
   typename DoFHandler<dim>::active_cell_iterator
     cell = temperature_dof_handler.begin_active(),
@@ -1134,19 +1123,19 @@ void BoussinesqFlowProblem<dim>::assemble_temperature_system ()
 	temperature_fe_values.reinit (cell);
 	stokes_fe_values.reinit (stokes_cell);
   
-	temperature_fe_values.get_function_values (localized_old_temperature_solution,
+	temperature_fe_values.get_function_values (old_temperature_solution,
 						   old_temperature_values);
-	temperature_fe_values.get_function_values (localized_old_old_temperature_solution,
+	temperature_fe_values.get_function_values (old_old_temperature_solution,
 						   old_old_temperature_values);
   
-	temperature_fe_values.get_function_gradients (localized_old_temperature_solution,
+	temperature_fe_values.get_function_gradients (old_temperature_solution,
 						      old_temperature_grads);
-	temperature_fe_values.get_function_gradients (localized_old_old_temperature_solution,
+	temperature_fe_values.get_function_gradients (old_old_temperature_solution,
 						      old_old_temperature_grads);
 	
-	temperature_fe_values.get_function_hessians (localized_old_temperature_solution,
+	temperature_fe_values.get_function_hessians (old_temperature_solution,
 						     old_temperature_hessians);
-	temperature_fe_values.get_function_hessians (localized_old_old_temperature_solution,
+	temperature_fe_values.get_function_hessians (old_old_temperature_solution,
 						     old_old_temperature_hessians);
 	
 	temperature_right_hand_side.value_list (temperature_fe_values.get_quadrature_points(),
@@ -1266,8 +1255,8 @@ void BoussinesqFlowProblem<dim>::solve ()
     SolverControl solver_control (stokes_matrix.m(),
 				  1e-6*stokes_rhs.l2_norm());
 
-    SolverGMRES<TrilinosWrappers::BlockVector> gmres(solver_control,
-      SolverGMRES<TrilinosWrappers::BlockVector >::AdditionalData(100));
+    SolverGMRES<TrilinosWrappers::MPI::BlockVector> gmres(solver_control,
+      SolverGMRES<TrilinosWrappers::MPI::BlockVector >::AdditionalData(100));
 
     gmres.solve(stokes_matrix, stokes_solution, stokes_rhs, preconditioner);
 
@@ -1276,7 +1265,7 @@ void BoussinesqFlowProblem<dim>::solve ()
 	  << " GMRES iterations for Stokes subsystem."
 	  << std::endl;
 
-    BlockVector<double> localized_stokes_solution (stokes_solution);
+    TrilinosWrappers::BlockVector localized_stokes_solution (stokes_solution);
     stokes_constraints.distribute (localized_stokes_solution);
     stokes_solution = localized_stokes_solution;
   }
@@ -1295,7 +1284,7 @@ void BoussinesqFlowProblem<dim>::solve ()
 
     SolverControl solver_control (temperature_matrix.m(),
 				  1e-8*temperature_rhs.l2_norm());
-    SolverCG<TrilinosWrappers::Vector>   cg (solver_control);
+    SolverCG<TrilinosWrappers::MPI::Vector>   cg (solver_control);
 
     TrilinosWrappers::PreconditionSSOR preconditioner (temperature_matrix,
 						       1.2);
@@ -1303,7 +1292,7 @@ void BoussinesqFlowProblem<dim>::solve ()
 	      temperature_rhs,
 	      preconditioner);
 
-    Vector<double> localized_temperature_solution (temperature_solution);
+    TrilinosWrappers::Vector localized_temperature_solution (temperature_solution);
     temperature_constraints.distribute (localized_temperature_solution);
     temperature_solution = localized_temperature_solution;
 
@@ -1346,8 +1335,8 @@ void BoussinesqFlowProblem<dim>::output_results ()  const
 	  ExcInternalError());
   
   Vector<double> joint_solution (joint_dof_handler.n_dofs());
-  BlockVector<double> localized_stokes_solution (stokes_solution);
-  Vector<double> localized_temperature_solution (temperature_solution);
+  TrilinosWrappers::BlockVector localized_stokes_solution (stokes_solution);
+  TrilinosWrappers::Vector localized_temperature_solution (temperature_solution);
 
   {
     std::vector<unsigned int> local_joint_dof_indices (joint_fe.dofs_per_cell);
@@ -1396,25 +1385,28 @@ void BoussinesqFlowProblem<dim>::output_results ()  const
 
   DataOut<dim> data_out;
 
-  data_out.attach_dof_handler (joint_dof_handler);
+  if (trilinos_communicator.MyPID() == 0)
+    {
+      data_out.attach_dof_handler (joint_dof_handler);
 
-  std::vector<DataComponentInterpretation::DataComponentInterpretation>
-    data_component_interpretation
-    (dim+2, DataComponentInterpretation::component_is_scalar);
-  for (unsigned int i=0; i<dim; ++i)
-    data_component_interpretation[i]
-      = DataComponentInterpretation::component_is_part_of_vector;
+      std::vector<DataComponentInterpretation::DataComponentInterpretation>
+	data_component_interpretation
+	(dim+2, DataComponentInterpretation::component_is_scalar);
+      for (unsigned int i=0; i<dim; ++i)
+	data_component_interpretation[i]
+	  = DataComponentInterpretation::component_is_part_of_vector;
 
-  data_out.add_data_vector (joint_solution, joint_solution_names,
-			    DataOut<dim>::type_dof_data,
-			    data_component_interpretation);
-  data_out.build_patches (std::min(stokes_degree, temperature_degree));
+      data_out.add_data_vector (joint_solution, joint_solution_names,
+				DataOut<dim>::type_dof_data,
+				data_component_interpretation);
+      data_out.build_patches (std::min(stokes_degree, temperature_degree));
 
-  std::ostringstream filename;
-  filename << "solution-" << Utilities::int_to_string(timestep_number, 4) << ".vtk";
+      std::ostringstream filename;
+      filename << "solution-" << Utilities::int_to_string(timestep_number, 4) << ".vtk";
 
-  std::ofstream output (filename.str().c_str());
-  data_out.write_vtk (output);
+      std::ofstream output (filename.str().c_str());
+      data_out.write_vtk (output);
+    }
 }
 
 
@@ -1425,7 +1417,7 @@ void BoussinesqFlowProblem<dim>::refine_mesh (const unsigned int max_grid_level)
 {
   Vector<float> estimated_error_per_cell (triangulation.n_active_cells());
 
-  Vector<double> localized_temperature_solution (temperature_solution);
+  TrilinosWrappers::Vector localized_temperature_solution (temperature_solution);
 
   KellyErrorEstimator<dim>::estimate (temperature_dof_handler,
 				      QGauss<dim-1>(temperature_degree+1),
@@ -1442,11 +1434,11 @@ void BoussinesqFlowProblem<dim>::refine_mesh (const unsigned int max_grid_level)
 	 cell != triangulation.end(); ++cell)
       cell->clear_refine_flag ();
   
-  std::vector<Vector<double> > x_solution (2);
+  std::vector<TrilinosWrappers::Vector > x_solution (2);
   x_solution[0] = temperature_solution;
   x_solution[1] = old_temperature_solution;
 
-  SolutionTransfer<dim,Vector<double> > soltrans(temperature_dof_handler);
+  SolutionTransfer<dim,TrilinosWrappers::Vector > soltrans(temperature_dof_handler);
 
   triangulation.prepare_coarsening_and_refinement();
   soltrans.prepare_for_coarsening_and_refinement(x_solution);
@@ -1454,7 +1446,7 @@ void BoussinesqFlowProblem<dim>::refine_mesh (const unsigned int max_grid_level)
   triangulation.execute_coarsening_and_refinement ();
   setup_dofs ();
 
-  std::vector<Vector<double> > tmp (2);
+  std::vector<TrilinosWrappers::Vector > tmp (2);
   tmp[0] = temperature_solution;
   tmp[1] = temperature_solution;
   soltrans.interpolate(x_solution, tmp);

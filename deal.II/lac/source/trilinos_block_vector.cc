@@ -62,6 +62,20 @@ namespace TrilinosWrappers
 
 
 
+    BlockVector &
+    BlockVector::operator = (const ::dealii::TrilinosWrappers::BlockVector &v)
+    {
+      Assert (n_blocks() == v.n_blocks(),
+	      ExcDimensionMismatch(n_blocks(),v.n_blocks()));
+
+      for (unsigned int i=0; i<this->n_blocks(); ++i)
+	this->components[i] = v.block(i);
+
+      return *this;
+    }
+
+
+
     BlockVector::~BlockVector ()
     {}
 

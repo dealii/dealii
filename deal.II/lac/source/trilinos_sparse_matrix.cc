@@ -11,7 +11,6 @@
 //
 //---------------------------------------------------------------------------
 
-#include <lac/trilinos_vector_base.h>
 #include <lac/trilinos_sparse_matrix.h>
 
 #ifdef DEAL_II_USE_TRILINOS
@@ -86,6 +85,7 @@ namespace TrilinosWrappers
 #endif
 		  col_map (row_map),
 		  last_action (Zero),
+		  compressed (true),
 		  matrix (std::auto_ptr<Epetra_FECrsMatrix>
 				(new Epetra_FECrsMatrix(Copy, row_map, 0)))
   {}
@@ -96,6 +96,7 @@ namespace TrilinosWrappers
                   row_map (InputMap),
 		  col_map (row_map),
 		  last_action (Zero),
+		  compressed (true),
 		  matrix (std::auto_ptr<Epetra_FECrsMatrix>
 				(new Epetra_FECrsMatrix(Copy, row_map, 
 					int(n_max_entries_per_row), false)))
@@ -107,6 +108,7 @@ namespace TrilinosWrappers
                   row_map (InputMap),
 		  col_map (row_map),
 		  last_action (Zero),
+		  compressed (true),
 		  matrix (std::auto_ptr<Epetra_FECrsMatrix>
 		    (new Epetra_FECrsMatrix(Copy, row_map, 
 		      (int*)const_cast<unsigned int*>(&(n_entries_per_row[0])),
@@ -120,6 +122,7 @@ namespace TrilinosWrappers
                   row_map (InputRowMap),
                   col_map (InputColMap),
 		  last_action (Zero),
+		  compressed (true),
 		  matrix (std::auto_ptr<Epetra_FECrsMatrix>
 				(new Epetra_FECrsMatrix(Copy, row_map, col_map, 
 					int(n_max_entries_per_row), false)))
@@ -132,6 +135,7 @@ namespace TrilinosWrappers
                   row_map (InputRowMap),
                   col_map (InputColMap),
 		  last_action (Zero),
+		  compressed (true),
 		  matrix (std::auto_ptr<Epetra_FECrsMatrix>
 		    (new Epetra_FECrsMatrix(Copy, row_map, col_map, 
 		      (int*)const_cast<unsigned int*>(&(n_entries_per_row[0])),
@@ -270,10 +274,12 @@ namespace TrilinosWrappers
   SparseMatrix::reinit (const SparseMatrix &sparse_matrix)
   {
     matrix.reset();
+
     row_map = sparse_matrix.row_map;
     col_map = sparse_matrix.col_map;
     matrix = std::auto_ptr<Epetra_FECrsMatrix>(new Epetra_FECrsMatrix(
 				                   *sparse_matrix.matrix));
+    compressed = true;
   }
 
 
@@ -354,6 +360,7 @@ namespace TrilinosWrappers
 				   &values[0], &row_indices[0]);
       }
 
+    compress();
   }
 
 
@@ -376,6 +383,7 @@ namespace TrilinosWrappers
 
     matrix = std::auto_ptr<Epetra_FECrsMatrix> 
 	      (new Epetra_FECrsMatrix(Copy, row_map, 0));
+    compressed = true;
   }
 
 
@@ -394,6 +402,8 @@ namespace TrilinosWrappers
 
     ierr = matrix->OptimizeStorage ();
     AssertThrow (ierr == 0, ExcTrilinosError(ierr));
+
+    compressed = true;
   }
 
 
@@ -437,6 +447,11 @@ namespace TrilinosWrappers
     if (last_action != Insert)
       last_action = Insert;
 
+#ifdef DEBUG
+    if (in_local_range (i) == false)
+      compressed = false;
+#endif
+      
     int trilinos_i = i;
     int trilinos_j = j;
 
@@ -484,6 +499,11 @@ namespace TrilinosWrappers
     if (value == 0)
       return;
 
+#ifdef DEBUG
+    if (in_local_range (i) == false)
+      compressed = false;
+#endif
+      
     int trilinos_i = i;
     int trilinos_j = j;
 
