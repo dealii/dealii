@@ -128,7 +128,10 @@ namespace TrilinosWrappers
 					// already of the same size,
 					// create an object for the data
 					// exchange and then insert all
-					// the data.
+					// the data. The first assertion
+					// is basically there to check
+					// whether the user knows what
+					// she is doing.
       else
         {
 	  Assert (fast == false,

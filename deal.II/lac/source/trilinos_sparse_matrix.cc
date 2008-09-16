@@ -393,10 +393,7 @@ namespace TrilinosWrappers
   {
 				  // flush buffers
     int ierr;
-    if (row_map.SameAs(col_map))
-      ierr = matrix->GlobalAssemble (true);
-    else
-      ierr = matrix->GlobalAssemble (col_map, row_map, true);
+    ierr = matrix->GlobalAssemble (col_map, row_map, true);
     
     AssertThrow (ierr == 0, ExcTrilinosError(ierr));
 
@@ -436,10 +433,7 @@ namespace TrilinosWrappers
     if (last_action == Add)
       {
 	int ierr;
-	if (row_map.SameAs(col_map))
-	  ierr = matrix->GlobalAssemble (false);
-	else
-	  ierr = matrix->GlobalAssemble(col_map, row_map, false);
+	ierr = matrix->GlobalAssemble(col_map, row_map, false);
 	
 	AssertThrow (ierr == 0, ExcTrilinosError(ierr));
       }
@@ -478,10 +472,7 @@ namespace TrilinosWrappers
     if (last_action == Insert)
       {
 	int ierr;
-	if (row_map.SameAs(col_map))
-	  ierr = matrix->GlobalAssemble (false);
-	else
-	  ierr = matrix->GlobalAssemble(col_map, row_map, false);
+	ierr = matrix->GlobalAssemble(col_map, row_map, false);
 
 	AssertThrow (ierr == 0, ExcTrilinosError(ierr));
     }
@@ -494,8 +485,8 @@ namespace TrilinosWrappers
 				  // communication model (see the
 				  // comments in the documentation of
 				  // TrilinosWrappers::Vector), but we
-				  // can save some work if the addend
-				  // is zero
+				  // can save some work if the addend is
+				  // zero
     if (value == 0)
       return;
 
@@ -589,7 +580,7 @@ namespace TrilinosWrappers
 				      // already is transformed to
 				      // local indices.
 	if (matrix->Filled() == false)
-	  matrix->FillComplete(true);
+	  matrix->FillComplete(col_map, row_map, true);
 
 				      // Prepare pointers for extraction
 				      // of a view of the row.
@@ -668,7 +659,7 @@ namespace TrilinosWrappers
 				      // already is transformed to
 				      // local indices.
       if (!matrix->Filled())
-	matrix->FillComplete(true);
+	matrix->FillComplete(col_map, row_map, true);
 
 				      // Prepare pointers for extraction
 				      // of a view of the row.
@@ -801,7 +792,7 @@ namespace TrilinosWrappers
   SparseMatrix::l1_norm () const
   {
     if (matrix->Filled() == false)
-      matrix->FillComplete();
+      matrix->FillComplete(col_map, row_map, true);
 
     TrilinosScalar result = matrix->NormOne();
 
@@ -814,7 +805,7 @@ namespace TrilinosWrappers
   SparseMatrix::linfty_norm () const
   {
     if (matrix->Filled() == false)
-      matrix->FillComplete();
+      matrix->FillComplete(col_map, row_map, true);
 
     TrilinosScalar result = matrix->NormInf();
 
@@ -827,7 +818,7 @@ namespace TrilinosWrappers
   SparseMatrix::frobenius_norm () const
   {
     if (matrix->Filled() == false)
-      matrix->FillComplete();
+      matrix->FillComplete(col_map, row_map, true);
 
     TrilinosScalar result = matrix->NormFrobenius();
 
@@ -874,7 +865,7 @@ namespace TrilinosWrappers
 	    ExcMessage ("Row map of matrix does not fit with vector map!"));
 
     if (matrix->Filled() == false)
-      matrix->FillComplete();
+      matrix->FillComplete(col_map, row_map, true);
 
     const int ierr = matrix->Multiply (false, *(src.vector), *(dst.vector));
     AssertThrow (ierr == 0, ExcTrilinosError(ierr));
@@ -894,7 +885,7 @@ namespace TrilinosWrappers
 	    ExcMessage ("Column map of matrix does not fit with vector map!"));
 
     if (matrix->Filled() == false)
-      matrix->FillComplete();
+      matrix->FillComplete(col_map, row_map, true);
 
     const int ierr = matrix->Multiply (true, *(src.vector), *(dst.vector));
     AssertThrow (ierr == 0, ExcTrilinosError(ierr));

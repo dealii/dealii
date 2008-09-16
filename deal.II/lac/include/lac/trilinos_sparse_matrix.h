@@ -1649,7 +1649,7 @@ namespace TrilinosWrappers
   {
     int begin, end;
     begin = matrix->RowMap().MinMyGID();
-    end = matrix->RowMap().MaxMyGID();
+    end = matrix->RowMap().MaxMyGID()+1;
     
     return ((index >= static_cast<unsigned int>(begin)) &&
             (index < static_cast<unsigned int>(end)));
