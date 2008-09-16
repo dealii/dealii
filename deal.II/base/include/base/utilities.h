@@ -20,7 +20,7 @@
 #include <utility>
 #include <string>
 
-#ifdef DEAL_II_COMPILER_SUPPORTS_MPI
+#if defined(DEAL_II_COMPILER_SUPPORTS_MPI) || defined(DEAL_II_USE_PETSC)
 #include <mpi.h>
 #else
 typedef int MPI_Comm;
