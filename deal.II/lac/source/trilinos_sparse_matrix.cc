@@ -112,7 +112,7 @@ namespace TrilinosWrappers
 		  matrix (std::auto_ptr<Epetra_FECrsMatrix>
 		    (new Epetra_FECrsMatrix(Copy, row_map, 
 		      (int*)const_cast<unsigned int*>(&(n_entries_per_row[0])),
-					    true)))
+					    false)))
   {}
 
   SparseMatrix::SparseMatrix (const Epetra_Map  &InputRowMap,
@@ -139,7 +139,7 @@ namespace TrilinosWrappers
 		  matrix (std::auto_ptr<Epetra_FECrsMatrix>
 		    (new Epetra_FECrsMatrix(Copy, row_map, col_map, 
 		      (int*)const_cast<unsigned int*>(&(n_entries_per_row[0])),
-					    true)))
+					    false)))
   {}
 
 
@@ -263,7 +263,7 @@ namespace TrilinosWrappers
 				  // correct values.
     matrix = std::auto_ptr<Epetra_FECrsMatrix>
 	        (new Epetra_FECrsMatrix(Copy, row_map,
-					&n_entries_per_row[0], true));
+					&n_entries_per_row[0], false));
 
     reinit (sparsity_pattern);
   }
@@ -334,7 +334,7 @@ namespace TrilinosWrappers
 				  // correct values.
     matrix = std::auto_ptr<Epetra_FECrsMatrix>
 	        (new Epetra_FECrsMatrix(Copy, row_map,
-					&n_entries_per_row[0], true));
+					&n_entries_per_row[0], false));
 
     std::vector<double> values;
     std::vector<int> row_indices;

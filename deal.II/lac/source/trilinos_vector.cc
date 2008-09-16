@@ -129,9 +129,8 @@ namespace TrilinosWrappers
 					// create an object for the data
 					// exchange and then insert all
 					// the data. The first assertion
-					// is basically there to check
-					// whether the user knows what
-					// she is doing.
+					// is only a check whether the
+					// user knows what she is doing.
       else
         {
 	  Assert (fast == false,
@@ -146,6 +145,8 @@ namespace TrilinosWrappers
 
 	  const int ierr = vector->Import(*v.vector, data_exchange, Insert);
 	  AssertThrow (ierr == 0, ExcTrilinosError(ierr));
+
+	  last_action = Insert;
 	}
 
     }
@@ -178,6 +179,8 @@ namespace TrilinosWrappers
       const int ierr = vector->Import(*v.vector, data_exchange, Insert);
 
       AssertThrow (ierr == 0, ExcTrilinosError(ierr));
+
+      last_action = Insert;
 
       return *this;
     }
@@ -353,6 +356,8 @@ namespace TrilinosWrappers
 
 	const int ierr = vector->Import(*v.vector, data_exchange, Insert);
 	AssertThrow (ierr == 0, ExcTrilinosError(ierr));
+
+	last_action = Insert;
       }
 
   }

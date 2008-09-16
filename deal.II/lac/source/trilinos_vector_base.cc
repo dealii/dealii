@@ -617,6 +617,8 @@ namespace TrilinosWrappers
 
 	int ierr = vector->Import(*v.vector, data_exchange, Add);
 	AssertThrow (ierr == 0, ExcTrilinosError(ierr));
+
+	last_action = Insert;
       }
   }
 
