@@ -17,6 +17,7 @@
 #ifdef DEAL_II_USE_TRILINOS
 
 #include <Epetra_Map.h>
+#include <Epetra_MultiVector.h>
 #include <Epetra_Vector.h>
 #include <Teuchos_ParameterList.hpp>
 #include <ml_include.h>
@@ -78,27 +79,39 @@ namespace TrilinosWrappers
   
     if (higher_order_elements)
       parameter_list.set("aggregation: type", "MIS");
+
+    const Epetra_Map * domain_map = &(matrix.matrix->DomainMap());
     
-    std::vector<double> null_space_modes;
+    Epetra_MultiVector null_space_modes (*domain_map, null_space_dimension);
   
     if (null_space_dimension > 1)
       {
 	Assert (n_rows == null_space[0].size(),
 		ExcDimensionMismatch(n_rows,
 				     null_space[0].size()));
+	Assert (n_rows == (unsigned int)null_space_modes.GlobalLength(),
+		ExcDimensionMismatch(n_rows,
+				     null_space_modes.GlobalLength()));
+
+	unsigned int my_size = domain_map->NumMyElements();
+	Assert (my_size == domain_map->MaxLID()+1,
+		ExcDimensionMismatch (my_size, domain_map->MaxLID()+1));
 	
 				        // Reshape null space as a
 				        // contiguous vector of
 				        // doubles so that Trilinos
 				        // can read from it.
-	null_space_modes.resize (n_rows * null_space_dimension, 0.);
 	for (unsigned int d=0; d<null_space_dimension; ++d)
-	  for (unsigned int row=0; row<n_rows; ++row)
-	    null_space_modes[d*n_rows + row] = (double)null_space[d][row];
+	  for (unsigned int row=0; row<my_size; ++row)
+	    {
+	      int global_row_id = domain_map->GID(row);
+	      null_space_modes.ReplaceMyValue(row, d, 
+				 (double)null_space[d][global_row_id]);
+	    }
   
 	parameter_list.set("null space: type", "pre-computed");
-	parameter_list.set("null space: dimension", int(null_space_dimension));
-	parameter_list.set("null space: vectors", &null_space_modes[0]);
+	parameter_list.set("null space: dimension", null_space_modes.NumVectors());
+	parameter_list.set("null space: vectors", null_space_modes.Values());
       }
 
     multigrid_operator = boost::shared_ptr<ML_Epetra::MultiLevelPreconditioner>
