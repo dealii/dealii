@@ -38,7 +38,7 @@ namespace TrilinosWrappers
 #endif
     {
       last_action = Zero;
-      vector = std::auto_ptr<Epetra_FEVector> (new Epetra_FEVector(map));
+      vector = std::auto_ptr<Epetra_FEVector> (new Epetra_FEVector(map,false));
     }
 
 
@@ -48,7 +48,7 @@ namespace TrilinosWrappers
 		    map (InputMap)
     {
       last_action = Zero;
-      vector = std::auto_ptr<Epetra_FEVector> (new Epetra_FEVector(map));
+      vector = std::auto_ptr<Epetra_FEVector> (new Epetra_FEVector(map,false));
     }
   
 
@@ -94,8 +94,9 @@ namespace TrilinosWrappers
     {
       vector.reset();
       map = input_map;
+      (void)fast;
       
-      vector = std::auto_ptr<Epetra_FEVector> (new Epetra_FEVector(map,!fast));
+      vector = std::auto_ptr<Epetra_FEVector> (new Epetra_FEVector(map,false));
       last_action = Zero;
     }
 
@@ -119,7 +120,7 @@ namespace TrilinosWrappers
 	  if (map.SameAs(v.vector->Map()) == false)
 	    map = Epetra_Map(v.vector->GlobalLength(),0,v.vector->Comm());
 
-	  vector = std::auto_ptr<Epetra_FEVector> (new Epetra_FEVector(map,!fast));
+	  vector = std::auto_ptr<Epetra_FEVector> (new Epetra_FEVector(map,false));
 	  last_action = Zero;
 	}
 
@@ -253,7 +254,7 @@ namespace TrilinosWrappers
   {
     last_action = Zero;
     vector = std::auto_ptr<Epetra_FEVector>
-	              (new Epetra_FEVector(map,true));
+	              (new Epetra_FEVector(map,false));
   }
 
 
@@ -290,7 +291,7 @@ namespace TrilinosWrappers
 
     last_action = Zero;
 
-    vector = std::auto_ptr<Epetra_FEVector> (new Epetra_FEVector (map,true));
+    vector = std::auto_ptr<Epetra_FEVector> (new Epetra_FEVector (map,false));
   }
 
 
@@ -309,7 +310,8 @@ namespace TrilinosWrappers
 
     last_action = Zero;
 
-    vector = std::auto_ptr<Epetra_FEVector> (new Epetra_FEVector (map, !fast));
+    (void)fast;
+    vector = std::auto_ptr<Epetra_FEVector> (new Epetra_FEVector (map, false));
   }
 
 
@@ -332,7 +334,7 @@ namespace TrilinosWrappers
 	if (map.SameAs(v.vector->Map()) == false)
 	  map = Epetra_LocalMap (v.vector->GlobalLength(),0,v.vector->Comm());
 
-	vector = std::auto_ptr<Epetra_FEVector> (new Epetra_FEVector(map,!fast));
+	vector = std::auto_ptr<Epetra_FEVector> (new Epetra_FEVector(map,false));
 	last_action = Zero;
       }
 

@@ -400,6 +400,8 @@ namespace TrilinosWrappers
     ierr = matrix->OptimizeStorage ();
     AssertThrow (ierr == 0, ExcTrilinosError(ierr));
 
+    last_action = Zero;
+
     compressed = true;
   }
 

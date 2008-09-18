@@ -110,6 +110,7 @@ namespace TrilinosWrappers
 				 // what we did last to the vector.
     const int ierr = vector->GlobalAssemble(last_action);
     AssertThrow (ierr == 0, ExcTrilinosError(ierr));
+    last_action = Zero;
   
     compressed = true;
   }
@@ -123,6 +124,8 @@ namespace TrilinosWrappers
     Assert (numbers::is_finite(s),
 	    ExcMessage("The given value is not finite but either "
 		       "infinite or Not A Number (NaN)"));
+
+    compress();
 
     const int ierr = vector->PutScalar(s);
 
