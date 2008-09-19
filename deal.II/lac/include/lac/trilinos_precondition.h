@@ -387,7 +387,7 @@ namespace TrilinosWrappers
 					* so-called additive Schwarz
 					* preconditioner.
 					*/
-	AdditionalData (const double       ic_fill = 0.,
+	AdditionalData (const unsigned int ic_fill = 0,
 			const double       ic_atol = 0.,
 			const double       ic_rtol = 1.,
 			const unsigned int overlap = 0);
@@ -395,7 +395,8 @@ namespace TrilinosWrappers
                                        /**
 					* IC parameters and overlap.
 					*/
-	double ic_fill, ic_atol, ic_rtol;
+	unsigned int ic_fill;
+	double ic_atol, ic_rtol;
 	unsigned int overlap;
       };
 
@@ -493,7 +494,7 @@ namespace TrilinosWrappers
 					* so-called additive Schwarz
 					* preconditioner.
 					*/
-	AdditionalData (const double       ilu_fill = 0.,
+	AdditionalData (const unsigned int ilu_fill = 0,
 			const double       ilu_atol = 0.,
 			const double       ilu_rtol = 1.,
 			const unsigned int overlap  = 0);
@@ -501,7 +502,8 @@ namespace TrilinosWrappers
                                        /**
 					* ILU parameters and overlap.
 					*/
-	double ilu_drop, ilu_fill, ilu_atol, ilu_rtol;
+	unsigned int ilu_fill;
+	double ilu_atol, ilu_rtol;
 	unsigned int overlap;
       };
 

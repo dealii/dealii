@@ -199,7 +199,7 @@ namespace TrilinosWrappers
 
 
   PreconditionIC::AdditionalData::
-  AdditionalData (const double       ic_fill,
+  AdditionalData (const unsigned int ic_fill,
 		  const double       ic_atol,
 		  const double       ic_rtol,
 		  const unsigned int overlap)
@@ -229,7 +229,7 @@ namespace TrilinosWrappers
     int ierr;
 
     Teuchos::ParameterList parameter_list;
-    parameter_list.set ("fact: level-of-fill",additional_data.ic_fill); 
+    parameter_list.set ("fact: level-of-fill",(int)additional_data.ic_fill); 
     parameter_list.set ("fact: absolute threshold",additional_data.ic_atol); 
     parameter_list.set ("fact: relative threshold",additional_data.ic_rtol); 
     parameter_list.set ("schwarz: combine mode", "Add");
@@ -257,7 +257,7 @@ namespace TrilinosWrappers
 
 
   PreconditionILU::AdditionalData::
-  AdditionalData (const double       ilu_fill,
+  AdditionalData (const unsigned int ilu_fill,
 		  const double       ilu_atol,
 		  const double       ilu_rtol,
 		  const unsigned int overlap)
@@ -287,7 +287,7 @@ namespace TrilinosWrappers
     int ierr;
 
     Teuchos::ParameterList parameter_list;
-    parameter_list.set ("fact: level-of-fill",additional_data.ilu_fill); 
+    parameter_list.set ("fact: level-of-fill",(int)additional_data.ilu_fill); 
     parameter_list.set ("fact: absolute threshold",additional_data.ilu_atol); 
     parameter_list.set ("fact: relative threshold",additional_data.ilu_rtol); 
     parameter_list.set ("schwarz: combine mode", "Add");
