@@ -1,5 +1,5 @@
 //---------------------------------------------------------------------------
-//    $Id: trilinos_vector_base.h 16818 2008-09-12 14:30:24Z kronbichler $
+//    $Id$
 //    Version: $Name$
 //
 //    Copyright (C) 2008 by the deal.II authors
