@@ -1826,7 +1826,7 @@ void BoussinesqFlowProblem<dim>::solve ()
   }
 
   old_time_step = time_step;    
-  time_step = 1./(std::sqrt(2.)*dim*std::sqrt(1.*dim)) /
+  time_step = 1./(1.6*dim*std::sqrt(1.*dim)) /
 	      temperature_degree *
 	      GridTools::minimal_cell_diameter(triangulation) /
               std::max (get_maximal_velocity(), .01);
