@@ -217,7 +217,7 @@ DEAL_II_NAMESPACE_CLOSE
 
 #endif // DEAL_II_USE_TRILINOS
 
-/*----------------------------   trilinos_precondition_amg_base.h     ---------------------------*/
+/*----------------------------   trilinos_precondition_amg.h     ---------------------------*/
 
 #endif
-/*----------------------------   trilinos_precondition_amg_base.h     ---------------------------*/
+/*----------------------------   trilinos_precondition_amg.h     ---------------------------*/
