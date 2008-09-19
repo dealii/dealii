@@ -800,8 +800,9 @@ BoussinesqFlowProblem<dim>::build_stokes_preconditioner ()
 				 true, true, 5e-2, null_space, false);
 
   Mp_preconditioner = boost::shared_ptr<TrilinosWrappers::PreconditionSSOR>
-	(new TrilinosWrappers::PreconditionSSOR(
-	   stokes_preconditioner_matrix.block(1,1),1.2));
+                                   (new TrilinosWrappers::PreconditionSSOR());
+
+  Mp_preconditioner->initialize (stokes_preconditioner_matrix.block(1,1),1.2);
 
   pcout << std::endl;
 
@@ -1286,11 +1287,11 @@ void BoussinesqFlowProblem<dim>::solve ()
 				  1e-8*temperature_rhs.l2_norm());
     SolverCG<TrilinosWrappers::MPI::Vector>   cg (solver_control);
 
-    TrilinosWrappers::PreconditionSSOR preconditioner (temperature_matrix,
-						       1.2);
+    TrilinosWrappers::PreconditionSSOR preconditioner;
+    preconditioner.initialize (temperature_matrix, 1.2);
+
     cg.solve (temperature_matrix, temperature_solution,
-	      temperature_rhs,
-	      preconditioner);
+	      temperature_rhs, preconditioner);
 
     TrilinosWrappers::Vector localized_temperature_solution (temperature_solution);
     temperature_constraints.distribute (localized_temperature_solution);

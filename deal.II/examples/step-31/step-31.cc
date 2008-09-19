@@ -1144,8 +1144,8 @@ BoussinesqFlowProblem<dim>::build_stokes_preconditioner ()
 				   // keep the (1,1) block, though
       
   Mp_preconditioner = boost::shared_ptr<TrilinosWrappers::PreconditionSSOR>
-	(new TrilinosWrappers::PreconditionSSOR(
-	   stokes_preconditioner_matrix.block(1,1),1.2));
+                                   (new TrilinosWrappers::PreconditionSSOR());
+  Mp_preconditioner->initialize(stokes_preconditioner_matrix.block(1,1),1.2);
 
   std::cout << std::endl;
 
@@ -1841,11 +1841,11 @@ void BoussinesqFlowProblem<dim>::solve ()
 				  1e-8*temperature_rhs.l2_norm());
     SolverCG<TrilinosWrappers::Vector>   cg (solver_control);
 
-    TrilinosWrappers::PreconditionSSOR preconditioner (temperature_matrix,
-						       1.2);
+    TrilinosWrappers::PreconditionSSOR preconditioner;
+    preconditioner.initialize (temperature_matrix, 1.2);
+
     cg.solve (temperature_matrix, temperature_solution,
-	      temperature_rhs,
-	      preconditioner);
+	      temperature_rhs, preconditioner);
 
 				     // produce a consistent temperature field
     temperature_constraints.distribute (temperature_solution);
