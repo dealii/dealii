@@ -802,6 +802,8 @@ the Stokes matrix.
 
 <h3>Implementation details</h3>
 
+<h4>Using different DoFHandler objects</h4>
+
 One of the things worth explaining up front about the program below is the use
 of two different DoFHandler objects. If one looks at the structure of the
 equations above and the scheme for their solution, one realizes that there is
@@ -912,6 +914,29 @@ operations are relevant for the overall run time:
 </ul>
 In essence this means that all bottlenecks apart from the algebraic
 multigrid have been removed.
+
+
+
+<h4>Using Trilinos</h4>
+
+In much the same way as we used PETSc to support our linear algebra needs in
+@ref step_17 "step-17" and @ref step_18 "step-18", we use interfaces to the <a
+href="http://trilinos.sandia.gov">Trilinos</a> library (see @ref
+SoftwareTrilinos) in this program. Trilinos is a very large collection of
+everything that has to do with linear and nonlinear algebra, as well as all
+sorts of tools around that (and looks like it will grow in many other
+directions in the future as well).
+
+The main reason for using Trilinos, similar to our exploring PETSc, is that it
+is a very powerful library that provides a lot more tools than deal.II's own
+linear algebra library. That includes, in particular, the ability to work in
+parallel on a cluster, using MPI, and a wider variety of preconditioners. In
+the latter class, one of the most interesting capabilities is the existence of
+the Trilinos ML package that implements an Algebraic Multigrid (AMG)
+method. We will use this preconditioner to precondition the second order
+operator part of the momentum equation. The ability to solve problems in
+parallel will be explored in @ref step_32 "step-32", using the same problem as
+discussed here.
 
 
 
