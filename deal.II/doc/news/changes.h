@@ -114,6 +114,16 @@ inconvenience this causes.
 <ol>
   <li>
   <p>
+  Updated: The version of the <a href="http://www.boost.org/">BOOST</a>
+  library that is in the <code>contrib/</code> directory and is used in
+  various places of the library has been upgraded to 1.36.
+  <br>
+  (WB 2008/09/19)
+  </p>
+  </li>
+
+  <li>
+  <p>
   Fixed: In the @ref step_23 "step-23" tutorial program the terms corresponding
   to the external force were computed incorrectly. The error wasn't visible
   right away since in the program the right hand side is assumed to be zero.
