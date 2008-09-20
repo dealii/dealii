@@ -266,5 +266,24 @@ despite the penalty we pay in terms of smaller time steps.
 
 <h3> Possible extensions </h3>
 
-Parallelization -> @ref step_32 "step-32"
+There are various ways to extend the current program. Of particular interest
+is, of course, to make it faster and/or increase the resolution of the
+program, in particular in 3d. This is the topic of the @ref step_32 "step-32"
+tutorial program which will implement strategies to solve this problem in
+parallel on a cluster.
 
+Another direction would be to make the fluid flow more realistic. The program
+was initially written to simulate various cases simulating the convection of
+material in the earth's mantle, i.e. the zone between the outer earth core and
+the solid earth crust: there, material is heated from below and cooled from
+above, leading to thermal convection. The physics of this fluid are much more
+complicated than shown in this program, however: The viscosity of mantle
+material is strongly dependent on the temperature, i.e. $\eta=\eta(T)$, with
+the dependency frequently modeled as a viscosity that is reduced exponentially
+with rising temperature. Secondly, much of the dynamics of the mantle is
+determined by chemical reactions, primarily phase changes of the various
+crystals that make up the mantle; the buoyancy term on the right hand side of
+the Stokes equations then depends not only on the temperature, but also on the
+chemical composition at a given location which is advected by the flow field
+but also changes as a function of pressure and temperature. We will
+investigate some of these effects in later tutorial programs as well.
