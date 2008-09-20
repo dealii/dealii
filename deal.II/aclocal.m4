@@ -5397,7 +5397,9 @@ AC_DEFUN(DEAL_II_CONFIGURE_TRILINOS, dnl
     DEAL_II_CHECK_TRILINOS_SHARED_STATIC
 
     DEAL_II_EXPAND_TRILINOS_VECTOR="TrilinosWrappers::Vector"
+    DEAL_II_EXPAND_TRILINOS_MPI_VECTOR="TrilinosWrappers::MPI::Vector"
     DEAL_II_EXPAND_TRILINOS_BLOCKVECTOR="TrilinosWrappers::BlockVector"
+    DEAL_II_EXPAND_TRILINOS_MPI_BLOCKVECTOR="TrilinosWrappers::MPI::BlockVector"
 
     dnl Finally set with_trilinos if this hasn't happened yet
     if test "x$with_trilinos" = "x" ; then
@@ -5408,7 +5410,9 @@ AC_DEFUN(DEAL_II_CONFIGURE_TRILINOS, dnl
   dnl Make sure that the right values for Trilinos vectors are written into
   dnl common/template-arguments.in
   AC_SUBST(DEAL_II_EXPAND_TRILINOS_VECTOR)
+  AC_SUBST(DEAL_II_EXPAND_TRILINOS_MPI_VECTOR)
   AC_SUBST(DEAL_II_EXPAND_TRILINOS_BLOCKVECTOR)
+  AC_SUBST(DEAL_II_EXPAND_TRILINOS_MPI_BLOCKVECTOR)
 ])
 
 
