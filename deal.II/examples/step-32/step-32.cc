@@ -82,6 +82,8 @@ namespace EquationData
 				   // define viscosity
   const double eta = 1;
   const double kappa = 1e-6;
+  const double Rayleigh_number = 10;
+
 
   template <int dim>
   class PressureBoundaryValues : public Function<dim>
@@ -859,8 +861,6 @@ void BoussinesqFlowProblem<dim>::assemble_stokes_system ()
 
   std::vector<double>               old_temperature_values(n_q_points);
 
-  const double Rayleigh_number = 10;
-
   std::vector<Tensor<1,dim> >          phi_u       (dofs_per_cell);
   std::vector<SymmetricTensor<2,dim> > grads_phi_u (dofs_per_cell);
   std::vector<double>                  div_phi_u   (dofs_per_cell);
@@ -915,7 +915,7 @@ void BoussinesqFlowProblem<dim>::assemble_stokes_system ()
 	    const Point<dim> gravity = stokes_fe_values.quadrature_point(q) /
 				       stokes_fe_values.quadrature_point(q).norm();
 	    for (unsigned int i=0; i<dofs_per_cell; ++i)
-	      local_rhs(i) += (Rayleigh_number *
+	      local_rhs(i) += (EquationData::Rayleigh_number *
 			      gravity * phi_u[i] * old_temperature)*
 			      stokes_fe_values.JxW(q);
 	  }
