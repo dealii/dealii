@@ -912,3 +912,27 @@ operations are relevant for the overall run time:
 </ul>
 In essence this means that all bottlenecks apart from the algebraic
 multigrid have been removed.
+
+
+
+<h3>The testcase</h3>
+
+The case we want to solve here is as follows: we solve the Boussinesq
+equations described above with $\kappa=1, \eta=1, \mathrm{Ra}=10$. On the
+boundary, we will require no-normal flux for the velocity
+($\mathrm{n}\cdot\mathrm{u}=0$) and for the temperature
+($\mathrm{n}\cdot\nabla T=0$). No boundary conditions are required for the
+pressure under these conditions. Initial conditions are only necessary for the
+temperature field, and we choose it to be constant zero.
+
+The evolution of the problem is then entirely driven by the right hand side
+$\gamma(\mathrm{x},t)$ of the temperature equation, i.e. by heat sources and
+sinks. Here, we choose a setup invented in advance of a Christmas lecture:
+real candles are of course prohibited in U.S. class rooms, but virtual ones
+are allowed. We therefore choose three spherical heat sources unequally spaced
+close to the bottom of the domain, imitating three candles. The fluid located
+at these sources, initially at rest, is then heated up and as the temperature
+rises gains buoyancy, rising up; more fluid is dragged up and through the
+sources, leading to three hote plumes that rise up until they are captured by
+the recirculation of fluid that sinks down on the outside, replacing the air
+that rises due to heating.
