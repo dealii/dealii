@@ -722,8 +722,6 @@ DEAL_II_PETSC_MPIUNI_LIB
 DEAL_II_DEFINE_DEAL_II_USE_PETSC
 DEAL_II_EXPAND_TRILINOS_VECTOR
 DEAL_II_EXPAND_TRILINOS_BLOCKVECTOR
-DEAL_II_EXPAND_TRILINOS_MPI_VECTOR
-DEAL_II_EXPAND_TRILINOS_MPI_BLOCKVECTOR
 USE_CONTRIB_TRILINOS
 DEAL_II_TRILINOS_DIR
 DEAL_II_TRILINOS_SHARED
@@ -3816,6 +3814,8 @@ rm -f core conftest.err conftest.$ac_objext conftest_ipa8_conftest.oo \
       conftest$ac_exeext conftest.$ac_ext
 
 
+    CXXFLAGS="-DBOOST_NO_HASH -DBOOST_NO_SLIST"
+
     if test "$GXX" = yes ; then
     CXXFLAGSO="$CXXFLAGS -O2 -Wuninitialized -felide-constructors -ftemplate-depth-128"
     CXXFLAGSG="$CXXFLAGS -DDEBUG -pedantic -Wall -W -Wpointer-arith -Wwrite-strings -Woverloaded-virtual -Wsynth -Wsign-compare -Wswitch -ftemplate-depth-128"
@@ -4096,7 +4096,9 @@ rm -f core conftest.err conftest.$ac_objext conftest.$ac_ext
           CXXFLAGSPIC="-KPIC"
           LDFLAGSPIC="-KPIC"
                                                             LDFLAGS="$LDFLAGS -quiet_prelink -woff 131"
-                                        LIBS="$LIBS -lm"
+
+  LIBS="$LIBS -lm"
+
           ;;
 
       intel_icc*)
@@ -11288,7 +11290,7 @@ if test $ac_cv_lib_gfortran__gfortran_st_write_done = yes; then
 fi
 
 
-        if test "x$found" = "x1" ; then
+	        if test "x$found" = "x1" ; then
           F77LIBS="$F77LIBS -lgfortran"
         fi
 	;;
@@ -12051,8 +12053,6 @@ echo "$as_me: error: When building deal.II with shared libraries, Trilinos also
 
     DEAL_II_EXPAND_TRILINOS_VECTOR="TrilinosWrappers::Vector"
     DEAL_II_EXPAND_TRILINOS_BLOCKVECTOR="TrilinosWrappers::BlockVector"
-    DEAL_II_EXPAND_TRILINOS_MPI_VECTOR="TrilinosWrappers::MPI::Vector"
-    DEAL_II_EXPAND_TRILINOS_MPI_BLOCKVECTOR="TrilinosWrappers::MPI::BlockVector"
 
         if test "x$with_trilinos" = "x" ; then
       with_trilinos="yes"
@@ -12190,7 +12190,9 @@ ac_res=`eval echo '${'$as_ac_Lib'}'`
 echo "${ECHO_T}$ac_res" >&6; }
 if test `eval echo '${'$as_ac_Lib'}'` = yes; then
 
-                     LIBS="-l$blas $LIBS"
+
+  LIBS="-l$blas $LIBS"
+
 
 cat >>confdefs.h <<\_ACEOF
 #define HAVE_LIBBLAS 1
@@ -12390,7 +12392,9 @@ ac_res=`eval echo '${'$as_ac_Lib'}'`
 echo "${ECHO_T}$ac_res" >&6; }
 if test `eval echo '${'$as_ac_Lib'}'` = yes; then
 
-                       LIBS="-l$blas $LIBS"
+
+  LIBS="-l$blas $LIBS"
+
 
 cat >>confdefs.h <<\_ACEOF
 #define HAVE_LIBBLAS 1
@@ -12529,7 +12533,9 @@ ac_res=`eval echo '${'$as_ac_Lib'}'`
 	       { echo "$as_me:$LINENO: result: $ac_res" >&5
 echo "${ECHO_T}$ac_res" >&6; }
 if test `eval echo '${'$as_ac_Lib'}'` = yes; then
-   LIBS="-l$withval $LIBS"
+
+  LIBS="-l$withval $LIBS"
+
       cat >>confdefs.h <<\_ACEOF
 #define HAVE_LIBZ 1
 _ACEOF
@@ -12676,7 +12682,9 @@ cat >>confdefs.h <<\_ACEOF
 #define DEAL_II_HAVE_TECPLOT 1
 _ACEOF
 
-    LIBS="$TECPLOT_LIB $LIBS"
+
+  LIBS="$TECPLOT_LIB $LIBS"
+
   fi
 
 
@@ -12901,8 +12909,12 @@ fi
 { echo "$as_me:$LINENO: result: $ac_cv_lib_netcdf_nc_open" >&5
 echo "${ECHO_T}$ac_cv_lib_netcdf_nc_open" >&6; }
 if test $ac_cv_lib_netcdf_nc_open = yes; then
-   OLD_LIBS=$LIBS
-      LIBS="-lnetcdf_c++ -lnetcdf $LIBS"
+
+  OLD_LIBS="$LIBS"
+
+
+  LIBS="-lnetcdf_c++ -lnetcdf $LIBS"
+
       { echo "$as_me:$LINENO: checking for NcFile::NcFile in -lnetcdf_c++" >&5
 echo $ECHO_N "checking for NcFile::NcFile in -lnetcdf_c++... $ECHO_C" >&6; }
       cat >conftest.$ac_ext <<_ACEOF
@@ -12954,7 +12966,9 @@ sed 's/^/| /' conftest.$ac_ext >&5
 
 	 { echo "$as_me:$LINENO: result: no" >&5
 echo "${ECHO_T}no" >&6; }
-	LIBS=$OLD_LIBS
+
+  LIBS="$OLD_LIBS"
+
 
 fi
 
@@ -13303,7 +13317,9 @@ ac_res=`eval echo '${'$as_ac_Lib'}'`
 	       { echo "$as_me:$LINENO: result: $ac_res" >&5
 echo "${ECHO_T}$ac_res" >&6; }
 if test `eval echo '${'$as_ac_Lib'}'` = yes; then
-   LIBS="-l$lapack $LIBS"
+
+  LIBS="-l$lapack $LIBS"
+
 
 cat >>confdefs.h <<\_ACEOF
 #define HAVE_LIBLAPACK 1
@@ -13656,7 +13672,9 @@ echo "${ECHO_T}PowerPC64" >&6; }
 	      	      	      AR="$AR -X 64"
 	      LDFLAGS="$LDFLAGS -maix64"
 
-	      	      LIBS="$LIBS -lpthread"
+
+  LIBS="$LIBS -lpthread"
+
               ;;
         esac
 	;;
@@ -14715,8 +14733,6 @@ DEAL_II_PETSC_MPIUNI_LIB!$DEAL_II_PETSC_MPIUNI_LIB$ac_delim
 DEAL_II_DEFINE_DEAL_II_USE_PETSC!$DEAL_II_DEFINE_DEAL_II_USE_PETSC$ac_delim
 DEAL_II_EXPAND_TRILINOS_VECTOR!$DEAL_II_EXPAND_TRILINOS_VECTOR$ac_delim
 DEAL_II_EXPAND_TRILINOS_BLOCKVECTOR!$DEAL_II_EXPAND_TRILINOS_BLOCKVECTOR$ac_delim
-DEAL_II_EXPAND_TRILINOS_MPI_VECTOR!$DEAL_II_EXPAND_TRILINOS_MPI_VECTOR$ac_delim
-DEAL_II_EXPAND_TRILINOS_MPI_BLOCKVECTOR!$DEAL_II_EXPAND_TRILINOS_MPI_BLOCKVECTOR$ac_delim
 USE_CONTRIB_TRILINOS!$USE_CONTRIB_TRILINOS$ac_delim
 DEAL_II_TRILINOS_DIR!$DEAL_II_TRILINOS_DIR$ac_delim
 DEAL_II_TRILINOS_SHARED!$DEAL_II_TRILINOS_SHARED$ac_delim
@@ -14741,7 +14757,7 @@ LIBOBJS!$LIBOBJS$ac_delim
 LTLIBOBJS!$LTLIBOBJS$ac_delim
 _ACEOF
 
-  if test `sed -n "s/.*$ac_delim\$/X/p" conf$$subs.sed | grep -c X` = 31; then
+  if test `sed -n "s/.*$ac_delim\$/X/p" conf$$subs.sed | grep -c X` = 29; then
     break
   elif $ac_last_try; then
     { { echo "$as_me:$LINENO: error: could not make $CONFIG_STATUS" >&5

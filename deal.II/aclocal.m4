@@ -447,6 +447,9 @@ dnl
 dnl -------------------------------------------------------------
 AC_DEFUN(DEAL_II_SET_CXX_FLAGS, dnl
 [
+  dnl In no case do we want to induce BOOST to use deprecated header files
+  CXXFLAGS="-DBOOST_NO_HASH -DBOOST_NO_SLIST"
+
   dnl First the flags for gcc compilers
   if test "$GXX" = yes ; then
     CXXFLAGSO="$CXXFLAGS -O2 -Wuninitialized -felide-constructors -ftemplate-depth-128"
