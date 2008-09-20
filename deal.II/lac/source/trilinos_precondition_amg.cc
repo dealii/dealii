@@ -93,8 +93,8 @@ namespace TrilinosWrappers
 		ExcDimensionMismatch(n_rows,
 				     null_space_modes.GlobalLength()));
 
-	unsigned int my_size = domain_map->NumMyElements();
-	Assert (my_size == domain_map->MaxLID()+1,
+	const unsigned int my_size = domain_map->NumMyElements();
+	Assert (my_size == (unsigned int)domain_map->MaxLID()+1,
 		ExcDimensionMismatch (my_size, domain_map->MaxLID()+1));
 	
 				        // Reshape null space as a
