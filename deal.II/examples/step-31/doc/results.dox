@@ -218,33 +218,28 @@ can take.
 
 <h5>Conclusions</h5>
 
-Concluding, $\beta=0.03$ appears to be a good choice for the
-stabilization parameter in 2d, and $\beta=0.05$ in 3d. In a dimension
-independent way, we can model this as $\beta=0.015d$. As we have seen
-in the sections above, in 2d
-$k=\frac 14 \frac 1{q_T}\frac{h_K}{\|\mathbf{u}\|_{L^\infty(K)}}$
-is an appropriate time step, where $q_T$ is the polynomial degree of
-the temperature shape functions (in the program, this corresponds to
-the variable <code>temperature_degree</code>). To reconcile this with
-the findings in 3d for the same $\beta$, we could write this as
-$k=\frac 1{2\sqrt{2}\sqrt{d}} \frac
-1{q_T}\frac{h_K}{\|\mathbf{u}\|_{L^\infty(K)}}$
-but this doesn't take into account that we also have to increase
-$\beta$ in 3d. The final form that takes all these factors in reads as
-follows:
+Concluding, from the simple computations above, $\beta=0.03$ appears to be a
+good choice for the stabilization parameter in 2d, and $\beta=0.05$ in 3d. In
+a dimension independent way, we can model this as $\beta=0.015d$. If one does
+longer computations (several thousand time steps) on finer meshes, one
+realizes that that's not quite small enough and that for stability one will
+have to reduce the above values a bit more (by about a factor of $\frac 78$).
+
+As a consequence, a formula that reconciles 2d, 3d, and variable polynomial
+degree and takes all factors in account reads as follows:
 @f{eqnarray*}
   k =
-  \frac 1{2\sqrt{2}} \frac 1{\sqrt{d}}
+  \frac 1{2 \cdot 1.6} \frac 1{\sqrt{d}}
   \frac 2d
   \frac 1{q_T}
   \frac{h_K}{\|\mathbf{u}\|_{L^\infty(K)}}
   =
-  \frac 1{d\sqrt{2}\sqrt{d}}
+  \frac 1{1.6 d\sqrt{d}}
   \frac 1{q_T}
   \frac{h_K}{\|\mathbf{u}\|_{L^\infty(K)}}.
 @f}
 In the first form (in the center of the equation), $\frac
-1{2\sqrt{2}}$ is a universal constant, $\frac 1{\sqrt{d}}$
+1{2 \cdot 1.6}$ is a universal constant, $\frac 1{\sqrt{d}}$
 is the factor that accounts for the difference between cell diameter
 and grid point separation,
 $\frac 2d$ accounts for the increase in $\beta$ with space dimension,
