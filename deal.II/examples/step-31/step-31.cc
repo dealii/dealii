@@ -90,13 +90,14 @@ using namespace dealii;
 				 // step-22. Regarding the details, though,
 				 // there are some differences.
 
-				 // The first
-				 // thing is that we don't set any boundary
-				 // conditions on the velocity, as is
-				 // explained in the introduction. So
-				 // what is left are two conditions for
-				 // pressure <i>p</i> and temperature
-				 // <i>T</i>.
+				 // The first thing is that we don't set any
+				 // non-homogenous boundary conditions on the
+				 // velocity, since as is explained in the
+				 // introduction we will use no-flux
+				 // conditions
+				 // $\mathbf{n}\cdot\mathbf{u}=0$. So what is
+				 // left are two conditions for pressure
+				 // <i>p</i> and temperature <i>T</i>.
 
 				 // Secondly, we set an initial
 				 // condition for all problem variables,
@@ -113,29 +114,6 @@ namespace EquationData
   const double eta = 1;
   const double kappa = 1e-6;
   const double Rayleigh_number = 10;
-
-
-  template <int dim>
-  class PressureBoundaryValues : public Function<dim>
-  {
-    public:
-      PressureBoundaryValues () : Function<dim>(1) {}
-
-      virtual double value (const Point<dim>   &p,
-			    const unsigned int  component = 0) const;
-  };
-
-
-  template <int dim>
-  double
-  PressureBoundaryValues<dim>::value (const Point<dim>  &/*p*/,
-				      const unsigned int /*component*/) const
-  {
-    return 0;
-  }
-
-
-
 
 
 				   // @sect4{Initial values}
@@ -1278,7 +1256,6 @@ void BoussinesqFlowProblem<dim>::assemble_stokes_system ()
 				   // individual blocks (velocity,
 				   // pressure, temperature) from
 				   // the total FE system.
-  const EquationData::PressureBoundaryValues<dim> pressure_boundary_values;
   std::vector<double>               boundary_values (n_face_q_points);
 
   std::vector<double>               old_temperature_values(n_q_points);
@@ -1376,43 +1353,6 @@ void BoussinesqFlowProblem<dim>::assemble_stokes_system ()
 			     gravity * phi_u[i] * old_temperature)*
 			    stokes_fe_values.JxW(q);
 	}
-
-
-				       // Next follows the assembly 
-				       // of the face terms, result
-				       // from Neumann boundary 
-				       // conditions. Since these
-				       // terms only enter the right
-				       // hand side vector and not
-				       // the matrix, there is no
-				       // substantial benefit from
-				       // extracting the data 
-				       // before using it, so 
-				       // we remain in the lines 
-				       // of step-20 at this point.
-      for (unsigned int face_no=0;
-	   face_no<GeometryInfo<dim>::faces_per_cell;
-	   ++face_no)
-	if (cell->at_boundary(face_no))
-	  {
-	    stokes_fe_face_values.reinit (cell, face_no);
-
-	    pressure_boundary_values
-	      .value_list (stokes_fe_face_values.get_quadrature_points(),
-			   boundary_values);
-
-	    for (unsigned int q=0; q<n_face_q_points; ++q)
-	      for (unsigned int i=0; i<dofs_per_cell; ++i)
-		{
-		  const Tensor<1,dim>
-		    phi_i_u = stokes_fe_face_values[velocities].value (i, q);
-
-		  local_rhs(i) += -(phi_i_u *
-				    stokes_fe_face_values.normal_vector(q) *
-				    boundary_values[q] *
-				    stokes_fe_face_values.JxW(q));
-		}
-	  }      
 
 				       // The last step in the loop 
 				       // over all cells is to
