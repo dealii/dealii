@@ -272,7 +272,7 @@ possibilities for imposing boundary conditions:
     viscosities to not introduce much tangential stress on each other). 
     In formulas, this means that 
     @f{eqnarray*}
-      \textbf{n}\cdoy\textbf u &=& 0,
+      \textbf{n}\cdot\textbf u &=& 0,
       \\
       (\textbf 1-\textbf n\otimes\textbf n)
       \left(\textbf{n}\cdot [p \textbf{1} -
