@@ -162,54 +162,21 @@ namespace TrilinosWrappers
   void
   SparseMatrix::reinit (const SparsityPattern &sparsity_pattern)
   {
-    unsigned int n_rows = sparsity_pattern.n_rows();
+#ifdef DEAL_II_COMPILER_SUPPORTS_MPI
+    Epetra_MpiComm    trilinos_communicator (MPI_COMM_WORLD);
+#else
+    Epetra_SerialComm trilinos_communicator;
+#endif
 
-				  // TODO: As of now, assume that the
-				  // sparsity pattern sits at the all
-				  // processors (completely), and let
-				  // each processor set its rows. Since
-				  // this is wasteful, a better solution
-				  // should be found in the future.
-    Assert (matrix->NumGlobalRows() == (int)sparsity_pattern.n_rows(),
-	    ExcDimensionMismatch (matrix->NumGlobalRows(),
-				  sparsity_pattern.n_rows()));
-    
-				  // Trilinos has a bug for rectangular
-				  // matrices at this point, so do not
-				  // check for consistent column numbers
-				  // here.
-				  //
-				  // this bug is filed in the Sandia
-				  // bugzilla under #4123 and should be
-				  // fixed for version 9.0
-//        Assert (matrix->NumGlobalCols() == (int)sparsity_pattern.n_cols(),
-//		ExcDimensionMismatch (matrix->NumGlobalCols(),
-//				      sparsity_pattern.n_cols()));
+    const Epetra_Map rows (sparsity_pattern.n_rows(),
+			   0,
+			   trilinos_communicator);
+    const Epetra_Map columns (sparsity_pattern.n_cols(),
+			      0,
+			      trilinos_communicator);
 
-    std::vector<double> values;
-    std::vector<int>    row_indices;
-    
-    for (unsigned int row=0; row<n_rows; ++row)
-      if (row_map.MyGID(row))
-	{
-	  const int row_length = sparsity_pattern.row_length(row);
-	  row_indices.resize (row_length, -1);
-	  values.resize (row_length, 0.);
-
-	  for (int col=0; col < row_length; ++col)
-	    row_indices[col] = sparsity_pattern.column_number (row, col);
-
-	  matrix->InsertGlobalValues (row, row_length,
-				      &values[0], &row_indices[0]);
-	}
-    
-    last_action = Zero;
-
-				  // In the end, the matrix needs to
-				  // be compressed in order to be
-				  // really ready.
-    compress();
- }
+    reinit (rows, columns, sparsity_pattern);
+  }
 
 
 
@@ -265,7 +232,52 @@ namespace TrilinosWrappers
 	        (new Epetra_FECrsMatrix(Copy, row_map,
 					&n_entries_per_row[0], false));
 
-    reinit (sparsity_pattern);
+
+				  // TODO: As of now, assume that the
+				  // sparsity pattern sits at the all
+				  // processors (completely), and let
+				  // each processor set its rows. Since
+				  // this is wasteful, a better solution
+				  // should be found in the future.
+    Assert (matrix->NumGlobalRows() == (int)sparsity_pattern.n_rows(),
+	    ExcDimensionMismatch (matrix->NumGlobalRows(),
+				  sparsity_pattern.n_rows()));
+    
+				  // Trilinos has a bug for rectangular
+				  // matrices at this point, so do not
+				  // check for consistent column numbers
+				  // here.
+				  //
+				  // this bug is filed in the Sandia
+				  // bugzilla under #4123 and should be
+				  // fixed for version 9.0
+//        Assert (matrix->NumGlobalCols() == (int)sparsity_pattern.n_cols(),
+//		ExcDimensionMismatch (matrix->NumGlobalCols(),
+//				      sparsity_pattern.n_cols()));
+
+    std::vector<double> values;
+    std::vector<int>    row_indices;
+    
+    for (unsigned int row=0; row<n_rows; ++row)
+      if (row_map.MyGID(row))
+	{
+	  const int row_length = sparsity_pattern.row_length(row);
+	  row_indices.resize (row_length, -1);
+	  values.resize (row_length, 0.);
+
+	  for (int col=0; col < row_length; ++col)
+	    row_indices[col] = sparsity_pattern.column_number (row, col);
+
+	  matrix->InsertGlobalValues (row, row_length,
+				      &values[0], &row_indices[0]);
+	}
+    
+    last_action = Zero;
+
+				  // In the end, the matrix needs to
+				  // be compressed in order to be
+				  // really ready.
+    compress();    
   }
 
 
