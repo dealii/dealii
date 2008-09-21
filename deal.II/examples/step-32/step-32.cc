@@ -428,43 +428,72 @@ template <int dim>
 std::pair<double,double>
 BoussinesqFlowProblem<dim>::get_extrapolated_temperature_range () const
 {
-  QGauss<dim>   quadrature_formula(temperature_degree+2);
-  const unsigned int   n_q_points = quadrature_formula.size();
+  const QGauss<dim>  quadrature_formula(temperature_degree+2);
+  const unsigned int n_q_points = quadrature_formula.size();
 
   FEValues<dim> fe_values (temperature_fe, quadrature_formula,
                            update_values);
   std::vector<double> old_temperature_values(n_q_points);
   std::vector<double> old_old_temperature_values(n_q_points);
 
-  double min_temperature = (1. + time_step/old_time_step) *
-			   old_temperature_solution.linfty_norm()
-			   +
-			   time_step/old_time_step *
-			   old_old_temperature_solution.linfty_norm(),
-         max_temperature = -min_temperature;
+  if (timestep_number != 0)
+    {
+      double min_temperature = (1. + time_step/old_time_step) *
+			       old_temperature_solution.linfty_norm()
+			       +
+			       time_step/old_time_step *
+			       old_old_temperature_solution.linfty_norm(),
+	     max_temperature = -min_temperature;
 
-  typename DoFHandler<dim>::active_cell_iterator
-    cell = temperature_dof_handler.begin_active(),
-    endc = temperature_dof_handler.end();
-  for (; cell!=endc; ++cell)
-    if (cell->subdomain_id() == (unsigned int)trilinos_communicator.MyPID())
-      {
-	fe_values.reinit (cell);
-	fe_values.get_function_values (old_temperature_solution, old_temperature_values);
-	fe_values.get_function_values (old_old_temperature_solution, old_old_temperature_values);
+      typename DoFHandler<dim>::active_cell_iterator
+	cell = temperature_dof_handler.begin_active(),
+	endc = temperature_dof_handler.end();
+      for (; cell!=endc; ++cell)
+	{
+	  fe_values.reinit (cell);
+	  fe_values.get_function_values (old_temperature_solution,
+					 old_temperature_values);
+	  fe_values.get_function_values (old_old_temperature_solution,
+					 old_old_temperature_values);
 
-	for (unsigned int q=0; q<n_q_points; ++q)
-	  {
-	    const double temperature = 
-	      (1. + time_step/old_time_step) * old_temperature_values[q]-
-	      time_step/old_time_step * old_old_temperature_values[q];
+	  for (unsigned int q=0; q<n_q_points; ++q)
+	    {
+	      const double temperature = 
+		(1. + time_step/old_time_step) * old_temperature_values[q]-
+		time_step/old_time_step * old_old_temperature_values[q];
 
-	    min_temperature = std::min (min_temperature, temperature);
-	    max_temperature = std::max (max_temperature, temperature);
-	  }
-      }
+	      min_temperature = std::min (min_temperature, temperature);
+	      max_temperature = std::max (max_temperature, temperature);
+	    }
+	}
 
-  return std::make_pair(min_temperature, max_temperature);
+      return std::make_pair(min_temperature, max_temperature);
+    }
+  else
+    {
+      double min_temperature = old_temperature_solution.linfty_norm(),
+	     max_temperature = -min_temperature;
+
+      typename DoFHandler<dim>::active_cell_iterator
+	cell = temperature_dof_handler.begin_active(),
+	endc = temperature_dof_handler.end();
+      for (; cell!=endc; ++cell)
+	{
+	  fe_values.reinit (cell);
+	  fe_values.get_function_values (old_temperature_solution,
+					 old_temperature_values);
+
+	  for (unsigned int q=0; q<n_q_points; ++q)
+	    {
+	      const double temperature = old_temperature_values[q];
+
+	      min_temperature = std::min (min_temperature, temperature);
+	      max_temperature = std::max (max_temperature, temperature);
+	    }
+	}
+  
+      return std::make_pair(min_temperature, max_temperature);
+    }    
 }
 
 
@@ -1442,7 +1471,9 @@ void BoussinesqFlowProblem<dim>::run ()
 			EquationData::TemperatureInitialValues<dim>(),
 			old_temperature_solution);
   
-  timestep_number = 0;
+  timestep_number           = 0;
+  time_step = old_time_step = 0;
+
   double time = 0;
 
   do

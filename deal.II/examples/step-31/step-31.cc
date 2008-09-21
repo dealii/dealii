@@ -79,13 +79,12 @@ using namespace dealii;
 
 				 // @sect3{Equation data}
 
-				 // Again, the next stage in the program
-				 // is the definition of the equation 
-				 // data, that is, the various
-				 // boundary conditions, the right hand
-				 // side and the initial condition (remember
-				 // that we're about to solve a time-
-				 // dependent system). The basic strategy
+				 // Again, the next stage in the program is
+				 // the definition of the equation data, that
+				 // is, the various boundary conditions, the
+				 // right hand sides and the initial condition
+				 // (remember that we're about to solve a
+				 // time-dependent system). The basic strategy
 				 // for this definition is the same as in
 				 // step-22. Regarding the details, though,
 				 // there are some differences.
@@ -96,27 +95,52 @@ using namespace dealii;
 				 // introduction we will use no-flux
 				 // conditions
 				 // $\mathbf{n}\cdot\mathbf{u}=0$. So what is
-				 // left are two conditions for pressure
-				 // <i>p</i> and temperature <i>T</i>.
-
-				 // Secondly, we set an initial
-				 // condition for all problem variables,
-				 // i.e., for <b>u</b>, <i>p</i> and <i>T</i>,
-				 // so the function has <i>dim+2</i>
-				 // components.
-				 // In this case, we choose a very simple
-				 // test case, where everything is zero.
-
-				 // @sect4{Boundary values}
+				 // left are <code>dim-1</code> conditions for
+				 // the tangential part of the normal
+				 // component of the stress tensor,
+				 // $\textbf{n} \cdot [p \textbf{1} -
+				 // \eta\varepsilon(\textbf{u})]$; we assume
+				 // homogenous values for these components,
+				 // i.e. a natural boundary condition that
+				 // requires no specific action (it appears as
+				 // a zero term in the right hand side of the
+				 // weak form).
+				 //
+				 // For the temperature <i>T</i>, we assume no
+				 // thermal energy flux, i.e. $\mathbf{n}
+				 // \cdot \kappa \nabla T=0$. This, again, is
+				 // a boundary condition that does not require
+				 // us to do anything in particular.
+				 //
+				 // Secondly, we have to set initial
+				 // conditions for the temperature (no initial
+				 // conditions are required for the velocity
+				 // and pressure, since the Stokes equations
+				 // for the quasi-stationary case we consider
+				 // here have time derivatives of the velocity
+				 // or pressure). Here, we choose a very
+				 // simple test case, where the initial
+				 // temperature is zero, and all dynamics are
+				 // driven by the temperature right hand side.
+				 //
+				 // Thirdly, we need to define this right hand
+				 // side of the temperature equation. We
+				 // choose it to be constant within three
+				 // circles (or spheres in 3d) somewhere at
+				 // the bottom of the domain, as explained in
+				 // the introduction, and zero outside.
+				 // 
+				 // Finally, or maybe firstly, at the top of
+				 // this namespace, we define the various
+				 // material constants we need ($\eta,\kappa$
+				 // and the Rayleigh number $Ra$):
 namespace EquationData
 {
-				   // define viscosity
   const double eta = 1;
   const double kappa = 1e-6;
   const double Rayleigh_number = 10;
 
 
-				   // @sect4{Initial values}
   template <int dim>
   class TemperatureInitialValues : public Function<dim>
   {
@@ -150,20 +174,6 @@ namespace EquationData
   }
 
 
-
-				   // @sect4{Right hand side}
-				   // 
-				   // The last definition of this kind
-				   // is the one for the right hand
-				   // side function. Again, the content
-				   // of the function is very
-				   // basic and zero in most of the
-				   // components, except for a source
-				   // of temperature in some isolated
-				   // regions near the bottom of the
-				   // computational domain, as is explained
-				   // in the problem description in the
-				   // introduction.
   template <int dim>
   class TemperatureRightHandSide : public Function<dim>
   {
@@ -216,16 +226,19 @@ namespace EquationData
 
 				   // @sect3{Linear solvers and preconditioners}
 
-				   // This section introduces some
-				   // objects that are used for the
-				   // solution of the linear equations of
-				   // Stokes system that we need to
-				   // solve in each time step. The basic
-				   // structure is still the same as
-				   // in step-20, where Schur complement
-				   // based preconditioners and solvers
-				   // have been introduced, with the 
-				   // actual interface taken from step-22.
+				   // This section introduces some objects
+				   // that are used for the solution of the
+				   // linear equations of the Stokes system
+				   // that we need to solve in each time
+				   // step. The basic structure is still the
+				   // same as in step-20, where Schur
+				   // complement based preconditioners and
+				   // solvers have been introduced, with the
+				   // actual interface taken from step-22 (in
+				   // particular the discussion in the
+				   // "Results" section of step-22, in which
+				   // we introduce alternatives to the direct
+				   // Schur complement approach).
 namespace LinearSolvers
 {
 
@@ -262,8 +275,9 @@ namespace LinearSolvers
 
 
   template <class Matrix, class Preconditioner>
-  InverseMatrix<Matrix,Preconditioner>::InverseMatrix (const Matrix &m,
-						       const Preconditioner &preconditioner)
+  InverseMatrix<Matrix,Preconditioner>::
+  InverseMatrix (const Matrix &m,
+		 const Preconditioner &preconditioner)
 		  :
 		  matrix (&m),
 		  preconditioner (preconditioner)
@@ -272,9 +286,10 @@ namespace LinearSolvers
 
 
   template <class Matrix, class Preconditioner>
-  void InverseMatrix<Matrix,Preconditioner>::vmult (
-				TrilinosWrappers::Vector       &dst,
-				const TrilinosWrappers::Vector &src) const
+  void
+  InverseMatrix<Matrix,Preconditioner>::
+  vmult (TrilinosWrappers::Vector       &dst,
+	 const TrilinosWrappers::Vector &src) const
   {
     SolverControl solver_control (src.size(), 1e-6*src.l2_norm());
     SolverCG<TrilinosWrappers::Vector> cg (solver_control);
@@ -358,11 +373,11 @@ namespace LinearSolvers
 				   // only two distinct eigenvalues.
 				   // Such a preconditioner for the
 				   // blocked Stokes system has been 
-				   // proposed by Silvester and Wathen,
-				   // Fast iterative solution of 
+				   // proposed by Silvester and Wathen
+				   // ("Fast iterative solution of 
 				   // stabilised Stokes systems part II. 
-				   // Using general block preconditioners.
-				   // (SIAM J. Numer. Anal., 31 (1994),
+				   // Using general block preconditioners",
+				   // SIAM J. Numer. Anal., 31 (1994),
 				   // pp. 1352-1367).
 				   // 
 				   // The deal.II users who have already
@@ -382,12 +397,13 @@ namespace LinearSolvers
 				   // functions further below in the
 				   // program code.
 				   // 
-				   // First the declarations. These
-				   // are similar to the definition of
-				   // the Schur complement in step-20,
-				   // with the difference that we need
-				   // some more preconditioners in
-				   // the constructor.
+				   // First the declarations. These are
+				   // similar to the definition of the Schur
+				   // complement in step-20, with the
+				   // difference that we need some more
+				   // preconditioners in the constructor and
+				   // that the matrices we use here are built
+				   // upon Trilinos:
   template <class PreconditionerA, class PreconditionerMp>
   class BlockSchurPreconditioner : public Subscriptor
   {
@@ -425,25 +441,23 @@ namespace LinearSolvers
   {}
 
 
-				   // This is the <code>vmult</code>
-				   // function. We implement
-				   // the action of $P^{-1}$ as described
-				   // above in three successive steps.
-				   // The first step multiplies
-				   // the velocity vector by a 
-				   // preconditioner of the matrix <i>A</i>.
-				   // The resuling velocity vector
-				   // is then multiplied by $B$ and
-				   // subtracted from the pressure.
-				   // This second step only acts on 
-				   // the pressure vector and is 
+				   // Next is the <code>vmult</code>
+				   // function. We implement the action of
+				   // $P^{-1}$ as described above in three
+				   // successive steps.  The first step
+				   // multiplies the velocity part of the
+				   // vector by a preconditioner of the matrix
+				   // <i>A</i>.  The resuling velocity vector
+				   // is then multiplied by $B$ and subtracted
+				   // from the pressure.  This second step
+				   // only acts on the pressure vector and is
 				   // accomplished by the command
-				   // SparseMatrix::residual. Next, 
-				   // we change the sign in the 
-				   // temporary pressure vector and
-				   // finally multiply by the pressure
-				   // mass matrix to get the final
-				   // pressure vector.
+				   // SparseMatrix::residual. Next, we change
+				   // the sign in the temporary pressure
+				   // vector and finally multiply by the
+				   // pressure mass matrix to get the final
+				   // pressure vector, completing our work on
+				   // the Stokes preconditioner:
   template <class PreconditionerA, class PreconditionerMp>
   void BlockSchurPreconditioner<PreconditionerA, PreconditionerMp>::vmult (
     TrilinosWrappers::BlockVector       &dst,
@@ -460,19 +474,38 @@ namespace LinearSolvers
 
 				 // @sect3{The <code>BoussinesqFlowProblem</code> class template}
 
-				 // The definition of this class is
+				 // The definition of the class that defines
+				 // the top-level logic of solving the
+				 // time-dependent Boussinesq problem is
 				 // mainly based on the step-22 tutorial
-				 // program. Most of the data types are
-				 // the same as there. However, we
-				 // deal with a time-dependent system now,
-				 // and there is temperature to take care
-				 // of as well, so we need some additional
-				 // function and variable declarations.
-				 // Furthermore, we have a slightly more
-				 // sophisticated solver we are going to
-				 // use, so there is a second pointer
-				 // to a sparse ILU for a pressure
-				 // mass matrix as well.
+				 // program. The main differences are that now
+				 // we also have to solve for the temperature
+				 // equation, which forces us to have a second
+				 // DoFHandler object for the temperature
+				 // variable as well as matrices, right hand
+				 // sides, and solution vectors for the
+				 // current and previous time steps. As
+				 // mentioned in the introduction, all linear
+				 // algebra objects are going to use wrappers
+				 // of the corresponding Trilinos
+				 // functionality.
+				 //
+				 // The member functions of this class are
+				 // reminiscent of step-21, where we also used
+				 // a staggered scheme that first solves the
+				 // flow equations (here the Stokes equations,
+				 // in step-21 Darcy flow) and then updates
+				 // the advected quantity (here the
+				 // temperature, there the saturation). The
+				 // functions that are new are mainly
+				 // concerned with determining the time step,
+				 // as well as the proper size of the
+				 // artificial viscosity stabilization.
+				 //
+				 // The last three variables indicate whether
+				 // the various matrices or preconditioners
+				 // need to be rebuilt the next time the
+				 // corresponding build functions are called.
 template <int dim>
 class BoussinesqFlowProblem
 {
@@ -557,18 +590,17 @@ class BoussinesqFlowProblem
 
 				 // @sect4{BoussinesqFlowProblem::BoussinesqFlowProblem}
 				 // 
-				 // The constructor of this class is
-				 // an extension of the constructor
-				 // in step-22. We need to include 
-				 // the temperature in the definition
-				 // of the finite element. As discussed
-				 // in the introduction, we are going 
-				 // to use discontinuous elements 
-				 // of one degree less than for pressure
-				 // there. Moreover, we initialize
-				 // the time stepping as well as the
-				 // options for the matrix assembly 
-				 // and preconditioning.
+				 // The constructor of this class is an
+				 // extension of the constructor in
+				 // step-22. We need to add the various
+				 // variables that concern the temperature. As
+				 // discussed in the introduction, we are
+				 // going to use $Q_2\times Q_1$ (Taylor-Hood)
+				 // elements again for the Stokes part, and
+				 // $Q_2$ elements for the
+				 // temperature. Moreover, we initialize the
+				 // time stepping as well as the options for
+				 // matrix assembly and preconditioning:
 template <int dim>
 BoussinesqFlowProblem<dim>::BoussinesqFlowProblem ()
                 :
@@ -594,6 +626,13 @@ BoussinesqFlowProblem<dim>::BoussinesqFlowProblem ()
 
 
 				 // @sect4{BoussinesqFlowProblem::get_maximal_velocity}
+
+				 // Starting the real functionality of this
+				 // class is a helper function that determines
+				 // the maximum velocity in the domain (at the
+				 // quadrature points, in fact). It should be
+				 // relatively obvious to all who have gotten
+				 // to this point:
 template <int dim>
 double BoussinesqFlowProblem<dim>::get_maximal_velocity () const
 {
@@ -630,46 +669,125 @@ double BoussinesqFlowProblem<dim>::get_maximal_velocity () const
 
 
 				 // @sect4{BoussinesqFlowProblem::get_extrapolated_temperature_range}
+
+				 // Next a function that determines the
+				 // minimum and maximum temperature at
+				 // quadrature points inside $\Omega$ when
+				 // extrapolated from the two previous time
+				 // steps to the current one. We need this
+				 // information in the computation of the
+				 // artificial viscosity parameter $\nu$ as
+				 // discussed in the introduction.
+				 //
+				 // The formula for the extrapolated
+				 // temperature is
+				 // $\left(1+\frac{k_n}{\frac{k_{n-1}}
+				 // \right)T^{n-1} + \frac{k_n}{\frac{k_{n-1}}
+				 // T^{n-2}$. The way to compute it is to loop
+				 // over all quadrature points and updated the
+				 // maximum and minimum value if the current
+				 // value is bigger/smaller than the previous
+				 // one. We initialize the variables that
+				 // store the max and min before the loop over
+				 // all quadrature points by bounding
+				 // $\left(1+\frac{k_n}{\frac{k_{n-1}}
+				 // \right)T^{n-1}({\mathbf x}_s) +
+				 // \frac{k_n}{\frac{k_{n-1}} T^{n-2}({\mathbf
+				 // x}_s) \le \max_{{\mathbf
+				 // x}_s}\left(1+\frac{k_n}{\frac{k_{n-1}}
+				 // \right)T^{n-1}({\mathbf x}_s) +
+				 // \frac{k_n}{\frac{k_{n-1}} T^{n-2}({\mathbf
+				 // x}_s)$, where ${\mathbf x}_s$ is the set
+				 // of the support points (i.e. nodal points,
+				 // but note that the maximum of a finite
+				 // element function can be attained at a
+				 // point that's not a support point unless
+				 // one is using $Q_1$ elements). So if we
+				 // initialize the minimal value by this upper
+				 // bound, and the maximum value by the
+				 // negative of this upper bound, then we know
+				 // for a fact that it is larger/smaller than
+				 // the minimum/maximum and that the loop over
+				 // all quadrature points is ultimately going
+				 // to update the initial value with the
+				 // correct one.
+				 //
+				 // The only other complication worth
+				 // mentioning here is that in the first time
+				 // step, $T^{k-2}$ is not yet available of
+				 // course. In that case, we can only use
+				 // $T^{k-1}$ which we have from the initial
+				 // temperature.
 template <int dim>
 std::pair<double,double>
 BoussinesqFlowProblem<dim>::get_extrapolated_temperature_range () const
 {
-  QGauss<dim>   quadrature_formula(temperature_degree+2);
-  const unsigned int   n_q_points = quadrature_formula.size();
+  const QGauss<dim>  quadrature_formula(temperature_degree+2);
+  const unsigned int n_q_points = quadrature_formula.size();
 
   FEValues<dim> fe_values (temperature_fe, quadrature_formula,
                            update_values);
   std::vector<double> old_temperature_values(n_q_points);
   std::vector<double> old_old_temperature_values(n_q_points);
-  
-  double min_temperature = (1. + time_step/old_time_step) *
-			   old_temperature_solution.linfty_norm()
-			   +
-			   time_step/old_time_step *
-			   old_old_temperature_solution.linfty_norm(),
-	 max_temperature = -min_temperature;
 
-  typename DoFHandler<dim>::active_cell_iterator
-    cell = temperature_dof_handler.begin_active(),
-    endc = temperature_dof_handler.end();
-  for (; cell!=endc; ++cell)
+  if (timestep_number != 0)
     {
-      fe_values.reinit (cell);
-      fe_values.get_function_values (old_temperature_solution, old_temperature_values);
-      fe_values.get_function_values (old_old_temperature_solution, old_old_temperature_values);
+      double min_temperature = (1. + time_step/old_time_step) *
+			       old_temperature_solution.linfty_norm()
+			       +
+			       time_step/old_time_step *
+			       old_old_temperature_solution.linfty_norm(),
+	     max_temperature = -min_temperature;
 
-      for (unsigned int q=0; q<n_q_points; ++q)
-        {
-          const double temperature = 
-	    (1. + time_step/old_time_step) * old_temperature_values[q]-
-	    time_step/old_time_step * old_old_temperature_values[q];
+      typename DoFHandler<dim>::active_cell_iterator
+	cell = temperature_dof_handler.begin_active(),
+	endc = temperature_dof_handler.end();
+      for (; cell!=endc; ++cell)
+	{
+	  fe_values.reinit (cell);
+	  fe_values.get_function_values (old_temperature_solution,
+					 old_temperature_values);
+	  fe_values.get_function_values (old_old_temperature_solution,
+					 old_old_temperature_values);
 
-          min_temperature = std::min (min_temperature, temperature);
-	  max_temperature = std::max (max_temperature, temperature);
-        }
+	  for (unsigned int q=0; q<n_q_points; ++q)
+	    {
+	      const double temperature = 
+		(1. + time_step/old_time_step) * old_temperature_values[q]-
+		time_step/old_time_step * old_old_temperature_values[q];
+
+	      min_temperature = std::min (min_temperature, temperature);
+	      max_temperature = std::max (max_temperature, temperature);
+	    }
+	}
+
+      return std::make_pair(min_temperature, max_temperature);
     }
+  else
+    {
+      double min_temperature = old_temperature_solution.linfty_norm(),
+	     max_temperature = -min_temperature;
 
-  return std::make_pair(min_temperature, max_temperature);
+      typename DoFHandler<dim>::active_cell_iterator
+	cell = temperature_dof_handler.begin_active(),
+	endc = temperature_dof_handler.end();
+      for (; cell!=endc; ++cell)
+	{
+	  fe_values.reinit (cell);
+	  fe_values.get_function_values (old_temperature_solution,
+					 old_temperature_values);
+
+	  for (unsigned int q=0; q<n_q_points; ++q)
+	    {
+	      const double temperature = old_temperature_values[q];
+
+	      min_temperature = std::min (min_temperature, temperature);
+	      max_temperature = std::max (max_temperature, temperature);
+	    }
+	}
+  
+      return std::make_pair(min_temperature, max_temperature);
+    }    
 }
 
 
@@ -1949,7 +2067,7 @@ void BoussinesqFlowProblem<dim>::run ()
 
   setup_dofs();
 
-  unsigned int       pre_refinement_step    = 0;
+  unsigned int pre_refinement_step = 0;
   
   start_time_iteration:
 
@@ -1959,7 +2077,9 @@ void BoussinesqFlowProblem<dim>::run ()
 			EquationData::TemperatureInitialValues<dim>(),
 			old_temperature_solution);
   
-  timestep_number = 0;
+  timestep_number           = 0;
+  time_step = old_time_step = 0;
+  
   double time = 0;
 
   do
