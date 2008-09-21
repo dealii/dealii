@@ -249,8 +249,8 @@ possibilities for imposing boundary conditions:
     boundary, i.e. the tangential component $\textbf u_{\textbf t}=(\textbf
     1-\textbf n\otimes\textbf n)\textbf u$ be zero, thereby constraining
     <code>dim</code>-1 components of the velocity. The remaining component can
-    be constrained by requiring that the normal stress be zero, yielding the
-    following set of boundary conditions:
+    be constrained by requiring that the normal component of the normal 
+    stress be zero, yielding the following set of boundary conditions:
     @f{eqnarray*}
       \textbf u_{\textbf t} &=& 0,
       \\
