@@ -13,29 +13,22 @@
 
 				 // @sect3{Include files}
 
-				 // We include the functionality
-				 // of these well-known deal.II
-				 // library files and some C++
-				 // header files.
+				 // The first step, as always, is to include
+				 // the functionality of these well-known
+				 // deal.II library files and some C++ header
+				 // files.
 #include <base/quadrature_lib.h>
 #include <base/logstream.h>
-#include <base/function.h>
 #include <base/utilities.h>
 
 #include <lac/full_matrix.h>
 #include <lac/solver_gmres.h>
 #include <lac/solver_cg.h>
-#include <lac/trilinos_block_vector.h>
-#include <lac/trilinos_sparse_matrix.h>
-#include <lac/trilinos_block_sparse_matrix.h>
-#include <lac/trilinos_precondition.h>
-#include <lac/trilinos_precondition_amg.h>
 
 #include <grid/tria.h>
 #include <grid/grid_generator.h>
 #include <grid/tria_accessor.h>
 #include <grid/tria_iterator.h>
-#include <grid/tria_boundary_lib.h>
 #include <grid/grid_tools.h>
 #include <grid/grid_refinement.h>
 
@@ -48,27 +41,39 @@
 #include <fe/fe_q.h>
 #include <fe/fe_system.h>
 #include <fe/fe_values.h>
-#include <fe/mapping_q1.h>
 
 #include <numerics/vectors.h>
-#include <numerics/matrices.h>
 #include <numerics/data_out.h>
 #include <numerics/error_estimator.h>
 #include <numerics/solution_transfer.h>
 
-#ifdef DEAL_II_COMPILER_SUPPORTS_MPI
-#  include <Epetra_MpiComm.h>
-#else
-#  include <Epetra_SerialComm.h>
-#endif
-#include <Epetra_Map.h>
+				 // Then we need to include some header files
+				 // that provide vector, matrix, and
+				 // preconditioner classes that implement
+				 // interfaces to the respective Trilinos
+				 // classes. In particular, we will need
+				 // interfaces to the matrix and vector
+				 // classes based on Trilinos as well as
+				 // generic preconditioners and the Trilinos
+				 // Algebraic Multigrid (AMG) preconditioner
+				 // that we will use for the $A$ block of the
+				 // Stokes matrix:
+#include <lac/trilinos_block_vector.h>
+#include <lac/trilinos_sparse_matrix.h>
+#include <lac/trilinos_block_sparse_matrix.h>
+#include <lac/trilinos_precondition.h>
+#include <lac/trilinos_precondition_amg.h>
 
+				 // Finally, here are two C++ headers that
+				 // haven't been included yet by one of the
+				 // aforelisted header files:
 #include <fstream>
 #include <sstream>
 
 
-				 // Next, we import all deal.II
-				 // names into global namespace
+				 // At the end of this top-matter, we import
+				 // all deal.II names into the global
+				 // namespace:
 using namespace dealii;
 
 
@@ -527,12 +532,6 @@ class BoussinesqFlowProblem
 		      const double                        old_time_step);
 
 
-#ifdef DEAL_II_COMPILER_SUPPORTS_MPI
-    Epetra_MpiComm                      trilinos_communicator;
-#else
-    Epetra_SerialComm                   trilinos_communicator;
-#endif
-
     Triangulation<dim>                  triangulation;
 
     const unsigned int                  stokes_degree;
@@ -540,7 +539,7 @@ class BoussinesqFlowProblem
     DoFHandler<dim>                     stokes_dof_handler;
     ConstraintMatrix                    stokes_constraints;
 
-    std::vector<Epetra_Map>             stokes_partitioner;
+    std::vector<unsigned int>           stokes_block_sizes;
     TrilinosWrappers::BlockSparseMatrix stokes_matrix;
     TrilinosWrappers::BlockSparseMatrix stokes_preconditioner_matrix;
 
@@ -553,7 +552,6 @@ class BoussinesqFlowProblem
     DoFHandler<dim>                     temperature_dof_handler;
     ConstraintMatrix                    temperature_constraints;
 
-    Epetra_Map                          temperature_partitioner;
     TrilinosWrappers::SparseMatrix      temperature_mass_matrix;
     TrilinosWrappers::SparseMatrix      temperature_stiffness_matrix;
     TrilinosWrappers::SparseMatrix      temperature_matrix;
@@ -596,9 +594,6 @@ class BoussinesqFlowProblem
 template <int dim>
 BoussinesqFlowProblem<dim>::BoussinesqFlowProblem ()
                 :
-#ifdef DEAL_II_COMPILER_SUPPORTS_MPI
-		trilinos_communicator (MPI_COMM_WORLD),
-#endif
 		triangulation (Triangulation<dim>::maximum_smoothing),
 
                 stokes_degree (1),
@@ -609,8 +604,6 @@ BoussinesqFlowProblem<dim>::BoussinesqFlowProblem ()
 		temperature_degree (2),
 		temperature_fe (temperature_degree),
                 temperature_dof_handler (triangulation),
-
-		temperature_partitioner (0, 0, trilinos_communicator),
 
                 time_step (0),
 		old_time_step (0),
@@ -920,13 +913,9 @@ void BoussinesqFlowProblem<dim>::setup_dofs ()
 				 // need to reassign the 
 				 // system matrix structure to
 				 // the sparsity pattern.
-  stokes_partitioner.clear();
-  {
-    Epetra_Map map_u(n_u, 0, trilinos_communicator);
-    stokes_partitioner.push_back (map_u);
-    Epetra_Map map_p(n_p, 0, trilinos_communicator);
-    stokes_partitioner.push_back (map_p);
-  }
+  stokes_block_sizes.resize (2);
+  stokes_block_sizes[0] = n_u;
+  stokes_block_sizes[1] = n_p;
   {
     stokes_matrix.clear ();
 
@@ -960,7 +949,7 @@ void BoussinesqFlowProblem<dim>::setup_dofs ()
     BlockSparsityPattern stokes_sparsity_pattern;    
     stokes_sparsity_pattern.copy_from (csp);
 
-    stokes_matrix.reinit (stokes_partitioner, stokes_sparsity_pattern);
+    stokes_matrix.reinit (stokes_sparsity_pattern);
     stokes_matrix.collect_sizes();
   }
 
@@ -992,12 +981,10 @@ void BoussinesqFlowProblem<dim>::setup_dofs ()
     BlockSparsityPattern stokes_preconditioner_sparsity_pattern;
     stokes_preconditioner_sparsity_pattern.copy_from (csp);
 
-    stokes_preconditioner_matrix.reinit (stokes_partitioner,
-					 stokes_preconditioner_sparsity_pattern);
+    stokes_preconditioner_matrix.reinit (stokes_preconditioner_sparsity_pattern);
     stokes_preconditioner_matrix.collect_sizes();
   }
 
-  temperature_partitioner = Epetra_Map (n_T, 0, trilinos_communicator);
   {
     temperature_mass_matrix.clear ();
     temperature_stiffness_matrix.clear ();
@@ -1010,12 +997,9 @@ void BoussinesqFlowProblem<dim>::setup_dofs ()
     SparsityPattern temperature_sparsity_pattern;
     temperature_sparsity_pattern.copy_from (csp);
 
-    temperature_matrix.reinit (temperature_partitioner,
-			       temperature_sparsity_pattern);
-    temperature_mass_matrix.reinit (temperature_partitioner,
-				    temperature_sparsity_pattern);
-    temperature_stiffness_matrix.reinit (temperature_partitioner,
-					 temperature_sparsity_pattern);
+    temperature_matrix.reinit (temperature_sparsity_pattern);
+    temperature_mass_matrix.reinit (temperature_sparsity_pattern);
+    temperature_stiffness_matrix.reinit (temperature_sparsity_pattern);
   }
 
 				   // As last action in this function,
@@ -1027,14 +1011,14 @@ void BoussinesqFlowProblem<dim>::setup_dofs ()
 				   // three-block structure given
 				   // by velocity, pressure and
 				   // temperature.
-  stokes_solution.reinit (stokes_partitioner);
-  stokes_rhs.reinit (stokes_partitioner);
+  stokes_solution.reinit (stokes_block_sizes);
+  stokes_rhs.reinit (stokes_block_sizes);
 
-  temperature_solution.reinit (temperature_partitioner);
-  old_temperature_solution.reinit (temperature_partitioner);
-  old_old_temperature_solution.reinit (temperature_partitioner);
+  temperature_solution.reinit (temperature_dof_handler.n_dofs());
+  old_temperature_solution.reinit (temperature_dof_handler.n_dofs());
+  old_old_temperature_solution.reinit (temperature_dof_handler.n_dofs());
 
-  temperature_rhs.reinit (temperature_partitioner);
+  temperature_rhs.reinit (temperature_dof_handler.n_dofs());
 }
 
 
