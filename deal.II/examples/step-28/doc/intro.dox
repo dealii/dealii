@@ -280,9 +280,9 @@ and Babuska which approximates the error per cell by integrating the jump of
 the gradient of the solution along the faces of each cell. Using this, we
 obtain indicators
 @f{eqnarray*}
-\eta_{g,K}, \qquad g=1,2,\ldots,G,\qquad K\in{\mathbb T}_g,
+\eta_{g,K}, \qquad g=1,2,\ldots,G,\qquad K\in{\cal T}_g,
 @f}
-where ${\mathbb T}_g$ is the triangulation used in the solution of
+where ${\cal T}_g$ is the triangulation used in the solution of
 $\phi_g$. The question is what to do with this. For one, it is clear that
 refining only those cells with the highest error indicators might lead to bad
 results. To understand this, it is important to realize that $\eta_{g,K}$
@@ -306,7 +306,7 @@ whose errors satisfy
   \frac{\eta_{g,K}}{\|\phi_g\|_\infty}
   >
   \alpha_1
-  \displaystyle{\max_{{1\le g\le G \atop K\in {\mathbb T}_g}}
+  \displaystyle{\max_{{1\le g\le G \atop K\in {\cal T}_g}}
     \frac{\eta_{g,K}}{\|\phi_g\|_\infty}}
 @f}
 and coarsen the cells where
@@ -314,14 +314,14 @@ and coarsen the cells where
   \frac{\eta_{g,K}}{\|\phi_g\|_\infty}
   <
   \alpha_2
-  \displaystyle{\max_{{1\le g\le G \choose K\in {\mathbb T}_g}}
+  \displaystyle{\max_{{1\le g\le G \choose K\in {\cal T}_g}}
     \frac{\eta_{g,K}}{\|\phi_g\|_\infty}}.
 @f}
 We chose $\alpha_1=0.3$ and $\alpha_2=0.01$ in the code. Note that this will,
 of course, lead to different meshes for the different energy groups.
 
 The strategy above essentially means the following: If for energy group $g$
-there are many cells $K\in {\mathbb T}_g$ on which the error is large, for
+there are many cells $K\in {\cal T}_g$ on which the error is large, for
 example because the solution is globally very rough, then many cells will be
 above the threshold. On the other hand, if there are a few cells with large
 and many with small errors, for example because the solution is overall rather
@@ -360,16 +360,16 @@ functions may not be defined on these cells.
 
 The solution to this problem lies in the fact that both the meshes for $g$ and
 $g'$ are derived by adaptive refinement from a common coarse mesh. We can
-therefore always find a set of cells, which we denote by ${\mathbb T}_g \cap
-{\mathbb T}_{g'}$, that satisfy the following conditions:
+therefore always find a set of cells, which we denote by ${\cal T}_g \cap
+{\cal T}_{g'}$, that satisfy the following conditions:
 <ul>
 <li> the union of the cells covers the entire domain, and
-<li> a cell $K \in {\mathbb T}_g \cap {\mathbb T}_{g'}$ is active on at least
+<li> a cell $K \in {\cal T}_g \cap {\cal T}_{g'}$ is active on at least
   one of the two meshes.
 </ul>
 A way to construct this set is to take each cell of coarse mesh and do the
-following steps: (i) if the cell is active on either ${\mathbb T}_g$ or
-${\mathbb T}_{g'}$, then add this cell to the set; (ii) otherwise, i.e. if
+following steps: (i) if the cell is active on either ${\cal T}_g$ or
+${\cal T}_{g'}$, then add this cell to the set; (ii) otherwise, i.e. if
 this cell has children on both meshes, then do step (i) for each of the
 children of this cell. In fact, deal.II has a function
 GridTools::get_finest_common_cells that computes exactly this set
@@ -379,7 +379,7 @@ With this, we can write above integral as follows:
 @f{eqnarray*}
   F_i 
   = 
-  \sum_{K \in {\mathbb T}_g \cap {\mathbb T}_{g'}}
+  \sum_{K \in {\cal T}_g \cap {\cal T}_{g'}}
   \sum_j \left\{\int_K f(x) \varphi_g^i(x) \varphi_{g'}^j(x) 
   \ dx \right\} \phi_{g'}^j.
 @f}
