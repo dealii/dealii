@@ -786,7 +786,7 @@ for that.
 
 For example, by using the folllowing modification of the boundary values
 function
-<code>
+@code
 template <int dim>
 double
 BoundaryValues<dim>::value (const Point<dim>  &p,
@@ -801,10 +801,10 @@ BoundaryValues<dim>::value (const Point<dim>  &p,
     return (p[0] < x_offset ? -1 : (p[0] > x_offset ? 1 : 0));
   return 0;
 }
-</code>
+@endcode
 and the following way to generate the mesh as the domain
 $[-2,2]\times[-2,2]\times[-1,0]$ 
-<code>
+@code
     std::vector<unsigned int> subdivisions (dim, 1);
     subdivisions[0] = 4;
     subdivisions[1] = 4;
@@ -820,7 +820,7 @@ $[-2,2]\times[-2,2]\times[-1,0]$
                                                subdivisions,
                                                bottom_left,
                                                top_right);
-</code>
+@endcode
 then we get images where the the fault line is curved:
 <TABLE WIDTH="60%" ALIGN="center">
   <tr>
