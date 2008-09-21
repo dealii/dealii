@@ -2,7 +2,7 @@
 //    $Id$
 //    Version: $Name$
 //
-//    Copyright (C) 2004, 2005, 2006, 2007 by the deal.II authors
+//    Copyright (C) 2008 by the deal.II authors
 //
 //    This file is subject to QPL and may not be  distributed
 //    without copyright and license information. Please refer
@@ -541,6 +541,21 @@ namespace TrilinosWrappers
       void reinit (const std::vector<Epetra_Map> &input_maps,
 		   const bool                     fast = false);
 
+                                         /**
+                                          * Reinitialize the BlockVector to
+                                          * contain as many blocks as there
+                                          * are elements in the first
+                                          * argument, and with the respective
+                                          * sizes. Since no distribution map
+                                          * is given, all vectors are local
+                                          * vectors.
+                                          *
+                                          * If <tt>fast==false</tt>, the vector
+                                          * is filled with zeros.
+                                          */
+      void reinit (const std::vector<unsigned int> &N,
+		   const bool                       fast=false);
+      
                                          /**
                                           * Reinit the function
                                           * according to a distributed

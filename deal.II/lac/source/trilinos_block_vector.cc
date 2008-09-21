@@ -85,7 +85,7 @@ namespace TrilinosWrappers
     BlockVector::reinit (const std::vector<Epetra_Map> &input_maps,
 			 const bool                     fast)
     {
-      unsigned int no_blocks = input_maps.size();
+      const unsigned int no_blocks = input_maps.size();
       std::vector<unsigned int> block_sizes (no_blocks);
 
       for (unsigned int i=0; i<no_blocks; ++i)
@@ -192,6 +192,23 @@ namespace TrilinosWrappers
     collect_sizes();
   }
 
+
+
+  void
+  BlockVector::reinit (const std::vector<unsigned int> &block_sizes,
+		       const bool                       /*fast*/)
+  {
+    this->block_indices.reinit (block_sizes);
+    if (components.size() != n_blocks())
+      components.resize(n_blocks());
+
+    for (unsigned int i=0; i<n_blocks(); ++i)
+//TODO: use the 'fast' argument here...      
+      components[i].reinit(block_sizes[i]);
+
+    collect_sizes();      
+  }
+    
 
 
   void
