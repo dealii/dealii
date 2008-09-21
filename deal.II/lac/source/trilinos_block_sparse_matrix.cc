@@ -2,7 +2,7 @@
 //    $Id: trilinos_block_sparse_matrix.cc 15631 2008-01-17 23:47:31Z bangerth $
 //    Version: $Name$
 //
-//    Copyright (C) 2004, 2005, 2006, 2008 by the deal.II authors
+//    Copyright (C) 2008 by the deal.II authors
 //
 //    This file is subject to QPL and may not be  distributed
 //    without copyright and license information. Please refer
@@ -93,6 +93,13 @@ namespace TrilinosWrappers
   reinit (const std::vector<Epetra_Map> &input_maps,
 	  const BlockSparsityPattern    &block_sparsity_pattern)
   {
+    Assert (input_maps.size() == block_sparsity_pattern.n_block_rows(),
+	    ExcDimensionMismatch (input_maps.size(),
+				  block_sparsity_pattern.n_block_rows()));
+    Assert (input_maps.size() == block_sparsity_pattern.n_block_cols(),
+	    ExcDimensionMismatch (input_maps.size(),
+				  block_sparsity_pattern.n_block_cols()));
+    
     const unsigned int n_block_rows = input_maps.size();
 
     if (input_maps[0].Comm().MyPID()==0)
@@ -120,6 +127,38 @@ namespace TrilinosWrappers
     collect_sizes();
   }
 
+
+
+  void
+  BlockSparseMatrix::
+  reinit (const BlockSparsityPattern    &block_sparsity_pattern)
+  {
+    Assert (block_sparsity_pattern.n_block_rows() ==
+	    block_sparsity_pattern.n_block_cols(),
+	    ExcDimensionMismatch (block_sparsity_pattern.n_block_rows(),
+				  block_sparsity_pattern.n_block_cols()));
+    Assert (block_sparsity_pattern.n_rows() ==
+	    block_sparsity_pattern.n_cols(),
+	    ExcDimensionMismatch (block_sparsity_pattern.n_rows(),
+				  block_sparsity_pattern.n_cols()));
+    
+				     // produce a dummy local map and pass it
+				     // off to the other function
+#ifdef DEAL_II_COMPILER_SUPPORTS_MPI
+    Epetra_MpiComm    trilinos_communicator (MPI_COMM_WORLD);
+#else
+    Epetra_SerialComm trilinos_communicator;
+#endif
+
+    std::vector<Epetra_Map> input_maps;
+    for (unsigned int i=0; i<block_sparsity_pattern.n_block_rows(); ++i)
+      input_maps.push_back (Epetra_Map(block_sparsity_pattern.block(i,0).n_rows(),
+				       0,
+				       trilinos_communicator));
+
+    reinit (input_maps, block_sparsity_pattern);
+  }
+  
 
 
   void

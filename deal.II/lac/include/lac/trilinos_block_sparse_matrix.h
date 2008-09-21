@@ -2,7 +2,7 @@
 //    $Id$
 //    Version: $Name$
 //
-//    Copyright (C) 2004, 2005, 2006, 2007 by the deal.II authors
+//    Copyright (C) 2008 by the deal.II authors
 //
 //    This file is subject to QPL and may not be  distributed
 //    without copyright and license information. Please refer
@@ -182,6 +182,15 @@ namespace TrilinosWrappers
       void reinit (const std::vector<Epetra_Map> &input_maps,
 		   const BlockSparsityPattern    &block_sparsity_pattern);
 
+                                       /**
+                                        * Resize the matrix and initialize it
+                                        * by the given sparsity pattern. Since
+                                        * no distribution map is given, the
+                                        * result is a block matrix for which
+                                        * all elements are stored locally.
+                                        */
+      void reinit (const BlockSparsityPattern &block_sparsity_pattern);
+      
                                        /**
                                         * This function initializes the
 				        * Trilinos matrix using the deal.II
