@@ -259,6 +259,30 @@ possibilities for imposing boundary conditions:
       &=& 
       0.
     @f}
+
+    An alternative to this is when one wants the flow to be <i>parallel</i>
+    rather than perpendicular to the boundary (in deal.II, the
+    VectorTools::compute_no_normal_flux_constraints function can do this for
+    you). This is frequently the case for problems with a free boundary
+    (e.g. at the surface of a river or lake if vertical forces of the flow are
+    not large enough to actually deform the surface), or if no significant
+    friction is exerted by the boundary on the fluid (e.g. at the interface
+    between earth mantle and earth core where two fluids meet that are
+    stratified by different densities but that both have small enough
+    viscosities to not introduce much tangential stress on each other). 
+    In formulas, this means that 
+    @f{eqnarray*}
+      \textbf{n}\cdoy\textbf u &=& 0,
+      \\
+      (\textbf 1-\textbf n\otimes\textbf n)
+      \left(\textbf{n}\cdot [p \textbf{1} -
+      \varepsilon(\textbf{u})] \right)
+      &=& 
+      0,
+    @f}
+    the first condition (which needs to be imposed strongly) fixing a single
+    component of the velocity, with the second (which would be enforced in the
+    weak form) fixing the remaining two components.
 </ol>
 
 Despite this wealth of possibilities, we will only use Dirichlet and
