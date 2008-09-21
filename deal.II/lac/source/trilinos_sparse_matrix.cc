@@ -247,7 +247,7 @@ namespace TrilinosWrappers
     std::vector<int> n_entries_per_row(n_rows);
 
     for (unsigned int row=0; row<n_rows; ++row)
-      n_entries_per_row[(int)row] = sparsity_pattern.row_length(row);
+      n_entries_per_row[row] = sparsity_pattern.row_length(row);
 
 				  // TODO: There seems to be problem
 				  // in Epetra when a matrix is
