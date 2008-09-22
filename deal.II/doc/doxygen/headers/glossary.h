@@ -42,7 +42,14 @@
  * directional derivatives. Since the shape functions are linear
  * combinations of those, they constitute only a single block. The
  * primal function <i>u</i> would be in the second block, but in the
- * <tt>dim+1</tt>st component.  </dd>
+ * <tt>dim+1</tt>st component.
+ *
+ * In most cases, when you subdivide a matrix or vector into blocks, you do so
+ * by creating one block for each vector component. However, this is not
+ * always so, and the DoFRenumbering::component_wise function allows to group
+ * several vector components into the same block (see, for example, the @ref
+ * step_22 "step-22" or @ref step_31 "step-31" tutorial programs, as opposed
+ * to @ref step_20 "step-20").  </dd>
  *
  * <dt class="glossary">@anchor GlossComponent component</dt>
  *
