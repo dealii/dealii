@@ -681,8 +681,8 @@ double BoussinesqFlowProblem<dim>::get_maximal_velocity () const
 				 //
 				 // The formula for the extrapolated
 				 // temperature is
-				 // $\left(1+\frac{k_n}{\frac{k_{n-1}}
-				 // \right)T^{n-1} + \frac{k_n}{\frac{k_{n-1}}
+				 // $\left(1+\frac{k_n}{k_{n-1}}
+				 // \right)T^{n-1} + \frac{k_n}{k_{n-1}}
 				 // T^{n-2}$. The way to compute it is to loop
 				 // over all quadrature points and updated the
 				 // maximum and minimum value if the current
@@ -690,27 +690,27 @@ double BoussinesqFlowProblem<dim>::get_maximal_velocity () const
 				 // one. We initialize the variables that
 				 // store the max and min before the loop over
 				 // all quadrature points by bounding
-				 // $\left(1+\frac{k_n}{\frac{k_{n-1}}
+				 // $\left(1+\frac{k_n}{k_{n-1}}
 				 // \right)T^{n-1}({\mathbf x}_s) +
-				 // \frac{k_n}{\frac{k_{n-1}} T^{n-2}({\mathbf
-				 // x}_s) \le \max_{{\mathbf
-				 // x}_s}\left(1+\frac{k_n}{\frac{k_{n-1}}
-				 // \right)T^{n-1}({\mathbf x}_s) +
-				 // \frac{k_n}{\frac{k_{n-1}} T^{n-2}({\mathbf
-				 // x}_s)$, where ${\mathbf x}_s$ is the set
-				 // of the support points (i.e. nodal points,
-				 // but note that the maximum of a finite
-				 // element function can be attained at a
-				 // point that's not a support point unless
-				 // one is using $Q_1$ elements). So if we
-				 // initialize the minimal value by this upper
-				 // bound, and the maximum value by the
-				 // negative of this upper bound, then we know
-				 // for a fact that it is larger/smaller than
-				 // the minimum/maximum and that the loop over
-				 // all quadrature points is ultimately going
-				 // to update the initial value with the
-				 // correct one.
+				 // \frac{k_n}{k_{n-1}} T^{n-2}({\mathbf x}_s)
+				 // \le \max_{{\mathbf
+				 // x}'_s}\left(1+\frac{k_n}{k_{n-1}}
+				 // \right)T^{n-1}({\mathbf x}'_s) +
+				 // \max_{{\mathbf x}'_s} \frac{k_n}{k_{n-1}}
+				 // T^{n-2}({\mathbf x}'_s)$, where ${\mathbf
+				 // x}_s$ is the set of the support points
+				 // (i.e. nodal points, but note that the
+				 // maximum of a finite element function can
+				 // be attained at a point that's not a
+				 // support point unless one is using $Q_1$
+				 // elements). So if we initialize the minimal
+				 // value by this upper bound, and the maximum
+				 // value by the negative of this upper bound,
+				 // then we know for a fact that it is
+				 // larger/smaller than the minimum/maximum
+				 // and that the loop over all quadrature
+				 // points is ultimately going to update the
+				 // initial value with the correct one.
 				 //
 				 // The only other complication worth
 				 // mentioning here is that in the first time
@@ -792,22 +792,56 @@ BoussinesqFlowProblem<dim>::get_extrapolated_temperature_range () const
 
 
 
+				 // @sect4{BoussinesqFlowProblem::compute_viscosity}
+
+				 // The last of the tool functions computes
+				 // the artificial viscosity parameter
+				 // $\nu|_K$ on a cell $K$ as a function of
+				 // the extrapolated temperature, its
+				 // gradient, the velocity, the right hand
+				 // side $\gamma$ all on the quadrature points
+				 // of the current cell, and various other
+				 // parameters as described in detail in the
+				 // introduction.
+				 //
+				 // There are some universal constants worth
+				 // mentioning here. First, we need to fix
+				 // $\beta$; we choose $\beta=0.015\cdot dim$,
+				 // a choice discussed in detail in the
+				 // results section of this tutorial
+				 // program. The second is the exponent
+				 // $\alpha$; $\alpha=1$ appears to work fine
+				 // for the current program. Finally, there is
+				 // one thing that requires special casing: In
+				 // the first time step, the velocity equals
+				 // zero, and the formula for $\nu|_K$ is not
+				 // defined. In that case, we return
+				 // $\nu|_K=5\cdot 10^3 \cdot h_K$, a choice
+				 // admittedly more motivated by heuristics
+				 // than anything else (it is in the same
+				 // order of magnitude, however, as the value
+				 // returned for most cells on the second time
+				 // step).
+				 //
+				 // The rest of the function should be mostly
+				 // obvious based on the material discussed in
+				 // the introduction:
 template <int dim>
 double
 BoussinesqFlowProblem<dim>::
-compute_viscosity(const std::vector<double>          &old_temperature,
-		  const std::vector<double>          &old_old_temperature,
-		  const std::vector<Tensor<1,dim> >  &old_temperature_grads,
-		  const std::vector<Tensor<1,dim> >  &old_old_temperature_grads,
-		  const std::vector<Tensor<2,dim> >  &old_temperature_hessians,
-		  const std::vector<Tensor<2,dim> >  &old_old_temperature_hessians,
-		  const std::vector<Vector<double> > &present_stokes_values,
-		  const std::vector<double>          &gamma_values,
-		  const double                        global_u_infty,
-		  const double                        global_T_variation,
-		  const double                        global_Omega_diameter,
-		  const double                        cell_diameter,
-		  const double                        old_time_step)
+compute_viscosity (const std::vector<double>          &old_temperature,
+		   const std::vector<double>          &old_old_temperature,
+		   const std::vector<Tensor<1,dim> >  &old_temperature_grads,
+		   const std::vector<Tensor<1,dim> >  &old_old_temperature_grads,
+		   const std::vector<Tensor<2,dim> >  &old_temperature_hessians,
+		   const std::vector<Tensor<2,dim> >  &old_old_temperature_hessians,
+		   const std::vector<Vector<double> > &present_stokes_values,
+		   const std::vector<double>          &gamma_values,
+		   const double                        global_u_infty,
+		   const double                        global_T_variation,
+		   const double                        global_Omega_diameter,
+		   const double                        cell_diameter,
+		   const double                        old_time_step)
 {
   const double beta = 0.015 * dim;
   const double alpha = 1;
@@ -817,7 +851,6 @@ compute_viscosity(const std::vector<double>          &old_temperature,
   
   const unsigned int n_q_points = old_temperature.size();
   
-				   // Stage 1: calculate residual
   double max_residual = 0;
   double max_velocity = 0;
   
@@ -851,62 +884,64 @@ compute_viscosity(const std::vector<double>          &old_temperature,
   return (beta *
 	  max_velocity *
 	  std::min (cell_diameter,
-		    std::pow(cell_diameter,alpha) * max_residual / global_scaling));
+		    std::pow(cell_diameter,alpha) *
+		    max_residual / global_scaling));
 }
 
 
 
 				 // @sect4{BoussinesqFlowProblem::setup_dofs}
 				 // 
-				 // This function does the same as
-				 // in most other tutorial programs. 
-				 // As a slight difference, the 
-				 // program is called with a 
-				 // parameter <code>setup_matrices</code>
-				 // that decides whether to 
-				 // recreate the sparsity pattern
-				 // and the associated stiffness
-				 // matrix.
-				 // 
-				 // The body starts by assigning dofs on 
-				 // basis of the chosen finite element,
-				 // and then renumbers the dofs 
-				 // first using the Cuthill_McKee
-				 // algorithm (to generate a good
-				 // quality ILU during the linear
-				 // solution process) and then group
-				 // components of velocity, pressure
-				 // and temperature together. This 
-				 // happens in complete analogy to
+				 // This is the function that sets up the
+				 // DoFHandler objects we have here (one for
+				 // the Stokes part and one for the
+				 // temperature part) as well set to the right
+				 // sizes the various objects required for the
+				 // linear algebra in this program. Its basic
+				 // operations are similar to what we do in
 				 // step-22.
 				 // 
-				 // We then proceed with the generation
-				 // of the hanging node constraints
-				 // that arise from adaptive grid
-				 // refinement. Next we impose
-				 // the no-flux boundary conditions
-				 // $\vec{u}\cdot \vec{n}=0$ by adding
-				 // a respective constraint to the
-				 // hanging node constraints
-				 // matrix. The second parameter in 
-				 // the function describes the first 
-				 // of the velocity components
-				 // in the total dof vector, which is 
-				 // zero here. The parameter 
+				 // The body of the function first enumerates
+				 // all degrees of freedom for the Stokes and
+				 // temperature systems. In either case, it
+				 // then renumbers them according to the
+				 // Cuthill-McKee algorithm to improve the
+				 // behavior of preconditioners; for the
+				 // Stokes part, degrees of freedom are then
+				 // also renumbered to ensure that velocities
+				 // precede pressure DoFs so that we can
+				 // partition the Stokes matrix into a
+				 // $2\times 2$ matrix.
+				 // 
+				 // We then proceed with the generation of the
+				 // hanging node constraints that arise from
+				 // adaptive grid refinement for both
+				 // DoFHandler objects. For the velocity, we
+				 // impose no-flux boundary conditions
+				 // $\mathbf{u}\cdot \mathbf{n}=0$ by adding
+				 // constraints to the object that already
+				 // stores the hanging node constraints
+				 // matrix. The second parameter in the
+				 // function describes the first of the
+				 // velocity components in the total dof
+				 // vector, which is zero here. The parameter
 				 // <code>no_normal_flux_boundaries</code>
-				 // sets the no flux b.c. to those
-				 // boundaries with boundary indicator
-				 // zero.
+				 // sets the no flux b.c. to those boundaries
+				 // with boundary indicator zero.
+				 //
+				 // After having done so, we count the number
+				 // of degrees of freedom in the various
+				 // blocks:
 template <int dim>
 void BoussinesqFlowProblem<dim>::setup_dofs ()
 {
-  std::vector<unsigned int> stokes_block_component (dim+1,0);
-  stokes_block_component[dim] = 1;
+  std::vector<unsigned int> stokes_sub_blocks (dim+1,0);
+  stokes_sub_blocks[dim] = 1;
   
   {
     stokes_dof_handler.distribute_dofs (stokes_fe);
     DoFRenumbering::Cuthill_McKee (stokes_dof_handler);
-    DoFRenumbering::component_wise (stokes_dof_handler, stokes_block_component);
+    DoFRenumbering::component_wise (stokes_dof_handler, stokes_sub_blocks);
     
     stokes_constraints.clear ();
     DoFTools::make_hanging_node_constraints (stokes_dof_handler,
@@ -930,7 +965,7 @@ void BoussinesqFlowProblem<dim>::setup_dofs ()
   
   std::vector<unsigned int> stokes_dofs_per_block (2);
   DoFTools::count_dofs_per_block (stokes_dof_handler, stokes_dofs_per_block,
-				  stokes_block_component);
+				  stokes_sub_blocks);
   
   const unsigned int n_u = stokes_dofs_per_block[0],
                      n_p = stokes_dofs_per_block[1],
@@ -947,68 +982,55 @@ void BoussinesqFlowProblem<dim>::setup_dofs ()
             << " (" << n_u << '+' << n_p << '+'<< n_T <<')'
             << std::endl
             << std::endl;
-
-
   
-				 // The next step is to 
-				 // create the sparsity 
-				 // pattern for the system matrix 
-				 // based on the Boussinesq 
-				 // system. As in step-22, 
-				 // we choose to create the
-				 // pattern not as in the
-				 // first tutorial programs,
-				 // but by using the blocked
-				 // version of 
-				 // CompressedSetSparsityPattern.
-				 // The reason for doing this 
-				 // is mainly a memory issue,
-				 // that is, the basic procedures
-				 // consume too much memory
-				 // when used in three spatial
-				 // dimensions as we intend
-				 // to do for this program.
-				 // 
-				 // So, in case we need
-				 // to recreate the matrices,
-				 // we first release the
-				 // stiffness matrix from the
-				 // sparsity pattern and then
-				 // set up an object of the 
-				 // BlockCompressedSetSparsityPattern
-				 // consisting of three blocks. 
-				 // Each of these blocks is
-				 // initialized with the
-				 // respective number of 
-				 // degrees of freedom. 
-				 // Once the blocks are 
-				 // created, the overall size
-				 // of the sparsity pattern
-				 // is initiated by invoking 
-				 // the <code>collect_sizes()</code>
-				 // command, and then the
-				 // sparsity pattern can be
-				 // filled with information.
-				 // Then, the hanging
-				 // node constraints are applied
-				 // to the temporary sparsity
-				 // pattern, which is finally
-				 // then completed and copied
-				 // into the general sparsity
-				 // pattern structure.
-  
-				 // Observe that we use a 
-				 // coupling argument for 
-				 // telling the function
-				 // <code>make_stokes_sparsity_pattern</code>
-				 // which components actually
-				 // will hold data and which 
-				 // we're going to neglect.
-				 // 
-				 // After these actions, we 
-				 // need to reassign the 
-				 // system matrix structure to
-				 // the sparsity pattern.
+				   // The next step is to create the sparsity
+				   // pattern for the Stokes and temperature
+				   // system matrices as well as the
+				   // preconditioner matrix from which we
+				   // build the Stokes preconditioner. As in
+				   // step-22, we choose to create the pattern
+				   // not as in the first few tutorial
+				   // programs, but by using the blocked
+				   // version of CompressedSetSparsityPattern.
+				   // The reason for doing this is mainly a
+				   // memory issue, that is, the basic
+				   // procedures consume too much memory when
+				   // used in three spatial dimensions as we
+				   // intend to do for this program.
+				   // 
+				   // So, we first release the memory stored
+				   // in the matrices, then set up an object
+				   // of type
+				   // BlockCompressedSetSparsityPattern
+				   // consisting of $2\times 2$ blocks (for
+				   // the Stokes system matrix and
+				   // preconditioner) or
+				   // CompressedSparsityPattern (for the
+				   // temperature part). We then fill these
+				   // sparsity patterns with the nonzero
+				   // pattern, taking into account that for
+				   // the Stokes system matrix, there are no
+				   // entries in the pressure-pressure block
+				   // (but all velocity vector components
+				   // couple with each other and with the
+				   // pressure), and that in the Stokes
+				   // preconditioner matrix, only the diagonal
+				   // blocks are nonzero (we use the vector
+				   // Laplacian as discussed in the
+				   // introduction, which only couples each
+				   // vector component of the Laplacian with
+				   // itself, but not with the other vector
+				   // components; this, however, is subject to
+				   // the application of constraints which
+				   // couple vector components at the boundary
+				   // again).
+				   //
+				   // Then, constraints are applied to the
+				   // temporary sparsity patterns, which are
+				   // finally copied into an object of type
+				   // SparsityPattern and used to initialize
+				   // the nonzero pattern of the Trilinos
+				   // matrix objects we use.
   stokes_block_sizes.resize (2);
   stokes_block_sizes[0] = n_u;
   stokes_block_sizes[1] = n_p;
@@ -1026,12 +1048,6 @@ void BoussinesqFlowProblem<dim>::setup_dofs ()
 
     Table<2,DoFTools::Coupling> coupling (dim+1, dim+1);
 
-				     // build the sparsity
-				     // pattern. note that all dim
-				     // velocities couple with each
-				     // other and with the pressures,
-				     // but that there is no
-				     // pressure-pressure coupling:
     for (unsigned int c=0; c<dim+1; ++c)
       for (unsigned int d=0; d<dim+1; ++d)
 	if (! ((c==dim) && (d==dim)))
@@ -1098,15 +1114,13 @@ void BoussinesqFlowProblem<dim>::setup_dofs ()
     temperature_stiffness_matrix.reinit (temperature_sparsity_pattern);
   }
 
-				   // As last action in this function,
-				   // we need to set the vectors
-				   // for the solution, the old 
-				   // solution (required for 
-				   // time stepping) and the system
-				   // right hand side to the 
-				   // three-block structure given
-				   // by velocity, pressure and
-				   // temperature.
+				   // As last action in this function, we need
+				   // to set the vectors for the solution
+				   // $\mathbf u$ and $T^k$, the old solutions
+				   // $T^{k-1}$ and $T^{k-2}$ (required for
+				   // time stepping) and the system right hand
+				   // sides to their correct sizes and block
+				   // structure:
   stokes_solution.reinit (stokes_block_sizes);
   stokes_rhs.reinit (stokes_block_sizes);
 
