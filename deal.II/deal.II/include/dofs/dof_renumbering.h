@@ -170,6 +170,11 @@ DEAL_II_NAMESPACE_OPEN
  * matrix structure and additionally have a good numbering within each
  * block.
  *
+ * The component_wise() function allows not only to honor enumeration based on
+ * vector components, but also allows to group together vector components into
+ * "blocks". See @ref GlossComponent vs @ref GlossBlock for a description of
+ * the difference.
+ *
  *
  * <h3>Cell-wise numbering</h3>
  *
