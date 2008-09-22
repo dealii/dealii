@@ -566,8 +566,8 @@ compute_viscosity(const std::vector<double>          &old_temperature,
 template <int dim>
 void BoussinesqFlowProblem<dim>::setup_dofs ()
 {
-  std::vector<unsigned int> stokes_block_component (dim+1,0);
-  stokes_block_component[dim] = 1;
+  std::vector<unsigned int> stokes_sub_blocks (dim+1,0);
+  stokes_sub_blocks[dim] = 1;
 
   GridTools::partition_triangulation (trilinos_communicator.NumProc(), 
 				      triangulation);
@@ -576,7 +576,7 @@ void BoussinesqFlowProblem<dim>::setup_dofs ()
     stokes_dof_handler.distribute_dofs (stokes_fe);
     DoFRenumbering::Cuthill_McKee (stokes_dof_handler);
     DoFRenumbering::subdomain_wise (stokes_dof_handler);
-    DoFRenumbering::component_wise (stokes_dof_handler, stokes_block_component);
+    DoFRenumbering::component_wise (stokes_dof_handler, stokes_sub_blocks);
     
     stokes_constraints.clear ();
     DoFTools::make_hanging_node_constraints (stokes_dof_handler,
@@ -601,7 +601,7 @@ void BoussinesqFlowProblem<dim>::setup_dofs ()
   
   std::vector<unsigned int> stokes_dofs_per_block (2);
   DoFTools::count_dofs_per_block (stokes_dof_handler, stokes_dofs_per_block,
-				  stokes_block_component);
+				  stokes_sub_blocks);
   
   const unsigned int n_u = stokes_dofs_per_block[0],
                      n_p = stokes_dofs_per_block[1],
