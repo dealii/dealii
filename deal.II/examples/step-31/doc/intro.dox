@@ -946,9 +946,13 @@ The case we want to solve here is as follows: we solve the Boussinesq
 equations described above with $\kappa=1, \eta=1, \mathrm{Ra}=10$. On the
 boundary, we will require no-normal flux for the velocity
 ($\mathrm{n}\cdot\mathrm{u}=0$) and for the temperature
-($\mathrm{n}\cdot\nabla T=0$). No boundary conditions are required for the
-pressure under these conditions. Initial conditions are only necessary for the
-temperature field, and we choose it to be constant zero.
+($\mathrm{n}\cdot\nabla T=0$). This is one of the cases discussed in the
+introduction of @ref step_22 "step-22" and fixes one component of the velocity
+while allowing flow to be parallel to the boundary. There remain
+<code>dim-1</code> components to be fixed, namely the tangential components of
+the normal stress; for these, we choose homogenous conditions which means that
+we do not have to anything special. Initial conditions are only necessary for
+the temperature field, and we choose it to be constant zero.
 
 The evolution of the problem is then entirely driven by the right hand side
 $\gamma(\mathrm{x},t)$ of the temperature equation, i.e. by heat sources and
