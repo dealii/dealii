@@ -45,6 +45,8 @@ namespace TrilinosWrappers
 	      const std::vector<std::vector<bool> > &null_space,
 	      const bool                             output_details)
   {
+    multilevel_operator.release();
+
     const unsigned int n_rows = matrix.m();
     const unsigned int null_space_dimension = null_space.size();
 

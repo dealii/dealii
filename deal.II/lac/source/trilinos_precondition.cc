@@ -63,6 +63,7 @@ namespace TrilinosWrappers
   PreconditionJacobi::initialize (const SparseMatrix   &matrix,
 				  const AdditionalData &additional_data)
   {
+    preconditioner.release();
 
     preconditioner = Teuchos::rcp (Ifpack().Create ("point relaxation", &*matrix.matrix, 0));
     Assert (&*preconditioner != 0, ExcMessage ("Trilinos could not create this "
@@ -106,6 +107,7 @@ namespace TrilinosWrappers
   PreconditionSSOR::initialize (const SparseMatrix   &matrix,
 				const AdditionalData &additional_data)
   {
+    preconditioner.release();
 
     preconditioner = Teuchos::rcp (Ifpack().Create ("point relaxation",
 						    &*matrix.matrix, 
@@ -152,6 +154,7 @@ namespace TrilinosWrappers
   PreconditionSOR::initialize (const SparseMatrix   &matrix,
 			       const AdditionalData &additional_data)
   {
+    preconditioner.release();
 
     preconditioner = Teuchos::rcp (Ifpack().Create ("point relaxation",
 						    &*matrix.matrix, 
@@ -200,6 +203,8 @@ namespace TrilinosWrappers
   PreconditionIC::initialize (const SparseMatrix   &matrix,
 			      const AdditionalData &additional_data)
   {
+    preconditioner.release();
+
     preconditioner = Teuchos::rcp (Ifpack().Create ("IC", &*matrix.matrix, 
 						    additional_data.overlap));
     Assert (&*preconditioner != 0, ExcMessage ("Trilinos could not create this "
@@ -245,6 +250,8 @@ namespace TrilinosWrappers
   PreconditionILU::initialize (const SparseMatrix   &matrix,
 			       const AdditionalData &additional_data)
   {
+    preconditioner.release();
+
     preconditioner = Teuchos::rcp (Ifpack().Create ("ILU", &*matrix.matrix, 
 						    additional_data.overlap));
     Assert (&*preconditioner != 0, ExcMessage ("Trilinos could not create this "
