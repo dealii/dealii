@@ -19,7 +19,6 @@
 #include <Epetra_Map.h>
 #include <Epetra_MultiVector.h>
 #include <Epetra_Vector.h>
-#include <Teuchos_ParameterList.hpp>
 #include <ml_include.h>
 #include <ml_MultiLevelPreconditioner.h>
 
@@ -30,14 +29,9 @@ namespace TrilinosWrappers
 
   PreconditionAMG::PreconditionAMG () 
 #ifdef DEAL_II_COMPILER_SUPPORTS_MPI
-    :
-      communicator (MPI_COMM_WORLD)
+             :
+             communicator (MPI_COMM_WORLD)
 #endif
-  {}
-
-
-  
-  PreconditionAMG::~PreconditionAMG ()
   {}
 
 
@@ -114,12 +108,11 @@ namespace TrilinosWrappers
 	parameter_list.set("null space: vectors", null_space_modes.Values());
       }
 
-    multigrid_operator = boost::shared_ptr<ML_Epetra::MultiLevelPreconditioner>
-			 (new ML_Epetra::MultiLevelPreconditioner(
+    multilevel_operator = Teuchos::rcp (new ML_Epetra::MultiLevelPreconditioner(
 				      *matrix.matrix, parameter_list, true));
 
     if (output_details)
-      multigrid_operator->PrintUnused(0);
+      multilevel_operator->PrintUnused(0);
   }
 
 
@@ -155,19 +148,23 @@ namespace TrilinosWrappers
   void PreconditionAMG::
   reinit ()
   {
-    multigrid_operator->ReComputePreconditioner();
+    multilevel_operator->ReComputePreconditioner();
   }
-  
-  
-  
+
+
+
   void PreconditionAMG::vmult (VectorBase       &dst,
 			       const VectorBase &src) const
   {
-    const int ierr = multigrid_operator->ApplyInverse (*src.vector,
-						       *dst.vector);
-
-    Assert (ierr == 0, ExcTrilinosError(ierr));
+    Assert (dst.vector->Map().SameAs(multilevel_operator->OperatorRangeMap()),
+	    ExcNonMatchingMaps("dst"));
+    Assert (src.vector->Map().SameAs(multilevel_operator->OperatorDomainMap()),
+	    ExcNonMatchingMaps("src"));
+    
+    const int ierr = multilevel_operator->ApplyInverse (*src.vector, *dst.vector);
+    AssertThrow (ierr == 0, ExcTrilinosError(ierr));
   }
+
 
 
 				        // For the implementation of
@@ -195,20 +192,16 @@ namespace TrilinosWrappers
 			       const dealii::Vector<double> &src) const
   {
     Assert (Map->SameAs(Matrix->matrix->RowMap()),
-	    ExcMessage("The sparse matrix given to the preconditioner uses "
-		       "a map that is not compatible. Check ML preconditioner "
-		       "setup."));
+	    ExcNonMatchingMaps("dst"));
     Assert (Map->SameAs(Matrix->matrix->RowMap()),
-	    ExcMessage("The sparse matrix given to the preconditioner uses "
-		       "a map that is not compatible. Check ML preconditioner "
-		       "setup."));
+	    ExcNonMatchingMaps("src"));
     
-    Epetra_Vector LHS (View, multigrid_operator->OperatorDomainMap(),
+    Epetra_Vector LHS (View, multilevel_operator->OperatorDomainMap(),
 		       dst.begin());
-    Epetra_Vector RHS (View, multigrid_operator->OperatorRangeMap(),
+    Epetra_Vector RHS (View, multilevel_operator->OperatorRangeMap(),
 		       const_cast<double*>(src.begin()));
   
-    const int res = multigrid_operator->ApplyInverse (RHS, LHS);
+    const int res = multilevel_operator->ApplyInverse (RHS, LHS);
   
     Assert (res == 0,
 	    ExcMessage ("Trilinos AMG MultiLevel preconditioner returned "

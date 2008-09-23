@@ -4,7 +4,7 @@
 //
 //    Copyright (C) 2008 by the deal.II authors
 //
-//    This file is subject to QPL and may not be  distributed
+//    This file is subject to QPL and may not be distributed
 //    without copyright and license information. Please refer
 //    to the file deal.II/doc/license.html for the  text  and
 //    further information on this license.
@@ -19,6 +19,7 @@
 #ifdef DEAL_II_USE_TRILINOS
 
 #include <Ifpack.h>
+#include <Teuchos_ParameterList.hpp>
 
 
 DEAL_II_NAMESPACE_OPEN
@@ -26,17 +27,34 @@ DEAL_II_NAMESPACE_OPEN
 namespace TrilinosWrappers
 {
 
+  PreconditionBase::PreconditionBase()
+  {}
+
+
+
+  void
+  PreconditionBase::vmult (VectorBase       &dst,
+			   const VectorBase &src) const
+  {
+    Assert (dst.vector->Map().SameAs(preconditioner->OperatorRangeMap()),
+	    ExcNonMatchingMaps("dst"));
+    Assert (src.vector->Map().SameAs(preconditioner->OperatorDomainMap()),
+	    ExcNonMatchingMaps("src"));
+    
+    const int ierr = preconditioner->ApplyInverse (*src.vector, *dst.vector);
+    AssertThrow (ierr == 0, ExcTrilinosError(ierr));
+  }
+
+
+
+/* -------------------------- PreconditionJacobi -------------------------- */
+
   PreconditionJacobi::AdditionalData::
   AdditionalData (const double omega,
 		  const double min_diagonal)
                   :
                   omega (omega),
 		  min_diagonal (min_diagonal)
-  {}
-
-  
-
-  PreconditionJacobi::PreconditionJacobi ()
   {}
 
 
@@ -70,15 +88,7 @@ namespace TrilinosWrappers
 
 
 
-  void
-  PreconditionJacobi::vmult (VectorBase       &dst,
-			     const VectorBase &src) const
-  {
-    const int ierr = preconditioner->ApplyInverse (*src.vector, *dst.vector);
-    AssertThrow (ierr == 0, ExcTrilinosError(ierr));
-  }
-
-
+/* -------------------------- PreconditionSSOR -------------------------- */
 
   PreconditionSSOR::AdditionalData::
   AdditionalData (const double       omega,
@@ -88,11 +98,6 @@ namespace TrilinosWrappers
                   omega        (omega),
 		  min_diagonal (min_diagonal),
 		  overlap      (overlap)
-  {}
-
-  
-
-  PreconditionSSOR::PreconditionSSOR ()
   {}
 
 
@@ -129,15 +134,7 @@ namespace TrilinosWrappers
 
 
 
-  void
-  PreconditionSSOR::vmult (VectorBase       &dst,
-			   const VectorBase &src) const
-  {
-    const int ierr = preconditioner->ApplyInverse (*src.vector, *dst.vector);
-    AssertThrow (ierr == 0, ExcTrilinosError(ierr));
-  }
-
-
+/* -------------------------- PreconditionSOR -------------------------- */
 
   PreconditionSOR::AdditionalData::
   AdditionalData (const double       omega,
@@ -147,11 +144,6 @@ namespace TrilinosWrappers
                   omega        (omega),
 		  min_diagonal (min_diagonal),
 		  overlap      (overlap)
-  {}
-
-  
-
-  PreconditionSOR::PreconditionSOR ()
   {}
 
 
@@ -188,15 +180,7 @@ namespace TrilinosWrappers
 
 
 
-  void
-  PreconditionSOR::vmult (VectorBase       &dst,
-			  const VectorBase &src) const
-  {
-    const int ierr = preconditioner->ApplyInverse (*src.vector, *dst.vector);
-    AssertThrow (ierr == 0, ExcTrilinosError(ierr));
-  }
-
-
+/* -------------------------- PreconditionIC -------------------------- */
 
   PreconditionIC::AdditionalData::
   AdditionalData (const unsigned int ic_fill,
@@ -208,11 +192,6 @@ namespace TrilinosWrappers
 		  ic_atol (ic_atol),
 		  ic_rtol (ic_rtol),
 		  overlap (overlap)
-  {}
-
-
-
-  PreconditionIC::PreconditionIC ()
   {}
 
 
@@ -246,15 +225,7 @@ namespace TrilinosWrappers
 
 
 
-  void
-  PreconditionIC::vmult (VectorBase       &dst,
-			 const VectorBase &src) const
-  {
-    const int ierr = preconditioner->ApplyInverse (*src.vector, *dst.vector);
-    AssertThrow (ierr == 0, ExcTrilinosError(ierr));
-  }
-
-
+/* -------------------------- PreconditionILU -------------------------- */
 
   PreconditionILU::AdditionalData::
   AdditionalData (const unsigned int ilu_fill,
@@ -266,11 +237,6 @@ namespace TrilinosWrappers
 		  ilu_atol (ilu_atol),
 		  ilu_rtol (ilu_rtol),
 		  overlap  (overlap)
-  {}
-
-
-
-  PreconditionILU::PreconditionILU ()
   {}
 
 
@@ -302,15 +268,6 @@ namespace TrilinosWrappers
     AssertThrow (ierr == 0, ExcTrilinosError(ierr));
   }
 
-
-
-  void
-  PreconditionILU::vmult (VectorBase       &dst,
-			  const VectorBase &src) const
-  {
-    const int ierr = preconditioner->ApplyInverse (*src.vector, *dst.vector);
-    AssertThrow (ierr == 0, ExcTrilinosError(ierr));
-  }
 }
 
 DEAL_II_NAMESPACE_CLOSE

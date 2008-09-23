@@ -25,7 +25,6 @@
 // forward declarations
 class Ifpack_Preconditioner;
 
-
 DEAL_II_NAMESPACE_OPEN
 
 /*! @addtogroup TrilinosWrappers
@@ -37,13 +36,85 @@ namespace TrilinosWrappers
 
   class VectorBase;
   class SparseMatrix;
-  
-/**  
+  class SolverBase;
+
+/**
+ * The base class for all preconditioners based on Trilinos sparse
+ * matrices.
+ *
  * @ingroup TrilinosWrappers
  * @ingroup Preconditioners
  * @author Martin Kronbichler, 2008
  */
-  class PreconditionJacobi : public Subscriptor
+  class PreconditionBase : public Subscriptor
+  {
+    public:
+
+                                       /**
+                                        * Standardized data struct to
+                                        * pipe additional flags to the
+                                        * preconditioner.
+                                        */      
+      struct AdditionalData
+      {};
+
+                                       /**
+                                        * Constructor. Does not do
+                                        * anything. The
+                                        * <tt>initialize</tt> function
+                                        * of the derived classes will
+                                        * have to create the
+                                        * preconditioner from a given
+                                        * sparse matrix.
+                                        */
+      PreconditionBase ();
+      
+				       /**
+					* Apply the preconditioner.
+					*/
+      void vmult (VectorBase       &dst,
+		  const VectorBase &src) const;
+
+                                       /**
+					* Exception.
+					*/
+      DeclException1 (ExcNonMatchingMaps,
+		      std::string,
+		      << "The sparse matrix that the preconditioner is based "
+		      << "on a map that is not compatible to the one in vector "
+		      << arg1
+		      << ". Check preconditioner and matrix setup.");
+
+      friend class SolverBase;
+
+    protected:
+				       /**
+					* This is a pointer to the
+					* preconditioner object.
+					*/
+        Teuchos::RefCountPtr<Ifpack_Preconditioner> preconditioner;
+
+  };
+
+  
+/**
+ * A wrapper class for a (pointwise) Jacobi preconditioner for
+ * Trilinos matrices. This preconditioner works both in serial and in
+ * parallel, depending on the matrix it is based on.
+ *
+ * The AdditionalData data structure allows to set preconditioner
+ * options. For the Jacobi preconditioner, these options are the
+ * damping parameter <tt>omega</tt> and a <tt>min_diagonal</tt>
+ * argument that can be used to make the preconditioner work even if
+ * the matrix contains some zero elements on the diagonal. The default
+ * settings are 1 for the damping parameter and zero for the diagonal
+ * augmentation.
+ *
+ * @ingroup TrilinosWrappers 
+ * @ingroup Preconditioners 
+ * @author Martin Kronbichler, 2008
+ */
+  class PreconditionJacobi : public PreconditionBase
   {
     public:
 
@@ -91,45 +162,48 @@ namespace TrilinosWrappers
       };
 
                                        /**
-                                        * Constructor. Does not do
-                                        * anything. The
-                                        * <tt>initialize</tt> function
-                                        * will have to set create the
-                                        * partitioner.
-                                        */
-      PreconditionJacobi ();
-
-                                       /**
-					* Take the matrix which is
-                                        * used to form the
-                                        * preconditioner, and
-                                        * additional flags if there
-                                        * are any.
+					* Take the sparse matrix the
+                                        * preconditioner object should
+                                        * be built of, and additional
+                                        * flags (damping parameter,
+                                        * etc.) if there are any.
 					*/
       void initialize (const SparseMatrix   &matrix,
 		       const AdditionalData &additional_data = AdditionalData());
-      
-				       /**
-					* Apply the preconditioner.
-					*/
-      void vmult (VectorBase       &dst,
-		  const VectorBase &src) const;
-
-    private:
-      Teuchos::RefCountPtr<Ifpack_Preconditioner> preconditioner;
-      //std::auto_ptr<Ifpack_Preconditioner> preconditioner;
-      //boost::shared_ptr<Ifpack_Preconditioner> preconditioner;
   };
   
 
   
   
-/**  
+/**
+ * A wrapper class for a (pointwise) SSOR preconditioner for Trilinos
+ * matrices. This preconditioner works both in serial and in parallel,
+ * depending on the matrix it is based on.
+ *
+ * The AdditionalData data structure allows to set preconditioner
+ * options. For the SSOR preconditioner, these options are the
+ * damping/relaxation parameter <tt>omega</tt>, a
+ * <tt>min_diagonal</tt> argument that can be used to make the
+ * preconditioner work even if the matrix contains some zero elements
+ * on the diagonal, and a parameter <tt>overlap</tt> that determines
+ * if and how much overlap there should be between the matrix
+ * partitions on the various MPI processes. The default settings are 1
+ * for the relaxation parameter, 0 for the diagonal augmentation and 0
+ * for the overlap.
+ *
+ * Note that a parallel applicatoin of the SSOR preconditioner is
+ * actually a block-Jacobi preconditioner with block size equal to the
+ * local matrix size. Spoken more technically, this parallel operation
+ * is an <a
+ * href="http://en.wikipedia.org/wiki/Additive_Schwarz_method">additive
+ * Schwarz method</a> with an SSOR <em>approximate solve</em> as inner
+ * solver, based on the outer parallel partitioning.
+ *
  * @ingroup TrilinosWrappers
  * @ingroup Preconditioners
  * @author Wolfgang Bangerth, 2008
  */
-  class PreconditionSSOR : public Subscriptor
+  class PreconditionSSOR : public PreconditionBase
   {
     public:
  
@@ -191,43 +265,50 @@ namespace TrilinosWrappers
       };
 
                                        /**
-                                        * Constructor. Does not do
-                                        * anything. The
-                                        * <tt>initialize</tt> function
-                                        * will have to set create the
-                                        * partitioner.
-                                        */
-      PreconditionSSOR ();
-
-                                       /**
-					* Take the matrix which is
-                                        * used to form the
-                                        * preconditioner, and
-                                        * additional flags if there
+					* Take the sparse matrix the
+                                        * preconditioner object should
+                                        * be built of, and additional
+                                        * flags (damping parameter,
+                                        * overlap in parallel
+                                        * computations, etc.) if there
                                         * are any.
 					*/
       void initialize (const SparseMatrix   &matrix,
 		       const AdditionalData &additional_data = AdditionalData());
-      
-				       /**
-					* Apply the preconditioner.
-					*/
-      void vmult (VectorBase       &dst,
-		  const VectorBase &src) const;
-
-    private:
-      Teuchos::RefCountPtr<Ifpack_Preconditioner> preconditioner;
   };
   
 
   
   
-/**  
+/**
+ * A wrapper class for a (pointwise) SOR preconditioner for Trilinos
+ * matrices. This preconditioner works both in serial and in parallel,
+ * depending on the matrix it is based on.
+ *
+ * The AdditionalData data structure allows to set preconditioner
+ * options. For the SOR preconditioner, these options are the
+ * damping/relaxation parameter <tt>omega</tt>, a
+ * <tt>min_diagonal</tt> argument that can be used to make the
+ * preconditioner work even if the matrix contains some zero elements
+ * on the diagonal, and a parameter <tt>overlap</tt> that determines
+ * if and how much overlap there should be between the matrix
+ * partitions on the various MPI processes. The default settings are 1
+ * for the relaxation parameter, 0 for the diagonal augmentation and 0
+ * for the overlap. 
+ *
+ * Note that a parallel applicatoin of the SOR preconditioner is
+ * actually a block-Jacobi preconditioner with block size equal to the
+ * local matrix size. Spoken more technically, this parallel operation
+ * is an <a
+ * href="http://en.wikipedia.org/wiki/Additive_Schwarz_method">additive
+ * Schwarz method</a> with an SOR <em>approximate solve</em> as inner
+ * solver, based on the outer parallel partitioning.
+ *
  * @ingroup TrilinosWrappers
  * @ingroup Preconditioners
  * @author Martin Kronbichler, 2008
  */
-  class PreconditionSOR : public Subscriptor
+  class PreconditionSOR : public PreconditionBase
   {
     public:
 
@@ -289,42 +370,58 @@ namespace TrilinosWrappers
       };
 
                                        /**
-                                        * Constructor. Does not do
-                                        * anything. The
-                                        * <tt>initialize</tt> function
-                                        * will have to set create the
-                                        * partitioner.
-                                        */
-      PreconditionSOR ();
-
-                                       /**
-					* Take the matrix which is
-                                        * used to form the
-                                        * preconditioner, and
-                                        * additional flags if there
+					* Take the sparse matrix the
+                                        * preconditioner object should
+                                        * be built of, and additional
+                                        * flags (damping parameter,
+                                        * overlap in parallel
+                                        * computations etc.) if there
                                         * are any.
 					*/
       void initialize (const SparseMatrix   &matrix,
 		       const AdditionalData &additional_data = AdditionalData());
-      
-				       /**
-					* Apply the preconditioner.
-					*/
-      void vmult (VectorBase       &dst,
-		  const VectorBase &src) const;
-
-    private:
-      Teuchos::RefCountPtr<Ifpack_Preconditioner> preconditioner;
   };
 
 
 
-/**  
+/**
+ * A wrapper class for an incomplete Cholesky factorization (IC)
+ * preconditioner for @em symmetric Trilinos matrices. This
+ * preconditioner works both in serial and in parallel, depending on
+ * the matrix it is based on. In general, an incomplete factorization
+ * does not take all fill-in elements that would appear in a full
+ * factorization (that is the basis for a direct solve). Trilinos
+ * allows to set the amount of fill-in elements, governed by the
+ * additional data argument <tt>ic_fill</tt>, so one can gradually
+ * choose between a factorization on the sparse matrix structure only
+ * (<tt>ic_fill=0</tt>) to a full factorization (<tt>ic_fill</tt> in
+ * the range of 10 to 50, depending on the spatial dimension of the
+ * PDE problem and the degree of the finite element basis functions;
+ * generally, more required fill-in elements require this parameter to
+ * be set to a higher integer value).
+ *
+ * The AdditionalData data structure allows to set preconditioner
+ * options. Besides the fill-in argument, these options are some
+ * options for perturbations (see the documentation of the
+ * AdditionalData structure for details), and a parameter
+ * <tt>overlap</tt> that determines if and how much overlap there
+ * should be between the matrix partitions on the various MPI
+ * processes. The default settings are 1 for the relaxation parameter,
+ * 0 for the diagonal augmentation and 0 for the overlap.
+ *
+ * Note that a parallel applicatoin of the IC preconditioner is
+ * actually a block-Jacobi preconditioner with block size equal to the
+ * local matrix size. Spoken more technically, this parallel operation
+ * is an <a
+ * href="http://en.wikipedia.org/wiki/Additive_Schwarz_method">additive
+ * Schwarz method</a> with an IC <em>approximate solve</em> as inner
+ * solver, based on the (outer) parallel partitioning.
+ *
  * @ingroup TrilinosWrappers
  * @ingroup Preconditioners
  * @author Martin Kronbichler, 2008
  */
-  class PreconditionIC : public Subscriptor
+  class PreconditionIC : public PreconditionBase
   {
     public:
                                        /**
@@ -401,38 +498,56 @@ namespace TrilinosWrappers
       };
 
                                        /**
-					* (Empty) constructor.
-					*/
-      PreconditionIC ();
-
-                                       /**
                                         * Initialize function. Takes
-                                        * the matrix which is used to
-                                        * form the preconditioner, and
-                                        * additional flags if there
-                                        * are any.
+                                        * the matrix the
+                                        * preconditioner should be
+                                        * computed of, and additional
+                                        * flags if there are any.
                                         */
       void initialize (const SparseMatrix   &matrix,
 		       const AdditionalData &additional_data = AdditionalData());
-      
-				       /**
-					* Apply the preconditioner.
-					*/
-      void vmult (VectorBase       &dst,
-		  const VectorBase &src) const;
-
-    private:
-      Teuchos::RefCountPtr<Ifpack_Preconditioner> preconditioner;
   };
 
 
 
-/**  
+/**
+ * A wrapper class for an incomplete LU factorization (ILU)
+ * preconditioner for Trilinos matrices. This preconditioner works
+ * both in serial and in parallel, depending on the matrix it is based
+ * on. In general, an incomplete factorization does not take all
+ * fill-in elements that would appear in a full factorization (that is
+ * the basis for a direct solve). Trilinos allows to set the amount of
+ * fill-in elements, governed by the additional data argument
+ * <tt>ilu_fill</tt>, so one can gradually choose between a
+ * factorization on the sparse matrix structure only
+ * (<tt>ilu_fill=0</tt>) to a full factorization (<tt>ilu_fill</tt> in
+ * the range of 10 to 50, depending on the spatial dimension of the
+ * PDE problem and the degree of the finite element basis functions;
+ * generally, more required fill-in elements require this parameter to
+ * be set to a higher integer value).
+ *
+ * The AdditionalData data structure allows to set preconditioner
+ * options. Besides the fill-in argument, these options are some
+ * options for perturbations (see the documentation of the
+ * AdditionalData structure for details), and a parameter
+ * <tt>overlap</tt> that determines if and how much overlap there
+ * should be between the matrix partitions on the various MPI
+ * processes. The default settings are 1 for the relaxation parameter,
+ * 0 for the diagonal augmentation and 0 for the overlap.
+ *
+ * Note that a parallel applicatoin of the ILU preconditioner is
+ * actually a block-Jacobi preconditioner with block size equal to the
+ * local matrix size. Spoken more technically, this parallel operation
+ * is an <a
+ * href="http://en.wikipedia.org/wiki/Additive_Schwarz_method">additive
+ * Schwarz method</a> with an ILU <em>approximate solve</em> as inner
+ * solver, based on the (outer) parallel partitioning.
+ *
  * @ingroup TrilinosWrappers
  * @ingroup Preconditioners
  * @author Martin Kronbichler, 2008
  */
-  class PreconditionILU : public Subscriptor
+  class PreconditionILU : public PreconditionBase
   {
     public:
                                        /**
@@ -508,11 +623,6 @@ namespace TrilinosWrappers
       };
 
                                        /**
-					* (Empty) constructor.
-					*/
-      PreconditionILU ();
-
-                                       /**
                                         * Initialize function. Takes
                                         * the matrix which is used to
                                         * form the preconditioner, and
@@ -521,15 +631,6 @@ namespace TrilinosWrappers
                                         */
       void initialize (const SparseMatrix   &matrix,
 		       const AdditionalData &additional_data = AdditionalData());
-      
-				       /**
-					* Apply the preconditioner.
-					*/
-      void vmult (VectorBase       &dst,
-		  const VectorBase &src) const;
-
-    private:
-      Teuchos::RefCountPtr<Ifpack_Preconditioner> preconditioner;
   };
   
 

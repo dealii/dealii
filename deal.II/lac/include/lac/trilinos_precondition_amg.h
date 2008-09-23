@@ -30,6 +30,7 @@
 #else
 #  include <Epetra_SerialComm.h>
 #endif
+#include <Teuchos_RefCountPtr.hpp>
 
 // some forward declarations
 namespace ML_Epetra
@@ -49,15 +50,19 @@ DEAL_II_NAMESPACE_OPEN
 
 namespace TrilinosWrappers
 {
-  
+
+					// Forward declarations.
+  class SolverBase;
+
 /**  
  * This class implements an algebraic multigrid (AMG) preconditioner
- * based on the Trilinos ML implementation.  What this class does is
- * twofold.  When the initialize() function is invoked, a ML
- * preconditioner object is created based on the matrix that we want
- * the preconditioner to be based on. A call of the respective
- * <code>vmult</code> function does call the respective operation in
- * the Trilinos package, where it is called
+ * based on the Trilinos ML implementation, which is a black-box
+ * preconditioner that works well for many PDE-based linear problems.
+ * What this class does is twofold.  When the initialize() function is
+ * invoked, a ML preconditioner object is created based on the matrix
+ * that we want the preconditioner to be based on. A call of the
+ * respective <code>vmult</code> function does call the respective
+ * operation in the Trilinos package, where it is called
  * <code>ApplyInverse</code>. Use of this class is explained in the
  * @ref step_31 "step-31" tutorial program.
  *
@@ -75,8 +80,9 @@ namespace TrilinosWrappers
  * elliptic problems and convection dominated problems. We use the
  * standard options provided by Trilinos ML for elliptic problems,
  * except that we use a Chebyshev smoother instead of a symmetric
- * Gauss-Seidel smoother.  For most elliptic problems, Chebyshev is
- * better than Gauss-Seidel (SSOR).
+ * Gauss-Seidel smoother.  For most elliptic problems, Chebyshev
+ * provides a better damping of high frequencies (in the algebraic
+ * sense) than Gauss-Seidel (SSOR).
  *
  * @ingroup TrilinosWrappers
  * @ingroup Preconditioners
@@ -91,11 +97,6 @@ namespace TrilinosWrappers
       PreconditionAMG ();
 
 				       /**
-					* Destructor.
-					*/
-      ~PreconditionAMG ();
-
-				       /**
 					* Let Trilinos compute a
 					* multilevel hierarchy for the
 					* solution of a linear system
@@ -108,7 +109,7 @@ namespace TrilinosWrappers
 		       const bool                             elliptic = true,
 		       const bool                             higher_order_elements = false,
 		       const double                           aggregation_threshold = 1e-4,
-		       const std::vector<std::vector<bool> > &null_space = std::vector<std::vector<bool> > (),
+		       const std::vector<std::vector<bool> > &null_space = std::vector<std::vector<bool> > (1),
 		       const bool                             output_details = false);
 
 				       /**
@@ -156,16 +157,12 @@ namespace TrilinosWrappers
 				        * the AMG ML preconditioner.
 					*/
       void reinit ();
-
+      
 				       /**
-					* Multiply the source vector
-					* with the preconditioner
-					* represented by this object,
-					* and return it in the
-					* destination vector.
+					* Apply the preconditioner.
 					*/
-      void vmult (VectorBase        &dst,
-		  const VectorBase  &src) const;
+      void vmult (VectorBase       &dst,
+		  const VectorBase &src) const;
 
 				       /**
 					* Do the same as before, but 
@@ -176,12 +173,24 @@ namespace TrilinosWrappers
       void vmult (dealii::Vector<double>       &dst,
 		  const dealii::Vector<double> &src) const;
 
+                                       /**
+					* Exception.
+					*/
+      DeclException1 (ExcNonMatchingMaps,
+		      std::string,
+		      << "The sparse matrix that the preconditioner is based "
+		      << "on a map that is not compatible to the one in vector"
+		      << arg1
+		      << ". Check preconditioner and matrix setup.");
+
     private:
 
 				       /**
-					* Pointer to the Trilinos AMG object.
+					* A pointer to the
+					* preconditioner object.
 					*/
-      boost::shared_ptr<ML_Epetra::MultiLevelPreconditioner> multigrid_operator;
+      Teuchos::RefCountPtr<ML_Epetra::MultiLevelPreconditioner> 
+	multilevel_operator;
 
                                        /**
 					* Internal communication
@@ -200,13 +209,15 @@ namespace TrilinosWrappers
 					* case the matrix needs to be
 					* copied from deal.II format.
 					*/
-      boost::shared_ptr<Epetra_Map>       Map;
+      boost::shared_ptr<Epetra_Map>   Map;
 
 				       /**
 					* A copy of the deal.II matrix
 					* into Trilinos format.
 					*/
       boost::shared_ptr<SparseMatrix> Matrix;
+
+      friend class SolverBase;
   };
 }
 
