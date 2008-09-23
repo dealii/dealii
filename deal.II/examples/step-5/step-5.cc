@@ -616,6 +616,16 @@ void LaplaceProblem<dim>::assemble_system ()
 				 // default and do not specify
 				 // anything in the angle brackets.)
 				 //
+				 // Note that for the present case,
+				 // SSOR doesn't really perform much
+				 // better than most other
+				 // preconditioners (though better
+				 // than no preconditioning at all). A
+				 // brief comparison of different
+				 // preconditioners is presented in
+				 // the Results section of the next
+				 // tutorial program, step-6.
+				 //
 				 // With this, the rest of the
 				 // function is trivial: instead of
 				 // the <code>PreconditionIdentity</code>
