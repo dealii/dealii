@@ -267,6 +267,17 @@ inconvenience this causes.
 <ol>
   <li>
   <p>
+  Improved: The SparseILU::initialize function, for some reason, required
+  the second argument, SparseILU::AdditionalParameters, to be present even
+  if it is a default constructed object. This argument now has a default value
+  that equates to a default constructed object that can therefore be omitted
+  when so desired.
+  <br>
+  (WB 2008/09/23)
+  </p>
+
+  <li>
+  <p>
   Improved: The CompressedSparsityPattern can now elide some operations
   upon entering entries that may have been added before already.
   <br>

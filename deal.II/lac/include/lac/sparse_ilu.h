@@ -112,7 +112,7 @@ class SparseILU : public SparseLUDecomposition<number>
 				      */
     template <typename somenumber>
     void initialize (const SparseMatrix<somenumber> &matrix,
-		     const AdditionalData parameters);
+		     const AdditionalData parameters = AdditionalData());
 
 				     /**
 				      * This method is deprecated, and
