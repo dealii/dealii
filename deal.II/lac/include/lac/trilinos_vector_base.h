@@ -294,6 +294,17 @@ namespace TrilinosWrappers
                                         */
       void clear ();
 
+				       /**
+					* Reinit functionality, sets
+					* the dimension and the
+					* possibly parallel
+					* partitioning (Epetra_Map) of
+					* the calling vector the value
+					* of the input vector.
+					*/
+      void reinit (const VectorBase &v,
+		   const bool        fast = false);
+
                                        /**
                                         * Compress the underlying
                                         * representation of the Trilinos

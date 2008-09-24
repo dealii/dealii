@@ -104,6 +104,17 @@ namespace TrilinosWrappers
 
 
   void
+  VectorBase::reinit (const VectorBase &v,
+		      const bool        fast)
+  {
+    (void)fast;
+    if (&*vector != 0)
+      vector = std::auto_ptr<Epetra_FEVector>(new Epetra_FEVector(*v.vector));
+    else if (vector->Map().SameAs(v.vector->Map()) == false)
+      vector = std::auto_ptr<Epetra_FEVector>(new Epetra_FEVector(*v.vector));
+  }
+
+  void
   VectorBase::compress ()
   {
 				 // Now pass over the information about
