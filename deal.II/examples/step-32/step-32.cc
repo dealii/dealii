@@ -342,7 +342,7 @@ class BoussinesqFlowProblem
     unsigned int timestep_number;
 
     boost::shared_ptr<TrilinosWrappers::PreconditionAMG>  Amg_preconditioner;
-    boost::shared_ptr<TrilinosWrappers::PreconditionSSOR> Mp_preconditioner;
+    boost::shared_ptr<TrilinosWrappers::PreconditionIC> Mp_preconditioner;
 
     bool rebuild_stokes_matrix;
     bool rebuild_temperature_matrices;
@@ -807,10 +807,10 @@ BoussinesqFlowProblem<dim>::build_stokes_preconditioner ()
   Amg_preconditioner->initialize(stokes_preconditioner_matrix.block(0,0),
 				 true, true, 5e-2, null_space, false);
 
-  Mp_preconditioner = boost::shared_ptr<TrilinosWrappers::PreconditionSSOR>
-                                   (new TrilinosWrappers::PreconditionSSOR());
+  Mp_preconditioner = boost::shared_ptr<TrilinosWrappers::PreconditionIC>
+                                   (new TrilinosWrappers::PreconditionIC());
 
-  Mp_preconditioner->initialize (stokes_preconditioner_matrix.block(1,1),1.2);
+  Mp_preconditioner->initialize (stokes_preconditioner_matrix.block(1,1));
 
   pcout << std::endl;
 
@@ -1228,11 +1228,11 @@ void BoussinesqFlowProblem<dim>::solve ()
 
   {
     LinearSolvers::InverseMatrix<TrilinosWrappers::SparseMatrix,
-				 TrilinosWrappers::PreconditionSSOR>
+				 TrilinosWrappers::PreconditionIC>
       mp_inverse (stokes_preconditioner_matrix.block(1,1), *Mp_preconditioner);
 
     LinearSolvers::BlockSchurPreconditioner<TrilinosWrappers::PreconditionAMG,
-                                            TrilinosWrappers::PreconditionSSOR>
+                                            TrilinosWrappers::PreconditionIC>
       preconditioner (stokes_matrix, mp_inverse, *Amg_preconditioner);
 
     SolverControl solver_control (stokes_matrix.m(),

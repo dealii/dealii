@@ -291,7 +291,7 @@ namespace LinearSolvers
   vmult (TrilinosWrappers::Vector       &dst,
 	 const TrilinosWrappers::Vector &src) const
   {
-    SolverControl solver_control (src.size(), 1e-6*src.l2_norm());
+    SolverControl solver_control (src.size(), 1e-7*src.l2_norm());
     SolverCG<TrilinosWrappers::Vector> cg (solver_control);
 
     dst = 0;
@@ -308,35 +308,34 @@ namespace LinearSolvers
 
 				   // @sect4{Schur complement preconditioner}
 
-				   // This is the implementation
-				   // of the Schur complement
-				   // preconditioner as described
-				   // in the section on improved
-				   // solvers in step-22.
+				   // This is the implementation of
+				   // the Schur complement
+				   // preconditioner as described in
+				   // the section on improved solvers
+				   // in step-22.
 				   // 
-				   // The basic 
-				   // concept of the preconditioner is 
-				   // different to the solution 
-				   // strategy used in step-20 and 
-				   // step-22. There, the Schur
-				   // complement was used for a 
+				   // The basic concept of the
+				   // preconditioner is different to
+				   // the solution strategy used in
+				   // step-20 and step-22. There, the
+				   // Schur complement was used for a
 				   // two-stage solution of the linear
 				   // system. Recall that the process
-				   // in the Schur complement solver is
-				   // a Gaussian elimination of
-				   // a 2x2 block matrix, where each
-				   // block is solved iteratively. 
-				   // Here, the idea is to let 
-				   // an iterative solver act on the
-				   // whole system, and to use 
-				   // a Schur complement for 
+				   // in the Schur complement solver
+				   // is a Gaussian elimination of a
+				   // 2x2 block matrix, where each
+				   // block is solved iteratively.
+				   // Here, the idea is to let an
+				   // iterative solver act on the
+				   // whole system, and to use a Schur
+				   // complement for
 				   // preconditioning. As usual when
 				   // dealing with preconditioners, we
-				   // don't intend to exacly set up a 
+				   // don't intend to exacly set up a
 				   // Schur complement, but rather use
 				   // a good approximation to the
-				   // Schur complement for the purpose of
-				   // preconditioning.
+				   // Schur complement for the purpose
+				   // of preconditioning.
 				   // 
 				   // So the question is how we can
 				   // obtain a good preconditioner.
@@ -577,8 +576,8 @@ class BoussinesqFlowProblem
     double old_time_step;
     unsigned int timestep_number;
 
-    boost::shared_ptr<TrilinosWrappers::PreconditionAMG>  Amg_preconditioner;
-    boost::shared_ptr<TrilinosWrappers::PreconditionSSOR> Mp_preconditioner;
+    boost::shared_ptr<TrilinosWrappers::PreconditionAMG> Amg_preconditioner;
+    boost::shared_ptr<TrilinosWrappers::PreconditionIC>  Mp_preconditioner;
 
     bool rebuild_stokes_matrix;
     bool rebuild_temperature_matrices;
@@ -1239,9 +1238,9 @@ BoussinesqFlowProblem<dim>::build_stokes_preconditioner ()
 				   // copied over to Trilinos. we need to
 				   // keep the (1,1) block, though
       
-  Mp_preconditioner = boost::shared_ptr<TrilinosWrappers::PreconditionSSOR>
-                                   (new TrilinosWrappers::PreconditionSSOR());
-  Mp_preconditioner->initialize(stokes_preconditioner_matrix.block(1,1),1.2);
+  Mp_preconditioner = boost::shared_ptr<TrilinosWrappers::PreconditionIC>
+                                   (new TrilinosWrappers::PreconditionIC());
+  Mp_preconditioner->initialize(stokes_preconditioner_matrix.block(1,1));
 
   std::cout << std::endl;
 
@@ -1845,11 +1844,11 @@ void BoussinesqFlowProblem<dim>::solve ()
 				     // Set up inverse matrix for
 				     // pressure mass matrix
     LinearSolvers::InverseMatrix<TrilinosWrappers::SparseMatrix,
-				 TrilinosWrappers::PreconditionSSOR>
+				 TrilinosWrappers::PreconditionIC>
       mp_inverse (stokes_preconditioner_matrix.block(1,1), *Mp_preconditioner);
 
     LinearSolvers::BlockSchurPreconditioner<TrilinosWrappers::PreconditionAMG,
-                                            TrilinosWrappers::PreconditionSSOR>
+                                            TrilinosWrappers::PreconditionIC>
       preconditioner (stokes_matrix, mp_inverse, *Amg_preconditioner);
 
 				     // Set up GMRES solver and
