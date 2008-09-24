@@ -192,7 +192,7 @@ namespace LinearSolvers
 				TrilinosWrappers::MPI::Vector       &dst,
 				const TrilinosWrappers::MPI::Vector &src) const
   {
-    SolverControl solver_control (src.size(), 1e-6*src.l2_norm());
+    SolverControl solver_control (src.size(), 1e-7*src.l2_norm());
     SolverCG<TrilinosWrappers::MPI::Vector> cg (solver_control);
 
     dst = 0;
