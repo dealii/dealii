@@ -355,12 +355,10 @@
  *        is a <code>Tensor@<2,dim@></code>, i.e. a matrix $G_{ij}$ that consits
  *        of entries $G_{ij}=\frac{\partial\phi_i}{\partial x_j}$. Finally,
  *        both scalar and vector views can be asked for the second derivatives
- *        ("Hessians"); vector views can also be queried for the
- *        symmetric gradients as well as the divergence (as we do in the
- *        example), the latter former a tensor of rank 3, the latter a scalar.
- *        Finally, vector views can be asked for the symmetric gradient,
+ *        ("Hessians") and vector views can be asked for the symmetric gradient,
  *        defined as $S_{ij}=\frac 12 \left[\frac{\partial\phi_i}{\partial x_j}
- *        + \frac{\partial\phi_j}{\partial x_i}\right]$.
+ *        + \frac{\partial\phi_j}{\partial x_i}\right]$ as well as the
+ *        divergence $\sum_{d=0}^{dim-1} \frac{\partial\phi_d}{\partial x_d}$.
  * </ul>
  * Other examples of using extractors and views are shown in tutorial programs
  * @ref step_21 "step-21",
