@@ -211,7 +211,7 @@ namespace TrilinosWrappers
 					*/
 
 
-/** 
+/**
  * Base class for the two types of Trilinos vectors, the distributed
  * memory vector MPI::Vector and a localized vector Vector. The latter
  * is designed for use in either serial implementations or as a
@@ -260,6 +260,11 @@ namespace TrilinosWrappers
       typedef size_t                    size_type;
       typedef internal::VectorReference reference;
       typedef const internal::VectorReference const_reference;
+
+				       /**
+					* @name 1: Basic Object-handling 
+					*/
+				       //@{
 
                                        /**
                                         * Default constructor that
@@ -428,106 +433,6 @@ namespace TrilinosWrappers
       bool in_local_range (const unsigned int index) const;
 
                                        /**
-                                        * Provide access to a given
-                                        * element, both read and write.
-                                        */
-      reference
-	operator () (const unsigned int index);
-
-                                       /**
-                                        * Provide read-only access to an
-                                        * element. This is equivalent to
-                                        * the <code>el()</code> command.
-                                        */
-      TrilinosScalar
-	operator () (const unsigned int index) const;
-
-                                       /**
-                                        * Return the value of the vector
-                                        * entry <i>i</i>. Note that this
-                                        * function does only work
-                                        * properly when we request a
-                                        * data stored on the local
-                                        * processor. The function will
-                                        * throw an exception in case the
-                                        * elements sits on another
-                                        * process.
-                                        */
-      TrilinosScalar el (const unsigned int index) const;
-
-                                       /**
-                                        * A collective set operation:
-                                        * instead of setting individual
-                                        * elements of a vector, this
-                                        * function allows to set a whole
-                                        * set of elements at once. The
-                                        * indices of the elements to be
-                                        * set are stated in the first
-                                        * argument, the corresponding
-                                        * values in the second.
-                                        */
-      void set (const std::vector<unsigned int>    &indices,
-		const std::vector<TrilinosScalar>  &values);
-
-				       /**
-				        * This is a second collective
-				        * set operation. As a
-				        * difference, this function
-				        * takes a deal.II vector of
-				        * values.
-				        */
-      void set (const std::vector<unsigned int>        &indices,
-		const ::dealii::Vector<TrilinosScalar> &values);
-
-                                       /**
-				        * This collective set operation
-				        * is of lower level and can
-				        * handle anything else &mdash;
-				        * the only thing you have to
-				        * provide is an address where
-				        * all the indices are stored and
-				        * the number of elements to be
-				        * set.
-				        */
-      void set (const unsigned int    n_elements,
-		const unsigned int   *indices,
-		const TrilinosScalar *values);
-
-				       /**
-                                        * A collective add operation:
-                                        * This funnction adds a whole
-                                        * set of values stored in @p
-                                        * values to the vector
-                                        * components specified by @p
-                                        * indices.
-                                        */
-      void add (const std::vector<unsigned int>   &indices,
-		const std::vector<TrilinosScalar> &values);
-
-				       /**
-				        * This is a second collective
-				        * add operation. As a
-				        * difference, this function
-				        * takes a deal.II vector of
-				        * values.
-				        */
-      void add (const std::vector<unsigned int>        &indices,
-		const ::dealii::Vector<TrilinosScalar> &values);
-
-				      /**
-				       * Take an address where
-				       * <tt>n_elements</tt> are stored
-				       * contiguously and add them into
-				       * the vector. Handles all cases
-				       * which are not covered by the
-				       * other two <tt>add()</tt>
-				       * functions above.
-				       */
-      void add (const unsigned int    n_elements,
-		const unsigned int   *indices,
-		const TrilinosScalar *values);
-
-                                       /**
                                         * Return the scalar (inner)
                                         * product of two vectors. The
                                         * vectors must have the same
@@ -598,6 +503,120 @@ namespace TrilinosWrappers
                                         * zero).
                                         */
       bool is_non_negative () const;
+				       //@}
+
+
+                                       /**
+					* @name 2: Data-Access
+					*/
+				       //@{
+
+                                       /**
+                                        * Provide access to a given
+                                        * element, both read and write.
+                                        */
+      reference
+	operator () (const unsigned int index);
+
+                                       /**
+                                        * Provide read-only access to an
+                                        * element. This is equivalent to
+                                        * the <code>el()</code> command.
+                                        */
+      TrilinosScalar
+	operator () (const unsigned int index) const;
+
+                                       /**
+                                        * Return the value of the vector
+                                        * entry <i>i</i>. Note that this
+                                        * function does only work
+                                        * properly when we request a
+                                        * data stored on the local
+                                        * processor. The function will
+                                        * throw an exception in case the
+                                        * elements sits on another
+                                        * process.
+                                        */
+      TrilinosScalar el (const unsigned int index) const;
+
+                                       /**
+                                        * A collective set operation:
+                                        * instead of setting individual
+                                        * elements of a vector, this
+                                        * function allows to set a whole
+                                        * set of elements at once. The
+                                        * indices of the elements to be
+                                        * set are stated in the first
+                                        * argument, the corresponding
+                                        * values in the second.
+                                        */
+      void set (const std::vector<unsigned int>    &indices,
+		const std::vector<TrilinosScalar>  &values);
+
+				       /**
+				        * This is a second collective
+				        * set operation. As a
+				        * difference, this function
+				        * takes a deal.II vector of
+				        * values.
+				        */
+      void set (const std::vector<unsigned int>        &indices,
+		const ::dealii::Vector<TrilinosScalar> &values);
+				       //@}
+
+
+				       /**
+					* @name 3: Modification of vectors
+					*/
+				       //@{
+
+                                       /**
+				        * This collective set operation
+				        * is of lower level and can
+				        * handle anything else &mdash;
+				        * the only thing you have to
+				        * provide is an address where
+				        * all the indices are stored and
+				        * the number of elements to be
+				        * set.
+				        */
+      void set (const unsigned int    n_elements,
+		const unsigned int   *indices,
+		const TrilinosScalar *values);
+
+				       /**
+                                        * A collective add operation:
+                                        * This funnction adds a whole
+                                        * set of values stored in @p
+                                        * values to the vector
+                                        * components specified by @p
+                                        * indices.
+                                        */
+      void add (const std::vector<unsigned int>   &indices,
+		const std::vector<TrilinosScalar> &values);
+
+				       /**
+				        * This is a second collective
+				        * add operation. As a
+				        * difference, this function
+				        * takes a deal.II vector of
+				        * values.
+				        */
+      void add (const std::vector<unsigned int>        &indices,
+		const ::dealii::Vector<TrilinosScalar> &values);
+
+				      /**
+				       * Take an address where
+				       * <tt>n_elements</tt> are stored
+				       * contiguously and add them into
+				       * the vector. Handles all cases
+				       * which are not covered by the
+				       * other two <tt>add()</tt>
+				       * functions above.
+				       */
+      void add (const unsigned int    n_elements,
+		const unsigned int   *indices,
+		const TrilinosScalar *values);
 
                                        /**
                                         * Multiply the entire vector by
@@ -746,13 +765,20 @@ namespace TrilinosWrappers
                                         */
       void ratio (const VectorBase &a,
 		  const VectorBase &b);
+				       //@}
 
-				     /**
-				      *  Output of vector in
-				      *  user-defined format in analogy
-				      *  to the dealii::Vector<number>
-				      *  class.
-				      */
+
+				       /**
+					* @name 4: Mixed stuff
+					*/
+				       //@{
+
+				       /**
+					*  Output of vector in
+					*  user-defined format in analogy
+					*  to the dealii::Vector<number>
+					*  class.
+					*/
       void print (const char* format = 0) const;
 
                                        /**
@@ -807,6 +833,7 @@ namespace TrilinosWrappers
 					* for this class).
 					*/
       unsigned int memory_consumption () const;
+				       //@}
 
 				       /**
 					* Exception

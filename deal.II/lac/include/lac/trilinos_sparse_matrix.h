@@ -328,6 +328,10 @@ namespace TrilinosWrappers
                                         */
       typedef TrilinosScalar value_type;
       
+/**
+ * @name Constructors and initalization.
+ */
+//@{
                                        /**
                                         * Default constructor. Generates
                                         * an empty (zero-size) matrix.
@@ -444,16 +448,6 @@ namespace TrilinosWrappers
                                         * this class.
                                         */
       virtual ~SparseMatrix ();
-
-				       /**
-					* Copy the given matrix to this
-					* one.
-					*
-					* The function returns a
-					* reference to <tt>*this</tt>.
-					*/
-      SparseMatrix &
-	copy_from (const SparseMatrix &source);
 
                                        /**
                                         * This function initializes
@@ -604,6 +598,27 @@ namespace TrilinosWrappers
 		   const double                           drop_tolerance=1e-13);
 
                                        /**
+                                        * This operator assigns a scalar
+                                        * to a matrix. Since this does
+                                        * usually not make much sense
+                                        * (should we set all matrix
+                                        * entries to this value? Only
+                                        * the nonzero entries of the
+                                        * sparsity pattern?), this
+                                        * operation is only allowed if
+                                        * the actual value to be
+                                        * assigned is zero. This
+                                        * operator only exists to allow
+                                        * for the obvious notation
+                                        * <tt>matrix=0</tt>, which sets
+                                        * all elements of the matrix to
+                                        * zero, but keeps the sparsity
+                                        * pattern previously used.
+                                        */
+      SparseMatrix &
+	operator = (const double d);
+
+                                       /**
                                         * Release all memory and
                                         * return to a state just like
                                         * after having called the
@@ -652,174 +667,11 @@ namespace TrilinosWrappers
 					* compress().
 					*/
       bool is_compressed () const;
-
-                                       /**
-                                        * This operator assigns a scalar
-                                        * to a matrix. Since this does
-                                        * usually not make much sense
-                                        * (should we set all matrix
-                                        * entries to this value? Only
-                                        * the nonzero entries of the
-                                        * sparsity pattern?), this
-                                        * operation is only allowed if
-                                        * the actual value to be
-                                        * assigned is zero. This
-                                        * operator only exists to allow
-                                        * for the obvious notation
-                                        * <tt>matrix=0</tt>, which sets
-                                        * all elements of the matrix to
-                                        * zero, but keeps the sparsity
-                                        * pattern previously used.
-                                        */
-      SparseMatrix &
-	operator = (const double d);
-
-                                       /**
-                                        * Set the element (<i>i,j</i>)
-                                        * to @p value.
-					*
-					* Just as the respective call in
-					* deal.II SparseMatrix<Number>
-					* class (but in contrast to the
-					* situation for PETSc based
-					* matrices), this function
-					* throws an exception if an
-					* entry does not exist in the
-					* sparsity pattern. Moreover, if
-					* <tt>value</tt> is not a finite
-					* number an exception is thrown.
-					*/
-      void set (const unsigned int i,
-                const unsigned int j,
-                const TrilinosScalar value);
-
-                                       /**
-                                        * Add @p value to the element
-                                        * (<i>i,j</i>).
-					*
-					* Just as the respective call in
-					* deal.II SparseMatrix<Number>
-					* class (but in contrast to the
-					* situation for PETSc based
-					* matrices), this function
-					* throws an exception if an
-					* entry does not exist in the
-					* sparsity pattern. Moreover, if
-					* <tt>value</tt> is not a finite
-					* number an exception is thrown.
-                                        */
-      void add (const unsigned int i,
-                const unsigned int j,
-                const TrilinosScalar value);
-
-                                       /**
-                                        * Remove all elements from
-                                        * this <tt>row</tt> by setting
-                                        * them to zero. The function
-                                        * does not modify the number
-                                        * of allocated nonzero
-                                        * entries, it only sets some
-                                        * entries to zero. It may drop
-                                        * them from the sparsity
-                                        * pattern, though (but retains
-                                        * the allocated memory in case
-                                        * new entries are again added
-                                        * later). Note that this is a
-                                        * global operation, so this
-                                        * needs to be done on all MPI
-                                        * processes.
-                                        *
-                                        * This operation is used in
-                                        * eliminating constraints
-                                        * (e.g. due to hanging nodes)
-                                        * and makes sure that we can
-                                        * write this modification to
-                                        * the matrix without having to
-                                        * read entries (such as the
-                                        * locations of non-zero
-                                        * elements) from it &mdash;
-                                        * without this operation,
-                                        * removing constraints on
-                                        * parallel matrices is a
-                                        * rather complicated
-                                        * procedure.
-                                        *
-                                        * The second parameter can be
-                                        * used to set the diagonal
-                                        * entry of this row to a value
-                                        * different from zero. The
-                                        * default is to set it to
-                                        * zero.
-                                        */
-      void clear_row (const unsigned int   row,
-                      const TrilinosScalar new_diag_value = 0);
-
-                                       /**
-                                        * Same as clear_row(), except
-                                        * that it works on a number of
-                                        * rows at once.
-                                        *
-                                        * The second parameter can be
-                                        * used to set the diagonal
-                                        * entries of all cleared rows
-                                        * to something different from
-                                        * zero. Note that all of these
-                                        * diagonal entries get the
-                                        * same value -- if you want
-                                        * different values for the
-                                        * diagonal entries, you have
-                                        * to set them by hand.
-                                        */
-      void clear_rows (const std::vector<unsigned int> &rows,
-                       const TrilinosScalar             new_diag_value = 0);
-
-                                       /**
-                                        * Return the value of the
-                                        * entry (<i>i,j</i>).  This
-                                        * may be an expensive
-                                        * operation and you should
-                                        * always take care where to
-                                        * call this function. As in
-                                        * the deal.II sparse matrix
-                                        * class, we throw an exception
-                                        * if the respective entry
-                                        * doesn't exist in the
-                                        * sparsity pattern of this
-                                        * class, which is requested
-                                        * from Trilinos. Moreover, an
-                                        * exception will be thrown
-                                        * when the requested element
-                                        * is not saved on the calling
-                                        * process.
-                                        */
-      TrilinosScalar operator () (const unsigned int i,
-				  const unsigned int j) const;
-
-                                       /**
-                                        * Return the value of the
-                                        * matrix entry
-                                        * (<i>i,j</i>). If this entry
-                                        * does not exist in the
-                                        * sparsity pattern, then zero
-                                        * is returned. While this may
-                                        * be convenient in some cases,
-                                        * note that it is simple to
-                                        * write algorithms that are
-                                        * slow compared to an optimal
-                                        * solution, since the sparsity
-                                        * of the matrix is not used.
-                                        */
-      TrilinosScalar el (const unsigned int i,
-			 const unsigned int j) const;
-
-                                       /**
-                                        * Return the main diagonal
-                                        * element in the <i>i</i>th
-                                        * row. This function throws an
-                                        * error if the matrix is not
-                                        * quadratic.
-                                        */
-      TrilinosScalar diag_element (const unsigned int i) const;
+//@}
+/**
+ * @name Information on the matrix
+ */
+//@{
       
                                        /**
                                         * Return the number of rows in
@@ -886,50 +738,74 @@ namespace TrilinosWrappers
                                         * specific row.
                                         */
       unsigned int row_length (const unsigned int row) const;
-      
-                                       /**
-                                        * Return the
-                                        * <i>l</i><sub>1</sub>-norm of
-                                        * the matrix, that is
-                                        * $|M|_1=
-					* \max_{\mathrm{all columns } j}
-					* \sum_{\mathrm{all rows } i} 
-					* |M_{ij}|$, (max. sum
-                                        * of columns).  This is the
-                                        * natural matrix norm that is
-                                        * compatible to the l1-norm for
-                                        * vectors, i.e.  $|Mv|_1 \leq
-                                        * |M|_1 |v|_1$.
-                                        * (cf. Haemmerlin-Hoffmann:
-                                        * Numerische Mathematik)
-                                        */
-      TrilinosScalar l1_norm () const;
 
                                        /**
-                                        * Return the linfty-norm of the
-                                        * matrix, that is
-                                        * $|M|_\infty=\max_{\mathrm{all
-                                        * rows} i}\sum_{\mathrm{all
-                                        * columns} j} |M_{ij}|$,
-                                        * (max. sum of rows).  This is
-                                        * the natural matrix norm that
-                                        * is compatible to the
-                                        * linfty-norm of vectors, i.e.
-                                        * $|Mv|_\infty \leq |M|_\infty
-                                        * |v|_\infty$.
-                                        * (cf. Haemmerlin-Hoffmann:
-                                        * Numerische Mathematik)
-                                        */
-      TrilinosScalar linfty_norm () const;
+					* Test whether a matrix is
+					* symmetric.  Default
+					* tolerance is zero.  TODO:
+					* Not implemented.
+					*/
+      bool is_symmetric (const double tol = 0.0) const;
 
                                        /**
-                                        * Return the frobenius norm of
-                                        * the matrix, i.e. the square
-                                        * root of the sum of squares
-                                        * of all entries in the
-                                        * matrix.
+					* Test whether a matrix is
+					* Hermitian, i.e. it is the
+					* complex conjugate of its
+					* transpose.  TODO: Not
+					* implemented.
+					*/
+
+      bool is_hermitian () const;
+				     /**
+				      * Determine an estimate for the
+				      * memory consumption (in bytes)
+				      * of this object. Currently not
+				      * implemented for this class.
+				      */
+      unsigned int memory_consumption () const;
+
+//@}
+/**
+ * @name Modifying entries
+ */
+//@{
+                                       /**
+                                        * Set the element (<i>i,j</i>)
+                                        * to @p value.
+					*
+					* Just as the respective call in
+					* deal.II SparseMatrix<Number>
+					* class (but in contrast to the
+					* situation for PETSc based
+					* matrices), this function
+					* throws an exception if an
+					* entry does not exist in the
+					* sparsity pattern. Moreover, if
+					* <tt>value</tt> is not a finite
+					* number an exception is thrown.
+					*/
+      void set (const unsigned int i,
+                const unsigned int j,
+                const TrilinosScalar value);
+
+                                       /**
+                                        * Add @p value to the element
+                                        * (<i>i,j</i>).
+					*
+					* Just as the respective call in
+					* deal.II SparseMatrix<Number>
+					* class (but in contrast to the
+					* situation for PETSc based
+					* matrices), this function
+					* throws an exception if an
+					* entry does not exist in the
+					* sparsity pattern. Moreover, if
+					* <tt>value</tt> is not a finite
+					* number an exception is thrown.
                                         */
-      TrilinosScalar frobenius_norm () const;
+      void add (const unsigned int i,
+                const unsigned int j,
+                const TrilinosScalar value);
       
                                        /**
                                         * Multiply the entire matrix
@@ -942,6 +818,153 @@ namespace TrilinosWrappers
                                         * a fixed factor.
                                         */
       SparseMatrix & operator /= (const TrilinosScalar factor);
+
+				       /**
+					* Copy the given matrix to this
+					* one.
+					*
+					* The function returns a
+					* reference to <tt>*this</tt>.
+					*/
+      SparseMatrix &
+	copy_from (const SparseMatrix &source);
+
+				       /**
+					* Add <tt>matrix</tt> scaled
+					* by <tt>factor</tt> to this
+					* matrix, i.e. the matrix
+					* <tt>factor*matrix</tt> is
+					* added to <tt>this</tt>.
+					*/
+      void add (const TrilinosScalar  factor,
+		const SparseMatrix   &matrix);
+
+                                       /**
+                                        * Remove all elements from
+                                        * this <tt>row</tt> by setting
+                                        * them to zero. The function
+                                        * does not modify the number
+                                        * of allocated nonzero
+                                        * entries, it only sets some
+                                        * entries to zero. It may drop
+                                        * them from the sparsity
+                                        * pattern, though (but retains
+                                        * the allocated memory in case
+                                        * new entries are again added
+                                        * later). Note that this is a
+                                        * global operation, so this
+                                        * needs to be done on all MPI
+                                        * processes.
+                                        *
+                                        * This operation is used in
+                                        * eliminating constraints
+                                        * (e.g. due to hanging nodes)
+                                        * and makes sure that we can
+                                        * write this modification to
+                                        * the matrix without having to
+                                        * read entries (such as the
+                                        * locations of non-zero
+                                        * elements) from it &mdash;
+                                        * without this operation,
+                                        * removing constraints on
+                                        * parallel matrices is a
+                                        * rather complicated
+                                        * procedure.
+                                        *
+                                        * The second parameter can be
+                                        * used to set the diagonal
+                                        * entry of this row to a value
+                                        * different from zero. The
+                                        * default is to set it to
+                                        * zero.
+                                        */
+      void clear_row (const unsigned int   row,
+                      const TrilinosScalar new_diag_value = 0);
+
+                                       /**
+                                        * Same as clear_row(), except
+                                        * that it works on a number of
+                                        * rows at once.
+                                        *
+                                        * The second parameter can be
+                                        * used to set the diagonal
+                                        * entries of all cleared rows
+                                        * to something different from
+                                        * zero. Note that all of these
+                                        * diagonal entries get the
+                                        * same value -- if you want
+                                        * different values for the
+                                        * diagonal entries, you have
+                                        * to set them by hand.
+                                        */
+      void clear_rows (const std::vector<unsigned int> &rows,
+                       const TrilinosScalar             new_diag_value = 0);
+
+                                       /**
+					* Make an in-place transpose
+					* of a matrix.
+					*/
+      void transpose ();
+
+//@}
+/**
+ * @name Entry Access
+ */
+//@{
+
+                                       /**
+                                        * Return the value of the
+                                        * entry (<i>i,j</i>).  This
+                                        * may be an expensive
+                                        * operation and you should
+                                        * always take care where to
+                                        * call this function. As in
+                                        * the deal.II sparse matrix
+                                        * class, we throw an exception
+                                        * if the respective entry
+                                        * doesn't exist in the
+                                        * sparsity pattern of this
+                                        * class, which is requested
+                                        * from Trilinos. Moreover, an
+                                        * exception will be thrown
+                                        * when the requested element
+                                        * is not saved on the calling
+                                        * process.
+                                        */
+      TrilinosScalar operator () (const unsigned int i,
+				  const unsigned int j) const;
+
+                                       /**
+                                        * Return the value of the
+                                        * matrix entry
+                                        * (<i>i,j</i>). If this entry
+                                        * does not exist in the
+                                        * sparsity pattern, then zero
+                                        * is returned. While this may
+                                        * be convenient in some cases,
+                                        * note that it is simple to
+                                        * write algorithms that are
+                                        * slow compared to an optimal
+                                        * solution, since the sparsity
+                                        * of the matrix is not used.
+                                        */
+      TrilinosScalar el (const unsigned int i,
+			 const unsigned int j) const;
+
+                                       /**
+                                        * Return the main diagonal
+                                        * element in the <i>i</i>th
+                                        * row. This function throws an
+                                        * error if the matrix is not
+                                        * quadratic.
+                                        */
+      TrilinosScalar diag_element (const unsigned int i) const;
+
+//@}
+/**
+ * @name Matrix vector multiplications
+ */
+//@{
 
                                        /**
                                         * Matrix-vector multiplication:
@@ -1205,15 +1228,61 @@ namespace TrilinosWrappers
 			       const VectorBase &x,
 			       const VectorBase &b) const;
 
-				       /**
-					* Add <tt>matrix</tt> scaled
-					* by <tt>factor</tt> to this
-					* matrix, i.e. the matrix
-					* <tt>factor*matrix</tt> is
-					* added to <tt>this</tt>.
-					*/
-      void add (const TrilinosScalar  factor,
-		const SparseMatrix   &matrix);
+//@}
+/**
+ * @name Matrix norms
+ */
+//@{
+      
+                                       /**
+                                        * Return the
+                                        * <i>l</i><sub>1</sub>-norm of
+                                        * the matrix, that is
+                                        * $|M|_1=
+					* \max_{\mathrm{all columns } j}
+					* \sum_{\mathrm{all rows } i} 
+					* |M_{ij}|$, (max. sum
+                                        * of columns).  This is the
+                                        * natural matrix norm that is
+                                        * compatible to the l1-norm for
+                                        * vectors, i.e.  $|Mv|_1 \leq
+                                        * |M|_1 |v|_1$.
+                                        * (cf. Haemmerlin-Hoffmann:
+                                        * Numerische Mathematik)
+                                        */
+      TrilinosScalar l1_norm () const;
+
+                                       /**
+                                        * Return the linfty-norm of the
+                                        * matrix, that is
+                                        * $|M|_\infty=\max_{\mathrm{all
+                                        * rows} i}\sum_{\mathrm{all
+                                        * columns} j} |M_{ij}|$,
+                                        * (max. sum of rows).  This is
+                                        * the natural matrix norm that
+                                        * is compatible to the
+                                        * linfty-norm of vectors, i.e.
+                                        * $|Mv|_\infty \leq |M|_\infty
+                                        * |v|_\infty$.
+                                        * (cf. Haemmerlin-Hoffmann:
+                                        * Numerische Mathematik)
+                                        */
+      TrilinosScalar linfty_norm () const;
+
+                                       /**
+                                        * Return the frobenius norm of
+                                        * the matrix, i.e. the square
+                                        * root of the sum of squares
+                                        * of all entries in the
+                                        * matrix.
+                                        */
+      TrilinosScalar frobenius_norm () const;
+
+//@}
+/**
+ * @name Iterators
+ */
+//@{
 
                                        /**
                                         * STL-like iterator with the
@@ -1258,30 +1327,13 @@ namespace TrilinosWrappers
                                         */
       const_iterator end (const unsigned int r) const;
 
-                                       /**  
-					* Make an in-place transpose
-					* of a matrix.
-					*/
-      void transpose ();
+//@}
+/**
+ * @name Input/Output
+ */
+//@{
 
-                                       /**  
-					* Test whether a matrix is
-					* symmetric.  Default
-					* tolerance is zero.  TODO:
-					* Not implemented.
-					*/
-      bool is_symmetric (const double tol = 0.0);
-
-                                       /** 
-					* Test whether a matrix is
-					* Hermitian, i.e. it is the
-					* complex conjugate of its
-					* transpose.  TODO: Not
-					* implemented.
-					*/
-      bool is_hermitian ();
-
-                                       /** 
+                                       /**
 					* Abstract Trilinos object
 					* that helps view in ASCII
 					* other Trilinos
@@ -1308,6 +1360,9 @@ namespace TrilinosWrappers
                                         // object supports it, this should 
                                         // be very easy.
 
+//@}
+    				     /** @addtogroup Exceptions
+				      * @{ */
                                        /**
                                         * Exception
                                         */
@@ -1349,7 +1404,7 @@ namespace TrilinosWrappers
 		      << "/" << arg2 << ")"
 		      << " of a sparse matrix, but it appears to not"
 		      << " exist in the Trilinos sparsity pattern.");
-
+				     //@}    
     private:
                                        /**
 				        * Epetra Trilinos
