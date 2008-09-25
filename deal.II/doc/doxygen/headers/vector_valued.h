@@ -190,7 +190,7 @@
  *
  * This means that the final finite element will consist of <code>dim</code>
  * components made up of FE_Q elements of degree 1, and another one also of
- * degree 1. If course, a simpler (and more efficient) way to achieve the same
+ * degree 1. Of course, a simpler (and more efficient) way to achieve the same
  * is to use the following form instead:
  * @code
  *   FESystem<dim> finite_element (FE_Q<dim>(1), dim+1);
