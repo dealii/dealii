@@ -1044,7 +1044,7 @@ namespace TrilinosWrappers
 
 
   bool
-  SparseMatrix::is_symmetric (const double tolerance) 
+  SparseMatrix::is_symmetric (const double tolerance) const
   {
     (void)tolerance;
     
@@ -1056,7 +1056,7 @@ namespace TrilinosWrappers
 
 
   bool
-  SparseMatrix::is_hermitian () 
+  SparseMatrix::is_hermitian () const
   {
     Assert (false, ExcNotImplemented());
     return false;
