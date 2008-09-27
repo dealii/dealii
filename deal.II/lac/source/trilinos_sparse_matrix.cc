@@ -87,7 +87,7 @@ namespace TrilinosWrappers
 		  last_action (Zero),
 		  compressed (true),
 		  matrix (std::auto_ptr<Epetra_FECrsMatrix>
-				(new Epetra_FECrsMatrix(Copy, row_map, 0)))
+				(new Epetra_FECrsMatrix(View, row_map, 0)))
   {}
 
   SparseMatrix::SparseMatrix (const Epetra_Map  &InputMap,
@@ -394,7 +394,8 @@ namespace TrilinosWrappers
     col_map = row_map;
 
     matrix = std::auto_ptr<Epetra_FECrsMatrix> 
-	      (new Epetra_FECrsMatrix(Copy, row_map, 0));
+	      (new Epetra_FECrsMatrix(View, row_map, 0));
+
     compressed = true;
   }
 

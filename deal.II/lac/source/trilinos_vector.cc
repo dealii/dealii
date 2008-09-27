@@ -38,7 +38,7 @@ namespace TrilinosWrappers
 #endif
     {
       last_action = Zero;
-      vector = std::auto_ptr<Epetra_FEVector> (new Epetra_FEVector(map,false));
+      vector = std::auto_ptr<Epetra_FEVector> (new Epetra_FEVector(map));
     }
 
 
@@ -48,7 +48,7 @@ namespace TrilinosWrappers
 		    map (InputMap)
     {
       last_action = Zero;
-      vector = std::auto_ptr<Epetra_FEVector> (new Epetra_FEVector(map,false));
+      vector = std::auto_ptr<Epetra_FEVector> (new Epetra_FEVector(map));
     }
   
 
@@ -80,7 +80,7 @@ namespace TrilinosWrappers
 	vector = std::auto_ptr<Epetra_FEVector> (new Epetra_FEVector(*v.vector));
       else
 	{
-	  vector = std::auto_ptr<Epetra_FEVector> (new Epetra_FEVector(map, false));
+	  vector = std::auto_ptr<Epetra_FEVector> (new Epetra_FEVector(map));
 	  reinit (v, false, true);
 	}
 
@@ -96,7 +96,7 @@ namespace TrilinosWrappers
       map = input_map;
       (void)fast;
       
-      vector = std::auto_ptr<Epetra_FEVector> (new Epetra_FEVector(map,false));
+      vector = std::auto_ptr<Epetra_FEVector> (new Epetra_FEVector(map));
       last_action = Zero;
     }
 
@@ -120,7 +120,7 @@ namespace TrilinosWrappers
 	  if (map.SameAs(v.vector->Map()) == false)
 	    map = Epetra_Map(v.vector->GlobalLength(),0,v.vector->Comm());
 
-	  vector = std::auto_ptr<Epetra_FEVector> (new Epetra_FEVector(map,false));
+	  vector = std::auto_ptr<Epetra_FEVector> (new Epetra_FEVector(map));
 	  last_action = Zero;
 	}
 
@@ -195,7 +195,7 @@ namespace TrilinosWrappers
       Assert (size() == v.size(),
 	      ExcDimensionMismatch(size(), v.size()));
 
-      vector = std::auto_ptr<Epetra_FEVector> (new Epetra_FEVector(map, false));
+      vector = std::auto_ptr<Epetra_FEVector> (new Epetra_FEVector(map));
       
       const int min_my_id = map.MinMyGID();
       const unsigned int size = map.NumMyElements();
@@ -229,8 +229,7 @@ namespace TrilinosWrappers
 #endif
   {
     last_action = Zero;
-    vector = std::auto_ptr<Epetra_FEVector>
-	              (new Epetra_FEVector(map,false));
+    vector = std::auto_ptr<Epetra_FEVector> (new Epetra_FEVector(map));
   }
 
 
@@ -253,8 +252,7 @@ namespace TrilinosWrappers
                  map (InputMap.NumGlobalElements(), 0, InputMap.Comm())
   {
     last_action = Zero;
-    vector = std::auto_ptr<Epetra_FEVector>
-	              (new Epetra_FEVector(map,false));
+    vector = std::auto_ptr<Epetra_FEVector> (new Epetra_FEVector(map));
   }
 
 
@@ -264,7 +262,7 @@ namespace TrilinosWrappers
                  map (v.vector->Map().NumGlobalElements(), 0, v.vector->Comm())
   {
     last_action = Zero;
-    vector = std::auto_ptr<Epetra_FEVector> (new Epetra_FEVector(map,false));
+    vector = std::auto_ptr<Epetra_FEVector> (new Epetra_FEVector(map));
 
     if (vector->Map().SameAs(v.vector->Map()) == true)
       *vector = *v.vector;
@@ -291,7 +289,7 @@ namespace TrilinosWrappers
 
     last_action = Zero;
 
-    vector = std::auto_ptr<Epetra_FEVector> (new Epetra_FEVector (map,false));
+    vector = std::auto_ptr<Epetra_FEVector> (new Epetra_FEVector (map));
   }
 
 
@@ -311,7 +309,7 @@ namespace TrilinosWrappers
     last_action = Zero;
 
     (void)fast;
-    vector = std::auto_ptr<Epetra_FEVector> (new Epetra_FEVector (map, false));
+    vector = std::auto_ptr<Epetra_FEVector> (new Epetra_FEVector (map));
   }
 
 
@@ -334,7 +332,7 @@ namespace TrilinosWrappers
 	if (map.SameAs(v.vector->Map()) == false)
 	  map = Epetra_LocalMap (v.vector->GlobalLength(),0,v.vector->Comm());
 
-	vector = std::auto_ptr<Epetra_FEVector> (new Epetra_FEVector(map,false));
+	vector = std::auto_ptr<Epetra_FEVector> (new Epetra_FEVector(map));
 	last_action = Zero;
       }
 
@@ -373,7 +371,7 @@ namespace TrilinosWrappers
       {
 	map = Epetra_LocalMap (v.vector->Map().NumGlobalElements(), 0,
 			       v.vector->Comm());
-	vector = std::auto_ptr<Epetra_FEVector> (new Epetra_FEVector(map,false));
+	vector = std::auto_ptr<Epetra_FEVector> (new Epetra_FEVector(map));
       }
 
     reinit (v, false, true);
@@ -389,7 +387,7 @@ namespace TrilinosWrappers
       {
 	map = Epetra_LocalMap (v.vector->Map().NumGlobalElements(), 0,
 			       v.vector->Comm());
-	vector = std::auto_ptr<Epetra_FEVector> (new Epetra_FEVector(map,false));
+	vector = std::auto_ptr<Epetra_FEVector> (new Epetra_FEVector(map));
       }
 
     *vector = *v.vector;
@@ -406,7 +404,7 @@ namespace TrilinosWrappers
     if (size() != v.size())
       {
 	map = LocalMap (v.size(), 0, vector->Comm());
-	vector = std::auto_ptr<Epetra_FEVector> (new Epetra_FEVector(map,false));
+	vector = std::auto_ptr<Epetra_FEVector> (new Epetra_FEVector(map));
       }
 
     std::vector<int> indices (v.size());

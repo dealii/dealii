@@ -80,12 +80,13 @@ namespace TrilinosWrappers
 					*/
       DeclException1 (ExcNonMatchingMaps,
 		      std::string,
-		      << "The sparse matrix that the preconditioner is based "
-		      << "on a map that is not compatible to the one in vector "
+		      << "The sparse matrix the preconditioner is based on "
+		      << "uses a map that is not compatible to the one in vector "
 		      << arg1
 		      << ". Check preconditioner and matrix setup.");
 
       friend class SolverBase;
+      friend class SolverSaddlePoint;
 
     protected:
 				       /**
