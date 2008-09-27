@@ -1461,6 +1461,16 @@ namespace TrilinosWrappers
 					*/
       bool compressed;
 
+				       /**
+					* An internal Trilinos vector
+					* that is used for
+					* accelerating vmult_add
+					* functions (do not need to
+					* allocate too many temporary
+					* vectors).
+					*/
+      mutable VectorBase temp_vector;
+
     public:
                                        /**
                                         * A sparse matrix object in

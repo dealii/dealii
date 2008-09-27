@@ -914,9 +914,10 @@ namespace TrilinosWrappers
   {
     Assert (&src != &dst, ExcSourceEqualsDestination());
 
-    VectorBase tmp(dst);
+    temp_vector.reinit(dst);
+
     vmult (dst, src);
-    dst += tmp;
+    dst += temp_vector;
   }
 
 
@@ -927,9 +928,10 @@ namespace TrilinosWrappers
   {
     Assert (&src != &dst, ExcSourceEqualsDestination());
 
-    VectorBase tmp(dst);
+    temp_vector.reinit(dst);
+
     vmult (dst, src);
-    dst += tmp;
+    dst += temp_vector;
   }
 
 
@@ -937,9 +939,14 @@ namespace TrilinosWrappers
   TrilinosScalar
   SparseMatrix::matrix_norm_square (const VectorBase &v) const
   {
-    VectorBase tmp (v);
-    vmult (tmp, v);
-    return tmp*v;
+    Assert (row_map.SameAs(col_map),
+	    ExcDimensionMismatch(row_map.NumGlobalElements(),
+				 col_map.NumGlobalElements()));
+
+    temp_vector.reinit(v);
+
+    vmult (temp_vector, v);
+    return temp_vector*v;
   }
 
 
@@ -948,9 +955,14 @@ namespace TrilinosWrappers
   SparseMatrix::matrix_scalar_product (const VectorBase &u,
 				       const VectorBase &v) const
   {
-    VectorBase tmp (v);
-    vmult (tmp, v);
-    return u*tmp;
+    Assert (row_map.SameAs(col_map),
+	    ExcDimensionMismatch(row_map.NumGlobalElements(),
+				 col_map.NumGlobalElements()));
+
+    temp_vector.reinit(v);
+
+    vmult (temp_vector, v);
+    return u*temp_vector;
   }
 
 
