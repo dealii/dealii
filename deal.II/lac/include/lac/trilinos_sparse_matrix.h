@@ -443,6 +443,15 @@ namespace TrilinosWrappers
 		    const std::vector<unsigned int> &n_entries_per_row);
 
                                        /**
+                                        * Copy constructor. Sets the
+                                        * calling matrix to be the same
+                                        * as the input matrix, i.e.,
+                                        * using the same sparsity
+                                        * pattern and entries.
+                                        */
+      SparseMatrix (const SparseMatrix &InputMatrix);
+
+                                       /**
                                         * Destructor. Made virtual so
                                         * that one can use pointers to
                                         * this class.

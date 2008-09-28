@@ -142,6 +142,17 @@ namespace TrilinosWrappers
 					    false)))
   {}
 
+  SparseMatrix::SparseMatrix (const SparseMatrix &InputMatrix)
+		  :
+                  Subscriptor(),
+                  row_map (InputMatrix.row_map),
+		  col_map (InputMatrix.col_map),
+		  last_action (Zero),
+		  compressed (true),
+		  matrix (std::auto_ptr<Epetra_FECrsMatrix>
+			  (new Epetra_FECrsMatrix(*InputMatrix.matrix)))
+  {}
+
 
 
   SparseMatrix::~SparseMatrix ()
