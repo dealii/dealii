@@ -21,6 +21,8 @@
 #include <lac/householder.h>
 #include <lac/vector.h>
 #include <lac/block_vector.h>
+#include <lac/trilinos_vector.h>
+#include <lac/trilinos_block_vector.h>
 #include <grid/tria.h>
 #include <grid/tria_iterator.h>
 #include <grid/grid_generator.h>
@@ -2018,6 +2020,54 @@ void FETools::extrapolate<deal_II_dimension>
  Vector<float> &);
 
 
+#ifdef DEAL_II_USE_TRILINOS
+
+template
+void FETools::interpolate<deal_II_dimension>
+(const DoFHandler<deal_II_dimension> &, const TrilinosWrappers::Vector &,
+ const DoFHandler<deal_II_dimension> &,  TrilinosWrappers::Vector &);
+template
+void FETools::interpolate<deal_II_dimension>
+(const DoFHandler<deal_II_dimension> &, const TrilinosWrappers::Vector &,
+ const DoFHandler<deal_II_dimension> &, const ConstraintMatrix &,
+ TrilinosWrappers::Vector &);
+template
+void FETools::back_interpolate<deal_II_dimension>
+(const DoFHandler<deal_II_dimension> &, const TrilinosWrappers::Vector &,
+ const FiniteElement<deal_II_dimension> &,  TrilinosWrappers::Vector &);
+template
+void FETools::back_interpolate<deal_II_dimension>
+(const DoFHandler<deal_II_dimension> &, const ConstraintMatrix &,
+ const TrilinosWrappers::Vector &,
+ const DoFHandler<deal_II_dimension> &, const ConstraintMatrix &,
+ TrilinosWrappers::Vector &);
+template
+void FETools::interpolation_difference<deal_II_dimension>
+(const DoFHandler<deal_II_dimension> &, const TrilinosWrappers::Vector &,
+ const FiniteElement<deal_II_dimension> &, TrilinosWrappers::Vector &);
+template
+void FETools::interpolation_difference<deal_II_dimension>
+(const DoFHandler<deal_II_dimension> &, const ConstraintMatrix &,
+ const TrilinosWrappers::Vector &,
+ const DoFHandler<deal_II_dimension> &, const ConstraintMatrix &,
+ TrilinosWrappers::Vector &);
+template
+void FETools::project_dg<deal_II_dimension>
+(const DoFHandler<deal_II_dimension> &, const TrilinosWrappers::Vector &,
+ const DoFHandler<deal_II_dimension> &, TrilinosWrappers::Vector &);
+template
+void FETools::extrapolate<deal_II_dimension>
+(const DoFHandler<deal_II_dimension> &, const TrilinosWrappers::Vector &,
+ const DoFHandler<deal_II_dimension> &, TrilinosWrappers::Vector &);
+template
+void FETools::extrapolate<deal_II_dimension>
+(const DoFHandler<deal_II_dimension> &, const TrilinosWrappers::Vector &,
+ const DoFHandler<deal_II_dimension> &, const ConstraintMatrix &,
+ TrilinosWrappers::Vector &);
+
+#endif
+
+
 template
 void FETools::interpolate<deal_II_dimension>
 (const DoFHandler<deal_II_dimension> &, const BlockVector<double> &,
@@ -2122,6 +2172,55 @@ void FETools::extrapolate<deal_II_dimension>
 (const DoFHandler<deal_II_dimension> &, const BlockVector<float> &,
  const DoFHandler<deal_II_dimension> &, const ConstraintMatrix &,
  Vector<float> &);
+
+
+#ifdef DEAL_II_USE_TRILINOS
+
+template
+void FETools::interpolate<deal_II_dimension>
+(const DoFHandler<deal_II_dimension> &, const TrilinosWrappers::BlockVector &,
+ const DoFHandler<deal_II_dimension> &,  TrilinosWrappers::BlockVector &);
+template
+void FETools::interpolate<deal_II_dimension>
+(const DoFHandler<deal_II_dimension> &, const TrilinosWrappers::BlockVector &,
+ const DoFHandler<deal_II_dimension> &, const ConstraintMatrix &,
+ TrilinosWrappers::BlockVector &);
+template
+void FETools::back_interpolate<deal_II_dimension>
+(const DoFHandler<deal_II_dimension> &, const TrilinosWrappers::BlockVector &,
+ const FiniteElement<deal_II_dimension> &,  TrilinosWrappers::BlockVector &);
+template
+void FETools::back_interpolate<deal_II_dimension>
+(const DoFHandler<deal_II_dimension> &, const ConstraintMatrix &,
+ const TrilinosWrappers::BlockVector &,
+ const DoFHandler<deal_II_dimension> &, const ConstraintMatrix &,
+ TrilinosWrappers::BlockVector &);
+template
+void FETools::interpolation_difference<deal_II_dimension>
+(const DoFHandler<deal_II_dimension> &, const TrilinosWrappers::BlockVector &,
+ const FiniteElement<deal_II_dimension> &, TrilinosWrappers::BlockVector &);
+template
+void FETools::interpolation_difference<deal_II_dimension>
+(const DoFHandler<deal_II_dimension> &, const ConstraintMatrix &,
+ const TrilinosWrappers::BlockVector &,
+ const DoFHandler<deal_II_dimension> &, const ConstraintMatrix &,
+ TrilinosWrappers::BlockVector &);
+template
+void FETools::project_dg<deal_II_dimension>
+(const DoFHandler<deal_II_dimension> &, const TrilinosWrappers::BlockVector &,
+ const DoFHandler<deal_II_dimension> &, TrilinosWrappers::BlockVector &);
+template
+void FETools::extrapolate<deal_II_dimension>
+(const DoFHandler<deal_II_dimension> &, const TrilinosWrappers::BlockVector &,
+ const DoFHandler<deal_II_dimension> &, TrilinosWrappers::BlockVector &);
+template
+void FETools::extrapolate<deal_II_dimension>
+(const DoFHandler<deal_II_dimension> &, const TrilinosWrappers::BlockVector &,
+ const DoFHandler<deal_II_dimension> &, const ConstraintMatrix &,
+ TrilinosWrappers::BlockVector &);
+
+#endif
+
 
 template
 void FETools::interpolate<deal_II_dimension>

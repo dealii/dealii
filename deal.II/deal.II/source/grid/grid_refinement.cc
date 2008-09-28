@@ -13,6 +13,7 @@
 
 #include <lac/vector.h>
 #include <lac/petsc_vector.h>
+#include <lac/trilinos_vector.h>
 
 #include <grid/grid_refinement.h>
 #include <grid/tria_accessor.h>
@@ -73,6 +74,26 @@ namespace
     PetscScalar m = criteria(0);
     for (unsigned int i=1; i<criteria.size(); ++i)
       m = std::min (m, criteria(i));
+    return m;
+  }
+#endif
+
+
+#ifdef DEAL_II_USE_TRILINOS  
+  TrilinosScalar
+  max_element (const TrilinosWrappers::Vector &criteria)
+  {
+    TrilinosScalar m = 0;
+    criteria.vector->MaxValue(&m);
+    return m;
+  }
+
+
+  TrilinosScalar
+  min_element (const TrilinosWrappers::Vector &criteria)
+  {
+    TrilinosScalar m = 0;
+    criteria.vector->MinValue(&m);
     return m;
   }
 #endif
@@ -581,6 +602,48 @@ void
 GridRefinement::
 refine_and_coarsen_optimize (Triangulation<deal_II_dimension> &,
                              const PETScWrappers::Vector &);
+#endif
+
+
+#ifdef DEAL_II_USE_TRILINOS
+template
+void
+GridRefinement::
+refine (Triangulation<deal_II_dimension> &,
+        const TrilinosWrappers::Vector &,
+        const double);
+
+template
+void
+GridRefinement::
+coarsen (Triangulation<deal_II_dimension> &,
+         const TrilinosWrappers::Vector &,
+         const double);
+
+
+template
+void
+GridRefinement::
+refine_and_coarsen_fixed_number (Triangulation<deal_II_dimension> &,
+                                 const TrilinosWrappers::Vector &,
+                                 const double,
+                                 const double,
+				 const unsigned int);
+
+template
+void
+GridRefinement::
+refine_and_coarsen_fixed_fraction (Triangulation<deal_II_dimension> &,
+                                   const TrilinosWrappers::Vector &,
+                                   const double,
+                                   const double,
+				   const unsigned int);
+
+template
+void
+GridRefinement::
+refine_and_coarsen_optimize (Triangulation<deal_II_dimension> &,
+                             const TrilinosWrappers::Vector &);
 #endif
 
 DEAL_II_NAMESPACE_CLOSE
