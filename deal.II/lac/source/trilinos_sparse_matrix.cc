@@ -88,7 +88,9 @@ namespace TrilinosWrappers
 		  compressed (true),
 		  matrix (std::auto_ptr<Epetra_FECrsMatrix>
 				(new Epetra_FECrsMatrix(View, row_map, 0)))
-  {}
+  {
+    matrix->FillComplete();
+  }
 
   SparseMatrix::SparseMatrix (const Epetra_Map  &InputMap,
 			      const unsigned int n_max_entries_per_row)
@@ -288,7 +290,7 @@ namespace TrilinosWrappers
 				  // In the end, the matrix needs to
 				  // be compressed in order to be
 				  // really ready.
-    compress();    
+    compress();
   }
 
 
@@ -406,6 +408,8 @@ namespace TrilinosWrappers
 
     matrix = std::auto_ptr<Epetra_FECrsMatrix> 
 	      (new Epetra_FECrsMatrix(View, row_map, 0));
+
+    matrix->FillComplete();
 
     compressed = true;
   }
@@ -884,14 +888,14 @@ namespace TrilinosWrappers
 		       const VectorBase &src) const
   {
     Assert (&src != &dst, ExcSourceEqualsDestination());
-    
-    Assert (col_map.SameAs(src.vector->Map()) == true,
-	    ExcMessage ("Column map of matrix does not fit with vector map!"));
-    Assert (row_map.SameAs(dst.vector->Map()) == true,
-	    ExcMessage ("Row map of matrix does not fit with vector map!"));
 
     if (matrix->Filled() == false)
       matrix->FillComplete(col_map, row_map, true);
+
+    Assert (src.vector->Map().SameAs(matrix->DomainMap()) == true,
+	    ExcMessage ("Column map of matrix does not fit with vector map!"));
+    Assert (dst.vector->Map().SameAs(matrix->RangeMap()) == true,
+	    ExcMessage ("Row map of matrix does not fit with vector map!"));
 
     const int ierr = matrix->Multiply (false, *(src.vector), *(dst.vector));
     AssertThrow (ierr == 0, ExcTrilinosError(ierr));
@@ -905,13 +909,13 @@ namespace TrilinosWrappers
   {
     Assert (&src != &dst, ExcSourceEqualsDestination());
 
-    Assert (row_map.SameAs(src.vector->Map()) == true,
-	    ExcMessage ("Row map of matrix does not fit with vector map!"));
-    Assert (col_map.SameAs(dst.vector->Map()) == true,
-	    ExcMessage ("Column map of matrix does not fit with vector map!"));
-
     if (matrix->Filled() == false)
       matrix->FillComplete(col_map, row_map, true);
+
+    Assert (src.vector->Map().SameAs(matrix->DomainMap()) == true,
+	    ExcMessage ("Column map of matrix does not fit with vector map!"));
+    Assert (dst.vector->Map().SameAs(matrix->RangeMap()) == true,
+	    ExcMessage ("Row map of matrix does not fit with vector map!"));
 
     const int ierr = matrix->Multiply (true, *(src.vector), *(dst.vector));
     AssertThrow (ierr == 0, ExcTrilinosError(ierr));
