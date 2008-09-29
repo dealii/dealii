@@ -2,7 +2,7 @@
 //    $Id$
 //    Version: $Name$
 //
-//    Copyright (C) 1998, 1999, 2000, 2001, 2002, 2003, 2004, 2005, 2006, 2007 by the deal.II authors
+//    Copyright (C) 1998, 1999, 2000, 2001, 2002, 2003, 2004, 2005, 2006, 2007, 2008 by the deal.II authors
 //
 //    This file is subject to QPL and may not be  distributed
 //    without copyright and license information. Please refer
@@ -33,6 +33,9 @@
 #endif
 
 DEAL_II_NAMESPACE_OPEN
+
+//TODO: Instead of letting the Tria*Iterator classes take a dimension as first argument, deduce the space dimension from the TriaAccessor where necessary.
+
 
 template <int dim> class Triangulation;
 
