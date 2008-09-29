@@ -2,7 +2,7 @@
 //    $Id$
 //    Version: $Name$ 
 //
-//    Copyright (C) 2000, 2001, 2003, 2004, 2007 by the deal.II authors
+//    Copyright (C) 2000, 2001, 2003, 2004, 2007, 2008 by the deal.II authors
 //
 //    This file is subject to QPL and may not be  distributed
 //    without copyright and license information. Please refer
@@ -17,9 +17,12 @@
 // rhs vector was nested in the wrong loop. this was fixed by Moritz' commit
 // 14428
 //
-// the function internally has four branches, with different code used for the
-// cases with/without coefficient and scalar/vector-valued finite element. we
-// test these four cases through the _01, _02, _03, and _04 tests
+// the function internally has four branches, with different code used
+// for the cases with/without coefficient and scalar/vector-valued
+// finite element. we test these four cases through the _01, _02, _03,
+// and _04 tests. the version with a coefficient is tested in the
+// _0[1234]a tests, and versions without computing a right hand side
+// vectors with and without coefficient in the _0[1234][bc] tests
 
 
 
