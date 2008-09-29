@@ -11019,6 +11019,11 @@ echo "${ECHO_T}F77 compiler is gcc-4.2" >&6; }
 echo "${ECHO_T}F77 compiler is gcc-4.3" >&6; }
   	  F77_VERSION=gcc4.3
   	  ;;
+        *version\ 4.4*)
+  	  { echo "$as_me:$LINENO: result: F77 compiler is gcc-4.4" >&5
+echo "${ECHO_T}F77 compiler is gcc-4.4" >&6; }
+  	  F77_VERSION=gcc4.4
+  	  ;;
         *)
   	  { echo "$as_me:$LINENO: result: F77 compiler is unknown but accepted gcc version" >&5
 echo "${ECHO_T}F77 compiler is unknown but accepted gcc version" >&6; }

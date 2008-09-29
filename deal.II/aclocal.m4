@@ -1494,6 +1494,10 @@ AC_DEFUN(DEAL_II_DETERMINE_F77_BRAND, dnl
   	  AC_MSG_RESULT(F77 compiler is gcc-4.3)
   	  F77_VERSION=gcc4.3
   	  ;;
+        *version\ 4.4*)
+  	  AC_MSG_RESULT(F77 compiler is gcc-4.4)
+  	  F77_VERSION=gcc4.4
+  	  ;;
         *)
   	  AC_MSG_RESULT(F77 compiler is unknown but accepted gcc version)
   	  F77_VERSION=gcc-other
