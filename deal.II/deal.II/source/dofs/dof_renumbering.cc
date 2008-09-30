@@ -63,31 +63,6 @@ extern "C" long int lrand48 (void);
 DEAL_II_NAMESPACE_OPEN
 
 
-namespace internal
-{
-				   // the following function is sorta
-				   // stupid: gcc complains that the
-				   // variables _3, _4, ... declared
-				   // in
-				   // contrib/boost/include/boost/bind/placeholders.hpp
-				   // are unused. _1 and _2 are
-				   // apparently used, so this isn't a
-				   // problem. to suppress the warning
-				   // in this case, write a dummy
-				   // function that simply references
-				   // these variables in an
-				   // unobtrusive way...
-  void avoid_warning_about_unused_variables ()
-  {
-    std::printf ("%p %p %p %p %p %p %p",
-		 (void*)&_3, (void*)&_4,
-		 (void*)&_5,(void*) &_6,
-		 (void*)&_7,(void*) &_8,
-		 (void*)&_9);
-  }
-}
-
-
 namespace DoFRenumbering
 {
   namespace internal
