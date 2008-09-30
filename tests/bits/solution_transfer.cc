@@ -111,9 +111,17 @@ void transfer(std::ostream &out)
   tria.execute_coarsening_and_refinement();
   q_dof_handler.distribute_dofs (fe_q);
   dgq_dof_handler.distribute_dofs (fe_dgq);
+
+  Vector<double> tmp_q (q_dof_handler.n_dofs());
+  q_soltrans.refine_interpolate(q_solution, tmp_q);
+  q_solution.reinit (q_dof_handler.n_dofs());
+  q_solution = tmp_q;
   
-  q_soltrans.refine_interpolate(q_solution);
-  dgq_soltrans.refine_interpolate(dgq_solution);
+  Vector<double> tmp_dgq (dgq_dof_handler.n_dofs());
+  dgq_soltrans.refine_interpolate(dgq_solution, tmp_dgq);
+  dgq_solution.reinit (dgq_dof_handler.n_dofs());
+  dgq_solution = tmp_dgq;
+
 
   q_data_out.clear_data_vectors();
   q_data_out.add_data_vector (q_solution, "solution");
