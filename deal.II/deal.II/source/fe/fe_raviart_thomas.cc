@@ -330,7 +330,7 @@ FE_RaviartThomas<dim>::initialize_restriction()
 					   // when building the shape
 					   // functions, these weights
 					   // are equal to the
-					   // corresponding shpe
+					   // corresponding shape
 					   // functions.
 	  for (unsigned int k=0;k<n_face_points;++k)
 	    for (unsigned int i_child = 0; i_child < this->dofs_per_cell; ++i_child)
