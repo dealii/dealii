@@ -577,10 +577,25 @@ AC_DEFUN(DEAL_II_SET_CXX_FLAGS, dnl
 
     dnl Some system specific things
     case "$target" in
-      dnl Use -Wno-long-long on Apple Darwin to avoid some unnecessary warning
+      dnl Use -Wno-long-long on Apple Darwin to avoid some unnecessary
+      dnl warnings. However, newer gccs on that platform do not have 
+      dnl this flag any more, so check whether we can indeed do this
       *apple-darwin*)
-	CXXFLAGSG="$CXXFLAGSG -Wno-long-double"
-	CXXFLAGSO="$CXXFLAGSO -Wno-long-double"
+        OLD_CXXFLAGS="$CXXFLAGS"
+        CXXFLAGS=-Wno-long-double
+
+        AC_MSG_CHECKING(whether we can use -Wno-long-double)
+        AC_TRY_COMPILE([], [;],
+          [
+            AC_MSG_RESULT(yes)
+	    CXXFLAGSG="$CXXFLAGSG -Wno-long-double"
+	    CXXFLAGSO="$CXXFLAGSO -Wno-long-double"
+          ],
+          [
+            AC_MSG_RESULT(no)
+          ])
+
+        CXXFLAGS="${OLD_CXXFLAGS}"
         ;;
 
       dnl On DEC OSF, including both stdio.h and unistd.h causes a warning
