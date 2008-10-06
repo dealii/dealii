@@ -281,6 +281,39 @@ namespace
     return face_will_be_refined_by_neighbor_internal(cell, face_no,
 						     expected_face_ref_case);
   }
+
+
+
+  template <int dim>
+  bool
+  satisfies_level1_at_vertex_rule (const Triangulation<dim> &triangulation)
+  {
+    std::vector<unsigned int> min_adjacent_cell_level (triangulation.n_vertices(),
+						       triangulation.n_levels());
+    std::vector<unsigned int> max_adjacent_cell_level (triangulation.n_vertices(),
+						       0);
+      
+    for (typename Triangulation<dim>::active_cell_iterator
+	   cell = triangulation.begin_active();
+	 cell != triangulation.end(); ++cell)
+      for (unsigned int v=0; v<GeometryInfo<dim>::vertices_per_cell; ++v)
+	{
+	  min_adjacent_cell_level[cell->vertex_index(v)]
+	    = std::min<unsigned int>
+	    (min_adjacent_cell_level[cell->vertex_index(v)],
+	     cell->level());
+	  max_adjacent_cell_level[cell->vertex_index(v)]
+	    = std::max<unsigned int> (min_adjacent_cell_level[cell->vertex_index(v)],
+				      cell->level());
+	}
+
+    for (unsigned int k=0; k<triangulation.n_vertices(); ++k)
+      if (triangulation.vertex_used(k))
+	if (max_adjacent_cell_level[k] -
+	    min_adjacent_cell_level[k] > 1)
+	  return false;
+    return true;
+  }
   
 }// end of anonymous namespace
 
@@ -5175,6 +5208,13 @@ Triangulation<dim>::execute_coarsening_and_refinement ()
   execute_coarsening();
   execute_refinement();
 
+				   // verify a case with which we have had
+				   // some difficulty in the past (see the
+				   // deal.II/coarsening_* tests)
+  if (smooth_grid & limit_level_difference_at_vertices)
+    Assert (satisfies_level1_at_vertex_rule (*this) == true,
+	    ExcInternalError());
+  
 				   // Inform RefinementListeners
                                    // about end of refinement.
   for (ref_listener = refinement_listeners.begin ();
@@ -10418,10 +10458,25 @@ void Triangulation<dim>::fix_coarsen_flags ()
 	    vertex_level[cell->vertex_index(vertex)]
 	      = std::max (vertex_level[cell->vertex_index(vertex)],
 			  cell->level()+1);
-	  else
+	  else if (!cell->coarsen_flag_set())
 	    vertex_level[cell->vertex_index(vertex)]
 	      = std::max (vertex_level[cell->vertex_index(vertex)],
 			  cell->level());
+	  else
+	    {
+					       // if coarsen flag is set then
+					       // tentatively assume that the
+					       // cell will be coarsened. this
+					       // isn't always true (the
+					       // coarsen flag could be
+					       // removed again) and so we may
+					       // make an error here
+	      Assert (cell->coarsen_flag_set(), ExcInternalError());
+	      vertex_level[cell->vertex_index(vertex)]
+		= std::max (vertex_level[cell->vertex_index(vertex)],
+			    cell->level()-1);
+	    }
+      
 
 				       // loop over all cells in reverse
 				       // order. do so because we can then
@@ -11013,10 +11068,27 @@ bool Triangulation<dim>::prepare_coarsening_and_refinement ()
 		vertex_level[cell->vertex_index(vertex)]
 		  = std::max (vertex_level[cell->vertex_index(vertex)],
 			      cell->level()+1);
-	      else
+	      else if (!cell->coarsen_flag_set())
 		vertex_level[cell->vertex_index(vertex)]
 		  = std::max (vertex_level[cell->vertex_index(vertex)],
 			      cell->level());
+	      else
+		{
+						   // if coarsen flag is set
+						   // then tentatively assume
+						   // that the cell will be
+						   // coarsened. this isn't
+						   // always true (the coarsen
+						   // flag could be removed
+						   // again) and so we may
+						   // make an error here. we
+						   // hope we catch these
+						   // cases further down
+		  Assert (cell->coarsen_flag_set(), ExcInternalError());
+		  vertex_level[cell->vertex_index(vertex)]
+		    = std::max (vertex_level[cell->vertex_index(vertex)],
+				cell->level()-1);
+		}
 
 					   // loop over all cells in reverse
 					   // order. do so because we can then
