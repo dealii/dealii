@@ -312,6 +312,15 @@ inconvenience this causes.
 <ol>
   <li>
   <p>
+  Fixed: In rare cases, when Triangulation::limit_level_difference_at_vertices
+  is passed to the constructor of the Triangulation class, meshes could be
+  generated that do not honor this flag. This is now fixed.
+  <br>
+  (WB 2008/10/06)
+  </p>
+
+  <li>
+  <p>
   New: The class FE_Q can now alternatively be constructed based on 
   support points from a given one-dimensional quadrature rule.
   <br>

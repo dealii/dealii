@@ -10386,6 +10386,100 @@ Triangulation<dim>::coarsening_allowed(cell_iterator& cell)
 template <int dim>
 void Triangulation<dim>::fix_coarsen_flags ()
 {
+				   // copy a piece of code from
+				   // prepare_coarsening_and_refinement that
+				   // ensures that the level difference at
+				   // vertices is limited if so desired. we
+				   // need this code here since at least in 1d
+				   // we don't call the dimension-independent
+				   // version of
+				   // prepare_coarsening_and_refinement
+				   // function. in 2d and 3d, having this hunk
+				   // here makes our lives a bit easier as
+				   // well as it takes care of these cases
+				   // earlier than it would otherwise happen.
+  if (smooth_grid & limit_level_difference_at_vertices)
+    {
+      Assert(!anisotropic_refinement,
+	     ExcMessage("In case of anisotropic refinement the "
+			"limit_level_difference_at_vertices flag for "
+			"mesh smoothing must not be set!"));
+	  
+				       // store highest level one
+				       // of the cells adjacent to
+				       // a vertex belongs to
+      std::vector<int> vertex_level (vertices.size(), 0);
+      active_cell_iterator cell = begin_active(),
+			   endc = end();
+      for (; cell!=endc; ++cell)
+	for (unsigned int vertex=0; vertex<GeometryInfo<dim>::vertices_per_cell;
+	     ++vertex)
+	  if (cell->refine_flag_set())
+	    vertex_level[cell->vertex_index(vertex)]
+	      = std::max (vertex_level[cell->vertex_index(vertex)],
+			  cell->level()+1);
+	  else
+	    vertex_level[cell->vertex_index(vertex)]
+	      = std::max (vertex_level[cell->vertex_index(vertex)],
+			  cell->level());
+
+				       // loop over all cells in reverse
+				       // order. do so because we can then
+				       // update the vertex levels on the
+				       // adjacent vertices and maybe
+				       // already flag additional cells in
+				       // this loop
+				       //
+				       // note that not only may we have
+				       // to add additional refinement
+				       // flags, but we will also have to
+				       // remove coarsening flags on cells
+				       // adjacent to vertices that will
+				       // see refinement
+      for (cell=last_active(); cell != endc; --cell)
+	{
+	  if (cell->coarsen_flag_set() == true)
+	    {
+	      for (unsigned int vertex=0;
+		   vertex<GeometryInfo<dim>::vertices_per_cell; ++vertex)
+		if (vertex_level[cell->vertex_index(vertex)] >=
+		    cell->level()+1)
+		  {
+		    cell->clear_coarsen_flag();
+		    break;
+		  }
+	    }
+	  else if (cell->refine_flag_set() == false)
+	    {
+	      for (unsigned int vertex=0;
+		   vertex<GeometryInfo<dim>::vertices_per_cell; ++vertex)
+		if (vertex_level[cell->vertex_index(vertex)] >
+		    cell->level()+1)
+		  {
+						     // refine cell
+						     // and update
+						     // vertex levels
+		    cell->clear_coarsen_flag();
+		    cell->set_refine_flag();
+
+		    for (unsigned int v=0; v<GeometryInfo<dim>::vertices_per_cell;
+			 ++v)
+		      vertex_level[cell->vertex_index(v)]
+			= std::max (vertex_level[cell->vertex_index(v)],
+				    cell->level()+1);
+
+						     // now that we
+						     // fixed this
+						     // cell, we can
+						     // safely leave
+						     // this inner
+						     // loop.
+		    break;
+		  }
+	    }
+	}  
+    }
+  
 				   // loop over all cells. Flag all
 				   // cells of which all children are
 				   // flagged for coarsening and
@@ -10413,8 +10507,8 @@ void Triangulation<dim>::fix_coarsen_flags ()
 				   // cells with no mother cell,
 				   // i.e. on the coarsest level are
 				   // deleted explicitly.
-  active_cell_iterator acell = begin_active(0),
-			end_ac = end_active(0);
+  active_cell_iterator acell  = begin_active(0),
+		       end_ac = end_active(0);
   for (; acell!=end_ac; ++acell)
     acell->clear_coarsen_flag();
   
@@ -10902,7 +10996,9 @@ bool Triangulation<dim>::prepare_coarsening_and_refinement ()
       if (smooth_grid & limit_level_difference_at_vertices)
 	{
 	  Assert(!anisotropic_refinement,
-		 ExcMessage("In case of anisotropic refinement the limit_level_difference_at_vertices flag for mesh smoothing must not be set!"));
+		 ExcMessage("In case of anisotropic refinement the "
+			    "limit_level_difference_at_vertices flag for "
+			    "mesh smoothing must not be set!"));
 	  
 					   // store highest level one
 					   // of the cells adjacent to
@@ -10922,40 +11018,61 @@ bool Triangulation<dim>::prepare_coarsening_and_refinement ()
 		  = std::max (vertex_level[cell->vertex_index(vertex)],
 			      cell->level());
 
-					   // loop over all cells in
-					   // reverse order. do so
-					   // because we can then
-					   // update the vertex levels
-					   // on the and maybe already
-					   // flag additional cells in
+					   // loop over all cells in reverse
+					   // order. do so because we can then
+					   // update the vertex levels on the
+					   // adjacent vertices and maybe
+					   // already flag additional cells in
 					   // this loop
+					   //
+					   // note that not only may we have
+					   // to add additional refinement
+					   // flags, but we will also have to
+					   // remove coarsening flags on cells
+					   // adjacent to vertices that will
+					   // see refinement
 	  for (cell=last_active(); cell != endc; --cell)
-	    if (cell->refine_flag_set() == false) 
-	      for (unsigned int vertex=0;
-		   vertex<GeometryInfo<dim>::vertices_per_cell; ++vertex)
-		if (vertex_level[cell->vertex_index(vertex)] >
-		    cell->level()+1)
-		  {
-						     // refine cell
-						     // and update
-						     // vertex levels
-		    cell->clear_coarsen_flag();
-		    cell->set_refine_flag();
+	    {
+	      if (cell->coarsen_flag_set() == true)
+		{
+		  for (unsigned int vertex=0;
+		       vertex<GeometryInfo<dim>::vertices_per_cell; ++vertex)
+		    if (vertex_level[cell->vertex_index(vertex)] >=
+			cell->level()+1)
+		      {
+			cell->clear_coarsen_flag();
+			break;
+		      }
+		}
+	      else if (cell->refine_flag_set() == false)
+		{
+		  for (unsigned int vertex=0;
+		       vertex<GeometryInfo<dim>::vertices_per_cell; ++vertex)
+		    if (vertex_level[cell->vertex_index(vertex)] >
+			cell->level()+1)
+		      {
+							 // refine cell
+							 // and update
+							 // vertex levels
+			cell->clear_coarsen_flag();
+			cell->set_refine_flag();
 
-		    for (unsigned int v=0; v<GeometryInfo<dim>::vertices_per_cell;
-			 ++v)
-		      vertex_level[cell->vertex_index(v)]
-			= std::max (vertex_level[cell->vertex_index(v)],
-				    cell->level()+1);
+			for (unsigned int v=0; v<GeometryInfo<dim>::vertices_per_cell;
+			     ++v)
+			  vertex_level[cell->vertex_index(v)]
+			    = std::max (vertex_level[cell->vertex_index(v)],
+					cell->level()+1);
 
-						     // now that we
-						     // fixed this
-						     // cell, we can
-						     // safely leave
-						     // this inner
-						     // loop.
-		    break;
-		  }	  
+							 // now that we
+							 // fixed this
+							 // cell, we can
+							 // safely leave
+							 // this inner
+							 // loop.
+			break;
+		      }
+		}
+	    }  
 	}
 
 				       /////////////////////////////////////
