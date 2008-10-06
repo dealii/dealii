@@ -12,6 +12,7 @@
 //---------------------------------------------------------------------------
 
 #include <lac/trilinos_block_vector.h>
+#include <lac/trilinos_block_sparse_matrix.h>
 
 
 #ifdef DEAL_II_USE_TRILINOS
@@ -131,6 +132,29 @@ namespace TrilinosWrappers
   
       for (unsigned int i=0;i<this->n_blocks();++i)
         block(i).clear();
+    }
+
+
+
+    void
+    BlockVector::do_data_exchange (const TrilinosWrappers::BlockSparseMatrix &m,
+				   const BlockVector                         &v)
+    {
+      Assert (m.n_block_rows() == v.n_blocks(),
+	      ExcDimensionMismatch(m.n_block_rows(),v.n_blocks()));
+      Assert (m.n_block_cols() == v.n_blocks(),
+	      ExcDimensionMismatch(m.n_block_cols(),v.n_blocks()));
+
+      if (v.n_blocks() != n_blocks())
+	{
+	  block_indices = v.get_block_indices();
+	  components.resize(v.n_blocks());
+	}
+
+      for (unsigned int i=0; i<this->n_blocks(); ++i)
+	components[i].do_data_exchange(m.block(i,i), v.block(i));
+
+      collect_sizes();
     }
 
 

@@ -215,6 +215,33 @@ namespace TrilinosWrappers
       return *this;
     }
 
+
+
+    void
+    Vector::do_data_exchange (const TrilinosWrappers::SparseMatrix &m,
+			      const Vector                         &v)
+    {
+      Assert (m.matrix->Filled() == true,
+	      ExcMessage ("Matrix is not compressed. "
+			  "Cannot find exchange information!"));
+      Assert (v.vector->Map().UniqueGIDs() == true,
+	      ExcMessage ("The input vector has overlapping data, "
+			  "which is not allowed."));
+
+      if (vector->Map().SameAs(m.matrix->ColMap()) == false)
+	{
+	  map = m.matrix->ColMap();
+	  vector = std::auto_ptr<Epetra_FEVector> (new Epetra_FEVector(map));
+	}
+
+      Epetra_Import data_exchange (vector->Map(), v.vector->Map());
+      const int ierr = vector->Import(*v.vector, data_exchange, Insert);
+
+      AssertThrow (ierr == 0, ExcTrilinosError(ierr));
+
+      last_action = Insert;
+    }
+
   } /* end of namespace MPI */
 
 

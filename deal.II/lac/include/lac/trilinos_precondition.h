@@ -88,7 +88,7 @@ namespace TrilinosWrappers
       friend class SolverBase;
       friend class SolverSaddlePoint;
 
-    protected:
+      //protected:
 				       /**
 					* This is a pointer to the
 					* preconditioner object.
@@ -407,8 +407,9 @@ namespace TrilinosWrappers
  * AdditionalData structure for details), and a parameter
  * <tt>overlap</tt> that determines if and how much overlap there
  * should be between the matrix partitions on the various MPI
- * processes. The default settings are 1 for the relaxation parameter,
- * 0 for the diagonal augmentation and 0 for the overlap.
+ * processes.  The default settings are 0 for the additional fill-in, 0
+ * for the absolute augmentation tolerance, 1 for the relative
+ * augmentation tolerance, 0 for the overlap.
  *
  * Note that a parallel applicatoin of the IC preconditioner is
  * actually a block-Jacobi preconditioner with block size equal to the
@@ -533,8 +534,9 @@ namespace TrilinosWrappers
  * AdditionalData structure for details), and a parameter
  * <tt>overlap</tt> that determines if and how much overlap there
  * should be between the matrix partitions on the various MPI
- * processes. The default settings are 1 for the relaxation parameter,
- * 0 for the diagonal augmentation and 0 for the overlap.
+ * processes. The default settings are 0 for the additional fill-in, 0
+ * for the absolute augmentation tolerance, 1 for the relative
+ * augmentation tolerance, 0 for the overlap.
  *
  * Note that a parallel applicatoin of the ILU preconditioner is
  * actually a block-Jacobi preconditioner with block size equal to the
@@ -620,6 +622,60 @@ namespace TrilinosWrappers
 					*/
 	unsigned int ilu_fill;
 	double ilu_atol, ilu_rtol;
+	unsigned int overlap;
+      };
+
+                                       /**
+                                        * Initialize function. Takes
+                                        * the matrix which is used to
+                                        * form the preconditioner, and
+                                        * additional flags if there
+                                        * are any.
+                                        */
+      void initialize (const SparseMatrix   &matrix,
+		       const AdditionalData &additional_data = AdditionalData());
+  };
+
+
+
+/**
+ * A wrapper class for a sparse direct LU decomposition on parallel
+ * blocks for Trilinos matrices. When run in serial, this corresponds
+ * to a direct solve on the matrix.
+ *
+ * The AdditionalData data structure allows to set preconditioner
+ * options.
+ *
+ * Note that a parallel applicatoin of the block direct solve
+ * preconditioner is actually a block-Jacobi preconditioner with block
+ * size equal to the local matrix size. Spoken more technically, this
+ * parallel operation is an <a
+ * href="http://en.wikipedia.org/wiki/Additive_Schwarz_method">additive
+ * Schwarz method</a> with an <em>exact solve</em> as inner solver,
+ * based on the (outer) parallel partitioning.
+ *
+ * @ingroup TrilinosWrappers
+ * @ingroup Preconditioners
+ * @author Martin Kronbichler, 2008
+ */
+  class PreconditionBlockDirect : public PreconditionBase
+  {
+    public:
+                                       /**
+                                        * Standardized data struct to
+                                        * pipe additional parameters
+                                        * to the preconditioner.
+                                        */      
+      struct AdditionalData
+      {
+                                       /**
+					* Constructor.
+					*/
+	AdditionalData (const unsigned int overlap  = 0);
+	
+                                       /**
+					* Block direct parameters and overlap.
+					*/
 	unsigned int overlap;
       };
 

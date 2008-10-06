@@ -72,6 +72,7 @@ namespace TrilinosWrappers
     int ierr;
 
     Teuchos::ParameterList parameter_list;
+    parameter_list.set ("relaxation: sweeps", 1);
     parameter_list.set ("relaxation: type", "Jacobi");
     parameter_list.set ("relaxation: damping factor", additional_data.omega);
     parameter_list.set ("relaxation: min diagonal value", 
@@ -118,6 +119,7 @@ namespace TrilinosWrappers
     int ierr;
 
     Teuchos::ParameterList parameter_list;
+    parameter_list.set ("relaxation: sweeps", 1);
     parameter_list.set ("relaxation: type", "symmetric Gauss-Seidel");
     parameter_list.set ("relaxation: damping factor", additional_data.omega);
     parameter_list.set ("relaxation: min diagonal value", 
@@ -165,6 +167,7 @@ namespace TrilinosWrappers
     int ierr;
 
     Teuchos::ParameterList parameter_list;
+    parameter_list.set ("relaxation: sweeps", 1);
     parameter_list.set ("relaxation: type", "Gauss-Seidel");
     parameter_list.set ("relaxation: damping factor", additional_data.omega);
     parameter_list.set ("relaxation: min diagonal value", 
@@ -263,6 +266,44 @@ namespace TrilinosWrappers
     parameter_list.set ("fact: level-of-fill",(int)additional_data.ilu_fill); 
     parameter_list.set ("fact: absolute threshold",additional_data.ilu_atol); 
     parameter_list.set ("fact: relative threshold",additional_data.ilu_rtol); 
+    parameter_list.set ("schwarz: combine mode", "Add");
+    
+    ierr = preconditioner->SetParameters(parameter_list);
+    AssertThrow (ierr == 0, ExcTrilinosError(ierr));
+
+    ierr = preconditioner->Initialize();
+    AssertThrow (ierr == 0, ExcTrilinosError(ierr));
+
+    ierr = preconditioner->Compute();
+    AssertThrow (ierr == 0, ExcTrilinosError(ierr));
+  }
+
+
+
+/* ---------------------- PreconditionBlockDirect --------------------- */
+
+  PreconditionBlockDirect::AdditionalData::
+  AdditionalData (const unsigned int overlap)
+                  :
+                  overlap  (overlap)
+  {}
+
+
+
+  void
+  PreconditionBlockDirect::initialize (const SparseMatrix   &matrix,
+				       const AdditionalData &additional_data)
+  {
+    preconditioner.release();
+
+    preconditioner = Teuchos::rcp (Ifpack().Create ("Amesos", &*matrix.matrix, 
+						    additional_data.overlap));
+    Assert (&*preconditioner != 0, ExcMessage ("Trilinos could not create this "
+					       "preconditioner"));
+
+    int ierr;
+
+    Teuchos::ParameterList parameter_list;
     parameter_list.set ("schwarz: combine mode", "Add");
     
     ierr = preconditioner->SetParameters(parameter_list);

@@ -116,7 +116,7 @@ namespace TrilinosWrappers
                                         */
       ~BlockSparseMatrix ();
 
-                                       /** 
+                                       /**
                                         * Pseudo copy operator only copying
                                         * empty objects. The sizes of the block
                                         * matrices need to be the same.
