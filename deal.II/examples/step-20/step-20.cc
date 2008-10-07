@@ -1020,7 +1020,7 @@ void MixedLaplaceProblem<dim>::solve ()
       preconditioner (approximate_schur_complement);
 
     
-    SolverControl solver_control (system_matrix.block(0,0).m(),
+    SolverControl solver_control (solution.block(1).size(),
 				  1e-12*schur_rhs.l2_norm());
     SolverCG<>    cg (solver_control);
 
