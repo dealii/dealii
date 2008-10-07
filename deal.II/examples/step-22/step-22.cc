@@ -1037,7 +1037,7 @@ void StokesProblem<dim>::solve ()
     
 				     // The usual control structures for
 				     // the solver call are created...
-    SolverControl solver_control (system_matrix.block(0,0).m(),
+    SolverControl solver_control (solution.block(1).size(),
 				  1e-6*schur_rhs.l2_norm());
     SolverCG<>    cg (solver_control);
     
