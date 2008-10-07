@@ -11,6 +11,7 @@
 //
 //----------------------------  grid_in_msh.cc  ---------------------------
 
+// read a file in the MSH format used by the GMSH program
 
 #include "../tests.h"
 #include <dofs/dof_handler.h>
