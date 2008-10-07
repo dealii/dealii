@@ -10452,16 +10452,19 @@ void Triangulation<dim>::fix_coarsen_flags ()
       active_cell_iterator cell = begin_active(),
 			   endc = end();
       for (; cell!=endc; ++cell)
-	for (unsigned int vertex=0; vertex<GeometryInfo<dim>::vertices_per_cell;
-	     ++vertex)
+	{
 	  if (cell->refine_flag_set())
-	    vertex_level[cell->vertex_index(vertex)]
-	      = std::max (vertex_level[cell->vertex_index(vertex)],
-			  cell->level()+1);
+	    for (unsigned int vertex=0; vertex<GeometryInfo<dim>::vertices_per_cell;
+		 ++vertex)
+	      vertex_level[cell->vertex_index(vertex)]
+		= std::max (vertex_level[cell->vertex_index(vertex)],
+			    cell->level()+1);
 	  else if (!cell->coarsen_flag_set())
-	    vertex_level[cell->vertex_index(vertex)]
-	      = std::max (vertex_level[cell->vertex_index(vertex)],
-			  cell->level());
+	    for (unsigned int vertex=0; vertex<GeometryInfo<dim>::vertices_per_cell;
+		 ++vertex)
+	      vertex_level[cell->vertex_index(vertex)]
+		= std::max (vertex_level[cell->vertex_index(vertex)],
+			    cell->level());
 	  else
 	    {
 					       // if coarsen flag is set then
@@ -10472,10 +10475,13 @@ void Triangulation<dim>::fix_coarsen_flags ()
 					       // removed again) and so we may
 					       // make an error here
 	      Assert (cell->coarsen_flag_set(), ExcInternalError());
-	      vertex_level[cell->vertex_index(vertex)]
-		= std::max (vertex_level[cell->vertex_index(vertex)],
-			    cell->level()-1);
+	      for (unsigned int vertex=0; vertex<GeometryInfo<dim>::vertices_per_cell;
+		   ++vertex)
+		vertex_level[cell->vertex_index(vertex)]
+		  = std::max (vertex_level[cell->vertex_index(vertex)],
+			      cell->level()-1);
 	    }
+	}
       
 
 				       // loop over all cells in reverse
@@ -10492,47 +10498,41 @@ void Triangulation<dim>::fix_coarsen_flags ()
 				       // adjacent to vertices that will
 				       // see refinement
       for (cell=last_active(); cell != endc; --cell)
-	{
-	  if (cell->coarsen_flag_set() == true)
-	    {
-	      for (unsigned int vertex=0;
-		   vertex<GeometryInfo<dim>::vertices_per_cell; ++vertex)
-		if (vertex_level[cell->vertex_index(vertex)] >=
-		    cell->level()+1)
-		  {
-		    cell->clear_coarsen_flag();
-		    break;
-		  }
-	    }
-	  else if (cell->refine_flag_set() == false)
-	    {
-	      for (unsigned int vertex=0;
-		   vertex<GeometryInfo<dim>::vertices_per_cell; ++vertex)
-		if (vertex_level[cell->vertex_index(vertex)] >
-		    cell->level()+1)
-		  {
-						     // refine cell
-						     // and update
-						     // vertex levels
-		    cell->clear_coarsen_flag();
-		    cell->set_refine_flag();
+	if (cell->refine_flag_set() == false)
+	  {
+	    for (unsigned int vertex=0;
+		 vertex<GeometryInfo<dim>::vertices_per_cell; ++vertex)
+	      if (vertex_level[cell->vertex_index(vertex)] >=
+		  cell->level()+1)
+		{
+						   // remove coarsen flag...
+		  cell->clear_coarsen_flag();
 
-		    for (unsigned int v=0; v<GeometryInfo<dim>::vertices_per_cell;
-			 ++v)
-		      vertex_level[cell->vertex_index(v)]
-			= std::max (vertex_level[cell->vertex_index(v)],
-				    cell->level()+1);
+						   // ...and if necessary also
+						   // refine the current cell,
+						   // at the same time
+						   // updating the level
+						   // information about
+						   // vertices
+		  if (vertex_level[cell->vertex_index(vertex)] >
+		      cell->level()+1)
+		    {
+		      cell->set_refine_flag();
+		      
+		      for (unsigned int v=0; v<GeometryInfo<dim>::vertices_per_cell;
+			   ++v)
+			vertex_level[cell->vertex_index(v)]
+			  = std::max (vertex_level[cell->vertex_index(v)],
+				      cell->level()+1);
+		    }
 
-						     // now that we
-						     // fixed this
-						     // cell, we can
-						     // safely leave
-						     // this inner
-						     // loop.
-		    break;
-		  }
-	    }
-	}  
+						   // continue and see whether
+						   // we may, for example, go
+						   // into the inner 'if'
+						   // above based on a
+						   // different vertex
+		}
+	  }
     }
   
 				   // loop over all cells. Flag all
@@ -11062,33 +11062,37 @@ bool Triangulation<dim>::prepare_coarsening_and_refinement ()
 	  active_cell_iterator cell = begin_active(),
 			       endc = end();
 	  for (; cell!=endc; ++cell)
-	    for (unsigned int vertex=0; vertex<GeometryInfo<dim>::vertices_per_cell;
-		 ++vertex)
+	    {
 	      if (cell->refine_flag_set())
-		vertex_level[cell->vertex_index(vertex)]
-		  = std::max (vertex_level[cell->vertex_index(vertex)],
-			      cell->level()+1);
-	      else if (!cell->coarsen_flag_set())
-		vertex_level[cell->vertex_index(vertex)]
-		  = std::max (vertex_level[cell->vertex_index(vertex)],
-			      cell->level());
-	      else
-		{
-						   // if coarsen flag is set
-						   // then tentatively assume
-						   // that the cell will be
-						   // coarsened. this isn't
-						   // always true (the coarsen
-						   // flag could be removed
-						   // again) and so we may
-						   // make an error here. we
-						   // hope we catch these
-						   // cases further down
-		  Assert (cell->coarsen_flag_set(), ExcInternalError());
+		for (unsigned int vertex=0; vertex<GeometryInfo<dim>::vertices_per_cell;
+		     ++vertex)
 		  vertex_level[cell->vertex_index(vertex)]
 		    = std::max (vertex_level[cell->vertex_index(vertex)],
-				cell->level()-1);
+				cell->level()+1);
+	      else if (!cell->coarsen_flag_set())
+		for (unsigned int vertex=0; vertex<GeometryInfo<dim>::vertices_per_cell;
+		     ++vertex)
+		  vertex_level[cell->vertex_index(vertex)]
+		    = std::max (vertex_level[cell->vertex_index(vertex)],
+				cell->level());
+	      else
+		{
+						   // if coarsen flag is set then
+						   // tentatively assume that the
+						   // cell will be coarsened. this
+						   // isn't always true (the
+						   // coarsen flag could be
+						   // removed again) and so we may
+						   // make an error here
+		  Assert (cell->coarsen_flag_set(), ExcInternalError());
+		  for (unsigned int vertex=0; vertex<GeometryInfo<dim>::vertices_per_cell;
+		       ++vertex)
+		    vertex_level[cell->vertex_index(vertex)]
+		      = std::max (vertex_level[cell->vertex_index(vertex)],
+				  cell->level()-1);
 		}
+	    }
+      
 
 					   // loop over all cells in reverse
 					   // order. do so because we can then
@@ -11104,47 +11108,41 @@ bool Triangulation<dim>::prepare_coarsening_and_refinement ()
 					   // adjacent to vertices that will
 					   // see refinement
 	  for (cell=last_active(); cell != endc; --cell)
-	    {
-	      if (cell->coarsen_flag_set() == true)
-		{
-		  for (unsigned int vertex=0;
-		       vertex<GeometryInfo<dim>::vertices_per_cell; ++vertex)
-		    if (vertex_level[cell->vertex_index(vertex)] >=
-			cell->level()+1)
-		      {
-			cell->clear_coarsen_flag();
-			break;
-		      }
-		}
-	      else if (cell->refine_flag_set() == false)
-		{
-		  for (unsigned int vertex=0;
-		       vertex<GeometryInfo<dim>::vertices_per_cell; ++vertex)
-		    if (vertex_level[cell->vertex_index(vertex)] >
-			cell->level()+1)
-		      {
-							 // refine cell
-							 // and update
-							 // vertex levels
-			cell->clear_coarsen_flag();
-			cell->set_refine_flag();
+	    if (cell->refine_flag_set() == false)
+	      {
+		for (unsigned int vertex=0;
+		     vertex<GeometryInfo<dim>::vertices_per_cell; ++vertex)
+		  if (vertex_level[cell->vertex_index(vertex)] >=
+		      cell->level()+1)
+		    {
+						       // remove coarsen flag...
+		      cell->clear_coarsen_flag();
 
-			for (unsigned int v=0; v<GeometryInfo<dim>::vertices_per_cell;
-			     ++v)
-			  vertex_level[cell->vertex_index(v)]
-			    = std::max (vertex_level[cell->vertex_index(v)],
-					cell->level()+1);
+						       // ...and if necessary also
+						       // refine the current cell,
+						       // at the same time
+						       // updating the level
+						       // information about
+						       // vertices
+		      if (vertex_level[cell->vertex_index(vertex)] >
+			  cell->level()+1)
+			{
+			  cell->set_refine_flag();
+		      
+			  for (unsigned int v=0; v<GeometryInfo<dim>::vertices_per_cell;
+			       ++v)
+			    vertex_level[cell->vertex_index(v)]
+			      = std::max (vertex_level[cell->vertex_index(v)],
+					  cell->level()+1);
+			}
 
-							 // now that we
-							 // fixed this
-							 // cell, we can
-							 // safely leave
-							 // this inner
-							 // loop.
-			break;
-		      }
-		}
-	    }  
+						       // continue and see whether
+						       // we may, for example, go
+						       // into the inner 'if'
+						       // above based on a
+						       // different vertex
+		    }
+	      }
 	}
 
 				       /////////////////////////////////////
