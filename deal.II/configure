@@ -13117,83 +13117,11 @@ echo "${ECHO_T}$DEAL_II_METIS_VERSION" >&6; }
 if test "${with_umfpack+set}" = set; then
   withval=$with_umfpack;
   if test "x$withval" != "xyes" ; then
-    LDFLAGS="-L$withval/UMFPACK/Lib -L$withval/AMD/Lib $LDFLAGS"
-    if test "$LD_PATH_OPTION" != "no"; then
-      LDFLAGS = "$LD_PATH_OPTION$withval/UMFPACK/Lib $LD_PATH_OPTION$withval/AMD/Lib $LDFLAGS"
-    fi
+        UMFPACK_DIR=$withval
 
-{ echo "$as_me:$LINENO: checking for amd_info in -lamd" >&5
-echo $ECHO_N "checking for amd_info in -lamd... $ECHO_C" >&6; }
-if test "${ac_cv_lib_amd_amd_info+set}" = set; then
-  echo $ECHO_N "(cached) $ECHO_C" >&6
-else
-  ac_check_lib_save_LIBS=$LIBS
-LIBS="-lamd  $LIBS"
-cat >conftest.$ac_ext <<_ACEOF
-/* confdefs.h.  */
-_ACEOF
-cat confdefs.h >>conftest.$ac_ext
-cat >>conftest.$ac_ext <<_ACEOF
-/* end confdefs.h.  */
-
-/* Override any GCC internal prototype to avoid an error.
-   Use char because int might match the return type of a GCC
-   builtin and then its argument prototype would still apply.  */
-#ifdef __cplusplus
-extern "C"
-#endif
-char amd_info ();
-int
-main ()
-{
-return amd_info ();
-  ;
-  return 0;
-}
-_ACEOF
-rm -f conftest.$ac_objext conftest$ac_exeext
-if { (ac_try="$ac_link"
-case "(($ac_try" in
-  *\"* | *\`* | *\\*) ac_try_echo=\$ac_try;;
-  *) ac_try_echo=$ac_try;;
-esac
-eval "echo \"\$as_me:$LINENO: $ac_try_echo\"") >&5
-  (eval "$ac_link") 2>conftest.er1
-  ac_status=$?
-  grep -v '^ *+' conftest.er1 >conftest.err
-  rm -f conftest.er1
-  cat conftest.err >&5
-  echo "$as_me:$LINENO: \$? = $ac_status" >&5
-  (exit $ac_status); } && {
-	 test -z "$ac_cxx_werror_flag" ||
-	 test ! -s conftest.err
-       } && test -s conftest$ac_exeext &&
-       $as_test_x conftest$ac_exeext; then
-  ac_cv_lib_amd_amd_info=yes
-else
-  echo "$as_me: failed program was:" >&5
-sed 's/^/| /' conftest.$ac_ext >&5
-
-	ac_cv_lib_amd_amd_info=no
-fi
-
-rm -f core conftest.err conftest.$ac_objext conftest_ipa8_conftest.oo \
-      conftest$ac_exeext conftest.$ac_ext
-LIBS=$ac_check_lib_save_LIBS
-fi
-{ echo "$as_me:$LINENO: result: $ac_cv_lib_amd_amd_info" >&5
-echo "${ECHO_T}$ac_cv_lib_amd_amd_info" >&6; }
-if test $ac_cv_lib_amd_amd_info = yes; then
-  cat >>confdefs.h <<_ACEOF
-#define HAVE_LIBAMD 1
-_ACEOF
-
-  LIBS="-lamd $LIBS"
-
-fi
-
-
-{ echo "$as_me:$LINENO: checking for umfpack_di_defaults in -lumfpack" >&5
+            OLD_LDFLAGS="$LDFLAGS"
+    LDFLAGS="-L${UMFPACK_DIR}/UMFPACK/Lib $LDFLAGS"
+    { echo "$as_me:$LINENO: checking for umfpack_di_defaults in -lumfpack" >&5
 echo $ECHO_N "checking for umfpack_di_defaults in -lumfpack... $ECHO_C" >&6; }
 if test "${ac_cv_lib_umfpack_umfpack_di_defaults+set}" = set; then
   echo $ECHO_N "(cached) $ECHO_C" >&6
@@ -13255,17 +13183,263 @@ fi
 { echo "$as_me:$LINENO: result: $ac_cv_lib_umfpack_umfpack_di_defaults" >&5
 echo "${ECHO_T}$ac_cv_lib_umfpack_umfpack_di_defaults" >&6; }
 if test $ac_cv_lib_umfpack_umfpack_di_defaults = yes; then
-  cat >>confdefs.h <<_ACEOF
-#define HAVE_LIBUMFPACK 1
-_ACEOF
 
-  LIBS="-lumfpack $LIBS"
+
+  LIBS="$LIBS -lumfpack"
+
+        if test "$LD_PATH_OPTION" != "no"; then
+          LDFLAGS="$LD_PATH_OPTION${UMFPACK_DIR}/UMFPACK/Lib $LDFLAGS"
+        fi
+
+else
+
+                LDFLAGS="-L${UMFPACK_DIR}/lib $OLD_LDFLAGS"
+        { echo "$as_me:$LINENO: checking for umfpack_di_defaults in -lumfpack" >&5
+echo $ECHO_N "checking for umfpack_di_defaults in -lumfpack... $ECHO_C" >&6; }
+if test "${ac_cv_lib_umfpack_umfpack_di_defaults+set}" = set; then
+  echo $ECHO_N "(cached) $ECHO_C" >&6
+else
+  ac_check_lib_save_LIBS=$LIBS
+LIBS="-lumfpack  $LIBS"
+cat >conftest.$ac_ext <<_ACEOF
+/* confdefs.h.  */
+_ACEOF
+cat confdefs.h >>conftest.$ac_ext
+cat >>conftest.$ac_ext <<_ACEOF
+/* end confdefs.h.  */
+
+/* Override any GCC internal prototype to avoid an error.
+   Use char because int might match the return type of a GCC
+   builtin and then its argument prototype would still apply.  */
+#ifdef __cplusplus
+extern "C"
+#endif
+char umfpack_di_defaults ();
+int
+main ()
+{
+return umfpack_di_defaults ();
+  ;
+  return 0;
+}
+_ACEOF
+rm -f conftest.$ac_objext conftest$ac_exeext
+if { (ac_try="$ac_link"
+case "(($ac_try" in
+  *\"* | *\`* | *\\*) ac_try_echo=\$ac_try;;
+  *) ac_try_echo=$ac_try;;
+esac
+eval "echo \"\$as_me:$LINENO: $ac_try_echo\"") >&5
+  (eval "$ac_link") 2>conftest.er1
+  ac_status=$?
+  grep -v '^ *+' conftest.er1 >conftest.err
+  rm -f conftest.er1
+  cat conftest.err >&5
+  echo "$as_me:$LINENO: \$? = $ac_status" >&5
+  (exit $ac_status); } && {
+	 test -z "$ac_cxx_werror_flag" ||
+	 test ! -s conftest.err
+       } && test -s conftest$ac_exeext &&
+       $as_test_x conftest$ac_exeext; then
+  ac_cv_lib_umfpack_umfpack_di_defaults=yes
+else
+  echo "$as_me: failed program was:" >&5
+sed 's/^/| /' conftest.$ac_ext >&5
+
+	ac_cv_lib_umfpack_umfpack_di_defaults=no
+fi
+
+rm -f core conftest.err conftest.$ac_objext conftest_ipa8_conftest.oo \
+      conftest$ac_exeext conftest.$ac_ext
+LIBS=$ac_check_lib_save_LIBS
+fi
+{ echo "$as_me:$LINENO: result: $ac_cv_lib_umfpack_umfpack_di_defaults" >&5
+echo "${ECHO_T}$ac_cv_lib_umfpack_umfpack_di_defaults" >&6; }
+if test $ac_cv_lib_umfpack_umfpack_di_defaults = yes; then
+
+
+  LIBS="$LIBS -lumfpack"
+
+            if test "$LD_PATH_OPTION" != "no"; then
+              LDFLAGS="$LD_PATH_OPTION${UMFPACK_DIR}/lib $LDFLAGS"
+            fi
+
+else
+
+            { { echo "$as_me:$LINENO: error: installation of UMFPACK could not be determined" >&5
+echo "$as_me: error: installation of UMFPACK could not be determined" >&2;}
+   { (exit 1); exit 1; }; }
+
 
 fi
 
-    as_ac_File=`echo "ac_cv_file_$withval/UMFPACK/Include/umfpack.h" | $as_tr_sh`
-{ echo "$as_me:$LINENO: checking for $withval/UMFPACK/Include/umfpack.h" >&5
-echo $ECHO_N "checking for $withval/UMFPACK/Include/umfpack.h... $ECHO_C" >&6; }
+
+
+fi
+
+
+            OLD_LDFLAGS="$LDFLAGS"
+    LDFLAGS="-L${UMFPACK_DIR}/AMD/Lib $LDFLAGS"
+    { echo "$as_me:$LINENO: checking for amd_info in -lamd" >&5
+echo $ECHO_N "checking for amd_info in -lamd... $ECHO_C" >&6; }
+if test "${ac_cv_lib_amd_amd_info+set}" = set; then
+  echo $ECHO_N "(cached) $ECHO_C" >&6
+else
+  ac_check_lib_save_LIBS=$LIBS
+LIBS="-lamd  $LIBS"
+cat >conftest.$ac_ext <<_ACEOF
+/* confdefs.h.  */
+_ACEOF
+cat confdefs.h >>conftest.$ac_ext
+cat >>conftest.$ac_ext <<_ACEOF
+/* end confdefs.h.  */
+
+/* Override any GCC internal prototype to avoid an error.
+   Use char because int might match the return type of a GCC
+   builtin and then its argument prototype would still apply.  */
+#ifdef __cplusplus
+extern "C"
+#endif
+char amd_info ();
+int
+main ()
+{
+return amd_info ();
+  ;
+  return 0;
+}
+_ACEOF
+rm -f conftest.$ac_objext conftest$ac_exeext
+if { (ac_try="$ac_link"
+case "(($ac_try" in
+  *\"* | *\`* | *\\*) ac_try_echo=\$ac_try;;
+  *) ac_try_echo=$ac_try;;
+esac
+eval "echo \"\$as_me:$LINENO: $ac_try_echo\"") >&5
+  (eval "$ac_link") 2>conftest.er1
+  ac_status=$?
+  grep -v '^ *+' conftest.er1 >conftest.err
+  rm -f conftest.er1
+  cat conftest.err >&5
+  echo "$as_me:$LINENO: \$? = $ac_status" >&5
+  (exit $ac_status); } && {
+	 test -z "$ac_cxx_werror_flag" ||
+	 test ! -s conftest.err
+       } && test -s conftest$ac_exeext &&
+       $as_test_x conftest$ac_exeext; then
+  ac_cv_lib_amd_amd_info=yes
+else
+  echo "$as_me: failed program was:" >&5
+sed 's/^/| /' conftest.$ac_ext >&5
+
+	ac_cv_lib_amd_amd_info=no
+fi
+
+rm -f core conftest.err conftest.$ac_objext conftest_ipa8_conftest.oo \
+      conftest$ac_exeext conftest.$ac_ext
+LIBS=$ac_check_lib_save_LIBS
+fi
+{ echo "$as_me:$LINENO: result: $ac_cv_lib_amd_amd_info" >&5
+echo "${ECHO_T}$ac_cv_lib_amd_amd_info" >&6; }
+if test $ac_cv_lib_amd_amd_info = yes; then
+
+
+  LIBS="$LIBS -lamd"
+
+        if test "$LD_PATH_OPTION" != "no"; then
+          LDFLAGS="$LD_PATH_OPTION${UMFPACK_DIR}/AMD/Lib $LDFLAGS"
+        fi
+
+else
+
+                LDFLAGS="-L${UMFPACK_DIR}/lib $OLD_LDFLAGS"
+        { echo "$as_me:$LINENO: checking for amd_info in -lamd" >&5
+echo $ECHO_N "checking for amd_info in -lamd... $ECHO_C" >&6; }
+if test "${ac_cv_lib_amd_amd_info+set}" = set; then
+  echo $ECHO_N "(cached) $ECHO_C" >&6
+else
+  ac_check_lib_save_LIBS=$LIBS
+LIBS="-lamd  $LIBS"
+cat >conftest.$ac_ext <<_ACEOF
+/* confdefs.h.  */
+_ACEOF
+cat confdefs.h >>conftest.$ac_ext
+cat >>conftest.$ac_ext <<_ACEOF
+/* end confdefs.h.  */
+
+/* Override any GCC internal prototype to avoid an error.
+   Use char because int might match the return type of a GCC
+   builtin and then its argument prototype would still apply.  */
+#ifdef __cplusplus
+extern "C"
+#endif
+char amd_info ();
+int
+main ()
+{
+return amd_info ();
+  ;
+  return 0;
+}
+_ACEOF
+rm -f conftest.$ac_objext conftest$ac_exeext
+if { (ac_try="$ac_link"
+case "(($ac_try" in
+  *\"* | *\`* | *\\*) ac_try_echo=\$ac_try;;
+  *) ac_try_echo=$ac_try;;
+esac
+eval "echo \"\$as_me:$LINENO: $ac_try_echo\"") >&5
+  (eval "$ac_link") 2>conftest.er1
+  ac_status=$?
+  grep -v '^ *+' conftest.er1 >conftest.err
+  rm -f conftest.er1
+  cat conftest.err >&5
+  echo "$as_me:$LINENO: \$? = $ac_status" >&5
+  (exit $ac_status); } && {
+	 test -z "$ac_cxx_werror_flag" ||
+	 test ! -s conftest.err
+       } && test -s conftest$ac_exeext &&
+       $as_test_x conftest$ac_exeext; then
+  ac_cv_lib_amd_amd_info=yes
+else
+  echo "$as_me: failed program was:" >&5
+sed 's/^/| /' conftest.$ac_ext >&5
+
+	ac_cv_lib_amd_amd_info=no
+fi
+
+rm -f core conftest.err conftest.$ac_objext conftest_ipa8_conftest.oo \
+      conftest$ac_exeext conftest.$ac_ext
+LIBS=$ac_check_lib_save_LIBS
+fi
+{ echo "$as_me:$LINENO: result: $ac_cv_lib_amd_amd_info" >&5
+echo "${ECHO_T}$ac_cv_lib_amd_amd_info" >&6; }
+if test $ac_cv_lib_amd_amd_info = yes; then
+
+
+  LIBS="$LIBS -lamd"
+
+            if test "$LD_PATH_OPTION" != "no"; then
+              LDFLAGS="$LD_PATH_OPTION${UMFPACK_DIR}/lib $LDFLAGS"
+            fi
+
+else
+
+            { { echo "$as_me:$LINENO: error: installation of AMD could not be determined" >&5
+echo "$as_me: error: installation of AMD could not be determined" >&2;}
+   { (exit 1); exit 1; }; }
+
+
+fi
+
+
+
+fi
+
+
+        as_ac_File=`echo "ac_cv_file_${UMFPACK_DIR}/UMFPACK/Include/umfpack.h" | $as_tr_sh`
+{ echo "$as_me:$LINENO: checking for ${UMFPACK_DIR}/UMFPACK/Include/umfpack.h" >&5
+echo $ECHO_N "checking for ${UMFPACK_DIR}/UMFPACK/Include/umfpack.h... $ECHO_C" >&6; }
 if { as_var=$as_ac_File; eval "test \"\${$as_var+set}\" = set"; }; then
   echo $ECHO_N "(cached) $ECHO_C" >&6
 else
@@ -13273,7 +13447,7 @@ else
   { { echo "$as_me:$LINENO: error: cannot check for file existence when cross compiling" >&5
 echo "$as_me: error: cannot check for file existence when cross compiling" >&2;}
    { (exit 1); exit 1; }; }
-if test -r "$withval/UMFPACK/Include/umfpack.h"; then
+if test -r "${UMFPACK_DIR}/UMFPACK/Include/umfpack.h"; then
   eval "$as_ac_File=yes"
 else
   eval "$as_ac_File=no"
@@ -13283,23 +13457,154 @@ ac_res=`eval echo '${'$as_ac_File'}'`
 	       { echo "$as_me:$LINENO: result: $ac_res" >&5
 echo "${ECHO_T}$ac_res" >&6; }
 if test `eval echo '${'$as_ac_File'}'` = yes; then
-  UMFPACK_INCLUDE_DIR=-I$withval/UMFPACK/Include
+
+        UMFPACK_INCLUDE_DIR=-I${UMFPACK_DIR}/UMFPACK/Include
+
 else
-  { { echo "$as_me:$LINENO: error: UMFPack installation faulty" >&5
-echo "$as_me: error: UMFPack installation faulty" >&2;}
+
+        as_ac_File=`echo "ac_cv_file_${UMFPACK_DIR}/include/suitesparse/umfpack.h" | $as_tr_sh`
+{ echo "$as_me:$LINENO: checking for ${UMFPACK_DIR}/include/suitesparse/umfpack.h" >&5
+echo $ECHO_N "checking for ${UMFPACK_DIR}/include/suitesparse/umfpack.h... $ECHO_C" >&6; }
+if { as_var=$as_ac_File; eval "test \"\${$as_var+set}\" = set"; }; then
+  echo $ECHO_N "(cached) $ECHO_C" >&6
+else
+  test "$cross_compiling" = yes &&
+  { { echo "$as_me:$LINENO: error: cannot check for file existence when cross compiling" >&5
+echo "$as_me: error: cannot check for file existence when cross compiling" >&2;}
    { (exit 1); exit 1; }; }
+if test -r "${UMFPACK_DIR}/include/suitesparse/umfpack.h"; then
+  eval "$as_ac_File=yes"
+else
+  eval "$as_ac_File=no"
+fi
+fi
+ac_res=`eval echo '${'$as_ac_File'}'`
+	       { echo "$as_me:$LINENO: result: $ac_res" >&5
+echo "${ECHO_T}$ac_res" >&6; }
+if test `eval echo '${'$as_ac_File'}'` = yes; then
+
+            UMFPACK_INCLUDE_DIR=-I${UMFPACK_DIR}/include/suitesparse
+
+else
+
+            { { echo "$as_me:$LINENO: error: installation of UMFPACK could not be determined" >&5
+echo "$as_me: error: installation of UMFPACK could not be determined" >&2;}
+   { (exit 1); exit 1; }; }
+
+
 fi
 
-    echo -n "UMFPack version: "
-    grep "UMFPACK v" $withval/README
+
+
+fi
+
+
+    as_ac_File=`echo "ac_cv_file_${UMFPACK_DIR}/AMD/Include/amd.h" | $as_tr_sh`
+{ echo "$as_me:$LINENO: checking for ${UMFPACK_DIR}/AMD/Include/amd.h" >&5
+echo $ECHO_N "checking for ${UMFPACK_DIR}/AMD/Include/amd.h... $ECHO_C" >&6; }
+if { as_var=$as_ac_File; eval "test \"\${$as_var+set}\" = set"; }; then
+  echo $ECHO_N "(cached) $ECHO_C" >&6
+else
+  test "$cross_compiling" = yes &&
+  { { echo "$as_me:$LINENO: error: cannot check for file existence when cross compiling" >&5
+echo "$as_me: error: cannot check for file existence when cross compiling" >&2;}
+   { (exit 1); exit 1; }; }
+if test -r "${UMFPACK_DIR}/AMD/Include/amd.h"; then
+  eval "$as_ac_File=yes"
+else
+  eval "$as_ac_File=no"
+fi
+fi
+ac_res=`eval echo '${'$as_ac_File'}'`
+	       { echo "$as_me:$LINENO: result: $ac_res" >&5
+echo "${ECHO_T}$ac_res" >&6; }
+if test `eval echo '${'$as_ac_File'}'` = yes; then
+
+        UMFPACK_INCLUDE_DIR="${UMFPACK_INCLUDE_DIR} -I${UMFPACK_DIR}/AMD/Include"
+
+else
+
+        as_ac_File=`echo "ac_cv_file_${UMFPACK_DIR}/include/suitesparse/umfpack.h" | $as_tr_sh`
+{ echo "$as_me:$LINENO: checking for ${UMFPACK_DIR}/include/suitesparse/umfpack.h" >&5
+echo $ECHO_N "checking for ${UMFPACK_DIR}/include/suitesparse/umfpack.h... $ECHO_C" >&6; }
+if { as_var=$as_ac_File; eval "test \"\${$as_var+set}\" = set"; }; then
+  echo $ECHO_N "(cached) $ECHO_C" >&6
+else
+  test "$cross_compiling" = yes &&
+  { { echo "$as_me:$LINENO: error: cannot check for file existence when cross compiling" >&5
+echo "$as_me: error: cannot check for file existence when cross compiling" >&2;}
+   { (exit 1); exit 1; }; }
+if test -r "${UMFPACK_DIR}/include/suitesparse/umfpack.h"; then
+  eval "$as_ac_File=yes"
+else
+  eval "$as_ac_File=no"
+fi
+fi
+ac_res=`eval echo '${'$as_ac_File'}'`
+	       { echo "$as_me:$LINENO: result: $ac_res" >&5
+echo "${ECHO_T}$ac_res" >&6; }
+if test `eval echo '${'$as_ac_File'}'` = yes; then
+
+            UMFPACK_INCLUDE_DIR="${UMFPACK_INCLUDE_DIR} -I${UMFPACK_DIR}/include/suitesparse"
+
+else
+
+            { { echo "$as_me:$LINENO: error: installation of UMFPACK could not be determined" >&5
+echo "$as_me: error: installation of UMFPACK could not be determined" >&2;}
+   { (exit 1); exit 1; }; }
+
+
+fi
+
+
+
+fi
+
+
+            as_ac_File=`echo "ac_cv_file_${UMFPACK_DIR}/UFconfig/UFconfig.h" | $as_tr_sh`
+{ echo "$as_me:$LINENO: checking for ${UMFPACK_DIR}/UFconfig/UFconfig.h" >&5
+echo $ECHO_N "checking for ${UMFPACK_DIR}/UFconfig/UFconfig.h... $ECHO_C" >&6; }
+if { as_var=$as_ac_File; eval "test \"\${$as_var+set}\" = set"; }; then
+  echo $ECHO_N "(cached) $ECHO_C" >&6
+else
+  test "$cross_compiling" = yes &&
+  { { echo "$as_me:$LINENO: error: cannot check for file existence when cross compiling" >&5
+echo "$as_me: error: cannot check for file existence when cross compiling" >&2;}
+   { (exit 1); exit 1; }; }
+if test -r "${UMFPACK_DIR}/UFconfig/UFconfig.h"; then
+  eval "$as_ac_File=yes"
+else
+  eval "$as_ac_File=no"
+fi
+fi
+ac_res=`eval echo '${'$as_ac_File'}'`
+	       { echo "$as_me:$LINENO: result: $ac_res" >&5
+echo "${ECHO_T}$ac_res" >&6; }
+if test `eval echo '${'$as_ac_File'}'` = yes; then
+
+        UMFPACK_INCLUDE_DIR="${UMFPACK_INCLUDE_DIR} -I${UMFPACK_DIR}/UFconfig"
+
+else
+
+        { { echo "$as_me:$LINENO: error: not found" >&5
+echo "$as_me: error: not found" >&2;}
+   { (exit 1); exit 1; }; }
+
+
+fi
+
+
+
   else
-    { echo "$as_me:$LINENO: checking UmfPack library" >&5
+
+        { echo "$as_me:$LINENO: checking UmfPack library" >&5
 echo $ECHO_N "checking UmfPack library... $ECHO_C" >&6; }
     UMFPACK_INCLUDE_DIR='-I$D/contrib/umfpack/UMFPACK/Include'
     USE_CONTRIB_UMFPACK='yes'
     { echo "$as_me:$LINENO: result: using included version" >&5
 echo "${ECHO_T}using included version" >&6; }
   fi
+
 
 cat >>confdefs.h <<\_ACEOF
 #define HAVE_LIBUMFPACK 1

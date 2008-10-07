@@ -5557,23 +5557,132 @@ dnl --------------------------------------------------
 AC_DEFUN(DEAL_II_WITH_UMFPACK, dnl
 [
   if test "x$1" != "xyes" ; then
-    LDFLAGS="-L$1/UMFPACK/Lib -L$1/AMD/Lib $LDFLAGS"
-    if test "$LD_PATH_OPTION" != "no"; then
-      LDFLAGS = "$LD_PATH_OPTION$1/UMFPACK/Lib $LD_PATH_OPTION$1/AMD/Lib $LDFLAGS"
-    fi
-    AC_CHECK_LIB(amd, amd_info)
-    AC_CHECK_LIB(umfpack, umfpack_di_defaults)
-    AC_CHECK_FILE($1/UMFPACK/Include/umfpack.h,
-	UMFPACK_INCLUDE_DIR=-I$1/UMFPACK/Include,
-        AC_MSG_ERROR(UMFPack installation faulty))
-    echo -n "UMFPack version: "
-    grep "UMFPACK v" $1/README
+    dnl A pathname has been given to --with-umfpack
+    UMFPACK_DIR=$1
+
+    dnl Try old naming scheme for umfpack/amd libraries (before 
+    dnl Tim Davis incorporated everything into SuiteSparse)
+    OLD_LDFLAGS="$LDFLAGS"
+    LDFLAGS="-L${UMFPACK_DIR}/UMFPACK/Lib $LDFLAGS"
+    AC_CHECK_LIB(
+      [umfpack], 
+      [umfpack_di_defaults],
+      [
+        DEAL_II_ADD_EXTERNAL_LIBS_AT_TAIL(-lumfpack)
+        if test "$LD_PATH_OPTION" != "no"; then
+          LDFLAGS="$LD_PATH_OPTION${UMFPACK_DIR}/UMFPACK/Lib $LDFLAGS"
+        fi
+      ],
+      [
+        dnl Old naming scheme failed, try the new one
+        LDFLAGS="-L${UMFPACK_DIR}/lib $OLD_LDFLAGS"
+        AC_CHECK_LIB(
+          [umfpack], 
+          [umfpack_di_defaults],
+          [
+            DEAL_II_ADD_EXTERNAL_LIBS_AT_TAIL(-lumfpack)
+            if test "$LD_PATH_OPTION" != "no"; then
+              LDFLAGS="$LD_PATH_OPTION${UMFPACK_DIR}/lib $LDFLAGS"
+            fi
+          ],
+          [
+            AC_MSG_ERROR(installation of UMFPACK could not be determined)
+          ]
+        )
+      ]
+    )
+
+    dnl Now do the same for amd. this one comes second since on the linker
+    dnl line, -lumfpack has to preceded -lamd
+    OLD_LDFLAGS="$LDFLAGS"
+    LDFLAGS="-L${UMFPACK_DIR}/AMD/Lib $LDFLAGS"
+    AC_CHECK_LIB(
+      [amd], 
+      [amd_info],
+      [
+        DEAL_II_ADD_EXTERNAL_LIBS_AT_TAIL(-lamd)
+        if test "$LD_PATH_OPTION" != "no"; then
+          LDFLAGS="$LD_PATH_OPTION${UMFPACK_DIR}/AMD/Lib $LDFLAGS"
+        fi
+      ],
+      [
+        dnl Old naming scheme failed, try the new one
+        LDFLAGS="-L${UMFPACK_DIR}/lib $OLD_LDFLAGS"
+        AC_CHECK_LIB(
+          [amd], 
+          [amd_info],
+          [
+            DEAL_II_ADD_EXTERNAL_LIBS_AT_TAIL(-lamd)
+            if test "$LD_PATH_OPTION" != "no"; then
+              LDFLAGS="$LD_PATH_OPTION${UMFPACK_DIR}/lib $LDFLAGS"
+            fi
+          ],
+          [
+            AC_MSG_ERROR(installation of AMD could not be determined)
+          ]
+        )
+      ]
+    )
+
+    dnl Try old and new naming scheme for header files
+    AC_CHECK_FILE(
+      [${UMFPACK_DIR}/UMFPACK/Include/umfpack.h],
+      [
+        UMFPACK_INCLUDE_DIR=-I${UMFPACK_DIR}/UMFPACK/Include
+      ],
+      [  
+        AC_CHECK_FILE(
+          [${UMFPACK_DIR}/include/suitesparse/umfpack.h],
+          [
+            UMFPACK_INCLUDE_DIR=-I${UMFPACK_DIR}/include/suitesparse
+          ],
+          [  
+            AC_MSG_ERROR(installation of UMFPACK could not be determined)
+          ]
+        )
+      ]
+    )
+
+    AC_CHECK_FILE(
+      [${UMFPACK_DIR}/AMD/Include/amd.h],
+      [
+        UMFPACK_INCLUDE_DIR="${UMFPACK_INCLUDE_DIR} -I${UMFPACK_DIR}/AMD/Include"
+      ],
+      [  
+        AC_CHECK_FILE(
+          [${UMFPACK_DIR}/include/suitesparse/umfpack.h],
+          [
+            UMFPACK_INCLUDE_DIR="${UMFPACK_INCLUDE_DIR} -I${UMFPACK_DIR}/include/suitesparse"
+          ],
+          [  
+            AC_MSG_ERROR(installation of UMFPACK could not be determined)
+          ]
+        )
+      ]
+    )
+
+    dnl We also have to see whether the UFconfig.h file can be found
+    dnl somewhere
+    AC_CHECK_FILE(
+      [${UMFPACK_DIR}/UFconfig/UFconfig.h],
+      [
+        UMFPACK_INCLUDE_DIR="${UMFPACK_INCLUDE_DIR} -I${UMFPACK_DIR}/UFconfig"
+      ],
+      [  
+        AC_MSG_ERROR(not found)
+      ]
+    )
+
+
   else
+
+    dnl Use the umfpack version we package with deal.II
     AC_MSG_CHECKING(UmfPack library)
     UMFPACK_INCLUDE_DIR='-I$D/contrib/umfpack/UMFPACK/Include'
     USE_CONTRIB_UMFPACK='yes'
     AC_MSG_RESULT(using included version)
   fi
+
   AC_DEFINE(HAVE_LIBUMFPACK,1,[UMFPACK is $1])
 ])
 
