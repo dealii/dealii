@@ -154,29 +154,35 @@ $(LIBDIR)/libdeal_II_3d$(static-lib-suffix): $(o-files-3d)
 
 $(LIBDIR)/libdeal_II_1d.g$(shared-lib-suffix): $(go-files-1d)
 	@echo "=====deal.II====1d====debug======$(MT)== Linking library:   $(@F)"
-	@$(SHLIBLD) $(LDFLAGS) $(SHLIBFLAGS) -o $@ $(go-files-1d) $(deplibs.g)
+	@$(SHLIBLD) $(LDFLAGS) $(SHLIBFLAGS) -o $(LIBDIR)/libdeal_II_1d.g$(shared-lib-suffix).$(DEAL_II_VERSION) -Wl,-soname,libdeal_II_1d.g$(shared-lib-suffix).$(DEAL_II_VERSION) $(go-files-1d) $(deplibs.g)
+	@ln -s libdeal_II_1d.g$(shared-lib-suffix).$(DEAL_II_VERSION) $@
 
 $(LIBDIR)/libdeal_II_1d$(shared-lib-suffix): $(o-files-1d)
 	@echo "=====deal.II====1d====optimized==$(MT)== Linking library:   $(@F)"
-	@$(SHLIBLD) $(LDFLAGS) $(SHLIBFLAGS) -o $@ $(o-files-1d) $(deplibs.o)
+	@$(SHLIBLD) $(LDFLAGS) $(SHLIBFLAGS) -o $(LIBDIR)/libdeal_II_1d$(shared-lib-suffix).$(DEAL_II_VERSION) -Wl,-soname,libdeal_II_1d$(shared-lib-suffix).$(DEAL_II_VERSION) $(o-files-1d) $(deplibs.o)
+	@ln -s libdeal_II_1d$(shared-lib-suffix).$(DEAL_II_VERSION) $@
 
 
 $(LIBDIR)/libdeal_II_2d.g$(shared-lib-suffix): $(go-files-2d)
 	@echo "=====deal.II====2d====debug======$(MT)== Linking library:   $(@F)"
-	@$(SHLIBLD) $(LDFLAGS) $(SHLIBFLAGS) -o $@ $(go-files-2d) $(deplibs.g)
+	@$(SHLIBLD) $(LDFLAGS) $(SHLIBFLAGS) -o $(LIBDIR)/libdeal_II_2d.g$(shared-lib-suffix).$(DEAL_II_VERSION) -Wl,-soname,libdeal_II_2d.g$(shared-lib-suffix).$(DEAL_II_VERSION) $(go-files-2d) $(deplibs.g)
+	@ln -s libdeal_II_2d.g$(shared-lib-suffix).$(DEAL_II_VERSION) $@
 
 $(LIBDIR)/libdeal_II_2d$(shared-lib-suffix): $(o-files-2d)
 	@echo "=====deal.II====2d====optimized==$(MT)== Linking library:   $(@F)"
-	@$(SHLIBLD) $(LDFLAGS) $(SHLIBFLAGS) -o $@ $(o-files-2d) $(deplibs.o)
+	@$(SHLIBLD) $(LDFLAGS) $(SHLIBFLAGS) -o $(LIBDIR)/libdeal_II_2d$(shared-lib-suffix).$(DEAL_II_VERSION) -Wl,-soname,libdeal_II_2d$(shared-lib-suffix).$(DEAL_II_VERSION) $(o-files-2d) $(deplibs.o)
+	@ln -s libdeal_II_2d$(shared-lib-suffix).$(DEAL_II_VERSION) $@
 
 
 $(LIBDIR)/libdeal_II_3d.g$(shared-lib-suffix): $(go-files-3d)
 	@echo "=====deal.II====3d====debug======$(MT)== Linking library:   $(@F)"
-	@$(SHLIBLD) $(LDFLAGS) $(SHLIBFLAGS) -o $@ $(go-files-3d) $(deplibs.g)
+	@$(SHLIBLD) $(LDFLAGS) $(SHLIBFLAGS) -o $(LIBDIR)/libdeal_II_3d.g$(shared-lib-suffix).$(DEAL_II_VERSION) -Wl,-soname,libdeal_II_3d.g$(shared-lib-suffix).$(DEAL_II_VERSION) $(go-files-3d) $(deplibs.g)
+	@ln -s libdeal_II_3d.g$(shared-lib-suffix).$(DEAL_II_VERSION) $@
 
 $(LIBDIR)/libdeal_II_3d$(shared-lib-suffix): $(o-files-3d)
 	@echo "=====deal.II====3d====optimized==$(MT)== Linking library:   $(@F)"
-	@$(SHLIBLD) $(LDFLAGS) $(SHLIBFLAGS) -o $@ $(o-files-3d) $(deplibs.o)
+	@$(SHLIBLD) $(LDFLAGS) $(SHLIBFLAGS) -o $(LIBDIR)/libdeal_II_3d$(shared-lib-suffix).$(DEAL_II_VERSION) -Wl,-soname,libdeal_II_3d$(shared-lib-suffix).$(DEAL_II_VERSION) $(o-files-3d) $(deplibs.o)
+	@ln -s libdeal_II_3d$(shared-lib-suffix).$(DEAL_II_VERSION) $@
 
 
 

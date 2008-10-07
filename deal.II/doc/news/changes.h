@@ -114,6 +114,16 @@ inconvenience this causes.
 <ol>
   <li>
   <p>
+  New: The shared libraries we create are now versioned, i.e. they have
+  the form <code>libdeal_II_2d.g.so.6.2.0</code>. The library without
+  the version number is simply a link to the versioned library name.
+  <br>
+  (WB 2008/10/07)
+  </p>
+  </li>
+
+    <li>
+  <p>
   Updated: The version of the <a href="http://www.boost.org/">BOOST</a>
   library that is in the <code>contrib/</code> directory and is used in
   various places of the library has been upgraded to 1.36.
