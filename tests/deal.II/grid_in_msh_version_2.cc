@@ -59,8 +59,8 @@ void filename_resolution()
 
 int main ()
 {
-  deallog << std::setprecision (2);
-  logfile << std::setprecision (2);
+  deallog << std::setprecision (5);
+  logfile << std::setprecision (5);
   deallog.attach(logfile);
   deallog.depth_console(0);
   deallog.threshold_double(1.e-10);
