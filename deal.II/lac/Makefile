@@ -106,12 +106,12 @@ $(LIBDIR)/liblac.g$(static-lib-suffix): $(go-files)
 $(LIBDIR)/liblac$(shared-lib-suffix): $(o-files)
 	@echo "=====lac==============optimized==$(MT)== Linking library:   $(@F)"
 	@$(SHLIBLD) $(LDFLAGS) $(SHLIBFLAGS) -o $(LIBDIR)/liblac$(shared-lib-suffix).$(DEAL_II_VERSION) $(o-files) -Wl,-soname,liblac$(shared-lib-suffix).$(DEAL_II_VERSION) $(deplibs.o)
-	@ln -s liblac$(shared-lib-suffix).$(DEAL_II_VERSION) $@
+	@ln -f -s liblac$(shared-lib-suffix).$(DEAL_II_VERSION) $@
 
 $(LIBDIR)/liblac.g$(shared-lib-suffix): $(go-files)
 	@echo "=====lac==============debug======$(MT)== Linking library:   $(@F)"
 	@$(SHLIBLD) $(LDFLAGS) $(SHLIBFLAGS) -o $(LIBDIR)/liblac.g$(shared-lib-suffix).$(DEAL_II_VERSION) -Wl,-soname,liblac.g$(shared-lib-suffix).$(DEAL_II_VERSION) $(go-files) $(deplibs.g)
-	@ln -s liblac.g$(shared-lib-suffix).$(DEAL_II_VERSION) $@
+	@ln -f -s liblac.g$(shared-lib-suffix).$(DEAL_II_VERSION) $@
 
 
 clean:
