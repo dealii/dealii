@@ -127,6 +127,10 @@ class SubCellData;
  * file in the old format 1.0. This is done adding the line
  * "Mesh.MshFileVersion = 1" to the input file.
  *
+ * <li> <tt>Gmsh 2.0 mesh</tt> format: this is a variant of the above format.
+ * The read_msh() function automatically determines whether an input file
+ * is version 1 or version 2.
+ *
  * <li> <tt>Tecplot</tt> format: this format is used by @p TECPLOT and often
  * serves as a basis for data exchange between different applications. Note,
  * that currently only the ASCII format is supported, binary data cannot be

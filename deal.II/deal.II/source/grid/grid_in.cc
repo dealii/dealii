@@ -558,11 +558,45 @@ void GridIn<dim>::read_msh (std::istream &in)
   
   in >> line;
 
-  AssertThrow (line=="$NOD",
-	       ExcInvalidGMSHInput(line));
+				   // first determine file format
+  unsigned int gmsh_file_format;
+  if (line == "$NOD")
+    gmsh_file_format = 1;
+  else if (line == "$MeshFormat")
+    gmsh_file_format = 2;
+  else
+    AssertThrow (false, ExcInvalidGMSHInput(line));
 
+				   // if file format is 2 or greater
+				   // then we also have to read the
+				   // rest of the header
+  if (gmsh_file_format == 2)
+    {
+      double version;
+      unsigned int file_type, data_size;
+
+      in >> version >> file_type >> data_size;
+
+      Assert (version == 2.0, ExcNotImplemented());
+      Assert (file_type == 0, ExcNotImplemented());
+      Assert (data_size == sizeof(double), ExcNotImplemented());
+
+				       // read the end of the header
+				       // and the first line of the
+				       // nodes description to synch
+				       // ourselves with the format 1
+				       // handling above
+      in >> line;
+      AssertThrow (line == "$EndMeshFormat",
+		   ExcInvalidGMSHInput(line));
+
+      in >> line;
+      AssertThrow (line == "$Nodes",
+		   ExcInvalidGMSHInput(line));
+    }
+  
+				   // now read the nodes list
   in >> n_vertices;
-
   std::vector<Point<dim> >     vertices (n_vertices);
 				   // set up mapping between numbering
 				   // in msh-file (nod) and in the
@@ -580,19 +614,20 @@ void GridIn<dim>::read_msh (std::istream &in)
      
       for (unsigned int d=0; d<dim; ++d)
 	vertices[vertex](d) = x[d];
-				       // store mapping;
+				       // store mapping
       vertex_indices[vertex_number] = vertex;
-    };
+    }
 
 				   // Assert we reached the end of the block
   in >> line;
-  AssertThrow (line=="$ENDNOD",
+  static const std::string end_nodes_marker[] = {"$ENDNOD", "$EndNodes" };
+  AssertThrow (line==end_nodes_marker[gmsh_file_format-1],
 	       ExcInvalidGMSHInput(line));
-
   
 				   // Now read in next bit
   in >> line;
-  AssertThrow (line=="$ELM",
+  static const std::string begin_elements_marker[] = {"$ELM", "$Elements" };
+  AssertThrow (line==begin_elements_marker[gmsh_file_format-1],
 	       ExcInvalidGMSHInput(line));
 
   in >> n_cells;
@@ -609,24 +644,59 @@ void GridIn<dim>::read_msh (std::istream &in)
 				       // so check this:
       AssertThrow (in, ExcIO());
       
-/*  
-    $ENDNOD
-    $ELM
-    NUMBER-OF-ELEMENTS
-    ELM-NUMBER ELM-TYPE REG-PHYS REG-ELEM NUMBER-OF-NODES NODE-NUMBER-LIST
-    ...
-    $ENDELM
-*/
-      
       unsigned int cell_type;
       unsigned int material_id;
       unsigned int nod_num;
+
+/*
+  For file format version 1, the format of each cell is as follows:
+    elm-number elm-type reg-phys reg-elem number-of-nodes node-number-list
+
+  However, for version 2, the format reads like this:
+    elm-number elm-type number-of-tags < tag > ... node-number-list
+
+  In the following, we will ignore the element number (we simply enumerate
+  them in the order in which we read them, and we will take reg-phys
+  (version 1) or the first tag (version 2, if any tag is given at all) as
+  material id.
+*/
       
       in >> dummy          // ELM-NUMBER
-	 >> cell_type	   // ELM-TYPE
-	 >> material_id	   // REG-PHYS
-	 >> dummy	   // reg_elm
-	 >> nod_num;
+	 >> cell_type;	   // ELM-TYPE
+
+      switch (gmsh_file_format)
+	{
+	  case 1:
+	  {
+	    in >> material_id  // REG-PHYS
+	       >> dummy        // reg_elm
+	       >> nod_num;
+	    break;
+	  }
+	  
+	  case 2:
+	  {
+					     // read the tags; ignore
+					     // all but the first one
+	    unsigned int n_tags;
+	    in >> n_tags;
+	    if (n_tags > 0)
+	      in >> material_id;
+	    else
+	      material_id = 0;
+	    
+	    for (unsigned int i=1; i<n_tags; ++i)
+	      in >> dummy;
+
+	    nod_num = GeometryInfo<dim>::vertices_per_cell;
+
+	    break;
+	  }
+
+	  default:
+		AssertThrow (false, ExcNotImplemented());
+	}
+	  
       
 /*       `ELM-TYPE'
 	 defines the geometrical type of the N-th element:
@@ -648,6 +718,10 @@ void GridIn<dim>::read_msh (std::istream &in)
 	  ((cell_type == 5) && (dim == 3)))
 					 // found a cell
 	{
+	  AssertThrow (nod_num == GeometryInfo<dim>::vertices_per_cell,
+		       ExcMessage ("Number of nodes does not coincide with the "
+				   "number required for this object"));
+	  
 					   // allocate and read indices
 	  cells.push_back (CellData<dim>());
 	  for (unsigned int i=0; i<GeometryInfo<dim>::vertices_per_cell; ++i)
@@ -657,15 +731,14 @@ void GridIn<dim>::read_msh (std::istream &in)
 					   // transform from ucd to
 					   // consecutive numbering
 	  for (unsigned int i=0; i<GeometryInfo<dim>::vertices_per_cell; ++i)
-	    if (vertex_indices.find (cells.back().vertices[i]) != vertex_indices.end())
+	    {
+	      AssertThrow (vertex_indices.find (cells.back().vertices[i]) !=
+			   vertex_indices.end(),
+			   ExcInvalidVertexIndex(cell, cells.back().vertices[i]));
+	      
 					       // vertex with this index exists
 	      cells.back().vertices[i] = vertex_indices[cells.back().vertices[i]];
-	    else 
-	      {
-						 // no such vertex index
-		AssertThrow (false, ExcInvalidVertexIndex(cell, cells.back().vertices[i]));
-		cells.back().vertices[i] = numbers::invalid_unsigned_int;
-	      };
+	    }
 	}
       else
 	if ((cell_type == 1) && ((dim == 2) || (dim == 3)))
@@ -737,7 +810,8 @@ void GridIn<dim>::read_msh (std::istream &in)
 
 				   // Assert we reached the end of the block
   in >> line;
-  AssertThrow (line=="$ENDELM",
+  static const std::string end_elements_marker[] = {"$ENDELM", "$EndElements" };
+  AssertThrow (line==end_elements_marker[gmsh_file_format-1],
 	       ExcInvalidGMSHInput(line));
   
 				   // check that no forbidden arrays are used

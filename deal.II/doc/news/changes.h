@@ -322,6 +322,14 @@ inconvenience this causes.
 <ol>
   <li>
   <p>
+  New: The GridIn::read_msh function can now read version 2 of the MSH format described
+  <a target="_top" href="http://www.geuz.org/gmsh/doc/texinfo/gmsh_10.html">here</a>.
+  <br>
+  (WB 2008/10/07)
+  </p> 
+
+  <li>
+  <p>
   Fixed: In rare cases, when Triangulation::limit_level_difference_at_vertices
   is passed to the constructor of the Triangulation class, meshes could be
   generated that do not honor this flag. This is now fixed.
