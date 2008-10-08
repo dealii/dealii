@@ -54,15 +54,11 @@
 				 // classes. In particular, we will need
 				 // interfaces to the matrix and vector
 				 // classes based on Trilinos as well as
-				 // generic preconditioners and the Trilinos
-				 // Algebraic Multigrid (AMG) preconditioner
-				 // that we will use for the $A$ block of the
-				 // Stokes matrix:
+				 // Trilinos preconditioners:
 #include <lac/trilinos_block_vector.h>
 #include <lac/trilinos_sparse_matrix.h>
 #include <lac/trilinos_block_sparse_matrix.h>
 #include <lac/trilinos_precondition.h>
-#include <lac/trilinos_precondition_amg.h>
 
 				 // Finally, here are two C++ headers that
 				 // haven't been included yet by one of the
@@ -1231,7 +1227,8 @@ BoussinesqFlowProblem<dim>::build_stokes_preconditioner ()
   DoFTools::extract_constant_modes (stokes_dof_handler, velocity_components, 
 				    null_space);
   Amg_preconditioner->initialize(stokes_preconditioner_matrix.block(0,0),
-				 true, true, 5e-2, null_space, false);
+				 TrilinosWrappers::PreconditionAMG::AdditionalData
+				   (true, true, 5e-2, null_space, 0, false));
 
 				   // TODO: we could throw away the (0,0)
 				   // block here since things have been

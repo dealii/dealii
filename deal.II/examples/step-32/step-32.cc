@@ -28,7 +28,6 @@
 #include <lac/trilinos_sparse_matrix.h>
 #include <lac/trilinos_block_sparse_matrix.h>
 #include <lac/trilinos_precondition.h>
-#include <lac/trilinos_precondition_amg.h>
 
 #include <grid/tria.h>
 #include <grid/grid_generator.h>
@@ -805,7 +804,8 @@ BoussinesqFlowProblem<dim>::build_stokes_preconditioner ()
 				    null_space);
   
   Amg_preconditioner->initialize(stokes_preconditioner_matrix.block(0,0),
-				 true, true, 5e-2, null_space, false);
+				 TrilinosWrappers::PreconditionAMG::AdditionalData
+				   (true, true, 5e-2, null_space, 0, false));
 
   Mp_preconditioner = boost::shared_ptr<TrilinosWrappers::PreconditionIC>
                                    (new TrilinosWrappers::PreconditionIC());

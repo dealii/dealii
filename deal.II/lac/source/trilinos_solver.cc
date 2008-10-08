@@ -16,14 +16,12 @@
 #include <lac/trilinos_sparse_matrix.h>
 #include <lac/trilinos_vector_base.h>
 #include <lac/trilinos_precondition.h>
-#include <lac/trilinos_precondition_amg.h>
 
 #include <cmath>
 
 #ifdef DEAL_II_USE_TRILINOS
 
-#include <Ifpack.h>
-#include <ml_MultiLevelPreconditioner.h>
+#include <Epetra_Operator.h>
 
 DEAL_II_NAMESPACE_OPEN
 
@@ -50,28 +48,6 @@ namespace TrilinosWrappers
 
   
 
-  void
-  SolverBase::solve (const SparseMatrix     &A,
-                     VectorBase             &x,
-                     const VectorBase       &b,
-                     const PreconditionBase &preconditioner)
-  {
-    solve (A, x, b, &*preconditioner.preconditioner);
-  }
-
-
-
-  void
-  SolverBase::solve (const SparseMatrix     &A,
-                     VectorBase             &x,
-                     const VectorBase       &b,
-                     const PreconditionAMG  &preconditioner)
-  {
-    solve (A, x, b, &*preconditioner.multilevel_operator);
-  }
-
-
-
   SolverControl &
   SolverBase::control() const
   {
@@ -84,7 +60,7 @@ namespace TrilinosWrappers
   SolverBase::solve (const SparseMatrix     &A,
                      VectorBase             &x,
                      const VectorBase       &b,
-                     const Epetra_Operator*  preconditioner)
+                     const PreconditionBase &preconditioner)
   {
     int ierr;
     
@@ -129,7 +105,8 @@ namespace TrilinosWrappers
 
 					// Introduce the
 					// preconditioner, ...
-    ierr = solver.SetPrecOperator (const_cast<Epetra_Operator*>(preconditioner));
+    ierr = solver.SetPrecOperator (const_cast<Epetra_Operator*>
+				     (&*preconditioner.preconditioner));
     AssertThrow (ierr == 0, ExcTrilinosError(ierr));
 
 					// ... set some options, ...

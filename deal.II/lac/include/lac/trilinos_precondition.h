@@ -16,14 +16,31 @@
 
 #include <base/config.h>
 #include <base/subscriptor.h>
+#include <lac/vector.h>
+#include <lac/sparse_matrix.h>
+
+#include <boost/shared_ptr.hpp>
 
 
 #ifdef DEAL_II_USE_TRILINOS
 
+#ifdef DEAL_II_COMPILER_SUPPORTS_MPI
+#  include <Epetra_MpiComm.h>
+#else
+#  include <Epetra_SerialComm.h>
+#endif
+#include <Epetra_Map.h>
+
 #include <Teuchos_RefCountPtr.hpp>
+#include <Epetra_Operator.h>
 
 // forward declarations
 class Ifpack_Preconditioner;
+namespace ML_Epetra
+{
+  class MultiLevelPreconditioner;
+}
+
 
 DEAL_II_NAMESPACE_OPEN
 
@@ -68,12 +85,33 @@ namespace TrilinosWrappers
                                         * sparse matrix.
                                         */
       PreconditionBase ();
+
+                                       /**
+                                        * Constructor. Does not do
+                                        * anything. The
+                                        * <tt>initialize</tt> function
+                                        * of the derived classes will
+                                        * have to create the
+                                        * preconditioner from a given
+                                        * sparse matrix.
+                                        */
+      ~PreconditionBase ();
       
 				       /**
 					* Apply the preconditioner.
 					*/
       void vmult (VectorBase       &dst,
 		  const VectorBase &src) const;
+
+				       /**
+					* Apply the preconditioner on
+				        * deal.II data structures
+				        * instead of the ones provided
+				        * in the Trilinos wrapper
+				        * class.
+					*/
+      void vmult (dealii::Vector<double>       &dst,
+		  const dealii::Vector<double> &src) const;
 
                                        /**
 					* Exception.
@@ -88,13 +126,33 @@ namespace TrilinosWrappers
       friend class SolverBase;
       friend class SolverSaddlePoint;
 
-      //protected:
+    protected:
 				       /**
 					* This is a pointer to the
-					* preconditioner object.
+					* preconditioner object that
+					* is used when applying the
+					* preconditioner.
 					*/
-        Teuchos::RefCountPtr<Ifpack_Preconditioner> preconditioner;
+      Teuchos::RCP<const Epetra_Operator> preconditioner;
 
+                                       /**
+					* Internal communication
+					* pattern in case the matrix
+					* needs to be copied from
+					* deal.II format.
+					*/
+#ifdef DEAL_II_COMPILER_SUPPORTS_MPI
+      Epetra_MpiComm     communicator;
+#else
+      Epetra_SerialComm  communicator;
+#endif
+
+                                       /**
+					* Internal Trilinos map in
+					* case the matrix needs to be
+					* copied from deal.II format.
+					*/
+      std::auto_ptr<Epetra_Map>   map;
   };
 
   
@@ -156,10 +214,25 @@ namespace TrilinosWrappers
 			const double       min_diagonal = 0);
 	
                                        /**
-					* Relaxation parameter and
-					* minimal diagonal value.
+					* This specifies the
+					* relaxation parameter in the
+					* Jacobi preconditioner.
 					*/
-	double omega, min_diagonal;
+	double omega;
+
+                                       /**
+					* This specifies the minimum
+					* value the diagonal elements
+					* should have. This might be
+					* necessary when the Jacobi
+					* preconditioner is used on
+					* matrices with zero diagonal
+					* elements. In that case, a
+					* straight-forward application
+					* would not be possible since
+					* we would divide by zero.
+					*/
+	double min_diagonal;
       };
 
                                        /**
@@ -171,6 +244,14 @@ namespace TrilinosWrappers
 					*/
       void initialize (const SparseMatrix   &matrix,
 		       const AdditionalData &additional_data = AdditionalData());
+
+    private:
+				       /**
+					* This is a pointer to the
+					* Ifpack data contained in
+					* this preconditioner.
+					*/
+      Teuchos::RCP<Ifpack_Preconditioner> ifpack;
   };
   
 
@@ -257,11 +338,34 @@ namespace TrilinosWrappers
 			const unsigned int overlap = 0);
 	
                                        /**
-					* Relaxation parameter,
-					* minimal diagonal element,
-					* and overlap.
+					* This specifies the (over-)
+					* relaxation parameter in the
+					* SSOR preconditioner.
 					*/
-	double omega, min_diagonal;
+	double omega;
+
+                                       /**
+					* This specifies the minimum
+					* value the diagonal elements
+					* should have. This might be
+					* necessary when the SSOR
+					* preconditioner is used on
+					* matrices with zero diagonal
+					* elements. In that case, a
+					* straight-forward application
+					* would not be possible since
+					* we divide by the diagonal
+					* element.
+					*/
+	double min_diagonal;
+
+                                       /**
+					* This determines how large
+					* the overlap of the local
+					* matrix portions on each
+					* processor in a parallel
+					* application should be.
+					*/
 	unsigned int overlap; 
       };
 
@@ -276,6 +380,14 @@ namespace TrilinosWrappers
 					*/
       void initialize (const SparseMatrix   &matrix,
 		       const AdditionalData &additional_data = AdditionalData());
+
+    private:
+				       /**
+					* This is a pointer to the
+					* Ifpack data contained in
+					* this preconditioner.
+					*/
+      Teuchos::RCP<Ifpack_Preconditioner> ifpack;
   };
   
 
@@ -360,13 +472,36 @@ namespace TrilinosWrappers
 	AdditionalData (const double       omega = 1,
 			const double       min_diagonal = 0,
 			const unsigned int overlap = 0);
-	
+
                                        /**
-					* Relaxation parameter,
-					* minimal diagonal element,
-					* and overlap.
+					* This specifies the (over-)
+					* relaxation parameter in the
+					* SOR preconditioner.
 					*/
-	double omega, min_diagonal;
+	double omega;
+
+                                       /**
+					* This specifies the minimum
+					* value the diagonal elements
+					* should have. This might be
+					* necessary when the SOR
+					* preconditioner is used on
+					* matrices with zero diagonal
+					* elements. In that case, a
+					* straight-forward application
+					* would not be possible since
+					* we divide by the diagonal
+					* element.
+					*/
+	double min_diagonal;
+
+                                       /**
+					* This determines how large
+					* the overlap of the local
+					* matrix portions on each
+					* processor in a parallel
+					* application should be.
+					*/
 	unsigned int overlap; 
       };
 
@@ -380,7 +515,15 @@ namespace TrilinosWrappers
                                         * are any.
 					*/
       void initialize (const SparseMatrix   &matrix,
-		       const AdditionalData &additional_data = AdditionalData());
+		       const AdditionalData &additional_data = AdditionalData()); 
+
+    private:
+				       /**
+					* This is a pointer to the
+					* Ifpack data contained in
+					* this preconditioner.
+					*/
+      Teuchos::RCP<Ifpack_Preconditioner> ifpack;
   };
 
 
@@ -490,13 +633,55 @@ namespace TrilinosWrappers
 			const double       ic_atol = 0.,
 			const double       ic_rtol = 1.,
 			const unsigned int overlap = 0);
-	
+
                                        /**
-					* IC parameters and overlap.
+					* This specifies the amount of
+					* additional fill-in elements
+					* besides the sparse matrix
+					* structure. When
+					* <tt>ic_fill</tt> is large,
+					* this means that many
+					* fill-ins will be added, so
+					* that the IC preconditioner
+					* comes closer to a direct
+					* sparse Cholesky
+					* decomposition. Note,
+					* however, that this will
+					* drastically increase the
+					* memory requirement,
+					* especially when the
+					* preconditioner is used in
+					* 3D.
 					*/
 	unsigned int ic_fill;
-	double ic_atol, ic_rtol;
-	unsigned int overlap;
+
+                                       /**
+					* This specifies the amount of
+					* an absolute perturbation
+					* that will be added to the
+					* diagonal of the matrix,
+					* which sometimes can help to
+					* get better preconditioners.
+					*/
+	double ic_atol;
+
+                                       /**
+					* This specifies the factor by
+					* which the diagonal of the
+					* matrix will be scaled, which
+					* sometimes can help to get
+					* better preconditioners.
+					*/
+	double ic_rtol;
+
+                                       /**
+					* This determines how large
+					* the overlap of the local
+					* matrix portions on each
+					* processor in a parallel
+					* application should be.
+					*/
+	unsigned int overlap; 
       };
 
                                        /**
@@ -508,6 +693,14 @@ namespace TrilinosWrappers
                                         */
       void initialize (const SparseMatrix   &matrix,
 		       const AdditionalData &additional_data = AdditionalData());
+
+    private:
+				       /**
+					* This is a pointer to the
+					* Ifpack data contained in
+					* this preconditioner.
+					*/
+      Teuchos::RCP<Ifpack_Preconditioner> ifpack;
   };
 
 
@@ -616,13 +809,55 @@ namespace TrilinosWrappers
 			const double       ilu_atol = 0.,
 			const double       ilu_rtol = 1.,
 			const unsigned int overlap  = 0);
-	
+
                                        /**
-					* ILU parameters and overlap.
+					* This specifies the amount of
+					* additional fill-in elements
+					* besides the sparse matrix
+					* structure. When
+					* <tt>ilu_fill</tt> is large,
+					* this means that many
+					* fill-ins will be added, so
+					* that the ILU preconditioner
+					* comes closer to a (direct)
+					* sparse LU
+					* decomposition. Note,
+					* however, that this will
+					* drastically increase the
+					* memory requirement,
+					* especially when the
+					* preconditioner is used in
+					* 3D.
 					*/
 	unsigned int ilu_fill;
-	double ilu_atol, ilu_rtol;
-	unsigned int overlap;
+
+                                       /**
+					* This specifies the amount of
+					* an absolute perturbation
+					* that will be added to the
+					* diagonal of the matrix,
+					* which sometimes can help to
+					* get better preconditioners.
+					*/
+	double ilu_atol;
+
+                                       /**
+					* This specifies the factor by
+					* which the diagonal of the
+					* matrix will be scaled, which
+					* sometimes can help to get
+					* better preconditioners.
+					*/
+	double ilu_rtol;
+
+                                       /**
+					* This determines how large
+					* the overlap of the local
+					* matrix portions on each
+					* processor in a parallel
+					* application should be.
+					*/
+	unsigned int overlap; 
       };
 
                                        /**
@@ -634,6 +869,14 @@ namespace TrilinosWrappers
                                         */
       void initialize (const SparseMatrix   &matrix,
 		       const AdditionalData &additional_data = AdditionalData());
+
+    private:
+				       /**
+					* This is a pointer to the
+					* Ifpack data contained in
+					* this preconditioner.
+					*/
+      Teuchos::RCP<Ifpack_Preconditioner> ifpack;
   };
 
 
@@ -673,8 +916,13 @@ namespace TrilinosWrappers
 					*/
 	AdditionalData (const unsigned int overlap  = 0);
 	
+
                                        /**
-					* Block direct parameters and overlap.
+					* This determines how large
+					* the overlap of the local
+					* matrix portions on each
+					* processor in a parallel
+					* application should be.
 					*/
 	unsigned int overlap;
       };
@@ -688,8 +936,218 @@ namespace TrilinosWrappers
                                         */
       void initialize (const SparseMatrix   &matrix,
 		       const AdditionalData &additional_data = AdditionalData());
+
+    private:
+				       /**
+					* This is a pointer to the
+					* Ifpack data contained in
+					* this preconditioner.
+					*/
+      Teuchos::RCP<Ifpack_Preconditioner> ifpack;
   };
   
+
+
+/**
+ * This class implements an algebraic multigrid (AMG) preconditioner
+ * based on the Trilinos ML implementation, which is a black-box
+ * preconditioner that works well for many PDE-based linear problems.
+ * What this class does is twofold.  When the initialize() function is
+ * invoked, a ML preconditioner object is created based on the matrix
+ * that we want the preconditioner to be based on. A call of the
+ * respective <code>vmult</code> function does call the respective
+ * operation in the Trilinos package, where it is called
+ * <code>ApplyInverse</code>. Use of this class is explained in the
+ * @ref step_31 "step-31" tutorial program.
+ *
+ * There are a few pecularities in initialize(). Since the Trilinos
+ * objects we want to use are heavily dependent on Epetra objects, the
+ * fundamental construction routines for vectors and matrices in
+ * Trilinos, we do a copy of our deal.II preconditioner matrix to a
+ * Epetra matrix. This is of course not optimal, but for the time
+ * being there is no direct support for our data interface.  When
+ * doing this time-consuming operation, we can still profit from the
+ * fact that some of the entries in the preconditioner matrix are zero
+ * and hence can be neglected.
+ *
+ * The implementation is able to distinguish between matrices from
+ * elliptic problems and convection dominated problems. We use the
+ * standard options provided by Trilinos ML for elliptic problems,
+ * except that we use a Chebyshev smoother instead of a symmetric
+ * Gauss-Seidel smoother.  For most elliptic problems, Chebyshev
+ * provides a better damping of high frequencies (in the algebraic
+ * sense) than Gauss-Seidel (SSOR).
+ *
+ * @ingroup TrilinosWrappers
+ * @ingroup Preconditioners
+ * @author Martin Kronbichler, 2008
+ */
+  class PreconditionAMG : public PreconditionBase
+  {
+    public:
+
+    struct AdditionalData
+      {
+                                       /**
+					* Constructor. By default, we
+					* pretend to work on elliptic
+					* problems with linear finite
+					* elements on a scalar
+					* equation.
+					*/
+	AdditionalData (const bool                             elliptic = true,
+			const bool                             higher_order_elements = false,
+			const double                           aggregation_threshold = 1e-4,
+			const std::vector<std::vector<bool> > &null_space = std::vector<std::vector<bool> > (1),
+			const unsigned int                     smoother_overlap = 0,
+			const bool                             output_details = false);
+
+				       /**
+					* Determines whether the AMG
+					* preconditioner should be
+					* optimized for elliptic
+					* problems (ML option smoothed
+					* aggregation SA, using a
+					* Chebyshev smoother) or for
+					* non-elliptic problems (ML
+					* option non-symmetric
+					* smoothed aggregation NSSA,
+					* smoother is SSOR with
+					* underrelaxation).
+					*/
+	bool elliptic;
+
+				       /**
+					* Determines whether the
+					* matrix that the
+					* preconditioner is built upon
+					* is generated from linear or
+					* higher-order elements.
+					*/
+	bool higher_order_elements;
+
+				       /**
+					* This threshold tells the AMG
+					* setup how the coarsening
+					* should be performed. In the
+					* AMG used by ML, all points
+					* that strongly couple with
+					* the tentative coarse-level
+					* point form one
+					* aggregate. The term
+					* <em>strong coupling</em> is
+					* controlled by the variable
+					* <tt>aggregation_threshold</tt>,
+					* meaning that all elements
+					* that are not smaller than
+					* <tt>aggregation_threshold</tt>
+					* times the diagonal element
+					* do couple strongly.
+					*/
+	double aggregation_threshold;
+
+				       /**
+					* Specifies the constant modes
+					* (near null space) of the
+					* matrix. This parameter tells
+					* AMG whether we work on a
+					* scalar equation (where the
+					* near null space only
+					* consists of ones) or on a
+					* vector-valued equation.
+					*/
+	std::vector<std::vector<bool> > null_space;
+
+				       /**
+					* Determines the overlap in
+					* the SSOR/Chebyshev error
+					* smoother when run in
+					* parallel.
+					*/
+	unsigned int smoother_overlap;
+
+				       /**
+					* If this flag is set to
+					* <tt>true</tt>, then internal
+					* information from the ML
+					* preconditioner is printed to
+					* screen. This can be useful
+					* when debugging the
+					* preconditioner.
+					*/
+	bool output_details;
+      };
+
+				       /**
+					* Let Trilinos compute a
+					* multilevel hierarchy for the
+					* solution of a linear system
+					* with the given matrix. The
+					* function uses the matrix
+					* format specified in
+					* TrilinosWrappers::SparseMatrix.
+					*/
+      void initialize (const SparseMatrix                    &matrix,
+		       const AdditionalData &additional_data = AdditionalData());
+
+				       /**
+					* Let Trilinos compute a
+					* multilevel hierarchy for the
+					* solution of a linear system
+					* with the given matrix. This
+					* function takes a deal.ii
+					* matrix and copies the
+					* content into a Trilinos
+					* matrix, so the function can
+					* be considered rather
+					* inefficient.
+					*/
+      void initialize (const ::dealii::SparseMatrix<double> &deal_ii_sparse_matrix,
+		       const AdditionalData                 &additional_data = AdditionalData(),
+		       const double                          drop_tolerance = 1e-13);
+
+				       /**
+					* This function can be used
+				        * for a faster recalculation
+				        * of the preconditioner
+				        * construction when the matrix
+				        * entries underlying the
+				        * preconditioner have changed,
+				        * but the matrix sparsity
+				        * pattern has remained the
+				        * same. What this function
+				        * does is taking the already
+				        * generated coarsening
+				        * structure, computing the AMG
+				        * prolongation and restriction
+				        * according to a smoothed
+				        * aggregation strategy and
+				        * then building the whole
+				        * multilevel hiearchy. This
+				        * function can be considerably
+				        * faster than the initialize
+				        * function, since the
+				        * coarsening pattern is
+				        * usually the most difficult
+				        * thing to do when setting up
+				        * the AMG ML preconditioner.
+					*/
+      void reinit ();
+
+    private:
+
+				       /**
+					* A pointer to the
+					* preconditioner object.
+					*/
+      Teuchos::RCP<ML_Epetra::MultiLevelPreconditioner> multilevel_operator;
+
+				       /**
+					* A copy of the deal.II matrix
+					* into Trilinos format.
+					*/
+      boost::shared_ptr<SparseMatrix> Matrix;
+  };
 
 }
 

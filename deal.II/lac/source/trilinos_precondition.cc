@@ -20,6 +20,11 @@
 
 #include <Ifpack.h>
 #include <Teuchos_ParameterList.hpp>
+#include <Epetra_Vector.h>
+#include <Epetra_MultiVector.h>
+#include <Epetra_Vector.h>
+#include <ml_include.h>
+#include <ml_MultiLevelPreconditioner.h>
 
 
 DEAL_II_NAMESPACE_OPEN
@@ -28,7 +33,18 @@ namespace TrilinosWrappers
 {
 
   PreconditionBase::PreconditionBase()
+                    :
+#ifdef DEAL_II_COMPILER_SUPPORTS_MPI
+                    communicator (MPI_COMM_WORLD)
+#endif
   {}
+
+
+
+  PreconditionBase::~PreconditionBase()
+  {
+    preconditioner.release();
+  }
 
 
 
@@ -43,6 +59,45 @@ namespace TrilinosWrappers
     
     const int ierr = preconditioner->ApplyInverse (*src.vector, *dst.vector);
     AssertThrow (ierr == 0, ExcTrilinosError(ierr));
+  }
+
+
+
+				        // For the implementation of
+				        // the <code>vmult</code>
+				        // function we note that
+				        // invoking a call of the
+				        // Trilinos preconditioner
+				        // requires us to use Epetra
+				        // vectors as well. It is
+				        // faster to provide a view,
+				        // i.e., feed Trilinos with a
+				        // pointer to the data, so we
+				        // avoid copying the content
+				        // of the vectors during the
+				        // iteration. In the
+				        // declaration of the right
+				        // hand side, we need to cast
+				        // the source vector (that is
+				        // <code>const</code> in all
+				        // deal.II calls) to
+				        // non-constant value, as this
+				        // is the way Trilinos wants
+				        // to have them.
+  void PreconditionBase::vmult (dealii::Vector<double>       &dst,
+				const dealii::Vector<double> &src) const
+  {
+    
+    Epetra_Vector LHS (View, preconditioner->OperatorDomainMap(),
+		       dst.begin());
+    Epetra_Vector RHS (View, preconditioner->OperatorRangeMap(),
+		       const_cast<double*>(src.begin()));
+  
+    const int res = preconditioner->ApplyInverse (RHS, LHS);
+  
+    Assert (res == 0,
+	    ExcMessage ("Trilinos AMG MultiLevel preconditioner returned "
+			"with an error!"));
   }
 
 
@@ -64,10 +119,13 @@ namespace TrilinosWrappers
 				  const AdditionalData &additional_data)
   {
     preconditioner.release();
+    ifpack.release();
 
-    preconditioner = Teuchos::rcp (Ifpack().Create ("point relaxation", &*matrix.matrix, 0));
-    Assert (&*preconditioner != 0, ExcMessage ("Trilinos could not create this "
-					       "preconditioner"));
+    ifpack = Teuchos::rcp (Ifpack().Create ("point relaxation", 
+					    &*matrix.matrix, 0));
+
+    Assert (&*ifpack != 0, ExcMessage ("Trilinos could not create this "
+				       "preconditioner"));
 
     int ierr;
 
@@ -78,14 +136,16 @@ namespace TrilinosWrappers
     parameter_list.set ("relaxation: min diagonal value", 
 			additional_data.min_diagonal);
     
-    ierr = preconditioner->SetParameters(parameter_list);
+    ierr = ifpack->SetParameters(parameter_list);
     AssertThrow (ierr == 0, ExcTrilinosError(ierr));
 
-    ierr = preconditioner->Initialize();
+    ierr = ifpack->Initialize();
     AssertThrow (ierr == 0, ExcTrilinosError(ierr));
 
-    ierr = preconditioner->Compute();
+    ierr = ifpack->Compute();
     AssertThrow (ierr == 0, ExcTrilinosError(ierr));
+
+    preconditioner = Teuchos::rcp (&*ifpack, false);
   }
 
 
@@ -109,12 +169,14 @@ namespace TrilinosWrappers
 				const AdditionalData &additional_data)
   {
     preconditioner.release();
+    ifpack.release();
 
-    preconditioner = Teuchos::rcp (Ifpack().Create ("point relaxation",
-						    &*matrix.matrix, 
-						    additional_data.overlap));
-    Assert (&*preconditioner != 0, ExcMessage ("Trilinos could not create this "
-					       "preconditioner"));
+    ifpack = Teuchos::rcp (Ifpack().Create ("point relaxation",
+					    &*matrix.matrix, 
+					    additional_data.overlap));
+
+    Assert (&*ifpack != 0, ExcMessage ("Trilinos could not create this "
+				       "preconditioner"));
 
     int ierr;
 
@@ -126,14 +188,16 @@ namespace TrilinosWrappers
 			additional_data.min_diagonal);
     parameter_list.set ("schwarz: combine mode", "Add");
     
-    ierr = preconditioner->SetParameters(parameter_list);
+    ierr = ifpack->SetParameters(parameter_list);
     AssertThrow (ierr == 0, ExcTrilinosError(ierr));
 
-    ierr = preconditioner->Initialize();
+    ierr = ifpack->Initialize();
     AssertThrow (ierr == 0, ExcTrilinosError(ierr));
 
-    ierr = preconditioner->Compute();
+    ierr = ifpack->Compute();
     AssertThrow (ierr == 0, ExcTrilinosError(ierr));
+
+    preconditioner = Teuchos::rcp (&*ifpack, false);
   }
 
 
@@ -157,12 +221,14 @@ namespace TrilinosWrappers
 			       const AdditionalData &additional_data)
   {
     preconditioner.release();
+    ifpack.release();
 
-    preconditioner = Teuchos::rcp (Ifpack().Create ("point relaxation",
+    ifpack = Teuchos::rcp (Ifpack().Create ("point relaxation",
 						    &*matrix.matrix, 
 						    additional_data.overlap));
-    Assert (&*preconditioner != 0, ExcMessage ("Trilinos could not create this "
-					       "preconditioner"));
+
+    Assert (&*ifpack != 0, ExcMessage ("Trilinos could not create this "
+				       "preconditioner"));
 
     int ierr;
 
@@ -174,14 +240,16 @@ namespace TrilinosWrappers
 			additional_data.min_diagonal);
     parameter_list.set ("schwarz: combine mode", "Add");
     
-    ierr = preconditioner->SetParameters(parameter_list);
+    ierr = ifpack->SetParameters(parameter_list);
     AssertThrow (ierr == 0, ExcTrilinosError(ierr));
 
-    ierr = preconditioner->Initialize();
+    ierr = ifpack->Initialize();
     AssertThrow (ierr == 0, ExcTrilinosError(ierr));
 
-    ierr = preconditioner->Compute();
+    ierr = ifpack->Compute();
     AssertThrow (ierr == 0, ExcTrilinosError(ierr));
+
+    preconditioner = Teuchos::rcp (&*ifpack, false);
   }
 
 
@@ -207,10 +275,12 @@ namespace TrilinosWrappers
 			      const AdditionalData &additional_data)
   {
     preconditioner.release();
+    ifpack.release();
 
-    preconditioner = Teuchos::rcp (Ifpack().Create ("IC", &*matrix.matrix, 
-						    additional_data.overlap));
-    Assert (&*preconditioner != 0, ExcMessage ("Trilinos could not create this "
+    ifpack = Teuchos::rcp (Ifpack().Create ("IC", &*matrix.matrix, 
+					    additional_data.overlap));
+
+    Assert (&*ifpack != 0, ExcMessage ("Trilinos could not create this "
 					       "preconditioner"));
 
     int ierr;
@@ -221,14 +291,16 @@ namespace TrilinosWrappers
     parameter_list.set ("fact: relative threshold",additional_data.ic_rtol); 
     parameter_list.set ("schwarz: combine mode", "Add");
     
-    ierr = preconditioner->SetParameters(parameter_list);
+    ierr = ifpack->SetParameters(parameter_list);
     AssertThrow (ierr == 0, ExcTrilinosError(ierr));
 
-    ierr = preconditioner->Initialize();
+    ierr = ifpack->Initialize();
     AssertThrow (ierr == 0, ExcTrilinosError(ierr));
 
-    ierr = preconditioner->Compute();
+    ierr = ifpack->Compute();
     AssertThrow (ierr == 0, ExcTrilinosError(ierr));
+
+    preconditioner = Teuchos::rcp (&*ifpack, false);
   }
 
 
@@ -254,10 +326,12 @@ namespace TrilinosWrappers
 			       const AdditionalData &additional_data)
   {
     preconditioner.release();
+    ifpack.release();
 
-    preconditioner = Teuchos::rcp (Ifpack().Create ("ILU", &*matrix.matrix, 
-						    additional_data.overlap));
-    Assert (&*preconditioner != 0, ExcMessage ("Trilinos could not create this "
+    ifpack = Teuchos::rcp (Ifpack().Create ("ILU", &*matrix.matrix, 
+					    additional_data.overlap));
+
+    Assert (&*ifpack != 0, ExcMessage ("Trilinos could not create this "
 					       "preconditioner"));
 
     int ierr;
@@ -268,14 +342,16 @@ namespace TrilinosWrappers
     parameter_list.set ("fact: relative threshold",additional_data.ilu_rtol); 
     parameter_list.set ("schwarz: combine mode", "Add");
     
-    ierr = preconditioner->SetParameters(parameter_list);
+    ierr = ifpack->SetParameters(parameter_list);
     AssertThrow (ierr == 0, ExcTrilinosError(ierr));
 
-    ierr = preconditioner->Initialize();
+    ierr = ifpack->Initialize();
     AssertThrow (ierr == 0, ExcTrilinosError(ierr));
 
-    ierr = preconditioner->Compute();
+    ierr = ifpack->Compute();
     AssertThrow (ierr == 0, ExcTrilinosError(ierr));
+
+    preconditioner = Teuchos::rcp (&*ifpack, false);
   }
 
 
@@ -295,25 +371,164 @@ namespace TrilinosWrappers
 				       const AdditionalData &additional_data)
   {
     preconditioner.release();
+    ifpack.release();
 
-    preconditioner = Teuchos::rcp (Ifpack().Create ("Amesos", &*matrix.matrix, 
-						    additional_data.overlap));
-    Assert (&*preconditioner != 0, ExcMessage ("Trilinos could not create this "
-					       "preconditioner"));
+    ifpack = Teuchos::rcp (Ifpack().Create ("Amesos", &*matrix.matrix, 
+					    additional_data.overlap));
+    Assert (&*ifpack != 0, ExcMessage ("Trilinos could not create this "
+				       "preconditioner"));
 
     int ierr;
 
     Teuchos::ParameterList parameter_list;
     parameter_list.set ("schwarz: combine mode", "Add");
     
-    ierr = preconditioner->SetParameters(parameter_list);
+    ierr = ifpack->SetParameters(parameter_list);
     AssertThrow (ierr == 0, ExcTrilinosError(ierr));
 
-    ierr = preconditioner->Initialize();
+    ierr = ifpack->Initialize();
     AssertThrow (ierr == 0, ExcTrilinosError(ierr));
 
-    ierr = preconditioner->Compute();
+    ierr = ifpack->Compute();
     AssertThrow (ierr == 0, ExcTrilinosError(ierr));
+
+    preconditioner = Teuchos::rcp (&*ifpack, false);
+  }
+
+
+
+/* -------------------------- PreconditionAMG -------------------------- */
+
+  PreconditionAMG::AdditionalData::
+  AdditionalData (const bool                             elliptic,
+		  const bool                             higher_order_elements,
+		  const double                           aggregation_threshold,
+		  const std::vector<std::vector<bool> > &null_space,
+		  const unsigned int                     smoother_overlap,
+		  const bool                             output_details)
+                  :
+                  elliptic (elliptic),
+		  higher_order_elements (higher_order_elements),
+		  aggregation_threshold (aggregation_threshold),
+		  null_space (null_space),
+		  smoother_overlap (smoother_overlap),
+		  output_details (output_details)
+  {}
+
+
+
+  void
+  PreconditionAMG:: initialize (const SparseMatrix   &matrix,
+				const AdditionalData &additional_data)
+  {
+    preconditioner.release();
+    multilevel_operator.release();
+
+    const unsigned int n_rows = matrix.m();
+    const unsigned int null_space_dimension = additional_data.null_space.size();
+
+				        // Build the AMG preconditioner.
+    Teuchos::ParameterList parameter_list;
+  
+    if (additional_data.elliptic == true)
+      {
+	ML_Epetra::SetDefaults("SA",parameter_list);
+	parameter_list.set("smoother: type", "Chebyshev");
+	parameter_list.set("smoother: sweeps", 4);
+      }
+    else
+      {
+	ML_Epetra::SetDefaults("NSSA",parameter_list);
+	parameter_list.set("aggregation: type", "Uncoupled");
+	parameter_list.set("aggregation: block scaling", true);
+      }
+  
+    parameter_list.set("smoother: ifpack overlap", 
+		       (int)additional_data.smoother_overlap);
+    parameter_list.set("aggregation: threshold", 
+		       additional_data.aggregation_threshold);
+    
+    if (additional_data.output_details)
+      parameter_list.set("ML output", 10);
+    else
+      parameter_list.set("ML output", 0);
+  
+    if (additional_data.higher_order_elements)
+      parameter_list.set("aggregation: type", "MIS");
+
+    const Epetra_Map * domain_map = &(matrix.matrix->DomainMap());
+    
+    Epetra_MultiVector null_space_modes (*domain_map, null_space_dimension);
+  
+    if (null_space_dimension > 1)
+      {
+	Assert (n_rows == additional_data.null_space[0].size(),
+		ExcDimensionMismatch(n_rows,
+				     additional_data.null_space[0].size()));
+	Assert (n_rows == (unsigned int)null_space_modes.GlobalLength(),
+		ExcDimensionMismatch(n_rows,
+				     null_space_modes.GlobalLength()));
+
+	const unsigned int my_size = domain_map->NumMyElements();
+	Assert (my_size == (unsigned int)domain_map->MaxLID()+1,
+		ExcDimensionMismatch (my_size, domain_map->MaxLID()+1));
+	
+				        // Reshape null space as a
+				        // contiguous vector of
+				        // doubles so that Trilinos
+				        // can read from it.
+	for (unsigned int d=0; d<null_space_dimension; ++d)
+	  for (unsigned int row=0; row<my_size; ++row)
+	    {
+	      int global_row_id = domain_map->GID(row);
+	      null_space_modes.ReplaceMyValue(row, d, 
+				 (double)additional_data.null_space[d][global_row_id]);
+	    }
+  
+	parameter_list.set("null space: type", "pre-computed");
+	parameter_list.set("null space: dimension", null_space_modes.NumVectors());
+	parameter_list.set("null space: vectors", null_space_modes.Values());
+      }
+
+    multilevel_operator = Teuchos::rcp (new ML_Epetra::MultiLevelPreconditioner(
+				        *matrix.matrix, parameter_list, true));
+
+    if (additional_data.output_details)
+      multilevel_operator->PrintUnused(0);
+
+    preconditioner = Teuchos::rcp (&*multilevel_operator);
+  }
+
+
+
+  void
+  PreconditionAMG::
+  initialize (const ::dealii::SparseMatrix<double> &deal_ii_sparse_matrix,
+	      const AdditionalData                 &additional_data,
+	      const double                          drop_tolerance)
+  {
+    const unsigned int n_rows = deal_ii_sparse_matrix.m();
+  
+				        // Init Epetra Matrix, avoid
+				        // storing the nonzero
+				        // elements.
+
+    map.reset (new Epetra_Map(n_rows, 0, communicator));
+
+    Matrix.reset();
+    Matrix = boost::shared_ptr<SparseMatrix> (new SparseMatrix());
+
+    Matrix->reinit (*map, deal_ii_sparse_matrix, drop_tolerance);
+    Matrix->compress();
+
+    initialize (*Matrix, additional_data);
+  }
+  
+  
+  void PreconditionAMG::
+  reinit ()
+  {
+    multilevel_operator->ReComputePreconditioner();
   }
 
 }
