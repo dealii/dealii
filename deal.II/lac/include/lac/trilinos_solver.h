@@ -34,7 +34,6 @@ namespace TrilinosWrappers
   class SparseMatrix;
   class VectorBase;
   class PreconditionBase;
-  class PreconditionAMG;
   
   
 /**
@@ -107,20 +106,6 @@ namespace TrilinosWrappers
              const PreconditionBase &preconditioner);
 
                                        /**
-                                        * Solve the linear system
-                                        * <tt>Ax=b</tt>. In contrast
-                                        * to the other <tt>vmult</tt>
-                                        * function, this solves the
-                                        * system with an AMG
-                                        * preconditioner.
-                                        */
-      void
-      solve (const SparseMatrix     &A,
-             VectorBase             &x,
-             const VectorBase       &b,
-             const PreconditionAMG  &preconditioner);
-
-                                       /**
                                         * Access to object that controls
                                         * convergence.
                                         */
@@ -163,23 +148,6 @@ namespace TrilinosWrappers
       enum SolverName {cg, cgs, gmres, bicgstab, tfqmr} solver_name;
 
     private:
-
-				       /**
-					* Since we might need to call
-					* the solver with different
-					* types of preconditioners
-					* (Ifpack, ML), we write an
-					* additional function that
-					* does the actual job, whereas
-					* the public <tt>vmult</tt>
-					* operations do call this
-					* function with the respective
-					* argument.
-					*/
-      void solve (const SparseMatrix     &A,
-		  VectorBase             &x,
-		  const VectorBase       &b,
-		  const Epetra_Operator* preconditioner);
 
                                        /**
 					* A structure that collects
