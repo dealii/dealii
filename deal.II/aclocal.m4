@@ -1702,6 +1702,55 @@ AC_DEFUN(DEAL_II_CHECK_RPATH,
 ])
 
 
+
+dnl -------------------------------------------------------------
+dnl
+dnl Check whether we can use -soname for linking in the shared 
+dnl library version. On Mac OS X, -soname is called 
+dnl -dylib_install_name
+dnl
+dnl -------------------------------------------------------------
+AC_DEFUN(DEAL_II_CHECK_LINK_SONAME,
+[
+  dnl First try -soname
+  OLD_LDFLAGS=$LDFLAGS
+  LDFLAGS="-Wl,-soname,libbase.so.6.2.1 $LDFLAGS"
+  AC_MSG_CHECKING([whether compiler understands option -Wl,-soname])
+  AC_LINK_IFELSE(
+   [ AC_LANG_PROGRAM([[]],[[]])],
+   [ 
+     AC_MSG_RESULT(yes)
+     DEAL_II_LD_UNDERSTANDS_SONAME="yes"
+   ],
+   [ 
+     AC_MSG_RESULT(no)
+     DEAL_II_LD_UNDERSTANDS_SONAME="no"
+   ]
+  )
+  LDFLAGS=$OLD_LDFLAGS
+  AC_SUBST(DEAL_II_LD_UNDERSTANDS_SONAME)
+
+  dnl Now try the -dylib_install_name thing
+  OLD_LDFLAGS=$LDFLAGS
+  LDFLAGS="-Wl,-dylib_install_name -Wl,libbase.so.6.2.1 $LDFLAGS"
+  AC_MSG_CHECKING([whether compiler understands option -Wl,-dylib_install_name])
+  AC_LINK_IFELSE(
+   [ AC_LANG_PROGRAM([[]],[[]])],
+   [ 
+     AC_MSG_RESULT(yes)
+     DEAL_II_LD_UNDERSTANDS_DYLIB_INSTALL_NAME="yes"
+   ],
+   [ 
+     AC_MSG_RESULT(no)
+     DEAL_II_LD_UNDERSTANDS_DYLIB_INSTALL_NAME="no"
+   ]
+  )
+  LDFLAGS=$OLD_LDFLAGS
+  AC_SUBST(DEAL_II_LD_UNDERSTANDS_DYLIB_INSTALL_NAME)
+])
+
+
+
 dnl -------------------------------------------------------------
 dnl Check whether user wants optimization for a certain type of
 dnl CPU. If so, then set some flags, dependent on what he

@@ -703,6 +703,8 @@ F77FLAGSO
 F77FLAGSG
 F77FLAGSPIC
 F77LIBS
+DEAL_II_LD_UNDERSTANDS_SONAME
+DEAL_II_LD_UNDERSTANDS_DYLIB_INSTALL_NAME
 enableshared
 static_lib_suffix
 shared_lib_suffix
@@ -11430,34 +11432,25 @@ else
 fi
 
 
-
-
-shared_lib_suffix=".so"
-static_lib_suffix=".a"
-
 case "$target" in
    *-aix4* | alpha*-linux* | alpha*-osf45* | hppa64-unknown-linux-gnu )
 	   { echo "$as_me:$LINENO: WARNING: Shared libraries not supported on $target. Using static libs instead" >&5
 echo "$as_me: WARNING: Shared libraries not supported on $target. Using static libs instead" >&2;}
 	   enableshared=no
 	   ;;
-esac
-
-case "$target" in
    *cygwin )
            shared_lib_suffix=".dll"
            cygwin_shared_lib="yes"
            ;;
-esac
-
-
-case "$target" in
    *-apple-darwin* )
            shared_lib_suffix=".dylib"
            darwin_shared_lib="yes"
            ;;
+   * )
+           shared_lib_suffix=".so"
+           static_lib_suffix=".a"
+           ;;
 esac
-
 
 if test "x$enableshared" = "xyes" ; then
   CFLAGS="$CFLAGS $CFLAGSPIC"
@@ -11472,6 +11465,125 @@ if test "x$enableshared" = "xyes" ; then
        SHLIBFLAGS="-dynamiclib"
 	   ;;
   esac
+
+
+    OLD_LDFLAGS=$LDFLAGS
+  LDFLAGS="-Wl,-soname,libbase.so.6.2.1 $LDFLAGS"
+  { echo "$as_me:$LINENO: checking whether compiler understands option -Wl,-soname" >&5
+echo $ECHO_N "checking whether compiler understands option -Wl,-soname... $ECHO_C" >&6; }
+  cat >conftest.$ac_ext <<_ACEOF
+ /* confdefs.h.  */
+_ACEOF
+cat confdefs.h >>conftest.$ac_ext
+cat >>conftest.$ac_ext <<_ACEOF
+/* end confdefs.h.  */
+
+int
+main ()
+{
+
+  ;
+  return 0;
+}
+_ACEOF
+rm -f conftest.$ac_objext conftest$ac_exeext
+if { (ac_try="$ac_link"
+case "(($ac_try" in
+  *\"* | *\`* | *\\*) ac_try_echo=\$ac_try;;
+  *) ac_try_echo=$ac_try;;
+esac
+eval "echo \"\$as_me:$LINENO: $ac_try_echo\"") >&5
+  (eval "$ac_link") 2>conftest.er1
+  ac_status=$?
+  grep -v '^ *+' conftest.er1 >conftest.err
+  rm -f conftest.er1
+  cat conftest.err >&5
+  echo "$as_me:$LINENO: \$? = $ac_status" >&5
+  (exit $ac_status); } && {
+	 test -z "$ac_cxx_werror_flag" ||
+	 test ! -s conftest.err
+       } && test -s conftest$ac_exeext &&
+       $as_test_x conftest$ac_exeext; then
+
+     { echo "$as_me:$LINENO: result: yes" >&5
+echo "${ECHO_T}yes" >&6; }
+     DEAL_II_LD_UNDERSTANDS_SONAME="yes"
+
+else
+  echo "$as_me: failed program was:" >&5
+sed 's/^/| /' conftest.$ac_ext >&5
+
+
+     { echo "$as_me:$LINENO: result: no" >&5
+echo "${ECHO_T}no" >&6; }
+     DEAL_II_LD_UNDERSTANDS_SONAME="no"
+
+
+fi
+
+rm -f core conftest.err conftest.$ac_objext conftest_ipa8_conftest.oo \
+      conftest$ac_exeext conftest.$ac_ext
+  LDFLAGS=$OLD_LDFLAGS
+
+
+    OLD_LDFLAGS=$LDFLAGS
+  LDFLAGS="-Wl,-dylib_install_name -Wl,libbase.so.6.2.1 $LDFLAGS"
+  { echo "$as_me:$LINENO: checking whether compiler understands option -Wl,-dylib_install_name" >&5
+echo $ECHO_N "checking whether compiler understands option -Wl,-dylib_install_name... $ECHO_C" >&6; }
+  cat >conftest.$ac_ext <<_ACEOF
+ /* confdefs.h.  */
+_ACEOF
+cat confdefs.h >>conftest.$ac_ext
+cat >>conftest.$ac_ext <<_ACEOF
+/* end confdefs.h.  */
+
+int
+main ()
+{
+
+  ;
+  return 0;
+}
+_ACEOF
+rm -f conftest.$ac_objext conftest$ac_exeext
+if { (ac_try="$ac_link"
+case "(($ac_try" in
+  *\"* | *\`* | *\\*) ac_try_echo=\$ac_try;;
+  *) ac_try_echo=$ac_try;;
+esac
+eval "echo \"\$as_me:$LINENO: $ac_try_echo\"") >&5
+  (eval "$ac_link") 2>conftest.er1
+  ac_status=$?
+  grep -v '^ *+' conftest.er1 >conftest.err
+  rm -f conftest.er1
+  cat conftest.err >&5
+  echo "$as_me:$LINENO: \$? = $ac_status" >&5
+  (exit $ac_status); } && {
+	 test -z "$ac_cxx_werror_flag" ||
+	 test ! -s conftest.err
+       } && test -s conftest$ac_exeext &&
+       $as_test_x conftest$ac_exeext; then
+
+     { echo "$as_me:$LINENO: result: yes" >&5
+echo "${ECHO_T}yes" >&6; }
+     DEAL_II_LD_UNDERSTANDS_DYLIB_INSTALL_NAME="yes"
+
+else
+  echo "$as_me: failed program was:" >&5
+sed 's/^/| /' conftest.$ac_ext >&5
+
+
+     { echo "$as_me:$LINENO: result: no" >&5
+echo "${ECHO_T}no" >&6; }
+     DEAL_II_LD_UNDERSTANDS_DYLIB_INSTALL_NAME="no"
+
+
+fi
+
+rm -f core conftest.err conftest.$ac_objext conftest_ipa8_conftest.oo \
+      conftest$ac_exeext conftest.$ac_ext
+  LDFLAGS=$OLD_LDFLAGS
+
 
 else
   LDFLAGSSTATIC="-static"
@@ -15043,6 +15155,8 @@ F77FLAGSO!$F77FLAGSO$ac_delim
 F77FLAGSG!$F77FLAGSG$ac_delim
 F77FLAGSPIC!$F77FLAGSPIC$ac_delim
 F77LIBS!$F77LIBS$ac_delim
+DEAL_II_LD_UNDERSTANDS_SONAME!$DEAL_II_LD_UNDERSTANDS_SONAME$ac_delim
+DEAL_II_LD_UNDERSTANDS_DYLIB_INSTALL_NAME!$DEAL_II_LD_UNDERSTANDS_DYLIB_INSTALL_NAME$ac_delim
 enableshared!$enableshared$ac_delim
 static_lib_suffix!$static_lib_suffix$ac_delim
 shared_lib_suffix!$shared_lib_suffix$ac_delim
@@ -15053,8 +15167,6 @@ DEAL_II_DISABLE_PARSER!$DEAL_II_DISABLE_PARSER$ac_delim
 DEAL_II_EXPAND_PETSC_VECTOR!$DEAL_II_EXPAND_PETSC_VECTOR$ac_delim
 DEAL_II_EXPAND_PETSC_BLOCKVECTOR!$DEAL_II_EXPAND_PETSC_BLOCKVECTOR$ac_delim
 USE_CONTRIB_PETSC!$USE_CONTRIB_PETSC$ac_delim
-DEAL_II_PETSC_DIR!$DEAL_II_PETSC_DIR$ac_delim
-DEAL_II_PETSC_ARCH!$DEAL_II_PETSC_ARCH$ac_delim
 _ACEOF
 
   if test `sed -n "s/.*$ac_delim\$/X/p" conf$$subs.sed | grep -c X` = 97; then
@@ -15096,6 +15208,8 @@ _ACEOF
 ac_delim='%!_!# '
 for ac_last_try in false false false false false :; do
   cat >conf$$subs.sed <<_ACEOF
+DEAL_II_PETSC_DIR!$DEAL_II_PETSC_DIR$ac_delim
+DEAL_II_PETSC_ARCH!$DEAL_II_PETSC_ARCH$ac_delim
 DEAL_II_PETSC_VERSION_MAJOR!$DEAL_II_PETSC_VERSION_MAJOR$ac_delim
 DEAL_II_PETSC_VERSION_MINOR!$DEAL_II_PETSC_VERSION_MINOR$ac_delim
 DEAL_II_PETSC_VERSION_SUBMINOR!$DEAL_II_PETSC_VERSION_SUBMINOR$ac_delim
@@ -15129,7 +15243,7 @@ LIBOBJS!$LIBOBJS$ac_delim
 LTLIBOBJS!$LTLIBOBJS$ac_delim
 _ACEOF
 
-  if test `sed -n "s/.*$ac_delim\$/X/p" conf$$subs.sed | grep -c X` = 31; then
+  if test `sed -n "s/.*$ac_delim\$/X/p" conf$$subs.sed | grep -c X` = 33; then
     break
   elif $ac_last_try; then
     { { echo "$as_me:$LINENO: error: could not make $CONFIG_STATUS" >&5

@@ -78,13 +78,13 @@ $(LIBDIR)/libbase.g$(static-lib-suffix): $(go-files)
 
 $(LIBDIR)/libbase$(shared-lib-suffix): $(o-files)
 	@echo "=====base=============optimized==$(MT)== Linking library:   $(@F)"
-	@$(SHLIBLD) $(LDFLAGS) $(SHLIBFLAGS) -o $(LIBDIR)/libbase$(shared-lib-suffix).$(DEAL_II_VERSION) -Wl,-soname,libbase$(shared-lib-suffix).$(DEAL_II_VERSION) $(o-files) $(extra-o-files)  $(deplibs.o)
-	@ln -f -s libbase$(shared-lib-suffix).$(DEAL_II_VERSION) $@
+	@$(SHLIBLD) $(LDFLAGS) $(SHLIBFLAGS) -o $(LIBDIR)/$(call DEAL_II_SHLIB_NAME,base) $(call DEAL_II_ADD_SONAME,base) $(o-files) $(extra-o-files)  $(deplibs.o)
+	@ln -f -s $(LIBDIR)/$(call DEAL_II_SHLIB_NAME,base) $@
 
 $(LIBDIR)/libbase.g$(shared-lib-suffix): $(go-files)
 	@echo "=====base=============debug======$(MT)== Linking library:   $(@F)"
-	@$(SHLIBLD) $(LDFLAGS) $(SHLIBFLAGS) -o $(LIBDIR)/libbase.g$(shared-lib-suffix).$(DEAL_II_VERSION) -Wl,-soname,libbase.g$(shared-lib-suffix).$(DEAL_II_VERSION) $(go-files) $(extra-o-files)  $(deplibs.g)
-	@ln -f -s libbase.g$(shared-lib-suffix).$(DEAL_II_VERSION) $@
+	@$(SHLIBLD) $(LDFLAGS) $(SHLIBFLAGS) -o $(LIBDIR)/$(call DEAL_II_SHLIB_NAME,base.g) $(call DEAL_II_ADD_SONAME,base.g) $(go-files) $(extra-o-files)  $(deplibs.g)
+	@ln -f -s $(LIBDIR)/$(call DEAL_II_SHLIB_NAME,base.g) $@
 
 
 

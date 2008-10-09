@@ -61,15 +61,13 @@ ifeq ($(enable-shared),yes)
 
   libpetscall.g$(shared-lib-suffix): $(xlib.g)
 	@echo "======================debug============= Linking library:   libpetscall.g$(shared-lib-suffix)"
-	@$(SHLIBLD) $(LDFLAGS) $(SHLIBFLAGS) -o libpetscall.g$(shared-lib-suffix).$(DEAL_II_VERSION) \
-		-Wl,-soname,libpetscall.g$(shared-lib-suffix).$(DEAL_II_VERSION) $(xlib.g)
-	@ln -f -s libpetscall.g$(shared-lib-suffix).$(DEAL_II_VERSION) $@
+	@$(SHLIBLD) $(LDFLAGS) $(SHLIBFLAGS) -o $(LIBDIR)/$(call DEAL_II_SHLIB_NAME,petscall.g) $(call DEAL_II_ADD_SONAME,petscall.g) $(xlib.g)
+	@ln -f -s  $(LIBDIR)/$(call DEAL_II_SHLIB_NAME,petscall.g) $@
 
   libpetscall$(shared-lib-suffix): $(xlib.o)
 	@echo "======================optimized========= Linking library:   libpetscall$(shared-lib-suffix)"
-	@$(SHLIBLD) $(LDFLAGS) $(SHLIBFLAGS) -o libpetscall$(shared-lib-suffix).$(DEAL_II_VERSION) \
-		-Wl,-soname,libpetscall$(shared-lib-suffix).$(DEAL_II_VERSION) $(xlib.o)
-	@ln -f -s libpetscall$(shared-lib-suffix).$(DEAL_II_VERSION) $@
+	@$(SHLIBLD) $(LDFLAGS) $(SHLIBFLAGS) -o$(LIBDIR)/$(call DEAL_II_SHLIB_NAME,petscall) $(call DEAL_II_ADD_SONAME,petscall)  $(xlib.o)
+	@ln -f -s  $(LIBDIR)/$(call DEAL_II_SHLIB_NAME,petscall) $@
 
 else
 

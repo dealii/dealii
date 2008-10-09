@@ -68,7 +68,7 @@ USE_CONTRIB_UMFPACK  = @USE_CONTRIB_UMFPACK@
 TARGET               = @target@
 
 ######################################################
-# now configuration for compiler flags, pathes, etc
+# now configuration for compiler flags, paths, etc
 
 # path for libraries 
 
@@ -108,6 +108,19 @@ lib-deal2-3d.o = $(LIBDIR)/libdeal_II_3d$(lib-suffix)
 lib-deal2-1d.g = $(LIBDIR)/libdeal_II_1d.g$(lib-suffix)
 lib-deal2-2d.g = $(LIBDIR)/libdeal_II_2d.g$(lib-suffix)
 lib-deal2-3d.g = $(LIBDIR)/libdeal_II_3d.g$(lib-suffix)
+
+# dealing with shared libraries
+DEAL_II_SHLIB_NAME = lib$(1)$(shared-lib-suffix).$(DEAL_II_VERSION)
+
+ifeq (@DEAL_II_LD_UNDERSTANDS_SONAME@,yes)
+  DEAL_II_ADD_SONAME = -Wl,-soname,$(call DEAL_II_SHLIB_NAME,$(1))
+else
+  ifeq (@DEAL_II_LD_UNDERSTANDS_SONAME@,yes)
+    DEAL_II_ADD_SONAME = -Wl,-dylib_install_name -Wl,$(call DEAL_II_SHLIB_NAME,$(1))
+  else
+    DEAL_II_ADD_SONAME = 
+  endif
+endif
 
 # since the PETSc libs are called the same for both debug and
 # optimized mode, we have to have a trick to let the executable
