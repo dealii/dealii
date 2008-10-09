@@ -78,7 +78,8 @@ tests_x = block_matrices \
 	no_flux_* \
 	fe_values_view_* \
 	rt_hessian \
-	rt_covariant
+	rt_covariant \
+	coarsening_*
 
 # from above list of regular expressions, generate the real set of
 # tests
