@@ -192,9 +192,9 @@ void LaplaceProblem<dim>::setup_system ()
 				 // times before.
 				 //
 				 // A small difference, though: we
-				 // assemble the matrix for Helmholtz'
+				 // assemble the matrix for Poisson
 				 // equation so we can solve the
-				 // Neumann boundary value problem.
+				 // Dirichlet boundary value problem.
 template <int dim>
 void LaplaceProblem<dim>::assemble_system () 
 {  
