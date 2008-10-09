@@ -28,6 +28,7 @@
 #include <grid/tria_accessor.h>
 #include <grid/tria_iterator.h>
 #include <grid/grid_generator.h>
+#include <grid/grid_out.h>
 #include <grid/intergrid_map.h>
 #include <base/utilities.h>
 
@@ -75,8 +76,7 @@ void test(std::ostream& /*out*/)
   GridGenerator::hyper_cube(triangulation);
   triangulation.refine_global (2);
 
-  const unsigned int n_refinements[] = { 0, 13, 11, 6 };
-  for (unsigned int i=0; i<n_refinements[dim]; ++i)
+  for (unsigned int i=0; i<20; ++i)
     {
 				       // refine one-fifth of cells randomly
       std::vector<bool> flags (triangulation.n_active_cells(), false);
@@ -105,7 +105,22 @@ void test(std::ostream& /*out*/)
 	   cell != triangulation.end(); ++cell, ++index)
 	if (!flags[index])
 	  cell->set_coarsen_flag();
-	   
+
+      GridOut go;
+      go.write_gnuplot (triangulation, deallog.get_file_stream());
+
+      for (typename Triangulation<dim>::active_cell_iterator
+	     cell = triangulation.begin_active();
+	   cell != triangulation.end(); ++cell)
+	if (cell->refine_flag_set())
+	  {
+	    deallog << cell->center() << ' ' << cell->level() << std::endl;
+	    deallog << cell->center() << ' ' << 0 << std::endl;
+	    deallog << std::endl;
+	  }
+      
+
+      
       triangulation.execute_coarsening_and_refinement ();
 
 				       // verify that none of the cells

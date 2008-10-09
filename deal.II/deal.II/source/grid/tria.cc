@@ -10438,211 +10438,249 @@ void Triangulation<dim>::fix_coarsen_flags ()
 				   // here makes our lives a bit easier as
 				   // well as it takes care of these cases
 				   // earlier than it would otherwise happen.
-  if (smooth_grid & limit_level_difference_at_vertices)
+				   //
+				   // the main difference to the code
+				   // in p_c_and_r is that here we
+				   // absolutely have to make sure
+				   // that we get things right,
+				   // i.e. that in particular we set
+				   // flags right if
+				   // limit_level_difference_at_vertices
+				   // is set. to do so we iterate
+				   // until the flags don't change any
+				   // more
+  std::vector<bool> previous_coarsen_flags (n_active_cells());
+  save_coarsen_flags (previous_coarsen_flags);
+
+  bool continue_iterating = true;
+  
+  do
     {
-      Assert(!anisotropic_refinement,
-	     ExcMessage("In case of anisotropic refinement the "
-			"limit_level_difference_at_vertices flag for "
-			"mesh smoothing must not be set!"));
-	  
-				       // store highest level one
-				       // of the cells adjacent to
-				       // a vertex belongs to
-      std::vector<int> vertex_level (vertices.size(), 0);
-      active_cell_iterator cell = begin_active(),
-			   endc = end();
-      for (; cell!=endc; ++cell)
+      if (smooth_grid & limit_level_difference_at_vertices)
 	{
-	  if (cell->refine_flag_set())
-	    for (unsigned int vertex=0; vertex<GeometryInfo<dim>::vertices_per_cell;
-		 ++vertex)
-	      vertex_level[cell->vertex_index(vertex)]
-		= std::max (vertex_level[cell->vertex_index(vertex)],
-			    cell->level()+1);
-	  else if (!cell->coarsen_flag_set())
-	    for (unsigned int vertex=0; vertex<GeometryInfo<dim>::vertices_per_cell;
-		 ++vertex)
-	      vertex_level[cell->vertex_index(vertex)]
-		= std::max (vertex_level[cell->vertex_index(vertex)],
-			    cell->level());
-	  else
+	  Assert(!anisotropic_refinement,
+		 ExcMessage("In case of anisotropic refinement the "
+			    "limit_level_difference_at_vertices flag for "
+			    "mesh smoothing must not be set!"));
+	  
+					   // store highest level one
+					   // of the cells adjacent to
+					   // a vertex belongs to
+	  std::vector<int> vertex_level (vertices.size(), 0);
+	  active_cell_iterator cell = begin_active(),
+			       endc = end();
+	  for (; cell!=endc; ++cell)
 	    {
-					       // if coarsen flag is set then
-					       // tentatively assume that the
-					       // cell will be coarsened. this
-					       // isn't always true (the
-					       // coarsen flag could be
-					       // removed again) and so we may
-					       // make an error here
-	      Assert (cell->coarsen_flag_set(), ExcInternalError());
-	      for (unsigned int vertex=0; vertex<GeometryInfo<dim>::vertices_per_cell;
-		   ++vertex)
-		vertex_level[cell->vertex_index(vertex)]
-		  = std::max (vertex_level[cell->vertex_index(vertex)],
-			      cell->level()-1);
+	      if (cell->refine_flag_set())
+		for (unsigned int vertex=0; vertex<GeometryInfo<dim>::vertices_per_cell;
+		     ++vertex)
+		  vertex_level[cell->vertex_index(vertex)]
+		    = std::max (vertex_level[cell->vertex_index(vertex)],
+				cell->level()+1);
+	      else if (!cell->coarsen_flag_set())
+		for (unsigned int vertex=0; vertex<GeometryInfo<dim>::vertices_per_cell;
+		     ++vertex)
+		  vertex_level[cell->vertex_index(vertex)]
+		    = std::max (vertex_level[cell->vertex_index(vertex)],
+				cell->level());
+	      else
+		{
+						   // if coarsen flag is
+						   // set then tentatively
+						   // assume that the cell
+						   // will be
+						   // coarsened. this
+						   // isn't always true
+						   // (the coarsen flag
+						   // could be removed
+						   // again) and so we may
+						   // make an error
+						   // here. we try to
+						   // correct this by
+						   // iterating over the
+						   // entire process until
+						   // we are converged
+		  Assert (cell->coarsen_flag_set(), ExcInternalError());
+		  for (unsigned int vertex=0; vertex<GeometryInfo<dim>::vertices_per_cell;
+		       ++vertex)
+		    vertex_level[cell->vertex_index(vertex)]
+		      = std::max (vertex_level[cell->vertex_index(vertex)],
+				  cell->level()-1);
+		}
 	    }
-	}
       
 
-				       // loop over all cells in reverse
-				       // order. do so because we can then
-				       // update the vertex levels on the
-				       // adjacent vertices and maybe
-				       // already flag additional cells in
-				       // this loop
-				       //
-				       // note that not only may we have
-				       // to add additional refinement
-				       // flags, but we will also have to
-				       // remove coarsening flags on cells
-				       // adjacent to vertices that will
-				       // see refinement
-      for (cell=last_active(); cell != endc; --cell)
-	if (cell->refine_flag_set() == false)
-	  {
-	    for (unsigned int vertex=0;
-		 vertex<GeometryInfo<dim>::vertices_per_cell; ++vertex)
-	      if (vertex_level[cell->vertex_index(vertex)] >=
-		  cell->level()+1)
-		{
-						   // remove coarsen flag...
-		  cell->clear_coarsen_flag();
-
-						   // ...and if necessary also
-						   // refine the current cell,
-						   // at the same time
-						   // updating the level
-						   // information about
-						   // vertices
-		  if (vertex_level[cell->vertex_index(vertex)] >
+					   // loop over all cells in reverse
+					   // order. do so because we can then
+					   // update the vertex levels on the
+					   // adjacent vertices and maybe
+					   // already flag additional cells in
+					   // this loop
+					   //
+					   // note that not only may we have
+					   // to add additional refinement
+					   // flags, but we will also have to
+					   // remove coarsening flags on cells
+					   // adjacent to vertices that will
+					   // see refinement
+	  for (cell=last_active(); cell != endc; --cell)
+	    if (cell->refine_flag_set() == false)
+	      {
+		for (unsigned int vertex=0;
+		     vertex<GeometryInfo<dim>::vertices_per_cell; ++vertex)
+		  if (vertex_level[cell->vertex_index(vertex)] >=
 		      cell->level()+1)
 		    {
-		      cell->set_refine_flag();
+						       // remove coarsen flag...
+		      cell->clear_coarsen_flag();
+
+						       // ...and if necessary also
+						       // refine the current cell,
+						       // at the same time
+						       // updating the level
+						       // information about
+						       // vertices
+		      if (vertex_level[cell->vertex_index(vertex)] >
+			  cell->level()+1)
+			{
+			  cell->set_refine_flag();
 		      
-		      for (unsigned int v=0; v<GeometryInfo<dim>::vertices_per_cell;
-			   ++v)
-			vertex_level[cell->vertex_index(v)]
-			  = std::max (vertex_level[cell->vertex_index(v)],
-				      cell->level()+1);
+			  for (unsigned int v=0; v<GeometryInfo<dim>::vertices_per_cell;
+			       ++v)
+			    vertex_level[cell->vertex_index(v)]
+			      = std::max (vertex_level[cell->vertex_index(v)],
+					  cell->level()+1);
+			}
+
+						       // continue and see whether
+						       // we may, for example, go
+						       // into the inner 'if'
+						       // above based on a
+						       // different vertex
 		    }
-
-						   // continue and see whether
-						   // we may, for example, go
-						   // into the inner 'if'
-						   // above based on a
-						   // different vertex
-		}
-	  }
-    }
+	      }
+	}
   
-				   // loop over all cells. Flag all
-				   // cells of which all children are
-				   // flagged for coarsening and
-				   // delete the childrens'
-				   // flags. Also delete all flags of
-				   // cells for which not all children
-				   // of a cell are flagged. In
-				   // effect, only those cells are
-				   // flagged of which originally all
-				   // children were flagged and for
-				   // which all children are on the
-				   // same refinement level. For
-				   // flagging, the user flags are
-				   // used, to avoid confusion and
-				   // because non-active cells can't
-				   // be flagged for coarsening
-				   //
-				   // In effect, all coarsen flags are
-				   // turned into user flags of the
-				   // mother cell if coarsening is
-				   // possible or deleted
-				   // otherwise.
-  clear_user_flags ();
-				   // Coarsen flags of
-				   // cells with no mother cell,
-				   // i.e. on the coarsest level are
-				   // deleted explicitly.
-  active_cell_iterator acell  = begin_active(0),
-		       end_ac = end_active(0);
-  for (; acell!=end_ac; ++acell)
-    acell->clear_coarsen_flag();
+				       // loop over all cells. Flag all
+				       // cells of which all children are
+				       // flagged for coarsening and
+				       // delete the childrens'
+				       // flags. Also delete all flags of
+				       // cells for which not all children
+				       // of a cell are flagged. In
+				       // effect, only those cells are
+				       // flagged of which originally all
+				       // children were flagged and for
+				       // which all children are on the
+				       // same refinement level. For
+				       // flagging, the user flags are
+				       // used, to avoid confusion and
+				       // because non-active cells can't
+				       // be flagged for coarsening
+				       //
+				       // In effect, all coarsen flags are
+				       // turned into user flags of the
+				       // mother cell if coarsening is
+				       // possible or deleted
+				       // otherwise.
+      clear_user_flags ();
+				       // Coarsen flags of
+				       // cells with no mother cell,
+				       // i.e. on the coarsest level are
+				       // deleted explicitly.
+      active_cell_iterator acell  = begin_active(0),
+			   end_ac = end_active(0);
+      for (; acell!=end_ac; ++acell)
+	acell->clear_coarsen_flag();
   
-  cell_iterator cell = begin(),
-		endc = end();
-  for (; cell!=endc; ++cell) 
-    {
-				       // nothing to do if we are
-				       // already on the finest level
-      if (cell->active()) 
-	continue;
+      cell_iterator cell = begin(),
+		    endc = end();
+      for (; cell!=endc; ++cell) 
+	{
+					   // nothing to do if we are
+					   // already on the finest level
+	  if (cell->active()) 
+	    continue;
 
-      const unsigned int n_children=cell->n_children();
-      unsigned int flagged_children=0;
-      for (unsigned int child=0; child<n_children; ++child)
-	if (cell->child(child)->active() &&
-	    cell->child(child)->coarsen_flag_set()) 
-	  {
-	    ++flagged_children;
-					     // clear flag since we
-					     // don't need it anymore
-	    cell->child(child)->clear_coarsen_flag();
-	  }
+	  const unsigned int n_children=cell->n_children();
+	  unsigned int flagged_children=0;
+	  for (unsigned int child=0; child<n_children; ++child)
+	    if (cell->child(child)->active() &&
+		cell->child(child)->coarsen_flag_set()) 
+	      {
+		++flagged_children;
+						 // clear flag since we
+						 // don't need it anymore
+		cell->child(child)->clear_coarsen_flag();
+	      }
 	  
-				       // flag this cell for
-				       // coarsening if all children
-				       // were flagged
-      if (flagged_children == n_children)
-	cell->set_user_flag();
-    }
+					   // flag this cell for
+					   // coarsening if all children
+					   // were flagged
+	  if (flagged_children == n_children)
+	    cell->set_user_flag();
+	}
       
-				   // in principle no coarsen flags
-				   // should be set any more at this
-				   // point
+				       // in principle no coarsen flags
+				       // should be set any more at this
+				       // point
 #if DEBUG
-  for (cell=begin(); cell!=endc; ++cell)
-    Assert (cell->coarsen_flag_set() == false, ExcInternalError());
+      for (cell=begin(); cell!=endc; ++cell)
+	Assert (cell->coarsen_flag_set() == false, ExcInternalError());
 #endif
 
-				   // now loop over all cells which have the
-				   // user flag set. their children were
-				   // flagged for coarsening. set the coarsen
-				   // flag again if we are sure that none of
-				   // the neighbors of these children are
-				   // refined, or will be refined, since then
-				   // we would get a two-level jump in
-				   // refinement. on the other hand, if one of
-				   // the children's neighbors has their user
-				   // flag set, then we know that its children
-				   // will go away by coarsening, and we will
-				   // be ok.
-				   //
-				   // note on the other hand that we do allow
-				   // level-2 jumps in refinement between
-				   // neighbors in 1d, so this whole procedure
-				   // is only necessary if we are not in 1d
-				   //
-				   // since we remove some coarsening/user
-				   // flags in the process, we have to work
-				   // from the finest level to the coarsest
-				   // one, since we occasionally inspect user
-				   // flags of cells on finer levels and need
-				   // to be sure that these flags are final
-  for (cell=last(); cell!=endc; --cell)
-    if (cell->user_flag_set())
-				       // if allowed: flag the
-				       // children for coarsening
-      if (coarsening_allowed(cell))
-	for (unsigned int c=0; c<cell->n_children(); ++c)
-	  {
-	    Assert (cell->child(c)->refine_flag_set()==false,
-		    ExcInternalError());
+				       // now loop over all cells which have the
+				       // user flag set. their children were
+				       // flagged for coarsening. set the coarsen
+				       // flag again if we are sure that none of
+				       // the neighbors of these children are
+				       // refined, or will be refined, since then
+				       // we would get a two-level jump in
+				       // refinement. on the other hand, if one of
+				       // the children's neighbors has their user
+				       // flag set, then we know that its children
+				       // will go away by coarsening, and we will
+				       // be ok.
+				       //
+				       // note on the other hand that we do allow
+				       // level-2 jumps in refinement between
+				       // neighbors in 1d, so this whole procedure
+				       // is only necessary if we are not in 1d
+				       //
+				       // since we remove some coarsening/user
+				       // flags in the process, we have to work
+				       // from the finest level to the coarsest
+				       // one, since we occasionally inspect user
+				       // flags of cells on finer levels and need
+				       // to be sure that these flags are final
+      for (cell=last(); cell!=endc; --cell)
+	if (cell->user_flag_set())
+					   // if allowed: flag the
+					   // children for coarsening
+	  if (coarsening_allowed(cell))
+	    for (unsigned int c=0; c<cell->n_children(); ++c)
+	      {
+		Assert (cell->child(c)->refine_flag_set()==false,
+			ExcInternalError());
 	    
-	    cell->child(c)->set_coarsen_flag();
-	  }
+		cell->child(c)->set_coarsen_flag();
+	      }
   
-				   // clear all user flags again, now that we
-				   // don't need them any more
-  clear_user_flags ();
+				       // clear all user flags again, now that we
+				       // don't need them any more
+      clear_user_flags ();
+
+      
+				       // now see if anything has
+				       // changed in the last
+				       // iteration of this function
+      std::vector<bool> current_coarsen_flags (n_active_cells());
+      save_coarsen_flags (current_coarsen_flags);
+
+      continue_iterating = (current_coarsen_flags != previous_coarsen_flags);
+      previous_coarsen_flags = current_coarsen_flags;
+    }
+  while (continue_iterating == true);
 }
 
 
