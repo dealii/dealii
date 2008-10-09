@@ -965,7 +965,6 @@ void GridOut::write_gnuplot (
 	  << ' ' << cell->level()
 	  << ' ' << static_cast<unsigned int>(cell->material_id()) << '\n'
 	  << '\n';
-      break;
     }
 
 				   // make sure everything now gets to

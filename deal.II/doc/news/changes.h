@@ -322,6 +322,14 @@ inconvenience this causes.
 <ol>
   <li>
   <p>
+  Fixed: The GridOut::write_gnuplot function had a bug that made it output only the
+  very first cell. This is now fixed.
+  <br>
+  (WB 2008/10/09)
+  </p>
+
+  <li>
+  <p>
   New: The GridIn::read_msh function can now read version 2 of the MSH format described
   <a target="_top" href="http://www.geuz.org/gmsh/doc/texinfo/gmsh_10.html">here</a>.
   <br>
