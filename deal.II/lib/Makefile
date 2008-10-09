@@ -66,7 +66,7 @@ ifeq ($(enable-shared),yes)
 
   libpetscall$(shared-lib-suffix): $(xlib.o)
 	@echo "======================optimized========= Linking library:   libpetscall$(shared-lib-suffix)"
-	@$(SHLIBLD) $(LDFLAGS) $(SHLIBFLAGS) -o$(LIBDIR)/$(call DEAL_II_SHLIB_NAME,petscall) $(call DEAL_II_ADD_SONAME,petscall)  $(xlib.o)
+	@$(SHLIBLD) $(LDFLAGS) $(SHLIBFLAGS) -o $(LIBDIR)/$(call DEAL_II_SHLIB_NAME,petscall) $(call DEAL_II_ADD_SONAME,petscall)  $(xlib.o)
 	@ln -f -s  $(LIBDIR)/$(call DEAL_II_SHLIB_NAME,petscall) $@
 
 else
