@@ -25,6 +25,8 @@
 #include <boost/type_traits.hpp>
 #include <boost/tuple/tuple.hpp>
 #include <boost/shared_ptr.hpp>
+#include <boost/bind.hpp>
+#include <boost/function.hpp>
 
 #if DEAL_II_USE_MT == 1
 #  if defined(DEAL_II_USE_MT_POSIX)
@@ -247,8 +249,8 @@ namespace Threads
 					*/
       void dump () {}
 
-      				     /** @addtogroup Exceptions
-				      * @{ */
+				       /** @addtogroup Exceptions
+					* @{ */
       
 				       /**
 					* Exception.
@@ -852,20 +854,6 @@ namespace Threads
   {
                                      /**
 				      * @internal
-                                      * A type that is used to
-                                      * distinguish argument lists of
-                                      * functions by enumeration.
-                                      */
-    template <int> struct int2type
-    {
-    };
-  } 
-
-
-  namespace internal 
-  {
-                                     /**
-				      * @internal
 				      * Given an arbitrary type RT,
                                       * store an element of it and grant
                                       * access to it through functions
@@ -923,7 +911,8 @@ namespace Threads
                                       * a function get() that returns
                                       * void.
                                       */
-    template <> struct return_value<void> {
+    template <> struct return_value<void>
+    {
         static inline void get () {}
     };
   }
@@ -932,1397 +921,21 @@ namespace Threads
 
   namespace internal
   {
-                                     /**
-				      * @internal
-                                      * Call arbitrary functions with
-                                      * return type RT. For each number
-                                      * of arguments to these functions,
-                                      * there is an instance of the
-                                      * do_call function in this class
-                                      * that unpacks the argument list
-                                      * (which is passed by reference)
-                                      * and calls the function. The
-                                      * number of arguments is
-                                      * distinguished by the last
-                                      * argument. The return value
-                                      * object is the second last. A
-                                      * second version of the do_call
-                                      * function is used to call member
-                                      * function pointers, in which case
-                                      * there is an additional argument
-                                      * at second position holding a
-                                      * reference to the object with
-                                      * which the member function
-                                      * pointer is to be called.
-                                      *
-                                      * There is a specialization of
-                                      * this class for the case that the
-                                      * return type is void, in which
-                                      * case there is no return value to
-                                      * be set.
-                                      */
     template <typename RT>
-    struct Caller 
-    {
-                                         /**
-                                          * Call a function with 0
-                                          * arguments, and set the
-                                          * return value.
-                                          */
-        template <typename PFun, typename ArgList>
-        static inline void do_call (PFun     fun_ptr,
-                                    ArgList &,
-                                    internal::return_value<RT> &ret_val,
-                                    const int2type<0> &)
-          {
-            ret_val.set ((*fun_ptr) ());
-          }
-
-                                         /**
-                                          * Call a member function with
-                                          * 0 arguments, and set the
-                                          * return value.
-                                          */
-        template <typename PFun, typename C, typename ArgList>
-        static inline void do_call (PFun     fun_ptr,
-                                    C       &obj,
-                                    ArgList &,
-                                    internal::return_value<RT> &ret_val,
-                                    const int2type<0> &)
-          {
-            ret_val.set ((obj.*fun_ptr) ());
-          }
-
-
-                                         /**
-                                          * Call a function with 1
-                                          * argument, and set the
-                                          * return value.
-                                          */
-        template <typename PFun, typename ArgList>
-        static inline void do_call (PFun     fun_ptr,
-                                    ArgList &arg_list,
-                                    internal::return_value<RT> &ret_val,
-                                    const int2type<1> &)
-          {
-            ret_val.set ((*fun_ptr) (arg_list.template get<0>()));
-          }
-
-                                         /**
-                                          * Call a member function with
-                                          * 1 argument, and set the
-                                          * return value.
-                                          */
-        template <typename PFun, typename C, typename ArgList>
-        static inline void do_call (PFun     fun_ptr,
-                                    C       &obj,
-                                    ArgList &arg_list,
-                                    internal::return_value<RT> &ret_val,
-                                    const int2type<1> &)
-          {
-            ret_val.set ((obj.*fun_ptr) (arg_list.template get<0>()));
-          }
-
-
-
-
-                                         /**
-                                          * Call a function with 2
-                                          * arguments, and set the
-                                          * return value.
-                                          */
-        template <typename PFun, typename ArgList>
-        static inline void do_call (PFun     fun_ptr,
-                                    ArgList &arg_list,
-                                    internal::return_value<RT> &ret_val,
-                                    const int2type<2> &)
-          {
-            ret_val.set ((*fun_ptr) (arg_list.template get<0>(),
-                                     arg_list.template get<1>()));
-          }
-
-                                         /**
-                                          * Call a member function with
-                                          * 2 arguments, and set the
-                                          * return value.
-                                          */
-        template <typename PFun, typename C, typename ArgList>
-        static inline void do_call (PFun     fun_ptr,
-                                    C       &obj,
-                                    ArgList &arg_list,
-                                    internal::return_value<RT> &ret_val,
-                                    const int2type<2> &)
-          {
-            ret_val.set ((obj.*fun_ptr) (arg_list.template get<0>(),
-                                         arg_list.template get<1>()));
-          }
-
-
-                                         /**
-                                          * Call a function with 3
-                                          * arguments, and set the
-                                          * return value.
-                                          */
-        template <typename PFun, typename ArgList>
-        static inline void do_call (PFun     fun_ptr,
-                                    ArgList &arg_list,
-                                    internal::return_value<RT> &ret_val,
-                                    const int2type<3> &)
-          {
-            ret_val.set ((*fun_ptr) (arg_list.template get<0>(),
-                                     arg_list.template get<1>(),
-                                     arg_list.template get<2>()));
-          }
-
-                                         /**
-                                          * Call a member function with
-                                          * 3 arguments, and set the
-                                          * return value.
-                                          */
-        template <typename PFun, typename C, typename ArgList>
-        static inline void do_call (PFun     fun_ptr,
-                                    C       &obj,
-                                    ArgList &arg_list,
-                                    internal::return_value<RT> &ret_val,
-                                    const int2type<3> &)
-          {
-            ret_val.set ((obj.*fun_ptr) (arg_list.template get<0>(),
-                                         arg_list.template get<1>(),
-                                         arg_list.template get<2>()));
-          }
-
-
-                                         /**
-                                          * Call a function with 4
-                                          * arguments, and set the
-                                          * return value.
-                                          */
-        template <typename PFun, typename ArgList>
-        static inline void do_call (PFun     fun_ptr,
-                                    ArgList &arg_list,
-                                    internal::return_value<RT> &ret_val,
-                                    const int2type<4> &)
-          {
-            ret_val.set ((*fun_ptr) (arg_list.template get<0>(),
-                                     arg_list.template get<1>(),
-                                     arg_list.template get<2>(),
-                                     arg_list.template get<3>()));
-          }
-
-                                         /**
-                                          * Call a member function with
-                                          * 4 arguments, and set the
-                                          * return value.
-                                          */
-        template <typename PFun, typename C, typename ArgList>
-        static inline void do_call (PFun     fun_ptr,
-                                    C       &obj,
-                                    ArgList &arg_list,
-                                    internal::return_value<RT> &ret_val,
-                                    const int2type<4> &)
-          {
-            ret_val.set ((obj.*fun_ptr) (arg_list.template get<0>(),
-                                         arg_list.template get<1>(),
-                                         arg_list.template get<2>(),
-                                         arg_list.template get<3>()));
-          }
-
-
-                                         /**
-                                          * Call a function with 5
-                                          * arguments, and set the
-                                          * return value.
-                                          */
-        template <typename PFun, typename ArgList>
-        static inline void do_call (PFun     fun_ptr,
-                                    ArgList &arg_list,
-                                    internal::return_value<RT> &ret_val,
-                                    const int2type<5> &)
-          {
-            ret_val.set ((*fun_ptr) (arg_list.template get<0>(),
-                                     arg_list.template get<1>(),
-                                     arg_list.template get<2>(),
-                                     arg_list.template get<3>(),
-                                     arg_list.template get<4>()));
-          }
-
-                                         /**
-                                          * Call a member function with
-                                          * 5 arguments, and set the
-                                          * return value.
-                                          */
-        template <typename PFun, typename C, typename ArgList>
-        static inline void do_call (PFun     fun_ptr,
-                                    C       &obj,
-                                    ArgList &arg_list,
-                                    internal::return_value<RT> &ret_val,
-                                    const int2type<5> &)
-          {
-            ret_val.set ((obj.*fun_ptr) (arg_list.template get<0>(),
-                                         arg_list.template get<1>(),
-                                         arg_list.template get<2>(),
-                                         arg_list.template get<3>(),
-                                         arg_list.template get<4>()));
-          }
-
-
-                                         /**
-                                          * Call a function with 6
-                                          * arguments, and set the
-                                          * return value.
-                                          */
-        template <typename PFun, typename ArgList>
-        static inline void do_call (PFun     fun_ptr,
-                                    ArgList &arg_list,
-                                    internal::return_value<RT> &ret_val,
-                                    const int2type<6> &)
-          {
-            ret_val.set ((*fun_ptr) (arg_list.template get<0>(),
-                                     arg_list.template get<1>(),
-                                     arg_list.template get<2>(),
-                                     arg_list.template get<3>(),
-                                     arg_list.template get<4>(),
-                                     arg_list.template get<5>()));
-          }
-
-                                         /**
-                                          * Call a member function with
-                                          * 6 arguments, and set the
-                                          * return value.
-                                          */
-        template <typename PFun, typename C, typename ArgList>
-        static inline void do_call (PFun     fun_ptr,
-                                    C       &obj,
-                                    ArgList &arg_list,
-                                    internal::return_value<RT> &ret_val,
-                                    const int2type<6> &)
-          {
-            ret_val.set ((obj.*fun_ptr) (arg_list.template get<0>(),
-                                         arg_list.template get<1>(),
-                                         arg_list.template get<2>(),
-                                         arg_list.template get<3>(),
-                                         arg_list.template get<4>(),
-                                         arg_list.template get<5>()));
-          }
-
-
-                                         /**
-                                          * Call a function with 7
-                                          * arguments, and set the
-                                          * return value.
-                                          */
-        template <typename PFun, typename ArgList>
-        static inline void do_call (PFun     fun_ptr,
-                                    ArgList &arg_list,
-                                    internal::return_value<RT> &ret_val,
-                                    const int2type<7> &)
-          {
-            ret_val.set ((*fun_ptr) (arg_list.template get<0>(),
-                                     arg_list.template get<1>(),
-                                     arg_list.template get<2>(),
-                                     arg_list.template get<3>(),
-                                     arg_list.template get<4>(),
-                                     arg_list.template get<5>(),
-                                     arg_list.template get<6>()));
-          }
-
-                                         /**
-                                          * Call a member function with
-                                          * 7 arguments, and set the
-                                          * return value.
-                                          */
-        template <typename PFun, typename C, typename ArgList>
-        static inline void do_call (PFun     fun_ptr,
-                                    C       &obj,
-                                    ArgList &arg_list,
-                                    internal::return_value<RT> &ret_val,
-                                    const int2type<7> &)
-          {
-            ret_val.set ((obj.*fun_ptr) (arg_list.template get<0>(),
-                                         arg_list.template get<1>(),
-                                         arg_list.template get<2>(),
-                                         arg_list.template get<3>(),
-                                         arg_list.template get<4>(),
-                                         arg_list.template get<5>(),
-                                         arg_list.template get<6>()));
-          }
-
-
-                                         /**
-                                          * Call a function with 8
-                                          * arguments, and set the
-                                          * return value.
-                                          */
-        template <typename PFun, typename ArgList>
-        static inline void do_call (PFun     fun_ptr,
-                                    ArgList &arg_list,
-                                    internal::return_value<RT> &ret_val,
-                                    const int2type<8> &)
-          {
-            ret_val.set ((*fun_ptr) (arg_list.template get<0>(),
-                                     arg_list.template get<1>(),
-                                     arg_list.template get<2>(),
-                                     arg_list.template get<3>(),
-                                     arg_list.template get<4>(),
-                                     arg_list.template get<5>(),
-                                     arg_list.template get<6>(),
-                                     arg_list.template get<7>()));
-          }
-
-                                         /**
-                                          * Call a member function with
-                                          * 8 arguments, and set the
-                                          * return value.
-                                          */
-        template <typename PFun, typename C, typename ArgList>
-        static inline void do_call (PFun     fun_ptr,
-                                    C       &obj,
-                                    ArgList &arg_list,
-                                    internal::return_value<RT> &ret_val,
-                                    const int2type<8> &)
-          {
-            ret_val.set ((obj.*fun_ptr) (arg_list.template get<0>(),
-                                         arg_list.template get<1>(),
-                                         arg_list.template get<2>(),
-                                         arg_list.template get<3>(),
-                                         arg_list.template get<4>(),
-                                         arg_list.template get<5>(),
-                                         arg_list.template get<6>(),
-                                         arg_list.template get<7>()));
-          }
-
-
-                                         /**
-                                          * Call a function with 9
-                                          * arguments, and set the
-                                          * return value.
-                                          */
-        template <typename PFun, typename ArgList>
-        static inline void do_call (PFun     fun_ptr,
-                                    ArgList &arg_list,
-                                    internal::return_value<RT> &ret_val,
-                                    const int2type<9> &)
-          {
-            ret_val.set ((*fun_ptr) (arg_list.template get<0>(),
-                                     arg_list.template get<1>(),
-                                     arg_list.template get<2>(),
-                                     arg_list.template get<3>(),
-                                     arg_list.template get<4>(),
-                                     arg_list.template get<5>(),
-                                     arg_list.template get<6>(),
-                                     arg_list.template get<7>(),
-                                     arg_list.template get<8>()));
-          }
-
-                                         /**
-                                          * Call a member function with
-                                          * 9 arguments, and set the
-                                          * return value.
-                                          */
-        template <typename PFun, typename C, typename ArgList>
-        static inline void do_call (PFun     fun_ptr,
-                                    C       &obj,
-                                    ArgList &arg_list,
-                                    internal::return_value<RT> &ret_val,
-                                    const int2type<9> &)
-          {
-            ret_val.set ((obj.*fun_ptr) (arg_list.template get<0>(),
-                                         arg_list.template get<1>(),
-                                         arg_list.template get<2>(),
-                                         arg_list.template get<3>(),
-                                         arg_list.template get<4>(),
-                                         arg_list.template get<5>(),
-                                         arg_list.template get<6>(),
-                                         arg_list.template get<7>(),
-                                         arg_list.template get<8>()));
-          }
-
-
-                                         /**
-                                          * Call a function with 10
-                                          * arguments, and set the
-                                          * return value.
-                                          */
-        template <typename PFun, typename ArgList>
-        static inline void do_call (PFun     fun_ptr,
-                                    ArgList &arg_list,
-                                    internal::return_value<RT> &ret_val,
-                                    const int2type<10> &)
-          {
-            ret_val.set ((*fun_ptr) (arg_list.template get<0>(),
-                                     arg_list.template get<1>(),
-                                     arg_list.template get<2>(),
-                                     arg_list.template get<3>(),
-                                     arg_list.template get<4>(),
-                                     arg_list.template get<5>(),
-                                     arg_list.template get<6>(),
-                                     arg_list.template get<7>(),
-                                     arg_list.template get<8>(),
-                                     arg_list.template get<9>()));
-          }
-
-                                         /**
-                                          * Call a member function with
-                                          * 10 arguments, and set the
-                                          * return value.
-                                          */
-        template <typename PFun, typename C, typename ArgList>
-        static inline void do_call (PFun     fun_ptr,
-                                    C       &obj,
-                                    ArgList &arg_list,
-                                    internal::return_value<RT> &ret_val,
-                                    const int2type<10> &)
-          {
-            ret_val.set ((obj.*fun_ptr) (arg_list.template get<0>(),
-                                         arg_list.template get<1>(),
-                                         arg_list.template get<2>(),
-                                         arg_list.template get<3>(),
-                                         arg_list.template get<4>(),
-                                         arg_list.template get<5>(),
-                                         arg_list.template get<6>(),
-                                         arg_list.template get<7>(),
-                                         arg_list.template get<8>(),
-                                         arg_list.template get<9>()));
-          }
-    };
-
-
-
-  
-                                     /**
-				      * @internal
-                                      * Call arbitrary functions with
-                                      * void return type. For each
-                                      * number of arguments to these
-                                      * functions, there is an instance
-                                      * of the do_call function in this
-                                      * class that unpacks the argument
-                                      * list (which is passed by
-                                      * reference) and calls the
-                                      * function. The number of
-                                      * arguments is distinguished by
-                                      * the last argument. The return
-                                      * value object is the second last,
-                                      * but since the return type is
-                                      * void, this is of course simply
-                                      * ignored. A second version of the
-                                      * do_call function is used to call
-                                      * member function pointers, in
-                                      * which case there is an
-                                      * additional argument at second
-                                      * position holding a reference to
-                                      * the object with which the member
-                                      * function pointer is to be
-                                      * called.
-                                      */
-    template <>
-    struct Caller<void>
-    {
-                                         /**
-                                          * Call a void function with 0
-                                          * arguments.
-                                          */
-        template <typename PFun, typename ArgList>
-        static inline void do_call (PFun     fun_ptr,
-                                    ArgList &,
-                                    internal::return_value<void> &,
-                                    const int2type<0> &)
-          {
-            (*fun_ptr) ();
-          }
-
-                                         /**
-                                          * Call a void member function
-                                          * with 0 arguments.
-                                          */
-        template <typename PFun, typename C, typename ArgList>
-        static inline void do_call (PFun     fun_ptr,
-                                    C       &obj,
-                                    ArgList &,
-                                    internal::return_value<void> &,
-                                    const int2type<0> &)
-          {
-            (obj.*fun_ptr) ();
-          }
-
-
-                                         /**
-                                          * Call a void function with 1
-                                          * argument.
-                                          */
-        template <typename PFun, typename ArgList>
-        static inline void do_call (PFun     fun_ptr,
-                                    ArgList &arg_list,
-                                    internal::return_value<void> &,
-                                    const int2type<1> &)
-          {
-            (*fun_ptr) (arg_list.template get<0>());
-          }
-
-                                         /**
-                                          * Call a void member function
-                                          * with 1 argument.
-                                          */
-        template <typename PFun, typename C, typename ArgList>
-        static inline void do_call (PFun     fun_ptr,
-                                    C       &obj,
-                                    ArgList &arg_list,
-                                    internal::return_value<void> &,
-                                    const int2type<1> &)
-          {
-            (obj.*fun_ptr) (arg_list.template get<0>());
-          }
-
-
-
-
-                                         /**
-                                          * Call a void function with 2
-                                          * arguments.
-                                          */
-        template <typename PFun, typename ArgList>
-        static inline void do_call (PFun     fun_ptr,
-                                    ArgList &arg_list,
-                                    internal::return_value<void> &,
-                                    const int2type<2> &)
-          {
-            (*fun_ptr) (arg_list.template get<0>(),
-                        arg_list.template get<1>());
-          }
-
-                                         /**
-                                          * Call a void member function
-                                          * with 2 arguments.
-                                          */
-        template <typename PFun, typename C, typename ArgList>
-        static inline void do_call (PFun     fun_ptr,
-                                    C       &obj,
-                                    ArgList &arg_list,
-                                    internal::return_value<void> &,
-                                    const int2type<2> &)
-          {
-            (obj.*fun_ptr) (arg_list.template get<0>(),
-                            arg_list.template get<1>());
-          }
-
-
-                                         /**
-                                          * Call a void function with 3
-                                          * arguments.
-                                          */
-        template <typename PFun, typename ArgList>
-        static inline void do_call (PFun     fun_ptr,
-                                    ArgList &arg_list,
-                                    internal::return_value<void> &,
-                                    const int2type<3> &)
-          {
-            (*fun_ptr) (arg_list.template get<0>(),
-                        arg_list.template get<1>(),
-                        arg_list.template get<2>());
-          }
-
-                                         /**
-                                          * Call a void member function
-                                          * with 3 arguments.
-                                          */
-        template <typename PFun, typename C, typename ArgList>
-        static inline void do_call (PFun     fun_ptr,
-                                    C       &obj,
-                                    ArgList &arg_list,
-                                    internal::return_value<void> &,
-                                    const int2type<3> &)
-          {
-            (obj.*fun_ptr) (arg_list.template get<0>(),
-                            arg_list.template get<1>(),
-                            arg_list.template get<2>());
-          }
-
-
-                                         /**
-                                          * Call a void function with 4
-                                          * arguments.
-                                          */
-        template <typename PFun, typename ArgList>
-        static inline void do_call (PFun     fun_ptr,
-                                    ArgList &arg_list,
-                                    internal::return_value<void> &,
-                                    const int2type<4> &)
-          {
-            (*fun_ptr) (arg_list.template get<0>(),
-                        arg_list.template get<1>(),
-                        arg_list.template get<2>(),
-                        arg_list.template get<3>());
-          }
-
-                                         /**
-                                          * Call a void member function
-                                          * with 4 arguments.
-                                          */
-        template <typename PFun, typename C, typename ArgList>
-        static inline void do_call (PFun     fun_ptr,
-                                    C       &obj,
-                                    ArgList &arg_list,
-                                    internal::return_value<void> &,
-                                    const int2type<4> &)
-          {
-            (obj.*fun_ptr) (arg_list.template get<0>(),
-                            arg_list.template get<1>(),
-                            arg_list.template get<2>(),
-                            arg_list.template get<3>());
-          }
-
-
-                                         /**
-                                          * Call a void function with 5
-                                          * arguments.
-                                          */
-        template <typename PFun, typename ArgList>
-        static inline void do_call (PFun     fun_ptr,
-                                    ArgList &arg_list,
-                                    internal::return_value<void> &,
-                                    const int2type<5> &)
-          {
-            (*fun_ptr) (arg_list.template get<0>(),
-                        arg_list.template get<1>(),
-                        arg_list.template get<2>(),
-                        arg_list.template get<3>(),
-                        arg_list.template get<4>());
-          }
-
-                                         /**
-                                          * Call a void member function
-                                          * with 5 arguments.
-                                          */
-        template <typename PFun, typename C, typename ArgList>
-        static inline void do_call (PFun     fun_ptr,
-                                    C       &obj,
-                                    ArgList &arg_list,
-                                    internal::return_value<void> &,
-                                    const int2type<5> &)
-          {
-            (obj.*fun_ptr) (arg_list.template get<0>(),
-                            arg_list.template get<1>(),
-                            arg_list.template get<2>(),
-                            arg_list.template get<3>(),
-                            arg_list.template get<4>());
-          }
-
-
-                                         /**
-                                          * Call a void function with 6
-                                          * arguments.
-                                          */
-        template <typename PFun, typename ArgList>
-        static inline void do_call (PFun     fun_ptr,
-                                    ArgList &arg_list,
-                                    internal::return_value<void> &,
-                                    const int2type<6> &)
-          {
-            (*fun_ptr) (arg_list.template get<0>(),
-                        arg_list.template get<1>(),
-                        arg_list.template get<2>(),
-                        arg_list.template get<3>(),
-                        arg_list.template get<4>(),
-                        arg_list.template get<5>());
-          }
-
-                                         /**
-                                          * Call a void member function
-                                          * with 6 arguments.
-                                          */
-        template <typename PFun, typename C, typename ArgList>
-        static inline void do_call (PFun     fun_ptr,
-                                    C       &obj,
-                                    ArgList &arg_list,
-                                    internal::return_value<void> &,
-                                    const int2type<6> &)
-          {
-            (obj.*fun_ptr) (arg_list.template get<0>(),
-                            arg_list.template get<1>(),
-                            arg_list.template get<2>(),
-                            arg_list.template get<3>(),
-                            arg_list.template get<4>(),
-                            arg_list.template get<5>());
-          }
-
-
-                                         /**
-                                          * Call a void function with 7
-                                          * arguments.
-                                          */
-        template <typename PFun, typename ArgList>
-        static inline void do_call (PFun     fun_ptr,
-                                    ArgList &arg_list,
-                                    internal::return_value<void> &,
-                                    const int2type<7> &)
-          {
-            (*fun_ptr) (arg_list.template get<0>(),
-                        arg_list.template get<1>(),
-                        arg_list.template get<2>(),
-                        arg_list.template get<3>(),
-                        arg_list.template get<4>(),
-                        arg_list.template get<5>(),
-                        arg_list.template get<6>());
-          }
-
-                                         /**
-                                          * Call a void member function
-                                          * with 7 arguments.
-                                          */
-        template <typename PFun, typename C, typename ArgList>
-        static inline void do_call (PFun     fun_ptr,
-                                    C       &obj,
-                                    ArgList &arg_list,
-                                    internal::return_value<void> &,
-                                    const int2type<7> &)
-          {
-            (obj.*fun_ptr) (arg_list.template get<0>(),
-                            arg_list.template get<1>(),
-                            arg_list.template get<2>(),
-                            arg_list.template get<3>(),
-                            arg_list.template get<4>(),
-                            arg_list.template get<5>(),
-                            arg_list.template get<6>());
-          }
-
-
-                                         /**
-                                          * Call a void function with 8
-                                          * arguments.
-                                          */
-        template <typename PFun, typename ArgList>
-        static inline void do_call (PFun     fun_ptr,
-                                    ArgList &arg_list,
-                                    internal::return_value<void> &,
-                                    const int2type<8> &)
-          {
-            (*fun_ptr) (arg_list.template get<0>(),
-                        arg_list.template get<1>(),
-                        arg_list.template get<2>(),
-                        arg_list.template get<3>(),
-                        arg_list.template get<4>(),
-                        arg_list.template get<5>(),
-                        arg_list.template get<6>(),
-                        arg_list.template get<7>());
-          }
-
-                                         /**
-                                          * Call a void member function
-                                          * with 8 arguments.
-                                          */
-        template <typename PFun, typename C, typename ArgList>
-        static inline void do_call (PFun     fun_ptr,
-                                    C       &obj,
-                                    ArgList &arg_list,
-                                    internal::return_value<void> &,
-                                    const int2type<8> &)
-          {
-            (obj.*fun_ptr) (arg_list.template get<0>(),
-                            arg_list.template get<1>(),
-                            arg_list.template get<2>(),
-                            arg_list.template get<3>(),
-                            arg_list.template get<4>(),
-                            arg_list.template get<5>(),
-                            arg_list.template get<6>(),
-                            arg_list.template get<7>());
-          }
-
-
-                                         /**
-                                          * Call a void function with 9
-                                          * arguments.
-                                          */
-        template <typename PFun, typename ArgList>
-        static inline void do_call (PFun     fun_ptr,
-                                    ArgList &arg_list,
-                                    internal::return_value<void> &,
-                                    const int2type<9> &)
-          {
-            (*fun_ptr) (arg_list.template get<0>(),
-                        arg_list.template get<1>(),
-                        arg_list.template get<2>(),
-                        arg_list.template get<3>(),
-                        arg_list.template get<4>(),
-                        arg_list.template get<5>(),
-                        arg_list.template get<6>(),
-                        arg_list.template get<7>(),
-                        arg_list.template get<8>());
-          }
-
-                                         /**
-                                          * Call a void member function
-                                          * with 9 arguments.
-                                          */
-        template <typename PFun, typename C, typename ArgList>
-        static inline void do_call (PFun     fun_ptr,
-                                    C       &obj,
-                                    ArgList &arg_list,
-                                    internal::return_value<void> &,
-                                    const int2type<9> &)
-          {
-            (obj.*fun_ptr) (arg_list.template get<0>(),
-                            arg_list.template get<1>(),
-                            arg_list.template get<2>(),
-                            arg_list.template get<3>(),
-                            arg_list.template get<4>(),
-                            arg_list.template get<5>(),
-                            arg_list.template get<6>(),
-                            arg_list.template get<7>(),
-                            arg_list.template get<8>());
-          }
-
-
-                                         /**
-                                          * Call a void function with 10
-                                          * arguments.
-                                          */
-        template <typename PFun, typename ArgList>
-        static inline void do_call (PFun     fun_ptr,
-                                    ArgList &arg_list,
-                                    internal::return_value<void> &,
-                                    const int2type<10> &)
-          {
-            (*fun_ptr) (arg_list.template get<0>(),
-                        arg_list.template get<1>(),
-                        arg_list.template get<2>(),
-                        arg_list.template get<3>(),
-                        arg_list.template get<4>(),
-                        arg_list.template get<5>(),
-                        arg_list.template get<6>(),
-                        arg_list.template get<7>(),
-                        arg_list.template get<8>(),
-                        arg_list.template get<9>());
-          }
-
-                                         /**
-                                          * Call a void member function
-                                          * with 10 arguments.
-                                          */
-        template <typename PFun, typename C, typename ArgList>
-        static inline void do_call (PFun     fun_ptr,
-                                    C       &obj,
-                                    ArgList &arg_list,
-                                    internal::return_value<void> &,
-                                    const int2type<10> &)
-          {
-            (obj.*fun_ptr) (arg_list.template get<0>(),
-                            arg_list.template get<1>(),
-                            arg_list.template get<2>(),
-                            arg_list.template get<3>(),
-                            arg_list.template get<4>(),
-                            arg_list.template get<5>(),
-                            arg_list.template get<6>(),
-                            arg_list.template get<7>(),
-                            arg_list.template get<8>(),
-                            arg_list.template get<9>());
-          }
-    };
-  
-  
-
-                                     /**
-				      * @internal
-                                      * Call an arbitrary function by
-                                      * dispatching to the functions in
-                                      * the Caller class based on the
-                                      * number of elements in the
-                                      * argument list and the return
-                                      * type.
-                                      */
-    template <typename RT, typename PFun, typename ArgList>
-    inline void call (PFun     fun_ptr,
-		      ArgList &arg_list,
+    inline void call (boost::function<RT ()> &function,
 		      internal::return_value<RT> &ret_val)
     {
-      Caller<RT>::do_call (fun_ptr, arg_list, ret_val,
-                           int2type<boost::tuples::length<ArgList>::value>());
-    }
+      ret_val.set (function());
+    }  
 
 
-  
-                                     /**
-				      * @internal
-                                      * Call an arbitrary member
-                                      * function by dispatching to the
-                                      * functions in the Caller class
-                                      * based on the number of elements
-                                      * in the argument list and the
-                                      * return type.
-                                      */
-    template <typename RT, typename PFun, typename C, typename ArgList>
-    inline void call (PFun     fun_ptr,
-		      C       &obj,
-		      ArgList &arg_list,
-		      internal::return_value<RT> &ret_val)
+    inline void call (boost::function<void ()> &function,
+		      internal::return_value<void> &)
     {
-      Caller<RT>::do_call (fun_ptr, obj, arg_list, ret_val,
-                           int2type<boost::tuples::length<ArgList>::value>());
+      function();
     }  
   }
 
-
-
-  namespace internal
-  {
-                                     /**
-				      * @internal
-                                      * Construct a pointer to member
-                                      * function based on the template
-                                      * arguments, and whether the
-                                      * second argument is a const or
-                                      * non-const class, dependening on
-                                      * which the member function will
-                                      * also me const or
-                                      * non-const. There are
-                                      * specializations of this class
-                                      * for each number of arguments,
-                                      * and the const and non-const
-                                      * versions.
-                                      */
-    template <typename RT, class C, typename ArgList,
-              int length = boost::tuples::length<ArgList>::value>
-    struct mem_fun_ptr_helper;
-  
-
-                                     /**
-				      * @internal
-                                      * Construct a pointer to member
-                                      * function based on the template
-                                      * arguments. This is the
-                                      * specialization for 0 arguments
-                                      * and non-const member functions.
-                                      */
-    template <typename RT, class C, typename ArgList>
-    struct mem_fun_ptr_helper<RT, C, ArgList, 0>
-    {
-        typedef RT (C::*type) ();
-    };
-
-                                     /**
-				      * @internal
-                                      * Construct a pointer to member
-                                      * function based on the template
-                                      * arguments. This is the
-                                      * specialization for 0 arguments
-                                      * and const member functions.
-                                      */
-    template <typename RT, class C, typename ArgList>
-    struct mem_fun_ptr_helper<RT, const C, ArgList, 0>
-    {
-        typedef RT (C::*type) () const;
-    };
-
-
-                                     /**
-				      * @internal
-                                      * Construct a pointer to member
-                                      * function based on the template
-                                      * arguments. This is the
-                                      * specialization for 1 argument
-                                      * and non-const member functions.
-                                      */
-    template <typename RT, class C, typename ArgList>
-    struct mem_fun_ptr_helper<RT, C, ArgList, 1>
-    {
-        typedef RT (C::*type) (typename boost::tuples::element<0,ArgList>::type);
-    };
-
-                                     /**
-				      * @internal
-                                      * Construct a pointer to member
-                                      * function based on the template
-                                      * arguments. This is the
-                                      * specialization for 1 argument
-                                      * and const member functions.
-                                      */
-    template <typename RT, class C, typename ArgList>
-    struct mem_fun_ptr_helper<RT, const C, ArgList, 1>
-    {
-        typedef RT (C::*type) (typename boost::tuples::element<0,ArgList>::type) const;
-    };
-
-
-                                     /**
-				      * @internal
-                                      * Construct a pointer to member
-                                      * function based on the template
-                                      * arguments. This is the
-                                      * specialization for 2 arguments
-                                      * and non-const member functions.
-                                      */
-    template <typename RT, class C, typename ArgList>
-    struct mem_fun_ptr_helper<RT, C, ArgList, 2>
-    {
-        typedef RT (C::*type) (typename boost::tuples::element<0,ArgList>::type,
-                               typename boost::tuples::element<1,ArgList>::type);
-    };
-
-                                     /**
-				      * @internal
-                                      * Construct a pointer to member
-                                      * function based on the template
-                                      * arguments. This is the
-                                      * specialization for 2 arguments
-                                      * and const member functions.
-                                      */
-    template <typename RT, class C, typename ArgList>
-    struct mem_fun_ptr_helper<RT, const C, ArgList, 2>
-    {
-        typedef RT (C::*type) (typename boost::tuples::element<0,ArgList>::type,
-                               typename boost::tuples::element<1,ArgList>::type) const;
-    };
-
-
-                                     /**
-				      * @internal
-                                      * Construct a pointer to member
-                                      * function based on the template
-                                      * arguments. This is the
-                                      * specialization for 3 arguments
-                                      * and non-const member functions.
-                                      */
-    template <typename RT, class C, typename ArgList>
-    struct mem_fun_ptr_helper<RT, C, ArgList, 3>
-    {
-        typedef RT (C::*type) (typename boost::tuples::element<0,ArgList>::type,
-                               typename boost::tuples::element<1,ArgList>::type,
-                               typename boost::tuples::element<2,ArgList>::type);
-    };
-
-                                     /**
-				      * @internal
-                                      * Construct a pointer to member
-                                      * function based on the template
-                                      * arguments. This is the
-                                      * specialization for 3 arguments
-                                      * and const member functions.
-                                      */
-    template <typename RT, class C, typename ArgList>
-    struct mem_fun_ptr_helper<RT, const C, ArgList, 3>
-    {
-        typedef RT (C::*type) (typename boost::tuples::element<0,ArgList>::type,
-                               typename boost::tuples::element<1,ArgList>::type,
-                               typename boost::tuples::element<2,ArgList>::type) const;
-    };
-
-
-                                     /**
-				      * @internal
-                                      * Construct a pointer to member
-                                      * function based on the template
-                                      * arguments. This is the
-                                      * specialization for 4 arguments
-                                      * and non-const member functions.
-                                      */
-    template <typename RT, class C, typename ArgList>
-    struct mem_fun_ptr_helper<RT, C, ArgList, 4>
-    {
-        typedef RT (C::*type) (typename boost::tuples::element<0,ArgList>::type,
-                               typename boost::tuples::element<1,ArgList>::type,
-                               typename boost::tuples::element<2,ArgList>::type,
-                               typename boost::tuples::element<3,ArgList>::type);
-    };
-
-                                     /**
-				      * @internal
-                                      * Construct a pointer to member
-                                      * function based on the template
-                                      * arguments. This is the
-                                      * specialization for 4 arguments
-                                      * and const member functions.
-                                      */
-    template <typename RT, class C, typename ArgList>
-    struct mem_fun_ptr_helper<RT, const C, ArgList, 4>
-    {
-        typedef RT (C::*type) (typename boost::tuples::element<0,ArgList>::type,
-                               typename boost::tuples::element<1,ArgList>::type,
-                               typename boost::tuples::element<2,ArgList>::type,
-                               typename boost::tuples::element<3,ArgList>::type) const;
-    };
-
-
-                                     /**
-				      * @internal
-                                      * Construct a pointer to member
-                                      * function based on the template
-                                      * arguments. This is the
-                                      * specialization for 5 arguments
-                                      * and non-const member functions.
-                                      */
-    template <typename RT, class C, typename ArgList>
-    struct mem_fun_ptr_helper<RT, C, ArgList, 5>
-    {
-        typedef RT (C::*type) (typename boost::tuples::element<0,ArgList>::type,
-                               typename boost::tuples::element<1,ArgList>::type,
-                               typename boost::tuples::element<2,ArgList>::type,
-                               typename boost::tuples::element<3,ArgList>::type,
-                               typename boost::tuples::element<4,ArgList>::type);
-    };
-
-                                     /**
-				      * @internal
-                                      * Construct a pointer to member
-                                      * function based on the template
-                                      * arguments. This is the
-                                      * specialization for 5 arguments
-                                      * and const member functions.
-                                      */
-    template <typename RT, class C, typename ArgList>
-    struct mem_fun_ptr_helper<RT, const C, ArgList, 5>
-    {
-        typedef RT (C::*type) (typename boost::tuples::element<0,ArgList>::type,
-                               typename boost::tuples::element<1,ArgList>::type,
-                               typename boost::tuples::element<2,ArgList>::type,
-                               typename boost::tuples::element<3,ArgList>::type,
-                               typename boost::tuples::element<4,ArgList>::type) const;
-    };
-
-
-                                     /**
-				      * @internal
-                                      * Construct a pointer to member
-                                      * function based on the template
-                                      * arguments. This is the
-                                      * specialization for 6 arguments
-                                      * and non-const member functions.
-                                      */
-    template <typename RT, class C, typename ArgList>
-    struct mem_fun_ptr_helper<RT, C, ArgList, 6>
-    {
-        typedef RT (C::*type) (typename boost::tuples::element<0,ArgList>::type,
-                               typename boost::tuples::element<1,ArgList>::type,
-                               typename boost::tuples::element<2,ArgList>::type,
-                               typename boost::tuples::element<3,ArgList>::type,
-                               typename boost::tuples::element<4,ArgList>::type,
-                               typename boost::tuples::element<5,ArgList>::type);
-    };
-
-                                     /**
-				      * @internal
-                                      * Construct a pointer to member
-                                      * function based on the template
-                                      * arguments. This is the
-                                      * specialization for 6 arguments
-                                      * and const member functions.
-                                      */
-    template <typename RT, class C, typename ArgList>
-    struct mem_fun_ptr_helper<RT, const C, ArgList, 6>
-    {
-        typedef RT (C::*type) (typename boost::tuples::element<0,ArgList>::type,
-                               typename boost::tuples::element<1,ArgList>::type,
-                               typename boost::tuples::element<2,ArgList>::type,
-                               typename boost::tuples::element<3,ArgList>::type,
-                               typename boost::tuples::element<4,ArgList>::type,
-                               typename boost::tuples::element<5,ArgList>::type) const;
-    };
-
-
-                                     /**
-				      * @internal
-                                      * Construct a pointer to member
-                                      * function based on the template
-                                      * arguments. This is the
-                                      * specialization for 7 arguments
-                                      * and non-const member functions.
-                                      */
-    template <typename RT, class C, typename ArgList>
-    struct mem_fun_ptr_helper<RT, C, ArgList, 7>
-    {
-        typedef RT (C::*type) (typename boost::tuples::element<0,ArgList>::type,
-                               typename boost::tuples::element<1,ArgList>::type,
-                               typename boost::tuples::element<2,ArgList>::type,
-                               typename boost::tuples::element<3,ArgList>::type,
-                               typename boost::tuples::element<4,ArgList>::type,
-                               typename boost::tuples::element<5,ArgList>::type,
-                               typename boost::tuples::element<6,ArgList>::type);
-    };
-
-                                     /**
-				      * @internal
-                                      * Construct a pointer to member
-                                      * function based on the template
-                                      * arguments. This is the
-                                      * specialization for 7 arguments
-                                      * and const member functions.
-                                      */
-    template <typename RT, class C, typename ArgList>
-    struct mem_fun_ptr_helper<RT, const C, ArgList, 7>
-    {
-        typedef RT (C::*type) (typename boost::tuples::element<0,ArgList>::type,
-                               typename boost::tuples::element<1,ArgList>::type,
-                               typename boost::tuples::element<2,ArgList>::type,
-                               typename boost::tuples::element<3,ArgList>::type,
-                               typename boost::tuples::element<4,ArgList>::type,
-                               typename boost::tuples::element<5,ArgList>::type,
-                               typename boost::tuples::element<6,ArgList>::type) const;
-    };
-
-
-                                     /**
-				      * @internal
-                                      * Construct a pointer to member
-                                      * function based on the template
-                                      * arguments. This is the
-                                      * specialization for 8 arguments
-                                      * and non-const member functions.
-                                      */
-    template <typename RT, class C, typename ArgList>
-    struct mem_fun_ptr_helper<RT, C, ArgList, 8>
-    {
-        typedef RT (C::*type) (typename boost::tuples::element<0,ArgList>::type,
-                               typename boost::tuples::element<1,ArgList>::type,
-                               typename boost::tuples::element<2,ArgList>::type,
-                               typename boost::tuples::element<3,ArgList>::type,
-                               typename boost::tuples::element<4,ArgList>::type,
-                               typename boost::tuples::element<5,ArgList>::type,
-                               typename boost::tuples::element<6,ArgList>::type,
-                               typename boost::tuples::element<7,ArgList>::type);
-    };
-
-                                     /**
-				      * @internal
-                                      * Construct a pointer to member
-                                      * function based on the template
-                                      * arguments. This is the
-                                      * specialization for 8 arguments
-                                      * and const member functions.
-                                      */
-    template <typename RT, class C, typename ArgList>
-    struct mem_fun_ptr_helper<RT, const C, ArgList, 8>
-    {
-        typedef RT (C::*type) (typename boost::tuples::element<0,ArgList>::type,
-                               typename boost::tuples::element<1,ArgList>::type,
-                               typename boost::tuples::element<2,ArgList>::type,
-                               typename boost::tuples::element<3,ArgList>::type,
-                               typename boost::tuples::element<4,ArgList>::type,
-                               typename boost::tuples::element<5,ArgList>::type,
-                               typename boost::tuples::element<6,ArgList>::type,
-                               typename boost::tuples::element<7,ArgList>::type) const;
-    };
-
-
-                                     /**
-				      * @internal
-                                      * Construct a pointer to member
-                                      * function based on the template
-                                      * arguments. This is the
-                                      * specialization for 9 arguments
-                                      * and non-const member functions.
-                                      */
-    template <typename RT, class C, typename ArgList>
-    struct mem_fun_ptr_helper<RT, C, ArgList, 9>
-    {
-        typedef RT (C::*type) (typename boost::tuples::element<0,ArgList>::type,
-                               typename boost::tuples::element<1,ArgList>::type,
-                               typename boost::tuples::element<2,ArgList>::type,
-                               typename boost::tuples::element<3,ArgList>::type,
-                               typename boost::tuples::element<4,ArgList>::type,
-                               typename boost::tuples::element<5,ArgList>::type,
-                               typename boost::tuples::element<6,ArgList>::type,
-                               typename boost::tuples::element<7,ArgList>::type,
-                               typename boost::tuples::element<8,ArgList>::type);
-    };
-
-                                     /**
-				      * @internal
-                                      * Construct a pointer to member
-                                      * function based on the template
-                                      * arguments. This is the
-                                      * specialization for 9 arguments
-                                      * and const member functions.
-                                      */
-    template <typename RT, class C, typename ArgList>
-    struct mem_fun_ptr_helper<RT, const C, ArgList, 9>
-    {
-        typedef RT (C::*type) (typename boost::tuples::element<0,ArgList>::type,
-                               typename boost::tuples::element<1,ArgList>::type,
-                               typename boost::tuples::element<2,ArgList>::type,
-                               typename boost::tuples::element<3,ArgList>::type,
-                               typename boost::tuples::element<4,ArgList>::type,
-                               typename boost::tuples::element<5,ArgList>::type,
-                               typename boost::tuples::element<6,ArgList>::type,
-                               typename boost::tuples::element<7,ArgList>::type,
-                               typename boost::tuples::element<8,ArgList>::type) const;
-    };
-
-
-
-                                     /**
-				      * @internal
-                                      * Construct a pointer to member
-                                      * function based on the template
-                                      * arguments. This is the
-                                      * specialization for 10 arguments
-                                      * and non-const member functions.
-                                      */
-    template <typename RT, class C, typename ArgList>
-    struct mem_fun_ptr_helper<RT, C, ArgList, 10>
-    {
-        typedef RT (C::*type) (typename boost::tuples::element<0,ArgList>::type,
-                               typename boost::tuples::element<1,ArgList>::type,
-                               typename boost::tuples::element<2,ArgList>::type,
-                               typename boost::tuples::element<3,ArgList>::type,
-                               typename boost::tuples::element<4,ArgList>::type,
-                               typename boost::tuples::element<5,ArgList>::type,
-                               typename boost::tuples::element<6,ArgList>::type,
-                               typename boost::tuples::element<7,ArgList>::type,
-                               typename boost::tuples::element<8,ArgList>::type,
-                               typename boost::tuples::element<9,ArgList>::type);
-    };
-
-                                     /**
-				      * @internal
-                                      * Construct a pointer to member
-                                      * function based on the template
-                                      * arguments. This is the
-                                      * specialization for 10 arguments
-                                      * and const member functions.
-                                      */
-    template <typename RT, class C, typename ArgList>
-    struct mem_fun_ptr_helper<RT, const C, ArgList, 10>
-    {
-        typedef RT (C::*type) (typename boost::tuples::element<0,ArgList>::type,
-                               typename boost::tuples::element<1,ArgList>::type,
-                               typename boost::tuples::element<2,ArgList>::type,
-                               typename boost::tuples::element<3,ArgList>::type,
-                               typename boost::tuples::element<4,ArgList>::type,
-                               typename boost::tuples::element<5,ArgList>::type,
-                               typename boost::tuples::element<6,ArgList>::type,
-                               typename boost::tuples::element<7,ArgList>::type,
-                               typename boost::tuples::element<8,ArgList>::type,
-                               typename boost::tuples::element<9,ArgList>::type) const;
-    };
-
-  
-
-                                     /**
-				      * @internal
-                                      * Construct a pointer to member
-                                      * function based on the template
-                                      * arguments, and whether the
-                                      * second argument is a const or
-                                      * non-const class, dependening on
-                                      * which the member function will
-                                      * also me const or non-const. We
-                                      * do this by dispatching to the
-                                      * mem_fun_ptr_helper classes that
-                                      * are overloaded on the number of
-                                      * elements and the const/non-const
-                                      * decision.
-                                      *
-                                      * Note that the last template
-                                      * argument for the
-                                      * mem_fun_ptr_helper class is
-                                      * automatically computed in the
-                                      * default argument to the general
-                                      * template.
-                                      */
-    template <typename RT, class C, typename ArgList>
-    struct mem_fun_ptr
-    {
-        typedef typename mem_fun_ptr_helper<RT,C,ArgList>::type type;
-    };  
-  }
 
 
   namespace internal
@@ -2355,7 +968,7 @@ namespace Threads
     template <typename RT, typename ArgList>
     struct fun_ptr_helper<RT, ArgList, 0>
     {
-        typedef RT (*type) ();
+        typedef RT (type) ();
     };
 
 
@@ -2369,7 +982,7 @@ namespace Threads
     template <typename RT, typename ArgList>
     struct fun_ptr_helper<RT, ArgList, 1>
     {
-        typedef RT (*type) (typename boost::tuples::element<0,ArgList>::type);
+        typedef RT (type) (typename boost::tuples::element<0,ArgList>::type);
     };
 
 
@@ -2383,8 +996,8 @@ namespace Threads
     template <typename RT, typename ArgList>
     struct fun_ptr_helper<RT, ArgList, 2>
     {
-        typedef RT (*type) (typename boost::tuples::element<0,ArgList>::type,
-                            typename boost::tuples::element<1,ArgList>::type);
+        typedef RT (type) (typename boost::tuples::element<0,ArgList>::type,
+			   typename boost::tuples::element<1,ArgList>::type);
     };
 
 
@@ -2398,9 +1011,9 @@ namespace Threads
     template <typename RT, typename ArgList>
     struct fun_ptr_helper<RT, ArgList, 3>
     {
-        typedef RT (*type) (typename boost::tuples::element<0,ArgList>::type,
-                            typename boost::tuples::element<1,ArgList>::type,
-                            typename boost::tuples::element<2,ArgList>::type);
+        typedef RT (type) (typename boost::tuples::element<0,ArgList>::type,
+			   typename boost::tuples::element<1,ArgList>::type,
+			   typename boost::tuples::element<2,ArgList>::type);
     };
 
 
@@ -2414,10 +1027,10 @@ namespace Threads
     template <typename RT, typename ArgList>
     struct fun_ptr_helper<RT, ArgList, 4>
     {
-        typedef RT (*type) (typename boost::tuples::element<0,ArgList>::type,
-                            typename boost::tuples::element<1,ArgList>::type,
-                            typename boost::tuples::element<2,ArgList>::type,
-                            typename boost::tuples::element<3,ArgList>::type);
+        typedef RT (type) (typename boost::tuples::element<0,ArgList>::type,
+			   typename boost::tuples::element<1,ArgList>::type,
+			   typename boost::tuples::element<2,ArgList>::type,
+			   typename boost::tuples::element<3,ArgList>::type);
     };
 
 
@@ -2431,11 +1044,11 @@ namespace Threads
     template <typename RT, typename ArgList>
     struct fun_ptr_helper<RT, ArgList, 5>
     {
-        typedef RT (*type) (typename boost::tuples::element<0,ArgList>::type,
-                            typename boost::tuples::element<1,ArgList>::type,
-                            typename boost::tuples::element<2,ArgList>::type,
-                            typename boost::tuples::element<3,ArgList>::type,
-                            typename boost::tuples::element<4,ArgList>::type);
+        typedef RT (type) (typename boost::tuples::element<0,ArgList>::type,
+			   typename boost::tuples::element<1,ArgList>::type,
+			   typename boost::tuples::element<2,ArgList>::type,
+			   typename boost::tuples::element<3,ArgList>::type,
+			   typename boost::tuples::element<4,ArgList>::type);
     };
 
 
@@ -2449,12 +1062,12 @@ namespace Threads
     template <typename RT, typename ArgList>
     struct fun_ptr_helper<RT, ArgList, 6>
     {
-        typedef RT (*type) (typename boost::tuples::element<0,ArgList>::type,
-                            typename boost::tuples::element<1,ArgList>::type,
-                            typename boost::tuples::element<2,ArgList>::type,
-                            typename boost::tuples::element<3,ArgList>::type,
-                            typename boost::tuples::element<4,ArgList>::type,
-                            typename boost::tuples::element<5,ArgList>::type);
+        typedef RT (type) (typename boost::tuples::element<0,ArgList>::type,
+			   typename boost::tuples::element<1,ArgList>::type,
+			   typename boost::tuples::element<2,ArgList>::type,
+			   typename boost::tuples::element<3,ArgList>::type,
+			   typename boost::tuples::element<4,ArgList>::type,
+			   typename boost::tuples::element<5,ArgList>::type);
     };
 
 
@@ -2468,13 +1081,13 @@ namespace Threads
     template <typename RT, typename ArgList>
     struct fun_ptr_helper<RT, ArgList, 7>
     {
-        typedef RT (*type) (typename boost::tuples::element<0,ArgList>::type,
-                            typename boost::tuples::element<1,ArgList>::type,
-                            typename boost::tuples::element<2,ArgList>::type,
-                            typename boost::tuples::element<3,ArgList>::type,
-                            typename boost::tuples::element<4,ArgList>::type,
-                            typename boost::tuples::element<5,ArgList>::type,
-                            typename boost::tuples::element<6,ArgList>::type);
+        typedef RT (type) (typename boost::tuples::element<0,ArgList>::type,
+			   typename boost::tuples::element<1,ArgList>::type,
+			   typename boost::tuples::element<2,ArgList>::type,
+			   typename boost::tuples::element<3,ArgList>::type,
+			   typename boost::tuples::element<4,ArgList>::type,
+			   typename boost::tuples::element<5,ArgList>::type,
+			   typename boost::tuples::element<6,ArgList>::type);
     };
 
 
@@ -2488,14 +1101,14 @@ namespace Threads
     template <typename RT, typename ArgList>
     struct fun_ptr_helper<RT, ArgList, 8>
     {
-        typedef RT (*type) (typename boost::tuples::element<0,ArgList>::type,
-                            typename boost::tuples::element<1,ArgList>::type,
-                            typename boost::tuples::element<2,ArgList>::type,
-                            typename boost::tuples::element<3,ArgList>::type,
-                            typename boost::tuples::element<4,ArgList>::type,
-                            typename boost::tuples::element<5,ArgList>::type,
-                            typename boost::tuples::element<6,ArgList>::type,
-                            typename boost::tuples::element<7,ArgList>::type);
+        typedef RT (type) (typename boost::tuples::element<0,ArgList>::type,
+			   typename boost::tuples::element<1,ArgList>::type,
+			   typename boost::tuples::element<2,ArgList>::type,
+			   typename boost::tuples::element<3,ArgList>::type,
+			   typename boost::tuples::element<4,ArgList>::type,
+			   typename boost::tuples::element<5,ArgList>::type,
+			   typename boost::tuples::element<6,ArgList>::type,
+			   typename boost::tuples::element<7,ArgList>::type);
     };
 
 
@@ -2509,15 +1122,15 @@ namespace Threads
     template <typename RT, typename ArgList>
     struct fun_ptr_helper<RT, ArgList, 9>
     {
-        typedef RT (*type) (typename boost::tuples::element<0,ArgList>::type,
-                            typename boost::tuples::element<1,ArgList>::type,
-                            typename boost::tuples::element<2,ArgList>::type,
-                            typename boost::tuples::element<3,ArgList>::type,
-                            typename boost::tuples::element<4,ArgList>::type,
-                            typename boost::tuples::element<5,ArgList>::type,
-                            typename boost::tuples::element<6,ArgList>::type,
-                            typename boost::tuples::element<7,ArgList>::type,
-                            typename boost::tuples::element<8,ArgList>::type);
+        typedef RT (type) (typename boost::tuples::element<0,ArgList>::type,
+			   typename boost::tuples::element<1,ArgList>::type,
+			   typename boost::tuples::element<2,ArgList>::type,
+			   typename boost::tuples::element<3,ArgList>::type,
+			   typename boost::tuples::element<4,ArgList>::type,
+			   typename boost::tuples::element<5,ArgList>::type,
+			   typename boost::tuples::element<6,ArgList>::type,
+			   typename boost::tuples::element<7,ArgList>::type,
+			   typename boost::tuples::element<8,ArgList>::type);
     };
 
 
@@ -2532,16 +1145,16 @@ namespace Threads
     template <typename RT, typename ArgList>
     struct fun_ptr_helper<RT, ArgList, 10>
     {
-        typedef RT (*type) (typename boost::tuples::element<0,ArgList>::type,
-                            typename boost::tuples::element<1,ArgList>::type,
-                            typename boost::tuples::element<2,ArgList>::type,
-                            typename boost::tuples::element<3,ArgList>::type,
-                            typename boost::tuples::element<4,ArgList>::type,
-                            typename boost::tuples::element<5,ArgList>::type,
-                            typename boost::tuples::element<6,ArgList>::type,
-                            typename boost::tuples::element<7,ArgList>::type,
-                            typename boost::tuples::element<8,ArgList>::type,
-                            typename boost::tuples::element<9,ArgList>::type);
+        typedef RT (type) (typename boost::tuples::element<0,ArgList>::type,
+			   typename boost::tuples::element<1,ArgList>::type,
+			   typename boost::tuples::element<2,ArgList>::type,
+			   typename boost::tuples::element<3,ArgList>::type,
+			   typename boost::tuples::element<4,ArgList>::type,
+			   typename boost::tuples::element<5,ArgList>::type,
+			   typename boost::tuples::element<6,ArgList>::type,
+			   typename boost::tuples::element<7,ArgList>::type,
+			   typename boost::tuples::element<8,ArgList>::type,
+			   typename boost::tuples::element<9,ArgList>::type);
     };
 
   
@@ -2567,292 +1180,16 @@ namespace Threads
     struct fun_ptr
     {
         typedef typename fun_ptr_helper<RT,ArgList>::type type;
-    };  
+    };
   }
+
 
 
   namespace internal 
   {
-                                     /**
-				      * @internal
-                                      * Extract the Nth element of the
-                                      * type list and make it a
-                                      * reference.
-                                      */
-    template <int N, typename Tuple>
-    struct add_reference_to_Nth
-    {
-        typedef typename boost::tuples::element<N,Tuple>::type ArgType;
-        typedef typename boost::add_reference<ArgType>::type type;
-    };
-  
-                                     /**
-				      * @internal
-                                      * Specializations of this template
-                                      * declare a typedef to a tuple
-                                      * type that has the same basic
-                                      * types as the first template
-                                      * argument, but all references
-                                      * instead of values. The second
-                                      * argument is used to distinguish
-                                      * between the lengths of argument
-                                      * lists. The default argument
-                                      * makes it possible to omit this
-                                      * length argument.
-                                      */
-    template <typename Tuple, int = boost::tuples::length<Tuple>::value>
-    struct tie_args_helper;
-
-
-                                     /**
-				      * @internal
-                                      * Make a tuple type of all
-                                      * references out of the given
-                                      * tuple. Specialization for tuple
-                                      * of length 0.
-                                      */
-    template <typename Tuple>
-    struct tie_args_helper<Tuple,0>
-    {
-        typedef Tuple type;
-    };
-
-
-                                     /**
-				      * @internal
-                                      * Make a tuple type of all
-                                      * references out of the given
-                                      * tuple. Specialization for tuple
-                                      * of length 1.
-                                      */
-    template <typename Tuple>
-    struct tie_args_helper<Tuple,1>
-    {
-        typedef 
-        boost::tuple<typename add_reference_to_Nth<0,Tuple>::type>
-        type;
-    };
-
-
-                                     /**
-				      * @internal
-                                      * Make a tuple type of all
-                                      * references out of the given
-                                      * tuple. Specialization for tuple
-                                      * of length 2.
-                                      */
-    template <typename Tuple>
-    struct tie_args_helper<Tuple,2>
-    {
-        typedef 
-        boost::tuple<typename add_reference_to_Nth<0,Tuple>::type,
-                     typename add_reference_to_Nth<1,Tuple>::type>
-        type;
-    };
-
-
-                                     /**
-				      * @internal
-                                      * Make a tuple type of all
-                                      * references out of the given
-                                      * tuple. Specialization for tuple
-                                      * of length 3.
-                                      */
-    template <typename Tuple>
-    struct tie_args_helper<Tuple,3>
-    {
-        typedef 
-        boost::tuple<typename add_reference_to_Nth<0,Tuple>::type,
-                     typename add_reference_to_Nth<1,Tuple>::type,
-                     typename add_reference_to_Nth<2,Tuple>::type>
-        type;
-    };
-
-
-                                     /**
-				      * @internal
-                                      * Make a tuple type of all
-                                      * references out of the given
-                                      * tuple. Specialization for tuple
-                                      * of length 4.
-                                      */
-    template <typename Tuple>
-    struct tie_args_helper<Tuple,4>
-    {
-        typedef 
-        boost::tuple<typename add_reference_to_Nth<0,Tuple>::type,
-                     typename add_reference_to_Nth<1,Tuple>::type,
-                     typename add_reference_to_Nth<2,Tuple>::type,
-                     typename add_reference_to_Nth<3,Tuple>::type>
-        type;
-    };
-
-
-                                     /**
-				      * @internal
-                                      * Make a tuple type of all
-                                      * references out of the given
-                                      * tuple. Specialization for tuple
-                                      * of length 5.
-                                      */
-    template <typename Tuple>
-    struct tie_args_helper<Tuple,5>
-    {
-        typedef 
-        boost::tuple<typename add_reference_to_Nth<0,Tuple>::type,
-                     typename add_reference_to_Nth<1,Tuple>::type,
-                     typename add_reference_to_Nth<2,Tuple>::type,
-                     typename add_reference_to_Nth<3,Tuple>::type,
-                     typename add_reference_to_Nth<4,Tuple>::type>
-        type;
-    };
-
-
-                                     /**
-				      * @internal
-                                      * Make a tuple type of all
-                                      * references out of the given
-                                      * tuple. Specialization for tuple
-                                      * of length 6.
-                                      */
-    template <typename Tuple>
-    struct tie_args_helper<Tuple,6>
-    {
-        typedef 
-        boost::tuple<typename add_reference_to_Nth<0,Tuple>::type,
-                     typename add_reference_to_Nth<1,Tuple>::type,
-                     typename add_reference_to_Nth<2,Tuple>::type,
-                     typename add_reference_to_Nth<3,Tuple>::type,
-                     typename add_reference_to_Nth<4,Tuple>::type,
-                     typename add_reference_to_Nth<5,Tuple>::type>
-        type;
-    };
-
-
-
-                                     /**
-				      * @internal
-                                      * Make a tuple type of all
-                                      * references out of the given
-                                      * tuple. Specialization for tuple
-                                      * of length 7.
-                                      */
-    template <typename Tuple>
-    struct tie_args_helper<Tuple,7>
-    {
-        typedef 
-        boost::tuple<typename add_reference_to_Nth<0,Tuple>::type,
-                     typename add_reference_to_Nth<1,Tuple>::type,
-                     typename add_reference_to_Nth<2,Tuple>::type,
-                     typename add_reference_to_Nth<3,Tuple>::type,
-                     typename add_reference_to_Nth<4,Tuple>::type,
-                     typename add_reference_to_Nth<5,Tuple>::type,
-                     typename add_reference_to_Nth<6,Tuple>::type>
-        type;
-    };
-
-
-                                     /**
-				      * @internal
-                                      * Make a tuple type of all
-                                      * references out of the given
-                                      * tuple. Specialization for tuple
-                                      * of length 8.
-                                      */
-    template <typename Tuple>
-    struct tie_args_helper<Tuple,8>
-    {
-        typedef 
-        boost::tuple<typename add_reference_to_Nth<0,Tuple>::type,
-                     typename add_reference_to_Nth<1,Tuple>::type,
-                     typename add_reference_to_Nth<2,Tuple>::type,
-                     typename add_reference_to_Nth<3,Tuple>::type,
-                     typename add_reference_to_Nth<4,Tuple>::type,
-                     typename add_reference_to_Nth<5,Tuple>::type,
-                     typename add_reference_to_Nth<6,Tuple>::type,
-                     typename add_reference_to_Nth<7,Tuple>::type>
-        type;
-    };
-
-
-                                     /**
-				      * @internal
-                                      * Make a tuple type of all
-                                      * references out of the given
-                                      * tuple. Specialization for tuple
-                                      * of length 9.
-                                      */
-    template <typename Tuple>
-    struct tie_args_helper<Tuple,9>
-    {
-        typedef 
-        boost::tuple<typename add_reference_to_Nth<0,Tuple>::type,
-                     typename add_reference_to_Nth<1,Tuple>::type,
-                     typename add_reference_to_Nth<2,Tuple>::type,
-                     typename add_reference_to_Nth<3,Tuple>::type,
-                     typename add_reference_to_Nth<4,Tuple>::type,
-                     typename add_reference_to_Nth<5,Tuple>::type,
-                     typename add_reference_to_Nth<6,Tuple>::type,
-                     typename add_reference_to_Nth<7,Tuple>::type,
-                     typename add_reference_to_Nth<8,Tuple>::type>
-        type;
-    };
-
-
-                                     /**
-				      * @internal
-                                      * Make a tuple type of all
-                                      * references out of the given
-                                      * tuple. Specialization for tuple
-                                      * of length 10.
-                                      */
-    template <typename Tuple>
-    struct tie_args_helper<Tuple,10>
-    {
-        typedef 
-        boost::tuple<typename add_reference_to_Nth<0,Tuple>::type,
-                     typename add_reference_to_Nth<1,Tuple>::type,
-                     typename add_reference_to_Nth<2,Tuple>::type,
-                     typename add_reference_to_Nth<3,Tuple>::type,
-                     typename add_reference_to_Nth<4,Tuple>::type,
-                     typename add_reference_to_Nth<5,Tuple>::type,
-                     typename add_reference_to_Nth<6,Tuple>::type,
-                     typename add_reference_to_Nth<7,Tuple>::type,
-                     typename add_reference_to_Nth<8,Tuple>::type,
-                     typename add_reference_to_Nth<9,Tuple>::type>
-        type;
-    };
-
-
-  
-                                     /**
-				      * @internal
-                                      * Declare a typedef to a tuple
-                                      * type that has the same basic
-                                      * types as the template
-                                      * argument, but all references
-                                      * instead of values.
-                                      *
-                                      * Do so by redirecting to the
-                                      * tie_args_helper specializations;
-                                      * note that the second argument of
-                                      * these templates is computed
-                                      * automatically by the default
-                                      * argument specification.
-                                      */
-    template <typename Tuple>
-    struct tie_args 
-    {
-        typedef typename tie_args_helper<Tuple>::type type;
-    };
-  }
-
-
 #if (DEAL_II_USE_MT == 1)
 #  if defined(DEAL_II_USE_MT_POSIX)
 
-  namespace internal 
-  {
                                      /**
 				      * @internal
                                       * Base class describing a
@@ -2958,6 +1295,15 @@ namespace Threads
 #    error Not Implemented
 #  endif     // defined(DEAL_II_USE_MT_POSIX)
 
+#else        // no threading enabled
+
+    struct thread_description_base
+    {
+	static void join () {}
+    };
+    
+#endif
+
                                      /**
 				      * @internal
                                       * Class derived from
@@ -2973,9 +1319,9 @@ namespace Threads
     {
         return_value<RT> ret_val;
     };
-
+    
                                      // forward declare another class
-    template <typename, typename> struct wrapper_base;
+    template <typename> struct fun_wrapper;
   }
 
 
@@ -3013,7 +1359,7 @@ namespace Threads
                                         * We would like to make this
                                         * constructor private and only
                                         * grant the
-                                        * <tt>wrapper_base::fire_up</tt>
+                                        * <tt>fun_wrapper::fire_up</tt>
                                         * function friendship, but
                                         * granting friendship to
                                         * functions in other
@@ -3051,10 +1397,11 @@ namespace Threads
                                         * and have not assigned a
                                         * thread object to it.
                                         */
-      void join () const {
-        AssertThrow (thread_descriptor, ExcNoThread());
-        thread_descriptor->join ();
-      }
+      void join () const
+	{
+	  AssertThrow (thread_descriptor, ExcNoThread());
+	  thread_descriptor->join ();
+	}
 
                                        /**
                                         * Get the return value of the
@@ -3064,10 +1411,11 @@ namespace Threads
                                         * finishes, this implicitely
                                         * also calls <tt>join()</tt>.
                                         */
-      RT return_value () {
-        join ();
-        return thread_descriptor->ret_val.get();
-      }
+      RT return_value ()
+	{
+	  join ();
+	  return thread_descriptor->ret_val.get();
+	}
 
 
                                        /**
@@ -3079,12 +1427,13 @@ namespace Threads
                                         * thread, the check is simply
                                         * to compare these pointers.
                                         */
-      bool operator == (const Thread &t) {
-        return thread_descriptor == t.thread_descriptor;
-      }
+      bool operator == (const Thread &t)
+	{
+	  return thread_descriptor == t.thread_descriptor;
+	}
 
-      				     /** @addtogroup Exceptions
-				      * @{ */
+				       /** @addtogroup Exceptions
+					* @{ */
       
                                        /**
                                         * Exception
@@ -3106,7 +1455,7 @@ namespace Threads
       boost::shared_ptr<internal::thread_description<RT> > thread_descriptor;
 
 #if !defined(DEAL_II_NAMESP_TEMPL_FRIEND_BUG2) && !defined(DEAL_II_NAMESP_TEMPL_FRIEND_BUG)
-      template <typename, typename> friend struct internal::wrapper_base;
+      template <typename> friend struct internal::fun_wrapper;
 #endif
   };
 
@@ -3114,32 +1463,40 @@ namespace Threads
 
   namespace internal
   {
-
                                      /**
 				      * @internal
-                                      * Base class for the classes
-                                      * wrapping function pointers and
-                                      * arguments for non-member and
-                                      * member functions. The first
-                                      * template class denotes the
-                                      * return type of the function
-                                      * being called. The second one
-                                      * is a class that provides a
-                                      * function <tt>entry_point</tt>,
-                                      * which will be used as an entry
-                                      * point for the new thread. In
-                                      * the classes derived from this
-                                      * one, the second template
-                                      * argument is actually the
-                                      * derived class itself, using
-                                      * something like the
-                                      * Barton-Nackman trick.
+                                      * Wrap the arguments to a
+                                      * non-member or static member
+                                      * function and provide an entry
+                                      * point for a new thread that
+                                      * unwraps this data and calls
+                                      * the function with them.
                                       *
                                       * @author Wolfgang Bangerth, 2003
                                       */
-    template <typename RT, typename EntryPointClass>
-    struct wrapper_base
+    template <typename RT>
+    struct fun_wrapper
     {
+                                         /**
+                                          * Constructor. Store the
+                                          * necessary information
+                                          * about the function to be
+                                          * called and with which
+                                          * arguments.
+                                          *
+                                          * Pass down the address of
+                                          * this class's thread entry
+                                          * point function. This way,
+                                          * we can ensure that object
+                                          * and thread entry point
+                                          * function always are in
+                                          * synch with respect to
+                                          * their knowledge of the
+                                          * types involved.
+                                          */
+        fun_wrapper (const boost::function<RT ()> &function)
+                        : function (function)  {}
+
 
                                          /**
                                           * Start a new thread, wait
@@ -3147,20 +1504,42 @@ namespace Threads
                                           * data out of this object,
                                           * and return the thread
                                           * descriptor.
+					  *
+					  * In the non-multithreaded case,
+					  * simply call the function.
                                           */
-        Thread<RT> fire_up () {
-          thread_descriptor =
-            DescriptionPointer(new internal::thread_description<RT>());
+        Thread<RT> fire_up ()
+	  {
+	    thread_descriptor =
+	      DescriptionPointer(new internal::thread_description<RT>());
+	    
+#if (DEAL_II_USE_MT == 1)
+	    ThreadMutex::ScopedLock lock (mutex);        
+	    thread_descriptor->create (&entry_point, (void *)this);
+	    condition.wait (mutex);	    
+#else
+	    call (function, thread_descriptor->ret_val);
+#endif
+	    return thread_descriptor;
+	  }
 
-          ThreadMutex::ScopedLock lock (mutex);        
-          thread_descriptor->create (&EntryPointClass::entry_point,
-				     (void *)this);
-          condition.wait (mutex);
+      private:
+                                         /**
+                                          * Default constructor. Made
+                                          * private and not
+                                          * implemented to prevent
+                                          * calling.
+                                          */
+        fun_wrapper ();
 
-          return thread_descriptor;
-        }
+                                         /**
+                                          * Copy constructor. Made
+                                          * private and not
+                                          * implemented to prevent
+                                          * calling.
+                                          */
+        fun_wrapper (const fun_wrapper &);
 
-      protected:
                                          /**
                                           * Typedef for shared
                                           * pointers to the objects
@@ -3186,89 +1565,13 @@ namespace Threads
                                           */
         mutable ThreadMutex     mutex;    
         mutable ThreadCondition condition;
-    };
-  
-
-                                     /**
-				      * @internal
-                                      * Wrap the arguments to a
-                                      * non-member or static member
-                                      * function and provide an entry
-                                      * point for a new thread that
-                                      * unwraps this data and calls
-                                      * the function with them.
-                                      *
-                                      * @author Wolfgang Bangerth, 2003
-                                      */
-    template <typename RT, typename ArgList>
-    struct fun_wrapper : public wrapper_base<RT, fun_wrapper<RT,ArgList> >
-    {
-                                         /**
-                                          * Typedef for the type of
-                                          * the function to be called
-                                          * on the new thread.
-                                          */
-        typedef typename internal::fun_ptr<RT,ArgList>::type FunPtr;
-
-                                         /**
-                                          * Typedef for a typelist of
-                                          * reference arguments to the
-                                          * function to be called.
-                                          */
-        typedef typename internal::tie_args<ArgList>::type ArgReferences;
-
-                                         /**
-                                          * Constructor. Store the
-                                          * necessary information
-                                          * about the function to be
-                                          * called and with which
-                                          * arguments.
-                                          *
-                                          * Pass down the address of
-                                          * this class's thread entry
-                                          * point function. This way,
-                                          * we can ensure that object
-                                          * and thread entry point
-                                          * function always are in
-                                          * synch with respect to
-                                          * their knowledge of the
-                                          * types involved.
-                                          */
-        fun_wrapper (FunPtr               fun_ptr,
-                     const ArgReferences &args)
-                        : fun_ptr (fun_ptr),
-                          args (args)  {}
-      private:
-                                         /**
-                                          * Default constructor. Made
-                                          * private and not
-                                          * implemented to prevent
-                                          * calling.
-                                          */
-        fun_wrapper ();
-
-                                         /**
-                                          * Copy constructor. Made
-                                          * private and not
-                                          * implemented to prevent
-                                          * calling.
-                                          */
-        fun_wrapper (const fun_wrapper &);
 
                                          /**
                                           * Pointer to the function to
                                           * be called on the new
                                           * thread.
                                           */
-        FunPtr        fun_ptr;
-
-                                         /**
-                                          * References to the
-                                          * arguments with which the
-                                          * function is to be called.
-                                          */
-        ArgReferences args;
-      
+	boost::function<RT ()> function;      
 
                                          /**
                                           * Entry point for the new
@@ -3276,16 +1579,13 @@ namespace Threads
                                           */
         static void * entry_point (void *arg)
           {
-            const wrapper_base<RT, fun_wrapper> *w
-              = reinterpret_cast<const wrapper_base<RT, fun_wrapper>*> (arg);
-            const fun_wrapper *wrapper
-              = static_cast<const fun_wrapper*> (w);
+            const fun_wrapper<RT> *wrapper
+              = reinterpret_cast<const fun_wrapper<RT>*> (arg);
 
                                              // copy information from
                                              // the stack of the
                                              // calling thread
-            FunPtr    fun_ptr = wrapper->fun_ptr;
-            ArgList   args    = wrapper->args;
+            boost::function<RT ()> function = wrapper->function;
 
             boost::shared_ptr<internal::thread_description<RT> >
               thread_descriptor  = wrapper->thread_descriptor;
@@ -3314,8 +1614,7 @@ namespace Threads
             internal::register_thread ();
             try 
               {
-                internal::call (fun_ptr, args,
-                                thread_descriptor->ret_val);
+                internal::call (function, thread_descriptor->ret_val);
               }
             catch (const std::exception &exc)
               {
@@ -3338,164 +1637,7 @@ namespace Threads
 					  * point function.
 					  */
 	template <typename, typename> friend class wrapper_base;
-    };
-
-  
-  
-                                     /**
-				      * @internal
-                                      * Wrap the arguments to a member
-                                      * function and provide an entry
-                                      * point for a new thread that
-                                      * unwraps this data and calls
-                                      * the function with them.
-                                      *
-                                      * @author Wolfgang Bangerth, 2003
-                                      */
-    template <typename RT, class C, typename ArgList>
-    struct mem_fun_wrapper : public wrapper_base<RT, mem_fun_wrapper<RT,C,ArgList> >
-    {
-                                         /**
-                                          * Typedef for the type of
-                                          * the function to be called
-                                          * on the new thread.
-                                          */
-        typedef typename internal::mem_fun_ptr<RT,C,ArgList>::type MemFunPtr;
-
-                                         /**
-                                          * Typedef for a typelist of
-                                          * reference arguments to the
-                                          * function to be called.
-                                          */
-        typedef typename internal::tie_args<ArgList>::type ArgReferences;
-      
-                                         /**
-                                          * Constructor. Store the
-                                          * necessary information
-                                          * about the function to be
-                                          * called and with which
-                                          * arguments.
-                                          *
-                                          * Pass down the address of
-                                          * this class's thread entry
-                                          * point function. This way,
-                                          * we can ensure that object
-                                          * and thread entry point
-                                          * function always are in
-                                          * synch with respect to
-                                          * their knowledge of the
-                                          * types involved.
-                                          */
-        mem_fun_wrapper (MemFunPtr            mem_fun_ptr,
-                         C                   &c,
-                         const ArgReferences &args)
-                        :
-			c (c),
-			mem_fun_ptr (mem_fun_ptr),
-			args (args)  {}
-      private:
-                                         /**
-                                          * Default constructor. Made
-                                          * private and not
-                                          * implemented to prevent
-                                          * calling.
-                                          */
-        mem_fun_wrapper ();
-
-                                         /**
-                                          * Copy constructor. Made
-                                          * private and not
-                                          * implemented to prevent
-                                          * calling.
-                                          */
-        mem_fun_wrapper (const mem_fun_wrapper &);
-      
-                                         /**
-                                          * Pointer to the function to
-                                          * be called on the new
-                                          * thread, as well as the
-                                          * object with which this has
-                                          * to happen.
-                                          */
-        C            &c;
-        MemFunPtr     mem_fun_ptr;
-
-                                         /**
-                                          * References to the
-                                          * arguments with which the
-                                          * function is to be called.
-                                          */
-        ArgReferences args;
-
-                                         /**
-                                          * Entry point for the new
-                                          * thread.
-                                          */
-        static void * entry_point (void *arg)
-          {
-            const wrapper_base<RT,mem_fun_wrapper> *w
-              = reinterpret_cast<const wrapper_base<RT,mem_fun_wrapper>*> (arg);
-            const mem_fun_wrapper *wrapper
-              = static_cast<const mem_fun_wrapper*> (w);
-
-                                             // copy information from
-                                             // the stack of the
-                                             // calling thread
-            MemFunPtr mem_fun_ptr = wrapper->mem_fun_ptr;
-            C        &c           = wrapper->c;
-            ArgList   args        = wrapper->args;
-
-            boost::shared_ptr<internal::thread_description<RT> >
-              thread_descriptor  = wrapper->thread_descriptor;
-
-                                             // signal the fact that
-                                             // we have copied all the
-                                             // information that is
-                                             // needed
-            {
-              ThreadMutex::ScopedLock lock (wrapper->mutex);
-              wrapper->condition.signal ();
-            }
-          
-                                             // call the
-                                             // function. since an
-                                             // exception that is
-                                             // thrown from one of the
-                                             // called functions will
-                                             // not propagate to the
-                                             // main thread, it will
-                                             // kill the program if
-                                             // not treated here
-                                             // before we return to
-                                             // the operating system's
-                                             // thread library
-            internal::register_thread ();
-            try 
-              {
-                internal::call (mem_fun_ptr, c, args,
-                                thread_descriptor->ret_val);
-              }
-            catch (const std::exception &exc)
-              {
-                internal::handle_std_exception (exc);
-              }
-            catch (...)
-              {
-                internal::handle_unknown_exception ();
-              }
-            internal::deregister_thread ();
-          
-            return 0;
-          }
-
-					 /**
-					  * Make the base class a
-					  * friend, so that it can
-					  * access the thread entry
-					  * point function.
-					  */
-	template <typename, typename> friend class wrapper_base;
-    };
+    };  
   }
 
 
@@ -3525,71 +1667,392 @@ namespace Threads
                                       * used, even though we need to
                                       * specify it.
                                       */
-    template <typename RT, typename ArgList,
-              int length>
+    template <typename RT, typename ArgList, int length>
     class fun_encapsulator;
-
-
-                                     /**
-				      * @internal
-                                      * General template declaration
-                                      * of a class that is used to
-                                      * encapsulate arguments to
-                                      * non-static member functions,
-                                      * make sure a new thread is
-                                      * created and that function
-                                      * being run on that thread.
-                                      *
-                                      * Although this general template
-                                      * is not implemented at all, the
-                                      * default template argument
-                                      * makes sure that whenever using
-                                      * the name of this class, the
-                                      * last template argument will be
-                                      * computed correctly from the
-                                      * previous arguments, and the
-                                      * correct specialization for
-                                      * this last template argument be
-                                      * used, even though we need to
-                                      * specify it.
-                                      */
-    template <typename RT, typename C, typename ArgList,
-              int length>
-    class mem_fun_encapsulator;
-  }
 
 
 // ----------- encapsulators for member functions not taking any parameters
 
-  namespace internal
-  {
                                      /**
 				      * @internal
-                                      * Encapsulator class for member
+                                      * Encapsulator class for
                                       * functions with no arguments.
                                       */
-    template <typename RT, typename C, typename ArgList>
-    class mem_fun_encapsulator<RT, C, ArgList, 0>
+    template <typename RT, typename ArgList>
+    class fun_encapsulator<RT, ArgList, 0>
     {
-        typedef typename internal::mem_fun_ptr<RT,C,ArgList>::type MemFunPtr;
-
       public:
-        inline mem_fun_encapsulator (C &c, MemFunPtr mem_fun_ptr)
-                        : c (c), mem_fun_ptr(mem_fun_ptr) {}
+	fun_encapsulator (typename internal::fun_ptr<RT,ArgList>::type *function)
+			: function (*function)
+	  {}
+
+        fun_encapsulator (const boost::function<typename internal::fun_ptr<RT,ArgList>::type> &function)
+                        : function (function)
+	  {}
 
         inline
         Thread<RT>
-        operator() () {
-          return mem_fun_wrapper<RT,C,ArgList> (mem_fun_ptr, c,
-                                                ArgList()).fire_up ();
-        }
+        operator() ()
+	  {
+	    return fun_wrapper<RT> (function).fire_up ();
+	  }
     
       private:
-        C         &c;
-        MemFunPtr  mem_fun_ptr;
+        boost::function<typename internal::fun_ptr<RT,ArgList>::type> function;
     };
   
+                                     /**
+				      * @internal
+                                      * Encapsulator class for
+                                      * functions with 1 argument.
+                                      */
+    template <typename RT, typename ArgList>
+    class fun_encapsulator<RT, ArgList, 1>
+    {
+      public:
+	fun_encapsulator (typename internal::fun_ptr<RT,ArgList>::type *function)
+			: function (*function)
+	  {}
+
+        fun_encapsulator (const boost::function<typename internal::fun_ptr<RT,ArgList>::type> &function)
+                        : function (function)
+	  {}
+
+        inline
+        Thread<RT>
+        operator() (typename boost::tuples::element<0,ArgList>::type arg1)
+	  {
+	    return fun_wrapper<RT> (boost::bind (function,
+						 boost::ref(arg1))).fire_up ();
+	  }
+    
+      private:
+	boost::function<typename internal::fun_ptr<RT,ArgList>::type> function;
+    };
+
+				     /**
+				      * @internal
+				      * Encapsulator class for
+				      * functions with 2 arguments.
+				      */
+    template <typename RT, typename ArgList>
+    class fun_encapsulator<RT, ArgList, 2>
+    {
+      public:
+	fun_encapsulator (typename internal::fun_ptr<RT,ArgList>::type *function)
+			: function (*function)
+	  {}
+
+	fun_encapsulator (const boost::function<typename internal::fun_ptr<RT,ArgList>::type> &function)
+			: function (function)
+	  {}
+
+	inline
+	Thread<RT>
+	operator() (typename boost::tuples::element<0,ArgList>::type arg1,
+		    typename boost::tuples::element<1,ArgList>::type arg2)
+	  {
+	    return fun_wrapper<RT> (boost::bind (function,
+						 boost::ref(arg1),
+						 boost::ref(arg2))).fire_up ();
+	  }
+    
+      private:
+	boost::function<typename internal::fun_ptr<RT,ArgList>::type> function;
+    };
+  
+				     /**
+				      * @internal
+				      * Encapsulator class for
+				      * functions with 3 arguments.
+				      */
+    template <typename RT, typename ArgList>
+    class fun_encapsulator<RT, ArgList, 3>
+    {
+      public:
+	fun_encapsulator (typename internal::fun_ptr<RT,ArgList>::type *function)
+			: function (*function)
+	  {}
+
+	fun_encapsulator (const boost::function<typename internal::fun_ptr<RT,ArgList>::type> &function)
+			: function (function)
+	  {}
+
+	inline
+	Thread<RT>
+	operator() (typename boost::tuples::element<0,ArgList>::type arg1,
+		    typename boost::tuples::element<1,ArgList>::type arg2,
+		    typename boost::tuples::element<2,ArgList>::type arg3)
+	  {
+	    return fun_wrapper<RT> (boost::bind (function,
+						 boost::ref(arg1),
+						 boost::ref(arg2),
+						 boost::ref(arg3))).fire_up ();
+	  }
+    
+      private:
+	boost::function<typename internal::fun_ptr<RT,ArgList>::type> function;
+    };
+  
+				     /**
+				      * @internal
+				      * Encapsulator class for
+				      * functions with 4 arguments.
+				      */
+    template <typename RT, typename ArgList>
+    class fun_encapsulator<RT, ArgList, 4>
+    {
+      public:
+	fun_encapsulator (typename internal::fun_ptr<RT,ArgList>::type *function)
+			: function (*function)
+	  {}
+
+	fun_encapsulator (const boost::function<typename internal::fun_ptr<RT,ArgList>::type> &function)
+			: function (function)
+	  {}
+
+	inline
+	Thread<RT>
+	operator() (typename boost::tuples::element<0,ArgList>::type arg1,
+		    typename boost::tuples::element<1,ArgList>::type arg2,
+		    typename boost::tuples::element<2,ArgList>::type arg3,
+		    typename boost::tuples::element<3,ArgList>::type arg4)
+	  {
+	    return fun_wrapper<RT> (boost::bind (function,
+						 boost::ref(arg1),
+						 boost::ref(arg2),
+						 boost::ref(arg3),
+						 boost::ref(arg4))).fire_up ();
+	  }
+    
+      private:
+	boost::function<typename internal::fun_ptr<RT,ArgList>::type> function;
+    };
+  
+				     /**
+				      * @internal
+				      * Encapsulator class for
+				      * functions with 5 arguments.
+				      */
+    template <typename RT, typename ArgList>
+    class fun_encapsulator<RT, ArgList, 5>
+    {
+      public:
+	fun_encapsulator (typename internal::fun_ptr<RT,ArgList>::type *function)
+			: function (*function)
+	  {}
+
+	fun_encapsulator (const boost::function<typename internal::fun_ptr<RT,ArgList>::type> &function)
+			: function (function)
+	  {}
+
+	inline
+	Thread<RT>
+	operator() (typename boost::tuples::element<0,ArgList>::type arg1,
+		    typename boost::tuples::element<1,ArgList>::type arg2,
+		    typename boost::tuples::element<2,ArgList>::type arg3,
+		    typename boost::tuples::element<3,ArgList>::type arg4,
+		    typename boost::tuples::element<4,ArgList>::type arg5)
+	  {
+	    return fun_wrapper<RT> (boost::bind (function,
+						 boost::ref(arg1),
+						 boost::ref(arg2),
+						 boost::ref(arg3),
+						 boost::ref(arg4),
+						 boost::ref(arg5))).fire_up ();
+	  }
+    
+      private:
+	boost::function<typename internal::fun_ptr<RT,ArgList>::type> function;
+    };
+  
+				     /**
+				      * @internal
+				      * Encapsulator class for
+				      * functions with 6 arguments.
+				      */
+    template <typename RT, typename ArgList>
+    class fun_encapsulator<RT, ArgList, 6>
+    {
+      public:
+	fun_encapsulator (typename internal::fun_ptr<RT,ArgList>::type *function)
+			: function (*function)
+	  {}
+
+	fun_encapsulator (const boost::function<typename internal::fun_ptr<RT,ArgList>::type> &function)
+			: function (function)
+	  {}
+
+	inline
+	Thread<RT>
+	operator() (typename boost::tuples::element<0,ArgList>::type arg1,
+		    typename boost::tuples::element<1,ArgList>::type arg2,
+		    typename boost::tuples::element<2,ArgList>::type arg3,
+		    typename boost::tuples::element<3,ArgList>::type arg4,
+		    typename boost::tuples::element<4,ArgList>::type arg5,
+		    typename boost::tuples::element<5,ArgList>::type arg6)
+	  {
+	    return fun_wrapper<RT> (boost::bind (function,
+						 boost::ref(arg1),
+						 boost::ref(arg2),
+						 boost::ref(arg3),
+						 boost::ref(arg4),
+						 boost::ref(arg5),
+						 boost::ref(arg6))).fire_up ();
+	  }
+    
+      private:
+	boost::function<typename internal::fun_ptr<RT,ArgList>::type> function;
+    };
+  
+				     /**
+				      * @internal
+				      * Encapsulator class for
+				      * functions with 7 arguments.
+				      */
+    template <typename RT, typename ArgList>
+    class fun_encapsulator<RT, ArgList, 7>
+    {
+      public:
+	fun_encapsulator (typename internal::fun_ptr<RT,ArgList>::type *function)
+			: function (*function)
+	  {}
+
+	fun_encapsulator (const boost::function<typename internal::fun_ptr<RT,ArgList>::type> &function)
+			: function (function)
+	  {}
+
+	inline
+	Thread<RT>
+	operator() (typename boost::tuples::element<0,ArgList>::type arg1,
+		    typename boost::tuples::element<1,ArgList>::type arg2,
+		    typename boost::tuples::element<2,ArgList>::type arg3,
+		    typename boost::tuples::element<3,ArgList>::type arg4,
+		    typename boost::tuples::element<4,ArgList>::type arg5,
+		    typename boost::tuples::element<5,ArgList>::type arg6,
+		    typename boost::tuples::element<6,ArgList>::type arg7)
+	  {
+	    return fun_wrapper<RT> (boost::bind (function,
+						 boost::ref(arg1),
+						 boost::ref(arg2),
+						 boost::ref(arg3),
+						 boost::ref(arg4),
+						 boost::ref(arg5),
+						 boost::ref(arg6),
+						 boost::ref(arg7))).fire_up ();
+	  }
+    
+      private:
+	boost::function<typename internal::fun_ptr<RT,ArgList>::type> function;
+    };
+
+				     /**
+				      * @internal
+				      * Encapsulator class for
+				      * functions with 8 arguments.
+				      */
+    template <typename RT, typename ArgList>
+    class fun_encapsulator<RT, ArgList, 8>
+    {
+      public:
+	fun_encapsulator (typename internal::fun_ptr<RT,ArgList>::type *function)
+			: function (*function)
+	  {}
+
+	fun_encapsulator (const boost::function<typename internal::fun_ptr<RT,ArgList>::type> &function)
+			: function (function)
+	  {}
+
+	inline
+	Thread<RT>
+	operator() (typename boost::tuples::element<0,ArgList>::type arg1,
+		    typename boost::tuples::element<1,ArgList>::type arg2,
+		    typename boost::tuples::element<2,ArgList>::type arg3,
+		    typename boost::tuples::element<3,ArgList>::type arg4,
+		    typename boost::tuples::element<4,ArgList>::type arg5,
+		    typename boost::tuples::element<5,ArgList>::type arg6,
+		    typename boost::tuples::element<6,ArgList>::type arg7,
+		    typename boost::tuples::element<7,ArgList>::type arg8)
+	  {
+	    return fun_wrapper<RT> (boost::bind (function,
+						 boost::ref(arg1),
+						 boost::ref(arg2),
+						 boost::ref(arg3),
+						 boost::ref(arg4),
+						 boost::ref(arg5),
+						 boost::ref(arg6),
+						 boost::ref(arg7),
+						 boost::ref(arg8))).fire_up ();
+	  }
+    
+      private:
+	boost::function<typename internal::fun_ptr<RT,ArgList>::type> function;
+    };
+  
+				     /**
+				      * @internal
+				      * Encapsulator class for
+				      * functions with 9 arguments.
+				      */
+    template <typename RT, typename ArgList>
+    class fun_encapsulator<RT, ArgList, 9>
+    {
+      public:
+	fun_encapsulator (typename internal::fun_ptr<RT,ArgList>::type *function)
+			: function (*function)
+	  {}
+
+	fun_encapsulator (const boost::function<typename internal::fun_ptr<RT,ArgList>::type> &function)
+			: function (function)
+	  {}
+
+	inline
+	Thread<RT>
+	operator() (typename boost::tuples::element<0,ArgList>::type arg1,
+		    typename boost::tuples::element<1,ArgList>::type arg2,
+		    typename boost::tuples::element<2,ArgList>::type arg3,
+		    typename boost::tuples::element<3,ArgList>::type arg4,
+		    typename boost::tuples::element<4,ArgList>::type arg5,
+		    typename boost::tuples::element<5,ArgList>::type arg6,
+		    typename boost::tuples::element<6,ArgList>::type arg7,
+		    typename boost::tuples::element<7,ArgList>::type arg8,
+		    typename boost::tuples::element<8,ArgList>::type arg9)
+	  {
+	    return fun_wrapper<RT> (boost::bind (function,
+						 boost::ref(arg1),
+						 boost::ref(arg2),
+						 boost::ref(arg3),
+						 boost::ref(arg4),
+						 boost::ref(arg5),
+						 boost::ref(arg6),
+						 boost::ref(arg7),
+						 boost::ref(arg8),
+						 boost::ref(arg9))).fire_up ();
+	  }
+    
+      private:
+	boost::function<typename internal::fun_ptr<RT,ArgList>::type> function;
+    };
   }
+
+
+
+
+// ----------- encapsulators for functions not taking any parameters
+
+                                   /**
+                                    * Overload of the spawn function for
+                                    * non-member or static member
+                                    * functions with no arguments.
+                                    */
+  template <typename RT>
+  inline
+  internal::fun_encapsulator<RT,boost::tuple<>,0>
+  spawn (RT (*fun_ptr)())
+  {
+    return fun_ptr;
+  }
+
  
                                    /**
                                     * Overload of the non-const spawn
@@ -3598,9 +2061,12 @@ namespace Threads
                                     */
   template <typename RT, typename C>
   inline
-  internal::mem_fun_encapsulator<RT,C,boost::tuple<>,0>
-  spawn (C &c, RT (C::*fun_ptr)()) {
-    return internal::mem_fun_encapsulator<RT, C, boost::tuple<>,0> (c,fun_ptr);
+  internal::fun_encapsulator<RT,boost::tuple<>,0>
+  spawn (C &c, RT (C::*fun_ptr)())
+  {
+    return
+      boost::function<typename internal::fun_ptr<RT,boost::tuple<> >::type>
+      (boost::bind(fun_ptr, boost::ref(c)));
   }
 
                                    /**
@@ -3610,838 +2076,19 @@ namespace Threads
                                     */
   template <typename RT, typename C>
   inline
-  internal::mem_fun_encapsulator<RT,const C,boost::tuple<>,0>
-  spawn (const C &c, RT (C::*fun_ptr)() const) {
-    return internal::mem_fun_encapsulator<RT, const C, boost::tuple<>,0> (c,fun_ptr);
-  }
-
-
-
-
-// ----------- encapsulators for unary member functions
-
-  namespace internal
-  {
-                                     /**
-				      * @internal
-                                      * Encapsulator class for member
-                                      * functions with 1 argument.
-                                      */
-    template <typename RT, typename C, typename ArgList>
-    class mem_fun_encapsulator<RT, C, ArgList, 1>
-    {
-        typedef typename internal::mem_fun_ptr<RT,C,ArgList>::type MemFunPtr;      
-
-      public:
-        inline mem_fun_encapsulator (C &c, MemFunPtr mem_fun_ptr)
-                        : c (c), mem_fun_ptr(mem_fun_ptr) {}
-
-        inline
-        Thread<RT>
-        operator() (typename boost::tuples::element<0,ArgList>::type arg1) {
-          return mem_fun_wrapper<RT,C,ArgList> (mem_fun_ptr, c,
-                                                boost::tie(arg1)).fire_up ();
-        }
-    
-      private:
-        C         &c;
-        MemFunPtr  mem_fun_ptr;
-    };
-  
-  }
-
- 
-                                   /**
-                                    * Overload of the non-const spawn
-                                    * function for member functions with
-                                    * 1 argument.
-                                    */
-  template <typename RT, typename C, typename Arg1>
-  inline
-  internal::mem_fun_encapsulator<RT,C,boost::tuple<Arg1>,1>
-  spawn (C &c, RT (C::*fun_ptr)(Arg1)) {
-    return internal::mem_fun_encapsulator<RT, C, boost::tuple<Arg1>,1> (c,fun_ptr);
-  }
-
-                                   /**
-                                    * Overload of the spawn function for
-                                    * const member functions with 1
-                                    * argument.
-                                    */
-  template <typename RT, typename C, typename Arg1>
-  inline
-  internal::mem_fun_encapsulator<RT,const C,boost::tuple<Arg1>,1>
-  spawn (const C &c, RT (C::*fun_ptr)(Arg1) const) {
-    return internal::mem_fun_encapsulator<RT, const C, boost::tuple<Arg1>,1> (c,fun_ptr);
-  }
-
-
-
-
-// ----------- encapsulators for binary member functions
-
-  namespace internal
-  {
-                                     /**
-				      * @internal
-                                      * Encapsulator class for member
-                                      * functions with 2 arguments.
-                                      */
-    template <typename RT, typename C, typename ArgList>
-    class mem_fun_encapsulator<RT, C, ArgList, 2>
-    {
-        typedef typename internal::mem_fun_ptr<RT,C,ArgList>::type MemFunPtr;      
-
-      public:
-        inline mem_fun_encapsulator (C &c, MemFunPtr mem_fun_ptr)
-                        : c (c), mem_fun_ptr(mem_fun_ptr) {}
-
-        inline
-        Thread<RT>
-        operator() (typename boost::tuples::element<0,ArgList>::type arg1,
-                    typename boost::tuples::element<1,ArgList>::type arg2) {
-          return mem_fun_wrapper<RT,C,ArgList> (mem_fun_ptr, c,
-                                                boost::tie(arg1,
-                                                           arg2)).fire_up ();
-        }
-    
-      private:
-        C         &c;
-        MemFunPtr  mem_fun_ptr;
-    };
-  
-  }
-
-                                   /**
-                                    * Overload of the non-const spawn
-                                    * function for member functions with
-                                    * 2 arguments.
-                                    */
-  template <typename RT, typename C, typename Arg1, typename Arg2>
-  inline
-  internal::mem_fun_encapsulator<RT,C,boost::tuple<Arg1, Arg2>,2>
-  spawn (C &c, RT (C::*fun_ptr)(Arg1,Arg2)) {
-    return internal::mem_fun_encapsulator<RT, C, boost::tuple<Arg1, Arg2>,2> (c,fun_ptr);
-  }
-
-                                   /**
-                                    * Overload of the spawn function for
-                                    * const member functions with 2
-                                    * arguments.
-                                    */
-  template <typename RT, typename C, typename Arg1, typename Arg2>
-  inline
-  internal::mem_fun_encapsulator<RT,const C,boost::tuple<Arg1, Arg2>,2>
-  spawn (const C &c, RT (C::*fun_ptr)(Arg1,Arg2) const) {
-    return internal::mem_fun_encapsulator<RT, const C, boost::tuple<Arg1, Arg2>,2> (c,fun_ptr);
-  }
-
-
-
-// ----------- encapsulators for ternary member functions
-
-  namespace internal
-  {
-                                     /**
-				      * @internal
-                                      * Encapsulator class for member
-                                      * functions with 3 arguments.
-                                      */
-    template <typename RT, typename C, typename ArgList>
-    class mem_fun_encapsulator<RT, C, ArgList, 3>
-    {
-        typedef typename internal::mem_fun_ptr<RT,C,ArgList>::type MemFunPtr;      
-
-      public:
-        inline mem_fun_encapsulator (C &c, MemFunPtr mem_fun_ptr)
-                        : c (c), mem_fun_ptr(mem_fun_ptr) {}
-
-        inline
-        Thread<RT>
-        operator() (typename boost::tuples::element<0,ArgList>::type arg1,
-                    typename boost::tuples::element<1,ArgList>::type arg2,
-                    typename boost::tuples::element<2,ArgList>::type arg3) {
-          return mem_fun_wrapper<RT,C,ArgList> (mem_fun_ptr, c,
-                                                boost::tie(arg1,
-                                                           arg2,
-                                                           arg3)).fire_up ();
-        }
-    
-      private:
-        C         &c;
-        MemFunPtr  mem_fun_ptr;
-    };
-  
-  }
-
-                                   /**
-                                    * Overload of the non-const spawn
-                                    * function for member functions with
-                                    * 3 arguments.
-                                    */
-  template <typename RT, typename C,
-            typename Arg1, typename Arg2, typename Arg3>
-  inline
-  internal::mem_fun_encapsulator<RT,C,boost::tuple<Arg1, Arg2, Arg3>,3>
-  spawn (C &c, RT (C::*fun_ptr)(Arg1,Arg2,Arg3)) {
-    return internal::mem_fun_encapsulator<RT, C,
-      boost::tuple<Arg1, Arg2, Arg3>,3> (c,fun_ptr);
-  }
-
-                                   /**
-                                    * Overload of the spawn function for
-                                    * const member functions with 3
-                                    * arguments.
-                                    */
-  template <typename RT, typename C,
-            typename Arg1, typename Arg2, typename Arg3>
-  inline
-  internal::mem_fun_encapsulator<RT,const C,boost::tuple<Arg1, Arg2, Arg3>,3>
-  spawn (const C &c, RT (C::*fun_ptr)(Arg1,Arg2,Arg3) const) {
-    return internal::mem_fun_encapsulator<RT, const C,
-      boost::tuple<Arg1, Arg2, Arg3>,3> (c,fun_ptr);
-  }
-
-
-
-
-// ----------- encapsulators for member functions with 4 arguments
-
-  namespace internal
-  {
-                                     /**
-				      * @internal
-                                      * Encapsulator class for member
-                                      * functions with 4 arguments.
-                                      */
-    template <typename RT, typename C, typename ArgList>
-    class mem_fun_encapsulator<RT, C, ArgList, 4>
-    {
-        typedef typename internal::mem_fun_ptr<RT,C,ArgList>::type MemFunPtr;      
-
-      public:
-        inline mem_fun_encapsulator (C &c, MemFunPtr mem_fun_ptr)
-                        : c (c), mem_fun_ptr(mem_fun_ptr) {}
-
-        inline
-        Thread<RT>
-        operator() (typename boost::tuples::element<0,ArgList>::type arg1,
-                    typename boost::tuples::element<1,ArgList>::type arg2,
-                    typename boost::tuples::element<2,ArgList>::type arg3,
-                    typename boost::tuples::element<3,ArgList>::type arg4) {
-          return mem_fun_wrapper<RT,C,ArgList> (mem_fun_ptr, c,
-                                                boost::tie(arg1,arg2,
-                                                           arg3,arg4)).fire_up ();
-        }
-    
-      private:
-        C         &c;
-        MemFunPtr  mem_fun_ptr;
-    };
-  
-  }
-
-                                   /**
-                                    * Overload of the non-const spawn
-                                    * function for member functions with
-                                    * 4 arguments.
-                                    */
-  template <typename RT, typename C,
-            typename Arg1, typename Arg2, typename Arg3, typename Arg4>
-  inline
-  internal::mem_fun_encapsulator<RT,C,boost::tuple<Arg1, Arg2, Arg3, Arg4>,4>
-  spawn (C &c, RT (C::*fun_ptr)(Arg1,Arg2,Arg3,Arg4)) {
-    return internal::mem_fun_encapsulator<RT, C,
-      boost::tuple<Arg1, Arg2, Arg3, Arg4>,4> (c,fun_ptr);
-  }
-
-                                   /**
-                                    * Overload of the spawn function for
-                                    * const member functions with 4
-                                    * arguments.
-                                    */
-  template <typename RT, typename C,
-            typename Arg1, typename Arg2, typename Arg3, typename Arg4>
-  inline
-  internal::mem_fun_encapsulator<RT,const C,boost::tuple<Arg1, Arg2, Arg3, Arg4>,4>
-  spawn (const C &c, RT (C::*fun_ptr)(Arg1,Arg2,Arg3,Arg4) const) {
-    return internal::mem_fun_encapsulator<RT, const C,
-      boost::tuple<Arg1, Arg2, Arg3, Arg4>,4> (c,fun_ptr);
-  }
-
-
-
-
-// ----------- encapsulators for member functions with 5 arguments
-
-  namespace internal
-  {
-                                     /**
-				      * @internal
-                                      * Encapsulator class for member
-                                      * functions with 5 arguments.
-                                      */
-    template <typename RT, typename C, typename ArgList>
-    class mem_fun_encapsulator<RT, C, ArgList, 5>
-    {
-        typedef typename internal::mem_fun_ptr<RT,C,ArgList>::type MemFunPtr;      
-
-      public:
-        inline mem_fun_encapsulator (C &c, MemFunPtr mem_fun_ptr)
-                        : c (c), mem_fun_ptr(mem_fun_ptr) {}
-
-        inline
-        Thread<RT>
-        operator() (typename boost::tuples::element<0,ArgList>::type arg1,
-                    typename boost::tuples::element<1,ArgList>::type arg2,
-                    typename boost::tuples::element<2,ArgList>::type arg3,
-                    typename boost::tuples::element<3,ArgList>::type arg4,
-                    typename boost::tuples::element<4,ArgList>::type arg5) {
-          return mem_fun_wrapper<RT,C,ArgList> (mem_fun_ptr, c,
-                                                boost::tie(arg1,arg2,
-                                                           arg3,arg4,
-                                                           arg5)).fire_up ();
-        }
-    
-      private:
-        C         &c;
-        MemFunPtr  mem_fun_ptr;
-    };
-  
-  }
-
-                                   /**
-                                    * Overload of the non-const spawn
-                                    * function for member functions with
-                                    * 5 arguments.
-                                    */
-  template <typename RT, typename C,
-            typename Arg1, typename Arg2, typename Arg3,
-            typename Arg4, typename Arg5>
-  inline
-  internal::mem_fun_encapsulator<RT,C,boost::tuple<Arg1, Arg2, Arg3, Arg4, Arg5>,5>
-  spawn (C &c, RT (C::*fun_ptr)(Arg1,Arg2,Arg3,Arg4,Arg5)) {
-    return internal::mem_fun_encapsulator<RT, C,
-      boost::tuple<Arg1, Arg2, Arg3,
-      Arg4, Arg5>,5> (c,fun_ptr);
-  }
-
-                                   /**
-                                    * Overload of the spawn function for
-                                    * const member functions with 5
-                                    * arguments.
-                                    */
-  template <typename RT, typename C,
-            typename Arg1, typename Arg2, typename Arg3,
-            typename Arg4, typename Arg5>
-  inline
-  internal::mem_fun_encapsulator<RT,const C,boost::tuple<Arg1, Arg2, Arg3, Arg4, Arg5>,5>
-  spawn (const C &c, RT (C::*fun_ptr)(Arg1,Arg2,Arg3,Arg4,Arg5) const) {
-    return internal::mem_fun_encapsulator<RT, const C,
-      boost::tuple<Arg1, Arg2, Arg3,
-      Arg4, Arg5>,5> (c,fun_ptr);
-  }
-
-
-// ----------- encapsulators for member functions with 6 arguments
-
-  namespace internal
-  {
-                                     /**
-				      * @internal
-                                      * Encapsulator class for member
-                                      * functions with 6 arguments.
-                                      */
-    template <typename RT, typename C, typename ArgList>
-    class mem_fun_encapsulator<RT, C, ArgList, 6>
-    {
-        typedef typename internal::mem_fun_ptr<RT,C,ArgList>::type MemFunPtr;      
-
-      public:
-        inline mem_fun_encapsulator (C &c, MemFunPtr mem_fun_ptr)
-                        : c (c), mem_fun_ptr(mem_fun_ptr) {}
-
-        inline
-        Thread<RT>
-        operator() (typename boost::tuples::element<0,ArgList>::type arg1,
-                    typename boost::tuples::element<1,ArgList>::type arg2,
-                    typename boost::tuples::element<2,ArgList>::type arg3,
-                    typename boost::tuples::element<3,ArgList>::type arg4,
-                    typename boost::tuples::element<4,ArgList>::type arg5,
-                    typename boost::tuples::element<5,ArgList>::type arg6) {
-          return mem_fun_wrapper<RT,C,ArgList> (mem_fun_ptr, c,
-                                                boost::tie(arg1,arg2,
-                                                           arg3,arg4,
-                                                           arg5,arg6)).fire_up ();
-        }
-    
-      private:
-        C         &c;
-        MemFunPtr  mem_fun_ptr;
-    };
-  
-  }
-
-                                   /**
-                                    * Overload of the non-const spawn
-                                    * function for member functions with
-                                    * 6 arguments.
-                                    */
-  template <typename RT, typename C,
-            typename Arg1, typename Arg2, typename Arg3,
-            typename Arg4, typename Arg5, typename Arg6>
-  inline
-  internal::mem_fun_encapsulator<RT,C,boost::tuple<Arg1, Arg2, Arg3, Arg4, Arg5, Arg6>,6>
-  spawn (C &c, RT (C::*fun_ptr)(Arg1,Arg2,Arg3,Arg4,Arg5,Arg6)) {
-    return internal::mem_fun_encapsulator<RT, C,
-      boost::tuple<Arg1, Arg2, Arg3,
-      Arg4, Arg5, Arg6>,6> (c,fun_ptr);
-  }
-
-                                   /**
-                                    * Overload of the spawn function for
-                                    * const member functions with 6
-                                    * arguments.
-                                    */
-  template <typename RT, typename C,
-            typename Arg1, typename Arg2, typename Arg3,
-            typename Arg4, typename Arg5, typename Arg6>
-  inline
-  internal::mem_fun_encapsulator<RT,const C,
-                               boost::tuple<Arg1, Arg2, Arg3, Arg4, Arg5, Arg6>,6>
-  spawn (const C &c, RT (C::*fun_ptr)(Arg1,Arg2,Arg3,Arg4,Arg5,Arg6) const) {
-    return internal::mem_fun_encapsulator<RT, const C,
-      boost::tuple<Arg1, Arg2, Arg3,
-      Arg4, Arg5, Arg6>,6> (c,fun_ptr);
-  }
-
-
-// ----------- encapsulators for member functions with 7 arguments
-
-  namespace internal
-  {
-                                     /**
-				      * @internal
-                                      * Encapsulator class for member
-                                      * functions with 7 arguments.
-                                      */
-    template <typename RT, typename C, typename ArgList>
-    class mem_fun_encapsulator<RT, C, ArgList, 7>
-    {
-        typedef typename internal::mem_fun_ptr<RT,C,ArgList>::type MemFunPtr;      
-
-      public:
-        inline mem_fun_encapsulator (C &c, MemFunPtr mem_fun_ptr)
-                        : c (c), mem_fun_ptr(mem_fun_ptr) {}
-
-        inline
-        Thread<RT>
-        operator() (typename boost::tuples::element<0,ArgList>::type arg1,
-                    typename boost::tuples::element<1,ArgList>::type arg2,
-                    typename boost::tuples::element<2,ArgList>::type arg3,
-                    typename boost::tuples::element<3,ArgList>::type arg4,
-                    typename boost::tuples::element<4,ArgList>::type arg5,
-                    typename boost::tuples::element<5,ArgList>::type arg6,
-                    typename boost::tuples::element<6,ArgList>::type arg7) {
-          return mem_fun_wrapper<RT,C,ArgList> (mem_fun_ptr, c,
-                                                boost::tie(arg1,arg2,
-                                                           arg3,arg4,
-                                                           arg5,arg6,
-                                                           arg7)).fire_up ();
-        }
-    
-      private:
-        C         &c;
-        MemFunPtr  mem_fun_ptr;
-    };
-  
-  }
-
-                                   /**
-                                    * Overload of the non-const spawn
-                                    * function for member functions with
-                                    * 7 arguments.
-                                    */
-  template <typename RT, typename C,
-            typename Arg1, typename Arg2, typename Arg3,
-            typename Arg4, typename Arg5, typename Arg6,
-            typename Arg7>
-  inline
-  internal::mem_fun_encapsulator<RT,C,boost::tuple<Arg1, Arg2, Arg3,
-                                                 Arg4, Arg5, Arg6, Arg7>,7>
-  spawn (C &c, RT (C::*fun_ptr)(Arg1,Arg2,Arg3,Arg4,Arg5,Arg6,Arg7)) {
-    return internal::mem_fun_encapsulator<RT, C,
-      boost::tuple<Arg1, Arg2, Arg3,
-      Arg4, Arg5, Arg6,
-      Arg7>,7> (c,fun_ptr);
-  }
-
-                                   /**
-                                    * Overload of the spawn function for
-                                    * const member functions with 7
-                                    * arguments.
-                                    */
-  template <typename RT, typename C,
-            typename Arg1, typename Arg2, typename Arg3,
-            typename Arg4, typename Arg5, typename Arg6,
-            typename Arg7>
-  inline
-  internal::mem_fun_encapsulator<RT,const C,
-                               boost::tuple<Arg1, Arg2, Arg3,
-                                            Arg4, Arg5, Arg6, Arg7>,7>
-  spawn (const C &c, RT (C::*fun_ptr)(Arg1,Arg2,Arg3,Arg4,Arg5,Arg6,Arg7) const) {
-    return internal::mem_fun_encapsulator<RT, const C,
-      boost::tuple<Arg1, Arg2, Arg3,
-      Arg4, Arg5, Arg6,
-      Arg7>,7> (c,fun_ptr);
-  }
-
-
-// ----------- encapsulators for member functions with 8 arguments
-
-  namespace internal
-  {
-                                     /**
-				      * @internal
-                                      * Encapsulator class for member
-                                      * functions with 8 arguments.
-                                      */
-    template <typename RT, typename C, typename ArgList>
-    class mem_fun_encapsulator<RT, C, ArgList, 8>
-    {
-        typedef typename internal::mem_fun_ptr<RT,C,ArgList>::type MemFunPtr;      
-
-      public:
-        inline mem_fun_encapsulator (C &c, MemFunPtr mem_fun_ptr)
-                        : c (c), mem_fun_ptr(mem_fun_ptr) {}
-
-        inline
-        Thread<RT>
-        operator() (typename boost::tuples::element<0,ArgList>::type arg1,
-                    typename boost::tuples::element<1,ArgList>::type arg2,
-                    typename boost::tuples::element<2,ArgList>::type arg3,
-                    typename boost::tuples::element<3,ArgList>::type arg4,
-                    typename boost::tuples::element<4,ArgList>::type arg5,
-                    typename boost::tuples::element<5,ArgList>::type arg6,
-                    typename boost::tuples::element<6,ArgList>::type arg7,
-                    typename boost::tuples::element<7,ArgList>::type arg8) {
-          return mem_fun_wrapper<RT,C,ArgList> (mem_fun_ptr, c,
-                                                boost::tie(arg1,arg2,
-                                                           arg3,arg4,
-                                                           arg5,arg6,
-                                                           arg7,arg8)).fire_up ();
-        }
-    
-      private:
-        C         &c;
-        MemFunPtr  mem_fun_ptr;
-    };
-  
-  }
-
-                                   /**
-                                    * Overload of the non-const spawn
-                                    * function for member functions with
-                                    * 8 arguments.
-                                    */
-  template <typename RT, typename C,
-            typename Arg1, typename Arg2, typename Arg3,
-            typename Arg4, typename Arg5, typename Arg6,
-            typename Arg7, typename Arg8>
-  inline
-  internal::mem_fun_encapsulator<RT,C,boost::tuple<Arg1, Arg2, Arg3,
-                                                 Arg4, Arg5, Arg6,
-                                                 Arg7, Arg8>,8>
-  spawn (C &c, RT (C::*fun_ptr)(Arg1,Arg2,Arg3,Arg4,Arg5,
-                                Arg6,Arg7,Arg8)) {
-    return internal::mem_fun_encapsulator<RT, C,
-      boost::tuple<Arg1, Arg2, Arg3,
-      Arg4, Arg5, Arg6,
-      Arg7, Arg8>,8> (c,fun_ptr);
-  }
-
-                                   /**
-                                    * Overload of the spawn function for
-                                    * const member functions with 8
-                                    * arguments.
-                                    */
-  template <typename RT, typename C,
-            typename Arg1, typename Arg2, typename Arg3,
-            typename Arg4, typename Arg5, typename Arg6,
-            typename Arg7, typename Arg8>
-  inline
-  internal::mem_fun_encapsulator<RT,const C,
-                               boost::tuple<Arg1, Arg2, Arg3,
-                                            Arg4, Arg5, Arg6,
-                                            Arg7, Arg8>,8>
-  spawn (const C &c, RT (C::*fun_ptr)(Arg1,Arg2,Arg3,Arg4,Arg5,
-                                      Arg6,Arg7,Arg8) const) {
-    return internal::mem_fun_encapsulator<RT, const C,
-      boost::tuple<Arg1, Arg2, Arg3,
-      Arg4, Arg5, Arg6,
-      Arg7, Arg8>,8> (c,fun_ptr);
-  }
-
-
-// ----------- encapsulators for member functions with 9 arguments
-
-  namespace internal
-  {
-                                     /**
-				      * @internal
-                                      * Encapsulator class for member
-                                      * functions with 9 arguments.
-                                      */
-    template <typename RT, typename C, typename ArgList>
-    class mem_fun_encapsulator<RT, C, ArgList, 9>
-    {
-        typedef typename internal::mem_fun_ptr<RT,C,ArgList>::type MemFunPtr;      
-
-      public:
-        inline mem_fun_encapsulator (C &c, MemFunPtr mem_fun_ptr)
-                        : c (c), mem_fun_ptr(mem_fun_ptr) {}
-
-        inline
-        Thread<RT>
-        operator() (typename boost::tuples::element<0,ArgList>::type arg1,
-                    typename boost::tuples::element<1,ArgList>::type arg2,
-                    typename boost::tuples::element<2,ArgList>::type arg3,
-                    typename boost::tuples::element<3,ArgList>::type arg4,
-                    typename boost::tuples::element<4,ArgList>::type arg5,
-                    typename boost::tuples::element<5,ArgList>::type arg6,
-                    typename boost::tuples::element<6,ArgList>::type arg7,
-                    typename boost::tuples::element<7,ArgList>::type arg8,
-                    typename boost::tuples::element<8,ArgList>::type arg9) {
-          return mem_fun_wrapper<RT,C,ArgList> (mem_fun_ptr, c,
-                                                boost::tie(arg1,arg2,
-                                                           arg3,arg4,
-                                                           arg5,arg6,
-                                                           arg7,arg8,
-                                                           arg9)).fire_up ();
-        }
-    
-      private:
-        C         &c;
-        MemFunPtr  mem_fun_ptr;
-    };
-  
-  }
-
-                                   /**
-                                    * Overload of the non-const spawn
-                                    * function for member functions with
-                                    * 9 arguments.
-                                    */
-  template <typename RT, typename C,
-            typename Arg1, typename Arg2, typename Arg3,
-            typename Arg4, typename Arg5, typename Arg6,
-            typename Arg7, typename Arg8, typename Arg9>
-  inline
-  internal::mem_fun_encapsulator<RT,C,boost::tuple<Arg1, Arg2, Arg3,
-                                                 Arg4, Arg5, Arg6,
-                                                 Arg7, Arg8, Arg9>,9>
-  spawn (C &c, RT (C::*fun_ptr)(Arg1,Arg2,Arg3,Arg4,Arg5,
-                                Arg6,Arg7,Arg8,Arg9)) {
-    return internal::mem_fun_encapsulator<RT, C,
-      boost::tuple<Arg1, Arg2, Arg3,
-      Arg4, Arg5, Arg6,
-      Arg7, Arg8, Arg9>,9> (c,fun_ptr);
-  }
-
-                                   /**
-                                    * Overload of the spawn function for
-                                    * const member functions with 9
-                                    * arguments.
-                                    */
-  template <typename RT, typename C,
-            typename Arg1, typename Arg2, typename Arg3,
-            typename Arg4, typename Arg5, typename Arg6,
-            typename Arg7, typename Arg8, typename Arg9>
-  inline
-  internal::mem_fun_encapsulator<RT,const C,
-                               boost::tuple<Arg1, Arg2, Arg3,
-                                            Arg4, Arg5, Arg6,
-                                            Arg7, Arg8, Arg9>,9>
-  spawn (const C &c, RT (C::*fun_ptr)(Arg1,Arg2,Arg3,Arg4,Arg5,
-                                      Arg6,Arg7,Arg8,Arg9) const) {
-    return internal::mem_fun_encapsulator<RT, const C,
-      boost::tuple<Arg1, Arg2, Arg3,
-      Arg4, Arg5, Arg6,
-      Arg7, Arg8, Arg9>,9> (c,fun_ptr);
-  }
-
-
-// ----------- encapsulators for member functions with 10 arguments
-
-  namespace internal
-  {
-                                     /**
-				      * @internal
-                                      * Encapsulator class for member
-                                      * functions with 10 arguments.
-                                      */
-    template <typename RT, typename C, typename ArgList>
-    class mem_fun_encapsulator<RT, C, ArgList, 10>
-    {
-        typedef typename internal::mem_fun_ptr<RT,C,ArgList>::type MemFunPtr;      
-
-      public:
-        inline mem_fun_encapsulator (C &c, MemFunPtr mem_fun_ptr)
-                        : c (c), mem_fun_ptr(mem_fun_ptr) {}
-
-        inline
-        Thread<RT>
-        operator() (typename boost::tuples::element<0,ArgList>::type arg1,
-                    typename boost::tuples::element<1,ArgList>::type arg2,
-                    typename boost::tuples::element<2,ArgList>::type arg3,
-                    typename boost::tuples::element<3,ArgList>::type arg4,
-                    typename boost::tuples::element<4,ArgList>::type arg5,
-                    typename boost::tuples::element<5,ArgList>::type arg6,
-                    typename boost::tuples::element<6,ArgList>::type arg7,
-                    typename boost::tuples::element<7,ArgList>::type arg8,
-                    typename boost::tuples::element<8,ArgList>::type arg9,
-                    typename boost::tuples::element<9,ArgList>::type arg10) {
-          return mem_fun_wrapper<RT,C,ArgList> (mem_fun_ptr, c,
-                                                boost::tie(arg1,arg2,
-                                                           arg3,arg4,
-                                                           arg5,arg6,
-                                                           arg7,arg8,
-                                                           arg9, arg10)).fire_up ();
-        }
-    
-      private:
-        C         &c;
-        MemFunPtr  mem_fun_ptr;
-    };
-  
-  }
-
-                                   /**
-                                    * Overload of the non-const spawn
-                                    * function for member functions with
-                                    * 10 arguments.
-                                    */
-  template <typename RT, typename C,
-            typename Arg1, typename Arg2, typename Arg3,
-            typename Arg4, typename Arg5, typename Arg6,
-            typename Arg7, typename Arg8, typename Arg9,
-            typename Arg10>
-  inline
-  internal::mem_fun_encapsulator<RT,C,boost::tuple<Arg1, Arg2, Arg3,
-                                                 Arg4, Arg5, Arg6,
-                                                 Arg7, Arg8, Arg9, Arg10>,10>
-  spawn (C &c, RT (C::*fun_ptr)(Arg1,Arg2,Arg3,Arg4,Arg5,
-                                Arg6,Arg7,Arg8,Arg9,Arg10)) {
-    return internal::mem_fun_encapsulator<RT, C,
-      boost::tuple<Arg1, Arg2, Arg3,
-      Arg4, Arg5, Arg6,
-      Arg7, Arg8, Arg9,
-      Arg10>,10> (c,fun_ptr);
-  }
-
-                                   /**
-                                    * Overload of the spawn function for
-                                    * const member functions with 10
-                                    * arguments.
-                                    */
-  template <typename RT, typename C,
-            typename Arg1, typename Arg2, typename Arg3,
-            typename Arg4, typename Arg5, typename Arg6,
-            typename Arg7, typename Arg8, typename Arg9,
-            typename Arg10>
-  inline
-  internal::mem_fun_encapsulator<RT,const C,
-                               boost::tuple<Arg1, Arg2, Arg3,
-                                            Arg4, Arg5, Arg6,
-                                            Arg7, Arg8, Arg9, Arg10>,10>
-  spawn (const C &c, RT (C::*fun_ptr)(Arg1,Arg2,Arg3,Arg4,Arg5,
-                                      Arg6,Arg7,Arg8,Arg9,Arg10) const) {
-    return internal::mem_fun_encapsulator<RT, const C,
-      boost::tuple<Arg1, Arg2, Arg3,
-      Arg4, Arg5, Arg6,
-      Arg7, Arg8, Arg9,
-      Arg10>,10> (c,fun_ptr);
-  }
-
-
-
-// ----------- encapsulators for functions not taking any parameters
-
-  namespace internal
-  {
-                                     /**
-				      * @internal
-                                      * Encapsulator class for
-                                      * functions with no arguments.
-                                      */
-    template <typename RT, typename ArgList>
-    class fun_encapsulator<RT, ArgList, 0>
-    {
-        typedef typename internal::fun_ptr<RT,ArgList>::type FunPtr;      
-
-      public:
-        inline fun_encapsulator (FunPtr fun_ptr)
-                        : fun_ptr(fun_ptr) {}
-
-        inline
-        Thread<RT>
-        operator() () {
-          return fun_wrapper<RT,ArgList> (fun_ptr,
-                                          ArgList()).fire_up ();
-        }
-    
-      private:
-        FunPtr  fun_ptr;
-    };
-  
-  }
- 
-                                   /**
-                                    * Overload of the spawn function for
-                                    * non-member or static member
-                                    * functions with no arguments.
-                                    */
-  template <typename RT>
-  inline
   internal::fun_encapsulator<RT,boost::tuple<>,0>
-  spawn (RT (*fun_ptr)()) {
-    return internal::fun_encapsulator<RT, boost::tuple<>,0> (fun_ptr);
+  spawn (const C &c, RT (C::*fun_ptr)() const)
+  {
+    return
+      boost::function<typename internal::fun_ptr<RT,boost::tuple<> >::type>
+      (boost::bind(fun_ptr, boost::cref(c)));
   }
-
+  
 
 
 
 // ----------- encapsulators for unary functions
 
-  namespace internal
-  {
-                                     /**
-				      * @internal
-                                      * Encapsulator class for
-                                      * functions with 1 argument.
-                                      */
-    template <typename RT, typename ArgList>
-    class fun_encapsulator<RT, ArgList, 1>
-    {
-        typedef typename internal::fun_ptr<RT,ArgList>::type FunPtr;      
-
-      public:
-        inline fun_encapsulator (FunPtr fun_ptr)
-                        : fun_ptr(fun_ptr) {}
-
-        inline
-        Thread<RT>
-        operator() (typename boost::tuples::element<0,ArgList>::type arg1) {
-          return fun_wrapper<RT,ArgList> (fun_ptr,
-                                          boost::tie(arg1)).fire_up ();
-        }
-    
-      private:
-        FunPtr  fun_ptr;
-    };
-  
-  }
- 
                                    /**
                                     * Overload of the spawn function for
                                     * non-member or static member
@@ -4450,44 +2097,45 @@ namespace Threads
   template <typename RT, typename Arg1>
   inline
   internal::fun_encapsulator<RT,boost::tuple<Arg1>,1>
-  spawn (RT (*fun_ptr)(Arg1)) {
-    return internal::fun_encapsulator<RT, boost::tuple<Arg1>,1> (fun_ptr);
+  spawn (RT (*fun_ptr)(Arg1))
+  {
+    return fun_ptr;
   }
 
 
+
+				   /**
+				    * Overload of the non-const spawn
+				    * function for member functions with
+				    * 1 argument.
+				    */
+  template <typename RT, typename C, typename Arg1>
+  inline
+  internal::fun_encapsulator<RT,boost::tuple<Arg1>,1>
+  spawn (C &c, RT (C::*fun_ptr)(Arg1))
+  {
+    return
+      boost::function<typename internal::fun_ptr<RT,boost::tuple<Arg1> >::type>
+      (boost::bind(fun_ptr, boost::ref(c), _1));
+  }
+
+				   /**
+				    * Overload of the spawn function for
+				    * const member functions with 1
+				    * argument.
+				    */
+  template <typename RT, typename C, typename Arg1>
+  inline
+  internal::fun_encapsulator<RT,boost::tuple<Arg1>,1>
+  spawn (const C &c, RT (C::*fun_ptr)(Arg1) const)
+  {
+    return
+      boost::function<typename internal::fun_ptr<RT,boost::tuple<Arg1> >::type>
+      (boost::bind(fun_ptr, boost::cref(c), _1));
+  }
 
 
 // ----------- encapsulators for binary functions
-
-  namespace internal
-  {
-                                     /**
-                                      * Encapsulator class for
-                                      * functions with 2 arguments.
-                                      */
-    template <typename RT, typename ArgList>
-    class fun_encapsulator<RT, ArgList, 2>
-    {
-        typedef typename internal::fun_ptr<RT,ArgList>::type FunPtr;      
-
-      public:
-        inline fun_encapsulator (FunPtr fun_ptr)
-                        : fun_ptr(fun_ptr) {}
-
-        inline
-        Thread<RT>
-        operator() (typename boost::tuples::element<0,ArgList>::type arg1,
-                    typename boost::tuples::element<1,ArgList>::type arg2) {
-          return fun_wrapper<RT,ArgList> (fun_ptr,
-                                          boost::tie(arg1,
-                                                     arg2)).fire_up ();
-        }
-    
-      private:
-        FunPtr  fun_ptr;
-    };
-  
-  }
 
                                    /**
                                     * Overload of the spawn function for
@@ -4497,45 +2145,45 @@ namespace Threads
   template <typename RT, typename Arg1, typename Arg2>
   inline
   internal::fun_encapsulator<RT,boost::tuple<Arg1, Arg2>,2>
-  spawn (RT (*fun_ptr)(Arg1,Arg2)) {
-    return internal::fun_encapsulator<RT, boost::tuple<Arg1, Arg2>,2> (fun_ptr);
+  spawn (RT (*fun_ptr)(Arg1,Arg2))
+  {
+    return fun_ptr;
   }
 
+
+
+				   /**
+				    * Overload of the non-const spawn
+				    * function for member functions with
+				    * 2 arguments.
+				    */
+  template <typename RT, typename C, typename Arg1, typename Arg2>
+  inline
+  internal::fun_encapsulator<RT,boost::tuple<Arg1, Arg2>,2>
+  spawn (C &c, RT (C::*fun_ptr)(Arg1,Arg2))
+  {
+    return
+      boost::function<typename internal::fun_ptr<RT,boost::tuple<Arg1,Arg2> >::type>
+      (boost::bind(fun_ptr, boost::ref(c), _1, _2));
+  }
+
+				   /**
+				    * Overload of the spawn function for
+				    * const member functions with 2
+				    * arguments.
+				    */
+  template <typename RT, typename C, typename Arg1, typename Arg2>
+  inline
+  internal::fun_encapsulator<RT,boost::tuple<Arg1, Arg2>,2>
+  spawn (const C &c, RT (C::*fun_ptr)(Arg1,Arg2) const)
+  {
+    return
+      boost::function<typename internal::fun_ptr<RT,boost::tuple<Arg1,Arg2> >::type>
+      (boost::bind(fun_ptr, boost::cref(c), _1, _2));
+  }  
 
 
 // ----------- encapsulators for ternary functions
-
-  namespace internal
-  {
-                                     /**
-                                      * Encapsulator class for
-                                      * functions with 3 arguments.
-                                      */
-    template <typename RT, typename ArgList>
-    class fun_encapsulator<RT, ArgList, 3>
-    {
-        typedef typename internal::fun_ptr<RT,ArgList>::type FunPtr;      
-
-      public:
-        inline fun_encapsulator (FunPtr fun_ptr)
-                        : fun_ptr(fun_ptr) {}
-
-        inline
-        Thread<RT>
-        operator() (typename boost::tuples::element<0,ArgList>::type arg1,
-                    typename boost::tuples::element<1,ArgList>::type arg2,
-                    typename boost::tuples::element<2,ArgList>::type arg3) {
-          return fun_wrapper<RT,ArgList> (fun_ptr,
-                                          boost::tie(arg1,
-                                                     arg2,
-                                                     arg3)).fire_up ();
-        }
-    
-      private:
-        FunPtr  fun_ptr;
-    };
-  
-  }
 
                                    /**
                                     * Overload of the spawn function for
@@ -4546,47 +2194,48 @@ namespace Threads
             typename Arg1, typename Arg2, typename Arg3>
   inline
   internal::fun_encapsulator<RT,boost::tuple<Arg1, Arg2, Arg3>,3>
-  spawn (RT (*fun_ptr)(Arg1,Arg2,Arg3)) {
-    return internal::fun_encapsulator<RT,
-      boost::tuple<Arg1, Arg2, Arg3>,3> (fun_ptr);
+  spawn (RT (*fun_ptr)(Arg1,Arg2,Arg3))
+  {
+    return fun_ptr;
   }
 
+
+
+				   /**
+				    * Overload of the non-const spawn
+				    * function for member functions with
+				    * 3 arguments.
+				    */
+  template <typename RT, typename C,
+	    typename Arg1, typename Arg2, typename Arg3>
+  inline
+  internal::fun_encapsulator<RT,boost::tuple<Arg1, Arg2, Arg3>,3>
+  spawn (C &c, RT (C::*fun_ptr)(Arg1,Arg2,Arg3))
+  {
+    return
+      boost::function<typename internal::fun_ptr<RT,boost::tuple<Arg1,Arg2,Arg3> >::type>
+      (boost::bind(fun_ptr, boost::ref(c), _1, _2, _3));
+  }
+
+				   /**
+				    * Overload of the spawn function for
+				    * const member functions with 3
+				    * arguments.
+				    */
+  template <typename RT, typename C,
+	    typename Arg1, typename Arg2, typename Arg3>
+  inline
+  internal::fun_encapsulator<RT,boost::tuple<Arg1, Arg2, Arg3>,3>
+  spawn (const C &c, RT (C::*fun_ptr)(Arg1,Arg2,Arg3) const)
+  {
+    return
+      boost::function<typename internal::fun_ptr<RT,boost::tuple<Arg1,Arg2,Arg3> >::type>
+      (boost::bind(fun_ptr, boost::cref(c), _1, _2, _3));
+  }  
 
 
 
 // ----------- encapsulators for functions with 4 arguments
-
-  namespace internal
-  {
-                                     /**
-                                      * Encapsulator class for
-                                      * functions with 4 arguments.
-                                      */
-    template <typename RT, typename ArgList>
-    class fun_encapsulator<RT, ArgList, 4>
-    {
-        typedef typename internal::fun_ptr<RT,ArgList>::type FunPtr;      
-
-      public:
-        inline fun_encapsulator (FunPtr fun_ptr)
-                        : fun_ptr(fun_ptr) {}
-
-        inline
-        Thread<RT>
-        operator() (typename boost::tuples::element<0,ArgList>::type arg1,
-                    typename boost::tuples::element<1,ArgList>::type arg2,
-                    typename boost::tuples::element<2,ArgList>::type arg3,
-                    typename boost::tuples::element<3,ArgList>::type arg4) {
-          return fun_wrapper<RT,ArgList> (fun_ptr,
-                                          boost::tie(arg1,arg2,
-                                                     arg3,arg4)).fire_up ();
-        }
-    
-      private:
-        FunPtr  fun_ptr;
-    };
-  
-  }
 
                                    /**
                                     * Overload of the spawn function for
@@ -4597,49 +2246,47 @@ namespace Threads
             typename Arg1, typename Arg2, typename Arg3, typename Arg4>
   inline
   internal::fun_encapsulator<RT,boost::tuple<Arg1, Arg2, Arg3, Arg4>,4>
-  spawn (RT (*fun_ptr)(Arg1,Arg2,Arg3,Arg4)) {
-    return internal::fun_encapsulator<RT,
-      boost::tuple<Arg1, Arg2, Arg3, Arg4>,4> (fun_ptr);
+  spawn (RT (*fun_ptr)(Arg1,Arg2,Arg3,Arg4))
+  {
+    return fun_ptr;
   }
 
 
+
+				   /**
+				    * Overload of the non-const spawn
+				    * function for member functions with
+				    * 4 arguments.
+				    */
+  template <typename RT, typename C,
+	    typename Arg1, typename Arg2, typename Arg3, typename Arg4>
+  inline
+  internal::fun_encapsulator<RT,boost::tuple<Arg1, Arg2, Arg3, Arg4>,4>
+  spawn (C &c, RT (C::*fun_ptr)(Arg1,Arg2,Arg3,Arg4))
+  {
+    return
+      boost::function<typename internal::fun_ptr<RT,boost::tuple<Arg1, Arg2, Arg3, Arg4> >::type>
+      (boost::bind(fun_ptr, boost::ref(c), _1, _2, _3, _4));
+  }
+
+				   /**
+				    * Overload of the spawn function for
+				    * const member functions with 4
+				    * arguments.
+				    */
+  template <typename RT, typename C,
+	    typename Arg1, typename Arg2, typename Arg3, typename Arg4>
+  inline
+  internal::fun_encapsulator<RT,boost::tuple<Arg1, Arg2, Arg3, Arg4>,4>
+  spawn (const C &c, RT (C::*fun_ptr)(Arg1,Arg2,Arg3,Arg4) const)
+  {
+    return
+      boost::function<typename internal::fun_ptr<RT,boost::tuple<Arg1, Arg2, Arg3, Arg4> >::type>
+      (boost::bind(fun_ptr, boost::cref(c), _1, _2, _3, _4));
+  }
 
 
 // ----------- encapsulators for functions with 5 arguments
-
-  namespace internal
-  {
-                                     /**
-                                      * Encapsulator class for
-                                      * functions with 5 arguments.
-                                      */
-    template <typename RT, typename ArgList>
-    class fun_encapsulator<RT, ArgList, 5>
-    {
-        typedef typename internal::fun_ptr<RT,ArgList>::type FunPtr;      
-
-      public:
-        inline fun_encapsulator (FunPtr fun_ptr)
-                        : fun_ptr(fun_ptr) {}
-
-        inline
-        Thread<RT>
-        operator() (typename boost::tuples::element<0,ArgList>::type arg1,
-                    typename boost::tuples::element<1,ArgList>::type arg2,
-                    typename boost::tuples::element<2,ArgList>::type arg3,
-                    typename boost::tuples::element<3,ArgList>::type arg4,
-                    typename boost::tuples::element<4,ArgList>::type arg5) {
-          return fun_wrapper<RT,ArgList> (fun_ptr,
-                                          boost::tie(arg1,arg2,
-                                                     arg3,arg4,
-                                                     arg5)).fire_up ();
-        }
-    
-      private:
-        FunPtr  fun_ptr;
-    };
-  
-  }
 
                                    /**
                                     * Overload of the spawn function for
@@ -4651,49 +2298,49 @@ namespace Threads
             typename Arg4, typename Arg5>
   inline
   internal::fun_encapsulator<RT,boost::tuple<Arg1, Arg2, Arg3, Arg4, Arg5>,5>
-  spawn (RT (*fun_ptr)(Arg1,Arg2,Arg3,Arg4,Arg5)) {
-    return internal::fun_encapsulator<RT,
-      boost::tuple<Arg1, Arg2, Arg3,
-      Arg4, Arg5>,5> (fun_ptr);
+  spawn (RT (*fun_ptr)(Arg1,Arg2,Arg3,Arg4,Arg5))
+  {
+    return fun_ptr;
   }
 
+
+
+				   /**
+				    * Overload of the non-const spawn
+				    * function for member functions with
+				    * 5 arguments.
+				    */
+  template <typename RT, typename C,
+	    typename Arg1, typename Arg2, typename Arg3,
+	    typename Arg4, typename Arg5>
+  inline
+  internal::fun_encapsulator<RT,boost::tuple<Arg1, Arg2, Arg3, Arg4, Arg5>,5>
+  spawn (C &c, RT (C::*fun_ptr)(Arg1,Arg2,Arg3,Arg4,Arg5))
+  {
+    return
+      boost::function<typename internal::fun_ptr<RT,boost::tuple<Arg1, Arg2, Arg3, Arg4, Arg5> >::type>
+      (boost::bind(fun_ptr, boost::ref(c), _1, _2, _3, _4, _5));
+  }
+
+				   /**
+				    * Overload of the spawn function for
+				    * const member functions with 5
+				    * arguments.
+				    */
+  template <typename RT, typename C,
+	    typename Arg1, typename Arg2, typename Arg3,
+	    typename Arg4, typename Arg5>
+  inline
+  internal::fun_encapsulator<RT,boost::tuple<Arg1, Arg2, Arg3, Arg4, Arg5>,5>
+  spawn (const C &c, RT (C::*fun_ptr)(Arg1,Arg2,Arg3,Arg4,Arg5) const)
+  {
+    return
+      boost::function<typename internal::fun_ptr<RT,boost::tuple<Arg1, Arg2, Arg3, Arg4, Arg5> >::type>
+      (boost::bind(fun_ptr, boost::cref(c), _1, _2, _3, _4, _5));
+  }
+  
 
 // ----------- encapsulators for functions with 6 arguments
-
-  namespace internal
-  {
-                                     /**
-                                      * Encapsulator class for
-                                      * functions with 6 arguments.
-                                      */
-    template <typename RT, typename ArgList>
-    class fun_encapsulator<RT, ArgList, 6>
-    {
-        typedef typename internal::fun_ptr<RT,ArgList>::type FunPtr;      
-
-      public:
-        inline fun_encapsulator (FunPtr fun_ptr)
-                        : fun_ptr(fun_ptr) {}
-
-        inline
-        Thread<RT>
-        operator() (typename boost::tuples::element<0,ArgList>::type arg1,
-                    typename boost::tuples::element<1,ArgList>::type arg2,
-                    typename boost::tuples::element<2,ArgList>::type arg3,
-                    typename boost::tuples::element<3,ArgList>::type arg4,
-                    typename boost::tuples::element<4,ArgList>::type arg5,
-                    typename boost::tuples::element<5,ArgList>::type arg6) {
-          return fun_wrapper<RT,ArgList> (fun_ptr,
-                                          boost::tie(arg1,arg2,
-                                                     arg3,arg4,
-                                                     arg5,arg6)).fire_up ();
-        }
-    
-      private:
-        FunPtr  fun_ptr;
-    };
-  
-  }
 
                                    /**
                                     * Overload of the spawn function for
@@ -4705,51 +2352,50 @@ namespace Threads
             typename Arg4, typename Arg5, typename Arg6>
   inline
   internal::fun_encapsulator<RT,boost::tuple<Arg1, Arg2, Arg3, Arg4, Arg5, Arg6>,6>
-  spawn (RT (*fun_ptr)(Arg1,Arg2,Arg3,Arg4,Arg5,Arg6)) {
-    return internal::fun_encapsulator<RT,
-      boost::tuple<Arg1, Arg2, Arg3,
-      Arg4, Arg5, Arg6>,6> (fun_ptr);
+  spawn (RT (*fun_ptr)(Arg1,Arg2,Arg3,Arg4,Arg5,Arg6))
+  {
+    return fun_ptr;
   }
 
+
+
+				   /**
+				    * Overload of the non-const spawn
+				    * function for member functions with
+				    * 6 arguments.
+				    */
+  template <typename RT, typename C,
+	    typename Arg1, typename Arg2, typename Arg3,
+	    typename Arg4, typename Arg5, typename Arg6>
+  inline
+  internal::fun_encapsulator<RT,boost::tuple<Arg1, Arg2, Arg3, Arg4, Arg5, Arg6>,6>
+  spawn (C &c, RT (C::*fun_ptr)(Arg1,Arg2,Arg3,Arg4,Arg5,Arg6))
+  {
+    return
+      boost::function<typename internal::fun_ptr<RT,boost::tuple<Arg1, Arg2, Arg3, Arg4, Arg5, Arg6> >::type>
+      (boost::bind(fun_ptr, boost::ref(c), _1, _2, _3, _4, _5, _6));
+  }
+
+				   /**
+				    * Overload of the spawn function for
+				    * const member functions with 6
+				    * arguments.
+				    */
+  template <typename RT, typename C,
+	    typename Arg1, typename Arg2, typename Arg3,
+	    typename Arg4, typename Arg5, typename Arg6>
+  inline
+  internal::fun_encapsulator<RT,
+			     boost::tuple<Arg1, Arg2, Arg3, Arg4, Arg5, Arg6>,6>
+  spawn (const C &c, RT (C::*fun_ptr)(Arg1,Arg2,Arg3,Arg4,Arg5,Arg6) const)
+  {
+    return
+      boost::function<typename internal::fun_ptr<RT,boost::tuple<Arg1, Arg2, Arg3, Arg4, Arg5, Arg6> >::type>
+      (boost::bind(fun_ptr, boost::cref(c), _1, _2, _3, _4, _5, _6));
+  }
+  
 
 // ----------- encapsulators for functions with 7 arguments
-
-  namespace internal
-  {
-                                     /**
-                                      * Encapsulator class for
-                                      * functions with 7 arguments.
-                                      */
-    template <typename RT, typename ArgList>
-    class fun_encapsulator<RT, ArgList, 7>
-    {
-        typedef typename internal::fun_ptr<RT,ArgList>::type FunPtr;      
-
-      public:
-        inline fun_encapsulator (FunPtr fun_ptr)
-                        : fun_ptr(fun_ptr) {}
-
-        inline
-        Thread<RT>
-        operator() (typename boost::tuples::element<0,ArgList>::type arg1,
-                    typename boost::tuples::element<1,ArgList>::type arg2,
-                    typename boost::tuples::element<2,ArgList>::type arg3,
-                    typename boost::tuples::element<3,ArgList>::type arg4,
-                    typename boost::tuples::element<4,ArgList>::type arg5,
-                    typename boost::tuples::element<5,ArgList>::type arg6,
-                    typename boost::tuples::element<6,ArgList>::type arg7) {
-          return fun_wrapper<RT,ArgList> (fun_ptr,
-                                          boost::tie(arg1,arg2,
-                                                     arg3,arg4,
-                                                     arg5,arg6,
-                                                     arg7)).fire_up ();
-        }
-    
-      private:
-        FunPtr  fun_ptr;
-    };
-  
-  }
 
                                    /**
                                     * Overload of the spawn function for
@@ -4762,54 +2408,55 @@ namespace Threads
             typename Arg7>
   inline
   internal::fun_encapsulator<RT,boost::tuple<Arg1, Arg2, Arg3,
-                                           Arg4, Arg5, Arg6, Arg7>,7>
-  spawn (RT (*fun_ptr)(Arg1,Arg2,Arg3,Arg4,Arg5,Arg6,Arg7)) {
-    return internal::fun_encapsulator<RT,
-      boost::tuple<Arg1, Arg2, Arg3,
-      Arg4, Arg5, Arg6,
-      Arg7>,7> (fun_ptr);
+					     Arg4, Arg5, Arg6, Arg7>,7>
+  spawn (RT (*fun_ptr)(Arg1,Arg2,Arg3,Arg4,Arg5,Arg6,Arg7))
+  {
+    return fun_ptr;
   }
 
+
+
+				   /**
+				    * Overload of the non-const spawn
+				    * function for member functions with
+				    * 7 arguments.
+				    */
+  template <typename RT, typename C,
+	    typename Arg1, typename Arg2, typename Arg3,
+	    typename Arg4, typename Arg5, typename Arg6,
+	    typename Arg7>
+  inline
+  internal::fun_encapsulator<RT,boost::tuple<Arg1, Arg2, Arg3,
+					     Arg4, Arg5, Arg6, Arg7>,7>
+  spawn (C &c, RT (C::*fun_ptr)(Arg1,Arg2,Arg3,Arg4,Arg5,Arg6,Arg7))
+  {
+    return
+      boost::function<typename internal::fun_ptr<RT,boost::tuple<Arg1, Arg2, Arg3, Arg4, Arg5, Arg6, Arg7> >::type>
+      (boost::bind(fun_ptr, boost::ref(c), _1, _2, _3, _4, _5, _6, _7));
+  }
+
+				   /**
+				    * Overload of the spawn function for
+				    * const member functions with 7
+				    * arguments.
+				    */
+  template <typename RT, typename C,
+	    typename Arg1, typename Arg2, typename Arg3,
+	    typename Arg4, typename Arg5, typename Arg6,
+	    typename Arg7>
+  inline
+  internal::fun_encapsulator<RT,
+			     boost::tuple<Arg1, Arg2, Arg3,
+					  Arg4, Arg5, Arg6, Arg7>,7>
+  spawn (const C &c, RT (C::*fun_ptr)(Arg1,Arg2,Arg3,Arg4,Arg5,Arg6,Arg7) const)
+  {
+    return
+      boost::function<typename internal::fun_ptr<RT,boost::tuple<Arg1, Arg2, Arg3, Arg4, Arg5, Arg6, Arg7> >::type>
+      (boost::bind(fun_ptr, boost::cref(c), _1, _2, _3, _4, _5, _6, _7));
+  }
+  
 
 // ----------- encapsulators for functions with 8 arguments
-
-  namespace internal
-  {
-                                     /**
-                                      * Encapsulator class for
-                                      * functions with 8 arguments.
-                                      */
-    template <typename RT, typename ArgList>
-    class fun_encapsulator<RT, ArgList, 8>
-    {
-        typedef typename internal::fun_ptr<RT,ArgList>::type FunPtr;      
-
-      public:
-        inline fun_encapsulator (FunPtr fun_ptr)
-                        : fun_ptr(fun_ptr) {}
-
-        inline
-        Thread<RT>
-        operator() (typename boost::tuples::element<0,ArgList>::type arg1,
-                    typename boost::tuples::element<1,ArgList>::type arg2,
-                    typename boost::tuples::element<2,ArgList>::type arg3,
-                    typename boost::tuples::element<3,ArgList>::type arg4,
-                    typename boost::tuples::element<4,ArgList>::type arg5,
-                    typename boost::tuples::element<5,ArgList>::type arg6,
-                    typename boost::tuples::element<6,ArgList>::type arg7,
-                    typename boost::tuples::element<7,ArgList>::type arg8) {
-          return fun_wrapper<RT,ArgList> (fun_ptr,
-                                          boost::tie(arg1,arg2,
-                                                     arg3,arg4,
-                                                     arg5,arg6,
-                                                     arg7,arg8)).fire_up ();
-        }
-    
-      private:
-        FunPtr  fun_ptr;
-    };
-  
-  }
 
                                    /**
                                     * Overload of the spawn function for
@@ -4822,58 +2469,61 @@ namespace Threads
             typename Arg7, typename Arg8>
   inline
   internal::fun_encapsulator<RT,boost::tuple<Arg1, Arg2, Arg3,
-                                           Arg4, Arg5, Arg6,
-                                           Arg7, Arg8>,8>
+					     Arg4, Arg5, Arg6,
+					     Arg7, Arg8>,8>
   spawn (RT (*fun_ptr)(Arg1,Arg2,Arg3,Arg4,Arg5,
-                       Arg6,Arg7,Arg8)) {
-    return internal::fun_encapsulator<RT,
-      boost::tuple<Arg1, Arg2, Arg3,
-      Arg4, Arg5, Arg6,
-      Arg7, Arg8>,8> (fun_ptr);
+                       Arg6,Arg7,Arg8))
+  {
+    return fun_ptr;
   }
 
+
+
+				   /**
+				    * Overload of the non-const spawn
+				    * function for member functions with
+				    * 8 arguments.
+				    */
+  template <typename RT, typename C,
+	    typename Arg1, typename Arg2, typename Arg3,
+	    typename Arg4, typename Arg5, typename Arg6,
+	    typename Arg7, typename Arg8>
+  inline
+  internal::fun_encapsulator<RT,boost::tuple<Arg1, Arg2, Arg3,
+					     Arg4, Arg5, Arg6,
+					     Arg7, Arg8>,8>
+  spawn (C &c, RT (C::*fun_ptr)(Arg1,Arg2,Arg3,Arg4,Arg5,
+				Arg6,Arg7,Arg8))
+  {
+    return
+      boost::function<typename internal::fun_ptr<RT,boost::tuple<Arg1, Arg2, Arg3, Arg4, Arg5, Arg6, Arg7, Arg8> >::type>
+      (boost::bind(fun_ptr, boost::ref(c), _1, _2, _3, _4, _5, _6, _7, _8));
+  }
+
+				   /**
+				    * Overload of the spawn function for
+				    * const member functions with 8
+				    * arguments.
+				    */
+  template <typename RT, typename C,
+	    typename Arg1, typename Arg2, typename Arg3,
+	    typename Arg4, typename Arg5, typename Arg6,
+	    typename Arg7, typename Arg8>
+  inline
+  internal::fun_encapsulator<RT,
+			     boost::tuple<Arg1, Arg2, Arg3,
+					  Arg4, Arg5, Arg6,
+					  Arg7, Arg8>,8>
+  spawn (const C &c, RT (C::*fun_ptr)(Arg1,Arg2,Arg3,Arg4,Arg5,
+				      Arg6,Arg7,Arg8) const)
+  {
+    return
+      boost::function<typename internal::fun_ptr<RT,boost::tuple<Arg1, Arg2, Arg3, Arg4, Arg5, Arg6, Arg7, Arg8> >::type>
+      (boost::bind(fun_ptr, boost::cref(c), _1, _2, _3, _4, _5, _6, _7, _8));
+  }
+  
 
 // ----------- encapsulators for functions with 9 arguments
-
-  namespace internal
-  {
-                                     /**
-                                      * Encapsulator class for
-                                      * functions with 9 arguments.
-                                      */
-    template <typename RT, typename ArgList>
-    class fun_encapsulator<RT, ArgList, 9>
-    {
-        typedef typename internal::fun_ptr<RT,ArgList>::type FunPtr;      
-
-      public:
-        inline fun_encapsulator (FunPtr fun_ptr)
-                        : fun_ptr(fun_ptr) {}
-
-        inline
-        Thread<RT>
-        operator() (typename boost::tuples::element<0,ArgList>::type arg1,
-                    typename boost::tuples::element<1,ArgList>::type arg2,
-                    typename boost::tuples::element<2,ArgList>::type arg3,
-                    typename boost::tuples::element<3,ArgList>::type arg4,
-                    typename boost::tuples::element<4,ArgList>::type arg5,
-                    typename boost::tuples::element<5,ArgList>::type arg6,
-                    typename boost::tuples::element<6,ArgList>::type arg7,
-                    typename boost::tuples::element<7,ArgList>::type arg8,
-                    typename boost::tuples::element<8,ArgList>::type arg9) {
-          return fun_wrapper<RT,ArgList> (fun_ptr,
-                                          boost::tie(arg1,arg2,
-                                                     arg3,arg4,
-                                                     arg5,arg6,
-                                                     arg7,arg8,
-                                                     arg9)).fire_up ();
-        }
-    
-      private:
-        FunPtr  fun_ptr;
-    };
-  
-  }
 
                                    /**
                                     * Overload of the spawn function for
@@ -4886,1775 +2536,59 @@ namespace Threads
             typename Arg7, typename Arg8, typename Arg9>
   inline
   internal::fun_encapsulator<RT,boost::tuple<Arg1, Arg2, Arg3,
-                                           Arg4, Arg5, Arg6,
-                                           Arg7, Arg8, Arg9>,9>
+					     Arg4, Arg5, Arg6,
+					     Arg7, Arg8, Arg9>,9>
   spawn (RT (*fun_ptr)(Arg1,Arg2,Arg3,Arg4,Arg5,
-                       Arg6,Arg7,Arg8,Arg9)) {
-    return internal::fun_encapsulator<RT,
-      boost::tuple<Arg1, Arg2, Arg3,
-      Arg4, Arg5, Arg6,
-      Arg7, Arg8, Arg9>,9> (fun_ptr);
-  }
-
-
-// ----------- encapsulators for functions with 10 arguments
-
-  namespace internal
+                       Arg6,Arg7,Arg8,Arg9))
   {
-                                     /**
-                                      * Encapsulator class for
-                                      * functions with 10 arguments.
-                                      */
-    template <typename RT, typename ArgList>
-    class fun_encapsulator<RT, ArgList, 10>
-    {
-        typedef typename internal::fun_ptr<RT,ArgList>::type FunPtr;      
-
-      public:
-        inline fun_encapsulator (FunPtr fun_ptr)
-                        : fun_ptr(fun_ptr) {}
-
-        inline
-        Thread<RT>
-        operator() (typename boost::tuples::element<0,ArgList>::type arg1,
-                    typename boost::tuples::element<1,ArgList>::type arg2,
-                    typename boost::tuples::element<2,ArgList>::type arg3,
-                    typename boost::tuples::element<3,ArgList>::type arg4,
-                    typename boost::tuples::element<4,ArgList>::type arg5,
-                    typename boost::tuples::element<5,ArgList>::type arg6,
-                    typename boost::tuples::element<6,ArgList>::type arg7,
-                    typename boost::tuples::element<7,ArgList>::type arg8,
-                    typename boost::tuples::element<8,ArgList>::type arg9,
-                    typename boost::tuples::element<9,ArgList>::type arg10) {
-          return fun_wrapper<RT,ArgList> (fun_ptr,
-                                          boost::tie(arg1,arg2,
-                                                     arg3,arg4,
-                                                     arg5,arg6,
-                                                     arg7,arg8,
-                                                     arg9, arg10)).fire_up ();
-        }
-    
-      private:
-        FunPtr  fun_ptr;
-    };
-  
+    return fun_ptr;
   }
 
-                                   /**
-                                    * Overload of the spawn function for
-                                    * non-member or static member
-                                    * functions with 10 arguments.
-                                    */
-  template <typename RT,
-            typename Arg1, typename Arg2, typename Arg3,
-            typename Arg4, typename Arg5, typename Arg6,
-            typename Arg7, typename Arg8, typename Arg9,
-            typename Arg10>
+
+
+				   /**
+				    * Overload of the non-const spawn
+				    * function for member functions with
+				    * 9 arguments.
+				    */
+  template <typename RT, typename C,
+	    typename Arg1, typename Arg2, typename Arg3,
+	    typename Arg4, typename Arg5, typename Arg6,
+	    typename Arg7, typename Arg8, typename Arg9>
   inline
   internal::fun_encapsulator<RT,boost::tuple<Arg1, Arg2, Arg3,
-                                           Arg4, Arg5, Arg6,
-                                           Arg7, Arg8, Arg9, Arg10>,10>
-  spawn (RT (*fun_ptr)(Arg1,Arg2,Arg3,Arg4,Arg5,
-                       Arg6,Arg7,Arg8,Arg9,Arg10)) {
-    return internal::fun_encapsulator<RT,
-      boost::tuple<Arg1, Arg2, Arg3,
-      Arg4, Arg5, Arg6,
-      Arg7, Arg8, Arg9,
-      Arg10>,10> (fun_ptr);
-  }
-
-#else  // #if (DEAL_II_USE_MT == 1)
-
-  template <typename RT = void>
-  class Thread 
-  {
-    public:
-                                       /**
-                                        * Default constructor.
-                                        */
-      Thread ()  {}
-
-                                       /**
-                                        * Initialize the return value
-                                        * of this object using the
-                                        * given member-function
-                                        * pointer, object, and
-                                        * argument list.
-                                        */
-      template <typename PFun, typename C, typename ArgRefs>
-      Thread (PFun     fun_ptr,
-              C       &obj,
-              ArgRefs  arg_refs)
-        {
-          internal::call (fun_ptr, obj, arg_refs, rv);
-        }
-
-                                       /**
-                                        * Initialize the return value
-                                        * of this object using the
-                                        * given function pointer, and
-                                        * argument list.
-                                        */
-      template <typename PFun, typename ArgRefs>
-      Thread (PFun    fun_ptr,
-              ArgRefs arg_refs)
-        {
-          internal::call (fun_ptr, arg_refs, rv);
-        }
-
-                                       /**
-                                        * Get the return value of the
-                                        * function of the
-                                        * thread.
-                                        */
-      RT return_value () const 
-        {
-          return rv.get();
-        }
-
-                                       /**
-                                        * Join this thread. Is of
-                                        * course a no-op in this of no
-                                        * thread support.
-                                        */
-      void join () const {}
-
-                                       /**
-                                        * Compare for equality of
-                                        * threads. Since thrheads are
-                                        * not supported, there can
-                                        * only be exactly one thread,
-                                        * and the result is
-                                        * <tt>true</tt>. This function
-                                        * doesn't make much sense,
-                                        * though, when threads are not
-                                        * supported.
-                                        */
-      bool operator == (const Thread &)
-        {
-          return true;
-        }
-      
-    private:
-                                       /**
-                                        * Store the return value of
-                                        * the thread function.
-                                        */
-      internal::return_value<RT> rv;
-  };
-  
-
-  namespace internal
-  {
-                                     /**
-				      * @internal
-                                      * General template declaration
-                                      * of a class that is used to
-                                      * forward arguments to
-                                      * global and static member
-                                      * functions.
-                                      *
-                                      * Although this general template
-                                      * is not implemented at all, the
-                                      * default template argument
-                                      * makes sure that whenever using
-                                      * the name of this class, the
-                                      * last template argument will be
-                                      * computed correctly from the
-                                      * previous arguments, and the
-                                      * correct specialization for
-                                      * this last template argument be
-                                      * used, even though we need to
-                                      * specify it.
-                                      */
-    template <typename RT, typename ArgList,
-              int length>
-    class fun_forwarder;
-
-                                     /**
-				      * @internal
-                                      * General template declaration
-                                      * of a class that is used to
-                                      * forward arguments to
-                                      * non-static member functions.
-                                      *
-                                      * Although this general template
-                                      * is not implemented at all, the
-                                      * default template argument
-                                      * makes sure that whenever using
-                                      * the name of this class, the
-                                      * last template argument will be
-                                      * computed correctly from the
-                                      * previous arguments, and the
-                                      * correct specialization for
-                                      * this last template argument be
-                                      * used, even though we need to
-                                      * specify it.
-                                      */
-    template <typename RT, typename C, typename ArgList,
-              int length>
-    class mem_fun_forwarder;    
-  }
-
-
-  namespace internal
-  {
-                                     /**
-				      * @internal
-                                      * Forwarder class for member
-                                      * functions with no arguments.
-                                      */
-    template <typename RT, typename C, typename ArgList>
-    class mem_fun_forwarder<RT, C, ArgList, 0>
-    {
-        typedef typename internal::mem_fun_ptr<RT,C,ArgList>::type MemFunPtr;      
-
-      public:
-        inline mem_fun_forwarder (C &c, MemFunPtr mem_fun_ptr)
-                        : c (c), mem_fun_ptr(mem_fun_ptr) {}
-
-        inline
-        Thread<RT>
-        operator() () {
-          return Thread<RT> (mem_fun_ptr, c,
-                             ArgList());
-        }
-    
-      private:
-        C         &c;
-        MemFunPtr  mem_fun_ptr;
-    };
-  
-  }
- 
-                                   /**
-                                    * Overload of the non-const spawn
-                                    * function for member functions
-                                    * with no arguments. This version of the
-				    * function is only visible if
-				    * multithreading is not enabled, but
-				    * it has the exact same interface as
-				    * if multithreading was enabled.
-                                    */
-  template <typename RT, typename C>
-  inline
-  internal::mem_fun_forwarder<RT,C,boost::tuple<>,0>
-  spawn (C &c, RT (C::*fun_ptr)()) {
-    return internal::mem_fun_forwarder<RT, C, boost::tuple<>,0> (c,fun_ptr);
-  }
-
-                                   /**
-                                    * Overload of the spawn function
-                                    * for const member functions with
-                                    * no arguments. This version of the
-				    * function is only visible if
-				    * multithreading is not enabled, but
-				    * it has the exact same interface as
-				    * if multithreading was enabled.
-                                    */
-  template <typename RT, typename C>
-  inline
-  internal::mem_fun_forwarder<RT,const C,boost::tuple<>,0>
-  spawn (const C &c, RT (C::*fun_ptr)() const) {
-    return internal::mem_fun_forwarder<RT, const C, boost::tuple<>,0> (c,fun_ptr);
-  }
-
-
-
-
-// ----------- forwarders for unary member functions
-
-  namespace internal
-  {
-                                     /**
-				      * @internal
-                                      * Forwarder class for member
-                                      * functions with 1 argument.
-                                      */
-    template <typename RT, typename C, typename ArgList>
-    class mem_fun_forwarder<RT, C, ArgList, 1>
-    {
-        typedef typename internal::mem_fun_ptr<RT,C,ArgList>::type MemFunPtr;      
-
-      public:
-        inline mem_fun_forwarder (C &c, MemFunPtr mem_fun_ptr)
-                        : c (c), mem_fun_ptr(mem_fun_ptr) {}
-
-        inline
-        Thread<RT>
-        operator() (typename boost::tuples::element<0,ArgList>::type arg1) {
-          return Thread<RT> (mem_fun_ptr, c,
-                             boost::tie(arg1));
-        }
-    
-      private:
-        C         &c;
-        MemFunPtr  mem_fun_ptr;
-    };
-  
-  }
- 
-                                   /**
-                                    * Overload of the non-const spawn
-                                    * function for member functions with
-                                    * 1 argument. This version of the
-				    * function is only visible if
-				    * multithreading is not enabled, but
-				    * it has the exact same interface as
-				    * if multithreading was enabled.
-                                    */
-  template <typename RT, typename C, typename Arg1>
-  inline
-  internal::mem_fun_forwarder<RT,C,boost::tuple<Arg1>,1>
-  spawn (C &c, RT (C::*fun_ptr)(Arg1)) {
-    return internal::mem_fun_forwarder<RT, C, boost::tuple<Arg1>,1> (c,fun_ptr);
-  }
-
-                                   /**
-                                    * Overload of the spawn function for
-                                    * const member functions with 1
-                                    * argument. This version of the
-				    * function is only visible if
-				    * multithreading is not enabled, but
-				    * it has the exact same interface as
-				    * if multithreading was enabled.
-                                    */
-  template <typename RT, typename C, typename Arg1>
-  inline
-  internal::mem_fun_forwarder<RT,const C,boost::tuple<Arg1>,1>
-  spawn (const C &c, RT (C::*fun_ptr)(Arg1) const) {
-    return internal::mem_fun_forwarder<RT, const C, boost::tuple<Arg1>,1> (c,fun_ptr);
-  }
-
-
-
-
-// ----------- forwarders for binary member functions
-
-  namespace internal
-  {
-                                     /**
-				      * @internal
-                                      * Forwarder class for member
-                                      * functions with 2
-                                      * arguments.
-                                      */
-    template <typename RT, typename C, typename ArgList>
-    class mem_fun_forwarder<RT, C, ArgList, 2>
-    {
-        typedef typename internal::mem_fun_ptr<RT,C,ArgList>::type MemFunPtr;      
-
-      public:
-        inline mem_fun_forwarder (C &c, MemFunPtr mem_fun_ptr)
-                        : c (c), mem_fun_ptr(mem_fun_ptr) {}
-
-        inline
-        Thread<RT>
-        operator() (typename boost::tuples::element<0,ArgList>::type arg1,
-                    typename boost::tuples::element<1,ArgList>::type arg2) {
-          return Thread<RT> (mem_fun_ptr, c,
-                             boost::tie(arg1,
-                                        arg2));
-        }
-    
-      private:
-        C         &c;
-        MemFunPtr  mem_fun_ptr;
-    };
-  
-  }
-
-                                   /**
-                                    * Overload of the non-const spawn
-                                    * function for member functions
-                                    * with 2 arguments. This version of the
-				    * function is only visible if
-				    * multithreading is not enabled, but
-				    * it has the exact same interface as
-				    * if multithreading was enabled.
-                                    */
-  template <typename RT, typename C, typename Arg1, typename Arg2>
-  inline
-  internal::mem_fun_forwarder<RT,C,boost::tuple<Arg1, Arg2>,2>
-  spawn (C &c, RT (C::*fun_ptr)(Arg1,Arg2)) {
-    return internal::mem_fun_forwarder<RT, C, boost::tuple<Arg1, Arg2>,2> (c,fun_ptr);
-  }
-
-                                   /**
-                                    * Overload of the spawn function
-                                    * for const member functions with
-                                    * 2 arguments. This version of the
-				    * function is only visible if
-				    * multithreading is not enabled, but
-				    * it has the exact same interface as
-				    * if multithreading was enabled.
-                                    */
-  template <typename RT, typename C, typename Arg1, typename Arg2>
-  inline
-  internal::mem_fun_forwarder<RT,const C,boost::tuple<Arg1, Arg2>,2>
-  spawn (const C &c, RT (C::*fun_ptr)(Arg1,Arg2) const) {
-    return internal::mem_fun_forwarder<RT, const C, boost::tuple<Arg1, Arg2>,2> (c,fun_ptr);
-  }
-
-
-
-// ----------- forwarders for ternary member functions
-
-  namespace internal
-  {
-                                     /**
-				      * @internal
-                                      * Forwarder class for member
-                                      * functions with 3
-                                      * arguments.
-                                      */
-    template <typename RT, typename C, typename ArgList>
-    class mem_fun_forwarder<RT, C, ArgList, 3>
-    {
-        typedef typename internal::mem_fun_ptr<RT,C,ArgList>::type MemFunPtr;      
-
-      public:
-        inline mem_fun_forwarder (C &c, MemFunPtr mem_fun_ptr)
-                        : c (c), mem_fun_ptr(mem_fun_ptr) {}
-
-        inline
-        Thread<RT>
-        operator() (typename boost::tuples::element<0,ArgList>::type arg1,
-                    typename boost::tuples::element<1,ArgList>::type arg2,
-                    typename boost::tuples::element<2,ArgList>::type arg3) {
-          return Thread<RT> (mem_fun_ptr, c,
-                             boost::tie(arg1,
-                                        arg2,
-                                        arg3));
-        }
-    
-      private:
-        C         &c;
-        MemFunPtr  mem_fun_ptr;
-    };
-  
-  }
-
-                                   /**
-                                    * Overload of the non-const spawn
-                                    * function for member functions
-                                    * with 3 arguments. This version of the
-				    * function is only visible if
-				    * multithreading is not enabled, but
-				    * it has the exact same interface as
-				    * if multithreading was enabled.
-                                    */
-  template <typename RT, typename C,
-            typename Arg1, typename Arg2, typename Arg3>
-  inline
-  internal::mem_fun_forwarder<RT,C,boost::tuple<Arg1, Arg2, Arg3>,3>
-  spawn (C &c, RT (C::*fun_ptr)(Arg1,Arg2,Arg3)) {
-    return internal::mem_fun_forwarder<RT, C,
-      boost::tuple<Arg1, Arg2, Arg3>,3> (c,fun_ptr);
-  }
-
-                                   /**
-                                    * Overload of the spawn function
-                                    * for const member functions with
-                                    * 3 arguments. This version of the
-				    * function is only visible if
-				    * multithreading is not enabled, but
-				    * it has the exact same interface as
-				    * if multithreading was enabled.
-                                    */
-  template <typename RT, typename C,
-            typename Arg1, typename Arg2, typename Arg3>
-  inline
-  internal::mem_fun_forwarder<RT,const C,boost::tuple<Arg1, Arg2, Arg3>,3>
-  spawn (const C &c, RT (C::*fun_ptr)(Arg1,Arg2,Arg3) const) {
-    return internal::mem_fun_forwarder<RT, const C,
-      boost::tuple<Arg1, Arg2, Arg3>,3> (c,fun_ptr);
-  }
-
-
-
-
-// ----------- forwarders for member functions with 4 arguments
-
-  namespace internal
-  {
-                                     /**
-				      * @internal
-                                      * Forwarder class for member
-                                      * functions with 4
-                                      * arguments.
-                                      */
-    template <typename RT, typename C, typename ArgList>
-    class mem_fun_forwarder<RT, C, ArgList, 4>
-    {
-        typedef typename internal::mem_fun_ptr<RT,C,ArgList>::type MemFunPtr;      
-
-      public:
-        inline mem_fun_forwarder (C &c, MemFunPtr mem_fun_ptr)
-                        : c (c), mem_fun_ptr(mem_fun_ptr) {}
-
-        inline
-        Thread<RT>
-        operator() (typename boost::tuples::element<0,ArgList>::type arg1,
-                    typename boost::tuples::element<1,ArgList>::type arg2,
-                    typename boost::tuples::element<2,ArgList>::type arg3,
-                    typename boost::tuples::element<3,ArgList>::type arg4) {
-          return Thread<RT> (mem_fun_ptr, c,
-                             boost::tie(arg1,arg2,
-                                        arg3,arg4));
-        }
-    
-      private:
-        C         &c;
-        MemFunPtr  mem_fun_ptr;
-    };
-  
-  }
-
-                                   /**
-                                    * Overload of the non-const spawn
-                                    * function for member functions
-                                    * with 4 arguments. This version of the
-				    * function is only visible if
-				    * multithreading is not enabled, but
-				    * it has the exact same interface as
-				    * if multithreading was enabled.
-                                    */
-  template <typename RT, typename C,
-            typename Arg1, typename Arg2, typename Arg3, typename Arg4>
-  inline
-  internal::mem_fun_forwarder<RT,C,boost::tuple<Arg1, Arg2, Arg3, Arg4>,4>
-  spawn (C &c, RT (C::*fun_ptr)(Arg1,Arg2,Arg3,Arg4)) {
-    return internal::mem_fun_forwarder<RT, C,
-      boost::tuple<Arg1, Arg2, Arg3, Arg4>,4> (c,fun_ptr);
-  }
-
-                                   /**
-                                    * Overload of the spawn function
-                                    * for const member functions with
-                                    * 4 arguments. This version of the
-				    * function is only visible if
-				    * multithreading is not enabled, but
-				    * it has the exact same interface as
-				    * if multithreading was enabled.
-                                    */
-  template <typename RT, typename C,
-            typename Arg1, typename Arg2, typename Arg3, typename Arg4>
-  inline
-  internal::mem_fun_forwarder<RT,const C,boost::tuple<Arg1, Arg2, Arg3, Arg4>,4>
-  spawn (const C &c, RT (C::*fun_ptr)(Arg1,Arg2,Arg3,Arg4) const) {
-    return internal::mem_fun_forwarder<RT, const C,
-      boost::tuple<Arg1, Arg2, Arg3, Arg4>,4> (c,fun_ptr);
-  }
-
-
-
-
-// ----------- forwarders for member functions with 5 arguments
-
-  namespace internal
-  {
-                                     /**
-				      * @internal
-                                      * Forwarder class for member
-                                      * functions with 5
-                                      * arguments.
-                                      */
-    template <typename RT, typename C, typename ArgList>
-    class mem_fun_forwarder<RT, C, ArgList, 5>
-    {
-        typedef typename internal::mem_fun_ptr<RT,C,ArgList>::type MemFunPtr;      
-
-      public:
-        inline mem_fun_forwarder (C &c, MemFunPtr mem_fun_ptr)
-                        : c (c), mem_fun_ptr(mem_fun_ptr) {}
-
-        inline
-        Thread<RT>
-        operator() (typename boost::tuples::element<0,ArgList>::type arg1,
-                    typename boost::tuples::element<1,ArgList>::type arg2,
-                    typename boost::tuples::element<2,ArgList>::type arg3,
-                    typename boost::tuples::element<3,ArgList>::type arg4,
-                    typename boost::tuples::element<4,ArgList>::type arg5) {
-          return Thread<RT> (mem_fun_ptr, c,
-                             boost::tie(arg1,arg2,
-                                        arg3,arg4,
-                                        arg5));
-        }
-    
-      private:
-        C         &c;
-        MemFunPtr  mem_fun_ptr;
-    };
-  
-  }
-
-                                   /**
-                                    * Overload of the non-const spawn
-                                    * function for member functions
-                                    * with 5 arguments. This version of the
-				    * function is only visible if
-				    * multithreading is not enabled, but
-				    * it has the exact same interface as
-				    * if multithreading was enabled.
-                                    */
-  template <typename RT, typename C,
-            typename Arg1, typename Arg2, typename Arg3,
-            typename Arg4, typename Arg5>
-  inline
-  internal::mem_fun_forwarder<RT,C,boost::tuple<Arg1, Arg2, Arg3, Arg4, Arg5>,5>
-  spawn (C &c, RT (C::*fun_ptr)(Arg1,Arg2,Arg3,Arg4,Arg5)) {
-    return internal::mem_fun_forwarder<RT, C,
-      boost::tuple<Arg1, Arg2, Arg3,
-      Arg4, Arg5>,5> (c,fun_ptr);
-  }
-
-                                   /**
-                                    * Overload of the spawn function
-                                    * for const member functions with
-                                    * 5 arguments. This version of the
-				    * function is only visible if
-				    * multithreading is not enabled, but
-				    * it has the exact same interface as
-				    * if multithreading was enabled.
-                                    */
-  template <typename RT, typename C,
-            typename Arg1, typename Arg2, typename Arg3,
-            typename Arg4, typename Arg5>
-  inline
-  internal::mem_fun_forwarder<RT,const C,boost::tuple<Arg1, Arg2, Arg3, Arg4, Arg5>,5>
-  spawn (const C &c, RT (C::*fun_ptr)(Arg1,Arg2,Arg3,Arg4,Arg5) const) {
-    return internal::mem_fun_forwarder<RT, const C,
-      boost::tuple<Arg1, Arg2, Arg3,
-      Arg4, Arg5>,5> (c,fun_ptr);
-  }
-
-
-// ----------- forwarders for member functions with 6 arguments
-
-  namespace internal
-  {
-                                     /**
-				      * @internal
-                                      * Forwarder class for member
-                                      * functions with 6
-                                      * arguments.
-                                      */
-    template <typename RT, typename C, typename ArgList>
-    class mem_fun_forwarder<RT, C, ArgList, 6>
-    {
-        typedef typename internal::mem_fun_ptr<RT,C,ArgList>::type MemFunPtr;      
-
-      public:
-        inline mem_fun_forwarder (C &c, MemFunPtr mem_fun_ptr)
-                        : c (c), mem_fun_ptr(mem_fun_ptr) {}
-
-        inline
-        Thread<RT>
-        operator() (typename boost::tuples::element<0,ArgList>::type arg1,
-                    typename boost::tuples::element<1,ArgList>::type arg2,
-                    typename boost::tuples::element<2,ArgList>::type arg3,
-                    typename boost::tuples::element<3,ArgList>::type arg4,
-                    typename boost::tuples::element<4,ArgList>::type arg5,
-                    typename boost::tuples::element<5,ArgList>::type arg6) {
-          return Thread<RT> (mem_fun_ptr, c,
-                             boost::tie(arg1,arg2,
-                                        arg3,arg4,
-                                        arg5,arg6));
-        }
-    
-      private:
-        C         &c;
-        MemFunPtr  mem_fun_ptr;
-    };
-  
-  }
-
-                                   /**
-                                    * Overload of the non-const spawn
-                                    * function for member functions
-                                    * with 6 arguments. This version of the
-				    * function is only visible if
-				    * multithreading is not enabled, but
-				    * it has the exact same interface as
-				    * if multithreading was enabled.
-                                    */
-  template <typename RT, typename C,
-            typename Arg1, typename Arg2, typename Arg3,
-            typename Arg4, typename Arg5, typename Arg6>
-  inline
-  internal::mem_fun_forwarder<RT,C,boost::tuple<Arg1, Arg2, Arg3, Arg4, Arg5, Arg6>,6>
-  spawn (C &c, RT (C::*fun_ptr)(Arg1,Arg2,Arg3,Arg4,Arg5,Arg6)) {
-    return internal::mem_fun_forwarder<RT, C,
-      boost::tuple<Arg1, Arg2, Arg3,
-      Arg4, Arg5, Arg6>,6> (c,fun_ptr);
-  }
-
-                                   /**
-                                    * Overload of the spawn function
-                                    * for const member functions with
-                                    * 6 arguments. This version of the
-				    * function is only visible if
-				    * multithreading is not enabled, but
-				    * it has the exact same interface as
-				    * if multithreading was enabled.
-                                    */
-  template <typename RT, typename C,
-            typename Arg1, typename Arg2, typename Arg3,
-            typename Arg4, typename Arg5, typename Arg6>
-  inline
-  internal::mem_fun_forwarder<RT,const C,
-                              boost::tuple<Arg1, Arg2, Arg3, Arg4, Arg5, Arg6>,6>
-  spawn (const C &c, RT (C::*fun_ptr)(Arg1,Arg2,Arg3,Arg4,Arg5,Arg6) const) {
-    return internal::mem_fun_forwarder<RT, const C,
-      boost::tuple<Arg1, Arg2, Arg3,
-      Arg4, Arg5, Arg6>,6> (c,fun_ptr);
-  }
-
-
-// ----------- forwarders for member functions with 7 arguments
-
-  namespace internal
-  {
-                                     /**
-				      * @internal
-                                      * Forwarder class for member
-                                      * functions with 7
-                                      * arguments.
-                                      */
-    template <typename RT, typename C, typename ArgList>
-    class mem_fun_forwarder<RT, C, ArgList, 7>
-    {
-        typedef typename internal::mem_fun_ptr<RT,C,ArgList>::type MemFunPtr;      
-
-      public:
-        inline mem_fun_forwarder (C &c, MemFunPtr mem_fun_ptr)
-                        : c (c), mem_fun_ptr(mem_fun_ptr) {}
-
-        inline
-        Thread<RT>
-        operator() (typename boost::tuples::element<0,ArgList>::type arg1,
-                    typename boost::tuples::element<1,ArgList>::type arg2,
-                    typename boost::tuples::element<2,ArgList>::type arg3,
-                    typename boost::tuples::element<3,ArgList>::type arg4,
-                    typename boost::tuples::element<4,ArgList>::type arg5,
-                    typename boost::tuples::element<5,ArgList>::type arg6,
-                    typename boost::tuples::element<6,ArgList>::type arg7) {
-          return Thread<RT> (mem_fun_ptr, c,
-                             boost::tie(arg1,arg2,
-                                        arg3,arg4,
-                                        arg5,arg6,
-                                        arg7));
-        }
-    
-      private:
-        C         &c;
-        MemFunPtr  mem_fun_ptr;
-    };
-  
-  }
-
-                                   /**
-                                    * Overload of the non-const spawn
-                                    * function for member functions
-                                    * with 7 arguments. This version of the
-				    * function is only visible if
-				    * multithreading is not enabled, but
-				    * it has the exact same interface as
-				    * if multithreading was enabled.
-                                    */
-  template <typename RT, typename C,
-            typename Arg1, typename Arg2, typename Arg3,
-            typename Arg4, typename Arg5, typename Arg6,
-            typename Arg7>
-  inline
-  internal::mem_fun_forwarder<RT,C,boost::tuple<Arg1, Arg2, Arg3,
-                                                Arg4, Arg5, Arg6, Arg7>,7>
-  spawn (C &c, RT (C::*fun_ptr)(Arg1,Arg2,Arg3,Arg4,Arg5,Arg6,Arg7)) {
-    return internal::mem_fun_forwarder<RT, C,
-      boost::tuple<Arg1, Arg2, Arg3,
-      Arg4, Arg5, Arg6,
-      Arg7>,7> (c,fun_ptr);
-  }
-
-                                   /**
-                                    * Overload of the spawn function
-                                    * for const member functions with
-                                    * 7 arguments. This version of the
-				    * function is only visible if
-				    * multithreading is not enabled, but
-				    * it has the exact same interface as
-				    * if multithreading was enabled.
-                                    */
-  template <typename RT, typename C,
-            typename Arg1, typename Arg2, typename Arg3,
-            typename Arg4, typename Arg5, typename Arg6,
-            typename Arg7>
-  inline
-  internal::mem_fun_forwarder<RT,const C,
-                              boost::tuple<Arg1, Arg2, Arg3,
-                                           Arg4, Arg5, Arg6, Arg7>,7>
-  spawn (const C &c, RT (C::*fun_ptr)(Arg1,Arg2,Arg3,Arg4,Arg5,Arg6,Arg7) const) {
-    return internal::mem_fun_forwarder<RT, const C,
-      boost::tuple<Arg1, Arg2, Arg3,
-      Arg4, Arg5, Arg6,
-      Arg7>,7> (c,fun_ptr);
-  }
-
-
-// ----------- forwarders for member functions with 8 arguments
-
-  namespace internal
-  {
-                                     /**
-				      * @internal
-                                      * Forwarder class for member
-                                      * functions with 8
-                                      * arguments.
-                                      */
-    template <typename RT, typename C, typename ArgList>
-    class mem_fun_forwarder<RT, C, ArgList, 8>
-    {
-        typedef typename internal::mem_fun_ptr<RT,C,ArgList>::type MemFunPtr;      
-
-      public:
-        inline mem_fun_forwarder (C &c, MemFunPtr mem_fun_ptr)
-                        : c (c), mem_fun_ptr(mem_fun_ptr) {}
-
-        inline
-        Thread<RT>
-        operator() (typename boost::tuples::element<0,ArgList>::type arg1,
-                    typename boost::tuples::element<1,ArgList>::type arg2,
-                    typename boost::tuples::element<2,ArgList>::type arg3,
-                    typename boost::tuples::element<3,ArgList>::type arg4,
-                    typename boost::tuples::element<4,ArgList>::type arg5,
-                    typename boost::tuples::element<5,ArgList>::type arg6,
-                    typename boost::tuples::element<6,ArgList>::type arg7,
-                    typename boost::tuples::element<7,ArgList>::type arg8) {
-          return Thread<RT> (mem_fun_ptr, c,
-                             boost::tie(arg1,arg2,
-                                        arg3,arg4,
-                                        arg5,arg6,
-                                        arg7,arg8));
-        }
-    
-      private:
-        C         &c;
-        MemFunPtr  mem_fun_ptr;
-    };
-  
-  }
-
-                                   /**
-                                    * Overload of the non-const spawn
-                                    * function for member functions
-                                    * with 8 arguments. This version of the
-				    * function is only visible if
-				    * multithreading is not enabled, but
-				    * it has the exact same interface as
-				    * if multithreading was enabled.
-                                    */
-  template <typename RT, typename C,
-            typename Arg1, typename Arg2, typename Arg3,
-            typename Arg4, typename Arg5, typename Arg6,
-            typename Arg7, typename Arg8>
-  inline
-  internal::mem_fun_forwarder<RT,C,boost::tuple<Arg1, Arg2, Arg3,
-                                                Arg4, Arg5, Arg6,
-                                                Arg7, Arg8>,8>
+					     Arg4, Arg5, Arg6,
+					     Arg7, Arg8, Arg9>,9>
   spawn (C &c, RT (C::*fun_ptr)(Arg1,Arg2,Arg3,Arg4,Arg5,
-                                Arg6,Arg7,Arg8)) {
-    return internal::mem_fun_forwarder<RT, C,
-      boost::tuple<Arg1, Arg2, Arg3,
-      Arg4, Arg5, Arg6,
-      Arg7, Arg8>,8> (c,fun_ptr);
+				Arg6,Arg7,Arg8,Arg9))
+  {
+    return
+      boost::function<typename internal::fun_ptr<RT,boost::tuple<Arg1, Arg2, Arg3, Arg4, Arg5, Arg6, Arg7, Arg8, Arg9> >::type>
+      (boost::bind(fun_ptr, boost::ref(c), _1, _2, _3, _4, _5, _6, _7, _8, _9));
   }
 
-                                   /**
-                                    * Overload of the spawn function
-                                    * for const member functions with
-                                    * 8 arguments. This version of the
-				    * function is only visible if
-				    * multithreading is not enabled, but
-				    * it has the exact same interface as
-				    * if multithreading was enabled.
-                                    */
+				   /**
+				    * Overload of the spawn function for
+				    * const member functions with 9
+				    * arguments.
+				    */
   template <typename RT, typename C,
-            typename Arg1, typename Arg2, typename Arg3,
-            typename Arg4, typename Arg5, typename Arg6,
-            typename Arg7, typename Arg8>
+	    typename Arg1, typename Arg2, typename Arg3,
+	    typename Arg4, typename Arg5, typename Arg6,
+	    typename Arg7, typename Arg8, typename Arg9>
   inline
-  internal::mem_fun_forwarder<RT,const C,
-                              boost::tuple<Arg1, Arg2, Arg3,
-                                           Arg4, Arg5, Arg6,
-                                           Arg7, Arg8>,8>
+  internal::fun_encapsulator<RT,
+			     boost::tuple<Arg1, Arg2, Arg3,
+					  Arg4, Arg5, Arg6,
+					  Arg7, Arg8, Arg9>,9>
   spawn (const C &c, RT (C::*fun_ptr)(Arg1,Arg2,Arg3,Arg4,Arg5,
-                                      Arg6,Arg7,Arg8) const) {
-    return internal::mem_fun_forwarder<RT, const C,
-      boost::tuple<Arg1, Arg2, Arg3,
-      Arg4, Arg5, Arg6,
-      Arg7, Arg8>,8> (c,fun_ptr);
-  }
-
-
-// ----------- forwarders for member functions with 9 arguments
-
-  namespace internal
+				      Arg6,Arg7,Arg8,Arg9) const)
   {
-                                     /**
-				      * @internal
-                                      * Forwarder class for member
-                                      * functions with 9
-                                      * arguments.
-                                      */
-    template <typename RT, typename C, typename ArgList>
-    class mem_fun_forwarder<RT, C, ArgList, 9>
-    {
-        typedef typename internal::mem_fun_ptr<RT,C,ArgList>::type MemFunPtr;      
-
-      public:
-        inline mem_fun_forwarder (C &c, MemFunPtr mem_fun_ptr)
-                        : c (c), mem_fun_ptr(mem_fun_ptr) {}
-
-        inline
-        Thread<RT>
-        operator() (typename boost::tuples::element<0,ArgList>::type arg1,
-                    typename boost::tuples::element<1,ArgList>::type arg2,
-                    typename boost::tuples::element<2,ArgList>::type arg3,
-                    typename boost::tuples::element<3,ArgList>::type arg4,
-                    typename boost::tuples::element<4,ArgList>::type arg5,
-                    typename boost::tuples::element<5,ArgList>::type arg6,
-                    typename boost::tuples::element<6,ArgList>::type arg7,
-                    typename boost::tuples::element<7,ArgList>::type arg8,
-                    typename boost::tuples::element<8,ArgList>::type arg9) {
-          return Thread<RT> (mem_fun_ptr, c,
-                             boost::tie(arg1,arg2,
-                                        arg3,arg4,
-                                        arg5,arg6,
-                                        arg7,arg8,
-                                        arg9));
-        }
-    
-      private:
-        C         &c;
-        MemFunPtr  mem_fun_ptr;
-    };
-  
-  }
-
-                                   /**
-                                    * Overload of the non-const spawn
-                                    * function for member functions
-                                    * with 9 arguments. This version of the
-				    * function is only visible if
-				    * multithreading is not enabled, but
-				    * it has the exact same interface as
-				    * if multithreading was enabled.
-                                    */
-  template <typename RT, typename C,
-            typename Arg1, typename Arg2, typename Arg3,
-            typename Arg4, typename Arg5, typename Arg6,
-            typename Arg7, typename Arg8, typename Arg9>
-  inline
-  internal::mem_fun_forwarder<RT,C,boost::tuple<Arg1, Arg2, Arg3,
-                                                Arg4, Arg5, Arg6,
-                                                Arg7, Arg8, Arg9>,9>
-  spawn (C &c, RT (C::*fun_ptr)(Arg1,Arg2,Arg3,Arg4,Arg5,
-                                Arg6,Arg7,Arg8,Arg9)) {
-    return internal::mem_fun_forwarder<RT, C,
-      boost::tuple<Arg1, Arg2, Arg3,
-      Arg4, Arg5, Arg6,
-      Arg7, Arg8, Arg9>,9> (c,fun_ptr);
-  }
-
-                                   /**
-                                    * Overload of the spawn function
-                                    * for const member functions with
-                                    * 9 arguments. This version of the
-				    * function is only visible if
-				    * multithreading is not enabled, but
-				    * it has the exact same interface as
-				    * if multithreading was enabled.
-                                    */
-  template <typename RT, typename C,
-            typename Arg1, typename Arg2, typename Arg3,
-            typename Arg4, typename Arg5, typename Arg6,
-            typename Arg7, typename Arg8, typename Arg9>
-  inline
-  internal::mem_fun_forwarder<RT,const C,
-                              boost::tuple<Arg1, Arg2, Arg3,
-                                           Arg4, Arg5, Arg6,
-                                           Arg7, Arg8, Arg9>,9>
-  spawn (const C &c, RT (C::*fun_ptr)(Arg1,Arg2,Arg3,Arg4,Arg5,
-                                      Arg6,Arg7,Arg8,Arg9) const) {
-    return internal::mem_fun_forwarder<RT, const C,
-      boost::tuple<Arg1, Arg2, Arg3,
-      Arg4, Arg5, Arg6,
-      Arg7, Arg8, Arg9>,9> (c,fun_ptr);
-  }
-
-
-// ----------- forwarders for member functions with 10 arguments
-
-  namespace internal
-  {
-                                     /**
-				      * @internal
-                                      * Forwarder class for member
-                                      * functions with 10
-                                      * arguments.
-                                      */
-    template <typename RT, typename C, typename ArgList>
-    class mem_fun_forwarder<RT, C, ArgList, 10>
-    {
-        typedef typename internal::mem_fun_ptr<RT,C,ArgList>::type MemFunPtr;      
-
-      public:
-        inline mem_fun_forwarder (C &c, MemFunPtr mem_fun_ptr)
-                        : c (c), mem_fun_ptr(mem_fun_ptr) {}
-
-        inline
-        Thread<RT>
-        operator() (typename boost::tuples::element<0,ArgList>::type arg1,
-                    typename boost::tuples::element<1,ArgList>::type arg2,
-                    typename boost::tuples::element<2,ArgList>::type arg3,
-                    typename boost::tuples::element<3,ArgList>::type arg4,
-                    typename boost::tuples::element<4,ArgList>::type arg5,
-                    typename boost::tuples::element<5,ArgList>::type arg6,
-                    typename boost::tuples::element<6,ArgList>::type arg7,
-                    typename boost::tuples::element<7,ArgList>::type arg8,
-                    typename boost::tuples::element<8,ArgList>::type arg9,
-                    typename boost::tuples::element<9,ArgList>::type arg10) {
-          return Thread<RT> (mem_fun_ptr, c,
-                             boost::tie(arg1,arg2,
-                                        arg3,arg4,
-                                        arg5,arg6,
-                                        arg7,arg8,
-                                        arg9, arg10));
-        }
-    
-      private:
-        C         &c;
-        MemFunPtr  mem_fun_ptr;
-    };
-  
-  }
-
-                                   /**
-                                    * Overload of the non-const spawn
-                                    * function for member functions
-                                    * with 10 arguments. This version of the
-				    * function is only visible if
-				    * multithreading is not enabled, but
-				    * it has the exact same interface as
-				    * if multithreading was enabled.
-                                    */
-  template <typename RT, typename C,
-            typename Arg1, typename Arg2, typename Arg3,
-            typename Arg4, typename Arg5, typename Arg6,
-            typename Arg7, typename Arg8, typename Arg9,
-            typename Arg10>
-  inline
-  internal::mem_fun_forwarder<RT,C,boost::tuple<Arg1, Arg2, Arg3,
-                                                Arg4, Arg5, Arg6,
-                                                Arg7, Arg8, Arg9, Arg10>,10>
-  spawn (C &c, RT (C::*fun_ptr)(Arg1,Arg2,Arg3,Arg4,Arg5,
-                                Arg6,Arg7,Arg8,Arg9,Arg10)) {
-    return internal::mem_fun_forwarder<RT, C,
-      boost::tuple<Arg1, Arg2, Arg3,
-      Arg4, Arg5, Arg6,
-      Arg7, Arg8, Arg9,
-      Arg10>,10> (c,fun_ptr);
-  }
-
-                                   /**
-                                    * Overload of the spawn function
-                                    * for const member functions with
-                                    * 10 arguments. This version of the
-				    * function is only visible if
-				    * multithreading is not enabled, but
-				    * it has the exact same interface as
-				    * if multithreading was enabled.
-                                    */
-  template <typename RT, typename C,
-            typename Arg1, typename Arg2, typename Arg3,
-            typename Arg4, typename Arg5, typename Arg6,
-            typename Arg7, typename Arg8, typename Arg9,
-            typename Arg10>
-  inline
-  internal::mem_fun_forwarder<RT,const C,
-                              boost::tuple<Arg1, Arg2, Arg3,
-                                           Arg4, Arg5, Arg6,
-                                           Arg7, Arg8, Arg9, Arg10>,10>
-  spawn (const C &c, RT (C::*fun_ptr)(Arg1,Arg2,Arg3,Arg4,Arg5,
-                                      Arg6,Arg7,Arg8,Arg9,Arg10) const) {
-    return internal::mem_fun_forwarder<RT, const C,
-      boost::tuple<Arg1, Arg2, Arg3,
-      Arg4, Arg5, Arg6,
-      Arg7, Arg8, Arg9,
-      Arg10>,10> (c,fun_ptr);
-  }
-
-
-
-// ----------- forwarders for functions not taking any parameters
-
-  namespace internal
-  {
-                                     /**
-				      * @internal
-                                      * Forwarder class for functions
-                                      * with no arguments.
-                                      */
-    template <typename RT, typename ArgList>
-    class fun_forwarder<RT, ArgList, 0>
-    {
-        typedef typename internal::fun_ptr<RT,ArgList>::type FunPtr;      
-
-      public:
-        inline fun_forwarder (FunPtr fun_ptr)
-                        : fun_ptr(fun_ptr) {}
-
-        inline
-        Thread<RT>
-        operator() () {
-          return Thread<RT> (fun_ptr,
-                             ArgList());
-        }
-    
-      private:
-        FunPtr  fun_ptr;
-    };
-  
-  }
- 
-                                   /**
-                                    * Overload of the spawn function
-                                    * for non-member or static member
-                                    * functions with no
-                                    * arguments. This version of the
-                                    * function is only visible if *
-                                    * multithreading is not enabled,
-                                    * but * it has the exact same
-                                    * interface as * if multithreading
-                                    * was enabled.
-                                    */
-  template <typename RT>
-  inline
-  internal::fun_forwarder<RT,boost::tuple<>,0>
-  spawn (RT (*fun_ptr)()) {
-    return internal::fun_forwarder<RT, boost::tuple<>,0> (fun_ptr);
-  }
-
-
-
-
-// ----------- forwarders for unary functions
-
-  namespace internal
-  {
-                                     /**
-				      * @internal
-                                      * Forwarder class for functions
-                                      * with 1 argument.
-                                      */
-    template <typename RT, typename ArgList>
-    class fun_forwarder<RT, ArgList, 1>
-    {
-        typedef typename internal::fun_ptr<RT,ArgList>::type FunPtr;      
-
-      public:
-        inline fun_forwarder (FunPtr fun_ptr)
-                        : fun_ptr(fun_ptr) {}
-
-        inline
-        Thread<RT>
-        operator() (typename boost::tuples::element<0,ArgList>::type arg1) {
-          return Thread<RT> (fun_ptr,
-                             boost::tie(arg1));
-        }
-    
-      private:
-        FunPtr  fun_ptr;
-    };
-  
-  }
- 
-                                   /**
-                                    * Overload of the spawn function
-                                    * for non-member or static member
-                                    * functions with 1 argument. This version of the
-				    * function is only visible if
-				    * multithreading is not enabled, but
-				    * it has the exact same interface as
-				    * if multithreading was enabled.
-                                    */
-  template <typename RT, typename Arg1>
-  inline
-  internal::fun_forwarder<RT,boost::tuple<Arg1>,1>
-  spawn (RT (*fun_ptr)(Arg1)) {
-    return internal::fun_forwarder<RT, boost::tuple<Arg1>,1> (fun_ptr);
-  }
-
-
-
-
-// ----------- forwarders for binary functions
-
-  namespace internal
-  {
-                                     /**
-				      * @internal
-                                      * Forwarder class for functions
-                                      * with 2 arguments.
-                                      */
-    template <typename RT, typename ArgList>
-    class fun_forwarder<RT, ArgList, 2>
-    {
-        typedef typename internal::fun_ptr<RT,ArgList>::type FunPtr;      
-
-      public:
-        inline fun_forwarder (FunPtr fun_ptr)
-                        : fun_ptr(fun_ptr) {}
-
-        inline
-        Thread<RT>
-        operator() (typename boost::tuples::element<0,ArgList>::type arg1,
-                    typename boost::tuples::element<1,ArgList>::type arg2) {
-          return Thread<RT> (fun_ptr,
-                             boost::tie(arg1,
-                                        arg2));
-        }
-    
-      private:
-        FunPtr  fun_ptr;
-    };
-  
-  }
-
-                                   /**
-                                    * Overload of the spawn function
-                                    * for non-member or static member
-                                    * functions with 2 arguments. This version of the
-				    * function is only visible if
-				    * multithreading is not enabled, but
-				    * it has the exact same interface as
-				    * if multithreading was enabled.
-                                    */
-  template <typename RT, typename Arg1, typename Arg2>
-  inline
-  internal::fun_forwarder<RT,boost::tuple<Arg1, Arg2>,2>
-  spawn (RT (*fun_ptr)(Arg1,Arg2)) {
-    return internal::fun_forwarder<RT, boost::tuple<Arg1, Arg2>,2> (fun_ptr);
-  }
-
-
-
-// ----------- forwarders for ternary functions
-
-  namespace internal
-  {
-                                     /**
-				      * @internal
-                                      * Forwarder class for functions
-                                      * with 3 arguments.
-                                      */
-    template <typename RT, typename ArgList>
-    class fun_forwarder<RT, ArgList, 3>
-    {
-        typedef typename internal::fun_ptr<RT,ArgList>::type FunPtr;      
-
-      public:
-        inline fun_forwarder (FunPtr fun_ptr)
-                        : fun_ptr(fun_ptr) {}
-
-        inline
-        Thread<RT>
-        operator() (typename boost::tuples::element<0,ArgList>::type arg1,
-                    typename boost::tuples::element<1,ArgList>::type arg2,
-                    typename boost::tuples::element<2,ArgList>::type arg3) {
-          return Thread<RT> (fun_ptr,
-                             boost::tie(arg1,
-                                        arg2,
-                                        arg3));
-        }
-    
-      private:
-        FunPtr  fun_ptr;
-    };
-  
-  }
-
-                                   /**
-                                    * Overload of the spawn function
-                                    * for non-member or static member
-                                    * functions with 3 arguments. This version of the
-				    * function is only visible if
-				    * multithreading is not enabled, but
-				    * it has the exact same interface as
-				    * if multithreading was enabled.
-                                    */
-  template <typename RT,
-            typename Arg1, typename Arg2, typename Arg3>
-  inline
-  internal::fun_forwarder<RT,boost::tuple<Arg1, Arg2, Arg3>,3>
-  spawn (RT (*fun_ptr)(Arg1,Arg2,Arg3)) {
-    return internal::fun_forwarder<RT,
-      boost::tuple<Arg1, Arg2, Arg3>,3> (fun_ptr);
-  }
-
-
-
-
-// ----------- forwarders for functions with 4 arguments
-
-  namespace internal
-  {
-                                     /**
-				      * @internal
-                                      * Forwarder class for functions
-                                      * with 4 arguments.
-                                      */
-    template <typename RT, typename ArgList>
-    class fun_forwarder<RT, ArgList, 4>
-    {
-        typedef typename internal::fun_ptr<RT,ArgList>::type FunPtr;      
-
-      public:
-        inline fun_forwarder (FunPtr fun_ptr)
-                        : fun_ptr(fun_ptr) {}
-
-        inline
-        Thread<RT>
-        operator() (typename boost::tuples::element<0,ArgList>::type arg1,
-                    typename boost::tuples::element<1,ArgList>::type arg2,
-                    typename boost::tuples::element<2,ArgList>::type arg3,
-                    typename boost::tuples::element<3,ArgList>::type arg4) {
-          return Thread<RT> (fun_ptr,
-                             boost::tie(arg1,arg2,
-                                        arg3,arg4));
-        }
-    
-      private:
-        FunPtr  fun_ptr;
-    };
-  
-  }
-
-                                   /**
-                                    * Overload of the spawn function
-                                    * for non-member or static member
-                                    * functions with 4 arguments. This version of the
-				    * function is only visible if
-				    * multithreading is not enabled, but
-				    * it has the exact same interface as
-				    * if multithreading was enabled.
-                                    */
-  template <typename RT,
-            typename Arg1, typename Arg2, typename Arg3, typename Arg4>
-  inline
-  internal::fun_forwarder<RT,boost::tuple<Arg1, Arg2, Arg3, Arg4>,4>
-  spawn (RT (*fun_ptr)(Arg1,Arg2,Arg3,Arg4)) {
-    return internal::fun_forwarder<RT,
-      boost::tuple<Arg1, Arg2, Arg3, Arg4>,4> (fun_ptr);
-  }
-
-
-
-
-// ----------- forwarders for functions with 5 arguments
-
-  namespace internal
-  {
-                                     /**
-				      * @internal
-                                      * Forwarder class for functions
-                                      * with 5 arguments.
-                                      */
-    template <typename RT, typename ArgList>
-    class fun_forwarder<RT, ArgList, 5>
-    {
-        typedef typename internal::fun_ptr<RT,ArgList>::type FunPtr;      
-
-      public:
-        inline fun_forwarder (FunPtr fun_ptr)
-                        : fun_ptr(fun_ptr) {}
-
-        inline
-        Thread<RT>
-        operator() (typename boost::tuples::element<0,ArgList>::type arg1,
-                    typename boost::tuples::element<1,ArgList>::type arg2,
-                    typename boost::tuples::element<2,ArgList>::type arg3,
-                    typename boost::tuples::element<3,ArgList>::type arg4,
-                    typename boost::tuples::element<4,ArgList>::type arg5) {
-          return Thread<RT> (fun_ptr,
-                             boost::tie(arg1,arg2,
-                                        arg3,arg4,
-                                        arg5));
-        }
-    
-      private:
-        FunPtr  fun_ptr;
-    };
-  
-  }
-
-                                   /**
-                                    * Overload of the spawn function
-                                    * for non-member or static member
-                                    * functions with 5 arguments. This version of the
-				    * function is only visible if
-				    * multithreading is not enabled, but
-				    * it has the exact same interface as
-				    * if multithreading was enabled.
-                                    */
-  template <typename RT,
-            typename Arg1, typename Arg2, typename Arg3,
-            typename Arg4, typename Arg5>
-  inline
-  internal::fun_forwarder<RT,boost::tuple<Arg1, Arg2, Arg3, Arg4, Arg5>,5>
-  spawn (RT (*fun_ptr)(Arg1,Arg2,Arg3,Arg4,Arg5)) {
-    return internal::fun_forwarder<RT,
-      boost::tuple<Arg1, Arg2, Arg3,
-      Arg4, Arg5>,5> (fun_ptr);
-  }
-
-
-// ----------- forwarders for functions with 6 arguments
-
-  namespace internal
-  {
-                                     /**
-				      * @internal
-                                      * Forwarder class for functions
-                                      * with 6 arguments.
-                                      */
-    template <typename RT, typename ArgList>
-    class fun_forwarder<RT, ArgList, 6>
-    {
-        typedef typename internal::fun_ptr<RT,ArgList>::type FunPtr;      
-
-      public:
-        inline fun_forwarder (FunPtr fun_ptr)
-                        : fun_ptr(fun_ptr) {}
-
-        inline
-        Thread<RT>
-        operator() (typename boost::tuples::element<0,ArgList>::type arg1,
-                    typename boost::tuples::element<1,ArgList>::type arg2,
-                    typename boost::tuples::element<2,ArgList>::type arg3,
-                    typename boost::tuples::element<3,ArgList>::type arg4,
-                    typename boost::tuples::element<4,ArgList>::type arg5,
-                    typename boost::tuples::element<5,ArgList>::type arg6) {
-          return Thread<RT> (fun_ptr,
-                             boost::tie(arg1,arg2,
-                                        arg3,arg4,
-                                        arg5,arg6));
-        }
-    
-      private:
-        FunPtr  fun_ptr;
-    };
-  
-  }
-
-                                   /**
-                                    * Overload of the spawn function
-                                    * for non-member or static member
-                                    * functions with 6 arguments. This version of the
-				    * function is only visible if
-				    * multithreading is not enabled, but
-				    * it has the exact same interface as
-				    * if multithreading was enabled.
-                                    */
-  template <typename RT,
-            typename Arg1, typename Arg2, typename Arg3,
-            typename Arg4, typename Arg5, typename Arg6>
-  inline
-  internal::fun_forwarder<RT,boost::tuple<Arg1, Arg2, Arg3, Arg4, Arg5, Arg6>,6>
-  spawn (RT (*fun_ptr)(Arg1,Arg2,Arg3,Arg4,Arg5,Arg6)) {
-    return internal::fun_forwarder<RT,
-      boost::tuple<Arg1, Arg2, Arg3,
-      Arg4, Arg5, Arg6>,6> (fun_ptr);
-  }
-
-
-// ----------- forwarders for functions with 7 arguments
-
-  namespace internal
-  {
-                                     /**
-				      * @internal
-                                      * Forwarder class for functions
-                                      * with 7 arguments.
-                                      */
-    template <typename RT, typename ArgList>
-    class fun_forwarder<RT, ArgList, 7>
-    {
-        typedef typename internal::fun_ptr<RT,ArgList>::type FunPtr;      
-
-      public:
-        inline fun_forwarder (FunPtr fun_ptr)
-                        : fun_ptr(fun_ptr) {}
-
-        inline
-        Thread<RT>
-        operator() (typename boost::tuples::element<0,ArgList>::type arg1,
-                    typename boost::tuples::element<1,ArgList>::type arg2,
-                    typename boost::tuples::element<2,ArgList>::type arg3,
-                    typename boost::tuples::element<3,ArgList>::type arg4,
-                    typename boost::tuples::element<4,ArgList>::type arg5,
-                    typename boost::tuples::element<5,ArgList>::type arg6,
-                    typename boost::tuples::element<6,ArgList>::type arg7) {
-          return Thread<RT> (fun_ptr,
-                             boost::tie(arg1,arg2,
-                                        arg3,arg4,
-                                        arg5,arg6,
-                                        arg7));
-        }
-    
-      private:
-        FunPtr  fun_ptr;
-    };
-  
-  }
-
-                                   /**
-                                    * Overload of the spawn function
-                                    * for non-member or static member
-                                    * functions with 7 arguments. This version of the
-				    * function is only visible if
-				    * multithreading is not enabled, but
-				    * it has the exact same interface as
-				    * if multithreading was enabled.
-                                    */
-  template <typename RT,
-            typename Arg1, typename Arg2, typename Arg3,
-            typename Arg4, typename Arg5, typename Arg6,
-            typename Arg7>
-  inline
-  internal::fun_forwarder<RT,boost::tuple<Arg1, Arg2, Arg3,
-                                          Arg4, Arg5, Arg6, Arg7>,7>
-  spawn (RT (*fun_ptr)(Arg1,Arg2,Arg3,Arg4,Arg5,Arg6,Arg7)) {
-    return internal::fun_forwarder<RT,
-      boost::tuple<Arg1, Arg2, Arg3,
-      Arg4, Arg5, Arg6,
-      Arg7>,7> (fun_ptr);
-  }
-
-
-// ----------- forwarders for functions with 8 arguments
-
-  namespace internal
-  {
-                                     /**
-				      * @internal
-                                      * Forwarder class for functions
-                                      * with 8 arguments.
-                                      */
-    template <typename RT, typename ArgList>
-    class fun_forwarder<RT, ArgList, 8>
-    {
-        typedef typename internal::fun_ptr<RT,ArgList>::type FunPtr;      
-
-      public:
-        inline fun_forwarder (FunPtr fun_ptr)
-                        : fun_ptr(fun_ptr) {}
-
-        inline
-        Thread<RT>
-        operator() (typename boost::tuples::element<0,ArgList>::type arg1,
-                    typename boost::tuples::element<1,ArgList>::type arg2,
-                    typename boost::tuples::element<2,ArgList>::type arg3,
-                    typename boost::tuples::element<3,ArgList>::type arg4,
-                    typename boost::tuples::element<4,ArgList>::type arg5,
-                    typename boost::tuples::element<5,ArgList>::type arg6,
-                    typename boost::tuples::element<6,ArgList>::type arg7,
-                    typename boost::tuples::element<7,ArgList>::type arg8) {
-          return Thread<RT> (fun_ptr,
-                             boost::tie(arg1,arg2,
-                                        arg3,arg4,
-                                        arg5,arg6,
-                                        arg7,arg8));
-        }
-    
-      private:
-        FunPtr  fun_ptr;
-    };
-  
-  }
-
-                                   /**
-                                    * Overload of the spawn function
-                                    * for non-member or static member
-                                    * functions with 8 arguments. This version of the
-				    * function is only visible if
-				    * multithreading is not enabled, but
-				    * it has the exact same interface as
-				    * if multithreading was enabled.
-                                    */
-  template <typename RT,
-            typename Arg1, typename Arg2, typename Arg3,
-            typename Arg4, typename Arg5, typename Arg6,
-            typename Arg7, typename Arg8>
-  inline
-  internal::fun_forwarder<RT,boost::tuple<Arg1, Arg2, Arg3,
-                                          Arg4, Arg5, Arg6,
-                                          Arg7, Arg8>,8>
-  spawn (RT (*fun_ptr)(Arg1,Arg2,Arg3,Arg4,Arg5,
-                       Arg6,Arg7,Arg8)) {
-    return internal::fun_forwarder<RT,
-      boost::tuple<Arg1, Arg2, Arg3,
-      Arg4, Arg5, Arg6,
-      Arg7, Arg8>,8> (fun_ptr);
-  }
-
-
-// ----------- forwarders for functions with 9 arguments
-
-  namespace internal
-  {
-                                     /**
-				      * @internal
-                                      * Forwarder class for functions
-                                      * with 9 arguments.
-                                      */
-    template <typename RT, typename ArgList>
-    class fun_forwarder<RT, ArgList, 9>
-    {
-        typedef typename internal::fun_ptr<RT,ArgList>::type FunPtr;      
-
-      public:
-        inline fun_forwarder (FunPtr fun_ptr)
-                        : fun_ptr(fun_ptr) {}
-
-        inline
-        Thread<RT>
-        operator() (typename boost::tuples::element<0,ArgList>::type arg1,
-                    typename boost::tuples::element<1,ArgList>::type arg2,
-                    typename boost::tuples::element<2,ArgList>::type arg3,
-                    typename boost::tuples::element<3,ArgList>::type arg4,
-                    typename boost::tuples::element<4,ArgList>::type arg5,
-                    typename boost::tuples::element<5,ArgList>::type arg6,
-                    typename boost::tuples::element<6,ArgList>::type arg7,
-                    typename boost::tuples::element<7,ArgList>::type arg8,
-                    typename boost::tuples::element<8,ArgList>::type arg9) {
-          return Thread<RT> (fun_ptr,
-                             boost::tie(arg1,arg2,
-                                        arg3,arg4,
-                                        arg5,arg6,
-                                        arg7,arg8,
-                                        arg9));
-        }
-    
-      private:
-        FunPtr  fun_ptr;
-    };
-  
-  }
-
-                                   /**
-                                    * Overload of the spawn function
-                                    * for non-member or static member
-                                    * functions with 9 arguments. This version of the
-				    * function is only visible if
-				    * multithreading is not enabled, but
-				    * it has the exact same interface as
-				    * if multithreading was enabled.
-                                    */
-  template <typename RT,
-            typename Arg1, typename Arg2, typename Arg3,
-            typename Arg4, typename Arg5, typename Arg6,
-            typename Arg7, typename Arg8, typename Arg9>
-  inline
-  internal::fun_forwarder<RT,boost::tuple<Arg1, Arg2, Arg3,
-                                          Arg4, Arg5, Arg6,
-                                          Arg7, Arg8, Arg9>,9>
-  spawn (RT (*fun_ptr)(Arg1,Arg2,Arg3,Arg4,Arg5,
-                       Arg6,Arg7,Arg8,Arg9)) {
-    return internal::fun_forwarder<RT,
-      boost::tuple<Arg1, Arg2, Arg3,
-      Arg4, Arg5, Arg6,
-      Arg7, Arg8, Arg9>,9> (fun_ptr);
-  }
-
-
-// ----------- forwarders for functions with 10 arguments
-
-  namespace internal
-  {
-                                     /**
-				      * @internal
-                                      * Forwarder class for functions
-                                      * with 10 arguments.
-                                      */
-    template <typename RT, typename ArgList>
-    class fun_forwarder<RT, ArgList, 10>
-    {
-        typedef typename internal::fun_ptr<RT,ArgList>::type FunPtr;      
-
-      public:
-        inline fun_forwarder (FunPtr fun_ptr)
-                        : fun_ptr(fun_ptr) {}
-
-        inline
-        Thread<RT>
-        operator() (typename boost::tuples::element<0,ArgList>::type arg1,
-                    typename boost::tuples::element<1,ArgList>::type arg2,
-                    typename boost::tuples::element<2,ArgList>::type arg3,
-                    typename boost::tuples::element<3,ArgList>::type arg4,
-                    typename boost::tuples::element<4,ArgList>::type arg5,
-                    typename boost::tuples::element<5,ArgList>::type arg6,
-                    typename boost::tuples::element<6,ArgList>::type arg7,
-                    typename boost::tuples::element<7,ArgList>::type arg8,
-                    typename boost::tuples::element<8,ArgList>::type arg9,
-                    typename boost::tuples::element<9,ArgList>::type arg10) {
-          return Thread<RT> (fun_ptr,
-                             boost::tie(arg1,arg2,
-                                        arg3,arg4,
-                                        arg5,arg6,
-                                        arg7,arg8,
-                                        arg9, arg10));
-        }
-    
-      private:
-        FunPtr  fun_ptr;
-    };
-  
-  }
-
-                                   /**
-                                    * Overload of the spawn function
-                                    * for non-member or static member
-                                    * functions with 10
-                                    * arguments. This version of the
-				    * function is only visible if
-				    * multithreading is not enabled, but
-				    * it has the exact same interface as
-				    * if multithreading was enabled.
-                                    */
-  template <typename RT,
-            typename Arg1, typename Arg2, typename Arg3,
-            typename Arg4, typename Arg5, typename Arg6,
-            typename Arg7, typename Arg8, typename Arg9,
-            typename Arg10>
-  inline
-  internal::fun_forwarder<RT,boost::tuple<Arg1, Arg2, Arg3,
-                                          Arg4, Arg5, Arg6,
-                                          Arg7, Arg8, Arg9, Arg10>,10>
-  spawn (RT (*fun_ptr)(Arg1,Arg2,Arg3,Arg4,Arg5,
-                       Arg6,Arg7,Arg8,Arg9,Arg10)) {
-    return internal::fun_forwarder<RT,
-      boost::tuple<Arg1, Arg2, Arg3,
-      Arg4, Arg5, Arg6,
-      Arg7, Arg8, Arg9,
-      Arg10>,10> (fun_ptr);
+    return
+      boost::function<typename internal::fun_ptr<RT,boost::tuple<Arg1, Arg2, Arg3, Arg4, Arg5, Arg6, Arg7, Arg8, Arg9> >::type>
+      (boost::bind(fun_ptr, boost::cref(c), _1, _2, _3, _4, _5, _6, _7, _8, _9));
   }
   
-
-  
-#endif // #if (DEAL_II_USE_MT == 1)
-
 
 
                                    /**
@@ -6675,10 +2609,11 @@ namespace Threads
                                         * Add another thread object to
                                         * the collection.
                                         */
-      ThreadGroup & operator += (const Thread<RT> &t) {
-        threads.push_back (t);
-        return *this;
-      }
+      ThreadGroup & operator += (const Thread<RT> &t)
+	{
+	  threads.push_back (t);
+	  return *this;
+	}
 
                                        /**
                                         * Wait for all threads in the

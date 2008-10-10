@@ -32,6 +32,21 @@ inconvenience this causes.
 <ol>
   <li>
   <p> 
+  Changed: The way we set up threads in the Threads::spawn functions
+  and friends has been completely written, using the boost::bind and
+  boost::function libraries. This has made things significantly simpler
+  and allowed us to remove some 4,100 lines of code. The only
+  user-visible side effect is that you can now no longer spawn 
+  functions with 10 arguments (this was the maximum before) whereas 9
+  arguments continues to work; the reason for this is a limitation in
+  the boost::bind library. This limit will be lifted with the next
+  C++ standard, however, using variadic templates.
+  <br>
+  (WB 2008/08/28)
+  </p>
+
+  <li>
+  <p> 
   Changed: The SolutionTransfer class used to take a type as second
   template argument that denoted the scalar upon which Vector objects
   were built, in order to allow interpolating Vector@<float@> objects,
