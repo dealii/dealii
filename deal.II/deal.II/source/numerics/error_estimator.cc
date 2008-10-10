@@ -643,12 +643,14 @@ estimate_some (const hp::MappingCollection<dim>                  &mapping,
                const hp::QCollection<dim-1>             &quadrature,
                const typename FunctionMap<dim>::type &neumann_bc,
                const std::vector<const InputVector *> &solutions,
-               const std::vector<bool>                  &component_mask,
-               const Function<dim>                 *coefficients,
+	       const std::pair<const std::vector<bool>*,const Function<dim>*> &component_mask_and_coefficients,
                const std::pair<unsigned int, unsigned int> this_thread,
                typename FaceIntegrals<DH>::type                       &face_integrals,
                PerThreadData                       &per_thread_data)
 {
+  const std::vector<bool> &component_mask = *component_mask_and_coefficients.first;
+  const Function<dim>     *coefficients   = component_mask_and_coefficients.second;
+
   const unsigned int n_solution_vectors = solutions.size();
   const unsigned int n_components       = dof_handler.get_fe().n_components();
   
@@ -1020,8 +1022,7 @@ estimate (const Mapping<dim>                  &mapping,
 			     const hp::QCollection<dim-1>             &,
 			     const typename FunctionMap<dim>::type &,
 			     const std::vector<const InputVector *> &,
-			     const std::vector<bool>               &,
-			     const Function<dim>                 *,
+			     const std::pair<const std::vector<bool>*,const Function<dim>*> &,
 			     const std::pair<unsigned int, unsigned int>,
 			     typename FaceIntegrals<DH>::type                       &,
 			     PerThreadData                       &)
@@ -1034,7 +1035,7 @@ estimate (const Mapping<dim>                  &mapping,
     threads += Threads::spawn (estimate_some_ptr)
                (mapping_collection, dof_handler,
                 face_quadratures, neumann_bc, solutions,
-                component_mask, coefficients,
+                std::make_pair(&component_mask, coefficients),
                 std::make_pair(i, n_threads),
                 face_integrals,
                 *data_structures[i]);

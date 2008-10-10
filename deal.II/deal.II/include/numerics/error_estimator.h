@@ -2,7 +2,7 @@
 //    $Id$
 //    Version: $Name$
 //
-//    Copyright (C) 1998, 1999, 2000, 2001, 2002, 2003, 2004, 2005, 2006 by the deal.II authors
+//    Copyright (C) 1998, 1999, 2000, 2001, 2002, 2003, 2004, 2005, 2006, 2008 by the deal.II authors
 //
 //    This file is subject to QPL and may not be  distributed
 //    without copyright and license information. Please refer
@@ -699,8 +699,7 @@ class KellyErrorEstimator
                                const hp::QCollection<dim-1>         &quadrature,
                                const typename FunctionMap<dim>::type &neumann_bc,
                                const std::vector<const InputVector *> &solutions,
-                               const std::vector<bool>                  &component_mask,
-                               const Function<dim>                 *coefficients,
+			       const std::pair<const std::vector<bool>*,const Function<dim>*> &component_mask_and_coefficients,
                                const std::pair<unsigned int, unsigned int> this_thread,
                                typename FaceIntegrals<DH>::type    &face_integrals,
                                PerThreadData                       &per_thread_data);
