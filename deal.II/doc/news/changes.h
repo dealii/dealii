@@ -42,7 +42,7 @@ inconvenience this causes.
   the boost::bind library. This limit will be lifted with the next
   C++ standard, however, using variadic templates.
   <br>
-  (WB 2008/08/28)
+  (WB 2008/10/10)
   </p>
 
   <li>
