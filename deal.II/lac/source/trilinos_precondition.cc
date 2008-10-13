@@ -33,8 +33,8 @@ namespace TrilinosWrappers
 {
 
   PreconditionBase::PreconditionBase()
-                    :
 #ifdef DEAL_II_COMPILER_SUPPORTS_MPI
+                    :
                     communicator (MPI_COMM_WORLD)
 #endif
   {}
