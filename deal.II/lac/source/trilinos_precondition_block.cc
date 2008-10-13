@@ -61,8 +61,7 @@ namespace TrilinosWrappers
 					// (Thyra wrapper around the
 					// matrix).
     Teuchos::RCP<const Thyra::LinearOpBase<double> > tmpM = 
-      Teuchos::rcp(new Thyra::EpetraLinearOp(Teuchos::rcp(&*input_M.matrix, 
-							  false)));
+      Thyra::epetraLinearOp(Teuchos::rcp(&*input_M.matrix, false));
 
     Teuchos::RCP<const Thyra::LinearOpSourceBase<double> > M 
       = Teuchos::rcp(new Thyra::DefaultLinearOpSource<double>(tmpM), true);
@@ -72,11 +71,11 @@ namespace TrilinosWrappers
 					// Create a Thyra version of
 					// the preconditioner.
     Teuchos::RCP<const Thyra::LinearOpBase<double> > tmpP = 
-      Teuchos::rcp(new Thyra::EpetraLinearOp(Teuchos::rcp(const_cast<Epetra_Operator*>(input_P),
-							  false), 
-					     Thyra::NOTRANS,
-					     Thyra::EPETRA_OP_APPLY_APPLY_INVERSE,
-					     Thyra::EPETRA_OP_ADJOINT_SUPPORTED));
+      Thyra::epetraLinearOp(Teuchos::rcp(const_cast<Epetra_Operator*>(input_P),
+					 false), 
+			    Thyra::NOTRANS,
+			    Thyra::EPETRA_OP_APPLY_APPLY_INVERSE,
+			    Thyra::EPETRA_OP_ADJOINT_SUPPORTED);
 	
     //Thyra::ConstLinearOperator<double> opPM = tmpP;
 
