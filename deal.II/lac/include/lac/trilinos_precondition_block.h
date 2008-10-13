@@ -90,15 +90,25 @@ namespace TrilinosWrappers
 
 					// Forward declarations.
 
-/**  
+/**
  * This class implements a black box preconditioner for saddle points
  * systems arising from the Stokes or Navier&ndash;Stokes equations as
  * specified by the papers <em>D. Silvester, A. Wathen, Fast iterative
  * solution of stabilised Stokes systems part II. Using general block
- * preconditioners, SIAM J. Numer. Anal. 31:1352&ndash1367 (1994)</em>
+ * preconditioners, SIAM J. Numer. Anal. 31:1352&ndash;1367 (1994)</em>
  * and <em> D. Kay, D. Loghin, A. Wathen, A preconditioner for the
  * steady-state Navier&ndash;Stokes equations, SIAM
  * J. Sci. Comput. 24(1):237&ndash;256 (2002)</em>, respectively.
+ *
+ * The preconditioner is based an approximation to the Schur
+ * complement of the block matrix. The Schur complement $S=B
+ * A_{\mathbf u}^{-1} B^T$ is approximated by a mass matrix $M_p$ on
+ * the pressure space in the case of the Stokes equations, and as a
+ * product $S^{-1} = L_p^{-1} F_p M_p^{-1}$ with pressure Laplace
+ * matrix $L_p$, pressure convection-diffusion operator $F_p$
+ * (corresponding to the sum of time derivative, convection and
+ * diffusion), and pressure mass matrix $M_p$ in the case of the
+ * Navier&ndash;Stokes equations.
  *
  * @ingroup TrilinosWrappers
  * @ingroup Preconditioners
