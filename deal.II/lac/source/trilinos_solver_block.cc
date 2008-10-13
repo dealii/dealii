@@ -60,8 +60,17 @@ namespace TrilinosWrappers
   
   SolverBlockBase::SolverBlockBase (SolverControl  &cn)
                   :
-                  solver_control (cn),
-		  solver_name    (gmres)
+                  solver_name    (gmres),
+                  solver_control (cn)
+  {}
+
+  
+
+  SolverBlockBase::SolverBlockBase (SolverBlockBase::SolverBlockName solver_name,
+				    SolverControl                   &cn)
+                  :
+                  solver_name    (solver_name),
+                  solver_control (cn)
   {}
 
   

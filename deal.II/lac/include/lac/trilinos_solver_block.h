@@ -48,6 +48,22 @@ namespace TrilinosWrappers
   {
     public:
 
+				       /**
+					* Enumeration object that is
+					* set in the constructor of
+					* the derived classes and
+					* tells Trilinos which solver
+					* to use. This option can also
+					* be set in the user program,
+					* so one might use this base
+					* class instead of one of the
+					* specialized derived classes
+					* when the solver should be
+					* set at runtime. Currently
+					* enabled options are:
+					*/
+      enum SolverBlockName {cg, gmres} solver_name;
+
                                        /**
                                         * Standardized data struct to
                                         * pipe additional data to the
@@ -92,12 +108,21 @@ namespace TrilinosWrappers
                                        /**
                                         * Constructor. Takes the
                                         * solver control object and
-                                        * the MPI communicator over
-                                        * which parallel computations
-                                        * are to happen.
+                                        * creates the solver.
                                         */
       SolverBlockBase (SolverControl  &cn);
-      
+
+                                       /**
+                                        * Second constructor. This
+                                        * constructor takes an enum
+                                        * object that specifies the
+                                        * solver name and sets the
+                                        * appropriate Krylov
+                                        * method.
+                                        */
+      SolverBlockBase (const enum SolverBlockName  solver_name,
+		       SolverControl              &cn);
+
                                        /**
                                         * Destructor.
                                         */
@@ -189,17 +214,6 @@ namespace TrilinosWrappers
                                         * afterwards.
                                         */
       SolverControl &solver_control;
-
-				       /**
-					* String object that is set in
-					* the constructor of the
-					* derived classes and tells
-					* Trilinos which solver to
-					* use. Currently enabled
-					* options are <tt>"cg",
-					* "gmres"</tt>.
-					*/
-      enum SolverBlockName {cg, gmres} solver_name;
 
     protected:
 
