@@ -53,6 +53,7 @@ namespace TrilinosWrappers
 
   class VectorBase;
   class SparseMatrix;
+  class BlockSparseMatrix;
   class SolverBase;
 
 /**
@@ -124,9 +125,9 @@ namespace TrilinosWrappers
 		      << ". Check preconditioner and matrix setup.");
 
       friend class SolverBase;
-      friend class SolverSaddlePoint;
+      friend class PreconditionStokes;
 
-    protected:
+      //protected:
 				       /**
 					* This is a pointer to the
 					* preconditioner object that

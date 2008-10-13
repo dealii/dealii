@@ -47,12 +47,34 @@ namespace TrilinosWrappers
  * "http://trilinos.sandia.gov/packages/aztecoo/AztecOOUserGuide.pdf">AztecOO
  * user guide</a>.
  *
+ * This solver class can also be used as a standalone class, where the
+ * respective Krylov method is set via the flag
+ * <tt>solver_name</tt>. This can be done at runtime (e.g., when
+ * parsing the solver from a ParameterList) and is similar to the
+ * deal.II class SolverSelector.
+ *
  * @ingroup TrilinosWrappers
  * @author Martin Kronbichler, 2008
  */
   class SolverBase
   {
     public:
+
+				       /**
+					* Enumeration object that is
+					* set in the constructor of
+					* the derived classes and
+					* tells Trilinos which solver
+					* to use. This option can also
+					* be set in the user program,
+					* so one might use this base
+					* class instead of one of the
+					* specialized derived classes
+					* when the solver should be
+					* set at runtime. Currently
+					* enabled options are:
+					*/
+      enum SolverName {cg, cgs, gmres, bicgstab, tfqmr} solver_name;
 
                                        /**
                                         * Standardized data struct to
@@ -77,11 +99,20 @@ namespace TrilinosWrappers
                                        /**
                                         * Constructor. Takes the
                                         * solver control object and
-                                        * the MPI communicator over
-                                        * which parallel computations
-                                        * are to happen.
+                                        * creates the solver.
                                         */
       SolverBase (SolverControl  &cn);
+
+                                       /**
+                                        * Second constructor. This
+                                        * constructor takes an enum
+                                        * object that specifies the
+                                        * solver name and sets the
+                                        * appropriate Krylov
+                                        * method.
+                                        */
+      SolverBase (const enum SolverName  solver_name,
+		  SolverControl         &cn);
       
                                        /**
                                         * Destructor.
@@ -134,18 +165,6 @@ namespace TrilinosWrappers
                                         * afterwards.
                                         */
       SolverControl &solver_control;
-
-				       /**
-					* String object that is set in
-					* the constructor of the
-					* derived classes and tells
-					* Trilinos which solver to
-					* use. Currently enabled
-					* options are <tt>"cg", "cgs",
-					* "gmres", "bicgstab"</tt>,
-					* and <tt>"tfqmr"</tt>.
-					*/
-      enum SolverName {cg, cgs, gmres, bicgstab, tfqmr} solver_name;
 
     private:
 

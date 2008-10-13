@@ -224,8 +224,8 @@ namespace TrilinosWrappers
     ifpack.release();
 
     ifpack = Teuchos::rcp (Ifpack().Create ("point relaxation",
-						    &*matrix.matrix, 
-						    additional_data.overlap));
+					    &*matrix.matrix, 
+					    additional_data.overlap));
 
     Assert (&*ifpack != 0, ExcMessage ("Trilinos could not create this "
 				       "preconditioner"));
@@ -281,7 +281,7 @@ namespace TrilinosWrappers
 					    additional_data.overlap));
 
     Assert (&*ifpack != 0, ExcMessage ("Trilinos could not create this "
-					       "preconditioner"));
+				       "preconditioner"));
 
     int ierr;
 
@@ -332,7 +332,7 @@ namespace TrilinosWrappers
 					    additional_data.overlap));
 
     Assert (&*ifpack != 0, ExcMessage ("Trilinos could not create this "
-					       "preconditioner"));
+				       "preconditioner"));
 
     int ierr;
 
