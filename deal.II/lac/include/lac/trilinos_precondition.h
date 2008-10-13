@@ -127,7 +127,7 @@ namespace TrilinosWrappers
       friend class SolverBase;
       friend class PreconditionStokes;
 
-      //protected:
+    protected:
 				       /**
 					* This is a pointer to the
 					* preconditioner object that
