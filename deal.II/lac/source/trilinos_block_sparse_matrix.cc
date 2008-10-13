@@ -1,5 +1,5 @@
 //---------------------------------------------------------------------------
-//    $Id: trilinos_block_sparse_matrix.cc 15631 2008-01-17 23:47:31Z bangerth $
+//    $Id$
 //    Version: $Name$
 //
 //    Copyright (C) 2008 by the deal.II authors
