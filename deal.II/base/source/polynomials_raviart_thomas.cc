@@ -2,7 +2,7 @@
 //    $Id$
 //    Version: $Name$
 //
-//    Copyright (C) 2004, 2005, 2006, 2007 by the deal.II authors
+//    Copyright (C) 2004, 2005, 2006, 2007, 2008 by the deal.II authors
 //
 //    This file is subject to QPL and may not be  distributed
 //    without copyright and license information. Please refer
@@ -13,6 +13,7 @@
 
 #include <base/polynomials_raviart_thomas.h>
 #include <base/quadrature_lib.h>
+#include <base/thread_management.h>
 #include <iostream>
 #include <iomanip>
 
@@ -51,9 +52,9 @@ PolynomialsRaviartThomas<dim>::create_polynomials (const unsigned int k)
 template <int dim>
 void
 PolynomialsRaviartThomas<dim>::compute (const Point<dim>            &unit_point,
-			      std::vector<Tensor<1,dim> > &values,
-			      std::vector<Tensor<2,dim> > &grads,
-			      std::vector<Tensor<3,dim> > &grad_grads) const
+					std::vector<Tensor<1,dim> > &values,
+					std::vector<Tensor<2,dim> > &grads,
+					std::vector<Tensor<3,dim> > &grad_grads) const
 {
   Assert(values.size()==n_pols || values.size()==0,
 	 ExcDimensionMismatch(values.size(), n_pols));
@@ -62,7 +63,27 @@ PolynomialsRaviartThomas<dim>::compute (const Point<dim>            &unit_point,
   Assert(grad_grads.size()==n_pols|| grad_grads.size()==0,
 	 ExcDimensionMismatch(grad_grads.size(), n_pols));
 
-  const unsigned int n_sub = polynomial_space.n();
+				   // have a few scratch
+				   // arrays. because we don't want to
+				   // re-allocate them every time this
+				   // function is called, we make them
+				   // static. however, in return we
+				   // have to ensure that the calls to
+				   // the use of these variables is
+				   // locked with a mutex. if the
+				   // mutex is removed, several tests
+				   // (notably
+				   // deal.II/create_mass_matrix_05)
+				   // will start to produce random
+				   // results in multithread mode
+  static Threads::ThreadMutex mutex;
+  Threads::ThreadMutex::ScopedLock lock(mutex);
+
+  static std::vector<double> p_values;    
+  static std::vector<Tensor<1,dim> > p_grads;
+  static std::vector<Tensor<2,dim> > p_grad_grads;
+
+  const unsigned int n_sub = polynomial_space.n();  
   p_values.resize((values.size() == 0) ? 0 : n_sub);
   p_grads.resize((grads.size() == 0) ? 0 : n_sub);
   p_grad_grads.resize((grad_grads.size() == 0) ? 0 : n_sub);

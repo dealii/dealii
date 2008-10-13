@@ -198,6 +198,15 @@ inconvenience this causes.
 <ol>
   <li>
   <p>
+  Fixed: The PolynomialsRaviartThomas class had a bug that led to random
+  results when used from multiple threads. As a consequence the FE_RaviartThomas
+  class was unusable in a multithreaded context. This has now been fixed.
+  <br> 
+  (WB 2008/10/13)
+  </p>
+
+  <li>
+  <p>
   New: There is a new function scalar_product(const Tensor<2,dim> &,
   const Tensor<2,dim> &) that computes the scalar product
   $a:b=\sum_{i,j} a_{ij}b_{ij}$ between two tensors of rank 2.

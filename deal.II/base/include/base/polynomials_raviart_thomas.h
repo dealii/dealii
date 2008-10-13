@@ -2,7 +2,7 @@
 //    $Id$
 //    Version: $Name$
 //
-//    Copyright (C) 2004, 2005, 2006, 2007 by the deal.II authors
+//    Copyright (C) 2004, 2005, 2006, 2007, 2008 by the deal.II authors
 //
 //    This file is subject to QPL and may not be  distributed
 //    without copyright and license information. Please refer
@@ -135,22 +135,7 @@ class PolynomialsRaviartThomas
 				      * Number of Raviart-Thomas
 				      * polynomials.
 				      */
-    unsigned int n_pols;
-    
-				     /**
-				      * Auxiliary memory.
-				      */
-    mutable std::vector<double> p_values;    
-    
-				     /**
-				      * Auxiliary memory.
-				      */
-    mutable std::vector<Tensor<1,dim> > p_grads;
-    
-				     /**
-				      * Auxiliary memory.
-				      */
-    mutable std::vector<Tensor<2,dim> > p_grad_grads;
+    const unsigned int n_pols;
 
 				     /**
 				      * A static member function that
