@@ -87,6 +87,9 @@ namespace TrilinosWrappers
                                         */
       PreconditionBase ();
 
+                                       /**
+                                        * Copy constructor.
+					*/
       PreconditionBase (const PreconditionBase &);
 
                                        /**
