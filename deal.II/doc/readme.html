@@ -629,11 +629,13 @@
       Trilinos use is configured in, header files are automatically found and
       libraries are linked with. To do so, set the <code>TRILINOS_DIR</code>
       environment variable to the path to an existing Trilinos installation,
-      or use the <code>--enable-trilinos=/path/to/trilinos</code> switch of
-      the deal.II <code>./configure</code> script. The Trilinos installation needs to
-      provide the same kind of libraries that <acronym>deal.II</acronym> is
-      configured for, i.e. if you want deal.II to use shared libraries, then
-      Trilinos needs to use shared libraries as well.
+      or use the <code>--with-trilinos=/path/to/trilinos</code> switch of
+      the deal.II <code>./configure</code> script. It should point to the path
+      of which the include and lib directories are subdirs. The Trilinos 
+      installation needs to provide the same kind of libraries that 
+      <acronym>deal.II</acronym> is configured for, i.e. if you want deal.II
+      to use shared libraries, then Trilinos needs to use shared libraries as
+      well.
       </p>
     </dd>
 
