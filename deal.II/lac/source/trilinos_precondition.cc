@@ -41,6 +41,18 @@ namespace TrilinosWrappers
 
 
 
+  PreconditionBase::PreconditionBase(const PreconditionBase &base)
+                    :
+                    Subscriptor (),
+                    preconditioner (base.preconditioner),
+#ifdef DEAL_II_COMPILER_SUPPORTS_MPI
+                    communicator (base.communicator),
+#endif
+		    map (new Epetra_Map(*base.map))
+  {}
+
+
+
   PreconditionBase::~PreconditionBase()
   {
     preconditioner.release();

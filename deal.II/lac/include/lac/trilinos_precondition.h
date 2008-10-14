@@ -87,14 +87,10 @@ namespace TrilinosWrappers
                                         */
       PreconditionBase ();
 
+      PreconditionBase (const PreconditionBase &);
+
                                        /**
-                                        * Constructor. Does not do
-                                        * anything. The
-                                        * <tt>initialize</tt> function
-                                        * of the derived classes will
-                                        * have to create the
-                                        * preconditioner from a given
-                                        * sparse matrix.
+                                        * Destructor.
                                         */
       ~PreconditionBase ();
       
