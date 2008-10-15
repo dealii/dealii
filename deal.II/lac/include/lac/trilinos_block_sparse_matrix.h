@@ -28,6 +28,8 @@
 
 #ifdef DEAL_II_USE_TRILINOS
 
+#  define TrilinosScalar double
+
 DEAL_II_NAMESPACE_OPEN
 
 
@@ -338,20 +340,8 @@ namespace TrilinosWrappers
                                         * applicable if the matrix has
                                         * only one block.
                                         */
-      void vmult (MPI::Vector       &dst,
-                  const MPI::Vector &src) const;
-
-                                       /**
-                                        * Matrix-vector
-                                        * multiplication. Just like the
-                                        * previous function, but only
-                                        * applicable if the matrix has
-                                        * only one block, now applied to
-                                        * localized vectors (works only
-                                        * when run on one processor).
-                                        */
-      void vmult (Vector       &dst,
-		  const Vector &src) const;
+      void vmult (VectorBase       &dst,
+                  const VectorBase &src) const;
 
                                        /**
                                         * Matrix-vector multiplication:
@@ -431,21 +421,156 @@ namespace TrilinosWrappers
                                         * applicable if the matrix has
                                         * only one block.
                                         */
-      void Tvmult (MPI::Vector       &dst,
-                   const MPI::Vector &src) const;
+      void Tvmult (VectorBase       &dst,
+                   const VectorBase &src) const;
 
                                        /**
-                                        * Matrix-vector
-                                        * multiplication. Just like the
-                                        * previous function, but only
-                                        * applicable if the matrix has
-                                        * only one block, now applied to
-                                        * localized Trilinos vectors
-                                        * (works only when run on one
-                                        * processor).
+                                        * Compute the residual of an
+                                        * equation <i>Mx=b</i>, where
+                                        * the residual is defined to
+                                        * be <i>r=b-Mx</i>. Write the
+                                        * residual into @p dst. The
+                                        * <i>l<sub>2</sub></i> norm of
+                                        * the residual vector is
+                                        * returned.
+                                        *
+                                        * Source <i>x</i> and
+                                        * destination <i>dst</i> must
+                                        * not be the same vector.
+					*
+					* Note that both vectors have
+					* to be distributed vectors
+					* generated using the same Map
+					* as was used for the matrix
+					* in case you work on a
+					* distributed memory
+					* architecture, using the
+					* interface in the
+					* TrilinosWrappers::MPI::BlockVector
+					* class.
                                         */
-      void Tvmult (Vector       &dst,
-                   const Vector &src) const;
+      TrilinosScalar residual (MPI::BlockVector       &dst,
+			       const MPI::BlockVector &x,
+			       const MPI::BlockVector &b) const;
+
+                                       /**
+                                        * Compute the residual of an
+                                        * equation <i>Mx=b</i>, where
+                                        * the residual is defined to
+                                        * be <i>r=b-Mx</i>. Write the
+                                        * residual into @p dst. The
+                                        * <i>l<sub>2</sub></i> norm of
+                                        * the residual vector is
+                                        * returned.
+                                        *
+                                        * Source <i>x</i> and
+                                        * destination <i>dst</i> must
+                                        * not be the same vector.
+					*
+					* Note that both vectors have
+					* to be distributed vectors
+					* generated using the same Map
+					* as was used for the matrix
+					* in case you work on a
+					* distributed memory
+					* architecture, using the
+					* interface in the
+					* TrilinosWrappers::BlockVector
+					* class. Since the block
+					* matrix is in general
+					* distributed among processes,
+					* this function only works
+					* when running the program on
+					* one processor.
+                                        */
+      TrilinosScalar residual (BlockVector       &dst,
+			       const BlockVector &x,
+			       const BlockVector &b) const;
+
+                                       /**
+                                        * Compute the residual of an
+                                        * equation <i>Mx=b</i>, where
+                                        * the residual is defined to
+                                        * be <i>r=b-Mx</i>. Write the
+                                        * residual into @p dst. The
+                                        * <i>l<sub>2</sub></i> norm of
+                                        * the residual vector is
+                                        * returned. Just like the
+                                        * previous function, but only
+                                        * applicable if the matrix
+                                        * only has one block row.
+                                        */
+      TrilinosScalar residual (MPI::BlockVector       &dst,
+			       const MPI::Vector      &x,
+			       const MPI::BlockVector &b) const;
+
+                                       /**
+                                        * Compute the residual of an
+                                        * equation <i>Mx=b</i>, where
+                                        * the residual is defined to
+                                        * be <i>r=b-Mx</i>. Write the
+                                        * residual into @p dst. The
+                                        * <i>l<sub>2</sub></i> norm of
+                                        * the residual vector is
+                                        * returned. Just like the
+                                        * previous function, but only
+                                        * applicable if the matrix
+                                        * only has one block row.
+                                        */
+      TrilinosScalar residual (BlockVector       &dst,
+			       const Vector      &x,
+			       const BlockVector &b) const;
+
+                                       /**
+                                        * Compute the residual of an
+                                        * equation <i>Mx=b</i>, where
+                                        * the residual is defined to
+                                        * be <i>r=b-Mx</i>. Write the
+                                        * residual into @p dst. The
+                                        * <i>l<sub>2</sub></i> norm of
+                                        * the residual vector is
+                                        * returned. Just like the
+                                        * previous function, but only
+                                        * applicable if the matrix
+                                        * only has one block column.
+                                        */
+      TrilinosScalar residual (MPI::Vector            &dst,
+			       const MPI::BlockVector &x,
+			       const MPI::Vector      &b) const;
+
+                                       /**
+                                        * Compute the residual of an
+                                        * equation <i>Mx=b</i>, where
+                                        * the residual is defined to
+                                        * be <i>r=b-Mx</i>. Write the
+                                        * residual into @p dst. The
+                                        * <i>l<sub>2</sub></i> norm of
+                                        * the residual vector is
+                                        * returned. Just like the
+                                        * previous function, but only
+                                        * applicable if the matrix
+                                        * only has one block column.
+                                        */
+      TrilinosScalar residual (Vector            &dst,
+			       const BlockVector &x,
+			       const Vector      &b) const;
+
+                                       /**
+                                        * Compute the residual of an
+                                        * equation <i>Mx=b</i>, where
+                                        * the residual is defined to
+                                        * be <i>r=b-Mx</i>. Write the
+                                        * residual into @p dst. The
+                                        * <i>l<sub>2</sub></i> norm of
+                                        * the residual vector is
+                                        * returned. Just like the
+                                        * previous function, but only
+                                        * applicable if the matrix
+                                        * only has one block.
+                                        */
+      TrilinosScalar residual (VectorBase       &dst,
+			       const VectorBase &x,
+			       const VectorBase &b) const;
 
                                        /**
                                         * Make the clear() function in the
@@ -562,18 +687,8 @@ namespace TrilinosWrappers
 
   inline
   void
-  BlockSparseMatrix::vmult (MPI::Vector       &dst,
-			    const MPI::Vector &src) const
-  {
-    BaseClass::vmult_nonblock_nonblock (dst, src);
-  }
-
-
-
-  inline
-  void
-  BlockSparseMatrix::vmult (Vector       &dst,
-                            const Vector &src) const
+  BlockSparseMatrix::vmult (VectorBase       &dst,
+			    const VectorBase &src) const
   {
     BaseClass::vmult_nonblock_nonblock (dst, src);
   }
@@ -642,18 +757,8 @@ namespace TrilinosWrappers
 
   inline
   void
-  BlockSparseMatrix::Tvmult (MPI::Vector       &dst,
-			     const MPI::Vector &src) const
-  {
-    BaseClass::Tvmult_nonblock_nonblock (dst, src);
-  }
-
-
-
-  inline
-  void
-  BlockSparseMatrix::Tvmult (Vector       &dst,
-			     const Vector &src) const
+  BlockSparseMatrix::Tvmult (VectorBase       &dst,
+			     const VectorBase &src) const
   {
     BaseClass::Tvmult_nonblock_nonblock (dst, src);
   }

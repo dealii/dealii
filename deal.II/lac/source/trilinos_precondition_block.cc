@@ -87,7 +87,7 @@ namespace TrilinosWrappers
 	*defaultPrec = &Teuchos::dyn_cast<Thyra::DefaultPreconditioner<double> >
 	               (*PM);
 
-      (*defaultPrec).initializeRight(tmpP);
+      (*defaultPrec).initializeUnspecified(tmpP);
     }
 
 					// Set up the solver.
