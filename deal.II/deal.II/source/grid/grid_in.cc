@@ -559,7 +559,7 @@ void GridIn<dim>::read_msh (std::istream &in)
   in >> line;
 
 				   // first determine file format
-  unsigned int gmsh_file_format;
+  unsigned int gmsh_file_format = 0;
   if (line == "$NOD")
     gmsh_file_format = 1;
   else if (line == "$MeshFormat")
