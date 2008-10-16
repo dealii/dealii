@@ -1248,8 +1248,8 @@ class SparseDirectUMFPACK : public Subscriptor
                                       * The arrays in which we store the data
                                       * for the solver.
                                       */
-    std::vector<int> Ap;
-    std::vector<int> Ai;
+    std::vector<long int> Ap;
+    std::vector<long int> Ai;
     std::vector<double> Ax;
 
                                      /**

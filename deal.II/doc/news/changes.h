@@ -301,6 +301,15 @@ inconvenience this causes.
 <ol>
   <li>
   <p>
+  Changed: The SparseDirectUMFPACK class now calls the umfpack_dl_* routines 
+  instead of umfpack_di_*. On machines with 64-bit longs this allows the 
+  UMFPACK solver to allocate more than 2GB of memory for large problems.
+  <br>
+  (Moritz Allmaras 2008/10/16)
+  </p>
+
+  <li>
+  <p>
   Improved: The SparseILU::initialize function, for some reason, required
   the second argument, SparseILU::AdditionalParameters, to be present even
   if it is a default constructed object. This argument now has a default value

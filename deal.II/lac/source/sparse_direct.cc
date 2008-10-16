@@ -1499,7 +1499,7 @@ SparseDirectUMFPACK::SparseDirectUMFPACK ()
                 numeric_decomposition (0),
                 control (UMFPACK_CONTROL)
 {
-  umfpack_di_defaults (&control[0]);
+  umfpack_dl_defaults (&control[0]);
 }
 
 
@@ -1511,23 +1511,23 @@ SparseDirectUMFPACK::clear ()
                                    // yet
   if (symbolic_decomposition != 0)
     {
-      umfpack_di_free_symbolic (&symbolic_decomposition);
+      umfpack_dl_free_symbolic (&symbolic_decomposition);
       symbolic_decomposition = 0;
     }
 
   if (numeric_decomposition != 0)
     {
-      umfpack_di_free_numeric (&numeric_decomposition);
+      umfpack_dl_free_numeric (&numeric_decomposition);
       numeric_decomposition = 0;
     }
   
   {
-    std::vector<int> tmp;
+    std::vector<long int> tmp;
     tmp.swap (Ap);
   }
 
   {
-    std::vector<int> tmp;
+    std::vector<long int> tmp;
     tmp.swap (Ai);
   }
   
@@ -1536,7 +1536,7 @@ SparseDirectUMFPACK::clear ()
     tmp.swap (Ax);
   }
 
-  umfpack_di_defaults (&control[0]);
+  umfpack_dl_defaults (&control[0]);
 }
 
 
@@ -1578,7 +1578,7 @@ sort_arrays (const SparseMatrix<number> &matrix)
                                        // that the row has at least two
                                        // entries and that the diagonal
                                        // entry is really in the wrong place
-      int cursor = Ap[row];
+      long int cursor = Ap[row];
       while ((cursor < Ap[row+1]-1) &&
              (Ai[cursor] > Ai[cursor+1]))
         {
@@ -1609,7 +1609,7 @@ sort_arrays (const BlockSparseMatrix<number> &matrix)
                                    // do it multiple times
   for (unsigned int row=0; row<matrix.m(); ++row)
     {
-      int cursor = Ap[row];
+      long int cursor = Ap[row];
       for (unsigned int block=0; block<matrix.n_block_cols(); ++block)
         {
 
@@ -1627,7 +1627,7 @@ sort_arrays (const BlockSparseMatrix<number> &matrix)
                                          // otherwise swap this entry
                                          // with successive ones as
                                          // long as necessary
-        int element = cursor;
+        long int element = cursor;
         while ((element < Ap[row+1]-1) &&
                (Ai[element] > Ai[element+1]))
           {
@@ -1660,7 +1660,7 @@ factorize (const Matrix &matrix)
                                    // work around this by, rather than
                                    // shuffling things around, copy over the
                                    // data we have, but then call the
-                                   // umfpack_di_solve function with the
+                                   // umfpack_dl_solve function with the
                                    // UMFPACK_At argument, meaning that we
                                    // want to solve for the transpose system
                                    //
@@ -1705,7 +1705,7 @@ factorize (const Matrix &matrix)
 				     // have an array that for each
 				     // row points to the first entry
 				     // not yet written to
-    std::vector<int> row_pointers = Ap;
+    std::vector<long int> row_pointers = Ap;
     
     for (typename Matrix::const_iterator p=matrix.begin();
          p!=matrix.end(); ++p)
@@ -1733,21 +1733,21 @@ factorize (const Matrix &matrix)
   sort_arrays (matrix);
         
   int status;
-  status = umfpack_di_symbolic (N, N,
+  status = umfpack_dl_symbolic (N, N,
                                 &Ap[0], &Ai[0], &Ax[0],
                                 &symbolic_decomposition,
                                 &control[0], 0);
   AssertThrow (status == UMFPACK_OK,
-               ExcUMFPACKError("umfpack_di_symbolic", status));
+               ExcUMFPACKError("umfpack_dl_symbolic", status));
   
-  status = umfpack_di_numeric (&Ap[0], &Ai[0], &Ax[0],
+  status = umfpack_dl_numeric (&Ap[0], &Ai[0], &Ax[0],
                                symbolic_decomposition,
                                &numeric_decomposition,
                                &control[0], 0);
   AssertThrow (status == UMFPACK_OK,
-               ExcUMFPACKError("umfpack_di_numeric", status));
+               ExcUMFPACKError("umfpack_dl_numeric", status));
 
-  umfpack_di_free_symbolic (&symbolic_decomposition) ;
+  umfpack_dl_free_symbolic (&symbolic_decomposition) ;
 }
 
 
@@ -1771,12 +1771,12 @@ SparseDirectUMFPACK::solve (Vector<double> &rhs_and_solution) const
                                    // SparsityPattern classes, we solve for
                                    // UMFPACK's A^T instead
   const int status
-    = umfpack_di_solve (UMFPACK_At,
+    = umfpack_dl_solve (UMFPACK_At,
                         &Ap[0], &Ai[0], &Ax[0],
                         rhs_and_solution.begin(), rhs.begin(),
                         numeric_decomposition,
                         &control[0], 0);
-  AssertThrow (status == UMFPACK_OK, ExcUMFPACKError("umfpack_di_solve", status));
+  AssertThrow (status == UMFPACK_OK, ExcUMFPACKError("umfpack_dl_solve", status));
 }
 
 
