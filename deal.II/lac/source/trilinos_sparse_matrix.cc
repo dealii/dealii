@@ -560,14 +560,15 @@ namespace TrilinosWrappers
 		ExcTrilinosError(ierr));
 	
 	int* diag_find = std::find(col_indices,col_indices+num_entries, 
-				  local_row);
+				   local_row);
 	int diag_index = (int)(diag_find - col_indices);
 
 	for (int j=0; j<num_entries; ++j)
 	  if (diag_index != j || new_diag_value == 0)
 	    values[j] = 0.;
 
-	if (diag_find && std::fabs(values[diag_index]) == 0 && new_diag_value!=0)
+	if (diag_find && std::fabs(values[diag_index]) == 0.0 && 
+	    new_diag_value != 0.0)
 	  values[diag_index] = new_diag_value;
       }
   }

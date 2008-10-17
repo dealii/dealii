@@ -745,28 +745,33 @@ namespace TrilinosWrappers
           (dof->first < local_range.second))
         constrained_rows.push_back (dof->first);
 
-                                     // then eliminate these rows and set
-                                     // their diagonal entry to what we have
-                                     // determined above. if the value already
-                                     // is nonzero, it will be preserved, 
-                                     // in accordance with the basic 
+                                     // then eliminate these rows and
+                                     // set their diagonal entry to
+                                     // what we have determined
+                                     // above. if the value already is
+                                     // nonzero, it will be preserved,
+                                     // in accordance with the basic
                                      // matrix classes in deal.II.
     matrix.clear_rows (constrained_rows, average_nonzero_diagonal_entry);
 
-                                     // the next thing is to set right hand
-                                     // side to the wanted value. there's one
-                                     // drawback: if we write to individual
-                                     // vector elements, then we have to do
-                                     // that on all processors. however, some
+                                     // the next thing is to set right
+                                     // hand side to the wanted
+                                     // value. there's one drawback:
+                                     // if we write to individual
+                                     // vector elements, then we have
+                                     // to do that on all
+                                     // processors. however, some
                                      // processors may not need to set
-                                     // anything because their chunk of
-                                     // matrix/rhs do not contain any boundary
-                                     // nodes. therefore, rather than using
-                                     // individual calls, we use one call for
-                                     // all elements, thereby making sure that
-                                     // all processors call this function,
-                                     // even if some only have an empty set of
-                                     // elements to set
+                                     // anything because their chunk
+                                     // of matrix/rhs do not contain
+                                     // any boundary nodes. therefore,
+                                     // rather than using individual
+                                     // calls, we use one call for all
+                                     // elements, thereby making sure
+                                     // that all processors call this
+                                     // function, even if some only
+                                     // have an empty set of elements
+                                     // to set
     right_hand_side.compress ();
     solution.compress ();
 
@@ -784,10 +789,10 @@ namespace TrilinosWrappers
         }
     solution.set (indices, solution_values);
 
-                                     // now also set appropriate values for
-                                     // the rhs
+                                     // now also set appropriate
+                                     // values for the rhs
     for (unsigned int i=0; i<solution_values.size(); ++i)
-      solution_values[i] *= matrix.diag_element(i);
+      solution_values[i] *= matrix.diag_element(indices[i]);
 
     right_hand_side.set (indices, solution_values);
 
@@ -807,6 +812,8 @@ namespace TrilinosWrappers
 			       TrilinosBlockVector &right_hand_side,
 			       const bool          eliminate_columns)
   {
+    Assert (eliminate_columns == false, ExcNotImplemented());
+
     Assert (matrix.n() == right_hand_side.size(),
 	    ExcDimensionMismatch(matrix.n(), right_hand_side.size()));
     Assert (matrix.n() == solution.size(),
