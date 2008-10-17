@@ -5262,7 +5262,7 @@ AC_DEFUN(DEAL_II_CONFIGURE_PETSC, dnl
     fi
   fi
 
-  dnl Make sure that the right values for Trilinos vectors are written into
+  dnl Make sure that the right values for PETSC vectors are written into
   dnl common/template-arguments.in
   AC_SUBST(DEAL_II_EXPAND_PETSC_VECTOR)
   AC_SUBST(DEAL_II_EXPAND_PETSC_BLOCKVECTOR)
