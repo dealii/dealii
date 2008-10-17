@@ -73,6 +73,12 @@ ifneq ($(GXX-VERSION),compaq_cxx)
     deplibs.o += $(lib-contrib-petsc.o)
   endif
 
+  # same with PETSC
+  ifeq ($(USE_CONTRIB_TRILINOS),yes)
+    deplibs.g += $(lib-contrib-trilinos)
+    deplibs.o += $(lib-contrib-trilinos)
+  endif
+
   # and METIS
   ifeq ($(USE_CONTRIB_METIS),yes)
     deplibs.g += $(lib-contrib-metis)
