@@ -67,6 +67,21 @@ LogStream::~LogStream()
 {
   if (old_cerr)
     std::cerr.rdbuf(old_cerr);
+
+				   // on some systems, destroying the
+				   // outstreams objects of deallog
+				   // triggers some sort of memory
+				   // corruption, in particular when
+				   // we also link with Trilinos;
+				   // since this happens at the very
+				   // end of the program, we take the
+				   // liberty to simply not do it by
+				   // putting that object into a
+				   // deliberate memory leak and
+				   // instead destroying an empty
+				   // object
+  if (this == &deallog)
+    (new stream_map_type())->swap (outstreams);
 }
 
 
