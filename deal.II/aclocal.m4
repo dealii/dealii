@@ -5464,6 +5464,7 @@ AC_DEFUN(DEAL_II_CONFIGURE_TRILINOS, dnl
 
     DEAL_II_CHECK_TRILINOS_SHARED_STATIC
     DEAL_II_CHECK_TRILINOS_WARNINGS
+    DEAL_II_CHECK_TRILINOS_HEADER_FILES
 
     DEAL_II_EXPAND_TRILINOS_VECTOR="TrilinosWrappers::Vector"
     DEAL_II_EXPAND_TRILINOS_MPI_VECTOR="TrilinosWrappers::MPI::Vector"
@@ -5592,7 +5593,67 @@ AC_DEFUN(DEAL_II_CHECK_TRILINOS_WARNINGS, dnl
       AC_MSG_RESULT(no)
     ])
 
- CXXFLAGS="${OLD_CXXFLAGS}"
+  CXXFLAGS="${OLD_CXXFLAGS}"
+])
+
+
+
+dnl ------------------------------------------------------------
+dnl Trilinos consists of a number of individual packages. We
+dnl need several of those so we should make sure at configure
+dnl that all necessary Trilinos packages were compiled and installed
+dnl when Trilinos was built.
+dnl
+dnl Usage: DEAL_II_CHECK_TRILINOS_HEADER_FILES
+dnl
+dnl ------------------------------------------------------------
+AC_DEFUN(DEAL_II_CHECK_TRILINOS_HEADER_FILES, dnl
+[
+  OLD_CXXFLAGS="$CXXFLAGS"
+  CXXFLAGS="-I$DEAL_II_TRILINOS_DIR/include"
+  AC_CHECK_HEADERS([Amesos.h
+                    AztecOO.h
+                    AztecOO_Operator.h
+                    Epetra_CrsGraph.h
+                    Epetra_CrsMatrix.h
+                    Epetra_Import.h
+                    Epetra_LinearProblem.h
+                    Epetra_Map.h
+                    Epetra_MultiVector.h
+                    Epetra_Operator.h
+                    Epetra_SerialComm.h
+                    Epetra_Vector.h
+                    Ifpack.h
+                    ml_MultiLevelPreconditioner.h
+                    Sacado.hpp
+                    Teuchos_ParameterList.hpp
+                    Teuchos_RCP.hpp
+                    Teuchos_RefCountPtr.hpp
+                    Thyra_AztecOOLinearOpWithSolveFactory.hpp
+                    Thyra_DefaultBlockedLinearOpDecl.hpp
+                    Thyra_DefaultBlockedLinearOp.hpp
+                    Thyra_DefaultInverseLinearOp.hpp
+                    Thyra_EpetraLinearOp.hpp
+                    Thyra_EpetraThyraWrappers.hpp
+                    Thyra_InverseLinearOperator.hpp
+                    Thyra_LinearOperatorDecl.hpp
+                    Thyra_LinearOperatorImpl.hpp
+                    Thyra_LinearOpWithSolveFactoryHelpers.hpp
+                    Thyra_MultiVectorBase.hpp
+                    Thyra_MultiVectorDefaultBase.hpp
+                    Thyra_VectorDecl.hpp
+                    Thyra_VectorImpl.hpp
+                    Thyra_VectorSpaceImpl.hpp
+                   ],
+                   [],
+                   [
+                     AC_MSG_ERROR([The Trilinos installation is missing one or more
+                                   header files necessary for the deal.II Trilinos
+                                   interfaces. Please re-install Trilinos with the missing
+                                   Trilinos sub-packages enabled.])
+                   ],
+                   [])
+  CXXFLAGS="${OLD_CXXFLAGS}"
 ])
 
 
