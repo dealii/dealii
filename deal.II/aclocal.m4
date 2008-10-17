@@ -5463,6 +5463,7 @@ AC_DEFUN(DEAL_II_CONFIGURE_TRILINOS, dnl
     DEAL_II_DEFINE_DEAL_II_USE_TRILINOS=DEAL_II_USE_TRILINOS
 
     DEAL_II_CHECK_TRILINOS_SHARED_STATIC
+    DEAL_II_CHECK_TRILINOS_WARNINGS
 
     DEAL_II_EXPAND_TRILINOS_VECTOR="TrilinosWrappers::Vector"
     DEAL_II_EXPAND_TRILINOS_MPI_VECTOR="TrilinosWrappers::MPI::Vector"
@@ -5541,6 +5542,59 @@ AC_DEFUN(DEAL_II_CHECK_TRILINOS_SHARED_STATIC, dnl
     fi
   fi
 ])
+
+
+
+dnl ------------------------------------------------------------
+dnl Trilinos has headers that produce tons of warnings when
+dnl used with -W -Wall (which includes -Wunused). Regrettable
+dnl though it may be, these warnings pretty much drown everything
+dnl else and we better disable some of the warnings to enable us
+dnl to see through the clutter.
+dnl
+dnl Usage: DEAL_II_CHECK_TRILINOS_WARNINGS
+dnl
+dnl ------------------------------------------------------------
+AC_DEFUN(DEAL_II_CHECK_TRILINOS_WARNINGS, dnl
+[
+  OLD_CXXFLAGS="$CXXFLAGS"
+
+  AC_MSG_CHECKING(whether we can use -Wno-unused to suppress Trilinos warnings)
+  CXXFLAGS=-Wno-unused
+  AC_TRY_COMPILE([], [;],
+    [
+      AC_MSG_RESULT(yes)
+      CXXFLAGSG="$CXXFLAGSG -Wno-unused"
+    ],
+    [
+      AC_MSG_RESULT(no)
+    ])
+
+  AC_MSG_CHECKING(whether we can use -Wno-overloaded-virtual to suppress Trilinos warnings)
+  CXXFLAGS=-Wno-overloaded-virtual
+  AC_TRY_COMPILE([], [;],
+    [
+      AC_MSG_RESULT(yes)
+      CXXFLAGSG="$CXXFLAGSG -Wno-overloaded-virtual"
+    ],
+    [
+      AC_MSG_RESULT(no)
+    ])
+
+  AC_MSG_CHECKING(whether we can use -Wno-extra to suppress Trilinos warnings)
+  CXXFLAGS=-Wno-extra
+  AC_TRY_COMPILE([], [;],
+    [
+      AC_MSG_RESULT(yes)
+      CXXFLAGSG="$CXXFLAGSG -Wno-extra"
+    ],
+    [
+      AC_MSG_RESULT(no)
+    ])
+
+ CXXFLAGS="${OLD_CXXFLAGS}"
+])
+
 
 
 dnl ------------------------------------------------------------
