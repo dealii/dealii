@@ -12389,8 +12389,10 @@ rm -f core conftest.err conftest.$ac_objext conftest.$ac_ext
 
 
   OLD_CXXFLAGS="$CXXFLAGS"
-  CPPFLAGS="-I$DEAL_II_TRILINOS_DIR/include"
-  CXXFLAGS="-I$DEAL_II_TRILINOS_DIR/include"
+  OLD_CPPFLAGS="$CPPFLAGS"
+
+  CPPFLAGS="-I$DEAL_II_TRILINOS_DIR/include $CPPFLAGS"
+  CXXFLAGS="-I$DEAL_II_TRILINOS_DIR/include $CXXFLAGS"
 
 
 
@@ -12613,6 +12615,7 @@ fi
 
 done
 
+  CPPFLAGS="${OLD_CPPFLAGS}"
   CXXFLAGS="${OLD_CXXFLAGS}"
 
 

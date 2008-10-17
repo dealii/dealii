@@ -5610,8 +5610,10 @@ dnl ------------------------------------------------------------
 AC_DEFUN(DEAL_II_CHECK_TRILINOS_HEADER_FILES, dnl
 [
   OLD_CXXFLAGS="$CXXFLAGS"
-  CPPFLAGS="-I$DEAL_II_TRILINOS_DIR/include"
-  CXXFLAGS="-I$DEAL_II_TRILINOS_DIR/include"
+  OLD_CPPFLAGS="$CPPFLAGS"
+
+  CPPFLAGS="-I$DEAL_II_TRILINOS_DIR/include $CPPFLAGS"
+  CXXFLAGS="-I$DEAL_II_TRILINOS_DIR/include $CXXFLAGS"
   AC_CHECK_HEADERS([Amesos.h \
                     AztecOO.h \
                     AztecOO_Operator.h \
@@ -5654,6 +5656,7 @@ AC_DEFUN(DEAL_II_CHECK_TRILINOS_HEADER_FILES, dnl
                                    Trilinos sub-packages enabled.])
                    ],
                    [])
+  CPPFLAGS="${OLD_CPPFLAGS}"
   CXXFLAGS="${OLD_CXXFLAGS}"
 ])
 
