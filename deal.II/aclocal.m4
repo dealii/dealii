@@ -5610,39 +5610,40 @@ dnl ------------------------------------------------------------
 AC_DEFUN(DEAL_II_CHECK_TRILINOS_HEADER_FILES, dnl
 [
   OLD_CXXFLAGS="$CXXFLAGS"
+  CPPFLAGS="-I$DEAL_II_TRILINOS_DIR/include"
   CXXFLAGS="-I$DEAL_II_TRILINOS_DIR/include"
-  AC_CHECK_HEADERS([Amesos.h
-                    AztecOO.h
-                    AztecOO_Operator.h
-                    Epetra_CrsGraph.h
-                    Epetra_CrsMatrix.h
-                    Epetra_Import.h
-                    Epetra_LinearProblem.h
-                    Epetra_Map.h
-                    Epetra_MultiVector.h
-                    Epetra_Operator.h
-                    Epetra_SerialComm.h
-                    Epetra_Vector.h
-                    Ifpack.h
-                    ml_MultiLevelPreconditioner.h
-                    Sacado.hpp
-                    Teuchos_ParameterList.hpp
-                    Teuchos_RCP.hpp
-                    Teuchos_RefCountPtr.hpp
-                    Thyra_AztecOOLinearOpWithSolveFactory.hpp
-                    Thyra_DefaultBlockedLinearOpDecl.hpp
-                    Thyra_DefaultBlockedLinearOp.hpp
-                    Thyra_DefaultInverseLinearOp.hpp
-                    Thyra_EpetraLinearOp.hpp
-                    Thyra_EpetraThyraWrappers.hpp
-                    Thyra_InverseLinearOperator.hpp
-                    Thyra_LinearOperatorDecl.hpp
-                    Thyra_LinearOperatorImpl.hpp
-                    Thyra_LinearOpWithSolveFactoryHelpers.hpp
-                    Thyra_MultiVectorBase.hpp
-                    Thyra_MultiVectorDefaultBase.hpp
-                    Thyra_VectorDecl.hpp
-                    Thyra_VectorImpl.hpp
+  AC_CHECK_HEADERS([Amesos.h \
+                    AztecOO.h \
+                    AztecOO_Operator.h \
+                    Epetra_CrsGraph.h \
+                    Epetra_CrsMatrix.h \
+                    Epetra_Import.h \
+                    Epetra_LinearProblem.h \
+                    Epetra_Map.h \
+                    Epetra_MultiVector.h \
+                    Epetra_Operator.h \
+                    Epetra_SerialComm.h \
+                    Epetra_Vector.h \
+                    Ifpack.h \
+                    ml_MultiLevelPreconditioner.h \
+                    Sacado.hpp \
+                    Teuchos_ParameterList.hpp \
+                    Teuchos_RCP.hpp \
+                    Teuchos_RefCountPtr.hpp \
+                    Thyra_AztecOOLinearOpWithSolveFactory.hpp \
+                    Thyra_DefaultBlockedLinearOpDecl.hpp \
+                    Thyra_DefaultBlockedLinearOp.hpp \
+                    Thyra_DefaultInverseLinearOp.hpp \
+                    Thyra_EpetraLinearOp.hpp \
+                    Thyra_EpetraThyraWrappers.hpp \
+                    Thyra_InverseLinearOperator.hpp \
+                    Thyra_LinearOperatorDecl.hpp \
+                    Thyra_LinearOperatorImpl.hpp \
+                    Thyra_LinearOpWithSolveFactoryHelpers.hpp \
+                    Thyra_MultiVectorBase.hpp \
+                    Thyra_MultiVectorDefaultBase.hpp \
+                    Thyra_VectorDecl.hpp \
+                    Thyra_VectorImpl.hpp \
                     Thyra_VectorSpaceImpl.hpp
                    ],
                    [],
