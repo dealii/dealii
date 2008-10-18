@@ -521,10 +521,10 @@ namespace TrilinosWrappers
   {
     const unsigned int n_rows = deal_ii_sparse_matrix.m();
   
-				        // Init Epetra Matrix, avoid
+				        // Init Epetra Matrix using an
+				        // equidistributed map; avoid
 				        // storing the nonzero
 				        // elements.
-
     map.reset (new Epetra_Map(n_rows, 0, communicator));
 
     Matrix.reset();
