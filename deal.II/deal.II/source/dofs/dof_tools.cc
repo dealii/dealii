@@ -3800,8 +3800,8 @@ DoFTools::count_dofs_with_subdomain_association (const DH           &dof_handler
   } 
 #endif
 
-  std::vector<bool> subdomain_association (dof_handler.n_dofs());
-  extract_subdomain_dofs (dof_handler, subdomain, subdomain_association);
+  std::vector<unsigned int> subdomain_association (dof_handler.n_dofs());
+  get_subdomain_association (dof_handler, subdomain_association);
 
   std::vector<bool> component_association (dof_handler.n_dofs());
   for (unsigned int c=0; c<dof_handler.get_fe().n_components(); ++c)
@@ -3811,7 +3811,7 @@ DoFTools::count_dofs_with_subdomain_association (const DH           &dof_handler
       extract_dofs (dof_handler, component_mask, component_association);
 
       for (unsigned int i=0; i<dof_handler.n_dofs(); ++i)
-	if ((subdomain_association[i] == true) &&
+	if ((subdomain_association[i] == subdomain) &&
 	    (component_association[i] == true))
 	  ++n_dofs_on_subdomain[c];
     }
