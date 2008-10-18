@@ -118,7 +118,10 @@ namespace TrilinosWrappers
         {
 	  vector.reset();
 	  if (map.SameAs(v.vector->Map()) == false)
-	    map = Epetra_Map(v.vector->GlobalLength(),0,v.vector->Comm());
+	    map = Epetra_Map(v.vector->Map().NumGlobalElements(),
+			     v.vector->Map().NumMyElements(),
+			     v.vector->Map().IndexBase(),
+			     v.vector->Map().Comm());
 
 	  vector = std::auto_ptr<Epetra_FEVector> (new Epetra_FEVector(map));
 	  last_action = Zero;
