@@ -355,6 +355,16 @@ inconvenience this causes.
 <ol>
   <li>
   <p>
+  New: There is now a second DoFTools::count_dofs_with_subdomain_association function that
+  calculates the number of degrees of freedom associated with a certain subdomain and
+  splits the result up according to the vector component of each degree of freedom. This
+  function is needed when splitting block matrices in parallel computations.
+  <br>
+  (WB 2008/10/07)
+  </p> 
+
+  <li>
+  <p>
   Fixed: The GridOut::write_gnuplot function had a bug that made it output only the
   very first cell. This is now fixed.
   <br>

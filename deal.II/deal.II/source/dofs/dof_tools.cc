@@ -3738,9 +3738,8 @@ DoFTools::get_subdomain_association (const DH                  &dof_handler,
 
 template <class DH>
 unsigned int
-DoFTools::count_dofs_with_subdomain_association (
-  const DH           &dof_handler,
-  const unsigned int  subdomain)
+DoFTools::count_dofs_with_subdomain_association (const DH           &dof_handler,
+						 const unsigned int  subdomain)
 {
                                    // in debug mode, make sure that there are
                                    // some cells at least with this subdomain
@@ -3767,6 +3766,55 @@ DoFTools::count_dofs_with_subdomain_association (
   return std::count (subdomain_association.begin(),
                      subdomain_association.end(),
                      subdomain);
+}
+
+
+
+template <class DH>
+void
+DoFTools::count_dofs_with_subdomain_association (const DH           &dof_handler,
+						 const unsigned int  subdomain,
+						 std::vector<unsigned int> &n_dofs_on_subdomain)
+{
+  Assert (n_dofs_on_subdomain.size() == dof_handler.get_fe().n_components(),
+	  ExcDimensionMismatch (n_dofs_on_subdomain.size(),
+				dof_handler.get_fe().n_components()));
+  std::fill (n_dofs_on_subdomain.begin(), n_dofs_on_subdomain.end(), 0);
+  
+                                   // in debug mode, make sure that there are
+                                   // some cells at least with this subdomain
+                                   // id
+#ifdef DEBUG
+  {
+    bool found = false;
+    for (typename Triangulation<DH::dimension>::active_cell_iterator
+           cell=dof_handler.get_tria().begin_active();
+         cell!=dof_handler.get_tria().end(); ++cell)
+      if (cell->subdomain_id() == subdomain)
+        {
+          found = true;
+          break;
+        }
+    Assert (found == true,
+            ExcMessage ("There are no cells for the given subdomain!"));
+  } 
+#endif
+
+  std::vector<bool> subdomain_association (dof_handler.n_dofs());
+  extract_subdomain_dofs (dof_handler, subdomain, subdomain_association);
+
+  std::vector<bool> component_association (dof_handler.n_dofs());
+  for (unsigned int c=0; c<dof_handler.get_fe().n_components(); ++c)
+    {
+      std::vector<bool> component_mask (dof_handler.get_fe().n_components(), false);
+      component_mask[c] = true;
+      extract_dofs (dof_handler, component_mask, component_association);
+
+      for (unsigned int i=0; i<dof_handler.n_dofs(); ++i)
+	if ((subdomain_association[i] == true) &&
+	    (component_association[i] == true))
+	  ++n_dofs_on_subdomain[c];
+    }
 }
 
 
@@ -5788,15 +5836,33 @@ DoFTools::count_dofs_with_subdomain_association<DoFHandler<deal_II_dimension> >
 (const DoFHandler<deal_II_dimension> &,
  const unsigned int);
 template
+void
+DoFTools::count_dofs_with_subdomain_association<DoFHandler<deal_II_dimension> >
+(const DoFHandler<deal_II_dimension> &,
+ const unsigned int,
+ std::vector<unsigned int> &);
+template
 unsigned int
 DoFTools::count_dofs_with_subdomain_association<hp::DoFHandler<deal_II_dimension> >
 (const hp::DoFHandler<deal_II_dimension> &,
  const unsigned int);
 template
+void
+DoFTools::count_dofs_with_subdomain_association<hp::DoFHandler<deal_II_dimension> >
+(const hp::DoFHandler<deal_II_dimension> &,
+ const unsigned int,
+ std::vector<unsigned int> &);
+template
 unsigned int
 DoFTools::count_dofs_with_subdomain_association<MGDoFHandler<deal_II_dimension> >
 (const MGDoFHandler<deal_II_dimension> &,
  const unsigned int);
+template
+void
+DoFTools::count_dofs_with_subdomain_association<MGDoFHandler<deal_II_dimension> >
+(const MGDoFHandler<deal_II_dimension> &,
+ const unsigned int,
+ std::vector<unsigned int> &);
 
 
 template

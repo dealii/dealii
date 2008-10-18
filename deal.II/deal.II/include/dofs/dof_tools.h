@@ -1161,6 +1161,28 @@ class DoFTools
                                            const unsigned int  subdomain);
 
                                      /**
+                                      * Count how many degrees of freedom are
+                                      * uniquely associated with the given
+                                      * @p subdomain index.
+                                      *
+                                      * This function does what the previous
+                                      * one does except that it splits the
+                                      * result among the vector components of
+                                      * the finite element in use by the
+                                      * DoFHandler object. The last argument
+                                      * (which must have a length equal to the
+                                      * number of vector components) will
+                                      * therefore store how many degrees of
+                                      * freedom of each vector component are
+                                      * associated with the given subdomain.
+                                      */
+    template <class DH>
+    static void
+    count_dofs_with_subdomain_association (const DH           &dof_handler,
+                                           const unsigned int  subdomain,
+					   std::vector<unsigned int> &n_dofs_on_subdomain);
+    
+                                     /**
 				      * Count how many degrees of
 				      * freedom out of the total
 				      * number belong to each
