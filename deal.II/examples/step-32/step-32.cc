@@ -620,9 +620,20 @@ void BoussinesqFlowProblem<dim>::setup_dofs ()
 
   stokes_partitioner.clear();
   {
-    Epetra_Map map_u(n_u, 0, trilinos_communicator);
+    std::vector<unsigned int> local_dofs (dim+1);
+    DoFTools::
+      count_dofs_with_subdomain_association (stokes_dof_handler,
+					     trilinos_communicator.MyPID(),
+					     local_dofs);
+    unsigned int n_local_velocities = 0;
+    for (unsigned int c=0; c<dim; ++c)
+      n_local_velocities += local_dofs[c];
+
+    const unsigned int n_local_pressures = local_dofs[dim];
+
+    Epetra_Map map_u(n_u, n_local_velocities, 0, trilinos_communicator);
     stokes_partitioner.push_back (map_u);
-    Epetra_Map map_p(n_p, 0, trilinos_communicator);
+    Epetra_Map map_p(n_p, n_local_pressures, 0, trilinos_communicator);
     stokes_partitioner.push_back (map_p);
   }
   {
@@ -690,7 +701,13 @@ void BoussinesqFlowProblem<dim>::setup_dofs ()
 
   }
 
-  temperature_partitioner = Epetra_Map (n_T, 0, trilinos_communicator);
+  temperature_partitioner
+    = Epetra_Map (n_T,
+		  DoFTools::count_dofs_with_subdomain_association
+		  (temperature_dof_handler,
+		   trilinos_communicator.MyPID()),
+		  0,
+		  trilinos_communicator);
   {
     temperature_mass_matrix.clear ();
     temperature_stiffness_matrix.clear ();
