@@ -16,47 +16,60 @@
 
     <h1>Interfacing <acronym>deal.II</acronym> to PETSc and Trilinos</h1>
 
+    <h3>About PETSc, Trilinos, and the <acronym>deal.II</acronym>
+    interfaces</h3>
+
     <p>    
       <acronym>deal.II</acronym> can interface to the <a
       href="http://www.mcs.anl.gov/petsc/" target="_top">PETSc</a> and
       <a href="http://trilinos.sandia.gov" target="_top">Trilinos</a> software
-      libraries. Both of these libraries provide lots of functions for
-      linear algebra, among other things, for example
-      implementations of a variety of linear solvers, as well as various
-      different sparse and dense matrix and vector formats. Trilinos
-      also has many subpackages that deal with problems that go far
-      beyond linear algebra, for example nonlinear solvers, automatic
-      differentiation packages, etc. Of particular interest to deal.II
-      is their ability to provide this functionality both on
-      sequential and parallel (using MPI) computers. PETSc is written
-      in C; Trilinos is written in C++ and can be considered to be a
-      more modern version of PETSc though both packages are under
-      continuing development at their respective national laboratories.
+      libraries. Both of these libraries provide lots of functions for linear
+      algebra, among other things, for example implementations of a variety of
+      linear solvers, as well as various different sparse and dense matrix and
+      vector formats. Trilinos also has many subpackages that deal with
+      problems that go far beyond linear algebra, for example nonlinear
+      solvers, automatic differentiation packages, uncertainty propagation
+      engines, etc. Of particular interest to deal.II is their ability to
+      provide this functionality both on sequential and parallel (using MPI)
+      computers. PETSc is written in C; Trilinos is written in C++ and can be
+      considered to be a more modern version of PETSc though both packages are
+      under continuing development at their respective national laboratories.
       </p>
 
       <p>
-      <acronym>deal.II</acronym> has wrapper classes that provide almost the
+      <acronym>deal.II</acronym> has wrapper classes to the linear algebra
+      parts of both packages that provide almost the
       same interfaces as the built-in <acronym>deal.II</acronym> linear
-      algebra classes. The main advantage of PETSc is the variety of its
-      algorithms, and that all of them can work in a parallel setting,
-      i.e. matrices and vectors can be distributed across a cluster of
-      computers that communicate via MPI, providing <acronym>deal.II</acronym>
-      with parallel computing capabilities.
+      algebra classes. We use these interfaces for parallel computations based
+      on MPI since the native deal.II linear algebra classes lack this ability.
       </p>
 
+
+      <h3>Configuring the interfaces to PETSc and Trilinos</h3>
+
       <p>
-      The use of PETSc is optional, since <acronym>deal.II</acronym> comes
-      with a complete implementation of linear algebra classes
-      itself. However, if you wish to use the PETSc wrappers, you can do so by
-      having a PETSc installation around at the time of calling
-      <code>./configure</code>. PETSc usually requires you to set the
+      The use of PETSc and Trilinos is optional. To use the wrapper classes,
+      you first have to install these packages and
+      point <acronym>deal.II</acronym>'s <code>./configure</code> to the
+      installation directories. This happens in similar ways for the two
+      packages: 
+      </p>
+
+
+      <h6>PETSc</h6>
+      
+      <p>
+      PETSc usually requires you to set the
       environment variables <code>PETSC_DIR</code> and <code>PETSC_ARCH</code>
       to a path to PETSc and denoting the architecture for which PETSc is
       compiled. If these environment variables are set, then
       <acronym>deal.II</acronym> will pick them up during configuration, and
       store them. It will then also recognize that PETSc shall be used, and
-      enable the wrapper classes. The
-      <code>--with-petsc=DIR</code> and
+      enable the wrapper classes. 
+      </p>
+
+      <p>
+      Alternatively, the <code>--with-petsc=DIR</code> and
       <code>--with-petsc-arch=ARCH</code> switches to
       <code>./configure</code> can be used to override the values
       of <code>PETSC_DIR</code> and <code>PETSC_ARCH</code> or if these
@@ -85,27 +98,12 @@
       href="http://ganymed.iwr.uni-heidelberg.de/pipermail/dealii/2007/001820.html">in
       this posting to the mailing list</a>. 
       </p>
-    </dd>
 
 
-    <a name="trilinos"></a>
-    <dt>Trilinos</dt>
-    <dd>
-      <p>
-      <acronym>deal.II</acronym> can also interface to the <a
-      href="http://trilinos.sandia.gov" target="_top">Trilinos</a> software
-      library. Trilinos, like PETSc, provides a large number of linear algebra
-      and other classes that can be used on  . It is written in C++ and considered more modern than PETSc.
-      </p>
+      <h6>Trilinos</h6>
 
       <p>
-      Unlike with <href="#petsc">PETSc support</a>, <acronym>deal.II</acronym>
-      does not currently have wrappers that allow Trilinos linear algebra
-      classes to be used with 
-      the same interface as <acronym>deal.II</acronym> classes, though we hope
-      to have them in the future. However, our Makefiles are set up so that if
-      Trilinos use is configured in, header files are automatically found and
-      libraries are linked with. To do so, set the <code>TRILINOS_DIR</code>
+      As above, set the <code>TRILINOS_DIR</code>
       environment variable to the path to an existing Trilinos installation,
       or use the <code>--with-trilinos=/path/to/trilinos</code> switch of
       the deal.II <code>./configure</code> script. It should point to the path
@@ -114,6 +112,22 @@
       <acronym>deal.II</acronym> is configured for, i.e. if you want deal.II
       to use shared libraries, then Trilinos needs to use shared libraries as
       well.
+      </p>
+
+      <p>
+      <acronym>deal.II</acronym> and its tutorial programs use several of the
+      Trilinos sub-packages. Configuring Trilinos with a command
+      like the following should do the trick:
+      <code>
+      <pre>
+../configure --enable-shared \
+      --with-cflags=-fPIC --with-cxxflags=-fPIC --with-fflags=-fPIC \
+      --enable-thyra --enable-stratimikos --enable-rtop --enable-teuchos \
+      --enable-sacado --enable-ml --enable-ifpack --enable-epetra \
+      --enable-belos --enable-aztecoo \
+      --prefix=/home/bangerth/bin/trilinos-9.0.1
+      </pre>
+      </code>
       </p>
 
     <hr>

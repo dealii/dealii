@@ -58,7 +58,7 @@
           2.2 (though only with static instead of shared libraries);
       <li>Linux on x86, with Portland Groups (PGI) pgCC compiler
           version 7.1 and 7.2;
-      <li><a href="http://www.cygwin.com">Cygwin/Windows</a> with
+      <li><a href="http://www.cygwin.com" target="_top">Cygwin/Windows</a> with
           cygwin1.dll versions 1.5.xx, and gcc 3.3 and 3.4 under Windows XP
           and NT.
     </ul>
@@ -550,61 +550,13 @@
     <a name="petsc"></a>
     <dt>Petsc</dt>
     <dd>
+      <p>
       <acronym>deal.II</acronym> can interface to the <a
       href="http://www.mcs.anl.gov/petsc/" target="_top">PETSc</a>
-      library. PETSc's provides lots of functions for
-      linear algebra, among other things, for example
-      implementations of a variety of linear solvers, as well as various
-      different sparse and dense matrix and vector formats.
-      <acronym>deal.II</acronym> has wrapper classes that provide almost the
-      same interfaces as the built-in <acronym>deal.II</acronym> linear
-      algebra classes. The main advantage of PETSc is the variety of its
-      algorithms, and that all of them can work in a parallel setting,
-      i.e. matrices and vectors can be distributed across a cluster of
-      computers that communicate via MPI, providing <acronym>deal.II</acronym>
-      with parallel computing capabilities.
-      </p>
-
-      <p>
-      The use of PETSc is optional, since <acronym>deal.II</acronym> comes
-      with a complete implementation of linear algebra classes
-      itself. However, if you wish to use the PETSc wrappers, you can do so by
-      having a PETSc installation around at the time of calling
-      <code>./configure</code>. PETSc usually requires you to set the
-      environment variables <code>PETSC_DIR</code> and <code>PETSC_ARCH</code>
-      to a path to PETSc and denoting the architecture for which PETSc is
-      compiled. If these environment variables are set, then
-      <acronym>deal.II</acronym> will pick them up during configuration, and
-      store them. It will then also recognize that PETSc shall be used, and
-      enable the wrapper classes. The
-      <code>--with-petsc=DIR</code> and
-      <code>--with-petsc-arch=ARCH</code> switches to
-      <code>./configure</code> can be used to override the values
-      of <code>PETSC_DIR</code> and <code>PETSC_ARCH</code> or if these
-      environment variables are not set at all. If you do have a PETSc installation
-      and have set the <code>PETSC_DIR</code> and
-      <code>PETSC_ARCH</code> environment variables but do not wish
-      <acronym>deal.II</acronym> to be configured for PETSc use, you
-      should specify <code>--with-petsc=no</code> as a flag during
-      configuration. 
-      </p>
-
-      <p>
-      Note that in order to use PETSc with <acronym>deal.II</acronym>
-      with the current version of <acronym>deal.II</acronym>, you
-      need to have at least PETSc version 2.3.1
-      installed. <acronym>deal.II</acronym> version 6.0 has been
-      tested up to PETSc release 2.3.3-p4.
-      </p>
-
-      <p>
-      Installing both PETSc and deal.II together can be a bit of a challenge. A
-      good summary of the relevant steps can be found on the <a
-      href="http://www-dimat.unipv.it/heltai/wikideal/index.php/Deal.II_Questions_and_Answers"
-      target="_top">Frequently Asked Questions page</a>, as well as
-      <a
-      href="http://ganymed.iwr.uni-heidelberg.de/pipermail/dealii/2007/001820.html">in
-      this posting to the mailing list</a>. 
+      library. The simplest way to do so is to set the <code>PETSC_DIR</code>
+      and <code>PETSC_ARCH</code> environment variables. More information and
+      configuration options can be found <a href="readme-petsc-trilinos.html"
+      target="body">here</a>. 
       </p>
     </dd>
 
@@ -613,29 +565,13 @@
     <dt>Trilinos</dt>
     <dd>
       <p>
-      <acronym>deal.II</acronym> can also interface to the <a
-      href="http://trilinos.sandia.gov" target="_top">Trilinos</a> software
-      library. Trilinos, like PETSc, provides a large number of linear algebra
-      and other classes that can be used on sequential or parallel
-      computers. It is written in C++ and considered more modern than PETSc.
-      </p>
-
-      <p>
-      Unlike with <href="#petsc">PETSc support</a>, <acronym>deal.II</acronym>
-      does not currently have wrappers that allow Trilinos linear algebra
-      classes to be used with 
-      the same interface as <acronym>deal.II</acronym> classes, though we hope
-      to have them in the future. However, our Makefiles are set up so that if
-      Trilinos use is configured in, header files are automatically found and
-      libraries are linked with. To do so, set the <code>TRILINOS_DIR</code>
-      environment variable to the path to an existing Trilinos installation,
-      or use the <code>--with-trilinos=/path/to/trilinos</code> switch of
-      the deal.II <code>./configure</code> script. It should point to the path
-      of which the include and lib directories are subdirs. The Trilinos 
-      installation needs to provide the same kind of libraries that 
-      <acronym>deal.II</acronym> is configured for, i.e. if you want deal.II
-      to use shared libraries, then Trilinos needs to use shared libraries as
-      well.
+      <acronym>deal.II</acronym> can also interface to <a
+      href="http://trilinos.sandia.gov" target="_top">Trilinos</a>. The
+      simplest way to use these interfaces is to
+      pass <code>--with-trilinos=/path/to/trilinos</code>
+      to <acronym>deal.II</acronym>'s <code>./configure</code> script. More
+      configuration options can be found <a href="readme-petsc-trilinos.html"
+      target="body">here</a>. 
       </p>
     </dd>
 
