@@ -216,7 +216,7 @@ ifeq ($(USE_CONTRIB_TRILINOS),yes)
   INCLUDE += -I$(include-path-trilinos)
 
   ifeq ($(enable-shared),yes)
-    lib-contrib-trilinos = \
+    lib-contrib-trilinos = -lamesos \
                 -laztecoo \
 		-lbelos \
 		-lepetra \
@@ -226,6 +226,7 @@ ifeq ($(USE_CONTRIB_TRILINOS),yes)
 		-lrtop \
 		-lsacado \
 		-lstratimikos \
+		-lstratimikosamesos \
 		-lstratimikosaztecoo \
 		-lstratimikosifpack \
 		-lstratimikosml \
@@ -236,6 +237,7 @@ ifeq ($(USE_CONTRIB_TRILINOS),yes)
 		-ltriutils  
   else
     lib-contrib-trilinos =  \
+		$(DEAL_II_TRILINOS_LIBDIR)/libamesos.a \
 		$(DEAL_II_TRILINOS_LIBDIR)/libaztecoo.a \
 		$(DEAL_II_TRILINOS_LIBDIR)/libbelos.a \
 		$(DEAL_II_TRILINOS_LIBDIR)/libepetra.a \
@@ -245,6 +247,7 @@ ifeq ($(USE_CONTRIB_TRILINOS),yes)
 		$(DEAL_II_TRILINOS_LIBDIR)/librtop.a \
 		$(DEAL_II_TRILINOS_LIBDIR)/libsacado.a \
 		$(DEAL_II_TRILINOS_LIBDIR)/libstratimikos.a \
+		$(DEAL_II_TRILINOS_LIBDIR)/libstratimikosamesos.a \
 		$(DEAL_II_TRILINOS_LIBDIR)/libstratimikosaztecoo.a \
 		$(DEAL_II_TRILINOS_LIBDIR)/libstratimikosifpack.a \
 		$(DEAL_II_TRILINOS_LIBDIR)/libstratimikosml.a \
