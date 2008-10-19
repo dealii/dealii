@@ -5136,36 +5136,72 @@ AC_DEFUN(DEAL_II_CONFIGURE_NETCDF, dnl
         fi
      ])
   
+   AC_ARG_WITH(netcdf-include,
+   [  --with-netcdf-include=/path/to/netcdf  Specify the path to the NetCDF headers file; 
+			   use this if you want to override the
+			   NETCDF_INCLUDE_DIR environment variable.],
+      [
+	 NETCDF_INCLUDE_DIR=$withval
+      ])
+
+   AC_ARG_WITH(netcdf-libs,
+   [  --with-netcdf-libs=/path/to/netcdf  Specify the path to the NetCDF libraries; 
+			   use this if you want to override the
+			   NETCDF_LIBDIR environment variable.],
+      [
+	 NETCDF_LIBDIR=$withval
+      ])
+ 
+
   if test "x$DEAL_II_NETCDF_DIR" != "x" ; then
-    CPPFLAGS="-I$DEAL_II_NETCDF_DIR/include $CPPFLAGS"
-    CXXFLAGS="-I$DEAL_II_NETCDF_DIR/include $CXXFLAGS"
-    LDFLAGS="-L$DEAL_II_NETCDF_DIR/lib $LDFLAGS"
-    if test "$LD_PATH_OPTION" != "no" ; then
-      LDFLAGS="$LD_PATH_OPTION$DEAL_II_NETCDF_DIR/lib $LDFLAGS"
+    if test "x$NETCDF_INCLUDE_DIR" != "x" ; then
+      CPPFLAGS="-I$NETCDF_INCLUDE_DIR $CPPFLAGS"
+      CXXFLAGS="-I$NETCDF_INCLUDE_DIR $CXXFLAGS"
+    else
+      CPPFLAGS="-I$DEAL_II_NETCDF_DIR/include $CPPFLAGS"
+      CXXFLAGS="-I$DEAL_II_NETCDF_DIR/include $CXXFLAGS"
+    fi
+    if test "x$NETCDF_LIBDIR" != "x" ; then
+      LDFLAGS="$LDFLAGS -L$NETCDF_LIBDIR"
+    else
+      LDFLAGS="-L$DEAL_II_NETCDF_DIR/lib $LDFLAGS"
+      if test "$LD_PATH_OPTION" != "no" ; then
+	LDFLAGS="$LD_PATH_OPTION$DEAL_II_NETCDF_DIR/lib $LDFLAGS"
+      fi
+    fi 
+  else
+    if test "x$NETCDF_INCLUDE_DIR" != "x" ; then
+      CPPFLAGS="-I$NETCDF_INCLUDE_DIR $CPPFLAGS"
+      CXXFLAGS="-I$NETCDF_INCLUDE_DIR $CXXFLAGS"
+    fi
+    if test "x$NETCDF_LIBDIR" != "x" ; then
+      LDFLAGS="$LDFLAGS -L$NETCDF_LIBDIR"
     fi
   fi
   
   dnl Check for header, if found check for C library,
   dnl if found check for C++ library,
   dnl if successful, HAVE_LIBNETCDF will be set
-  AC_CHECK_HEADER(netcdfcpp.h, AC_CHECK_LIB(netcdf, nc_open,
-    [ DEAL_II_EXTERNAL_LIBS_SAVE_VAL()
-      DEAL_II_ADD_EXTERNAL_LIBS_AT_FRONT(-lnetcdf_c++ -lnetcdf)
-      AC_MSG_CHECKING([for NcFile::NcFile in -lnetcdf_c++])
-      AC_LINK_IFELSE(
-      [  AC_LANG_PROGRAM([[#include <netcdfcpp.h>
-	               ]],
-                       [[NcFile test("test")]])
-      ],
-      [ AC_MSG_RESULT(yes)
-        AC_DEFINE(HAVE_LIBNETCDF,1,[Define to 1 if you have the `NetCDF' library (-lnetcdf).])
-      ],
-      [ AC_MSG_RESULT(no)
-	DEAL_II_EXTERNAL_LIBS_RESTORE_VAL()
-      ])
-    ]))
+  AC_CHECK_HEADER(netcdfcpp.h)
+      
+  AC_CHECK_LIB(netcdf, nc_open,
+  [ DEAL_II_EXTERNAL_LIBS_SAVE_VAL()
+    DEAL_II_ADD_EXTERNAL_LIBS_AT_FRONT(-lnetcdf_c++ -lnetcdf)
+    AC_MSG_CHECKING([for NcFile::NcFile in -lnetcdf_c++])
+    AC_LINK_IFELSE(
+    [  AC_LANG_PROGRAM([[#include <netcdfcpp.h>
+	             ]],
+                     [[NcFile test("test")]])
+    ],
+    [ AC_MSG_RESULT(yes)
+      AC_DEFINE(HAVE_LIBNETCDF,1,[Define to 1 if you have the `NetCDF' library (-lnetcdf).])
+    ],
+    [ AC_MSG_RESULT(no)
+      DEAL_II_EXTERNAL_LIBS_RESTORE_VAL()
+    ])   
+  ])
+  
 ])
-
 
 
 dnl ------------------------------------------------------------
@@ -5403,9 +5439,8 @@ dnl
 dnl ------------------------------------------------------------
 AC_DEFUN(DEAL_II_CONFIGURE_TRILINOS, dnl
 [
-  AC_MSG_CHECKING(for Trilinos library directory)
-
-  AC_ARG_WITH(trilinos,
+ AC_MSG_CHECKING(for Trilinos directory)
+ AC_ARG_WITH(trilinos,
   [  --with-trilinos=/path/to/trilinos  Specify the path to the Trilinos installation,
                           of which the include and lib directories
                           are subdirs; use this if you want to override
@@ -5426,6 +5461,9 @@ AC_DEFUN(DEAL_II_CONFIGURE_TRILINOS, dnl
             AC_MSG_ERROR([Path to Trilinos specified with --with-trilinos does not
  		  	  point to a complete Trilinos installation])
 	  fi
+	  
+	  DEAL_II_TRILINOS_INCDIR="$DEAL_II_TRILINOS_DIR/include"
+	  DEAL_II_TRILINOS_LIBDIR="$DEAL_II_TRILINOS_DIR/lib"
         fi
      ],
      [
@@ -5442,6 +5480,8 @@ AC_DEFUN(DEAL_II_CONFIGURE_TRILINOS, dnl
 	  		  environment variable does not
  			  point to a complete Trilinos installation])
 	  fi
+	  DEAL_II_TRILINOS_INCDIR="$DEAL_II_TRILINOS_DIR/include"
+	  DEAL_II_TRILINOS_LIBDIR="$DEAL_II_TRILINOS_DIR/lib"
         else
 	  USE_CONTRIB_TRILINOS=no
           DEAL_II_TRILINOS_DIR=""
@@ -5449,6 +5489,103 @@ AC_DEFUN(DEAL_II_CONFIGURE_TRILINOS, dnl
         fi
      ])
 
+  AC_MSG_CHECKING(for Trilinos header directory)
+  AC_ARG_WITH(trilinos-include,
+  [  --with-trilinos-include=/path/to/trilinos  Specify the path to the Trilinos include; 
+                          use this if you want to override
+                          the TRILINOS_INCDIR environment variable.],
+     [
+        dnl Special case when someone does --with-petsc=no
+        if test "x$withval" = "xno" ; then
+          AC_MSG_RESULT([explicitly disabled])
+          USE_CONTRIB_TRILINOS=no
+        else
+	  USE_CONTRIB_TRILINOS=yes
+          DEAL_II_TRILINOS_INCDIR=$withval
+	  AC_MSG_RESULT($DEAL_II_TRILINOS_INCDIR)
+
+          dnl Make sure that what was specified is actually correct
+          if test ! -d $DEAL_II_TRILINOS_INCDIR ; then
+            AC_MSG_ERROR([Path to Trilinos specified with --with-trilinos-include does not
+ 		  	  point to a complete Trilinos installation])
+	  fi
+        fi
+     ],
+     [
+        dnl Take something from the environment variables, if it is there
+        if test "x$TRILINOS_INCDIR" != "x" ; then
+  	  USE_CONTRIB_TRILINOS=yes
+	  DEAL_II_TRILINOS_INCDIR="$TRILINOS_INCDIR"
+	  AC_MSG_RESULT($DEAL_II_TRILINOS_INCDIR)
+
+          dnl Make sure that what this is actually correct
+          if test ! -d $DEAL_II_TRILINOS_INCDIR ; then
+            AC_MSG_ERROR([The path to Trilinos includes specified in the TRILINOS_INCDIR
+	  		  environment variable does not point to a valid directory])
+	  fi
+        else
+          dnl --with-trilinos-include not explicitly specified. do
+	  dnl nothing if --with-trilinos has previously been specified,
+	  dnl otherwise say no to trilinos
+          if test "x${USE_CONTRIB_TRILINOS}" != "xyes" ; then
+	    USE_CONTRIB_TRILINOS=no
+            DEAL_II_TRILINOS_INCDIR=""
+            AC_MSG_RESULT(not found)
+          else
+            AC_MSG_RESULT(not explicitly specified)
+          fi
+        fi
+     ])
+
+  AC_MSG_CHECKING(for Trilinos library directory)
+  AC_ARG_WITH(trilinos-libs,
+  [  --with-trilinos-libs=/path/to/trilinos  Specify the path to the Trilinos libraries; 
+                          use this if you want to override
+                          the TRILINOS_LIBDIR environment variable.],
+     [
+        dnl Special case when someone does --with-petsc=no
+        if test "x$withval" = "xno" ; then
+          AC_MSG_RESULT([explicitly disabled])
+          USE_CONTRIB_TRILINOS=no
+        else
+	  USE_CONTRIB_TRILINOS=yes
+          DEAL_II_TRILINOS_LIBDIR=$withval
+	  AC_MSG_RESULT($DEAL_II_TRILINOS_LIBDIR)
+
+          dnl Make sure that what was specified is actually correct
+          if test ! -d $DEAL_II_TRILINOS_LIBDIR ; then
+            AC_MSG_ERROR([Path to Trilinos libraries with --with-trilinos-libs does not
+ 		  	  point to a valid directory])
+	  fi
+        fi
+     ],
+     [
+        dnl Take something from the environment variables, if it is there
+        if test "x$TRILINOS_DIR" != "x" ; then
+  	  USE_CONTRIB_TRILINOS=yes
+	  DEAL_II_TRILINOS_LIBDIR="$TRILINOS_DIR"
+	  AC_MSG_RESULT($DEAL_II_TRILINOS_LIBDIR)
+
+          dnl Make sure that what this is actually correct
+          if test ! -d $DEAL_II_TRILINOS_LIBDIR ; then
+            AC_MSG_ERROR([The path to Trilinos specified in the TRILINOS_LIBDIR
+	  		  environment variable does not
+ 			  point to a complete Trilinos installation])
+	  fi
+        else
+          dnl --with-trilinos-include not explicitly specified. do
+	  dnl nothing if --with-trilinos has previously been specified,
+	  dnl otherwise say no to trilinos
+          if test "x${USE_CONTRIB_TRILINOS}" != "xyes" ; then
+	    USE_CONTRIB_TRILINOS=no
+            DEAL_II_TRILINOS_LIBDIR=""
+            AC_MSG_RESULT(not found)
+          else
+            AC_MSG_RESULT(not explicitly specified)
+          fi
+        fi
+     ])
+     
   dnl If we have found Trilinos, determine and set additional pieces of data
   if test "$USE_CONTRIB_TRILINOS" = "yes" ; then
     AC_DEFINE(DEAL_II_USE_TRILINOS, 1,
@@ -5500,7 +5637,7 @@ AC_DEFUN(DEAL_II_CHECK_TRILINOS_SHARED_STATIC, dnl
   dnl Check using the epetra library since that should always be there
 
   AC_MSG_CHECKING(whether Trilinos uses shared libraries)
-  if test -f $DEAL_II_TRILINOS_DIR/lib/libepetra${shared_lib_suffix} ; then
+  if test -f $DEAL_II_TRILINOS_LIBDIR/libepetra${shared_lib_suffix} ; then
     AC_MSG_RESULT(yes)
     DEAL_II_TRILINOS_SHARED=yes
   else
@@ -5508,7 +5645,7 @@ AC_DEFUN(DEAL_II_CHECK_TRILINOS_SHARED_STATIC, dnl
   fi
 
   AC_MSG_CHECKING(whether Trilinos uses static libraries)
-  if test -f $DEAL_II_TRILINOS_DIR/lib/libepetra${static_lib_suffix} ; then
+  if test -f $DEAL_II_TRILINOS_LIBDIR/libepetra${static_lib_suffix} ; then
     AC_MSG_RESULT(yes)
     DEAL_II_TRILINOS_STATIC=yes
   else
@@ -5612,8 +5749,9 @@ AC_DEFUN(DEAL_II_CHECK_TRILINOS_HEADER_FILES, dnl
   OLD_CXXFLAGS="$CXXFLAGS"
   OLD_CPPFLAGS="$CPPFLAGS"
 
-  CPPFLAGS="-I$DEAL_II_TRILINOS_DIR/include $CPPFLAGS"
-  CXXFLAGS="-I$DEAL_II_TRILINOS_DIR/include $CXXFLAGS"
+echo $DEAL_II_TRILINOS_INCDIR
+  CPPFLAGS="-I$DEAL_II_TRILINOS_INCDIR $CPPFLAGS"
+  CXXFLAGS="-I$DEAL_II_TRILINOS_INCDIR $CXXFLAGS"
   AC_CHECK_HEADERS([Amesos.h \
                     AztecOO.h \
                     AztecOO_Operator.h \
@@ -5672,7 +5810,6 @@ dnl ------------------------------------------------------------
 AC_DEFUN(DEAL_II_CONFIGURE_METIS, dnl
 [
   dnl First check for the Metis directory
-  AC_MSG_CHECKING(for Metis library directory)
 
   AC_ARG_WITH(metis,
   [  --with-metis=/path/to/metis  Specify the path to the Metis installation,
@@ -5689,6 +5826,9 @@ AC_DEFUN(DEAL_II_CONFIGURE_METIS, dnl
           AC_MSG_ERROR([Path to Metis specified with --with-metis does not
  			point to a complete Metis installation])
 	fi
+	
+	DEAL_II_METIS_LIBDIR="$DEAL_II_METIS_DIR/Lib"
+	DEAL_II_METIS_INCDIR="$DEAL_II_METIS_DIR/include"
      ],
      [
         dnl Take something from the environment variables, if it is there
@@ -5703,21 +5843,70 @@ AC_DEFUN(DEAL_II_CONFIGURE_METIS, dnl
 	  		  environment variable does not
  			  point to a complete Metis installation])
 	  fi
+	  DEAL_II_METIS_LIBDIR="$DEAL_II_METIS_DIR/Lib"
+	  DEAL_II_METIS_INCDIR="$DEAL_II_METIS_DIR/include"
         else
 	  USE_CONTRIB_METIS=no
           DEAL_II_METIS_DIR=""
-          AC_MSG_RESULT(not found)
         fi
      ])
+
+  AC_ARG_WITH(metis-include,
+  [  --with-metis-include=/path/to/metis  Specify the path to the METIS headers file; 
+                          use this if you want to override the
+                          METIS_INCLUDE_DIR environment variable.],
+     [
+        METIS_INCLUDE_DIR=$withval
+	DEAL_II_METIS_INCDIR="$METIS_INCLUDE_DIR"
+     ])
+     
+  AC_ARG_WITH(metis-libs,
+  [  --with-metis-libs=/path/to/metis  Specify the path to the METIS libraries; 
+                          use this if you want to override the
+                          METIS_LIBDIR environment variable.],
+     [
+	USE_CONTRIB_METIS=yes
+        DEAL_II_METIS_LIBDIR=$withval
+	AC_MSG_RESULT($DEAL_II_METIS_LIBDIR)
+
+        dnl Make sure that what was specified is actually correct
+        if test ! -d $DEAL_II_METIS_LIBDIR ; then
+          AC_MSG_ERROR([Path to Metis specified with --with-metis does not
+ 			point to a complete Metis installation])
+	fi
+     ],
+     [
+        dnl Take something from the environment variables, if it is there
+        if test "x$METIS_LIBDIR" != "x" ; then
+  	  USE_CONTRIB_METIS=yes
+          DEAL_II_METIS_LIBDIR="$METIS_LIBDIR"
+	  AC_MSG_RESULT($DEAL_II_METIS_LIBDIR)
+
+          dnl Make sure that what this is actually correct
+          if test ! -d $DEAL_II_METIS_LIBDIR ; then
+            AC_MSG_ERROR([The path to Metis specified in the METIS_DIR
+	  		  environment variable does not
+ 			  point to a complete Metis installation])
+	  fi
+        else
+          dnl Unless --with-metis has been set before, declare that METIS
+	  dnl is not desired.
+          if test "x$USE_CONTRIB_METIS" != "xyes" ; then
+  	    USE_CONTRIB_METIS=no
+            DEAL_II_METIS_LIBDIR=""
+          fi
+        fi
+     ])
+     
   if test "x$USE_CONTRIB_METIS" = "xyes" ; then
     AC_DEFINE(DEAL_II_USE_METIS, 1,
               [Defined if a Metis installation was found and is going
                to be used])
-    LDFLAGS="$LDFLAGS -L$DEAL_II_METIS_DIR -lmetis"
+    LDFLAGS="$LDFLAGS -L$DEAL_II_METIS_LIBDIR -lmetis"
 
-    AC_MSG_CHECKING(for Metis version)
-    DEAL_II_METIS_VERSION=`cat $DEAL_II_METIS_DIR/VERSION`
-    AC_MSG_RESULT($DEAL_II_METIS_VERSION)
+    dnl AC_MSG_CHECKING(for Metis version)
+    dnl DEAL_II_METIS_VERSION=`cat $DEAL_II_METIS_DIR/VERSION`
+    dnl AC_MSG_RESULT($DEAL_II_METIS_VERSION)
   fi
 ])
 
@@ -5727,9 +5916,38 @@ dnl What to do if UMFPack is selected
 dnl --------------------------------------------------
 AC_DEFUN(DEAL_II_WITH_UMFPACK, dnl
 [
-  if test "x$1" != "xyes" ; then
+  acx_umfpack=no
+
+  AC_ARG_WITH(umfpack,
+  [  --with-umfpack=umfpack-root-directory  Use installed UMFPack version.
+                          'umfpack-root-directory' should be the directory
+                          containing directories AMD and UMFPACK. The
+                          contributed UMFPack library is used if no argument
+                          is given. Default is not to use UMFPack.],
+     [
+        UMFPACK_DIR=$withval
+    ])
+
+  AC_ARG_WITH(umfpack-include,
+  [  --with-umfpack-include=/path/to/UMFPACK  Specify the path to the UMFPACK headers file; 
+			  use this if you want to override the
+			  UMFPACK_INCDIR environment variable.],
+     [
+	UMFPACK_INCDIR=$withval
+        acx_umfpack=yes
+     ])
+  
+  AC_ARG_WITH(umfpack-libs,
+  [  --with-umfpack-libs=/path/to/UMFPACK  Specify the path to the UMFPACK libraries; 
+			  use this if you want to override the
+			  UMFPACK_LIBDIR environment variable.],
+     [
+	UMFPACK_LIBDIR=$withval
+        acx_umfpack=yes
+     ])
+
+  if test "x$UMFPACK_DIR" != "x" -a "x$acs_umfpack" == "xno" ; then
     dnl A pathname has been given to --with-umfpack
-    UMFPACK_DIR=$1
 
     dnl Try old naming scheme for umfpack/amd libraries (before 
     dnl Tim Davis incorporated everything into SuiteSparse)
@@ -5847,11 +6065,69 @@ AC_DEFUN(DEAL_II_WITH_UMFPACK, dnl
 
   else
 
-    dnl Use the umfpack version we package with deal.II
-    AC_MSG_CHECKING(UmfPack library)
-    UMFPACK_INCLUDE_DIR='-I$D/contrib/umfpack/UMFPACK/Include'
-    USE_CONTRIB_UMFPACK='yes'
-    AC_MSG_RESULT(using included version)
+    if test "x$UMFPACK_INCDIR" != "x" ; then  
+       UMFPACK_INCLUDE_DIR="-I${UMFPACK_INCDIR}"
+       OLD_CXXFLAGS="$CXXFLAGS"
+       OLD_CPPFLAGS="$CPPFLAGS"
+       CXXFLAGS="-I$UMFPACK_INCDIR $CXXFLAGS"
+       CPPFLAGS="-I$UMFPACK_INCDIR $CPPFLAGS"
+       AC_CHECK_HEADER(
+               [umfpack.h], 
+               [], 
+               [AC_MSG_ERROR(installation of UMFPACK could not be determined)]
+       )
+       AC_CHECK_HEADER([amd.h], [], [AC_MSG_ERROR(installation of UMFPACK could not be determined)])
+       AC_CHECK_HEADER([UFconfig.h], [], [AC_MSG_ERROR(installation of UMFPACK could not be determined)])
+
+       if test "x$UMFPACK_LIBDIR" != "x" ; then  
+          AC_CHECK_LIB(
+               [amd], 
+               [amd_info],
+               [
+                    DEAL_II_ADD_EXTERNAL_LIBS_AT_TAIL(-lamd)
+                    if test "$LD_PATH_OPTION" != "no"; then
+                        LDFLAGS="$LD_PATH_OPTION${UMFPACK_LIBDIR} $LDFLAGS"
+                    fi
+               ],
+               [AC_MSG_ERROR(installation of AMD could not be determined)]
+          )
+          AC_CHECK_LIB(
+               [umfpack], 
+               [umfpack_di_defaults],
+               [
+                    DEAL_II_ADD_EXTERNAL_LIBS_AT_TAIL(-lumfpack)
+                    if test "$LD_PATH_OPTION" != "no"; then
+                        LDFLAGS="$LD_PATH_OPTION${UMFPACK_LIBDIR} $LDFLAGS"
+                    fi
+               ],
+               [AC_MSG_ERROR(installation of UMFPACK could not be determined)]
+          )
+       else
+          AC_CHECK_LIB(
+               [amd], 
+               [amd_info],
+               [
+                    DEAL_II_ADD_EXTERNAL_LIBS_AT_TAIL(-lamd)
+               ],
+               [AC_MSG_ERROR(installation of AMD could not be determined)]
+          )
+          AC_CHECK_LIB(
+               [umfpack], 
+               [umfpack_di_defaults],
+               [
+                    DEAL_II_ADD_EXTERNAL_LIBS_AT_TAIL(-lumfpack)
+               ],
+               [AC_MSG_ERROR(installation of UMFPACK could not be determined)]
+          )
+       fi
+    
+    else
+       dnl Use the umfpack version we package with deal.II
+       AC_MSG_CHECKING(UmfPack library)
+       UMFPACK_INCLUDE_DIR='-I$D/contrib/umfpack/UMFPACK/Include'
+       USE_CONTRIB_UMFPACK='yes'
+       AC_MSG_RESULT(using included version)
+    fi 
   fi
 
   AC_DEFINE(HAVE_LIBUMFPACK,1,[UMFPACK is $1])

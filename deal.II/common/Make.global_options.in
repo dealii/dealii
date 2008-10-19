@@ -55,12 +55,14 @@ DEAL_II_PETSC_VERSION_SUBMINOR = @DEAL_II_PETSC_VERSION_SUBMINOR@
 DEAL_II_PETSC_MPIUNI_LIB = @DEAL_II_PETSC_MPIUNI_LIB@
 
 USE_CONTRIB_TRILINOS = @USE_CONTRIB_TRILINOS@
-DEAL_II_TRILINOS_DIR = @DEAL_II_TRILINOS_DIR@
+DEAL_II_TRILINOS_INCDIR = @DEAL_II_TRILINOS_INCDIR@
+DEAL_II_TRILINOS_LIBDIR = @DEAL_II_TRILINOS_LIBDIR@
 DEAL_II_TRILINOS_SHARED = @DEAL_II_TRILINOS_SHARED@
 DEAL_II_TRILINOS_STATIC = @DEAL_II_TRILINOS_STATIC@
 
 USE_CONTRIB_METIS    = @USE_CONTRIB_METIS@
-DEAL_II_METIS_DIR    = @DEAL_II_METIS_DIR@
+DEAL_II_METIS_INCDIR    = @DEAL_II_METIS_INCDIR@
+DEAL_II_METIS_LIBDIR    = @DEAL_II_METIS_LIBDIR@
 
 USE_CONTRIB_HSL      = @USE_CONTRIB_HSL@
 USE_CONTRIB_UMFPACK  = @USE_CONTRIB_UMFPACK@
@@ -184,7 +186,7 @@ endif
 
 include-path-petsc           = $(DEAL_II_PETSC_DIR)/include
 include-path-petsc-bmake     = $(DEAL_II_PETSC_DIR)/bmake/$(DEAL_II_PETSC_ARCH)
-include-path-trilinos        = $(DEAL_II_TRILINOS_DIR)/include
+include-path-trilinos        = $(DEAL_II_TRILINOS_INCDIR)
 include-path-metis           = $(DEAL_II_METIS_DIR)/Lib
 
 # include paths as command line flags. while compilers allow a space between
@@ -214,13 +216,46 @@ ifeq ($(USE_CONTRIB_TRILINOS),yes)
   INCLUDE += -I$(include-path-trilinos)
 
   ifeq ($(enable-shared),yes)
-    lib-contrib-trilinos = $(shell echo $(DEAL_II_TRILINOS_DIR)/lib/*$(shared-lib-suffix))
+    lib-contrib-trilinos = \
+                -laztecoo \
+		-lbelos \
+		-lepetra \
+		-lepetraext \
+		-lifpack \
+		-lml \
+		-lrtop \
+		-lsacado \
+		-lstratimikos \
+		-lstratimikosaztecoo \
+		-lstratimikosifpack \
+		-lstratimikosml \
+		-lteuchos \
+		-lthyra \
+		-lthyraepetra \
+		-lthyraepetraext \
+		-ltriutils  
   else
-    lib-contrib-trilinos = $(shell echo $(DEAL_II_TRILINOS_DIR)/lib/*$(static-lib-suffix))
+    lib-contrib-trilinos =  \
+		$(DEAL_II_TRILINOS_LIBDIR)/libaztecoo.a \
+		$(DEAL_II_TRILINOS_LIBDIR)/libbelos.a \
+		$(DEAL_II_TRILINOS_LIBDIR)/libepetra.a \
+		$(DEAL_II_TRILINOS_LIBDIR)/libepetraext.a \
+		$(DEAL_II_TRILINOS_LIBDIR)/libifpack.a \
+		$(DEAL_II_TRILINOS_LIBDIR)/libml.a \
+		$(DEAL_II_TRILINOS_LIBDIR)/librtop.a \
+		$(DEAL_II_TRILINOS_LIBDIR)/libsacado.a \
+		$(DEAL_II_TRILINOS_LIBDIR)/libstratimikos.a \
+		$(DEAL_II_TRILINOS_LIBDIR)/libstratimikosaztecoo.a \
+		$(DEAL_II_TRILINOS_LIBDIR)/libstratimikosifpack.a \
+		$(DEAL_II_TRILINOS_LIBDIR)/libstratimikosml.a \
+		$(DEAL_II_TRILINOS_LIBDIR)/libteuchos.a \
+		$(DEAL_II_TRILINOS_LIBDIR)/libthyra.a \
+		$(DEAL_II_TRILINOS_LIBDIR)/libthyraepetra.a \
+		$(DEAL_II_TRILINOS_LIBDIR)/libthyraepetraext.a \
+		$(DEAL_II_TRILINOS_LIBDIR)/libtriutils.a
   endif
 
-  lib-lac.g += $(lib-contrib-trilinos)
-  lib-lac.o += $(lib-contrib-trilinos)
+  LDFLAGS += $(lib-contrib-trilinos)
 endif
 
 ifeq ($(USE_CONTRIB_METIS),yes)

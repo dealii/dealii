@@ -727,7 +727,8 @@ DEAL_II_EXPAND_TRILINOS_MPI_VECTOR
 DEAL_II_EXPAND_TRILINOS_BLOCKVECTOR
 DEAL_II_EXPAND_TRILINOS_MPI_BLOCKVECTOR
 USE_CONTRIB_TRILINOS
-DEAL_II_TRILINOS_DIR
+DEAL_II_TRILINOS_INCDIR
+DEAL_II_TRILINOS_LIBDIR
 DEAL_II_TRILINOS_SHARED
 DEAL_II_TRILINOS_STATIC
 NEEDS_F77LIBS
@@ -735,7 +736,8 @@ HSL_INCLUDE_DIR
 USE_CONTRIB_HSL
 TECPLOT_INCLUDE_DIR
 USE_CONTRIB_METIS
-DEAL_II_METIS_DIR
+DEAL_II_METIS_INCDIR
+DEAL_II_METIS_LIBDIR
 UMFPACK_LIB
 UMFPACK_INCLUDE_DIR
 USE_CONTRIB_UMFPACK
@@ -1364,6 +1366,12 @@ Optional Packages:
                           of which the include and lib directories
                           are subdirs; use this if you want to override
                           the TRILINOS_DIR environment variable.
+  --with-trilinos-include=/path/to/trilinos  Specify the path to the Trilinos include;
+                          use this if you want to override
+                          the TRILINOS_INCDIR environment variable.
+  --with-trilinos-libs=/path/to/trilinos  Specify the path to the Trilinos libraries;
+                          use this if you want to override
+                          the TRILINOS_LIBDIR environment variable.
   --with-blas=blaslib     use the blas library blaslib. Make sure
                           the path to the libary is searched by ld, since
                           it is included by the argument -lblaslib. If no
@@ -1376,15 +1384,33 @@ Optional Packages:
                           of which the include and library directories are
                           subdirs; use this if you want to override the
                           NETCDF_DIR environment variable.
+  --with-netcdf-include=/path/to/netcdf  Specify the path to the NetCDF headers file;
+			   use this if you want to override the
+			   NETCDF_INCLUDE_DIR environment variable.
+  --with-netcdf-libs=/path/to/netcdf  Specify the path to the NetCDF libraries;
+			   use this if you want to override the
+			   NETCDF_LIBDIR environment variable.
   --with-metis=/path/to/metis  Specify the path to the Metis installation,
                           of which the include and library directories
                           are subdirs; use this if you want to override
                           the METIS_DIR environment variable.
+  --with-metis-include=/path/to/metis  Specify the path to the METIS headers file;
+                          use this if you want to override the
+                          METIS_INCLUDE_DIR environment variable.
+  --with-metis-libs=/path/to/metis  Specify the path to the METIS libraries;
+                          use this if you want to override the
+                          METIS_LIBDIR environment variable.
   --with-umfpack=umfpack-root-directory  Use installed UMFPack version.
                           'umfpack-root-directory' should be the directory
                           containing directories AMD and UMFPACK. The
                           contributed UMFPack library is used if no argument
                           is given. Default is not to use UMFPack.
+  --with-umfpack-include=/path/to/UMFPACK  Specify the path to the UMFPACK headers file;
+			  use this if you want to override the
+			  UMFPACK_INCDIR environment variable.
+  --with-umfpack-libs=/path/to/UMFPACK  Specify the path to the UMFPACK libraries;
+			  use this if you want to override the
+			  UMFPACK_LIBDIR environment variable.
   --with-lapack=lapacklib  use the lapack library lapacklib. Make sure
                           the path to the libary is searched by ld, since it
                           is included by the argument -llapacklib. If no
@@ -12106,9 +12132,8 @@ echo "${ECHO_T}$DEAL_II_PETSC_MPIUNI_LIB" >&6; }
 
 
 
-  { echo "$as_me:$LINENO: checking for Trilinos library directory" >&5
-echo $ECHO_N "checking for Trilinos library directory... $ECHO_C" >&6; }
-
+ { echo "$as_me:$LINENO: checking for Trilinos directory" >&5
+echo $ECHO_N "checking for Trilinos directory... $ECHO_C" >&6; }
 
 # Check whether --with-trilinos was given.
 if test "${with_trilinos+set}" = set; then
@@ -12131,6 +12156,9 @@ echo "$as_me: error: Path to Trilinos specified with --with-trilinos does not
  		  	  point to a complete Trilinos installation" >&2;}
    { (exit 1); exit 1; }; }
 	  fi
+
+	  DEAL_II_TRILINOS_INCDIR="$DEAL_II_TRILINOS_DIR/include"
+	  DEAL_II_TRILINOS_LIBDIR="$DEAL_II_TRILINOS_DIR/lib"
         fi
 
 else
@@ -12151,11 +12179,125 @@ echo "$as_me: error: The path to Trilinos specified in the TRILINOS_DIR
  			  point to a complete Trilinos installation" >&2;}
    { (exit 1); exit 1; }; }
 	  fi
+	  DEAL_II_TRILINOS_INCDIR="$DEAL_II_TRILINOS_DIR/include"
+	  DEAL_II_TRILINOS_LIBDIR="$DEAL_II_TRILINOS_DIR/lib"
         else
 	  USE_CONTRIB_TRILINOS=no
           DEAL_II_TRILINOS_DIR=""
           { echo "$as_me:$LINENO: result: not found" >&5
 echo "${ECHO_T}not found" >&6; }
+        fi
+
+fi
+
+
+  { echo "$as_me:$LINENO: checking for Trilinos header directory" >&5
+echo $ECHO_N "checking for Trilinos header directory... $ECHO_C" >&6; }
+
+# Check whether --with-trilinos-include was given.
+if test "${with_trilinos_include+set}" = set; then
+  withval=$with_trilinos_include;
+                if test "x$withval" = "xno" ; then
+          { echo "$as_me:$LINENO: result: explicitly disabled" >&5
+echo "${ECHO_T}explicitly disabled" >&6; }
+          USE_CONTRIB_TRILINOS=no
+        else
+	  USE_CONTRIB_TRILINOS=yes
+          DEAL_II_TRILINOS_INCDIR=$withval
+	  { echo "$as_me:$LINENO: result: $DEAL_II_TRILINOS_INCDIR" >&5
+echo "${ECHO_T}$DEAL_II_TRILINOS_INCDIR" >&6; }
+
+                    if test ! -d $DEAL_II_TRILINOS_INCDIR ; then
+            { { echo "$as_me:$LINENO: error: Path to Trilinos specified with --with-trilinos-include does not
+ 		  	  point to a complete Trilinos installation" >&5
+echo "$as_me: error: Path to Trilinos specified with --with-trilinos-include does not
+ 		  	  point to a complete Trilinos installation" >&2;}
+   { (exit 1); exit 1; }; }
+	  fi
+        fi
+
+else
+
+                if test "x$TRILINOS_INCDIR" != "x" ; then
+  	  USE_CONTRIB_TRILINOS=yes
+	  DEAL_II_TRILINOS_INCDIR="$TRILINOS_INCDIR"
+	  { echo "$as_me:$LINENO: result: $DEAL_II_TRILINOS_INCDIR" >&5
+echo "${ECHO_T}$DEAL_II_TRILINOS_INCDIR" >&6; }
+
+                    if test ! -d $DEAL_II_TRILINOS_INCDIR ; then
+            { { echo "$as_me:$LINENO: error: The path to Trilinos includes specified in the TRILINOS_INCDIR
+	  		  environment variable does not point to a valid directory" >&5
+echo "$as_me: error: The path to Trilinos includes specified in the TRILINOS_INCDIR
+	  		  environment variable does not point to a valid directory" >&2;}
+   { (exit 1); exit 1; }; }
+	  fi
+        else
+          	  	            if test "x${USE_CONTRIB_TRILINOS}" != "xyes" ; then
+	    USE_CONTRIB_TRILINOS=no
+            DEAL_II_TRILINOS_INCDIR=""
+            { echo "$as_me:$LINENO: result: not found" >&5
+echo "${ECHO_T}not found" >&6; }
+          else
+            { echo "$as_me:$LINENO: result: not explicitly specified" >&5
+echo "${ECHO_T}not explicitly specified" >&6; }
+          fi
+        fi
+
+fi
+
+
+  { echo "$as_me:$LINENO: checking for Trilinos library directory" >&5
+echo $ECHO_N "checking for Trilinos library directory... $ECHO_C" >&6; }
+
+# Check whether --with-trilinos-libs was given.
+if test "${with_trilinos_libs+set}" = set; then
+  withval=$with_trilinos_libs;
+                if test "x$withval" = "xno" ; then
+          { echo "$as_me:$LINENO: result: explicitly disabled" >&5
+echo "${ECHO_T}explicitly disabled" >&6; }
+          USE_CONTRIB_TRILINOS=no
+        else
+	  USE_CONTRIB_TRILINOS=yes
+          DEAL_II_TRILINOS_LIBDIR=$withval
+	  { echo "$as_me:$LINENO: result: $DEAL_II_TRILINOS_LIBDIR" >&5
+echo "${ECHO_T}$DEAL_II_TRILINOS_LIBDIR" >&6; }
+
+                    if test ! -d $DEAL_II_TRILINOS_LIBDIR ; then
+            { { echo "$as_me:$LINENO: error: Path to Trilinos libraries with --with-trilinos-libs does not
+ 		  	  point to a valid directory" >&5
+echo "$as_me: error: Path to Trilinos libraries with --with-trilinos-libs does not
+ 		  	  point to a valid directory" >&2;}
+   { (exit 1); exit 1; }; }
+	  fi
+        fi
+
+else
+
+                if test "x$TRILINOS_DIR" != "x" ; then
+  	  USE_CONTRIB_TRILINOS=yes
+	  DEAL_II_TRILINOS_LIBDIR="$TRILINOS_DIR"
+	  { echo "$as_me:$LINENO: result: $DEAL_II_TRILINOS_LIBDIR" >&5
+echo "${ECHO_T}$DEAL_II_TRILINOS_LIBDIR" >&6; }
+
+                    if test ! -d $DEAL_II_TRILINOS_LIBDIR ; then
+            { { echo "$as_me:$LINENO: error: The path to Trilinos specified in the TRILINOS_LIBDIR
+	  		  environment variable does not
+ 			  point to a complete Trilinos installation" >&5
+echo "$as_me: error: The path to Trilinos specified in the TRILINOS_LIBDIR
+	  		  environment variable does not
+ 			  point to a complete Trilinos installation" >&2;}
+   { (exit 1); exit 1; }; }
+	  fi
+        else
+          	  	            if test "x${USE_CONTRIB_TRILINOS}" != "xyes" ; then
+	    USE_CONTRIB_TRILINOS=no
+            DEAL_II_TRILINOS_LIBDIR=""
+            { echo "$as_me:$LINENO: result: not found" >&5
+echo "${ECHO_T}not found" >&6; }
+          else
+            { echo "$as_me:$LINENO: result: not explicitly specified" >&5
+echo "${ECHO_T}not explicitly specified" >&6; }
+          fi
         fi
 
 fi
@@ -12174,7 +12316,7 @@ _ACEOF
 
   { echo "$as_me:$LINENO: checking whether Trilinos uses shared libraries" >&5
 echo $ECHO_N "checking whether Trilinos uses shared libraries... $ECHO_C" >&6; }
-  if test -f $DEAL_II_TRILINOS_DIR/lib/libepetra${shared_lib_suffix} ; then
+  if test -f $DEAL_II_TRILINOS_LIBDIR/libepetra${shared_lib_suffix} ; then
     { echo "$as_me:$LINENO: result: yes" >&5
 echo "${ECHO_T}yes" >&6; }
     DEAL_II_TRILINOS_SHARED=yes
@@ -12185,7 +12327,7 @@ echo "${ECHO_T}no" >&6; }
 
   { echo "$as_me:$LINENO: checking whether Trilinos uses static libraries" >&5
 echo $ECHO_N "checking whether Trilinos uses static libraries... $ECHO_C" >&6; }
-  if test -f $DEAL_II_TRILINOS_DIR/lib/libepetra${static_lib_suffix} ; then
+  if test -f $DEAL_II_TRILINOS_LIBDIR/libepetra${static_lib_suffix} ; then
     { echo "$as_me:$LINENO: result: yes" >&5
 echo "${ECHO_T}yes" >&6; }
     DEAL_II_TRILINOS_STATIC=yes
@@ -12391,8 +12533,9 @@ rm -f core conftest.err conftest.$ac_objext conftest.$ac_ext
   OLD_CXXFLAGS="$CXXFLAGS"
   OLD_CPPFLAGS="$CPPFLAGS"
 
-  CPPFLAGS="-I$DEAL_II_TRILINOS_DIR/include $CPPFLAGS"
-  CXXFLAGS="-I$DEAL_II_TRILINOS_DIR/include $CXXFLAGS"
+echo $DEAL_II_TRILINOS_INCDIR
+  CPPFLAGS="-I$DEAL_II_TRILINOS_INCDIR $CPPFLAGS"
+  CXXFLAGS="-I$DEAL_II_TRILINOS_INCDIR $CXXFLAGS"
 
 
 
@@ -12628,6 +12771,7 @@ done
       with_trilinos="yes"
     fi
   fi
+
 
 
 
@@ -13279,12 +13423,48 @@ else
 fi
 
 
+
+# Check whether --with-netcdf-include was given.
+if test "${with_netcdf_include+set}" = set; then
+  withval=$with_netcdf_include;
+	 NETCDF_INCLUDE_DIR=$withval
+
+fi
+
+
+
+# Check whether --with-netcdf-libs was given.
+if test "${with_netcdf_libs+set}" = set; then
+  withval=$with_netcdf_libs;
+	 NETCDF_LIBDIR=$withval
+
+fi
+
+
+
   if test "x$DEAL_II_NETCDF_DIR" != "x" ; then
-    CPPFLAGS="-I$DEAL_II_NETCDF_DIR/include $CPPFLAGS"
-    CXXFLAGS="-I$DEAL_II_NETCDF_DIR/include $CXXFLAGS"
-    LDFLAGS="-L$DEAL_II_NETCDF_DIR/lib $LDFLAGS"
-    if test "$LD_PATH_OPTION" != "no" ; then
-      LDFLAGS="$LD_PATH_OPTION$DEAL_II_NETCDF_DIR/lib $LDFLAGS"
+    if test "x$NETCDF_INCLUDE_DIR" != "x" ; then
+      CPPFLAGS="-I$NETCDF_INCLUDE_DIR $CPPFLAGS"
+      CXXFLAGS="-I$NETCDF_INCLUDE_DIR $CXXFLAGS"
+    else
+      CPPFLAGS="-I$DEAL_II_NETCDF_DIR/include $CPPFLAGS"
+      CXXFLAGS="-I$DEAL_II_NETCDF_DIR/include $CXXFLAGS"
+    fi
+    if test "x$NETCDF_LIBDIR" != "x" ; then
+      LDFLAGS="$LDFLAGS -L$NETCDF_LIBDIR"
+    else
+      LDFLAGS="-L$DEAL_II_NETCDF_DIR/lib $LDFLAGS"
+      if test "$LD_PATH_OPTION" != "no" ; then
+	LDFLAGS="$LD_PATH_OPTION$DEAL_II_NETCDF_DIR/lib $LDFLAGS"
+      fi
+    fi
+  else
+    if test "x$NETCDF_INCLUDE_DIR" != "x" ; then
+      CPPFLAGS="-I$NETCDF_INCLUDE_DIR $CPPFLAGS"
+      CXXFLAGS="-I$NETCDF_INCLUDE_DIR $CXXFLAGS"
+    fi
+    if test "x$NETCDF_LIBDIR" != "x" ; then
+      LDFLAGS="$LDFLAGS -L$NETCDF_LIBDIR"
     fi
   fi
 
@@ -13418,7 +13598,9 @@ fi
 echo "${ECHO_T}$ac_cv_header_netcdfcpp_h" >&6; }
 
 fi
-if test $ac_cv_header_netcdfcpp_h = yes; then
+
+
+
   { echo "$as_me:$LINENO: checking for nc_open in -lnetcdf" >&5
 echo $ECHO_N "checking for nc_open in -lnetcdf... $ECHO_C" >&6; }
 if test "${ac_cv_lib_netcdf_nc_open+set}" = set; then
@@ -13487,9 +13669,9 @@ if test $ac_cv_lib_netcdf_nc_open = yes; then
 
   LIBS="-lnetcdf_c++ -lnetcdf $LIBS"
 
-      { echo "$as_me:$LINENO: checking for NcFile::NcFile in -lnetcdf_c++" >&5
+    { echo "$as_me:$LINENO: checking for NcFile::NcFile in -lnetcdf_c++" >&5
 echo $ECHO_N "checking for NcFile::NcFile in -lnetcdf_c++... $ECHO_C" >&6; }
-      cat >conftest.$ac_ext <<_ACEOF
+    cat >conftest.$ac_ext <<_ACEOF
   /* confdefs.h.  */
 _ACEOF
 cat confdefs.h >>conftest.$ac_ext
@@ -13549,14 +13731,10 @@ rm -f core conftest.err conftest.$ac_objext conftest_ipa8_conftest.oo \
 
 fi
 
-fi
 
 
 
 
-
-    { echo "$as_me:$LINENO: checking for Metis library directory" >&5
-echo $ECHO_N "checking for Metis library directory... $ECHO_C" >&6; }
 
 
 # Check whether --with-metis was given.
@@ -13575,6 +13753,9 @@ echo "$as_me: error: Path to Metis specified with --with-metis does not
    { (exit 1); exit 1; }; }
 	fi
 
+	DEAL_II_METIS_LIBDIR="$DEAL_II_METIS_DIR/Lib"
+	DEAL_II_METIS_INCDIR="$DEAL_II_METIS_DIR/include"
+
 else
 
                 if test "x$METIS_DIR" != "x" ; then
@@ -13592,14 +13773,69 @@ echo "$as_me: error: The path to Metis specified in the METIS_DIR
  			  point to a complete Metis installation" >&2;}
    { (exit 1); exit 1; }; }
 	  fi
+	  DEAL_II_METIS_LIBDIR="$DEAL_II_METIS_DIR/Lib"
+	  DEAL_II_METIS_INCDIR="$DEAL_II_METIS_DIR/include"
         else
 	  USE_CONTRIB_METIS=no
           DEAL_II_METIS_DIR=""
-          { echo "$as_me:$LINENO: result: not found" >&5
-echo "${ECHO_T}not found" >&6; }
         fi
 
 fi
+
+
+
+# Check whether --with-metis-include was given.
+if test "${with_metis_include+set}" = set; then
+  withval=$with_metis_include;
+        METIS_INCLUDE_DIR=$withval
+	DEAL_II_METIS_INCDIR="$METIS_INCLUDE_DIR"
+
+fi
+
+
+
+# Check whether --with-metis-libs was given.
+if test "${with_metis_libs+set}" = set; then
+  withval=$with_metis_libs;
+	USE_CONTRIB_METIS=yes
+        DEAL_II_METIS_LIBDIR=$withval
+	{ echo "$as_me:$LINENO: result: $DEAL_II_METIS_LIBDIR" >&5
+echo "${ECHO_T}$DEAL_II_METIS_LIBDIR" >&6; }
+
+                if test ! -d $DEAL_II_METIS_LIBDIR ; then
+          { { echo "$as_me:$LINENO: error: Path to Metis specified with --with-metis does not
+ 			point to a complete Metis installation" >&5
+echo "$as_me: error: Path to Metis specified with --with-metis does not
+ 			point to a complete Metis installation" >&2;}
+   { (exit 1); exit 1; }; }
+	fi
+
+else
+
+                if test "x$METIS_LIBDIR" != "x" ; then
+  	  USE_CONTRIB_METIS=yes
+          DEAL_II_METIS_LIBDIR="$METIS_LIBDIR"
+	  { echo "$as_me:$LINENO: result: $DEAL_II_METIS_LIBDIR" >&5
+echo "${ECHO_T}$DEAL_II_METIS_LIBDIR" >&6; }
+
+                    if test ! -d $DEAL_II_METIS_LIBDIR ; then
+            { { echo "$as_me:$LINENO: error: The path to Metis specified in the METIS_DIR
+	  		  environment variable does not
+ 			  point to a complete Metis installation" >&5
+echo "$as_me: error: The path to Metis specified in the METIS_DIR
+	  		  environment variable does not
+ 			  point to a complete Metis installation" >&2;}
+   { (exit 1); exit 1; }; }
+	  fi
+        else
+          	            if test "x$USE_CONTRIB_METIS" != "xyes" ; then
+  	    USE_CONTRIB_METIS=no
+            DEAL_II_METIS_LIBDIR=""
+          fi
+        fi
+
+fi
+
 
   if test "x$USE_CONTRIB_METIS" = "xyes" ; then
 
@@ -13607,24 +13843,47 @@ cat >>confdefs.h <<\_ACEOF
 #define DEAL_II_USE_METIS 1
 _ACEOF
 
-    LDFLAGS="$LDFLAGS -L$DEAL_II_METIS_DIR -lmetis"
+    LDFLAGS="$LDFLAGS -L$DEAL_II_METIS_LIBDIR -lmetis"
 
-    { echo "$as_me:$LINENO: checking for Metis version" >&5
-echo $ECHO_N "checking for Metis version... $ECHO_C" >&6; }
-    DEAL_II_METIS_VERSION=`cat $DEAL_II_METIS_DIR/VERSION`
-    { echo "$as_me:$LINENO: result: $DEAL_II_METIS_VERSION" >&5
-echo "${ECHO_T}$DEAL_II_METIS_VERSION" >&6; }
-  fi
+              fi
 
 
 
+
+
+
+  acx_umfpack=no
 
 
 # Check whether --with-umfpack was given.
 if test "${with_umfpack+set}" = set; then
   withval=$with_umfpack;
-  if test "x$withval" != "xyes" ; then
         UMFPACK_DIR=$withval
+
+fi
+
+
+
+# Check whether --with-umfpack-include was given.
+if test "${with_umfpack_include+set}" = set; then
+  withval=$with_umfpack_include;
+	UMFPACK_INCDIR=$withval
+        acx_umfpack=yes
+
+fi
+
+
+
+# Check whether --with-umfpack-libs was given.
+if test "${with_umfpack_libs+set}" = set; then
+  withval=$with_umfpack_libs;
+	UMFPACK_LIBDIR=$withval
+        acx_umfpack=yes
+
+fi
+
+
+  if test "x$UMFPACK_DIR" != "x" -a "x$acs_umfpack" == "xno" ; then
 
             OLD_LDFLAGS="$LDFLAGS"
     LDFLAGS="-L${UMFPACK_DIR}/UMFPACK/Lib $LDFLAGS"
@@ -14104,12 +14363,745 @@ fi
 
   else
 
-        { echo "$as_me:$LINENO: checking UmfPack library" >&5
+    if test "x$UMFPACK_INCDIR" != "x" ; then
+       UMFPACK_INCLUDE_DIR="-I${UMFPACK_INCDIR}"
+       OLD_CXXFLAGS="$CXXFLAGS"
+       OLD_CPPFLAGS="$CPPFLAGS"
+       CXXFLAGS="-I$UMFPACK_INCDIR $CXXFLAGS"
+       CPPFLAGS="-I$UMFPACK_INCDIR $CPPFLAGS"
+       if test "${ac_cv_header_umfpack_h+set}" = set; then
+  { echo "$as_me:$LINENO: checking for umfpack.h" >&5
+echo $ECHO_N "checking for umfpack.h... $ECHO_C" >&6; }
+if test "${ac_cv_header_umfpack_h+set}" = set; then
+  echo $ECHO_N "(cached) $ECHO_C" >&6
+fi
+{ echo "$as_me:$LINENO: result: $ac_cv_header_umfpack_h" >&5
+echo "${ECHO_T}$ac_cv_header_umfpack_h" >&6; }
+else
+  # Is the header compilable?
+{ echo "$as_me:$LINENO: checking umfpack.h usability" >&5
+echo $ECHO_N "checking umfpack.h usability... $ECHO_C" >&6; }
+cat >conftest.$ac_ext <<_ACEOF
+/* confdefs.h.  */
+_ACEOF
+cat confdefs.h >>conftest.$ac_ext
+cat >>conftest.$ac_ext <<_ACEOF
+/* end confdefs.h.  */
+$ac_includes_default
+#include <umfpack.h>
+_ACEOF
+rm -f conftest.$ac_objext
+if { (ac_try="$ac_compile"
+case "(($ac_try" in
+  *\"* | *\`* | *\\*) ac_try_echo=\$ac_try;;
+  *) ac_try_echo=$ac_try;;
+esac
+eval "echo \"\$as_me:$LINENO: $ac_try_echo\"") >&5
+  (eval "$ac_compile") 2>conftest.er1
+  ac_status=$?
+  grep -v '^ *+' conftest.er1 >conftest.err
+  rm -f conftest.er1
+  cat conftest.err >&5
+  echo "$as_me:$LINENO: \$? = $ac_status" >&5
+  (exit $ac_status); } && {
+	 test -z "$ac_cxx_werror_flag" ||
+	 test ! -s conftest.err
+       } && test -s conftest.$ac_objext; then
+  ac_header_compiler=yes
+else
+  echo "$as_me: failed program was:" >&5
+sed 's/^/| /' conftest.$ac_ext >&5
+
+	ac_header_compiler=no
+fi
+
+rm -f core conftest.err conftest.$ac_objext conftest.$ac_ext
+{ echo "$as_me:$LINENO: result: $ac_header_compiler" >&5
+echo "${ECHO_T}$ac_header_compiler" >&6; }
+
+# Is the header present?
+{ echo "$as_me:$LINENO: checking umfpack.h presence" >&5
+echo $ECHO_N "checking umfpack.h presence... $ECHO_C" >&6; }
+cat >conftest.$ac_ext <<_ACEOF
+/* confdefs.h.  */
+_ACEOF
+cat confdefs.h >>conftest.$ac_ext
+cat >>conftest.$ac_ext <<_ACEOF
+/* end confdefs.h.  */
+#include <umfpack.h>
+_ACEOF
+if { (ac_try="$ac_cpp conftest.$ac_ext"
+case "(($ac_try" in
+  *\"* | *\`* | *\\*) ac_try_echo=\$ac_try;;
+  *) ac_try_echo=$ac_try;;
+esac
+eval "echo \"\$as_me:$LINENO: $ac_try_echo\"") >&5
+  (eval "$ac_cpp conftest.$ac_ext") 2>conftest.er1
+  ac_status=$?
+  grep -v '^ *+' conftest.er1 >conftest.err
+  rm -f conftest.er1
+  cat conftest.err >&5
+  echo "$as_me:$LINENO: \$? = $ac_status" >&5
+  (exit $ac_status); } >/dev/null && {
+	 test -z "$ac_cxx_preproc_warn_flag$ac_cxx_werror_flag" ||
+	 test ! -s conftest.err
+       }; then
+  ac_header_preproc=yes
+else
+  echo "$as_me: failed program was:" >&5
+sed 's/^/| /' conftest.$ac_ext >&5
+
+  ac_header_preproc=no
+fi
+
+rm -f conftest.err conftest.$ac_ext
+{ echo "$as_me:$LINENO: result: $ac_header_preproc" >&5
+echo "${ECHO_T}$ac_header_preproc" >&6; }
+
+# So?  What about this header?
+case $ac_header_compiler:$ac_header_preproc:$ac_cxx_preproc_warn_flag in
+  yes:no: )
+    { echo "$as_me:$LINENO: WARNING: umfpack.h: accepted by the compiler, rejected by the preprocessor!" >&5
+echo "$as_me: WARNING: umfpack.h: accepted by the compiler, rejected by the preprocessor!" >&2;}
+    { echo "$as_me:$LINENO: WARNING: umfpack.h: proceeding with the compiler's result" >&5
+echo "$as_me: WARNING: umfpack.h: proceeding with the compiler's result" >&2;}
+    ac_header_preproc=yes
+    ;;
+  no:yes:* )
+    { echo "$as_me:$LINENO: WARNING: umfpack.h: present but cannot be compiled" >&5
+echo "$as_me: WARNING: umfpack.h: present but cannot be compiled" >&2;}
+    { echo "$as_me:$LINENO: WARNING: umfpack.h:     check for missing prerequisite headers?" >&5
+echo "$as_me: WARNING: umfpack.h:     check for missing prerequisite headers?" >&2;}
+    { echo "$as_me:$LINENO: WARNING: umfpack.h: see the Autoconf documentation" >&5
+echo "$as_me: WARNING: umfpack.h: see the Autoconf documentation" >&2;}
+    { echo "$as_me:$LINENO: WARNING: umfpack.h:     section \"Present But Cannot Be Compiled\"" >&5
+echo "$as_me: WARNING: umfpack.h:     section \"Present But Cannot Be Compiled\"" >&2;}
+    { echo "$as_me:$LINENO: WARNING: umfpack.h: proceeding with the preprocessor's result" >&5
+echo "$as_me: WARNING: umfpack.h: proceeding with the preprocessor's result" >&2;}
+    { echo "$as_me:$LINENO: WARNING: umfpack.h: in the future, the compiler will take precedence" >&5
+echo "$as_me: WARNING: umfpack.h: in the future, the compiler will take precedence" >&2;}
+    ( cat <<\_ASBOX
+## -------------------------------- ##
+## Report this to dealii@dealii.org ##
+## -------------------------------- ##
+_ASBOX
+     ) | sed "s/^/$as_me: WARNING:     /" >&2
+    ;;
+esac
+{ echo "$as_me:$LINENO: checking for umfpack.h" >&5
+echo $ECHO_N "checking for umfpack.h... $ECHO_C" >&6; }
+if test "${ac_cv_header_umfpack_h+set}" = set; then
+  echo $ECHO_N "(cached) $ECHO_C" >&6
+else
+  ac_cv_header_umfpack_h=$ac_header_preproc
+fi
+{ echo "$as_me:$LINENO: result: $ac_cv_header_umfpack_h" >&5
+echo "${ECHO_T}$ac_cv_header_umfpack_h" >&6; }
+
+fi
+if test $ac_cv_header_umfpack_h = yes; then
+  :
+else
+  { { echo "$as_me:$LINENO: error: installation of UMFPACK could not be determined" >&5
+echo "$as_me: error: installation of UMFPACK could not be determined" >&2;}
+   { (exit 1); exit 1; }; }
+
+fi
+
+
+       if test "${ac_cv_header_amd_h+set}" = set; then
+  { echo "$as_me:$LINENO: checking for amd.h" >&5
+echo $ECHO_N "checking for amd.h... $ECHO_C" >&6; }
+if test "${ac_cv_header_amd_h+set}" = set; then
+  echo $ECHO_N "(cached) $ECHO_C" >&6
+fi
+{ echo "$as_me:$LINENO: result: $ac_cv_header_amd_h" >&5
+echo "${ECHO_T}$ac_cv_header_amd_h" >&6; }
+else
+  # Is the header compilable?
+{ echo "$as_me:$LINENO: checking amd.h usability" >&5
+echo $ECHO_N "checking amd.h usability... $ECHO_C" >&6; }
+cat >conftest.$ac_ext <<_ACEOF
+/* confdefs.h.  */
+_ACEOF
+cat confdefs.h >>conftest.$ac_ext
+cat >>conftest.$ac_ext <<_ACEOF
+/* end confdefs.h.  */
+$ac_includes_default
+#include <amd.h>
+_ACEOF
+rm -f conftest.$ac_objext
+if { (ac_try="$ac_compile"
+case "(($ac_try" in
+  *\"* | *\`* | *\\*) ac_try_echo=\$ac_try;;
+  *) ac_try_echo=$ac_try;;
+esac
+eval "echo \"\$as_me:$LINENO: $ac_try_echo\"") >&5
+  (eval "$ac_compile") 2>conftest.er1
+  ac_status=$?
+  grep -v '^ *+' conftest.er1 >conftest.err
+  rm -f conftest.er1
+  cat conftest.err >&5
+  echo "$as_me:$LINENO: \$? = $ac_status" >&5
+  (exit $ac_status); } && {
+	 test -z "$ac_cxx_werror_flag" ||
+	 test ! -s conftest.err
+       } && test -s conftest.$ac_objext; then
+  ac_header_compiler=yes
+else
+  echo "$as_me: failed program was:" >&5
+sed 's/^/| /' conftest.$ac_ext >&5
+
+	ac_header_compiler=no
+fi
+
+rm -f core conftest.err conftest.$ac_objext conftest.$ac_ext
+{ echo "$as_me:$LINENO: result: $ac_header_compiler" >&5
+echo "${ECHO_T}$ac_header_compiler" >&6; }
+
+# Is the header present?
+{ echo "$as_me:$LINENO: checking amd.h presence" >&5
+echo $ECHO_N "checking amd.h presence... $ECHO_C" >&6; }
+cat >conftest.$ac_ext <<_ACEOF
+/* confdefs.h.  */
+_ACEOF
+cat confdefs.h >>conftest.$ac_ext
+cat >>conftest.$ac_ext <<_ACEOF
+/* end confdefs.h.  */
+#include <amd.h>
+_ACEOF
+if { (ac_try="$ac_cpp conftest.$ac_ext"
+case "(($ac_try" in
+  *\"* | *\`* | *\\*) ac_try_echo=\$ac_try;;
+  *) ac_try_echo=$ac_try;;
+esac
+eval "echo \"\$as_me:$LINENO: $ac_try_echo\"") >&5
+  (eval "$ac_cpp conftest.$ac_ext") 2>conftest.er1
+  ac_status=$?
+  grep -v '^ *+' conftest.er1 >conftest.err
+  rm -f conftest.er1
+  cat conftest.err >&5
+  echo "$as_me:$LINENO: \$? = $ac_status" >&5
+  (exit $ac_status); } >/dev/null && {
+	 test -z "$ac_cxx_preproc_warn_flag$ac_cxx_werror_flag" ||
+	 test ! -s conftest.err
+       }; then
+  ac_header_preproc=yes
+else
+  echo "$as_me: failed program was:" >&5
+sed 's/^/| /' conftest.$ac_ext >&5
+
+  ac_header_preproc=no
+fi
+
+rm -f conftest.err conftest.$ac_ext
+{ echo "$as_me:$LINENO: result: $ac_header_preproc" >&5
+echo "${ECHO_T}$ac_header_preproc" >&6; }
+
+# So?  What about this header?
+case $ac_header_compiler:$ac_header_preproc:$ac_cxx_preproc_warn_flag in
+  yes:no: )
+    { echo "$as_me:$LINENO: WARNING: amd.h: accepted by the compiler, rejected by the preprocessor!" >&5
+echo "$as_me: WARNING: amd.h: accepted by the compiler, rejected by the preprocessor!" >&2;}
+    { echo "$as_me:$LINENO: WARNING: amd.h: proceeding with the compiler's result" >&5
+echo "$as_me: WARNING: amd.h: proceeding with the compiler's result" >&2;}
+    ac_header_preproc=yes
+    ;;
+  no:yes:* )
+    { echo "$as_me:$LINENO: WARNING: amd.h: present but cannot be compiled" >&5
+echo "$as_me: WARNING: amd.h: present but cannot be compiled" >&2;}
+    { echo "$as_me:$LINENO: WARNING: amd.h:     check for missing prerequisite headers?" >&5
+echo "$as_me: WARNING: amd.h:     check for missing prerequisite headers?" >&2;}
+    { echo "$as_me:$LINENO: WARNING: amd.h: see the Autoconf documentation" >&5
+echo "$as_me: WARNING: amd.h: see the Autoconf documentation" >&2;}
+    { echo "$as_me:$LINENO: WARNING: amd.h:     section \"Present But Cannot Be Compiled\"" >&5
+echo "$as_me: WARNING: amd.h:     section \"Present But Cannot Be Compiled\"" >&2;}
+    { echo "$as_me:$LINENO: WARNING: amd.h: proceeding with the preprocessor's result" >&5
+echo "$as_me: WARNING: amd.h: proceeding with the preprocessor's result" >&2;}
+    { echo "$as_me:$LINENO: WARNING: amd.h: in the future, the compiler will take precedence" >&5
+echo "$as_me: WARNING: amd.h: in the future, the compiler will take precedence" >&2;}
+    ( cat <<\_ASBOX
+## -------------------------------- ##
+## Report this to dealii@dealii.org ##
+## -------------------------------- ##
+_ASBOX
+     ) | sed "s/^/$as_me: WARNING:     /" >&2
+    ;;
+esac
+{ echo "$as_me:$LINENO: checking for amd.h" >&5
+echo $ECHO_N "checking for amd.h... $ECHO_C" >&6; }
+if test "${ac_cv_header_amd_h+set}" = set; then
+  echo $ECHO_N "(cached) $ECHO_C" >&6
+else
+  ac_cv_header_amd_h=$ac_header_preproc
+fi
+{ echo "$as_me:$LINENO: result: $ac_cv_header_amd_h" >&5
+echo "${ECHO_T}$ac_cv_header_amd_h" >&6; }
+
+fi
+if test $ac_cv_header_amd_h = yes; then
+  :
+else
+  { { echo "$as_me:$LINENO: error: installation of UMFPACK could not be determined" >&5
+echo "$as_me: error: installation of UMFPACK could not be determined" >&2;}
+   { (exit 1); exit 1; }; }
+fi
+
+
+       if test "${ac_cv_header_UFconfig_h+set}" = set; then
+  { echo "$as_me:$LINENO: checking for UFconfig.h" >&5
+echo $ECHO_N "checking for UFconfig.h... $ECHO_C" >&6; }
+if test "${ac_cv_header_UFconfig_h+set}" = set; then
+  echo $ECHO_N "(cached) $ECHO_C" >&6
+fi
+{ echo "$as_me:$LINENO: result: $ac_cv_header_UFconfig_h" >&5
+echo "${ECHO_T}$ac_cv_header_UFconfig_h" >&6; }
+else
+  # Is the header compilable?
+{ echo "$as_me:$LINENO: checking UFconfig.h usability" >&5
+echo $ECHO_N "checking UFconfig.h usability... $ECHO_C" >&6; }
+cat >conftest.$ac_ext <<_ACEOF
+/* confdefs.h.  */
+_ACEOF
+cat confdefs.h >>conftest.$ac_ext
+cat >>conftest.$ac_ext <<_ACEOF
+/* end confdefs.h.  */
+$ac_includes_default
+#include <UFconfig.h>
+_ACEOF
+rm -f conftest.$ac_objext
+if { (ac_try="$ac_compile"
+case "(($ac_try" in
+  *\"* | *\`* | *\\*) ac_try_echo=\$ac_try;;
+  *) ac_try_echo=$ac_try;;
+esac
+eval "echo \"\$as_me:$LINENO: $ac_try_echo\"") >&5
+  (eval "$ac_compile") 2>conftest.er1
+  ac_status=$?
+  grep -v '^ *+' conftest.er1 >conftest.err
+  rm -f conftest.er1
+  cat conftest.err >&5
+  echo "$as_me:$LINENO: \$? = $ac_status" >&5
+  (exit $ac_status); } && {
+	 test -z "$ac_cxx_werror_flag" ||
+	 test ! -s conftest.err
+       } && test -s conftest.$ac_objext; then
+  ac_header_compiler=yes
+else
+  echo "$as_me: failed program was:" >&5
+sed 's/^/| /' conftest.$ac_ext >&5
+
+	ac_header_compiler=no
+fi
+
+rm -f core conftest.err conftest.$ac_objext conftest.$ac_ext
+{ echo "$as_me:$LINENO: result: $ac_header_compiler" >&5
+echo "${ECHO_T}$ac_header_compiler" >&6; }
+
+# Is the header present?
+{ echo "$as_me:$LINENO: checking UFconfig.h presence" >&5
+echo $ECHO_N "checking UFconfig.h presence... $ECHO_C" >&6; }
+cat >conftest.$ac_ext <<_ACEOF
+/* confdefs.h.  */
+_ACEOF
+cat confdefs.h >>conftest.$ac_ext
+cat >>conftest.$ac_ext <<_ACEOF
+/* end confdefs.h.  */
+#include <UFconfig.h>
+_ACEOF
+if { (ac_try="$ac_cpp conftest.$ac_ext"
+case "(($ac_try" in
+  *\"* | *\`* | *\\*) ac_try_echo=\$ac_try;;
+  *) ac_try_echo=$ac_try;;
+esac
+eval "echo \"\$as_me:$LINENO: $ac_try_echo\"") >&5
+  (eval "$ac_cpp conftest.$ac_ext") 2>conftest.er1
+  ac_status=$?
+  grep -v '^ *+' conftest.er1 >conftest.err
+  rm -f conftest.er1
+  cat conftest.err >&5
+  echo "$as_me:$LINENO: \$? = $ac_status" >&5
+  (exit $ac_status); } >/dev/null && {
+	 test -z "$ac_cxx_preproc_warn_flag$ac_cxx_werror_flag" ||
+	 test ! -s conftest.err
+       }; then
+  ac_header_preproc=yes
+else
+  echo "$as_me: failed program was:" >&5
+sed 's/^/| /' conftest.$ac_ext >&5
+
+  ac_header_preproc=no
+fi
+
+rm -f conftest.err conftest.$ac_ext
+{ echo "$as_me:$LINENO: result: $ac_header_preproc" >&5
+echo "${ECHO_T}$ac_header_preproc" >&6; }
+
+# So?  What about this header?
+case $ac_header_compiler:$ac_header_preproc:$ac_cxx_preproc_warn_flag in
+  yes:no: )
+    { echo "$as_me:$LINENO: WARNING: UFconfig.h: accepted by the compiler, rejected by the preprocessor!" >&5
+echo "$as_me: WARNING: UFconfig.h: accepted by the compiler, rejected by the preprocessor!" >&2;}
+    { echo "$as_me:$LINENO: WARNING: UFconfig.h: proceeding with the compiler's result" >&5
+echo "$as_me: WARNING: UFconfig.h: proceeding with the compiler's result" >&2;}
+    ac_header_preproc=yes
+    ;;
+  no:yes:* )
+    { echo "$as_me:$LINENO: WARNING: UFconfig.h: present but cannot be compiled" >&5
+echo "$as_me: WARNING: UFconfig.h: present but cannot be compiled" >&2;}
+    { echo "$as_me:$LINENO: WARNING: UFconfig.h:     check for missing prerequisite headers?" >&5
+echo "$as_me: WARNING: UFconfig.h:     check for missing prerequisite headers?" >&2;}
+    { echo "$as_me:$LINENO: WARNING: UFconfig.h: see the Autoconf documentation" >&5
+echo "$as_me: WARNING: UFconfig.h: see the Autoconf documentation" >&2;}
+    { echo "$as_me:$LINENO: WARNING: UFconfig.h:     section \"Present But Cannot Be Compiled\"" >&5
+echo "$as_me: WARNING: UFconfig.h:     section \"Present But Cannot Be Compiled\"" >&2;}
+    { echo "$as_me:$LINENO: WARNING: UFconfig.h: proceeding with the preprocessor's result" >&5
+echo "$as_me: WARNING: UFconfig.h: proceeding with the preprocessor's result" >&2;}
+    { echo "$as_me:$LINENO: WARNING: UFconfig.h: in the future, the compiler will take precedence" >&5
+echo "$as_me: WARNING: UFconfig.h: in the future, the compiler will take precedence" >&2;}
+    ( cat <<\_ASBOX
+## -------------------------------- ##
+## Report this to dealii@dealii.org ##
+## -------------------------------- ##
+_ASBOX
+     ) | sed "s/^/$as_me: WARNING:     /" >&2
+    ;;
+esac
+{ echo "$as_me:$LINENO: checking for UFconfig.h" >&5
+echo $ECHO_N "checking for UFconfig.h... $ECHO_C" >&6; }
+if test "${ac_cv_header_UFconfig_h+set}" = set; then
+  echo $ECHO_N "(cached) $ECHO_C" >&6
+else
+  ac_cv_header_UFconfig_h=$ac_header_preproc
+fi
+{ echo "$as_me:$LINENO: result: $ac_cv_header_UFconfig_h" >&5
+echo "${ECHO_T}$ac_cv_header_UFconfig_h" >&6; }
+
+fi
+if test $ac_cv_header_UFconfig_h = yes; then
+  :
+else
+  { { echo "$as_me:$LINENO: error: installation of UMFPACK could not be determined" >&5
+echo "$as_me: error: installation of UMFPACK could not be determined" >&2;}
+   { (exit 1); exit 1; }; }
+fi
+
+
+
+       if test "x$UMFPACK_LIBDIR" != "x" ; then
+          { echo "$as_me:$LINENO: checking for amd_info in -lamd" >&5
+echo $ECHO_N "checking for amd_info in -lamd... $ECHO_C" >&6; }
+if test "${ac_cv_lib_amd_amd_info+set}" = set; then
+  echo $ECHO_N "(cached) $ECHO_C" >&6
+else
+  ac_check_lib_save_LIBS=$LIBS
+LIBS="-lamd  $LIBS"
+cat >conftest.$ac_ext <<_ACEOF
+/* confdefs.h.  */
+_ACEOF
+cat confdefs.h >>conftest.$ac_ext
+cat >>conftest.$ac_ext <<_ACEOF
+/* end confdefs.h.  */
+
+/* Override any GCC internal prototype to avoid an error.
+   Use char because int might match the return type of a GCC
+   builtin and then its argument prototype would still apply.  */
+#ifdef __cplusplus
+extern "C"
+#endif
+char amd_info ();
+int
+main ()
+{
+return amd_info ();
+  ;
+  return 0;
+}
+_ACEOF
+rm -f conftest.$ac_objext conftest$ac_exeext
+if { (ac_try="$ac_link"
+case "(($ac_try" in
+  *\"* | *\`* | *\\*) ac_try_echo=\$ac_try;;
+  *) ac_try_echo=$ac_try;;
+esac
+eval "echo \"\$as_me:$LINENO: $ac_try_echo\"") >&5
+  (eval "$ac_link") 2>conftest.er1
+  ac_status=$?
+  grep -v '^ *+' conftest.er1 >conftest.err
+  rm -f conftest.er1
+  cat conftest.err >&5
+  echo "$as_me:$LINENO: \$? = $ac_status" >&5
+  (exit $ac_status); } && {
+	 test -z "$ac_cxx_werror_flag" ||
+	 test ! -s conftest.err
+       } && test -s conftest$ac_exeext &&
+       $as_test_x conftest$ac_exeext; then
+  ac_cv_lib_amd_amd_info=yes
+else
+  echo "$as_me: failed program was:" >&5
+sed 's/^/| /' conftest.$ac_ext >&5
+
+	ac_cv_lib_amd_amd_info=no
+fi
+
+rm -f core conftest.err conftest.$ac_objext conftest_ipa8_conftest.oo \
+      conftest$ac_exeext conftest.$ac_ext
+LIBS=$ac_check_lib_save_LIBS
+fi
+{ echo "$as_me:$LINENO: result: $ac_cv_lib_amd_amd_info" >&5
+echo "${ECHO_T}$ac_cv_lib_amd_amd_info" >&6; }
+if test $ac_cv_lib_amd_amd_info = yes; then
+
+
+  LIBS="$LIBS -lamd"
+
+                    if test "$LD_PATH_OPTION" != "no"; then
+                        LDFLAGS="$LD_PATH_OPTION${UMFPACK_LIBDIR} $LDFLAGS"
+                    fi
+
+else
+  { { echo "$as_me:$LINENO: error: installation of AMD could not be determined" >&5
+echo "$as_me: error: installation of AMD could not be determined" >&2;}
+   { (exit 1); exit 1; }; }
+
+fi
+
+          { echo "$as_me:$LINENO: checking for umfpack_di_defaults in -lumfpack" >&5
+echo $ECHO_N "checking for umfpack_di_defaults in -lumfpack... $ECHO_C" >&6; }
+if test "${ac_cv_lib_umfpack_umfpack_di_defaults+set}" = set; then
+  echo $ECHO_N "(cached) $ECHO_C" >&6
+else
+  ac_check_lib_save_LIBS=$LIBS
+LIBS="-lumfpack  $LIBS"
+cat >conftest.$ac_ext <<_ACEOF
+/* confdefs.h.  */
+_ACEOF
+cat confdefs.h >>conftest.$ac_ext
+cat >>conftest.$ac_ext <<_ACEOF
+/* end confdefs.h.  */
+
+/* Override any GCC internal prototype to avoid an error.
+   Use char because int might match the return type of a GCC
+   builtin and then its argument prototype would still apply.  */
+#ifdef __cplusplus
+extern "C"
+#endif
+char umfpack_di_defaults ();
+int
+main ()
+{
+return umfpack_di_defaults ();
+  ;
+  return 0;
+}
+_ACEOF
+rm -f conftest.$ac_objext conftest$ac_exeext
+if { (ac_try="$ac_link"
+case "(($ac_try" in
+  *\"* | *\`* | *\\*) ac_try_echo=\$ac_try;;
+  *) ac_try_echo=$ac_try;;
+esac
+eval "echo \"\$as_me:$LINENO: $ac_try_echo\"") >&5
+  (eval "$ac_link") 2>conftest.er1
+  ac_status=$?
+  grep -v '^ *+' conftest.er1 >conftest.err
+  rm -f conftest.er1
+  cat conftest.err >&5
+  echo "$as_me:$LINENO: \$? = $ac_status" >&5
+  (exit $ac_status); } && {
+	 test -z "$ac_cxx_werror_flag" ||
+	 test ! -s conftest.err
+       } && test -s conftest$ac_exeext &&
+       $as_test_x conftest$ac_exeext; then
+  ac_cv_lib_umfpack_umfpack_di_defaults=yes
+else
+  echo "$as_me: failed program was:" >&5
+sed 's/^/| /' conftest.$ac_ext >&5
+
+	ac_cv_lib_umfpack_umfpack_di_defaults=no
+fi
+
+rm -f core conftest.err conftest.$ac_objext conftest_ipa8_conftest.oo \
+      conftest$ac_exeext conftest.$ac_ext
+LIBS=$ac_check_lib_save_LIBS
+fi
+{ echo "$as_me:$LINENO: result: $ac_cv_lib_umfpack_umfpack_di_defaults" >&5
+echo "${ECHO_T}$ac_cv_lib_umfpack_umfpack_di_defaults" >&6; }
+if test $ac_cv_lib_umfpack_umfpack_di_defaults = yes; then
+
+
+  LIBS="$LIBS -lumfpack"
+
+                    if test "$LD_PATH_OPTION" != "no"; then
+                        LDFLAGS="$LD_PATH_OPTION${UMFPACK_LIBDIR} $LDFLAGS"
+                    fi
+
+else
+  { { echo "$as_me:$LINENO: error: installation of UMFPACK could not be determined" >&5
+echo "$as_me: error: installation of UMFPACK could not be determined" >&2;}
+   { (exit 1); exit 1; }; }
+
+fi
+
+       else
+          { echo "$as_me:$LINENO: checking for amd_info in -lamd" >&5
+echo $ECHO_N "checking for amd_info in -lamd... $ECHO_C" >&6; }
+if test "${ac_cv_lib_amd_amd_info+set}" = set; then
+  echo $ECHO_N "(cached) $ECHO_C" >&6
+else
+  ac_check_lib_save_LIBS=$LIBS
+LIBS="-lamd  $LIBS"
+cat >conftest.$ac_ext <<_ACEOF
+/* confdefs.h.  */
+_ACEOF
+cat confdefs.h >>conftest.$ac_ext
+cat >>conftest.$ac_ext <<_ACEOF
+/* end confdefs.h.  */
+
+/* Override any GCC internal prototype to avoid an error.
+   Use char because int might match the return type of a GCC
+   builtin and then its argument prototype would still apply.  */
+#ifdef __cplusplus
+extern "C"
+#endif
+char amd_info ();
+int
+main ()
+{
+return amd_info ();
+  ;
+  return 0;
+}
+_ACEOF
+rm -f conftest.$ac_objext conftest$ac_exeext
+if { (ac_try="$ac_link"
+case "(($ac_try" in
+  *\"* | *\`* | *\\*) ac_try_echo=\$ac_try;;
+  *) ac_try_echo=$ac_try;;
+esac
+eval "echo \"\$as_me:$LINENO: $ac_try_echo\"") >&5
+  (eval "$ac_link") 2>conftest.er1
+  ac_status=$?
+  grep -v '^ *+' conftest.er1 >conftest.err
+  rm -f conftest.er1
+  cat conftest.err >&5
+  echo "$as_me:$LINENO: \$? = $ac_status" >&5
+  (exit $ac_status); } && {
+	 test -z "$ac_cxx_werror_flag" ||
+	 test ! -s conftest.err
+       } && test -s conftest$ac_exeext &&
+       $as_test_x conftest$ac_exeext; then
+  ac_cv_lib_amd_amd_info=yes
+else
+  echo "$as_me: failed program was:" >&5
+sed 's/^/| /' conftest.$ac_ext >&5
+
+	ac_cv_lib_amd_amd_info=no
+fi
+
+rm -f core conftest.err conftest.$ac_objext conftest_ipa8_conftest.oo \
+      conftest$ac_exeext conftest.$ac_ext
+LIBS=$ac_check_lib_save_LIBS
+fi
+{ echo "$as_me:$LINENO: result: $ac_cv_lib_amd_amd_info" >&5
+echo "${ECHO_T}$ac_cv_lib_amd_amd_info" >&6; }
+if test $ac_cv_lib_amd_amd_info = yes; then
+
+
+  LIBS="$LIBS -lamd"
+
+
+else
+  { { echo "$as_me:$LINENO: error: installation of AMD could not be determined" >&5
+echo "$as_me: error: installation of AMD could not be determined" >&2;}
+   { (exit 1); exit 1; }; }
+
+fi
+
+          { echo "$as_me:$LINENO: checking for umfpack_di_defaults in -lumfpack" >&5
+echo $ECHO_N "checking for umfpack_di_defaults in -lumfpack... $ECHO_C" >&6; }
+if test "${ac_cv_lib_umfpack_umfpack_di_defaults+set}" = set; then
+  echo $ECHO_N "(cached) $ECHO_C" >&6
+else
+  ac_check_lib_save_LIBS=$LIBS
+LIBS="-lumfpack  $LIBS"
+cat >conftest.$ac_ext <<_ACEOF
+/* confdefs.h.  */
+_ACEOF
+cat confdefs.h >>conftest.$ac_ext
+cat >>conftest.$ac_ext <<_ACEOF
+/* end confdefs.h.  */
+
+/* Override any GCC internal prototype to avoid an error.
+   Use char because int might match the return type of a GCC
+   builtin and then its argument prototype would still apply.  */
+#ifdef __cplusplus
+extern "C"
+#endif
+char umfpack_di_defaults ();
+int
+main ()
+{
+return umfpack_di_defaults ();
+  ;
+  return 0;
+}
+_ACEOF
+rm -f conftest.$ac_objext conftest$ac_exeext
+if { (ac_try="$ac_link"
+case "(($ac_try" in
+  *\"* | *\`* | *\\*) ac_try_echo=\$ac_try;;
+  *) ac_try_echo=$ac_try;;
+esac
+eval "echo \"\$as_me:$LINENO: $ac_try_echo\"") >&5
+  (eval "$ac_link") 2>conftest.er1
+  ac_status=$?
+  grep -v '^ *+' conftest.er1 >conftest.err
+  rm -f conftest.er1
+  cat conftest.err >&5
+  echo "$as_me:$LINENO: \$? = $ac_status" >&5
+  (exit $ac_status); } && {
+	 test -z "$ac_cxx_werror_flag" ||
+	 test ! -s conftest.err
+       } && test -s conftest$ac_exeext &&
+       $as_test_x conftest$ac_exeext; then
+  ac_cv_lib_umfpack_umfpack_di_defaults=yes
+else
+  echo "$as_me: failed program was:" >&5
+sed 's/^/| /' conftest.$ac_ext >&5
+
+	ac_cv_lib_umfpack_umfpack_di_defaults=no
+fi
+
+rm -f core conftest.err conftest.$ac_objext conftest_ipa8_conftest.oo \
+      conftest$ac_exeext conftest.$ac_ext
+LIBS=$ac_check_lib_save_LIBS
+fi
+{ echo "$as_me:$LINENO: result: $ac_cv_lib_umfpack_umfpack_di_defaults" >&5
+echo "${ECHO_T}$ac_cv_lib_umfpack_umfpack_di_defaults" >&6; }
+if test $ac_cv_lib_umfpack_umfpack_di_defaults = yes; then
+
+
+  LIBS="$LIBS -lumfpack"
+
+
+else
+  { { echo "$as_me:$LINENO: error: installation of UMFPACK could not be determined" >&5
+echo "$as_me: error: installation of UMFPACK could not be determined" >&2;}
+   { (exit 1); exit 1; }; }
+
+fi
+
+       fi
+
+    else
+              { echo "$as_me:$LINENO: checking UmfPack library" >&5
 echo $ECHO_N "checking UmfPack library... $ECHO_C" >&6; }
-    UMFPACK_INCLUDE_DIR='-I$D/contrib/umfpack/UMFPACK/Include'
-    USE_CONTRIB_UMFPACK='yes'
-    { echo "$as_me:$LINENO: result: using included version" >&5
+       UMFPACK_INCLUDE_DIR='-I$D/contrib/umfpack/UMFPACK/Include'
+       USE_CONTRIB_UMFPACK='yes'
+       { echo "$as_me:$LINENO: result: using included version" >&5
 echo "${ECHO_T}using included version" >&6; }
+    fi
   fi
 
 
@@ -14117,8 +15109,6 @@ cat >>confdefs.h <<\_ACEOF
 #define HAVE_LIBUMFPACK 1
 _ACEOF
 
-
-fi
 
 
 
@@ -15615,7 +16605,8 @@ DEAL_II_EXPAND_TRILINOS_MPI_VECTOR!$DEAL_II_EXPAND_TRILINOS_MPI_VECTOR$ac_delim
 DEAL_II_EXPAND_TRILINOS_BLOCKVECTOR!$DEAL_II_EXPAND_TRILINOS_BLOCKVECTOR$ac_delim
 DEAL_II_EXPAND_TRILINOS_MPI_BLOCKVECTOR!$DEAL_II_EXPAND_TRILINOS_MPI_BLOCKVECTOR$ac_delim
 USE_CONTRIB_TRILINOS!$USE_CONTRIB_TRILINOS$ac_delim
-DEAL_II_TRILINOS_DIR!$DEAL_II_TRILINOS_DIR$ac_delim
+DEAL_II_TRILINOS_INCDIR!$DEAL_II_TRILINOS_INCDIR$ac_delim
+DEAL_II_TRILINOS_LIBDIR!$DEAL_II_TRILINOS_LIBDIR$ac_delim
 DEAL_II_TRILINOS_SHARED!$DEAL_II_TRILINOS_SHARED$ac_delim
 DEAL_II_TRILINOS_STATIC!$DEAL_II_TRILINOS_STATIC$ac_delim
 NEEDS_F77LIBS!$NEEDS_F77LIBS$ac_delim
@@ -15623,7 +16614,8 @@ HSL_INCLUDE_DIR!$HSL_INCLUDE_DIR$ac_delim
 USE_CONTRIB_HSL!$USE_CONTRIB_HSL$ac_delim
 TECPLOT_INCLUDE_DIR!$TECPLOT_INCLUDE_DIR$ac_delim
 USE_CONTRIB_METIS!$USE_CONTRIB_METIS$ac_delim
-DEAL_II_METIS_DIR!$DEAL_II_METIS_DIR$ac_delim
+DEAL_II_METIS_INCDIR!$DEAL_II_METIS_INCDIR$ac_delim
+DEAL_II_METIS_LIBDIR!$DEAL_II_METIS_LIBDIR$ac_delim
 UMFPACK_LIB!$UMFPACK_LIB$ac_delim
 UMFPACK_INCLUDE_DIR!$UMFPACK_INCLUDE_DIR$ac_delim
 USE_CONTRIB_UMFPACK!$USE_CONTRIB_UMFPACK$ac_delim
@@ -15638,7 +16630,7 @@ LIBOBJS!$LIBOBJS$ac_delim
 LTLIBOBJS!$LTLIBOBJS$ac_delim
 _ACEOF
 
-  if test `sed -n "s/.*$ac_delim\$/X/p" conf$$subs.sed | grep -c X` = 33; then
+  if test `sed -n "s/.*$ac_delim\$/X/p" conf$$subs.sed | grep -c X` = 35; then
     break
   elif $ac_last_try; then
     { { echo "$as_me:$LINENO: error: could not make $CONFIG_STATUS" >&5

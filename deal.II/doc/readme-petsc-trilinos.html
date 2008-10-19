@@ -124,10 +124,31 @@
       --with-cflags=-fPIC --with-cxxflags=-fPIC --with-fflags=-fPIC \
       --enable-thyra --enable-stratimikos --enable-rtop --enable-teuchos \
       --enable-sacado --enable-ml --enable-ifpack --enable-epetra \
-      --enable-belos --enable-aztecoo \
+      --enable-belos --enable-aztecoo --enable-amesos \
       --prefix=/home/bangerth/bin/trilinos-9.0.1
       </pre>
       </code>
+      </p>
+
+
+      <h3>Configuring for installed Trilinos packages</h3>
+
+      <p>
+	The above scheme works if Trilinos is installed in its own directory
+	and header and library files are in subdirectories of the directory
+	given to <code>--with-trilinos</code>. This scheme doesn't work, 
+	however, if Trilinos has been installed as a regular package on a
+	system, for example into the <code>/usr</code> or <code>/opt</code>
+	directories. 
+      </p>
+
+      <p>
+	In that case, paths to include and library files may be specified
+	separately using the <code>--with-trilinos-include</code>
+	and <code>--with-trilinos-libs</code> switches 
+	to <code>./configure</code>. Alternatively, this information can also
+	be passed to the configuration script by setting the environment
+	variables <code>TRILINOS_INCDIR, TRILINOS_LIBDIR</code>.
       </p>
 
     <hr>

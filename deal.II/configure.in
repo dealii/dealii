@@ -26,7 +26,7 @@ define([AC_CACHE_SAVE], )dnl
 AC_INIT(deal.II, 6.2.pre, dealii@dealii.org, deal.II)
 
 AC_REVISION($Revision$)
-AC_PREREQ(2.50)
+AC_PREREQ(2.61)
 
 
 dnl Where the output config file is located
@@ -66,7 +66,7 @@ DEAL2_DIR=$DEAL_II_PATH
 AC_SUBST(DEAL2_DIR)
 
 dnl    Check for machine type operating system
-AC_CANONICAL_SYSTEM
+AC_CANONICAL_TARGET
 AC_SUBST(target)
 
 dnl    Set the language for which subsequent tests shall be
@@ -317,7 +317,7 @@ if test "x$enableshared" = "xyes" ; then
 else
 dnl The gcc compiler needs -static for static linking. For the case
 dnl other compilers do not like this flag we should introduce a
-dnl LDFLAGSSTATIC variable and check -static through AC_TRY_LINK.
+dnl LDFLAGSSTATIC variable and check -static through AC_LINK_IFELSE([AC_LANG_PROGRAM([[]], [[]])],[],[]).
   LDFLAGSSTATIC="-static"
   case "$target" in
     *-apple-darwin* )
@@ -352,8 +352,7 @@ dnl                       Optional features
 dnl --------------------------------------------------------------
 
 AC_ARG_ENABLE(parser,
-              AC_HELP_STRING([--enable-parser],
-                             [While switched on by default, this option allows
+              AS_HELP_STRING([--enable-parser],[While switched on by default, this option allows
                               to switch off support for the function parser
 			      in the contrib directory.]),
 	      [ enableparser=$enableval
@@ -407,7 +406,8 @@ AC_SUBST(DEAL_II_DEFINE_DEAL_II_USE_PETSC)
 
 DEAL_II_CONFIGURE_TRILINOS
 AC_SUBST(USE_CONTRIB_TRILINOS)
-AC_SUBST(DEAL_II_TRILINOS_DIR)
+AC_SUBST(DEAL_II_TRILINOS_INCDIR)
+AC_SUBST(DEAL_II_TRILINOS_LIBDIR)
 AC_SUBST(DEAL_II_TRILINOS_SHARED)
 AC_SUBST(DEAL_II_TRILINOS_STATIC)
 
@@ -521,17 +521,12 @@ DEAL_II_CONFIGURE_NETCDF
 
 DEAL_II_CONFIGURE_METIS
 AC_SUBST(USE_CONTRIB_METIS)
-AC_SUBST(DEAL_II_METIS_DIR)
+AC_SUBST(DEAL_II_METIS_INCDIR)
+AC_SUBST(DEAL_II_METIS_LIBDIR)
 
 dnl Check for UMFPack. This is more an enable for the contributed version,
 dnl but it should become a real --with-umfpack later
-AC_ARG_WITH(umfpack,
-  [  --with-umfpack=umfpack-root-directory  Use installed UMFPack version.
-                          'umfpack-root-directory' should be the directory
-                          containing directories AMD and UMFPACK. The
-                          contributed UMFPack library is used if no argument
-                          is given. Default is not to use UMFPack.],
-  DEAL_II_WITH_UMFPACK($withval))
+DEAL_II_WITH_UMFPACK
 AC_SUBST(UMFPACK_LIB)
 AC_SUBST(UMFPACK_INCLUDE_DIR)
 AC_SUBST(USE_CONTRIB_UMFPACK)
@@ -699,7 +694,8 @@ process_files="common/Make.global_options
 	       doc/doxygen/header.136
                doc/doxygen/header.tex
                common/template-arguments"
-AC_OUTPUT($process_files)
+AC_CONFIG_FILES([$process_files])
+AC_OUTPUT
 
 dnl    Autoconf has the annoying habit to simply define PACKAGE_NAME in
 dnl    AC_INIT and put this name into config.h, irrespective of the fact

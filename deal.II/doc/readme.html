@@ -534,9 +534,17 @@
     <dd>Enabled by <tt>--with-umfpack</tt>. If no argument is given,
     use the version of UMFPACK that comes bundled with deal.II. If you
     want a different version of UMFPACK, provide the path to that
-    version as an argument. Enabling
-    UMFPACK adds the class <tt>SparseDirectUMFPACK</tt> to the
-    library. The default is to not use UMFPACK.
+    version as an argument. Enabling UMFPACK adds the
+    class <tt>SparseDirectUMFPACK</tt> to the library. The default is to not
+    use UMFPACK. 
+
+    <p>
+    If you want to use an external installation of UMFPACK, but UMFPACK was
+    installed as 
+    part of <code>/usr</code> or <code>/opt</code>, instead of local
+    directories in a home directory for example, you can use configure
+    switches <code>--with-umfpack-include, --with-umfpack-libs</code>.
+    </p>
 
     <p>
     Note that UMFPACK has its own license; if
@@ -594,12 +602,13 @@
       <p>
       As with PETSc, the use of METIS is optional. If you wish to use it, you
       can do so by having a METIS installation around at the time of calling
-      <code>./configure</code>. You can let <code>./configure</code> know
-      about this by either setting a <code>METIS_DIR</code> environment
-      variable denoting the path to the METIS library, or by transmitting this
-      information to <code>./configure</code> using the
-      <code>--with-metis</code> flag. We have tested our interface code with
-      METIS version 4.0.1, and newer versions should presumably work as well.
+      <code>./configure</code> by either
+      setting the <code>METIS_DIR</code> environment
+      variable denoting the path to the METIS library, or using the
+      <code>--with-metis</code> flag. If METIS was installed as part
+      of <code>/usr</code> or <code>/opt</code>, instead of local directories
+      in a home directory for example, you can use configure
+      switches <code>--with-metis-include, --with-metis-libs</code>.
       </p>
       
       <p>
@@ -673,8 +682,11 @@
     href="http://www.unidata.ucar.edu/software/netcdf/">NetCDF</a>
     library. Can also be enabled by
     <tt>--with-netcdf=/path/to/netcdf</tt> which overrides the path in
-    <tt>$NETCDF_DIR</tt>. If enabled, allows grid input in NetCDF
-    format (GridIn::read_netcdf).
+    <tt>$NETCDF_DIR</tt>. If enabled, <acronym>deal.II</acronym> allows grid
+    input in NetCDF format (GridIn::read_netcdf). If NetCDF was installed as
+    part of <code>/usr</code> or <code>/opt</code>, instead of local
+    directories in a home directory for example, you can use configure
+    switches <code>--with-netcdf-include, --with-netcdf-libs</code>.
     </dd>
 
     <a name="hsl"></a>
