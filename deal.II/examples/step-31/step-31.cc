@@ -244,14 +244,15 @@ namespace LinearSolvers
 				   // calculate the action of an
 				   // "inverted" matrix on a vector
 				   // (using the <code>vmult</code>
-				   // operation)
-				   // in the same way as the corresponding
-				   // function in step-22: when the
-				   // product of an object of this class
-				   // is requested, we solve a linear
+				   // operation) in the same way as
+				   // the corresponding function in
+				   // step-22: when the product of an
+				   // object of this class is
+				   // requested, we solve a linear
 				   // equation system with that matrix
 				   // using the CG method, accelerated
-				   // by a preconditioner of (templated) class
+				   // by a preconditioner of
+				   // (templated) class
 				   // <code>Preconditioner</code>.
   template <class Matrix, class Preconditioner>
   class InverseMatrix : public Subscriptor
@@ -307,97 +308,95 @@ namespace LinearSolvers
 				   // This is the implementation of
 				   // the Schur complement
 				   // preconditioner as described in
-				   // the section on improved solvers
-				   // in step-22.
-				   // 
-				   // The basic concept of the
-				   // preconditioner is different to
-				   // the solution strategy used in
-				   // step-20 and step-22. There, the
-				   // Schur complement was used for a
-				   // two-stage solution of the linear
-				   // system. Recall that the process
-				   // in the Schur complement solver
-				   // is a Gaussian elimination of a
-				   // 2x2 block matrix, where each
-				   // block is solved iteratively.
-				   // Here, the idea is to let an
-				   // iterative solver act on the
-				   // whole system, and to use a Schur
-				   // complement for
-				   // preconditioning. As usual when
-				   // dealing with preconditioners, we
-				   // don't intend to exacly set up a
-				   // Schur complement, but rather use
-				   // a good approximation to the
-				   // Schur complement for the purpose
-				   // of preconditioning.
-				   // 
-				   // So the question is how we can
-				   // obtain a good preconditioner.
-				   // Let's have a look at the 
+				   // detail in the introduction. As
+				   // opposed to step-20 and step-22,
+				   // we solve the block system
+				   // all-at-once using GMRES, and use
+				   // the Schur complement of the
+				   // block structured matrix to build
+				   // a good preconditioner instead.
+				   //
+				   // Let's have a look at the ideal
 				   // preconditioner matrix <i>P</i>
-				   // acting on the block system, built
-				   // as
+				   // described in the introduction. If
+				   // we apply this matrix in the
+				   // solution of a linear system,
+				   // convergence of an iterative
+				   // GMRES solver will be
+				   // governed by the matrix
 				   // @f{eqnarray*}
-				   //   P^{-1}
-				   //   = 
-				   //   \left(\begin{array}{cc}
-				   //     A^{-1} & 0 \\ S^{-1} B A^{-1} & -S^{-1}
-				   //   \end{array}\right)
-				   // @f}
-				   // using the Schur complement 
-				   // $S = B A^{-1} B^T$. If we apply
-				   // this matrix in the solution of 
-				   // a linear system, convergence of
-				   // an iterative Krylov-based solver
-				   // will be governed by the matrix
-				   // @f{eqnarray*}
-				   //   P^{-1}\left(\begin{array}{cc}
-				   //     A & B^T \\ B & 0
-				   //   \end{array}\right) 
-				   //  = 
-				   //   \left(\begin{array}{cc}
-				   //     I & A^{-1} B^T \\ 0 & 0
-				   //   \end{array}\right),
-				   // @f}
-				   // which turns out to be very simple.
-				   // A GMRES solver based on exact
+				   // P^{-1}\left(\begin{array}{cc} A
+				   // & B^T \\ B & 0
+				   // \end{array}\right) =
+				   // \left(\begin{array}{cc} I &
+				   // A^{-1} B^T \\ 0 & 0
+				   // \end{array}\right), @f} 
+				   //
+				   // which indeed is very simple. A
+				   // GMRES solver based on exact
 				   // matrices would converge in two
-				   // iterations, since there are
-				   // only two distinct eigenvalues.
-				   // Such a preconditioner for the
-				   // blocked Stokes system has been 
-				   // proposed by Silvester and Wathen
-				   // ("Fast iterative solution of 
-				   // stabilised Stokes systems part II. 
-				   // Using general block preconditioners",
+				   // iterations, since there are only
+				   // two distinct eigenvalues. Such
+				   // a preconditioner for the blocked
+				   // Stokes system has been proposed
+				   // by Silvester and Wathen ("Fast
+				   // iterative solution of stabilised
+				   // Stokes systems part II.  Using
+				   // general block preconditioners",
 				   // SIAM J. Numer. Anal., 31 (1994),
 				   // pp. 1352-1367).
 				   // 
-				   // The deal.II users who have already
-				   // gone through the step-20 and step-22 
-				   // tutorials can certainly imagine
-				   // how we're going to implement this.
-				   // We replace the inverse matrices
-				   // in $P^{-1}$ using the InverseMatrix
-				   // class, and the inverse Schur 
+				   // Replacing <i>P</i> by
+				   // $\tilde{P}$ does not change the
+				   // situation dramatically. The
+				   // product $P^{-1} A$ will still be
+				   // close to a matrix with
+				   // eigenvalues 0 and 1, which lets
+				   // us hope to be able to get a
+				   // number of GMRES iterations that
+				   // does not depend on the problem
+				   // size.
+				   //
+				   // The deal.II users who have
+				   // already gone through the step-20
+				   // and step-22 tutorials can
+				   // certainly imagine how we're
+				   // going to implement this.  We
+				   // replace the inverse matrices in
+				   // $P^{-1}$ using the InverseMatrix
+				   // class, and the inverse Schur
 				   // complement will be approximated
-				   // by the pressure mass matrix $M_p$.
-				   // Having this in mind, we define a
-				   // preconditioner class with a 
-				   // <code>vmult</code> functionality,
-				   // which is all we need for the
-				   // interaction with the usual solver
-				   // functions further below in the
-				   // program code.
+				   // by the pressure mass matrix
+				   // $M_p$. As pointed out in the
+				   // results section of step-22, we
+				   // can replace the exact inverse of
+				   // <i>A</i> by just the application
+				   // of a preconditioner. This does
+				   // increase the number of GMRES
+				   // iterations, but is still
+				   // significantly cheaper than an
+				   // exact inverse, which would
+				   // require between 20 and 35 CG
+				   // iterations for <em>each</em>
+				   // outer solver step (using the AMG
+				   // preconditioner).
 				   // 
-				   // First the declarations. These are
-				   // similar to the definition of the Schur
-				   // complement in step-20, with the
-				   // difference that we need some more
-				   // preconditioners in the constructor and
-				   // that the matrices we use here are built
+				   // Having the above explanations in
+				   // mind, we define a preconditioner
+				   // class with a <code>vmult</code>
+				   // functionality, which is all we
+				   // need for the interaction with
+				   // the usual solver functions
+				   // further below in the program
+				   // code.
+				   // 
+				   // First the declarations. These
+				   // are similar to the definition of
+				   // the Schur complement in step-20,
+				   // with the difference that we need
+				   // some more preconditioners in the
+				   // constructor and that the
+				   // matrices we use here are built
 				   // upon Trilinos:
   template <class PreconditionerA, class PreconditionerMp>
   class BlockSchurPreconditioner : public Subscriptor
@@ -405,7 +404,8 @@ namespace LinearSolvers
     public:
       BlockSchurPreconditioner (
 	const TrilinosWrappers::BlockSparseMatrix     &S,
-	const InverseMatrix<TrilinosWrappers::SparseMatrix,PreconditionerMp>  &Mpinv,
+	const InverseMatrix<TrilinosWrappers::SparseMatrix,
+	                    PreconditionerMp>         &Mpinv,
 	const PreconditionerA                         &Apreconditioner);
 
       void vmult (TrilinosWrappers::BlockVector       &dst,
@@ -426,7 +426,8 @@ namespace LinearSolvers
   template <class PreconditionerA, class PreconditionerMp>
   BlockSchurPreconditioner<PreconditionerA, PreconditionerMp>::
   BlockSchurPreconditioner(const TrilinosWrappers::BlockSparseMatrix  &S,
-			   const InverseMatrix<TrilinosWrappers::SparseMatrix,PreconditionerMp> &Mpinv,
+			   const InverseMatrix<TrilinosWrappers::SparseMatrix,
+			                       PreconditionerMp>      &Mpinv,
 			   const PreconditionerA                      &Apreconditioner)
 		  :
 		  stokes_matrix           (&S),
@@ -437,21 +438,24 @@ namespace LinearSolvers
 
 
 				   // Next is the <code>vmult</code>
-				   // function. We implement the action of
-				   // $P^{-1}$ as described above in three
-				   // successive steps.  The first step
-				   // multiplies the velocity part of the
-				   // vector by a preconditioner of the matrix
-				   // <i>A</i>.  The resuling velocity vector
-				   // is then multiplied by $B$ and subtracted
-				   // from the pressure.  This second step
-				   // only acts on the pressure vector and is
-				   // accomplished by the command
-				   // SparseMatrix::residual. Next, we change
-				   // the sign in the temporary pressure
-				   // vector and finally multiply by the
-				   // pressure mass matrix to get the final
-				   // pressure vector, completing our work on
+				   // function. We implement the
+				   // action of $P^{-1}$ as described
+				   // above in three successive steps.
+				   // The first step multiplies the
+				   // velocity part of the vector by a
+				   // preconditioner of the matrix
+				   // <i>A</i>.  The resuling velocity
+				   // vector is then multiplied by $B$
+				   // and subtracted from the
+				   // pressure.  This second step only
+				   // acts on the pressure vector and
+				   // is accomplished by the command
+				   // SparseMatrix::residual. Next, we
+				   // change the sign in the temporary
+				   // pressure vector and finally
+				   // multiply by the pressure mass
+				   // matrix to get the final pressure
+				   // vector, completing our work on
 				   // the Stokes preconditioner:
   template <class PreconditionerA, class PreconditionerMp>
   void BlockSchurPreconditioner<PreconditionerA, PreconditionerMp>::vmult (
@@ -622,12 +626,14 @@ BoussinesqFlowProblem<dim>::BoussinesqFlowProblem ()
 
 				 // @sect4{BoussinesqFlowProblem::get_maximal_velocity}
 
-				 // Starting the real functionality of this
-				 // class is a helper function that determines
-				 // the maximum velocity in the domain (at the
-				 // quadrature points, in fact). It should be
-				 // relatively obvious to all who have gotten
-				 // to this point:
+				 // Starting the real functionality of
+				 // this class is a helper function
+				 // that determines the maximum
+				 // ($L_\infty$) velocity in the
+				 // domain (at the quadrature points,
+				 // in fact). It should be relatively
+				 // obvious to all who have gotten to
+				 // this point:
 template <int dim>
 double BoussinesqFlowProblem<dim>::get_maximal_velocity () const
 {
@@ -993,32 +999,37 @@ void BoussinesqFlowProblem<dim>::setup_dofs ()
 				   // used in three spatial dimensions as we
 				   // intend to do for this program.
 				   // 
-				   // So, we first release the memory stored
-				   // in the matrices, then set up an object
-				   // of type
+				   // So, we first release the memory
+				   // stored in the matrices, then set
+				   // up an object of type
 				   // BlockCompressedSetSparsityPattern
-				   // consisting of $2\times 2$ blocks (for
-				   // the Stokes system matrix and
-				   // preconditioner) or
-				   // CompressedSparsityPattern (for the
-				   // temperature part). We then fill these
-				   // sparsity patterns with the nonzero
-				   // pattern, taking into account that for
-				   // the Stokes system matrix, there are no
-				   // entries in the pressure-pressure block
-				   // (but all velocity vector components
-				   // couple with each other and with the
-				   // pressure), and that in the Stokes
-				   // preconditioner matrix, only the diagonal
-				   // blocks are nonzero (we use the vector
+				   // consisting of $2\times 2$ blocks
+				   // (for the Stokes system matrix
+				   // and preconditioner) or
+				   // CompressedSparsityPattern (for
+				   // the temperature part). We then
+				   // fill these sparsity patterns
+				   // with the nonzero pattern, taking
+				   // into account that for the Stokes
+				   // system matrix, there are no
+				   // entries in the pressure-pressure
+				   // block (but all velocity vector
+				   // components couple with each
+				   // other and with the
+				   // pressure). Similarly, in the
+				   // Stokes preconditioner matrix,
+				   // only the diagonal blocks are
+				   // nonzero, since we use the vector
 				   // Laplacian as discussed in the
-				   // introduction, which only couples each
-				   // vector component of the Laplacian with
-				   // itself, but not with the other vector
-				   // components; this, however, is subject to
-				   // the application of constraints which
-				   // couple vector components at the boundary
-				   // again).
+				   // introduction. This operator only
+				   // couples each vector component of
+				   // the Laplacian with itself, but
+				   // not with the other vector
+				   // components. Though, the operator
+				   // is subject to the application of
+				   // constraints which couple vector
+				   // components at the boundary
+				   // again.
 				   //
 				   // Then, constraints are applied to the
 				   // temporary sparsity patterns, which are
@@ -1109,12 +1120,14 @@ void BoussinesqFlowProblem<dim>::setup_dofs ()
     temperature_stiffness_matrix.reinit (temperature_sparsity_pattern);
   }
 
-				   // As last action in this function, we need
-				   // to set the vectors for the solution
-				   // $\mathbf u$ and $T^k$, the old solutions
-				   // $T^{k-1}$ and $T^{k-2}$ (required for
-				   // time stepping) and the system right hand
-				   // sides to their correct sizes and block
+				   // As last action in this function,
+				   // we need to set the vectors for
+				   // the solution $\mathbf u$ and
+				   // $T^k$, the old solutions
+				   // $T^{k-1}$ and $T^{k-2}$
+				   // (required for time stepping) and
+				   // the system right hand sides to
+				   // their correct sizes and block
 				   // structure:
   stokes_solution.reinit (stokes_block_sizes);
   stokes_rhs.reinit (stokes_block_sizes);
@@ -1128,6 +1141,33 @@ void BoussinesqFlowProblem<dim>::setup_dofs ()
 
 
 
+				 // @sect4{BoussinesqFlowProblem::assemble_stokes_preconditioner}
+				 // 
+                                 // This function assembles the matrix
+                                 // we use for preconditioning the
+                                 // Stokes system. What we need are a
+                                 // vector Laplace matrix on the
+                                 // velocity components and a mass
+                                 // matrix on the pressure
+                                 // component. We start by generating
+                                 // a quadrature object of appropriate
+                                 // order, the FEValues object that
+                                 // can give values and gradients at
+                                 // the quadrature points (together
+                                 // with quadrature weights). Next we
+                                 // create data structures for the
+                                 // cell matrix and the relation
+                                 // between local and global DoFs. The
+                                 // vectors <tt>phi_grad_u</tt> and
+                                 // <tt>phi_p</tt> are going to hold
+                                 // the values of the basis functions
+                                 // in order to faster build up the
+                                 // local matrices, as was already
+                                 // done in step-22. Before we start
+                                 // the loop over all active cells, we
+                                 // have to specify which components
+                                 // are pressure and which are
+                                 // velocity.
 template <int dim>
 void
 BoussinesqFlowProblem<dim>::assemble_stokes_preconditioner ()
@@ -1160,6 +1200,25 @@ BoussinesqFlowProblem<dim>::assemble_stokes_preconditioner ()
       stokes_fe_values.reinit (cell);
       local_matrix = 0;
 
+				   // The creation of the local matrix
+				   // is very simple. There are only a
+				   // Laplace term (on the velocity)
+				   // and a mass matrix to be
+				   // generated, so the creation of
+				   // the local matrix is done in two
+				   // lines, if we first shortcut to
+				   // the FE data. Once the local
+				   // matrix is ready (loop over rows
+				   // and columns in the local matrix
+				   // on each quadrature point), we
+				   // get the local DoF indices and
+				   // write the local information into
+				   // the global matrix. We do this as
+				   // in step-27, i.e. we directly
+				   // apply the constraints from
+				   // hanging nodes locally. By doing
+				   // so, we don't have to do that
+				   // afterwards.
       for (unsigned int q=0; q<n_q_points; ++q)
 	{
 	  for (unsigned int k=0; k<dofs_per_cell; ++k)
@@ -1181,7 +1240,6 @@ BoussinesqFlowProblem<dim>::assemble_stokes_preconditioner ()
 						     local_dof_indices,
 						     stokes_preconditioner_matrix);
     }
-  stokes_preconditioner_matrix.compress();
 }
 
 
