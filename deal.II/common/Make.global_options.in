@@ -160,7 +160,7 @@ endif
 
 
 # same for metis, except that there is only one library in that case
-lib-contrib-metis = $(DEAL_II_METIS_DIR)/libmetis.a
+lib-contrib-metis = $(DEAL_II_METIS_LIBDIR)/libmetis.a
 
 
 # if PETSC is used, we need to add a number of libraries to what
@@ -187,7 +187,7 @@ endif
 include-path-petsc           = $(DEAL_II_PETSC_DIR)/include
 include-path-petsc-bmake     = $(DEAL_II_PETSC_DIR)/bmake/$(DEAL_II_PETSC_ARCH)
 include-path-trilinos        = $(DEAL_II_TRILINOS_INCDIR)
-include-path-metis           = $(DEAL_II_METIS_DIR)/Lib
+include-path-metis           = $(DEAL_II_METIS_INCDIR)
 
 # include paths as command line flags. while compilers allow a space between
 # the '-I' and the actual path, we also send these flags to the 
