@@ -5827,7 +5827,7 @@ AC_DEFUN(DEAL_II_CONFIGURE_METIS, dnl
  			point to a complete Metis installation])
 	fi
 	
-	DEAL_II_METIS_LIBDIR="$DEAL_II_METIS_DIR/Lib"
+	DEAL_II_METIS_LIBDIR="$DEAL_II_METIS_DIR"
 	DEAL_II_METIS_INCDIR="$DEAL_II_METIS_DIR/include"
      ],
      [
@@ -5843,7 +5843,7 @@ AC_DEFUN(DEAL_II_CONFIGURE_METIS, dnl
 	  		  environment variable does not
  			  point to a complete Metis installation])
 	  fi
-	  DEAL_II_METIS_LIBDIR="$DEAL_II_METIS_DIR/Lib"
+	  DEAL_II_METIS_LIBDIR="$DEAL_II_METIS_DIR"
 	  DEAL_II_METIS_INCDIR="$DEAL_II_METIS_DIR/include"
         else
 	  USE_CONTRIB_METIS=no
