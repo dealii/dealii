@@ -13754,7 +13754,7 @@ echo "$as_me: error: Path to Metis specified with --with-metis does not
 	fi
 
 	DEAL_II_METIS_LIBDIR="$DEAL_II_METIS_DIR"
-	DEAL_II_METIS_INCDIR="$DEAL_II_METIS_DIR/include"
+	DEAL_II_METIS_INCDIR="$DEAL_II_METIS_DIR/Lib"
 
 else
 
@@ -13774,7 +13774,7 @@ echo "$as_me: error: The path to Metis specified in the METIS_DIR
    { (exit 1); exit 1; }; }
 	  fi
 	  DEAL_II_METIS_LIBDIR="$DEAL_II_METIS_DIR"
-	  DEAL_II_METIS_INCDIR="$DEAL_II_METIS_DIR/include"
+	  DEAL_II_METIS_INCDIR="$DEAL_II_METIS_DIR/Lib"
         else
 	  USE_CONTRIB_METIS=no
           DEAL_II_METIS_DIR=""
