@@ -215,47 +215,34 @@ endif
 ifeq ($(USE_CONTRIB_TRILINOS),yes)
   INCLUDE += -I$(include-path-trilinos)
 
+  DEAL_II_TRILINOS_LIBS = amesos \
+                aztecoo \
+		belos \
+		epetra \
+		epetraext \
+		ifpack \
+		ml \
+		rtop \
+		sacado \
+		stratimikos \
+		stratimikosamesos \
+		stratimikosaztecoo \
+		stratimikosifpack \
+		stratimikosml \
+		teuchos \
+		thyra \
+		thyraepetra \
+		thyraepetraext \
+		triutils 
+
   ifeq ($(enable-shared),yes)
-    lib-contrib-trilinos = -lamesos \
-                -laztecoo \
-		-lbelos \
-		-lepetra \
-		-lepetraext \
-		-lifpack \
-		-lml \
-		-lrtop \
-		-lsacado \
-		-lstratimikos \
-		-lstratimikosamesos \
-		-lstratimikosaztecoo \
-		-lstratimikosifpack \
-		-lstratimikosml \
-		-lteuchos \
-		-lthyra \
-		-lthyraepetra \
-		-lthyraepetraext \
-		-ltriutils  
+    lib-contrib-trilinos = \
+       $(addsuffix $(shared-lib-suffix), $(addprefix $(DEAL_II_TRILINOS_LIBDIR)/lib, \
+                                                     $(DEAL_II_TRILINOS_LIBS)))
   else
-    lib-contrib-trilinos =  \
-		$(DEAL_II_TRILINOS_LIBDIR)/libamesos.a \
-		$(DEAL_II_TRILINOS_LIBDIR)/libaztecoo.a \
-		$(DEAL_II_TRILINOS_LIBDIR)/libbelos.a \
-		$(DEAL_II_TRILINOS_LIBDIR)/libepetra.a \
-		$(DEAL_II_TRILINOS_LIBDIR)/libepetraext.a \
-		$(DEAL_II_TRILINOS_LIBDIR)/libifpack.a \
-		$(DEAL_II_TRILINOS_LIBDIR)/libml.a \
-		$(DEAL_II_TRILINOS_LIBDIR)/librtop.a \
-		$(DEAL_II_TRILINOS_LIBDIR)/libsacado.a \
-		$(DEAL_II_TRILINOS_LIBDIR)/libstratimikos.a \
-		$(DEAL_II_TRILINOS_LIBDIR)/libstratimikosamesos.a \
-		$(DEAL_II_TRILINOS_LIBDIR)/libstratimikosaztecoo.a \
-		$(DEAL_II_TRILINOS_LIBDIR)/libstratimikosifpack.a \
-		$(DEAL_II_TRILINOS_LIBDIR)/libstratimikosml.a \
-		$(DEAL_II_TRILINOS_LIBDIR)/libteuchos.a \
-		$(DEAL_II_TRILINOS_LIBDIR)/libthyra.a \
-		$(DEAL_II_TRILINOS_LIBDIR)/libthyraepetra.a \
-		$(DEAL_II_TRILINOS_LIBDIR)/libthyraepetraext.a \
-		$(DEAL_II_TRILINOS_LIBDIR)/libtriutils.a
+    lib-contrib-trilinos = \
+       $(addsuffix $(static-lib-suffix), $(addprefix $(DEAL_II_TRILINOS_LIBDIR)/lib, \
+                                                     $(DEAL_II_TRILINOS_LIBS)))
   endif
 
   LDFLAGS += $(lib-contrib-trilinos)
