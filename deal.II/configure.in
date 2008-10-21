@@ -415,6 +415,7 @@ AC_SUBST(DEAL_II_TRILINOS_STATIC)
 dnl Make sure we configure for libraries used by other libraries. For
 dnl example, UMFPACK needs blas, and so does LAPACK
 
+
 if test "x$with_umfpack" != "x" -a "x$with_umfpack" != "xno" ; then
   if test "x$with_blas" = "x" -o "x$with_blas" = "xno"; then
     with_blas="yes"
@@ -524,8 +525,7 @@ AC_SUBST(USE_CONTRIB_METIS)
 AC_SUBST(DEAL_II_METIS_INCDIR)
 AC_SUBST(DEAL_II_METIS_LIBDIR)
 
-dnl Check for UMFPack. This is more an enable for the contributed version,
-dnl but it should become a real --with-umfpack later
+dnl Check for UMFPack
 DEAL_II_WITH_UMFPACK
 AC_SUBST(UMFPACK_LIB)
 AC_SUBST(UMFPACK_INCLUDE_DIR)

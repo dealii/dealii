@@ -12533,7 +12533,6 @@ rm -f core conftest.err conftest.$ac_objext conftest.$ac_ext
   OLD_CXXFLAGS="$CXXFLAGS"
   OLD_CPPFLAGS="$CPPFLAGS"
 
-echo $DEAL_II_TRILINOS_INCDIR
   CPPFLAGS="-I$DEAL_II_TRILINOS_INCDIR $CPPFLAGS"
   CXXFLAGS="-I$DEAL_II_TRILINOS_INCDIR $CXXFLAGS"
 
@@ -12771,6 +12770,7 @@ done
       with_trilinos="yes"
     fi
   fi
+
 
 
 
@@ -13852,17 +13852,30 @@ _ACEOF
 
 
 
-  acx_umfpack=no
-
 
 # Check whether --with-umfpack was given.
 if test "${with_umfpack+set}" = set; then
   withval=$with_umfpack;
-        UMFPACK_DIR=$withval
+        { echo "$as_me:$LINENO: checking UMFPACK library" >&5
+echo $ECHO_N "checking UMFPACK library... $ECHO_C" >&6; }
+        USE_CONTRIB_UMFPACK='yes'
+        if test "x$withval" = "xyes" ; then
+          UMFPACK_DIR="`pwd`/contrib/umfpack"
+          UMFPACK_INCLUDE_DIR="-I`pwd`/contrib/umfpack/UMFPACK/Include"
+          { echo "$as_me:$LINENO: result: using included version" >&5
+echo "${ECHO_T}using included version" >&6; }
+          DEAL_II_USE_INTERNAL_UMFPACK=yes
+        else
+          UMFPACK_DIR=$withval
+          UMFPACK_INCLUDE_DIR="-I$withval/Include"
+          { echo "$as_me:$LINENO: result: trying version at $withval" >&5
+echo "${ECHO_T}trying version at $withval" >&6; }
+        fi
 
 fi
 
 
+  acx_umfpack=no
 
 # Check whether --with-umfpack-include was given.
 if test "${with_umfpack_include+set}" = set; then
@@ -13883,11 +13896,12 @@ if test "${with_umfpack_libs+set}" = set; then
 fi
 
 
-  if test "x$UMFPACK_DIR" != "x" -a "x$acs_umfpack" == "xno" ; then
+  if test "x$UMFPACK_DIR" != "x" -a "x$acx_umfpack" == "xno" ; then
 
-            OLD_LDFLAGS="$LDFLAGS"
-    LDFLAGS="-L${UMFPACK_DIR}/UMFPACK/Lib $LDFLAGS"
-    { echo "$as_me:$LINENO: checking for umfpack_di_defaults in -lumfpack" >&5
+                if test "x$DEAL_II_USE_INTERNAL_UMFPACK" != "xyes" ; then
+                  OLD_LDFLAGS="$LDFLAGS"
+      LDFLAGS="-L${UMFPACK_DIR}/UMFPACK $LDFLAGS"
+      { echo "$as_me:$LINENO: checking for umfpack_di_defaults in -lumfpack" >&5
 echo $ECHO_N "checking for umfpack_di_defaults in -lumfpack... $ECHO_C" >&6; }
 if test "${ac_cv_lib_umfpack_umfpack_di_defaults+set}" = set; then
   echo $ECHO_N "(cached) $ECHO_C" >&6
@@ -13953,14 +13967,14 @@ if test $ac_cv_lib_umfpack_umfpack_di_defaults = yes; then
 
   LIBS="$LIBS -lumfpack"
 
-        if test "$LD_PATH_OPTION" != "no"; then
-          LDFLAGS="$LD_PATH_OPTION${UMFPACK_DIR}/UMFPACK/Lib $LDFLAGS"
-        fi
+          if test "$LD_PATH_OPTION" != "no"; then
+            LDFLAGS="$LD_PATH_OPTION${UMFPACK_DIR}/UMFPACK $LDFLAGS"
+          fi
 
 else
 
-                LDFLAGS="-L${UMFPACK_DIR}/lib $OLD_LDFLAGS"
-        { echo "$as_me:$LINENO: checking for umfpack_di_defaults in -lumfpack" >&5
+                    LDFLAGS="-L${UMFPACK_DIR}/lib $OLD_LDFLAGS"
+          { echo "$as_me:$LINENO: checking for umfpack_di_defaults in -lumfpack" >&5
 echo $ECHO_N "checking for umfpack_di_defaults in -lumfpack... $ECHO_C" >&6; }
 if test "${ac_cv_lib_umfpack_umfpack_di_defaults+set}" = set; then
   echo $ECHO_N "(cached) $ECHO_C" >&6
@@ -14026,13 +14040,13 @@ if test $ac_cv_lib_umfpack_umfpack_di_defaults = yes; then
 
   LIBS="$LIBS -lumfpack"
 
-            if test "$LD_PATH_OPTION" != "no"; then
-              LDFLAGS="$LD_PATH_OPTION${UMFPACK_DIR}/lib $LDFLAGS"
-            fi
+              if test "$LD_PATH_OPTION" != "no"; then
+                LDFLAGS="$LD_PATH_OPTION${UMFPACK_DIR}/lib $LDFLAGS"
+              fi
 
 else
 
-            { { echo "$as_me:$LINENO: error: installation of UMFPACK could not be determined" >&5
+              { { echo "$as_me:$LINENO: error: installation of UMFPACK could not be determined" >&5
 echo "$as_me: error: installation of UMFPACK could not be determined" >&2;}
    { (exit 1); exit 1; }; }
 
@@ -14044,9 +14058,9 @@ fi
 fi
 
 
-            OLD_LDFLAGS="$LDFLAGS"
-    LDFLAGS="-L${UMFPACK_DIR}/AMD/Lib $LDFLAGS"
-    { echo "$as_me:$LINENO: checking for amd_info in -lamd" >&5
+                  OLD_LDFLAGS="$LDFLAGS"
+      LDFLAGS="-L${UMFPACK_DIR}/AMD/Lib $LDFLAGS"
+      { echo "$as_me:$LINENO: checking for amd_info in -lamd" >&5
 echo $ECHO_N "checking for amd_info in -lamd... $ECHO_C" >&6; }
 if test "${ac_cv_lib_amd_amd_info+set}" = set; then
   echo $ECHO_N "(cached) $ECHO_C" >&6
@@ -14112,14 +14126,14 @@ if test $ac_cv_lib_amd_amd_info = yes; then
 
   LIBS="$LIBS -lamd"
 
-        if test "$LD_PATH_OPTION" != "no"; then
-          LDFLAGS="$LD_PATH_OPTION${UMFPACK_DIR}/AMD/Lib $LDFLAGS"
-        fi
+          if test "$LD_PATH_OPTION" != "no"; then
+            LDFLAGS="$LD_PATH_OPTION${UMFPACK_DIR}/AMD/Lib $LDFLAGS"
+          fi
 
 else
 
-                LDFLAGS="-L${UMFPACK_DIR}/lib $OLD_LDFLAGS"
-        { echo "$as_me:$LINENO: checking for amd_info in -lamd" >&5
+                    LDFLAGS="-L${UMFPACK_DIR}/lib $OLD_LDFLAGS"
+          { echo "$as_me:$LINENO: checking for amd_info in -lamd" >&5
 echo $ECHO_N "checking for amd_info in -lamd... $ECHO_C" >&6; }
 if test "${ac_cv_lib_amd_amd_info+set}" = set; then
   echo $ECHO_N "(cached) $ECHO_C" >&6
@@ -14185,13 +14199,13 @@ if test $ac_cv_lib_amd_amd_info = yes; then
 
   LIBS="$LIBS -lamd"
 
-            if test "$LD_PATH_OPTION" != "no"; then
-              LDFLAGS="$LD_PATH_OPTION${UMFPACK_DIR}/lib $LDFLAGS"
-            fi
+              if test "$LD_PATH_OPTION" != "no"; then
+                LDFLAGS="$LD_PATH_OPTION${UMFPACK_DIR}/lib $LDFLAGS"
+              fi
 
 else
 
-            { { echo "$as_me:$LINENO: error: installation of AMD could not be determined" >&5
+              { { echo "$as_me:$LINENO: error: installation of AMD could not be determined" >&5
 echo "$as_me: error: installation of AMD could not be determined" >&2;}
    { (exit 1); exit 1; }; }
 
@@ -14202,6 +14216,7 @@ fi
 
 fi
 
+    fi
 
         as_ac_File=`echo "ac_cv_file_${UMFPACK_DIR}/UMFPACK/Include/umfpack.h" | $as_tr_sh`
 { echo "$as_me:$LINENO: checking for ${UMFPACK_DIR}/UMFPACK/Include/umfpack.h" >&5
@@ -14327,7 +14342,8 @@ fi
 fi
 
 
-            as_ac_File=`echo "ac_cv_file_${UMFPACK_DIR}/UFconfig/UFconfig.h" | $as_tr_sh`
+                if test "x$DEAL_II_USE_INTERNAL_UMFPACK" != "xyes" ; then
+      as_ac_File=`echo "ac_cv_file_${UMFPACK_DIR}/UFconfig/UFconfig.h" | $as_tr_sh`
 { echo "$as_me:$LINENO: checking for ${UMFPACK_DIR}/UFconfig/UFconfig.h" >&5
 echo $ECHO_N "checking for ${UMFPACK_DIR}/UFconfig/UFconfig.h... $ECHO_C" >&6; }
 if { as_var=$as_ac_File; eval "test \"\${$as_var+set}\" = set"; }; then
@@ -14348,22 +14364,23 @@ ac_res=`eval echo '${'$as_ac_File'}'`
 echo "${ECHO_T}$ac_res" >&6; }
 if test `eval echo '${'$as_ac_File'}'` = yes; then
 
-        UMFPACK_INCLUDE_DIR="${UMFPACK_INCLUDE_DIR} -I${UMFPACK_DIR}/UFconfig"
+          UMFPACK_INCLUDE_DIR="${UMFPACK_INCLUDE_DIR} -I${UMFPACK_DIR}/UFconfig"
 
 else
 
-        { { echo "$as_me:$LINENO: error: not found" >&5
+          { { echo "$as_me:$LINENO: error: not found" >&5
 echo "$as_me: error: not found" >&2;}
    { (exit 1); exit 1; }; }
 
 
 fi
 
-
+    fi
 
   else
 
     if test "x$UMFPACK_INCDIR" != "x" ; then
+
        UMFPACK_INCLUDE_DIR="-I${UMFPACK_INCDIR}"
        OLD_CXXFLAGS="$CXXFLAGS"
        OLD_CPPFLAGS="$CPPFLAGS"
@@ -15093,14 +15110,6 @@ echo "$as_me: error: installation of UMFPACK could not be determined" >&2;}
 fi
 
        fi
-
-    else
-              { echo "$as_me:$LINENO: checking UmfPack library" >&5
-echo $ECHO_N "checking UmfPack library... $ECHO_C" >&6; }
-       UMFPACK_INCLUDE_DIR='-I$D/contrib/umfpack/UMFPACK/Include'
-       USE_CONTRIB_UMFPACK='yes'
-       { echo "$as_me:$LINENO: result: using included version" >&5
-echo "${ECHO_T}using included version" >&6; }
     fi
   fi
 
