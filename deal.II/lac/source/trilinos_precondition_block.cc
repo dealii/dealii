@@ -173,7 +173,7 @@ namespace TrilinosWrappers
   PreconditionStokes::AdditionalData::
   AdditionalData (const bool          right_preconditioning,
 		  const bool          Av_is_symmetric,
-		  const std::vector<std::vector<bool> > &Av_null_space,
+		  const std::vector<std::vector<bool> > &Av_constant_modes,
 		  const double        inner_solve_tolerance,
 		  const bool          use_ssor_on_mass_matrix,
 		  const bool          velocity_uses_higher_order_elements,
@@ -185,7 +185,7 @@ namespace TrilinosWrappers
                   :
                   right_preconditioning (right_preconditioning),
                   Av_is_symmetric (Av_is_symmetric),
-		  Av_null_space (Av_null_space),
+		  Av_constant_modes (Av_constant_modes),
 		  inner_solve_tolerance (inner_solve_tolerance),
 		  use_ssor_on_mass_matrix (use_ssor_on_mass_matrix),
 		  velocity_uses_higher_order_elements (velocity_uses_higher_order_elements),
@@ -238,7 +238,7 @@ namespace TrilinosWrappers
       PreconditionAMG::AdditionalData av_amg_data;
       av_amg_data.elliptic = additional_data.Av_is_symmetric;
       av_amg_data.higher_order_elements = additional_data.velocity_uses_higher_order_elements;
-      av_amg_data.null_space = additional_data.Av_null_space;
+      av_amg_data.constant_modes = additional_data.Av_constant_modes;
 
       if (Av_matrix.m() == system_matrix.block(0,0).m())
 	Av_precondition->initialize (Av_matrix, av_amg_data);

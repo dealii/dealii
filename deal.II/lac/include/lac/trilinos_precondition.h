@@ -31,7 +31,7 @@
 #endif
 #include <Epetra_Map.h>
 
-#include <Teuchos_RefCountPtr.hpp>
+#include <Teuchos_RCP.hpp>
 #include <Epetra_Operator.h>
 
 // forward declarations
@@ -998,7 +998,7 @@ namespace TrilinosWrappers
 	AdditionalData (const bool                             elliptic = true,
 			const bool                             higher_order_elements = false,
 			const double                           aggregation_threshold = 1e-4,
-			const std::vector<std::vector<bool> > &null_space = std::vector<std::vector<bool> > (1),
+			const std::vector<std::vector<bool> > &constant_modes = std::vector<std::vector<bool> > (1),
 			const unsigned int                     smoother_overlap = 0,
 			const bool                             output_details = false);
 
@@ -1056,7 +1056,7 @@ namespace TrilinosWrappers
 					* consists of ones) or on a
 					* vector-valued equation.
 					*/
-	std::vector<std::vector<bool> > null_space;
+	std::vector<std::vector<bool> > constant_modes;
 
 				       /**
 					* Determines the overlap in

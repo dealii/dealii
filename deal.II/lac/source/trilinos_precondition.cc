@@ -74,20 +74,22 @@ namespace TrilinosWrappers
   }
 
 
-
 				        // For the implementation of
 				        // the <code>vmult</code>
-				        // function we note that
+				        // function with deal.II data
+				        // structures we note that
 				        // invoking a call of the
 				        // Trilinos preconditioner
 				        // requires us to use Epetra
-				        // vectors as well. It is
-				        // faster to provide a view,
-				        // i.e., feed Trilinos with a
+				        // vectors as well. We do this
+				        // by providing a view, i.e.,
+				        // feed Trilinos with a
 				        // pointer to the data, so we
 				        // avoid copying the content
 				        // of the vectors during the
-				        // iteration. In the
+				        // iteration (this function is
+				        // only useful when used in
+				        // serial anyway). In the
 				        // declaration of the right
 				        // hand side, we need to cast
 				        // the source vector (that is
@@ -415,14 +417,14 @@ namespace TrilinosWrappers
   AdditionalData (const bool                             elliptic,
 		  const bool                             higher_order_elements,
 		  const double                           aggregation_threshold,
-		  const std::vector<std::vector<bool> > &null_space,
+		  const std::vector<std::vector<bool> > &constant_modes,
 		  const unsigned int                     smoother_overlap,
 		  const bool                             output_details)
                   :
                   elliptic (elliptic),
 		  higher_order_elements (higher_order_elements),
 		  aggregation_threshold (aggregation_threshold),
-		  null_space (null_space),
+		  constant_modes (constant_modes),
 		  smoother_overlap (smoother_overlap),
 		  output_details (output_details)
   {}
@@ -437,7 +439,8 @@ namespace TrilinosWrappers
     multilevel_operator.release();
 
     const unsigned int n_rows = matrix.m();
-    const unsigned int null_space_dimension = additional_data.null_space.size();
+    const unsigned int constant_modes_dimension = 
+      additional_data.constant_modes.size();
 
 				        // Build the AMG preconditioner.
     Teuchos::ParameterList parameter_list;
@@ -470,16 +473,17 @@ namespace TrilinosWrappers
 
     const Epetra_Map * domain_map = &(matrix.matrix->DomainMap());
     
-    Epetra_MultiVector null_space_modes (*domain_map, null_space_dimension);
+    Epetra_MultiVector distributed_constant_modes (*domain_map, 
+						   constant_modes_dimension);
   
-    if (null_space_dimension > 1)
+    if (constant_modes_dimension > 1)
       {
-	Assert (n_rows == additional_data.null_space[0].size(),
+	Assert (n_rows == additional_data.constant_modes[0].size(),
 		ExcDimensionMismatch(n_rows,
-				     additional_data.null_space[0].size()));
-	Assert (n_rows == (unsigned int)null_space_modes.GlobalLength(),
+				     additional_data.constant_modes[0].size()));
+	Assert (n_rows == (unsigned int)distributed_constant_modes.GlobalLength(),
 		ExcDimensionMismatch(n_rows,
-				     null_space_modes.GlobalLength()));
+				     distributed_constant_modes.GlobalLength()));
 
 	const unsigned int my_size = domain_map->NumMyElements();
 	Assert (my_size == (unsigned int)domain_map->MaxLID()+1,
@@ -489,17 +493,19 @@ namespace TrilinosWrappers
 				        // contiguous vector of
 				        // doubles so that Trilinos
 				        // can read from it.
-	for (unsigned int d=0; d<null_space_dimension; ++d)
+	for (unsigned int d=0; d<constant_modes_dimension; ++d)
 	  for (unsigned int row=0; row<my_size; ++row)
 	    {
 	      int global_row_id = domain_map->GID(row);
-	      null_space_modes.ReplaceMyValue(row, d, 
-				 (double)additional_data.null_space[d][global_row_id]);
+	      distributed_constant_modes.ReplaceMyValue(row, d, 
+		       (double)additional_data.constant_modes[d][global_row_id]);
 	    }
   
 	parameter_list.set("null space: type", "pre-computed");
-	parameter_list.set("null space: dimension", null_space_modes.NumVectors());
-	parameter_list.set("null space: vectors", null_space_modes.Values());
+	parameter_list.set("null space: dimension", 
+			   distributed_constant_modes.NumVectors());
+	parameter_list.set("null space: vectors", 
+			   distributed_constant_modes.Values());
       }
 
     multilevel_operator = Teuchos::rcp (new ML_Epetra::MultiLevelPreconditioner(
@@ -508,7 +514,7 @@ namespace TrilinosWrappers
     if (additional_data.output_details)
       multilevel_operator->PrintUnused(0);
 
-    preconditioner = Teuchos::rcp (&*multilevel_operator);
+    preconditioner = Teuchos::rcp (&*multilevel_operator, false);
   }
 
 

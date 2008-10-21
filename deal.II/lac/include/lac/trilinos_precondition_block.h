@@ -23,7 +23,7 @@
 
 #ifdef DEAL_II_USE_TRILINOS
 
-#include <Teuchos_RefCountPtr.hpp>
+#include <Teuchos_RCP.hpp>
 #include <Thyra_LinearOperatorDecl.hpp>
 #include <Epetra_Operator.h>
 
@@ -160,7 +160,7 @@ namespace TrilinosWrappers
 					*/
 	AdditionalData (const bool          right_preconditioning = false,
 			const bool          Av_is_symmetric = true,
-			const std::vector<std::vector<bool> > &Av_null_space = std::vector<std::vector<bool> > (1),
+			const std::vector<std::vector<bool> > &Av_constant_modes = std::vector<std::vector<bool> > (1),
 			const double        inner_solve_tolerance = 1e-9,
 			const bool          use_ssor_on_mass_matrix = false,
 			const bool          velocity_uses_higher_order_elements = false,
@@ -207,7 +207,7 @@ namespace TrilinosWrappers
 					* DoFTools::extract_constant_modes()
 					* function.
 					*/
-	std::vector<std::vector<bool> > Av_null_space;
+	std::vector<std::vector<bool> > Av_constant_modes;
 
 				       /**
 					* Tolerance level that the
