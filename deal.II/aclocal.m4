@@ -5934,6 +5934,8 @@ AC_DEFUN(DEAL_II_WITH_UMFPACK, dnl
           UMFPACK_INCLUDE_DIR="-I$withval/Include"
           AC_MSG_RESULT(trying version at $withval)
         fi
+
+        AC_DEFINE(HAVE_LIBUMFPACK,1,[UMFPACK is $1])
      ])
 
   acx_umfpack=no
@@ -5954,6 +5956,10 @@ AC_DEFUN(DEAL_II_WITH_UMFPACK, dnl
 	UMFPACK_LIBDIR=$withval
         acx_umfpack=yes
      ])
+
+  if test "x$acx_umfpack" = "xyes" ; then
+    AC_DEFINE(HAVE_LIBUMFPACK,1,[UMFPACK is $1])
+  fi
 
   if test "x$UMFPACK_DIR" != "x" -a "x$acx_umfpack" == "xno" ; then
     dnl A pathname has been given to --with-umfpack but nothing
@@ -6143,8 +6149,6 @@ AC_DEFUN(DEAL_II_WITH_UMFPACK, dnl
        fi
     fi 
   fi
-
-  AC_DEFINE(HAVE_LIBUMFPACK,1,[UMFPACK is $1])
 ])
 
 
