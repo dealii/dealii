@@ -863,12 +863,6 @@ void BoussinesqFlowProblem<dim>::assemble_stokes_system ()
   FEValues<dim> temperature_fe_values (temperature_fe, quadrature_formula,
 				       update_values);
 
-  FEFaceValues<dim> stokes_fe_face_values (stokes_fe, face_quadrature_formula,
-					   update_values    | 
-					   update_normal_vectors |
-					   update_quadrature_points  | 
-					   update_JxW_values);
-
   const unsigned int   dofs_per_cell   = stokes_fe.dofs_per_cell;
 
   const unsigned int   n_q_points      = quadrature_formula.size();
