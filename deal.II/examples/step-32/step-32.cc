@@ -639,8 +639,6 @@ void BoussinesqFlowProblem<dim>::setup_dofs ()
   {
     stokes_matrix.clear ();
 
-    BlockSparsityPattern stokes_sparsity_pattern (2,2);
-
     BlockCompressedSetSparsityPattern csp (2,2);
 
     csp.block(0,0).reinit (n_u, n_u);
@@ -662,9 +660,7 @@ void BoussinesqFlowProblem<dim>::setup_dofs ()
     DoFTools::make_sparsity_pattern (stokes_dof_handler, coupling, csp,
 				     stokes_constraints, false);
 
-    stokes_sparsity_pattern.copy_from (csp);
-
-    stokes_matrix.reinit (stokes_partitioner, stokes_sparsity_pattern);
+    stokes_matrix.reinit (stokes_partitioner, csp);
   }
 
   {
@@ -672,8 +668,6 @@ void BoussinesqFlowProblem<dim>::setup_dofs ()
     Mp_preconditioner.reset ();
     stokes_preconditioner_matrix.clear ();
 
-    BlockSparsityPattern stokes_preconditioner_sparsity_pattern (2,2);
-    
     BlockCompressedSetSparsityPattern csp (2,2);
 
     csp.block(0,0).reinit (n_u, n_u);
@@ -693,13 +687,8 @@ void BoussinesqFlowProblem<dim>::setup_dofs ()
 
     DoFTools::make_sparsity_pattern (stokes_dof_handler, coupling, csp,
 				     stokes_constraints, false);
-    stokes_constraints.condense (csp);
 
-    stokes_preconditioner_sparsity_pattern.copy_from (csp);
-
-    stokes_preconditioner_matrix.reinit (stokes_partitioner,
-					 stokes_preconditioner_sparsity_pattern);
-
+    stokes_preconditioner_matrix.reinit (stokes_partitioner, csp);
   }
 
   temperature_partitioner
@@ -714,21 +703,13 @@ void BoussinesqFlowProblem<dim>::setup_dofs ()
     temperature_stiffness_matrix.clear ();
     temperature_matrix.clear ();
 
-    SparsityPattern temperature_sparsity_pattern;
-
     CompressedSetSparsityPattern csp (n_T, n_T);
     DoFTools::make_sparsity_pattern (temperature_dof_handler, csp,
 				     temperature_constraints, false);
-    temperature_constraints.condense (csp);
 
-    temperature_sparsity_pattern.copy_from (csp);
-
-    temperature_matrix.reinit (temperature_partitioner,
-			       temperature_sparsity_pattern);
-    temperature_mass_matrix.reinit (temperature_partitioner,
-				    temperature_sparsity_pattern);
-    temperature_stiffness_matrix.reinit (temperature_partitioner,
-					 temperature_sparsity_pattern);
+    temperature_matrix.reinit (temperature_partitioner, csp);
+    temperature_mass_matrix.reinit (temperature_partitioner, csp);
+    temperature_stiffness_matrix.reinit (temperature_partitioner, csp);
   }
 
   stokes_solution.reinit (stokes_partitioner);

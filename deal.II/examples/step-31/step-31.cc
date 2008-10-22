@@ -1111,10 +1111,7 @@ void BoussinesqFlowProblem<dim>::setup_dofs ()
     DoFTools::make_sparsity_pattern (stokes_dof_handler, coupling, csp,
 				     stokes_constraints, false);
 
-    BlockSparsityPattern stokes_sparsity_pattern;    
-    stokes_sparsity_pattern.copy_from (csp);
-
-    stokes_matrix.reinit (stokes_sparsity_pattern);
+    stokes_matrix.reinit (csp);
     stokes_matrix.collect_sizes();
   }
 
@@ -1142,11 +1139,8 @@ void BoussinesqFlowProblem<dim>::setup_dofs ()
 
     DoFTools::make_sparsity_pattern (stokes_dof_handler, coupling, csp,
 				     stokes_constraints, false);
-    
-    BlockSparsityPattern stokes_preconditioner_sparsity_pattern;
-    stokes_preconditioner_sparsity_pattern.copy_from (csp);
 
-    stokes_preconditioner_matrix.reinit (stokes_preconditioner_sparsity_pattern);
+    stokes_preconditioner_matrix.reinit (csp);
     stokes_preconditioner_matrix.collect_sizes();
   }
 
@@ -1165,12 +1159,9 @@ void BoussinesqFlowProblem<dim>::setup_dofs ()
     DoFTools::make_sparsity_pattern (temperature_dof_handler, csp,
 				     temperature_constraints, false);
 
-    SparsityPattern temperature_sparsity_pattern;
-    temperature_sparsity_pattern.copy_from (csp);
-
-    temperature_matrix.reinit (temperature_sparsity_pattern);
-    temperature_mass_matrix.reinit (temperature_sparsity_pattern);
-    temperature_stiffness_matrix.reinit (temperature_sparsity_pattern);
+    temperature_matrix.reinit (csp);
+    temperature_mass_matrix.reinit (csp);
+    temperature_stiffness_matrix.reinit (csp);
   }
 
 				   // As last action in this function,
