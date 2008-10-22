@@ -443,25 +443,29 @@ namespace LinearSolvers
 
 
 				   // Next is the <code>vmult</code>
-				   // function. We implement the
-				   // action of $P^{-1}$ as described
-				   // above in three successive steps.
-				   // The first step multiplies the
-				   // velocity part of the vector by a
-				   // preconditioner of the matrix
-				   // <i>A</i>.  The resuling velocity
-				   // vector is then multiplied by $B$
-				   // and subtracted from the
-				   // pressure.  This second step only
-				   // acts on the pressure vector and
-				   // is accomplished by the command
-				   // SparseMatrix::residual. Next, we
-				   // change the sign in the temporary
-				   // pressure vector and finally
-				   // multiply by the pressure mass
-				   // matrix to get the final pressure
-				   // vector, completing our work on
-				   // the Stokes preconditioner:
+				   // function. We implement the action of
+				   // $P^{-1}$ as described above in three
+				   // successive steps.  In formulas, we want
+				   // to compute $Y=P^{-1}X$ where $X,Y$ are
+				   // both vectors with two block components.
+				   //
+				   // The first step multiplies the velocity
+				   // part of the vector by a preconditioner
+				   // of the matrix <i>A</i>, i.e. we compute
+				   // $Y_0={\tilde A}^{-1}X_0$.  The resulting
+				   // velocity vector is then multiplied by
+				   // $B$ and subtracted from the pressure,
+				   // i.e. we want to compute $X_1-BY_0$.
+				   // This second step only acts on the
+				   // pressure vector and is accomplished by
+				   // the residual function of our matrix
+				   // classes, except that the sign is
+				   // wrong. Consequently, we change the sign
+				   // in the temporary pressure vector and
+				   // finally multiply by the inverse pressure
+				   // mass matrix to get the final pressure
+				   // vector, completing our work on the
+				   // Stokes preconditioner:
   template <class PreconditionerA, class PreconditionerMp>
   void BlockSchurPreconditioner<PreconditionerA, PreconditionerMp>::vmult (
     TrilinosWrappers::BlockVector       &dst,
