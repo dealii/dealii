@@ -168,7 +168,7 @@ template <int dim> class Mapping;
  *
  *
  * @ingroup dofs
- * @author Wolfgang Bangerth, Guido Kanschat and others, 1998 - 2005
+ * @author Wolfgang Bangerth, Guido Kanschat and others, 1998 - 2008
  */
 class DoFTools
 {
@@ -375,6 +375,7 @@ class DoFTools
 				      * BlockSparsityPattern,
 				      * BlockCompressedSparsityPattern,
 				      * BlockCompressedSetSparsityPattern,
+				      * BlockCompressedSimpleSparsityPattern,
 				      * or any other class that
 				      * satisfies similar
 				      * requirements. It is assumed
@@ -403,18 +404,38 @@ class DoFTools
 				      * taken into account at the time of
 				      * creating the sparsity pattern. For
 				      * this, pass the ConstraintMatrix object
-				      * as the last argument to the current
+				      * as the third argument to the current
 				      * function. No call to
 				      * ConstraintMatrix::condense() is then
 				      * necessary. This process is explained
 				      * in @ref step_27 "step-27".
+				      *
+				      * In case the constraints are
+				      * already taken care of in this
+				      * function, it is possible to
+				      * neglect off-diagonal entries
+				      * in the sparsity pattern. When
+				      * using
+				      * ConstraintMatrix::distribute_local_to_global
+				      * during assembling, no entries
+				      * will ever be written into
+				      * these matrix position, so that
+				      * one can save some computing
+				      * time in matrix-vector products
+				      * by not even creating these
+				      * elements. In that case, the
+				      * variable
+				      * <tt>keep_constrained_dofs</tt>
+				      * needs to be set to
+				      * <tt>false</tt>.
 				      */
     template <class DH, class SparsityPattern>
     static
     void
-    make_sparsity_pattern (const DH        &dof,
-			   SparsityPattern &sparsity_pattern,
-			   const ConstraintMatrix &constraints = ConstraintMatrix());
+    make_sparsity_pattern (const DH               &dof,
+			   SparsityPattern        &sparsity_pattern,
+			   const ConstraintMatrix &constraints = ConstraintMatrix(),
+			   const bool              keep_constrained_dofs = true);
 
 				     /**
 				      * Locate non-zero entries for
@@ -499,13 +520,60 @@ class DoFTools
 				      *
 				      * Not implemented for
 				      * hp::DoFHandler.
+				      *
+				      * As mentioned before, the
+				      * creation of the sparsity
+				      * pattern is a purely local
+				      * process and the sparsity
+				      * pattern does not provide for
+				      * entries introduced by the
+				      * elimination of hanging
+				      * nodes. They have to be taken
+				      * care of by a call to
+				      * ConstraintMatrix::condense()
+				      * afterwards.
+				      *
+				      * Alternatively, the constraints
+				      * on degrees of freedom can
+				      * already be taken into account
+				      * at the time of creating the
+				      * sparsity pattern. For this,
+				      * pass the ConstraintMatrix
+				      * object as the third argument
+				      * to the current function. No
+				      * call to
+				      * ConstraintMatrix::condense()
+				      * is then necessary. This
+				      * process is explained in @ref
+				      * step_27 "step-27".
+				      *
+				      * In case the constraints are
+				      * already taken care of in this
+				      * function, it is possible to
+				      * neglect off-diagonal entries
+				      * in the sparsity pattern. When
+				      * using
+				      * ConstraintMatrix::distribute_local_to_global
+				      * during assembling, no entries
+				      * will ever be written into
+				      * these matrix position, so that
+				      * one can save some computing
+				      * time in matrix-vector products
+				      * by not even creating these
+				      * elements. In that case, the
+				      * variable
+				      * <tt>keep_constrained_dofs</tt>
+				      * needs to be set to
+				      * <tt>false</tt>.
 				      */
     template <class DH, class SparsityPattern>
     static
     void
     make_sparsity_pattern (const DH                 &dof,
 			   const Table<2, Coupling> &coupling,
-			   SparsityPattern&          sparsity_pattern);
+			   SparsityPattern          &sparsity_pattern,
+			   const ConstraintMatrix   &constraints = ConstraintMatrix(),
+			   const bool                keep_constrained_dofs = true);
     
 				     /**
 				      * @deprecated This is the old

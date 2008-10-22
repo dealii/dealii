@@ -1,5 +1,5 @@
 /* $Id$ */
-/* Author: Martin Kronbichler, University of Uppsala,
+/* Author: Martin Kronbichler, Uppsala University,
            Wolfgang Bangerth, Texas A&M University 2007, 2008 */
 
 /*    $Id$       */
@@ -55,9 +55,10 @@
 				 // interfaces to the matrix and vector
 				 // classes based on Trilinos as well as
 				 // Trilinos preconditioners:
-#include <lac/trilinos_block_vector.h>
 #include <lac/trilinos_sparse_matrix.h>
 #include <lac/trilinos_block_sparse_matrix.h>
+#include <lac/trilinos_vector.h>
+#include <lac/trilinos_block_vector.h>
 #include <lac/trilinos_precondition.h>
 
 				 // Finally, here are two C++ headers that
@@ -1053,13 +1054,36 @@ void BoussinesqFlowProblem<dim>::setup_dofs ()
 				   // components at the boundary
 				   // again.
 				   //
-				   // Then, constraints are applied to
-				   // the temporary sparsity patterns,
-				   // which are finally copied into an
-				   // object of type SparsityPattern
-				   // and used to initialize the
-				   // nonzero pattern of the Trilinos
-				   // matrix objects we use.
+				   // When generating the sparsity
+				   // pattern, we directly apply the
+				   // constraints from hanging nodes
+				   // and no-flux boundary
+				   // conditions. This approach was
+				   // already used in step-27, but is
+				   // different from the one in early
+				   // tutorial programs. The reason
+				   // for doing so is that later
+				   // during assembly we are going to
+				   // distribute the constraints
+				   // immediately when transferring
+				   // local to global
+				   // dofs. Consequently, there will
+				   // be no data written at positions
+				   // of constrained degrees of
+				   // freedom, so we can let the
+				   // DoFTools::make_sparsity_pattern
+				   // function omit these entries by
+				   // setting the last boolean flag to
+				   // <tt>false</tt>. Once the
+				   // sparsity pattern is ready, we
+				   // can use it to initialize the
+				   // Trilinos matrices. Note that the
+				   // Trilinos matrices store the
+				   // sparsity pattern internally, so
+				   // there is no need to keep the
+				   // sparsity pattern around after
+				   // the initialization of the
+				   // matrix.
   stokes_block_sizes.resize (2);
   stokes_block_sizes[0] = n_u;
   stokes_block_sizes[1] = n_p;
@@ -1084,8 +1108,8 @@ void BoussinesqFlowProblem<dim>::setup_dofs ()
 	else
 	  coupling[c][d] = DoFTools::none;
 
-    DoFTools::make_sparsity_pattern (stokes_dof_handler, coupling, csp);
-    stokes_constraints.condense (csp);
+    DoFTools::make_sparsity_pattern (stokes_dof_handler, coupling, csp,
+				     stokes_constraints, false);
 
     BlockSparsityPattern stokes_sparsity_pattern;    
     stokes_sparsity_pattern.copy_from (csp);
@@ -1116,8 +1140,8 @@ void BoussinesqFlowProblem<dim>::setup_dofs ()
 	else
 	  coupling[c][d] = DoFTools::none;
 
-    DoFTools::make_sparsity_pattern (stokes_dof_handler, coupling, csp);
-    stokes_constraints.condense (csp);
+    DoFTools::make_sparsity_pattern (stokes_dof_handler, coupling, csp,
+				     stokes_constraints, false);
     
     BlockSparsityPattern stokes_preconditioner_sparsity_pattern;
     stokes_preconditioner_sparsity_pattern.copy_from (csp);
@@ -1126,14 +1150,20 @@ void BoussinesqFlowProblem<dim>::setup_dofs ()
     stokes_preconditioner_matrix.collect_sizes();
   }
 
+				   // The generation of the
+				   // temperature matrix follows the
+				   // generation of the Stokes matrix
+				   // &ndash; except that it is much
+				   // easier since we do not need to
+				   // take care of any blocks.
   {
     temperature_mass_matrix.clear ();
     temperature_stiffness_matrix.clear ();
     temperature_matrix.clear ();
 
     CompressedSetSparsityPattern csp (n_T, n_T);      
-    DoFTools::make_sparsity_pattern (temperature_dof_handler, csp);
-    temperature_constraints.condense (csp);
+    DoFTools::make_sparsity_pattern (temperature_dof_handler, csp,
+				     temperature_constraints, false);
 
     SparsityPattern temperature_sparsity_pattern;
     temperature_sparsity_pattern.copy_from (csp);
@@ -1440,36 +1470,33 @@ BoussinesqFlowProblem<dim>::build_stokes_preconditioner ()
 				 // work by doing the full assembly
 				 // only when it is needed.
 				 // 
-				 // Regarding the technical details
-				 // of implementation, not much has
+				 // Regarding the technical details of
+				 // implementation, not much has
 				 // changed from step-22. We reset
-				 // matrix and vector, create 
-				 // a quadrature formula on the 
-				 // cells and one on cell faces
-				 // (for implementing Neumann 
-				 // boundary conditions). Then,
-				 // we create a respective
-				 // FEValues object for both the 
-				 // cell and the face integration.
-				 // For the the update flags of
-				 // the first, we perform the
+				 // matrix and vector, create a
+				 // quadrature formula on the cells
+				 // and one on cell faces (for
+				 // implementing Neumann boundary
+				 // conditions). Then, we create a
+				 // respective FEValues object for
+				 // both the cell and the face
+				 // integration.  For the the update
+				 // flags of the first, we perform the
 				 // calculations of basis function
-				 // derivatives only in
-				 // case of a full assembly, since
-				 // they are not needed otherwise,
-				 // which makes the call of
-				 // the FEValues::reinit function
-				 // further down in the program 
-				 // more efficient.
+				 // derivatives only in case of a full
+				 // assembly, since they are not
+				 // needed otherwise, which makes the
+				 // call of the FEValues::reinit
+				 // function further down in the
+				 // program more efficient.
 				 // 
-				 // The declarations proceed 
-				 // with some shortcuts for 
-				 // array sizes, the creation of
-				 // the local matrix and right 
-				 // hand side as well as the
-				 // vector for the indices of
-				 // the local dofs compared to
-				 // the global system.
+				 // The declarations proceed with some
+				 // shortcuts for array sizes, the
+				 // creation of the local matrix and
+				 // right hand side as well as the
+				 // vector for the indices of the
+				 // local dofs compared to the global
+				 // system.
 template <int dim>
 void BoussinesqFlowProblem<dim>::assemble_stokes_system ()
 {
@@ -1520,20 +1547,20 @@ void BoussinesqFlowProblem<dim>::assemble_stokes_system ()
 				   // term in the momentum equation.
 				   // 
 				   // The set of vectors we create
-				   // next hold the evaluations of
-				   // the basis functions that will
-				   // be used for creating the
+				   // next hold the evaluations of the
+				   // basis functions that will be
+				   // used for creating the
 				   // matrices. This gives faster
 				   // access to that data, which
-				   // increases the performance
-				   // of the assembly. See step-22 
-				   // for details.
+				   // increases the performance of the
+				   // assembly. See step-22 for
+				   // details.
 				   // 
-				   // The last two declarations 
-				   // are used to extract the 
-				   // individual blocks (velocity,
-				   // pressure, temperature) from
-				   // the total FE system.
+				   // The last two declarations are
+				   // used to extract the individual
+				   // blocks (velocity, pressure,
+				   // temperature) from the total FE
+				   // system.
   std::vector<double>               boundary_values (n_face_q_points);
 
   std::vector<double>               old_temperature_values(n_q_points);

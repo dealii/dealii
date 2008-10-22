@@ -824,18 +824,50 @@ void
 ConstraintMatrix::
 add_entries_local_to_global (const std::vector<unsigned int> &local_dof_indices,
 			     SparsityType                    &sparsity_pattern,
-			     const bool                       keep_constrained_entries) const
+			     const bool                       keep_constrained_entries,
+			     const Table<2,bool>             &dof_mask) const
 {
 				   // similar to the function for distributing
 				   // matrix entries; see there for comments.
   const unsigned int n_local_dofs = local_dof_indices.size();
-  
+  bool dof_mask_is_active = false;
+  if (dof_mask.n_rows() == n_local_dofs)
+    {
+      dof_mask_is_active = true;
+      Assert (dof_mask.n_cols() == n_local_dofs,
+	      ExcDimensionMismatch(dof_mask.n_cols(), n_local_dofs));
+    }
+
   if (lines.size() == 0)
     {
+      bool add_these_indices;
       for (unsigned int i=0; i<n_local_dofs; ++i)
         for (unsigned int j=0; j<n_local_dofs; ++j)
-          sparsity_pattern.add(local_dof_indices[i],
-			       local_dof_indices[j]);
+	  {
+				        // There is one complication when 
+				        // we call this function with
+				        // dof_mask argument: When the
+				        // mask is empty, we cannot
+				        // access the respective
+				        // position, and it would even
+				        // be inefficient to create
+				        // such a mask. Hence, we need
+				        // to first check whether
+				        // there is some information
+				        // in the mask at all.
+	    if (dof_mask_is_active)
+	      {
+		if (dof_mask[i][j] == true)
+		  add_these_indices = true;
+		else
+		  add_these_indices = false;
+	      }
+	    else
+	      add_these_indices = true;
+	    if (add_these_indices == true)
+	      sparsity_pattern.add(local_dof_indices[i],
+				   local_dof_indices[j]);
+	  }
     }
   else
     {
@@ -866,67 +898,86 @@ add_entries_local_to_global (const std::vector<unsigned int> &local_dof_indices,
         }
 
 
+      bool add_these_indices;
       for (unsigned int i=0; i<n_local_dofs; ++i)
         {
           const ConstraintLine *position_i = constraint_lines[i];
           const bool is_constrained_i = (position_i != 0);
-          
+
           for (unsigned int j=0; j<n_local_dofs; ++j)
-            {
-              const ConstraintLine *position_j = constraint_lines[j];
-              const bool is_constrained_j = (position_j != 0);
+	    {
+				        // Again, first check whether
+				        // the mask contains any
+				        // information, and decide
+				        // then whether the current
+				        // index should be added.			
+	      if (dof_mask_is_active)
+		{
+		  if (dof_mask[i][j] == true)
+		    add_these_indices = true;
+		  else
+		    add_these_indices = false;
+		}
+	      else
+		add_these_indices = true;
+
+	      if (add_these_indices == true)
+	      {
+		const ConstraintLine *position_j = constraint_lines[j];
+		const bool is_constrained_j = (position_j != 0);
 
 					       // if so requested, add the
 					       // entry unconditionally, even
 					       // if it is going to be
 					       // constrained away
-	      if (keep_constrained_entries == true)
-		sparsity_pattern.add (local_dof_indices[i],
-				      local_dof_indices[j]);
-
-	      
-              if ((is_constrained_i == false) &&
-                  (is_constrained_j == false) &&
-		  (keep_constrained_entries == false))
-                {
-                  sparsity_pattern.add (local_dof_indices[i],
+		if (keep_constrained_entries == true)
+		  sparsity_pattern.add (local_dof_indices[i],
 					local_dof_indices[j]);
-                }
-              else if ((is_constrained_i == true) &&
-                       (is_constrained_j == false))
-                {
-                  for (unsigned int q=0; q<position_i->entries.size(); ++q)
-                    sparsity_pattern.add (position_i->entries[q].first,
-					  local_dof_indices[j]);
-                }
-              else if ((is_constrained_i == false) &&
-                       (is_constrained_j == true))
-                {
-                  for (unsigned int q=0; q<position_j->entries.size(); ++q)
-                    sparsity_pattern.add (local_dof_indices[i],
-					  position_j->entries[q].first);
-                }
-              else if ((is_constrained_i == true) &&
-                       (is_constrained_j == true))
-                {
-                  for (unsigned int p=0; p<position_i->entries.size(); ++p)
-                    for (unsigned int q=0; q<position_j->entries.size(); ++q)
-                      sparsity_pattern.add (position_i->entries[p].first,
-					    position_j->entries[q].first);
 
-                  if (i == j)
-                    sparsity_pattern.add (local_dof_indices[i],
-					  local_dof_indices[i]);
-                }
-              else
+
+		if ((is_constrained_i == false) &&
+		    (is_constrained_j == false) &&
+		    (keep_constrained_entries == false))
+		  {
+		    sparsity_pattern.add (local_dof_indices[i],
+					  local_dof_indices[j]);
+		  }
+		else if ((is_constrained_i == true) &&
+			 (is_constrained_j == false))
+		  {
+		    for (unsigned int q=0; q<position_i->entries.size(); ++q)
+		      sparsity_pattern.add (position_i->entries[q].first,
+					    local_dof_indices[j]);
+		  }
+		else if ((is_constrained_i == false) &&
+			 (is_constrained_j == true))
+		  {
+		    for (unsigned int q=0; q<position_j->entries.size(); ++q)
+		      sparsity_pattern.add (local_dof_indices[i],
+					    position_j->entries[q].first);
+		  }
+		else if ((is_constrained_i == true) &&
+			 (is_constrained_j == true))
+		  {
+		    for (unsigned int p=0; p<position_i->entries.size(); ++p)
+		      for (unsigned int q=0; q<position_j->entries.size(); ++q)
+			sparsity_pattern.add (position_i->entries[p].first,
+					      position_j->entries[q].first);
+
+		    if (i == j)
+		      sparsity_pattern.add (local_dof_indices[i],
+					    local_dof_indices[i]);
+		  }
+		else
 						 // the only case that can
 						 // happen here is one that we
 						 // have already taken care of
-                Assert ((is_constrained_i == false) &&
-			(is_constrained_j == false) &&
-			(keep_constrained_entries == true),
-			ExcInternalError());
-            }
+		  Assert ((is_constrained_i == false) &&
+			  (is_constrained_j == false) &&
+			  (keep_constrained_entries == true),
+			  ExcInternalError());
+	      }
+	    }
         }
     }
 }

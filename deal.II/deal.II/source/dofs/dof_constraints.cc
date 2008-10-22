@@ -52,6 +52,12 @@
 DEAL_II_NAMESPACE_OPEN
 
 
+
+				        // Static member variable
+const Table<2,bool> ConstraintMatrix::default_empty_table = Table<2,bool>();
+
+
+
 bool
 ConstraintMatrix::check_zero_weight (const std::pair<unsigned int, double> &p)
 {
@@ -1802,37 +1808,45 @@ MATRIX_FUNCTIONS(TrilinosWrappers::BlockSparseMatrix);
 template void ConstraintMatrix::
 add_entries_local_to_global<SparsityPattern> (const std::vector<unsigned int> &,
 					      SparsityPattern                 &,
-					      const bool) const;
+					      const bool,
+					      const Table<2,bool> &) const;
 template void ConstraintMatrix::
 add_entries_local_to_global<CompressedSparsityPattern> (const std::vector<unsigned int> &,
 					      CompressedSparsityPattern       &,
-					      const bool) const;
+					      const bool,
+					      const Table<2,bool> &) const;
 template void ConstraintMatrix::
 add_entries_local_to_global<CompressedSetSparsityPattern> (const std::vector<unsigned int> &,
 					      CompressedSetSparsityPattern       &,
-					      const bool) const;
+					      const bool,
+					      const Table<2,bool> &) const;
 
 template void ConstraintMatrix::
 add_entries_local_to_global<CompressedSimpleSparsityPattern> (const std::vector<unsigned int> &,
 					      CompressedSimpleSparsityPattern       &,
-					      const bool) const;
+					      const bool,
+					      const Table<2,bool> &) const;
 
 template void ConstraintMatrix::
 add_entries_local_to_global<BlockSparsityPattern> (const std::vector<unsigned int> &,
 					      BlockSparsityPattern       &,
-					      const bool) const;
+					      const bool,
+					      const Table<2,bool> &) const;
 template void ConstraintMatrix::
 add_entries_local_to_global<BlockCompressedSparsityPattern> (const std::vector<unsigned int> &,
 					      BlockCompressedSparsityPattern       &,
-					      const bool) const;
+					      const bool,
+					      const Table<2,bool> &) const;
 template void ConstraintMatrix::
 add_entries_local_to_global<BlockCompressedSetSparsityPattern> (const std::vector<unsigned int> &,
 					      BlockCompressedSetSparsityPattern       &,
-					      const bool) const;
+					      const bool,
+					      const Table<2,bool> &) const;
 
 template void ConstraintMatrix::
 add_entries_local_to_global<BlockCompressedSimpleSparsityPattern> (const std::vector<unsigned int> &,
                                               BlockCompressedSimpleSparsityPattern       &,
-                                              const bool) const;
+                                              const bool,
+					      const Table<2,bool> &) const;
 
 DEAL_II_NAMESPACE_CLOSE

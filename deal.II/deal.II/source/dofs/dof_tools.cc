@@ -48,9 +48,10 @@ DEAL_II_NAMESPACE_OPEN
 
 template <class DH, class SparsityPattern>
 void
-DoFTools::make_sparsity_pattern (const DH        &dof,
-				 SparsityPattern &sparsity,
-				 const ConstraintMatrix &constraints)
+DoFTools::make_sparsity_pattern (const DH               &dof,
+				 SparsityPattern        &sparsity,
+				 const ConstraintMatrix &constraints,
+				 const bool              keep_constrained_dofs)
 {
   const unsigned int n_dofs = dof.n_dofs();
 
@@ -74,7 +75,8 @@ DoFTools::make_sparsity_pattern (const DH        &dof,
 				       // given, then the following call acts
 				       // as if simply no constraints existed
       constraints.add_entries_local_to_global (dofs_on_this_cell,
-					       sparsity);
+					       sparsity,
+					       keep_constrained_dofs);
     }
 }
 
@@ -85,7 +87,9 @@ void
 DoFTools::make_sparsity_pattern (
   const DH                &dof,
   const Table<2,Coupling> &couplings,
-  SparsityPattern&         sparsity)
+  SparsityPattern         &sparsity,
+  const ConstraintMatrix  &constraints,
+  const bool               keep_constrained_dofs)
 {
   const unsigned int n_dofs = dof.n_dofs();
 
@@ -107,13 +111,12 @@ DoFTools::make_sparsity_pattern (
 				   // respect to non-primitive shape
 				   // functions, which takes some additional
 				   // thought
-  std::vector<std::vector<std::vector<bool> > > dof_mask(fe_collection.size());
+  std::vector<Table<2,bool> > dof_mask(fe_collection.size());
   for (unsigned int f=0; f<fe_collection.size(); ++f)
     {
       const unsigned int dofs_per_cell = fe_collection[f].dofs_per_cell;
 
-      dof_mask[f].resize (dofs_per_cell,
-			  std::vector<bool>(dofs_per_cell, false));
+      dof_mask[f].reinit (dofs_per_cell, dofs_per_cell);
       
       for (unsigned int i=0; i<dofs_per_cell; ++i)
 	for (unsigned int j=0; j<dofs_per_cell; ++j)
@@ -155,19 +158,22 @@ DoFTools::make_sparsity_pattern (
     {
       const unsigned int fe_index
 	= cell->active_fe_index();
-      
+
       const unsigned int dofs_per_cell
 	= fe_collection[fe_index].dofs_per_cell;
-      
+
       dofs_on_this_cell.resize (dofs_per_cell);
       cell->get_dof_indices (dofs_on_this_cell);
-      
-				       // make sparsity pattern for this cell
-      for (unsigned int i=0; i<dofs_per_cell; ++i)
-	for (unsigned int j=0; j<dofs_per_cell; ++j)
-	  if (dof_mask[fe_index][i][j] == true)
-	    sparsity.add (dofs_on_this_cell[i],
-			  dofs_on_this_cell[j]);
+
+
+				       // make sparsity pattern for this
+				       // cell. if no constraints pattern was
+				       // given, then the following call acts
+				       // as if simply no constraints existed
+      constraints.add_entries_local_to_global (dofs_on_this_cell,
+					       sparsity,
+					       keep_constrained_dofs,
+					       dof_mask[fe_index]);
     }
 }
 
@@ -5113,56 +5119,65 @@ DoFTools::make_sparsity_pattern<DoFHandler<deal_II_dimension>,
 				SparsityPattern>
 (const DoFHandler<deal_II_dimension> &dof,
  SparsityPattern    &sparsity,
- const ConstraintMatrix &);
+ const ConstraintMatrix &,
+ const bool);
 template void
 DoFTools::make_sparsity_pattern<DoFHandler<deal_II_dimension>,
 				CompressedSparsityPattern>
 (const DoFHandler<deal_II_dimension> &dof,
  CompressedSparsityPattern    &sparsity,
- const ConstraintMatrix &);
+ const ConstraintMatrix &,
+ const bool);
 template void
 DoFTools::make_sparsity_pattern<DoFHandler<deal_II_dimension>,
 				CompressedSetSparsityPattern>
 (const DoFHandler<deal_II_dimension> &dof,
  CompressedSetSparsityPattern    &sparsity,
- const ConstraintMatrix &);
+ const ConstraintMatrix &,
+ const bool);
 template void
 DoFTools::make_sparsity_pattern<DoFHandler<deal_II_dimension>,
 				CompressedSimpleSparsityPattern>
 (const DoFHandler<deal_II_dimension> &dof,
  CompressedSimpleSparsityPattern &sparsity,
- const ConstraintMatrix &);
+ const ConstraintMatrix &,
+ const bool);
 template void
 DoFTools::make_sparsity_pattern<DoFHandler<deal_II_dimension>,
 				BlockSparsityPattern>
 (const DoFHandler<deal_II_dimension> &dof,
  BlockSparsityPattern                &sparsity,
- const ConstraintMatrix &);
+ const ConstraintMatrix &,
+ const bool);
 template void
 DoFTools::make_sparsity_pattern<DoFHandler<deal_II_dimension>,
 				BlockCompressedSparsityPattern>
 (const DoFHandler<deal_II_dimension> &dof,
  BlockCompressedSparsityPattern      &sparsity,
- const ConstraintMatrix &);
+ const ConstraintMatrix &,
+ const bool);
 template void
 DoFTools::make_sparsity_pattern<DoFHandler<deal_II_dimension>,
 				BlockCompressedSetSparsityPattern>
 (const DoFHandler<deal_II_dimension> &dof,
  BlockCompressedSetSparsityPattern      &sparsity,
- const ConstraintMatrix &);
+ const ConstraintMatrix &,
+ const bool);
 template void
 DoFTools::make_sparsity_pattern<DoFHandler<deal_II_dimension>,
 				BlockCompressedSimpleSparsityPattern>
 (const DoFHandler<deal_II_dimension> &dof,
  BlockCompressedSimpleSparsityPattern      &sparsity,
- const ConstraintMatrix &);
+ const ConstraintMatrix &,
+ const bool);
 
 template void
 DoFTools::make_sparsity_pattern<hp::DoFHandler<deal_II_dimension>,
 				SparsityPattern>
 (const hp::DoFHandler<deal_II_dimension> &dof,
  SparsityPattern    &sparsity,
- const ConstraintMatrix &);
+ const ConstraintMatrix &,
+ const bool);
 
 
 template void
@@ -5170,21 +5185,24 @@ DoFTools::make_sparsity_pattern<hp::DoFHandler<deal_II_dimension>,
 				CompressedSparsityPattern>
 (const hp::DoFHandler<deal_II_dimension> &dof,
  CompressedSparsityPattern    &sparsity,
- const ConstraintMatrix &);
+ const ConstraintMatrix &,
+ const bool);
 
 template void
 DoFTools::make_sparsity_pattern<hp::DoFHandler<deal_II_dimension>,
 				CompressedSetSparsityPattern>
 (const hp::DoFHandler<deal_II_dimension> &dof,
  CompressedSetSparsityPattern    &sparsity,
- const ConstraintMatrix &);
+ const ConstraintMatrix &,
+ const bool);
 
 template void
 DoFTools::make_sparsity_pattern<hp::DoFHandler<deal_II_dimension>,
 				CompressedSimpleSparsityPattern>
 (const hp::DoFHandler<deal_II_dimension> &dof,
  CompressedSimpleSparsityPattern    &sparsity,
- const ConstraintMatrix &);
+ const ConstraintMatrix &,
+ const bool);
 
 
 template void
@@ -5192,25 +5210,29 @@ DoFTools::make_sparsity_pattern<hp::DoFHandler<deal_II_dimension>,
 				BlockSparsityPattern>
 (const hp::DoFHandler<deal_II_dimension> &dof,
  BlockSparsityPattern                &sparsity,
- const ConstraintMatrix &);
+ const ConstraintMatrix &,
+ const bool);
 template void
 DoFTools::make_sparsity_pattern<hp::DoFHandler<deal_II_dimension>,
 				BlockCompressedSparsityPattern>
 (const hp::DoFHandler<deal_II_dimension> &dof,
  BlockCompressedSparsityPattern      &sparsity,
- const ConstraintMatrix &);
+ const ConstraintMatrix &,
+ const bool);
 template void
 DoFTools::make_sparsity_pattern<hp::DoFHandler<deal_II_dimension>,
 				BlockCompressedSetSparsityPattern>
 (const hp::DoFHandler<deal_II_dimension> &dof,
  BlockCompressedSetSparsityPattern      &sparsity,
- const ConstraintMatrix &);
+ const ConstraintMatrix &,
+ const bool);
 template void
 DoFTools::make_sparsity_pattern<hp::DoFHandler<deal_II_dimension>,
 				BlockCompressedSimpleSparsityPattern>
 (const hp::DoFHandler<deal_II_dimension> &dof,
  BlockCompressedSimpleSparsityPattern      &sparsity,
- const ConstraintMatrix &);
+ const ConstraintMatrix &,
+ const bool);
 
 
 template void 
@@ -5218,98 +5240,130 @@ DoFTools::make_sparsity_pattern<DoFHandler<deal_II_dimension>,
 				SparsityPattern>
 (const DoFHandler<deal_II_dimension>&,
  const Table<2,Coupling>&,
- SparsityPattern&);
+ SparsityPattern&,
+ const ConstraintMatrix &,
+ const bool);
 template void 
 DoFTools::make_sparsity_pattern<DoFHandler<deal_II_dimension>,
 				CompressedSparsityPattern>
 (const DoFHandler<deal_II_dimension>&,
  const Table<2,Coupling>&,
- CompressedSparsityPattern&);
+ CompressedSparsityPattern&,
+ const ConstraintMatrix &,
+ const bool);
 template void 
 DoFTools::make_sparsity_pattern<DoFHandler<deal_II_dimension>,
 				CompressedSetSparsityPattern>
 (const DoFHandler<deal_II_dimension>&,
  const Table<2,Coupling>&,
- CompressedSetSparsityPattern&);
+ CompressedSetSparsityPattern&,
+ const ConstraintMatrix &,
+ const bool);
 template void 
 DoFTools::make_sparsity_pattern<DoFHandler<deal_II_dimension>,
 				CompressedSimpleSparsityPattern>
 (const DoFHandler<deal_II_dimension>&,
  const Table<2,Coupling>&,
- CompressedSimpleSparsityPattern&);
+ CompressedSimpleSparsityPattern&,
+ const ConstraintMatrix &,
+ const bool);
 template void
 DoFTools::make_sparsity_pattern<DoFHandler<deal_II_dimension>,
 				BlockSparsityPattern>
 (const DoFHandler<deal_II_dimension>&,
  const Table<2,Coupling>&,
- BlockSparsityPattern&);
+ BlockSparsityPattern&,
+ const ConstraintMatrix &,
+ const bool);
 template void 
 DoFTools::make_sparsity_pattern<DoFHandler<deal_II_dimension>,
 				BlockCompressedSparsityPattern>
 (const DoFHandler<deal_II_dimension>&,
  const Table<2,Coupling>&,
- BlockCompressedSparsityPattern&);
+ BlockCompressedSparsityPattern&,
+ const ConstraintMatrix &,
+ const bool);
 template void 
 DoFTools::make_sparsity_pattern<DoFHandler<deal_II_dimension>,
 				BlockCompressedSetSparsityPattern>
 (const DoFHandler<deal_II_dimension>&,
  const Table<2,Coupling>&,
- BlockCompressedSetSparsityPattern&);
+ BlockCompressedSetSparsityPattern&,
+ const ConstraintMatrix &,
+ const bool);
 template void
 DoFTools::make_sparsity_pattern<DoFHandler<deal_II_dimension>,
 				BlockCompressedSimpleSparsityPattern>
 (const DoFHandler<deal_II_dimension>&,
  const Table<2,Coupling>&,
- BlockCompressedSimpleSparsityPattern&);
+ BlockCompressedSimpleSparsityPattern&,
+ const ConstraintMatrix &,
+ const bool);
 
 template void 
 DoFTools::make_sparsity_pattern<hp::DoFHandler<deal_II_dimension>,
 				SparsityPattern>
 (const hp::DoFHandler<deal_II_dimension>&,
  const Table<2,Coupling>&,
- SparsityPattern&);
+ SparsityPattern&,
+ const ConstraintMatrix &,
+ const bool);
 template void 
 DoFTools::make_sparsity_pattern<hp::DoFHandler<deal_II_dimension>,
 				CompressedSparsityPattern>
 (const hp::DoFHandler<deal_II_dimension>&,
  const Table<2,Coupling>&,
- CompressedSparsityPattern&);
+ CompressedSparsityPattern&,
+ const ConstraintMatrix &,
+ const bool);
 template void 
 DoFTools::make_sparsity_pattern<hp::DoFHandler<deal_II_dimension>,
 				CompressedSetSparsityPattern>
 (const hp::DoFHandler<deal_II_dimension>&,
  const Table<2,Coupling>&,
- CompressedSetSparsityPattern&);
+ CompressedSetSparsityPattern&,
+ const ConstraintMatrix &,
+ const bool);
 template void 
 DoFTools::make_sparsity_pattern<hp::DoFHandler<deal_II_dimension>,
 				CompressedSimpleSparsityPattern>
 (const hp::DoFHandler<deal_II_dimension>&,
  const Table<2,Coupling>&,
- CompressedSimpleSparsityPattern&);
+ CompressedSimpleSparsityPattern&,
+ const ConstraintMatrix &,
+ const bool);
 template void
 DoFTools::make_sparsity_pattern<hp::DoFHandler<deal_II_dimension>,
 				BlockSparsityPattern>
 (const hp::DoFHandler<deal_II_dimension>&,
  const Table<2,Coupling>&,
- BlockSparsityPattern&);
+ BlockSparsityPattern&,
+ const ConstraintMatrix &,
+ const bool);
 template void 
 DoFTools::make_sparsity_pattern<hp::DoFHandler<deal_II_dimension>,
 				BlockCompressedSparsityPattern>
 (const hp::DoFHandler<deal_II_dimension>&,
  const Table<2,Coupling>&,
- BlockCompressedSparsityPattern&);
+ BlockCompressedSparsityPattern&,
+ const ConstraintMatrix &,
+ const bool);
 template void 
 DoFTools::make_sparsity_pattern<hp::DoFHandler<deal_II_dimension>,
 				BlockCompressedSetSparsityPattern>
 (const hp::DoFHandler<deal_II_dimension>&,
  const Table<2,Coupling>&,
- BlockCompressedSetSparsityPattern&);
+ BlockCompressedSetSparsityPattern&,
+ const ConstraintMatrix &,
+ const bool);
 template void
 DoFTools::make_sparsity_pattern<hp::DoFHandler<deal_II_dimension>,
 				BlockCompressedSimpleSparsityPattern>
 (const hp::DoFHandler<deal_II_dimension>&,
  const Table<2,Coupling>&,
- BlockCompressedSimpleSparsityPattern&);
+ BlockCompressedSimpleSparsityPattern&,
+ const ConstraintMatrix &,
+ const bool);
 
 
 template void

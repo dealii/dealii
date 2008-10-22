@@ -17,6 +17,7 @@
 #include <base/config.h>
 #include <base/exceptions.h>
 #include <base/subscriptor.h>
+#include <base/table.h>
 
 #include <vector>
 #include <map>
@@ -24,6 +25,7 @@
 
 DEAL_II_NAMESPACE_OPEN
 
+template<int dim, class T> class Table;
 template <typename> class Vector;
 template <typename> class FullMatrix;
 class SparsityPattern;
@@ -991,23 +993,52 @@ class ConstraintMatrix : public Subscriptor
 				      * second input argument is not necessary
 				      * here.
 				      *
-				      * The last argument to this function,
-				      * keep_constrained_entries determines
-				      * whether the function shall allocate
-				      * entries in the sparsity pattern at all
-				      * for entries that will later be set to
-				      * zero upon condensation of the
-				      * matrix. These entries are necessary if
-				      * the matrix is built unconstrained, and
-				      * only later condensed. They are not
-				      * necessary if the matrix is built using
-				      * the distribute_local_to_global()
+				      * The third argument to this
+				      * function,
+				      * keep_constrained_entries
+				      * determines whether the
+				      * function shall allocate
+				      * entries in the sparsity
+				      * pattern at all for entries
+				      * that will later be set to zero
+				      * upon condensation of the
+				      * matrix. These entries are
+				      * necessary if the matrix is
+				      * built unconstrained, and only
+				      * later condensed. They are not
+				      * necessary if the matrix is
+				      * built using the
+				      * distribute_local_to_global()
 				      * function of this class which
-				      * distributes entries right away when
-				      * copying a local matrix into a global
-				      * object. The default of this argument
-				      * is true, meaning to allocate the few
-				      * entries that may later be set to zero.
+				      * distributes entries right away
+				      * when copying a local matrix
+				      * into a global object. The
+				      * default of this argument is
+				      * true, meaning to allocate the
+				      * few entries that may later be
+				      * set to zero.
+				      *
+				      * By default, the function adds
+				      * entries for all pairs of
+				      * indices given in the first
+				      * argument to the sparsity
+				      * pattern (unless
+				      * keep_constrained_entries is
+				      * false). However, sometimes one
+				      * would like to only add a
+				      * subset of all of these
+				      * pairs. In that case, the last
+				      * argument can be used which
+				      * specifies a boolean mask which
+				      * of the pairs of indices should
+				      * be considered. If the mask is
+				      * false for a pair of indices,
+				      * then no entry will be added to
+				      * the sparsity pattern for this
+				      * pair, irrespective of whether
+				      * one or both of the indices
+				      * correspond to constrained
+				      * degrees of freedom.
 				      *
 				      * This function is not typically called
 				      * from user code, but is used in the
@@ -1019,7 +1050,8 @@ class ConstraintMatrix : public Subscriptor
     void
     add_entries_local_to_global (const std::vector<unsigned int> &local_dof_indices,
 				 SparsityType                    &sparsity_pattern,
-				 const bool                       keep_constrained_entries = true) const;
+				 const bool                       keep_constrained_entries = true,
+				 const Table<2,bool>             &dof_mask = default_empty_table) const;
 
 				     /**
 				      * Delete hanging nodes in a
@@ -1297,6 +1329,14 @@ class ConstraintMatrix : public Subscriptor
 				      * weight.
 				      */
     static bool check_zero_weight (const std::pair<unsigned int, double> &p);
+
+    //public:
+				     /**
+				      * Dummy table that serves as
+				      * default argument for function
+				      * <tt>add_entries_local_to_global()</tt>.
+				      */
+    static const Table<2,bool> default_empty_table;
 };
 
 

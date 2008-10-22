@@ -355,6 +355,13 @@ inconvenience this causes.
 <ol>
   <li>
   <p>
+  New: When calling function DoFTools::make_sparsity_pattern with a ConstraintMatrix, it is now possible to set a bool argument keep_constrained_dofs. When this flag is set to false, constrained rows and columns will not be part of the sparsity pattern, which increases the performance of matrix operations and decrease memory consumption in case there are many constraints.
+  <br>
+  (Martin Kronbichler 2008/10/21)
+  </p> 
+
+  <li>
+  <p>
   New: There is now a second DoFTools::count_dofs_with_subdomain_association function that
   calculates the number of degrees of freedom associated with a certain subdomain and
   splits the result up according to the vector component of each degree of freedom. This

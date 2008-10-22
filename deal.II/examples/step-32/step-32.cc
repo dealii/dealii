@@ -1,5 +1,5 @@
 /* $Id$ */
-/* Author: Martin Kronbichler, University of Uppsala,
+/* Author: Martin Kronbichler, Uppsala University,
            Wolfgang Bangerth, Texas A&M University 2007, 2008 */
 /*                                                                */
 /*    Copyright (C) 2008 by the deal.II authors */
@@ -659,8 +659,8 @@ void BoussinesqFlowProblem<dim>::setup_dofs ()
 	else
 	  coupling[c][d] = DoFTools::none;
 
-    DoFTools::make_sparsity_pattern (stokes_dof_handler, coupling, csp);
-    stokes_constraints.condense (csp);
+    DoFTools::make_sparsity_pattern (stokes_dof_handler, coupling, csp,
+				     stokes_constraints, false);
 
     stokes_sparsity_pattern.copy_from (csp);
 
@@ -691,7 +691,8 @@ void BoussinesqFlowProblem<dim>::setup_dofs ()
 	else
 	  coupling[c][d] = DoFTools::none;
 
-    DoFTools::make_sparsity_pattern (stokes_dof_handler, coupling, csp);
+    DoFTools::make_sparsity_pattern (stokes_dof_handler, coupling, csp,
+				     stokes_constraints, false);
     stokes_constraints.condense (csp);
 
     stokes_preconditioner_sparsity_pattern.copy_from (csp);
@@ -716,7 +717,8 @@ void BoussinesqFlowProblem<dim>::setup_dofs ()
     SparsityPattern temperature_sparsity_pattern;
 
     CompressedSetSparsityPattern csp (n_T, n_T);
-    DoFTools::make_sparsity_pattern (temperature_dof_handler, csp);
+    DoFTools::make_sparsity_pattern (temperature_dof_handler, csp,
+				     temperature_constraints, false);
     temperature_constraints.condense (csp);
 
     temperature_sparsity_pattern.copy_from (csp);
