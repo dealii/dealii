@@ -286,8 +286,8 @@ namespace TrilinosWrappers
 					* block, so that the number of
 					* outer iterations is
 					* reduced. See the discussion
-					* in the @step_22 step-22
-					* tutorial program.
+					* in the @ref step_22
+					* "step-22" tutorial program.
 					*/
 	unsigned int Av_do_solve;
 	  

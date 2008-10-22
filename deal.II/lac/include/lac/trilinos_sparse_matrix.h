@@ -16,7 +16,6 @@
 
 #include <base/config.h>
 #include <base/subscriptor.h>
-#include <lac/sparsity_pattern.h>
 #include <lac/sparse_matrix.h>
 #include <lac/exceptions.h>
 #include <lac/trilinos_vector_base.h>
@@ -41,6 +40,11 @@
 
 DEAL_II_NAMESPACE_OPEN
 
+                                   // forward declarations
+class SparsityPattern;
+class CompressedSparsityPattern;
+class CompressedSetSparsityPattern;
+class CompressedSimpleSparsityPattern;
 
 namespace TrilinosWrappers
 {
@@ -466,28 +470,33 @@ namespace TrilinosWrappers
 				        * Epetra matrix know the
 				        * position of nonzero entries
 				        * according to the sparsity
-				        * pattern. Note that, when
-				        * using this function, the
-				        * matrix must already be
-				        * initialized with a suitable
-				        * Epetra_Map that describes
-				        * the distribution of the
-				        * matrix among the MPI
-				        * processes. Otherwise, an
-				        * error will be thrown. In a
-				        * parallel run, it is currently
-				        * necessary that each processor
-				        * holds the sparsity_pattern
-				        * structure because each
-				        * processor sets its rows.
+				        * pattern. This function is
+				        * meant for use in serial
+				        * programs, where there is no
+				        * need to specify how the
+				        * matrix is going to be
+				        * distributed among the
+				        * processors. This function
+				        * works in parallel, too, but
+				        * it is recommended to
+				        * manually specify the
+				        * parallel partioning of the
+				        * matrix using an
+				        * Epetra_Map. When run in
+				        * parallel, it is currently
+				        * necessary that each
+				        * processor holds the
+				        * sparsity_pattern structure
+				        * because each processor sets
+				        * its rows.
 					*
-					* This is a
-				        * collective operation that
-				        * needs to be called on all
-				        * processors in order to avoid a
-				        * dead lock.
+					* This is a collective
+				        * operation that needs to be
+				        * called on all processors in
+				        * order to avoid a dead lock.
                                         */
-      void reinit (const SparsityPattern &sparsity_pattern);
+      template<typename SparsityType>
+      void reinit (const SparsityType &sparsity_pattern);
 
 				       /**
                                         * This function is initializes
@@ -526,8 +535,9 @@ namespace TrilinosWrappers
 				        * processors in order to avoid a
 				        * dead lock.
                                         */
-      void reinit (const Epetra_Map       &input_map,
-		   const SparsityPattern  &sparsity_pattern);
+      template<typename SparsityType>
+      void reinit (const Epetra_Map    &input_map,
+		   const SparsityType  &sparsity_pattern);
 
 				       /**
                                         * This function is similar to
@@ -545,9 +555,10 @@ namespace TrilinosWrappers
 				        * processors in order to avoid a
 				        * dead lock.
                                         */
-      void reinit (const Epetra_Map       &input_row_map,
-		   const Epetra_Map       &input_col_map,
-		   const SparsityPattern  &sparsity_pattern);
+      template<typename SparsityType>
+      void reinit (const Epetra_Map    &input_row_map,
+		   const Epetra_Map    &input_col_map,
+		   const SparsityType  &sparsity_pattern);
 
 				       /**
 				        * This function copies the
@@ -574,6 +585,34 @@ namespace TrilinosWrappers
 				        * threshold (so zeros in the
 				        * deal.II matrix can be
 				        * filtered away).
+					*
+					* This is a
+				        * collective operation that
+				        * needs to be called on all
+				        * processors in order to avoid a
+				        * dead lock.
+                                        */
+      void reinit (const ::dealii::SparseMatrix<double> &dealii_sparse_matrix,
+		   const double                          drop_tolerance=1e-13);
+
+				       /**
+                                        * This function initializes
+				        * the Trilinos matrix using
+				        * the deal.II sparse matrix
+				        * and the entries stored
+				        * therein. It uses a threshold
+				        * to copy only elements with
+				        * modulus larger than the
+				        * threshold (so zeros in the
+				        * deal.II matrix can be
+				        * filtered away). In contrast
+				        * to the other reinit function
+				        * with deal.II sparse matrix
+				        * argument, this function
+				        * takes a parallel
+				        * partitioning specified by
+				        * the user instead of
+				        * internally generating one.
 					*
 					* This is a
 				        * collective operation that

@@ -13,6 +13,11 @@
 
 #include <lac/trilinos_sparse_matrix.h>
 
+#include <lac/sparsity_pattern.h>
+#include <lac/compressed_sparsity_pattern.h>
+#include <lac/compressed_set_sparsity_pattern.h>
+#include <lac/compressed_simple_sparsity_pattern.h>
+
 #ifdef DEAL_II_USE_TRILINOS
 
 DEAL_II_NAMESPACE_OPEN
@@ -172,8 +177,9 @@ namespace TrilinosWrappers
   
 
 
+  template <typename SparsityType>
   void
-  SparseMatrix::reinit (const SparsityPattern &sparsity_pattern)
+  SparseMatrix::reinit (const SparsityType &sparsity_pattern)
   {
 #ifdef DEAL_II_COMPILER_SUPPORTS_MPI
     Epetra_MpiComm    trilinos_communicator (MPI_COMM_WORLD);
@@ -193,19 +199,21 @@ namespace TrilinosWrappers
 
 
 
+  template <typename SparsityType>
   void
-  SparseMatrix::reinit (const Epetra_Map       &input_map,
-			const SparsityPattern  &sparsity_pattern)
+  SparseMatrix::reinit (const Epetra_Map    &input_map,
+			const SparsityType  &sparsity_pattern)
   {
     reinit (input_map, input_map, sparsity_pattern);
   }
 
 
 
+  template <typename SparsityType>
   void
-  SparseMatrix::reinit (const Epetra_Map       &input_row_map,
-			const Epetra_Map       &input_col_map,
-			const SparsityPattern  &sparsity_pattern)
+  SparseMatrix::reinit (const Epetra_Map    &input_row_map,
+			const Epetra_Map    &input_col_map,
+			const SparsityType  &sparsity_pattern)
   {
     matrix.reset();
 
@@ -295,6 +303,110 @@ namespace TrilinosWrappers
 
 
 
+				   // The CompressedSetSparsityPattern
+				   // class stores the columns
+				   // differently, so we need to
+				   // explicitly rewrite this function
+				   // in that case.
+  template<>
+  void
+  SparseMatrix::reinit (const Epetra_Map                    &input_row_map,
+			const Epetra_Map                    &input_col_map,
+			const CompressedSetSparsityPattern  &sparsity_pattern)
+  {
+    matrix.reset();
+
+    unsigned int n_rows = sparsity_pattern.n_rows();
+
+    if (input_row_map.Comm().MyPID() == 0)
+      {
+	Assert (input_row_map.NumGlobalElements() == (int)sparsity_pattern.n_rows(),
+		ExcDimensionMismatch (input_row_map.NumGlobalElements(),
+				      sparsity_pattern.n_rows()));
+	Assert (input_col_map.NumGlobalElements() == (int)sparsity_pattern.n_cols(),
+		ExcDimensionMismatch (input_col_map.NumGlobalElements(),
+				      sparsity_pattern.n_cols()));
+      }
+
+    row_map = input_row_map;
+    col_map = input_col_map;
+
+    std::vector<int> n_entries_per_row(n_rows);
+
+    for (unsigned int row=0; row<n_rows; ++row)
+      n_entries_per_row[row] = sparsity_pattern.row_length(row);
+
+				  // TODO: There seems to be problem
+				  // in Epetra when a matrix is
+				  // initialized with both row and
+				  // column map. Maybe find something
+				  // more out about this... It could
+				  // be related to the bug #4123. For
+				  // the moment, just ignore the
+				  // column information and generate
+				  // the matrix as if it were
+				  // square. The call to
+				  // GlobalAssemble later will set the
+				  // correct values.
+    matrix = std::auto_ptr<Epetra_FECrsMatrix>
+	        (new Epetra_FECrsMatrix(Copy, row_map,
+					&n_entries_per_row[0], false));
+
+
+				  // TODO: As of now, assume that the
+				  // sparsity pattern sits at the all
+				  // processors (completely), and let
+				  // each processor set its rows. Since
+				  // this is wasteful, a better solution
+				  // should be found in the future.
+    Assert (matrix->NumGlobalRows() == (int)sparsity_pattern.n_rows(),
+	    ExcDimensionMismatch (matrix->NumGlobalRows(),
+				  sparsity_pattern.n_rows()));
+    
+				  // Trilinos has a bug for rectangular
+				  // matrices at this point, so do not
+				  // check for consistent column numbers
+				  // here.
+				  //
+				  // this bug is filed in the Sandia
+				  // bugzilla under #4123 and should be
+				  // fixed for version 9.0
+//        Assert (matrix->NumGlobalCols() == (int)sparsity_pattern.n_cols(),
+//		ExcDimensionMismatch (matrix->NumGlobalCols(),
+//				      sparsity_pattern.n_cols()));
+
+    std::vector<double> values;
+    std::vector<int>    row_indices;
+    
+    for (unsigned int row=0; row<n_rows; ++row)
+      if (row_map.MyGID(row))
+	{
+	  const int row_length = sparsity_pattern.row_length(row);
+	  row_indices.resize (row_length, -1);
+	  values.resize (row_length, 0.);
+
+	  CompressedSetSparsityPattern::row_iterator col_num = 
+	    sparsity_pattern.row_begin (row);
+
+	  for (unsigned int col = 0; 
+	       col_num != sparsity_pattern.row_end (row); 
+	       ++col_num, ++col)
+	    row_indices[col] = *col_num;
+
+	  matrix->InsertGlobalValues (row, row_length,
+				      &values[0], &row_indices[0]);
+	}
+    
+    last_action = Zero;
+
+				  // In the end, the matrix needs to
+				  // be compressed in order to be
+				  // really ready.
+    compress();
+  }
+
+
+
   void
   SparseMatrix::reinit (const SparseMatrix &sparse_matrix)
   {
@@ -305,6 +417,27 @@ namespace TrilinosWrappers
     matrix = std::auto_ptr<Epetra_FECrsMatrix>(new Epetra_FECrsMatrix(
 				                   *sparse_matrix.matrix));
     compressed = true;
+  }
+
+
+
+  void
+  SparseMatrix::reinit (const ::dealii::SparseMatrix<double> &dealii_sparse_matrix,
+			const double                          drop_tolerance)
+  {
+#ifdef DEAL_II_COMPILER_SUPPORTS_MPI
+    Epetra_MpiComm    trilinos_communicator (MPI_COMM_WORLD);
+#else
+    Epetra_SerialComm trilinos_communicator;
+#endif
+
+    const Epetra_Map rows (dealii_sparse_matrix.m(),
+			   0,
+			   trilinos_communicator);
+    const Epetra_Map columns (dealii_sparse_matrix.n(),
+			      0,
+			      trilinos_communicator);
+    reinit (rows, columns, dealii_sparse_matrix, drop_tolerance);
   }
 
 
@@ -1104,7 +1237,8 @@ namespace TrilinosWrappers
 				  // As of now, no particularly neat
 				  // ouput is generated in case of
 				  // multiple processors.
-  void SparseMatrix::print (std::ostream &out) const
+  void
+  SparseMatrix::print (std::ostream &out) const
   {
     double * values;
     int * indices;
@@ -1120,6 +1254,48 @@ namespace TrilinosWrappers
   
     AssertThrow (out, ExcIO());
   }
+
+
+
+
+  // explicit instantiations
+  //
+  template void
+  SparseMatrix::reinit (const SparsityPattern &);
+  template void
+  SparseMatrix::reinit (const CompressedSparsityPattern &);
+  template void
+  SparseMatrix::reinit (const CompressedSetSparsityPattern &);
+  template void
+  SparseMatrix::reinit (const CompressedSimpleSparsityPattern &);
+
+
+  template void
+  SparseMatrix::reinit (const Epetra_Map &,
+			const SparsityPattern &);
+  template void
+  SparseMatrix::reinit (const Epetra_Map &,
+			const CompressedSparsityPattern &);
+  template void
+  SparseMatrix::reinit (const Epetra_Map &,
+			const CompressedSetSparsityPattern &);
+  template void
+  SparseMatrix::reinit (const Epetra_Map &,
+			const CompressedSimpleSparsityPattern &);
+
+
+  template void
+  SparseMatrix::reinit (const Epetra_Map &,
+			const Epetra_Map &,
+			const SparsityPattern &);
+  template void
+  SparseMatrix::reinit (const Epetra_Map &,
+			const Epetra_Map &,
+			const CompressedSparsityPattern &);
+  template void
+  SparseMatrix::reinit (const Epetra_Map &,
+			const Epetra_Map &,
+			const CompressedSimpleSparsityPattern &);
 
 }
 

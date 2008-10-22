@@ -13,6 +13,7 @@
 
 #include <lac/trilinos_block_sparse_matrix.h>
 
+#include <lac/block_sparsity_pattern.h>
 
 #ifdef DEAL_II_USE_TRILINOS
 
@@ -88,10 +89,11 @@ namespace TrilinosWrappers
 
 
 
+  template <typename BlockSparsityType>  
   void
   BlockSparseMatrix::
   reinit (const std::vector<Epetra_Map> &input_maps,
-	  const BlockSparsityPattern    &block_sparsity_pattern)
+	  const BlockSparsityType       &block_sparsity_pattern)
   {
     Assert (input_maps.size() == block_sparsity_pattern.n_block_rows(),
 	    ExcDimensionMismatch (input_maps.size(),
@@ -129,9 +131,10 @@ namespace TrilinosWrappers
 
 
 
+  template <typename BlockSparsityType>
   void
   BlockSparseMatrix::
-  reinit (const BlockSparsityPattern    &block_sparsity_pattern)
+  reinit (const BlockSparsityType &block_sparsity_pattern)
   {
     Assert (block_sparsity_pattern.n_block_rows() ==
 	    block_sparsity_pattern.n_block_cols(),
@@ -158,7 +161,7 @@ namespace TrilinosWrappers
 
     reinit (input_maps, block_sparsity_pattern);
   }
-  
+
 
 
   void
@@ -190,6 +193,39 @@ namespace TrilinosWrappers
         }
 
     collect_sizes();
+  }
+
+
+
+  void
+  BlockSparseMatrix::
+  reinit (const ::dealii::BlockSparseMatrix<double> &dealii_block_sparse_matrix,
+	  const double                               drop_tolerance)
+  {
+    Assert (dealii_block_sparse_matrix.n_block_rows() ==
+	    dealii_block_sparse_matrix.n_block_cols(),
+	    ExcDimensionMismatch (dealii_block_sparse_matrix.n_block_rows(),
+				  dealii_block_sparse_matrix.n_block_cols()));
+    Assert (dealii_block_sparse_matrix.m() ==
+	    dealii_block_sparse_matrix.n(),
+	    ExcDimensionMismatch (dealii_block_sparse_matrix.m(),
+				  dealii_block_sparse_matrix.n()));
+    
+				     // produce a dummy local map and pass it
+				     // off to the other function
+#ifdef DEAL_II_COMPILER_SUPPORTS_MPI
+    Epetra_MpiComm    trilinos_communicator (MPI_COMM_WORLD);
+#else
+    Epetra_SerialComm trilinos_communicator;
+#endif
+
+    std::vector<Epetra_Map> input_maps;
+    for (unsigned int i=0; i<dealii_block_sparse_matrix.n_block_rows(); ++i)
+      input_maps.push_back (Epetra_Map(dealii_block_sparse_matrix.block(i,0).m(),
+				       0,
+				       trilinos_communicator));
+
+    reinit (input_maps, dealii_block_sparse_matrix, drop_tolerance);
   }
 
 
@@ -325,6 +361,35 @@ namespace TrilinosWrappers
 
     return dst.l2_norm();
   }
+
+
+
+
+
+  // -------------------- explicit instantiations -----------------------
+  //
+  template void
+  BlockSparseMatrix::reinit (const BlockSparsityPattern &);
+  template void
+  BlockSparseMatrix::reinit (const BlockCompressedSparsityPattern &);
+  template void
+  BlockSparseMatrix::reinit (const BlockCompressedSetSparsityPattern &);
+  template void
+  BlockSparseMatrix::reinit (const BlockCompressedSimpleSparsityPattern &);
+
+
+  template void
+  BlockSparseMatrix::reinit (const std::vector<Epetra_Map> &,
+			     const BlockSparsityPattern    &);
+  template void
+  BlockSparseMatrix::reinit (const std::vector<Epetra_Map> &,
+			     const BlockCompressedSparsityPattern &);
+  template void
+  BlockSparseMatrix::reinit (const std::vector<Epetra_Map> &,
+			     const BlockCompressedSetSparsityPattern &);
+  template void
+  BlockSparseMatrix::reinit (const std::vector<Epetra_Map> &,
+			     const BlockCompressedSimpleSparsityPattern &);
 
 }
 

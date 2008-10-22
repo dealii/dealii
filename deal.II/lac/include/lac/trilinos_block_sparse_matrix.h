@@ -18,7 +18,6 @@
 #include <base/table.h>
 #include <lac/block_matrix_base.h>
 #include <lac/block_sparse_matrix.h>
-#include <lac/block_sparsity_pattern.h>
 #include <lac/trilinos_sparse_matrix.h>
 #include <lac/trilinos_block_vector.h>
 #include <lac/exceptions.h>
@@ -32,6 +31,11 @@
 
 DEAL_II_NAMESPACE_OPEN
 
+                                   // forward declarations
+class BlockSparsityPattern;
+class BlockCompressedSparsityPattern;
+class BlockCompressedSetSparsityPattern;
+class BlockCompressedSimpleSparsityPattern;
 
 
 namespace TrilinosWrappers
@@ -181,8 +185,9 @@ namespace TrilinosWrappers
 				        * assumes that a quadratic block
 				        * matrix is generated.
                                         */
+      template <typename BlockSparsityType>
       void reinit (const std::vector<Epetra_Map> &input_maps,
-		   const BlockSparsityPattern    &block_sparsity_pattern);
+		   const BlockSparsityType       &block_sparsity_pattern);
 
                                        /**
                                         * Resize the matrix and initialize it
@@ -191,8 +196,9 @@ namespace TrilinosWrappers
                                         * result is a block matrix for which
                                         * all elements are stored locally.
                                         */
-      void reinit (const BlockSparsityPattern &block_sparsity_pattern);
-      
+      template <typename BlockSparsityType>
+      void reinit (const BlockSparsityType &block_sparsity_pattern);
+
                                        /**
                                         * This function initializes the
 				        * Trilinos matrix using the deal.II
@@ -208,7 +214,25 @@ namespace TrilinosWrappers
 		   const ::dealii::BlockSparseMatrix<double> &deal_ii_sparse_matrix,
 		   const double                               drop_tolerance=1e-13);
 
-				       /** 
+                                       /**
+                                        * This function initializes
+				        * the Trilinos matrix using
+				        * the deal.II sparse matrix
+				        * and the entries stored
+				        * therein. It uses a threshold
+				        * to copy only elements whose
+				        * modulus is larger than the
+				        * threshold (so zeros in the
+				        * deal.II matrix can be
+				        * filtered away). Since no
+				        * Epetra_Map is given, all the
+				        * elements will be locally
+				        * stored.
+                                        */
+      void reinit (const ::dealii::BlockSparseMatrix<double> &deal_ii_sparse_matrix,
+		   const double                               drop_tolerance=1e-13);
+
+				       /**
 					* This function calls the compress()
 				        * command of all matrices after 
 				        * the assembly is 
