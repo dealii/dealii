@@ -11,7 +11,7 @@
 //
 //----------------------------  trilinos_solver_01.cc  ---------------------------
 
-// test the PETSc Richardson solver
+// test the Trilinos Richardson solver
 
 
 #include "../tests.h"

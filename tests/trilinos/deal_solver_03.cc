@@ -11,7 +11,7 @@
 //
 //----------------------------  trilinos_deal_solver_03.cc  ---------------------------
 
-// test the GMRES solver using the PETSc matrix and vector classes
+// test the GMRES solver using the Trilinos matrix and vector classes
 
 
 

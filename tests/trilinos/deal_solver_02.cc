@@ -11,7 +11,7 @@
 //
 //----------------------------  trilinos_deal_solver_02.cc  ---------------------------
 
-// test the BiCGStab solver using the PETSc matrix and vector classes
+// test the BiCGStab solver using the Trilinos matrix and vector classes
 
 
 

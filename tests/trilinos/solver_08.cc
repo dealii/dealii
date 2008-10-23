@@ -11,7 +11,7 @@
 //
 //----------------------------  trilinos_solver_08.cc  ---------------------------
 
-// test the PETSc TFQMR solver
+// test the Trilinos TFQMR solver
 
 
 #include "../tests.h"

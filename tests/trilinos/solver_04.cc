@@ -11,7 +11,7 @@
 //
 //----------------------------  trilinos_solver_04.cc  ---------------------------
 
-// test the PETSc BiCG solver
+// test the Trilinos BiCG solver
 
 
 #include "../tests.h"

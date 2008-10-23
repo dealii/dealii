@@ -11,7 +11,7 @@
 //
 //----------------------------  trilinos_solver_02.cc  ---------------------------
 
-// test the PETSc Chebychev solver
+// test the Trilinos Chebychev solver
 
 
 #include "../tests.h"

@@ -11,7 +11,7 @@
 //
 //----------------------------  trilinos_solver_05.cc  ---------------------------
 
-// test the PETSc GMRES solver
+// test the Trilinos GMRES solver
 
 
 #include "../tests.h"

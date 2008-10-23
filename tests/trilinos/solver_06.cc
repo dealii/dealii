@@ -11,7 +11,7 @@
 //
 //----------------------------  trilinos_solver_06.cc  ---------------------------
 
-// test the PETSc Bicgstab solver
+// test the Trilinos Bicgstab solver
 
 
 #include "../tests.h"

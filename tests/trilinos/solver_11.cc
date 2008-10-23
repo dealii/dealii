@@ -11,7 +11,7 @@
 //
 //----------------------------  trilinos_solver_11.cc  ---------------------------
 
-// test the PETSc LSQR solver
+// test the Trilinos LSQR solver
 
 
 #include "../tests.h"

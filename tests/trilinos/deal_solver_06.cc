@@ -11,7 +11,7 @@
 //
 //----------------------------  trilinos_deal_solver_06.cc  ---------------------------
 
-// test the Richardson solver using the PETSc matrix and vector classes
+// test the Richardson solver using the Trilinos matrix and vector classes
 
 
 #include "../tests.h"

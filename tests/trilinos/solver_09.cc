@@ -11,9 +11,9 @@
 //
 //----------------------------  trilinos_solver_09.cc  ---------------------------
 
-// test the PETSc TCQMR solver
+// test the Trilinos TCQMR solver
 //
-// note that this test fails on PETSc 2.1.6 due to a bug in the TCQMR
+// note that this test fails on Trilinos 2.1.6 due to a bug in the TCQMR
 // implementation. this is reported and should be fixed soonish
 
 

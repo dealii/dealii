@@ -11,7 +11,7 @@
 //
 //----------------------------  trilinos_solver_03.cc  ---------------------------
 
-// test the PETSc CG solver
+// test the Trilinos CG solver
 
 
 #include "../tests.h"
