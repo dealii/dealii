@@ -15,7 +15,7 @@
 // this is equivalent to the trilinos_vector_assign_02 test, except that we use
 // operator+= instead of operator=. Now, this does not present a problem,
 // since the compiler does not automatically generate a version of this
-// operator, but simply performs the conversion to PetscScalar, i.e. the
+// operator, but simply performs the conversion to TrilinosScalar, i.e. the
 // argument to the user-defined operator+=. This is not exciting, but since I
 // wrote the test to make sure it works this way, let's keep it then...
 

@@ -24,7 +24,7 @@
 void test (TrilinosWrappers::Vector &v)
 {
                                    // set some elements of the vector
-  PetscScalar norm = 0;
+  TrilinosScalar norm = 0;
   for (unsigned int i=0; i<v.size(); i+=1+i)
     {
       v(i) = i;
@@ -33,7 +33,7 @@ void test (TrilinosWrappers::Vector &v)
   v.compress ();
 
                                    // then check the norm
-  const double eps=typeid(PetscScalar)==typeid(double) ? 1e-14 : 1e-5;
+  const double eps=typeid(TrilinosScalar)==typeid(double) ? 1e-14 : 1e-5;
   Assert (std::fabs(v.norm_sqr() - norm) < eps*norm,
           ExcInternalError());
 

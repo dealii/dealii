@@ -24,7 +24,7 @@
 
 void test (TrilinosWrappers::Vector &v)
 {
-  Vector<PetscScalar> w (v.size());
+  Vector<TrilinosScalar> w (v.size());
 
   for (unsigned int i=0; i<w.size(); ++i)
     w(i) = i;

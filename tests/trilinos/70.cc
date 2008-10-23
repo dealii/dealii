@@ -12,7 +12,7 @@
 //----------------------------  trilinos_70.cc  ---------------------------
 
 
-// check PetscScalar
+// check TrilinosScalar
 
 #include "../tests.h"
 #include <base/logstream.h>
@@ -27,9 +27,9 @@ int main ()
   deallog.depth_console(0);
   deallog.threshold_double(1.e-10);
 
-  if (typeid(PetscScalar)==typeid(double))
+  if (typeid(TrilinosScalar)==typeid(double))
     deallog << "double" << std::endl;
-  else if (typeid(PetscScalar)==typeid(float))
+  else if (typeid(TrilinosScalar)==typeid(float))
     deallog << "float" << std::endl;
   else
     Assert(false, ExcNotImplemented());

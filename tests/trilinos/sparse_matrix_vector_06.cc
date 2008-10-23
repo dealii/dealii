@@ -36,13 +36,13 @@ void test (TrilinosWrappers::Vector &v)
   v.compress ();
 
                                    // <w,Mv>
-  const PetscScalar s = m.matrix_norm_square (v);
+  const TrilinosScalar s = m.matrix_norm_square (v);
 
                                    // make sure we get the expected result
   for (unsigned int i=0; i<v.size(); ++i)
     Assert (v(i) == i, ExcInternalError());
 
-  PetscScalar result = 0;
+  TrilinosScalar result = 0;
   for (unsigned int i=0; i<m.m(); ++i)
     for (unsigned int j=0; j<m.m(); ++j)
       result += (i+2*j)*j*i;

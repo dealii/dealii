@@ -2,7 +2,7 @@
 //    $Id$
 //    Version: $Name$ 
 //
-//    Copyright (C) 2004, 2005 by the deal.II authors
+//    Copyright (C) 2004, 2005, 2008 by the deal.II authors
 //
 //    This file is subject to QPL and may not be  distributed
 //    without copyright and license information. Please refer
@@ -36,11 +36,11 @@ void test (TrilinosWrappers::Vector &v)
 
   v.compress ();
 
-  Vector<double> w; w=v;
-  Vector<float>  x; x=v;
+  Vector<double> w(v.size()); w=v;
+  Vector<float>  x(v.size()); x=v;
 
-  TrilinosWrappers::Vector w1; w1=w;
-  TrilinosWrappers::Vector x1; x1=x;
+  TrilinosWrappers::Vector w1(v.size()); w1=w;
+  TrilinosWrappers::Vector x1(v.size()); x1=x;
   
   for (unsigned int i=0; i<v.size(); ++i)
     {

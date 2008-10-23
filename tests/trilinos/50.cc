@@ -12,7 +12,7 @@
 //----------------------------  trilinos_50.cc  ---------------------------
 
 
-// check TrilinosWrappers::operator = (Vector<T>) with T!=PetscScalar
+// check TrilinosWrappers::operator = (Vector<T>) with T!=TrilinosScalar
 
 #include "../tests.h"
 #include <lac/trilinos_vector.h>
@@ -38,7 +38,7 @@ void test (TrilinosWrappers::Vector &v)
                                    // and do the same. in at least one of the
                                    // two cases, the template argument to
                                    // Vector<T> must be different from
-                                   // PetscScalar
+                                   // TrilinosScalar
   v = w;
   for (unsigned int i=0; i<v.size(); ++i)
     {

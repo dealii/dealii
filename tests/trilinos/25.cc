@@ -12,7 +12,7 @@
 //----------------------------  trilinos_25.cc  ---------------------------
 
 
-// check TrilinosWrappers::Vector::operator = (PetscScalar) with setting to zero
+// check TrilinosWrappers::Vector::operator = (TrilinosScalar) with setting to zero
 
 #include "../tests.h"
 #include <lac/trilinos_vector.h>    
