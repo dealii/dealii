@@ -21,8 +21,8 @@
 
 #include "../tests.h"
 #include <lac/sparse_matrix.h>
-#include <lac/trilinos_parallel_sparse_matrix.h>
-#include <lac/trilinos_parallel_vector.h>
+#include <lac/trilinos_sparse_matrix.h>
+#include <lac/trilinos_vector.h>
 #include <fstream>
 #include <iostream>
 
@@ -32,7 +32,7 @@ void test ()
   const unsigned int N = 200;
 
                                    // build the sparse matrix 
-  TrilinosWrappers::MPI::SparseMatrix matrix (PETSC_COMM_WORLD,
+  TrilinosWrappers::SparseMatrix matrix (PETSC_COMM_WORLD,
                                            N*N, N*N,
                                            N*N, N*N,
                                            5);

@@ -16,7 +16,7 @@
 
 
 #include "../tests.h"
-#include <lac/trilinos_parallel_vector.h>
+#include <lac/trilinos_vector.h>
 
 #include <fstream>
 #include <iostream>

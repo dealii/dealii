@@ -1,4 +1,4 @@
-//----------------------------  trilinos_parallel_sparse_matrix_01.cc  ---------------------------
+//----------------------------  trilinos_sparse_matrix_01.cc  ---------------------------
 //    $Id$
 //    Version: $Name$ 
 //
@@ -9,10 +9,10 @@
 //    to the file deal.II/doc/license.html for the  text  and
 //    further information on this license.
 //
-//----------------------------  trilinos_parallel_sparse_matrix_01.cc  ---------------------------
+//----------------------------  trilinos_sparse_matrix_01.cc  ---------------------------
 
 
-// TrilinosWrappers::MPI::SparseMatrix::reinit(CompressedSparsityPattern) should
+// TrilinosWrappers::SparseMatrix::reinit(CompressedSparsityPattern) should
 // create a matrix that, when filled with elements that match the sparsity
 // pattern, doesn't require any more memory allocation any more. This is
 // tricky to get right, though, and took a while until it worked.
@@ -24,7 +24,7 @@
 // malloc calls have been performed
 
 #include "../tests.h"
-#include <lac/trilinos_parallel_sparse_matrix.h>
+#include <lac/trilinos_sparse_matrix.h>
 #include <lac/compressed_sparsity_pattern.h>
 #include <fstream>
 #include <cstdlib>
@@ -95,7 +95,7 @@ void test ()
   
                                    // now create a matrix with this sparsity
                                    // pattern
-  TrilinosWrappers::MPI::SparseMatrix m;
+  TrilinosWrappers::SparseMatrix m;
   m.reinit (MPI_COMM_WORLD, csp, local_rows_per_process,
             local_rows_per_process, get_this_mpi_process());
 
@@ -115,7 +115,7 @@ void test ()
 
 int main (int argc,char **argv) 
 {
-  std::ofstream logfile("parallel_sparse_matrix_01/output");
+  std::ofstream logfile("sparse_matrix_01/output");
   deallog.attach(logfile);
   deallog.depth_console(0);
   deallog.threshold_double(1.e-10);
