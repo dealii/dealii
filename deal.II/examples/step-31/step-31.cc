@@ -1144,12 +1144,17 @@ void BoussinesqFlowProblem<dim>::setup_dofs ()
     stokes_preconditioner_matrix.collect_sizes();
   }
 
-				   // The generation of the
-				   // temperature matrix follows the
+				   // The creation of the temperature
+				   // matrix (or, rather, matrices,
+				   // since we provide a temperature
+				   // mass matrix and a temperature
+				   // stiffness matrix, that will be
+				   // added together for time
+				   // discretization) follows the
 				   // generation of the Stokes matrix
 				   // &ndash; except that it is much
-				   // easier since we do not need to
-				   // take care of any blocks.
+				   // easier here since we do not need
+				   // to take care of any blocks.
   {
     temperature_mass_matrix.clear ();
     temperature_stiffness_matrix.clear ();
@@ -1165,14 +1170,13 @@ void BoussinesqFlowProblem<dim>::setup_dofs ()
   }
 
 				   // As last action in this function,
-				   // we need to set the vectors for
-				   // the solution $\mathbf u$ and
-				   // $T^k$, the old solutions
-				   // $T^{k-1}$ and $T^{k-2}$
-				   // (required for time stepping) and
-				   // the system right hand sides to
-				   // their correct sizes and block
-				   // structure:
+				   // we set the vectors for the
+				   // solution $\mathbf u$ and $T^k$,
+				   // the old solutions $T^{k-1}$ and
+				   // $T^{k-2}$ (required for time
+				   // stepping) and the system right
+				   // hand sides to their correct
+				   // sizes and block structure:
   stokes_solution.reinit (stokes_block_sizes);
   stokes_rhs.reinit (stokes_block_sizes);
 
@@ -2082,17 +2086,76 @@ void BoussinesqFlowProblem<dim>::assemble_temperature_system ()
 
 
 
-				 // @sect4{BoussinesqFlowProblem::solve}
+				   // @sect4{BoussinesqFlowProblem::solve}
+				   //
+				   // This function solves the linear
+				   // equation systems. According to
+				   // the introduction, we start with
+				   // the Stokes system, where we need
+				   // to generate our block Schur
+				   // preconditioner. Since all the
+				   // relevant actions are implemented
+				   // in the class
+				   // <tt>BlockSchurPreconditioner</tt>,
+				   // all we have to do is to
+				   // initialize the class
+				   // appropriately. What we need to
+				   // pass down is an
+				   // <tt>InverseMatrix</tt> object
+				   // for the pressure mass matrix,
+				   // which we set up using the
+				   // respective class together with
+				   // the IC preconditioner we already
+				   // generated, and the AMG
+				   // preconditioner for the
+				   // velocity-velocity matrix. Note
+				   // that both
+				   // <tt>Mp_preconditioner</tt> and
+				   // <tt>Amg_preconditioner</tt> are
+				   // only pointers, so we use
+				   // <tt>*</tt> to pass down the
+				   // actual preconditioner objects.
+				   // 
+				   // Once the preconditioner is
+				   // ready, we create a GMRES solver
+				   // for the block system. Since we
+				   // are working with Trilinos data
+				   // structures, we have to set the
+				   // respective template argument in
+				   // the solver. GMRES needs to
+				   // internally store temporary
+				   // vectors for each iteration (see
+				   // even the discussion in the
+				   // results section of step-22)
+				   // &ndash; the more vectors it can
+				   // use, the better it will
+				   // generally perform. To let memory
+				   // demands not increase to much, we
+				   // set the number of vectors to
+				   // 100. This means that up to 100
+				   // solver iterations, every
+				   // temporary vector can be
+				   // stored. If the solver needs to
+				   // iterate more often to get the
+				   // specified tolerance, it will
+				   // work on a reduced set of vectors
+				   // by restarting at every 100
+				   // iterations. Then, we solve the
+				   // system and distribute the
+				   // constraints in the Stokes
+				   // system, i.e. hanging nodes and
+				   // no-flux boundary condition, in
+				   // order to have the appropriate
+				   // solution values even at
+				   // constrained dofs. Finally, we
+				   // write the number of iterations
+				   // to the screen.
 template <int dim>
 void BoussinesqFlowProblem<dim>::solve ()
 {
   std::cout << "   Solving..." << std::endl;
 
   {
-				     // Set up inverse matrix for
-				     // pressure mass matrix. Then,
-				     // create the Block Schur
-				     // preconditioner object.
     LinearSolvers::InverseMatrix<TrilinosWrappers::SparseMatrix,
 				 TrilinosWrappers::PreconditionIC>
       mp_inverse (stokes_preconditioner_matrix.block(1,1), *Mp_preconditioner);
@@ -2101,8 +2164,6 @@ void BoussinesqFlowProblem<dim>::solve ()
                                             TrilinosWrappers::PreconditionIC>
       preconditioner (stokes_matrix, mp_inverse, *Amg_preconditioner);
 
-				     // Set up GMRES solver and
-				     // solve.
     SolverControl solver_control (stokes_matrix.m(),
 				  1e-6*stokes_rhs.l2_norm());
 
@@ -2111,21 +2172,47 @@ void BoussinesqFlowProblem<dim>::solve ()
 
     gmres.solve(stokes_matrix, stokes_solution, stokes_rhs, preconditioner);
 
+    stokes_constraints.distribute (stokes_solution);
+
     std::cout << "   "
               << solver_control.last_step()
               << " GMRES iterations for Stokes subsystem."
               << std::endl;
-
-				     // Produce a constistent solution
-				     // field (we can't do this on the 'up'
-				     // vector since it does not have the
-				     // temperature component, but
-				     // hanging_node_constraints has
-				     // constraints also for the
-				     // temperature vector)
-    stokes_constraints.distribute (stokes_solution);
   }
 
+				   // Once we know the Stokes
+				   // solution, we can determine the
+				   // new time step from the maximal
+				   // velocity. We have to do this to
+				   // satisfy the CFL condition since
+				   // convection terms are treated
+				   // explicitly in the temperature
+				   // equation, as discussed in the
+				   // introduction. Next we set up the
+				   // temperature system and the right
+				   // hand side using the function
+				   // <tt>assemble_temperature_system()</tt>. Knowing
+				   // the matrix and right hand side
+				   // of the temperature equation, we
+				   // set up a preconditioner and a
+				   // solver. The temperature matrix
+				   // is a mass matrix plus a Laplace
+				   // matrix times a small number, the
+				   // time step. Hence, the mass
+				   // matrix dominates and we get a
+				   // reasonable good preconditioner
+				   // by simple means, namely SSOR. We
+				   // set the relaxation parameter to
+				   // 1.2. As a solver, we choose the
+				   // conjugate gradient method CG. As
+				   // before, we tell the solver to
+				   // use Trilinos vectors via the
+				   // template argument
+				   // <tt>TrilinosWrappers::Vector</tt>
+				   // at construction. Finally, we
+				   // solve, distribute the hanging
+				   // node constraints and write out
+				   // the number of iterations.
   old_time_step = time_step;    
   time_step = 1./(1.6*dim*std::sqrt(1.*dim)) /
 	      temperature_degree *
@@ -2140,7 +2227,7 @@ void BoussinesqFlowProblem<dim>::solve ()
 
     SolverControl solver_control (temperature_matrix.m(),
 				  1e-8*temperature_rhs.l2_norm());
-    SolverCG<TrilinosWrappers::Vector>   cg (solver_control);
+    SolverCG<TrilinosWrappers::Vector> cg (solver_control);
 
     TrilinosWrappers::PreconditionSSOR preconditioner;
     preconditioner.initialize (temperature_matrix, 1.2);
@@ -2148,7 +2235,6 @@ void BoussinesqFlowProblem<dim>::solve ()
     cg.solve (temperature_matrix, temperature_solution,
 	      temperature_rhs, preconditioner);
 
-				     // produce a consistent temperature field
     temperature_constraints.distribute (temperature_solution);
 
     std::cout << "   "
@@ -2156,6 +2242,11 @@ void BoussinesqFlowProblem<dim>::solve ()
               << " CG iterations for temperature."
               << std::endl;
 
+				   // In the end of this function, we
+				   // step through the vector and read
+				   // out the maximum and minimum
+				   // temperature value, which we also
+				   // want to output.
     double min_temperature = temperature_solution(0),
 	   max_temperature = temperature_solution(0);
     for (unsigned int i=0; i<temperature_solution.size(); ++i)
@@ -2174,7 +2265,53 @@ void BoussinesqFlowProblem<dim>::solve ()
 
 
 
-				 // @sect4{BoussinesqFlowProblem::output_results}
+				   // @sect4{BoussinesqFlowProblem::output_results}
+				   // 
+				   // This function writes the
+				   // solution to a vtk output file
+				   // for visualization, which is done
+				   // every tenth time step. This is
+				   // usually a quite simple task,
+				   // since the deal.II library
+				   // provides functions that do
+				   // almost all the job for us. In
+				   // this case, the situation is a
+				   // bit more complicated, since we
+				   // want to visualize both the
+				   // Stokes solution and the
+				   // temperature as one data set, but
+				   // we have done all the
+				   // calculations based on two
+				   // different. The way we're going
+				   // to achieve this recombination is
+				   // to create a joint DoFHandler
+				   // that collects both components,
+				   // the Stokes solution and the
+				   // temperature solution. This can
+				   // be nicely done by combining the
+				   // finite elements from the two
+				   // systems to form one FESystem,
+				   // and let this collective system
+				   // define a new DoFHandler
+				   // object. To be sure that
+				   // everything was done correctly,
+				   // we perform a sanity check that
+				   // ensures that we got all the dofs
+				   // from both Stokes and temperature
+				   // even in the combined system.
+				   // 
+				   // Next, we create a vector that
+				   // collects the actual solution
+				   // values (up to now, we've just
+				   // provided the tools for it
+				   // without reading any data. Since
+				   // this vector is only going to be
+				   // used for output, we create it as
+				   // a deal.II vector that nicely
+				   // cooperate with the data output
+				   // classes. Remember that we used
+				   // Trilinos vectors for assembly
+				   // and solving.
 template <int dim>
 void BoussinesqFlowProblem<dim>::output_results ()  const
 {
@@ -2191,6 +2328,42 @@ void BoussinesqFlowProblem<dim>::output_results ()  const
   
   Vector<double> joint_solution (joint_dof_handler.n_dofs());
 
+				   // Unfortunately, there is no
+				   // straight-forward relation that
+				   // tells us how to sort Stokes and
+				   // temperature vector into the
+				   // joint vector. The way we can get
+				   // around this trouble is to rely
+				   // on the information collected in
+				   // the FESystem. For each dof in a
+				   // cell, the joint finite element
+				   // knows to which equation
+				   // component (velocity component,
+				   // pressure, or temperature) it
+				   // belongs &ndash; that's the
+				   // information we need! So we step
+				   // through all cells (as a
+				   // complication, we need to create
+				   // iterations for the cells in the
+				   // Stokes system and the
+				   // temperature system, too, even
+				   // though they are the same in all
+				   // the three cases), and for each
+				   // joint cell dof, we read out that
+				   // component using the function
+				   // <tt>joint_fe.system_to_base_index(i).second</tt>. We
+				   // also need to keep track whether
+				   // we're on a Stokes dof or a
+				   // temperature dof, which is
+				   // contained in
+				   // <tt>joint_fe.system_to_base_index(i).first.first</tt>. Eventually,
+				   // the dof_indices data structures
+				   // on either of the three systems
+				   // tell us how the relation between
+				   // global vector and local dofs
+				   // looks like on the present cell,
+				   // which concludes this tedious
+				   // work.
   {
     std::vector<unsigned int> local_joint_dof_indices (joint_fe.dofs_per_cell);
     std::vector<unsigned int> local_stokes_dof_indices (stokes_fe.dofs_per_cell);
@@ -2231,7 +2404,31 @@ void BoussinesqFlowProblem<dim>::output_results ()  const
       }
   }
   
-  
+				   // Next, we proceed as we've done
+				   // in step-22. We create solution
+				   // names (that are going to appear
+				   // in the visualization program for
+				   // the individual components), and
+				   // attach the joint dof handler to
+				   // a DataOut object. The first
+				   // <tt>dim</tt> components are the
+				   // vector velocity, and then we
+				   // have pressure and
+				   // temperature. This information is
+				   // read out using the
+				   // DataComponentInterpretation
+				   // helper class. Next, we attach
+				   // the solution values together
+				   // with the names of its components
+				   // to the output object, and build
+				   // patches according to the degree
+				   // of freedom, which are (sub-)
+				   // elements that describe the data
+				   // for visualization
+				   // programs. Finally, we set a file
+				   // name (that includes the time
+				   // step number) and write the vtk
+				   // file.
   std::vector<std::string> joint_solution_names (dim, "velocity");
   joint_solution_names.push_back ("p");
   joint_solution_names.push_back ("T");
@@ -2261,7 +2458,44 @@ void BoussinesqFlowProblem<dim>::output_results ()  const
 
 
 
-				 // @sect4{BoussinesqFlowProblem::refine_mesh}
+				   // @sect4{BoussinesqFlowProblem::refine_mesh}
+				   // 
+				   // This function takes care of the
+				   // adaptive mesh refinement. The
+				   // three tasks this function
+				   // performs is to first find out
+				   // which cells to refine/coarsen,
+				   // then to actually do the
+				   // refinement and eventually
+				   // transfer the solution vectors
+				   // between the two different
+				   // grids. The first task is simply
+				   // achieved by using the
+				   // well-established Kelly error
+				   // estimator on the temperature (it
+				   // is the temperature we're mainly
+				   // interested in for this program,
+				   // and we need to be accurate in
+				   // regions of high temperature
+				   // gradients, also to not have too
+				   // much numerical diffusion). The
+				   // second task is to actually do
+				   // the remeshing. That involves
+				   // only basic functions as well,
+				   // such as the
+				   // <tt>refine_and_coarsen_fixed_fraction</tt>
+				   // that refines the 80 precent of
+				   // the cells which have the largest
+				   // estimated error and coarsens the
+				   // 10 precent with the smallest
+				   // error. For reasons of limited
+				   // computer ressources, we have to
+				   // set a limit on the maximum
+				   // refinement level. We do this
+				   // after the refinement indicator
+				   // has been applied to the cells,
+				   // and simply unselect cells with
+				   // too high grid level.
 template <int dim>
 void BoussinesqFlowProblem<dim>::refine_mesh (const unsigned int max_grid_level)
 {
@@ -2281,7 +2515,40 @@ void BoussinesqFlowProblem<dim>::refine_mesh (const unsigned int max_grid_level)
 	   cell = triangulation.begin_active(max_grid_level);
 	 cell != triangulation.end(); ++cell)
       cell->clear_refine_flag ();
-  
+
+				   // Before we can apply the mesh
+				   // refinement, we have to prepare
+				   // the solution vectors that should
+				   // be transfered to the new grid
+				   // (we will lose the old grid once
+				   // we have done the
+				   // refinement). What we definetely
+				   // need are the current and the old
+				   // temperature (BDF-2 time stepping
+				   // requires two old
+				   // solutions). Since the
+				   // SolutionTransfer objects only
+				   // support to transfer one object
+				   // per dof handler, we need to
+				   // collect the two temperature
+				   // solutions in one data
+				   // structure. Moreover, we choose
+				   // to transfer the Stokes solution,
+				   // too. The reason for doing so is
+				   // that the Stokes solution will
+				   // not change dramatically from
+				   // step to step, so we get a good
+				   // initial guess for the linear
+				   // solver when we reuse old data,
+				   // which reduces the number of
+				   // needed solver iterations. Next,
+				   // we initialize the
+				   // SolutionTransfer objects, by
+				   // attaching them to the old dof
+				   // handler. With this at place, we
+				   // can prepare the triangulation
+				   // and the data vectors for
+				   // refinement (in this order).
   std::vector<TrilinosWrappers::Vector> x_temperature (2);
   x_temperature[0].reinit (temperature_solution);
   x_temperature[0] = temperature_solution;
@@ -2297,6 +2564,31 @@ void BoussinesqFlowProblem<dim>::refine_mesh (const unsigned int max_grid_level)
   temperature_trans.prepare_for_coarsening_and_refinement(x_temperature);
   stokes_trans.prepare_for_coarsening_and_refinement(x_stokes);
 
+				   // Now everything is ready, so do
+				   // the refinement and recreate the
+				   // dof structure on the new grid,
+				   // and initialize the matrix
+				   // structures and the new vectors
+				   // in the <tt>setup_dofs</tt>
+				   // function. Next, we actually
+				   // perform the interpolation of the
+				   // solutions between the grids. We
+				   // create another copy of temporary
+				   // vectors for temperature (now
+				   // according to the new grid), and
+				   // let the interpolate function do
+				   // the job. Then, the new vector is
+				   // written into the respective
+				   // vector. For the Stokes vector,
+				   // everything is just the same
+				   // &ndash; except that we do not
+				   // need another temporary vector
+				   // since we just interpolate a
+				   // single vector. In the end, we
+				   // have to tell the program that
+				   // the matrices and preconditioners
+				   // need to be regenerated, since
+				   // the mesh has changed.
   triangulation.execute_coarsening_and_refinement ();
   setup_dofs ();
 
@@ -2317,7 +2609,35 @@ void BoussinesqFlowProblem<dim>::refine_mesh (const unsigned int max_grid_level)
 
 
 
-				 // @sect4{BoussinesqFlowProblem::run}
+				   // @sect4{BoussinesqFlowProblem::run}
+				   // 
+ 				   // This function performs all the
+ 				   // essential steps in the
+ 				   // Boussinesq program. It starts by
+ 				   // setting up a grid (depending on
+ 				   // the spatial dimension, we choose
+ 				   // some different level of initial
+ 				   // refinement and additional
+ 				   // adative refinement steps, and
+ 				   // then create a cube in
+ 				   // <tt>dim</tt> dimensions and set
+ 				   // up the dofs for the first
+ 				   // time. Since we want to start the
+ 				   // time stepping already with an
+ 				   // adaptively refined grid, we
+ 				   // perform some pre-refinement
+ 				   // steps, consisting of all
+ 				   // assembly, solution and
+ 				   // refinement, but without actually
+ 				   // advancing in time.
+				   // 
+				   // Before we start, we project the
+				   // initial values to the grid and
+				   // obtain the first data for the
+				   // <tt>old_temperature_solution</tt>
+				   // vector. Then, we initialize time
+				   // step number and time step and
+				   // start the time loop.
 template <int dim>
 void BoussinesqFlowProblem<dim>::run ()
 {
@@ -2352,6 +2672,28 @@ void BoussinesqFlowProblem<dim>::run ()
 		<< ", dt=" << time_step
                 << std::endl;
 
+				   // The first steps in the time loop
+				   // are all obvious &ndash; we
+				   // assemble the Stokes system, the
+				   // preconditioner, the temperature
+				   // matrix (matrices and
+				   // preconditioner do actually only
+				   // change in case we've remeshed
+				   // before), and then do the
+				   // solve. The solution is then
+				   // written to screen. Before going
+				   // on with the next time step, we
+				   // have to check whether we should
+				   // first finish the pre-refinement
+				   // steps or if we should remesh
+				   // (every fifth time step),
+				   // refining up to a level that is
+				   // consistent with initial
+				   // refinement and pre-refinement
+				   // steps. Last in the loop is to
+				   // advance the solutions, i.e. to
+				   // copy the temperature solution to
+				   // the next "older" time level.
       assemble_stokes_system ();
       build_stokes_preconditioner ();
       assemble_temperature_matrix ();
@@ -2379,12 +2721,26 @@ void BoussinesqFlowProblem<dim>::run ()
       old_old_temperature_solution = old_temperature_solution;
       old_temperature_solution     = temperature_solution;      
     }
+				   // Do all the above until we arrive
+				   // at time 100.
   while (time <= 100);
 }
 
 
 
-				 // @sect3{The <code>main</code> function}
+				   // @sect3{The <code>main</code> function}
+				   // 
+				   // The main function looks almost
+				   // the same as in all other
+				   // programs. The only difference is
+				   // that Trilinos wants to get the
+				   // arguments from calling the
+				   // function (argc and argv) in
+				   // order to correctly set up the
+				   // MPI system in case we use those
+				   // compilers (even though this
+				   // program is only meant to be run
+				   // in serial).
 int main (int argc, char *argv[])
 {
 #ifdef DEAL_II_COMPILER_SUPPORTS_MPI
