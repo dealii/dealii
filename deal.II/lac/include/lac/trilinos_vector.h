@@ -326,16 +326,10 @@ namespace TrilinosWrappers
 					* change the map, use the
 					* reinit(const Epetra_Map
 					* &input_map) function.
-					*
-					* Since Trilinos only works on
-					* doubles, this function is
-					* limited to accept only one
-					* possible number type in the
-					* deal.II vector.
 					*/
 	template <typename Number>
 	Vector & 
-	  operator = (const ::dealii::Vector<Number> &v);
+	operator = (const ::dealii::Vector<Number> &v);
 
 				       /**
 					* This reinit function is
@@ -414,7 +408,7 @@ namespace TrilinosWrappers
     {
       u.swap (v);
     }
-
+  
 
 #ifndef DOXYGEN
 
@@ -453,6 +447,16 @@ namespace TrilinosWrappers
       return *this;
     }
 
+
+    template <typename Number>
+    Vector & 
+    Vector::operator = (const ::dealii::Vector<Number> &v)
+    {
+      VectorBase::operator = (v);
+      return *this;
+    }
+    
+    
 #endif
 
   } /* end of namespace MPI */
@@ -594,8 +598,11 @@ namespace TrilinosWrappers
 	operator = (const Vector &V); 
 
     private:
+				       /**
+					* A map indicating the size of the
+					* vector.
+					*/
       Epetra_LocalMap map;
-
   };
 
 
@@ -612,46 +619,54 @@ namespace TrilinosWrappers
  * @relates TrilinosWrappers::Vector
  * @author Martin Kronbichler, Wolfgang Bangerth, 2008
  */
-    inline
-    void swap (Vector &u, Vector &v)
-    {
-      u.swap (v);
-    }
+  inline
+  void swap (Vector &u, Vector &v)
+  {
+    u.swap (v);
+  }
 
 
 #ifndef DOXYGEN
 
-    template <typename number>
-    Vector::Vector (const dealii::Vector<number> &v)
-                    :
+  template <typename number>
+  Vector::Vector (const dealii::Vector<number> &v)
+		  :
 #ifdef DEAL_II_COMPILER_SUPPORTS_MPI
-                    map (v.size(), 0, Epetra_MpiComm(MPI_COMM_WORLD))
+		  map (v.size(), 0, Epetra_MpiComm(MPI_COMM_WORLD))
 #else
-		    map (v.size(), 0, Epetra_SerialComm())
+		  map (v.size(), 0, Epetra_SerialComm())
 #endif
-    {
-      vector = std::auto_ptr<Epetra_FEVector> (new Epetra_FEVector(map, false));
+  {
+    vector = std::auto_ptr<Epetra_FEVector> (new Epetra_FEVector(map, false));
 
-      std::vector<int> indices (v.size());
-      for (unsigned int i=0; i<v.size(); ++i)
-	indices[i] = map.GID(i);
+    std::vector<int> indices (v.size());
+    for (unsigned int i=0; i<v.size(); ++i)
+      indices[i] = map.GID(i);
 
-      const int ierr = vector->ReplaceGlobalValues(v.size(), 0, v.begin(), 
-						   &indices[0]);
-      AssertThrow (ierr == 0, ExcTrilinosError());
-    }
+    const int ierr = vector->ReplaceGlobalValues(v.size(), 0, v.begin(), 
+						 &indices[0]);
+    AssertThrow (ierr == 0, ExcTrilinosError());
+  }
 
   
   
-    inline
-    Vector &
-    Vector::operator = (const TrilinosScalar s)
-    {
-      VectorBase::operator = (s);
+  inline
+  Vector &
+  Vector::operator = (const TrilinosScalar s)
+  {
+    VectorBase::operator = (s);
 
-      return *this;
-    }
+    return *this;
+  }
 
+  template <typename Number>
+  Vector & 
+  Vector::operator = (const ::dealii::Vector<Number> &v)
+  {
+    VectorBase::operator = (v);
+    return *this;
+  }
+  
 #endif
 
 

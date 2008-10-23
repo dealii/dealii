@@ -191,35 +191,6 @@ namespace TrilinosWrappers
 
 
 
-    template <typename Number>
-    Vector &
-    Vector::operator = (const ::dealii::Vector<Number> &v)
-    {
-      Assert (size() == v.size(),
-	      ExcDimensionMismatch(size(), v.size()));
-
-      vector = std::auto_ptr<Epetra_FEVector> (new Epetra_FEVector(map));
-      
-      const int min_my_id = map.MinMyGID();
-      const unsigned int size = map.NumMyElements();
-
-      Assert (map.MaxLID() == size-1,
-	      ExcDimensionMismatch(map.MaxLID(), size-1));
-
-      std::vector<int> indices (size);
-      for (unsigned int i=0; i<size; ++i)
-	indices[i] = map.GID(i);
-
-
-      const int ierr = vector->ReplaceGlobalValues(size, 0, v.begin()+min_my_id, 
-						   &indices[0]);
-      AssertThrow (ierr == 0, ExcTrilinosError());
-
-      return *this;
-    }
-
-
-
     void
     Vector::do_data_exchange (const TrilinosWrappers::SparseMatrix &m,
 			      const Vector                         &v)
@@ -424,30 +395,7 @@ namespace TrilinosWrappers
 
     return *this;
   }
-
-
-
-  template <typename Number>
-  Vector &
-  Vector::operator = (const ::dealii::Vector<Number> &v)
-  {
-    if (size() != v.size())
-      {
-	map = LocalMap (v.size(), 0, vector->Comm());
-	vector = std::auto_ptr<Epetra_FEVector> (new Epetra_FEVector(map));
-      }
-
-    std::vector<int> indices (v.size());
-    for (unsigned int i=0; i<v.size(); ++i)
-      indices[i] = map.GID(i);
-
-    const int ierr = vector->ReplaceGlobalValues(v.size(), 0, v.begin(), 
-						 &indices[0]);
-    AssertThrow (ierr == 0, ExcTrilinosError());
-
-    return *this;
-  }
-
+  
 }
 
 DEAL_II_NAMESPACE_CLOSE

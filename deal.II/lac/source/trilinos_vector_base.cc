@@ -146,6 +146,40 @@ namespace TrilinosWrappers
   }
 
 
+  template <typename number>
+  VectorBase &
+  VectorBase::operator = (const ::dealii::Vector<number> &v)
+  {
+    Assert (size() == v.size(),
+	    ExcDimensionMismatch(size(), v.size()));
+    
+				     // this is probably not very efficient
+				     // but works. in particular, we could do
+				     // better if we know that
+				     // number==TrilinosScalar because then we
+				     // could elide the copying of elements
+				     //
+				     // let's hope this isn't a
+				     // particularly frequent operation
+    std::pair<unsigned int, unsigned int>
+      local_range = this->local_range ();
+    std::vector<unsigned int>   indices (local_range.second -
+					 local_range.first);
+    std::vector<TrilinosScalar> values (local_range.second -
+					local_range.first);
+
+    for (unsigned int i=0; i<local_range.second-local_range.first; ++i)
+      {
+	indices[i] = i + local_range.first;
+	values[i] = v(i + local_range.first);
+      }
+    
+    set (indices.size(), &indices[0], &values[0]);
+      
+    return *this;
+  }
+  
+
 
   bool
   VectorBase::operator == (const VectorBase &v) const
@@ -948,6 +982,11 @@ namespace TrilinosWrappers
 
 } /* end of namespace TrilinosWrappers */
 
+
+namespace TrilinosWrappers
+{
+#include "trilinos_vector_base.inst"
+}
 
 DEAL_II_NAMESPACE_CLOSE
 
