@@ -766,7 +766,8 @@ BoussinesqFlowProblem<dim>::assemble_stokes_preconditioner ()
 
 	    for (unsigned int i=0; i<dofs_per_cell; ++i)
 	      for (unsigned int j=0; j<dofs_per_cell; ++j)
-		local_matrix(i,j) += (scalar_product (phi_grad_u[i], phi_grad_u[j])
+		local_matrix(i,j) += (EquationData::eta *
+				      scalar_product (phi_grad_u[i], phi_grad_u[j])
 				      +
 				      phi_p[i] * phi_p[j])
 				    * stokes_fe_values.JxW(q);
