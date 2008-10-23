@@ -870,8 +870,7 @@ namespace TrilinosWrappers
 	    ExcMessage("The given value is not finite but "
 		       "either infinite or Not A Number (NaN)"));
 
-    if (vector->Map().SameAs(v.vector->Map()) == false)
-	*vector = *v.vector;
+    *vector = *v.vector;
 
     sadd (a, b, w);
   }
