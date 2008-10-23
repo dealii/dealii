@@ -149,6 +149,24 @@ namespace TrilinosWrappers
 					    false)))
   {}
 
+  SparseMatrix::SparseMatrix (const unsigned int m,
+			      const unsigned int n,
+			      const unsigned int n_max_entries_per_row)
+		  :
+#ifdef DEAL_II_COMPILER_SUPPORTS_MPI
+                  row_map (m, 0, Epetra_MpiComm(MPI_COMM_WORLD)),
+                  col_map (n, 0, Epetra_MpiComm(MPI_COMM_WORLD)),
+#else
+                  row_map (m, 0, Epetra_SerialComm()),
+                  col_map (n, 0, Epetra_SerialComm()),
+#endif
+		  last_action (Zero),
+		  compressed (true),
+		  matrix (std::auto_ptr<Epetra_FECrsMatrix>
+				(new Epetra_FECrsMatrix(Copy, row_map, col_map, 
+					int(n_max_entries_per_row), false)))
+  {}
+
   SparseMatrix::SparseMatrix (const SparseMatrix &InputMatrix)
 		  :
                   Subscriptor(),

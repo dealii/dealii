@@ -447,6 +447,21 @@ namespace TrilinosWrappers
 		    const std::vector<unsigned int> &n_entries_per_row);
 
                                        /**
+                                        * Generate a matrix that is completely
+                                        * stored locally, having #m rows and
+                                        * #n columns. The resulting matrix
+                                        * will be completely stored locally.
+					*
+					* The number of columns entries
+					* per row is specified as the
+					* maximum number of entries
+					* argument.
+                                        */
+      SparseMatrix (const unsigned int  m,
+		    const unsigned int  n,
+		    const unsigned int  n_max_entries_per_row);
+
+                                       /**
                                         * Copy constructor. Sets the
                                         * calling matrix to be the same
                                         * as the input matrix, i.e.,
