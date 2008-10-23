@@ -131,7 +131,7 @@ namespace TrilinosWrappers
 		  last_action (Zero),
 		  compressed (true),
 		  matrix (std::auto_ptr<Epetra_FECrsMatrix>
-				(new Epetra_FECrsMatrix(Copy, row_map, col_map, 
+				(new Epetra_FECrsMatrix(Copy, row_map, 
 					int(n_max_entries_per_row), false)))
   {}
 
@@ -144,7 +144,7 @@ namespace TrilinosWrappers
 		  last_action (Zero),
 		  compressed (true),
 		  matrix (std::auto_ptr<Epetra_FECrsMatrix>
-		    (new Epetra_FECrsMatrix(Copy, row_map, col_map, 
+		    (new Epetra_FECrsMatrix(Copy, row_map, 
 		      (int*)const_cast<unsigned int*>(&(n_entries_per_row[0])),
 					    false)))
   {}
@@ -163,7 +163,7 @@ namespace TrilinosWrappers
 		  last_action (Zero),
 		  compressed (true),
 		  matrix (std::auto_ptr<Epetra_FECrsMatrix>
-				(new Epetra_FECrsMatrix(Copy, row_map, col_map, 
+				(new Epetra_FECrsMatrix(Copy, row_map, 
 					int(n_max_entries_per_row), false)))
   {}
 
