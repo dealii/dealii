@@ -487,7 +487,7 @@ namespace Utilities
 
     communicator = Teuchos::rcp (new Epetra_MpiComm (MPI_COMM_WORLD), true);
 #else
-    communicator = Teuchos::rcp (new Epetra_SerialComm (MPI_COMM_WORLD), true);
+    communicator = Teuchos::rcp (new Epetra_SerialComm (), true);
 #endif
   }
 
