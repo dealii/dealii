@@ -1330,7 +1330,6 @@ class ConstraintMatrix : public Subscriptor
 				      */
     static bool check_zero_weight (const std::pair<unsigned int, double> &p);
 
-    //public:
 				     /**
 				      * Dummy table that serves as
 				      * default argument for function
