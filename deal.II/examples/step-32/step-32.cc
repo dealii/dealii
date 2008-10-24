@@ -54,12 +54,6 @@
 #include <numerics/error_estimator.h>
 #include <numerics/solution_transfer.h>
 
-#ifdef DEAL_II_COMPILER_SUPPORTS_MPI
-#  include <Epetra_MpiComm.h>
-#else
-#  include <Epetra_SerialComm.h>
-#endif
-
 #include <Epetra_Map.h>
 
 #include <fstream>
@@ -264,7 +258,7 @@ template <int dim>
 class BoussinesqFlowProblem
 {
   public:
-    BoussinesqFlowProblem ();
+    BoussinesqFlowProblem (Utilities::TrilinosTools &trilinos_tools);
     void run ();
 
   private:
@@ -297,11 +291,7 @@ class BoussinesqFlowProblem
 		      const double                        old_time_step);
 
 
-#ifdef DEAL_II_COMPILER_SUPPORTS_MPI
-    Epetra_MpiComm                      trilinos_communicator;
-#else
-    Epetra_SerialComm                   trilinos_communicator;
-#endif
+    Utilities::TrilinosTools            trilinos_tools;
     
     ConditionalOStream                  pcout;
 
@@ -353,12 +343,10 @@ class BoussinesqFlowProblem
 
 				 // @sect4{BoussinesqFlowProblem::BoussinesqFlowProblem}
 template <int dim>
-BoussinesqFlowProblem<dim>::BoussinesqFlowProblem ()
+BoussinesqFlowProblem<dim>::BoussinesqFlowProblem (Utilities::TrilinosTools &trilinos_tools)
                 :
-#ifdef DEAL_II_COMPILER_SUPPORTS_MPI
-		trilinos_communicator (MPI_COMM_WORLD),
-#endif
-		pcout (std::cout, trilinos_communicator.MyPID()==0),
+                trilinos_tools (trilinos_tools),
+		pcout (std::cout, trilinos_tools.comm().MyPID()==0),
 
 		triangulation (Triangulation<dim>::maximum_smoothing),
 
@@ -371,7 +359,7 @@ BoussinesqFlowProblem<dim>::BoussinesqFlowProblem ()
 		temperature_fe (temperature_degree),
                 temperature_dof_handler (triangulation),
 
-		temperature_partitioner (0, 0, trilinos_communicator),
+		temperature_partitioner (0, 0, trilinos_tools.comm()),
 
                 time_step (0),
 		old_time_step (0),
@@ -401,7 +389,7 @@ double BoussinesqFlowProblem<dim>::get_maximal_velocity () const
     cell = stokes_dof_handler.begin_active(),
     endc = stokes_dof_handler.end();
   for (; cell!=endc; ++cell)
-    if (cell->subdomain_id() == (unsigned int)trilinos_communicator.MyPID())
+    if (cell->subdomain_id() == (unsigned int)trilinos_tools.comm().MyPID())
       {
 	fe_values.reinit (cell);
 	fe_values.get_function_values (localized_stokes_solution, stokes_values);
@@ -568,7 +556,7 @@ void BoussinesqFlowProblem<dim>::setup_dofs ()
   std::vector<unsigned int> stokes_sub_blocks (dim+1,0);
   stokes_sub_blocks[dim] = 1;
 
-  GridTools::partition_triangulation (trilinos_communicator.NumProc(), 
+  GridTools::partition_triangulation (trilinos_tools.comm().NumProc(), 
 				      triangulation);
 
   {
@@ -623,7 +611,7 @@ void BoussinesqFlowProblem<dim>::setup_dofs ()
     std::vector<unsigned int> local_dofs (dim+1);
     DoFTools::
       count_dofs_with_subdomain_association (stokes_dof_handler,
-					     trilinos_communicator.MyPID(),
+					     trilinos_tools.comm().MyPID(),
 					     local_dofs);
     unsigned int n_local_velocities = 0;
     for (unsigned int c=0; c<dim; ++c)
@@ -631,9 +619,9 @@ void BoussinesqFlowProblem<dim>::setup_dofs ()
 
     const unsigned int n_local_pressures = local_dofs[dim];
 
-    Epetra_Map map_u(n_u, n_local_velocities, 0, trilinos_communicator);
+    Epetra_Map map_u(n_u, n_local_velocities, 0, trilinos_tools.comm());
     stokes_partitioner.push_back (map_u);
-    Epetra_Map map_p(n_p, n_local_pressures, 0, trilinos_communicator);
+    Epetra_Map map_p(n_p, n_local_pressures, 0, trilinos_tools.comm());
     stokes_partitioner.push_back (map_p);
   }
   {
@@ -695,9 +683,9 @@ void BoussinesqFlowProblem<dim>::setup_dofs ()
     = Epetra_Map (n_T,
 		  DoFTools::count_dofs_with_subdomain_association
 		  (temperature_dof_handler,
-		   trilinos_communicator.MyPID()),
+		   trilinos_tools.comm().MyPID()),
 		  0,
-		  trilinos_communicator);
+		  trilinos_tools.comm());
   {
     temperature_mass_matrix.clear ();
     temperature_stiffness_matrix.clear ();
@@ -751,7 +739,7 @@ BoussinesqFlowProblem<dim>::assemble_stokes_preconditioner ()
     cell = stokes_dof_handler.begin_active(),
     endc = stokes_dof_handler.end();
   for (; cell!=endc; ++cell)
-    if (cell->subdomain_id() == (unsigned int)trilinos_communicator.MyPID())
+    if (cell->subdomain_id() == (unsigned int)trilinos_tools.comm().MyPID())
       {
 	stokes_fe_values.reinit (cell);
 	local_matrix = 0;
@@ -876,7 +864,7 @@ void BoussinesqFlowProblem<dim>::assemble_stokes_system ()
     temperature_cell = temperature_dof_handler.begin_active();
   
   for (; cell!=endc; ++cell, ++temperature_cell)
-    if (cell->subdomain_id() == (unsigned int)trilinos_communicator.MyPID())
+    if (cell->subdomain_id() == (unsigned int)trilinos_tools.comm().MyPID())
       {
 	stokes_fe_values.reinit (cell);
 	temperature_fe_values.reinit (temperature_cell);
@@ -977,7 +965,7 @@ void BoussinesqFlowProblem<dim>::assemble_temperature_matrix ()
     cell = temperature_dof_handler.begin_active(),
     endc = temperature_dof_handler.end();
   for (; cell!=endc; ++cell)
-    if (cell->subdomain_id() == (unsigned int)trilinos_communicator.MyPID())
+    if (cell->subdomain_id() == (unsigned int)trilinos_tools.comm().MyPID())
       {
 	local_mass_matrix = 0;
 	local_stiffness_matrix = 0;
@@ -1094,7 +1082,7 @@ void BoussinesqFlowProblem<dim>::assemble_temperature_system ()
     stokes_cell = stokes_dof_handler.begin_active();
 
   for (; cell!=endc; ++cell, ++stokes_cell)
-    if (cell->subdomain_id() == (unsigned int)trilinos_communicator.MyPID() )
+    if (cell->subdomain_id() == (unsigned int)trilinos_tools.comm().MyPID() )
       {
 	local_rhs = 0;
   
@@ -1363,7 +1351,7 @@ void BoussinesqFlowProblem<dim>::output_results ()  const
 
   DataOut<dim> data_out;
 
-  if (trilinos_communicator.MyPID() == 0)
+  if (trilinos_tools.comm().MyPID() == 0)
     {
       data_out.attach_dof_handler (joint_dof_handler);
 
@@ -1513,20 +1501,13 @@ void BoussinesqFlowProblem<dim>::run ()
 				 // @sect3{The <code>main</code> function}
 int main (int argc, char *argv[])
 {
-#ifdef DEAL_II_COMPILER_SUPPORTS_MPI
-  MPI_Init (&argc,&argv);
-#else
-  (void)argc;
-  (void)argv;
-#endif
-
-  //sleep (20);
-
   try
     {
       deallog.depth_console (0);
+      
+      Utilities::TrilinosTools trilinos(&argc, &argv);
 
-      BoussinesqFlowProblem<2> flow_problem;
+      BoussinesqFlowProblem<2> flow_problem (trilinos);
       flow_problem.run ();
     }
   catch (std::exception &exc)
@@ -1553,10 +1534,6 @@ int main (int argc, char *argv[])
                 << std::endl;
       return 1;
     }
-
-#ifdef DEAL_II_COMPILER_SUPPORTS_MPI
-  MPI_Finalize();
-#endif
 
   return 0;
 }

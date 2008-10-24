@@ -2744,16 +2744,11 @@ void BoussinesqFlowProblem<dim>::run ()
 				   // in serial).
 int main (int argc, char *argv[])
 {
-#ifdef DEAL_II_COMPILER_SUPPORTS_MPI
-  MPI_Init (&argc,&argv);
-#else
-  (void)argc;
-  (void)argv;
-#endif
-  
   try
     {
       deallog.depth_console (0);
+
+      Utilities::TrilinosTools trilinos (&argc, &argv);
 
       BoussinesqFlowProblem<2> flow_problem;
       flow_problem.run ();
@@ -2782,10 +2777,6 @@ int main (int argc, char *argv[])
                 << std::endl;
       return 1;
     }
-    
-#ifdef DEAL_II_COMPILER_SUPPORTS_MPI
-  MPI_Finalize();
-#endif
 
   return 0;
 }

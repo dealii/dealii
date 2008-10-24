@@ -459,7 +459,83 @@ namespace Utilities
     }
 #endif
   }
-  
+
+
+
+#ifdef DEAL_II_USE_TRILINOS
+
+
+  TrilinosTools::TrilinosTools (int* argc, char*** argv)
+                      :
+                      owns_mpi (true),
+#ifdef DEAL_II_COMPILER_SUPPORTS_MPI
+		      use_mpi (true)
+#else
+		      use_mpi (false)
+#endif
+  {
+#ifdef DEAL_II_COMPILER_SUPPORTS_MPI
+    int MPI_has_been_started = 0;
+    MPI_Initialized(&MPI_has_been_started);
+    Assert (MPI_has_been_started == 0,
+	    ExcMessage ("MPI error. You can only start MPI once!"));
+
+    int mpi_err;
+    mpi_err = MPI_Init (argc, argv);
+    Assert (mpi_err == 0,
+	    ExcMessage ("MPI could not be initialized."));
+
+    communicator = Teuchos::rcp (new Epetra_MpiComm (MPI_COMM_WORLD), true);
+#else
+    communicator = Teuchos::rcp (new Epetra_SerialComm (MPI_COMM_WORLD), true);
+#endif
+  }
+
+
+
+  TrilinosTools::TrilinosTools (const TrilinosTools &InputTrilinos)
+                      :
+                      owns_mpi (false),
+#ifdef DEAL_II_COMPILER_SUPPORTS_MPI
+		      use_mpi (true),
+#else
+		      use_mpi (false),
+#endif
+		      communicator (&*InputTrilinos.communicator, false)
+  {}
+
+
+
+  TrilinosTools::~TrilinosTools()
+  {
+    int mpi_err = 0;
+
+#ifdef DEAL_II_COMPILER_SUPPORTS_MPI
+    if (use_mpi == true && owns_mpi == true)
+      mpi_err = MPI_Finalize();
+#endif
+
+    Assert (mpi_err == 0,
+	    ExcMessage ("An error occurred while calling MPI_Finalize()"));
+  }
+
+
+  const Epetra_Comm&
+  TrilinosTools::comm() const
+  {
+    return *communicator;
+  }
+
+
+
+  bool
+  TrilinosTools::trilinos_uses_mpi () const
+  {
+    return use_mpi;
+  }
+
+#endif
+
 }
 
 DEAL_II_NAMESPACE_CLOSE

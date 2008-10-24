@@ -26,6 +26,16 @@
 typedef int MPI_Comm;
 #endif
 
+#ifdef DEAL_II_USE_TRILINOS
+#  include <Teuchos_RCP.hpp>
+#  include <Epetra_Comm.h>
+#  ifdef DEAL_II_COMPILER_SUPPORTS_MPI
+#    include <Epetra_MpiComm.h>
+#  else
+#    include <Epetra_SerialComm.h>
+#  endif
+#endif
+
 DEAL_II_NAMESPACE_OPEN
 
 
@@ -222,6 +232,108 @@ namespace Utilities
 				      */
     unsigned int get_this_mpi_process (const MPI_Comm &mpi_communicator);
   }
+
+
+
+  /**
+   * This class provides the basic structures for the use of the
+   * Trilinos classes such as matrices, vectors, and
+   * preconditioners. The most important function in this class is
+   * <tt>comm()</tt>, which is needed for the initialization of
+   * Trilinos Epetra_Maps, which design the parallel distribution of
+   * vectors and matrices. Moreover, this class provides a unified
+   * interface to both serial and parallel implementations of
+   * Trilinos, sets up the MPI communicator in case the programs are
+   * run in parallel, and correctly terminates all processes when the
+   * destructor is called. An example usage of this class is shown in
+   * @ref step_32 step-32.
+   */
+#ifdef DEAL_II_USE_TRILINOS
+  class TrilinosTools
+  {
+    public:
+				     /**
+				      * Constructor. Takes the
+				      * arguments from the command
+				      * line (in case of MPI, the
+				      * number of processes is
+				      * specified there), and sets up
+				      * a respective communicator by
+				      * calling <tt>MPI_Init()</tt>.
+				      */
+      TrilinosTools (int*    argc,
+		     char*** argv);
+
+				     /**
+				      * Copy constructor. Takes the
+				      * Trilinos communicator from the
+				      * input object and copies all
+				      * content. Note that the copied
+				      * class cannot own the MPI
+				      * process, and hence, the
+				      * original object needs to be
+				      * around as long as the copy.
+				      */
+      TrilinosTools(const TrilinosTools &InputTrilinos);
+
+				     /**
+				      * Destructor. Calls
+				      * <tt>MPI_Finalize()</tt> in
+				      * case this class owns the MPI
+				      * process.
+				      */
+      ~TrilinosTools();
+
+				     /**
+				      * Returns a Trilinos Epetra_Comm
+				      * object needed for creation of
+				      * Epetra_Maps.
+				      */
+      const Epetra_Comm& comm() const;
+
+				     /**
+				      * Returns whether we are using a
+				      * MPI version or a serial
+				      * version of Trilinos.
+				      */
+      bool trilinos_uses_mpi() const;
+
+    private:
+				     /**
+				      * This flag tells the class
+				      * whether it owns the MPI
+				      * process (i.e., it has been
+				      * constructed using the
+				      * argc/argv input, or it has
+				      * been copied). In the former
+				      * case, the command
+				      * <tt>MPI_Finalize()</tt> will
+				      * be called at destruction.
+				      */
+      const bool owns_mpi;
+
+				     /**
+				      * This flag tells whether we use
+				      * MPI or not.
+				      */
+      const bool use_mpi;
+
+				     /**
+				      * The actual communicator
+				      * object. If we run the program
+				      * in serial, we will have
+				      * another communicator than when
+				      * running in parallel.
+				      */
+#ifdef DEAL_II_COMPILER_SUPPORTS_MPI
+      Teuchos::RCP<Epetra_MpiComm> communicator;
+#else
+      Teuchos::RCP<Epetra_SerialComm> communicator;
+#endif
+  };
+
+#endif
+
 }
 
 
