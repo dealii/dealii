@@ -1005,85 +1005,74 @@ void BoussinesqFlowProblem<dim>::setup_dofs ()
             << std::endl;
   
 				   // The next step is to create the
-				   // sparsity pattern for the Stokes
-				   // and temperature system matrices
-				   // as well as the preconditioner
-				   // matrix from which we build the
-				   // Stokes preconditioner. As in
-				   // step-22, we choose to create the
+				   // sparsity pattern for the Stokes and
+				   // temperature system matrices as well as
+				   // the preconditioner matrix from which
+				   // we build the Stokes preconditioner. As
+				   // in step-22, we choose to create the
 				   // pattern not as in the first few
-				   // tutorial programs, but by using
-				   // the blocked version of
-				   // CompressedSetSparsityPattern.
-				   // The reason for doing this is
-				   // mainly memory, that is, the
-				   // basic procedures consume too
-				   // much memory when used in three
-				   // spatial dimensions as we intend
+				   // tutorial programs, but by using the
+				   // blocked version of
+				   // CompressedSetSparsityPattern.  The
+				   // reason for doing this is mainly
+				   // memory, that is, the basic procedures
+				   // consume too much memory when used in
+				   // three spatial dimensions as we intend
 				   // to do for this program.
 				   // 
-				   // So, we first release the memory
-				   // stored in the matrices, then set
-				   // up an object of type
+				   // So, we first release the memory stored
+				   // in the matrices, then set up an object
+				   // of type
 				   // BlockCompressedSetSparsityPattern
-				   // consisting of $2\times 2$ blocks
-				   // (for the Stokes system matrix
-				   // and preconditioner) or
-				   // CompressedSparsityPattern (for
-				   // the temperature part). We then
-				   // fill these sparsity patterns
-				   // with the nonzero pattern, taking
-				   // into account that for the Stokes
-				   // system matrix, there are no
-				   // entries in the pressure-pressure
-				   // block (but all velocity vector
-				   // components couple with each
-				   // other and with the
-				   // pressure). Similarly, in the
-				   // Stokes preconditioner matrix,
-				   // only the diagonal blocks are
-				   // nonzero, since we use the vector
-				   // Laplacian as discussed in the
-				   // introduction. This operator only
-				   // couples each vector component of
-				   // the Laplacian with itself, but
-				   // not with the other vector
-				   // components. Though, the operator
-				   // is subject to the application of
+				   // consisting of $2\times 2$ blocks (for
+				   // the Stokes system matrix and
+				   // preconditioner) or
+				   // CompressedSparsityPattern (for the
+				   // temperature part). We then fill these
+				   // sparsity patterns with the nonzero
+				   // pattern, taking into account that for
+				   // the Stokes system matrix, there are no
+				   // entries in the pressure-pressure block
+				   // (but all velocity vector components
+				   // couple with each other and with the
+				   // pressure). Similarly, in the Stokes
+				   // preconditioner matrix, only the
+				   // diagonal blocks are nonzero, since we
+				   // use the vector Laplacian as discussed
+				   // in the introduction. This operator
+				   // only couples each vector component of
+				   // the Laplacian with itself, but not
+				   // with the other vector
+				   // components. Though, the operator is
+				   // subject to the application of
 				   // constraints which couple vector
-				   // components at the boundary
-				   // again.
+				   // components at the boundary again.
 				   //
-				   // When generating the sparsity
-				   // pattern, we directly apply the
-				   // constraints from hanging nodes
-				   // and no-flux boundary
-				   // conditions. This approach was
-				   // already used in step-27, but is
-				   // different from the one in early
-				   // tutorial programs. The reason
-				   // for doing so is that later
-				   // during assembly we are going to
-				   // distribute the constraints
-				   // immediately when transferring
-				   // local to global
-				   // dofs. Consequently, there will
-				   // be no data written at positions
-				   // of constrained degrees of
-				   // freedom, so we can let the
+				   // When generating the sparsity pattern,
+				   // we directly apply the constraints from
+				   // hanging nodes and no-flux boundary
+				   // conditions. This approach was already
+				   // used in step-27, but is different from
+				   // the one in early tutorial
+				   // programs. The reason for doing so is
+				   // that later during assembly we are
+				   // going to distribute the constraints
+				   // immediately when transferring local to
+				   // global dofs. Consequently, there will
+				   // be no data written at positions of
+				   // constrained degrees of freedom, so we
+				   // can let the
 				   // DoFTools::make_sparsity_pattern
-				   // function omit these entries by
-				   // setting the last boolean flag to
-				   // <tt>false</tt>. Once the
-				   // sparsity pattern is ready, we
-				   // can use it to initialize the
-				   // Trilinos matrices. Note that the
-				   // Trilinos matrices store the
-				   // sparsity pattern internally, so
-				   // there is no need to keep the
-				   // sparsity pattern around after
-				   // the initialization of the
-				   // matrix.
+				   // function omit these entries by setting
+				   // the last boolean flag to
+				   // <tt>false</tt>. Once the sparsity
+				   // pattern is ready, we can use it to
+				   // initialize the Trilinos matrices. Note
+				   // that the Trilinos matrices store the
+				   // sparsity pattern internally, so there
+				   // is no need to keep the sparsity
+				   // pattern around after the
+				   // initialization of the matrix.
   stokes_block_sizes.resize (2);
   stokes_block_sizes[0] = n_u;
   stokes_block_sizes[1] = n_p;
@@ -1112,7 +1101,6 @@ void BoussinesqFlowProblem<dim>::setup_dofs ()
 				     stokes_constraints, false);
 
     stokes_matrix.reinit (csp);
-    stokes_matrix.collect_sizes();
   }
 
   {
@@ -1141,20 +1129,18 @@ void BoussinesqFlowProblem<dim>::setup_dofs ()
 				     stokes_constraints, false);
 
     stokes_preconditioner_matrix.reinit (csp);
-    stokes_preconditioner_matrix.collect_sizes();
   }
 
-				   // The creation of the temperature
-				   // matrix (or, rather, matrices,
-				   // since we provide a temperature
-				   // mass matrix and a temperature
-				   // stiffness matrix, that will be
-				   // added together for time
-				   // discretization) follows the
-				   // generation of the Stokes matrix
-				   // &ndash; except that it is much
-				   // easier here since we do not need
-				   // to take care of any blocks.
+				   // The creation of the temperature matrix
+				   // (or, rather, matrices, since we
+				   // provide a temperature mass matrix and
+				   // a temperature stiffness matrix, that
+				   // will be added together for time
+				   // discretization) follows the generation
+				   // of the Stokes matrix &ndash; except
+				   // that it is much easier here since we
+				   // do not need to take care of any
+				   // blocks.
   {
     temperature_mass_matrix.clear ();
     temperature_stiffness_matrix.clear ();
@@ -1169,14 +1155,13 @@ void BoussinesqFlowProblem<dim>::setup_dofs ()
     temperature_stiffness_matrix.reinit (csp);
   }
 
-				   // As last action in this function,
-				   // we set the vectors for the
-				   // solution $\mathbf u$ and $T^k$,
-				   // the old solutions $T^{k-1}$ and
-				   // $T^{k-2}$ (required for time
-				   // stepping) and the system right
-				   // hand sides to their correct
-				   // sizes and block structure:
+				   // As last action in this function, we
+				   // set the vectors for the solution
+				   // $\mathbf u$ and $T^k$, the old
+				   // solutions $T^{k-1}$ and $T^{k-2}$
+				   // (required for time stepping) and the
+				   // system right hand sides to their
+				   // correct sizes and block structure:
   stokes_solution.reinit (stokes_block_sizes);
   stokes_rhs.reinit (stokes_block_sizes);
 
@@ -1191,31 +1176,27 @@ void BoussinesqFlowProblem<dim>::setup_dofs ()
 
 				 // @sect4{BoussinesqFlowProblem::assemble_stokes_preconditioner}
 				 // 
-                                 // This function assembles the matrix
-                                 // we use for preconditioning the
-                                 // Stokes system. What we need are a
-                                 // vector Laplace matrix on the
-                                 // velocity components and a mass
-                                 // matrix on the pressure
-                                 // component. We start by generating
-                                 // a quadrature object of appropriate
-                                 // order, the FEValues object that
-                                 // can give values and gradients at
-                                 // the quadrature points (together
-                                 // with quadrature weights). Next we
-                                 // create data structures for the
-                                 // cell matrix and the relation
-                                 // between local and global DoFs. The
-                                 // vectors <tt>phi_grad_u</tt> and
-                                 // <tt>phi_p</tt> are going to hold
-                                 // the values of the basis functions
-                                 // in order to faster build up the
-                                 // local matrices, as was already
-                                 // done in step-22. Before we start
-                                 // the loop over all active cells, we
-                                 // have to specify which components
-                                 // are pressure and which are
-                                 // velocity.
+                                 // This function assembles the matrix we
+                                 // use for preconditioning the Stokes
+                                 // system. What we need are a vector
+                                 // Laplace matrix on the velocity
+                                 // components and a mass matrix on the
+                                 // pressure component. We start by
+                                 // generating a quadrature object of
+                                 // appropriate order, the FEValues object
+                                 // that can give values and gradients at
+                                 // the quadrature points (together with
+                                 // quadrature weights). Next we create data
+                                 // structures for the cell matrix and the
+                                 // relation between local and global
+                                 // DoFs. The vectors <tt>phi_grad_u</tt>
+                                 // and <tt>phi_p</tt> are going to hold the
+                                 // values of the basis functions in order
+                                 // to faster build up the local matrices,
+                                 // as was already done in step-22. Before
+                                 // we start the loop over all active cells,
+                                 // we have to specify which components are
+                                 // pressure and which are velocity.
 template <int dim>
 void
 BoussinesqFlowProblem<dim>::assemble_stokes_preconditioner ()
@@ -1227,8 +1208,8 @@ BoussinesqFlowProblem<dim>::assemble_stokes_preconditioner ()
 				  update_JxW_values |
 				  update_values |
 				  update_gradients);
-  const unsigned int   dofs_per_cell   = stokes_fe.dofs_per_cell;
 
+  const unsigned int   dofs_per_cell   = stokes_fe.dofs_per_cell;
   const unsigned int   n_q_points      = quadrature_formula.size();
 
   FullMatrix<double>   local_matrix (dofs_per_cell, dofs_per_cell);
@@ -1248,25 +1229,22 @@ BoussinesqFlowProblem<dim>::assemble_stokes_preconditioner ()
       stokes_fe_values.reinit (cell);
       local_matrix = 0;
 
-				   // The creation of the local matrix
-				   // is very simple. There are only a
-				   // Laplace term (on the velocity)
-				   // and a mass matrix to be
-				   // generated, so the creation of
-				   // the local matrix is done in two
-				   // lines, if we first shortcut to
-				   // the FE data. Once the local
-				   // matrix is ready (loop over rows
-				   // and columns in the local matrix
-				   // on each quadrature point), we
-				   // get the local DoF indices and
-				   // write the local information into
-				   // the global matrix. We do this as
-				   // in step-27, i.e. we directly
-				   // apply the constraints from
-				   // hanging nodes locally. By doing
-				   // so, we don't have to do that
-				   // afterwards.
+				   // The creation of the local matrix is
+				   // very simple. There are only a Laplace
+				   // term (on the velocity) and a mass
+				   // matrix to be generated, so the
+				   // creation of the local matrix is done
+				   // in two lines, if we first shortcut to
+				   // the FE data. Once the local matrix is
+				   // ready (loop over rows and columns in
+				   // the local matrix on each quadrature
+				   // point), we get the local DoF indices
+				   // and write the local information into
+				   // the global matrix. We do this as in
+				   // step-27, i.e. we directly apply the
+				   // constraints from hanging nodes
+				   // locally. By doing so, we don't have to
+				   // do that afterwards.
       for (unsigned int q=0; q<n_q_points; ++q)
 	{
 	  for (unsigned int k=0; k<dofs_per_cell; ++k)
@@ -1295,52 +1273,45 @@ BoussinesqFlowProblem<dim>::assemble_stokes_preconditioner ()
 
 				   // @sect4{BoussinesqFlowProblem::assemble_stokes_preconditioner}
 				   // 
-				   // This function generates the
-				   // inner preconditioners that are
-				   // going to be used for the Schur
-				   // complement block
+				   // This function generates the inner
+				   // preconditioners that are going to be
+				   // used for the Schur complement block
 				   // preconditioner. Since the
 				   // preconditioners need only to be
-				   // regenerated when the matrices
-				   // change, this function does not
-				   // have to do anything in case the
-				   // matrices have not changed (i.e.,
-				   // the flag
+				   // regenerated when the matrices change,
+				   // this function does not have to do
+				   // anything in case the matrices have not
+				   // changed (i.e., the flag
 				   // <tt>rebuild_stokes_preconditioner</tt>
 				   // has the value <tt>false</tt>).
 				   // 
-				   // Next, we set up the
-				   // preconditioner for the
-				   // velocity-velocity matrix
+				   // Next, we set up the preconditioner for
+				   // the velocity-velocity matrix
 				   // <i>A</i>. As explained in the
-				   // introduction, we are going to
-				   // use an AMG preconditioner based
-				   // on a vector Laplace matrix
-				   // $\hat{A}$ (which is spectrally
-				   // close to the Stokes matrix
+				   // introduction, we are going to use an
+				   // AMG preconditioner based on a vector
+				   // Laplace matrix $\hat{A}$ (which is
+				   // spectrally close to the Stokes matrix
 				   // <i>A</i>). Usually, the
 				   // TrilinosWrappers::PreconditionAMG
-				   // class can be seen as a good
-				   // black-box preconditioner which
-				   // does not need any special
-				   // knowledge. In this case,
-				   // however, we have to be careful:
-				   // since we build an AMG for a
-				   // vector problem, we have to tell
-				   // the preconditioner setup which
-				   // dofs belong to which vector
-				   // component. We do this using the
+				   // class can be seen as a good black-box
+				   // preconditioner which does not need any
+				   // special knowledge. In this case,
+				   // however, we have to be careful: since
+				   // we build an AMG for a vector problem,
+				   // we have to tell the preconditioner
+				   // setup which dofs belong to which
+				   // vector component. We do this using the
 				   // function
-				   // DoFTools::extract_constant_modes,
-				   // a function that generates a
-				   // bunch of <tt>dim</tt> vectors,
-				   // where each one has ones in the
-				   // respective component of the
-				   // vector problem and zeros
+				   // DoFTools::extract_constant_modes, a
+				   // function that generates a bunch of
+				   // <tt>dim</tt> vectors, where each one
+				   // has ones in the respective component
+				   // of the vector problem and zeros
 				   // elsewhere. Hence, these are the
-				   // constant modes on each
-				   // component, which explains the
-				   // name of the variable.
+				   // constant modes on each component,
+				   // which explains the name of the
+				   // variable.
 template <int dim>
 void
 BoussinesqFlowProblem<dim>::build_stokes_preconditioner ()
@@ -1363,55 +1334,46 @@ BoussinesqFlowProblem<dim>::build_stokes_preconditioner ()
   TrilinosWrappers::PreconditionAMG::AdditionalData amg_data;
   amg_data.constant_modes = constant_modes;
 
-				   // Next, we set some more options
-				   // of the AMG preconditioner. In
-				   // particular, we use quadratic
-				   // basis functions for the velocity
-				   // matrix, which we need to tell
-				   // the AMG setup (this implies more
-				   // nonzero elements in the matrix,
-				   // so that a more rubust algorithm
-				   // needs to be chosen
-				   // internally). Moreover, we want
-				   // to be able to control how the
-				   // coarsening structure is build
-				   // up. The way AMG does this is to
-				   // look which matrix entries are of
-				   // similar size than the diagonal
-				   // entry in order to algebraically
-				   // build a coarse-grid
-				   // structure. By setting the
-				   // parameter
-				   // <tt>aggregation_threshold</tt>
-				   // to 0.05, we specify that all
-				   // entries that are more than five
-				   // precent of size of some diagonal
-				   // pivots in that row should form
-				   // one coarse grid point. This
-				   // parameter is rather ad-hoc, and
-				   // some fine-tuning of it can
+				   // Next, we set some more options of the
+				   // AMG preconditioner. In particular,
+				   // need to tell the AMG setup that we use
+				   // quadratic basis functions for the
+				   // velocity matrix (this implies more
+				   // nonzero elements in the matrix, so
+				   // that a more rubust algorithm needs to
+				   // be chosen internally). Moreover, we
+				   // want to be able to control how the
+				   // coarsening structure is build up. The
+				   // way AMG does this is to look which
+				   // matrix entries are of similar size
+				   // than the diagonal entry in order to
+				   // algebraically build a coarse-grid
+				   // structure. By setting the parameter
+				   // <tt>aggregation_threshold</tt> to
+				   // 0.05, we specify that all entries that
+				   // are more than five precent of size of
+				   // some diagonal pivots in that row
+				   // should form one coarse grid
+				   // point. This parameter is rather
+				   // ad-hoc, and some fine-tuning of it can
 				   // influence the performance of the
-				   // preconditioner. As a rule of
-				   // thumb, larger values of
-				   // <tt>aggregation_threshold</tt>
-				   // will decrease the number of
-				   // iterations, but increase the
-				   // costs per iteration.
+				   // preconditioner. As a rule of thumb,
+				   // larger values of
+				   // <tt>aggregation_threshold</tt> will
+				   // decrease the number of iterations, but
+				   // increase the costs per iteration.
 				   // 
 				   // Eventually, we initialize the
-				   // preconditioner for the inversion
-				   // of the pressure mass
-				   // matrix. This matrix is symmetric
-				   // and well-behaved, so we can
-				   // chose a simple
-				   // preconditioner. We stick with an
-				   // incomple Cholesky (IC)
-				   // factorization preconditioner,
-				   // which is designed for symmetric
-				   // matrices. We wrap the
-				   // preconditioners into a
-				   // boost::shared_ptr pointer, which
-				   // makes it easier to recreate the
+				   // preconditioner for the inversion of
+				   // the pressure mass matrix. This matrix
+				   // is symmetric and well-behaved, so we
+				   // can chose a simple preconditioner. We
+				   // stick with an incomple Cholesky (IC)
+				   // factorization preconditioner, which is
+				   // designed for symmetric matrices. We
+				   // wrap the preconditioners into a
+				   // boost::shared_ptr pointer, which makes
+				   // it easier to recreate the
 				   // preconditioner.
   amg_data.elliptic = true;
   amg_data.higher_order_elements = true;
@@ -1432,66 +1394,67 @@ BoussinesqFlowProblem<dim>::build_stokes_preconditioner ()
 
 				 // @sect4{BoussinesqFlowProblem::assemble_stokes_system}
 				 // 
-				 // The actual assembly of the
-				 // Boussinesq system is a two-step
-				 // procedure. The first one is to
-				 // create the Stokes system matrix
-				 // and right hand side for the
-				 // velocity-pressure system, and the
-				 // second is to create matrix and
-				 // right hand sides for the
-				 // temperature dofs. The reason for
-				 // doing this in two steps is the
-				 // chosen time stepping, which needs
-				 // the result from the Stokes system
-				 // at the current time step for
-				 // building the right hand side of
-				 // the temperature equation.
+				 // The time lag scheme we use for advancing
+				 // the coupled Stokes-temperature system
+				 // forces us to split up the assembly (and
+				 // the solution of linear systems) into two
+				 // step. The first one is to create the
+				 // Stokes system matrix and right hand
+				 // side, and the second is to create matrix
+				 // and right hand sides for the temperature
+				 // dofs, which depends on the result for
+				 // the velocity.
 				 // 
-				 // This function does the 
-				 // first of these two tasks.
-				 // There are two different situations
-				 // for calling this function. The
-				 // first one is when we reset the
-				 // mesh, and both the matrix and
-				 // the right hand side have to
-				 // be generated. The second situation
-				 // only sets up the right hand
-				 // side. The reason for having 
-				 // two different accesses is that
-				 // the matrix of the Stokes system
-				 // does not change in time unless
-				 // the mesh is changed, so we can
-				 // save a considerable amount of
-				 // work by doing the full assembly
-				 // only when it is needed.
+				 // This function does the first of these
+				 // two tasks. There are two different
+				 // situations for calling this
+				 // function. The first one is when we reset
+				 // the mesh, and both the matrix and the
+				 // right hand side have to be
+				 // generated. The second situation only
+				 // sets up the right hand side. The reason
+				 // for having two different accesses is
+				 // that the matrix of the Stokes system
+				 // does not change in time unless the mesh
+				 // is changed, so we can save a
+				 // considerable amount of work by doing the
+				 // full assembly only when it is needed.
 				 // 
 				 // Regarding the technical details of
-				 // implementation, not much has
-				 // changed from step-22. We reset
-				 // matrix and vector, create a
-				 // quadrature formula on the cells
-				 // and one on cell faces (for
+				 // implementation, not much has changed
+				 // from step-22. We reset matrix and
+				 // vector, create a quadrature formula on
+				 // the cells and one on cell faces (for
 				 // implementing Neumann boundary
 				 // conditions). Then, we create a
-				 // respective FEValues object for
-				 // both the cell and the face
-				 // integration.  For the the update
-				 // flags of the first, we perform the
-				 // calculations of basis function
-				 // derivatives only in case of a full
-				 // assembly, since they are not
-				 // needed otherwise, which makes the
-				 // call of the FEValues::reinit
-				 // function further down in the
-				 // program more efficient.
+				 // respective FEValues object for both the
+				 // cell and the face integration. For the
+				 // the update flags of the first, we
+				 // perform the calculations of basis
+				 // function derivatives only in case of a
+				 // full assembly, since they are not needed
+				 // otherwise, which makes the call of the
+				 // FEValues::reinit function further down
+				 // in the program more efficient.
+                                 //
+				 // There is one thing that needs to be
+				 // commented &ndash; since we have a
+				 // individual finite element and DoFHandler
+				 // for the temperature, we need to generate
+				 // a second FEValues object for the proper
+				 // evaluation of the temperature
+				 // solution. This isn't too complicated to
+				 // realize here: just use the temperature
+				 // structures and set an update flag for
+				 // the basis function values which we need
+				 // for evaluation of the temperature
+				 // solution.
 				 // 
 				 // The declarations proceed with some
-				 // shortcuts for array sizes, the
-				 // creation of the local matrix and
-				 // right hand side as well as the
-				 // vector for the indices of the
-				 // local dofs compared to the global
+				 // shortcuts for array sizes, the creation
+				 // of the local matrix and right hand side
+				 // as well as the vector for the indices of
+				 // the local dofs compared to the global
 				 // system.
 template <int dim>
 void BoussinesqFlowProblem<dim>::assemble_stokes_system ()
@@ -1503,8 +1466,7 @@ void BoussinesqFlowProblem<dim>::assemble_stokes_system ()
 
   stokes_rhs=0;
 
-  QGauss<dim>   quadrature_formula(stokes_degree+2);
-  QGauss<dim-1> face_quadrature_formula(stokes_degree+2);
+  QGauss<dim>   quadrature_formula (stokes_degree+2);
 
   FEValues<dim> stokes_fe_values (stokes_fe, quadrature_formula,
 				  update_values    |
@@ -1520,45 +1482,33 @@ void BoussinesqFlowProblem<dim>::assemble_stokes_system ()
 				       update_values);
 
   const unsigned int   dofs_per_cell   = stokes_fe.dofs_per_cell;
-
   const unsigned int   n_q_points      = quadrature_formula.size();
-  const unsigned int   n_face_q_points = face_quadrature_formula.size();
 
   FullMatrix<double>   local_matrix (dofs_per_cell, dofs_per_cell);
-  Vector<double>       local_rhs (dofs_per_cell);
+  Vector<double>       local_rhs    (dofs_per_cell);
 
   std::vector<unsigned int> local_dof_indices (dofs_per_cell);
 
-				   // These few declarations provide
-				   // the structures for the evaluation
-				   // of inhomogeneous Neumann boundary
-				   // conditions from the function
-				   // declaration made above.
-				   // The vector <code>old_solution_values</code>
-				   // evaluates the solution 
-				   // at the old time level, since
-				   // the temperature from the
-				   // old time level enters the 
-				   // Stokes system as a source
-				   // term in the momentum equation.
+				   // The vector
+				   // <code>old_solution_values</code>
+				   // evaluates the temperature solution at
+				   // the old time level at the quadrature
+				   // points, which is needed for building
+				   // the source term in the right hand side
+				   // of the momentum equation.
 				   // 
-				   // The set of vectors we create
-				   // next hold the evaluations of the
-				   // basis functions that will be
-				   // used for creating the
-				   // matrices. This gives faster
-				   // access to that data, which
-				   // increases the performance of the
-				   // assembly. See step-22 for
-				   // details.
+				   // The set of vectors we create next hold
+				   // the evaluations of the basis functions
+				   // that will be used for creating the
+				   // matrices. This gives faster access to
+				   // that data, which increases the
+				   // performance of the assembly. See
+				   // step-22 for details.
 				   // 
-				   // The last two declarations are
-				   // used to extract the individual
-				   // blocks (velocity, pressure,
-				   // temperature) from the total FE
-				   // system.
-  std::vector<double>               boundary_values (n_face_q_points);
-
+				   // The last two declarations are used to
+				   // extract the individual blocks
+				   // (velocity, pressure, temperature) from
+				   // the total FE system.
   std::vector<double>               old_temperature_values(n_q_points);
 
   std::vector<Tensor<1,dim> >          phi_u       (dofs_per_cell);
@@ -1569,17 +1519,25 @@ void BoussinesqFlowProblem<dim>::assemble_stokes_system ()
   const FEValuesExtractors::Vector velocities (0);
   const FEValuesExtractors::Scalar pressure (dim);
 
-				   // Now start the loop over all
-				   // cells in the problem. The first
-				   // commands are all very familiar,
-				   // doing the update of the finite
-				   // element data as specified by the
-				   // update flags, zeroing out the
-				   // local arrays and getting the
-				   // values of the old solution at
-				   // the quadrature point. Then we
-				   // are ready to loop over the
-				   // quadrature points on the cell.
+				   // Now start the loop over all cells in
+				   // the problem. We are working on two
+				   // different DoFHandlers for this
+				   // assembly routine, so we must have two
+				   // different cell iterators for the two
+				   // objects in use. This might seem a bit
+				   // peculiar, since both the Stokes system
+				   // and the temperature system use the
+				   // same grid, but that's the only way to
+				   // keep degrees of freedom in sync. The
+				   // first commands within the loop are
+				   // again all very familiar, doing the
+				   // update of the finite element data as
+				   // specified by the update flags, zeroing
+				   // out the local arrays and getting the
+				   // values of the old solution at the
+				   // quadrature point. Then we are ready to
+				   // loop over the quadrature points on the
+				   // cell.
   typename DoFHandler<dim>::active_cell_iterator
     cell = stokes_dof_handler.begin_active(),
     endc = stokes_dof_handler.end();
@@ -1594,33 +1552,30 @@ void BoussinesqFlowProblem<dim>::assemble_stokes_system ()
       local_matrix = 0;
       local_rhs = 0;
 
-      temperature_fe_values.get_function_values (old_temperature_solution, old_temperature_values);
+      temperature_fe_values.get_function_values (old_temperature_solution, 
+						 old_temperature_values);
 
       for (unsigned int q=0; q<n_q_points; ++q)
 	{
 	  const double old_temperature = old_temperature_values[q];
 
-				   // Extract the basis relevant terms
-				   // in the inner products once in
-				   // advance as shown in step-22 in
-				   // order to accelerate assembly.
+				   // Extract the basis relevant terms in
+				   // the inner products once in advance as
+				   // shown in step-22 in order to
+				   // accelerate assembly.
 				   // 
-				   // Once this is done, we start the
-				   // loop over the rows and columns
-				   // of the local matrix and feed the
-				   // matrix with the relevant
-				   // products. The right hand side is
-				   // filled with the forcing term
-				   // driven by temperature in
-				   // direction of gravity (which is
-				   // vertical in our example).  Note
-				   // that the right hand side term is
-				   // always generated, whereas the
-				   // matrix contributions are only
-				   // updated when it is requested by
-				   // the
-				   // <code>rebuild_matrices</code>
-				   // flag.
+				   // Once this is done, we start the loop
+				   // over the rows and columns of the local
+				   // matrix and feed the matrix with the
+				   // relevant products. The right hand side
+				   // is filled with the forcing term driven
+				   // by temperature in direction of gravity
+				   // (which is vertical in our example).
+				   // Note that the right hand side term is
+				   // always generated, whereas the matrix
+				   // contributions are only updated when it
+				   // is requested by the
+				   // <code>rebuild_matrices</code> flag.
 	  for (unsigned int k=0; k<dofs_per_cell; ++k)
 	    {
 	      phi_u[k] = stokes_fe_values[velocities].value (k,q);
@@ -1649,22 +1604,19 @@ void BoussinesqFlowProblem<dim>::assemble_stokes_system ()
 			    stokes_fe_values.JxW(q);
 	}
 
-				       // The last step in the loop
-				       // over all cells is to enter
-				       // the local contributions into
-				       // the global matrix and vector
-				       // structures to the positions
-				       // specified in
-				       // <code>local_dof_indices</code>.
-				       // Again, we only add the
-				       // matrix data when it is
-				       // requested. Again, we let the
-				       // ConstraintMatrix class do
-				       // the insertion of the local
-				       // entries to the global
-				       // entries, which already
-				       // condenses the hanging node
-				       // constraints.
+				   // The last step in the loop over all
+				   // cells is to enter the local
+				   // contributions into the global matrix
+				   // and vector structures to the positions
+				   // specified in
+				   // <code>local_dof_indices</code>.
+				   // Again, we only add the matrix data
+				   // when it is requested. Again, we let
+				   // the ConstraintMatrix class do the
+				   // insertion of the cell matrix elements
+				   // to the global matrix, which already
+				   // condenses the hanging node
+				   // constraints.
       cell->get_dof_indices (local_dof_indices);
 
       if (rebuild_stokes_matrix == true)
@@ -1685,47 +1637,39 @@ void BoussinesqFlowProblem<dim>::assemble_stokes_system ()
 
 
 
-
-
 				   // @sect4{BoussinesqFlowProblem::assemble_temperature_matrix}
 				   // 
-				   // This function assembles the
-				   // matrix in the temperature
-				   // equation. The temperature matrix
-				   // consists of two parts, a mass
-				   // matrix and the time step size
-				   // times a stiffness matrix given
-				   // by a Laplace term times the
-				   // amount of diffusion. Since the
-				   // matrix depends on the time step
-				   // size (which varies from one step
-				   // to another), the temperature
-				   // matrix needs to be updated every
-				   // time step. We could simply
-				   // regenerate the matrices in every
-				   // time step, but this is not
-				   // really efficient since mass and
-				   // Laplace matrix do only change
-				   // when we change the mesh. Hence,
-				   // we do this more efficiently by
-				   // generating two separate matrices
-				   // in this function, one for the
-				   // mass matrix and one for the
-				   // stiffness (diffusion) matrix. We
-				   // will then sum up the matrix plus
-				   // the stiffness matrix times the
-				   // time step size.
+				   // This function assembles the matrix in
+				   // the temperature equation. The
+				   // temperature matrix consists of two
+				   // parts, a mass matrix and the time step
+				   // size times a stiffness matrix given by
+				   // a Laplace term times the amount of
+				   // diffusion. Since the matrix depends on
+				   // the time step size (which varies from
+				   // one step to another), the temperature
+				   // matrix needs to be updated every time
+				   // step. We could simply regenerate the
+				   // matrices in every time step, but this
+				   // is not really efficient since mass and
+				   // Laplace matrix do only change when we
+				   // change the mesh. Hence, we do this
+				   // more efficiently by generating two
+				   // separate matrices in this function,
+				   // one for the mass matrix and one for
+				   // the stiffness (diffusion) matrix. We
+				   // will then sum up the matrix plus the
+				   // stiffness matrix times the time step
+				   // size.
 				   // 
-				   // So the details for this first
-				   // step are very simple. In case we
-				   // need to rebuild the matrix
-				   // (i.e., the mesh has changed), we
-				   // zero the data structures, get a
-				   // quadrature formula and a
-				   // FEValues object, and create
-				   // local matrices, local dof
-				   // indices and evaluation
-				   // structures for the basis
+				   // So the details for this first step are
+				   // very simple. In case we need to
+				   // rebuild the matrix (i.e., the mesh has
+				   // changed), we zero the data structures,
+				   // get a quadrature formula and a
+				   // FEValues object, and create local
+				   // matrices, local dof indices and
+				   // evaluation structures for the basis
 				   // functions.
 template <int dim>
 void BoussinesqFlowProblem<dim>::assemble_temperature_matrix ()
@@ -1754,22 +1698,19 @@ void BoussinesqFlowProblem<dim>::assemble_temperature_matrix ()
   std::vector<double>         phi_T       (dofs_per_cell);
   std::vector<Tensor<1,dim> > grad_phi_T  (dofs_per_cell);
 
-				   // Now, let's start the loop over
-				   // all cells in the
-				   // triangulation. We need to zero
-				   // out the local matrices, update
-				   // the finite element evaluations,
-				   // and then loop over the rows and
-				   // columns of the matrices on each
-				   // quadrature point, where we then
-				   // create the mass matrix and the
-				   // stiffness matrix (Laplace terms
-				   // times the diffusion
+				   // Now, let's start the loop over all
+				   // cells in the triangulation. We need to
+				   // zero out the local matrices, update
+				   // the finite element evaluations, and
+				   // then loop over the rows and columns of
+				   // the matrices on each quadrature point,
+				   // where we then create the mass matrix
+				   // and the stiffness matrix (Laplace
+				   // terms times the diffusion
 				   // <tt>EquationData::kappa</tt>. Finally,
-				   // we let the hanging node
-				   // constraints insert these values
-				   // into the global matrix, and
-				   // directly condense the
+				   // we let the hanging node constraints
+				   // insert these values into the global
+				   // matrix, and directly condense the
 				   // constraints into the matrix.
   typename DoFHandler<dim>::active_cell_iterator
     cell = temperature_dof_handler.begin_active(),
@@ -1820,37 +1761,32 @@ void BoussinesqFlowProblem<dim>::assemble_temperature_matrix ()
 
                                    // @sect4{BoussinesqFlowProblem::assemble_temperature_system}
                                    //
-				   // This function does the second
-				   // part of the assembly work on the
-				   // temperature matrix, the actual
-				   // addition of pressure mass and
-				   // stiffness matrix (where the time
-				   // step size comes into play), as
-				   // well as the creation of the
+				   // This function does the second part of
+				   // the assembly work on the temperature
+				   // matrix, the actual addition of
+				   // pressure mass and stiffness matrix
+				   // (where the time step size comes into
+				   // play), as well as the creation of the
 				   // velocity-dependent right hand
-				   // side. The declarations for the
-				   // right hand side assembly in this
-				   // function are pretty much the
-				   // same as the ones used in the
-				   // other assembly routines, except
-				   // that we restrict ourselves to
-				   // vectors this time. We are going
-				   // to calculate residuals on the
-				   // temperature system, which means
-				   // that we have to evaluate second
-				   // derivatives, specified by the
-				   // update flag
-				   // <tt>update_hessians</tt>. Since
-				   // the temperature equation is
-				   // coupled to the Stokes system by
-				   // means of the fluid velocity, and
-				   // since these two parts of the
-				   // solution are associated with
-				   // different dof handlers, we need
-				   // to create a second FEValues
-				   // object for the evaluation of the
-				   // velocity at the quadrature
-				   // points.
+				   // side. The declarations for the right
+				   // hand side assembly in this function
+				   // are pretty much the same as the ones
+				   // used in the other assembly routines,
+				   // except that we restrict ourselves to
+				   // vectors this time. We are going to
+				   // calculate residuals on the temperature
+				   // system, which means that we have to
+				   // evaluate second derivatives, specified
+				   // by the update flag
+				   // <tt>update_hessians</tt>. The
+				   // temperature equation is coupled to the
+				   // Stokes system by means of the fluid
+				   // velocity, and these two parts of the
+				   // solution are associated with different
+				   // dof handlers. So we need to create a
+				   // second FEValues object for the
+				   // evaluation of the velocity at the
+				   // quadrature points.
 template <int dim>
 void BoussinesqFlowProblem<dim>::assemble_temperature_system ()
 {
@@ -1887,28 +1823,24 @@ void BoussinesqFlowProblem<dim>::assemble_temperature_system ()
 
   std::vector<unsigned int> local_dof_indices (dofs_per_cell);
 
-				   // Here comes the declaration of
-				   // vectors to hold the old and
-				   // present solution values and
-				   // gradients for both the cell as
-				   // well as faces to the cell, that
-				   // will be generated from the
-				   // global solution vectors. Next
-				   // comes the declaration of an
-				   // object to hold the temperature
-				   // right hande side values, and we
-				   // again use shortcuts for the
+				   // Here comes the declaration of vectors
+				   // to hold the old and present solution
+				   // values and gradients for both the cell
+				   // as well as faces to the cell, that
+				   // will be generated from the global
+				   // solution vectors. Next comes the
+				   // declaration of an object to hold the
+				   // temperature right hande side values,
+				   // and we again use shortcuts for the
 				   // temperature basis
-				   // functions. Eventually, we need
-				   // to find the maximum of velocity,
-				   // temperature and the diameter of
-				   // the computational domain which
-				   // will be used for the definition
-				   // of the stabilization parameter.
+				   // functions. Eventually, we need to find
+				   // the maximum of velocity, temperature
+				   // and the diameter of the computational
+				   // domain which will be used for the
+				   // definition of the stabilization
+				   // parameter.
   std::vector<Vector<double> > present_stokes_values (n_q_points, 
 						      Vector<double>(dim+1));
-
-  
   std::vector<double>         old_temperature_values (n_q_points);
   std::vector<double>         old_old_temperature_values(n_q_points);
   std::vector<Tensor<1,dim> > old_temperature_grads(n_q_points);
@@ -1919,26 +1851,24 @@ void BoussinesqFlowProblem<dim>::assemble_temperature_system ()
   EquationData::TemperatureRightHandSide<dim>  temperature_right_hand_side;
   std::vector<double> gamma_values (n_q_points);
 
-  std::vector<double>         phi_T       (dofs_per_cell);
-  std::vector<Tensor<1,dim> > grad_phi_T  (dofs_per_cell);
+  std::vector<double>         phi_T      (dofs_per_cell);
+  std::vector<Tensor<1,dim> > grad_phi_T (dofs_per_cell);
   
   const double global_u_infty = get_maximal_velocity();
   const std::pair<double,double>
     global_T_range = get_extrapolated_temperature_range();
   const double global_Omega_diameter = GridTools::diameter (triangulation);
 
-				   // Now, let's start the loop over
-				   // all cells in the
-				   // triangulation. First set the
-				   // local rhs to zero, and then get
+				   // Now, let's start the loop over all
+				   // cells in the triangulation. First set
+				   // the local rhs to zero, and then get
 				   // the values of the old solution
-				   // functions (and the current
-				   // velocity) at the quadrature
-				   // points, since they are going to
-				   // be needed for the definition of
-				   // the stabilization parameters and
-				   // as coefficients in the equation,
-				   // respectively.
+				   // functions (and the current velocity)
+				   // at the quadrature points, since they
+				   // are going to be needed for the
+				   // definition of the stabilization
+				   // parameters and as coefficients in the
+				   // equation, respectively.
   typename DoFHandler<dim>::active_cell_iterator
     cell = temperature_dof_handler.begin_active(),
     endc = temperature_dof_handler.end();
