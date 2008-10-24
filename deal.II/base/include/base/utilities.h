@@ -236,30 +236,31 @@ namespace Utilities
 
 
   /**
-   * This class provides the basic structures for the use of the
-   * Trilinos classes such as matrices, vectors, and
-   * preconditioners. The most important function in this class is
-   * <tt>comm()</tt>, which is needed for the initialization of
-   * Trilinos Epetra_Maps, which design the parallel distribution of
-   * vectors and matrices. Moreover, this class provides a unified
-   * interface to both serial and parallel implementations of
-   * Trilinos, sets up the MPI communicator in case the programs are
-   * run in parallel, and correctly terminates all processes when the
-   * destructor is called. An example usage of this class is shown in
-   * @ref step_32 step-32.
+   * This class provides the basic structures for the use of the Trilinos
+   * classes such as matrices, vectors, and preconditioners. The most
+   * important function in this class is <tt>comm()</tt>, which is needed
+   * for the initialization of Trilinos Epetra_Maps, which design the
+   * parallel distribution of vectors and matrices. Moreover, this class
+   * provides a unified interface to both serial and parallel
+   * implementations of Trilinos, sets up the MPI communicator in case the
+   * programs are run in parallel, and correctly terminates all processes
+   * when the destructor is called. An example usage of this class is shown
+   * in the tutorial program @ref step_32 "step-32".
    */
 #ifdef DEAL_II_USE_TRILINOS
   class TrilinosTools
   {
     public:
 				     /**
-				      * Constructor. Takes the
-				      * arguments from the command
-				      * line (in case of MPI, the
-				      * number of processes is
-				      * specified there), and sets up
-				      * a respective communicator by
-				      * calling <tt>MPI_Init()</tt>.
+				      * Constructor. Takes the arguments
+				      * from the command line (in case of
+				      * MPI, the number of processes is
+				      * specified there), and sets up a
+				      * respective communicator by calling
+				      * <tt>MPI_Init()</tt>. This
+				      * constructor can only be called once
+				      * in a program, since MPI cannot be
+				      * initialized twice.
 				      */
       TrilinosTools (int*    argc,
 		     char*** argv);

@@ -477,13 +477,13 @@ namespace Utilities
 #ifdef DEAL_II_COMPILER_SUPPORTS_MPI
     int MPI_has_been_started = 0;
     MPI_Initialized(&MPI_has_been_started);
-    Assert (MPI_has_been_started == 0,
-	    ExcMessage ("MPI error. You can only start MPI once!"));
+    AssertThrow (MPI_has_been_started == 0,
+		 ExcMessage ("MPI error. You can only start MPI once!"));
 
     int mpi_err;
     mpi_err = MPI_Init (argc, argv);
-    Assert (mpi_err == 0,
-	    ExcMessage ("MPI could not be initialized."));
+    AssertThrow (mpi_err == 0,
+		 ExcMessage ("MPI could not be initialized."));
 
     communicator = Teuchos::rcp (new Epetra_MpiComm (MPI_COMM_WORLD), true);
 #else
@@ -515,8 +515,8 @@ namespace Utilities
       mpi_err = MPI_Finalize();
 #endif
 
-    Assert (mpi_err == 0,
-	    ExcMessage ("An error occurred while calling MPI_Finalize()"));
+    AssertThrow (mpi_err == 0,
+		 ExcMessage ("An error occurred while calling MPI_Finalize()"));
   }
 
 
