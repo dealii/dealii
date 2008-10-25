@@ -653,6 +653,14 @@ operator leads to a block structured matrix
 @f}
 and as discussed there a good preconditioner is
 @f{eqnarray*}
+  P
+  =
+  \left(\begin{array}{cc}
+    A & 0 \\ B & -S
+  \end{array}\right),
+  \qquad
+  \text{or equivalently}
+  \qquad
   P^{-1}
   = 
   \left(\begin{array}{cc}
@@ -674,7 +682,11 @@ where $\tilde A^{-1},\tilde S^{-1}$ are approximations to the inverse
 matrices. In particular, it turned out that <i>S</i> is spectrally
 equivalent to the mass matrix and consequently replacing $\tilde
 S^{-1}$ by a CG solver applied to the mass matrix on the pressure
-space was a good choice.
+space was a good choice. In a small deviation from @ref step_22 "step-22", we
+here have a coefficient $\eta$ in the momentum equation, and by the same
+derivation as there we should arrive at the conclusion that it is the weighted
+mass matrix with entries $\tilde S_{ij}=(\eta^{-1}\varphi_i,\varphi_j)$ that
+we should be using.
 
 It was more complicated to come up with a good replacement $\tilde
 A^{-1}$, which corresponds to the discretized symmetric Laplacian of
@@ -763,7 +775,7 @@ To sum this whole story up, we can observe:
 
   <li>On the other hand, preconditioners for the Laplace matrix are typically
   more mature and perform better than ones for vector problems. For example,
-  at the time of this writing, Algebraic Multigrid (AMG) algorithms are very
+  at the time of this writing, Algebraic %Multigrid (AMG) algorithms are very
   well developed for scalar problems, but not so for vector problems.
 
   <li>In building this preconditioner, we will have to build up the
@@ -943,7 +955,9 @@ discussed here.
 <h3>The testcase</h3>
 
 The case we want to solve here is as follows: we solve the Boussinesq
-equations described above with $\kappa=1, \eta=1, \mathrm{Ra}=10$. On the
+equations described above with $\kappa=10^{-6}, \eta=1, \mathrm{Ra}=10$,
+i.e. a relatively slow moving fluid that has virtually no thermal diffusive
+conductivity and transports heat mainly through convection. On the
 boundary, we will require no-normal flux for the velocity
 ($\mathrm{n}\cdot\mathrm{u}=0$) and for the temperature
 ($\mathrm{n}\cdot\nabla T=0$). This is one of the cases discussed in the

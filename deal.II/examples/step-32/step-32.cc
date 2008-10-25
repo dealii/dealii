@@ -161,8 +161,9 @@ namespace LinearSolvers
 		     const Preconditioner &preconditioner);
 
 
-      void vmult (TrilinosWrappers::MPI::Vector       &dst,
-		  const TrilinosWrappers::MPI::Vector &src) const;
+      template <typename VectorType>
+      void vmult (VectorType       &dst,
+		  const VectorType &src) const;
 
     private:
       const SmartPointer<const Matrix> matrix;
@@ -171,8 +172,9 @@ namespace LinearSolvers
 
 
   template <class Matrix, class Preconditioner>
-  InverseMatrix<Matrix,Preconditioner>::InverseMatrix (const Matrix &m,
-						       const Preconditioner &preconditioner)
+  InverseMatrix<Matrix,Preconditioner>::
+  InverseMatrix (const Matrix &m,
+		 const Preconditioner &preconditioner)
 		  :
 		  matrix (&m),
 		  preconditioner (preconditioner)
@@ -181,12 +183,14 @@ namespace LinearSolvers
 
 
   template <class Matrix, class Preconditioner>
-  void InverseMatrix<Matrix,Preconditioner>::vmult (
-				TrilinosWrappers::MPI::Vector       &dst,
-				const TrilinosWrappers::MPI::Vector &src) const
+  template <typename VectorType>
+  void
+  InverseMatrix<Matrix,Preconditioner>::
+  vmult (VectorType       &dst,
+	 const VectorType &src) const
   {
     SolverControl solver_control (src.size(), 1e-7*src.l2_norm());
-    SolverCG<TrilinosWrappers::MPI::Vector> cg (solver_control);
+    SolverCG<VectorType> cg (solver_control);
 
     dst = 0;
 
@@ -757,6 +761,7 @@ BoussinesqFlowProblem<dim>::assemble_stokes_preconditioner ()
 		local_matrix(i,j) += (EquationData::eta *
 				      scalar_product (phi_grad_u[i], phi_grad_u[j])
 				      +
+				      (1./EquationData::eta) *
 				      phi_p[i] * phi_p[j])
 				    * stokes_fe_values.JxW(q);
 	  }

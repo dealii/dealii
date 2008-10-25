@@ -1,6 +1,6 @@
 /* $Id$ */
 /* Author: Martin Kronbichler, Uppsala University,
-           Wolfgang Bangerth, Texas A&M University 2007, 2008 */
+   Wolfgang Bangerth, Texas A&M University 2007, 2008 */
 
 /*    $Id$       */
 /*                                                                */
@@ -114,13 +114,13 @@ using namespace dealii;
 				 // conditions are required for the velocity
 				 // and pressure, since the Stokes equations
 				 // for the quasi-stationary case we consider
-				 // here have time derivatives of the velocity
-				 // or pressure). Here, we choose a very
-				 // simple test case, where the initial
+				 // here have no time derivatives of the
+				 // velocity or pressure). Here, we choose a
+				 // very simple test case, where the initial
 				 // temperature is zero, and all dynamics are
 				 // driven by the temperature right hand side.
 				 //
-				 // Thirdly, we need to define this right hand
+				 // Thirdly, we need to define the right hand
 				 // side of the temperature equation. We
 				 // choose it to be constant within three
 				 // circles (or spheres in 3d) somewhere at
@@ -188,8 +188,13 @@ namespace EquationData
   template <int dim>
   double
   TemperatureRightHandSide<dim>::value (const Point<dim>  &p,
-					const unsigned int /*component*/) const
+					const unsigned int component) const
   {
+    Assert (component == 0,
+	    ExcMessage ("Invalid operation for a scalar function."));
+    
+    Assert ((dim==2) || (dim==3), ExcNotImplemented());
+    
     static const Point<dim> source_centers[3]
       = { (dim == 2 ? Point<dim>(.3,.1) : Point<dim>(.3,.5,.1)),
 	  (dim == 2 ? Point<dim>(.45,.1) : Point<dim>(.45,.5,.1)),
@@ -221,21 +226,27 @@ namespace EquationData
 
 
 
-				   // @sect3{Linear solvers and preconditioners}
+				 // @sect3{Linear solvers and preconditioners}
 
-				   // This section introduces some objects
-				   // that are used for the solution of the
-				   // linear equations of the Stokes system
-				   // that we need to solve in each time
-				   // step. The basic structure is still the
-				   // same as in step-20, where Schur
-				   // complement based preconditioners and
-				   // solvers have been introduced, with the
-				   // actual interface taken from step-22 (in
-				   // particular the discussion in the
-				   // "Results" section of step-22, in which
-				   // we introduce alternatives to the direct
-				   // Schur complement approach).
+				 // This section introduces some objects
+				 // that are used for the solution of the
+				 // linear equations of the Stokes system
+				 // that we need to solve in each time
+				 // step. Many of the ideas used here are
+				 // the same as in step-20, where Schur
+				 // complement based preconditioners and
+				 // solvers have been introduced, with the
+				 // actual interface taken from step-22 (in
+				 // particular the discussion in the
+				 // "Results" section of step-22, in which
+				 // we introduce alternatives to the direct
+				 // Schur complement approach). Note,
+				 // however, that here we don't use the
+				 // Schur complement to solve the Stokes
+				 // equations, though an approximate Schur
+				 // complement (the mass matrix on the
+				 // pressure space) appears in the
+				 // preconditioner.
 namespace LinearSolvers
 {
 
@@ -246,7 +257,7 @@ namespace LinearSolvers
 				   // "inverted" matrix on a vector
 				   // (using the <code>vmult</code>
 				   // operation) in the same way as
-				   // the corresponding function in
+				   // the corresponding class in
 				   // step-22: when the product of an
 				   // object of this class is
 				   // requested, we solve a linear
@@ -255,6 +266,51 @@ namespace LinearSolvers
 				   // by a preconditioner of
 				   // (templated) class
 				   // <code>Preconditioner</code>.
+				   //
+				   // In a minor deviation from the
+				   // implementation of the same class in
+				   // step-22 (and step-20), we make the
+				   // <code>vmult</code> function take any
+				   // kind of vector type (it will yield
+				   // compiler errors, however, if the matrix
+				   // does not allow a matrix-vector product
+				   // with this kind of vector).
+				   //
+				   // Secondly, we catch any exceptions that
+				   // the solver may have thrown. The reason
+				   // is as follows: When debugging a program
+				   // like this one occasionally makes a
+				   // mistake of passing an indefinite or
+				   // non-symmetric matrix or preconditioner
+				   // to the current class. The solver will,
+				   // in that case, not converge and throw a
+				   // run-time exception. If not caught here
+				   // it will propagate up the call stack and
+				   // may end up in <code>main()</code> where
+				   // we output an error message that will say
+				   // that the CG solver failed. The question
+				   // then becomes: Which CG solver? The one
+				   // that inverted the mass matrix? The one
+				   // that inverted the top left block with
+				   // the Laplace operator? Or a CG solver in
+				   // one of the several other nested places
+				   // where we use linear solvers in the
+				   // current code? No indication about this
+				   // is present in a run-time exception
+				   // because it doesn't store the stack of
+				   // calls through which we got to the place
+				   // where the exception was generated.
+				   //
+				   // So rather than letting the exception
+				   // propagate freely up to
+				   // <code>main()</code> we realize that
+				   // there is little that an outer function
+				   // can do if the inner solver fails and
+				   // rather convert the run-time exception
+				   // into an assertion that fails and
+				   // triggers a call to <code>abort()</code>,
+				   // allowing us to trace back in a debugger
+				   // how we got to the current place.
   template <class Matrix, class Preconditioner>
   class InverseMatrix : public Subscriptor
   {
@@ -263,8 +319,9 @@ namespace LinearSolvers
 		     const Preconditioner &preconditioner);
 
 
-      void vmult (TrilinosWrappers::Vector       &dst,
-		  const TrilinosWrappers::Vector &src) const;
+      template <typename VectorType>
+      void vmult (VectorType       &dst,
+		  const VectorType &src) const;
 
     private:
       const SmartPointer<const Matrix> matrix;
@@ -284,13 +341,14 @@ namespace LinearSolvers
 
 
   template <class Matrix, class Preconditioner>
+  template <typename VectorType>
   void
   InverseMatrix<Matrix,Preconditioner>::
-  vmult (TrilinosWrappers::Vector       &dst,
-	 const TrilinosWrappers::Vector &src) const
+  vmult (VectorType       &dst,
+	 const VectorType &src) const
   {
     SolverControl solver_control (src.size(), 1e-7*src.l2_norm());
-    SolverCG<TrilinosWrappers::Vector> cg (solver_control);
+    SolverCG<VectorType> cg (solver_control);
 
     dst = 0;
 
@@ -318,7 +376,9 @@ namespace LinearSolvers
 				   // a good preconditioner instead.
 				   //
 				   // Let's have a look at the ideal
-				   // preconditioner matrix <i>P</i>
+				   // preconditioner matrix
+				   // $P=\left(\begin{array}{cc} A & 0 \\ B &
+				   // -S \end{array}\right)$
 				   // described in the introduction. If
 				   // we apply this matrix in the
 				   // solution of a linear system,
@@ -358,33 +418,29 @@ namespace LinearSolvers
 				   // does not depend on the problem
 				   // size.
 				   //
-				   // The deal.II users who have
-				   // already gone through the step-20
-				   // and step-22 tutorials can
-				   // certainly imagine how we're
-				   // going to implement this.  We
-				   // replace the exact inverse
-				   // matrices in $P^{-1}$ by some
-				   // approximate inverses build from
-				   // the InverseMatrix class, and the
-				   // inverse Schur complement will be
-				   // approximated by the pressure
-				   // mass matrix $M_p$. As pointed
-				   // out in the results section of
-				   // step-22, we can replace the
-				   // exact inverse of <i>A</i> by
-				   // just the application of a
-				   // preconditioner, in this case on
-				   // a vector Laplace matrix as was
-				   // explained in the
-				   // introduction. This does increase
-				   // the number of (outer) GMRES
-				   // iterations, but is still
-				   // significantly cheaper than an
-				   // exact inverse, which would
-				   // require between 20 and 35 CG
-				   // iterations for <em>each</em>
-				   // outer solver step (using the AMG
+				   // The deal.II users who have already gone
+				   // through the step-20 and step-22
+				   // tutorials can certainly imagine how
+				   // we're going to implement this.  We
+				   // replace the exact inverse matrices in
+				   // $P^{-1}$ by some approximate inverses
+				   // built from the InverseMatrix class, and
+				   // the inverse Schur complement will be
+				   // approximated by the pressure mass matrix
+				   // $M_p$ (weighted by $\eta^{-1}$ as
+				   // mentioned in the introduction). As
+				   // pointed out in the results section of
+				   // step-22, we can replace the exact
+				   // inverse of <i>A</i> by just the
+				   // application of a preconditioner, in this
+				   // case on a vector Laplace matrix as was
+				   // explained in the introduction. This does
+				   // increase the number of (outer) GMRES
+				   // iterations, but is still significantly
+				   // cheaper than an exact inverse, which
+				   // would require between 20 and 35 CG
+				   // iterations for <em>each</em> outer
+				   // solver step (using the AMG
 				   // preconditioner).
 				   // 
 				   // Having the above explanations in
@@ -411,7 +467,7 @@ namespace LinearSolvers
       BlockSchurPreconditioner (
 	const TrilinosWrappers::BlockSparseMatrix     &S,
 	const InverseMatrix<TrilinosWrappers::SparseMatrix,
-	                    PreconditionerMp>         &Mpinv,
+	PreconditionerMp>         &Mpinv,
 	const PreconditionerA                         &Apreconditioner);
 
       void vmult (TrilinosWrappers::BlockVector       &dst,
@@ -424,8 +480,7 @@ namespace LinearSolvers
       const PreconditionerA &a_preconditioner;
 
       mutable TrilinosWrappers::Vector tmp;
-
-};
+  };
 
 
 
@@ -433,7 +488,7 @@ namespace LinearSolvers
   BlockSchurPreconditioner<PreconditionerA, PreconditionerMp>::
   BlockSchurPreconditioner(const TrilinosWrappers::BlockSparseMatrix  &S,
 			   const InverseMatrix<TrilinosWrappers::SparseMatrix,
-			                       PreconditionerMp>      &Mpinv,
+			   PreconditionerMp>      &Mpinv,
 			   const PreconditionerA                      &Apreconditioner)
 		  :
 		  stokes_matrix           (&S),
@@ -501,9 +556,9 @@ namespace LinearSolvers
 				 //
 				 // The member functions of this class are
 				 // reminiscent of step-21, where we also used
-				 // a staggered scheme that first solves the
+				 // a staggered scheme that first solve the
 				 // flow equations (here the Stokes equations,
-				 // in step-21 Darcy flow) and then updates
+				 // in step-21 Darcy flow) and then update
 				 // the advected quantity (here the
 				 // temperature, there the saturation). The
 				 // functions that are new are mainly
@@ -514,7 +569,12 @@ namespace LinearSolvers
 				 // The last three variables indicate whether
 				 // the various matrices or preconditioners
 				 // need to be rebuilt the next time the
-				 // corresponding build functions are called.
+				 // corresponding build functions are
+				 // called. This allows us to move the
+				 // corresponding <code>if</code> into the
+				 // respective function and thereby keeping
+				 // our main <code>run()</code> function clean
+				 // and easy to read.
 template <int dim>
 class BoussinesqFlowProblem
 {
@@ -607,7 +667,13 @@ class BoussinesqFlowProblem
 				 // going to use $Q_2\times Q_1$ (Taylor-Hood)
 				 // elements again for the Stokes part, and
 				 // $Q_2$ elements for the
-				 // temperature. Moreover, we initialize the
+				 // temperature. However, by using variables
+				 // that store the polynomial degree of the
+				 // Stokes and temperature finite elements, it
+				 // is easy to consistently modify the degree
+				 // of the elements as well as all quadrature
+				 // formulas used on them
+				 // downstream. Moreover, we initialize the
 				 // time stepping as well as the options for
 				 // matrix assembly and preconditioning:
 template <int dim>
@@ -636,18 +702,23 @@ BoussinesqFlowProblem<dim>::BoussinesqFlowProblem ()
 
 				 // @sect4{BoussinesqFlowProblem::get_maximal_velocity}
 
-				 // Starting the real functionality of
-				 // this class is a helper function
-				 // that determines the maximum
-				 // ($L_\infty$) velocity in the
-				 // domain (at the quadrature points,
-				 // in fact). It should be relatively
-				 // obvious to all who have gotten to
-				 // this point:
+				 // Starting the real functionality of this
+				 // class is a helper function that determines
+				 // the maximum ($L_\infty$) velocity in the
+				 // domain (at the quadrature points, in
+				 // fact). How it works should be relatively
+				 // obvious to all who have gotten to this
+				 // point of the tutorial.
+				 //
+				 // The only point worth thinking about a bit
+				 // is how to choose the quadrature points we
+				 // use here.
+//TODO finish...
 template <int dim>
 double BoussinesqFlowProblem<dim>::get_maximal_velocity () const
 {
-  const QGauss<dim>  quadrature_formula(stokes_degree+2);
+  const QIterated<dim> quadrature_formula (QTrapez<1>(),
+					   stokes_degree+1);
   const unsigned int n_q_points = quadrature_formula.size();
 
   FEValues<dim> fe_values (stokes_fe, quadrature_formula, update_values);
@@ -1229,22 +1300,23 @@ BoussinesqFlowProblem<dim>::assemble_stokes_preconditioner ()
       stokes_fe_values.reinit (cell);
       local_matrix = 0;
 
-				   // The creation of the local matrix is
-				   // very simple. There are only a Laplace
-				   // term (on the velocity) and a mass
-				   // matrix to be generated, so the
-				   // creation of the local matrix is done
-				   // in two lines, if we first shortcut to
-				   // the FE data. Once the local matrix is
-				   // ready (loop over rows and columns in
-				   // the local matrix on each quadrature
-				   // point), we get the local DoF indices
-				   // and write the local information into
-				   // the global matrix. We do this as in
-				   // step-27, i.e. we directly apply the
-				   // constraints from hanging nodes
-				   // locally. By doing so, we don't have to
-				   // do that afterwards.
+				       // The creation of the local matrix is
+				       // very simple. There are only a
+				       // Laplace term (on the velocity) and a
+				       // mass matrix weighted by $\eta^{-1}$
+				       // to be generated, so the creation of
+				       // the local matrix is done in two
+				       // lines, if we first shortcut to the
+				       // FE data. Once the local matrix is
+				       // ready (loop over rows and columns in
+				       // the local matrix on each quadrature
+				       // point), we get the local DoF indices
+				       // and write the local information into
+				       // the global matrix. We do this as in
+				       // step-27, i.e. we directly apply the
+				       // constraints from hanging nodes
+				       // locally. By doing so, we don't have
+				       // to do that afterwards.
       for (unsigned int q=0; q<n_q_points; ++q)
 	{
 	  for (unsigned int k=0; k<dofs_per_cell; ++k)
@@ -1258,6 +1330,7 @@ BoussinesqFlowProblem<dim>::assemble_stokes_preconditioner ()
 	      local_matrix(i,j) += (EquationData::eta *
 				    scalar_product (phi_grad_u[i], phi_grad_u[j])
 				    +
+				    (1./EquationData::eta) *
 				    phi_p[i] * phi_p[j])
 				   * stokes_fe_values.JxW(q);
 	}
@@ -1382,7 +1455,7 @@ BoussinesqFlowProblem<dim>::build_stokes_preconditioner ()
 				 amg_data);
       
   Mp_preconditioner = boost::shared_ptr<TrilinosWrappers::PreconditionIC>
-                                   (new TrilinosWrappers::PreconditionIC());
+		      (new TrilinosWrappers::PreconditionIC());
   Mp_preconditioner->initialize(stokes_preconditioner_matrix.block(1,1));
 
   std::cout << std::endl;
@@ -1903,29 +1976,29 @@ void BoussinesqFlowProblem<dim>::assemble_temperature_system ()
       stokes_fe_values.get_function_values (stokes_solution,
 					    present_stokes_values);
 
-				   // Next, we calculate the
-				   // artificial viscosity for
-				   // stabilization according to the
-				   // discussion in the introduction
-				   // using the dedicated
-				   // function. With that at hand, we
-				   // can define get into the loop
-				   // over quadrature points and local
-				   // rhs vector components. The terms
-				   // here are quite lenghty, but
-				   // their definition follows the
-				   // time-discrete system developed
-				   // in the introduction of this
-				   // program. The BDF-2 scheme needs
-				   // one more term from the old time
-				   // step (and involves more
-				   // complicated factors) than the
-				   // backward Euler scheme that is
-				   // used for the first time
-				   // step. When all this is done, we
-				   // distribute the local vector into
-				   // the global one (including
-				   // hanging node constraints).
+				       // Next, we calculate the
+				       // artificial viscosity for
+				       // stabilization according to the
+				       // discussion in the introduction
+				       // using the dedicated
+				       // function. With that at hand, we
+				       // can define get into the loop
+				       // over quadrature points and local
+				       // rhs vector components. The terms
+				       // here are quite lenghty, but
+				       // their definition follows the
+				       // time-discrete system developed
+				       // in the introduction of this
+				       // program. The BDF-2 scheme needs
+				       // one more term from the old time
+				       // step (and involves more
+				       // complicated factors) than the
+				       // backward Euler scheme that is
+				       // used for the first time
+				       // step. When all this is done, we
+				       // distribute the local vector into
+				       // the global one (including
+				       // hanging node constraints).
       const double nu
 	= compute_viscosity (old_temperature_values,
 			     old_old_temperature_values,
@@ -2017,70 +2090,70 @@ void BoussinesqFlowProblem<dim>::assemble_temperature_system ()
 
 
 
-				   // @sect4{BoussinesqFlowProblem::solve}
-				   //
-				   // This function solves the linear
-				   // equation systems. According to
-				   // the introduction, we start with
-				   // the Stokes system, where we need
-				   // to generate our block Schur
-				   // preconditioner. Since all the
-				   // relevant actions are implemented
-				   // in the class
-				   // <tt>BlockSchurPreconditioner</tt>,
-				   // all we have to do is to
-				   // initialize the class
-				   // appropriately. What we need to
-				   // pass down is an
-				   // <tt>InverseMatrix</tt> object
-				   // for the pressure mass matrix,
-				   // which we set up using the
-				   // respective class together with
-				   // the IC preconditioner we already
-				   // generated, and the AMG
-				   // preconditioner for the
-				   // velocity-velocity matrix. Note
-				   // that both
-				   // <tt>Mp_preconditioner</tt> and
-				   // <tt>Amg_preconditioner</tt> are
-				   // only pointers, so we use
-				   // <tt>*</tt> to pass down the
-				   // actual preconditioner objects.
-				   // 
-				   // Once the preconditioner is
-				   // ready, we create a GMRES solver
-				   // for the block system. Since we
-				   // are working with Trilinos data
-				   // structures, we have to set the
-				   // respective template argument in
-				   // the solver. GMRES needs to
-				   // internally store temporary
-				   // vectors for each iteration (see
-				   // even the discussion in the
-				   // results section of step-22)
-				   // &ndash; the more vectors it can
-				   // use, the better it will
-				   // generally perform. To let memory
-				   // demands not increase to much, we
-				   // set the number of vectors to
-				   // 100. This means that up to 100
-				   // solver iterations, every
-				   // temporary vector can be
-				   // stored. If the solver needs to
-				   // iterate more often to get the
-				   // specified tolerance, it will
-				   // work on a reduced set of vectors
-				   // by restarting at every 100
-				   // iterations. Then, we solve the
-				   // system and distribute the
-				   // constraints in the Stokes
-				   // system, i.e. hanging nodes and
-				   // no-flux boundary condition, in
-				   // order to have the appropriate
-				   // solution values even at
-				   // constrained dofs. Finally, we
-				   // write the number of iterations
-				   // to the screen.
+				 // @sect4{BoussinesqFlowProblem::solve}
+				 //
+				 // This function solves the linear
+				 // equation systems. According to
+				 // the introduction, we start with
+				 // the Stokes system, where we need
+				 // to generate our block Schur
+				 // preconditioner. Since all the
+				 // relevant actions are implemented
+				 // in the class
+				 // <tt>BlockSchurPreconditioner</tt>,
+				 // all we have to do is to
+				 // initialize the class
+				 // appropriately. What we need to
+				 // pass down is an
+				 // <tt>InverseMatrix</tt> object
+				 // for the pressure mass matrix,
+				 // which we set up using the
+				 // respective class together with
+				 // the IC preconditioner we already
+				 // generated, and the AMG
+				 // preconditioner for the
+				 // velocity-velocity matrix. Note
+				 // that both
+				 // <tt>Mp_preconditioner</tt> and
+				 // <tt>Amg_preconditioner</tt> are
+				 // only pointers, so we use
+				 // <tt>*</tt> to pass down the
+				 // actual preconditioner objects.
+				 // 
+				 // Once the preconditioner is
+				 // ready, we create a GMRES solver
+				 // for the block system. Since we
+				 // are working with Trilinos data
+				 // structures, we have to set the
+				 // respective template argument in
+				 // the solver. GMRES needs to
+				 // internally store temporary
+				 // vectors for each iteration (see
+				 // even the discussion in the
+				 // results section of step-22)
+				 // &ndash; the more vectors it can
+				 // use, the better it will
+				 // generally perform. To let memory
+				 // demands not increase to much, we
+				 // set the number of vectors to
+				 // 100. This means that up to 100
+				 // solver iterations, every
+				 // temporary vector can be
+				 // stored. If the solver needs to
+				 // iterate more often to get the
+				 // specified tolerance, it will
+				 // work on a reduced set of vectors
+				 // by restarting at every 100
+				 // iterations. Then, we solve the
+				 // system and distribute the
+				 // constraints in the Stokes
+				 // system, i.e. hanging nodes and
+				 // no-flux boundary condition, in
+				 // order to have the appropriate
+				 // solution values even at
+				 // constrained dofs. Finally, we
+				 // write the number of iterations
+				 // to the screen.
 template <int dim>
 void BoussinesqFlowProblem<dim>::solve ()
 {
@@ -2088,18 +2161,18 @@ void BoussinesqFlowProblem<dim>::solve ()
 
   {
     LinearSolvers::InverseMatrix<TrilinosWrappers::SparseMatrix,
-				 TrilinosWrappers::PreconditionIC>
+      TrilinosWrappers::PreconditionIC>
       mp_inverse (stokes_preconditioner_matrix.block(1,1), *Mp_preconditioner);
 
     LinearSolvers::BlockSchurPreconditioner<TrilinosWrappers::PreconditionAMG,
-                                            TrilinosWrappers::PreconditionIC>
+      TrilinosWrappers::PreconditionIC>
       preconditioner (stokes_matrix, mp_inverse, *Amg_preconditioner);
 
     SolverControl solver_control (stokes_matrix.m(),
 				  1e-6*stokes_rhs.l2_norm());
 
     SolverGMRES<TrilinosWrappers::BlockVector> gmres(solver_control,
-      SolverGMRES<TrilinosWrappers::BlockVector >::AdditionalData(100));
+						     SolverGMRES<TrilinosWrappers::BlockVector >::AdditionalData(100));
 
     gmres.solve(stokes_matrix, stokes_solution, stokes_rhs, preconditioner);
 
@@ -2173,11 +2246,11 @@ void BoussinesqFlowProblem<dim>::solve ()
               << " CG iterations for temperature."
               << std::endl;
 
-				   // In the end of this function, we
-				   // step through the vector and read
-				   // out the maximum and minimum
-				   // temperature value, which we also
-				   // want to output.
+				     // In the end of this function, we
+				     // step through the vector and read
+				     // out the maximum and minimum
+				     // temperature value, which we also
+				     // want to output.
     double min_temperature = temperature_solution(0),
 	   max_temperature = temperature_solution(0);
     for (unsigned int i=0; i<temperature_solution.size(); ++i)
@@ -2196,53 +2269,53 @@ void BoussinesqFlowProblem<dim>::solve ()
 
 
 
-				   // @sect4{BoussinesqFlowProblem::output_results}
-				   // 
-				   // This function writes the
-				   // solution to a vtk output file
-				   // for visualization, which is done
-				   // every tenth time step. This is
-				   // usually a quite simple task,
-				   // since the deal.II library
-				   // provides functions that do
-				   // almost all the job for us. In
-				   // this case, the situation is a
-				   // bit more complicated, since we
-				   // want to visualize both the
-				   // Stokes solution and the
-				   // temperature as one data set, but
-				   // we have done all the
-				   // calculations based on two
-				   // different. The way we're going
-				   // to achieve this recombination is
-				   // to create a joint DoFHandler
-				   // that collects both components,
-				   // the Stokes solution and the
-				   // temperature solution. This can
-				   // be nicely done by combining the
-				   // finite elements from the two
-				   // systems to form one FESystem,
-				   // and let this collective system
-				   // define a new DoFHandler
-				   // object. To be sure that
-				   // everything was done correctly,
-				   // we perform a sanity check that
-				   // ensures that we got all the dofs
-				   // from both Stokes and temperature
-				   // even in the combined system.
-				   // 
-				   // Next, we create a vector that
-				   // collects the actual solution
-				   // values (up to now, we've just
-				   // provided the tools for it
-				   // without reading any data. Since
-				   // this vector is only going to be
-				   // used for output, we create it as
-				   // a deal.II vector that nicely
-				   // cooperate with the data output
-				   // classes. Remember that we used
-				   // Trilinos vectors for assembly
-				   // and solving.
+				 // @sect4{BoussinesqFlowProblem::output_results}
+				 // 
+				 // This function writes the
+				 // solution to a vtk output file
+				 // for visualization, which is done
+				 // every tenth time step. This is
+				 // usually a quite simple task,
+				 // since the deal.II library
+				 // provides functions that do
+				 // almost all the job for us. In
+				 // this case, the situation is a
+				 // bit more complicated, since we
+				 // want to visualize both the
+				 // Stokes solution and the
+				 // temperature as one data set, but
+				 // we have done all the
+				 // calculations based on two
+				 // different. The way we're going
+				 // to achieve this recombination is
+				 // to create a joint DoFHandler
+				 // that collects both components,
+				 // the Stokes solution and the
+				 // temperature solution. This can
+				 // be nicely done by combining the
+				 // finite elements from the two
+				 // systems to form one FESystem,
+				 // and let this collective system
+				 // define a new DoFHandler
+				 // object. To be sure that
+				 // everything was done correctly,
+				 // we perform a sanity check that
+				 // ensures that we got all the dofs
+				 // from both Stokes and temperature
+				 // even in the combined system.
+				 // 
+				 // Next, we create a vector that
+				 // collects the actual solution
+				 // values (up to now, we've just
+				 // provided the tools for it
+				 // without reading any data. Since
+				 // this vector is only going to be
+				 // used for output, we create it as
+				 // a deal.II vector that nicely
+				 // cooperate with the data output
+				 // classes. Remember that we used
+				 // Trilinos vectors for assembly
+				 // and solving.
 template <int dim>
 void BoussinesqFlowProblem<dim>::output_results ()  const
 {
@@ -2389,44 +2462,44 @@ void BoussinesqFlowProblem<dim>::output_results ()  const
 
 
 
-				   // @sect4{BoussinesqFlowProblem::refine_mesh}
-				   // 
-				   // This function takes care of the
-				   // adaptive mesh refinement. The
-				   // three tasks this function
-				   // performs is to first find out
-				   // which cells to refine/coarsen,
-				   // then to actually do the
-				   // refinement and eventually
-				   // transfer the solution vectors
-				   // between the two different
-				   // grids. The first task is simply
-				   // achieved by using the
-				   // well-established Kelly error
-				   // estimator on the temperature (it
-				   // is the temperature we're mainly
-				   // interested in for this program,
-				   // and we need to be accurate in
-				   // regions of high temperature
-				   // gradients, also to not have too
-				   // much numerical diffusion). The
-				   // second task is to actually do
-				   // the remeshing. That involves
-				   // only basic functions as well,
-				   // such as the
-				   // <tt>refine_and_coarsen_fixed_fraction</tt>
-				   // that refines the 80 precent of
-				   // the cells which have the largest
-				   // estimated error and coarsens the
-				   // 10 precent with the smallest
-				   // error. For reasons of limited
-				   // computer ressources, we have to
-				   // set a limit on the maximum
-				   // refinement level. We do this
-				   // after the refinement indicator
-				   // has been applied to the cells,
-				   // and simply unselect cells with
-				   // too high grid level.
+				 // @sect4{BoussinesqFlowProblem::refine_mesh}
+				 // 
+				 // This function takes care of the
+				 // adaptive mesh refinement. The
+				 // three tasks this function
+				 // performs is to first find out
+				 // which cells to refine/coarsen,
+				 // then to actually do the
+				 // refinement and eventually
+				 // transfer the solution vectors
+				 // between the two different
+				 // grids. The first task is simply
+				 // achieved by using the
+				 // well-established Kelly error
+				 // estimator on the temperature (it
+				 // is the temperature we're mainly
+				 // interested in for this program,
+				 // and we need to be accurate in
+				 // regions of high temperature
+				 // gradients, also to not have too
+				 // much numerical diffusion). The
+				 // second task is to actually do
+				 // the remeshing. That involves
+				 // only basic functions as well,
+				 // such as the
+				 // <tt>refine_and_coarsen_fixed_fraction</tt>
+				 // that refines the 80 precent of
+				 // the cells which have the largest
+				 // estimated error and coarsens the
+				 // 10 precent with the smallest
+				 // error. For reasons of limited
+				 // computer ressources, we have to
+				 // set a limit on the maximum
+				 // refinement level. We do this
+				 // after the refinement indicator
+				 // has been applied to the cells,
+				 // and simply unselect cells with
+				 // too high grid level.
 template <int dim>
 void BoussinesqFlowProblem<dim>::refine_mesh (const unsigned int max_grid_level)
 {
@@ -2540,35 +2613,35 @@ void BoussinesqFlowProblem<dim>::refine_mesh (const unsigned int max_grid_level)
 
 
 
-				   // @sect4{BoussinesqFlowProblem::run}
-				   // 
- 				   // This function performs all the
- 				   // essential steps in the
- 				   // Boussinesq program. It starts by
- 				   // setting up a grid (depending on
- 				   // the spatial dimension, we choose
- 				   // some different level of initial
- 				   // refinement and additional
- 				   // adative refinement steps, and
- 				   // then create a cube in
- 				   // <tt>dim</tt> dimensions and set
- 				   // up the dofs for the first
- 				   // time. Since we want to start the
- 				   // time stepping already with an
- 				   // adaptively refined grid, we
- 				   // perform some pre-refinement
- 				   // steps, consisting of all
- 				   // assembly, solution and
- 				   // refinement, but without actually
- 				   // advancing in time.
-				   // 
-				   // Before we start, we project the
-				   // initial values to the grid and
-				   // obtain the first data for the
-				   // <tt>old_temperature_solution</tt>
-				   // vector. Then, we initialize time
-				   // step number and time step and
-				   // start the time loop.
+				 // @sect4{BoussinesqFlowProblem::run}
+				 // 
+				 // This function performs all the
+				 // essential steps in the
+				 // Boussinesq program. It starts by
+				 // setting up a grid (depending on
+				 // the spatial dimension, we choose
+				 // some different level of initial
+				 // refinement and additional
+				 // adative refinement steps, and
+				 // then create a cube in
+				 // <tt>dim</tt> dimensions and set
+				 // up the dofs for the first
+				 // time. Since we want to start the
+				 // time stepping already with an
+				 // adaptively refined grid, we
+				 // perform some pre-refinement
+				 // steps, consisting of all
+				 // assembly, solution and
+				 // refinement, but without actually
+				 // advancing in time.
+				 // 
+				 // Before we start, we project the
+				 // initial values to the grid and
+				 // obtain the first data for the
+				 // <tt>old_temperature_solution</tt>
+				 // vector. Then, we initialize time
+				 // step number and time step and
+				 // start the time loop.
 template <int dim>
 void BoussinesqFlowProblem<dim>::run ()
 {
@@ -2603,28 +2676,28 @@ void BoussinesqFlowProblem<dim>::run ()
 		<< ", dt=" << time_step
                 << std::endl;
 
-				   // The first steps in the time loop
-				   // are all obvious &ndash; we
-				   // assemble the Stokes system, the
-				   // preconditioner, the temperature
-				   // matrix (matrices and
-				   // preconditioner do actually only
-				   // change in case we've remeshed
-				   // before), and then do the
-				   // solve. The solution is then
-				   // written to screen. Before going
-				   // on with the next time step, we
-				   // have to check whether we should
-				   // first finish the pre-refinement
-				   // steps or if we should remesh
-				   // (every fifth time step),
-				   // refining up to a level that is
-				   // consistent with initial
-				   // refinement and pre-refinement
-				   // steps. Last in the loop is to
-				   // advance the solutions, i.e. to
-				   // copy the temperature solution to
-				   // the next "older" time level.
+				       // The first steps in the time loop
+				       // are all obvious &ndash; we
+				       // assemble the Stokes system, the
+				       // preconditioner, the temperature
+				       // matrix (matrices and
+				       // preconditioner do actually only
+				       // change in case we've remeshed
+				       // before), and then do the
+				       // solve. The solution is then
+				       // written to screen. Before going
+				       // on with the next time step, we
+				       // have to check whether we should
+				       // first finish the pre-refinement
+				       // steps or if we should remesh
+				       // (every fifth time step),
+				       // refining up to a level that is
+				       // consistent with initial
+				       // refinement and pre-refinement
+				       // steps. Last in the loop is to
+				       // advance the solutions, i.e. to
+				       // copy the temperature solution to
+				       // the next "older" time level.
       assemble_stokes_system ();
       build_stokes_preconditioner ();
       assemble_temperature_matrix ();
@@ -2659,19 +2732,19 @@ void BoussinesqFlowProblem<dim>::run ()
 
 
 
-				   // @sect3{The <code>main</code> function}
-				   // 
-				   // The main function looks almost
-				   // the same as in all other
-				   // programs. The only difference is
-				   // that Trilinos wants to get the
-				   // arguments from calling the
-				   // function (argc and argv) in
-				   // order to correctly set up the
-				   // MPI system in case we use those
-				   // compilers (even though this
-				   // program is only meant to be run
-				   // in serial).
+				 // @sect3{The <code>main</code> function}
+				 // 
+				 // The main function looks almost
+				 // the same as in all other
+				 // programs. The only difference is
+				 // that Trilinos wants to get the
+				 // arguments from calling the
+				 // function (argc and argv) in
+				 // order to correctly set up the
+				 // MPI system in case we use those
+				 // compilers (even though this
+				 // program is only meant to be run
+				 // in serial).
 int main (int argc, char *argv[])
 {
   try
