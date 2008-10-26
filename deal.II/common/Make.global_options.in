@@ -112,8 +112,11 @@ lib-deal2-2d.g = $(LIBDIR)/libdeal_II_2d.g$(lib-suffix)
 lib-deal2-3d.g = $(LIBDIR)/libdeal_II_3d.g$(lib-suffix)
 
 # dealing with shared libraries
-DEAL_II_SHLIB_NAME = lib$(1)$(shared-lib-suffix).$(DEAL_II_VERSION)
-
+ifeq ($(shared-lib-suffix),.so)
+  DEAL_II_SHLIB_NAME = lib$(1)$(shared-lib-suffix).$(DEAL_II_VERSION)
+else
+  DEAL_II_SHLIB_NAME = lib$(1).$(DEAL_II_VERSION)$(shared-lib-suffix)
+endif
 ifeq (@DEAL_II_LD_UNDERSTANDS_SONAME@,yes)
   DEAL_II_ADD_SONAME = -Wl,-soname,$(call DEAL_II_SHLIB_NAME,$(1))
 else
