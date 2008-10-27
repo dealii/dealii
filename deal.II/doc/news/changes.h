@@ -321,6 +321,16 @@ inconvenience this causes.
 
   <li>
   <p>
+  New: Added the CompressedSimpleSparsityPattern as an alternative to 
+  CompressedSparsityPattern and CompressedSetSparsityPattern, which
+  should be faster in most cases but its memory usage is somewhere
+  inbetween.
+  <br>
+  (Timo Heister 2008/09/03)
+  </p>
+
+  <li>
+  <p>
   Improved: The CompressedSparsityPattern can now elide some operations
   upon entering entries that may have been added before already.
   <br>
@@ -353,6 +363,13 @@ inconvenience this causes.
 <h3>deal.II</h3>
 
 <ol>
+  <li>
+  <p>
+  New: MatrixTools::apply_boundary_values() also for PETScWrappers::MPI::BlockSparseMatrix.
+  <br>
+  (Timo Heister 2008/10/27)
+  </p>
+
   <li>
   <p>
   New: When calling function DoFTools::make_sparsity_pattern with a ConstraintMatrix, it is now possible to set a bool argument keep_constrained_dofs. When this flag is set to false, constrained rows and columns will not be part of the sparsity pattern, which increases the performance of matrix operations and decrease memory consumption in case there are many constraints.

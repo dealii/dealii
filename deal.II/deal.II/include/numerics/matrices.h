@@ -55,7 +55,9 @@ namespace PETScWrappers
   namespace MPI
   {
     class SparseMatrix;
+    class BlockSparseMatrix;
     class Vector;
+    class BlockVector;
   }
 }
 #endif
@@ -1109,6 +1111,17 @@ class MatrixTools : public MatrixCreator
 			   PETScWrappers::Vector       &solution,
 			   PETScWrappers::MPI::Vector  &right_hand_side,
 			   const bool             eliminate_columns = true);
+    
+                                    /**
+                                      * Same as above but for BlockSparseMatrix.
+				      */    					
+    static void
+    apply_boundary_values (const std::map<unsigned int,double>  &boundary_values,
+                       PETScWrappers::MPI::BlockSparseMatrix  &matrix,
+                       PETScWrappers::MPI::BlockVector        &solution,
+                       PETScWrappers::MPI::BlockVector        &right_hand_side,
+                       const bool       eliminate_columns = true);
+    
 #endif
 
 #ifdef DEAL_II_USE_TRILINOS

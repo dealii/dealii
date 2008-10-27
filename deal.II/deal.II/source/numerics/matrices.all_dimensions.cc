@@ -24,6 +24,7 @@
 #  include <lac/petsc_sparse_matrix.h>
 #  include <lac/petsc_parallel_vector.h>
 #  include <lac/petsc_vector.h>
+#  include <lac/petsc_parallel_block_sparse_matrix.h>
 #endif
 
 #ifdef DEAL_II_USE_TRILINOS
@@ -680,6 +681,81 @@ apply_boundary_values (const std::map<unsigned int,double> &boundary_values,
   matrix.compress ();  
 }
 
+
+void
+MatrixTools::
+apply_boundary_values (const std::map<unsigned int,double>  &boundary_values,
+                       PETScWrappers::MPI::BlockSparseMatrix  &matrix,
+                       PETScWrappers::MPI::BlockVector        &solution,
+                       PETScWrappers::MPI::BlockVector        &right_hand_side,
+                       const bool                            eliminate_columns)
+{
+  Assert (matrix.n() == right_hand_side.size(),
+          ExcDimensionMismatch(matrix.n(), right_hand_side.size()));
+  Assert (matrix.n() == solution.size(),
+          ExcDimensionMismatch(matrix.n(), solution.size()));
+  Assert (matrix.n_block_rows() == matrix.n_block_cols(),
+          ExcNotQuadratic());
+
+  const unsigned int n_blocks = matrix.n_block_rows();
+
+  matrix.compress();
+
+                                   // We need to find the subdivision
+                                   // into blocks for the boundary values.
+                                   // To this end, generate a vector of
+                                   // maps with the respective indices.
+  std::vector<std::map<unsigned int,double> > block_boundary_values(n_blocks);
+  {
+    int offset = 0, block=0;
+    for (std::map<unsigned int,double>::const_iterator
+            dof  = boundary_values.begin();
+          dof != boundary_values.end();
+          ++dof)
+      {
+        if (dof->first >= matrix.block(block,0).m() + offset)
+          {
+            offset += matrix.block(block,0).m();
+            block++;
+          }
+        const unsigned int index = dof->first - offset;
+        block_boundary_values[block].insert(std::pair<unsigned int, double> (index,dof->second));
+      }
+  }
+
+                                   // Now call the non-block variants on
+                                   // the diagonal subblocks and the
+                                   // solution/rhs.
+  for (unsigned int block=0; block<n_blocks; ++block)
+    PETScWrappers::apply_boundary_values(block_boundary_values[block],
+                                         matrix.block(block,block),
+                                         solution.block(block),
+                                         right_hand_side.block(block),
+                                         eliminate_columns);
+
+                                  // Finally, we need to do something
+                                   // about the off-diagonal matrices. This
+                                   // is luckily not difficult. Just clear
+                                   // the whole row.
+  for (unsigned int block_m=0; block_m<n_blocks; ++block_m)
+    {
+      const std::pair<unsigned int, unsigned int> local_range
+        = matrix.block(block_m,0).local_range();
+
+      std::vector<unsigned int> constrained_rows;
+      for (std::map<unsigned int,double>::const_iterator
+            dof  = block_boundary_values[block_m].begin();
+          dof != block_boundary_values[block_m].end();
+          ++dof)
+        if ((dof->first >= local_range.first) &&
+            (dof->first < local_range.second))
+          constrained_rows.push_back (dof->first);
+
+      for (unsigned int block_n=0; block_n<n_blocks; ++block_n)
+        if (block_m != block_n)
+          matrix.block(block_m,block_n).clear_rows(constrained_rows);
+    }
+}
 
 #endif
 
