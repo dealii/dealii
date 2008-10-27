@@ -7,6 +7,12 @@ DEAL:1d::subdivided_hyper_cube
 1.00000 0 0
 3.00000 0 0
 
+3.00000 0 0
+5.00000 0 0
+
+5.00000 0 0
+7.00000 0 0
+
 DEAL:1d::hyper_rectangle
 2.00000 0 0
 3.00000 0 0
@@ -14,6 +20,9 @@ DEAL:1d::hyper_rectangle
 DEAL:1d::subdivided_hyper_rectangle
 2.00000 0 1
 2.50000 0 1
+
+2.50000 0 1
+3.00000 0 1
 
 DEAL:2d::hyper_cube
 #FIG 3.2
