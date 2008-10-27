@@ -712,8 +712,54 @@ BoussinesqFlowProblem<dim>::BoussinesqFlowProblem ()
 				 //
 				 // The only point worth thinking about a bit
 				 // is how to choose the quadrature points we
-				 // use here.
-//TODO finish...
+				 // use here. Since the goal of this function
+				 // is to find the maximal velocity over a
+				 // domain by looking at quadrature points on
+				 // each cell. So we should ask how we should
+				 // best choose these quadrature points on
+				 // each cell. To this end, recall that if we
+				 // had a single $Q_1$ field (rather than the
+				 // vector-valued field of higher order) then
+				 // the maximum would be attained at a vertex
+				 // of the mesh. In other words, we should use
+				 // the QTrapez class that has quadrature
+				 // points only at the vertices of cells.
+				 //
+				 // For higher order shape functions, the
+				 // situation is more complicated: the maxima
+				 // and minima may be attained at points
+				 // between the support points of shape
+				 // functions (for the usual $Q_p$ elements
+				 // the support points are the equidistant
+				 // Lagrange interpolation points);
+				 // furthermore, since we are looking for the
+				 // maximum magnitude of a vector-valued
+				 // quantity, we can even less say with
+				 // certainty where the set of potential
+				 // maximal points are. Nevertheless,
+				 // intuitively if not provably, the Lagrange
+				 // interpolation points appear to be a better
+				 // choice than the Gauss points.
+				 //
+				 // There are now different methods to produce
+				 // a quadrature formula with quadrature
+				 // points equal to the interpolation points
+				 // of the finite element. One option would be
+				 // to use the
+				 // FiniteElement::get_unit_support_points()
+				 // function, reduce the output to a unique
+				 // set of points to avoid duplicate function
+				 // evaluations, and create a Quadrature
+				 // object using these points. Another option,
+				 // chosen here, is to use the QTrapez class
+				 // and combine it with the QIterated class
+				 // that repeats the QTrapez formula on a
+				 // number of sub-cells in each coordinate
+				 // direction. To cover all support points, we
+				 // need to iterate it
+				 // <code>stokes_degree+1</code> times since
+				 // this is the polynomial degree of the
+				 // Stokes element in use:
 template <int dim>
 double BoussinesqFlowProblem<dim>::get_maximal_velocity () const
 {
@@ -766,7 +812,7 @@ double BoussinesqFlowProblem<dim>::get_maximal_velocity () const
 				 // $\left(1+\frac{k_n}{k_{n-1}}
 				 // \right)T^{n-1} + \frac{k_n}{k_{n-1}}
 				 // T^{n-2}$. The way to compute it is to loop
-				 // over all quadrature points and updated the
+				 // over all quadrature points and update the
 				 // maximum and minimum value if the current
 				 // value is bigger/smaller than the previous
 				 // one. We initialize the variables that
@@ -799,12 +845,18 @@ double BoussinesqFlowProblem<dim>::get_maximal_velocity () const
 				 // step, $T^{k-2}$ is not yet available of
 				 // course. In that case, we can only use
 				 // $T^{k-1}$ which we have from the initial
-				 // temperature.
+				 // temperature. As quadrature points, we use
+				 // the same choice as in the previous
+				 // function though with the difference that
+				 // now the number of repetitions is
+				 // determined by the polynomial degree of the
+				 // temperature field.
 template <int dim>
 std::pair<double,double>
 BoussinesqFlowProblem<dim>::get_extrapolated_temperature_range () const
 {
-  const QGauss<dim>  quadrature_formula(temperature_degree+2);
+  const QIterated<dim> quadrature_formula (QTrapez<1>(),
+					   temperature_degree);
   const unsigned int n_q_points = quadrature_formula.size();
 
   FEValues<dim> fe_values (temperature_fe, quadrature_formula,

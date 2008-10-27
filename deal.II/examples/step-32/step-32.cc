@@ -379,7 +379,8 @@ BoussinesqFlowProblem<dim>::BoussinesqFlowProblem (Utilities::TrilinosTools &tri
 template <int dim>
 double BoussinesqFlowProblem<dim>::get_maximal_velocity () const
 {
-  const QGauss<dim>  quadrature_formula(stokes_degree+2);
+  const QIterated<dim> quadrature_formula (QTrapez<1>(),
+					   stokes_degree+1);
   const unsigned int n_q_points = quadrature_formula.size();
 
   BlockVector<double> localized_stokes_solution (stokes_solution);
@@ -419,7 +420,8 @@ template <int dim>
 std::pair<double,double>
 BoussinesqFlowProblem<dim>::get_extrapolated_temperature_range () const
 {
-  const QGauss<dim>  quadrature_formula(temperature_degree+2);
+  const QIterated<dim> quadrature_formula (QTrapez<1>(),
+					   temperature_degree);
   const unsigned int n_q_points = quadrature_formula.size();
 
   FEValues<dim> fe_values (temperature_fe, quadrature_formula,
