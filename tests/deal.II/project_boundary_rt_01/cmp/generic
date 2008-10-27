@@ -1,7 +1,17 @@
 
+DEAL::FE_RaviartThomasNodal<2>(1)
+DEAL::Cells: 16
+DEAL::Constraints: 32
+DEAL::0
 DEAL::FE_RaviartThomasNodal<2>(2)
+DEAL::Cells: 16
+DEAL::Constraints: 48
 DEAL::0
 DEAL::FE_RaviartThomasNodal<2>(3)
+DEAL::Cells: 16
+DEAL::Constraints: 64
 DEAL::0
 DEAL::FE_RaviartThomasNodal<2>(4)
+DEAL::Cells: 16
+DEAL::Constraints: 80
 DEAL::0
