@@ -723,11 +723,11 @@ BoussinesqFlowProblem<dim>::assemble_stokes_preconditioner ()
 {
   stokes_preconditioner_matrix = 0;
 
-  QGauss<dim>   quadrature_formula(stokes_degree+2);
-  FEValues<dim> stokes_fe_values (stokes_fe, quadrature_formula,
-				  update_JxW_values |
-				  update_values |
-				  update_gradients);
+  const QGauss<dim> quadrature_formula (stokes_degree+2);
+  FEValues<dim>     stokes_fe_values (stokes_fe, quadrature_formula,
+				      update_JxW_values |
+				      update_values |
+				      update_gradients);
   const unsigned int   dofs_per_cell   = stokes_fe.dofs_per_cell;
 
   const unsigned int   n_q_points      = quadrature_formula.size();
@@ -826,33 +826,28 @@ void BoussinesqFlowProblem<dim>::assemble_stokes_system ()
 
   stokes_rhs=0;
 
-  QGauss<dim>   quadrature_formula(stokes_degree+2);
-  QGauss<dim-1> face_quadrature_formula(stokes_degree+2);
-
-  FEValues<dim> stokes_fe_values (stokes_fe, quadrature_formula,
-				  update_values    |
-				  update_quadrature_points  |
-				  update_JxW_values |
-				  (rebuild_stokes_matrix == true
-				   ?
-				   update_gradients
-				   :
-				   UpdateFlags(0)));
-
-  FEValues<dim> temperature_fe_values (temperature_fe, quadrature_formula,
-				       update_values);
+  const QGauss<dim> quadrature_formula(stokes_degree+2);
+  FEValues<dim>     stokes_fe_values (stokes_fe, quadrature_formula,
+				      update_values    |
+				      update_quadrature_points  |
+				      update_JxW_values |
+				      (rebuild_stokes_matrix == true
+				       ?
+				       update_gradients
+				       :
+				       UpdateFlags(0)));
+  
+  FEValues<dim>     temperature_fe_values (temperature_fe, quadrature_formula,
+					   update_values);
 
   const unsigned int   dofs_per_cell   = stokes_fe.dofs_per_cell;
 
   const unsigned int   n_q_points      = quadrature_formula.size();
-  const unsigned int   n_face_q_points = face_quadrature_formula.size();
 
   FullMatrix<double>   local_matrix (dofs_per_cell, dofs_per_cell);
   Vector<double>       local_rhs (dofs_per_cell);
 
   std::vector<unsigned int> local_dof_indices (dofs_per_cell);
-
-  std::vector<double>               boundary_values (n_face_q_points);
 
   std::vector<double>               old_temperature_values(n_q_points);
 
@@ -950,10 +945,10 @@ void BoussinesqFlowProblem<dim>::assemble_temperature_matrix ()
   temperature_mass_matrix = 0;
   temperature_stiffness_matrix = 0;
   
-  QGauss<dim>   quadrature_formula(temperature_degree+2);
-  FEValues<dim> temperature_fe_values (temperature_fe, quadrature_formula,
-				       update_values    | update_gradients |
-				       update_JxW_values);
+  const QGauss<dim> quadrature_formula(temperature_degree+2);
+  FEValues<dim>     temperature_fe_values (temperature_fe, quadrature_formula,
+					   update_values    | update_gradients |
+					   update_JxW_values);
 
   const unsigned int   dofs_per_cell   = temperature_fe.dofs_per_cell;
   const unsigned int   n_q_points      = quadrature_formula.size();
@@ -962,8 +957,6 @@ void BoussinesqFlowProblem<dim>::assemble_temperature_matrix ()
   FullMatrix<double>   local_stiffness_matrix (dofs_per_cell, dofs_per_cell);
 
   std::vector<unsigned int> local_dof_indices (dofs_per_cell);
-
-  std::vector<double> gamma_values (n_q_points);
 
   std::vector<double>                  phi_T       (dofs_per_cell);
   std::vector<Tensor<1,dim> >          grad_phi_T  (dofs_per_cell);
@@ -1041,11 +1034,13 @@ void BoussinesqFlowProblem<dim>::assemble_temperature_system ()
   
   temperature_rhs = 0;
   
-  QGauss<dim>   quadrature_formula(temperature_degree+2);
-  FEValues<dim> temperature_fe_values (temperature_fe, quadrature_formula,
-				       update_values    | update_gradients |
-				       update_hessians |
-				       update_quadrature_points  | update_JxW_values);
+  const QGauss<dim> quadrature_formula(temperature_degree+2);
+  FEValues<dim>     temperature_fe_values (temperature_fe, quadrature_formula,
+					   update_values    |
+					   update_gradients |
+					   update_hessians  |
+					   update_quadrature_points |
+					   update_JxW_values);
   FEValues<dim> stokes_fe_values (stokes_fe, quadrature_formula,
 				  update_values);
 
