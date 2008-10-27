@@ -928,17 +928,15 @@ BoussinesqFlowProblem<dim>::get_extrapolated_temperature_range () const
 
 				 // @sect4{BoussinesqFlowProblem::compute_viscosity}
 
-				 // The last of the tool functions
-				 // computes the artificial viscosity
-				 // parameter $\nu|_K$ on a cell $K$
-				 // as a function of the extrapolated
-				 // temperature, its gradient, the
-				 // velocity, the right hand side
-				 // $\gamma$ all on the quadrature
-				 // points of the current cell, and
-				 // various other parameters as
-				 // described in detail in the
-				 // introduction.
+				 // The last of the tool functions computes
+				 // the artificial viscosity parameter
+				 // $\nu|_K$ on a cell $K$ as a function of
+				 // the extrapolated temperature, its gradient
+				 // and Hessian (second derivatives), the
+				 // velocity, the right hand side $\gamma$ all
+				 // on the quadrature points of the current
+				 // cell, and various other parameters as
+				 // described in detail in the introduction.
 				 //
 				 // There are some universal constants
 				 // worth mentioning here. First, we
@@ -1039,11 +1037,11 @@ compute_viscosity (const std::vector<double>          &old_temperature,
 				 // This is the function that sets up the
 				 // DoFHandler objects we have here (one for
 				 // the Stokes part and one for the
-				 // temperature part) as well set to the right
-				 // sizes the various objects required for the
-				 // linear algebra in this program. Its basic
-				 // operations are similar to what we do in
-				 // step-22.
+				 // temperature part) as well as set to the
+				 // right sizes the various objects required
+				 // for the linear algebra in this
+				 // program. Its basic operations are similar
+				 // to what we do in step-22.
 				 // 
 				 // The body of the function first enumerates
 				 // all degrees of freedom for the Stokes and
@@ -1068,10 +1066,11 @@ compute_viscosity (const std::vector<double>          &old_temperature,
 				 // matrix. The second parameter in the
 				 // function describes the first of the
 				 // velocity components in the total dof
-				 // vector, which is zero here. The parameter
+				 // vector, which is zero here. The variable
 				 // <code>no_normal_flux_boundaries</code>
-				 // sets the no flux b.c. to those boundaries
-				 // with boundary indicator zero.
+				 // denotes the boundary indicators for which
+				 // to set the no flux boundary conditions;
+				 // here, this is boundary indicator zero.
 				 //
 				 // After having done so, we count the number
 				 // of degrees of freedom in the various
@@ -1127,21 +1126,20 @@ void BoussinesqFlowProblem<dim>::setup_dofs ()
             << std::endl
             << std::endl;
   
-				   // The next step is to create the
-				   // sparsity pattern for the Stokes and
-				   // temperature system matrices as well as
-				   // the preconditioner matrix from which
-				   // we build the Stokes preconditioner. As
-				   // in step-22, we choose to create the
-				   // pattern not as in the first few
-				   // tutorial programs, but by using the
-				   // blocked version of
-				   // CompressedSetSparsityPattern.  The
-				   // reason for doing this is mainly
-				   // memory, that is, the basic procedures
-				   // consume too much memory when used in
-				   // three spatial dimensions as we intend
-				   // to do for this program.
+				   // The next step is to create the sparsity
+				   // pattern for the Stokes and temperature
+				   // system matrices as well as the
+				   // preconditioner matrix from which we
+				   // build the Stokes preconditioner. As in
+				   // step-22, we choose to create the pattern
+				   // not as in the first few tutorial
+				   // programs, but by using the blocked
+				   // version of CompressedSetSparsityPattern.
+				   // The reason for doing this is mainly
+				   // memory, that is, the SparsityPattern
+				   // class would consume too much memory when
+				   // used in three spatial dimensions as we
+				   // intend to do for this program.
 				   // 
 				   // So, we first release the memory stored
 				   // in the matrices, then set up an object
@@ -1159,42 +1157,43 @@ void BoussinesqFlowProblem<dim>::setup_dofs ()
 				   // (but all velocity vector components
 				   // couple with each other and with the
 				   // pressure). Similarly, in the Stokes
-				   // preconditioner matrix, only the
-				   // diagonal blocks are nonzero, since we
-				   // use the vector Laplacian as discussed
-				   // in the introduction. This operator
-				   // only couples each vector component of
-				   // the Laplacian with itself, but not
-				   // with the other vector
-				   // components. Though, the operator is
-				   // subject to the application of
-				   // constraints which couple vector
-				   // components at the boundary again.
+				   // preconditioner matrix, only the diagonal
+				   // blocks are nonzero, since we use the
+				   // vector Laplacian as discussed in the
+				   // introduction. This operator only couples
+				   // each vector component of the Laplacian
+				   // with itself, but not with the other
+				   // vector components. (Application of the
+				   // constraints resulting from the no-flux
+				   // boundary conditions will couple vector
+				   // components at the boundary again,
+				   // however.)
 				   //
-				   // When generating the sparsity pattern,
-				   // we directly apply the constraints from
+				   // When generating the sparsity pattern, we
+				   // directly apply the constraints from
 				   // hanging nodes and no-flux boundary
 				   // conditions. This approach was already
 				   // used in step-27, but is different from
-				   // the one in early tutorial
-				   // programs. The reason for doing so is
-				   // that later during assembly we are
-				   // going to distribute the constraints
-				   // immediately when transferring local to
-				   // global dofs. Consequently, there will
-				   // be no data written at positions of
-				   // constrained degrees of freedom, so we
-				   // can let the
-				   // DoFTools::make_sparsity_pattern
-				   // function omit these entries by setting
-				   // the last boolean flag to
-				   // <tt>false</tt>. Once the sparsity
-				   // pattern is ready, we can use it to
-				   // initialize the Trilinos matrices. Note
-				   // that the Trilinos matrices store the
-				   // sparsity pattern internally, so there
-				   // is no need to keep the sparsity
-				   // pattern around after the
+				   // the one in early tutorial programs where
+				   // we first built the original sparsity
+				   // pattern and only then added the entries
+				   // resulting from constraints. The reason
+				   // for doing so is that later during
+				   // assembly we are going to distribute the
+				   // constraints immediately when
+				   // transferring local to global
+				   // dofs. Consequently, there will be no
+				   // data written at positions of constrained
+				   // degrees of freedom, so we can let the
+				   // DoFTools::make_sparsity_pattern function
+				   // omit these entries by setting the last
+				   // boolean flag to <tt>false</tt>. Once the
+				   // sparsity pattern is ready, we can use it
+				   // to initialize the Trilinos
+				   // matrices. Note that the Trilinos
+				   // matrices store the sparsity pattern
+				   // internally, so there is no need to keep
+				   // the sparsity pattern around after the
 				   // initialization of the matrix.
   stokes_block_sizes.resize (2);
   stokes_block_sizes[0] = n_u;
@@ -1263,7 +1262,7 @@ void BoussinesqFlowProblem<dim>::setup_dofs ()
 				   // of the Stokes matrix &ndash; except
 				   // that it is much easier here since we
 				   // do not need to take care of any
-				   // blocks.
+				   // blocks or coupling between components:
   {
     temperature_mass_matrix.clear ();
     temperature_stiffness_matrix.clear ();
@@ -1278,13 +1277,12 @@ void BoussinesqFlowProblem<dim>::setup_dofs ()
     temperature_stiffness_matrix.reinit (csp);
   }
 
-				   // As last action in this function, we
-				   // set the vectors for the solution
-				   // $\mathbf u$ and $T^k$, the old
+				   // Lastly, we set the vectors for the
+				   // solution $\mathbf u$ and $T^k$, the old
 				   // solutions $T^{k-1}$ and $T^{k-2}$
 				   // (required for time stepping) and the
-				   // system right hand sides to their
-				   // correct sizes and block structure:
+				   // system right hand sides to their correct
+				   // sizes and block structure:
   stokes_solution.reinit (stokes_block_sizes);
   stokes_rhs.reinit (stokes_block_sizes);
 
@@ -1299,27 +1297,27 @@ void BoussinesqFlowProblem<dim>::setup_dofs ()
 
 				 // @sect4{BoussinesqFlowProblem::assemble_stokes_preconditioner}
 				 // 
-                                 // This function assembles the matrix we
-                                 // use for preconditioning the Stokes
-                                 // system. What we need are a vector
-                                 // Laplace matrix on the velocity
-                                 // components and a mass matrix on the
-                                 // pressure component. We start by
-                                 // generating a quadrature object of
-                                 // appropriate order, the FEValues object
-                                 // that can give values and gradients at
-                                 // the quadrature points (together with
-                                 // quadrature weights). Next we create data
-                                 // structures for the cell matrix and the
-                                 // relation between local and global
-                                 // DoFs. The vectors <tt>phi_grad_u</tt>
-                                 // and <tt>phi_p</tt> are going to hold the
-                                 // values of the basis functions in order
-                                 // to faster build up the local matrices,
-                                 // as was already done in step-22. Before
-                                 // we start the loop over all active cells,
-                                 // we have to specify which components are
-                                 // pressure and which are velocity.
+                                 // This function assembles the matrix we use
+                                 // for preconditioning the Stokes
+                                 // system. What we need are a vector Laplace
+                                 // matrix on the velocity components and a
+                                 // mass matrix weighted by $\eta^{-1}$ on the
+                                 // pressure component. We start by generating
+                                 // a quadrature object of appropriate order,
+                                 // the FEValues object that can give values
+                                 // and gradients at the quadrature points
+                                 // (together with quadrature weights). Next
+                                 // we create data structures for the cell
+                                 // matrix and the relation between local and
+                                 // global DoFs. The vectors
+                                 // <tt>phi_grad_u</tt> and <tt>phi_p</tt> are
+                                 // going to hold the values of the basis
+                                 // functions in order to faster build up the
+                                 // local matrices, as was already done in
+                                 // step-22. Before we start the loop over all
+                                 // active cells, we have to specify which
+                                 // components are pressure and which are
+                                 // velocity.
 template <int dim>
 void
 BoussinesqFlowProblem<dim>::assemble_stokes_preconditioner ()
@@ -1353,13 +1351,12 @@ BoussinesqFlowProblem<dim>::assemble_stokes_preconditioner ()
       local_matrix = 0;
 
 				       // The creation of the local matrix is
-				       // very simple. There are only a
+				       // rather simple. There are only a
 				       // Laplace term (on the velocity) and a
 				       // mass matrix weighted by $\eta^{-1}$
 				       // to be generated, so the creation of
 				       // the local matrix is done in two
-				       // lines, if we first shortcut to the
-				       // FE data. Once the local matrix is
+				       // lines. Once the local matrix is
 				       // ready (loop over rows and columns in
 				       // the local matrix on each quadrature
 				       // point), we get the local DoF indices
@@ -1368,7 +1365,11 @@ BoussinesqFlowProblem<dim>::assemble_stokes_preconditioner ()
 				       // step-27, i.e. we directly apply the
 				       // constraints from hanging nodes
 				       // locally. By doing so, we don't have
-				       // to do that afterwards.
+				       // to do that afterwards, and we don't
+				       // also write into entries of the
+				       // matrix that will actually be set to
+				       // zero again later when eliminating
+				       // constraints.
       for (unsigned int q=0; q<n_q_points; ++q)
 	{
 	  for (unsigned int k=0; k<dofs_per_cell; ++k)
