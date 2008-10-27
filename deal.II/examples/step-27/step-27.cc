@@ -211,27 +211,24 @@ LaplaceProblem<dim>::~LaplaceProblem ()
 				 // @sect4{LaplaceProblem::setup_system}
 				 //
 				 // This function is again an almost
-				 // verbatim copy of what we already
-				 // did in step-6, with the main
-				 // difference that we don't directly
-				 // build the sparsity pattern, but
-				 // first create an intermediate
-				 // object that we later copy into the
-				 // right data structure. In another
-				 // slight deviation, we do not first
-				 // build the sparsity pattern then
-				 // condense away constrained degrees
-				 // of freedom, but pass the
-				 // constraint matrix object directly
-				 // to the function that builds the
-				 // sparsity pattern. We disable the
-				 // insertion of constrained entries
-				 // with <tt>false</tt> as fourth
-				 // argument in the
-				 // DoFTools::make_sparsity_pattern
-				 // function. Both of these steps are
-				 // explained in the introduction of
-				 // this program.
+				 // verbatim copy of what we already did in
+				 // step-6, with the main difference that we
+				 // don't directly build the sparsity
+				 // pattern, but first create an
+				 // intermediate object that we later copy
+				 // into the right data structure. In
+				 // another slight deviation, we do not
+				 // first build the sparsity pattern then
+				 // condense away constrained degrees of
+				 // freedom, but pass the constraint matrix
+				 // object directly to the function that
+				 // builds the sparsity pattern. We disable
+				 // the insertion of constrained entries
+				 // with <tt>false</tt> as fourth argument
+				 // in the DoFTools::make_sparsity_pattern
+				 // function. Both of these changes are
+				 // explained in the introduction of this
+				 // program.
 				 //
 				 // The second change, maybe hidden in plain
 				 // sight, is that the dof_handler variable

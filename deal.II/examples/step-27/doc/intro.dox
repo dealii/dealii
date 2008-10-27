@@ -715,15 +715,14 @@ we now use the following:
                                    hanging_node_constraints, false);
 @endcode
 
-Note also the last argument <tt>false</tt> for the creation of the
-sparsity pattern. It tells the sparsity pattern that constrained
-entries should not be inserted into the sparsity pattern. This makes
-sense for the way we're going to do assembly, which does the
-elimination of constraints already locally. Hence, we will never write
-touch the constrained entries. This gives some additional performance
-gain, since the system matrix will use have less entries &mdash; this
-saves both memory and computing time when doing matrix-vector
-multiplications or using a preconditioner.
+Note the last <tt>false</tt> argument we pass when creating the sparsity
+pattern. It tells the sparsity pattern that constrained entries should not
+be inserted into the sparsity pattern. This makes sense for the way we're
+going to do assembly, which does the elimination of constraints already
+locally. Hence, we will never write touch the constrained entries. This is
+the second key to increase this program's performance, since the system
+matrix will have less entries &mdash; this saves both memory and computing
+time when doing matrix-vector multiplications or applying a preconditioner.
 
 In a similar vein, we have to slightly modify the way we copy local
 contributions into global matrices and vectors. In previous tutorial programs,
