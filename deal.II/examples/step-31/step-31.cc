@@ -2427,6 +2427,19 @@ void BoussinesqFlowProblem<dim>::output_results ()  const
 				   // the relation between global vector and
 				   // local dofs looks like on the present
 				   // cell, which concludes this tedious work.
+				   // 
+				   // There's one thing worth remembering
+				   // when looking at the output: In our
+				   // algorithm, we first solve for the
+				   // Stokes system at time level <i>n-1</i>
+				   // and then for the temperature at time
+				   // level <i>n</i>. These are the two
+				   // components we join for output, so what
+				   // one is going to look at has this
+				   // little misalignment. Since output is
+				   // only a qualititative mean anyway, we
+				   // can ignore this $\mathcal{O}(h)$
+				   // error.
   {
     std::vector<unsigned int> local_joint_dof_indices (joint_fe.dofs_per_cell);
     std::vector<unsigned int> local_stokes_dof_indices (stokes_fe.dofs_per_cell);
