@@ -1358,6 +1358,7 @@ AC_DEFUN(DEAL_II_SET_CC_FLAGS, dnl
       ibm_xlc)
           CFLAGS="$CFLAGS -O2"
           CFLAGSPIC="-fPIC"
+	  SHLIBLD="$CXX"
           ;;
   
       MIPSpro*)
