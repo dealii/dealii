@@ -1212,19 +1212,20 @@ void BoussinesqFlowProblem<dim>::solve ()
   pcout << "   Solving..." << std::endl;
 
   {
-    LinearSolvers::InverseMatrix<TrilinosWrappers::SparseMatrix,
-				 TrilinosWrappers::PreconditionIC>
+    const LinearSolvers::InverseMatrix<TrilinosWrappers::SparseMatrix,
+		 		       TrilinosWrappers::PreconditionIC>
       mp_inverse (stokes_preconditioner_matrix.block(1,1), *Mp_preconditioner);
 
-    LinearSolvers::BlockSchurPreconditioner<TrilinosWrappers::PreconditionAMG,
-                                            TrilinosWrappers::PreconditionIC>
+    const LinearSolvers::BlockSchurPreconditioner<TrilinosWrappers::PreconditionAMG,
+                                                  TrilinosWrappers::PreconditionIC>
       preconditioner (stokes_matrix, mp_inverse, *Amg_preconditioner);
 
     SolverControl solver_control (stokes_matrix.m(),
 				  1e-6*stokes_rhs.l2_norm());
 
-    SolverGMRES<TrilinosWrappers::MPI::BlockVector> gmres(solver_control,
-      SolverGMRES<TrilinosWrappers::MPI::BlockVector >::AdditionalData(100));
+    SolverGMRES<TrilinosWrappers::MPI::BlockVector>
+      gmres (solver_control,
+	     SolverGMRES<TrilinosWrappers::MPI::BlockVector >::AdditionalData(100));
 
     gmres.solve(stokes_matrix, stokes_solution, stokes_rhs, preconditioner);
 
@@ -1243,6 +1244,9 @@ void BoussinesqFlowProblem<dim>::solve ()
 	      temperature_degree *
 	      GridTools::minimal_cell_diameter(triangulation) /
               std::max (get_maximal_velocity(), 1.e-5);
+  
+  std::cout << "   " << "Time step: " << time_step
+	    << std::endl;
   
   temperature_solution = old_temperature_solution;
 
@@ -1465,7 +1469,6 @@ void BoussinesqFlowProblem<dim>::run ()
     {
       pcout << "Timestep " << timestep_number
 	    << ":  t=" << time
-	    << ", dt=" << time_step
 	    << std::endl;
 
       assemble_stokes_system ();
