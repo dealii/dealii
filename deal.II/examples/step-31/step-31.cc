@@ -2172,7 +2172,7 @@ void BoussinesqFlowProblem<dim>::assemble_temperature_system ()
 				 // @sect4{BoussinesqFlowProblem::solve}
 				 //
 				 // This function solves the linear systems
-				 // of equations. Following to the
+				 // of equations. Following the
 				 // introduction, we start with the Stokes
 				 // system, where we need to generate our
 				 // block Schur preconditioner. Since all
@@ -2227,19 +2227,20 @@ void BoussinesqFlowProblem<dim>::solve ()
   std::cout << "   Solving..." << std::endl;
 
   {
-    LinearSolvers::InverseMatrix<TrilinosWrappers::SparseMatrix,
-      TrilinosWrappers::PreconditionIC>
+    const LinearSolvers::InverseMatrix<TrilinosWrappers::SparseMatrix,
+                                       TrilinosWrappers::PreconditionIC>
       mp_inverse (stokes_preconditioner_matrix.block(1,1), *Mp_preconditioner);
 
-    LinearSolvers::BlockSchurPreconditioner<TrilinosWrappers::PreconditionAMG,
-      TrilinosWrappers::PreconditionIC>
+    const LinearSolvers::BlockSchurPreconditioner<TrilinosWrappers::PreconditionAMG,
+                                                  TrilinosWrappers::PreconditionIC>
       preconditioner (stokes_matrix, mp_inverse, *Amg_preconditioner);
 
     SolverControl solver_control (stokes_matrix.m(),
 				  1e-6*stokes_rhs.l2_norm());
 
-    SolverGMRES<TrilinosWrappers::BlockVector> gmres(solver_control,
-						     SolverGMRES<TrilinosWrappers::BlockVector >::AdditionalData(100));
+    SolverGMRES<TrilinosWrappers::BlockVector>
+      gmres (solver_control,
+	     SolverGMRES<TrilinosWrappers::BlockVector >::AdditionalData(100));
 
     gmres.solve(stokes_matrix, stokes_solution, stokes_rhs, preconditioner);
 
@@ -2280,16 +2281,16 @@ void BoussinesqFlowProblem<dim>::solve ()
 				   // $[1,1+k_nh^{-2}]$ (up to
 				   // constants). This matrix is only
 				   // moderately ill conditioned even for
-				   // small mesh sizes and we get a reasonable
+				   // small mesh sizes and we get a reasonably
 				   // good preconditioner by simple means, for
-				   // example SSOR. We set the relaxation
-				   // parameter to 1.2. As a solver, we choose
+				   // example SSOR with a relaxation
+				   // parameter of 1.2. As a solver, we choose
 				   // the conjugate gradient method CG. As
 				   // before, we tell the solver to use
 				   // Trilinos vectors via the template
 				   // argument
-				   // <code>TrilinosWrappers::Vector</code> at
-				   // construction. Finally, we solve,
+				   // <code>TrilinosWrappers::Vector</code>.
+				   // Finally, we solve,
 				   // distribute the hanging node constraints
 				   // and write out the number of iterations.
   old_time_step = time_step;    
@@ -2297,6 +2298,9 @@ void BoussinesqFlowProblem<dim>::solve ()
 	      temperature_degree *
 	      GridTools::minimal_cell_diameter(triangulation) /
               std::max (get_maximal_velocity(), .01);
+
+  std::cout << "   " << "Time step = " << time_step
+	    << std::endl;
   
   temperature_solution = old_temperature_solution;
 
@@ -2607,32 +2611,47 @@ void BoussinesqFlowProblem<dim>::refine_mesh (const unsigned int max_grid_level)
 	 cell != triangulation.end(); ++cell)
       cell->clear_refine_flag ();
 
-				   // Before we can apply the mesh
-				   // refinement, we have to prepare the
-				   // solution vectors that should be
-				   // transfered to the new grid (we will
-				   // lose the old grid once we have done
-				   // the refinement). What we definetely
+				   // As part of mesh refinement we
+				   // need to transfer the solution
+				   // vectors from the old mesh to the
+				   // new one. To this end we use the
+				   // SolutionTransfer class and we
+				   // have to prepare the solution
+				   // vectors that should be
+				   // transfered to the new grid (we
+				   // will lose the old grid once we
+				   // have done the refinement so the
+				   // transfer has to happen
+				   // concurrently with
+				   // refinement). What we definetely
 				   // need are the current and the old
 				   // temperature (BDF-2 time stepping
-				   // requires two old solutions). Since the
-				   // SolutionTransfer objects only support
-				   // to transfer one object per dof
-				   // handler, we need to collect the two
-				   // temperature solutions in one data
-				   // structure. Moreover, we choose to
-				   // transfer the Stokes solution, too. The
-				   // reason for doing so is that the Stokes
-				   // solution will not change dramatically
-				   // from step to step, so we get a good
-				   // initial guess for the linear solver
-				   // when we reuse old data, which reduces
-				   // the number of needed solver
-				   // iterations. Next, we initialize the
-				   // SolutionTransfer objects, by attaching
-				   // them to the old dof handler. With this
-				   // at place, we can prepare the
-				   // triangulation and the data vectors for
+				   // requires two old
+				   // solutions). Since the
+				   // SolutionTransfer objects only
+				   // support to transfer one object
+				   // per dof handler, we need to
+				   // collect the two temperature
+				   // solutions in one data
+				   // structure. Moreover, we choose
+				   // to transfer the Stokes solution,
+				   // too. The reason for doing so is
+				   // that the Stokes solution will
+				   // not change dramatically from
+				   // step to step, so we get a good
+				   // initial guess for the linear
+				   // solver when we reuse old data,
+				   // which reduces the number of
+				   // needed solver iterations.
+				   //
+				   // Consequently, we initialize two
+				   // SolutionTransfer objects for the
+				   // Stokes and temperature
+				   // DoFHandler objects, by attaching
+				   // them to the old dof
+				   // handlers. With this at place, we
+				   // can prepare the triangulation
+				   // and the data vectors for
 				   // refinement (in this order).
   std::vector<TrilinosWrappers::Vector> x_temperature (2);
   x_temperature[0].reinit (temperature_solution);
@@ -2662,16 +2681,17 @@ void BoussinesqFlowProblem<dim>::refine_mesh (const unsigned int max_grid_level)
 				   // solutions between the grids. We
 				   // create another copy of temporary
 				   // vectors for temperature (now
-				   // according to the new grid), and
-				   // let the interpolate function do
-				   // the job. Then, the new vector is
-				   // written into the respective
-				   // vector. For the Stokes vector,
-				   // everything is just the same
-				   // &ndash; except that we do not
-				   // need another temporary vector
-				   // since we just interpolate a
-				   // single vector. In the end, we
+				   // corresponding to the new grid),
+				   // and let the interpolate function
+				   // do the job. Then, the resulting
+				   // array of vectors is written into
+				   // the respective vector member
+				   // variables. For the Stokes
+				   // vector, everything is just the
+				   // same &ndash; except that we do
+				   // not need another temporary
+				   // vector since we just interpolate
+				   // a single vector. In the end, we
 				   // have to tell the program that
 				   // the matrices and preconditioners
 				   // need to be regenerated, since
@@ -2699,24 +2719,30 @@ void BoussinesqFlowProblem<dim>::refine_mesh (const unsigned int max_grid_level)
 				 // @sect4{BoussinesqFlowProblem::run}
 				 // 
 				 // This function performs all the
-				 // essential steps in the
-				 // Boussinesq program. It starts by
-				 // setting up a grid (depending on
-				 // the spatial dimension, we choose
-				 // some different level of initial
-				 // refinement and additional
-				 // adative refinement steps, and
-				 // then create a cube in
-				 // <code>dim</code> dimensions and set
-				 // up the dofs for the first
-				 // time. Since we want to start the
-				 // time stepping already with an
-				 // adaptively refined grid, we
-				 // perform some pre-refinement
-				 // steps, consisting of all
-				 // assembly, solution and
-				 // refinement, but without actually
-				 // advancing in time.
+				 // essential steps in the Boussinesq
+				 // program. It starts by setting up a
+				 // grid (depending on the spatial
+				 // dimension, we choose some
+				 // different level of initial
+				 // refinement and additional adaptive
+				 // refinement steps, and then create
+				 // a cube in <code>dim</code>
+				 // dimensions and set up the dofs for
+				 // the first time. Since we want to
+				 // start the time stepping already
+				 // with an adaptively refined grid,
+				 // we perform some pre-refinement
+				 // steps, consisting of all assembly,
+				 // solution and refinement, but
+				 // without actually advancing in
+				 // time. Rather, we use the vilified
+				 // <code>goto</code> statement to
+				 // jump out of the time loop right
+				 // after mesh refinement to start all
+				 // over again on the new mesh
+				 // beginning at the
+				 // <code>start_time_iteration</code>
+				 // label.
 				 // 
 				 // Before we start, we project the
 				 // initial values to the grid and
@@ -2756,7 +2782,6 @@ void BoussinesqFlowProblem<dim>::run ()
     {
       std::cout << "Timestep " << timestep_number
 		<< ":  t=" << time
-		<< ", dt=" << time_step
                 << std::endl;
 
 				       // The first steps in the time loop
@@ -2767,8 +2792,7 @@ void BoussinesqFlowProblem<dim>::run ()
 				       // preconditioner do actually only
 				       // change in case we've remeshed
 				       // before), and then do the
-				       // solve. The solution is then
-				       // written to screen. Before going on
+				       // solve. Before going on
 				       // with the next time step, we have
 				       // to check whether we should first
 				       // finish the pre-refinement steps or
