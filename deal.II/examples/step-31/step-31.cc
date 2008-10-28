@@ -364,35 +364,33 @@ namespace LinearSolvers
 
 				   // @sect4{Schur complement preconditioner}
 
-				   // This is the implementation of
-				   // the Schur complement
-				   // preconditioner as described in
-				   // detail in the introduction. As
-				   // opposed to step-20 and step-22,
-				   // we solve the block system
-				   // all-at-once using GMRES, and use
-				   // the Schur complement of the
-				   // block structured matrix to build
-				   // a good preconditioner instead.
+				   // This is the implementation of the
+				   // Schur complement preconditioner as
+				   // described in detail in the
+				   // introduction. As opposed to step-20
+				   // and step-22, we solve the block system
+				   // all-at-once using GMRES, and use the
+				   // Schur complement of the block
+				   // structured matrix to build a good
+				   // preconditioner instead.
 				   //
 				   // Let's have a look at the ideal
 				   // preconditioner matrix
-				   // $P=\left(\begin{array}{cc} A & 0 \\ B &
-				   // -S \end{array}\right)$
-				   // described in the introduction. If
-				   // we apply this matrix in the
-				   // solution of a linear system,
-				   // convergence of an iterative
-				   // GMRES solver will be
-				   // governed by the matrix
+				   // $P=\left(\begin{array}{cc} A & 0 \\ B
+				   // & -S \end{array}\right)$ described in
+				   // the introduction. If we apply this
+				   // matrix in the solution of a linear
+				   // system, convergence of an iterative
+				   // GMRES solver will be governed by the
+				   // matrix
 				   // @f{eqnarray*}
 				   // P^{-1}\left(\begin{array}{cc} A
 				   // & B^T \\ B & 0
 				   // \end{array}\right) =
 				   // \left(\begin{array}{cc} I &
 				   // A^{-1} B^T \\ 0 & 0
-				   // \end{array}\right), @f} 
-				   //
+				   // \end{array}\right), 
+				   // @f} 
 				   // which indeed is very simple. A
 				   // GMRES solver based on exact
 				   // matrices would converge in two
@@ -407,59 +405,56 @@ namespace LinearSolvers
 				   // SIAM J. Numer. Anal., 31 (1994),
 				   // pp. 1352-1367).
 				   // 
-				   // Replacing <i>P</i> by
-				   // $\tilde{P}$ does not change the
-				   // situation dramatically. The
-				   // product $P^{-1} A$ will still be
-				   // close to a matrix with
-				   // eigenvalues 0 and 1, which lets
-				   // us hope to be able to get a
-				   // number of GMRES iterations that
-				   // does not depend on the problem
-				   // size.
+				   // Replacing <i>P</i> by $\tilde{P}$ does
+				   // not change the situation
+				   // dramatically. The product $P^{-1} A$
+				   // will still be close to a matrix with
+				   // eigenvalues 0 and 1, which lets us
+				   // hope to be able to get a number of
+				   // GMRES iterations that does not depend
+				   // on the problem size.
 				   //
-				   // The deal.II users who have already gone
-				   // through the step-20 and step-22
+				   // The deal.II users who have already
+				   // gone through the step-20 and step-22
 				   // tutorials can certainly imagine how
 				   // we're going to implement this.  We
 				   // replace the exact inverse matrices in
 				   // $P^{-1}$ by some approximate inverses
-				   // built from the InverseMatrix class, and
-				   // the inverse Schur complement will be
-				   // approximated by the pressure mass matrix
-				   // $M_p$ (weighted by $\eta^{-1}$ as
-				   // mentioned in the introduction). As
+				   // built from the InverseMatrix class,
+				   // and the inverse Schur complement will
+				   // be approximated by the pressure mass
+				   // matrix $M_p$ (weighted by $\eta^{-1}$
+				   // as mentioned in the introduction). As
 				   // pointed out in the results section of
 				   // step-22, we can replace the exact
 				   // inverse of <i>A</i> by just the
-				   // application of a preconditioner, in this
-				   // case on a vector Laplace matrix as was
-				   // explained in the introduction. This does
-				   // increase the number of (outer) GMRES
-				   // iterations, but is still significantly
-				   // cheaper than an exact inverse, which
-				   // would require between 20 and 35 CG
+				   // application of a preconditioner, in
+				   // this case on a vector Laplace matrix
+				   // as was explained in the
+				   // introduction. This does increase the
+				   // number of (outer) GMRES iterations,
+				   // but is still significantly cheaper
+				   // than an exact inverse, which would
+				   // require between 20 and 35 CG
 				   // iterations for <em>each</em> outer
 				   // solver step (using the AMG
 				   // preconditioner).
 				   // 
-				   // Having the above explanations in
-				   // mind, we define a preconditioner
-				   // class with a <code>vmult</code>
-				   // functionality, which is all we
-				   // need for the interaction with
-				   // the usual solver functions
-				   // further below in the program
+				   // Having the above explanations in mind,
+				   // we define a preconditioner class with
+				   // a <code>vmult</code> functionality,
+				   // which is all we need for the
+				   // interaction with the usual solver
+				   // functions further below in the program
 				   // code.
 				   // 
-				   // First the declarations. These
-				   // are similar to the definition of
-				   // the Schur complement in step-20,
-				   // with the difference that we need
-				   // some more preconditioners in the
-				   // constructor and that the
-				   // matrices we use here are built
-				   // upon Trilinos:
+				   // First the declarations. These are
+				   // similar to the definition of the Schur
+				   // complement in step-20, with the
+				   // difference that we need some more
+				   // preconditioners in the constructor and
+				   // that the matrices we use here are
+				   // built upon Trilinos:
   template <class PreconditionerA, class PreconditionerMp>
   class BlockSchurPreconditioner : public Subscriptor
   {
@@ -603,7 +598,8 @@ class BoussinesqFlowProblem
 		      const std::vector<Tensor<1,dim> >  &old_old_temperature_grads,
 		      const std::vector<Tensor<2,dim> >  &old_temperature_hessians,
 		      const std::vector<Tensor<2,dim> >  &old_old_temperature_hessians,
-		      const std::vector<Vector<double> > &present_stokes_values,
+		      const std::vector<Vector<double> > &old_stokes_values,
+		      const std::vector<Vector<double> > &old_old_stokes_values,
 		      const std::vector<double>          &gamma_values,
 		      const double                        global_u_infty,
 		      const double                        global_T_variation,
@@ -624,6 +620,7 @@ class BoussinesqFlowProblem
     TrilinosWrappers::BlockSparseMatrix stokes_preconditioner_matrix;
 
     TrilinosWrappers::BlockVector       stokes_solution;
+    TrilinosWrappers::BlockVector       old_stokes_solution;
     TrilinosWrappers::BlockVector       stokes_rhs;
 
 
@@ -931,43 +928,39 @@ BoussinesqFlowProblem<dim>::get_extrapolated_temperature_range () const
 				 // The last of the tool functions computes
 				 // the artificial viscosity parameter
 				 // $\nu|_K$ on a cell $K$ as a function of
-				 // the extrapolated temperature, its gradient
-				 // and Hessian (second derivatives), the
-				 // velocity, the right hand side $\gamma$ all
-				 // on the quadrature points of the current
-				 // cell, and various other parameters as
-				 // described in detail in the introduction.
+				 // the extrapolated temperature, its
+				 // gradient and Hessian (second
+				 // derivatives), the velocity, the right
+				 // hand side $\gamma$ all on the quadrature
+				 // points of the current cell, and various
+				 // other parameters as described in detail
+				 // in the introduction.
 				 //
-				 // There are some universal constants
-				 // worth mentioning here. First, we
-				 // need to fix $\beta$; we choose
-				 // $\beta=0.015\cdot dim$, a choice
-				 // discussed in detail in the results
-				 // section of this tutorial
-				 // program. The second is the
-				 // exponent $\alpha$; $\alpha=1$
-				 // appears to work fine for the
-				 // current program, even though some
-				 // additional benefit might be
+				 // There are some universal constants worth
+				 // mentioning here. First, we need to fix
+				 // $\beta$; we choose $\beta=0.015\cdot
+				 // dim$, a choice discussed in detail in
+				 // the results section of this tutorial
+				 // program. The second is the exponent
+				 // $\alpha$; $\alpha=1$ appears to work
+				 // fine for the current program, even
+				 // though some additional benefit might be
 				 // expected from chosing $\alpha =
-				 // 2$. Finally, there is one thing
-				 // that requires special casing: In
-				 // the first time step, the velocity
-				 // equals zero, and the formula for
-				 // $\nu|_K$ is not defined. In that
-				 // case, we return $\nu|_K=5\cdot
-				 // 10^3 \cdot h_K$, a choice
-				 // admittedly more motivated by
-				 // heuristics than anything else (it
-				 // is in the same order of magnitude,
-				 // however, as the value returned for
-				 // most cells on the second time
-				 // step).
+				 // 2$. Finally, there is one thing that
+				 // requires special casing: In the first
+				 // time step, the velocity equals zero, and
+				 // the formula for $\nu|_K$ is not
+				 // defined. In that case, we return
+				 // $\nu|_K=5\cdot 10^3 \cdot h_K$, a choice
+				 // admittedly more motivated by heuristics
+				 // than anything else (it is in the same
+				 // order of magnitude, however, as the
+				 // value returned for most cells on the
+				 // second time step).
 				 //
 				 // The rest of the function should be
-				 // mostly obvious based on the
-				 // material discussed in the
-				 // introduction:
+				 // mostly obvious based on the material
+				 // discussed in the introduction:
 template <int dim>
 double
 BoussinesqFlowProblem<dim>::
@@ -977,7 +970,8 @@ compute_viscosity (const std::vector<double>          &old_temperature,
 		   const std::vector<Tensor<1,dim> >  &old_old_temperature_grads,
 		   const std::vector<Tensor<2,dim> >  &old_temperature_hessians,
 		   const std::vector<Tensor<2,dim> >  &old_old_temperature_hessians,
-		   const std::vector<Vector<double> > &present_stokes_values,
+		   const std::vector<Vector<double> > &old_stokes_values,
+		   const std::vector<Vector<double> > &old_old_stokes_values,
 		   const std::vector<double>          &gamma_values,
 		   const double                        global_u_infty,
 		   const double                        global_T_variation,
@@ -1000,7 +994,7 @@ compute_viscosity (const std::vector<double>          &old_temperature,
     {
       Tensor<1,dim> u;
       for (unsigned int d=0; d<dim; ++d)
-	u[d] = present_stokes_values[q](d);
+	u[d] = (old_stokes_values[q](d) + old_old_stokes_values[q](d)) / 2;
       
       const double dT_dt = (old_temperature[q] - old_old_temperature[q])
 			   / old_time_step;
@@ -1278,12 +1272,15 @@ void BoussinesqFlowProblem<dim>::setup_dofs ()
   }
 
 				   // Lastly, we set the vectors for the
-				   // solution $\mathbf u$ and $T^k$, the old
-				   // solutions $T^{k-1}$ and $T^{k-2}$
-				   // (required for time stepping) and the
-				   // system right hand sides to their correct
-				   // sizes and block structure:
+				   // Stokes solutions $\mathbf u^{n-1}$ and
+				   // $\mathbf u^{n-2}$, as well as for the
+				   // temperatures $T^{n}$, $T^{n-1}$ and
+				   // $T^{n-2}$ (required for time stepping)
+				   // and all the system right hand sides to
+				   // their correct sizes and block
+				   // structure:
   stokes_solution.reinit (stokes_block_sizes);
+  old_stokes_solution.reinit (stokes_block_sizes);
   stokes_rhs.reinit (stokes_block_sizes);
 
   temperature_solution.reinit (temperature_dof_handler.n_dofs());
@@ -1961,21 +1958,26 @@ void BoussinesqFlowProblem<dim>::assemble_temperature_system ()
 
   std::vector<unsigned int> local_dof_indices (dofs_per_cell);
 
-				   // Next comes the declaration of vectors to
-				   // hold the old and present solution values
-				   // and gradients at quadrature points of
-				   // the current cell. We also declarate an
-				   // object to hold the temperature right
-				   // hande side values
-				   // (<code>gamma_values</code>), and we
-				   // again use shortcuts for the temperature
-				   // basis functions. Eventually, we need to
-				   // find the maximum of velocity,
-				   // temperature and the diameter of the
-				   // computational domain which will be used
-				   // for the definition of the stabilization
+				   // Next comes the declaration of vectors
+				   // to hold the old and older solution
+				   // values (as a notation for time levels
+				   // <i>n-1</i> and <i>n-2</i>,
+				   // respectively) and gradients at
+				   // quadrature points of the current
+				   // cell. We also declarate an object to
+				   // hold the temperature right hande side
+				   // values (<code>gamma_values</code>),
+				   // and we again use shortcuts for the
+				   // temperature basis
+				   // functions. Eventually, we need to find
+				   // the maximum of velocity, temperature
+				   // and the diameter of the computational
+				   // domain which will be used for the
+				   // definition of the stabilization
 				   // parameter.
-  std::vector<Vector<double> > present_stokes_values (n_q_points, 
+  std::vector<Vector<double> > old_stokes_values (n_q_points, 
+						  Vector<double>(dim+1));
+  std::vector<Vector<double> > old_old_stokes_values (n_q_points, 
 						      Vector<double>(dim+1));
   std::vector<double>         old_temperature_values (n_q_points);
   std::vector<double>         old_old_temperature_values(n_q_points);
@@ -1995,21 +1997,20 @@ void BoussinesqFlowProblem<dim>::assemble_temperature_system ()
     global_T_range = get_extrapolated_temperature_range();
   const double global_Omega_diameter = GridTools::diameter (triangulation);
 
-				   // Now, let's start the loop over all cells
-				   // in the triangulation. Again, we need two
-				   // cell iterators that walk in parallel
-				   // through the cells of the two involved
-				   // DoFHandler objects for the Stokes and
-				   // temperature part. Within the loop, we
-				   // first set the local rhs to zero, and
-				   // then get the values and derivatives of
-				   // the old solution functions (and the
-				   // current velocity) at the quadrature
-				   // points, since they are going to be
-				   // needed for the definition of the
-				   // stabilization parameters and as
-				   // coefficients in the equation,
-				   // respectively.
+				   // Now, let's start the loop over all
+				   // cells in the triangulation. Again, we
+				   // need two cell iterators that walk in
+				   // parallel through the cells of the two
+				   // involved DoFHandler objects for the
+				   // Stokes and temperature part. Within
+				   // the loop, we first set the local rhs
+				   // to zero, and then get the values and
+				   // derivatives of the old solution
+				   // functions at the quadrature points,
+				   // since they are going to be needed for
+				   // the definition of the stabilization
+				   // parameters and as coefficients in the
+				   // equation, respectively.
   typename DoFHandler<dim>::active_cell_iterator
     cell = temperature_dof_handler.begin_active(),
     endc = temperature_dof_handler.end();
@@ -2042,7 +2043,9 @@ void BoussinesqFlowProblem<dim>::assemble_temperature_system ()
 					      gamma_values);
 
       stokes_fe_values.get_function_values (stokes_solution,
-					    present_stokes_values);
+					    old_stokes_values);
+      stokes_fe_values.get_function_values (old_stokes_solution,
+					    old_old_stokes_values);
 
 				       // Next, we calculate the
 				       // artificial viscosity for
@@ -2074,7 +2077,8 @@ void BoussinesqFlowProblem<dim>::assemble_temperature_system ()
 			     old_old_temperature_grads,
 			     old_temperature_hessians,
 			     old_old_temperature_hessians,
-			     present_stokes_values,
+			     old_stokes_values,
+			     old_old_stokes_values,
 			     gamma_values,
 			     global_u_infty,
 			     global_T_range.second - global_T_range.first,
@@ -2096,9 +2100,16 @@ void BoussinesqFlowProblem<dim>::assemble_temperature_system ()
 	  const Tensor<1,dim> old_old_grad_T = old_old_temperature_grads[q];
 
 	  
-	  Tensor<1,dim> present_u;
+	  Tensor<1,dim> extrapolated_u;
 	  for (unsigned int d=0; d<dim; ++d)
-	    present_u[d] = present_stokes_values[q](d);
+	    {
+	      if (use_bdf2_scheme == true)
+		extrapolated_u[d] = 
+		  old_stokes_values[q](d) * (1+time_step/old_time_step) - 
+		  old_old_stokes_values[q](d) * time_step/old_time_step;
+	      else
+		extrapolated_u[d] = old_stokes_values[q](d);
+	    }
 
 	  if (use_bdf2_scheme == true)
 	    {
@@ -2111,7 +2122,7 @@ void BoussinesqFlowProblem<dim>::assemble_temperature_system ()
 				 old_old_T * phi_T[i]
 				 -
 				 time_step *
-				 present_u *
+				 extrapolated_u *
 				 ((1+time_step/old_time_step) * old_grad_T
 				  -
 				  time_step / old_time_step * old_old_grad_T) *
@@ -2135,7 +2146,7 @@ void BoussinesqFlowProblem<dim>::assemble_temperature_system ()
 		local_rhs(i) += (old_T * phi_T[i]
 				 -
 				 time_step *
-				 present_u * old_grad_T * phi_T[i]
+				 extrapolated_u * old_grad_T * phi_T[i]
 				 -
 				 time_step *
 				 nu *
@@ -2160,59 +2171,48 @@ void BoussinesqFlowProblem<dim>::assemble_temperature_system ()
 
 				 // @sect4{BoussinesqFlowProblem::solve}
 				 //
-				 // This function solves the linear
-				 // systems of equations. Following to
-				 // the introduction, we start with
-				 // the Stokes system, where we need
-				 // to generate our block Schur
-				 // preconditioner. Since all the
-				 // relevant actions are implemented
-				 // in the class
+				 // This function solves the linear systems
+				 // of equations. Following to the
+				 // introduction, we start with the Stokes
+				 // system, where we need to generate our
+				 // block Schur preconditioner. Since all
+				 // the relevant actions are implemented in
+				 // the class
 				 // <code>BlockSchurPreconditioner</code>,
-				 // all we have to do is to
-				 // initialize the class
-				 // appropriately. What we need to
+				 // all we have to do is to initialize the
+				 // class appropriately. What we need to
 				 // pass down is an
-				 // <code>InverseMatrix</code> object
-				 // for the pressure mass matrix,
-				 // which we set up using the
-				 // respective class together with
-				 // the IC preconditioner we already
-				 // generated, and the AMG
-				 // preconditioner for the
-				 // velocity-velocity matrix. Note
-				 // that both
-				 // <code>Mp_preconditioner</code> and
-				 // <code>Amg_preconditioner</code> are
-				 // only pointers, so we use
-				 // <code>*</code> to pass down the
-				 // actual preconditioner objects.
+				 // <code>InverseMatrix</code> object for
+				 // the pressure mass matrix, which we set
+				 // up using the respective class together
+				 // with the IC preconditioner we already
+				 // generated, and the AMG preconditioner
+				 // for the velocity-velocity matrix. Note
+				 // that both <code>Mp_preconditioner</code>
+				 // and <code>Amg_preconditioner</code> are
+				 // only pointers, so we use <code>*</code>
+				 // to pass down the actual preconditioner
+				 // objects.
 				 // 
-				 // Once the preconditioner is
-				 // ready, we create a GMRES solver
-				 // for the block system. Since we
-				 // are working with Trilinos data
-				 // structures, we have to set the
-				 // respective template argument in
-				 // the solver. GMRES needs to
-				 // internally store temporary
-				 // vectors for each iteration (see
-				 // the discussion in the
-				 // results section of step-22)
-				 // &ndash; the more vectors it can
-				 // use, the better it will
+				 // Once the preconditioner is ready, we
+				 // create a GMRES solver for the block
+				 // system. Since we are working with
+				 // Trilinos data structures, we have to set
+				 // the respective template argument in the
+				 // solver. GMRES needs to internally store
+				 // temporary vectors for each iteration
+				 // (see the discussion in the results
+				 // section of step-22) &ndash; the more
+				 // vectors it can use, the better it will
 				 // generally perform. To keep memory
-				 // demands in check, we
-				 // set the number of vectors to
-				 // 100. This means that up to 100
-				 // solver iterations, every
-				 // temporary vector can be
-				 // stored. If the solver needs to
-				 // iterate more often to get the
-				 // specified tolerance, it will
-				 // work on a reduced set of vectors
-				 // by restarting at every 100
-				 // iterations.
+				 // demands in check, we set the number of
+				 // vectors to 100. This means that up to
+				 // 100 solver iterations, every temporary
+				 // vector can be stored. If the solver
+				 // needs to iterate more often to get the
+				 // specified tolerance, it will work on a
+				 // reduced set of vectors by restarting at
+				 // every 100 iterations.
 				 //
 				 // With this all set up, we solve the system
 				 // and distribute the constraints in the
@@ -2595,37 +2595,31 @@ void BoussinesqFlowProblem<dim>::refine_mesh (const unsigned int max_grid_level)
       cell->clear_refine_flag ();
 
 				   // Before we can apply the mesh
-				   // refinement, we have to prepare
-				   // the solution vectors that should
-				   // be transfered to the new grid
-				   // (we will lose the old grid once
-				   // we have done the
-				   // refinement). What we definetely
+				   // refinement, we have to prepare the
+				   // solution vectors that should be
+				   // transfered to the new grid (we will
+				   // lose the old grid once we have done
+				   // the refinement). What we definetely
 				   // need are the current and the old
 				   // temperature (BDF-2 time stepping
-				   // requires two old
-				   // solutions). Since the
-				   // SolutionTransfer objects only
-				   // support to transfer one object
-				   // per dof handler, we need to
-				   // collect the two temperature
-				   // solutions in one data
-				   // structure. Moreover, we choose
-				   // to transfer the Stokes solution,
-				   // too. The reason for doing so is
-				   // that the Stokes solution will
-				   // not change dramatically from
-				   // step to step, so we get a good
-				   // initial guess for the linear
-				   // solver when we reuse old data,
-				   // which reduces the number of
-				   // needed solver iterations. Next,
-				   // we initialize the
-				   // SolutionTransfer objects, by
-				   // attaching them to the old dof
-				   // handler. With this at place, we
-				   // can prepare the triangulation
-				   // and the data vectors for
+				   // requires two old solutions). Since the
+				   // SolutionTransfer objects only support
+				   // to transfer one object per dof
+				   // handler, we need to collect the two
+				   // temperature solutions in one data
+				   // structure. Moreover, we choose to
+				   // transfer the Stokes solution, too. The
+				   // reason for doing so is that the Stokes
+				   // solution will not change dramatically
+				   // from step to step, so we get a good
+				   // initial guess for the linear solver
+				   // when we reuse old data, which reduces
+				   // the number of needed solver
+				   // iterations. Next, we initialize the
+				   // SolutionTransfer objects, by attaching
+				   // them to the old dof handler. With this
+				   // at place, we can prepare the
+				   // triangulation and the data vectors for
 				   // refinement (in this order).
   std::vector<TrilinosWrappers::Vector> x_temperature (2);
   x_temperature[0].reinit (temperature_solution);
@@ -2761,19 +2755,18 @@ void BoussinesqFlowProblem<dim>::run ()
 				       // change in case we've remeshed
 				       // before), and then do the
 				       // solve. The solution is then
-				       // written to screen. Before going
-				       // on with the next time step, we
-				       // have to check whether we should
-				       // first finish the pre-refinement
-				       // steps or if we should remesh
-				       // (every fifth time step),
-				       // refining up to a level that is
-				       // consistent with initial
+				       // written to screen. Before going on
+				       // with the next time step, we have
+				       // to check whether we should first
+				       // finish the pre-refinement steps or
+				       // if we should remesh (every fifth
+				       // time step), refining up to a level
+				       // that is consistent with initial
 				       // refinement and pre-refinement
 				       // steps. Last in the loop is to
 				       // advance the solutions, i.e. to
-				       // copy the temperature solution to
-				       // the next "older" time level.
+				       // copy the solutions to the next
+				       // "older" time level.
       assemble_stokes_system ();
       build_stokes_preconditioner ();
       assemble_temperature_matrix ();
@@ -2798,11 +2791,12 @@ void BoussinesqFlowProblem<dim>::run ()
       time += time_step;
       ++timestep_number;
 
+      old_stokes_solution          = stokes_solution;
       old_old_temperature_solution = old_temperature_solution;
-      old_temperature_solution     = temperature_solution;      
+      old_temperature_solution     = temperature_solution;
     }
-				   // Do all the above until we arrive
-				   // at time 100.
+				   // Do all the above until we arrive at
+				   // time 100.
   while (time <= 100);
 }
 
@@ -2810,17 +2804,15 @@ void BoussinesqFlowProblem<dim>::run ()
 
 				 // @sect3{The <code>main</code> function}
 				 // 
-				 // The main function looks almost
-				 // the same as in all other
-				 // programs. The only difference is
-				 // that Trilinos wants to get the
-				 // arguments from calling the
-				 // function (argc and argv) in
-				 // order to correctly set up the
-				 // MPI system in case we use those
-				 // compilers (even though this
-				 // program is only meant to be run
-				 // in serial).
+				 // The main function looks almost the same
+				 // as in all other programs. The only
+				 // difference is that Trilinos wants to get
+				 // the arguments from calling the function
+				 // (argc and argv) in order to correctly
+				 // set up the MPI system in case those
+				 // compilers are in use (even though this
+				 // program is only meant to be run on one
+				 // processor).
 int main (int argc, char *argv[])
 {
   try

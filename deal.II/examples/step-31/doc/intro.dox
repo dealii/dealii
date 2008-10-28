@@ -178,29 +178,33 @@ in the top-left corner of the differential operator.
 
 <h4>Time stepping</h4>
 
-The structure of the problem as a DAE allows us to use the same
-strategy as we have already used in @ref step_21 "step-21", i.e. we
-use a time lag scheme: first solve the Stokes equations for velocity and
-pressure using the temperature field from the previous time step, then
-with the new velocities update the temperature field for the current
-time step. In other words, in time step <i>n</i> we first solve the Stokes
-system
+The structure of the problem as a DAE allows us to use the same strategy as
+we have already used in @ref step_21 "step-21", i.e. we use a time lag
+scheme: we first solve the temperature equation (using an extrapolated
+velocity field), and then insert the new temperature solution into the right
+hand side of the velocity equation. The way we implement this in our code
+looks at things from a slightly different perspective, though. We first
+solve the Stokes equations for velocity and pressure using the temperature
+field from the previous time step, which means that we get the velocity for
+the previous time step. In other words, we first solve the Stokes system for
+time step <i>n-1</i> as
 @f{eqnarray*}
-  -\nabla \cdot \eta \varepsilon ({\mathbf u}^n) + \nabla p^n &=& 
+  -\nabla \cdot \eta \varepsilon ({\mathbf u}^{n-1}) + \nabla p^{n-1} &=& 
   \mathrm{Ra} \; T^{n-1} \mathbf{g},
   \\
-  \nabla \cdot {\mathbf u}^n &=& 0,
+  \nabla \cdot {\mathbf u}^{n-1} &=& 0,
 @f}
-and then the temperature equation with the so-computed velocity field 
-${\mathbf u}^n$. In contrast to @ref step_21 "step-21", we'll use a
-higher order time stepping scheme here, namely the <a 
-href="http://en.wikipedia.org/wiki/Backward_differentiation_formula">Backward
-Differentiation Formula scheme of order 2 (BDF-2 in short)</a> that
-replaces the time derivative $\frac{\partial T}{\partial t}$ by the (one-sided)
-difference quotient $\frac{\frac 32 T^{n}-2T^{n-1}+\frac 12 T^{n-2}}{k}$ with
-<i>k</i> the time step size.
+and then the temperature equation with an extrapolated velocity field to
+time <i>n</i>.
 
-This gives the discretized-in-time temperature equation
+In contrast to @ref step_21 "step-21", we'll use a higher order time
+stepping scheme here, namely the <a
+href="http://en.wikipedia.org/wiki/Backward_differentiation_formula">Backward
+Differentiation Formula scheme of order 2 (BDF-2 in short)</a> that replaces
+the time derivative $\frac{\partial T}{\partial t}$ by the (one-sided)
+difference quotient $\frac{\frac 32 T^{n}-2T^{n-1}+\frac 12 T^{n-2}}{k}$
+with <i>k</i> the time step size. This gives the discretized-in-time
+temperature equation
 @f{eqnarray*}
   \frac 32 T^n
   -
@@ -210,38 +214,35 @@ This gives the discretized-in-time temperature equation
   -
   \frac 12 T^{n-2}
   -
-  k{\mathbf u}^n \cdot \nabla (2T^{n-1}-T^{n-2})
+  k(2{\mathbf u}^{n-1} - {\mathbf u}^{n-2} ) \cdot \nabla (2T^{n-1}-T^{n-2})
   +
   k\gamma.
 @f}
-Note how the temperature equation is
-solved semi-explicitly: diffusion is treated implicitly whereas
-advection is treated explicitly using the just-computed velocity
-field but only previously computed temperature fields. The
-temperature terms appearing in the advection term are forward
-projected to the current time:
-$T^n \approx T^{n-1} + k_n
-\frac{\partial T}{\partial t} \approx T^{n-1} + k_n
-\frac{T^{n-1}-T^{n-2}}{k_n} = 2T^{n-1}-T^{n-2}$. We need this projection
-for maintaining the order of accuracy of the BDF-2 scheme. In other words, the
-temperature fields we use in the explicit right hand side are first
-order approximations of the current temperature field &mdash; not
-quite an explicit time stepping scheme, but by character not too far
-away either.
+Note how the temperature equation is solved semi-explicitly: diffusion is
+treated implicitly whereas advection is treated explicitly using an
+extrapolation (or forward-projection) of temperature and velocity, including
+the just-computed velocity ${\mathbf u}^{n-1}$. The forward-projection to
+the current time level <i>n</i> is derived from a Taylor expansion, $T^n
+\approx T^{n-1} + k_n \frac{\partial T}{\partial t} \approx T^{n-1} + k_n
+\frac{T^{n-1}-T^{n-2}}{k_n} = 2T^{n-1}-T^{n-2}$. We need this projection for
+maintaining the order of accuracy of the BDF-2 scheme. In other words, the
+temperature fields we use in the explicit right hand side are second order
+approximations of the current temperature field &mdash; not quite an
+explicit time stepping scheme, but by character not too far away either.
 
-The introduction of the temperature extrapolation limits the time step
-by a <a href="http://en.wikipedia.org/wiki/Courant–Friedrichs–Lewy_condition">
-Courant-Friedrichs-Lewy (CFL) condition</a> just like it was in 
-@ref step_21 "step-21". (We wouldn't have had that stability condition if
-we treated the advection term implicitly since the BDF-2 scheme is A-stable, 
-at the price that we needed to build a new temperature matrix at each time 
-step.) We will discuss the exact choice of time step in the <a
-href="#Results">results section</a>, but for the moment of importance is that 
-this CFL condition means that the time step
-size <i>k</i> may change from time step to time step, and that we have to
-modify the above formula slightly. If $k_n,k_{n-1}$ are the time steps
-sizes of the current and previous time step, then we use the
-approximations 
+The introduction of the temperature extrapolation limits the time step by a
+<a href="http://en.wikipedia.org/wiki/Courant–Friedrichs–Lewy_condition">
+Courant-Friedrichs-Lewy (CFL) condition</a> just like it was in @ref step_21
+"step-21". (We wouldn't have had that stability condition if we treated the
+advection term implicitly since the BDF-2 scheme is A-stable, at the price
+that we needed to build a new temperature matrix at each time step.) We will
+discuss the exact choice of time step in the <a href="#Results">results
+section</a>, but for the moment of importance is that this CFL condition
+means that the time step size <i>k</i> may change from time step to time
+step, and that we have to modify the above formula slightly. If
+$k_n,k_{n-1}$ are the time steps sizes of the current and previous time
+step, then we use the approximations
+
 $\frac{\partial T}{\partial t} \approx
  \frac 1{k_n}
  \left(
@@ -269,15 +270,18 @@ and above equation is generalized as follows:
   -
   \frac{k_n^2}{k_{n-1}(k_n+k_{n-1})} T^{n-2}
   -
-  k_n{\mathbf u}^n \cdot \nabla \left[
-    \left(1+\frac{k_n}{k_{n-1}}\right)T^{n-1}-\frac{k_n}{k_{n-1}}T^{n-2}
-  \right]
+  k_n{\mathbf u}^{*,n} \cdot \nabla T^{*,n}
   +
-  k_n\gamma.
+  k_n\gamma,
 @f}
-That's not an easy to read equation, but will provide us with the
-desired higher order accuracy. As a consistency check, it is easy to
-verify that it reduces to the same equation as above if $k_n=k_{n-1}$.
+
+where ${(\cdot)}^{*,n} = \left(1+\frac{k_n}{k_{n-1}}\right)(\cdot)^{n-1} -
+\frac{k_n}{k_{n-1}}(\cdot)^{n-2}$ denotes the extrapolation of velocity
+<b>u</b> and temperature <i>T</i> to time level <i>n</i>, using the values
+at the two previous time steps. That's not an easy to read equation, but
+will provide us with the desired higher order accuracy. As a consistency
+check, it is easy to verify that it reduces to the same equation as above if
+$k_n=k_{n-1}$.
 
 As a final remark we note that the choice of a higher order time
 stepping scheme of course forces us to keep more time steps in memory;
@@ -302,32 +306,32 @@ elements, so we can form the weak form of the Stokes equation without
 problem by integrating by parts and substituting continuous functions
 by their discrete counterparts:
 @f{eqnarray*}
-  (\nabla {\mathbf v}_h, \eta \varepsilon ({\mathbf u}^n_h))
+  (\nabla {\mathbf v}_h, \eta \varepsilon ({\mathbf u}^{n-1}_h))
   -
-  (\nabla \cdot {\mathbf v}_h, p^n_h) 
+  (\nabla \cdot {\mathbf v}_h, p^{n-1}_h) 
   &=& 
   ({\mathbf v}_h, \mathrm{Ra} \; T^{n-1}_h \mathbf{g}),
   \\
-  (q_h, \nabla \cdot {\mathbf u}^n_h) &=& 0,
+  (q_h, \nabla \cdot {\mathbf u}^{n-1}_h) &=& 0,
 @f}
 for all test functions $\mathbf v_h, q_h$. The first term of the first
 equation is considered as the inner product between tensors, i.e.
-$(\nabla {\mathbf v}_h, \eta \varepsilon ({\mathbf u}^n_h))_\Omega
+$(\nabla {\mathbf v}_h, \eta \varepsilon ({\mathbf u}^{n-1}_h))_\Omega
  = \int_\Omega \sum_{i,j=1}^d [\nabla {\mathbf v}_h]_{ij}
-           \eta [\varepsilon ({\mathbf u}^n_h)]_{ij}\, dx$.
+           \eta [\varepsilon ({\mathbf u}^{n-1}_h)]_{ij}\, dx$.
 Because the second tensor in this product is symmetric, the
 anti-symmetric component of $\nabla {\mathbf v}_h$ plays no role and
 it leads to the entirely same form if we use the symmetric gradient of
 $\mathbf v_h$ instead. Consequently, the formulation we consider and
 that we implement is
 @f{eqnarray*}
-  (\varepsilon({\mathbf v}_h), \eta \varepsilon ({\mathbf u}^n_h))
+  (\varepsilon({\mathbf v}_h), \eta \varepsilon ({\mathbf u}^{n-1}_h))
   -
-  (\nabla \cdot {\mathbf v}_h, p^n_h) 
+  (\nabla \cdot {\mathbf v}_h, p^{n-1}_h) 
   &=& 
   ({\mathbf v}_h, \mathrm{Ra} \; T^{n-1}_h \mathbf{g}),
   \\
-  (q_h, \nabla \cdot {\mathbf u}^n_h) &=& 0.
+  (q_h, \nabla \cdot {\mathbf u}^{n-1}_h) &=& 0.
 @f}
 
 This is exactly the same as what we already discussed in 
@@ -529,7 +533,7 @@ this yields for the simpler case of uniform time steps of size <i>k</i>:
   \\
   &&
   -
-  k{\mathbf u}^n \cdot \nabla (2T^{n-1}-T^{n-2})
+  k(2{\mathbf u}^{n-1}-{\mathbf u}^{n-2}) \cdot \nabla (2T^{n-1}-T^{n-2})
   \\
   &&
   +
@@ -573,7 +577,13 @@ form above first) and reads:
   \\
   &&
   -
-  k_n{\mathbf u}^n \cdot \nabla \left[
+  k_n
+  \left[
+    \left(1+\frac{k_n}{k_{n-1}}\right){\mathbf u}^{n-1} -
+    \frac{k_n}{k_{n-1}}{\mathbf u}^{n-2}
+  \right] 
+  \cdot \nabla 
+  \left[
     \left(1+\frac{k_n}{k_{n-1}}\right)T^{n-1}-\frac{k_n}{k_{n-1}}T^{n-2}
   \right]
   \\
@@ -595,9 +605,15 @@ at the weak form of the discretized equations:
   -
   \frac{k_n^2}{k_{n-1}(k_n+k_{n-1})} T_h^{n-2}
   \\
-  &&\qquad\qquad
+  &&\qquad
   -
-  k_n{\mathbf u}_h^n \cdot \nabla \left[
+  k_n
+  \left[
+    \left(1+\frac{k_n}{k_{n-1}}\right){\mathbf u}^{n-1} - 
+    \frac{k_n}{k_{n-1}}{\mathbf u}^{n-2}
+  \right]
+  \cdot \nabla 
+  \left[
     \left(1+\frac{k_n}{k_{n-1}}\right)T^{n-1}-\frac{k_n}{k_{n-1}}T^{n-2}
   \right]
   +
@@ -619,7 +635,8 @@ $\mathbf{n}\cdot\kappa\nabla T|_{\partial\Omega}=0$.
 This then results in a
 matrix equation of form
 @f{eqnarray*}
-  \left( \frac{2k_n+k_{n-1}}{k_n+k_{n-1}} M+k_n A_T\right) T_h^n = F(U_h^n,T_h^{n-1},T_h^{n-2}),
+  \left( \frac{2k_n+k_{n-1}}{k_n+k_{n-1}} M+k_n A_T\right) T_h^n 
+  = F(U_h^{n-1}, U_h^{n-2},T_h^{n-1},T_h^{n-2}),
 @f}
 which given the structure of matrix on the left (the sum of two
 positive definite matrices) is easily solved using the Conjugate
@@ -835,11 +852,11 @@ look like this:
     A & B^T & 0 \\ B & 0 &0 \\ C & 0 & K
   \end{array}\right)
   \left(\begin{array}{ccc}
-    U^n \\ P^n \\ T^n
+    U^{n-1} \\ P^{n-1} \\ T^n
   \end{array}\right)
   =
   \left(\begin{array}{ccc}
-    F_U(T^{n-1}) \\ 0 \\ F_T(U^n,T^{n-1},T^{n-1})
+    F_U(T^{n-1}) \\ 0 \\ F_T(U^{n-1},U^{n-2},T^{n-1},T^{n-2})
   \end{array}\right).
 @f}
 The problem with this is: We never use the whole matrix at the same time. In
