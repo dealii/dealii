@@ -2,7 +2,7 @@
 //    $Id$
 //    Version: $Name$
 //
-//    Copyright (C) 1999, 2000, 2001, 2002, 2003, 2004, 2005, 2006, 2007 by the deal.II authors
+//    Copyright (C) 1999, 2000, 2001, 2002, 2003, 2004, 2005, 2006, 2007, 2008 by the deal.II authors
 //
 //    This file is subject to QPL and may not be  distributed
 //    without copyright and license information. Please refer
@@ -198,14 +198,16 @@ class BlockVector : public BlockVectorBase<Vector<Number> >
 
 				     /**
 				      * Copy operator for arguments of the
-				      * same type.
+				      * same type. Resize the
+				      * present vector if necessary.
 				      */
     BlockVector &
     operator= (const BlockVector &V);
 
 				     /**
 				      * Copy operator for template arguments
-				      * of different types.
+				      * of different types. Resize the
+				      * present vector if necessary.
 				      */
     template <class Number2>
     BlockVector &
@@ -471,6 +473,7 @@ inline
 BlockVector<Number> &
 BlockVector<Number>::operator = (const BlockVector &v)
 {
+  reinit (v, true);
   BaseClass::operator = (v);
   return *this;
 }
@@ -494,6 +497,7 @@ inline
 BlockVector<Number> &
 BlockVector<Number>::operator = (const BlockVector<Number2> &v)
 {
+  reinit (v, true);
   BaseClass::operator = (v);
   return *this;
 }

@@ -301,6 +301,15 @@ inconvenience this causes.
 <ol>
   <li>
   <p>
+  Fixed: Whereas the Vector class copy operator resized the left hand side
+  operand whenever necessary, the corresponding operator of the BlockVector
+  class did not. This is now fixed.
+  <br>
+  (Christian Cornelssen, WB 2008/10/28)
+  </p>
+
+  <li>
+  <p>
   Changed: The SparseDirectUMFPACK class now calls the umfpack_dl_* routines 
   instead of umfpack_di_*. On machines with 64-bit longs this allows the 
   UMFPACK solver to allocate more than 2GB of memory for large problems.
