@@ -80,8 +80,10 @@ LogStream::~LogStream()
 				   // deliberate memory leak and
 				   // instead destroying an empty
 				   // object
+#ifdef DEAL_II_USE_TRILINOS  
   if (this == &deallog)
     (new stream_map_type())->swap (outstreams);
+#endif
 }
 
 
