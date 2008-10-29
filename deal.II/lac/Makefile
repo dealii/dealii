@@ -112,12 +112,12 @@ $(LIBDIR)/liblac.g$(static-lib-suffix): $(go-files)
 $(LIBDIR)/liblac$(shared-lib-suffix): $(o-files)
 	@echo "=====lac==============optimized==$(MT)== Linking library:   $(@F)"
 	@$(SHLIBLD) $(LDFLAGS) $(SHLIBFLAGS) -o $(LIBDIR)/$(call DEAL_II_SHLIB_NAME,lac) $(call DEAL_II_ADD_SONAME,lac) $(o-files) $(deplibs.o)
-	@ln -f -s $(LIBDIR)/$(call DEAL_II_SHLIB_NAME,lac) $@
+	@ln -f -s $(call DEAL_II_SHLIB_NAME,lac) $@
 
 $(LIBDIR)/liblac.g$(shared-lib-suffix): $(go-files)
 	@echo "=====lac==============debug======$(MT)== Linking library:   $(@F)"
 	@$(SHLIBLD) $(LDFLAGS) $(SHLIBFLAGS) -o $(LIBDIR)/$(call DEAL_II_SHLIB_NAME,lac.g) $(call DEAL_II_ADD_SONAME,lac.g) $(go-files) $(deplibs.g)
-	@ln -f -s $(LIBDIR)/$(call DEAL_II_SHLIB_NAME,lac.g) $@
+	@ln -f -s $(call DEAL_II_SHLIB_NAME,lac.g) $@
 
 
 clean:
