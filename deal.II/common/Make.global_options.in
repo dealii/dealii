@@ -218,25 +218,31 @@ endif
 ifeq ($(USE_CONTRIB_TRILINOS),yes)
   INCLUDE += -I$(include-path-trilinos)
 
-  DEAL_II_TRILINOS_LIBS = amesos \
-                aztecoo \
-		belos \
-		epetra \
-		epetraext \
-		ifpack \
-		ml \
-		rtop \
-		sacado \
-		stratimikos \
+  # List all trilinos libraries that we want to link with. These must be sorted
+  # in dependency order to allow for static linking where the order on the
+  # command line matters. Note that we check the availability of all these
+  # libraries in aclocal.m4; the two lists should therefore be kept in
+  # sync.
+  DEAL_II_TRILINOS_LIBS = \
 		stratimikosamesos \
 		stratimikosaztecoo \
 		stratimikosifpack \
 		stratimikosml \
+		stratimikos \
+		ml \
+		amesos \
+                aztecoo \
+		belos \
+		ifpack \
+		rtop \
+		sacado \
 		teuchos \
 		thyra \
 		thyraepetra \
 		thyraepetraext \
-		triutils 
+		epetraext \
+		epetra \
+		triutils
 
   ifeq ($(enable-shared),yes)
     lib-contrib-trilinos = \
