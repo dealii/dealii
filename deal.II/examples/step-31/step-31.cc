@@ -2850,7 +2850,7 @@ int main (int argc, char *argv[])
     {
       deallog.depth_console (0);
 
-      Utilities::TrilinosTools trilinos (&argc, &argv);
+      Utilities::System::MPI_InitFinalize mpi_initialization (argc, argv);
 
       BoussinesqFlowProblem<2> flow_problem;
       flow_problem.run ();

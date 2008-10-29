@@ -430,8 +430,7 @@ namespace Utilities
                                 // ``void'' -- not beautiful, but
                                 // helps calming down unwarranted
                                 // compiler warnings...
-    unsigned int get_n_mpi_processes (
-      const MPI_Comm &mpi_communicator)
+    unsigned int get_n_mpi_processes (const MPI_Comm &mpi_communicator)
     {
       int n_jobs=1;
       (void) MPI_Comm_size (mpi_communicator, &n_jobs);
@@ -439,15 +438,17 @@ namespace Utilities
       return n_jobs;
     }
 
-    unsigned int get_this_mpi_process (
-      const MPI_Comm &mpi_communicator)
+    
+    unsigned int get_this_mpi_process (const MPI_Comm &mpi_communicator)
     {
       int rank=0;
       (void) MPI_Comm_rank (mpi_communicator, &rank);
       
       return rank;
     }
+    
 #else
+    
     unsigned int get_n_mpi_processes (const MPI_Comm &)
     {
       return 1;
@@ -458,82 +459,96 @@ namespace Utilities
       return 0;
     }
 #endif
+
+
+
+    MPI_InitFinalize::MPI_InitFinalize (int    &argc,
+					char** &argv)
+		    :
+		    owns_mpi (true)
+    {
+      static bool constructor_has_already_run = false;
+      Assert (constructor_has_already_run == false,
+	      ExcMessage ("You can only create a single object of this class "
+			  "in a program sinc it initialize the MPI system."));
+      
+#ifdef DEAL_II_COMPILER_SUPPORTS_MPI
+      int MPI_has_been_started = 0;
+      MPI_Initialized(&MPI_has_been_started);
+      AssertThrow (MPI_has_been_started == 0,
+		   ExcMessage ("MPI error. You can only start MPI once!"));
+
+      int mpi_err;
+      mpi_err = MPI_Init (&argc, &argv);
+      AssertThrow (mpi_err == 0,
+		   ExcMessage ("MPI could not be initialized."));
+#endif
+
+      constructor_has_already_run = true;
+    }
+
+
+    MPI_InitFinalize::~MPI_InitFinalize()
+    {
+#ifdef DEAL_II_COMPILER_SUPPORTS_MPI
+      int mpi_err = 0;
+
+      if (program_uses_mpi() == true && owns_mpi == true)
+	mpi_err = MPI_Finalize();
+
+      AssertThrow (mpi_err == 0,
+		   ExcMessage ("An error occurred while calling MPI_Finalize()"));
+#endif
+    }
+
+
+
+    bool
+    program_uses_mpi ()
+    {
+#ifdef DEAL_II_COMPILER_SUPPORTS_MPI
+      int MPI_has_been_started = 0;
+      MPI_Initialized(&MPI_has_been_started);
+
+      return true && (MPI_has_been_started > 0);
+#else
+      return false;
+#endif
+    }    
   }
-
-
+  
 
 #ifdef DEAL_II_USE_TRILINOS
-
-
-  TrilinosTools::TrilinosTools (int* argc, char*** argv)
-                      :
-                      owns_mpi (true),
+  
+  namespace Trilinos
+  {
+    const Epetra_Comm&
+    comm_world()
+    {
 #ifdef DEAL_II_COMPILER_SUPPORTS_MPI
-		      use_mpi (true)
+      static Teuchos::RCP<Epetra_MpiComm>
+	communicator = Teuchos::rcp (new Epetra_MpiComm (MPI_COMM_WORLD), true);
 #else
-		      use_mpi (false)
+      static Teuchos::RCP<Epetra_SerialComm>
+	communicator = Teuchos::rcp (new Epetra_SerialComm (), true);
 #endif
-  {
-#ifdef DEAL_II_COMPILER_SUPPORTS_MPI
-    int MPI_has_been_started = 0;
-    MPI_Initialized(&MPI_has_been_started);
-    AssertThrow (MPI_has_been_started == 0,
-		 ExcMessage ("MPI error. You can only start MPI once!"));
+    
+      return *communicator;
+    }
 
-    int mpi_err;
-    mpi_err = MPI_Init (argc, argv);
-    AssertThrow (mpi_err == 0,
-		 ExcMessage ("MPI could not be initialized."));
 
-    communicator = Teuchos::rcp (new Epetra_MpiComm (MPI_COMM_WORLD), true);
-#else
-    communicator = Teuchos::rcp (new Epetra_SerialComm (), true);
-#endif
+    unsigned int get_n_mpi_processes (const Epetra_Comm &mpi_communicator)
+    {
+      return mpi_communicator.NumProc();
+    }
+    
+
+    unsigned int get_this_mpi_process (const Epetra_Comm &mpi_communicator)
+    {
+      return (unsigned int)mpi_communicator.MyPID();
+    }
   }
-
-
-
-  TrilinosTools::TrilinosTools (const TrilinosTools &InputTrilinos)
-                      :
-                      owns_mpi (false),
-#ifdef DEAL_II_COMPILER_SUPPORTS_MPI
-		      use_mpi (true),
-#else
-		      use_mpi (false),
-#endif
-		      communicator (&*InputTrilinos.communicator, false)
-  {}
-
-
-
-  TrilinosTools::~TrilinosTools()
-  {
-    int mpi_err = 0;
-
-#ifdef DEAL_II_COMPILER_SUPPORTS_MPI
-    if (use_mpi == true && owns_mpi == true)
-      mpi_err = MPI_Finalize();
-#endif
-
-    AssertThrow (mpi_err == 0,
-		 ExcMessage ("An error occurred while calling MPI_Finalize()"));
-  }
-
-
-  const Epetra_Comm&
-  TrilinosTools::comm() const
-  {
-    return *communicator;
-  }
-
-
-
-  bool
-  TrilinosTools::trilinos_uses_mpi () const
-  {
-    return use_mpi;
-  }
-
+  
 #endif
 
 }

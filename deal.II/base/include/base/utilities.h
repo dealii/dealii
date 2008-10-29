@@ -209,30 +209,94 @@ namespace Utilities
 
 				     /**
 				      * Return the number of MPI processes
-				      * there exist. If this is a sequential
-				      * job, it returns 1.
+				      * there exist in the given communicator
+				      * object. If this is a sequential job,
+				      * it returns 1.
 				      */
     unsigned int get_n_mpi_processes (const MPI_Comm &mpi_communicator);
 
 				     /**
-				      * Return the number of the
-				      * present MPI process in the
-				      * space of processes. This will
-				      * be a unique value for each
-				      * process between zero and (less
-				      * than) the number of all
+				      * Return the number of the present MPI
+				      * process in the space of processes
+				      * described by the given
+				      * communicator. This will be a unique
+				      * value for each process between zero
+				      * and (less than) the number of all
 				      * processes (given by
 				      * get_n_mpi_processes()).
-				      *
-				      * This function will only work if you
-				      * also configured the library to use
-				      * PETSc. If your program uses MPI but
-				      * not PETSc, then this function is
-				      * likely not going to work.
 				      */
     unsigned int get_this_mpi_process (const MPI_Comm &mpi_communicator);
-  }
 
+
+				     /**
+				      * A class that is used to initialize the
+				      * MPI system at the beginning of a
+				      * program and to shut it down again at
+				      * the end.
+				      *
+				      * If a program uses MPI one would
+				      * typically just create an object of
+				      * this type at the beginning of
+				      * <code>main()</code>. The constructor
+				      * of this class then runs
+				      * <code>MPI_Init()</code> with the given
+				      * arguments. At the end of the program,
+				      * the compiler will invoke the
+				      * destructor of this object which in
+				      * turns calls <code>MPI_Finalize</code>
+				      * to shut down the MPI system.
+				      *
+				      * This class is used in @ref step_32
+				      * "step-32", for example.
+				      */
+    class MPI_InitFinalize
+    {
+      public:
+					 /**
+					  * Constructor. Takes the arguments
+					  * from the command line (in case of
+					  * MPI, the number of processes is
+					  * specified there), and sets up a
+					  * respective communicator by calling
+					  * <tt>MPI_Init()</tt>. This
+					  * constructor can only be called once
+					  * in a program, since MPI cannot be
+					  * initialized twice.
+					  */
+	MPI_InitFinalize (int    &argc,
+			  char** &argv);
+	
+					 /**
+					  * Destructor. Calls
+					  * <tt>MPI_Finalize()</tt> in
+					  * case this class owns the MPI
+					  * process.
+					  */
+	~MPI_InitFinalize();
+
+      private:
+					 /**
+					  * This flag tells the class
+					  * whether it owns the MPI
+					  * process (i.e., it has been
+					  * constructed using the
+					  * argc/argv input, or it has
+					  * been copied). In the former
+					  * case, the command
+					  * <tt>MPI_Finalize()</tt> will
+					  * be called at destruction.
+					  */
+	const bool owns_mpi;
+    };
+
+				     /**
+				      * Returns whether deal.II has been
+				      * configured to use MPI and if so
+				      * whether MPI has already been
+				      * initialized using MPI_Init().
+				      */
+    bool program_uses_mpi();
+  }
 
 
   /**
@@ -248,43 +312,8 @@ namespace Utilities
    * in the tutorial program @ref step_32 "step-32".
    */
 #ifdef DEAL_II_USE_TRILINOS
-  class TrilinosTools
+  namespace Trilinos
   {
-    public:
-				     /**
-				      * Constructor. Takes the arguments
-				      * from the command line (in case of
-				      * MPI, the number of processes is
-				      * specified there), and sets up a
-				      * respective communicator by calling
-				      * <tt>MPI_Init()</tt>. This
-				      * constructor can only be called once
-				      * in a program, since MPI cannot be
-				      * initialized twice.
-				      */
-      TrilinosTools (int*    argc,
-		     char*** argv);
-
-				     /**
-				      * Copy constructor. Takes the
-				      * Trilinos communicator from the
-				      * input object and copies all
-				      * content. Note that the copied
-				      * class cannot own the MPI
-				      * process, and hence, the
-				      * original object needs to be
-				      * around as long as the copy.
-				      */
-      TrilinosTools(const TrilinosTools &InputTrilinos);
-
-				     /**
-				      * Destructor. Calls
-				      * <tt>MPI_Finalize()</tt> in
-				      * case this class owns the MPI
-				      * process.
-				      */
-      ~TrilinosTools();
-
 				     /**
 				      * Returns a Trilinos Epetra_Comm
 				      * object needed for creation of
@@ -299,48 +328,29 @@ namespace Utilities
 				      * that encompasses all processes within
 				      * this MPI universe.
 				      */
-      const Epetra_Comm& comm() const;
+    const Epetra_Comm& comm_world();
+
 
 				     /**
-				      * Returns whether we are using a
-				      * MPI version or a serial
-				      * version of Trilinos.
+				      * Return the number of MPI processes
+				      * there exist in the given communicator
+				      * object. If this is a sequential job,
+				      * it returns 1.
 				      */
-      bool trilinos_uses_mpi() const;
-
-    private:
-				     /**
-				      * This flag tells the class
-				      * whether it owns the MPI
-				      * process (i.e., it has been
-				      * constructed using the
-				      * argc/argv input, or it has
-				      * been copied). In the former
-				      * case, the command
-				      * <tt>MPI_Finalize()</tt> will
-				      * be called at destruction.
-				      */
-      const bool owns_mpi;
+    unsigned int get_n_mpi_processes (const Epetra_Comm &mpi_communicator);
 
 				     /**
-				      * This flag tells whether we use
-				      * MPI or not.
+				      * Return the number of the present MPI
+				      * process in the space of processes
+				      * described by the given
+				      * communicator. This will be a unique
+				      * value for each process between zero
+				      * and (less than) the number of all
+				      * processes (given by
+				      * get_n_mpi_processes()).
 				      */
-      const bool use_mpi;
-
-				     /**
-				      * The actual communicator
-				      * object. If we run the program
-				      * in serial, we will have
-				      * another communicator than when
-				      * running in parallel.
-				      */
-#ifdef DEAL_II_COMPILER_SUPPORTS_MPI
-      Teuchos::RCP<Epetra_MpiComm> communicator;
-#else
-      Teuchos::RCP<Epetra_SerialComm> communicator;
-#endif
-  };
+    unsigned int get_this_mpi_process (const Epetra_Comm &mpi_communicator);
+  }
 
 #endif
 

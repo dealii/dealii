@@ -262,7 +262,7 @@ template <int dim>
 class BoussinesqFlowProblem
 {
   public:
-    BoussinesqFlowProblem (Utilities::TrilinosTools &trilinos_tools);
+    BoussinesqFlowProblem ();
     void run ();
 
   private:
@@ -295,7 +295,7 @@ class BoussinesqFlowProblem
 		      const double                        old_time_step);
 
 
-    Utilities::TrilinosTools            trilinos_tools;
+    const Epetra_Comm                  &trilinos_communicator;
     
     ConditionalOStream                  pcout;
 
@@ -347,10 +347,10 @@ class BoussinesqFlowProblem
 
 				 // @sect4{BoussinesqFlowProblem::BoussinesqFlowProblem}
 template <int dim>
-BoussinesqFlowProblem<dim>::BoussinesqFlowProblem (Utilities::TrilinosTools &trilinos_tools)
+BoussinesqFlowProblem<dim>::BoussinesqFlowProblem ()
                 :
-                trilinos_tools (trilinos_tools),
-		pcout (std::cout, trilinos_tools.comm().MyPID()==0),
+                trilinos_communicator (Utilities::Trilinos::comm_world()),
+		pcout (std::cout, Utilities::Trilinos::get_this_mpi_process(trilinos_communicator)==0),
 
 		triangulation (Triangulation<dim>::maximum_smoothing),
 
@@ -363,7 +363,7 @@ BoussinesqFlowProblem<dim>::BoussinesqFlowProblem (Utilities::TrilinosTools &tri
 		temperature_fe (temperature_degree),
                 temperature_dof_handler (triangulation),
 
-		temperature_partitioner (0, 0, trilinos_tools.comm()),
+		temperature_partitioner (0, 0, trilinos_communicator),
 
                 time_step (0),
 		old_time_step (0),
@@ -394,7 +394,7 @@ double BoussinesqFlowProblem<dim>::get_maximal_velocity () const
     cell = stokes_dof_handler.begin_active(),
     endc = stokes_dof_handler.end();
   for (; cell!=endc; ++cell)
-    if (cell->subdomain_id() == (unsigned int)trilinos_tools.comm().MyPID())
+    if (cell->subdomain_id() == Utilities::Trilinos::get_this_mpi_process(trilinos_communicator))
       {
 	fe_values.reinit (cell);
 	fe_values.get_function_values (localized_stokes_solution, stokes_values);
@@ -562,7 +562,7 @@ void BoussinesqFlowProblem<dim>::setup_dofs ()
   std::vector<unsigned int> stokes_sub_blocks (dim+1,0);
   stokes_sub_blocks[dim] = 1;
 
-  GridTools::partition_triangulation (trilinos_tools.comm().NumProc(), 
+  GridTools::partition_triangulation (Utilities::Trilinos::get_n_mpi_processes(trilinos_communicator), 
 				      triangulation);
 
   {
@@ -617,7 +617,7 @@ void BoussinesqFlowProblem<dim>::setup_dofs ()
     std::vector<unsigned int> local_dofs (dim+1);
     DoFTools::
       count_dofs_with_subdomain_association (stokes_dof_handler,
-					     trilinos_tools.comm().MyPID(),
+					     Utilities::Trilinos::get_this_mpi_process(trilinos_communicator),
 					     local_dofs);
     unsigned int n_local_velocities = 0;
     for (unsigned int c=0; c<dim; ++c)
@@ -625,9 +625,9 @@ void BoussinesqFlowProblem<dim>::setup_dofs ()
 
     const unsigned int n_local_pressures = local_dofs[dim];
 
-    Epetra_Map map_u(n_u, n_local_velocities, 0, trilinos_tools.comm());
+    Epetra_Map map_u(n_u, n_local_velocities, 0, trilinos_communicator);
     stokes_partitioner.push_back (map_u);
-    Epetra_Map map_p(n_p, n_local_pressures, 0, trilinos_tools.comm());
+    Epetra_Map map_p(n_p, n_local_pressures, 0, trilinos_communicator);
     stokes_partitioner.push_back (map_p);
   }
   {
@@ -689,9 +689,9 @@ void BoussinesqFlowProblem<dim>::setup_dofs ()
     = Epetra_Map (n_T,
 		  DoFTools::count_dofs_with_subdomain_association
 		  (temperature_dof_handler,
-		   trilinos_tools.comm().MyPID()),
+		   Utilities::Trilinos::get_this_mpi_process(trilinos_communicator)),
 		  0,
-		  trilinos_tools.comm());
+		  trilinos_communicator);
   {
     temperature_mass_matrix.clear ();
     temperature_stiffness_matrix.clear ();
@@ -745,7 +745,7 @@ BoussinesqFlowProblem<dim>::assemble_stokes_preconditioner ()
     cell = stokes_dof_handler.begin_active(),
     endc = stokes_dof_handler.end();
   for (; cell!=endc; ++cell)
-    if (cell->subdomain_id() == (unsigned int)trilinos_tools.comm().MyPID())
+    if (cell->subdomain_id() == Utilities::Trilinos::get_this_mpi_process(trilinos_communicator))
       {
 	stokes_fe_values.reinit (cell);
 	local_matrix = 0;
@@ -866,7 +866,7 @@ void BoussinesqFlowProblem<dim>::assemble_stokes_system ()
     temperature_cell = temperature_dof_handler.begin_active();
   
   for (; cell!=endc; ++cell, ++temperature_cell)
-    if (cell->subdomain_id() == (unsigned int)trilinos_tools.comm().MyPID())
+    if (cell->subdomain_id() == Utilities::Trilinos::get_this_mpi_process(trilinos_communicator))
       {
 	stokes_fe_values.reinit (cell);
 	temperature_fe_values.reinit (temperature_cell);
@@ -965,7 +965,7 @@ void BoussinesqFlowProblem<dim>::assemble_temperature_matrix ()
     cell = temperature_dof_handler.begin_active(),
     endc = temperature_dof_handler.end();
   for (; cell!=endc; ++cell)
-    if (cell->subdomain_id() == (unsigned int)trilinos_tools.comm().MyPID())
+    if (cell->subdomain_id() == Utilities::Trilinos::get_this_mpi_process(trilinos_communicator))
       {
 	local_mass_matrix = 0;
 	local_stiffness_matrix = 0;
@@ -1084,7 +1084,7 @@ void BoussinesqFlowProblem<dim>::assemble_temperature_system ()
     stokes_cell = stokes_dof_handler.begin_active();
 
   for (; cell!=endc; ++cell, ++stokes_cell)
-    if (cell->subdomain_id() == (unsigned int)trilinos_tools.comm().MyPID() )
+    if (cell->subdomain_id() == Utilities::Trilinos::get_this_mpi_process(trilinos_communicator) )
       {
 	local_rhs = 0;
   
@@ -1357,7 +1357,7 @@ void BoussinesqFlowProblem<dim>::output_results ()  const
 
   DataOut<dim> data_out;
 
-  if (trilinos_tools.comm().MyPID() == 0)
+  if (Utilities::Trilinos::get_this_mpi_process(trilinos_communicator) == 0)
     {
       data_out.attach_dof_handler (joint_dof_handler);
 
@@ -1510,9 +1510,9 @@ int main (int argc, char *argv[])
     {
       deallog.depth_console (0);
       
-      Utilities::TrilinosTools trilinos(&argc, &argv);
+      Utilities::System::MPI_InitFinalize mpi_initialization(argc, argv);
 
-      BoussinesqFlowProblem<2> flow_problem (trilinos);
+      BoussinesqFlowProblem<2> flow_problem;
       flow_problem.run ();
     }
   catch (std::exception &exc)
