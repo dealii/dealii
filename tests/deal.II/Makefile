@@ -79,7 +79,8 @@ tests_x = block_matrices \
 	fe_values_view_* \
 	rt_hessian \
 	rt_covariant \
-	coarsening_*
+	coarsening_* \
+	number_cache
 
 # from above list of regular expressions, generate the real set of
 # tests
