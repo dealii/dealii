@@ -320,17 +320,6 @@ if test "x$enableshared" = "xyes" ; then
 
   dnl See if we can use -Wl,-soname,... for linking
   DEAL_II_CHECK_LINK_SONAME
-else
-dnl The gcc compiler needs -static for static linking. For the case
-dnl other compilers do not like this flag we should introduce a
-dnl LDFLAGSSTATIC variable and check -static through AC_LINK_IFELSE([AC_LANG_PROGRAM([[]], [[]])],[],[]).
-  LDFLAGSSTATIC="-static"
-  case "$target" in
-    *-apple-darwin* )
-       LDFLAGSSTATIC=""
-	   ;;
-  esac
-  LDFLAGS="$LDFLAGS $LDFLAGSSTATIC"
 fi
 
 AC_SUBST(enableshared)

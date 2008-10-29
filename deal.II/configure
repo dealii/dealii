@@ -11618,14 +11618,6 @@ rm -f core conftest.err conftest.$ac_objext conftest_ipa8_conftest.oo \
   LDFLAGS=$OLD_LDFLAGS
 
 
-else
-  LDFLAGSSTATIC="-static"
-  case "$target" in
-    *-apple-darwin* )
-       LDFLAGSSTATIC=""
-	   ;;
-  esac
-  LDFLAGS="$LDFLAGS $LDFLAGSSTATIC"
 fi
 
 
