@@ -86,7 +86,7 @@ FE_RaviartThomasNodal<dim>::FE_RaviartThomasNodal (const unsigned int deg)
   FullMatrix<double> face_embeddings[GeometryInfo<dim>::max_children_per_face];
   for (unsigned int i=0; i<GeometryInfo<dim>::max_children_per_face; ++i)
     face_embeddings[i].reinit (this->dofs_per_face, this->dofs_per_face);
-  FETools::compute_face_embedding_matrices(*this, face_embeddings, 0, 0);
+  FETools::compute_face_embedding_matrices<dim,double>(*this, face_embeddings, 0, 0);
   this->interface_constraints.reinit((1<<(dim-1)) * this->dofs_per_face,
 				     this->dofs_per_face);
   unsigned int target_row=0;

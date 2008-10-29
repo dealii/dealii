@@ -1924,7 +1924,7 @@ void FETools::compute_embedding_matrices<deal_II_dimension>
 (const FiniteElement<deal_II_dimension> &, std::vector<std::vector<FullMatrix<double> > >&);
 
 template
-void FETools::compute_face_embedding_matrices<deal_II_dimension>
+void FETools::compute_face_embedding_matrices<deal_II_dimension,double>
 (const FiniteElement<deal_II_dimension> &, FullMatrix<double> (&matrices)[GeometryInfo<deal_II_dimension>::max_children_per_face],
  unsigned int, unsigned int);
 
