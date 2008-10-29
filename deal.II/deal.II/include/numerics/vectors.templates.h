@@ -2536,14 +2536,50 @@ VectorTools::compute_no_normal_flux_constraints (const DH<dim>         &dof_hand
 		switch (dim)
 		  {
 		    case 3:
-		      // take cross product between normals[0] and
-		      // normals[1]. write it in the current form to
-		      // make sure that compilers don't warn about
-		      // out-of-bounds accesses -- the warnings are
-		      // bogus since we get here only for dim==3, but
-		      // at least one isn't quite smart enough to
-		      // notice this and warns when compiling the
-		      // function in 2d
+							   // take
+							   // cross
+							   // product
+							   // between
+							   // normals[0]
+							   // and
+							   // normals[1]. write
+							   // it in
+							   // the
+							   // current
+							   // form to
+							   // make
+							   // sure
+							   // that
+							   // compilers
+							   // don't
+							   // warn
+							   // about
+							   // out-of-bounds
+							   // accesses
+							   // -- the
+							   // warnings
+							   // are
+							   // bogus
+							   // since we
+							   // get here
+							   // only for
+							   // dim==3,
+							   // but at
+							   // least
+							   // one
+							   // isn't
+							   // quite
+							   // smart
+							   // enough
+							   // to
+							   // notice
+							   // this and
+							   // warns
+							   // when
+							   // compiling
+							   // the
+							   // function
+							   // in 2d
 			  cross_product (tangent, normals[0], normals[dim-2]);
 			  break;
 		    default:
