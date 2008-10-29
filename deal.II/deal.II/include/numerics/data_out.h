@@ -30,6 +30,62 @@ DEAL_II_NAMESPACE_OPEN
 
 template <int> class FEValuesBase;
 
+namespace internal
+{
+  namespace DataOut
+  {
+				     /**
+				      * A data structure that holds
+				      * all data needed in one thread
+				      * when building patches in
+				      * parallel.  These data
+				      * structures are created
+				      * globally rather than on each
+				      * cell to avoid allocation of
+				      * memory in the threads.
+				      *
+				      * The #cell_to_patch_index_map is
+				      * an array that stores for index
+				      * <tt>[i][j]</tt> the number of the
+				      * patch that associated with the
+				      * cell with index @p j on level
+				      * @p i. This information is set
+				      * up prior to generation of the
+				      * patches, and is needed to
+				      * generate neighborship
+				      * information.
+				      *
+				      * This structure is used by
+				      * several of the DataOut*
+				      * classes, not all of which use
+				      * all fields.
+				      */
+    template <int dim, int spacedim>
+    struct ParallelData
+    {
+	unsigned int n_threads;
+	unsigned int this_thread;
+	unsigned int n_components;
+	unsigned int n_datasets;
+	unsigned int n_subdivisions;
+	unsigned int n_patches_per_circle;
+	SmartPointer<const Mapping<dim> >              mapping;
+	std::vector<double>                            patch_values;
+	std::vector<Vector<double> >                   patch_values_system;
+	std::vector<Tensor<1,spacedim> >               patch_gradients;
+	std::vector<std::vector<Tensor<1,spacedim> > > patch_gradients_system;
+	std::vector<Tensor<2,spacedim> >               patch_hessians;
+	std::vector<std::vector<Tensor<2,spacedim> > > patch_hessians_system;
+	std::vector<Point<spacedim> >                  dummy_normals;
+	std::vector<Point<dim> >                       patch_normals;
+	std::vector<std::vector<Vector<double> > >     postprocessed_values;
+
+	std::vector<std::vector<unsigned int> > *cell_to_patch_index_map;
+    };
+  }
+}
+
+
 //TODO: Most of the documentation of DataOut_DoFData applies to DataOut.
 
 /**
@@ -1252,43 +1308,7 @@ class DataOut : public DataOut_DoFData<DH, DH::dimension>
 		    << ", is not valid.");
     
   private:
-				     /**
-				      * All data needed in one thread
-				      * is gathered in the struct
-				      * Data.  The data is handled
-				      * globally to avoid allocation
-				      * of memory in the threads.
-				      *
-				      * The #cell_to_patch_index_map is
-				      * an array that stores for index
-				      * <tt>[i][j]</tt> the number of the
-				      * patch that associated with the
-				      * cell with index @p j on level
-				      * @p i. This information is set
-				      * up prior to generation of the
-				      * patches, and is needed to
-				      * generate neighborship
-				      * information.
-				      */
-    struct Data 
-    {
-	unsigned int n_threads;
-	unsigned int this_thread;
-	unsigned int n_components;
-	unsigned int n_datasets;
-	unsigned int n_subdivisions;
-        SmartPointer<const Mapping<DH::dimension> > mapping;
-	std::vector<double>          patch_values;
-	std::vector<Vector<double> > patch_values_system;
-	std::vector<Tensor<1,DH::dimension> >               patch_gradients;
-	std::vector<std::vector<Tensor<1,DH::dimension> > > patch_gradients_system;
-	std::vector<Tensor<2,DH::dimension> >               patch_hessians;
-	std::vector<std::vector<Tensor<2,DH::dimension> > > patch_hessians_system;
-	std::vector<Point<dim> >                            dummy_normals;
-	std::vector<std::vector<Vector<double> > >          postprocessed_values;
 
-        std::vector<std::vector<unsigned int> > *cell_to_patch_index_map;
-    };
 				     /**
 				      * Builds every @p n_threads's
 				      * patch. This function may be
@@ -1297,7 +1317,7 @@ class DataOut : public DataOut_DoFData<DH, DH::dimension>
 				      * used, the function is called
 				      * once and generates all patches.
 				      */
-    void build_some_patches (Data &data);
+    void build_some_patches (internal::DataOut::ParallelData<DH::dimension, DH::dimension> &data);
 
 				     /**
 				      * Store in which region cells shall be

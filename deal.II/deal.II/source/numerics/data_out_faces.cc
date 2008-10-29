@@ -2,7 +2,7 @@
 //    $Id$
 //    Version: $Name$
 //
-//    Copyright (C) 2000, 2001, 2002, 2003, 2004, 2005, 2006, 2007 by the deal.II authors
+//    Copyright (C) 2000, 2001, 2002, 2003, 2004, 2005, 2006, 2007, 2008 by the deal.II authors
 //
 //    This file is subject to QPL and may not be  distributed
 //    without copyright and license information. Please refer
@@ -31,7 +31,7 @@ DEAL_II_NAMESPACE_OPEN
 
 
 template <int dim, class DH>
-void DataOutFaces<dim,DH>::build_some_patches (Data &data)
+void DataOutFaces<dim,DH>::build_some_patches (internal::DataOut::ParallelData<DH::dimension, DH::dimension> &data)
 {
 				   // Check consistency of redundant
 				   // template parameter
@@ -279,7 +279,7 @@ void DataOutFaces<dim,DH>::build_patches (const unsigned int nnnn_subdivisions,
        face = next_face(face))
     ++n_patches;
 
-  std::vector<Data> thread_data(n_threads);
+  std::vector<internal::DataOut::ParallelData<DH::dimension, DH::dimension> > thread_data(n_threads);
 
 				   // init data for the threads
   for (unsigned int i=0;i<n_threads;++i)

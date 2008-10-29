@@ -2,7 +2,7 @@
 //    $Id$
 //    Version: $Name$
 //
-//    Copyright (C) 2000, 2001, 2002, 2003, 2004, 2005, 2006, 2007 by the deal.II authors
+//    Copyright (C) 2000, 2001, 2002, 2003, 2004, 2005, 2006, 2007, 2008 by the deal.II authors
 //
 //    This file is subject to QPL and may not be  distributed
 //    without copyright and license information. Please refer
@@ -43,7 +43,7 @@ DEAL_II_NAMESPACE_OPEN
 
 #if deal_II_dimension < 3
 template <int dim, class DH>
-void DataOutRotation<dim,DH>::build_some_patches (Data &data)
+void DataOutRotation<dim,DH>::build_some_patches (internal::DataOut::ParallelData<DH::dimension, DH::dimension> &data)
 {
   QTrapez<1>     q_trapez;
   QIterated<DH::dimension> patch_points (q_trapez, data.n_subdivisions);
@@ -406,7 +406,7 @@ void DataOutRotation<dim,DH>::build_some_patches (Data &data)
 #else
 
 template <int dim, class DH>
-void DataOutRotation<dim,DH>::build_some_patches (Data&)
+void DataOutRotation<dim,DH>::build_some_patches (internal::DataOut::ParallelData<DH::dimension, DH::dimension> &)
 {
 				   // would this function make any
 				   // sense after all? who would want
@@ -477,7 +477,7 @@ void DataOutRotation<dim,DH>::build_patches (
 				   // rotation
   n_patches *= n_patches_per_circle;
 
-  std::vector<Data> thread_data(n_threads);
+  std::vector<internal::DataOut::ParallelData<DH::dimension, DH::dimension> > thread_data(n_threads);
 
 				   // init data for the threads
   for (unsigned int i=0;i<n_threads;++i)
@@ -521,7 +521,7 @@ void DataOutRotation<dim,DH>::build_patches (
 
   if (DEAL_II_USE_MT)
     {
-      void (DataOutRotation<dim,DH>::*p) (Data &)
+      void (DataOutRotation<dim,DH>::*p) (internal::DataOut::ParallelData<DH::dimension, DH::dimension> &)
         = &DataOutRotation<dim,DH>::build_some_patches;
 
       Threads::ThreadGroup<> threads;

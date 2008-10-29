@@ -2,7 +2,7 @@
 //    $Id$
 //    Version: $Name$
 //
-//    Copyright (C) 2000, 2001, 2002, 2003, 2004, 2005, 2006 by the deal.II authors
+//    Copyright (C) 2000, 2001, 2002, 2003, 2004, 2005, 2006, 2008 by the deal.II authors
 //
 //    This file is subject to QPL and may not be  distributed
 //    without copyright and license information. Please refer
@@ -170,33 +170,6 @@ class DataOutRotation : public DataOut_DoFData<DH,DH::dimension+1>
     
   private:
 				     /**
-				      * All data needed in one thread
-				      * is gathered in the struct
-				      * Data.
-				      * The data is handled globally
-				      * to avoid allocation of memory
-				      * in the threads.
-				      */
-    struct Data 
-    {
-	unsigned int n_threads;
-	unsigned int this_thread;
-	unsigned int n_components;
-	unsigned int n_datasets;
-	unsigned int n_patches_per_circle;
-	unsigned int n_subdivisions;
-	std::vector<double>                        patch_values;
-	std::vector<Vector<double> >               patch_values_system;
-	std::vector<Tensor<1,dim> >                patch_gradients;
-	std::vector<std::vector<Tensor<1,dim> > >  patch_gradients_system;
-	std::vector<Tensor<2,dim> >                patch_hessians;
-	std::vector<std::vector<Tensor<2,dim> > >  patch_hessians_system;
-	std::vector<std::vector<Vector<double> > > postprocessed_values;
-	std::vector<Point<dim> >                   dummy_normals;
-	Data ()
-	  {}
-    };
-				     /**
 				      * Builds every @p n_threads's
 				      * patch. This function may be
 				      * called in parallel.
@@ -204,7 +177,7 @@ class DataOutRotation : public DataOut_DoFData<DH,DH::dimension+1>
 				      * used, the function is called
 				      * once and generates all patches.
 				      */
-    void build_some_patches (Data &data);
+    void build_some_patches (internal::DataOut::ParallelData<DH::dimension, DH::dimension> &data);
 };
 
 

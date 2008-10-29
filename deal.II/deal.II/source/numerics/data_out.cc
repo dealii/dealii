@@ -620,7 +620,7 @@ DataOut_DoFData<DH,patch_dim,patch_space_dim>::memory_consumption () const
 
 
 template <int dim, class DH>
-void DataOut<dim,DH>::build_some_patches (Data &data)
+void DataOut<dim,DH>::build_some_patches (internal::DataOut::ParallelData<DH::dimension, DH::dimension> &data)
 {
 				   // Check consistency of redundant
 				   // template parameter
@@ -1049,7 +1049,7 @@ void DataOut<dim,DH>::build_patches (const Mapping<DH::dimension> &mapping,
   
 
 				   // init data for the threads    
-  std::vector<Data> thread_data(n_threads);
+  std::vector<internal::DataOut::ParallelData<DH::dimension, DH::dimension> > thread_data(n_threads);
   for (unsigned int i=0;i<n_threads;++i)
     {
       thread_data[i].n_threads      = n_threads;
