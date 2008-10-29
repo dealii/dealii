@@ -34,6 +34,45 @@
 std::ofstream logfile("number_cache/output");
 
 
+
+template <int dim>
+void output (const Triangulation<dim> &tria)
+{
+  
+  deallog << "  " << tria.n_active_cells() << std::endl;
+  deallog << "  " << tria.n_cells() << std::endl;
+  deallog << "  " << tria.n_active_lines() << std::endl;
+  deallog << "  " << tria.n_lines() << std::endl;
+  deallog << "  " << tria.n_active_quads() << std::endl;
+  deallog << "  " << tria.n_quads() << std::endl;
+  deallog << "  " << tria.n_active_hexs() << std::endl;
+  deallog << "  " << tria.n_hexs() << std::endl;
+
+  for (unsigned int i=0; i<tria.n_levels(); ++i)
+    {
+      deallog << "  " << tria.n_active_cells(i) << std::endl;
+      deallog << "  " << tria.n_cells(i) << std::endl;
+      if (dim == 1)
+	{
+	  deallog << "  " << tria.n_active_lines(i) << std::endl;
+	  deallog << "  " << tria.n_lines(i) << std::endl;
+	}
+      
+      if (dim == 2)
+	{
+	  deallog << "  " << tria.n_active_quads(i) << std::endl;
+	  deallog << "  " << tria.n_quads(i) << std::endl;
+	}
+      
+      if (dim == 3)
+	{
+	  deallog << "  " << tria.n_active_hexs(i) << std::endl;
+	  deallog << "  " << tria.n_hexs(i) << std::endl;
+	}
+    }
+}
+
+
 template <int dim>
 void test (const char *filename)
 {
@@ -56,14 +95,7 @@ void test (const char *filename)
       return;
     }
 
-  deallog << "  " << tria.n_active_cells() << std::endl;
-  deallog << "  " << tria.n_cells() << std::endl;
-  deallog << "  " << tria.n_active_lines() << std::endl;
-  deallog << "  " << tria.n_lines() << std::endl;
-  deallog << "  " << tria.n_active_quads() << std::endl;
-  deallog << "  " << tria.n_quads() << std::endl;
-  deallog << "  " << tria.n_active_hexs() << std::endl;
-  deallog << "  " << tria.n_hexs() << std::endl;
+  output (tria);
   
 				   // now refine a few cells and output again
   deallog << "  Refining..." << std::endl;
@@ -73,15 +105,8 @@ void test (const char *filename)
 				      10U); ++i, ++cell)
     cell->set_refine_flag ();
   tria.execute_coarsening_and_refinement ();
-  
-  deallog << "  " << tria.n_active_cells() << std::endl;
-  deallog << "  " << tria.n_cells() << std::endl;
-  deallog << "  " << tria.n_active_lines() << std::endl;
-  deallog << "  " << tria.n_lines() << std::endl;
-  deallog << "  " << tria.n_active_quads() << std::endl;
-  deallog << "  " << tria.n_quads() << std::endl;
-  deallog << "  " << tria.n_active_hexs() << std::endl;
-  deallog << "  " << tria.n_hexs() << std::endl;
+
+  output (tria);
 }
 
 
