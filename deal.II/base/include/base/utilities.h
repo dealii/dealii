@@ -289,6 +289,15 @@ namespace Utilities
 				      * Returns a Trilinos Epetra_Comm
 				      * object needed for creation of
 				      * Epetra_Maps.
+				      *
+				      * If deal.II has been configured to use
+				      * a compiler that does not support MPI
+				      * then the resulting communicator will
+				      * be a serial one. Otherwise, the
+				      * communicator will correspond to
+				      * MPI_COMM_WORLD, i.e. a communicator
+				      * that encompasses all processes within
+				      * this MPI universe.
 				      */
       const Epetra_Comm& comm() const;
 
