@@ -2617,48 +2617,38 @@ void BoussinesqFlowProblem<dim>::refine_mesh (const unsigned int max_grid_level)
 	 cell != triangulation.end(); ++cell)
       cell->clear_refine_flag ();
 
-				   // As part of mesh refinement we
-				   // need to transfer the solution
-				   // vectors from the old mesh to the
-				   // new one. To this end we use the
-				   // SolutionTransfer class and we
-				   // have to prepare the solution
-				   // vectors that should be
-				   // transfered to the new grid (we
-				   // will lose the old grid once we
-				   // have done the refinement so the
-				   // transfer has to happen
-				   // concurrently with
-				   // refinement). What we definetely
-				   // need are the current and the old
-				   // temperature (BDF-2 time stepping
-				   // requires two old
-				   // solutions). Since the
-				   // SolutionTransfer objects only
-				   // support to transfer one object
-				   // per dof handler, we need to
-				   // collect the two temperature
-				   // solutions in one data
-				   // structure. Moreover, we choose
-				   // to transfer the Stokes solution,
-				   // too. The reason for doing so is
-				   // that the Stokes solution will
-				   // not change dramatically from
-				   // step to step, so we get a good
-				   // initial guess for the linear
-				   // solver when we reuse old data,
-				   // which reduces the number of
-				   // needed solver iterations.
+				   // As part of mesh refinement we need to
+				   // transfer the solution vectors from the
+				   // old mesh to the new one. To this end
+				   // we use the SolutionTransfer class and
+				   // we have to prepare the solution
+				   // vectors that should be transfered to
+				   // the new grid (we will lose the old
+				   // grid once we have done the refinement
+				   // so the transfer has to happen
+				   // concurrently with refinement). What we
+				   // definetely need are the current and
+				   // the old temperature (BDF-2 time
+				   // stepping requires two old
+				   // solutions). Since the SolutionTransfer
+				   // objects only support to transfer one
+				   // object per dof handler, we need to
+				   // collect the two temperature solutions
+				   // in one data structure. Moreover, we
+				   // choose to transfer the Stokes
+				   // solution, too, since we need the
+				   // velocity at two previous time steps,
+				   // of which only one is calculated on the
+				   // fly.
 				   //
 				   // Consequently, we initialize two
 				   // SolutionTransfer objects for the
-				   // Stokes and temperature
-				   // DoFHandler objects, by attaching
-				   // them to the old dof
-				   // handlers. With this at place, we
-				   // can prepare the triangulation
-				   // and the data vectors for
-				   // refinement (in this order).
+				   // Stokes and temperature DoFHandler
+				   // objects, by attaching them to the old
+				   // dof handlers. With this at place, we
+				   // can prepare the triangulation and the
+				   // data vectors for refinement (in this
+				   // order).
   std::vector<TrilinosWrappers::Vector> x_temperature (2);
   x_temperature[0].reinit (temperature_solution);
   x_temperature[0] = temperature_solution;
@@ -2676,32 +2666,30 @@ void BoussinesqFlowProblem<dim>::refine_mesh (const unsigned int max_grid_level)
   temperature_trans.prepare_for_coarsening_and_refinement(x_temperature);
   stokes_trans.prepare_for_coarsening_and_refinement(x_stokes);
 
-				   // Now everything is ready, so do
-				   // the refinement and recreate the
-				   // dof structure on the new grid,
-				   // and initialize the matrix
-				   // structures and the new vectors
-				   // in the <code>setup_dofs</code>
-				   // function. Next, we actually
-				   // perform the interpolation of the
-				   // solutions between the grids. We
-				   // create another copy of temporary
-				   // vectors for temperature (now
-				   // corresponding to the new grid),
-				   // and let the interpolate function
-				   // do the job. Then, the resulting
-				   // array of vectors is written into
-				   // the respective vector member
-				   // variables. For the Stokes
-				   // vector, everything is just the
-				   // same &ndash; except that we do
-				   // not need another temporary
-				   // vector since we just interpolate
-				   // a single vector. In the end, we
-				   // have to tell the program that
-				   // the matrices and preconditioners
-				   // need to be regenerated, since
-				   // the mesh has changed.
+				   // Now everything is ready, so do the
+				   // refinement and recreate the dof
+				   // structure on the new grid, and
+				   // initialize the matrix structures and
+				   // the new vectors in the
+				   // <code>setup_dofs</code>
+				   // function. Next, we actually perform
+				   // the interpolation of the solutions
+				   // between the grids. We create another
+				   // copy of temporary vectors for
+				   // temperature (now corresponding to the
+				   // new grid), and let the interpolate
+				   // function do the job. Then, the
+				   // resulting array of vectors is written
+				   // into the respective vector member
+				   // variables. For the Stokes vector,
+				   // everything is just the same &ndash;
+				   // except that we do not need another
+				   // temporary vector since we just
+				   // interpolate a single vector. In the
+				   // end, we have to tell the program that
+				   // the matrices and preconditioners need
+				   // to be regenerated, since the mesh has
+				   // changed.
   triangulation.execute_coarsening_and_refinement ();
   setup_dofs ();
 
