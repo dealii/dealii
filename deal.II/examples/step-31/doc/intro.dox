@@ -28,7 +28,7 @@ In cases where the fluid moves slowly enough such that inertia effects
 can be neglected, the equations that describe such behavior are the
 Boussinesq equations that read as follows:
 @f{eqnarray*}
-  -\nabla \cdot \eta \varepsilon ({\mathbf u}) + \nabla p &=& 
+  -\nabla \cdot (2 \eta \varepsilon ({\mathbf u})) + \nabla p &=& 
   \mathrm{Ra} \; T \mathbf{g},
   \\
   \nabla \cdot {\mathbf u} &=& 0,
@@ -164,7 +164,7 @@ mixed Laplace system of the form
 @f}
 where now we have a Stokes system
 @f{eqnarray*}
-  -\nabla \cdot \eta \varepsilon ({\mathbf u}) + \nabla p &=& f, \\
+  -\nabla \cdot (2 \eta \varepsilon ({\mathbf u})) + \nabla p &=& f, \\
   \nabla\cdot \mathbf u &=& 0,
 @f}
 where $\nabla \cdot \eta \varepsilon (\cdot)$ is an operator similar to the
@@ -189,7 +189,7 @@ field from the previous time step, which means that we get the velocity for
 the previous time step. In other words, we first solve the Stokes system for
 time step <i>n-1</i> as
 @f{eqnarray*}
-  -\nabla \cdot \eta \varepsilon ({\mathbf u}^{n-1}) + \nabla p^{n-1} &=& 
+  -\nabla \cdot (2\eta \varepsilon ({\mathbf u}^{n-1})) + \nabla p^{n-1} &=& 
   \mathrm{Ra} \; T^{n-1} \mathbf{g},
   \\
   \nabla \cdot {\mathbf u}^{n-1} &=& 0,
@@ -306,7 +306,7 @@ elements, so we can form the weak form of the Stokes equation without
 problem by integrating by parts and substituting continuous functions
 by their discrete counterparts:
 @f{eqnarray*}
-  (\nabla {\mathbf v}_h, \eta \varepsilon ({\mathbf u}^{n-1}_h))
+  (\nabla {\mathbf v}_h, 2\eta \varepsilon ({\mathbf u}^{n-1}_h))
   -
   (\nabla \cdot {\mathbf v}_h, p^{n-1}_h) 
   &=& 
@@ -325,7 +325,7 @@ it leads to the entirely same form if we use the symmetric gradient of
 $\mathbf v_h$ instead. Consequently, the formulation we consider and
 that we implement is
 @f{eqnarray*}
-  (\varepsilon({\mathbf v}_h), \eta \varepsilon ({\mathbf u}^{n-1}_h))
+  (\varepsilon({\mathbf v}_h), 2\eta \varepsilon ({\mathbf u}^{n-1}_h))
   -
   (\nabla \cdot {\mathbf v}_h, p^{n-1}_h) 
   &=& 
@@ -708,7 +708,7 @@ we should be using.
 It was more complicated to come up with a good replacement $\tilde
 A^{-1}$, which corresponds to the discretized symmetric Laplacian of
 the vector-valued velocity field, i.e. 
-$A_{ij} = (\varepsilon {\mathbf v}_i, \eta \varepsilon ({\mathbf
+$A_{ij} = (\varepsilon {\mathbf v}_i, 2\eta \varepsilon ({\mathbf
 v}_j))$.
 In @ref step_22 "step-22" we used a sparse LU decomposition (using the
 SparseDirectUMFPACK class) of <i>A</i> for $\tilde A^{-1}$ &mdash; the
@@ -719,12 +719,12 @@ the SparseILU class) in 3d.
 
 For this program, we would like to go a bit further. To this end, note
 that the symmetrized bilinear form on vector fields, 
-$(\varepsilon {\mathbf v}_i, \eta \varepsilon ({\mathbf v}_j))$
+$(\varepsilon {\mathbf v}_i, 2 \eta \varepsilon ({\mathbf v}_j))$
 is not too far away from the nonsymmetrized version,
 $(\nabla {\mathbf v}_i, \eta \nabla {\mathbf v}_j)
 = \sum_{k,l=1}^d 
   (\partial_k ({\mathbf v}_i)_l, \eta \partial_k ({\mathbf v}_j)_l)
-$. The latter,
+$ (note that the factor 2 has disappeared in this form). The latter,
 however, has the advantage that the <code>dim</code> vector components
 of the test functions are not coupled (well, almost, see below),
 i.e. the resulting matrix is block-diagonal: one block for each vector
