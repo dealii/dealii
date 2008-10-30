@@ -51,7 +51,7 @@ endif
 %/exe : %/obj.g.$(OBJEXT)
 	@echo =====linking======= $@
 	@echo Linking > $*/status
-	@$(CXX) $(LDFLAGS) -o $@ $^ $(LIBS)
+	@$(CXX) -o $@ $^ $(LDFLAGS) $(LIBS)
 
 
 ############################################################
