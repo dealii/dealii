@@ -236,12 +236,12 @@ ifeq ($(USE_CONTRIB_TRILINOS),yes)
 		ifpack \
 		rtop \
 		sacado \
-		teuchos \
 		thyra \
 		thyraepetra \
 		thyraepetraext \
 		epetraext \
 		epetra \
+		teuchos \
 		triutils
 
   ifeq ($(enable-shared),yes)
