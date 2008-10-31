@@ -301,7 +301,21 @@ inconvenience this causes.
 <ol>
   <li>
   <p>
-  New: The function GridTools::get_face_connectivity_of_cells produces 
+  New: The function SparsityTools::reorder_Cuthill_McKee reorders
+  the nodes of a graph based on their connectivity to other nodes.
+  <br>
+  (WB 2008/10/31)
+  </p>
+
+
+  <li>
+  <p>
+  New: The function GridTools::get_face_connectivity_of_cells produces a
+  sparsity pattern that describes the connectivity of cells of a
+  triangulation based on whether they share common faces.
+  <br>
+  (WB 2008/10/31)
+  </p>
 
   <li>
   <p>
