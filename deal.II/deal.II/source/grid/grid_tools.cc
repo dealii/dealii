@@ -1267,7 +1267,7 @@ template
 void
 GridTools::
 get_face_connectivity_of_cells (const Triangulation<deal_II_dimension> &triangulation,
-				SparsityPattern          &cell_connectivity)
+				SparsityPattern          &cell_connectivity);
 
 template
 void
