@@ -172,6 +172,27 @@ namespace Utilities
   template <int N, typename T>
   T
   fixed_power (const T t);
+
+				   /**
+				    * Given a permutation vector (i.e. a
+				    * vector $p_0\ldots p_{N-1}$ where each
+				    * $p_i\in [0,N)$ and $p_i\neq p_j$ for
+				    * $i\neq j$), produce the reverse
+				    * permutation $q_i=N-1-p_i$.
+				    */
+  std::vector<unsigned int>
+  reverse_permutation (const std::vector<unsigned int> &permutation);
+
+				   /**
+				    * Given a permutation vector (i.e. a
+				    * vector $p_0\ldots p_{N-1}$ where each
+				    * $p_i\in [0,N)$ and $p_i\neq p_j$ for
+				    * $i\neq j$), produce the inverse
+				    * permutation $q_0\ldots q_{N-1}$ so that
+				    * $q_{p_i}=p_{q_i}=i$.
+				    */
+  std::vector<unsigned int>
+  invert_permutation (const std::vector<unsigned int> &permutation);
   
                                    /**
                                     * A namespace for utility functions that

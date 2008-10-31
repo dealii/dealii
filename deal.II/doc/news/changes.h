@@ -198,6 +198,14 @@ inconvenience this causes.
 <ol>
   <li>
   <p>
+  New: The Utilities::reverse_permutation and Utilities::invert_permutation
+  compute the reverse and inverse of a given permutation of indices.
+  <br> 
+  (WB 2008/10/31)
+  </p>
+
+  <li>
+  <p>
   Fixed: The PolynomialsRaviartThomas class had a bug that led to random
   results when used from multiple threads. As a consequence the FE_RaviartThomas
   class was unusable in a multithreaded context. This has now been fixed.
@@ -399,6 +407,15 @@ inconvenience this causes.
 <h3>deal.II</h3>
 
 <ol>
+  <li>
+  <p>
+  Fixed: The DoFRenumbering::Cuthill_McKee algorithm had a bug when applied
+  to MGDoFHandler objects and if the <code>reverse</code> flag was set. This
+  should now be fixed.
+  <br>
+  (WB 2008/10/31)
+  </p>
+
   <li>
   <p>
   New: MatrixTools::apply_boundary_values() also for PETScWrappers::MPI::BlockSparseMatrix.
