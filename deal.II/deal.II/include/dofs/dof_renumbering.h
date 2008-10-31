@@ -32,25 +32,25 @@ DEAL_II_NAMESPACE_OPEN
  *
  * Within this class, the Cuthill-McKee algorithm is implemented. It
  * starts at a degree of freedom, searches the other DoFs for those
- * which are couple with the one we started with and numbers these in
+ * which are coupled with the one we started with and numbers these in
  * a certain way. It then finds the second level of DoFs, namely those
  * that couple with those of the previous level (which were those that
  * coupled with the initial DoF) and numbers these. And so on. For the
  * details of the algorithm, especially the numbering within each
- * level, we refer the reader to the book of Schwarz (H.R.Schwarz:
- * Methode der finiten Elemente). The reverse Cuthill-McKee algorithm
+ * level, please see H. R. Schwarz:
+ * "Methode der finiten Elemente". The reverse Cuthill-McKee algorithm
  * does the same job, but numbers all elements in the reverse order.
  *
- * These algorithms have one major drawback: they require a good
- * starting point, i.e. the degree of freedom index afterwards to be
- * numbered zero. This can thus be given by the user, e.g. by
- * exploiting knowledge of the actual topology of the domain. It is
- * also possible to give several starting indices, which may be used
- * to simulate a simple upstream numbering (by giving the inflow dofs
- * as starting values) or to make preconditioning faster (by letting
- * the dirichlet boundary indices be starting points).
+ * These algorithms have one major drawback: they require a good starting
+ * point, i.e. the degree of freedom index that will get a new index of
+ * zero. The renumbering functions therefore allow the caller to specify such
+ * an initial DoF, e.g. by exploiting knowledge of the actual topology of the
+ * domain. It is also possible to give several starting indices, which may be
+ * used to simulate a simple upstream numbering (by giving the inflow dofs as
+ * starting values) or to make preconditioning faster (by letting the
+ * Dirichlet boundary indices be starting points).
  *
- * If no starting index is given, one is chosen by the program, namely
+ * If no starting index is given, one is chosen automatically, namely
  * one with the smallest coordination number (the coordination number
  * is the number of other dofs this dof couples with). This dof is
  * usually located on the boundary of the domain. There is, however,
@@ -70,15 +70,6 @@ DEAL_II_NAMESPACE_OPEN
  * engineering problems of the early 1980s (the second edition was
  * published in 1984), but certainly not with those used in this
  * library, featuring several 10,000 to a few 100,000 elements.
- *
- * On the other hand, the need to reduce the bandwidth has decreased
- * since with the mentioned number of cells, only iterative solution
- * methods are able to solve the resulting matrix systems. These,
- * however, are not so demanding with respect to the bandwidth as
- * direct solvers used for smaller problems. Things like upstream
- * numbering become much more important in recent times, so the
- * suboptimality of the renumbering algorithms is not that important
- * any more.
  *
  * 
  * <h4>Implementation of renumbering schemes</h4>
