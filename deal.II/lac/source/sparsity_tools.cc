@@ -78,13 +78,15 @@ namespace SparsityTools
 				     // integers :-(
     std::vector<idxtype> int_rowstart (sparsity_pattern.get_rowstart_indices(),
 				       sparsity_pattern.get_rowstart_indices() +
-				       sparsity_pattern.n_cols()+1);
-    std::vector<idxtype> int_colnums (sparsity_pattern.get_colnums(),
-				      sparsity_pattern.get_colnums()+max_vec_len+1);
+				       sparsity_pattern.n_rows()+1);
+    std::vector<idxtype> int_colnums (sparsity_pattern.get_column_numbers(),
+				      sparsity_pattern.get_column_numbers()+
+				      int_rowstart[sparsity_pattern.n_rows()]);
 
     std::vector<idxtype> int_partition_indices (sparsity_pattern.n_rows());
 
-				     // Select which type of partitioning to create
+				     // Select which type of partitioning to
+				     // create
 
 				     // Use recursive if the number of
 				     // partitions is less than or equal to 8
