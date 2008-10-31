@@ -500,20 +500,15 @@ namespace DoFRenumbering
 				     // constraints are not needed anymore
     constraints.clear ();
   
-    const unsigned int n_dofs = sparsity.n_rows();
-				     // store the new dof numbers;
-				     // invalid_dof_index means that no new
-				     // number was chosen yet
-    Assert(new_indices.size() == n_dofs,
-	   ExcDimensionMismatch(new_indices.size(), n_dofs));
+    Assert(new_indices.size() == n_dofs = sparsity.n_rows(),
+	   ExcDimensionMismatch(new_indices.size(),
+				n_dofs = sparsity.n_rows()));
 
     SparsityTools::reorder_Cuthill_McKee (sparsity, new_indices,
 					  starting_indices);
 
     if (reversed_numbering)
-      for (std::vector<unsigned int>::iterator i=new_indices.begin();
-	   i!=new_indices.end(); ++i)
-	*i = n_dofs-*i-1;
+      new_indices = Utilities::reverse_permutation (new_indices);
   }
 
 
@@ -530,17 +525,12 @@ namespace DoFRenumbering
 			      dof_handler.max_couplings_between_dofs());
     MGTools::make_sparsity_pattern (dof_handler, sparsity, level);
     
-    const unsigned int n_dofs = sparsity.n_rows();
-				     // store the new dof numbers; invalid_dof_index means
-				     // that no new number was chosen yet
-    std::vector<unsigned int> new_indices(n_dofs, DoFHandler<dim>::invalid_dof_index);
-  
+    std::vector<unsigned int> new_indices(sparsity.n_rows());
     SparsityTools::reorder_Cuthill_McKee (sparsity, new_indices,
 					  starting_indices);
 
     if (reversed_numbering)
-      for (std::vector<unsigned int>::iterator i=new_indices.begin(); i!=new_indices.end(); ++i)
-	*i = n_dofs-*i;
+      new_indices = Utilities::reverse_permutation (new_indices);
 
 				     // actually perform renumbering;
 				     // this is dimension specific and
