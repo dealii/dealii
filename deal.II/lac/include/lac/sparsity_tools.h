@@ -1,5 +1,5 @@
 //---------------------------------------------------------------------------
-//    $Id: sparsity_tools.h 16733 2008-09-03 14:22:26Z heister $
+//    $Id$
 //    Version: $Name$
 //
 //    Copyright (C) 2008 by the deal.II authors
