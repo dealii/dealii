@@ -521,6 +521,11 @@ namespace Utilities
       mpi_err = MPI_Init (&argc, &argv);
       AssertThrow (mpi_err == 0,
 		   ExcMessage ("MPI could not be initialized."));
+#else
+				       // make sure the compiler doesn't warn
+				       // about these variables
+      (void)argc;
+      (void)argv;
 #endif
 
       constructor_has_already_run = true;
