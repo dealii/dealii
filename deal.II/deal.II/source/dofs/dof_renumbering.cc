@@ -13,6 +13,7 @@
 
 
 #include <base/thread_management.h>
+#include <base/utilities.h>
 #include <lac/sparsity_pattern.h>
 #include <lac/sparsity_tools.h>
 #include <lac/compressed_sparsity_pattern.h>
@@ -500,9 +501,9 @@ namespace DoFRenumbering
 				     // constraints are not needed anymore
     constraints.clear ();
   
-    Assert(new_indices.size() == n_dofs = sparsity.n_rows(),
+    Assert(new_indices.size() == sparsity.n_rows(),
 	   ExcDimensionMismatch(new_indices.size(),
-				n_dofs = sparsity.n_rows()));
+				sparsity.n_rows()));
 
     SparsityTools::reorder_Cuthill_McKee (sparsity, new_indices,
 					  starting_indices);
