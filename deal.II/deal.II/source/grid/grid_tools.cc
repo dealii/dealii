@@ -822,26 +822,9 @@ GridTools::find_active_cell_around_point (const hp::MappingCollection<dim>   &ma
 template <int dim>
 void
 GridTools::
-partition_triangulation (const unsigned int  n_partitions,
-                         Triangulation<dim> &triangulation)
+get_face_connectivity_of_cells (const Triangulation<dim> &triangulation,
+				SparsityPattern          &cell_connectivity)
 {
-  Assert (n_partitions > 0, ExcInvalidNumberOfPartitions(n_partitions));
-
-                                   // check for an easy return
-  if (n_partitions == 1)
-    {
-      for (typename Triangulation<dim>::active_cell_iterator
-             cell = triangulation.begin_active();
-           cell != triangulation.end(); ++cell)
-        cell->set_subdomain_id (0);
-      return;
-    }
-
-                                   // we decompose the domain by first
-                                   // generating the connection graph of all
-                                   // cells with their neighbors, and then
-                                   // passing this graph off to METIS.
-				   //
 				   // as built in this function, we
 				   // only consider face neighbors,
 				   // which leads to a fixed number of
@@ -849,12 +832,12 @@ partition_triangulation (const unsigned int  n_partitions,
 				   // that each cell couples with
 				   // itself, and that neighbors can
 				   // be refined)
-  SparsityPattern cell_connectivity (triangulation.n_active_cells(),
-				     triangulation.n_active_cells(),
-				     GeometryInfo<dim>::faces_per_cell
-				     * GeometryInfo<dim>::max_children_per_face
-				     +
-				     1);
+  cell_connectivity.reinit (triangulation.n_active_cells(),
+			    triangulation.n_active_cells(),
+			    GeometryInfo<dim>::faces_per_cell
+			    * GeometryInfo<dim>::max_children_per_face
+			    +
+			    1);
 
 				   // next we have to build a mapping from the
 				   // list of cells to their indices. for
@@ -902,12 +885,44 @@ partition_triangulation (const unsigned int  n_partitions,
     }
   
 				   // now compress the so-built connectivity
-				   // pattern and restore user indices
+				   // pattern and restore user indices. the
+				   // const-cast is necessary since we treat
+				   // the triangulation as constant (we here
+				   // return it to its original state)
   cell_connectivity.compress ();
-  triangulation.load_user_indices (saved_user_indices);
-  
+  const_cast<Triangulation<dim>&>(triangulation)
+    .load_user_indices (saved_user_indices);  
+}
+
+
+
+template <int dim>
+void
+GridTools::
+partition_triangulation (const unsigned int  n_partitions,
+                         Triangulation<dim> &triangulation)
+{
+  Assert (n_partitions > 0, ExcInvalidNumberOfPartitions(n_partitions));
+
+                                   // check for an easy return
+  if (n_partitions == 1)
+    {
+      for (typename Triangulation<dim>::active_cell_iterator
+             cell = triangulation.begin_active();
+           cell != triangulation.end(); ++cell)
+        cell->set_subdomain_id (0);
+      return;
+    }
+
+                                   // we decompose the domain by first
+                                   // generating the connection graph of all
+                                   // cells with their neighbors, and then
+                                   // passing this graph off to METIS.
 				   // finally defer to the other function for
 				   // partitioning and assigning subdomain ids
+  SparsityPattern cell_connectivity;
+  get_face_connectivity_of_cells (triangulation, cell_connectivity);
+  
   partition_triangulation (n_partitions,
 			   cell_connectivity,
 			   triangulation);
@@ -1247,6 +1262,12 @@ std::pair<hp::DoFHandler<deal_II_dimension>::active_cell_iterator, Point<deal_II
 GridTools::find_active_cell_around_point (const hp::MappingCollection<deal_II_dimension> &,
                                           const hp::DoFHandler<deal_II_dimension> &,
                                           const Point<deal_II_dimension> &);
+
+template
+void
+GridTools::
+get_face_connectivity_of_cells (const Triangulation<deal_II_dimension> &triangulation,
+				SparsityPattern          &cell_connectivity)
 
 template
 void

@@ -301,6 +301,10 @@ inconvenience this causes.
 <ol>
   <li>
   <p>
+  New: The function GridTools::get_face_connectivity_of_cells produces 
+
+  <li>
+  <p>
   Changed: The function SparsityPattern::partition has been deprecated. It
   is now available in a new namespace SparsityTools that collects algorithms
   that work on sparsity patterns or connectivity graphs.

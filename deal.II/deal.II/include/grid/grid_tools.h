@@ -438,6 +438,22 @@ class GridTools
     static void
     get_active_neighbors (const typename Container::active_cell_iterator        &cell,
 			  std::vector<typename Container::active_cell_iterator> &active_neighbors);    
+
+				     /**
+				      * Produce a sparsity pattern in which
+				      * nonzero entries indicate that two
+				      * cells are connected via a common
+				      * face. The diagonal entries of the
+				      * sparsity pattern are also set.
+				      *
+				      * The rows and columns refer to the
+				      * cells as they are traversed in their
+				      * natural order using cell iterators.
+				      */
+    template <int dim>
+    static void
+    get_face_connectivity_of_cells (const Triangulation<dim> &triangulation,
+				    SparsityPattern          &connectivity);
     
                                      /**
                                       * Use the METIS partitioner to generate
