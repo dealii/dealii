@@ -301,6 +301,15 @@ inconvenience this causes.
 <ol>
   <li>
   <p>
+  Changed: The function SparsityPattern::partition has been deprecated. It
+  is now available in a new namespace SparsityTools that collects algorithms
+  that work on sparsity patterns or connectivity graphs.
+  <br>
+  (WB 2008/10/31)
+  </p>
+
+  <li>
+  <p>
   Fixed: Whereas the Vector class copy operator resized the left hand side
   operand whenever necessary, the corresponding operator of the BlockVector
   class did not. This is now fixed.

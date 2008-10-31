@@ -1205,6 +1205,11 @@ class SparsityPattern : public Subscriptor
     bool stores_only_added_elements () const;
     
                                      /**
+				      * @deprecated
+				      *
+				      * This function is deprecated. Use
+				      * SparsityTools::partition instead.
+				      *
                                       * Use the METIS partitioner to generate
                                       * a partitioning of the degrees of
                                       * freedom represented by this sparsity
@@ -1469,10 +1474,6 @@ class SparsityPattern : public Subscriptor
 		    int, int,
 		    << "The iterators denote a range of " << arg1
 		    << " elements, but the given number of rows was " << arg2);
-                                     /**
-                                      * Exception
-                                      */
-    DeclException0 (ExcMETISNotInstalled);
                                      /**
                                       * Exception
                                       */

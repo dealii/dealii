@@ -19,6 +19,7 @@
 #include <grid/tria_iterator.h>
 #include <grid/intergrid_map.h>
 #include <lac/sparsity_pattern.h>
+#include <lac/sparsity_tools.h>
 #include <lac/compressed_sparsity_pattern.h>
 #include <dofs/dof_handler.h>
 #include <dofs/dof_accessor.h>
@@ -942,7 +943,7 @@ partition_triangulation (const unsigned int     n_partitions,
                                    // of freedom (which is associated with a
                                    // cell)
   std::vector<unsigned int> partition_indices (triangulation.n_active_cells());
-  cell_connection_graph.partition (n_partitions,  partition_indices);
+  SparsityTools::partition (cell_connection_graph, n_partitions,  partition_indices);
 
                                    // finally loop over all cells and set the
                                    // subdomain ids
