@@ -132,7 +132,12 @@ namespace SparsityTools
 				     // in the last round. Default to starting
 				     // points
     std::vector<unsigned int> last_round_dofs (starting_indices);
-  
+
+				     // initialize the new_indices array with
+				     // invalid values
+    std::fill (new_indices.begin(), new_indices.end(),
+	       numbers::invalid_unsigned_int);
+    
 				     // delete disallowed elements
     for (unsigned int i=0; i<last_round_dofs.size(); ++i)
       if ((last_round_dofs[i]==numbers::invalid_unsigned_int) ||
