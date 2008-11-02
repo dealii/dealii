@@ -3710,11 +3710,17 @@ DoFTools::get_subdomain_association (const DH                  &dof_handler,
 
   std::vector<unsigned int> local_dof_indices;
   local_dof_indices.reserve (max_dofs_per_cell(dof_handler));
-  
-				   // this function is similar to the
-				   // make_sparsity_pattern function,
-				   // see there for more information
 
+				   // pseudo-randomly assign variables
+				   // which lie on the interface
+				   // between subdomains to each of
+				   // the two or more
+  bool coin_flip = true;
+  
+				   // loop over all cells and record
+				   // which subdomain a DoF belongs
+				   // to. toss a coin in case it is on
+				   // an interface
   typename DH::active_cell_iterator
     cell = dof_handler.begin_active(),
     endc = dof_handler.end();
@@ -3725,13 +3731,27 @@ DoFTools::get_subdomain_association (const DH                  &dof_handler,
       local_dof_indices.resize (dofs_per_cell);
       cell->get_dof_indices (local_dof_indices);
 
-                                       // set subdomain ids. if dofs already
-                                       // have their values set then they must
-                                       // be on partition interfaces. don't
-                                       // worry about that, just overwrite it
+                                       // set subdomain ids. if dofs
+                                       // already have their values
+                                       // set then they must be on
+                                       // partition interfaces. in
+                                       // that case randomly assign
+                                       // them to either the previous
+                                       // association or the current
+                                       // one, where we take "random"
+                                       // to be "once this way once
+                                       // that way"
       for (unsigned int i=0; i<dofs_per_cell; ++i)
-        subdomain_association[local_dof_indices[i]] = subdomain_id;
-    };
+	if (subdomain_association[local_dof_indices[i]] ==
+	    numbers::invalid_unsigned_int)
+	  subdomain_association[local_dof_indices[i]] = subdomain_id;
+	else
+	  {
+	    if (coin_flip == true)
+	      subdomain_association[local_dof_indices[i]] = subdomain_id;
+	    coin_flip = !coin_flip;
+	  }
+    }
 
   Assert (std::find (subdomain_association.begin(),
                      subdomain_association.end(),

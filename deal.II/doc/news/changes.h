@@ -32,6 +32,21 @@ inconvenience this causes.
 <ol>
   <li>
   <p> 
+  Changed: The function DoFTools::get_subdomain_association function used
+  to assign degrees of freedom to the subdomain of the last cell on which
+  the degree of freedom is a part. This introduced a bias for degrees of
+  freedom's subdomains located on boundaries of subdomains, and
+  consequently to unequal numbers of DoFs per subdomain even if the
+  number of cells is roughly equal across subdomains. This behavior has
+  been changed by assigning degrees of freedom pseudo-randomly to any of
+  the subdomains on which they are located. This is a deviation from
+  previous behavior, however.
+  <br>
+  (Timo Heister, WB 2008/11/02)
+  </p>
+
+  <li>
+  <p> 
   Changed: The way we set up threads in the Threads::spawn functions
   and friends has been completely written, using the boost::bind and
   boost::function libraries. This has made things significantly simpler
