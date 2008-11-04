@@ -37,7 +37,6 @@ namespace TrilinosWrappers
 	  this->sub_objects[r][c] = 0;
 	  delete p;
 	}
-
   }
 
 
@@ -122,19 +121,23 @@ namespace TrilinosWrappers
 	    ExcDimensionMismatch (n_block_rows,
 				  block_sparsity_pattern.n_block_cols()));
 
-				     // Call the other basic reinit function...
-    reinit (n_block_rows, n_block_rows);
+    
+				     // Call the other basic reinit function, ...
+    reinit (block_sparsity_pattern.n_block_rows(),
+	    block_sparsity_pattern.n_block_cols());
+
+				     // ... set the correct sizes, ...
+    this->row_block_indices    = block_sparsity_pattern.get_row_indices();
+    this->column_block_indices = block_sparsity_pattern.get_column_indices();
 	
 				     // ... and then assign the correct
 				     // data to the blocks.
     for (unsigned int r=0; r<this->n_block_rows(); ++r)
       for (unsigned int c=0; c<this->n_block_cols(); ++c)
         {
-          this->block(r,c).reinit(input_maps[r],input_maps[c],
-				  block_sparsity_pattern.block(r,c));
+	  this->sub_objects[r][c]->reinit (input_maps[r], input_maps[c],
+					   block_sparsity_pattern.block(r,c));
         }
-	
-    collect_sizes();
   }
 
 
@@ -195,9 +198,9 @@ namespace TrilinosWrappers
     for (unsigned int r=0; r<this->n_block_rows(); ++r)
       for (unsigned int c=0; c<this->n_block_cols(); ++c)
         {
-          this->block(r,c).reinit(input_maps[r],input_maps[c],
-				  dealii_block_sparse_matrix.block(r,c),
-				  drop_tolerance);
+          this->sub_objects[r][c]->reinit(input_maps[r],input_maps[c],
+					  dealii_block_sparse_matrix.block(r,c),
+					  drop_tolerance);
         }
 
     collect_sizes();
