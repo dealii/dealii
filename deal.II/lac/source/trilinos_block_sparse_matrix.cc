@@ -27,7 +27,18 @@ namespace TrilinosWrappers
 
 
   BlockSparseMatrix::~BlockSparseMatrix ()
-  {}
+  {
+  				   // delete previous content of
+				   // the subobjects array
+    for (unsigned int r=0; r<this->n_block_rows(); ++r)
+      for (unsigned int c=0; c<this->n_block_cols(); ++c)
+	{
+	  BlockType *p = this->sub_objects[r][c];
+	  this->sub_objects[r][c] = 0;
+	  delete p;
+	}
+
+  }
 
 
 
@@ -104,17 +115,14 @@ namespace TrilinosWrappers
     
     const unsigned int n_block_rows = input_maps.size();
 
-    if (input_maps[0].Comm().MyPID()==0)
-      {
-	Assert (n_block_rows == block_sparsity_pattern.n_block_rows(),
-		ExcDimensionMismatch (n_block_rows,
-				      block_sparsity_pattern.n_block_rows()));
-	Assert (n_block_rows == block_sparsity_pattern.n_block_cols(),
-		ExcDimensionMismatch (n_block_rows,
-				      block_sparsity_pattern.n_block_cols()));
-      }
+    Assert (n_block_rows == block_sparsity_pattern.n_block_rows(),
+	    ExcDimensionMismatch (n_block_rows,
+				  block_sparsity_pattern.n_block_rows()));
+    Assert (n_block_rows == block_sparsity_pattern.n_block_cols(),
+	    ExcDimensionMismatch (n_block_rows,
+				  block_sparsity_pattern.n_block_cols()));
 
-				     // Call the other basic reinit function ...
+				     // Call the other basic reinit function...
     reinit (n_block_rows, n_block_rows);
 	
 				     // ... and then assign the correct
