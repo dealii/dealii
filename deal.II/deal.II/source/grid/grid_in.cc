@@ -802,6 +802,11 @@ void GridIn<dim>::read_msh (std::istream &in)
 	    if (cell_type == 15)
 	      {
 						 // Ignore vertices
+						 // but read the
+						 // number of nodes
+						 // given
+		for (unsigned int i=0; i<nod_num; ++i)
+		  in >> dummy;
 	      }
 	    else
 					       // cannot read this

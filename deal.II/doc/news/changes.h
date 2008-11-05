@@ -152,7 +152,7 @@ inconvenience this causes.
   </p>
   </li>
 
-    <li>
+  <li>
   <p>
   Updated: The version of the <a href="http://www.boost.org/">BOOST</a>
   library that is in the <code>contrib/</code> directory and is used in
@@ -422,6 +422,15 @@ inconvenience this causes.
 <h3>deal.II</h3>
 
 <ol>
+  <li>
+  <p>
+  Fixed: The GridIn::read_msh function had a bug that made it reject
+  MSH input files if they contained type-15 cells with more than one
+  associated vertex.
+  <br>
+  (WB 2008/11/05)
+  </p>
+
   <li>
   <p>
   Fixed: The DoFRenumbering::Cuthill_McKee algorithm had a bug when applied
