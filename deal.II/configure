@@ -17276,6 +17276,7 @@ if test "x$cygwin_shared_lib" = "xyes" ; then
   echo "     to your .bash_profile file so that windows will be"
   echo "     able to find the deal.II shared libraries when"
   echo "     executing your programs."
+  echo
 fi
 
 if test "x$darwin_shared_lib" = "xyes" ; then
@@ -17284,13 +17285,22 @@ if test "x$darwin_shared_lib" = "xyes" ; then
   echo "     to your .bash_profile file so that OSX will be"
   echo "     able to find the deal.II shared libraries when"
   echo "     executing your programs."
+  echo
+
+  if test "x${USE_CONTRIB_TRILINOS}" = "xyes" ; then
+    echo "     You will also need to add the path to the Trilinos libraries"
+    echo "     to DYLIB_LIBRARY_PATH."
+    echo
+  fi
+
   if test "x$DARWIN_GCC_WEAK_LINKAGE_BUG" = "xyes" ; then
     echo "     WARNING: The installed compiler version seems to be "
     echo "     WARNING: the Apple gcc3.3, build 1666, which does not"
     echo "     WARNING: work properly for building dynamics libs"
-    echo "     WARNING: Please install Apples November 2004 patch"
+    echo "     WARNING: Please install Apple's November 2004 patch"
     echo "     WARNING: for the gcc, which can be found on:"
     echo "     WARNING: http://www.apple.com/developer"
+    echo
   fi
 fi
 
@@ -17311,6 +17321,7 @@ if test "x$CC_VERSION" = "xunknown_cc" ; then
   echo "     WARNING: configure has used a generic set of parameters."
   echo "     WARNING: Still, you have to expect trouble during compilation."
   echo "     WARNING: If so, report to dealii@dealii.org!"
+  echo
 fi
 
 if test "x$GXX_VERSION" = "xunknown_cc" ; then
@@ -17319,5 +17330,6 @@ if test "x$GXX_VERSION" = "xunknown_cc" ; then
   echo "     WARNING: configure has used a generic set of parameters."
   echo "     WARNING: Still, you have to expect trouble during compilation."
   echo "     WARNING: If so, report to dealii@dealii.org!"
+  echo
 fi
 
