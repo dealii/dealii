@@ -416,7 +416,7 @@ class GridIn
 		    << "ELM-TYPE\n"
 		    << "1 Line (2 nodes, 1 edge).\n"
 		    << "3 Quadrilateral (4 nodes, 4 edges).\n"
-		    << "5 Hexahedron (8 nodes, 12 edges, 6 faces)."
+		    << "5 Hexahedron (8 nodes, 12 edges, 6 faces).\n"
 		    << "15 Point (1 node, ignored when read)");
   protected:
 				     /**
