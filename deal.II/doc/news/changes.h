@@ -324,12 +324,20 @@ inconvenience this causes.
 <ol>
   <li>
   <p>
+  Fixed: The BlockMatrixBase::clear() function that is used by all other
+  block matrix type classes had a memory leak in that the memory
+  allocated by all sub-objects was not freed. This is now fixed.
+  <br>
+  (WB 2008/11/05)
+  </p>
+
+  <li>
+  <p>
   New: The function SparsityTools::reorder_Cuthill_McKee reorders
   the nodes of a graph based on their connectivity to other nodes.
   <br>
   (WB 2008/10/31)
   </p>
-
 
   <li>
   <p>

@@ -93,6 +93,9 @@ namespace TrilinosWrappers
       for (unsigned int c=0; c<this->n_block_cols(); ++c)
         {
           BlockType *p = new BlockType();
+
+	  Assert (this->sub_objects[r][c] == 0,
+		  ExcInternalError());
           this->sub_objects[r][c] = p;
         }
   }

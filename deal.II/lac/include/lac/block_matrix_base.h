@@ -2,7 +2,7 @@
 //    $Id$
 //    Version: $Name$
 //
-//    Copyright (C) 2004, 2005, 2006, 2007 by the deal.II authors
+//    Copyright (C) 2004, 2005, 2006, 2007, 2008 by the deal.II authors
 //
 //    This file is subject to QPL and may not be  distributed
 //    without copyright and license information. Please refer
@@ -1470,7 +1470,11 @@ BlockMatrixBase<MatrixType>::clear ()
 {
   for (unsigned int r=0; r<n_block_rows(); ++r)
     for (unsigned int c=0; c<n_block_cols(); ++c)
-      block(r,c).clear ();
+      {
+	MatrixType *p = this->sub_objects[r][c];
+	this->sub_objects[r][c] = 0;
+	delete p;
+      }
   sub_objects.reinit (0,0);
 
                                    // reset block indices to empty
