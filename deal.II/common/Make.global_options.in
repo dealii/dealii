@@ -121,7 +121,7 @@ ifeq (@DEAL_II_LD_UNDERSTANDS_SONAME@,yes)
   DEAL_II_ADD_SONAME = -Wl,-soname,$(call DEAL_II_SHLIB_NAME,$(1))
 else
   ifeq (@DEAL_II_LD_UNDERSTANDS_DYLIB_INSTALL_NAME@,yes)
-    DEAL_II_ADD_SONAME = -Wl,-dylib_install_name -Wl,$(call DEAL_II_SHLIB_NAME,$(1))
+    DEAL_II_ADD_SONAME = -Wl,-dynamic,-install_name -Wl,$(call DEAL_II_SHLIB_NAME,$(1))
   else
     DEAL_II_ADD_SONAME = 
   endif

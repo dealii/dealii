@@ -1733,8 +1733,8 @@ AC_DEFUN(DEAL_II_CHECK_LINK_SONAME,
 
   dnl Now try the -dylib_install_name thing
   OLD_LDFLAGS=$LDFLAGS
-  LDFLAGS="-Wl,-dylib_install_name -Wl,libbase.so.6.2.1 $LDFLAGS -shared"
-  AC_MSG_CHECKING([whether compiler understands option -Wl,-dylib_install_name])
+  LDFLAGS="-Wl,-dynamic,-install_name -Wl,libbase.so.6.2.1 $LDFLAGS -shared"
+  AC_MSG_CHECKING([whether compiler understands option -Wl,-dynamic,-install_name])
   AC_LINK_IFELSE(
    [ AC_LANG_PROGRAM([[]],[[]])],
    [ 
