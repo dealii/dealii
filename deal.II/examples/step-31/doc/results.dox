@@ -1,5 +1,155 @@
 <h1>Results</h1>
 
+<h3> Results in 2d </h3>
+
+When you run the program in 2d, the output will look something like
+this:
+<code>
+<pre>
+Number of active cells: 64 (on 3 levels)
+Number of degrees of freedom: 3041 (2187+125+729)
+
+Timestep 0:  t=0, dt=0
+   Assembling...
+   Rebuilding Stokes preconditioner...
+   Solving...
+   0 GMRES iterations for Stokes subsystem.
+   11 CG iterations for temperature.
+   Temperature range: -0.574475 4.20612
+
+Number of active cells: 288 (on 4 levels)
+Number of degrees of freedom: 12379 (8943+455+2981)
+
+Timestep 0:  t=0, dt=2.08333
+   Assembling...
+   Rebuilding Stokes preconditioner...
+   Solving...
+   0 GMRES iterations for Stokes subsystem.
+   12 CG iterations for temperature.
+   Temperature range: -0.449202 1.92021
+
+Number of active cells: 1296 (on 5 levels)
+Number of degrees of freedom: 51497 (37305+1757+12435)
+
+Timestep 0:  t=0, dt=1.04167
+   Assembling...
+   Rebuilding Stokes preconditioner...
+   Solving...
+   0 GMRES iterations for Stokes subsystem.
+   11 CG iterations for temperature.
+   Temperature range: -0.423543 0.720648
+
+Number of active cells: 5104 (on 6 levels)
+Number of degrees of freedom: 194273 (140913+6389+46971)
+
+Timestep 0:  t=0, dt=0.520833
+   Assembling...
+   Rebuilding Stokes preconditioner...
+   Solving...
+   0 GMRES iterations for Stokes subsystem.
+   12 CG iterations for temperature.
+   Temperature range: -0.228566 0.423852
+
+Timestep 1:  t=0.260417, dt=0.260417
+   Assembling...
+   Solving...
+   63 GMRES iterations for Stokes subsystem.
+   11 CG iterations for temperature.
+   Temperature range: -0.280384 0.640062  
+
+...
+</pre>
+</code>
+
+In the beginning we refine the mesh several times adaptively and
+always return to time step zero to restart on the newly refined
+mesh. Only then do we start the actual time iteration.
+
+The program runs for a while. The temperature field for time steps 0,
+500, 1000, 1500, 2000, 3000, 4000, and 5000 looks like this (note that
+the color scale used for the temperature is not always the same):
+
+<table align="center" border="1" cellspacing="3" cellpadding="3">
+  <tr>
+    <td>
+        @image html "step-31.2d.solution.00.png" "" width=22%
+    </td>
+    <td>
+        @image html "step-31.2d.solution.01.png" "" width=22%
+    </td>
+    <td>
+        @image html "step-31.2d.solution.02.png" "" width=22%
+    </td>
+    <td>
+        @image html "step-31.2d.solution.03.png" "" width=22%
+    </td>
+  </tr>
+
+  <tr>
+    <td>
+        @image html "step-31.2d.solution.04.png" "" width=22%
+    </td>
+    <td>
+        @image html "step-31.2d.solution.05.png" "" width=22%
+    </td>
+    <td>
+        @image html "step-31.2d.solution.06.png" "" width=22%
+    </td>
+    <td>
+        @image html "step-31.2d.solution.07.png" "" width=22%
+    </td>
+  </tr>
+</table>
+
+As can be seen, we have three heat sources that heat fluid and
+therefore produce a buoyancy effect that lets hots pockets of fluid
+rise up and swirl around. By a chimney effect, the three streams are
+pressed together by fluid that comes from the outside and wants to
+join the updraft party. Note that because the fluid is initially at
+rest, those parts of the fluid that were initially over the sources
+receive a longer heating time than that fluid that is later dragged
+over the source by the fully developed flow field. It is therefore
+hotter, a fact that can be seen in the red tips of the three
+plumes. Note also the relatively fine features of the flow field, a
+result of the sophisticated transport stabilization of the temperature
+equation we have chosen.
+
+In addition to the pictures above, the following ones show the
+adaptive mesh and the flow field at the same time steps:
+
+<table align="center" border="1" cellspacing="3" cellpadding="3">
+  <tr>
+    <td>
+        @image html "step-31.2d.grid.00.png" "" width=22%
+    </td>
+    <td>
+        @image html "step-31.2d.grid.01.png" "" width=22%
+    </td>
+    <td>
+        @image html "step-31.2d.grid.02.png" "" width=22%
+    </td>
+    <td>
+        @image html "step-31.2d.grid.03.png" "" width=22%
+    </td>
+  </tr>
+
+  <tr>
+    <td>
+        @image html "step-31.2d.grid.04.png" "" width=22%
+    </td>
+    <td>
+        @image html "step-31.2d.grid.05.png" "" width=22%
+    </td>
+    <td>
+        @image html "step-31.2d.grid.06.png" "" width=22%
+    </td>
+    <td>
+        @image html "step-31.2d.grid.07.png" "" width=22%
+    </td>
+  </tr>
+</table>
+
+
 
 
 <h3> Numerical experiments to determine optimal parameters </h3>
