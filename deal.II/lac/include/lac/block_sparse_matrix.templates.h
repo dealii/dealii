@@ -2,7 +2,7 @@
 //    $Id$
 //    Version: $Name$
 //
-//    Copyright (C) 2000, 2001, 2002, 2003, 2004, 2005, 2006 by the deal.II authors
+//    Copyright (C) 2000, 2001, 2002, 2003, 2004, 2005, 2006, 2008 by the deal.II authors
 //
 //    This file is subject to QPL and may not be  distributed
 //    without copyright and license information. Please refer
@@ -45,14 +45,7 @@ BlockSparseMatrix<number>::~BlockSparseMatrix ()
 {
   				   // delete previous content of
 				   // the subobjects array
-  for (unsigned int r=0; r<this->n_block_rows(); ++r)
-    for (unsigned int c=0; c<this->n_block_cols(); ++c)
-      {
-	BlockType *p = this->sub_objects[r][c];
-	this->sub_objects[r][c] = 0;
-	delete p;
-      }
-
+  clear ();
   sparsity_pattern = 0;
 }
 
@@ -114,14 +107,7 @@ reinit (const BlockSparsityPattern &sparsity)
 				   // first delete previous content of
 				   // the subobjects array and delete
 				   // the table completely
-  for (unsigned int r=0; r<this->n_block_rows(); ++r)
-    for (unsigned int c=0; c<this->n_block_cols(); ++c)
-      {
-	BlockType *p = this->sub_objects[r][c];
-	this->sub_objects[r][c] = 0;
-	delete p;
-      }
-  this->sub_objects.reinit (0,0);
+  clear ();
 
 				   // then associate new sparsity
 				   // pattern and resize

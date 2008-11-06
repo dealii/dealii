@@ -30,13 +30,7 @@ namespace TrilinosWrappers
   {
   				   // delete previous content of
 				   // the subobjects array
-    for (unsigned int r=0; r<this->n_block_rows(); ++r)
-      for (unsigned int c=0; c<this->n_block_cols(); ++c)
-	{
-	  BlockType *p = this->sub_objects[r][c];
-	  this->sub_objects[r][c] = 0;
-	  delete p;
-	}
+    clear ();
   }
 
 
@@ -70,15 +64,7 @@ namespace TrilinosWrappers
   {
                                      // first delete previous content of
                                      // the subobjects array
-    for (unsigned int r=0; r<this->n_block_rows(); ++r)
-      for (unsigned int c=0; c<this->n_block_cols(); ++c)
-        {
-          BlockType *p = this->sub_objects[r][c];
-          this->sub_objects[r][c] = 0;
-          delete p;
-        }
-  
-    this->sub_objects.reinit (0,0);
+    clear ();
 
                                      // then resize. set sizes of blocks to
                                      // zero. user will later have to call
