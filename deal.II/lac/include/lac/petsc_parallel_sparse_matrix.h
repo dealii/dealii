@@ -18,7 +18,6 @@
 #include <lac/exceptions.h>
 
 #include <lac/petsc_matrix_base.h>
-#include <lac/block_sparsity_pattern.h>
 
 #include <vector>
 
@@ -265,8 +264,9 @@ namespace PETScWrappers
                                           * get memory allocation right from
                                           * the start.
                                           */
+	template <typename SparsityType>
         SparseMatrix (const MPI_Comm                  &communicator,
-                      const CompressedSparsityPattern &sparsity_pattern,
+                      const SparsityType              &sparsity_pattern,
                       const std::vector<unsigned int> &local_rows_per_process,
                       const std::vector<unsigned int> &local_columns_per_process,
                       const unsigned int               this_process,
@@ -356,8 +356,9 @@ namespace PETScWrappers
                                           * get memory allocation right from
                                           * the start.
                                           */
-        void reinit (const MPI_Comm                  &communicator,
-                     const CompressedSparsityPattern &sparsity_pattern,
+        template <typename SparsityType>
+	void reinit (const MPI_Comm                  &communicator,
+                     const SparsityType              &sparsity_pattern,
                      const std::vector<unsigned int> &local_rows_per_process,
                      const std::vector<unsigned int> &local_columns_per_process,
                      const unsigned int               this_process,
@@ -416,7 +417,8 @@ namespace PETScWrappers
                                          /**
                                           * Same as previous functions.
                                           */
-        void do_reinit (const CompressedSparsityPattern &sparsity_pattern,
+	template <typename SparsityType>
+        void do_reinit (const SparsityType              &sparsity_pattern,
                         const std::vector<unsigned int> &local_rows_per_process,
                         const std::vector<unsigned int> &local_columns_per_process,
                         const unsigned int               this_process,

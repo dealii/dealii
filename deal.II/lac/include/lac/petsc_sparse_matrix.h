@@ -17,7 +17,6 @@
 #include <base/config.h>
 #include <lac/exceptions.h>
 #include <lac/petsc_matrix_base.h>
-#include <lac/compressed_sparsity_pattern.h>
 
 #include <vector>
 
@@ -182,8 +181,9 @@ namespace PETScWrappers
                                         * flag has a default value equal to
                                         * @p false.
                                         */
-      SparseMatrix (const CompressedSparsityPattern &sparsity_pattern,
-                    const bool                       preset_nonzero_locations = false);
+      template <typename SparsityType>
+      SparseMatrix (const SparsityType &sparsity_pattern,
+                    const bool          preset_nonzero_locations = false);
 
                                        /**
                                         * This operator assigns a scalar to
@@ -277,8 +277,9 @@ namespace PETScWrappers
                                         * flag has a default value equal to
                                         * @p false.
                                         */
-      void reinit (const CompressedSparsityPattern &sparsity_pattern,
-                   const bool                       preset_nonzero_locations = false);
+      template <typename SparsityType>
+      void reinit (const SparsityType &sparsity_pattern,
+                   const bool          preset_nonzero_locations = false);
 
                                        /**
                                         * Return a reference to the MPI
@@ -314,8 +315,9 @@ namespace PETScWrappers
                                        /**
                                         * Same as previous function.
                                         */
-      void do_reinit (const CompressedSparsityPattern &sparsity_pattern,
-                      const bool                       preset_nonzero_locations);
+      template <typename SparsityType>
+      void do_reinit (const SparsityType &sparsity_pattern,
+                      const bool          preset_nonzero_locations);
   };
 }
 

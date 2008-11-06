@@ -15,6 +15,10 @@
 #include <lac/petsc_sparse_matrix.h>
 #include <lac/petsc_vector.h>
 
+#include <lac/sparsity_pattern.h>
+#include <lac/compressed_sparsity_pattern.h>
+#include <lac/compressed_simple_sparsity_pattern.h>
+
 #ifdef DEAL_II_USE_PETSC
 
 DEAL_II_NAMESPACE_OPEN
@@ -52,9 +56,10 @@ namespace PETScWrappers
 
 
 
+  template <typename SparsityType>
   SparseMatrix::
-  SparseMatrix (const CompressedSparsityPattern &sparsity_pattern,
-                const bool                       preset_nonzero_locations)
+  SparseMatrix (const SparsityType &sparsity_pattern,
+                const bool          preset_nonzero_locations)
   {
     do_reinit (sparsity_pattern, preset_nonzero_locations);
   }
@@ -101,10 +106,12 @@ namespace PETScWrappers
   }  
 
 
+
+  template <typename SparsityType>
   void
   SparseMatrix::
-  reinit (const CompressedSparsityPattern &sparsity_pattern,
-          const bool                       preset_nonzero_locations)
+  reinit (const SparsityType &sparsity_pattern,
+          const bool          preset_nonzero_locations)
   {
                                      // get rid of old matrix and generate a
                                      // new one
@@ -185,9 +192,10 @@ namespace PETScWrappers
 
 
 
+  template <typename SparsityType>
   void
-  SparseMatrix::do_reinit (const CompressedSparsityPattern &sparsity_pattern,
-                           const bool preset_nonzero_locations)
+  SparseMatrix::do_reinit (const SparsityType &sparsity_pattern,
+                           const bool          preset_nonzero_locations)
   {
     std::vector<unsigned int> row_lengths (sparsity_pattern.n_rows());
     for (unsigned int i=0; i<sparsity_pattern.n_rows(); ++i)
@@ -229,6 +237,39 @@ namespace PETScWrappers
         compress ();
       }
   }
+
+
+  // Explicit instantiations
+  //
+  template
+  SparseMatrix::SparseMatrix (const SparsityPattern &,
+			      const bool);
+  template
+  SparseMatrix::SparseMatrix (const CompressedSparsityPattern &,
+			      const bool);
+  template
+  SparseMatrix::SparseMatrix (const CompressedSimpleSparsityPattern &,
+			      const bool);
+
+  template void
+  SparseMatrix::reinit (const SparsityPattern &,
+			const bool);
+  template void
+  SparseMatrix::reinit (const CompressedSparsityPattern &,
+			const bool);
+  template void
+  SparseMatrix::reinit (const CompressedSimpleSparsityPattern &,
+			const bool);
+
+  template void
+  SparseMatrix::do_reinit (const SparsityPattern &,
+                           const bool);
+  template void
+  SparseMatrix::do_reinit (const CompressedSparsityPattern &,
+                           const bool);
+  template void
+  SparseMatrix::do_reinit (const CompressedSimpleSparsityPattern &,
+                           const bool);
 }
 
 

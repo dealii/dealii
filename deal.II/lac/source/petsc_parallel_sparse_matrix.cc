@@ -15,6 +15,10 @@
 #include <lac/petsc_parallel_sparse_matrix.h>
 #include <lac/petsc_vector.h>
 
+#include <lac/sparsity_pattern.h>
+#include <lac/compressed_sparsity_pattern.h>
+#include <lac/compressed_simple_sparsity_pattern.h>
+
 #ifdef DEAL_II_USE_PETSC
 
 DEAL_II_NAMESPACE_OPEN
@@ -70,9 +74,10 @@ namespace PETScWrappers
 
 
 
+    template <typename SparsityType>
     SparseMatrix::
     SparseMatrix (const MPI_Comm                  &communicator,
-                  const CompressedSparsityPattern &sparsity_pattern,
+                  const SparsityType              &sparsity_pattern,
                   const std::vector<unsigned int> &local_rows_per_process,
                   const std::vector<unsigned int> &local_columns_per_process,
                   const unsigned int               this_process,
@@ -139,10 +144,11 @@ namespace PETScWrappers
 
 
 
+    template <typename SparsityType>
     void
     SparseMatrix::
     reinit (const MPI_Comm                  &communicator,
-            const CompressedSparsityPattern &sparsity_pattern,
+            const SparsityType              &sparsity_pattern,
             const std::vector<unsigned int> &local_rows_per_process,
             const std::vector<unsigned int> &local_columns_per_process,
             const unsigned int               this_process,
@@ -248,9 +254,10 @@ namespace PETScWrappers
 
 
 
+    template <typename SparsityType>
     void
     SparseMatrix::
-    do_reinit (const CompressedSparsityPattern &sparsity_pattern,
+    do_reinit (const SparsityType              &sparsity_pattern,
                const std::vector<unsigned int> &local_rows_per_process,
                const std::vector<unsigned int> &local_columns_per_process,
                const unsigned int               this_process,
@@ -445,6 +452,73 @@ namespace PETScWrappers
 //TODO: We should use the appropriate option with MatSetOption here indicating that we do not intend to add any further matrix entries. Maybe this would accelerate some things as well
         }
     }
+
+
+
+    // explicit instantiations
+    //
+    template
+    SparseMatrix::SparseMatrix (const MPI_Comm &,
+				const SparsityPattern &,
+				const std::vector<unsigned int> &,
+				const std::vector<unsigned int> &,
+				const unsigned int,
+				const bool);
+    template
+    SparseMatrix::SparseMatrix (const MPI_Comm &,
+				const CompressedSparsityPattern &,
+				const std::vector<unsigned int> &,
+				const std::vector<unsigned int> &,
+				const unsigned int,
+				const bool);
+    template
+    SparseMatrix::SparseMatrix (const MPI_Comm &,
+				const CompressedSimpleSparsityPattern &,
+				const std::vector<unsigned int> &,
+				const std::vector<unsigned int> &,
+				const unsigned int,
+				const bool);
+
+    template void
+    SparseMatrix::reinit (const MPI_Comm &,
+			  const SparsityPattern &,
+			  const std::vector<unsigned int> &,
+			  const std::vector<unsigned int> &,
+			  const unsigned int,
+			  const bool);
+    template void
+    SparseMatrix::reinit (const MPI_Comm &,
+			  const CompressedSparsityPattern &,
+			  const std::vector<unsigned int> &,
+			  const std::vector<unsigned int> &,
+			  const unsigned int,
+			  const bool);
+    template void
+    SparseMatrix::reinit (const MPI_Comm &,
+			  const CompressedSimpleSparsityPattern &,
+			  const std::vector<unsigned int> &,
+			  const std::vector<unsigned int> &,
+			  const unsigned int,
+			  const bool);
+
+    template void
+    SparseMatrix::do_reinit (const SparsityPattern &,
+			     const std::vector<unsigned int> &,
+			     const std::vector<unsigned int> &,
+			     const unsigned int ,
+			     const bool);
+    template void
+    SparseMatrix::do_reinit (const CompressedSparsityPattern &,
+			     const std::vector<unsigned int> &,
+			     const std::vector<unsigned int> &,
+			     const unsigned int ,
+			     const bool);
+    template void
+    SparseMatrix::do_reinit (const CompressedSimpleSparsityPattern &,
+			     const std::vector<unsigned int> &,
+			     const std::vector<unsigned int> &,
+			     const unsigned int ,
+			     const bool);
   }
 }
 
