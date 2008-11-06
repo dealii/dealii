@@ -630,9 +630,21 @@ namespace TrilinosWrappers
     int trilinos_i = i;
     int trilinos_j = j;
 
-    const int ierr = matrix->ReplaceGlobalValues (trilinos_i, 1,
-						  const_cast<double*>(&value), 
-						  &trilinos_j);
+    int ierr;
+
+				        // If the matrix is not yet filled,
+				        // we can insert new entries into
+				        // the matrix using this
+				        // command. Otherwise, we're just
+				        // able to replace existing entries.
+    if (matrix->Filled() == false)
+      ierr = matrix->InsertGlobalValues (trilinos_i, 1,
+					 const_cast<double*>(&value), 
+					 &trilinos_j);
+    else
+      ierr = matrix->ReplaceGlobalValues (trilinos_i, 1,
+					  const_cast<double*>(&value), 
+					  &trilinos_j);
 
     AssertThrow (ierr <= 0, ExcAccessToNonPresentElement(i,j));
     AssertThrow (ierr == 0, ExcTrilinosError(ierr));
@@ -762,7 +774,7 @@ namespace TrilinosWrappers
 				      // already is transformed to
 				      // local indices.
 	if (matrix->Filled() == false)
-	  matrix->FillComplete(col_map, row_map, true);
+	  matrix->GlobalAssemble(col_map, row_map, true);
 
 				      // Prepare pointers for extraction
 				      // of a view of the row.
@@ -785,10 +797,10 @@ namespace TrilinosWrappers
 				      // look for the value, and then
 				      // finally get it.
       
-	int* el_find = std::find(&col_indices[0],&col_indices[0] + nnz_present,
+	int* el_find = std::find(col_indices, col_indices + nnz_present,
 				 trilinos_j);
-      
-	int el_index = (int)(el_find - col_indices);
+
+	int local_col_index = (int)(el_find - col_indices);
 
 				        // This is actually the only
 				        // difference to the el(i,j)
@@ -798,13 +810,12 @@ namespace TrilinosWrappers
 				        // returning zero for an
 				        // element that is not present
 				        // in the sparsity pattern.
-	if (!el_find)
+	if (local_col_index == nnz_present)
 	  {
 	    Assert (false, ExcInvalidIndex (i,j));
 	  }
 	else
-	  value = values[el_index];
-
+	  value = values[local_col_index];
       }
 
     return value;
@@ -841,7 +852,7 @@ namespace TrilinosWrappers
 				      // already is transformed to
 				      // local indices.
       if (!matrix->Filled())
-	matrix->FillComplete(col_map, row_map, true);
+	matrix->GlobalAssemble(col_map, row_map, true);
 
 				      // Prepare pointers for extraction
 				      // of a view of the row.
@@ -863,18 +874,23 @@ namespace TrilinosWrappers
 				      // Search the index where we
 				      // look for the value, and then
 				      // finally get it.
-      
-      int* el_find = std::find(&col_indices[0],&col_indices[0] + nnz_present,
-				trilinos_j);
-      
-      int el_index = (int)(el_find - col_indices);
+      int* el_find = std::find(col_indices, col_indices + nnz_present,
+			       trilinos_j);
 
-      if (!el_find)
+      int local_col_index = (int)(el_find - col_indices);
+
+
+				        // This is actually the only
+				        // difference to the () function
+				        // querying (i,j), where we throw an
+				        // exception instead of just
+				        // returning zero for an element
+				        // that is not present in the
+				        // sparsity pattern.
+      if (local_col_index == nnz_present)
 	value = 0;
       else
-	{
-	  value = values[el_index];
-	}
+	value = values[local_col_index];
     }
 
     return value;

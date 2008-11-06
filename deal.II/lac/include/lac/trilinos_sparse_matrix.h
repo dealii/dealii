@@ -836,15 +836,17 @@ namespace TrilinosWrappers
                                         * Set the element (<i>i,j</i>)
                                         * to @p value.
 					*
-					* Just as the respective call in
-					* deal.II SparseMatrix<Number>
-					* class (but in contrast to the
-					* situation for PETSc based
-					* matrices), this function
-					* throws an exception if an
-					* entry does not exist in the
-					* sparsity pattern. Moreover, if
-					* <tt>value</tt> is not a finite
+					* This function is able to insert
+					* new elements into the matrix as
+					* long as compress() has not been
+					* called, so the sparsity pattern
+					* will be extended. When compress()
+					* is called for the first time, then
+					* this is no longer possible and an
+					* insertion of elements at positions
+					* which have not been initialized
+					* will throw an exception. Moreover,
+					* if <tt>value</tt> is not a finite
 					* number an exception is thrown.
 					*/
       void set (const unsigned int i,
