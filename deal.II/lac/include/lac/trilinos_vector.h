@@ -431,7 +431,7 @@ namespace TrilinosWrappers
 	indices[i] = map.GID(i);
 
 
-      const int ierr = vector->ReplaceGlobalValues(size, 0, v.begin()+min_my_id, 
+      const int ierr = vector->ReplaceGlobalValues(size, v.begin()+min_my_id, 
 						   &indices[0]);
       AssertThrow (ierr == 0, ExcTrilinosError());
     }
@@ -643,7 +643,7 @@ namespace TrilinosWrappers
     for (unsigned int i=0; i<v.size(); ++i)
       indices[i] = map.GID(i);
 
-    const int ierr = vector->ReplaceGlobalValues(v.size(), 0, v.begin(), 
+    const int ierr = vector->ReplaceGlobalValues(v.size(), v.begin(), 
 						 &indices[0]);
     AssertThrow (ierr == 0, ExcTrilinosError());
   }
