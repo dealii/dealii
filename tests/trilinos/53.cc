@@ -14,7 +14,8 @@
 
 // check TrilinosWrappers::Vector::operator() in set, and later in add-mode
 
-#include "../tests.h"
+#include "../tests.h" 
+#include <base/utilities.h>
 #include <lac/trilinos_vector.h>    
 #include <fstream>
 #include <iostream>
@@ -55,7 +56,10 @@ int main (int argc,char **argv)
   std::ofstream logfile("53/output");
   deallog.attach(logfile);
   deallog.depth_console(0);
-  deallog.threshold_double(1.e-10);
+  deallog.threshold_double(1.e-10); 
+
+  Utilities::System::MPI_InitFinalize mpi_initialization (argc, argv);
+
 
   try
     {

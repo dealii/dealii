@@ -12,11 +12,12 @@
 //----------------------------  trilinos_01.cc  ---------------------------
 
 
-// check setting elements in a petsc matrix using
+// check setting elements in a trilinos matrix using
 // TrilinosWrappers::SparseMatrix::set()
 
-#include "../tests.h"
-#include <lac/trilinos_sparse_matrix.h>    
+#include "../tests.h" 
+#include <base/utilities.h>
+#include <lac/trilinos_sparse_matrix.h>
 #include <fstream>
 #include <iostream>
 
@@ -30,7 +31,7 @@ void test (TrilinosWrappers::SparseMatrix &m)
         m.set (i,j, i*j*.5+.5);
 
   m.compress ();
-  
+
                                    // then make sure we retrieve the same ones
   for (unsigned int i=0; i<m.m(); ++i)
     for (unsigned int j=0; j<m.m(); ++j)
@@ -41,7 +42,6 @@ void test (TrilinosWrappers::SparseMatrix &m)
         }
       else
         {
-          Assert (m(i,j) == 0, ExcInternalError());
           Assert (m.el(i,j) == 0, ExcInternalError());
         }
 
@@ -55,7 +55,9 @@ int main (int argc,char **argv)
   std::ofstream logfile("01/output");
   deallog.attach(logfile);
   deallog.depth_console(0);
-  deallog.threshold_double(1.e-10);
+  deallog.threshold_double(1.e-10); 
+
+  Utilities::System::MPI_InitFinalize mpi_initialization (argc, argv);
 
   try
     {

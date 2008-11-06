@@ -25,7 +25,8 @@
 // matrix in a consecutive fashion, but rather according to the order of
 // degrees of freedom in the sequence of cells that we traverse
 
-#include "../tests.h"
+#include "../tests.h" 
+#include <base/utilities.h>
 #include <lac/sparse_matrix.h>
 #include <lac/trilinos_sparse_matrix.h>
 #include <lac/trilinos_vector.h>

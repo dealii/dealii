@@ -14,7 +14,8 @@
 // this test is an adaptation of lac/block_vector_iterator for PETSc block
 // vectors
 
-#include "../tests.h"
+#include "../tests.h" 
+#include <base/utilities.h>
 #include <base/logstream.h>
 #include <lac/trilinos_block_vector.h>
 #include <fstream>
@@ -325,7 +326,10 @@ int main (int argc,char **argv)
   logfile.precision(3);
   deallog.attach(logfile);
   deallog.depth_console(0);
-  deallog.threshold_double(1.e-10);
+  deallog.threshold_double(1.e-10); 
+
+  Utilities::System::MPI_InitFinalize mpi_initialization (argc, argv);
+
   
   try
     {

@@ -14,7 +14,8 @@
 // test the Trilinos BiCG solver
 
 
-#include "../tests.h"
+#include "../tests.h" 
+#include <base/utilities.h>
 #include "../lac/testmatrix.h"
 #include <cmath>
 #include <fstream>
@@ -58,7 +59,10 @@ int main(int argc, char **argv)
   logfile.precision(4);
   deallog.attach(logfile);
   deallog.depth_console(0);
-  deallog.threshold_double(1.e-10);
+  deallog.threshold_double(1.e-10); 
+
+  Utilities::System::MPI_InitFinalize mpi_initialization (argc, argv);
+
 
   {  
     SolverControl control(100, 1.e-3);

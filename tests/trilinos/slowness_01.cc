@@ -19,7 +19,8 @@
 //
 // the tests build the 5-point stencil matrix for a uniform grid of size N*N
 
-#include "../tests.h"
+#include "../tests.h" 
+#include <base/utilities.h>
 #include <lac/sparse_matrix.h>
 #include <lac/vector.h>
 #include <lac/trilinos_sparse_matrix.h>

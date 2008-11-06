@@ -14,7 +14,8 @@
 
 // like _01, except that we use operator[] instead of operator*
 
-#include "../tests.h"
+#include "../tests.h" 
+#include <base/utilities.h>
 #include <lac/trilinos_block_vector.h>
 #include <fstream>
 #include <iostream>
@@ -74,7 +75,10 @@ int main (int argc,char **argv)
   std::ofstream logfile("block_vector_iterator_02/output");
   deallog.attach(logfile);
   deallog.depth_console(0);
-  deallog.threshold_double(1.e-10);
+  deallog.threshold_double(1.e-10); 
+
+  Utilities::System::MPI_InitFinalize mpi_initialization (argc, argv);
+
 
   try
     {
