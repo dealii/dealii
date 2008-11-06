@@ -21,6 +21,7 @@
 #include <base/utilities.h>
 #include <lac/vector.h>
 #include <lac/full_matrix.h>
+#include <lac/compressed_sparsity_pattern.h>
 #include <lac/petsc_vector.h>
 #include <lac/petsc_parallel_vector.h>
 #include <lac/petsc_parallel_sparse_matrix.h>
