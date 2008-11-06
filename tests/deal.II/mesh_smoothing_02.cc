@@ -53,7 +53,7 @@ using namespace dealii;
 
 
 template <int dim>
-bool cell_is_patch_level_1 (const TriaIterator<dim, dealii::CellAccessor<dim> > &cell)
+bool cell_is_patch_level_1 (const typename Triangulation<dim>::cell_iterator &cell)
 {
   Assert (cell->active() == false, ExcInternalError());
 
@@ -117,7 +117,7 @@ void test ()
 	      (cell->coarsen_flag_set() == false),
 	      ExcInternalError());
       if (!cell->active())
-	Assert (cell_is_patch_level_1(cell),
+	Assert (cell_is_patch_level_1<2>(cell),
 		ExcInternalError());
     }
 
