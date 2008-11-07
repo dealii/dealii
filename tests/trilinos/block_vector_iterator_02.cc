@@ -23,7 +23,11 @@
 
 void test ()
 {
-  TrilinosWrappers::BlockVector v(2,1);
+  TrilinosWrappers::BlockVector v(2);
+  for (unsigned int i=0; i<v.n_blocks(); ++i)
+    v.block(i).reinit(1);
+  v.collect_sizes();
+
   v(0) = 1;
   v(1) = 2;
 

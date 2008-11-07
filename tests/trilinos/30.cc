@@ -31,7 +31,7 @@ void test (TrilinosWrappers::Vector &v)
   v.compress ();
 
                                    // then resize with setting to zero
-  v.reinit (13, false);
+  v.reinit (13);
   
   Assert (v.size() == 13, ExcInternalError());
   Assert (v.l2_norm() == 0, ExcInternalError());

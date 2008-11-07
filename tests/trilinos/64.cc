@@ -12,15 +12,14 @@
 //----------------------------  trilinos_64.cc  ---------------------------
 
 
-// This test should be run on multiple processors. note that this test also
-// started to fail with the upgrade to petsc 2.2.1 which required a fix in
-// TrilinosWrappers::MatrixBase::operator=
+// This test should be run on multiple processors.
 
 
 #include "../tests.h" 
 #include <base/utilities.h>
 #include <lac/trilinos_sparse_matrix.h>
-#include <lac/trilinos_sparse_matrix.h>
+#include <Epetra_Map.h>
+#include <Epetra_Comm.h>
 #include <lac/vector.h>
 
 #include <fstream>
@@ -31,7 +30,8 @@
 template<typename MatrixType>
 void test (MatrixType &m)
 {
-  m.add(0,0,1);  
+  m.set(0,0,1.);  
+  m.compress();
   m = 0;
   m.compress();
 
@@ -64,14 +64,12 @@ int main (int argc,char **argv)
 
 					 // check
 					 // TrilinosWrappers::SparseMatrix
-	MPI_Comm mpi_communicator (MPI_COMM_WORLD);	
-	int n_jobs=1;
-	MPI_Comm_size (mpi_communicator, &n_jobs);
-	const unsigned int n_mpi_processes=static_cast<unsigned int>(n_jobs);
-	Assert(n_dofs%n_mpi_processes==0, ExcInternalError());
-	const unsigned int n_local_dofs=n_dofs/n_mpi_processes;
-        TrilinosWrappers::SparseMatrix
-	  v2 (mpi_communicator, n_dofs, n_dofs, n_local_dofs, n_local_dofs, 5);
+	const unsigned int n_jobs = 
+	  Utilities::Trilinos::get_n_mpi_processes(Utilities::Trilinos::comm_world());
+	Assert(n_dofs%n_jobs==0, ExcInternalError());
+	const unsigned int n_local_dofs=n_dofs/n_jobs;
+	Epetra_Map map(n_dofs, n_local_dofs, Utilities::Trilinos::comm_world());
+        TrilinosWrappers::SparseMatrix v2 (map, 5);
         test (v2);
       }
     }

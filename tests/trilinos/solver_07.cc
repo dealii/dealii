@@ -1,8 +1,8 @@
 //----------------------------  trilinos_solver_07.cc  ---------------------------
-//    $Id$
+//    $Id: solver_07.cc 17307 2008-10-23 01:52:20Z bangerth $
 //    Version: $Name$ 
 //
-//    Copyright (C) 2004, 2005, 2008 by the deal.II authors
+//    Copyright (C) 2004, 2005 by the deal.II authors
 //
 //    This file is subject to QPL and may not be  distributed
 //    without copyright and license information. Please refer
@@ -14,14 +14,14 @@
 // test the Trilinos CGS solver
 
 
-#include "../tests.h" 
-#include <base/utilities.h>
+#include "../tests.h"
 #include "../lac/testmatrix.h"
 #include <cmath>
 #include <fstream>
 #include <iostream>
 #include <iomanip>
 #include <base/logstream.h>
+#include <base/utilities.h>
 #include <lac/trilinos_sparse_matrix.h>
 #include <lac/trilinos_vector.h>
 #include <lac/trilinos_solver.h>
@@ -59,13 +59,12 @@ int main(int argc, char **argv)
   logfile.precision(4);
   deallog.attach(logfile);
   deallog.depth_console(0);
-  deallog.threshold_double(1.e-10); 
+  deallog.threshold_double(1.e-10);
 
-  Utilities::System::MPI_InitFinalize mpi_initialization (argc, argv);
-
+  Utilities::System::MPI_InitFinalize mpi_initialization(argc, argv);
 
   {
-    SolverControl control(100, 1.e-3);
+    SolverControl control(200, 1.e-3);
 
     const unsigned int size = 32;
     unsigned int dim = (size-1)*(size-1);
@@ -85,8 +84,10 @@ int main(int argc, char **argv)
     u.compress ();
 
     TrilinosWrappers::SolverCGS solver(control);
-    TrilinosWrappers::PreconditionJacobi preconditioner(A);
+    TrilinosWrappers::PreconditionJacobi preconditioner;
+    preconditioner.initialize(A);
     check_solve (solver, A,u,f, preconditioner);
   }
+
 }
 

@@ -33,34 +33,32 @@ void test ()
   const unsigned int N = 200;
 
                                    // build the sparse matrix 
-  TrilinosWrappers::SparseMatrix matrix (PETSC_COMM_WORLD,
-                                           N*N, N*N,
-                                           N*N, N*N,
-                                           5);
+  Epetra_Map map (N*N, 0, Utilities::Trilinos::comm_world());
+  TrilinosWrappers::SparseMatrix matrix (map, 5);
   for(unsigned int i=0; i<N; i++)
     for(unsigned int j=0; j<N; j++)
       {
         const unsigned int global = i*N+j;
-        matrix.add(global, global, 4);
+        matrix.set(global, global, 4);
         if (j>0)
           {
-            matrix.add(global-1, global, -1);
-            matrix.add(global, global-1, -1);
+            matrix.set(global-1, global, -1);
+            matrix.set(global, global-1, -1);
           }
         if (j<N-1)
           {
-            matrix.add(global+1, global, -1);
-            matrix.add(global, global+1, -1);
+            matrix.set(global+1, global, -1);
+            matrix.set(global, global+1, -1);
           }
         if (i>0)
           {
-            matrix.add(global-N, global, -1);
-            matrix.add(global, global-N, -1);
+            matrix.set(global-N, global, -1);
+            matrix.set(global, global-N, -1);
           }
         if (i<N-1)
           {
-            matrix.add(global+N, global, -1);
-            matrix.add(global, global+N, -1);
+            matrix.set(global+N, global, -1);
+            matrix.set(global, global+N, -1);
           }
       }
   matrix.compress ();
@@ -68,8 +66,8 @@ void test ()
                                    // then do a single matrix-vector
                                    // multiplication with subsequent formation
                                    // of the matrix norm
-  TrilinosWrappers::MPI::Vector v1(PETSC_COMM_WORLD, N*N, N*N);
-  TrilinosWrappers::MPI::Vector v2(PETSC_COMM_WORLD, N*N, N*N);
+  TrilinosWrappers::MPI::Vector v1(map);
+  TrilinosWrappers::MPI::Vector v2(map);
   for (unsigned int i=0; i<N*N; ++i)
     v1(i) = i;
   matrix.vmult (v2, v1);
@@ -84,6 +82,8 @@ int main (int argc,char **argv)
   std::ofstream logfile("slowness_03/output");
   deallog.attach(logfile);
   deallog.depth_console(0);
+
+  Utilities::System::MPI_InitFinalize mpi_initialization(argc, argv);
 
   try
     {
@@ -115,4 +115,6 @@ int main (int argc,char **argv)
 		<< std::endl;
       return 1;
     };
+
+  return 0;
 }

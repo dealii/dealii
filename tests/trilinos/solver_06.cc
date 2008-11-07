@@ -85,7 +85,8 @@ int main(int argc, char **argv)
     u.compress ();
 
     TrilinosWrappers::SolverBicgstab solver(control);
-    TrilinosWrappers::PreconditionJacobi preconditioner(A);
+    TrilinosWrappers::PreconditionJacobi preconditioner;
+    preconditioner.initialize(A);
     check_solve (solver, A,u,f, preconditioner);
   }
 }

@@ -24,7 +24,7 @@
 
 void test (TrilinosWrappers::Vector &v)
 {
-  v.reinit (13, true);
+  v.reinit (13);
   
   Assert (v.size() == 13, ExcInternalError());
 

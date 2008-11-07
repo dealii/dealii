@@ -70,7 +70,7 @@ int main(int argc, char **argv)
 
 
   {
-    SolverControl control(100, 1.e-3);
+    SolverControl control(200, 1.e-3);
 
     const unsigned int size = 32;
     unsigned int dim = (size-1)*(size-1);
@@ -90,7 +90,7 @@ int main(int argc, char **argv)
     u.compress ();
 
     GrowingVectorMemory<TrilinosWrappers::Vector> mem;
-    SolverCG<TrilinosWrappers::Vector> solver(control,mem);
+    SolverCG<TrilinosWrappers::Vector> solver(control, mem);
     PreconditionIdentity preconditioner;
     check_solve (solver, A,u,f, preconditioner);
   }

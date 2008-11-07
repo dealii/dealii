@@ -13,8 +13,8 @@
 
 
 // this is part of a whole suite of tests that checks the relative speed of
-// using PETSc for sparse matrices as compared to the speed of our own
-// library. the tests therefore may not all actually use PETSc, but they are
+// using Trilinos for sparse matrices as compared to the speed of our own
+// library. the tests therefore may not all actually use Trilinos, but they are
 // meant to compare it
 //
 // the tests build the 5-point stencil matrix for a uniform grid of size N*N
@@ -111,6 +111,8 @@ int main (int argc,char **argv)
   deallog.attach(logfile);
   deallog.depth_console(0);
 
+  Utilities::System::MPI_InitFinalize mpi_initialization(argc, argv);
+
   try
     {
       {
@@ -141,4 +143,5 @@ int main (int argc,char **argv)
 		<< std::endl;
       return 1;
     };
+  return 0;
 }

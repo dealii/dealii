@@ -45,7 +45,6 @@ void test (TrilinosWrappers::SparseMatrix &m)
         }
       else
         {
-          Assert (m(i,j) == 0, ExcInternalError());
           Assert (m.el(i,j) == 0, ExcInternalError());
         }
 

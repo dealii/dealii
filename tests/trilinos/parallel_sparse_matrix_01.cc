@@ -31,36 +31,19 @@
 #include <cstdlib>
 
 
-unsigned int
-get_n_mpi_processes ()
-{
-  int n_jobs;
-  MPI_Comm_size (MPI_COMM_WORLD, &n_jobs);
-    
-  return n_jobs;
-}
-
-
-
-unsigned int
-get_this_mpi_process ()
-{
-  int rank;
-  MPI_Comm_rank (MPI_COMM_WORLD, &rank);
-    
-  return rank;
-}
-
-
 void test ()
 {
                                    // create a parallel matrix where the first
                                    // process has 10 rows, the second one 20,
                                    // the third one 30, and so on
   unsigned int N = 0;
-  std::vector<unsigned int> local_rows_per_process (get_n_mpi_processes());
-  std::vector<unsigned int> start_row (get_n_mpi_processes());
-  for (unsigned int i=0; i<get_n_mpi_processes(); ++i)
+  std::vector<unsigned int> local_rows_per_process 
+    (Utilities::Trilinos::get_n_mpi_processes(Utilities::Trilinos::comm_world()));
+  std::vector<unsigned int> start_row 
+    (Utilities::Trilinos::get_n_mpi_processes(Utilities::Trilinos::comm_world()));
+  for (unsigned int i=0; 
+       i<Utilities::Trilinos::get_n_mpi_processes(Utilities::Trilinos::comm_world()); 
+       ++i)
     {
       N += (i+1)*10;
       local_rows_per_process[i] = (i+1)*10;
@@ -96,11 +79,13 @@ void test ()
   
                                    // now create a matrix with this sparsity
                                    // pattern
-  TrilinosWrappers::SparseMatrix m;
-  m.reinit (MPI_COMM_WORLD, csp, local_rows_per_process,
-            local_rows_per_process, get_this_mpi_process());
+  Epetra_Map map (-1, local_rows_per_process[Utilities::Trilinos::get_this_mpi_process
+					     (Utilities::Trilinos::comm_world())], 
+		  0, Utilities::Trilinos::comm_world());
 
-                                   // no write into the exact same matrix
+  TrilinosWrappers::SparseMatrix m;
+  m.reinit (map, csp);
+                                   // now write into the exact same matrix
                                    // entries as have been created by the
                                    // sparsity pattern above
   for (unsigned int i=0; i<N; ++i)

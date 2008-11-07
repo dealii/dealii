@@ -26,7 +26,8 @@
 
 void test ()
 {
-  TrilinosWrappers::MPI::Vector v(PETSC_COMM_WORLD, 100, 100);
+  TrilinosWrappers::MPI::Vector 
+    v (Epetra_Map(100,0,Utilities::Trilinos::comm_world()));
   v(0) = 1;
   v = 0;
 

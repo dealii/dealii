@@ -12,7 +12,7 @@
 //----------------------------  trilinos_62.cc  ---------------------------
 
 
-// check TrilinosWrappers::MatrixBase::clear ()
+// check TrilinosWrappers::SparseMatrix::clear ()
 
 #include "../tests.h" 
 #include <base/utilities.h>
@@ -24,7 +24,7 @@
 #include <vector>
 
 
-void test (TrilinosWrappers::MatrixBase &m)
+void test (TrilinosWrappers::SparseMatrix &m)
 {
   Assert (m.m() != 0, ExcInternalError());
   Assert (m.n() != 0, ExcInternalError());

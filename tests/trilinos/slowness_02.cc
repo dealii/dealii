@@ -38,26 +38,26 @@ void test ()
     for(unsigned int j=0; j<N; j++)
       {
         const unsigned int global = i*N+j;
-        matrix.add(global, global, 4);
+        matrix.set(global, global, 4);
         if (j>0)
           {
-            matrix.add(global-1, global, -1);
-            matrix.add(global, global-1, -1);
+            matrix.set(global-1, global, -1);
+            matrix.set(global, global-1, -1);
           }
         if (j<N-1)
           {
-            matrix.add(global+1, global, -1);
-            matrix.add(global, global+1, -1);
+            matrix.set(global+1, global, -1);
+            matrix.set(global, global+1, -1);
           }
         if (i>0)
           {
-            matrix.add(global-N, global, -1);
-            matrix.add(global, global-N, -1);
+            matrix.set(global-N, global, -1);
+            matrix.set(global, global-N, -1);
           }
         if (i<N-1)
           {
-            matrix.add(global+N, global, -1);
-            matrix.add(global, global+N, -1);
+            matrix.set(global+N, global, -1);
+            matrix.set(global, global+N, -1);
           }
       }
   matrix.compress ();
@@ -81,6 +81,8 @@ int main (int argc,char **argv)
   std::ofstream logfile("slowness_02/output");
   deallog.attach(logfile);
   deallog.depth_console(0);
+
+  Utilities::System::MPI_InitFinalize mpi_initialization(argc, argv);
 
   try
     {
@@ -112,4 +114,5 @@ int main (int argc,char **argv)
 		<< std::endl;
       return 1;
     };
+  return 0;
 }

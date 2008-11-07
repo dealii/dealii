@@ -21,7 +21,7 @@
 
 #include <fstream>
 
-int main () 
+int main (int argc, char** argv) 
 {
   std::ofstream logfile("70/output");
   deallog.attach(logfile);

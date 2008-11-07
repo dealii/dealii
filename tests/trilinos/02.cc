@@ -28,6 +28,12 @@ void test (TrilinosWrappers::SparseMatrix &m)
   for (unsigned int i=0; i<m.m(); ++i)
     for (unsigned int j=0; j<m.m(); ++j)
       if ((i+2*j+1) % 3 == 0)
+        m.set (i,j, 0.);
+
+                                   // then add values to these entries
+  for (unsigned int i=0; i<m.m(); ++i)
+    for (unsigned int j=0; j<m.m(); ++j)
+      if ((i+2*j+1) % 3 == 0)
         m.add (i,j, i*j*.5+.5);
 
   m.compress ();

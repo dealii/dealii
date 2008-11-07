@@ -22,7 +22,7 @@
 #include <vector>
 
 
-void test (TrilinosWrappers::MatrixBase &m)
+void test (TrilinosWrappers::SparseMatrix &m)
 {
   Assert (m.m() == 100, ExcInternalError());
   Assert (m.n() == 100, ExcInternalError());

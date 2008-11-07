@@ -33,8 +33,6 @@ void test (TrilinosWrappers::SparseMatrix &m)
     for (unsigned int j=0; j<m.m(); ++j)
       if ((i+2*j+1) % 3 == 0)
         m.set (i,j, i*j*.5+.5);
-
-  m.compress();
   
                                    // then add the same elements again
   for (unsigned int i=0; i<m.m(); ++i)

@@ -38,6 +38,9 @@ void test (TrilinosWrappers::SparseMatrix &m)
     for (unsigned int j=0; j<m.m(); ++j)
       if ((i+2*j+1) % 3 == 0)
         m.add (i,j, i*j*.5+.5);
+
+  m.compress();
+
                                    // and overwrite everything again
   for (unsigned int i=0; i<m.m(); ++i)
     for (unsigned int j=0; j<m.m(); ++j)
@@ -56,7 +59,6 @@ void test (TrilinosWrappers::SparseMatrix &m)
         }
       else
         {
-          Assert (m(i,j) == 0, ExcInternalError());
           Assert (m.el(i,j) == 0, ExcInternalError());
         }
 

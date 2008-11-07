@@ -24,7 +24,7 @@
 #include <vector>
 
 
-void test (TrilinosWrappers::MatrixBase &m)
+void test (TrilinosWrappers::SparseMatrix &m)
 {
   Assert (m.m() != 0, ExcInternalError());
   Assert (m.n() != 0, ExcInternalError());
@@ -38,7 +38,7 @@ void test (TrilinosWrappers::MatrixBase &m)
       if (i>=5)
         {
           const double s = rand();
-          m.add (i,i-5, s);
+          m.set (i,i-5, s);
           norm_sqr += s*s;
           ++nnz;
         }
@@ -46,13 +46,13 @@ void test (TrilinosWrappers::MatrixBase &m)
       if (i<N-5)
         {
           const double s = rand();
-          m.add (i,i+5, s);
+          m.set (i,i+5, s);
           norm_sqr += s*s;
           ++nnz;
         }
       
       const double s = rand();
-      m.add (i,i,s);
+      m.set (i,i,s);
       norm_sqr += s*s;
       ++nnz;
     }
