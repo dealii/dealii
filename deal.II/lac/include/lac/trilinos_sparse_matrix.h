@@ -416,30 +416,26 @@ namespace TrilinosWrappers
 		    const unsigned int  n_max_entries_per_row);
 
                                        /**
-                                        * This constructor is similar to
-				        * the one above, but it now
-				        * takes two different Epetra
-				        * maps for rows and
-				        * columns. This interface is
-				        * meant to be used for
-				        * generating rectangular
-				        * matrices, where one map
-				        * specifies the parallel
+                                        * This constructor is similar to the
+				        * one above, but it now takes two
+				        * different Epetra maps for rows and
+				        * columns. This interface is meant
+				        * to be used for generating
+				        * rectangular matrices, where one
+				        * map specifies the parallel
 				        * distribution of rows and the
-				        * second one specifies the
-				        * number of columns in the
-				        * total matrix. It also provides
-				        * information for the internal
-				        * arrangement in matrix vector
-				        * products, but is not used for
-				        * the distribution of the
-				        * columns &ndash; rather, all
-				        * column elements of a row are
-				        * stored on the same
-				        * processor. The vector
-				        * n_entries_per_row specifies
-				        * the number of entries in each
-				        * row of the newly generated
+				        * second one specifies the number of
+				        * columns in the total matrix. It
+				        * also provides information for the
+				        * internal arrangement in matrix
+				        * vector products, but is not used
+				        * for the distribution of the
+				        * columns &ndash; rather, all column
+				        * elements of a row are stored on
+				        * the same processor. The vector
+				        * <tt>n_entries_per_row</tt>
+				        * specifies the number of entries in
+				        * each row of the newly generated
 				        * matrix.
                                         */
       SparseMatrix (const Epetra_Map                &InputRowMap,
@@ -452,14 +448,28 @@ namespace TrilinosWrappers
                                         * #n columns. The resulting matrix
                                         * will be completely stored locally.
 					*
-					* The number of columns entries
-					* per row is specified as the
-					* maximum number of entries
-					* argument.
+					* The number of columns entries per
+					* row is specified as the maximum
+					* number of entries argument.
                                         */
       SparseMatrix (const unsigned int  m,
 		    const unsigned int  n,
 		    const unsigned int  n_max_entries_per_row);
+
+                                       /**
+                                        * Generate a matrix that is completely
+                                        * stored locally, having #m rows and
+                                        * #n columns. The resulting matrix
+                                        * will be completely stored locally.
+					*
+					* The vector
+					* <tt>n_entries_per_row</tt>
+					* specifies the number of entries in
+					* each row.
+                                        */
+      SparseMatrix (const unsigned int               m,
+		    const unsigned int               n,
+		    const std::vector<unsigned int> &n_entries_per_row);
 
                                        /**
                                         * Copy constructor. Sets the

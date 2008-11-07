@@ -418,21 +418,28 @@ namespace TrilinosWrappers
                     :
                     map (InputMap)
     {
-      vector = std::auto_ptr<Epetra_FEVector> (new Epetra_FEVector(map, false));
+      vector = std::auto_ptr<Epetra_FEVector> (new Epetra_FEVector(map));
       
       const int min_my_id = map.MinMyGID();
-      const unsigned int size = map.NumMyElements();
+      const int size = map.NumMyElements();
 
       Assert (map.MaxLID() == size-1,
 	      ExcDimensionMismatch(map.MaxLID(), size-1));
 
+				   // Need to copy out values, since the
+				   // deal.II might not use doubles, so 
+				   // that a direct access is not possible.
       std::vector<int> indices (size);
+      std::vector<double> values (size);
       for (unsigned int i=0; i<size; ++i)
-	indices[i] = map.GID(i);
+	{
+	  indices[i] = map.GID(i);
+	  values[i] = v(i);
+	}
 
+      const int ierr = vector->ReplaceGlobalValues (size, &indices[0], 
+						    &values[0]);
 
-      const int ierr = vector->ReplaceGlobalValues(size, v.begin()+min_my_id, 
-						   &indices[0]);
       AssertThrow (ierr == 0, ExcTrilinosError());
     }
 
@@ -637,15 +644,20 @@ namespace TrilinosWrappers
 		  map (v.size(), 0, Epetra_SerialComm())
 #endif
   {
-    vector = std::auto_ptr<Epetra_FEVector> (new Epetra_FEVector(map, false));
+    vector = std::auto_ptr<Epetra_FEVector> (new Epetra_FEVector(map));
 
     std::vector<int> indices (v.size());
+    std::vector<double> values (v.size());
     for (unsigned int i=0; i<v.size(); ++i)
-      indices[i] = map.GID(i);
+      {
+	indices[i] = map.GID(i);
+	values[i] = v(i);
+      }
 
-    const int ierr = vector->ReplaceGlobalValues(v.size(), v.begin(), 
-						 &indices[0]);
-    AssertThrow (ierr == 0, ExcTrilinosError());
+    const int ierr = vector->ReplaceGlobalValues((int)v.size(),
+						 &indices[0], &values[0]);
+
+    AssertThrow (ierr == 0, ExcTrilinosError(ierr));
   }
 
   

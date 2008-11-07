@@ -504,7 +504,7 @@ namespace TrilinosWrappers
 					* elements.
 					*/
       BlockVector (const BlockVector  &V);
-    
+
                                        /**
 					* Creates a block vector
 					* consisting of
@@ -516,7 +516,40 @@ namespace TrilinosWrappers
 					* reinit of the blocks.
 					*/
       BlockVector (const unsigned int num_blocks);
-    
+
+                                       /**
+					* Constructor. Set the number of
+					* blocks to <tt>n.size()</tt> and
+					* initialize each block with
+					* <tt>n[i]</tt> zero elements.
+					*
+					* References BlockVector.reinit().
+					*/
+      BlockVector (const std::vector<unsigned int> &N);
+
+                                       /**
+                                        * Constructor. Set the number of
+                                        * blocks to
+                                        * <tt>n.size()</tt>. Initialize the
+                                        * vector with the elements
+                                        * pointed to by the range of
+                                        * iterators given as second and
+                                        * third argument. Apart from the
+                                        * first argument, this
+                                        * constructor is in complete
+                                        * analogy to the respective
+                                        * constructor of the
+                                        * <tt>std::vector</tt> class, but the
+                                        * first argument is needed in
+                                        * order to know how to subdivide
+                                        * the block vector into
+                                        * different blocks.
+                                        */
+      template <typename InputIterator>
+      BlockVector (const std::vector<unsigned int> &n,
+                   const InputIterator              first,
+                   const InputIterator              end);
+
                                        /**
 					* Destructor. Clears memory
 					*/
@@ -728,6 +761,37 @@ namespace TrilinosWrappers
       }
 
     reinit (InputMaps);
+  }
+
+
+
+  inline
+  BlockVector::BlockVector (const std::vector<unsigned int> &N)
+  {
+    reinit (N);
+  }
+
+
+
+  template <typename InputIterator>
+  BlockVector::BlockVector (const std::vector<unsigned int> &n,
+                            const InputIterator              first,
+                            const InputIterator              end)
+  {
+                                     // first set sizes of blocks, but
+                                     // don't initialize them as we will
+                                     // copy elements soon
+    reinit (n, true);
+    InputIterator start = first;
+    for (unsigned int b=0; b<n.size(); ++b)
+      {
+        InputIterator end = start;
+        std::advance (end, static_cast<signed int>(n[b]));
+
+	for (unsigned int i=0; i<n[b]; ++i, ++start)
+	  this->block(b)(i) = *start;
+      }
+    Assert (start == end, ExcIteratorRangeDoesNotMatchVectorSize());
   }
 
 

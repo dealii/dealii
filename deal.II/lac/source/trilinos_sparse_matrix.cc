@@ -167,6 +167,25 @@ namespace TrilinosWrappers
 					int(n_max_entries_per_row), false)))
   {}
 
+  SparseMatrix::SparseMatrix (const unsigned int               m,
+			      const unsigned int               n,
+			      const std::vector<unsigned int> &n_entries_per_row)
+		  :
+#ifdef DEAL_II_COMPILER_SUPPORTS_MPI
+                  row_map (m, 0, Epetra_MpiComm(MPI_COMM_WORLD)),
+                  col_map (n, 0, Epetra_MpiComm(MPI_COMM_WORLD)),
+#else
+                  row_map (m, 0, Epetra_SerialComm()),
+                  col_map (n, 0, Epetra_SerialComm()),
+#endif
+		  last_action (Zero),
+		  compressed (true),
+		  matrix (std::auto_ptr<Epetra_FECrsMatrix>
+		     (new Epetra_FECrsMatrix(Copy, row_map, 
+			(int*)const_cast<unsigned int*>(&(n_entries_per_row[0])), 
+					     false)))
+  {}
+
   SparseMatrix::SparseMatrix (const SparseMatrix &InputMatrix)
 		  :
                   Subscriptor(),
@@ -609,8 +628,11 @@ namespace TrilinosWrappers
 
     Assert (numbers::is_finite(value),
 	    ExcMessage("The given value is not finite but either "
-		      "infinite or Not A Number (NaN)"));
+		       "infinite or Not A Number (NaN)"));
 
+				        // If the last thing we did was an
+				        // addition, we need to do all the
+				        // data exchange.
     if (last_action == Add)
       {
 	int ierr;
@@ -619,6 +641,9 @@ namespace TrilinosWrappers
 	AssertThrow (ierr == 0, ExcTrilinosError(ierr));
       }
 
+				        // If our last action was not an
+				        // addition, we tell that at this
+				        // point here.
     if (last_action != Insert)
       last_action = Insert;
 
@@ -638,13 +663,19 @@ namespace TrilinosWrappers
 				        // command. Otherwise, we're just
 				        // able to replace existing entries.
     if (matrix->Filled() == false)
-      ierr = matrix->InsertGlobalValues (trilinos_i, 1,
-					 const_cast<double*>(&value), 
-					 &trilinos_j);
+      {
+	ierr = matrix->InsertGlobalValues (trilinos_i, 1,
+					   const_cast<double*>(&value), 
+					   &trilinos_j);
+	if (ierr > 0)
+	  ierr = 0;
+      }
     else
-      ierr = matrix->ReplaceGlobalValues (trilinos_i, 1,
-					  const_cast<double*>(&value), 
-					  &trilinos_j);
+      {
+	ierr = matrix->ReplaceGlobalValues (trilinos_i, 1,
+					    const_cast<double*>(&value), 
+					    &trilinos_j);
+      }
 
     AssertThrow (ierr <= 0, ExcAccessToNonPresentElement(i,j));
     AssertThrow (ierr == 0, ExcTrilinosError(ierr));
