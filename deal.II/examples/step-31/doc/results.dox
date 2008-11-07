@@ -6,56 +6,73 @@ When you run the program in 2d, the output will look something like
 this:
 <code>
 <pre>
-Number of active cells: 64 (on 3 levels)
-Number of degrees of freedom: 3041 (2187+125+729)
+Number of active cells: 256 (on 5 levels)
+Number of degrees of freedom: 3556 (2178+289+1089)
 
-Timestep 0:  t=0, dt=0
+Timestep 0:  t=0
    Assembling...
    Rebuilding Stokes preconditioner...
    Solving...
    0 GMRES iterations for Stokes subsystem.
-   11 CG iterations for temperature.
-   Temperature range: -0.574475 4.20612
+   Time step: 0.976562
+   8 CG iterations for temperature.
+   Temperature range: -0.17714 1.38103
 
-Number of active cells: 288 (on 4 levels)
-Number of degrees of freedom: 12379 (8943+455+2981)
+Number of active cells: 280 (on 6 levels)
+Number of degrees of freedom: 4062 (2490+327+1245)
 
-Timestep 0:  t=0, dt=2.08333
+Timestep 0:  t=0
    Assembling...
    Rebuilding Stokes preconditioner...
    Solving...
    0 GMRES iterations for Stokes subsystem.
-   12 CG iterations for temperature.
-   Temperature range: -0.449202 1.92021
+   Time step: 0.488281
+   9 CG iterations for temperature.
+   Temperature range: -0.10423 0.635684
 
-Number of active cells: 1296 (on 5 levels)
-Number of degrees of freedom: 51497 (37305+1757+12435)
+Number of active cells: 520 (on 7 levels)
+Number of degrees of freedom: 7432 (4562+589+2281)
 
-Timestep 0:  t=0, dt=1.04167
+Timestep 0:  t=0
    Assembling...
    Rebuilding Stokes preconditioner...
    Solving...
    0 GMRES iterations for Stokes subsystem.
-   11 CG iterations for temperature.
-   Temperature range: -0.423543 0.720648
+   Time step: 0.244141
+   10 CG iterations for temperature.
+   Temperature range: -0.0583624 0.312553
 
-Number of active cells: 5104 (on 6 levels)
-Number of degrees of freedom: 194273 (140913+6389+46971)
+Number of active cells: 1072 (on 8 levels)
+Number of degrees of freedom: 15294 (9398+1197+4699)
 
-Timestep 0:  t=0, dt=0.520833
+Timestep 0:  t=0
    Assembling...
    Rebuilding Stokes preconditioner...
    Solving...
    0 GMRES iterations for Stokes subsystem.
-   12 CG iterations for temperature.
-   Temperature range: -0.228566 0.423852
+   Time step: 0.12207
+   9 CG iterations for temperature.
+   Temperature range: -0.0288897 0.166335
 
-Timestep 1:  t=0.260417, dt=0.260417
+Number of active cells: 2128 (on 9 levels)
+Number of degrees of freedom: 30270 (18614+2349+9307)
+
+Timestep 0:  t=0
+   Assembling...
+   Rebuilding Stokes preconditioner...
+   Solving...
+   0 GMRES iterations for Stokes subsystem.
+   Time step: 0.0610352
+   9 CG iterations for temperature.
+   Temperature range: -0.0156055 0.0781987
+
+Timestep 1:  t=0.0610352
    Assembling...
    Solving...
-   63 GMRES iterations for Stokes subsystem.
-   11 CG iterations for temperature.
-   Temperature range: -0.280384 0.640062  
+   30 GMRES iterations for Stokes subsystem.
+   Time step: 0.0610352
+   9 CG iterations for temperature.
+   Temperature range: -0.0285735 0.153308
 
 ...
 </pre>
@@ -154,7 +171,66 @@ adaptive mesh and the flow field at the same time steps:
 
 The same thing can of course be done in 3d by changing the template
 parameter to the BoussinesqFlowProblem object in <code>main()</code>
-from 2 to 3. Visualizing the temperature isocontours at time steps 0,
+from 2 to 3, so that the output now looks like follows:
+
+<code>
+<pre>
+Number of active cells: 64 (on 3 levels)
+Number of degrees of freedom: 3041 (2187+125+729)
+
+Timestep 0:  t=0, dt=0
+   Assembling...
+   Rebuilding Stokes preconditioner...
+   Solving...
+   0 GMRES iterations for Stokes subsystem.
+   11 CG iterations for temperature.
+   Temperature range: -0.574475 4.20612
+
+Number of active cells: 288 (on 4 levels)
+Number of degrees of freedom: 12379 (8943+455+2981)
+
+Timestep 0:  t=0, dt=2.08333
+   Assembling...
+   Rebuilding Stokes preconditioner...
+   Solving...
+   0 GMRES iterations for Stokes subsystem.
+   12 CG iterations for temperature.
+   Temperature range: -0.449202 1.92021
+
+Number of active cells: 1296 (on 5 levels)
+Number of degrees of freedom: 51497 (37305+1757+12435)
+
+Timestep 0:  t=0, dt=1.04167
+   Assembling...
+   Rebuilding Stokes preconditioner...
+   Solving...
+   0 GMRES iterations for Stokes subsystem.
+   11 CG iterations for temperature.
+   Temperature range: -0.423543 0.720648
+
+Number of active cells: 5104 (on 6 levels)
+Number of degrees of freedom: 194273 (140913+6389+46971)
+
+Timestep 0:  t=0, dt=0.520833
+   Assembling...
+   Rebuilding Stokes preconditioner...
+   Solving...
+   0 GMRES iterations for Stokes subsystem.
+   12 CG iterations for temperature.
+   Temperature range: -0.228566 0.423852
+
+Timestep 1:  t=0.260417, dt=0.260417
+   Assembling...
+   Solving...
+   63 GMRES iterations for Stokes subsystem.
+   11 CG iterations for temperature.
+   Temperature range: -0.280384 0.640062  
+
+...
+</pre>
+</code>
+
+Visualizing the temperature isocontours at time steps 0,
 50, 100, 150, 200, 300, 400, 500, 600, 700, and 800 yields the
 following plots:
 
