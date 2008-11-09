@@ -1715,7 +1715,7 @@ AC_DEFUN(DEAL_II_CHECK_LINK_SONAME,
 [
   dnl First try -soname
   OLD_LDFLAGS=$LDFLAGS
-  LDFLAGS="-Wl,-soname,libbase.so.6.2.1 $LDFLAGS"
+  LDFLAGS="-Wl,-soname,libbase.so.6.2.1 $LDFLAGS $SHLIBFLAGS"
   AC_MSG_CHECKING([whether compiler understands option -Wl,-soname])
   AC_LINK_IFELSE(
    [ AC_LANG_PROGRAM([[]],[[]])],
