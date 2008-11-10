@@ -3844,7 +3844,7 @@ rm -f core conftest.err conftest.$ac_objext conftest_ipa8_conftest.oo \
       conftest$ac_exeext conftest.$ac_ext
 
 
-    CXXFLAGS="-DBOOST_NO_HASH -DBOOST_NO_SLIST"
+    CXXFLAGS="$CXXFLAGS -DBOOST_NO_HASH -DBOOST_NO_SLIST"
 
     if test "$GXX" = yes ; then
     CXXFLAGSO="$CXXFLAGS -O2 -Wuninitialized -felide-constructors -ftemplate-depth-128"
