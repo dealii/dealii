@@ -773,8 +773,16 @@ namespace TrilinosWrappers
   SparseMatrix::clear_rows (const std::vector<unsigned int> &rows,
 			    const TrilinosScalar             new_diag_value)
   {
+    compress();
     for (unsigned int row=0; row<rows.size(); ++row)
       clear_row(rows[row], new_diag_value);
+
+				        // This function needs to be called
+				        // on all processors. We change some
+				        // data, so we need to flush the
+				        // buffers to make sure that the
+				        // right data is used.
+    compress();
   }
 
 
