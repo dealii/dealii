@@ -2,7 +2,7 @@
 //    $Id$
 //    Version: $Name$
 //
-//    Copyright (C) 2005, 2006 by the deal.II authors
+//    Copyright (C) 2005, 2006, 2008 by the deal.II authors
 //
 //    This file is subject to QPL and may not be  distributed
 //    without copyright and license information. Please refer
@@ -34,6 +34,8 @@ namespace LAPACKSupport
   {
 					 /// Contents is actually a matrix.
 	matrix,
+					 /// Contents is the inverse of a matrix.
+	inverse_matrix,
 					 /// Contents is an LU decomposition.
 	lu,
 					 /// Eigenvalue vector is filled
@@ -51,6 +53,8 @@ namespace LAPACKSupport
       {
 	case matrix:
 	      return "matrix";
+	case inverse_matrix:
+	      return "inverse matrix";
 	case lu:
 	      return "lu decomposition";
 	case eigenvalues:

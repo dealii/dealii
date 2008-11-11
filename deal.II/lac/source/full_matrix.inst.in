@@ -25,6 +25,9 @@ for (S : REAL_SCALARS)
 for (S1, S2 : REAL_SCALARS)
   {
     template
+      FullMatrix<S1>& FullMatrix<S1>::operator = (const LAPACKFullMatrix<S2>&);
+
+    template
       void FullMatrix<S1>::fill<S2> (
 	const FullMatrix<S2>&, unsigned, unsigned, unsigned, unsigned);
     template

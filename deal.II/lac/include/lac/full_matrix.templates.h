@@ -109,6 +109,22 @@ FullMatrix<number>::operator = (const IdentityMatrix &id)
 
 
 template <typename number>
+template <typename number2>
+FullMatrix<number> &
+FullMatrix<number>::operator = (const LAPACKFullMatrix<number2>& M)
+{
+  Assert (this->m() == M.n_rows(), ExcDimensionMismatch(this->m(), M.n_rows()));
+  Assert (this->n() == M.n_cols(), ExcDimensionMismatch(this->n(), M.n_rows()));
+  for (unsigned int i=0;i<this->m();++i)
+    for (unsigned int j=0;j<this->n();++j)
+      (*this)(i,j) = M(i,j);
+  
+  return *this;
+}
+
+
+
+template <typename number>
 bool
 FullMatrix<number>::all_zero () const
 {

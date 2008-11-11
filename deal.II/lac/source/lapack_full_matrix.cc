@@ -2,7 +2,7 @@
 //    $Id$
 //    Version: $Name$
 //
-//    Copyright (C) 2005, 2006 by the deal.II authors
+//    Copyright (C) 2005, 2006, 2008 by the deal.II authors
 //
 //    This file is subject to QPL and may not be  distributed
 //    without copyright and license information. Please refer
@@ -172,6 +172,38 @@ LAPACKFullMatrix<number>::compute_lu_factorization()
   Assert(info == 0, LACExceptions::ExcSingular());
   
   state = lu;
+}
+
+
+template <typename number>
+void
+LAPACKFullMatrix<number>::invert()
+{
+  Assert(state == matrix || state == lu, 
+	 ExcState(state));
+  const int mm = this->n_rows();
+  const int nn = this->n_cols();
+  Assert (nn == mm, ExcNotQuadratic());
+
+  number* values = const_cast<number*> (this->data());
+  ipiv.resize(mm);
+  int info;
+
+  if (state == matrix)
+    {
+      getrf(&mm, &nn, values, &mm, &ipiv[0], &info);
+
+      Assert(info >= 0, ExcInternalError());
+      Assert(info == 0, LACExceptions::ExcSingular());
+    }
+
+  iwork.resize (mm);
+  getri(&mm, values, &mm, &ipiv[0], &iwork[0], &mm, &info);
+
+  Assert(info >= 0, ExcInternalError());
+  Assert(info == 0, LACExceptions::ExcSingular());
+  
+  state = inverse_matrix;
 }
 
 

@@ -5,7 +5,7 @@
 //    This file was automatically generated from blas.h.in
 //    See blastemplates in the deal.II contrib directory
 //
-//    Copyright (C) 2005, 2006, 2007 by the deal authors
+//    Copyright (C) 2005, 2006, 2007, 2008 by the deal authors
 //
 //    This file is subject to QPL and may not be  distributed
 //    without copyright and license information. Please refer
@@ -49,6 +49,11 @@ void dgetrf_ (const int* m, const int* n, double* A,
 	      const int* lda, int* ipiv, int* info);
 void sgetrf_ (const int* m, const int* n, float* A,
 	      const int* lda, int* ipiv, int* info);
+// Invert matrix from LU factorization
+void dgetri_ (const int* n, double* A, const int* lda, 
+	      int* ipiv, double* iwork, const int* lwork, int* info);
+void sgetri_ (const int* n, float* A, const int* lda, 
+	      int* ipiv, float* iwork, const int* lwork, int* info);
 // Apply forward/backward substitution to LU factorization
 void dgetrs_ (const char* trans, const int* n, const int* nrhs,
 	      const double* A, const int* lda, const int* ipiv,
@@ -207,6 +212,36 @@ getrf (const int* m, const int* n, float* A, const int* lda, int* ipiv, int* inf
 #else
 inline void
 getrf (const int*, const int*, float*, const int*, int*, int*)
+{
+  LAPACKSupport::ExcMissing("sgetrf");
+}
+#endif
+
+
+#ifdef HAVE_DGETRI_
+inline void
+getri (const int* n, double* A, const int* lda, int* ipiv, double* iwork, const int* lwork, int* info)
+{
+  dgetri_ (n,A,lda,ipiv,iwork,lwork,info);
+}
+#else
+inline void
+getri (const int*, double*, const int*, int*, double*, const int*, int*)
+{
+  LAPACKSupport::ExcMissing("dgetrf");
+}
+#endif
+
+
+#ifdef HAVE_SGETRI_
+inline void
+getri (const int* n, float* A, const int* lda, int* ipiv, float* iwork, const int* lwork, int* info)
+{
+  sgetri_ (n,A,lda,ipiv,iwork,lwork,info);
+}
+#else
+inline void
+getri (const int*, float*, const int*, int*, float*, const int*, int*)
 {
   LAPACKSupport::ExcMissing("sgetrf");
 }

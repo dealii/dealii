@@ -542,7 +542,7 @@ if test "x$with_blas" != "x" -a "x$with_blas" != "xno" ; then
 fi
 
 AC_CHECK_FUNCS([dgemv_ sgemv_ dgeev_ sgeev_ dgeevx_ sgeevx_ dgesvd_ sgesvd_])
-AC_CHECK_FUNCS([dgetrf_ sgetrf_ dgetrs_ sgetrs_ dstev_ sstev_])
+AC_CHECK_FUNCS([dgetrf_ sgetrf_ dgetri_ sgetri_ dgetrs_ sgetrs_ dstev_ sstev_])
 
 dnl -------------------------------------------------------------
 dnl       set include paths of several libraries

@@ -324,6 +324,16 @@ inconvenience this causes.
 <ol>
   <li>
   <p>
+  New: The class LAPACKFullMatrix can now invert full matrices using 
+  the (optimized) LAPACK functions getrf and getri. The speedup over 
+  the FullMatrix::gauss_jordan() function is a factor of two for matrices
+  with 100 rows and columns, and grows with matrix size.
+  <br>
+  (Martin Kronbichler 2008/11/11)
+  </p>
+
+  <li>
+  <p>
   Fixed: The BlockMatrixBase::clear() function that is used by all other
   block matrix type classes had a memory leak in that the memory
   allocated by all sub-objects was not freed. This is now fixed.

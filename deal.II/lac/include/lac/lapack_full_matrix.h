@@ -2,7 +2,7 @@
 //    $Id$
 //    Version: $Name$
 //
-//    Copyright (C) 2005, 2006 by the deal.II authors
+//    Copyright (C) 2005, 2006, 2008 by the deal.II authors
 //
 //    This file is subject to QPL and may not be  distributed
 //    without copyright and license information. Please refer
@@ -232,6 +232,14 @@ class LAPACKFullMatrix : public TransposeTable<number>
     void compute_lu_factorization ();
 
 				     /**
+				      * Invert the matrix by first computing
+				      * an LU factorization with the LAPACK
+				      * function Xgetrf and then building
+				      * the actual inverse using Xgetri.
+				      */
+    void invert ();
+
+				     /**
 				      * Solve the linear system with
 				      * right hand side given by
 				      * applying forward/backward
@@ -369,6 +377,13 @@ class LAPACKFullMatrix : public TransposeTable<number>
 				      * LU-factorization.
 				      */
     std::vector<int> ipiv;
+    
+				     /**
+				      * Workspace for calculating the
+				      * inverse matrix from an LU
+				      * factorization.
+				      */
+    std::vector<number> iwork;
     
 				     /**
 				      * Real parts of

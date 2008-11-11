@@ -19,6 +19,7 @@
 #include <base/table.h>
 #include <lac/exceptions.h>
 #include <lac/identity_matrix.h>
+#include <lac/lapack_full_matrix.h>
 
 #include <vector>
 #include <iomanip>
@@ -329,6 +330,16 @@ class FullMatrix : public Table<2,number>
 				      */
     FullMatrix<number> &
     operator = (const IdentityMatrix &id);
+    
+				     /**
+				      * Assignment operator for a
+				      * LapackFullMatrix. The calling matrix
+				      * must be of the same size as the
+				      * LAPACK matrix.
+				      */
+    template <typename number2>
+    FullMatrix<number> &
+    operator = (const LAPACKFullMatrix<number2>&);
     
                                      /**
 				      * Assignment from different
