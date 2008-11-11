@@ -388,20 +388,21 @@ namespace LinearSolvers
 				   // & B^T \\ B & 0
 				   // \end{array}\right) =
 				   // \left(\begin{array}{cc} I &
-				   // A^{-1} B^T \\ 0 & 0
+				   // A^{-1} B^T \\ 0 & I
 				   // \end{array}\right), 
-				   // @f} 
-				   // which indeed is very simple. A
-				   // GMRES solver based on exact
-				   // matrices would converge in two
-				   // iterations, since there are only
-				   // two distinct eigenvalues. Such
-				   // a preconditioner for the blocked
-				   // Stokes system has been proposed
-				   // by Silvester and Wathen ("Fast
-				   // iterative solution of stabilised
-				   // Stokes systems part II.  Using
-				   // general block preconditioners",
+				   // @f}
+				   // which indeed is very simple. A GMRES
+				   // solver based on exact matrices would
+				   // converge in one iteration, since all
+				   // eigenvalues are equal (any Krylov
+				   // method takes at most as many
+				   // iterations as there are distinct
+				   // eigenvalues). Such a preconditioner
+				   // for the blocked Stokes system has been
+				   // proposed by Silvester and Wathen
+				   // ("Fast iterative solution of
+				   // stabilised Stokes systems part II.
+				   // Using general block preconditioners",
 				   // SIAM J. Numer. Anal., 31 (1994),
 				   // pp. 1352-1367).
 				   // 

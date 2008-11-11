@@ -416,16 +416,17 @@ would appear to be a good choice since
   \end{array}\right) 
   = 
   \left(\begin{array}{cc}
-    I & A^{-1} B^T \\ 0 & 0
+    I & A^{-1} B^T \\ 0 & I
   \end{array}\right).
 @f}
-This is the approach taken by the paper by Silvester and Wathen referenced to
-in the introduction (with the exception that Silvester and Wathen use right 
-preconditioning). In this case, a Krylov-based iterative method would 
-converge in two steps if exact inverses of $A$ and $S$ were applied, since
-there are only two distinct eigenvalues 0 and 1 of the matrix. Below, we will
-discuss the choice of an adequate solver for this problem. First, we are going
-to have a closer look at the implementation of the preconditioner.
+This is the approach taken by the paper by Silvester and Wathen referenced
+to in the introduction (with the exception that Silvester and Wathen use
+right preconditioning). In this case, a Krylov-based iterative method would
+converge in one step only if exact inverses of $A$ and $S$ were applied,
+since all the eigenvalues are one (and the number of iterations in such a
+method is bounded by the number of distinct eigenvalues). Below, we will
+discuss the choice of an adequate solver for this problem. First, we are
+going to have a closer look at the implementation of the preconditioner.
 
 Since $P$ is aimed to be a preconditioner only, we shall use approximations to 
 the inverse of the Schur complement $S$ and the matrix $A$. Hence, the Schur
