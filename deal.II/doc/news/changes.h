@@ -144,6 +144,17 @@ inconvenience this causes.
 <ol>
   <li>
   <p>
+  Updated: In the @ref step_22 "step-22" tutorial program the generation of
+  the sparsity pattern using the class BlockCompressedSetSparsityPattern has 
+  been replaced by a pattern of the class BlockCompressedSimpleSparsityPattern, 
+  which uses far less memory and is slightly faster.
+  <br>
+  (Martin Kronbichler 2008/11/12)
+  </p>
+  </li>
+
+  <li>
+  <p>
   New: The shared libraries we create are now versioned, i.e. they have
   the form <code>libdeal_II_2d.g.so.6.2.0</code>. The library without
   the version number is simply a link to the versioned library name.
