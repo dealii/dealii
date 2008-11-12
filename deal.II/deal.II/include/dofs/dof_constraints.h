@@ -31,9 +31,11 @@ template <typename> class FullMatrix;
 class SparsityPattern;
 class CompressedSparsityPattern;
 class CompressedSetSparsityPattern;
+class CompressedSimpleSparsityPattern;
 class BlockSparsityPattern;
 class BlockCompressedSparsityPattern;
 class BlockCompressedSetSparsityPattern;
+class BlockCompressedSimpleSparsityPattern;
 template <typename number> class SparseMatrix;
 template <typename number> class BlockSparseMatrix;
 class BlockIndices;
@@ -721,6 +723,14 @@ class ConstraintMatrix : public Subscriptor
 
 				     /**
 				      * Same function as above, but
+				      * condenses compressed
+				      * sparsity patterns, which are
+				      * based on the ''simple'' aproach.
+				      */
+    void condense (CompressedSimpleSparsityPattern &sparsity) const;
+
+				     /**
+				      * Same function as above, but
 				      * condenses square compressed
 				      * sparsity patterns.
 				      *
@@ -752,6 +762,13 @@ class ConstraintMatrix : public Subscriptor
 				      * sparsity patterns.
 				      */
     void condense (BlockCompressedSetSparsityPattern &sparsity) const;
+
+				     /**
+				      * Same function as above, but
+				      * condenses square compressed
+				      * sparsity patterns.
+				      */
+    void condense (BlockCompressedSimpleSparsityPattern &sparsity) const;
     
     
 				     /**

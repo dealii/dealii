@@ -1095,6 +1095,7 @@ void ConstraintMatrix::condense (CompressedSparsityPattern &sparsity) const
 }
 
 
+
 void ConstraintMatrix::condense (CompressedSetSparsityPattern &sparsity) const
 {
   Assert (sorted == true, ExcMatrixNotClosed());
@@ -1180,6 +1181,141 @@ void ConstraintMatrix::condense (CompressedSetSparsityPattern &sparsity) const
 				  .entries[q].first);
 	    };
 	}
+    };
+}
+
+
+
+void ConstraintMatrix::condense (CompressedSimpleSparsityPattern &sparsity) const
+{
+  Assert (sorted == true, ExcMatrixNotClosed());
+  Assert (sparsity.n_rows() == sparsity.n_cols(),
+	  ExcNotQuadratic());
+  
+				   // store for each index whether it must be
+				   // distributed or not. If entry is
+				   // numbers::invalid_unsigned_int,
+				   // no distribution is necessary.
+				   // otherwise, the number states which line
+				   // in the constraint matrix handles this
+				   // index
+  std::vector<unsigned int> distribute(sparsity.n_rows(),
+                                       numbers::invalid_unsigned_int);
+  
+  for (unsigned int c=0; c<lines.size(); ++c)
+    distribute[lines[c].line] = c;
+
+  const unsigned int n_rows = sparsity.n_rows();
+  for (unsigned int row=0; row<n_rows; ++row)
+    {
+      if (distribute[row] == numbers::invalid_unsigned_int)
+					 // regular line. loop over
+					 // cols. note that as we
+					 // proceed to distribute
+					 // cols, the loop may get
+					 // longer
+	for (unsigned int j=0; j<sparsity.row_length(row); ++j)
+	  {
+	    const unsigned int column = sparsity.column_number(row,j);
+
+ 	    if (distribute[column] != numbers::invalid_unsigned_int)
+	      {
+						 // distribute entry
+						 // at regular row
+						 // @p{row} and
+						 // irregular column
+						 // column. note that
+						 // this changes the
+						 // line we are
+						 // presently working
+						 // on: we add
+						 // additional
+						 // entries. if we add
+						 // another entry at a
+						 // column behind the
+						 // present one, we
+						 // will encounter it
+						 // later on (but
+						 // since it can't be
+						 // further
+						 // constrained, won't
+						 // have to do
+						 // anything about
+						 // it). if we add it
+						 // up front of the
+						 // present column, we
+						 // will find the
+						 // present column
+						 // later on again as
+						 // it was shifted
+						 // back (again
+						 // nothing happens,
+						 // in particular no
+						 // endless loop, as
+						 // when we encounter
+						 // it the second time
+						 // we won't be able
+						 // to add more
+						 // entries as they
+						 // all already exist,
+						 // but we do the same
+						 // work more often
+						 // than necessary,
+						 // and the loop gets
+						 // longer), so move
+						 // the cursor one to
+						 // the right in the
+						 // case that we add
+						 // an entry up front
+						 // that did not exist
+						 // before. check
+						 // whether it existed
+						 // before by tracking
+						 // the length of this
+						 // row
+		unsigned int old_rowlength = sparsity.row_length(row);
+		for (unsigned int q=0;
+		     q!=lines[distribute[column]].entries.size();
+		     ++q) 
+		  {
+		    const unsigned int
+		      new_col = lines[distribute[column]].entries[q].first;
+		    
+		    sparsity.add (row, new_col);
+
+		    const unsigned int new_rowlength = sparsity.row_length(row);
+		    if ((new_col < column) && (old_rowlength != new_rowlength))
+		      ++j;
+		    old_rowlength = new_rowlength;
+		  };
+	      };
+	  }
+      else
+					 // row must be distributed
+	for (unsigned int j=0; j<sparsity.row_length(row); ++j)
+	  {
+	    const unsigned int column = sparsity.column_number(row,j);
+
+	    if (distribute[column] == numbers::invalid_unsigned_int)
+					       // distribute entry at irregular
+					       // row @p{row} and regular column
+					       // sparsity.colnums[j]
+	      for (unsigned int q=0;
+		   q!=lines[distribute[row]].entries.size(); ++q) 
+		sparsity.add (lines[distribute[row]].entries[q].first,
+			      column);
+	    else
+					       // distribute entry at irregular
+					       // row @p{row} and irregular column
+					       // sparsity.get_column_numbers()[j]
+	      for (unsigned int p=0; p!=lines[distribute[row]].entries.size(); ++p)
+		for (unsigned int q=0;
+		     q!=lines[distribute[sparsity.column_number(row,j)]]
+				    .entries.size(); ++q)
+		  sparsity.add (lines[distribute[row]].entries[p].first,
+				lines[distribute[sparsity.column_number(row,j)]]
+				.entries[q].first);
+	  };
     };
 }
 
@@ -1554,6 +1690,140 @@ void ConstraintMatrix::condense (BlockCompressedSetSparsityPattern &sparsity) co
 		{
 		  const unsigned int global_col
 		    = index_mapping.local_to_global (block_col, *j);
+		    
+		  if (distribute[global_col] == numbers::invalid_unsigned_int)
+						     // distribute entry at irregular
+						     // row @p{row} and regular column
+						     // global_col.
+		    {
+		      for (unsigned int q=0; q!=lines[distribute[row]].entries.size(); ++q) 
+			sparsity.add (lines[distribute[row]].entries[q].first,
+				      global_col);
+		    }
+		  else
+						     // distribute entry at irregular
+						     // row @p{row} and irregular column
+						     // @p{global_col}
+		    {
+		      for (unsigned int p=0; p!=lines[distribute[row]].entries.size(); ++p)
+			for (unsigned int q=0; q!=lines[distribute[global_col]].entries.size(); ++q)
+			  sparsity.add (lines[distribute[row]].entries[p].first,
+					lines[distribute[global_col]].entries[q].first);
+		    };
+		};
+	    };
+	};
+    };
+}
+
+
+
+void ConstraintMatrix::condense (BlockCompressedSimpleSparsityPattern &sparsity) const
+{
+  Assert (sorted == true, ExcMatrixNotClosed());
+  Assert (sparsity.n_rows() == sparsity.n_cols(),
+	  ExcNotQuadratic());
+  Assert (sparsity.n_block_rows() == sparsity.n_block_cols(),
+	  ExcNotQuadratic());
+  Assert (sparsity.get_column_indices() == sparsity.get_row_indices(),
+	  ExcNotQuadratic());
+  
+  const BlockIndices &
+    index_mapping = sparsity.get_column_indices();
+
+  const unsigned int n_blocks = sparsity.n_block_rows();
+  
+				   // store for each index whether it must be
+				   // distributed or not. If entry is
+				   // numbers::invalid_unsigned_int,
+				   // no distribution is necessary.
+				   // otherwise, the number states which line
+				   // in the constraint matrix handles this
+				   // index
+  std::vector<unsigned int> distribute (sparsity.n_rows(),
+                                        numbers::invalid_unsigned_int);
+  
+  for (unsigned int c=0; c<lines.size(); ++c)
+    distribute[lines[c].line] = static_cast<signed int>(c);
+
+  const unsigned int n_rows = sparsity.n_rows();
+  for (unsigned int row=0; row<n_rows; ++row)
+    {
+				       // get index of this row
+				       // within the blocks
+      const std::pair<unsigned int,unsigned int>
+	block_index = index_mapping.global_to_local(row);
+      const unsigned int block_row = block_index.first;
+      const unsigned int local_row = block_index.second;
+      
+      if (distribute[row] == numbers::invalid_unsigned_int)
+					 // regular line. loop over
+					 // all columns and see
+					 // whether this column must
+					 // be distributed. note that
+					 // as we proceed to
+					 // distribute cols, the loop
+					 // over cols may get longer.
+					 //
+					 // don't try to be clever
+					 // here as in the algorithm
+					 // for the
+					 // CompressedSparsityPattern,
+					 // as that would be much more
+					 // complicated here. after
+					 // all, we know that
+					 // compressed patterns are
+					 // inefficient...
+	{
+
+					   // to loop over all entries
+					   // in this row, we have to
+					   // loop over all blocks in
+					   // this blockrow and the
+					   // corresponding row
+					   // therein
+	  for (unsigned int block_col=0; block_col<n_blocks; ++block_col)
+	    {
+	      const CompressedSimpleSparsityPattern &
+		block_sparsity = sparsity.block(block_row, block_col);
+
+	      for (unsigned int j=0; j<block_sparsity.row_length(local_row); ++j)
+		{
+		  const unsigned int global_col
+		    = index_mapping.local_to_global(block_col,
+						    block_sparsity.column_number(local_row,j));
+		    
+		  if (distribute[global_col] != numbers::invalid_unsigned_int)
+						     // distribute entry at regular
+						     // row @p{row} and irregular column
+						     // global_col
+		    {
+		      for (unsigned int q=0;
+			   q!=lines[distribute[global_col]]
+					  .entries.size(); ++q)
+			sparsity.add (row,
+				      lines[distribute[global_col]].entries[q].first);
+		    };
+		};
+	    };
+	}
+      else
+	{
+					   // row must be
+					   // distributed. split the
+					   // whole row into the
+					   // chunks defined by the
+					   // blocks
+	  for (unsigned int block_col=0; block_col<n_blocks; ++block_col)
+	    {
+	      const CompressedSimpleSparsityPattern &
+		block_sparsity = sparsity.block(block_row,block_col);
+      
+	      for (unsigned int j=0; j<block_sparsity.row_length(local_row); ++j)
+		{
+		  const unsigned int global_col
+		    = index_mapping.local_to_global (block_col,
+						     block_sparsity.column_number(local_row,j));
 		    
 		  if (distribute[global_col] == numbers::invalid_unsigned_int)
 						     // distribute entry at irregular

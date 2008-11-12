@@ -336,22 +336,20 @@ InverseMatrix<Matrix,Preconditioner>::InverseMatrix (const Matrix &m,
 				 // This is the implementation of the 
 				 // <code>vmult</code> function.
                     
-				 // Note that we use a rather large
-				 // tolerance for the solver
-				 // control. The reason for this is
-				 // that the function is used very
-				 // frequently, and hence, any
-				 // additional effort to make the
-				 // residual in the CG solve smaller
-				 // makes the solution more
-				 // expensive. Note that we do not
-				 // only use this class as a
-				 // preconditioner for the Schur
-				 // complement, but also when forming
-				 // the inverse of the Laplace matrix -
-				 // which needs to be accurate in
-				 // order to obtain a solution to the
-				 // right problem.
+				 // In this class we use a rather large
+				 // tolerance for the solver control. The
+				 // reason for this is that the function is
+				 // used very frequently, and hence, any
+				 // additional effort to make the residual
+				 // in the CG solve smaller makes the
+				 // solution more expensive. Note that we do
+				 // not only use this class as a
+				 // preconditioner for the Schur complement,
+				 // but also when forming the inverse of the
+				 // Laplace matrix &ndash; which is hence
+				 // directly responsible for the accuracy of
+				 // the solution itself, so we can't choose
+				 // a too large tolerance, either.
 template <class Matrix, class Preconditioner>
 void InverseMatrix<Matrix,Preconditioner>::vmult (Vector<double>       &dst,
 						  const Vector<double> &src) const
@@ -599,95 +597,88 @@ void StokesProblem<dim>::setup_dofs ()
             << std::endl;
       
 				   // The next task is to allocate a
-				   // sparsity pattern for the system
-				   // matrix we will create. We could
-				   // do this in the same way as in
-				   // step-20, i.e. directly build an
-				   // object of type SparsityPattern
-				   // through
+				   // sparsity pattern for the system matrix
+				   // we will create. We could do this in
+				   // the same way as in step-20,
+				   // i.e. directly build an object of type
+				   // SparsityPattern through
 				   // DoFTools::make_sparsity_pattern. However,
-				   // there is a major reason not to
-				   // do so: In 3D, the function
+				   // there is a major reason not to do so:
+				   // In 3D, the function
 				   // DoFTools::max_couplings_between_dofs
-				   // yields a conservative but rather
-				   // large number for the coupling
-				   // between the individual dofs, so
-				   // that the memory initially
-				   // provided for the creation of the
-				   // sparsity pattern of the matrix
-				   // is far too much -- so much
-				   // actually that the initial
-				   // sparsity pattern won't even fit
-				   // into the physical memory of most
-				   // systems already for
-				   // moderately-sized 3D problems,
-				   // see also the discussion in
-				   // step-18.  Instead, we first
-				   // build a temporary object that
-				   // uses a different data structure
-				   // that doesn't require allocating
-				   // more memory than necessary but
-				   // isn't suitable for use as a
-				   // basis of SparseMatrix or
-				   // BlockSparseMatrix objects; in a
-				   // second step we then copy this
-				   // object into an object of
-				   // BlockSparsityPattern. This is
-				   // entirely analgous to what we
-				   // already did in step-11 and
-				   // step-18.
+				   // yields a conservative but rather large
+				   // number for the coupling between the
+				   // individual dofs, so that the memory
+				   // initially provided for the creation of
+				   // the sparsity pattern of the matrix is
+				   // far too much -- so much actually that
+				   // the initial sparsity pattern won't
+				   // even fit into the physical memory of
+				   // most systems already for
+				   // moderately-sized 3D problems, see also
+				   // the discussion in step-18.  Instead,
+				   // we first build a temporary object that
+				   // uses a different data structure that
+				   // doesn't require allocating more memory
+				   // than necessary but isn't suitable for
+				   // use as a basis of SparseMatrix or
+				   // BlockSparseMatrix objects; in a second
+				   // step we then copy this object into an
+				   // object of BlockSparsityPattern. This
+				   // is entirely analgous to what we
+				   // already did in step-11 and step-18.
 				   //
-				   // There is one snag again here,
-				   // though: just as in step-27, it
-				   // turns out that using the
-				   // CompressedSparsityPattern (or
-				   // the block version
-				   // BlockCompressedSparsityPattern
-				   // we would use here)
-				   // has a bottleneck that makes the
-				   // algorithm to build the sparsity
-				   // pattern be quadratic in the
-				   // number of degrees of
-				   // freedom. This doesn't become
-				   // noticable until we get well into
-				   // the range of several 100,000
-				   // degrees of freedom, but
-				   // eventually dominates the setup
-				   // of the linear system when we get
-				   // to more than a million degrees
-				   // of freedom. This is due to the
-				   // data structures used in the
+				   // There is one snag again here, though:
+				   // it turns out that using the
+				   // CompressedSparsityPattern (or the
+				   // block version
+				   // BlockCompressedSparsityPattern we
+				   // would use here) has a bottleneck that
+				   // makes the algorithm to build the
+				   // sparsity pattern be quadratic in the
+				   // number of degrees of freedom. This
+				   // doesn't become noticable until we get
+				   // well into the range of several 100,000
+				   // degrees of freedom, but eventually
+				   // dominates the setup of the linear
+				   // system when we get to more than a
+				   // million degrees of freedom. This is
+				   // due to the data structures used in the
 				   // CompressedSparsityPattern class,
 				   // nothing that can easily be
-				   // changed. Fortunately, there is
-				   // an easy solution, as already
-				   // pointed out in step-27: the
-				   // CompressedSetSparsityPattern
-				   // class (and its block variant
-				   // BlockCompressedSetSparsityPattern)
-				   // has exactly the same interface,
-				   // uses a different internal data
-				   // structure, is slightly slower
-				   // for smaller numbers of degrees
-				   // of freedom (but there we don't
-				   // care that much anyway) but is
-				   // linear in the number of degrees
-				   // of freedom and therefore much
-				   // more efficient for large
-				   // problems.
+				   // changed. Fortunately, there is an easy
+				   // solution: the
+				   // CompressedSimpleSparsityPattern class
+				   // (and its block variant
+				   // BlockCompressedSimpleSparsityPattern)
+				   // has exactly the same interface, uses a
+				   // different internal data structure, is
+				   // slightly slower for smaller numbers of
+				   // degrees of freedom (but there we don't
+				   // care that much anyway) but is linear
+				   // in the number of degrees of freedom
+				   // and therefore much more efficient for
+				   // large problems. As another
+				   // alternative, we could also have chosen
+				   // the class
+				   // BlockCompressedSetSparsityPattern that
+				   // uses yet another strategy for internal
+				   // memory management. Though, that class
+				   // turns out to be more memory-demanding
+				   // than
+				   // BlockCompressedSimpleSparsityPattern
+				   // for this example.
 				   //
-				   // Consequently, this is the class
-				   // that we will use for our
-				   // intermediate sparsity
-				   // representation. All this is done
-				   // inside a new scope, which means
-				   // that the memory of
-				   // <code>csp</code> will be
-				   // released once the information
+				   // Consequently, this is the class that
+				   // we will use for our intermediate
+				   // sparsity representation. All this is
+				   // done inside a new scope, which means
+				   // that the memory of <code>csp</code>
+				   // will be released once the information
 				   // has been copied to
 				   // <code>sparsity_pattern</code>.
   {
-    BlockCompressedSetSparsityPattern csp (2,2);
+    BlockCompressedSimpleSparsityPattern csp (2,2);
 
     csp.block(0,0).reinit (n_u, n_u);
     csp.block(1,0).reinit (n_p, n_u);
@@ -858,23 +849,20 @@ void StokesProblem<dim>::assemble_system ()
 	    }
 	}
 
-				       // Note that in the above
-				       // computation of the local
-				       // matrix contribution we added
-				       // the term <code> phi_p[i] *
-				       // phi_p[j] </code>, yielding a
+				       // Note that in the above computation
+				       // of the local matrix contribution
+				       // we added the term <code> phi_p[i]
+				       // * phi_p[j] </code>, yielding a
 				       // pressure mass matrix in the
-				       // $(1,1)$ block of the matrix
-				       // as discussed in the
-				       // introduction. That this term
-				       // only ends up in the $(1,1)$
-				       // block stems from the fact
-				       // that both of the factors in
-				       // <code>phi_p[i] *
-				       // phi_p[j]</code> are only
-				       // non-zero when all the other
-				       // terms vanish (and the other
-				       // way around).
+				       // $(1,1)$ block of the matrix as
+				       // discussed in the
+				       // introduction. That this term only
+				       // ends up in the $(1,1)$ block stems
+				       // from the fact that both of the
+				       // factors in <code>phi_p[i] *
+				       // phi_p[j]</code> are only non-zero
+				       // when all the other terms vanish
+				       // (and the other way around).
 				       //
 				       // Note also that operator* is
 				       // overloaded for symmetric
@@ -923,33 +911,28 @@ void StokesProblem<dim>::assemble_system ()
     }
 
 				   // After the addition of the local
-				   // contributions, we have to
-				   // condense the hanging node
-				   // constraints and interpolate
-				   // Dirichlet boundary conditions.
-				   // Further down below where we set
-				   // up the mesh, we will associate
+				   // contributions, we have to condense the
+				   // hanging node constraints and
+				   // interpolate Dirichlet boundary
+				   // conditions.  Further down below where
+				   // we set up the mesh, we will associate
 				   // the top boundary where we impose
-				   // Dirichlet boundary conditions
-				   // with boundary indicator 1.  We
-				   // will have to pass this boundary
-				   // indicator as second argument to
-				   // the function below interpolating
-				   // boundary values.  There is one
-				   // more thing, though.  The
-				   // function describing the
-				   // Dirichlet conditions was defined
-				   // for all components, both
-				   // velocity and pressure. However,
-				   // the Dirichlet conditions are to
-				   // be set for the velocity only.
-				   // To this end, we use a
+				   // Dirichlet boundary conditions with
+				   // boundary indicator 1.  We will have to
+				   // pass this boundary indicator as second
+				   // argument to the function below
+				   // interpolating boundary values.  There
+				   // is one more thing, though.  The
+				   // function describing the Dirichlet
+				   // conditions was defined for all
+				   // components, both velocity and
+				   // pressure. However, the Dirichlet
+				   // conditions are to be set for the
+				   // velocity only.  To this end, we use a
 				   // <code>component_mask</code> that
-				   // filters out the pressure
-				   // component, so that the
-				   // condensation is performed on
-				   // velocity degrees of freedom
-				   // only:
+				   // filters out the pressure component, so
+				   // that the condensation is performed on
+				   // velocity degrees of freedom only:
   hanging_node_constraints.condense (system_matrix);
   hanging_node_constraints.condense (system_rhs);  
 
@@ -973,17 +956,16 @@ void StokesProblem<dim>::assemble_system ()
 				   // linear system, we generate a
 				   // preconditioner for the
 				   // velocity-velocity matrix, i.e.,
-				   // <code>block(0,0)</code> in the
-				   // system matrix. As mentioned
-				   // above, this depends on the
-				   // spatial dimension. Since the two
-				   // classes described by the
-				   // <code>InnerPreconditioner@<dim@> :: type</code>
-				   // typedef have the same interface,
-				   // we do not have to do anything
-				   // different whether we want to use
-				   // a sparse direct solver or an
-				   // ILU:
+				   // <code>block(0,0)</code> in the system
+				   // matrix. As mentioned above, this
+				   // depends on the spatial
+				   // dimension. Since the two classes
+				   // described by the
+				   // <code>InnerPreconditioner@<dim@> ::
+				   // type</code> typedef have the same
+				   // interface, we do not have to do
+				   // anything different whether we want to
+				   // use a sparse direct solver or an ILU:
   std::cout << "   Computing preconditioner..." << std::endl << std::flush;
       
   A_preconditioner
@@ -1041,49 +1023,50 @@ void StokesProblem<dim>::solve ()
 				  1e-6*schur_rhs.l2_norm());
     SolverCG<>    cg (solver_control);
     
-				     // Now to the preconditioner to
-				     // the Schur complement. As
-				     // explained in the introduction,
-				     // the preconditioning is done by
-				     // a mass matrix in the pressure
-				     // variable.  It is stored in the
-				     // $(1,1)$ block of the system
-				     // matrix (that is not used
+				     // Now to the preconditioner to the
+				     // Schur complement. As explained in
+				     // the introduction, the
+				     // preconditioning is done by a mass
+				     // matrix in the pressure variable.  It
+				     // is stored in the $(1,1)$ block of
+				     // the system matrix (that is not used
 				     // anywhere else but in
 				     // preconditioning).
 				     //
-				     // Actually, the solver needs to have the
-				     // preconditioner in the form $P^{-1}$, so
-				     // we need to create an inverse
-				     // operation. Once again, we use an
-				     // object of the class
+				     // Actually, the solver needs to have
+				     // the preconditioner in the form
+				     // $P^{-1}$, so we need to create an
+				     // inverse operation. Once again, we
+				     // use an object of the class
 				     // <code>InverseMatrix</code>, which
 				     // implements the <code>vmult</code>
 				     // operation that is needed by the
 				     // solver.  In this case, we have to
-				     // invert the pressure mass matrix. As it
-				     // already turned out in earlier tutorial
-				     // programs, the inversion of a mass
-				     // matrix is a rather cheap and
+				     // invert the pressure mass matrix. As
+				     // it already turned out in earlier
+				     // tutorial programs, the inversion of
+				     // a mass matrix is a rather cheap and
 				     // straight-forward operation (compared
 				     // to, e.g., a Laplace matrix). The CG
 				     // method with ILU preconditioning
 				     // converges in 5-10 steps,
-				     // independently on the mesh size.  This
-				     // is precisely what we do here: We
-				     // choose another ILU preconditioner 
+				     // independently on the mesh size.
+				     // This is precisely what we do here:
+				     // We choose another ILU preconditioner
 				     // and take it along to the
 				     // InverseMatrix object via the
 				     // corresponding template parameter.  A
 				     // CG solver is then called within the
-				     // vmult operation of the inverse matrix.
+				     // vmult operation of the inverse
+				     // matrix.
 				     //
-				     // An alternative that is cheaper to build,
-				     // but needs more iterations afterwards,
-				     // would be to choose a SSOR preconditioner
-				     // with factor 1.2. It needs about twice 
-				     // the number of iterations, but the costs
-				     // for its generation are almost neglible.
+				     // An alternative that is cheaper to
+				     // build, but needs more iterations
+				     // afterwards, would be to choose a
+				     // SSOR preconditioner with factor
+				     // 1.2. It needs about twice the number
+				     // of iterations, but the costs for its
+				     // generation are almost neglible.
     SparseILU<double> preconditioner;
     preconditioner.initialize (system_matrix.block(1,1), 
       SparseILU<double>::AdditionalData());
@@ -1091,21 +1074,20 @@ void StokesProblem<dim>::solve ()
     InverseMatrix<SparseMatrix<double>,SparseILU<double> >
       m_inverse (system_matrix.block(1,1), preconditioner);
     
-				     // With the Schur complement and
-				     // an efficient preconditioner at
-				     // hand, we can solve the
-				     // respective equation for the
-				     // pressure (i.e. block 0 in the
-				     // solution vector) in the usual
+				     // With the Schur complement and an
+				     // efficient preconditioner at hand, we
+				     // can solve the respective equation
+				     // for the pressure (i.e. block 0 in
+				     // the solution vector) in the usual
 				     // way:
     cg.solve (schur_complement, solution.block(1), schur_rhs,
 	      m_inverse);
   
-				     // After this first solution step,
-				     // the hanging node constraints have
-				     // to be distributed to the solution
-				     // in order to achieve a consistent 
-				     // pressure field.
+				     // After this first solution step, the
+				     // hanging node constraints have to be
+				     // distributed to the solution in order
+				     // to achieve a consistent pressure
+				     // field.
     hanging_node_constraints.distribute (solution);
   
     std::cout << "  "
@@ -1115,19 +1097,17 @@ void StokesProblem<dim>::solve ()
 	      << std::endl;    
   }
     
-				   // As in step-20, we finally need
-				   // to solve for the velocity
-				   // equation where we plug in the
-				   // solution to the pressure
-				   // equation. This involves only
-				   // objects we already know - so we
-				   // simply multiply $p$ by $B^T$,
-				   // subtract the right hand side and
-				   // multiply by the inverse of
-				   // $A$. At the end, we need to
+				   // As in step-20, we finally need to
+				   // solve for the velocity equation where
+				   // we plug in the solution to the
+				   // pressure equation. This involves only
+				   // objects we already know - so we simply
+				   // multiply $p$ by $B^T$, subtract the
+				   // right hand side and multiply by the
+				   // inverse of $A$. At the end, we need to
 				   // distribute the constraints from
-				   // hanging nodes in order to obtain
-				   // a constistent flow field:
+				   // hanging nodes in order to obtain a
+				   // constistent flow field:
   {
     system_matrix.block(0,1).vmult (tmp, solution.block(1));
     tmp *= -1;
@@ -1144,43 +1124,41 @@ void StokesProblem<dim>::solve ()
                         
 				 // The next function generates graphical
 				 // output. In this example, we are going to
-				 // use the VTK file format.  We attach names
-				 // to the individual variables in the problem:
-				 // <code>velocity</code> to the <code>dim</code>
-				 // components of velocity and <code>pressure</code>
-				 // to the pressure.
+				 // use the VTK file format.  We attach
+				 // names to the individual variables in the
+				 // problem: <code>velocity</code> to the
+				 // <code>dim</code> components of velocity
+				 // and <code>pressure</code> to the
+				 // pressure.
 				 //
-				 // Not all visualization programs
-				 // have the ability to group
-				 // individual vector components into
-				 // a vector to provide vector plots;
-				 // in particular, this holds for some
-				 // VTK-based visualization
-				 // programs. In this case, the
-				 // logical grouping of components
-				 // into vectors should already be
-				 // described in the file containing
-				 // the data. In other words, what we
-				 // need to do is provide our output
-				 // writers with a way to know which
-				 // of the components of the finite
-				 // element logically form a vector
-				 // (with $d$ components in $d$ space
-				 // dimensions) rather than letting
-				 // them assume that we simply have a
-				 // bunch of scalar fields.  This is
-				 // achieved using the members of the
+				 // Not all visualization programs have the
+				 // ability to group individual vector
+				 // components into a vector to provide
+				 // vector plots; in particular, this holds
+				 // for some VTK-based visualization
+				 // programs. In this case, the logical
+				 // grouping of components into vectors
+				 // should already be described in the file
+				 // containing the data. In other words,
+				 // what we need to do is provide our output
+				 // writers with a way to know which of the
+				 // components of the finite element
+				 // logically form a vector (with $d$
+				 // components in $d$ space dimensions)
+				 // rather than letting them assume that we
+				 // simply have a bunch of scalar fields.
+				 // This is achieved using the members of
+				 // the
 				 // <code>DataComponentInterpretation</code>
-				 // namespace: as with the filename,
-				 // we create a vector in which the
-				 // first <code>dim</code> components
-				 // refer to the velocities and are
-				 // given the tag
+				 // namespace: as with the filename, we
+				 // create a vector in which the first
+				 // <code>dim</code> components refer to the
+				 // velocities and are given the tag
 				 // <code>DataComponentInterpretation::component_is_part_of_vector</code>;
 				 // we finally push one tag
 				 // <code>DataComponentInterpretation::component_is_scalar</code>
-				 // to describe the grouping of the
-				 // pressure variable.
+				 // to describe the grouping of the pressure
+				 // variable.
 
 				 // The rest of the function is then
 				 // the same as in step-20.
@@ -1216,19 +1194,18 @@ StokesProblem<dim>::output_results (const unsigned int refinement_cycle)  const
 
 				 // @sect4{StokesProblem::refine_mesh}
                         
-				 // This is the last interesting function
-				 // of the <code>StokesProblem</code> class.
+				 // This is the last interesting function of
+				 // the <code>StokesProblem</code> class.
 				 // As indicated by its name, it takes the
-				 // solution to the problem and
-				 // refines the mesh where this is
-				 // needed. The procedure is the same
-				 // as in the respective step in
-				 // step-6, with the exception that
-				 // we base the refinement only on the
-				 // change in pressure, i.e., we call
-				 // the Kelly error estimator with a
-				 // mask object. Additionally, we do
-				 // not coarsen the grid again:
+				 // solution to the problem and refines the
+				 // mesh where this is needed. The procedure
+				 // is the same as in the respective step in
+				 // step-6, with the exception that we base
+				 // the refinement only on the change in
+				 // pressure, i.e., we call the Kelly error
+				 // estimator with a mask
+				 // object. Additionally, we do not coarsen
+				 // the grid again:
 template <int dim>
 void
 StokesProblem<dim>::refine_mesh () 
@@ -1253,28 +1230,25 @@ StokesProblem<dim>::refine_mesh ()
 
 				 // @sect4{StokesProblem::run}
                         
-				 // The last step in the Stokes class
-				 // is, as usual, the function that generates
-				 // the initial grid and calls the other
+				 // The last step in the Stokes class is, as
+				 // usual, the function that generates the
+				 // initial grid and calls the other
 				 // functions in the respective order.
 				 //
-				 // We start off with a rectangle of
-				 // size $4 \times 1$ (in 2d) or $4
-				 // \times 1 \times 1$ (in 3d), placed
-				 // in $R^2/R^3$ as
+				 // We start off with a rectangle of size $4
+				 // \times 1$ (in 2d) or $4 \times 1 \times
+				 // 1$ (in 3d), placed in $R^2/R^3$ as
 				 // $(-2,2)\times(-1,0)$ or
 				 // $(-2,2)\times(0,1)\times(-1,1)$,
-				 // respectively. It is natural to
-				 // start with equal mesh size in each
-				 // direction, so we subdivide the
-				 // initial rectangle four times in
-				 // the first coordinate direction. To
-				 // limit the scope of the variables
-				 // involved in the creation of the
-				 // mesh to the range where we
-				 // actually need them, we put the
-				 // entire block between a pair of
-				 // braces:
+				 // respectively. It is natural to start
+				 // with equal mesh size in each direction,
+				 // so we subdivide the initial rectangle
+				 // four times in the first coordinate
+				 // direction. To limit the scope of the
+				 // variables involved in the creation of
+				 // the mesh to the range where we actually
+				 // need them, we put the entire block
+				 // between a pair of braces:
 template <int dim>
 void StokesProblem<dim>::run () 
 {
@@ -1309,22 +1283,19 @@ void StokesProblem<dim>::run ()
 	cell->face(f)->set_all_boundary_indicators(1);
   
   
-				   // We then apply an initial
-				   // refinement before solving for
-				   // the first time. In 3D, there are
-				   // going to be more degrees of
-				   // freedom, so we refine less
-				   // there:
+				   // We then apply an initial refinement
+				   // before solving for the first time. In
+				   // 3D, there are going to be more degrees
+				   // of freedom, so we refine less there:
   triangulation.refine_global (4-dim);
 
-				   // As first seen in step-6, we
-				   // cycle over the different
-				   // refinement levels and refine
-				   // (except for the first cycle),
+				   // As first seen in step-6, we cycle over
+				   // the different refinement levels and
+				   // refine (except for the first cycle),
 				   // setup the degrees of freedom and
-				   // matrices, assemble, solve and
-				   // create output:
-  for (unsigned int refinement_cycle = 0; refinement_cycle<4;
+				   // matrices, assemble, solve and create
+				   // output:
+  for (unsigned int refinement_cycle = 0; refinement_cycle<6;
        ++refinement_cycle)
     {
       std::cout << "Refinement cycle " << refinement_cycle << std::endl;
@@ -1359,7 +1330,7 @@ int main ()
     {
       deallog.depth_console (0);
 
-      StokesProblem<3> flow_problem(1);
+      StokesProblem<2> flow_problem(1);
       flow_problem.run ();
     }
   catch (std::exception &exc)

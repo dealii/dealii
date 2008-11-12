@@ -633,7 +633,7 @@ void BoussinesqFlowProblem<dim>::setup_dofs ()
   {
     stokes_matrix.clear ();
 
-    BlockCompressedSetSparsityPattern csp (2,2);
+    BlockCompressedSimpleSparsityPattern csp (2,2);
 
     csp.block(0,0).reinit (n_u, n_u);
     csp.block(0,1).reinit (n_u, n_p);
@@ -662,7 +662,7 @@ void BoussinesqFlowProblem<dim>::setup_dofs ()
     Mp_preconditioner.reset ();
     stokes_preconditioner_matrix.clear ();
 
-    BlockCompressedSetSparsityPattern csp (2,2);
+    BlockCompressedSimpleSparsityPattern csp (2,2);
 
     csp.block(0,0).reinit (n_u, n_u);
     csp.block(0,1).reinit (n_u, n_p);
@@ -697,7 +697,7 @@ void BoussinesqFlowProblem<dim>::setup_dofs ()
     temperature_stiffness_matrix.clear ();
     temperature_matrix.clear ();
 
-    CompressedSetSparsityPattern csp (n_T, n_T);
+    CompressedSimpleSparsityPattern csp (n_T, n_T);
     DoFTools::make_sparsity_pattern (temperature_dof_handler, csp,
 				     temperature_constraints, false);
 

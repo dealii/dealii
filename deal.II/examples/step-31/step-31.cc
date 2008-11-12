@@ -406,12 +406,11 @@ namespace LinearSolvers
 				   // SIAM J. Numer. Anal., 31 (1994),
 				   // pp. 1352-1367).
 				   // 
-				   // Replacing <i>P</i> by $\tilde{P}$ does
-				   // not change the situation
-				   // dramatically. The product $P^{-1} A$
-				   // will still be close to a matrix with
-				   // eigenvalues 0 and 1, which lets us
-				   // hope to be able to get a number of
+				   // Replacing <i>P</i> by $\tilde{P}$
+				   // keeps that spirit alive: the product
+				   // $P^{-1} A$ will still be close to a
+				   // matrix with eigenvalues 1, which lets
+				   // us hope to be able to get a number of
 				   // GMRES iterations that does not depend
 				   // on the problem size.
 				   //
@@ -1129,7 +1128,7 @@ void BoussinesqFlowProblem<dim>::setup_dofs ()
 				   // step-22, we choose to create the pattern
 				   // not as in the first few tutorial
 				   // programs, but by using the blocked
-				   // version of CompressedSetSparsityPattern.
+				   // version of CompressedSimpleSparsityPattern.
 				   // The reason for doing this is mainly
 				   // memory, that is, the SparsityPattern
 				   // class would consume too much memory when
@@ -1139,56 +1138,59 @@ void BoussinesqFlowProblem<dim>::setup_dofs ()
 				   // So, we first release the memory stored
 				   // in the matrices, then set up an object
 				   // of type
-				   // BlockCompressedSetSparsityPattern
+				   // BlockCompressedSimpleSparsityPattern
 				   // consisting of $2\times 2$ blocks (for
 				   // the Stokes system matrix and
 				   // preconditioner) or
-				   // CompressedSparsityPattern (for the
-				   // temperature part). We then fill these
-				   // sparsity patterns with the nonzero
+				   // CompressedSimpleSparsityPattern (for
+				   // the temperature part). We then fill
+				   // these objects with the nonzero
 				   // pattern, taking into account that for
 				   // the Stokes system matrix, there are no
 				   // entries in the pressure-pressure block
 				   // (but all velocity vector components
 				   // couple with each other and with the
 				   // pressure). Similarly, in the Stokes
-				   // preconditioner matrix, only the diagonal
-				   // blocks are nonzero, since we use the
-				   // vector Laplacian as discussed in the
-				   // introduction. This operator only couples
-				   // each vector component of the Laplacian
-				   // with itself, but not with the other
-				   // vector components. (Application of the
+				   // preconditioner matrix, only the
+				   // diagonal blocks are nonzero, since we
+				   // use the vector Laplacian as discussed
+				   // in the introduction. This operator
+				   // only couples each vector component of
+				   // the Laplacian with itself, but not
+				   // with the other vector
+				   // components. (Application of the
 				   // constraints resulting from the no-flux
 				   // boundary conditions will couple vector
 				   // components at the boundary again,
 				   // however.)
 				   //
-				   // When generating the sparsity pattern, we
-				   // directly apply the constraints from
+				   // When generating the sparsity pattern,
+				   // we directly apply the constraints from
 				   // hanging nodes and no-flux boundary
 				   // conditions. This approach was already
 				   // used in step-27, but is different from
-				   // the one in early tutorial programs where
-				   // we first built the original sparsity
-				   // pattern and only then added the entries
-				   // resulting from constraints. The reason
-				   // for doing so is that later during
-				   // assembly we are going to distribute the
-				   // constraints immediately when
-				   // transferring local to global
-				   // dofs. Consequently, there will be no
-				   // data written at positions of constrained
-				   // degrees of freedom, so we can let the
-				   // DoFTools::make_sparsity_pattern function
-				   // omit these entries by setting the last
-				   // boolean flag to <code>false</code>. Once
-				   // the sparsity pattern is ready, we can
-				   // use it to initialize the Trilinos
-				   // matrices. Note that the Trilinos
-				   // matrices store the sparsity pattern
-				   // internally, so there is no need to keep
-				   // the sparsity pattern around after the
+				   // the one in early tutorial programs
+				   // where we first built the original
+				   // sparsity pattern and only then added
+				   // the entries resulting from
+				   // constraints. The reason for doing so
+				   // is that later during assembly we are
+				   // going to distribute the constraints
+				   // immediately when transferring local to
+				   // global dofs. Consequently, there will
+				   // be no data written at positions of
+				   // constrained degrees of freedom, so we
+				   // can let the
+				   // DoFTools::make_sparsity_pattern
+				   // function omit these entries by setting
+				   // the last boolean flag to
+				   // <code>false</code>. Once the sparsity
+				   // pattern is ready, we can use it to
+				   // initialize the Trilinos
+				   // matrices. Since the Trilinos matrices
+				   // store the sparsity pattern internally,
+				   // there is no need to keep the sparsity
+				   // pattern around after the
 				   // initialization of the matrix.
   stokes_block_sizes.resize (2);
   stokes_block_sizes[0] = n_u;
@@ -1196,7 +1198,7 @@ void BoussinesqFlowProblem<dim>::setup_dofs ()
   {
     stokes_matrix.clear ();
 
-    BlockCompressedSetSparsityPattern csp (2,2);
+    BlockCompressedSimpleSparsityPattern csp (2,2);
  
     csp.block(0,0).reinit (n_u, n_u);
     csp.block(0,1).reinit (n_u, n_p);
@@ -1225,7 +1227,7 @@ void BoussinesqFlowProblem<dim>::setup_dofs ()
     Mp_preconditioner.reset ();
     stokes_preconditioner_matrix.clear ();
 
-    BlockCompressedSetSparsityPattern csp (2,2);
+    BlockCompressedSimpleSparsityPattern csp (2,2);
  
     csp.block(0,0).reinit (n_u, n_u);
     csp.block(0,1).reinit (n_u, n_p);
@@ -1256,14 +1258,14 @@ void BoussinesqFlowProblem<dim>::setup_dofs ()
 				   // discretization) follows the generation
 				   // of the Stokes matrix &ndash; except
 				   // that it is much easier here since we
-				   // do not need to take care of any
-				   // blocks or coupling between components:
+				   // do not need to take care of any blocks
+				   // or coupling between components:
   {
     temperature_mass_matrix.clear ();
     temperature_stiffness_matrix.clear ();
     temperature_matrix.clear ();
 
-    CompressedSetSparsityPattern csp (n_T, n_T);      
+    CompressedSimpleSparsityPattern csp (n_T, n_T);      
     DoFTools::make_sparsity_pattern (temperature_dof_handler, csp,
 				     temperature_constraints, false);
 

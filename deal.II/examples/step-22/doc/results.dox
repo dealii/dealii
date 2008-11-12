@@ -5,8 +5,9 @@
 
 <h4>2D calculations</h4>
 
-Running the program with the space dimension set to 2 in
-<code>main()</code> yields the following output:
+Running the program with the space dimension set to 2 in <code>main()</code>
+yields the following output (when the flag is set to optimized in the
+Makefile):
 @code
 examples/step-22> make run
 ============================ Remaking Makefile.dep
@@ -54,16 +55,9 @@ Refinement cycle 5
    Assembling...
    Computing preconditioner...
    Solving...  11 outer CG Schur complement iterations for pressure
-
-Refinement cycle 6
-   Number of active cells: 8896
-   Number of degrees of freedom: 83885 (74474+9411)
-   Assembling...
-   Computing preconditioner...
-   Solving...  11 outer CG Schur complement iterations for pressure
 @endcode
 
-The entire computation above takes about 30 seconds on a reasonably
+The entire computation above takes about 20 seconds on a reasonably
 quick (for 2007 standards) machine.
 
 What we see immediately from this is that the number of (outer)
@@ -181,12 +175,7 @@ Refinement cycle 5
 Again, we see that the number of outer iterations does not increase as
 we refine the mesh. Nevertheless, the compute time increases
 significantly: for each of the iterations above separately, it takes a
-few seconds, a few seconds, 1min, 5min, 21min, and 1h35. (One level
-more can be run on machines with more memory, though one may have to
-replace the BlockCompressedSetSparsityPattern class by the
-BlockCompressedSparsityPattern class as the former needs significantly
-more memory and becomes the bottleneck; the latter class, however, has
-a superlinear runtime complexity.) This overall
+few seconds, a few seconds, 1min, 5min, 21min, and 1h35. This overall
 superlinear (in the number of unknowns) increase in runtime is due to the fact
 that our inner solver is not ${\cal O}(N)$: a simple experiment shows
 that as we keep refining the mesh, the average number of
