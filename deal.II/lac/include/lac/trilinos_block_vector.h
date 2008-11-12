@@ -404,6 +404,19 @@ namespace TrilinosWrappers
 
 
 
+    inline
+    void
+    BlockVector::swap (BlockVector &v)
+    {
+      Assert (n_blocks() == v.n_blocks(),
+	      ExcDimensionMismatch(n_blocks(),v.n_blocks()));
+      
+      for (unsigned int row=0; row<n_blocks(); ++row)
+	block(row).swap (v.block(row));
+    }
+    
+
+
 /**
  * Global function which overloads the default implementation
  * of the C++ standard library which uses a temporary object. The
@@ -827,6 +840,16 @@ namespace TrilinosWrappers
   }
 
 
+  inline
+  void
+  BlockVector::swap (BlockVector &v)
+  {
+    Assert (n_blocks() == v.n_blocks(),
+	    ExcDimensionMismatch(n_blocks(),v.n_blocks()));
+      
+    for (unsigned int row=0; row<n_blocks(); ++row)
+      block(row).swap (v.block(row));
+  }
 
 
 /**
@@ -838,12 +861,12 @@ namespace TrilinosWrappers
  * @relates TrilinosWrappers::BlockVector
  * @author Martin Kronbichler, 2008
  */
-    inline
-    void swap (BlockVector &u,
-               BlockVector &v)
-    {
-      u.swap (v);
-    }
+  inline
+  void swap (BlockVector &u,
+	     BlockVector &v)
+  {
+    u.swap (v);
+  }
 
 }
 
