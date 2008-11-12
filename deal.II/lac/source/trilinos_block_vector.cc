@@ -166,19 +166,6 @@ namespace TrilinosWrappers
 	components[i].compress();
     }
 
-
-
-    void
-    BlockVector::swap (BlockVector &v)
-    {
-      Assert (this->n_blocks() == v.n_blocks(),
-              ExcDimensionMismatch(this->n_blocks(), v.n_blocks()));
-  
-      for (unsigned int i=0; i<this->n_blocks(); ++i)
-        this->components[i].swap (v.components[i]);
-      ::dealii::swap (this->block_indices, v.block_indices);
-    }
-  
   } /* end of namespace MPI */
 
 
