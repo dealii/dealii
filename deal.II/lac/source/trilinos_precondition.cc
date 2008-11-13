@@ -19,6 +19,7 @@
 #ifdef DEAL_II_USE_TRILINOS
 
 #include <Ifpack.h>
+#include <Ifpack_Chebyshev.h>
 #include <Teuchos_ParameterList.hpp>
 #include <Epetra_Vector.h>
 #include <Epetra_MultiVector.h>
@@ -372,7 +373,7 @@ namespace TrilinosWrappers
 
 /* ---------------------- PreconditionBlockDirect --------------------- */
 
-  PreconditionBlockDirect::AdditionalData::
+  PreconditionBlockwiseDirect::AdditionalData::
   AdditionalData (const unsigned int overlap)
                   :
                   overlap  (overlap)
@@ -381,8 +382,8 @@ namespace TrilinosWrappers
 
 
   void
-  PreconditionBlockDirect::initialize (const SparseMatrix   &matrix,
-				       const AdditionalData &additional_data)
+  PreconditionBlockwiseDirect::initialize (const SparseMatrix   &matrix,
+					   const AdditionalData &additional_data)
   {
     preconditioner.release();
     ifpack.release();
@@ -397,6 +398,67 @@ namespace TrilinosWrappers
     Teuchos::ParameterList parameter_list;
     parameter_list.set ("schwarz: combine mode", "Add");
     
+    ierr = ifpack->SetParameters(parameter_list);
+    AssertThrow (ierr == 0, ExcTrilinosError(ierr));
+
+    ierr = ifpack->Initialize();
+    AssertThrow (ierr == 0, ExcTrilinosError(ierr));
+
+    ierr = ifpack->Compute();
+    AssertThrow (ierr == 0, ExcTrilinosError(ierr));
+
+    preconditioner = Teuchos::rcp (&*ifpack, false);
+  }
+
+
+
+/* ---------------------- PreconditionBlockDirect --------------------- */
+
+  PreconditionChebyshev::AdditionalData::
+  AdditionalData (const unsigned int degree,
+		  const double       max_eigenvalue,
+		  const double       eigenvalue_ratio,
+		  const double       min_eigenvalue,
+		  const double       min_diagonal,
+		  const bool         nonzero_starting)
+                  :
+                  degree  (degree),
+		  max_eigenvalue (max_eigenvalue),
+		  eigenvalue_ratio (eigenvalue_ratio),
+		  min_eigenvalue (min_eigenvalue),
+		  min_diagonal (min_diagonal),
+		  nonzero_starting (nonzero_starting)
+  {}
+
+
+
+  void
+  PreconditionChebyshev::initialize (const SparseMatrix   &matrix,
+				     const AdditionalData &additional_data)
+  {
+    preconditioner.release();
+    ifpack.release();
+
+    ifpack = Teuchos::rcp (new Ifpack_Chebyshev(&*matrix.matrix));
+    Assert (&*ifpack != 0, ExcMessage ("Trilinos could not create this "
+				       "preconditioner"));
+
+    int ierr;
+
+    Teuchos::ParameterList parameter_list;
+    parameter_list.set ("chebyshev: ratio eigenvalue",
+			additional_data.eigenvalue_ratio);
+    parameter_list.set ("chebyshev: min eigenvalue",
+			additional_data.min_eigenvalue);
+    parameter_list.set ("chebyshev: max eigenvalue",
+			additional_data.max_eigenvalue);
+    parameter_list.set ("chebyshev: degree",
+			(int)additional_data.degree);
+    parameter_list.set ("chebyshev: min diagonal value",
+			additional_data.min_diagonal);
+    parameter_list.set ("chebyshev: zero starting solution",
+			!additional_data.nonzero_starting);
+
     ierr = ifpack->SetParameters(parameter_list);
     AssertThrow (ierr == 0, ExcTrilinosError(ierr));
 

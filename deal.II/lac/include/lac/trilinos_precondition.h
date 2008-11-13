@@ -36,6 +36,7 @@
 
 // forward declarations
 class Ifpack_Preconditioner;
+class Ifpack_Chebyshev;
 namespace ML_Epetra
 {
   class MultiLevelPreconditioner;
@@ -901,7 +902,7 @@ namespace TrilinosWrappers
  * @ingroup Preconditioners
  * @author Martin Kronbichler, 2008
  */
-  class PreconditionBlockDirect : public PreconditionBase
+  class PreconditionBlockwiseDirect : public PreconditionBase
   {
     public:
                                        /**
@@ -944,6 +945,107 @@ namespace TrilinosWrappers
 					* this preconditioner.
 					*/
       Teuchos::RCP<Ifpack_Preconditioner> ifpack;
+  };
+  
+
+
+
+
+
+/**
+ * A wrapper class for a Chebyshev preconditioner for Trilinos matrices.
+ *
+ * The AdditionalData data structure allows to set preconditioner
+ * options.
+ *
+ * @ingroup TrilinosWrappers
+ * @ingroup Preconditioners
+ * @author Martin Kronbichler, 2008
+ */
+  class PreconditionChebyshev : public PreconditionBase
+  {
+    public:
+                                       /**
+                                        * Standardized data struct to
+                                        * pipe additional parameters
+                                        * to the preconditioner.
+                                        */      
+      struct AdditionalData
+      {
+                                       /**
+					* Constructor.
+					*/
+	AdditionalData (const unsigned int degree           = 1,
+			const double       max_eigenvalue   = 10.,
+			const double       eigenvalue_ratio = 30.,
+			const double       min_eigenvalue   = 1.,
+			const double       min_diagonal     = 1e-12,
+			const bool         nonzero_starting = false);
+	
+                                       /**
+					* This determines the degree of the
+					* Chebyshev polynomial.
+					*/
+	unsigned int degree;
+
+                                       /**
+					* This sets the maximum eigenvalue
+					* of the matrix, which needs to be
+					* set properly for appropriate
+					* performance of the Chebyshev
+					* preconditioner.
+					*/
+	double max_eigenvalue;
+
+                                       /**
+					* This sets the ratio between the
+					* maximum and the minimum
+					* eigenvalue.
+					*/
+	double eigenvalue_ratio;
+
+                                       /**
+					* This sets the minimum eigenvalue,
+					* which is an optional parameter
+					* only used internally for checking
+					* whether we use an identity matrix.
+					*/
+	double min_eigenvalue;
+
+                                       /**
+					* This sets a threshold below which
+					* the diagonal element will not be
+					* inverted in the Chebyshev
+					* algorithm.
+					*/
+	double min_diagonal;
+
+                                       /**
+					* This flag let the preconditioner
+					* start at a nonzero value when
+					* generating the Chebyshev
+					* polynomial.
+					*/
+	double nonzero_starting;
+      };
+
+                                       /**
+                                        * Initialize function. Takes
+                                        * the matrix which is used to
+                                        * form the preconditioner, and
+                                        * additional flags if there
+                                        * are any.
+                                        */
+      void initialize (const SparseMatrix   &matrix,
+		       const AdditionalData &additional_data = AdditionalData());
+
+    private:
+				       /**
+					* This is a pointer to the
+					* Ifpack data contained in
+					* this preconditioner.
+					*/
+      Teuchos::RCP<Ifpack_Chebyshev> ifpack;
   };
   
 
