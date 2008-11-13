@@ -12,8 +12,10 @@
 //----------------------------  mesh_smoothing_02.cc  ---------------------------
 
 
-// a redux of mesh_smoothing_01: when we have patch_level_1 set, and if we
-// have a mesh like this:
+// a redux of mesh_smoothing_01 (since deleted since it used a list of
+// refinement flags for one particular mesh that after a later fix
+// cannot be reproduced any more in exactly this way): when we have
+// patch_level_1 set, and if we have a mesh like this:
 //
 // *-*-*-*-*---*---*
 // *-*-*-*-*   |   |
