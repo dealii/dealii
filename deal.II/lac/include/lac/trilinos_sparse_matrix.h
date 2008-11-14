@@ -671,6 +671,13 @@ namespace TrilinosWrappers
 		   const double                           drop_tolerance=1e-13);
 
                                        /**
+					* This reinit function takes as
+					* input a Trilinos Epetra_CrsMatrix
+					* and copies its content.
+					*/
+      void reinit (const Epetra_CrsMatrix &input_matrix);
+
+                                       /**
                                         * This operator assigns a scalar
                                         * to a matrix. Since this does
                                         * usually not make much sense

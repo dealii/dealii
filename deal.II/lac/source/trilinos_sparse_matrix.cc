@@ -560,6 +560,39 @@ namespace TrilinosWrappers
 
 
 
+  void 
+  SparseMatrix::reinit (const Epetra_CrsMatrix &input_matrix)
+  {
+    matrix.reset();
+
+    Assert (input_matrix.Filled()==true,
+	    ExcMessage("Input CrsMatrix has not called FillComplete()!"));
+
+    row_map = input_matrix.RangeMap();
+    col_map = input_matrix.DomainMap();
+
+    const Epetra_CrsGraph *graph = &input_matrix.Graph();
+
+    matrix = std::auto_ptr<Epetra_FECrsMatrix> 
+                      (new Epetra_FECrsMatrix(Copy, *graph, false));
+
+    matrix->FillComplete (col_map, row_map, true);
+
+    int length;
+    int *row_indices;
+    TrilinosScalar *values;
+    for (unsigned int row=0; row<m(); ++row)
+      if (row_map.MyGID(row))
+	{
+	  const int local_row = row_map.LID(row);
+	  input_matrix.ExtractMyRowView(local_row, length, values, row_indices);
+	  matrix->ReplaceMyValues(local_row, length, values, row_indices);
+	}
+
+    compress();
+  }
+
+
   void
   SparseMatrix::clear ()
   {
@@ -1119,9 +1152,9 @@ namespace TrilinosWrappers
     if (matrix->Filled() == false)
       matrix->FillComplete(col_map, row_map, true);
 
-    Assert (src.vector->Map().SameAs(matrix->DomainMap()) == true,
+    Assert (src.vector->Map().SameAs(matrix->RangeMap()) == true,
 	    ExcMessage ("Column map of matrix does not fit with vector map!"));
-    Assert (dst.vector->Map().SameAs(matrix->RangeMap()) == true,
+    Assert (dst.vector->Map().SameAs(matrix->DomainMap()) == true,
 	    ExcMessage ("Row map of matrix does not fit with vector map!"));
 
     const int ierr = matrix->Multiply (true, *(src.vector), *(dst.vector));
