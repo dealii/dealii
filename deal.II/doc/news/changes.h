@@ -144,15 +144,26 @@ inconvenience this causes.
 <ol>
   <li>
   <p>
+  New: A new  tutorial program, @ref step_31 "step-31", is contributed by
+  Martin Kronbichler and Wolfgang Bangerth and shows the
+  solution of the Boussinesq approximation to thermally driven
+  convection in an incompressible fluid.
+  <br>
+  (Martin Kronbichler 2008/11/14)
+  </p>
+  </li>
+
+  <li>
+  <p>
   Updated: In the @ref step_22 "step-22" tutorial program the generation of
   the sparsity pattern using the class BlockCompressedSetSparsityPattern has 
   been replaced by a pattern of the class BlockCompressedSimpleSparsityPattern, 
   which uses far less memory and is slightly faster.
   <br>
-  (Martin Kronbichler 2008/11/12)
+  (Martin Kronbichler, WB 2008/11/12)
   </p>
   </li>
-
+  
   <li>
   <p>
   New: The shared libraries we create are now versioned, i.e. they have
@@ -181,6 +192,18 @@ inconvenience this causes.
   This has now been fixed.
   <br>
   (Johan Lorentzon, WB 2008/09/12)
+  </p>
+  </li>
+
+  <li>
+  <p>
+  New: A new  tutorial program, @ref step_28 "step-28", is contributed by
+  Yaqi Wang. It illustrates the solution
+  of a coupled system of diffusion equations relevant to
+  nuclear reactor physics where we use different meshes for
+  different components of a vector-valued solution.
+  <br>
+  (Yaqi Wang 2008/09/10)
   </p>
   </li>
 
