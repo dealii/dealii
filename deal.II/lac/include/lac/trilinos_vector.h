@@ -459,7 +459,35 @@ namespace TrilinosWrappers
     Vector & 
     Vector::operator = (const ::dealii::Vector<Number> &v)
     {
-      VectorBase::operator = (v);
+#ifdef DEAL_II_COMPILER_SUPPORTS_MPI
+      map = Epetra_Map (v.size(), 0, Epetra_MpiComm(MPI_COMM_WORLD));
+#else
+      map = Epetra_Map (v.size(), 0, Epetra_SerialComm());
+#endif
+
+      vector = std::auto_ptr<Epetra_FEVector> (new Epetra_FEVector(map));
+      
+      const int min_my_id = map.MinMyGID();
+      const int size = map.NumMyElements();
+
+      Assert (map.MaxLID() == size-1,
+	      ExcDimensionMismatch(map.MaxLID(), size-1));
+
+				   // Need to copy out values, since the
+				   // deal.II might not use doubles, so 
+				   // that a direct access is not possible.
+      std::vector<int> indices (size);
+      std::vector<double> values (size);
+      for (unsigned int i=0; i<size; ++i)
+	{
+	  indices[i] = map.GID(i);
+	  values[i] = v(i);
+	}
+
+      const int ierr = vector->ReplaceGlobalValues (size, &indices[0], 
+						    &values[0]);
+      AssertThrow (ierr == 0, ExcTrilinosError());
+
       return *this;
     }
     
@@ -675,7 +703,35 @@ namespace TrilinosWrappers
   Vector & 
   Vector::operator = (const ::dealii::Vector<Number> &v)
   {
-    VectorBase::operator = (v);
+#ifdef DEAL_II_COMPILER_SUPPORTS_MPI
+    map = Epetra_LocalMap (v.size(), 0, Epetra_MpiComm(MPI_COMM_WORLD));
+#else
+    map = Epetra_LocalMap (v.size(), 0, Epetra_SerialComm());
+#endif
+
+    vector = std::auto_ptr<Epetra_FEVector> (new Epetra_FEVector(map));
+      
+    const int min_my_id = map.MinMyGID();
+    const int size = map.NumMyElements();
+
+    Assert (map.MaxLID() == size-1,
+	    ExcDimensionMismatch(map.MaxLID(), size-1));
+
+				   // Need to copy out values, since the
+				   // deal.II might not use doubles, so 
+				   // that a direct access is not possible.
+    std::vector<int> indices (size);
+    std::vector<double> values (size);
+    for (unsigned int i=0; i<size; ++i)
+      {
+	indices[i] = map.GID(i);
+	values[i] = v(i);
+      }
+
+    const int ierr = vector->ReplaceGlobalValues (size, &indices[0], 
+						  &values[0]);
+    AssertThrow (ierr == 0, ExcTrilinosError());
+
     return *this;
   }
   

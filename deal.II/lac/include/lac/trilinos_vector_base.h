@@ -365,6 +365,17 @@ namespace TrilinosWrappers
 	operator = (const TrilinosScalar s);
 
                                        /**
+					* Copy function. This function takes
+					* a VectorBase vector and copies all
+					* the elements. The target vector
+					* will have the same parallel
+					* distribution as the calling
+					* vector.
+					*/
+      VectorBase & 
+	operator = (const VectorBase &v);
+
+                                       /**
 					* Another copy function. This
 					* one takes a deal.II vector and
 					* copies it into a
@@ -383,7 +394,7 @@ namespace TrilinosWrappers
 					*/
       template <typename Number>
       VectorBase & 
-      operator = (const ::dealii::Vector<Number> &v);
+	operator = (const ::dealii::Vector<Number> &v);
 
                                        /**
                                         * Test for equality. This

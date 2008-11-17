@@ -108,11 +108,13 @@ namespace TrilinosWrappers
 		      const bool        fast)
   {
     (void)fast;
-    if (&*vector != 0)
+    if (&*vector == 0)
       vector = std::auto_ptr<Epetra_FEVector>(new Epetra_FEVector(*v.vector));
     else if (vector->Map().SameAs(v.vector->Map()) == false)
       vector = std::auto_ptr<Epetra_FEVector>(new Epetra_FEVector(*v.vector));
   }
+
+
 
   void
   VectorBase::compress ()
@@ -144,6 +146,22 @@ namespace TrilinosWrappers
 
     return *this;
   }
+
+
+
+  VectorBase &
+  VectorBase::operator = (const VectorBase &v)
+  {
+    if (&*vector == 0)
+      vector = std::auto_ptr<Epetra_FEVector>(new Epetra_FEVector(*v.vector));
+    else if (vector->Map().SameAs(v.vector->Map()) == false)
+      vector = std::auto_ptr<Epetra_FEVector>(new Epetra_FEVector(*v.vector));
+    else
+      *vector = *v.vector;
+
+    return *this;
+  }
+
 
 
   template <typename number>
