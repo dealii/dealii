@@ -214,7 +214,7 @@ namespace TrilinosWrappers
                                           * elements.
                                           */
         template <typename Number>
-        explicit Vector (const Epetra_Map              &InputMap,
+        explicit Vector (const Epetra_Map             &InputMap,
                          const dealii::Vector<Number> &v);
 
 				       /**
@@ -229,41 +229,38 @@ namespace TrilinosWrappers
 
 				       /**
 				        * Reinit functionality. This
-				        * function sets the calling
-				        * vector to the dimension and
-				        * the parallel distribution of
-				        * the input vector, but does not
-				        * copy the elements in
-				        * <tt>v</tt>. If <tt>fast</tt>
-				        * is not <tt>true</tt>, the
-				        * elements in the vector are
-				        * initialized with zero,
-				        * otherwise the content will be
-				        * left unchanged and the user
-				        * has to set all elements.
+				        * function sets the calling vector
+				        * to the dimension and the parallel
+				        * distribution of the input vector,
+				        * but does not copy the elements in
+				        * <tt>v</tt>. If <tt>fast</tt> is
+				        * not <tt>true</tt>, the elements in
+				        * the vector are initialized with
+				        * zero, otherwise the content will
+				        * be left unchanged and the user has
+				        * to set all elements.
 					*
-					* This class has a third
-					* possible argument,
+				        * Reinit functionality. This class
+					* also has a third possible
+					* argument,
 					* <tt>allow_different_maps</tt>,
 					* that allows for an exchange of
 					* data between two equal-sized
 					* vectors (but being distributed
 					* differently among the
-					* processors). A trivial
-					* application of this function
-					* is to generate a replication
-					* of a whole vector on each
-					* machine, when the calling
-					* vector is build according to
-					* the localized vector class
+					* processors). A trivial application
+					* of this function is to generate a
+					* replication of a whole vector on
+					* each machine, when the calling
+					* vector is build according to the
+					* localized vector class
 					* TrilinosWrappers::Vector, and
 					* <tt>v</tt> is a distributed
-					* vector. In this case, the
-					* variable <tt>fast</tt> needs
-					* to be set to <tt>false</tt>,
-					* since it does not make sense
-					* to exchange data between
-					* differently parallelized
+					* vector. In this case, the variable
+					* <tt>fast</tt> needs to be set to
+					* <tt>false</tt>, since it does not
+					* make sense to exchange data
+					* between differently parallelized
 					* vectors without touching the
 					* elements.
 				        */
@@ -431,7 +428,7 @@ namespace TrilinosWrappers
 				   // that a direct access is not possible.
       std::vector<int> indices (size);
       std::vector<double> values (size);
-      for (unsigned int i=0; i<size; ++i)
+      for (int i=0; i<size; ++i)
 	{
 	  indices[i] = map.GID(i);
 	  values[i] = v(i);
@@ -440,7 +437,7 @@ namespace TrilinosWrappers
       const int ierr = vector->ReplaceGlobalValues (size, &indices[0], 
 						    &values[0]);
 
-      AssertThrow (ierr == 0, ExcTrilinosError());
+      AssertThrow (ierr == 0, VectorBase::ExcTrilinosError());
     }
 
   
@@ -459,34 +456,16 @@ namespace TrilinosWrappers
     Vector & 
     Vector::operator = (const ::dealii::Vector<Number> &v)
     {
-#ifdef DEAL_II_COMPILER_SUPPORTS_MPI
-      map = Epetra_Map (v.size(), 0, Epetra_MpiComm(MPI_COMM_WORLD));
-#else
-      map = Epetra_Map (v.size(), 0, Epetra_SerialComm());
-#endif
-
-      vector = std::auto_ptr<Epetra_FEVector> (new Epetra_FEVector(map));
-      
-      const int min_my_id = map.MinMyGID();
-      const int size = map.NumMyElements();
-
-      Assert (map.MaxLID() == size-1,
-	      ExcDimensionMismatch(map.MaxLID(), size-1));
-
-				   // Need to copy out values, since the
-				   // deal.II might not use doubles, so 
-				   // that a direct access is not possible.
-      std::vector<int> indices (size);
-      std::vector<double> values (size);
-      for (unsigned int i=0; i<size; ++i)
+      if (size() != v.size())
 	{
-	  indices[i] = map.GID(i);
-	  values[i] = v(i);
+#ifdef DEAL_II_COMPILER_SUPPORTS_MPI
+	  map = Epetra_Map (v.size(), 0, Epetra_MpiComm(MPI_COMM_WORLD));
+#else
+	  map = Epetra_Map (v.size(), 0, Epetra_SerialComm());
+#endif
 	}
-
-      const int ierr = vector->ReplaceGlobalValues (size, &indices[0], 
-						    &values[0]);
-      AssertThrow (ierr == 0, ExcTrilinosError());
+      
+      *this = Vector(map, v);
 
       return *this;
     }
@@ -566,7 +545,8 @@ namespace TrilinosWrappers
 					* the vector to the size
 					* specified by <tt>n</tt>.
 					*/
-      void reinit (const unsigned int n);
+      void reinit (const unsigned int n,
+		   const bool         fast = false);
 
                                        /**
 					* Initialization with an
@@ -586,10 +566,9 @@ namespace TrilinosWrappers
 
                                        /**
 					* Reinit function. Takes the
-					* information of a
-					* Vector and copies
-					* everything to the calling
-					* vector.
+					* information of a Vector and copies
+					* everything to the calling vector,
+					* now also allowing different maps.
 					*/
       void reinit (const VectorBase &V,
 		   const bool        fast = false,
@@ -665,27 +644,8 @@ namespace TrilinosWrappers
 
   template <typename number>
   Vector::Vector (const dealii::Vector<number> &v)
-		  :
-#ifdef DEAL_II_COMPILER_SUPPORTS_MPI
-		  map (v.size(), 0, Epetra_MpiComm(MPI_COMM_WORLD))
-#else
-		  map (v.size(), 0, Epetra_SerialComm())
-#endif
   {
-    vector = std::auto_ptr<Epetra_FEVector> (new Epetra_FEVector(map));
-
-    std::vector<int> indices (v.size());
-    std::vector<double> values (v.size());
-    for (unsigned int i=0; i<v.size(); ++i)
-      {
-	indices[i] = map.GID(i);
-	values[i] = v(i);
-      }
-
-    const int ierr = vector->ReplaceGlobalValues((int)v.size(),
-						 &indices[0], &values[0]);
-
-    AssertThrow (ierr == 0, ExcTrilinosError(ierr));
+    *this = v;
   }
 
   
@@ -722,7 +682,7 @@ namespace TrilinosWrappers
 				   // that a direct access is not possible.
     std::vector<int> indices (size);
     std::vector<double> values (size);
-    for (unsigned int i=0; i<size; ++i)
+    for (int i=0; i<size; ++i)
       {
 	indices[i] = map.GID(i);
 	values[i] = v(i);
@@ -730,7 +690,7 @@ namespace TrilinosWrappers
 
     const int ierr = vector->ReplaceGlobalValues (size, &indices[0], 
 						  &values[0]);
-    AssertThrow (ierr == 0, ExcTrilinosError());
+    AssertThrow (ierr == 0, VectorBase::ExcTrilinosError(ierr));
 
     return *this;
   }

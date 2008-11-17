@@ -115,7 +115,7 @@ namespace TrilinosWrappers
         components.resize(n_blocks());
   
       for (unsigned int i=0;i<n_blocks();++i)
-        components[i].reinit(v.block(i), fast);
+        components[i].reinit(v.block(i), fast, false);
       
       collect_sizes();
     }
@@ -132,6 +132,8 @@ namespace TrilinosWrappers
   
       for (unsigned int i=0;i<this->n_blocks();++i)
         block(i).clear();
+
+      collect_sizes();
     }
 
 
@@ -207,15 +209,14 @@ namespace TrilinosWrappers
 
   void
   BlockVector::reinit (const std::vector<unsigned int> &block_sizes,
-		       const bool                       /*fast*/)
+		       const bool                       fast)
   {
     this->block_indices.reinit (block_sizes);
     if (components.size() != n_blocks())
       components.resize(n_blocks());
 
     for (unsigned int i=0; i<n_blocks(); ++i)
-//TODO: use the 'fast' argument here...      
-      components[i].reinit(block_sizes[i]);
+      components[i].reinit(block_sizes[i], fast);
 
     collect_sizes();      
   }
@@ -230,7 +231,7 @@ namespace TrilinosWrappers
       components.resize(n_blocks());
   
     for (unsigned int i=0;i<n_blocks();++i)
-      components[i].reinit(v.block(i));
+      components[i].reinit(v.block(i), true, false);
       
     collect_sizes();
   }
@@ -247,6 +248,8 @@ namespace TrilinosWrappers
   
     for (unsigned int i=0;i<n_blocks();++i)
       block(i).clear();
+
+    collect_sizes();
   }
 
 

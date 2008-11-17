@@ -72,8 +72,8 @@ namespace TrilinosWrappers
 			Subscriptor(),
 			last_action (Zero),
 			compressed (true),
-			  vector(std::auto_ptr<Epetra_FEVector> 
-				 (new Epetra_FEVector(*v.vector)))
+			vector(std::auto_ptr<Epetra_FEVector> 
+			       (new Epetra_FEVector(*v.vector)))
   {}
   
 
@@ -107,10 +107,10 @@ namespace TrilinosWrappers
   VectorBase::reinit (const VectorBase &v,
 		      const bool        fast)
   {
-    (void)fast;
-    if (&*vector == 0)
-      vector = std::auto_ptr<Epetra_FEVector>(new Epetra_FEVector(*v.vector));
-    else if (vector->Map().SameAs(v.vector->Map()) == false)
+    Assert (&*vector != 0,
+	    ExcMessage("Vector is not constructed properly."));
+
+    if (fast == false || vector->Map().SameAs(v.vector->Map()) == false)
       vector = std::auto_ptr<Epetra_FEVector>(new Epetra_FEVector(*v.vector));
   }
 
@@ -152,9 +152,10 @@ namespace TrilinosWrappers
   VectorBase &
   VectorBase::operator = (const VectorBase &v)
   {
-    if (&*vector == 0)
-      vector = std::auto_ptr<Epetra_FEVector>(new Epetra_FEVector(*v.vector));
-    else if (vector->Map().SameAs(v.vector->Map()) == false)
+    Assert (&*vector != 0,
+	    ExcMessage("Vector is not constructed properly."));
+
+    if (vector->Map().SameAs(v.vector->Map()) == false)
       vector = std::auto_ptr<Epetra_FEVector>(new Epetra_FEVector(*v.vector));
     else
       *vector = *v.vector;

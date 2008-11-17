@@ -165,7 +165,10 @@ namespace TrilinosWrappers
       else
 	{
 	  vector.reset();
-	  map = v.map;
+	  map = Epetra_Map(v.vector->Map().NumGlobalElements(),
+			   v.vector->Map().NumMyElements(),
+			   v.vector->Map().IndexBase(),
+			   v.vector->Map().Comm());
 	  vector = std::auto_ptr<Epetra_FEVector> (new Epetra_FEVector(*v.vector));
 	}
 
@@ -275,22 +278,23 @@ namespace TrilinosWrappers
 
 
   void
-  Vector::reinit (const unsigned int n)
+  Vector::reinit (const unsigned int n,
+		  const bool         fast)
   {
-    vector.reset();
-
-    if (map.NumGlobalElements() != (int)n)
+    if (size() != n)
       {
+	vector.reset();
+
 #ifdef DEAL_II_COMPILER_SUPPORTS_MPI
 	map = Epetra_LocalMap ((int)n, 0, Epetra_MpiComm(MPI_COMM_WORLD));
 #else
 	map = Epetra_LocalMap ((int)n, 0, Epetra_SerialComm());
 #endif
+
+	last_action = Zero;
+
+	vector = std::auto_ptr<Epetra_FEVector> (new Epetra_FEVector (map));
       }
-
-    last_action = Zero;
-
-    vector = std::auto_ptr<Epetra_FEVector> (new Epetra_FEVector (map));
   }
 
 
@@ -303,7 +307,8 @@ namespace TrilinosWrappers
 
     if (map.NumGlobalElements() != input_map.NumGlobalElements())
       {
-	map = Epetra_LocalMap (input_map.NumGlobalElements(),0,
+	map = Epetra_LocalMap (input_map.NumGlobalElements(),
+			       input_map.IndexBase(),
 			       input_map.Comm());
       }
 
@@ -331,7 +336,9 @@ namespace TrilinosWrappers
       {
 	vector.reset();
 	if (map.SameAs(v.vector->Map()) == false)
-	  map = Epetra_LocalMap (v.vector->GlobalLength(),0,v.vector->Comm());
+	  map = Epetra_LocalMap (v.vector->GlobalLength(),
+				 v.vector->Map().IndexBase(),
+				 v.vector->Comm());
 
 	vector = std::auto_ptr<Epetra_FEVector> (new Epetra_FEVector(map));
 	last_action = Zero;
@@ -368,9 +375,10 @@ namespace TrilinosWrappers
   Vector &
   Vector::operator = (const MPI::Vector &v)
   {
-    if (vector->Map().SameAs(v.vector->Map()) == false)
+    if (size() != v.size())
       {
-	map = Epetra_LocalMap (v.vector->Map().NumGlobalElements(), 0,
+	map = Epetra_LocalMap (v.vector->Map().NumGlobalElements(), 
+			       v.vector->Map().IndexBase(),
 			       v.vector->Comm());
 	vector = std::auto_ptr<Epetra_FEVector> (new Epetra_FEVector(map));
       }
@@ -386,7 +394,8 @@ namespace TrilinosWrappers
   {
     if (vector->Map().SameAs(v.vector->Map()) == false)
       {
-	map = Epetra_LocalMap (v.vector->Map().NumGlobalElements(), 0,
+	map = Epetra_LocalMap (v.vector->Map().NumGlobalElements(), 
+			       v.vector->Map().IndexBase(),
 			       v.vector->Comm());
 	vector = std::auto_ptr<Epetra_FEVector> (new Epetra_FEVector(map));
       }
