@@ -480,6 +480,7 @@ namespace TrilinosWrappers
 		  const bool                             higher_order_elements,
 		  const double                           aggregation_threshold,
 		  const std::vector<std::vector<bool> > &constant_modes,
+		  const unsigned int                     smoother_sweeps,
 		  const unsigned int                     smoother_overlap,
 		  const bool                             output_details)
                   :
@@ -487,6 +488,7 @@ namespace TrilinosWrappers
 		  higher_order_elements (higher_order_elements),
 		  aggregation_threshold (aggregation_threshold),
 		  constant_modes (constant_modes),
+		  smoother_sweeps (smoother_sweeps),
 		  smoother_overlap (smoother_overlap),
 		  output_details (output_details)
   {}
@@ -511,13 +513,16 @@ namespace TrilinosWrappers
       {
 	ML_Epetra::SetDefaults("SA",parameter_list);
 	parameter_list.set("smoother: type", "Chebyshev");
-	parameter_list.set("smoother: sweeps", 4);
+	parameter_list.set("smoother: sweeps", 
+			   (int)additional_data.smoother_sweeps);
       }
     else
       {
 	ML_Epetra::SetDefaults("NSSA",parameter_list);
 	parameter_list.set("aggregation: type", "Uncoupled");
 	parameter_list.set("aggregation: block scaling", true);
+	parameter_list.set("smoother: sweeps",
+			   (int)additional_data.smoother_sweeps);
       }
   
     parameter_list.set("smoother: ifpack overlap", 

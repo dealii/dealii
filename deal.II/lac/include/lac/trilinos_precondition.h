@@ -1088,13 +1088,14 @@ namespace TrilinosWrappers
  * fact that some of the entries in the preconditioner matrix are zero
  * and hence can be neglected.
  *
- * The implementation is able to distinguish between matrices from
- * elliptic problems and convection dominated problems. We use the
- * standard options provided by Trilinos ML for elliptic problems,
- * except that we use a Chebyshev smoother instead of a symmetric
- * Gauss-Seidel smoother.  For most elliptic problems, Chebyshev
- * provides a better damping of high frequencies (in the algebraic
- * sense) than Gauss-Seidel (SSOR).
+ * The implementation is able to distinguish between matrices from elliptic
+ * problems and convection dominated problems. We use the standard options
+ * provided by Trilinos ML for elliptic problems, except that we use a
+ * Chebyshev smoother instead of a symmetric Gauss-Seidel smoother.  For
+ * most elliptic problems, Chebyshev provides a better damping of high
+ * frequencies (in the algebraic sense) than Gauss-Seidel (SSOR), and is
+ * faster (Chebyshev requires only some matrix-vector products, whereas SSOR
+ * requires substitutions which are more expensive).
  *
  * @ingroup TrilinosWrappers
  * @ingroup Preconditioners
@@ -1117,6 +1118,7 @@ namespace TrilinosWrappers
 			const bool                             higher_order_elements = false,
 			const double                           aggregation_threshold = 1e-4,
 			const std::vector<std::vector<bool> > &constant_modes = std::vector<std::vector<bool> > (1),
+			const unsigned int                     smoother_sweeps = 3,
 			const unsigned int                     smoother_overlap = 0,
 			const bool                             output_details = false);
 
@@ -1175,6 +1177,23 @@ namespace TrilinosWrappers
 					* vector-valued equation.
 					*/
 	std::vector<std::vector<bool> > constant_modes;
+
+				       /**
+					* Determines how many sweeps of the
+					* smoother should be performed. When
+					* the flag <tt>elliptic</tt> is set
+					* to <tt>true</tt>, i.e., for
+					* elliptic or almost elliptic
+					* problems, the polynomial degree of
+					* the Chebyshev smoother is set to
+					* <tt>smoother_sweeps</tt>. In the
+					* non-elliptic case,
+					* <tt>smoother_sweeps</tt> sets the
+					* number of SSOR relaxation sweeps
+					* for post-smoothing to be
+					* performed.
+					*/
+	unsigned int smoother_sweeps;
 
 				       /**
 					* Determines the overlap in

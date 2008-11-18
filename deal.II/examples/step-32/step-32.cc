@@ -801,7 +801,7 @@ BoussinesqFlowProblem<dim>::build_stokes_preconditioner ()
   
   Amg_preconditioner->initialize(stokes_preconditioner_matrix.block(0,0),
 				 TrilinosWrappers::PreconditionAMG::AdditionalData
-				   (true, true, 5e-2, null_space, 0, false));
+				 (true, true, 5e-2, null_space, 3, 0, false));
 
   Mp_preconditioner = boost::shared_ptr<TrilinosWrappers::PreconditionIC>
                                    (new TrilinosWrappers::PreconditionIC());
@@ -1258,8 +1258,12 @@ void BoussinesqFlowProblem<dim>::solve ()
 				  1e-8*temperature_rhs.l2_norm());
     SolverCG<TrilinosWrappers::MPI::Vector>   cg (solver_control);
 
-    TrilinosWrappers::PreconditionSSOR preconditioner;
-    preconditioner.initialize (temperature_matrix, 1.2);
+    TrilinosWrappers::PreconditionChebyshev preconditioner;
+    TrilinosWrappers::PreconditionChebyshev::AdditionalData data;
+    data.degree=3;
+    data.eigenvalue_ratio = 3;
+    data.max_eigenvalue = 2;
+    preconditioner.initialize (temperature_matrix, 3);
 
     cg.solve (temperature_matrix, temperature_solution,
 	      temperature_rhs, preconditioner);
