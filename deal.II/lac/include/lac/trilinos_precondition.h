@@ -984,7 +984,11 @@ namespace TrilinosWrappers
 	
                                        /**
 					* This determines the degree of the
-					* Chebyshev polynomial.
+					* Chebyshev polynomial. The degree
+					* of the polynomial gives the number
+					* of matrix-vector products to be
+					* performed for one application of
+					* the vmult() operation.
 					*/
 	unsigned int degree;
 
@@ -1021,12 +1025,24 @@ namespace TrilinosWrappers
 	double min_diagonal;
 
                                        /**
-					* This flag let the preconditioner
-					* start at a nonzero value when
-					* generating the Chebyshev
-					* polynomial.
+					* When this flag is set to
+					* <tt>true</tt>, it enables the
+					* method <tt>vmult(dst, src)</tt> to
+					* use non-zero data in the vector
+					* <tt>dst</tt>, appending to it the
+					* Chebyshev corrections. This can be
+					* useful in some situations
+					* (e.g. when used for high-frequency
+					* error smoothing), but not the way
+					* the solver classes expect a
+					* preconditioner to work (where one
+					* ignores the content in
+					* <tt>dst</tt> for the
+					* preconditioner application). The
+					* user should really know what she
+					* is doing when touching this flag.
 					*/
-	double nonzero_starting;
+	bool nonzero_starting;
       };
 
                                        /**
