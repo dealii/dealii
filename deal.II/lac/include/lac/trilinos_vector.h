@@ -644,7 +644,14 @@ namespace TrilinosWrappers
 
   template <typename number>
   Vector::Vector (const dealii::Vector<number> &v)
+                 :
+#ifdef DEAL_II_COMPILER_SUPPORTS_MPI
+                 map (v.size(), 0, Epetra_MpiComm(MPI_COMM_WORLD))
+#else
+		 map (v.size(), 0, Epetra_SerialComm())
+#endif
   {
+    vector = std::auto_ptr<Epetra_FEVector> (new Epetra_FEVector(map));
     *this = v;
   }
 
@@ -663,14 +670,18 @@ namespace TrilinosWrappers
   Vector & 
   Vector::operator = (const ::dealii::Vector<Number> &v)
   {
+    if (size() != v.size())
+      {
+	vector.release();
 #ifdef DEAL_II_COMPILER_SUPPORTS_MPI
-    map = Epetra_LocalMap (v.size(), 0, Epetra_MpiComm(MPI_COMM_WORLD));
+	map = Epetra_LocalMap (v.size(), 0, Epetra_MpiComm(MPI_COMM_WORLD));
 #else
-    map = Epetra_LocalMap (v.size(), 0, Epetra_SerialComm());
+	map = Epetra_LocalMap (v.size(), 0, Epetra_SerialComm());
 #endif
 
-    vector = std::auto_ptr<Epetra_FEVector> (new Epetra_FEVector(map));
-      
+	vector = std::auto_ptr<Epetra_FEVector> (new Epetra_FEVector(map));
+      }
+
     const int min_my_id = map.MinMyGID();
     const int size = map.NumMyElements();
 
