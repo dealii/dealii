@@ -108,7 +108,7 @@ namespace TrilinosWrappers
 		      const bool        fast)
   {
     Assert (&*vector != 0,
-	    ExcMessage("Vector is not constructed properly."));
+	    ExcMessage("Vector has not been constructed properly."));
 
     if (fast == false || vector->Map().SameAs(v.vector->Map()) == false)
       vector = std::auto_ptr<Epetra_FEVector>(new Epetra_FEVector(*v.vector));
@@ -156,9 +156,22 @@ namespace TrilinosWrappers
 	    ExcMessage("Vector is not constructed properly."));
 
     if (vector->Map().SameAs(v.vector->Map()) == false)
-      vector = std::auto_ptr<Epetra_FEVector>(new Epetra_FEVector(*v.vector));
+      {
+	vector.reset();
+	last_action = Zero;
+	vector = std::auto_ptr<Epetra_FEVector>(new Epetra_FEVector(*v.vector));
+      }
     else
-      *vector = *v.vector;
+      {
+	int ierr;
+	ierr = vector->GlobalAssemble(last_action);
+	AssertThrow (ierr == 0, ExcTrilinosError(ierr));
+
+	ierr = vector->Update(1.0, *v.vector, 0.0);
+	AssertThrow (ierr == 0, ExcTrilinosError(ierr));
+
+	last_action = Zero;
+      }
 
     return *this;
   }

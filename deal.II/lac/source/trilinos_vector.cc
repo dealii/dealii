@@ -92,11 +92,19 @@ namespace TrilinosWrappers
     Vector::reinit (const Epetra_Map &input_map,
 		    const bool        fast)
     {
-      vector.reset();
-      map = input_map;
-      (void)fast;
+      if (vector->Map().SameAs(input_map) == false)
+	{
+	  vector.reset();
+	  map = input_map;
       
-      vector = std::auto_ptr<Epetra_FEVector> (new Epetra_FEVector(map));
+	  vector = std::auto_ptr<Epetra_FEVector> (new Epetra_FEVector(map));
+	}
+      else if (fast == false)
+	{
+	  const int ierr = vector->PutScalar(0.);
+	  AssertThrow (ierr == 0, ExcTrilinosError(ierr));
+	}
+  
       last_action = Zero;
     }
 
@@ -116,15 +124,28 @@ namespace TrilinosWrappers
 					// generate the vector.
       if (allow_different_maps == false)
         {
-	  vector.reset();
 	  if (map.SameAs(v.vector->Map()) == false)
-	    map = Epetra_Map(v.vector->Map().NumGlobalElements(),
-			     v.vector->Map().NumMyElements(),
-			     v.vector->Map().IndexBase(),
-			     v.vector->Map().Comm());
+	    {
+	      vector.reset();
+	      map = Epetra_Map(v.vector->Map().NumGlobalElements(),
+			       v.vector->Map().NumMyElements(),
+			       v.vector->Map().IndexBase(),
+			       v.vector->Map().Comm());
 
-	  vector = std::auto_ptr<Epetra_FEVector> (new Epetra_FEVector(map));
-	  last_action = Zero;
+	      vector = std::auto_ptr<Epetra_FEVector> (new Epetra_FEVector(map));
+	      last_action = Zero;
+	    }
+	  else if (fast == false)
+	    {
+	      int ierr;
+	      ierr = vector->GlobalAssemble (last_action);	
+	      AssertThrow (ierr == 0, ExcTrilinosError(ierr));
+
+	      ierr = vector->PutScalar(0.0);
+	      AssertThrow (ierr == 0, ExcTrilinosError(ierr));
+
+	      last_action = Zero;
+	    }
 	}
 
 					// Otherwise, we have to check
@@ -161,7 +182,13 @@ namespace TrilinosWrappers
     Vector::operator = (const Vector &v)
     {
       if (vector->Map().SameAs(v.vector->Map()) == true)
-	*vector = *v.vector;
+	{
+	  vector->GlobalAssemble(last_action);
+	  const int ierr = vector->Update(1.0, *v.vector, 0.0);
+	  AssertThrow (ierr == 0, ExcTrilinosError(ierr));
+
+	  last_action = Insert;
+	}
       else
 	{
 	  vector.reset();
@@ -169,7 +196,9 @@ namespace TrilinosWrappers
 			   v.vector->Map().NumMyElements(),
 			   v.vector->Map().IndexBase(),
 			   v.vector->Map().Comm());
-	  vector = std::auto_ptr<Epetra_FEVector> (new Epetra_FEVector(*v.vector));
+	  vector = std::auto_ptr<Epetra_FEVector> 
+	                    (new Epetra_FEVector(*v.vector));
+	  last_action = Zero;
 	}
 
       return *this;
@@ -246,14 +275,16 @@ namespace TrilinosWrappers
 		 map ((int)n, 0, Epetra_SerialComm())
 #endif
   {
-    reinit (n);
+    last_action = Zero;
+    vector = std::auto_ptr<Epetra_FEVector> (new Epetra_FEVector (map));
   }
 
 
 
   Vector::Vector (const Epetra_Map &InputMap)
                  :
-                 map (InputMap.NumGlobalElements(), 0, InputMap.Comm())
+                 map (InputMap.NumGlobalElements(), InputMap.IndexBase(), 
+		      InputMap.Comm())
   {
     last_action = Zero;
     vector = std::auto_ptr<Epetra_FEVector> (new Epetra_FEVector(map));
@@ -269,7 +300,10 @@ namespace TrilinosWrappers
     vector = std::auto_ptr<Epetra_FEVector> (new Epetra_FEVector(map));
 
     if (vector->Map().SameAs(v.vector->Map()) == true)
-      *vector = *v.vector;
+      {
+	const int ierr = vector->Update(1.0, *v.vector, 0.0);
+	AssertThrow (ierr == 0, ExcTrilinosError(ierr));
+      }
     else
       reinit (v, false, true);
 
@@ -291,10 +325,19 @@ namespace TrilinosWrappers
 	map = Epetra_LocalMap ((int)n, 0, Epetra_SerialComm());
 #endif
 
-	last_action = Zero;
-
 	vector = std::auto_ptr<Epetra_FEVector> (new Epetra_FEVector (map));
       }
+    else if (fast == false)
+      {
+	int ierr;
+	ierr = vector->GlobalAssemble(last_action);
+	AssertThrow (ierr == 0, ExcTrilinosError(ierr));
+
+	ierr = vector->PutScalar(0.0);
+	AssertThrow (ierr == 0, ExcTrilinosError(ierr));
+      }
+    
+    last_action = Zero;
   }
 
 
@@ -303,21 +346,26 @@ namespace TrilinosWrappers
   Vector::reinit (const Epetra_Map &input_map,
                   const bool        fast)
   {
-    vector.reset();
-
     if (map.NumGlobalElements() != input_map.NumGlobalElements())
       {
+	vector.reset();
 	map = Epetra_LocalMap (input_map.NumGlobalElements(),
 			       input_map.IndexBase(),
 			       input_map.Comm());
+	vector = std::auto_ptr<Epetra_FEVector> (new Epetra_FEVector (map));
+      }
+    else if (fast == false)
+      {
+	int ierr;
+	ierr = vector->GlobalAssemble(last_action);
+	AssertThrow (ierr == 0, ExcTrilinosError(ierr));
+
+	ierr = vector->PutScalar(0.0);
+	AssertThrow (ierr == 0, ExcTrilinosError(ierr));
       }
 
     last_action = Zero;
-
-    (void)fast;
-    vector = std::auto_ptr<Epetra_FEVector> (new Epetra_FEVector (map));
   }
-
 
 
   void
@@ -334,13 +382,24 @@ namespace TrilinosWrappers
 					// generate the vector.
     if (allow_different_maps == false)
       {
-	vector.reset();
 	if (map.SameAs(v.vector->Map()) == false)
-	  map = Epetra_LocalMap (v.vector->GlobalLength(),
-				 v.vector->Map().IndexBase(),
-				 v.vector->Comm());
+	  {
+	    vector.reset();
+	    map = Epetra_LocalMap (v.vector->GlobalLength(),
+				   v.vector->Map().IndexBase(),
+				   v.vector->Comm());
 
-	vector = std::auto_ptr<Epetra_FEVector> (new Epetra_FEVector(map));
+	    vector = std::auto_ptr<Epetra_FEVector> (new Epetra_FEVector(map));
+	  }
+	else
+	  {
+	    int ierr;
+	    ierr = vector->GlobalAssemble(last_action);
+	    AssertThrow (ierr == 0, ExcTrilinosError(ierr));
+
+	    ierr = vector->PutScalar(0.0);
+	    AssertThrow (ierr == 0, ExcTrilinosError(ierr));
+	  }
 	last_action = Zero;
       }
 
@@ -377,6 +436,7 @@ namespace TrilinosWrappers
   {
     if (size() != v.size())
       {
+	vector.reset();
 	map = Epetra_LocalMap (v.vector->Map().NumGlobalElements(), 
 			       v.vector->Map().IndexBase(),
 			       v.vector->Comm());
@@ -400,7 +460,8 @@ namespace TrilinosWrappers
 	vector = std::auto_ptr<Epetra_FEVector> (new Epetra_FEVector(map));
       }
 
-    *vector = *v.vector;
+    const int ierr = vector->Update(1.0, *v.vector, 0.0);
+    AssertThrow (ierr == 0, ExcTrilinosError(ierr));	
 
     return *this;
   }
