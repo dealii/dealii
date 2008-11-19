@@ -20,6 +20,7 @@
 #include <base/template_constraints.h>
 #include <lac/vector.h>
 #include <lac/full_matrix.h>
+#include <lac/lapack_templates.h>
 
 #include <vector>
 #include <cmath>
@@ -1241,9 +1242,64 @@ FullMatrix<number>::gauss_jordan ()
 {
   Assert (!this->empty(), ExcEmptyMatrix());  
   Assert (this->n_cols() == this->n_rows(), ExcNotQuadratic());
-  
-				   // Gauss-Jordan-Algorithmus
-				   // cf. Stoer I (4th Edition) p. 153
+
+				   // see if we can use Lapack
+				   // algorithms for this and if the
+				   // type for 'number' works for us:
+#if defined(HAVE_DGETRF_) && defined (HAVE_SGETRF_) && \
+    defined(HAVE_DGETRI_) && defined (HAVE_SGETRI_)
+  if (types_are_equal<number,double>::value
+      ||
+      types_are_equal<number,float>::value)
+    {
+				       // In case we have the LAPACK functions 
+				       // getrf and getri detected at configure, 
+				       // we use these algorithms for inversion 
+				       // since they provide better performance 
+				       // than the deal.II native functions. 
+				       //
+				       // Note that BLAS/LAPACK stores matrix 
+				       // elements column-wise (i.e., all values in 
+				       // one column, then all in the next, etc.), 
+				       // whereas the FullMatrix stores them 
+				       // row-wise.
+				       // We ignore that difference, and give our
+				       // row-wise data to LAPACK,
+				       // let LAPACK build the inverse of the
+				       // transpose matrix, and read the result as
+				       // if it were row-wise again. In other words,
+				       // we just got ((A^T)^{-1})^T, which is
+				       // A^{-1}.
+
+      const int nn = this->n();
+      ipiv.resize(nn);
+      int info;
+
+				       // Use the LAPACK function getrf for 
+				       // calculating the LU factorization.
+      getrf(&nn, &nn, this->data(), &nn, &ipiv[0], &info);
+
+      Assert(info >= 0, ExcInternalError());
+      Assert(info == 0, LACExceptions::ExcSingular());
+
+      inv_work.resize (nn);
+				       // Use the LAPACK function getri for
+				       // calculating the actual inverse using
+				       // the LU factorization.
+      getri(&nn, values, &nn, &ipiv[0], &inv_work[0], &nn, &info);
+
+      Assert(info >= 0, ExcInternalError());
+      Assert(info == 0, LACExceptions::ExcSingular());
+
+      return;
+    }
+
+#endif
+
+				   // otherwise do it by hand. use the
+				   // Gauss-Jordan-Algorithmus from
+				   // Stoer & Bulirsch I (4th Edition)
+				   // p. 153
   const unsigned int N = n();
 
 				   // first get an estimate of the
