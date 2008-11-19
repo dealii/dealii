@@ -2,7 +2,7 @@
 //    $Id$
 //    Version: $Name$
 //
-//    Copyright (C) 2003, 2004, 2005, 2006 by the deal.II authors
+//    Copyright (C) 2003, 2004, 2005, 2006, 2008 by the deal.II authors
 //
 //    This file is subject to QPL and may not be  distributed
 //    without copyright and license information. Please refer
@@ -208,6 +208,43 @@ namespace internal
   struct int2type 
   {};
 }
+
+
+
+/**
+ * A type that can be used to determine whether two types are equal.
+ * It allows to write code like
+ * @code
+ *   template <typename T>
+ *   void Vector<T>::some_operation () {
+ *     if (types_are_equal<T,double>::value == true)
+ *       call_some_blas_function_for_doubles;
+ *     else
+ *       do_it_by_hand;
+ *   }
+ * @endcode
+ *
+ * This construct is made possible through the existence of a partial
+ * specialization of the class for template arguments that are equal.
+ */
+template <typename T, typename U>
+struct types_are_equal
+{
+    static const bool value = false;
+};
+
+
+/**
+ * Partial specialization of the general template for the case that
+ * both template arguments are equal. See the documentation of the
+ * general template for more information.
+ */
+template <typename T>
+struct types_are_equal<T,T>
+{
+    static const bool value = true;
+};
+
 
 
 // --------------- inline functions -----------------

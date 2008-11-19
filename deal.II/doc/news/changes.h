@@ -247,6 +247,16 @@ inconvenience this causes.
 <ol>
   <li>
   <p>
+  New: The new class types_are_equal allows to write some templates more
+  efficient by allowing to figure out whether certain template types are,
+  for example, equal to double or float (in which case we can use
+  BLAS functions, or could do something else special).
+  <br> 
+  (WB 2008/10/31)
+  </p>
+
+  <li>
+  <p>
   New: The Utilities::reverse_permutation and Utilities::invert_permutation
   compute the reverse and inverse of a given permutation of indices.
   <br> 
