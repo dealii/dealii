@@ -218,7 +218,7 @@ getrf (const int*, const int*, float*, const int*, int*, int*)
 #endif
 
 
-#ifdef HAVE_DGETRF_
+#ifdef HAVE_DGETRI_
 inline void
 getri (const int* n, double* A, const int* lda, int* ipiv, double* inv_work, const int* lwork, int* info)
 {
@@ -233,7 +233,7 @@ getri (const int*, double*, const int*, int*, double*, const int*, int*)
 #endif
 
 
-#ifdef HAVE_SGETRF_
+#ifdef HAVE_SGETRI_
 inline void
 getri (const int* n, float* A, const int* lda, int* ipiv, float* inv_work, const int* lwork, int* info)
 {

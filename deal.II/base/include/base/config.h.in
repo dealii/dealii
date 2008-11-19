@@ -220,6 +220,15 @@
    linking. For the details, look at aclocal.m4 in the top-level directory. */
 #undef DEAL_II_WEAK_LINKAGE_BUG
 
+/* Define to 1 if you have the <Amesos.h> header file. */
+#undef HAVE_AMESOS_H
+
+/* Define to 1 if you have the <AztecOO.h> header file. */
+#undef HAVE_AZTECOO_H
+
+/* Define to 1 if you have the <AztecOO_Operator.h> header file. */
+#undef HAVE_AZTECOO_OPERATOR_H
+
 /* Define if the compiler provides __builtin_expect */
 #undef HAVE_BUILTIN_EXPECT
 
@@ -238,11 +247,41 @@
 /* Define to 1 if you have the `dgetrf_' function. */
 #undef HAVE_DGETRF_
 
+/* Define to 1 if you have the `dgetri_' function. */
+#undef HAVE_DGETRI_
+
 /* Define to 1 if you have the `dgetrs_' function. */
 #undef HAVE_DGETRS_
 
 /* Define to 1 if you have the `dstev_' function. */
 #undef HAVE_DSTEV_
+
+/* Define to 1 if you have the <Epetra_CrsGraph.h> header file. */
+#undef HAVE_EPETRA_CRSGRAPH_H
+
+/* Define to 1 if you have the <Epetra_CrsMatrix.h> header file. */
+#undef HAVE_EPETRA_CRSMATRIX_H
+
+/* Define to 1 if you have the <Epetra_Import.h> header file. */
+#undef HAVE_EPETRA_IMPORT_H
+
+/* Define to 1 if you have the <Epetra_LinearProblem.h> header file. */
+#undef HAVE_EPETRA_LINEARPROBLEM_H
+
+/* Define to 1 if you have the <Epetra_Map.h> header file. */
+#undef HAVE_EPETRA_MAP_H
+
+/* Define to 1 if you have the <Epetra_MultiVector.h> header file. */
+#undef HAVE_EPETRA_MULTIVECTOR_H
+
+/* Define to 1 if you have the <Epetra_Operator.h> header file. */
+#undef HAVE_EPETRA_OPERATOR_H
+
+/* Define to 1 if you have the <Epetra_SerialComm.h> header file. */
+#undef HAVE_EPETRA_SERIALCOMM_H
+
+/* Define to 1 if you have the <Epetra_Vector.h> header file. */
+#undef HAVE_EPETRA_VECTOR_H
 
 /* Define to 1 if you have the `gethostname' function. */
 #undef HAVE_GETHOSTNAME
@@ -260,11 +299,11 @@
 /* Availability of the MA47 algorithm from HSL */
 #undef HAVE_HSL_MA47
 
+/* Define to 1 if you have the <Ifpack.h> header file. */
+#undef HAVE_IFPACK_H
+
 /* Define to 1 if you have the <inttypes.h> header file. */
 #undef HAVE_INTTYPES_H
-
-/* Define to 1 if you have the `amd' library (-lamd). */
-#undef HAVE_LIBAMD
 
 /* Defined if deal.II was configured with BLAS support */
 #undef HAVE_LIBBLAS
@@ -279,7 +318,7 @@
    libstdc++ interface. */
 #undef HAVE_LIBSTDCXX_DEMANGLER
 
-/* UMFPACK is $withval */
+/* UMFPACK is */
 #undef HAVE_LIBUMFPACK
 
 /* Define to 1 if you have the `z' library (-lz). */
@@ -288,8 +327,14 @@
 /* Define to 1 if you have the <memory.h> header file. */
 #undef HAVE_MEMORY_H
 
+/* Define to 1 if you have the <ml_MultiLevelPreconditioner.h> header file. */
+#undef HAVE_ML_MULTILEVELPRECONDITIONER_H
+
 /* Define if you have the rand_r function */
 #undef HAVE_RAND_R
+
+/* Define to 1 if you have the <Sacado.hpp> header file. */
+#undef HAVE_SACADO_HPP
 
 /* Define to 1 if you have the `sgeevx_' function. */
 #undef HAVE_SGEEVX_
@@ -305,6 +350,9 @@
 
 /* Define to 1 if you have the `sgetrf_' function. */
 #undef HAVE_SGETRF_
+
+/* Define to 1 if you have the `sgetri_' function. */
+#undef HAVE_SGETRI_
 
 /* Define to 1 if you have the `sgetrs_' function. */
 #undef HAVE_SGETRS_
@@ -350,6 +398,67 @@
 
 /* Define to 1 if you have the <sys/types.h> header file. */
 #undef HAVE_SYS_TYPES_H
+
+/* Define to 1 if you have the <Teuchos_ParameterList.hpp> header file. */
+#undef HAVE_TEUCHOS_PARAMETERLIST_HPP
+
+/* Define to 1 if you have the <Teuchos_RCP.hpp> header file. */
+#undef HAVE_TEUCHOS_RCP_HPP
+
+/* Define to 1 if you have the <Teuchos_RefCountPtr.hpp> header file. */
+#undef HAVE_TEUCHOS_REFCOUNTPTR_HPP
+
+/* Define to 1 if you have the <Thyra_AztecOOLinearOpWithSolveFactory.hpp>
+   header file. */
+#undef HAVE_THYRA_AZTECOOLINEAROPWITHSOLVEFACTORY_HPP
+
+/* Define to 1 if you have the <Thyra_DefaultBlockedLinearOpDecl.hpp> header
+   file. */
+#undef HAVE_THYRA_DEFAULTBLOCKEDLINEAROPDECL_HPP
+
+/* Define to 1 if you have the <Thyra_DefaultBlockedLinearOp.hpp> header file.
+   */
+#undef HAVE_THYRA_DEFAULTBLOCKEDLINEAROP_HPP
+
+/* Define to 1 if you have the <Thyra_DefaultInverseLinearOp.hpp> header file.
+   */
+#undef HAVE_THYRA_DEFAULTINVERSELINEAROP_HPP
+
+/* Define to 1 if you have the <Thyra_EpetraLinearOp.hpp> header file. */
+#undef HAVE_THYRA_EPETRALINEAROP_HPP
+
+/* Define to 1 if you have the <Thyra_EpetraThyraWrappers.hpp> header file. */
+#undef HAVE_THYRA_EPETRATHYRAWRAPPERS_HPP
+
+/* Define to 1 if you have the <Thyra_InverseLinearOperator.hpp> header file.
+   */
+#undef HAVE_THYRA_INVERSELINEAROPERATOR_HPP
+
+/* Define to 1 if you have the <Thyra_LinearOperatorDecl.hpp> header file. */
+#undef HAVE_THYRA_LINEAROPERATORDECL_HPP
+
+/* Define to 1 if you have the <Thyra_LinearOperatorImpl.hpp> header file. */
+#undef HAVE_THYRA_LINEAROPERATORIMPL_HPP
+
+/* Define to 1 if you have the <Thyra_LinearOpWithSolveFactoryHelpers.hpp>
+   header file. */
+#undef HAVE_THYRA_LINEAROPWITHSOLVEFACTORYHELPERS_HPP
+
+/* Define to 1 if you have the <Thyra_MultiVectorBase.hpp> header file. */
+#undef HAVE_THYRA_MULTIVECTORBASE_HPP
+
+/* Define to 1 if you have the <Thyra_MultiVectorDefaultBase.hpp> header file.
+   */
+#undef HAVE_THYRA_MULTIVECTORDEFAULTBASE_HPP
+
+/* Define to 1 if you have the <Thyra_VectorDecl.hpp> header file. */
+#undef HAVE_THYRA_VECTORDECL_HPP
+
+/* Define to 1 if you have the <Thyra_VectorImpl.hpp> header file. */
+#undef HAVE_THYRA_VECTORIMPL_HPP
+
+/* Define to 1 if you have the <Thyra_VectorSpaceImpl.hpp> header file. */
+#undef HAVE_THYRA_VECTORSPACEIMPL_HPP
 
 /* Define to 1 if you have the <unistd.h> header file. */
 #undef HAVE_UNISTD_H

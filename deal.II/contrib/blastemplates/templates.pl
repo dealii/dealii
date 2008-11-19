@@ -2,7 +2,7 @@
 #    $Id$
 #    Version: $Name$
 #
-#    Copyright (C) 2005, 2006, 2007 by the deal authors
+#    Copyright (C) 2005, 2006, 2007, 2008 by the deal authors
 #
 #    This file is subject to QPL and may not be  distributed
 #    without copyright and license information. Please refer
@@ -23,7 +23,7 @@ print << 'EOT'
 //    This file was automatically generated from blas.h.in
 //    See blastemplates in the deal.II contrib directory
 //
-//    Copyright (C) 2005, 2006, 2007 by the deal authors
+//    Copyright (C) 2005, 2006, 2007, 2008 by the deal authors
 //
 //    This file is subject to QPL and may not be  distributed
 //    without copyright and license information. Please refer

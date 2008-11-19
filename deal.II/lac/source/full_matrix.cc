@@ -23,7 +23,7 @@ DEAL_II_NAMESPACE_OPEN
                                    // inversion since it only works with
                                    // floats and doubles in case LAPACK was
                                    // detected by configure.
-#if defined(HAVE_DGETRF_) && defined (HAVE_SGETRF_) 
+#if defined(HAVE_DGETRF_) && defined (HAVE_SGETRF_) && defined(HAVE_DGETRI_) && defined (HAVE_SGETRI_)
 
 template <>
 void

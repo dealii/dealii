@@ -1156,7 +1156,7 @@ class FullMatrix : public Table<2,number>
 
   private:
 
-#ifdef HAVE_LIBLAPACK
+#if defined(HAVE_DGETRF_) && defined (HAVE_SGETRF_) && defined(HAVE_DGETRI_) && defined (HAVE_SGETRI_)
                                      /**
 				      * The vector storing the
 				      * permutations applied for
