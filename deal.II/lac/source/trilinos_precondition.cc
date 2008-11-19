@@ -513,18 +513,16 @@ namespace TrilinosWrappers
       {
 	ML_Epetra::SetDefaults("SA",parameter_list);
 	parameter_list.set("smoother: type", "Chebyshev");
-	parameter_list.set("smoother: sweeps", 
-			   (int)additional_data.smoother_sweeps);
       }
     else
       {
 	ML_Epetra::SetDefaults("NSSA",parameter_list);
 	parameter_list.set("aggregation: type", "Uncoupled");
 	parameter_list.set("aggregation: block scaling", true);
-	parameter_list.set("smoother: sweeps",
-			   (int)additional_data.smoother_sweeps);
       }
   
+    parameter_list.set("smoother: sweeps", 
+		       (int)additional_data.smoother_sweeps);
     parameter_list.set("smoother: ifpack overlap", 
 		       (int)additional_data.smoother_overlap);
     parameter_list.set("aggregation: threshold", 
