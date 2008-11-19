@@ -2,7 +2,7 @@
 //    $Id$
 //    Version: $Name$
 //
-//    Copyright (C) 1999, 2000, 2001, 2002, 2003, 2004, 2005, 2006, 2007 by the deal.II authors
+//    Copyright (C) 1999, 2000, 2001, 2002, 2003, 2004, 2005, 2006, 2007, 2008 by the deal.II authors
 //
 //    This file is subject to QPL and may not be  distributed
 //    without copyright and license information. Please refer
@@ -906,7 +906,15 @@ class FullMatrix : public Table<2,number>
 				      * well-behaved for positive
 				      * definite matrices, but be
 				      * aware of round-off errors in
-				      * the indefinite case.
+				      * the indefinite case. 
+				      *
+				      * In case deal.II was configured with
+				      * LAPACK, the functions Xgetrf and
+				      * Xgetri build an LU factorization and
+				      * invert the matrix upon that
+				      * factorization, providing best
+				      * performance up to matrices with a
+				      * few hundreds rows and columns.
 				      *
 				      * The numerical effort to invert
 				      * an <tt>n x n</tt> matrix is of the
@@ -1145,6 +1153,26 @@ class FullMatrix : public Table<2,number>
 				     //@}
     
     friend class Accessor;
+
+  private:
+
+#ifdef HAVE_LIBLAPACK
+                                     /**
+				      * The vector storing the
+				      * permutations applied for
+				      * pivoting in the
+				      * LU-factorization.
+				      */
+    std::vector<int> ipiv;
+    
+				     /**
+				      * Workspace for calculating the
+				      * inverse matrix from an LU
+				      * factorization.
+				      */
+    std::vector<number> inv_work;
+#endif
+
 };
 
 /**@}*/

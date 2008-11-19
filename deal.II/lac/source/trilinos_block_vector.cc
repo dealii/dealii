@@ -231,9 +231,7 @@ namespace TrilinosWrappers
       components.resize(n_blocks());
   
     for (unsigned int i=0;i<n_blocks();++i)
-      components[i].reinit(v.block(i), true, false);
-      
-    collect_sizes();
+      components[i] = v.block(i);
   }
 
 

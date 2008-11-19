@@ -51,9 +51,9 @@ void sgetrf_ (const int* m, const int* n, float* A,
 	      const int* lda, int* ipiv, int* info);
 // Invert matrix from LU factorization
 void dgetri_ (const int* n, double* A, const int* lda, 
-	      int* ipiv, double* iwork, const int* lwork, int* info);
+	      int* ipiv, double* inv_work, const int* lwork, int* info);
 void sgetri_ (const int* n, float* A, const int* lda, 
-	      int* ipiv, float* iwork, const int* lwork, int* info);
+	      int* ipiv, float* inv_work, const int* lwork, int* info);
 // Apply forward/backward substitution to LU factorization
 void dgetrs_ (const char* trans, const int* n, const int* nrhs,
 	      const double* A, const int* lda, const int* ipiv,
@@ -218,32 +218,32 @@ getrf (const int*, const int*, float*, const int*, int*, int*)
 #endif
 
 
-#ifdef HAVE_DGETRI_
+#ifdef HAVE_DGETRF_
 inline void
-getri (const int* n, double* A, const int* lda, int* ipiv, double* iwork, const int* lwork, int* info)
+getri (const int* n, double* A, const int* lda, int* ipiv, double* inv_work, const int* lwork, int* info)
 {
-  dgetri_ (n,A,lda,ipiv,iwork,lwork,info);
+  dgetri_ (n,A,lda,ipiv,inv_work,lwork,info);
 }
 #else
 inline void
 getri (const int*, double*, const int*, int*, double*, const int*, int*)
 {
-  LAPACKSupport::ExcMissing("dgetrf");
+  LAPACKSupport::ExcMissing("dgetri");
 }
 #endif
 
 
-#ifdef HAVE_SGETRI_
+#ifdef HAVE_SGETRF_
 inline void
-getri (const int* n, float* A, const int* lda, int* ipiv, float* iwork, const int* lwork, int* info)
+getri (const int* n, float* A, const int* lda, int* ipiv, float* inv_work, const int* lwork, int* info)
 {
-  sgetri_ (n,A,lda,ipiv,iwork,lwork,info);
+  sgetri_ (n,A,lda,ipiv,inv_work,lwork,info);
 }
 #else
 inline void
 getri (const int*, float*, const int*, int*, float*, const int*, int*)
 {
-  LAPACKSupport::ExcMissing("sgetrf");
+  LAPACKSupport::ExcMissing("sgetri");
 }
 #endif
 

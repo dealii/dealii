@@ -383,7 +383,7 @@ class LAPACKFullMatrix : public TransposeTable<number>
 				      * inverse matrix from an LU
 				      * factorization.
 				      */
-    std::vector<number> iwork;
+    std::vector<number> inv_work;
     
 				     /**
 				      * Real parts of

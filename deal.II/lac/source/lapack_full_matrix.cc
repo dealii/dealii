@@ -197,8 +197,8 @@ LAPACKFullMatrix<number>::invert()
       Assert(info == 0, LACExceptions::ExcSingular());
     }
 
-  iwork.resize (mm);
-  getri(&mm, values, &mm, &ipiv[0], &iwork[0], &mm, &info);
+  inv_work.resize (mm);
+  getri(&mm, values, &mm, &ipiv[0], &inv_work[0], &mm, &info);
 
   Assert(info >= 0, ExcInternalError());
   Assert(info == 0, LACExceptions::ExcSingular());

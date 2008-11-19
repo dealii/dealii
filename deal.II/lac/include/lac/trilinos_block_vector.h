@@ -836,7 +836,11 @@ namespace TrilinosWrappers
                     :
                     BlockVectorBase<Vector > ()
   {
-    reinit(v);
+    this->components.resize (v.n_blocks());
+    this->block_indices = v.block_indices;
+    
+    for (unsigned int i=0; i<this->n_blocks(); ++i)
+      this->components[i] = v.components[i];
   }
 
 
