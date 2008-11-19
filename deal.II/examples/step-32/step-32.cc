@@ -567,7 +567,6 @@ void BoussinesqFlowProblem<dim>::setup_dofs ()
 
   {
     stokes_dof_handler.distribute_dofs (stokes_fe);
-    DoFRenumbering::Cuthill_McKee (stokes_dof_handler);
     DoFRenumbering::subdomain_wise (stokes_dof_handler);
     DoFRenumbering::component_wise (stokes_dof_handler, stokes_sub_blocks);
     
@@ -583,7 +582,6 @@ void BoussinesqFlowProblem<dim>::setup_dofs ()
   }
   {
     temperature_dof_handler.distribute_dofs (temperature_fe);
-    DoFRenumbering::Cuthill_McKee (temperature_dof_handler);
     DoFRenumbering::subdomain_wise (temperature_dof_handler);
 
     temperature_constraints.clear ();

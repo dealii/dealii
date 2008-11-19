@@ -409,10 +409,12 @@ namespace LinearSolvers
 				   // Replacing <i>P</i> by $\tilde{P}$
 				   // keeps that spirit alive: the product
 				   // $P^{-1} A$ will still be close to a
-				   // matrix with eigenvalues 1, which lets
-				   // us hope to be able to get a number of
-				   // GMRES iterations that does not depend
-				   // on the problem size.
+				   // matrix with eigenvalues 1 with a
+				   // distribution that does not depend on
+				   // the problem size. This lets us hope to
+				   // be able to get a number of GMRES
+				   // iterations that is problem-size
+				   // independent.
 				   //
 				   // The deal.II users who have already
 				   // gone through the step-20 and step-22
@@ -1037,17 +1039,26 @@ compute_viscosity (const std::vector<double>          &old_temperature,
 				 // program. Its basic operations are similar
 				 // to what we do in step-22.
 				 // 
-				 // The body of the function first enumerates
-				 // all degrees of freedom for the Stokes and
-				 // temperature systems. In either case, it
-				 // then renumbers them according to the
-				 // Cuthill-McKee algorithm to improve the
-				 // behavior of preconditioners; for the
-				 // Stokes part, degrees of freedom are then
-				 // also renumbered to ensure that velocities
+				 // The body of the function first
+				 // enumerates all degrees of freedom for
+				 // the Stokes and temperature systems. For
+				 // the Stokes part, degrees of freedom are
+				 // then sorted to ensure that velocities
 				 // precede pressure DoFs so that we can
 				 // partition the Stokes matrix into a
-				 // $2\times 2$ matrix.
+				 // $2\times 2$ matrix. As a difference to
+				 // step-22, we do not perform any
+				 // additional DoF renumbering. In that
+				 // program, it paid off since our solver
+				 // was heavily dependent on ILU's, whereas
+				 // we use AMG here which is not sensitive
+				 // to the DoF numbering. The IC
+				 // preconditioner for the inversion of the
+				 // pressure mass matrix would of course
+				 // take advantage of a Cuthill-McKee like
+				 // renumbering, but its costs are low
+				 // compared to the velocity portion, so the
+				 // additional work does not pay off.
 				 // 
 				 // We then proceed with the generation of the
 				 // hanging node constraints that arise from
@@ -1077,7 +1088,6 @@ void BoussinesqFlowProblem<dim>::setup_dofs ()
   
   {
     stokes_dof_handler.distribute_dofs (stokes_fe);
-    DoFRenumbering::Cuthill_McKee (stokes_dof_handler);
     DoFRenumbering::component_wise (stokes_dof_handler, stokes_sub_blocks);
     
     stokes_constraints.clear ();
@@ -1092,7 +1102,6 @@ void BoussinesqFlowProblem<dim>::setup_dofs ()
   }
   {
     temperature_dof_handler.distribute_dofs (temperature_fe);
-    DoFRenumbering::Cuthill_McKee (temperature_dof_handler);
 
     temperature_constraints.clear ();
     DoFTools::make_hanging_node_constraints (temperature_dof_handler,
@@ -2050,29 +2059,28 @@ void BoussinesqFlowProblem<dim>::assemble_temperature_system ()
       stokes_fe_values.get_function_values (old_stokes_solution,
 					    old_old_stokes_values);
 
-				       // Next, we calculate the
-				       // artificial viscosity for
-				       // stabilization according to the
-				       // discussion in the introduction
-				       // using the dedicated
+				       // Next, we calculate the artificial
+				       // viscosity for stabilization
+				       // according to the discussion in the
+				       // introduction using the dedicated
 				       // function. With that at hand, we
-				       // can get into the loop
-				       // over quadrature points and local
-				       // rhs vector components. The terms
-				       // here are quite lenghty, but
-				       // their definition follows the
-				       // time-discrete system developed
-				       // in the introduction of this
+				       // can get into the loop over
+				       // quadrature points and local rhs
+				       // vector components. The terms here
+				       // are quite lenghty, but their
+				       // definition follows the
+				       // time-discrete system developed in
+				       // the introduction of this
 				       // program. The BDF-2 scheme needs
 				       // one more term from the old time
 				       // step (and involves more
 				       // complicated factors) than the
-				       // backward Euler scheme that is
-				       // used for the first time
-				       // step. When all this is done, we
-				       // distribute the local vector into
-				       // the global one (including
-				       // hanging node constraints).
+				       // backward Euler scheme that is used
+				       // for the first time step. When all
+				       // this is done, we distribute the
+				       // local vector into the global one
+				       // (including hanging node
+				       // constraints).
       const double nu
 	= compute_viscosity (old_temperature_values,
 			     old_old_temperature_values,
@@ -2269,33 +2277,33 @@ void BoussinesqFlowProblem<dim>::solve ()
 				   // Next we set up the temperature system
 				   // and the right hand side using the
 				   // function
-				   // <code>assemble_temperature_system()</code>. Knowing
-				   // the matrix and right hand side of the
-				   // temperature equation, we set up a
-				   // preconditioner and a solver. The
+				   // <code>assemble_temperature_system()</code>.
+				   // Knowing the matrix and right hand side
+				   // of the temperature equation, we set up
+				   // a preconditioner and a solver. The
 				   // temperature matrix is a mass matrix
 				   // (with eigenvalues around one) plus a
-				   // Laplace matrix (with eigenvalues between
-				   // zero and $ch^{-2}$) times a small number
-				   // proportional to the time step
-				   // $k_n$. Hence, the resulting symmetric
-				   // and positive definite matrix has
-				   // eigenvalues in the range
+				   // Laplace matrix (with eigenvalues
+				   // between zero and $ch^{-2}$) times a
+				   // small number proportional to the time
+				   // step $k_n$. Hence, the resulting
+				   // symmetric and positive definite matrix
+				   // has eigenvalues in the range
 				   // $[1,1+k_nh^{-2}]$ (up to
 				   // constants). This matrix is only
 				   // moderately ill conditioned even for
-				   // small mesh sizes and we get a reasonably
-				   // good preconditioner by simple means, for
-				   // example SSOR with a relaxation
-				   // parameter of 1.2. As a solver, we choose
-				   // the conjugate gradient method CG. As
-				   // before, we tell the solver to use
-				   // Trilinos vectors via the template
-				   // argument
+				   // small mesh sizes and we get a
+				   // reasonably good preconditioner by
+				   // simple means, for example SSOR with a
+				   // relaxation parameter of 1.2. As a
+				   // solver, we choose the conjugate
+				   // gradient method CG. As before, we tell
+				   // the solver to use Trilinos vectors via
+				   // the template argument
 				   // <code>TrilinosWrappers::Vector</code>.
-				   // Finally, we solve,
-				   // distribute the hanging node constraints
-				   // and write out the number of iterations.
+				   // Finally, we solve, distribute the
+				   // hanging node constraints and write out
+				   // the number of iterations.
   old_time_step = time_step;    
   time_step = 1./(1.6*dim*std::sqrt(1.*dim)) /
 	      temperature_degree *
@@ -2407,52 +2415,51 @@ void BoussinesqFlowProblem<dim>::output_results ()  const
   Vector<double> joint_solution (joint_dof_handler.n_dofs());
 
 				   // Unfortunately, there is no
-				   // straight-forward relation that tells us
-				   // how to sort Stokes and temperature
-				   // vector into the joint vector. The way we
-				   // can get around this trouble is to rely
-				   // on the information collected in the
-				   // FESystem. For each dof in a cell, the
-				   // joint finite element knows to which
-				   // equation component (velocity component,
-				   // pressure, or temperature) it belongs
-				   // &ndash; that's the information we need!
-				   // So we step through all cells (with
-				   // iterators into all three DoFHandlers
-				   // moving in synch), and for each joint
-				   // cell dof, we read out that component
-				   // using the
+				   // straight-forward relation that tells
+				   // us how to sort Stokes and temperature
+				   // vector into the joint vector. The way
+				   // we can get around this trouble is to
+				   // rely on the information collected in
+				   // the FESystem. For each dof in a cell,
+				   // the joint finite element knows to
+				   // which equation component (velocity
+				   // component, pressure, or temperature)
+				   // it belongs &ndash; that's the
+				   // information we need!  So we step
+				   // through all cells (with iterators into
+				   // all three DoFHandlers moving in
+				   // synch), and for each joint cell dof,
+				   // we read out that component using the
 				   // FiniteElement::system_to_base_index
-				   // function (see there for a description of
-				   // what the various parts of its return
-				   // value contain). We also need to keep
-				   // track whether we're on a Stokes dof or a
-				   // temperature dof, which is contained in
-				   // <code>joint_fe.system_to_base_index(i).first.first</code>. Eventually,
-				   // the dof_indices data structures on
-				   // either of the three systems tell us how
-				   // the relation between global vector and
-				   // local dofs looks like on the present
-				   // cell, which concludes this tedious work.
+				   // function (see there for a description
+				   // of what the various parts of its
+				   // return value contain). We also need to
+				   // keep track whether we're on a Stokes
+				   // dof or a temperature dof, which is
+				   // contained in
+				   // <code>joint_fe.system_to_base_index(i).first.first</code>.
+				   // Eventually, the dof_indices data
+				   // structures on either of the three
+				   // systems tell us how the relation
+				   // between global vector and local dofs
+				   // looks like on the present cell, which
+				   // concludes this tedious work.
 				   // 
-				   // There's one thing worth
-				   // remembering when looking at the
-				   // output: In our algorithm, we
-				   // first solve for the Stokes
-				   // system at time level <i>n-1</i>
-				   // in each time step and then for
-				   // the temperature at time level
-				   // <i>n</i> using the previously
-				   // computed velocity. These are the
-				   // two components we join for
-				   // output, so these two parts of
-				   // the output file are actually
-				   // misaligned by one time
-				   // step. Since we consider
-				   // graphical output as only a
-				   // qualititative means to
-				   // understand a solution, we ignore
-				   // this $\mathcal{O}(h)$ error.
+				   // There's one thing worth remembering
+				   // when looking at the output: In our
+				   // algorithm, we first solve for the
+				   // Stokes system at time level <i>n-1</i>
+				   // in each time step and then for the
+				   // temperature at time level <i>n</i>
+				   // using the previously computed
+				   // velocity. These are the two components
+				   // we join for output, so these two parts
+				   // of the output file are actually
+				   // misaligned by one time step. Since we
+				   // consider graphical output as only a
+				   // qualititative means to understand a
+				   // solution, we ignore this
+				   // $\mathcal{O}(h)$ error.
   {
     std::vector<unsigned int> local_joint_dof_indices (joint_fe.dofs_per_cell);
     std::vector<unsigned int> local_stokes_dof_indices (stokes_fe.dofs_per_cell);
@@ -2493,30 +2500,27 @@ void BoussinesqFlowProblem<dim>::output_results ()  const
       }
   }
   
-				   // Next, we proceed as we've done
-				   // in step-22. We create solution
-				   // names (that are going to appear
-				   // in the visualization program for
-				   // the individual components), and
-				   // attach the joint dof handler to
-				   // a DataOut object. The first
-				   // <code>dim</code> components are the
-				   // vector velocity, and then we
-				   // have pressure and
-				   // temperature. This information is
-				   // read out using the
-				   // DataComponentInterpretation
-				   // helper class. Next, we attach
-				   // the solution values together
-				   // with the names of its components
-				   // to the output object, and build
-				   // patches according to the degree
-				   // of freedom, which are (sub-)
-				   // elements that describe the data
-				   // for visualization
-				   // programs. Finally, we set a file
-				   // name (that includes the time
-				   // step number) and write the vtk
+				   // Next, we proceed as we've done in
+				   // step-22. We create solution names
+				   // (that are going to appear in the
+				   // visualization program for the
+				   // individual components), and attach the
+				   // joint dof handler to a DataOut
+				   // object. The first <code>dim</code>
+				   // components are the vector velocity,
+				   // and then we have pressure and
+				   // temperature. This information is read
+				   // out using the
+				   // DataComponentInterpretation helper
+				   // class. Next, we attach the solution
+				   // values together with the names of its
+				   // components to the output object, and
+				   // build patches according to the degree
+				   // of freedom, which are (sub-) elements
+				   // that describe the data for
+				   // visualization programs. Finally, we
+				   // set a file name (that includes the
+				   // time step number) and write the vtk
 				   // file.
   std::vector<std::string> joint_solution_names (dim, "velocity");
   joint_solution_names.push_back ("p");
