@@ -23,7 +23,7 @@ DEAL_II_NAMESPACE_OPEN
                                    // inversion since it only works with
                                    // floats and doubles in case LAPACK was
                                    // detected by configure.
-#ifdef HAVE_LIBLAPACK
+#if defined(HAVE_DGETRF_) && defined (HAVE_SGETRF_) 
 
 template <>
 void
@@ -115,9 +115,7 @@ FullMatrix<double>::gauss_jordan ()
                                    // Use the LAPACK function getri for
                                    // calculating the actual inverse using
                                    // the LU factorization.
-  std::cout << " blas";
   getri(&nn, values, &nn, &ipiv[0], &inv_work[0], &nn, &info);
-  std::cout << " 2 mal" << std::endl;
 
   Assert(info >= 0, ExcInternalError());
   Assert(info == 0, LACExceptions::ExcSingular());
