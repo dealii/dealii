@@ -1235,6 +1235,43 @@ FullMatrix<number>::print_formatted (
 }
 
 
+namespace internal
+{
+				   // a namespace into which we import
+				   // the global definitions of the
+				   // LAPACK functions getrf for
+				   // various data types and add
+				   // general templates for all other
+				   // types. this allows to call the
+				   // getrf function for all data
+				   // types but generated an exception
+				   // if something is called for a
+				   // data type not supported by
+				   // LAPACK.
+  namespace getrf_switch
+  {
+    using ::getrf;
+
+    template <typename T>
+    void
+    getrf (const int*, const int*, T*, const int*, int*, int*)
+    {
+      Assert (false, LAPACKSupport::ExcMissing("dgetr for this data type"));
+    }
+    
+
+    using ::getri;
+
+    template <typename T>
+    void
+    getri (const int*, T*, const int*, int*, T*, const int*, int*)
+    {
+      Assert (false, LAPACKSupport::ExcMissing("dgetri for this data type"));
+    }    
+  }
+}
+
+
 
 template <typename number>
 void
@@ -1272,21 +1309,25 @@ FullMatrix<number>::gauss_jordan ()
 				       // A^{-1}.
 
       const int nn = this->n();
-      ipiv.resize(nn);
+
+				       // workspace for permutations
+      std::vector<int> ipiv(nn);
       int info;
 
 				       // Use the LAPACK function getrf for 
 				       // calculating the LU factorization.
-      getrf(&nn, &nn, this->data(), &nn, &ipiv[0], &info);
+      internal::getrf_switch::getrf(&nn, &nn, this->val, &nn, &ipiv[0], &info);
 
       Assert(info >= 0, ExcInternalError());
       Assert(info == 0, LACExceptions::ExcSingular());
 
-      inv_work.resize (nn);
+				       // scratch array
+      std::vector<number> inv_work (nn);
+      
 				       // Use the LAPACK function getri for
 				       // calculating the actual inverse using
 				       // the LU factorization.
-      getri(&nn, values, &nn, &ipiv[0], &inv_work[0], &nn, &info);
+      internal::getrf_switch::getri(&nn, this->val, &nn, &ipiv[0], &inv_work[0], &nn, &info);
 
       Assert(info >= 0, ExcInternalError());
       Assert(info == 0, LACExceptions::ExcSingular());

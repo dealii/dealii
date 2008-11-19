@@ -1153,26 +1153,6 @@ class FullMatrix : public Table<2,number>
 				     //@}
     
     friend class Accessor;
-
-  private:
-
-#if defined(HAVE_DGETRF_) && defined (HAVE_SGETRF_) && defined(HAVE_DGETRI_) && defined (HAVE_SGETRI_)
-                                     /**
-				      * The vector storing the
-				      * permutations applied for
-				      * pivoting in the
-				      * LU-factorization.
-				      */
-    std::vector<int> ipiv;
-    
-				     /**
-				      * Workspace for calculating the
-				      * inverse matrix from an LU
-				      * factorization.
-				      */
-    std::vector<number> inv_work;
-#endif
-
 };
 
 /**@}*/
