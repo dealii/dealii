@@ -283,33 +283,11 @@ class GridIn
     
     				     /**
 				      * Read grid data from an msh
-				      * file.
-				      *
-				      * The text file read consists of
-				      * two blocks. The first lists
-				      * the positions of the mesh
-				      * nodes and has the format
-				      *
-				      * <code><pre>
-				      * \$NOD
-				      * @<n@>
-				      * 1 @<x1@> @<y1@> @<z1@>
-				      * 2 @<x2@> @<y2@> @<z2@>
-				      * ...
-				      * n @<xn@> @<yn@> @<zn@>
-				      * \$ENDNOD
-				      * </pre></code>
-				      *
-				      * The second block lists the
-				      * connectivity and material id's
-				      * of the cells and faces. It is
-				      * enclosed by <tt>\$ELM</tt> and
-				      * <tt>\$ENDELM</tt>
-				      * keywords. deal.II can handle
-				      * elements which are lines,
-				      * quadrilaterals or hexahedra
-				      * only. For convenience, element
-				      * type 15 (points) are ignored.
+				      * file, either version 1 or
+				      * version 2 of that file
+				      * format. The GMSH formats are
+				      * documented at
+				      * http://www.geuz.org/gmsh/ .
 				      *
 				      * @note The input function of
 				      * deal.II does not distinguish
