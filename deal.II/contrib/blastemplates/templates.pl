@@ -91,7 +91,7 @@ while(<>)
 	$templates .= "\n\n#ifdef HAVE_D$capname\_";
 	$templates .= "\ninline $type\n$name ($args)\n{\n  d$name\_ ($args2);\n}\n";
 	$templates .= "#else\ninline $type\n$name ($args0)\n";
-	$templates .= "{\n  LAPACKSupport::ExcMissing(\"d$name\");\n}\n#endif\n";
+	$templates .= "{\n  Assert (false, LAPACKSupport::ExcMissing(\"d$name\"));\n}\n#endif\n";
 	
 	$args =~ s/double/float/g;
 	$args0 =~ s/double/float/g;
@@ -99,7 +99,7 @@ while(<>)
 	$templates .= "\n\n#ifdef HAVE_S$capname\_";
 	$templates .= "\ninline $type\n$name ($args)\n{\n  s$name\_ ($args2);\n}\n";
 	$templates .= "#else\ninline $type\n$name ($args0)\n";
-	$templates .= "{\n  LAPACKSupport::ExcMissing(\"s$name\");\n}\n#endif\n";
+	$templates .= "{\n  Assert (false, LAPACKSupport::ExcMissing(\"s$name\"));\n}\n#endif\n";
     }
 }
 
