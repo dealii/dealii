@@ -26,11 +26,18 @@ debug-mode = on
 D = ../../
 
 
-# The last field specifies the names of data and other files that
+# The fourth field specifies the names of data and other files that
 # shall be deleted when calling `make clean'. Object and backup files,
 # executables and the like are removed anyway. Here, we give a list of
 # files in the various output formats that deal.II supports.
 clean-up-files = *gmv *gnuplot *gpl *eps *pov *vtk
+
+
+
+# The last field specifies the name of the input file that passes the
+# parameters to the program.
+run-parameters = input.prm
+
 
 
 
@@ -115,7 +122,7 @@ $(target) : $(libraries)
 # following rule:
 run: $(target)
 	@echo ============================ Running $<
-	@./$(target)$(EXEEXT)
+	@./$(target)$(EXEEXT) $(run-parameters)
 
 
 # As a last rule to the `make' program, we define what to do when

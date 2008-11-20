@@ -143,21 +143,11 @@ clean:
 	@$(CXX) $(CXXFLAGS.o) -c $< -o $@
 
 
-# A rule made to ensure that UMFPACK is indeed configured
-ifeq ($(USE_CONTRIB_UMFPACK),yes)
-UMFPACK-check:
-else
-UMFPACK-check:
-	@echo "This program can only be run if deal.II is configured with UMFPACK support"
-	@false
-endif
-
-
 
 # The following statement tells make that the rules `run' and `clean'
 # are not expected to produce files of the same name as Makefile rules
 # usually do.
-.PHONY: run clean UMFPACK-check
+.PHONY: run clean
 
 
 # Finally there is a rule which you normally need not care much about:
