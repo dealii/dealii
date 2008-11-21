@@ -1241,8 +1241,6 @@ namespace TrilinosWrappers
   SparseMatrix::vmult_add (VectorBase       &dst,
 			   const VectorBase &src) const
   {
-    Assert (&src != &dst, ExcSourceEqualsDestination());
-
     temp_vector.reinit(dst);
 
     vmult (dst, src);
@@ -1255,8 +1253,6 @@ namespace TrilinosWrappers
   SparseMatrix::Tvmult_add (VectorBase       &dst,
 			    const VectorBase &src) const
   {
-    Assert (&src != &dst, ExcSourceEqualsDestination());
-
     temp_vector.reinit(dst);
 
     vmult (dst, src);
