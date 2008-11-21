@@ -328,13 +328,7 @@ namespace TrilinosWrappers
 					* vector, i.e., whether
 					* compress() has already been
 					* called after an operation
-					* requiring data exchange. Does
-					* only return non-true values
-					* when used in <tt>debug</tt>
-					* mode, since it is quite
-					* expensive to keep track of all
-					* operations that lead to a
-					* need for compress().
+					* requiring data exchange.
 					*/
       bool is_compressed () const;
 
