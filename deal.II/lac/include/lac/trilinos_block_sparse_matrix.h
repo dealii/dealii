@@ -20,6 +20,7 @@
 #include <lac/block_sparse_matrix.h>
 #include <lac/trilinos_sparse_matrix.h>
 #include <lac/trilinos_block_vector.h>
+#include <lac/full_matrix.h>
 #include <lac/exceptions.h>
 
 #include <cmath>
@@ -290,6 +291,95 @@ namespace TrilinosWrappers
                                         * matrix. 
                                         */
       unsigned int n_nonzero_elements () const;
+
+                                       /**
+                                        * Set the element (<i>i,j</i>)
+                                        * to @p value.
+					*/
+      void set (const unsigned int i,
+                const unsigned int j,
+                const TrilinosScalar value);
+
+                                       /**
+                                        * Set all elements given in a
+                                        * FullMatrix<double> into the sparse
+                                        * matrix, according to row_indices
+                                        * and col_indices.
+					*/
+      void set (const std::vector<unsigned int>  &row_indices,
+		const std::vector<unsigned int>  &col_indices,
+		const FullMatrix<TrilinosScalar> &full_matrix);
+
+                                       /**
+                                        * Set several elements in the
+                                        * specified row of the matrix with
+                                        * column indices as given by
+                                        * <tt>col_indices</tt> to the
+                                        * respective value.
+					*/
+      void set (const unsigned int                row,
+		const std::vector<unsigned int>   &col_indices,
+		const std::vector<TrilinosScalar> &values);
+
+                                       /**
+                                        * Set several elements to values
+                                        * given by <tt>values</tt> at
+                                        * locations specified by row_indices
+                                        * and col_indices in the sparse
+                                        * matrix. The array <tt>values</tt>
+                                        * is assumed to store data in C
+                                        * style, i.e., row-wise.
+					*/
+      void set (const unsigned int    n_rows,
+		const unsigned int   *row_indices,
+		const unsigned int    n_cols,
+		const unsigned int   *col_indices,
+		const TrilinosScalar *values);
+
+                                       /**
+                                        * Add @p value to the element
+                                        * (<i>i,j</i>).
+                                        */
+      void add (const unsigned int i,
+                const unsigned int j,
+                const TrilinosScalar value);
+
+                                       /**
+                                        * Add all elements in a FullMatrix
+                                        * <tt>full_matrix</tt> (cell matrix)
+                                        * into the sparse matrix, at
+                                        * locations according to row_indices
+                                        * and col_indices.
+					*/
+      void add (const std::vector<unsigned int>  &row_indices,
+		const std::vector<unsigned int>  &col_indices,
+		const FullMatrix<TrilinosScalar> &full_matrix);
+
+                                       /**
+                                        * Set several elements in the
+                                        * specified row of the matrix with
+                                        * column indices as given by
+                                        * <tt>col_indices</tt> to the
+                                        * respective value.
+					*/
+      void add (const unsigned int                row,
+		const std::vector<unsigned int>   &col_indices,
+		const std::vector<TrilinosScalar> &values);
+
+                                       /**
+                                        * Set several elements to values
+                                        * given by <tt>values</tt> at
+                                        * locations specified by row_indices
+                                        * and col_indices in the sparse
+                                        * matrix. The array <tt>values</tt>
+                                        * is assumed to store data in C
+                                        * style, i.e., row-wise.
+					*/
+      void add (const unsigned int    n_rows,
+		const unsigned int   *row_indices,
+		const unsigned int    n_cols,
+		const unsigned int   *col_indices,
+		const TrilinosScalar *values);
 
                                        /**
                                         * Matrix-vector multiplication:
@@ -623,6 +713,14 @@ namespace TrilinosWrappers
                       << "The blocks [" << arg1 << ',' << arg2 << "] and ["
                       << arg3 << ',' << arg4 << "] have differing column numbers.");
 				       ///@}
+
+    private:
+                                       /**
+					* A few temporary vectors for
+					* writing data from local to global
+					* matrices.
+					*/
+      std::vector<unsigned int> block_col_indices, local_row_length, local_col_indices;
   };
 
 

@@ -17,6 +17,7 @@
 #include <base/config.h>
 #include <base/subscriptor.h>
 #include <lac/sparse_matrix.h>
+#include <lac/full_matrix.h>
 #include <lac/exceptions.h>
 #include <lac/trilinos_vector_base.h>
 
@@ -867,6 +868,75 @@ namespace TrilinosWrappers
                 const TrilinosScalar value);
 
                                        /**
+                                        * Set all elements given in a
+                                        * FullMatrix<double> into the sparse
+                                        * matrix, according to row_indices
+                                        * and col_indices.
+					*
+					* This function is able to insert
+					* new elements into the matrix as
+					* long as compress() has not been
+					* called, so the sparsity pattern
+					* will be extended. When compress()
+					* is called for the first time, then
+					* this is no longer possible and an
+					* insertion of elements at positions
+					* which have not been initialized
+					* will throw an exception.
+					*/
+      void set (const std::vector<unsigned int>  &row_indices,
+		const std::vector<unsigned int>  &col_indices,
+		const FullMatrix<TrilinosScalar> &full_matrix);
+
+                                       /**
+                                        * Set several elements in the
+                                        * specified row of the matrix with
+                                        * column indices as given by
+                                        * <tt>col_indices</tt> to the
+                                        * respective value.
+					*
+					* This function is able to insert
+					* new elements into the matrix as
+					* long as compress() has not been
+					* called, so the sparsity pattern
+					* will be extended. When compress()
+					* is called for the first time, then
+					* this is no longer possible and an
+					* insertion of elements at positions
+					* which have not been initialized
+					* will throw an exception.
+					*/
+      void set (const unsigned int                row,
+		const std::vector<unsigned int>   &col_indices,
+		const std::vector<TrilinosScalar> &values);
+
+                                       /**
+                                        * Set several elements to values
+                                        * given by <tt>values</tt> at
+                                        * locations specified by row_indices
+                                        * and col_indices in the sparse
+                                        * matrix. The array <tt>values</tt>
+                                        * is assumed to store data in C
+                                        * style, i.e., row-wise.
+					*
+					* This function is able to insert
+					* new elements into the matrix as
+					* long as compress() has not been
+					* called, so the sparsity pattern
+					* will be extended. When compress()
+					* is called for the first time, then
+					* this is no longer possible and an
+					* insertion of elements at positions
+					* which have not been initialized
+					* will throw an exception.
+					*/
+      void set (const unsigned int    n_rows,
+		const unsigned int   *row_indices,
+		const unsigned int    n_cols,
+		const unsigned int   *col_indices,
+		const TrilinosScalar *values);
+
+                                       /**
                                         * Add @p value to the element
                                         * (<i>i,j</i>).
 					*
@@ -884,7 +954,71 @@ namespace TrilinosWrappers
       void add (const unsigned int i,
                 const unsigned int j,
                 const TrilinosScalar value);
-      
+
+                                       /**
+                                        * Add all elements in a FullMatrix
+                                        * <tt>full_matrix</tt> (cell matrix)
+                                        * into the sparse matrix, at
+                                        * locations according to row_indices
+                                        * and col_indices.
+					*
+					* Just as the respective call in
+					* deal.II SparseMatrix<Number>
+					* class (but in contrast to the
+					* situation for PETSc based
+					* matrices), this function
+					* throws an exception if an
+					* entry does not exist in the
+					* sparsity pattern.
+					*/
+      void add (const std::vector<unsigned int>  &row_indices,
+		const std::vector<unsigned int>  &col_indices,
+		const FullMatrix<TrilinosScalar> &full_matrix);
+
+                                       /**
+                                        * Set several elements in the
+                                        * specified row of the matrix with
+                                        * column indices as given by
+                                        * <tt>col_indices</tt> to the
+                                        * respective value.
+					*
+					* Just as the respective call in
+					* deal.II SparseMatrix<Number>
+					* class (but in contrast to the
+					* situation for PETSc based
+					* matrices), this function
+					* throws an exception if an
+					* entry does not exist in the
+					* sparsity pattern.
+					*/
+      void add (const unsigned int                row,
+		const std::vector<unsigned int>   &col_indices,
+		const std::vector<TrilinosScalar> &values);
+
+                                       /**
+                                        * Set several elements to values
+                                        * given by <tt>values</tt> at
+                                        * locations specified by row_indices
+                                        * and col_indices in the sparse
+                                        * matrix. The array <tt>values</tt>
+                                        * is assumed to store data in C
+                                        * style, i.e., row-wise.
+					*
+					* Just as the respective call in
+					* deal.II SparseMatrix<Number>
+					* class (but in contrast to the
+					* situation for PETSc based
+					* matrices), this function
+					* throws an exception if an
+					* entry does not exist in the
+					* sparsity pattern.
+					*/
+      void add (const unsigned int    n_rows,
+		const unsigned int   *row_indices,
+		const unsigned int    n_cols,
+		const unsigned int   *col_indices,
+		const TrilinosScalar *values);
+
                                        /**
                                         * Multiply the entire matrix
                                         * by a fixed factor.

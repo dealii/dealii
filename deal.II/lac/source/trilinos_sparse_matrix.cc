@@ -669,97 +669,124 @@ namespace TrilinosWrappers
 	    ExcMessage("The given value is not finite but either "
 		       "infinite or Not A Number (NaN)"));
 
-				        // If the last thing we did was an
-				        // addition, we need to do all the
-				        // data exchange.
+    set (1, &i, 1, &j, &value);
+  }
+
+
+
+  void
+  SparseMatrix::set (const std::vector<unsigned int>  &row_indices,
+		     const std::vector<unsigned int>  &col_indices,
+		     const FullMatrix<TrilinosScalar> &values)
+  {
+    Assert (row_indices.size() == values.m(),
+	    ExcDimensionMismatch(row_indices.size(), values.m()));
+    Assert (col_indices.size() == values.n(),
+	    ExcDimensionMismatch(col_indices.size(), values.n()));
+
+    set (row_indices.size(), &row_indices[0], 
+	 col_indices.size(), &col_indices[0], &values(0,0));
+  }
+
+
+
+  void
+  SparseMatrix::set (const unsigned int                 row,
+		     const std::vector<unsigned int>   &col_indices,
+		     const std::vector<TrilinosScalar> &values)
+  {
+    Assert (col_indices.size() == values.size(),
+	    ExcDimensionMismatch(col_indices.size(), values.size()));
+
+    set (1, &row, col_indices.size(), &col_indices[0], &values[0]);
+  }
+
+
+
+  void
+  SparseMatrix::set (const unsigned int    n_rows,
+		     const unsigned int   *row_indices,
+		     const unsigned int    n_cols,
+		     const unsigned int   *col_indices,
+		     const TrilinosScalar *values)
+  {
+    int ierr;
     if (last_action == Add)
       {
-	int ierr;
 	ierr = matrix->GlobalAssemble(col_map, row_map, false);
-	
+
 	AssertThrow (ierr == 0, ExcTrilinosError(ierr));
       }
 
-				        // If our last action was not an
-				        // addition, we tell that at this
-				        // point here.
     if (last_action != Insert)
       last_action = Insert;
 
-    compressed = false;
-
-    int ierr;
-
-				        // In case this matrix owns the
-				        // actual row, we can save some
-				        // computing time by directly
-				        // accessing the Epetra_CrsMatrix
-				        // set functions.
-    if (row_map.MyGID(i) == true)
+				   // Now go through all rows that are
+				   // present in the input data.
+    for (unsigned int i=0; i<n_rows; ++i)
       {
-				        // If the matrix is not yet filled,
-				        // we can insert new entries into
-				        // the matrix using this
-				        // command. Otherwise, we're just
-				        // able to replace existing entries.
-	if (matrix->Filled() == false)
+				   // If the calling matrix owns the row to
+				   // which we want to add values, we
+				   // can directly call the Epetra_CrsMatrix
+				   // input function, which is much faster
+				   // than the Epetra_FECrsMatrix function.
+	if (row_map.MyGID(i) == true)
 	  {
-	    ierr = matrix->Epetra_CrsMatrix::InsertGlobalValues (
-					   (int)i, 1,
-					   const_cast<TrilinosScalar*>(&value),
-					   (int*)&j);
+	    if (matrix->Filled() == false)
+	      {
+		ierr = matrix->Epetra_CrsMatrix::InsertGlobalValues(
+				   (int)row_indices[i], (int)n_cols,
+				   const_cast<TrilinosScalar*>(&values[i*n_cols]),
+				   (int*)&col_indices[0]);
 
 				        // When adding up elements, we do
 				        // not want to create exceptions in
 				        // the case when adding elements.
-	    if (ierr > 0)
-	      ierr = 0;
+		if (ierr > 0)
+		  ierr = 0;
+	      }
+	    else
+	      ierr = matrix->Epetra_CrsMatrix::ReplaceGlobalValues(
+				   (int)row_indices[i], (int)n_cols,
+				   const_cast<TrilinosScalar*>(&values[i*n_cols]),
+				   (int*)&col_indices[0]);
 	  }
 	else
 	  {
-	    ierr = matrix->Epetra_CrsMatrix::ReplaceGlobalValues ( 
-					   (int)i, 1,
-					   const_cast<TrilinosScalar*>(&value),
-					   (int*)&j);
+				   // When we're at off-processor data, we
+				   // have to stick with the standard
+				   // SumIntoGlobalValues
+				   // function. Nevertheless, the way we
+				   // call it is the fastest one (any other
+				   // will lead to repeated allocation and
+				   // deallocation of memory in order to
+				   // call the function we already use,
+				   // which is very unefficient if writing
+				   // one element at a time).
+	    compressed = false;
+      
+	    const TrilinosScalar* value_ptr = &values[i*n_cols];
+
+	    if (matrix->Filled() == false)
+	      {
+		ierr = matrix->InsertGlobalValues (1, (int*)&i, 
+					    (int)n_cols, (int*)&col_indices[0],
+					    &value_ptr, 
+					    Epetra_FECrsMatrix::ROW_MAJOR);
+		if (ierr > 0)
+		  ierr = 0;
+	      }
+	    else
+	      ierr = matrix->ReplaceGlobalValues (1, (int*)&i, 
+					    (int)n_cols, (int*)&col_indices[0],
+					    &value_ptr, 
+					    Epetra_FECrsMatrix::ROW_MAJOR);
 	  }
+
+	Assert (ierr <= 0, ExcAccessToNonPresentElement(row_indices[i],
+							col_indices[0]));
+	AssertThrow (ierr == 0, ExcTrilinosError(ierr));
       }
-    else
-      {
-	int trilinos_i = i;
-	int trilinos_j = j;
-	const TrilinosScalar* value_ptr = &value;
-
-
-				        // If the matrix is not yet filled,
-				        // we can insert new entries into
-				        // the matrix using this
-				        // command. Otherwise, we're just
-				        // able to replace existing entries.
-	if (matrix->Filled() == false)
-	  {
-	    ierr = matrix->InsertGlobalValues (1, &trilinos_i, 
-					       1, &trilinos_j,
-					       &value_ptr, 
-					       Epetra_FECrsMatrix::ROW_MAJOR);
-
-				        // When adding up elements, we do
-				        // not want to create exceptions in
-				        // the case when adding elements.
-	    if (ierr > 0)
-	      ierr = 0;
-	  }
-	else
-	  {
-	    ierr = matrix->ReplaceGlobalValues (1, &trilinos_i, 
-						1, &trilinos_j,
-						&value_ptr, 
-						Epetra_FECrsMatrix::ROW_MAJOR);
-	  }
-      }
-
-    Assert (ierr <= 0, ExcAccessToNonPresentElement(i,j));
-    AssertThrow (ierr == 0, ExcTrilinosError(ierr));
-
   }
 
 
@@ -774,42 +801,101 @@ namespace TrilinosWrappers
 	    ExcMessage("The given value is not finite but either "
 		       "infinite or Not A Number (NaN)"));
 
+    if (value == 0)
+      {
+				  // we have to do above actions in any case
+				  // to be consistent with the MPI
+				  // communication model (see the comments
+				  // in the documentation of
+				  // TrilinosWrappers::Vector), but we can
+				  // save some work if the addend is
+				  // zero. However, these actions are done
+				  // in case we pass on to the other
+				  // function.
+	if (last_action == Insert)
+	  {
+	    int ierr;
+	    ierr = matrix->GlobalAssemble(col_map, row_map, false);
+
+	    AssertThrow (ierr == 0, ExcTrilinosError(ierr));
+	  }
+
+	if (last_action != Add)
+	  last_action = Add;
+
+	return;
+      }
+    else
+      add (1, &i, 1, &j, &value);
+  }
+
+
+
+  void
+  SparseMatrix::add (const std::vector<unsigned int>  &row_indices,
+		     const std::vector<unsigned int>  &col_indices,
+		     const FullMatrix<TrilinosScalar> &values)
+  {
+    Assert (row_indices.size() == values.m(),
+	    ExcDimensionMismatch(row_indices.size(), values.m()));
+    Assert (col_indices.size() == values.n(),
+	    ExcDimensionMismatch(col_indices.size(), values.n()));
+
+    add (row_indices.size(), &row_indices[0], 
+	 col_indices.size(), &col_indices[0], &values(0,0));
+  }
+
+
+
+  void
+  SparseMatrix::add (const unsigned int                 row,
+		     const std::vector<unsigned int>   &col_indices,
+		     const std::vector<TrilinosScalar> &values)
+  {
+    Assert (col_indices.size() == values.size(),
+	    ExcDimensionMismatch(col_indices.size(), values.size()));
+
+    add (1, &row, col_indices.size(), &col_indices[0], &values[0]);
+  }
+
+
+
+  void
+  SparseMatrix::add (const unsigned int    n_rows,
+		     const unsigned int   *row_indices,
+		     const unsigned int    n_cols,
+		     const unsigned int   *col_indices,
+		     const TrilinosScalar *values)
+  {
+    int ierr;
     if (last_action == Insert)
       {
-	int ierr;
 	ierr = matrix->GlobalAssemble(col_map, row_map, false);
 
 	AssertThrow (ierr == 0, ExcTrilinosError(ierr));
-    }
+      }
 
     if (last_action != Add)
       last_action = Add;
 
-				  // we have to do above actions in any
-				  // case to be consistent with the MPI
-				  // communication model (see the
-				  // comments in the documentation of
-				  // TrilinosWrappers::Vector), but we
-				  // can save some work if the addend is
-				  // zero
-    if (value == 0)
-      return;
-
-    int ierr;
+				   // Now go through all rows that are
+				   // present in the input data.
+    for (unsigned int i=0; i<n_rows; ++i)
+      {
 				   // If the calling matrix owns the row to
-				   // which we want to add this value, we
+				   // which we want to add values, we
 				   // can directly call the Epetra_CrsMatrix
 				   // input function, which is much faster
 				   // than the Epetra_FECrsMatrix function.
-    if (row_map.MyGID(i) == true)
-      {
-	ierr = matrix->Epetra_CrsMatrix::SumIntoGlobalValues(
-					   (int)i, 1,
-					   const_cast<TrilinosScalar*>(&value),
-					   (int*)&j);
-      }
-    else
-      {
+	if (row_map.MyGID(i) == true)
+	  {
+	    ierr = matrix->Epetra_CrsMatrix::SumIntoGlobalValues(
+				   (int)row_indices[i], (int)n_cols,
+				   const_cast<TrilinosScalar*>(&values[i*n_cols]),
+				   (int*)&col_indices[0]);
+	  }
+	else
+	  {
 				   // When we're at off-processor data, we
 				   // have to stick with the standard
 				   // SumIntoGlobalValues
@@ -820,21 +906,20 @@ namespace TrilinosWrappers
 				   // call the function we already use,
 				   // which is very unefficient if writing
 				   // one element at a time).
-	compressed = false;
+	    compressed = false;
       
-	int trilinos_i = i;
-	int trilinos_j = j;
+	    const TrilinosScalar* value_ptr = &values[i*n_cols];
 
-	const TrilinosScalar* value_ptr = &value;
+	    ierr = matrix->SumIntoGlobalValues (1, (int*)&i, 
+						(int)n_cols, (int*)&col_indices[0],
+						&value_ptr, 
+						Epetra_FECrsMatrix::ROW_MAJOR);
+	  }
 
-	ierr = matrix->SumIntoGlobalValues (1, &trilinos_i, 
-					    1, &trilinos_j,
-					    &value_ptr, 
-					    Epetra_FECrsMatrix::ROW_MAJOR);
+	Assert (ierr <= 0, ExcAccessToNonPresentElement(row_indices[i],
+						        col_indices[0]));
+	AssertThrow (ierr == 0, ExcTrilinosError(ierr));
       }
-
-    AssertThrow (ierr <= 0, ExcAccessToNonPresentElement(i,j));
-    AssertThrow (ierr == 0, ExcTrilinosError(ierr));
   }
 
 
@@ -1243,6 +1328,11 @@ namespace TrilinosWrappers
   {
     Assert (&src != &dst, ExcSourceEqualsDestination());
 
+				   // Choose to reinit the vector with fast
+				   // argument set, which does not overwrite
+				   // the content -- this is what we need
+				   // since we're going to overwrite that
+				   // anyway in the vmult operation.
     temp_vector.reinit(dst, true);
 
     vmult (temp_vector, src);
