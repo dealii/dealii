@@ -208,6 +208,8 @@ namespace TrilinosWrappers
   SparseMatrix &
   SparseMatrix::copy_from (const SparseMatrix &m)
   {
+    row_map = m.row_map;
+    col_map = m.col_map;
     *matrix = *m.matrix;
     return *this;
   }
@@ -313,8 +315,8 @@ namespace TrilinosWrappers
 //		ExcDimensionMismatch (matrix->NumGlobalCols(),
 //				      sparsity_pattern.n_cols()));
 
-    std::vector<double> values;
-    std::vector<int>    row_indices;
+    std::vector<TrilinosScalar> values;
+    std::vector<int>            row_indices;
     
     for (unsigned int row=0; row<n_rows; ++row)
       if (row_map.MyGID(row))
@@ -326,8 +328,9 @@ namespace TrilinosWrappers
 	  for (int col=0; col < row_length; ++col)
 	    row_indices[col] = sparsity_pattern.column_number (row, col);
 
-	  matrix->InsertGlobalValues (row, row_length,
-				      &values[0], &row_indices[0]);
+	  matrix->Epetra_CrsMatrix::InsertGlobalValues ((int)row, row_length,
+							&values[0],
+							&row_indices[0]);
 	}
     
     last_action = Zero;
@@ -412,7 +415,7 @@ namespace TrilinosWrappers
 //		ExcDimensionMismatch (matrix->NumGlobalCols(),
 //				      sparsity_pattern.n_cols()));
 
-    std::vector<double> values;
+    std::vector<TrilinosScalar> values;
     std::vector<int>    row_indices;
     
     for (unsigned int row=0; row<n_rows; ++row)
@@ -430,8 +433,9 @@ namespace TrilinosWrappers
 	       ++col_num, ++col)
 	    row_indices[col] = *col_num;
 
-	  matrix->InsertGlobalValues (row, row_length,
-				      &values[0], &row_indices[0]);
+	  matrix->Epetra_CrsMatrix::InsertGlobalValues ((int)row, row_length,
+							&values[0],
+							&row_indices[0]);
 	}
     
     last_action = Zero;
@@ -531,7 +535,7 @@ namespace TrilinosWrappers
 	        (new Epetra_FECrsMatrix(Copy, row_map,
 					&n_entries_per_row[0], false));
 
-    std::vector<double> values;
+    std::vector<TrilinosScalar> values;
     std::vector<int> row_indices;
 
     for (unsigned int row=0; row<n_rows; ++row)
@@ -549,10 +553,12 @@ namespace TrilinosWrappers
 	      values[index]      = p->value();
 	      ++index;
 	    }
-	const int n_row_entries = index;
 
-	matrix->InsertGlobalValues(row, n_row_entries,
-				   &values[0], &row_indices[0]);
+	const int row_length = index;
+
+	matrix->Epetra_CrsMatrix::InsertGlobalValues ((int)row, row_length,
+						      &values[0],
+						      &row_indices[0]);
       }
 
     compress();
@@ -680,38 +686,80 @@ namespace TrilinosWrappers
     if (last_action != Insert)
       last_action = Insert;
 
-#ifdef DEBUG
-    if (in_local_range (i) == false)
-      compressed = false;
-#endif
-      
-    int trilinos_i = i;
-    int trilinos_j = j;
+    compressed = false;
 
     int ierr;
+
+				        // In case this matrix owns the
+				        // actual row, we can save some
+				        // computing time by directly
+				        // accessing the Epetra_CrsMatrix
+				        // set functions.
+    if (row_map.MyGID(i) == true)
+      {
+				        // If the matrix is not yet filled,
+				        // we can insert new entries into
+				        // the matrix using this
+				        // command. Otherwise, we're just
+				        // able to replace existing entries.
+	if (matrix->Filled() == false)
+	  {
+	    ierr = matrix->Epetra_CrsMatrix::InsertGlobalValues (
+					   (int)i, 1,
+					   const_cast<TrilinosScalar*>(&value),
+					   (int*)&j);
+
+				        // When adding up elements, we do
+				        // not want to create exceptions in
+				        // the case when adding elements.
+	    if (ierr > 0)
+	      ierr = 0;
+	  }
+	else
+	  {
+	    ierr = matrix->Epetra_CrsMatrix::ReplaceGlobalValues ( 
+					   (int)i, 1,
+					   const_cast<TrilinosScalar*>(&value),
+					   (int*)&j);
+	  }
+      }
+    else
+      {
+	int trilinos_i = i;
+	int trilinos_j = j;
+	const TrilinosScalar* value_ptr = &value;
+
 
 				        // If the matrix is not yet filled,
 				        // we can insert new entries into
 				        // the matrix using this
 				        // command. Otherwise, we're just
 				        // able to replace existing entries.
-    if (matrix->Filled() == false)
-      {
-	ierr = matrix->InsertGlobalValues (trilinos_i, 1,
-					   const_cast<double*>(&value), 
-					   &trilinos_j);
-	if (ierr > 0)
-	  ierr = 0;
-      }
-    else
-      {
-	ierr = matrix->ReplaceGlobalValues (trilinos_i, 1,
-					    const_cast<double*>(&value), 
-					    &trilinos_j);
+	if (matrix->Filled() == false)
+	  {
+	    ierr = matrix->InsertGlobalValues (1, &trilinos_i, 
+					       1, &trilinos_j,
+					       &value_ptr, 
+					       Epetra_FECrsMatrix::ROW_MAJOR);
+
+				        // When adding up elements, we do
+				        // not want to create exceptions in
+				        // the case when adding elements.
+	    if (ierr > 0)
+	      ierr = 0;
+	  }
+	else
+	  {
+	    ierr = matrix->ReplaceGlobalValues (1, &trilinos_i, 
+						1, &trilinos_j,
+						&value_ptr, 
+						Epetra_FECrsMatrix::ROW_MAJOR);
+	  }
       }
 
-    AssertThrow (ierr <= 0, ExcAccessToNonPresentElement(i,j));
+    Assert (ierr <= 0, ExcAccessToNonPresentElement(i,j));
     AssertThrow (ierr == 0, ExcTrilinosError(ierr));
+
   }
 
 
@@ -747,17 +795,43 @@ namespace TrilinosWrappers
     if (value == 0)
       return;
 
-#ifdef DEBUG
-    if (in_local_range (i) == false)
-      compressed = false;
-#endif
+    int ierr;
+				   // If the calling matrix owns the row to
+				   // which we want to add this value, we
+				   // can directly call the Epetra_CrsMatrix
+				   // input function, which is much faster
+				   // than the Epetra_FECrsMatrix function.
+    if (row_map.MyGID(i) == true)
+      {
+	ierr = matrix->Epetra_CrsMatrix::SumIntoGlobalValues(
+					   (int)i, 1,
+					   const_cast<TrilinosScalar*>(&value),
+					   (int*)&j);
+      }
+    else
+      {
+				   // When we're at off-processor data, we
+				   // have to stick with the standard
+				   // SumIntoGlobalValues
+				   // function. Nevertheless, the way we
+				   // call it is the fastest one (any other
+				   // will lead to repeated allocation and
+				   // deallocation of memory in order to
+				   // call the function we already use,
+				   // which is very unefficient if writing
+				   // one element at a time).
+	compressed = false;
       
-    int trilinos_i = i;
-    int trilinos_j = j;
+	int trilinos_i = i;
+	int trilinos_j = j;
 
-    const int ierr = matrix->SumIntoGlobalValues (trilinos_i, 1, 
-						  const_cast<double*>(&value), 
-						  &trilinos_j);
+	const TrilinosScalar* value_ptr = &value;
+
+	ierr = matrix->SumIntoGlobalValues (1, &trilinos_i, 
+					    1, &trilinos_j,
+					    &value_ptr, 
+					    Epetra_FECrsMatrix::ROW_MAJOR);
+      }
 
     AssertThrow (ierr <= 0, ExcAccessToNonPresentElement(i,j));
     AssertThrow (ierr == 0, ExcTrilinosError(ierr));
@@ -1262,26 +1336,53 @@ namespace TrilinosWrappers
 	= std::max (max_row_length,
 		    static_cast<unsigned int>(rhs.matrix->NumGlobalEntries(row)));
     
-    std::vector<int>    column_indices (max_row_length);
-    std::vector<double> values (max_row_length);
-    
-    for (unsigned int row=local_range.first;
-	 row < local_range.second; ++row)
+    std::vector<int>            column_indices (max_row_length);
+    std::vector<TrilinosScalar> values (max_row_length);
+
+				   // If both matrices have been transformed
+				   // to local index space (in Trilinos
+				   // speak: they are filled), we can
+				   // extract MyRows instead of GlobalRows,
+				   // which is faster.
+    if (matrix->Filled() == true && rhs.matrix->Filled() == true)
+      for (unsigned int row=local_range.first;
+	   row < local_range.second; ++row)
+	{
+	  const int row_local = matrix->RowMap().LID(row);
+	  int n_entries;
+	  rhs.matrix->ExtractMyRowCopy (row_local, max_row_length,
+					n_entries,
+					&values[0],
+					&column_indices[0]);
+	  for (int i=0; i<n_entries; ++i)
+	    values[i] *= factor;
+
+	  TrilinosScalar *value_ptr = &values[0];
+
+	  matrix->SumIntoMyValues (row_local, n_entries, value_ptr,
+				   &column_indices[0]);
+	}
+    else
       {
-	int n_entries;
-	rhs.matrix->ExtractGlobalRowCopy (row, max_row_length,
-					  n_entries,
-					  &values[0],
-					  &column_indices[0]);
-	for (int i=0; i<n_entries; ++i)
-	  values[i] *= factor;
+	for (unsigned int row=local_range.first;
+	     row < local_range.second; ++row)
+	  {
+	    int n_entries;
+	    rhs.matrix->Epetra_CrsMatrix::ExtractGlobalRowCopy ((int)row, 
+								max_row_length,
+								n_entries,
+								&values[0],
+								&column_indices[0]);
+	    for (int i=0; i<n_entries; ++i)
+	      values[i] *= factor;
 
-	matrix->SumIntoGlobalValues (row, n_entries,
-				     &values[0],
-				     &column_indices[0]);
+	    matrix->Epetra_CrsMatrix::SumIntoGlobalValues ((int)row, 
+							   n_entries, 
+							   &values[0],
+							   &column_indices[0]);
+	  }
+	compress ();
       }
-
-    compress ();
   }
   
 

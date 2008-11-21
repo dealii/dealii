@@ -734,17 +734,13 @@ namespace TrilinosWrappers
       void compress ();
 
 				       /**
-					* Returns the state of the
-					* matrix, i.e., whether
-					* compress() needs to be called
-					* after an operation requiring
-					* data exchange. Does only
-					* return non-true values when
-					* used in <tt>debug</tt> mode,
-					* since it is quite expensive to
-					* keep track of all operations
-					* that lead to the need for
-					* compress().
+					* Returns the state of the matrix,
+					* i.e., whether compress() needs to
+					* be called after an operation
+					* requiring data exchange. A call to
+					* compress() is also after the
+					* method set() is called (even when
+					* working in serial).
 					*/
       bool is_compressed () const;
 //@}

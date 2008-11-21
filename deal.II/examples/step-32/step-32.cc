@@ -1243,8 +1243,8 @@ void BoussinesqFlowProblem<dim>::solve ()
 	      GridTools::minimal_cell_diameter(triangulation) /
               std::max (get_maximal_velocity(), 1.e-5);
   
-  std::cout << "   " << "Time step: " << time_step
-	    << std::endl;
+  pcout << "   " << "Time step: " << time_step
+	<< std::endl;
   
   temperature_solution = old_temperature_solution;
 
