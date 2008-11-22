@@ -749,6 +749,266 @@ namespace TrilinosWrappers
 
   inline
   void
+  BlockSparseMatrix::set (const unsigned int   i,
+			  const unsigned int   j,
+			  const TrilinosScalar value)
+  {
+    BaseClass::set (i, j, value);
+  }
+
+
+
+  inline
+  void
+  BlockSparseMatrix::set (const std::vector<unsigned int>  &row_indices,
+			  const std::vector<unsigned int>  &col_indices,
+			  const FullMatrix<TrilinosScalar> &values)
+  {
+    Assert (row_indices.size() == values.m(),
+	    ExcDimensionMismatch(row_indices.size(), values.m()));
+    Assert (col_indices.size() == values.n(),
+	    ExcDimensionMismatch(col_indices.size(), values.n()));
+
+    set (row_indices.size(), &row_indices[0], 
+	 col_indices.size(), &col_indices[0], &values(0,0));
+  }
+
+
+
+  inline
+  void
+  BlockSparseMatrix::set (const unsigned int                 row,
+			  const std::vector<unsigned int>   &col_indices,
+			  const std::vector<TrilinosScalar> &values)
+  {
+    Assert (col_indices.size() == values.size(),
+	    ExcDimensionMismatch(col_indices.size(), values.size()));
+
+    set (1, &row, col_indices.size(), &col_indices[0], &values[0]);
+  }
+
+
+
+  inline
+  void
+  BlockSparseMatrix::set (const unsigned int    n_rows,
+			  const unsigned int   *row_indices,
+			  const unsigned int    n_cols,
+			  const unsigned int   *col_indices,
+			  const TrilinosScalar *values)
+  {
+				   // Resize scratch arrays
+    block_col_indices.resize (this->n_block_cols());
+    local_row_length.resize (this->n_block_cols());	
+    local_col_indices.resize (n_cols);
+
+				   // Clear the content in local_row_length
+    for (unsigned int i=0; i<this->n_block_cols(); ++i)
+      local_row_length[i] = 0;
+
+				   // Go through the column indices to find
+				   // out which portions of the values
+				   // should be written into which block
+				   // matrix. This can be done before
+				   // starting the loop over all the rows,
+				   // since we assume a rectangular set of
+				   // matrix data.
+    {
+      unsigned int current_block = 0, row_length = 0;
+      block_col_indices[0] = 0;
+      for (unsigned int j=0; j<n_cols; ++j, ++row_length)
+	{
+	  const std::pair<unsigned int, unsigned int>
+	    col_index = this->column_block_indices.global_to_local(col_indices[j]);
+	  local_col_indices[j] = col_index.second;
+	  if (col_index.first > current_block)
+	    {
+	      local_row_length[current_block] = row_length;
+	      row_length = 0;
+	      while (col_index.first > current_block)
+		current_block++;
+	      block_col_indices[current_block] = j;
+	    }
+
+	  Assert (col_index.first == current_block,
+		  ExcInternalError());
+	}
+      local_row_length[current_block] = row_length;
+      Assert (current_block < this->n_block_cols(),
+	      ExcInternalError());
+
+#ifdef DEBUG
+				   // If in debug mode, do a check whether
+				   // the right length has been obtained.
+      unsigned int length = 0;
+      for (unsigned int i=0; i<this->n_block_cols(); ++i)
+	length += local_row_length[i];
+      Assert (length == n_cols,
+	      ExcDimensionMismatch(length, n_cols));
+#endif
+    }
+
+				   // Now we found out about where the
+				   // individual columns should start and
+				   // where we should start reading out
+				   // data. Now let's write the data into
+				   // the individual blocks!
+    for (unsigned int i=0; i<n_rows; ++i)
+      {
+	const std::pair<unsigned int,unsigned int> 
+	  row_index = this->row_block_indices.global_to_local (row_indices[i]);
+	for (unsigned int block_col=0; block_col<n_block_cols(); ++block_col)
+	  {
+	    if (local_row_length[block_col] == 0)
+	      continue;
+
+	    block(row_index.first, block_col).set 
+	      (1, &row_index.second, 
+	       local_row_length[block_col], 
+	       &local_col_indices[block_col_indices[block_col]],
+	       &values[n_cols*i + block_col_indices[block_col]]);
+	  }
+      }
+  }
+
+
+
+  inline
+  void
+  BlockSparseMatrix::add (const unsigned int   i,
+			  const unsigned int   j,
+			  const TrilinosScalar value)
+  {
+				   // For adding one single element, it is
+				   // faster to rely on the BaseClass add
+				   // function, than doing all the strange
+				   // operations below.
+    BaseClass::add (i, j, value);
+  }
+
+
+
+  inline
+  void
+  BlockSparseMatrix::add (const std::vector<unsigned int>  &row_indices,
+			  const std::vector<unsigned int>  &col_indices,
+			  const FullMatrix<TrilinosScalar> &values)
+  {
+    Assert (row_indices.size() == values.m(),
+	    ExcDimensionMismatch(row_indices.size(), values.m()));
+    Assert (col_indices.size() == values.n(),
+	    ExcDimensionMismatch(col_indices.size(), values.n()));
+
+    add (row_indices.size(), &row_indices[0], 
+	 col_indices.size(), &col_indices[0], &values(0,0));
+  }
+
+
+
+  inline
+  void
+  BlockSparseMatrix::add (const unsigned int                 row,
+			  const std::vector<unsigned int>   &col_indices,
+			  const std::vector<TrilinosScalar> &values)
+  {
+    Assert (col_indices.size() == values.size(),
+	    ExcDimensionMismatch(col_indices.size(), values.size()));
+
+    add (1, &row, col_indices.size(), &col_indices[0], &values[0]);
+  }
+
+
+
+  inline
+  void
+  BlockSparseMatrix::add (const unsigned int    n_rows,
+			  const unsigned int   *row_indices,
+			  const unsigned int    n_cols,
+			  const unsigned int   *col_indices,
+			  const TrilinosScalar *values)
+  {
+				   // TODO: Look over this to find out
+				   // whether we can do that more
+				   // efficiently.
+
+				   // Resize scratch arrays
+    block_col_indices.resize (this->n_block_cols());
+    local_row_length.resize (this->n_block_cols());	
+    local_col_indices.resize (n_cols);
+
+				   // Clear the content in local_row_length
+    for (unsigned int i=0; i<this->n_block_cols(); ++i)
+      local_row_length[i] = 0;
+
+				   // Go through the column indices to find
+				   // out which portions of the values
+				   // should be written into which block
+				   // matrix. This can be done before
+				   // starting the loop over all the rows,
+				   // since we assume a rectangular set of
+				   // matrix data.
+    {
+      unsigned int current_block = 0, row_length = 0;
+      block_col_indices[0] = 0;
+      for (unsigned int j=0; j<n_cols; ++j, ++row_length)
+	{
+	  const std::pair<unsigned int, unsigned int>
+	    col_index = this->column_block_indices.global_to_local(col_indices[j]);
+	  local_col_indices[j] = col_index.second;
+	  if (col_index.first > current_block)
+	    {
+	      local_row_length[current_block] = row_length;
+	      row_length = 0;
+	      while (col_index.first > current_block)
+		current_block++;
+	      block_col_indices[current_block] = j;
+	    }
+
+	  Assert (col_index.first == current_block,
+		  ExcInternalError());
+	}
+      local_row_length[current_block] = row_length;
+      Assert (current_block < this->n_block_cols(),
+	      ExcInternalError());
+
+#ifdef DEBUG
+				   // If in debug mode, do a check whether
+				   // the right length has been obtained.
+      unsigned int length = 0;
+      for (unsigned int i=0; i<this->n_block_cols(); ++i)
+	length += local_row_length[i];
+      Assert (length == n_cols,
+	      ExcDimensionMismatch(length, n_cols));
+#endif
+    }
+
+				   // Now we found out about where the
+				   // individual columns should start and
+				   // where we should start reading out
+				   // data. Now let's write the data into
+				   // the individual blocks!
+    for (unsigned int i=0; i<n_rows; ++i)
+      {
+	const std::pair<unsigned int,unsigned int> 
+	  row_index = this->row_block_indices.global_to_local (row_indices[i]);
+	for (unsigned int block_col=0; block_col<n_block_cols(); ++block_col)
+	  {
+	    if (local_row_length[block_col] == 0)
+	      continue;
+
+	    block(row_index.first, block_col).add 
+	      (1, &row_index.second, 
+	       local_row_length[block_col], 
+	       &local_col_indices[block_col_indices[block_col]],
+	       &values[n_cols*i + block_col_indices[block_col]]);
+	  }
+      }
+  }
+
+
+
+  inline
+  void
   BlockSparseMatrix::vmult (MPI::BlockVector       &dst,
 			    const MPI::BlockVector &src) const
   {

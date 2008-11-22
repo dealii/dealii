@@ -1066,6 +1066,126 @@ namespace TrilinosWrappers
   }
 
 
+
+  inline
+  void
+  VectorBase::set (const std::vector<unsigned int>    &indices,
+		   const std::vector<TrilinosScalar>  &values)
+  {
+    Assert (indices.size() == values.size(),
+	    ExcDimensionMismatch(indices.size(),values.size()));
+
+    set (indices.size(), &indices[0], &values[0]);
+  }
+
+
+
+  inline
+  void
+  VectorBase::set (const std::vector<unsigned int>        &indices,
+		   const ::dealii::Vector<TrilinosScalar> &values)
+  {
+    Assert (indices.size() == values.size(),
+	    ExcDimensionMismatch(indices.size(),values.size()));
+
+    set (indices.size(), &indices[0], values.begin());
+  }
+
+
+
+  inline
+  void
+  VectorBase::set (const unsigned int    n_elements,
+		   const unsigned int   *indices,
+		   const TrilinosScalar *values)
+  {
+    if (last_action == Add)
+      vector->GlobalAssemble(Add);
+
+    if (last_action != Insert)
+      last_action = Insert;
+
+    int ierr;
+    for (unsigned int i=0; i<n_elements; ++i)
+      {
+	const unsigned int row = indices[i];
+	const int local_row = vector->Map().LID(indices[i]);
+	if (local_row == -1)
+	  {
+	    ierr = vector->ReplaceGlobalValues (1, 
+						(const int*)(&row), 
+						&values[i]);
+	    compressed = false;
+	  }
+	else
+	  ierr = vector->ReplaceMyValue (local_row, 0, values[i]);
+
+	AssertThrow (ierr == 0, ExcTrilinosError(ierr));
+      }
+  }
+
+
+
+  inline
+  void
+  VectorBase::add (const std::vector<unsigned int>    &indices,
+		   const std::vector<TrilinosScalar>  &values)
+  {
+    Assert (indices.size() == values.size(),
+	    ExcDimensionMismatch(indices.size(),values.size()));
+
+    add (indices.size(), &indices[0], &values[0]);
+  }
+
+
+
+  inline
+  void
+  VectorBase::add (const std::vector<unsigned int>        &indices,
+		   const ::dealii::Vector<TrilinosScalar> &values)
+  {
+    Assert (indices.size() == values.size(),
+	    ExcDimensionMismatch(indices.size(),values.size()));
+
+    add (indices.size(), &indices[0], values.begin());
+  }
+
+
+
+  inline
+  void
+  VectorBase::add (const unsigned int    n_elements,
+		   const unsigned int   *indices,
+		   const TrilinosScalar *values)
+  {
+    if (last_action == Insert)
+      vector->GlobalAssemble(Insert);
+
+    if (last_action != Add)
+      last_action = Add;
+
+    int ierr;
+    for (unsigned int i=0; i<n_elements; ++i)
+      {
+	const unsigned int row = indices[i];
+	const int local_row = vector->Map().LID(indices[i]);
+	if (local_row == -1)
+	  {
+	    ierr = vector->SumIntoGlobalValues (1, 
+						(const int*)(&row), 
+						&values[i]);
+	    compressed = false;
+	  }
+	else
+	  ierr = vector->SumIntoMyValue (local_row, 0, values[i]);
+
+	AssertThrow (ierr == 0, ExcTrilinosError(ierr));
+      }
+  }
+
+
+
+
 #endif // DOXYGEN
 
 }
