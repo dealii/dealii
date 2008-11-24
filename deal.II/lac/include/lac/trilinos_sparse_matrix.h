@@ -2013,29 +2013,42 @@ namespace TrilinosWrappers
 				   // present in the input data.
     for (unsigned int i=0; i<n_rows; ++i)
       {
+	const int row = row_indices[i];
+
 				   // If the calling matrix owns the row to
-				   // which we want to add values, we
+				   // which we want to insert values, we
 				   // can directly call the Epetra_CrsMatrix
 				   // input function, which is much faster
-				   // than the Epetra_FECrsMatrix function.
-	if (row_map.MyGID(i) == true)
+				   // than the Epetra_FECrsMatrix
+                                   // function. We distinguish between two 
+				   // cases: the first one is when the matrix
+				   // is not filled (i.e., it is possible to 
+				   // add new elements to the sparsity pattern), 
+				   // and the second one is when the pattern is
+				   // already fixed. In the former case, we 
+				   // add the possibility to insert new values,
+				   // and in the second we just replace
+				   // data.
+	if (row_map.MyGID(row) == true)
 	  {
 	    if (matrix->Filled() == false)
 	      {
 		ierr = matrix->Epetra_CrsMatrix::InsertGlobalValues(
-				   (int)row_indices[i], (int)n_cols,
+				   row, (int)n_cols,
 				   const_cast<TrilinosScalar*>(&values[i*n_cols]),
 				   (int*)&col_indices[0]);
 
-				        // When adding up elements, we do
+				        // When inserting elements, we do
 				        // not want to create exceptions in
-				        // the case when adding elements.
+				        // the case when inserting non-local
+					// data (since that's what we want 
+				        // to do right now).
 		if (ierr > 0)
 		  ierr = 0;
 	      }
 	    else
 	      ierr = matrix->Epetra_CrsMatrix::ReplaceGlobalValues(
-				   (int)row_indices[i], (int)n_cols,
+				   row, (int)n_cols,
 				   const_cast<TrilinosScalar*>(&values[i*n_cols]),
 				   (int*)&col_indices[0]);
 	  }
@@ -2043,7 +2056,7 @@ namespace TrilinosWrappers
 	  {
 				   // When we're at off-processor data, we
 				   // have to stick with the standard
-				   // SumIntoGlobalValues
+				   // Insert/ReplaceGlobalValues
 				   // function. Nevertheless, the way we
 				   // call it is the fastest one (any other
 				   // will lead to repeated allocation and
@@ -2057,7 +2070,7 @@ namespace TrilinosWrappers
 
 	    if (matrix->Filled() == false)
 	      {
-		ierr = matrix->InsertGlobalValues (1, (int*)&i, 
+		ierr = matrix->InsertGlobalValues (1, &row, 
 					    (int)n_cols, (int*)&col_indices[0],
 					    &value_ptr, 
 					    Epetra_FECrsMatrix::ROW_MAJOR);
@@ -2065,7 +2078,7 @@ namespace TrilinosWrappers
 		  ierr = 0;
 	      }
 	    else
-	      ierr = matrix->ReplaceGlobalValues (1, (int*)&i, 
+	      ierr = matrix->ReplaceGlobalValues (1, &row, 
 					    (int)n_cols, (int*)&col_indices[0],
 					    &value_ptr, 
 					    Epetra_FECrsMatrix::ROW_MAJOR);
@@ -2174,15 +2187,16 @@ namespace TrilinosWrappers
 				   // present in the input data.
     for (unsigned int i=0; i<n_rows; ++i)
       {
+	const int row = row_indices[i];
 				   // If the calling matrix owns the row to
 				   // which we want to add values, we
 				   // can directly call the Epetra_CrsMatrix
 				   // input function, which is much faster
 				   // than the Epetra_FECrsMatrix function.
-	if (row_map.MyGID(i) == true)
+	if (row_map.MyGID(row_indices[i]) == true)
 	  {
 	    ierr = matrix->Epetra_CrsMatrix::SumIntoGlobalValues(
-				   (int)row_indices[i], (int)n_cols,
+				   row, (int)n_cols,
 				   const_cast<TrilinosScalar*>(&values[i*n_cols]),
 				   (int*)&col_indices[0]);
 	  }
@@ -2202,7 +2216,7 @@ namespace TrilinosWrappers
       
 	    const TrilinosScalar* value_ptr = &values[i*n_cols];
 
-	    ierr = matrix->SumIntoGlobalValues (1, (int*)&i, 
+	    ierr = matrix->SumIntoGlobalValues (1, &row, 
 						(int)n_cols, (int*)&col_indices[0],
 						&value_ptr, 
 						Epetra_FECrsMatrix::ROW_MAJOR);

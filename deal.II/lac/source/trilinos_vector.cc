@@ -124,7 +124,7 @@ namespace TrilinosWrappers
 					// generate the vector.
       if (allow_different_maps == false)
         {
-	  if (map.SameAs(v.vector->Map()) == false)
+	  if (local_range() != v.local_range())
 	    {
 	      vector.reset();
 	      map = Epetra_Map(v.vector->Map().NumGlobalElements(),
@@ -138,6 +138,10 @@ namespace TrilinosWrappers
 	  else if (fast == false)
 	    {
 	      int ierr;
+	      Assert (vector->Map().SameAs(v.vector->Map()) == true,
+		      ExcMessage ("The Epetra maps in the assignment operator ="
+				  " do not match, even though the local_range "
+				  " seems to be the same. Check vector setup!"));
 	      ierr = vector->GlobalAssemble (last_action);	
 	      AssertThrow (ierr == 0, ExcTrilinosError(ierr));
 
@@ -181,8 +185,12 @@ namespace TrilinosWrappers
     Vector &
     Vector::operator = (const Vector &v)
     {
-      if (vector->Map().SameAs(v.vector->Map()) == true)
+      if (local_range() == v.local_range())
 	{
+	  Assert (vector->Map().SameAs(v.vector->Map()) == true,
+		  ExcMessage ("The Epetra maps in the assignment operator ="
+			      " do not match, even though the local_range "
+			      " seems to be the same. Check vector setup!"));
 	  vector->GlobalAssemble(last_action);
 	  const int ierr = vector->Update(1.0, *v.vector, 0.0);
 	  AssertThrow (ierr == 0, ExcTrilinosError(ierr));
@@ -224,8 +232,8 @@ namespace TrilinosWrappers
 
 
     void
-    Vector::do_data_exchange (const TrilinosWrappers::SparseMatrix &m,
-			      const Vector                         &v)
+    Vector::import_nonlocal_data_for_fe (const TrilinosWrappers::SparseMatrix &m,
+					 const Vector                         &v)
     {
       Assert (m.matrix->Filled() == true,
 	      ExcMessage ("Matrix is not compressed. "
@@ -382,7 +390,7 @@ namespace TrilinosWrappers
 					// generate the vector.
     if (allow_different_maps == false)
       {
-	if (map.SameAs(v.vector->Map()) == false)
+	if (local_range() != v.local_range())
 	  {
 	    vector.reset();
 	    map = Epetra_LocalMap (v.vector->GlobalLength(),
@@ -394,6 +402,11 @@ namespace TrilinosWrappers
 	else
 	  {
 	    int ierr;
+	    Assert (vector->Map().SameAs(v.vector->Map()) == true,
+		    ExcMessage ("The Epetra maps in the assignment operator ="
+				" do not match, even though the local_range "
+				" seems to be the same. Check vector setup!"));
+
 	    ierr = vector->GlobalAssemble(last_action);
 	    AssertThrow (ierr == 0, ExcTrilinosError(ierr));
 
@@ -452,7 +465,7 @@ namespace TrilinosWrappers
   Vector &
   Vector::operator = (const Vector &v)
   {
-    if (vector->Map().SameAs(v.vector->Map()) == false)
+    if (size() != v.size())
       {
 	map = Epetra_LocalMap (v.vector->Map().NumGlobalElements(), 
 			       v.vector->Map().IndexBase(),

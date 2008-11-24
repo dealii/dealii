@@ -139,8 +139,9 @@ namespace TrilinosWrappers
 
 
     void
-    BlockVector::do_data_exchange (const TrilinosWrappers::BlockSparseMatrix &m,
-				   const BlockVector                         &v)
+    BlockVector::import_nonlocal_data_for_fe 
+      (const TrilinosWrappers::BlockSparseMatrix &m,
+       const BlockVector                         &v)
     {
       Assert (m.n_block_rows() == v.n_blocks(),
 	      ExcDimensionMismatch(m.n_block_rows(),v.n_blocks()));
@@ -154,7 +155,7 @@ namespace TrilinosWrappers
 	}
 
       for (unsigned int i=0; i<this->n_blocks(); ++i)
-	components[i].do_data_exchange(m.block(i,i), v.block(i));
+	components[i].import_nonlocal_data_for_fe(m.block(i,i), v.block(i));
 
       collect_sizes();
     }

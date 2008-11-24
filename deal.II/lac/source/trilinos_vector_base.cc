@@ -110,7 +110,7 @@ namespace TrilinosWrappers
     Assert (&*vector != 0,
 	    ExcMessage("Vector has not been constructed properly."));
 
-    if (fast == false || vector->Map().SameAs(v.vector->Map()) == false)
+    if (fast == false || local_range() != v.local_range())
       vector = std::auto_ptr<Epetra_FEVector>(new Epetra_FEVector(*v.vector));
   }
 
@@ -155,7 +155,7 @@ namespace TrilinosWrappers
     Assert (&*vector != 0,
 	    ExcMessage("Vector is not constructed properly."));
 
-    if (vector->Map().SameAs(v.vector->Map()) == false)
+    if (local_range() != v.local_range())
       {
 	vector.reset();
 	last_action = Zero;
@@ -163,6 +163,10 @@ namespace TrilinosWrappers
       }
     else
       {
+	Assert (vector->Map().SameAs(v.vector->Map()) == true,
+		ExcMessage ("The Epetra maps in the assignment operator ="
+			    " do not match, even though the local_range "
+			    " seems to be the same. Check vector setup!"));
 	int ierr;
 	ierr = vector->GlobalAssemble(last_action);
 	AssertThrow (ierr == 0, ExcTrilinosError(ierr));
@@ -250,17 +254,6 @@ namespace TrilinosWrappers
   VectorBase::local_size () const
   {
     return (unsigned int) vector->Map().NumMyElements();
-  }
-
-
-
-  std::pair<unsigned int, unsigned int>
-  VectorBase::local_range () const
-  {
-    int begin, end;
-    begin = vector->Map().MinMyGID();
-    end = vector->Map().MaxMyGID()+1;
-    return std::make_pair (begin, end);
   }
 
 

@@ -277,8 +277,8 @@ namespace TrilinosWrappers
 					* for example done during the
 					* solution of linear systems.
 					*/
-	void do_data_exchange (const TrilinosWrappers::BlockSparseMatrix &m,
-			       const BlockVector                         &v);
+	void import_nonlocal_data_for_fe (const TrilinosWrappers::BlockSparseMatrix &m,
+					  const BlockVector                         &v);
 
 					 /**
 					  * Compresses all the components

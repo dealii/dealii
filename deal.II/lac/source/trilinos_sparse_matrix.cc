@@ -599,6 +599,7 @@ namespace TrilinosWrappers
   }
 
 
+
   void
   SparseMatrix::clear ()
   {

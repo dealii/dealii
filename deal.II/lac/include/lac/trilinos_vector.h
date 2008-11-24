@@ -368,8 +368,9 @@ namespace TrilinosWrappers
 					* for example done during the
 					* solution of linear systems.
 					*/
-	void do_data_exchange (const dealii::TrilinosWrappers::SparseMatrix &matrix,
-			       const Vector                                 &vector);
+	void import_nonlocal_data_for_fe 
+	  (const dealii::TrilinosWrappers::SparseMatrix &matrix,
+	   const Vector                                 &vector);
 
       private:
                                        /**

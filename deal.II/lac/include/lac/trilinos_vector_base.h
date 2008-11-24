@@ -1185,6 +1185,16 @@ namespace TrilinosWrappers
 
 
 
+  inline
+  std::pair<unsigned int, unsigned int>
+  VectorBase::local_range () const
+  {
+    int begin, end;
+    begin = vector->Map().MinMyGID();
+    end = vector->Map().MaxMyGID()+1;
+    return std::make_pair (begin, end);
+  }
+
 
 #endif // DOXYGEN
 
