@@ -2089,6 +2089,7 @@ namespace TrilinosWrappers
 
     int * col_index_ptr;
     TrilinosScalar const* col_value_ptr;
+    int n_columns;
 
 				   // If we don't elide zeros, the pointers
 				   // are already available...
@@ -2096,6 +2097,7 @@ namespace TrilinosWrappers
       {
 	col_index_ptr = (int*)col_indices;
 	col_value_ptr = values;
+	n_columns = n_cols;
       }
     else
       {
@@ -2105,7 +2107,7 @@ namespace TrilinosWrappers
 	column_indices.resize(n_cols);
 	column_values.resize(n_cols);
 
-	unsigned int n_columns = 0;
+	n_columns = 0;
 	for (unsigned int j=0; j<n_cols; ++j)
 	  if (values[j] != 0)
 	    {
@@ -2113,7 +2115,7 @@ namespace TrilinosWrappers
 	      column_values[n_columns] = values[j];
 	      n_columns++;
 	    }
-	Assert(n_columns <= n_cols, ExcInternalError());
+	Assert(n_columns <= (int)n_cols, ExcInternalError());
 
 	col_index_ptr = (int*)&column_indices[0];
 	col_value_ptr = &column_values[0];
@@ -2138,7 +2140,7 @@ namespace TrilinosWrappers
       {
 	if (matrix->Filled() == false)
 	  {
-	    ierr = matrix->Epetra_CrsMatrix::InsertGlobalValues(row, n_cols, 
+	    ierr = matrix->Epetra_CrsMatrix::InsertGlobalValues(row, n_columns, 
 					    const_cast<double*>(col_value_ptr),
 								col_index_ptr);
 
@@ -2151,7 +2153,7 @@ namespace TrilinosWrappers
 	      ierr = 0;
 	  }
 	else
-	  ierr = matrix->Epetra_CrsMatrix::ReplaceGlobalValues(row, n_cols, 	
+	  ierr = matrix->Epetra_CrsMatrix::ReplaceGlobalValues(row, n_columns, 	
 					   const_cast<double*>(col_value_ptr),
 							       col_index_ptr);
       }
@@ -2172,7 +2174,7 @@ namespace TrilinosWrappers
 	if (matrix->Filled() == false)
 	  {
 	    ierr = matrix->InsertGlobalValues (1, (int*)&row, 
-					       (int)n_cols, col_index_ptr,
+					       n_columns, col_index_ptr,
 					       &col_value_ptr, 
 					       Epetra_FECrsMatrix::ROW_MAJOR);
 	    if (ierr > 0)
@@ -2180,13 +2182,13 @@ namespace TrilinosWrappers
 	  }
 	else
 	  ierr = matrix->ReplaceGlobalValues (1, (int*)&row, 
-					      (int)n_cols, col_index_ptr,
+					      n_columns, col_index_ptr,
 					      &col_value_ptr, 
 					      Epetra_FECrsMatrix::ROW_MAJOR);
       }
 
     Assert (ierr <= 0, ExcAccessToNonPresentElement(row, col_index_ptr[0]));
-    AssertThrow (ierr == 0, ExcTrilinosError(ierr));
+    AssertThrow (ierr >= 0, ExcTrilinosError(ierr));
   }
 
 
@@ -2289,6 +2291,7 @@ namespace TrilinosWrappers
 
     int * col_index_ptr;
     TrilinosScalar const* col_value_ptr;
+    int n_columns;
 
 				   // If we don't elide zeros, the pointers
 				   // are already available...
@@ -2296,6 +2299,7 @@ namespace TrilinosWrappers
       {
 	col_index_ptr = (int*)col_indices;
 	col_value_ptr = values;
+	n_columns = n_cols;
       }
     else
       {
@@ -2305,7 +2309,7 @@ namespace TrilinosWrappers
 	column_indices.resize(n_cols);
 	column_values.resize(n_cols);
 
-	unsigned int n_columns = 0;
+	n_columns = 0;
 	for (unsigned int j=0; j<n_cols; ++j)
 	  if (values[j] != 0)
 	    {
@@ -2313,7 +2317,7 @@ namespace TrilinosWrappers
 	      column_values[n_columns] = values[j];
 	      n_columns++;
 	    }
-	Assert(n_columns <= n_cols, ExcInternalError());
+	Assert(n_columns <= (int)n_cols, ExcInternalError());
 
 	col_index_ptr = (int*)&column_indices[0];
 	col_value_ptr = &column_values[0];
@@ -2326,7 +2330,7 @@ namespace TrilinosWrappers
 				   // than the Epetra_FECrsMatrix function.
     if (row_map.MyGID(row) == true)
       {
-	ierr = matrix->Epetra_CrsMatrix::SumIntoGlobalValues(row, n_cols,
+	ierr = matrix->Epetra_CrsMatrix::SumIntoGlobalValues(row, n_columns,
 					 const_cast<double*>(col_value_ptr),
 							     col_index_ptr);
       }
@@ -2344,14 +2348,14 @@ namespace TrilinosWrappers
 				   // one element at a time).
 	compressed = false;
 
-	ierr = matrix->SumIntoGlobalValues (1, (int*)&row, (int)n_cols, 
+	ierr = matrix->SumIntoGlobalValues (1, (int*)&row, n_columns, 
 					    col_index_ptr,
 					    &col_value_ptr, 
 					    Epetra_FECrsMatrix::ROW_MAJOR);
       }
 
     Assert (ierr <= 0, ExcAccessToNonPresentElement(row, col_index_ptr[0]));
-    AssertThrow (ierr == 0, ExcTrilinosError(ierr));
+    AssertThrow (ierr >= 0, ExcTrilinosError(ierr));
   }
 
 

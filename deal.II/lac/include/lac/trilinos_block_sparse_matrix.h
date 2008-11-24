@@ -828,7 +828,7 @@ namespace TrilinosWrappers
 	    ExcDimensionMismatch(col_indices.size(), values.n()));
 
     for (unsigned int i=0; i<row_indices.size(); ++i)
-      set (row_indices[i], col_indices.size(), &col_indices[0], &values(0,0),
+      set (row_indices[i], col_indices.size(), &col_indices[0], &values(i,0),
 	   elide_zero_values);
   }
 
@@ -961,7 +961,7 @@ namespace TrilinosWrappers
 
     for (unsigned int i=0; i<row_indices.size(); ++i)
       add(row_indices[i], col_indices.size(), &col_indices[0], 
-	  &values(0,0), elide_zero_values);
+	  &values(i,0), elide_zero_values);
   }
 
 
