@@ -1073,7 +1073,7 @@ namespace TrilinosWrappers
 		const unsigned int    n_cols,
 		const unsigned int   *col_indices,
 		const TrilinosScalar *values,
-		const bool            elide_zero_values = false);
+		const bool            elide_zero_values = true);
 
                                        /**
                                         * Multiply the entire matrix
@@ -2046,7 +2046,7 @@ namespace TrilinosWrappers
 	    ExcDimensionMismatch(col_indices.size(), values.n()));
 
     for (unsigned int i=0; i<row_indices.size(); ++i)
-      set (row_indices[i], col_indices.size(), &col_indices[0], &values(0,0),
+      set (row_indices[i], col_indices.size(), &col_indices[0], &values(i,0),
 	   elide_zero_values);
   }
 
@@ -2246,7 +2246,7 @@ namespace TrilinosWrappers
 	    ExcDimensionMismatch(col_indices.size(), values.n()));
 
     for (unsigned int i=0; i<row_indices.size(); ++i)
-      add (row_indices[i], col_indices.size(), &col_indices[0], &values(0,0),
+      add (row_indices[i], col_indices.size(), &col_indices[0], &values(i,0),
 	   elide_zero_values);
   }
 
@@ -2294,7 +2294,7 @@ namespace TrilinosWrappers
 				   // are already available...
     if (elide_zero_values == false)
       {
-	col_index_ptr = (int*)&col_indices[0];
+	col_index_ptr = (int*)col_indices;
 	col_value_ptr = values;
       }
     else
