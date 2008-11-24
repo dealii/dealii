@@ -305,10 +305,20 @@ namespace TrilinosWrappers
                                         * FullMatrix<double> into the sparse
                                         * matrix, according to row_indices
                                         * and col_indices.
+					*
+					* The optional parameter
+					* <tt>elide_zero_values</tt> can be
+					* used to specify whether zero
+					* values should be inserted anyway
+					* or they should be filtered
+					* away. The default value is
+					* <tt>false</tt>, i.e., even zero
+					* values are inserted/replaced.
 					*/
       void set (const std::vector<unsigned int>  &row_indices,
 		const std::vector<unsigned int>  &col_indices,
-		const FullMatrix<TrilinosScalar> &full_matrix);
+		const FullMatrix<TrilinosScalar> &full_matrix,
+		const bool                        elide_zero_values = false);
 
                                        /**
                                         * Set several elements in the
@@ -316,25 +326,42 @@ namespace TrilinosWrappers
                                         * column indices as given by
                                         * <tt>col_indices</tt> to the
                                         * respective value.
+					*
+					* The optional parameter
+					* <tt>elide_zero_values</tt> can be
+					* used to specify whether zero
+					* values should be inserted anyway
+					* or they should be filtered
+					* away. The default value is
+					* <tt>false</tt>, i.e., even zero
+					* values are inserted/replaced.
 					*/
-      void set (const unsigned int                row,
+      void set (const unsigned int                 row,
 		const std::vector<unsigned int>   &col_indices,
-		const std::vector<TrilinosScalar> &values);
+		const std::vector<TrilinosScalar> &values,
+		const bool                         elide_zero_values = false);
 
                                        /**
                                         * Set several elements to values
-                                        * given by <tt>values</tt> at
-                                        * locations specified by row_indices
-                                        * and col_indices in the sparse
-                                        * matrix. The array <tt>values</tt>
-                                        * is assumed to store data in C
-                                        * style, i.e., row-wise.
+                                        * given by <tt>values</tt> in the
+                                        * given row at column locations
+                                        * specified by col_indices in the
+                                        * sparse matrix.
+					*
+					* The optional parameter
+					* <tt>elide_zero_values</tt> can be
+					* used to specify whether zero
+					* values should be inserted anyway
+					* or they should be filtered
+					* away. The default value is
+					* <tt>false</tt>, i.e., even zero
+					* values are inserted/replaced.
 					*/
-      void set (const unsigned int    n_rows,
-		const unsigned int   *row_indices,
+      void set (const unsigned int    row,
 		const unsigned int    n_cols,
 		const unsigned int   *col_indices,
-		const TrilinosScalar *values);
+		const TrilinosScalar *values,
+		const bool            elide_zero_values = false);
 
                                        /**
                                         * Add @p value to the element
@@ -350,10 +377,21 @@ namespace TrilinosWrappers
                                         * into the sparse matrix, at
                                         * locations according to row_indices
                                         * and col_indices.
+					*
+					* The optional parameter
+					* <tt>elide_zero_values</tt> can be
+					* used to specify whether zero
+					* values should be added anyway or
+					* these should be filtered away and
+					* only non-zero data is added. The
+					* default value is <tt>true</tt>,
+					* i.e., zero values won't be added
+					* into the matrix.
 					*/
       void add (const std::vector<unsigned int>  &row_indices,
 		const std::vector<unsigned int>  &col_indices,
-		const FullMatrix<TrilinosScalar> &full_matrix);
+		const FullMatrix<TrilinosScalar> &full_matrix,
+		const bool                        elide_zero_values = true);
 
                                        /**
                                         * Set several elements in the
@@ -361,25 +399,44 @@ namespace TrilinosWrappers
                                         * column indices as given by
                                         * <tt>col_indices</tt> to the
                                         * respective value.
+					*
+					* The optional parameter
+					* <tt>elide_zero_values</tt> can be
+					* used to specify whether zero
+					* values should be added anyway or
+					* these should be filtered away and
+					* only non-zero data is added. The
+					* default value is <tt>true</tt>,
+					* i.e., zero values won't be added
+					* into the matrix.
 					*/
-      void add (const unsigned int                row,
+      void add (const unsigned int                 row,
 		const std::vector<unsigned int>   &col_indices,
-		const std::vector<TrilinosScalar> &values);
+		const std::vector<TrilinosScalar> &values,
+		const bool                         elide_zero_values = true);
 
                                        /**
                                         * Set several elements to values
-                                        * given by <tt>values</tt> at
-                                        * locations specified by row_indices
-                                        * and col_indices in the sparse
-                                        * matrix. The array <tt>values</tt>
-                                        * is assumed to store data in C
-                                        * style, i.e., row-wise.
+                                        * given by <tt>values</tt> in the
+                                        * given row at column locations
+                                        * specified by col_indices in the
+                                        * sparse matrix.
+					*
+					* The optional parameter
+					* <tt>elide_zero_values</tt> can be
+					* used to specify whether zero
+					* values should be added anyway or
+					* these should be filtered away and
+					* only non-zero data is added. The
+					* default value is <tt>true</tt>,
+					* i.e., zero values won't be added
+					* into the matrix.
 					*/
-      void add (const unsigned int    n_rows,
-		const unsigned int   *row_indices,
+      void add (const unsigned int    row,
 		const unsigned int    n_cols,
 		const unsigned int   *col_indices,
-		const TrilinosScalar *values);
+		const TrilinosScalar *values,
+		const bool            elide_zero_values = true);
 
                                        /**
                                         * Matrix-vector multiplication:
@@ -720,7 +777,7 @@ namespace TrilinosWrappers
 					* writing data from local to global
 					* matrices.
 					*/
-      std::vector<unsigned int> block_col_indices, local_row_length, local_col_indices;
+      std::vector<unsigned int> block_col_indices, local_col_indices, local_row_length;
   };
 
 
@@ -762,15 +819,17 @@ namespace TrilinosWrappers
   void
   BlockSparseMatrix::set (const std::vector<unsigned int>  &row_indices,
 			  const std::vector<unsigned int>  &col_indices,
-			  const FullMatrix<TrilinosScalar> &values)
+			  const FullMatrix<TrilinosScalar> &values,
+			  const bool                        elide_zero_values)
   {
     Assert (row_indices.size() == values.m(),
 	    ExcDimensionMismatch(row_indices.size(), values.m()));
     Assert (col_indices.size() == values.n(),
 	    ExcDimensionMismatch(col_indices.size(), values.n()));
 
-    set (row_indices.size(), &row_indices[0], 
-	 col_indices.size(), &col_indices[0], &values(0,0));
+    for (unsigned int i=0; i<row_indices.size(); ++i)
+      set (row_indices[i], col_indices.size(), &col_indices[0], &values(0,0),
+	   elide_zero_values);
   }
 
 
@@ -779,27 +838,32 @@ namespace TrilinosWrappers
   void
   BlockSparseMatrix::set (const unsigned int                 row,
 			  const std::vector<unsigned int>   &col_indices,
-			  const std::vector<TrilinosScalar> &values)
+			  const std::vector<TrilinosScalar> &values,
+			  const bool                         elide_zero_values)
   {
     Assert (col_indices.size() == values.size(),
 	    ExcDimensionMismatch(col_indices.size(), values.size()));
 
-    set (1, &row, col_indices.size(), &col_indices[0], &values[0]);
+    set (row, col_indices.size(), &col_indices[0], &values[0],
+	 elide_zero_values);
   }
 
 
 
+				   // This is a very messy function, since
+				   // we need to calculate to each position 
+				   // the location in the global array.
   inline
   void
-  BlockSparseMatrix::set (const unsigned int    n_rows,
-			  const unsigned int   *row_indices,
+  BlockSparseMatrix::set (const unsigned int    row,
 			  const unsigned int    n_cols,
 			  const unsigned int   *col_indices,
-			  const TrilinosScalar *values)
+			  const TrilinosScalar *values,
+			  const bool            elide_zero_values)
   {
 				   // Resize scratch arrays
+    local_row_length.resize (this->n_block_cols());
     block_col_indices.resize (this->n_block_cols());
-    local_row_length.resize (this->n_block_cols());	
     local_col_indices.resize (n_cols);
 
 				   // Clear the content in local_row_length
@@ -809,10 +873,7 @@ namespace TrilinosWrappers
 				   // Go through the column indices to find
 				   // out which portions of the values
 				   // should be written into which block
-				   // matrix. This can be done before
-				   // starting the loop over all the rows,
-				   // since we assume a rectangular set of
-				   // matrix data.
+				   // matrix.
     {
       unsigned int current_block = 0, row_length = 0;
       block_col_indices[0] = 0;
@@ -853,21 +914,19 @@ namespace TrilinosWrappers
 				   // where we should start reading out
 				   // data. Now let's write the data into
 				   // the individual blocks!
-    for (unsigned int i=0; i<n_rows; ++i)
+    const std::pair<unsigned int,unsigned int> 
+      row_index = this->row_block_indices.global_to_local (row);
+    for (unsigned int block_col=0; block_col<n_block_cols(); ++block_col)
       {
-	const std::pair<unsigned int,unsigned int> 
-	  row_index = this->row_block_indices.global_to_local (row_indices[i]);
-	for (unsigned int block_col=0; block_col<n_block_cols(); ++block_col)
-	  {
-	    if (local_row_length[block_col] == 0)
-	      continue;
+	if (local_row_length[block_col] == 0)
+	  continue;
 
-	    block(row_index.first, block_col).set 
-	      (1, &row_index.second, 
+	block(row_index.first, block_col).set 
+	      (row_index.second, 
 	       local_row_length[block_col], 
 	       &local_col_indices[block_col_indices[block_col]],
-	       &values[n_cols*i + block_col_indices[block_col]]);
-	  }
+	       &values[block_col_indices[block_col]],
+	       elide_zero_values);
       }
   }
 
@@ -892,15 +951,17 @@ namespace TrilinosWrappers
   void
   BlockSparseMatrix::add (const std::vector<unsigned int>  &row_indices,
 			  const std::vector<unsigned int>  &col_indices,
-			  const FullMatrix<TrilinosScalar> &values)
+			  const FullMatrix<TrilinosScalar> &values,
+			  const bool                        elide_zero_values)
   {
     Assert (row_indices.size() == values.m(),
 	    ExcDimensionMismatch(row_indices.size(), values.m()));
     Assert (col_indices.size() == values.n(),
 	    ExcDimensionMismatch(col_indices.size(), values.n()));
 
-    add (row_indices.size(), &row_indices[0], 
-	 col_indices.size(), &col_indices[0], &values(0,0));
+    for (unsigned int i=0; i<row_indices.size(); ++i)
+      add(row_indices[i], col_indices.size(), &col_indices[0], 
+	  &values(0,0), elide_zero_values);
   }
 
 
@@ -909,23 +970,25 @@ namespace TrilinosWrappers
   void
   BlockSparseMatrix::add (const unsigned int                 row,
 			  const std::vector<unsigned int>   &col_indices,
-			  const std::vector<TrilinosScalar> &values)
+			  const std::vector<TrilinosScalar> &values,
+			  const bool                         elide_zero_values)
   {
     Assert (col_indices.size() == values.size(),
 	    ExcDimensionMismatch(col_indices.size(), values.size()));
 
-    add (1, &row, col_indices.size(), &col_indices[0], &values[0]);
+    add (row, col_indices.size(), &col_indices[0], &values[0], 
+	 elide_zero_values);
   }
 
 
 
   inline
   void
-  BlockSparseMatrix::add (const unsigned int    n_rows,
-			  const unsigned int   *row_indices,
+  BlockSparseMatrix::add (const unsigned int    row,
 			  const unsigned int    n_cols,
 			  const unsigned int   *col_indices,
-			  const TrilinosScalar *values)
+			  const TrilinosScalar *values,
+			  const bool            elide_zero_values)
   {
 				   // TODO: Look over this to find out
 				   // whether we can do that more
@@ -943,10 +1006,7 @@ namespace TrilinosWrappers
 				   // Go through the column indices to find
 				   // out which portions of the values
 				   // should be written into which block
-				   // matrix. This can be done before
-				   // starting the loop over all the rows,
-				   // since we assume a rectangular set of
-				   // matrix data.
+				   // matrix.
     {
       unsigned int current_block = 0, row_length = 0;
       block_col_indices[0] = 0;
@@ -987,21 +1047,19 @@ namespace TrilinosWrappers
 				   // where we should start reading out
 				   // data. Now let's write the data into
 				   // the individual blocks!
-    for (unsigned int i=0; i<n_rows; ++i)
+    const std::pair<unsigned int,unsigned int> 
+      row_index = this->row_block_indices.global_to_local (row);
+    for (unsigned int block_col=0; block_col<n_block_cols(); ++block_col)
       {
-	const std::pair<unsigned int,unsigned int> 
-	  row_index = this->row_block_indices.global_to_local (row_indices[i]);
-	for (unsigned int block_col=0; block_col<n_block_cols(); ++block_col)
-	  {
-	    if (local_row_length[block_col] == 0)
-	      continue;
+	if (local_row_length[block_col] == 0)
+	  continue;
 
-	    block(row_index.first, block_col).add 
-	      (1, &row_index.second, 
+	block(row_index.first, block_col).add 
+	      (row_index.second, 
 	       local_row_length[block_col], 
 	       &local_col_indices[block_col_indices[block_col]],
-	       &values[n_cols*i + block_col_indices[block_col]]);
-	  }
+	       &values[block_col_indices[block_col]],
+	       elide_zero_values);
       }
   }
 

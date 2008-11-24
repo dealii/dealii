@@ -316,7 +316,7 @@ namespace TrilinosWrappers
 //				      sparsity_pattern.n_cols()));
 
     std::vector<TrilinosScalar> values;
-    std::vector<int>            row_indices;
+    std::vector<unsigned int>   row_indices;
     
     for (unsigned int row=0; row<n_rows; ++row)
       if (row_map.MyGID(row))
@@ -327,10 +327,8 @@ namespace TrilinosWrappers
 
 	  for (int col=0; col < row_length; ++col)
 	    row_indices[col] = sparsity_pattern.column_number (row, col);
-
-	  matrix->Epetra_CrsMatrix::InsertGlobalValues ((int)row, row_length,
-							&values[0],
-							&row_indices[0]);
+	  
+	  set (row, row_length, &row_indices[0], &values[0], false);
 	}
     
     last_action = Zero;
@@ -416,7 +414,7 @@ namespace TrilinosWrappers
 //				      sparsity_pattern.n_cols()));
 
     std::vector<TrilinosScalar> values;
-    std::vector<int>    row_indices;
+    std::vector<unsigned int>   row_indices;
     
     for (unsigned int row=0; row<n_rows; ++row)
       if (row_map.MyGID(row))
@@ -433,9 +431,7 @@ namespace TrilinosWrappers
 	       ++col_num, ++col)
 	    row_indices[col] = *col_num;
 
-	  matrix->Epetra_CrsMatrix::InsertGlobalValues ((int)row, row_length,
-							&values[0],
-							&row_indices[0]);
+	  set (row, row_length, &row_indices[0], &values[0], false);
 	}
     
     last_action = Zero;
@@ -536,7 +532,7 @@ namespace TrilinosWrappers
 					&n_entries_per_row[0], false));
 
     std::vector<TrilinosScalar> values;
-    std::vector<int> row_indices;
+    std::vector<unsigned int>   row_indices;
 
     for (unsigned int row=0; row<n_rows; ++row)
       {
@@ -554,11 +550,7 @@ namespace TrilinosWrappers
 	      ++index;
 	    }
 
-	const int row_length = index;
-
-	matrix->Epetra_CrsMatrix::InsertGlobalValues ((int)row, row_length,
-						      &values[0],
-						      &row_indices[0]);
+	set (row, index, &row_indices[0], &values[0], false);
       }
 
     compress();

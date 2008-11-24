@@ -883,10 +883,20 @@ namespace TrilinosWrappers
 					* insertion of elements at positions
 					* which have not been initialized
 					* will throw an exception.
+					*
+					* The optional parameter
+					* <tt>elide_zero_values</tt> can be
+					* used to specify whether zero
+					* values should be inserted anyway
+					* or they should be filtered
+					* away. The default value is
+					* <tt>false</tt>, i.e., even zero
+					* values are inserted/replaced.
 					*/
       void set (const std::vector<unsigned int>  &row_indices,
 		const std::vector<unsigned int>  &col_indices,
-		const FullMatrix<TrilinosScalar> &full_matrix);
+		const FullMatrix<TrilinosScalar> &full_matrix,
+		const bool                        elide_zero_values = false);
 
                                        /**
                                         * Set several elements in the
@@ -905,19 +915,27 @@ namespace TrilinosWrappers
 					* insertion of elements at positions
 					* which have not been initialized
 					* will throw an exception.
+					*
+					* The optional parameter
+					* <tt>elide_zero_values</tt> can be
+					* used to specify whether zero
+					* values should be inserted anyway
+					* or they should be filtered
+					* away. The default value is
+					* <tt>false</tt>, i.e., even zero
+					* values are inserted/replaced.
 					*/
       void set (const unsigned int                row,
 		const std::vector<unsigned int>   &col_indices,
-		const std::vector<TrilinosScalar> &values);
+		const std::vector<TrilinosScalar> &values,
+		const bool                         elide_zero_values = false);
 
                                        /**
                                         * Set several elements to values
-                                        * given by <tt>values</tt> at
-                                        * locations specified by row_indices
-                                        * and col_indices in the sparse
-                                        * matrix. The array <tt>values</tt>
-                                        * is assumed to store data in C
-                                        * style, i.e., row-wise.
+                                        * given by <tt>values</tt> in a
+                                        * given row in columns given by
+                                        * col_indices into the sparse
+                                        * matrix.
 					*
 					* This function is able to insert
 					* new elements into the matrix as
@@ -929,12 +947,21 @@ namespace TrilinosWrappers
 					* insertion of elements at positions
 					* which have not been initialized
 					* will throw an exception.
+					*
+					* The optional parameter
+					* <tt>elide_zero_values</tt> can be
+					* used to specify whether zero
+					* values should be inserted anyway
+					* or they should be filtered
+					* away. The default value is
+					* <tt>false</tt>, i.e., even zero
+					* values are inserted/replaced.
 					*/
-      void set (const unsigned int    n_rows,
-		const unsigned int   *row_indices,
+      void set (const unsigned int    row,
 		const unsigned int    n_cols,
 		const unsigned int   *col_indices,
-		const TrilinosScalar *values);
+		const TrilinosScalar *values,
+		const bool            elide_zero_values = false);
 
                                        /**
                                         * Add @p value to the element
@@ -970,10 +997,21 @@ namespace TrilinosWrappers
 					* throws an exception if an
 					* entry does not exist in the
 					* sparsity pattern.
+					*
+					* The optional parameter
+					* <tt>elide_zero_values</tt> can be
+					* used to specify whether zero
+					* values should be added anyway or
+					* these should be filtered away and
+					* only non-zero data is added. The
+					* default value is <tt>true</tt>,
+					* i.e., zero values won't be added
+					* into the matrix.
 					*/
       void add (const std::vector<unsigned int>  &row_indices,
 		const std::vector<unsigned int>  &col_indices,
-		const FullMatrix<TrilinosScalar> &full_matrix);
+		const FullMatrix<TrilinosScalar> &full_matrix,
+		const bool                        elide_zero_values = true);
 
                                        /**
                                         * Set several elements in the
@@ -990,34 +1028,52 @@ namespace TrilinosWrappers
 					* throws an exception if an
 					* entry does not exist in the
 					* sparsity pattern.
+					*
+					* The optional parameter
+					* <tt>elide_zero_values</tt> can be
+					* used to specify whether zero
+					* values should be added anyway or
+					* these should be filtered away and
+					* only non-zero data is added. The
+					* default value is <tt>true</tt>,
+					* i.e., zero values won't be added
+					* into the matrix.
 					*/
       void add (const unsigned int                row,
 		const std::vector<unsigned int>   &col_indices,
-		const std::vector<TrilinosScalar> &values);
+		const std::vector<TrilinosScalar> &values,
+		const bool                         elide_zero_values = true);
 
                                        /**
-                                        * Set several elements to values
-                                        * given by <tt>values</tt> at
-                                        * locations specified by row_indices
-                                        * and col_indices in the sparse
-                                        * matrix. The array <tt>values</tt>
-                                        * is assumed to store data in C
-                                        * style, i.e., row-wise.
+                                        * Add an array of values given by
+                                        * <tt>values</tt> in the given
+                                        * global matrix row at columns
+                                        * specified by col_indices in the
+                                        * sparse matrix.
 					*
 					* Just as the respective call in
-					* deal.II SparseMatrix<Number>
-					* class (but in contrast to the
-					* situation for PETSc based
-					* matrices), this function
-					* throws an exception if an
+					* deal.II SparseMatrix<Number> class
+					* (but in contrast to the situation
+					* for PETSc based matrices), this
+					* function throws an exception if an
 					* entry does not exist in the
 					* sparsity pattern.
+					*
+					* The optional parameter
+					* <tt>elide_zero_values</tt> can be
+					* used to specify whether zero
+					* values should be added anyway or
+					* these should be filtered away and
+					* only non-zero data is added. The
+					* default value is <tt>true</tt>,
+					* i.e., zero values won't be added
+					* into the matrix.
 					*/
-      void add (const unsigned int    n_rows,
-		const unsigned int   *row_indices,
+      void add (const unsigned int    row,
 		const unsigned int    n_cols,
 		const unsigned int   *col_indices,
-		const TrilinosScalar *values);
+		const TrilinosScalar *values,
+		const bool            elide_zero_values = false);
 
                                        /**
                                         * Multiply the entire matrix
@@ -1683,6 +1739,24 @@ namespace TrilinosWrappers
 					*/
       mutable VectorBase temp_vector;
 
+				       /**
+					* An internal array of integer
+					* values that is used to store the
+					* column indices when
+					* adding/inserting local data into
+					* the (large) sparse matrix.
+					*/
+      std::vector<unsigned int> column_indices;
+
+				       /**
+					* An internal array of double values
+					* that is used to store the column
+					* indices when adding/inserting
+					* local data into the (large) sparse
+					* matrix.
+					*/
+      std::vector<TrilinosScalar> column_values;
+
     public:
                                        /**
                                         * A sparse matrix object in
@@ -1954,7 +2028,7 @@ namespace TrilinosWrappers
 	    ExcMessage("The given value is not finite but either "
 		       "infinite or Not A Number (NaN)"));
 
-    set (1, &i, 1, &j, &value);
+    set (i, 1, &j, &value, false);
   }
 
 
@@ -1963,15 +2037,17 @@ namespace TrilinosWrappers
   void
   SparseMatrix::set (const std::vector<unsigned int>  &row_indices,
 		     const std::vector<unsigned int>  &col_indices,
-		     const FullMatrix<TrilinosScalar> &values)
+		     const FullMatrix<TrilinosScalar> &values,
+		     const bool                        elide_zero_values)
   {
     Assert (row_indices.size() == values.m(),
 	    ExcDimensionMismatch(row_indices.size(), values.m()));
     Assert (col_indices.size() == values.n(),
 	    ExcDimensionMismatch(col_indices.size(), values.n()));
 
-    set (row_indices.size(), &row_indices[0], 
-	 col_indices.size(), &col_indices[0], &values(0,0));
+    for (unsigned int i=0; i<row_indices.size(); ++i)
+      set (row_indices[i], col_indices.size(), &col_indices[0], &values(0,0),
+	   elide_zero_values);
   }
 
 
@@ -1980,23 +2056,25 @@ namespace TrilinosWrappers
   void
   SparseMatrix::set (const unsigned int                 row,
 		     const std::vector<unsigned int>   &col_indices,
-		     const std::vector<TrilinosScalar> &values)
+		     const std::vector<TrilinosScalar> &values,
+		     const bool                         elide_zero_values)
   {
     Assert (col_indices.size() == values.size(),
 	    ExcDimensionMismatch(col_indices.size(), values.size()));
 
-    set (1, &row, col_indices.size(), &col_indices[0], &values[0]);
+    set (row, col_indices.size(), &col_indices[0], &values[0],
+	 elide_zero_values);
   }
 
 
 
   inline
   void
-  SparseMatrix::set (const unsigned int    n_rows,
-		     const unsigned int   *row_indices,
+  SparseMatrix::set (const unsigned int    row,
 		     const unsigned int    n_cols,
 		     const unsigned int   *col_indices,
-		     const TrilinosScalar *values)
+		     const TrilinosScalar *values,
+		     const bool            elide_zero_values)
   {
     int ierr;
     if (last_action == Add)
@@ -2009,11 +2087,38 @@ namespace TrilinosWrappers
     if (last_action != Insert)
       last_action = Insert;
 
-				   // Now go through all rows that are
-				   // present in the input data.
-    for (unsigned int i=0; i<n_rows; ++i)
+    int * col_index_ptr;
+    TrilinosScalar const* col_value_ptr;
+
+				   // If we don't elide zeros, the pointers
+				   // are already available...
+    if (elide_zero_values == false)
       {
-	const int row = row_indices[i];
+	col_index_ptr = (int*)col_indices;
+	col_value_ptr = values;
+      }
+    else
+      {
+				   // Otherwise, extract nonzero values in
+				   // each row and pass on to the other 
+				   // function.
+	column_indices.resize(n_cols);
+	column_values.resize(n_cols);
+
+	unsigned int n_columns = 0;
+	for (unsigned int j=0; j<n_cols; ++j)
+	  if (values[j] != 0)
+	    {
+	      column_indices[n_columns] = col_indices[j];
+	      column_values[n_columns] = values[j];
+	      n_columns++;
+	    }
+	Assert(n_columns <= n_cols, ExcInternalError());
+
+	col_index_ptr = (int*)&column_indices[0];
+	col_value_ptr = &column_values[0];
+      }
+
 
 				   // If the calling matrix owns the row to
 				   // which we want to insert values, we
@@ -2029,31 +2134,29 @@ namespace TrilinosWrappers
 				   // add the possibility to insert new values,
 				   // and in the second we just replace
 				   // data.
-	if (row_map.MyGID(row) == true)
+    if (row_map.MyGID(row) == true)
+      {
+	if (matrix->Filled() == false)
 	  {
-	    if (matrix->Filled() == false)
-	      {
-		ierr = matrix->Epetra_CrsMatrix::InsertGlobalValues(
-				   row, (int)n_cols,
-				   const_cast<TrilinosScalar*>(&values[i*n_cols]),
-				   (int*)&col_indices[0]);
+	    ierr = matrix->Epetra_CrsMatrix::InsertGlobalValues(row, n_cols, 
+					    const_cast<double*>(col_value_ptr),
+								col_index_ptr);
 
 				        // When inserting elements, we do
 				        // not want to create exceptions in
 				        // the case when inserting non-local
 					// data (since that's what we want 
 				        // to do right now).
-		if (ierr > 0)
-		  ierr = 0;
-	      }
-	    else
-	      ierr = matrix->Epetra_CrsMatrix::ReplaceGlobalValues(
-				   row, (int)n_cols,
-				   const_cast<TrilinosScalar*>(&values[i*n_cols]),
-				   (int*)&col_indices[0]);
+	    if (ierr > 0)
+	      ierr = 0;
 	  }
 	else
-	  {
+	  ierr = matrix->Epetra_CrsMatrix::ReplaceGlobalValues(row, n_cols, 	
+					   const_cast<double*>(col_value_ptr),
+							       col_index_ptr);
+      }
+    else
+      {
 				   // When we're at off-processor data, we
 				   // have to stick with the standard
 				   // Insert/ReplaceGlobalValues
@@ -2064,30 +2167,26 @@ namespace TrilinosWrappers
 				   // call the function we already use,
 				   // which is very unefficient if writing
 				   // one element at a time).
-	    compressed = false;
+	compressed = false;
       
-	    const TrilinosScalar* value_ptr = &values[i*n_cols];
-
-	    if (matrix->Filled() == false)
-	      {
-		ierr = matrix->InsertGlobalValues (1, &row, 
-					    (int)n_cols, (int*)&col_indices[0],
-					    &value_ptr, 
-					    Epetra_FECrsMatrix::ROW_MAJOR);
-		if (ierr > 0)
-		  ierr = 0;
-	      }
-	    else
-	      ierr = matrix->ReplaceGlobalValues (1, &row, 
-					    (int)n_cols, (int*)&col_indices[0],
-					    &value_ptr, 
-					    Epetra_FECrsMatrix::ROW_MAJOR);
+	if (matrix->Filled() == false)
+	  {
+	    ierr = matrix->InsertGlobalValues (1, (int*)&row, 
+					       (int)n_cols, col_index_ptr,
+					       &col_value_ptr, 
+					       Epetra_FECrsMatrix::ROW_MAJOR);
+	    if (ierr > 0)
+	      ierr = 0;
 	  }
-
-	Assert (ierr <= 0, ExcAccessToNonPresentElement(row_indices[i],
-							col_indices[0]));
-	AssertThrow (ierr == 0, ExcTrilinosError(ierr));
+	else
+	  ierr = matrix->ReplaceGlobalValues (1, (int*)&row, 
+					      (int)n_cols, col_index_ptr,
+					      &col_value_ptr, 
+					      Epetra_FECrsMatrix::ROW_MAJOR);
       }
+
+    Assert (ierr <= 0, ExcAccessToNonPresentElement(row, col_index_ptr[0]));
+    AssertThrow (ierr == 0, ExcTrilinosError(ierr));
   }
 
 
@@ -2105,7 +2204,8 @@ namespace TrilinosWrappers
 
     if (value == 0)
       {
-				  // we have to do above actions in any case
+				  // we have to do checkings on Insert/Add
+				  // in any case
 				  // to be consistent with the MPI
 				  // communication model (see the comments
 				  // in the documentation of
@@ -2128,7 +2228,7 @@ namespace TrilinosWrappers
 	return;
       }
     else
-      add (1, &i, 1, &j, &value);
+      add (i, 1, &j, &value, false);
   }
 
 
@@ -2137,15 +2237,17 @@ namespace TrilinosWrappers
   void
   SparseMatrix::add (const std::vector<unsigned int>  &row_indices,
 		     const std::vector<unsigned int>  &col_indices,
-		     const FullMatrix<TrilinosScalar> &values)
+		     const FullMatrix<TrilinosScalar> &values,
+		     const bool                        elide_zero_values)
   {
     Assert (row_indices.size() == values.m(),
 	    ExcDimensionMismatch(row_indices.size(), values.m()));
     Assert (col_indices.size() == values.n(),
 	    ExcDimensionMismatch(col_indices.size(), values.n()));
 
-    add (row_indices.size(), &row_indices[0], 
-	 col_indices.size(), &col_indices[0], &values(0,0));
+    for (unsigned int i=0; i<row_indices.size(); ++i)
+      add (row_indices[i], col_indices.size(), &col_indices[0], &values(0,0),
+	   elide_zero_values);
   }
 
 
@@ -2154,23 +2256,25 @@ namespace TrilinosWrappers
   void
   SparseMatrix::add (const unsigned int                 row,
 		     const std::vector<unsigned int>   &col_indices,
-		     const std::vector<TrilinosScalar> &values)
+		     const std::vector<TrilinosScalar> &values,
+		     const bool                         elide_zero_values)
   {
     Assert (col_indices.size() == values.size(),
 	    ExcDimensionMismatch(col_indices.size(), values.size()));
 
-    add (1, &row, col_indices.size(), &col_indices[0], &values[0]);
+    add (row, col_indices.size(), &col_indices[0], &values[0],
+	 elide_zero_values);
   }
 
 
 
   inline
   void
-  SparseMatrix::add (const unsigned int    n_rows,
-		     const unsigned int   *row_indices,
+  SparseMatrix::add (const unsigned int    row,
 		     const unsigned int    n_cols,
 		     const unsigned int   *col_indices,
-		     const TrilinosScalar *values)
+		     const TrilinosScalar *values,
+		     const bool            elide_zero_values)
   {
     int ierr;
     if (last_action == Insert)
@@ -2183,25 +2287,51 @@ namespace TrilinosWrappers
     if (last_action != Add)
       last_action = Add;
 
-				   // Now go through all rows that are
-				   // present in the input data.
-    for (unsigned int i=0; i<n_rows; ++i)
+    int * col_index_ptr;
+    TrilinosScalar const* col_value_ptr;
+
+				   // If we don't elide zeros, the pointers
+				   // are already available...
+    if (elide_zero_values == false)
       {
-	const int row = row_indices[i];
+	col_index_ptr = (int*)&col_indices[0];
+	col_value_ptr = values;
+      }
+    else
+      {
+				   // Otherwise, extract nonzero values in
+				   // each row and pass on to the other 
+				   // function.
+	column_indices.resize(n_cols);
+	column_values.resize(n_cols);
+
+	unsigned int n_columns = 0;
+	for (unsigned int j=0; j<n_cols; ++j)
+	  if (values[j] != 0)
+	    {
+	      column_indices[n_columns] = col_indices[j];
+	      column_values[n_columns] = values[j];
+	      n_columns++;
+	    }
+	Assert(n_columns <= n_cols, ExcInternalError());
+
+	col_index_ptr = (int*)&column_indices[0];
+	col_value_ptr = &column_values[0];
+      }
+
 				   // If the calling matrix owns the row to
 				   // which we want to add values, we
 				   // can directly call the Epetra_CrsMatrix
 				   // input function, which is much faster
 				   // than the Epetra_FECrsMatrix function.
-	if (row_map.MyGID(row_indices[i]) == true)
-	  {
-	    ierr = matrix->Epetra_CrsMatrix::SumIntoGlobalValues(
-				   row, (int)n_cols,
-				   const_cast<TrilinosScalar*>(&values[i*n_cols]),
-				   (int*)&col_indices[0]);
-	  }
-	else
-	  {
+    if (row_map.MyGID(row) == true)
+      {
+	ierr = matrix->Epetra_CrsMatrix::SumIntoGlobalValues(row, n_cols,
+					 const_cast<double*>(col_value_ptr),
+							     col_index_ptr);
+      }
+    else
+      {
 				   // When we're at off-processor data, we
 				   // have to stick with the standard
 				   // SumIntoGlobalValues
@@ -2212,20 +2342,16 @@ namespace TrilinosWrappers
 				   // call the function we already use,
 				   // which is very unefficient if writing
 				   // one element at a time).
-	    compressed = false;
-      
-	    const TrilinosScalar* value_ptr = &values[i*n_cols];
+	compressed = false;
 
-	    ierr = matrix->SumIntoGlobalValues (1, &row, 
-						(int)n_cols, (int*)&col_indices[0],
-						&value_ptr, 
-						Epetra_FECrsMatrix::ROW_MAJOR);
-	  }
-
-	Assert (ierr <= 0, ExcAccessToNonPresentElement(row_indices[i],
-						        col_indices[0]));
-	AssertThrow (ierr == 0, ExcTrilinosError(ierr));
+	ierr = matrix->SumIntoGlobalValues (1, (int*)&row, (int)n_cols, 
+					    col_index_ptr,
+					    &col_value_ptr, 
+					    Epetra_FECrsMatrix::ROW_MAJOR);
       }
+
+    Assert (ierr <= 0, ExcAccessToNonPresentElement(row, col_index_ptr[0]));
+    AssertThrow (ierr == 0, ExcTrilinosError(ierr));
   }
 
 
