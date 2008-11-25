@@ -3257,6 +3257,8 @@ VectorTools::compute_mean_value (const Mapping<dim>    &mapping,
 				 const InVector        &v,
 				 const unsigned int     component)
 {
+  Assert (v.size() == dof.n_dofs(),
+	  ExcDimensionMismatch (v.size(), dof.n_dofs()));
   Assert (component < dof.get_fe().n_components(),
 	  ExcIndexRange(component, 0, dof.get_fe().n_components()));
   
