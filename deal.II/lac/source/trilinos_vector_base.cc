@@ -315,7 +315,7 @@ namespace TrilinosWrappers
   TrilinosScalar
   VectorBase::operator * (const VectorBase &vec) const
   {
-    Assert (size() == vec.size(),
+    Assert (local_range() == vec.local_range(),
 	    ExcDimensionMismatch(size(), vec.size()));
 
     TrilinosScalar result;
@@ -766,9 +766,31 @@ namespace TrilinosWrappers
 	    ExcMessage("The given value is not finite but "
 		       "either infinite or Not A Number (NaN)"));
 
-    *vector = *v.vector;
+				   // If we don't have the same map, copy.
+    if (local_range() != v.local_range())
+      {
+	vector.reset();
+	last_action = Zero;
+	*vector = *v.vector;
+	*this *= a;
+      }
+    else
+      {
+				   // Otherwise, just update
+	Assert (vector->Map().SameAs(v.vector->Map()) == true,
+		ExcMessage ("The Epetra maps in the assignment operator ="
+			    " do not match, even though the local_range "
+			    " seems to be the same. Check vector setup!"));
+	int ierr;
+	ierr = vector->GlobalAssemble(last_action);
+	AssertThrow (ierr == 0, ExcTrilinosError(ierr));
 
-    *this *= a;
+	ierr = vector->Update(a, *v.vector, 0.0);
+	AssertThrow (ierr == 0, ExcTrilinosError(ierr));
+
+	last_action = Zero;
+      }
+
   }
 
 
@@ -790,9 +812,30 @@ namespace TrilinosWrappers
 	    ExcMessage("The given value is not finite but "
 		       "either infinite or Not A Number (NaN)"));
 
-    *vector = *v.vector;
+				   // If we don't have the same map, copy.
+    if (local_range() != v.local_range())
+      {
+	vector.reset();
+	last_action = Zero;
+	*vector = *v.vector;
+	sadd (a, b, w);
+      }
+    else
+      {
+				   // Otherwise, just update
+	Assert (vector->Map().SameAs(v.vector->Map()) == true,
+		ExcMessage ("The Epetra maps in the assignment operator ="
+			    " do not match, even though the local_range "
+			    " seems to be the same. Check vector setup!"));
+	int ierr;
+	ierr = vector->GlobalAssemble(last_action);
+	AssertThrow (ierr == 0, ExcTrilinosError(ierr));
 
-    sadd (a, b, w);
+	ierr = vector->Update(a, *v.vector, b, *w.vector, 0.0);
+	AssertThrow (ierr == 0, ExcTrilinosError(ierr));
+
+	last_action = Zero;
+      }
   }
 
 
