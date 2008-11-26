@@ -765,7 +765,95 @@ class SparseMatrix : public virtual Subscriptor
     void set (const unsigned int i,
               const unsigned int j,
 	      const number value);
-    
+
+                                       /**
+                                        * Set all elements given in a
+                                        * FullMatrix into the sparse matrix
+                                        * locations given by
+                                        * <tt>indices</tt>. In other words,
+                                        * this function writes the elements
+                                        * in <tt>full_matrix</tt> into the
+                                        * calling matrix, using the
+                                        * local-to-global indexing specified
+                                        * by <tt>indices</tt> for both the
+                                        * rows and the columns of the
+                                        * matrix. This function assumes a
+                                        * quadratic sparse matrix and a
+                                        * quadratic full_matrix, the usual
+                                        * situation in FE calculations.
+					*
+					* The optional parameter
+					* <tt>elide_zero_values</tt> can be
+					* used to specify whether zero
+					* values should be set anyway or
+					* they should be filtered away (and
+					* not change the previous content in
+					* the respective element if it
+					* exists). The default value is
+					* <tt>false</tt>, i.e., even zero
+					* values are treated.
+					*/
+    void set (const std::vector<unsigned int> &indices,
+	      const FullMatrix<number>        &full_matrix,
+	      const bool                       elide_zero_values = false);
+
+                                       /**
+                                        * Same function as before, but now
+                                        * including the possibility to use
+                                        * rectangular full_matrices and
+                                        * different local-to-global indexing
+                                        * on rows and columns, respectively.
+					*/
+    void set (const std::vector<unsigned int> &row_indices,
+	      const std::vector<unsigned int> &col_indices,
+	      const FullMatrix<number>        &full_matrix,
+	      const bool                       elide_zero_values = false);
+
+                                       /**
+                                        * Set several elements in the
+                                        * specified row of the matrix with
+                                        * column indices as given by
+                                        * <tt>col_indices</tt> to the
+                                        * respective value.
+					*
+					* The optional parameter
+					* <tt>elide_zero_values</tt> can be
+					* used to specify whether zero
+					* values should be set anyway or
+					* they should be filtered away (and
+					* not change the previous content in
+					* the respective element if it
+					* exists). The default value is
+					* <tt>false</tt>, i.e., even zero
+					* values are treated.
+					*/
+    void set (const unsigned int               row,
+	      const std::vector<unsigned int> &col_indices,
+	      const std::vector<number>       &values,
+	      const bool                       elide_zero_values = false);
+
+                                       /**
+                                        * Set several elements to values
+                                        * given by <tt>values</tt> in a
+                                        * given row in columns given by
+                                        * col_indices into the sparse
+                                        * matrix.
+					*
+					* The optional parameter
+					* <tt>elide_zero_values</tt> can be
+					* used to specify whether zero
+					* values should be inserted anyway
+					* or they should be filtered
+					* away. The default value is
+					* <tt>false</tt>, i.e., even zero
+					* values are inserted/replaced.
+					*/
+    void set (const unsigned int  row,
+	      const unsigned int  n_cols,
+	      const unsigned int *col_indices,
+	      const number       *values,
+	      const bool          elide_zero_values = false);
+
 				     /**
 				      * Add <tt>value</tt> to the
 				      * element (<i>i,j</i>).  Throws
@@ -778,6 +866,94 @@ class SparseMatrix : public virtual Subscriptor
     void add (const unsigned int i,
               const unsigned int j,
 	      const number value);
+
+                                       /**
+                                        * Add all elements given in a
+                                        * FullMatrix<double> into sparse
+                                        * matrix locations given by
+                                        * <tt>indices</tt>. In other words,
+                                        * this function adds the elements in
+                                        * <tt>full_matrix</tt> to the
+                                        * respective entries in calling
+                                        * matrix, using the local-to-global
+                                        * indexing specified by
+                                        * <tt>indices</tt> for both the rows
+                                        * and the columns of the
+                                        * matrix. This function assumes a
+                                        * quadratic sparse matrix and a
+                                        * quadratic full_matrix, the usual
+                                        * situation in FE calculations.
+					*
+					* The optional parameter
+					* <tt>elide_zero_values</tt> can be
+					* used to specify whether zero
+					* values should be added anyway or
+					* these should be filtered away and
+					* only non-zero data is added. The
+					* default value is <tt>true</tt>,
+					* i.e., zero values won't be added
+					* into the matrix.
+					*/
+    void add (const std::vector<unsigned int> &indices,
+	      const FullMatrix<number>        &full_matrix,
+	      const bool                       elide_zero_values = true);
+
+                                       /**
+                                        * Same function as before, but now
+                                        * including the possibility to use
+                                        * rectangular full_matrices and
+                                        * different local-to-global indexing
+                                        * on rows and columns, respectively.
+					*/
+    void add (const std::vector<unsigned int> &row_indices,
+	      const std::vector<unsigned int> &col_indices,
+	      const FullMatrix<number>        &full_matrix,
+	      const bool                       elide_zero_values = true);
+
+                                       /**
+                                        * Set several elements in the
+                                        * specified row of the matrix with
+                                        * column indices as given by
+                                        * <tt>col_indices</tt> to the
+                                        * respective value.
+					*
+					* The optional parameter
+					* <tt>elide_zero_values</tt> can be
+					* used to specify whether zero
+					* values should be added anyway or
+					* these should be filtered away and
+					* only non-zero data is added. The
+					* default value is <tt>true</tt>,
+					* i.e., zero values won't be added
+					* into the matrix.
+					*/
+    void add (const unsigned int               row,
+	      const std::vector<unsigned int> &col_indices,
+	      const std::vector<number>       &values,
+	      const bool                       elide_zero_values = true);
+
+                                       /**
+                                        * Add an array of values given by
+                                        * <tt>values</tt> in the given
+                                        * global matrix row at columns
+                                        * specified by col_indices in the
+                                        * sparse matrix.
+					*
+					* The optional parameter
+					* <tt>elide_zero_values</tt> can be
+					* used to specify whether zero
+					* values should be added anyway or
+					* these should be filtered away and
+					* only non-zero data is added. The
+					* default value is <tt>true</tt>,
+					* i.e., zero values won't be added
+					* into the matrix.
+					*/
+    void add (const unsigned int  row,
+	      const unsigned int  n_cols,
+	      const unsigned int *col_indices,
+	      const number       *values,
+	      const bool          elide_zero_values = true);
 
 				     /**
 				      * Multiply the entire matrix by a
@@ -1713,6 +1889,26 @@ class SparseMatrix : public virtual Subscriptor
 				      */
     unsigned int max_len;
 
+				       /**
+					* An internal array of integer
+					* values that is used to store the
+					* indices in the global value array
+					* val when adding/inserting local
+					* data into the (large) sparse
+					* matrix.
+					*/
+    std::vector<unsigned int> global_indices;
+
+				       /**
+					* An internal array of double values
+					* that is used to store the column
+					* indices when adding/inserting
+					* local data into the (large) sparse
+					* matrix.
+					*/
+    std::vector<number> column_values;
+
+
 				     /**
 				      * Version of vmult() which only
 				      * performs its actions on the
@@ -1812,51 +2008,290 @@ unsigned int SparseMatrix<number>::n () const
 }
 
 
-template <typename number>
+				        // Inline the set() and add()
+				        // functions, since they will be 
+                                        // called frequently, and the 
+				        // compiler can optimize away 
+				        // some unnecessary loops when
+					// the sizes are given at 
+				        // compile time.
+template <typename number>  
 inline
-void SparseMatrix<number>::set (const unsigned int i,
-				const unsigned int j,
-				const number value)
+void
+SparseMatrix<number>::set (const unsigned int i,
+			   const unsigned int j,
+			   const number       value)
 {
 
-  Assert (numbers::is_finite(value), 
-          ExcMessage("The given value is not finite but either infinite or Not A Number (NaN)"));
+  Assert (numbers::is_finite(value),
+	  ExcMessage("The given value is not finite but either "
+		     "infinite or Not A Number (NaN)"));
 
-  Assert (cols != 0, ExcNotInitialized());
-				   // it is allowed to set elements of
-				   // the matrix that are not part of
-				   // the sparsity pattern, if the
-				   // value to which we set it is zero
-  const unsigned int index = cols->operator()(i,j);
-  Assert ((index != SparsityPattern::invalid_entry) ||
-	  (value == 0.),
-	  ExcInvalidIndex(i,j));
-
-  if (index != SparsityPattern::invalid_entry)
-    val[index] = value;
+  set (i, 1, &j, &value, false);
 }
 
 
 
-template <typename number>
+template <typename number>  
 inline
-void SparseMatrix<number>::add (const unsigned int i,
-				const unsigned int j,
-				const number value)
+void
+SparseMatrix<number>::set (const std::vector<unsigned int> &indices,
+			   const FullMatrix<number>        &values,
+			   const bool                       elide_zero_values)
 {
+  Assert (indices.size() == values.m(),
+	  ExcDimensionMismatch(indices.size(), values.m()));
+  Assert (values.m() == values.n(), ExcNotQuadratic());
 
-  Assert (numbers::is_finite(value), 
-          ExcMessage("The given value is not finite but either infinite or Not A Number (NaN)"));
+  for (unsigned int i=0; i<indices.size(); ++i)
+    set (indices[i], indices.size(), &indices[0], &values(i,0),
+	 elide_zero_values);
+}
 
+
+
+template <typename number>  
+inline
+void
+SparseMatrix<number>::set (const std::vector<unsigned int> &row_indices,
+			   const std::vector<unsigned int> &col_indices,
+			   const FullMatrix<number>        &values,
+			   const bool                       elide_zero_values)
+{
+  Assert (row_indices.size() == values.m(),
+	  ExcDimensionMismatch(row_indices.size(), values.m()));
+  Assert (col_indices.size() == values.n(),
+	  ExcDimensionMismatch(col_indices.size(), values.n()));
+
+  for (unsigned int i=0; i<row_indices.size(); ++i)
+    set (row_indices[i], col_indices.size(), &col_indices[0], &values(i,0),
+	 elide_zero_values);
+}
+
+
+
+template <typename number>  
+inline
+void
+SparseMatrix<number>::set (const unsigned int               row,
+			   const std::vector<unsigned int> &col_indices,
+			   const std::vector<number>       &values,
+			   const bool                       elide_zero_values)
+{
+  Assert (col_indices.size() == values.size(),
+	  ExcDimensionMismatch(col_indices.size(), values.size()));
+
+  set (row, col_indices.size(), &col_indices[0], &values[0],
+       elide_zero_values);
+}
+
+
+
+template <typename number>  
+inline
+void
+SparseMatrix<number>::set (const unsigned int  row,
+			   const unsigned int  n_cols,
+			   const unsigned int *col_indices,
+			   const number       *values,
+			   const bool          elide_zero_values)
+{
   Assert (cols != 0, ExcNotInitialized());
 
-  const unsigned int index = cols->operator()(i,j);
-  Assert ((index != SparsityPattern::invalid_entry) ||
-	  (value == 0.),
-	  ExcInvalidIndex(i,j));
+  unsigned int n_columns = 0;
 
-  if (value != 0.)
-    val[index] += value;
+				   // Otherwise, extract nonzero values in
+				   // each row and pass on to the other 
+				   // function.
+  global_indices.resize(n_cols);
+  column_values.resize(n_cols);
+
+  const unsigned int * index_ptr = &col_indices[0];
+  const number * value_ptr = &values[0];
+
+				   // First, search all the indices to find
+				   // out which values we actually need to
+				   // set.
+				   // TODO: Could probably made more
+				   // efficient.
+  for (unsigned int j=0; j<n_cols; ++j)
+    {
+      const number value = *value_ptr++;
+      Assert (numbers::is_finite(value),
+	      ExcMessage("The given value is not finite but either "
+			 "infinite or Not A Number (NaN)"));
+
+      if (value == 0 && elide_zero_values == true)
+	{
+	  continue;
+	  ++index_ptr;
+	}
+
+      const unsigned int index = cols->operator()(row, *index_ptr++);
+
+				   // it is allowed to set elements in
+				   // the matrix that are not part of
+				   // the sparsity pattern, if the
+				   // value to which we set it is zero
+      if (index == SparsityPattern::invalid_entry)
+	{
+	  Assert ((index != SparsityPattern::invalid_entry) ||
+		  (value == 0.),
+		  ExcInvalidIndex(row,col_indices[j]));
+	  continue;
+	}
+
+      global_indices[n_columns] = index;
+      column_values[n_columns] = value;
+      n_columns++;
+    }
+
+  index_ptr = &global_indices[0];
+  value_ptr = &column_values[0];
+  
+				    // Finally, go through the index list 
+				    // and set the elements one by one.
+  for (unsigned int j=0; j<n_columns; ++j)
+    val[*index_ptr++] = *value_ptr++;
+}
+
+
+
+template <typename number>  
+inline
+void
+SparseMatrix<number>::add (const unsigned int i,
+			   const unsigned int j,
+			   const number       value)
+{
+
+  Assert (numbers::is_finite(value),
+	  ExcMessage("The given value is not finite but either "
+		     "infinite or Not A Number (NaN)"));
+
+  add (i, 1, &j, &value, false);
+}
+
+
+
+template <typename number>  
+inline
+void
+SparseMatrix<number>::add (const std::vector<unsigned int> &indices,
+			   const FullMatrix<number>        &values,
+			   const bool                       elide_zero_values)
+{
+  Assert (indices.size() == values.m(),
+	  ExcDimensionMismatch(indices.size(), values.m()));
+  Assert (values.m() == values.n(), ExcNotQuadratic());
+
+  for (unsigned int i=0; i<indices.size(); ++i)
+    add (indices[i], indices.size(), &indices[0], &values(i,0),
+	 elide_zero_values);
+}
+
+
+
+template <typename number>  
+inline
+void
+SparseMatrix<number>::add (const std::vector<unsigned int> &row_indices,
+			   const std::vector<unsigned int> &col_indices,
+			   const FullMatrix<number>        &values,
+			   const bool                       elide_zero_values)
+{
+  Assert (row_indices.size() == values.m(),
+	  ExcDimensionMismatch(row_indices.size(), values.m()));
+  Assert (col_indices.size() == values.n(),
+	  ExcDimensionMismatch(col_indices.size(), values.n()));
+
+  for (unsigned int i=0; i<row_indices.size(); ++i)
+    add (row_indices[i], col_indices.size(), &col_indices[0], &values(i,0),
+	 elide_zero_values);
+}
+
+
+
+template <typename number>  
+inline
+void
+SparseMatrix<number>::add (const unsigned int               row,
+			   const std::vector<unsigned int> &col_indices,
+			   const std::vector<number>       &values,
+			   const bool                       elide_zero_values)
+{
+  Assert (col_indices.size() == values.size(),
+	  ExcDimensionMismatch(col_indices.size(), values.size()));
+
+  add (row, col_indices.size(), &col_indices[0], &values[0],
+       elide_zero_values);
+}
+
+
+
+template <typename number>  
+inline
+void
+SparseMatrix<number>::add (const unsigned int  row,
+			   const unsigned int  n_cols,
+			   const unsigned int *col_indices,
+			   const number       *values,
+			   const bool          elide_zero_values)
+{
+  Assert (cols != 0, ExcNotInitialized());
+
+  unsigned int n_columns = 0;
+
+  global_indices.resize(n_cols);
+  column_values.resize(n_cols);
+
+  const unsigned int * index_ptr = &col_indices[0];
+  const number * value_ptr = &values[0];
+
+				   // First, search all the indices to find
+				   // out which values we actually need to
+				   // add.
+				   // TODO: Could probably made more
+				   // efficient.
+  for (unsigned int j=0; j<n_cols; ++j)
+    {
+      const number value = *value_ptr++;
+      Assert (numbers::is_finite(value),
+	      ExcMessage("The given value is not finite but either "
+			 "infinite or Not A Number (NaN)"));
+
+      if (value == 0 && elide_zero_values == true)
+	{
+	  continue;
+	  ++index_ptr;
+	}
+
+      const unsigned int index = cols->operator()(row, *index_ptr++);
+
+				   // it is allowed to add elements to
+				   // the matrix that are not part of
+				   // the sparsity pattern, if the
+				   // value to which we set it is zero
+      if (index == SparsityPattern::invalid_entry)
+	{
+	  Assert ((index != SparsityPattern::invalid_entry) ||
+		  (value == 0.),
+		  ExcInvalidIndex(row,col_indices[j]));
+	  continue;
+	}
+
+      global_indices[n_columns] = index;
+      column_values[n_columns] = value;
+      n_columns++;
+    }
+
+  index_ptr = &global_indices[0];
+  value_ptr = &column_values[0];
+  
+				    // Finally, go through the index list 
+				    // and add the elements one by one.
+  for (unsigned int j=0; j<n_columns; ++j)
+    val[*index_ptr++] += *value_ptr++;
 }
 
 

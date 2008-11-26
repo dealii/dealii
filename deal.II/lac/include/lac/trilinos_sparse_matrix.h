@@ -2168,8 +2168,8 @@ namespace TrilinosWrappers
     else
       {
 				   // Otherwise, extract nonzero values in
-				   // each row and pass on to the other 
-				   // function.
+				   // each row and get the respective
+				   // indices.
 	column_indices.resize(n_cols);
 	column_values.resize(n_cols);
 
@@ -2394,8 +2394,7 @@ namespace TrilinosWrappers
     else
       {
 				   // Otherwise, extract nonzero values in
-				   // each row and pass on to the other 
-				   // function.
+				   // each row and the corresponding index.
 	column_indices.resize(n_cols);
 	column_values.resize(n_cols);
 

@@ -19,6 +19,7 @@
 #include <base/smartpointer.h>
 #include <lac/block_indices.h>
 #include <lac/exceptions.h>
+#include <lac/full_matrix.h>
 #include <lac/matrix_iterator.h>
 
 #include <cmath>
@@ -477,20 +478,195 @@ class BlockMatrixBase : public Subscriptor
     void set (const unsigned int i,
 	      const unsigned int j,
 	      const value_type value);
-    
+
+                                     /**
+				      * Set all elements given in a
+				      * FullMatrix into the sparse matrix
+				      * locations given by
+				      * <tt>indices</tt>. In other words,
+				      * this function writes the elements
+				      * in <tt>full_matrix</tt> into the
+				      * calling matrix, using the
+				      * local-to-global indexing specified
+				      * by <tt>indices</tt> for both the
+				      * rows and the columns of the
+				      * matrix. This function assumes a
+				      * quadratic sparse matrix and a
+				      * quadratic full_matrix, the usual
+				      * situation in FE calculations.
+				      *
+				      * The optional parameter
+				      * <tt>elide_zero_values</tt> can be
+				      * used to specify whether zero
+				      * values should be set anyway or
+				      * they should be filtered away (and
+				      * not change the previous content in
+				      * the respective element if it
+				      * exists). The default value is
+				      * <tt>false</tt>, i.e., even zero
+				      * values are treated.
+				      */
+    void set (const std::vector<unsigned int> &indices,
+	      const FullMatrix<value_type>    &full_matrix,
+	      const bool                       elide_zero_values = false);
+
+                                     /**
+				      * Same function as before, but now
+				      * including the possibility to use
+				      * rectangular full_matrices and
+				      * different local-to-global indexing
+				      * on rows and columns, respectively.
+				      */
+    void set (const std::vector<unsigned int> &row_indices,
+	      const std::vector<unsigned int> &col_indices,
+	      const FullMatrix<value_type>    &full_matrix,
+	      const bool                       elide_zero_values = false);
+
+                                     /**
+				      * Set several elements in the
+				      * specified row of the matrix with
+				      * column indices as given by
+				      * <tt>col_indices</tt> to the
+				      * respective value.
+				      *
+				      * The optional parameter
+				      * <tt>elide_zero_values</tt> can be
+				      * used to specify whether zero
+				      * values should be set anyway or
+				      * they should be filtered away (and
+				      * not change the previous content in
+				      * the respective element if it
+				      * exists). The default value is
+				      * <tt>false</tt>, i.e., even zero
+				      * values are treated.
+				      */
+    void set (const unsigned int               row,
+	      const std::vector<unsigned int> &col_indices,
+	      const std::vector<value_type>   &values,
+	      const bool                       elide_zero_values = false);
+
+                                     /**
+				      * Set several elements to values
+				      * given by <tt>values</tt> in a
+				      * given row in columns given by
+				      * col_indices into the sparse
+				      * matrix.
+				      *
+				      * The optional parameter
+				      * <tt>elide_zero_values</tt> can be
+				      * used to specify whether zero
+				      * values should be inserted anyway
+				      * or they should be filtered
+				      * away. The default value is
+				      * <tt>false</tt>, i.e., even zero
+				      * values are inserted/replaced.
+				      */
+    void set (const unsigned int  row,
+	      const unsigned int  n_cols,
+	      const unsigned int *col_indices,
+	      const value_type   *values,
+	      const bool          elide_zero_values = false);
+
 				     /**
 				      * Add <tt>value</tt> to the
-				      * element <tt>(i,j)</tt>.
-				      * Throws an error if the entry
-				      * does not exist or if
-				      * <tt>value</tt> is not a finite
-				      * number. Still, it is allowed
-				      * to store zero values in
-				      * non-existent fields.
+				      * element (<i>i,j</i>).  Throws
+				      * an error if the entry does not
+				      * exist or if <tt>value</tt> is
+				      * not a finite number. Still, it
+				      * is allowed to store zero
+				      * values in non-existent fields.
 				      */
     void add (const unsigned int i,
               const unsigned int j,
 	      const value_type value);
+
+                                     /**
+				      * Add all elements given in a
+				      * FullMatrix<double> into sparse
+				      * matrix locations given by
+				      * <tt>indices</tt>. In other words,
+				      * this function adds the elements in
+				      * <tt>full_matrix</tt> to the
+				      * respective entries in calling
+				      * matrix, using the local-to-global
+				      * indexing specified by
+				      * <tt>indices</tt> for both the rows
+				      * and the columns of the
+				      * matrix. This function assumes a
+				      * quadratic sparse matrix and a
+				      * quadratic full_matrix, the usual
+				      * situation in FE calculations.
+				      *
+				      * The optional parameter
+				      * <tt>elide_zero_values</tt> can be
+				      * used to specify whether zero
+				      * values should be added anyway or
+				      * these should be filtered away and
+				      * only non-zero data is added. The
+				      * default value is <tt>true</tt>,
+				      * i.e., zero values won't be added
+				      * into the matrix.
+				      */
+    void add (const std::vector<unsigned int> &indices,
+	      const FullMatrix<value_type>    &full_matrix,
+	      const bool                       elide_zero_values = true);
+
+                                     /**
+				      * Same function as before, but now
+				      * including the possibility to use
+				      * rectangular full_matrices and
+				      * different local-to-global indexing
+				      * on rows and columns, respectively.
+				      */
+    void add (const std::vector<unsigned int> &row_indices,
+	      const std::vector<unsigned int> &col_indices,
+	      const FullMatrix<value_type>    &full_matrix,
+	      const bool                       elide_zero_values = true);
+
+                                     /**
+				      * Set several elements in the
+				      * specified row of the matrix with
+				      * column indices as given by
+				      * <tt>col_indices</tt> to the
+				      * respective value.
+				      *
+				      * The optional parameter
+				      * <tt>elide_zero_values</tt> can be
+				      * used to specify whether zero
+				      * values should be added anyway or
+				      * these should be filtered away and
+				      * only non-zero data is added. The
+				      * default value is <tt>true</tt>,
+				      * i.e., zero values won't be added
+				      * into the matrix.
+				      */
+    void add (const unsigned int               row,
+	      const std::vector<unsigned int> &col_indices,
+	      const std::vector<value_type>   &values,
+	      const bool                       elide_zero_values = true);
+
+                                     /**
+				      * Add an array of values given by
+				      * <tt>values</tt> in the given
+				      * global matrix row at columns
+				      * specified by col_indices in the
+				      * sparse matrix.
+				      *
+				      * The optional parameter
+				      * <tt>elide_zero_values</tt> can be
+				      * used to specify whether zero
+				      * values should be added anyway or
+				      * these should be filtered away and
+				      * only non-zero data is added. The
+				      * default value is <tt>true</tt>,
+				      * i.e., zero values won't be added
+				      * into the matrix.
+				      */
+    void add (const unsigned int  row,
+	      const unsigned int  n_cols,
+	      const unsigned int *col_indices,
+	      const value_type   *values,
+	      const bool          elide_zero_values = true);
 
 				     /**
 				      * Return the value of the entry
@@ -984,7 +1160,30 @@ class BlockMatrixBase : public Subscriptor
     friend class ConstAccessor;
     
     friend class const_iterator;
-#endif    
+#endif
+
+
+  private:
+                                       /**
+					* Temporary vector for block indices
+					* when writing local to global data.
+					*/
+    std::vector<unsigned int> block_col_indices; 
+
+                                       /**
+					* Temporary vector for column
+					* indices when writing local to
+					* global data and passing the call
+					* down to a SparseMatrix.
+					*/
+    std::vector<unsigned int> local_col_indices;
+
+                                       /**
+					* Temporary vector for storing the
+					* local lengths of the row data.
+					*/
+    std::vector<unsigned int> local_row_length;
+
 };
 
 
@@ -1554,6 +1753,9 @@ BlockMatrixBase<MatrixType>::n_block_rows () const
 
 
 
+                                   // Write the single set manually,
+                                   // since the other function has a lot
+                                   // of overhead in that case.
 template <class MatrixType>
 inline
 void
@@ -1571,6 +1773,144 @@ BlockMatrixBase<MatrixType>::set (const unsigned int i,
   block(row_index.first,col_index.first).set (row_index.second,
 					      col_index.second,
 					      value);
+}
+
+
+
+template <class MatrixType>
+inline
+void
+BlockMatrixBase<MatrixType>::set (const std::vector<unsigned int> &row_indices,
+				  const std::vector<unsigned int> &col_indices,
+				  const FullMatrix<value_type>    &values,
+				  const bool                       elide_zero_values)
+{
+  Assert (row_indices.size() == values.m(),
+	  ExcDimensionMismatch(row_indices.size(), values.m()));
+  Assert (col_indices.size() == values.n(),
+	  ExcDimensionMismatch(col_indices.size(), values.n()));
+
+  for (unsigned int i=0; i<row_indices.size(); ++i)
+    set (row_indices[i], col_indices.size(), &col_indices[0], &values(i,0),
+	 elide_zero_values);
+}
+
+
+
+template <class MatrixType>
+inline
+void
+BlockMatrixBase<MatrixType>::set (const std::vector<unsigned int> &indices,
+				  const FullMatrix<value_type>    &values,
+				  const bool                       elide_zero_values)
+{
+  Assert (indices.size() == values.m(),
+	  ExcDimensionMismatch(indices.size(), values.m()));
+  Assert (values.n() == values.m(), ExcNotQuadratic());
+
+  for (unsigned int i=0; i<indices.size(); ++i)
+    set (indices[i], indices.size(), &indices[0], &values(i,0),
+	 elide_zero_values);
+}
+
+
+
+template <class MatrixType>
+inline
+void
+BlockMatrixBase<MatrixType>::set (const unsigned int               row,
+				  const std::vector<unsigned int> &col_indices,
+				  const std::vector<value_type>   &values,
+				  const bool                       elide_zero_values)
+{
+  Assert (col_indices.size() == values.size(),
+	  ExcDimensionMismatch(col_indices.size(), values.size()));
+
+  set (row, col_indices.size(), &col_indices[0], &values[0],
+       elide_zero_values);
+}
+
+
+
+				   // This is a very messy function, since
+				   // we need to calculate to each position 
+				   // the location in the global array.
+template <class MatrixType>
+inline
+void
+BlockMatrixBase<MatrixType>::set (const unsigned int   row,
+				  const unsigned int   n_cols,
+				  const unsigned int  *col_indices,
+				  const value_type    *values,
+				  const bool           elide_zero_values)
+{
+				   // Resize scratch arrays
+  local_row_length.resize (this->n_block_cols());
+  block_col_indices.resize (this->n_block_cols());
+  local_col_indices.resize (n_cols);
+
+				   // Clear the content in local_row_length
+  for (unsigned int i=0; i<this->n_block_cols(); ++i)
+    local_row_length[i] = 0;
+
+				   // Go through the column indices to find
+				   // out which portions of the values
+				   // should be written into which block
+				   // matrix.
+  {
+    unsigned int current_block = 0, row_length = 0;
+    block_col_indices[0] = 0;
+    for (unsigned int j=0; j<n_cols; ++j, ++row_length)
+      {
+	const std::pair<unsigned int, unsigned int>
+	  col_index = this->column_block_indices.global_to_local(col_indices[j]);
+	local_col_indices[j] = col_index.second;
+	if (col_index.first > current_block)
+	  {
+	    local_row_length[current_block] = row_length;
+	    row_length = 0;
+	    while (col_index.first > current_block)
+	      current_block++;
+	    block_col_indices[current_block] = j;
+	  }
+
+	Assert (col_index.first == current_block,
+		ExcInternalError());
+      }
+    local_row_length[current_block] = row_length;
+    Assert (current_block < this->n_block_cols(),
+	    ExcInternalError());
+
+#ifdef DEBUG
+				   // If in debug mode, do a check whether
+				   // the right length has been obtained.
+    unsigned int length = 0;
+    for (unsigned int i=0; i<this->n_block_cols(); ++i)
+      length += local_row_length[i];
+    Assert (length == n_cols,
+	    ExcDimensionMismatch(length, n_cols));
+#endif
+  }
+
+				   // Now we found out about where the
+				   // individual columns should start and
+				   // where we should start reading out
+				   // data. Now let's write the data into
+				   // the individual blocks!
+  const std::pair<unsigned int,unsigned int> 
+    row_index = this->row_block_indices.global_to_local (row);
+  for (unsigned int block_col=0; block_col<n_block_cols(); ++block_col)
+    {
+      if (local_row_length[block_col] == 0)
+	continue;
+
+      block(row_index.first, block_col).set 
+	(row_index.second, 
+	 local_row_length[block_col], 
+	 &local_col_indices[block_col_indices[block_col]],
+	 &values[block_col_indices[block_col]],
+	 elide_zero_values);
+    }
 }
 
 
@@ -1601,6 +1941,148 @@ BlockMatrixBase<MatrixType>::add (const unsigned int i,
   block(row_index.first,col_index.first).add (row_index.second,
 					      col_index.second,
 					      value);
+}
+
+
+
+template <class MatrixType>
+inline
+void
+BlockMatrixBase<MatrixType>::add (const std::vector<unsigned int> &row_indices,
+				  const std::vector<unsigned int> &col_indices,
+				  const FullMatrix<value_type>    &values,
+				  const bool                       elide_zero_values)
+{
+  Assert (row_indices.size() == values.m(),
+	  ExcDimensionMismatch(row_indices.size(), values.m()));
+  Assert (col_indices.size() == values.n(),
+	  ExcDimensionMismatch(col_indices.size(), values.n()));
+
+  for (unsigned int i=0; i<row_indices.size(); ++i)
+    add (row_indices[i], col_indices.size(), &col_indices[0], &values(i,0),
+	 elide_zero_values);
+}
+
+
+
+template <class MatrixType>
+inline
+void
+BlockMatrixBase<MatrixType>::add (const std::vector<unsigned int> &indices,
+				  const FullMatrix<value_type>    &values,
+				  const bool                       elide_zero_values)
+{
+  Assert (indices.size() == values.m(),
+	  ExcDimensionMismatch(indices.size(), values.m()));
+  Assert (values.n() == values.m(), ExcNotQuadratic());
+
+  for (unsigned int i=0; i<indices.size(); ++i)
+    add (indices[i], indices.size(), &indices[0], &values(i,0),
+	 elide_zero_values);
+}
+
+
+
+template <class MatrixType>
+inline
+void
+BlockMatrixBase<MatrixType>::add (const unsigned int               row,
+				  const std::vector<unsigned int> &col_indices,
+				  const std::vector<value_type>   &values,
+				  const bool                       elide_zero_values)
+{
+  Assert (col_indices.size() == values.size(),
+	  ExcDimensionMismatch(col_indices.size(), values.size()));
+
+  add (row, col_indices.size(), &col_indices[0], &values[0],
+       elide_zero_values);
+}
+
+
+
+				   // This is a very messy function, since
+				   // we need to calculate to each position 
+				   // the location in the global array.
+template <class MatrixType>
+inline
+void
+BlockMatrixBase<MatrixType>::add (const unsigned int   row,
+				  const unsigned int   n_cols,
+				  const unsigned int  *col_indices,
+				  const value_type    *values,
+				  const bool           elide_zero_values)
+{
+				   // TODO: Look over this to find out
+				   // whether we can do that more
+				   // efficiently.
+
+				   // Resize scratch arrays
+  block_col_indices.resize (this->n_block_cols());
+  local_row_length.resize (this->n_block_cols());	
+  local_col_indices.resize (n_cols);
+
+				   // Clear the content in local_row_length
+  for (unsigned int i=0; i<this->n_block_cols(); ++i)
+    local_row_length[i] = 0;
+
+				   // Go through the column indices to find
+				   // out which portions of the values
+				   // should be written into which block
+				   // matrix.
+  {
+    unsigned int current_block = 0, row_length = 0;
+    block_col_indices[0] = 0;
+    for (unsigned int j=0; j<n_cols; ++j, ++row_length)
+      {
+	const std::pair<unsigned int, unsigned int>
+	  col_index = this->column_block_indices.global_to_local(col_indices[j]);
+	local_col_indices[j] = col_index.second;
+	if (col_index.first > current_block)
+	  {
+	    local_row_length[current_block] = row_length;
+	    row_length = 0;
+	    while (col_index.first > current_block)
+	      current_block++;
+	    block_col_indices[current_block] = j;
+	  }
+
+	Assert (col_index.first == current_block,
+		ExcInternalError());
+      }
+    local_row_length[current_block] = row_length;
+    Assert (current_block < this->n_block_cols(),
+	    ExcInternalError());
+
+#ifdef DEBUG
+				   // If in debug mode, do a check whether
+				   // the right length has been obtained.
+    unsigned int length = 0;
+    for (unsigned int i=0; i<this->n_block_cols(); ++i)
+      length += local_row_length[i];
+    Assert (length == n_cols,
+	    ExcDimensionMismatch(length, n_cols));
+#endif
+  }
+
+				   // Now we found out about where the
+				   // individual columns should start and
+				   // where we should start reading out
+				   // data. Now let's write the data into
+				   // the individual blocks!
+  const std::pair<unsigned int,unsigned int> 
+    row_index = this->row_block_indices.global_to_local (row);
+  for (unsigned int block_col=0; block_col<n_block_cols(); ++block_col)
+    {
+      if (local_row_length[block_col] == 0)
+	continue;
+
+      block(row_index.first, block_col).add 
+	(row_index.second, 
+	 local_row_length[block_col], 
+	 &local_col_indices[block_col_indices[block_col]],
+	 &values[block_col_indices[block_col]],
+	 elide_zero_values);
+    }
 }
 
 
