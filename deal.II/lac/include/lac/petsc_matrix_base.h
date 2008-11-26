@@ -16,6 +16,7 @@
 
 #include <base/config.h>
 #include <base/subscriptor.h>
+#include <lac/full_matrix.h>
 #include <lac/exceptions.h>
 
 #ifdef DEAL_II_USE_PETSC
@@ -330,48 +331,274 @@ namespace PETScWrappers
       void clear ();
 
                                        /**
-                                        * Set the element (<i>i,j</i>)
-                                        * to @p value.
+                                        * Set the element (<i>i,j</i>) to @p
+                                        * value.
 					*
-					* If the present object (from
-					* a derived class of this one)
-					* happens to be a sparse
-					* matrix, then this function
-					* adds a new entry to the
-					* matrix if it didn't exist
-					* before, very much in
-					* contrast to the SparseMatrix
-					* class which throws an error
-					* if the entry does not exist.
-					* If <tt>value</tt> is not a
-					* finite number an exception
-					* is thrown.
+					* If the present object (from a
+					* derived class of this one) happens
+					* to be a sparse matrix, then this
+					* function adds a new entry to the
+					* matrix if it didn't exist before,
+					* very much in contrast to the
+					* SparseMatrix class which throws an
+					* error if the entry does not exist.
+					* If <tt>value</tt> is not a finite
+					* number an exception is thrown.
 					*/
       void set (const unsigned int i,
                 const unsigned int j,
                 const PetscScalar value);
 
                                        /**
-                                        * Add @p value to the
-                                        * element (<i>i,j</i>).
+                                        * Set all elements given in a
+                                        * FullMatrix<double> into the sparse
+                                        * matrix locations given by
+                                        * <tt>indices</tt>. In other words,
+                                        * this function writes the elements
+                                        * in <tt>full_matrix</tt> into the
+                                        * calling matrix, using the
+                                        * local-to-global indexing specified
+                                        * by <tt>indices</tt> for both the
+                                        * rows and the columns of the
+                                        * matrix. This function assumes a
+                                        * quadratic sparse matrix and a
+                                        * quadratic full_matrix, the usual
+                                        * situation in FE calculations.
 					*
-					* If the present object (from
-					* a derived class of this one)
-					* happens to be a sparse
-					* matrix, then this function
-					* adds a new entry to the
-					* matrix if it didn't exist
-					* before, very much in
-					* contrast to the SparseMatrix
-					* class which throws an error
-					* if the entry does not exist.
-					* If <tt>value</tt> is not a
-					* finite number an exception
-					* is thrown.
+					* If the present object (from a
+					* derived class of this one) happens
+					* to be a sparse matrix, then this
+					* function adds some new entries to
+					* the matrix if they didn't exist
+					* before, very much in contrast to
+					* the SparseMatrix class which
+					* throws an error if the entry does
+					* not exist.
+					*
+					* The optional parameter
+					* <tt>elide_zero_values</tt> can be
+					* used to specify whether zero
+					* values should be inserted anyway
+					* or they should be filtered
+					* away. The default value is
+					* <tt>false</tt>, i.e., even zero
+					* values are inserted/replaced.
+					*/
+      void set (const std::vector<unsigned int> &indices,
+		const FullMatrix<PetscScalar>   &full_matrix,
+		const bool                       elide_zero_values = false);
+
+                                       /**
+                                        * Same function as before, but now
+                                        * including the possibility to use
+                                        * rectangular full_matrices and
+                                        * different local-to-global indexing
+                                        * on rows and columns, respectively.
+					*/
+      void set (const std::vector<unsigned int> &row_indices,
+		const std::vector<unsigned int> &col_indices,
+		const FullMatrix<PetscScalar>   &full_matrix,
+		const bool                       elide_zero_values = false);
+
+                                       /**
+                                        * Set several elements in the
+                                        * specified row of the matrix with
+                                        * column indices as given by
+                                        * <tt>col_indices</tt> to the
+                                        * respective value.
+					*
+					* If the present object (from a
+					* derived class of this one) happens
+					* to be a sparse matrix, then this
+					* function adds some new entries to
+					* the matrix if they didn't exist
+					* before, very much in contrast to
+					* the SparseMatrix class which
+					* throws an error if the entry does
+					* not exist.
+					*
+					* The optional parameter
+					* <tt>elide_zero_values</tt> can be
+					* used to specify whether zero
+					* values should be inserted anyway
+					* or they should be filtered
+					* away. The default value is
+					* <tt>false</tt>, i.e., even zero
+					* values are inserted/replaced.
+					*/
+      void set (const unsigned int               row,
+		const std::vector<unsigned int> &col_indices,
+		const std::vector<PetscScalar>  &values,
+		const bool                       elide_zero_values = false);
+
+                                       /**
+                                        * Set several elements to values
+                                        * given by <tt>values</tt> in a
+                                        * given row in columns given by
+                                        * col_indices into the sparse
+                                        * matrix.
+					*
+					* If the present object (from a
+					* derived class of this one) happens
+					* to be a sparse matrix, then this
+					* function adds some new entries to
+					* the matrix if they didn't exist
+					* before, very much in contrast to
+					* the SparseMatrix class which
+					* throws an error if the entry does
+					* not exist.
+					*
+					* The optional parameter
+					* <tt>elide_zero_values</tt> can be
+					* used to specify whether zero
+					* values should be inserted anyway
+					* or they should be filtered
+					* away. The default value is
+					* <tt>false</tt>, i.e., even zero
+					* values are inserted/replaced.
+					*/
+      void set (const unsigned int  row,
+		const unsigned int  n_cols,
+		const unsigned int *col_indices,
+		const PetscScalar  *values,
+		const bool          elide_zero_values = false);
+
+                                       /**
+                                        * Add @p value to the element
+                                        * (<i>i,j</i>).
+					*
+					* If the present object (from a
+					* derived class of this one) happens
+					* to be a sparse matrix, then this
+					* function adds a new entry to the
+					* matrix if it didn't exist before,
+					* very much in contrast to the
+					* SparseMatrix class which throws an
+					* error if the entry does not exist.
+					* If <tt>value</tt> is not a finite
+					* number an exception is thrown.
                                         */
       void add (const unsigned int i,
                 const unsigned int j,
                 const PetscScalar value);
+
+                                       /**
+                                        * Add all elements given in a
+                                        * FullMatrix<double> into sparse
+                                        * matrix locations given by
+                                        * <tt>indices</tt>. In other words,
+                                        * this function adds the elements in
+                                        * <tt>full_matrix</tt> to the
+                                        * respective entries in calling
+                                        * matrix, using the local-to-global
+                                        * indexing specified by
+                                        * <tt>indices</tt> for both the rows
+                                        * and the columns of the
+                                        * matrix. This function assumes a
+                                        * quadratic sparse matrix and a
+                                        * quadratic full_matrix, the usual
+                                        * situation in FE calculations.
+					*
+					* If the present object (from a
+					* derived class of this one) happens
+					* to be a sparse matrix, then this
+					* function adds some new entries to
+					* the matrix if they didn't exist
+					* before, very much in contrast to
+					* the SparseMatrix class which
+					* throws an error if the entry does
+					* not exist.
+					*
+					* The optional parameter
+					* <tt>elide_zero_values</tt> can be
+					* used to specify whether zero
+					* values should be added anyway or
+					* these should be filtered away and
+					* only non-zero data is added. The
+					* default value is <tt>true</tt>,
+					* i.e., zero values won't be added
+					* into the matrix.
+					*/
+      void add (const std::vector<unsigned int> &indices,
+		const FullMatrix<PetscScalar>   &full_matrix,
+		const bool                       elide_zero_values = true);
+
+                                       /**
+                                        * Same function as before, but now
+                                        * including the possibility to use
+                                        * rectangular full_matrices and
+                                        * different local-to-global indexing
+                                        * on rows and columns, respectively.
+					*/
+      void add (const std::vector<unsigned int> &row_indices,
+		const std::vector<unsigned int> &col_indices,
+		const FullMatrix<PetscScalar>   &full_matrix,
+		const bool                       elide_zero_values = true);
+
+                                       /**
+                                        * Set several elements in the
+                                        * specified row of the matrix with
+                                        * column indices as given by
+                                        * <tt>col_indices</tt> to the
+                                        * respective value.
+					*
+					* If the present object (from a
+					* derived class of this one) happens
+					* to be a sparse matrix, then this
+					* function adds some new entries to
+					* the matrix if they didn't exist
+					* before, very much in contrast to
+					* the SparseMatrix class which
+					* throws an error if the entry does
+					* not exist.
+					*
+					* The optional parameter
+					* <tt>elide_zero_values</tt> can be
+					* used to specify whether zero
+					* values should be added anyway or
+					* these should be filtered away and
+					* only non-zero data is added. The
+					* default value is <tt>true</tt>,
+					* i.e., zero values won't be added
+					* into the matrix.
+					*/
+      void add (const unsigned int               row,
+		const std::vector<unsigned int> &col_indices,
+		const std::vector<PetscScalar>  &values,
+		const bool                       elide_zero_values = true);
+
+                                       /**
+                                        * Add an array of values given by
+                                        * <tt>values</tt> in the given
+                                        * global matrix row at columns
+                                        * specified by col_indices in the
+                                        * sparse matrix.
+					*
+					* If the present object (from a
+					* derived class of this one) happens
+					* to be a sparse matrix, then this
+					* function adds some new entries to
+					* the matrix if they didn't exist
+					* before, very much in contrast to
+					* the SparseMatrix class which
+					* throws an error if the entry does
+					* not exist.
+					*
+					* The optional parameter
+					* <tt>elide_zero_values</tt> can be
+					* used to specify whether zero
+					* values should be added anyway or
+					* these should be filtered away and
+					* only non-zero data is added. The
+					* default value is <tt>true</tt>,
+					* i.e., zero values won't be added
+					* into the matrix.
+					*/
+      void add (const unsigned int  row,
+		const unsigned int  n_cols,
+		const unsigned int *col_indices,
+		const PetscScalar  *values,
+		const bool          elide_zero_values = true);
 
                                        /**
                                         * Remove all elements from
@@ -887,7 +1114,7 @@ namespace PETScWrappers
                                         * Exception
                                         */
       DeclException0 (ExcSourceEqualsDestination);
-      
+
     protected:
                                        /**
                                         * A generic matrix object in
@@ -926,7 +1153,27 @@ namespace PETScWrappers
                                         * Store whether the last action was a
                                         * write or add operation.
                                         */
-      LastAction::Values last_action;            
+      LastAction::Values last_action;
+
+    private:
+				       /**
+					* An internal array of integer
+					* values that is used to store the
+					* column indices when
+					* adding/inserting local data into
+					* the (large) sparse matrix.
+					*/
+      std::vector<unsigned int> column_indices;
+
+				       /**
+					* An internal array of double values
+					* that is used to store the column
+					* indices when adding/inserting
+					* local data into the (large) sparse
+					* matrix.
+					*/
+      std::vector<PetscScalar> column_values;
+
   };
 
 
@@ -1082,8 +1329,322 @@ namespace PETScWrappers
     }
     
   }
-  
-  
+
+
+
+				        // Inline the set() and add()
+				        // functions, since they will be 
+                                        // called frequently, and the 
+				        // compiler can optimize away 
+				        // some unnecessary loops when
+					// the sizes are given at 
+				        // compile time.
+  inline
+  void
+  MatrixBase::set (const unsigned int i,
+		   const unsigned int j,
+		   const PetscScalar  value)
+  {
+
+    Assert (numbers::is_finite(value),
+	    ExcMessage("The given value is not finite but either "
+		       "infinite or Not A Number (NaN)"));
+
+    set (i, 1, &j, &value, false);
+  }
+
+
+
+  inline
+  void
+  MatrixBase::set (const std::vector<unsigned int> &indices,
+		   const FullMatrix<PetscScalar>   &values,
+		   const bool                       elide_zero_values)
+  {
+    Assert (indices.size() == values.m(),
+	    ExcDimensionMismatch(indices.size(), values.m()));
+    Assert (values.m() == values.n(), ExcNotQuadratic());
+
+    for (unsigned int i=0; i<indices.size(); ++i)
+      set (indices[i], indices.size(), &indices[0], &values(i,0),
+	   elide_zero_values);
+  }
+
+
+
+  inline
+  void
+  MatrixBase::set (const std::vector<unsigned int> &row_indices,
+		   const std::vector<unsigned int> &col_indices,
+		   const FullMatrix<PetscScalar>   &values,
+		   const bool                       elide_zero_values)
+  {
+    Assert (row_indices.size() == values.m(),
+	    ExcDimensionMismatch(row_indices.size(), values.m()));
+    Assert (col_indices.size() == values.n(),
+	    ExcDimensionMismatch(col_indices.size(), values.n()));
+
+    for (unsigned int i=0; i<row_indices.size(); ++i)
+      set (row_indices[i], col_indices.size(), &col_indices[0], &values(i,0),
+	   elide_zero_values);
+  }
+
+
+
+  inline
+  void
+  MatrixBase::set (const unsigned int               row,
+		   const std::vector<unsigned int> &col_indices,
+		   const std::vector<PetscScalar>  &values,
+		   const bool                       elide_zero_values)
+  {
+    Assert (col_indices.size() == values.size(),
+	    ExcDimensionMismatch(col_indices.size(), values.size()));
+
+    set (row, col_indices.size(), &col_indices[0], &values[0],
+	 elide_zero_values);
+  }
+
+
+
+  inline
+  void
+  MatrixBase::set (const unsigned int  row,
+		   const unsigned int  n_cols,
+		   const unsigned int *col_indices,
+		   const PetscScalar  *values,
+		   const bool          elide_zero_values)
+  {
+
+    if (last_action != LastAction::insert)
+      {
+        int ierr;
+        ierr = MatAssemblyBegin(matrix,MAT_FLUSH_ASSEMBLY);
+        AssertThrow (ierr == 0, ExcPETScError(ierr));
+
+        ierr = MatAssemblyEnd(matrix,MAT_FLUSH_ASSEMBLY);
+        AssertThrow (ierr == 0, ExcPETScError(ierr));
+
+	last_action = LastAction::insert;
+      }
+    
+    const signed int petsc_i = row;
+    int * col_index_ptr;
+    PetscScalar const* col_value_ptr;
+    int n_columns;
+
+				   // If we don't elide zeros, the pointers
+				   // are already available...
+    if (elide_zero_values == false)
+      {
+	col_index_ptr = (int*)col_indices;
+	col_value_ptr = values;
+	n_columns = n_cols;
+      }
+    else
+      {
+				   // Otherwise, extract nonzero values in
+				   // each row and pass on to the other 
+				   // function.
+	column_indices.resize(n_cols);
+	column_values.resize(n_cols);
+
+	n_columns = 0;
+	for (unsigned int j=0; j<n_cols; ++j)
+	  {
+	    const double value = values[j];
+	    Assert (numbers::is_finite(value),
+		    ExcMessage("The given value is not finite but either "
+			       "infinite or Not A Number (NaN)"));
+	    if (value != 0)
+	      {
+		column_indices[n_columns] = col_indices[j];
+		column_values[n_columns] = value;
+		n_columns++;
+	      }
+	  }
+	Assert(n_columns <= (int)n_cols, ExcInternalError());
+
+	col_index_ptr = (int*)&column_indices[0];
+	col_value_ptr = &column_values[0];
+      }
+          
+    const int ierr
+      = MatSetValues (matrix, 1, &petsc_i, n_columns, col_index_ptr,
+		      col_value_ptr, INSERT_VALUES);
+    AssertThrow (ierr == 0, ExcPETScError(ierr));
+  }
+
+
+
+  inline
+  void
+  MatrixBase::add (const unsigned int i,
+		   const unsigned int j,
+		   const PetscScalar  value)
+  {
+
+    Assert (numbers::is_finite(value), 
+	    ExcMessage("The given value is not finite but either "
+		       "infinite or Not A Number (NaN)"));
+
+    if (value == 0)
+      {
+				  // we have to do checkings on Insert/Add
+				  // in any case
+				  // to be consistent with the MPI
+				  // communication model (see the comments
+				  // in the documentation of
+				  // TrilinosWrappers::Vector), but we can
+				  // save some work if the addend is
+				  // zero. However, these actions are done
+				  // in case we pass on to the other
+				  // function.
+	if (last_action != LastAction::add)
+	  {
+	    int ierr;
+	    ierr = MatAssemblyBegin(matrix,MAT_FLUSH_ASSEMBLY);
+	    AssertThrow (ierr == 0, ExcPETScError(ierr));
+
+	    ierr = MatAssemblyEnd(matrix,MAT_FLUSH_ASSEMBLY);
+	    AssertThrow (ierr == 0, ExcPETScError(ierr));
+
+	    last_action = LastAction::add;
+	  }
+
+	return;
+      }
+    else
+      add (i, 1, &j, &value, false);
+  }
+
+
+
+  inline
+  void
+  MatrixBase::add (const std::vector<unsigned int> &indices,
+		   const FullMatrix<PetscScalar>   &values,
+		   const bool                       elide_zero_values)
+  {
+    Assert (indices.size() == values.m(),
+	    ExcDimensionMismatch(indices.size(), values.m()));
+    Assert (values.m() == values.n(), ExcNotQuadratic());
+
+    for (unsigned int i=0; i<indices.size(); ++i)
+      add (indices[i], indices.size(), &indices[0], &values(i,0),
+	   elide_zero_values);
+  }
+
+
+
+  inline
+  void
+  MatrixBase::add (const std::vector<unsigned int> &row_indices,
+		   const std::vector<unsigned int> &col_indices,
+		   const FullMatrix<PetscScalar>   &values,
+		   const bool                       elide_zero_values)
+  {
+    Assert (row_indices.size() == values.m(),
+	    ExcDimensionMismatch(row_indices.size(), values.m()));
+    Assert (col_indices.size() == values.n(),
+	    ExcDimensionMismatch(col_indices.size(), values.n()));
+
+    for (unsigned int i=0; i<row_indices.size(); ++i)
+      add (row_indices[i], col_indices.size(), &col_indices[0], &values(i,0),
+	   elide_zero_values);
+  }
+
+
+
+  inline
+  void
+  MatrixBase::add (const unsigned int               row,
+		   const std::vector<unsigned int> &col_indices,
+		   const std::vector<PetscScalar>  &values,
+		   const bool                       elide_zero_values)
+  {
+    Assert (col_indices.size() == values.size(),
+	    ExcDimensionMismatch(col_indices.size(), values.size()));
+
+    add (row, col_indices.size(), &col_indices[0], &values[0],
+	 elide_zero_values);
+  }
+
+
+
+  inline
+  void
+  MatrixBase::add (const unsigned int  row,
+		   const unsigned int  n_cols,
+		   const unsigned int *col_indices,
+		   const PetscScalar  *values,
+		   const bool          elide_zero_values)
+  {
+    if (last_action != LastAction::add)
+      {
+        int ierr;
+        ierr = MatAssemblyBegin(matrix,MAT_FLUSH_ASSEMBLY);
+        AssertThrow (ierr == 0, ExcPETScError(ierr));
+
+        ierr = MatAssemblyEnd(matrix,MAT_FLUSH_ASSEMBLY);
+        AssertThrow (ierr == 0, ExcPETScError(ierr));
+
+        last_action = LastAction::add;
+      }
+    
+    
+    const signed int petsc_i = row;
+    int * col_index_ptr;
+    PetscScalar const* col_value_ptr;
+    int n_columns;
+
+				   // If we don't elide zeros, the pointers
+				   // are already available...
+    if (elide_zero_values == false)
+      {
+	col_index_ptr = (int*)col_indices;
+	col_value_ptr = values;
+	n_columns = n_cols;
+      }
+    else
+      {
+				   // Otherwise, extract nonzero values in
+				   // each row and pass on to the other 
+				   // function.
+	column_indices.resize(n_cols);
+	column_values.resize(n_cols);
+
+	n_columns = 0;
+	for (unsigned int j=0; j<n_cols; ++j)
+	  {
+	    const double value = values[j];
+	    Assert (numbers::is_finite(value),
+		    ExcMessage("The given value is not finite but either "
+			       "infinite or Not A Number (NaN)"));
+	    if (value != 0)
+	      {
+		column_indices[n_columns] = col_indices[j];
+		column_values[n_columns] = value;
+		n_columns++;
+	      }
+	  }
+	Assert(n_columns <= (int)n_cols, ExcInternalError());
+
+	col_index_ptr = (int*)&column_indices[0];
+	col_value_ptr = &column_values[0];
+      }
+          
+    const int ierr
+      = MatSetValues (matrix, 1, &petsc_i, n_columns, col_index_ptr,
+		      col_value_ptr, ADD_VALUES);
+    AssertThrow (ierr == 0, ExcPETScError(ierr));
+  }
+
+
+
+
+
+
   inline
   PetscScalar
   MatrixBase::operator() (const unsigned int i,

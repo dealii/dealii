@@ -236,6 +236,11 @@ namespace PETScWrappers
           }
         compress ();
       }
+
+				        // In the end, tell the matrix that
+				        // it should not expect any new
+				        // entries.
+    MatSetOption (matrix, MAT_NO_NEW_NONZERO_LOCATIONS);
   }
 
 

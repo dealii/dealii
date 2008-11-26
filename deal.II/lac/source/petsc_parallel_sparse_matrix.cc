@@ -449,7 +449,11 @@ namespace PETScWrappers
           
 #endif
 
-//TODO: We should use the appropriate option with MatSetOption here indicating that we do not intend to add any further matrix entries. Maybe this would accelerate some things as well
+				           // Now we won't insert any
+				           // further entries, so PETSc can
+				           // internally optimize some data
+				           // structures.
+	  MatSetOption (matrix, MAT_NO_NEW_NONZERO_LOCATIONS);
         }
     }
 

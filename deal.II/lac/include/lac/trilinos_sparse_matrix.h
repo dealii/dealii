@@ -831,14 +831,14 @@ namespace TrilinosWrappers
 					* transpose.  TODO: Not
 					* implemented.
 					*/
-
       bool is_hermitian () const;
-				     /**
-				      * Determine an estimate for the
-				      * memory consumption (in bytes)
-				      * of this object. Currently not
-				      * implemented for this class.
-				      */
+
+				       /**
+					* Determine an estimate for the
+					* memory consumption (in bytes)
+					* of this object. Currently not
+					* implemented for this class.
+					*/
       unsigned int memory_consumption () const;
 
 //@}
@@ -870,8 +870,18 @@ namespace TrilinosWrappers
                                        /**
                                         * Set all elements given in a
                                         * FullMatrix<double> into the sparse
-                                        * matrix, according to row_indices
-                                        * and col_indices.
+                                        * matrix locations given by
+                                        * <tt>indices</tt>. In other words,
+                                        * this function writes the elements
+                                        * in <tt>full_matrix</tt> into the
+                                        * calling matrix, using the
+                                        * local-to-global indexing specified
+                                        * by <tt>indices</tt> for both the
+                                        * rows and the columns of the
+                                        * matrix. This function assumes a
+                                        * quadratic sparse matrix and a
+                                        * quadratic full_matrix, the usual
+                                        * situation in FE calculations.
 					*
 					* This function is able to insert
 					* new elements into the matrix as
@@ -892,6 +902,17 @@ namespace TrilinosWrappers
 					* away. The default value is
 					* <tt>false</tt>, i.e., even zero
 					* values are inserted/replaced.
+					*/
+      void set (const std::vector<unsigned int>  &indices,
+		const FullMatrix<TrilinosScalar> &full_matrix,
+		const bool                        elide_zero_values = false);
+
+                                       /**
+                                        * Same function as before, but now
+                                        * including the possibility to use
+                                        * rectangular full_matrices and
+                                        * different local-to-global indexing
+                                        * on rows and columns, respectively.
 					*/
       void set (const std::vector<unsigned int>  &row_indices,
 		const std::vector<unsigned int>  &col_indices,
@@ -983,11 +1004,21 @@ namespace TrilinosWrappers
                 const TrilinosScalar value);
 
                                        /**
-                                        * Add all elements in a FullMatrix
-                                        * <tt>full_matrix</tt> (cell matrix)
-                                        * into the sparse matrix, at
-                                        * locations according to row_indices
-                                        * and col_indices.
+                                        * Add all elements given in a
+                                        * FullMatrix<double> into sparse
+                                        * matrix locations given by
+                                        * <tt>indices</tt>. In other words,
+                                        * this function adds the elements in
+                                        * <tt>full_matrix</tt> to the
+                                        * respective entries in calling
+                                        * matrix, using the local-to-global
+                                        * indexing specified by
+                                        * <tt>indices</tt> for both the rows
+                                        * and the columns of the
+                                        * matrix. This function assumes a
+                                        * quadratic sparse matrix and a
+                                        * quadratic full_matrix, the usual
+                                        * situation in FE calculations.
 					*
 					* Just as the respective call in
 					* deal.II SparseMatrix<Number>
@@ -1007,6 +1038,17 @@ namespace TrilinosWrappers
 					* default value is <tt>true</tt>,
 					* i.e., zero values won't be added
 					* into the matrix.
+					*/
+      void add (const std::vector<unsigned int>  &indices,
+		const FullMatrix<TrilinosScalar> &full_matrix,
+		const bool                        elide_zero_values = true);
+
+                                       /**
+                                        * Same function as before, but now
+                                        * including the possibility to use
+                                        * rectangular full_matrices and
+                                        * different local-to-global indexing
+                                        * on rows and columns, respectively.
 					*/
       void add (const std::vector<unsigned int>  &row_indices,
 		const std::vector<unsigned int>  &col_indices,
@@ -2017,6 +2059,13 @@ namespace TrilinosWrappers
 
 
 
+				        // Inline the set() and add()
+				        // functions, since they will be 
+                                        // called frequently, and the 
+				        // compiler can optimize away 
+				        // some unnecessary loops when
+					// the sizes are given at 
+				        // compile time.
   inline
   void
   SparseMatrix::set (const unsigned int   i,
@@ -2029,6 +2078,23 @@ namespace TrilinosWrappers
 		       "infinite or Not A Number (NaN)"));
 
     set (i, 1, &j, &value, false);
+  }
+
+
+
+  inline
+  void
+  SparseMatrix::set (const std::vector<unsigned int>  &indices,
+		     const FullMatrix<TrilinosScalar> &values,
+		     const bool                        elide_zero_values)
+  {
+    Assert (indices.size() == values.m(),
+	    ExcDimensionMismatch(indices.size(), values.m()));
+    Assert (values.m() == values.n(), ExcNotQuadratic());
+
+    for (unsigned int i=0; i<indices.size(); ++i)
+      set (indices[i], indices.size(), &indices[0], &values(i,0),
+	   elide_zero_values);
   }
 
 
@@ -2109,12 +2175,19 @@ namespace TrilinosWrappers
 
 	n_columns = 0;
 	for (unsigned int j=0; j<n_cols; ++j)
-	  if (values[j] != 0)
-	    {
-	      column_indices[n_columns] = col_indices[j];
-	      column_values[n_columns] = values[j];
-	      n_columns++;
-	    }
+	  {
+	    const double value = values[j];
+	    Assert (numbers::is_finite(value),
+		    ExcMessage("The given value is not finite but either "
+			       "infinite or Not A Number (NaN)"));
+	    if (value != 0)
+	      {
+		column_indices[n_columns] = col_indices[j];
+		column_values[n_columns] = value;
+		n_columns++;
+	      }
+	  }
+
 	Assert(n_columns <= (int)n_cols, ExcInternalError());
 
 	col_index_ptr = (int*)&column_indices[0];
@@ -2237,6 +2310,23 @@ namespace TrilinosWrappers
 
   inline
   void
+  SparseMatrix::add (const std::vector<unsigned int>  &indices,
+		     const FullMatrix<TrilinosScalar> &values,
+		     const bool                        elide_zero_values)
+  {
+    Assert (indices.size() == values.m(),
+	    ExcDimensionMismatch(indices.size(), values.m()));
+    Assert (values.m() == values.n(), ExcNotQuadratic());
+
+    for (unsigned int i=0; i<indices.size(); ++i)
+      add (indices[i], indices.size(), &indices[0], &values(i,0),
+	   elide_zero_values);
+  }
+
+
+
+  inline
+  void
   SparseMatrix::add (const std::vector<unsigned int>  &row_indices,
 		     const std::vector<unsigned int>  &col_indices,
 		     const FullMatrix<TrilinosScalar> &values,
@@ -2311,12 +2401,19 @@ namespace TrilinosWrappers
 
 	n_columns = 0;
 	for (unsigned int j=0; j<n_cols; ++j)
-	  if (values[j] != 0)
-	    {
-	      column_indices[n_columns] = col_indices[j];
-	      column_values[n_columns] = values[j];
-	      n_columns++;
-	    }
+	  {
+	    const double value = values[j];
+	    Assert (numbers::is_finite(value),
+		    ExcMessage("The given value is not finite but either "
+			       "infinite or Not A Number (NaN)"));
+	    if (value != 0)
+	      {
+		column_indices[n_columns] = col_indices[j];
+		column_values[n_columns] = value;
+		n_columns++;
+	      }
+	  }
+
 	Assert(n_columns <= (int)n_cols, ExcInternalError());
 
 	col_index_ptr = (int*)&column_indices[0];
