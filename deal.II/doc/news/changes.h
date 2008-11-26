@@ -486,6 +486,15 @@ inconvenience this causes.
 <ol>
   <li>
   <p>
+  Fixed: The VectorTools::interpolate_boundary_values function was implemented a bit
+  clumsily and was using much more time than necessary. This should be fixed now.
+  associated vertex.
+  <br>
+  (WB 2008/11/25)
+  </p>
+
+  <li>
+  <p>
   Fixed: The GridIn::read_msh function had a bug that made it reject
   MSH input files if they contained type-15 cells with more than one
   associated vertex.
