@@ -2,7 +2,7 @@
 //    $Id: fe.h 12032 2006-01-15 00:41:50Z wolf $
 //    Version: $Name$
 //
-//    Copyright (C) 1998, 2007 by the deal.II authors
+//    Copyright (C) 1998, 2007, 2008 by the deal.II authors
 //
 //    This file is subject to QPL and may not be  distributed
 //    without copyright and license information. Please refer
@@ -42,10 +42,12 @@ The following are the general rules we attempt to follow:
   visibly enough.</li>
 
 <li> Whenever an integer variable can only assume nonnegative values,
-  it has to be marked as unsigned.</li>
+  it is marked as unsigned.</li>
 
 <li> Whenever an argument will not be changed, it should be marked
-  const, even if it passed by value. This makes programs more readable
+  const, even if passed by value. Generally, we mark input parameters as
+  const. This aids as an additional documentation tool to clarify the
+  purpose of a parameter
   and lets the compiler issue warnings if such a parameter variable is
   changed, which is often either involuntarily or poor style.</li>
 
@@ -55,17 +57,13 @@ The following are the general rules we attempt to follow:
 <li> %Function and variable names may not consist of only one or two
   letters, unless the variable is a pure counting index.</li>
 
-<li> Use the geometry information in GeometryInfo<dim> to get the
+<li> Use the geometry information in GeometryInfo to get the
   number of faces per cell, the number of children per cell, the
   child indices of the child cells adjacent to face 3, etc, rather
-  than writing them into the directly as <code>2*dim</code>, <code>(1@<@<dim)</code> and
+  than writing them into the code directly as <code>2*dim</code>,
+  <code>(1@<@<dim)</code> and
   <code>{0,3}</code>. This reduces the possibilities for errors and enhances
-  readability of code. Unfortunately, the GeometryInfo mechanism
-  was not invented right at the start of the program, so there are
-  quite a lot of places where this rule is violated. Of you find
-  such a place, fix it. We have set an amount of 1 cent per fixed
-  place, payable by cheque when the deal.II project is considered
-  finished by the author(s).</li>
+  readability of code.</li>
 
 <li> The layout of class declarations is the following: first the
   block of public functions, beginning with the constructors, then
@@ -82,9 +80,10 @@ The following are the general rules we attempt to follow:
 
 <li> If a function has both input and output parameters, usually the
   input parameters shall precede the output parameters, unless there
-  are good reasons to change this order.</li>
+  are good reasons to change this order. (The most common reason is trailing
+  input parameters with default default values.) </li>
 
-<li> Exceptions are used for internal parameter checking and for
+<li> Exceptions are used for %internal parameter checking and for
   consistency checks through the Assert macro. Exception handling
   like done by the C++ language (<code>try/throw/catch</code>) are used to
   handle run time errors (like I/O failures) which must be on
@@ -92,7 +91,7 @@ The following are the general rules we attempt to follow:
 
 <li> Classes and types generally are named using uppercase letters to denote
   word beginnings (e.g. TriaIterator) while functions and variables
-  use lowercase letters and underscores to denote different words.
+  use lowercase letters and underscores to separate words.
   The only exception are the iterator typedefs in Triangulation
   and DoFHandler (named cell_iterator, active_line_iterator, etc)
   to make the connection to the STL classes clear.</li>
