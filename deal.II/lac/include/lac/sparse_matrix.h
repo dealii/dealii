@@ -2106,9 +2106,6 @@ SparseMatrix<number>::set (const unsigned int  row,
   global_indices.resize(n_cols);
   column_values.resize(n_cols);
 
-  const unsigned int * index_ptr = &col_indices[0];
-  const number * value_ptr = &values[0];
-
 				   // First, search all the indices to find
 				   // out which values we actually need to
 				   // set.
@@ -2116,18 +2113,15 @@ SparseMatrix<number>::set (const unsigned int  row,
 				   // efficient.
   for (unsigned int j=0; j<n_cols; ++j)
     {
-      const number value = *value_ptr++;
+      const number value = values[j];
       Assert (numbers::is_finite(value),
 	      ExcMessage("The given value is not finite but either "
 			 "infinite or Not A Number (NaN)"));
 
       if (value == 0 && elide_zero_values == true)
-	{
-	  ++index_ptr;
-	  continue;
-	}
+	continue;
 
-      const unsigned int index = cols->operator()(row, *index_ptr++);
+      const unsigned int index = cols->operator()(row, col_indices[j]);
 
 				   // it is allowed to set elements in
 				   // the matrix that are not part of
@@ -2146,8 +2140,8 @@ SparseMatrix<number>::set (const unsigned int  row,
       n_columns++;
     }
 
-  index_ptr = &global_indices[0];
-  value_ptr = &column_values[0];
+  const unsigned int * index_ptr = &global_indices[0];
+  const number * value_ptr = &column_values[0];
   
 				    // Finally, go through the index list 
 				    // and set the elements one by one.
@@ -2245,9 +2239,6 @@ SparseMatrix<number>::add (const unsigned int  row,
   global_indices.resize(n_cols);
   column_values.resize(n_cols);
 
-  const unsigned int * index_ptr = &col_indices[0];
-  const number * value_ptr = &values[0];
-
 				   // First, search all the indices to find
 				   // out which values we actually need to
 				   // add.
@@ -2255,18 +2246,15 @@ SparseMatrix<number>::add (const unsigned int  row,
 				   // efficient.
   for (unsigned int j=0; j<n_cols; ++j)
     {
-      const number value = *value_ptr++;
+      const number value = values[j];
       Assert (numbers::is_finite(value),
 	      ExcMessage("The given value is not finite but either "
 			 "infinite or Not A Number (NaN)"));
 
       if (value == 0 && elide_zero_values == true)
-	{
-	  ++index_ptr;
-	  continue;
-	}
+	continue;
 
-      const unsigned int index = cols->operator()(row, *index_ptr++);
+      const unsigned int index = cols->operator()(row, col_indices[j]);
 
 				   // it is allowed to add elements to
 				   // the matrix that are not part of
@@ -2285,9 +2273,9 @@ SparseMatrix<number>::add (const unsigned int  row,
       n_columns++;
     }
 
-  index_ptr = &global_indices[0];
-  value_ptr = &column_values[0];
-  
+  const unsigned int * index_ptr = &global_indices[0];
+  const number * value_ptr = &column_values[0];
+
 				    // Finally, go through the index list 
 				    // and add the elements one by one.
   for (unsigned int j=0; j<n_columns; ++j)

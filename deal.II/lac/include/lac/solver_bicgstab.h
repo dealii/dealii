@@ -42,16 +42,18 @@ DEAL_II_NAMESPACE_OPEN
  * solver changes.
  *
  * The Bicgstab-method has two additional parameters: the first is a
- * boolean, deciding whether to compute the actual residual in each
- * step (@p true) or to use the length of the computed orthogonal
- * residual (@p false). Remark, that computing the residual causes a
- * third matrix-vector-multiplication, though no additional
- * preconditioning, in each step. The reason for doing this is, that
- * the size of the orthogonalized residual computed during the
- * iteration may be larger by orders of magnitude than the true
- * residual. This is due to numerical instabilities related to badly
- * conditioned matrices. Since this instability results in a bad
- * stopping criterion, the default for this parameter is @p true.
+ * boolean, deciding whether to compute the actual residual in each step (@p
+ * true) or to use the length of the computed orthogonal residual (@p
+ * false). Remark, that computing the residual causes a third
+ * matrix-vector-multiplication, though no additional preconditioning, in
+ * each step. The reason for doing this is, that the size of the
+ * orthogonalized residual computed during the iteration may be larger by
+ * orders of magnitude than the true residual. This is due to numerical
+ * instabilities related to badly conditioned matrices. Since this
+ * instability results in a bad stopping criterion, the default for this
+ * parameter is @p true. Whenever the user knows that the estimated residual
+ * works reasonably as well, it the flag should be set to @p false in order
+ * to increase the performance of the solver.
  *
  * The second parameter is the size of a breakdown criterion. It is
  * difficult to find a general good criterion, so if things do not
@@ -62,13 +64,17 @@ class SolverBicgstab : public Solver<VECTOR>
 {
   public:
     				     /**
-				      * There are two possibilities to compute
-				      * the residual: one is an estimate using
-				      * the computed value @p tau. The other
-				      * is exact computation using another matrix
-				      * vector multiplication.
+				      * There are two possibilities to
+				      * compute the residual: one is an
+				      * estimate using the computed value @p
+				      * tau. The other is exact computation
+				      * using another matrix vector
+				      * multiplication. This increases the
+				      * costs of the algorithm, so it is
+				      * should be set to false whenever the
+				      * problem allows it.
 				      *
-				      * Bicgstab, is susceptible to breakdowns, so
+				      * Bicgstab is susceptible to breakdowns, so
 				      * we need a parameter telling us, which
 				      * numbers are considered zero.
 				      */
@@ -77,9 +83,9 @@ class SolverBicgstab : public Solver<VECTOR>
 					 /**
 					  * Constructor.
 					  *
-					  * The default is exact residual
-					  * computation and breakdown
-					  * parameter 1e-16.
+					  * The default is to perform an
+					  * exact residual computation and
+					  * breakdown parameter 1e-10.
 					  */
 	AdditionalData(bool exact_residual = true,
 		       double breakdown=1.e-10) :
