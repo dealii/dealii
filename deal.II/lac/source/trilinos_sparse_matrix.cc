@@ -283,7 +283,10 @@ namespace TrilinosWrappers
 				  // into it, and then build up the matrix
 				  // from the graph. This is considerable
 				  // faster than directly filling elements
-				  // into the matrix.
+				  // into the matrix. Moreover, it consumes
+				  // less memory, since the internal
+				  // reordering does not need to be done on
+				  // all the double values.
 
 				  // TODO: There seems to be problem in
 				  // Epetra when a Graph/matrix is

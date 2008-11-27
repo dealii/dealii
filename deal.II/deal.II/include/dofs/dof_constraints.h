@@ -18,6 +18,7 @@
 #include <base/exceptions.h>
 #include <base/subscriptor.h>
 #include <base/table.h>
+#include <base/thread_management.h>
 
 #include <vector>
 #include <map>
@@ -269,7 +270,7 @@ class BlockIndices;
  * a second step.
  *
  * @ingroup dofs
- * @author Wolfgang Bangerth, 1998, 2004
+ * @author Wolfgang Bangerth, 1998, 2004, 2008
  */
 class ConstraintMatrix : public Subscriptor
 {
@@ -1353,6 +1354,35 @@ class ConstraintMatrix : public Subscriptor
 				      * <tt>add_entries_local_to_global()</tt>.
 				      */
     static const Table<2,bool> default_empty_table;
+
+				     /**
+				      * A mutex that makes the function
+				      * <tt>distribute_local_to_global()</tt>
+				      * only accessible to one process at
+				      * time.
+				      */
+    Threads::ThreadMutex mutex;
+
+				     /**
+				      * A temporary array for the function
+				      * <tt>distribute_local_to_global()</tt>
+				      * that collects column indices for
+				      * values that should be written into
+				      * the same row (so that we can write
+				      * the values collectively into the
+				      * sparse matrix, which is faster).
+				      */
+    mutable std::vector<unsigned int> column_indices;
+
+				     /**
+				      * A temporary array for the function
+				      * <tt>distribute_local_to_global()</tt>
+				      * that collects values that should be
+				      * written into the same row (so that
+				      * we can write them collectively into
+				      * the sparse matrix, which is faster).
+				      */
+    mutable std::vector<double> column_values;
 };
 
 

@@ -376,6 +376,17 @@ inconvenience this causes.
 <ol>
   <li>
   <p>
+  New: All SparseMatrix classes (SparseMatrix<number>, PETSc sparse
+  matrices, Trilinos sparse matrices, block sparse matrices) can now
+  directly add and set a FullMatrix and some other arrays into their value
+  list. This is faster and more convenient than an element-by-element
+  addition/set.
+  <br>
+  (Martin Kronbichler 2008/11/26)
+  </p>
+
+  <li>
+  <p>
   New: The class LAPACKFullMatrix can now invert full matrices using 
   the (optimized) LAPACK functions getrf and getri. The speedup over 
   the FullMatrix::gauss_jordan() function is a factor of two for matrices
@@ -492,6 +503,15 @@ inconvenience this causes.
 <h3>deal.II</h3>
 
 <ol>
+  <li>
+  <p>
+  Updated: The function ConstraintMatrix::distribute_local_to_global() for
+  matrices does now use row-wise addition into sparse matrices, which
+  accelerates the transfer from local to global data.
+  <br>
+  (Martin Kronbichler, WB 2008/11/27)
+  </p>
+
   <li>
   <p>
   Fixed: The VectorTools::interpolate_boundary_values function was implemented a bit

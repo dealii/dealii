@@ -101,8 +101,8 @@ ConstraintMatrix::condense (const SparseMatrix<number> &uncondensed,
 			 uncondensed.global_entry(j));
 	else 
 	  {
-					     // let c point to the constraint
-					     // of this column
+					     // let c point to the
+					     // constraint of this column
 	    std::vector<ConstraintLine>::const_iterator c = lines.begin();
 	    while (c->line != uncondensed_struct.get_column_numbers()[j])
 	      ++c;
@@ -649,35 +649,39 @@ distribute_local_to_global (const FullMatrix<double>        &local_matrix,
   Assert (sorted == true, ExcMatrixNotClosed());
 
   const unsigned int n_local_dofs = local_dof_indices.size();
+
+                                   // A lock that allows only one thread at
+				   // time to go on in this function.
+  mutex.acquire();
   
                                    // have a special case where there are no
                                    // constraints at all, since then we can be
                                    // a lot faster
   if (lines.size() == 0)
-    {
-      for (unsigned int i=0; i<n_local_dofs; ++i)
-        for (unsigned int j=0; j<n_local_dofs; ++j)
-          global_matrix.add(local_dof_indices[i],
-                            local_dof_indices[j],
-                            local_matrix(i,j));
-    }
+    global_matrix.add(local_dof_indices, local_matrix);
   else
     {
                                        // here we have to do something a
                                        // little nastier than in the
-                                       // respective function for vectors. the
-                                       // reason is that we have two nested
-                                       // loops and we don't want to
-                                       // repeatedly check whether a certain
-                                       // dof is constrained or not by
-                                       // searching over all the constrained
-                                       // dofs. so we have to cache this
-                                       // knowledge, by storing for each dof
-                                       // index whether and where the line of
-                                       // the constraint matrix is located
+                                       // respective function for
+                                       // vectors. the reason is that we
+                                       // have two nested loops and we don't
+                                       // want to repeatedly check whether a
+                                       // certain dof is constrained or not
+                                       // by searching over all the
+                                       // constrained dofs. so we have to
+                                       // cache this knowledge, by storing
+                                       // for each dof index whether and
+                                       // where the line of the constraint
+                                       // matrix is located. Moreover, we
+                                       // store how many entries there are
+                                       // at most in one constrained row in
+                                       // order to set the scratch array for
+                                       // column data to a sufficient size.
       std::vector<const ConstraintLine *>
         constraint_lines (n_local_dofs,
                           static_cast<const ConstraintLine *>(0));
+      unsigned int n_max_entries_per_row = 0;
       for (unsigned int i=0; i<n_local_dofs; ++i)
         {
           ConstraintLine index_comparison;
@@ -688,24 +692,41 @@ distribute_local_to_global (const FullMatrix<double>        &local_matrix,
                                          lines.end(),
                                          index_comparison);
           
-                                           // if this dof is constrained, then
-                                           // set the respective entry in the
-                                           // array. otherwise leave it at the
-                                           // invalid position
+                                           // if this dof is constrained,
+                                           // then set the respective entry
+                                           // in the array. otherwise leave
+                                           // it at the invalid position
           if ((position != lines.end()) &&
               (position->line == local_dof_indices[i]))
-            constraint_lines[i] = &*position;
+	    {
+	      constraint_lines[i] = &*position;
+	      n_max_entries_per_row += position->entries.size();
+	    }
         }
 
+				       // We need to add the number of
+				       // entries in the local matrix in
+				       // order to obtain a sufficient size
+				       // for the scratch array.
+      n_max_entries_per_row += n_local_dofs;
+      column_indices.resize(n_max_entries_per_row);
+      column_values.resize(n_max_entries_per_row);
 
-                                       // now distribute entries
+                                       // now distribute entries row by row
       for (unsigned int i=0; i<n_local_dofs; ++i)
         {
           const ConstraintLine *position_i = constraint_lines[i];
           const bool is_constrained_i = (position_i != 0);
+
+	  unsigned int col_counter = 0;
           
           for (unsigned int j=0; j<n_local_dofs; ++j)
             {
+				       // we don't need to proceed when the
+				       // matrix element is zero
+	      if (local_matrix(i,j) == 0)
+		continue;
+
               const ConstraintLine *position_j = constraint_lines[j];
               const bool is_constrained_j = (position_j != 0);
 
@@ -713,16 +734,26 @@ distribute_local_to_global (const FullMatrix<double>        &local_matrix,
                   (is_constrained_j == false))
                 {
                                                    // neither row nor column
-                                                   // is constrained
-                  global_matrix.add (local_dof_indices[i],
-                                     local_dof_indices[j],
-                                     local_matrix(i,j));
+                                                   // is constrained, so
+                                                   // write the value into
+                                                   // the scratch array
+		  column_indices[col_counter] = local_dof_indices[j];
+		  column_values[col_counter] = local_matrix(i,j);
+		  col_counter++;
                 }
               else if ((is_constrained_i == true) &&
                        (is_constrained_j == false))
                 {
-                                                   // ok, row is constrained,
-                                                   // but column is not
+                                                   // ok, row is
+                                                   // constrained, but
+                                                   // column is not. This
+                                                   // creates entries in
+                                                   // several rows to the
+                                                   // same column, which is
+                                                   // not covered by the
+                                                   // scratch array. Write
+                                                   // the values directly
+                                                   // into the matrix
                   for (unsigned int q=0; q<position_i->entries.size(); ++q)
                     global_matrix.add (position_i->entries[q].first,
                                        local_dof_indices[j],
@@ -733,19 +764,32 @@ distribute_local_to_global (const FullMatrix<double>        &local_matrix,
                        (is_constrained_j == true))
                 {
                                                    // simply the other way
-                                                   // round: row ok, column is
-                                                   // constrained
+                                                   // round: row ok, column
+                                                   // is constrained. This
+                                                   // time, we can put
+                                                   // everything into the
+                                                   // scratch array, since
+                                                   // we are in the correct
+                                                   // row.
                   for (unsigned int q=0; q<position_j->entries.size(); ++q)
-                    global_matrix.add (local_dof_indices[i],
-                                       position_j->entries[q].first,
-                                       local_matrix(i,j) *
-                                       position_j->entries[q].second);
+		    {
+		      column_indices[col_counter] = position_j->entries[q].first;
+		      column_values[col_counter] = local_matrix(i,j) *
+			                           position_j->entries[q].second;
+		      col_counter++;
+		    }
                 }
               else if ((is_constrained_i == true) &&
                        (is_constrained_j == true))
                 {
-                                                   // last case: both row and
-                                                   // column are constrained
+                                                   // last case: both row
+                                                   // and column are
+                                                   // constrained. Again,
+                                                   // this creates entries
+                                                   // in other rows than the
+                                                   // current one, so write
+                                                   // the values again in
+                                                   // the matrix directly
                   for (unsigned int p=0; p<position_i->entries.size(); ++p)
                     for (unsigned int q=0; q<position_j->entries.size(); ++q)
                       global_matrix.add (position_i->entries[p].first,
@@ -760,61 +804,68 @@ distribute_local_to_global (const FullMatrix<double>        &local_matrix,
                                                    // do something with the
                                                    // diagonal elements. add
                                                    // the absolute value of
-                                                   // the local matrix, so the
-                                                   // resulting entry will
-                                                   // always be positive and
+                                                   // the local matrix, so
+                                                   // the resulting entry
+                                                   // will always be
+                                                   // positive and
                                                    // furthermore be in the
-                                                   // same order of magnitude
-                                                   // as the other elements of
-                                                   // the matrix
+                                                   // same order of
+                                                   // magnitude as the other
+                                                   // elements of the matrix
 						   //
-						   // note that this
-						   // also captures
-						   // the special case
-						   // that a dof is
-						   // both constrained
-						   // and fixed (this
-						   // can happen for
+						   // note that this also
+						   // captures the special
+						   // case that a dof is
+						   // both constrained and
+						   // fixed (this can happen
+						   // for hanging nodes in
+						   // 3d that also happen to
+						   // be on the
+						   // boundary). in that
+						   // case, following the
+						   // above program flow, it
+						   // is realized that when
+						   // distributing the row
+						   // and column no elements
+						   // of the matrix are
+						   // actually touched if
+						   // all the degrees of
+						   // freedom to which this
+						   // dof is constrained are
+						   // also constrained (the
+						   // usual case with
 						   // hanging nodes in
-						   // 3d that also
-						   // happen to be on
-						   // the
-						   // boundary). in
-						   // that case,
-						   // following the
-						   // above program
-						   // flow, it is
-						   // realized that
-						   // when
-						   // distributing the
-						   // row and column
-						   // no elements of
-						   // the matrix are
-						   // actually touched
-						   // if all the
-						   // degrees of
-						   // freedom to which
-						   // this dof is
-						   // constrained are
-						   // also constrained
-						   // (the usual case
-						   // with hanging
-						   // nodes in
-						   // 3d). however, in
-						   // the line below,
-						   // we do actually
-						   // do something
+						   // 3d). however, in the
+						   // line below, we do
+						   // actually do something
 						   // with this dof
                   if (i == j)
-                    global_matrix.add (local_dof_indices[i],
-                                       local_dof_indices[i],
-                                       local_matrix(i,i));
+		    {
+		      column_indices[col_counter] = local_dof_indices[j];
+		      column_values[col_counter] = local_matrix(i,j);
+		      col_counter++;
+		    }
                 }
               else
                 Assert (false, ExcInternalError());
             }
+
+				   // Check whether we did remain within the
+				   // arrays when adding elements into the
+				   // scratch arrays. Moreover, there should
+				   // be at least one element in the scratch
+				   // array (the element diagonal).
+	  Assert (col_counter <= n_max_entries_per_row, ExcInternalError());
+
+				   // Finally, write the scratch array into
+				   // the sparse matrix.
+	  if (col_counter > 0)
+	    global_matrix.add(local_dof_indices[i], col_counter, 
+			      &column_indices[0], &column_values[0], 
+			      false);
         }
     }
+  mutex.release();
 }
 
 

@@ -793,8 +793,9 @@ class SparseMatrix : public virtual Subscriptor
 					* <tt>false</tt>, i.e., even zero
 					* values are treated.
 					*/
+    template <typename number2>
     void set (const std::vector<unsigned int> &indices,
-	      const FullMatrix<number>        &full_matrix,
+	      const FullMatrix<number2>       &full_matrix,
 	      const bool                       elide_zero_values = false);
 
                                        /**
@@ -804,9 +805,10 @@ class SparseMatrix : public virtual Subscriptor
                                         * different local-to-global indexing
                                         * on rows and columns, respectively.
 					*/
+    template <typename number2>
     void set (const std::vector<unsigned int> &row_indices,
 	      const std::vector<unsigned int> &col_indices,
-	      const FullMatrix<number>        &full_matrix,
+	      const FullMatrix<number2>       &full_matrix,
 	      const bool                       elide_zero_values = false);
 
                                        /**
@@ -827,9 +829,10 @@ class SparseMatrix : public virtual Subscriptor
 					* <tt>false</tt>, i.e., even zero
 					* values are treated.
 					*/
+    template <typename number2>
     void set (const unsigned int               row,
 	      const std::vector<unsigned int> &col_indices,
-	      const std::vector<number>       &values,
+	      const std::vector<number2>      &values,
 	      const bool                       elide_zero_values = false);
 
                                        /**
@@ -848,10 +851,11 @@ class SparseMatrix : public virtual Subscriptor
 					* <tt>false</tt>, i.e., even zero
 					* values are inserted/replaced.
 					*/
+    template <typename number2>
     void set (const unsigned int  row,
 	      const unsigned int  n_cols,
 	      const unsigned int *col_indices,
-	      const number       *values,
+	      const number2      *values,
 	      const bool          elide_zero_values = false);
 
 				     /**
@@ -894,8 +898,9 @@ class SparseMatrix : public virtual Subscriptor
 					* i.e., zero values won't be added
 					* into the matrix.
 					*/
+    template <typename number2>
     void add (const std::vector<unsigned int> &indices,
-	      const FullMatrix<number>        &full_matrix,
+	      const FullMatrix<number2>       &full_matrix,
 	      const bool                       elide_zero_values = true);
 
                                        /**
@@ -905,9 +910,10 @@ class SparseMatrix : public virtual Subscriptor
                                         * different local-to-global indexing
                                         * on rows and columns, respectively.
 					*/
+    template <typename number2>
     void add (const std::vector<unsigned int> &row_indices,
 	      const std::vector<unsigned int> &col_indices,
-	      const FullMatrix<number>        &full_matrix,
+	      const FullMatrix<number2>       &full_matrix,
 	      const bool                       elide_zero_values = true);
 
                                        /**
@@ -927,9 +933,10 @@ class SparseMatrix : public virtual Subscriptor
 					* i.e., zero values won't be added
 					* into the matrix.
 					*/
+    template <typename number2>
     void add (const unsigned int               row,
 	      const std::vector<unsigned int> &col_indices,
-	      const std::vector<number>       &values,
+	      const std::vector<number2>      &values,
 	      const bool                       elide_zero_values = true);
 
                                        /**
@@ -949,10 +956,11 @@ class SparseMatrix : public virtual Subscriptor
 					* i.e., zero values won't be added
 					* into the matrix.
 					*/
+    template <typename number2>
     void add (const unsigned int  row,
 	      const unsigned int  n_cols,
 	      const unsigned int *col_indices,
-	      const number       *values,
+	      const number2      *values,
 	      const bool          elide_zero_values = true);
 
 				     /**
@@ -2033,10 +2041,11 @@ SparseMatrix<number>::set (const unsigned int i,
 
 
 template <typename number>  
+template <typename number2>  
 inline
 void
 SparseMatrix<number>::set (const std::vector<unsigned int> &indices,
-			   const FullMatrix<number>        &values,
+			   const FullMatrix<number2>       &values,
 			   const bool                       elide_zero_values)
 {
   Assert (indices.size() == values.m(),
@@ -2051,11 +2060,12 @@ SparseMatrix<number>::set (const std::vector<unsigned int> &indices,
 
 
 template <typename number>  
+template <typename number2>  
 inline
 void
 SparseMatrix<number>::set (const std::vector<unsigned int> &row_indices,
 			   const std::vector<unsigned int> &col_indices,
-			   const FullMatrix<number>        &values,
+			   const FullMatrix<number2>       &values,
 			   const bool                       elide_zero_values)
 {
   Assert (row_indices.size() == values.m(),
@@ -2071,11 +2081,12 @@ SparseMatrix<number>::set (const std::vector<unsigned int> &row_indices,
 
 
 template <typename number>  
+template <typename number2>  
 inline
 void
 SparseMatrix<number>::set (const unsigned int               row,
 			   const std::vector<unsigned int> &col_indices,
-			   const std::vector<number>       &values,
+			   const std::vector<number2>      &values,
 			   const bool                       elide_zero_values)
 {
   Assert (col_indices.size() == values.size(),
@@ -2087,13 +2098,14 @@ SparseMatrix<number>::set (const unsigned int               row,
 
 
 
-template <typename number>  
+template <typename number>
+template <typename number2>
 inline
 void
 SparseMatrix<number>::set (const unsigned int  row,
 			   const unsigned int  n_cols,
 			   const unsigned int *col_indices,
-			   const number       *values,
+			   const number2       *values,
 			   const bool          elide_zero_values)
 {
   Assert (cols != 0, ExcNotInitialized());
@@ -2169,10 +2181,11 @@ SparseMatrix<number>::add (const unsigned int i,
 
 
 template <typename number>  
+template <typename number2>  
 inline
 void
 SparseMatrix<number>::add (const std::vector<unsigned int> &indices,
-			   const FullMatrix<number>        &values,
+			   const FullMatrix<number2>       &values,
 			   const bool                       elide_zero_values)
 {
   Assert (indices.size() == values.m(),
@@ -2187,11 +2200,12 @@ SparseMatrix<number>::add (const std::vector<unsigned int> &indices,
 
 
 template <typename number>  
+template <typename number2>  
 inline
 void
 SparseMatrix<number>::add (const std::vector<unsigned int> &row_indices,
 			   const std::vector<unsigned int> &col_indices,
-			   const FullMatrix<number>        &values,
+			   const FullMatrix<number2>       &values,
 			   const bool                       elide_zero_values)
 {
   Assert (row_indices.size() == values.m(),
@@ -2207,11 +2221,12 @@ SparseMatrix<number>::add (const std::vector<unsigned int> &row_indices,
 
 
 template <typename number>  
+template <typename number2>  
 inline
 void
 SparseMatrix<number>::add (const unsigned int               row,
 			   const std::vector<unsigned int> &col_indices,
-			   const std::vector<number>       &values,
+			   const std::vector<number2>      &values,
 			   const bool                       elide_zero_values)
 {
   Assert (col_indices.size() == values.size(),
@@ -2223,13 +2238,14 @@ SparseMatrix<number>::add (const unsigned int               row,
 
 
 
-template <typename number>  
+template <typename number>
+template <typename number2>
 inline
 void
 SparseMatrix<number>::add (const unsigned int  row,
 			   const unsigned int  n_cols,
 			   const unsigned int *col_indices,
-			   const number       *values,
+			   const number2      *values,
 			   const bool          elide_zero_values)
 {
   Assert (cols != 0, ExcNotInitialized());
