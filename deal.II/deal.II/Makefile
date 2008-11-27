@@ -101,6 +101,12 @@ ifneq ($(GXX-VERSION),compaq_cxx)
     deplibs.o += $(lib-contrib-petsc.o)
   endif
 
+  # same with SLEPC
+  ifeq ($(USE_CONTRIB_SLEPC),yes)
+    deplibs.g += $(lib-contrib-slepc)
+    deplibs.o += $(lib-contrib-slepc)
+  endif
+
   # and METIS
   ifeq ($(USE_CONTRIB_METIS),yes)
     deplibs.g += $(lib-contrib-metis)

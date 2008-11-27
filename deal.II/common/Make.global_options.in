@@ -54,6 +54,13 @@ DEAL_II_PETSC_VERSION_MINOR    = @DEAL_II_PETSC_VERSION_MINOR@
 DEAL_II_PETSC_VERSION_SUBMINOR = @DEAL_II_PETSC_VERSION_SUBMINOR@
 DEAL_II_PETSC_MPIUNI_LIB = @DEAL_II_PETSC_MPIUNI_LIB@
 
+USE_CONTRIB_SLEPC    = @USE_CONTRIB_SLEPC@
+DEAL_II_SLEPC_DIR    = @DEAL_II_SLEPC_DIR@
+DEAL_II_SLEPC_ARCH   = @DEAL_II_SLEPC_ARCH@
+DEAL_II_SLEPC_VERSION_MAJOR    = @DEAL_II_SLEPC_VERSION_MAJOR@
+DEAL_II_SLEPC_VERSION_MINOR    = @DEAL_II_SLEPC_VERSION_MINOR@
+DEAL_II_SLEPC_VERSION_SUBMINOR = @DEAL_II_SLEPC_VERSION_SUBMINOR@
+
 USE_CONTRIB_TRILINOS = @USE_CONTRIB_TRILINOS@
 DEAL_II_TRILINOS_INCDIR = @DEAL_II_TRILINOS_INCDIR@
 DEAL_II_TRILINOS_LIBDIR = @DEAL_II_TRILINOS_LIBDIR@
@@ -161,10 +168,11 @@ else
   endif
 endif  
 
+# similar (and simpler) for slepc
+ lib-contrib-slepc = $(DEAL_II_SLEPC_DIR)/lib/$(DEAL_II_SLEPC_ARCH)/libslepc$(lib-suffix)
 
 # same for metis, except that there is only one library in that case
 lib-contrib-metis = $(DEAL_II_METIS_LIBDIR)/libmetis.a
-
 
 # if PETSC is used, we need to add a number of libraries to what
 # we link for LAC
@@ -174,6 +182,11 @@ ifeq ($(USE_CONTRIB_PETSC),yes)
   LIBS += $(DEAL_II_PETSC_MPIUNI_LIB)
 endif
 
+# if SLEPC is used, we need to add one library to the lac libs
+ifeq ($(USE_CONTRIB_SLEPC),yes)
+  lib-lac.g += $(lib-contrib-slepc)
+  lib-lac.o += $(lib-contrib-slepc)
+endif
 
 # If METIS was detected, add it to the lac libs, since this is where we call
 # them
@@ -182,13 +195,14 @@ ifeq ($(USE_CONTRIB_METIS),yes)
   lib-lac.o += $(lib-contrib-metis)
 endif
 
-
 # include paths. do not take into account a possibly existing
 # environment variable, since the compiler will evaluate the value of
 # that anyway at compile time
 
 include-path-petsc           = $(DEAL_II_PETSC_DIR)/include
 include-path-petsc-bmake     = $(DEAL_II_PETSC_DIR)/bmake/$(DEAL_II_PETSC_ARCH)
+include-path-slepc           = $(DEAL_II_SLEPC_DIR)/include
+include-path-slepc-bmake     = $(DEAL_II_SLEPC_DIR)/bmake/$(DEAL_II_SLEPC_ARCH)
 include-path-trilinos        = $(DEAL_II_TRILINOS_INCDIR)
 include-path-metis           = $(DEAL_II_METIS_INCDIR)
 
@@ -200,7 +214,7 @@ INCLUDE = -I$D/base/include -I$D/lac/include -I$D/deal.II/include \
           @UMFPACK_INCLUDE_DIR@ @HSL_INCLUDE_DIR@ \
 	  -I$D/contrib
 
-# add PETSc, Trilinos and METIS include path if necessary. this rule
+# add PETSc, SLEPSc, Trilinos and METIS include path if necessary. this rule
 # (and the one further down below to get correct flags) should eventually
 # be replaced by something where we do not blindly include PETSc make files
 # (and thus import all of its variables), but rather set up a scheme to
@@ -213,6 +227,10 @@ ifeq ($(USE_CONTRIB_PETSC),yes)
   endif
   INCLUDE += -I$(include-path-petsc) -I$(include-path-petsc-bmake)\
              $(MPI_INCLUDE)
+endif
+
+ifeq ($(USE_CONTRIB_SLEPC),yes)
+  INCLUDE += -I$(include-path-slepc) -I$(include-path-slepc-bmake)
 endif
 
 ifeq ($(USE_CONTRIB_TRILINOS),yes)
@@ -285,5 +303,4 @@ ifeq ($(USE_CONTRIB_PETSC),yes)
   CXXFLAGS.g += $(GCXX_PETSCFLAGS)
   CXXFLAGS.o += $(OCXX_PETSCFLAGS)
 endif
-
 
