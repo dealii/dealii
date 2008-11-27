@@ -2123,8 +2123,8 @@ SparseMatrix<number>::set (const unsigned int  row,
 
       if (value == 0 && elide_zero_values == true)
 	{
-	  continue;
 	  ++index_ptr;
+	  continue;
 	}
 
       const unsigned int index = cols->operator()(row, *index_ptr++);
@@ -2262,8 +2262,8 @@ SparseMatrix<number>::add (const unsigned int  row,
 
       if (value == 0 && elide_zero_values == true)
 	{
-	  continue;
 	  ++index_ptr;
+	  continue;
 	}
 
       const unsigned int index = cols->operator()(row, *index_ptr++);
