@@ -32,14 +32,6 @@ inconvenience this causes.
 <ol>
   <li>
   <p> 
-  Added: Autodetect SLEPc in dealii configury. In this way we now have 
-  a handle on the generalized eigenvalue problem.
-  <br>
-  (Toby D. Young 2008/11/27)
-  </p>
-
-  <li>
-  <p> 
   Changed: The function DoFTools::get_subdomain_association function used
   to assign degrees of freedom to the subdomain of the last cell on which
   the degree of freedom is a part. This introduced a bias for degrees of
@@ -150,6 +142,14 @@ inconvenience this causes.
 <h3>General</h3>
 
 <ol>
+  <li>
+  <p> 
+  Added: The deal.II configure script now autodetects SLEPc, an eigenvalue
+  solver.
+  <br>
+  (Toby D. Young 2008/11/27)
+  </p>
+
   <li>
   <p>
   New: A new  tutorial program, @ref step_31 "step-31", is contributed by
