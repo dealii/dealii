@@ -2170,8 +2170,11 @@ namespace TrilinosWrappers
 				   // Otherwise, extract nonzero values in
 				   // each row and get the respective
 				   // indices.
-	column_indices.resize(n_cols);
-	column_values.resize(n_cols);
+	if (column_indices.size() < n_cols)
+	  {
+	    column_indices.resize(n_cols);
+	    column_values.resize(n_cols);
+	  }
 
 	n_columns = 0;
 	for (unsigned int j=0; j<n_cols; ++j)
@@ -2395,8 +2398,11 @@ namespace TrilinosWrappers
       {
 				   // Otherwise, extract nonzero values in
 				   // each row and the corresponding index.
-	column_indices.resize(n_cols);
-	column_values.resize(n_cols);
+	if (column_indices.size() < n_cols)
+	  {
+	    column_indices.resize(n_cols);
+	    column_values.resize(n_cols);
+	  }
 
 	n_columns = 0;
 	for (unsigned int j=0; j<n_cols; ++j)

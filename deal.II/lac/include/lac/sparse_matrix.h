@@ -2252,8 +2252,11 @@ SparseMatrix<number>::add (const unsigned int  row,
 
   unsigned int n_columns = 0;
 
-  global_indices.resize(n_cols);
-  column_values.resize(n_cols);
+  if (global_indices.size() < n_cols)
+    {
+      global_indices.resize(n_cols);
+      column_values.resize(n_cols);
+    }
 
 				   // First, search all the indices to find
 				   // out which values we actually need to

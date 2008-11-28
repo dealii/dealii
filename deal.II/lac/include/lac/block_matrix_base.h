@@ -1861,30 +1861,46 @@ BlockMatrixBase<MatrixType>::set (const unsigned int  row,
 				  const bool          elide_zero_values)
 {
 				   // Resize scratch arrays
-  column_indices.resize (this->n_block_cols());
-  column_values.resize (this->n_block_cols());
-  counter_within_block.resize (this->n_block_cols());
-
-				   // Resize sub-arrays to n_cols. This is a
-				   // bit wasteful, but we resize only a few
-				   // times (then the maximum row length
-				   // won't increase that much any more).
-  for (unsigned int i=0; i<this->n_block_cols(); ++i)
+  if (column_indices.size() < this->n_block_cols())
     {
-      column_indices[i].resize(n_cols);
-      column_values[i].resize(n_cols);
-      counter_within_block[i] = 0;
+      column_indices.resize (this->n_block_cols());
+      column_values.resize (this->n_block_cols());
+      counter_within_block.resize (this->n_block_cols());
     }
 
-				   // Go through the column indices to find
-				   // out which portions of the values
-				   // should be written into which block
-				   // matrix. We need to restore all the
-				   // data, since we can't be sure that the
-				   // data of one block is stored
-				   // contiguously (in fact, it will be
-				   // intermixed when the data comes from an
-				   // element matrix).
+				   // Resize sub-arrays to n_cols. This
+				   // is a bit wasteful, but we resize
+				   // only a few times (then the maximum
+				   // row length won't increase that
+				   // much any more). At least we know
+				   // that all arrays are going to be of
+				   // the same size, so we can check
+				   // whether the size of one is large
+				   // enough before actually going
+				   // through all of them.
+  if (column_indices[0].size() < n_cols)
+    {
+      for (unsigned int i=0; i<this->n_block_cols(); ++i)
+        {
+	  column_indices[i].resize(n_cols);
+	  column_values[i].resize(n_cols);
+	}
+    }
+
+				   // Reset the number of added elements
+				   // in each block to zero.
+  for (unsigned int i=0; i<this->n_block_cols(); ++i)
+    counter_within_block[i] = 0;
+
+				   // Go through the column indices to
+				   // find out which portions of the
+				   // values should be set in which
+				   // block of the matrix. We need to
+				   // touch all the data, since we can't
+				   // be sure that the data of one block
+				   // is stored contiguously (in fact,
+				   // indices will be intermixed when it
+				   // comes from an element matrix).
   for (unsigned int j=0; j<n_cols; ++j)
     {
       double value = values[j];
@@ -2037,31 +2053,48 @@ BlockMatrixBase<MatrixType>::add (const unsigned int   row,
 				   // TODO: Look over this to find out
 				   // whether we can do that more
 				   // efficiently.
-				   // Resize scratch arrays
-  column_indices.resize (this->n_block_cols());
-  column_values.resize (this->n_block_cols());
-  counter_within_block.resize (this->n_block_cols());
 
-				   // Resize sub-arrays to n_cols. This is a
-				   // bit wasteful, but we resize only a few
-				   // times (then the maximum row length
-				   // won't increase that much any more).
-  for (unsigned int i=0; i<this->n_block_cols(); ++i)
+				   // Resize scratch arrays
+  if (column_indices.size() < this->n_block_cols())
     {
-      column_indices[i].resize(n_cols);
-      column_values[i].resize(n_cols);
-      counter_within_block[i] = 0;
+      column_indices.resize (this->n_block_cols());
+      column_values.resize (this->n_block_cols());
+      counter_within_block.resize (this->n_block_cols());
     }
 
-				   // Go through the column indices to find
-				   // out which portions of the values
-				   // should be written into which block
-				   // matrix. We need to restore all the
-				   // data, since we can't be sure that the
-				   // data of one block is stored
-				   // contiguously (in fact, it will be
-				   // intermixed when the data comes from an
-				   // element matrix).
+				   // Resize sub-arrays to n_cols. This
+				   // is a bit wasteful, but we resize
+				   // only a few times (then the maximum
+				   // row length won't increase that
+				   // much any more). At least we know
+				   // that all arrays are going to be of
+				   // the same size, so we can check
+				   // whether the size of one is large
+				   // enough before actually going
+				   // through all of them.
+  if (column_indices[0].size() < n_cols)
+    {
+      for (unsigned int i=0; i<this->n_block_cols(); ++i)
+        {
+	  column_indices[i].resize(n_cols);
+	  column_values[i].resize(n_cols);
+	}
+    }
+
+				   // Reset the number of added elements
+				   // in each block to zero.
+  for (unsigned int i=0; i<this->n_block_cols(); ++i)
+    counter_within_block[i] = 0;
+
+				   // Go through the column indices to
+				   // find out which portions of the
+				   // values should be written into
+				   // which block of the matrix. We need
+				   // to touch all the data, since we
+				   // can't be sure that the data of one
+				   // block is stored contiguously (in
+				   // fact, data will be intermixed when
+				   // it comes from an element matrix).
   for (unsigned int j=0; j<n_cols; ++j)
     {
       double value = values[j];

@@ -709,8 +709,11 @@ distribute_local_to_global (const FullMatrix<double>        &local_matrix,
 				       // order to obtain a sufficient size
 				       // for the scratch array.
       n_max_entries_per_row += n_local_dofs;
-      column_indices.resize(n_max_entries_per_row);
-      column_values.resize(n_max_entries_per_row);
+      if (column_indices.size() < n_max_entries_per_row)
+        {
+	  column_indices.resize(n_max_entries_per_row);
+	  column_values.resize(n_max_entries_per_row);
+	}
 
                                        // now distribute entries row by row
       for (unsigned int i=0; i<n_local_dofs; ++i)
