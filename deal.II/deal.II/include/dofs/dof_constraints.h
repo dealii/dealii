@@ -1361,7 +1361,7 @@ class ConstraintMatrix : public Subscriptor
 				      * only accessible to one process at
 				      * time.
 				      */
-    Threads::ThreadMutex mutex;
+    mutable Threads::ThreadMutex mutex;
 
 				     /**
 				      * A temporary array for the function
