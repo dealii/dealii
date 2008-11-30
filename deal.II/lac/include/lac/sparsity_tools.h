@@ -17,6 +17,8 @@
 #include <base/config.h>
 #include <base/exceptions.h>
 
+#include <vector>
+
 DEAL_II_NAMESPACE_OPEN
 
 class SparsityPattern;
