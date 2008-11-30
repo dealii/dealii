@@ -56,6 +56,7 @@ Makefile.dep: $(HEADERS:%=$D/%) Makefile
 		echo test-$$i \\ ; \
 	 done > Makefile.dep
 	@echo : >> Makefile.dep
+	@echo '	@echo "=================== $$(call subst_slashes,$$@).cc"' >> Makefile.dep
 	@echo '	@echo "#include <$$(call normalize,$$@)>" > $$(call subst_slashes,$$@).cc' >> Makefile.dep
 	@echo '	@$$(MAKE) $$(call subst_slashes,$$@).g.o' >> Makefile.dep
 	@echo '	@rm -f $$(call subst_slashes,$$@).g.o' >> Makefile.dep
