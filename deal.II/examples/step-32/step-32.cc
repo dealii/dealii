@@ -388,7 +388,7 @@ double BoussinesqFlowProblem<dim>::get_maximal_velocity () const
   FEValues<dim> fe_values (stokes_fe, quadrature_formula, update_values);
   std::vector<Vector<double> > stokes_values(n_q_points,
 					     Vector<double>(dim+1));
-  double max_velocity = 0;
+  double max_local_velocity = 0, max_velocity = 0;
 
   typename DoFHandler<dim>::active_cell_iterator
     cell = stokes_dof_handler.begin_active(),
@@ -405,9 +405,11 @@ double BoussinesqFlowProblem<dim>::get_maximal_velocity () const
 	    for (unsigned int i=0; i<dim; ++i)
 	      velocity[i] = stokes_values[q](i);
 
-	    max_velocity = std::max (max_velocity, velocity.norm());
+	    max_local_velocity = std::max (max_local_velocity, velocity.norm());
 	  }
       }
+
+  trilinos_communicator.MaxAll(&max_local_velocity, &max_velocity, 1);
 
   return max_velocity;
 }
@@ -431,12 +433,12 @@ BoussinesqFlowProblem<dim>::get_extrapolated_temperature_range () const
 
   if (timestep_number != 0)
     {
-      double min_temperature = (1. + time_step/old_time_step) *
-			       old_temperature_solution.linfty_norm()
-			       +
-			       time_step/old_time_step *
-			       old_old_temperature_solution.linfty_norm(),
-	     max_temperature = -min_temperature;
+      double min_local_temperature = (1. + time_step/old_time_step) *
+	                             old_temperature_solution.linfty_norm()
+	                             +
+			             time_step/old_time_step *
+			             old_old_temperature_solution.linfty_norm(),
+	     max_local_temperature = -min_local_temperature;
 
       typename DoFHandler<dim>::active_cell_iterator
 	cell = temperature_dof_handler.begin_active(),
@@ -455,17 +457,24 @@ BoussinesqFlowProblem<dim>::get_extrapolated_temperature_range () const
 		(1. + time_step/old_time_step) * old_temperature_values[q]-
 		time_step/old_time_step * old_old_temperature_values[q];
 
-	      min_temperature = std::min (min_temperature, temperature);
-	      max_temperature = std::max (max_temperature, temperature);
+	      min_local_temperature = std::min (min_local_temperature, 
+						temperature);
+	      max_local_temperature = std::max (max_local_temperature, 
+						temperature);
 	    }
 	}
+
+      double min_temperature, max_temperature;
+
+      trilinos_communicator.MaxAll(&max_local_temperature, &max_temperature, 1);
+      trilinos_communicator.MaxAll(&min_local_temperature, &min_temperature, 1);
 
       return std::make_pair(min_temperature, max_temperature);
     }
   else
     {
-      double min_temperature = old_temperature_solution.linfty_norm(),
-	     max_temperature = -min_temperature;
+      double min_local_temperature = old_temperature_solution.linfty_norm(),
+	     max_local_temperature = -min_local_temperature;
 
       typename DoFHandler<dim>::active_cell_iterator
 	cell = temperature_dof_handler.begin_active(),
@@ -480,11 +489,18 @@ BoussinesqFlowProblem<dim>::get_extrapolated_temperature_range () const
 	    {
 	      const double temperature = old_temperature_values[q];
 
-	      min_temperature = std::min (min_temperature, temperature);
-	      max_temperature = std::max (max_temperature, temperature);
+	      min_local_temperature = std::min (min_local_temperature, 
+						temperature);
+	      max_local_temperature = std::max (max_local_temperature, 
+						temperature);
 	    }
 	}
   
+      double min_temperature, max_temperature;
+
+      trilinos_communicator.MaxAll(&max_local_temperature, &max_temperature, 1);
+      trilinos_communicator.MaxAll(&min_local_temperature, &min_temperature, 1);
+
       return std::make_pair(min_temperature, max_temperature);
     }    
 }
