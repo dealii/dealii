@@ -1165,15 +1165,6 @@ namespace TrilinosWrappers
     Assert (rhs.m() == m(), ExcDimensionMismatch (rhs.m(), m()));
     Assert (rhs.n() == n(), ExcDimensionMismatch (rhs.n(), n()));
     
-				  // I bet that there must be a
-                                  // better way to do this but it
-                                  // has not been found: currently,
-				  // we simply go through each row
-				  // of the argument matrix, copy
-				  // it, scale it, and add it to
-				  // the current matrix. that's
-				  // probably not the most
-				  // efficient way to do things.
     const std::pair<unsigned int, unsigned int>
       local_range = rhs.local_range();
 
@@ -1186,29 +1177,98 @@ namespace TrilinosWrappers
     
     std::vector<int>            column_indices (max_row_length);
     std::vector<TrilinosScalar> values (max_row_length);
+    int ierr;
 
 				   // If both matrices have been transformed
 				   // to local index space (in Trilinos
-				   // speak: they are filled), we can
-				   // extract MyRows instead of GlobalRows,
-				   // which is faster.
-    if (matrix->Filled() == true && rhs.matrix->Filled() == true)
+				   // speak: they are filled), we're having
+				   // matrices based on the same indices
+				   // with the same number of nonzeros
+				   // (actually, we'd need sparsity pattern,
+				   // but that is too expensive to check),
+				   // we can extract views of the column
+				   // data on both matrices and simply
+				   // manipulate the values that are
+				   // addressed by the pointers.
+    if (matrix->Filled() == true && 
+	rhs.matrix->Filled() == true &&
+	this->local_range() == local_range && 
+	matrix->NumMyNonzeros() == rhs.matrix->NumMyNonzeros())
+      for (unsigned int row=local_range.first;
+	   row < local_range.second; ++row)
+	{
+	  Assert (matrix->NumGlobalEntries(row) == 
+		  rhs.matrix->NumGlobalEntries(row),
+		  ExcDimensionMismatch(matrix->NumGlobalEntries(row),
+				       rhs.matrix->NumGlobalEntries(row)));
+
+	  const int row_local = matrix->RowMap().LID(row);
+	  int n_entries, rhs_n_entries;
+	  TrilinosScalar *value_ptr, *rhs_value_ptr;
+
+				   // In debug mode, we want to check
+				   // whether the indices really are the
+				   // same in the calling matrix and the
+				   // input matrix. The reason for doing
+				   // this only in debug mode is that both
+				   // extracting indices and comparing
+				   // indices is relatively slow compared to
+				   // just working with the values.
+#ifdef DEBUG
+	  int *index_ptr, *rhs_index_ptr;
+	  ierr = rhs.matrix->ExtractMyRowView (row_local, rhs_n_entries, 
+					       rhs_value_ptr, rhs_index_ptr);
+	  Assert (ierr == 0, ExcTrilinosError(ierr));
+
+	  ierr = matrix->ExtractMyRowView (row_local, n_entries, value_ptr,
+					   index_ptr);
+	  Assert (ierr == 0, ExcTrilinosError(ierr));
+#else
+	  rhs.matrix->ExtractMyRowView (row_local, rhs_n_entries,rhs_value_ptr);
+	  matrix->ExtractMyRowView (row_local, n_entries, value_ptr);
+#endif
+
+	  AssertThrow (n_entries == rhs_n_entries,
+		       ExcDimensionMismatch (n_entries, rhs_n_entries));
+
+	  for (int i=0; i<n_entries; ++i)
+	    {
+	      *value_ptr++ += *rhs_value_ptr++ * factor;
+#ifdef DEBUG
+	      Assert (*index_ptr++ == *rhs_index_ptr++,
+		      ExcInternalError());
+#endif
+	    }
+	}
+				   // If we have different sparsity patterns
+				   // (expressed by a different number of
+				   // nonzero elements), we have to be more
+				   // careful and extract a copy of the row
+				   // data, multiply it by the factor and
+				   // then add it to the matrix using the
+				   // respective add() function.
+    else if (matrix->Filled() == true && rhs.matrix->Filled() == true &&
+	     this->local_range() == local_range)
       for (unsigned int row=local_range.first;
 	   row < local_range.second; ++row)
 	{
 	  const int row_local = matrix->RowMap().LID(row);
 	  int n_entries;
-	  rhs.matrix->ExtractMyRowCopy (row_local, max_row_length,
-					n_entries,
-					&values[0],
-					&column_indices[0]);
+
+	  ierr = rhs.matrix->ExtractMyRowCopy (row_local, max_row_length,
+					       n_entries,
+					       &values[0],
+					       &column_indices[0]);
+	  Assert (ierr == 0, ExcTrilinosError(ierr));
+
 	  for (int i=0; i<n_entries; ++i)
 	    values[i] *= factor;
 
 	  TrilinosScalar *value_ptr = &values[0];
 
-	  matrix->SumIntoMyValues (row_local, n_entries, value_ptr,
-				   &column_indices[0]);
+	  ierr = matrix->SumIntoMyValues (row_local, n_entries, value_ptr,
+					  &column_indices[0]);
+	  Assert (ierr == 0, ExcTrilinosError(ierr));
 	}
     else
       {
@@ -1216,18 +1276,16 @@ namespace TrilinosWrappers
 	     row < local_range.second; ++row)
 	  {
 	    int n_entries;
-	    rhs.matrix->Epetra_CrsMatrix::ExtractGlobalRowCopy ((int)row, 
-								max_row_length,
-								n_entries,
-								&values[0],
-								&column_indices[0]);
+	    ierr = rhs.matrix->Epetra_CrsMatrix::ExtractGlobalRowCopy 
+	      ((int)row, max_row_length, n_entries, &values[0], &column_indices[0]);
+	    Assert (ierr == 0, ExcTrilinosError(ierr));
+
 	    for (int i=0; i<n_entries; ++i)
 	      values[i] *= factor;
 
-	    matrix->Epetra_CrsMatrix::SumIntoGlobalValues ((int)row, 
-							   n_entries, 
-							   &values[0],
-							   &column_indices[0]);
+	    ierr = matrix->Epetra_CrsMatrix::SumIntoGlobalValues 
+	      ((int)row, n_entries, &values[0], &column_indices[0]);
+	    Assert (ierr == 0, ExcTrilinosError(ierr));
 	  }
 	compress ();
       }

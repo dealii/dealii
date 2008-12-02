@@ -1140,11 +1140,16 @@ namespace TrilinosWrappers
 	copy_from (const SparseMatrix &source);
 
 				       /**
-					* Add <tt>matrix</tt> scaled
-					* by <tt>factor</tt> to this
-					* matrix, i.e. the matrix
-					* <tt>factor*matrix</tt> is
-					* added to <tt>this</tt>.
+					* Add <tt>matrix</tt> scaled by
+					* <tt>factor</tt> to this matrix,
+					* i.e. the matrix
+					* <tt>factor*matrix</tt> is added to
+					* <tt>this</tt>. If the sparsity
+					* pattern of the calling matrix does
+					* not contain all the elements in
+					* the sparsity pattern of the input
+					* matrix, this function will throw
+					* an exception.
 					*/
       void add (const TrilinosScalar  factor,
 		const SparseMatrix   &matrix);
