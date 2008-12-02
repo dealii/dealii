@@ -196,22 +196,21 @@ namespace hp
  *
  *  In some cases, for example in time-dependent problems, one would
  *  like to compute the error estimates for several solution vectors
- *  on the same grid at once, with the same coefficients, etc,
- *  e.g. for the solutions on several successive time steps. One could
- *  then call the functions of this class several times for each
- *  solution. However, it is observed that the largest factor in the
- *  computation of the error estimates (in terms of computing time) is
- *  initialization of FEFaceValues and FESubFaceValues
+ *  on the same grid at once, with the same coefficients, boundary
+ *  condition object, etc, e.g. for the solutions on several
+ *  successive time steps. One could then call the functions of this
+ *  class several times for each solution. However, the largest factor
+ *  in the computation of the error estimates (in terms of computing
+ *  time) is initialization of FEFaceValues and FESubFaceValues
  *  objects, and iterating through all faces and subfaces. If the
  *  solution vectors live on the same grid, this effort can be reduced
  *  significantly by treating all solution vectors at the same time,
- *  initializing the FEFaceValues objects only once per cell and
- *  for all solution vectors at once, and also only looping through
- *  the triangulation only once. For this reason, besides the
- *  @p estimate function in this class that takes a single input
- *  vector and returns a single output vector, there is also a
- *  function that accepts several in- and output vectors at the same
- *  time. 
+ *  initializing the FEFaceValues objects only once per cell and for
+ *  all solution vectors at once, and also only looping through the
+ *  triangulation only once. For this reason, besides the @p estimate
+ *  function in this class that takes a single input vector and
+ *  returns a single output vector, there is also a function that
+ *  accepts several in- and output vectors at the same time.
  *
  *  @ingroup numerics
  *  @author Wolfgang Bangerth, 1998, 1999, 2000, 2004, 2006; parallelization by Thomas Richter, 2000
