@@ -1272,12 +1272,8 @@ void BoussinesqFlowProblem<dim>::solve ()
 				  1e-8*temperature_rhs.l2_norm());
     SolverCG<TrilinosWrappers::MPI::Vector>   cg (solver_control);
 
-    TrilinosWrappers::PreconditionChebyshev preconditioner;
-    TrilinosWrappers::PreconditionChebyshev::AdditionalData data;
-    data.degree=3;
-    data.eigenvalue_ratio = 3;
-    data.max_eigenvalue = 2;
-    preconditioner.initialize (temperature_matrix, 3);
+    TrilinosWrappers::PreconditionIC preconditioner;
+    preconditioner.initialize (temperature_matrix);
 
     cg.solve (temperature_matrix, temperature_solution,
 	      temperature_rhs, preconditioner);
