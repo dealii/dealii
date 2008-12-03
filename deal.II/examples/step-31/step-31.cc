@@ -592,7 +592,6 @@ class BoussinesqFlowProblem
     void output_results () const;
     void refine_mesh (const unsigned int max_grid_level);
 
-    static
     double
     compute_viscosity(const std::vector<double>          &old_temperature,
 		      const std::vector<double>          &old_old_temperature,
@@ -605,12 +604,11 @@ class BoussinesqFlowProblem
 		      const std::vector<double>          &gamma_values,
 		      const double                        global_u_infty,
 		      const double                        global_T_variation,
-		      const double                        global_Omega_diameter,
-		      const double                        cell_diameter,
-		      const double                        old_time_step);
+		      const double                        cell_diameter);
 
 
     Triangulation<dim>                  triangulation;
+    double                              global_Omega_diameter;
 
     const unsigned int                  stokes_degree;
     FESystem<dim>                       stokes_fe;
@@ -977,9 +975,7 @@ compute_viscosity (const std::vector<double>          &old_temperature,
 		   const std::vector<double>          &gamma_values,
 		   const double                        global_u_infty,
 		   const double                        global_T_variation,
-		   const double                        global_Omega_diameter,
-		   const double                        cell_diameter,
-		   const double                        old_time_step)
+		   const double                        cell_diameter)
 {
   const double beta = 0.015 * dim;
   const double alpha = 1;
@@ -1506,19 +1502,23 @@ BoussinesqFlowProblem<dim>::build_stokes_preconditioner ()
 				   // matrix we want it to apply to.
 				   // 
 				   // Finally, we also initialize the
-				   // preconditioner for the inversion of the
-				   // pressure mass matrix. This matrix is
-				   // symmetric and well-behaved, so we can
-				   // chose a simple preconditioner. We stick
-				   // with an incomple Cholesky (IC)
+				   // preconditioner for the inversion of
+				   // the pressure mass matrix. This matrix
+				   // is symmetric and well-behaved, so we
+				   // can chose a simple preconditioner. We
+				   // stick with an incomple Cholesky (IC)
 				   // factorization preconditioner, which is
-				   // designed for symmetric matrices. We wrap
-				   // the preconditioners into a
-				   // <code>boost::shared_ptr</code> pointer,
-				   // which makes it easier to recreate the
-				   // preconditioner next time around since we
-				   // do not have to care about destroying the
-				   // previously used object.
+				   // designed for symmetric matrices. We
+				   // could have also chosen an SSOR
+				   // preconditioner with relaxation factor
+				   // around 1.2, but IC is cheaper for our
+				   // example. We wrap the preconditioners
+				   // into a <code>boost::shared_ptr</code>
+				   // pointer, which makes it easier to
+				   // recreate the preconditioner next time
+				   // around since we do not have to care
+				   // about destroying the previously used
+				   // object.
   amg_data.elliptic = true;
   amg_data.higher_order_elements = true;
   amg_data.aggregation_threshold = 5e-2;
@@ -2007,7 +2007,6 @@ void BoussinesqFlowProblem<dim>::assemble_temperature_system ()
   const double global_u_infty = get_maximal_velocity();
   const std::pair<double,double>
     global_T_range = get_extrapolated_temperature_range();
-  const double global_Omega_diameter = GridTools::diameter (triangulation);
 
 				   // Now, let's start the loop over all
 				   // cells in the triangulation. Again, we
@@ -2093,8 +2092,7 @@ void BoussinesqFlowProblem<dim>::assemble_temperature_system ()
 			     gamma_values,
 			     global_u_infty,
 			     global_T_range.second - global_T_range.first,
-			     global_Omega_diameter, cell->diameter(),
-			     old_time_step);
+			     cell->diameter());
       
       for (unsigned int q=0; q<n_q_points; ++q)
 	{
@@ -2104,12 +2102,24 @@ void BoussinesqFlowProblem<dim>::assemble_temperature_system ()
 	      phi_T[k]      = temperature_fe_values.shape_value (k, q);
 	    }
 
-	  const double        old_T      = old_temperature_values[q];
-	  const double        old_old_T  = old_old_temperature_values[q];
+	  const double old_Ts = use_bdf2_scheme ?
+	                         (old_temperature_values[q] *
+	                          (time_step + old_time_step) / old_time_step
+                                  -
+				  old_old_temperature_values[q] *
+                                  (time_step * time_step) /
+                                  (old_time_step * (time_step + old_time_step)))
+	                        :
+	                        old_temperature_values[q];
 
-	  const Tensor<1,dim> old_grad_T     = old_temperature_grads[q];
-	  const Tensor<1,dim> old_old_grad_T = old_old_temperature_grads[q];
-
+	  const Tensor<1,dim> ext_grad_T = use_bdf2_scheme ? 
+					    (old_temperature_grads[q] *
+					     (1+time_step/old_time_step) 
+					     -
+					     old_old_temperature_grads[q] *
+					     time_step / old_time_step) 
+					    :
+					    old_temperature_grads[q];
 	  
 	  Tensor<1,dim> extrapolated_u;
 	  for (unsigned int d=0; d<dim; ++d)
@@ -2122,54 +2132,21 @@ void BoussinesqFlowProblem<dim>::assemble_temperature_system ()
 		extrapolated_u[d] = old_stokes_values[q](d);
 	    }
 
-	  if (use_bdf2_scheme == true)
-	    {
-	      for (unsigned int i=0; i<dofs_per_cell; ++i)
-		local_rhs(i) += ((time_step + old_time_step) / old_time_step *
-				 old_T * phi_T[i]
-				 -
-				 (time_step * time_step) /
-				 (old_time_step * (time_step + old_time_step)) *
-				 old_old_T * phi_T[i]
-				 -
-				 time_step *
-				 extrapolated_u *
-				 ((1+time_step/old_time_step) * old_grad_T
-				  -
-				  time_step / old_time_step * old_old_grad_T) *
-				 phi_T[i]
-				 -
-				 time_step *
-				 nu *
-				 ((1+time_step/old_time_step) * old_grad_T
-				  -
-				  time_step / old_time_step * old_old_grad_T) *
-				 grad_phi_T[i]
-				 +
-				 time_step *
-				 gamma_values[q] * phi_T[i])
-				*
-				temperature_fe_values.JxW(q);
-	    }
-	  else
-	    {
-	      for (unsigned int i=0; i<dofs_per_cell; ++i)
-		local_rhs(i) += (old_T * phi_T[i]
-				 -
-				 time_step *
-				 extrapolated_u * old_grad_T * phi_T[i]
-				 -
-				 time_step *
-				 nu *
-				 old_grad_T * grad_phi_T[i]
-				 +
-				 time_step *
-				 gamma_values[q] * phi_T[i])
-				*
-				temperature_fe_values.JxW(q);
-	    }
+	  for (unsigned int i=0; i<dofs_per_cell; ++i)
+	    local_rhs(i) += (old_Ts * phi_T[i]
+			     -
+			     time_step *
+			     extrapolated_u * ext_grad_T * phi_T[i]
+			     -
+			     time_step *
+			     nu * ext_grad_T * grad_phi_T[i]
+			     +
+			     time_step *
+			     gamma_values[q] * phi_T[i])
+	                    *
+	                    temperature_fe_values.JxW(q);
 	}
-      
+ 
       cell->get_dof_indices (local_dof_indices);
       temperature_constraints.distribute_local_to_global (local_rhs,
 							  local_dof_indices,
@@ -2294,12 +2271,15 @@ void BoussinesqFlowProblem<dim>::solve ()
 				   // moderately ill conditioned even for
 				   // small mesh sizes and we get a
 				   // reasonably good preconditioner by
-				   // simple means, for example SSOR with a
-				   // relaxation parameter of 1.2. As a
-				   // solver, we choose the conjugate
-				   // gradient method CG. As before, we tell
-				   // the solver to use Trilinos vectors via
-				   // the template argument
+				   // simple means, for example with an
+				   // incomplete Cholesky decomposition
+				   // preconditioner (IC) as we also use for
+				   // preconditioning the pressure mass
+				   // matrix solver. As a solver, we choose
+				   // the conjugate gradient method CG. As
+				   // before, we tell the solver to use
+				   // Trilinos vectors via the template
+				   // argument
 				   // <code>TrilinosWrappers::Vector</code>.
 				   // Finally, we solve, distribute the
 				   // hanging node constraints and write out
@@ -2323,8 +2303,8 @@ void BoussinesqFlowProblem<dim>::solve ()
 				  1e-8*temperature_rhs.l2_norm());
     SolverCG<TrilinosWrappers::Vector> cg (solver_control);
 
-    TrilinosWrappers::PreconditionSSOR preconditioner;
-    preconditioner.initialize (temperature_matrix, 1.2);
+    TrilinosWrappers::PreconditionIC preconditioner;
+    preconditioner.initialize (temperature_matrix);
 
     cg.solve (temperature_matrix, temperature_solution,
 	      temperature_rhs, preconditioner);
@@ -2760,6 +2740,8 @@ void BoussinesqFlowProblem<dim>::run ()
 
 
   GridGenerator::hyper_cube (triangulation);
+  global_Omega_diameter = GridTools::diameter (triangulation);
+
   triangulation.refine_global (initial_refinement);
 
   setup_dofs();
