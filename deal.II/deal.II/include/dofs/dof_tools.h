@@ -1752,6 +1752,17 @@ class DoFTools
     convert_couplings_to_blocks (const hp::DoFHandler<dim>& dof_handler,
 				 const Table<2, Coupling>& table_by_component,
 				 std::vector<Table<2,Coupling> >& tables_by_block);
+
+                                     /** 
+				      * Make a constraint matrix with 
+				      * zero boundary values.
+				      */
+    template <int dim, template <int> class DH> 
+      static void 
+      make_zero_boundary_constraints (const DH<dim>           &dof,  
+				      ConstraintMatrix        &zero_boundary_constraints,    
+				      const std::vector<bool> &component_mask_=std::vector<bool>());
+
 				     /**
 				      * Map a coupling table from the
 				      * user friendly organization by

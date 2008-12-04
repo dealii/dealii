@@ -505,6 +505,16 @@ inconvenience this causes.
 <ol>
   <li>
   <p>
+  New: The function DoFTools::make_zero_boundary_constraints() applies 
+  zero boundary constraints to a (symmetric preserved) matrix without 
+  accessing the sparsity pattern. Use cases are for when the sparsity pattern
+  of the matrix is unknown / inaccessible.
+  <br>
+  (Toby D. Young 2008/12/04)
+  </p>
+
+  <li>
+  <p>
   Updated: The function ConstraintMatrix::distribute_local_to_global() for
   matrices does now use row-wise addition into sparse matrices, which
   accelerates the transfer from local to global data.

@@ -26,6 +26,7 @@
 #include <dofs/dof_constraints.h>
 #include <fe/fe.h>
 #include <fe/fe_values.h>
+#include <fe/fe_tools.h>
 #include <hp/fe_collection.h>
 #include <dofs/dof_tools.h>
 #include <lac/sparsity_pattern.h>
@@ -34,6 +35,7 @@
 #include <lac/compressed_simple_sparsity_pattern.h>
 #include <lac/block_sparsity_pattern.h>
 #include <lac/vector.h>
+#include <numerics/vectors.h>
 
 #include <multigrid/mg_dof_handler.h>
 #include <multigrid/mg_dof_accessor.h>
@@ -5132,6 +5134,217 @@ DoFTools::convert_couplings_to_blocks (
     }
 }
 
+#if deal_II_dimension == 1
+
+template <int dim, template <int> class DH> 
+void 
+DoFTools::make_zero_boundary_constraints (const DH<dim>           &dof,  
+ 					  ConstraintMatrix        &zero_boundary_constraints,
+ 					  const std::vector<bool> &component_mask_) 
+{
+  Assert ((component_mask_.size() == 0) || 
+ 	  (component_mask_.size() == dof.get_fe().n_components()), 
+ 	  ExcMessage ("The number of components in the mask has to be either " 
+ 		      "zero or equal to the number of components in the finite " 
+ 		      "element.")); 
+
+                                   // check for boundary cells in both
+                                   // directions to secure indicators
+                                   // for the entire boundary, i.e. 0
+                                   // is left boundary and 1 is right
+                                   // boundary
+  for (unsigned int direction = 0; direction < 2; ++direction)
+    {
+
+                                   // first find the outermost active
+                                   // cell by traversing the coarse
+                                   // grid to its end and then looking
+                                   // for the children
+      typename DH<dim>::cell_iterator outermost_cell = dof.begin(0);
+      while (outermost_cell->neighbor(direction).state() == IteratorState::valid)
+	outermost_cell = outermost_cell->neighbor(direction);
+      
+      while (outermost_cell->has_children())
+	outermost_cell = outermost_cell->child(direction);
+
+                                   // then get the FE corresponding to
+                                   // this cell
+      const FiniteElement<dim> &fe = outermost_cell->get_fe();
+
+				   // set the component mask to either
+				   // the original value or a vector
+				   // of trues
+      const std::vector<bool> component_mask ((component_mask_.size() == 0) ?
+					      std::vector<bool> (fe.n_components(), true) :
+					      component_mask_);
+      Assert (std::count(component_mask.begin(), component_mask.end(), true) > 0,
+	      VectorTools::ExcNoComponentSelected());
+
+                                   // cast zero boundary constraints
+                                   // onto a matrix if component_mask
+                                   // == true
+      for (unsigned int i=0; i<fe.dofs_per_vertex; ++i)
+	if (component_mask[fe.face_system_to_component_index(i).first])
+	  zero_boundary_constraints.add_line (outermost_cell->vertex_dof_index (direction, i));
+
+    }
+}
+
+#else
+
+template <int dim, template <int> class DH> 
+void 
+DoFTools::make_zero_boundary_constraints (const DH<dim>           &dof,  
+ 					  ConstraintMatrix        &zero_boundary_constraints,
+ 					  const std::vector<bool> &component_mask_) 
+{
+  Assert ((component_mask_.size() == 0) || 
+ 	  (component_mask_.size() == dof.get_fe().n_components()), 
+ 	  ExcMessage ("The number of components in the mask has to be either " 
+ 		      "zero or equal to the number of components in the finite " 
+ 		      "element.")); 
+
+  const unsigned int        n_components = DoFTools::n_components(dof);
+  const bool                fe_is_system = (n_components != 1);
+
+				   // set the component mask to either
+				   // the original value or a vector
+				   // of trues
+  const std::vector<bool> component_mask ((component_mask_.size() == 0) ?
+					  std::vector<bool> (n_components, true) :
+					  component_mask_);
+  Assert (std::count(component_mask.begin(), component_mask.end(), true) > 0,
+	  VectorTools::ExcNoComponentSelected());
+
+				   // a field to store the indices
+  std::vector<unsigned int> face_dofs;
+  face_dofs.reserve (DoFTools::max_dofs_per_face(dof));
+
+  typename DH<dim>::active_cell_iterator cell = dof.begin_active(),
+					 endc = dof.end();
+  for (; cell!=endc; ++cell)
+    for (unsigned int face_no = 0; face_no < GeometryInfo<dim>::faces_per_cell;
+	 ++face_no)
+      {
+        const FiniteElement<dim> &fe = cell->get_fe();
+
+				   // we can presently deal only with
+				   // primitive elements for boundary
+				   // values. make sure that all shape
+				   // functions that are non-zero for
+				   // the components we are interested
+				   // in, are in fact primitive
+	for (unsigned int i=0; i<cell->get_fe().dofs_per_cell; ++i)
+	  {
+	    const std::vector<bool> &nonzero_component_array
+	      = cell->get_fe().get_nonzero_components (i);
+	    for (unsigned int c=0; c<n_components; ++c)
+	      if ((nonzero_component_array[c] == true)
+		  &&
+		  (component_mask[c] == true))
+		Assert (cell->get_fe().is_primitive (i),
+			ExcMessage ("This function can only deal with requested boundary "
+				    "values that correspond to primitive (scalar) base "
+				    "elements"));
+	  }
+
+	typename DH<dim>::face_iterator face = cell->face(face_no);
+	if (face->boundary_indicator () == 0)
+	                           // face is of the right component
+	  {
+				   // get indices and physical
+				   // location on this face
+ 	    face_dofs.resize (fe.dofs_per_face);
+ 	    face->get_dof_indices (face_dofs, cell->active_fe_index());
+
+	    if (fe_is_system)
+	      {
+				    // enter those dofs into the list
+				    // that match the component
+				    // signature.
+		for (unsigned int i=0; i<face_dofs.size(); ++i)
+                  {
+                    unsigned int component;
+                    if (fe.is_primitive())
+                      component = fe.face_system_to_component_index(i).first;
+                    else
+                      {
+                                    // non-primitive case. make sure
+                                    // that this particular shape
+                                    // function _is_ primitive, and
+                                    // get at it's component. use
+                                    // usual trick to transfer face
+                                    // dof index to cell dof index
+                        const unsigned int cell_i
+                          = (dim == 1 ?
+                             i
+                             :
+                             (dim == 2 ?
+                              (i<2*fe.dofs_per_vertex ? i : i+2*fe.dofs_per_vertex)
+                              :
+                              (dim == 3 ?
+                               (i<4*fe.dofs_per_vertex ?
+                                i
+                                :
+                                (i<4*fe.dofs_per_vertex+4*fe.dofs_per_line ?
+                                 i+4*fe.dofs_per_vertex
+                                 :
+                                 i+4*fe.dofs_per_vertex+8*fe.dofs_per_line))
+                               :
+                               numbers::invalid_unsigned_int)));
+                        Assert (cell_i < fe.dofs_per_cell, ExcInternalError());
+
+                                    // make sure that if this is not a
+                                    // primitive shape function, then
+                                    // all the corresponding
+                                    // components in the mask are not
+                                    // set
+                        if (!fe.is_primitive(cell_i))
+                          for (unsigned int c=0; c<n_components; ++c)
+                            if (fe.get_nonzero_components(cell_i)[c])
+                              Assert (component_mask[c] == false,
+                                      FETools::ExcFENotPrimitive());
+
+                                    // pick the first possibly of more
+                                    // than one non-zero component. if
+                                    // the shape function is
+                                    // non-primitive, then we will
+                                    // ignore the result in the
+                                    // following anyway, otherwise
+                                    // there's only one non-zero
+                                    // component which we will use
+                        component = (std::find (fe.get_nonzero_components(cell_i).begin(),
+                                                fe.get_nonzero_components(cell_i).end(),
+                                                true)
+                                     -
+                                     fe.get_nonzero_components(cell_i).begin());
+                      }
+
+				    // cast zero boundary constraints onto
+				    // a matrix
+		    for (unsigned int i=0; i<fe.dofs_per_vertex; ++i)
+		      if (component_mask[fe.face_system_to_component_index(i).first])
+			zero_boundary_constraints.add_line (face_dofs[i]);
+
+                  } 
+	      }
+	    else 
+	      {
+				    // get the one component that this
+				    // function has and cast zero
+				    // boundary constraints onto a
+				    // matrix
+		for (unsigned int i=0; i<fe.dofs_per_face; ++i)
+		  if (component_mask[fe.face_system_to_component_index(i).first])
+		    zero_boundary_constraints.add_line (face_dofs[i]);
+
+	      }
+
+	  }
+      } 
+}
+    
+#endif
 
 // explicit instantiations
 template void
@@ -6038,5 +6251,11 @@ DoFTools::convert_couplings_to_blocks (
   const hp::DoFHandler<deal_II_dimension>&, const Table<2, Coupling>&,
   std::vector<Table<2,Coupling> >&);
 
+template 
+void 
+DoFTools::make_zero_boundary_constraints<deal_II_dimension>
+(const DoFHandler<deal_II_dimension> &, 
+ ConstraintMatrix                    &,
+ const std::vector<bool>             &);
 
 DEAL_II_NAMESPACE_CLOSE
