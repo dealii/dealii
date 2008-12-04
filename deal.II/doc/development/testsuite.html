@@ -16,13 +16,16 @@
 
     <h1>The deal.II Testsuite</h1>
     
-    <p>The deal.II testsuite consists of two parts, the build tests and
-    the regression tests. While the build tests just check if the
+    <p>The deal.II testsuite consists of two parts, the 
+    <a href="#build_tests">build tests</a> and the
+    <a href="#regression_tests">regression tests</a>. While the build tests
+    just check if the 
     library can be compiled on different systems and with different (versions
     of) compilers, the regression tests are actually run and their output
     compared with previously stored. These two testsuites are
     described below.</p>
 
+    <a name="build_tests"></a>
     <h2>The build tests</h2>
 
     <p>With our build tests, we check if deal.II can be compiled on
@@ -116,6 +119,7 @@
     </p>
 
 
+    <a name="regression_tests"></a>
     <h2>The regression tests</h2>
 
     <p>
@@ -369,17 +373,17 @@ int main ()
     things behind the scenes that are helpful in this context). In
     above case, we only (nonsensically) write a zero to the output
     file. Most tests actually write computed data to the output file
-    to make sure that whatever we computed is what we got when the
-    test was written first.
+    to make sure that whatever we compute is what we got when the
+    test was first written.
     </p>
 
     <p>
     There are a number of directories where you can put tests
     in. Extensive tests of individual classes or groups of classes
     have traditionally been into the <code>base/</code>,
-    <code>lac/</code>, <code>deal.II/</code>, <code>fe/</code>, or
-    <code>multigrid/</code> directories, depending on where the
-    classes that are tested are located.
+    <code>lac/</code>, <code>deal.II/</code>, <code>fe/</code>, 
+    <code>hp/</code>, or <code>multigrid/</code> directories, depending on
+    where the classes that are tested are located.
     </p>
 
     <p>
@@ -388,7 +392,8 @@ int main ()
     library, often only a single function. These tests go into the
     <code>bits/</code> directory and often have names that are
     composed of the name of the class being tested and a two-digit
-    number (for example, <code>dof_tools_11</code>). 
+    number (for example, <code>dof_tools_11</code>). There are also
+    directories for PETSc and Trilinos wrapper functionality.
     </p>
 
     
@@ -531,6 +536,22 @@ testname/cmp/generic
       svn add bits/my_new_test/cmp/generic
       svn commit -m "New test" bits/my_new_test* bits/Makefile
     </pre>
+    In addition, you should do the following in order to avoid that the files
+    generated while running the testsuite show up in the output of <code>svn
+    status</code> commands:
+    <pre>
+      svn propset svn:ignore "obj.*
+        exe
+        output
+        status
+        OK" bits/my_new_test
+      svn commit -m "Ignore generated files." bits/my_new_test
+    </pre>
+    Note that the list of files given in quotes to the propset command extends
+    over several lines.
+    </p>
+
+    <p>
     If you don't have subversion write access, talk to us on the mailing
     list; writing testcases is a worthy and laudable task, and we would
     like to encourage it by giving people the opportunity to
