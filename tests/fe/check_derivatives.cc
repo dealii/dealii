@@ -2,7 +2,7 @@
 //    check_derivatives.cc,v 1.3 2003/06/09 16:00:38 wolf Exp
 //    Version: 
 //
-//    Copyright (C) 2005 by the deal.II authors
+//    Copyright (C) 2005, 2008 by the deal.II authors
 //
 //    This file is subject to QPL and may not be  distributed
 //    without copyright and license information. Please refer
@@ -67,6 +67,22 @@ void test (const FiniteElement<dim> &fe,
 
 
 
+template <template <int,int> class FE>
+void check (const unsigned int min_degree,
+            const unsigned int max_degree)
+{
+  for (unsigned int degree=min_degree; degree<=max_degree; ++degree)
+    {
+      FE<1,1> fe1(degree);
+      test<1> (fe1, QGauss<1> (degree+1));
+      FE<2,2> fe2(degree);
+      test<2> (fe2, QGauss<2> (degree+1));
+      FE<3,3> fe3(degree);
+      test<3> (fe3, QGauss<3> (degree+1));
+    }
+}
+
+
 template <template <int> class FE>
 void check (const unsigned int min_degree,
             const unsigned int max_degree)
@@ -100,7 +116,7 @@ void check<FE_Nedelec> (const unsigned int min_degree,
 // former is also not implemented in 3d
 template <>
 void check<FE_RaviartThomas> (const unsigned int min_degree,
-                        const unsigned int max_degree)
+			      const unsigned int max_degree)
 {
   for (unsigned int degree=min_degree; degree<=max_degree; ++degree)
     {
