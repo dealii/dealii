@@ -22,10 +22,10 @@
 
 DEAL_II_NAMESPACE_OPEN
 
-template <int dim> class DoFHandler;
+template <int dim, int spacedim> class DoFHandler;
 namespace hp
 {
-  template <int dim> class DoFHandler;
+  template <int dim, int spacedim> class DoFHandler;
 }
 
 
@@ -77,7 +77,7 @@ namespace hp
  * @code
  * --------------------------------------------------------
  * An error occurred in line <749> of file <source/numerics/derivative_approximation.cc> in function
- *     static void DerivativeApproximation::approximate(const Mapping<dim>&, const DH<dim>&, const InputVector&, unsigned int, const
+ *     static void DerivativeApproximation::approximate(const Mapping<dim,spacedim>&, const DH<dim,spacedim>&, const InputVector&, unsigned int, const
  *  std::pair<unsigned int, unsigned int>&, Vector<float>&) [with DerivativeDescription = DerivativeApproximation::Gradient<3>, int
  * dim = 3, DH = DoFHandler, InputVector = Vector<double>]
  * The violated condition was:
@@ -201,10 +201,10 @@ class DerivativeApproximation
 				      * number of vector components can be
 				      * given here.
 				      */
-    template <int dim, template <int> class DH, class InputVector>
+    template <int dim, template <int, int> class DH, class InputVector, int spacedim>
     static void
-    approximate_gradient (const Mapping<dim>    &mapping,
-			  const DH<dim>         &dof,
+    approximate_gradient (const Mapping<dim,spacedim>    &mapping,
+			  const DH<dim,spacedim>         &dof,
 			  const InputVector     &solution,
 			  Vector<float>         &derivative_norm,
 			  const unsigned int     component = 0);
@@ -214,9 +214,9 @@ class DerivativeApproximation
 				      * function, see above, with
 				      * <tt>mapping=MappingQ1@<dim@>()</tt>.
 				      */
-    template <int dim, template <int> class DH, class InputVector>
+    template <int dim, template <int, int> class DH, class InputVector, int spacedim>
     static void
-    approximate_gradient (const DH<dim>         &dof,
+    approximate_gradient (const DH<dim,spacedim>         &dof,
 			  const InputVector     &solution,
 			  Vector<float>         &derivative_norm,
 			  const unsigned int     component = 0);
@@ -248,10 +248,10 @@ class DerivativeApproximation
 				      * number of vector components can be
 				      * given here.
 				      */
-    template <int dim, template <int> class DH, class InputVector>
+    template <int dim, template <int, int> class DH, class InputVector, int spacedim>
     static void
-    approximate_second_derivative (const Mapping<dim>    &mapping,
-				   const DH<dim>         &dof,
+    approximate_second_derivative (const Mapping<dim,spacedim>    &mapping,
+				   const DH<dim,spacedim>         &dof,
 				   const InputVector     &solution,
 				   Vector<float>         &derivative_norm,
 				   const unsigned int     component = 0);
@@ -261,9 +261,9 @@ class DerivativeApproximation
 				      * function, see above, with
 				      * <tt>mapping=MappingQ1@<dim@>()</tt>.
 				      */
-    template <int dim, template <int> class DH, class InputVector>
+    template <int dim, template <int, int> class DH, class InputVector, int spacedim>
     static void
-    approximate_second_derivative (const DH<dim>         &dof,
+    approximate_second_derivative (const DH<dim,spacedim>         &dof,
 				   const InputVector     &solution,
 				   Vector<float>         &derivative_norm,
 				   const unsigned int     component = 0);
@@ -286,12 +286,12 @@ class DerivativeApproximation
 				      * given here.
 				      */
 
-    template <int dim, template <int> class DH, class InputVector, int order>
+    template <int dim, template <int, int> class DH, class InputVector, int order, int spacedim>
     static void
-    approximate_derivative_tensor (const Mapping<dim>                           &mapping,
-				   const DH<dim>                                &dof,
+    approximate_derivative_tensor (const Mapping<dim,spacedim>                           &mapping,
+				   const DH<dim,spacedim>                                &dof,
 				   const InputVector                            &solution,
-				   const typename DH<dim>::active_cell_iterator &cell,
+				   const typename DH<dim,spacedim>::active_cell_iterator &cell,
 				   Tensor<order,dim>                            &derivative,
 				   const unsigned int                            component = 0);
 
@@ -300,11 +300,11 @@ class DerivativeApproximation
 				      * <tt>mapping=MappingQ1@<dim@>()</tt>.
 				      */
 
-    template <int dim, template <int> class DH, class InputVector, int order>
+    template <int dim, template <int, int> class DH, class InputVector, int order, int spacedim>
     static void
-    approximate_derivative_tensor (const DH<dim>                                &dof,
+    approximate_derivative_tensor (const DH<dim,spacedim>                                &dof,
 				   const InputVector                            &solution,
-				   const typename DH<dim>::active_cell_iterator &cell,
+				   const typename DH<dim,spacedim>::active_cell_iterator &cell,
 				   Tensor<order,dim>                            &derivative,
 				   const unsigned int                            component = 0);
 
@@ -379,9 +379,9 @@ class DerivativeApproximation
 					  * field at the center of each
 					  * cell).
 					  */
-	template <class InputVector>
+	template <class InputVector, int spacedim>
 	static ProjectedDerivative
-	get_projected_derivative (const FEValues<dim>  &fe_values,
+	get_projected_derivative (const FEValues<dim,spacedim>  &fe_values,
 				  const InputVector    &solution,
 				  const unsigned int    component);
     
@@ -460,9 +460,9 @@ class DerivativeApproximation
 					  * field at the center of each
 					  * cell).
 					  */
-	template <class InputVector>
+	template <class InputVector, int spacedim>
 	static ProjectedDerivative
-	get_projected_derivative (const FEValues<dim>  &fe_values,
+	get_projected_derivative (const FEValues<dim,spacedim>  &fe_values,
 				  const InputVector    &solution,
 				  const unsigned int    component);
 	
@@ -538,9 +538,9 @@ class DerivativeApproximation
 					  * field at the center of each
 					  * cell).
 					  */
-	template <class InputVector>
+	template <class InputVector, int spacedim>
 	static ProjectedDerivative
-	get_projected_derivative (const FEValues<dim>  &fe_values,
+	get_projected_derivative (const FEValues<dim,spacedim>  &fe_values,
 				  const InputVector    &solution,
 				  const unsigned int    component);
 	
@@ -652,10 +652,10 @@ class DerivativeApproximation
 				      * on.
 				      */
     template <class DerivativeDescription, int dim,
-              template <int> class DH, class InputVector>
+              template <int, int> class DH, class InputVector, int spacedim>
     static void
-    approximate_derivative (const Mapping<dim>    &mapping,
-			    const DH<dim>         &dof,
+    approximate_derivative (const Mapping<dim,spacedim>    &mapping,
+			    const DH<dim,spacedim>         &dof,
 			    const InputVector     &solution,
 			    const unsigned int     component,
 			    Vector<float>         &derivative_norm);
@@ -670,10 +670,10 @@ class DerivativeApproximation
 				      * tensors on each cell.
 				      */
     template <class DerivativeDescription, int dim,
-              template <int> class DH, class InputVector>
+              template <int, int> class DH, class InputVector, int spacedim>
     static void
-    approximate (const Mapping<dim>    &mapping,
-		 const DH<dim>         &dof,
+    approximate (const Mapping<dim,spacedim>    &mapping,
+		 const DH<dim,spacedim>         &dof,
 		 const InputVector     &solution,
 		 const unsigned int     component,
 		 const IndexInterval   &index_interval,
@@ -685,13 +685,13 @@ class DerivativeApproximation
 				      * derivative tensor.
 				      */
     template <class DerivativeDescription, int dim,
-              template <int> class DH, class InputVector>
+              template <int, int> class DH, class InputVector, int spacedim>
     static void
-    approximate_cell (const Mapping<dim>                            &mapping,
-		      const DH<dim>                                 &dof,
+    approximate_cell (const Mapping<dim,spacedim>                            &mapping,
+		      const DH<dim,spacedim>                                 &dof,
 		      const InputVector                             &solution,
 		      const unsigned int                             component,
-		      const typename DH<dim>::active_cell_iterator  &cell,
+		      const typename DH<dim,spacedim>::active_cell_iterator  &cell,
 		      typename DerivativeDescription::Derivative    &derivative);    
 };
 

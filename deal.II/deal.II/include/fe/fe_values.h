@@ -46,8 +46,8 @@
 
 DEAL_II_NAMESPACE_OPEN
 
-template <int dim> class Quadrature;
-template <int dim> class FEValuesBase;
+template <int dim>   class Quadrature;
+template <int dim, int spacedim=dim> class FEValuesBase;
 
 
 
@@ -151,7 +151,7 @@ namespace FEValuesViews
 				    *
 				    * @ingroup feaccess vector_valued
 				    */
-  template <int dim>
+  template <int dim, int spacedim=dim>  
   class Scalar
   {
     public:
@@ -172,7 +172,7 @@ namespace FEValuesViews
 					* gradient is a
 					* <code>Tensor@<1,dim@></code>.
 					*/
-      typedef Tensor<1,dim> gradient_type;
+      typedef Tensor<1,spacedim> gradient_type;
 
 				       /**
 					* A typedef for the type of second
@@ -182,7 +182,7 @@ namespace FEValuesViews
 					* Hessian is a
 					* <code>Tensor@<2,dim@></code>.
 					*/
-      typedef Tensor<2,dim> hessian_type;
+      typedef Tensor<2,spacedim> hessian_type;
 
 				       /**
 					* Constructor for an object that
@@ -191,7 +191,7 @@ namespace FEValuesViews
 					* of the classes derived from
 					* FEValuesBase).
 					*/
-      Scalar (const FEValuesBase<dim> &fe_values_base,
+      Scalar (const FEValuesBase<dim,spacedim> &fe_values_base,
 	      const unsigned int       component);
 
 				       /**
@@ -233,7 +233,7 @@ namespace FEValuesViews
 					* A reference to the FEValuesBase object
 					* we operator on.
 					*/
-      const FEValuesBase<dim> &fe_values;
+      const FEValuesBase<dim,spacedim> &fe_values;
 
 				       /**
 					* The single scalar component this
@@ -254,7 +254,7 @@ namespace FEValuesViews
 				    *
 				    * @ingroup feaccess vector_valued
 				    */
-  template <int dim>
+  template <int dim, int spacedim=dim>  
   class Vector
   {
     public:
@@ -263,9 +263,9 @@ namespace FEValuesViews
 					* values of the view this class
 					* represents. Since we deal with a set
 					* of <code>dim</code> components, the
-					* value type is a Tensor<1,dim>.
+					* value type is a Tensor<1,spacedim>.
 					*/
-      typedef Tensor<1,dim>          value_type;
+      typedef Tensor<1,spacedim>          value_type;
 
 				       /**
 					* A typedef for the type of gradients
@@ -273,9 +273,9 @@ namespace FEValuesViews
 					* represents. Here, for a set of
 					* <code>dim</code> components of the
 					* finite element, the gradient is a
-					* <code>Tensor@<2,dim@></code>.
+					* <code>Tensor@<2,spacedim@></code>.
 					*/
-      typedef Tensor<2,dim>          gradient_type;
+      typedef Tensor<2,spacedim>          gradient_type;
 
 				       /**
 					* A typedef for the type of
@@ -284,9 +284,9 @@ namespace FEValuesViews
 					* set of <code>dim</code> components
 					* of the finite element, the
 					* symmetrized gradient is a
-					* <code>SymmetricTensor@<2,dim@></code>.
+					* <code>SymmetricTensor@<2,spacedim@></code>.
 					*/
-      typedef SymmetricTensor<2,dim> symmetric_gradient_type;
+      typedef SymmetricTensor<2,spacedim> symmetric_gradient_type;
 
 				       /**
 					* A typedef for the type of the
@@ -320,7 +320,7 @@ namespace FEValuesViews
 					* index of the first component of the
 					* selected vector.
 					*/
-      Vector (const FEValuesBase<dim> &fe_values_base,
+      Vector (const FEValuesBase<dim,spacedim> &fe_values_base,
 	      const unsigned int first_vector_component);
 	      
 				       /**
@@ -399,7 +399,7 @@ namespace FEValuesViews
 					* A reference to the FEValuesBase object
 					* we operator on.
 					*/
-      const FEValuesBase<dim> &fe_values;
+      const FEValuesBase<dim,spacedim> &fe_values;
 
 				       /**
 					* The first component of the vector
@@ -435,7 +435,7 @@ namespace FEValuesViews
  * 
  * @author Guido Kanschat, 2000
  */
-template <int dim>
+template <int dim, int spacedim=dim>
 class FEValuesData
 {
   public:
@@ -444,7 +444,7 @@ class FEValuesData
 				      * correct size.
 				      */
     void initialize (const unsigned int        n_quadrature_points,
-		     const FiniteElement<dim> &fe,
+		     const FiniteElement<dim,spacedim> &fe,
 		     const UpdateFlags         flags);
 
 				     /**
@@ -493,13 +493,13 @@ class FEValuesData
 				      * is the same as for the
 				      * #ShapeVector data type.
 				      */
-    typedef std::vector<std::vector<Tensor<1,dim> > > GradientVector;
+    typedef std::vector<std::vector<Tensor<1,spacedim> > > GradientVector;
 
 				     /**
 				      * Likewise for second order
 				      * derivatives.
 				      */
-    typedef std::vector<std::vector<Tensor<2,dim> > > HessianVector;
+    typedef std::vector<std::vector<Tensor<2,spacedim> > > HessianVector;
 
 				     /**
 				      * Store the values of the shape
@@ -563,19 +563,19 @@ class FEValuesData
 				      * Array of the Jacobian matrices at the
 				      * quadrature points.
 				      */
-    std::vector<Tensor<2,dim> > jacobians;
+    std::vector<Tensor<2,spacedim> > jacobians;
 
 				     /**
 				      * Array of the derivatives of the Jacobian
 				      * matrices at the quadrature points.
 				      */
-    std::vector<Tensor<3,dim> > jacobian_grads;
+    std::vector<Tensor<3,spacedim> > jacobian_grads;
 
 				     /**
 				      * Array of the inverse Jacobian matrices 
 				      * at the quadrature points.
 				      */
-    std::vector<Tensor<2,dim> > inverse_jacobians;
+    std::vector<Tensor<2,spacedim> > inverse_jacobians;
 
 				     /**
 				      * Store an array of weights
@@ -609,27 +609,35 @@ class FEValuesData
 				      * real element, rather than on the
 				      * reference element.
 				      */
-    std::vector<Point<dim> >  quadrature_points;
+    std::vector<Point<spacedim> >  quadrature_points;
 
 				     /**
 				      * List of outward normal vectors at the
 				      * quadrature points. This field is filled
 				      * in by the finite element class.
 				      */
-    std::vector<Point<dim> >  normal_vectors;
+    std::vector<Point<spacedim> >  normal_vectors;
+
+                                      /** 
+				       * List of outward vectors normal to the cell  
+                                       * surface (line) at the quadrature points
+				       * for the codimension 1 case,
+				       * when spacedim=3 (=2).
+				       */
+    std::vector<Point<spacedim> >  cell_normal_vectors;
 
                                      /**
 				      * List of boundary forms at the
 				      * quadrature points. This field is filled
 				      * in by the finite element class.
 				      */
-    std::vector<Tensor<1,dim> >  boundary_forms;
+    std::vector<Tensor<1,spacedim> >  boundary_forms;
 
 				     /**
 				      * Array of the mapped support
 				      * points, filled by Mapping.
 				      */
-    std::vector<Point<dim> > support_points;
+    std::vector<Point<spacedim> > support_points;
 
 				     /**
 				      * Array of the Jacobian of the
@@ -797,8 +805,8 @@ class FEValuesData
  *
  * @author Wolfgang Bangerth, 1998, 2003, Guido Kanschat, 2001
  */
-template <int dim>
-class FEValuesBase : protected FEValuesData<dim>,
+template <int dim, int spacedim>
+  class FEValuesBase : protected FEValuesData<dim,spacedim>,
                      public Subscriptor
 {
   public:
@@ -835,9 +843,9 @@ class FEValuesBase : protected FEValuesData<dim>,
 				      */
     FEValuesBase (const unsigned int n_q_points,
 		  const unsigned int dofs_per_cell,
-		  const UpdateFlags         update_flags,
-		  const Mapping<dim>       &mapping,
-		  const FiniteElement<dim> &fe);
+		  const UpdateFlags update_flags,
+		  const Mapping<dim,spacedim> &mapping,
+		  const FiniteElement<dim,spacedim> &fe);
 
 
 				     /**
@@ -858,7 +866,7 @@ class FEValuesBase : protected FEValuesData<dim>,
 				      * FEValuesViews and in particular
 				      * in the @ref vector_valued module.
 				      */
-    FEValuesViews::Scalar<dim>
+    FEValuesViews::Scalar<dim,spacedim>
     operator[] (const FEValuesExtractors::Scalar &scalar) const;
 
 				     /**
@@ -871,7 +879,7 @@ class FEValuesBase : protected FEValuesData<dim>,
 				      * the namespace FEValuesViews and in particular
 				      * in the @ref vector_valued module.
 				      */
-    FEValuesViews::Vector<dim>
+    FEValuesViews::Vector<dim,spacedim>
     operator[] (const FEValuesExtractors::Vector &vector) const;
 
     				     //@}
@@ -976,7 +984,7 @@ class FEValuesBase : protected FEValuesData<dim>,
 				      * shape_grad_component()
 				      * function.
 				      */
-    const Tensor<1,dim> &
+    const Tensor<1,spacedim> &
     shape_grad (const unsigned int function,
 		const unsigned int quadrature_point) const;
 
@@ -1004,7 +1012,7 @@ class FEValuesBase : protected FEValuesData<dim>,
 				      * is necessary since the other
 				      * function cannot be used.
 				      */
-    Tensor<1,dim>
+    Tensor<1,spacedim>
     shape_grad_component (const unsigned int function_no,
 			  const unsigned int point_no,
 			  const unsigned int component) const;
@@ -1038,14 +1046,14 @@ class FEValuesBase : protected FEValuesData<dim>,
 				      * shape_grad_grad_component()
 				      * function.
 				      */
-    const Tensor<2,dim> &
+    const Tensor<2,spacedim> &
     shape_hessian (const unsigned int function_no,
 		   const unsigned int point_no) const;
 
 				     /**
 				      * @deprecated Wrapper for shape_hessian()
 				      */
-    const Tensor<2,dim> &
+    const Tensor<2,spacedim> &
     shape_2nd_derivative (const unsigned int function_no,
 			  const unsigned int point_no) const;
 
@@ -1076,7 +1084,7 @@ class FEValuesBase : protected FEValuesData<dim>,
 				      * is necessary since the other
 				      * function cannot be used.
 				      */
-    Tensor<2,dim>
+    Tensor<2,spacedim>
     shape_hessian_component (const unsigned int function_no,
 				    const unsigned int point_no,
 				    const unsigned int component) const;
@@ -1084,7 +1092,7 @@ class FEValuesBase : protected FEValuesData<dim>,
 				     /**
 				      * @deprecated Wrapper for shape_hessian_component()
 				      */
-    Tensor<2,dim>
+    Tensor<2,spacedim>
     shape_2nd_derivative_component (const unsigned int function_no,
 				    const unsigned int point_no,
 				    const unsigned int component) const;
@@ -1357,7 +1365,7 @@ class FEValuesBase : protected FEValuesData<dim>,
 				      */
     template <class InputVector>
     void get_function_gradients (const InputVector      &fe_function,
-			     std::vector<Tensor<1,dim> > &gradients) const;
+			     std::vector<Tensor<1,spacedim> > &gradients) const;
 
 				     /**
 				      * @deprecated Use
@@ -1365,7 +1373,7 @@ class FEValuesBase : protected FEValuesData<dim>,
 				      */
     template <class InputVector>
     void get_function_grads (const InputVector      &fe_function,
-			     std::vector<Tensor<1,dim> > &gradients) const;
+			     std::vector<Tensor<1,spacedim> > &gradients) const;
 
 				     /**
 				      * Compute the gradients of the finite
@@ -1407,7 +1415,7 @@ class FEValuesBase : protected FEValuesData<dim>,
 				      */
     template <class InputVector>
     void get_function_gradients (const InputVector               &fe_function,
-			     std::vector<std::vector<Tensor<1,dim> > > &gradients) const;
+			     std::vector<std::vector<Tensor<1,spacedim> > > &gradients) const;
 
     
 				     /**
@@ -1416,7 +1424,7 @@ class FEValuesBase : protected FEValuesData<dim>,
 				      */
     template <class InputVector>
     void get_function_grads (const InputVector               &fe_function,
-			     std::vector<std::vector<Tensor<1,dim> > > &gradients) const;
+			     std::vector<std::vector<Tensor<1,spacedim> > > &gradients) const;
 
 				     /**
 				      * Function gradient access with
@@ -1427,7 +1435,7 @@ class FEValuesBase : protected FEValuesData<dim>,
     template <class InputVector>
     void get_function_gradients (const InputVector& fe_function,
 				 const VectorSlice<const std::vector<unsigned int> >& indices,
-				 std::vector<Tensor<1,dim> >& gradients) const;
+				 std::vector<Tensor<1,spacedim> >& gradients) const;
 
 				     /**
 				      * @deprecated Use
@@ -1436,7 +1444,7 @@ class FEValuesBase : protected FEValuesData<dim>,
     template <class InputVector>
     void get_function_grads (const InputVector& fe_function,
 			     const VectorSlice<const std::vector<unsigned int> >& indices,
-			     std::vector<Tensor<1,dim> >& gradients) const;
+			     std::vector<Tensor<1,spacedim> >& gradients) const;
 
 				     /**
 				      * Function gradient access with
@@ -1447,7 +1455,7 @@ class FEValuesBase : protected FEValuesData<dim>,
     template <class InputVector>
     void get_function_gradients (const InputVector& fe_function,
 				 const VectorSlice<const std::vector<unsigned int> >& indices,
-				 std::vector<std::vector<Tensor<1,dim> > >& gradients,
+				 std::vector<std::vector<Tensor<1,spacedim> > >& gradients,
 				 bool quadrature_points_fastest = false) const;
 
 				     /**
@@ -1457,7 +1465,7 @@ class FEValuesBase : protected FEValuesData<dim>,
     template <class InputVector>
     void get_function_grads (const InputVector& fe_function,
 			     const VectorSlice<const std::vector<unsigned int> >& indices,
-			     std::vector<std::vector<Tensor<1,dim> > >& gradients,
+			     std::vector<std::vector<Tensor<1,spacedim> > >& gradients,
 			     bool quadrature_points_fastest = false) const;
 
 				     /**
@@ -1502,7 +1510,7 @@ class FEValuesBase : protected FEValuesData<dim>,
     template <class InputVector>
     void
     get_function_hessians (const InputVector& fe_function,
-			   std::vector<Tensor<2,dim> >& hessians) const;
+			   std::vector<Tensor<2,spacedim> >& hessians) const;
 
     
 				     /**
@@ -1543,7 +1551,7 @@ class FEValuesBase : protected FEValuesData<dim>,
     template <class InputVector>
     void
     get_function_hessians (const InputVector      &fe_function,
-			   std::vector<std::vector<Tensor<2,dim> > > &hessians,
+			   std::vector<std::vector<Tensor<2,spacedim> > > &hessians,
 			   bool quadrature_points_fastest = false) const;
 
 				     /**
@@ -1557,7 +1565,7 @@ class FEValuesBase : protected FEValuesData<dim>,
     void get_function_hessians (
       const InputVector& fe_function,
       const VectorSlice<const std::vector<unsigned int> >& indices,
-      std::vector<Tensor<2,dim> >& result) const;
+      std::vector<Tensor<2,spacedim> >& result) const;
 
 				     /**
 				      * Access to the second
@@ -1570,7 +1578,7 @@ class FEValuesBase : protected FEValuesData<dim>,
     void get_function_hessians (
       const InputVector& fe_function,
       const VectorSlice<const std::vector<unsigned int> >& indices,
-      std::vector<std::vector<Tensor<2,dim> > >& result,
+      std::vector<std::vector<Tensor<2,spacedim> > >& result,
       bool quadrature_points_fastest = false) const;
 
 				     /**
@@ -1579,7 +1587,7 @@ class FEValuesBase : protected FEValuesData<dim>,
     template <class InputVector>
     void
     get_function_2nd_derivatives (const InputVector&,
-				  std::vector<Tensor<2,dim> >&) const;
+				  std::vector<Tensor<2,spacedim> >&) const;
 
 				     /**
 				      * @deprecated Wrapper for get_function_hessians()
@@ -1587,7 +1595,7 @@ class FEValuesBase : protected FEValuesData<dim>,
     template <class InputVector>
     void
     get_function_2nd_derivatives (const InputVector&,
-				  std::vector<std::vector<Tensor<2,dim> > >&,
+				  std::vector<std::vector<Tensor<2,spacedim> > >&,
 				  bool = false) const;
     
 
@@ -1597,13 +1605,13 @@ class FEValuesBase : protected FEValuesData<dim>,
 				      * Position of the <tt>i</tt>th
 				      * quadrature point in real space.
 				      */
-    const Point<dim> & quadrature_point (const unsigned int i) const;
+    const Point<spacedim> & quadrature_point (const unsigned int i) const;
 
 				     /**
 				      * Return a pointer to the vector of
 				      * quadrature points.
 				      */
-    const std::vector<Point<dim> > & get_quadrature_points () const;
+    const std::vector<Point<spacedim> > & get_quadrature_points () const;
 
 				     /**
 				      * Mapped quadrature weight. If
@@ -1636,13 +1644,13 @@ class FEValuesBase : protected FEValuesData<dim>,
 				      * quadrature point, i.e.
 				      * $J_{ij}=dx_i/d\hat x_j$
 				      */
-    const Tensor<2,dim> & jacobian (const unsigned int quadrature_point) const;
+    const Tensor<2,spacedim> & jacobian (const unsigned int quadrature_point) const;
 
 				     /**
 				      * Pointer to the array holding
 				      * the values returned by jacobian().
 				      */
-    const std::vector<Tensor<2,dim> > & get_jacobians () const;
+    const std::vector<Tensor<2,spacedim> > & get_jacobians () const;
 
     				     /**
 				      * Return the second derivative of the
@@ -1651,14 +1659,14 @@ class FEValuesBase : protected FEValuesData<dim>,
 				      * Jacobian, at the specified quadrature
 				      * point, i.e. $G_{ijk}=dJ_{jk}/d\hat x_i$.
 				      */
-    const Tensor<3,dim> & jacobian_grad (const unsigned int quadrature_point) const;
+    const Tensor<3,spacedim> & jacobian_grad (const unsigned int quadrature_point) const;
 
 				     /**
 				      * Pointer to the array holding
 				      * the values returned by
 				      * jacobian_grads().
 				      */
-    const std::vector<Tensor<3,dim> > & get_jacobian_grads () const;
+    const std::vector<Tensor<3,spacedim> > & get_jacobian_grads () const;
 
 				     /**
 				      * Return the inverse Jacobian of the
@@ -1666,33 +1674,50 @@ class FEValuesBase : protected FEValuesData<dim>,
 				      * quadrature point, i.e.
 				      * $J_{ij}=d\hat x_i/dx_j$
 				      */
-    const Tensor<2,dim> & inverse_jacobian (const unsigned int quadrature_point) const;
+    const Tensor<2,spacedim> & inverse_jacobian (const unsigned int quadrature_point) const;
 
 				     /**
 				      * Pointer to the array holding
 				      * the values returned by 
 				      * inverse_jacobian().
 				      */
-    const std::vector<Tensor<2,dim> > & get_inverse_jacobians () const;
+    const std::vector<Tensor<2,spacedim> > & get_inverse_jacobians () const;
 
 				     /**
 				      * Constant reference to the
 				      * selected mapping object.
 				      */
-    const Mapping<dim> & get_mapping () const;
+    const Mapping<dim,spacedim> & get_mapping () const;
 
 				     /**
 				      * Constant reference to the
 				      * selected finite element
 				      * object.
 				      */
-    const FiniteElement<dim> & get_fe () const;
+    const FiniteElement<dim,spacedim> & get_fe () const;
 
 				     /**
 				      * Return a triangulation
 				      * iterator to the current cell.
 				      */
-    const typename Triangulation<dim>::cell_iterator get_cell () const;
+    const typename Triangulation<dim,spacedim>::cell_iterator get_cell () const;
+
+				     /**
+				      * Returns the vectors normal to
+				      * the cell in each of the
+				      * quadrature points.
+				      */
+
+    const std::vector<Point<spacedim> > & get_cell_normal_vectors () const;
+
+
+    				     /**
+				      * Return the outward normal vector to
+				      * the cell at the <tt>i</tt>th quadrature
+				      * point. The length of the vector
+				      * is normalized to one.
+				      */
+    const Point<spacedim> & cell_normal_vector (const unsigned int i) const;
 
 				     /**
 				      * Determine an estimate for the
@@ -1835,7 +1860,7 @@ class FEValuesBase : protected FEValuesData<dim>,
                                           * conversion operator.
                                           */
         virtual
-        operator const typename Triangulation<dim>::cell_iterator () const = 0;
+        operator const typename Triangulation<dim,spacedim>::cell_iterator () const = 0;
 
                                          /**
                                           * Return the number of
@@ -2021,7 +2046,7 @@ class FEValuesBase : protected FEValuesData<dim>,
                                           * conversion operator.
                                           */
         virtual
-        operator const typename Triangulation<dim>::cell_iterator () const;
+        operator const typename Triangulation<dim,spacedim>::cell_iterator () const;
         
                                          /**
                                           * Return the number of
@@ -2230,7 +2255,7 @@ class FEValuesBase : protected FEValuesData<dim>,
                                           * iterator and store it in
                                           * this class.
                                           */
-        TriaCellIterator (const typename Triangulation<dim>::cell_iterator &cell);
+        TriaCellIterator (const typename Triangulation<dim,spacedim>::cell_iterator &cell);
         
                                          /**
                                           * Conversion operator to an
@@ -2248,7 +2273,7 @@ class FEValuesBase : protected FEValuesData<dim>,
                                           * from and to the same time.
                                           */
         virtual
-        operator const typename Triangulation<dim>::cell_iterator () const;
+        operator const typename Triangulation<dim,spacedim>::cell_iterator () const;
 
                                          /**
                                           * Implement the respective
@@ -2406,7 +2431,7 @@ class FEValuesBase : protected FEValuesData<dim>,
                                           * Copy of the iterator which
                                           * we use in this object.
                                           */
-        const typename Triangulation<dim>::cell_iterator cell;
+        const typename Triangulation<dim,spacedim>::cell_iterator cell;
 
                                          /**
                                           * String to be displayed
@@ -2432,23 +2457,23 @@ class FEValuesBase : protected FEValuesData<dim>,
 				     /**
 				      * Storage for the mapping object.
 				      */
-    const SmartPointer<const Mapping<dim> > mapping;
+    const SmartPointer<const Mapping<dim,spacedim> > mapping;
     
 				     /**
 				      * Store the finite element for later use.
 				      */
-    const SmartPointer<const FiniteElement<dim> > fe;
+    const SmartPointer<const FiniteElement<dim,spacedim> > fe;
 
     
 				     /**
 				      * Internal data of mapping.
 				      */
-    SmartPointer<typename Mapping<dim>::InternalDataBase> mapping_data;
+    SmartPointer<typename Mapping<dim,spacedim>::InternalDataBase> mapping_data;
 
 				     /**
 				      * Internal data of finite element.
 				      */
-    SmartPointer<typename Mapping<dim>::InternalDataBase> fe_data;
+    SmartPointer<typename Mapping<dim,spacedim>::InternalDataBase> fe_data;
 
 				     /**
 				      * Initialize some update
@@ -2506,8 +2531,8 @@ class FEValuesBase : protected FEValuesData<dim>,
  * 
  * @author Wolfgang Bangerth, 1998, Guido Kanschat, 2001
  */
-template <int dim>
-class FEValues : public FEValuesBase<dim>
+template <int dim, int spacedim=dim>
+  class FEValues : public FEValuesBase<dim,spacedim>
 {
   public:
                                      /**
@@ -2515,6 +2540,12 @@ class FEValues : public FEValuesBase<dim>
                                       * operates.
                                       */
     static const unsigned int dimension = dim;
+
+                                     /**
+                                      * Dimension of the space in
+                                      * which this object operates.
+                                      */
+    static const unsigned int space_dimension = spacedim;
 
                                      /**
                                       * Dimension of the object over
@@ -2531,8 +2562,8 @@ class FEValues : public FEValuesBase<dim>
 				      * matching the quadrature rule
 				      * and update flags.
 				      */
-    FEValues (const Mapping<dim>       &mapping,
-	      const FiniteElement<dim> &fe,
+    FEValues (const Mapping<dim,spacedim>       &mapping,
+	      const FiniteElement<dim,spacedim> &fe,
 	      const Quadrature<dim>    &quadrature,
 	      const UpdateFlags         update_flags);
 
@@ -2540,7 +2571,7 @@ class FEValues : public FEValuesBase<dim>
 				      * Constructor. Uses MappingQ1
 				      * implicitly.
 				      */
-    FEValues (const FiniteElement<dim> &fe,
+    FEValues (const FiniteElement<dim,spacedim> &fe,
 	      const Quadrature<dim>    &quadrature,
 	      const UpdateFlags         update_flags);
     
@@ -2557,7 +2588,7 @@ class FEValues : public FEValuesBase<dim>
 				      * used by this FEValues
 				      * object.
 				      */
-    void reinit (const typename DoFHandler<dim>::cell_iterator &cell);
+    void reinit (const typename DoFHandler<dim,spacedim>::cell_iterator &cell);
 
 				     /**
 				      * Reinitialize the gradients,
@@ -2572,7 +2603,7 @@ class FEValues : public FEValuesBase<dim>
 				      * used by this @p FEValues
 				      * object.
 				      */
-    void reinit (const typename hp::DoFHandler<dim>::cell_iterator &cell);
+    void reinit (const typename hp::DoFHandler<dim,spacedim>::cell_iterator &cell);
 
 				     /**
 				      * Reinitialize the gradients,
@@ -2587,7 +2618,7 @@ class FEValues : public FEValuesBase<dim>
 				      * used by this FEValues
 				      * object.
 				      */
-    void reinit (const typename MGDoFHandler<dim>::cell_iterator &cell);
+    void reinit (const typename MGDoFHandler<dim,spacedim>::cell_iterator &cell);
 
 				     /**
 				      * Reinitialize the gradients,
@@ -2615,7 +2646,7 @@ class FEValues : public FEValuesBase<dim>
 				      * DoFHandler or other DoF
 				      * handler type objects.
 				      */
-    void reinit (const typename Triangulation<dim>::cell_iterator &cell);
+    void reinit (const typename Triangulation<dim,spacedim>::cell_iterator &cell);
 
 				     /**
 				      * Return a reference to the copy
@@ -2654,7 +2685,7 @@ class FEValues : public FEValuesBase<dim>
                                       * that one can templatize on
                                       * FEValues/hpFEValues).
                                       */
-    const FEValues<dim> & get_present_fe_values () const;
+    const FEValues<dim,spacedim> & get_present_fe_values () const;
     
   private:
 				     /**
@@ -2705,8 +2736,8 @@ class FEValues : public FEValuesBase<dim>
  *
  *  @author Wolfgang Bangerth, 1998, Guido Kanschat, 2000, 2001
  */
-template <int dim>
-class FEFaceValuesBase : public FEValuesBase<dim>
+template <int dim, int spacedim=dim>  
+class FEFaceValuesBase : public FEValuesBase<dim,spacedim>
 {
   public:
 				     /**
@@ -2730,8 +2761,8 @@ class FEFaceValuesBase : public FEValuesBase<dim>
     FEFaceValuesBase (const unsigned int n_q_points,
 		      const unsigned int dofs_per_cell,
 		      const UpdateFlags         update_flags,
-		      const Mapping<dim>       &mapping,
-		      const FiniteElement<dim> &fe,
+		      const Mapping<dim,spacedim>       &mapping,
+		      const FiniteElement<dim,spacedim> &fe,
 		      const Quadrature<dim-1>& quadrature);
 
     				     /**
@@ -2759,7 +2790,7 @@ class FEFaceValuesBase : public FEValuesBase<dim>
 				      * this value to integrate
 				      * <tt>n.ds</tt>.
 				      */
-    const Tensor<1,dim> & boundary_form (const unsigned int i) const;
+    const Tensor<1,spacedim> & boundary_form (const unsigned int i) const;
     
 				     /**
 				      * Return the list of outward normal
@@ -2774,7 +2805,7 @@ class FEFaceValuesBase : public FEValuesBase<dim>
 				      * Jacobian of the surface
 				      * mapping.
 				      */
-    const std::vector<Tensor<1,dim> > & get_boundary_forms () const;
+    const std::vector<Tensor<1,spacedim> > & get_boundary_forms () const;
 
 				     /**
 				      * Return the index of the face
@@ -2828,15 +2859,18 @@ class FEFaceValuesBase : public FEValuesBase<dim>
  *
  * @author Wolfgang Bangerth, 1998, Guido Kanschat, 2000, 2001
  */
-template <int dim>
-class FEFaceValues : public FEFaceValuesBase<dim>
+template <int dim, int spacedim=dim>  
+class FEFaceValues : public FEFaceValuesBase<dim,spacedim>
 {
   public:
                                      /**
                                       * Dimension in which this object
                                       * operates.
                                       */
+
     static const unsigned int dimension = dim;
+
+    static const unsigned int space_dimension = spacedim;
 
                                      /**
                                       * Dimension of the object over
@@ -2853,8 +2887,8 @@ class FEFaceValues : public FEFaceValuesBase<dim>
 				      * matching the quadrature rule
 				      * and update flags.
 				      */
-    FEFaceValues (const Mapping<dim>       &mapping,
-		  const FiniteElement<dim> &fe,
+    FEFaceValues (const Mapping<dim,spacedim>       &mapping,
+		  const FiniteElement<dim,spacedim> &fe,
 		  const Quadrature<dim-1>  &quadrature,
 		  const UpdateFlags         update_flags);
 
@@ -2862,7 +2896,7 @@ class FEFaceValues : public FEFaceValuesBase<dim>
 				      * Constructor. Uses MappingQ1
 				      * implicitly.
 				      */
-    FEFaceValues (const FiniteElement<dim> &fe,
+    FEFaceValues (const FiniteElement<dim,spacedim> &fe,
 		  const Quadrature<dim-1>  &quadrature,
 		  const UpdateFlags         update_flags);
 
@@ -2872,7 +2906,7 @@ class FEFaceValues : public FEFaceValuesBase<dim>
 				      * number @p face_no of @p cell
 				      * and the given finite element.
 				      */
-    void reinit (const typename DoFHandler<dim>::cell_iterator &cell,
+    void reinit (const typename DoFHandler<dim,spacedim>::cell_iterator &cell,
 		 const unsigned int                            face_no);
 
 				     /**
@@ -2888,7 +2922,7 @@ class FEFaceValues : public FEFaceValuesBase<dim>
 				      * used by this FEValues
 				      * object.
 				      */
-    void reinit (const typename hp::DoFHandler<dim>::cell_iterator &cell,
+    void reinit (const typename hp::DoFHandler<dim,spacedim>::cell_iterator &cell,
 		 const unsigned int                              face_no);
 
 				     /**
@@ -2904,7 +2938,7 @@ class FEFaceValues : public FEFaceValuesBase<dim>
 				      * used by this FEValues
 				      * object.
 				      */
-    void reinit (const typename MGDoFHandler<dim>::cell_iterator &cell,
+    void reinit (const typename MGDoFHandler<dim,spacedim>::cell_iterator &cell,
 		 const unsigned int                              face_no);
 
 				     /**
@@ -2933,7 +2967,7 @@ class FEFaceValues : public FEFaceValuesBase<dim>
 				      * DoFHandler or other DoF
 				      * handler type objects.
 				      */
-    void reinit (const typename Triangulation<dim>::cell_iterator &cell,
+    void reinit (const typename Triangulation<dim,spacedim>::cell_iterator &cell,
 		 const unsigned int                    face_no);
     
                                      /**
@@ -2959,7 +2993,7 @@ class FEFaceValues : public FEFaceValuesBase<dim>
                                       * that one can templatize on
                                       * FEValues/hpFEValues).
                                       */
-    const FEFaceValues<dim> & get_present_fe_values () const;
+    const FEFaceValues<dim,spacedim> & get_present_fe_values () const;
   private:
 
 				     /**
@@ -3001,8 +3035,8 @@ class FEFaceValues : public FEFaceValuesBase<dim>
  *
  * @author Wolfgang Bangerth, 1998, Guido Kanschat, 2000, 2001
  */
-template <int dim>
-class FESubfaceValues : public FEFaceValuesBase<dim>
+template <int dim, int spacedim=dim>  
+class FESubfaceValues : public FEFaceValuesBase<dim,spacedim>
 {
   public:
                                      /**
@@ -3010,6 +3044,12 @@ class FESubfaceValues : public FEFaceValuesBase<dim>
                                       * operates.
                                       */
     static const unsigned int dimension = dim;
+
+                                     /**
+                                      * Dimension of the space in
+                                      * which this object operates.
+                                      */
+    static const unsigned int space_dimension = spacedim;
 
                                      /**
                                       * Dimension of the object over
@@ -3026,8 +3066,8 @@ class FESubfaceValues : public FEFaceValuesBase<dim>
 				      * matching the quadrature rule
 				      * and update flags.
 				      */
-    FESubfaceValues (const Mapping<dim>       &mapping,
-		     const FiniteElement<dim> &fe,
+    FESubfaceValues (const Mapping<dim,spacedim>       &mapping,
+		     const FiniteElement<dim,spacedim> &fe,
 		     const Quadrature<dim-1>  &face_quadrature,
 		     const UpdateFlags         update_flags);
 
@@ -3035,7 +3075,7 @@ class FESubfaceValues : public FEFaceValuesBase<dim>
 				      * Constructor. Uses MappingQ1
 				      * implicitly.
 				      */
-    FESubfaceValues (const FiniteElement<dim> &fe,
+    FESubfaceValues (const FiniteElement<dim,spacedim> &fe,
 		     const Quadrature<dim-1>  &face_quadrature,
 		     const UpdateFlags         update_flags);
 
@@ -3052,7 +3092,7 @@ class FESubfaceValues : public FEFaceValuesBase<dim>
 				      * used by this
 				      * FESubfaceValues object.
 				      */
-    void reinit (const typename DoFHandler<dim>::cell_iterator &cell,
+    void reinit (const typename DoFHandler<dim,spacedim>::cell_iterator &cell,
 		 const unsigned int                    face_no,
 		 const unsigned int                    subface_no);
 
@@ -3069,7 +3109,7 @@ class FESubfaceValues : public FEFaceValuesBase<dim>
 				      * used by this FEValues
 				      * object.
 				      */
-    void reinit (const typename hp::DoFHandler<dim>::cell_iterator &cell,
+    void reinit (const typename hp::DoFHandler<dim,spacedim>::cell_iterator &cell,
 		 const unsigned int                    face_no,
 		 const unsigned int                    subface_no);
     
@@ -3086,7 +3126,7 @@ class FESubfaceValues : public FEFaceValuesBase<dim>
 				      * used by this FEValues
 				      * object.
 				      */
-    void reinit (const typename MGDoFHandler<dim>::cell_iterator &cell,
+    void reinit (const typename MGDoFHandler<dim,spacedim>::cell_iterator &cell,
 		 const unsigned int                    face_no,
 		 const unsigned int                    subface_no);
     
@@ -3116,7 +3156,7 @@ class FESubfaceValues : public FEFaceValuesBase<dim>
 				      * DoFHandler or other DoF
 				      * handler type objects.
 				      */
-    void reinit (const typename Triangulation<dim>::cell_iterator &cell,
+    void reinit (const typename Triangulation<dim,spacedim>::cell_iterator &cell,
 		 const unsigned int                    face_no,
 		 const unsigned int                    subface_no);
 
@@ -3143,7 +3183,7 @@ class FESubfaceValues : public FEFaceValuesBase<dim>
                                       * that one can templatize on
                                       * FEValues/hpFEValues).
                                       */
-    const FESubfaceValues<dim> & get_present_fe_values () const;
+    const FESubfaceValues<dim,spacedim> & get_present_fe_values () const;
 
                                      /**
 				      * @todo Document this
@@ -3212,9 +3252,9 @@ namespace FEValuesExtractors
 
 namespace FEValuesViews
 {
-  template <int dim>
+  template <int dim, int spacedim>  
   inline
-  Scalar<dim>::Scalar (const FEValuesBase<dim> &fe_values,
+  Scalar<dim,spacedim>::Scalar (const FEValuesBase<dim,spacedim> &fe_values,
 		       const unsigned int       component)
 		  :
 		  fe_values (fe_values),
@@ -3226,16 +3266,17 @@ namespace FEValuesViews
 
 
 
-  template <int dim>
+  template <int dim, int spacedim>  
   inline
-  typename Scalar<dim>::value_type
-  Scalar<dim>::value (const unsigned int shape_function,
+  typename Scalar<dim,spacedim>::value_type
+  Scalar<dim,spacedim>::value (const unsigned int shape_function,
 		      const unsigned int q_point) const
   {
+    typedef FEValuesBase<dim,spacedim> FVB;
     Assert (shape_function < fe_values.fe->dofs_per_cell,
 	    ExcIndexRange (shape_function, 0, fe_values.fe->dofs_per_cell));
     Assert (fe_values.update_flags & update_values,
-	    typename FEValuesBase<dim>::ExcAccessToUninitializedField());    
+	    typename FVB::ExcAccessToUninitializedField());    
 
 				     // an adaptation of the
 				     // FEValuesBase::shape_value_component
@@ -3274,16 +3315,17 @@ namespace FEValuesViews
 
 
 
-  template <int dim>
+  template <int dim, int spacedim>  
   inline
-  typename Scalar<dim>::gradient_type
-  Scalar<dim>::gradient (const unsigned int shape_function,
+  typename Scalar<dim,spacedim>::gradient_type
+  Scalar<dim,spacedim>::gradient (const unsigned int shape_function,
 			 const unsigned int q_point) const
   {
+    typedef FEValuesBase<dim,spacedim> FVB;
     Assert (shape_function < fe_values.fe->dofs_per_cell,
 	    ExcIndexRange (shape_function, 0, fe_values.fe->dofs_per_cell));
     Assert (fe_values.update_flags & update_gradients,
-	    typename FEValuesBase<dim>::ExcAccessToUninitializedField());    
+	    typename FVB::ExcAccessToUninitializedField());    
 
 				     // an adaptation of the
 				     // FEValuesBase::shape_grad_component
@@ -3322,16 +3364,17 @@ namespace FEValuesViews
 
 
 
-  template <int dim>
+  template <int dim, int spacedim>  
   inline
-  typename Scalar<dim>::hessian_type
-  Scalar<dim>::hessian (const unsigned int shape_function,
+  typename Scalar<dim,spacedim>::hessian_type
+  Scalar<dim,spacedim>::hessian (const unsigned int shape_function,
 			const unsigned int q_point) const
   {
+    typedef FEValuesBase<dim,spacedim> FVB;
     Assert (shape_function < fe_values.fe->dofs_per_cell,
 	    ExcIndexRange (shape_function, 0, fe_values.fe->dofs_per_cell));
     Assert (fe_values.update_flags & update_hessians,
-	    typename FEValuesBase<dim>::ExcAccessToUninitializedField());    
+	    typename FVB::ExcAccessToUninitializedField());    
 
 				     // an adaptation of the
 				     // FEValuesBase::shape_grad_component
@@ -3370,9 +3413,9 @@ namespace FEValuesViews
 
 
 
-  template <int dim>
+  template <int dim, int spacedim>  
   inline
-  Vector<dim>::Vector (const FEValuesBase<dim> &fe_values,
+  Vector<dim,spacedim>::Vector (const FEValuesBase<dim,spacedim> &fe_values,
 		       const unsigned int       first_vector_component)
 		  :
 		  fe_values (fe_values),
@@ -3385,16 +3428,17 @@ namespace FEValuesViews
 
 
 
-  template <int dim>
+  template <int dim, int spacedim>  
   inline
-  typename Vector<dim>::value_type
-  Vector<dim>::value (const unsigned int shape_function,
+  typename Vector<dim,spacedim>::value_type
+  Vector<dim,spacedim>::value (const unsigned int shape_function,
 		      const unsigned int q_point) const
   {
+    typedef FEValuesBase<dim,spacedim> FVB;
     Assert (shape_function < fe_values.fe->dofs_per_cell,
 	    ExcIndexRange (shape_function, 0, fe_values.fe->dofs_per_cell));
     Assert (fe_values.update_flags & update_values,
-	    typename FEValuesBase<dim>::ExcAccessToUninitializedField());    
+	    typename FVB::ExcAccessToUninitializedField());    
 
 				     // compared to the scalar case above, we
 				     // can save some work here because we
@@ -3449,18 +3493,20 @@ namespace FEValuesViews
 
   
 
-  template <int dim>
+  template <int dim, int spacedim>  
   inline
-  typename Vector<dim>::gradient_type
-  Vector<dim>::gradient (const unsigned int shape_function,
+  typename Vector<dim,spacedim>::gradient_type
+  Vector<dim,spacedim>::gradient (const unsigned int shape_function,
 			 const unsigned int q_point) const
   {
-				     // this function works like in the case
-				     // above    
+				     // this function works like in
+				     // the case above
+				
+    typedef FEValuesBase<dim,spacedim> FVB;    
     Assert (shape_function < fe_values.fe->dofs_per_cell,
 	    ExcIndexRange (shape_function, 0, fe_values.fe->dofs_per_cell));
     Assert (fe_values.update_flags & update_gradients,
-	    typename FEValuesBase<dim>::ExcAccessToUninitializedField());    
+	    typename FVB::ExcAccessToUninitializedField());    
 
     gradient_type return_value;
     
@@ -3506,18 +3552,20 @@ namespace FEValuesViews
 
 
 
-  template <int dim>
+  template <int dim, int spacedim>  
   inline
-  typename Vector<dim>::divergence_type
-  Vector<dim>::divergence (const unsigned int shape_function,
+  typename Vector<dim,spacedim>::divergence_type
+  Vector<dim,spacedim>::divergence (const unsigned int shape_function,
 			   const unsigned int q_point) const
   {
-				     // this function works like in the case
-				     // above    
+				     // this function works like in
+				     // the case above
+				
+    typedef FEValuesBase<dim,spacedim> FVB; 
     Assert (shape_function < fe_values.fe->dofs_per_cell,
 	    ExcIndexRange (shape_function, 0, fe_values.fe->dofs_per_cell));
     Assert (fe_values.update_flags & update_gradients,
-	    typename FEValuesBase<dim>::ExcAccessToUninitializedField());    
+	    typename FVB::ExcAccessToUninitializedField());    
 
     if (fe_values.fe->is_primitive() ||
 	fe_values.fe->is_primitive(shape_function))
@@ -3565,18 +3613,19 @@ namespace FEValuesViews
   
 
 
-  template <int dim>
+  template <int dim, int spacedim>  
   inline
-  typename Vector<dim>::hessian_type
-  Vector<dim>::hessian (const unsigned int shape_function,
+  typename Vector<dim,spacedim>::hessian_type
+  Vector<dim,spacedim>::hessian (const unsigned int shape_function,
 			const unsigned int q_point) const
   {
-				     // this function works like in the case
-				     // above    
+				     // this function works like in
+				     // the case above				
+    typedef FEValuesBase<dim,spacedim> FVB;    
     Assert (shape_function < fe_values.fe->dofs_per_cell,
 	    ExcIndexRange (shape_function, 0, fe_values.fe->dofs_per_cell));
     Assert (fe_values.update_flags & update_hessians,
-	    typename FEValuesBase<dim>::ExcAccessToUninitializedField());    
+	    typename FVB::ExcAccessToUninitializedField());    
 
     hessian_type return_value;
     
@@ -3871,33 +3920,33 @@ namespace FEValuesViews
 
 
 
-template <int dim>
+template <int dim, int spacedim>
 inline
-FEValuesViews::Scalar<dim>
-FEValuesBase<dim>::
+FEValuesViews::Scalar<dim,spacedim>
+FEValuesBase<dim,spacedim>::
 operator[] (const FEValuesExtractors::Scalar &scalar) const
 {
-  return FEValuesViews::Scalar<dim> (*this, scalar.component);
+  return FEValuesViews::Scalar<dim,spacedim> (*this, scalar.component);
 }
 
 
 
-template <int dim>
+template <int dim, int spacedim>  
 inline
-FEValuesViews::Vector<dim>
-FEValuesBase<dim>::
+FEValuesViews::Vector<dim,spacedim>
+FEValuesBase<dim,spacedim>::
 operator[] (const FEValuesExtractors::Vector &vector) const
 {
   return
-    FEValuesViews::Vector<dim> (*this, vector.first_vector_component);
+    FEValuesViews::Vector<dim,spacedim> (*this, vector.first_vector_component);
 }
 
 
 
-template <int dim>
+template <int dim, int spacedim>  
 inline
 double
-FEValuesBase<dim>::shape_value (const unsigned int i,
+FEValuesBase<dim,spacedim>::shape_value (const unsigned int i,
 				const unsigned int j) const
 {
   Assert (i < fe->dofs_per_cell,
@@ -3926,10 +3975,10 @@ FEValuesBase<dim>::shape_value (const unsigned int i,
 
 
 
-template <int dim>
+template <int dim, int spacedim>  
 inline
 double
-FEValuesBase<dim>::shape_value_component (const unsigned int i,
+FEValuesBase<dim,spacedim>::shape_value_component (const unsigned int i,
 					  const unsigned int j,
 					  const unsigned int component) const
 {
@@ -3990,10 +4039,10 @@ FEValuesBase<dim>::shape_value_component (const unsigned int i,
 
 
 
-template <int dim>
+template <int dim, int spacedim>  
 inline
-const Tensor<1,dim> &
-FEValuesBase<dim>::shape_grad (const unsigned int i,
+const Tensor<1,spacedim> &
+FEValuesBase<dim,spacedim>::shape_grad (const unsigned int i,
 			       const unsigned int j) const
 {
   Assert (i < fe->dofs_per_cell,
@@ -4026,10 +4075,10 @@ FEValuesBase<dim>::shape_grad (const unsigned int i,
 
 
 
-template <int dim>
+template <int dim, int spacedim>  
 inline
-Tensor<1,dim>
-FEValuesBase<dim>::shape_grad_component (const unsigned int i,
+Tensor<1,spacedim>
+FEValuesBase<dim,spacedim>::shape_grad_component (const unsigned int i,
 					 const unsigned int j,
 					 const unsigned int component) const
 {
@@ -4054,7 +4103,7 @@ FEValuesBase<dim>::shape_grad_component (const unsigned int i,
       if (component == fe->system_to_component_index(i).first)
 	return this->shape_gradients[this->shape_function_to_row_table[i]][j];
       else
-	return Tensor<1,dim>();
+	return Tensor<1,spacedim>();
     }
   else
     {
@@ -4068,7 +4117,7 @@ FEValuesBase<dim>::shape_grad_component (const unsigned int i,
 				       // is non-zero at all within
 				       // this component:
       if (fe->get_nonzero_components(i)[component] == false)
-	return Tensor<1,dim>();
+	return Tensor<1,spacedim>();
 
 				       // count how many non-zero
 				       // component the shape function
@@ -4090,10 +4139,10 @@ FEValuesBase<dim>::shape_grad_component (const unsigned int i,
 
 
 
-template <int dim>
+template <int dim, int spacedim>  
 inline
-const Tensor<2,dim> &
-FEValuesBase<dim>::shape_hessian (const unsigned int i,
+const Tensor<2,spacedim> &
+FEValuesBase<dim,spacedim>::shape_hessian (const unsigned int i,
 				  const unsigned int j) const
 {
   Assert (i < fe->dofs_per_cell,
@@ -4126,10 +4175,10 @@ FEValuesBase<dim>::shape_hessian (const unsigned int i,
 
 
 
-template <int dim>
+template <int dim, int spacedim>  
 inline
-const Tensor<2,dim> &
-FEValuesBase<dim>::shape_2nd_derivative (const unsigned int i,
+const Tensor<2,spacedim> &
+FEValuesBase<dim,spacedim>::shape_2nd_derivative (const unsigned int i,
 					 const unsigned int j) const
 {
   return shape_hessian(i,j);
@@ -4137,10 +4186,10 @@ FEValuesBase<dim>::shape_2nd_derivative (const unsigned int i,
 
 
 
-template <int dim>
+template <int dim, int spacedim>  
 inline
-Tensor<2,dim>
-FEValuesBase<dim>::shape_hessian_component (const unsigned int i,
+Tensor<2,spacedim>
+FEValuesBase<dim,spacedim>::shape_hessian_component (const unsigned int i,
 					    const unsigned int j,
 					    const unsigned int component) const
 {
@@ -4165,7 +4214,7 @@ FEValuesBase<dim>::shape_hessian_component (const unsigned int i,
       if (component == fe->system_to_component_index(i).first)
 	return this->shape_hessians[this->shape_function_to_row_table[i]][j];
       else
-	return Tensor<2,dim>();
+	return Tensor<2,spacedim>();
     }
   else
     {
@@ -4179,7 +4228,7 @@ FEValuesBase<dim>::shape_hessian_component (const unsigned int i,
 				       // is non-zero at all within
 				       // this component:
       if (fe->get_nonzero_components(i)[component] == false)
-	return Tensor<2,dim>();
+	return Tensor<2,spacedim>();
 
 				       // count how many non-zero
 				       // component the shape function
@@ -4201,10 +4250,10 @@ FEValuesBase<dim>::shape_hessian_component (const unsigned int i,
 
 
 
-template <int dim>
+template <int dim, int spacedim>  
 inline
-Tensor<2,dim>
-FEValuesBase<dim>::shape_2nd_derivative_component (const unsigned int i,
+Tensor<2,spacedim>
+FEValuesBase<dim,spacedim>::shape_2nd_derivative_component (const unsigned int i,
 						   const unsigned int j,
 						   const unsigned int component) const
 {
@@ -4213,38 +4262,38 @@ FEValuesBase<dim>::shape_2nd_derivative_component (const unsigned int i,
 
 
 
-template <int dim>
+template <int dim, int spacedim>  
 inline
-const FiniteElement<dim> & 
-FEValuesBase<dim>::get_fe () const
+const FiniteElement<dim,spacedim> & 
+FEValuesBase<dim,spacedim>::get_fe () const
 {
   return *fe;
 }
 
 
-template <int dim>
+template <int dim, int spacedim>  
 inline
-const Mapping<dim> & 
-FEValuesBase<dim>::get_mapping () const
+const Mapping<dim,spacedim> & 
+FEValuesBase<dim,spacedim>::get_mapping () const
 {
   return *mapping;
 }
 
 
 
-template <int dim>
+template <int dim, int spacedim>  
 inline
-const typename Triangulation<dim>::cell_iterator
-FEValuesBase<dim>::get_cell () const
+const typename Triangulation<dim,spacedim>::cell_iterator
+FEValuesBase<dim,spacedim>::get_cell () const
 {
   return *present_cell;
 }
 
 
-template <int dim>
+template <int dim, int spacedim>  
 inline
-const std::vector<Point<dim> > &
-FEValuesBase<dim>::get_quadrature_points () const
+const std::vector<Point<spacedim> > &
+FEValuesBase<dim,spacedim>::get_quadrature_points () const
 {
   Assert (this->update_flags & update_quadrature_points, ExcAccessToUninitializedField());
   return this->quadrature_points;
@@ -4252,10 +4301,10 @@ FEValuesBase<dim>::get_quadrature_points () const
 
 
 
-template <int dim>
+template <int dim, int spacedim>  
 inline
 const std::vector<double> &
-FEValuesBase<dim>::get_JxW_values () const
+FEValuesBase<dim,spacedim>::get_JxW_values () const
 {
   Assert (this->update_flags & update_JxW_values, ExcAccessToUninitializedField());
   return this->JxW_values;
@@ -4263,10 +4312,10 @@ FEValuesBase<dim>::get_JxW_values () const
 
 
 
-template <int dim>
+template <int dim, int spacedim>  
 inline
-const std::vector<Tensor<2,dim> >&
-FEValuesBase<dim>::get_jacobians () const
+const std::vector<Tensor<2,spacedim> >&
+FEValuesBase<dim,spacedim>::get_jacobians () const
 {
   Assert (this->update_flags & update_jacobians, ExcAccessToUninitializedField());
   return this->jacobians;
@@ -4274,10 +4323,10 @@ FEValuesBase<dim>::get_jacobians () const
 
 
 
-template <int dim>
+template <int dim, int spacedim>
 inline
-const std::vector<Tensor<3,dim> >&
-FEValuesBase<dim>::get_jacobian_grads () const
+const std::vector<Tensor<3,spacedim> >&
+FEValuesBase<dim,spacedim>::get_jacobian_grads () const
 {
   Assert (this->update_flags & update_jacobian_grads, ExcAccessToUninitializedField());
   return this->jacobian_grads;
@@ -4285,10 +4334,10 @@ FEValuesBase<dim>::get_jacobian_grads () const
 
 
 
-template <int dim>
+template <int dim, int spacedim>
 inline
-const std::vector<Tensor<2,dim> >&
-FEValuesBase<dim>::get_inverse_jacobians () const
+const std::vector<Tensor<2,spacedim> >&
+FEValuesBase<dim,spacedim>::get_inverse_jacobians () const
 {
   Assert (this->update_flags & update_inverse_jacobians, ExcAccessToUninitializedField());
   return this->inverse_jacobians;
@@ -4296,10 +4345,9 @@ FEValuesBase<dim>::get_inverse_jacobians () const
 
 
 
-template <int dim>
-inline
-const Point<dim> &
-FEValuesBase<dim>::quadrature_point (const unsigned int i) const
+template <int dim, int spacedim>
+const Point<spacedim> &
+FEValuesBase<dim,spacedim>::quadrature_point (const unsigned int i) const
 {
   Assert (this->update_flags & update_quadrature_points, ExcAccessToUninitializedField());
   Assert (i<this->quadrature_points.size(), ExcIndexRange(i, 0, this->quadrature_points.size()));
@@ -4310,10 +4358,10 @@ FEValuesBase<dim>::quadrature_point (const unsigned int i) const
 
 
 
-template <int dim>
+template <int dim, int spacedim>  
 inline
 double
-FEValuesBase<dim>::JxW (const unsigned int i) const
+FEValuesBase<dim,spacedim>::JxW (const unsigned int i) const
 {
   Assert (this->update_flags & update_JxW_values, ExcAccessToUninitializedField());
   Assert (i<this->JxW_values.size(), ExcIndexRange(i, 0, this->JxW_values.size()));
@@ -4323,10 +4371,10 @@ FEValuesBase<dim>::JxW (const unsigned int i) const
 
 
 
-template <int dim>
+template <int dim, int spacedim>  
 inline
-const Tensor<2,dim> &
-FEValuesBase<dim>::jacobian (const unsigned int i) const
+const Tensor<2,spacedim> &
+FEValuesBase<dim,spacedim>::jacobian (const unsigned int i) const
 {
   Assert (this->update_flags & update_jacobians, ExcAccessToUninitializedField());
   Assert (i<this->jacobians.size(), ExcIndexRange(i, 0, this->jacobians.size()));
@@ -4336,10 +4384,10 @@ FEValuesBase<dim>::jacobian (const unsigned int i) const
 
 
 
-template <int dim>
+template <int dim, int spacedim>
 inline
-const Tensor<3,dim> &
-FEValuesBase<dim>::jacobian_grad (const unsigned int i) const
+const Tensor<3,spacedim> &
+FEValuesBase<dim,spacedim>::jacobian_grad (const unsigned int i) const
 {
   Assert (this->update_flags & update_jacobian_grads, ExcAccessToUninitializedField());
   Assert (i<this->jacobian_grads.size(), ExcIndexRange(i, 0, this->jacobian_grads.size()));
@@ -4349,10 +4397,10 @@ FEValuesBase<dim>::jacobian_grad (const unsigned int i) const
 
 
 
-template <int dim>
+template <int dim, int spacedim>
 inline
-const Tensor<2,dim> &
-FEValuesBase<dim>::inverse_jacobian (const unsigned int i) const
+const Tensor<2,spacedim> &
+FEValuesBase<dim,spacedim>::inverse_jacobian (const unsigned int i) const
 {
   Assert (this->update_flags & update_inverse_jacobians, ExcAccessToUninitializedField());
   Assert (i<this->inverse_jacobians.size(), ExcIndexRange(i, 0, this->inverse_jacobians.size()));
@@ -4362,53 +4410,53 @@ FEValuesBase<dim>::inverse_jacobian (const unsigned int i) const
 
 
 
-template <int dim>
+template <int dim, int spacedim>
 template <class InputVector>
 inline
 void
-FEValuesBase<dim>::get_function_grads (const InputVector           &fe_function,
-				       std::vector<Tensor<1,dim> > &gradients) const
+FEValuesBase<dim,spacedim>::get_function_grads (const InputVector           &fe_function,
+				       std::vector<Tensor<1,spacedim> > &gradients) const
 {
   get_function_gradients(fe_function, gradients);
 }
 
 
 
-template <int dim>
+template <int dim, int spacedim>  
 template <class InputVector>
 inline
 void
-FEValuesBase<dim>::get_function_grads (
+FEValuesBase<dim,spacedim>::get_function_grads (
   const InputVector& fe_function,
   const VectorSlice<const std::vector<unsigned int> >& indices,
-  std::vector<Tensor<1,dim> > &values) const
+  std::vector<Tensor<1,spacedim> > &values) const
 {
   get_function_gradients(fe_function, indices, values);
 }
 
 
 
-template <int dim>
+template <int dim, int spacedim>  
 template <class InputVector>
 inline
 void
-FEValuesBase<dim>::
+FEValuesBase<dim,spacedim>::
 get_function_grads (const InputVector                         &fe_function,
-		    std::vector<std::vector<Tensor<1,dim> > > &gradients) const
+		    std::vector<std::vector<Tensor<1,spacedim> > > &gradients) const
 {
   get_function_gradients(fe_function, gradients);
 }
 
 
 
-template <int dim>
+template <int dim, int spacedim>  
 template <class InputVector>
 inline
 void
-FEValuesBase<dim>::get_function_grads (
+FEValuesBase<dim,spacedim>::get_function_grads (
   const InputVector& fe_function,
   const VectorSlice<const std::vector<unsigned int> >& indices,
-  std::vector<std::vector<Tensor<1,dim> > >& values,
+  std::vector<std::vector<Tensor<1,spacedim> > >& values,
   bool q_points_fastest) const
 {
   get_function_gradients(fe_function, indices, values, q_points_fastest);
@@ -4416,26 +4464,26 @@ FEValuesBase<dim>::get_function_grads (
 
 
 
-template <int dim>
+template <int dim, int spacedim>  
 template <class InputVector>
 inline
 void
-FEValuesBase<dim>::
+FEValuesBase<dim,spacedim>::
 get_function_2nd_derivatives (const InputVector           &fe_function,
-			      std::vector<Tensor<2,dim> > &hessians) const
+			      std::vector<Tensor<2,spacedim> > &hessians) const
 {
   get_function_hessians(fe_function, hessians);
 }
 
 
 
-template <int dim>
+template <int dim, int spacedim>  
 template <class InputVector>
 inline
 void
-FEValuesBase<dim>::
+FEValuesBase<dim,spacedim>::
 get_function_2nd_derivatives (const InputVector                         &fe_function,
-			      std::vector<std::vector<Tensor<2,dim> > > &hessians,
+			      std::vector<std::vector<Tensor<2,spacedim> > > &hessians,
 			      bool quadrature_points_fastest) const
 {
   get_function_hessians(fe_function, hessians, quadrature_points_fastest);
@@ -4443,23 +4491,40 @@ get_function_2nd_derivatives (const InputVector                         &fe_func
 
 
 
+template <int dim, int spacedim>  
+inline
+const Point<spacedim> &
+FEValuesBase<dim,spacedim>::cell_normal_vector (const unsigned int i) const
+{
+  typedef FEValuesBase<dim,spacedim> FVB;
+  Assert (i<this->cell_normal_vectors.size(),
+	  ExcIndexRange(i, 0, this->cell_normal_vectors.size()));
+  Assert (this->update_flags & update_cell_normal_vectors,
+	  typename FVB::ExcAccessToUninitializedField());
+  
+  return this->cell_normal_vectors[i];
+}
+
+
+
+
 /*------------------------ Inline functions: FEValues ----------------------------*/
 
 
-template <int dim>
+template <int dim, int spacedim>  
 inline
 const Quadrature<dim> &
-FEValues<dim>::get_quadrature () const 
+FEValues<dim,spacedim>::get_quadrature () const 
 {
   return quadrature;
 }
 
 
 
-template <int dim>
+template <int dim, int spacedim>  
 inline
-const FEValues<dim> &
-FEValues<dim>::get_present_fe_values () const 
+const FEValues<dim,spacedim> &
+FEValues<dim,spacedim>::get_present_fe_values () const 
 {
   return *this;
 }
@@ -4468,24 +4533,25 @@ FEValues<dim>::get_present_fe_values () const
 /*------------------------ Inline functions: FEFaceValuesBase --------------------*/
 
 
-template <int dim>
+template <int dim, int spacedim>  
 inline
 const Point<dim> &
-FEFaceValuesBase<dim>::normal_vector (const unsigned int i) const
+FEFaceValuesBase<dim,spacedim>::normal_vector (const unsigned int i) const
 {
+  typedef FEValuesBase<dim,spacedim> FVB;
   Assert (i<this->normal_vectors.size(),
 	  ExcIndexRange(i, 0, this->normal_vectors.size()));
   Assert (this->update_flags & update_normal_vectors,
-	  typename FEValuesBase<dim>::ExcAccessToUninitializedField());
+	  typename FVB::ExcAccessToUninitializedField());
   
   return this->normal_vectors[i];
 }
 
 
-template <int dim>
+template <int dim, int spacedim>  
 inline
 unsigned int
-FEFaceValuesBase<dim>::get_face_index () const
+FEFaceValuesBase<dim,spacedim>::get_face_index () const
 {
   return present_face_index;
 }
@@ -4493,45 +4559,46 @@ FEFaceValuesBase<dim>::get_face_index () const
 
 /*------------------------ Inline functions: FE*FaceValues --------------------*/
 
-template <int dim>
+template <int dim, int spacedim>  
 inline
 const Quadrature<dim-1> &
-FEFaceValuesBase<dim>::get_quadrature () const 
+FEFaceValuesBase<dim,spacedim>::get_quadrature () const 
 {
   return quadrature;
 }
 
 
 
-template <int dim>
+template <int dim, int spacedim>  
 inline
-const FEFaceValues<dim> &
-FEFaceValues<dim>::get_present_fe_values () const 
+const FEFaceValues<dim,spacedim> &
+FEFaceValues<dim,spacedim>::get_present_fe_values () const 
 {
   return *this;
 }
 
 
 
-template <int dim>
+template <int dim, int spacedim>  
 inline
-const FESubfaceValues<dim> &
-FESubfaceValues<dim>::get_present_fe_values () const 
+const FESubfaceValues<dim,spacedim> &
+FESubfaceValues<dim,spacedim>::get_present_fe_values () const 
 {
   return *this;
 }
 
 
 
-template <int dim>
+template <int dim, int spacedim>  
 inline
-const Tensor<1,dim> &
-FEFaceValuesBase<dim>::boundary_form (const unsigned int i) const
+const Tensor<1,spacedim> &
+FEFaceValuesBase<dim,spacedim>::boundary_form (const unsigned int i) const
 {
+  typedef FEValuesBase<dim,spacedim> FVB;
   Assert (i<this->boundary_forms.size(),
 	  ExcIndexRange(i, 0, this->boundary_forms.size()));
   Assert (this->update_flags & update_boundary_forms,
-	  typename FEValuesBase<dim>::ExcAccessToUninitializedField());
+	  typename FVB::ExcAccessToUninitializedField());
   
   return this->boundary_forms[i];
 }

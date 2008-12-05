@@ -104,7 +104,7 @@ DoFTools::make_sparsity_pattern (
   Assert (couplings.n_cols() == dof.get_fe().n_components(),
 	  ExcDimensionMismatch(couplings.n_cols(), dof.get_fe().n_components()));
 
-  const hp::FECollection<DH::dimension> fe_collection (dof.get_fe());
+  const hp::FECollection<DH::dimension,DH::space_dimension> fe_collection (dof.get_fe());
   
 				   // first, for each finite element, build a
 				   // mask for each dof, not like the one
@@ -289,7 +289,7 @@ template <class DH, class SparsityPattern>
 void
 DoFTools::make_boundary_sparsity_pattern (
   const DH                               &dof_handler,
-  const typename FunctionMap<DH::dimension>::type &function_map,
+  const typename FunctionMap<DH::space_dimension>::type &function_map,
   const std::vector<unsigned int>        &dof_to_boundary_mapping,
   SparsityPattern                        &sparsity)
 {
@@ -418,7 +418,7 @@ DoFTools::make_boundary_sparsity_pattern (
 template <class DH, class SparsityPattern>
 void DoFTools::make_boundary_sparsity_pattern (
   const DH                                        &dof,
-  const typename FunctionMap<DH::dimension>::type &boundary_indicators,
+  const typename FunctionMap<DH::space_dimension>::type &boundary_indicators,
   const std::vector<unsigned int>                 &dof_to_boundary_mapping,
   SparsityPattern                                 &sparsity)
 {
@@ -1064,10 +1064,10 @@ namespace internal
 					* this isn't the case, go back
 					* and select dofs differently
 					*/
-      template <int dim>
+      template <int dim, int spacedim>  
       void
-      select_master_dofs_for_face_restriction (const FiniteElement<dim> &fe1,
-					       const FiniteElement<dim> &fe2,
+      select_master_dofs_for_face_restriction (const FiniteElement<dim,spacedim> &fe1,
+					       const FiniteElement<dim,spacedim> &fe2,
 					       const FullMatrix<double> &face_interpolation_matrix,
 					       std::vector<bool>        &master_dof_mask)
       {
@@ -1238,10 +1238,10 @@ namespace internal
 					* masters on refined faces where an
 					* fe1 and a fe2 meet.
 					*/
-      template <int dim>
+      template <int dim, int spacedim>  
       void
-      ensure_existence_of_master_dof_mask (const FiniteElement<dim> &fe1,
-					   const FiniteElement<dim> &fe2,
+      ensure_existence_of_master_dof_mask (const FiniteElement<dim,spacedim> &fe1,
+					   const FiniteElement<dim,spacedim> &fe2,
 					   const FullMatrix<double> &face_interpolation_matrix,
 					   boost::shared_ptr<std::vector<bool> > &master_dof_mask)
       {
@@ -1266,10 +1266,10 @@ namespace internal
                                         * with the correct data. If it
                                         * is nonzero, don't touch it.
                                         */
-      template <int dim>
+      template <int dim, int spacedim>  
       void
-      ensure_existence_of_face_matrix (const FiniteElement<dim> &fe1,
-                                       const FiniteElement<dim> &fe2,
+      ensure_existence_of_face_matrix (const FiniteElement<dim,spacedim> &fe1,
+                                       const FiniteElement<dim,spacedim> &fe2,
                                        boost::shared_ptr<FullMatrix<double> > &matrix)
       {
         if (matrix == 0)
@@ -1288,10 +1288,10 @@ namespace internal
 					* Same, but for subface
 					* interpolation matrices.
 					*/
-      template <int dim>
+      template <int dim, int spacedim>  
       void
-      ensure_existence_of_subface_matrix (const FiniteElement<dim> &fe1,
-                                          const FiniteElement<dim> &fe2,
+      ensure_existence_of_subface_matrix (const FiniteElement<dim,spacedim> &fe1,
+                                          const FiniteElement<dim,spacedim> &fe2,
                                           const unsigned int        subface,
                                           boost::shared_ptr<FullMatrix<double> > &matrix)
       {
@@ -1379,19 +1379,22 @@ namespace internal
                                        // a given DoFHandler class
                                        // supports different finite
                                        // element elements
-      template <typename> struct DoFHandlerSupportsDifferentP
+      template <typename>
+      struct DoFHandlerSupportsDifferentFEs
       {
           static const bool value = true;
       };
 
 
-      template <int dim> struct DoFHandlerSupportsDifferentP< dealii::DoFHandler<dim> >
+      template <int dim, int spacedim>
+      struct DoFHandlerSupportsDifferentFEs< dealii::DoFHandler<dim,spacedim> >
       {
           static const bool value = false;
       };
 
 
-      template <int dim> struct DoFHandlerSupportsDifferentP< dealii::MGDoFHandler<dim> >
+      template <int dim, int spacedim>
+      struct DoFHandlerSupportsDifferentFEs< dealii::MGDoFHandler<dim,spacedim> >
       {
           static const bool value = false;
       };
@@ -1406,9 +1409,9 @@ namespace internal
                                         * dof_handler.get_fe().size()
                                         * for the hp-versions.
                                         */
-      template <int dim>
+      template <int dim, int spacedim>
       unsigned int
-      n_finite_elements (const dealii::hp::DoFHandler<dim> &dof_handler)
+      n_finite_elements (const dealii::hp::DoFHandler<dim,spacedim> &dof_handler)
       {
         return dof_handler.get_fe().size();
       }
@@ -1435,6 +1438,9 @@ namespace internal
       unsigned int
       get_most_dominating_subface_fe_index (const face_iterator &face)
       {
+
+	const unsigned int spacedim=dim;
+ 
         unsigned int dominating_subface_no = 0;
         for (; dominating_subface_no<face->n_children();
              ++dominating_subface_no)
@@ -1450,7 +1456,7 @@ namespace internal
                     == 1,
                     ExcInternalError());
 			
-            const FiniteElement<dim> &
+            const FiniteElement<dim,spacedim> &
               this_subface_fe = (face->child(dominating_subface_no)
                                  ->get_fe (face->child(dominating_subface_no)
                                            ->nth_active_fe_index(0)));
@@ -1460,7 +1466,7 @@ namespace internal
             for (unsigned int sf=0; sf<face->n_children(); ++sf)
               if (sf != dominating_subface_no)
                 {
-                  const FiniteElement<dim> &
+                  const FiniteElement<dim,spacedim> &
                     that_subface_fe = (face->child(sf)
                                        ->get_fe (face->child(sf)
                                                  ->nth_active_fe_index(0)));
@@ -1681,6 +1687,8 @@ namespace internal
 					    dealii::internal::int2type<2>)
     {
       const unsigned int dim = 2;
+
+      const unsigned int spacedim = DH::space_dimension;
   
       std::vector<unsigned int> dofs_on_mother;
       std::vector<unsigned int> dofs_on_children;
@@ -1746,7 +1754,7 @@ namespace internal
 			ExcNotImplemented());
 
 					       // ok, start up the work
-	      const FiniteElement<dim> &fe       = cell->get_fe();
+	      const FiniteElement<dim,spacedim> &fe       = cell->get_fe();
 	      const unsigned int        fe_index = cell->active_fe_index();
 		
 	      const unsigned int
@@ -2071,6 +2079,8 @@ namespace internal
 				       // what is going on here
       const unsigned int dim = DH::dimension;
 
+      const unsigned int spacedim = DH::space_dimension;
+
       
                                        // a matrix to be used for
                                        // constraints below. declared
@@ -2194,7 +2204,7 @@ namespace internal
 	      FiniteElementDomination::Domination
 		mother_face_dominates = FiniteElementDomination::either_element_can_dominate;
 
-              if (DoFHandlerSupportsDifferentP<DH>::value == true)
+              if (DoFHandlerSupportsDifferentFEs<DH>::value == true)
                 for (unsigned int c=0; c<cell->face(face)->number_of_children(); ++c)
                   mother_face_dominates = mother_face_dominates &
                                           (cell->get_fe().compare_for_face_domination
@@ -2345,7 +2355,7 @@ namespace internal
                                                      // dof handlers,
                                                      // add a check
                                                      // here...
-                    Assert (DoFHandlerSupportsDifferentP<DH>::value == true,
+                    Assert (DoFHandlerSupportsDifferentFEs<DH>::value == true,
                             ExcInternalError());
 
 						     // we first have
@@ -2360,7 +2370,7 @@ namespace internal
                     const unsigned int dominating_fe_index
                       = get_most_dominating_subface_fe_index<dim> (cell->face(face));
                     
-		    const FiniteElement<dim> &dominating_fe
+		    const FiniteElement<dim,spacedim> &dominating_fe
 		      = dof_handler.get_fe()[dominating_fe_index];
 		    
 						     // check also
@@ -2499,7 +2509,7 @@ namespace internal
 
 			const unsigned int subface_fe_index
 			  = cell->face(face)->child(sf)->nth_active_fe_index(0);
-			const FiniteElement<dim> &subface_fe
+			const FiniteElement<dim,spacedim> &subface_fe
 			  = dof_handler.get_fe()[subface_fe_index];
 			    
 							 // first get the
@@ -2572,7 +2582,7 @@ namespace internal
 					       // and the same h-level,
 					       // some action has
 					       // to be taken.
-	      if ((DoFHandlerSupportsDifferentP<DH>::value == true)
+	      if ((DoFHandlerSupportsDifferentFEs<DH>::value == true)
                   &&
                   !cell->face(face)->at_boundary ()
                   &&
@@ -2867,15 +2877,15 @@ void DoFTools::distribute_cell_to_dof_vector (
 
 
 
-template <int dim>
+template <int dim, int spacedim>
 void
 DoFTools::extract_dofs (
-  const DoFHandler<dim>   &dof,
+  const DoFHandler<dim,spacedim>   &dof,
   const std::vector<bool> &component_select,
   std::vector<bool>       &selected_dofs,
   const bool               count_by_blocks)
 {
-  const FiniteElement<dim> &fe = dof.get_fe();
+  const FiniteElement<dim,spacedim> &fe = dof.get_fe();
   
   if (count_by_blocks == true)
     {
@@ -2970,7 +2980,7 @@ DoFTools::extract_dofs (
                                    // then loop over all cells and do
                                    // the work
   std::vector<unsigned int> indices(fe.dofs_per_cell);
-  typename DoFHandler<dim>::active_cell_iterator c;
+  typename DoFHandler<dim,spacedim>::active_cell_iterator c;
   for (c=dof.begin_active(); c!=dof.end(); ++ c)
     {
       c->get_dof_indices(indices);
@@ -2981,10 +2991,10 @@ DoFTools::extract_dofs (
 
 
 
-template <int dim>
+template <int dim, int spacedim>
 void
 DoFTools::extract_dofs (
-  const hp::DoFHandler<dim>   &/*dof*/,
+  const hp::DoFHandler<dim,spacedim>   &/*dof*/,
   const std::vector<bool> &/*component_select*/,
   std::vector<bool>       &/*selected_dofs*/,
   const bool               /*count_by_blocks*/)
@@ -2992,7 +3002,7 @@ DoFTools::extract_dofs (
 //TODO[WB]: implement this function  
   Assert (false, ExcNotImplemented());
 /*  
-  const FiniteElement<dim> &fe = dof.get_fe();
+  const FiniteElement<dim,spacedim> &fe = dof.get_fe();
   
   if (count_by_blocks == true)
     {
@@ -3087,7 +3097,7 @@ DoFTools::extract_dofs (
                                    // then loop over all cells and do
                                    // the work
   std::vector<unsigned int> indices(fe.dofs_per_cell);
-  typename DoFHandler<dim>::active_cell_iterator c;
+  typename DoFHandler<dim,spacedim>::active_cell_iterator c;
   for (c=dof.begin_active(); c!=dof.end(); ++ c)
     {
       c->get_dof_indices(indices);
@@ -3099,16 +3109,16 @@ DoFTools::extract_dofs (
 
 
 
-template<int dim>
+template<int dim, int spacedim>
 void
 DoFTools::extract_level_dofs(
   const unsigned int       level,
-  const MGDoFHandler<dim> &dof,
+  const MGDoFHandler<dim,spacedim> &dof,
   const std::vector<bool> &component_select,
   std::vector<bool>       &selected_dofs,
   const bool               count_by_blocks)
 {
-  const FiniteElement<dim>& fe = dof.get_fe();
+  const FiniteElement<dim,spacedim>& fe = dof.get_fe();
   
   if (count_by_blocks == true)
     {
@@ -3202,7 +3212,7 @@ DoFTools::extract_level_dofs(
                                    // then loop over all cells and do
                                    // work
   std::vector<unsigned int> indices(fe.dofs_per_cell);  
-  typename MGDoFHandler<dim>::cell_iterator c;
+  typename MGDoFHandler<dim,spacedim>::cell_iterator c;
   for (c = dof.begin(level) ; c != dof.end(level) ; ++ c)
     {
       c->get_mg_dof_indices(indices);
@@ -3464,127 +3474,135 @@ DoFTools::extract_boundary_dofs (const DH                 &dof_handler,
 #endif
 
 
-
-#if deal_II_dimension == 1
-
-void
-DoFTools::extract_hanging_node_dofs (const DoFHandler<1> &dof_handler,
-				     std::vector<bool>   &selected_dofs)
+namespace internal
 {
-  Assert(selected_dofs.size() == dof_handler.n_dofs(),
-	 ExcDimensionMismatch(selected_dofs.size(), dof_handler.n_dofs()));
-				   // preset all values by false
-  std::fill_n (selected_dofs.begin(), dof_handler.n_dofs(), false);
+  namespace DoFTools
+  {
+    template <int spacedim>
+    void extract_hanging_node_dofs (const dealii::DoFHandler<1,spacedim> &dof_handler,
+				     std::vector<bool>           &selected_dofs)
+    {
+      Assert(selected_dofs.size() == dof_handler.n_dofs(),
+	     ExcDimensionMismatch(selected_dofs.size(), dof_handler.n_dofs()));
+				       // preset all values by false
+      std::fill_n (selected_dofs.begin(), dof_handler.n_dofs(), false);
+      
+				       // there are no hanging nodes in 1d
+    }
 
-				   // there are no hanging nodes in 1d
-}
 
-#endif
-
-
-#if deal_II_dimension == 2
-
-void
-DoFTools::extract_hanging_node_dofs (const DoFHandler<2> &dof_handler,
-				     std::vector<bool>   &selected_dofs)
-{
-  const unsigned int dim = 2;
+    template <int spacedim>
+    void extract_hanging_node_dofs (const dealii::DoFHandler<2,spacedim> &dof_handler,
+				     std::vector<bool>           &selected_dofs)
+    {
+      const unsigned int dim = 2;
   
-  Assert(selected_dofs.size() == dof_handler.n_dofs(),
-	 ExcDimensionMismatch(selected_dofs.size(), dof_handler.n_dofs()));
-				   // preset all values by false
-  std::fill_n (selected_dofs.begin(), dof_handler.n_dofs(), false);
+      Assert(selected_dofs.size() == dof_handler.n_dofs(),
+	     ExcDimensionMismatch(selected_dofs.size(), dof_handler.n_dofs()));
+				       // preset all values by false
+      std::fill_n (selected_dofs.begin(), dof_handler.n_dofs(), false);
 
-  const FiniteElement<dim> &fe   = dof_handler.get_fe();
+      const FiniteElement<dim,spacedim> &fe = dof_handler.get_fe();
 
-				   // this function is similar to the
-				   // make_sparsity_pattern function,
-				   // see there for more information
-  DoFHandler<dim>::active_cell_iterator cell = dof_handler.begin_active(),
-					endc = dof_handler.end();
-  for (; cell!=endc; ++cell)
-    for (unsigned int face=0; face<GeometryInfo<dim>::faces_per_cell; ++face)
-      if (cell->face(face)->has_children()) 
-	{
-	  const DoFHandler<dim>::line_iterator line = cell->face(face);
+				       // this function is similar to the
+				       // make_sparsity_pattern function,
+				       // see there for more information
+      typename dealii::DoFHandler<dim,spacedim>::active_cell_iterator
+	cell = dof_handler.begin_active(),
+	endc = dof_handler.end();
+      for (; cell!=endc; ++cell)
+	for (unsigned int face=0; face<GeometryInfo<dim>::faces_per_cell; ++face)
+	  if (cell->face(face)->has_children()) 
+	    {
+	      const typename dealii::DoFHandler<dim,spacedim>::line_iterator
+		line = cell->face(face);
 
-	  for (unsigned int dof=0; dof!=fe.dofs_per_vertex; ++dof)
-	    selected_dofs[line->child(0)->vertex_dof_index(1,dof)] = true;
+	      for (unsigned int dof=0; dof!=fe.dofs_per_vertex; ++dof)
+		selected_dofs[line->child(0)->vertex_dof_index(1,dof)] = true;
 	  
-	  for (unsigned int child=0; child<2; ++child)
-	    for (unsigned int dof=0; dof!=fe.dofs_per_line; ++dof)
-	      selected_dofs[line->child(child)->dof_index(dof)] = true;
-	};
-}
-
-#endif
+	      for (unsigned int child=0; child<2; ++child)
+		for (unsigned int dof=0; dof!=fe.dofs_per_line; ++dof)
+		  selected_dofs[line->child(child)->dof_index(dof)] = true;
+	    }
+    }
 
 
+    template <int spacedim>
+    void extract_hanging_node_dofs (const dealii::DoFHandler<3,spacedim> &dof_handler,
+				     std::vector<bool>           &selected_dofs)
+    {
+      const unsigned int dim = 3;
 
-#if deal_II_dimension == 3
+      Assert(selected_dofs.size() == dof_handler.n_dofs(),
+	     ExcDimensionMismatch(selected_dofs.size(), dof_handler.n_dofs()));
+				       // preset all values by false
+      std::fill_n (selected_dofs.begin(), dof_handler.n_dofs(), false);
 
-void
-DoFTools::extract_hanging_node_dofs (const DoFHandler<3> &dof_handler,
-				     std::vector<bool>   &selected_dofs)
-{
-  const unsigned int dim = 3;
-
-  Assert(selected_dofs.size() == dof_handler.n_dofs(),
-	 ExcDimensionMismatch(selected_dofs.size(), dof_handler.n_dofs()));
-				   // preset all values by false
-  std::fill_n (selected_dofs.begin(), dof_handler.n_dofs(), false);
-
-  const FiniteElement<dim> &fe   = dof_handler.get_fe();
+      const FiniteElement<dim,spacedim> &fe = dof_handler.get_fe();
   
-				   // this function is similar to the
-				   // make_sparsity_pattern function,
-				   // see there for more information
+				       // this function is similar to the
+				       // make_sparsity_pattern function,
+				       // see there for more information
 
-  DoFHandler<dim>::active_cell_iterator cell = dof_handler.begin_active(),
-					endc = dof_handler.end();
-  for (; cell!=endc; ++cell)
-    for (unsigned int f=0; f<GeometryInfo<dim>::faces_per_cell; ++f)
-      if (cell->face(f)->has_children()) 
-	{
-	  const DoFHandler<dim>::face_iterator face = cell->face(f);
+      typename dealii::DoFHandler<dim,spacedim>::active_cell_iterator
+	cell = dof_handler.begin_active(),
+	endc = dof_handler.end();
+      for (; cell!=endc; ++cell)
+	for (unsigned int f=0; f<GeometryInfo<dim>::faces_per_cell; ++f)
+	  if (cell->face(f)->has_children()) 
+	    {
+	      const typename dealii::DoFHandler<dim,spacedim>::face_iterator
+		face = cell->face(f);
 	  
-	  for (unsigned int dof=0; dof!=fe.dofs_per_vertex; ++dof)
-	    selected_dofs[face->child(0)->vertex_dof_index(2,dof)] = true;
+	      for (unsigned int dof=0; dof!=fe.dofs_per_vertex; ++dof)
+		selected_dofs[face->child(0)->vertex_dof_index(2,dof)] = true;
 	  
-					   // dof numbers on the centers of
-					   // the lines bounding this face
-	  for (unsigned int line=0; line<4; ++line)
-	    for (unsigned int dof=0; dof!=fe.dofs_per_vertex; ++dof)
-	      selected_dofs[face->line(line)->child(0)->vertex_dof_index(1,dof)] = true;
+					       // dof numbers on the centers of
+					       // the lines bounding this face
+	      for (unsigned int line=0; line<4; ++line)
+		for (unsigned int dof=0; dof!=fe.dofs_per_vertex; ++dof)
+		  selected_dofs[face->line(line)->child(0)->vertex_dof_index(1,dof)] = true;
 	  
-					   // next the dofs on the lines interior
-					   // to the face; the order of these
-					   // lines is laid down in the
-					   // FiniteElement class documentation
-	  for (unsigned int dof=0; dof<fe.dofs_per_line; ++dof)
-	    selected_dofs[face->child(0)->line(1)->dof_index(dof)] = true;
-	  for (unsigned int dof=0; dof<fe.dofs_per_line; ++dof)
-	    selected_dofs[face->child(1)->line(2)->dof_index(dof)] = true;
-	  for (unsigned int dof=0; dof<fe.dofs_per_line; ++dof)
-	    selected_dofs[face->child(2)->line(3)->dof_index(dof)] = true;
-	  for (unsigned int dof=0; dof<fe.dofs_per_line; ++dof)
-	    selected_dofs[face->child(3)->line(0)->dof_index(dof)] = true;
+					       // next the dofs on the lines interior
+					       // to the face; the order of these
+					       // lines is laid down in the
+					       // FiniteElement class documentation
+	      for (unsigned int dof=0; dof<fe.dofs_per_line; ++dof)
+		selected_dofs[face->child(0)->line(1)->dof_index(dof)] = true;
+	      for (unsigned int dof=0; dof<fe.dofs_per_line; ++dof)
+		selected_dofs[face->child(1)->line(2)->dof_index(dof)] = true;
+	      for (unsigned int dof=0; dof<fe.dofs_per_line; ++dof)
+		selected_dofs[face->child(2)->line(3)->dof_index(dof)] = true;
+	      for (unsigned int dof=0; dof<fe.dofs_per_line; ++dof)
+		selected_dofs[face->child(3)->line(0)->dof_index(dof)] = true;
 	  
-					   // dofs on the bordering lines
-	  for (unsigned int line=0; line<4; ++line)
-	    for (unsigned int child=0; child<2; ++child)
-	      for (unsigned int dof=0; dof!=fe.dofs_per_line; ++dof)
-		selected_dofs[face->line(line)->child(child)->dof_index(dof)] = true;
+					       // dofs on the bordering lines
+	      for (unsigned int line=0; line<4; ++line)
+		for (unsigned int child=0; child<2; ++child)
+		  for (unsigned int dof=0; dof!=fe.dofs_per_line; ++dof)
+		    selected_dofs[face->line(line)->child(child)->dof_index(dof)] = true;
 	
-					   // finally, for the dofs interior
-					   // to the four child faces
-	  for (unsigned int child=0; child<4; ++child)
-	    for (unsigned int dof=0; dof!=fe.dofs_per_quad; ++dof)
-	      selected_dofs[face->child(child)->dof_index(dof)] = true;
-	};
+					       // finally, for the dofs interior
+					       // to the four child faces
+	      for (unsigned int child=0; child<4; ++child)
+		for (unsigned int dof=0; dof!=fe.dofs_per_quad; ++dof)
+		  selected_dofs[face->child(child)->dof_index(dof)] = true;
+	    }
+    }
+  }
 }
 
-#endif
+    
+
+template <int dim, int spacedim>
+void
+DoFTools::
+extract_hanging_node_dofs (const DoFHandler<dim,spacedim> &dof_handler,
+			   std::vector<bool>              &selected_dofs)
+{
+  internal::DoFTools::extract_hanging_node_dofs (dof_handler,
+						 selected_dofs);
+}
 
 
 
@@ -3775,7 +3793,7 @@ DoFTools::count_dofs_with_subdomain_association (const DH           &dof_handler
 #ifdef DEBUG
   {
     bool found = false;
-    for (typename Triangulation<DH::dimension>::active_cell_iterator
+    for (typename Triangulation<DH::dimension, DH::space_dimension>::active_cell_iterator
            cell=dof_handler.get_tria().begin_active();
          cell!=dof_handler.get_tria().end(); ++cell)
       if (cell->subdomain_id() == subdomain)
@@ -3815,7 +3833,7 @@ DoFTools::count_dofs_with_subdomain_association (const DH           &dof_handler
 #ifdef DEBUG
   {
     bool found = false;
-    for (typename Triangulation<DH::dimension>::active_cell_iterator
+    for (typename Triangulation<DH::dimension,DH::space_dimension>::active_cell_iterator
            cell=dof_handler.get_tria().begin_active();
          cell!=dof_handler.get_tria().end(); ++cell)
       if (cell->subdomain_id() == subdomain)
@@ -3847,15 +3865,15 @@ DoFTools::count_dofs_with_subdomain_association (const DH           &dof_handler
 
 
 
-template <int dim>
+template <int dim, int spacedim>
 void
 DoFTools::count_dofs_per_component (
-  const DoFHandler<dim>&     dof_handler,
+  const DoFHandler<dim,spacedim>&     dof_handler,
   std::vector<unsigned int>& dofs_per_component,
   bool only_once,
   std::vector<unsigned int>  target_component)
 {
-  const FiniteElement<dim>& fe = dof_handler.get_fe();
+  const FiniteElement<dim,spacedim>& fe = dof_handler.get_fe();
   const unsigned int n_components = fe.n_components();
   dofs_per_component.resize (n_components);
   std::fill (dofs_per_component.begin(), dofs_per_component.end(), 0U);
@@ -3896,7 +3914,7 @@ DoFTools::count_dofs_per_component (
   Threads::ThreadGroup<> threads;
   for (unsigned int i=0; i<n_components; ++i)
     {
-      void (*fun_ptr) (const DoFHandler<dim>   &,
+      void (*fun_ptr) (const DoFHandler<dim,spacedim>   &,
 		       const std::vector<bool> &,
 		       std::vector<bool>       &,
 		       bool)
@@ -3911,7 +3929,7 @@ DoFTools::count_dofs_per_component (
   unsigned int component = 0;
   for (unsigned int b=0;b<fe.n_base_elements();++b)
     {
-      const FiniteElement<dim>& base = fe.base_element(b);
+      const FiniteElement<dim,spacedim>& base = fe.base_element(b);
 				       // Dimension of base element
       unsigned int d = base.n_components();
       
@@ -3942,14 +3960,14 @@ DoFTools::count_dofs_per_component (
 }
 
 
-template <int dim>
+template <int dim, int spacedim>
 void
 DoFTools::count_dofs_per_block (
-  const DoFHandler<dim>&     dof_handler,
+  const DoFHandler<dim,spacedim>&     dof_handler,
   std::vector<unsigned int>& dofs_per_block,
   std::vector<unsigned int>  target_block)
 {
-  const FiniteElement<dim>& fe = dof_handler.get_fe();
+  const FiniteElement<dim,spacedim>& fe = dof_handler.get_fe();
   const unsigned int n_blocks = fe.n_blocks();
   dofs_per_block.resize (n_blocks);
   std::fill (dofs_per_block.begin(), dofs_per_block.end(), 0U);
@@ -3986,7 +4004,7 @@ DoFTools::count_dofs_per_block (
   Threads::ThreadGroup<> threads;
   for (unsigned int i=0; i<n_blocks; ++i)
     {
-      void (*fun_ptr) (const DoFHandler<dim>   &,
+      void (*fun_ptr) (const DoFHandler<dim,spacedim>   &,
 		       const std::vector<bool> &,
 		       std::vector<bool>       &,
 		       bool)
@@ -4006,10 +4024,10 @@ DoFTools::count_dofs_per_block (
 }
 
 
-template <int dim>
+template <int dim, int spacedim>
 void
 DoFTools::count_dofs_per_component (
-  const DoFHandler<dim>&     dof_handler,
+  const DoFHandler<dim,spacedim>&     dof_handler,
   std::vector<unsigned int>& dofs_per_component,
   std::vector<unsigned int>  target_component)
 {
@@ -4017,14 +4035,14 @@ DoFTools::count_dofs_per_component (
 }
 
 
-template <int dim>
+template <int dim, int spacedim>
 void
 DoFTools::compute_intergrid_constraints (
-  const DoFHandler<dim>              &coarse_grid,
+  const DoFHandler<dim,spacedim>              &coarse_grid,
   const unsigned int                  coarse_component,
-  const DoFHandler<dim>              &fine_grid,
+  const DoFHandler<dim,spacedim>              &fine_grid,
   const unsigned int                  fine_component,
-  const InterGridMap<DoFHandler<dim> > &coarse_to_fine_grid_map,
+  const InterGridMap<DoFHandler<dim,spacedim> > &coarse_to_fine_grid_map,
   ConstraintMatrix                   &constraints)
 {
 				   // store the weights with which a dof
@@ -4240,15 +4258,15 @@ DoFTools::compute_intergrid_constraints (
 
 
 
-template <int dim>
+template <int dim, int spacedim>
 void
 DoFTools::
 compute_intergrid_transfer_representation (
-  const DoFHandler<dim>              &coarse_grid,
+  const DoFHandler<dim,spacedim>              &coarse_grid,
   const unsigned int                  coarse_component,
-  const DoFHandler<dim>              &fine_grid,
+  const DoFHandler<dim,spacedim>              &fine_grid,
   const unsigned int                  fine_component,
-  const InterGridMap<DoFHandler<dim> > &coarse_to_fine_grid_map,
+  const InterGridMap<DoFHandler<dim,spacedim> > &coarse_to_fine_grid_map,
   std::vector<std::map<unsigned int, float> > &transfer_representation)
 {
 				   // store the weights with which a dof
@@ -4311,7 +4329,7 @@ compute_intergrid_transfer_representation (
 				   // first construct the inverse
 				   // mapping of weight_mapping
   std::vector<unsigned int> inverse_weight_mapping (n_global_parm_dofs,
-						    DoFHandler<dim>::invalid_dof_index);
+						    DoFHandler<dim,spacedim>::invalid_dof_index);
   for (unsigned int i=0; i<weight_mapping.size(); ++i)
     {
       const unsigned int parameter_dof = weight_mapping[i];
@@ -4320,7 +4338,7 @@ compute_intergrid_transfer_representation (
       if (parameter_dof != numbers::invalid_unsigned_int)
 	{
 	  Assert (parameter_dof < n_global_parm_dofs, ExcInternalError());
-	  Assert (inverse_weight_mapping[parameter_dof] == DoFHandler<dim>::invalid_dof_index,
+	  Assert ((inverse_weight_mapping[parameter_dof] == DoFHandler<dim,spacedim>::invalid_dof_index),
 		  ExcInternalError());
 	  
 	  inverse_weight_mapping[parameter_dof] = i;
@@ -4351,20 +4369,20 @@ compute_intergrid_transfer_representation (
 
 
 
-template <int dim>
+template <int dim, int spacedim>
 unsigned int
 DoFTools::compute_intergrid_weights_1 (
-  const DoFHandler<dim>              &coarse_grid,
+  const DoFHandler<dim,spacedim>              &coarse_grid,
   const unsigned int                  coarse_component,
-  const DoFHandler<dim>              &fine_grid,
+  const DoFHandler<dim,spacedim>              &fine_grid,
   const unsigned int                  fine_component,
-  const InterGridMap<DoFHandler<dim> > &coarse_to_fine_grid_map,
+  const InterGridMap<DoFHandler<dim,spacedim> > &coarse_to_fine_grid_map,
   std::vector<std::map<unsigned int, float> > &weights,
   std::vector<int>                   &weight_mapping)
 {
 				   // aliases to the finite elements
 				   // used by the dof handlers:
-  const FiniteElement<dim> &coarse_fe = coarse_grid.get_fe(),
+  const FiniteElement<dim,spacedim> &coarse_fe = coarse_grid.get_fe(),
 			   &fine_fe   = fine_grid.get_fe();
 
 				   // global numbers of dofs
@@ -4416,7 +4434,7 @@ DoFTools::compute_intergrid_weights_1 (
 				   // the coarse grid is indeed
 				   // coarser everywhere than the fine
 				   // grid
-  for (typename DoFHandler<dim>::active_cell_iterator cell=coarse_grid.begin_active();
+  for (typename DoFHandler<dim,spacedim>::active_cell_iterator cell=coarse_grid.begin_active();
        cell != coarse_grid.end(); ++cell)
     Assert (cell->level() <= coarse_to_fine_grid_map[cell]->level(),
 	    ExcGridNotCoarser());
@@ -4482,7 +4500,7 @@ DoFTools::compute_intergrid_weights_1 (
       std::vector<bool> dof_is_interesting (fine_grid.n_dofs(), false);
       std::vector<unsigned int>  local_dof_indices (fine_fe.dofs_per_cell);
       
-      for (typename DoFHandler<dim>::active_cell_iterator
+      for (typename DoFHandler<dim,spacedim>::active_cell_iterator
 	     cell=fine_grid.begin_active();
 	   cell!=fine_grid.end(); ++cell)
 	{
@@ -4509,7 +4527,7 @@ DoFTools::compute_intergrid_weights_1 (
     {
       std::vector<unsigned int> local_dof_indices(fine_fe.dofs_per_cell);
       unsigned int next_free_index=0;
-      for (typename DoFHandler<dim>::active_cell_iterator cell=fine_grid.begin_active();
+      for (typename DoFHandler<dim,spacedim>::active_cell_iterator cell=fine_grid.begin_active();
 	   cell != fine_grid.end(); ++cell)
 	{
 	  cell->get_dof_indices (local_dof_indices);
@@ -4588,33 +4606,33 @@ DoFTools::compute_intergrid_weights_1 (
 
 
 
-template <int dim>
+template <int dim, int spacedim>
 void
 DoFTools::compute_intergrid_weights_2 (
-  const DoFHandler<dim>              &coarse_grid,
+  const DoFHandler<dim,spacedim>              &coarse_grid,
   const unsigned int                  coarse_component,
-  const InterGridMap<DoFHandler<dim> > &coarse_to_fine_grid_map,
+  const InterGridMap<DoFHandler<dim,spacedim> > &coarse_to_fine_grid_map,
   const std::vector<Vector<double> > &parameter_dofs,
   const std::vector<int>             &weight_mapping,
   std::vector<std::map<unsigned int,float> > &weights)
 {
 				   // simply distribute the range of
 				   // cells to different threads
-  typedef typename DoFHandler<dim>::active_cell_iterator active_cell_iterator;
+  typedef typename DoFHandler<dim,spacedim>::active_cell_iterator active_cell_iterator;
   std::vector<std::pair<active_cell_iterator,active_cell_iterator> >
     cell_intervals = Threads::split_range<active_cell_iterator> (coarse_grid.begin_active(),
 								 coarse_grid.end(),
 								 multithread_info.n_default_threads);
 
   Threads::ThreadGroup<> threads;
-  void (*fun_ptr) (const DoFHandler<dim>              &,
+  void (*fun_ptr) (const DoFHandler<dim,spacedim>              &,
 		   const unsigned int                  ,
-		   const InterGridMap<DoFHandler<dim> > &,
+		   const InterGridMap<DoFHandler<dim,spacedim> > &,
 		   const std::vector<Vector<double> > &,
 		   const std::vector<int>             &,
 		   std::vector<std::map<unsigned int, float> > &,
-		   const typename DoFHandler<dim>::active_cell_iterator &,
-		   const typename DoFHandler<dim>::active_cell_iterator &)
+		   const typename DoFHandler<dim,spacedim>::active_cell_iterator &,
+		   const typename DoFHandler<dim,spacedim>::active_cell_iterator &)
     = &DoFTools::template compute_intergrid_weights_3<dim>;
   for (unsigned int i=0; i<multithread_info.n_default_threads; ++i)
     threads += Threads::spawn (fun_ptr)(coarse_grid, coarse_component,
@@ -4629,21 +4647,21 @@ DoFTools::compute_intergrid_weights_2 (
 
 
 
-template <int dim>
+template <int dim, int spacedim>
 void
 DoFTools::compute_intergrid_weights_3 (
-  const DoFHandler<dim>              &coarse_grid,
+  const DoFHandler<dim,spacedim>              &coarse_grid,
   const unsigned int                  coarse_component,
-  const InterGridMap<DoFHandler<dim> > &coarse_to_fine_grid_map,
+  const InterGridMap<DoFHandler<dim,spacedim> > &coarse_to_fine_grid_map,
   const std::vector<Vector<double> > &parameter_dofs,
   const std::vector<int>             &weight_mapping,
   std::vector<std::map<unsigned int, float> > &weights,
-  const typename DoFHandler<dim>::active_cell_iterator &begin,
-  const typename DoFHandler<dim>::active_cell_iterator &end)
+  const typename DoFHandler<dim,spacedim>::active_cell_iterator &begin,
+  const typename DoFHandler<dim,spacedim>::active_cell_iterator &end)
 {
 				   // aliases to the finite elements
 				   // used by the dof handlers:
-  const FiniteElement<dim> &coarse_fe = coarse_grid.get_fe();    
+  const FiniteElement<dim,spacedim> &coarse_fe = coarse_grid.get_fe();    
 
 				   // for each cell on the parameter grid:
 				   // find out which degrees of freedom on the
@@ -4717,7 +4735,7 @@ DoFTools::compute_intergrid_weights_3 (
   const unsigned int n_fine_dofs = weight_mapping.size();
   Vector<double> global_parameter_representation (n_fine_dofs);
   
-  typename DoFHandler<dim>::active_cell_iterator cell;
+  typename DoFHandler<dim,spacedim>::active_cell_iterator cell;
   std::vector<unsigned int> parameter_dof_indices (coarse_fe.dofs_per_cell);
   
   for (cell=begin; cell!=end; ++cell)
@@ -4975,10 +4993,10 @@ void DoFTools::map_dof_to_boundary_indices (
 
 
 
-template <int dim>
+template <int dim, int spacedim>
 void
-DoFTools::map_dofs_to_support_points (const Mapping<dim>       &mapping,
-				      const DoFHandler<dim>    &dof_handler,
+DoFTools::map_dofs_to_support_points (const Mapping<dim,spacedim>       &mapping,
+				      const DoFHandler<dim,spacedim>    &dof_handler,
 				      std::vector<Point<dim> > &support_points)
 {
   const unsigned int dofs_per_cell = dof_handler.get_fe().dofs_per_cell;
@@ -5005,7 +5023,7 @@ DoFTools::map_dofs_to_support_points (const Mapping<dim>       &mapping,
   Quadrature<dim> q_dummy(dof_handler.get_fe().get_unit_support_points());
   FEValues<dim> fe_values (mapping, dof_handler.get_fe(),
 			   q_dummy, update_quadrature_points);
-  typename DoFHandler<dim>::active_cell_iterator
+  typename DoFHandler<dim,spacedim>::active_cell_iterator
     cell = dof_handler.begin_active(),
     endc = dof_handler.end();
 
@@ -5022,12 +5040,12 @@ DoFTools::map_dofs_to_support_points (const Mapping<dim>       &mapping,
 }
 
 
-template <int dim>
+template <int dim, int spacedim>
 void
 DoFTools::compute_dof_couplings(
   Table<2,Coupling>&        dof_couplings,
   const Table<2,Coupling>&  component_couplings,
-  const FiniteElement<dim>& fe)
+  const FiniteElement<dim,spacedim>& fe)
 {
   Assert(component_couplings.n_rows() == fe.n_components(),
 	 ExcDimensionMismatch(component_couplings.n_rows(),
@@ -5079,14 +5097,14 @@ DoFTools::compute_dof_couplings(
 }
 
 
-template<int dim>
+template<int dim, int spacedim>
 void
 DoFTools::convert_couplings_to_blocks (
-  const DoFHandler<dim>& dof_handler,
+  const DoFHandler<dim,spacedim>& dof_handler,
   const Table<2, Coupling>& table,
   std::vector<Table<2,Coupling> >& tables_by_block)
 {
-  const FiniteElement<dim>& fe = dof_handler.get_fe();
+  const FiniteElement<dim,spacedim>& fe = dof_handler.get_fe();
   const unsigned int nb = fe.n_blocks();
   
   tables_by_block.resize(1);
@@ -5105,10 +5123,10 @@ DoFTools::convert_couplings_to_blocks (
 }
 
 
-template<int dim>
+template<int dim, int spacedim>
 void
 DoFTools::convert_couplings_to_blocks (
-  const hp::DoFHandler<dim>& dof_handler,
+  const hp::DoFHandler<dim,spacedim>& dof_handler,
   const Table<2, Coupling>& table,
   std::vector<Table<2,Coupling> >& tables_by_block)
 {
@@ -5117,7 +5135,7 @@ DoFTools::convert_couplings_to_blocks (
 
   for (unsigned int f=0;f<fe_collection.size();++f)
     {
-      const FiniteElement<dim>& fe = fe_collection[f];
+      const FiniteElement<dim,spacedim>& fe = fe_collection[f];
       
       const unsigned int nb = fe.n_blocks();
       tables_by_block[f].reinit(nb, nb);
@@ -5136,9 +5154,9 @@ DoFTools::convert_couplings_to_blocks (
 
 #if deal_II_dimension == 1
 
-template <int dim, template <int> class DH> 
+template <int dim, int spacedim, template <int,int> class DH> 
 void 
-DoFTools::make_zero_boundary_constraints (const DH<dim>           &dof,  
+DoFTools::make_zero_boundary_constraints (const DH<dim, spacedim> &dof,  
  					  ConstraintMatrix        &zero_boundary_constraints,
  					  const std::vector<bool> &component_mask_) 
 {
@@ -5160,7 +5178,7 @@ DoFTools::make_zero_boundary_constraints (const DH<dim>           &dof,
                                    // cell by traversing the coarse
                                    // grid to its end and then looking
                                    // for the children
-      typename DH<dim>::cell_iterator outermost_cell = dof.begin(0);
+      typename DH<dim,spacedim>::cell_iterator outermost_cell = dof.begin(0);
       while (outermost_cell->neighbor(direction).state() == IteratorState::valid)
 	outermost_cell = outermost_cell->neighbor(direction);
       
@@ -5169,7 +5187,7 @@ DoFTools::make_zero_boundary_constraints (const DH<dim>           &dof,
 
                                    // then get the FE corresponding to
                                    // this cell
-      const FiniteElement<dim> &fe = outermost_cell->get_fe();
+      const FiniteElement<dim,spacedim> &fe = outermost_cell->get_fe();
 
 				   // set the component mask to either
 				   // the original value or a vector
@@ -5192,9 +5210,9 @@ DoFTools::make_zero_boundary_constraints (const DH<dim>           &dof,
 
 #else
 
-template <int dim, template <int> class DH> 
+template <int dim, int spacedim, template <int,int> class DH> 
 void 
-DoFTools::make_zero_boundary_constraints (const DH<dim>           &dof,  
+DoFTools::make_zero_boundary_constraints (const DH<dim, spacedim> &dof,  
  					  ConstraintMatrix        &zero_boundary_constraints,
  					  const std::vector<bool> &component_mask_) 
 {
@@ -5220,13 +5238,14 @@ DoFTools::make_zero_boundary_constraints (const DH<dim>           &dof,
   std::vector<unsigned int> face_dofs;
   face_dofs.reserve (DoFTools::max_dofs_per_face(dof));
 
-  typename DH<dim>::active_cell_iterator cell = dof.begin_active(),
-					 endc = dof.end();
+  typename DH<dim,spacedim>::active_cell_iterator
+    cell = dof.begin_active(),
+    endc = dof.end();
   for (; cell!=endc; ++cell)
     for (unsigned int face_no = 0; face_no < GeometryInfo<dim>::faces_per_cell;
 	 ++face_no)
       {
-        const FiniteElement<dim> &fe = cell->get_fe();
+        const FiniteElement<dim,spacedim> &fe = cell->get_fe();
 
 				   // we can presently deal only with
 				   // primitive elements for boundary
@@ -5248,7 +5267,7 @@ DoFTools::make_zero_boundary_constraints (const DH<dim>           &dof,
 				    "elements"));
 	  }
 
-	typename DH<dim>::face_iterator face = cell->face(face_no);
+	typename DH<dim,spacedim>::face_iterator face = cell->face(face_no);
 	if (face->boundary_indicator () == 0)
 	                           // face is of the right component
 	  {
@@ -6075,6 +6094,12 @@ DoFTools::extract_boundary_dofs<hp::DoFHandler<deal_II_dimension> >
 
 template
 void
+DoFTools::extract_hanging_node_dofs
+(const DoFHandler<deal_II_dimension> &dof_handler,
+ std::vector<bool>     &selected_dofs);
+
+template
+void
 DoFTools::extract_subdomain_dofs<DoFHandler<deal_II_dimension> >
 (const DoFHandler<deal_II_dimension> &dof_handler,
  const unsigned int     subdomain_id,
@@ -6229,7 +6254,7 @@ DoFTools::map_dof_to_boundary_indices<hp::DoFHandler<deal_II_dimension> >
 template
 void
 DoFTools::map_dofs_to_support_points<deal_II_dimension>
-(const Mapping<deal_II_dimension>&,
+(const Mapping<deal_II_dimension,deal_II_dimension>&,
  const DoFHandler<deal_II_dimension>&,
  std::vector<Point<deal_II_dimension> >&);
 
@@ -6253,9 +6278,448 @@ DoFTools::convert_couplings_to_blocks (
 
 template 
 void 
-DoFTools::make_zero_boundary_constraints<deal_II_dimension>
+DoFTools::make_zero_boundary_constraints
 (const DoFHandler<deal_II_dimension> &, 
  ConstraintMatrix                    &,
  const std::vector<bool>             &);
+
+#if deal_II_dimension !=3
+
+// explicit instantiations
+template void
+DoFTools::make_sparsity_pattern<DoFHandler<deal_II_dimension,deal_II_dimension+1>,
+				SparsityPattern>
+(const DoFHandler<deal_II_dimension,deal_II_dimension+1> &dof,
+ SparsityPattern    &sparsity,
+ const ConstraintMatrix &,
+ const bool);
+template void
+DoFTools::make_sparsity_pattern<DoFHandler<deal_II_dimension,deal_II_dimension+1>,
+				CompressedSparsityPattern>
+(const DoFHandler<deal_II_dimension,deal_II_dimension+1> &dof,
+ CompressedSparsityPattern    &sparsity,
+ const ConstraintMatrix &,
+ const bool);
+template void
+DoFTools::make_sparsity_pattern<DoFHandler<deal_II_dimension,deal_II_dimension+1>,
+				CompressedSetSparsityPattern>
+(const DoFHandler<deal_II_dimension,deal_II_dimension+1> &dof,
+ CompressedSetSparsityPattern    &sparsity,
+ const ConstraintMatrix &,
+ const bool);
+template void
+DoFTools::make_sparsity_pattern<DoFHandler<deal_II_dimension,deal_II_dimension+1>,
+				BlockSparsityPattern>
+(const DoFHandler<deal_II_dimension,deal_II_dimension+1> &dof,
+ BlockSparsityPattern                &sparsity,
+ const ConstraintMatrix &,
+ const bool);
+template void
+DoFTools::make_sparsity_pattern<DoFHandler<deal_II_dimension,deal_II_dimension+1>,
+				BlockCompressedSparsityPattern>
+(const DoFHandler<deal_II_dimension,deal_II_dimension+1> &dof,
+ BlockCompressedSparsityPattern      &sparsity,
+ const ConstraintMatrix &,
+ const bool);
+template void
+DoFTools::make_sparsity_pattern<DoFHandler<deal_II_dimension,deal_II_dimension+1>,
+				BlockCompressedSetSparsityPattern>
+(const DoFHandler<deal_II_dimension,deal_II_dimension+1> &dof,
+ BlockCompressedSetSparsityPattern      &sparsity,
+ const ConstraintMatrix &,
+ const bool);
+
+// template void
+// DoFTools::make_sparsity_pattern<hp::DoFHandler<deal_II_dimension,deal_II_dimension+1>,
+// 				SparsityPattern>
+// (const hp::DoFHandler<deal_II_dimension,deal_II_dimension+1> &dof,
+//  SparsityPattern    &sparsity,
+//  const ConstraintMatrix &);
+
+
+// template void
+// DoFTools::make_sparsity_pattern<hp::DoFHandler<deal_II_dimension,deal_II_dimension+1>,
+// 				CompressedSparsityPattern>
+// (const hp::DoFHandler<deal_II_dimension,deal_II_dimension+1> &dof,
+//  CompressedSparsityPattern    &sparsity,
+//  const ConstraintMatrix &);
+
+// template void
+// DoFTools::make_sparsity_pattern<hp::DoFHandler<deal_II_dimension,deal_II_dimension+1>,
+// 				CompressedSetSparsityPattern>
+// (const hp::DoFHandler<deal_II_dimension,deal_II_dimension+1> &dof,
+//  CompressedSetSparsityPattern    &sparsity,
+//  const ConstraintMatrix &);
+
+
+// template void
+// DoFTools::make_sparsity_pattern<hp::DoFHandler<deal_II_dimension,deal_II_dimension+1>,
+// 				BlockSparsityPattern>
+// (const hp::DoFHandler<deal_II_dimension,deal_II_dimension+1> &dof,
+//  BlockSparsityPattern                &sparsity,
+//  const ConstraintMatrix &);
+// template void
+// DoFTools::make_sparsity_pattern<hp::DoFHandler<deal_II_dimension,deal_II_dimension+1>,
+// 				BlockCompressedSparsityPattern>
+// (const hp::DoFHandler<deal_II_dimension,deal_II_dimension+1> &dof,
+//  BlockCompressedSparsityPattern      &sparsity,
+//  const ConstraintMatrix &);
+// template void
+// DoFTools::make_sparsity_pattern<hp::DoFHandler<deal_II_dimension,deal_II_dimension+1>,
+// 				BlockCompressedSetSparsityPattern>
+// (const hp::DoFHandler<deal_II_dimension,deal_II_dimension+1> &dof,
+//  BlockCompressedSetSparsityPattern      &sparsity,
+//  const ConstraintMatrix &);
+
+
+template void 
+DoFTools::make_sparsity_pattern<DoFHandler<deal_II_dimension,deal_II_dimension+1>,
+				SparsityPattern>
+(const DoFHandler<deal_II_dimension,deal_II_dimension+1>&,
+ const Table<2,Coupling>&,
+ SparsityPattern&,
+ const ConstraintMatrix&,
+ const bool);
+template void 
+DoFTools::make_sparsity_pattern<DoFHandler<deal_II_dimension,deal_II_dimension+1>,
+				CompressedSparsityPattern>
+(const DoFHandler<deal_II_dimension,deal_II_dimension+1>&,
+ const Table<2,Coupling>&,
+ CompressedSparsityPattern&,
+ const ConstraintMatrix&,
+ const bool);
+template void 
+DoFTools::make_sparsity_pattern<DoFHandler<deal_II_dimension,deal_II_dimension+1>,
+				CompressedSetSparsityPattern>
+(const DoFHandler<deal_II_dimension,deal_II_dimension+1>&,
+ const Table<2,Coupling>&,
+ CompressedSetSparsityPattern&,
+ const ConstraintMatrix&,
+ const bool);
+template void 
+DoFTools::make_sparsity_pattern<DoFHandler<deal_II_dimension,deal_II_dimension+1>,
+				BlockSparsityPattern>
+(const DoFHandler<deal_II_dimension,deal_II_dimension+1>&,
+ const Table<2,Coupling>&,
+ BlockSparsityPattern&,
+ const ConstraintMatrix&,
+ const bool);
+template void 
+DoFTools::make_sparsity_pattern<DoFHandler<deal_II_dimension,deal_II_dimension+1>,
+				BlockCompressedSparsityPattern>
+(const DoFHandler<deal_II_dimension,deal_II_dimension+1>&,
+ const Table<2,Coupling>&,
+ BlockCompressedSparsityPattern&,
+ const ConstraintMatrix&,
+ const bool);
+template void 
+DoFTools::make_sparsity_pattern<DoFHandler<deal_II_dimension,deal_II_dimension+1>,
+				BlockCompressedSetSparsityPattern>
+(const DoFHandler<deal_II_dimension,deal_II_dimension+1>&,
+ const Table<2,Coupling>&,
+ BlockCompressedSetSparsityPattern&,
+ const ConstraintMatrix&,
+ const bool);
+
+
+// template void 
+// DoFTools::make_sparsity_pattern<hp::DoFHandler<deal_II_dimension,deal_II_dimension+1>,
+// 				SparsityPattern>
+// (const hp::DoFHandler<deal_II_dimension,deal_II_dimension+1>&,
+//  const Table<2,Coupling>&,
+//  SparsityPattern&);
+// template void 
+// DoFTools::make_sparsity_pattern<hp::DoFHandler<deal_II_dimension,deal_II_dimension+1>,
+// 				CompressedSparsityPattern>
+// (const hp::DoFHandler<deal_II_dimension,deal_II_dimension+1>&,
+//  const Table<2,Coupling>&,
+//  CompressedSparsityPattern&);
+// template void 
+// DoFTools::make_sparsity_pattern<hp::DoFHandler<deal_II_dimension,deal_II_dimension+1>,
+// 				CompressedSetSparsityPattern>
+// (const hp::DoFHandler<deal_II_dimension,deal_II_dimension+1>&,
+//  const Table<2,Coupling>&,
+//  CompressedSetSparsityPattern&);
+// template void 
+// DoFTools::make_sparsity_pattern<hp::DoFHandler<deal_II_dimension,deal_II_dimension+1>,
+// 				BlockSparsityPattern>
+// (const hp::DoFHandler<deal_II_dimension,deal_II_dimension+1>&,
+//  const Table<2,Coupling>&,
+//  BlockSparsityPattern&);
+// template void 
+// DoFTools::make_sparsity_pattern<hp::DoFHandler<deal_II_dimension,deal_II_dimension+1>,
+// 				BlockCompressedSparsityPattern>
+// (const hp::DoFHandler<deal_II_dimension,deal_II_dimension+1>&,
+//  const Table<2,Coupling>&,
+//  BlockCompressedSparsityPattern&);
+// template void 
+// DoFTools::make_sparsity_pattern<hp::DoFHandler<deal_II_dimension,deal_II_dimension+1>,
+// 				BlockCompressedSetSparsityPattern>
+// (const hp::DoFHandler<deal_II_dimension,deal_II_dimension+1>&,
+//  const Table<2,Coupling>&,
+//  BlockCompressedSetSparsityPattern&);
+
+
+template void
+DoFTools::make_sparsity_pattern<DoFHandler<deal_II_dimension,deal_II_dimension+1>,
+				SparsityPattern>
+(const DoFHandler<deal_II_dimension,deal_II_dimension+1> &dof_row,
+ const DoFHandler<deal_II_dimension,deal_II_dimension+1> &dof_col,
+ SparsityPattern    &sparsity);
+template void
+DoFTools::make_sparsity_pattern<DoFHandler<deal_II_dimension,deal_II_dimension+1>,
+				CompressedSparsityPattern>
+(const DoFHandler<deal_II_dimension,deal_II_dimension+1> &dof_row,
+ const DoFHandler<deal_II_dimension,deal_II_dimension+1> &dof_col,
+ CompressedSparsityPattern    &sparsity);
+template void
+DoFTools::make_sparsity_pattern<DoFHandler<deal_II_dimension,deal_II_dimension+1>,
+				CompressedSetSparsityPattern>
+(const DoFHandler<deal_II_dimension,deal_II_dimension+1> &dof_row,
+ const DoFHandler<deal_II_dimension,deal_II_dimension+1> &dof_col,
+ CompressedSetSparsityPattern    &sparsity);
+template void
+DoFTools::make_sparsity_pattern<DoFHandler<deal_II_dimension,deal_II_dimension+1>,
+				BlockSparsityPattern>
+(const DoFHandler<deal_II_dimension,deal_II_dimension+1> &dof_row,
+ const DoFHandler<deal_II_dimension,deal_II_dimension+1> &dof_col,
+ BlockSparsityPattern                &sparsity);
+template void
+DoFTools::make_sparsity_pattern<DoFHandler<deal_II_dimension,deal_II_dimension+1>,
+				BlockCompressedSparsityPattern>
+(const DoFHandler<deal_II_dimension,deal_II_dimension+1> &dof_row,
+ const DoFHandler<deal_II_dimension,deal_II_dimension+1> &dof_col,
+ BlockCompressedSparsityPattern      &sparsity);
+template void
+DoFTools::make_sparsity_pattern<DoFHandler<deal_II_dimension,deal_II_dimension+1>,
+				BlockCompressedSetSparsityPattern>
+(const DoFHandler<deal_II_dimension,deal_II_dimension+1> &dof_row,
+ const DoFHandler<deal_II_dimension,deal_II_dimension+1> &dof_col,
+ BlockCompressedSetSparsityPattern      &sparsity);
+
+// template void
+// DoFTools::make_sparsity_pattern<hp::DoFHandler<deal_II_dimension,deal_II_dimension+1>,
+// 				SparsityPattern>
+// (const hp::DoFHandler<deal_II_dimension,deal_II_dimension+1> &dof_row,
+//  const hp::DoFHandler<deal_II_dimension,deal_II_dimension+1> &dof_col,
+//  SparsityPattern    &sparsity);
+// template void
+// DoFTools::make_sparsity_pattern<hp::DoFHandler<deal_II_dimension,deal_II_dimension+1>,
+// 				CompressedSparsityPattern>
+// (const hp::DoFHandler<deal_II_dimension,deal_II_dimension+1> &dof_row,
+//  const hp::DoFHandler<deal_II_dimension,deal_II_dimension+1> &dof_col,
+//  CompressedSparsityPattern    &sparsity);
+// template void
+// DoFTools::make_sparsity_pattern<hp::DoFHandler<deal_II_dimension,deal_II_dimension+1>,
+// 				CompressedSetSparsityPattern>
+// (const hp::DoFHandler<deal_II_dimension,deal_II_dimension+1> &dof_row,
+//  const hp::DoFHandler<deal_II_dimension,deal_II_dimension+1> &dof_col,
+//  CompressedSetSparsityPattern    &sparsity);
+// template void
+// DoFTools::make_sparsity_pattern<hp::DoFHandler<deal_II_dimension,deal_II_dimension+1>,
+// 				BlockSparsityPattern>
+// (const hp::DoFHandler<deal_II_dimension,deal_II_dimension+1> &dof_row,
+//  const hp::DoFHandler<deal_II_dimension,deal_II_dimension+1> &dof_col,
+//  BlockSparsityPattern                &sparsity);
+// template void
+// DoFTools::make_sparsity_pattern<hp::DoFHandler<deal_II_dimension,deal_II_dimension+1>,
+// 				BlockCompressedSparsityPattern>
+// (const hp::DoFHandler<deal_II_dimension,deal_II_dimension+1> &dof_row,
+//  const hp::DoFHandler<deal_II_dimension,deal_II_dimension+1> &dof_col,
+//  BlockCompressedSparsityPattern      &sparsity);
+// template void
+// DoFTools::make_sparsity_pattern<hp::DoFHandler<deal_II_dimension,deal_II_dimension+1>,
+// 				BlockCompressedSetSparsityPattern>
+// (const hp::DoFHandler<deal_II_dimension,deal_II_dimension+1> &dof_row,
+//  const hp::DoFHandler<deal_II_dimension,deal_II_dimension+1> &dof_col,
+//  BlockCompressedSetSparsityPattern      &sparsity);
+
+
+// #if deal_II_dimension > 1
+template void
+DoFTools::make_boundary_sparsity_pattern<DoFHandler<deal_II_dimension,deal_II_dimension+1>,SparsityPattern>
+(const DoFHandler<deal_II_dimension,deal_II_dimension+1>& dof,
+ const std::vector<unsigned int>  &,
+ SparsityPattern    &);
+template void
+DoFTools::make_boundary_sparsity_pattern<DoFHandler<deal_II_dimension,deal_II_dimension+1>,CompressedSparsityPattern>
+(const DoFHandler<deal_II_dimension,deal_II_dimension+1>& dof,
+ const std::vector<unsigned int>  &,
+ CompressedSparsityPattern    &);
+template void
+DoFTools::make_boundary_sparsity_pattern<DoFHandler<deal_II_dimension,deal_II_dimension+1>,CompressedSetSparsityPattern>
+(const DoFHandler<deal_II_dimension,deal_II_dimension+1>& dof,
+ const std::vector<unsigned int>  &,
+ CompressedSetSparsityPattern    &);
+template void
+DoFTools::make_boundary_sparsity_pattern<DoFHandler<deal_II_dimension,deal_II_dimension+1>,BlockSparsityPattern>
+(const DoFHandler<deal_II_dimension,deal_II_dimension+1>& dof,
+ const std::vector<unsigned int>  &,
+ BlockSparsityPattern    &);
+template void
+DoFTools::make_boundary_sparsity_pattern<DoFHandler<deal_II_dimension,deal_II_dimension+1>,BlockCompressedSparsityPattern>
+(const DoFHandler<deal_II_dimension,deal_II_dimension+1>& dof,
+ const std::vector<unsigned int>  &,
+ BlockCompressedSparsityPattern    &);
+template void
+DoFTools::make_boundary_sparsity_pattern<DoFHandler<deal_II_dimension,deal_II_dimension+1>,BlockCompressedSetSparsityPattern>
+(const DoFHandler<deal_II_dimension,deal_II_dimension+1>& dof,
+ const std::vector<unsigned int>  &,
+ BlockCompressedSetSparsityPattern    &);
+
+// template void
+// DoFTools::make_boundary_sparsity_pattern<hp::DoFHandler<deal_II_dimension,deal_II_dimension+1>,SparsityPattern>
+// (const hp::DoFHandler<deal_II_dimension,deal_II_dimension+1>& dof,
+//  const std::vector<unsigned int>  &,
+//  SparsityPattern    &);
+// template void
+// DoFTools::make_boundary_sparsity_pattern<hp::DoFHandler<deal_II_dimension,deal_II_dimension+1>,CompressedSparsityPattern>
+// (const hp::DoFHandler<deal_II_dimension,deal_II_dimension+1>& dof,
+//  const std::vector<unsigned int>  &,
+//  CompressedSparsityPattern    &);
+// template void
+// DoFTools::make_boundary_sparsity_pattern<hp::DoFHandler<deal_II_dimension,deal_II_dimension+1>,CompressedSetSparsityPattern>
+// (const hp::DoFHandler<deal_II_dimension,deal_II_dimension+1>& dof,
+//  const std::vector<unsigned int>  &,
+//  CompressedSetSparsityPattern    &);
+// template void
+// DoFTools::make_boundary_sparsity_pattern<hp::DoFHandler<deal_II_dimension,deal_II_dimension+1>,BlockSparsityPattern>
+// (const hp::DoFHandler<deal_II_dimension,deal_II_dimension+1>& dof,
+//  const std::vector<unsigned int>  &,
+//  BlockSparsityPattern    &);
+// template void
+// DoFTools::make_boundary_sparsity_pattern<hp::DoFHandler<deal_II_dimension,deal_II_dimension+1>,BlockCompressedSparsityPattern>
+// (const hp::DoFHandler<deal_II_dimension,deal_II_dimension+1>& dof,
+//  const std::vector<unsigned int>  &,
+//  BlockCompressedSparsityPattern    &);
+// template void
+// DoFTools::make_boundary_sparsity_pattern<hp::DoFHandler<deal_II_dimension,deal_II_dimension+1>,BlockCompressedSetSparsityPattern>
+// (const hp::DoFHandler<deal_II_dimension,deal_II_dimension+1>& dof,
+//  const std::vector<unsigned int>  &,
+//  BlockCompressedSetSparsityPattern    &);
+
+
+template void
+DoFTools::make_boundary_sparsity_pattern<DoFHandler<deal_II_dimension,deal_II_dimension+1>,SparsityPattern>
+(const DoFHandler<deal_II_dimension,deal_II_dimension+1>& dof,
+ const FunctionMap<deal_II_dimension+1>::type  &boundary_indicators,
+ const std::vector<unsigned int>  &dof_to_boundary_mapping,
+ SparsityPattern    &sparsity);
+template void
+DoFTools::make_boundary_sparsity_pattern<DoFHandler<deal_II_dimension,deal_II_dimension+1>,CompressedSparsityPattern>
+(const DoFHandler<deal_II_dimension,deal_II_dimension+1>& dof,
+ const FunctionMap<deal_II_dimension+1>::type  &boundary_indicators,
+ const std::vector<unsigned int>  &dof_to_boundary_mapping,
+ CompressedSparsityPattern    &sparsity);
+template void
+DoFTools::make_boundary_sparsity_pattern<DoFHandler<deal_II_dimension,deal_II_dimension+1>,CompressedSetSparsityPattern>
+(const DoFHandler<deal_II_dimension,deal_II_dimension+1>& dof,
+ const FunctionMap<deal_II_dimension+1>::type  &boundary_indicators,
+ const std::vector<unsigned int>  &dof_to_boundary_mapping,
+ CompressedSetSparsityPattern    &sparsity);
+template void
+DoFTools::make_boundary_sparsity_pattern<DoFHandler<deal_II_dimension,deal_II_dimension+1>,BlockSparsityPattern>
+(const DoFHandler<deal_II_dimension,deal_II_dimension+1>& dof,
+ const FunctionMap<deal_II_dimension+1>::type  &boundary_indicators,
+ const std::vector<unsigned int>  &dof_to_boundary_mapping,
+ BlockSparsityPattern    &sparsity);
+template void
+DoFTools::make_boundary_sparsity_pattern<DoFHandler<deal_II_dimension,deal_II_dimension+1>,BlockCompressedSparsityPattern>
+(const DoFHandler<deal_II_dimension,deal_II_dimension+1>& dof,
+ const FunctionMap<deal_II_dimension+1>::type  &boundary_indicators,
+ const std::vector<unsigned int>  &dof_to_boundary_mapping,
+ BlockCompressedSparsityPattern    &sparsity);
+template void
+DoFTools::make_boundary_sparsity_pattern<DoFHandler<deal_II_dimension,deal_II_dimension+1>,BlockCompressedSetSparsityPattern>
+(const DoFHandler<deal_II_dimension,deal_II_dimension+1>& dof,
+ const FunctionMap<deal_II_dimension+1>::type  &boundary_indicators,
+ const std::vector<unsigned int>  &dof_to_boundary_mapping,
+ BlockCompressedSetSparsityPattern    &sparsity);
+
+// template void
+// DoFTools::make_boundary_sparsity_pattern<hp::DoFHandler<deal_II_dimension,deal_II_dimension+1>,SparsityPattern>
+// (const hp::DoFHandler<deal_II_dimension,deal_II_dimension+1>& dof,
+//  const FunctionMap<deal_II_dimension+1>::type  &boundary_indicators,
+//  const std::vector<unsigned int>  &dof_to_boundary_mapping,
+//  SparsityPattern    &sparsity);
+// template void
+// DoFTools::make_boundary_sparsity_pattern<hp::DoFHandler<deal_II_dimension,deal_II_dimension+1>,CompressedSparsityPattern>
+// (const hp::DoFHandler<deal_II_dimension,deal_II_dimension+1>& dof,
+//  const FunctionMap<deal_II_dimension+1>::type  &boundary_indicators,
+//  const std::vector<unsigned int>  &dof_to_boundary_mapping,
+//  CompressedSparsityPattern    &sparsity);
+// template void
+// DoFTools::make_boundary_sparsity_pattern<hp::DoFHandler<deal_II_dimension,deal_II_dimension+1>,CompressedSetSparsityPattern>
+// (const hp::DoFHandler<deal_II_dimension,deal_II_dimension+1>& dof,
+//  const FunctionMap<deal_II_dimension+1>::type  &boundary_indicators,
+//  const std::vector<unsigned int>  &dof_to_boundary_mapping,
+//  CompressedSetSparsityPattern    &sparsity);
+// template void
+// DoFTools::make_boundary_sparsity_pattern<hp::DoFHandler<deal_II_dimension,deal_II_dimension+1>,BlockSparsityPattern>
+// (const hp::DoFHandler<deal_II_dimension,deal_II_dimension+1>& dof,
+//  const FunctionMap<deal_II_dimension+1>::type  &boundary_indicators,
+//  const std::vector<unsigned int>  &dof_to_boundary_mapping,
+//  BlockSparsityPattern    &sparsity);
+// template void
+// DoFTools::make_boundary_sparsity_pattern<hp::DoFHandler<deal_II_dimension,deal_II_dimension+1>,BlockCompressedSparsityPattern>
+// (const hp::DoFHandler<deal_II_dimension,deal_II_dimension+1>& dof,
+//  const FunctionMap<deal_II_dimension+1>::type  &boundary_indicators,
+//  const std::vector<unsigned int>  &dof_to_boundary_mapping,
+//  BlockCompressedSparsityPattern    &sparsity);
+// template void
+// DoFTools::make_boundary_sparsity_pattern<hp::DoFHandler<deal_II_dimension,deal_II_dimension+1>,BlockCompressedSetSparsityPattern>
+// (const hp::DoFHandler<deal_II_dimension,deal_II_dimension+1>& dof,
+//  const FunctionMap<deal_II_dimension+1>::type  &boundary_indicators,
+//  const std::vector<unsigned int>  &dof_to_boundary_mapping,
+//  BlockCompressedSetSparsityPattern    &sparsity);
+
+
+template
+void
+DoFTools::map_dof_to_boundary_indices<DoFHandler<deal_II_dimension,deal_II_dimension+1> >
+(const DoFHandler<deal_II_dimension,deal_II_dimension+1> &,
+ const std::set<unsigned char> &,
+ std::vector<unsigned int> &);
+
+#if deal_II_dimension != 1
+
+template
+void
+DoFTools::map_dof_to_boundary_indices<DoFHandler<deal_II_dimension,deal_II_dimension+1> >
+(const DoFHandler<deal_II_dimension,deal_II_dimension+1> &,
+ std::vector<unsigned int> &);
+
+#endif
+
+
+template
+void
+DoFTools::extract_hanging_node_dofs
+(const DoFHandler<deal_II_dimension,deal_II_dimension+1> &dof_handler,
+ std::vector<bool>     &selected_dofs);
+
+// template
+// void
+// DoFTools::map_dof_to_boundary_indices<hp::DoFHandler<deal_II_dimension,deal_II_dimension+1> >
+// (const hp::DoFHandler<deal_II_dimension,deal_II_dimension+1> &,
+//  const std::set<unsigned char> &,
+//  std::vector<unsigned int> &);
+
+// #if deal_II_dimension != 1
+
+// template
+// void
+// DoFTools::map_dof_to_boundary_indices<hp::DoFHandler<deal_II_dimension,deal_II_dimension+1> >
+// (const hp::DoFHandler<deal_II_dimension,deal_II_dimension+1> &,
+//  std::vector<unsigned int> &);
+
+// #endif
+
+
+
+#endif
+
+
+
 
 DEAL_II_NAMESPACE_CLOSE

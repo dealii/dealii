@@ -75,23 +75,23 @@ namespace
 }
 
 
-template <int dim>
+template <int dim, int spacedim>
 void
-GridGenerator::hyper_rectangle (Triangulation<dim> &tria,
-				const Point<dim>   &p_1,
-				const Point<dim>   &p_2,
+GridGenerator::hyper_rectangle (Triangulation<dim,spacedim> &tria,
+				const Point<spacedim>   &p_1,
+				const Point<spacedim>   &p_2,
 				const bool          colorize)
 {
 				   // First, normalize input such that
 				   // p1 is lower in all coordinate directions.
-  Point<dim> p1(p_1);
-  Point<dim> p2(p_2);
+  Point<spacedim> p1(p_1);
+  Point<spacedim> p2(p_2);
   
-  for (unsigned int i=0;i<dim;++i)
+  for (unsigned int i=0;i<spacedim;++i)
     if (p1(i) > p2(i))
       std::swap (p1(i), p2(i));
   
-  std::vector<Point<dim> > vertices (GeometryInfo<dim>::vertices_per_cell);
+  std::vector<Point<spacedim> > vertices (GeometryInfo<dim>::vertices_per_cell);
   switch (dim)
     {
       case 1:
@@ -133,7 +133,7 @@ GridGenerator::hyper_rectangle (Triangulation<dim> &tria,
   tria.create_triangulation (vertices, cells, SubCellData());
 
 				   // Assign boundary indicators
-  if (colorize)
+  if (colorize && (spacedim == dim))
     colorize_hyper_rectangle (tria);
 }
 
@@ -142,9 +142,9 @@ GridGenerator::hyper_rectangle (Triangulation<dim> &tria,
 #if deal_II_dimension == 1
 
 // Implementation for 1D only
-template <int dim>
+template <int dim, int spacedim>
 void
-GridGenerator::colorize_hyper_rectangle (Triangulation<dim> &)
+GridGenerator::colorize_hyper_rectangle (Triangulation<dim,spacedim> &)
 {
 				   // Nothing to do in 1D
 }
@@ -153,13 +153,13 @@ GridGenerator::colorize_hyper_rectangle (Triangulation<dim> &)
 #else
 
 // Implementation for dimensions except 1
-template <int dim>
+template <int dim, int spacedim>
 void
-GridGenerator::colorize_hyper_rectangle (Triangulation<dim> &tria)
+GridGenerator::colorize_hyper_rectangle (Triangulation<dim,spacedim> &tria)
 {
 				   // there is only one cell, so
 				   // simple task
-  const typename Triangulation<dim>::cell_iterator cell = tria.begin();
+  const typename Triangulation<dim,spacedim>::cell_iterator cell = tria.begin();
   for (unsigned int f=0; f<GeometryInfo<dim>::faces_per_cell; ++f)
     cell->face(f)->set_boundary_indicator (f);
 }
@@ -167,16 +167,20 @@ GridGenerator::colorize_hyper_rectangle (Triangulation<dim> &tria)
 #endif
 
 
-template <int dim>
-void GridGenerator::hyper_cube (Triangulation<dim> &tria,
+template <int dim, int spacedim>
+void GridGenerator::hyper_cube (Triangulation<dim,spacedim> &tria,
 			        const double        left,
 			        const double        right)
 {
   Assert (left < right,
 	  ExcMessage ("Invalid left and right bounds of hypercube"));
   
-  Point<dim> p1;
-  Point<dim> p2;
+  Point<spacedim> p1;
+  Point<spacedim> p2;
+
+  p1(spacedim-1) = 0;
+  p2(spacedim-1) = 0;
+
   for (unsigned int i=0;i<dim;++i)
     {
       p1(i) = left;
@@ -2798,5 +2802,19 @@ template void
 GridGenerator::
 laplace_transformation<deal_II_dimension> (Triangulation<deal_II_dimension> &,
 					   const std::map<unsigned int,Point<deal_II_dimension> > &);
+
+#if deal_II_dimension != 3
+
+template void
+GridGenerator::hyper_cube<deal_II_dimension, deal_II_dimension+1> (
+  Triangulation<deal_II_dimension,deal_II_dimension+1> &, const double, const double);
+template void
+GridGenerator::hyper_rectangle<deal_II_dimension,deal_II_dimension+1> (
+  Triangulation<deal_II_dimension,deal_II_dimension+1> &,
+  const Point<deal_II_dimension+1>&, const Point<deal_II_dimension+1>&,
+  const bool);
+
+#endif
+
 
 DEAL_II_NAMESPACE_CLOSE

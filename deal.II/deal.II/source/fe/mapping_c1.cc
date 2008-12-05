@@ -22,10 +22,10 @@ DEAL_II_NAMESPACE_OPEN
 
 
 
-template <int dim>
-MappingC1<dim>::MappingC1 ()
+template <int dim, int spacedim>
+MappingC1<dim,spacedim>::MappingC1 ()
 		:
-		MappingQ<dim> (3)
+		MappingQ<dim,spacedim> (3)
 {
   Assert (dim > 1, ExcImpossibleInDim(dim));
 }
@@ -190,9 +190,9 @@ MappingC1<2>::add_line_support_points (const Triangulation<2>::cell_iterator &ce
 
 
 
-template <int dim>
+template<int dim, int spacedim>
 void
-MappingC1<dim>::add_line_support_points (const typename Triangulation<dim>::cell_iterator &,
+MappingC1<dim,spacedim>::add_line_support_points (const typename Triangulation<dim>::cell_iterator &,
 					 std::vector<Point<dim> > &) const
 {
   Assert (false, ExcNotImplemented());
@@ -232,9 +232,9 @@ MappingC1<2>::add_quad_support_points (const Triangulation<2>::cell_iterator &,
 
 
 
-template <int dim>
+template<int dim, int spacedim>
 void
-MappingC1<dim>::add_quad_support_points (const typename Triangulation<dim>::cell_iterator &,
+MappingC1<dim,spacedim>::add_quad_support_points (const typename Triangulation<dim>::cell_iterator &,
 					 std::vector<Point<dim> > &) const
 {
   Assert (false, ExcNotImplemented());
@@ -242,11 +242,11 @@ MappingC1<dim>::add_quad_support_points (const typename Triangulation<dim>::cell
 
 
 
-template <int dim>
-Mapping<dim> *
-MappingC1<dim>::clone () const
+template<int dim, int spacedim>
+Mapping<dim, spacedim> *
+MappingC1<dim,spacedim>::clone () const
 {
-  return new MappingC1<dim>(*this);
+  return new MappingC1<dim,spacedim>(*this);
 }
 
 

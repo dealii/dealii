@@ -2,7 +2,7 @@
 //    $Id$
 //    Version: $Name$
 //
-//    Copyright (C) 2003, 2006, 2007 by the deal.II authors
+//    Copyright (C) 2003, 2006, 2007, 2008 by the deal.II authors
 //
 //    This file is subject to QPL and may not be  distributed
 //    without copyright and license information. Please refer
@@ -26,8 +26,8 @@ namespace internal
 
     template <int dim, int q_dim, class FEValues>
     FEValuesBase<dim,q_dim,FEValues>::
-    FEValuesBase (const dealii::hp::MappingCollection<dim> &mapping_collection,
-                  const dealii::hp::FECollection<dim>      &fe_collection,
+    FEValuesBase (const dealii::hp::MappingCollection<dim,FEValues::space_dimension> &mapping_collection,
+                  const dealii::hp::FECollection<dim,FEValues::space_dimension>      &fe_collection,
                   const dealii::hp::QCollection<q_dim>     &q_collection,
                   const UpdateFlags                   update_flags)
                     :
@@ -46,12 +46,13 @@ namespace internal
 
     template <int dim, int q_dim, class FEValues>
     FEValuesBase<dim,q_dim,FEValues>::
-    FEValuesBase (const dealii::hp::FECollection<dim>      &fe_collection,
-                  const dealii::hp::QCollection<q_dim> &q_collection,
-                  const UpdateFlags         update_flags)
+    FEValuesBase (const dealii::hp::FECollection<dim,FEValues::space_dimension>      &fe_collection,
+		  const dealii::hp::QCollection<q_dim> &q_collection,
+		  const UpdateFlags         update_flags)
                     :
-                    fe_collection (&fe_collection),
-                    mapping_collection (&dealii::hp::StaticMappingQ1<dim>::mapping_collection),
+		  fe_collection (&fe_collection),
+		  mapping_collection (&dealii::hp::StaticMappingQ1<dim,FEValues::space_dimension>::
+				      mapping_collection),
                     q_collection (q_collection),
                     fe_values_table (fe_collection.size(),
                                      1,
@@ -112,36 +113,36 @@ namespace hp
 // -------------------------- FEValues -------------------------
 
 
-  template <int dim>
-  FEValues<dim>::FEValues (const hp::MappingCollection<dim> &mapping,
-                           const hp::FECollection<dim>      &fe_collection,
-                           const hp::QCollection<dim>       &q_collection,
-                           const UpdateFlags                 update_flags)
+  template <int dim, int spacedim>
+  FEValues<dim,spacedim>::FEValues (const hp::MappingCollection<dim,spacedim> &mapping,
+				    const hp::FECollection<dim,spacedim>      &fe_collection,
+				    const hp::QCollection<dim>       &q_collection,
+				    const UpdateFlags                 update_flags)
                   :
-                  internal::hp::FEValuesBase<dim,dim,dealii::FEValues<dim> > (mapping,
+    internal::hp::FEValuesBase<dim,dim,dealii::FEValues<dim,spacedim> > (mapping,
 									fe_collection,
 									q_collection,
 									update_flags)
   {}
 
 
-  template <int dim>
-  FEValues<dim>::FEValues (const hp::FECollection<dim> &fe_collection,
-                           const hp::QCollection<dim>      &q_collection,
-                           const UpdateFlags            update_flags)
+  template <int dim, int spacedim>
+  FEValues<dim,spacedim>::FEValues (const hp::FECollection<dim,spacedim> &fe_collection,
+				    const hp::QCollection<dim>      &q_collection,
+				    const UpdateFlags            update_flags)
                   :
-                  internal::hp::FEValuesBase<dim,dim,dealii::FEValues<dim> > (fe_collection,
+    internal::hp::FEValuesBase<dim,dim,dealii::FEValues<dim,spacedim> > (fe_collection,
 									q_collection,
 									update_flags)
   {}
 
 
-  template <int dim>
+  template <int dim, int spacedim>
   void
-  FEValues<dim>::reinit (const typename hp::DoFHandler<dim>::cell_iterator &cell,
-                         const unsigned int q_index,
-                         const unsigned int mapping_index,
-                         const unsigned int fe_index)
+  FEValues<dim,spacedim>::reinit (const typename hp::DoFHandler<dim,spacedim>::cell_iterator &cell,
+				  const unsigned int q_index,
+				  const unsigned int mapping_index,
+				  const unsigned int fe_index)
   {
                                      // determine which indices we
                                      // should actually use
@@ -186,9 +187,49 @@ namespace hp
 
 
 
-  template <int dim>
+  template <int dim, int spacedim>
   void
-  FEValues<dim>::reinit (const typename dealii::DoFHandler<dim>::cell_iterator &cell,
+  FEValues<dim,spacedim>::reinit (const typename dealii::DoFHandler<dim,spacedim>::cell_iterator &cell,
+				  const unsigned int q_index,
+				  const unsigned int mapping_index,
+				  const unsigned int fe_index)
+  {
+                                     // determine which indices we
+                                     // should actually use
+    unsigned int real_q_index       = q_index,
+                 real_mapping_index = mapping_index,
+                 real_fe_index      = fe_index;
+
+    if (real_q_index == numbers::invalid_unsigned_int)
+      real_q_index = 0;
+    
+    if (real_mapping_index == numbers::invalid_unsigned_int)
+      real_mapping_index = 0;
+
+    if (real_fe_index == numbers::invalid_unsigned_int)
+      real_fe_index = 0;
+
+                                     // some checks
+    Assert (real_q_index < this->q_collection.size(),
+            ExcIndexRange (real_q_index, 0, this->q_collection.size()));
+    Assert (real_mapping_index < this->mapping_collection->size(),
+            ExcIndexRange (real_mapping_index, 0, this->mapping_collection->size()));
+    Assert (real_fe_index < this->fe_collection->size(),
+            ExcIndexRange (real_fe_index, 0, this->fe_collection->size()));
+    
+                                     // now finally actually get the
+                                     // corresponding object and
+                                     // initialize it
+    this->select_fe_values (real_fe_index,
+                            real_mapping_index,
+                            real_q_index).reinit (cell);
+  }
+
+
+
+  template <int dim, int spacedim>
+  void
+  FEValues<dim,spacedim>::reinit (const typename MGDoFHandler<dim,spacedim>::cell_iterator &cell,
                          const unsigned int q_index,
                          const unsigned int mapping_index,
                          const unsigned int fe_index)
@@ -226,49 +267,9 @@ namespace hp
 
 
 
-  template <int dim>
+  template <int dim, int spacedim>
   void
-  FEValues<dim>::reinit (const typename MGDoFHandler<dim>::cell_iterator &cell,
-                         const unsigned int q_index,
-                         const unsigned int mapping_index,
-                         const unsigned int fe_index)
-  {
-                                     // determine which indices we
-                                     // should actually use
-    unsigned int real_q_index       = q_index,
-                 real_mapping_index = mapping_index,
-                 real_fe_index      = fe_index;
-
-    if (real_q_index == numbers::invalid_unsigned_int)
-      real_q_index = 0;
-    
-    if (real_mapping_index == numbers::invalid_unsigned_int)
-      real_mapping_index = 0;
-
-    if (real_fe_index == numbers::invalid_unsigned_int)
-      real_fe_index = 0;
-
-                                     // some checks
-    Assert (real_q_index < this->q_collection.size(),
-            ExcIndexRange (real_q_index, 0, this->q_collection.size()));
-    Assert (real_mapping_index < this->mapping_collection->size(),
-            ExcIndexRange (real_mapping_index, 0, this->mapping_collection->size()));
-    Assert (real_fe_index < this->fe_collection->size(),
-            ExcIndexRange (real_fe_index, 0, this->fe_collection->size()));
-    
-                                     // now finally actually get the
-                                     // corresponding object and
-                                     // initialize it
-    this->select_fe_values (real_fe_index,
-                            real_mapping_index,
-                            real_q_index).reinit (cell);
-  }
-
-
-
-  template <int dim>
-  void
-  FEValues<dim>::reinit (const typename Triangulation<dim>::cell_iterator &cell,
+  FEValues<dim,spacedim>::reinit (const typename Triangulation<dim,spacedim>::cell_iterator &cell,
                          const unsigned int q_index,
                          const unsigned int mapping_index,
                          const unsigned int fe_index)
@@ -734,5 +735,39 @@ namespace hp
   template class FESubfaceValues<deal_II_dimension>;
 #endif
 }
+
+
+
+#if deal_II_dimension != 3
+
+namespace internal
+{
+  namespace hp
+  {
+    template class FEValuesBase<deal_II_dimension,deal_II_dimension,
+                                dealii::FEValues<deal_II_dimension,deal_II_dimension+1> >;
+// not yet implemented:  
+// #if deal_II_dimension == 2
+//     template class FEValuesBase<deal_II_dimension,deal_II_dimension-1,
+//                                 dealii::FEFaceValues<deal_II_dimension> >;
+//     template class FEValuesBase<deal_II_dimension,deal_II_dimension-1,
+//                                 dealii::FESubfaceValues<deal_II_dimension> >;
+// #endif
+  }
+}
+
+namespace hp
+{
+  template class FEValues<deal_II_dimension, deal_II_dimension+1>;
+
+// not yet implemented:  
+//#if deal_II_dimension == 2
+//   template class FEFaceValues<deal_II_dimension, deal_II_dimension+1>;
+//   template class FESubfaceValues<deal_II_dimension, deal_II_dimension+1>;
+//#endif
+}
+#endif
+
+
 
 DEAL_II_NAMESPACE_CLOSE

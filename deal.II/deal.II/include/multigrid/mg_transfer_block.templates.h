@@ -35,10 +35,10 @@ typedef std::map<unsigned int, unsigned int>::const_iterator IT;
 
 
 template <typename number>
-template <int dim, typename number2>
+template <int dim, typename number2, int spacedim>
 void
 MGTransferBlockSelect<number>::copy_to_mg (
-  const MGDoFHandler<dim>        &mg_dof_handler,
+  const MGDoFHandler<dim,spacedim>        &mg_dof_handler,
   MGLevelObject<Vector<number> > &dst,
   const BlockVector<number2>     &src) const
 {
@@ -63,10 +63,10 @@ MGTransferBlockSelect<number>::copy_to_mg (
 
 
 template <typename number>
-template <int dim, typename number2>
+template <int dim, typename number2, int spacedim>
 void
 MGTransferBlockSelect<number>::copy_to_mg (
-  const MGDoFHandler<dim>        &mg_dof_handler,
+  const MGDoFHandler<dim,spacedim>        &mg_dof_handler,
   MGLevelObject<Vector<number> > &dst,
   const Vector<number2>          &src) const
 {
@@ -90,10 +90,10 @@ MGTransferBlockSelect<number>::copy_to_mg (
 
 
 template <typename number>
-template <int dim, typename number2>
+template <int dim, typename number2, int spacedim>
 void
 MGTransferBlockSelect<number>::copy_from_mg (
-  const MGDoFHandler<dim>&              mg_dof_handler,
+  const MGDoFHandler<dim,spacedim>&              mg_dof_handler,
   BlockVector<number2>&                 dst,
   const MGLevelObject<Vector<number> >& src) const
 {
@@ -106,10 +106,10 @@ MGTransferBlockSelect<number>::copy_from_mg (
 
 
 template <typename number>
-template <int dim, typename number2>
+template <int dim, typename number2, int spacedim>
 void
 MGTransferBlockSelect<number>::copy_from_mg (
-  const MGDoFHandler<dim>&              mg_dof_handler,
+  const MGDoFHandler<dim,spacedim>&              mg_dof_handler,
   Vector<number2>&                      dst,
   const MGLevelObject<Vector<number> >& src) const
 {
@@ -122,10 +122,10 @@ MGTransferBlockSelect<number>::copy_from_mg (
 
 
 template <typename number>
-template <int dim, typename number2>
+template <int dim, typename number2, int spacedim>
 void
 MGTransferBlockSelect<number>::copy_from_mg_add (
-  const MGDoFHandler<dim>&              mg_dof_handler,
+  const MGDoFHandler<dim,spacedim>&              mg_dof_handler,
   BlockVector<number2>&                 dst,
   const MGLevelObject<Vector<number> >& src) const
 {
@@ -138,10 +138,10 @@ MGTransferBlockSelect<number>::copy_from_mg_add (
 
 
 template <typename number>
-template <int dim, typename number2>
+template <int dim, typename number2, int spacedim>
 void
 MGTransferBlockSelect<number>::copy_from_mg_add (
-  const MGDoFHandler<dim>&              mg_dof_handler,
+  const MGDoFHandler<dim,spacedim>&              mg_dof_handler,
   Vector<number2>&                      dst,
   const MGLevelObject<Vector<number> >& src) const
 {
@@ -166,10 +166,10 @@ MGTransferBlockSelect<number>::memory_consumption () const
 
 
 template <typename number>
-template <int dim, typename number2>
+template <int dim, typename number2, int spacedim>
 void
 MGTransferBlock<number>::copy_to_mg (
-  const MGDoFHandler<dim>& mg_dof_handler,
+  const MGDoFHandler<dim,spacedim>& mg_dof_handler,
   MGLevelObject<BlockVector<number> >& dst,
   const BlockVector<number2>& src) const
 {
@@ -193,10 +193,10 @@ MGTransferBlock<number>::copy_to_mg (
 
 
 template <typename number>
-template <int dim, typename number2>
+template <int dim, typename number2, int spacedim>
 void
 MGTransferBlock<number>::copy_from_mg (
-  const MGDoFHandler<dim>& mg_dof_handler,
+  const MGDoFHandler<dim,spacedim>& mg_dof_handler,
   BlockVector<number2>& dst,
   const MGLevelObject<BlockVector<number> >& src) const
 {
@@ -211,10 +211,10 @@ MGTransferBlock<number>::copy_from_mg (
 
 
 template <typename number>
-template <int dim, typename number2>
+template <int dim, typename number2, int spacedim>
 void
 MGTransferBlock<number>::copy_from_mg_add (
-  const MGDoFHandler<dim>& mg_dof_handler,
+  const MGDoFHandler<dim,spacedim>& mg_dof_handler,
   BlockVector<number2>& dst,
   const MGLevelObject<BlockVector<number> >& src) const
 {

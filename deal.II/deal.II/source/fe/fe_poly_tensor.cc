@@ -52,6 +52,7 @@ namespace
 			std::vector<double>                   &face_sign)
   {
     const unsigned int dim = 2;
+    const unsigned int spacedim = 2;
     
 				     // Default is no sign
 				     // change. I.e. multiply by one.
@@ -60,7 +61,7 @@ namespace
     for (unsigned int f = GeometryInfo<dim>::faces_per_cell / 2; 
 	 f < GeometryInfo<dim>::faces_per_cell; ++f)
       {
-	Triangulation<dim>::face_iterator face = cell->face (f);
+	Triangulation<dim,spacedim>::face_iterator face = cell->face (f);
 	if (!face->at_boundary ())
 	  {
 	    const unsigned int neighbor_level = cell->neighbor (f)->level ();
@@ -107,13 +108,13 @@ namespace
 
 
 
-template <class POLY, int dim>
-FE_PolyTensor<POLY,dim>::FE_PolyTensor (const unsigned int degree,
+template <class POLY, int dim, int spacedim>
+FE_PolyTensor<POLY,dim,spacedim>::FE_PolyTensor (const unsigned int degree,
 					const FiniteElementData<dim> &fe_data,
 					const std::vector<bool> &restriction_is_additive_flags,
 					const std::vector<std::vector<bool> > &nonzero_components)
 		:
-		FiniteElement<dim> (fe_data,
+		FiniteElement<dim,spacedim> (fe_data,
 				    restriction_is_additive_flags,
 				    nonzero_components),
                 poly_space(POLY(degree))
@@ -132,19 +133,21 @@ FE_PolyTensor<POLY,dim>::FE_PolyTensor (const unsigned int degree,
 
 
 
-template <class POLY, int dim>
+template <class POLY, int dim, int spacedim>
 double
-FE_PolyTensor<POLY,dim>::shape_value (const unsigned int, const Point<dim> &) const
+FE_PolyTensor<POLY,dim,spacedim>::shape_value (const unsigned int, const Point<dim> &) const
+
 {
-  Assert(false, typename FiniteElement<dim>::ExcFENotPrimitive());
+  typedef    FiniteElement<dim,spacedim> FEE;
+  Assert(false, typename FEE::ExcFENotPrimitive());
   return 0.;
 }
 
 
 
-template <class POLY, int dim>
+template <class POLY, int dim, int spacedim>
 double
-FE_PolyTensor<POLY,dim>::shape_value_component (const unsigned int i,
+FE_PolyTensor<POLY,dim,spacedim>::shape_value_component (const unsigned int i,
 						const Point<dim> &p,
 						const unsigned int component) const
 {
@@ -169,20 +172,21 @@ FE_PolyTensor<POLY,dim>::shape_value_component (const unsigned int i,
 
 
 
-template <class POLY, int dim>
+template <class POLY, int dim, int spacedim>
 Tensor<1,dim>
-FE_PolyTensor<POLY,dim>::shape_grad (const unsigned int,
+FE_PolyTensor<POLY,dim,spacedim>::shape_grad (const unsigned int,
 				     const Point<dim> &) const
 {
-  Assert(false, typename FiniteElement<dim>::ExcFENotPrimitive());
+  typedef    FiniteElement<dim,spacedim> FEE;
+  Assert(false, typename FEE::ExcFENotPrimitive());
   return Tensor<1,dim>();
 }
 
 
 
-template <class POLY, int dim>
+template <class POLY, int dim, int spacedim>
 Tensor<1,dim>
-FE_PolyTensor<POLY,dim>::shape_grad_component (const unsigned int i,
+FE_PolyTensor<POLY,dim,spacedim>::shape_grad_component (const unsigned int i,
 					       const Point<dim> &p,
 					       const unsigned int component) const
 {
@@ -208,19 +212,20 @@ FE_PolyTensor<POLY,dim>::shape_grad_component (const unsigned int i,
 
 
 
-template <class POLY, int dim>
+template <class POLY, int dim, int spacedim>
 Tensor<2,dim>
-FE_PolyTensor<POLY,dim>::shape_grad_grad (const unsigned int, const Point<dim> &) const
+FE_PolyTensor<POLY,dim,spacedim>::shape_grad_grad (const unsigned int, const Point<dim> &) const
 {
-  Assert(false, typename FiniteElement<dim>::ExcFENotPrimitive());
+  typedef    FiniteElement<dim,spacedim> FEE;
+  Assert(false, typename FEE::ExcFENotPrimitive());
   return Tensor<2,dim>();
 }
 
 
 
-template <class POLY, int dim>
+template <class POLY, int dim, int spacedim>
 Tensor<2,dim>
-FE_PolyTensor<POLY,dim>::shape_grad_grad_component (const unsigned int i,
+FE_PolyTensor<POLY,dim,spacedim>::shape_grad_grad_component (const unsigned int i,
 						    const Point<dim> &p,
 						    const unsigned int component) const
 {
@@ -250,10 +255,10 @@ FE_PolyTensor<POLY,dim>::shape_grad_grad_component (const unsigned int i,
 // Data field initialization
 //---------------------------------------------------------------------------
 
-template <class POLY, int dim>
-typename Mapping<dim>::InternalDataBase *
-FE_PolyTensor<POLY,dim>::get_data (const UpdateFlags      update_flags,
-			     const Mapping<dim>    &mapping,
+template <class POLY, int dim, int spacedim>
+typename Mapping<dim,spacedim>::InternalDataBase *
+FE_PolyTensor<POLY,dim,spacedim>::get_data (const UpdateFlags      update_flags,
+			     const Mapping<dim,spacedim>    &mapping,
 			     const Quadrature<dim> &quadrature) const
 {
 				   // generate a new data object and
@@ -350,15 +355,15 @@ FE_PolyTensor<POLY,dim>::get_data (const UpdateFlags      update_flags,
 // Fill data of FEValues
 //---------------------------------------------------------------------------
 
-template <class POLY, int dim>
+template <class POLY, int dim, int spacedim>
 void
-FE_PolyTensor<POLY,dim>::fill_fe_values (
-  const Mapping<dim>                   &mapping,
-  const typename Triangulation<dim>::cell_iterator &cell,
+FE_PolyTensor<POLY,dim,spacedim>::fill_fe_values (
+  const Mapping<dim,spacedim>                   &mapping,
+  const typename Triangulation<dim,spacedim>::cell_iterator &cell,
   const Quadrature<dim>                &quadrature,
-  typename Mapping<dim>::InternalDataBase &mapping_data,
-  typename Mapping<dim>::InternalDataBase &fedata,
-  FEValuesData<dim>                    &data) const
+  typename Mapping<dim,spacedim>::InternalDataBase &mapping_data,
+  typename Mapping<dim,spacedim>::InternalDataBase &fedata,
+  FEValuesData<dim,spacedim>                    &data) const
 {
 				   // convert data object to internal
 				   // data for this class. fails with
@@ -519,16 +524,16 @@ FE_PolyTensor<POLY,dim>::fill_fe_values (
 
 
 
-template <class POLY, int dim>
+template <class POLY, int dim, int spacedim>
 void
-FE_PolyTensor<POLY,dim>::fill_fe_face_values (
-  const Mapping<dim>                   &mapping,
-  const typename Triangulation<dim>::cell_iterator &cell,
+FE_PolyTensor<POLY,dim,spacedim>::fill_fe_face_values (
+  const Mapping<dim,spacedim>                   &mapping,
+  const typename Triangulation<dim,spacedim>::cell_iterator &cell,
   const unsigned int                    face,
   const Quadrature<dim-1>              &quadrature,
-  typename Mapping<dim>::InternalDataBase       &mapping_data,
-  typename Mapping<dim>::InternalDataBase       &fedata,
-  FEValuesData<dim>                    &data) const
+  typename Mapping<dim,spacedim>::InternalDataBase       &mapping_data,
+  typename Mapping<dim,spacedim>::InternalDataBase       &fedata,
+  FEValuesData<dim,spacedim>                    &data) const
 {
 				   // convert data object to internal
 				   // data for this class. fails with
@@ -702,17 +707,17 @@ FE_PolyTensor<POLY,dim>::fill_fe_face_values (
 
 
 
-template <class POLY, int dim>
+template <class POLY, int dim, int spacedim>
 void
-FE_PolyTensor<POLY,dim>::fill_fe_subface_values (
-  const Mapping<dim>                   &mapping,
-  const typename Triangulation<dim>::cell_iterator &cell,
+FE_PolyTensor<POLY,dim,spacedim>::fill_fe_subface_values (
+  const Mapping<dim,spacedim>                   &mapping,
+  const typename Triangulation<dim,spacedim>::cell_iterator &cell,
   const unsigned int                    face,
   const unsigned int                    subface,
   const Quadrature<dim-1>              &quadrature,
-  typename Mapping<dim>::InternalDataBase       &mapping_data,
-  typename Mapping<dim>::InternalDataBase       &fedata,
-  FEValuesData<dim>                    &data) const
+  typename Mapping<dim,spacedim>::InternalDataBase       &mapping_data,
+  typename Mapping<dim,spacedim>::InternalDataBase       &fedata,
+  FEValuesData<dim,spacedim>                    &data) const
 {
 				   // convert data object to internal
 				   // data for this class. fails with
@@ -886,18 +891,18 @@ FE_PolyTensor<POLY,dim>::fill_fe_subface_values (
 
 
 
-template <class POLY, int dim>
+template <class POLY, int dim, int spacedim>
 unsigned int
-FE_PolyTensor<POLY,dim>::n_base_elements () const
+FE_PolyTensor<POLY,dim,spacedim>::n_base_elements () const
 {
   return 1;
 }
 
 
 
-template <class POLY, int dim>
-const FiniteElement<dim> &
-FE_PolyTensor<POLY,dim>::base_element (const unsigned int index) const
+template <class POLY, int dim, int spacedim>
+const FiniteElement<dim,spacedim> &
+FE_PolyTensor<POLY,dim,spacedim>::base_element (const unsigned int index) const
 {
   Assert (index==0, ExcIndexRange(index, 0, 1));
   return *this;
@@ -905,18 +910,18 @@ FE_PolyTensor<POLY,dim>::base_element (const unsigned int index) const
 
 
 
-template <class POLY, int dim>
+template <class POLY, int dim, int spacedim>
 unsigned int
-FE_PolyTensor<POLY,dim>::element_multiplicity (const unsigned int index) const
+FE_PolyTensor<POLY,dim,spacedim>::element_multiplicity (const unsigned int index) const
 {
   Assert (index==0, ExcIndexRange(index, 0, 1));
   return 1;
 }
 
 
-template <class POLY, int dim>
+template <class POLY, int dim, int spacedim>
 UpdateFlags
-FE_PolyTensor<POLY,dim>::update_once (const UpdateFlags flags) const
+FE_PolyTensor<POLY,dim,spacedim>::update_once (const UpdateFlags flags) const
 {
   Assert (mapping_type != no_mapping, ExcNotInitialized());
   const bool values_once = (mapping_type == independent);
@@ -930,9 +935,9 @@ FE_PolyTensor<POLY,dim>::update_once (const UpdateFlags flags) const
 }
 
 
-template <class POLY, int dim>
+template <class POLY, int dim, int spacedim>
 UpdateFlags
-FE_PolyTensor<POLY,dim>::update_each (const UpdateFlags flags) const
+FE_PolyTensor<POLY,dim,spacedim>::update_each (const UpdateFlags flags) const
 {
   Assert (mapping_type != no_mapping, ExcNotInitialized());
   const bool values_once = (mapping_type == independent);
@@ -945,13 +950,18 @@ FE_PolyTensor<POLY,dim>::update_each (const UpdateFlags flags) const
     out |= update_gradients          | update_covariant_transformation;
   if (flags & update_hessians)
     out |= update_hessians | update_covariant_transformation;
+  if (flags & update_cell_normal_vectors)
+    out |= update_cell_normal_vectors | update_JxW_values;
 
   return out;
 }
 
 
+
 template class FE_PolyTensor<PolynomialsRaviartThomas<deal_II_dimension>,deal_II_dimension>;
 template class FE_PolyTensor<PolynomialsABF<deal_II_dimension>,deal_II_dimension>;
 template class FE_PolyTensor<PolynomialsBDM<deal_II_dimension>,deal_II_dimension>;
+
+
 
 DEAL_II_NAMESPACE_CLOSE

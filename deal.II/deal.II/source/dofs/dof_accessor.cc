@@ -37,287 +37,35 @@ DEAL_II_NAMESPACE_OPEN
 /*------------------------- Functions: DoFCellAccessor -----------------------*/
 
 
-#if deal_II_dimension == 1
-
-template <>
-TriaIterator<1, DoFObjectAccessor<0,DoFHandler<1> > >
-DoFCellAccessor<DoFHandler<1> >::face (const unsigned int) const
-{
-  Assert (false, ExcImpossibleInDim(1));
-  return TriaIterator<1, DoFObjectAccessor<0,DoFHandler<1> > >();
-}
-
-
-template <>
-void
-DoFCellAccessor<DoFHandler<1> >::update_cell_dof_indices_cache () const
-{
-  Assert (static_cast<unsigned int>(this->present_level) < this->dof_handler->levels.size(),
-          ExcMessage ("DoFHandler not initialized"));
-  
-  Assert (this->dof_handler != 0, BaseClass::ExcInvalidObject());
-  Assert (&this->get_fe() != 0, BaseClass::ExcInvalidObject());
-
-				   // check as in documentation that
-				   // cell is either active, or dofs
-				   // are only in vertices. otherwise
-				   // simply don't update the cache at
-				   // all. the get_dof_indices
-				   // function will then make sure we
-				   // don't access the invalid data
-  if (this->has_children()
-      &&
-      (this->get_fe().dofs_per_cell !=
-       this->get_fe().dofs_per_vertex * GeometryInfo<1>::vertices_per_cell))
-    return;
-  
-  const unsigned int dofs_per_vertex = this->get_fe().dofs_per_vertex,
-		     dofs_per_line   = this->get_fe().dofs_per_line,
-		     dofs_per_cell   = this->get_fe().dofs_per_cell;
-
-				   // make sure the cache is at least
-				   // as big as we need it when
-				   // writing to the last element of
-				   // this cell
-  Assert (this->present_index * dofs_per_cell + dofs_per_cell
-	  <=
-	  this->dof_handler->levels[this->present_level]
-	  ->cell_dof_indices_cache.size(),
-	  ExcInternalError());
-
-  std::vector<unsigned int>::iterator next
-    = (this->dof_handler->levels[this->present_level]
-       ->cell_dof_indices_cache.begin() + this->present_index * dofs_per_cell);
-  
-  for (unsigned int vertex=0; vertex<2; ++vertex)
-    for (unsigned int d=0; d<dofs_per_vertex; ++d)
-      *next++ = vertex_dof_index(vertex,d);
-  for (unsigned int d=0; d<dofs_per_line; ++d)
-    *next++ = dof_index(d);
-}
-
-
-
-template <>
-void
-DoFCellAccessor<hp::DoFHandler<1> >::update_cell_dof_indices_cache () const
-{
-//TODO[WB]: should implement a dof indices cache for hp as well
-  
-				   // not implemented, but should also
-				   // not be called
-  Assert (false, ExcNotImplemented());
-}
-
-
-
-#endif
-
-
-#if deal_II_dimension == 2
-
-template <>
-TriaIterator<2, DoFObjectAccessor<1,DoFHandler<2> > >
-DoFCellAccessor<DoFHandler<2> >::face (const unsigned int i) const
-{
-  return this->line(i);
-}
-
-
-
-template <>
-void
-DoFCellAccessor<DoFHandler<2> >::update_cell_dof_indices_cache () const
-{
-  Assert (static_cast<unsigned int>(this->present_level) < this->dof_handler->levels.size(),
-          ExcMessage ("DoFHandler not initialized"));
-
-  Assert (this->dof_handler != 0, BaseClass::ExcInvalidObject());
-  Assert (&this->get_fe() != 0, BaseClass::ExcInvalidObject());
-
-				   // check as in documentation that
-				   // cell is either active, or dofs
-				   // are only in vertices. otherwise
-				   // simply don't update the cache at
-				   // all. the get_dof_indices
-				   // function will then make sure we
-				   // don't access the invalid data
-  if (this->has_children()
-      &&
-      (this->get_fe().dofs_per_cell !=
-       this->get_fe().dofs_per_vertex * GeometryInfo<2>::vertices_per_cell))
-    return;
-  
-  const unsigned int dofs_per_vertex = this->get_fe().dofs_per_vertex,
-		     dofs_per_line   = this->get_fe().dofs_per_line,
-		     dofs_per_quad   = this->get_fe().dofs_per_quad,
-		     dofs_per_cell   = this->get_fe().dofs_per_cell;
-
-				   // make sure the cache is at least
-				   // as big as we need it when
-				   // writing to the last element of
-				   // this cell
-  Assert (this->present_index * dofs_per_cell + dofs_per_cell
-	  <=
-	  this->dof_handler->levels[this->present_level]
-	  ->cell_dof_indices_cache.size(),
-	  ExcInternalError());
-
-  std::vector<unsigned int>::iterator next
-    = (this->dof_handler->levels[this->present_level]
-       ->cell_dof_indices_cache.begin() + this->present_index * dofs_per_cell);
-
-  for (unsigned int vertex=0; vertex<4; ++vertex)
-    for (unsigned int d=0; d<dofs_per_vertex; ++d)
-      *next++ = vertex_dof_index(vertex,d);
-  for (unsigned int line=0; line<4; ++line)
-    for (unsigned int d=0; d<dofs_per_line; ++d)
-      *next++ = this->line(line)->dof_index(d);
-  for (unsigned int d=0; d<dofs_per_quad; ++d)
-    *next++ = dof_index(d);
-}
-
-
-
-template <>
-void
-DoFCellAccessor<hp::DoFHandler<2> >::update_cell_dof_indices_cache () const
-{
-//TODO[WB]: should implement a dof indices cache for hp as well
-  
-				   // not implemented, but should also
-				   // not be called
-  Assert (false, ExcNotImplemented());
-}
-
-
-#endif
-
-
-#if deal_II_dimension == 3
-
-template <>
-TriaIterator<3, DoFObjectAccessor<2,DoFHandler<3> > >
-DoFCellAccessor<DoFHandler<3> >::face (const unsigned int i) const
-{
-  return this->quad(i);
-}
-
-
-
-template <>
-void
-DoFCellAccessor<DoFHandler<3> >::update_cell_dof_indices_cache () const
-{
-  Assert (static_cast<unsigned int>(this->present_level) < this->dof_handler->levels.size(),
-          ExcMessage ("DoFHandler not initialized"));
-
-  Assert (this->dof_handler != 0, BaseClass::ExcInvalidObject());
-  Assert (&this->get_fe() != 0, BaseClass::ExcInvalidObject());
-
-				   // check as in documentation that
-				   // cell is either active, or dofs
-				   // are only in vertices. otherwise
-				   // simply don't update the cache at
-				   // all. the get_dof_indices
-				   // function will then make sure we
-				   // don't access the invalid data
-  if (this->has_children()
-      &&
-      (this->get_fe().dofs_per_cell !=
-       this->get_fe().dofs_per_vertex * GeometryInfo<3>::vertices_per_cell))
-    return;
-  
-  const unsigned int dofs_per_vertex = this->get_fe().dofs_per_vertex,
-		     dofs_per_line   = this->get_fe().dofs_per_line,
-		     dofs_per_quad   = this->get_fe().dofs_per_quad,
-		     dofs_per_hex    = this->get_fe().dofs_per_hex,
-		     dofs_per_cell   = this->get_fe().dofs_per_cell;
-
-				   // make sure the cache is at least
-				   // as big as we need it when
-				   // writing to the last element of
-				   // this cell
-  Assert (this->present_index * dofs_per_cell + dofs_per_cell
-	  <=
-	  this->dof_handler->levels[this->present_level]
-	  ->cell_dof_indices_cache.size(),
-	  ExcInternalError());
-
-  std::vector<unsigned int>::iterator next
-    = (this->dof_handler->levels[this->present_level]
-       ->cell_dof_indices_cache.begin() + this->present_index * dofs_per_cell);
-
-  for (unsigned int vertex=0; vertex<8; ++vertex)
-    for (unsigned int d=0; d<dofs_per_vertex; ++d)
-      *next++ = vertex_dof_index(vertex,d);
-				   // now copy dof numbers from the line. for
-				   // lines with the wrong orientation, we have
-				   // already made sure that we're ok by picking
-				   // the correct vertices (this happens
-				   // automatically in the vertex()
-				   // function). however, if the line is in
-				   // wrong orientation, we look at it in
-				   // flipped orientation and we will have to
-				   // adjust the shape function indices that we
-				   // see to correspond to the correct
-				   // (cell-local) ordering.
-  for (unsigned int line=0; line<12; ++line)
-    for (unsigned int d=0; d<dofs_per_line; ++d)
-      *next++ = this->line(line)->dof_index(this->dof_handler->get_fe().
-					    adjust_line_dof_index_for_line_orientation(d,
-										       this->line_orientation(line)));
-				   // now copy dof numbers from the face. for
-				   // faces with the wrong orientation, we
-				   // have already made sure that we're ok by
-				   // picking the correct lines and vertices
-				   // (this happens automatically in the
-				   // line() and vertex() functions). however,
-				   // if the face is in wrong orientation, we
-				   // look at it in flipped orientation and we
-				   // will have to adjust the shape function
-				   // indices that we see to correspond to the
-				   // correct (cell-local) ordering. The same
-				   // applies, if the face_rotation or
-				   // face_orientation is non-standard
-  for (unsigned int quad=0; quad<6; ++quad)
-    for (unsigned int d=0; d<dofs_per_quad; ++d)
-      *next++ = this->quad(quad)->dof_index(this->dof_handler->get_fe().
-					    adjust_quad_dof_index_for_face_orientation(d,
-										       this->face_orientation(quad),
-										       this->face_flip(quad),
-										       this->face_rotation(quad)));
-  for (unsigned int d=0; d<dofs_per_hex; ++d)
-    *next++ = dof_index(d);
-}
-
-
-template <>
-void
-DoFCellAccessor<hp::DoFHandler<3> >::update_cell_dof_indices_cache () const
-{
-//TODO[WB]: should implement a dof indices cache for hp as well
-  
-				   // not implemented, but should also
-				   // not be called
-  Assert (false, ExcNotImplemented());
-}
-
-
-#endif
 
 
 template <class DH>
-TriaIterator<DH::dimension,DoFCellAccessor<DH> >
+void
+DoFCellAccessor<DH>::update_cell_dof_indices_cache () const
+{
+  Assert (static_cast<unsigned int>(this->present_level) < this->dof_handler->levels.size(),
+          ExcMessage ("DoFHandler not initialized"));
+  
+  Assert (this->dof_handler != 0, typename BaseClass::ExcInvalidObject());
+  Assert (&this->get_fe() != 0, typename BaseClass::ExcInvalidObject());
+
+  Implementation::update_cell_dof_indices_cache (*this);
+}
+
+
+
+template <class DH>
+typename internal::DoFHandler::Iterators<DH>::cell_iterator
 DoFCellAccessor<DH>::neighbor_child_on_subface (const unsigned int face,
 						const unsigned int subface) const
 {
-  const TriaIterator<dim,CellAccessor<dim> > q
-    = CellAccessor<dim>::neighbor_child_on_subface (face, subface);
-  return TriaIterator<dim,DoFCellAccessor<DH> > (this->tria,
-						 q->level (),
-						 q->index (),
-						 this->dof_handler);
+  const TriaIterator<CellAccessor<dim,spacedim> > q
+    = CellAccessor<dim,spacedim>::neighbor_child_on_subface (face, subface);
+  return
+    typename internal::DoFHandler::Iterators<DH>::cell_iterator (this->tria,
+								 q->level (),
+								 q->index (),
+								 this->dof_handler);
 }
 
 
@@ -368,7 +116,7 @@ DoFCellAccessor<DH>::
 get_interpolated_dof_values (const InputVector &values,
 			     Vector<number>    &interpolated_values) const
 {
-  const FiniteElement<dim> &fe            = this->get_fe();
+  const FiniteElement<dim,spacedim> &fe            = this->get_fe();
   const unsigned int        dofs_per_cell = fe.dofs_per_cell;
   
   Assert (this->dof_handler != 0,
@@ -524,19 +272,15 @@ set_dof_values_by_interpolation (const Vector<number> &local_values,
 
 #if deal_II_dimension == 1
 template class DoFAccessor<1, DoFHandler<1> >;
-template class DoFObjectAccessor<1, DoFHandler<1> >;
 #endif
 
 #if deal_II_dimension == 2
 template class DoFAccessor<1, DoFHandler<2> >;
 template class DoFAccessor<2, DoFHandler<2> >;
 
-template class DoFObjectAccessor<1, DoFHandler<2> >;
-template class DoFObjectAccessor<2, DoFHandler<2> >;
-
-template class TriaRawIterator   <2,DoFObjectAccessor<1, DoFHandler<2> > >;
-template class TriaIterator      <2,DoFObjectAccessor<1, DoFHandler<2> > >;
-template class TriaActiveIterator<2,DoFObjectAccessor<1, DoFHandler<2> > >;
+template class TriaRawIterator   <DoFAccessor<1, DoFHandler<2> > >;
+template class TriaIterator      <DoFAccessor<1, DoFHandler<2> > >;
+template class TriaActiveIterator<DoFAccessor<1, DoFHandler<2> > >;
 #endif
 
 #if deal_II_dimension == 3
@@ -544,24 +288,20 @@ template class DoFAccessor<1, DoFHandler<3> >;
 template class DoFAccessor<2, DoFHandler<3> >;
 template class DoFAccessor<3, DoFHandler<3> >;
 
-template class DoFObjectAccessor<1, DoFHandler<3> >;
-template class DoFObjectAccessor<2, DoFHandler<3> >;
-template class DoFObjectAccessor<3, DoFHandler<3> >;
-
-template class TriaRawIterator   <3,DoFObjectAccessor<1, DoFHandler<3> > >;
-template class TriaIterator      <3,DoFObjectAccessor<1, DoFHandler<3> > >;
-template class TriaActiveIterator<3,DoFObjectAccessor<1, DoFHandler<3> > >;
-template class TriaRawIterator   <3,DoFObjectAccessor<2, DoFHandler<3> > >;
-template class TriaIterator      <3,DoFObjectAccessor<2, DoFHandler<3> > >;
-template class TriaActiveIterator<3,DoFObjectAccessor<2, DoFHandler<3> > >;
+template class TriaRawIterator   <DoFAccessor<1, DoFHandler<3> > >;
+template class TriaIterator      <DoFAccessor<1, DoFHandler<3> > >;
+template class TriaActiveIterator<DoFAccessor<1, DoFHandler<3> > >;
+template class TriaRawIterator   <DoFAccessor<2, DoFHandler<3> > >;
+template class TriaIterator      <DoFAccessor<2, DoFHandler<3> > >;
+template class TriaActiveIterator<DoFAccessor<2, DoFHandler<3> > >;
 #endif
 
 
 template class DoFCellAccessor<DoFHandler<deal_II_dimension> >;
 
-template class TriaRawIterator   <deal_II_dimension,DoFCellAccessor<DoFHandler<deal_II_dimension> > >;
-template class TriaIterator      <deal_II_dimension,DoFCellAccessor<DoFHandler<deal_II_dimension> > >;
-template class TriaActiveIterator<deal_II_dimension,DoFCellAccessor<DoFHandler<deal_II_dimension> > >;
+template class TriaRawIterator   <DoFCellAccessor<DoFHandler<deal_II_dimension> > >;
+template class TriaIterator      <DoFCellAccessor<DoFHandler<deal_II_dimension> > >;
+template class TriaActiveIterator<DoFCellAccessor<DoFHandler<deal_II_dimension> > >;
 
 
 // --------------------------------------------------------------------------
@@ -569,19 +309,15 @@ template class TriaActiveIterator<deal_II_dimension,DoFCellAccessor<DoFHandler<d
 
 #if deal_II_dimension == 1
 template class DoFAccessor<1, hp::DoFHandler<1> >;
-template class DoFObjectAccessor<1, hp::DoFHandler<1> >;
 #endif
 
 #if deal_II_dimension == 2
 template class DoFAccessor<1, hp::DoFHandler<2> >;
 template class DoFAccessor<2, hp::DoFHandler<2> >;
 
-template class DoFObjectAccessor<1, hp::DoFHandler<2> >;
-template class DoFObjectAccessor<2, hp::DoFHandler<2> >;
-
-template class TriaRawIterator   <2,DoFObjectAccessor<1, hp::DoFHandler<2> > >;
-template class TriaIterator      <2,DoFObjectAccessor<1, hp::DoFHandler<2> > >;
-template class TriaActiveIterator<2,DoFObjectAccessor<1, hp::DoFHandler<2> > >;
+template class TriaRawIterator   <DoFAccessor<1, hp::DoFHandler<2> > >;
+template class TriaIterator      <DoFAccessor<1, hp::DoFHandler<2> > >;
+template class TriaActiveIterator<DoFAccessor<1, hp::DoFHandler<2> > >;
 #endif
 
 
@@ -590,24 +326,77 @@ template class DoFAccessor<1, hp::DoFHandler<3> >;
 template class DoFAccessor<2, hp::DoFHandler<3> >;
 template class DoFAccessor<3, hp::DoFHandler<3> >;
 
-template class DoFObjectAccessor<1, hp::DoFHandler<3> >;
-template class DoFObjectAccessor<2, hp::DoFHandler<3> >;
-template class DoFObjectAccessor<3, hp::DoFHandler<3> >;
-
-template class TriaRawIterator   <3,DoFObjectAccessor<1, hp::DoFHandler<3> > >;
-template class TriaIterator      <3,DoFObjectAccessor<1, hp::DoFHandler<3> > >;
-template class TriaActiveIterator<3,DoFObjectAccessor<1, hp::DoFHandler<3> > >;
-template class TriaRawIterator   <3,DoFObjectAccessor<2, hp::DoFHandler<3> > >;
-template class TriaIterator      <3,DoFObjectAccessor<2, hp::DoFHandler<3> > >;
-template class TriaActiveIterator<3,DoFObjectAccessor<2, hp::DoFHandler<3> > >;
+template class TriaRawIterator   <DoFAccessor<1, hp::DoFHandler<3> > >;
+template class TriaIterator      <DoFAccessor<1, hp::DoFHandler<3> > >;
+template class TriaActiveIterator<DoFAccessor<1, hp::DoFHandler<3> > >;
+template class TriaRawIterator   <DoFAccessor<2, hp::DoFHandler<3> > >;
+template class TriaIterator      <DoFAccessor<2, hp::DoFHandler<3> > >;
+template class TriaActiveIterator<DoFAccessor<2, hp::DoFHandler<3> > >;
 #endif
 
 
 template class DoFCellAccessor<hp::DoFHandler<deal_II_dimension> >;
 
-template class TriaRawIterator   <deal_II_dimension,DoFCellAccessor<hp::DoFHandler<deal_II_dimension> > >;
-template class TriaIterator      <deal_II_dimension,DoFCellAccessor<hp::DoFHandler<deal_II_dimension> > >;
-template class TriaActiveIterator<deal_II_dimension,DoFCellAccessor<hp::DoFHandler<deal_II_dimension> > >;
+template class TriaRawIterator   <DoFCellAccessor<hp::DoFHandler<deal_II_dimension> > >;
+template class TriaIterator      <DoFCellAccessor<hp::DoFHandler<deal_II_dimension> > >;
+template class TriaActiveIterator<DoFCellAccessor<hp::DoFHandler<deal_II_dimension> > >;
+
+
+
+// // --------------------------------------------------------------------------
+// // explicit instantiations (for DoFHandler)
+
+#if deal_II_dimension == 1
+template class DoFAccessor<1, DoFHandler<1,2> >;
+#endif
+
+#if deal_II_dimension == 2
+template class DoFAccessor<1, DoFHandler<2,3> >;
+template class DoFAccessor<2, DoFHandler<2,3> >;
+
+template class TriaRawIterator   <DoFAccessor<1, DoFHandler<2,3> > >;
+template class TriaIterator      <DoFAccessor<1, DoFHandler<2,3> > >;
+template class TriaActiveIterator<DoFAccessor<1, DoFHandler<2,3> > >;
+#endif
+
+
+#if deal_II_dimension != 3
+template class DoFCellAccessor<DoFHandler<deal_II_dimension,deal_II_dimension+1> >;
+
+template class 
+TriaRawIterator   <DoFCellAccessor<DoFHandler<deal_II_dimension,deal_II_dimension+1> > >;
+template class 
+TriaIterator      <DoFCellAccessor<DoFHandler<deal_II_dimension,deal_II_dimension+1> > >;
+template class 
+TriaActiveIterator<DoFCellAccessor<DoFHandler<deal_II_dimension,deal_II_dimension+1> > >;
+#endif
+
+// --------------------------------------------------------------------------
+// explicit instantiations (for hp::DoFHandler)
+
+#if deal_II_dimension == 1
+template class DoFAccessor<1, hp::DoFHandler<1,2> >;
+#endif
+
+#if deal_II_dimension == 2
+template class DoFAccessor<1, hp::DoFHandler<2,3> >;
+template class DoFAccessor<2, hp::DoFHandler<2,3> >;
+
+template class TriaRawIterator   <DoFAccessor<1, hp::DoFHandler<2,3> > >;
+template class TriaIterator      <DoFAccessor<1, hp::DoFHandler<2,3> > >;
+template class TriaActiveIterator<DoFAccessor<1, hp::DoFHandler<2,3> > >;
+#endif
+
+#if deal_II_dimension != 3
+template class DoFCellAccessor<hp::DoFHandler<deal_II_dimension,deal_II_dimension+1> >;
+
+template class 
+TriaRawIterator   <DoFCellAccessor<hp::DoFHandler<deal_II_dimension,deal_II_dimension+1> > >;
+template class 
+TriaIterator      <DoFCellAccessor<hp::DoFHandler<deal_II_dimension,deal_II_dimension+1> > >;
+template class 
+TriaActiveIterator<DoFCellAccessor<hp::DoFHandler<deal_II_dimension,deal_II_dimension+1> > >;
+#endif
 
 
 #include "dof_accessor.inst"

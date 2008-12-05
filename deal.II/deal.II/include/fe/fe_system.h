@@ -73,12 +73,15 @@ DEAL_II_NAMESPACE_OPEN
  * multiplicity. The number of blocks of the system is simply the sum
  * of all multiplicities.
  *
+ * For more information on the template parameter <tt>spacedim</tt>
+ * see the documentation of Triangulation.
+ *
  * @ingroup febase fe vector_valued
  * 
  * @author Wolfgang Bangerth, Guido Kanschat, 1999, 2002, 2003, 2006, Ralf Hartmann 2001.
  */
-template <int dim>
-class FESystem : public FiniteElement<dim>
+template <int dim, int spacedim=dim>
+class FESystem : public FiniteElement<dim,spacedim>
 {
   public:
 
@@ -102,7 +105,7 @@ class FESystem : public FiniteElement<dim>
 				      * class needs to be of the same dimension
 				      * as is this object.
 				      */
-    FESystem (const FiniteElement<dim> &fe,
+    FESystem (const FiniteElement<dim,spacedim> &fe,
 	      const unsigned int n_elements);
 
 				     /** 
@@ -112,8 +115,8 @@ class FESystem : public FiniteElement<dim>
 				      *
 				      * See the other constructor.
 				      */
-    FESystem (const FiniteElement<dim> &fe1, const unsigned int n1,
-	      const FiniteElement<dim> &fe2, const unsigned int n2);
+    FESystem (const FiniteElement<dim,spacedim> &fe1, const unsigned int n1,
+	      const FiniteElement<dim,spacedim> &fe2, const unsigned int n2);
 
 				     /** 
 				      * Constructor for mixed
@@ -122,9 +125,9 @@ class FESystem : public FiniteElement<dim>
 				      *
 				      * See the other constructor.
 				      */
-    FESystem (const FiniteElement<dim> &fe1, const unsigned int n1,
-	      const FiniteElement<dim> &fe2, const unsigned int n2,
-	      const FiniteElement<dim> &fe3, const unsigned int n3);
+    FESystem (const FiniteElement<dim,spacedim> &fe1, const unsigned int n1,
+	      const FiniteElement<dim,spacedim> &fe2, const unsigned int n2,
+	      const FiniteElement<dim,spacedim> &fe3, const unsigned int n3);
 
 				     /**
 				      * Destructor.
@@ -324,11 +327,11 @@ class FESystem : public FiniteElement<dim>
 				      * @p get_interpolation_matrix
 				      * functions. Otherwise, an
 				      * exception of type
-				      * FiniteElement<dim>::ExcInterpolationNotImplemented
+				      * FiniteElement<dim,spacedim>::ExcInterpolationNotImplemented
 				      * is thrown.
 				      */
     virtual void
-    get_interpolation_matrix (const FiniteElement<dim> &source,
+    get_interpolation_matrix (const FiniteElement<dim,spacedim> &source,
 			      FullMatrix<double>           &matrix) const;
 
                                      /** 
@@ -362,7 +365,7 @@ class FESystem : public FiniteElement<dim>
 				      * multiplicities are greater
 				      * than one.
 				      */
-    virtual const FiniteElement<dim> &
+    virtual const FiniteElement<dim,spacedim> &
     base_element (const unsigned int index) const;
     
 				     /**
@@ -436,12 +439,12 @@ class FESystem : public FiniteElement<dim>
 				      * interpolation from a given element,
 				      * then they must throw an exception of
 				      * type
-				      * FiniteElement<dim>::ExcInterpolationNotImplemented,
+				      * FiniteElement<dim,spacedim>::ExcInterpolationNotImplemented,
 				      * which will get propagated out from
 				      * this element.
 				      */
     virtual void
-    get_face_interpolation_matrix (const FiniteElement<dim> &source,
+    get_face_interpolation_matrix (const FiniteElement<dim,spacedim> &source,
 				   FullMatrix<double>       &matrix) const;
     
 
@@ -463,12 +466,12 @@ class FESystem : public FiniteElement<dim>
 				      * interpolation from a given element,
 				      * then they must throw an exception of
 				      * type
-				      * FiniteElement<dim>::ExcInterpolationNotImplemented,
+				      * FiniteElement<dim,spacedim>::ExcInterpolationNotImplemented,
 				      * which will get propagated out from
 				      * this element.
 				      */
     virtual void
-    get_subface_interpolation_matrix (const FiniteElement<dim> &source,
+    get_subface_interpolation_matrix (const FiniteElement<dim,spacedim> &source,
 				      const unsigned int        subface,
 				      FullMatrix<double>       &matrix) const;
 
@@ -508,7 +511,7 @@ class FESystem : public FiniteElement<dim>
 				      */
     virtual
     std::vector<std::pair<unsigned int, unsigned int> >
-    hp_vertex_dof_identities (const FiniteElement<dim> &fe_other) const;
+    hp_vertex_dof_identities (const FiniteElement<dim,spacedim> &fe_other) const;
 
 				     /**
 				      * Same as
@@ -519,7 +522,7 @@ class FESystem : public FiniteElement<dim>
 				      */
     virtual
     std::vector<std::pair<unsigned int, unsigned int> >
-    hp_line_dof_identities (const FiniteElement<dim> &fe_other) const;
+    hp_line_dof_identities (const FiniteElement<dim,spacedim> &fe_other) const;
 
 				     /**
 				      * Same as
@@ -530,7 +533,7 @@ class FESystem : public FiniteElement<dim>
 				      */
     virtual
     std::vector<std::pair<unsigned int, unsigned int> >
-    hp_quad_dof_identities (const FiniteElement<dim> &fe_other) const;
+    hp_quad_dof_identities (const FiniteElement<dim,spacedim> &fe_other) const;
     
 				     /**
 				      * Return whether this element dominates
@@ -546,7 +549,7 @@ class FESystem : public FiniteElement<dim>
 				      */
     virtual
     FiniteElementDomination::Domination
-    compare_for_face_domination (const FiniteElement<dim> &fe_other) const;
+    compare_for_face_domination (const FiniteElement<dim,spacedim> &fe_other) const;
 				     //@}
     
 				     /**
@@ -582,16 +585,16 @@ class FESystem : public FiniteElement<dim>
 				      * This function is needed by the
 				      * constructors of @p FESystem.
 				      */
-    virtual FiniteElement<dim> * clone() const;
+    virtual FiniteElement<dim,spacedim> * clone() const;
   
 				     /**
 				      * Prepare internal data
 				      * structures and fill in values
 				      * independent of the cell.
 				      */
-    virtual typename Mapping<dim>::InternalDataBase*
+    virtual typename Mapping<dim,spacedim>::InternalDataBase*
     get_data (const UpdateFlags      update_flags,
-	      const Mapping<dim>    &mapping,
+	      const Mapping<dim,spacedim>    &mapping,
 	      const Quadrature<dim> &quadrature) const ;
 
 				     /**
@@ -606,12 +609,12 @@ class FESystem : public FiniteElement<dim>
 				      * functions.
 				      */
     virtual void
-    fill_fe_values (const Mapping<dim>                      &mapping,
-		    const typename Triangulation<dim>::cell_iterator &cell,
+    fill_fe_values (const Mapping<dim,spacedim>                      &mapping,
+		    const typename Triangulation<dim,spacedim>::cell_iterator &cell,
 		    const Quadrature<dim>                   &quadrature,
-		    typename Mapping<dim>::InternalDataBase &mapping_data,
-		    typename Mapping<dim>::InternalDataBase &fe_data,
-		    FEValuesData<dim>                       &data) const;
+		    typename Mapping<dim,spacedim>::InternalDataBase &mapping_data,
+		    typename Mapping<dim,spacedim>::InternalDataBase &fe_data,
+		    FEValuesData<dim,spacedim>                       &data) const;
 
 				     /**
 				      * Implementation of the same
@@ -624,13 +627,13 @@ class FESystem : public FiniteElement<dim>
 				      * <tt>fill_fe*_values</tt> functions.
 				      */    
     virtual void
-    fill_fe_face_values (const Mapping<dim>                   &mapping,
-			 const typename Triangulation<dim>::cell_iterator &cell,
+    fill_fe_face_values (const Mapping<dim,spacedim>                   &mapping,
+			 const typename Triangulation<dim,spacedim>::cell_iterator &cell,
 			 const unsigned int                    face_no,
 			 const Quadrature<dim-1>              &quadrature,
-			 typename Mapping<dim>::InternalDataBase      &mapping_data,
-			 typename Mapping<dim>::InternalDataBase      &fe_data,
-			 FEValuesData<dim>                    &data) const ;
+			 typename Mapping<dim,spacedim>::InternalDataBase      &mapping_data,
+			 typename Mapping<dim,spacedim>::InternalDataBase      &fe_data,
+			 FEValuesData<dim,spacedim>                    &data) const ;
 
     				     /**
 				      * Implementation of the same
@@ -643,14 +646,14 @@ class FESystem : public FiniteElement<dim>
 				      * <tt>fill_fe*_values</tt> functions.
 				      */
     virtual void
-    fill_fe_subface_values (const Mapping<dim>                   &mapping,
-			    const typename Triangulation<dim>::cell_iterator &cell,
+    fill_fe_subface_values (const Mapping<dim,spacedim>                   &mapping,
+			    const typename Triangulation<dim,spacedim>::cell_iterator &cell,
 			    const unsigned int                    face_no,
 			    const unsigned int                    sub_no,
 			    const Quadrature<dim-1>              &quadrature,
-			    typename Mapping<dim>::InternalDataBase      &mapping_data,
-			    typename Mapping<dim>::InternalDataBase      &fe_data,
-			    FEValuesData<dim>                    &data) const ;
+			    typename Mapping<dim,spacedim>::InternalDataBase      &mapping_data,
+			    typename Mapping<dim,spacedim>::InternalDataBase      &fe_data,
+			    FEValuesData<dim,spacedim>                    &data) const ;
     
 
 				     /**
@@ -676,14 +679,14 @@ class FESystem : public FiniteElement<dim>
 				      * <tt>sub_no!=invalid_face_no</tt>.
 				      */
     template <int dim_1>
-    void compute_fill (const Mapping<dim>                   &mapping,
-		       const typename Triangulation<dim>::cell_iterator &cell,
+    void compute_fill (const Mapping<dim,spacedim>                   &mapping,
+		       const typename Triangulation<dim,spacedim>::cell_iterator &cell,
 		       const unsigned int                    face_no,
 		       const unsigned int                    sub_no,
 		       const Quadrature<dim_1>              &quadrature,
-		       typename Mapping<dim>::InternalDataBase &mapping_data,
-		       typename Mapping<dim>::InternalDataBase &fe_data,
-		       FEValuesData<dim>                    &data) const ;
+		       typename Mapping<dim,spacedim>::InternalDataBase &mapping_data,
+		       typename Mapping<dim,spacedim>::InternalDataBase &fe_data,
+		       FEValuesData<dim,spacedim>                    &data) const ;
 
   private:
 
@@ -698,7 +701,7 @@ class FESystem : public FiniteElement<dim>
 				      * Pairs of multiplicity and
 				      * element type.
 				      */
-    typedef std::pair<const FiniteElement<dim> *, unsigned int> ElementPair;
+    typedef std::pair<const FiniteElement<dim,spacedim> *, unsigned int> ElementPair;
     
 				     /**
 				      * Pointer to underlying finite
@@ -791,7 +794,7 @@ class FESystem : public FiniteElement<dim>
 				      * of the sub-element @p fe.
 				      */
     static std::vector<bool>
-    compute_restriction_is_additive_flags (const FiniteElement<dim> &fe,
+    compute_restriction_is_additive_flags (const FiniteElement<dim,spacedim> &fe,
 					   const unsigned int        N);
     
 				     /**
@@ -799,9 +802,9 @@ class FESystem : public FiniteElement<dim>
 				      * with two different sub-elements.
 				      */
     static std::vector<bool>
-    compute_restriction_is_additive_flags (const FiniteElement<dim> &fe1,
+    compute_restriction_is_additive_flags (const FiniteElement<dim,spacedim> &fe1,
 					   const unsigned int        N1,
-					   const FiniteElement<dim> &fe2,
+					   const FiniteElement<dim,spacedim> &fe2,
 					   const unsigned int        N2);
 
 				     /**
@@ -809,11 +812,11 @@ class FESystem : public FiniteElement<dim>
 				      * with three different sub-elements.
 				      */
     static std::vector<bool>
-    compute_restriction_is_additive_flags (const FiniteElement<dim> &fe1,
+    compute_restriction_is_additive_flags (const FiniteElement<dim,spacedim> &fe1,
 					   const unsigned int        N1,
-					   const FiniteElement<dim> &fe2,
+					   const FiniteElement<dim,spacedim> &fe2,
 					   const unsigned int        N2,
-					   const FiniteElement<dim> &fe3,
+					   const FiniteElement<dim,spacedim> &fe3,
 					   const unsigned int        N3);
 
 				     /**
@@ -825,7 +828,7 @@ class FESystem : public FiniteElement<dim>
 				      * functions.
 				     */
     static std::vector<bool>
-    compute_restriction_is_additive_flags (const std::vector<const FiniteElement<dim>*> &fes,
+    compute_restriction_is_additive_flags (const std::vector<const FiniteElement<dim,spacedim>*> &fes,
                                            const std::vector<unsigned int>              &multiplicities);
     
     
@@ -835,7 +838,7 @@ class FESystem : public FiniteElement<dim>
 				      * finite element.
 				      */
     static std::vector<std::vector<bool> >
-    compute_nonzero_components (const FiniteElement<dim> &fe1,
+    compute_nonzero_components (const FiniteElement<dim,spacedim> &fe1,
 				const unsigned int        N1);
 
 				     /**
@@ -844,9 +847,9 @@ class FESystem : public FiniteElement<dim>
 				      * finite element.
 				      */
     static std::vector<std::vector<bool> >
-    compute_nonzero_components (const FiniteElement<dim> &fe1,
+    compute_nonzero_components (const FiniteElement<dim,spacedim> &fe1,
 				const unsigned int        N1,
-				const FiniteElement<dim> &fe2,
+				const FiniteElement<dim,spacedim> &fe2,
 				const unsigned int        N2);
 
 				     /**
@@ -855,11 +858,11 @@ class FESystem : public FiniteElement<dim>
 				      * finite element.
 				      */
     static std::vector<std::vector<bool> >
-    compute_nonzero_components (const FiniteElement<dim> &fe1,
+    compute_nonzero_components (const FiniteElement<dim,spacedim> &fe1,
 				const unsigned int        N1,
-				const FiniteElement<dim> &fe2,
+				const FiniteElement<dim,spacedim> &fe2,
 				const unsigned int        N2,
-				const FiniteElement<dim> &fe3,
+				const FiniteElement<dim,spacedim> &fe3,
 				const unsigned int        N3);
 
 				     /**
@@ -871,7 +874,7 @@ class FESystem : public FiniteElement<dim>
 				      * the above functions.
 				     */
     static std::vector<std::vector<bool> >
-    compute_nonzero_components (const std::vector<const FiniteElement<dim>*> &fes,
+    compute_nonzero_components (const std::vector<const FiniteElement<dim,spacedim>*> &fes,
 				const std::vector<unsigned int>              &multiplicities);
     
 				     /**
@@ -910,7 +913,7 @@ class FESystem : public FiniteElement<dim>
 				      */
     template <int structdim>
     std::vector<std::pair<unsigned int, unsigned int> >
-    hp_object_dof_identities (const FiniteElement<dim> &fe_other) const;
+    hp_object_dof_identities (const FiniteElement<dim,spacedim> &fe_other) const;
     
 				     /**
 				      * Usually: Fields of
@@ -922,7 +925,7 @@ class FESystem : public FiniteElement<dim>
 				      * @p InternalData objects for
 				      * each of the base elements.
 				      */
-    class InternalData : public FiniteElement<dim>::InternalDataBase
+    class InternalData : public FiniteElement<dim,spacedim>::InternalDataBase
     {
       public:
 					 /**
@@ -959,7 +962,7 @@ class FESystem : public FiniteElement<dim>
 					  * element.
 					  */
 	void set_fe_data(const unsigned int                        base_no,
-			 typename FiniteElement<dim>::InternalDataBase *);
+			 typename FiniteElement<dim,spacedim>::InternalDataBase *);
 
 					 /**
 					  * Gives read-access to the
@@ -967,7 +970,7 @@ class FESystem : public FiniteElement<dim>
 					  * @p InternalData of the
 					  * @p base_noth base element.
 					  */	
-	typename FiniteElement<dim>::InternalDataBase &
+	typename FiniteElement<dim,spacedim>::InternalDataBase &
 	get_fe_data (const unsigned int base_no) const;
 
 
@@ -979,7 +982,7 @@ class FESystem : public FiniteElement<dim>
 					  * element.
 					  */
 	void set_fe_values_data (const unsigned int base_no,
-				 FEValuesData<dim> *);
+				 FEValuesData<dim,spacedim> *);
 
 					 /**
 					  * Gives read-access to the
@@ -987,7 +990,7 @@ class FESystem : public FiniteElement<dim>
 					  * @p FEValuesData for the
 					  * @p base_noth base element.
 					  */	
-	FEValuesData<dim> & get_fe_values_data (const unsigned int base_no) const;
+	FEValuesData<dim,spacedim> & get_fe_values_data (const unsigned int base_no) const;
 
 					 /**
 					  * Deletes the
@@ -1051,7 +1054,7 @@ class FESystem : public FiniteElement<dim>
 					  * elements, irrespective of
 					  * their multiplicity.
 					  */
-	typename std::vector<typename FiniteElement<dim>::InternalDataBase *> base_fe_datas;
+	typename std::vector<typename FiniteElement<dim,spacedim>::InternalDataBase *> base_fe_datas;
 
 					 /**
 					  * Pointers to the
@@ -1070,7 +1073,7 @@ class FESystem : public FiniteElement<dim>
 					  * by the InternalData
 					  * constructor.
 					  */
-	std::vector<FEValuesData<dim> *> base_fe_values_datas;
+	std::vector<FEValuesData<dim,spacedim> *> base_fe_values_datas;
     };
 };
 

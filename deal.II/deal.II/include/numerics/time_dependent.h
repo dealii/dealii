@@ -30,7 +30,7 @@ DEAL_II_NAMESPACE_OPEN
 // forward declarations
 class TimeStepBase;
 template <typename number> class Vector;
-template <int dim> class Triangulation;
+template <int dim, int spacedim> class Triangulation;
 
 /**
  * This class provides an abstract interface to time dependent problems in that
@@ -1628,7 +1628,7 @@ class TimeStepBase_Tria : public TimeStepBase
 				      * function of this class.
 				      */
     TimeStepBase_Tria (const double              time,
-		       const Triangulation<dim> &coarse_grid,
+		       const Triangulation<dim, dim> &coarse_grid,
 		       const Flags              &flags,
 		       const RefinementFlags    &refinement_flags = RefinementFlags());
 
@@ -1795,7 +1795,7 @@ class TimeStepBase_Tria : public TimeStepBase
 				      * such a behaviour is specified
 				      * in the @p flags structure.
 				      */
-    SmartPointer<Triangulation<dim> > tria;
+    SmartPointer<Triangulation<dim, dim> > tria;
 
 				     /**
 				      * Pointer to a grid which is to
@@ -1806,7 +1806,7 @@ class TimeStepBase_Tria : public TimeStepBase
 				      * with the owner of this
 				      * management object.
 				      */
-    SmartPointer<const Triangulation<dim> > coarse_grid;
+    SmartPointer<const Triangulation<dim, dim> > coarse_grid;
     
 				     /**
 				      * Some flags about how this time level

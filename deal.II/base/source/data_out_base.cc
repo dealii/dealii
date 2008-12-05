@@ -2186,7 +2186,7 @@ void DataOutBase::write_gnuplot (const std::vector<Patch<dim,spacedim> > &patche
     {
       const unsigned int n_subdivisions = patch->n_subdivisions;
       const unsigned int n = n_subdivisions+1;
-				       // Length of loops in all dimensons
+				       // Length of loops in all dimensions
       const unsigned int n1 = (dim>0) ? n : 1;
       const unsigned int n2 = (dim>1) ? n : 1;
       const unsigned int n3 = (dim>2) ? n : 1;

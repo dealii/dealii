@@ -32,87 +32,94 @@ DEAL_II_NAMESPACE_OPEN
  * along the coordinate directions. It is specifically developed for
  * cartesian meshes. Apply this mapping to a general mesh to get
  * strange results.
+ * 
+ * For more information about the <tt>spacedim</tt> template parameter
+ * check the documentation of FiniteElement or the one of
+ * Triangulation.
  *
  * @author Guido Kanschat, 2001; Ralf Hartmann, 2005
  */
-template <int dim>
-class MappingCartesian : public Mapping<dim>
+template <int dim, int spacedim=dim>
+class MappingCartesian : public Mapping<dim,spacedim>
 {
   public:
     virtual
-    typename Mapping<dim>::InternalDataBase *
+    typename Mapping<dim, spacedim>::InternalDataBase *
     get_data (const UpdateFlags,
 	      const Quadrature<dim>& quadrature) const;
 
     virtual
-    typename Mapping<dim>::InternalDataBase *
+    typename Mapping<dim, spacedim>::InternalDataBase *
     get_face_data (const UpdateFlags flags,
 		   const Quadrature<dim-1>& quadrature) const;
 
     virtual
-    typename Mapping<dim>::InternalDataBase *
+    typename Mapping<dim, spacedim>::InternalDataBase *
     get_subface_data (const UpdateFlags flags,
 		      const Quadrature<dim-1>& quadrature) const;
 
     virtual void
-    fill_fe_values (const typename Triangulation<dim>::cell_iterator &cell,
+    fill_fe_values (const typename Triangulation<dim,spacedim>::cell_iterator &cell,
 		    const Quadrature<dim>& quadrature,
-		    typename Mapping<dim>::InternalDataBase &mapping_data,
-		    std::vector<Point<dim> >        &quadrature_points,
-		    std::vector<double>             &JxW_values,
-		    std::vector<Tensor<2,dim> >     &jacobians,
-		    std::vector<Tensor<3,dim> >     &jacobian_grads,
-		    std::vector<Tensor<2,dim> >     &inverse_jacobians) const ;
+		    typename Mapping<dim, spacedim>::InternalDataBase &mapping_data,
+		    std::vector<Point<spacedim> >                     &quadrature_points,
+		    std::vector<double>                               &JxW_values,
+		    std::vector<Tensor<2,spacedim> >                  &jacobians,
+		    std::vector<Tensor<3,spacedim> >                  &jacobian_grads,
+		    std::vector<Tensor<2,spacedim> >                  &inverse_jacobians,
+	 	    std::vector<Point<spacedim> >   &) const ;
+
 
     virtual void
-    fill_fe_face_values (const typename Triangulation<dim>::cell_iterator &cell,
+    fill_fe_face_values (const typename Triangulation<dim,spacedim>::cell_iterator &cell,
 			 const unsigned int face_no,
 			 const Quadrature<dim-1>& quadrature,
-			 typename Mapping<dim>::InternalDataBase &mapping_data,
+			 typename Mapping<dim, spacedim>::InternalDataBase &mapping_data,
 			 std::vector<Point<dim> >        &quadrature_points,
 			 std::vector<double>             &JxW_values,
 			 std::vector<Tensor<1,dim> >        &boundary_form,
 			 std::vector<Point<dim> >        &normal_vectors,
 			 std::vector<double>             &cell_JxW_values) const ;
     virtual void
-    fill_fe_subface_values (const typename Triangulation<dim>::cell_iterator &cell,
+    fill_fe_subface_values (const typename Triangulation<dim,spacedim>::cell_iterator &cell,
 			    const unsigned int face_no,
 			    const unsigned int sub_no,
 			    const Quadrature<dim-1>& quadrature,
-			    typename Mapping<dim>::InternalDataBase &mapping_data,
+			    typename Mapping<dim, spacedim>::InternalDataBase &mapping_data,
 			    std::vector<Point<dim> >        &quadrature_points,
 			    std::vector<double>             &JxW_values,
 			    std::vector<Tensor<1,dim> >        &boundary_form,
 			    std::vector<Point<dim> >        &normal_vectors,
 			    std::vector<double>             &cell_JxW_values) const ;
 
-    virtual void
-    transform_covariant (const VectorSlice<const std::vector<Tensor<1,dim> > > input,
-                         const unsigned int                 offset,
-			 VectorSlice<std::vector<Tensor<1,dim> > > output,
-			 const typename Mapping<dim>::InternalDataBase &internal) const;
-    
-    virtual void
-    transform_covariant (const VectorSlice<const std::vector<Tensor<2,dim> > > input,
-                         const unsigned int                 offset,
-			 VectorSlice<std::vector<Tensor<2,dim> > > output,
-			 const typename Mapping<dim>::InternalDataBase &internal) const;
-    
-    virtual void
-    transform_contravariant (const VectorSlice<const std::vector<Tensor<1,dim> > > input,
-                             const unsigned int                 offset,
-			     VectorSlice<std::vector<Tensor<1,dim> > > output,
-			     const typename Mapping<dim>::InternalDataBase &internal) const;
-    
-    virtual void
-    transform_contravariant (const VectorSlice<const std::vector<Tensor<2,dim> > > input,
-                             const unsigned int                 offset,
-			     VectorSlice<std::vector<Tensor<2,dim> > > output,
-			     const typename Mapping<dim>::InternalDataBase &internal) const;
 
-    virtual Point<dim>
+    virtual void
+    transform_covariant (const VectorSlice<const std::vector<Tensor<1,spacedim> > > input,
+                         const unsigned int                 offset,
+			 VectorSlice<std::vector<Tensor<1,spacedim> > > output,
+			 const typename Mapping<dim, spacedim>::InternalDataBase &internal) const;
+    
+    virtual void
+    transform_covariant (const VectorSlice<const std::vector<Tensor<2,spacedim> > > input,
+                         const unsigned int                 offset,
+			 VectorSlice<std::vector<Tensor<2,spacedim> > > output,
+			 const typename Mapping<dim, spacedim>::InternalDataBase &internal) const;
+    
+    virtual void
+    transform_contravariant (const VectorSlice<const std::vector<Tensor<1,spacedim> > > input,
+                             const unsigned int                 offset,
+			     VectorSlice<std::vector<Tensor<1,spacedim> > > output,
+			     const typename Mapping<dim, spacedim>::InternalDataBase &internal) const;
+    
+    virtual void
+    transform_contravariant (const VectorSlice<const std::vector<Tensor<2,spacedim> > > input,
+                             const unsigned int                 offset,
+			     VectorSlice<std::vector<Tensor<2,spacedim> > > output,
+			     const typename Mapping<dim, spacedim>::InternalDataBase &internal) const;
+
+    virtual Point<spacedim>
     transform_unit_to_real_cell (
-      const typename Triangulation<dim>::cell_iterator &cell,
+      const typename Triangulation<dim,spacedim>::cell_iterator &cell,
       const Point<dim>                                 &p) const;
 
 				     /**
@@ -127,8 +134,8 @@ class MappingCartesian : public Mapping<dim>
 				      */
     virtual Point<dim>
     transform_real_to_unit_cell (
-      const typename Triangulation<dim>::cell_iterator &cell,
-      const Point<dim>                                 &p) const;
+      const typename Triangulation<dim,spacedim>::cell_iterator &cell,
+      const Point<spacedim>                            &p) const;
     
 
                                      /**
@@ -137,14 +144,14 @@ class MappingCartesian : public Mapping<dim>
                                       * copy then assumes ownership of it.
                                       */
     virtual
-    Mapping<dim> * clone () const;
+    Mapping<dim, spacedim> * clone () const;
     
   protected:
 				     /** 
 				      * Storage for internal data of
 				      * the scaling.
 				      */
-    class InternalData : public Mapping<dim>::InternalDataBase
+    class InternalData : public Mapping<dim, spacedim>::InternalDataBase
     {
       public:
 					 /**
@@ -180,7 +187,7 @@ class MappingCartesian : public Mapping<dim>
 				      * Do the computation for the
 				      * <tt>fill_*</tt> functions.
 				      */
-    void compute_fill (const typename Triangulation<dim>::cell_iterator &cell,
+    void compute_fill (const typename Triangulation<dim,spacedim>::cell_iterator &cell,
 		       const unsigned int face_no,
 		       const unsigned int sub_no,
 		       InternalData& data,

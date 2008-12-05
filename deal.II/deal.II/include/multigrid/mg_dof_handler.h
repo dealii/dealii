@@ -2,7 +2,7 @@
 //    $Id$
 //    Version: $Name$
 //
-//    Copyright (C) 1998, 1999, 2000, 2001, 2002, 2003, 2004, 2005, 2006, 2007 by the deal.II authors
+//    Copyright (C) 1998, 1999, 2000, 2001, 2002, 2003, 2004, 2005, 2006, 2007, 2008 by the deal.II authors
 //
 //    This file is subject to QPL and may not be  distributed
 //    without copyright and license information. Please refer
@@ -33,45 +33,51 @@ DEAL_II_NAMESPACE_OPEN
  *
  * At present, multilevel algorithms are not fully functional, so this
  * documentation is still very brief.
+ *
+ * This class has not yet been implemented for the use in the codimension
+ * one case (<tt>spacedim != dim </tt>).
+ *
 //TODO:[WB] Extend MGDoFHandler doc 
  *
  * @author Wolfgang Bangerth, 1998, 1999
  */
-template <int dim>
-class MGDoFHandler : public DoFHandler<dim>
+template <int dim, int spacedim=dim>
+class MGDoFHandler : public DoFHandler<dim,spacedim>
 {
   public:
-    typedef typename internal::MGDoFHandler::Iterators<dim>::raw_line_iterator raw_line_iterator;
-    typedef typename internal::MGDoFHandler::Iterators<dim>::line_iterator line_iterator;
-    typedef typename internal::MGDoFHandler::Iterators<dim>::active_line_iterator active_line_iterator;
+    typedef typename internal::MGDoFHandler::Iterators<dim,spacedim>::raw_line_iterator raw_line_iterator;
+    typedef typename internal::MGDoFHandler::Iterators<dim,spacedim>::line_iterator line_iterator;
+    typedef typename internal::MGDoFHandler::Iterators<dim,spacedim>::active_line_iterator active_line_iterator;
 
-    typedef typename internal::MGDoFHandler::Iterators<dim>::raw_quad_iterator raw_quad_iterator;
-    typedef typename internal::MGDoFHandler::Iterators<dim>::quad_iterator quad_iterator;
-    typedef typename internal::MGDoFHandler::Iterators<dim>::active_quad_iterator active_quad_iterator;
+    typedef typename internal::MGDoFHandler::Iterators<dim,spacedim>::raw_quad_iterator raw_quad_iterator;
+    typedef typename internal::MGDoFHandler::Iterators<dim,spacedim>::quad_iterator quad_iterator;
+    typedef typename internal::MGDoFHandler::Iterators<dim,spacedim>::active_quad_iterator active_quad_iterator;
 
-    typedef typename internal::MGDoFHandler::Iterators<dim>::raw_hex_iterator raw_hex_iterator;
-    typedef typename internal::MGDoFHandler::Iterators<dim>::hex_iterator hex_iterator;
-    typedef typename internal::MGDoFHandler::Iterators<dim>::active_hex_iterator active_hex_iterator;
+    typedef typename internal::MGDoFHandler::Iterators<dim,spacedim>::raw_hex_iterator raw_hex_iterator;
+    typedef typename internal::MGDoFHandler::Iterators<dim,spacedim>::hex_iterator hex_iterator;
+    typedef typename internal::MGDoFHandler::Iterators<dim,spacedim>::active_hex_iterator active_hex_iterator;
 
-    typedef typename internal::MGDoFHandler::Iterators<dim>::raw_cell_iterator raw_cell_iterator;
-    typedef typename internal::MGDoFHandler::Iterators<dim>::cell_iterator cell_iterator;
-    typedef typename internal::MGDoFHandler::Iterators<dim>::active_cell_iterator active_cell_iterator;
+    typedef typename internal::MGDoFHandler::Iterators<dim,spacedim>::raw_cell_iterator raw_cell_iterator;
+    typedef typename internal::MGDoFHandler::Iterators<dim,spacedim>::cell_iterator cell_iterator;
+    typedef typename internal::MGDoFHandler::Iterators<dim,spacedim>::active_cell_iterator active_cell_iterator;
 
-    typedef typename internal::MGDoFHandler::Iterators<dim>::raw_face_iterator raw_face_iterator;
-    typedef typename internal::MGDoFHandler::Iterators<dim>::face_iterator face_iterator;
-    typedef typename internal::MGDoFHandler::Iterators<dim>::active_face_iterator active_face_iterator;
+    typedef typename internal::MGDoFHandler::Iterators<dim,spacedim>::raw_face_iterator raw_face_iterator;
+    typedef typename internal::MGDoFHandler::Iterators<dim,spacedim>::face_iterator face_iterator;
+    typedef typename internal::MGDoFHandler::Iterators<dim,spacedim>::active_face_iterator active_face_iterator;
 
 				     /**
-				      * Make the dimension available
+				      * Make the dimension and the space_dimension available
 				      * in function templates.
 				      */
     static const unsigned int dimension = dim;
+
+    static const unsigned int space_dimension = spacedim;
 
 				     /**
 				      * Constructor. Take @p tria as
 				      * the triangulation to work on.
 				      */
-    MGDoFHandler (const Triangulation<dim> &tria);
+    MGDoFHandler (const Triangulation<dim, spacedim> &tria);
 
 				     /**
 				      * Destructor
@@ -92,7 +98,7 @@ class MGDoFHandler : public DoFHandler<dim>
 				      * A copy of the transferred
 				      * finite element is stored.
 				      */
-    virtual void distribute_dofs (const FiniteElement<dim> &,
+    virtual void distribute_dofs (const FiniteElement<dim,spacedim> &,
 				  const unsigned int offset = 0);
 
 				     /**
@@ -727,11 +733,24 @@ class MGDoFHandler : public DoFHandler<dim>
 
 
 				     /**
-				      * Exception.
+				      *  Exception
 				      */
     DeclException1 (ExcInvalidLevel,
 		    int,
-		    << "The level index " << arg1 << "was not in the valid range.");
+		    << "The given level " << arg1
+		    << " is not in the valid range!");
+				     /**
+				      * Exception
+				      */
+    DeclException0 (ExcFacesHaveNoLevel);
+				     /**
+				      * The triangulation level you
+				      * accessed is empty.
+				      */
+    DeclException1 (ExcEmptyLevel,
+		    int,
+		    << "You tried to do something on level " << arg1
+		    << ", but this level is empty.");
     
   private:
 
@@ -995,25 +1014,24 @@ class MGDoFHandler : public DoFHandler<dim>
 				     /**
 				      * Make accessor objects friends.
 				      */
-    template <int dim1, int dim2> friend class MGDoFAccessor;
-    template <int dim1, int dim2> friend class MGDoFObjectAccessor;
+    template <int dim1, int dim2, int dim3> friend class MGDoFAccessor;
 };
 
 /*@}*/
 
 /* ----------------------- Inline functions of MGDoFHandler -------------------*/
 
-template <int dim>
+template <int dim, int spacedim>
 inline
-unsigned int MGDoFHandler<dim>::n_dofs() const
+unsigned int MGDoFHandler<dim,spacedim>::n_dofs() const
 {
   return DoFHandler<dim>::n_dofs();
 }
 
 
-template <int dim>
+template <int dim, int spacedim>
 inline
-void MGDoFHandler<dim>::renumber_dofs (const std::vector<unsigned int> &new_numbers)
+void MGDoFHandler<dim,spacedim>::renumber_dofs (const std::vector<unsigned int> &new_numbers)
 {
   return DoFHandler<dim>::renumber_dofs (new_numbers);
 }
@@ -1021,9 +1039,9 @@ void MGDoFHandler<dim>::renumber_dofs (const std::vector<unsigned int> &new_numb
 
 /* ----------------------- Inline functions of MGVertexDoFs -------------------*/
 
-template <int dim>
+template <int dim, int spacedim>
 inline
-void MGDoFHandler<dim>::MGVertexDoFs::set_index  (const unsigned int level,
+void MGDoFHandler<dim,spacedim>::MGVertexDoFs::set_index  (const unsigned int level,
 						  const unsigned int dof_number,
 						  const unsigned int dofs_per_vertex,
 						  const unsigned int index) {
@@ -1036,10 +1054,10 @@ void MGDoFHandler<dim>::MGVertexDoFs::set_index  (const unsigned int level,
 }
 
 
-template <int dim>
+template <int dim, int spacedim>
 inline
 unsigned int
-MGDoFHandler<dim>::MGVertexDoFs::get_index  (const unsigned int level,
+MGDoFHandler<dim,spacedim>::MGVertexDoFs::get_index  (const unsigned int level,
 					     const unsigned int dof_number,
 					     const unsigned int dofs_per_vertex) const {
   Assert ((level >= coarsest_level) && (level <= finest_level),
@@ -1050,252 +1068,6 @@ MGDoFHandler<dim>::MGVertexDoFs::get_index  (const unsigned int level,
   return indices[(level-coarsest_level)*dofs_per_vertex + dof_number];
 }
 
-
-template <>
-MGDoFHandler<1>::raw_cell_iterator
-MGDoFHandler<1>::begin_raw (const unsigned int level) const;
-template <>
-MGDoFHandler<1>::cell_iterator
-MGDoFHandler<1>::begin (const unsigned int level) const;
-template <>
-MGDoFHandler<1>::active_cell_iterator
-MGDoFHandler<1>::begin_active (const unsigned int level) const;
-template <>
-MGDoFHandler<1>::raw_cell_iterator
-MGDoFHandler<1>::end () const;
-template <>
-MGDoFHandler<1>::raw_cell_iterator
-MGDoFHandler<1>::last_raw () const;
-template <>
-MGDoFHandler<1>::raw_cell_iterator
-MGDoFHandler<1>::last_raw (const unsigned int level) const;
-template <>
-MGDoFHandler<1>::cell_iterator
-MGDoFHandler<1>::last () const;
-template <>
-MGDoFHandler<1>::cell_iterator
-MGDoFHandler<1>::last (const unsigned int level) const;
-template <>
-MGDoFHandler<1>::active_cell_iterator
-MGDoFHandler<1>::last_active () const;
-template <>
-MGDoFHandler<1>::active_cell_iterator
-MGDoFHandler<1>::last_active (const unsigned int level) const;
-template <>
-internal::MGDoFHandler::Iterators<1>::raw_face_iterator
-MGDoFHandler<1>::begin_raw_face () const;
-template <>
-internal::MGDoFHandler::Iterators<1>::face_iterator
-MGDoFHandler<1>::begin_face () const;
-template <>
-internal::MGDoFHandler::Iterators<1>::active_face_iterator
-MGDoFHandler<1>::begin_active_face () const;
-template <>
-internal::MGDoFHandler::Iterators<1>::raw_face_iterator
-MGDoFHandler<1>::end_face () const;
-template <>
-internal::MGDoFHandler::Iterators<1>::raw_face_iterator
-MGDoFHandler<1>::last_raw_face () const;
-template <>
-internal::MGDoFHandler::Iterators<1>::face_iterator
-MGDoFHandler<1>::last_face () const;
-template <>
-internal::MGDoFHandler::Iterators<1>::active_face_iterator
-MGDoFHandler<1>::last_active_face () const;
-template <>
-MGDoFHandler<1>::raw_quad_iterator
-MGDoFHandler<1>::begin_raw_quad (const unsigned int) const;
-template <>
-MGDoFHandler<1>::quad_iterator
-MGDoFHandler<1>::begin_quad (const unsigned int) const;
-template <>
-MGDoFHandler<1>::active_quad_iterator
-MGDoFHandler<1>::begin_active_quad (const unsigned int) const;
-template <>
-MGDoFHandler<1>::raw_quad_iterator
-MGDoFHandler<1>::end_quad () const;
-template <>
-MGDoFHandler<1>::raw_quad_iterator
-MGDoFHandler<1>::last_raw_quad (const unsigned int) const;
-template <>
-MGDoFHandler<1>::quad_iterator
-MGDoFHandler<1>::last_quad (const unsigned int) const;
-template <>
-MGDoFHandler<1>::active_quad_iterator
-MGDoFHandler<1>::last_active_quad (const unsigned int) const;
-template <>
-MGDoFHandler<1>::raw_quad_iterator
-MGDoFHandler<1>::last_raw_quad () const;
-template <>
-MGDoFHandler<1>::quad_iterator
-MGDoFHandler<1>::last_quad () const;
-template <>
-MGDoFHandler<1>::active_quad_iterator
-MGDoFHandler<1>::last_active_quad () const;
-template <>
-MGDoFHandler<1>::raw_hex_iterator
-MGDoFHandler<1>::begin_raw_hex (const unsigned int) const;
-template <>
-MGDoFHandler<1>::hex_iterator
-MGDoFHandler<1>::begin_hex (const unsigned int) const;
-template <>
-MGDoFHandler<1>::active_hex_iterator
-MGDoFHandler<1>::begin_active_hex (const unsigned int) const;
-template <>
-MGDoFHandler<1>::raw_hex_iterator
-MGDoFHandler<1>::end_hex () const;
-template <>
-MGDoFHandler<1>::raw_hex_iterator
-MGDoFHandler<1>::last_raw_hex (const unsigned int) const;
-template <>
-MGDoFHandler<1>::hex_iterator
-MGDoFHandler<1>::last_hex (const unsigned int) const;
-template <>
-MGDoFHandler<1>::active_hex_iterator
-MGDoFHandler<1>::last_active_hex (const unsigned int) const;
-template <>
-MGDoFHandler<1>::raw_hex_iterator
-MGDoFHandler<1>::last_raw_hex () const;
-template <>
-MGDoFHandler<1>::hex_iterator
-MGDoFHandler<1>::last_hex () const;
-template <>
-MGDoFHandler<1>::active_hex_iterator
-MGDoFHandler<1>::last_active_hex () const;
-//======================================================================//
-template <>
-MGDoFHandler<2>::raw_cell_iterator
-MGDoFHandler<2>::begin_raw (const unsigned int level) const;
-template <>
-MGDoFHandler<2>::cell_iterator
-MGDoFHandler<2>::begin (const unsigned int level) const;
-template <>
-MGDoFHandler<2>::active_cell_iterator
-MGDoFHandler<2>::begin_active (const unsigned int level) const;
-template <>
-MGDoFHandler<2>::raw_cell_iterator
-MGDoFHandler<2>::end () const;
-template <>
-MGDoFHandler<2>::raw_cell_iterator
-MGDoFHandler<2>::last_raw () const;
-template <>
-MGDoFHandler<2>::raw_cell_iterator
-MGDoFHandler<2>::last_raw (const unsigned int level) const;
-template <>
-MGDoFHandler<2>::cell_iterator
-MGDoFHandler<2>::last () const;
-template <>
-MGDoFHandler<2>::cell_iterator
-MGDoFHandler<2>::last (const unsigned int level) const;
-template <>
-MGDoFHandler<2>::active_cell_iterator
-MGDoFHandler<2>::last_active () const;
-template <>
-MGDoFHandler<2>::active_cell_iterator
-MGDoFHandler<2>::last_active (const unsigned int level) const;
-template <>
-internal::MGDoFHandler::Iterators<2>::raw_face_iterator
-MGDoFHandler<2>::begin_raw_face () const;
-template <>
-internal::MGDoFHandler::Iterators<2>::face_iterator
-MGDoFHandler<2>::begin_face () const;
-template <>
-internal::MGDoFHandler::Iterators<2>::active_face_iterator
-MGDoFHandler<2>::begin_active_face () const;
-template <>
-internal::MGDoFHandler::Iterators<2>::raw_face_iterator
-MGDoFHandler<2>::end_face () const;
-template <>
-internal::MGDoFHandler::Iterators<2>::raw_face_iterator
-MGDoFHandler<2>::last_raw_face () const;
-template <>
-internal::MGDoFHandler::Iterators<2>::face_iterator
-MGDoFHandler<2>::last_face () const;
-template <>
-internal::MGDoFHandler::Iterators<2>::active_face_iterator
-MGDoFHandler<2>::last_active_face () const;
-template <>
-MGDoFHandler<2>::raw_hex_iterator
-MGDoFHandler<2>::begin_raw_hex (const unsigned int) const;
-template <>
-MGDoFHandler<2>::hex_iterator
-MGDoFHandler<2>::begin_hex (const unsigned int) const;
-template <>
-MGDoFHandler<2>::active_hex_iterator
-MGDoFHandler<2>::begin_active_hex (const unsigned int) const;
-template <>
-MGDoFHandler<2>::raw_hex_iterator
-MGDoFHandler<2>::end_hex () const;
-template <>
-MGDoFHandler<2>::raw_hex_iterator
-MGDoFHandler<2>::last_raw_hex (const unsigned int) const;
-template <>
-MGDoFHandler<2>::hex_iterator
-MGDoFHandler<2>::last_hex (const unsigned int) const;
-template <>
-MGDoFHandler<2>::active_hex_iterator
-MGDoFHandler<2>::last_active_hex (const unsigned int) const;
-template <>
-MGDoFHandler<2>::raw_hex_iterator
-MGDoFHandler<2>::last_raw_hex () const;
-template <>
-MGDoFHandler<2>::hex_iterator
-MGDoFHandler<2>::last_hex () const;
-template <>
-MGDoFHandler<2>::active_hex_iterator
-MGDoFHandler<2>::last_active_hex () const;
-//======================================================================//
-template <>
-MGDoFHandler<3>::raw_cell_iterator
-MGDoFHandler<3>::begin_raw (const unsigned int level) const;
-template <>
-MGDoFHandler<3>::cell_iterator
-MGDoFHandler<3>::begin (const unsigned int level) const;
-template <>
-MGDoFHandler<3>::active_cell_iterator
-MGDoFHandler<3>::begin_active (const unsigned int level) const;
-template <>
-MGDoFHandler<3>::raw_cell_iterator
-MGDoFHandler<3>::end () const;
-template <>
-MGDoFHandler<3>::raw_cell_iterator
-MGDoFHandler<3>::last_raw () const;
-template <>
-MGDoFHandler<3>::raw_cell_iterator
-MGDoFHandler<3>::last_raw (const unsigned int level) const;
-template <>
-MGDoFHandler<3>::cell_iterator
-MGDoFHandler<3>::last () const;
-template <>
-MGDoFHandler<3>::cell_iterator
-MGDoFHandler<3>::last (const unsigned int level) const;
-template <>
-MGDoFHandler<3>::active_cell_iterator
-MGDoFHandler<3>::last_active () const;
-template <>
-MGDoFHandler<3>::active_cell_iterator
-MGDoFHandler<3>::last_active (const unsigned int level) const;
-template <>
-internal::MGDoFHandler::Iterators<3>::raw_face_iterator
-MGDoFHandler<3>::begin_raw_face () const;
-template <>
-internal::MGDoFHandler::Iterators<3>::face_iterator
-MGDoFHandler<3>::begin_face () const;
-template <>
-internal::MGDoFHandler::Iterators<3>::active_face_iterator
-MGDoFHandler<3>::begin_active_face () const;
-template <>
-internal::MGDoFHandler::Iterators<3>::raw_face_iterator
-MGDoFHandler<3>::end_face () const;
-template <>
-internal::MGDoFHandler::Iterators<3>::raw_face_iterator
-MGDoFHandler<3>::last_raw_face () const;
-template <>
-internal::MGDoFHandler::Iterators<3>::face_iterator
-MGDoFHandler<3>::last_face () const;
-template <>
-internal::MGDoFHandler::Iterators<3>::active_face_iterator
-MGDoFHandler<3>::last_active_face () const;
 
 
 template <>

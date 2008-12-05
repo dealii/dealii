@@ -20,7 +20,7 @@
 
 DEAL_II_NAMESPACE_OPEN
 
-template <int> class DoFHandler;
+template <int, int> class DoFHandler;
 
 namespace internal
 {
@@ -94,9 +94,9 @@ namespace internal
                                           * class hierarchy between hp
                                           * and non-hp classes.
                                           */
-	template <int spacedim>
+	template <int dh_dim, int spacedim>
         void
-        set_dof_index (const dealii::DoFHandler<spacedim> &dof_handler,
+        set_dof_index (const dealii::DoFHandler<dh_dim,spacedim> &dof_handler,
 		       const unsigned int       obj_index,
 		       const unsigned int       fe_index,
 		       const unsigned int       local_index,
@@ -127,9 +127,9 @@ namespace internal
                                           * class hierarchy between hp
                                           * and non-hp classes.
                                           */
-	template <int spacedim>
+	template <int dh_dim, int spacedim>
 	unsigned int
-        get_dof_index (const dealii::DoFHandler<spacedim> &dof_handler,
+        get_dof_index (const dealii::DoFHandler<dh_dim,spacedim> &dof_handler,
 		       const unsigned int       obj_index,
 		       const unsigned int       fe_index,
 		       const unsigned int       local_index) const;
@@ -142,9 +142,9 @@ namespace internal
                                           * functions in the classes
                                           * internal::hp::DoFObjects 
                                           */
-        template <int spacedim>
+        template <int dh_dim, int spacedim>
         unsigned int
-        n_active_fe_indices (const dealii::DoFHandler<spacedim> &dof_handler,
+        n_active_fe_indices (const dealii::DoFHandler<dh_dim,spacedim> &dof_handler,
                              const unsigned int       index) const;
 
                                          /**
@@ -153,9 +153,9 @@ namespace internal
                                           * given index is zero, and
                                           * then return true.
                                           */
-        template <int spacedim>
+        template <int dh_dim, int spacedim>
         bool
-        fe_index_is_active (const dealii::DoFHandler<spacedim> &dof_handler,
+        fe_index_is_active (const dealii::DoFHandler<dh_dim,spacedim> &dof_handler,
                             const unsigned int       index,
                             const unsigned int       fe_index) const;
 
@@ -181,10 +181,10 @@ namespace internal
 // --------------------- template and inline functions ------------------
 
     template <int dim>
-    template <int spacedim>
+    template <int dh_dim, int spacedim>
     inline
     unsigned int
-    DoFObjects<dim>::n_active_fe_indices (const dealii::DoFHandler<spacedim> &,
+    DoFObjects<dim>::n_active_fe_indices (const dealii::DoFHandler<dh_dim,spacedim> &,
 					  const unsigned) const
     {
       return 1;
@@ -193,10 +193,10 @@ namespace internal
 
     
     template <int dim>
-    template <int spacedim>
+    template <int dh_dim, int spacedim>
     inline
     bool
-    DoFObjects<dim>::fe_index_is_active (const dealii::DoFHandler<spacedim> &,
+    DoFObjects<dim>::fe_index_is_active (const dealii::DoFHandler<dh_dim,spacedim> &,
 					 const unsigned int,
 					 const unsigned int fe_index) const
     {
@@ -209,16 +209,16 @@ namespace internal
     
 
     template <int dim>
-    template <int spacedim>
+    template <int dh_dim, int spacedim>
     inline
     unsigned int
     DoFObjects<dim>::
-    get_dof_index (const dealii::DoFHandler<spacedim> &dof_handler,
+    get_dof_index (const dealii::DoFHandler<dh_dim,spacedim> &dof_handler,
 		   const unsigned int       obj_index,
 		   const unsigned int       fe_index,
 		   const unsigned int       local_index) const
     {
-      Assert (fe_index == dealii::DoFHandler<spacedim>::default_fe_index,
+      Assert ((fe_index == dealii::DoFHandler<dh_dim,spacedim>::default_fe_index),
 	      ExcMessage ("Only the default FE index is allowed for non-hp DoFHandler objects"));
       Assert (local_index<dof_handler.get_fe().template n_dofs_per_object<dim>(),
 	      ExcIndexRange (local_index, 0, dof_handler.get_fe().template n_dofs_per_object<dim>()));

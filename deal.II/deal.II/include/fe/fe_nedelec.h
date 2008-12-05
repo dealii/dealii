@@ -19,7 +19,7 @@
 
 DEAL_II_NAMESPACE_OPEN
 
-template <int dim> class MappingQ;
+template <int dim, int spacedim> class MappingQ;
 
 
 /*!@addtogroup fe */
@@ -35,6 +35,9 @@ template <int dim> class MappingQ;
  * (i.e. <tt>p==1</tt>) are implemented. For a general overview of this
  * element and its properties, see the report by Anna Schneebeli that
  * is linked from the general documentation page of the library.
+ *
+ * This class has not yet been implemented for the codimension one case
+ * (<tt>spacedim != dim</tt>).
  *
  *
  * <h3>Restriction on transformations</h3>
@@ -180,8 +183,8 @@ template <int dim> class MappingQ;
  *
  * @author Wolfgang Bangerth, Anna Schneebeli, 2002, 2003
  */
-template <int dim>
-class FE_Nedelec : public FiniteElement<dim>
+template <int dim, int spacedim=dim>
+class FE_Nedelec : public FiniteElement<dim,spacedim>
 {
   public:
 				     /**
@@ -269,7 +272,7 @@ class FE_Nedelec : public FiniteElement<dim>
 				      * @p this, and all other
 				      * indices throw an error.
 				      */
-    virtual const FiniteElement<dim> &
+    virtual const FiniteElement<dim,spacedim> &
     base_element (const unsigned int index) const;
 
                                      /**
@@ -390,7 +393,7 @@ class FE_Nedelec : public FiniteElement<dim>
 				      * This function is needed by the
 				      * constructors of @p FESystem.
 				      */
-    virtual FiniteElement<dim> * clone() const;
+    virtual FiniteElement<dim,spacedim> * clone() const;
   
 				     /**
 				      * Prepare internal data
@@ -398,9 +401,9 @@ class FE_Nedelec : public FiniteElement<dim>
 				      * independent of the cell.
 				      */
     virtual
-    typename Mapping<dim>::InternalDataBase *
+    typename Mapping<dim,spacedim>::InternalDataBase *
     get_data (const UpdateFlags,
-	      const Mapping<dim>& mapping,
+	      const Mapping<dim,spacedim>& mapping,
 	      const Quadrature<dim>& quadrature) const ;
 
 				     /**
@@ -409,12 +412,12 @@ class FE_Nedelec : public FiniteElement<dim>
 				      * FiniteElement.
 				      */
     virtual void
-    fill_fe_values (const Mapping<dim> &mapping,
-		    const typename Triangulation<dim>::cell_iterator &cell,
+    fill_fe_values (const Mapping<dim,spacedim> &mapping,
+		    const typename Triangulation<dim,spacedim>::cell_iterator &cell,
 		    const Quadrature<dim>                &quadrature,
-		    typename Mapping<dim>::InternalDataBase      &mapping_internal,
-		    typename Mapping<dim>::InternalDataBase      &fe_internal,
-		    FEValuesData<dim>& data) const;
+		    typename Mapping<dim,spacedim>::InternalDataBase      &mapping_internal,
+		    typename Mapping<dim,spacedim>::InternalDataBase      &fe_internal,
+		    FEValuesData<dim,spacedim>& data) const;
     
 				     /**
 				      * Implementation of the same
@@ -422,13 +425,13 @@ class FE_Nedelec : public FiniteElement<dim>
 				      * FiniteElement.
 				      */
     virtual void
-    fill_fe_face_values (const Mapping<dim> &mapping,
-			 const typename Triangulation<dim>::cell_iterator &cell,
+    fill_fe_face_values (const Mapping<dim,spacedim> &mapping,
+			 const typename Triangulation<dim,spacedim>::cell_iterator &cell,
 			 const unsigned int                    face_no,
 			 const Quadrature<dim-1>                &quadrature,
-			 typename Mapping<dim>::InternalDataBase      &mapping_internal,
-			 typename Mapping<dim>::InternalDataBase      &fe_internal,
-			 FEValuesData<dim>& data) const ;
+			 typename Mapping<dim,spacedim>::InternalDataBase      &mapping_internal,
+			 typename Mapping<dim,spacedim>::InternalDataBase      &fe_internal,
+			 FEValuesData<dim,spacedim>& data) const ;
     
 				     /**
 				      * Implementation of the same
@@ -436,14 +439,14 @@ class FE_Nedelec : public FiniteElement<dim>
 				      * FiniteElement.
 				      */
     virtual void
-    fill_fe_subface_values (const Mapping<dim> &mapping,
-			    const typename Triangulation<dim>::cell_iterator &cell,
+    fill_fe_subface_values (const Mapping<dim,spacedim> &mapping,
+			    const typename Triangulation<dim,spacedim>::cell_iterator &cell,
 			    const unsigned int                    face_no,
 			    const unsigned int                    sub_no,
 			    const Quadrature<dim-1>                &quadrature,
-			    typename Mapping<dim>::InternalDataBase      &mapping_internal,
-			    typename Mapping<dim>::InternalDataBase      &fe_internal,
-			    FEValuesData<dim>& data) const ;
+			    typename Mapping<dim,spacedim>::InternalDataBase      &mapping_internal,
+			    typename Mapping<dim,spacedim>::InternalDataBase      &fe_internal,
+			    FEValuesData<dim,spacedim>& data) const ;
 
   private:
     
@@ -551,7 +554,7 @@ class FE_Nedelec : public FiniteElement<dim>
 				      * see the documentation of the
 				      * base class.
 				      */
-    class InternalData : public FiniteElement<dim>::InternalDataBase
+    class InternalData : public FiniteElement<dim,spacedim>::InternalDataBase
     {
       public:
 					 /**
@@ -604,7 +607,7 @@ class FE_Nedelec : public FiniteElement<dim>
 				      * Allow access from other
 				      * dimensions.
 				      */
-    template <int dim1> friend class FE_Nedelec;
+    template <int , int> friend class FE_Nedelec;
 };
 
 /*@}*/
@@ -615,59 +618,59 @@ class FE_Nedelec : public FiniteElement<dim>
 /* -------------- declaration of explicit specializations ------------- */
 
 template <>
-void FE_Nedelec<1>::initialize_unit_face_support_points ();
+void FE_Nedelec<1,1>::initialize_unit_face_support_points ();
 
 template <>
 double
-FE_Nedelec<1>::shape_value_component (const unsigned int ,
+FE_Nedelec<1,1>::shape_value_component (const unsigned int ,
                                       const Point<1>    &,
                                       const unsigned int ) const;
 
 template <>
 double
-FE_Nedelec<2>::shape_value_component (const unsigned int ,
+FE_Nedelec<2,2>::shape_value_component (const unsigned int ,
                                       const Point<2>    &,
                                       const unsigned int ) const;
 
 template <>
 double
-FE_Nedelec<3>::shape_value_component (const unsigned int ,
+FE_Nedelec<3,3>::shape_value_component (const unsigned int ,
                                       const Point<3>    &,
                                       const unsigned int ) const;
 
 template <>
 Tensor<1,1>
-FE_Nedelec<1>::shape_grad_component (const unsigned int ,
+FE_Nedelec<1,1>::shape_grad_component (const unsigned int ,
                                      const Point<1>    &,
                                      const unsigned int ) const;
 
 template <>
 Tensor<1,2>
-FE_Nedelec<2>::shape_grad_component (const unsigned int ,
+FE_Nedelec<2,2>::shape_grad_component (const unsigned int ,
                                      const Point<2>    &,
                                      const unsigned int ) const;
 
 template <>
 Tensor<1,3>
-FE_Nedelec<3>::shape_grad_component (const unsigned int ,
+FE_Nedelec<3,3>::shape_grad_component (const unsigned int ,
                                      const Point<3>    &,
                                      const unsigned int ) const;
 
 template <>
 Tensor<2,1>
-FE_Nedelec<1>::shape_grad_grad_component (const unsigned int ,
+FE_Nedelec<1,1>::shape_grad_grad_component (const unsigned int ,
                                           const Point<1>    &,
                                           const unsigned int ) const;
 
 template <>
 Tensor<2,2>
-FE_Nedelec<2>::shape_grad_grad_component (const unsigned int ,
+FE_Nedelec<2,2>::shape_grad_grad_component (const unsigned int ,
                                           const Point<2>    &,
                                           const unsigned int ) const;
 
 template <>
 Tensor<2,3>
-FE_Nedelec<3>::shape_grad_grad_component (const unsigned int ,
+FE_Nedelec<3,3>::shape_grad_grad_component (const unsigned int ,
                                           const Point<3>    &,
                                           const unsigned int ) const;
 
@@ -678,42 +681,42 @@ FE_Nedelec<3>::shape_grad_grad_component (const unsigned int ,
 #ifndef DEAL_II_MEMBER_VAR_SPECIALIZATION_BUG
 template <> 
 const double * const 
-FE_Nedelec<1>::Matrices::embedding[][GeometryInfo<1>::max_children_per_cell];
+FE_Nedelec<1,1>::Matrices::embedding[][GeometryInfo<1>::max_children_per_cell];
 
 template <>
-const unsigned int FE_Nedelec<1>::Matrices::n_embedding_matrices;
+const unsigned int FE_Nedelec<1,1>::Matrices::n_embedding_matrices;
 
 template <>
-const double * const FE_Nedelec<1>::Matrices::constraint_matrices[];
+const double * const FE_Nedelec<1,1>::Matrices::constraint_matrices[];
 
 template <>
-const unsigned int FE_Nedelec<1>::Matrices::n_constraint_matrices;
+const unsigned int FE_Nedelec<1,1>::Matrices::n_constraint_matrices;
 
 template <> 
 const double * const 
-FE_Nedelec<2>::Matrices::embedding[][GeometryInfo<2>::max_children_per_cell];
+FE_Nedelec<2,2>::Matrices::embedding[][GeometryInfo<2>::max_children_per_cell];
 
 template <>
-const unsigned int FE_Nedelec<2>::Matrices::n_embedding_matrices;
+const unsigned int FE_Nedelec<2,2>::Matrices::n_embedding_matrices;
 
 template <>
-const double * const FE_Nedelec<2>::Matrices::constraint_matrices[];
+const double * const FE_Nedelec<2,2>::Matrices::constraint_matrices[];
 
 template <>
-const unsigned int FE_Nedelec<2>::Matrices::n_constraint_matrices;
+const unsigned int FE_Nedelec<2,2>::Matrices::n_constraint_matrices;
 
 template <> 
 const double * const 
-FE_Nedelec<3>::Matrices::embedding[][GeometryInfo<3>::max_children_per_cell];
+FE_Nedelec<3,3>::Matrices::embedding[][GeometryInfo<3>::max_children_per_cell];
 
 template <>
-const unsigned int FE_Nedelec<3>::Matrices::n_embedding_matrices;
+const unsigned int FE_Nedelec<3,3>::Matrices::n_embedding_matrices;
 
 template <>
-const double * const FE_Nedelec<3>::Matrices::constraint_matrices[];
+const double * const FE_Nedelec<3,3>::Matrices::constraint_matrices[];
 
 template <>
-const unsigned int FE_Nedelec<3>::Matrices::n_constraint_matrices;
+const unsigned int FE_Nedelec<3,3>::Matrices::n_constraint_matrices;
 
 #endif
 #endif // DOXYGEN

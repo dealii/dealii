@@ -40,10 +40,10 @@ DEAL_II_NAMESPACE_OPEN
 
 #if deal_II_dimension == 1
 
-template <int dim>
+template <int dim, int spacedim>
 void
 MGTools::compute_row_length_vector(
-  const MGDoFHandler<dim>&,
+  const MGDoFHandler<dim,spacedim>&,
   const unsigned int,
   std::vector<unsigned int>&,
   const DoFTools::Coupling)
@@ -52,10 +52,10 @@ MGTools::compute_row_length_vector(
 }
 
 
-template <int dim>
+template <int dim, int spacedim>
 void
 MGTools::compute_row_length_vector(
-  const MGDoFHandler<dim>&,
+  const MGDoFHandler<dim,spacedim>&,
   const unsigned int,
   std::vector<unsigned int>&,
   const Table<2,DoFTools::Coupling>&,
@@ -68,10 +68,10 @@ MGTools::compute_row_length_vector(
 #else
 
 // Template for 2D and 3D. For 1D see specialization above
-template <int dim>
+template <int dim, int spacedim>
 void
 MGTools::compute_row_length_vector(
-  const MGDoFHandler<dim>& dofs,
+  const MGDoFHandler<dim,spacedim>& dofs,
   const unsigned int level,
   std::vector<unsigned int>& row_lengths,
   const DoFTools::Coupling             flux_coupling)
@@ -89,13 +89,13 @@ MGTools::compute_row_length_vector(
 				   // triangulation for the user
 				   // flags. Since we restore them in
 				   // the end, this cast is safe.
-  Triangulation<dim>& user_flags_triangulation =
-    const_cast<Triangulation<dim>&> (dofs.get_tria());
+  Triangulation<dim,spacedim>& user_flags_triangulation =
+    const_cast<Triangulation<dim,spacedim>&> (dofs.get_tria());
   user_flags_triangulation.save_user_flags(old_flags);
   user_flags_triangulation.clear_user_flags();
   
-  const typename MGDoFHandler<dim>::cell_iterator end = dofs.end(level);
-  typename MGDoFHandler<dim>::active_cell_iterator cell;
+  const typename MGDoFHandler<dim,spacedim>::cell_iterator end = dofs.end(level);
+  typename MGDoFHandler<dim,spacedim>::active_cell_iterator cell;
   std::vector<unsigned int> cell_indices;
   std::vector<unsigned int> neighbor_indices;
 
@@ -178,7 +178,7 @@ MGTools::compute_row_length_vector(
       for (unsigned int iface=0;iface<GeometryInfo<dim>::faces_per_cell;++iface)
 	{
 	  bool level_boundary = cell->at_boundary(iface);
-	  typename MGDoFHandler<dim>::cell_iterator neighbor;
+	  typename MGDoFHandler<dim,spacedim>::cell_iterator neighbor;
 	  if (!level_boundary)
 	    {
 	      neighbor = cell->neighbor(iface);
@@ -194,7 +194,7 @@ MGTools::compute_row_length_vector(
 	    }
 	  
 	  const FiniteElement<dim>& nfe = neighbor->get_fe();
-	  typename MGDoFHandler<dim>::face_iterator face = cell->face(iface);
+	  typename MGDoFHandler<dim,spacedim>::face_iterator face = cell->face(iface);
 	  
 					   // Flux couplings are
 					   // computed from both sides
@@ -241,10 +241,10 @@ MGTools::compute_row_length_vector(
 
 
 // This is the template for 2D and 3D. See version for 1D above
-template <int dim>
+template <int dim, int spacedim>
 void
 MGTools::compute_row_length_vector(
-  const MGDoFHandler<dim>& dofs,
+  const MGDoFHandler<dim,spacedim>& dofs,
   const unsigned int level,
   std::vector<unsigned int>& row_lengths,
   const Table<2,DoFTools::Coupling>& couplings,
@@ -263,13 +263,13 @@ MGTools::compute_row_length_vector(
 				   // triangulation for the user
 				   // flags. Since we restore them in
 				   // the end, this cast is safe.
-  Triangulation<dim>& user_flags_triangulation =
-    const_cast<Triangulation<dim>&> (dofs.get_tria());
+  Triangulation<dim,spacedim>& user_flags_triangulation =
+    const_cast<Triangulation<dim,spacedim>&> (dofs.get_tria());
   user_flags_triangulation.save_user_flags(old_flags);
   user_flags_triangulation.clear_user_flags();
   
-  const typename MGDoFHandler<dim>::cell_iterator end = dofs.end(level);
-  typename MGDoFHandler<dim>::active_cell_iterator cell;
+  const typename MGDoFHandler<dim,spacedim>::cell_iterator end = dofs.end(level);
+  typename MGDoFHandler<dim,spacedim>::active_cell_iterator cell;
   std::vector<unsigned int> cell_indices;
   std::vector<unsigned int> neighbor_indices;
   
@@ -416,7 +416,7 @@ MGTools::compute_row_length_vector(
       for (unsigned int iface=0;iface<GeometryInfo<dim>::faces_per_cell;++iface)
 	{
 	  bool level_boundary = cell->at_boundary(iface);
-	  typename MGDoFHandler<dim>::cell_iterator neighbor;
+	  typename MGDoFHandler<dim,spacedim>::cell_iterator neighbor;
 	  if (!level_boundary)
 	    {
 	      neighbor = cell->neighbor(iface);
@@ -432,7 +432,7 @@ MGTools::compute_row_length_vector(
 	    }
 	  
 	  const FiniteElement<dim>& nfe = neighbor->get_fe();
-	  typename MGDoFHandler<dim>::face_iterator face = cell->face(iface);
+	  typename MGDoFHandler<dim,spacedim>::face_iterator face = cell->face(iface);
 	  
 					   // Flux couplings are
 					   // computed from both sides
@@ -502,9 +502,9 @@ MGTools::compute_row_length_vector(
 #endif
 
 
-template <int dim, class SparsityPattern>
+template <int dim, class SparsityPattern, int spacedim>
 void MGTools::make_sparsity_pattern (
-  const MGDoFHandler<dim> &dof,
+  const MGDoFHandler<dim,spacedim> &dof,
   SparsityPattern         &sparsity,
   const unsigned int       level)
 {
@@ -517,7 +517,7 @@ void MGTools::make_sparsity_pattern (
 
   const unsigned int dofs_per_cell = dof.get_fe().dofs_per_cell;
   std::vector<unsigned int> dofs_on_this_cell(dofs_per_cell);
-  typename MGDoFHandler<dim>::cell_iterator cell = dof.begin(level),
+  typename MGDoFHandler<dim,spacedim>::cell_iterator cell = dof.begin(level),
 					    endc = dof.end(level);
   for (; cell!=endc; ++cell) 
     {
@@ -532,10 +532,10 @@ void MGTools::make_sparsity_pattern (
 
 
 
-template<int dim, class SparsityPattern>
+template <int dim, class SparsityPattern, int spacedim>
 void
 MGTools::make_flux_sparsity_pattern (
-  const MGDoFHandler<dim> &dof,
+  const MGDoFHandler<dim,spacedim> &dof,
   SparsityPattern       &sparsity,
   const unsigned int level)
 {
@@ -549,7 +549,7 @@ MGTools::make_flux_sparsity_pattern (
   const unsigned int dofs_per_cell = dof.get_fe().dofs_per_cell;
   std::vector<unsigned int> dofs_on_this_cell(dofs_per_cell);
   std::vector<unsigned int> dofs_on_other_cell(dofs_per_cell);
-  typename MGDoFHandler<dim>::cell_iterator cell = dof.begin(level),
+  typename MGDoFHandler<dim,spacedim>::cell_iterator cell = dof.begin(level),
 					    endc = dof.end(level);
   for (; cell!=endc; ++cell)
     {
@@ -568,7 +568,7 @@ MGTools::make_flux_sparsity_pattern (
 	  if ( (! cell->at_boundary(face)) &&
 	       (static_cast<unsigned int>(cell->neighbor_level(face)) == level) )
 	    {
-	      typename MGDoFHandler<dim>::cell_iterator
+	      typename MGDoFHandler<dim,spacedim>::cell_iterator
 		neighbor = cell->neighbor(face);
 	      neighbor->get_mg_dof_indices (dofs_on_other_cell);
 					       // only add one direction
@@ -589,10 +589,10 @@ MGTools::make_flux_sparsity_pattern (
 
 
 
-template<int dim, class SparsityPattern>
+template <int dim, class SparsityPattern, int spacedim>
 void
 MGTools::make_flux_sparsity_pattern_edge (
-  const MGDoFHandler<dim> &dof,
+  const MGDoFHandler<dim,spacedim> &dof,
   SparsityPattern       &sparsity,
   const unsigned int level)
 {
@@ -612,7 +612,7 @@ MGTools::make_flux_sparsity_pattern_edge (
   const unsigned int dofs_per_cell = dof.get_fe().dofs_per_cell;
   std::vector<unsigned int> dofs_on_this_cell(dofs_per_cell);
   std::vector<unsigned int> dofs_on_other_cell(dofs_per_cell);
-  typename MGDoFHandler<dim>::cell_iterator cell = dof.begin(level),
+  typename MGDoFHandler<dim,spacedim>::cell_iterator cell = dof.begin(level),
 					    endc = dof.end(level);
   for (; cell!=endc; ++cell)
     {
@@ -627,7 +627,7 @@ MGTools::make_flux_sparsity_pattern_edge (
 	  if ( (! cell->at_boundary(face)) &&
 	       (static_cast<unsigned int>(cell->neighbor_level(face)) != level) )
 	    {
-	      typename MGDoFHandler<dim>::cell_iterator
+	      typename MGDoFHandler<dim,spacedim>::cell_iterator
 		neighbor = cell->neighbor(face);
 	      neighbor->get_mg_dof_indices (dofs_on_other_cell);
 
@@ -651,10 +651,10 @@ MGTools::make_flux_sparsity_pattern_edge (
 
 
 
-template<int dim, class SparsityPattern>
+template <int dim, class SparsityPattern, int spacedim>
 void
 MGTools::make_flux_sparsity_pattern (
-  const MGDoFHandler<dim> &dof,
+  const MGDoFHandler<dim,spacedim> &dof,
   SparsityPattern       &sparsity,
   const unsigned int level,
   const Table<2,DoFTools::Coupling> &int_mask,
@@ -682,7 +682,7 @@ MGTools::make_flux_sparsity_pattern (
   std::vector<unsigned int> dofs_on_other_cell(total_dofs);
   Table<2,bool> support_on_face(total_dofs, GeometryInfo<dim>::faces_per_cell);
   
-  typename MGDoFHandler<dim>::cell_iterator cell = dof.begin(level),
+  typename MGDoFHandler<dim,spacedim>::cell_iterator cell = dof.begin(level),
 					    endc = dof.end(level);
 
   Table<2,DoFTools::Coupling> int_dof_mask(total_dofs, total_dofs);
@@ -705,7 +705,7 @@ MGTools::make_flux_sparsity_pattern (
 				   // beginning of this function.
   std::vector<bool> user_flags;
   dof.get_tria().save_user_flags(user_flags);
-  const_cast<Triangulation<dim> &>(dof.get_tria()).clear_user_flags ();
+  const_cast<Triangulation<dim,spacedim> &>(dof.get_tria()).clear_user_flags ();
   
   for (; cell!=endc; ++cell)
     {
@@ -722,7 +722,7 @@ MGTools::make_flux_sparsity_pattern (
 	   face < GeometryInfo<dim>::faces_per_cell;
 	   ++face)
 	{
-	  typename MGDoFHandler<dim>::face_iterator cell_face = cell->face(face);
+	  typename MGDoFHandler<dim,spacedim>::face_iterator cell_face = cell->face(face);
 	  if (cell_face->user_flag_set ())
 	    continue;
 
@@ -747,7 +747,7 @@ MGTools::make_flux_sparsity_pattern (
 	    }
 	  else
 	    {
-	      typename MGDoFHandler<dim>::cell_iterator
+	      typename MGDoFHandler<dim,spacedim>::cell_iterator
 		neighbor = cell->neighbor(face);
 	      
 	      if (neighbor->level() < cell->level())
@@ -825,15 +825,15 @@ MGTools::make_flux_sparsity_pattern (
     }
   
 				   // finally restore the user flags
-  const_cast<Triangulation<dim> &>(dof.get_tria()).load_user_flags(user_flags);
+  const_cast<Triangulation<dim,spacedim> &>(dof.get_tria()).load_user_flags(user_flags);
 }
 
 
 
-template<int dim, class SparsityPattern>
+template <int dim, class SparsityPattern, int spacedim>
 void
 MGTools::make_flux_sparsity_pattern_edge (
-  const MGDoFHandler<dim> &dof,
+  const MGDoFHandler<dim,spacedim> &dof,
   SparsityPattern       &sparsity,
   const unsigned int level,
   const Table<2,DoFTools::Coupling> &flux_mask)
@@ -863,7 +863,7 @@ MGTools::make_flux_sparsity_pattern_edge (
   std::vector<unsigned int> dofs_on_other_cell(dofs_per_cell);
   Table<2,bool> support_on_face(dofs_per_cell, GeometryInfo<dim>::faces_per_cell);
   
-  typename MGDoFHandler<dim>::cell_iterator cell = dof.begin(level),
+  typename MGDoFHandler<dim,spacedim>::cell_iterator cell = dof.begin(level),
 					    endc = dof.end(level);
 
    Table<2,DoFTools::Coupling> flux_dof_mask(dofs_per_cell, dofs_per_cell);
@@ -887,7 +887,7 @@ MGTools::make_flux_sparsity_pattern_edge (
 	  if ( (! cell->at_boundary(face)) &&
 	       (static_cast<unsigned int>(cell->neighbor_level(face)) != level) )
 	    {
-	      typename MGDoFHandler<dim>::cell_iterator
+	      typename MGDoFHandler<dim,spacedim>::cell_iterator
 		neighbor = cell->neighbor(face);
 	      neighbor->get_mg_dof_indices (dofs_on_other_cell);
 
@@ -911,10 +911,10 @@ MGTools::make_flux_sparsity_pattern_edge (
 
 
 
-template <int dim>
+template <int dim, int spacedim>
 void
 MGTools::count_dofs_per_component (
-  const MGDoFHandler<dim> &dof_handler,
+  const MGDoFHandler<dim,spacedim> &dof_handler,
   std::vector<std::vector<unsigned int> > &result,
   bool only_once,
   std::vector<unsigned int> target_component)
@@ -963,7 +963,7 @@ MGTools::count_dofs_per_component (
 	  for (unsigned int i=0; i<n_components; ++i)
 	    {
 	      void (*fun_ptr) (const unsigned int       level,
-			       const MGDoFHandler<dim>    &,
+			       const MGDoFHandler<dim,spacedim>    &,
 			       const std::vector<bool>    &,
 			       std::vector<bool>          &,
 			       bool)
@@ -1009,10 +1009,10 @@ MGTools::count_dofs_per_component (
 
 
 
-template <int dim>
+template <int dim, int spacedim>
 void
 MGTools::count_dofs_per_component (
-  const MGDoFHandler<dim> &dof_handler,
+  const MGDoFHandler<dim,spacedim> &dof_handler,
   std::vector<std::vector<unsigned int> > &result,
   std::vector<unsigned int> target_component)
 {
@@ -1020,10 +1020,10 @@ MGTools::count_dofs_per_component (
 }
 
 
-template <int dim>
+template <int dim, int spacedim>
 void
 MGTools::count_dofs_per_block (
-  const MGDoFHandler<dim>&     dof_handler,
+  const MGDoFHandler<dim,spacedim>&     dof_handler,
   std::vector<std::vector<unsigned int> >& dofs_per_block,
   std::vector<unsigned int>  target_block)
 {
@@ -1074,7 +1074,7 @@ MGTools::count_dofs_per_block (
       for (unsigned int i=0; i<n_blocks; ++i)
 	{
 	  void (*fun_ptr) (const unsigned int level,
-			   const MGDoFHandler<dim>&,
+			   const MGDoFHandler<dim,spacedim>&,
 			   const std::vector<bool>&,
 			   std::vector<bool>&,
 			   bool)
@@ -1097,10 +1097,10 @@ MGTools::count_dofs_per_block (
 
 #if deal_II_dimension == 1
 
-template <int dim>
+template <int dim, int spacedim>
 void
 MGTools::make_boundary_list(
-  const MGDoFHandler<dim>&,
+  const MGDoFHandler<dim,spacedim>&,
   const typename FunctionMap<dim>::type&,
   std::vector<std::set<unsigned int> >&,
   const std::vector<bool>&)
@@ -1111,10 +1111,10 @@ MGTools::make_boundary_list(
 
 #else
 
-template <int dim>
+template <int dim, int spacedim>
 void
 MGTools::make_boundary_list(
-  const MGDoFHandler<dim>& dof,
+  const MGDoFHandler<dim,spacedim>& dof,
   const typename FunctionMap<dim>::type& function_map,
   std::vector<std::set<unsigned int> >& boundary_indices,
   const std::vector<bool>& component_mask_)
@@ -1150,7 +1150,7 @@ MGTools::make_boundary_list(
   face_dofs.reserve (DoFTools::max_dofs_per_face(dof));
   std::fill (face_dofs.begin (), face_dofs.end (), DoFHandler<dim>::invalid_dof_index);
   
-  typename MGDoFHandler<dim>::cell_iterator cell = dof.begin(),
+  typename MGDoFHandler<dim,spacedim>::cell_iterator cell = dof.begin(),
 					    endc = dof.end();
   for (; cell!=endc; ++cell)
     for (unsigned int face_no = 0; face_no < GeometryInfo<dim>::faces_per_cell;
@@ -1183,7 +1183,7 @@ MGTools::make_boundary_list(
                                     "elements"));
           }
 
-        typename MGDoFHandler<dim>::face_iterator face = cell->face(face_no);
+        typename MGDoFHandler<dim,spacedim>::face_iterator face = cell->face(face_no);
         const unsigned char boundary_component = face->boundary_indicator();
         if (function_map.find(boundary_component) != function_map.end())
                                            // face is of the right component
@@ -1297,9 +1297,9 @@ MGTools::make_boundary_list(
 
 
   
-template<int dim, typename number>
+template <int dim, typename number, int spacedim>
 void
-MGTools::reinit_vector (const MGDoFHandler<dim> &mg_dof,
+MGTools::reinit_vector (const MGDoFHandler<dim,spacedim> &mg_dof,
 			MGLevelObject<Vector<number> > &v)
 {
   for (unsigned int level=v.get_minlevel();
@@ -1312,9 +1312,9 @@ MGTools::reinit_vector (const MGDoFHandler<dim> &mg_dof,
 }
 
 
-template<int dim, typename number>
+template <int dim, typename number, int spacedim>
 void
-MGTools::reinit_vector (const MGDoFHandler<dim> &mg_dof,
+MGTools::reinit_vector (const MGDoFHandler<dim,spacedim> &mg_dof,
 			MGLevelObject<BlockVector<number> > &v)
 {
   const unsigned int n_blocks = mg_dof.get_fe().n_blocks();
@@ -1331,10 +1331,10 @@ MGTools::reinit_vector (const MGDoFHandler<dim> &mg_dof,
 }
 
 
-template<int dim, typename number>
+template <int dim, typename number, int spacedim>
 void
 MGTools::reinit_vector_by_components (
-  const MGDoFHandler<dim> &mg_dof,
+  const MGDoFHandler<dim,spacedim> &mg_dof,
   MGLevelObject<BlockVector<number> > &v,
   const std::vector<bool> &sel,
   const std::vector<unsigned int> &target_comp,
@@ -1405,10 +1405,10 @@ MGTools::reinit_vector_by_components (
 }
 
 
-template<int dim, typename number>
+template <int dim, typename number, int spacedim>
 void
 MGTools::reinit_vector_by_components (
-  const MGDoFHandler<dim> &mg_dof,
+  const MGDoFHandler<dim,spacedim> &mg_dof,
   MGLevelObject<Vector<number> > &v,
   const std::vector<bool> &selected,
   const std::vector<unsigned int> &target_component,
@@ -1447,10 +1447,10 @@ MGTools::reinit_vector_by_components (
 }
 
 
-template<int dim, typename number>
+template <int dim, typename number, int spacedim>
 void
 MGTools::reinit_vector_by_blocks (
-  const MGDoFHandler<dim> &mg_dof,
+  const MGDoFHandler<dim,spacedim> &mg_dof,
   MGLevelObject<BlockVector<number> > &v,
   const std::vector<bool> &sel,
   std::vector<std::vector<unsigned int> >& ndofs)
@@ -1488,10 +1488,10 @@ MGTools::reinit_vector_by_blocks (
 }
 
 
-template<int dim, typename number>
+template <int dim, typename number, int spacedim>
 void
 MGTools::reinit_vector_by_blocks (
-  const MGDoFHandler<dim> &mg_dof,
+  const MGDoFHandler<dim,spacedim> &mg_dof,
   MGLevelObject<Vector<number> > &v,
   const unsigned int selected_block,
   std::vector<std::vector<unsigned int> >& ndofs)

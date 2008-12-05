@@ -30,7 +30,7 @@
 
 DEAL_II_NAMESPACE_OPEN
 
-template<int dim> class FESystem;
+template<int dim, int spacedim> class FESystem;
 
 
 /**

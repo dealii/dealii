@@ -38,7 +38,7 @@ DEAL_II_NAMESPACE_OPEN
 //   static void SYMBOL (const int2type<1> & ) {}
 // }
 // 
-// template <int dim> void g() {
+// template <int dim, int spacedim> void g() {
 //   SYMBOL(int2type<dim>());
 // }
 //
@@ -174,10 +174,379 @@ namespace FE_Q_Helper
 
 
 
-template <int dim>
-FE_Q<dim>::FE_Q (const unsigned int degree)
+/**
+ * A class with the same purpose as the similarly named class of the
+ * Triangulation class. See there for more information.
+ */
+template <int xdim, int xspacedim>
+struct FE_Q<xdim,xspacedim>::Implementation
+{
+				     /**
+				      * Initialize the hanging node
+				      * constraints matrices. Called from the
+				      * constructor in case the finite element
+				      * is based on quadrature points.
+				      */
+    template <int spacedim>
+    static
+    void initialize_constraints (const Quadrature<1> &,
+				 FE_Q<1,spacedim>    &)
+      {
+					 // no constraints in 1d
+      }
+
+
+    template <int spacedim>
+    static
+    void initialize_constraints (const Quadrature<1> &points,
+				 FE_Q<2,spacedim>    &fe)
+      {
+	const unsigned int dim = 2;
+
+					 // restricted to each face, the
+					 // traces of the shape functions is
+					 // an element of P_{k} (in 2d), or
+					 // Q_{k} (in 3d), where k is the
+					 // degree of the element.  from
+					 // this, we interpolate between
+					 // mother and cell face.
+
+					 // the interpolation process works
+					 // as followings: on each subface,
+					 // we want that finite element
+					 // solutions from both sides
+					 // coincide. i.e. if a and b are
+					 // expansion coefficients for the
+					 // shape functions from both sides,
+					 // we seek a relation between x and
+					 // y such that
+					 //   sum_j a_j phi^c_j(x)
+					 //   == sum_j b_j phi_j(x)  
+					 // for all points x on the
+					 // interface. here, phi^c_j are the
+					 // shape functions on the small
+					 // cell on one side of the face,
+					 // and phi_j those on the big cell
+					 // on the other side. To get this
+					 // relation, it suffices to look at
+					 // a sufficient number of points
+					 // for which this has to hold. if
+					 // there are n functions, then we
+					 // need n evaluation points, and we
+					 // choose them equidistantly.
+					 //
+					 // we obtain the matrix system
+					 //    A a  ==  B b
+					 // where
+					 //    A_ij = phi^c_j(x_i)
+					 //    B_ij = phi_j(x_i)
+					 // and the relation we are looking
+					 // for is
+					 //    a = A^-1 B b
+					 //
+					 // for the special case of Lagrange
+					 // interpolation polynomials, A_ij
+					 // reduces to delta_ij, and
+					 //    a_i = B_ij b_j
+					 // Hence,
+					 // interface_constraints(i,j)=B_ij.
+					 //
+					 // for the general case, where we
+					 // don't have Lagrange
+					 // interpolation polynomials, this
+					 // is a little more
+					 // complicated. Then we would
+					 // evaluate at a number of points
+					 // and invert the interpolation
+					 // matrix A.
+					 //
+					 // Note, that we build up these
+					 // matrices for all subfaces at
+					 // once, rather than considering
+					 // them separately. the reason is
+					 // that we finally will want to
+					 // have them in this order anyway,
+					 // as this is the format we need
+					 // inside deal.II
+
+					 // In the following the points x_i
+					 // are constructed in following
+					 // order (n=degree-1)
+					 // *----------*---------*
+					 //     1..n   0  n+1..2n
+					 // i.e. first the midpoint of the
+					 // line, then the support points on
+					 // subface 0 and on subface 1
+	std::vector<Point<dim-1> > constraint_points;
+					 // Add midpoint
+	constraint_points.push_back (Point<dim-1> (0.5));
+
+	if (fe.degree>1)
+	  {
+	    const unsigned int n=fe.degree-1;
+	    const double step=1./fe.degree;
+					     // subface 0
+	    for (unsigned int i=1; i<=n; ++i)
+	      constraint_points.push_back (
+		GeometryInfo<dim-1>::child_to_cell_coordinates(Point<dim-1>(i*step),0));
+					     // subface 1
+	    for (unsigned int i=1; i<=n; ++i)
+	      constraint_points.push_back (
+		GeometryInfo<dim-1>::child_to_cell_coordinates(Point<dim-1>(i*step),1));
+	  }
+
+					 // Now construct relation between
+					 // destination (child) and source (mother)
+					 // dofs.
+	const std::vector<Polynomials::Polynomial<double> > polynomials=
+	  Polynomials::Lagrange::generate_complete_basis(points.get_points());
+
+	fe.interface_constraints
+	  .TableBase<2,double>::reinit (fe.interface_constraints_size());
+
+	for (unsigned int i=0; i<constraint_points.size(); ++i)
+	  for (unsigned j=0; j<fe.degree+1; ++j)
+	    {
+	      fe.interface_constraints(i,j) = 
+		polynomials[fe.face_index_map[j]].value (constraint_points[i](0));
+		    
+					       // if the value is small up
+					       // to round-off, then
+					       // simply set it to zero to
+					       // avoid unwanted fill-in
+					       // of the constraint
+					       // matrices (which would
+					       // then increase the number
+					       // of other DoFs a
+					       // constrained DoF would
+					       // couple to)
+	      if (std::fabs(fe.interface_constraints(i,j)) < 1e-14)
+		fe.interface_constraints(i,j) = 0;
+	    }
+      }
+
+
+    template <int spacedim>
+    static
+    void initialize_constraints (const Quadrature<1> &points,
+				 FE_Q<3,spacedim>    &fe)
+      {
+	const unsigned int dim = 3;
+
+					 // For a detailed documentation of
+					 // the interpolation see the
+					 // FE_Q<2>::initialize_constraints
+					 // function.
+
+					 // In the following the points x_i
+					 // are constructed in the order as
+					 // described in the documentation
+					 // of the FiniteElement class
+					 // (fe_base.h), i.e.
+					 //   *--15--4--16--*
+					 //   |      |      |
+					 //   10 19  6  20  12
+					 //   |      |      |
+					 //   1--7---0--8---2
+					 //   |      |      |
+					 //   9  17  5  18  11
+					 //   |      |      |
+					 //   *--13--3--14--*
+	std::vector<Point<dim-1> > constraint_points;
+
+					 // Add midpoint
+	constraint_points.push_back (Point<dim-1> (0.5, 0.5));
+
+					 // Add midpoints of lines of
+					 // "mother-face"
+	constraint_points.push_back (Point<dim-1> (0, 0.5));
+	constraint_points.push_back (Point<dim-1> (1, 0.5));
+	constraint_points.push_back (Point<dim-1> (0.5, 0));
+	constraint_points.push_back (Point<dim-1> (0.5, 1));
+
+	if (fe.degree>1)
+	  {
+	    const unsigned int n=fe.degree-1;
+	    const double step=1./fe.degree;
+	    std::vector<Point<dim-2> > line_support_points(n);
+	    for (unsigned int i=0; i<n; ++i)
+	      line_support_points[i](0)=(i+1)*step;
+	    Quadrature<dim-2> qline(line_support_points);
+
+					     // auxiliary points in 2d
+	    std::vector<Point<dim-1> > p_line(n);
+  
+					     // Add nodes of lines interior
+					     // in the "mother-face"
+
+					     // line 5: use line 9
+	    QProjector<dim-1>::project_to_subface(qline, 0, 0, p_line);
+	    for (unsigned int i=0; i<n; ++i)
+	      constraint_points.push_back (p_line[i] + Point<dim-1> (0.5, 0));
+					     // line 6: use line 10
+	    QProjector<dim-1>::project_to_subface(qline, 0, 1, p_line);
+	    for (unsigned int i=0; i<n; ++i)
+	      constraint_points.push_back (p_line[i] + Point<dim-1> (0.5, 0));
+					     // line 7: use line 13
+	    QProjector<dim-1>::project_to_subface(qline, 2, 0, p_line);
+	    for (unsigned int i=0; i<n; ++i)
+	      constraint_points.push_back (p_line[i] + Point<dim-1> (0, 0.5));
+					     // line 8: use line 14
+	    QProjector<dim-1>::project_to_subface(qline, 2, 1, p_line);
+	    for (unsigned int i=0; i<n; ++i)
+	      constraint_points.push_back (p_line[i] + Point<dim-1> (0, 0.5));
+      
+					     // DoFs on bordering lines
+					     // lines 9-16
+	    for (unsigned int face=0; face<GeometryInfo<dim-1>::faces_per_cell; ++face)
+	      for (unsigned int subface=0;
+		   subface<GeometryInfo<dim-1>::max_children_per_face; ++subface)
+		{
+		  QProjector<dim-1>::project_to_subface(qline, face, subface, p_line);
+		  constraint_points.insert(constraint_points.end(),
+					   p_line.begin(), p_line.end());
+		}
+      
+					     // Create constraints for
+					     // interior nodes
+	    std::vector<Point<dim-1> > inner_points(n*n);
+	    for (unsigned int i=0, iy=1; iy<=n; ++iy)
+	      for (unsigned int ix=1; ix<=n; ++ix)
+		inner_points[i++] = Point<dim-1> (ix*step, iy*step);
+      
+	    for (unsigned int child=0; 
+		 child<GeometryInfo<dim-1>::max_children_per_cell; ++child)
+	      for (unsigned int i=0; i<inner_points.size(); ++i)
+		constraint_points.push_back (
+		  GeometryInfo<dim-1>::child_to_cell_coordinates(inner_points[i], child));
+	  }
+
+					 // Now construct relation between
+					 // destination (child) and source (mother)
+					 // dofs.
+	const unsigned int pnts=(fe.degree+1)*(fe.degree+1); 
+	const std::vector<Polynomials::Polynomial<double> > polynomial_basis=
+	  Polynomials::Lagrange::generate_complete_basis(points.get_points()); 
+
+	const TensorProductPolynomials<dim-1> face_polynomials(polynomial_basis);
+
+	fe.interface_constraints
+	  .TableBase<2,double>::reinit (fe.interface_constraints_size());
+
+	for (unsigned int i=0; i<constraint_points.size(); ++i)
+	  {
+	    const double interval = (double) (fe.degree * 2);
+	    bool mirror[dim - 1];
+	    Point<dim-1> constraint_point;
+
+					     // Eliminate FP errors in constraint
+					     // points. Due to their origin, they
+					     // must all be fractions of the unit
+					     // interval. If we have polynomial
+					     // degree 4, the refined element has 8
+					     // intervals.  Hence the coordinates
+					     // must be 0, 0.125, 0.25, 0.375 etc.
+					     // Now the coordinates of the
+					     // constraint points will be multiplied
+					     // by the inverse of the interval size
+					     // (in the example by 8).  After that
+					     // the coordinates must be integral
+					     // numbers. Hence a normal truncation
+					     // is performed and the coordinates
+					     // will be scaled back. The equal
+					     // treatment of all coordinates should
+					     // eliminate any FP errors.
+	    for (unsigned int k=0; k<dim-1; ++k)
+	      {
+		const int coord_int =
+		  static_cast<int> (constraint_points[i](k) * interval + 0.25);
+		constraint_point(k) = 1.*coord_int / interval;
+
+						 // The following lines of code
+						 // should eliminate the problems
+						 // with the Constraint-Matrix,
+						 // which appeared for P>=4. The
+						 // Constraint-Matrix class
+						 // complained about different
+						 // constraints for the same entry
+						 // of the Constraint-Matrix.
+						 // Actually this difference could
+						 // be attributed to FP errors, as
+						 // it was in the range of
+						 // 1.0e-16. These errors originate
+						 // in the loss of symmetry in the
+						 // FP approximation of the
+						 // shape-functions.  Considering a
+						 // 3rd order shape function in 1D,
+						 // we have N0(x)=N3(1-x) and
+						 // N1(x)=N2(1-x).  For higher order
+						 // polynomials the FP
+						 // approximations of the shape
+						 // functions do not satisfy these
+						 // equations any more!  Thus in the
+						 // following code everything is
+						 // computed in the interval x \in
+						 // [0..0.5], which is sufficient to
+						 // express all values that could
+						 // come out from a computation of
+						 // any shape function in the full
+						 // interval [0..1]. If x > 0.5 the
+						 // computation is done for 1-x with
+						 // the shape function N_{p-n}
+						 // instead of N_n.  Hence symmetry
+						 // is preserved and everything
+						 // works fine...
+						 //
+						 // For a different explanation of
+						 // the problem, see the discussion
+						 // in the FiniteElement class
+						 // for constraint matrices in 3d.
+		mirror[k] = (constraint_point(k) > 0.5);
+		if (mirror[k])
+		  constraint_point(k) = 1.0 - constraint_point(k);
+	      }
+
+	    for (unsigned j=0; j<pnts; ++j)
+	      {
+		unsigned int indices[2]
+		  = { fe.face_index_map[j] % (fe.degree + 1),
+		      fe.face_index_map[j] / (fe.degree + 1) };
+          
+		for (unsigned int k = 0; k<2; ++k)
+		  if (mirror[k])
+		    indices[k] = fe.degree - indices[k];
+          
+		const unsigned int
+		  new_index = indices[1] * (fe.degree + 1) + indices[0];
+
+		fe.interface_constraints(i,j) = 
+		  face_polynomials.compute_value (new_index, constraint_point);
+	    
+						 // if the value is small up
+						 // to round-off, then
+						 // simply set it to zero to
+						 // avoid unwanted fill-in
+						 // of the constraint
+						 // matrices (which would
+						 // then increase the number
+						 // of other DoFs a
+						 // constrained DoF would
+						 // couple to)
+		if (std::fabs(fe.interface_constraints(i,j)) < 1e-14)
+		  fe.interface_constraints(i,j) = 0;
+	      }
+	  }
+      }
+};
+
+
+    
+
+
+template <int dim, int spacedim>
+FE_Q<dim,spacedim>::FE_Q (const unsigned int degree)
 		:
-		FE_Poly<TensorProductPolynomials<dim>, dim> (
+		FE_Poly<TensorProductPolynomials<dim>, dim, spacedim> (
 		  TensorProductPolynomials<dim>(Polynomials::LagrangeEquidistant::generate_complete_basis(degree)),
 		  FiniteElementData<dim>(get_dpo_vector(degree),
 					 1, degree,
@@ -210,10 +579,10 @@ FE_Q<dim>::FE_Q (const unsigned int degree)
 
 
 
-template <int dim>
-FE_Q<dim>::FE_Q (const Quadrature<1> &points)
+template <int dim, int spacedim>
+FE_Q<dim,spacedim>::FE_Q (const Quadrature<1> &points)
 		:
-		FE_Poly<TensorProductPolynomials<dim>, dim> (
+		FE_Poly<TensorProductPolynomials<dim>, dim, spacedim> (
 		  TensorProductPolynomials<dim>(Polynomials::Lagrange::generate_complete_basis(points.get_points())),
 		  FiniteElementData<dim>(get_dpo_vector(points.n_quadrature_points-1),
 					 1, points.n_quadrature_points-1,
@@ -243,7 +612,7 @@ FE_Q<dim>::FE_Q (const Quadrature<1> &points)
 
 				   // compute constraint, embedding
 				   // and restriction matrices
-  initialize_constraints (points);
+  Implementation::initialize_constraints (points, *this);
 
 				   // Reinit the vectors of
 				   // restriction and prolongation
@@ -262,9 +631,9 @@ FE_Q<dim>::FE_Q (const Quadrature<1> &points)
 
 
 
-template <int dim>
+template <int dim, int spacedim>
 std::string
-FE_Q<dim>::get_name () const
+FE_Q<dim,spacedim>::get_name () const
 {
 				   // note that the
 				   // FETools::get_fe_from_name
@@ -335,28 +704,31 @@ FE_Q<dim>::get_name () const
 
 
 
-template <int dim>
-FiniteElement<dim> *
-FE_Q<dim>::clone() const
+template <int dim, int spacedim>
+FiniteElement<dim,spacedim> *
+FE_Q<dim,spacedim>::clone() const
 {
-  return new FE_Q<dim>(*this);
+  return new FE_Q<dim,spacedim>(*this);
 }
 
 
 
-template <int dim>
+template <int dim, int spacedim>
 void
-FE_Q<dim>::
-get_interpolation_matrix (const FiniteElement<dim> &x_source_fe,
+FE_Q<dim,spacedim>::
+get_interpolation_matrix (const FiniteElement<dim,spacedim> &x_source_fe,
 			  FullMatrix<double>       &interpolation_matrix) const
 {
 				   // this is only implemented, if the
 				   // source FE is also a
 				   // Q element
+  typedef FE_Q<dim,spacedim> FEQ;
+  typedef FiniteElement<dim,spacedim> FEL;
+
   AssertThrow ((x_source_fe.get_name().find ("FE_Q<") == 0)
                ||
-               (dynamic_cast<const FE_Q<dim>*>(&x_source_fe) != 0),
-               typename FiniteElement<dim>::
+               (dynamic_cast<const FEQ*>(&x_source_fe) != 0),
+               typename FEL::
                ExcInterpolationNotImplemented());
   
   Assert (interpolation_matrix.m() == this->dofs_per_cell,
@@ -368,8 +740,8 @@ get_interpolation_matrix (const FiniteElement<dim> &x_source_fe,
 
 				   // ok, source is a Q element, so
 				   // we will be able to do the work
-  const FE_Q<dim> &source_fe
-    = dynamic_cast<const FE_Q<dim>&>(x_source_fe);
+  const FE_Q<dim,spacedim> &source_fe
+    = dynamic_cast<const FE_Q<dim,spacedim>&>(x_source_fe);
 
 				   // compute the interpolation
 				   // matrices in much the same way as
@@ -452,24 +824,53 @@ get_subface_interpolation_matrix (const FiniteElement<1> &/*x_source_fe*/,
 	  ExcInterpolationNotImplemented ());
 }
 
+
+template <>
+void
+FE_Q<1,2>::
+get_face_interpolation_matrix (const FiniteElement<1,2> &/*x_source_fe*/,
+			       FullMatrix<double>     &/*interpolation_matrix*/) const
+{
+  typedef FiniteElement<1,2> FEL;
+  Assert (false,
+	  FEL::
+	   ExcInterpolationNotImplemented ());
+}
+
+
+template <>
+void
+FE_Q<1,2>::
+get_subface_interpolation_matrix (const FiniteElement<1,2> &/*x_source_fe*/,
+				  const unsigned int      /*subface*/,
+				  FullMatrix<double>     &/*interpolation_matrix*/) const
+{
+  typedef FiniteElement<1,2> FEL;
+  Assert (false,
+	  FEL::
+	  ExcInterpolationNotImplemented ());
+}
+
 #endif
 
 
 #if deal_II_dimension > 1
 
-template <int dim>
+template <int dim, int spacedim>
 void
-FE_Q<dim>::
-get_face_interpolation_matrix (const FiniteElement<dim> &x_source_fe,
+FE_Q<dim,spacedim>::
+get_face_interpolation_matrix (const FiniteElement<dim,spacedim> &x_source_fe,
 			       FullMatrix<double>       &interpolation_matrix) const
 {
 				   // this is only implemented, if the
 				   // source FE is also a
 				   // Q element
+  typedef FE_Q<dim,spacedim> FEQ;
+  typedef FiniteElement<dim,spacedim> FEL;
   AssertThrow ((x_source_fe.get_name().find ("FE_Q<") == 0)
                ||
-               (dynamic_cast<const FE_Q<dim>*>(&x_source_fe) != 0),
-               typename FiniteElement<dim>::
+               (dynamic_cast<const FEQ*>(&x_source_fe) != 0),
+               typename FEL::
                ExcInterpolationNotImplemented());
   
   Assert (interpolation_matrix.n() == this->dofs_per_face,
@@ -481,8 +882,8 @@ get_face_interpolation_matrix (const FiniteElement<dim> &x_source_fe,
 
 				   // ok, source is a Q element, so
 				   // we will be able to do the work
-  const FE_Q<dim> &source_fe
-    = dynamic_cast<const FE_Q<dim>&>(x_source_fe);
+  const FE_Q<dim,spacedim> &source_fe
+    = dynamic_cast<const FE_Q<dim,spacedim>&>(x_source_fe);
 
 				   // Make sure, that the element,
                                    // for which the DoFs should be
@@ -496,7 +897,7 @@ get_face_interpolation_matrix (const FiniteElement<dim> &x_source_fe,
                                    // hp procedures, which use this
 				   // method.
   Assert (this->dofs_per_face <= source_fe.dofs_per_face,
-	  typename FiniteElement<dim>::
+	  typename FEL::
 	  ExcInterpolationNotImplemented ());
   
                                    // generate a quadrature
@@ -512,7 +913,7 @@ get_face_interpolation_matrix (const FiniteElement<dim> &x_source_fe,
 				   // given polynomial degree.
 				   // This value is used to cut
 				   // off values close to zero.
-  double eps = 2e-13*this->degree*(dim-1);
+  const double eps = 2e-13*this->degree*(dim-1);
   
 				   // compute the interpolation
 				   // matrix by simply taking the
@@ -564,20 +965,22 @@ get_face_interpolation_matrix (const FiniteElement<dim> &x_source_fe,
 
 
 
-template <int dim>
+template <int dim, int spacedim>
 void
-FE_Q<dim>::
-get_subface_interpolation_matrix (const FiniteElement<dim> &x_source_fe,
+FE_Q<dim,spacedim>::
+get_subface_interpolation_matrix (const FiniteElement<dim,spacedim> &x_source_fe,
 				  const unsigned int        subface,
 				  FullMatrix<double>       &interpolation_matrix) const
 {
 				   // this is only implemented, if the
 				   // source FE is also a
 				   // Q element
+  typedef FE_Q<dim,spacedim> FEQ;
+  typedef FiniteElement<dim,spacedim> FEL;
   AssertThrow ((x_source_fe.get_name().find ("FE_Q<") == 0)
                ||
-               (dynamic_cast<const FE_Q<dim>*>(&x_source_fe) != 0),
-               typename FiniteElement<dim>::
+               (dynamic_cast<const FEQ*>(&x_source_fe) != 0),
+               typename FEL::
                ExcInterpolationNotImplemented());
   
   Assert (interpolation_matrix.n() == this->dofs_per_face,
@@ -589,8 +992,8 @@ get_subface_interpolation_matrix (const FiniteElement<dim> &x_source_fe,
 
 				   // ok, source is a Q element, so
 				   // we will be able to do the work
-  const FE_Q<dim> &source_fe
-    = dynamic_cast<const FE_Q<dim>&>(x_source_fe);
+  const FE_Q<dim,spacedim> &source_fe
+    = dynamic_cast<const FE_Q<dim,spacedim>&>(x_source_fe);
 
 				   // Make sure, that the element,
                                    // for which the DoFs should be
@@ -604,7 +1007,7 @@ get_subface_interpolation_matrix (const FiniteElement<dim> &x_source_fe,
                                    // hp procedures, which use this
 				   // method.
   Assert (this->dofs_per_face <= source_fe.dofs_per_face,
-	  typename FiniteElement<dim>::
+	  typename FEL::
 	  ExcInterpolationNotImplemented ());
   
                                    // generate a point on this
@@ -671,9 +1074,9 @@ get_subface_interpolation_matrix (const FiniteElement<dim> &x_source_fe,
 #endif
 
 
-template <int dim>
+template <int dim, int spacedim>
 bool
-FE_Q<dim>::hp_constraints_are_implemented () const
+FE_Q<dim,spacedim>::hp_constraints_are_implemented () const
 {
   return true;
 }
@@ -681,10 +1084,10 @@ FE_Q<dim>::hp_constraints_are_implemented () const
 
 
 
-template <int dim>
+template <int dim, int spacedim>
 std::vector<std::pair<unsigned int, unsigned int> >
-FE_Q<dim>::
-hp_vertex_dof_identities (const FiniteElement<dim> &fe_other) const
+FE_Q<dim,spacedim>::
+hp_vertex_dof_identities (const FiniteElement<dim,spacedim> &fe_other) const
 {
 				   // we can presently only compute
 				   // these identities if both FEs are
@@ -692,7 +1095,7 @@ hp_vertex_dof_identities (const FiniteElement<dim> &fe_other) const
 				   // should be exactly one single DoF
 				   // of each FE at a vertex, and they
 				   // should have identical value
-  if (dynamic_cast<const FE_Q<dim>*>(&fe_other) != 0)
+  if (dynamic_cast<const FE_Q<dim,spacedim>*>(&fe_other) != 0)
     return
       std::vector<std::pair<unsigned int, unsigned int> > (1, std::make_pair (0U, 0U));
   else
@@ -704,15 +1107,15 @@ hp_vertex_dof_identities (const FiniteElement<dim> &fe_other) const
 
 
 
-template <int dim>
+template <int dim, int spacedim>
 std::vector<std::pair<unsigned int, unsigned int> >
-FE_Q<dim>::
-hp_line_dof_identities (const FiniteElement<dim> &fe_other) const
+FE_Q<dim,spacedim>::
+hp_line_dof_identities (const FiniteElement<dim,spacedim> &fe_other) const
 {
 				   // we can presently only compute
 				   // these identities if both FEs are
 				   // FE_Qs
-  if (const FE_Q<dim> *fe_q_other = dynamic_cast<const FE_Q<dim>*>(&fe_other))
+  if (const FE_Q<dim,spacedim> *fe_q_other = dynamic_cast<const FE_Q<dim,spacedim>*>(&fe_other))
     {
 				       // dofs are located along
 				       // lines, so two dofs are
@@ -747,15 +1150,15 @@ hp_line_dof_identities (const FiniteElement<dim> &fe_other) const
 
 
 
-template <int dim>
+template <int dim, int spacedim>
 std::vector<std::pair<unsigned int, unsigned int> >
-FE_Q<dim>::
-hp_quad_dof_identities (const FiniteElement<dim>        &fe_other) const
+FE_Q<dim,spacedim>::
+hp_quad_dof_identities (const FiniteElement<dim,spacedim>        &fe_other) const
 {
 				   // we can presently only compute
 				   // these identities if both FEs are
 				   // FE_Qs
-  if (const FE_Q<dim> *fe_q_other = dynamic_cast<const FE_Q<dim>*>(&fe_other))
+  if (const FE_Q<dim,spacedim> *fe_q_other = dynamic_cast<const FE_Q<dim,spacedim>*>(&fe_other))
     {
 				       // this works exactly like the line
 				       // case above, except that now we
@@ -792,13 +1195,13 @@ hp_quad_dof_identities (const FiniteElement<dim>        &fe_other) const
 
 
 
-template <int dim>
+template <int dim, int spacedim>
 FiniteElementDomination::Domination
-FE_Q<dim>::
-compare_for_face_domination (const FiniteElement<dim> &fe_other) const
+FE_Q<dim,spacedim>::
+compare_for_face_domination (const FiniteElement<dim,spacedim> &fe_other) const
 {
-  if (const FE_Q<dim> *fe_q_other
-      = dynamic_cast<const FE_Q<dim>*>(&fe_other))
+  if (const FE_Q<dim,spacedim> *fe_q_other
+      = dynamic_cast<const FE_Q<dim,spacedim>*>(&fe_other))
     {
       if (this->degree < fe_q_other->degree)
 	return FiniteElementDomination::this_element_dominates;
@@ -819,8 +1222,8 @@ compare_for_face_domination (const FiniteElement<dim> &fe_other) const
 
 
 
-template <int dim>
-void FE_Q<dim>::initialize_unit_support_points ()
+template <int dim, int spacedim>
+void FE_Q<dim,spacedim>::initialize_unit_support_points ()
 {
 				   // number of points: (degree+1)^dim
   unsigned int n = this->degree+1;
@@ -852,8 +1255,8 @@ void FE_Q<dim>::initialize_unit_support_points ()
 
 
 
-template <int dim>
-void FE_Q<dim>::initialize_unit_support_points (const Quadrature<1> &points)
+template <int dim, int spacedim>
+void FE_Q<dim,spacedim>::initialize_unit_support_points (const Quadrature<1> &points)
 {
 				   // number of points: (degree+1)^dim
   unsigned int n = this->degree+1;
@@ -890,11 +1293,23 @@ void FE_Q<1>::initialize_unit_face_support_points (const Quadrature<1> &/*points
 				   // no faces in 1d, so nothing to do
 }
 
+template <>
+void FE_Q<1,2>::initialize_unit_face_support_points ()
+{
+				   // no faces in 1d, so nothing to do
+}
+
+template <>
+void FE_Q<1,2>::initialize_unit_face_support_points (const Quadrature<1> &/*points*/)
+{
+				   // no faces in 1d, so nothing to do
+}
+
 #endif
 
 
-template <int dim>
-void FE_Q<dim>::initialize_unit_face_support_points ()
+template <int dim, int spacedim>
+void FE_Q<dim,spacedim>::initialize_unit_face_support_points ()
 {
   const unsigned int codim = dim-1;
   
@@ -928,8 +1343,8 @@ void FE_Q<dim>::initialize_unit_face_support_points ()
 
 
 
-template <int dim>
-void FE_Q<dim>::initialize_unit_face_support_points (const Quadrature<1> &points)
+template <int dim, int spacedim>
+void FE_Q<dim,spacedim>::initialize_unit_face_support_points (const Quadrature<1> &points)
 {
   const unsigned int codim = dim-1;
   
@@ -964,9 +1379,9 @@ void FE_Q<dim>::initialize_unit_face_support_points (const Quadrature<1> &points
 
 
 
-template <int dim>
+template <int dim, int spacedim>
 void
-FE_Q<dim>::initialize_quad_dof_index_permutation ()
+FE_Q<dim,spacedim>::initialize_quad_dof_index_permutation ()
 {
 				   // general template for 1D and 2D, do nothing
 }
@@ -1044,9 +1459,9 @@ FE_Q<3>::initialize_quad_dof_index_permutation ()
 
 
 
-template <int dim>
+template <int dim, int spacedim>
 std::vector<unsigned int>
-FE_Q<dim>::get_dpo_vector(const unsigned int deg)
+FE_Q<dim,spacedim>::get_dpo_vector(const unsigned int deg)
 {
   std::vector<unsigned int> dpo(dim+1, 1U);
   for (unsigned int i=1; i<dpo.size(); ++i)
@@ -1055,10 +1470,9 @@ FE_Q<dim>::get_dpo_vector(const unsigned int deg)
 }
 
 
-
-template <int dim>
+template <int dim, int spacedim>
 std::vector<unsigned int>
-FE_Q<dim>::face_lexicographic_to_hierarchic_numbering (const unsigned int degree)
+FE_Q<dim,spacedim>::face_lexicographic_to_hierarchic_numbering (const unsigned int degree)
 {
   const FiniteElementData<dim-1> face_data(FE_Q<dim-1>::get_dpo_vector(degree),1,degree);
   std::vector<unsigned int> face_renumber (face_data.dofs_per_cell);  
@@ -1076,385 +1490,29 @@ FE_Q<1>::face_lexicographic_to_hierarchic_numbering (const unsigned int)
   return std::vector<unsigned int>();
 }
 
+template <>
+std::vector<unsigned int>
+FE_Q<1,2>::face_lexicographic_to_hierarchic_numbering (const unsigned int)
+{
+  return std::vector<unsigned int>();
+}
+
 #endif
 
-
-
-template <int dim>
+template <int dim, int spacedim>
 void
-FE_Q<dim>::initialize_constraints ()
+FE_Q<dim,spacedim>::initialize_constraints ()
 {
   QTrapez<1> trapez;
   QIterated<1> points (trapez,this->degree);
-  initialize_constraints (points);
+  Implementation::initialize_constraints (points, *this);
 }
 
 
-#if deal_II_dimension == 1
 
-template <>
+template <int dim, int spacedim>
 void
-FE_Q<1>::initialize_constraints (const Quadrature<1> &/*points*/)
-{
-				   // no constraints in 1d
-}
-
-#endif
-
-
-#if deal_II_dimension == 2
-
-template <>
-void
-FE_Q<2>::initialize_constraints (const Quadrature<1> &points)
-{
-  const unsigned int dim = 2;
-
-				   // restricted to each face, the
-				   // traces of the shape functions is
-				   // an element of P_{k} (in 2d), or
-				   // Q_{k} (in 3d), where k is the
-				   // degree of the element.  from
-				   // this, we interpolate between
-				   // mother and cell face.
-
-				   // the interpolation process works
-				   // as followings: on each subface,
-				   // we want that finite element
-				   // solutions from both sides
-				   // coincide. i.e. if a and b are
-				   // expansion coefficients for the
-				   // shape functions from both sides,
-				   // we seek a relation between x and
-				   // y such that
-				   //   sum_j a_j phi^c_j(x)
-				   //   == sum_j b_j phi_j(x)  
-				   // for all points x on the
-				   // interface. here, phi^c_j are the
-				   // shape functions on the small
-				   // cell on one side of the face,
-				   // and phi_j those on the big cell
-				   // on the other side. To get this
-				   // relation, it suffices to look at
-				   // a sufficient number of points
-				   // for which this has to hold. if
-				   // there are n functions, then we
-				   // need n evaluation points, and we
-				   // choose them equidistantly.
-				   //
-				   // we obtain the matrix system
-				   //    A a  ==  B b
-				   // where
-				   //    A_ij = phi^c_j(x_i)
-  				   //    B_ij = phi_j(x_i)
-				   // and the relation we are looking
-				   // for is
-				   //    a = A^-1 B b
-				   //
-				   // for the special case of Lagrange
-				   // interpolation polynomials, A_ij
-				   // reduces to delta_ij, and
-				   //    a_i = B_ij b_j
-				   // Hence,
-				   // interface_constraints(i,j)=B_ij.
-				   //
-				   // for the general case, where we
-				   // don't have Lagrange
-				   // interpolation polynomials, this
-				   // is a little more
-				   // complicated. Then we would
-				   // evaluate at a number of points
-				   // and invert the interpolation
-				   // matrix A.
-				   //
-				   // Note, that we build up these
-				   // matrices for all subfaces at
-				   // once, rather than considering
-				   // them separately. the reason is
-				   // that we finally will want to
-				   // have them in this order anyway,
-				   // as this is the format we need
-				   // inside deal.II
-
-				   // In the following the points x_i
-				   // are constructed in following
-				   // order (n=degree-1)
-				   // *----------*---------*
-				   //     1..n   0  n+1..2n
-				   // i.e. first the midpoint of the
-				   // line, then the support points on
-				   // subface 0 and on subface 1
-  std::vector<Point<dim-1> > constraint_points;
-                                   // Add midpoint
-  constraint_points.push_back (Point<dim-1> (0.5));
-
-  if (this->degree>1)
-    {
-      const unsigned int n=this->degree-1;
-      const double step=1./this->degree;
-				       // subface 0
-      for (unsigned int i=1; i<=n; ++i)
-	constraint_points.push_back (
-	  GeometryInfo<dim-1>::child_to_cell_coordinates(Point<dim-1>(i*step),0));
-				       // subface 1
-      for (unsigned int i=1; i<=n; ++i)
-	constraint_points.push_back (
-	  GeometryInfo<dim-1>::child_to_cell_coordinates(Point<dim-1>(i*step),1));
-    }
-
-                                   // Now construct relation between
-                                   // destination (child) and source (mother)
-                                   // dofs.
-  const std::vector<Polynomials::Polynomial<double> > polynomials=
-    Polynomials::Lagrange::generate_complete_basis(points.get_points());
-
-  this->interface_constraints
-    .TableBase<2,double>::reinit (this->interface_constraints_size());
-
-  for (unsigned int i=0; i<constraint_points.size(); ++i)
-    for (unsigned j=0; j<this->degree+1; ++j)
-      {
-	this->interface_constraints(i,j) = 
-	  polynomials[face_index_map[j]].value (constraint_points[i](0));
-		    
-                                   // if the value is small up
-                                   // to round-off, then
-				   // simply set it to zero to
-                                   // avoid unwanted fill-in
-                                   // of the constraint
-                                   // matrices (which would
-                                   // then increase the number
-                                   // of other DoFs a
-                                   // constrained DoF would
-                                   // couple to)
-          if (std::fabs(this->interface_constraints(i,j)) < 1e-14)
-            this->interface_constraints(i,j) = 0;
-      }
-}
-
-#endif
-
-#if deal_II_dimension == 3
-
-template <>
-void
-FE_Q<3>::initialize_constraints (const Quadrature<1> &points)
-{
-  const unsigned int dim = 3;
-
-				   // For a detailed documentation of
-				   // the interpolation see the
-				   // FE_Q<2>::initialize_constraints
-				   // function.
-
-				   // In the following the points x_i
-				   // are constructed in the order as
-				   // described in the documentation
-				   // of the FiniteElement class
-				   // (fe_base.h), i.e.
-				   //   *--15--4--16--*
-				   //   |      |      |
-				   //   10 19  6  20  12
-				   //   |      |      |
-				   //   1--7---0--8---2
-				   //   |      |      |
-				   //   9  17  5  18  11
-				   //   |      |      |
-				   //   *--13--3--14--*
-  std::vector<Point<dim-1> > constraint_points;
-
-                                   // Add midpoint
-  constraint_points.push_back (Point<dim-1> (0.5, 0.5));
-
-                                   // Add midpoints of lines of
-                                   // "mother-face"
-  constraint_points.push_back (Point<dim-1> (0, 0.5));
-  constraint_points.push_back (Point<dim-1> (1, 0.5));
-  constraint_points.push_back (Point<dim-1> (0.5, 0));
-  constraint_points.push_back (Point<dim-1> (0.5, 1));
-
-  if (this->degree>1)
-    {
-      const unsigned int n=this->degree-1;
-      const double step=1./this->degree;
-      std::vector<Point<dim-2> > line_support_points(n);
-      for (unsigned int i=0; i<n; ++i)
-	line_support_points[i](0)=(i+1)*step;
-      Quadrature<dim-2> qline(line_support_points);
-
-				       // auxiliary points in 2d
-      std::vector<Point<dim-1> > p_line(n);
-  
-				       // Add nodes of lines interior
-				       // in the "mother-face"
-
-				       // line 5: use line 9
-      QProjector<dim-1>::project_to_subface(qline, 0, 0, p_line);
-      for (unsigned int i=0; i<n; ++i)
-	constraint_points.push_back (p_line[i] + Point<dim-1> (0.5, 0));
-				       // line 6: use line 10
-      QProjector<dim-1>::project_to_subface(qline, 0, 1, p_line);
-      for (unsigned int i=0; i<n; ++i)
-	constraint_points.push_back (p_line[i] + Point<dim-1> (0.5, 0));
-				       // line 7: use line 13
-      QProjector<dim-1>::project_to_subface(qline, 2, 0, p_line);
-      for (unsigned int i=0; i<n; ++i)
-	constraint_points.push_back (p_line[i] + Point<dim-1> (0, 0.5));
-				       // line 8: use line 14
-      QProjector<dim-1>::project_to_subface(qline, 2, 1, p_line);
-      for (unsigned int i=0; i<n; ++i)
-	constraint_points.push_back (p_line[i] + Point<dim-1> (0, 0.5));
-      
-				       // DoFs on bordering lines
-				       // lines 9-16
-      for (unsigned int face=0; face<GeometryInfo<dim-1>::faces_per_cell; ++face)
-	for (unsigned int subface=0;
-	     subface<GeometryInfo<dim-1>::max_children_per_face; ++subface)
-	  {
-	    QProjector<dim-1>::project_to_subface(qline, face, subface, p_line);
-	    constraint_points.insert(constraint_points.end(),
-				     p_line.begin(), p_line.end());
-	  }
-      
-				       // Create constraints for
-				       // interior nodes
-      std::vector<Point<dim-1> > inner_points(n*n);
-      for (unsigned int i=0, iy=1; iy<=n; ++iy)
-	for (unsigned int ix=1; ix<=n; ++ix)
-	  inner_points[i++] = Point<dim-1> (ix*step, iy*step);
-      
-      for (unsigned int child=0; 
-	   child<GeometryInfo<dim-1>::max_children_per_cell; ++child)
-	for (unsigned int i=0; i<inner_points.size(); ++i)
-	  constraint_points.push_back (
-	    GeometryInfo<dim-1>::child_to_cell_coordinates(inner_points[i], child));
-    }
-
-                                   // Now construct relation between
-                                   // destination (child) and source (mother)
-                                   // dofs.
-  const unsigned int pnts=(this->degree+1)*(this->degree+1); 
-  const std::vector<Polynomials::Polynomial<double> > polynomial_basis=
-    Polynomials::Lagrange::generate_complete_basis(points.get_points()); 
-    //const std::vector<Polynomials::Polynomial<double> > polynomial_basis=
-    //Polynomials::LagrangeEquidistant::generate_complete_basis(this->degree);
- 
-  const TensorProductPolynomials<dim-1> face_polynomials(polynomial_basis);
-
-  this->interface_constraints
-    .TableBase<2,double>::reinit (this->interface_constraints_size());
-
-  for (unsigned int i=0; i<constraint_points.size(); ++i)
-    {
-      const double interval = (double) (this->degree * 2);
-      bool mirror[dim - 1];
-      Point<dim-1> constraint_point;
-
-                                       // Eliminate FP errors in constraint
-                                       // points. Due to their origin, they
-                                       // must all be fractions of the unit
-                                       // interval. If we have polynomial
-                                       // degree 4, the refined element has 8
-                                       // intervals.  Hence the coordinates
-                                       // must be 0, 0.125, 0.25, 0.375 etc.
-                                       // Now the coordinates of the
-                                       // constraint points will be multiplied
-                                       // by the inverse of the interval size
-                                       // (in the example by 8).  After that
-                                       // the coordinates must be integral
-                                       // numbers. Hence a normal truncation
-                                       // is performed and the coordinates
-                                       // will be scaled back. The equal
-                                       // treatment of all coordinates should
-                                       // eliminate any FP errors.
-      for (unsigned int k=0; k<dim-1; ++k)
-        {
-          const int coord_int =
-            static_cast<int> (constraint_points[i](k) * interval + 0.25);
-          constraint_point(k) = 1.*coord_int / interval;
-
-                                           // The following lines of code
-                                           // should eliminate the problems
-                                           // with the Constraint-Matrix,
-                                           // which appeared for P>=4. The
-                                           // Constraint-Matrix class
-                                           // complained about different
-                                           // constraints for the same entry
-                                           // of the Constraint-Matrix.
-                                           // Actually this difference could
-                                           // be attributed to FP errors, as
-                                           // it was in the range of
-                                           // 1.0e-16. These errors originate
-                                           // in the loss of symmetry in the
-                                           // FP approximation of the
-                                           // shape-functions.  Considering a
-                                           // 3rd order shape function in 1D,
-                                           // we have N0(x)=N3(1-x) and
-                                           // N1(x)=N2(1-x).  For higher order
-                                           // polynomials the FP
-                                           // approximations of the shape
-                                           // functions do not satisfy these
-                                           // equations any more!  Thus in the
-                                           // following code everything is
-                                           // computed in the interval x \in
-                                           // [0..0.5], which is sufficient to
-                                           // express all values that could
-                                           // come out from a computation of
-                                           // any shape function in the full
-                                           // interval [0..1]. If x > 0.5 the
-                                           // computation is done for 1-x with
-                                           // the shape function N_{p-n}
-                                           // instead of N_n.  Hence symmetry
-                                           // is preserved and everything
-                                           // works fine...
-                                           //
-                                           // For a different explanation of
-                                           // the problem, see the discussion
-                                           // in the FiniteElement class
-                                           // for constraint matrices in 3d.
-          mirror[k] = (constraint_point(k) > 0.5);
-          if (mirror[k])
-            constraint_point(k) = 1.0 - constraint_point(k);
-        }
-
-      for (unsigned j=0; j<pnts; ++j)
-        {
-          unsigned int indices[2]
-            = { face_index_map[j] % (this->degree + 1),
-                face_index_map[j] / (this->degree + 1) };
-          
-          for (unsigned int k = 0; k<2; ++k)
-            if (mirror[k])
-              indices[k] = this->degree - indices[k];
-          
-          const unsigned int
-            new_index = indices[1] * (this->degree + 1) + indices[0];
-
-          this->interface_constraints(i,j) = 
-            face_polynomials.compute_value (new_index, constraint_point);
-	    
-                                           // if the value is small up
-                                           // to round-off, then
-                                           // simply set it to zero to
-                                           // avoid unwanted fill-in
-                                           // of the constraint
-                                           // matrices (which would
-                                           // then increase the number
-                                           // of other DoFs a
-                                           // constrained DoF would
-                                           // couple to)
-          if (std::fabs(this->interface_constraints(i,j)) < 1e-14)
-            this->interface_constraints(i,j) = 0;
-        }
-    }
-}
-
-#endif
-
-
-template <int dim>
-void
-FE_Q<dim>::initialize_embedding ()
+FE_Q<dim,spacedim>::initialize_embedding ()
 {
   unsigned int iso=RefinementCase<dim>::isotropic_refinement-1;
 
@@ -1594,9 +1652,9 @@ FE_Q<dim>::initialize_embedding ()
 
 
 
-template <int dim>
+template <int dim, int spacedim>
 void
-FE_Q<dim>::initialize_restriction ()
+FE_Q<dim,spacedim>::initialize_restriction ()
 {
   unsigned int iso=RefinementCase<dim>::isotropic_refinement-1;
 
@@ -1754,12 +1812,36 @@ FE_Q<1>::has_support_on_face (const unsigned int shape_index,
 }
 
 
+template <>
+bool
+FE_Q<1,2>::has_support_on_face (const unsigned int shape_index,
+                              const unsigned int face_index) const
+{
+  Assert (shape_index < this->dofs_per_cell,
+	  ExcIndexRange (shape_index, 0, this->dofs_per_cell));
+  Assert (face_index < GeometryInfo<1>::faces_per_cell,
+	  ExcIndexRange (face_index, 0, GeometryInfo<1>::faces_per_cell));
+
+
+				   // in 1d, things are simple. since
+				   // there is only one degree of
+				   // freedom per vertex in this
+				   // class, the first is on vertex 0
+				   // (==face 0 in some sense), the
+				   // second on face 1:
+  return (((shape_index == 0) && (face_index == 0)) ||
+          ((shape_index == 1) && (face_index == 1)));
+}
+
+
+
+
 #else
 
 
-template <int dim>
+template <int dim, int spacedim>
 bool
-FE_Q<dim>::has_support_on_face (const unsigned int shape_index,
+FE_Q<dim,spacedim>::has_support_on_face (const unsigned int shape_index,
 				const unsigned int face_index) const
 {
   Assert (shape_index < this->dofs_per_cell,
@@ -1866,9 +1948,9 @@ FE_Q<dim>::has_support_on_face (const unsigned int shape_index,
 #endif
 
 
-template <int dim>
+template <int dim, int spacedim>
 unsigned int
-FE_Q<dim>::memory_consumption () const
+FE_Q<dim,spacedim>::memory_consumption () const
 {
   Assert (false, ExcNotImplemented ());
   return 0;
@@ -1877,5 +1959,11 @@ FE_Q<dim>::memory_consumption () const
 
 
 template class FE_Q<deal_II_dimension>;
+
+#if deal_II_dimension !=3
+template class FE_Q<deal_II_dimension,deal_II_dimension+1>;
+#endif
+
+
 
 DEAL_II_NAMESPACE_CLOSE

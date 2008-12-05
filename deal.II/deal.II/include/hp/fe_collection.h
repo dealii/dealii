@@ -35,12 +35,15 @@ namespace hp
  * vertex, line, etc, to allow allocation of as much memory as is necessary in
  * the worst case when using the finite elements associated with the cells of
  * a triangulation.
+ *
+ * This class has not yet been implemented for the use in the codimension
+ * one case (<tt>spacedim != dim </tt>).
  * 
  * @ingroup hp hpcollection
  * 
  * @author Wolfgang Bangerth, 2003
  */
-  template <int dim>
+  template <int dim, int spacedim=dim>
   class FECollection : public Subscriptor
   {
     public:
@@ -63,12 +66,12 @@ namespace hp
                                         * probably be clearer to add
                                         * all mappings the same way.
                                         */
-      explicit FECollection (const FiniteElement<dim> &fe);
+      explicit FECollection (const FiniteElement<dim,spacedim> &fe);
 
                                        /**
                                         * Copy constructor.
                                         */
-      FECollection (const FECollection<dim> &fe_collection);
+      FECollection (const FECollection<dim,spacedim> &fe_collection);
 
                                        /**
                                         * Add a finite element. This
@@ -87,7 +90,7 @@ namespace hp
                                         * as all other elements
                                         * already in the collection.
                                         */
-      void push_back (const FiniteElement<dim> &new_fe);
+      void push_back (const FiniteElement<dim,spacedim> &new_fe);
 
                                        /**
                                         * Get a reference to the given
@@ -98,7 +101,7 @@ namespace hp
                                         * of elements of the
                                         * collection.
                                         */
-      const FiniteElement<dim> &
+      const FiniteElement<dim,spacedim> &
       operator[] (const unsigned int index) const;
 
                                        /**
@@ -212,36 +215,36 @@ namespace hp
                                         * Array of pointers to the finite
                                         * elements stored by this collection.
                                         */
-      std::vector<boost::shared_ptr<const FiniteElement<dim> > > finite_elements;
+      std::vector<boost::shared_ptr<const FiniteElement<dim,spacedim> > > finite_elements;
   };
 
 
 
 /* --------------- inline functions ------------------- */
 
-  template <int dim>
+  template <int dim, int spacedim>
   inline
   unsigned int
-  FECollection<dim>::size () const 
+  FECollection<dim,spacedim>::size () const 
   {
     return finite_elements.size();
   }
 
 
-  template <int dim>
+  template <int dim, int spacedim>
   inline
   unsigned int
-  FECollection<dim>::n_components () const
+  FECollection<dim,spacedim>::n_components () const
   {
     Assert (finite_elements.size () > 0, ExcNoFiniteElements());
     return finite_elements[0]->n_components ();
   }
 
 
-  template <int dim>
+  template <int dim, int spacedim>
   inline
-  const FiniteElement<dim> &
-  FECollection<dim>::operator[] (const unsigned int index) const 
+  const FiniteElement<dim,spacedim> &
+  FECollection<dim,spacedim>::operator[] (const unsigned int index) const 
   {
     Assert (index < finite_elements.size(),
             ExcIndexRange (index, 0, finite_elements.size()));
@@ -250,9 +253,9 @@ namespace hp
 
 
 
-  template <int dim>
+  template <int dim, int spacedim>
   unsigned int
-  FECollection<dim>::max_dofs_per_vertex () const 
+  FECollection<dim,spacedim>::max_dofs_per_vertex () const 
   {
     Assert (finite_elements.size() > 0, ExcNoFiniteElements());
   
@@ -266,9 +269,9 @@ namespace hp
 
 
 
-  template <int dim>
+  template <int dim, int spacedim>
   unsigned int
-  FECollection<dim>::max_dofs_per_line () const 
+  FECollection<dim,spacedim>::max_dofs_per_line () const 
   {
     Assert (finite_elements.size() > 0, ExcNoFiniteElements());
   
@@ -282,9 +285,9 @@ namespace hp
 
 
 
-  template <int dim>
+  template <int dim, int spacedim>
   unsigned int
-  FECollection<dim>::max_dofs_per_quad () const 
+  FECollection<dim,spacedim>::max_dofs_per_quad () const 
   {
     Assert (finite_elements.size() > 0, ExcNoFiniteElements());
   
@@ -298,9 +301,9 @@ namespace hp
 
 
 
-  template <int dim>
+  template <int dim, int spacedim>
   unsigned int
-  FECollection<dim>::max_dofs_per_hex () const 
+  FECollection<dim,spacedim>::max_dofs_per_hex () const 
   {
     Assert (finite_elements.size() > 0, ExcNoFiniteElements());
   
@@ -314,9 +317,9 @@ namespace hp
 
 
 
-  template <int dim>
+  template <int dim, int spacedim>
   unsigned int
-  FECollection<dim>::max_dofs_per_face () const 
+  FECollection<dim,spacedim>::max_dofs_per_face () const 
   {
     Assert (finite_elements.size() > 0, ExcNoFiniteElements());
   
@@ -330,9 +333,9 @@ namespace hp
 
 
 
-  template <int dim>
+  template <int dim, int spacedim>
   unsigned int
-  FECollection<dim>::max_dofs_per_cell () const 
+  FECollection<dim,spacedim>::max_dofs_per_cell () const 
   {
     Assert (finite_elements.size() > 0, ExcNoFiniteElements());
   
@@ -345,9 +348,9 @@ namespace hp
   }
   
 
-  template <int dim>
+  template <int dim, int spacedim>
   bool
-  FECollection<dim>::hp_constraints_are_implemented () const 
+  FECollection<dim,spacedim>::hp_constraints_are_implemented () const 
   {
     Assert (finite_elements.size() > 0, ExcNoFiniteElements());
   

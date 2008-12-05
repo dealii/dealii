@@ -72,10 +72,11 @@ void advance_by_n (CellIterator &cell,
 #if deal_II_dimension == 1
 
 
+template <int spacedim>
 template <typename InputVector, class DH>
 void
-KellyErrorEstimator<1>::
-estimate (const Mapping<1>      &mapping,
+KellyErrorEstimator<1,spacedim>::
+estimate (const Mapping<1,spacedim>      &mapping,
           const DH   &dof_handler,
           const Quadrature<0> &quadrature,
           const FunctionMap<1>::type &neumann_bc,
@@ -95,9 +96,11 @@ estimate (const Mapping<1>      &mapping,
 }
 
 
+
+template <int spacedim>
 template <typename InputVector, class DH>
 void
-KellyErrorEstimator<1>::
+KellyErrorEstimator<1,spacedim>::
 estimate (const DH   &dof_handler,
           const Quadrature<0> &quadrature,
           const FunctionMap<1>::type &neumann_bc,
@@ -110,15 +113,16 @@ estimate (const DH   &dof_handler,
           const unsigned int       material_id)
 {
   Assert (DEAL_II_COMPAT_MAPPING, ExcCompatibility("mapping"));
-  estimate(StaticMappingQ1<1>::mapping, dof_handler, quadrature, neumann_bc, solution,
+  estimate(StaticMappingQ1<1,spacedim>::mapping, dof_handler, quadrature, neumann_bc, solution,
 	   error, component_mask, coefficients, n_threads, subdomain_id, material_id);
 }
 
 
 
+template <int spacedim>
 template <typename InputVector, class DH>
 void
-KellyErrorEstimator<1>::
+KellyErrorEstimator<1,spacedim>::
 estimate (const DH   &dof_handler,
           const Quadrature<0> &quadrature,
           const FunctionMap<1>::type &neumann_bc,
@@ -131,16 +135,17 @@ estimate (const DH   &dof_handler,
           const unsigned int       material_id)
 {
   Assert (DEAL_II_COMPAT_MAPPING, ExcCompatibility("mapping"));
-  estimate(StaticMappingQ1<1>::mapping, dof_handler, quadrature, neumann_bc, solutions,
+  estimate(StaticMappingQ1<1,spacedim>::mapping, dof_handler, quadrature, neumann_bc, solutions,
 	   errors, component_mask, coefficients, n_threads, subdomain_id, material_id);
 }
 
 
 
+template <int spacedim>
 template <typename InputVector, class DH>
 void
-KellyErrorEstimator<1>::
-estimate (const Mapping<1>      &mapping,
+KellyErrorEstimator<1,spacedim>::
+estimate (const Mapping<1,spacedim>      &mapping,
           const DH   &dof_handler,
           const hp::QCollection<0> &quadrature,
           const FunctionMap<1>::type &neumann_bc,
@@ -160,9 +165,10 @@ estimate (const Mapping<1>      &mapping,
 }
 
 
+template <int spacedim>
 template <typename InputVector, class DH>
 void
-KellyErrorEstimator<1>::
+KellyErrorEstimator<1,spacedim>::
 estimate (const DH   &dof_handler,
           const hp::QCollection<0> &quadrature,
           const FunctionMap<1>::type &neumann_bc,
@@ -175,15 +181,16 @@ estimate (const DH   &dof_handler,
           const unsigned int       material_id)
 {
   Assert (DEAL_II_COMPAT_MAPPING, ExcCompatibility("mapping"));
-  estimate(StaticMappingQ1<1>::mapping, dof_handler, quadrature, neumann_bc, solution,
+  estimate(StaticMappingQ1<1,spacedim>::mapping, dof_handler, quadrature, neumann_bc, solution,
 	   error, component_mask, coefficients, n_threads, subdomain_id, material_id);
 }
 
 
 
+template <int spacedim>
 template <typename InputVector, class DH>
 void
-KellyErrorEstimator<1>::
+KellyErrorEstimator<1,spacedim>::
 estimate (const DH   &dof_handler,
           const hp::QCollection<0> &quadrature,
           const FunctionMap<1>::type &neumann_bc,
@@ -196,16 +203,17 @@ estimate (const DH   &dof_handler,
           const unsigned int       material_id)
 {
   Assert (DEAL_II_COMPAT_MAPPING, ExcCompatibility("mapping"));
-  estimate(StaticMappingQ1<1>::mapping, dof_handler, quadrature, neumann_bc, solutions,
+  estimate(StaticMappingQ1<1,spacedim>::mapping, dof_handler, quadrature, neumann_bc, solutions,
 	   errors, component_mask, coefficients, n_threads, subdomain_id, material_id);
 }
 
 
 
 
+template <int spacedim>
 template <typename InputVector, class DH>
-void KellyErrorEstimator<1>::
-estimate (const Mapping<1>                    &/*mapping*/,
+void KellyErrorEstimator<1,spacedim>::
+estimate (const Mapping<1,spacedim>                    &/*mapping*/,
           const DH                            &/*dof_handler*/,
           const hp::QCollection<0>            &,
           const FunctionMap<1>::type          &/*neumann_bc*/,
@@ -222,9 +230,10 @@ estimate (const Mapping<1>                    &/*mapping*/,
 
 
 
+template <int spacedim>
 template <typename InputVector, class DH>
-void KellyErrorEstimator<1>::
-estimate (const Mapping<1>                    &mapping,
+void KellyErrorEstimator<1,spacedim>::
+estimate (const Mapping<1,spacedim>                    &mapping,
           const DH                 &dof_handler,
           const Quadrature<0>                 &,
           const FunctionMap<1>::type          &neumann_bc,
@@ -318,12 +327,12 @@ estimate (const Mapping<1>                    &mapping,
   const QTrapez<1> quadrature;
   const hp::QCollection<1> q_collection(quadrature);
 
-  const hp::FECollection<1> fe (dof_handler.get_fe());
+  const hp::FECollection<1,spacedim> fe (dof_handler.get_fe());
 
-  hp::MappingCollection<1> mapping_collection;
+  hp::MappingCollection<1,spacedim> mapping_collection;
   mapping_collection.push_back (mapping);
   
-  hp::FEValues<1> fe_values (mapping_collection, fe, q_collection,
+  hp::FEValues<1,spacedim> fe_values (mapping_collection, fe, q_collection,
 			     update_gradients);
   
 				   // loop over all cells and do something on
@@ -460,8 +469,8 @@ estimate (const Mapping<1>                    &mapping,
 #else // #if deal_II_dimension !=1
 
 
-template <int dim>
-KellyErrorEstimator<dim>::PerThreadData::
+template <int dim, int spacedim>
+KellyErrorEstimator<dim, spacedim>::PerThreadData::
 PerThreadData (const unsigned int n_solution_vectors,
 	       const unsigned int n_components,
 	       const unsigned int max_n_q_points,
@@ -506,9 +515,9 @@ PerThreadData (const unsigned int n_solution_vectors,
 
 
 
-template <int dim>
+template <int dim, int spacedim>
 void
-KellyErrorEstimator<dim>::PerThreadData::
+KellyErrorEstimator<dim, spacedim>::PerThreadData::
 resize (const unsigned int n_components,
 	const unsigned int n_q_points)
 {
@@ -542,11 +551,11 @@ resize (const unsigned int n_components,
 
 // the following function is still independent of dimension, but it
 // calls dimension dependent functions
-template <int dim>
+template <int dim, int spacedim>
 template <typename InputVector, class DH>
 void
-KellyErrorEstimator<dim>::
-estimate (const Mapping<dim>      &mapping,
+KellyErrorEstimator<dim, spacedim>::
+estimate (const Mapping<dim, spacedim>      &mapping,
           const DH                &dof_handler,
           const Quadrature<dim-1> &quadrature,
           const typename FunctionMap<dim>::type &neumann_bc,
@@ -566,10 +575,10 @@ estimate (const Mapping<dim>      &mapping,
 }
 
 
-template <int dim>
+template <int dim, int spacedim>
 template <typename InputVector, class DH>
 void
-KellyErrorEstimator<dim>::
+KellyErrorEstimator<dim,spacedim>::
 estimate (const DH                &dof_handler,
           const Quadrature<dim-1> &quadrature,
           const typename FunctionMap<dim>::type &neumann_bc,
@@ -588,11 +597,11 @@ estimate (const DH                &dof_handler,
 }
 
 
-template <int dim>
+template <int dim, int spacedim>
 template <typename InputVector, class DH>
 void
-KellyErrorEstimator<dim>::
-estimate (const Mapping<dim>      &mapping,
+KellyErrorEstimator<dim, spacedim>::
+estimate (const Mapping<dim, spacedim>      &mapping,
           const DH                &dof_handler,
           const hp::QCollection<dim-1> &quadrature,
           const typename FunctionMap<dim>::type &neumann_bc,
@@ -612,10 +621,10 @@ estimate (const Mapping<dim>      &mapping,
 }
 
 
-template <int dim>
+template <int dim, int spacedim>
 template <typename InputVector, class DH>
 void
-KellyErrorEstimator<dim>::
+KellyErrorEstimator<dim, spacedim>::
 estimate (const DH                &dof_handler,
           const hp::QCollection<dim-1> &quadrature,
           const typename FunctionMap<dim>::type &neumann_bc,
@@ -635,10 +644,10 @@ estimate (const DH                &dof_handler,
 
 
 
-template <int dim>
+template <int dim, int spacedim>
 template <typename InputVector, class DH>
-void KellyErrorEstimator<dim>::
-estimate_some (const hp::MappingCollection<dim>                  &mapping,
+void KellyErrorEstimator<dim, spacedim>::
+estimate_some (const hp::MappingCollection<dim, spacedim>      &mapping,
                const DH                                 &dof_handler,
                const hp::QCollection<dim-1>             &quadrature,
                const typename FunctionMap<dim>::type &neumann_bc,
@@ -904,11 +913,11 @@ estimate_some (const hp::MappingCollection<dim>                  &mapping,
 
 
 
-template <int dim>
+template <int dim, int spacedim>
 template <typename InputVector, class DH>
 void
-KellyErrorEstimator<dim>::
-estimate (const Mapping<dim>                  &mapping,
+KellyErrorEstimator<dim, spacedim>::
+estimate (const Mapping<dim, spacedim>                  &mapping,
           const DH                            &dof_handler,
           const hp::QCollection<dim-1>        &face_quadratures,
           const typename FunctionMap<dim>::type &neumann_bc,
@@ -1017,7 +1026,7 @@ estimate (const Mapping<dim>                  &mapping,
 				   // work around another nasty bug in
 				   // icc7
   Threads::ThreadGroup<> threads;
-  void (*estimate_some_ptr) (const hp::MappingCollection<dim>                  &,
+  void (*estimate_some_ptr) (const hp::MappingCollection<dim,spacedim>                  &,
 			     const DH               &,
 			     const hp::QCollection<dim-1>             &,
 			     const typename FunctionMap<dim>::type &,
@@ -1026,9 +1035,9 @@ estimate (const Mapping<dim>                  &mapping,
 			     const std::pair<unsigned int, unsigned int>,
 			     typename FaceIntegrals<DH>::type                       &,
 			     PerThreadData                       &)
-    = &KellyErrorEstimator<dim>::template estimate_some<InputVector,DH>;
+    = &KellyErrorEstimator<dim, spacedim>::template estimate_some<InputVector,DH>;
 
-  hp::MappingCollection<dim> mapping_collection;
+  hp::MappingCollection<dim,spacedim> mapping_collection;
   mapping_collection.push_back (mapping);
   
   for (unsigned int i=0; i<n_threads; ++i)
@@ -1110,11 +1119,11 @@ estimate (const Mapping<dim>                  &mapping,
 
 
 
-template <int dim>
+template <int dim, int spacedim>
 template <typename InputVector, class DH>
 void
-KellyErrorEstimator<dim>::
-estimate (const Mapping<dim>                  &mapping,
+KellyErrorEstimator<dim, spacedim>::
+estimate (const Mapping<dim, spacedim>                  &mapping,
           const DH                            &dof_handler,
           const Quadrature<dim-1>             &quadrature,
           const typename FunctionMap<dim>::type &neumann_bc,
@@ -1135,9 +1144,9 @@ estimate (const Mapping<dim>                  &mapping,
 }
 
 
-template <int dim>
+template <int dim, int spacedim>
 template <typename InputVector, class DH>
-void KellyErrorEstimator<dim>::estimate (const DH                            &dof_handler,
+void KellyErrorEstimator<dim, spacedim>::estimate (const DH                            &dof_handler,
 					 const Quadrature<dim-1>             &quadrature,
 					 const typename FunctionMap<dim>::type &neumann_bc,
 					 const std::vector<const InputVector *> &solutions,
@@ -1156,9 +1165,9 @@ void KellyErrorEstimator<dim>::estimate (const DH                            &do
 
 
 
-template <int dim>
+template <int dim, int spacedim>
 template <typename InputVector, class DH>
-void KellyErrorEstimator<dim>::estimate (const DH                            &dof_handler,
+void KellyErrorEstimator<dim, spacedim>::estimate (const DH                            &dof_handler,
 					 const hp::QCollection<dim-1>             &quadrature,
 					 const typename FunctionMap<dim>::type &neumann_bc,
 					 const std::vector<const InputVector *> &solutions,
@@ -1177,9 +1186,9 @@ void KellyErrorEstimator<dim>::estimate (const DH                            &do
 
 
 
-template <int dim>
+template <int dim, int spacedim>
 template <typename InputVector, class DH>
-void KellyErrorEstimator<dim>::
+void KellyErrorEstimator<dim, spacedim>::
 integrate_over_regular_face (const DH                                 &dof_handler,
                              const hp::QCollection<dim-1>             &quadrature,
                              const typename FunctionMap<dim>::type &neumann_bc,
@@ -1384,9 +1393,9 @@ integrate_over_regular_face (const DH                                 &dof_handl
 
 
 
-template <int dim>
+template <int dim, int spacedim>
 template <typename InputVector, class DH>
-void KellyErrorEstimator<dim>::
+void KellyErrorEstimator<dim, spacedim>::
 integrate_over_irregular_face (const DH                                 &dof_handler,
                                const hp::QCollection<dim-1>             &quadrature,
                                const std::vector<const InputVector *> &solutions,
@@ -1582,7 +1591,7 @@ integrate_over_irregular_face (const DH                                 &dof_han
 
 // explicit instantiations
 #if deal_II_dimension != 1
-template class KellyErrorEstimator<deal_II_dimension>;
+template class KellyErrorEstimator<deal_II_dimension, deal_II_dimension>;
 #endif
 
 // instantiate the externally visible functions. define a list of functions
@@ -1591,8 +1600,8 @@ template class KellyErrorEstimator<deal_II_dimension>;
 #define INSTANTIATE_1(InputVector,DH,Q) \
 template    \
 void    \
-KellyErrorEstimator<deal_II_dimension>::    \
-estimate<InputVector,DH > (const Mapping<deal_II_dimension>      &,    \
+KellyErrorEstimator<deal_II_dimension, deal_II_dimension>::    \
+estimate<InputVector,DH > (const Mapping<deal_II_dimension, deal_II_dimension>      &,    \
           const DH   &,    \
           const Q<deal_II_dimension-1> &,    \
           const FunctionMap<deal_II_dimension>::type &,    \
@@ -1606,7 +1615,7 @@ estimate<InputVector,DH > (const Mapping<deal_II_dimension>      &,    \
     \
 template    \
 void    \
-KellyErrorEstimator<deal_II_dimension>::    \
+KellyErrorEstimator<deal_II_dimension, deal_II_dimension>::    \
 estimate<InputVector,DH > (const DH   &,    \
           const Q<deal_II_dimension-1> &,    \
           const FunctionMap<deal_II_dimension>::type &,    \
@@ -1620,8 +1629,8 @@ estimate<InputVector,DH > (const DH   &,    \
         \
 template    \
 void    \
-KellyErrorEstimator<deal_II_dimension>::    \
-estimate<InputVector,DH > (const Mapping<deal_II_dimension>          &,    \
+KellyErrorEstimator<deal_II_dimension, deal_II_dimension>::    \
+estimate<InputVector,DH > (const Mapping<deal_II_dimension, deal_II_dimension>          &,    \
           const DH       &,    \
           const Q<deal_II_dimension-1>     &,    \
           const FunctionMap<deal_II_dimension>::type &,    \
@@ -1635,7 +1644,7 @@ estimate<InputVector,DH > (const Mapping<deal_II_dimension>          &,    \
     \
 template    \
 void    \
-KellyErrorEstimator<deal_II_dimension>::    \
+KellyErrorEstimator<deal_II_dimension, deal_II_dimension>::    \
 estimate<InputVector,DH > (const DH       &,    \
           const Q<deal_II_dimension-1>     &,    \
           const FunctionMap<deal_II_dimension>::type &,    \

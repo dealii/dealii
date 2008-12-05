@@ -2,7 +2,7 @@
 //    $Id$
 //    Version: $Name$
 //
-//    Copyright (C) 2001, 2002, 2003, 2004, 2005, 2006 by the deal.II authors
+//    Copyright (C) 2001, 2002, 2003, 2004, 2005, 2006, 2008 by the deal.II authors
 //
 //    This file is subject to QPL and may not be  distributed
 //    without copyright and license information. Please refer
@@ -77,11 +77,15 @@ DEAL_II_NAMESPACE_OPEN
  * Not specifying this template argument in applications using the PETSc
  * vector classes leads to the construction of a copy of the vector
  * which is not acccessible afterwards!
+ * 
+ * For more information about the <tt>spacedim</tt> template parameter
+ * check the documentation of FiniteElement or the one of
+ * Triangulation.
  *
  * @author Michael Stadler, 2001
  */
-template <int dim, class EulerVectorType = Vector<double> >
-class MappingQ1Eulerian : public MappingQ1<dim>
+template <int dim, class EulerVectorType = Vector<double>, int spacedim=dim >
+class MappingQ1Eulerian : public MappingQ1<dim,spacedim>
 {
   public:
 
@@ -104,7 +108,7 @@ class MappingQ1Eulerian : public MappingQ1<dim>
 				      * of a nonlinear problem.
 				      * Alternatively, the @p Vector
 				      * can be initialized by
-				      * <tt>DoFObjectAccessor::set_dof_values()</tt>.
+				      * <tt>DoFAccessor::set_dof_values()</tt>.
 				      */
     MappingQ1Eulerian (const EulerVectorType  &euler_transform_vectors,
                        const DoFHandler<dim> &shiftmap_dof_handler);
@@ -115,7 +119,7 @@ class MappingQ1Eulerian : public MappingQ1<dim>
                                       * copy then assumes ownership of it.
                                       */
     virtual
-    Mapping<dim> * clone () const;
+    Mapping<dim,spacedim> * clone () const;
 
     
 				     /**

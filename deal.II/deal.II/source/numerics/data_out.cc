@@ -66,7 +66,7 @@ DataEntryBase::DataEntryBase (const std::vector<std::string> &names_in,
 
 template <class DH, int patch_dim, int patch_space_dim>
 DataOut_DoFData<DH,patch_dim,patch_space_dim>::
-DataEntryBase::DataEntryBase (const DataPostprocessor<DH::dimension> *data_postprocessor)
+DataEntryBase::DataEntryBase (const DataPostprocessor<DH::space_dimension> *data_postprocessor)
 		:
 		names(data_postprocessor->get_names()),
 		data_component_interpretation (data_postprocessor->get_data_component_interpretation()),
@@ -127,7 +127,7 @@ template <typename VectorType>
 DataOut_DoFData<DH,patch_dim,patch_space_dim>::
 DataEntry<VectorType>::
 DataEntry (const VectorType                       *data,
-	   const DataPostprocessor<DH::dimension> *data_postprocessor)
+	   const DataPostprocessor<DH::space_dimension> *data_postprocessor)
 		:
                 DataEntryBase (data_postprocessor),
 		vector (data)
@@ -152,7 +152,7 @@ template <typename VectorType>
 void
 DataOut_DoFData<DH,patch_dim,patch_space_dim>::
 DataEntry<VectorType>::
-get_function_values (const FEValuesBase<DH::dimension> &fe_patch_values,
+get_function_values (const FEValuesBase<DH::dimension,DH::space_dimension> &fe_patch_values,
                      std::vector<Vector<double> >    &patch_values_system) const
 {
   fe_patch_values.get_function_values (*vector, patch_values_system);
@@ -166,7 +166,7 @@ template <typename VectorType>
 void
 DataOut_DoFData<DH,patch_dim,patch_space_dim>::
 DataEntry<VectorType>::
-get_function_values (const FEValuesBase<DH::dimension> &fe_patch_values,
+get_function_values (const FEValuesBase<DH::dimension,DH::space_dimension> &fe_patch_values,
                      std::vector<double>             &patch_values) const
 {
   fe_patch_values.get_function_values (*vector, patch_values);
@@ -179,8 +179,8 @@ template <typename VectorType>
 void
 DataOut_DoFData<DH,patch_dim,patch_space_dim>::
 DataEntry<VectorType>::
-get_function_gradients (const FEValuesBase<DH::dimension> &fe_patch_values,
-			std::vector<std::vector<Tensor<1,DH::dimension> > >   &patch_gradients_system) const
+get_function_gradients (const FEValuesBase<DH::dimension,DH::space_dimension> &fe_patch_values,
+			std::vector<std::vector<Tensor<1,DH::space_dimension> > >   &patch_gradients_system) const
 {
   fe_patch_values.get_function_grads (*vector, patch_gradients_system);
 }
@@ -193,8 +193,8 @@ template <typename VectorType>
 void
 DataOut_DoFData<DH,patch_dim,patch_space_dim>::
 DataEntry<VectorType>::
-get_function_gradients (const FEValuesBase<DH::dimension> &fe_patch_values,
-			std::vector<Tensor<1,DH::dimension> >       &patch_gradients) const
+get_function_gradients (const FEValuesBase<DH::dimension,DH::space_dimension> &fe_patch_values,
+			std::vector<Tensor<1,DH::space_dimension> >       &patch_gradients) const
 {
   fe_patch_values.get_function_grads (*vector, patch_gradients);
 }
@@ -206,8 +206,8 @@ template <typename VectorType>
 void
 DataOut_DoFData<DH,patch_dim,patch_space_dim>::
 DataEntry<VectorType>::
-get_function_hessians (const FEValuesBase<DH::dimension> &fe_patch_values,
-		       std::vector<std::vector<Tensor<2,DH::dimension> > >   &patch_hessians_system) const
+get_function_hessians (const FEValuesBase<DH::dimension,DH::space_dimension> &fe_patch_values,
+		       std::vector<std::vector<Tensor<2,DH::space_dimension> > >   &patch_hessians_system) const
 {
   fe_patch_values.get_function_2nd_derivatives (*vector, patch_hessians_system);
 }
@@ -220,8 +220,8 @@ template <typename VectorType>
 void
 DataOut_DoFData<DH,patch_dim,patch_space_dim>::
 DataEntry<VectorType>::
-get_function_hessians (const FEValuesBase<DH::dimension> &fe_patch_values,
-		       std::vector<Tensor<2,DH::dimension> >       &patch_hessians) const
+get_function_hessians (const FEValuesBase<DH::dimension,DH::space_dimension> &fe_patch_values,
+		       std::vector<Tensor<2,DH::space_dimension> >       &patch_hessians) const
 {
   fe_patch_values.get_function_2nd_derivatives (*vector, patch_hessians);
 }
@@ -398,7 +398,7 @@ template <class VECTOR>
 void
 DataOut_DoFData<DH,patch_dim,patch_space_dim>::
 add_data_vector (const VECTOR                           &vec,
-		 const DataPostprocessor<DH::dimension> &data_postprocessor)
+		 const DataPostprocessor<DH::space_dimension> &data_postprocessor)
 {
 				   // this is a specialized version of the
 				   // other function where we have a
@@ -620,7 +620,7 @@ DataOut_DoFData<DH,patch_dim,patch_space_dim>::memory_consumption () const
 
 
 template <int dim, class DH>
-void DataOut<dim,DH>::build_some_patches (internal::DataOut::ParallelData<DH::dimension, DH::dimension> &data)
+void DataOut<dim,DH>::build_some_patches (internal::DataOut::ParallelData<DH::dimension, DH::space_dimension> &data)
 {
 				   // Check consistency of redundant
 				   // template parameter
@@ -644,8 +644,8 @@ void DataOut<dim,DH>::build_some_patches (internal::DataOut::ParallelData<DH::di
 				   // collection of which we do a
 				   // shallow copy instead
   const hp::QCollection<DH::dimension>       q_collection (patch_points);
-  const hp::FECollection<DH::dimension>      fe_collection(this->dofs->get_fe());
-  const hp::MappingCollection<DH::dimension> mapping_collection(*(data.mapping));
+  const hp::FECollection<DH::dimension,DH::space_dimension>      fe_collection(this->dofs->get_fe());
+  const hp::MappingCollection<DH::dimension,DH::space_dimension> mapping_collection(*(data.mapping));
 
   UpdateFlags update_flags=update_values;
   if (curved_cell_region != no_curved_cells)
@@ -660,14 +660,14 @@ void DataOut<dim,DH>::build_some_patches (internal::DataOut::ParallelData<DH::di
   Assert (!(update_flags & update_normal_vectors),
 	  ExcMessage("The update of normal vectors may not be requested for evaluation of data on cells via DataPostprocessor."));
   
-  hp::FEValues<DH::dimension> x_fe_patch_values (mapping_collection,
+  hp::FEValues<DH::dimension,DH::space_dimension> x_fe_patch_values (mapping_collection,
 						 fe_collection,
 						 q_collection,
 						 update_flags);
 
   const unsigned int n_q_points = patch_points.n_quadrature_points;
   
-  typename std::vector< dealii::DataOutBase::Patch<DH::dimension> >::iterator
+  typename std::vector< dealii::DataOutBase::Patch<DH::dimension,DH::space_dimension> >::iterator
     patch = this->patches.begin();
   cell_iterator cell=first_cell();
 
@@ -715,7 +715,7 @@ void DataOut<dim,DH>::build_some_patches (internal::DataOut::ParallelData<DH::di
       if (data.n_datasets > 0)
 	{
           x_fe_patch_values.reinit (cell);
-          const FEValues<DH::dimension> &fe_patch_values
+          const FEValues<DH::dimension,DH::space_dimension> &fe_patch_values
             = x_fe_patch_values.get_present_fe_values ();
 	  
 					   // depending on the requested output
@@ -732,7 +732,7 @@ void DataOut<dim,DH>::build_some_patches (internal::DataOut::ParallelData<DH::di
 	      (curved_cell_region==curved_boundary && cell->at_boundary()))
 	    {
 	      Assert(patch->space_dim==dim, ExcInternalError());
-	      const std::vector<Point<dim> > & q_points=fe_patch_values.get_quadrature_points();
+	      const std::vector<Point<DH::space_dimension> > & q_points=fe_patch_values.get_quadrature_points();
 					       // resize the patch->data member
 					       // in order to have enough memory
 					       // for the quadrature points as
@@ -754,7 +754,7 @@ void DataOut<dim,DH>::build_some_patches (internal::DataOut::ParallelData<DH::di
 					   // first fill dof_data
 	  for (unsigned int dataset=0; dataset<this->dof_data.size(); ++dataset)
 	    {
-	      const DataPostprocessor<dim> *postprocessor=this->dof_data[dataset]->postprocessor;
+	      const DataPostprocessor<DH::space_dimension> *postprocessor=this->dof_data[dataset]->postprocessor;
 	      
 	      if (postprocessor != 0)
 		{
@@ -939,13 +939,13 @@ template <int dim, class DH>
 void DataOut<dim,DH>::build_patches (const unsigned int n_subdivisions,
 				     const unsigned int n_threads_) 
 {
-  build_patches (StaticMappingQ1<DH::dimension>::mapping,
+  build_patches (StaticMappingQ1<DH::dimension,DH::space_dimension>::mapping,
 		 n_subdivisions, n_threads_, no_curved_cells);
 }
 
 
 template <int dim, class DH>
-void DataOut<dim,DH>::build_patches (const Mapping<DH::dimension> &mapping,
+void DataOut<dim,DH>::build_patches (const Mapping<DH::dimension,DH::space_dimension> &mapping,
 				     const unsigned int nnnn_subdivisions,
 				     const unsigned int n_threads_,
 				     const CurvedCellRegion curved_region) 
@@ -964,7 +964,7 @@ void DataOut<dim,DH>::build_patches (const Mapping<DH::dimension> &mapping,
   Assert (n_subdivisions >= 1,
 	  ExcInvalidNumberOfSubdivisions(n_subdivisions));
 
-  typedef DataOut_DoFData<DH, DH::dimension> BaseClass;
+  typedef DataOut_DoFData<DH, DH::dimension, DH::space_dimension> BaseClass;
   Assert (this->dofs != 0, typename BaseClass::ExcNoDoFHandlerSelected());
 
   Assert (!DEAL_II_USE_MT || (n_threads_ >= 1),
@@ -988,7 +988,7 @@ void DataOut<dim,DH>::build_patches (const Mapping<DH::dimension> &mapping,
 				   // clear the patches array
   if (true)
     {
-      std::vector< dealii::DataOutBase::Patch<DH::dimension> > dummy;
+      std::vector< dealii::DataOutBase::Patch<DH::dimension, DH::space_dimension> > dummy;
       this->patches.swap (dummy);
     };
   
@@ -1011,7 +1011,7 @@ void DataOut<dim,DH>::build_patches (const Mapping<DH::dimension> &mapping,
                                 static_cast<unsigned int>(cell->index()));
       
       cell_to_patch_index_map[l].resize (max_index+1,
-                                         dealii::DataOutBase::Patch<DH::dimension>::no_neighbor);
+                                         dealii::DataOutBase::Patch<DH::dimension,DH::space_dimension>::no_neighbor);
     };
                                   
   unsigned int n_patches = 0;
@@ -1039,7 +1039,7 @@ void DataOut<dim,DH>::build_patches (const Mapping<DH::dimension> &mapping,
                                    //
                                    // then number the patches
                                    // consecutively
-  dealii::DataOutBase::Patch<DH::dimension>  default_patch;
+  dealii::DataOutBase::Patch<DH::dimension,DH::space_dimension>  default_patch;
   default_patch.n_subdivisions = n_subdivisions;
   default_patch.data.reinit (n_datasets, n_q_points);
   this->patches.insert (this->patches.end(), n_patches, default_patch);
@@ -1049,7 +1049,7 @@ void DataOut<dim,DH>::build_patches (const Mapping<DH::dimension> &mapping,
   
 
 				   // init data for the threads    
-  std::vector<internal::DataOut::ParallelData<DH::dimension, DH::dimension> > thread_data(n_threads);
+  std::vector<internal::DataOut::ParallelData<DH::dimension, DH::space_dimension> > thread_data(n_threads);
   for (unsigned int i=0;i<n_threads;++i)
     {
       thread_data[i].n_threads      = n_threads;
@@ -1113,52 +1113,52 @@ DataOut<dim,DH>::next_cell (const typename DataOut<dim,DH>::cell_iterator &cell)
 
 // explicit instantiations 
 
-#define INSTANTIATE(DH,D2,D3,V) \
+#define INSTANTIATE(DH,D0,D1,D2,D3,V)		\
 template void \
-DataOut_DoFData<DH,D2,D3>:: \
+DataOut_DoFData<DH<D0,D1>,D2,D3>::	    \
 add_data_vector<V > (const V             &, \
                      const std::string   &, \
                      const DataVectorType,  \
 		     const std::vector<DataComponentInterpretation::DataComponentInterpretation> &); \
 \
 template void \
-DataOut_DoFData<DH,D2,D3>:: \
+ DataOut_DoFData<DH<D0,D1>,D2,D3>::		       \
 add_data_vector<V > (const V                        &, \
                      const std::vector<std::string> &, \
                      const DataVectorType,  \
 		     const std::vector<DataComponentInterpretation::DataComponentInterpretation> &); \
 \
 template void \
-DataOut_DoFData<DH,D2,D3>:: \
+ DataOut_DoFData<DH<D0,D1>,D2,D3>::		 \
 add_data_vector<V > (const V                  &, \
-		     const DataPostprocessor<DH::dimension> &)
+		     const DataPostprocessor<DH<D0,D1>::space_dimension> &)
 
 #ifndef DEAL_II_USE_PETSC
-# define INSTANTIATE_VECTORS(DH,D2,D3) \
-    INSTANTIATE(DH,D2,D3,Vector<double>); \
-    INSTANTIATE(DH,D2,D3,Vector<float>); \
-    INSTANTIATE(DH,D2,D3,BlockVector<double>) ; \
-    INSTANTIATE(DH,D2,D3,BlockVector<float>)
+# define INSTANTIATE_VECTORS(DH,D0,D1,D2,D3)	\
+    INSTANTIATE(DH,D0,D1,D2,D3,Vector<double>); \
+    INSTANTIATE(DH,D0,D1,D2,D3,Vector<float>); \
+    INSTANTIATE(DH,D0,D1,D2,D3,BlockVector<double>) ; \
+    INSTANTIATE(DH,D0,D1,D2,D3,BlockVector<float>)
 #else
-# define INSTANTIATE_VECTORS(DH,D2,D3) \
-    INSTANTIATE(DH,D2,D3,Vector<double>); \
-    INSTANTIATE(DH,D2,D3,Vector<float>); \
-    INSTANTIATE(DH,D2,D3,BlockVector<double>) ; \
-    INSTANTIATE(DH,D2,D3,BlockVector<float>); \
-    INSTANTIATE(DH,D2,D3,PETScWrappers::Vector); \
-    INSTANTIATE(DH,D2,D3,PETScWrappers::BlockVector)
+# define INSTANTIATE_VECTORS(DH,D0,D1,D2,D3)	 \
+    INSTANTIATE(DH,D0,D1,D2,D3,Vector<double>); \
+    INSTANTIATE(DH,D0,D1,D2,D3,Vector<float>); \
+    INSTANTIATE(DH,D0,D1,D2,D3,BlockVector<double>) ; \
+    INSTANTIATE(DH,D0,D1,D2,D3,BlockVector<float>); \
+    INSTANTIATE(DH,D0,D1,D2,D3,PETScWrappers::Vector);		\
+    INSTANTIATE(DH,D0,D1,D2,D3,PETScWrappers::BlockVector)
 #endif
 
 // now do actual instantiations, first for DoFHandler...
 template class DataOut_DoFData<DoFHandler<deal_II_dimension>,deal_II_dimension>;
 template class DataOut_DoFData<DoFHandler<deal_II_dimension>,deal_II_dimension+1>;
-INSTANTIATE_VECTORS(DoFHandler<deal_II_dimension>,deal_II_dimension,deal_II_dimension);
-INSTANTIATE_VECTORS(DoFHandler<deal_II_dimension>,deal_II_dimension+1,deal_II_dimension+1);
+INSTANTIATE_VECTORS(DoFHandler,deal_II_dimension,deal_II_dimension,deal_II_dimension,deal_II_dimension);
+INSTANTIATE_VECTORS(DoFHandler,deal_II_dimension,deal_II_dimension,deal_II_dimension+1,deal_II_dimension+1);
 
 // for 3d, also generate an extra class
 #if deal_II_dimension >= 2
 template class DataOut_DoFData<DoFHandler<deal_II_dimension>,deal_II_dimension-1,deal_II_dimension>;
-INSTANTIATE_VECTORS(DoFHandler<deal_II_dimension>,deal_II_dimension-1,deal_II_dimension);
+INSTANTIATE_VECTORS(DoFHandler,deal_II_dimension,deal_II_dimension,deal_II_dimension-1,deal_II_dimension);
 #endif
 
 template class DataOut<deal_II_dimension, DoFHandler<deal_II_dimension> >;
@@ -1167,15 +1167,26 @@ template class DataOut<deal_II_dimension, DoFHandler<deal_II_dimension> >;
 // ...and now for hp::DoFHandler
 template class DataOut_DoFData<hp::DoFHandler<deal_II_dimension>,deal_II_dimension>;
 template class DataOut_DoFData<hp::DoFHandler<deal_II_dimension>,deal_II_dimension+1>;
-INSTANTIATE_VECTORS(hp::DoFHandler<deal_II_dimension>,deal_II_dimension,deal_II_dimension);
-INSTANTIATE_VECTORS(hp::DoFHandler<deal_II_dimension>,deal_II_dimension+1,deal_II_dimension+1);
+INSTANTIATE_VECTORS(hp::DoFHandler,deal_II_dimension,deal_II_dimension,deal_II_dimension,deal_II_dimension);
+INSTANTIATE_VECTORS(hp::DoFHandler,deal_II_dimension,deal_II_dimension,deal_II_dimension+1,deal_II_dimension+1);
 
 #if deal_II_dimension >= 2
 template class DataOut_DoFData<hp::DoFHandler<deal_II_dimension>,deal_II_dimension-1,deal_II_dimension>;
-INSTANTIATE_VECTORS(hp::DoFHandler<deal_II_dimension>,deal_II_dimension-1,deal_II_dimension);
+INSTANTIATE_VECTORS(hp::DoFHandler,deal_II_dimension,deal_II_dimension,deal_II_dimension-1,deal_II_dimension);
 #endif
 
 template class DataOut<deal_II_dimension, hp::DoFHandler<deal_II_dimension> >;
+
+#if deal_II_dimension == 2 || deal_II_dimension ==1
+// now do actual instantiations, first for DoFHandler...
+template class DataOut_DoFData<DoFHandler<deal_II_dimension,deal_II_dimension+1>,deal_II_dimension, deal_II_dimension+1>;
+template class DataOut_DoFData<DoFHandler<deal_II_dimension,deal_II_dimension+1>,deal_II_dimension+1, deal_II_dimension+1>;
+
+INSTANTIATE_VECTORS(DoFHandler,deal_II_dimension,deal_II_dimension+1,deal_II_dimension,deal_II_dimension+1);
+INSTANTIATE_VECTORS(DoFHandler,deal_II_dimension,deal_II_dimension+1,deal_II_dimension+1,deal_II_dimension+1);
+
+template class DataOut<deal_II_dimension, DoFHandler<deal_II_dimension,deal_II_dimension+1> >;
+#endif
 
 
 #undef INSTANTIATE

@@ -25,8 +25,8 @@
 
 DEAL_II_NAMESPACE_OPEN
 
-template <int dim> class MappingQ1;
-template <int dim> class FiniteElement;
+template <int dim, int spacedim> class MappingQ1;
+template <int dim, int spacedim> class FiniteElement;
 
 
 
@@ -65,8 +65,8 @@ namespace internal
                                           * indicated by the parameters
                                           * to the constructor.
                                           */
-        FEValuesBase (const dealii::hp::MappingCollection<dim> &mapping_collection,
-                      const dealii::hp::FECollection<dim>      &fe_collection,
+      FEValuesBase (const dealii::hp::MappingCollection<dim,FEValues::space_dimension> &mapping_collection,
+		    const dealii::hp::FECollection<dim,FEValues::space_dimension>      &fe_collection,
                       const dealii::hp::QCollection<q_dim>     &q_collection,
                       const UpdateFlags             update_flags);
                                          /**
@@ -78,7 +78,7 @@ namespace internal
                                           * object for the mapping
                                           * object.
                                           */
-        FEValuesBase (const dealii::hp::FECollection<dim> &fe_collection,
+      FEValuesBase (const dealii::hp::FECollection<dim,FEValues::space_dimension> &fe_collection,
                       const dealii::hp::QCollection<q_dim> &q_collection,
                       const UpdateFlags         update_flags);
         
@@ -121,14 +121,14 @@ namespace internal
                                           * collection of finite
                                           * elements to be used.
                                           */
-        const SmartPointer<const dealii::hp::FECollection<dim> > fe_collection;
+        const SmartPointer<const dealii::hp::FECollection<dim,FEValues::space_dimension> > fe_collection;
         
                                          /**
                                           * A pointer to the
                                           * collection of mappings to
                                           * be used.
                                           */
-        const SmartPointer<const dealii::hp::MappingCollection<dim> > mapping_collection;
+        const SmartPointer<const dealii::hp::MappingCollection<dim, FEValues::space_dimension> > mapping_collection;
     
                                          /**
                                           * Copy of the quadrature
@@ -229,13 +229,21 @@ namespace hp
  * finite element, quadrature formula and mapping, but only those that will
  * actually be needed.
  *
+ * This class has not yet been implemented for the use in the codimension
+ * one case (<tt>spacedim != dim </tt>).
+ *
  * @ingroup hp hpcollection
  * @author Wolfgang Bangerth, 2003
  */  
-  template <int dim>
-  class FEValues : public internal::hp::FEValuesBase<dim,dim,dealii::FEValues<dim> >
+  template <int dim, int spacedim=dim>
+    class FEValues : public internal::hp::FEValuesBase<dim,dim,dealii::FEValues<dim,spacedim> >
   {
     public:
+ 
+    static const unsigned int dimension = dim;
+
+    static const unsigned int space_dimension = spacedim;
+
                                        /**
                                         * Constructor. Initialize this
                                         * object with the given
@@ -256,8 +264,8 @@ namespace hp
                                         * <tt>DoFHandler::get_fe()</tt>
                                         * function.
                                         */
-      FEValues (const dealii::hp::MappingCollection<dim> &mapping_collection,
-                const dealii::hp::FECollection<dim>  &fe_collection,
+    FEValues (const dealii::hp::MappingCollection<dim,spacedim> &mapping_collection,
+	      const dealii::hp::FECollection<dim,spacedim>  &fe_collection,
                 const dealii::hp::QCollection<dim>       &q_collection,
                 const UpdateFlags             update_flags);
 
@@ -284,7 +292,7 @@ namespace hp
                                         * <tt>DoFHandler::get_fe()</tt>
                                         * function.
                                         */
-      FEValues (const hp::FECollection<dim> &fe_collection,
+    FEValues (const hp::FECollection<dim,spacedim> &fe_collection,
                 const hp::QCollection<dim>      &q_collection,
                 const UpdateFlags            update_flags);
 
@@ -389,7 +397,7 @@ namespace hp
                                         * this argument is specified.
                                         */
       void
-      reinit (const typename hp::DoFHandler<dim>::cell_iterator &cell,
+      reinit (const typename hp::DoFHandler<dim,spacedim>::cell_iterator &cell,
               const unsigned int q_index = numbers::invalid_unsigned_int,
               const unsigned int mapping_index = numbers::invalid_unsigned_int,
               const unsigned int fe_index = numbers::invalid_unsigned_int);
@@ -424,7 +432,7 @@ namespace hp
                                         * these last three arguments.
                                         */
       void
-      reinit (const typename dealii::DoFHandler<dim>::cell_iterator &cell,
+      reinit (const typename dealii::DoFHandler<dim,spacedim>::cell_iterator &cell,
               const unsigned int q_index = numbers::invalid_unsigned_int,
               const unsigned int mapping_index = numbers::invalid_unsigned_int,
               const unsigned int fe_index = numbers::invalid_unsigned_int);
@@ -459,7 +467,7 @@ namespace hp
                                         * these last three arguments.
                                         */
       void
-      reinit (const typename MGDoFHandler<dim>::cell_iterator &cell,
+      reinit (const typename MGDoFHandler<dim,spacedim>::cell_iterator &cell,
               const unsigned int q_index = numbers::invalid_unsigned_int,
               const unsigned int mapping_index = numbers::invalid_unsigned_int,
               const unsigned int fe_index = numbers::invalid_unsigned_int);
@@ -495,10 +503,12 @@ namespace hp
                                         * three arguments.
                                         */
       void
-      reinit (const typename Triangulation<dim>::cell_iterator &cell,
+      reinit (const typename Triangulation<dim,spacedim>::cell_iterator &cell,
               const unsigned int q_index = numbers::invalid_unsigned_int,
               const unsigned int mapping_index = numbers::invalid_unsigned_int,
               const unsigned int fe_index = numbers::invalid_unsigned_int);
+
+
   };
 
 

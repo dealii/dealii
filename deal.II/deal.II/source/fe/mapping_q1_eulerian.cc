@@ -23,8 +23,8 @@
 DEAL_II_NAMESPACE_OPEN
 
 
-template <int dim, class EulerVectorType>
-MappingQ1Eulerian<dim, EulerVectorType>::
+template <int dim, class EulerVectorType, int spacedim>
+MappingQ1Eulerian<dim, EulerVectorType, spacedim>::
 MappingQ1Eulerian (const EulerVectorType  &euler_transform_vectors,
 		   const DoFHandler<dim> &shiftmap_dof_handler)
                      :
@@ -34,9 +34,9 @@ MappingQ1Eulerian (const EulerVectorType  &euler_transform_vectors,
 
 
 
-template <int dim, class EulerVectorType>
+template <int dim, class EulerVectorType, int spacedim>
 void
-MappingQ1Eulerian<dim, EulerVectorType>::
+MappingQ1Eulerian<dim, EulerVectorType, spacedim>::
 compute_mapping_support_points(const typename Triangulation<dim>::cell_iterator &cell,
 			       std::vector<Point<dim> > &a) const
 {
@@ -106,11 +106,11 @@ compute_mapping_support_points(const typename Triangulation<dim>::cell_iterator 
 
 
 
-template <int dim, class EulerVectorType>
-Mapping<dim> *
-MappingQ1Eulerian<dim, EulerVectorType>::clone () const
+template <int dim, class EulerVectorType, int spacedim>
+Mapping<dim,spacedim> *
+MappingQ1Eulerian<dim, EulerVectorType, spacedim>::clone () const
 {
-  return new MappingQ1Eulerian<dim,EulerVectorType>(*this);
+  return new MappingQ1Eulerian<dim,EulerVectorType,spacedim>(*this);
 }
 
 

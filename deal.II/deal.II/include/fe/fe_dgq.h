@@ -22,7 +22,7 @@
 
 DEAL_II_NAMESPACE_OPEN
 
-template <int dim> class MappingQ;
+template <int dim, int spacedim> class MappingQ;
 template <int dim> class Quadrature;
 
 /*!@addtogroup fe */
@@ -71,11 +71,16 @@ template <int dim> class Quadrature;
  * on the surface of the cell, they are logically in the interior
  * since there are no continuity requirements for these shape
  * functions across cell boundaries.
+ * This class if partially implemented for the codimension one case
+ * (<tt>spacedim != dim </tt>), since no passage of information
+ * between meshes of different refinement level is possible because
+ * the embedding and projection matrices are not computed in the class
+ * constructor.
  *
  * @author Ralf Hartmann, Guido Kanschat 2001, 2004
  */
-template <int dim>
-class FE_DGQ : public FE_Poly<TensorProductPolynomials<dim>,dim>
+template <int dim, int spacedim=dim>
+class FE_DGQ : public FE_Poly<TensorProductPolynomials<dim>, dim, spacedim>
 {
   public:
 				     /**
@@ -119,7 +124,7 @@ class FE_DGQ : public FE_Poly<TensorProductPolynomials<dim>,dim>
 				      * is thrown.
 				      */
     virtual void
-    get_interpolation_matrix (const FiniteElement<dim> &source,
+    get_interpolation_matrix (const FiniteElement<dim, spacedim> &source,
 			      FullMatrix<double>           &matrix) const;
     
 				     /**
@@ -144,7 +149,7 @@ class FE_DGQ : public FE_Poly<TensorProductPolynomials<dim>,dim>
 				      * FiniteElement<dim>::ExcInterpolationNotImplemented.
 				      */
     virtual void
-    get_face_interpolation_matrix (const FiniteElement<dim> &source,
+    get_face_interpolation_matrix (const FiniteElement<dim, spacedim> &source,
 				   FullMatrix<double>       &matrix) const;    
 
 				     /**
@@ -169,7 +174,7 @@ class FE_DGQ : public FE_Poly<TensorProductPolynomials<dim>,dim>
 				      * FiniteElement<dim>::ExcInterpolationNotImplemented.
 				      */
     virtual void
-    get_subface_interpolation_matrix (const FiniteElement<dim> &source,
+    get_subface_interpolation_matrix (const FiniteElement<dim, spacedim> &source,
 				      const unsigned int        subface,
 				      FullMatrix<double>       &matrix) const;
 
@@ -218,7 +223,7 @@ class FE_DGQ : public FE_Poly<TensorProductPolynomials<dim>,dim>
 				      */
     virtual
     std::vector<std::pair<unsigned int, unsigned int> >
-    hp_vertex_dof_identities (const FiniteElement<dim> &fe_other) const;
+    hp_vertex_dof_identities (const FiniteElement<dim, spacedim> &fe_other) const;
 
 				     /**
 				      * Same as
@@ -233,7 +238,7 @@ class FE_DGQ : public FE_Poly<TensorProductPolynomials<dim>,dim>
 				      */
     virtual
     std::vector<std::pair<unsigned int, unsigned int> >
-    hp_line_dof_identities (const FiniteElement<dim> &fe_other) const;
+    hp_line_dof_identities (const FiniteElement<dim, spacedim> &fe_other) const;
 
 				     /**
 				      * Same as
@@ -248,7 +253,7 @@ class FE_DGQ : public FE_Poly<TensorProductPolynomials<dim>,dim>
 				      */
     virtual
     std::vector<std::pair<unsigned int, unsigned int> >
-    hp_quad_dof_identities (const FiniteElement<dim> &fe_other) const;
+    hp_quad_dof_identities (const FiniteElement<dim, spacedim> &fe_other) const;
 
                                      /**
                                       * Return whether this element
@@ -278,7 +283,7 @@ class FE_DGQ : public FE_Poly<TensorProductPolynomials<dim>,dim>
 				      */
     virtual
     FiniteElementDomination::Domination
-    compare_for_face_domination (const FiniteElement<dim> &fe_other) const;
+    compare_for_face_domination (const FiniteElement<dim, spacedim> &fe_other) const;
 
 				     /**
 				      * @}
@@ -338,7 +343,7 @@ class FE_DGQ : public FE_Poly<TensorProductPolynomials<dim>,dim>
 				      * This function is needed by the
 				      * constructors of @p FESystem.
 				      */
-    virtual FiniteElement<dim> *clone() const;
+    virtual FiniteElement<dim, spacedim> *clone() const;
 
   private:
 				     /**
@@ -385,14 +390,14 @@ class FE_DGQ : public FE_Poly<TensorProductPolynomials<dim>,dim>
 				     /**
 				      * Allow access from other dimensions.
 				      */
-    template <int dim1> friend class FE_DGQ;
+    template <int dim1, int spacedim1> friend class FE_DGQ;
 
 				     /**
 				      * Allows @p MappingQ class to
 				      * access to build_renumbering
 				      * function.
 				      */
-    template <int dim1> friend class MappingQ;
+    template <int dim1, int spacedim1> friend class MappingQ;
 };
 
 

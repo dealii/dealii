@@ -28,30 +28,33 @@
 DEAL_II_NAMESPACE_OPEN
 
 
-// helper function to aquire the number of levels within a grid
-template <class GridClass>
-unsigned int
-get_n_levels (const GridClass &grid)
+namespace
 {
-				   // all objects we deal with are able
-				   // to deliver a pointer to the
-				   // underlying triangulation.
-				   //
-				   // for the triangulation as GridClass
-				   // of this object, there is a
-				   // specialization of this function
-  return grid.get_tria().n_levels();
-}
+// helper function to aquire the number of levels within a grid
+  template <class GridClass>
+  unsigned int
+  get_n_levels (const GridClass &grid)
+  {
+				     // all objects we deal with are able
+				     // to deliver a pointer to the
+				     // underlying triangulation.
+				     //
+				     // for the triangulation as GridClass
+				     // of this object, there is a
+				     // specialization of this function
+    return grid.get_tria().n_levels();
+  }
 
 
 // specialization for grid==tria
-template <int dim>
-unsigned int
-get_n_levels (const Triangulation<dim> &grid)
-{
-				   // if GridClass==Triangulation, then
-				   // we can ask directly.
-  return grid.n_levels();
+  template <int dim>
+  unsigned int
+  get_n_levels (const Triangulation<dim> &grid)
+  {
+				     // if GridClass==Triangulation, then
+				     // we can ask directly.
+    return grid.n_levels();
+  }
 }
 
 

@@ -19,7 +19,7 @@
 
 DEAL_II_NAMESPACE_OPEN
 
-template <int dim> class MappingQ;
+template <int dim, int spacedim> class MappingQ;
 
 
 /*!@addtogroup fe */
@@ -47,6 +47,8 @@ template <int dim> class MappingQ;
  * usually have a worse condition number than the ones originating
  * from the FE_DGP element.
  *
+ * This class is not implemented for the codimension one case
+ * (<tt>spacedim != dim</tt>).
  *
  * <h3>Transformation properties</h3>
  *

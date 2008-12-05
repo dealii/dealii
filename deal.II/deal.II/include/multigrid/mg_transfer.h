@@ -38,7 +38,7 @@
 DEAL_II_NAMESPACE_OPEN
 
 
-template <int dim> class MGDoFHandler;
+template <int dim, int spacedim> class MGDoFHandler;
 
 /*
  * MGTransferBase is defined in mg_base.h
@@ -72,8 +72,8 @@ class MGTransferPrebuilt : public MGTransferBase<VECTOR>
 				      * Actually build the prolongation
 				      * matrices for each level.
 				      */
-    template <int dim>
-    void build_matrices (const MGDoFHandler<dim> &mg_dof);
+    template <int dim, int spacedim>
+    void build_matrices (const MGDoFHandler<dim,spacedim> &mg_dof);
 
     virtual void prolongate (const unsigned int    to_level,
 			     VECTOR       &dst,
@@ -89,9 +89,9 @@ class MGTransferPrebuilt : public MGTransferBase<VECTOR>
 				      * on each of the levels
 				      * separately, i.a. an @p MGVector.
 				      */
-    template <int dim, class InVector>
+    template <int dim, class InVector, int spacedim>
     void
-    copy_to_mg (const MGDoFHandler<dim>& mg_dof,
+    copy_to_mg (const MGDoFHandler<dim,spacedim>& mg_dof,
 		MGLevelObject<VECTOR>& dst,
 		const InVector& src) const;
 
@@ -107,9 +107,9 @@ class MGTransferPrebuilt : public MGTransferBase<VECTOR>
 				      * constrained degrees of freedom
 				      * are set to zero.
 				      */
-    template <int dim, class OutVector>
+    template <int dim, class OutVector, int spacedim>
     void
-    copy_from_mg (const MGDoFHandler<dim>& mg_dof,
+    copy_from_mg (const MGDoFHandler<dim,spacedim>& mg_dof,
 		  OutVector& dst,
 		  const MGLevelObject<VECTOR> &src) const;
 
@@ -121,9 +121,9 @@ class MGTransferPrebuilt : public MGTransferBase<VECTOR>
 				      * function, but probably not for
 				      * continuous elements.
 				      */
-    template <int dim, class OutVector>
+    template <int dim, class OutVector, int spacedim>
     void
-    copy_from_mg_add (const MGDoFHandler<dim>& mg_dof,
+    copy_from_mg_add (const MGDoFHandler<dim,spacedim>& mg_dof,
 		      OutVector& dst,
 		      const MGLevelObject<VECTOR>& src) const;
 

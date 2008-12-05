@@ -24,10 +24,10 @@
 
 DEAL_II_NAMESPACE_OPEN
 
-template <int dim>
-FE_DGPNonparametric<dim>::FE_DGPNonparametric (const unsigned int degree)
+template <int dim, int spacedim>  
+FE_DGPNonparametric<dim,spacedim>::FE_DGPNonparametric (const unsigned int degree)
 		:
-		FiniteElement<dim> (
+		FiniteElement<dim,spacedim> (
 		  FiniteElementData<dim>(get_dpo_vector(degree), 1, degree,
 					 FiniteElementData<dim>::L2),
 		  std::vector<bool>(
@@ -90,9 +90,9 @@ FE_DGPNonparametric<dim>::FE_DGPNonparametric (const unsigned int degree)
 
 
 
-template <int dim>
+template <int dim, int spacedim>  
 std::string
-FE_DGPNonparametric<dim>::get_name () const
+FE_DGPNonparametric<dim,spacedim>::get_name () const
 {
 				   // note that the
 				   // FETools::get_fe_from_name
@@ -109,18 +109,18 @@ FE_DGPNonparametric<dim>::get_name () const
 
 
 
-template <int dim>
-FiniteElement<dim> *
-FE_DGPNonparametric<dim>::clone() const
+template <int dim, int spacedim>  
+FiniteElement<dim,spacedim> *
+FE_DGPNonparametric<dim,spacedim>::clone() const
 {
-  return new FE_DGPNonparametric<dim>(*this);
+  return new FE_DGPNonparametric<dim,spacedim>(*this);
 }
 
 
 
-template <int dim>
+template <int dim, int spacedim>  
 double
-FE_DGPNonparametric<dim>::shape_value (const unsigned int i,
+FE_DGPNonparametric<dim,spacedim>::shape_value (const unsigned int i,
 			  const Point<dim> &p) const
 {
   Assert (i<this->dofs_per_cell, ExcIndexRange(i, 0, this->dofs_per_cell));
@@ -129,9 +129,9 @@ FE_DGPNonparametric<dim>::shape_value (const unsigned int i,
 
 
 
-template <int dim>
+template <int dim, int spacedim>  
 double
-FE_DGPNonparametric<dim>::shape_value_component (const unsigned int i,
+FE_DGPNonparametric<dim,spacedim>::shape_value_component (const unsigned int i,
 				    const Point<dim> &p,
 				    const unsigned int component) const
 {
@@ -142,9 +142,9 @@ FE_DGPNonparametric<dim>::shape_value_component (const unsigned int i,
 
 
 
-template <int dim>
+template <int dim, int spacedim>  
 Tensor<1,dim>
-FE_DGPNonparametric<dim>::shape_grad (const unsigned int i,
+FE_DGPNonparametric<dim,spacedim>::shape_grad (const unsigned int i,
 			 const Point<dim> &p) const
 {
   Assert (i<this->dofs_per_cell, ExcIndexRange(i, 0, this->dofs_per_cell));
@@ -152,9 +152,9 @@ FE_DGPNonparametric<dim>::shape_grad (const unsigned int i,
 }
 
 
-template <int dim>
+template <int dim, int spacedim>  
 Tensor<1,dim>
-FE_DGPNonparametric<dim>::shape_grad_component (const unsigned int i,
+FE_DGPNonparametric<dim,spacedim>::shape_grad_component (const unsigned int i,
 				   const Point<dim> &p,
 				   const unsigned int component) const
 {
@@ -165,9 +165,9 @@ FE_DGPNonparametric<dim>::shape_grad_component (const unsigned int i,
 
 
 
-template <int dim>
+template <int dim, int spacedim>  
 Tensor<2,dim>
-FE_DGPNonparametric<dim>::shape_grad_grad (const unsigned int i,
+FE_DGPNonparametric<dim,spacedim>::shape_grad_grad (const unsigned int i,
 			      const Point<dim> &p) const
 {
   Assert (i<this->dofs_per_cell, ExcIndexRange(i, 0, this->dofs_per_cell));
@@ -176,9 +176,9 @@ FE_DGPNonparametric<dim>::shape_grad_grad (const unsigned int i,
 
 
 
-template <int dim>
+template <int dim, int spacedim>  
 Tensor<2,dim>
-FE_DGPNonparametric<dim>::shape_grad_grad_component (const unsigned int i,
+FE_DGPNonparametric<dim,spacedim>::shape_grad_grad_component (const unsigned int i,
 					const Point<dim> &p,
 					const unsigned int component) const
 {
@@ -193,9 +193,9 @@ FE_DGPNonparametric<dim>::shape_grad_grad_component (const unsigned int i,
 //---------------------------------------------------------------------------
 
 
-template <int dim>
+template <int dim, int spacedim>  
 std::vector<unsigned int>
-FE_DGPNonparametric<dim>::get_dpo_vector (const unsigned int deg)
+FE_DGPNonparametric<dim,spacedim>::get_dpo_vector (const unsigned int deg)
 {
   std::vector<unsigned int> dpo(dim+1, static_cast<unsigned int>(0));
   dpo[dim] = deg+1;
@@ -208,9 +208,9 @@ FE_DGPNonparametric<dim>::get_dpo_vector (const unsigned int deg)
 }
 
 
-template <int dim>
+template <int dim, int spacedim>  
 UpdateFlags
-FE_DGPNonparametric<dim>::update_once (const UpdateFlags) const
+FE_DGPNonparametric<dim,spacedim>::update_once (const UpdateFlags) const
 {
 				   // for this kind of elements, only
 				   // the values can be precomputed
@@ -221,9 +221,9 @@ FE_DGPNonparametric<dim>::update_once (const UpdateFlags) const
 }
 
 
-template <int dim>
+template <int dim, int spacedim>  
 UpdateFlags
-FE_DGPNonparametric<dim>::update_each (const UpdateFlags flags) const
+FE_DGPNonparametric<dim,spacedim>::update_each (const UpdateFlags flags) const
 {
   UpdateFlags out = flags;
 
@@ -238,11 +238,11 @@ FE_DGPNonparametric<dim>::update_each (const UpdateFlags flags) const
 // Data field initialization
 //---------------------------------------------------------------------------
 
-template <int dim>
-typename Mapping<dim>::InternalDataBase *
-FE_DGPNonparametric<dim>::get_data (
+template <int dim, int spacedim>  
+typename Mapping<dim,spacedim>::InternalDataBase *
+FE_DGPNonparametric<dim,spacedim>::get_data (
   const UpdateFlags      update_flags,
-  const Mapping<dim>&,
+  const Mapping<dim,spacedim>&,
   const Quadrature<dim>&) const
 {
 				   // generate a new data object
@@ -283,15 +283,15 @@ FE_DGPNonparametric<dim>::get_data (
 // Fill data of FEValues
 //---------------------------------------------------------------------------
 
-template <int dim>
+template <int dim, int spacedim>  
 void
-FE_DGPNonparametric<dim>::fill_fe_values (
-  const Mapping<dim>&,
-  const typename Triangulation<dim>::cell_iterator&,
+FE_DGPNonparametric<dim,spacedim>::fill_fe_values (
+  const Mapping<dim,spacedim>&,
+  const typename Triangulation<dim,spacedim>::cell_iterator&,
   const Quadrature<dim>&,
-  typename Mapping<dim>::InternalDataBase&,
-  typename Mapping<dim>::InternalDataBase& fedata,
-  FEValuesData<dim>& data) const
+  typename Mapping<dim,spacedim>::InternalDataBase&,
+  typename Mapping<dim,spacedim>::InternalDataBase& fedata,
+  FEValuesData<dim,spacedim>& data) const
 {
 				   // convert data object to internal
 				   // data for this class. fails with
@@ -323,16 +323,16 @@ FE_DGPNonparametric<dim>::fill_fe_values (
 
 
 
-template <int dim>
+template <int dim, int spacedim>  
 void
-FE_DGPNonparametric<dim>::fill_fe_face_values (
-  const Mapping<dim>&,
-  const typename Triangulation<dim>::cell_iterator&,
+FE_DGPNonparametric<dim,spacedim>::fill_fe_face_values (
+  const Mapping<dim,spacedim>&,
+  const typename Triangulation<dim,spacedim>::cell_iterator&,
   const unsigned int,
   const Quadrature<dim-1>&,
-  typename Mapping<dim>::InternalDataBase&,
-  typename Mapping<dim>::InternalDataBase&       fedata,
-  FEValuesData<dim>&                             data) const
+  typename Mapping<dim,spacedim>::InternalDataBase&,
+  typename Mapping<dim,spacedim>::InternalDataBase&       fedata,
+  FEValuesData<dim,spacedim>&                             data) const
 {
 				   // convert data object to internal
 				   // data for this class. fails with
@@ -364,17 +364,17 @@ FE_DGPNonparametric<dim>::fill_fe_face_values (
 
 
 
-template <int dim>
+template <int dim, int spacedim>  
 void
-FE_DGPNonparametric<dim>::fill_fe_subface_values (
-  const Mapping<dim>&,
-  const typename Triangulation<dim>::cell_iterator&,
+FE_DGPNonparametric<dim,spacedim>::fill_fe_subface_values (
+  const Mapping<dim,spacedim>&,
+  const typename Triangulation<dim,spacedim>::cell_iterator&,
   const unsigned int,
   const unsigned int,
   const Quadrature<dim-1>&,
-  typename Mapping<dim>::InternalDataBase&,
-  typename Mapping<dim>::InternalDataBase&       fedata,
-  FEValuesData<dim>&                             data) const
+  typename Mapping<dim,spacedim>::InternalDataBase&,
+  typename Mapping<dim,spacedim>::InternalDataBase&       fedata,
+  FEValuesData<dim,spacedim>&                             data) const
 {
 				   // convert data object to internal
 				   // data for this class. fails with
@@ -406,18 +406,18 @@ FE_DGPNonparametric<dim>::fill_fe_subface_values (
 
 
 
-template <int dim>
+template <int dim, int spacedim>  
 unsigned int
-FE_DGPNonparametric<dim>::n_base_elements () const
+FE_DGPNonparametric<dim,spacedim>::n_base_elements () const
 {
   return 1;
 }
 
 
 
-template <int dim>
-const FiniteElement<dim> &
-FE_DGPNonparametric<dim>::base_element (const unsigned int index) const
+template <int dim, int spacedim>  
+const FiniteElement<dim,spacedim> &
+FE_DGPNonparametric<dim,spacedim>::base_element (const unsigned int index) const
 {
   Assert (index==0, ExcIndexRange(index, 0, 1));
   return *this;
@@ -425,9 +425,9 @@ FE_DGPNonparametric<dim>::base_element (const unsigned int index) const
 
 
 
-template <int dim>
+template <int dim, int spacedim>  
 unsigned int
-FE_DGPNonparametric<dim>::element_multiplicity (const unsigned int index) const
+FE_DGPNonparametric<dim,spacedim>::element_multiplicity (const unsigned int index) const
 {
   Assert (index==0, ExcIndexRange(index, 0, 1));
   return 1;
@@ -435,10 +435,10 @@ FE_DGPNonparametric<dim>::element_multiplicity (const unsigned int index) const
 
 
 
-template <int dim>
+template <int dim, int spacedim>  
 void
-FE_DGPNonparametric<dim>::
-get_face_interpolation_matrix (const FiniteElement<dim> &x_source_fe,
+FE_DGPNonparametric<dim,spacedim>::
+get_face_interpolation_matrix (const FiniteElement<dim,spacedim> &x_source_fe,
 			       FullMatrix<double>       &interpolation_matrix) const
 {
 				   // this is only implemented, if the source
@@ -447,10 +447,11 @@ get_face_interpolation_matrix (const FiniteElement<dim> &x_source_fe,
 				   // faces and the face interpolation matrix
 				   // is necessarily empty -- i.e. there isn't
 				   // much we need to do here.
+  typedef	       FiniteElement<dim,spacedim> FEE;
   AssertThrow ((x_source_fe.get_name().find ("FE_DGPNonparametric<") == 0)
                ||
-               (dynamic_cast<const FE_DGPNonparametric<dim>*>(&x_source_fe) != 0),
-               typename FiniteElement<dim>::
+               (dynamic_cast<const FE_DGPNonparametric<dim,spacedim>*>(&x_source_fe) != 0),
+               typename FEE::
                ExcInterpolationNotImplemented());
   
   Assert (interpolation_matrix.m() == 0,
@@ -463,10 +464,10 @@ get_face_interpolation_matrix (const FiniteElement<dim> &x_source_fe,
 
 
 
-template <int dim>
+template <int dim, int spacedim>  
 void
-FE_DGPNonparametric<dim>::
-get_subface_interpolation_matrix (const FiniteElement<dim> &x_source_fe,
+FE_DGPNonparametric<dim,spacedim>::
+get_subface_interpolation_matrix (const FiniteElement<dim,spacedim> &x_source_fe,
 				  const unsigned int ,
 				  FullMatrix<double>           &interpolation_matrix) const
 {
@@ -476,11 +477,12 @@ get_subface_interpolation_matrix (const FiniteElement<dim> &x_source_fe,
 				   // faces and the face interpolation matrix
 				   // is necessarily empty -- i.e. there isn't
 				   // much we need to do here.
+  typedef	       FiniteElement<dim,spacedim> FEE;
   AssertThrow ((x_source_fe.get_name().find ("FE_DGPNonparametric<") == 0)
                ||
-               (dynamic_cast<const FE_DGPNonparametric<dim>*>(&x_source_fe) != 0),
-               typename FiniteElement<dim>::
-               ExcInterpolationNotImplemented());
+               (dynamic_cast<const FE_DGPNonparametric<dim,spacedim>*>(&x_source_fe) != 0),
+               typename FEE::
+	       ExcInterpolationNotImplemented());
   
   Assert (interpolation_matrix.m() == 0,
 	  ExcDimensionMismatch (interpolation_matrix.m(),
@@ -492,23 +494,23 @@ get_subface_interpolation_matrix (const FiniteElement<dim> &x_source_fe,
 
 
 
-template <int dim>
+template <int dim, int spacedim>  
 bool
-FE_DGPNonparametric<dim>::hp_constraints_are_implemented () const
+FE_DGPNonparametric<dim,spacedim>::hp_constraints_are_implemented () const
 {
   return true;
 }
 
 
 
-template <int dim>
+template <int dim, int spacedim>  
 std::vector<std::pair<unsigned int, unsigned int> >
-FE_DGPNonparametric<dim>::
-hp_vertex_dof_identities (const FiniteElement<dim> &fe_other) const
+FE_DGPNonparametric<dim,spacedim>::
+hp_vertex_dof_identities (const FiniteElement<dim,spacedim> &fe_other) const
 {
 				   // there are no such constraints for DGPNonparametric
 				   // elements at all
-  if (dynamic_cast<const FE_DGPNonparametric<dim>*>(&fe_other) != 0)
+  if (dynamic_cast<const FE_DGPNonparametric<dim,spacedim>*>(&fe_other) != 0)
     return
       std::vector<std::pair<unsigned int, unsigned int> > ();
   else
@@ -520,14 +522,14 @@ hp_vertex_dof_identities (const FiniteElement<dim> &fe_other) const
 
 
 
-template <int dim>
+template <int dim, int spacedim>  
 std::vector<std::pair<unsigned int, unsigned int> >
-FE_DGPNonparametric<dim>::
-hp_line_dof_identities (const FiniteElement<dim> &fe_other) const
+FE_DGPNonparametric<dim,spacedim>::
+hp_line_dof_identities (const FiniteElement<dim,spacedim> &fe_other) const
 {
 				   // there are no such constraints for DGPNonparametric
 				   // elements at all
-  if (dynamic_cast<const FE_DGPNonparametric<dim>*>(&fe_other) != 0)
+  if (dynamic_cast<const FE_DGPNonparametric<dim,spacedim>*>(&fe_other) != 0)
     return
       std::vector<std::pair<unsigned int, unsigned int> > ();
   else
@@ -539,14 +541,14 @@ hp_line_dof_identities (const FiniteElement<dim> &fe_other) const
 
 
 
-template <int dim>
+template <int dim, int spacedim>  
 std::vector<std::pair<unsigned int, unsigned int> >
-FE_DGPNonparametric<dim>::
-hp_quad_dof_identities (const FiniteElement<dim>        &fe_other) const
+FE_DGPNonparametric<dim,spacedim>::
+hp_quad_dof_identities (const FiniteElement<dim,spacedim>        &fe_other) const
 {
 				   // there are no such constraints for DGPNonparametric
 				   // elements at all
-  if (dynamic_cast<const FE_DGPNonparametric<dim>*>(&fe_other) != 0)
+  if (dynamic_cast<const FE_DGPNonparametric<dim,spacedim>*>(&fe_other) != 0)
     return
       std::vector<std::pair<unsigned int, unsigned int> > ();
   else
@@ -558,16 +560,16 @@ hp_quad_dof_identities (const FiniteElement<dim>        &fe_other) const
 
 
 
-template <int dim>
+template <int dim, int spacedim>  
 FiniteElementDomination::Domination
-FE_DGPNonparametric<dim>::
-compare_for_face_domination (const FiniteElement<dim> &fe_other) const
+FE_DGPNonparametric<dim,spacedim>::
+compare_for_face_domination (const FiniteElement<dim,spacedim> &fe_other) const
 {
 				   // check whether both are discontinuous
 				   // elements and both could dominate, see
 				   // the description of
 				   // FiniteElementDomination::Domination
-  if (dynamic_cast<const FE_DGPNonparametric<dim>*>(&fe_other) != 0)
+  if (dynamic_cast<const FE_DGPNonparametric<dim,spacedim>*>(&fe_other) != 0)
     return FiniteElementDomination::either_element_can_dominate;
 
   Assert (false, ExcNotImplemented());
@@ -576,9 +578,9 @@ compare_for_face_domination (const FiniteElement<dim> &fe_other) const
 
 
 
-template <int dim>
+template <int dim, int spacedim>  
 bool
-FE_DGPNonparametric<dim>::has_support_on_face (const unsigned int,
+FE_DGPNonparametric<dim,spacedim>::has_support_on_face (const unsigned int,
 				  const unsigned int) const
 {
   return true;
@@ -586,9 +588,9 @@ FE_DGPNonparametric<dim>::has_support_on_face (const unsigned int,
 
 
 
-template <int dim>
+template <int dim, int spacedim>  
 unsigned int
-FE_DGPNonparametric<dim>::memory_consumption () const
+FE_DGPNonparametric<dim,spacedim>::memory_consumption () const
 {
   Assert (false, ExcNotImplemented ());
   return 0;
@@ -596,9 +598,9 @@ FE_DGPNonparametric<dim>::memory_consumption () const
 
 
 
-template <int dim>
+template <int dim, int spacedim>  
 unsigned int
-FE_DGPNonparametric<dim>::get_degree () const
+FE_DGPNonparametric<dim,spacedim>::get_degree () const
 {
   return degree;
 }

@@ -20,25 +20,25 @@ DEAL_II_NAMESPACE_OPEN
 namespace hp
 {
 
-  template <int dim>
-  MappingCollection<dim>::MappingCollection ()
+  template<int dim, int spacedim>
+  MappingCollection<dim,spacedim>::MappingCollection ()
   {}
 
 
   
-  template <int dim>
-  MappingCollection<dim>::
-  MappingCollection (const Mapping<dim> &mapping)
+  template<int dim, int spacedim>
+  MappingCollection<dim,spacedim>::
+  MappingCollection (const Mapping<dim,spacedim> &mapping)
   {
     mappings
-      .push_back (boost::shared_ptr<const Mapping<dim> >(mapping.clone()));
+      .push_back (boost::shared_ptr<const Mapping<dim,spacedim> >(mapping.clone()));
   }
 
 
 
-  template <int dim>
-  MappingCollection<dim>::
-  MappingCollection (const MappingCollection<dim> &mapping_collection)
+  template<int dim, int spacedim>
+  MappingCollection<dim,spacedim>::
+  MappingCollection (const MappingCollection<dim,spacedim> &mapping_collection)
                   :
                   Subscriptor (),
                                                    // copy the array
@@ -57,9 +57,9 @@ namespace hp
   
   
 
-  template <int dim>
+  template<int dim, int spacedim>
   unsigned int
-  MappingCollection<dim>::memory_consumption () const
+  MappingCollection<dim,spacedim>::memory_consumption () const
   {
     return (sizeof(*this) +
 	    MemoryConsumption::memory_consumption (mappings));
@@ -67,31 +67,37 @@ namespace hp
 
   
 
-  template <int dim>
+  template<int dim, int spacedim>
   void
-  MappingCollection<dim>::push_back (const Mapping<dim> &new_mapping)
+  MappingCollection<dim,spacedim>::push_back (const Mapping<dim,spacedim> &new_mapping)
   {
     mappings
-      .push_back (boost::shared_ptr<const Mapping<dim> >(new_mapping.clone()));
+      .push_back (boost::shared_ptr<const Mapping<dim,spacedim> >(new_mapping.clone()));
   }
 
 //---------------------------------------------------------------------------
 
 
 
-  template <int dim>
-  MappingQ1<dim>
-  StaticMappingQ1<dim>::mapping_q1;
+  template<int dim, int spacedim>
+  MappingQ1<dim,spacedim>
+  StaticMappingQ1<dim,spacedim>::mapping_q1;
   
 
-  template <int dim>
-  MappingCollection<dim>
-  StaticMappingQ1<dim>::mapping_collection
-  = MappingCollection<dim>(mapping_q1);
+  template<int dim, int spacedim>
+  MappingCollection<dim,spacedim>
+  StaticMappingQ1<dim,spacedim>::mapping_collection
+  = MappingCollection<dim,spacedim>(mapping_q1);
 
 // explicit instantiations
   template class MappingCollection<deal_II_dimension>;
   template struct StaticMappingQ1<deal_II_dimension>;
+
+#if deal_II_dimension != 3
+  template class MappingCollection<deal_II_dimension,deal_II_dimension+1>;
+  template struct StaticMappingQ1<deal_II_dimension,deal_II_dimension+1>;
+
+#endif
   
 }
 

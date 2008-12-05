@@ -18,13 +18,16 @@
 #include <base/config.h>
 #include <base/exceptions.h>
 #include <base/point.h>
+#include <grid/tria.h>
+#include <fe/mapping.h>
+
 #include <string>
 
 DEAL_II_NAMESPACE_OPEN
 
 class ParameterHandler;
-template <int dim> class Triangulation;
-template <int dim> class Mapping;
+template <int dim, int spacedim> class Triangulation;
+template <int dim, int spacedim> class Mapping;
 
 
 /**
@@ -823,6 +826,9 @@ class GridOut
 				      * together with their level and
 				      * their material id or boundary
 				      * indicator, resp.
+				      * 
+				      * Not implemented for the
+				      * codimension one case.
 				      */
     template <int dim>
     void write_dx (const Triangulation<dim> &tria,
@@ -886,6 +892,9 @@ class GridOut
 				      * can be found in the
 				      * documentation of the
 				      * GridOutFlags::Gnuplot() class.
+				      *
+				      * Not implemented for the
+				      * codimension one case.
 				      */
     template <int dim>
     void write_gnuplot (const Triangulation<dim> &tria,
@@ -925,9 +934,12 @@ class GridOut
 				      * can be found in the
 				      * documentation of the
 				      * GridOut::Msh() class.
+				      *
+				      * Works also in the
+				      * codimension one case.
 				      */
-    template <int dim>
-    void write_msh (const Triangulation<dim> &tria,
+    template <int dim, int spacedim>
+    void write_msh (const Triangulation<dim,spacedim> &tria,
 		    std::ostream             &out) const;
 
 				     /**
@@ -964,9 +976,12 @@ class GridOut
 				      * can be found in the
 				      * documentation of the
 				      * GridOut::Ucd() class.
+				      *
+				      * Works also for the
+				      * codimension one case.
 				      */
-    template <int dim>
-    void write_ucd (const Triangulation<dim> &tria,
+    template <int dim, int spacedim>
+    void write_ucd (const Triangulation<dim,spacedim> &tria,
 		    std::ostream             &out) const;
 
 				     /**
@@ -1024,6 +1039,9 @@ class GridOut
 				      * viewpoint for three
 				      * dimensional grids is of
 				      * importance here.
+				      *
+				      * Not implemented for the
+				      * codimension one case.
 				      */
     template <int dim>
     void write_eps (const Triangulation<dim> &tria,
@@ -1053,11 +1071,14 @@ class GridOut
 				      * or at 800+@p boundary_id. Therefore,
 				      * boundary edges are alway in front of
 				      * cells.
+				      *
+				      * Not implemented for the
+				      * codimension one case.
 				      */
     template <int dim>
     void write_xfig (const Triangulation<dim> &tria,
-		    std::ostream             &out,
-		    const Mapping<dim>       *mapping=0) const;
+		    std::ostream              &out,
+		    const Mapping<dim>        *mapping=0) const;
     
 				     /**
 				      * Write grid to @p out according
@@ -1066,20 +1087,20 @@ class GridOut
 				      * appropriate <tt>write_*</tt>
 				      * function.
 				      */
-    template <int dim>
-    void write (const Triangulation<dim> &tria,
+    template <int dim, int spacedim>
+    void write (const Triangulation<dim,spacedim> &tria,
 		std::ostream             &out,
 		const OutputFormat        output_format,
-		const Mapping<dim>       *mapping=0) const;
+		const Mapping<dim,spacedim>       *mapping=0) const;
     
 				     /**
 				      * Write mesh in default format
 				      * set by ParameterHandler.
 				      */
-    template <int dim>
-    void write (const Triangulation<dim> &tria,
+    template <int dim, int spacedim>
+    void write (const Triangulation<dim,spacedim> &tria,
 		std::ostream             &out,
-		const Mapping<dim>       *mapping=0) const;
+		const Mapping<dim,spacedim>       *mapping=0) const;
     
 				     /**
 				      * Set flags for DX output
@@ -1292,8 +1313,8 @@ class GridOut
 				      * would complain anyway when compiling
 				      * the function for <tt>dim==1</tt>. Bad luck.
 				      */
-    template <int dim>
-    void write_msh_faces (const Triangulation<dim> &tria,
+    template <int dim, int spacedim>
+    void write_msh_faces (const Triangulation<dim,spacedim> &tria,
 			  const unsigned int        starting_index,
 			  std::ostream             &out) const;
 
@@ -1302,7 +1323,15 @@ class GridOut
 				      * of above function for 1d. Does
 				      * nothing.
 				      */
-    void write_msh_faces (const Triangulation<1> &tria,
+    void write_msh_faces (const Triangulation<1,1> &tria,
+			  const unsigned int      starting_index,
+			  std::ostream           &out) const;
+				     /**
+				      * Declaration of the specialization
+				      * of above function for 1d, 2sd. Does
+				      * nothing.
+				      */
+    void write_msh_faces (const Triangulation<1,2> &tria,
 			  const unsigned int      starting_index,
 			  std::ostream           &out) const;
    
@@ -1335,8 +1364,8 @@ class GridOut
 				      * when compiling the function
 				      * for <tt>dim==1/2</tt>. Bad luck.
 				      */
-    template <int dim>
-    void write_msh_lines (const Triangulation<dim> &tria,
+    template <int dim, int spacedim>
+    void write_msh_lines (const Triangulation<dim,spacedim> &tria,
 			  const unsigned int        starting_index,
 			  std::ostream             &out) const;
 
@@ -1345,16 +1374,32 @@ class GridOut
 				      * of above function for 1d. Does
 				      * nothing.
 				      */
-    void write_msh_lines (const Triangulation<1> &tria,
+    void write_msh_lines (const Triangulation<1,1> &tria,
 			  const unsigned int      starting_index,
 			  std::ostream           &out) const;
    
 				     /**
 				      * Declaration of the specialization
+				      * of above function for 1d, 2sd. Does
+				      * nothing.
+				      */
+    void write_msh_lines (const Triangulation<1,2> &tria,
+			  const unsigned int      starting_index,
+			  std::ostream           &out) const;
+				     /**
+				      * Declaration of the specialization
 				      * of above function for 2d. Does
 				      * nothing.
 				      */
-    void write_msh_lines (const Triangulation<2> &tria,
+    void write_msh_lines (const Triangulation<2,2> &tria,
+			  const unsigned int      starting_index,
+			  std::ostream           &out) const;
+				     /**
+				      * Declaration of the specialization
+				      * of above function for 2d, 3sd. Does
+				      * nothing.
+				      */
+    void write_msh_lines (const Triangulation<2,3> &tria,
 			  const unsigned int      starting_index,
 			  std::ostream           &out) const;
 
@@ -1384,8 +1429,8 @@ class GridOut
 				      */
 
    
-    template <int dim>
-    void write_ucd_faces (const Triangulation<dim> &tria,
+    template <int dim, int spacedim>
+    void write_ucd_faces (const Triangulation<dim,spacedim> &tria,
 			  const unsigned int        starting_index,
 			  std::ostream             &out) const;
 
@@ -1394,7 +1439,16 @@ class GridOut
 				      * of above function for 1d. Does
 				      * nothing.
 				      */
-    void write_ucd_faces (const Triangulation<1> &tria,
+    void write_ucd_faces (const Triangulation<1,1> &tria,
+			  const unsigned int      starting_index,
+			  std::ostream           &out) const;
+
+				     /**
+				      * Declaration of the specialization
+				      * of above function for 1d, 2sd. Does
+				      * nothing.
+				      */
+    void write_ucd_faces (const Triangulation<1,2> &tria,
 			  const unsigned int      starting_index,
 			  std::ostream           &out) const;
 
@@ -1426,8 +1480,8 @@ class GridOut
 				      */
 
    
-    template <int dim>
-    void write_ucd_lines (const Triangulation<dim> &tria,
+    template <int dim, int spacedim>
+    void write_ucd_lines (const Triangulation<dim,spacedim> &tria,
 			  const unsigned int        starting_index,
 			  std::ostream             &out) const;
 
@@ -1436,16 +1490,33 @@ class GridOut
 				      * of above function for 1d. Does
 				      * nothing.
 				      */
-    void write_ucd_lines (const Triangulation<1> &tria,
+    void write_ucd_lines (const Triangulation<1,1> &tria,
 			  const unsigned int      starting_index,
 			  std::ostream           &out) const;
+				     /**
+				      * Declaration of the specialization
+				      * of above function for 1d, 2sd. Does
+				      * nothing.
+				      */
+    void write_ucd_lines (const Triangulation<1,2> &tria,
+			  const unsigned int      starting_index,
+			  std::ostream           &out) const;
+
 
 				     /**
 				      * Declaration of the specialization
 				      * of above function for 2d. Does
 				      * nothing.
 				      */
-    void write_ucd_lines (const Triangulation<2> &tria,
+    void write_ucd_lines (const Triangulation<2,2> &tria,
+			  const unsigned int      starting_index,
+			  std::ostream           &out) const;
+				     /**
+				      * Declaration of the specialization
+				      * of above function for 2d, 3sd. Does
+				      * nothing.
+				      */
+    void write_ucd_lines (const Triangulation<2,3> &tria,
 			  const unsigned int      starting_index,
 			  std::ostream           &out) const;
     
@@ -1467,15 +1538,21 @@ class GridOut
 				      * same as for @p write_ucd_faces. See
 				      * there for more information.
 				      */
-    template <int dim>
-    unsigned int n_boundary_faces (const Triangulation<dim> &tria) const;
+    template <int dim, int spacedim>
+    unsigned int n_boundary_faces (const Triangulation<dim,spacedim> &tria) const;
 
 				     /**
 				      * Declaration of the specialization
 				      * of above function for
 				      * 1d. Simply returns zero.
 				      */
-    unsigned int n_boundary_faces (const Triangulation<1> &tria) const;
+    unsigned int n_boundary_faces (const Triangulation<1,1> &tria) const;
+				     /**
+				      * Declaration of the specialization
+				      * of above function for
+				      * 1d, 2sd. Simply returns zero.
+				      */
+    unsigned int n_boundary_faces (const Triangulation<1,2> &tria) const;
 
 				     /**
 				      * Return the number of lines in the
@@ -1495,22 +1572,35 @@ class GridOut
 				      * same as for @p write_ucd_faces. See
 				      * there for more information.
 				      */
-    template <int dim>
-    unsigned int n_boundary_lines (const Triangulation<dim> &tria) const;
+    template <int dim, int spacedim>
+    unsigned int n_boundary_lines (const Triangulation<dim,spacedim> &tria) const;
 
 				     /**
 				      * Declaration of the specialization
 				      * of above function for
 				      * 1d. Simply returns zero.
 				      */
-    unsigned int n_boundary_lines (const Triangulation<1> &tria) const;
+    unsigned int n_boundary_lines (const Triangulation<1,1> &tria) const;
+
+				     /**
+				      * Declaration of the specialization
+				      * of above function for
+				      * 1d, 2sd. Simply returns zero.
+				      */
+    unsigned int n_boundary_lines (const Triangulation<1,2> &tria) const;
 
 				     /**
 				      * Declaration of the specialization
 				      * of above function for
 				      * 2d. Simply returns zero.
 				      */
-    unsigned int n_boundary_lines (const Triangulation<2> &tria) const;
+    unsigned int n_boundary_lines (const Triangulation<2,2> &tria) const;
+				     /**
+				      * Declaration of the specialization
+				      * of above function for
+				      * 2d, 3sd. Simply returns zero.
+				      */
+    unsigned int n_boundary_lines (const Triangulation<2,3> &tria) const;
 };
 
 

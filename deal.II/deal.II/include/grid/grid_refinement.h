@@ -2,7 +2,7 @@
 //    $Id$
 //    Version: $Name$
 //
-//    Copyright (C) 2000, 2001, 2002, 2003, 2004, 2005, 2006, 2007 by the deal.II authors
+//    Copyright (C) 2000, 2001, 2002, 2003, 2004, 2005, 2006, 2007, 2008 by the deal.II authors
 //
 //    This file is subject to QPL and may not be  distributed
 //    without copyright and license information. Please refer
@@ -16,6 +16,7 @@
 
 #include <base/config.h>
 #include <base/exceptions.h>
+#include <grid/tria.h>
 
 #include <vector>
 #include <limits>
@@ -23,7 +24,7 @@
 DEAL_II_NAMESPACE_OPEN
 
 // forward declarations
-template <int dim> class Triangulation;
+template <int dim, int spacedim> class Triangulation;
 template <class T> class Vector;
 
 
@@ -173,10 +174,10 @@ class GridRefinement
 				      * general doc for this class for
 				      * more information.
 				      */
-    template <int dim, class Vector>
-    static void refine (Triangulation<dim> &tria,
-			const Vector       &criteria,
-			const double        threshold);
+    template <int dim, class Vector, int spacedim>
+    static void refine (Triangulation<dim,spacedim> &tria,
+			const Vector                &criteria,
+			const double                threshold);
 
 				     /**
 				      * Analogue to the @p refine
@@ -186,10 +187,10 @@ class GridRefinement
 				      * criterion is less than the
 				      * given threshold.
 				      */
-    template <int dim, class Vector>
-    static void coarsen (Triangulation<dim> &tria,
-			 const Vector       &criteria,
-			 const double        threshold);
+    template <int dim, class Vector, int spacedim>
+    static void coarsen (Triangulation<dim,spacedim> &tria,
+			 const Vector                &criteria,
+			 const double                threshold);
     
 				     /**
 				      * Refine the triangulation by
@@ -223,14 +224,14 @@ class GridRefinement
 				      * this class for more
 				      * information.
 				      */
-    template <int dim, class Vector>
+    template <int dim, class Vector, int spacedim>
     static
     void
-    refine_and_coarsen_fixed_number (Triangulation<dim> &tria,
-                                     const Vector       &criteria,
-                                     const double        top_fraction_of_cells,
-                                     const double        bottom_fraction_of_cells,
-				     const unsigned int  max_n_cells = std::numeric_limits<unsigned int>::max());
+    refine_and_coarsen_fixed_number (Triangulation<dim,spacedim> &tria,
+                                     const Vector                &criteria,
+                                     const double                top_fraction_of_cells,
+                                     const double                bottom_fraction_of_cells,
+				     const unsigned int          max_n_cells = std::numeric_limits<unsigned int>::max());
     
 				     /**
 				      * Refine the triangulation by
@@ -264,14 +265,14 @@ class GridRefinement
 				      * this class for more
 				      * information.
 				      */
-    template <int dim, class Vector>
+    template <int dim, class Vector, int spacedim>
     static
     void
-    refine_and_coarsen_fixed_fraction (Triangulation<dim> &tria,
-                                       const Vector       &criteria,
-                                       const double        top_fraction,
-                                       const double        bottom_fraction,
-				       const unsigned int  max_n_cells = std::numeric_limits<unsigned int>::max());
+    refine_and_coarsen_fixed_fraction (Triangulation<dim,spacedim> &tria,
+                                       const Vector                &criteria,
+                                       const double                top_fraction,
+                                       const double                bottom_fraction,
+				       const unsigned int          max_n_cells = std::numeric_limits<unsigned int>::max());
 
 
 
@@ -296,34 +297,16 @@ class GridRefinement
 				      * information.
 				      */
     
-    template <int dim, class Vector>
+    template <int dim, class Vector, int spacedim>
     static
     void
-    refine_and_coarsen_optimize (Triangulation<dim> &tria,
-                                 const Vector       &criteria);
+    refine_and_coarsen_optimize (Triangulation<dim,spacedim> &tria,
+                                 const Vector                &criteria);
 
 				     /**
 				      * Exception
 				      */
     DeclException0 (ExcInvalidParameterValue);
-
-
-  private:
-    
-				     /**
-				      * Sorts the vector @p ind as an
-				      * index vector of @p a in
-				      * increasing order.  This
-				      * implementation of quicksort
-				      * seems to be faster than the
-				      * STL version and is needed in
-				      * @p refine_and_coarsen_optimize
-				      */
-    template <class Vector>
-    static void qsort_index (const Vector               &a,
-                             std::vector<unsigned int>  &ind,
-                             int                         l,
-                             int                         r);
 };
 
 

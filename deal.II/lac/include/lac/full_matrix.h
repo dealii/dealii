@@ -21,6 +21,7 @@
 #include <lac/identity_matrix.h>
 #include <lac/lapack_full_matrix.h>
 
+
 #include <vector>
 #include <iomanip>
 
@@ -28,7 +29,9 @@ DEAL_II_NAMESPACE_OPEN
 
 
 // forward declarations
-template<typename number> class Vector;
+template <typename number> class Vector;
+
+template <int rank, int dim> class Tensor;
 
 
 /*! @addtogroup Matrix1
@@ -291,6 +294,7 @@ class FullMatrix : public Table<2,number>
 				      */
     explicit FullMatrix (const IdentityMatrix &id);
     
+
 				     /**
 				      * Assignment operator.
 				      */
@@ -899,7 +903,8 @@ class FullMatrix : public Table<2,number>
     void symmetrize ();
 
     				     /**
-				      * A=Inverse(A). Inversion of
+				      * A=Inverse(A). A must be a square matrix. 
+                                      * Inversion of 
 				      * this matrix by Gauss-Jordan
 				      * algorithm with partial
 				      * pivoting.  This process is
@@ -934,6 +939,70 @@ class FullMatrix : public Table<2,number>
 				      */
     template <typename number2>
     void invert (const FullMatrix<number2> &M);
+
+				     /**
+				      * Assign the left_inverse of the given matrix
+				      * to <tt>*this</tt>. The calculation being 
+				      * performed is <i>(A<sup>T</sup>*A)<sup>-1</sup>
+				      * *A<sup>T</sup></i>.
+				      */   
+    template <typename number2>
+    void left_invert (const FullMatrix<number2> &M);
+
+				     /**
+				      * Assign the right_inverse of the given matrix
+				      * to <tt>*this</tt>. The calculation being 
+				      * performed is <i>A<sup>T</sup>*(A*A<sup>T</sup>)
+				      * <sup>-1</sup></i>.
+				      */
+    template <typename number2>
+    void right_invert (const FullMatrix<number2> &M);
+
+                                     /** 
+				      * Fill matrix with elements
+				      * extracted from a tensor,
+				      * taking rows included between
+				      * <tt>r_i</tt> and <tt>r_j</tt>
+				      * and columns between
+				      * <tt>c_i</tt> and
+				      * <tt>c_j</tt>. The resulting
+				      * matrix is then inserted in the
+				      * destination matrix at position
+				      * <tt>(dst_r, dst_c)</tt> Checks
+				      * on the indices are made.
+				      */
+    template <int dim>
+    void
+    copy_from (Tensor<2,dim> &T,
+	       const unsigned int src_r_i=0,
+	       const unsigned int src_r_j=dim-1,
+	       const unsigned int src_c_i=0,
+	       const unsigned int src_c_j=dim-1,
+	       const unsigned int dst_r=0,
+	       const unsigned int dst_c=0);
+
+                                     /**
+				      * Insert a submatrix (also
+				      * rectangular) into a tensor,
+				      * putting its upper left element
+				      * at the specified position
+				      * <tt>(dst_r, dst_c)</tt> and
+				      * the other elements
+				      * consequently. Default values
+				      * are chosen so that no
+				      * parameter needs to be specified
+				      * if the size of the tensor and
+				      * that of the matrix coincide.
+                                      */
+    template <int dim>
+    void 
+    copy_to(Tensor<2,dim> &T,
+	    const unsigned int src_r_i=0,
+	    const unsigned int src_r_j=dim-1,
+	    const unsigned int src_c_i=0,
+	    const unsigned int src_c_j=dim-1,
+	    const unsigned int dst_r=0,
+	    const unsigned int dst_c=0);
 
 
 //@}
@@ -1431,7 +1500,6 @@ FullMatrix<number>::print (STREAM             &s,
       s << std::endl;
     }
 }
-
 
 
 #endif // DOXYGEN

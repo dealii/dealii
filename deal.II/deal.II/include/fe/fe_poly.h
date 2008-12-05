@@ -61,8 +61,8 @@ DEAL_II_NAMESPACE_OPEN
  *
  * @author Ralf Hartmann 2004
  **/
-template <class POLY, int dim/*=POLY::dim*/>
-class FE_Poly : public FiniteElement<dim>
+template <class POLY, int dim/*=POLY::dim*/, int spacedim=dim>
+class FE_Poly : public FiniteElement<dim,spacedim>
 {
   public:
 				     /**
@@ -195,7 +195,7 @@ class FE_Poly : public FiniteElement<dim>
 				      * <tt>this</tt>, and all other
 				      * indices throw an error.
 				      */
-    virtual const FiniteElement<dim> &
+    virtual const FiniteElement<dim,spacedim> &
     base_element (const unsigned int index) const;
 
                                      /**
@@ -212,37 +212,37 @@ class FE_Poly : public FiniteElement<dim>
   protected:
       
     virtual
-    typename Mapping<dim>::InternalDataBase *
+    typename Mapping<dim,spacedim>::InternalDataBase *
     get_data (const UpdateFlags,
-	      const Mapping<dim>& mapping,
+	      const Mapping<dim,spacedim>& mapping,
 	      const Quadrature<dim>& quadrature) const ;
 
     virtual void
-    fill_fe_values (const Mapping<dim> &mapping,
-		    const typename Triangulation<dim>::cell_iterator &cell,
+    fill_fe_values (const Mapping<dim,spacedim> &mapping,
+		    const typename Triangulation<dim,spacedim>::cell_iterator &cell,
 		    const Quadrature<dim>                &quadrature,
-		    typename Mapping<dim>::InternalDataBase      &mapping_internal,
-		    typename Mapping<dim>::InternalDataBase      &fe_internal,
-		    FEValuesData<dim>& data) const;
+		    typename Mapping<dim,spacedim>::InternalDataBase      &mapping_internal,
+		    typename Mapping<dim,spacedim>::InternalDataBase      &fe_internal,
+		    FEValuesData<dim,spacedim>& data) const;
     
     virtual void
-    fill_fe_face_values (const Mapping<dim> &mapping,
-			 const typename Triangulation<dim>::cell_iterator &cell,
+    fill_fe_face_values (const Mapping<dim,spacedim> &mapping,
+			 const typename Triangulation<dim,spacedim>::cell_iterator &cell,
 			 const unsigned int                    face_no,
 			 const Quadrature<dim-1>                &quadrature,
-			 typename Mapping<dim>::InternalDataBase      &mapping_internal,
-			 typename Mapping<dim>::InternalDataBase      &fe_internal,
-			 FEValuesData<dim>& data) const ;
+			 typename Mapping<dim,spacedim>::InternalDataBase      &mapping_internal,
+			 typename Mapping<dim,spacedim>::InternalDataBase      &fe_internal,
+			 FEValuesData<dim,spacedim>& data) const ;
     
     virtual void
-    fill_fe_subface_values (const Mapping<dim> &mapping,
-			    const typename Triangulation<dim>::cell_iterator &cell,
+    fill_fe_subface_values (const Mapping<dim,spacedim> &mapping,
+			    const typename Triangulation<dim,spacedim>::cell_iterator &cell,
 			    const unsigned int                    face_no,
 			    const unsigned int                    sub_no,
 			    const Quadrature<dim-1>                &quadrature,
-			    typename Mapping<dim>::InternalDataBase      &mapping_internal,
-			    typename Mapping<dim>::InternalDataBase      &fe_internal,
-			    FEValuesData<dim>& data) const ;
+			    typename Mapping<dim,spacedim>::InternalDataBase      &mapping_internal,
+			    typename Mapping<dim,spacedim>::InternalDataBase      &fe_internal,
+			    FEValuesData<dim,spacedim>& data) const ;
 
     
 				     /**
@@ -338,7 +338,7 @@ class FE_Poly : public FiniteElement<dim>
 				      * see the documentation of the
 				      * base class.
 				      */
-    class InternalData : public FiniteElement<dim>::InternalDataBase
+    class InternalData : public FiniteElement<dim,spacedim>::InternalDataBase
     {
       public:
 					 /**

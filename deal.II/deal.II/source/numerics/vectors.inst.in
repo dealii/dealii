@@ -14,43 +14,43 @@
 for (VEC : SERIAL_VECTORS)
 {  
   template
-    void VectorTools::interpolate<deal_II_dimension>
+    void VectorTools::interpolate
     (const Mapping<deal_II_dimension>&,
      const DoFHandler<deal_II_dimension>&,
      const Function<deal_II_dimension>&,
      VEC&);
-  template
-    void VectorTools::interpolate<deal_II_dimension>
-    (const DoFHandler<deal_II_dimension>&,
-     const Function<deal_II_dimension>&,
-     VEC&);
-
-  template
-    void VectorTools::interpolate<deal_II_dimension>
+   template 
+     void VectorTools::interpolate
+      (const DoFHandler<deal_II_dimension>&,
+      const Function<deal_II_dimension>&,
+      VEC&);
+      
+  template 
+    void VectorTools::interpolate
     (const Mapping<deal_II_dimension>&,
      const hp::DoFHandler<deal_II_dimension>&,
      const Function<deal_II_dimension>&,
      VEC&);
   template
-    void VectorTools::interpolate<deal_II_dimension>
+    void VectorTools::interpolate
     (const hp::DoFHandler<deal_II_dimension>&,
      const Function<deal_II_dimension>&,
      VEC&);
 
   template
-    void VectorTools::interpolate<deal_II_dimension>
+    void VectorTools::interpolate
     (const Mapping<deal_II_dimension>&,
      const MGDoFHandler<deal_II_dimension>&,
      const Function<deal_II_dimension>&,
      VEC&);
   template
-    void VectorTools::interpolate<deal_II_dimension>
+    void VectorTools::interpolate
     (const MGDoFHandler<deal_II_dimension>&,
      const Function<deal_II_dimension>&,
      VEC&);
 
   template
-    void VectorTools::interpolate<deal_II_dimension>
+    void VectorTools::interpolate
     (const DoFHandler<deal_II_dimension>&,
      const DoFHandler<deal_II_dimension>&,
      const FullMatrix<double>&,
@@ -224,4 +224,43 @@ for (VEC : SERIAL_VECTORS)
      const bool,
      const Quadrature<deal_II_dimension-1> &,
      const bool);
+
+
+#if deal_II_dimension != 3
+  template
+    void VectorTools::interpolate
+    (const Mapping<deal_II_dimension,deal_II_dimension+1>&,
+     const DoFHandler<deal_II_dimension,deal_II_dimension+1>&,
+     const Function<deal_II_dimension+1>&,
+     VEC&);
+  template
+    void VectorTools::interpolate
+    (const DoFHandler<deal_II_dimension,deal_II_dimension+1>&,
+     const Function<deal_II_dimension+1>&,
+     VEC&);
+
+  template
+    void VectorTools::project
+    (const Mapping<deal_II_dimension,deal_II_dimension+1>      &,
+     const DoFHandler<deal_II_dimension,deal_II_dimension+1>   &,
+     const ConstraintMatrix                &,
+     const Quadrature<deal_II_dimension>   &,
+     const Function<deal_II_dimension+1>     &,
+     VEC                                   &,
+     const bool,
+     const Quadrature<deal_II_dimension-1> &,
+     const bool);
+
+  template
+    void VectorTools::project
+    (const DoFHandler<deal_II_dimension,deal_II_dimension+1>   &,
+     const ConstraintMatrix                &,
+     const Quadrature<deal_II_dimension>   &,
+     const Function<deal_II_dimension+1>     &,
+     VEC                                   &,
+     const bool,
+     const Quadrature<deal_II_dimension-1> &,
+     const bool);
+#endif
+
 }

@@ -48,7 +48,7 @@ namespace hp
  * 
  * @author Oliver Kayser-Herold, 2005
  */
-  template <int dim>
+  template<int dim, int spacedim=dim>
   class MappingCollection : public Subscriptor
   {
     public:
@@ -71,12 +71,12 @@ namespace hp
                                         * clearer to add all mappings
                                         * the same way.
                                         */
-      explicit MappingCollection (const Mapping<dim> &mapping);
+      explicit MappingCollection (const Mapping<dim,spacedim> &mapping);
 
                                        /**
                                         * Copy constructor.
                                         */
-      MappingCollection (const MappingCollection<dim> &mapping_collection);
+      MappingCollection (const MappingCollection<dim,spacedim> &mapping_collection);
       
                                        /**
                                         * Adds a new mapping to the
@@ -91,7 +91,7 @@ namespace hp
                                         * object for active_fe_index
                                         * 1.
                                         */
-      void push_back (const Mapping<dim> &new_mapping);
+      void push_back (const Mapping<dim,spacedim> &new_mapping);
 
                                        /**
                                         * Returns the mapping object
@@ -105,7 +105,7 @@ namespace hp
                                         * of elements of the
                                         * collection.
                                         */
-      const Mapping<dim> &
+      const Mapping<dim,spacedim> &
       operator[] (const unsigned int index) const;
 
                                        /**
@@ -128,7 +128,7 @@ namespace hp
                                         * pointers to the different Mapping
                                         * objects.
                                         */
-      std::vector<boost::shared_ptr<const Mapping<dim> > > mappings;
+      std::vector<boost::shared_ptr<const Mapping<dim,spacedim> > > mappings;
   };
 
 
@@ -139,7 +139,7 @@ namespace hp
  * MappingQ1 mapping object once and for all places where it is
  * needed.
  */
-  template <int dim>
+  template<int dim, int spacedim=dim>
   struct StaticMappingQ1
   {
     private:
@@ -153,7 +153,7 @@ namespace hp
                                         * constructor for the present
                                         * static object.
                                         */
-      static MappingQ1<dim> mapping_q1;
+      static MappingQ1<dim,spacedim> mapping_q1;
       
     public:
                                        /**
@@ -161,26 +161,26 @@ namespace hp
                                         * static Q1 mapping collection
                                         * object.
                                         */
-      static MappingCollection<dim> mapping_collection;
+      static MappingCollection<dim,spacedim> mapping_collection;
   };
 
 
 /* --------------- inline functions ------------------- */
 
-  template <int dim>
+  template<int dim, int spacedim>
   inline
   unsigned int
-  MappingCollection<dim>::size () const 
+  MappingCollection<dim,spacedim>::size () const 
   {
     return mappings.size();
   }
 
 
 
-  template <int dim>
+  template<int dim, int spacedim>
   inline
-  const Mapping<dim> &
-  MappingCollection<dim>::operator[] (const unsigned int index) const
+  const Mapping<dim,spacedim> &
+  MappingCollection<dim,spacedim>::operator[] (const unsigned int index) const
   {
     Assert (index < mappings.size (),
             ExcIndexRange (index, 0, mappings.size ()));

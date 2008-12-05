@@ -29,7 +29,7 @@ DEAL_II_NAMESPACE_OPEN
 // declares mainly additional data. This would have to be changed in case of a
 // partial specialization.
 
-template <int dim> class Triangulation;
+template <int dim, int spacedim> class Triangulation;
 
 
 namespace internal
@@ -79,7 +79,7 @@ namespace internal
 					  *  stored in this list. An object is
 					  *  called active if it has no
 					  *  children. The function
-					  *  TriaAccessor::has_children()
+					  *  TriaAccessorBase::has_children()
 					  *  tests for this.
 					  */
 	std::vector<int>  children;
@@ -178,8 +178,8 @@ namespace internal
 					  * <code>G=TriaObject<1>
 					  * </code>.
 					  */
-	template <int dim>
-	typename dealii::Triangulation<dim>::raw_line_iterator next_free_single_line (const dealii::Triangulation<dim> &tria);
+	template <int dim, int spacedim>
+	typename dealii::Triangulation<dim,spacedim>::raw_line_iterator next_free_single_line (const dealii::Triangulation<dim,spacedim> &tria);
 
 					 /**
 					  * Return an iterator to the
@@ -188,8 +188,8 @@ namespace internal
 					  * for <code>G=TriaObject<1>
 					  * </code>.
 					  */
-	template <int dim>
-	typename dealii::Triangulation<dim>::raw_line_iterator next_free_pair_line (const dealii::Triangulation<dim> &tria);
+	template <int dim, int spacedim>
+	typename dealii::Triangulation<dim,spacedim>::raw_line_iterator next_free_pair_line (const dealii::Triangulation<dim,spacedim> &tria);
 	
 					 /**
 					  * Return an iterator to the
@@ -199,8 +199,8 @@ namespace internal
 					  * <code>G=TriaObject@<2@>
 					  * </code>.
 					  */
-	template <int dim>
-	typename dealii::Triangulation<dim>::raw_quad_iterator next_free_single_quad (const dealii::Triangulation<dim> &tria);
+	template <int dim, int spacedim>
+	typename dealii::Triangulation<dim,spacedim>::raw_quad_iterator next_free_single_quad (const dealii::Triangulation<dim,spacedim> &tria);
 
 					 /**
 					  * Return an iterator to the
@@ -209,8 +209,8 @@ namespace internal
 					  * for <code>G=TriaObject@<2@>
 					  * </code>.
 					  */
-	template <int dim>
-	typename dealii::Triangulation<dim>::raw_quad_iterator next_free_pair_quad (const dealii::Triangulation<dim> &tria);
+	template <int dim, int spacedim>
+	typename dealii::Triangulation<dim,spacedim>::raw_quad_iterator next_free_pair_quad (const dealii::Triangulation<dim,spacedim> &tria);
 	
 					 /**
 					  * Return an iterator to the
@@ -219,8 +219,8 @@ namespace internal
 					  * for
 					  * <code>G=Hexahedron</code>.
 					  */
-	template <int dim>
-	typename dealii::Triangulation<dim>::raw_hex_iterator next_free_hex (const dealii::Triangulation<dim> &tria,
+	template <int dim, int spacedim>
+	typename dealii::Triangulation<dim,spacedim>::raw_hex_iterator next_free_hex (const dealii::Triangulation<dim,spacedim> &tria,
 									     const unsigned int               level);
 
 					 /**

@@ -27,9 +27,9 @@ namespace internal
   namespace Triangulation
   {    
     template <>
-    template <int dim>
-    typename dealii::Triangulation<dim>::raw_line_iterator
-    TriaObjects<TriaObject<1> >::next_free_single_line (const dealii::Triangulation<dim> &tria)
+    template <int dim, int spacedim>
+    typename dealii::Triangulation<dim,spacedim>::raw_line_iterator
+    TriaObjects<TriaObject<1> >::next_free_single_line (const dealii::Triangulation<dim,spacedim> &tria)
     {
 				       // TODO: Think of a way to ensure that we are using the correct triangulation, i.e. the one containing *this.
       
@@ -72,15 +72,15 @@ namespace internal
 	    return tria.end_line();
 	}
 
-      return typename dealii::Triangulation<dim>::raw_line_iterator(&tria,0,pos);
+      return typename dealii::Triangulation<dim,spacedim>::raw_line_iterator(&tria,0,pos);
     }
     
 	  
 
     template <>
-    template <int dim>
-    typename dealii::Triangulation<dim>::raw_line_iterator
-    TriaObjects<TriaObject<1> >::next_free_pair_line (const dealii::Triangulation<dim> &tria)
+    template <int dim, int spacedim>
+    typename dealii::Triangulation<dim,spacedim>::raw_line_iterator
+    TriaObjects<TriaObject<1> >::next_free_pair_line (const dealii::Triangulation<dim,spacedim> &tria)
     {
 				       // TODO: Think of a way to ensure that we are using the correct triangulation, i.e. the one containing *this.
       
@@ -100,15 +100,15 @@ namespace internal
       else
 	next_free_pair=pos+2;
       
-      return typename dealii::Triangulation<dim>::raw_line_iterator(&tria,0,pos);
+      return typename dealii::Triangulation<dim,spacedim>::raw_line_iterator(&tria,0,pos);
     }
 
 
     
     template <>
-    template <int dim>
-    typename dealii::Triangulation<dim>::raw_quad_iterator
-    TriaObjects<TriaObject<1> >::next_free_single_quad (const dealii::Triangulation<dim> &tria)
+    template <int dim, int spacedim>
+    typename dealii::Triangulation<dim,spacedim>::raw_quad_iterator
+    TriaObjects<TriaObject<1> >::next_free_single_quad (const dealii::Triangulation<dim,spacedim> &tria)
     {
       Assert(false, ExcWrongIterator("quad","line"));
       return tria.end_quad();
@@ -117,9 +117,9 @@ namespace internal
 
 
     template <>
-    template <int dim>
-    typename dealii::Triangulation<dim>::raw_quad_iterator
-    TriaObjects<TriaObject<1> >::next_free_pair_quad (const dealii::Triangulation<dim> &tria)
+    template <int dim, int spacedim>
+    typename dealii::Triangulation<dim,spacedim>::raw_quad_iterator
+    TriaObjects<TriaObject<1> >::next_free_pair_quad (const dealii::Triangulation<dim,spacedim> &tria)
     {
       Assert(false, ExcWrongIterator("quad","line"));
       return tria.end_quad();
@@ -128,9 +128,9 @@ namespace internal
 
     
     template <>
-    template <int dim>
-    typename dealii::Triangulation<dim>::raw_quad_iterator
-    TriaObjects<TriaObject<2> >::next_free_single_quad (const dealii::Triangulation<dim> &tria)
+    template <int dim, int spacedim>
+    typename dealii::Triangulation<dim,spacedim>::raw_quad_iterator
+    TriaObjects<TriaObject<2> >::next_free_single_quad (const dealii::Triangulation<dim,spacedim> &tria)
     {
 				       // TODO: Think of a way to ensure that we are using the correct triangulation, i.e. the one containing *this.
       
@@ -173,15 +173,15 @@ namespace internal
 	    return tria.end_quad();
 	}
 
-      return typename dealii::Triangulation<dim>::raw_quad_iterator(&tria,0,pos);
+      return typename dealii::Triangulation<dim,spacedim>::raw_quad_iterator(&tria,0,pos);
     }
     
 	  
 
     template <>
-    template <int dim>
-    typename dealii::Triangulation<dim>::raw_quad_iterator
-    TriaObjects<TriaObject<2> >::next_free_pair_quad (const dealii::Triangulation<dim> &tria)
+    template <int dim, int spacedim>
+    typename dealii::Triangulation<dim,spacedim>::raw_quad_iterator
+    TriaObjects<TriaObject<2> >::next_free_pair_quad (const dealii::Triangulation<dim,spacedim> &tria)
     {
 				       // TODO: Think of a way to ensure that we are using the correct triangulation, i.e. the one containing *this.
       
@@ -201,14 +201,14 @@ namespace internal
       else
 	next_free_pair=pos+2;
       
-      return typename dealii::Triangulation<dim>::raw_quad_iterator(&tria,0,pos);
+      return typename dealii::Triangulation<dim,spacedim>::raw_quad_iterator(&tria,0,pos);
     }
 
 
     template <>
-    template <int dim>
-    typename dealii::Triangulation<dim>::raw_line_iterator
-    TriaObjects<TriaObject<2> >::next_free_single_line (const dealii::Triangulation<dim> &tria)
+    template <int dim, int spacedim>
+    typename dealii::Triangulation<dim,spacedim>::raw_line_iterator
+    TriaObjects<TriaObject<2> >::next_free_single_line (const dealii::Triangulation<dim,spacedim> &tria)
     {
       Assert(false, ExcWrongIterator("line","quad"));
       return tria.end_line();
@@ -217,9 +217,9 @@ namespace internal
 
 
     template <>
-    template <int dim>
-    typename dealii::Triangulation<dim>::raw_line_iterator
-    TriaObjects<TriaObject<2> >::next_free_pair_line (const dealii::Triangulation<dim> &tria)
+    template <int dim, int spacedim>
+    typename dealii::Triangulation<dim,spacedim>::raw_line_iterator
+    TriaObjects<TriaObject<2> >::next_free_pair_line (const dealii::Triangulation<dim,spacedim> &tria)
     {
       Assert(false, ExcWrongIterator("line","quad"));
       return tria.end_line();
@@ -228,9 +228,9 @@ namespace internal
 
 
     template <>
-    template <int dim>
-    typename dealii::Triangulation<dim>::raw_hex_iterator
-    TriaObjects<TriaObject<3> >::next_free_hex (const dealii::Triangulation<dim> &tria,
+    template <int dim, int spacedim>
+    typename dealii::Triangulation<dim,spacedim>::raw_hex_iterator
+    TriaObjects<TriaObject<3> >::next_free_hex (const dealii::Triangulation<dim,spacedim> &tria,
 					    const unsigned int               level)
     {
 				       // TODO: Think of a way to ensure that we are using the correct triangulation, i.e. the one containing *this.
@@ -250,7 +250,7 @@ namespace internal
       else
 	next_free_pair=pos+2;
       
-      return typename dealii::Triangulation<dim>::raw_hex_iterator(&tria,level,pos);
+      return typename dealii::Triangulation<dim,spacedim>::raw_hex_iterator(&tria,level,pos);
     }
 
 

@@ -21,8 +21,8 @@
 
 DEAL_II_NAMESPACE_OPEN
 
-template <int> class DoFHandler;
-template <int> class MGDoFHandler;
+template <int, int> class DoFHandler;
+template <int, int> class MGDoFHandler;
   
 namespace internal
 {

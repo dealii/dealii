@@ -306,6 +306,72 @@ class QWeddle : public Quadrature<dim>
     QWeddle ();
 };
 
+
+
+/**
+ * Gauss Quadrature Formula to integrate <tt>ln[(x-a)/(b-a)]*f(x)</tt> on the
+ * interval <tt>[a,b]</tt>, where f is a smooth function without
+ * singularities. See <tt>Numerical Recipes</tt> for more information.  The
+ * quadrature formula weights are chosen in order to integrate
+ * <tt>f(x)*ln[(x-a)/(b-a)]</tt> (that is, the argument of the logarithm goes
+ * linearly from 0 to 1 on the interval of integration). So, the only
+ * thing one can specify is the function <tt>f(x)</tt>. Using logarithm
+ * properties, one can add the integral of <tt>f(x)*ln(b-a)</tt> (calculated
+ * with QGauss class formulas) to the integral of <tt>f(x)*ln[(x-a)/(b-a)]</tt>
+ * to finally obtain the integral of <tt>f(x)*ln(x-a)</tt>.  It is also
+ * possible to integrate with weighting function <tt>ln[(b-x)/(b-a)]</tt> if
+ * revert is set to true.
+ * 
+ * It works up to <tt>n=12</tt>.
+ *
+//TODO: implement the calculation of points and weights as it is
+//described in Numerical Recipes, instead of passing them to set_*
+//functions, so that n can also be grater than 12.
+ *
+ */
+template <int dim>
+class QGaussLog : public Quadrature<dim>
+{
+  public:
+				   /**
+				    * Generate a formula with
+				    * <tt>n</tt> quadrature points 
+				    */
+  QGaussLog(const unsigned int n,
+            const bool revert=false);
+   
+  protected: 
+                                    /**  
+				     * Sets the points of the
+				     * quadrature formula.
+				     */
+  std::vector<double>
+  set_quadrature_points(const unsigned int n) const;
+
+                                    /**  
+				     * Sets the weights of the
+				     * quadrature formula.
+				     */
+  std::vector<double>
+  set_quadrature_weights(const unsigned int n) const;
+
+                                    /**  
+				     * If the singularity is at the rightmost point 
+				     * of the interval just revert the vectors
+				     * of points and weights and everything 
+				     * works.
+				     */
+  void
+  revert_points_and_weights(std::vector<double> &p,
+			    std::vector<double> &w) const;
+
+};
+
+
+
+
+
+
 /*@}*/
 
 /* -------------- declaration of explicit specializations ------------- */
@@ -324,6 +390,11 @@ JacobiP(const long double, const int, const int, const unsigned int) const;
 template <>
 unsigned int 
 QGaussLobatto<1>::gamma(const unsigned int n) const;
+
+template <> void QGaussLog<1>::revert_points_and_weights(std::vector<double> &, std::vector<double> &) const;
+template <> std::vector<double> QGaussLog<1>::set_quadrature_points(const unsigned int) const;
+template <> std::vector<double> QGaussLog<1>::set_quadrature_weights(const unsigned int) const;
+
 template <> QGauss2<1>::QGauss2 ();
 template <> QGauss3<1>::QGauss3 ();
 template <> QGauss4<1>::QGauss4 ();
@@ -335,6 +406,10 @@ template <> QTrapez<1>::QTrapez ();
 template <> QSimpson<1>::QSimpson ();
 template <> QMilne<1>::QMilne ();
 template <> QWeddle<1>::QWeddle ();
+template <> QGaussLog<1>::QGaussLog (const unsigned int n, const bool revert);
+
+
+
 
 DEAL_II_NAMESPACE_CLOSE
 

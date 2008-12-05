@@ -24,7 +24,7 @@
 
 DEAL_II_NAMESPACE_OPEN
 
-template <int dim> class DoFHandler;
+template <int dim, int spacedim> class DoFHandler;
 
 /**
  * This class is used to stack the output from several computations
@@ -86,7 +86,7 @@ template <int dim> class DoFHandler;
  *                                  // now do computations
  *   for (double parameter=0; ...)
  *     {
- *       DoFHandler<dim> dof_handler;
+ *       DoFHandler<dim,spacedim> dof_handler;
  *       ...                        // compute something
  *
  *                                  // now for output
@@ -103,7 +103,7 @@ template <int dim> class DoFHandler;
  * @ingroup output
  * @author Wolfgang Bangerth, 1999
  */
-template <int dim, class DH = DoFHandler<dim> >
+template <int dim, int spacedim=dim, class DH = DoFHandler<dim,spacedim> >
 class DataOutStack : public DataOutInterface<dim+1> 
 {
   public:

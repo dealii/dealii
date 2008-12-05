@@ -28,16 +28,16 @@ DEAL_II_NAMESPACE_OPEN
 /* ----------------------- FESystem::InternalData ------------------- */
 
 
-template <int dim>
-FESystem<dim>::InternalData::InternalData(const unsigned int n_base_elements):
+template <int dim, int spacedim>
+FESystem<dim,spacedim>::InternalData::InternalData(const unsigned int n_base_elements):
 		base_fe_datas(n_base_elements),
 		base_fe_values_datas(n_base_elements)
 {}
 
 
 
-template <int dim>
-FESystem<dim>::InternalData::~InternalData()
+template <int dim, int spacedim>
+FESystem<dim,spacedim>::InternalData::~InternalData()
 {
 				   // delete pointers and set them to
 				   // zero to avoid inadvertant use
@@ -58,9 +58,9 @@ FESystem<dim>::InternalData::~InternalData()
 
 
 
-template <int dim>
-typename FiniteElement<dim>::InternalDataBase &
-FESystem<dim>::
+template <int dim, int spacedim>
+typename FiniteElement<dim,spacedim>::InternalDataBase &
+FESystem<dim,spacedim>::
 InternalData::get_fe_data (const unsigned int base_no) const
 {
   Assert(base_no<base_fe_datas.size(),
@@ -70,11 +70,11 @@ InternalData::get_fe_data (const unsigned int base_no) const
 
 
 
-template <int dim>
+template <int dim, int spacedim>
 void
-FESystem<dim>::
+FESystem<dim,spacedim>::
 InternalData::set_fe_data (const unsigned int base_no,
-			   typename FiniteElement<dim>::InternalDataBase *ptr)
+			   typename FiniteElement<dim,spacedim>::InternalDataBase *ptr)
 {
   Assert(base_no<base_fe_datas.size(),
 	 ExcIndexRange(base_no,0,base_fe_datas.size()));
@@ -83,9 +83,9 @@ InternalData::set_fe_data (const unsigned int base_no,
 
 
 
-template <int dim>
-FEValuesData<dim> &
-FESystem<dim>::
+template <int dim, int spacedim>
+FEValuesData<dim,spacedim> &
+FESystem<dim,spacedim>::
 InternalData::get_fe_values_data (const unsigned int base_no) const
 {
   Assert(base_no<base_fe_values_datas.size(),
@@ -96,11 +96,11 @@ InternalData::get_fe_values_data (const unsigned int base_no) const
 
 
 
-template <int dim>
+template <int dim, int spacedim>
 void
-FESystem<dim>::
+FESystem<dim,spacedim>::
 InternalData::set_fe_values_data (const unsigned int base_no,
-				  FEValuesData<dim> *ptr)
+				  FEValuesData<dim,spacedim> *ptr)
 {
   Assert(base_no<base_fe_values_datas.size(),
 	 ExcIndexRange(base_no,0,base_fe_values_datas.size()));
@@ -109,9 +109,9 @@ InternalData::set_fe_values_data (const unsigned int base_no,
 
 
 
-template <int dim>
+template <int dim, int spacedim>
 void
-FESystem<dim>::
+FESystem<dim,spacedim>::
 InternalData::delete_fe_values_data (const unsigned int base_no)
 {
   Assert(base_no<base_fe_values_datas.size(),
@@ -123,13 +123,13 @@ InternalData::delete_fe_values_data (const unsigned int base_no)
 
 
 
-template <int dim>
+template <int dim, int spacedim>
 void
-FESystem<dim>::InternalData::clear_first_cell ()
+FESystem<dim,spacedim>::InternalData::clear_first_cell ()
 {
                                    // call respective function of base
                                    // class
-  FiniteElement<dim>::InternalDataBase::clear_first_cell ();
+  FiniteElement<dim,spacedim>::InternalDataBase::clear_first_cell ();
                                    // then the functions of all the
                                    // sub-objects
   for (unsigned int i=0; i<base_fe_datas.size(); ++i)
@@ -140,14 +140,14 @@ FESystem<dim>::InternalData::clear_first_cell ()
 /* ---------------------------------- FESystem ------------------- */
 
 
-template <int dim>
-const unsigned int FESystem<dim>::invalid_face_number;
+template <int dim, int spacedim>
+const unsigned int FESystem<dim,spacedim>::invalid_face_number;
 
 
-template <int dim>
-FESystem<dim>::FESystem (const FiniteElement<dim> &fe,
+template <int dim, int spacedim>
+FESystem<dim,spacedim>::FESystem (const FiniteElement<dim,spacedim> &fe,
 			 const unsigned int n_elements) :
-		FiniteElement<dim> (multiply_dof_numbers(fe, n_elements),
+		FiniteElement<dim,spacedim> (multiply_dof_numbers(fe, n_elements),
 				    compute_restriction_is_additive_flags (fe, n_elements),
 				    compute_nonzero_components(fe, n_elements)),
                 base_elements(1)
@@ -159,12 +159,12 @@ FESystem<dim>::FESystem (const FiniteElement<dim> &fe,
 
 
 
-template <int dim>
-FESystem<dim>::FESystem (const FiniteElement<dim> &fe1,
+template <int dim, int spacedim>
+FESystem<dim,spacedim>::FESystem (const FiniteElement<dim,spacedim> &fe1,
 			 const unsigned int        n1,
-			 const FiniteElement<dim> &fe2,
+			 const FiniteElement<dim,spacedim> &fe2,
 			 const unsigned int        n2) :
-		FiniteElement<dim> (multiply_dof_numbers(fe1, n1, fe2, n2),
+		FiniteElement<dim,spacedim> (multiply_dof_numbers(fe1, n1, fe2, n2),
 				    compute_restriction_is_additive_flags (fe1, n1,
 									   fe2, n2),
 				    compute_nonzero_components(fe1, n1,
@@ -181,14 +181,14 @@ FESystem<dim>::FESystem (const FiniteElement<dim> &fe1,
 
 
 
-template <int dim>
-FESystem<dim>::FESystem (const FiniteElement<dim> &fe1,
+template <int dim, int spacedim>
+FESystem<dim,spacedim>::FESystem (const FiniteElement<dim,spacedim> &fe1,
 			 const unsigned int        n1,
-			 const FiniteElement<dim> &fe2,
+			 const FiniteElement<dim,spacedim> &fe2,
 			 const unsigned int        n2,
-			 const FiniteElement<dim> &fe3,
+			 const FiniteElement<dim,spacedim> &fe3,
 			 const unsigned int        n3) :
-		FiniteElement<dim> (multiply_dof_numbers(fe1, n1,
+		FiniteElement<dim,spacedim> (multiply_dof_numbers(fe1, n1,
 							 fe2, n2,
 							 fe3, n3),
 				    compute_restriction_is_additive_flags (fe1, n1,
@@ -212,8 +212,8 @@ FESystem<dim>::FESystem (const FiniteElement<dim> &fe1,
 
 
 
-template <int dim>
-FESystem<dim>::~FESystem ()
+template <int dim, int spacedim>
+FESystem<dim,spacedim>::~FESystem ()
 {
 				   // delete base elements created in
 				   // the constructor
@@ -227,9 +227,9 @@ FESystem<dim>::~FESystem ()
 
 
 
-template <int dim>
+template <int dim, int spacedim>
 std::string
-FESystem<dim>::get_name () const
+FESystem<dim,spacedim>::get_name () const
 {
 				   // note that the
 				   // FETools::get_fe_from_name
@@ -256,9 +256,9 @@ FESystem<dim>::get_name () const
 
 
 
-template <int dim>
-FiniteElement<dim>*
-FESystem<dim>::clone() const
+template <int dim, int spacedim>
+FiniteElement<dim,spacedim>*
+FESystem<dim,spacedim>::clone() const
 {
   switch (n_base_elements())
     {
@@ -285,14 +285,14 @@ FESystem<dim>::clone() const
 
 
 
-template <int dim>
+template <int dim, int spacedim>
 double
-FESystem<dim>::shape_value (const unsigned int i,
+FESystem<dim,spacedim>::shape_value (const unsigned int i,
 			    const Point<dim> &p) const
 {
   Assert (i<this->dofs_per_cell, ExcIndexRange(i, 0, this->dofs_per_cell));
   Assert (this->is_primitive(i), 
-	  typename FiniteElement<dim>::ExcShapeFunctionNotPrimitive(i));
+	  (typename FiniteElement<dim,spacedim>::ExcShapeFunctionNotPrimitive(i)));
 
   return (base_element(this->system_to_base_table[i].first.first)
 	  .shape_value(this->system_to_base_table[i].second, p));
@@ -300,9 +300,9 @@ FESystem<dim>::shape_value (const unsigned int i,
 
 
 
-template <int dim>
+template <int dim, int spacedim>
 double
-FESystem<dim>::shape_value_component (const unsigned int i,
+FESystem<dim,spacedim>::shape_value_component (const unsigned int i,
 				      const Point<dim>  &p,
 				      const unsigned int component) const
 {
@@ -337,14 +337,14 @@ FESystem<dim>::shape_value_component (const unsigned int i,
 
 
 
-template <int dim>
+template <int dim, int spacedim>
 Tensor<1,dim>
-FESystem<dim>::shape_grad (const unsigned int i,
+FESystem<dim,spacedim>::shape_grad (const unsigned int i,
 			   const Point<dim> &p) const
 {
   Assert (i<this->dofs_per_cell, ExcIndexRange(i, 0, this->dofs_per_cell));
   Assert (this->is_primitive(i),
-	  typename FiniteElement<dim>::ExcShapeFunctionNotPrimitive(i));
+	  (typename FiniteElement<dim,spacedim>::ExcShapeFunctionNotPrimitive(i)));
 
   return (base_element(this->system_to_base_table[i].first.first)
 	  .shape_grad(this->system_to_base_table[i].second, p));
@@ -352,9 +352,9 @@ FESystem<dim>::shape_grad (const unsigned int i,
 
 
 
-template <int dim>
+template <int dim, int spacedim>
 Tensor<1,dim>
-FESystem<dim>::shape_grad_component (const unsigned int i,
+FESystem<dim,spacedim>::shape_grad_component (const unsigned int i,
 				     const Point<dim>  &p,
 				     const unsigned int component) const
 {
@@ -389,14 +389,14 @@ FESystem<dim>::shape_grad_component (const unsigned int i,
 
 
 
-template <int dim>
+template <int dim, int spacedim>
 Tensor<2,dim>
-FESystem<dim>::shape_grad_grad (const unsigned int i,
+FESystem<dim,spacedim>::shape_grad_grad (const unsigned int i,
 				const Point<dim> &p) const
 {
   Assert (i<this->dofs_per_cell, ExcIndexRange(i, 0, this->dofs_per_cell));
   Assert (this->is_primitive(i), 
-	  typename FiniteElement<dim>::ExcShapeFunctionNotPrimitive(i));
+	  (typename FiniteElement<dim,spacedim>::ExcShapeFunctionNotPrimitive(i)));
 
   return (base_element(this->system_to_base_table[i].first.first)
 	  .shape_grad_grad(this->system_to_base_table[i].second, p));
@@ -404,9 +404,9 @@ FESystem<dim>::shape_grad_grad (const unsigned int i,
 
 
 
-template <int dim>
+template <int dim, int spacedim>
 Tensor<2,dim>
-FESystem<dim>::shape_grad_grad_component (const unsigned int i,
+FESystem<dim,spacedim>::shape_grad_grad_component (const unsigned int i,
 					  const Point<dim>  &p,
 					  const unsigned int component) const
 {
@@ -441,10 +441,10 @@ FESystem<dim>::shape_grad_grad_component (const unsigned int i,
 
 
 
-template <int dim>
+template <int dim, int spacedim>
 void
-FESystem<dim>::
-get_interpolation_matrix (const FiniteElement<dim> &x_source_fe,
+FESystem<dim,spacedim>::
+get_interpolation_matrix (const FiniteElement<dim,spacedim> &x_source_fe,
 			  FullMatrix<double>           &interpolation_matrix) const
 {
   Assert (interpolation_matrix.m() == this->dofs_per_cell,
@@ -460,21 +460,23 @@ get_interpolation_matrix (const FiniteElement<dim> &x_source_fe,
                                    // 
                                    // condition 1: the other element
                                    // must also be a system element
+
+  typedef FiniteElement<dim,spacedim> FEL;
   AssertThrow ((x_source_fe.get_name().find ("FESystem<") == 0)
                ||
-               (dynamic_cast<const FESystem<dim>*>(&x_source_fe) != 0),
-               typename FiniteElement<dim>::
+               (dynamic_cast<const FESystem<dim,spacedim>*>(&x_source_fe) != 0),
+               typename FEL::
                ExcInterpolationNotImplemented());
   
 				   // ok, source is a system element,
 				   // so we may be able to do the work
-  const FESystem<dim> &source_fe
-    = dynamic_cast<const FESystem<dim>&>(x_source_fe);
+  const FESystem<dim,spacedim> &source_fe
+    = dynamic_cast<const FESystem<dim,spacedim>&>(x_source_fe);
 
                                    // condition 2: same number of
                                    // basis elements
   AssertThrow (n_base_elements() == source_fe.n_base_elements(),
-               typename FiniteElement<dim>::
+               typename FEL::
                ExcInterpolationNotImplemented());
 
                                    // condition 3: same number of
@@ -482,7 +484,7 @@ get_interpolation_matrix (const FiniteElement<dim> &x_source_fe,
   for (unsigned int i=0; i<n_base_elements(); ++i)
     AssertThrow (element_multiplicity(i) ==
                  source_fe.element_multiplicity(i),
-                 typename FiniteElement<dim>::
+                 typename FEL::
                  ExcInterpolationNotImplemented());
 
                                    // ok, so let's try whether it
@@ -531,9 +533,9 @@ get_interpolation_matrix (const FiniteElement<dim> &x_source_fe,
 
 
 
-template <int dim>
+template <int dim, int spacedim>
 UpdateFlags
-FESystem<dim>::update_once (const UpdateFlags flags) const
+FESystem<dim,spacedim>::update_once (const UpdateFlags flags) const
 {
   UpdateFlags out = update_default;
 				   // generate maximal set of flags
@@ -545,9 +547,9 @@ FESystem<dim>::update_once (const UpdateFlags flags) const
 
 
 
-template <int dim>
+template <int dim, int spacedim>
 UpdateFlags
-FESystem<dim>::update_each (const UpdateFlags flags) const
+FESystem<dim,spacedim>::update_each (const UpdateFlags flags) const
 {
   UpdateFlags out = update_default;
 				   // generate maximal set of flags
@@ -572,10 +574,10 @@ FESystem<dim>::update_each (const UpdateFlags flags) const
 
 
 
-template <int dim>
-typename Mapping<dim>::InternalDataBase *
-FESystem<dim>::get_data (const UpdateFlags      flags_,
-			 const Mapping<dim>    &mapping,
+template <int dim, int spacedim>
+typename Mapping<dim,spacedim>::InternalDataBase *
+FESystem<dim,spacedim>::get_data (const UpdateFlags      flags_,
+			 const Mapping<dim,spacedim>    &mapping,
 			 const Quadrature<dim> &quadrature) const
 {
   UpdateFlags flags = flags_;
@@ -607,11 +609,11 @@ FESystem<dim>::get_data (const UpdateFlags      flags_,
 				   // the base elements and store them
   for (unsigned int base_no=0; base_no<n_base_elements(); ++base_no)
     {
-      typename Mapping<dim>::InternalDataBase *base_fe_data_base =
+      typename Mapping<dim,spacedim>::InternalDataBase *base_fe_data_base =
 	base_element(base_no).get_data(sub_flags, mapping, quadrature);
 
-      typename FiniteElement<dim>::InternalDataBase *base_fe_data =
-	dynamic_cast<typename FiniteElement<dim>::InternalDataBase *>
+      typename FiniteElement<dim,spacedim>::InternalDataBase *base_fe_data =
+	dynamic_cast<typename FiniteElement<dim,spacedim>::InternalDataBase *>
 	(base_fe_data_base);
       
       data->set_fe_data(base_no, base_fe_data);
@@ -649,7 +651,7 @@ FESystem<dim>::get_data (const UpdateFlags      flags_,
 				       // @p{data}, similar to the
 				       // storing of the
 				       // @p{base_fe_data}s.
-      FEValuesData<dim> *base_data = new FEValuesData<dim>();
+      FEValuesData<dim,spacedim> *base_data = new FEValuesData<dim,spacedim>();
       data->set_fe_values_data(base_no, base_data);
     }
   data->update_flags = data->update_once |
@@ -659,15 +661,15 @@ FESystem<dim>::get_data (const UpdateFlags      flags_,
 
 
 
-template <int dim>
+template <int dim, int spacedim>
 void
-FESystem<dim>::
-fill_fe_values (const Mapping<dim>                   &mapping,
-                const typename Triangulation<dim>::cell_iterator &cell,
+FESystem<dim,spacedim>::
+fill_fe_values (const Mapping<dim,spacedim>                   &mapping,
+                const typename Triangulation<dim,spacedim>::cell_iterator &cell,
                 const Quadrature<dim>                &quadrature,
-                typename Mapping<dim>::InternalDataBase &mapping_data,
-                typename Mapping<dim>::InternalDataBase &fe_data,
-                FEValuesData<dim>                    &data) const
+                typename Mapping<dim,spacedim>::InternalDataBase &mapping_data,
+                typename Mapping<dim,spacedim>::InternalDataBase &fe_data,
+                FEValuesData<dim,spacedim>                    &data) const
 {
   compute_fill(mapping, cell, invalid_face_number, invalid_face_number,
 	       quadrature, mapping_data, fe_data, data);
@@ -675,16 +677,16 @@ fill_fe_values (const Mapping<dim>                   &mapping,
 
 
 
-template <int dim>
+template <int dim, int spacedim>
 void
-FESystem<dim>::
-fill_fe_face_values (const Mapping<dim>                   &mapping,
-                     const typename Triangulation<dim>::cell_iterator &cell,
+FESystem<dim,spacedim>::
+fill_fe_face_values (const Mapping<dim,spacedim>                   &mapping,
+                     const typename Triangulation<dim,spacedim>::cell_iterator &cell,
                      const unsigned int                    face_no,
                      const Quadrature<dim-1>              &quadrature,
-                     typename Mapping<dim>::InternalDataBase &mapping_data,
-                     typename Mapping<dim>::InternalDataBase &fe_data,
-                     FEValuesData<dim>                    &data) const
+                     typename Mapping<dim,spacedim>::InternalDataBase &mapping_data,
+                     typename Mapping<dim,spacedim>::InternalDataBase &fe_data,
+                     FEValuesData<dim,spacedim>                    &data) const
 {
   compute_fill (mapping, cell, face_no, invalid_face_number,
                 quadrature, mapping_data, fe_data, data);
@@ -693,17 +695,17 @@ fill_fe_face_values (const Mapping<dim>                   &mapping,
 
 
 
-template <int dim>
+template <int dim, int spacedim>
 void
-FESystem<dim>::
-fill_fe_subface_values (const Mapping<dim>                   &mapping,
-                        const typename Triangulation<dim>::cell_iterator &cell,
+FESystem<dim,spacedim>::
+fill_fe_subface_values (const Mapping<dim,spacedim>                   &mapping,
+                        const typename Triangulation<dim,spacedim>::cell_iterator &cell,
                         const unsigned int                    face_no,
                         const unsigned int                    sub_no,
                         const Quadrature<dim-1>              &quadrature,
-                        typename Mapping<dim>::InternalDataBase &mapping_data,
-                        typename Mapping<dim>::InternalDataBase &fe_data,
-                        FEValuesData<dim>                    &data) const
+                        typename Mapping<dim,spacedim>::InternalDataBase &mapping_data,
+                        typename Mapping<dim,spacedim>::InternalDataBase &fe_data,
+                        FEValuesData<dim,spacedim>                    &data) const
 {
   compute_fill (mapping, cell, face_no, sub_no,
                 quadrature, mapping_data, fe_data, data);
@@ -711,18 +713,18 @@ fill_fe_subface_values (const Mapping<dim>                   &mapping,
 
 
 
-template <int dim>
+template <int dim, int spacedim>
 template <int dim_1>
 void
-FESystem<dim>::
-compute_fill (const Mapping<dim>                   &mapping,
-              const typename Triangulation<dim>::cell_iterator &cell,
+FESystem<dim,spacedim>::
+compute_fill (const Mapping<dim,spacedim>                   &mapping,
+              const typename Triangulation<dim,spacedim>::cell_iterator &cell,
               const unsigned int                    face_no,
               const unsigned int                    sub_no,
               const Quadrature<dim_1>              &quadrature,
-              typename Mapping<dim>::InternalDataBase &mapping_data,
-              typename Mapping<dim>::InternalDataBase &fedata,
-              FEValuesData<dim>                    &data) const
+              typename Mapping<dim,spacedim>::InternalDataBase &mapping_data,
+              typename Mapping<dim,spacedim>::InternalDataBase &fedata,
+              FEValuesData<dim,spacedim>                    &data) const
 {       
   const unsigned int n_q_points = quadrature.size();
   
@@ -764,7 +766,7 @@ compute_fill (const Mapping<dim>                   &mapping,
 					       // Pointer needed to get
 					       // the update flags of the
 					       // base element
-	      typename Mapping<dim>::InternalDataBase &
+	      typename Mapping<dim,spacedim>::InternalDataBase &
 		base_fe_data = fe_data.get_fe_data(base_no);
 	      
 					       // compute update flags ...
@@ -773,8 +775,8 @@ compute_fill (const Mapping<dim>                   &mapping,
 	      
 					       // Initialize the FEValuesDatas
 					       // for the base elements.
-	      FEValuesData<dim> &base_data=fe_data.get_fe_values_data(base_no);
-	      const FiniteElement<dim> &base_fe=base_element(base_no);
+	      FEValuesData<dim,spacedim> &base_data=fe_data.get_fe_values_data(base_no);
+	      const FiniteElement<dim,spacedim> &base_fe=base_element(base_no);
 	      base_data.initialize (n_q_points, base_fe, base_update_flags);
 	    }
 	}
@@ -814,11 +816,11 @@ compute_fill (const Mapping<dim>                   &mapping,
                                        // necessary data
       for (unsigned int base_no=0; base_no<n_base_elements(); ++base_no)
 	{
-	  const FiniteElement<dim> &
+	  const FiniteElement<dim,spacedim> &
             base_fe      = base_element(base_no);
-	  typename FiniteElement<dim>::InternalDataBase &
+	  typename FiniteElement<dim,spacedim>::InternalDataBase &
 	    base_fe_data = fe_data.get_fe_data(base_no);
-	  FEValuesData<dim> &
+	  FEValuesData<dim,spacedim> &
             base_data    = fe_data.get_fe_values_data(base_no);
 
 					   //TODO: Think about a smarter alternative
@@ -965,7 +967,7 @@ compute_fill (const Mapping<dim>                   &mapping,
 					       // Pointer needed to get
 					       // the update flags of the
 					       // base element
-	      typename Mapping<dim>::InternalDataBase &base_fe_data=
+	      typename Mapping<dim,spacedim>::InternalDataBase &base_fe_data=
 		fe_data.get_fe_data(base_no);
 	      
 					       // compute update flags ...
@@ -1008,9 +1010,9 @@ compute_fill (const Mapping<dim>                   &mapping,
 
 
 
-template <int dim>
+template <int dim, int spacedim>
 void
-FESystem<dim>::build_cell_tables()
+FESystem<dim,spacedim>::build_cell_tables()
 {
 				   // If the system is not primitive,
 				   // these have not been initialized
@@ -1194,9 +1196,9 @@ FESystem<dim>::build_cell_tables()
 
 
 
-template <int dim>
+template <int dim, int spacedim>
 void
-FESystem<dim>::build_face_tables()
+FESystem<dim,spacedim>::build_face_tables()
 {
 				   // Initialize index tables. do this
 				   // in the same way as done for the
@@ -1376,8 +1378,8 @@ FESystem<dim>::build_face_tables()
 
 
 
-template <int dim>
-void FESystem<dim>::build_interface_constraints () 
+template <int dim, int spacedim>
+void FESystem<dim,spacedim>::build_interface_constraints () 
 {
                                    // check whether all base elements
                                    // implement their interface
@@ -1642,8 +1644,8 @@ void FESystem<dim>::build_interface_constraints ()
 
 
 
-template <int dim>
-void FESystem<dim>::initialize ()
+template <int dim, int spacedim>
+void FESystem<dim,spacedim>::initialize ()
 {
   build_cell_tables();
   build_face_tables();
@@ -1756,9 +1758,9 @@ void FESystem<dim>::initialize ()
 
 
 
-template <int dim>
+template <int dim, int spacedim>
 FiniteElementData<dim>
-FESystem<dim>::multiply_dof_numbers (const FiniteElementData<dim> &fe_data,
+FESystem<dim,spacedim>::multiply_dof_numbers (const FiniteElementData<dim> &fe_data,
 				     const unsigned int            N)
 {
   std::vector<unsigned int> dpo;
@@ -1777,9 +1779,9 @@ FESystem<dim>::multiply_dof_numbers (const FiniteElementData<dim> &fe_data,
 
 
 
-template <int dim>
+template <int dim, int spacedim>
 void
-FESystem<dim>::
+FESystem<dim,spacedim>::
 initialize_unit_support_points ()
 {
 				   // if one of the base elements
@@ -1828,9 +1830,9 @@ initialize_unit_face_support_points ()
 #endif
 
 
-template <int dim>
+template <int dim, int spacedim>
 void
-FESystem<dim>::
+FESystem<dim,spacedim>::
 initialize_unit_face_support_points ()
 {
 				   // if one of the base elements has
@@ -1870,9 +1872,9 @@ initialize_unit_face_support_points ()
 
 
 
-template <int dim>
+template <int dim, int spacedim>
 void
-FESystem<dim>::initialize_quad_dof_index_permutation ()
+FESystem<dim,spacedim>::initialize_quad_dof_index_permutation ()
 {
 				   // general template for 1D and 2D, do nothing
 }
@@ -1932,9 +1934,9 @@ FESystem<3>::initialize_quad_dof_index_permutation ()
 
 
 
-template <int dim>
+template <int dim, int spacedim>
 bool
-FESystem<dim>::
+FESystem<dim,spacedim>::
 hp_constraints_are_implemented () const
 {
   for (unsigned int b=0; b<n_base_elements(); ++b)
@@ -1946,16 +1948,17 @@ hp_constraints_are_implemented () const
 
 
 
-template <int dim>
+template <int dim, int spacedim>
 void
-FESystem<dim>::
-get_face_interpolation_matrix (const FiniteElement<dim> &x_source_fe,
+FESystem<dim,spacedim>::
+get_face_interpolation_matrix (const FiniteElement<dim,spacedim> &x_source_fe,
 			       FullMatrix<double>       &interpolation_matrix) const
 {
+  typedef FiniteElement<dim,spacedim> FEL;
   AssertThrow ((x_source_fe.get_name().find ("FE_System<") == 0)
 	       ||
-	       (dynamic_cast<const FESystem<dim>*>(&x_source_fe) != 0),
-	       typename FiniteElement<dim>::
+	       (dynamic_cast<const FESystem<dim,spacedim>*>(&x_source_fe) != 0),
+	       typename FEL::
 	       ExcInterpolationNotImplemented());
 
   Assert (interpolation_matrix.n() == this->dofs_per_face,
@@ -1981,8 +1984,8 @@ get_face_interpolation_matrix (const FiniteElement<dim> &x_source_fe,
 				   // FESystem(FE_Q(r),2,FE_Q(s),1), but not
 				   // FESystem(FE_Q(p),1,FE_Q(q),2) vs
 				   // FESystem(FESystem(FE_Q(r),2),1,FE_Q(s),1)
-  const FESystem<dim> *fe_other_system
-    = dynamic_cast<const FESystem<dim>*>(&x_source_fe);
+  const FESystem<dim,spacedim> *fe_other_system
+    = dynamic_cast<const FESystem<dim,spacedim>*>(&x_source_fe);
 
 				   // clear matrix, since we will not get to
 				   // set all elements
@@ -2000,7 +2003,7 @@ get_face_interpolation_matrix (const FiniteElement<dim> &x_source_fe,
   
   while (true)
     {
-      const FiniteElement<dim>
+      const FiniteElement<dim,spacedim>
 	&base       = base_element(base_index),
 	&base_other = fe_other_system->base_element(base_index_other);
 
@@ -2072,17 +2075,18 @@ get_face_interpolation_matrix (const FiniteElement<dim> &x_source_fe,
 
 
 
-template <int dim>
+template <int dim, int spacedim>
 void
-FESystem<dim>::
-get_subface_interpolation_matrix (const FiniteElement<dim> &x_source_fe,
+FESystem<dim,spacedim>::
+get_subface_interpolation_matrix (const FiniteElement<dim,spacedim> &x_source_fe,
 				  const unsigned int        subface,
 				  FullMatrix<double>       &interpolation_matrix) const
 {
+  typedef FiniteElement<dim,spacedim> FEL;
   AssertThrow ((x_source_fe.get_name().find ("FE_System<") == 0)
 	       ||
-	       (dynamic_cast<const FESystem<dim>*>(&x_source_fe) != 0),
-	       typename FiniteElement<dim>::
+	       (dynamic_cast<const FESystem<dim,spacedim>*>(&x_source_fe) != 0),
+	       typename FEL::
 	       ExcInterpolationNotImplemented());
 
   Assert (interpolation_matrix.n() == this->dofs_per_face,
@@ -2108,8 +2112,8 @@ get_subface_interpolation_matrix (const FiniteElement<dim> &x_source_fe,
 				   // FESystem(FE_Q(r),2,FE_Q(s),1), but not
 				   // FESystem(FE_Q(p),1,FE_Q(q),2) vs
 				   // FESystem(FESystem(FE_Q(r),2),1,FE_Q(s),1)
-  const FESystem<dim> *fe_other_system
-    = dynamic_cast<const FESystem<dim>*>(&x_source_fe);
+  const FESystem<dim,spacedim> *fe_other_system
+    = dynamic_cast<const FESystem<dim,spacedim>*>(&x_source_fe);
 
 				   // clear matrix, since we will not get to
 				   // set all elements
@@ -2127,7 +2131,7 @@ get_subface_interpolation_matrix (const FiniteElement<dim> &x_source_fe,
   
   while (true)
     {
-      const FiniteElement<dim>
+      const FiniteElement<dim,spacedim>
 	&base       = base_element(base_index),
 	&base_other = fe_other_system->base_element(base_index_other);
 
@@ -2200,10 +2204,10 @@ get_subface_interpolation_matrix (const FiniteElement<dim> &x_source_fe,
 
 
 
-template <int dim>
+template <int dim, int spacedim>
 template <int structdim>
 std::vector<std::pair<unsigned int, unsigned int> >
-FESystem<dim>::hp_object_dof_identities (const FiniteElement<dim> &fe_other) const
+FESystem<dim,spacedim>::hp_object_dof_identities (const FiniteElement<dim,spacedim> &fe_other) const
 {
 				   // since dofs on each subobject (vertex,
 				   // line, ...) are ordered such that first
@@ -2224,8 +2228,8 @@ FESystem<dim>::hp_object_dof_identities (const FiniteElement<dim> &fe_other) con
 				   // FESystem(FE_Q(r),2,FE_Q(s),1), but not
 				   // FESystem(FE_Q(p),1,FE_Q(q),2) vs
 				   // FESystem(FESystem(FE_Q(r),2),1,FE_Q(s),1)
-  if (const FESystem<dim> *fe_other_system
-      = dynamic_cast<const FESystem<dim>*>(&fe_other))
+  if (const FESystem<dim,spacedim> *fe_other_system
+      = dynamic_cast<const FESystem<dim,spacedim>*>(&fe_other))
     {
 				       // loop over all the base elements of
 				       // this and the other element, counting
@@ -2245,7 +2249,7 @@ FESystem<dim>::hp_object_dof_identities (const FiniteElement<dim> &fe_other) con
       
       while (true)
 	{
-	  const FiniteElement<dim>
+	  const FiniteElement<dim,spacedim>
 	    &base       = base_element(base_index),
 	    &base_other = fe_other_system->base_element(base_index_other);
 
@@ -2332,41 +2336,41 @@ FESystem<dim>::hp_object_dof_identities (const FiniteElement<dim> &fe_other) con
 
 
 
-template <int dim>
+template <int dim, int spacedim>
 std::vector<std::pair<unsigned int, unsigned int> >
-FESystem<dim>::hp_vertex_dof_identities (const FiniteElement<dim> &fe_other) const
+FESystem<dim,spacedim>::hp_vertex_dof_identities (const FiniteElement<dim,spacedim> &fe_other) const
 {
   return hp_object_dof_identities<0> (fe_other);
 }
 
-template <int dim>
+template <int dim, int spacedim>
 std::vector<std::pair<unsigned int, unsigned int> >
-FESystem<dim>::hp_line_dof_identities (const FiniteElement<dim> &fe_other) const
+FESystem<dim,spacedim>::hp_line_dof_identities (const FiniteElement<dim,spacedim> &fe_other) const
 {
   return hp_object_dof_identities<1> (fe_other);
 }
 
 
 
-template <int dim>
+template <int dim, int spacedim>
 std::vector<std::pair<unsigned int, unsigned int> >
-FESystem<dim>::hp_quad_dof_identities (const FiniteElement<dim> &fe_other) const
+FESystem<dim,spacedim>::hp_quad_dof_identities (const FiniteElement<dim,spacedim> &fe_other) const
 {
   return hp_object_dof_identities<2> (fe_other);
 }
 
 
 
-template <int dim>
+template <int dim, int spacedim>
 FiniteElementDomination::Domination
-FESystem<dim>::
-compare_for_face_domination (const FiniteElement<dim> &fe_other) const
+FESystem<dim,spacedim>::
+compare_for_face_domination (const FiniteElement<dim,spacedim> &fe_other) const
 {
 				   // at present all we can do is to compare
 				   // with other FESystems that have the same
 				   // number of components and bases
-  if (const FESystem<dim> *fe_sys_other
-      = dynamic_cast<const FESystem<dim>*>(&fe_other))
+  if (const FESystem<dim,spacedim> *fe_sys_other
+      = dynamic_cast<const FESystem<dim,spacedim>*>(&fe_other))
     {
       Assert (this->n_components() == fe_sys_other->n_components(),
 	      ExcNotImplemented());
@@ -2410,9 +2414,9 @@ compare_for_face_domination (const FiniteElement<dim> &fe_other) const
 
 
 
-template <int dim>
+template <int dim, int spacedim>
 FiniteElementData<dim>
-FESystem<dim>::multiply_dof_numbers (const FiniteElementData<dim> &fe1,
+FESystem<dim,spacedim>::multiply_dof_numbers (const FiniteElementData<dim> &fe1,
 				     const unsigned int            N1,
 				     const FiniteElementData<dim> &fe2,
 				     const unsigned int            N2)
@@ -2440,9 +2444,9 @@ FESystem<dim>::multiply_dof_numbers (const FiniteElementData<dim> &fe1,
 
 
 
-template <int dim>
+template <int dim, int spacedim>
 FiniteElementData<dim>
-FESystem<dim>::multiply_dof_numbers (const FiniteElementData<dim> &fe1,
+FESystem<dim,spacedim>::multiply_dof_numbers (const FiniteElementData<dim> &fe1,
 				     const unsigned int            N1,
 				     const FiniteElementData<dim> &fe2,
 				     const unsigned int            N2,
@@ -2479,12 +2483,12 @@ FESystem<dim>::multiply_dof_numbers (const FiniteElementData<dim> &fe1,
 
 
 
-template <int dim>
+template <int dim, int spacedim>
 std::vector<bool>
-FESystem<dim>::compute_restriction_is_additive_flags (const FiniteElement<dim> &fe,
+FESystem<dim,spacedim>::compute_restriction_is_additive_flags (const FiniteElement<dim,spacedim> &fe,
 						      const unsigned int n_elements) 
 {
-  std::vector<const FiniteElement<dim>*> fe_list;
+  std::vector<const FiniteElement<dim,spacedim>*> fe_list;
   std::vector<unsigned int>              multiplicities;
 
   fe_list.push_back (&fe);
@@ -2495,14 +2499,14 @@ FESystem<dim>::compute_restriction_is_additive_flags (const FiniteElement<dim> &
 
 
 
-template <int dim>
+template <int dim, int spacedim>
 std::vector<bool>
-FESystem<dim>::compute_restriction_is_additive_flags (const FiniteElement<dim> &fe1,
+FESystem<dim,spacedim>::compute_restriction_is_additive_flags (const FiniteElement<dim,spacedim> &fe1,
 						      const unsigned int        N1,
-						      const FiniteElement<dim> &fe2,
+						      const FiniteElement<dim,spacedim> &fe2,
 						      const unsigned int        N2) 
 {
-  std::vector<const FiniteElement<dim>*> fe_list;
+  std::vector<const FiniteElement<dim,spacedim>*> fe_list;
   std::vector<unsigned int>              multiplicities;
 
   fe_list.push_back (&fe1);
@@ -2516,16 +2520,16 @@ FESystem<dim>::compute_restriction_is_additive_flags (const FiniteElement<dim> &
 
 
 
-template <int dim>
+template <int dim, int spacedim>
 std::vector<bool>
-FESystem<dim>::compute_restriction_is_additive_flags (const FiniteElement<dim> &fe1,
+FESystem<dim,spacedim>::compute_restriction_is_additive_flags (const FiniteElement<dim,spacedim> &fe1,
 						      const unsigned int        N1,
-						      const FiniteElement<dim> &fe2,
+						      const FiniteElement<dim,spacedim> &fe2,
 						      const unsigned int        N2,
-						      const FiniteElement<dim> &fe3,
+						      const FiniteElement<dim,spacedim> &fe3,
 						      const unsigned int        N3) 
 {
-  std::vector<const FiniteElement<dim>*> fe_list;
+  std::vector<const FiniteElement<dim,spacedim>*> fe_list;
   std::vector<unsigned int>              multiplicities;
 
   fe_list.push_back (&fe1);
@@ -2542,10 +2546,10 @@ FESystem<dim>::compute_restriction_is_additive_flags (const FiniteElement<dim> &
 
 
 
-template <int dim>
+template <int dim, int spacedim>
 std::vector<bool>
-FESystem<dim>::
-compute_restriction_is_additive_flags (const std::vector<const FiniteElement<dim>*> &fes,
+FESystem<dim,spacedim>::
+compute_restriction_is_additive_flags (const std::vector<const FiniteElement<dim,spacedim>*> &fes,
                                        const std::vector<unsigned int>              &multiplicities)
 {
   Assert (fes.size() == multiplicities.size(), ExcInternalError());
@@ -2674,12 +2678,12 @@ compute_restriction_is_additive_flags (const std::vector<const FiniteElement<dim
 
 
 
-template <int dim>
+template <int dim, int spacedim>
 std::vector<std::vector<bool> >
-FESystem<dim>::compute_nonzero_components (const FiniteElement<dim> &fe1,
+FESystem<dim,spacedim>::compute_nonzero_components (const FiniteElement<dim,spacedim> &fe1,
 					   const unsigned int        N1)
 {
-  std::vector<const FiniteElement<dim>*> fe_list;
+  std::vector<const FiniteElement<dim,spacedim>*> fe_list;
   std::vector<unsigned int>              multiplicities;
 
   fe_list.push_back (&fe1);
@@ -2690,14 +2694,14 @@ FESystem<dim>::compute_nonzero_components (const FiniteElement<dim> &fe1,
 
 
 
-template <int dim>
+template <int dim, int spacedim>
 std::vector<std::vector<bool> >
-FESystem<dim>::compute_nonzero_components (const FiniteElement<dim> &fe1,
+FESystem<dim,spacedim>::compute_nonzero_components (const FiniteElement<dim,spacedim> &fe1,
 					   const unsigned int        N1,
-					   const FiniteElement<dim> &fe2,
+					   const FiniteElement<dim,spacedim> &fe2,
 					   const unsigned int        N2)
 {
-  std::vector<const FiniteElement<dim>*> fe_list;
+  std::vector<const FiniteElement<dim,spacedim>*> fe_list;
   std::vector<unsigned int>              multiplicities;
 
   fe_list.push_back (&fe1);
@@ -2711,16 +2715,16 @@ FESystem<dim>::compute_nonzero_components (const FiniteElement<dim> &fe1,
 
 
 
-template <int dim>
+template <int dim, int spacedim>
 std::vector<std::vector<bool> >
-FESystem<dim>::compute_nonzero_components (const FiniteElement<dim> &fe1,
+FESystem<dim,spacedim>::compute_nonzero_components (const FiniteElement<dim,spacedim> &fe1,
 					   const unsigned int        N1,
-					   const FiniteElement<dim> &fe2,
+					   const FiniteElement<dim,spacedim> &fe2,
 					   const unsigned int        N2,
-					   const FiniteElement<dim> &fe3,
+					   const FiniteElement<dim,spacedim> &fe3,
 					   const unsigned int        N3)
 {
-  std::vector<const FiniteElement<dim>*> fe_list;
+  std::vector<const FiniteElement<dim,spacedim>*> fe_list;
   std::vector<unsigned int>              multiplicities;
 
   fe_list.push_back (&fe1);
@@ -2737,10 +2741,10 @@ FESystem<dim>::compute_nonzero_components (const FiniteElement<dim> &fe1,
 
 
 
-template <int dim>
+template <int dim, int spacedim>
 std::vector<std::vector<bool> >
-FESystem<dim>::
-compute_nonzero_components (const std::vector<const FiniteElement<dim>*> &fes,
+FESystem<dim,spacedim>::
+compute_nonzero_components (const std::vector<const FiniteElement<dim,spacedim>*> &fes,
 			    const std::vector<unsigned int>              &multiplicities)
 {
   Assert (fes.size() == multiplicities.size(), ExcInternalError());
@@ -2920,9 +2924,9 @@ compute_nonzero_components (const std::vector<const FiniteElement<dim>*> &fes,
 
 
 
-template <int dim>
-const FiniteElement<dim> &
-FESystem<dim>::base_element (const unsigned int index) const
+template <int dim, int spacedim>
+const FiniteElement<dim,spacedim> &
+FESystem<dim,spacedim>::base_element (const unsigned int index) const
 {
   Assert (index < base_elements.size(), 
 	  ExcIndexRange(index, 0, base_elements.size()));
@@ -2931,18 +2935,18 @@ FESystem<dim>::base_element (const unsigned int index) const
 
 
 
-template <int dim>
+template <int dim, int spacedim>
 unsigned int
-FESystem<dim>::n_base_elements () const
+FESystem<dim,spacedim>::n_base_elements () const
 {
   return base_elements.size();
 }
 
 
 
-template<int dim>
+template <int dim, int spacedim>
 unsigned int
-FESystem<dim>::element_multiplicity (const unsigned int index) const
+FESystem<dim,spacedim>::element_multiplicity (const unsigned int index) const
 {
   Assert (index < base_elements.size(), 
 	  ExcIndexRange(index, 0, base_elements.size()));
@@ -2951,9 +2955,9 @@ FESystem<dim>::element_multiplicity (const unsigned int index) const
 
 
 
-template <int dim>
+template <int dim, int spacedim>
 bool
-FESystem<dim>::has_support_on_face (const unsigned int shape_index,
+FESystem<dim,spacedim>::has_support_on_face (const unsigned int shape_index,
 				    const unsigned int face_index) const
 {
   return (base_element(this->system_to_base_index(shape_index).first.first)
@@ -2963,15 +2967,16 @@ FESystem<dim>::has_support_on_face (const unsigned int shape_index,
 
 
 
-template <int dim>
+template <int dim, int spacedim>
 Point<dim>
-FESystem<dim>::unit_support_point (const unsigned index) const
+FESystem<dim,spacedim>::unit_support_point (const unsigned index) const
 {
   Assert (index < this->dofs_per_cell,
           ExcIndexRange (index, 0, this->dofs_per_cell));
+  typedef FiniteElement<dim,spacedim> FEL;
   Assert ((this->unit_support_points.size() == this->dofs_per_cell) ||
           (this->unit_support_points.size() == 0),
-          typename FiniteElement<dim>::ExcFEHasNoSupportPoints ());
+          typename FEL::ExcFEHasNoSupportPoints ());
 
                                    // let's see whether we have the
                                    // information pre-computed
@@ -2987,15 +2992,16 @@ FESystem<dim>::unit_support_point (const unsigned index) const
 
 
 
-template <int dim>
+template <int dim, int spacedim>
 Point<dim-1>
-FESystem<dim>::unit_face_support_point (const unsigned index) const
+FESystem<dim,spacedim>::unit_face_support_point (const unsigned index) const
 {
   Assert (index < this->dofs_per_face,
           ExcIndexRange (index, 0, this->dofs_per_face));
+  typedef  FiniteElement<dim,spacedim> FEL;
   Assert ((this->unit_face_support_points.size() == this->dofs_per_face) ||
           (this->unit_face_support_points.size() == 0),
-          typename FiniteElement<dim>::ExcFEHasNoSupportPoints ());
+          typename FEL::ExcFEHasNoSupportPoints ());
 
                                    // let's see whether we have the
                                    // information pre-computed
@@ -3011,9 +3017,9 @@ FESystem<dim>::unit_face_support_point (const unsigned index) const
 
 
 
-template <int dim>
+template <int dim, int spacedim>
 unsigned int
-FESystem<dim>::memory_consumption () const 
+FESystem<dim,spacedim>::memory_consumption () const 
 {
 				   // neglect size of data stored in
 				   // @p{base_elements} due to some
@@ -3021,7 +3027,7 @@ FESystem<dim>::memory_consumption () const
 				   // compiler. should be neglectable
 				   // after all, considering the size
 				   // of the data of the subelements
-  unsigned int mem = (FiniteElement<dim>::memory_consumption () +
+  unsigned int mem = (FiniteElement<dim,spacedim>::memory_consumption () +
 		      sizeof (base_elements));
   for (unsigned int i=0; i<base_elements.size(); ++i)
     mem += MemoryConsumption::memory_consumption (*base_elements[i].first);
@@ -3033,5 +3039,8 @@ FESystem<dim>::memory_consumption () const
 
 // explicit instantiations
 template class FESystem<deal_II_dimension>;
+#if deal_II_dimension != 3
+template class FESystem<deal_II_dimension, deal_II_dimension+1>;
+#endif
 
 DEAL_II_NAMESPACE_CLOSE

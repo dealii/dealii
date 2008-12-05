@@ -366,6 +366,15 @@ inconvenience this causes.
   <br> 
   (RH 2008/07/08 as of branch_anisotropic at 2005/03/03)
   </p>
+
+  <li>
+  <p>
+  New: The class QGaussLog allows the quadrature of integrals with logarithmic
+  kernels.
+  <br> 
+  (Cataldo Manigrasso 2008/05/28)
+  </p>
+
 </ol>
 
 
@@ -374,7 +383,6 @@ inconvenience this causes.
 <h3>lac</h3>
 
 <ol>
-  <li>
   <p>
   New: All SparseMatrix classes (SparseMatrix<number>, PETSc sparse
   matrices, Trilinos sparse matrices, block sparse matrices) can now
@@ -495,6 +503,21 @@ inconvenience this causes.
   <br>
   (WB 2008/07/30)
   </p>
+
+
+  <li> New: Added two new functions to calculate the left or the right inverse of a given 
+  rectangular matrix (FullMatrix::left_invert, FullMatrix::right_invert).
+  They throw an exception if the matrices are not invertible.
+  <br>
+  (Cataldo Manigrasso 2008/6/12)
+  </li>
+
+  <li> Fixed: FullMatrix::Tadd can now transpose correctly rectangular
+  matrices, there was a mismatch about the indexes in the code.
+  <br>
+  (Cataldo Manigrasso 2008/6/12)
+</li>
+
 </ol>
 
 

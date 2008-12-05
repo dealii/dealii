@@ -52,9 +52,9 @@ MGSmootherContinuous<VECTOR>::MGSmootherContinuous (
 #if deal_II_dimension > 1
 
 template <class VECTOR>
-template <int dim>
+template <int dim, int spacedim>
 MGSmootherContinuous<VECTOR>::MGSmootherContinuous (
-  const MGDoFHandler<dim> &mg_dof,
+  const MGDoFHandler<dim,spacedim> &mg_dof,
   const unsigned int steps)
 		:
 		steps(steps)
@@ -85,7 +85,7 @@ MGSmootherContinuous<VECTOR>::MGSmootherContinuous (
 				       // at the boundary of this level's
 				       // cells and if so add the dofs
 				       // to the interior boundary dofs
-      for (typename MGDoFHandler<dim>::cell_iterator cell=mg_dof.begin(level);
+      for (typename MGDoFHandler<dim,spacedim>::cell_iterator cell=mg_dof.begin(level);
 	   cell != mg_dof.end(level); ++cell)
 	for (unsigned int face=0; face<GeometryInfo<dim>::faces_per_cell; ++face)
 	  if ((cell->neighbor(face).state() == IteratorState::valid) &&

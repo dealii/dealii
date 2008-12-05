@@ -2,7 +2,7 @@
 //    $Id$
 //    Version: $Name$
 //
-//    Copyright (C) 1998, 1999, 2000, 2001, 2002, 2003, 2004, 2005, 2006, 2007 by the deal.II authors
+//    Copyright (C) 1998, 1999, 2000, 2001, 2002, 2003, 2004, 2005, 2006, 2007, 2008 by the deal.II authors
 //
 //    This file is subject to QPL and may not be  distributed
 //    without copyright and license information. Please refer
@@ -62,6 +62,13 @@ namespace internal
  * presented by the <tt>++</tt> and <tt>--</tt> operators is the same as that
  * for the corresponding triangulation iterators.
  *
+ * The <tt>spacedim</tt> parameter has to be used if one wants to
+ * solve problems in the boundary element method formulation or in an
+ * equivalent one, as it is explained in the Triangulation class. If
+ * not specified, this parameter takes the default value <tt>=dim</tt>
+ * so that this class can be used to solve problems in the finite
+ * element method formulation.
+ *
  * 
  * <h3>Distribution of indices for degrees of freedom</h3>
  *
@@ -104,10 +111,10 @@ namespace internal
  * @ingroup dofs
  * @author Wolfgang Bangerth, 1998
  */
-template <int dim>
+template <int dim, int spacedim=dim>
 class DoFHandler  :  public Subscriptor
 {
-    typedef internal::DoFHandler::Iterators<DoFHandler<dim> > IteratorSelector;
+    typedef internal::DoFHandler::Iterators<DoFHandler<dim,spacedim> > IteratorSelector;
   public:
     typedef typename IteratorSelector::raw_line_iterator    raw_line_iterator;
     typedef typename IteratorSelector::line_iterator        line_iterator;
@@ -133,14 +140,20 @@ class DoFHandler  :  public Subscriptor
 				      * Alias the @p FunctionMap type
 				      * declared elsewhere.
 				      */
-    typedef typename dealii::FunctionMap<dim>::type FunctionMap;
+    typedef typename dealii::FunctionMap<spacedim>::type FunctionMap;
 
 				     /**
 				      * Make the dimension available
 				      * in function templates.
 				      */
     static const unsigned int dimension = dim;
-    
+
+				     /**
+				      * Make the space dimension available
+				      * in function templates.
+				      */
+    static const unsigned int space_dimension = spacedim;
+
 				     /**
 				      * When the arrays holding the
 				      * DoF indices are set up, but
@@ -184,8 +197,8 @@ class DoFHandler  :  public Subscriptor
 				      * Constructor. Take @p tria as the
 				      * triangulation to work on.
 				      */
-    DoFHandler (const Triangulation<dim> &tria);
-    
+    DoFHandler ( const Triangulation<dim,spacedim> &tria);    
+
 				     /**
 				      * Destructor.
 				      */
@@ -222,7 +235,7 @@ class DoFHandler  :  public Subscriptor
 				      * releases the lock of this
 				      * object to the finite element.
 				      */
-    virtual void distribute_dofs (const FiniteElement<dim> &fe,
+    virtual void distribute_dofs (const FiniteElement<dim,spacedim> &fe,
 				  const unsigned int        offset = 0);
 
 				     /**
@@ -898,14 +911,14 @@ class DoFHandler  :  public Subscriptor
 				      * the selected finite element
 				      * object.
 				      */
-    const FiniteElement<dim> & get_fe () const;
+    const FiniteElement<dim,spacedim> & get_fe () const;
 
 				     /**
 				      * Return a constant reference to
 				      * the triangulation underlying
 				      * this object.
 				      */
-    const Triangulation<dim> & get_tria () const;
+    const Triangulation<dim,spacedim> & get_tria () const;
     
 				     /**
 				      * Determine an estimate for the
@@ -954,6 +967,25 @@ class DoFHandler  :  public Subscriptor
 		    int,
 		    << "The given list of new dof indices is not consecutive: "
 		    << "the index " << arg1 << " does not exist.");
+				     /**
+				      *  Exception
+				      */
+    DeclException1 (ExcInvalidLevel,
+		    int,
+		    << "The given level " << arg1
+		    << " is not in the valid range!");
+				     /**
+				      * Exception
+				      */
+    DeclException0 (ExcFacesHaveNoLevel);
+				     /**
+				      * The triangulation level you
+				      * accessed is empty.
+				      */
+    DeclException1 (ExcEmptyLevel,
+		    int,
+		    << "You tried to do something on level " << arg1
+		    << ", but this level is empty.");
 
   protected:
     
@@ -961,7 +993,7 @@ class DoFHandler  :  public Subscriptor
 				      * Address of the triangulation to
 				      * work on.
 				      */
-    SmartPointer<const Triangulation<dim> > tria;
+    SmartPointer<const Triangulation<dim,spacedim> > tria;
 
 				     /**
 				      * Store a pointer to the finite element
@@ -975,7 +1007,7 @@ class DoFHandler  :  public Subscriptor
 				      * function (this clears all data of
 				      * this object as well, though).
 				      */
-    SmartPointer<const FiniteElement<dim> > selected_fe;
+    SmartPointer<const FiniteElement<dim,spacedim> > selected_fe;
 
   private:
 
@@ -1002,37 +1034,9 @@ class DoFHandler  :  public Subscriptor
     DoFHandler & operator = (const DoFHandler &);
 
 				     /**
-				      * Reserve enough space in the 
-				      * <tt>levels[]</tt> objects to store the
-				      * numbers of the degrees of freedom
-				      * needed for the given element. The
-				      * given element is that one which
-				      * was selected when calling
-				      * @p distribute_dofs the last time.
-				      */
-    void reserve_space ();
-
-				     /**
 				      * Free all used memory.
 				      */
     void clear_space ();
-    
-				     /**
-				      * Distribute dofs on the given cell,
-				      * with new dofs starting with index
-				      * @p next_free_dof. Return the next
-				      * unused index number. The finite
-				      * element used is the one given to
-				      * @p distribute_dofs, which is copied
-				      * to @p selected_fe.
-				      *
-				      * This function is excluded from the
-				      * @p distribute_dofs function since
-				      * it can not be implemented dimension
-				      * independent.
-				      */
-    unsigned int distribute_dofs_on_cell (active_cell_iterator &cell,
-					  unsigned int next_free_dof);
 
 				     /**
 				      * Set the @p local_index-th
@@ -1199,6 +1203,15 @@ class DoFHandler  :  public Subscriptor
 				      */
     std::vector<unsigned int>      vertex_dofs;
 
+				     /**
+				      * Forward declaration of a class
+				      * into which we put significant
+				      * parts of the implementation.
+				      *
+				      * See the .cc file for more
+				      * information.
+				      */
+    struct Implementation;    
     
 				     /*
 				      * Make accessor objects friends.
@@ -1206,14 +1219,12 @@ class DoFHandler  :  public Subscriptor
     template <int structdim, class DH> friend class DoFAccessor;
 
 				     /*
-				      * Make accessor objects friends.
-				      */
-    template <int dim1, class DH> friend class DoFObjectAccessor;
-
-				     /*
 				      * Same with cell accessor
 				      */
     template <class DH> friend class DoFCellAccessor;
+
+
+    friend class DoFHandler<dim,spacedim>::Implementation;
 };
 
 
@@ -1226,153 +1237,50 @@ class DoFHandler  :  public Subscriptor
 template <> unsigned int DoFHandler<1>::n_boundary_dofs () const;
 template <> unsigned int DoFHandler<1>::n_boundary_dofs (const FunctionMap &) const;
 template <> unsigned int DoFHandler<1>::n_boundary_dofs (const std::set<unsigned char> &) const;
-template <> unsigned int DoFHandler<1>::max_couplings_between_dofs () const;
-template <> unsigned int DoFHandler<1>::max_couplings_between_boundary_dofs () const;
-template <> unsigned int DoFHandler<2>::max_couplings_between_dofs () const;
-template <> unsigned int DoFHandler<2>::max_couplings_between_boundary_dofs () const;
-template <> unsigned int DoFHandler<3>::max_couplings_between_dofs () const;
-template <> unsigned int DoFHandler<3>::max_couplings_between_boundary_dofs () const;
 
-template <> DoFHandler<1>::raw_cell_iterator DoFHandler<1>::begin_raw (const unsigned int level) const;
-template <> DoFHandler<1>::cell_iterator DoFHandler<1>::begin (const unsigned int level) const;
-template <> DoFHandler<1>::active_cell_iterator DoFHandler<1>::begin_active (const unsigned int level) const;
-template <> DoFHandler<1>::raw_cell_iterator DoFHandler<1>::end () const;
-template <> DoFHandler<1>::raw_cell_iterator DoFHandler<1>::last_raw () const;
-template <> DoFHandler<1>::raw_cell_iterator DoFHandler<1>::last_raw (const unsigned int level) const;
-template <> DoFHandler<1>::cell_iterator DoFHandler<1>::last () const;
-template <> DoFHandler<1>::cell_iterator DoFHandler<1>::last (const unsigned int level) const;
-template <> DoFHandler<1>::active_cell_iterator DoFHandler<1>::last_active () const;
-template <> DoFHandler<1>::active_cell_iterator DoFHandler<1>::last_active (const unsigned int level) const;
-template <> DoFHandler<1>::raw_face_iterator DoFHandler<1>::begin_raw_face () const;
-template <> DoFHandler<1>::face_iterator DoFHandler<1>::begin_face () const;
-template <> DoFHandler<1>::active_face_iterator DoFHandler<1>::begin_active_face () const;
-template <> DoFHandler<1>::raw_face_iterator DoFHandler<1>::end_face () const;
-template <> DoFHandler<1>::raw_face_iterator DoFHandler<1>::last_raw_face () const;
-template <> DoFHandler<1>::face_iterator DoFHandler<1>::last_face () const;
-template <> DoFHandler<1>::active_face_iterator DoFHandler<1>::last_active_face () const;
-template <> DoFHandler<1>::raw_quad_iterator DoFHandler<1>::begin_raw_quad (const unsigned int) const;
-template <> DoFHandler<1>::quad_iterator DoFHandler<1>::begin_quad (const unsigned int) const;
-template <> DoFHandler<1>::active_quad_iterator DoFHandler<1>::begin_active_quad (const unsigned int) const;
-template <> DoFHandler<1>::raw_quad_iterator DoFHandler<1>::end_quad () const;
-template <> DoFHandler<1>::raw_quad_iterator DoFHandler<1>::last_raw_quad (const unsigned int) const;
-template <> DoFHandler<1>::quad_iterator DoFHandler<1>::last_quad (const unsigned int) const;
-template <> DoFHandler<1>::active_quad_iterator DoFHandler<1>::last_active_quad (const unsigned int) const;
-template <> DoFHandler<1>::raw_quad_iterator DoFHandler<1>::last_raw_quad () const;
-template <> DoFHandler<1>::quad_iterator DoFHandler<1>::last_quad () const;
-template <> DoFHandler<1>::active_quad_iterator DoFHandler<1>::last_active_quad () const;
-template <> DoFHandler<1>::raw_hex_iterator DoFHandler<1>::begin_raw_hex (const unsigned int) const;
-template <> DoFHandler<1>::hex_iterator DoFHandler<1>::begin_hex (const unsigned int) const;
-template <> DoFHandler<1>::active_hex_iterator DoFHandler<1>::begin_active_hex (const unsigned int) const;
-template <> DoFHandler<1>::raw_hex_iterator DoFHandler<1>::end_hex () const;
-template <> DoFHandler<1>::raw_hex_iterator DoFHandler<1>::last_raw_hex (const unsigned int) const;
-template <> DoFHandler<1>::raw_hex_iterator DoFHandler<1>::last_raw_hex () const;
-template <> DoFHandler<1>::hex_iterator DoFHandler<1>::last_hex (const unsigned int) const;
-template <> DoFHandler<1>::hex_iterator DoFHandler<1>::last_hex () const;
-template <> DoFHandler<1>::active_hex_iterator DoFHandler<1>::last_active_hex (const unsigned int) const;
-template <> DoFHandler<1>::active_hex_iterator DoFHandler<1>::last_active_hex () const;
-template <> DoFHandler<2>::raw_cell_iterator DoFHandler<2>::begin_raw (const unsigned int level) const;
-template <> DoFHandler<2>::cell_iterator DoFHandler<2>::begin (const unsigned int level) const;
-template <> DoFHandler<2>::active_cell_iterator DoFHandler<2>::begin_active (const unsigned int level) const;
-template <> DoFHandler<2>::raw_cell_iterator DoFHandler<2>::end () const;
-template <> DoFHandler<2>::raw_cell_iterator DoFHandler<2>::last_raw () const;
-template <> DoFHandler<2>::raw_cell_iterator DoFHandler<2>::last_raw (const unsigned int level) const;
-template <> DoFHandler<2>::cell_iterator DoFHandler<2>::last () const;
-template <> DoFHandler<2>::cell_iterator DoFHandler<2>::last (const unsigned int level) const;
-template <> DoFHandler<2>::active_cell_iterator DoFHandler<2>::last_active () const;
-template <> DoFHandler<2>::active_cell_iterator DoFHandler<2>::last_active (const unsigned int level) const;
-template <> DoFHandler<2>::raw_face_iterator DoFHandler<2>::begin_raw_face () const;
-template <> DoFHandler<2>::face_iterator DoFHandler<2>::begin_face () const;
-template <> DoFHandler<2>::active_face_iterator DoFHandler<2>::begin_active_face () const;
-template <> DoFHandler<2>::raw_face_iterator DoFHandler<2>::end_face () const;
-template <> DoFHandler<2>::raw_face_iterator DoFHandler<2>::last_raw_face () const;
-template <> DoFHandler<2>::face_iterator DoFHandler<2>::last_face () const;
-template <> DoFHandler<2>::active_face_iterator DoFHandler<2>::last_active_face () const;
-template <> DoFHandler<2>::raw_hex_iterator DoFHandler<2>::begin_raw_hex (const unsigned int) const;
-template <> DoFHandler<2>::hex_iterator DoFHandler<2>::begin_hex (const unsigned int) const;
-template <> DoFHandler<2>::active_hex_iterator DoFHandler<2>::begin_active_hex (const unsigned int) const;
-template <> DoFHandler<2>::raw_hex_iterator DoFHandler<2>::end_hex () const;
-template <> DoFHandler<2>::raw_hex_iterator DoFHandler<2>::last_raw_hex (const unsigned int) const;
-template <> DoFHandler<2>::raw_hex_iterator DoFHandler<2>::last_raw_hex () const;
-template <> DoFHandler<2>::hex_iterator DoFHandler<2>::last_hex (const unsigned int) const;
-template <> DoFHandler<2>::hex_iterator DoFHandler<2>::last_hex () const;
-template <> DoFHandler<2>::active_hex_iterator DoFHandler<2>::last_active_hex (const unsigned int) const;
-template <> DoFHandler<2>::active_hex_iterator DoFHandler<2>::last_active_hex () const;
-template <> DoFHandler<3>::raw_cell_iterator DoFHandler<3>::begin_raw (const unsigned int level) const;
-template <> DoFHandler<3>::cell_iterator DoFHandler<3>::begin (const unsigned int level) const;
-template <> DoFHandler<3>::active_cell_iterator DoFHandler<3>::begin_active (const unsigned int level) const;
-template <> DoFHandler<3>::raw_cell_iterator DoFHandler<3>::end () const;
-template <> DoFHandler<3>::raw_cell_iterator DoFHandler<3>::last_raw () const;
-template <> DoFHandler<3>::raw_cell_iterator DoFHandler<3>::last_raw (const unsigned int level) const;
-template <> DoFHandler<3>::cell_iterator DoFHandler<3>::last () const;
-template <> DoFHandler<3>::cell_iterator DoFHandler<3>::last (const unsigned int level) const;
-template <> DoFHandler<3>::active_cell_iterator DoFHandler<3>::last_active () const;
-template <> DoFHandler<3>::active_cell_iterator DoFHandler<3>::last_active (const unsigned int level) const;
-template <> DoFHandler<3>::raw_face_iterator DoFHandler<3>::begin_raw_face () const;
-template <> DoFHandler<3>::face_iterator DoFHandler<3>::begin_face () const;
-template <> DoFHandler<3>::active_face_iterator DoFHandler<3>::begin_active_face () const;
-template <> DoFHandler<3>::raw_face_iterator DoFHandler<3>::end_face () const;
-template <> DoFHandler<3>::raw_face_iterator DoFHandler<3>::last_raw_face () const;
-template <> DoFHandler<3>::face_iterator DoFHandler<3>::last_face () const;
-template <> DoFHandler<3>::active_face_iterator DoFHandler<3>::last_active_face () const;
-
-template <>
-unsigned int DoFHandler<1>::distribute_dofs_on_cell (active_cell_iterator &cell,
-						     unsigned int          next_free_dof);
-template <>
-unsigned int DoFHandler<2>::distribute_dofs_on_cell (active_cell_iterator &cell,
-						     unsigned int          next_free_dof);
-template <>
-unsigned int DoFHandler<3>::distribute_dofs_on_cell (active_cell_iterator &cell,
-						     unsigned int          next_free_dof);
-template <> void DoFHandler<1>::renumber_dofs (const std::vector<unsigned int> &new_numbers);
-template <> void DoFHandler<2>::renumber_dofs (const std::vector<unsigned int> &new_numbers);
-template <> void DoFHandler<3>::renumber_dofs (const std::vector<unsigned int> &new_numbers);
-template <> void DoFHandler<1>::reserve_space ();
-template <> void DoFHandler<2>::reserve_space ();
-template <> void DoFHandler<3>::reserve_space ();
 
 /* ----------------------- Inline functions ---------------------------------- */
 
 
-template <int dim>
+template <int dim, int spacedim>
 inline
 unsigned int
-DoFHandler<dim>::n_dofs () const
+DoFHandler<dim,spacedim>::n_dofs () const
 {
   return used_dofs;
 }
 
 
 
-template <int dim>
+template <int dim, int spacedim>
 inline
-const FiniteElement<dim> &
-DoFHandler<dim>::get_fe () const
+const FiniteElement<dim,spacedim> &
+DoFHandler<dim,spacedim>::get_fe () const
 {
   Assert(selected_fe!=0, ExcNoFESelected());
   return *selected_fe;
 }
 
 
-template <int dim>
+template <int dim, int spacedim>
 inline
-const Triangulation<dim> &
-DoFHandler<dim>::get_tria () const
+const Triangulation<dim,spacedim> &
+DoFHandler<dim,spacedim>::get_tria () const
 {
   return *tria;
 }
 
 
 
-template <int dim>
+template <int dim, int spacedim>
 inline
 unsigned int
-DoFHandler<dim>::
+DoFHandler<dim,spacedim>::
 get_vertex_dof_index (const unsigned int vertex_index,
 		      const unsigned int fe_index,
 		      const unsigned int local_index) const
 {
-  Assert (fe_index == DoFHandler<dim>::default_fe_index,
+  Assert ((fe_index == DoFHandler<dim,spacedim>::default_fe_index),
 	  ExcMessage ("Only the default FE index is allowed for non-hp DoFHandler objects"));
   Assert (selected_fe != 0,
 	  ExcMessage ("No finite element collection is associated with "
@@ -1386,16 +1294,16 @@ get_vertex_dof_index (const unsigned int vertex_index,
 
 
 
-template <int dim>
+template <int dim, int spacedim>
 inline
 void
-DoFHandler<dim>::
+DoFHandler<dim,spacedim>::
 set_vertex_dof_index (const unsigned int vertex_index,
 		      const unsigned int fe_index,
 		      const unsigned int local_index,
 		      const unsigned int global_index)
 {
-  Assert (fe_index == DoFHandler<dim>::default_fe_index,
+  Assert ((fe_index == DoFHandler<dim,spacedim>::default_fe_index),
 	  ExcMessage ("Only the default FE index is allowed for non-hp DoFHandler objects"));
   Assert (selected_fe != 0,
 	  ExcMessage ("No finite element collection is associated with "
@@ -1409,11 +1317,11 @@ set_vertex_dof_index (const unsigned int vertex_index,
 
 
 
-template <int dim>
+template <int dim, int spacedim>
 template <int structdim>
 inline
 bool
-DoFHandler<dim>::fe_index_is_active (const unsigned int,
+DoFHandler<dim,spacedim>::fe_index_is_active (const unsigned int,
 				     const unsigned int,
 				     const unsigned int fe_index) const
 {
@@ -1422,11 +1330,11 @@ DoFHandler<dim>::fe_index_is_active (const unsigned int,
 
 
 
-template <int dim>
+template <int dim, int spacedim>
 template <int structdim>
 inline
 unsigned int
-DoFHandler<dim>::n_active_fe_indices (const unsigned int obj_level,
+DoFHandler<dim,spacedim>::n_active_fe_indices (const unsigned int obj_level,
 				      const unsigned int obj_index) const
 {
 				   // check that the object we look at is in
@@ -1462,11 +1370,11 @@ DoFHandler<dim>::n_active_fe_indices (const unsigned int obj_level,
 
 
 
-template <int dim>
+template <int dim, int spacedim>
 template <int structdim>
 inline
 unsigned int
-DoFHandler<dim>::nth_active_fe_index (const unsigned int obj_level,
+DoFHandler<dim,spacedim>::nth_active_fe_index (const unsigned int obj_level,
 				      const unsigned int obj_index,
 				      const unsigned int n) const
 {

@@ -141,9 +141,9 @@ namespace internal
                                           * class template for more
                                           * information.
 					  */
-        template <int spacedim>
+        template <int dimm, int spacedim>
         void
-        set_dof_index (const dealii::hp::DoFHandler<spacedim> &dof_handler,
+        set_dof_index (const dealii::hp::DoFHandler<dimm,spacedim> &dof_handler,
 		       const unsigned int               obj_index,
 		       const unsigned int               fe_index,
 		       const unsigned int               local_index,
@@ -173,9 +173,9 @@ namespace internal
                                           * class template for more
                                           * information.
 					  */
-        template <int spacedim>
+        template <int dimm, int spacedim>
         unsigned int
-        get_dof_index (const dealii::hp::DoFHandler<spacedim> &dof_handler,
+        get_dof_index (const dealii::hp::DoFHandler<dimm,spacedim> &dof_handler,
 		       const unsigned int               obj_index,
 		       const unsigned int               fe_index,
 		       const unsigned int               local_index,
@@ -204,9 +204,9 @@ namespace internal
 					  * been distributed and zero
 					  * is returned.
                                           */
-        template <int spacedim>
+        template <int dimm, int spacedim>
         unsigned int
-        n_active_fe_indices (const dealii::hp::DoFHandler<spacedim> &dof_handler,
+        n_active_fe_indices (const dealii::hp::DoFHandler<dimm,spacedim> &dof_handler,
                              const unsigned int               obj_index) const;
 
 					 /**
@@ -214,9 +214,9 @@ namespace internal
 					  * n-th active finite element
 					  * on this object.
 					  */
-        template <int spacedim>
+        template <int dimm, int spacedim>
         unsigned int
-        nth_active_fe_index (const dealii::hp::DoFHandler<spacedim> &dof_handler,
+        nth_active_fe_index (const dealii::hp::DoFHandler<dimm,spacedim> &dof_handler,
 			     const unsigned int               obj_level,
                              const unsigned int               obj_index,
 			     const unsigned int               n) const;
@@ -227,9 +227,9 @@ namespace internal
                                           * used on the present
                                           * object or not.
                                           */
-        template <int spacedim>
+        template <int dimm, int spacedim>
         bool
-        fe_index_is_active (const dealii::hp::DoFHandler<spacedim> &dof_handler,
+        fe_index_is_active (const dealii::hp::DoFHandler<dimm,spacedim> &dof_handler,
                             const unsigned int               obj_index,
                             const unsigned int               fe_index,
 			    const unsigned int               obj_level) const;
@@ -254,17 +254,17 @@ namespace internal
 // --------------------- inline and template functions ------------------
 
     template <int dim>
-    template <int spacedim>
+    template <int dimm, int spacedim>
     inline
     unsigned int
     DoFObjects<dim>::
-    get_dof_index (const dealii::hp::DoFHandler<spacedim> &dof_handler,
+    get_dof_index (const dealii::hp::DoFHandler<dimm,spacedim> &dof_handler,
                    const unsigned int                obj_index,
                    const unsigned int                fe_index,
                    const unsigned int                local_index,
                    const unsigned int                obj_level) const
     {
-      Assert (fe_index != dealii::hp::DoFHandler<spacedim>::default_fe_index,
+      Assert ((fe_index != dealii::hp::DoFHandler<dimm,spacedim>::default_fe_index),
               ExcMessage ("You need to specify a FE index when working "
                           "with hp DoFHandlers"));
       Assert (&dof_handler != 0,
@@ -290,7 +290,7 @@ namespace internal
                           "information for an object on which no such "
                           "information is available"));
 
-      if (dim == spacedim)
+      if (dim == dimm)
         {
                                            // if we are on a cell, then
                                            // the only set of indices we
@@ -335,18 +335,18 @@ namespace internal
 
 
     template <int dim>
-    template <int spacedim>
+    template <int dimm, int spacedim>
     inline
     void
     DoFObjects<dim>::
-    set_dof_index (const dealii::hp::DoFHandler<spacedim> &dof_handler,
+    set_dof_index (const dealii::hp::DoFHandler<dimm,spacedim> &dof_handler,
                    const unsigned int                obj_index,
                    const unsigned int                fe_index,
                    const unsigned int                local_index,
                    const unsigned int                global_index,
                    const unsigned int                obj_level)
     {
-      Assert (fe_index != dealii::hp::DoFHandler<spacedim>::default_fe_index,
+      Assert ((fe_index != dealii::hp::DoFHandler<dimm,spacedim>::default_fe_index),
               ExcMessage ("You need to specify a FE index when working "
                           "with hp DoFHandlers"));
       Assert (&dof_handler != 0,
@@ -372,7 +372,7 @@ namespace internal
                           "information for an object on which no such "
                           "information is available"));
 
-      if (dim == spacedim)
+      if (dim == dimm)
         {
                                            // if we are on a cell, then
                                            // the only set of indices we
@@ -420,14 +420,14 @@ namespace internal
 
 
     template <int dim>
-    template <int spacedim>
+    template <int dimm, int spacedim>
     inline
     unsigned int
     DoFObjects<dim>::
-    n_active_fe_indices (const dealii::hp::DoFHandler<spacedim> &dof_handler,
+    n_active_fe_indices (const dealii::hp::DoFHandler<dimm,spacedim> &dof_handler,
                          const unsigned int                obj_index) const
     {
-      Assert (dim <= spacedim, ExcInternalError());
+      Assert (dim <= dimm, ExcInternalError());
       Assert (&dof_handler != 0,
               ExcMessage ("No DoFHandler is specified for this iterator"));
       Assert (&dof_handler.get_fe() != 0,
@@ -446,7 +446,7 @@ namespace internal
                                        // only set of indices we store
                                        // is the one for the cell,
                                        // which is unique
-      if (dim == spacedim)
+      if (dim == dimm)
         return 1;
       else
         {
@@ -483,16 +483,16 @@ namespace internal
 
 
     template <int dim>
-    template <int spacedim>
+    template <int dimm, int spacedim>
     inline
     unsigned int
     DoFObjects<dim>::
-    nth_active_fe_index (const dealii::hp::DoFHandler<spacedim> &dof_handler,
+    nth_active_fe_index (const dealii::hp::DoFHandler<dimm,spacedim> &dof_handler,
                          const unsigned int                obj_level,
                          const unsigned int                obj_index,
                          const unsigned int                n) const
     {
-      Assert (dim <= spacedim, ExcInternalError());
+      Assert (dim <= dimm, ExcInternalError());
       Assert (&dof_handler != 0,
               ExcMessage ("No DoFHandler is specified for this iterator"));
       Assert (&dof_handler.get_fe() != 0,
@@ -509,7 +509,7 @@ namespace internal
                           "information for an object on which no such "
                           "information is available"));
 
-      if (dim == spacedim)
+      if (dim == dimm)
         {
                                            // this is a cell, so there
                                            // is only a single
@@ -563,11 +563,11 @@ namespace internal
 
 
     template <int dim>
-    template <int spacedim>
+    template <int dimm, int spacedim>
     inline
     bool
     DoFObjects<dim>::
-    fe_index_is_active (const dealii::hp::DoFHandler<spacedim> &dof_handler,
+    fe_index_is_active (const dealii::hp::DoFHandler<dimm,spacedim> &dof_handler,
                         const unsigned int                obj_index,
                         const unsigned int                fe_index,
                         const unsigned int                obj_level) const
@@ -579,7 +579,7 @@ namespace internal
                           "this DoFHandler"));
       Assert (obj_index < dof_offsets.size(),
               ExcIndexRange (obj_index, 0, dof_offsets.size()));
-      Assert (fe_index != dealii::hp::DoFHandler<spacedim>::default_fe_index,
+      Assert ((fe_index != dealii::hp::DoFHandler<dimm,spacedim>::default_fe_index),
               ExcMessage ("You need to specify a FE index when working "
                           "with hp DoFHandlers"));
       Assert (fe_index < dof_handler.get_fe().size(),
@@ -593,7 +593,7 @@ namespace internal
                           "information for an object on which no such "
                           "information is available"));
 
-      if (dim == spacedim)
+      if (dim == dimm)
         {
                                            // if we are on a cell,
                                            // then the only set of

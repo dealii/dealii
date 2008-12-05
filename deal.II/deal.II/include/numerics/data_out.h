@@ -28,7 +28,7 @@
 
 DEAL_II_NAMESPACE_OPEN
 
-template <int> class FEValuesBase;
+template <int, int> class FEValuesBase;
 
 namespace internal
 {
@@ -69,7 +69,7 @@ namespace internal
 	unsigned int n_datasets;
 	unsigned int n_subdivisions;
 	unsigned int n_patches_per_circle;
-	SmartPointer<const Mapping<dim> >              mapping;
+	SmartPointer<const Mapping<dim,spacedim> >     mapping;
 	std::vector<double>                            patch_values;
 	std::vector<Vector<double> >                   patch_values_system;
 	std::vector<Tensor<1,spacedim> >               patch_gradients;
@@ -486,7 +486,7 @@ class DataOut_DoFData : public DataOutInterface<patch_dim,patch_space_dim>
 				      */
     template <class VECTOR>
     void add_data_vector (const VECTOR                           &data,
-			  const DataPostprocessor<DH::dimension> &data_postprocessor);
+			  const DataPostprocessor<DH::space_dimension> &data_postprocessor);
 
 				     /**
 				      * Release the pointers to the
@@ -707,7 +707,7 @@ class DataOut_DoFData : public DataOutInterface<patch_dim,patch_space_dim>
 					  * vector declarations are going to
 					  * be aquired from the postprocessor.
 					  */
-	DataEntryBase (const DataPostprocessor<DH::dimension> *data_postprocessor);
+	DataEntryBase (const DataPostprocessor<DH::space_dimension> *data_postprocessor);
 	
                                          /**
                                           * Destructor made virtual.
@@ -731,7 +731,7 @@ class DataOut_DoFData : public DataOutInterface<patch_dim,patch_space_dim>
                                           */
         virtual
         void
-        get_function_values (const FEValuesBase<DH::dimension> &fe_patch_values,
+        get_function_values (const FEValuesBase<DH::dimension,DH::space_dimension> &fe_patch_values,
                              std::vector<double>             &patch_values) const = 0;
         
                                          /**
@@ -744,7 +744,7 @@ class DataOut_DoFData : public DataOutInterface<patch_dim,patch_space_dim>
                                           */
         virtual
         void
-        get_function_values (const FEValuesBase<DH::dimension> &fe_patch_values,
+        get_function_values (const FEValuesBase<DH::dimension,DH::space_dimension> &fe_patch_values,
                              std::vector<Vector<double> >    &patch_values_system) const = 0;
 
                                          /**
@@ -755,8 +755,8 @@ class DataOut_DoFData : public DataOutInterface<patch_dim,patch_space_dim>
                                           */
         virtual
         void
-        get_function_gradients (const FEValuesBase<DH::dimension> &fe_patch_values,
-				std::vector<Tensor<1,DH::dimension> >       &patch_gradients) const = 0;
+        get_function_gradients (const FEValuesBase<DH::dimension,DH::space_dimension> &fe_patch_values,
+				std::vector<Tensor<1,DH::space_dimension> >       &patch_gradients) const = 0;
         
                                          /**
                                           * Given a FEValuesBase object,
@@ -768,8 +768,8 @@ class DataOut_DoFData : public DataOutInterface<patch_dim,patch_space_dim>
                                           */
         virtual
         void
-        get_function_gradients (const FEValuesBase<DH::dimension> &fe_patch_values,
-				std::vector<std::vector<Tensor<1,DH::dimension> > > &patch_gradients_system) const = 0;
+        get_function_gradients (const FEValuesBase<DH::dimension,DH::space_dimension> &fe_patch_values,
+				std::vector<std::vector<Tensor<1,DH::space_dimension> > > &patch_gradients_system) const = 0;
 
                                          /**
                                           * Given a FEValuesBase object, extract
@@ -779,8 +779,8 @@ class DataOut_DoFData : public DataOutInterface<patch_dim,patch_space_dim>
                                           */
         virtual
         void
-        get_function_hessians (const FEValuesBase<DH::dimension> &fe_patch_values,
-			       std::vector<Tensor<2,DH::dimension> >       &patch_hessians) const = 0;
+        get_function_hessians (const FEValuesBase<DH::dimension,DH::space_dimension> &fe_patch_values,
+			       std::vector<Tensor<2,DH::space_dimension> >       &patch_hessians) const = 0;
         
                                          /**
                                           * Given a FEValuesBase object, extract
@@ -792,8 +792,8 @@ class DataOut_DoFData : public DataOutInterface<patch_dim,patch_space_dim>
                                           */
         virtual
         void
-        get_function_hessians (const FEValuesBase<DH::dimension> &fe_patch_values,
-			       std::vector<std::vector< Tensor<2,DH::dimension> > > &patch_hessians_system) const = 0;
+        get_function_hessians (const FEValuesBase<DH::dimension,DH::space_dimension> &fe_patch_values,
+			       std::vector<std::vector< Tensor<2,DH::space_dimension> > > &patch_hessians_system) const = 0;
 
                                          /**
                                           * Clear all references to the
@@ -830,7 +830,7 @@ class DataOut_DoFData : public DataOutInterface<patch_dim,patch_space_dim>
 					  * object which shall be applied to
 					  * this data vector.
 					  */
-	SmartPointer<const DataPostprocessor<DH::dimension> > postprocessor;
+	SmartPointer<const DataPostprocessor<DH::space_dimension> > postprocessor;
 
 					 /**
 					  * Number of output variables this
@@ -879,7 +879,7 @@ class DataOut_DoFData : public DataOutInterface<patch_dim,patch_space_dim>
 					  * be aquired from the postprocessor.
 					  */
 	DataEntry (const VectorType                       *data,
-		   const DataPostprocessor<DH::dimension> *data_postprocessor);
+		   const DataPostprocessor<DH::space_dimension> *data_postprocessor);
 
                                          /**
                                           * Assuming that the stored vector is
@@ -898,7 +898,7 @@ class DataOut_DoFData : public DataOutInterface<patch_dim,patch_space_dim>
                                           */
         virtual
         void
-        get_function_values (const FEValuesBase<DH::dimension> &fe_patch_values,
+        get_function_values (const FEValuesBase<DH::dimension,DH::space_dimension> &fe_patch_values,
                              std::vector<double>             &patch_values) const;
         
                                          /**
@@ -911,7 +911,7 @@ class DataOut_DoFData : public DataOutInterface<patch_dim,patch_space_dim>
                                           */
         virtual
         void
-        get_function_values (const FEValuesBase<DH::dimension> &fe_patch_values,
+        get_function_values (const FEValuesBase<DH::dimension,DH::space_dimension> &fe_patch_values,
                              std::vector<Vector<double> >    &patch_values_system) const;
 
                                          /**
@@ -922,8 +922,8 @@ class DataOut_DoFData : public DataOutInterface<patch_dim,patch_space_dim>
                                           */
         virtual
         void
-        get_function_gradients (const FEValuesBase<DH::dimension> &fe_patch_values,
-				std::vector<Tensor<1,DH::dimension> >       &patch_gradients) const;
+        get_function_gradients (const FEValuesBase<DH::dimension,DH::space_dimension> &fe_patch_values,
+				std::vector<Tensor<1,DH::space_dimension> >       &patch_gradients) const;
         
                                          /**
                                           * Given a FEValuesBase object,
@@ -935,8 +935,8 @@ class DataOut_DoFData : public DataOutInterface<patch_dim,patch_space_dim>
                                           */
         virtual
         void
-        get_function_gradients (const FEValuesBase<DH::dimension> &fe_patch_values,
-				std::vector<std::vector<Tensor<1,DH::dimension> > > &patch_gradients_system) const;
+        get_function_gradients (const FEValuesBase<DH::dimension,DH::space_dimension> &fe_patch_values,
+				std::vector<std::vector<Tensor<1,DH::space_dimension> > > &patch_gradients_system) const;
 
                                          /**
                                           * Given a FEValuesBase object, extract
@@ -946,8 +946,8 @@ class DataOut_DoFData : public DataOutInterface<patch_dim,patch_space_dim>
                                           */
         virtual
         void
-        get_function_hessians (const FEValuesBase<DH::dimension> &fe_patch_values,
-			       std::vector<Tensor<2,DH::dimension> >       &patch_hessians) const;
+        get_function_hessians (const FEValuesBase<DH::dimension,DH::space_dimension> &fe_patch_values,
+			       std::vector<Tensor<2,DH::space_dimension> >       &patch_hessians) const;
         
                                          /**
                                           * Given a FEValuesBase object, extract
@@ -959,8 +959,8 @@ class DataOut_DoFData : public DataOutInterface<patch_dim,patch_space_dim>
                                           */
         virtual
         void
-        get_function_hessians (const FEValuesBase<DH::dimension> &fe_patch_values,
-			       std::vector<std::vector< Tensor<2,DH::dimension> > > &patch_hessians_system) const;
+        get_function_hessians (const FEValuesBase<DH::dimension,DH::space_dimension> &fe_patch_values,
+			       std::vector<std::vector< Tensor<2,DH::space_dimension> > > &patch_hessians_system) const;
 
                                          /**
                                           * Clear all references to the
@@ -1160,7 +1160,7 @@ class DataOut_DoFData : public DataOutInterface<patch_dim,patch_space_dim>
  * @author Wolfgang Bangerth, 1999
  */
 template <int dim, class DH=DoFHandler<dim> >
-class DataOut : public DataOut_DoFData<DH, DH::dimension> 
+class DataOut : public DataOut_DoFData<DH, DH::dimension, DH::space_dimension> 
 {
   public:
 				     /**
@@ -1168,8 +1168,8 @@ class DataOut : public DataOut_DoFData<DH, DH::dimension>
 				      * of the dof handler class under
 				      * consideration.
 				      */
-    typedef typename DataOut_DoFData<DH,DH::dimension>::cell_iterator cell_iterator;
-    typedef typename DataOut_DoFData<DH,DH::dimension>::active_cell_iterator active_cell_iterator;
+    typedef typename DataOut_DoFData<DH,DH::dimension,DH::space_dimension>::cell_iterator cell_iterator;
+    typedef typename DataOut_DoFData<DH,DH::dimension,DH::space_dimension>::active_cell_iterator active_cell_iterator;
 
 				     /**
 				      * Enumeration describing the region of the
@@ -1261,7 +1261,7 @@ class DataOut : public DataOut_DoFData<DH, DH::dimension>
 				      * replaced by a hp::MappingCollection in
 				      * case of a hp::DoFHandler.
 				      */
-    virtual void build_patches (const Mapping<DH::dimension> &mapping,
+  virtual void build_patches (const Mapping<DH::dimension,DH::space_dimension> &mapping,
 				const unsigned int n_subdivisions = 0,
 				const unsigned int n_threads      = multithread_info.n_default_threads,
 				const CurvedCellRegion curved_region = curved_boundary);
@@ -1308,7 +1308,6 @@ class DataOut : public DataOut_DoFData<DH, DH::dimension>
 		    << ", is not valid.");
     
   private:
-
 				     /**
 				      * Builds every @p n_threads's
 				      * patch. This function may be
@@ -1317,7 +1316,7 @@ class DataOut : public DataOut_DoFData<DH, DH::dimension>
 				      * used, the function is called
 				      * once and generates all patches.
 				      */
-    void build_some_patches (internal::DataOut::ParallelData<DH::dimension, DH::dimension> &data);
+    void build_some_patches (internal::DataOut::ParallelData<DH::dimension, DH::space_dimension> &data);
 
 				     /**
 				      * Store in which region cells shall be

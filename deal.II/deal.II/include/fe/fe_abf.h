@@ -26,7 +26,7 @@
 
 DEAL_II_NAMESPACE_OPEN
 
-template <int dim> class MappingQ;
+template <int dim, int spacedim> class MappingQ;
 
 
 /*!@addtogroup fe */
@@ -47,6 +47,9 @@ template <int dim> class MappingQ;
  * convergence rates deteriorate on these meshes. As a solution the
  * authors propose the ABF elements, which are implemented in this
  * module.
+ *
+ * This class is not implemented for the codimension one case
+ * (<tt>spacedim != dim</tt>).
  *
  * @todo Even if this element is implemented for two and three space
  * dimensions, the definition of the node values relies on

@@ -230,10 +230,9 @@ class Tensor
     void clear ();
 
 				     /**
-				      * Determine an estimate for
-				      * the memory consumption (in
-				      * bytes) of this
-				      * object.
+				      * Determine an estimate for the
+				      * memory consumption (in bytes)
+				      * of this object.
 				      */
     static unsigned int memory_consumption ();
 

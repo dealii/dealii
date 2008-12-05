@@ -33,10 +33,10 @@ DEAL_II_NAMESPACE_OPEN
 
 
 
-template <int dim>
+template <int dim, int spacedim>
 void MGTransferComponentBase::build_matrices (
-  const DoFHandler<dim>&,
-  const MGDoFHandler<dim>& mg_dof)
+  const DoFHandler<dim,spacedim>&,
+  const MGDoFHandler<dim,spacedim>& mg_dof)
 {
 				   // Fill target component with
 				   // standard values (identity) if it
@@ -114,7 +114,7 @@ void MGTransferComponentBase::build_matrices (
 
   component_start.resize(target_component.size());
   DoFTools::
-    count_dofs_per_component (static_cast<const DoFHandler<dim>&>(mg_dof),
+    count_dofs_per_component (static_cast<const DoFHandler<dim,spacedim>&>(mg_dof),
                               component_start, true, target_component);
 
   unsigned int k=0;
@@ -196,7 +196,7 @@ void MGTransferComponentBase::build_matrices (
 
       prolongation_sparsities[level]->collect_sizes();
       
-      for (typename MGDoFHandler<dim>::cell_iterator cell=mg_dof.begin(level);
+      for (typename MGDoFHandler<dim,spacedim>::cell_iterator cell=mg_dof.begin(level);
 	   cell != mg_dof.end(level); ++cell)
 	if (cell->has_children())
 	  {
@@ -233,7 +233,7 @@ void MGTransferComponentBase::build_matrices (
 
       prolongation_matrices[level]->reinit (*prolongation_sparsities[level]);
 				       // now actually build the matrices
-      for (typename MGDoFHandler<dim>::cell_iterator cell=mg_dof.begin(level);
+      for (typename MGDoFHandler<dim,spacedim>::cell_iterator cell=mg_dof.begin(level);
 	   cell != mg_dof.end(level); ++cell)
 	if (cell->has_children())
 	  {
@@ -269,10 +269,10 @@ void MGTransferComponentBase::build_matrices (
 
 
 template <typename number>
-template <int dim>
+template <int dim, int spacedim>
 void MGTransferSelect<number>::build_matrices (
-  const DoFHandler<dim> &dof,
-  const MGDoFHandler<dim> &mg_dof,
+  const DoFHandler<dim,spacedim> &dof,
+  const MGDoFHandler<dim,spacedim> &mg_dof,
   unsigned int select,
   unsigned int mg_select,
   const std::vector<unsigned int>& t_component,
@@ -317,16 +317,16 @@ void MGTransferSelect<number>::build_matrices (
   std::vector<unsigned int> level_dof_indices  (fe.dofs_per_cell);
   for (int level=dof.get_tria().n_levels()-1; level>=0; --level)
     {
-      typename MGDoFHandler<dim>::active_cell_iterator
+      typename MGDoFHandler<dim,spacedim>::active_cell_iterator
 	level_cell = mg_dof.begin_active(level);
-      const typename MGDoFHandler<dim>::active_cell_iterator
+      const typename MGDoFHandler<dim,spacedim>::active_cell_iterator
 	level_end  = mg_dof.end_active(level);
       
 				       // Compute coarse level right hand side
 				       // by restricting from fine level.
       for (; level_cell!=level_end; ++level_cell)
 	{
-	  DoFObjectAccessor<dim, DoFHandler<dim> >& global_cell = *level_cell;
+	  DoFAccessor<dim, DoFHandler<dim,spacedim> >& global_cell = *level_cell;
 					   // get the dof numbers of
 					   // this cell for the global
 					   // and the level-wise

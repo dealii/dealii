@@ -25,7 +25,7 @@
 DEAL_II_NAMESPACE_OPEN
 
 template <class Object> class MGLevelObject;
-template <int dim> class MGDoFHandler;
+template <int dim, int spacedim> class MGDoFHandler;
 template <typename number> class Vector;
 template <typename number> class SparseMatrix;
 template <typename number> class BlockVector;
@@ -56,10 +56,10 @@ class MGTools
 				      * Compute row length vector for
 				      * multilevel methods.
 				      */
-    template <int dim>
+    template <int dim, int spacedim>
     static
     void compute_row_length_vector(
-      const MGDoFHandler<dim>& dofs,
+      const MGDoFHandler<dim,spacedim>& dofs,
       const unsigned int level,
       std::vector<unsigned int>& row_lengths,
       const DoFTools::Coupling flux_couplings = DoFTools::none);
@@ -70,10 +70,10 @@ class MGTools
 				      * optimization for block
 				      * couplings.
 				      */
-    template <int dim>
+    template <int dim, int spacedim>
     static
     void compute_row_length_vector(
-      const MGDoFHandler<dim>& dofs,
+      const MGDoFHandler<dim,spacedim>& dofs,
       const unsigned int level,
       std::vector<unsigned int>& row_lengths,
       const Table<2,DoFTools::Coupling>& couplings,
@@ -93,9 +93,9 @@ class MGTools
 				      * hanging nodes here, since only
 				      * one level is considered.
 				      */
-    template <int dim, class SparsityPattern>
+    template <int dim, class SparsityPattern, int spacedim>
     static void
-    make_sparsity_pattern (const MGDoFHandler<dim> &dof_handler,
+    make_sparsity_pattern (const MGDoFHandler<dim,spacedim> &dof_handler,
 			   SparsityPattern         &sparsity,
 			   const unsigned int       level);
 
@@ -105,9 +105,9 @@ class MGTools
 				      * @ref make_sparsity_pattern
 				      * @ref DoFTools
 				      */
-    template <int dim, class SparsityPattern>
+    template <int dim, class SparsityPattern, int spacedim>
     static void
-    make_flux_sparsity_pattern (const MGDoFHandler<dim> &dof_handler,
+    make_flux_sparsity_pattern (const MGDoFHandler<dim,spacedim> &dof_handler,
 				SparsityPattern         &sparsity,
 				const unsigned int       level);
 
@@ -121,9 +121,9 @@ class MGTools
 				      *
 				      * make_flux_sparsity_pattern()
 				      */
-    template <int dim, class SparsityPattern>
+    template <int dim, class SparsityPattern, int spacedim>
     static void
-    make_flux_sparsity_pattern_edge (const MGDoFHandler<dim> &dof_handler,
+    make_flux_sparsity_pattern_edge (const MGDoFHandler<dim,spacedim> &dof_handler,
 				     SparsityPattern         &sparsity,
 				     const unsigned int       level);
 
@@ -144,9 +144,9 @@ class MGTools
 				      * for the couplings occuring in
 				      * fluxes.
 				      */
-    template <int dim, class SparsityPattern>
+    template <int dim, class SparsityPattern, int spacedim>
     static void
-    make_flux_sparsity_pattern (const MGDoFHandler<dim> &dof,
+    make_flux_sparsity_pattern (const MGDoFHandler<dim,spacedim> &dof,
 				SparsityPattern       &sparsity,
 				const unsigned int level,
 				const Table<2,DoFTools::Coupling> &int_mask,
@@ -164,9 +164,9 @@ class MGTools
 				      *
 				      * make_flux_sparsity_pattern()
 				      */
-    template <int dim, class SparsityPattern>
+    template <int dim, class SparsityPattern, int spacedim>
     static void
-    make_flux_sparsity_pattern_edge (const MGDoFHandler<dim> &dof_handler,
+    make_flux_sparsity_pattern_edge (const MGDoFHandler<dim,spacedim> &dof_handler,
 				     SparsityPattern         &sparsity,
 				     const unsigned int       level,
 				     const Table<2,DoFTools::Coupling> &flux_mask);
@@ -181,9 +181,9 @@ class MGTools
 				      * for each block (access is
 				      * <tt>result[level][block]</tt>).
 				      */
-    template <int dim>
+    template <int dim, int spacedim>
       static void count_dofs_per_block (
-	const MGDoFHandler<dim> &mg_dof,
+	const MGDoFHandler<dim,spacedim> &mg_dof,
 	std::vector<std::vector<unsigned int> > &result,
 	std::vector<unsigned int> target_block = std::vector<unsigned int>());
 
@@ -197,9 +197,9 @@ class MGTools
 				      * for each component (access is
 				      * <tt>result[level][component]</tt>).
 				      */
-    template <int dim>
+    template <int dim, int spacedim>
       static void count_dofs_per_component (
-	const MGDoFHandler<dim> &mg_dof,
+	const MGDoFHandler<dim,spacedim> &mg_dof,
 	std::vector<std::vector<unsigned int> > &result,
 	const bool only_once = false,
 	std::vector<unsigned int> target_component = std::vector<unsigned int>());
@@ -209,9 +209,9 @@ class MGTools
 				      * other function with same name,
 				      * introduced for compatibility.
 				      */
-    template <int dim>
+    template <int dim, int spacedim>
       static void count_dofs_per_component (
-	const MGDoFHandler<dim> &mg_dof,
+	const MGDoFHandler<dim,spacedim> &mg_dof,
 	std::vector<std::vector<unsigned int> > &result,
 	std::vector<unsigned int> target_component);
 
@@ -237,9 +237,9 @@ class MGTools
 				      * length has to match the number
 				      * of levels.
 				      */
-    template <int dim>
+    template <int dim, int spacedim>
     static void make_boundary_list(
-      const MGDoFHandler<dim>& mg_dof,
+      const MGDoFHandler<dim,spacedim>& mg_dof,
       const typename FunctionMap<dim>::type& function_map,
       std::vector<std::set<unsigned int> >& boundary_indices,
       const std::vector<bool>& component_mask = std::vector<bool>());
@@ -264,9 +264,9 @@ class MGTools
 				      * @p reinit each level vector
 				      * to this length.
 				      */
-    template <int dim, typename number>
+    template <int dim, typename number, int spacedim>
       static void
-      reinit_vector (const MGDoFHandler<dim> &mg_dof,
+      reinit_vector (const MGDoFHandler<dim,spacedim> &mg_dof,
 		     MGLevelObject<Vector<number> > &vector);
 
 				     /**
@@ -277,9 +277,9 @@ class MGTools
 				      * @p reinit each level vector
 				      * to this length.
 				      */
-    template <int dim, typename number>
+    template <int dim, typename number, int spacedim>
       static void
-      reinit_vector (const MGDoFHandler<dim> &mg_dof,
+      reinit_vector (const MGDoFHandler<dim,spacedim> &mg_dof,
 		     MGLevelObject<BlockVector<number> > &vector);
 
 
@@ -290,10 +290,10 @@ class MGTools
 				      * counted by block and only the
 				      * block selected is used.
 				      */
-    template <int dim, typename number>
+    template <int dim, typename number, int spacedim>
     static void
     reinit_vector_by_blocks (
-      const MGDoFHandler<dim> &mg_dof,
+      const MGDoFHandler<dim,spacedim> &mg_dof,
       MGLevelObject<Vector<number> > &v,
       const unsigned int selected,
       std::vector<std::vector<unsigned int> >& cached_sizes);
@@ -304,10 +304,10 @@ class MGTools
 				      * degrees of freedom on each
 				      * level are counted by block.
 				      */
-    template <int dim, typename number>
+    template <int dim, typename number, int spacedim>
     static void
     reinit_vector_by_blocks (
-      const MGDoFHandler<dim> &mg_dof,
+      const MGDoFHandler<dim,spacedim> &mg_dof,
       MGLevelObject<BlockVector<number> > &v,
       const std::vector<bool> &selected,
       std::vector<std::vector<unsigned int> >& cached_sizes);
@@ -346,9 +346,9 @@ class MGTools
 				      *
 				      * 
 				      */
-    template <int dim, typename number>
+    template <int dim, typename number, int spacedim>
       static void
-      reinit_vector_by_components (const MGDoFHandler<dim>& mg_dof,
+      reinit_vector_by_components (const MGDoFHandler<dim,spacedim>& mg_dof,
 				   MGLevelObject<BlockVector<number> >& v,
 				   const std::vector<bool>& selected,
 				   const std::vector<unsigned int>& target_component,
@@ -379,10 +379,10 @@ class MGTools
 				      * as in
 				      * DoFRenumbering::component_wise.
 				      */
-    template <int dim, typename number>
+    template <int dim, typename number, int spacedim>
       static void
       reinit_vector_by_components (
-	const MGDoFHandler<dim> &mg_dof,
+	const MGDoFHandler<dim,spacedim> &mg_dof,
 	MGLevelObject<Vector<number> > &v,
 	const std::vector<bool> &selected,
 	const std::vector<unsigned int> &target_component,

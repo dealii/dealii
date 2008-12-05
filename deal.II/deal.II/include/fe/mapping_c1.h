@@ -34,11 +34,15 @@ DEAL_II_NAMESPACE_OPEN
  * To use this class, make sure that the
  * Boundary::@p get_normals_at_vertices function is implemented
  * for the users boundary object.
+ * 
+ * For more information about the <tt>spacedim</tt> template parameter
+ * check the documentation of FiniteElement or the one of
+ * Triangulation.
  *
  * @author Wolfgang Bangerth, 2001
  */
-template <int dim>
-class MappingC1 : public MappingQ<dim>
+template<int dim, int spacedim=dim>
+class MappingC1 : public MappingQ<dim,spacedim>
 {
   public:
 				     /**
@@ -57,7 +61,7 @@ class MappingC1 : public MappingQ<dim>
                                       * copy then assumes ownership of it.
                                       */
     virtual
-    Mapping<dim> * clone () const;
+    Mapping<dim,spacedim> * clone () const;
 
   protected:
 				     /**

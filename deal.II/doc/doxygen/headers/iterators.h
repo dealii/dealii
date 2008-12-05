@@ -11,14 +11,18 @@ somethings in common. In fact, these iterators are instantiations or
 subclasses of the same class TriaIterator (we do not include TriaRawIterator
 here, since it is only for %internal use).
 
-The template signature of TriaIterator is
+Basically, the template signature of TriaIterator is
 @code
-  TriaIterator<dim, Accessor>
-@endcode 
+  TriaIterator<Accessor>
+@endcode
 
-Usually, you will not use this definition directly, but employ one of the
-typedefs below. Before going into this, let us first discuss the concept of
-iterators, before delving into what the accessors do.
+Conceptually, this type represents something like a pointer to an object
+represented by the <code>Accessor</code> class.  Usually, you will not use the
+actual class names spelled out directly, but employ one of the typedefs
+provided by the container classes, such as <code>typename
+Triangulation@<dim@>::cell_iterator</code>. Before going into this, let us
+first discuss the concept of iterators, before delving into what the accessors
+do.
 
 As usual in C++, iterators, just as pointers, are incremented to the next
 element using <tt>operator ++</tt>, and decremented to the previous element
@@ -33,7 +37,7 @@ as <tt>begin_active()</tt>, <tt>begin_face()</tt>, etc.
 
 In terms of the concepts for iterators defined in the C++ standard, the
 deal.II mesh iterators are bi-directional iterators: they can be incremented
-and decremented, but an operation like <tt>it=it+n</tt> takes a computing time
+and decremented, but an operation like <tt>it=it+n</tt> takes a compute time
 proportional to <tt>n</tt>, since it is implemented as a sequence of
 <tt>n</tt> individual unit increments. Note that this is in contrast to the
 next more specialized iterator concept, random access iterators, for which
@@ -44,9 +48,7 @@ access to an arbitrary object requires only constant time, rather than linear.
 
 As mentioned above, iterators in deal.II can be considered as iterating over
 all the objects that constitute a mesh. (These objects are lines, quads, and
-hexes, and are each represented by a different kind of Accessor class; this
-accessor is the second template argument in the code example above, and are
-discussed in more detail below.) This suggests to view a triangulation as a
+hexes, and are represented by the type of Accessor class given as template argument to the iterator.) This suggests to view a triangulation as a
 collection of cells and other objects that are held together by a certain data
 structure that links all these objects, in the same was as a linked list is
 the data structure that connects objects in a linear fashion.
@@ -57,7 +59,7 @@ data. This can be understood as follows: Consider the cells of the coarse mesh
 as roots; then, if one of these coarse mesh cells is refined, it will have
 2<sup>dim</sup> children, which in turn can, but do not have to have
 2<sup>dim</sup> children of their own, and so on. This means, that each cell
-of the coarse mesh can be considered the root of a binary tree (in qd), a
+of the coarse mesh can be considered the root of a binary tree (in 1d), a
 quadtree (in 2d), or an octree (in 3d). The collection of these trees
 emanating from the cells of the coarse mesh then constitutes the forest that
 completely describes the triangulation, including all of its active and
@@ -72,7 +74,7 @@ or 8 children). Depending on the dimension, these objects are also termed
 cells or faces.
 
 Iterators loop over the elements of such forests. While the usual iterators
-loop over all nodes of a forest, active iterators skip iterate over the
+loop over all nodes of a forest, active iterators iterate over the
 elements in the same order, but skip all non-active entries and therefore only
 visit terminal nodes (i.e. active cells, faces, etc). There are many ways to
 traverse the elements of a forest, for example breadth first or depth
@@ -95,21 +97,21 @@ Iterators have two properties: what they point to (i.e. the type of the
 Accessor template argument), and the exact definition of the set they iterate
 over. In general, iterators are always declared as
 @code
-  KindIterator<dim,Accessor>
+  KindIterator<Accessor>
 @endcode
 
 Here, <tt>Kind</tt> determines what property an accessor needs to have to be
 reached by this iterator (or omitted, for that matter). For example,
 @code
-  Iterator<dim,Accessor>
+  Iterator<Accessor>
 @endcode
 iterates over all objects of kind Accessor that make up the mesh (for example
 all cells, whether they are further refined and have children, or not), whereas
 @code
-  ActiveIterator<dim,Accessor>
+  ActiveIterator<Accessor>
 @endcode
 skips all objects that have children, i.e. objects that are not active.
-Active iterators therefore operate on a strict subset of the objects
+Active iterators therefore operate on a subset of the objects
 that normal iterators act on, namely those that possess the property that
 they are active. Note that this is independent of the kind of object we
 are operating on: all valid accessor classes have to provide the iterator
@@ -118,7 +120,7 @@ classes a method to find out whether they are active or not.
 (For completeness, let us mention that there is a third kind of iterators: "raw
 iterators" also traverse objects that are unused in the triangulation, but
 allocated anyway for efficiency reasons. User code should never use raw
-iterators, they are only for internal purposes of the library.)
+iterators, they are only for %internal purposes of the library.)
 
 Whether an object is active can be considered a "predicate": a property that
 is either true or false. Filtered iterators can be used to restrict the scope
@@ -147,9 +149,9 @@ order. Take this code example:
   DoFHandler<dim>    dof1(tria);
   DoFHandler<dim>    dof2(tria);
   ...
-  typename Trianguation<dim>::cell_iterator ti  = tria.active();
-  typename DoFHandler<dim>::cell_iterator   di1 = dof1.active();
-  typename DoFHandler<dim>::cell_iterator   di2 = dof2.active();
+  typename Trianguation<dim>::cell_iterator ti  = tria.begin();
+  typename DoFHandler<dim>::cell_iterator   di1 = dof1.begin();
+  typename DoFHandler<dim>::cell_iterator   di2 = dof2.begin();
   ...
   while (ti != tria.end())
   {
@@ -170,7 +172,7 @@ assume any such order, but rather consider this an implementation detail
 of the library.
 
 Corresponding to above example, the order in which iterators traverse active
-objects is the same for all iterators in the following snippet:
+objects is the same for all iterators in the following snippet, the difference to the previous example being that here we only consider active cells:
 @code
   typename Trianguation<dim>::active_cell_iterator ti  = tria.begin_active();
   typename DoFHandler<dim>::active_cell_iterator   di1 = dof1.begin_active();
@@ -201,8 +203,9 @@ arrays and tables and lists that the Triangulation class sets up to describe a
 mesh.
 
 Accessing data that characterizes a cell is always done through the Accessor,
-i.e. the expression <tt>i-&gt;</tt> grants access to <b>all</b> attributes of
-this Accessor. Examples of properties you can query from an iterator are
+i.e. the expression <code>i-&gt;xxx()</code> grants access to <b>all</b>
+attributes of this Accessor. Examples of properties you can query from an
+iterator are
 @code
   cell->vertex(1);
   line->child(0);
@@ -211,17 +214,52 @@ this Accessor. Examples of properties you can query from an iterator are
   face->boundary_indicator();
 @endcode
 
-Since dereferencing iterators yields accessor objects, these member functions
-are declared in documented in the hierarchy of <code>TriaObjectAccessor</code>,
-<code>CellAccessor</code>, <code>DoFObjectAccessor</code>,
-<code>DoFCellAccessor</code>, <code>MGDoFObjectAccessor</code>, and
-<code>MGDoFCellAccessor</code> classes. 
+Since dereferencing iterators yields accessor objects, these calls are to
+member functions <code>Accesor::vertex()</code>,
+<code>Accessor::child()</code> etc. These in turn figure out the relevant data
+from the various data structures that store this data. How this is actually
+done and what data structures are used is not really of concern to authors of
+applications in deal.II. In particular, by hiding the actual data structures
+we are able to store data in an efficient way, not necessarily in a way that
+makes it easily accessible or understandable to application writers.
 
 
-@section IteratorsTypedefs Iterators defined in the deal.II containers
 
-Several classes in deal.II typedef iterators inside their class declarations.
-The normal iterator types and calls to get them for cells and faces are:
+@section IteratorsTypedefs Kinds of accessors
+
+Depending on what sort of data you want to access, there are different kinds
+of accessor classes:
+
+- The TriaAccessor class provides you with data that identifies the geometric
+  properties of cells, faces, lines, quads, and hexes that make up a
+  triangulation, as well as mother-child relationships.
+
+- The CellAccessor class is derived from the TriaAccessor class for cases
+  where an object has full dimension, i.e. is a cell rather than for example a
+  line bounding a cell. In that case, additional information about the
+  topological connection of a mesh is available from an accessor such as to
+  request iterators pointing to neighbors of a cell.
+
+- The DoFAccessor class lets you access information related to degrees of
+  freedom associated with cells, faces, etc; it does so for both DoFHandler
+  and hp::DoFHandler objects. Note that the DoFAccessor class is derived from
+  either TriaAccessor or CellAccessor (depending on whether the DoFAccessor
+  points to an object of full dimension or not) and so is able to provide a
+  superset of information over its base classes.
+
+- The DoFCellAccessor class has the same purpose and relation to
+  DoFCellAccessor as the CellAccessor has to TriaAccessor.
+
+- The MGDoFAccessor and MFCellDoFAccessor give access to the multilevel degree
+  of freedom information associated with MGDoFHandler objects. As before,
+  since the MGDoFHandler extends the data structures of regular DoFHandler
+  objects, the MGDoFAccessor is also derived from the DoFAccessor (or
+  DoFCellAccessor) class to provide a superset of information.
+
+Except to look up member documentation, you will not usually have to deal with
+the actual class names listed above. Rather, one uses the typedefs provided by
+the container classes Triangulation, DoFHandler, hp::DoFHandler and
+MGDoFHandler, as well as the function that generate such objects:
 
 <table border=1>
   <tr>
@@ -232,25 +270,25 @@ The normal iterator types and calls to get them for cells and faces are:
   
   <tr>
     <th>Triangulation</th>
-    <td>TriaIterator&lt;dim, CellAccessor&lt;dim&gt; &gt;</td>
+    <td>typename Triangulation@<dim,spacedim@>::cell_iterator</td>
     <td>triangulation.begin()</td>
   </tr>
 
   <tr>
     <th>DoFHandler</th>
-    <td>TriaIterator&lt;dim, DoFCellAccessor&lt; ::DoFHandler&lt;dim&gt; &gt; &gt;</td>
+    <td>typename DoFHandler@<dim,spacedim@>::cell_iterator</td>
     <td>dof_handler.begin()</td>
   </tr>
 
   <tr>
     <th>hp::DoFHandler</th>
-    <td>TriaIterator&lt;dim, DoFCellAccessor&lt;hp::DoFHandler&lt;dim&gt; &gt; &gt;</td>
+    <td>typename hp::DoFHandler@<dim,spacedim@>::cell_iterator</td>
     <td>hp_dof_handler.begin()</td>
   </tr>
 
   <tr>
     <th>MGDoFHandler</th>
-    <td>TriaIterator&lt;dim, MGDoFCellAccessor&lt;dim&gt; &gt;</td>
+    <td>typename MGDoFHandler@<dim,spacedim@>::cell_iterator</td>
     <td>mg_dof_handler.begin()</td>
   </tr>
 </table>
@@ -265,59 +303,60 @@ The normal iterator types and calls to get them for cells and faces are:
   
   <tr>
     <th>Triangulation</th>
-    <td>TriaIterator&lt;dim, TriaObjectAccessor&lt;dim-1, dim&gt; &gt;</td>
+    <td>typename Triangulation@<dim,spacedim@>::face_iterator</td>
     <td>triangulation.begin_face()</td>
   </tr>
 
   <tr>
     <th>DoFHandler</th>
-    <td>TriaIterator&lt;dim, DoFObjectAccessor&lt;dim-1, ::DoFHandler&lt;dim&gt; &gt; &gt;</td>
+    <td>typename DoFHandler@<dim,spacedim@>::face_iterator</td>
     <td>dof_handler.begin_face()</td>
   </tr>
 
   <tr>
     <th>hp::DoFHandler</th>
-    <td>TriaIterator&lt;dim, DoFObjectAccessor&lt;dim-1, hp::DoFHandler&lt;dim&gt; &gt; &gt;</td>
+    <td>typename hp::DoFHandler@<dim,spacedim@>::face_iterator</td>
     <td>hp_dof_handler.begin_face()</td>
   </tr>
 
   <tr>
     <th>MGDoFHandler</th>
-    <td>TriaIterator&lt;dim, MGDoFObjectAccessor&lt;dim-1, dim&gt; &gt;</td>
+    <td>typename MGDoFHandler@<dim,spacedim@>::face_iterator</td>
     <td>mg_dof_handler.begin_face()</td>
   </tr>
 </table>
 
 
-Likewise, active iterators are as follows:
+Likewise, active iterators have the following properties:
+
 <table border=1>
   <tr>
     <th>Container</th>
-    <th>active_cell_iterator type</th>
+    <th>cell_iterator type</th>
     <th>function call</th>
   </tr>
   
   <tr>
     <th>Triangulation</th>
-    <td>TriaActiveIterator&lt;dim, TriaCellAccessor&lt;dim&gt; &gt;</td>
+    <td>typename Triangulation@<dim,spacedim@>::active_cell_iterator</td>
     <td>triangulation.begin_active()</td>
   </tr>
 
   <tr>
     <th>DoFHandler</th>
-    <td>TriaActiveIterator&lt;dim, DoFCellAccessor&lt; ::DoFHandler&lt;dim&gt; &gt; &gt;</td>
+    <td>typename DoFHandler@<dim,spacedim@>::active_cell_iterator</td>
     <td>dof_handler.begin_active()</td>
   </tr>
 
   <tr>
     <th>hp::DoFHandler</th>
-    <td>TriaActiveIterator&lt;dim, DoFCellAccessor&lt;hp::DoFHandler&lt;dim&gt; &gt; &gt;</td>
+    <td>typename hp::DoFHandler@<dim,spacedim@>::active_cell_iterator</td>
     <td>hp_dof_handler.begin_active()</td>
   </tr>
 
   <tr>
     <th>MGDoFHandler</th>
-    <td>TriaActiveIterator&lt;dim, MGDoFCellAccessor&lt;dim&gt; &gt;</td>
+    <td>typename MGDoFHandler@<dim,spacedim@>::active_cell_iterator</td>
     <td>mg_dof_handler.begin_active()</td>
   </tr>
 </table>
@@ -326,46 +365,65 @@ Likewise, active iterators are as follows:
 <table border=1>
   <tr>
     <th>Container</th>
-    <th>active_face_iterator type</th>
+    <th>face_iterator type</th>
     <th>function call</th>
   </tr>
   
   <tr>
     <th>Triangulation</th>
-    <td>TriaActiveIterator&lt;dim, TriaObjectAccessor&lt;dim-1, dim&gt; &gt;</td>
+    <td>typename Triangulation@<dim,spacedim@>::active_face_iterator</td>
     <td>triangulation.begin_active_face()</td>
   </tr>
 
   <tr>
     <th>DoFHandler</th>
-    <td>TriaActiveIterator&lt;dim, DoFObjectAccessor&lt;dim-1, ::DoFHandler&lt;dim&gt; &gt; &gt;</td>
+    <td>typename DoFHandler@<dim,spacedim@>::active_face_iterator</td>
     <td>dof_handler.begin_active_face()</td>
   </tr>
 
   <tr>
     <th>hp::DoFHandler</th>
-    <td>TriaActiveIterator&lt;dim, DoFObjectAccessor&lt;dim-1, hp::DoFHandler&lt;dim&gt; &gt; &gt;</td>
+    <td>typename hp::DoFHandler@<dim,spacedim@>::active_face_iterator</td>
     <td>hp_dof_handler.begin_active_face()</td>
   </tr>
 
   <tr>
     <th>MGDoFHandler</th>
-    <td>TriaActiveIterator&lt;dim, MGDoFObjectAccessor&lt;dim-1, dim&gt; &gt;</td>
+    <td>typename MGDoFHandler@<dim,spacedim@>::active_face_iterator</td>
     <td>mg_dof_handler.begin_active_face()</td>
   </tr>
 </table>
 
+
 In addition to these types and calls that act on cells and faces (logical
 concepts that depend on the dimension: a cell is a quadrilateral in 2d, but
-a hexehedron in 3d), there are corresponding types and calls like
+a hexahedron in 3d), there are corresponding types and calls like
 <code>begin_active_quad()</code> or <code>end_quad()</code> that act on the
 dimension independent geometric objects line, quad, and hex. These calls,
 just as the ones above, exist in active and non-active forms.
 
+The actual definition of all the typedefs local to the container classes are
+stated in the
 
+- internal::Triangulation::Iterators<1,spacedim>,
+  internal::Triangulation::Iterators<2,spacedim>, and
+  internal::Triangulation::Iterators<3,spacedim> classes for Triangulation
+  iterators,
+
+- internal::DoFHandler::Iterators<DH<1,spacedim> >,
+  internal::DoFHandler::Iterators<DH<2,spacedim> >, and
+  internal::DoFHandler::Iterators<DH<3,spacedim> > classes for DoFHandler
+  and hp::DoFHandler iterators,
+
+- internal::MGDoFHandler::Iterators<1,spacedim>,
+  internal::MGDoFHandler::Iterators<2,spacedim>, and
+  internal::MGDoFHandler::Iterators<3,spacedim> classes for MGDoFHandler
+  iterators.
+  
+  
 @section IteratorAccessorInternals Iterator and accessor internals
 
-Iterators, being like pointer, act as if they pointed to an actual
+Iterators, being like pointers, act as if they pointed to an actual
 object, but in reality all they do is to return an accessor when
 dereferenced. The accessor object contains the state, i.e. it knows
 which object it represents, by storing for example which Triangulation
@@ -376,49 +434,20 @@ face, or edge) it represents
 There is a representation of past-the-end-pointers, denoted by special
 values of the member variables <code>present_level</code> and <code>present_index</code> in
 the TriaAccessor class: If <code>present_level</code> @> =0 and <code>present_index</code> @> =0,
-then the object is valid (there is no check whether the triangulation
-really has that many levels or that many cells on the present level
-when we investigate the state of an iterator; however, in many places
-where an iterator is dereferenced we make this check); if
+then the object is valid; if
 <code>present_level</code>==-1 and <code>present_index</code>==-1, then the iterator points
 past the end; in all other cases, the iterator is considered invalid.
-You can check this by calling the state() function.
-
-An iterator is also invalid, if the pointer pointing to the
-Triangulation object is invalid or zero.
-
-Finally, an iterator is invalid, if the element pointed to by
-<code>present_level</code> and <code>present_index</code> is not used, i.e. if the
-<tt>used</tt> flag is set to false.
-
-The last two checks are not made in state() since both cases should
-only occur upon unitialized construction through <tt>memcpy</tt>
-and the like (the parent triangulation can only be set upon
-construction). If an iterator is constructed empty through the
-empty constructor, it sets <code>present_level</code>==-2 and
-<code>present_index</code>==-2. Thus, the iterator is invalid anyway,
-regardless of the state of the triangulation pointer and the state
-of the element pointed to.
+You can check this by calling the TriaAccessorBase::state() function.
 
 Past-the-end iterators may also be used to compare an iterator with
 the before-the-start value, when running backwards. There is no
 distiction between the iterators pointing past the two ends of a
 vector.
 
-Defining only one value to be past-the-end and making all other
-values invalid provides a second track of security: if we should
-have forgotten a check in the library when an iterator is
-incremented or decremented, we automatically convert the iterator
-from the allowed state "past-the-end" to the disallowed state
-"invalid" which increases the chance that somehwen earlier than for
-past-the-end iterators an exception is raised.
-
-Cells are stored based on a hierachical structure of levels, therefore
-the above mentioned structure is useful. Faces however are not organized
-in levels, therefore the <code>present_level</code> variable is ignored in that
-cases and is set to 0 for all faces. Several Accessor- and Iterator-
-functions check for that value, if the object accessed is not a cell
-but a face in the current triangulation.
+Cells are stored based on a hierachical structure of levels, therefore the
+above mentioned structure is useful. Faces however are not organized in
+levels, and accessors for objects of lower dimensionality do not have a
+<code>present_level</code> member variable.
 
 
 @ingroup grid

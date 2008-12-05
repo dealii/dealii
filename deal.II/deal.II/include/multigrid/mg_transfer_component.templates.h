@@ -32,10 +32,10 @@ DEAL_II_NAMESPACE_OPEN
 
 
 template <typename number>
-template <int dim, typename number2>
+template <int dim, typename number2, int spacedim>
 void
 MGTransferSelect<number>::copy_to_mg (
-  const MGDoFHandler<dim>        &mg_dof_handler,
+  const MGDoFHandler<dim,spacedim>        &mg_dof_handler,
   MGLevelObject<Vector<number> > &dst,
   const BlockVector<number2>     &src) const
 {
@@ -45,10 +45,10 @@ MGTransferSelect<number>::copy_to_mg (
 
 
 template <typename number>
-template <int dim, typename number2>
+template <int dim, typename number2, int spacedim>
 void
 MGTransferSelect<number>::copy_to_mg (
-  const MGDoFHandler<dim>        &mg_dof_handler,
+  const MGDoFHandler<dim,spacedim>        &mg_dof_handler,
   MGLevelObject<Vector<number> > &dst,
   const Vector<number2>          &src) const
 {
@@ -58,10 +58,10 @@ MGTransferSelect<number>::copy_to_mg (
 
 
 template <typename number>
-template <int dim, class InVector>
+template <int dim, class InVector, int spacedim>
 void
 MGTransferSelect<number>::do_copy_to_mg (
-  const MGDoFHandler<dim>&        mg_dof_handler,
+  const MGDoFHandler<dim,spacedim>&        mg_dof_handler,
   MGLevelObject<Vector<number> >& dst,
   const InVector&                 src,
   const unsigned int              offset) const
@@ -111,9 +111,9 @@ MGTransferSelect<number>::do_copy_to_mg (
   for (int level=maxlevel; level>=static_cast<signed int>(minlevel); --level)
     {
 
-  typename MGDoFHandler<dim>::active_cell_iterator
+  typename MGDoFHandler<dim,spacedim>::active_cell_iterator
 	level_cell = mg_dof_handler.begin_active(level);
-      const typename MGDoFHandler<dim>::active_cell_iterator
+      const typename MGDoFHandler<dim,spacedim>::active_cell_iterator
 	level_end  = mg_dof_handler.end_active(level);
 				       // Compute coarse level right hand side
 				       // by restricting from fine level.
@@ -158,10 +158,10 @@ MGTransferSelect<number>::do_copy_to_mg (
 
 
 template <typename number>
-template <int dim, typename number2>
+template <int dim, typename number2, int spacedim>
 void
 MGTransferSelect<number>::copy_from_mg (
-  const MGDoFHandler<dim>&              mg_dof_handler,
+  const MGDoFHandler<dim,spacedim>&              mg_dof_handler,
   BlockVector<number2>&                 dst,
   const MGLevelObject<Vector<number> >& src) const
 {
@@ -171,10 +171,10 @@ MGTransferSelect<number>::copy_from_mg (
 
 
 template <typename number>
-template <int dim, typename number2>
+template <int dim, typename number2, int spacedim>
 void
 MGTransferSelect<number>::copy_from_mg (
-  const MGDoFHandler<dim>&              mg_dof_handler,
+  const MGDoFHandler<dim,spacedim>&              mg_dof_handler,
   Vector<number2>&                      dst,
   const MGLevelObject<Vector<number> >& src) const
 {
@@ -185,10 +185,10 @@ MGTransferSelect<number>::copy_from_mg (
 
 
 template <typename number>
-template <int dim, typename number2>
+template <int dim, typename number2, int spacedim>
 void
 MGTransferSelect<number>::copy_from_mg_add (
-  const MGDoFHandler<dim>&              mg_dof_handler,
+  const MGDoFHandler<dim,spacedim>&              mg_dof_handler,
   BlockVector<number2>&                 dst,
   const MGLevelObject<Vector<number> >& src) const
 {
@@ -198,10 +198,10 @@ MGTransferSelect<number>::copy_from_mg_add (
 
 
 template <typename number>
-template <int dim, typename number2>
+template <int dim, typename number2, int spacedim>
 void
 MGTransferSelect<number>::copy_from_mg_add (
-  const MGDoFHandler<dim>&              mg_dof_handler,
+  const MGDoFHandler<dim,spacedim>&              mg_dof_handler,
   Vector<number2>&                      dst,
   const MGLevelObject<Vector<number> >& src) const
 {
@@ -212,10 +212,10 @@ MGTransferSelect<number>::copy_from_mg_add (
 
 
 template <typename number>
-template <int dim, class OutVector>
+template <int dim, class OutVector, int spacedim>
 void
 MGTransferSelect<number>::do_copy_from_mg (
-  const MGDoFHandler<dim>              &mg_dof_handler,
+  const MGDoFHandler<dim,spacedim>              &mg_dof_handler,
   OutVector                            &dst,
   const MGLevelObject<Vector<number> > &src,
   const unsigned int offset) const
@@ -226,9 +226,9 @@ MGTransferSelect<number>::do_copy_from_mg (
   std::vector<unsigned int> global_dof_indices (dofs_per_cell);
   std::vector<unsigned int> level_dof_indices (dofs_per_cell);
 
-  typename MGDoFHandler<dim>::active_cell_iterator
+  typename MGDoFHandler<dim,spacedim>::active_cell_iterator
     level_cell = mg_dof_handler.begin_active();
-  const typename MGDoFHandler<dim>::active_cell_iterator
+  const typename MGDoFHandler<dim,spacedim>::active_cell_iterator
     endc = mg_dof_handler.end();
 
 				   // traverse all cells and copy the
@@ -268,10 +268,10 @@ MGTransferSelect<number>::do_copy_from_mg (
 
 
 template <typename number>
-template <int dim, class OutVector>
+template <int dim, class OutVector, int spacedim>
 void
 MGTransferSelect<number>::do_copy_from_mg_add (
-  const MGDoFHandler<dim>              &mg_dof_handler,
+  const MGDoFHandler<dim,spacedim>              &mg_dof_handler,
   OutVector                            &dst,
   const MGLevelObject<Vector<number> > &src,
   const unsigned int offset) const
@@ -282,9 +282,9 @@ MGTransferSelect<number>::do_copy_from_mg_add (
   std::vector<unsigned int> global_dof_indices (dofs_per_cell);
   std::vector<unsigned int> level_dof_indices (dofs_per_cell);
 
-  typename MGDoFHandler<dim>::active_cell_iterator
+  typename MGDoFHandler<dim,spacedim>::active_cell_iterator
     level_cell = mg_dof_handler.begin_active();
-  const typename MGDoFHandler<dim>::active_cell_iterator
+  const typename MGDoFHandler<dim,spacedim>::active_cell_iterator
     endc = mg_dof_handler.end();
 
 				   // traverse all cells and copy the

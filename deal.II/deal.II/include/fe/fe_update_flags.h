@@ -54,7 +54,7 @@ DEAL_II_NAMESPACE_OPEN
  * FiniteElement::update_each(flags) determine the values required by
  * the FiniteElement once or on each cell. The same functions exist in Mapping.
  *
- * Since the FiniteElement does not know if a value reuired from
+ * Since the FiniteElement does not know if a value required from
  * Mapping should be computed once or for each cell,
  * FEValuesBase::compute_update_flags() is used to compute the union
  * of all values to be computed ever. It does this by first adding to
@@ -143,13 +143,21 @@ enum UpdateFlags
 					* reference to realcell.
 					*/
       update_JxW_values                   = 0x0020,
-				       //! Normal vectors
+				       //! Normal vectors to the faces
 				       /**
 					* Compute the unit outer
 					* normal vector on the face of
 					* a cell.
 					*/
-      update_normal_vectors               = 0x0040,
+      update_face_normal_vectors          = 0x0040,
+				       //! Normal vectors to the cells
+				       /**
+					* Compute the unit outer
+					* normal vector on the cell
+					* itself. Only possible if
+					* dim=spacedim-1
+					*/      
+      update_cell_normal_vectors          = 0x20000,
 				       //! Volume element
 				       /**
 					* Compute the Jacobian of the
@@ -251,8 +259,14 @@ enum UpdateFlags
 					* @deprecated Update second
 					* derivatives.
 					*/
-      update_second_derivatives = update_hessians
-				
+      update_second_derivatives = update_hessians,
+                                       //! Normal vectors
+				       /**
+					* @deprecated Update normal
+					* vectors. Use
+					* update_face_normal_vectors
+					*/
+      update_normal_vectors               = update_face_normal_vectors
 
 };
 

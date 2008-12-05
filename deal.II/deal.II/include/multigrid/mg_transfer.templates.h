@@ -34,10 +34,10 @@ typedef std::map<unsigned int, unsigned int>::const_iterator IT;
 
 
 template <class VECTOR>
-template <int dim, class InVector>
+template <int dim, class InVector, int spacedim>
 void
 MGTransferPrebuilt<VECTOR>::copy_to_mg (
-  const MGDoFHandler<dim>& mg_dof_handler,
+  const MGDoFHandler<dim,spacedim>& mg_dof_handler,
   MGLevelObject<VECTOR>& dst,
   const InVector& src) const
 {
@@ -58,10 +58,10 @@ MGTransferPrebuilt<VECTOR>::copy_to_mg (
 
 
 template <class VECTOR>
-template <int dim, class OutVector>
+template <int dim, class OutVector, int spacedim>
 void
 MGTransferPrebuilt<VECTOR>::copy_from_mg(
-  const MGDoFHandler<dim>&       mg_dof_handler,
+  const MGDoFHandler<dim,spacedim>&       mg_dof_handler,
   OutVector&                     dst,
   const MGLevelObject<VECTOR>& src) const
 {
@@ -74,10 +74,10 @@ MGTransferPrebuilt<VECTOR>::copy_from_mg(
 
 
 template <class VECTOR>
-template <int dim, class OutVector>
+template <int dim, class OutVector, int spacedim>
 void
 MGTransferPrebuilt<VECTOR>::copy_from_mg_add (
-  const MGDoFHandler<dim>              &mg_dof_handler,
+  const MGDoFHandler<dim,spacedim>              &mg_dof_handler,
   OutVector                            &dst,
   const MGLevelObject<VECTOR> &src) const
 {

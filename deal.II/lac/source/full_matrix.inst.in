@@ -19,7 +19,28 @@ for (S : REAL_SCALARS)
     template void FullMatrix<S>::print(
       LogStream&, const unsigned int, const unsigned int) const;
     template void FullMatrix<S>::print(
-      std::ostream&, const unsigned int, const unsigned int) const;
+      std::ostream&, const unsigned int, const unsigned int) const;    
+
+    template void FullMatrix<S>::copy_from<1>(
+      Tensor<2,1>&, const unsigned, const unsigned, const unsigned, const unsigned, const unsigned, const unsigned);
+						
+    template void FullMatrix<S>::copy_from<2>(
+      Tensor<2,2>&, const unsigned, const unsigned, const unsigned, const unsigned, const unsigned, const unsigned);
+						
+    template void FullMatrix<S>::copy_from<3>(
+      Tensor<2,3>&, const unsigned, const unsigned, const unsigned, const unsigned, const unsigned, const unsigned);
+						
+    template void FullMatrix<S>::copy_to<1>(
+      Tensor<2,1>&, const unsigned, const unsigned, const unsigned, const unsigned, const unsigned, const unsigned);
+
+    template void FullMatrix<S>::copy_to<2>(
+      Tensor<2,2>&, const unsigned, const unsigned, const unsigned, const unsigned, const unsigned, const unsigned);
+
+    template void FullMatrix<S>::copy_to<3>(
+      Tensor<2,3>&, const unsigned, const unsigned, const unsigned, const unsigned, const unsigned, const unsigned);
+
+
+
   }
 
 for (S1, S2 : REAL_SCALARS)
@@ -62,6 +83,11 @@ for (S1, S2 : REAL_SCALARS)
       void FullMatrix<S1>::Tmmult<S2> (FullMatrix<S2>&, const FullMatrix<S2>&, const bool) const;
     template
       void FullMatrix<S1>::invert<S2> (const FullMatrix<S2>&);
+ 
+    template 
+      void FullMatrix<S1>::left_invert<S2> (const FullMatrix<S2> &);
+    template 
+      void FullMatrix<S1>::right_invert<S2> (const FullMatrix<S2> &);
 
     template
       void FullMatrix<S1>::fill_permutation<S2> (
@@ -154,6 +180,11 @@ for (S1, S2 : COMPLEX_SCALARS)
       void FullMatrix<S1>::Tmmult<S2> (FullMatrix<S2>&, const FullMatrix<S2>&, const bool) const;
     template
       void FullMatrix<S1>::invert<S2> (const FullMatrix<S2>&);
+
+    template 
+      void FullMatrix<S1>::left_invert<S2> (const FullMatrix<S2> &);
+    template 
+      void FullMatrix<S1>::right_invert<S2> (const FullMatrix<S2> &);
 
     template
       void FullMatrix<S1>::fill_permutation<S2> (

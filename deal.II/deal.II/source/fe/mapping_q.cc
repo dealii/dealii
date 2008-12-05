@@ -32,10 +32,10 @@
 DEAL_II_NAMESPACE_OPEN
 
 
-template<int dim>
-MappingQ<dim>::InternalData::InternalData (const unsigned int n_shape_functions)
+template<int dim, int spacedim>
+MappingQ<dim,spacedim>::InternalData::InternalData (const unsigned int n_shape_functions)
 		:
-		MappingQ1<dim>::InternalData(n_shape_functions),
+		MappingQ1<dim,spacedim>::InternalData(n_shape_functions),
                 use_mapping_q1_on_current_cell(false),
 		mapping_q1_data(1 << dim)
 {
@@ -44,11 +44,11 @@ MappingQ<dim>::InternalData::InternalData (const unsigned int n_shape_functions)
 
 
 
-template<int dim>
+template<int dim, int spacedim>
 unsigned int
-MappingQ<dim>::InternalData::memory_consumption () const 
+MappingQ<dim,spacedim>::InternalData::memory_consumption () const 
 {
-  return (MappingQ1<dim>::InternalData::memory_consumption () +
+  return (MappingQ1<dim,spacedim>::InternalData::memory_consumption () +
 	  MemoryConsumption::memory_consumption (unit_normals) +
 	  MemoryConsumption::memory_consumption (use_mapping_q1_on_current_cell) +
 	  MemoryConsumption::memory_consumption (mapping_q1_data));
@@ -97,8 +97,8 @@ MappingQ<1>::~MappingQ ()
 
 
 
-template<int dim>
-MappingQ<dim>::MappingQ (const unsigned int p,
+template<int dim, int spacedim>
+MappingQ<dim,spacedim>::MappingQ (const unsigned int p,
 			 const bool use_mapping_q_on_all_cells)
                 :
 		degree(p),
@@ -154,10 +154,10 @@ MappingQ<dim>::MappingQ (const unsigned int p,
 }
 
 
-template<int dim>
-MappingQ<dim>::MappingQ (const MappingQ<dim> &mapping)
+template<int dim, int spacedim>
+MappingQ<dim,spacedim>::MappingQ (const MappingQ<dim,spacedim> &mapping)
 		:
-		MappingQ1<dim>(),
+		MappingQ1<dim,spacedim>(),
 		degree(mapping.degree),
 		n_inner(mapping.n_inner),
 		n_outer(n_outer),
@@ -173,8 +173,8 @@ MappingQ<dim>::MappingQ (const MappingQ<dim> &mapping)
 }
 
 
-template<int dim>
-MappingQ<dim>::~MappingQ ()
+template<int dim, int spacedim>
+MappingQ<dim,spacedim>::~MappingQ ()
 {
   delete tensor_pols;
 }
@@ -195,10 +195,10 @@ MappingQ<1>::compute_shapes_virtual (const std::vector<Point<1> > &unit_points,
 
 
 
-template<int dim>
+template<int dim, int spacedim>
 void
-MappingQ<dim>::compute_shapes_virtual (const std::vector<Point<dim> > &unit_points,
-				       typename MappingQ1<dim>::InternalData &data) const
+MappingQ<dim,spacedim>::compute_shapes_virtual (const std::vector<Point<dim> > &unit_points,
+				       typename MappingQ1<dim,spacedim>::InternalData &data) const
 {
   const unsigned int n_points=unit_points.size();
   std::vector<double> values;
@@ -247,9 +247,9 @@ MappingQ<dim>::compute_shapes_virtual (const std::vector<Point<dim> > &unit_poin
 
 
 
-template <int dim>
-typename Mapping<dim>::InternalDataBase *
-MappingQ<dim>::get_data (const UpdateFlags update_flags,
+template<int dim, int spacedim>
+typename Mapping<dim,spacedim>::InternalDataBase *
+MappingQ<dim,spacedim>::get_data (const UpdateFlags update_flags,
 			 const Quadrature<dim> &quadrature) const
 {
   InternalData *data = new InternalData(n_shape_functions);
@@ -263,9 +263,9 @@ MappingQ<dim>::get_data (const UpdateFlags update_flags,
 
 
 
-template <int dim>
-typename Mapping<dim>::InternalDataBase *
-MappingQ<dim>::get_face_data (const UpdateFlags update_flags,
+template<int dim, int spacedim>
+typename Mapping<dim,spacedim>::InternalDataBase *
+MappingQ<dim,spacedim>::get_face_data (const UpdateFlags update_flags,
 			      const Quadrature<dim-1>& quadrature) const
 {
   InternalData *data = new InternalData(n_shape_functions);
@@ -281,9 +281,9 @@ MappingQ<dim>::get_face_data (const UpdateFlags update_flags,
 
 
 
-template <int dim>
-typename Mapping<dim>::InternalDataBase *
-MappingQ<dim>::get_subface_data (const UpdateFlags update_flags,
+template<int dim, int spacedim>
+typename Mapping<dim,spacedim>::InternalDataBase *
+MappingQ<dim,spacedim>::get_subface_data (const UpdateFlags update_flags,
 				 const Quadrature<dim-1>& quadrature) const
 {
   InternalData *data = new InternalData(n_shape_functions);
@@ -299,16 +299,18 @@ MappingQ<dim>::get_subface_data (const UpdateFlags update_flags,
 
 
 
-template <int dim>
+template<int dim, int spacedim>
 void
-MappingQ<dim>::fill_fe_values (const typename Triangulation<dim>::cell_iterator &cell,
-			       const Quadrature<dim>                &q,
-			       typename Mapping<dim>::InternalDataBase       &mapping_data,
-			       std::vector<Point<dim> >             &quadrature_points,
-			       std::vector<double>                  &JxW_values,
-			       std::vector<Tensor<2,dim> >          &jacobians,
-			       std::vector<Tensor<3,dim> >          &jacobian_grads,
-			       std::vector<Tensor<2,dim> >          &inverse_jacobians) const
+MappingQ<dim,spacedim>::fill_fe_values (
+                               const typename Triangulation<dim,spacedim>::cell_iterator &cell,
+			       const Quadrature<dim>                                     &q,
+			       typename Mapping<dim,spacedim>::InternalDataBase          &mapping_data,
+			       std::vector<Point<spacedim> >                             &quadrature_points,
+			       std::vector<double>                                       &JxW_values,
+			       std::vector<Tensor<2,spacedim> >                          &jacobians,
+			       std::vector<Tensor<3,spacedim> >                          &jacobian_grads,
+			       std::vector<Tensor<2,spacedim> >                          &inverse_jacobians,
+			       std::vector<Point<spacedim> >                             &cell_normal_vectors) const
 {
 				   // convert data object to internal
 				   // data for this class. fails with
@@ -327,25 +329,26 @@ MappingQ<dim>::fill_fe_values (const typename Triangulation<dim>::cell_iterator 
 				   // depending on this result, use
 				   // this or the other data object
 				   // for the mapping
-  typename MappingQ1<dim>::InternalData *p_data=0;
+  typename MappingQ1<dim,spacedim>::InternalData *p_data=0;
   if (data.use_mapping_q1_on_current_cell)
     p_data=&data.mapping_q1_data;
   else
     p_data=&data;
   
-  MappingQ1<dim>::fill_fe_values(cell, q, *p_data,
-				 quadrature_points, JxW_values,
-				 jacobians, jacobian_grads, inverse_jacobians);
+  MappingQ1<dim,spacedim>::fill_fe_values(cell, q, *p_data,
+	        			  quadrature_points, JxW_values,
+				          jacobians, jacobian_grads, inverse_jacobians,
+					  cell_normal_vectors);
 }
 
 
 
-template <int dim>
+template<int dim, int spacedim>
 void
-MappingQ<dim>::fill_fe_face_values (const typename Triangulation<dim>::cell_iterator &cell,
+MappingQ<dim,spacedim>::fill_fe_face_values (const typename Triangulation<dim,spacedim>::cell_iterator &cell,
 				    const unsigned int       face_no,
 				    const Quadrature<dim-1> &q,
-				    typename Mapping<dim>::InternalDataBase &mapping_data,
+				    typename Mapping<dim,spacedim>::InternalDataBase &mapping_data,
 				    std::vector<Point<dim> >     &quadrature_points,
 				    std::vector<double>          &JxW_values,
 				    std::vector<Tensor<1,dim> >  &exterior_forms,
@@ -378,7 +381,7 @@ MappingQ<dim>::fill_fe_face_values (const typename Triangulation<dim>::cell_iter
 				   // depending on this result, use
 				   // this or the other data object
 				   // for the mapping
-  typename MappingQ1<dim>::InternalData *p_data=0;
+  typename MappingQ1<dim,spacedim>::InternalData *p_data=0;
   if (data.use_mapping_q1_on_current_cell)
     p_data=&data.mapping_q1_data;
   else
@@ -403,13 +406,13 @@ MappingQ<dim>::fill_fe_face_values (const typename Triangulation<dim>::cell_iter
 }
 
 
-template <int dim>
+template<int dim, int spacedim>
 void
-MappingQ<dim>::fill_fe_subface_values (const typename Triangulation<dim>::cell_iterator &cell,
+MappingQ<dim,spacedim>::fill_fe_subface_values (const typename Triangulation<dim,spacedim>::cell_iterator &cell,
 				       const unsigned int       face_no,
 				       const unsigned int       sub_no,
 				       const Quadrature<dim-1> &q,
-				       typename Mapping<dim>::InternalDataBase &mapping_data,
+				       typename Mapping<dim,spacedim>::InternalDataBase &mapping_data,
 				       std::vector<Point<dim> >     &quadrature_points,
 				       std::vector<double>          &JxW_values,
 				       std::vector<Tensor<1,dim> >  &exterior_forms,
@@ -442,7 +445,7 @@ MappingQ<dim>::fill_fe_subface_values (const typename Triangulation<dim>::cell_i
 				   // depending on this result, use
 				   // this or the other data object
 				   // for the mapping
-  typename MappingQ1<dim>::InternalData *p_data=0;
+  typename MappingQ1<dim,spacedim>::InternalData *p_data=0;
   if (data.use_mapping_q1_on_current_cell)
     p_data=&data.mapping_q1_data;
   else
@@ -478,9 +481,9 @@ MappingQ<1>::set_laplace_on_quad_vector(Table<2,double> &) const
 
 #else
 
-template <int dim>
+template<int dim, int spacedim>
 void
-MappingQ<dim>::set_laplace_on_quad_vector(Table<2,double> &loqvs) const
+MappingQ<dim,spacedim>::set_laplace_on_quad_vector(Table<2,double> &loqvs) const
 {
   Assert(degree>1, ExcInternalError());
   const unsigned int n_inner_2d=(degree-1)*(degree-1);
@@ -733,9 +736,9 @@ MappingQ<3>::set_laplace_on_hex_vector(Table<2,double> &lohvs) const
 #endif
 
 
-template <int dim>
+template<int dim, int spacedim>
 void
-MappingQ<dim>::set_laplace_on_hex_vector(Table<2,double> &) const
+MappingQ<dim,spacedim>::set_laplace_on_hex_vector(Table<2,double> &) const
 {
   Assert(false, ExcInternalError());
 }
@@ -755,9 +758,9 @@ MappingQ<1>::compute_laplace_vector(Table<2,double> &) const
 #else
 
 
-template <int dim>
+template<int dim, int spacedim>
 void
-MappingQ<dim>::compute_laplace_vector(Table<2,double> &lvs) const
+MappingQ<dim,spacedim>::compute_laplace_vector(Table<2,double> &lvs) const
 {
   Assert(lvs.n_rows()==0, ExcInternalError());
   Assert(dim==2 || dim==3, ExcNotImplemented());
@@ -818,9 +821,9 @@ MappingQ<dim>::compute_laplace_vector(Table<2,double> &lvs) const
 
 
 
-template <int dim>
+template<int dim, int spacedim>
 void
-MappingQ<dim>::apply_laplace_vector(const Table<2,double> &lvs,
+MappingQ<dim,spacedim>::apply_laplace_vector(const Table<2,double> &lvs,
 				    std::vector<Point<dim> > &a) const
 {
                                    // check whether the data we need
@@ -861,10 +864,10 @@ MappingQ<dim>::apply_laplace_vector(const Table<2,double> &lvs,
 }
 
 
-template <int dim>
+template<int dim, int spacedim>
 void
-MappingQ<dim>::compute_mapping_support_points(
-  const typename Triangulation<dim>::cell_iterator &cell,
+MappingQ<dim,spacedim>::compute_mapping_support_points(
+  const typename Triangulation<dim,spacedim>::cell_iterator &cell,
   std::vector<Point<dim> > &a) const
 {
 				   // if this is a cell for which we
@@ -888,9 +891,9 @@ MappingQ<dim>::compute_mapping_support_points(
 }
 
   
-template <int dim>
+template<int dim, int spacedim>
 void
-MappingQ<dim>::compute_support_points_laplace(const typename Triangulation<dim>::cell_iterator &cell,
+MappingQ<dim,spacedim>::compute_support_points_laplace(const typename Triangulation<dim,spacedim>::cell_iterator &cell,
 					      std::vector<Point<dim> > &a) const
 {
 				   // in any case, we need the
@@ -948,9 +951,9 @@ MappingQ<1>::add_line_support_points (const Triangulation<1>::cell_iterator &,
 #endif
 
 
-template <int dim>
+template<int dim, int spacedim>
 void
-MappingQ<dim>::add_line_support_points (const typename Triangulation<dim>::cell_iterator &cell,
+MappingQ<dim,spacedim>::add_line_support_points (const typename Triangulation<dim,spacedim>::cell_iterator &cell,
 					std::vector<Point<dim> > &a) const
 {
   static const StraightBoundary<dim> straight_boundary;
@@ -960,7 +963,7 @@ MappingQ<dim>::add_line_support_points (const typename Triangulation<dim>::cell_
     {
       for (unsigned int line_no=0; line_no<GeometryInfo<dim>::lines_per_cell; ++line_no)
 	{
-	  const typename Triangulation<dim>::line_iterator line = cell->line(line_no);
+	  const typename Triangulation<dim,spacedim>::line_iterator line = cell->line(line_no);
 	  const Boundary<dim> * const boundary
 	    = (line->at_boundary() ?
 	       &line->get_triangulation().get_boundary(line->boundary_indicator()) :
@@ -985,7 +988,7 @@ MappingQ<dim>::add_line_support_points (const typename Triangulation<dim>::cell_
 				       // it
       for (unsigned int line_no=0; line_no<GeometryInfo<dim>::lines_per_cell; ++line_no)
 	{
-	  const typename Triangulation<dim>::line_iterator line = cell->line(line_no);
+	  const typename Triangulation<dim,spacedim>::line_iterator line = cell->line(line_no);
 	  
 	  const Boundary<dim> * const boundary
 	    = (line->at_boundary() ?
@@ -1188,10 +1191,10 @@ add_quad_support_points(const Triangulation<3>::cell_iterator &cell,
 #endif
 
 
-template<int dim>
+template<int dim, int spacedim>
 void
-MappingQ<dim>::
-add_quad_support_points(const typename Triangulation<dim>::cell_iterator &,
+MappingQ<dim,spacedim>::
+add_quad_support_points(const typename Triangulation<dim,spacedim>::cell_iterator &,
                         std::vector<Point<dim> > &) const
 {
   Assert (dim > 2, ExcImpossibleInDim(dim));
@@ -1199,16 +1202,16 @@ add_quad_support_points(const typename Triangulation<dim>::cell_iterator &,
 
 
 
-template <int dim>
+template<int dim, int spacedim>
 void
-MappingQ<dim>::transform_covariant (
-  const VectorSlice<const std::vector<Tensor<1,dim> > > input,
+MappingQ<dim,spacedim>::transform_covariant (
+  const VectorSlice<const std::vector<Tensor<1,spacedim> > > input,
   const unsigned int                 offset,
-  VectorSlice<std::vector<Tensor<1,dim> > > output,
-  const typename Mapping<dim>::InternalDataBase &mapping_data) const
+  VectorSlice<std::vector<Tensor<1,spacedim> > > output,
+  const typename Mapping<dim,spacedim>::InternalDataBase &mapping_data) const
 {
-  const typename MappingQ1<dim>::InternalData *q1_data =
-    dynamic_cast<const typename MappingQ1<dim>::InternalData *> (&mapping_data);
+  const typename MappingQ1<dim,spacedim>::InternalData *q1_data =
+    dynamic_cast<const typename MappingQ1<dim,spacedim>::InternalData *> (&mapping_data);
   Assert(q1_data!=0, ExcInternalError());
 
   Assert (output.size() + offset <= input.size(), ExcInternalError());
@@ -1234,16 +1237,16 @@ MappingQ<dim>::transform_covariant (
 
 
 
-template <int dim>
+template<int dim, int spacedim>
 void
-MappingQ<dim>::transform_covariant (
-  const VectorSlice<const std::vector<Tensor<2,dim> > > input,
+MappingQ<dim,spacedim>::transform_covariant (
+  const VectorSlice<const std::vector<Tensor<2,spacedim> > > input,
   const unsigned int                 offset,
-  VectorSlice<std::vector<Tensor<2,dim> > > output,
-  const typename Mapping<dim>::InternalDataBase &mapping_data) const
+  VectorSlice<std::vector<Tensor<2,spacedim> > > output,
+  const typename Mapping<dim,spacedim>::InternalDataBase &mapping_data) const
 {
-  const typename MappingQ1<dim>::InternalData *q1_data =
-    dynamic_cast<const typename MappingQ1<dim>::InternalData *> (&mapping_data);
+  const typename MappingQ1<dim,spacedim>::InternalData *q1_data =
+    dynamic_cast<const typename MappingQ1<dim,spacedim>::InternalData *> (&mapping_data);
   Assert(q1_data!=0, ExcInternalError());
 
   Assert (output.size() + offset <= input.size(), ExcInternalError());
@@ -1269,16 +1272,16 @@ MappingQ<dim>::transform_covariant (
 
 
 
-template <int dim>
+template<int dim, int spacedim>
 void
-MappingQ<dim>::transform_contravariant (
-  const VectorSlice<const std::vector<Tensor<1,dim> > > input,
+MappingQ<dim,spacedim>::transform_contravariant (
+  const VectorSlice<const std::vector<Tensor<1,spacedim> > > input,
   const unsigned int                 offset,
-  VectorSlice<std::vector<Tensor<1,dim> > > output,
-  const typename Mapping<dim>::InternalDataBase &mapping_data) const
+  VectorSlice<std::vector<Tensor<1,spacedim> > > output,
+  const typename Mapping<dim,spacedim>::InternalDataBase &mapping_data) const
 {
-  const typename MappingQ1<dim>::InternalData *q1_data =
-    dynamic_cast<const typename MappingQ1<dim>::InternalData *> (&mapping_data);
+  const typename MappingQ1<dim,spacedim>::InternalData *q1_data =
+    dynamic_cast<const typename MappingQ1<dim,spacedim>::InternalData *> (&mapping_data);
   Assert(q1_data!=0, ExcInternalError());
   
   Assert (output.size() + offset <= input.size(), ExcInternalError());
@@ -1304,16 +1307,16 @@ MappingQ<dim>::transform_contravariant (
 
 
 
-template <int dim>
+template<int dim, int spacedim>
 void
-MappingQ<dim>::transform_contravariant (
-  const VectorSlice<const std::vector<Tensor<2,dim> > > input,
+MappingQ<dim,spacedim>::transform_contravariant (
+  const VectorSlice<const std::vector<Tensor<2,spacedim> > > input,
   const unsigned int                 offset,
-  VectorSlice<std::vector<Tensor<2,dim> > > output,
-  const typename Mapping<dim>::InternalDataBase &mapping_data) const
+  VectorSlice<std::vector<Tensor<2,spacedim> > > output,
+  const typename Mapping<dim,spacedim>::InternalDataBase &mapping_data) const
 {
-  const typename MappingQ1<dim>::InternalData *q1_data =
-    dynamic_cast<const typename MappingQ1<dim>::InternalData *> (&mapping_data);
+  const typename MappingQ1<dim,spacedim>::InternalData *q1_data =
+    dynamic_cast<const typename MappingQ1<dim,spacedim>::InternalData *> (&mapping_data);
   Assert(q1_data!=0, ExcInternalError());
   
   Assert (output.size() + offset <= input.size(), ExcInternalError());
@@ -1339,10 +1342,10 @@ MappingQ<dim>::transform_contravariant (
 
 
 
-template <int dim>
-Point<dim>
-MappingQ<dim>::
-transform_unit_to_real_cell (const typename Triangulation<dim>::cell_iterator &cell,
+template<int dim, int spacedim>
+Point<spacedim>
+MappingQ<dim,spacedim>::
+transform_unit_to_real_cell (const typename Triangulation<dim,spacedim>::cell_iterator &cell,
                              const Point<dim>                                 &p) const
 {
 				   // Use the get_data function to
@@ -1358,7 +1361,7 @@ transform_unit_to_real_cell (const typename Triangulation<dim>::cell_iterator &c
   mdata->use_mapping_q1_on_current_cell = !(use_mapping_q_on_all_cells
 					    || cell->has_boundary_lines());
 
-  typename MappingQ1<dim>::InternalData
+  typename MappingQ1<dim,spacedim>::InternalData
     *p_data = (mdata->use_mapping_q1_on_current_cell ?
                &mdata->mapping_q1_data :
                &*mdata);
@@ -1370,15 +1373,15 @@ transform_unit_to_real_cell (const typename Triangulation<dim>::cell_iterator &c
 
 
 
-template <int dim>
+template<int dim, int spacedim>
 Point<dim>
-MappingQ<dim>::
-transform_real_to_unit_cell (const typename Triangulation<dim>::cell_iterator &cell,
-                             const Point<dim>                                 &p) const
+MappingQ<dim,spacedim>::
+transform_real_to_unit_cell (const typename Triangulation<dim,spacedim>::cell_iterator &cell,
+                             const Point<spacedim>                            &p) const
 {
 				   // first a Newton iteration based
 				   // on a Q1 mapping
-  Point<dim> p_unit = MappingQ1<dim>::transform_real_to_unit_cell(cell, p);
+  Point<dim> p_unit = MappingQ1<dim,spacedim>::transform_real_to_unit_cell(cell, p);
   
                                    // then a Newton iteration based on
                                    // the full MappingQ if we need
@@ -1405,20 +1408,20 @@ transform_real_to_unit_cell (const typename Triangulation<dim>::cell_iterator &c
 
 
 
-template <int dim>
+template<int dim, int spacedim>
 unsigned int
-MappingQ<dim>::get_degree() const
+MappingQ<dim,spacedim>::get_degree() const
 {
   return degree;
 }
 
 
 
-template <int dim>
-Mapping<dim> *
-MappingQ<dim>::clone () const
+template<int dim, int spacedim>
+Mapping<dim,spacedim> *
+MappingQ<dim,spacedim>::clone () const
 {
-  return new MappingQ<dim>(*this);
+  return new MappingQ<dim,spacedim>(*this);
 }
 
   

@@ -128,10 +128,10 @@ namespace
 
 
 
-template <int dim>
-FE_DGQ<dim>::FE_DGQ (const unsigned int degree)
+template <int dim, int spacedim>
+FE_DGQ<dim, spacedim>::FE_DGQ (const unsigned int degree)
 		:
-		FE_Poly<TensorProductPolynomials<dim>, dim> (
+		FE_Poly<TensorProductPolynomials<dim>, dim, spacedim> (
 		  TensorProductPolynomials<dim>(Polynomials::LagrangeEquidistant::generate_complete_basis(degree)),
 		  FiniteElementData<dim>(get_dpo_vector(degree), 1, degree, FiniteElementData<dim>::L2),
 		  std::vector<bool>(FiniteElementData<dim>(get_dpo_vector(degree),1, degree).dofs_per_cell, true),
@@ -143,8 +143,10 @@ FE_DGQ<dim>::FE_DGQ (const unsigned int degree)
 				   // matrices to the right sizes
   this->reinit_restriction_and_prolongation_matrices();
 				   // Fill prolongation matrices with embedding operators
+  if (dim ==spacedim)
   FETools::compute_embedding_matrices (*this, this->prolongation);
 				   // Fill restriction matrices with L2-projection
+  if (dim ==spacedim)
   FETools::compute_projection_matrices (*this, this->restriction);
 			      
   
@@ -190,10 +192,10 @@ FE_DGQ<dim>::FE_DGQ (const unsigned int degree)
 
 
 
-template <int dim>
-FE_DGQ<dim>::FE_DGQ (const Quadrature<1>& points)
+template <int dim, int spacedim>
+FE_DGQ<dim, spacedim>::FE_DGQ (const Quadrature<1>& points)
 		:
-		FE_Poly<TensorProductPolynomials<dim>, dim> (
+		FE_Poly<TensorProductPolynomials<dim>, dim, spacedim> (
 		  TensorProductPolynomials<dim>(Polynomials::Lagrange::generate_complete_basis(points.get_points())),
 		  FiniteElementData<dim>(get_dpo_vector(points.size()-1), 1, points.size()-1, FiniteElementData<dim>::L2),
 		  std::vector<bool>(FiniteElementData<dim>(get_dpo_vector(points.size()-1),1, points.size()-1).dofs_per_cell, true),
@@ -219,9 +221,9 @@ FE_DGQ<dim>::FE_DGQ (const Quadrature<1>& points)
 
 
 
-template <int dim>
+template <int dim, int spacedim>
 std::string
-FE_DGQ<dim>::get_name () const
+FE_DGQ<dim, spacedim>::get_name () const
 {
 				   // note that the
 				   // FETools::get_fe_from_name
@@ -237,11 +239,11 @@ FE_DGQ<dim>::get_name () const
 
 
 
-template <int dim>
-FiniteElement<dim> *
-FE_DGQ<dim>::clone() const
+template <int dim, int spacedim>
+FiniteElement<dim,spacedim> *
+FE_DGQ<dim, spacedim>::clone() const
 {
-  return new FE_DGQ<dim>(*this);
+  return new FE_DGQ<dim, spacedim>(*this);
 }
 
 
@@ -250,9 +252,9 @@ FE_DGQ<dim>::clone() const
 //---------------------------------------------------------------------------
 
 
-template <int dim>
+template <int dim, int spacedim>
 std::vector<unsigned int>
-FE_DGQ<dim>::get_dpo_vector (const unsigned int deg)
+FE_DGQ<dim, spacedim>::get_dpo_vector (const unsigned int deg)
 {
   std::vector<unsigned int> dpo(dim+1, 0U);
   dpo[dim] = deg+1;
@@ -263,9 +265,9 @@ FE_DGQ<dim>::get_dpo_vector (const unsigned int deg)
 
 
 
-template <int dim>
+template <int dim, int spacedim>
 void
-FE_DGQ<dim>::rotate_indices (std::vector<unsigned int> &numbers,
+FE_DGQ<dim, spacedim>::rotate_indices (std::vector<unsigned int> &numbers,
 			     const char                 direction) const
 {
   const unsigned int n = this->degree+1;
@@ -340,25 +342,25 @@ FE_DGQ<dim>::rotate_indices (std::vector<unsigned int> &numbers,
 
 
 
-template <int dim>
+template <int dim, int spacedim>
 void
-FE_DGQ<dim>::
-get_interpolation_matrix (const FiniteElement<dim> &x_source_fe,
+FE_DGQ<dim, spacedim>::
+get_interpolation_matrix (const FiniteElement<dim, spacedim> &x_source_fe,
 			  FullMatrix<double>           &interpolation_matrix) const
 {
 				   // this is only implemented, if the
 				   // source FE is also a
 				   // DGQ element
+  typedef FiniteElement<dim, spacedim> FE;
   AssertThrow ((x_source_fe.get_name().find ("FE_DGQ<") == 0)
                ||
-               (dynamic_cast<const FE_DGQ<dim>*>(&x_source_fe) != 0),
-               typename FiniteElement<dim>::
-               ExcInterpolationNotImplemented());
+               (dynamic_cast<const FE_DGQ<dim, spacedim>*>(&x_source_fe) != 0),
+                typename FE::ExcInterpolationNotImplemented() );
   
 				   // ok, source is a Q element, so
 				   // we will be able to do the work
-  const FE_DGQ<dim> &source_fe
-    = dynamic_cast<const FE_DGQ<dim>&>(x_source_fe);
+  const FE_DGQ<dim, spacedim> &source_fe
+    = dynamic_cast<const FE_DGQ<dim, spacedim>&>(x_source_fe);
 
   Assert (interpolation_matrix.m() == this->dofs_per_cell,
 	  ExcDimensionMismatch (interpolation_matrix.m(),
@@ -426,10 +428,10 @@ get_interpolation_matrix (const FiniteElement<dim> &x_source_fe,
 
 
 
-template <int dim>
+template <int dim, int spacedim>
 void
-FE_DGQ<dim>::
-get_face_interpolation_matrix (const FiniteElement<dim> &x_source_fe,
+FE_DGQ<dim, spacedim>::
+get_face_interpolation_matrix (const FiniteElement<dim, spacedim> &x_source_fe,
 			       FullMatrix<double>       &interpolation_matrix) const
 {
 				   // this is only implemented, if the source
@@ -438,11 +440,11 @@ get_face_interpolation_matrix (const FiniteElement<dim> &x_source_fe,
 				   // faces and the face interpolation matrix
 				   // is necessarily empty -- i.e. there isn't
 				   // much we need to do here.
+  typedef FiniteElement<dim,spacedim> FE;
   AssertThrow ((x_source_fe.get_name().find ("FE_DGQ<") == 0)
                ||
-               (dynamic_cast<const FE_DGQ<dim>*>(&x_source_fe) != 0),
-               typename FiniteElement<dim>::
-               ExcInterpolationNotImplemented());
+               (dynamic_cast<const FE_DGQ<dim, spacedim>*>(&x_source_fe) != 0),
+               typename FE::ExcInterpolationNotImplemented());
   
   Assert (interpolation_matrix.m() == 0,
 	  ExcDimensionMismatch (interpolation_matrix.m(),
@@ -454,10 +456,10 @@ get_face_interpolation_matrix (const FiniteElement<dim> &x_source_fe,
 
 
 
-template <int dim>
+template <int dim, int spacedim>
 void
-FE_DGQ<dim>::
-get_subface_interpolation_matrix (const FiniteElement<dim> &x_source_fe,
+FE_DGQ<dim, spacedim>::
+get_subface_interpolation_matrix (const FiniteElement<dim, spacedim> &x_source_fe,
 				  const unsigned int ,
 				  FullMatrix<double>           &interpolation_matrix) const
 {
@@ -467,11 +469,11 @@ get_subface_interpolation_matrix (const FiniteElement<dim> &x_source_fe,
 				   // faces and the face interpolation matrix
 				   // is necessarily empty -- i.e. there isn't
 				   // much we need to do here.
+  typedef FiniteElement<dim, spacedim> FE;
   AssertThrow ((x_source_fe.get_name().find ("FE_DGQ<") == 0)
                ||
-               (dynamic_cast<const FE_DGQ<dim>*>(&x_source_fe) != 0),
-               typename FiniteElement<dim>::
-               ExcInterpolationNotImplemented());
+               (dynamic_cast<const FE_DGQ<dim, spacedim>*>(&x_source_fe) != 0),
+               typename FE::ExcInterpolationNotImplemented());
   
   Assert (interpolation_matrix.m() == 0,
 	  ExcDimensionMismatch (interpolation_matrix.m(),
@@ -483,23 +485,23 @@ get_subface_interpolation_matrix (const FiniteElement<dim> &x_source_fe,
 
 
 
-template <int dim>
+template <int dim, int spacedim>
 bool
-FE_DGQ<dim>::hp_constraints_are_implemented () const
+FE_DGQ<dim, spacedim>::hp_constraints_are_implemented () const
 {
   return true;
 }
 
 
 
-template <int dim>
+template <int dim, int spacedim>
 std::vector<std::pair<unsigned int, unsigned int> >
-FE_DGQ<dim>::
-hp_vertex_dof_identities (const FiniteElement<dim> &fe_other) const
+FE_DGQ<dim, spacedim>::
+hp_vertex_dof_identities (const FiniteElement<dim, spacedim> &fe_other) const
 {
 				   // there are no such constraints for DGQ
 				   // elements at all
-  if (dynamic_cast<const FE_DGQ<dim>*>(&fe_other) != 0)
+  if (dynamic_cast<const FE_DGQ<dim, spacedim>*>(&fe_other) != 0)
     return
       std::vector<std::pair<unsigned int, unsigned int> > ();
   else
@@ -511,14 +513,14 @@ hp_vertex_dof_identities (const FiniteElement<dim> &fe_other) const
 
 
 
-template <int dim>
+template <int dim, int spacedim>
 std::vector<std::pair<unsigned int, unsigned int> >
-FE_DGQ<dim>::
-hp_line_dof_identities (const FiniteElement<dim> &fe_other) const
+FE_DGQ<dim, spacedim>::
+hp_line_dof_identities (const FiniteElement<dim, spacedim> &fe_other) const
 {
 				   // there are no such constraints for DGQ
 				   // elements at all
-  if (dynamic_cast<const FE_DGQ<dim>*>(&fe_other) != 0)
+  if (dynamic_cast<const FE_DGQ<dim, spacedim>*>(&fe_other) != 0)
     return
       std::vector<std::pair<unsigned int, unsigned int> > ();
   else
@@ -530,14 +532,14 @@ hp_line_dof_identities (const FiniteElement<dim> &fe_other) const
 
 
 
-template <int dim>
+template <int dim, int spacedim>
 std::vector<std::pair<unsigned int, unsigned int> >
-FE_DGQ<dim>::
-hp_quad_dof_identities (const FiniteElement<dim>        &fe_other) const
+FE_DGQ<dim, spacedim>::
+hp_quad_dof_identities (const FiniteElement<dim, spacedim>        &fe_other) const
 {
 				   // there are no such constraints for DGQ
 				   // elements at all
-  if (dynamic_cast<const FE_DGQ<dim>*>(&fe_other) != 0)
+  if (dynamic_cast<const FE_DGQ<dim, spacedim>*>(&fe_other) != 0)
     return
       std::vector<std::pair<unsigned int, unsigned int> > ();
   else
@@ -549,15 +551,15 @@ hp_quad_dof_identities (const FiniteElement<dim>        &fe_other) const
 
 
 
-template <int dim>
+template <int dim, int spacedim>
 FiniteElementDomination::Domination
-FE_DGQ<dim>::compare_for_face_domination (const FiniteElement<dim> &fe_other) const
+FE_DGQ<dim, spacedim>::compare_for_face_domination (const FiniteElement<dim, spacedim> &fe_other) const
 {
 				   // check whether both are discontinuous
 				   // elements and both could dominate, see
 				   // the description of
 				   // FiniteElementDomination::Domination
-  if (dynamic_cast<const FE_DGQ<dim>*>(&fe_other) != 0)
+  if (dynamic_cast<const FE_DGQ<dim, spacedim>*>(&fe_other) != 0)
     return FiniteElementDomination::either_element_can_dominate;
 
   Assert (false, ExcNotImplemented());
@@ -566,9 +568,9 @@ FE_DGQ<dim>::compare_for_face_domination (const FiniteElement<dim> &fe_other) co
 
 
 
-template <int dim>
+template <int dim, int spacedim>
 bool
-FE_DGQ<dim>::has_support_on_face (const unsigned int shape_index,
+FE_DGQ<dim, spacedim>::has_support_on_face (const unsigned int shape_index,
 				  const unsigned int face_index) const
 {
   Assert (shape_index < this->dofs_per_cell,
@@ -639,9 +641,9 @@ FE_DGQ<dim>::has_support_on_face (const unsigned int shape_index,
 
 
 
-template <int dim>
+template <int dim, int spacedim>
 unsigned int
-FE_DGQ<dim>::memory_consumption () const
+FE_DGQ<dim, spacedim>::memory_consumption () const
 {
   Assert (false, ExcNotImplemented ());
   return 0;
@@ -744,6 +746,13 @@ FE_DGQArbitraryNodes<dim>::clone() const
 
 
 template class FE_DGQ<deal_II_dimension>;
+
+//codimension 1
+
+#if deal_II_dimension != 3
+template class FE_DGQ<deal_II_dimension, deal_II_dimension+1>;
+#endif
+
 template class FE_DGQArbitraryNodes<deal_II_dimension>;
 
 DEAL_II_NAMESPACE_CLOSE

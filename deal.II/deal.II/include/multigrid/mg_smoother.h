@@ -24,7 +24,7 @@
 
 DEAL_II_NAMESPACE_OPEN
 
-template <int dim> class MGDoFHandler;
+template <int dim, int spacedim> class MGDoFHandler;
 
 
 /*
@@ -106,7 +106,7 @@ class MGSmootherContinuous : public MGSmootherBase<VECTOR>
 				      * about this text is, that there
 				      * is no 1d implementation.
 				      */
-    MGSmootherContinuous (const MGDoFHandler<1> &mg_dof,
+    MGSmootherContinuous (const MGDoFHandler<1,1> &mg_dof,
 			  const unsigned int     steps);
 
 				     /**
@@ -122,8 +122,8 @@ class MGSmootherContinuous : public MGSmootherBase<VECTOR>
 				      * the number of smoothing steps
 				      * to be executed by @p smooth.
 				      */
-    template <int dim>
-    MGSmootherContinuous (const MGDoFHandler<dim> &mg_dof,
+    template <int dim, int spacedim>
+    MGSmootherContinuous (const MGDoFHandler<dim,spacedim> &mg_dof,
 			  const unsigned int       steps);    
 
 				     /**

@@ -27,14 +27,7 @@ template <typename number> class FullMatrix;
 template <typename number> class SparseMatrix;
 template <typename number> class Vector;
 
-template <int celldim, class DH> class DoFObjectAccessor;
-template <class DH> class DoFObjectAccessor<0,DH>;
-template <class DH> class DoFObjectAccessor<1,DH>;
-template <class DH> class DoFObjectAccessor<2,DH>;
-template <class DH> class DoFObjectAccessor<3,DH>;
-
-
-template <int dim, typename Accessor> class TriaRawIterator;
+template <typename Accessor> class TriaRawIterator;
 
 
 
@@ -44,60 +37,56 @@ template <int dim, typename Accessor> class TriaRawIterator;
 // inlining and thus faster code.
 
 
+namespace internal
+{
+  namespace DoFAccessor
+  {
 /**
  * This is a switch class which only declares a @p typedef. It is meant to
- * determine which class a DoFObjectAccessor class is to be derived
- * from. By default, <tt>DoFObjectAccessor<celldim,dim></tt> derives from
- * the @p typedef in the general <tt>DoFObjectAccessor_Inheritance<celldim,dim></tt>
- * class, which is <tt>TriaObjectAccessor<celldim,dim></tt>,
- * but if <tt>celldim==dim</tt>, then the specialization <tt>DoFObjectAccessor_Inheritance<dim,dim></tt>
- * is used which declares its local type to be <tt>CellAccessor<dim></tt>. Therefore,
- * the inheritance is automatically chosen to be from CellAccessor if the
- * object under consideration has full dimension, i.e. constitutes a cell.
+ * determine which class a DoFAccessor class is to be derived from. By
+ * default, <tt>DoFAccessor@<celldim,dim,spacedim@></tt> derives from the
+ * typedef in the general
+ * <tt>Inheritance@<celldim,dim,spacedim@></tt> class, which is
+ * <tt>TriaAccessor@<celldim,dim,spacedim@></tt>, but if
+ * <tt>celldim==dim</tt>, then the specialization
+ * <tt>Inheritance@<dim,dim,spacedim@></tt> is used which declares
+ * its local type to be <tt>CellAccessor@<dim,spacedim@></tt>. Therefore, the
+ * inheritance is automatically chosen to be from CellAccessor if the object
+ * under consideration has full dimension, i.e. constitutes a cell.
  *
  * @ingroup dofs
  * @ingroup Accessors 
  * @author Wolfgang Bangerth, 1999
  */
-template <int celldim, int dim>
-class DoFObjectAccessor_Inheritance 
-{
-  public:
-				     /**
-				      * Declaration of the @p typedef.
-				      * See the full documentation for
-				      * more information.
-				      */
-    typedef TriaObjectAccessor<celldim,dim> BaseClass;
-};
+    template <int celldim, int dim, int spacedim>
+    struct Inheritance 
+    {
+					 /**
+					  * Declaration of the @p typedef.
+					  * See the full documentation for
+					  * more information.
+					  */
+	typedef TriaAccessor<celldim,dim,spacedim> BaseClass;
+    };
 
 
 /**
- * This is a switch class which only declares a @p typedef. It is meant to
- * determine which class a DoFObjectAccessor class is to be derived
- * from. By default, <tt>DoFObjectAccessor<celldim,dim></tt> derives from
- * the @p typedef in the general <tt>DoFObjectAccessor_Inheritance<celldim,dim></tt>
- * class, which is <tt>TriaObjectAccessor<celldim,dim></tt>,
- * but if <tt>celldim==dim</tt>, then the specialization <tt>DoFObjectAccessor_Inheritance<dim,dim></tt>
- * is used which declares its local type to be <tt>CellAccessor<dim></tt>. Therefore,
- * the inheritance is automatically chosen to be from CellAccessor if the
- * object under consideration has full dimension, i.e. constitutes a cell.
- *
- * @ingroup dofs
- * @ingroup Accessors 
- * @author Wolfgang Bangerth, 1999
+ * This is the specialization of the general template used for the case where
+ * an object has full dimension, i.e. is a cell. See the general template for
+ * more details.
  */
-template <int dim>
-class DoFObjectAccessor_Inheritance<dim,dim>
-{
-  public:
-				     /**
-				      * Declaration of the @p typedef.
-				      * See the full documentation for
-				      * more information.
-				      */
-    typedef CellAccessor<dim> BaseClass;
-};
+    template <int dim, int spacedim>
+    struct Inheritance<dim,dim,spacedim>
+    {
+					 /**
+					  * Declaration of the @p typedef.
+					  * See the full documentation for
+					  * more information.
+					  */
+	typedef CellAccessor<dim,spacedim> BaseClass;
+    };
+  }
+}
 
 
 /* -------------------------------------------------------------------------- */
@@ -105,29 +94,26 @@ class DoFObjectAccessor_Inheritance<dim,dim>
 
 
 /**
- * Define the base class for accessors to the degrees of
- * freedom. Accessors are used to, well, access the data that pertains
- * to edges, faces, and cells of a triangulation. The concept is
+ * A class that gives access to the degrees of freedom stored in a DoFHandler
+ * or hp::DoFHandler object. Accessors are used to, well, access the data that
+ * pertains to edges, faces, and cells of a triangulation. The concept is
  * explained in more detail in connection to @ref Iterators.
  *
  * This class follows mainly the route laid out by the accessor library
- * declared in the triangulation library (TriaAccessor). It enables
- * the user to access the degrees of freedom on the lines (there are similar
- * versions for the DoFs on quads, etc), where the dimension of the underlying
- * triangulation does not really matter (i.e. this accessor works with the
- * lines in 1D-, 2D-, etc dimensions).
- *
- * The first template argument of this class refers to the structural
- * dimension of the thing accessed: it is 1 for lines, 2 for quads, or
- * 3 for hexes. The second argument denotes the type of DoF handler we
- * should work on. It can either be ::DoFHandler<dim> or
- * hp::DoFHandler<dim>. The space dimension of the object we are to
- * work on is automatically extracted from the DH template argument.
+ * declared in the triangulation library (TriaAccessor). It enables the user
+ * to access the degrees of freedom on lines, quads, or hexes. The first
+ * template argument of this class determines the dimensionality of the object
+ * under consideration: 1 for lines, 2 for quads, and 3 for hexes. From the
+ * second template argument we can deduce the dimensionality of the
+ * triangulation to which this object belongs as well as the dimensionality of
+ * the space in which it is embedded. The second argument also denotes the
+ * type of DoF handler we should work on. It can either be
+ * ::DoFHandler or hp::DoFHandler.
  *
  * Depending on whether the structural dimension of the object
- * accessed equals the space dimension on which the DoF handler object
+ * accessed equals the dimension on which the DoF handler object
  * operates, this class is derived from CellAccessor or
- * TriaObjectAccessor. This means that, for example accessors to quads
+ * TriaAccessor. This means that, for example accessors to quads
  * in 2d have access to all the mesh aspects of cells, whereas
  * accessors to quads in 3d can only access things that make sense for
  * faces.
@@ -150,28 +136,34 @@ class DoFObjectAccessor_Inheritance<dim,dim>
  * rather than lower-dimensional objects. In that case, inheritance is
  * from CellAccessor, to provide access to all the cell specific
  * information afforded by that class. Otherwise, i.e. for
- * lower-dimensional objects, inheritance is from TriaObjectAccessor.
+ * lower-dimensional objects, inheritance is from TriaAccessor.
  *
- * There are classes DoFObjectAccessor<1>, DoFObjectAccessor<2>, and
- * DoFObjectAccessor<3> derived from the present class that provide
- * things that are specific to objects of a particular
- * dimensionality. For example, DoFObjectAccessor<2> allows access to
- * the DoF iterators pointing to the lines that bound that
- * quadrilateral, which is obviously something that a line can't
- * do. Consequently, these few operations are declared in these
- * derived classes.
- *
- * In addition, there is a DoFCellAccessor class that provides the
+ * There is a DoFCellAccessor class that provides the
  * equivalent to the CellAccessor class.
  *
  * @ingroup dofs
  * @ingroup Accessors
- * @author Wolfgang Bangerth, 1998, 2006
+ * @author Wolfgang Bangerth, 1998, 2006, 2008
  */
 template <int structdim, class DH>
-class DoFAccessor : public DoFObjectAccessor_Inheritance<structdim, DH::dimension>::BaseClass
+class DoFAccessor : public internal::DoFAccessor::Inheritance<structdim, DH::dimension, DH::space_dimension>::BaseClass
 {
   public:
+
+				     /**
+				      * A static variable that allows users of
+				      * this class to discover the value of
+				      * the second template argument.
+				      */
+    static const unsigned int dimension=DH::dimension;
+
+				     /**
+				      * A static variable that allows users of
+				      * this class to discover the value of
+				      * the third template argument.
+				      */
+    static const unsigned int space_dimension=DH::space_dimension;
+
 				     /**
 				      * Declare a typedef to the base
 				      * class to make accessing some
@@ -179,7 +171,7 @@ class DoFAccessor : public DoFObjectAccessor_Inheritance<structdim, DH::dimensio
 				      * simpler.
 				      */
     typedef
-    typename DoFObjectAccessor_Inheritance<structdim, DH::dimension>::BaseClass
+    typename internal::DoFAccessor::Inheritance<structdim, dimension, space_dimension>::BaseClass
     BaseClass;
 
 				     /**
@@ -187,6 +179,13 @@ class DoFAccessor : public DoFObjectAccessor_Inheritance<structdim, DH::dimensio
 				      */
     typedef DH AccessorData;
 
+				     /**
+				      * @name Constructors
+				      */
+				     /**
+				      * @{
+				      */
+    
 				     /**
 				      * Default constructor. Provides
 				      * an accessor that can't be
@@ -197,16 +196,48 @@ class DoFAccessor : public DoFObjectAccessor_Inheritance<structdim, DH::dimensio
 				     /**
 				      * Constructor
 				      */
-    DoFAccessor (const Triangulation<DH::dimension> *tria,
+    DoFAccessor (const Triangulation<DH::dimension,DH::space_dimension> *tria,
 		 const int                 level,
 		 const int                 index,
 		 const DH                 *local_data);
 
 				     /**
-				      * Reset the DoF handler pointer.
+				      * Conversion constructor. This
+				      * constructor exists to make certain
+				      * constructs simpler to write in
+				      * dimension independent code. For
+				      * example, it allows assigning a face
+				      * iterator to a line iterator, an
+				      * operation that is useful in 2d but
+				      * doesn't make any sense in 3d. The
+				      * constructor here exists for the
+				      * purpose of making the code conform to
+				      * C++ but it will unconditionally abort;
+				      * in other words, assigning a face
+				      * iterator to a line iterator is better
+				      * put into an if-statement that checks
+				      * that the dimension is two, and assign
+				      * to a quad iterator in 3d (an operator
+				      * that, without this constructor would
+				      * be illegal if we happen to compile for
+				      * 2d).
 				      */
-    void set_dof_handler (DH *dh);
+    template <int structdim2, int dim2, int spacedim2>
+    DoFAccessor (const InvalidAccessor<structdim2,dim2,spacedim2> &);
 
+				     /**
+				      * Another conversion operator
+				      * between objects that don't
+				      * make sense, just like the
+				      * previous one.
+				      */
+    template <int dim2, class DH2>
+    DoFAccessor (const DoFAccessor<dim2, DH2> &);
+
+				     /**
+				      * @}
+				      */
+    
 				     /**
 				      * Return a handle on the
 				      * DoFHandler object which we
@@ -228,11 +259,117 @@ class DoFAccessor : public DoFObjectAccessor_Inheritance<structdim, DH::dimensio
     void copy_from (const DoFAccessor<structdim, DH> &a);
 
 				     /**
+				      *  @name Accessing sub-objects
+				      */
+				     /**
+				      * @{
+				      */
+
+				     /**
 				      * Return an iterator pointing to
 				      * the the @p c-th child.
 				      */
-    TriaIterator<DH::dimension,DoFObjectAccessor<structdim,DH> >
+    TriaIterator<DoFAccessor<structdim,DH> >
     child (const unsigned int c) const;
+
+				     /**
+				      * Pointer to the @p ith line
+				      * bounding this object.
+				      */
+    typename internal::DoFHandler::Iterators<DH>::line_iterator
+    line (const unsigned int i) const;
+
+    				     /**
+				      * Pointer to the @p ith quad
+				      * bounding this object.
+				      */
+    typename internal::DoFHandler::Iterators<DH>::quad_iterator
+    quad (const unsigned int i) const;
+
+				     /**
+				      * @}
+				      */
+
+				     /**
+				      *  @name Accessing the DoF indices of this object
+				      */
+				     /**
+				      * @{
+				      */
+    
+    				     /**
+				      * Return the indices of the dofs of this
+				      * object in the standard ordering: dofs
+				      * on vertex 0, dofs on vertex 1, etc,
+				      * dofs on line 0, dofs on line 1, etc,
+				      * dofs on quad 0, etc.
+				      *
+				      * The vector has to have the
+				      * right size before being passed
+				      * to this function.
+				      *
+				      * This function is most often
+				      * used on active objects (edges,
+				      * faces, cells). It can be used
+				      * on non-active objects as well
+				      * (i.e. objects that have
+				      * children), but only if the
+				      * finite element under
+				      * consideration has degrees of
+				      * freedom exclusively on
+				      * vertices. Otherwise, the
+				      * function doesn't make much
+				      * sense, since for example
+				      * inactive edges do not have
+				      * degrees of freedom associated
+				      * with them at all.
+				      *
+				      * The last argument denotes the
+				      * finite element index. For the
+				      * standard ::DoFHandler class,
+				      * this value must be equal to
+				      * its default value since that
+				      * class only supports the same
+				      * finite element on all cells
+				      * anyway.
+				      *
+				      * However, for hp objects
+				      * (i.e. the hp::DoFHandler
+				      * class), different finite
+				      * element objects may be used on
+				      * different cells. On faces
+				      * between two cells, as well as
+				      * vertices, there may therefore
+				      * be two sets of degrees of
+				      * freedom, one for each of the
+				      * finite elements used on the
+				      * adjacent cells. In order to
+				      * specify which set of degrees
+				      * of freedom to work on, the
+				      * last argument is used to
+				      * disambiguate. Finally, if this
+				      * function is called for a cell
+				      * object, there can only be a
+				      * single set of degrees of
+				      * freedom, and fe_index has to
+				      * match the result of
+				      * active_fe_index().
+				      *
+				      * For cells, there is only a
+				      * single possible finite element
+				      * index (namely the one for that
+				      * cell, returned by
+				      * <code>cell-@>active_fe_index</code>. Consequently,
+				      * the derived DoFCellAccessor
+				      * class has an overloaded
+				      * version of this function that
+				      * calls the present function
+				      * with
+				      * <code>cell-@>active_fe_index</code>
+				      * as last argument.
+				      */
+    void get_dof_indices (std::vector<unsigned int> &dof_indices,
+			  const unsigned int fe_index = DH::default_fe_index) const;
 
 				     /**
 				      * Global DoF index of the <i>i</i>
@@ -275,47 +412,6 @@ class DoFAccessor : public DoFObjectAccessor_Inheritance<structdim, DH::dimensio
 				   const unsigned int fe_index = DH::default_fe_index) const;
 
 				     /**
-				      * Set the global index of the <i>i</i>
-				      * degree on the @p vertex-th vertex of
-				      * the present cell to @p index.
-				      *
-				      * The last argument denotes the
-				      * finite element index. For the
-				      * standard ::DoFHandler class,
-				      * this value must be equal to
-				      * its default value since that
-				      * class only supports the same
-				      * finite element on all cells
-				      * anyway.
-				      *
-				      * However, for hp objects
-				      * (i.e. the hp::DoFHandler
-				      * class), different finite
-				      * element objects may be used on
-				      * different cells. On faces
-				      * between two cells, as well as
-				      * vertices, there may therefore
-				      * be two sets of degrees of
-				      * freedom, one for each of the
-				      * finite elements used on the
-				      * adjacent cells. In order to
-				      * specify which set of degrees
-				      * of freedom to work on, the
-				      * last argument is used to
-				      * disambiguate. Finally, if this
-				      * function is called for a cell
-				      * object, there can only be a
-				      * single set of degrees of
-				      * freedom, and fe_index has to
-				      * match the result of
-				      * active_fe_index().
-				      */
-    void set_vertex_dof_index (const unsigned int vertex,
-			       const unsigned int i,
-			       const unsigned int index,
-			       const unsigned int fe_index = DH::default_fe_index) const;
-
-				     /**
 				      * Index of the <i>i</i>th degree
 				      * of freedom of this object.
 				      *
@@ -353,46 +449,17 @@ class DoFAccessor : public DoFObjectAccessor_Inheritance<structdim, DH::dimensio
     unsigned int dof_index (const unsigned int i,
 			    const unsigned int fe_index = DH::default_fe_index) const;
 
-    				     /**
-				      * Set the index of the
-				      * <i>i</i>th degree of freedom
-				      * of this object to @p index.
-				      *
-				      * The last argument denotes the
-				      * finite element index. For the
-				      * standard ::DoFHandler class,
-				      * this value must be equal to
-				      * its default value since that
-				      * class only supports the same
-				      * finite element on all cells
-				      * anyway.
-				      *
-				      * However, for hp objects
-				      * (i.e. the hp::DoFHandler
-				      * class), different finite
-				      * element objects may be used on
-				      * different cells. On faces
-				      * between two cells, as well as
-				      * vertices, there may therefore
-				      * be two sets of degrees of
-				      * freedom, one for each of the
-				      * finite elements used on the
-				      * adjacent cells. In order to
-				      * specify which set of degrees
-				      * of freedom to work on, the
-				      * last argument is used to
-				      * disambiguate. Finally, if this
-				      * function is called for a cell
-				      * object, there can only be a
-				      * single set of degrees of
-				      * freedom, and fe_index has to
-				      * match the result of
-				      * active_fe_index().
+				     /**
+				      * @}
 				      */
-    void set_dof_index (const unsigned int i,
-			const unsigned int index,
-			const unsigned int fe_index = DH::default_fe_index) const;
 
+				     /**
+				      *  @name Accessing the finite element associated with this object
+				      */
+				     /**
+				      * @{
+				      */
+    
                                      /**
                                       * Return the number of finite
                                       * elements that are active on a
@@ -461,8 +528,12 @@ class DoFAccessor : public DoFObjectAccessor_Inheritance<structdim, DH::dimensio
 				      * i.e. <code>fe_index_is_active(fe_index)</code>
 				      * must return true.
 				      */
-    const FiniteElement<DH::dimension> &
+    const FiniteElement<DH::dimension,DH::space_dimension> &
     get_fe (const unsigned int fe_index) const;
+
+				     /**
+				      * @}
+				      */
     
                                      /**
 				      * Exceptions for child classes
@@ -521,12 +592,107 @@ class DoFAccessor : public DoFObjectAccessor_Inheritance<structdim, DH::dimensio
 				      */
     bool operator != (const DoFAccessor &) const;
 
+				     /**
+				      * Reset the DoF handler pointer.
+				      */
+    void set_dof_handler (DH *dh);
+
+    				     /**
+				      * Set the index of the
+				      * <i>i</i>th degree of freedom
+				      * of this object to @p index.
+				      *
+				      * The last argument denotes the
+				      * finite element index. For the
+				      * standard ::DoFHandler class,
+				      * this value must be equal to
+				      * its default value since that
+				      * class only supports the same
+				      * finite element on all cells
+				      * anyway.
+				      *
+				      * However, for hp objects
+				      * (i.e. the hp::DoFHandler
+				      * class), different finite
+				      * element objects may be used on
+				      * different cells. On faces
+				      * between two cells, as well as
+				      * vertices, there may therefore
+				      * be two sets of degrees of
+				      * freedom, one for each of the
+				      * finite elements used on the
+				      * adjacent cells. In order to
+				      * specify which set of degrees
+				      * of freedom to work on, the
+				      * last argument is used to
+				      * disambiguate. Finally, if this
+				      * function is called for a cell
+				      * object, there can only be a
+				      * single set of degrees of
+				      * freedom, and fe_index has to
+				      * match the result of
+				      * active_fe_index().
+				      */
+    void set_dof_index (const unsigned int i,
+			const unsigned int index,
+			const unsigned int fe_index = DH::default_fe_index) const;
+
+				     /**
+				      * Set the global index of the <i>i</i>
+				      * degree on the @p vertex-th vertex of
+				      * the present cell to @p index.
+				      *
+				      * The last argument denotes the
+				      * finite element index. For the
+				      * standard ::DoFHandler class,
+				      * this value must be equal to
+				      * its default value since that
+				      * class only supports the same
+				      * finite element on all cells
+				      * anyway.
+				      *
+				      * However, for hp objects
+				      * (i.e. the hp::DoFHandler
+				      * class), different finite
+				      * element objects may be used on
+				      * different cells. On faces
+				      * between two cells, as well as
+				      * vertices, there may therefore
+				      * be two sets of degrees of
+				      * freedom, one for each of the
+				      * finite elements used on the
+				      * adjacent cells. In order to
+				      * specify which set of degrees
+				      * of freedom to work on, the
+				      * last argument is used to
+				      * disambiguate. Finally, if this
+				      * function is called for a cell
+				      * object, there can only be a
+				      * single set of degrees of
+				      * freedom, and fe_index has to
+				      * match the result of
+				      * active_fe_index().
+				      */
+    void set_vertex_dof_index (const unsigned int vertex,
+			       const unsigned int i,
+			       const unsigned int index,
+			       const unsigned int fe_index = DH::default_fe_index) const;
+    
                                      /**
                                       * Iterator classes need to be friends
                                       * because they need to access operator==
                                       * and operator!=.
                                       */
-    template <int, typename> friend class TriaRawIterator;
+    template <typename> friend class TriaRawIterator;
+
+
+				     /**
+				      * Make the DoFHandler class a friend so
+				      * that it can call the set_xxx()
+				      * functions.
+				      */
+    template <int dim, int spacedim> friend class DoFHandler;
+    template <int dim, int spacedim> friend class hp::DoFHandler;
 };
 
 
@@ -534,439 +700,9 @@ class DoFAccessor : public DoFObjectAccessor_Inheritance<structdim, DH::dimensio
 
 
 /**
- * Closure class. Unused, but necessary for some template constructs.
- * @ingroup dofs
- * @ingroup Accessors
- */
-template <class DH>
-class DoFObjectAccessor<0, DH> : public DoFAccessor<0, DH>
-{
-  public:
-    				     /**
-				      * Extract dimension from DH.
-				      */
-    static const unsigned int dim = DH::dimension;
-
-    typedef void AccessorData;
-
-				     /**
-				      * Constructor. Should never be called
-				      * and thus throws an error.
-				      */
-    DoFObjectAccessor (Triangulation<dim> *,
-		       const int,
-		       const int,
-		       const AccessorData *)
-      {
-	Assert (false, ExcInternalError());
-      }
-};
-
-
-
-/**
- * Grant access to those aspects of degrees of freedom located on
- * quads that are dimension specific. See the DoFAccessor class for
- * more information.
+ * Grant access to the degrees of freedom on a cell.
  *
- * @ingroup dofs
- * @ingroup Accessors
- * @author Wolfgang Bangerth, 1998, 2006
- */
-template <class DH>
-class DoFObjectAccessor<1, DH> : public DoFAccessor<1,DH>
-{
-  public:
-				     /**
-				      * Extract dimension from DH.
-				      */
-    static const unsigned int dim = DH::dimension;
-    
-				     /**
-				      * Declare the data type that this accessor
-				      * class expects to get passed from the
-				      * iterator classes.
-				      */
-    typedef DH AccessorData;
-
-				     /**
-				      * Declare base class as a local typedef
-				      * for simpler access.
-				      */
-    typedef DoFAccessor<1,DH> BaseClass;
-
-				     /**
-				      * Default constructor, unused thus
-				      * not implemented.
-				      */
-    DoFObjectAccessor ();
-    
-    				     /**
-				      * Constructor. The @p local_data
-				      * argument is assumed to be a pointer
-				      * to a DoFHandler object.
-				      */
-    DoFObjectAccessor (const Triangulation<DH::dimension> *tria,
-		       const int                 level,
-		       const int                 index,
-		       const AccessorData       *local_data);    
-
-    				     /**
-				      * Return the indices of the dofs of this
-				      * object in the standard ordering: dofs
-				      * on vertex 0, dofs on vertex 1, etc,
-				      * dofs on line 0, dofs on line 1, etc,
-				      * dofs on quad 0, etc.
-				      *
-				      * The vector has to have the
-				      * right size before being passed
-				      * to this function.
-				      *
-				      * This function is most often
-				      * used on active objects (edges,
-				      * faces, cells). It can be used
-				      * on non-active objects as well
-				      * (i.e. objects that have
-				      * children), but only if the
-				      * finite element under
-				      * consideration has degrees of
-				      * freedom exclusively on
-				      * vertices. Otherwise, the
-				      * function doesn't make much
-				      * sense, since for example
-				      * inactive edges do not have
-				      * degrees of freedom associated
-				      * with them at all.
-				      *
-				      * The last argument denotes the
-				      * finite element index. For the
-				      * standard ::DoFHandler class,
-				      * this value must be equal to
-				      * its default value since that
-				      * class only supports the same
-				      * finite element on all cells
-				      * anyway.
-				      *
-				      * However, for hp objects
-				      * (i.e. the hp::DoFHandler
-				      * class), different finite
-				      * element objects may be used on
-				      * different cells. On faces
-				      * between two cells, as well as
-				      * vertices, there may therefore
-				      * be two sets of degrees of
-				      * freedom, one for each of the
-				      * finite elements used on the
-				      * adjacent cells. In order to
-				      * specify which set of degrees
-				      * of freedom to work on, the
-				      * last argument is used to
-				      * disambiguate. Finally, if this
-				      * function is called for a cell
-				      * object, there can only be a
-				      * single set of degrees of
-				      * freedom, and fe_index has to
-				      * match the result of
-				      * active_fe_index().
-				      *
-				      * For cells, there is only a
-				      * single possible finite element
-				      * index (namely the one for that
-				      * cell, returned by
-				      * <code>cell-@>active_fe_index</code>. Consequently,
-				      * the derived DoFCellAccessor
-				      * class has an overloaded
-				      * version of this function that
-				      * calls the present function
-				      * with
-				      * <code>cell-@>active_fe_index</code>
-				      * as last argument.
-				      */
-    void get_dof_indices (std::vector<unsigned int> &dof_indices,
-			  const unsigned int fe_index = DH::default_fe_index) const;
-};
-
-
-/**
- * Grant access to those aspects of degrees of freedom located on
- * quads that are dimension specific. See the DoFAccessor class for
- * more information.
- *
- * @ingroup dofs
- * @ingroup Accessors
- * @author Wolfgang Bangerth, 1998, 2006
- */
-template <class DH>
-class DoFObjectAccessor<2, DH> : public DoFAccessor<2,DH>
-{
-  public:
-				     /**
-				      * Extract dimension from DH.
-				      */
-    static const unsigned int dim = DH::dimension;
-
-				     /**
-				      * Declare the data type that this accessor
-				      * class expects to get passed from the
-				      * iterator classes.
-				      */
-    typedef DH AccessorData;
-
-				     /**
-				      * Declare base class as a local typedef
-				      * for simpler access.
-				      */
-    typedef DoFAccessor<2,DH> BaseClass;
-    
-				     /**
-				      * Default constructor, unused thus
-				      * not implemented.
-				      */
-    DoFObjectAccessor ();
-
-    				     /**
-				      * Constructor. The @p local_data
-				      * argument is assumed to be a pointer
-				      * to a DoFHandler object.
-				      */
-    DoFObjectAccessor (const Triangulation<DH::dimension> *tria,
-		       const int                 level,
-		       const int                 index,
-		       const AccessorData       *local_data);
-    
-    				     /**
-				      * Return the indices of the dofs of this
-				      * object in the standard ordering: dofs
-				      * on vertex 0, dofs on vertex 1, etc,
-				      * dofs on line 0, dofs on line 1, etc,
-				      * dofs on quad 0, etc.
-				      *
-				      * The vector has to have the
-				      * right size before being passed
-				      * to this function.
-				      *
-				      * This function is most often
-				      * used on active objects (edges,
-				      * faces, cells). It can be used
-				      * on non-active objects as well
-				      * (i.e. objects that have
-				      * children), but only if the
-				      * finite element under
-				      * consideration has degrees of
-				      * freedom exclusively on
-				      * vertices. Otherwise, the
-				      * function doesn't make much
-				      * sense, since for example
-				      * inactive edges do not have
-				      * degrees of freedom associated
-				      * with them at all.
-				      *
-				      * The last argument denotes the
-				      * finite element index. For the
-				      * standard ::DoFHandler class,
-				      * this value must be equal to
-				      * its default value since that
-				      * class only supports the same
-				      * finite element on all cells
-				      * anyway.
-				      *
-				      * However, for hp objects
-				      * (i.e. the hp::DoFHandler
-				      * class), different finite
-				      * element objects may be used on
-				      * different cells. On faces
-				      * between two cells, as well as
-				      * vertices, there may therefore
-				      * be two sets of degrees of
-				      * freedom, one for each of the
-				      * finite elements used on the
-				      * adjacent cells. In order to
-				      * specify which set of degrees
-				      * of freedom to work on, the
-				      * last argument is used to
-				      * disambiguate. Finally, if this
-				      * function is called for a cell
-				      * object, there can only be a
-				      * single set of degrees of
-				      * freedom, and fe_index has to
-				      * match the result of
-				      * active_fe_index().
-				      *
-				      * For cells, there is only a
-				      * single possible finite element
-				      * index (namely the one for that
-				      * cell, returned by
-				      * <code>cell-@>active_fe_index</code>. Consequently,
-				      * the derived DoFCellAccessor
-				      * class has an overloaded
-				      * version of this function that
-				      * calls the present function
-				      * with
-				      * <code>cell-@>active_fe_index</code>
-				      * as last argument.
-				      */
-    void get_dof_indices (std::vector<unsigned int> &dof_indices,
-			  const unsigned int fe_index = DH::default_fe_index) const;
-
-    				     /**
-				      *  Return a pointer to the @p ith line
-				      *  bounding this @p Quad.
-				      */
-    TriaIterator<DH::dimension,DoFObjectAccessor<1, DH> >
-    line (const unsigned int i) const;
-};
-
-
-/**
- * Grant access to those aspects of degrees of freedom located on
- * hexes that are dimension specific. See the DoFAccessor class for
- * more information.
- *
- * @ingroup dofs
- * @ingroup Accessors
- * @author Wolfgang Bangerth, 1998, 2006
- */
-template <class DH>
-class DoFObjectAccessor<3, DH> : public DoFAccessor<3,DH>
-{
-  public:
-				     /**
-				      * Extract dimension from DH.
-				      */
-    static const unsigned int dim = DH::dimension;
-    
-				     /**
-				      * Declare the data type that this accessor
-				      * class expects to get passed from the
-				      * iterator classes.
-				      */
-    typedef DH AccessorData;
-
-				     /**
-				      * Declare base class as a local typedef
-				      * for simpler access.
-				      */
-    typedef DoFAccessor<1,DH> BaseClass;
-    
-				     /**
-				      * Default constructor, unused thus
-				      * not implemented.
-				      */
-    DoFObjectAccessor ();
-
-    				     /**
-				      * Constructor. The @p local_data
-				      * argument is assumed to be a pointer
-				      * to a DoFHandler object.
-				      */
-    DoFObjectAccessor (const Triangulation<DH::dimension> *tria,
-		       const int                 level,
-		       const int                 index,
-		       const AccessorData       *local_data);
-    
-    				     /**
-				      * Return the indices of the dofs of this
-				      * object in the standard ordering: dofs
-				      * on vertex 0, dofs on vertex 1, etc,
-				      * dofs on line 0, dofs on line 1, etc,
-				      * dofs on quad 0, etc.
-				      *
-				      * The vector has to have the
-				      * right size before being passed
-				      * to this function.
-				      *
-				      * This function is most often
-				      * used on active objects (edges,
-				      * faces, cells). It can be used
-				      * on non-active objects as well
-				      * (i.e. objects that have
-				      * children), but only if the
-				      * finite element under
-				      * consideration has degrees of
-				      * freedom exclusively on
-				      * vertices. Otherwise, the
-				      * function doesn't make much
-				      * sense, since for example
-				      * inactive edges do not have
-				      * degrees of freedom associated
-				      * with them at all.
-				      *
-				      * The last argument denotes the
-				      * finite element index. For the
-				      * standard ::DoFHandler class,
-				      * this value must be equal to
-				      * its default value since that
-				      * class only supports the same
-				      * finite element on all cells
-				      * anyway.
-				      *
-				      * However, for hp objects
-				      * (i.e. the hp::DoFHandler
-				      * class), different finite
-				      * element objects may be used on
-				      * different cells. On faces
-				      * between two cells, as well as
-				      * vertices, there may therefore
-				      * be two sets of degrees of
-				      * freedom, one for each of the
-				      * finite elements used on the
-				      * adjacent cells. In order to
-				      * specify which set of degrees
-				      * of freedom to work on, the
-				      * last argument is used to
-				      * disambiguate. Finally, if this
-				      * function is called for a cell
-				      * object, there can only be a
-				      * single set of degrees of
-				      * freedom, and fe_index has to
-				      * match the result of
-				      * active_fe_index().
-				      *
-				      * For cells, there is only a
-				      * single possible finite element
-				      * index (namely the one for that
-				      * cell, returned by
-				      * <code>cell-@>active_fe_index</code>. Consequently,
-				      * the derived DoFCellAccessor
-				      * class has an overloaded
-				      * version of this function that
-				      * calls the present function
-				      * with
-				      * <code>cell-@>active_fe_index</code>
-				      * as last argument.
-				      */
-    void get_dof_indices (std::vector<unsigned int> &dof_indices,
-			  const unsigned int fe_index = DH::default_fe_index) const;
-
-    				     /**
-				      *  Return a pointer to the @p ith line
-				      *  bounding this @p Hex.
-				      */
-    TriaIterator<DH::dimension,DoFObjectAccessor<1, DH> >
-    line (const unsigned int i) const;
-
-    				     /**
-				      *  Return a pointer to the @p ith quad
-				      *  bounding this @p Hex.
-				      */
-    TriaIterator<DH::dimension,DoFObjectAccessor<2, DH> >
-    quad (const unsigned int i) const;
-};
-
-
-
-/**
- * Grant access to the degrees of freedom on a cell. In fact, since all
- * access to the degrees of freedom has been enabled by the classes
- * <tt>DoFObjectAccessor<1, 1></tt> and <tt>DoFObjectAccessor<2, 2></tt> for the space dimension
- * one and two, respectively, this class only collects the pieces
- * together by deriving from the appropriate <tt>DoF*Accessor</tt> and the
- * right <tt>CellAccessor<dim></tt> and finally adding two functions which give
- * access to the neighbors and children as DoFCellAccessor objects
- * rather than CellAccessor objects (the latter function was inherited
- * from the <tt>CellAccessor<dim></tt> class).
- *
- * Note that since for the class we derive from, i.e. <tt>DoFObjectAccessor<dim,dim></tt>,
+ * Note that since for the class we derive from, i.e. <tt>DoFAccessor<dim></tt>,
  * the two template parameters are equal, the base class is actually derived from
  * CellAccessor, which makes the functions of this class available to the
  * DoFCellAccessor class as well.
@@ -976,13 +712,18 @@ class DoFObjectAccessor<3, DH> : public DoFAccessor<3,DH>
  * @author Wolfgang Bangerth, 1998
  */
 template <class DH>
-class DoFCellAccessor :  public DoFObjectAccessor<DH::dimension,DH>
+class DoFCellAccessor :  public DoFAccessor<DH::dimension,DH>
 {
   public:
 				     /**
 				      * Extract dimension from DH.
 				      */
     static const unsigned int dim = DH::dimension;
+
+				     /**
+				      * Extract space dimension from DH.
+				      */
+    static const unsigned int spacedim = DH::space_dimension;
     
 				     /**
 				      * Declare the data type that
@@ -990,7 +731,7 @@ class DoFCellAccessor :  public DoFObjectAccessor<DH::dimension,DH>
 				      * get passed from the iterator
 				      * classes.
 				      */
-    typedef typename DoFObjectAccessor<DH::dimension,DH>::AccessorData AccessorData;
+    typedef typename DoFAccessor<DH::dimension,DH>::AccessorData AccessorData;
 
 				     /**
 				      * Declare a typedef to the base
@@ -998,16 +739,67 @@ class DoFCellAccessor :  public DoFObjectAccessor<DH::dimension,DH>
 				      * of the exception classes
 				      * simpler.
 				      */
-    typedef DoFObjectAccessor<DH::dimension,DH> BaseClass;
+    typedef DoFAccessor<DH::dimension,DH> BaseClass;
     
+				     /**
+				      * @name Constructors
+				      */
+				     /**
+				      * @{
+				      */
+
     				     /**
 				      * Constructor
 				      */
-    DoFCellAccessor (const Triangulation<DH::dimension> *tria,
+    DoFCellAccessor (const Triangulation<DH::dimension,DH::space_dimension> *tria,
 		     const int                 level,
 		     const int                 index,
 		     const AccessorData       *local_data);
 
+				     /**
+				      * Conversion constructor. This
+				      * constructor exists to make certain
+				      * constructs simpler to write in
+				      * dimension independent code. For
+				      * example, it allows assigning a face
+				      * iterator to a line iterator, an
+				      * operation that is useful in 2d but
+				      * doesn't make any sense in 3d. The
+				      * constructor here exists for the
+				      * purpose of making the code conform to
+				      * C++ but it will unconditionally abort;
+				      * in other words, assigning a face
+				      * iterator to a line iterator is better
+				      * put into an if-statement that checks
+				      * that the dimension is two, and assign
+				      * to a quad iterator in 3d (an operator
+				      * that, without this constructor would
+				      * be illegal if we happen to compile for
+				      * 2d).
+				      */
+    template <int structdim2, int dim2, int spacedim2>
+    DoFCellAccessor (const InvalidAccessor<structdim2,dim2,spacedim2> &);
+
+				     /**
+				      * Another conversion operator
+				      * between objects that don't
+				      * make sense, just like the
+				      * previous one.
+				      */
+    template <int dim2, class DH2>
+    DoFCellAccessor (const DoFAccessor<dim2, DH2> &);
+
+				     /**
+				      * @}
+				      */
+
+				     /**
+				      *  @name Accessing sub-objects and neighbors
+				      */
+				     /**
+				      * @{
+				      */
+    
 				     /**
 				      * Return the @p ith neighbor as
 				      * a DoF cell iterator. This
@@ -1017,7 +809,7 @@ class DoFCellAccessor :  public DoFObjectAccessor<DH::dimension,DH>
 				      * without access to the DoF
 				      * data.
 				      */
-    TriaIterator<DH::dimension,DoFCellAccessor<DH> >
+    typename internal::DoFHandler::Iterators<DH>::cell_iterator
     neighbor (const unsigned int) const;
 
     				     /**
@@ -1029,7 +821,7 @@ class DoFCellAccessor :  public DoFObjectAccessor<DH::dimension,DH>
 				      * without access to the DoF
 				      * data.
 				      */
-    TriaIterator<DH::dimension,DoFCellAccessor<DH> >
+    typename internal::DoFHandler::Iterators<DH>::cell_iterator
     child (const unsigned int) const;
 
     				     /**
@@ -1037,10 +829,10 @@ class DoFCellAccessor :  public DoFObjectAccessor<DH::dimension,DH>
 				      * of this cell.
 				      *
 				      * This function is not implemented in
-				      * 1D, and maps to DoFObjectAccessor<2,
+				      * 1D, and maps to DoFAccessor<2,
 				      * dim>::line in 2D.
 				      */
-    TriaIterator<DH::dimension, DoFObjectAccessor<dim-1, DH> >
+    typename internal::DoFHandler::Iterators<DH>::face_iterator
     face (const unsigned int i) const;
 
                                      /**
@@ -1054,9 +846,20 @@ class DoFCellAccessor :  public DoFObjectAccessor<DH::dimension,DH>
 				      * access to the triangulation
 				      * data).
 				      */
-    TriaIterator<DH::dimension,DoFCellAccessor<DH> >
+    typename internal::DoFHandler::Iterators<DH>::cell_iterator
     neighbor_child_on_subface (const unsigned int face_no,
                                const unsigned int subface_no) const;
+
+				     /**
+				      * @}
+				      */
+
+				     /**
+				      *  @name Extracting values from global vectors
+				      */
+				     /**
+				      * @{
+				      */
 
     				     /**
 				      * Return the values of the given vector
@@ -1257,6 +1060,54 @@ class DoFCellAccessor :  public DoFObjectAccessor<DH::dimension,DH>
     void set_dof_values_by_interpolation (const Vector<number> &local_values,
 					  OutputVector         &values) const;
 
+				     /**
+				      * Distribute a local (cell
+				      * based) vector to a global one
+				      * by mapping the local numbering
+				      * of the degrees of freedom to
+				      * the global one and entering
+				      * the local values into the
+				      * global vector.
+				      *
+				      * The elements are
+				      * <em>added</em> up to the
+				      * elements in the global vector,
+				      * rather than just set, since
+				      * this is usually what one
+				      * wants.
+				      */
+    template <typename number, typename OutputVector>
+    void
+    distribute_local_to_global (const Vector<number> &local_source,
+                                OutputVector         &global_destination) const;
+
+				     /**
+				      * This function does much the
+				      * same as the
+				      * <tt>distribute_local_to_global(Vector,Vector)</tt>
+				      * function, but operates on
+				      * matrices instead of
+				      * vectors. If the matrix type is
+				      * a sparse matrix then it is
+				      * supposed to have non-zero
+				      * entry slots where required.
+				      */
+    template <typename number, typename OutputMatrix>
+    void
+    distribute_local_to_global (const FullMatrix<number> &local_source,
+                                OutputMatrix             &global_destination) const;
+    
+				     /**
+				      * @}
+				      */
+
+				     /**
+				      *  @name Accessing the DoF indices of this object
+				      */
+				     /**
+				      * @{
+				      */
+    
     				     /**
 				      * Return the indices of the dofs of this
 				      * quad in the standard ordering: dofs
@@ -1304,6 +1155,17 @@ class DoFCellAccessor :  public DoFObjectAccessor<DH::dimension,DH>
 				      */
     void get_dof_indices (std::vector<unsigned int> &dof_indices) const;
 
+				     /**
+				      * @}
+				      */
+
+				     /**
+				      *  @name Accessing the finite element associated with this object
+				      */
+				     /**
+				      * @{
+				      */
+
                                      /**
                                       * Return the finite element that
                                       * is used on the cell pointed to
@@ -1315,7 +1177,7 @@ class DoFCellAccessor :  public DoFObjectAccessor<DH::dimension,DH>
                                       * for hp DoF handlers, this may
                                       * change from cell to cell.
                                       */
-    const FiniteElement<DH::dimension> &
+    const FiniteElement<DH::dimension,DH::space_dimension> &
     get_fe () const;
 
                                      /**
@@ -1330,45 +1192,21 @@ class DoFCellAccessor :  public DoFObjectAccessor<DH::dimension,DH>
 				      *  this cell.
 				      */
     void set_active_fe_index (const unsigned int i);
-
 				     /**
-				      * Distribute a local (cell
-				      * based) vector to a global one
-				      * by mapping the local numbering
-				      * of the degrees of freedom to
-				      * the global one and entering
-				      * the local values into the
-				      * global vector.
-				      *
-				      * The elements are
-				      * <em>added</em> up to the
-				      * elements in the global vector,
-				      * rather than just set, since
-				      * this is usually what one
-				      * wants.
+				      * @}
 				      */
-    template <typename number, typename OutputVector>
-    void
-    distribute_local_to_global (const Vector<number> &local_source,
-                                OutputVector         &global_destination) const;
-
-				     /**
-				      * This function does much the
-				      * same as the
-				      * <tt>distribute_local_to_global(Vector,Vector)</tt>
-				      * function, but operates on
-				      * matrices instead of
-				      * vectors. If the matrix type is
-				      * a sparse matrix then it is
-				      * supposed to have non-zero
-				      * entry slots where required.
-				      */
-    template <typename number, typename OutputMatrix>
-    void
-    distribute_local_to_global (const FullMatrix<number> &local_source,
-                                OutputMatrix             &global_destination) const;
     
   private:
+				     /**
+				      * Forward declaration of a class
+				      * into which we put some
+				      * parts of the implementation.
+				      *
+				      * See the .cc file for more
+				      * information.
+				      */
+    struct Implementation;    
+    
 				     /**
 				      * Update the cache in which we
 				      * store the dof indices of this
@@ -1382,72 +1220,8 @@ class DoFCellAccessor :  public DoFObjectAccessor<DH::dimension,DH>
 				      * update_cell_dof_indices_cache()
 				      * function
 				      */
-    template <int> friend class DoFHandler;
+    template <int dim, int spacedim> friend class DoFHandler;
 };
-
-
-/* -------------- declaration of explicit specializations ------------- */
-
-template <>
-TriaIterator<1, DoFObjectAccessor<0,DoFHandler<1> > >
-DoFCellAccessor<DoFHandler<1> >::face (const unsigned int) const;
-template <>
-TriaIterator<2, DoFObjectAccessor<1,DoFHandler<2> > >
-DoFCellAccessor<DoFHandler<2> >::face (const unsigned int i) const;
-template <>
-TriaIterator<3, DoFObjectAccessor<2,DoFHandler<3> > >
-DoFCellAccessor<DoFHandler<3> >::face (const unsigned int i) const;
-
-
-template <>
-const FiniteElement<1> &
-DoFCellAccessor<hp::DoFHandler<1> >::get_fe () const;
-template <>
-const FiniteElement<2> &
-DoFCellAccessor<hp::DoFHandler<2> >::get_fe () const;
-template <>
-const FiniteElement<3> &
-DoFCellAccessor<hp::DoFHandler<3> >::get_fe () const;
-
-template <>
-unsigned int
-DoFCellAccessor<hp::DoFHandler<1> >::active_fe_index () const;
-template <>
-unsigned int
-DoFCellAccessor<hp::DoFHandler<2> >::active_fe_index () const;
-template <>
-unsigned int
-DoFCellAccessor<hp::DoFHandler<3> >::active_fe_index () const;
-
-template <>
-void
-DoFCellAccessor<hp::DoFHandler<1> >::set_active_fe_index (const unsigned int i);
-template <>
-void
-DoFCellAccessor<hp::DoFHandler<2> >::set_active_fe_index (const unsigned int i);
-template <>
-void
-DoFCellAccessor<hp::DoFHandler<3> >::set_active_fe_index (const unsigned int i);
-
-template <>
-void
-DoFCellAccessor<DoFHandler<1> >::update_cell_dof_indices_cache () const;
-template <>
-void
-DoFCellAccessor<DoFHandler<2> >::update_cell_dof_indices_cache () const;
-template <>
-void
-DoFCellAccessor<DoFHandler<3> >::update_cell_dof_indices_cache () const;
-
-template <>
-void
-DoFCellAccessor<hp::DoFHandler<1> >::update_cell_dof_indices_cache () const;
-template <>
-void
-DoFCellAccessor<hp::DoFHandler<2> >::update_cell_dof_indices_cache () const;
-template <>
-void
-DoFCellAccessor<hp::DoFHandler<3> >::update_cell_dof_indices_cache () const;
 
 
 DEAL_II_NAMESPACE_CLOSE

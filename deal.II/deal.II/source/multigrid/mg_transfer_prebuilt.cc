@@ -31,9 +31,9 @@ DEAL_II_NAMESPACE_OPEN
 
 
 template <typename number>
-template <int dim>
+template <int dim, int spacedim>
 void MGTransferPrebuilt<number>::build_matrices (
-  const MGDoFHandler<dim> &mg_dof)
+  const MGDoFHandler<dim,spacedim> &mg_dof)
 {
   const unsigned int n_levels      = mg_dof.get_tria().n_levels();
   const unsigned int dofs_per_cell = mg_dof.get_fe().dofs_per_cell;
@@ -90,7 +90,7 @@ void MGTransferPrebuilt<number>::build_matrices (
 					      sizes[level],
 					      dofs_per_cell+1);
       
-      for (typename MGDoFHandler<dim>::cell_iterator cell=mg_dof.begin(level);
+      for (typename MGDoFHandler<dim,spacedim>::cell_iterator cell=mg_dof.begin(level);
 	   cell != mg_dof.end(level); ++cell)
 	if (cell->has_children())
 	  {
@@ -127,7 +127,7 @@ void MGTransferPrebuilt<number>::build_matrices (
       prolongation_matrices[level]->reinit (*prolongation_sparsities[level]);
 
 				       // now actually build the matrices
-      for (typename MGDoFHandler<dim>::cell_iterator cell=mg_dof.begin(level);
+      for (typename MGDoFHandler<dim,spacedim>::cell_iterator cell=mg_dof.begin(level);
 	   cell != mg_dof.end(level); ++cell)
 	if (cell->has_children())
 	  {
@@ -163,16 +163,16 @@ void MGTransferPrebuilt<number>::build_matrices (
   for (int level=mg_dof.get_tria().n_levels()-1; level>=0; --level)
     {
       copy_indices[level].clear();
-      typename MGDoFHandler<dim>::active_cell_iterator
+      typename MGDoFHandler<dim,spacedim>::active_cell_iterator
 	level_cell = mg_dof.begin_active(level);
-      const typename MGDoFHandler<dim>::active_cell_iterator
+      const typename MGDoFHandler<dim,spacedim>::active_cell_iterator
 	level_end  = mg_dof.end_active(level);
       
 				       // Compute coarse level right hand side
 				       // by restricting from fine level.
       for (; level_cell!=level_end; ++level_cell)
 	{
-	  DoFObjectAccessor<dim, DoFHandler<dim> >& global_cell = *level_cell;
+	  DoFAccessor<dim, DoFHandler<dim,spacedim> >& global_cell = *level_cell;
 					   // get the dof numbers of
 					   // this cell for the global
 					   // and the level-wise

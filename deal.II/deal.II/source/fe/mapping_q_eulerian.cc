@@ -29,13 +29,13 @@ DEAL_II_NAMESPACE_OPEN
 
 // .... MAPPING Q EULERIAN CONSTRUCTOR
 
-template <int dim, class EulerVectorType>
-MappingQEulerian<dim, EulerVectorType>::
+template <int dim, class EulerVectorType, int spacedim>
+MappingQEulerian<dim, EulerVectorType, spacedim>::
 MappingQEulerian (const unsigned int degree,
 		  const EulerVectorType &euler_vector,
 		  const DoFHandler<dim> &euler_dof_handler)
 		:
-		MappingQ<dim>(degree, true),
+		MappingQ<dim,spacedim>(degree, true),
 		euler_vector(euler_vector),
 		euler_dof_handler(&euler_dof_handler),
 		support_quadrature(degree),
@@ -46,11 +46,11 @@ MappingQEulerian (const unsigned int degree,
 
 
 
-template <int dim, class EulerVectorType>
-Mapping<dim> *
-MappingQEulerian<dim, EulerVectorType>::clone () const
+template <int dim, class EulerVectorType, int spacedim>
+Mapping<dim,spacedim> *
+MappingQEulerian<dim, EulerVectorType, spacedim>::clone () const
 {
-  return new MappingQEulerian<dim,EulerVectorType>(this->get_degree(),
+  return new MappingQEulerian<dim,EulerVectorType,spacedim>(this->get_degree(),
 						   euler_vector,
 						   *euler_dof_handler);
 }
@@ -59,8 +59,8 @@ MappingQEulerian<dim, EulerVectorType>::clone () const
 
 // .... SUPPORT QUADRATURE CONSTRUCTOR
 
-template <int dim, class EulerVectorType>
-MappingQEulerian<dim,EulerVectorType>::
+template <int dim, class EulerVectorType, int spacedim>
+MappingQEulerian<dim,EulerVectorType,spacedim>::
 SupportQuadrature::
 SupportQuadrature (const unsigned int map_degree)
 		:
@@ -99,9 +99,9 @@ SupportQuadrature (const unsigned int map_degree)
 
 // .... COMPUTE MAPPING SUPPORT POINTS
 
-template <int dim, class EulerVectorType>
+template <int dim, class EulerVectorType, int spacedim>
 void
-MappingQEulerian<dim, EulerVectorType>::
+MappingQEulerian<dim, EulerVectorType, spacedim>::
 compute_mapping_support_points
 (const typename Triangulation<dim>::cell_iterator &cell,
  std::vector<Point<dim> > &a) const

@@ -18,11 +18,12 @@
 #include <base/exceptions.h>
 #include <base/point.h>
 #include <base/table.h>
+#include <grid/tria.h>
 #include <map>
 
 DEAL_II_NAMESPACE_OPEN
 
-template <int dim> class Triangulation;
+template <int dim, int spacedim> class Triangulation;
 template <typename number> class Vector;
 template <typename number> class SparseMatrix;
 
@@ -42,6 +43,9 @@ template <typename number> class SparseMatrix;
  * according to given new boundary points. This can be used to
  * transform (simple-shaped) grids to a more complicated ones, like a
  * shell onto a grid of an airfoil, for example.
+ *
+ * No meshes for the codimension one case are provided at the moment.
+ *
  *
  * @ingroup grid
  * @author Wolfgang Bangerth, Ralf Hartmann, Guido Kanschat, Stefan
@@ -81,8 +85,8 @@ class GridGenerator
 				      * void upon calling this
 				      * function.
 				      */
-    template <int dim>
-    static void hyper_cube (Triangulation<dim> &tria,
+    template <int dim, int spacedim>
+    static void hyper_cube (Triangulation<dim,spacedim>  &tria,
 			    const double        left = 0.,
 			    const double        right= 1.);
 
@@ -97,12 +101,23 @@ class GridGenerator
 				      * the given volume is
 				      * <tt>repetitions<sup>dim</sup></tt>.
 				      *
-				      * @note The triangulation needs to be
-				      * void upon calling this
+				      * If spacedim=dim+1 the same
+				      * mesh as in the case
+				      * spacedim=dim is created, but
+				      * the vertices have an
+				      * additional coordinate =0. So,
+				      * if dim=1 one obtains line
+				      * along the x axis in the xy
+				      * plane, and if dim=3 one
+				      * obtains a square in lying in
+				      * the xy plane in 3d space.
+				      *
+				      * @note The triangulation needs
+				      * to be void upon calling this
 				      * function.
 				      */
     template <int dim>
-    static void subdivided_hyper_cube (Triangulation<dim> &tria,
+    static void subdivided_hyper_cube (Triangulation<dim>  &tria,
                                        const unsigned int  repetitions,
                                        const double        left = 0.,
                                        const double        right= 1.);
@@ -137,11 +152,11 @@ class GridGenerator
 				      * void upon calling this
 				      * function.
 				      */
-    template <int dim>
-    static void hyper_rectangle (Triangulation<dim> &tria,
-				 const Point<dim>   &p1,
-				 const Point<dim>   &p2,
-				 const bool          colorize = false);
+    template <int dim, int spacedim>
+    static void hyper_rectangle (Triangulation<dim,spacedim> &tria,
+				 const Point<spacedim>       &p1,
+				 const Point<spacedim>       &p2,
+				 const bool                  colorize = false);
 
 				     /**
 				      * Create a coordinate-parallel
@@ -201,7 +216,7 @@ class GridGenerator
 				const std::vector<unsigned int> &repetitions,
 				const Point<dim>                &p1,
 				const Point<dim>                &p2,
-				const bool                       colorize=false);
+				const bool                      colorize=false);
 
 				     /**
 				      * Like the previous
@@ -236,11 +251,11 @@ class GridGenerator
     template <int dim>
     static
     void
-    subdivided_hyper_rectangle(Triangulation<dim>              &tria,
+    subdivided_hyper_rectangle(Triangulation<dim>                      &tria,
 			       const std::vector<std::vector<double> > &step_sizes,
-			       const Point<dim>                &p_1,
-			       const Point<dim>                &p_2,
-			       const bool                       colorize);
+			       const Point<dim>                        &p_1,
+			       const Point<dim>                        &p_2,
+			       const bool                              colorize);
 
 				     /**
 				      * Like the previous function, but with
@@ -263,7 +278,7 @@ class GridGenerator
 				const std::vector< std::vector<double> > &spacing,
 				const Point<dim>                         &p,
 				const Table<dim,unsigned char>           &material_id,
-				const bool                                colorize=false);
+				const bool                               colorize=false);
     
 				     /**
 				      * A parallelogram. The first
@@ -660,7 +675,7 @@ class GridGenerator
 				      * @param R           The radius of the circle, which forms the middle line of the torus containing the loop of cells. Must be greater than @p r.
 				      * @param r           The radius of the cylinder bend together as loop.
 				      */
-    static void moebius (Triangulation<3>&  tria,
+    static void moebius (Triangulation<3,3>&  tria,
 			 const unsigned int   n_cells,
 			 const unsigned int   n_rotations,
 			 const double         R,
@@ -718,8 +733,8 @@ class GridGenerator
 				      * the hyper_rectangle()
 				      * function of this class.
 				      */
-    template <int dim>
-    static void colorize_hyper_rectangle (Triangulation<dim> &tria);
+    template <int dim, int spacedim>
+    static void colorize_hyper_rectangle (Triangulation<dim,spacedim> &tria);
 
 				     /**
 				      * Perform the action specified
@@ -767,6 +782,7 @@ class GridGenerator
 		   const std::map<unsigned int,double> &m,
 		   Vector<double>                      &u);
 };
+
 
 
 

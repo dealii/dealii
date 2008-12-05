@@ -18,23 +18,23 @@ DEAL_II_NAMESPACE_OPEN
 
 namespace hp
 {
-  template <int dim>
-  FECollection<dim>::FECollection ()
+  template <int dim, int spacedim>
+  FECollection<dim,spacedim>::FECollection ()
   {}
   
 
   
-  template <int dim>
-  FECollection<dim>::FECollection (const FiniteElement<dim> &fe)
+  template <int dim, int spacedim>
+  FECollection<dim,spacedim>::FECollection (const FiniteElement<dim,spacedim> &fe)
   {
     push_back (fe);
   }
   
 
   
-  template <int dim>
-  FECollection<dim>::
-  FECollection (const FECollection<dim> &fe_collection)
+  template <int dim, int spacedim>
+  FECollection<dim,spacedim>::
+  FECollection (const FECollection<dim,spacedim> &fe_collection)
                   :
                   Subscriptor (),
                                                    // copy the array
@@ -53,8 +53,8 @@ namespace hp
 
 
 
-  template <int dim>
-  void FECollection<dim>::push_back (const FiniteElement<dim> &new_fe)
+  template <int dim, int spacedim>
+  void FECollection<dim,spacedim>::push_back (const FiniteElement<dim,spacedim> &new_fe)
   {
                                      // check that the new element has the right
                                      // number of components. only check with
@@ -67,14 +67,14 @@ namespace hp
                           "same number of vector components!"));
   
     finite_elements
-      .push_back (boost::shared_ptr<const FiniteElement<dim> >(new_fe.clone()));
+      .push_back (boost::shared_ptr<const FiniteElement<dim,spacedim> >(new_fe.clone()));
   }
 
 
 
-  template <int dim>
+  template <int dim, int spacedim> 
   unsigned int
-  FECollection<dim>::memory_consumption () const
+  FECollection<dim,spacedim>::memory_consumption () const
   {
     unsigned int mem
       = (sizeof(*this) +
@@ -88,6 +88,10 @@ namespace hp
 
 // explicit instantiations
   template class FECollection<deal_II_dimension>;
+
+#if deal_II_dimension != 3
+  template class FECollection<deal_II_dimension, deal_II_dimension+1>;
+#endif
   
 }
 

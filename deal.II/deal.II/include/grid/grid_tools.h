@@ -25,12 +25,12 @@
 DEAL_II_NAMESPACE_OPEN
 
 
-template <int> class DoFHandler;
-template <int> class Mapping;
+template <int, int> class DoFHandler;
+template <int, int> class Mapping;
 namespace hp
 {
-  template <int> class DoFHandler;
-  template <int> class MappingCollection;
+  template <int, int> class DoFHandler;
+  template <int, int> class MappingCollection;
 }
 
 class SparsityPattern;
@@ -60,15 +60,20 @@ class GridTools
 				      * this function will not catch
 				      * this.
 				      */
-    template <int dim>
+    template <int dim, int spacedim>
     static
-    double diameter (const Triangulation<dim> &tria);
+    double diameter (const Triangulation<dim, spacedim> &tria);
 
 				     /**
 				      * Same function, but for 1d.
 				      */
     static
-    double diameter (const Triangulation<1> &tria);
+    double diameter (const Triangulation<1> &tria); 
+				     /**
+				      * Same function, but for 1d, 2sd.
+				      */
+    static
+    double diameter (const Triangulation<1,2> &tria);
 
 				     /**
 				      * Given a list of vertices (typically
@@ -90,7 +95,7 @@ class GridTools
     static
     double cell_measure (const std::vector<Point<dim> > &all_vertices,
 			 const unsigned int (&vertex_indices)[GeometryInfo<dim>::vertices_per_cell]);
-
+ 
 				     /**
 				      * Remove vertices that are not
 				      * referenced by any of the
@@ -119,10 +124,13 @@ class GridTools
 				      * by that class, so we have to
 				      * eliminate unused vertices
 				      * beforehand.
+				      * 
+				      * Not implemented for the
+				      * codimension one case.
 				      */
-    template <int dim>
+    template <int dim, int spacedim>
     static
-    void delete_unused_vertices (std::vector<Point<dim> >    &vertices,
+    void delete_unused_vertices (std::vector<Point<spacedim> >    &vertices,
 				 std::vector<CellData<dim> > &cells,
 				 SubCellData                 &subcelldata);
     
@@ -149,9 +157,9 @@ class GridTools
 				      * their difference in each coordinate
 				      * direction is less than @p tol.
 				      */
-    template <int dim>
+    template <int dim, int spacedim>
     static
-    void delete_duplicated_vertices (std::vector<Point<dim> >    &all_vertices,
+    void delete_duplicated_vertices (std::vector<Point<spacedim> >    &all_vertices,
 				     std::vector<CellData<dim> > &cells,
 				     SubCellData                 &subcelldata,
 				     std::vector<unsigned int>   &considered_vertices,
@@ -186,10 +194,10 @@ class GridTools
 				      * return value have to be of
 				      * type <tt>Point<dim></tt>.
 				      */
-    template <int dim, typename Predicate>
+    template <int dim, typename Predicate, int spacedim>
     static
     void transform (const Predicate    &predicate,
-		    Triangulation<dim> &triangulation);
+		    Triangulation<dim,spacedim> &triangulation);
 
 				     /**
 				      * Shift each vertex of the
@@ -202,10 +210,10 @@ class GridTools
 				      * hold for this function as
 				      * well.
 				      */
-    template <int dim>
+    template <int dim, int spacedim>
     static
-    void shift (const Point<dim>   &shift_vector,
-		Triangulation<dim> &triangulation);
+    void shift (const Point<spacedim>   &shift_vector,
+		Triangulation<dim,spacedim> &triangulation);
 
 
 				     /**
@@ -241,10 +249,10 @@ class GridTools
 				      * hold for this function as
 				      * well.
 				      */
-    template <int dim>
+    template <int dim, int spacedim>
     static
     void scale (const double        scaling_factor,
-		Triangulation<dim> &triangulation);
+		Triangulation<dim, spacedim> &triangulation);
 
                                      /**
                                       * Find and return the number of
@@ -258,11 +266,11 @@ class GridTools
                                       *
                                       * @author Ralf B. Schulz, 2006
                                       */
-    template <int dim, template <int> class Container>
+    template <int dim, template <int, int> class Container, int spacedim>
     static
     unsigned int
-    find_closest_vertex (const Container<dim> &container,
-                         const Point<dim>     &p);
+    find_closest_vertex (const Container<dim, spacedim> &container,
+                         const Point<spacedim>     &p);
 
                                      /**
                                       * Find and return a vector of
@@ -282,10 +290,10 @@ class GridTools
                                       * @author Ralf B. Schulz,
                                       * Wolfgang Bangerth, 2006
                                       */
-   template<int dim, template <int> class Container>
+   template<int dim, template <int, int> class Container, int spacedim>
    static
-   std::vector<typename Container<dim>::active_cell_iterator>
-   find_cells_adjacent_to_vertex (const Container<dim> &container,
+   std::vector<typename Container<dim,spacedim>::active_cell_iterator>
+   find_cells_adjacent_to_vertex (const Container<dim,spacedim> &container,
 				  const unsigned int    vertex);
 
 
@@ -317,11 +325,11 @@ class GridTools
                                       * local coordinate of the given point
                                       * without additional computational cost.
                                       */
-    template <int dim, typename Container>
+    template <int dim, template <int,int> class Container, int spacedim>
     static
-    typename Container::active_cell_iterator
-    find_active_cell_around_point (const Container  &container,
-                                   const Point<dim> &p);
+    typename Container<dim,spacedim>::active_cell_iterator
+    find_active_cell_around_point (const Container<dim,spacedim>  &container,
+                                   const Point<spacedim> &p);
 
                                      /**
                                       * Find and return an iterator to
@@ -377,12 +385,12 @@ class GridTools
                                       * This is not automatically performed
                                       * by the algorithm.
                                       */
-    template <int dim, template<int> class Container>
+    template <int dim, template<int, int> class Container, int spacedim>
     static
-    std::pair<typename Container<dim>::active_cell_iterator, Point<dim> >
-    find_active_cell_around_point (const Mapping<dim>   &mapping,
-                                   const Container<dim> &container,
-                                   const Point<dim>     &p);
+    std::pair<typename Container<dim,spacedim>::active_cell_iterator, Point<spacedim> >
+    find_active_cell_around_point (const Mapping<dim,spacedim>   &mapping,
+                                   const Container<dim,spacedim> &container,
+                                   const Point<spacedim>     &p);
 
 				     /**
 				      * A version of the previous function
@@ -394,12 +402,12 @@ class GridTools
 				      * finite element index for all other DoF
 				      * handlers is always zero.
 				      */
-    template <int dim>
+    template <int dim, int spacedim>
     static
-    std::pair<typename hp::DoFHandler<dim>::active_cell_iterator, Point<dim> >
-    find_active_cell_around_point (const hp::MappingCollection<dim>   &mapping,
-                                   const hp::DoFHandler<dim> &container,
-                                   const Point<dim>     &p);
+    std::pair<typename hp::DoFHandler<dim,spacedim>::active_cell_iterator, Point<spacedim> >
+    find_active_cell_around_point (const hp::MappingCollection<dim,spacedim>   &mapping,
+                                   const hp::DoFHandler<dim,spacedim> &container,
+                                   const Point<spacedim>     &p);
 
 				     /**
 				      * Return a list of all descendents of
@@ -450,10 +458,10 @@ class GridTools
 				      * cells as they are traversed in their
 				      * natural order using cell iterators.
 				      */
-    template <int dim>
+    template <int dim, int spacedim>
     static void
-    get_face_connectivity_of_cells (const Triangulation<dim> &triangulation,
-				    SparsityPattern          &connectivity);
+    get_face_connectivity_of_cells (const Triangulation<dim, spacedim> &triangulation,
+				    SparsityPattern                    &connectivity);
     
                                      /**
                                       * Use the METIS partitioner to generate
@@ -475,10 +483,10 @@ class GridTools
                                       * requires METIS when multiple
                                       * partitions are required.
                                       */
-    template <int dim>
+    template <int dim, int spacedim>
     static
     void partition_triangulation (const unsigned int  n_partitions,
-                                  Triangulation<dim> &triangulation);
+                                  Triangulation<dim, spacedim> &triangulation);
 
 				     /**
 				      * This function does the same as the
@@ -556,11 +564,11 @@ class GridTools
 				      * you may want to build your own
 				      * connectivity graph.
 				      */
-    template <int dim>
+    template <int dim, int spacedim>
     static
     void partition_triangulation (const unsigned int     n_partitions,
 				  const SparsityPattern &cell_connection_graph,
-                                  Triangulation<dim>    &triangulation);
+                                  Triangulation<dim,spacedim>    &triangulation);
     
                                      /**
                                       * For each active cell, return in the
@@ -577,9 +585,9 @@ class GridTools
 				      * <tt>DoFTools::get_subdomain_association</tt>
 				      * function.
                                       */
-    template <int dim>
+    template <int dim, int spacedim>
     static void
-    get_subdomain_association (const Triangulation<dim>  &triangulation,
+    get_subdomain_association (const Triangulation<dim, spacedim>  &triangulation,
                                std::vector<unsigned int> &subdomain);
 
                                      /**
@@ -599,9 +607,9 @@ class GridTools
 				      * <tt>DoFTools::count_dofs_with_subdomain_association</tt>
 				      * function.
                                       */
-    template <int dim>
+    template <int dim, int spacedim>
     static unsigned int
-    count_cells_with_subdomain_association (const Triangulation<dim> &triangulation,
+    count_cells_with_subdomain_association (const Triangulation<dim, spacedim> &triangulation,
                                             const unsigned int        subdomain);
 
                                      /**
@@ -681,11 +689,11 @@ class GridTools
                                       * different refinement histories
                                       * beyond the coarse mesh.
                                       */
-    template <int dim>
+    template <int dim, int spacedim>
     static
     bool
-    have_same_coarse_mesh (const Triangulation<dim> &mesh_1,
-                           const Triangulation<dim> &mesh_2);
+    have_same_coarse_mesh (const Triangulation<dim, spacedim> &mesh_1,
+                           const Triangulation<dim, spacedim> &mesh_2);
 
                                      /**
                                       * The same function as above,
@@ -712,19 +720,19 @@ class GridTools
 				      * @ref step_24 "step-24" for an example
 				      * of use of this function.
 				      */
-    template <int dim>
+    template <int dim, int spacedim>
     static
     double
-    minimal_cell_diameter (const Triangulation<dim> &triangulation);
+    minimal_cell_diameter (const Triangulation<dim, spacedim> &triangulation);
 
 				     /**
 				      * Return the diamater of the largest
 				      * active cell of a triangulation.
 				      */
-    template <int dim>
+    template <int dim, int spacedim>
     static
     double
-    maximal_cell_diameter (const Triangulation<dim> &triangulation);
+    maximal_cell_diameter (const Triangulation<dim, spacedim> &triangulation);
 
 				     /**
 				      * Given the two triangulations
@@ -742,12 +750,12 @@ class GridTools
 				      * derived from the same coarse
 				      * grid.
 				      */
-    template <int dim>
+    template <int dim, int spacedim>
     static
     void
-    create_union_triangulation (const Triangulation<dim> &triangulation_1,
-				const Triangulation<dim> &triangulation_2,
-				Triangulation<dim>       &result);
+    create_union_triangulation (const Triangulation<dim, spacedim> &triangulation_1,
+				const Triangulation<dim, spacedim> &triangulation_2,
+				Triangulation<dim, spacedim>       &result);
     
                                      /**
                                       * Exception
@@ -802,9 +810,9 @@ class GridTools
 
 /* ----------------- Template function --------------- */
 
-template <int dim, typename Predicate>
+template <int dim, typename Predicate, int spacedim>
 void GridTools::transform (const Predicate    &predicate,
-			   Triangulation<dim> &triangulation)
+			   Triangulation<dim, spacedim> &triangulation)
 {
   Assert (triangulation.n_levels() == 1,
 	  ExcTriangulationHasBeenRefined());
@@ -818,7 +826,7 @@ void GridTools::transform (const Predicate    &predicate,
 				   // that we get to all vertices in
 				   // the triangulation by only
 				   // visiting the active cells.
-  typename Triangulation<dim>::active_cell_iterator
+  typename Triangulation<dim, spacedim>::active_cell_iterator
     cell = triangulation.begin_active (),
     endc = triangulation.end ();
   for (; cell!=endc; ++cell)
@@ -924,13 +932,20 @@ GridTools::get_active_neighbors(const typename Container::active_cell_iterator  
 
 
 // declaration of explicit specializations
+
 template <>
 double
-GridTools::cell_measure(const std::vector<Point<2> > &all_vertices,
+GridTools::cell_measure<3>(const std::vector<Point<3> > &all_vertices,
+			const unsigned int (&vertex_indices) [GeometryInfo<3>::vertices_per_cell]);
+
+template <>
+double
+GridTools::cell_measure<2>(const std::vector<Point<2> > &all_vertices,
 			const unsigned int (&vertex_indices) [GeometryInfo<2>::vertices_per_cell]);
 
-
-
+// double
+// GridTools::cell_measure<2,3>(const std::vector<Point<3> > &all_vertices,
+// 			const unsigned int (&vertex_indices) [GeometryInfo<2>::vertices_per_cell]);
 
 
 DEAL_II_NAMESPACE_CLOSE

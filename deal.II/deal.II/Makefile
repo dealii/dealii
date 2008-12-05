@@ -14,6 +14,7 @@ include $D/common/Make.global_options
 # top level targets
 default: 2dg 2d
 all: 2dg 2d 3dg 3d 1dg 1d
+debug: 2dg 3dg 1dg
 
 
 1dg: $(LIBDIR)/libdeal_II_1d.g$(lib-suffix)

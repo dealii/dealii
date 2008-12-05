@@ -40,7 +40,8 @@ FullMatrix<number>::FullMatrix (const unsigned int n)
 
 template <typename number>
 FullMatrix<number>::FullMatrix (const unsigned int m,
-				const unsigned int n) :
+				const unsigned int n) 
+                :
 		Table<2,number> (m, n)
 {}
 
@@ -72,8 +73,6 @@ FullMatrix<number>::FullMatrix (const IdentityMatrix &id)
   for (unsigned int i=0; i<id.m(); ++i)
     (*this)(i,i) = 1;
 }
-
-
 
 
 template <typename number>
@@ -857,9 +856,10 @@ void FullMatrix<number>::Tadd (const FullMatrix<number2> &src,
   
 				   // Compute maximal size of copied block
   const unsigned int rows = std::min (m() - dst_offset_i,
-				      src.m() - src_offset_j);
+				      src.n() - src_offset_j);
   const unsigned int cols = std::min (n() - dst_offset_j,
-				      src.n() - src_offset_i);
+				      src.m() - src_offset_i);
+
   
   for (unsigned int i=0; i<rows ; ++i)
     for (unsigned int j=0; j<cols ; ++j)
@@ -1162,6 +1162,120 @@ FullMatrix<number>::invert (const FullMatrix<number2> &M)
 	    gauss_jordan();
     };    
 }
+
+template <typename number>
+template <typename number2>
+void
+FullMatrix<number>::left_invert (const FullMatrix<number2> &A)
+{
+  Assert (!A.empty(), ExcEmptyMatrix());
+  Assert(A.m()>A.n(), ExcDimensionMismatch(A.m(), A.n()));
+  Assert(this->m()==A.n(), ExcDimensionMismatch(this->m(), A.n()));
+  Assert(this->n()==A.m(), ExcDimensionMismatch(this->n(), A.m()));
+  
+  FullMatrix<number2> A_t(A.n(),A.m());
+  FullMatrix<number2> A_t_times_A(A.n(),A.n());
+  FullMatrix<number2> A_t_times_A_inv(A.n(),A.n());
+  FullMatrix<number2> left_inv(A.n(),A.m());
+
+  A_t.Tadd(A,1);
+  A_t.mmult(A_t_times_A,A);
+  if (number(A_t_times_A.determinant())==number(0))
+    Assert(false, ExcSingular())
+  else
+    {
+      A_t_times_A_inv.invert(A_t_times_A);
+      A_t_times_A_inv.mmult(left_inv,A_t);				  
+  
+      *this=left_inv;
+    }
+}
+
+template <typename number>
+template <typename number2>
+void
+FullMatrix<number>::right_invert (const FullMatrix<number2> &A)
+{
+  Assert (!A.empty(), ExcEmptyMatrix());
+  Assert(A.n()>A.m(), ExcDimensionMismatch(A.n(), A.m()));
+  Assert(this->m()==A.n(), ExcDimensionMismatch(this->m(), A.n()));
+  Assert(this->n()==A.m(), ExcDimensionMismatch(this->n(), A.m()));
+  
+  FullMatrix<number> A_t(A.n(),A.m());
+  FullMatrix<number> A_times_A_t(A.m(),A.m());
+  FullMatrix<number> A_times_A_t_inv(A.m(),A.m());
+  FullMatrix<number> right_inv(A.n(),A.m());
+
+  A_t.Tadd(A,1);
+  A.mmult(A_times_A_t,A_t);
+  if (number(A_times_A_t.determinant())==number(0))
+    Assert(false, ExcSingular())
+  else
+    {
+      A_times_A_t_inv.invert(A_times_A_t);
+      A_t.mmult(right_inv,A_times_A_t_inv);				  
+  
+      *this=right_inv;
+    }
+}
+
+
+template <typename number>
+template <int dim>
+void
+FullMatrix<number>::copy_from (Tensor<2,dim> &T, 
+			       const unsigned int src_r_i,
+			       const unsigned int src_r_j,
+			       const unsigned int src_c_i,
+			       const unsigned int src_c_j,
+			       const unsigned int dst_r,
+			       const unsigned int dst_c) 
+{
+
+  Assert (!this->empty(), ExcEmptyMatrix());  
+  Assert(this->m()-dst_r>src_r_j-src_r_i, 
+	 ExcIndexRange(this->m()-dst_r,0,src_r_j-src_r_i));
+  Assert(this->n()-dst_c>src_c_j-src_c_i, 
+	 ExcIndexRange(this->n()-dst_c,0,src_c_j-src_c_i));
+  Assert(dim>src_r_j, ExcIndexRange(dim,0,src_r_j));
+  Assert(dim>src_c_j, ExcIndexRange(dim,0,src_r_j));
+  Assert(src_r_j>=src_r_i, ExcIndexRange(src_r_j,0,src_r_i));
+  Assert(src_c_j>=src_c_i, ExcIndexRange(src_r_j,0,src_r_i));
+  
+  for (unsigned int i=0; i<src_r_j-src_r_i+1; i++)
+    for (unsigned int j=0; j<src_c_j-src_c_i+1; j++)
+      (*this)(i+dst_r,j+dst_c)=number(T[i+src_r_i][j+src_c_i]);	
+
+}
+
+
+template <typename number>
+template <int dim>
+void
+FullMatrix<number>::copy_to (Tensor<2,dim> &T,
+			     const unsigned int src_r_i,
+			     const unsigned int src_r_j,
+			     const unsigned int src_c_i,
+			     const unsigned int src_c_j,
+			     const unsigned int dst_r,
+			     const unsigned int dst_c)
+{
+  Assert (!this->empty(), ExcEmptyMatrix());  
+  Assert(dim-dst_r>src_r_j-src_r_i, 
+	 ExcIndexRange(dim-dst_r,0,src_r_j-src_r_i));
+  Assert(dim-dst_c>src_c_j-src_c_i, 
+	 ExcIndexRange(dim-dst_c,0,src_c_j-src_c_i));
+  Assert(this->m()>src_r_j, ExcIndexRange(dim,0,src_r_j));
+  Assert(this->n()>src_c_j, ExcIndexRange(dim,0,src_r_j));
+  Assert(src_r_j>=src_r_i, ExcIndexRange(src_r_j,0,src_r_i));
+  Assert(src_c_j>=src_c_i, ExcIndexRange(src_r_j,0,src_r_i));
+
+
+  for (unsigned int i=0; i<src_r_j-src_r_i+1; i++)
+    for (unsigned int j=0; j<src_c_j-src_c_i+1; j++)
+      T[i+dst_r][j+dst_c] = double ((*this)(i+src_r_i,j+src_c_i));
+}
+
 
 
 template <typename number>

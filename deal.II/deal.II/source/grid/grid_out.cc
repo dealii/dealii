@@ -281,8 +281,8 @@ void GridOut::write_dx (const Triangulation<dim> &tria,
 #endif
 
 
-template <int dim>
-void GridOut::write_msh (const Triangulation<dim> &tria,
+template <int dim, int spacedim>
+void GridOut::write_msh (const Triangulation<dim, spacedim> &tria,
 			 std::ostream             &out) const
 {
   AssertThrow (out, ExcIO());
@@ -290,13 +290,13 @@ void GridOut::write_msh (const Triangulation<dim> &tria,
 				   // get the positions of the
 				   // vertices and whether they are
 				   // used.
-  const std::vector<Point<dim> > &vertices    = tria.get_vertices();
+  const std::vector<Point<spacedim> > &vertices    = tria.get_vertices();
   const std::vector<bool>        &vertex_used = tria.get_used_vertices();
   
   const unsigned int n_vertices = tria.n_used_vertices();
 
-  typename Triangulation<dim>::active_cell_iterator       cell=tria.begin_active();
-  const typename Triangulation<dim>::active_cell_iterator endc=tria.end();
+  typename Triangulation<dim,spacedim>::active_cell_iterator       cell=tria.begin_active();
+  const typename Triangulation<dim,spacedim>::active_cell_iterator endc=tria.end();
 
 				   // Write Header
 				   // The file format is:
@@ -326,7 +326,7 @@ void GridOut::write_msh (const Triangulation<dim> &tria,
 	out << i+1                 // vertex index
 	    << "  "
 	    << vertices[i];
-	for (unsigned int d=dim+1; d<=3; ++d)
+	for (unsigned int d=spacedim+1; d<=3; ++d)
 	  out << " 0";             // fill with zeroes
 	out << std::endl;
       };
@@ -424,8 +424,8 @@ void GridOut::write_msh (const Triangulation<dim> &tria,
 }
 
 
-template <int dim>
-void GridOut::write_ucd (const Triangulation<dim> &tria,
+template <int dim, int spacedim>
+void GridOut::write_ucd (const Triangulation<dim,spacedim> &tria,
 			 std::ostream             &out) const
 {
   AssertThrow (out, ExcIO());
@@ -433,13 +433,13 @@ void GridOut::write_ucd (const Triangulation<dim> &tria,
 				   // get the positions of the
 				   // vertices and whether they are
 				   // used.
-  const std::vector<Point<dim> > &vertices    = tria.get_vertices();
-  const std::vector<bool>        &vertex_used = tria.get_used_vertices();
+  const std::vector<Point<spacedim> > &vertices    = tria.get_vertices();
+  const std::vector<bool>             &vertex_used = tria.get_used_vertices();
 
   const unsigned int n_vertices = tria.n_used_vertices();
 
-  typename Triangulation<dim>::active_cell_iterator       cell=tria.begin_active();
-  const typename Triangulation<dim>::active_cell_iterator endc=tria.end();
+  typename Triangulation<dim,spacedim>::active_cell_iterator       cell=tria.begin_active();
+  const typename Triangulation<dim,spacedim>::active_cell_iterator endc=tria.end();
 
 				   // write preamble
   if (ucd_flags.write_preamble)
@@ -482,7 +482,7 @@ void GridOut::write_ucd (const Triangulation<dim> &tria,
 	out << i+1                 // vertex index
 	    << "  "
 	    << vertices[i];
-	for (unsigned int d=dim+1; d<=3; ++d)
+	for (unsigned int d=spacedim+1; d<=3; ++d)
 	  out << " 0";             // fill with zeroes
 	out << '\n';
       };
@@ -700,6 +700,16 @@ unsigned int GridOut::n_boundary_lines (const Triangulation<1> &) const
   return 0;
 }
 
+
+unsigned int GridOut::n_boundary_faces (const Triangulation<1,2> &) const
+{
+  return 0;
+}
+
+unsigned int GridOut::n_boundary_lines (const Triangulation<1,2> &) const
+{
+  return 0;
+}
 #endif
 
 
@@ -710,14 +720,18 @@ unsigned int GridOut::n_boundary_lines (const Triangulation<2> &) const
   return 0;
 }
 
+unsigned int GridOut::n_boundary_lines (const Triangulation<2,3> &) const
+{
+  return 0;
+}
 #endif
 
 
 
-template <int dim>
-unsigned int GridOut::n_boundary_faces (const Triangulation<dim> &tria) const
+template <int dim, int spacedim>
+unsigned int GridOut::n_boundary_faces (const Triangulation<dim,spacedim> &tria) const
 {
-  typename Triangulation<dim>::active_face_iterator face, endf;
+    typename Triangulation<dim,spacedim>::active_face_iterator face, endf;
   unsigned int n_faces = 0;
 
   for (face=tria.begin_active_face(), endf=tria.end_face();
@@ -731,10 +745,10 @@ unsigned int GridOut::n_boundary_faces (const Triangulation<dim> &tria) const
 
 
 
-template <int dim>
-unsigned int GridOut::n_boundary_lines (const Triangulation<dim> &tria) const
+template <int dim, int spacedim>
+unsigned int GridOut::n_boundary_lines (const Triangulation<dim, spacedim> &tria) const
 {
-  typename Triangulation<dim>::active_line_iterator edge, endedge;
+    typename Triangulation<dim, spacedim>::active_line_iterator edge, endedge;
   unsigned int n_lines = 0;
 
   for (edge=tria.begin_active_line(), endedge=tria.end_line();
@@ -758,7 +772,22 @@ void GridOut::write_msh_faces (const Triangulation<1> &,
 }
 
 
+void GridOut::write_msh_faces (const Triangulation<1,2> &,
+			       const unsigned int,
+			       std::ostream &) const
+{
+  return;
+}
+
+
 void GridOut::write_msh_lines (const Triangulation<1> &,
+			       const unsigned int,
+			       std::ostream &) const
+{
+  return;
+}
+
+void GridOut::write_msh_lines (const Triangulation<1,2> &,
 			       const unsigned int,
 			       std::ostream &) const
 {
@@ -777,16 +806,23 @@ void GridOut::write_msh_lines (const Triangulation<2> &,
   return;
 }
 
+void GridOut::write_msh_lines (const Triangulation<2,3> &,
+			       const unsigned int,
+			       std::ostream &) const
+{
+  return;
+}
+
 #endif
 
 
 
-template <int dim>
-void GridOut::write_msh_faces (const Triangulation<dim> &tria,
+template <int dim, int spacedim>
+void GridOut::write_msh_faces (const Triangulation<dim,spacedim> &tria,
 			       const unsigned int        starting_index,
 			       std::ostream             &out) const
 {
-  typename Triangulation<dim>::active_face_iterator face, endf;
+    typename Triangulation<dim,spacedim>::active_face_iterator face, endf;
   unsigned int index=starting_index;
 
   for (face=tria.begin_active_face(), endf=tria.end_face();
@@ -817,12 +853,12 @@ void GridOut::write_msh_faces (const Triangulation<dim> &tria,
 }
 
 
-template <int dim>
-void GridOut::write_msh_lines (const Triangulation<dim> &tria,
+template <int dim, int spacedim>
+void GridOut::write_msh_lines (const Triangulation<dim, spacedim> &tria,
 			       const unsigned int        starting_index,
 			       std::ostream             &out) const
 {
-  typename Triangulation<dim>::active_line_iterator line, endl;
+    typename Triangulation<dim,spacedim>::active_line_iterator line, endl;
   unsigned int index=starting_index;
 
   for (line=tria.begin_active_line(), endl=tria.end_line();
@@ -856,8 +892,21 @@ void GridOut::write_ucd_faces (const Triangulation<1> &,
   return;
 }
 
+void GridOut::write_ucd_faces (const Triangulation<1,2> &,
+			       const unsigned int,
+			       std::ostream &) const
+{
+  return;
+}
 
 void GridOut::write_ucd_lines (const Triangulation<1> &,
+			       const unsigned int,
+			       std::ostream &) const
+{
+  return;
+}
+
+void GridOut::write_ucd_lines (const Triangulation<1,2> &,
 			       const unsigned int,
 			       std::ostream &) const
 {
@@ -877,16 +926,23 @@ void GridOut::write_ucd_lines (const Triangulation<2> &,
   return;
 }
 
+void GridOut::write_ucd_lines (const Triangulation<2,3> &,
+			       const unsigned int,
+			       std::ostream &) const
+{
+  return;
+}
+
 #endif
 
 
 
-template <int dim>
-void GridOut::write_ucd_faces (const Triangulation<dim> &tria,
+template <int dim, int spacedim>
+void GridOut::write_ucd_faces (const Triangulation<dim, spacedim> &tria,
 			       const unsigned int        starting_index,
 			       std::ostream             &out) const
 {
-  typename Triangulation<dim>::active_face_iterator face, endf;
+    typename Triangulation<dim,spacedim>::active_face_iterator face, endf;
   unsigned int index=starting_index;
 
   for (face=tria.begin_active_face(), endf=tria.end_face();
@@ -915,12 +971,12 @@ void GridOut::write_ucd_faces (const Triangulation<dim> &tria,
 
 
 
-template <int dim>
-void GridOut::write_ucd_lines (const Triangulation<dim> &tria,
+template <int dim, int spacedim>
+void GridOut::write_ucd_lines (const Triangulation<dim, spacedim> &tria,
 			       const unsigned int        starting_index,
 			       std::ostream             &out) const
 {
-  typename Triangulation<dim>::active_line_iterator line, endl;
+    typename Triangulation<dim, spacedim>::active_line_iterator line, endl;
   unsigned int index=starting_index;
 
   for (line=tria.begin_active_line(), endl=tria.end_line();
@@ -1801,12 +1857,12 @@ void GridOut::write_eps (
 #endif
 
 
-template <int dim>
+template <int dim, int spacedim>
 void GridOut::write (
-  const Triangulation<dim> &tria,
+    const Triangulation<dim, spacedim> &tria,
   std::ostream             &out,
   const OutputFormat        output_format,
-  const Mapping<dim>       *mapping) const
+  const Mapping<dim,spacedim>       *mapping) const
 {
   switch (output_format)
     {
@@ -1842,11 +1898,11 @@ void GridOut::write (
 }
 
 
-template <int dim>
+template <int dim, int spacedim>
 void GridOut::write (
-  const Triangulation<dim> &tria,
+    const Triangulation<dim, spacedim> &tria,
   std::ostream             &out,
-  const Mapping<dim>       *mapping) const
+  const Mapping<dim,spacedim>       *mapping) const
 {
   write(tria, out, default_format, mapping);
 }
@@ -1864,24 +1920,34 @@ template void GridOut::write_msh
 template void GridOut::write_xfig
 (const Triangulation<deal_II_dimension>&,
  std::ostream&,
- const Mapping<deal_II_dimension>*) const;
+ const Mapping<deal_II_dimension,deal_II_dimension>*) const;
 template void GridOut::write_gnuplot
 (const Triangulation<deal_II_dimension>&,
  std::ostream&,
- const Mapping<deal_II_dimension>*) const;
+ const Mapping<deal_II_dimension,deal_II_dimension>*) const;
 template void GridOut::write_ucd<deal_II_dimension>
 (const Triangulation<deal_II_dimension> &,
  std::ostream &) const;
 template void GridOut::write_eps<deal_II_dimension>
 (const Triangulation<deal_II_dimension> &,
  std::ostream &,
- const Mapping<deal_II_dimension> *) const;
+ const Mapping<deal_II_dimension,deal_II_dimension> *) const;
 template void GridOut::write<deal_II_dimension>
 (const Triangulation<deal_II_dimension> &,
  std::ostream &, const OutputFormat,
- const Mapping<deal_II_dimension> *) const;
+ const Mapping<deal_II_dimension,deal_II_dimension> *) const;
 template void GridOut::write<deal_II_dimension>
 (const Triangulation<deal_II_dimension> &,
- std::ostream &, const Mapping<deal_II_dimension> *) const;
+ std::ostream &, const Mapping<deal_II_dimension,deal_II_dimension> *) const;
+
+#if deal_II_dimension == 1 || deal_II_dimension ==2
+// explicit instantiations for codimension one
+template void GridOut::write_msh
+(const Triangulation<deal_II_dimension, deal_II_dimension+1>&,
+ std::ostream&) const;
+template void GridOut::write_ucd
+(const Triangulation<deal_II_dimension, deal_II_dimension+1> &,
+ std::ostream &) const;
+#endif
 
 DEAL_II_NAMESPACE_CLOSE

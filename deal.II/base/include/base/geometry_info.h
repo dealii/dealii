@@ -811,6 +811,16 @@ struct GeometryInfo<0>
     static const unsigned int max_children_per_face = 0;
 
 				     /**
+				      * Return the number of children
+				      * of a cell (or face) refined
+				      * with <tt>ref_case</tt>. Since
+				      * we are concerned here with
+				      * points, the number of children
+				      * is equal to one.
+				      */
+    static unsigned int n_children(const RefinementCase<0> &refinement_case);
+    
+				     /**
 				      * Number of vertices a cell has.
 				      */
     static const unsigned int vertices_per_cell = 1;
@@ -1684,7 +1694,7 @@ struct GeometryInfo
 				      * entry.
 				      *
 				      * In the case of anisotropically refined
-				      * cells and faces, the @p RefineCase of
+				      * cells and faces, the @p RefinementCase of
 				      * the face, <tt>face_ref_case</tt>,
 				      * might have an influence on 
 				      * which child is behind which given

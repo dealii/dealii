@@ -24,17 +24,19 @@
 DEAL_II_NAMESPACE_OPEN
 
 template <int dim> class Point;
-template <int dim> class Triangulation;
+template <int dim, int space_dim> class Triangulation;
 template <int dim> class CellData;
 class SubCellData;
 
 
 /**
- * This class implements an input mechanism for grid data. It allows
- * to read a grid structure into a triangulation object. At present,
- * UCD (unstructured cell data), DB Mesh and Gmsh are supported as input
- * format for grid data. Any numerical data after the block of
- * topological information is ignored.
+ * This class implements an input mechanism for grid data. It allows to
+ * read a grid structure into a triangulation object. At present, UCD
+ * (unstructured cell data), DB Mesh, XDA, Gmsh, Tecplot, NetCDF and Cubit
+ * are supported as input format for grid data. Any numerical data after
+ * the block of topological information is ignored. Notice also that at
+ * the moment in the codimension 1 case only UCD and Gmsh format are
+ * accepted.
  *
  * Since the coarse mesh fed into a @p Triangulation object cannot
  * have hanging nodes, strange things will happen if the input file
@@ -202,7 +204,7 @@ class SubCellData;
  * @ingroup input
  * @author Wolfgang Bangerth, 1998, 2000, Luca Heltai, 2004, 2007
  */
-template <int dim>
+template <int dim, int spacedim=dim>
 class GridIn
 {
   public:
@@ -241,7 +243,7 @@ class GridIn
 				      * Attach this triangulation
 				      * to be fed with the grid data.
 				      */
-    void attach_triangulation (Triangulation<dim> &tria);
+    void attach_triangulation (Triangulation<dim,spacedim> &tria);
 
 				     /**
 				      * Read from the given stream. If
@@ -401,7 +403,7 @@ class GridIn
 				      * Store address of the triangulation to
 				      * be fed with the data read in.
 				      */
-    SmartPointer<Triangulation<dim> > tria;
+    SmartPointer<Triangulation<dim,spacedim> > tria;
     
 				     /**
 				      * This function can write the
@@ -449,7 +451,7 @@ class GridIn
 				      * user.
 				      */
     static void debug_output_grid (const std::vector<CellData<dim> > &cells,
-				   const std::vector<Point<dim> >    &vertices,
+				   const std::vector<Point<spacedim> > &vertices,
 				   std::ostream &out);
 
   private:
@@ -515,6 +517,13 @@ template <>
 void
 GridIn<2>::debug_output_grid (const std::vector<CellData<2> > &cells,
 			      const std::vector<Point<2> >    &vertices,
+			      std::ostream                    &out);
+
+
+template <>
+void
+GridIn<2,3>::debug_output_grid (const std::vector<CellData<2> > &cells,
+			      const std::vector<Point<3> >    &vertices,
 			      std::ostream                    &out);
 template <>
 void

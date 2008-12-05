@@ -41,11 +41,15 @@ DEAL_II_NAMESPACE_OPEN
  * Shape function for this mapping are the same as for the finite
  * element FE_Q of order 1. Therefore, coupling these two yields
  * an isoparametric element.
+ * 
+ * For more information about the <tt>spacedim</tt> template parameter
+ * check the documentation of FiniteElement or the one of
+ * Triangulation.
  *
  * @author Guido Kanschat, 2000, 2001; Ralf Hartmann, 2000, 2001, 2005
  */
-template <int dim>
-class MappingQ1 : public Mapping<dim>
+template <int dim, int spacedim=dim>
+class MappingQ1 : public Mapping<dim,spacedim>
 {
   public:
 				     /**
@@ -53,9 +57,9 @@ class MappingQ1 : public Mapping<dim>
 				      */
     MappingQ1 ();
     
-    virtual Point<dim>
+    virtual Point<spacedim>
     transform_unit_to_real_cell (
-      const typename Triangulation<dim>::cell_iterator &cell,
+      const typename Triangulation<dim,spacedim>::cell_iterator &cell,
       const Point<dim>                                 &p) const;
     
 				     /**
@@ -70,32 +74,32 @@ class MappingQ1 : public Mapping<dim>
 				      */
     virtual Point<dim>
     transform_real_to_unit_cell (
-      const typename Triangulation<dim>::cell_iterator &cell,
-      const Point<dim>                                 &p) const;
+      const typename Triangulation<dim,spacedim>::cell_iterator &cell,
+      const Point<spacedim>                            &p) const;
     
     virtual void
     transform_covariant (const VectorSlice<const std::vector<Tensor<1,dim> > > input,
                          const unsigned int                 offset,
-			 VectorSlice<std::vector<Tensor<1,dim> > > output,
-			 const typename Mapping<dim>::InternalDataBase &internal) const;
+			 VectorSlice<std::vector<Tensor<1,spacedim> > > output,
+			 const typename Mapping<dim,spacedim>::InternalDataBase &internal) const;
     
     virtual void
     transform_covariant (const VectorSlice<const std::vector<Tensor<2,dim> > > input,
                          const unsigned int                 offset,
-			 VectorSlice<std::vector<Tensor<2,dim> > > output,
-			 const typename Mapping<dim>::InternalDataBase &internal) const;
+			 VectorSlice<std::vector<Tensor<2,spacedim> > > output,
+			 const typename Mapping<dim,spacedim>::InternalDataBase &internal) const;
     
     virtual void
-    transform_contravariant (const VectorSlice<const std::vector<Tensor<1,dim> > > input,
+    transform_contravariant (const VectorSlice<const std::vector<Tensor<1,spacedim> > > input,
                              const unsigned int                 offset,
-			     VectorSlice<std::vector<Tensor<1,dim> > > output,
-			     const typename Mapping<dim>::InternalDataBase &internal) const;
+			     VectorSlice<std::vector<Tensor<1,spacedim> > > output,
+			     const typename Mapping<dim,spacedim>::InternalDataBase &internal) const;
     
     virtual void
-    transform_contravariant (const VectorSlice<const std::vector<Tensor<2,dim> > > input,
+    transform_contravariant (const VectorSlice<const std::vector<Tensor<2,spacedim> > > input,
                              const unsigned int                 offset,
-			     VectorSlice<std::vector<Tensor<2,dim> > > output,
-			     const typename Mapping<dim>::InternalDataBase &internal) const;
+			     VectorSlice<std::vector<Tensor<2,spacedim> > > output,
+			     const typename Mapping<dim,spacedim>::InternalDataBase &internal) const;
     
                                      /**
                                       * Return a pointer to a copy of the
@@ -103,13 +107,13 @@ class MappingQ1 : public Mapping<dim>
                                       * copy then assumes ownership of it.
                                       */
     virtual
-    Mapping<dim> * clone () const;
+    Mapping<dim,spacedim> * clone () const;
 
 				     /** 
 				      * Storage for internal data of
 				      * d-linear transformation.
 				      */
-    class InternalData : public Mapping<dim>::InternalDataBase
+    class InternalData : public Mapping<dim,spacedim>::InternalDataBase
     {
       public:
 					 /**
@@ -216,7 +220,7 @@ class MappingQ1 : public Mapping<dim>
 					  *
 					  * Computed on each cell.
 					  */
-	std::vector<Tensor<2,dim> > covariant;
+	std::vector<Tensor<2,spacedim> > covariant;
 	
 					 /**
 					  * Tensors of contravariant
@@ -229,7 +233,7 @@ class MappingQ1 : public Mapping<dim>
 					  *
 					  * Computed on each cell.
 					  */
-	std::vector<Tensor<2,dim> > contravariant;
+	std::vector<Tensor<2,spacedim> > contravariant;
 	
 					 /**
 					  * Unit tangential vectors. Used
@@ -239,26 +243,26 @@ class MappingQ1 : public Mapping<dim>
 					  *
 					  * Filled once.
 					  */
-        std::vector<std::vector<Tensor<1,dim> > > unit_tangentials;
+        std::vector<std::vector<Tensor<1,spacedim> > > unit_tangentials;
 	
 					 /**
 					  * Auxiliary vectors for internal use.
 					  */
-        std::vector<std::vector<Tensor<1,dim> > > aux;
+        std::vector<std::vector<Tensor<1,spacedim> > > aux;
 
 					 /**
 					  * Stores the support points of
 					  * the mapping shape functions on
 					  * the @p cell_of_current_support_points.
 					  */
-	std::vector<Point<dim> > mapping_support_points;
+	std::vector<Point<spacedim> > mapping_support_points;
 	
 					 /**
 					  * Stores the cell of which the
 					  * @p mapping_support_points are
 					  * stored.
 					  */
-	typename Triangulation<dim>::cell_iterator cell_of_current_support_points;
+	typename Triangulation<dim,spacedim>::cell_iterator cell_of_current_support_points;
 	
 					 /**
 					  * Default value of this flag
@@ -303,44 +307,45 @@ class MappingQ1 : public Mapping<dim>
 				      * Mapping.
 				      */
     virtual void
-    fill_fe_values (const typename Triangulation<dim>::cell_iterator &cell,
-		    const Quadrature<dim>& quadrature,
-		    typename Mapping<dim>::InternalDataBase &mapping_data,
-		    typename std::vector<Point<dim> >       &quadrature_points,
-		    std::vector<double>             &JxW_values,
-		    std::vector<Tensor<2,dim> >     &jacobians,
-		    std::vector<Tensor<3,dim> >     &jacobian_grads,
-		    std::vector<Tensor<2,dim> >     &inverse_jacobians) const ;
+    fill_fe_values (const typename Triangulation<dim,spacedim>::cell_iterator &cell,
+		    const Quadrature<dim>                                     & quadrature,
+		    typename Mapping<dim,spacedim>::InternalDataBase          &mapping_data,
+		    typename std::vector<Point<spacedim> >                    &quadrature_points,
+		    std::vector<double>                                       &JxW_values,
+		    std::vector<Tensor<2,spacedim> >                          &jacobians,
+		    std::vector<Tensor<3,spacedim> >                          &jacobian_grads,
+		    std::vector<Tensor<2,spacedim> >                          &inverse_jacobians,
+		    std::vector<Point<spacedim> >                             &cell_normal_vectors) const;
 
 				     /**
 				      * Implementation of the interface in
 				      * Mapping.
 				      */
     virtual void
-    fill_fe_face_values (const typename Triangulation<dim>::cell_iterator &cell,
-			 const unsigned int face_no,
-			 const Quadrature<dim-1>& quadrature,
-			 typename Mapping<dim>::InternalDataBase &mapping_data,
-			 typename std::vector<Point<dim> >        &quadrature_points,
-			 std::vector<double>             &JxW_values,
-			 typename std::vector<Tensor<1,dim> >        &boundary_form,
-			 typename std::vector<Point<dim> >        &normal_vectors,
-			 std::vector<double>             &cell_JxW_values) const ;
+    fill_fe_face_values (const typename Triangulation<dim,spacedim>::cell_iterator &cell,
+			 const unsigned int                               face_no,
+			 const Quadrature<dim-1>                          &quadrature,
+			 typename Mapping<dim,spacedim>::InternalDataBase &mapping_data,
+			 typename std::vector<Point<dim> >                &quadrature_points,
+			 std::vector<double>                              &JxW_values,
+			 typename std::vector<Tensor<1,dim> >             &boundary_form,
+			 typename std::vector<Point<spacedim> >           &normal_vectors,
+			 std::vector<double>                              &cell_JxW_values) const ;
 
 				     /**
 				      * Implementation of the interface in
 				      * Mapping.
 				      */
     virtual void
-    fill_fe_subface_values (const typename Triangulation<dim>::cell_iterator &cell,
+    fill_fe_subface_values (const typename Triangulation<dim,spacedim>::cell_iterator &cell,
 			    const unsigned int face_no,
 			    const unsigned int sub_no,
 			    const Quadrature<dim-1>& quadrature,
-			    typename Mapping<dim>::InternalDataBase &mapping_data,
+			    typename Mapping<dim,spacedim>::InternalDataBase &mapping_data,
 			    typename std::vector<Point<dim> >        &quadrature_points,
 			    std::vector<double>             &JxW_values,
 			    typename std::vector<Tensor<1,dim> >        &boundary_form,
-			    typename std::vector<Point<dim> >        &normal_vectors,
+			    typename std::vector<Point<spacedim> >        &normal_vectors,
 			    std::vector<double>             &cell_JxW_values) const ;
     
 				     /**
@@ -392,17 +397,17 @@ class MappingQ1 : public Mapping<dim>
 				      * Do the computation for the
 				      * <tt>fill_*</tt> functions.
 				      */
-    void compute_fill (const typename Triangulation<dim>::cell_iterator &cell,
+    void compute_fill (const typename Triangulation<dim,spacedim>::cell_iterator &cell,
 		       const unsigned int      npts,
 		       const DataSetDescriptor data_set,
 		       InternalData           &data,
-		       std::vector<Point<dim> > &quadrature_points) const;
+		       std::vector<Point<spacedim> > &quadrature_points) const;
     
 				     /**
 				      * Do the computation for the
 				      * <tt>fill_*</tt> functions.
 				      */
-    void compute_fill_face (const typename Triangulation<dim>::cell_iterator &cell,
+    void compute_fill_face (const typename Triangulation<dim,spacedim>::cell_iterator &cell,
 			    const unsigned int      face_no,
 			    const unsigned int      subface_no,
 			    const unsigned int      npts,
@@ -412,7 +417,7 @@ class MappingQ1 : public Mapping<dim>
 			    std::vector<Point<dim> >    &quadrature_points,
 			    std::vector<double>         &JxW_values,
 			    std::vector<Tensor<1,dim> > &boundary_form,
-			    std::vector<Point<dim> > &normal_vectors,
+			    std::vector<Point<spacedim> > &normal_vectors,
 			    std::vector<double>         &cell_JxW_values) const;
     
 				     /**
@@ -448,7 +453,7 @@ class MappingQ1 : public Mapping<dim>
 				      * computations of the mapping
 				      * support points.
 				      */
-    Point<dim> transform_unit_to_real_cell_internal (const InternalData &mdata) const;
+    Point<spacedim> transform_unit_to_real_cell_internal (const InternalData &mdata) const;
     
 				     /**
 				      * Transforms the point @p p on
@@ -484,8 +489,8 @@ class MappingQ1 : public Mapping<dim>
 				      * @p mdata will be changed by
 				      * this function.
 				      */
-    void transform_real_to_unit_cell_internal (const typename Triangulation<dim>::cell_iterator &cell,
-					       const Point<dim> &p,
+    void transform_real_to_unit_cell_internal (const typename Triangulation<dim,spacedim>::cell_iterator &cell,
+					       const Point<spacedim> &p,
 					       InternalData &mdata,
 					       Point<dim> &p_unit) const;
 
@@ -567,17 +572,17 @@ class MappingQ1 : public Mapping<dim>
     virtual UpdateFlags update_each (const UpdateFlags flags) const;
 
     virtual
-    typename Mapping<dim>::InternalDataBase *
+    typename Mapping<dim,spacedim>::InternalDataBase *
     get_data (const UpdateFlags,
 	      const Quadrature<dim>& quadrature) const;
 
     virtual
-    typename Mapping<dim>::InternalDataBase *
+    typename Mapping<dim,spacedim>::InternalDataBase *
     get_face_data (const UpdateFlags flags,
 		   const Quadrature<dim-1>& quadrature) const;
 
     virtual
-    typename Mapping<dim>::InternalDataBase *
+    typename Mapping<dim,spacedim>::InternalDataBase *
     get_subface_data (const UpdateFlags flags,
 		      const Quadrature<dim-1>& quadrature) const;
 
@@ -598,8 +603,8 @@ class MappingQ1 : public Mapping<dim>
 				      * geometry of the cell.
 				      */
     virtual void compute_mapping_support_points(
-      const typename Triangulation<dim>::cell_iterator &cell,
-      std::vector<Point<dim> > &a) const;
+      const typename Triangulation<dim,spacedim>::cell_iterator &cell,
+      std::vector<Point<spacedim> > &a) const;
 
 				     /**
 				      * Number of shape functions. Is
@@ -616,10 +621,10 @@ class MappingQ1 : public Mapping<dim>
  * functions), we define a static MappingQ1 objects once and for all
  * places where it is needed.
  */
-template <int dim>
+template <int dim, int spacedim=dim>
 struct StaticMappingQ1
 {
-    static MappingQ1<dim> mapping;
+    static MappingQ1<dim, spacedim> mapping;
 };
 
 
@@ -627,10 +632,10 @@ struct StaticMappingQ1
 
 /*----------------------------------------------------------------------*/
 
-template<int dim>
+template<int dim, int spacedim>
 inline
 double
-MappingQ1<dim>::InternalData::shape (const unsigned int qpoint,
+MappingQ1<dim,spacedim>::InternalData::shape (const unsigned int qpoint,
 				     const unsigned int shape_nr) const
 {
   Assert(qpoint*n_shape_functions + shape_nr < shape_values.size(),
@@ -641,10 +646,10 @@ MappingQ1<dim>::InternalData::shape (const unsigned int qpoint,
 
 
 
-template <int dim>
+template<int dim, int spacedim>
 inline
 double &
-MappingQ1<dim>::InternalData::shape (const unsigned int qpoint,
+MappingQ1<dim,spacedim>::InternalData::shape (const unsigned int qpoint,
 				     const unsigned int shape_nr)
 {
   Assert(qpoint*n_shape_functions + shape_nr < shape_values.size(),
@@ -654,10 +659,10 @@ MappingQ1<dim>::InternalData::shape (const unsigned int qpoint,
 }
 
 
-template <int dim>
+template<int dim, int spacedim>
 inline
 Tensor<1,dim>
-MappingQ1<dim>::InternalData::derivative (const unsigned int qpoint,
+MappingQ1<dim,spacedim>::InternalData::derivative (const unsigned int qpoint,
 					  const unsigned int shape_nr) const
 {
   Assert(qpoint*n_shape_functions + shape_nr < shape_derivatives.size(),
@@ -668,10 +673,10 @@ MappingQ1<dim>::InternalData::derivative (const unsigned int qpoint,
 
 
 
-template <int dim>
+template<int dim, int spacedim>
 inline
 Tensor<1,dim> &
-MappingQ1<dim>::InternalData::derivative (const unsigned int qpoint,
+MappingQ1<dim,spacedim>::InternalData::derivative (const unsigned int qpoint,
 					  const unsigned int shape_nr)
 {
   Assert(qpoint*n_shape_functions + shape_nr < shape_derivatives.size(),
@@ -681,11 +686,11 @@ MappingQ1<dim>::InternalData::derivative (const unsigned int qpoint,
 }
 
 
-template <int dim>
+template <int dim, int spacedim>
 inline
 Tensor<2,dim>
-MappingQ1<dim>::InternalData::second_derivative (const unsigned int qpoint,
-						 const unsigned int shape_nr) const
+MappingQ1<dim,spacedim>::InternalData::second_derivative (const unsigned int qpoint,
+			      			          const unsigned int shape_nr) const
 {
   Assert(qpoint*n_shape_functions + shape_nr < shape_second_derivatives.size(),
 	 ExcIndexRange(qpoint*n_shape_functions + shape_nr, 0,
@@ -695,10 +700,10 @@ MappingQ1<dim>::InternalData::second_derivative (const unsigned int qpoint,
 
 
 
-template <int dim>
+template <int dim, int spacedim>
 inline
 Tensor<2,dim> &
-MappingQ1<dim>::InternalData::second_derivative (const unsigned int qpoint,
+MappingQ1<dim,spacedim>::InternalData::second_derivative (const unsigned int qpoint,
 						 const unsigned int shape_nr)
 {
   Assert(qpoint*n_shape_functions + shape_nr < shape_second_derivatives.size(),
@@ -713,23 +718,6 @@ MappingQ1<dim>::InternalData::second_derivative (const unsigned int qpoint,
 /* -------------- declaration of explicit specializations ------------- */
 
 #ifndef DOXYGEN
-
-template<> void MappingQ1<1>::compute_shapes_virtual (
-  const std::vector<Point<1> > &unit_points,
-  InternalData& data) const;
-template<> void MappingQ1<2>::compute_shapes_virtual (
-  const std::vector<Point<2> > &unit_points,
-  InternalData &data) const;
-template<> void MappingQ1<3>::compute_shapes_virtual (
-  const std::vector<Point<3> > &unit_points,
-  InternalData &data) const;
-
-template <>
-void
-MappingQ1<1>::compute_face_data (const UpdateFlags,
-                                 const Quadrature<1> &,
-                                 const unsigned int,
-                                 InternalData &) const;
 
 template <> void MappingQ1<1>::compute_fill_face (
   const Triangulation<1>::cell_iterator &,

@@ -26,11 +26,11 @@ DEAL_II_NAMESPACE_OPEN
 template <typename number> class FullMatrix;
 template <typename number> class Vector;
 template <int dim> class Quadrature;
-template <int dim> class FiniteElement;
-template <int dim> class DoFHandler;
+template <int dim, int spacedim> class FiniteElement;
+template <int dim, int spacedim> class DoFHandler;
 namespace hp
 {
-  template <int dim> class DoFHandler;
+  template <int dim, int spacedim> class DoFHandler;
 }
 template <int dim> class FiniteElementData;
 class ConstraintMatrix;
@@ -54,6 +54,10 @@ class ConstraintMatrix;
  * on each cell. Furthermore it provides the difference matrix
  * $id-I_h$ that is needed for evaluating $(id-I_h)z$ for e.g. the
  * dual solution $z$.
+ * 
+ * For more information about the <tt>spacedim</tt> template parameter
+ * check the documentation of FiniteElement or the one of
+ * Triangulation.
  *
  * @author Wolfgang Bangerth, Ralf Hartmann, Guido Kanschat;
  * 2000, 2003, 2004, 2005, 2006
@@ -78,7 +82,7 @@ class FETools
 				      *
 				      * @author Guido Kanschat, 2006
 				      */
-    template <int dim>
+    template <int dim, int spacedim=dim>
     class FEFactoryBase
     {
       public:
@@ -86,7 +90,7 @@ class FETools
 					  * Create a FiniteElement and
 					  * return a pointer to it.
 					  */
-	virtual FiniteElement<dim>*
+	virtual FiniteElement<dim,spacedim>*
 	get (const unsigned int degree) const = 0;
 
                                          /**
@@ -114,14 +118,14 @@ class FETools
 				      * @author Guido Kanschat, 2006
 				      */
     template <class FE>
-    class FEFactory : public FEFactoryBase<FE::dimension>
+    class FEFactory : public FEFactoryBase<FE::dimension,FE::dimension>
     {
       public:
 					 /**
 					  * Create a FiniteElement and
 					  * return a pointer to it.
 					  */
-	virtual FiniteElement<FE::dimension>*
+	virtual FiniteElement<FE::dimension,FE::dimension>*
 	get (const unsigned int degree) const;
     };
     
@@ -150,9 +154,9 @@ class FETools
 				      * size, the second one is
 				      * reinitialized for convenience.
 				      */
-    template<int dim>
+    template<int dim, int spacedim>
     static void compute_component_wise(
-      const FiniteElement<dim>&                fe,
+      const FiniteElement<dim,spacedim>&                fe,
       std::vector<unsigned int>&               renumbering,
       std::vector<std::vector<unsigned int> >& start_indices);
 
@@ -167,9 +171,9 @@ class FETools
 				      * @todo Which way does this
 				      * vector map the numbers?
 				      */
-    template<int dim>
+    template<int dim, int spacedim>
     static void compute_block_renumbering (
-      const FiniteElement<dim>&  fe,
+      const FiniteElement<dim,spacedim>&  fe,
       std::vector<unsigned int>& renumbering,
       std::vector<unsigned int>& start_indices);
     
@@ -191,11 +195,11 @@ class FETools
 				      * @p fe2 then the @p interpolation_matrix
 				      * is an embedding matrix.
 				      */
-    template <int dim, typename number>
+    template <int dim, typename number, int spacedim>
     static
     void
-    get_interpolation_matrix(const FiniteElement<dim> &fe1,
-                             const FiniteElement<dim> &fe2,
+    get_interpolation_matrix(const FiniteElement<dim,spacedim> &fe1,
+                             const FiniteElement<dim,spacedim> &fe2,
                              FullMatrix<number> &interpolation_matrix);
     
 				     /**
@@ -216,11 +220,11 @@ class FETools
 				      * the @p interpolation_matrix would be 
 				      * only the unit matrix.
 				      */
-    template <int dim, typename number>
+    template <int dim, typename number, int spacedim>
     static
     void
-    get_back_interpolation_matrix(const FiniteElement<dim> &fe1,
-                                  const FiniteElement<dim> &fe2,
+    get_back_interpolation_matrix(const FiniteElement<dim,spacedim> &fe1,
+                                  const FiniteElement<dim,spacedim> &fe2,
                                   FullMatrix<number> &interpolation_matrix);
 
 				     /**
@@ -240,11 +244,11 @@ class FETools
 				      * error-representations where $z$
 				      * denotes the dual solution.
 				      */
-    template <int dim, typename number>
+    template <int dim, typename number, int spacedim>
     static
     void
-    get_interpolation_difference_matrix(const FiniteElement<dim> &fe1,
-                                        const FiniteElement<dim> &fe2,
+    get_interpolation_difference_matrix(const FiniteElement<dim,spacedim> &fe1,
+                                        const FiniteElement<dim,spacedim> &fe2,
                                         FullMatrix<number> &difference_matrix);
 
 				     /**
@@ -252,9 +256,9 @@ class FETools
 				      * $L^2$-projection matrix from
 				      * fe1 to fe2.
 				      */
-    template <int dim, typename number>
-    static void get_projection_matrix(const FiniteElement<dim> &fe1,
-				      const FiniteElement<dim> &fe2,
+    template <int dim, typename number, int spacedim>
+    static void get_projection_matrix(const FiniteElement<dim,spacedim> &fe1,
+				      const FiniteElement<dim,spacedim> &fe2,
 				      FullMatrix<number> &matrix);
     
 				     /**
@@ -300,9 +304,9 @@ class FETools
 				      * points and and interpolation
 				      * functions.
 				      */
-    template <int dim>
+    template <int dim, int spacedim>
     static void compute_node_matrix(FullMatrix<double>& M,
-				    const FiniteElement<dim>& fe);
+				    const FiniteElement<dim,spacedim>& fe);
     
 				     /**
 				      * For all possible (isotropic
@@ -370,8 +374,8 @@ class FETools
 				      * FiniteElement, where we want
 				      * to use this function mostly.
 				      */
-    template <int dim, typename number>
-    static void compute_embedding_matrices(const FiniteElement<dim> &fe,
+    template <int dim, typename number, int spacedim>
+    static void compute_embedding_matrices(const FiniteElement<dim,spacedim> &fe,
 					   std::vector<std::vector<FullMatrix<number> > >& matrices);
 
 				     /**
@@ -401,9 +405,9 @@ class FETools
 				      * matrices. It is not
 				      * sufficiently tested yet.
 				     */
-    template<int dim, typename number>
+    template <int dim, typename number, int spacedim>
     static void
-    compute_face_embedding_matrices(const FiniteElement<dim>& fe,
+    compute_face_embedding_matrices(const FiniteElement<dim,spacedim>& fe,
 				    FullMatrix<number> (&matrices)[GeometryInfo<dim>::max_children_per_face],
 				    const unsigned int face_coarse,
 				    const unsigned int face_fine);
@@ -456,8 +460,8 @@ class FETools
 				      * FiniteElement, where we want
 				      * to use this function mostly.
 				      */
-    template <int dim, typename number>
-    static void compute_projection_matrices(const FiniteElement<dim> &fe,
+    template <int dim, typename number, int spacedim>
+    static void compute_projection_matrices(const FiniteElement<dim,spacedim> &fe,
 					    std::vector<std::vector<FullMatrix<number> > >& matrices);
 
 //TODO:[WB] Replace this documentation by something comprehensible
@@ -610,10 +614,10 @@ class FETools
 				      * the support points of the
 				      * finite element.
                                       */
-    template <int dim>
+    template <int dim, int spacedim>
     static
     void
-    compute_projection_from_quadrature_points_matrix (const FiniteElement<dim> &fe,
+    compute_projection_from_quadrature_points_matrix (const FiniteElement<dim,spacedim> &fe,
                                                       const Quadrature<dim>    &lhs_quadrature,
                                                       const Quadrature<dim>    &rhs_quadrature,
                                                       FullMatrix<double>       &X);
@@ -629,10 +633,10 @@ class FETools
                                       * compute_projection_from_quadrature_points_matrix
                                       * function.
                                       */
-    template <int dim>
+    template <int dim, int spacedim>
     static
     void
-    compute_interpolation_to_quadrature_points_matrix (const FiniteElement<dim> &fe,
+    compute_interpolation_to_quadrature_points_matrix (const FiniteElement<dim,spacedim> &fe,
                                                        const Quadrature<dim>    &quadrature,
                                                        FullMatrix<double>       &I_q);
     
@@ -699,16 +703,16 @@ class FETools
 				      * your hanging node constraints
 				      * object.
 				      */
-    template <int dim,
-              template <int> class DH1,
-              template <int> class DH2,
+    template <int dim, int spacedim,
+              template <int,int> class DH1,
+              template <int,int> class DH2,
               class InVector, class OutVector>
     static
     void
-    interpolate (const DH1<dim> &dof1,
-                 const InVector &u1,
-                 const DH2<dim> &dof2,
-                 OutVector      &u2);
+    interpolate (const DH1<dim,spacedim> &dof1,
+                 const InVector          &u1,
+                 const DH2<dim,spacedim> &dof2,
+                 OutVector               &u2);
     
 				     /**
 				      * Gives the interpolation of a
@@ -743,15 +747,15 @@ class FETools
 				      * at the DoF values on the
 				      * discontinuities.
 				      */
-    template <int dim,
-              template <int> class DH1,
-              template <int> class DH2,              
+    template <int dim, int spacedim, 
+              template <int, int> class DH1,
+              template <int, int> class DH2,              
               class InVector, class OutVector>
-    static void interpolate (const DH1<dim>         &dof1,
-			     const InVector         &u1,
-			     const DH2<dim>         &dof2,
-			     const ConstraintMatrix &constraints,
-			     OutVector&              u2);    
+    static void interpolate (const DH1<dim,spacedim>  &dof1,
+			     const InVector           &u1,
+			     const DH2<dim,spacedim>  &dof2,
+			     const ConstraintMatrix   &constraints,
+			     OutVector&                u2);    
 
 				     /**
 				      * Gives the interpolation of the
@@ -779,10 +783,10 @@ class FETools
 				      * function is simply an identity
 				      * mapping.
 				      */
-    template <int dim, class InVector, class OutVector>
-    static void back_interpolate (const DoFHandler<dim>    &dof1,
+    template <int dim, class InVector, class OutVector, int spacedim>
+    static void back_interpolate (const DoFHandler<dim,spacedim>    &dof1,
 				  const InVector           &u1,
-				  const FiniteElement<dim> &fe2,
+				  const FiniteElement<dim,spacedim> &fe2,
 				  OutVector                &u1_interpolated);
 
                                      /**
@@ -793,10 +797,10 @@ class FETools
                                       */
     template <int dim,
               template <int> class DH,
-              class InVector, class OutVector>
+              class InVector, class OutVector, int spacedim>
     static void back_interpolate (const DH<dim>            &dof1,
 				  const InVector           &u1,
-				  const FiniteElement<dim> &fe2,
+				  const FiniteElement<dim,spacedim> &fe2,
 				  OutVector                &u1_interpolated);
 
                                      /**
@@ -826,11 +830,11 @@ class FETools
 				      * function is simply an identity
 				      * mapping.
 				      */
-    template <int dim, class InVector, class OutVector>
-    static void back_interpolate (const DoFHandler<dim>&  dof1,
+    template <int dim, class InVector, class OutVector, int spacedim>
+    static void back_interpolate (const DoFHandler<dim,spacedim>&  dof1,
 				  const ConstraintMatrix& constraints1,
 				  const InVector&         u1,
-				  const DoFHandler<dim>&  dof2,
+				  const DoFHandler<dim,spacedim>&  dof2,
 				  const ConstraintMatrix& constraints2,
 				  OutVector&              u1_interpolated);
 
@@ -850,10 +854,10 @@ class FETools
 				      * additional
 				      * @p ConstraintMatrix object.
 				      */
-    template <int dim, class InVector, class OutVector>
-    static void interpolation_difference(const DoFHandler<dim> &dof1,
+    template <int dim, class InVector, class OutVector, int spacedim>
+    static void interpolation_difference(const DoFHandler<dim,spacedim> &dof1,
 					 const InVector &z1,
-					 const FiniteElement<dim> &fe2,
+					 const FiniteElement<dim,spacedim> &fe2,
 					 OutVector &z1_difference);    
     
 				     /**
@@ -873,11 +877,11 @@ class FETools
 				      * nodes (locally refined grids)
 				      * are involved.
 				      */
-    template <int dim, class InVector, class OutVector>
-    static void interpolation_difference(const DoFHandler<dim>&  dof1,
+    template <int dim, class InVector, class OutVector, int spacedim>
+    static void interpolation_difference(const DoFHandler<dim,spacedim>&  dof1,
 					 const ConstraintMatrix& constraints1,
 					 const InVector&         z1,
-					 const DoFHandler<dim>&  dof2,
+					 const DoFHandler<dim,spacedim>&  dof2,
 					 const ConstraintMatrix& constraints2,
 					 OutVector&              z1_difference);
     
@@ -895,10 +899,10 @@ class FETools
 				      * since a global mass matrix
 				      * must be inverted.
 				      */
-    template <int dim, class InVector, class OutVector>
-    static void project_dg (const DoFHandler<dim>& dof1,
+    template <int dim, class InVector, class OutVector, int spacedim>
+    static void project_dg (const DoFHandler<dim,spacedim>& dof1,
 			    const InVector&        u1,
-			    const DoFHandler<dim>& dof2,
+			    const DoFHandler<dim,spacedim>& dof2,
 			    OutVector&             u2);
     
 				     /**
@@ -936,10 +940,10 @@ class FETools
 				      * this is not the case, an
 				      * exception will be raised.
 				      */
-    template <int dim, class InVector, class OutVector>
-    static void extrapolate (const DoFHandler<dim>& dof1,
+    template <int dim, class InVector, class OutVector, int spacedim>
+    static void extrapolate (const DoFHandler<dim,spacedim>& dof1,
 			     const InVector&        z1,
-			     const DoFHandler<dim>& dof2,
+			     const DoFHandler<dim,spacedim>& dof2,
 			     OutVector&             z2);    
 
 				     /**
@@ -962,10 +966,10 @@ class FETools
 				      * for the other @p extrapolate
 				      * function.
 				      */
-    template <int dim, class InVector, class OutVector>
-    static void extrapolate (const DoFHandler<dim>&  dof1,
+    template <int dim, class InVector, class OutVector, int spacedim>
+    static void extrapolate (const DoFHandler<dim,spacedim>&  dof1,
 			     const InVector&         z1,
-			     const DoFHandler<dim>&  dof2,
+			     const DoFHandler<dim,spacedim>&  dof2,
 			     const ConstraintMatrix& constraints,
 			     OutVector&              z2);    
 				     //@}
@@ -1096,11 +1100,15 @@ class FETools
 				      * make your own elements known
 				      * to this function, use the
 				      * add_fe_name() function.
+				      * This function does not work 
+				      * if one wants to get a codimension
+				      * 1 finite element.
 				      */
     template <int dim>
     static
-    FiniteElement<dim> *
+    FiniteElement<dim, dim> *
     get_fe_from_name (const std::string &name);
+
 
 				     /**
 				      * Extend the list of finite
@@ -1184,9 +1192,9 @@ class FETools
 				      * want your finite element added
 				      * to the map.
 				      */
-    template <int dim>
+    template <int dim, int spacedim>
     static void add_fe_name (const std::string& name,
-			     const FEFactoryBase<dim>* factory);
+			     const FEFactoryBase<dim,spacedim>* factory);
     
 				     /**
 				      * The string used for
@@ -1303,16 +1311,16 @@ class FETools
 				      * the part of <tt>name</tt>
 				      * defining this element.
 				      */
-    template <int dim>
+    template <int dim, int spacedim>
     static
-    FiniteElement<dim> *
+    FiniteElement<dim,spacedim> *
     get_fe_from_name_aux (std::string &name);
     
 };
 
 
 template<class FE>
-FiniteElement<FE::dimension>*
+FiniteElement<FE::dimension, FE::dimension>*
 FETools::FEFactory<FE>::get (const unsigned int degree) const
 {
   return new FE(degree);

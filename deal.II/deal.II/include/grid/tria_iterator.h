@@ -19,6 +19,7 @@
 
 #include <base/config.h>
 #include <base/exceptions.h>
+
 #include <base/point.h>
 #include <grid/tria_iterator_base.h>
 
@@ -34,10 +35,14 @@
 
 DEAL_II_NAMESPACE_OPEN
 
-//TODO: Instead of letting the Tria*Iterator classes take a dimension as first argument, deduce the space dimension from the TriaAccessor where necessary.
+template <int dim, int spacedim> class Triangulation;
+
+template <typename> class TriaRawIterator;
+template <typename> class TriaIterator;
+template <typename> class TriaActiveIterator;
 
 
-template <int dim> class Triangulation;
+
 
 // note: in non-debug mode, i.e. with optimizations, the file
 // tria_iterator.templates.h is included at the end of this file.
@@ -77,7 +82,7 @@ template <int dim> class Triangulation;
  * iterators is rather expensive compared to normal pointers.
  *   
  * The objects pointed to are accessors, derived from
- * TriaAccessor. Which kind of accessor is determined by the template
+ * TriaAccessorBase. Which kind of accessor is determined by the template
  * argument <em>Accessor</em>. These accessors are not so much data
  * structures as they are a collection of functions providing access
  * to the data stored in Tringulation or DoFHandler objects. Using
@@ -166,7 +171,7 @@ template <int dim> class Triangulation;
  * The accessors provided by the library are distributed in three
  * groups, determined by whether they access the data of
  * Triangulation, DoFHandler or MGDoFHandler. They are derived from
- * TriaObjectAccessor, DoFObjectAccessor and MGDoFObjectAccessor,
+ * TriaAccessor, DoFAccessor and MGDoFAccessor,
  * respectively. In each group, there is an accessor to cells, which
  * have more functionality.
  * 
@@ -177,7 +182,7 @@ template <int dim> class Triangulation;
  * triangulation.
  *
  * @note More information on valid and invalid iterators can be found
- * in the documentation of TriaAccessor, where the iterator states are
+ * in the documentation of TriaAccessorBase, where the iterator states are
  * checked and implemented.
  *
  * 
@@ -226,7 +231,7 @@ template <int dim> class Triangulation;
  * @author Wolfgang Bangerth, 1998
  * @author documentation update Guido Kanschat, 2004
  */
-template <int dim, typename Accessor>
+template <typename Accessor>
 class TriaRawIterator :
 #ifdef HAVE_STD_ITERATOR_CLASS  
                public std::iterator<std::bidirectional_iterator_tag,Accessor>
@@ -272,6 +277,15 @@ class TriaRawIterator :
 				      * @endverbatim
 				      */
     TriaRawIterator (const Accessor &a);
+
+				     /**
+				      * Constructor. Assumes that the
+				      * other accessor type is
+				      * convertible to the current
+				      * one.
+				      */
+    template <typename OtherAccessor>
+    TriaRawIterator (const OtherAccessor &a);
     
 				     /**
 				      *  Proper constructor, initialized
@@ -281,9 +295,9 @@ class TriaRawIterator :
 				      *  of a type declared by the accessor
 				      *  class.
 				      */
-    TriaRawIterator (const Triangulation<dim> *parent,
-		     const int                 level,
-		     const int                 index,
+    TriaRawIterator (const Triangulation<Accessor::dimension,Accessor::space_dimension> *parent,
+		     const int level,
+		     const int index,
 		     const typename AccessorType::AccessorData *local_data = 0);
 
 				     /**
@@ -299,16 +313,30 @@ class TriaRawIterator :
 				      * a Triangulation@p ::raw_cell_iterator from
 				      * a DoFHandler@p ::raw_cell_iterator, since
 				      * the DoFAccessor class is derived from
-				      * the TriaAccessor class.
-				      *
-				      * Since TriaIterator and
-				      * TriaActiveIterator are derived classes
-				      * of this class, this constructor also
-				      * serves to convert these iterators with
-				      * other accessor classes.
+				      * the TriaAccessorBase class.
 				      */
     template <typename OtherAccessor>
-    TriaRawIterator (const TriaRawIterator<dim,OtherAccessor> &i);
+    TriaRawIterator (const TriaRawIterator<OtherAccessor> &i);
+
+				     /**
+				      * Conversion constructor. Same
+				      * as above with the difference
+				      * that it converts from
+				      * TriaIterator classes (not
+				      * TriaRawIterator).
+				      */
+    template <typename OtherAccessor>
+    TriaRawIterator (const TriaIterator<OtherAccessor> &i);
+
+				     /**
+				      * Conversion constructor. Same
+				      * as above with the difference
+				      * that it converts from
+				      * TriaActiveIterator classes
+				      * (not TriaRawIterator).
+				      */
+    template <typename OtherAccessor>
+    TriaRawIterator (const TriaActiveIterator<OtherAccessor> &i);
     
 				     /**
 				      *  @name Dereferencing
@@ -545,9 +573,9 @@ class TriaRawIterator :
 				      * accessor since then it says that would
 				      * be a artial specialization.
 				      */
-    template <int anydim, typename SomeAccessor> friend class TriaRawIterator;
-    template <int anydim, typename SomeAccessor> friend class TriaIterator;
-    template <int anydim, typename SomeAccessor> friend class TriaActiveIterator;
+    template <typename SomeAccessor> friend class TriaRawIterator;
+    template <typename SomeAccessor> friend class TriaIterator;
+    template <typename SomeAccessor> friend class TriaActiveIterator;
 };
 
 
@@ -558,8 +586,8 @@ class TriaRawIterator :
  * @ingroup grid
  * @ingroup Iterators
  */
-template <int dim, typename Accessor>
-class TriaIterator : public TriaRawIterator<dim,Accessor> 
+template <typename Accessor>
+class TriaIterator : public TriaRawIterator<Accessor> 
 {
   public:
 				     /**
@@ -571,7 +599,7 @@ class TriaIterator : public TriaRawIterator<dim,Accessor>
 				     /**
 				      *  Copy constructor.
 				      */
-    TriaIterator (const TriaIterator<dim,Accessor> &);
+    TriaIterator (const TriaIterator<Accessor> &);
 
     				     /**
 				      *  Cross copy constructor from
@@ -583,7 +611,7 @@ class TriaIterator : public TriaRawIterator<dim,Accessor>
 				      *  used, the debug version raises
 				      *  an error!
 				      */
-    TriaIterator (const TriaRawIterator<dim,Accessor> &);
+    TriaIterator (const TriaRawIterator<Accessor> &);
 
 				     /**
 				      *  Proper constructor, initialized
@@ -598,7 +626,7 @@ class TriaIterator : public TriaRawIterator<dim,Accessor>
 				      *  used, the debug version raises
 				      *  an error!
 				      */
-    TriaIterator (const Triangulation<dim> *parent,
+    TriaIterator (const Triangulation<Accessor::dimension,Accessor::space_dimension> *parent,
 		  const int                 level,
 		  const int                 index,
 		  const typename Accessor::AccessorData *local_data = 0);
@@ -616,15 +644,10 @@ class TriaIterator : public TriaRawIterator<dim,Accessor>
 				      * a Triangulation@p ::cell_iterator from
 				      * a DoFHandler@p ::cell_iterator, since
 				      * the DoFAccessor class is derived from
-				      * the TriaAccessor class.
-				      *
-				      * Since TriaActiveIterator is a derived
-				      * class of this class, this constructor
-				      * also serves to convert these iterators 
-				      * with other accessor classes.
+				      * the TriaAccessorBase class.
 				      */
     template <typename OtherAccessor>
-    TriaIterator (const TriaIterator<dim,OtherAccessor> &i);
+    TriaIterator (const TriaIterator<OtherAccessor> &i);
 
 				     /**
 				      * Similar conversion operator to the above
@@ -633,13 +656,22 @@ class TriaIterator : public TriaRawIterator<dim,Accessor>
 				      * which is necessary for raw iterators.
 				      */
     template <typename OtherAccessor>
-    TriaIterator (const TriaRawIterator<dim,OtherAccessor> &i);
+    TriaIterator (const TriaRawIterator<OtherAccessor> &i);
 
+				     /**
+				      * Similar conversion operator to
+				      * the above one, but for
+				      * conversion from active
+				      * iterators.
+				      */
+    template <typename OtherAccessor>
+    TriaIterator (const TriaActiveIterator<OtherAccessor> &i);
+    
     				     /**
 				      *  Assignment operator.
 				      */
-    TriaIterator<dim,Accessor> &
-    operator = (const TriaIterator<dim,Accessor> &);
+    TriaIterator<Accessor> &
+    operator = (const TriaIterator<Accessor> &);
 
     				     /**
 				      *  Cross assignment operator. This
@@ -647,8 +679,8 @@ class TriaIterator : public TriaRawIterator<dim,Accessor>
 				      *  given iterator points to a used
 				      *  element.
 				      */
-    TriaIterator<dim,Accessor> &
-    operator = (const TriaRawIterator<dim,Accessor> &);
+    TriaIterator<Accessor> &
+    operator = (const TriaRawIterator<Accessor> &);
 
 				     /**@name Advancement of iterators*/
 				     /*@{*/
@@ -658,7 +690,7 @@ class TriaIterator : public TriaRawIterator<dim,Accessor>
 				      *  the next used element and returns
 				      *  a reference to <tt>*this</tt>.
 				      */
-    TriaIterator<dim,Accessor> & operator ++ ();
+    TriaIterator<Accessor> & operator ++ ();
 
 				     /**
 				      *  Postfix <tt>++</tt> operator: <tt>i++</tt>. This
@@ -677,7 +709,7 @@ class TriaIterator : public TriaRawIterator<dim,Accessor>
 				      *  you normally never need the
 				      *  returned value.
 				      */
-    TriaIterator<dim,Accessor> operator ++ (int);
+    TriaIterator<Accessor> operator ++ (int);
 
     				     /**
 				      *  Prefix @p -- operator: @p --i. This
@@ -685,12 +717,12 @@ class TriaIterator : public TriaRawIterator<dim,Accessor>
 				      *  the previous used element and returns
 				      *  a reference to <tt>*this</tt>.
 				      */
-    TriaIterator<dim,Accessor> & operator -- ();
+    TriaIterator<Accessor> & operator -- ();
 
 				     /**
 				      *  Postfix @p -- operator: @p i--.
 				      */
-    TriaIterator<dim,Accessor> operator -- (int);
+    TriaIterator<Accessor> operator -- (int);
 				     /*@}*/
     
 				     /**
@@ -709,8 +741,8 @@ class TriaIterator : public TriaRawIterator<dim,Accessor>
  * @ingroup grid
  * @ingroup Iterators
  */
-template <int dim, typename Accessor>
-class TriaActiveIterator : public TriaIterator<dim,Accessor> 
+template <typename Accessor>
+class TriaActiveIterator : public TriaIterator<Accessor> 
 {
   public:
 				     /**
@@ -722,7 +754,7 @@ class TriaActiveIterator : public TriaIterator<dim,Accessor>
 				     /**
 				      *  Copy constructor.
 				      */
-    TriaActiveIterator (const TriaActiveIterator<dim,Accessor> &);
+    TriaActiveIterator (const TriaActiveIterator<Accessor> &);
 
     				     /**
 				      *  Cross copy constructor from
@@ -734,7 +766,7 @@ class TriaActiveIterator : public TriaIterator<dim,Accessor>
 				      *  active, the debug version raises
 				      *  an error!
 				      */
-    TriaActiveIterator (const TriaRawIterator<dim,Accessor> &);
+    TriaActiveIterator (const TriaRawIterator<Accessor> &);
 
 				     /**
 				      *  Cross copy constructor from
@@ -746,7 +778,7 @@ class TriaActiveIterator : public TriaIterator<dim,Accessor>
 				      *  active, the debug version raises
 				      *  an error!
 				      */
-    TriaActiveIterator (const TriaIterator<dim,Accessor> &);
+    TriaActiveIterator (const TriaIterator<Accessor> &);
 
 				     /**
 				      *  Proper constructor, initialized
@@ -761,9 +793,9 @@ class TriaActiveIterator : public TriaIterator<dim,Accessor>
 				      *  active, the debug version raises
 				      *  an error!
 				      */
-    TriaActiveIterator (const Triangulation<dim> *parent,
-			const int                 level,
-			const int                 index,
+    TriaActiveIterator (const Triangulation<Accessor::dimension,Accessor::space_dimension> *parent,
+			const int level,
+			const int index,
 			const typename Accessor::AccessorData *local_data = 0);
 
 				     /**
@@ -779,10 +811,10 @@ class TriaActiveIterator : public TriaIterator<dim,Accessor>
 				      * a Triangulation@p ::active_cell_iterator from
 				      * a DoFHandler@p ::active_cell_iterator, since
 				      * the DoFAccessor class is derived from
-				      * the TriaAccessor class.
+				      * the TriaAccessorBase class.
 				      */
     template <typename OtherAccessor>
-    TriaActiveIterator (const TriaActiveIterator<dim,OtherAccessor> &i);
+    TriaActiveIterator (const TriaActiveIterator<OtherAccessor> &i);
 
 				     /**
 				      * Similar conversion operator to the above
@@ -792,16 +824,16 @@ class TriaActiveIterator : public TriaIterator<dim,Accessor>
 				      * raw iterators. Since usual iterators
 				      * are also raw iterators, this constructor
 				      * works also for parameters of type
-				      * <tt>TriaIterator<dim,OtherAccessor></tt>.
+				      * <tt>TriaIterator<OtherAccessor></tt>.
 				      */
     template <typename OtherAccessor>
-    TriaActiveIterator (const TriaRawIterator<dim,OtherAccessor> &i);
+    TriaActiveIterator (const TriaRawIterator<OtherAccessor> &i);
 
     				     /**
 				      *  Assignment operator.
 				      */
-    TriaActiveIterator<dim,Accessor> &
-    operator = (const TriaActiveIterator<dim,Accessor> &);
+    TriaActiveIterator<Accessor> &
+    operator = (const TriaActiveIterator<Accessor> &);
 
     				     /**
 				      *  Cross assignment operator. This
@@ -809,8 +841,8 @@ class TriaActiveIterator : public TriaIterator<dim,Accessor>
 				      *  given iterator points to an active
 				      *  element or past the end.
 				      */
-    TriaActiveIterator<dim,Accessor> &
-    operator = (const TriaRawIterator<dim,Accessor> &);
+    TriaActiveIterator<Accessor> &
+    operator = (const TriaRawIterator<Accessor> &);
 
 				     /**
 				      *  Cross assignment operator. This
@@ -818,8 +850,8 @@ class TriaActiveIterator : public TriaIterator<dim,Accessor>
 				      *  given iterator points to an active
 				      *  element or past the end.
 				      */
-    TriaActiveIterator<dim,Accessor> &
-    operator = (const TriaIterator<dim,Accessor> &);
+    TriaActiveIterator<Accessor> &
+    operator = (const TriaIterator<Accessor> &);
 
 				     /**
 				      *  Prefix <tt>++</tt> operator: <tt>++i</tt>. This
@@ -827,7 +859,7 @@ class TriaActiveIterator : public TriaIterator<dim,Accessor>
 				      *  the next active element and returns
 				      *  a reference to <tt>*this</tt>.
 				      */
-    TriaActiveIterator<dim,Accessor> & operator ++ ();
+    TriaActiveIterator<Accessor> & operator ++ ();
 
 				     /**@name Advancement of iterators*/
 				     /*@{*/
@@ -848,7 +880,7 @@ class TriaActiveIterator : public TriaIterator<dim,Accessor>
 				      *  you normally never need the
 				      *  returned value.
 				      */
-    TriaActiveIterator<dim,Accessor> operator ++ (int);
+    TriaActiveIterator<Accessor> operator ++ (int);
 
     				     /**
 				      *  Prefix @p -- operator: @p --i. This
@@ -856,12 +888,12 @@ class TriaActiveIterator : public TriaIterator<dim,Accessor>
 				      *  the previous active element and
 				      *  returns a reference to <tt>*this</tt>.
 				      */
-    TriaActiveIterator<dim,Accessor> & operator -- ();
+    TriaActiveIterator<Accessor> & operator -- ();
 
 				     /**
 				      *  Postfix @p -- operator: @p i--.
 				      */
-    TriaActiveIterator<dim,Accessor> operator -- (int);
+    TriaActiveIterator<Accessor> operator -- (int);
 				     /*@}*/
     
 				     /**
@@ -874,32 +906,69 @@ class TriaActiveIterator : public TriaIterator<dim,Accessor>
 /*----------------------- Inline functions -------------------*/
 
 
-template <int dim, typename Accessor>
+template <typename Accessor>
 inline
-TriaRawIterator<dim,Accessor>::TriaRawIterator (const Accessor &a) :
+TriaRawIterator<Accessor>::
+TriaRawIterator (const Accessor &a)
+		:
 		accessor (a)
 {}
 
 
 
-template <int dim, typename Accessor>
+template <typename Accessor>
 template <typename OtherAccessor>
 inline
-TriaRawIterator<dim,Accessor>::TriaRawIterator (const TriaRawIterator<dim,OtherAccessor> &i)
-		: accessor (i.accessor)
+TriaRawIterator<Accessor>::
+TriaRawIterator (const OtherAccessor &a)
+		:
+		accessor (a)
 {}
 
 
 
-template <int dim, typename Accessor>
+template <typename Accessor>
+template <typename OtherAccessor>
+inline
+TriaRawIterator<Accessor>::
+TriaRawIterator (const TriaRawIterator<OtherAccessor> &i)
+		:
+		accessor (i.accessor)
+{}
+
+
+
+template <typename Accessor>
+template <typename OtherAccessor>
+inline
+TriaRawIterator<Accessor>::
+TriaRawIterator (const TriaIterator<OtherAccessor> &i)
+		:
+		accessor (i.accessor)
+{}
+
+
+
+template <typename Accessor>
+template <typename OtherAccessor>
+inline
+TriaRawIterator<Accessor>::
+TriaRawIterator (const TriaActiveIterator<OtherAccessor> &i)
+		:
+		accessor (i.accessor)
+{}
+
+
+
+template <typename Accessor>
 inline
 const Accessor &
-TriaRawIterator<dim,Accessor>::operator * () const
+TriaRawIterator<Accessor>::operator * () const
 {
-  Assert (Accessor::objectdim!=dim ||
+  Assert (Accessor::structure_dimension!=Accessor::dimension ||
 	  state() == IteratorState::valid,
 	  ExcDereferenceInvalidCell(accessor));
-  Assert (Accessor::objectdim==dim ||
+  Assert (Accessor::structure_dimension==Accessor::dimension ||
 	  state() == IteratorState::valid,
 	  ExcDereferenceInvalidObject(accessor));
   
@@ -908,15 +977,15 @@ TriaRawIterator<dim,Accessor>::operator * () const
 
 
 
-template <int dim, typename Accessor>
+template <typename Accessor>
 inline
 Accessor &
-TriaRawIterator<dim,Accessor>::operator * ()
+TriaRawIterator<Accessor>::operator * ()
 {
-  Assert (Accessor::objectdim!=dim ||
+  Assert (Accessor::structure_dimension!=Accessor::dimension ||
 	  state() == IteratorState::valid,
 	  ExcDereferenceInvalidCell(accessor));
-  Assert (Accessor::objectdim==dim ||
+  Assert (Accessor::structure_dimension==Accessor::dimension ||
 	  state() == IteratorState::valid,
 	  ExcDereferenceInvalidObject(accessor));
 
@@ -925,59 +994,59 @@ TriaRawIterator<dim,Accessor>::operator * ()
 
 
 
-template <int dim, typename Accessor>
+template <typename Accessor>
 inline
 const Accessor *
-TriaRawIterator<dim,Accessor>::operator -> () const
+TriaRawIterator<Accessor>::operator -> () const
 {
   return &(this->operator* ());
 }
 
 
 
-template <int dim, typename Accessor>
+template <typename Accessor>
 inline
 Accessor *
-TriaRawIterator<dim,Accessor>::operator -> ()
+TriaRawIterator<Accessor>::operator -> ()
 {
   return &(this->operator* ());
 }
 
 
 
-template <int dim, typename Accessor>
+template <typename Accessor>
 inline
 IteratorState::IteratorStates
-TriaRawIterator<dim,Accessor>::state () const
+TriaRawIterator<Accessor>::state () const
 {
   return accessor.state ();
 }
 
 
 
-template <int dim, typename Accessor>
+template <typename Accessor>
 inline
 bool
-TriaRawIterator<dim,Accessor>::operator < (const TriaRawIterator &i) const
+TriaRawIterator<Accessor>::operator < (const TriaRawIterator &i) const
 {
-  Assert (Accessor::objectdim!=dim ||
+  Assert (Accessor::structure_dimension!=Accessor::dimension ||
 	  state() != IteratorState::invalid,
 	  ExcDereferenceInvalidCell(accessor));
-  Assert (Accessor::objectdim==dim ||
+  Assert (Accessor::structure_dimension==Accessor::dimension ||
 	  state() != IteratorState::invalid,
 	  ExcDereferenceInvalidObject(accessor));
 
-  Assert (Accessor::objectdim!=dim ||
+  Assert (Accessor::structure_dimension!=Accessor::dimension ||
 	  i.state() != IteratorState::invalid,
 	  ExcDereferenceInvalidCell(i.accessor));
-  Assert (Accessor::objectdim==dim ||
+  Assert (Accessor::structure_dimension==Accessor::dimension ||
 	  i.state() != IteratorState::invalid,
 	  ExcDereferenceInvalidObject(i.accessor));
 
   Assert (&accessor.get_triangulation() == &i.accessor.get_triangulation(),
 	  ExcInvalidComparison());
 
-  if (Accessor::objectdim==dim)
+  if (Accessor::structure_dimension==Accessor::dimension)
     return ((((accessor.level() < i.accessor.level()) ||
 	      ((accessor.level() == i.accessor.level()) &&
 	       (accessor.index() < i.accessor.index()))        ) &&
@@ -994,10 +1063,10 @@ TriaRawIterator<dim,Accessor>::operator < (const TriaRawIterator &i) const
 }
 
 
-template <int dim, typename Accessor>
+template <typename Accessor>
 inline
-TriaRawIterator<dim,Accessor> &
-TriaRawIterator<dim,Accessor>::operator ++ ()
+TriaRawIterator<Accessor> &
+TriaRawIterator<Accessor>::operator ++ ()
 {
   Assert (state() == IteratorState::valid, ExcAdvanceInvalidObject());
 
@@ -1007,10 +1076,10 @@ TriaRawIterator<dim,Accessor>::operator ++ ()
 
 
 
-template <int dim, typename Accessor>
+template <typename Accessor>
 inline
-TriaRawIterator<dim,Accessor> &
-TriaRawIterator<dim,Accessor>::operator -- ()
+TriaRawIterator<Accessor> &
+TriaRawIterator<Accessor>::operator -- ()
 {
   Assert (state() == IteratorState::valid, ExcAdvanceInvalidObject());
 
@@ -1020,12 +1089,12 @@ TriaRawIterator<dim,Accessor>::operator -- ()
 
 
 
-template <int dim, typename Accessor>
+template <typename Accessor>
 inline
 void
-TriaRawIterator<dim,Accessor>::print (std::ostream &out) const
+TriaRawIterator<Accessor>::print (std::ostream &out) const
 {
-  if (Accessor::objectdim==dim)
+  if (Accessor::structure_dimension==Accessor::dimension)
     out << accessor.level() << "." << accessor.index();
   else
     out << accessor.index();
@@ -1033,30 +1102,42 @@ TriaRawIterator<dim,Accessor>::print (std::ostream &out) const
 
 
 
-template <int dim, typename Accessor>
+template <typename Accessor>
 inline
 unsigned int
-TriaRawIterator<dim,Accessor>::memory_consumption () const
+TriaRawIterator<Accessor>::memory_consumption () const
 {
-  return sizeof(TriaRawIterator<dim,Accessor>);
+  return sizeof(TriaRawIterator<Accessor>);
 }
 
 
 
-template <int dim, typename Accessor>
+template <typename Accessor>
 template <typename OtherAccessor>
 inline
-TriaIterator<dim,Accessor>::TriaIterator (const TriaIterator<dim,OtherAccessor> &i)
-		: TriaRawIterator<dim,Accessor> (static_cast<TriaIterator<dim,OtherAccessor> >(i))
+TriaIterator<Accessor>::TriaIterator (const TriaIterator<OtherAccessor> &i)
+		:
+		TriaRawIterator<Accessor> (i.accessor)
 {}
 
 
 
-template <int dim, typename Accessor>
+template <typename Accessor>
 template <typename OtherAccessor>
 inline
-TriaIterator<dim,Accessor>::TriaIterator (const TriaRawIterator<dim,OtherAccessor> &i)
-		: TriaRawIterator<dim,Accessor> (static_cast<TriaRawIterator<dim,OtherAccessor> >(i))
+TriaIterator<Accessor>::TriaIterator (const TriaActiveIterator<OtherAccessor> &i)
+		:
+		TriaRawIterator<Accessor> (i.accessor)
+{}
+
+
+
+template <typename Accessor>
+template <typename OtherAccessor>
+inline
+TriaIterator<Accessor>::TriaIterator (const TriaRawIterator<OtherAccessor> &i)
+		:
+		TriaRawIterator<Accessor> (i.accessor)
 {
 #ifdef DEBUG
 				   // do this like this, because:
@@ -1073,20 +1154,22 @@ TriaIterator<dim,Accessor>::TriaIterator (const TriaRawIterator<dim,OtherAccesso
 
 
 
-template <int dim, typename Accessor>
+template <typename Accessor>
 template <typename OtherAccessor>
 inline
-TriaActiveIterator<dim,Accessor>::TriaActiveIterator (const TriaActiveIterator<dim,OtherAccessor> &i)
-		: TriaIterator<dim,Accessor> (static_cast<TriaIterator<dim,OtherAccessor> >(i))
+TriaActiveIterator<Accessor>::TriaActiveIterator (const TriaActiveIterator<OtherAccessor> &i)
+		:
+		TriaIterator<Accessor> (i.accessor)
 {}
 
 
 
-template <int dim, typename Accessor>
+template <typename Accessor>
 template <typename OtherAccessor>
 inline
-TriaActiveIterator<dim,Accessor>::TriaActiveIterator (const TriaRawIterator<dim,OtherAccessor> &i)
-		: TriaIterator<dim,Accessor> (i)
+TriaActiveIterator<Accessor>::TriaActiveIterator (const TriaRawIterator<OtherAccessor> &i)
+		:
+		TriaIterator<Accessor> (i)
 {
 #ifdef DEBUG
 				   // do this like this, because:
@@ -1111,10 +1194,10 @@ TriaActiveIterator<dim,Accessor>::TriaActiveIterator (const TriaRawIterator<dim,
  *
  * @author Wolfgang Bangerth, 1998
  */
-template <int dim, typename Accessor>
+template <typename Accessor>
 inline
 std::ostream & operator << (std::ostream                        &out,
-			    const TriaRawIterator<dim,Accessor> &i)
+			    const TriaRawIterator<Accessor> &i)
 {
   i.print(out);
   return out;
@@ -1130,10 +1213,10 @@ std::ostream & operator << (std::ostream                        &out,
  *
  * @author Wolfgang Bangerth, 1998
  */
-template <int dim, typename Accessor>
+template <typename Accessor>
 inline
 std::ostream & operator << (std::ostream                     &out,
-			    const TriaIterator<dim,Accessor> &i)
+			    const TriaIterator<Accessor> &i)
 {
   i.print(out);
   return out;
@@ -1149,10 +1232,10 @@ std::ostream & operator << (std::ostream                     &out,
  *
  * @author Wolfgang Bangerth, 1998
  */
-template <int dim, typename Accessor>
+template <typename Accessor>
 inline
 std::ostream & operator << (std::ostream                           &out,
-			    const TriaActiveIterator<dim,Accessor> &i)
+			    const TriaActiveIterator<Accessor> &i)
 {
   i.print(out);
   return out;

@@ -17,16 +17,16 @@
 DEAL_II_NAMESPACE_OPEN
 
 
-template <int dim>
-Mapping<dim>::~Mapping ()
+template <int dim, int spacedim>
+Mapping<dim, spacedim>::~Mapping ()
 {}
 
 
 /*------------------------------ InternalDataBase ------------------------------*/
 
 
-template <int dim>
-Mapping<dim>::InternalDataBase::InternalDataBase ():
+template <int dim, int spacedim>
+Mapping<dim, spacedim>::InternalDataBase::InternalDataBase ():
 		update_flags(update_default),
 		update_once(update_default),
 		update_each(update_default),
@@ -35,15 +35,15 @@ Mapping<dim>::InternalDataBase::InternalDataBase ():
 
 
 
-template <int dim>
-Mapping<dim>::InternalDataBase::~InternalDataBase ()
+template <int dim, int spacedim>
+Mapping<dim, spacedim>::InternalDataBase::~InternalDataBase ()
 {}
 
 
 
-template <int dim>
+template <int dim, int spacedim>
 unsigned int
-Mapping<dim>::InternalDataBase::memory_consumption () const
+Mapping<dim, spacedim>::InternalDataBase::memory_consumption () const
 {
   return sizeof(*this);
 }
@@ -54,5 +54,9 @@ Mapping<dim>::InternalDataBase::memory_consumption () const
 
 
 template class Mapping<deal_II_dimension>;
+
+#if deal_II_dimension != 3
+template class Mapping<deal_II_dimension,deal_II_dimension+1>;
+#endif
 
 DEAL_II_NAMESPACE_CLOSE

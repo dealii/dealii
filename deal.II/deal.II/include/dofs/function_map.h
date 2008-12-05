@@ -18,7 +18,7 @@
 
 DEAL_II_NAMESPACE_OPEN
 
-template <int dim> class Function;
+template <int spacedim> class Function;
 
 
 

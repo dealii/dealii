@@ -204,14 +204,14 @@ class CylinderBoundary : public StraightBoundary<dim>
  *
  *   @author Wolfgang Bangerth, 1998, Ralf Hartmann, 2001
  */
-template <int dim>
-class HyperBallBoundary : public StraightBoundary<dim>
+template <int dim, int spacedim=dim>
+class HyperBallBoundary : public StraightBoundary<dim,spacedim>
 {
   public:
 				     /**
 				      * Constructor
 				      */
-    HyperBallBoundary (const Point<dim> p      = Point<dim>(),
+    HyperBallBoundary (const Point<spacedim> p      = Point<spacedim>(),
 		       const double     radius = 1.0);
 
 				     /**
@@ -219,16 +219,16 @@ class HyperBallBoundary : public StraightBoundary<dim>
 				      * this class and the documentation of the
 				      * base class.
 				      */
-    virtual Point<dim>
-    get_new_point_on_line (const typename Triangulation<dim>::line_iterator &line) const;
+    virtual Point<spacedim>
+    get_new_point_on_line (const typename Triangulation<dim,spacedim>::line_iterator &line) const;
 
 				     /**
 				      * Refer to the general documentation of
 				      * this class and the documentation of the
 				      * base class.
 				      */
-    virtual Point<dim>
-    get_new_point_on_quad (const typename Triangulation<dim>::quad_iterator &quad) const;
+    virtual Point<spacedim>
+    get_new_point_on_quad (const typename Triangulation<dim,spacedim>::quad_iterator &quad) const;
 
 				     /**
 				      * Refer to the general
@@ -240,8 +240,8 @@ class HyperBallBoundary : public StraightBoundary<dim>
 				      * @p get_intermediate_points_between_points.
 				      */
     virtual void
-    get_intermediate_points_on_line (const typename Triangulation<dim>::line_iterator &line,
-				     std::vector<Point<dim> > &points) const;
+    get_intermediate_points_on_line (const typename Triangulation<dim,spacedim>::line_iterator &line,
+				     std::vector<Point<spacedim> > &points) const;
 
 				     /**
 				      * Refer to the general
@@ -253,8 +253,8 @@ class HyperBallBoundary : public StraightBoundary<dim>
 				      * and for <tt>points.size()==1</tt>.
 				      */
     virtual void
-    get_intermediate_points_on_quad (const typename Triangulation<dim>::quad_iterator &quad,
-				     std::vector<Point<dim> > &points) const;
+    get_intermediate_points_on_quad (const typename Triangulation<dim,spacedim>::quad_iterator &quad,
+				     std::vector<Point<spacedim> > &points) const;
 
 				     /**
 				      * Compute the normals to the
@@ -267,13 +267,13 @@ class HyperBallBoundary : public StraightBoundary<dim>
 				      * base class.
 				      */
     virtual void
-    get_normals_at_vertices (const typename Triangulation<dim>::face_iterator &face,
-			     typename Boundary<dim>::FaceVertexNormals &face_vertex_normals) const;
+    get_normals_at_vertices (const typename Triangulation<dim,spacedim>::face_iterator &face,
+			     typename Boundary<dim,spacedim>::FaceVertexNormals &face_vertex_normals) const;
 
 				     /**
 				      * Return the center of the ball.
 				      */
-    Point<dim> get_center () const;
+    Point<spacedim> get_center () const;
 
 				     /**
 				      * Return the radius of the ball.
@@ -294,7 +294,7 @@ class HyperBallBoundary : public StraightBoundary<dim>
 				     /**
 				      * Center point of the hyperball.
 				      */
-    const Point<dim> center;
+    const Point<spacedim> center;
 
 				     /**
 				      * Radius of the hyperball.
@@ -334,8 +334,8 @@ class HyperBallBoundary : public StraightBoundary<dim>
 				      * in the documentation of the
 				      * base class.
 				      */
-    void get_intermediate_points_between_points (const Point<dim> &p0, const Point<dim> &p1,
-						 std::vector<Point<dim> > &points) const;    
+    void get_intermediate_points_between_points (const Point<spacedim> &p0, const Point<spacedim> &p1,
+						 std::vector<Point<spacedim> > &points) const;    
 };
 
 

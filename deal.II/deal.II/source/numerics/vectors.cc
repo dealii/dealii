@@ -114,7 +114,7 @@ VectorTools::create_boundary_right_hand_side<deal_II_dimension>
  const std::set<unsigned char> &);
 
 template
-void VectorTools::interpolate_boundary_values<deal_II_dimension> (
+void VectorTools::interpolate_boundary_values ( 
   const DoFHandler<deal_II_dimension> &,
   const unsigned char,
   const Function<deal_II_dimension>   &,
@@ -122,7 +122,7 @@ void VectorTools::interpolate_boundary_values<deal_II_dimension> (
   const std::vector<bool>    &);
 
 template
-void VectorTools::interpolate_boundary_values<deal_II_dimension> (
+void VectorTools::interpolate_boundary_values (
   const hp::DoFHandler<deal_II_dimension> &,
   const unsigned char,
   const Function<deal_II_dimension>   &,
@@ -130,7 +130,7 @@ void VectorTools::interpolate_boundary_values<deal_II_dimension> (
   const std::vector<bool>    &);
 
 template
-void VectorTools::interpolate_boundary_values<deal_II_dimension> (
+void VectorTools::interpolate_boundary_values (
   const MGDoFHandler<deal_II_dimension> &,
   const unsigned char,
   const Function<deal_II_dimension>   &,
@@ -181,7 +181,7 @@ VectorTools::compute_no_normal_flux_constraints (const DoFHandler<deal_II_dimens
 // and thus need no explicit instantiation
 //#if deal_II_dimension > 1
 template
-void VectorTools::interpolate_boundary_values<deal_II_dimension>
+void VectorTools::interpolate_boundary_values
 (const Mapping<deal_II_dimension>    &,
  const DoFHandler<deal_II_dimension> &,
  const FunctionMap<deal_II_dimension>::type &,
@@ -189,7 +189,7 @@ void VectorTools::interpolate_boundary_values<deal_II_dimension>
  const std::vector<bool>    &);
 
 template
-void VectorTools::interpolate_boundary_values<deal_II_dimension>
+void VectorTools::interpolate_boundary_values
 (const Mapping<deal_II_dimension>    &,
  const DoFHandler<deal_II_dimension> &,
  const unsigned char,
@@ -202,11 +202,44 @@ void VectorTools::interpolate_boundary_values<deal_II_dimension>
 
 template
 void
-VectorTools::interpolate_boundary_values<deal_II_dimension>
+VectorTools::interpolate_boundary_values
 (const DoFHandler<deal_II_dimension>         &,
  const FunctionMap<deal_II_dimension>::type &,
  std::map<unsigned int,double> &,
  const std::vector<bool>       &);
+
+
+#if deal_II_dimension != 3
+
+template
+void VectorTools::create_right_hand_side<deal_II_dimension,deal_II_dimension+1>
+(const Mapping<deal_II_dimension,deal_II_dimension+1>    &,
+ const DoFHandler<deal_II_dimension,deal_II_dimension+1> &,
+ const Quadrature<deal_II_dimension> &,
+ const Function<deal_II_dimension+1>   &,
+ Vector<double>                      &);
+template
+void VectorTools::create_right_hand_side<deal_II_dimension,deal_II_dimension+1>
+(const DoFHandler<deal_II_dimension,deal_II_dimension+1> &,
+ const Quadrature<deal_II_dimension> &,
+ const Function<deal_II_dimension+1>   &,
+ Vector<double>                      &);
+
+// template
+// void VectorTools::create_right_hand_side<deal_II_dimension,deal_II_dimension+1>
+// (const hp::MappingCollection<deal_II_dimension,deal_II_dimension+1>    &,
+//  const hp::DoFHandler<deal_II_dimension,deal_II_dimension+1> &,
+//  const hp::QCollection<deal_II_dimension> &,
+//  const Function<deal_II_dimension+1>   &,
+//  Vector<double>                      &);
+// template
+// void VectorTools::create_right_hand_side<deal_II_dimension,deal_II_dimension+1>
+// (const hp::DoFHandler<deal_II_dimension,deal_II_dimension+1> &,
+//  const hp::QCollection<deal_II_dimension> &,
+//  const Function<deal_II_dimension+1>   &,
+//  Vector<double>                      &);
+
+#endif
 
 
 DEAL_II_NAMESPACE_CLOSE

@@ -23,7 +23,7 @@
 
 DEAL_II_NAMESPACE_OPEN
 
-template <int dim> class Triangulation;
+template <int dim, int space_dim> class Triangulation;
 
 
 
@@ -75,7 +75,7 @@ template <int dim> class Triangulation;
  * @ingroup boundary
  *   @author Wolfgang Bangerth, 1999, 2001, Ralf Hartmann, 2001, 2008
  */
-template <int dim>
+template <int dim, int spacedim=dim>
 class Boundary : public Subscriptor
 {
   public:
@@ -103,7 +103,7 @@ class Boundary : public Subscriptor
 				      * For obvious reasons, this
 				      * type is not useful in 1d.
 				      */
-    typedef Tensor<1,dim> FaceVertexNormals[GeometryInfo<dim>::vertices_per_face];
+    typedef Tensor<1,spacedim> FaceVertexNormals[GeometryInfo<dim>::vertices_per_face];
 	
 				     /**
 				      * Destructor. Does nothing here, but
@@ -123,8 +123,8 @@ class Boundary : public Subscriptor
 				      * lines therefore is also on the
 				      * boundary).
 				      */
-    virtual Point<dim>
-    get_new_point_on_line (const typename Triangulation<dim>::line_iterator &line) const = 0;
+    virtual Point<spacedim>
+    get_new_point_on_line (const typename Triangulation<dim,spacedim>::line_iterator &line) const = 0;
 
 				     /**
 				      * Return the point which shall
@@ -152,8 +152,8 @@ class Boundary : public Subscriptor
 				      * default implementation throws
 				      * an error in any case, however.
 				      */
-    virtual Point<dim>
-    get_new_point_on_quad (const typename Triangulation<dim>::quad_iterator &quad) const;
+    virtual Point<spacedim>
+    get_new_point_on_quad (const typename Triangulation<dim,spacedim>::quad_iterator &quad) const;
 
 				     /**
 				      * Depending on <tt>dim=2</tt> or
@@ -167,8 +167,8 @@ class Boundary : public Subscriptor
 				      * allows dimension independent
 				      * programming.
 				      */
-    Point<dim>
-    get_new_point_on_face (const typename Triangulation<dim>::face_iterator &face) const;
+    Point<spacedim>
+    get_new_point_on_face (const typename Triangulation<dim,spacedim>::face_iterator &face) const;
 
 				     /**
 				      * Return equally spaced
@@ -195,8 +195,8 @@ class Boundary : public Subscriptor
 				      * an error in any case, however.
 				      */
     virtual void
-    get_intermediate_points_on_line (const typename Triangulation<dim>::line_iterator &line,
-				     std::vector<Point<dim> > &points) const;
+    get_intermediate_points_on_line (const typename Triangulation<dim,spacedim>::line_iterator &line,
+				     std::vector<Point<spacedim> > &points) const;
     
 				     /**
 				      * Return equally spaced
@@ -229,8 +229,8 @@ class Boundary : public Subscriptor
 				      * an error in any case, however.
 				      */
     virtual void
-    get_intermediate_points_on_quad (const typename Triangulation<dim>::quad_iterator &quad,
-				     std::vector<Point<dim> > &points) const;
+    get_intermediate_points_on_quad (const typename Triangulation<dim,spacedim>::quad_iterator &quad,
+				     std::vector<Point<spacedim> > &points) const;
 
 				     /**
 				      * Depending on <tt>dim=2</tt> or
@@ -246,8 +246,8 @@ class Boundary : public Subscriptor
 				      * programming.
 				      */
     void
-    get_intermediate_points_on_face (const typename Triangulation<dim>::face_iterator &face,
-				     std::vector<Point<dim> > &points) const;
+    get_intermediate_points_on_face (const typename Triangulation<dim,spacedim>::face_iterator &face,
+				     std::vector<Point<spacedim> > &points) const;
 
 				     /**
 				      * Compute the normal vectors to
@@ -278,14 +278,14 @@ class Boundary : public Subscriptor
 				      * the given face.
 				      */
     virtual void
-    get_normals_at_vertices (const typename Triangulation<dim>::face_iterator &face,
+    get_normals_at_vertices (const typename Triangulation<dim,spacedim>::face_iterator &face,
 			     FaceVertexNormals &face_vertex_normals) const;
 };
 
 
 
 /**
- *   Specialization of Boundary<dim>, which places the new point
+ *   Specialization of Boundary<dim,spacedim>, which places the new point
  *   right into the middle of the given points. The middle is defined
  *   as the arithmetic mean of the points.
  *
@@ -299,8 +299,8 @@ class Boundary : public Subscriptor
  *
  *   @author Wolfgang Bangerth, 1998, 2001, Ralf Hartmann, 2001
  */
-template <int dim>
-class StraightBoundary : public Boundary<dim>
+template <int dim, int spacedim=dim>
+class StraightBoundary : public Boundary<dim,spacedim>
 {
   public:
 				     /**
@@ -321,8 +321,8 @@ class StraightBoundary : public Boundary<dim>
 				      * base class for more
 				      * information.
 				      */
-    virtual Point<dim>
-    get_new_point_on_line (const typename Triangulation<dim>::line_iterator &line) const;
+    virtual Point<spacedim>
+    get_new_point_on_line (const typename Triangulation<dim,spacedim>::line_iterator &line) const;
 
 				     /**
 				      * Let the new point be the
@@ -339,8 +339,8 @@ class StraightBoundary : public Boundary<dim>
 				      * base class for more
 				      * information.
 				      */
-    virtual Point<dim>
-    get_new_point_on_quad (const typename Triangulation<dim>::quad_iterator &quad) const;
+    virtual Point<spacedim>
+    get_new_point_on_quad (const typename Triangulation<dim,spacedim>::quad_iterator &quad) const;
 
 				     /**
 				      * Gives <tt>n=points.size()</tt>
@@ -355,8 +355,8 @@ class StraightBoundary : public Boundary<dim>
 				      * base class.
 				      */
     virtual void
-    get_intermediate_points_on_line (const typename Triangulation<dim>::line_iterator &line,
-				     std::vector<Point<dim> > &points) const;
+    get_intermediate_points_on_line (const typename Triangulation<dim,spacedim>::line_iterator &line,
+				     std::vector<Point<spacedim> > &points) const;
 
 				     /**
 				      * Gives <tt>n=points.size()=m*m</tt>
@@ -371,8 +371,8 @@ class StraightBoundary : public Boundary<dim>
 				      * base class.
 				      */
     virtual void
-    get_intermediate_points_on_quad (const typename Triangulation<dim>::quad_iterator &quad,
-				     std::vector<Point<dim> > &points) const;
+    get_intermediate_points_on_quad (const typename Triangulation<dim,spacedim>::quad_iterator &quad,
+				     std::vector<Point<spacedim> > &points) const;
 
 				     /**
 				      * Compute the normals to the
@@ -385,8 +385,8 @@ class StraightBoundary : public Boundary<dim>
 				      * base class.
 				      */
     virtual void
-    get_normals_at_vertices (const typename Triangulation<dim>::face_iterator &face,
-			     typename Boundary<dim>::FaceVertexNormals &face_vertex_normals) const;
+    get_normals_at_vertices (const typename Triangulation<dim,spacedim>::face_iterator &face,
+			     typename Boundary<dim,spacedim>::FaceVertexNormals &face_vertex_normals) const;
 };
 
 
@@ -397,68 +397,58 @@ class StraightBoundary : public Boundary<dim>
 
 template <>
 Point<1>
-Boundary<1>::
-get_new_point_on_face (const Triangulation<1>::face_iterator &) const;
+Boundary<1,1>::
+get_new_point_on_face (const Triangulation<1,1>::face_iterator &) const;
+
+template <>
+void
+Boundary<1,1>::
+get_intermediate_points_on_face (const Triangulation<1,1>::face_iterator &,
+				 std::vector<Point<1> > &) const;
 
 template <>
 Point<2>
-Boundary<2>::
-get_new_point_on_face (const Triangulation<2>::face_iterator &) const;
-
-template <>
-Point<3>
-Boundary<3>::
-get_new_point_on_face (const Triangulation<3>::face_iterator &) const;
+Boundary<1,2>::
+get_new_point_on_face (const Triangulation<1,2>::face_iterator &) const;
 
 template <>
 void
-Boundary<1>::
-get_intermediate_points_on_face (const Triangulation<1>::face_iterator &,
-				 std::vector<Point<1> > &) const;
-
-template <>
-void
-Boundary<2>::
-get_intermediate_points_on_face (const Triangulation<2>::face_iterator &,
+Boundary<1,2>::
+get_intermediate_points_on_face (const Triangulation<1,2>::face_iterator &,
 				 std::vector<Point<2> > &) const;
 
-template <>
-void
-Boundary<3>::
-get_intermediate_points_on_face (const Triangulation<3>::face_iterator &,
-				 std::vector<Point<3> > &) const;
 
 template <>
 void
-StraightBoundary<1>::
-get_normals_at_vertices (const Triangulation<1>::face_iterator &,
-			 Boundary<1>::FaceVertexNormals &) const;
+StraightBoundary<1,1>::
+get_normals_at_vertices (const Triangulation<1,1>::face_iterator &,
+			 Boundary<1,1>::FaceVertexNormals &) const;
 template <>
 void
-StraightBoundary<2>::
-get_normals_at_vertices (const Triangulation<2>::face_iterator &face,
-			 Boundary<2>::FaceVertexNormals &face_vertex_normals) const;
+StraightBoundary<2,2>::
+get_normals_at_vertices (const Triangulation<2,2>::face_iterator &face,
+			 Boundary<2,2>::FaceVertexNormals &face_vertex_normals) const;
 template <>
 void
-StraightBoundary<3>::
-get_normals_at_vertices (const Triangulation<3>::face_iterator &face,
-			 Boundary<3>::FaceVertexNormals &face_vertex_normals) const;
+StraightBoundary<3,3>::
+get_normals_at_vertices (const Triangulation<3,3>::face_iterator &face,
+			 Boundary<3,3>::FaceVertexNormals &face_vertex_normals) const;
 
 template <>
 Point<3>
-StraightBoundary<3>::
-get_new_point_on_quad (const Triangulation<3>::quad_iterator &quad) const;
+StraightBoundary<3,3>::
+get_new_point_on_quad (const Triangulation<3,3>::quad_iterator &quad) const;
 
 template <>
 void
-StraightBoundary<1>::
-get_intermediate_points_on_line (const Triangulation<1>::line_iterator &,
+StraightBoundary<1,1>::
+get_intermediate_points_on_line (const Triangulation<1,1>::line_iterator &,
 				 std::vector<Point<1> > &) const;
 
 template <>
 void
-StraightBoundary<3>::
-get_intermediate_points_on_quad (const Triangulation<3>::quad_iterator &quad,
+StraightBoundary<3,3>::
+get_intermediate_points_on_quad (const Triangulation<3,3>::quad_iterator &quad,
 				 std::vector<Point<3> > &points) const;
 
 #endif // DOXYGEN

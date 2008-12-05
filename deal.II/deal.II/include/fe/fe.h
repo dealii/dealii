@@ -20,16 +20,16 @@
 
 DEAL_II_NAMESPACE_OPEN
 
-template <int dim> class FEValuesData;
-template <int dim> class FEValuesBase;
-template <int dim> class FEValues;
-template <int dim> class FEFaceValues;
-template <int dim> class FESubfaceValues;
-template <int dim> class FESystem;
-template <class POLY, int dim> class FE_PolyTensor;
+template <int dim, int spacedim> class FEValuesData;
+template <int dim, int spacedim> class FEValuesBase;
+template <int dim, int spacedim> class FEValues;
+template <int dim, int spacedim>   class FEFaceValues;
+template <int dim, int spacedim>   class FESubfaceValues;
+template <int dim, int spacedim>   class FESystem;
+template <class POLY, int dim, int spacedim> class FE_PolyTensor;
 namespace hp
 {
-  template <int dim> class FECollection;
+  template <int dim, int spacedim>   class FECollection;
 }
 
 
@@ -62,6 +62,13 @@ namespace hp
  * functionality, if only part of it is needed. The functionality
  * under consideration here is hanging nodes constraints and grid
  * transfer, respectively.
+ *
+ * The <tt>spacedim</tt> parameter has to be used if one wants to
+ * solve problems in the boundary element method formulation or in an
+ * equivalent one, as it is explained in the Triangulation class. If
+ * not specified, this parameter takes the default value <tt>=dim</tt>
+ * so that this class can be used to solve problems in the finite
+ * element method formulation.
  *
  * <h3>Components and blocks</h3>
  *
@@ -118,7 +125,7 @@ namespace hp
  * <h3>Notes on the implementation of derived classes</h3>
  *
  * The following sections list the information to be provided by
- * derived classes, depending on the space dimension. They are
+ * derived classes, depending on the dimension. They are
  * followed by a list of functions helping to generate these values.
  *
  * <h4>Finite elements in one dimension</h4>
@@ -248,7 +255,7 @@ namespace hp
  *
  * Construction of a finite element and computation of the matrices
  * described above may be a tedious task, in particular if it has to
- * be performed for several space dimensions. Therefore, some
+ * be performed for several dimensions. Therefore, some
  * functions in FETools have been provided to help with these tasks.
  *
  * <h5>Computing the correct basis from "raw" basis functions</h5>
@@ -326,7 +333,7 @@ namespace hp
  * 
  * @author Wolfgang Bangerth, Guido Kanschat, Ralf Hartmann, 1998, 2000, 2001, 2005
  */
-template <int dim>
+template <int dim, int spacedim=dim>
 class FiniteElement : public Subscriptor,
 		      public FiniteElementData<dim>
 {
@@ -343,7 +350,7 @@ class FiniteElement : public Subscriptor,
 				    *
 				    * @author Guido Kanschat, 2001
 				    */
-  class InternalDataBase : public Mapping<dim>::InternalDataBase
+  class InternalDataBase : public Mapping<dim,spacedim>::InternalDataBase
     {
       public:      
 					 /**
@@ -360,8 +367,8 @@ class FiniteElement : public Subscriptor,
 					  * finite differencing of
 					  * gradients.
 					  */
-	void initialize_2nd (const FiniteElement<dim> *element,
-			     const Mapping<dim>       &mapping,
+	void initialize_2nd (const FiniteElement<dim,spacedim> *element,
+			     const Mapping<dim,spacedim>       &mapping,
 			     const Quadrature<dim>    &quadrature);
 	
 					 /**
@@ -377,7 +384,7 @@ class FiniteElement : public Subscriptor,
 					  * entries in lower dimensions
 					  * are missing.
 					  */
-	std::vector<FEValues<dim>*> differences;
+	std::vector<FEValues<dim,spacedim>*> differences;
     };
 
   public:
@@ -401,7 +408,7 @@ class FiniteElement : public Subscriptor,
 				      * element. The general
 				      * convention is that this is the
 				      * class name, followed by the
-				      * space dimension in angle
+				      * dimension in angle
 				      * brackets, and the polynomial
 				      * degree and whatever else is
 				      * necessary in parentheses. For
@@ -458,7 +465,7 @@ class FiniteElement : public Subscriptor,
 				      * the present finite element
 				      * anyway).
 				      */
-    const FiniteElement<dim> & operator[] (const unsigned int fe_index) const;
+    const FiniteElement<dim,spacedim> & operator[] (const unsigned int fe_index) const;
     
 				     /**
 				      * @name Shape function access
@@ -900,7 +907,7 @@ class FiniteElement : public Subscriptor,
 				      * unrefined cell.
 				      * 
 				      * The matrix is obviously empty
-				      * in only one space dimension,
+				      * in only one dimension,
 				      * since there are no constraints
 				      * then.
 				      *
@@ -1016,7 +1023,7 @@ class FiniteElement : public Subscriptor,
 				      * ExcInterpolationNotImplemented.
 				      */
     virtual void
-    get_interpolation_matrix (const FiniteElement<dim> &source,
+    get_interpolation_matrix (const FiniteElement<dim,spacedim> &source,
 			      FullMatrix<double>       &matrix) const;
 				     //@}
 
@@ -1048,7 +1055,7 @@ class FiniteElement : public Subscriptor,
 				      * ExcInterpolationNotImplemented.
 				      */
     virtual void
-    get_face_interpolation_matrix (const FiniteElement<dim> &source,
+    get_face_interpolation_matrix (const FiniteElement<dim,spacedim> &source,
 				   FullMatrix<double>       &matrix) const;
     
 
@@ -1074,7 +1081,7 @@ class FiniteElement : public Subscriptor,
 				      * ExcInterpolationNotImplemented.
 				      */
     virtual void
-    get_subface_interpolation_matrix (const FiniteElement<dim> &source,
+    get_subface_interpolation_matrix (const FiniteElement<dim,spacedim> &source,
 				      const unsigned int        subface,
 				      FullMatrix<double>       &matrix) const;
 				     //@}
@@ -1116,7 +1123,7 @@ class FiniteElement : public Subscriptor,
 				      */
     virtual
     std::vector<std::pair<unsigned int, unsigned int> >
-    hp_vertex_dof_identities (const FiniteElement<dim> &fe_other) const;
+    hp_vertex_dof_identities (const FiniteElement<dim,spacedim> &fe_other) const;
 
 				     /**
 				      * Same as
@@ -1127,7 +1134,7 @@ class FiniteElement : public Subscriptor,
 				      */
     virtual
     std::vector<std::pair<unsigned int, unsigned int> >
-    hp_line_dof_identities (const FiniteElement<dim> &fe_other) const;
+    hp_line_dof_identities (const FiniteElement<dim,spacedim> &fe_other) const;
 
 				     /**
 				      * Same as
@@ -1138,7 +1145,7 @@ class FiniteElement : public Subscriptor,
 				      */
     virtual
     std::vector<std::pair<unsigned int, unsigned int> >
-    hp_quad_dof_identities (const FiniteElement<dim> &fe_other) const;
+    hp_quad_dof_identities (const FiniteElement<dim,spacedim> &fe_other) const;
 
 				     /**
 				      * Return whether this element dominates
@@ -1154,7 +1161,7 @@ class FiniteElement : public Subscriptor,
 				      */
     virtual
     FiniteElementDomination::Domination
-    compare_for_face_domination (const FiniteElement<dim> &fe_other) const;
+    compare_for_face_domination (const FiniteElement<dim,spacedim> &fe_other) const;
     
 				     //@}
     
@@ -1175,7 +1182,7 @@ class FiniteElement : public Subscriptor,
 				      * #restriction and
 				      * #prolongation.
 				      */
-    bool operator == (const FiniteElement<dim> &) const;
+    bool operator == (const FiniteElement<dim,spacedim> &) const;
 
 				     /**
 				      * @name Index computations
@@ -1442,7 +1449,7 @@ class FiniteElement : public Subscriptor,
 				      * @p this.
 				      */
     virtual
-    const FiniteElement<dim> &
+    const FiniteElement<dim,spacedim> &
     base_element (const unsigned int index) const = 0;
 
                                      /**
@@ -2074,7 +2081,7 @@ class FiniteElement : public Subscriptor,
 				      * derived class.
 				      *
 				      * This field is obviously
-				      * useless in one space dimension
+				      * useless in one dimension
 				      * and has there a zero size.
 				      */
     FullMatrix<double> interface_constraints;
@@ -2204,12 +2211,12 @@ class FiniteElement : public Subscriptor,
 				      * finite differences of
 				      * gradients.
 				      */
-    void compute_2nd (const Mapping<dim>                      &mapping,
-		      const typename Triangulation<dim>::cell_iterator    &cell,
+    void compute_2nd (const Mapping<dim,spacedim>                      &mapping,
+		      const typename Triangulation<dim,spacedim>::cell_iterator    &cell,
 		      const unsigned int                       offset,
-		      typename Mapping<dim>::InternalDataBase &mapping_internal,
+		      typename Mapping<dim,spacedim>::InternalDataBase &mapping_internal,
 		      InternalDataBase                        &fe_internal,
-		      FEValuesData<dim>                       &data) const;
+		      FEValuesData<dim,spacedim>                       &data) const;
 
 				     /**
 				      * Given the pattern of nonzero
@@ -2294,7 +2301,7 @@ class FiniteElement : public Subscriptor,
 				      * knowing their exact type. They
 				      * do so through this function.
 				      */
-    virtual FiniteElement<dim> *clone() const = 0;    
+    virtual FiniteElement<dim,spacedim> *clone() const = 0;    
     
   private:
 				     /**
@@ -2530,9 +2537,9 @@ class FiniteElement : public Subscriptor,
 				      * includes destruction when it
 				      * is no more needed).
 				      */
-    virtual typename Mapping<dim>::InternalDataBase*
+    virtual typename Mapping<dim,spacedim>::InternalDataBase*
     get_data (const UpdateFlags      flags,
-	      const Mapping<dim>    &mapping,
+	      const Mapping<dim,spacedim>    &mapping,
 	      const Quadrature<dim> &quadrature) const = 0;
 
 				     /**
@@ -2547,9 +2554,9 @@ class FiniteElement : public Subscriptor,
 				      * includes destruction when it
 				      * is no more needed).
 				      */
-    virtual typename Mapping<dim>::InternalDataBase*
+    virtual typename Mapping<dim,spacedim>::InternalDataBase*
     get_face_data (const UpdateFlags        flags,
-		   const Mapping<dim>      &mapping,
+		   const Mapping<dim,spacedim>      &mapping,
 		   const Quadrature<dim-1> &quadrature) const;
 
 				     /**
@@ -2564,9 +2571,9 @@ class FiniteElement : public Subscriptor,
 				      * includes destruction when it
 				      * is no more needed).
 				      */
-    virtual typename Mapping<dim>::InternalDataBase*
+    virtual typename Mapping<dim,spacedim>::InternalDataBase*
     get_subface_data (const UpdateFlags        flags,
-		      const Mapping<dim>      &mapping,
+		      const Mapping<dim,spacedim>      &mapping,
 		      const Quadrature<dim-1> &quadrature) const;
 
 				     /**
@@ -2581,12 +2588,12 @@ class FiniteElement : public Subscriptor,
 				      * called for the same cell first!
 				      */				      
     virtual void
-    fill_fe_values (const Mapping<dim>                   &mapping,
-		    const typename Triangulation<dim>::cell_iterator &cell,
+    fill_fe_values (const Mapping<dim,spacedim>                   &mapping,
+		    const typename Triangulation<dim,spacedim>::cell_iterator &cell,
 		    const Quadrature<dim>                &quadrature,
-		    typename Mapping<dim>::InternalDataBase       &mapping_internal,
-		    typename Mapping<dim>::InternalDataBase       &fe_internal,
-		    FEValuesData<dim>                    &data) const = 0;
+		    typename Mapping<dim,spacedim>::InternalDataBase       &mapping_internal,
+		    typename Mapping<dim,spacedim>::InternalDataBase       &fe_internal,
+		    FEValuesData<dim,spacedim>                    &data) const = 0;
     
 				     /**
 				      * Fill the fields of
@@ -2600,13 +2607,13 @@ class FiniteElement : public Subscriptor,
 				      * called for the same cell first!
 				      */				      
     virtual void
-    fill_fe_face_values (const Mapping<dim>                   &mapping,
-			 const typename Triangulation<dim>::cell_iterator &cell,
+    fill_fe_face_values (const Mapping<dim,spacedim>                   &mapping,
+			 const typename Triangulation<dim,spacedim>::cell_iterator &cell,
 			 const unsigned int                    face_no,
 			 const Quadrature<dim-1>              &quadrature,
-			 typename Mapping<dim>::InternalDataBase       &mapping_internal,
-			 typename Mapping<dim>::InternalDataBase       &fe_internal,
-			 FEValuesData<dim>                    &data) const = 0;
+			 typename Mapping<dim,spacedim>::InternalDataBase       &mapping_internal,
+			 typename Mapping<dim,spacedim>::InternalDataBase       &fe_internal,
+			 FEValuesData<dim,spacedim>                    &data) const = 0;
     
 				     /**
 				      * Fill the fields of
@@ -2620,33 +2627,34 @@ class FiniteElement : public Subscriptor,
 				      * called for the same cell first!
 				      */				      
     virtual void
-    fill_fe_subface_values (const Mapping<dim>                   &mapping,
-			    const typename Triangulation<dim>::cell_iterator &cell,
+    fill_fe_subface_values (const Mapping<dim,spacedim>                   &mapping,
+			    const typename Triangulation<dim,spacedim>::cell_iterator &cell,
 			    const unsigned int                    face_no,
 			    const unsigned int                    sub_no,
 			    const Quadrature<dim-1>              &quadrature,
-			    typename Mapping<dim>::InternalDataBase &mapping_internal,
-			    typename Mapping<dim>::InternalDataBase &fe_internal,
-			    FEValuesData<dim>                    &data) const = 0;
+			    typename Mapping<dim,spacedim>::InternalDataBase &mapping_internal,
+			    typename Mapping<dim,spacedim>::InternalDataBase &fe_internal,
+			    FEValuesData<dim,spacedim>                    &data) const = 0;
 
     friend class InternalDataBase;
-    friend class FEValuesBase<dim>;
-    friend class FEValues<dim>;
-    friend class FEFaceValues<dim>;
-    friend class FESubfaceValues<dim>;
-    template <int dim_> friend class FESystem;
-    template <class POLY, int dim_> friend class FE_PolyTensor;
-    friend class hp::FECollection<dim>;
+    friend class FEValuesBase<dim,spacedim>;
+    friend class FEValues<dim,spacedim>;
+    friend class FEFaceValues<dim,spacedim>;
+    friend class FESubfaceValues<dim,spacedim>;
+    template <int, int > friend class FESystem;
+    template <class POLY, int dim_, int spacedim_> friend class FE_PolyTensor;
+    friend class hp::FECollection<dim,spacedim>;
+
 };
 
 
 //----------------------------------------------------------------------//
 
 
-template <int dim>
+template <int dim, int spacedim>
 inline
-const FiniteElement<dim> &
-FiniteElement<dim>::operator[] (const unsigned int fe_index) const
+const FiniteElement<dim,spacedim> &
+FiniteElement<dim,spacedim>::operator[] (const unsigned int fe_index) const
 {
   Assert (fe_index == 0,
 	  ExcMessage ("A fe_index of zero is the only index allowed here"));
@@ -2655,24 +2663,24 @@ FiniteElement<dim>::operator[] (const unsigned int fe_index) const
 
 
 
-template <int dim>  
+template <int dim, int spacedim>  
 inline
 std::pair<unsigned int,unsigned int>
-FiniteElement<dim>::system_to_component_index (const unsigned int index) const
+FiniteElement<dim,spacedim>::system_to_component_index (const unsigned int index) const
 {
   Assert (index < system_to_component_table.size(),
 	 ExcIndexRange(index, 0, system_to_component_table.size()));
   Assert (is_primitive (index),
-	  typename FiniteElement<dim>::ExcShapeFunctionNotPrimitive(index));
+	  ( typename FiniteElement<dim,spacedim>::ExcShapeFunctionNotPrimitive(index)) );
   return system_to_component_table[index];
 }
 
 
 
-template <int dim>  
+template <int dim, int spacedim>  
 inline
 unsigned int
-FiniteElement<dim>::component_to_system_index (const unsigned int component,
+FiniteElement<dim,spacedim>::component_to_system_index (const unsigned int component,
                                                    const unsigned int index) const
 {
    std::vector< std::pair<unsigned int, unsigned int> >::const_iterator
@@ -2685,10 +2693,10 @@ FiniteElement<dim>::component_to_system_index (const unsigned int component,
 
 
 
-template <int dim>  
+template <int dim, int spacedim>  
 inline
 std::pair<unsigned int,unsigned int>
-FiniteElement<dim>::face_system_to_component_index (const unsigned int index) const
+FiniteElement<dim,spacedim>::face_system_to_component_index (const unsigned int index) const
 {
   Assert(index < face_system_to_component_table.size(),
 	 ExcIndexRange(index, 0, face_system_to_component_table.size()));
@@ -2707,17 +2715,17 @@ FiniteElement<dim>::face_system_to_component_index (const unsigned int index) co
                                    // in 1d, the face index is equal
                                    // to the cell index
   Assert (is_primitive(this->face_to_equivalent_cell_index(index)),
-          typename FiniteElement<dim>::ExcShapeFunctionNotPrimitive(index));
+          (typename FiniteElement<dim,spacedim>::ExcShapeFunctionNotPrimitive(index)) );
 
   return face_system_to_component_table[index];
 }
 
 
 
-template <int dim>  
+template <int dim, int spacedim>  
 inline
 std::pair<std::pair<unsigned int,unsigned int>,unsigned int>
-FiniteElement<dim>::system_to_base_index (const unsigned int index) const
+FiniteElement<dim,spacedim>::system_to_base_index (const unsigned int index) const
 {
   Assert (index < system_to_base_table.size(),
 	 ExcIndexRange(index, 0, system_to_base_table.size()));
@@ -2727,10 +2735,10 @@ FiniteElement<dim>::system_to_base_index (const unsigned int index) const
 
 
 
-template <int dim>  
+template <int dim, int spacedim>  
 inline
 std::pair<std::pair<unsigned int,unsigned int>,unsigned int>
-FiniteElement<dim>::face_system_to_base_index (const unsigned int index) const
+FiniteElement<dim,spacedim>::face_system_to_base_index (const unsigned int index) const
 {
   Assert(index < face_system_to_base_table.size(),
 	 ExcIndexRange(index, 0, face_system_to_base_table.size()));
@@ -2739,10 +2747,10 @@ FiniteElement<dim>::face_system_to_base_index (const unsigned int index) const
 
 
 
-template <int dim>  
+template <int dim, int spacedim>  
 inline
 unsigned int
-FiniteElement<dim>::first_block_of_base (const unsigned int index) const
+FiniteElement<dim,spacedim>::first_block_of_base (const unsigned int index) const
 {
   Assert(index < first_block_of_base_table.size(),
 	 ExcIndexRange(index, 0, first_block_of_base_table.size()));
@@ -2752,10 +2760,10 @@ FiniteElement<dim>::first_block_of_base (const unsigned int index) const
 
 
 
-template <int dim>  
+template <int dim, int spacedim>  
 inline
 std::pair<unsigned int,unsigned int>
-FiniteElement<dim>::component_to_base_index (const unsigned int index) const
+FiniteElement<dim,spacedim>::component_to_base_index (const unsigned int index) const
 {
   Assert(index < component_to_base_table.size(),
 	 ExcIndexRange(index, 0, component_to_base_table.size()));
@@ -2765,10 +2773,10 @@ FiniteElement<dim>::component_to_base_index (const unsigned int index) const
 
 
 
-template <int dim>  
+template <int dim, int spacedim>  
 inline
 std::pair<unsigned int,unsigned int>
-FiniteElement<dim>::block_to_base_index (const unsigned int index) const
+FiniteElement<dim,spacedim>::block_to_base_index (const unsigned int index) const
 {
   Assert(index < this->n_blocks(),
 	 ExcIndexRange(index, 0, this->n_blocks()));
@@ -2783,10 +2791,10 @@ FiniteElement<dim>::block_to_base_index (const unsigned int index) const
 
 
 
-template <int dim>  
+template <int dim, int spacedim>  
 inline
 std::pair<unsigned int,unsigned int>
-FiniteElement<dim>::system_to_block_index (const unsigned int index) const
+FiniteElement<dim,spacedim>::system_to_block_index (const unsigned int index) const
 {
   Assert (index < this->dofs_per_cell,
 	  ExcIndexRange(index, 0, this->dofs_per_cell));
@@ -2801,10 +2809,10 @@ FiniteElement<dim>::system_to_block_index (const unsigned int index) const
 
 
 
-template <int dim>
+template <int dim, int spacedim>
 inline
 bool
-FiniteElement<dim>::restriction_is_additive (const unsigned int index) const
+FiniteElement<dim,spacedim>::restriction_is_additive (const unsigned int index) const
 {
   Assert(index < this->dofs_per_cell,
 	 ExcIndexRange(index, 0, this->dofs_per_cell));
@@ -2813,10 +2821,10 @@ FiniteElement<dim>::restriction_is_additive (const unsigned int index) const
 
 
 
-template <int dim>
+template <int dim, int spacedim>  
 inline
 const std::vector<bool> &
-FiniteElement<dim>::get_nonzero_components (const unsigned int i) const
+FiniteElement<dim,spacedim>::get_nonzero_components (const unsigned int i) const
 {
   Assert (i < this->dofs_per_cell, ExcIndexRange (i, 0, this->dofs_per_cell));
   return nonzero_components[i];
@@ -2824,10 +2832,10 @@ FiniteElement<dim>::get_nonzero_components (const unsigned int i) const
 
 
 
-template <int dim>
+template <int dim, int spacedim>  
 inline
 unsigned int
-FiniteElement<dim>::n_nonzero_components (const unsigned int i) const
+FiniteElement<dim,spacedim>::n_nonzero_components (const unsigned int i) const
 {
   Assert (i < this->dofs_per_cell, ExcIndexRange (i, 0, this->dofs_per_cell));
   return n_nonzero_components_table[i];
@@ -2835,10 +2843,10 @@ FiniteElement<dim>::n_nonzero_components (const unsigned int i) const
 
 
 
-template <int dim>
+template <int dim, int spacedim>  
 inline
 bool
-FiniteElement<dim>::is_primitive (const unsigned int i) const
+FiniteElement<dim,spacedim>::is_primitive (const unsigned int i) const
 {
   Assert (i < this->dofs_per_cell, ExcIndexRange (i, 0, this->dofs_per_cell));
 
@@ -2861,10 +2869,10 @@ FiniteElement<dim>::is_primitive (const unsigned int i) const
 
 
 
-template <int dim>
+template <int dim, int spacedim>  
 inline
 bool
-FiniteElement<dim>::is_primitive () const
+FiniteElement<dim,spacedim>::is_primitive () const
 {
   return cached_primitivity;
 }

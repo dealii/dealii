@@ -2,7 +2,7 @@
 //    $Id$
 //    Version: $Name$
 //
-//    Copyright (C) 2000, 2001, 2002, 2003, 2004, 2005, 2006, 2007 by the deal.II authors
+//    Copyright (C) 2000, 2001, 2002, 2003, 2004, 2005, 2006, 2007, 2008 by the deal.II authors
 //
 //    This file is subject to QPL and may not be  distributed
 //    without copyright and license information. Please refer
@@ -32,6 +32,10 @@ DEAL_II_NAMESPACE_OPEN
  * The standard constructor of this class takes the degree @p p of this finite
  * element. Alternatively, it can take a quadrature formula @p points defining
  * the support points of the Lagrange interpolation in one coordinate direction.
+ * 
+ * For more information about the <tt>spacedim</tt> template parameter
+ * check the documentation of FiniteElement or the one of
+ * Triangulation.
  *
  * <h3>Implementation</h3>
  *
@@ -236,8 +240,8 @@ DEAL_II_NAMESPACE_OPEN
  *
  * @author Wolfgang Bangerth, 1998, 2003; Guido Kanschat, 2001; Ralf Hartmann, 2001, 2004, 2005; Oliver Kayser-Herold, 2004; Katharina Kormann, 2008; Martin Kronbichler, 2008
  */
-template <int dim>
-class FE_Q : public FE_Poly<TensorProductPolynomials<dim>,dim>
+template <int dim, int spacedim=dim>
+class FE_Q : public FE_Poly<TensorProductPolynomials<dim>,dim,spacedim>
 {
   public:
 				     /**
@@ -282,11 +286,11 @@ class FE_Q : public FE_Poly<TensorProductPolynomials<dim>,dim>
 				      * element is also a @p FE_Q
 				      * element. Otherwise, an
 				      * exception of type
-				      * FiniteElement<dim>::ExcInterpolationNotImplemented
+				      * FiniteElement<dim,spacedim>::ExcInterpolationNotImplemented
 				      * is thrown.
 				      */
     virtual void
-    get_interpolation_matrix (const FiniteElement<dim> &source,
+    get_interpolation_matrix (const FiniteElement<dim,spacedim> &source,
 			      FullMatrix<double>       &matrix) const;
 
     
@@ -309,10 +313,10 @@ class FE_Q : public FE_Poly<TensorProductPolynomials<dim>,dim>
 				      * interpolation from a given
 				      * element, then they must throw
 				      * an exception of type
-				      * FiniteElement<dim>::ExcInterpolationNotImplemented.
+				      * FiniteElement<dim,spacedim>::ExcInterpolationNotImplemented.
 				      */
     virtual void
-    get_face_interpolation_matrix (const FiniteElement<dim> &source,
+    get_face_interpolation_matrix (const FiniteElement<dim,spacedim> &source,
 				   FullMatrix<double>       &matrix) const;    
 
 				     /**
@@ -334,10 +338,10 @@ class FE_Q : public FE_Poly<TensorProductPolynomials<dim>,dim>
 				      * interpolation from a given
 				      * element, then they must throw
 				      * an exception of type
-				      * FiniteElement<dim>::ExcInterpolationNotImplemented.
+				      * FiniteElement<dim,spacedim>::ExcInterpolationNotImplemented.
 				      */
     virtual void
-    get_subface_interpolation_matrix (const FiniteElement<dim> &source,
+    get_subface_interpolation_matrix (const FiniteElement<dim,spacedim> &source,
 				      const unsigned int        subface,
 				      FullMatrix<double>       &matrix) const;
     
@@ -413,7 +417,7 @@ class FE_Q : public FE_Poly<TensorProductPolynomials<dim>,dim>
 				      */
     virtual
     std::vector<std::pair<unsigned int, unsigned int> >
-    hp_vertex_dof_identities (const FiniteElement<dim> &fe_other) const;
+    hp_vertex_dof_identities (const FiniteElement<dim,spacedim> &fe_other) const;
 
 				     /**
 				      * Same as
@@ -424,7 +428,7 @@ class FE_Q : public FE_Poly<TensorProductPolynomials<dim>,dim>
 				      */
     virtual
     std::vector<std::pair<unsigned int, unsigned int> >
-    hp_line_dof_identities (const FiniteElement<dim> &fe_other) const;
+    hp_line_dof_identities (const FiniteElement<dim,spacedim> &fe_other) const;
 
 				     /**
 				      * Same as
@@ -435,7 +439,7 @@ class FE_Q : public FE_Poly<TensorProductPolynomials<dim>,dim>
 				      */
     virtual
     std::vector<std::pair<unsigned int, unsigned int> >
-    hp_quad_dof_identities (const FiniteElement<dim> &fe_other) const;
+    hp_quad_dof_identities (const FiniteElement<dim,spacedim> &fe_other) const;
     
 				     /**
 				      * Return whether this element dominates
@@ -451,7 +455,7 @@ class FE_Q : public FE_Poly<TensorProductPolynomials<dim>,dim>
 				      */
     virtual
     FiniteElementDomination::Domination
-    compare_for_face_domination (const FiniteElement<dim> &fe_other) const;
+    compare_for_face_domination (const FiniteElement<dim,spacedim> &fe_other) const;
 				     //@}
 
 				     /**
@@ -475,7 +479,7 @@ class FE_Q : public FE_Poly<TensorProductPolynomials<dim>,dim>
 				      * This function is needed by the
 				      * constructors of @p FESystem.
 				      */
-    virtual FiniteElement<dim> * clone() const;
+    virtual FiniteElement<dim,spacedim> * clone() const;
     
   private:
     
@@ -509,14 +513,6 @@ class FE_Q : public FE_Poly<TensorProductPolynomials<dim>,dim>
 				      */
     void initialize_constraints ();
 	
-					     /**
-				      * Initialize the hanging node
-				      * constraints matrices. Called from the
-				      * constructor in case the finite element
-				      * is based on quadrature points.
-				      */
-    void initialize_constraints (const Quadrature<1> &points);
-
 				     /**
 				      * Initialize the embedding
 				      * matrices. Called from the
@@ -584,6 +580,17 @@ class FE_Q : public FE_Poly<TensorProductPolynomials<dim>,dim>
 				      * functions.
 				      */
     const std::vector<unsigned int> face_index_map;
+
+
+				     /**
+				      * Forward declaration of a class
+				      * into which we put significant
+				      * parts of the implementation.
+				      *
+				      * See the .cc file for more
+				      * information.
+				      */
+    struct Implementation;
     
 				     /**
 				      * Allow access from other
@@ -594,7 +601,9 @@ class FE_Q : public FE_Poly<TensorProductPolynomials<dim>,dim>
 				      * for the faces of the finite
 				      * element of dimension dim+1.
 				      */
-    template <int dim1> friend class FE_Q;
+    template <int, int> friend class FE_Q;
+
+    friend class FE_Q<dim,spacedim>::Implementation;
 };
 
 
@@ -610,14 +619,17 @@ template <>
 std::vector<unsigned int>
 FE_Q<1>::face_lexicographic_to_hierarchic_numbering (const unsigned int);
 
-template <>
-void FE_Q<1>::initialize_constraints (const Quadrature<1>&);
+
+#if deal_II_dimension != 3
 
 template <>
-void FE_Q<2>::initialize_constraints (const Quadrature<1>&);
+void FE_Q<1,2>::initialize_unit_face_support_points ();
 
 template <>
-void FE_Q<3>::initialize_constraints (const Quadrature<1>&);
+std::vector<unsigned int>
+FE_Q<1,2>::face_lexicographic_to_hierarchic_numbering (const unsigned int);
+
+#endif
 
 
 DEAL_II_NAMESPACE_CLOSE

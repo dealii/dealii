@@ -14,11 +14,12 @@
 
 #include <lac/full_matrix.templates.h>
 #include <base/logstream.h>
+#include <base/tensor.h>
+#include <base/tensor_base.h>
 
 DEAL_II_NAMESPACE_OPEN
 
 #include "full_matrix.inst"
-
 
 // do a few functions that currently don't fit the scheme because they have
 // two template arguments that need to be different (the case of same

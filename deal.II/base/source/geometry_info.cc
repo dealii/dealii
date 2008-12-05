@@ -17,6 +17,14 @@
 DEAL_II_NAMESPACE_OPEN
 
 
+unsigned int
+GeometryInfo<0>::n_children(const RefinementCase<0> &)
+{
+  return 0;
+}
+
+
+
 template <int dim> const unsigned int GeometryInfo<dim>::max_children_per_cell;
 template <int dim> const unsigned int GeometryInfo<dim>::faces_per_cell;
 template <int dim> const unsigned int GeometryInfo<dim>::max_children_per_face;

@@ -65,12 +65,12 @@ MatrixCreator::IteratorRange<DH>::IteratorRange (const iterator_pair &ip)
 
 
 
-template <int dim, typename number>
-void MatrixCreator::create_mass_matrix (const Mapping<dim>       &mapping,
-					const DoFHandler<dim>    &dof,
+template <int dim, typename number, int spacedim>
+void MatrixCreator::create_mass_matrix (const Mapping<dim, spacedim>       &mapping,
+					const DoFHandler<dim,spacedim>    &dof,
 					const Quadrature<dim>    &q,
 					SparseMatrix<number>     &matrix,
-					const Function<dim> * const coefficient)
+					const Function<spacedim> * const coefficient)
 {
   Assert (matrix.m() == dof.n_dofs(),
 	  ExcDimensionMismatch (matrix.m(), dof.n_dofs()));
@@ -82,7 +82,7 @@ void MatrixCreator::create_mass_matrix (const Mapping<dim>       &mapping,
 
 				   // define starting and end point
 				   // for each thread
-  typedef typename DoFHandler<dim>::active_cell_iterator active_cell_iterator;  
+  typedef typename DoFHandler<dim,spacedim>::active_cell_iterator active_cell_iterator;  
   const std::vector<std::pair<active_cell_iterator,active_cell_iterator> >
     thread_ranges = Threads::split_range<active_cell_iterator> (dof.begin_active(),
 								 dof.end(), n_threads);
@@ -92,14 +92,14 @@ void MatrixCreator::create_mass_matrix (const Mapping<dim>       &mapping,
   Threads::ThreadMutex mutex;
   
 				   // then assemble in parallel
-  typedef void (*create_mass_matrix_1_t) (const Mapping<dim>       &mapping,
-					  const DoFHandler<dim>    &dof,
+  typedef void (*create_mass_matrix_1_t) (const Mapping<dim, spacedim>       &mapping,
+					  const DoFHandler<dim,spacedim>    &dof,
 					  const Quadrature<dim>    &q,
 					  SparseMatrix<number>     &matrix,
-					  const Function<dim> * const coefficient,
-					  const IteratorRange<DoFHandler<dim> >  range,
+					  const Function<spacedim> * const coefficient,
+					  const IteratorRange<DoFHandler<dim,spacedim> >  range,
 					  Threads::ThreadMutex     &mutex);
-  create_mass_matrix_1_t p = &MatrixCreator::template create_mass_matrix_1<dim,number>;
+  create_mass_matrix_1_t p = &MatrixCreator::template create_mass_matrix_1<dim,number,spacedim>;
   for (unsigned int thread=0; thread<n_threads; ++thread)
     threads += Threads::spawn (p)(mapping, dof, q, matrix, coefficient,
                                   thread_ranges[thread], mutex);
@@ -108,24 +108,24 @@ void MatrixCreator::create_mass_matrix (const Mapping<dim>       &mapping,
 
 
 
-template <int dim, typename number>
-void MatrixCreator::create_mass_matrix_1 (const Mapping<dim>       &mapping,
-					  const DoFHandler<dim>    &dof,
+template <int dim, typename number, int spacedim>
+void MatrixCreator::create_mass_matrix_1 (const Mapping<dim, spacedim>       &mapping,
+					  const DoFHandler<dim,spacedim>    &dof,
 					  const Quadrature<dim>    &q,
 					  SparseMatrix<number>     &matrix,
-					  const Function<dim> * const coefficient,
-					  const IteratorRange<DoFHandler<dim> >  range,
+					  const Function<spacedim> * const coefficient,
+					  const IteratorRange<DoFHandler<dim,spacedim> >  range,
 					  Threads::ThreadMutex     &mutex)
 {
   UpdateFlags update_flags = UpdateFlags(update_values | update_JxW_values);
   if (coefficient != 0)
     update_flags = UpdateFlags (update_flags | update_quadrature_points);
   
-  FEValues<dim> fe_values (mapping, dof.get_fe(), q, update_flags);
+  FEValues<dim,spacedim> fe_values (mapping, dof.get_fe(), q, update_flags);
     
   const unsigned int dofs_per_cell = fe_values.dofs_per_cell,
 		     n_q_points    = fe_values.n_quadrature_points;
-  const FiniteElement<dim>    &fe  = fe_values.get_fe();
+  const FiniteElement<dim,spacedim>    &fe  = fe_values.get_fe();
   const unsigned int n_components  = fe.n_components();
 
   Assert(coefficient == 0 ||
@@ -139,7 +139,7 @@ void MatrixCreator::create_mass_matrix_1 (const Mapping<dim>       &mapping,
   
   std::vector<unsigned int> dof_indices (dofs_per_cell);
   
-  typename DoFHandler<dim>::active_cell_iterator cell = range.first;
+  typename DoFHandler<dim,spacedim>::active_cell_iterator cell = range.first;
   for (; cell!=range.second; ++cell)
     {
       fe_values.reinit (cell);
@@ -298,25 +298,25 @@ void MatrixCreator::create_mass_matrix_1 (const Mapping<dim>       &mapping,
 }
 
 
-template <int dim, typename number>
-void MatrixCreator::create_mass_matrix (const DoFHandler<dim>    &dof,
+template <int dim, typename number, int spacedim>
+void MatrixCreator::create_mass_matrix (const DoFHandler<dim,spacedim>    &dof,
 					const Quadrature<dim>    &q,
 					SparseMatrix<number>     &matrix,
-					const Function<dim> * const coefficient)
+					const Function<spacedim> * const coefficient)
 {
   Assert (DEAL_II_COMPAT_MAPPING, ExcCompatibility("mapping"));
-  create_mass_matrix(StaticMappingQ1<dim>::mapping, dof, q, matrix, coefficient);
+  create_mass_matrix(StaticMappingQ1<dim,spacedim>::mapping, dof, q, matrix, coefficient);
 }
 
 
-template <int dim, typename number>
-void MatrixCreator::create_mass_matrix (const Mapping<dim>       &mapping,
-					const DoFHandler<dim>    &dof,
+template <int dim, typename number, int spacedim>
+void MatrixCreator::create_mass_matrix (const Mapping<dim, spacedim>       &mapping,
+					const DoFHandler<dim,spacedim>    &dof,
 					const Quadrature<dim>    &q,
 					SparseMatrix<number>     &matrix,
-					const Function<dim>      &rhs,
+					const Function<spacedim>      &rhs,
 					Vector<double>           &rhs_vector,
-					const Function<dim> * const coefficient)
+					const Function<spacedim> * const coefficient)
 {
   Assert (matrix.m() == dof.n_dofs(),
 	  ExcDimensionMismatch (matrix.m(), dof.n_dofs()));
@@ -328,7 +328,7 @@ void MatrixCreator::create_mass_matrix (const Mapping<dim>       &mapping,
 
 				   // define starting and end point
 				   // for each thread
-  typedef typename DoFHandler<dim>::active_cell_iterator active_cell_iterator;  
+  typedef typename DoFHandler<dim,spacedim>::active_cell_iterator active_cell_iterator;  
   std::vector<std::pair<active_cell_iterator,active_cell_iterator> > thread_ranges
     = Threads::split_range<active_cell_iterator> (dof.begin_active(),
 						  dof.end(), n_threads);
@@ -338,16 +338,16 @@ void MatrixCreator::create_mass_matrix (const Mapping<dim>       &mapping,
   Threads::ThreadMutex mutex;
   
 				   // then assemble in parallel
-  typedef void (*create_mass_matrix_2_t) (const Mapping<dim>       &mapping,
-					  const DoFHandler<dim>    &dof,
+  typedef void (*create_mass_matrix_2_t) (const Mapping<dim, spacedim>       &mapping,
+					  const DoFHandler<dim,spacedim>    &dof,
 					  const Quadrature<dim>    &q,
 					  SparseMatrix<number>     &matrix,
-					  const Function<dim>      &rhs,
+					  const Function<spacedim>      &rhs,
 					  Vector<double>           &rhs_vector,
-					  const Function<dim> * const coefficient,
-					  const IteratorRange<DoFHandler<dim> >  range,
+					  const Function<spacedim> * const coefficient,
+					  const IteratorRange<DoFHandler<dim,spacedim> >  range,
 					  Threads::ThreadMutex     &mutex);
-  create_mass_matrix_2_t p = &MatrixCreator::template create_mass_matrix_2<dim,number>;
+  create_mass_matrix_2_t p = &MatrixCreator::template create_mass_matrix_2<dim,number,spacedim>;
   for (unsigned int thread=0; thread<n_threads; ++thread)
     threads += Threads::spawn (p)(mapping, dof, q, matrix, rhs,
                                   rhs_vector, coefficient,
@@ -357,16 +357,16 @@ void MatrixCreator::create_mass_matrix (const Mapping<dim>       &mapping,
 
 
 
-template <int dim, typename number>
+template <int dim, typename number, int spacedim>
 void
-MatrixCreator::create_mass_matrix_2 (const Mapping<dim>       &mapping,
-				     const DoFHandler<dim>    &dof,
+MatrixCreator::create_mass_matrix_2 (const Mapping<dim, spacedim>       &mapping,
+				     const DoFHandler<dim,spacedim>    &dof,
 				     const Quadrature<dim>    &q,
 				     SparseMatrix<number>     &matrix,
-				     const Function<dim>      &rhs,
+				     const Function<spacedim>      &rhs,
 				     Vector<double>           &rhs_vector,
-				     const Function<dim> * const coefficient,
-				     const IteratorRange<DoFHandler<dim> >  range,
+				     const Function<spacedim> * const coefficient,
+				     const IteratorRange<DoFHandler<dim,spacedim> >  range,
 				     Threads::ThreadMutex     &mutex)
 {
   UpdateFlags update_flags = UpdateFlags(update_values |
@@ -375,11 +375,11 @@ MatrixCreator::create_mass_matrix_2 (const Mapping<dim>       &mapping,
   if (coefficient != 0)
     update_flags = UpdateFlags (update_flags | update_quadrature_points);
 
-  FEValues<dim> fe_values (mapping, dof.get_fe(), q, update_flags);
+  FEValues<dim,spacedim> fe_values (mapping, dof.get_fe(), q, update_flags);
     
   const unsigned int dofs_per_cell = fe_values.dofs_per_cell,
 		     n_q_points    = fe_values.n_quadrature_points;
-  const FiniteElement<dim>    &fe  = fe_values.get_fe();
+  const FiniteElement<dim,spacedim>    &fe  = fe_values.get_fe();
   const unsigned int n_components  = fe.n_components();
 
   Assert(coefficient == 0 ||
@@ -395,7 +395,7 @@ MatrixCreator::create_mass_matrix_2 (const Mapping<dim>       &mapping,
   
   std::vector<unsigned int> dof_indices (dofs_per_cell);
   
-  typename DoFHandler<dim>::active_cell_iterator cell = range.first;
+  typename DoFHandler<dim,spacedim>::active_cell_iterator cell = range.first;
   for (; cell!=range.second; ++cell)
     {
       fe_values.reinit (cell);
@@ -493,27 +493,27 @@ MatrixCreator::create_mass_matrix_2 (const Mapping<dim>       &mapping,
 }
 
 
-template <int dim, typename number>
-void MatrixCreator::create_mass_matrix (const DoFHandler<dim>    &dof,
+template <int dim, typename number, int spacedim>
+void MatrixCreator::create_mass_matrix (const DoFHandler<dim,spacedim>    &dof,
 					const Quadrature<dim>    &q,
 					SparseMatrix<number>     &matrix,
-					const Function<dim>      &rhs,
+					const Function<spacedim>      &rhs,
 					Vector<double>           &rhs_vector,
-					const Function<dim> * const coefficient)
+					const Function<spacedim> * const coefficient)
 {
   Assert (DEAL_II_COMPAT_MAPPING, ExcCompatibility("mapping"));
-  create_mass_matrix(StaticMappingQ1<dim>::mapping,
+  create_mass_matrix(StaticMappingQ1<dim,spacedim>::mapping,
 		     dof, q, matrix, rhs, rhs_vector, coefficient);
 }
 
 
 
-template <int dim, typename number>
-void MatrixCreator::create_mass_matrix (const hp::MappingCollection<dim>       &mapping,
-					const hp::DoFHandler<dim>    &dof,
+template <int dim, typename number, int spacedim>
+void MatrixCreator::create_mass_matrix (const hp::MappingCollection<dim,spacedim>       &mapping,
+					const hp::DoFHandler<dim,spacedim>    &dof,
 					const hp::QCollection<dim>    &q,
 					SparseMatrix<number>     &matrix,
-					const Function<dim> * const coefficient)
+					const Function<spacedim> * const coefficient)
 {
   Assert (matrix.m() == dof.n_dofs(),
 	  ExcDimensionMismatch (matrix.m(), dof.n_dofs()));
@@ -525,7 +525,7 @@ void MatrixCreator::create_mass_matrix (const hp::MappingCollection<dim>       &
 
 				   // define starting and end point
 				   // for each thread
-  typedef typename hp::DoFHandler<dim>::active_cell_iterator active_cell_iterator;  
+  typedef typename hp::DoFHandler<dim,spacedim>::active_cell_iterator active_cell_iterator;  
   std::vector<std::pair<active_cell_iterator,active_cell_iterator> > thread_ranges
     = Threads::split_range<active_cell_iterator> (dof.begin_active(),
 						  dof.end(), n_threads);
@@ -535,12 +535,12 @@ void MatrixCreator::create_mass_matrix (const hp::MappingCollection<dim>       &
   Threads::ThreadMutex mutex;
   
 				   // then assemble in parallel
-  typedef void (*create_mass_matrix_1_t) (const hp::MappingCollection<dim>       &mapping,
-					  const hp::DoFHandler<dim>    &dof,
+  typedef void (*create_mass_matrix_1_t) (const hp::MappingCollection<dim,spacedim>       &mapping,
+					  const hp::DoFHandler<dim,spacedim>    &dof,
 					  const hp::QCollection<dim>    &q,
 					  SparseMatrix<number>     &matrix,
-					  const Function<dim> * const coefficient,
-					  const IteratorRange<hp::DoFHandler<dim> >  range,
+					  const Function<spacedim> * const coefficient,
+					  const IteratorRange<hp::DoFHandler<dim,spacedim> >  range,
 					  Threads::ThreadMutex     &mutex);
   create_mass_matrix_1_t p = &MatrixCreator::template create_mass_matrix_1<dim>;
   for (unsigned int thread=0; thread<n_threads; ++thread)
@@ -551,14 +551,14 @@ void MatrixCreator::create_mass_matrix (const hp::MappingCollection<dim>       &
 
 
 
-template <int dim, typename number>
+template <int dim, typename number, int spacedim>
 void
-MatrixCreator::create_mass_matrix_1 (const hp::MappingCollection<dim>       &mapping,
-				     const hp::DoFHandler<dim>    &dof,
+MatrixCreator::create_mass_matrix_1 (const hp::MappingCollection<dim,spacedim>       &mapping,
+				     const hp::DoFHandler<dim,spacedim>    &dof,
 				     const hp::QCollection<dim>    &q,
 				     SparseMatrix<number>     &matrix,
-				     const Function<dim> * const coefficient,
-				     const IteratorRange<hp::DoFHandler<dim> >  range,
+				     const Function<spacedim> * const coefficient,
+				     const IteratorRange<hp::DoFHandler<dim,spacedim> >  range,
 				     Threads::ThreadMutex     &mutex)
 {
   UpdateFlags update_flags = UpdateFlags(update_values |
@@ -566,7 +566,7 @@ MatrixCreator::create_mass_matrix_1 (const hp::MappingCollection<dim>       &map
   if (coefficient != 0)
     update_flags = UpdateFlags (update_flags | update_quadrature_points);
 
-  hp::FEValues<dim> x_fe_values (mapping, dof.get_fe(), q, update_flags);
+  hp::FEValues<dim,spacedim> x_fe_values (mapping, dof.get_fe(), q, update_flags);
     
   const unsigned int n_components  = dof.get_fe().n_components();
 
@@ -580,15 +580,15 @@ MatrixCreator::create_mass_matrix_1 (const hp::MappingCollection<dim>       &map
   
   std::vector<unsigned int> dof_indices;
   
-  typename hp::DoFHandler<dim>::active_cell_iterator cell = range.first;
+  typename hp::DoFHandler<dim,spacedim>::active_cell_iterator cell = range.first;
   for (; cell!=range.second; ++cell)
     {
       x_fe_values.reinit (cell);
-      const FEValues<dim> &fe_values = x_fe_values.get_present_fe_values ();
+      const FEValues<dim,spacedim> &fe_values = x_fe_values.get_present_fe_values ();
 
       const unsigned int dofs_per_cell = fe_values.dofs_per_cell,
 			 n_q_points    = fe_values.n_quadrature_points;
-      const FiniteElement<dim>    &fe  = fe_values.get_fe();
+      const FiniteElement<dim,spacedim>    &fe  = fe_values.get_fe();
 
       cell_matrix.reinit (dofs_per_cell, dofs_per_cell);
       coefficient_values.resize (n_q_points);
@@ -682,11 +682,11 @@ MatrixCreator::create_mass_matrix_1 (const hp::MappingCollection<dim>       &map
 
 
 
-template <int dim, typename number>
-void MatrixCreator::create_mass_matrix (const hp::DoFHandler<dim>    &dof,
+template <int dim, typename number, int spacedim>
+void MatrixCreator::create_mass_matrix (const hp::DoFHandler<dim,spacedim>    &dof,
 					const hp::QCollection<dim>    &q,
 					SparseMatrix<number>     &matrix,
-					const Function<dim> * const coefficient)
+					const Function<spacedim> * const coefficient)
 {
   Assert (DEAL_II_COMPAT_MAPPING, ExcCompatibility("mapping"));
   create_mass_matrix(hp::StaticMappingQ1<dim>::mapping_collection, dof, q, matrix, coefficient);
@@ -694,14 +694,14 @@ void MatrixCreator::create_mass_matrix (const hp::DoFHandler<dim>    &dof,
 
 
 
-template <int dim, typename number>
-void MatrixCreator::create_mass_matrix (const hp::MappingCollection<dim>       &mapping,
-					const hp::DoFHandler<dim>    &dof,
+template <int dim, typename number, int spacedim>
+void MatrixCreator::create_mass_matrix (const hp::MappingCollection<dim,spacedim>       &mapping,
+					const hp::DoFHandler<dim,spacedim>    &dof,
 					const hp::QCollection<dim>    &q,
 					SparseMatrix<number>     &matrix,
-					const Function<dim>      &rhs,
+					const Function<spacedim>      &rhs,
 					Vector<double>           &rhs_vector,
-					const Function<dim> * const coefficient)
+					const Function<spacedim> * const coefficient)
 {
   Assert (matrix.m() == dof.n_dofs(),
 	  ExcDimensionMismatch (matrix.m(), dof.n_dofs()));
@@ -713,7 +713,7 @@ void MatrixCreator::create_mass_matrix (const hp::MappingCollection<dim>       &
 
 				   // define starting and end point
 				   // for each thread
-  typedef typename hp::DoFHandler<dim>::active_cell_iterator active_cell_iterator;  
+  typedef typename hp::DoFHandler<dim,spacedim>::active_cell_iterator active_cell_iterator;  
   std::vector<std::pair<active_cell_iterator,active_cell_iterator> > thread_ranges
     = Threads::split_range<active_cell_iterator> (dof.begin_active(),
 						  dof.end(), n_threads);
@@ -723,14 +723,14 @@ void MatrixCreator::create_mass_matrix (const hp::MappingCollection<dim>       &
   Threads::ThreadMutex mutex;
   
 				   // then assemble in parallel
-  typedef void (*create_mass_matrix_2_t) (const hp::MappingCollection<dim>       &mapping,
-					  const hp::DoFHandler<dim>    &dof,
+  typedef void (*create_mass_matrix_2_t) (const hp::MappingCollection<dim,spacedim>       &mapping,
+					  const hp::DoFHandler<dim,spacedim>    &dof,
 					  const hp::QCollection<dim>    &q,
 					  SparseMatrix<number>     &matrix,
-					  const Function<dim>      &rhs,
+					  const Function<spacedim>      &rhs,
 					  Vector<double>           &rhs_vector,
-					  const Function<dim> * const coefficient,
-					  const IteratorRange<hp::DoFHandler<dim> >  range,
+					  const Function<spacedim> * const coefficient,
+					  const IteratorRange<hp::DoFHandler<dim,spacedim> >  range,
 					  Threads::ThreadMutex     &mutex);
   create_mass_matrix_2_t p = &MatrixCreator::template create_mass_matrix_2<dim>;
   for (unsigned int thread=0; thread<n_threads; ++thread)
@@ -742,16 +742,16 @@ void MatrixCreator::create_mass_matrix (const hp::MappingCollection<dim>       &
 
 
 
-template <int dim, typename number>
+template <int dim, typename number, int spacedim>
 void
-MatrixCreator::create_mass_matrix_2 (const hp::MappingCollection<dim>       &mapping,
-				     const hp::DoFHandler<dim>    &dof,
+MatrixCreator::create_mass_matrix_2 (const hp::MappingCollection<dim,spacedim>       &mapping,
+				     const hp::DoFHandler<dim,spacedim>    &dof,
 				     const hp::QCollection<dim>    &q,
 				     SparseMatrix<number>     &matrix,
-				     const Function<dim>      &rhs,
+				     const Function<spacedim>      &rhs,
 				     Vector<double>           &rhs_vector,
-				     const Function<dim> * const coefficient,
-				     const IteratorRange<hp::DoFHandler<dim> >  range,
+				     const Function<spacedim> * const coefficient,
+				     const IteratorRange<hp::DoFHandler<dim,spacedim> >  range,
 				     Threads::ThreadMutex     &mutex)
 {
   UpdateFlags update_flags = UpdateFlags(update_values    |
@@ -760,7 +760,7 @@ MatrixCreator::create_mass_matrix_2 (const hp::MappingCollection<dim>       &map
   if (coefficient != 0)
     update_flags = UpdateFlags (update_flags | update_quadrature_points);
 
-  hp::FEValues<dim> x_fe_values (mapping, dof.get_fe(), q, update_flags);
+  hp::FEValues<dim,spacedim> x_fe_values (mapping, dof.get_fe(), q, update_flags);
     
   const unsigned int n_components  = dof.get_fe().n_components();
 
@@ -776,15 +776,15 @@ MatrixCreator::create_mass_matrix_2 (const hp::MappingCollection<dim>       &map
   
   std::vector<unsigned int> dof_indices;
   
-  typename hp::DoFHandler<dim>::active_cell_iterator cell = range.first;
+  typename hp::DoFHandler<dim,spacedim>::active_cell_iterator cell = range.first;
   for (; cell!=range.second; ++cell)
     {
       x_fe_values.reinit (cell);
-      const FEValues<dim> &fe_values = x_fe_values.get_present_fe_values ();
+      const FEValues<dim,spacedim> &fe_values = x_fe_values.get_present_fe_values ();
 
       const unsigned int dofs_per_cell = fe_values.dofs_per_cell,
 			 n_q_points    = fe_values.n_quadrature_points;
-      const FiniteElement<dim>    &fe  = fe_values.get_fe();
+      const FiniteElement<dim,spacedim>    &fe  = fe_values.get_fe();
 
       cell_matrix.reinit (dofs_per_cell, dofs_per_cell);
       local_rhs.reinit (dofs_per_cell);
@@ -891,13 +891,13 @@ MatrixCreator::create_mass_matrix_2 (const hp::MappingCollection<dim>       &map
 
 
 
-template <int dim, typename number>
-void MatrixCreator::create_mass_matrix (const hp::DoFHandler<dim>    &dof,
+template <int dim, typename number, int spacedim>
+void MatrixCreator::create_mass_matrix (const hp::DoFHandler<dim,spacedim>    &dof,
 					const hp::QCollection<dim>    &q,
 					SparseMatrix<number>     &matrix,
-					const Function<dim>      &rhs,
+					const Function<spacedim>      &rhs,
 					Vector<double>           &rhs_vector,
-					const Function<dim> * const coefficient)
+					const Function<spacedim> * const coefficient)
 {
   Assert (DEAL_II_COMPAT_MAPPING, ExcCompatibility("mapping"));
   create_mass_matrix(hp::StaticMappingQ1<dim>::mapping_collection, dof, q,
@@ -909,15 +909,32 @@ void MatrixCreator::create_mass_matrix (const hp::DoFHandler<dim>    &dof,
 
 #if deal_II_dimension == 1
 
-template <int dim>
-void MatrixCreator::create_boundary_mass_matrix (const Mapping<dim>&,
-						 const DoFHandler<dim>&,
-						 const Quadrature<dim-1>&,
+template <>
+void MatrixCreator::create_boundary_mass_matrix (const Mapping<1,1>&,
+						 const DoFHandler<1,1>&,
+						 const Quadrature<0>&,
 						 SparseMatrix<double>&,
-						 const typename FunctionMap<dim>::type&,
+						 const FunctionMap<1>::type&,
 						 Vector<double>&,
 						 std::vector<unsigned int>&,
-						 const Function<dim>* const,
+						 const Function<1>* const,
+						 std::vector<unsigned int>)
+{
+				   // what would that be in 1d? the
+				   // identity matrix on the boundary
+				   // dofs?
+  Assert (false, ExcNotImplemented());
+}
+
+template <>
+void MatrixCreator::create_boundary_mass_matrix (const Mapping<1,2>&,
+						 const DoFHandler<1,2>&,
+						 const Quadrature<0>&,
+						 SparseMatrix<double>&,
+						 const FunctionMap<2>::type&,
+						 Vector<double>&,
+						 std::vector<unsigned int>&,
+						 const Function<2>* const,
 						 std::vector<unsigned int>)
 {
 				   // what would that be in 1d? the
@@ -931,19 +948,19 @@ void MatrixCreator::create_boundary_mass_matrix (const Mapping<dim>&,
 
 
 
-template <int dim>
+template <int dim, int spacedim>
 void
-MatrixCreator::create_boundary_mass_matrix (const Mapping<dim>        &mapping,
-					    const DoFHandler<dim>     &dof,
-					    const Quadrature<dim-1>   &q,
-					    SparseMatrix<double>      &matrix,
-					    const typename FunctionMap<dim>::type         &boundary_functions,
+MatrixCreator::create_boundary_mass_matrix (const Mapping<dim, spacedim>  &mapping,
+					    const DoFHandler<dim,spacedim> &dof,
+					    const Quadrature<dim-1>  &q,
+					    SparseMatrix<double>  &matrix,
+					    const typename FunctionMap<spacedim>::type  &boundary_functions,
 					    Vector<double>            &rhs_vector,
 					    std::vector<unsigned int> &dof_to_boundary_mapping,
-					    const Function<dim> * const coefficient,
+					    const Function<spacedim> * const coefficient,
 					    std::vector<unsigned int> component_mapping)
 {
-  const FiniteElement<dim> &fe = dof.get_fe();
+  const FiniteElement<dim,spacedim> &fe = dof.get_fe();
   const unsigned int n_components  = fe.n_components();
   
   Assert (matrix.n() == dof.n_boundary_dofs(boundary_functions),
@@ -971,7 +988,7 @@ MatrixCreator::create_boundary_mass_matrix (const Mapping<dim>        &mapping,
 
 				   // define starting and end point
 				   // for each thread
-  typedef typename DoFHandler<dim>::active_cell_iterator active_cell_iterator;  
+  typedef typename DoFHandler<dim,spacedim>::active_cell_iterator active_cell_iterator;  
   std::vector<std::pair<active_cell_iterator,active_cell_iterator> > thread_ranges
     = Threads::split_range<active_cell_iterator> (dof.begin_active(),
 						  dof.end(), n_threads);
@@ -980,22 +997,22 @@ MatrixCreator::create_boundary_mass_matrix (const Mapping<dim>        &mapping,
 				   // the matrix
   Threads::ThreadMutex mutex;
 
-  typedef boost::tuple<const Mapping<dim>&,
-    const DoFHandler<dim>&,
+  typedef boost::tuple<const Mapping<dim,spacedim>&,
+    const DoFHandler<dim,spacedim>&,
     const Quadrature<dim-1>&> Commons;
   
 				   // then assemble in parallel
   typedef void (*create_boundary_mass_matrix_1_t)
       (Commons,
        SparseMatrix<double>      &matrix,
-       const typename FunctionMap<dim>::type &boundary_functions,
+       const typename FunctionMap<spacedim>::type &boundary_functions,
        Vector<double>            &rhs_vector,
        std::vector<unsigned int> &dof_to_boundary_mapping,
-       const Function<dim> * const coefficient,
+       const Function<spacedim> * const coefficient,
        const std::vector<unsigned int>& component_mapping,
-       const IteratorRange<DoFHandler<dim> >   range,
+       const IteratorRange<DoFHandler<dim,spacedim> >   range,
        Threads::ThreadMutex      &mutex);
-  create_boundary_mass_matrix_1_t p = &MatrixCreator::template create_boundary_mass_matrix_1<dim>;
+  create_boundary_mass_matrix_1_t p = &MatrixCreator::template create_boundary_mass_matrix_1<dim,spacedim>;
   for (unsigned int thread=0; thread<n_threads; ++thread)
     threads += Threads::spawn (p)(Commons(mapping, dof, q), matrix,
                                   boundary_functions, rhs_vector,
@@ -1007,29 +1024,48 @@ MatrixCreator::create_boundary_mass_matrix (const Mapping<dim>        &mapping,
 
 
 
-template <int dim>
+template <>
 void
 MatrixCreator::
-create_boundary_mass_matrix_1 (boost::tuple<const Mapping<dim>&,
-			       const DoFHandler<dim>&,
-			       const Quadrature<dim-1>&> commons,
+create_boundary_mass_matrix_1<2,3> (boost::tuple<const Mapping<2,3> &,
+				    const DoFHandler<2,3> &,
+			            const Quadrature<1> & > ,
+			            SparseMatrix<double>  &,
+			            const FunctionMap<3>::type &,
+			            Vector<double> &,
+			            std::vector<unsigned int> &,
+			            const Function<3> * const ,
+			            const std::vector<unsigned int> &,
+				    const IteratorRange<DoFHandler<2,3> > ,
+			            Threads::ThreadMutex &)
+{
+  Assert(false,ExcNotImplemented());
+}
+
+
+template <int dim, int spacedim>
+void
+MatrixCreator::
+create_boundary_mass_matrix_1 (boost::tuple<const Mapping<dim, spacedim> &,
+			       const DoFHandler<dim,spacedim> &,
+			       const Quadrature<dim-1> & >  commons,
 			       SparseMatrix<double>      &matrix,
-			       const typename FunctionMap<dim>::type &boundary_functions,
+			       const typename FunctionMap<spacedim>::type &boundary_functions,
 			       Vector<double>            &rhs_vector,
 			       std::vector<unsigned int> &dof_to_boundary_mapping,
-			       const Function<dim> * const coefficient,
+			       const Function<spacedim> * const coefficient,
 			       const std::vector<unsigned int>& component_mapping,
-			       const IteratorRange<DoFHandler<dim> >   range,
+			       const IteratorRange<DoFHandler<dim,spacedim> >   range,
 			       Threads::ThreadMutex      &mutex)
 {
 				   // All assertions for this function
 				   // are in the calling function
 				   // before creating threads.
-  const Mapping<dim>& mapping = boost::get<0>(commons);
-  const DoFHandler<dim>& dof = boost::get<1>(commons);
+  const Mapping<dim,spacedim>& mapping = boost::get<0>(commons);
+  const DoFHandler<dim,spacedim>& dof = boost::get<1>(commons);
   const Quadrature<dim-1>& q = boost::get<2>(commons);
   
-  const FiniteElement<dim> &fe = dof.get_fe();
+  const FiniteElement<dim,spacedim> &fe = dof.get_fe();
   const unsigned int n_components  = fe.n_components();
   const unsigned int n_function_components = boundary_functions.begin()->second->n_components;
   const bool         fe_is_system  = (n_components != 1);
@@ -1068,7 +1104,7 @@ create_boundary_mass_matrix_1 (boost::tuple<const Mapping<dim>&,
 				   // flag whether it is on the face
   std::vector<bool>         dof_is_on_face(dofs_per_cell);
   
-  typename DoFHandler<dim>::active_cell_iterator cell = range.first;
+  typename DoFHandler<dim,spacedim>::active_cell_iterator cell = range.first;
   for (; cell!=range.second; ++cell)
     for (unsigned int face=0; face<GeometryInfo<dim>::faces_per_cell; ++face)
 				       // check if this face is on that part of
@@ -1124,7 +1160,7 @@ create_boundary_mass_matrix_1 (boost::tuple<const Mapping<dim>&,
 	      
 	      for (unsigned int comp = 0;comp<n_components;++comp)
 		{
-		  const FiniteElement<dim>& base = fe.base_element(fe.component_to_base_index(comp).first);
+		  const FiniteElement<dim,spacedim>& base = fe.base_element(fe.component_to_base_index(comp).first);
 		  const unsigned int bcomp = fe.component_to_base_index(comp).second;
 		  
 		  if (!base.conforms(FiniteElementData<dim>::H1) &&
@@ -1274,18 +1310,18 @@ create_boundary_mass_matrix_1 (boost::tuple<const Mapping<dim>&,
 
 #endif
 
-template <int dim>
-void MatrixCreator::create_boundary_mass_matrix (const DoFHandler<dim>     &dof,
+template <int dim, int spacedim>
+void MatrixCreator::create_boundary_mass_matrix (const DoFHandler<dim,spacedim>     &dof,
 						 const Quadrature<dim-1>   &q,
 						 SparseMatrix<double>      &matrix,
-						 const typename FunctionMap<dim>::type &rhs,
+						 const typename FunctionMap<spacedim>::type &rhs,
 						 Vector<double>            &rhs_vector,
 						 std::vector<unsigned int> &dof_to_boundary_mapping,
-						 const Function<dim> * const a,
+						 const Function<spacedim> * const a,
 						 std::vector<unsigned int> component_mapping)
 {
   Assert (DEAL_II_COMPAT_MAPPING, ExcCompatibility("mapping"));
-  create_boundary_mass_matrix(StaticMappingQ1<dim>::mapping, dof, q,
+  create_boundary_mass_matrix(StaticMappingQ1<dim,spacedim>::mapping, dof, q,
 			      matrix,rhs, rhs_vector, dof_to_boundary_mapping, a, component_mapping);
 }
 
@@ -1293,16 +1329,16 @@ void MatrixCreator::create_boundary_mass_matrix (const DoFHandler<dim>     &dof,
 
 #if deal_II_dimension == 1
 
-template <int dim>
+template <int dim, int spacedim>
 void
-MatrixCreator::create_boundary_mass_matrix (const hp::MappingCollection<dim>&,
-					    const hp::DoFHandler<dim>&,
+MatrixCreator::create_boundary_mass_matrix (const hp::MappingCollection<dim,spacedim>&,
+					    const hp::DoFHandler<dim,spacedim>&,
 					    const hp::QCollection<dim-1>&,
 					    SparseMatrix<double>&,
-					    const typename FunctionMap<dim>::type&,
+					    const typename FunctionMap<spacedim>::type&,
 					    Vector<double>&,
 					    std::vector<unsigned int>&,
-					    const Function<dim>* const,
+					    const Function<spacedim>* const,
 					    std::vector<unsigned int>)
 {
 				   // what would that be in 1d? the
@@ -1315,16 +1351,16 @@ MatrixCreator::create_boundary_mass_matrix (const hp::MappingCollection<dim>&,
 #else
 
 
-template <int dim>
+template <int dim, int spacedim>
 void
-MatrixCreator::create_boundary_mass_matrix (const hp::MappingCollection<dim>        &mapping,
-					    const hp::DoFHandler<dim>     &dof,
+MatrixCreator::create_boundary_mass_matrix (const hp::MappingCollection<dim,spacedim>        &mapping,
+					    const hp::DoFHandler<dim,spacedim>     &dof,
 					    const hp::QCollection<dim-1>   &q,
 					    SparseMatrix<double>      &matrix,
-					    const typename FunctionMap<dim>::type         &boundary_functions,
+					    const typename FunctionMap<spacedim>::type         &boundary_functions,
 					    Vector<double>            &rhs_vector,
 					    std::vector<unsigned int> &dof_to_boundary_mapping,
-					    const Function<dim> * const coefficient,
+					    const Function<spacedim> * const coefficient,
 					    std::vector<unsigned int> component_mapping)
 {
   const hp::FECollection<dim> &fe_collection = dof.get_fe();
@@ -1355,7 +1391,7 @@ MatrixCreator::create_boundary_mass_matrix (const hp::MappingCollection<dim>    
 
 				   // define starting and end point
 				   // for each thread
-  typedef typename hp::DoFHandler<dim>::active_cell_iterator active_cell_iterator;  
+  typedef typename hp::DoFHandler<dim,spacedim>::active_cell_iterator active_cell_iterator;  
   std::vector<std::pair<active_cell_iterator,active_cell_iterator> > thread_ranges
     = Threads::split_range<active_cell_iterator> (dof.begin_active(),
 						  dof.end(), n_threads);
@@ -1372,14 +1408,14 @@ MatrixCreator::create_boundary_mass_matrix (const hp::MappingCollection<dim>    
   typedef void (*create_boundary_mass_matrix_1_t)
       (Commons,
        SparseMatrix<double>      &matrix,
-       const typename FunctionMap<dim>::type &boundary_functions,
+       const typename FunctionMap<spacedim>::type &boundary_functions,
        Vector<double>            &rhs_vector,
        std::vector<unsigned int> &dof_to_boundary_mapping,
-       const Function<dim> * const coefficient,
+       const Function<spacedim> * const coefficient,
        const std::vector<unsigned int>& component_mapping,
-       const IteratorRange<hp::DoFHandler<dim> >   range,
+       const IteratorRange<hp::DoFHandler<dim,spacedim> >   range,
        Threads::ThreadMutex      &mutex);
-  create_boundary_mass_matrix_1_t p = &MatrixCreator::template create_boundary_mass_matrix_1<dim>;
+  create_boundary_mass_matrix_1_t p = &MatrixCreator::template create_boundary_mass_matrix_1<dim,spacedim>;
   for (unsigned int thread=0; thread<n_threads; ++thread)
     threads += Threads::spawn (p)(Commons(mapping, dof, q), matrix,
                                   boundary_functions, rhs_vector,
@@ -1391,25 +1427,25 @@ MatrixCreator::create_boundary_mass_matrix (const hp::MappingCollection<dim>    
 
 
 
-template <int dim>
+template <int dim, int spacedim>
 void
 MatrixCreator::
-create_boundary_mass_matrix_1 (boost::tuple<const hp::MappingCollection<dim>&,
-			       const hp::DoFHandler<dim>&,
-			       const hp::QCollection<dim-1>&> commons,
+create_boundary_mass_matrix_1 (boost::tuple<const hp::MappingCollection<dim,spacedim> &,
+			       const hp::DoFHandler<dim,spacedim> &,
+			       const hp::QCollection<dim-1> &> commons,
 			       SparseMatrix<double>      &matrix,
-			       const typename FunctionMap<dim>::type &boundary_functions,
+			       const typename FunctionMap<spacedim>::type &boundary_functions,
 			       Vector<double>            &rhs_vector,
 			       std::vector<unsigned int> &dof_to_boundary_mapping,
-			       const Function<dim> * const coefficient,
+			       const Function<spacedim> * const coefficient,
 			       const std::vector<unsigned int>& component_mapping,
-			       const IteratorRange<hp::DoFHandler<dim> >   range,
+			       const IteratorRange<hp::DoFHandler<dim,spacedim> >   range,
 			       Threads::ThreadMutex      &mutex)
 {
   const hp::MappingCollection<dim>& mapping = boost::get<0>(commons);
   const hp::DoFHandler<dim>& dof = boost::get<1>(commons);
   const hp::QCollection<dim-1>& q = boost::get<2>(commons);
-  const hp::FECollection<dim> &fe_collection = dof.get_fe();
+  const hp::FECollection<dim,spacedim> &fe_collection = dof.get_fe();
   const unsigned int n_components  = fe_collection.n_components();
   const unsigned int n_function_components = boundary_functions.begin()->second->n_components;
   const bool         fe_is_system  = (n_components != 1);
@@ -1419,7 +1455,7 @@ create_boundary_mass_matrix_1 (boost::tuple<const hp::MappingCollection<dim>&,
       unsigned int max_element = 0;
       for (std::vector<unsigned int>::const_iterator i=dof_to_boundary_mapping.begin();
 	   i!=dof_to_boundary_mapping.end(); ++i)
-	if ((*i != hp::DoFHandler<dim>::invalid_dof_index) &&
+	if ((*i != hp::DoFHandler<dim,spacedim>::invalid_dof_index) &&
 	    (*i > max_element))
 	  max_element = *i;
       Assert (max_element  == matrix.n()-1, ExcInternalError());
@@ -1455,7 +1491,7 @@ create_boundary_mass_matrix_1 (boost::tuple<const hp::MappingCollection<dim>&,
   std::vector<bool>         dof_is_on_face(max_dofs_per_cell);
 
 
-  typename hp::DoFHandler<dim>::active_cell_iterator cell = range.first;
+  typename hp::DoFHandler<dim,spacedim>::active_cell_iterator cell = range.first;
   for (; cell!=range.second; ++cell)
     for (unsigned int face=0; face<GeometryInfo<dim>::faces_per_cell; ++face)
 				       // check if this face is on that part of
@@ -1467,7 +1503,7 @@ create_boundary_mass_matrix_1 (boost::tuple<const hp::MappingCollection<dim>&,
 
 	  const FEFaceValues<dim> &fe_values = x_fe_values.get_present_fe_values ();
 
-	  const FiniteElement<dim> &fe = cell->get_fe();
+	  const FiniteElement<dim,spacedim> &fe = cell->get_fe();
 	  const unsigned int dofs_per_cell = fe.dofs_per_cell;
 	  const unsigned int dofs_per_face = fe.dofs_per_face;
 	  
@@ -1763,29 +1799,29 @@ create_boundary_mass_matrix_1 (boost::tuple<const hp::MappingCollection<dim>&,
 
 #endif
 
-template <int dim>
-void MatrixCreator::create_boundary_mass_matrix (const hp::DoFHandler<dim>     &dof,
+template <int dim, int spacedim>
+void MatrixCreator::create_boundary_mass_matrix (const hp::DoFHandler<dim,spacedim>     &dof,
 						 const hp::QCollection<dim-1>   &q,
 						 SparseMatrix<double>      &matrix,
-						 const typename FunctionMap<dim>::type &rhs,
+						 const typename FunctionMap<spacedim>::type &rhs,
 						 Vector<double>            &rhs_vector,
 						 std::vector<unsigned int> &dof_to_boundary_mapping,
-						 const Function<dim> * const a,
+						 const Function<spacedim> * const a,
 						 std::vector<unsigned int> component_mapping)
 {
   Assert (DEAL_II_COMPAT_MAPPING, ExcCompatibility("mapping"));
-  create_boundary_mass_matrix(hp::StaticMappingQ1<dim>::mapping_collection, dof, q,
+  create_boundary_mass_matrix(hp::StaticMappingQ1<dim,spacedim>::mapping_collection, dof, q,
 			      matrix,rhs, rhs_vector, dof_to_boundary_mapping, a, component_mapping);
 }
 
 
 
-template <int dim>
-void MatrixCreator::create_laplace_matrix (const Mapping<dim>       &mapping,
-					   const DoFHandler<dim>    &dof,
+template <int dim, int spacedim>
+void MatrixCreator::create_laplace_matrix (const Mapping<dim, spacedim>       &mapping,
+					   const DoFHandler<dim,spacedim>    &dof,
 					   const Quadrature<dim>    &q,
 					   SparseMatrix<double>     &matrix,
-					   const Function<dim> * const coefficient)
+					   const Function<spacedim> * const coefficient)
 {
   Assert (matrix.m() == dof.n_dofs(),
 	  ExcDimensionMismatch (matrix.m(), dof.n_dofs()));
@@ -1797,7 +1833,7 @@ void MatrixCreator::create_laplace_matrix (const Mapping<dim>       &mapping,
 
 				   // define starting and end point
 				   // for each thread
-  typedef typename DoFHandler<dim>::active_cell_iterator active_cell_iterator;  
+  typedef typename DoFHandler<dim,spacedim>::active_cell_iterator active_cell_iterator;  
   std::vector<std::pair<active_cell_iterator,active_cell_iterator> > thread_ranges
     = Threads::split_range<active_cell_iterator> (dof.begin_active(),
 						  dof.end(), n_threads);
@@ -1807,12 +1843,12 @@ void MatrixCreator::create_laplace_matrix (const Mapping<dim>       &mapping,
   Threads::ThreadMutex mutex;
   
 				   // then assemble in parallel
-  typedef void (*create_laplace_matrix_1_t) (const Mapping<dim>       &mapping,
-					     const DoFHandler<dim>    &dof,
+  typedef void (*create_laplace_matrix_1_t) (const Mapping<dim, spacedim>       &mapping,
+					     const DoFHandler<dim,spacedim>    &dof,
 					     const Quadrature<dim>    &q,
 					     SparseMatrix<double>     &matrix,
-					     const Function<dim> * const coefficient,
-					     const IteratorRange<DoFHandler<dim> >  range,
+					     const Function<spacedim> * const coefficient,
+					     const IteratorRange<DoFHandler<dim,spacedim> >  range,
 					     Threads::ThreadMutex     &mutex);
   create_laplace_matrix_1_t p = &MatrixCreator::template create_laplace_matrix_1<dim>;
   for (unsigned int thread=0; thread<n_threads; ++thread)
@@ -1823,13 +1859,13 @@ void MatrixCreator::create_laplace_matrix (const Mapping<dim>       &mapping,
 
 
 
-template <int dim>
-void MatrixCreator::create_laplace_matrix_1 (const Mapping<dim>       &mapping,
-					     const DoFHandler<dim>    &dof,
+template <int dim, int spacedim>
+void MatrixCreator::create_laplace_matrix_1 (const Mapping<dim, spacedim>       &mapping,
+					     const DoFHandler<dim,spacedim>    &dof,
 					     const Quadrature<dim>    &q,
 					     SparseMatrix<double>     &matrix,
-					     const Function<dim> * const coefficient,
-					     const IteratorRange<DoFHandler<dim> >  range,
+					     const Function<spacedim> * const coefficient,
+					     const IteratorRange<DoFHandler<dim,spacedim> >  range,
 					     Threads::ThreadMutex     &mutex)
 {
   UpdateFlags update_flags = UpdateFlags(update_JxW_values |
@@ -1837,11 +1873,11 @@ void MatrixCreator::create_laplace_matrix_1 (const Mapping<dim>       &mapping,
   if (coefficient != 0)
     update_flags = UpdateFlags (update_flags | update_quadrature_points);
 
-  FEValues<dim> fe_values (mapping, dof.get_fe(), q, update_flags);
+  FEValues<dim,spacedim> fe_values (mapping, dof.get_fe(), q, update_flags);
     
   const unsigned int dofs_per_cell = fe_values.dofs_per_cell,
 		     n_q_points    = fe_values.n_quadrature_points;
-  const FiniteElement<dim>    &fe  = fe_values.get_fe();
+  const FiniteElement<dim,spacedim>    &fe  = fe_values.get_fe();
   const unsigned int n_components  = fe.n_components();
 
   Assert(coefficient == 0 ||
@@ -1855,7 +1891,7 @@ void MatrixCreator::create_laplace_matrix_1 (const Mapping<dim>       &mapping,
   
   std::vector<unsigned int> dof_indices (dofs_per_cell);
   
-  typename DoFHandler<dim>::active_cell_iterator cell = range.first;
+  typename DoFHandler<dim,spacedim>::active_cell_iterator cell = range.first;
   for (; cell!=range.second; ++cell)
     {
       fe_values.reinit (cell);
@@ -1946,11 +1982,11 @@ void MatrixCreator::create_laplace_matrix_1 (const Mapping<dim>       &mapping,
 
 
 
-template <int dim>
-void MatrixCreator::create_laplace_matrix (const DoFHandler<dim>    &dof,
+template <int dim, int spacedim>
+void MatrixCreator::create_laplace_matrix (const DoFHandler<dim,spacedim>    &dof,
 					   const Quadrature<dim>    &q,
 					   SparseMatrix<double>     &matrix,
-					   const Function<dim> * const coefficient)
+					   const Function<spacedim> * const coefficient)
 {
   Assert (DEAL_II_COMPAT_MAPPING, ExcCompatibility("mapping"));
   create_laplace_matrix(StaticMappingQ1<dim>::mapping, dof, q, matrix, coefficient);
@@ -1958,14 +1994,14 @@ void MatrixCreator::create_laplace_matrix (const DoFHandler<dim>    &dof,
 
 
 
-template <int dim>
-void MatrixCreator::create_laplace_matrix (const Mapping<dim>       &mapping,
-					   const DoFHandler<dim>    &dof,
+template <int dim, int spacedim>
+void MatrixCreator::create_laplace_matrix (const Mapping<dim, spacedim>       &mapping,
+					   const DoFHandler<dim,spacedim>    &dof,
 					   const Quadrature<dim>    &q,
 					   SparseMatrix<double>     &matrix,
-					   const Function<dim>      &rhs,
+					   const Function<spacedim>      &rhs,
 					   Vector<double>           &rhs_vector,
-					   const Function<dim> * const coefficient)
+					   const Function<spacedim> * const coefficient)
 {
   Assert (matrix.m() == dof.n_dofs(),
 	  ExcDimensionMismatch (matrix.m(), dof.n_dofs()));
@@ -1977,7 +2013,7 @@ void MatrixCreator::create_laplace_matrix (const Mapping<dim>       &mapping,
 
 				   // define starting and end point
 				   // for each thread
-  typedef typename DoFHandler<dim>::active_cell_iterator active_cell_iterator;  
+  typedef typename DoFHandler<dim,spacedim>::active_cell_iterator active_cell_iterator;  
   std::vector<std::pair<active_cell_iterator,active_cell_iterator> > thread_ranges
     = Threads::split_range<active_cell_iterator> (dof.begin_active(),
 						  dof.end(), n_threads);
@@ -1987,14 +2023,14 @@ void MatrixCreator::create_laplace_matrix (const Mapping<dim>       &mapping,
   Threads::ThreadMutex mutex;
   
 				   // then assemble in parallel
-  typedef void (*create_laplace_matrix_2_t) (const Mapping<dim>       &mapping,
-					     const DoFHandler<dim>    &dof,
+  typedef void (*create_laplace_matrix_2_t) (const Mapping<dim, spacedim>       &mapping,
+					     const DoFHandler<dim,spacedim>    &dof,
 					     const Quadrature<dim>    &q,
 					     SparseMatrix<double>     &matrix,
-					     const Function<dim>      &rhs,
+					     const Function<spacedim>      &rhs,
 					     Vector<double>           &rhs_vector,
-					     const Function<dim> * const coefficient,
-					     const IteratorRange<DoFHandler<dim> >  range,
+					     const Function<spacedim> * const coefficient,
+					     const IteratorRange<DoFHandler<dim,spacedim> >  range,
 					     Threads::ThreadMutex     &mutex);
   create_laplace_matrix_2_t p = &MatrixCreator::template create_laplace_matrix_2<dim>;
   for (unsigned int thread=0; thread<n_threads; ++thread)
@@ -2006,16 +2042,16 @@ void MatrixCreator::create_laplace_matrix (const Mapping<dim>       &mapping,
 
 
 
-template <int dim>
+template <int dim, int spacedim>
 void
-MatrixCreator::create_laplace_matrix_2 (const Mapping<dim>       &mapping,
-					const DoFHandler<dim>    &dof,
+MatrixCreator::create_laplace_matrix_2 (const Mapping<dim, spacedim>       &mapping,
+					const DoFHandler<dim,spacedim>    &dof,
 					const Quadrature<dim>    &q,
 					SparseMatrix<double>     &matrix,
-					const Function<dim>      &rhs,
+					const Function<spacedim>      &rhs,
 					Vector<double>           &rhs_vector,
-					const Function<dim> * const coefficient,
-					const IteratorRange<DoFHandler<dim> >  range,
+					const Function<spacedim> * const coefficient,
+					const IteratorRange<DoFHandler<dim,spacedim> >  range,
 					Threads::ThreadMutex     &mutex)
 {
   UpdateFlags update_flags = UpdateFlags(update_values    |
@@ -2025,11 +2061,11 @@ MatrixCreator::create_laplace_matrix_2 (const Mapping<dim>       &mapping,
   if (coefficient != 0)
     update_flags = UpdateFlags (update_flags | update_quadrature_points);
 
-  FEValues<dim> fe_values (mapping, dof.get_fe(), q, update_flags);
+  FEValues<dim,spacedim> fe_values (mapping, dof.get_fe(), q, update_flags);
     
   const unsigned int dofs_per_cell = fe_values.dofs_per_cell,
 		     n_q_points    = fe_values.n_quadrature_points;
-  const FiniteElement<dim>    &fe  = fe_values.get_fe();
+  const FiniteElement<dim,spacedim>    &fe  = fe_values.get_fe();
   const unsigned int n_components  = fe.n_components();
 
   Assert(coefficient == 0 ||
@@ -2045,7 +2081,7 @@ MatrixCreator::create_laplace_matrix_2 (const Mapping<dim>       &mapping,
   
   std::vector<unsigned int> dof_indices (dofs_per_cell);
   
-  typename DoFHandler<dim>::active_cell_iterator cell = range.first;
+  typename DoFHandler<dim,spacedim>::active_cell_iterator cell = range.first;
   for (; cell!=range.second; ++cell)
     {
       fe_values.reinit (cell);
@@ -2146,13 +2182,13 @@ MatrixCreator::create_laplace_matrix_2 (const Mapping<dim>       &mapping,
 
 
 
-template <int dim>
-void MatrixCreator::create_laplace_matrix (const DoFHandler<dim>    &dof,
+template <int dim, int spacedim>
+void MatrixCreator::create_laplace_matrix (const DoFHandler<dim,spacedim>    &dof,
 					   const Quadrature<dim>    &q,
 					   SparseMatrix<double>     &matrix,
-					   const Function<dim>      &rhs,
+					   const Function<spacedim>      &rhs,
 					   Vector<double>           &rhs_vector,
-					   const Function<dim> * const coefficient)
+					   const Function<spacedim> * const coefficient)
 {
   Assert (DEAL_II_COMPAT_MAPPING, ExcCompatibility("mapping"));
   create_laplace_matrix(StaticMappingQ1<dim>::mapping, dof, q,
@@ -2161,12 +2197,12 @@ void MatrixCreator::create_laplace_matrix (const DoFHandler<dim>    &dof,
 
 
 
-template <int dim>
-void MatrixCreator::create_laplace_matrix (const hp::MappingCollection<dim>       &mapping,
-					   const hp::DoFHandler<dim>    &dof,
+template <int dim, int spacedim>
+void MatrixCreator::create_laplace_matrix (const hp::MappingCollection<dim,spacedim>       &mapping,
+					   const hp::DoFHandler<dim,spacedim>    &dof,
 					   const hp::QCollection<dim>    &q,
 					   SparseMatrix<double>     &matrix,
-					   const Function<dim> * const coefficient)
+					   const Function<spacedim> * const coefficient)
 {
   Assert (matrix.m() == dof.n_dofs(),
 	  ExcDimensionMismatch (matrix.m(), dof.n_dofs()));
@@ -2178,7 +2214,7 @@ void MatrixCreator::create_laplace_matrix (const hp::MappingCollection<dim>     
 
 				   // define starting and end point
 				   // for each thread
-  typedef typename hp::DoFHandler<dim>::active_cell_iterator active_cell_iterator;  
+  typedef typename hp::DoFHandler<dim,spacedim>::active_cell_iterator active_cell_iterator;  
   std::vector<std::pair<active_cell_iterator,active_cell_iterator> > thread_ranges
     = Threads::split_range<active_cell_iterator> (dof.begin_active(),
 						  dof.end(), n_threads);
@@ -2188,12 +2224,12 @@ void MatrixCreator::create_laplace_matrix (const hp::MappingCollection<dim>     
   Threads::ThreadMutex mutex;
   
 				   // then assemble in parallel
-  typedef void (*create_laplace_matrix_1_t) (const hp::MappingCollection<dim>       &mapping,
-					     const hp::DoFHandler<dim>    &dof,
+  typedef void (*create_laplace_matrix_1_t) (const hp::MappingCollection<dim,spacedim>       &mapping,
+					     const hp::DoFHandler<dim,spacedim>    &dof,
 					     const hp::QCollection<dim>    &q,
 					     SparseMatrix<double>     &matrix,
-					     const Function<dim> * const coefficient,
-					     const IteratorRange<hp::DoFHandler<dim> >  range,
+					     const Function<spacedim> * const coefficient,
+					     const IteratorRange<hp::DoFHandler<dim,spacedim> >  range,
 					     Threads::ThreadMutex     &mutex);
   create_laplace_matrix_1_t p = &MatrixCreator::template create_laplace_matrix_1<dim>;
   for (unsigned int thread=0; thread<n_threads; ++thread)
@@ -2204,14 +2240,14 @@ void MatrixCreator::create_laplace_matrix (const hp::MappingCollection<dim>     
 
 
 
-template <int dim>
+template <int dim, int spacedim>
 void
-MatrixCreator::create_laplace_matrix_1 (const hp::MappingCollection<dim>       &mapping,
-					const hp::DoFHandler<dim>    &dof,
+MatrixCreator::create_laplace_matrix_1 (const hp::MappingCollection<dim,spacedim>       &mapping,
+					const hp::DoFHandler<dim,spacedim>    &dof,
 					const hp::QCollection<dim>    &q,
 					SparseMatrix<double>     &matrix,
-					const Function<dim> * const coefficient,
-					const IteratorRange<hp::DoFHandler<dim> >  range,
+					const Function<spacedim> * const coefficient,
+					const IteratorRange<hp::DoFHandler<dim,spacedim> >  range,
 					Threads::ThreadMutex     &mutex)
 {
   UpdateFlags update_flags = UpdateFlags(update_gradients |
@@ -2219,7 +2255,7 @@ MatrixCreator::create_laplace_matrix_1 (const hp::MappingCollection<dim>       &
   if (coefficient != 0)
     update_flags = UpdateFlags (update_flags | update_quadrature_points);
 
-  hp::FEValues<dim> x_fe_values (mapping, dof.get_fe(), q, update_flags);
+  hp::FEValues<dim,spacedim> x_fe_values (mapping, dof.get_fe(), q, update_flags);
     
   const unsigned int n_components  = dof.get_fe().n_components();
 
@@ -2233,15 +2269,15 @@ MatrixCreator::create_laplace_matrix_1 (const hp::MappingCollection<dim>       &
   
   std::vector<unsigned int> dof_indices;
   
-  typename hp::DoFHandler<dim>::active_cell_iterator cell = range.first;
+  typename hp::DoFHandler<dim,spacedim>::active_cell_iterator cell = range.first;
   for (; cell!=range.second; ++cell)
     {
       x_fe_values.reinit (cell);
-      const FEValues<dim> &fe_values = x_fe_values.get_present_fe_values ();
+      const FEValues<dim,spacedim> &fe_values = x_fe_values.get_present_fe_values ();
 
       const unsigned int dofs_per_cell = fe_values.dofs_per_cell,
 			 n_q_points    = fe_values.n_quadrature_points;
-      const FiniteElement<dim>    &fe  = fe_values.get_fe();
+      const FiniteElement<dim,spacedim>    &fe  = fe_values.get_fe();
 
       cell_matrix.reinit (dofs_per_cell, dofs_per_cell);
       coefficient_values.resize (n_q_points);
@@ -2335,11 +2371,11 @@ MatrixCreator::create_laplace_matrix_1 (const hp::MappingCollection<dim>       &
 
 
 
-template <int dim>
-void MatrixCreator::create_laplace_matrix (const hp::DoFHandler<dim>    &dof,
+template <int dim, int spacedim>
+void MatrixCreator::create_laplace_matrix (const hp::DoFHandler<dim,spacedim>    &dof,
 					   const hp::QCollection<dim>    &q,
 					   SparseMatrix<double>     &matrix,
-					   const Function<dim> * const coefficient)
+					   const Function<spacedim> * const coefficient)
 {
   Assert (DEAL_II_COMPAT_MAPPING, ExcCompatibility("mapping"));
   create_laplace_matrix(hp::StaticMappingQ1<dim>::mapping_collection, dof, q, matrix, coefficient);
@@ -2347,14 +2383,14 @@ void MatrixCreator::create_laplace_matrix (const hp::DoFHandler<dim>    &dof,
 
 
 
-template <int dim>
-void MatrixCreator::create_laplace_matrix (const hp::MappingCollection<dim>       &mapping,
-					   const hp::DoFHandler<dim>    &dof,
+template <int dim, int spacedim>
+void MatrixCreator::create_laplace_matrix (const hp::MappingCollection<dim,spacedim>       &mapping,
+					   const hp::DoFHandler<dim,spacedim>    &dof,
 					   const hp::QCollection<dim>    &q,
 					   SparseMatrix<double>     &matrix,
-					   const Function<dim>      &rhs,
+					   const Function<spacedim>      &rhs,
 					   Vector<double>           &rhs_vector,
-					   const Function<dim> * const coefficient)
+					   const Function<spacedim> * const coefficient)
 {
   Assert (matrix.m() == dof.n_dofs(),
 	  ExcDimensionMismatch (matrix.m(), dof.n_dofs()));
@@ -2366,7 +2402,7 @@ void MatrixCreator::create_laplace_matrix (const hp::MappingCollection<dim>     
 
 				   // define starting and end point
 				   // for each thread
-  typedef typename hp::DoFHandler<dim>::active_cell_iterator active_cell_iterator;  
+  typedef typename hp::DoFHandler<dim,spacedim>::active_cell_iterator active_cell_iterator;  
   std::vector<std::pair<active_cell_iterator,active_cell_iterator> > thread_ranges
     = Threads::split_range<active_cell_iterator> (dof.begin_active(),
 						  dof.end(), n_threads);
@@ -2376,14 +2412,14 @@ void MatrixCreator::create_laplace_matrix (const hp::MappingCollection<dim>     
   Threads::ThreadMutex mutex;
   
 				   // then assemble in parallel
-  typedef void (*create_laplace_matrix_2_t) (const hp::MappingCollection<dim>       &mapping,
-					     const hp::DoFHandler<dim>    &dof,
+  typedef void (*create_laplace_matrix_2_t) (const hp::MappingCollection<dim,spacedim>       &mapping,
+					     const hp::DoFHandler<dim,spacedim>    &dof,
 					     const hp::QCollection<dim>    &q,
 					     SparseMatrix<double>     &matrix,
-					     const Function<dim>      &rhs,
+					     const Function<spacedim>      &rhs,
 					     Vector<double>           &rhs_vector,
-					     const Function<dim> * const coefficient,
-					     const IteratorRange<hp::DoFHandler<dim> >  range,
+					     const Function<spacedim> * const coefficient,
+					     const IteratorRange<hp::DoFHandler<dim,spacedim> >  range,
 					     Threads::ThreadMutex     &mutex);
   create_laplace_matrix_2_t p = &MatrixCreator::template create_laplace_matrix_2<dim>;
   for (unsigned int thread=0; thread<n_threads; ++thread)
@@ -2395,16 +2431,16 @@ void MatrixCreator::create_laplace_matrix (const hp::MappingCollection<dim>     
 
 
 
-template <int dim>
+template <int dim, int spacedim>
 void
-MatrixCreator::create_laplace_matrix_2 (const hp::MappingCollection<dim>       &mapping,
-					const hp::DoFHandler<dim>    &dof,
+MatrixCreator::create_laplace_matrix_2 (const hp::MappingCollection<dim,spacedim>       &mapping,
+					const hp::DoFHandler<dim,spacedim>    &dof,
 					const hp::QCollection<dim>    &q,
 					SparseMatrix<double>     &matrix,
-					const Function<dim>      &rhs,
+					const Function<spacedim>      &rhs,
 					Vector<double>           &rhs_vector,
-					const Function<dim> * const coefficient,
-					const IteratorRange<hp::DoFHandler<dim> >  range,
+					const Function<spacedim> * const coefficient,
+					const IteratorRange<hp::DoFHandler<dim,spacedim> >  range,
 					Threads::ThreadMutex     &mutex)
 {
   UpdateFlags update_flags = UpdateFlags(update_values    |
@@ -2414,7 +2450,7 @@ MatrixCreator::create_laplace_matrix_2 (const hp::MappingCollection<dim>       &
   if (coefficient != 0)
     update_flags = UpdateFlags (update_flags | update_quadrature_points);
 
-  hp::FEValues<dim> x_fe_values (mapping, dof.get_fe(), q, update_flags);
+  hp::FEValues<dim,spacedim> x_fe_values (mapping, dof.get_fe(), q, update_flags);
     
   const unsigned int n_components  = dof.get_fe().n_components();
 
@@ -2430,15 +2466,15 @@ MatrixCreator::create_laplace_matrix_2 (const hp::MappingCollection<dim>       &
   
   std::vector<unsigned int> dof_indices;
   
-  typename hp::DoFHandler<dim>::active_cell_iterator cell = range.first;
+  typename hp::DoFHandler<dim,spacedim>::active_cell_iterator cell = range.first;
   for (; cell!=range.second; ++cell)
     {
       x_fe_values.reinit (cell);
-      const FEValues<dim> &fe_values = x_fe_values.get_present_fe_values ();
+      const FEValues<dim,spacedim> &fe_values = x_fe_values.get_present_fe_values ();
 
       const unsigned int dofs_per_cell = fe_values.dofs_per_cell,
 			 n_q_points    = fe_values.n_quadrature_points;
-      const FiniteElement<dim>    &fe  = fe_values.get_fe();
+      const FiniteElement<dim,spacedim>    &fe  = fe_values.get_fe();
 
       cell_matrix.reinit (dofs_per_cell, dofs_per_cell);
       local_rhs.reinit (dofs_per_cell);
@@ -2545,13 +2581,13 @@ MatrixCreator::create_laplace_matrix_2 (const hp::MappingCollection<dim>       &
 
 
 
-template <int dim>
-void MatrixCreator::create_laplace_matrix (const hp::DoFHandler<dim>    &dof,
+template <int dim, int spacedim>
+void MatrixCreator::create_laplace_matrix (const hp::DoFHandler<dim,spacedim>    &dof,
 					   const hp::QCollection<dim>    &q,
 					   SparseMatrix<double>     &matrix,
-					   const Function<dim>      &rhs,
+					   const Function<spacedim>      &rhs,
 					   Vector<double>           &rhs_vector,
-					   const Function<dim> * const coefficient)
+					   const Function<spacedim> * const coefficient)
 {
   Assert (DEAL_II_COMPAT_MAPPING, ExcCompatibility("mapping"));
   create_laplace_matrix(hp::StaticMappingQ1<dim>::mapping_collection, dof, q,
@@ -2811,5 +2847,193 @@ void MatrixCreator::create_laplace_matrix<deal_II_dimension>
  const Function<deal_II_dimension>      &rhs,
  Vector<double>           &rhs_vector,
  const Function<deal_II_dimension> * const coefficient);
+
+
+
+#if deal_II_dimension != 3
+
+// non-hp version of create_mass_matrix
+template
+void MatrixCreator::create_mass_matrix<deal_II_dimension,double,deal_II_dimension+1>
+(const Mapping<deal_II_dimension,deal_II_dimension+1>       &mapping,
+ const DoFHandler<deal_II_dimension,deal_II_dimension+1>    &dof,
+ const Quadrature<deal_II_dimension>    &q,
+ SparseMatrix<double>     &matrix,
+ const Function<deal_II_dimension+1> * const coefficient);
+template
+void MatrixCreator::create_mass_matrix<deal_II_dimension,double,deal_II_dimension+1>
+(const DoFHandler<deal_II_dimension,deal_II_dimension+1>    &dof,
+ const Quadrature<deal_II_dimension>    &q,
+ SparseMatrix<double>     &matrix,
+ const Function<deal_II_dimension+1> * const coefficient);
+template
+void MatrixCreator::create_mass_matrix<deal_II_dimension,double,deal_II_dimension+1>
+(const Mapping<deal_II_dimension,deal_II_dimension+1>       &mapping,
+ const DoFHandler<deal_II_dimension,deal_II_dimension+1>    &dof,
+ const Quadrature<deal_II_dimension>    &q,
+ SparseMatrix<double>     &matrix,
+ const Function<deal_II_dimension+1>      &rhs,
+ Vector<double>           &rhs_vector,
+ const Function<deal_II_dimension+1> * const coefficient);
+template
+void MatrixCreator::create_mass_matrix<deal_II_dimension,double,deal_II_dimension+1>
+(const DoFHandler<deal_II_dimension,deal_II_dimension+1>    &dof,
+ const Quadrature<deal_II_dimension>    &q,
+ SparseMatrix<double>     &matrix,
+ const Function<deal_II_dimension+1>      &rhs,
+ Vector<double>           &rhs_vector,
+ const Function<deal_II_dimension+1> * const coefficient);
+
+
+template
+void MatrixCreator::create_mass_matrix<deal_II_dimension,float,deal_II_dimension+1>
+(const Mapping<deal_II_dimension,deal_II_dimension+1>       &mapping,
+ const DoFHandler<deal_II_dimension,deal_II_dimension+1>    &dof,
+ const Quadrature<deal_II_dimension>    &q,
+ SparseMatrix<float>     &matrix,
+ const Function<deal_II_dimension+1> * const coefficient);
+template
+void MatrixCreator::create_mass_matrix<deal_II_dimension,float,deal_II_dimension+1>
+(const DoFHandler<deal_II_dimension,deal_II_dimension+1>    &dof,
+ const Quadrature<deal_II_dimension>    &q,
+ SparseMatrix<float>     &matrix,
+ const Function<deal_II_dimension+1> * const coefficient);
+template
+void MatrixCreator::create_mass_matrix<deal_II_dimension,float,deal_II_dimension+1>
+(const Mapping<deal_II_dimension,deal_II_dimension+1>       &mapping,
+ const DoFHandler<deal_II_dimension,deal_II_dimension+1>    &dof,
+ const Quadrature<deal_II_dimension>    &q,
+ SparseMatrix<float>     &matrix,
+ const Function<deal_II_dimension+1>      &rhs,
+ Vector<double>           &rhs_vector,
+ const Function<deal_II_dimension+1> * const coefficient);
+template
+void MatrixCreator::create_mass_matrix<deal_II_dimension,float,deal_II_dimension+1>
+(const DoFHandler<deal_II_dimension,deal_II_dimension+1>    &dof,
+ const Quadrature<deal_II_dimension>    &q,
+ SparseMatrix<float>     &matrix,
+ const Function<deal_II_dimension+1>      &rhs,
+ Vector<double>           &rhs_vector,
+ const Function<deal_II_dimension+1> * const coefficient);
+
+template
+void
+MatrixCreator::create_boundary_mass_matrix<deal_II_dimension,deal_II_dimension+1>
+(const Mapping<deal_II_dimension,deal_II_dimension+1>        &mapping,
+ const DoFHandler<deal_II_dimension,deal_II_dimension+1>     &dof,
+ const Quadrature<deal_II_dimension-1>   &q,
+ SparseMatrix<double>      &matrix,
+ const FunctionMap<deal_II_dimension+1>::type         &boundary_functions,
+ Vector<double>            &rhs_vector,
+ std::vector<unsigned int> &dof_to_boundary_mapping,
+ const Function<deal_II_dimension+1> * const a,
+ std::vector<unsigned int>);
+
+template
+void MatrixCreator::create_boundary_mass_matrix<deal_II_dimension,deal_II_dimension+1>
+(const DoFHandler<deal_II_dimension,deal_II_dimension+1>     &dof,
+ const Quadrature<deal_II_dimension-1>   &q,
+ SparseMatrix<double>      &matrix,
+ const FunctionMap<deal_II_dimension+1>::type &rhs,
+ Vector<double>            &rhs_vector,
+ std::vector<unsigned int> &dof_to_boundary_mapping,
+ const Function<deal_II_dimension+1> * const a,
+ std::vector<unsigned int>);
+
+ 
+
+// #if deal_II_dimension != 1
+// template
+// void
+// MatrixCreator::create_boundary_mass_matrix<deal_II_dimension,deal_II_dimension+1>
+// (const Mapping<deal_II_dimension,deal_II_dimension+1>        &mapping,
+//  const DoFHandler<deal_II_dimension,deal_II_dimension+1>     &dof,
+//  const Quadrature<deal_II_dimension-1>   &q,
+//  SparseMatrix<double>      &matrix,
+//  const FunctionMap<deal_II_dimension+1>::type         &boundary_functions,
+//  Vector<double>            &rhs_vector,
+//  std::vector<unsigned int> &dof_to_boundary_mapping,
+//  const Function<deal_II_dimension+1> * const a,
+//  std::vector<unsigned int> &component_mapping);
+// #endif
+
+// template
+// void MatrixCreator::create_boundary_mass_matrix<deal_II_dimension,deal_II_dimension+1>
+// (const DoFHandler<deal_II_dimension,deal_II_dimension+1>     &dof,
+//  const Quadrature<deal_II_dimension-1>   &q,
+//  SparseMatrix<double>      &matrix,
+//  const FunctionMap<deal_II_dimension+1>::type &rhs,
+//  Vector<double>            &rhs_vector,
+//  std::vector<unsigned int> &dof_to_boundary_mapping,
+//  const Function<deal_II_dimension+1> * const a,
+//  std::vector<unsigned int> &component_mapping);
+
+
+// // non-hp version of create_mass_matrix
+// template
+// void MatrixCreator::create_mass_matrix
+// (const Mapping<deal_II_dimension,deal_II_dimension+1>       &mapping,
+//  const DoFHandler<deal_II_dimension,deal_II_dimension+1>    &dof,
+//  const Quadrature<deal_II_dimension>    &q,
+//  SparseMatrix<double>     &matrix,
+//  const Function<deal_II_dimension+1> * const coefficient);
+// template
+// void MatrixCreator::create_mass_matrix
+// (const DoFHandler<deal_II_dimension,deal_II_dimension+1>    &dof,
+//  const Quadrature<deal_II_dimension>    &q,
+//  SparseMatrix<double>     &matrix,
+//  const Function<deal_II_dimension+1> * const coefficient);
+// template
+// void MatrixCreator::create_mass_matrix
+// (const Mapping<deal_II_dimension,deal_II_dimension+1>       &mapping,
+//  const DoFHandler<deal_II_dimension,deal_II_dimension+1>    &dof,
+//  const Quadrature<deal_II_dimension>    &q,
+//  SparseMatrix<double>     &matrix,
+//  const Function<deal_II_dimension+1>      &rhs,
+//  Vector<double>           &rhs_vector,
+//  const Function<deal_II_dimension+1> * const coefficient);
+// template
+// void MatrixCreator::create_mass_matrix
+// (const DoFHandler<deal_II_dimension,deal_II_dimension+1>    &dof,
+//  const Quadrature<deal_II_dimension>    &q,
+//  SparseMatrix<double>     &matrix,
+//  const Function<deal_II_dimension+1>      &rhs,
+//  Vector<double>           &rhs_vector,
+//  const Function<deal_II_dimension+1> * const coefficient);
+
+
+// template
+// void MatrixCreator::create_mass_matrix
+// (const Mapping<deal_II_dimension,deal_II_dimension+1>       &mapping,
+//  const DoFHandler<deal_II_dimension,deal_II_dimension+1>    &dof,
+//  const Quadrature<deal_II_dimension>    &q,
+//  SparseMatrix<float>     &matrix,
+//  const Function<deal_II_dimension+1> * const coefficient);
+// template
+// void MatrixCreator::create_mass_matrix
+// (const DoFHandler<deal_II_dimension,deal_II_dimension+1>    &dof,
+//  const Quadrature<deal_II_dimension>    &q,
+//  SparseMatrix<float>     &matrix,
+//  const Function<deal_II_dimension+1> * const coefficient);
+// template
+// void MatrixCreator::create_mass_matrix
+// (const Mapping<deal_II_dimension,deal_II_dimension+1>       &mapping,
+//  const DoFHandler<deal_II_dimension,deal_II_dimension+1>    &dof,
+//  const Quadrature<deal_II_dimension>    &q,
+//  SparseMatrix<float>     &matrix,
+//  const Function<deal_II_dimension+1>      &rhs,
+//  Vector<double>           &rhs_vector,
+//  const Function<deal_II_dimension+1> * const coefficient);
+// template
+// void MatrixCreator::create_mass_matrix
+// (const DoFHandler<deal_II_dimension,deal_II_dimension+1>    &dof,
+//  const Quadrature<deal_II_dimension>    &q,
+//  SparseMatrix<float>     &matrix,
+//  const Function<deal_II_dimension+1>      &rhs,
+//  Vector<double>           &rhs_vector,
+//  const Function<deal_II_dimension+1> * const coefficient);
+
+
+#endif
 
 DEAL_II_NAMESPACE_CLOSE

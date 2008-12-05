@@ -26,113 +26,136 @@ DEAL_II_NAMESPACE_OPEN
 /* -------------------------- Boundary --------------------- */
 
 
-template <int dim>
-Boundary<dim>::~Boundary ()
+template <int dim, int spacedim>
+Boundary<dim, spacedim>::~Boundary ()
 {}
 
 
 
-template <int dim>
-Point<dim>
-Boundary<dim>::get_new_point_on_quad (const typename Triangulation<dim>::quad_iterator &) const 
+template <int dim, int spacedim>
+Point<spacedim>
+Boundary<dim, spacedim>::
+get_new_point_on_quad (const typename Triangulation<dim, spacedim>::quad_iterator &) const 
 {
   Assert (false, ExcPureFunctionCalled());
-  return Point<dim>();
+  return Point<spacedim>();
 }
 
 
 
-template <int dim>
+template <int dim, int spacedim>
 void
-Boundary<dim>::
-get_intermediate_points_on_line (const typename Triangulation<dim>::line_iterator &,
-				 std::vector<Point<dim> > &) const
+Boundary<dim, spacedim>::
+get_intermediate_points_on_line (const typename Triangulation<dim, spacedim>::line_iterator &,
+				 std::vector<Point<spacedim> > &) const
 {
   Assert (false, ExcPureFunctionCalled());
 }
 
 
 
-template <int dim>
+template <int dim, int spacedim>
 void
-Boundary<dim>::
-get_intermediate_points_on_quad (const typename Triangulation<dim>::quad_iterator &,
-				 std::vector<Point<dim> > &) const
+Boundary<dim, spacedim>::
+get_intermediate_points_on_quad (const typename Triangulation<dim, spacedim>::quad_iterator &,
+				 std::vector<Point<spacedim> > &) const
 {
   Assert (false, ExcPureFunctionCalled());
 }
 
-#if deal_II_dimension == 1
+
+#if deal_II_dimension > 1
+
+template <int dim, int spacedim>
+Point<spacedim>
+Boundary<dim,spacedim>::
+get_new_point_on_face (const typename Triangulation<dim,spacedim>::face_iterator &face) const
+{
+  Assert (dim>1, ExcImpossibleInDim(dim));
+
+  switch (dim)
+    {
+      case 2:
+	    return get_new_point_on_line (face);
+      case 3:
+	    return get_new_point_on_quad (face);
+    }
+  
+  return Point<spacedim>();
+}
+
+
+template <int dim, int spacedim>
+void
+Boundary<dim,spacedim>::
+get_intermediate_points_on_face (const typename Triangulation<dim,spacedim>::face_iterator &face,
+				 std::vector<Point<spacedim> > &points) const
+{
+  Assert (dim>1, ExcImpossibleInDim(dim));
+
+  switch (dim)
+    {
+      case 2:
+	    get_intermediate_points_on_line (face, points);
+	    break;
+      case 3:
+	    get_intermediate_points_on_quad (face, points);
+	    break;
+      default:
+	    Assert (false, ExcNotImplemented());
+    }
+}
+
+#else
 
 template <>
 Point<1>
-Boundary<1>::
-get_new_point_on_face (const Triangulation<1>::face_iterator &) const
+Boundary<1,1>::
+get_new_point_on_face (const Triangulation<1,1>::face_iterator &) const
 {
   Assert (false, ExcImpossibleInDim(1));
   return Point<1>();
 }
 
+
 template <>
 void
-Boundary<1>::
-get_intermediate_points_on_face (const Triangulation<1>::face_iterator &,
+Boundary<1,1>::
+get_intermediate_points_on_face (const Triangulation<1,1>::face_iterator &,
 				 std::vector<Point<1> > &) const
 {
   Assert (false, ExcImpossibleInDim(1));
 }
 
-#endif
 
-#if deal_II_dimension == 2
 
 template <>
 Point<2>
-Boundary<2>::
-get_new_point_on_face (const Triangulation<2>::face_iterator &face) const
+Boundary<1,2>::
+get_new_point_on_face (const Triangulation<1,2>::face_iterator &) const
 {
-  return get_new_point_on_line(face);
+  Assert (false, ExcImpossibleInDim(1));
+  return Point<2>();
 }
+
 
 template <>
 void
-Boundary<2>::
-get_intermediate_points_on_face (const Triangulation<2>::face_iterator &face,
-				 std::vector<Point<2> > &points) const
+Boundary<1,2>::
+get_intermediate_points_on_face (const Triangulation<1,2>::face_iterator &,
+				 std::vector<Point<2> > &) const
 {
-  get_intermediate_points_on_line(face, points);
+  Assert (false, ExcImpossibleInDim(1));
 }
+
+
 
 #endif
 
-
-#if deal_II_dimension == 3
-
-template <>
-Point<3>
-Boundary<3>::
-get_new_point_on_face (const Triangulation<3>::face_iterator &face) const
-{
-  return get_new_point_on_quad(face);
-}
-
-template <>
+template <int dim, int spacedim>
 void
-Boundary<3>::
-get_intermediate_points_on_face (const Triangulation<3>::face_iterator &face,
-				 std::vector<Point<3> > &points) const
-{
-  get_intermediate_points_on_quad(face, points);
-}
-
-#endif
-
-
-
-template <int dim>
-void
-Boundary<dim>::
-get_normals_at_vertices (const typename Triangulation<dim>::face_iterator &,
+Boundary<dim, spacedim>::
+get_normals_at_vertices (const typename Triangulation<dim, spacedim>::face_iterator &,
 			 FaceVertexNormals                                &) const
 {
   Assert (false, ExcPureFunctionCalled());
@@ -143,84 +166,107 @@ get_normals_at_vertices (const typename Triangulation<dim>::face_iterator &,
 /* -------------------------- StraightBoundary --------------------- */
 
 
-template <int dim>
-StraightBoundary<dim>::StraightBoundary ()
+template <int dim, int spacedim>
+StraightBoundary<dim, spacedim>::StraightBoundary ()
 {}
 
 
-
-template <int dim>
-Point<dim>
-StraightBoundary<dim>::get_new_point_on_line (const typename Triangulation<dim>::line_iterator &line) const 
+template <int dim, int spacedim>
+Point<spacedim>
+StraightBoundary<dim, spacedim>::
+get_new_point_on_line (const typename Triangulation<dim, spacedim>::line_iterator &line) const 
 {
   return (line->vertex(0) + line->vertex(1)) / 2;
 }
 
 
-#if deal_II_dimension < 3
-
-template <int dim>
-Point<dim>
-StraightBoundary<dim>::get_new_point_on_quad (const typename Triangulation<dim>::quad_iterator &) const 
+namespace
 {
-  Assert (false, ExcImpossibleInDim(dim));
-  return Point<dim>();
+				   // compute the new midpoint of a quad --
+				   // either of a 2d cell on a manifold in 3d
+				   // or of a face of a 3d triangulation in 3d
+  template <int dim>
+  Point<3>
+  compute_new_point_on_quad (const typename Triangulation<dim, 3>::quad_iterator &quad)
+  {
+				     // generate a new point in the middle of
+				     // the face based on the points on the
+				     // edges and the vertices.
+				     //
+				     // there is a pathological situation when
+				     // this face is on a straight boundary, but
+				     // one of its edges and the face behind it
+				     // are not; if that face is refined first,
+				     // the new point in the middle of that edge
+				     // may not be at the same position as
+				     // quad->line(.)->center() would have been,
+				     // but would have been moved to the
+				     // non-straight boundary. We cater to that
+				     // situation by using existing edge
+				     // midpoints if available, or center() if
+				     // not
+				     //
+				     // note that this situation can not happen
+				     // during mesh refinement, as there the
+				     // edges are refined first and only then
+				     // the face. thus, the check whether a line
+				     // has children does not lead to the
+				     // situation where the new face midpoints
+				     // have different positions depending on
+				     // which of the two cells is refined first.
+				     //
+				     // the situation where the edges aren't
+				     // refined happens when the a higher order
+				     // MappingQ requests the midpoint of a
+				     // face, though, and it is for these cases
+				     // that we need to have the check available
+    return (quad->vertex(0) + quad->vertex(1) +
+	    quad->vertex(2) + quad->vertex(3) +
+	    (quad->line(0)->has_children() ?
+	     quad->line(0)->child(0)->vertex(1) :
+	     quad->line(0)->center()) +
+	    (quad->line(1)->has_children() ?
+	     quad->line(1)->child(0)->vertex(1) :
+	     quad->line(1)->center()) +
+	    (quad->line(2)->has_children() ?
+	     quad->line(2)->child(0)->vertex(1) :
+	     quad->line(2)->center()) +
+	    (quad->line(3)->has_children() ?
+	     quad->line(3)->child(0)->vertex(1) :
+	     quad->line(3)->center())               ) / 8;
+  }
 }
 
 
-#else
+#if deal_II_dimension < 3
 
+template <int dim, int spacedim>
+Point<spacedim>
+StraightBoundary<dim, spacedim>::
+get_new_point_on_quad (const typename Triangulation<dim, spacedim>::quad_iterator &) const 
+{
+  Assert (false, ExcImpossibleInDim(dim));
+  return Point<spacedim>();
+}
+
+#if deal_II_dimension == 2
+template <>
+Point<3>
+StraightBoundary<2,3>::
+get_new_point_on_quad (const Triangulation<2,3>::quad_iterator &quad) const 
+{
+  return compute_new_point_on_quad<2> (quad);
+}
+
+#endif
+#else
 
 template <>
 Point<3>
 StraightBoundary<3>::
 get_new_point_on_quad (const Triangulation<3>::quad_iterator &quad) const 
 {
-                                   // generate a new point in the middle of
-                                   // the face based on the points on the
-                                   // edges and the vertices.
-                                   //
-                                   // there is a pathological situation when
-                                   // this face is on a straight boundary, but
-                                   // one of its edges and the face behind it
-                                   // are not; if that face is refined first,
-                                   // the new point in the middle of that edge
-                                   // may not be at the same position as
-                                   // quad->line(.)->center() would have been,
-                                   // but would have been moved to the
-                                   // non-straight boundary. We cater to that
-                                   // situation by using existing edge
-                                   // midpoints if available, or center() if
-                                   // not
-                                   //
-                                   // note that this situation can not happen
-                                   // during mesh refinement, as there the
-                                   // edges are refined first and only then
-                                   // the face. thus, the check whether a line
-                                   // has children does not lead to the
-                                   // situation where the new face midpoints
-                                   // have different positions depending on
-                                   // which of the two cells is refined first.
-                                   //
-                                   // the situation where the edges aren't
-                                   // refined happens when the a higher order
-                                   // MappingQ requests the midpoint of a
-                                   // face, though, and it is for these cases
-                                   // that we need to have the check available
-  return (quad->vertex(0) + quad->vertex(1) +
-	  quad->vertex(2) + quad->vertex(3) +
-	  (quad->line(0)->has_children() ?
-           quad->line(0)->child(0)->vertex(1) :
-           quad->line(0)->center()) +
-	  (quad->line(1)->has_children() ?
-           quad->line(1)->child(0)->vertex(1) :
-           quad->line(1)->center()) +
-	  (quad->line(2)->has_children() ?
-           quad->line(2)->child(0)->vertex(1) :
-           quad->line(2)->center()) +
-	  (quad->line(3)->has_children() ?
-           quad->line(3)->child(0)->vertex(1) :
-           quad->line(3)->center())               ) / 8;
+  return compute_new_point_on_quad<3> (quad);
 }
 
 #endif
@@ -238,14 +284,22 @@ get_intermediate_points_on_line (const Triangulation<1>::line_iterator &,
 }
 
 
+template <>
+void
+StraightBoundary<1,2>::
+get_intermediate_points_on_line (const Triangulation<1,2>::line_iterator &,
+				 std::vector<Point<2> > &) const
+{
+  Assert(false, ExcImpossibleInDim(1));
+}
 #else
 
 
-template <int dim>
+template <int dim, int spacedim>
 void
-StraightBoundary<dim>::
-get_intermediate_points_on_line (const typename Triangulation<dim>::line_iterator &line,
-				 std::vector<Point<dim> > &points) const
+StraightBoundary<dim, spacedim>::
+get_intermediate_points_on_line (const typename Triangulation<dim, spacedim>::line_iterator &line,
+				 std::vector<Point<spacedim> > &points) const
 {
   const unsigned int n=points.size();
   Assert(n>0, ExcInternalError());
@@ -253,7 +307,7 @@ get_intermediate_points_on_line (const typename Triangulation<dim>::line_iterato
   const double dx=1./(n+1);
   double x=dx;
 
-  const Point<dim> vertices[2] = { line->vertex(0),
+  const Point<spacedim> vertices[2] = { line->vertex(0),
 				   line->vertex(1) };
   
   for (unsigned int i=0; i<n; ++i, x+=dx)
@@ -266,11 +320,11 @@ get_intermediate_points_on_line (const typename Triangulation<dim>::line_iterato
 
 #if deal_II_dimension < 3
 
-template <int dim>
+template <int dim, int spacedim>
 void
-StraightBoundary<dim>::
-get_intermediate_points_on_quad (const typename Triangulation<dim>::quad_iterator &,
-				 std::vector<Point<dim> > &) const
+StraightBoundary<dim, spacedim>::
+get_intermediate_points_on_quad (const typename Triangulation<dim, spacedim>::quad_iterator &,
+				 std::vector<Point<spacedim> > &) const
 {
   Assert(false, ExcImpossibleInDim(dim));
 }
@@ -283,7 +337,7 @@ StraightBoundary<3>::
 get_intermediate_points_on_quad (const Triangulation<3>::quad_iterator &quad,
 				 std::vector<Point<3> > &points) const
 {
-  const unsigned int dim = 3;
+  const unsigned int spacedim = 3;
   
   const unsigned int n=points.size(),
 		     m=static_cast<unsigned int>(std::sqrt(static_cast<double>(n)));
@@ -293,10 +347,10 @@ get_intermediate_points_on_quad (const Triangulation<3>::quad_iterator &quad,
   const double ds=1./(m+1);
   double y=ds;
 
-  const Point<dim> vertices[4] = { quad->vertex(0),
-				   quad->vertex(1),
-				   quad->vertex(2),
-				   quad->vertex(3) };
+  const Point<spacedim> vertices[4] = { quad->vertex(0),
+					quad->vertex(1),
+					quad->vertex(2),
+					quad->vertex(3) };
 
   for (unsigned int i=0; i<m; ++i, y+=ds)
     {
@@ -324,6 +378,15 @@ get_normals_at_vertices (const Triangulation<1>::face_iterator &,
   Assert (false, ExcImpossibleInDim(1));
 }
 
+template <>
+void
+StraightBoundary<1,2>::
+get_normals_at_vertices (const Triangulation<1,2>::face_iterator &,
+			 Boundary<1,2>::FaceVertexNormals &) const
+{
+  Assert (false, ExcImpossibleInDim(1));
+}
+
 #endif
 
 
@@ -340,6 +403,20 @@ get_normals_at_vertices (const Triangulation<2>::face_iterator &face,
 				     // compute normals from tangent
     face_vertex_normals[vertex] = Point<2>(tangent[1],
                                            -tangent[0]);
+}
+
+template <>
+void
+StraightBoundary<2,3>::
+get_normals_at_vertices (const Triangulation<2,3>::face_iterator &face,
+			 Boundary<2,3>::FaceVertexNormals &face_vertex_normals) const
+{
+  const Tensor<1,3> tangent = face->vertex(1) - face->vertex(0);
+  for (unsigned int vertex=0; vertex<GeometryInfo<2>::vertices_per_face; ++vertex)
+				     // compute normals from tangent
+    face_vertex_normals[vertex] = Point<3>(tangent[1],
+                                           -tangent[0],0);
+  Assert(false, ExcNotImplemented());
 }
 
 #endif
@@ -387,6 +464,11 @@ get_normals_at_vertices (const Triangulation<3>::face_iterator &face,
 // explicit instantiations
 template class Boundary<deal_II_dimension>;
 template class StraightBoundary<deal_II_dimension>;
+
+#if deal_II_dimension == 1 || deal_II_dimension == 2
+template class Boundary<deal_II_dimension, deal_II_dimension+1>;
+template class StraightBoundary<deal_II_dimension, deal_II_dimension+1>;
+#endif
 
 DEAL_II_NAMESPACE_CLOSE
 

@@ -19,7 +19,7 @@
 
 DEAL_II_NAMESPACE_OPEN
 
-template <int dim> class MappingQ;
+template <int dim, int spacedim> class MappingQ;
 
 
 /*!@addtogroup fe */
@@ -53,6 +53,9 @@ template <int dim> class MappingQ;
  *
  * The constructor of this class takes the degree @p p of this finite
  * element.
+ *
+ * This class is not implemented for the codimension one case
+ * (<tt>spacedim != dim</tt>).
  *
  * <h3>Implementation</h3>
  *

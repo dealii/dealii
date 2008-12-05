@@ -19,7 +19,7 @@
 
 DEAL_II_NAMESPACE_OPEN
 
-template <int dim> class MappingQ;
+template <int dim, int spacedim> class MappingQ;
 
 /*!@addtogroup fe */
 /*@{*/
@@ -47,6 +47,11 @@ template <int dim> class MappingQ;
  * basis functions, refer to PolynomialSpace, remebering that the
  * Legendre polynomials are ordered by ascending degree.
  *
+ * This class if partially implemented for the codimension one case
+ * (<tt>spacedim != dim </tt>), since no passage of information
+ * between meshes of different refinement level is possible because
+ * the embedding and projection matrices are not computed in the class
+ * constructor.
  *
  * <h3>Transformation properties</h3>
  *
@@ -82,8 +87,8 @@ template <int dim> class MappingQ;
  * 
  * @author Guido Kanschat, 2001, 2002, Ralf Hartmann 2004
  */
-template <int dim>
-class FE_DGP : public FE_Poly<PolynomialSpace<dim>,dim>
+template <int dim, int spacedim=dim>
+class FE_DGP : public FE_Poly<PolynomialSpace<dim>,dim,spacedim>
 {
   public:
 				     /**
@@ -148,7 +153,7 @@ class FE_DGP : public FE_Poly<PolynomialSpace<dim>,dim>
 				      */
     virtual
     std::vector<std::pair<unsigned int, unsigned int> >
-    hp_vertex_dof_identities (const FiniteElement<dim> &fe_other) const;
+      hp_vertex_dof_identities (const FiniteElement<dim,spacedim> &fe_other) const;
 
 				     /**
 				      * Same as
@@ -163,7 +168,7 @@ class FE_DGP : public FE_Poly<PolynomialSpace<dim>,dim>
 				      */
     virtual
     std::vector<std::pair<unsigned int, unsigned int> >
-    hp_line_dof_identities (const FiniteElement<dim> &fe_other) const;
+    hp_line_dof_identities (const FiniteElement<dim,spacedim> &fe_other) const;
 
 				     /**
 				      * Same as
@@ -178,7 +183,7 @@ class FE_DGP : public FE_Poly<PolynomialSpace<dim>,dim>
 				      */
     virtual
     std::vector<std::pair<unsigned int, unsigned int> >
-    hp_quad_dof_identities (const FiniteElement<dim> &fe_other) const;
+    hp_quad_dof_identities (const FiniteElement<dim,spacedim> &fe_other) const;
 
                                      /**
                                       * Return whether this element
@@ -208,7 +213,7 @@ class FE_DGP : public FE_Poly<PolynomialSpace<dim>,dim>
 				      */
     virtual
     FiniteElementDomination::Domination
-    compare_for_face_domination (const FiniteElement<dim> &fe_other) const;
+    compare_for_face_domination (const FiniteElement<dim,spacedim> &fe_other) const;
     
 				     /**
 				      * @}
@@ -233,10 +238,10 @@ class FE_DGP : public FE_Poly<PolynomialSpace<dim>,dim>
 				      * interpolation from a given
 				      * element, then they must throw
 				      * an exception of type
-				      * FiniteElement<dim>::ExcInterpolationNotImplemented.
+				      * FiniteElement<dim,spacedim>::ExcInterpolationNotImplemented.
 				      */
     virtual void
-    get_face_interpolation_matrix (const FiniteElement<dim> &source,
+    get_face_interpolation_matrix (const FiniteElement<dim,spacedim> &source,
 				   FullMatrix<double>       &matrix) const;    
 
 				     /**
@@ -258,10 +263,10 @@ class FE_DGP : public FE_Poly<PolynomialSpace<dim>,dim>
 				      * interpolation from a given
 				      * element, then they must throw
 				      * an exception of type
-				      * FiniteElement<dim>::ExcInterpolationNotImplemented.
+				      * FiniteElement<dim,spacedim>::ExcInterpolationNotImplemented.
 				      */
     virtual void
-    get_subface_interpolation_matrix (const FiniteElement<dim> &source,
+    get_subface_interpolation_matrix (const FiniteElement<dim,spacedim> &source,
 				      const unsigned int        subface,
 				      FullMatrix<double>       &matrix) const;
 
@@ -331,7 +336,7 @@ class FE_DGP : public FE_Poly<PolynomialSpace<dim>,dim>
 				      * This function is needed by the
 				      * constructors of @p FESystem.
 				      */
-    virtual FiniteElement<dim> *clone() const;
+    virtual FiniteElement<dim,spacedim> *clone() const;
 
   private:
     
@@ -372,6 +377,24 @@ const double * const FE_DGP<3>::Matrices::projection_matrices[][GeometryInfo<3>:
 
 template <>
 const unsigned int FE_DGP<3>::Matrices::n_projection_matrices;
+
+//codimension 1
+#if deal_II_dimension != 3
+template <>
+const double * const FE_DGP<1,2>::Matrices::projection_matrices[][GeometryInfo<1>::max_children_per_cell];
+
+template <>
+const unsigned int FE_DGP<1,2>::Matrices::n_projection_matrices;
+
+template <>
+const double * const FE_DGP<2,3>::Matrices::projection_matrices[][GeometryInfo<2>::max_children_per_cell];
+
+template <>
+const unsigned int FE_DGP<2,3>::Matrices::n_projection_matrices;
+
+#endif
+
+
 #endif
 
 #endif // DOXYGEN

@@ -30,21 +30,21 @@
 
 DEAL_II_NAMESPACE_OPEN
 
-template <int dim>
-GridIn<dim>::GridIn () :
+template <int dim, int spacedim>
+GridIn<dim, spacedim>::GridIn () :
 		tria(0), default_format(ucd)
 {}
 
 
-template <int dim>
-void GridIn<dim>::attach_triangulation (Triangulation<dim> &t)
+template <int dim, int spacedim>
+void GridIn<dim, spacedim>::attach_triangulation (Triangulation<dim, spacedim> &t)
 {
   tria = &t;
 }
 
 
-template <int dim>
-void GridIn<dim>::read_ucd (std::istream &in)
+template <int dim, int spacedim>
+void GridIn<dim, spacedim>::read_ucd (std::istream &in)
 {
   Assert (tria != 0, ExcNoTriangulationSelected());
   AssertThrow (in, ExcIO());
@@ -64,7 +64,7 @@ void GridIn<dim>::read_ucd (std::istream &in)
      >> dummy;        // model data
 
 				   // set up array of vertices
-  std::vector<Point<dim> >     vertices (n_vertices);
+  std::vector<Point<spacedim> >     vertices (n_vertices);
 				   // set up mapping between numbering
 				   // in ucd-file (key) and in the
 				   // vertices vector
@@ -80,7 +80,7 @@ void GridIn<dim>::read_ucd (std::istream &in)
 	 >> x[0] >> x[1] >> x[2];
 
 				       // store vertex
-      for (unsigned int d=0; d<dim; ++d)
+      for (unsigned int d=0; d<spacedim; ++d)
 	vertices[vertex](d) = x[d];
 				       // store mapping; note that
 				       // vertices_indices[i] is automatically
@@ -204,15 +204,16 @@ void GridIn<dim>::read_ucd (std::istream &in)
 				   // do some clean-up on vertices...
   GridTools::delete_unused_vertices (vertices, cells, subcelldata);
 				   // ... and cells
-  GridReordering<dim>::invert_all_cells_of_negative_grid (vertices, cells);
-  GridReordering<dim>::reorder_cells (cells);
+  if(dim==spacedim)
+    GridReordering<dim,spacedim>::invert_all_cells_of_negative_grid (vertices, cells);
+  GridReordering<dim,spacedim>::reorder_cells (cells);
   tria->create_triangulation_compatibility (vertices, cells, subcelldata);
 }
 
 
 
-template <int dim>
-void GridIn<dim>::read_dbmesh (std::istream &in)
+template <int dim, int spacedim>
+void GridIn<dim, spacedim>::read_dbmesh (std::istream &in)
 {
   Assert (tria != 0, ExcNoTriangulationSelected());
   Assert (dim==2, ExcNotImplemented());
@@ -264,7 +265,7 @@ void GridIn<dim>::read_dbmesh (std::istream &in)
   double dummy;
   
   in >> n_vertices;
-  std::vector<Point<dim> >     vertices (n_vertices);
+  std::vector<Point<spacedim> >     vertices (n_vertices);
   for (unsigned int vertex=0; vertex<n_vertices; ++vertex)
     {
 				       // read vertex coordinates
@@ -371,15 +372,15 @@ void GridIn<dim>::read_dbmesh (std::istream &in)
 				   // do some clean-up on vertices...
   GridTools::delete_unused_vertices (vertices, cells, subcelldata);
 				   // ...and cells
-  GridReordering<dim>::invert_all_cells_of_negative_grid (vertices, cells);
-  GridReordering<dim>::reorder_cells (cells);
+  GridReordering<dim,spacedim>::invert_all_cells_of_negative_grid (vertices, cells);
+  GridReordering<dim,spacedim>::reorder_cells (cells);
   tria->create_triangulation_compatibility (vertices, cells, subcelldata);
 }
 
 
 
-template <int dim>
-void GridIn<dim>::read_xda (std::istream &)
+template <int dim, int spacedim>
+void GridIn<dim, spacedim>::read_xda (std::istream &)
 {
   Assert (false, ExcNotImplemented());
 }
@@ -545,8 +546,8 @@ void GridIn<3>::read_xda (std::istream &in)
 
 
 
-template <int dim>
-void GridIn<dim>::read_msh (std::istream &in)
+template <int dim, int spacedim>
+void GridIn<dim, spacedim>::read_msh (std::istream &in)
 {
   Assert (tria != 0, ExcNoTriangulationSelected());
   AssertThrow (in, ExcIO());
@@ -597,7 +598,7 @@ void GridIn<dim>::read_msh (std::istream &in)
   
 				   // now read the nodes list
   in >> n_vertices;
-  std::vector<Point<dim> >     vertices (n_vertices);
+  std::vector<Point<spacedim> >     vertices (n_vertices);
 				   // set up mapping between numbering
 				   // in msh-file (nod) and in the
 				   // vertices vector
@@ -612,7 +613,7 @@ void GridIn<dim>::read_msh (std::istream &in)
       in >> vertex_number
 	 >> x[0] >> x[1] >> x[2];
      
-      for (unsigned int d=0; d<dim; ++d)
+      for (unsigned int d=0; d<spacedim; ++d)
 	vertices[vertex](d) = x[d];
 				       // store mapping
       vertex_indices[vertex_number] = vertex;
@@ -827,8 +828,9 @@ void GridIn<dim>::read_msh (std::istream &in)
 				   // do some clean-up on vertices...
   GridTools::delete_unused_vertices (vertices, cells, subcelldata);
 				   // ... and cells
-  GridReordering<dim>::invert_all_cells_of_negative_grid (vertices, cells);
-  GridReordering<dim>::reorder_cells (cells);
+  if(dim==spacedim)
+    GridReordering<dim,spacedim>::invert_all_cells_of_negative_grid (vertices, cells);
+  GridReordering<dim,spacedim>::reorder_cells (cells);
   tria->create_triangulation_compatibility (vertices, cells, subcelldata);
 }
 
@@ -841,11 +843,22 @@ void GridIn<1>::read_netcdf (const std::string &)
   AssertThrow(false, ExcImpossibleInDim(1));
 }
 
+template <>
+void GridIn<1,2>::read_netcdf (const std::string &)
+{
+  AssertThrow(false, ExcImpossibleInDim(1));
+}
+
 #endif
 
 
 
 #if deal_II_dimension == 2
+
+template <>
+void GridIn<2, 3>::read_netcdf (const std::string &) {
+    Assert(false, ExcNotImplemented());
+}
 
 template <>
 void GridIn<2>::read_netcdf (const std::string &filename)
@@ -857,6 +870,7 @@ void GridIn<2>::read_netcdf (const std::string &filename)
   AssertThrow(false, ExcNeedsNetCDF());
 #else
   const unsigned int dim=2;
+  const unsigned int spacedim=2;
   const bool output=false;
   Assert (tria != 0, ExcNoTriangulationSelected());
 				   // this function assumes the TAU
@@ -1049,7 +1063,7 @@ void GridIn<2>::read_netcdf (const std::string &filename)
   points_zc->get(&*point_values[2].begin(), n_vertices);
 
 				   // and fill the vertices
-  std::vector<Point<dim> > vertices (n_vertices);
+  std::vector<Point<spacedim> > vertices (n_vertices);
   for (unsigned int i=0; i<n_vertices; ++i)
     {
       vertices[i](0)=point_values[x2d][i];
@@ -1112,7 +1126,7 @@ void GridIn<2>::read_netcdf (const std::string &filename)
 
   SubCellData subcelldata;
   GridTools::delete_unused_vertices(vertices, cells, subcelldata);
-  GridReordering<dim>::reorder_cells (cells);
+  GridReordering<dim,spacedim>::reorder_cells (cells);
   tria->create_triangulation_compatibility (vertices, cells, subcelldata);  
 #endif
 }
@@ -1132,6 +1146,7 @@ void GridIn<3>::read_netcdf (const std::string &filename)
   AssertThrow(false, ExcNeedsNetCDF());
 #else
   const unsigned int dim=3;
+  const unsigned int spacedim=3;
   const bool output=false;
   Assert (tria != 0, ExcNoTriangulationSelected());
 				   // this function assumes the TAU
@@ -1232,7 +1247,7 @@ void GridIn<3>::read_netcdf (const std::string &filename)
     }
 
 				   // and fill the vertices
-  std::vector<Point<dim> > vertices (n_vertices);
+  std::vector<Point<spacedim> > vertices (n_vertices);
   for (unsigned int i=0; i<n_vertices; ++i)
     {
       vertices[i](0)=point_values[0][i];
@@ -1320,16 +1335,16 @@ void GridIn<3>::read_netcdf (const std::string &filename)
     }
 
   GridTools::delete_unused_vertices(vertices, cells, subcelldata);
-  GridReordering<dim>::invert_all_cells_of_negative_grid (vertices, cells);
-  GridReordering<dim>::reorder_cells (cells);
+  GridReordering<dim,spacedim>::invert_all_cells_of_negative_grid (vertices, cells);
+  GridReordering<dim,spacedim>::reorder_cells (cells);
   tria->create_triangulation_compatibility (vertices, cells, subcelldata);  
 #endif
 }
 
 #endif
 
-template <int dim>
-void GridIn<dim>::parse_tecplot_header(std::string &header,
+template <int dim, int spacedim>
+void GridIn<dim, spacedim>::parse_tecplot_header(std::string &header,
 				       std::vector<unsigned int> &tecplot2deal,
 				       unsigned int &n_vars,
 				       unsigned int &n_vertices,
@@ -1533,6 +1548,7 @@ template <>
 void GridIn<2>::read_tecplot (std::istream &in)
 {
   const unsigned int dim=2;
+  const unsigned int spacedim=2;
   Assert (tria != 0, ExcNoTriangulationSelected());
   AssertThrow (in, ExcIO());
   
@@ -1577,8 +1593,8 @@ void GridIn<2>::read_tecplot (std::istream &in)
 				   // with 0. in order not to use -1 for all the
 				   // connectivity information, a 0th vertex
 				   // (unused) is inserted at the origin.
-  std::vector<Point<dim> > vertices(n_vertices+1);
-  vertices[0]=Point<dim>();
+  std::vector<Point<spacedim> > vertices(n_vertices+1);
+  vertices[0]=Point<spacedim>();
 				   // reserve space for cells
   std::vector<CellData<dim> > cells(n_cells);
   SubCellData                 subcelldata;
@@ -1753,22 +1769,22 @@ void GridIn<2>::read_tecplot (std::istream &in)
   AssertThrow (in, ExcIO());
 
 				   // do some cleanup on cells
-  GridReordering<dim>::invert_all_cells_of_negative_grid (vertices, cells);
-  GridReordering<dim>::reorder_cells (cells);
+  GridReordering<dim,spacedim>::invert_all_cells_of_negative_grid (vertices, cells);
+  GridReordering<dim,spacedim>::reorder_cells (cells);
   tria->create_triangulation_compatibility (vertices, cells, subcelldata);
 }
 
 #endif
 
-template <int dim>
-void GridIn<dim>::read_tecplot(std::istream &)
+template <int dim, int spacedim>
+void GridIn<dim, spacedim>::read_tecplot(std::istream &)
 {
   Assert(false, ExcNotImplemented());
 }
 
 
-template <int dim>
-void GridIn<dim>::skip_empty_lines (std::istream &in)
+template <int dim, int spacedim>
+void GridIn<dim, spacedim>::skip_empty_lines (std::istream &in)
 {    
   std::string line;
   while (in) 
@@ -1795,8 +1811,8 @@ void GridIn<dim>::skip_empty_lines (std::istream &in)
 
 
 
-template <int dim>
-void GridIn<dim>::skip_comment_lines (std::istream &in,
+template <int dim, int spacedim>
+void GridIn<dim, spacedim>::skip_comment_lines (std::istream &in,
 				      const char    comment_start)
 {
   char c;
@@ -1819,9 +1835,9 @@ void GridIn<dim>::skip_comment_lines (std::istream &in,
 
 
 
-template <int dim>
-void GridIn<dim>::debug_output_grid (const std::vector<CellData<dim> > &/*cells*/,
-				     const std::vector<Point<dim> >    &/*vertices*/,
+template <int dim, int spacedim>
+void GridIn<dim, spacedim>::debug_output_grid (const std::vector<CellData<dim> > &/*cells*/,
+				     const std::vector<Point<spacedim> >    &/*vertices*/,
 				     std::ostream                      &/*out*/)
 {
   Assert (false, ExcNotImplemented());
@@ -1976,8 +1992,8 @@ GridIn<3>::debug_output_grid (const std::vector<CellData<3> > &cells,
 
 #endif
 
-template <int dim>
-void GridIn<dim>::read (const std::string& filename,
+template <int dim, int spacedim>
+void GridIn<dim, spacedim>::read (const std::string& filename,
 			Format format)
 {
 				   // Search file class for meshes
@@ -2009,8 +2025,8 @@ void GridIn<dim>::read (const std::string& filename,
 }
 
 
-template <int dim>
-void GridIn<dim>::read (std::istream& in,
+template <int dim, int spacedim>
+void GridIn<dim, spacedim>::read (std::istream& in,
 			Format format)
 {
   if (format == Default)
@@ -2052,9 +2068,9 @@ void GridIn<dim>::read (std::istream& in,
 
 
 
-template <int dim>
+template <int dim, int spacedim>
 std::string
-GridIn<dim>::default_suffix (const Format format) 
+GridIn<dim, spacedim>::default_suffix (const Format format) 
 {
   switch (format) 
     {
@@ -2078,9 +2094,9 @@ GridIn<dim>::default_suffix (const Format format)
 
 
 
-template <int dim>
-typename GridIn<dim>::Format
-GridIn<dim>::parse_format (const std::string &format_name)
+template <int dim, int spacedim>
+typename GridIn<dim, spacedim>::Format
+GridIn<dim, spacedim>::parse_format (const std::string &format_name)
 {
   if (format_name == "dbmesh")
     return dbmesh;
@@ -2128,8 +2144,8 @@ GridIn<dim>::parse_format (const std::string &format_name)
 
 
 
-template <int dim>
-std::string GridIn<dim>::get_format_names () 
+template <int dim, int spacedim>
+std::string GridIn<dim, spacedim>::get_format_names () 
 {
   return "dbmesh|msh|ucd|xda|netcdf|tecplot";
 }
@@ -2138,5 +2154,9 @@ std::string GridIn<dim>::get_format_names ()
 
 //explicit instantiations
 template class GridIn<deal_II_dimension>;
+
+#if deal_II_dimension != 3
+template class GridIn<deal_II_dimension, deal_II_dimension+1>;
+#endif
 
 DEAL_II_NAMESPACE_CLOSE

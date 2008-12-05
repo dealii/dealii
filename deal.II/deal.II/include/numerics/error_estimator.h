@@ -24,15 +24,15 @@
 DEAL_II_NAMESPACE_OPEN
 
 
-template <int> class DoFHandler;
-template <int> class Mapping;
+template <int, int> class DoFHandler;
+template <int, int> class Mapping;
 template <int> class Quadrature;
 
 namespace hp
 {
-  template <int> class DoFHandler;
+  template <int, int> class DoFHandler;
   template <int> class QCollection;
-  template <int> class MappingCollection;
+  template <int, int> class MappingCollection;
   template <int dim> class FEFaceValues;
   template <int dim> class FESubfaceValues;
 }
@@ -215,7 +215,7 @@ namespace hp
  *  @ingroup numerics
  *  @author Wolfgang Bangerth, 1998, 1999, 2000, 2004, 2006; parallelization by Thomas Richter, 2000
  */
-template <int dim>
+template <int dim, int spacedim=dim>
 class KellyErrorEstimator
 {
   public:
@@ -309,7 +309,7 @@ class KellyErrorEstimator
 				      * id.
 				      */
     template <typename InputVector, class DH>
-    static void estimate (const Mapping<dim>      &mapping,
+    static void estimate (const Mapping<dim, spacedim>      &mapping,
 			  const DH                &dof,
 			  const Quadrature<dim-1> &quadrature,
 			  const typename FunctionMap<dim>::type &neumann_bc,
@@ -366,7 +366,7 @@ class KellyErrorEstimator
 				      * vector of pointers.)
 				      */
     template <typename InputVector, class DH>
-    static void estimate (const Mapping<dim>          &mapping,
+    static void estimate (const Mapping<dim, spacedim>          &mapping,
 			  const DH                    &dof,
 			  const Quadrature<dim-1>     &quadrature,
 			  const typename FunctionMap<dim>::type &neumann_bc,
@@ -403,7 +403,7 @@ class KellyErrorEstimator
 				      * element dof handlers.
 				      */
     template <typename InputVector, class DH>
-    static void estimate (const Mapping<dim>      &mapping,
+    static void estimate (const Mapping<dim, spacedim>      &mapping,
 			  const DH                &dof,
 			  const hp::QCollection<dim-1> &quadrature,
 			  const typename FunctionMap<dim>::type &neumann_bc,
@@ -442,7 +442,7 @@ class KellyErrorEstimator
 				      * element dof handlers.
 				      */
     template <typename InputVector, class DH>
-    static void estimate (const Mapping<dim>          &mapping,
+    static void estimate (const Mapping<dim, spacedim>          &mapping,
 			  const DH                    &dof,
 			  const hp::QCollection<dim-1> &quadrature,
 			  const typename FunctionMap<dim>::type &neumann_bc,
@@ -693,7 +693,7 @@ class KellyErrorEstimator
 				      * seperatly.
 				      */
     template <typename InputVector, class DH>
-    static void estimate_some (const hp::MappingCollection<dim>    &mapping,
+    static void estimate_some (const hp::MappingCollection<dim, spacedim>    &mapping,
                                const DH                            &dof_handler,
                                const hp::QCollection<dim-1>         &quadrature,
                                const typename FunctionMap<dim>::type &neumann_bc,
@@ -794,8 +794,8 @@ class KellyErrorEstimator
  *
  * @author Wolfgang Bangerth, 1998, 2004.
  */
-template <>
-class KellyErrorEstimator<1>
+template <int spacedim>
+class KellyErrorEstimator<1,spacedim>
 {
   public:
 				     /**
@@ -846,7 +846,7 @@ class KellyErrorEstimator<1>
 				      * general case.
 				      */
     template <typename InputVector, class DH>
-    static void estimate (const Mapping<1>      &mapping,
+    static void estimate (const Mapping<1,spacedim>  &mapping,
 			  const DH   &dof,
 			  const Quadrature<0> &quadrature,
 			  const FunctionMap<1>::type &neumann_bc,
@@ -903,7 +903,7 @@ class KellyErrorEstimator<1>
 				      * vector of pointers.)
 				      */
     template <typename InputVector, class DH>
-    static void estimate (const Mapping<1>          &mapping,
+    static void estimate (const Mapping<1,spacedim>          &mapping,
 			  const DH       &dof,
 			  const Quadrature<0>     &quadrature,
 			  const FunctionMap<1>::type &neumann_bc,
@@ -940,7 +940,7 @@ class KellyErrorEstimator<1>
 				      * element dof handlers.
 				      */
     template <typename InputVector, class DH>
-    static void estimate (const Mapping<1>      &mapping,
+    static void estimate (const Mapping<1,spacedim>      &mapping,
 			  const DH                &dof,
 			  const hp::QCollection<0> &quadrature,
 			  const typename FunctionMap<1>::type &neumann_bc,
@@ -979,7 +979,7 @@ class KellyErrorEstimator<1>
 				      * element dof handlers.
 				      */
     template <typename InputVector, class DH>
-    static void estimate (const Mapping<1>          &mapping,
+    static void estimate (const Mapping<1,spacedim>          &mapping,
 			  const DH                    &dof,
 			  const hp::QCollection<0> &quadrature,
 			  const typename FunctionMap<1>::type &neumann_bc,

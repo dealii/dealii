@@ -29,24 +29,24 @@
 DEAL_II_NAMESPACE_OPEN
 
 
-template <int dim>
-const unsigned int MappingCartesian<dim>::invalid_face_number;
+template<int dim, int spacedim>
+const unsigned int MappingCartesian<dim,spacedim>::invalid_face_number;
 
 
 
-template<int dim>
-MappingCartesian<dim>::InternalData::InternalData (const Quadrature<dim>& q)
+template<int dim, int spacedim>
+MappingCartesian<dim, spacedim>::InternalData::InternalData (const Quadrature<dim>& q)
 		:
 		quadrature_points (q.get_points ())
 {}
 
 
 
-template <int dim>
+template<int dim, int spacedim>
 unsigned int
-MappingCartesian<dim>::InternalData::memory_consumption () const
+MappingCartesian<dim, spacedim>::InternalData::memory_consumption () const
 {
-  return (Mapping<dim>::InternalDataBase::memory_consumption() +
+  return (Mapping<dim, spacedim>::InternalDataBase::memory_consumption() +
 	  MemoryConsumption::memory_consumption (length) +
 	  MemoryConsumption::memory_consumption (quadrature_points));
 }
@@ -54,18 +54,18 @@ MappingCartesian<dim>::InternalData::memory_consumption () const
 
 
 
-template <int dim>
+template<int dim, int spacedim>
 UpdateFlags
-MappingCartesian<dim>::update_once (const UpdateFlags) const
+MappingCartesian<dim, spacedim>::update_once (const UpdateFlags) const
 {
   return update_default;
 }
 
 
 
-template <int dim>
+template<int dim, int spacedim>
 UpdateFlags
-MappingCartesian<dim>::update_each (const UpdateFlags in) const
+MappingCartesian<dim, spacedim>::update_each (const UpdateFlags in) const
 {
   UpdateFlags out = in;
   if (out & update_boundary_forms)
@@ -76,9 +76,9 @@ MappingCartesian<dim>::update_each (const UpdateFlags in) const
 
 
 
-template <int dim>
-typename Mapping<dim>::InternalDataBase *
-MappingCartesian<dim>::get_data (const UpdateFlags      update_flags,
+template<int dim, int spacedim>
+typename Mapping<dim, spacedim>::InternalDataBase *
+MappingCartesian<dim, spacedim>::get_data (const UpdateFlags      update_flags,
 				 const Quadrature<dim> &q) const
 {
   InternalData* data = new InternalData (q);
@@ -92,9 +92,9 @@ MappingCartesian<dim>::get_data (const UpdateFlags      update_flags,
 
 
 
-template <int dim>
-typename Mapping<dim>::InternalDataBase *
-MappingCartesian<dim>::get_face_data (const UpdateFlags update_flags,
+template<int dim, int spacedim>
+typename Mapping<dim, spacedim>::InternalDataBase *
+MappingCartesian<dim, spacedim>::get_face_data (const UpdateFlags update_flags,
 				      const Quadrature<dim-1>& quadrature) const
 {
   InternalData* data
@@ -109,9 +109,9 @@ MappingCartesian<dim>::get_face_data (const UpdateFlags update_flags,
 
 
 
-template <int dim>
-typename Mapping<dim>::InternalDataBase *
-MappingCartesian<dim>::get_subface_data (const UpdateFlags update_flags,
+template<int dim, int spacedim>
+typename Mapping<dim, spacedim>::InternalDataBase *
+MappingCartesian<dim, spacedim>::get_subface_data (const UpdateFlags update_flags,
 					 const Quadrature<dim-1> &quadrature) const
 {
   InternalData* data
@@ -127,9 +127,9 @@ MappingCartesian<dim>::get_subface_data (const UpdateFlags update_flags,
 
 
 
-template <int dim>
+template<int dim, int spacedim>
 void
-MappingCartesian<dim>::compute_fill (const typename Triangulation<dim>::cell_iterator &cell,
+MappingCartesian<dim, spacedim>::compute_fill (const typename Triangulation<dim,spacedim>::cell_iterator &cell,
 				     const unsigned int        face_no,
 				     const unsigned int        sub_no,
 				     InternalData             &data,
@@ -294,17 +294,18 @@ MappingCartesian<dim>::compute_fill (const typename Triangulation<dim>::cell_ite
 
 
 
-template <int dim>
+template<int dim, int spacedim>
 void
-MappingCartesian<dim>::
-fill_fe_values (const typename Triangulation<dim>::cell_iterator& cell,
+MappingCartesian<dim, spacedim>::
+fill_fe_values (const typename Triangulation<dim,spacedim>::cell_iterator& cell,
                 const Quadrature<dim>& q, 
-                typename Mapping<dim>::InternalDataBase& mapping_data,
-                std::vector<Point<dim> >& quadrature_points,
+	        typename Mapping<dim,spacedim>::InternalDataBase& mapping_data,
+                std::vector<Point<spacedim> >& quadrature_points,
                 std::vector<double>& JxW_values,
-		std::vector<Tensor<2,dim> >& jacobians,
-		std::vector<Tensor<3,dim> >& jacobian_grads,
-		std::vector<Tensor<2,dim> >& inverse_jacobians) const
+		std::vector<Tensor<2,spacedim> >& jacobians,
+		std::vector<Tensor<3,spacedim> >& jacobian_grads,
+		std::vector<Tensor<2,spacedim> >& inverse_jacobians,
+	        std::vector<Point<spacedim> >       &) const
 {
 				   // convert data object to internal
 				   // data for this class. fails with
@@ -361,12 +362,12 @@ fill_fe_values (const typename Triangulation<dim>::cell_iterator& cell,
 
 
 
-template <int dim>
+template<int dim, int spacedim>
 void
-MappingCartesian<dim>::fill_fe_face_values (const typename Triangulation<dim>::cell_iterator &cell,
+MappingCartesian<dim, spacedim>::fill_fe_face_values (const typename Triangulation<dim,spacedim>::cell_iterator &cell,
 					    const unsigned int            face_no,
 					    const Quadrature<dim-1>      &q,
-					    typename Mapping<dim>::InternalDataBase &mapping_data,
+					    typename Mapping<dim, spacedim>::InternalDataBase &mapping_data,
 					    std::vector<Point<dim> >     &quadrature_points,
 					    std::vector<double>          &JxW_values,
 					    std::vector<Tensor<1,dim> >  &boundary_forms,
@@ -406,13 +407,13 @@ MappingCartesian<dim>::fill_fe_face_values (const typename Triangulation<dim>::c
 
 
 
-template <int dim>
+template<int dim, int spacedim>
 void
-MappingCartesian<dim>::fill_fe_subface_values (const typename Triangulation<dim>::cell_iterator &cell,
+MappingCartesian<dim, spacedim>::fill_fe_subface_values (const typename Triangulation<dim,spacedim>::cell_iterator &cell,
 					       const unsigned int       face_no,
 					       const unsigned int       sub_no,
 					       const Quadrature<dim-1> &q,
-					       typename Mapping<dim>::InternalDataBase &mapping_data,
+					       typename Mapping<dim, spacedim>::InternalDataBase &mapping_data,
 					       std::vector<Point<dim> >     &quadrature_points,
 					       std::vector<double>          &JxW_values,
 					       std::vector<Tensor<1,dim> >  &boundary_forms,
@@ -503,13 +504,13 @@ MappingCartesian<1>::fill_fe_subface_values (const Triangulation<1>::cell_iterat
 #endif
 
 
-template <int dim>
+template<int dim, int spacedim>
 void
-MappingCartesian<dim>::transform_covariant (
-  const VectorSlice<const std::vector<Tensor<1,dim> > > input,
+MappingCartesian<dim, spacedim>::transform_covariant (
+  const VectorSlice<const std::vector<Tensor<1,spacedim> > > input,
   const unsigned int                 offset,
-  VectorSlice<std::vector<Tensor<1,dim> > > output,
-  const typename Mapping<dim>::InternalDataBase &mapping_data) const
+  VectorSlice<std::vector<Tensor<1,spacedim> > > output,
+  const typename Mapping<dim, spacedim>::InternalDataBase &mapping_data) const
 {
   const InternalData &data = dynamic_cast<const InternalData&> (mapping_data);
 
@@ -527,13 +528,13 @@ MappingCartesian<dim>::transform_covariant (
 
 
 
-template <int dim>
+template<int dim, int spacedim>
 void
-MappingCartesian<dim>::transform_covariant (
-  const VectorSlice<const std::vector<Tensor<2,dim> > > input,
+MappingCartesian<dim, spacedim>::transform_covariant (
+  const VectorSlice<const std::vector<Tensor<2,spacedim> > > input,
   const unsigned int                 offset,
-  VectorSlice<std::vector<Tensor<2,dim> > > output,
-  const typename Mapping<dim>::InternalDataBase &mapping_data) const
+  VectorSlice<std::vector<Tensor<2,spacedim> > > output,
+  const typename Mapping<dim, spacedim>::InternalDataBase &mapping_data) const
 {
   const InternalData &data = dynamic_cast<const InternalData&> (mapping_data);
 
@@ -552,13 +553,13 @@ MappingCartesian<dim>::transform_covariant (
 
 
 
-template <int dim>
+template<int dim, int spacedim>
 void
-MappingCartesian<dim>::transform_contravariant (
-  const VectorSlice<const std::vector<Tensor<1,dim> > > input,
+MappingCartesian<dim, spacedim>::transform_contravariant (
+  const VectorSlice<const std::vector<Tensor<1,spacedim> > > input,
   const unsigned int                 offset,
-  VectorSlice<std::vector<Tensor<1,dim> > > output,
-  const typename Mapping<dim>::InternalDataBase &mapping_data) const
+  VectorSlice<std::vector<Tensor<1,spacedim> > > output,
+  const typename Mapping<dim, spacedim>::InternalDataBase &mapping_data) const
 {
 				   // convert data object to internal
 				   // data for this class. fails with
@@ -580,13 +581,13 @@ MappingCartesian<dim>::transform_contravariant (
 
 
 
-template <int dim>
+template<int dim, int spacedim>
 void
-MappingCartesian<dim>::transform_contravariant (
-  const VectorSlice<const std::vector<Tensor<2,dim> > > input,
+MappingCartesian<dim, spacedim>::transform_contravariant (
+  const VectorSlice<const std::vector<Tensor<2,spacedim> > > input,
   const unsigned int                 offset,
-  VectorSlice<std::vector<Tensor<2,dim> > > output,
-  const typename Mapping<dim>::InternalDataBase &mapping_data) const
+  VectorSlice<std::vector<Tensor<2,spacedim> > > output,
+  const typename Mapping<dim, spacedim>::InternalDataBase &mapping_data) const
 {
 				   // convert data object to internal
 				   // data for this class. fails with
@@ -609,10 +610,10 @@ MappingCartesian<dim>::transform_contravariant (
 
 
 
-template <int dim>
-Point<dim>
-MappingCartesian<dim>::transform_unit_to_real_cell (
-  const typename Triangulation<dim>::cell_iterator &cell,
+template <int dim, int spacedim>
+Point<spacedim>
+MappingCartesian<dim, spacedim>::transform_unit_to_real_cell (
+  const typename Triangulation<dim,spacedim>::cell_iterator &cell,
   const Point<dim>                                 &p) const
 {
   Tensor<1,dim> length;
@@ -644,12 +645,15 @@ MappingCartesian<dim>::transform_unit_to_real_cell (
 
 
 
-template <int dim>
+template<int dim, int spacedim>
 Point<dim>
-MappingCartesian<dim>::transform_real_to_unit_cell (
-  const typename Triangulation<dim>::cell_iterator &cell,
-  const Point<dim>                                 &p) const
+MappingCartesian<dim, spacedim>::transform_real_to_unit_cell (
+  const typename Triangulation<dim,spacedim>::cell_iterator &cell,
+  const Point<spacedim>                            &p) const
 {
+
+  if(dim != spacedim)
+      Assert(false, ExcNotImplemented());
   const Point<dim> &start = cell->vertex(0);
   Point<dim> real = p;
   real -= start;
@@ -675,11 +679,11 @@ MappingCartesian<dim>::transform_real_to_unit_cell (
 }
 
 
-template <int dim>
-Mapping<dim> *
-MappingCartesian<dim>::clone () const
+template<int dim, int spacedim>
+Mapping<dim, spacedim> *
+MappingCartesian<dim, spacedim>::clone () const
 {
-  return new MappingCartesian<dim>(*this);
+  return new MappingCartesian<dim, spacedim>(*this);
 }
 
 

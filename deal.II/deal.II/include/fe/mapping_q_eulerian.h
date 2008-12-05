@@ -85,8 +85,8 @@ DEAL_II_NAMESPACE_OPEN
  *
  * @author Joshua White, 2008
  */
-template <int dim, class EulerVectorType = Vector<double> >
-class MappingQEulerian : public MappingQ<dim>
+template <int dim, class EulerVectorType = Vector<double>, int spacedim=dim >
+class MappingQEulerian : public MappingQ<dim, spacedim>
 {
   public:
                                      /**
@@ -109,7 +109,7 @@ class MappingQEulerian : public MappingQ<dim>
                                       * of a nonlinear problem.
                                       * Alternatively, the @p Vector
                                       * can be initialized by
-                                      * <tt>DoFObjectAccessor::set_dof_values()</tt>.
+                                      * <tt>DoFAccessor::set_dof_values()</tt>.
                                       */
 
     MappingQEulerian (const unsigned int     degree,
@@ -122,7 +122,7 @@ class MappingQEulerian : public MappingQ<dim>
                                       * copy then assumes ownership of it.
                                       */
     virtual
-    Mapping<dim> * clone () const;
+    Mapping<dim,spacedim> * clone () const;
 
                                      /**
                                       * Exception

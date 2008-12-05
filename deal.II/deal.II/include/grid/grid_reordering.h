@@ -2,7 +2,7 @@
 //    $Id$
 //    Version: $Name$
 //
-//    Copyright (C) 2000, 2001, 2002, 2003, 2004, 2005, 2006, 2007 by the deal.II authors
+//    Copyright (C) 2000, 2001, 2002, 2003, 2004, 2005, 2006, 2007, 2008 by the deal.II authors
 //
 //    This file is subject to QPL and may not be  distributed
 //    without copyright and license information. Please refer
@@ -643,7 +643,7 @@ DEAL_II_NAMESPACE_OPEN
  * @ingroup grid
  * @author Wolfgang Bangerth, 2000, Michael Anderson 2003, Ralf Hartmann 2005
  */
-template <int dim>
+template <int dim, int spacedim=dim>
 class GridReordering
 {
   public:
@@ -670,7 +670,7 @@ class GridReordering
 				      *
 				      * In 2d and 3d this function checks
 				      * whether all cells have
-				      * negative or positiv
+				      * negative or positive
 				      * measure/volume. In the former
 				      * case, all cells are inverted.
 				      * It does nothing in 1d.
@@ -692,7 +692,7 @@ class GridReordering
 				      * reorder_cells().
 				      */
     static void invert_all_cells_of_negative_grid(
-      const std::vector<Point<dim> > &all_vertices,
+      const std::vector<Point<spacedim> > &all_vertices,
       std::vector<CellData<dim> > &original_cells);    
 };
 
@@ -704,15 +704,17 @@ GridReordering<2>::reorder_cells (std::vector<CellData<2> > &original_cells);
 
 template<>
 void
+GridReordering<2,3>::reorder_cells (std::vector<CellData<2> > &original_cells);
+
+template<>
+void
 GridReordering<2>::invert_all_cells_of_negative_grid(const std::vector<Point<2> > &all_vertices,
 						     std::vector<CellData<2> >    &cells);
 
-template <>
+template<>
 void
-Triangulation<2>::create_triangulation_compatibility (const std::vector<Point<2> >    &v,
-						      const std::vector<CellData<2> > &c,
-						      const SubCellData               &subcelldata);
-
+GridReordering<2,3>::invert_all_cells_of_negative_grid(const std::vector<Point<3> > &all_vertices,
+						     std::vector<CellData<2> >    &cells);
 
 
 DEAL_II_NAMESPACE_CLOSE

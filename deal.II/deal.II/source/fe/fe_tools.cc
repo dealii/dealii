@@ -167,20 +167,20 @@ namespace
                                    // that function directly if
                                    // T==double, and otherwise uses a
                                    // temporary
-  template <int dim>
+  template <int dim, int spacedim>
   inline
-  void gim_forwarder (const FiniteElement<dim> &fe1,
-                      const FiniteElement<dim> &fe2,
+  void gim_forwarder (const FiniteElement<dim,spacedim> &fe1,
+                      const FiniteElement<dim,spacedim> &fe2,
                       FullMatrix<double> &interpolation_matrix)
   {
     fe2.get_interpolation_matrix (fe1, interpolation_matrix);
   }
 
   
-  template <int dim, typename number>
+  template <int dim, typename number, int spacedim>
   inline
-  void gim_forwarder (const FiniteElement<dim> &fe1,
-                      const FiniteElement<dim> &fe2,
+  void gim_forwarder (const FiniteElement<dim,spacedim> &fe1,
+                      const FiniteElement<dim,spacedim> &fe2,
                       FullMatrix<number> &interpolation_matrix)
   {
     FullMatrix<double> tmp (interpolation_matrix.m(),
@@ -198,7 +198,7 @@ namespace
 				   // specialized string with "dim"
 				   // replaced with the numeric value
 				   // of the template argument
-  template <int dim>
+  template <int dim, int spacedim>
   inline
   unsigned int match_dimension (const std::string &name,
 				const unsigned int position)
@@ -238,14 +238,14 @@ namespace
 }
 
 
-template <int dim>
-FETools::FEFactoryBase<dim>::~FEFactoryBase()
+template <int dim, int spacedim>
+FETools::FEFactoryBase<dim,spacedim>::~FEFactoryBase()
 {}
 
 
-template<int dim>
+template<int dim, int spacedim>
 void FETools::compute_component_wise(
-  const FiniteElement<dim>& element,
+  const FiniteElement<dim,spacedim>& element,
   std::vector<unsigned int>& renumbering,
   std::vector<std::vector<unsigned int> >& comp_start)
 {
@@ -285,9 +285,9 @@ void FETools::compute_component_wise(
 
 
 
-template<int dim>
+template<int dim, int spacedim>
 void FETools::compute_block_renumbering (
-  const FiniteElement<dim>& element,
+  const FiniteElement<dim,spacedim>& element,
   std::vector<unsigned int>& renumbering,
   std::vector<unsigned int>& start_indices)
 {
@@ -319,9 +319,9 @@ void FETools::compute_block_renumbering (
 
 
 
-template <int dim, typename number>
-void FETools::get_interpolation_matrix (const FiniteElement<dim> &fe1,
-                                        const FiniteElement<dim> &fe2,
+template <int dim, typename number, int spacedim>
+void FETools::get_interpolation_matrix (const FiniteElement<dim,spacedim> &fe1,
+                                        const FiniteElement<dim,spacedim> &fe2,
                                         FullMatrix<number> &interpolation_matrix)
 {
   Assert (fe1.n_components() == fe2.n_components(),
@@ -341,7 +341,7 @@ void FETools::get_interpolation_matrix (const FiniteElement<dim> &fe1,
     {
       gim_forwarder (fe1, fe2, interpolation_matrix);
     }
-  catch (typename FiniteElement<dim>::ExcInterpolationNotImplemented &)
+  catch (typename FiniteElement<dim,spacedim>::ExcInterpolationNotImplemented &)
     {
                                        // too bad....
       fe_implements_interpolation = false;
@@ -363,8 +363,9 @@ void FETools::get_interpolation_matrix (const FiniteElement<dim> &fe1,
   const std::vector<Point<dim> > &
     fe2_support_points = fe2.get_unit_support_points ();
 
+  typedef FiniteElement<dim,spacedim> FEL;
   Assert(fe2_support_points.size()==fe2.dofs_per_cell,
-	 typename FiniteElement<dim>::ExcFEHasNoSupportPoints());
+	 typename FEL::ExcFEHasNoSupportPoints());
 
   for (unsigned int i=0; i<fe2.dofs_per_cell; ++i)	
     {
@@ -382,9 +383,9 @@ void FETools::get_interpolation_matrix (const FiniteElement<dim> &fe1,
 
 
 
-template <int dim, typename number>
-void FETools::get_back_interpolation_matrix(const FiniteElement<dim> &fe1,
-					    const FiniteElement<dim> &fe2,
+template <int dim, typename number, int spacedim>
+void FETools::get_back_interpolation_matrix(const FiniteElement<dim,spacedim> &fe1,
+					    const FiniteElement<dim,spacedim> &fe2,
 					    FullMatrix<number> &interpolation_matrix)
 {
   Assert (fe1.n_components() == fe2.n_components(),
@@ -408,9 +409,9 @@ void FETools::get_back_interpolation_matrix(const FiniteElement<dim> &fe1,
 
 
 
-template <int dim, typename number>
-void FETools::get_interpolation_difference_matrix (const FiniteElement<dim> &fe1,
-						   const FiniteElement<dim> &fe2,
+template <int dim, typename number, int spacedim>
+void FETools::get_interpolation_difference_matrix (const FiniteElement<dim,spacedim> &fe1,
+						   const FiniteElement<dim,spacedim> &fe2,
 						   FullMatrix<number> &difference_matrix)
 {
   Assert (fe1.n_components() == fe2.n_components(),
@@ -434,9 +435,9 @@ void FETools::get_interpolation_difference_matrix (const FiniteElement<dim> &fe1
 
 
 
-template <int dim, typename number>
-void FETools::get_projection_matrix (const FiniteElement<dim> &fe1,
-				     const FiniteElement<dim> &fe2,
+template <int dim, typename number, int spacedim>
+void FETools::get_projection_matrix (const FiniteElement<dim,spacedim> &fe1,
+				     const FiniteElement<dim,spacedim> &fe2,
 				     FullMatrix<number> &matrix)
 {
   Assert (fe1.n_components() == 1, ExcNotImplemented());
@@ -453,7 +454,7 @@ void FETools::get_projection_matrix (const FiniteElement<dim> &fe1,
 
   				   // First, create a local mass matrix for
   				   // the unit cell
-  Triangulation<dim> tr;
+  Triangulation<dim,spacedim> tr;
   GridGenerator::hyper_cube(tr);
   
 				   // Choose a quadrature rule
@@ -517,11 +518,11 @@ void FETools::get_projection_matrix (const FiniteElement<dim> &fe1,
 }
 
 
-template<int dim>
+template<int dim, int spacedim>
 void
 FETools::compute_node_matrix(
   FullMatrix<double>& N,
-  const FiniteElement<dim>& fe)
+  const FiniteElement<dim,spacedim>& fe)
 {
   const unsigned int n_dofs = fe.dofs_per_cell;
   Assert (fe.has_generalized_support_points(), ExcNotInitialized());
@@ -559,13 +560,32 @@ FETools::compute_node_matrix(
     }
 }
 
+#if deal_II_dimension != 3
+template<>
+void
+FETools::compute_embedding_matrices(const FiniteElement<1,2> &,
+				    std::vector<std::vector<FullMatrix<double> > > & )
+{
+  Assert(false, ExcNotImplemented());
+}
+
+template<>
+void
+FETools::compute_embedding_matrices(const FiniteElement<2,3>&,
+				    std::vector<std::vector<FullMatrix<double> > >& )
+{
+  Assert(false, ExcNotImplemented());
+}
+
+#endif
 
 // This function is tested by tests/fe/internals, since it produces the matrices printed there
-template<int dim, typename number>
+template <int dim, typename number, int spacedim>
 void
-FETools::compute_embedding_matrices(const FiniteElement<dim>& fe,
+FETools::compute_embedding_matrices(const FiniteElement<dim,spacedim>& fe,
 				    std::vector<std::vector<FullMatrix<number> > >& matrices)
 {
+
   const unsigned int n  = fe.dofs_per_cell;
   const unsigned int nd = fe.n_components();
   const unsigned int degree = fe.degree;
@@ -581,9 +601,9 @@ FETools::compute_embedding_matrices(const FiniteElement<dim>& fe,
 	  Assert(matrices[ref_case-1][i].m() == n, ExcDimensionMismatch(matrices[ref_case-1][i].m(),n));
 	}
   
-				       // Set up meshes, one with a single
-				       // reference cell and refine it once
-      Triangulation<dim> tria;
+                                   // Set up meshes, one with a single
+                                   // reference cell and refine it once
+      Triangulation<dim,spacedim> tria;
       GridGenerator::hyper_cube (tria, 0, 1);
       tria.begin_active()->set_refine_flag(RefinementCase<dim>(ref_case));
       tria.execute_coarsening_and_refinement();
@@ -682,9 +702,9 @@ FETools::compute_embedding_matrices(const FiniteElement<dim>& fe,
 // This function is tested by tests/fe/internals, since it produces the matrices printed there
 
 //TODO:[GK] Is this correct for vector valued?
-template<int dim, typename number>
+template <int dim, typename number, int spacedim>
 void
-FETools::compute_face_embedding_matrices(const FiniteElement<dim>& fe,
+FETools::compute_face_embedding_matrices(const FiniteElement<dim,spacedim>& fe,
 					 FullMatrix<number> (&matrices)[GeometryInfo<dim>::max_children_per_face],
 					 const unsigned int face_coarse,
 					 const unsigned int face_fine)
@@ -702,7 +722,7 @@ FETools::compute_face_embedding_matrices(const FiniteElement<dim>& fe,
   
                                    // Set up meshes, one with a single
                                    // reference cell and refine it once
-  Triangulation<dim> tria;
+  Triangulation<dim,spacedim> tria;
   GridGenerator::hyper_cube (tria, 0, 1);
   tria.refine_global(1);
 
@@ -802,7 +822,7 @@ FETools::compute_face_embedding_matrices(const FiniteElement<dim>& fe,
 	= QProjector<dim>::project_to_subface(q_gauss, face_coarse, cell_number);
       FEValues<dim> coarse (mapping, fe, q_coarse, update_values);
       
-      typename Triangulation<dim>::active_cell_iterator fine_cell
+      typename Triangulation<dim,spacedim>::active_cell_iterator fine_cell
 	= tria.begin(0)->child(GeometryInfo<dim>::child_cell_on_face(
 	  tria.begin(0)->refinement_case(), face_coarse, cell_number));
       fine.reinit(fine_cell);
@@ -847,10 +867,29 @@ FETools::compute_face_embedding_matrices(const FiniteElement<dim>& fe,
     }
 }
 
-
-template<int dim, typename number>
+#if deal_II_dimension != 3
+template <>
 void
-FETools::compute_projection_matrices(const FiniteElement<dim>& fe,
+FETools::compute_projection_matrices(const FiniteElement<1,2>&,
+				     std::vector<std::vector<FullMatrix<double> > >& )
+{
+  Assert(false, ExcNotImplemented());
+}
+
+template <>
+void
+FETools::compute_projection_matrices(const FiniteElement<2,3>&,
+				     std::vector<std::vector<FullMatrix<double> > >& )
+{
+  Assert(false, ExcNotImplemented());
+}
+
+#endif
+
+
+template <int dim, typename number, int spacedim>
+void
+FETools::compute_projection_matrices(const FiniteElement<dim,spacedim>& fe,
 				     std::vector<std::vector<FullMatrix<number> > >& matrices)
 {
   const unsigned int n  = fe.dofs_per_cell;
@@ -872,7 +911,7 @@ FETools::compute_projection_matrices(const FiniteElement<dim>& fe,
 		 ExcDimensionMismatch(matrices[ref_case-1][i].m(),n));
 	}
   
-      Triangulation<dim> tr;
+      Triangulation<dim,spacedim> tr;
       GridGenerator::hyper_cube (tr, 0, 1);
       tr.begin_active()->set_refine_flag(RefinementCase<dim>(ref_case));
       tr.execute_coarsening_and_refinement();
@@ -890,7 +929,7 @@ FETools::compute_projection_matrices(const FiniteElement<dim>& fe,
 			  update_JxW_values |
 			  update_values);
   
-      typename Triangulation<dim>::cell_iterator coarse_cell
+      typename Triangulation<dim,spacedim>::cell_iterator coarse_cell
 	= tr.begin(0);
 				       // Compute the coarse level mass
 				       // matrix
@@ -976,15 +1015,15 @@ FETools::compute_projection_matrices(const FiniteElement<dim>& fe,
 }
 
 
-template <int dim,
-          template <int> class DH1,
-          template <int> class DH2,
+template <int dim, int spacedim,
+          template <int, int> class DH1,
+          template <int, int> class DH2,
           class InVector, class OutVector>
 void
-FETools::interpolate(const DH1<dim> &dof1,
-                     const InVector &u1,
-                     const DH2<dim> &dof2,
-                     OutVector      &u2)
+FETools::interpolate(const DH1<dim, spacedim> &dof1,
+                     const InVector           &u1,
+                     const DH2<dim, spacedim> &dof2,
+                     OutVector                &u2)
 {
   ConstraintMatrix dummy;
   dummy.close();
@@ -993,16 +1032,16 @@ FETools::interpolate(const DH1<dim> &dof1,
 
 
 
-template <int dim,
-          template <int> class DH1,
-          template <int> class DH2,              
+template <int dim, int spacedim,
+          template <int, int> class DH1,
+          template <int, int> class DH2,              
           class InVector, class OutVector>
 void
-FETools::interpolate (const DH1<dim>         &dof1,
-                      const InVector         &u1,
-                      const DH2<dim>         &dof2,
-                      const ConstraintMatrix &constraints,
-                      OutVector              &u2)
+FETools::interpolate (const DH1<dim, spacedim> &dof1,
+                      const InVector           &u1,
+                      const DH2<dim, spacedim> &dof2,
+                      const ConstraintMatrix   &constraints,
+                      OutVector                &u2)
 {
   Assert(&dof1.get_tria()==&dof2.get_tria(), ExcTriangulationMismatch());
 
@@ -1022,15 +1061,15 @@ FETools::interpolate (const DH1<dim>         &dof1,
                                    // have a map for interpolation
                                    // matrices. shared_ptr make sure
                                    // that memory is released again
-  std::map<const FiniteElement<dim> *,
-           std::map<const FiniteElement<dim> *,
+  std::map<const FiniteElement<dim,spacedim> *,
+           std::map<const FiniteElement<dim,spacedim> *,
                     boost::shared_ptr<FullMatrix<double> > > >
     interpolation_matrices;
   
-  typename DH1<dim>::active_cell_iterator cell1 = dof1.begin_active(),
-                                          endc1 = dof1.end();
-  typename DH2<dim>::active_cell_iterator cell2 = dof2.begin_active(),
-                                          endc2 = dof2.end();
+  typename DH1<dim,spacedim>::active_cell_iterator cell1 = dof1.begin_active(),
+                                                   endc1 = dof1.end();
+  typename DH2<dim,spacedim>::active_cell_iterator cell2 = dof2.begin_active(),
+                                                   endc2 = dof2.end();
 
   std::vector<unsigned int> touch_count(dof2.n_dofs(),0);
   std::vector<unsigned int> dofs;
@@ -1115,11 +1154,11 @@ FETools::interpolate (const DH1<dim>         &dof1,
 
 
 
-template <int dim, class InVector, class OutVector>
+template <int dim, class InVector, class OutVector, int spacedim>
 void
-FETools::back_interpolate(const DoFHandler<dim>    &dof1,
+FETools::back_interpolate(const DoFHandler<dim,spacedim>    &dof1,
                           const InVector           &u1,
-                          const FiniteElement<dim> &fe2,
+                          const FiniteElement<dim,spacedim> &fe2,
                           OutVector                &u1_interpolated)
 {
   Assert(dof1.get_fe().n_components() == fe2.n_components(),
@@ -1143,7 +1182,7 @@ FETools::back_interpolate(const DoFHandler<dim>    &dof1,
   Vector<typename OutVector::value_type> u1_local(dofs_per_cell1);
   Vector<typename OutVector::value_type> u1_int_local(dofs_per_cell1);
   
-  typename DoFHandler<dim>::active_cell_iterator cell = dof1.begin_active(),
+  typename DoFHandler<dim,spacedim>::active_cell_iterator cell = dof1.begin_active(),
 						 endc = dof1.end();
 
   FullMatrix<double> interpolation_matrix(dofs_per_cell1, dofs_per_cell1);
@@ -1167,11 +1206,11 @@ FETools::back_interpolate(const DoFHandler<dim>    &dof1,
   
 template <int dim,
           template <int> class DH,
-          class InVector, class OutVector>
+          class InVector, class OutVector, int spacedim>
 void
 FETools::back_interpolate(const DH<dim>            &dof1,
                           const InVector           &u1,
-                          const FiniteElement<dim> &fe2,
+                          const FiniteElement<dim,spacedim> &fe2,
                           OutVector                &u1_interpolated)
 {
   Assert(u1.size() == dof1.n_dofs(),
@@ -1237,11 +1276,11 @@ FETools::back_interpolate(const DH<dim>            &dof1,
 
 
   
-template <int dim, class InVector, class OutVector>
-void FETools::back_interpolate(const DoFHandler<dim> &dof1,
+template <int dim, class InVector, class OutVector, int spacedim>
+void FETools::back_interpolate(const DoFHandler<dim,spacedim> &dof1,
 			       const ConstraintMatrix &constraints1,
 			       const InVector &u1,
-			       const DoFHandler<dim> &dof2,
+			       const DoFHandler<dim,spacedim> &dof2,
 			       const ConstraintMatrix &constraints2,
 			       OutVector &u1_interpolated)
 {
@@ -1275,10 +1314,10 @@ void FETools::back_interpolate(const DoFHandler<dim> &dof1,
 
 
   
-template <int dim, class InVector, class OutVector>
-void FETools::interpolation_difference (const DoFHandler<dim> &dof1,
+template <int dim, class InVector, class OutVector, int spacedim>
+void FETools::interpolation_difference (const DoFHandler<dim,spacedim> &dof1,
 					const InVector &u1,
-					const FiniteElement<dim> &fe2,
+					const FiniteElement<dim,spacedim> &fe2,
 					OutVector &u1_difference)
 {
   Assert(dof1.get_fe().n_components() == fe2.n_components(),
@@ -1306,7 +1345,7 @@ void FETools::interpolation_difference (const DoFHandler<dim> &dof1,
   FETools::get_interpolation_difference_matrix(dof1.get_fe(), fe2,
 					       difference_matrix);
   
-  typename DoFHandler<dim>::active_cell_iterator cell = dof1.begin_active(),
+  typename DoFHandler<dim,spacedim>::active_cell_iterator cell = dof1.begin_active(),
 						 endc = dof1.end();
   
   for (; cell!=endc; ++cell)
@@ -1325,11 +1364,11 @@ void FETools::interpolation_difference (const DoFHandler<dim> &dof1,
 
 
 
-template <int dim, class InVector, class OutVector>
-void FETools::interpolation_difference(const DoFHandler<dim> &dof1,
+template <int dim, class InVector, class OutVector, int spacedim>
+void FETools::interpolation_difference(const DoFHandler<dim,spacedim> &dof1,
 				       const ConstraintMatrix &constraints1,
 				       const InVector &u1,
-				       const DoFHandler<dim> &dof2,
+				       const DoFHandler<dim,spacedim> &dof2,
 				       const ConstraintMatrix &constraints2,
 				       OutVector &u1_difference)
 {
@@ -1348,10 +1387,10 @@ void FETools::interpolation_difference(const DoFHandler<dim> &dof1,
 }
 
   
-template <int dim, class InVector, class OutVector>
-void FETools::project_dg(const DoFHandler<dim> &dof1,
+template <int dim, class InVector, class OutVector, int spacedim>
+void FETools::project_dg(const DoFHandler<dim,spacedim> &dof1,
 			 const InVector &u1,
-			 const DoFHandler<dim> &dof2,
+			 const DoFHandler<dim,spacedim> &dof2,
 			 OutVector &u2)
 {
   Assert(&dof1.get_tria()==&dof2.get_tria(), ExcTriangulationMismatch());
@@ -1360,9 +1399,9 @@ void FETools::project_dg(const DoFHandler<dim> &dof1,
   Assert(u1.size()==dof1.n_dofs(), ExcDimensionMismatch(u1.size(), dof1.n_dofs()));  
   Assert(u2.size()==dof2.n_dofs(), ExcDimensionMismatch(u2.size(), dof2.n_dofs()));
 
-  typename DoFHandler<dim>::active_cell_iterator cell1 = dof1.begin_active();
-  typename DoFHandler<dim>::active_cell_iterator cell2 = dof2.begin_active();
-  typename DoFHandler<dim>::active_cell_iterator end = dof2.end();
+  typename DoFHandler<dim,spacedim>::active_cell_iterator cell1 = dof1.begin_active();
+  typename DoFHandler<dim,spacedim>::active_cell_iterator cell2 = dof2.begin_active();
+  typename DoFHandler<dim,spacedim>::active_cell_iterator end = dof2.end();
 
   const unsigned int n1 = dof1.get_fe().dofs_per_cell;
   const unsigned int n2 = dof2.get_fe().dofs_per_cell;
@@ -1390,10 +1429,10 @@ void FETools::project_dg(const DoFHandler<dim> &dof1,
 }
 
   
-template <int dim, class InVector, class OutVector>
-void FETools::extrapolate(const DoFHandler<dim> &dof1,
+template <int dim, class InVector, class OutVector, int spacedim>
+void FETools::extrapolate(const DoFHandler<dim,spacedim> &dof1,
 			  const InVector &u1,
-			  const DoFHandler<dim> &dof2,
+			  const DoFHandler<dim,spacedim> &dof2,
 			  OutVector &u2)
 {
   ConstraintMatrix dummy;
@@ -1403,10 +1442,10 @@ void FETools::extrapolate(const DoFHandler<dim> &dof1,
 
 
 
-template <int dim, class InVector, class OutVector>
-void FETools::extrapolate(const DoFHandler<dim> &dof1,
+template <int dim, class InVector, class OutVector, int spacedim>
+void FETools::extrapolate(const DoFHandler<dim,spacedim> &dof1,
 			  const InVector &u1,
-			  const DoFHandler<dim> &dof2,
+			  const DoFHandler<dim,spacedim> &dof2,
 			  const ConstraintMatrix &constraints,
 			  OutVector &u2)
 {
@@ -1429,7 +1468,7 @@ void FETools::extrapolate(const DoFHandler<dim> &dof1,
 				   // treat these cells and would
 				   // generate a bogus result
   {
-    typename DoFHandler<dim>::cell_iterator cell = dof2.begin(0),
+    typename DoFHandler<dim,spacedim>::cell_iterator cell = dof2.begin(0),
 					    endc = dof2.end(0);
     for (; cell!=endc; ++cell)
       Assert (cell->has_children(), ExcGridNotRefinedAtLeastOnce());
@@ -1438,7 +1477,7 @@ void FETools::extrapolate(const DoFHandler<dim> &dof1,
 				   // then traverse grid bottom up
   for (unsigned int level=0; level<dof1.get_tria().n_levels()-1; ++level)
     {
-      typename DoFHandler<dim>::cell_iterator cell=dof2.begin(level),
+      typename DoFHandler<dim,spacedim>::cell_iterator cell=dof2.begin(level),
 					      endc=dof2.end(level);
 
       for (; cell!=endc; ++cell)
@@ -1475,10 +1514,10 @@ void FETools::extrapolate(const DoFHandler<dim> &dof1,
 }
 
 
-template <int dim>
+template <int dim, int spacedim>
 void
 FETools::add_fe_name(const std::string& parameter_name,
-		     const FEFactoryBase<dim>* factory)
+		     const FEFactoryBase<dim,spacedim>* factory)
 {
 				   // Erase everything after the
 				   // actual class name
@@ -1504,7 +1543,7 @@ FETools::add_fe_name(const std::string& parameter_name,
 
 
 template <int dim>
-FiniteElement<dim> *
+FiniteElement<dim, dim> *
 FETools::get_fe_from_name (const std::string &parameter_name)
 {
 				   // Create a version of the name
@@ -1554,7 +1593,7 @@ FETools::get_fe_from_name (const std::string &parameter_name)
   
   try
     {    
-      FiniteElement<dim> *fe = get_fe_from_name_aux<dim> (name);
+      FiniteElement<dim,dim> *fe = get_fe_from_name_aux<dim,dim> (name);
 
                                        // Make sure the auxiliary function
                                        // ate up all characters of the name.
@@ -1574,9 +1613,16 @@ FETools::get_fe_from_name (const std::string &parameter_name)
 }
 
 
+// template <int dim>
+// FiniteElement<dim> *
+// FETools::get_fe_from_name (const std::string &parameter_name)
+// {
+//     return get_fe_from_name<dim,dim>(parameter_name);
+// }
 
-template <int dim>
-FiniteElement<dim>*
+
+template <int dim, int spacedim>
+FiniteElement<dim,spacedim>*
 FETools::get_fe_from_name_aux (std::string &name)
 {
 				   // Extract the name of the
@@ -1605,7 +1651,7 @@ FETools::get_fe_from_name_aux (std::string &name)
 				       // recursive calls if one of
 				       // these calls should throw
 				       // an exception
-      std::vector<FiniteElement<dim>*> base_fes;
+      std::vector<FiniteElement<dim,spacedim>*> base_fes;
       std::vector<unsigned int>        base_multiplicities;
       try
 	{
@@ -1621,7 +1667,7 @@ FETools::get_fe_from_name_aux (std::string &name)
 					       // Now, the name of the
 					       // first base element is
 					       // first... Let's get it
-	      base_fes.push_back (get_fe_from_name_aux<dim> (name));
+	      base_fes.push_back (get_fe_from_name_aux<dim,spacedim> (name));
 					       // next check whether
 					       // FESystem placed a
 					       // multiplicity after
@@ -1677,7 +1723,7 @@ FETools::get_fe_from_name_aux (std::string &name)
 					     // everything went ok. so
 					     // generate the composed
 					     // element
-	    FiniteElement<dim> *system_element = 0;
+	    FiniteElement<dim,spacedim> *system_element = 0;
 	    switch (base_fes.size())
 	      {
 		case 1:
@@ -1803,10 +1849,10 @@ FETools::get_fe_from_name_aux (std::string &name)
 
 
 
-template <int dim>
+template <int dim, int spacedim>
 void
 FETools::
-compute_projection_from_quadrature_points_matrix (const FiniteElement<dim> &fe,
+compute_projection_from_quadrature_points_matrix (const FiniteElement<dim,spacedim> &fe,
                                                   const Quadrature<dim>    &lhs_quadrature,
                                                   const Quadrature<dim>    &rhs_quadrature,
                                                   FullMatrix<double>       &X)
@@ -1844,10 +1890,10 @@ compute_projection_from_quadrature_points_matrix (const FiniteElement<dim> &fe,
 
 
 
-template <int dim>
+template <int dim, int spacedim>
 void
 FETools::
-compute_interpolation_to_quadrature_points_matrix (const FiniteElement<dim> &fe,
+compute_interpolation_to_quadrature_points_matrix (const FiniteElement<dim,spacedim> &fe,
                                                    const Quadrature<dim>    &quadrature,
                                                    FullMatrix<double>       &I_q)
 {
@@ -1941,6 +1987,25 @@ void FETools::interpolate<deal_II_dimension>
 (const DoFHandler<deal_II_dimension> &, const Vector<double> &,
  const DoFHandler<deal_II_dimension> &, const ConstraintMatrix &,
  Vector<double> &);
+
+#if deal_II_dimension != 3
+template
+void FETools::compute_embedding_matrices<deal_II_dimension,double,deal_II_dimension+1>
+(const FiniteElement<deal_II_dimension,deal_II_dimension+1> &, std::vector<std::vector<FullMatrix<double> > >&);
+template
+void FETools::compute_projection_matrices<deal_II_dimension,double,deal_II_dimension+1>
+(const FiniteElement<deal_II_dimension,deal_II_dimension+1> &, std::vector<std::vector<FullMatrix<double> > >&);
+template
+void FETools::interpolate<deal_II_dimension,deal_II_dimension+1>
+(const DoFHandler<deal_II_dimension,deal_II_dimension+1> &, const Vector<double> &,
+ const DoFHandler<deal_II_dimension,deal_II_dimension+1> &, Vector<double> &);
+template
+void FETools::interpolate<deal_II_dimension,deal_II_dimension+1>
+(const DoFHandler<deal_II_dimension,deal_II_dimension+1> &, const Vector<double> &,
+ const DoFHandler<deal_II_dimension,deal_II_dimension+1> &, const ConstraintMatrix &,
+ Vector<double> &);
+#endif
+
 template
 void FETools::back_interpolate<deal_II_dimension>
 (const DoFHandler<deal_II_dimension> &, const Vector<double> &,
@@ -1985,6 +2050,19 @@ void FETools::interpolate<deal_II_dimension>
 (const DoFHandler<deal_II_dimension> &, const Vector<float> &,
  const DoFHandler<deal_II_dimension> &, const ConstraintMatrix &,
  Vector<float> &);
+
+#if deal_II_dimension != 3
+template
+void FETools::interpolate<deal_II_dimension,deal_II_dimension+1>
+(const DoFHandler<deal_II_dimension,deal_II_dimension+1> &, const Vector<float> &,
+ const DoFHandler<deal_II_dimension,deal_II_dimension+1> &, Vector<float> &);
+template
+void FETools::interpolate<deal_II_dimension>
+(const DoFHandler<deal_II_dimension,deal_II_dimension+1> &, const Vector<float> &,
+ const DoFHandler<deal_II_dimension,deal_II_dimension+1> &, const ConstraintMatrix &,
+ Vector<float> &);
+#endif
+
 template
 void FETools::back_interpolate<deal_II_dimension>
 (const DoFHandler<deal_II_dimension> &, const Vector<float> &,
@@ -2077,6 +2155,19 @@ void FETools::interpolate<deal_II_dimension>
 (const DoFHandler<deal_II_dimension> &, const BlockVector<double> &,
  const DoFHandler<deal_II_dimension> &, const ConstraintMatrix &,
  BlockVector<double> &);
+
+#if deal_II_dimension != 3
+template
+void FETools::interpolate<deal_II_dimension,deal_II_dimension+1>
+(const DoFHandler<deal_II_dimension,deal_II_dimension+1> &, const BlockVector<double> &,
+ const DoFHandler<deal_II_dimension,deal_II_dimension+1> &, BlockVector<double> &);
+template
+void FETools::interpolate<deal_II_dimension,deal_II_dimension+1>
+(const DoFHandler<deal_II_dimension,deal_II_dimension+1> &, const BlockVector<double> &,
+ const DoFHandler<deal_II_dimension,deal_II_dimension+1> &, const ConstraintMatrix &,
+ BlockVector<double> &);
+#endif
+
 template
 void FETools::back_interpolate<deal_II_dimension>
 (const DoFHandler<deal_II_dimension> &, const BlockVector<double> &,
@@ -2130,6 +2221,19 @@ void FETools::interpolate<deal_II_dimension>
 (const DoFHandler<deal_II_dimension> &, const BlockVector<float> &,
  const DoFHandler<deal_II_dimension> &, const ConstraintMatrix &,
  BlockVector<float> &);
+
+#if deal_II_dimension != 3
+template
+void FETools::interpolate<deal_II_dimension,deal_II_dimension+1>
+(const DoFHandler<deal_II_dimension,deal_II_dimension+1> &, const BlockVector<float> &,
+ const DoFHandler<deal_II_dimension,deal_II_dimension+1> &, BlockVector<float> &);
+template
+void FETools::interpolate<deal_II_dimension,deal_II_dimension+1>
+(const DoFHandler<deal_II_dimension,deal_II_dimension+1> &, const BlockVector<float> &,
+ const DoFHandler<deal_II_dimension,deal_II_dimension+1> &, const ConstraintMatrix &,
+ BlockVector<float> &);
+#endif
+
 template
 void FETools::back_interpolate<deal_II_dimension>
 (const DoFHandler<deal_II_dimension> &, const BlockVector<float> &,
@@ -2241,10 +2345,13 @@ void FETools::interpolate<deal_II_dimension>
  const hp::DoFHandler<deal_II_dimension> &, const ConstraintMatrix &,
  Vector<float> &);
 
-template FiniteElement<deal_II_dimension> *
+
+template FiniteElement<deal_II_dimension,deal_II_dimension> *
 FETools::get_fe_from_name<deal_II_dimension> (const std::string &);
-template void
-FETools::add_fe_name<deal_II_dimension>(
+
+
+template 
+void FETools::add_fe_name<deal_II_dimension>(
   const std::string& name,
   const FEFactoryBase<deal_II_dimension>* factory);
   
@@ -2262,6 +2369,7 @@ FETools::
 compute_interpolation_to_quadrature_points_matrix (const FiniteElement<deal_II_dimension> &fe,
                                                    const Quadrature<deal_II_dimension>    &quadrature,
                                                    FullMatrix<double>       &I_q);
+
 
 
 /*----------------------------   fe_tools.cc     ---------------------------*/

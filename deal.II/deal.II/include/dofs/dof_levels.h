@@ -21,8 +21,8 @@
 
 DEAL_II_NAMESPACE_OPEN
 
-template <int> class DoFHandler;
-template <int> class MGDoFHandler;
+template <int, int> class DoFHandler;
+template <int, int> class MGDoFHandler;
 
 
 namespace internal
@@ -152,8 +152,8 @@ namespace internal
                                           * resize arrays as
                                           * necessary.
                                           */
-        template <int> friend class dealii::DoFHandler;
-        template <int> friend class dealii::MGDoFHandler;
+        template <int, int> friend class dealii::DoFHandler;
+        template <int, int> friend class dealii::MGDoFHandler;
     };
 
 
@@ -189,8 +189,8 @@ namespace internal
                                           * resize arrays as
                                           * necessary.
                                           */
-        template <int> friend class dealii::DoFHandler;
-        template <int> friend class dealii::MGDoFHandler;
+        template <int, int> friend class dealii::DoFHandler;
+        template <int, int> friend class dealii::MGDoFHandler;
     };
 
 
@@ -227,8 +227,8 @@ namespace internal
                                           * resize arrays as
                                           * necessary.
                                           */
-        template <int> friend class dealii::DoFHandler;
-        template <int> friend class dealii::MGDoFHandler;
+        template <int, int> friend class dealii::DoFHandler;
+        template <int, int> friend class dealii::MGDoFHandler;
     };
 
   }

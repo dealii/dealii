@@ -43,6 +43,23 @@ GridReordering<1>::invert_all_cells_of_negative_grid(const std::vector<Point<1> 
 				   // nothing to be done in 1d
 }
 
+template<>
+void
+GridReordering<1,2>::reorder_cells (std::vector<CellData<1> > &)
+{
+				   // there should not be much to do
+				   // in 1d...
+}
+
+
+template<>
+void
+GridReordering<1,2>::invert_all_cells_of_negative_grid(const std::vector<Point<2> > &,
+						     std::vector<CellData<1> > &)
+{
+				   // nothing to be done in 1d
+}
+
 #endif
 
 
@@ -566,6 +583,8 @@ namespace internal
 } // namespace internal
 
 
+
+
 template<>
 void
 GridReordering<2>::reorder_cells (std::vector<CellData<2> > &original_cells)
@@ -580,6 +599,12 @@ GridReordering<2>::reorder_cells (std::vector<CellData<2> > &original_cells)
   internal::GridReordering2d::GridReordering().reorient(original_cells);
 }
 
+
+template<>
+void
+GridReordering<2,3>::reorder_cells (std::vector<CellData<2> > &original_cells) {
+    GridReordering<2>::reorder_cells(original_cells);
+}
 
 template<>
 void
@@ -622,8 +647,16 @@ GridReordering<2>::invert_all_cells_of_negative_grid(const std::vector<Point<2> 
   AssertThrow(n_negative_cells==0 || n_negative_cells==cells.size(), ExcInternalError());
 }
 
-#endif // deal_II_dimension == 2
 
+template<>
+void
+GridReordering<2,3>::invert_all_cells_of_negative_grid(const std::vector<Point<3> > &,
+						     std::vector<CellData<2> >    &)
+{
+  Assert(false, ExcNotImplemented());
+}
+
+#endif
 
 
 #if deal_II_dimension == 3

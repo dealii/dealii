@@ -48,7 +48,7 @@ class BlockIndices;
  * $x_{i_1} = \sum_{j=2}^M a_{i_j} x_{i_j}$. In the context of adaptive finite
  * elements, such constraints appear most frequently as "hanging nodes". For
  * example, when using Q1 and Q2 elements (i.e. using
- * FE_Q&lt;dim&gt;(1) and FE_Q&lt;dim&gt;(2)) on the two
+ * FE_Q&lt;dim,spacedim&gt;(1) and FE_Q&lt;dim,spacedim&gt;(2)) on the two
  * marked cells of the mesh
  *
  * @image html hp-refinement-simple.png

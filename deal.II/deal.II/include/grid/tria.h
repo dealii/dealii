@@ -26,10 +26,11 @@
 
 DEAL_II_NAMESPACE_OPEN
 
-template <int dim> class Boundary;
-template <int dim> class StraightBoundary;
+template <int dim, int spacedim> class Boundary;
+template <int dim, int spacedim> class StraightBoundary;
 
-template <int, int> class TriaObjectAccessor;
+template <int, int, int> class TriaAccessor;
+template <int, int, int> class TriaAccessor;
 
 namespace internal
 {
@@ -39,18 +40,18 @@ namespace internal
     template <int dim> class TriaFaces;
   }
 }
-template <int dim> class DoFHandler;
+template <int dim, int spacedim> class DoFHandler;
 namespace hp
 {
-  template <int dim> class DoFHandler;
+  template <int dim, int spacedim> class DoFHandler;
 }
-template <int dim> class MGDoFHandler;
+template <int dim, int spacedim> class MGDoFHandler;
 
 /*------------------------------------------------------------------------*/
 
 /**
  *  Structure which is passed to the
- *  <tt>Triangulation<dim>::create_triangulation</tt> function. It
+ *  <tt>Triangulation<dim,spacedim>::create_triangulation</tt> function. It
  *  contains all data needed to construct a cell, namely the indices
  *  of the vertices and the material indicator.
  *
@@ -76,14 +77,14 @@ struct CellData
 
 
 /**
- *  Structure to be passed to the Triangulation<dim>::create_triangulation
+ *  Structure to be passed to the Triangulation<dim,spacedim>::create_triangulation
  *  function to describe boundary information.
  *
  *  This structure is the same for all dimensions, since we use an input
  *  function which is the same for all dimensions. The content of objects
  *  of this structure varies with the dimensions, however.
  *
- *  Since in one space dimension, there is no boundary information apart
+ *  Since in one dimension, there is no boundary information apart
  *  from the two end points of the interval, this structure does not contain
  *  anything and exists only for consistency, to allow a common interface
  *  for all space dimensions. All fields should always be empty.
@@ -289,7 +290,7 @@ namespace internal
  *
  * In the old days, whenever one wanted to access one of these
  * numbers, one had to perform a loop over all lines, e.g., and count
- * the elements until we hit the end iterator. This is time consuming
+ * the elements until we hit the end . This is time consuming
  * and since access to the number of lines etc is a rather frequent
  * operation, this was not an optimal solution.
  *
@@ -345,7 +346,16 @@ namespace internal
 
 /**
  *  Triangulations denote a hierarchy of levels of elements which together
- *  form a region in @p dim spatial dimensions.
+ *  form a @p dim -dimensional manifold in @p spacedim spatial dimensions 
+ *  (if spacedim is not specified it takes the default value @ spacedim=dim).
+ *  
+ *  Thus, for example, an object of type @p Triangulation<1,1> (or simply 
+ *  @p Triangulation<1> since @p spacedim==dim by default) is used to represent 
+ *  and handle the usual one-dimensional triangulation used in the finite 
+ *  element method (so, segments on a straight line). On the other hand, 
+ *  objects such as @p Triangulation<1,2> or @p Triangulation<2,3> (that 
+ *  are associated with curves in 2D or surfaces in 3D) 
+ *  are the ones one wants to use in the boundary element method.
  *
  *  This class is written to be as independent of the dimension as possible
  *  (thus the complex construction of the internal::Triangulation::TriaLevel
@@ -410,7 +420,7 @@ namespace internal
  *  By using the cell iterators, you can write code nearly independent of
  *  the spatial dimension. The same applies for substructure iterators,
  *  where a substructure is defined as a face of a cell. The face of a
- *  cell is be a vertex in 1D and a line in 2D; however, vertices are
+ *  cell is a vertex in 1D and a line in 2D; however, vertices are
  *  handled in a different way and therefore lines have no faces.
  *
  *  The Triangulation class offers functions like @p begin_active which gives
@@ -418,12 +428,14 @@ namespace internal
  *  returning iterators. Take a look at the class doc to get an overview.
  *
  *  Usage of these iterators works mostly like with the STL iterators. Some
- *  examples taken from the Triangulation source code follow.
+ *  examples taken from the Triangulation source code follow (notice that in the last
+ *  two examples the template parameter @p spacedim has been omitted, so it takes
+ *  the default value @ dim).
  *  <ul>
  *  <li> <em>Counting the number of cells on a specific level</em>
  *    @verbatim
- *     template <int dim>
- *     int Triangulation<dim>::n_cells (const int level) const {
+ *     template <int dim, int spacedim>
+ *     int Triangulation<dim, spacedim>::n_cells (const int level) const {
  *        cell_iterator cell = begin (level),
  *                      endc = end(level);
  *        int n=0;
@@ -530,7 +542,7 @@ namespace internal
  *
  *        Creating the hierarchical information needed for this
  *        library from cells storing only vertex information can be
- *        quite a complex task.  For example in 2d, we have to create
+ *        quite a complex task.  For example in 2D, we have to create
  *        lines between vertices (but only once, though there are two
  *        cells which link these two vertices) and we have to create
  *        neighborship information. Grids being read in should
@@ -547,7 +559,7 @@ namespace internal
  *        To guarantee this, in the input vector keeping the cell list, the
  *        vertex indices for each cell have to be in a defined order, see the
  *        documentation of GeometryInfo<dim>. In one dimension, the first vertex
- *        index must refer to that vertex with the lower coordinate value. In 2d
+ *        index must refer to that vertex with the lower coordinate value. In 2D
  *        and 3D, the correspondoing conditions are not easy to verify and no
  *        full attempt to do so is made.
  *        If you violate this condition, you may end up with matrix entries
@@ -560,7 +572,7 @@ namespace internal
  *        the vertex numbering within cells. They do not only hold for
  *        the data read from an UCD or any other input file, but also
  *        for the data passed to the
- *        <tt>Triangulation<dim>::create_triangulation ()</tt>
+ *        <tt>Triangulation<dim,spacedim>::create_triangulation ()</tt>
  *        function. See the documentation for the GridIn class
  *        for more details on this, and above all to the
  *        GridReordering class that explains many of the
@@ -568,13 +580,13 @@ namespace internal
  *        satisfy the conditions outlined above.
  *
  *     <li> Copying a triangulation: when computing on time dependent meshes
- *        of when using adaptive refinement, you will often want to create a
+ *        or when using adaptive refinement, you will often want to create a
  *        new triangulation to be the same as another one. This is facilitated
  *        by the @p copy_triangulation function.
  *
  *        It is guaranteed that vertex, line or cell numbers in the two
  *        triangulations are the same and that two iterators walking on the
- *        two triangulations visit matching cells if the are incremented in
+ *        two triangulations visit matching cells if they are incremented in
  *        parallel. It may be conceivable to implement a clean-up in the copy
  *        operation, which eliminates holes of unused memory, re-joins
  *        scattered data and so on. In principle this would be a useful
@@ -584,7 +596,7 @@ namespace internal
  *   </ul>
  *
  *   Finally, there is a special function for folks who like bad grids:
- *   <tt>Triangulation<dim>::distort_random</tt>. It moves all the vertices in the
+ *   <tt>Triangulation<dim,spacedim>::distort_random</tt>. It moves all the vertices in the
  *   grid a bit around by a random value, leaving behind a distorted mesh.
  *   Note that you should apply this function to the final mesh, since
  *   refinement smoothes the mesh a bit.
@@ -1180,7 +1192,7 @@ namespace internal
  * @ingroup grid aniso
  * @author Wolfgang Bangerth, 1998; Ralf Hartmann, 2005
  */
-template <int dim>
+template <int dim, int spacedim=dim>
 class Triangulation : public Subscriptor
 {
   private:
@@ -1190,7 +1202,7 @@ class Triangulation : public Subscriptor
 				      * the definition of the iterator
 				      * classes simpler.
 				      */
-    typedef internal::Triangulation::Iterators<dim> IteratorSelector;
+    typedef internal::Triangulation::Iterators<dim, spacedim> IteratorSelector;
 		      
   public:
 				     /**
@@ -1199,8 +1211,18 @@ class Triangulation : public Subscriptor
 				      * boundary object has been explicitly
 				      * set using set_boundary().
 				      */
-    static const StraightBoundary<dim> straight_boundary;
-    
+    static const StraightBoundary<dim,spacedim> straight_boundary;
+
+				     /** 
+				      * Default boundary object to be
+				      * used in the codimension 1
+				      * case.  This is used for those
+				      * boundaries for which no
+				      * boundary object has been
+				      * explicitly set using
+				      * set_boundary().
+				      */
+    static const StraightBoundary<spacedim,spacedim> straight_manifold_description;
 				     /**
 				      * Declare some symbolic names
 				      * for mesh smoothing
@@ -1291,7 +1313,7 @@ class Triangulation : public Subscriptor
                                           */
         virtual
         void
-        pre_refinement_notification (const Triangulation<dim> &tria);
+        pre_refinement_notification (const Triangulation<dim, spacedim> &tria);
         
                                          /**
                                           * After refinement is actually
@@ -1302,7 +1324,7 @@ class Triangulation : public Subscriptor
                                           */
         virtual
         void
-        post_refinement_notification (const Triangulation<dim> &tria);
+        post_refinement_notification (const Triangulation<dim, spacedim> &tria);
 
                                          /**
                                           * At the end of a call to
@@ -1320,8 +1342,8 @@ class Triangulation : public Subscriptor
                                           */
         virtual
         void
-        copy_notification (const Triangulation<dim> &old_tria,
-			   const Triangulation<dim> &new_tria);
+        copy_notification (const Triangulation<dim, spacedim> &old_tria,
+			   const Triangulation<dim, spacedim> &new_tria);
     };
     
 				     /**
@@ -1329,6 +1351,12 @@ class Triangulation : public Subscriptor
 				      * in function templates.
 				      */
     static const unsigned int dimension = dim;
+
+				     /**
+				      * Make the space-dimension available
+				      * in function templates.
+				      */
+    static const unsigned int space_dimension = spacedim;
 
 				     /**
 				      *  Create an empty
@@ -1369,7 +1397,7 @@ class Triangulation : public Subscriptor
 				      *  code has to be changed to
 				      *  avoid copies.
 				      */
-    Triangulation (const Triangulation<dim> &t);
+    Triangulation (const Triangulation<dim, spacedim> &t);
     
 				     /**
 				      *  Delete the object and all levels of
@@ -1389,16 +1417,25 @@ class Triangulation : public Subscriptor
     void clear ();
     
 				     /**					
-				      * Assign a boundary object to a certain
-				      * part of the boundary of a the
-				      * triangulation. If a face with boundary
-				      * number @p number is refined, this
-				      * object is used to find the location of
-				      * new vertices on the boundary. It is
-				      * also used for for non-linear (i.e.:
-				      * non-Q1) transformations of cells to
-				      * the unit cell in shape function
-				      * calculations.
+				      * If @p dim==spacedim, assign a boundary
+				      * object to a certain part of the
+				      * boundary of a the triangulation. If a
+				      * face with boundary number @p number is
+				      * refined, this object is used to find
+				      * the location of new vertices on the
+				      * boundary. It is also used for for
+				      * non-linear (i.e.: non-Q1)
+				      * transformations of cells to the unit
+				      * cell in shape function calculations.
+				      * 
+				      * If @p dim!=spacedim the boundary object
+				      * is in fact the exact manifold that the
+				      * triangulation is approximating (for
+				      * example a circle approximated by a
+				      * polygon triangulation). As above, the
+				      * refinement is made in such a way that
+				      * the new points are located on the exact
+				      * manifold.
 				      *
 				      * Numbers of boundary objects correspond
 				      * to material numbers of faces at the
@@ -1432,7 +1469,7 @@ class Triangulation : public Subscriptor
 				      * approximation.
 				      */
     void set_boundary (const unsigned int   number,
-		       const Boundary<dim> &boundary_object);
+		       const Boundary<dim,spacedim> &boundary_object);
 
                                      /**
                                       * Reset those parts of the boundary with
@@ -1452,7 +1489,7 @@ class Triangulation : public Subscriptor
 				      * the same as in
 				      * @p set_boundary
 				      */
-    const Boundary<dim> & get_boundary (const unsigned int number) const;
+    const Boundary<dim,spacedim> & get_boundary (const unsigned int number) const;
 
 				     /**
 				      * Returns a vector containing
@@ -1512,7 +1549,7 @@ class Triangulation : public Subscriptor
 				      *  new Triangulation as well, if that is
 				      *  desired.
 				      */
-    virtual void copy_triangulation (const Triangulation<dim> &old_tria);
+    virtual void copy_triangulation (const Triangulation<dim, spacedim> &old_tria);
 
 				     /**
 				      * Create a triangulation from a
@@ -1549,7 +1586,7 @@ class Triangulation : public Subscriptor
 				      * and the GridIn and
 				      * GridReordering class.
 				      */
-    virtual void create_triangulation (const std::vector<Point<dim> >    &vertices,
+    virtual void create_triangulation (const std::vector<Point<spacedim> >    &vertices,
 				       const std::vector<CellData<dim> > &cells,
 				       const SubCellData                 &subcelldata);
 
@@ -1564,7 +1601,7 @@ class Triangulation : public Subscriptor
 				      * create_triangulation().
 				      */
     virtual void create_triangulation_compatibility (
-      const std::vector<Point<dim> >    &vertices,
+      const std::vector<Point<spacedim> >    &vertices,
       const std::vector<CellData<dim> > &cells,
       const SubCellData                 &subcelldata);
 
@@ -1673,13 +1710,6 @@ class Triangulation : public Subscriptor
 				      * See the general doc of this
 				      * class for more information on
 				      * smoothing upon refinement.
-				      *
-				      * This part of the function is
-				      * mostly dimension
-				      * independent. However, for some
-				      * dimension dependent things, it
-				      * calls
-				      * @p prepare_refinement_dim_dependent.
 				      *
 				      * Regarding the coarsening part,
 				      * flagging and deflagging cells
@@ -2582,9 +2612,9 @@ class Triangulation : public Subscriptor
 				      * versions, with and without an argument describing
 				      * the level. The versions with this argument are only
 				      * applicable for objects descibing the cells of the
-				      * present triangulation. For example: in 2d
+				      * present triangulation. For example: in 2D
 				      * <tt>n_lines(level)</tt> cannot be called, only
-				      * <tt>n_lines()</tt>, as lines are faces in 2d and
+				      * <tt>n_lines()</tt>, as lines are faces in 2D and
 				      * therefore have no level.
 				      */
     
@@ -2734,8 +2764,8 @@ class Triangulation : public Subscriptor
 
 				     /**
 				      *  Return total number of used faces,
-				      *  active or not.  In 2d, the result
-				      *  equals n_lines(), while in 3d it
+				      *  active or not.  In 2D, the result
+				      *  equals n_lines(), while in 3D it
 				      *  equals n_quads(). Since there are no
 				      *  face objects in 1d, the function
 				      *  returns zero in 1d.
@@ -2744,8 +2774,8 @@ class Triangulation : public Subscriptor
 
     				     /**
 				      *  Return total number of active faces,
-				      *  active or not.  In 2d, the result
-				      *  equals n_active_lines(), while in 3d
+				      *  active or not.  In 2D, the result
+				      *  equals n_active_lines(), while in 3D
 				      *  it equals n_active_quads(). Since
 				      *  there are no face objects in 1d, the
 				      *  function returns zero in 1d.
@@ -2797,7 +2827,7 @@ class Triangulation : public Subscriptor
 				      * used by the function
 				      * get_used_vertices().
 				      */
-    const std::vector<Point<dim> > &
+    const std::vector<Point<spacedim> > &
     get_vertices () const;
 
 				     /**
@@ -3018,23 +3048,28 @@ class Triangulation : public Subscriptor
 
 				     /**
 				      *  Write a bool vector to the given stream,
-				      *  writing a pre- and a postfix magica
+				      *  writing a pre- and a postfix magic
 				      *  number. The vector is written in an
 				      *  almost binary format, i.e. the bool
 				      *  flags are packed but the data is written
 				      *  as ASCII text.
 				      *
-				      *  The flags are stored in a binary
-				      *  format: for each @p true, a @p 1
-				      *  bit is stored, a @p 0 bit otherwise.
-				      *  The bits are stored as <tt>unsigned char</tt>,
-				      *  thus avoiding endianess. They are
-				      *  written to @p out in plain text, thus
-				      *  amounting to 3.6 bits per active cell
-				      *  on the average. Other information
-				      *  (magic numbers ans number of elements)
-				      *  is stored as plain text
-				      *  as well. The format should therefore be
+				      *  The flags are stored in a
+				      *  binary format: for each @p
+				      *  true, a @p 1 bit is stored, a
+				      *  @p 0 bit otherwise.  The bits
+				      *  are stored as <tt>unsigned
+				      *  char</tt>, thus avoiding
+				      *  endianess. They are written
+				      *  to @p out in plain text, thus
+				      *  amounting to 3.6 bits in the
+				      *  output per bits in the input
+				      *  on the average. Other
+				      *  information (magic numbers
+				      *  and number of elements of the
+				      *  input vector) is stored as
+				      *  plain text as well. The
+				      *  format should therefore be
 				      *  interplatform compatible.
 				      */
     static void write_bool_vector (const unsigned int       magic_number1,
@@ -3104,163 +3139,11 @@ class Triangulation : public Subscriptor
     void execute_coarsening ();
 
 				     /**
-				      * Actually refine a cell, i.e. create its
-				      * children. The faces of the cell have to
-				      * be refined already, whereas the inner
-				      * lines in 2D or lines and quads in 3D
-				      * will be created in this
-				      * function. Therefore iterator pointers
-				      * into the vectors of lines, quads and
-				      * cells have to be passed, which point at
-				      * (or "before") the reserved space.
-				      */
-    void create_children (unsigned int &next_unused_vertex,
-			  raw_line_iterator &next_unused_line,
-			  raw_quad_iterator &next_unused_quad,
-			  raw_cell_iterator &next_unused_cell,
-			  cell_iterator &cell);
-
-				     /**
-				      * Actually delete a cell, or rather all
-				      * its children, which is the main step for
-				      * the coarsening process.  This is the
-				      * dimension dependent part of @p
-				      * execute_coarsening. The second argument
-				      * is a vector which gives for each line
-				      * index the number of cells containing
-				      * this line. This information is needed to
-				      * decide whether a refined line may be
-				      * coarsened or not in 3D. In 1D and 2D
-				      * this argument is not needed and thus
-				      * ignored. The same applies for the last
-				      * argument and quads instead of lines.
-				      */
-    void delete_children (cell_iterator &cell,
-			  std::vector<unsigned int> &line_cell_count,
-			  std::vector<unsigned int> &quad_cell_count);
-
-				     /**
-				      * Set the neighbor information of all
-				      * outer neighbor of all children of the
-				      * given cell <tt>cell</tt>, if
-				      * <tt>refining=true</tt>. In this
-				      * constellation the function is called
-				      * after the creation of children in @p
-				      * execute_refinement. If
-				      * <tt>refining=false</tt>, it is assumed,
-				      * that the given cell is just coarsened,
-				      * i.e. that its children are about to be
-				      * deleted, thus they do not need new
-				      * neighbor information.
-				      *
-				      * In both cases, the neighbor information
-				      * of the cell's neighbors are updated, if
-				      * necessary.
-				      */
-    void update_neighbors (cell_iterator &cell,
-			   bool refining);
-    
-				     /**
-				      * Fill the vector @p line_cell_count
-				      * needed by @p delete_children with the
-				      * number of cells containing a given
-				      * line. As this is only needed in 3D, it
-				      * is only implemented there and throws an
-				      * exception otherwise.
-				      */
-    void count_cells_at_line (std::vector<unsigned int> &line_cell_count);
-
-				     /**
-				      * Fill the vector @p quad_cell_count
-				      * needed by @p delete_children with the
-				      * number of cells containing a given
-				      * quad. As this is only needed in 3D, it
-				      * is only implemented there and throws an
-				      * exception otherwise.
-				      */
-    void count_cells_at_quad (std::vector<unsigned int> &quad_cell_count);
-
-				     /**
-				      * Some dimension dependent stuff for
-				      * mesh smoothing.
-				      *
-				      * At present, this function does nothing
-				      * in 1d and 2d, but makes sure no two
-				      * cells with a level difference greater
-				      * than one share one line in 3d. This
-				      * is a requirement needed for the
-				      * interpolation of hanging nodes, since
-				      * otherwise to steps of interpolation
-				      * would be necessary. This would make
-				      * the processes implemented in the
-				      * @p ConstraintMatrix class much more
-				      * complex, since these two steps of
-				      * interpolation do not commute.
-				      */
-    void prepare_refinement_dim_dependent ();
-
-				     /**
-				      * At the boundary of the domain, the new
-				      * point on the face may be far inside the
-				      * current cell, if the boundary has a
-				      * strong curvature. If we allow anisotropic
-				      * refinement here, the resulting cell may
-				      * be strongly distorted. To prevent this,
-				      * this function flags such cells for
-				      * isotropic refinement. It is called
-				      * automatically from
-				      * prepare_coarsening_and_refinement().
-				      */
-    void prevent_distorted_boundary_cells ();
-
-				     /**
 				      * Make sure that either all or none of
 				      * the children of a cell are tagged for
 				      * coarsening.
 				      */
     void fix_coarsen_flags ();
-    
-				     /**
-				      * Helper function for
-				      * @p fix_coarsen_flags. Return wether 
-				      * coarsening of this cell is allowed.
-				      * Coarsening can be forbidden if the
-				      * neighboring cells are or will be
-				      * refined twice along the common face. 
-				      */
-    bool coarsening_allowed (cell_iterator& cell);
-
-				     /**
-				      * Re-compute the number of
-				      * lines, quads, etc. This
-				      * function is called by
-				      * @p execute_coarsening_and_refinement
-				      * and by
-				      * @p create_triangulation after
-				      * the grid was changed.
-				      *
-				      * This function simply delegates
-				      * to the functions below, which
-				      * count only a certain class of
-				      * objects.
-				      */
-    void update_number_cache ();
-
-				     /**
-				      * Recompute the number of lines.
-				      */
-    void update_number_cache_lines ();
-
-    				     /**
-				      * Recompute the number of quads.
-				      */
-    void update_number_cache_quads ();
-
-    				     /**
-				      * Recompute the number of hexes.
-				      */
-    void update_number_cache_hexes ();
-
 
 				     /**
 				      *  Array of pointers pointing to the
@@ -3271,8 +3154,8 @@ class Triangulation : public Subscriptor
 
 				     /**
 				      *  Pointer to the faces of the triangulation. In 1d
-				      *  this contains nothing, in 2d it contains data
-				      *  concerning lines and in 3d quads and lines.  All of
+				      *  this contains nothing, in 2D it contains data
+				      *  concerning lines and in 3D quads and lines.  All of
 				      *  these have no level and are therefore treated
 				      *  seperately.
 				      */
@@ -3283,7 +3166,7 @@ class Triangulation : public Subscriptor
 				      *  Array of the vertices of this
 				      *  triangulation.
 				      */
-    std::vector<Point<dim> >              vertices;
+    std::vector<Point<spacedim> >              vertices;
 
 				     /**
 				      *  Array storing a bit-pattern which
@@ -3300,7 +3183,18 @@ class Triangulation : public Subscriptor
 				      *  and can thus never be
 				      *  associated with a boundary.
 				      */
-    SmartPointer<const Boundary<dim> > boundary[255];
+    SmartPointer<const Boundary<dim,spacedim> > boundary[255];
+
+				     /**
+				      *  Collection of ly
+				      *  objects. We only need 255
+				      *  objects rather than 256,
+				      *  since the indicator 255 is
+				      *  reserved for interior faces
+				      *  and can thus never be
+				      *  associated with a boundary.
+				      */
+    SmartPointer<const Boundary<spacedim,spacedim> > manifold_description[255];
 
 				     /**
 				      * Flag indicating whether
@@ -3342,38 +3236,50 @@ class Triangulation : public Subscriptor
 				      */    
     mutable std::list<RefinementListener *> refinement_listeners;
 
+				     /**
+				      * Forward declaration of a class
+				      * into which we put significant
+				      * parts of the implementation.
+				      *
+				      * See the .cc file for more
+				      * information.
+				      */
+    struct Implementation;
+    
 				     // make a couple of classes
 				     // friends
-    template <int,int> friend class TriaAccessor;
+    template <int,int,int> friend class TriaAccessorBase;
+    template <int,int,int> friend class TriaAccessor;
 
-    template <int dim1, int dim2>
-    friend class TriaObjectAccessor;
+    template <int dim1, int dim2, int dim3>
+    friend class TriaAccessor;
     
-    friend class CellAccessor<dim>;
+    friend class CellAccessor<dim, spacedim>;
     
-    friend class TriaRawIterator<1,TriaObjectAccessor<1, 1> >;
-    friend class TriaRawIterator<1,CellAccessor<1> >;
+    friend class TriaRawIterator<TriaAccessor<1, 1, 1> >;
+    friend class TriaRawIterator<CellAccessor<1, 1> >;
 
-    friend class TriaRawIterator<2,TriaObjectAccessor<1, 2> >;
-    friend class TriaRawIterator<2,TriaObjectAccessor<2, 2> >;
-    friend class TriaRawIterator<2,CellAccessor<2> >;
+    friend class TriaRawIterator<TriaAccessor<1, 2, 2> >;
+    friend class TriaRawIterator<TriaAccessor<2, 2, 2> >;
+    friend class TriaRawIterator<CellAccessor<2, 2> >;
 
-    friend class TriaRawIterator<3,TriaObjectAccessor<1, 3> >;
-    friend class TriaRawIterator<3,TriaObjectAccessor<2, 3> >;
-    friend class TriaRawIterator<3,TriaObjectAccessor<3, 3> >;
-    friend class TriaRawIterator<3,CellAccessor<3> >;
+    friend class TriaRawIterator<TriaAccessor<1, 3, 3> >;
+    friend class TriaRawIterator<TriaAccessor<2, 3, 3> >;
+    friend class TriaRawIterator<TriaAccessor<3, 3, 3> >;
+    friend class TriaRawIterator<CellAccessor<3, 3> >;
     
-    friend class hp::DoFHandler<dim>;
-    
+    friend class hp::DoFHandler<dim,spacedim>;
+
+    friend class Triangulation<dim,spacedim>::Implementation;
 };
 
 
 #ifndef DOXYGEN
 
-template <int dim>
+template <int dim, int spacedim>
 inline
 bool
-Triangulation<dim>::vertex_used(const unsigned int index) const
+Triangulation<dim,spacedim>::vertex_used(const unsigned int index) const
 {
   Assert (index < vertices_used.size(),
 	  ExcIndexRange(index, 0, vertices_used.size()));
@@ -3383,166 +3289,38 @@ Triangulation<dim>::vertex_used(const unsigned int index) const
 
 /* -------------- declaration of explicit specializations ------------- */
 
+template <> unsigned int Triangulation<1,1>::n_raw_lines (const unsigned int level) const;
+template <> unsigned int Triangulation<1,1>::n_quads () const;
+template <> unsigned int Triangulation<1,1>::n_quads (const unsigned int level) const;
+template <> unsigned int Triangulation<1,1>::n_raw_quads (const unsigned int level) const;
+template <> unsigned int Triangulation<2,2>::n_raw_quads (const unsigned int level) const;
+template <> unsigned int Triangulation<1,1>::n_raw_quads () const;
+template <> unsigned int Triangulation<1,1>::n_raw_hexs (const unsigned int level) const;
+template <> unsigned int Triangulation<1,1>::n_active_quads (const unsigned int level) const;
+template <> unsigned int Triangulation<1,1>::n_active_quads () const;
+template <> unsigned int Triangulation<1,1>::max_adjacent_cells () const;
 
 
-template <> Triangulation<1>::cell_iterator Triangulation<1>::begin (const unsigned int level) const;
-template <> Triangulation<1>::raw_cell_iterator Triangulation<1>::end () const;
-template <> Triangulation<2>::cell_iterator Triangulation<2>::begin (const unsigned int level) const;
-template <> Triangulation<2>::raw_cell_iterator Triangulation<2>::end () const;
-template <> Triangulation<3>::cell_iterator Triangulation<3>::begin (const unsigned int level) const;
-template <> Triangulation<3>::raw_cell_iterator Triangulation<3>::end () const;
-template <> void Triangulation<1>::create_triangulation (const std::vector<Point<1> >    &v,
-							 const std::vector<CellData<1> > &cells,
-							 const SubCellData                          &subcelldata);
-template <> void Triangulation<2>::create_triangulation (const std::vector<Point<2> >    &v,
-							 const std::vector<CellData<2> > &cells,
-							 const SubCellData                          &subcelldata);
-template <> void Triangulation<3>::create_triangulation (const std::vector<Point<3> >    &v,
-							 const std::vector<CellData<3> > &cells,
-							 const SubCellData                          &subcelldata);
-template <> void Triangulation<1>::distort_random (const double factor,
-						   const bool   keep_boundary);
-template <> void Triangulation<1>::clear_user_pointers ();
-template <> void Triangulation<1>::clear_user_flags ();
-template <> void Triangulation<2>::clear_user_pointers ();
-template <> void Triangulation<2>::clear_user_flags ();
-template <> void Triangulation<3>::clear_user_pointers ();
-template <> void Triangulation<3>::clear_user_flags ();
-template <> void Triangulation<1>::clear_user_flags_line ();
-template <> void Triangulation<1>::clear_user_flags_quad ();
-template <> void Triangulation<1>::save_user_flags_quad (std::ostream &) const;
-template <> void Triangulation<1>::save_user_flags_quad (std::vector<bool> &) const;
-template <> void Triangulation<1>::load_user_flags_quad (std::istream &);
-template <> void Triangulation<1>::load_user_flags_quad (const std::vector<bool> &);
-template <> void Triangulation<1>::clear_user_flags_hex ();
-template <> void Triangulation<1>::save_user_flags_hex (std::ostream &) const;
-template <> void Triangulation<1>::save_user_flags_hex (std::vector<bool> &) const;
-template <> void Triangulation<1>::load_user_flags_hex (std::istream &);
-template <> void Triangulation<1>::load_user_flags_hex (const std::vector<bool> &);
-template <> void Triangulation<2>::clear_user_flags_quad ();
-template <> void Triangulation<2>::clear_user_flags_hex ();
-template <> void Triangulation<2>::save_user_flags_hex (std::ostream &) const;
-template <> void Triangulation<2>::save_user_flags_hex (std::vector<bool> &) const;
-template <> void Triangulation<2>::load_user_flags_hex (std::istream &);
-template <> void Triangulation<2>::load_user_flags_hex (const std::vector<bool> &);
-template <> void Triangulation<3>::clear_user_flags_quad ();
-template <> void Triangulation<3>::clear_user_flags_hex ();
-template <> Triangulation<1>::raw_cell_iterator Triangulation<1>::begin_raw (const unsigned int level) const;
-template <> Triangulation<1>::active_cell_iterator Triangulation<1>::begin_active (const unsigned int level) const;
-template <> Triangulation<1>::raw_cell_iterator Triangulation<1>::last_raw () const;
-template <> Triangulation<1>::raw_cell_iterator Triangulation<1>::last_raw (const unsigned int level) const;
-template <> Triangulation<1>::cell_iterator Triangulation<1>::last () const;
-template <> Triangulation<1>::cell_iterator Triangulation<1>::last (const unsigned int level) const;
-template <> Triangulation<1>::active_cell_iterator Triangulation<1>::last_active () const;
-template <> Triangulation<1>::active_cell_iterator Triangulation<1>::last_active (const unsigned int level) const;
-template <> Triangulation<1>::raw_face_iterator Triangulation<1>::begin_raw_face () const;
-template <> Triangulation<1>::face_iterator Triangulation<1>::begin_face () const;
-template <> Triangulation<1>::active_face_iterator Triangulation<1>::begin_active_face () const;
-template <> Triangulation<1>::raw_face_iterator Triangulation<1>::end_face () const;
-template <> Triangulation<1>::raw_face_iterator Triangulation<1>::last_raw_face () const;
-template <> Triangulation<1>::face_iterator Triangulation<1>::last_face () const;
-template <> Triangulation<1>::active_face_iterator Triangulation<1>::last_active_face () const;
-template <> Triangulation<1>::raw_line_iterator Triangulation<1>::begin_raw_line (const unsigned int level) const;
-template <> Triangulation<1>::raw_line_iterator Triangulation<1>::last_raw_line (const unsigned int level) const;
-template <> Triangulation<1>::raw_quad_iterator Triangulation<1>::begin_raw_quad (const unsigned int level) const;
-template <> Triangulation<1>::quad_iterator Triangulation<1>::begin_quad (const unsigned int level) const;
-template <> Triangulation<1>::active_quad_iterator Triangulation<1>::begin_active_quad (const unsigned int level) const;
-template <> Triangulation<1>::raw_quad_iterator Triangulation<1>::end_quad () const;
-template <> Triangulation<1>::raw_quad_iterator Triangulation<1>::last_raw_quad (const unsigned int level) const;
-template <> Triangulation<1>::raw_quad_iterator Triangulation<1>::last_raw_quad () const;
-template <> Triangulation<1>::quad_iterator Triangulation<1>::last_quad (const unsigned int level) const;
-template <> Triangulation<1>::quad_iterator Triangulation<1>::last_quad () const;
-template <> Triangulation<1>::active_quad_iterator Triangulation<1>::last_active_quad (const unsigned int level) const;
-template <> Triangulation<1>::active_quad_iterator Triangulation<1>::last_active_quad () const;
-template <> Triangulation<1>::raw_hex_iterator Triangulation<1>::begin_raw_hex (const unsigned int level) const;
-template <> Triangulation<1>::hex_iterator Triangulation<1>::begin_hex (const unsigned int) const;
-template <> Triangulation<1>::active_hex_iterator Triangulation<1>::begin_active_hex (const unsigned int level) const;
-template <> Triangulation<1>::raw_hex_iterator Triangulation<1>::end_hex () const;
-template <> Triangulation<1>::raw_hex_iterator Triangulation<1>::last_raw_hex (const unsigned int level) const;
-template <> Triangulation<1>::raw_hex_iterator Triangulation<1>::last_raw_hex () const;
-template <> Triangulation<1>::hex_iterator Triangulation<1>::last_hex (const unsigned int level) const;
-template <> Triangulation<1>::hex_iterator Triangulation<1>::last_hex () const;
-template <> Triangulation<1>::active_hex_iterator Triangulation<1>::last_active_hex (const unsigned int level) const;
-template <> Triangulation<1>::active_hex_iterator Triangulation<1>::last_active_hex () const;
-template <> Triangulation<2>::raw_cell_iterator Triangulation<2>::begin_raw (const unsigned int level) const;
-template <> Triangulation<2>::active_cell_iterator Triangulation<2>::begin_active (const unsigned int level) const;
-template <> Triangulation<2>::raw_cell_iterator Triangulation<2>::last_raw () const;
-template <> Triangulation<2>::raw_cell_iterator Triangulation<2>::last_raw (const unsigned int level) const;
-template <> Triangulation<2>::cell_iterator Triangulation<2>::last () const;
-template <> Triangulation<2>::cell_iterator Triangulation<2>::last (const unsigned int level) const;
-template <> Triangulation<2>::active_cell_iterator Triangulation<2>::last_active () const;
-template <> Triangulation<2>::active_cell_iterator Triangulation<2>::last_active (const unsigned int level) const;
-template <> Triangulation<2>::raw_face_iterator Triangulation<2>::begin_raw_face () const;
-template <> Triangulation<2>::face_iterator Triangulation<2>::begin_face () const;
-template <> Triangulation<2>::active_face_iterator Triangulation<2>::begin_active_face () const;
-template <> Triangulation<2>::raw_face_iterator Triangulation<2>::end_face () const;
-template <> Triangulation<2>::raw_face_iterator Triangulation<2>::last_raw_face () const;
-template <> Triangulation<2>::face_iterator Triangulation<2>::last_face () const;
-template <> Triangulation<2>::active_face_iterator Triangulation<2>::last_active_face () const;
-template <> Triangulation<2>::raw_quad_iterator Triangulation<2>::begin_raw_quad (const unsigned int level) const;
-template <> Triangulation<2>::raw_quad_iterator Triangulation<2>::last_raw_quad (const unsigned int level) const;
-template <> Triangulation<2>::raw_hex_iterator Triangulation<2>::begin_raw_hex (const unsigned int level) const;
-template <> Triangulation<2>::hex_iterator Triangulation<2>::begin_hex (const unsigned int level) const;
-template <> Triangulation<2>::active_hex_iterator Triangulation<2>::begin_active_hex (const unsigned int level) const;
-template <> Triangulation<2>::raw_hex_iterator Triangulation<2>::end_hex () const;
-template <> Triangulation<2>::raw_hex_iterator Triangulation<2>::last_raw_hex (const unsigned int level) const;
-template <> Triangulation<2>::raw_hex_iterator Triangulation<2>::last_raw_hex () const;
-template <> Triangulation<2>::hex_iterator Triangulation<2>::last_hex (const unsigned int level) const;
-template <> Triangulation<2>::hex_iterator Triangulation<2>::last_hex () const;
-template <> Triangulation<2>::active_hex_iterator Triangulation<2>::last_active_hex (const unsigned int level) const;
-template <> Triangulation<2>::active_hex_iterator Triangulation<2>::last_active_hex () const;
-template <> Triangulation<3>::raw_cell_iterator Triangulation<3>::begin_raw (const unsigned int level) const;
-template <> Triangulation<3>::active_cell_iterator Triangulation<3>::begin_active (const unsigned int level) const;
-template <> Triangulation<3>::raw_cell_iterator Triangulation<3>::last_raw () const;
-template <> Triangulation<3>::raw_cell_iterator Triangulation<3>::last_raw (const unsigned int level) const;
-template <> Triangulation<3>::cell_iterator Triangulation<3>::last () const;
-template <> Triangulation<3>::cell_iterator Triangulation<3>::last (const unsigned int level) const;
-template <> Triangulation<3>::active_cell_iterator Triangulation<3>::last_active () const;
-template <> Triangulation<3>::active_cell_iterator Triangulation<3>::last_active (const unsigned int level) const;
-template <> Triangulation<3>::raw_face_iterator Triangulation<3>::begin_raw_face () const;
-template <> Triangulation<3>::face_iterator Triangulation<3>::begin_face () const;
-template <> Triangulation<3>::active_face_iterator Triangulation<3>::begin_active_face () const;
-template <> Triangulation<3>::raw_face_iterator Triangulation<3>::end_face () const;
-template <> Triangulation<3>::raw_face_iterator Triangulation<3>::last_raw_face () const;
-template <> Triangulation<3>::face_iterator Triangulation<3>::last_face () const;
-template <> Triangulation<3>::active_face_iterator Triangulation<3>::last_active_face () const;
-template <> Triangulation<3>::raw_quad_iterator Triangulation<3>::begin_raw_quad (const unsigned int level) const;
-template <> unsigned int Triangulation<1>::n_raw_lines (const unsigned int level) const;
-template <> unsigned int Triangulation<1>::n_quads () const;
-template <> unsigned int Triangulation<1>::n_quads (const unsigned int level) const;
-template <> unsigned int Triangulation<1>::n_raw_quads (const unsigned int level) const;
-template <> unsigned int Triangulation<2>::n_raw_quads (const unsigned int level) const;
-template <> unsigned int Triangulation<1>::n_raw_quads () const;
-template <> unsigned int Triangulation<1>::n_raw_hexs (const unsigned int level) const;
-template <> unsigned int Triangulation<1>::n_active_quads (const unsigned int level) const;
-template <> unsigned int Triangulation<1>::n_active_quads () const;
-template <> unsigned int Triangulation<1>::max_adjacent_cells () const;
-template <> void Triangulation<1>::execute_refinement ();
-template <> void Triangulation<2>::execute_refinement ();
-template <> void Triangulation<3>::execute_refinement ();
-template <> void Triangulation<3>::prepare_refinement_dim_dependent ();
-template <> void Triangulation<1>::delete_children (cell_iterator &cell,
-						    std::vector<unsigned int> &,
-						    std::vector<unsigned int> &);
-template <> void Triangulation<2>::delete_children (cell_iterator &cell,
-						    std::vector<unsigned int> &,
-						    std::vector<unsigned int> &);
-template <> void Triangulation<3>::delete_children (cell_iterator &cell,
-						    std::vector<unsigned int> &line_cell_count,
-						    std::vector<unsigned int> &quad_cell_count);
-template <> void Triangulation<2>::create_children (unsigned int &next_unused_vertex,
-						    raw_line_iterator &next_unused_line,
-						    raw_quad_iterator &next_unused_quad,
-						    raw_cell_iterator &next_unused_cell,
-						    cell_iterator &cell);
-template <> void Triangulation<3>::update_neighbors (cell_iterator &cell,
-						     bool refining);
-template <> void Triangulation<3>::count_cells_at_line (std::vector<unsigned int> &line_cell_count);
-template <> void Triangulation<3>::count_cells_at_quad (std::vector<unsigned int> &quad_cell_count);
-template <> void Triangulation<1>::prevent_distorted_boundary_cells ();
-template <> void Triangulation<1>::update_number_cache_quads ();
-template <> void Triangulation<1>::update_number_cache_hexes ();
-template <> void Triangulation<2>::update_number_cache_hexes ();
+// -------------------------------------------------------------------
+// -- Explicit specializations for codimension one grids
+
+
+template <> unsigned int Triangulation<1,2>::n_raw_lines (const unsigned int level) const;
+template <> unsigned int Triangulation<1,2>::n_quads () const;
+template <> unsigned int Triangulation<1,2>::n_quads (const unsigned int level) const;
+template <> unsigned int Triangulation<1,2>::n_raw_quads (const unsigned int level) const;
+template <> unsigned int Triangulation<2,3>::n_raw_quads (const unsigned int level) const;
+template <> unsigned int Triangulation<1,2>::n_raw_quads () const;
+template <> unsigned int Triangulation<1,2>::n_raw_hexs (const unsigned int level) const;
+template <> unsigned int Triangulation<1,2>::n_active_quads (const unsigned int level) const;
+template <> unsigned int Triangulation<1,2>::n_active_quads () const;
+template <> unsigned int Triangulation<1,2>::max_adjacent_cells () const;
+
+
+// -------------------------------------------------------------------
+
+
+
 
 #endif // DOXYGEN
 

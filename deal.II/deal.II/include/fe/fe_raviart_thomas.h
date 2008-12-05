@@ -26,7 +26,7 @@
 
 DEAL_II_NAMESPACE_OPEN
 
-template <int dim> class MappingQ;
+template <int dim, int spacedim> class MappingQ;
 
 
 /*!@addtogroup fe */
@@ -42,6 +42,9 @@ template <int dim> class MappingQ;
  * subspace contained in the RT space. Then, approciamtion order of
  * the function itself is <i>degree+1</i>, as with usual polynomial
  * spaces.
+ *
+ * This class is not implemented for the codimension one case
+ * (<tt>spacedim != dim</tt>).
  *
  * @todo Even if this element is implemented for two and three space
  * dimensions, the definition of the node values relies on

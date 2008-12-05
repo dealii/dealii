@@ -627,6 +627,319 @@ QWeddle<1>::QWeddle ()
 }
 
 
+template <>
+QGaussLog<1>::QGaussLog(const unsigned int n,
+                        const bool revert) 
+                 : 
+                 Quadrature<1> (n)
+{
+
+  std::vector<double> p=set_quadrature_points(n);
+  std::vector<double> w=set_quadrature_weights(n);
+  
+  if (revert == true)
+      revert_points_and_weights(p,w);
+
+  for (unsigned int i=0; i<this->size(); ++i)
+    {
+      this->quadrature_points[i] = Point<1>(p[i]);
+      this->weights[i]           = w[i];
+    }
+
+}
+
+template <>
+std::vector<double>
+QGaussLog<1>::set_quadrature_points(const unsigned int n) const
+{
+ 
+  std::vector<double> points(n);
+
+  switch (n)
+    {    
+    case 1:
+      points[0] = 0.3333333333333333;
+      break; 
+
+    case 2:
+      points[0] = 0.1120088061669761;
+      points[1] = 0.6022769081187381;
+      break;	
+
+    case 3:
+      points[0] = 0.06389079308732544;
+      points[1] = 0.3689970637156184;
+      points[2] = 0.766880303938942;
+      break;
+
+    case 4:
+      points[0] = 0.04144848019938324;
+      points[1] = 0.2452749143206022;
+      points[2] = 0.5561654535602751;
+      points[3] = 0.848982394532986;
+      break;
+
+    case 5:
+      points[0] = 0.02913447215197205;
+      points[1] = 0.1739772133208974;
+      points[2] =  0.4117025202849029;
+      points[3] = 0.6773141745828183;
+      points[4] = 0.89477136103101;  
+      break;
+
+    case 6:
+      points[0] = 0.02163400584411693;
+      points[1] = 0.1295833911549506;
+      points[2] = 0.3140204499147661;
+      points[3] = 0.5386572173517997;
+      points[4] = 0.7569153373774084;
+      points[5] = 0.922668851372116;
+      break;
+
+
+    case 7:
+      points[0] = 0.0167193554082585;
+      points[1] = 0.100185677915675;
+      points[2] = 0.2462942462079286;
+      points[3] = 0.4334634932570557;
+      points[4] = 0.6323509880476823;
+      points[5] = 0.81111862674023;
+      points[6] = 0.940848166743287;
+      break;
+
+    case 8:
+      points[0] = 0.01332024416089244;
+      points[1] = 0.07975042901389491;
+      points[2] = 0.1978710293261864;
+      points[3] =   0.354153994351925;
+      points[4] =   0.5294585752348643;
+      points[5] = 0.7018145299391673;
+      points[6] = 0.849379320441094;
+      points[7] = 0.953326450056343;
+      break;
+
+    case 9:
+      points[0] = 0.01086933608417545;
+      points[1] = 0.06498366633800794;
+      points[2] = 0.1622293980238825;
+      points[3] = 0.2937499039716641;
+      points[4] = 0.4466318819056009;
+      points[5] = 0.6054816627755208;
+      points[6] = 0.7541101371585467;
+      points[7] = 0.877265828834263;
+      points[8] = 0.96225055941096;
+      break;
+
+    case 10:
+      points[0] = 0.00904263096219963;
+      points[1] = 0.05397126622250072;
+      points[2] =  0.1353118246392511;
+      points[3] = 0.2470524162871565;
+      points[4] = 0.3802125396092744;
+      points[5] = 0.5237923179723384;
+      points[6] = 0.6657752055148032;
+      points[7] = 0.7941904160147613;
+      points[8] = 0.898161091216429;
+      points[9] = 0.9688479887196;
+      break;
+
+
+    case 11:
+      points[0] = 0.007643941174637681;
+      points[1] = 0.04554182825657903;
+      points[2] = 0.1145222974551244;
+      points[3] = 0.2103785812270227;
+      points[4] = 0.3266955532217897;
+      points[5] = 0.4554532469286375;
+      points[6] = 0.5876483563573721;
+      points[7] = 0.7139638500230458;
+      points[8] = 0.825453217777127;
+      points[9] = 0.914193921640008;
+      points[10] = 0.973860256264123;
+      break;
+      
+    case 12:   
+      points[0] = 0.006548722279080035;
+      points[1] = 0.03894680956045022;
+      points[2] = 0.0981502631060046;
+      points[3] = 0.1811385815906331;
+      points[4] = 0.2832200676673157;
+      points[5] = 0.398434435164983;
+      points[6] = 0.5199526267791299;
+      points[7] = 0.6405109167754819;
+      points[8] = 0.7528650118926111;
+      points[9] = 0.850240024421055;
+      points[10] = 0.926749682988251;
+      points[11] = 0.977756129778486;
+      break;   
+
+    default:
+      Assert(false, ExcNotImplemented());
+      break;
+    }
+    
+  return points;
+}
+
+
+template <>
+std::vector<double>
+QGaussLog<1>::set_quadrature_weights(const unsigned int n) const
+{
+ 
+  std::vector<double> weights(n);
+
+  switch (n)
+    {    
+    case 1:
+      weights[0] = -1.0;
+      break; 
+    case 2:
+      weights[0] = -0.7185393190303845;
+      weights[1] = -0.2814606809696154;
+      break;
+
+    case 3:
+      weights[0] = -0.5134045522323634;
+      weights[1] = -0.3919800412014877;
+      weights[2] = -0.0946154065661483;
+      break;
+
+    case 4:
+      weights[0] =-0.3834640681451353;
+      weights[1] =-0.3868753177747627;
+      weights[2] =-0.1904351269501432;
+      weights[3] =-0.03922548712995894;
+      break;
+
+    case 5:
+      weights[0] =-0.2978934717828955;
+      weights[1] =-0.3497762265132236;
+      weights[2] =-0.234488290044052;
+      weights[3] =-0.0989304595166356;
+      weights[4] =-0.01891155214319462;
+      break;
+
+    case 6:
+      weights[0] = -0.2387636625785478;
+      weights[1] = -0.3082865732739458;
+      weights[2] = -0.2453174265632108;
+      weights[3] = -0.1420087565664786;
+      weights[4] = -0.05545462232488041;
+      weights[5] = -0.01016895869293513;
+      break;
+
+
+    case 7:
+      weights[0] = -0.1961693894252476;
+      weights[1] = -0.2703026442472726;
+      weights[2] = -0.239681873007687;
+      weights[3] = -0.1657757748104267;
+      weights[4] = -0.0889432271377365;
+      weights[5] = -0.03319430435645653;
+      weights[6] = -0.005932787015162054;
+      break;
+
+    case 8:
+      weights[0] = -0.164416604728002;
+      weights[1] = -0.2375256100233057;
+      weights[2] = -0.2268419844319134;
+      weights[3] = -0.1757540790060772;
+      weights[4] = -0.1129240302467932;
+      weights[5] = -0.05787221071771947;
+      weights[6] = -0.02097907374214317;
+      weights[7] = -0.003686407104036044;
+      break;
+
+    case 9:
+      weights[0] = -0.1400684387481339;
+      weights[1] = -0.2097722052010308;
+      weights[2] = -0.211427149896601;
+      weights[3] = -0.1771562339380667;
+      weights[4] = -0.1277992280331758;
+      weights[5] = -0.07847890261203835;
+      weights[6] = -0.0390225049841783;
+      weights[7] = -0.01386729555074604;
+      weights[8] = -0.002408041036090773;
+      break;
+
+    case 10:
+      weights[0] = -0.12095513195457;
+      weights[1] = -0.1863635425640733;
+      weights[2] = -0.1956608732777627;
+      weights[3] = -0.1735771421828997;
+      weights[4] = -0.135695672995467;
+      weights[5] = -0.0936467585378491;
+      weights[6] = -0.05578772735275126;
+      weights[7] = -0.02715981089692378;
+      weights[8] = -0.00951518260454442;
+      weights[9] = -0.001638157633217673;
+      break;
+
+
+    case 11:
+      weights[0] = -0.1056522560990997;
+      weights[1] = -0.1665716806006314;
+      weights[2] = -0.1805632182877528;
+      weights[3] = -0.1672787367737502;
+      weights[4] = -0.1386970574017174;
+      weights[5] = -0.1038334333650771;
+      weights[6] = -0.06953669788988512;
+      weights[7] = -0.04054160079499477;
+      weights[8] = -0.01943540249522013;
+      weights[9] = -0.006737429326043388;
+      weights[10] = -0.001152486965101561;      
+      break;
+      
+    case 12:   
+      weights[0] = -0.09319269144393;
+      weights[1] = -0.1497518275763289;
+      weights[2] = -0.166557454364573;
+      weights[3] = -0.1596335594369941;
+      weights[4] = -0.1384248318647479;
+      weights[5] = -0.1100165706360573;
+      weights[6] = -0.07996182177673273;
+      weights[7] = -0.0524069547809709;
+      weights[8] = -0.03007108900074863;
+      weights[9] = -0.01424924540252916;
+      weights[10] = -0.004899924710875609;
+      weights[11] = -0.000834029009809656;     
+      break;
+
+    default:
+      Assert(false, ExcNotImplemented());
+      break;  
+    }
+
+  return weights;
+
+}
+
+
+template <> 
+void
+QGaussLog<1>::revert_points_and_weights(std::vector<double> &p,
+					std::vector<double> &w) const
+{
+
+  double temp;
+  const unsigned int sz = this->size();
+
+  for (unsigned int i=0; i<sz/2; i++)
+    {
+      temp = p[sz-1-i];
+      p[sz-1-i] = p[i];
+      p[i]=temp;
+      
+      temp = w[sz-1-i];
+      w[sz-1-i]=w[i];
+      w[i]=temp;      
+    }
+
+}
+
+
+
 
 // construct the quadrature formulae in higher dimensions by
 // tensor product of lower dimensions

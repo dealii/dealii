@@ -38,7 +38,7 @@
 DEAL_II_NAMESPACE_OPEN
 
 
-template <int dim> class MGDoFHandler;
+template <int dim, int spacedim> class MGDoFHandler;
 
 /*
  * MGTransferBase is defined in mg_base.h
@@ -82,9 +82,9 @@ class MGTransferComponentBase
 				      * re-ordering and grouping of
 				      * components.
 				      */
-    template <int dim>
-    void build_matrices (const DoFHandler<dim>& dof,
-			 const MGDoFHandler<dim>& mg_dof);
+    template <int dim, int spacedim>
+    void build_matrices (const DoFHandler<dim,spacedim>& dof,
+			 const MGDoFHandler<dim,spacedim>& mg_dof);
 
 				   /**
 				    * Flag of selected components.
@@ -234,9 +234,9 @@ class MGTransferSelect : public MGTransferBase<Vector<number> >,
 				      * also affects the behavior of
 				      * the <tt>selected</tt> argument
 				      */
-    template <int dim>
-    void build_matrices (const DoFHandler<dim> &dof,
-			 const MGDoFHandler<dim> &mg_dof,
+    template <int dim, int spacedim>
+    void build_matrices (const DoFHandler<dim,spacedim> &dof,
+			 const MGDoFHandler<dim,spacedim> &mg_dof,
 			 unsigned int selected,
 			 unsigned int mg_selected,
 			 const std::vector<unsigned int>& target_component
@@ -263,9 +263,9 @@ class MGTransferSelect : public MGTransferBase<Vector<number> >,
 				      * Transfer from a vector on the
 				      * global grid to a multilevel vector.
 				      */
-    template <int dim, typename number2>
+    template <int dim, typename number2, int spacedim>
     void
-    copy_to_mg (const MGDoFHandler<dim>        &mg_dof,
+    copy_to_mg (const MGDoFHandler<dim,spacedim>        &mg_dof,
 		MGLevelObject<Vector<number> > &dst,
 		const Vector<number2>          &src) const;
 
@@ -278,9 +278,9 @@ class MGTransferSelect : public MGTransferBase<Vector<number> >,
 				      * vector into the respective
 				      * positions of a Vector.
 				      */
-    template <int dim, typename number2>
+    template <int dim, typename number2, int spacedim>
     void
-    copy_from_mg (const MGDoFHandler<dim>              &mg_dof,
+    copy_from_mg (const MGDoFHandler<dim,spacedim>              &mg_dof,
 		  Vector<number2>                      &dst,
 		  const MGLevelObject<Vector<number> > &src) const;
 
@@ -292,9 +292,9 @@ class MGTransferSelect : public MGTransferBase<Vector<number> >,
 				      * function, but probably not for
 				      * continuous elements.
 				      */
-    template <int dim, typename number2>
+    template <int dim, typename number2, int spacedim>
     void
-    copy_from_mg_add (const MGDoFHandler<dim>              &mg_dof,
+    copy_from_mg_add (const MGDoFHandler<dim,spacedim>              &mg_dof,
 		      Vector<number2>                      &dst,
 		      const MGLevelObject<Vector<number> > &src) const;
 
@@ -302,9 +302,9 @@ class MGTransferSelect : public MGTransferBase<Vector<number> >,
 				      * Transfer from a vector on the
 				      * global grid to multilevel vectors.
 				      */
-    template <int dim, typename number2>
+    template <int dim, typename number2, int spacedim>
     void
-    copy_to_mg (const MGDoFHandler<dim>        &mg_dof,
+    copy_to_mg (const MGDoFHandler<dim,spacedim>        &mg_dof,
 		MGLevelObject<Vector<number> > &dst,
 		const BlockVector<number2>     &src) const;
 
@@ -318,9 +318,9 @@ class MGTransferSelect : public MGTransferBase<Vector<number> >,
 				      * positions of a global
 				      * BlockVector.
 				      */
-    template <int dim, typename number2>
+    template <int dim, typename number2, int spacedim>
     void
-    copy_from_mg (const MGDoFHandler<dim>              &mg_dof,
+    copy_from_mg (const MGDoFHandler<dim,spacedim>              &mg_dof,
 		  BlockVector<number2>                 &dst,
 		  const MGLevelObject<Vector<number> > &src) const;
 
@@ -332,9 +332,9 @@ class MGTransferSelect : public MGTransferBase<Vector<number> >,
 				      * function, but probably not for
 				      * continuous elements.
 				      */
-    template <int dim, typename number2>
+    template <int dim, typename number2, int spacedim>
     void
-    copy_from_mg_add (const MGDoFHandler<dim>              &mg_dof,
+    copy_from_mg_add (const MGDoFHandler<dim,spacedim>              &mg_dof,
 		      BlockVector<number2>                 &dst,
 		      const MGLevelObject<Vector<number> > &src) const;
 
@@ -348,9 +348,9 @@ class MGTransferSelect : public MGTransferBase<Vector<number> >,
 				      * Implementation of the public
 				      * function.
 				      */
-    template <int dim, class OutVector>
+    template <int dim, class OutVector, int spacedim>
     void
-    do_copy_from_mg (const MGDoFHandler<dim>              &mg_dof,
+    do_copy_from_mg (const MGDoFHandler<dim,spacedim>              &mg_dof,
 		     OutVector                            &dst,
 		     const MGLevelObject<Vector<number> > &src,
 		     const unsigned int offset) const;
@@ -359,9 +359,9 @@ class MGTransferSelect : public MGTransferBase<Vector<number> >,
 				      * Implementation of the public
 				      * function.
 				      */
-    template <int dim, class OutVector>
+    template <int dim, class OutVector, int spacedim>
     void
-    do_copy_from_mg_add (const MGDoFHandler<dim>              &mg_dof,
+    do_copy_from_mg_add (const MGDoFHandler<dim,spacedim>              &mg_dof,
 			 OutVector                            &dst,
 			 const MGLevelObject<Vector<number> > &src,
 			 const unsigned int offset) const;
@@ -370,9 +370,9 @@ class MGTransferSelect : public MGTransferBase<Vector<number> >,
 				      * Actual implementation of
 				      * copy_to_mg().
 				      */
-    template <int dim, class InVector>
+    template <int dim, class InVector, int spacedim>
     void
-    do_copy_to_mg (const MGDoFHandler<dim>        &mg_dof,
+    do_copy_to_mg (const MGDoFHandler<dim,spacedim>        &mg_dof,
 		   MGLevelObject<Vector<number> > &dst,
 		   const InVector                 &src,
 		   const unsigned int              offset) const;

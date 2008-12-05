@@ -31,10 +31,10 @@ DEAL_II_NAMESPACE_OPEN
 
 
 //TODO: Remove doubled member variable 'degree'
-template <int dim>
-FE_Nedelec<dim>::FE_Nedelec (const unsigned int degree)
+template <int dim, int spacedim>
+FE_Nedelec<dim,spacedim>::FE_Nedelec (const unsigned int degree)
 		:
-		FiniteElement<dim> (
+		FiniteElement<dim,spacedim> (
 		  FiniteElementData<dim>(get_dpo_vector(degree), dim,
 					 degree+1, FiniteElementData<dim>::Hcurl, 1),
 				    std::vector<bool> (
@@ -80,9 +80,9 @@ FE_Nedelec<dim>::FE_Nedelec (const unsigned int degree)
 
 
 
-template <int dim>
+template <int dim, int spacedim>
 std::string
-FE_Nedelec<dim>::get_name () const
+FE_Nedelec<dim,spacedim>::get_name () const
 {
 				   // note that the
 				   // FETools::get_fe_from_name
@@ -99,11 +99,11 @@ FE_Nedelec<dim>::get_name () const
 
 
 
-template <int dim>
-FiniteElement<dim> *
-FE_Nedelec<dim>::clone() const
+template <int dim, int spacedim>
+FiniteElement<dim,spacedim> *
+FE_Nedelec<dim,spacedim>::clone() const
 {
-  return new FE_Nedelec<dim>(*this);
+  return new FE_Nedelec<dim,spacedim>(*this);
 }
 
 
@@ -545,9 +545,9 @@ FE_Nedelec<3>::shape_grad_grad_component (const unsigned int i,
 
 
 
-template <int dim>
+template <int dim, int spacedim>
 void
-FE_Nedelec<dim>::initialize_constraints ()
+FE_Nedelec<dim,spacedim>::initialize_constraints ()
 {
 				   // copy constraint matrices if they
 				   // are defined. otherwise leave
@@ -562,9 +562,9 @@ FE_Nedelec<dim>::initialize_constraints ()
 
 
 
-template <int dim>
+template <int dim, int spacedim>
 void
-FE_Nedelec<dim>::initialize_embedding ()
+FE_Nedelec<dim,spacedim>::initialize_embedding ()
 {
   unsigned int iso=RefinementCase<dim>::isotropic_refinement-1;
   if ((degree < Matrices::n_embedding_matrices+1) &&
@@ -597,9 +597,9 @@ FE_Nedelec<dim>::initialize_embedding ()
 
 
 
-template <int dim>
+template <int dim, int spacedim>
 void
-FE_Nedelec<dim>::initialize_restriction ()
+FE_Nedelec<dim,spacedim>::initialize_restriction ()
 {
   unsigned int iso=RefinementCase<dim>::isotropic_refinement-1;
   switch (dim)
@@ -777,8 +777,8 @@ FE_Nedelec<dim>::initialize_restriction ()
 
 
 
-template <int dim>
-void FE_Nedelec<dim>::initialize_unit_support_points ()
+template <int dim, int spacedim>
+void FE_Nedelec<dim,spacedim>::initialize_unit_support_points ()
 {
   switch (degree)
     {
@@ -828,8 +828,8 @@ void FE_Nedelec<1>::initialize_unit_face_support_points ()
 #endif
 
 
-template <int dim>
-void FE_Nedelec<dim>::initialize_unit_face_support_points ()
+template <int dim, int spacedim>
+void FE_Nedelec<dim,spacedim>::initialize_unit_face_support_points ()
 {
   switch (degree)
     {
@@ -866,9 +866,9 @@ void FE_Nedelec<dim>::initialize_unit_face_support_points ()
 
 
 
-template <int dim>
+template <int dim, int spacedim>
 std::vector<unsigned int>
-FE_Nedelec<dim>::get_dpo_vector(const unsigned int degree)
+FE_Nedelec<dim,spacedim>::get_dpo_vector(const unsigned int degree)
 {
   Assert (degree == 1, ExcNotImplemented());
 
@@ -884,9 +884,9 @@ FE_Nedelec<dim>::get_dpo_vector(const unsigned int degree)
 
 
 
-template <int dim>
+template <int dim, int spacedim>
 UpdateFlags
-FE_Nedelec<dim>::update_once (const UpdateFlags) const
+FE_Nedelec<dim,spacedim>::update_once (const UpdateFlags) const
 {
 				   // even the values have to be
 				   // computed on the real cell, so
@@ -896,9 +896,9 @@ FE_Nedelec<dim>::update_once (const UpdateFlags) const
 
 
 
-template <int dim>
+template <int dim, int spacedim>
 UpdateFlags
-FE_Nedelec<dim>::update_each (const UpdateFlags flags) const
+FE_Nedelec<dim,spacedim>::update_each (const UpdateFlags flags) const
 {
   UpdateFlags out = update_default;
 
@@ -918,10 +918,10 @@ FE_Nedelec<dim>::update_each (const UpdateFlags flags) const
 // Data field initialization
 //---------------------------------------------------------------------------
 
-template <int dim>
-typename Mapping<dim>::InternalDataBase *
-FE_Nedelec<dim>::get_data (const UpdateFlags      update_flags,
-			   const Mapping<dim>    &mapping,
+template <int dim, int spacedim>
+typename Mapping<dim,spacedim>::InternalDataBase *
+FE_Nedelec<dim,spacedim>::get_data (const UpdateFlags      update_flags,
+			   const Mapping<dim,spacedim>    &mapping,
 			   const Quadrature<dim> &quadrature) const
 {
  				   // generate a new data object and
@@ -988,14 +988,14 @@ FE_Nedelec<dim>::get_data (const UpdateFlags      update_flags,
 // Fill data of FEValues
 //---------------------------------------------------------------------------
 
-template <int dim>
+template <int dim, int spacedim>
 void
-FE_Nedelec<dim>::fill_fe_values (const Mapping<dim>                   &mapping,
-				 const typename Triangulation<dim>::cell_iterator &cell,
+FE_Nedelec<dim,spacedim>::fill_fe_values (const Mapping<dim,spacedim>                   &mapping,
+				 const typename Triangulation<dim,spacedim>::cell_iterator &cell,
 				 const Quadrature<dim>                &quadrature,
-				 typename Mapping<dim>::InternalDataBase &mapping_data,
-				 typename Mapping<dim>::InternalDataBase &fedata,
-				 FEValuesData<dim>                    &data) const
+				 typename Mapping<dim,spacedim>::InternalDataBase &mapping_data,
+				 typename Mapping<dim,spacedim>::InternalDataBase &fedata,
+				 FEValuesData<dim,spacedim>                    &data) const
 {
  				   // convert data object to internal
  				   // data for this class. fails with
@@ -1113,15 +1113,15 @@ FE_Nedelec<dim>::fill_fe_values (const Mapping<dim>                   &mapping,
 
 
 
-template <int dim>
+template <int dim, int spacedim>
 void
-FE_Nedelec<dim>::fill_fe_face_values (const Mapping<dim>                   &mapping,
-				      const typename Triangulation<dim>::cell_iterator &cell,
+FE_Nedelec<dim,spacedim>::fill_fe_face_values (const Mapping<dim,spacedim>                   &mapping,
+				      const typename Triangulation<dim,spacedim>::cell_iterator &cell,
 				      const unsigned int                    face,
 				      const Quadrature<dim-1>              &quadrature,
-				      typename Mapping<dim>::InternalDataBase       &mapping_data,
-				      typename Mapping<dim>::InternalDataBase       &fedata,
-				      FEValuesData<dim>                    &data) const
+				      typename Mapping<dim,spacedim>::InternalDataBase       &mapping_data,
+				      typename Mapping<dim,spacedim>::InternalDataBase       &fedata,
+				      FEValuesData<dim,spacedim>                    &data) const
 {
  				   // convert data object to internal
  				   // data for this class. fails with
@@ -1261,16 +1261,16 @@ FE_Nedelec<dim>::fill_fe_face_values (const Mapping<dim>                   &mapp
 
 
 
-template <int dim>
+template <int dim, int spacedim>
 void
-FE_Nedelec<dim>::fill_fe_subface_values (const Mapping<dim>                   &mapping,
-					 const typename Triangulation<dim>::cell_iterator &cell,
+FE_Nedelec<dim,spacedim>::fill_fe_subface_values (const Mapping<dim,spacedim>                   &mapping,
+					 const typename Triangulation<dim,spacedim>::cell_iterator &cell,
 					 const unsigned int                    face,
 					 const unsigned int                    subface,
 					 const Quadrature<dim-1>              &quadrature,
-					 typename Mapping<dim>::InternalDataBase       &mapping_data,
-					 typename Mapping<dim>::InternalDataBase       &fedata,
-					 FEValuesData<dim>                    &data) const
+					 typename Mapping<dim,spacedim>::InternalDataBase       &mapping_data,
+					 typename Mapping<dim,spacedim>::InternalDataBase       &fedata,
+					 FEValuesData<dim,spacedim>                    &data) const
 {
  				   // convert data object to internal
  				   // data for this class. fails with
@@ -1407,18 +1407,18 @@ FE_Nedelec<dim>::fill_fe_subface_values (const Mapping<dim>                   &m
 
 
 
-template <int dim>
+template <int dim, int spacedim>
 unsigned int
-FE_Nedelec<dim>::n_base_elements () const
+FE_Nedelec<dim,spacedim>::n_base_elements () const
 {
   return 1;
 }
 
 
 
-template <int dim>
-const FiniteElement<dim> &
-FE_Nedelec<dim>::base_element (const unsigned int index) const
+template <int dim, int spacedim>
+const FiniteElement<dim,spacedim> &
+FE_Nedelec<dim,spacedim>::base_element (const unsigned int index) const
 {
   Assert (index==0, ExcIndexRange(index, 0, 1));
   return *this;
@@ -1426,9 +1426,9 @@ FE_Nedelec<dim>::base_element (const unsigned int index) const
 
 
 
-template <int dim>
+template <int dim, int spacedim>
 unsigned int
-FE_Nedelec<dim>::element_multiplicity (const unsigned int index) const
+FE_Nedelec<dim,spacedim>::element_multiplicity (const unsigned int index) const
 {
   Assert (index==0, ExcIndexRange(index, 0, 1));
   return 1;
@@ -1436,9 +1436,9 @@ FE_Nedelec<dim>::element_multiplicity (const unsigned int index) const
 
 
 
-template <int dim>
+template <int dim, int spacedim>
 bool
-FE_Nedelec<dim>::has_support_on_face (const unsigned int shape_index,
+FE_Nedelec<dim,spacedim>::has_support_on_face (const unsigned int shape_index,
 				      const unsigned int face_index) const
 {
   Assert (shape_index < this->dofs_per_cell,
@@ -1499,9 +1499,9 @@ FE_Nedelec<dim>::has_support_on_face (const unsigned int shape_index,
 
 
 
-template <int dim>
+template <int dim, int spacedim>
 unsigned int
-FE_Nedelec<dim>::memory_consumption () const
+FE_Nedelec<dim,spacedim>::memory_consumption () const
 {
   Assert (false, ExcNotImplemented ());
   return 0;
@@ -1509,9 +1509,9 @@ FE_Nedelec<dim>::memory_consumption () const
 
 
 
-template <int dim>
+template <int dim, int spacedim>
 unsigned int
-FE_Nedelec<dim>::get_degree () const
+FE_Nedelec<dim,spacedim>::get_degree () const
 {
   return degree;
 }

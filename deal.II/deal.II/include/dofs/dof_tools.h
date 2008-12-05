@@ -31,16 +31,16 @@ class SparsityPattern;
 template <typename number> class Vector;
 template <int dim> class Function;
 template <int dim> class Point;
-template <int dim> class FiniteElement;
-template <int dim> class DoFHandler;
+template <int dim, int spacedim> class FiniteElement;
+template <int dim, int spacedim> class DoFHandler;
 namespace hp
 {
-  template <int dim> class DoFHandler;
+  template <int dim, int spacedim> class DoFHandler;
 }
-template <int dim> class MGDoFHandler;
+template <int dim, int spacedim> class MGDoFHandler;
 class ConstraintMatrix;
 template <class GridClass> class InterGridMap;
-template <int dim> class Mapping;
+template <int dim, int spacedim> class Mapping;
 
 
 //TODO: map_support_points_to_dofs should generate a multimap, rather than just a map, since several dofs may be located at the same support point
@@ -208,13 +208,13 @@ class DoFTools
 				      * Maximal number of degrees of
 				      * freedom on a cell.
 				      */
-    template <int dim>
+    template <int dim, int spacedim>
     static unsigned int
-    max_dofs_per_cell (const DoFHandler<dim> &dh);
+    max_dofs_per_cell (const DoFHandler<dim,spacedim> &dh);
     
-    template <int dim>
+    template <int dim, int spacedim>
     static unsigned int
-    max_dofs_per_cell (const hp::DoFHandler<dim> &dh);
+    max_dofs_per_cell (const hp::DoFHandler<dim,spacedim> &dh);
     
     
 				     /**
@@ -226,9 +226,9 @@ class DoFTools
 				      * uniform interface to query this
 				      * property.
 				      */
-    template <int dim>
+    template <int dim, int spacedim>
     static unsigned int
-    max_dofs_per_face (const DoFHandler<dim> &dh);
+    max_dofs_per_face (const DoFHandler<dim,spacedim> &dh);
 
 				     /**
 				      * Maximal number of degrees of
@@ -239,9 +239,9 @@ class DoFTools
 				      * uniform interface to query this
 				      * property.
 				      */
-    template <int dim>
+    template <int dim, int spacedim>
     static unsigned int
-    max_dofs_per_face (const hp::DoFHandler<dim> &dh);
+    max_dofs_per_face (const hp::DoFHandler<dim,spacedim> &dh);
     
 				     /**
 				      * Maximal number of degrees of
@@ -252,9 +252,9 @@ class DoFTools
 				      * uniform interface to query this
 				      * property.
 				      */
-    template <int dim>
+    template <int dim, int spacedim>
     static unsigned int
-    max_dofs_per_vertex (const DoFHandler<dim> &dh);
+    max_dofs_per_vertex (const DoFHandler<dim,spacedim> &dh);
     
 				     /**
 				      * Maximal number of degrees of
@@ -265,9 +265,9 @@ class DoFTools
 				      * uniform interface to query this
 				      * property.
 				      */
-    template <int dim>
+    template <int dim, int spacedim>
     static unsigned int
-    max_dofs_per_vertex (const hp::DoFHandler<dim> &dh);
+    max_dofs_per_vertex (const hp::DoFHandler<dim,spacedim> &dh);
     
 				     /**
 				      * Number of vector components in the
@@ -279,9 +279,9 @@ class DoFTools
 				      * uniform interface to query this
 				      * property.
 				      */
-    template <int dim>
+    template <int dim, int spacedim>
     static unsigned int
-    n_components (const DoFHandler<dim> &dh);
+    n_components (const DoFHandler<dim,spacedim> &dh);
     
 				     /**
 				      * Number of vector components in the
@@ -293,9 +293,9 @@ class DoFTools
 				      * uniform interface to query this
 				      * property.
 				      */
-    template <int dim>
+    template <int dim, int spacedim>
     static unsigned int
-    n_components (const hp::DoFHandler<dim> &dh);
+    n_components (const hp::DoFHandler<dim,spacedim> &dh);
     
 				     /**
 				      * Find out whether the FiniteElement
@@ -307,9 +307,9 @@ class DoFTools
 				      * uniform interface to query this
 				      * property.
 				      */
-    template <int dim>
+    template <int dim, int spacedim>
     static unsigned int
-    fe_is_primitive (const DoFHandler<dim> &dh);
+    fe_is_primitive (const DoFHandler<dim,spacedim> &dh);
     
 				     /**
 				      * Find out whether the FiniteElement
@@ -321,9 +321,9 @@ class DoFTools
 				      * uniform interface to query this
 				      * property.
 				      */
-    template <int dim>
+    template <int dim, int spacedim>
     static unsigned int
-    fe_is_primitive (const hp::DoFHandler<dim> &dh);
+    fe_is_primitive (const hp::DoFHandler<dim,spacedim> &dh);
     
 				     /**
 				      * @}
@@ -685,7 +685,7 @@ class DoFTools
     template <class DH, class SparsityPattern>
     static void
     make_boundary_sparsity_pattern (const DH &dof,
-				    const typename FunctionMap<DH::dimension>::type &boundary_indicators,
+				    const typename FunctionMap<DH::space_dimension>::type &boundary_indicators,
 				    const std::vector<unsigned int> &dof_to_boundary_mapping,
 				    SparsityPattern    &sparsity);
 
@@ -931,9 +931,9 @@ class DoFTools
 				      * this non-primitive base
 				      * element.
 				      */
-    template <int dim>
+    template <int dim, int spacedim>
     static void
-    extract_dofs (const DoFHandler<dim>   &dof_handler,
+    extract_dofs (const DoFHandler<dim,spacedim>   &dof_handler,
 		  const std::vector<bool> &select,
 		  std::vector<bool>       &selected_dofs,
 		  const bool               blocks = false);
@@ -942,9 +942,9 @@ class DoFTools
 				      * The same function as above,
 				      * but for a hp::DoFHandler.
 				      */
-    template <int dim>
+    template <int dim, int spacedim>
     static void
-    extract_dofs (const hp::DoFHandler<dim>   &dof_handler,
+    extract_dofs (const hp::DoFHandler<dim,spacedim>   &dof_handler,
 		  const std::vector<bool> &select,
 		  std::vector<bool>       &selected_dofs,
 		  const bool               blocks = false);
@@ -954,10 +954,10 @@ class DoFTools
 				      * extract_dofs() for one level
 				      * of a multi-grid DoF numbering.
 				      */
-    template <int dim>
+    template <int dim, int spacedim>
     static void
     extract_level_dofs (const unsigned int       level,
-			const MGDoFHandler<dim> &dof,
+			const MGDoFHandler<dim,spacedim> &dof,
 			const std::vector<bool> &select,
 			std::vector<bool>       &selected_dofs,
 			const bool               blocks = false);
@@ -1031,25 +1031,10 @@ class DoFTools
 				      * contents of this array or
 				      * overwritten.
 				      */
+    template <int dim, int spacedim>
     static void
-    extract_hanging_node_dofs (const DoFHandler<1> &dof_handler,
-			       std::vector<bool>   &selected_dofs);
-
-				     /**
-				      * Declaration of same function
-				      * for different space dimension.
-				      */
-    static void
-    extract_hanging_node_dofs (const DoFHandler<2> &dof_handler,
-			       std::vector<bool>   &selected_dofs);
-
-				     /**
-				      * Declaration of same function
-				      * for different space dimension.
-				      */
-    static void
-    extract_hanging_node_dofs (const DoFHandler<3> &dof_handler,
-			       std::vector<bool>   &selected_dofs);
+    extract_hanging_node_dofs (const DoFHandler<dim,spacedim> &dof_handler,
+			       std::vector<bool>              &selected_dofs);
 				     //@}
     
 				     /**
@@ -1327,9 +1312,9 @@ class DoFTools
 				      * targetted by target_components
 				      * are left untouched.
 				      */
-    template <int dim>
+    template <int dim, int spacedim>
     static void
-    count_dofs_per_component (const DoFHandler<dim>&     dof_handler,
+    count_dofs_per_component (const DoFHandler<dim,spacedim>&     dof_handler,
 			      std::vector<unsigned int>& dofs_per_component,
 			      const bool vector_valued_once = false,
 			      std::vector<unsigned int>  target_component
@@ -1350,9 +1335,9 @@ class DoFTools
 				      * function. If this is not the
 				      * case, an assertion is thrown.
 				      */
-    template <int dim>
+    template <int dim, int spacedim>
     static void
-    count_dofs_per_block (const DoFHandler<dim>&     dof_handler,
+    count_dofs_per_block (const DoFHandler<dim,spacedim>&     dof_handler,
 			  std::vector<unsigned int>& dofs_per_block,
 			  std::vector<unsigned int>  target_block
 			  = std::vector<unsigned int>());
@@ -1365,9 +1350,9 @@ class DoFTools
 				      * compatibility with older
 				      * versions only.
 				      */
-    template <int dim>
+    template <int dim, int spacedim>
     static void
-    count_dofs_per_component (const DoFHandler<dim>&     dof_handler,
+    count_dofs_per_component (const DoFHandler<dim,spacedim>&     dof_handler,
 			      std::vector<unsigned int>& dofs_per_component,
 			      std::vector<unsigned int>  target_component);
     
@@ -1585,13 +1570,13 @@ class DoFTools
 				      * only need one object of this
 				      * type.
 				      */
-    template <int dim>
+    template <int dim, int spacedim>
     static void
-    compute_intergrid_constraints (const DoFHandler<dim>              &coarse_grid,
+    compute_intergrid_constraints (const DoFHandler<dim,spacedim>              &coarse_grid,
 				   const unsigned int                  coarse_component,
-				   const DoFHandler<dim>              &fine_grid,
+				   const DoFHandler<dim,spacedim>              &fine_grid,
 				   const unsigned int                  fine_component,
-				   const InterGridMap<DoFHandler<dim> > &coarse_to_fine_grid_map,
+				   const InterGridMap<DoFHandler<dim,spacedim> > &coarse_to_fine_grid_map,
 				   ConstraintMatrix                   &constraints);
 
 
@@ -1618,13 +1603,13 @@ class DoFTools
 				      * SparsityPattern ad
 				      * SparseMatrix classes.
 				      */
-    template <int dim>
+    template <int dim, int spacedim>
     static void
-    compute_intergrid_transfer_representation (const DoFHandler<dim>              &coarse_grid,
+    compute_intergrid_transfer_representation (const DoFHandler<dim,spacedim>              &coarse_grid,
 					       const unsigned int                  coarse_component,
-					       const DoFHandler<dim>              &fine_grid,
+					       const DoFHandler<dim,spacedim>              &fine_grid,
 					       const unsigned int                  fine_component,
-					       const InterGridMap<DoFHandler<dim> > &coarse_to_fine_grid_map,
+					       const InterGridMap<DoFHandler<dim,spacedim> > &coarse_to_fine_grid_map,
 					       std::vector<std::map<unsigned int, float> > &transfer_representation);
     
 				     /**
@@ -1693,10 +1678,10 @@ class DoFTools
 				      * length of as many elements as
 				      * there are degrees of freedom.
 				      */
-    template <int dim>
+    template <int dim, int spacedim>
     static void
-    map_dofs_to_support_points (const Mapping<dim>       &mapping,
-				const DoFHandler<dim>    &dof_handler,
+    map_dofs_to_support_points (const Mapping<dim,spacedim>       &mapping,
+				const DoFHandler<dim,spacedim>    &dof_handler,
 				std::vector<Point<dim> > &support_points);
 
 				     /**
@@ -1728,7 +1713,7 @@ class DoFTools
 				      */
     template <class DH, class Comp>
     static void
-    map_support_points_to_dofs (const Mapping<DH::dimension> &mapping,
+    map_support_points_to_dofs (const Mapping<DH::dimension, DH::space_dimension> &mapping,
 				const DH                     &dof_handler,
 				std::map<Point<DH::dimension>, unsigned int, Comp> &point_to_index_map);
 
@@ -1747,9 +1732,9 @@ class DoFTools
 				      * initialized to the correct
 				      * length inside this function.
 				      */
-    template <int dim>
+    template <int dim, int spacedim>
     static void
-    convert_couplings_to_blocks (const hp::DoFHandler<dim>& dof_handler,
+    convert_couplings_to_blocks (const hp::DoFHandler<dim,spacedim>& dof_handler,
 				 const Table<2, Coupling>& table_by_component,
 				 std::vector<Table<2,Coupling> >& tables_by_block);
 
@@ -1757,11 +1742,11 @@ class DoFTools
 				      * Make a constraint matrix with 
 				      * zero boundary values.
 				      */
-    template <int dim, template <int> class DH> 
-      static void 
-      make_zero_boundary_constraints (const DH<dim>           &dof,  
-				      ConstraintMatrix        &zero_boundary_constraints,    
-				      const std::vector<bool> &component_mask_=std::vector<bool>());
+    template <int dim, int spacedim, template <int, int> class DH> 
+    static void 
+    make_zero_boundary_constraints (const DH<dim,spacedim> &dof,  
+				    ConstraintMatrix        &zero_boundary_constraints,    
+				    const std::vector<bool> &component_mask_=std::vector<bool>());
 
 				     /**
 				      * Map a coupling table from the
@@ -1778,9 +1763,9 @@ class DoFTools
 				      * initialized to the correct
 				      * length inside this function.
 				      */
-    template <int dim>
+    template <int dim, int spacedim>
     static void
-    convert_couplings_to_blocks (const DoFHandler<dim>& dof_handler,
+    convert_couplings_to_blocks (const DoFHandler<dim,spacedim>& dof_handler,
 				 const Table<2, Coupling>& table_by_component,
 				 std::vector<Table<2,Coupling> >& tables_by_block);
     
@@ -1838,13 +1823,13 @@ class DoFTools
 				      * function for a thorough
 				      * description of how it works.
 				      */
-    template <int dim>
+    template <int dim, int spacedim>
     static unsigned int
-    compute_intergrid_weights_1 (const DoFHandler<dim>              &coarse_grid,
+    compute_intergrid_weights_1 (const DoFHandler<dim,spacedim>              &coarse_grid,
 				 const unsigned int                  coarse_component,
-				 const DoFHandler<dim>              &fine_grid,
+				 const DoFHandler<dim,spacedim>              &fine_grid,
 				 const unsigned int                  fine_component,
-				 const InterGridMap<DoFHandler<dim> > &coarse_to_fine_grid_map,
+				 const InterGridMap<DoFHandler<dim,spacedim> > &coarse_to_fine_grid_map,
 				 std::vector<std::map<unsigned int, float> > &weights,
 				 std::vector<int>                   &weight_mapping);
     
@@ -1855,11 +1840,11 @@ class DoFTools
 				      * function for a thorough
 				      * description of how it works.
 				      */
-    template <int dim>
+    template <int dim, int spacedim>
     static void
-    compute_intergrid_weights_2 (const DoFHandler<dim>              &coarse_grid,
+    compute_intergrid_weights_2 (const DoFHandler<dim,spacedim>              &coarse_grid,
 				 const unsigned int                  coarse_component,
-				 const InterGridMap<DoFHandler<dim> > &coarse_to_fine_grid_map,
+				 const InterGridMap<DoFHandler<dim,spacedim> > &coarse_to_fine_grid_map,
 				 const std::vector<Vector<double> > &parameter_dofs,
 				 const std::vector<int>             &weight_mapping,
 				 std::vector<std::map<unsigned int, float> > &weights);
@@ -1874,26 +1859,26 @@ class DoFTools
 				      * then worked on in parallel, if
 				      * multithreading is available.
 				      */
-    template <int dim>
+    template <int dim, int spacedim>
     static void
-    compute_intergrid_weights_3 (const DoFHandler<dim>              &coarse_grid,
+    compute_intergrid_weights_3 (const DoFHandler<dim,spacedim>              &coarse_grid,
 				 const unsigned int                  coarse_component,
-				 const InterGridMap<DoFHandler<dim> > &coarse_to_fine_grid_map,
+				 const InterGridMap<DoFHandler<dim,spacedim> > &coarse_to_fine_grid_map,
 				 const std::vector<Vector<double> > &parameter_dofs,
 				 const std::vector<int>             &weight_mapping,
 				 std::vector<std::map<unsigned int, float> > &weights,
-				 const typename DoFHandler<dim>::active_cell_iterator &begin,
-				 const typename DoFHandler<dim>::active_cell_iterator &end);
+				 const typename DoFHandler<dim,spacedim>::active_cell_iterator &begin,
+				 const typename DoFHandler<dim,spacedim>::active_cell_iterator &end);
 
 				     /**
 				      * Compute coupling of dofs from
 				      * coupling of components.
 				      */
-    template <int dim>
+    template <int dim, int spacedim>
     static void compute_dof_couplings (
       Table<2,Coupling>& dof_couplings,
       const Table<2,Coupling>& component_couplings,
-      const FiniteElement<dim>& fe);
+      const FiniteElement<dim,spacedim>& fe);
 
     friend class MGTools;
 };
@@ -1904,7 +1889,7 @@ class DoFTools
 
 template <>
 void
-DoFTools::map_dof_to_boundary_indices (const DoFHandler<1>       &dof_handler,
+DoFTools::map_dof_to_boundary_indices (const DoFHandler<1,1>       &dof_handler,
                                        std::vector<unsigned int> &mapping);
 
 
@@ -1948,82 +1933,82 @@ DoFTools::Coupling operator | (const DoFTools::Coupling c1,
 
 // ---------------------- inline and template functions --------------------
 
-template <int dim>
+template <int dim, int spacedim>
 inline unsigned int
-DoFTools::max_dofs_per_cell (const DoFHandler<dim> &dh)
+DoFTools::max_dofs_per_cell (const DoFHandler<dim,spacedim> &dh)
 {
   return dh.get_fe().dofs_per_cell;
 }
 
 
-template <int dim>
+template <int dim, int spacedim>
 inline unsigned int
-DoFTools::max_dofs_per_face (const DoFHandler<dim> &dh) 
+DoFTools::max_dofs_per_face (const DoFHandler<dim,spacedim> &dh) 
 {
   return dh.get_fe().dofs_per_face;
 }
 
 
-template <int dim>
+template <int dim, int spacedim>
 inline unsigned int
-DoFTools::max_dofs_per_vertex (const DoFHandler<dim> &dh) 
+DoFTools::max_dofs_per_vertex (const DoFHandler<dim,spacedim> &dh) 
 {
   return dh.get_fe().dofs_per_vertex;
 }
 
 
-template <int dim>
+template <int dim, int spacedim>
 inline unsigned int
-DoFTools::n_components (const DoFHandler<dim> &dh) 
+DoFTools::n_components (const DoFHandler<dim,spacedim> &dh) 
 {
   return dh.get_fe().n_components();
 }
 
 
 
-template <int dim>
+template <int dim, int spacedim>
 inline unsigned int
-DoFTools::fe_is_primitive (const DoFHandler<dim> &dh) 
+DoFTools::fe_is_primitive (const DoFHandler<dim,spacedim> &dh) 
 {
   return dh.get_fe().is_primitive();
 }
 
 
-template <int dim>
+template <int dim, int spacedim>
 inline unsigned int
-DoFTools::max_dofs_per_cell (const hp::DoFHandler<dim> &dh) 
+DoFTools::max_dofs_per_cell (const hp::DoFHandler<dim,spacedim> &dh) 
 {
   return dh.get_fe().max_dofs_per_cell ();
 }
 
 
-template <int dim>
+template <int dim, int spacedim>
 inline unsigned int
-DoFTools::max_dofs_per_face (const hp::DoFHandler<dim> &dh) 
+DoFTools::max_dofs_per_face (const hp::DoFHandler<dim,spacedim> &dh) 
 {
   return dh.get_fe().max_dofs_per_face ();
 }
 
 
-template <int dim>
+template <int dim, int spacedim>
 inline unsigned int
-DoFTools::max_dofs_per_vertex (const hp::DoFHandler<dim> &dh) 
+DoFTools::max_dofs_per_vertex (const hp::DoFHandler<dim,spacedim> &dh) 
 {
   return dh.get_fe().max_dofs_per_vertex ();
 }
 
 
-template <int dim>
+template <int dim, int spacedim>
 inline unsigned int
-DoFTools::n_components (const hp::DoFHandler<dim> &dh) 
+DoFTools::n_components (const hp::DoFHandler<dim,spacedim> &dh) 
 {
   return dh.get_fe()[0].n_components();
 }
 
 
-template <int dim>
+template <int dim, int spacedim>
 inline unsigned int
-DoFTools::fe_is_primitive (const hp::DoFHandler<dim> &dh) 
+DoFTools::fe_is_primitive (const hp::DoFHandler<dim,spacedim> &dh) 
 {
   return dh.get_fe()[0].is_primitive();
 }
@@ -2058,7 +2043,7 @@ DoFTools::make_sparsity_pattern (
 template <class DH, class Comp>
 void
 DoFTools::map_support_points_to_dofs (
-  const Mapping<DH::dimension> &mapping,
+  const Mapping<DH::dimension,DH::space_dimension> &mapping,
   const DH                     &dof_handler,
   std::map<Point<DH::dimension>, unsigned int, Comp> &point_to_index_map)
 {

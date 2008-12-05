@@ -21,7 +21,7 @@
 DEAL_II_NAMESPACE_OPEN
 
 template <int dim> class PolynomialSpace;
-template <int dim> class MappingQ;
+template <int dim, int spacedim> class MappingQ;
 
 
 /*!@addtogroup fe */
@@ -45,10 +45,13 @@ template <int dim> class MappingQ;
  * The purpose of this class is experimental, therefore the
  * implementation will remain incomplete.
  *
+ * Besides, this class is not implemented for the codimension one case
+ * (<tt>spacedim != dim</tt>).
+ *
  * @author Guido Kanschat, 2002
  */
-template <int dim>
-class FE_DGPNonparametric : public FiniteElement<dim>
+template <int dim, int spacedim=dim>
+class FE_DGPNonparametric : public FiniteElement<dim,spacedim>
 {
   public:
 				     /**
@@ -194,7 +197,7 @@ class FE_DGPNonparametric : public FiniteElement<dim>
 				      * @p this, and all other
 				      * indices throw an error.
 				      */
-    virtual const FiniteElement<dim> &
+    virtual const FiniteElement<dim,spacedim> &
     base_element (const unsigned int index) const;
 
                                      /**
@@ -226,10 +229,10 @@ class FE_DGPNonparametric : public FiniteElement<dim>
 				      * interpolation from a given
 				      * element, then they must throw
 				      * an exception of type
-				      * FiniteElement<dim>::ExcInterpolationNotImplemented.
+				      * FiniteElement<dim,spacedim>::ExcInterpolationNotImplemented.
 				      */
     virtual void
-    get_face_interpolation_matrix (const FiniteElement<dim> &source,
+    get_face_interpolation_matrix (const FiniteElement<dim,spacedim> &source,
 				   FullMatrix<double>       &matrix) const;    
 
 				     /**
@@ -251,10 +254,10 @@ class FE_DGPNonparametric : public FiniteElement<dim>
 				      * interpolation from a given
 				      * element, then they must throw
 				      * an exception of type
-				      * FiniteElement<dim>::ExcInterpolationNotImplemented.
+				      * FiniteElement<dim,spacedim>::ExcInterpolationNotImplemented.
 				      */
     virtual void
-    get_subface_interpolation_matrix (const FiniteElement<dim> &source,
+    get_subface_interpolation_matrix (const FiniteElement<dim,spacedim> &source,
 				      const unsigned int        subface,
 				      FullMatrix<double>       &matrix) const;
 
@@ -303,7 +306,7 @@ class FE_DGPNonparametric : public FiniteElement<dim>
 				      */
     virtual
     std::vector<std::pair<unsigned int, unsigned int> >
-    hp_vertex_dof_identities (const FiniteElement<dim> &fe_other) const;
+    hp_vertex_dof_identities (const FiniteElement<dim,spacedim> &fe_other) const;
 
 				     /**
 				      * Same as
@@ -318,7 +321,7 @@ class FE_DGPNonparametric : public FiniteElement<dim>
 				      */
     virtual
     std::vector<std::pair<unsigned int, unsigned int> >
-    hp_line_dof_identities (const FiniteElement<dim> &fe_other) const;
+    hp_line_dof_identities (const FiniteElement<dim,spacedim> &fe_other) const;
 
 				     /**
 				      * Same as
@@ -333,7 +336,7 @@ class FE_DGPNonparametric : public FiniteElement<dim>
 				      */
     virtual
     std::vector<std::pair<unsigned int, unsigned int> >
-    hp_quad_dof_identities (const FiniteElement<dim> &fe_other) const;
+    hp_quad_dof_identities (const FiniteElement<dim,spacedim> &fe_other) const;
 
                                      /**
                                       * Return whether this element
@@ -364,7 +367,7 @@ class FE_DGPNonparametric : public FiniteElement<dim>
 				      */
     virtual
     FiniteElementDomination::Domination
-    compare_for_face_domination (const FiniteElement<dim> &fe_other) const;
+    compare_for_face_domination (const FiniteElement<dim,spacedim> &fe_other) const;
 
 				     /**
 				      * @}
@@ -456,7 +459,7 @@ class FE_DGPNonparametric : public FiniteElement<dim>
 				      * This function is needed by the
 				      * constructors of @p FESystem.
 				      */
-    virtual FiniteElement<dim> *clone() const;
+    virtual FiniteElement<dim,spacedim> *clone() const;
   
 				     /**
 				      * Prepare internal data
@@ -464,9 +467,9 @@ class FE_DGPNonparametric : public FiniteElement<dim>
 				      * independent of the cell.
 				      */
     virtual
-    typename Mapping<dim>::InternalDataBase *
+    typename Mapping<dim,spacedim>::InternalDataBase *
     get_data (const UpdateFlags,
-	      const Mapping<dim>& mapping,
+	      const Mapping<dim,spacedim>& mapping,
 	      const Quadrature<dim>& quadrature) const ;
 
 				     /**
@@ -475,12 +478,12 @@ class FE_DGPNonparametric : public FiniteElement<dim>
 				      * FiniteElement.
 				      */
     virtual void
-    fill_fe_values (const Mapping<dim> &mapping,
-		    const typename Triangulation<dim>::cell_iterator &cell,
+    fill_fe_values (const Mapping<dim,spacedim> &mapping,
+		    const typename Triangulation<dim,spacedim>::cell_iterator &cell,
 		    const Quadrature<dim>                &quadrature,
-		    typename Mapping<dim>::InternalDataBase      &mapping_internal,
-		    typename Mapping<dim>::InternalDataBase      &fe_internal,
-		    FEValuesData<dim>& data) const;
+		    typename Mapping<dim,spacedim>::InternalDataBase      &mapping_internal,
+		    typename Mapping<dim,spacedim>::InternalDataBase      &fe_internal,
+		    FEValuesData<dim,spacedim>& data) const;
     
 				     /**
 				      * Implementation of the same
@@ -488,13 +491,13 @@ class FE_DGPNonparametric : public FiniteElement<dim>
 				      * FiniteElement.
 				      */
     virtual void
-    fill_fe_face_values (const Mapping<dim> &mapping,
-			 const typename Triangulation<dim>::cell_iterator &cell,
+    fill_fe_face_values (const Mapping<dim,spacedim> &mapping,
+			 const typename Triangulation<dim,spacedim>::cell_iterator &cell,
 			 const unsigned int                    face_no,
 			 const Quadrature<dim-1>                &quadrature,
-			 typename Mapping<dim>::InternalDataBase      &mapping_internal,
-			 typename Mapping<dim>::InternalDataBase      &fe_internal,
-			 FEValuesData<dim>& data) const ;
+			 typename Mapping<dim,spacedim>::InternalDataBase      &mapping_internal,
+			 typename Mapping<dim,spacedim>::InternalDataBase      &fe_internal,
+			 FEValuesData<dim,spacedim>& data) const ;
     
 				     /**
 				      * Implementation of the same
@@ -502,14 +505,14 @@ class FE_DGPNonparametric : public FiniteElement<dim>
 				      * FiniteElement.
 				      */
     virtual void
-    fill_fe_subface_values (const Mapping<dim> &mapping,
-			    const typename Triangulation<dim>::cell_iterator &cell,
+    fill_fe_subface_values (const Mapping<dim,spacedim> &mapping,
+			    const typename Triangulation<dim,spacedim>::cell_iterator &cell,
 			    const unsigned int                    face_no,
 			    const unsigned int                    sub_no,
 			    const Quadrature<dim-1>                &quadrature,
-			    typename Mapping<dim>::InternalDataBase      &mapping_internal,
-			    typename Mapping<dim>::InternalDataBase      &fe_internal,
-			    FEValuesData<dim>& data) const ;
+			    typename Mapping<dim,spacedim>::InternalDataBase      &mapping_internal,
+			    typename Mapping<dim,spacedim>::InternalDataBase      &fe_internal,
+			    FEValuesData<dim,spacedim>& data) const ;
 
   private:
     
@@ -584,7 +587,7 @@ class FE_DGPNonparametric : public FiniteElement<dim>
 				      * see the documentation of the
 				      * base class.
 				      */
-    class InternalData : public FiniteElement<dim>::InternalDataBase
+    class InternalData : public FiniteElement<dim,spacedim>::InternalDataBase
     {
       public:
 				       // have some scratch arrays
@@ -596,14 +599,15 @@ class FE_DGPNonparametric : public FiniteElement<dim>
 				     /**
 				      * Allow access from other dimensions.
 				      */
-    template <int dim1> friend class FE_DGPNonparametric;
+    template <int, int> friend class FE_DGPNonparametric;
 
 				     /**
 				      * Allows @p MappingQ class to
 				      * access to build_renumbering
 				      * function.
 				      */
-    friend class MappingQ<dim>;
+    template <int, int> friend class MappingQ;
+//    friend class MappingQ<dim>;
 };
 
 /*@}*/
@@ -614,40 +618,40 @@ class FE_DGPNonparametric : public FiniteElement<dim>
 // compiler allows us to do that (the standard says we must)
 #ifndef DEAL_II_MEMBER_VAR_SPECIALIZATION_BUG
 template <> 
-const double * const FE_DGPNonparametric<1>::Matrices::embedding[][GeometryInfo<1>::max_children_per_cell];
+const double * const FE_DGPNonparametric<1,1>::Matrices::embedding[][GeometryInfo<1>::max_children_per_cell];
 
 template <>
-const unsigned int FE_DGPNonparametric<1>::Matrices::n_embedding_matrices;
+const unsigned int FE_DGPNonparametric<1,1>::Matrices::n_embedding_matrices;
 
 template <>
-const double * const FE_DGPNonparametric<1>::Matrices::projection_matrices[][GeometryInfo<1>::max_children_per_cell];
+const double * const FE_DGPNonparametric<1,1>::Matrices::projection_matrices[][GeometryInfo<1>::max_children_per_cell];
 
 template <>
-const unsigned int FE_DGPNonparametric<1>::Matrices::n_projection_matrices;
+const unsigned int FE_DGPNonparametric<1,1>::Matrices::n_projection_matrices;
 
 template <> 
-const double * const FE_DGPNonparametric<2>::Matrices::embedding[][GeometryInfo<2>::max_children_per_cell];
+const double * const FE_DGPNonparametric<2,2>::Matrices::embedding[][GeometryInfo<2>::max_children_per_cell];
 
 template <>
-const unsigned int FE_DGPNonparametric<2>::Matrices::n_embedding_matrices;
+const unsigned int FE_DGPNonparametric<2,2>::Matrices::n_embedding_matrices;
 
 template <>
-const double * const FE_DGPNonparametric<2>::Matrices::projection_matrices[][GeometryInfo<2>::max_children_per_cell];
+const double * const FE_DGPNonparametric<2,2>::Matrices::projection_matrices[][GeometryInfo<2>::max_children_per_cell];
 
 template <>
-const unsigned int FE_DGPNonparametric<2>::Matrices::n_projection_matrices;
+const unsigned int FE_DGPNonparametric<2,2>::Matrices::n_projection_matrices;
 
 template <> 
-const double * const FE_DGPNonparametric<3>::Matrices::embedding[][GeometryInfo<3>::max_children_per_cell];
+const double * const FE_DGPNonparametric<3,3>::Matrices::embedding[][GeometryInfo<3>::max_children_per_cell];
 
 template <>
-const unsigned int FE_DGPNonparametric<3>::Matrices::n_embedding_matrices;
+const unsigned int FE_DGPNonparametric<3,3>::Matrices::n_embedding_matrices;
 
 template <>
-const double * const FE_DGPNonparametric<3>::Matrices::projection_matrices[][GeometryInfo<3>::max_children_per_cell];
+const double * const FE_DGPNonparametric<3,3>::Matrices::projection_matrices[][GeometryInfo<3>::max_children_per_cell];
 
 template <>
-const unsigned int FE_DGPNonparametric<3>::Matrices::n_projection_matrices;
+const unsigned int FE_DGPNonparametric<3,3>::Matrices::n_projection_matrices;
 #endif
 
 #endif // DOXYGEN

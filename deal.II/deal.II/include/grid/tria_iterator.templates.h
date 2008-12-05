@@ -2,7 +2,7 @@
 //    $Id$
 //    Version: $Name$
 //
-//    Copyright (C) 1998, 1999, 2000, 2001, 2002, 2003, 2005, 2006 by the deal.II authors
+//    Copyright (C) 1998, 1999, 2000, 2001, 2002, 2003, 2005, 2006, 2008 by the deal.II authors
 //
 //    This file is subject to QPL and may not be  distributed
 //    without copyright and license information. Please refer
@@ -30,49 +30,58 @@ DEAL_II_NAMESPACE_OPEN
 /*------------------------ Functions: TriaRawIterator ------------------*/
 
 
-template <int dim, typename Accessor>
+template <typename Accessor>
 inline
-TriaRawIterator<dim,Accessor>::TriaRawIterator () :
-		accessor (0, -2, -2, 0) {}
+TriaRawIterator<Accessor>::TriaRawIterator ()
+		:
+		accessor (0, -2, -2, 0)
+{}
 
 
-template <int dim, typename Accessor>
+template <typename Accessor>
 inline
-TriaRawIterator<dim,Accessor>::TriaRawIterator (const TriaRawIterator<dim,Accessor> &i) :
-		accessor (i.accessor) {}
+TriaRawIterator<Accessor>::TriaRawIterator (const TriaRawIterator<Accessor> &i)
+		:
+		accessor (i.accessor)
+{}
 
 
-template <int dim, typename Accessor>
+
+template <typename Accessor>
 inline
-TriaRawIterator<dim,Accessor>::TriaRawIterator (const Triangulation<dim> *parent,
-						const int                 level,
-						const int                 index,
-						const typename Accessor::AccessorData *local_data) :
-		accessor (parent, level, index, local_data) {}
+TriaRawIterator<Accessor>::
+TriaRawIterator (const Triangulation<Accessor::dimension,Accessor::space_dimension> *parent,
+		 const int                 level,
+		 const int                 index,
+		 const typename Accessor::AccessorData *local_data)
+		:
+		accessor (parent, level, index, local_data)
+{}
 
 
-template <int dim, typename Accessor>
+template <typename Accessor>
 inline
-TriaRawIterator<dim,Accessor> &
-TriaRawIterator<dim,Accessor>::operator = (const TriaRawIterator<dim,Accessor> &i) {
+TriaRawIterator<Accessor> &
+TriaRawIterator<Accessor>::operator = (const TriaRawIterator<Accessor> &i)
+{
   accessor.copy_from (i.accessor);
   
   return *this;
 }
 
 
-template <int dim, typename Accessor>
+template <typename Accessor>
 inline
 bool
-TriaRawIterator<dim,Accessor>::operator == (const TriaRawIterator<dim,Accessor> &i) const {
+TriaRawIterator<Accessor>::operator == (const TriaRawIterator<Accessor> &i) const {
   return accessor == i.accessor;
 }
 
 
-template <int dim, typename Accessor>
+template <typename Accessor>
 inline
 bool
-TriaRawIterator<dim,Accessor>::operator != (const TriaRawIterator<dim,Accessor> &i) const {
+TriaRawIterator<Accessor>::operator != (const TriaRawIterator<Accessor> &i) const {
 				   // Note that at times, there is a problem
 				   // with egcs 1.1 that makes it choose
 				   // the global STL operator != (which
@@ -88,22 +97,22 @@ TriaRawIterator<dim,Accessor>::operator != (const TriaRawIterator<dim,Accessor> 
 }
 
 
-template <int dim, typename Accessor>
+template <typename Accessor>
 inline
-TriaRawIterator<dim,Accessor>
-TriaRawIterator<dim,Accessor>::operator ++ (int) {
-  TriaRawIterator<dim,Accessor> tmp(*this);
+TriaRawIterator<Accessor>
+TriaRawIterator<Accessor>::operator ++ (int) {
+  TriaRawIterator<Accessor> tmp(*this);
   operator++ ();
   
   return tmp;
 }
 
 
-template <int dim, typename Accessor>
+template <typename Accessor>
 inline
-TriaRawIterator<dim,Accessor>
-TriaRawIterator<dim,Accessor>::operator -- (int) {
-  TriaRawIterator<dim,Accessor> tmp(*this);
+TriaRawIterator<Accessor>
+TriaRawIterator<Accessor>::operator -- (int) {
+  TriaRawIterator<Accessor> tmp(*this);
   operator-- ();
   
   return tmp;
@@ -113,22 +122,24 @@ TriaRawIterator<dim,Accessor>::operator -- (int) {
 /*-----------------------  functions: TriaIterator ---------------*/
 
 
-template <int dim, typename Accessor>
+template <typename Accessor>
 inline
-TriaIterator<dim,Accessor>::TriaIterator () :
-		TriaRawIterator<dim,Accessor> () {}
+TriaIterator<Accessor>::TriaIterator () :
+		TriaRawIterator<Accessor> () {}
 
 
-template <int dim, typename Accessor>
+template <typename Accessor>
 inline
-TriaIterator<dim,Accessor>::TriaIterator (const TriaIterator<dim,Accessor> &i) :
-		TriaRawIterator<dim,Accessor> (static_cast<TriaRawIterator<dim,Accessor> >(i)) {}
+TriaIterator<Accessor>::TriaIterator (const TriaIterator<Accessor> &i)
+		:
+		TriaRawIterator<Accessor> (i.accessor) {}
 
 
-template <int dim, typename Accessor>
+template <typename Accessor>
 inline
-TriaIterator<dim,Accessor>::TriaIterator (const TriaRawIterator<dim,Accessor> &i) :
-		TriaRawIterator<dim,Accessor> (i)
+TriaIterator<Accessor>::TriaIterator (const TriaRawIterator<Accessor> &i)
+		:
+		TriaRawIterator<Accessor> (i.accessor)
 {
 #ifdef DEBUG
 				   // do this like this, because:
@@ -144,13 +155,13 @@ TriaIterator<dim,Accessor>::TriaIterator (const TriaRawIterator<dim,Accessor> &i
 }
 
 
-template <int dim, typename Accessor>
+template <typename Accessor>
 inline
-TriaIterator<dim,Accessor>::TriaIterator (const Triangulation<dim> *parent,
+TriaIterator<Accessor>::TriaIterator (const Triangulation<Accessor::dimension,Accessor::space_dimension> *parent,
 					  const int                 level,
 					  const int                 index,
 					  const typename Accessor::AccessorData *local_data) :
-		TriaRawIterator<dim,Accessor> (parent, level, index, local_data)
+		TriaRawIterator<Accessor> (parent, level, index, local_data)
 {
 #ifdef DEBUG
 				   // do this like this, because:
@@ -166,19 +177,19 @@ TriaIterator<dim,Accessor>::TriaIterator (const Triangulation<dim> *parent,
 }
 
 
-template <int dim, typename Accessor>
+template <typename Accessor>
 inline
-TriaIterator<dim,Accessor> &
-TriaIterator<dim,Accessor>::operator = (const TriaIterator<dim,Accessor> &i) {
+TriaIterator<Accessor> &
+TriaIterator<Accessor>::operator = (const TriaIterator<Accessor> &i) {
   this->accessor.copy_from (i.accessor);
   return *this;
 }
 
 
-template <int dim, typename Accessor>
+template <typename Accessor>
 inline
-TriaIterator<dim,Accessor> &
-TriaIterator<dim,Accessor>::operator = (const TriaRawIterator<dim,Accessor> &i) {
+TriaIterator<Accessor> &
+TriaIterator<Accessor>::operator = (const TriaRawIterator<Accessor> &i) {
   this->accessor.copy_from (i.accessor);
 #ifdef DEBUG
 				   // do this like this, because:
@@ -195,10 +206,10 @@ TriaIterator<dim,Accessor>::operator = (const TriaRawIterator<dim,Accessor> &i) 
 }
 
 
-template <int dim, typename Accessor>
+template <typename Accessor>
 inline
-TriaIterator<dim,Accessor> & TriaIterator<dim,Accessor>::operator ++ () {
-  while (TriaRawIterator<dim,Accessor>::operator++(),
+TriaIterator<Accessor> & TriaIterator<Accessor>::operator ++ () {
+  while (TriaRawIterator<Accessor>::operator++(),
 	 (this->state() == IteratorState::valid))
     if (this->accessor.used() == true)
       return *this;
@@ -206,21 +217,21 @@ TriaIterator<dim,Accessor> & TriaIterator<dim,Accessor>::operator ++ () {
 }
 
 
-template <int dim, typename Accessor>
+template <typename Accessor>
 inline
-TriaIterator<dim,Accessor>  TriaIterator<dim,Accessor>::operator ++ (int) {
-  TriaIterator<dim,Accessor> tmp(*this);
+TriaIterator<Accessor>  TriaIterator<Accessor>::operator ++ (int) {
+  TriaIterator<Accessor> tmp(*this);
   operator++ ();
   
   return tmp;
 }
 
 
-template <int dim, typename Accessor>
+template <typename Accessor>
 inline
-TriaIterator<dim,Accessor> &
-TriaIterator<dim,Accessor>::operator -- () {
-  while (TriaRawIterator<dim,Accessor>::operator--(),
+TriaIterator<Accessor> &
+TriaIterator<Accessor>::operator -- () {
+  while (TriaRawIterator<Accessor>::operator--(),
 	 (this->state() == IteratorState::valid))
     if (this->accessor.used() == true)
       return *this;
@@ -228,11 +239,11 @@ TriaIterator<dim,Accessor>::operator -- () {
 }
 
 
-template <int dim, typename Accessor>
+template <typename Accessor>
 inline
-TriaIterator<dim,Accessor>
-TriaIterator<dim,Accessor>::operator -- (int) {
-  TriaIterator<dim,Accessor> tmp(*this);
+TriaIterator<Accessor>
+TriaIterator<Accessor>::operator -- (int) {
+  TriaIterator<Accessor> tmp(*this);
   operator-- ();
   
   return tmp;
@@ -242,22 +253,22 @@ TriaIterator<dim,Accessor>::operator -- (int) {
 /*-----------------------  functions: TriaActiveIterator ---------------*/
 
 
-template <int dim, typename Accessor>
+template <typename Accessor>
 inline
-TriaActiveIterator<dim,Accessor>::TriaActiveIterator () :
-		TriaIterator<dim,Accessor> () {}
+TriaActiveIterator<Accessor>::TriaActiveIterator () :
+		TriaIterator<Accessor> () {}
 
 
-template <int dim, typename Accessor>
+template <typename Accessor>
 inline
-TriaActiveIterator<dim,Accessor>::TriaActiveIterator (const TriaActiveIterator<dim,Accessor> &i) :
-		TriaIterator<dim,Accessor> (static_cast<TriaIterator<dim,Accessor> >(i)) {}
+TriaActiveIterator<Accessor>::TriaActiveIterator (const TriaActiveIterator<Accessor> &i) :
+		TriaIterator<Accessor> (static_cast<TriaIterator<Accessor> >(i)) {}
 
 
-template <int dim, typename Accessor>
+template <typename Accessor>
 inline
-TriaActiveIterator<dim,Accessor>::TriaActiveIterator (const TriaRawIterator<dim,Accessor> &i) :
-		TriaIterator<dim,Accessor> (i)
+TriaActiveIterator<Accessor>::TriaActiveIterator (const TriaRawIterator<Accessor> &i) :
+		TriaIterator<Accessor> (i)
 {
 #ifdef DEBUG
 				   // do this like this, because:
@@ -273,10 +284,10 @@ TriaActiveIterator<dim,Accessor>::TriaActiveIterator (const TriaRawIterator<dim,
 }
 
 
-template <int dim, typename Accessor>
+template <typename Accessor>
 inline
-TriaActiveIterator<dim,Accessor>::TriaActiveIterator (const TriaIterator<dim,Accessor> &i) :
-		TriaIterator<dim,Accessor> (i)
+TriaActiveIterator<Accessor>::TriaActiveIterator (const TriaIterator<Accessor> &i) :
+		TriaIterator<Accessor> (i)
 {
 #ifdef DEBUG
 				   // do this like this, because:
@@ -292,13 +303,13 @@ TriaActiveIterator<dim,Accessor>::TriaActiveIterator (const TriaIterator<dim,Acc
 }
 
 
-template <int dim, typename Accessor>
+template <typename Accessor>
 inline
-TriaActiveIterator<dim,Accessor>::TriaActiveIterator (const Triangulation<dim> *parent,
+TriaActiveIterator<Accessor>::TriaActiveIterator (const Triangulation<Accessor::dimension,Accessor::space_dimension> *parent,
 						      const int                 level,
 						      const int                 index,
 						      const typename Accessor::AccessorData *local_data) :
-		TriaIterator<dim,Accessor> (parent, level, index, local_data)
+		TriaIterator<Accessor> (parent, level, index, local_data)
 {
 #ifdef DEBUG
 				   // do this like this, because:
@@ -314,19 +325,19 @@ TriaActiveIterator<dim,Accessor>::TriaActiveIterator (const Triangulation<dim> *
 }
 
 
-template <int dim, typename Accessor>
+template <typename Accessor>
 inline
-TriaActiveIterator<dim,Accessor> &
-TriaActiveIterator<dim,Accessor>::operator = (const TriaActiveIterator<dim,Accessor> &i) {
+TriaActiveIterator<Accessor> &
+TriaActiveIterator<Accessor>::operator = (const TriaActiveIterator<Accessor> &i) {
   this->accessor.copy_from (i.accessor);
   return *this;
 }
 
 
-template <int dim, typename Accessor>
+template <typename Accessor>
 inline
-TriaActiveIterator<dim,Accessor> &
-TriaActiveIterator<dim,Accessor>::operator = (const TriaRawIterator<dim,Accessor> &i) {
+TriaActiveIterator<Accessor> &
+TriaActiveIterator<Accessor>::operator = (const TriaRawIterator<Accessor> &i) {
   this->accessor.copy_from (i.accessor);
 #ifdef DEBUG
 				   // do this like this, because:
@@ -343,10 +354,10 @@ TriaActiveIterator<dim,Accessor>::operator = (const TriaRawIterator<dim,Accessor
 }
 
 
-template <int dim, typename Accessor>
+template <typename Accessor>
 inline
-TriaActiveIterator<dim,Accessor> &
-TriaActiveIterator<dim,Accessor>::operator = (const TriaIterator<dim,Accessor> &i) {
+TriaActiveIterator<Accessor> &
+TriaActiveIterator<Accessor>::operator = (const TriaIterator<Accessor> &i) {
   this->accessor.copy_from (i.accessor);
 #ifdef DEBUG
 				   // do this like this, because:
@@ -363,11 +374,11 @@ TriaActiveIterator<dim,Accessor>::operator = (const TriaIterator<dim,Accessor> &
 }
 
 
-template <int dim, typename Accessor>
+template <typename Accessor>
 inline
-TriaActiveIterator<dim,Accessor> &
-TriaActiveIterator<dim,Accessor>::operator ++ () {
-  while (TriaIterator<dim,Accessor>::operator++(),
+TriaActiveIterator<Accessor> &
+TriaActiveIterator<Accessor>::operator ++ () {
+  while (TriaIterator<Accessor>::operator++(),
 	 (this->state() == IteratorState::valid))
     if (this->accessor.has_children() == false)
       return *this;
@@ -375,22 +386,22 @@ TriaActiveIterator<dim,Accessor>::operator ++ () {
 }
 
 
-template <int dim, typename Accessor>
+template <typename Accessor>
 inline
-TriaActiveIterator<dim,Accessor>
-TriaActiveIterator<dim,Accessor>::operator ++ (int) {
-  TriaActiveIterator<dim,Accessor> tmp(*this);
+TriaActiveIterator<Accessor>
+TriaActiveIterator<Accessor>::operator ++ (int) {
+  TriaActiveIterator<Accessor> tmp(*this);
   operator++ ();
   
   return tmp;
 }
 
 
-template <int dim, typename Accessor>
+template <typename Accessor>
 inline
-TriaActiveIterator<dim,Accessor> &
-TriaActiveIterator<dim,Accessor>::operator -- () {
-  while (TriaIterator<dim,Accessor>::operator--(),
+TriaActiveIterator<Accessor> &
+TriaActiveIterator<Accessor>::operator -- () {
+  while (TriaIterator<Accessor>::operator--(),
 	 (this->state() == IteratorState::valid))
     if (this->accessor.has_children() == false)
       return *this;
@@ -398,10 +409,10 @@ TriaActiveIterator<dim,Accessor>::operator -- () {
 }
 
 
-template <int dim, typename Accessor>
+template <typename Accessor>
 inline
-TriaActiveIterator<dim,Accessor> TriaActiveIterator<dim,Accessor>::operator -- (int) {
-  TriaActiveIterator<dim,Accessor> tmp(*this);
+TriaActiveIterator<Accessor> TriaActiveIterator<Accessor>::operator -- (int) {
+  TriaActiveIterator<Accessor> tmp(*this);
   operator-- ();
   
   return tmp;

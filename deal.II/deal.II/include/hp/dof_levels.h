@@ -180,7 +180,7 @@ namespace internal
                                           * resize arrays as
                                           * necessary.
                                           */
-        template <int> friend class dealii::hp::DoFHandler;
+        template <int, int> friend class dealii::hp::DoFHandler;
     };
 
 
@@ -214,7 +214,7 @@ namespace internal
                                           * resize arrays as
                                           * necessary.
                                           */
-        template <int> friend class dealii::hp::DoFHandler;
+        template <int, int> friend class dealii::hp::DoFHandler;
     };
 
 
@@ -249,7 +249,7 @@ namespace internal
                                           * resize arrays as
                                           * necessary.
                                           */
-        template <int> friend class dealii::hp::DoFHandler;
+        template <int, int> friend class dealii::hp::DoFHandler;
     };
 
   } // namespace hp
