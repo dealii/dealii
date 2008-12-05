@@ -528,6 +528,16 @@ inconvenience this causes.
 <ol>
   <li>
   <p>
+  Fixed: The GridGenerator::laplace_transform would only do at most 1000
+  iterations in its solver, irrespective of the actual number of nodes to
+  be moved around. This is now fixed: the maximum number now equals the
+  number of nodes.
+  <br>
+  (Luca D'Auria 2008/12/05)
+  </p>
+
+  <li>
+  <p>
   New: The function DoFTools::make_zero_boundary_constraints() computes the
   constraints that result from requiring the degrees of freedom at the
   boundary to be zero. Use cases are when the sparsity pattern is not known 

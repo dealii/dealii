@@ -2397,7 +2397,7 @@ void GridGenerator::laplace_solve (const SparseMatrix<double> &S,
   prec.initialize(S, 1.2);
   FilteredMatrix<Vector<double> > PF (prec);
   
-  SolverControl control (1000, 1.e-10, false, false);
+  SolverControl control (n_dofs, 1.e-10, false, false);
   GrowingVectorMemory<Vector<double> > mem;
   SolverCG<Vector<double> > solver (control, mem);
   
