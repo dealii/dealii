@@ -1,0 +1,27 @@
+
+DEAL::Test <1,2>
+DEAL::Approximate measure of hyper sphere = 6.18034
+DEAL::Error = 0.102845
+DEAL::Average error in norms: 0.185172
+DEAL::Approximate measure of hyper sphere = 6.27244
+DEAL::Error = 0.0107493
+DEAL::Average error in norms: 0.0586351
+DEAL::Approximate measure of hyper sphere = 6.28058
+DEAL::Error = 0.00260371
+DEAL::Average error in norms: 0.0288054
+DEAL::Approximate measure of hyper sphere = 6.28253
+DEAL::Error = 0.000650989
+DEAL::Average error in norms: 0.0143971
+DEAL::Test <2,3>
+DEAL::Approximate measure of hyper sphere = 12.1766
+DEAL::Error = 0.389728
+DEAL::Average error in norms: 0.143231
+DEAL::Approximate measure of hyper sphere = 12.4510
+DEAL::Error = 0.115385
+DEAL::Average error in norms: 0.0767183
+DEAL::Approximate measure of hyper sphere = 12.5384
+DEAL::Error = 0.0279804
+DEAL::Average error in norms: 0.0378600
+DEAL::Approximate measure of hyper sphere = 12.5589
+DEAL::Error = 0.00742861
+DEAL::Average error in norms: 0.0195407
