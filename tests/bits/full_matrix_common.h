@@ -1,5 +1,5 @@
 //----------------------------  full_matrix_common.h  ---------------------------
-//    $Id$
+//    $Id:$
 //    Version: $Name$ 
 //
 //    Copyright (C) 2007, 2008 by the deal.II authors
@@ -98,7 +98,28 @@ print_vector (const Vector<number> &v)
 	    << std::endl;
 }
 
+template <typename number>
+void 
+display_matrix(FullMatrix<number> M)
+{
+  deallog<<M.m()<<"x"<<M.n()<<" matrix"<<std::endl;
+  for (unsigned int i=0;i<M.m();i++)
+    {
+      for (unsigned int j=0;j<M.n();j++)
+	deallog<<M(i,j)<<" ";
+      deallog<<std::endl;
+    }
+}
 
+
+template <typename number>
+void 
+fill_matrix(FullMatrix<number> &A)
+{
+  for (unsigned int i=0; i<A.m();i++)
+    for (unsigned int j=0; j<A.n();j++)
+      A(i,j)=number(i*A.n() + j+1);
+}
 
 int
 main()
