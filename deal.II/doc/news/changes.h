@@ -505,10 +505,11 @@ inconvenience this causes.
 <ol>
   <li>
   <p>
-  New: The function DoFTools::make_zero_boundary_constraints() applies 
-  zero boundary constraints to a (symmetric preserved) matrix without 
-  accessing the sparsity pattern. Use cases are for when the sparsity pattern
-  of the matrix is unknown / inaccessible.
+  New: The function DoFTools::make_zero_boundary_constraints() computes the
+  constraints that result from requiring the degrees of freedom at the
+  boundary to be zero. This allos to apply zero boundary constraints to
+  a matrix in the same way as other constraints, rather than going
+  through the MatrixTools::apply_boundary_values function.
   <br>
   (Toby D. Young 2008/12/04)
   </p>
