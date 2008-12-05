@@ -507,9 +507,8 @@ inconvenience this causes.
   <p>
   New: The function DoFTools::make_zero_boundary_constraints() computes the
   constraints that result from requiring the degrees of freedom at the
-  boundary to be zero. This allos to apply zero boundary constraints to
-  a matrix in the same way as other constraints, rather than going
-  through the MatrixTools::apply_boundary_values function.
+  boundary to be zero. Use cases are when the sparsity pattern is not known 
+  / not wanted / not inaccessible.
   <br>
   (Toby D. Young 2008/12/04)
   </p>
