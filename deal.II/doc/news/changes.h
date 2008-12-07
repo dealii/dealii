@@ -528,6 +528,13 @@ inconvenience this causes.
 <ol>
   <li>
   <p>
+  Upgraded: The FunctionParser classes now use version 2.83. 
+  <br>
+  (Luca Heltai 2008/12/08)
+  </p>
+
+  <li>
+  <p>
   Fixed: The GridGenerator::laplace_transform would only do at most 1000
   iterations in its solver, irrespective of the actual number of nodes to
   be moved around. This is now fixed: the maximum number now equals the

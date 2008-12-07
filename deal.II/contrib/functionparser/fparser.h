@@ -1,7 +1,8 @@
 /***************************************************************************\
-|* Function parser v2.71 by Warp                                           *|
+|* Function parser v2.83 by Warp                                           *|
 |* -----------------------------                                           *|
 |* Parses and evaluates the given function with the given variable values. *|
+|* See fparser.txt for details.                                            *|
 |*                                                                         *|
 \***************************************************************************/
 
@@ -15,10 +16,8 @@
 #ifdef FUNCTIONPARSER_SUPPORT_DEBUG_OUTPUT
 #include <iostream>
 #endif
+namespace fparser {
 
-namespace fparser
-{
-  
 class FunctionParser
 {
 public:
@@ -40,6 +39,7 @@ public:
     inline int EvalError() const { return evalErrorType; }
 
     bool AddConstant(const std::string& name, double value);
+    bool AddUnit(const std::string& name, double value);
 
     typedef double (*FunctionPtr)(const double*);
 
@@ -59,17 +59,22 @@ public:
     FunctionParser& operator=(const FunctionParser&);
 
 
+    void ForceDeepCopy();
+
+
 #ifdef FUNCTIONPARSER_SUPPORT_DEBUG_OUTPUT
     // For debugging purposes only:
     void PrintByteCode(std::ostream& dest) const;
 #endif
-
-
+     
     // Added by Luca Heltai. For consistency checking.
     unsigned int NVars() {
       return data->varAmount;
     }
     
+
+
+
 
 //========================================================================
 private:
@@ -85,13 +90,14 @@ private:
         unsigned referenceCounter;
 
         int varAmount;
-        bool useDegreeConversion;
+        bool useDegreeConversion, isOptimized;
 
         typedef std::map<std::string, unsigned> VarMap_t;
         VarMap_t Variables;
 
         typedef std::map<std::string, double> ConstMap_t;
         ConstMap_t Constants;
+        ConstMap_t Units;
 
         VarMap_t FuncPtrNames;
         struct FuncPtrData
@@ -119,6 +125,7 @@ private:
     };
 
     Data* data;
+    unsigned evalRecursionLevel;
 
     // Temp data needed in Compile():
     unsigned StackPtr;
@@ -128,21 +135,21 @@ private:
 
 // Private methods:
 // ---------------
-    inline void copyOnWrite();
+    void CopyOnWrite();
 
 
-    bool checkRecursiveLinking(const FunctionParser*) const;
+    bool CheckRecursiveLinking(const FunctionParser*) const;
 
-    bool isValidName(const std::string&) const;
-
-    inline
-    Data::VarMap_t::const_iterator FindVariable(const char*,
-                                                const Data::VarMap_t&) const;
-
-    inline
-    Data::ConstMap_t::const_iterator FindConstant(const char*) const;
+    bool ParseVars(const std::string& Vars,
+                   std::map<std::string, unsigned>& dest);
+    int VarNameType(const std::string&) const;
+    Data::VarMap_t::const_iterator
+    FindVariable(const char*, const Data::VarMap_t&) const;
+    Data::ConstMap_t::const_iterator
+    FindConstant(const char*, const Data::ConstMap_t&) const;
+    int CheckForUnit(const char*, int) const;
     int CheckSyntax(const char*);
-    bool Compile(const char*);
+    int Compile(const char*);
     bool IsVariable(int);
     void AddCompiledByte(unsigned);
     void AddImmediate(double);
@@ -151,6 +158,7 @@ private:
     int CompileIf(const char*, int);
     int CompileFunctionParams(const char*, int, unsigned);
     int CompileElement(const char*, int);
+    int CompilePossibleUnit(const char*, int);
     int CompilePow(const char*, int);
     int CompileUnaryMinus(const char*, int);
     int CompileMult(const char*, int);
@@ -163,8 +171,6 @@ private:
 
     void MakeTree(void*) const;
 };
- 
-}
 
-  
+}
 #endif

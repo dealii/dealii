@@ -1,4 +1,4 @@
-  Function parser for C++  v2.71 by Warp.
+  Function parser for C++  v2.83 by Warp.
   ======================================
 
   Optimization code contributed by Bisqwit (http://iki.fi/bisqwit/)
@@ -7,31 +7,34 @@
   The usage license of this library is located at the end of this text file.
 
 
-
-  What's new in v2.71
+  What's new in v2.83
   -------------------
-  - Fixed a couple of syntax errors which slipped through in the v2.7
-    distribution version:
-    * non-standard semicolons at the end of namespace blocks
-    * a compilation error which happens if SUPPORT_OPTIMIZER is disabled
-  - Included a simple example program.
+  - Fixed bug in the optimizer which caused functions like "x-y*1" to crash.
 
-  What's new in v2.7
-  ------------------
-  - Changed precedence rules for unary minus and the power operator (^) to
-    make it closer in functionality to the power "operator" in mathematics
-    (ie. superscript):
-    * Consecutive power operators at the same precedence level are
-      evaluated from right to left. That is, for example "2^3^4" is
-      now evaluated as if it had been written as "2^(3^4)" (and not
-      as "(2^3)^4" like in previous versions).
-    * The unary minus in the base of the power has now a lower precedence
-      than the power operator. That is, "-2^3" will be evaluated as if
-      written as "-(2^3)", ie. the result is "-8" (and not "8" like in
-      previous versions). The unary minus in the exponent is still
-      evaluated first because of the right-left precedence change above
-      (that is, "-2^-3" is evaluated as "-(2^(-3))").
-  - Fixed a bug in the copy-on-write engine.
+  What's new in v2.82
+  -------------------
+  - Fixed bug in the optimizer which caused a crash with some functions.
+
+  What's new in v2.81
+  -------------------
+  - Added support for units (see help on the AddUnit() method).
+  - Added support for optionally making the Eval() function thread-safe
+    with a precompiler constant.
+
+
+  Table of contents:
+  -----------------
+  - Preface
+  - Usage
+    * Configuring the compilation
+    * Copying and assignment
+    * Short descriptions of FunctionParser methods
+    * Long descriptions of FunctionParser methods
+  - About thread safety
+  - The function string
+  - Contacting the author
+  - The algorithm used in the library
+  - Usage license
 
 
 
@@ -63,37 +66,69 @@ compiler.
   - Usage
 =============================================================================
 
-  To use the FunctionParser class, you have to include "fparser.hh". When
-compiling, you have to compile fparser.cc and link it to the main program.
-You can also make a library from the fparser.cc (see the help on your
-compiler to see how this is done).
+  To use the FunctionParser class, you have to include "fparser.hh" in
+your source code files which use the FunctionParser class.
+
+  When compiling, you have to compile fparser.cc and fpoptimizer.cc and
+link them to the main program. In some developement environments it's
+enough to add those two files to your current project.
+
+  If you are not going to use the optimizer (ie. you have commented out
+SUPPORT_OPTIMIZER in fpconfig.hh), you can leave the latter file out.
 
 
-  * Conditional compiling:
-    ---------------------
+  * Configuring the compilation:
+    ---------------------------
 
-    There is a set of precompiler options at the beginning of fparser.cc
-  which can be used for setting certain features on or off. These lines
-  can be commented or uncommented depending on the desired behaviour:
+    There is a set of precompiler options in the fpconfig.hh file
+  which can be used for setting certain features on or off:
 
   NO_ASINH : (Default on)
        By default the library does not support the asinh(), acosh()
        and atanh() functions because they are not part of the ISO C++
        standard. If your compiler supports them and you want the
-       parser to support them as well, comment this line.
+       parser to support them as well, comment out this line.
 
   DISABLE_EVAL : (Default off)
-       The eval() function can be dangerous because it can cause an
-       infinite recursion in the parser when not used properly (which
-       causes the function stack created by the compiler to overflow).
-       If this possibility should be prevented then the eval() function
-       can be disabled completely by uncommenting this line.
+       Even though the maximum recursion level of the eval() function
+       is limited, it is still possible to write functions which never
+       reach this maximum recursion level but take enormous amounts of
+       time to evaluate (this can be undesirable eg. in web server-side
+       applications).
+       Uncommenting this line will disable the eval() function completely,
+       thus removing the danger of exploitation.
+
+       Note that you can also disable eval() by specifying the
+       DISABLE_EVAL precompiler constant in your compiler (eg.
+       with -DDISABLE_EVAL in gcc).
+
+  EVAL_MAX_REC_LEVEL : (Default 1000)
+       Sets the maximum recursion level allowed for eval().
 
   SUPPORT_OPTIMIZER : (Default on)
        If you are not going to use the Optimize() method, you can comment
        this line out to speed-up the compilation of fparser.cc a bit, as
        well as making the binary a bit smaller. (Optimize() can still be
        called, but it will not do anything.)
+
+       You can also disable the optimizer by specifying the
+       NO_SUPPORT_OPTIMIZER precompiler constant in your compiler
+       (eg. with -DNO_SUPPORT_OPTIMIZER in gcc).
+
+  FP_EPSILON : (Default 1e-14)
+       Epsilon value used in comparison operators.
+       If this line is commented out, then no epsilon will be used.
+
+  FP_USE_THREAD_SAFE_EVAL : (Default off)
+       Define this precompiler constant to make Eval() thread-safe.
+       Refer to the thread safety section later in this document for
+       more information.
+       Note that defining this may make Eval() slightly slower.
+
+  FP_USE_THREAD_SAFE_EVAL_WITH_ALLOCA : (Default off)
+       This like the previous, but makes Eval() use the alloca() function
+       (instead of std::vector). This will make it faster, but the alloca()
+       function is not standard and thus not supported by all compilers.
 
 
   * Copying and assignment:
@@ -173,6 +208,12 @@ bool AddConstant(const std::string& name, double value);
     is invalid, else true.
 
 
+bool AddUnit(const std::string& name, double value);
+
+    Add a new unit to the parser. Returns false if the name of the unit
+    is invalid, else true.
+
+
 bool AddFunction(const std::string& name,
                  double (*functionPtr)(const double*),
                  unsigned paramsAmount);
@@ -212,7 +253,7 @@ int Parse(const std::string& Function, const std::string& Vars,
     "VAR" and "Var" are *different* variable names). Letters, digits and
     underscores can be used in variable names, but the name of a variable
     can't begin with a digit. Each variable name can appear only once in
-    the string. Function names are not legal variable names.
+    the 'Vars' string. Function names are not legal variable names.
 
     Using longer variable names causes no overhead whatsoever to the Eval()
     method, so it's completely safe to use variable names of any size.
@@ -265,8 +306,8 @@ MISSING_PARENTH    : "Missing ')'"
 EMPTY_PARENTH      : "Empty parentheses"
 EXPECT_OPERATOR    : "Syntax error: Operator expected"
 OUT_OF_MEMORY      : "Not enough memory"
-UNEXPECTED_ERROR   : "An unexpected error ocurred. Please make a full bug "
-                     "report to warp@iki.fi"
+UNEXPECTED_ERROR   : "An unexpected error occurred. Please make a full bug "
+                     "report to the author"
 INVALID_VARS       : "Syntax error in parameter 'Vars' given to "
                      "FunctionParser::Parse()"
 ILL_PARAMS_AMOUNT  : "Illegal number of parameters to function"
@@ -308,6 +349,7 @@ int EvalError(void) const;
         2: sqrt error (sqrt of a negative value)
         3: log error (logarithm of a negative value)
         4: trigonometric error (asin or acos of illegal value)
+        5: maximum recursion level in eval() reached
 
 
 ---------------------------------------------------------------------------
@@ -341,9 +383,9 @@ void Optimize();
     Optimize() and checking EvalError().
 
       If the destination application is not going to use this method,
-    the compiler constant SUPPORT_OPTIMIZER can be undefined at the beginning
-    of fparser.cc to make the library smaller (Optimize() can still be called,
-    but it will not do anything).
+    the compiler constant SUPPORT_OPTIMIZER can be undefined in fpconfig.hh
+    to make the library smaller (Optimize() can still be called, but it will
+    not do anything).
 
     (If you are interested in seeing how this method optimizes the opcode,
     you can call the PrintByteCode() method before and after the call to
@@ -374,10 +416,53 @@ bool AddConstant(const std::string& name, double value);
       The return value will be false if the 'name' of the constant was
     illegal, else true. If the name was illegal, the method does nothing.
 
-    Example: parser.AddConstant("pi", 3.14159265);
+    Example: parser.AddConstant("pi", 3.1415926535897932);
 
     Now for example parser.Parse("x*pi", "x"); will be identical to the
-    call parser.Parse("x*3.14159265", "x");
+    call parser.Parse("x*3.1415926535897932", "x");
+
+
+---------------------------------------------------------------------------
+bool AddUnit(const std::string& name, double value);
+---------------------------------------------------------------------------
+
+    In some applications it is desirable to have units of measurement.
+    A typical example is an application which creates a page layout to be
+    printed. When printing, distances are usually measured in points
+    (defined by the resolution of the printer). However, it is often more
+    useful for the user to be able to specify measurements in other units
+    such as centimeters or inches.
+
+      A unit is simply a value by which the preceding element is multiplied.
+    For example, if the printing has been set up to 300 DPI, one inch is
+    then 300 points (dots). Thus saying eg. "5in" is the same as saying
+    "5*300" or "1500" (assuming "in" has been added as a unit with the
+    value 300).
+
+      Note that units are slightly different from a multiplication in
+    that they have a higher precedence than any other operator (except
+    parentheses). Thus for example "5/2in" is parsed as "5/(2*300)".
+    (If 5/2 inches is what one wants, it has to be written "(5/2)in".)
+
+      You can use the AddUnit() method to add a new unit. The unit can then
+    be used after any element in the function (and will work as a multiplier
+    for that element). An element is a float literal, a constant, a variable,
+    a function or any expression in parentheses. When the element is not a
+    float literal nor an expression in parentheses, there has to naturally
+    be at least one whitespace between the element and the unit (eg. "x in").
+    To change the value of a unit, call AddUnit() again with the same unit
+    name and the new value.
+
+      Note that units are independent from variables, constants and functions.
+    This means that a unit can have the same name as those (there isn't any
+    syntactical problem in that), thus for example "x x" is a valid function
+    if "x" is a variable or constant and "x" is a unit, although for the sake
+    of clarity that is usually not recommended.
+
+    Example: parser.AddUnit("in", 300);
+
+      Now for example the function "5in" will be identical to "(5*300)".
+    Other usage examples include "x in", "3in+2", "pow(x,2)in", "(x+2)in".
 
 
 ---------------------------------------------------------------------------
@@ -401,9 +486,9 @@ bool AddFunction(const std::string& name,
       must have the form:
           double functionName(const double* params);
 
-    - The number of parameters the function takes. NOTE: Currently this
-      value must be at least 1; the parser does not support functions which
-      take no parameters (this problem may be fixed in the future).
+    - The number of parameters the function takes. 0 is a valid value
+      in which case the function takes no parameters (such function
+      should simply ignore the double* it gets as a parameter).
 
     The return value will be false if the given name was invalid (either it
     did not follow the variable naming conventions, or the name was already
@@ -424,10 +509,22 @@ bool AddFunction(const std::string& name,
     parser.Parse("2*sqr(x)", "x");
 
 
+    An example of a useful function taking no parameters is a function
+    returning a random value. For example:
+
+    double Rand(const double*)
+    {
+        return drand48();
+    }
+
+    parser.AddFunction("rand", Rand, 0);
+
+
     IMPORTANT NOTE: If you use the Optimize() method, it will assume that
     the user-given function has no side-effects, that is, it always
     returns the same value for the same parameters. The optimizer will
     optimize the function call away in some cases, making this assumption.
+    (The Rand() function given as example above is one such problematic case.)
 
 
 ---------------------------------------------------------------------------
@@ -446,17 +543,13 @@ bool AddFunction(const std::string& name, FunctionParser&);
       want to use the parser A in the parser B, you must call A.Parse()
       before you can call B.AddFunction("name", A).
 
-    - The amount of parameters in the FunctionParser instance given as
+    - The amount of variables in the FunctionParser instance given as
       parameter must not change after it has been given to the AddFunction()
-      of another instance. Changing the number of parameters will result in
+      of another instance. Changing the number of variables will result in
       malfunction.
 
     - AddFunction() will fail (ie. return false) if a recursive loop is
       formed. The method specifically checks that no such loop is built.
-
-    - As with the other AddFunction(), the number of parameters taken by
-      the user-defined function must be at least 1 (this may be fixed in
-      the future).
 
     Example:
 
@@ -464,30 +557,43 @@ bool AddFunction(const std::string& name, FunctionParser&);
     f1.Parse("x*x", "x");
     f2.AddFunction("sqr", f1);
 
+    This version of the AddFunction() method can be useful to eg. chain
+    user-given functions. For example, ask the user for a function F1,
+    and then ask the user another function F2, but now the user can
+    call F1 in this second function if he wants (and so on with a third
+    function F3, where he can call F1 and F2, etc).
 
----------------------------------------------------------------------------
 
-  Example program:
 
-#include "fparser.hh"
-#include <iostream>
 
-int main()
-{
-    FunctionParser fp;
+=============================================================================
+  - About thread safety
+=============================================================================
 
-    int ret = fp.Parse("x+y-1", "x,y");
-    if(ret >= 0)
-    {
-        std::cerr << "At col " << ret << ": " << fp.ErrorMsg() << std::endl;
-        return 1;
-    }
+  None of the member functions of the FunctionParser class are thread-safe.
+Most prominently, the Eval() function is not thread-safe. (In other words,
+the Eval() function of a single FunctionParser instance cannot be safely
+called simultaneously by two threads.)
 
-    double vals[] = { 4, 8 };
+  There are ways to use this library in a thread-safe way, though. If each
+thread uses its own FunctionParser instance, no problems will obviously
+happen. Note, however, that if these instances need to be a copy of a given
+FunctionParser instance (eg. one where the user has entered a function),
+a deep copy of this instance has to be performed for each thread. By
+default FunctionParser uses shallow-copying (copy-on-write), which means
+that a simple assignment of copy construction will not copy the data itself.
+To force a deep copy you can all the ForceDeepCopy() function on each of
+the instances of each thread after the assignment or copying has been done.
 
-    std::cout << fp.Eval(vals) << std::endl;
-}
-
+  Another possibility is to compile the FunctionParser library so that
+its Eval() function will be thread-safe. (This can be done by defining
+the FP_USE_THREAD_SAFE_EVAL or the FP_USE_THREAD_SAFE_EVAL_WITH_ALLOCA
+precompiler constant.) As long as only one thread calls the other functions
+of FunctionParser, the other threads can safely call the Eval() of this
+one instance.
+  Note, however, that compiling the library like this can make Eval()
+slightly slower. (The alloca version, if supported by the compiler,
+will not be as slow.)
 
 
 =============================================================================
@@ -499,18 +605,26 @@ int main()
 or functions using the following operators in this order of precedence:
 
    ()             expressions in parentheses first
-   -A             unary minus
+   A unit         a unit multiplier (if one has been added)
    A^B            exponentiation (A raised to the power B)
+   -A             unary minus
+   !A             unary logical not (result is 1 if int(A) is 0, else 0)
    A*B  A/B  A%B  multiplication, division and modulo
    A+B  A-B       addition and subtraction
-   A=B  A<B  A>B  comparison between A and B (result is either 0 or 1)
-   A&B            result is 1 if int(A) and int(B) differ from 0, else 0.
-   A|B            result is 1 if int(A) or int(B) differ from 0, else 0.
+   A=B  A!=B  A<B  A<=B  A>B  A>=B
+                  comparison between A and B (result is either 0 or 1)
+   A&B            result is 1 if int(A) and int(B) differ from 0, else 0
+   A|B            result is 1 if int(A) or int(B) differ from 0, else 0
 
     Since the unary minus has higher precedence than any other operator, for
   example the following expression is valid: x*-y
-    Note that the '=' comparison can be inaccurate due to floating point
-  precision problems (eg. "sqrt(100)=10" probably returns 0, not 1).
+
+    The comparison operators use an epsilon value, so expressions which may
+  differ in very least-significant digits should work correctly. For example,
+  "0.1+0.1+0.1+0.1+0.1+0.1+0.1+0.1+0.1+0.1 = 1" should always return 1, and
+  the same comparison done with ">" or "<" should always return 0.
+  (The epsilon value can be configured in the fpconfig.hh file.)
+  Without epsilon this comparison probably returns the wrong value.
 
   The class supports these functions:
 
@@ -538,7 +652,7 @@ or functions using the following operators in this order of precedence:
   csc(A)    : Cosecant of A (equivalent to 1/sin(A)).
   eval(...) : This a recursive call to the function to be evaluated. The
               number of parameters must be the same as the number of parameters
-              taken by the function. Usually called inside if() to avoid
+              taken by the function. Must be called inside if() to avoid
               infinite recursion.
   exp(A)    : Exponential of A. Returns the value of e raised to the power
               A where e is the base of the natural logarithm, i.e. the
@@ -581,13 +695,11 @@ or functions using the following operators in this order of precedence:
   extremely deep recursions should be avoided (eg. millions of nested recursive
   calls).
 
-  Also note that the if() function is the only place where making a recursive
-  call is safe. In any other place it will cause an infinite recursion (which
-  will make the program eventually run out of memory). If this is something
-  which should be avoided, it may be a good idea to disable the eval()
-  function completely.
-  The eval() function can be disabled with the DISABLE_EVAL precompiler
-  constant (see the beginning of fparser.cc).
+  Also note that even though the maximum recursion level of eval() is
+  limited, it is possible to write functions which never reach that level
+  but still take enormous amounts of time to evaluate.
+  This can sometimes be undesirable because it is prone to exploitation,
+  but you can disable the eval() function completely in the fpconfig.hh file.
 
 
 =============================================================================
@@ -676,7 +788,7 @@ make loops or anything.
   Usage license:
 =============================================================================
 
-Copyright © 2003 Juha Nieminen, Joel Yliluoma
+Copyright © 2003-2005 Juha Nieminen, Joel Yliluoma
 
   This library is distributed under two distinct usage licenses depending
 on the software ("Software" below) which uses the Function Parser library
