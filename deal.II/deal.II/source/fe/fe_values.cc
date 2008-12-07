@@ -191,10 +191,10 @@ get_interpolated_dof_values (const TrilinosWrappers::BlockVector &in,
 
 
 
-template <int dim>
+template <int dim, int spacedim>
 template <typename CI>
 void
-FEValuesBase<dim>::CellIterator<CI>::
+FEValuesBase<dim, spacedim>::CellIterator<CI>::
 get_interpolated_dof_values (const TrilinosWrappers::MPI::Vector &in,
                              Vector<TrilinosScalar>              &out) const
 {
@@ -203,10 +203,10 @@ get_interpolated_dof_values (const TrilinosWrappers::MPI::Vector &in,
 
 
 
-template <int dim>
+template <int dim, int spacedim>
 template <typename CI>
 void
-FEValuesBase<dim>::CellIterator<CI>::
+FEValuesBase<dim, spacedim>::CellIterator<CI>::
 get_interpolated_dof_values (const TrilinosWrappers::MPI::BlockVector &in,
                              Vector<TrilinosScalar>                   &out) const
 {
@@ -367,9 +367,9 @@ get_interpolated_dof_values (const TrilinosWrappers::BlockVector &,
 
 
 
-template <int dim>
+template <int dim, int spacedim>
 void
-FEValuesBase<dim>::TriaCellIterator::
+FEValuesBase<dim, spacedim>::TriaCellIterator::
 get_interpolated_dof_values (const TrilinosWrappers::MPI::Vector &,
                              Vector<TrilinosScalar>              &) const
 {
@@ -378,9 +378,9 @@ get_interpolated_dof_values (const TrilinosWrappers::MPI::Vector &,
 
 
 
-template <int dim>
+template <int dim, int spacedim>
 void
-FEValuesBase<dim>::TriaCellIterator::
+FEValuesBase<dim,spacedim>::TriaCellIterator::
 get_interpolated_dof_values (const TrilinosWrappers::MPI::BlockVector &,
                              Vector<TrilinosScalar>                   &) const
 {
