@@ -186,6 +186,15 @@ inconvenience this causes.
   
   <li>
   <p> 
+  New: In analogy to the existing interfaces to the PETSc library, there
+  are now also interfaces to much of the linear algebra part of the
+  Trilinos library.
+  <br>
+  (Martin Kronbichler 2008/12/01)
+  </p>
+  
+  <li>
+  <p> 
   New: The deal.II configure script now autodetects SLEPc, an eigenvalue
   solver.
   <br>
