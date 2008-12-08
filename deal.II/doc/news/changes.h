@@ -383,6 +383,7 @@ inconvenience this causes.
 <h3>lac</h3>
 
 <ol>
+  <li>
   <p>
   New: All SparseMatrix classes (SparseMatrix<number>, PETSc sparse
   matrices, Trilinos sparse matrices, block sparse matrices) can now
