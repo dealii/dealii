@@ -143,8 +143,50 @@ inconvenience this causes.
 
 <ol>
   <li>
+  New: Based on work by Cataldo Manigrasso and Luca Heltai
+  developed over the last few months on a branch, deal.II now
+  supports meshes that are embedded in higher space
+  dimensions. This allows, for example, to solve equations on
+  the surface of a sphere (e.g. to use boundary element
+  methods for exterior problems).
+  <br>
+  In practice, this is implemented by giving a large number
+  of classes a second template argument. Whereas the first one,
+  typically named <code>dim</code> still denotes the dimensionality
+  of the triangulation (e.g. <code>dim=2</code> for triangulations
+  of quadrilaterals, or <code>dim=3</code> for those made
+  up of hexahedra), the second template argument <code>spacedim</code>
+  denotes the dimensionality of the space this all is embedded in.
+  As a consequence, if one wants to have a triangulation of a
+  two-dimensional manifold in three-dimensional space, one would
+  use <code>dim=2, spacedim=3</code> as template arguments.
+  <br>
+  In order to remain backward compatible, the new second template
+  argument always has a default value that equals <code>dim</code>
+  meaning it is still sufficient to write <code>Triangulation@<2@></code>
+  if you intend two-dimensional triangulations of two-dimensional
+  domains.
+  <br>
+  (Cataldo Manigrasso, Luca Heltai 2008/12/05)
+  </p>
+
+  <li>
   <p> 
-  Added: The deal.II configure script now autodetects SLEPc, an eigenvalue
+  Changed: The various accessor classes have been rewritten entirely.
+  Where previously we had these accessor classes as separate
+  specializations for 1d, 2d, and 3d, each implementing the same
+  set of functions, these classes have now all been merged into
+  common templates TriaAccessor, DoFAccessor, and MGDoFAccessor,
+  along with the existing CellAccessor, DoFCellAccessor and
+  MGDoFCellAccessor. As a result, the documentation of individual
+  functions should now be much easier to find.
+  <br>
+  (WB 2008/12/05)
+  </p>
+  
+  <li>
+  <p> 
+  New: The deal.II configure script now autodetects SLEPc, an eigenvalue
   solver.
   <br>
   (Toby D. Young 2008/11/27)
