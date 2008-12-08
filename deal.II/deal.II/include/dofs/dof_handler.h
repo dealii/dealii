@@ -37,6 +37,11 @@ namespace internal
     struct Implementation;
   }
 
+  namespace DoFAccessor
+  {
+    struct Implementation;
+  }
+  
   namespace DoFCellAccessor
   {
     struct Implementation;
@@ -1117,31 +1122,6 @@ class DoFHandler  :  public Subscriptor
 			  const unsigned int local_index) const;
 
 				     /**
-				      *  Return the @p i-th
-				      *  dof-index. This function
-				      *  calls the respective function
-				      *  of DoFObjects.
-				      */
-    template <int structdim>
-    unsigned int get_dof_index (const unsigned int       obj_level,
-				const unsigned int       obj_index,
-				const unsigned int       fe_index,
-				const unsigned int       local_index) const;
-
-				     /**
-				      *  Set the @p i-th
-				      *  dof-index. This function
-				      *  calls the respective function
-				      *  of DoFObjects.
-				      */
-    template <int structdim>
-    void set_dof_index (const unsigned int       obj_level,
-			const unsigned int       obj_index,
-			const unsigned int       fe_index,
-			const unsigned int       local_index,
-			const unsigned int       global_index) const;
-    
-				     /**
 				      * Return the number of active
 				      * fe-indices on the given
 				      * object. Since we have a non-hp
@@ -1215,6 +1195,7 @@ class DoFHandler  :  public Subscriptor
 				      */
     template <int, class> friend class DoFAccessor;
     template <class> friend class DoFCellAccessor;
+    friend class internal::DoFAccessor::Implementation;
     friend class internal::DoFCellAccessor::Implementation;
 
     friend class internal::DoFHandler::Implementation;    

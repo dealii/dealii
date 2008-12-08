@@ -2648,41 +2648,6 @@ namespace hp
 
 //------------------------------------------------------------------
 #if deal_II_dimension == 1 
-  template <>
-  template <>
-  unsigned int
-  DoFHandler<1>::get_dof_index<1> (const unsigned int       obj_level,
-				   const unsigned int       obj_index,
-				   const unsigned int       fe_index,
-				   const unsigned int       local_index) const
-  {
-    return this->levels[obj_level]->lines.
-      get_dof_index (*this,
-		     obj_index,
-		     fe_index,
-		     local_index,
-		     obj_level);
-  }
-
-
-  template <>
-  template <>
-  void
-  DoFHandler<1>::set_dof_index<1> (const unsigned int       obj_level,
-				   const unsigned int       obj_index,
-				   const unsigned int       fe_index,
-				   const unsigned int       local_index,
-				   const unsigned int       global_index) const
-  {
-    this->levels[obj_level]->lines.
-      set_dof_index (*this,
-		     obj_index,
-		     fe_index,
-		     local_index,
-		     global_index,
-		     obj_level);
-  }
-
 
   template <>
   template <>
@@ -2723,42 +2688,6 @@ namespace hp
 							       n);
   }
 
-
-
-  template <>
-  template <>
-  unsigned int
-  DoFHandler<1,2>::get_dof_index<1> (const unsigned int       obj_level,
-				   const unsigned int       obj_index,
-				   const unsigned int       fe_index,
-				   const unsigned int       local_index) const
-  {
-    return this->levels[obj_level]->lines.
-      get_dof_index (*this,
-		     obj_index,
-		     fe_index,
-		     local_index,
-		     obj_level);
-  }
-
-
-  template <>
-  template <>
-  void
-  DoFHandler<1,2>::set_dof_index<1> (const unsigned int       obj_level,
-				   const unsigned int       obj_index,
-				   const unsigned int       fe_index,
-				   const unsigned int       local_index,
-				   const unsigned int       global_index) const
-  {
-    this->levels[obj_level]->lines.
-      set_dof_index (*this,
-		     obj_index,
-		     fe_index,
-		     local_index,
-		     global_index,
-		     obj_level);
-  }
 
 
   template <>
@@ -2806,43 +2735,6 @@ namespace hp
 #if deal_II_dimension == 2
   template <>
   template <>
-  unsigned int
-  DoFHandler<2>::get_dof_index<1> (const unsigned int       obj_level,
-				   const unsigned int       obj_index,
-				   const unsigned int       fe_index,
-				   const unsigned int       local_index) const
-  {
-    return this->faces->lines.
-      get_dof_index (*this,
-		     obj_index,
-		     fe_index,
-		     local_index,
-		     obj_level);
-  }
-
-
-  template <>
-  template <>
-  void
-  DoFHandler<2>::set_dof_index<1> (const unsigned int       obj_level,
-				   const unsigned int       obj_index,
-				   const unsigned int       fe_index,
-				   const unsigned int       local_index,
-				   const unsigned int       global_index) const
-  {
-    this->faces->lines.
-      set_dof_index (*this,
-		     obj_index,
-		     fe_index,
-		     local_index,
-		     global_index,
-		     obj_level);
-  
-  }
-
-
-  template <>
-  template <>
   bool
   DoFHandler<2>::fe_index_is_active<1> (const unsigned int obj_level,
 					const unsigned int obj_index,
@@ -2880,43 +2772,6 @@ namespace hp
   }
 
   
-
-  template <>
-  template <>
-  unsigned int
-  DoFHandler<2>::get_dof_index<2> (const unsigned int       obj_level,
-				   const unsigned int       obj_index,
-				   const unsigned int       fe_index,
-				   const unsigned int       local_index) const
-  {
-    return this->levels[obj_level]->quads.
-      get_dof_index (*this,
-		     obj_index,
-		     fe_index,
-		     local_index,
-		     obj_level);
-  }
-
-
-  template <>
-  template <>
-  void
-  DoFHandler<2>::set_dof_index<2> (const unsigned int       obj_level,
-				   const unsigned int       obj_index,
-				   const unsigned int       fe_index,
-				   const unsigned int       local_index,
-				   const unsigned int       global_index) const
-  {
-    this->levels[obj_level]->quads.
-      set_dof_index (*this,
-		     obj_index,
-		     fe_index,
-		     local_index,
-		     global_index,
-		     obj_level);
-  
-  }
-
 
   template <>
   template <>
@@ -2960,43 +2815,6 @@ namespace hp
 
   template <>
   template <>
-  unsigned int
-  DoFHandler<2,3>::get_dof_index<1> (const unsigned int       obj_level,
-				   const unsigned int       obj_index,
-				   const unsigned int       fe_index,
-				   const unsigned int       local_index) const
-  {
-    return this->faces->lines.
-      get_dof_index (*this,
-		     obj_index,
-		     fe_index,
-		     local_index,
-		     obj_level);
-  }
-
-
-  template <>
-  template <>
-  void
-  DoFHandler<2,3>::set_dof_index<1> (const unsigned int       obj_level,
-				   const unsigned int       obj_index,
-				   const unsigned int       fe_index,
-				   const unsigned int       local_index,
-				   const unsigned int       global_index) const
-  {
-    this->faces->lines.
-      set_dof_index (*this,
-		     obj_index,
-		     fe_index,
-		     local_index,
-		     global_index,
-		     obj_level);
-  
-  }
-
-
-  template <>
-  template <>
   bool
   DoFHandler<2,3>::fe_index_is_active<1> (const unsigned int obj_level,
 					const unsigned int obj_index,
@@ -3034,43 +2852,6 @@ namespace hp
   }
 
   
-
-  template <>
-  template <>
-  unsigned int
-  DoFHandler<2,3>::get_dof_index<2> (const unsigned int       obj_level,
-				   const unsigned int       obj_index,
-				   const unsigned int       fe_index,
-				   const unsigned int       local_index) const
-  {
-    return this->levels[obj_level]->quads.
-      get_dof_index (*this,
-		     obj_index,
-		     fe_index,
-		     local_index,
-		     obj_level);
-  }
-
-
-  template <>
-  template <>
-  void
-  DoFHandler<2,3>::set_dof_index<2> (const unsigned int       obj_level,
-				   const unsigned int       obj_index,
-				   const unsigned int       fe_index,
-				   const unsigned int       local_index,
-				   const unsigned int       global_index) const
-  {
-    this->levels[obj_level]->quads.
-      set_dof_index (*this,
-		     obj_index,
-		     fe_index,
-		     local_index,
-		     global_index,
-		     obj_level);
-  
-  }
-
 
   template <>
   template <>
@@ -3117,43 +2898,6 @@ namespace hp
 #if deal_II_dimension == 3
   template <>
   template <>
-  unsigned int
-  DoFHandler<3>::get_dof_index<1> (const unsigned int       obj_level,
-				   const unsigned int       obj_index,
-				   const unsigned int       fe_index,
-				   const unsigned int       local_index) const
-  {
-    return this->faces->lines.
-      get_dof_index (*this,
-		     obj_index,
-		     fe_index,
-		     local_index,
-		     obj_level);
-  }
-
-
-  template <>
-  template <>
-  void
-  DoFHandler<3>::set_dof_index<1> (const unsigned int       obj_level,
-				   const unsigned int       obj_index,
-				   const unsigned int       fe_index,
-				   const unsigned int       local_index,
-				   const unsigned int       global_index) const
-  {
-    this->faces->lines.
-      set_dof_index (*this,
-		     obj_index,
-		     fe_index,
-		     local_index,
-		     global_index,
-		     obj_level);
-  
-  }
-
-
-  template <>
-  template <>
   bool
   DoFHandler<3>::fe_index_is_active<1> (const unsigned int obj_level,
 					const unsigned int obj_index,
@@ -3191,80 +2935,6 @@ namespace hp
 						   n);
   }
 
-
-
-  template <>
-  template <>
-  unsigned int
-  DoFHandler<3>::get_dof_index<2> (const unsigned int       obj_level,
-				   const unsigned int       obj_index,
-				   const unsigned int       fe_index,
-				   const unsigned int       local_index) const
-  {
-    return this->faces->quads.
-      get_dof_index (*this,
-		     obj_index,
-		     fe_index,
-		     local_index,
-		     obj_level);
-  }
-
-
-  template <>
-  template <>
-  unsigned int
-  DoFHandler<3>::get_dof_index<3> (const unsigned int       obj_level,
-				   const unsigned int       obj_index,
-				   const unsigned int       fe_index,
-				   const unsigned int       local_index) const
-  {
-    return this->levels[obj_level]->hexes.
-      get_dof_index (*this,
-		     obj_index,
-		     fe_index,
-		     local_index,
-		     obj_level);
-  }
-
-
-  template <>
-  template <>
-  void
-  DoFHandler<3>::set_dof_index<2> (const unsigned int       obj_level,
-				   const unsigned int       obj_index,
-				   const unsigned int       fe_index,
-				   const unsigned int       local_index,
-				   const unsigned int       global_index) const
-  {
-    this->faces->quads.
-      set_dof_index (*this,
-		     obj_index,
-		     fe_index,
-		     local_index,
-		     global_index,
-		     obj_level);
-  
-  }
-
-
-  template <>
-  template <>
-  void
-  DoFHandler<3>::set_dof_index<3> (const unsigned int       obj_level,
-				   const unsigned int       obj_index,
-				   const unsigned int       fe_index,
-				   const unsigned int       local_index,
-				   const unsigned int       global_index) const
-  {
-    this->levels[obj_level]->hexes.
-      set_dof_index (*this,
-		     obj_index,
-		     fe_index,
-		     local_index,
-		     global_index,
-		     obj_level);
-  
-  }
 
 
   template <>

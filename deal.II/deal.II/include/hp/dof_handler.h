@@ -46,6 +46,11 @@ namespace internal
 
 namespace internal
 {
+  namespace DoFAccessor
+  {
+    struct Implementation;
+  }
+
   namespace DoFCellAccessor
   {
     struct Implementation;
@@ -1062,32 +1067,7 @@ namespace hp
 					*/
       bool
       fe_is_active_on_vertex (const unsigned int vertex_index,
-			      const unsigned int fe_index) const;
-      
-				       /**
-					*  Return the @p i-th
-					*  dof-index. This function
-					*  calls the respective
-					*  function of DoFObjects.
-					*/
-      template <int structdim>
-      unsigned int get_dof_index (const unsigned int       obj_level,
-				  const unsigned int       obj_index,
-				  const unsigned int       fe_index,
-				  const unsigned int       local_index) const;
-      
-				       /**
-					*  Set the @p i-th
-					*  dof-index. This function
-					*  calls the respective
-					*  function of DoFObjects.
-					*/
-      template <int structdim>
-      void set_dof_index (const unsigned int       obj_level,
-			  const unsigned int       obj_index,
-			  const unsigned int       fe_index,
-			  const unsigned int       local_index,
-			  const unsigned int       global_index) const;
+			      const unsigned int fe_index) const;      
       
 				       /**
 					* Number of active fe-indices,
@@ -1271,6 +1251,7 @@ namespace hp
                                         */
       template <int, class> friend class dealii::DoFAccessor;
       template <class> friend class dealii::DoFCellAccessor;
+      friend class internal::DoFAccessor::Implementation;
       friend class internal::DoFCellAccessor::Implementation;
 
                                        /**

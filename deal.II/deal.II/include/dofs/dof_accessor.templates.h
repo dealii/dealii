@@ -17,7 +17,9 @@
 #include <base/config.h>
 #include <dofs/dof_accessor.h>
 #include <dofs/dof_levels.h>
+#include <dofs/dof_faces.h>
 #include <hp/dof_levels.h>
+#include <hp/dof_faces.h>
 #include <grid/tria_iterator.h>
 #include <grid/tria_iterator.templates.h>
 
@@ -200,6 +202,507 @@ DoFAccessor<structdim, DH>::set_vertex_dof_index (const unsigned int vertex,
 
 
 
+namespace internal
+{
+  namespace DoFAccessor
+  {
+				     /**
+				      * A class like the one with same
+				      * name in tria.cc. See there for
+				      * more information.
+				      */
+    struct Implementation
+    {
+					 /**
+					  * Implementations of the
+					  * get_dof_index/set_dof_index functions.
+					  */
+	template <int spacedim>
+	static
+	unsigned int
+	get_dof_index (const dealii::DoFHandler<1,spacedim>   &dof_handler,
+		       const unsigned int              obj_level,
+		       const unsigned int              obj_index,
+		       const unsigned int              fe_index,
+		       const unsigned int              local_index,
+		       internal::int2type<1>)
+	  {
+	    return dof_handler.levels[obj_level]->lines.
+	      get_dof_index (dof_handler,
+			     obj_index,
+			     fe_index,
+			     local_index);
+	  }
+
+
+	template <int spacedim>
+	static
+	void
+	set_dof_index (const dealii::DoFHandler<1,spacedim>   &dof_handler,
+		       const unsigned int              obj_level,
+		       const unsigned int              obj_index,
+		       const unsigned int              fe_index,
+		       const unsigned int              local_index,
+		       internal::int2type<1>,
+		       const unsigned int              global_index)
+	  {
+	    dof_handler.levels[obj_level]->lines.
+	      set_dof_index (dof_handler,
+			     obj_index,
+			     fe_index,
+			     local_index,
+			     global_index);
+	  }
+    
+
+	template <int spacedim>
+	static
+	unsigned int
+	get_dof_index (const dealii::DoFHandler<2,spacedim>   &dof_handler,
+		       const unsigned int              obj_level,
+		       const unsigned int              obj_index,
+		       const unsigned int              fe_index,
+		       const unsigned int              local_index,
+		       internal::int2type<1>)
+	  {
+					     // faces have no levels
+	    Assert (obj_level == 0, ExcInternalError());
+	    return dof_handler.faces->lines.
+	      get_dof_index (dof_handler,
+			     obj_index,
+			     fe_index,
+			     local_index);
+	  }
+
+
+	template <int spacedim>
+	static
+	void
+	set_dof_index (const dealii::DoFHandler<2,spacedim>   &dof_handler,
+		       const unsigned int              obj_level,
+		       const unsigned int              obj_index,
+		       const unsigned int              fe_index,
+		       const unsigned int              local_index,
+		       internal::int2type<1>,
+		       const unsigned int              global_index)
+	  {
+					     // faces have no levels
+	    Assert (obj_level == 0, ExcInternalError());
+	    dof_handler.faces->lines.
+	      set_dof_index (dof_handler,
+			     obj_index,
+			     fe_index,
+			     local_index,
+			     global_index);
+	  }
+    
+    
+	template <int spacedim>
+	static
+	unsigned int
+	get_dof_index (const dealii::DoFHandler<2,spacedim>   &dof_handler,
+		       const unsigned int              obj_level,
+		       const unsigned int              obj_index,
+		       const unsigned int              fe_index,
+		       const unsigned int              local_index,
+		       internal::int2type<2>)
+	  {
+	    return dof_handler.levels[obj_level]->quads.
+	      get_dof_index (dof_handler,
+			     obj_index,
+			     fe_index,
+			     local_index);
+	  }
+
+
+	template <int spacedim>
+	static
+	void
+	set_dof_index (const dealii::DoFHandler<2,spacedim>   &dof_handler,
+		       const unsigned int              obj_level,
+		       const unsigned int              obj_index,
+		       const unsigned int              fe_index,
+		       const unsigned int              local_index,
+		       internal::int2type<2>,
+		       const unsigned int              global_index)
+	  {
+	    dof_handler.levels[obj_level]->quads.
+	      set_dof_index (dof_handler,
+			     obj_index,
+			     fe_index,
+			     local_index,
+			     global_index);
+	  }
+
+
+	template <int spacedim>
+	static
+	unsigned int
+	get_dof_index (const dealii::DoFHandler<3,spacedim>   &dof_handler,
+		       const unsigned int              obj_level,
+		       const unsigned int              obj_index,
+		       const unsigned int              fe_index,
+		       const unsigned int              local_index,
+		       internal::int2type<1>)
+	  {
+					     // faces have no levels
+	    Assert (obj_level == 0, ExcInternalError());
+	    return dof_handler.faces->lines.
+	      get_dof_index (dof_handler,
+			     obj_index,
+			     fe_index,
+			     local_index);
+	  }
+
+
+	template <int spacedim>
+	static
+	void
+	set_dof_index (const dealii::DoFHandler<3,spacedim>   &dof_handler,
+		       const unsigned int              obj_level,
+		       const unsigned int              obj_index,
+		       const unsigned int              fe_index,
+		       const unsigned int              local_index,
+		       internal::int2type<1>,
+		       const unsigned int              global_index)
+	  {
+					     // faces have no levels
+	    Assert (obj_level == 0, ExcInternalError());
+	    dof_handler.faces->lines.
+	      set_dof_index (dof_handler,
+			     obj_index,
+			     fe_index,
+			     local_index,
+			     global_index);
+	  }
+
+
+
+	template <int spacedim>
+	static
+	unsigned int
+	get_dof_index (const dealii::DoFHandler<3,spacedim>   &dof_handler,
+		       const unsigned int              obj_level,
+		       const unsigned int              obj_index,
+		       const unsigned int              fe_index,
+		       const unsigned int              local_index,
+		       internal::int2type<2>)
+	  {
+					     // faces have no levels
+	    Assert (obj_level == 0, ExcInternalError());
+	    return dof_handler.faces->quads.
+	      get_dof_index (dof_handler,
+			     obj_index,
+			     fe_index,
+			     local_index);
+	  }
+
+
+	template <int spacedim>
+	static
+	void
+	set_dof_index (const dealii::DoFHandler<3,spacedim>   &dof_handler,
+		       const unsigned int              obj_level,
+		       const unsigned int              obj_index,
+		       const unsigned int              fe_index,
+		       const unsigned int              local_index,
+		       internal::int2type<2>,
+		       const unsigned int              global_index)
+	  {
+					     // faces have no levels
+	    Assert (obj_level == 0, ExcInternalError());
+	    dof_handler.faces->quads.
+	      set_dof_index (dof_handler,
+			     obj_index,
+			     fe_index,
+			     local_index,
+			     global_index);
+	  }
+
+
+
+	template <int spacedim>
+	static
+	unsigned int
+	get_dof_index (const dealii::DoFHandler<3,spacedim>   &dof_handler,
+		       const unsigned int              obj_level,
+		       const unsigned int              obj_index,
+		       const unsigned int              fe_index,
+		       const unsigned int              local_index,
+		       internal::int2type<3>)
+	  {
+	    return dof_handler.levels[obj_level]->hexes.
+	      get_dof_index (dof_handler,
+			     obj_index,
+			     fe_index,
+			     local_index);	
+	  }
+
+
+	template <int spacedim>
+	static
+	void
+	set_dof_index (const dealii::DoFHandler<3,spacedim>   &dof_handler,
+		       const unsigned int              obj_level,
+		       const unsigned int              obj_index,
+		       const unsigned int              fe_index,
+		       const unsigned int              local_index,
+		       internal::int2type<3>,
+		       const unsigned int              global_index)
+	  {
+	    dof_handler.levels[obj_level]->hexes.
+	      set_dof_index (dof_handler,
+			     obj_index,
+			     fe_index,
+			     local_index,
+			     global_index);
+	  }
+
+
+	template <int spacedim>
+	static
+	unsigned int
+	get_dof_index (const dealii::hp::DoFHandler<1,spacedim> &dof_handler,
+		       const unsigned int       obj_level,
+		       const unsigned int       obj_index,
+		       const unsigned int       fe_index,
+		       const unsigned int       local_index,
+		       const internal::int2type<1> &)
+	  {
+	    return dof_handler.levels[obj_level]->lines.
+	      get_dof_index (dof_handler,
+			     obj_index,
+			     fe_index,
+			     local_index,
+			     obj_level);
+	  }
+
+
+	template <int spacedim>
+	static
+	void
+	set_dof_index (const dealii::hp::DoFHandler<1,spacedim> &dof_handler,
+		       const unsigned int       obj_level,
+		       const unsigned int       obj_index,
+		       const unsigned int       fe_index,
+		       const unsigned int       local_index,
+		       const internal::int2type<1> &,
+		       const unsigned int       global_index)
+	  {
+	    dof_handler.levels[obj_level]->lines.
+	      set_dof_index (dof_handler,
+			     obj_index,
+			     fe_index,
+			     local_index,
+			     global_index,
+			     obj_level);
+	  }
+
+
+	template <int spacedim>
+	static
+	unsigned int
+	get_dof_index (const dealii::hp::DoFHandler<2,spacedim> &dof_handler,
+		       const unsigned int       obj_level,
+		       const unsigned int       obj_index,
+		       const unsigned int       fe_index,
+		       const unsigned int       local_index,
+		       const internal::int2type<1> &)
+	  {
+	    return dof_handler.faces->lines.
+	      get_dof_index (dof_handler,
+			     obj_index,
+			     fe_index,
+			     local_index,
+			     obj_level);
+	  }
+
+
+	template <int spacedim>
+	static
+	void
+	set_dof_index (const dealii::hp::DoFHandler<2,spacedim> &dof_handler,
+		       const unsigned int       obj_level,
+		       const unsigned int       obj_index,
+		       const unsigned int       fe_index,
+		       const unsigned int       local_index,
+		       const internal::int2type<1> &,
+		       const unsigned int       global_index)
+	  {
+	    dof_handler.faces->lines.
+	      set_dof_index (dof_handler,
+			     obj_index,
+			     fe_index,
+			     local_index,
+			     global_index,
+			     obj_level);  
+	  }
+
+
+	template <int spacedim>
+	static
+	unsigned int
+	get_dof_index (const dealii::hp::DoFHandler<2,spacedim> &dof_handler,
+		       const unsigned int       obj_level,
+		       const unsigned int       obj_index,
+		       const unsigned int       fe_index,
+		       const unsigned int       local_index,
+		       const internal::int2type<2> &)
+	  {
+	    return dof_handler.levels[obj_level]->quads.
+	      get_dof_index (dof_handler,
+			     obj_index,
+			     fe_index,
+			     local_index,
+			     obj_level);
+	  }
+
+
+	template <int spacedim>
+	static
+	void
+	set_dof_index (const dealii::hp::DoFHandler<2,spacedim> &dof_handler,
+		       const unsigned int       obj_level,
+		       const unsigned int       obj_index,
+		       const unsigned int       fe_index,
+		       const unsigned int       local_index,
+		       const internal::int2type<2> &,
+		       const unsigned int       global_index)
+	  {
+	    dof_handler.levels[obj_level]->quads.
+	      set_dof_index (dof_handler,
+			     obj_index,
+			     fe_index,
+			     local_index,
+			     global_index,
+			     obj_level);
+	  }
+
+
+	template <int spacedim>
+	static
+	unsigned int
+	get_dof_index (const dealii::hp::DoFHandler<3,spacedim> &dof_handler,
+		       const unsigned int       obj_level,
+		       const unsigned int       obj_index,
+		       const unsigned int       fe_index,
+		       const unsigned int       local_index,
+		       const internal::int2type<1> &)
+	  {
+	    return dof_handler.faces->lines.
+	      get_dof_index (dof_handler,
+			     obj_index,
+			     fe_index,
+			     local_index,
+			     obj_level);
+	  }
+
+
+	template <int spacedim>
+	static
+	void
+	set_dof_index (const dealii::hp::DoFHandler<3,spacedim> &dof_handler,
+		       const unsigned int       obj_level,
+		       const unsigned int       obj_index,
+		       const unsigned int       fe_index,
+		       const unsigned int       local_index,
+		       const internal::int2type<1> &,
+		       const unsigned int       global_index)
+	  {
+	    dof_handler.faces->lines.
+	      set_dof_index (dof_handler,
+			     obj_index,
+			     fe_index,
+			     local_index,
+			     global_index,
+			     obj_level);  
+	  }
+
+
+	template <int spacedim>
+	static
+	unsigned int
+	get_dof_index (const dealii::hp::DoFHandler<3,spacedim> &dof_handler,
+		       const unsigned int       obj_level,
+		       const unsigned int       obj_index,
+		       const unsigned int       fe_index,
+		       const unsigned int       local_index,
+		       const internal::int2type<2> &)
+	  {
+	    return dof_handler.faces->quads.
+	      get_dof_index (dof_handler,
+			     obj_index,
+			     fe_index,
+			     local_index,
+			     obj_level);
+	  }
+
+
+	template <int spacedim>
+	static
+	void
+	set_dof_index (const dealii::hp::DoFHandler<3,spacedim> &dof_handler,
+		       const unsigned int       obj_level,
+		       const unsigned int       obj_index,
+		       const unsigned int       fe_index,
+		       const unsigned int       local_index,
+		       const internal::int2type<2> &,
+		       const unsigned int       global_index)
+	  {
+	    dof_handler.faces->quads.
+	      set_dof_index (dof_handler,
+			     obj_index,
+			     fe_index,
+			     local_index,
+			     global_index,
+			     obj_level);
+	  }
+
+
+	template <int spacedim>
+	static
+	unsigned int
+	get_dof_index (const dealii::hp::DoFHandler<3,spacedim> &dof_handler,
+		       const unsigned int       obj_level,
+		       const unsigned int       obj_index,
+		       const unsigned int       fe_index,
+		       const unsigned int       local_index,
+		       const internal::int2type<3> &)
+	  {
+	    return dof_handler.levels[obj_level]->hexes.
+	      get_dof_index (dof_handler,
+			     obj_index,
+			     fe_index,
+			     local_index,
+			     obj_level);
+	  }
+
+
+	template <int spacedim>
+	static
+	void
+	set_dof_index (const dealii::hp::DoFHandler<3,spacedim> &dof_handler,
+		       const unsigned int       obj_level,
+		       const unsigned int       obj_index,
+		       const unsigned int       fe_index,
+		       const unsigned int       local_index,
+		       const internal::int2type<3> &,
+		       const unsigned int       global_index)
+	  {
+	    dof_handler.levels[obj_level]->hexes.
+	      set_dof_index (dof_handler,
+			     obj_index,
+			     fe_index,
+			     local_index,
+			     global_index,
+			     obj_level);  
+	  }
+    };
+  }
+}
+
+
+
 template <int dim, class DH>
 inline
 unsigned int
@@ -207,11 +710,12 @@ DoFAccessor<dim,DH>::dof_index (const unsigned int i,
 				const unsigned int fe_index) const
 {
 				   // access the respective DoF 
-  return this->dof_handler
-    ->template get_dof_index<dim> (this->level(),
-				   this->present_index,
-				   fe_index,
-				   i);
+  return internal::DoFAccessor::Implementation::get_dof_index (*this->dof_handler,
+							       this->level(),
+							       this->present_index,
+							       fe_index,
+							       i,
+							       internal::int2type<dim>());
 }
 
 
@@ -224,12 +728,13 @@ DoFAccessor<dim,DH>::set_dof_index (const unsigned int i,
 				    const unsigned int fe_index) const
 {
 				   // access the respective DoF
-  this->dof_handler
-    ->template set_dof_index<dim> (this->level(),
-				   this->present_index,
-				   fe_index,
-				   i,
-				   index);
+  internal::DoFAccessor::Implementation::set_dof_index (*this->dof_handler,
+							this->level(),
+							this->present_index,
+							fe_index,
+							i,
+							internal::int2type<dim>(),
+							index);
 }
 
 
