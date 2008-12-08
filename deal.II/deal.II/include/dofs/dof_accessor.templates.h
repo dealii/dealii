@@ -909,6 +909,28 @@ DoFCellAccessor (const Triangulation<DH::dimension,DH::space_dimension> *tria,
 {}
 
 
+
+template <class DH>
+template <int structdim2, int dim2, int spacedim2>
+inline
+DoFCellAccessor<DH>::
+DoFCellAccessor (const InvalidAccessor<structdim2,dim2,spacedim2> &)
+{
+  Assert (false, typename BaseClass::ExcInvalidObject());
+}
+
+
+
+template <class DH>
+template <int dim2, class DH2>
+inline
+DoFCellAccessor<DH>::
+DoFCellAccessor (const DoFAccessor<dim2,DH2> &)
+{
+  Assert (false, typename BaseClass::ExcInvalidObject());
+}
+
+
 template <class DH>
 inline
 typename internal::DoFHandler::Iterators<DH>::cell_iterator

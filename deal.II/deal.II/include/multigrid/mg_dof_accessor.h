@@ -394,6 +394,8 @@ template <int dim, int spacedim=dim>
 class MGDoFCellAccessor :  public MGDoFAccessor<dim,dim,spacedim>
 {
   public:
+    typedef MGDoFAccessor<dim,dim,spacedim> BaseClass;
+    
 				     /**
 				      * Type of faces.
 				      */
@@ -560,6 +562,64 @@ class MGDoFCellAccessor :  public MGDoFAccessor<dim,dim,spacedim>
 };
 
 /*@}*/
+
+// ------------------- template and inline functions -------------
+
+#ifndef DOXYGEN
+
+template <int structdim, int dim, int spacedim>
+template <int structdim2, int dim2, int spacedim2>
+inline
+MGDoFAccessor<structdim,dim,spacedim>::
+MGDoFAccessor (const InvalidAccessor<structdim2,dim2,spacedim2> &)
+		:
+		BaseClass (0, -1, -1, 0)
+{
+  Assert (false, ExcInvalidObject());
+}
+
+
+
+template <int structdim, int dim, int spacedim>
+template <int structdim2, int dim2, int spacedim2>
+inline
+MGDoFAccessor<structdim,dim,spacedim>::
+MGDoFAccessor (const MGDoFAccessor<structdim2,dim2,spacedim2> &)
+		:
+		BaseClass (0, -1, -1, 0)
+{
+  Assert (false, ExcInvalidObject());
+}
+
+
+
+template <int dim, int spacedim>
+template <int structdim2, int dim2, int spacedim2>
+inline
+MGDoFCellAccessor<dim,spacedim>::
+MGDoFCellAccessor (const InvalidAccessor<structdim2,dim2,spacedim2> &)
+		:
+		BaseClass (0, -1, -1, 0)
+{
+  Assert (false, typename BaseClass::ExcInvalidObject());
+}
+
+
+
+template <int dim, int spacedim>
+template <int dim2, class DH>
+inline
+MGDoFCellAccessor<dim,spacedim>::
+MGDoFCellAccessor (const DoFAccessor<dim2,DH> &)
+		:
+		BaseClass (0, -1, -1, 0)
+{
+  Assert (false, typename BaseClass::ExcInvalidObject());
+}
+
+
+#endif
+
 
 
 DEAL_II_NAMESPACE_CLOSE

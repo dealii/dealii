@@ -53,29 +53,6 @@ MGDoFAccessor<structdim, dim, spacedim>::MGDoFAccessor (const Triangulation<dim,
 {}
 
 
-template <int structdim, int dim, int spacedim>
-template <int structdim2, int dim2, int spacedim2>
-MGDoFAccessor<structdim,dim,spacedim>::
-MGDoFAccessor (const InvalidAccessor<structdim2,dim2,spacedim2> &)
-		:
-		BaseClass (0, -1, -1, 0)
-{
-  Assert (false, ExcInvalidObject());
-}
-
-
-
-template <int structdim, int dim, int spacedim>
-template <int structdim2, int dim2, int spacedim2>
-MGDoFAccessor<structdim,dim,spacedim>::
-MGDoFAccessor (const MGDoFAccessor<structdim2,dim2,spacedim2> &)
-		:
-		BaseClass (0, -1, -1, 0)
-{
-  Assert (false, ExcInvalidObject());
-}
-
-
 
 template <int structdim, int dim, int spacedim>
 void
