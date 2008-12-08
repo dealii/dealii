@@ -33,6 +33,13 @@ namespace internal
   {
     template <int dim> class DoFLevel;
     template <int dim> class DoFFaces;
+
+    struct Implementation;
+  }
+
+  namespace DoFCellAccessor
+  {
+    struct Implementation;
   }
 }
 
@@ -1203,28 +1210,14 @@ class DoFHandler  :  public Subscriptor
 				      */
     std::vector<unsigned int>      vertex_dofs;
 
-				     /**
-				      * Forward declaration of a class
-				      * into which we put significant
-				      * parts of the implementation.
-				      *
-				      * See the .cc file for more
-				      * information.
-				      */
-    struct Implementation;    
-    
 				     /*
 				      * Make accessor objects friends.
 				      */
-    template <int structdim, class DH> friend class DoFAccessor;
+    template <int, class> friend class DoFAccessor;
+    template <class> friend class DoFCellAccessor;
+    friend class internal::DoFCellAccessor::Implementation;
 
-				     /*
-				      * Same with cell accessor
-				      */
-    template <class DH> friend class DoFCellAccessor;
-
-
-    friend class DoFHandler<dim,spacedim>::Implementation;
+    friend class internal::DoFHandler::Implementation;    
 };
 
 

@@ -43,6 +43,12 @@ namespace internal
   {
     template <int dim> class TriaObject;
     template <typename G> class TriaObjects;
+    struct Implementation;
+  }
+
+  namespace TriaAccessor
+  {
+    struct Implementation;
   }
 }
 template <int celldim, int dim, int spacedim>	class TriaAccessor;
@@ -1516,20 +1522,10 @@ class TriaAccessor : public TriaAccessorBase<structdim, dim, spacedim>
 				      */
     void operator = (const TriaAccessor &);
     
-				     /**
-				      * Forward declaration of a class
-				      * into which we put significant
-				      * parts of the implementation.
-				      *
-				      * See the .templates.h file for
-				      * more information.
-				      */
-    struct Implementation;
-    
-    
     template <int, int> friend class Triangulation;
-    
-    friend class Implementation;
+
+    friend class internal::Triangulation::Implementation;
+    friend class internal::TriaAccessor::Implementation;
 };
 
 

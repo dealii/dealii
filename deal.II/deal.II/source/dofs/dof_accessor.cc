@@ -49,7 +49,7 @@ DoFCellAccessor<DH>::update_cell_dof_indices_cache () const
   Assert (this->dof_handler != 0, typename BaseClass::ExcInvalidObject());
   Assert (&this->get_fe() != 0, typename BaseClass::ExcInvalidObject());
 
-  Implementation::update_cell_dof_indices_cache (*this);
+  internal::DoFCellAccessor::Implementation::update_cell_dof_indices_cache (*this);
 }
 
 

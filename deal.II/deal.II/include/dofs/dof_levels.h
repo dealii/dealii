@@ -2,7 +2,7 @@
 //    $Id$
 //    Version: $Name$
 //
-//    Copyright (C) 1998, 1999, 2000, 2001, 2002, 2003, 2004, 2005, 2006 by the deal.II authors
+//    Copyright (C) 1998, 1999, 2000, 2001, 2002, 2003, 2004, 2005, 2006, 2008 by the deal.II authors
 //
 //    This file is subject to QPL and may not be  distributed
 //    without copyright and license information. Please refer
@@ -130,30 +130,19 @@ namespace internal
     template <>
     class DoFLevel<1> : public DoFLevel<0>
     {
-      private:
+      public:
                                          /**
                                           * The object containing dof-indices
 					  * and related access-functions
 					  */
 	DoFObjects<1> lines;
 
-      public:
 					 /**
                                           * Determine an estimate for the
                                           * memory consumption (in bytes)
                                           * of this object.
                                           */
         unsigned int memory_consumption () const;
-
-                                         /**
-                                          * Make the DoFHandler and
-                                          * MGDoFHandler classes a
-                                          * friend, so that it can
-                                          * resize arrays as
-                                          * necessary.
-                                          */
-        template <int, int> friend class dealii::DoFHandler;
-        template <int, int> friend class dealii::MGDoFHandler;
     };
 
 
@@ -167,30 +156,19 @@ namespace internal
     template <>
     class DoFLevel<2> : public DoFLevel<0>
     {
-      private:
+      public:
                                          /**
                                           * The object containing dof-indices
 					  * and related access-functions
 					  */
 	internal::DoFHandler::DoFObjects<2> quads;
 
-      public:
 					 /**
                                           * Determine an estimate for the
                                           * memory consumption (in bytes)
                                           * of this object.
                                           */
         unsigned int memory_consumption () const;
-
-                                         /**
-                                          * Make the DoFHandler and
-                                          * MGDoFHandler classes a
-                                          * friend, so that it can
-                                          * resize arrays as
-                                          * necessary.
-                                          */
-        template <int, int> friend class dealii::DoFHandler;
-        template <int, int> friend class dealii::MGDoFHandler;
     };
 
 
@@ -204,14 +182,12 @@ namespace internal
     template <>
     class DoFLevel<3> : public DoFLevel<0>
     {
-      private:
+      public:
                                          /**
                                           * The object containing dof-indices
 					  * and related access-functions
 					  */
 	internal::DoFHandler::DoFObjects<3> hexes;
-
-      public:
 	
 					 /**
                                           * Determine an estimate for the
@@ -219,16 +195,6 @@ namespace internal
                                           * of this object.
                                           */
         unsigned int memory_consumption () const;
-
-                                         /**
-                                          * Make the DoFHandler and
-                                          * MGDoFHandler classes a
-                                          * friend, so that it can
-                                          * resize arrays as
-                                          * necessary.
-                                          */
-        template <int, int> friend class dealii::DoFHandler;
-        template <int, int> friend class dealii::MGDoFHandler;
     };
 
   }

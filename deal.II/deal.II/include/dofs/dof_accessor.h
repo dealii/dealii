@@ -29,6 +29,27 @@ template <typename number> class Vector;
 
 template <typename Accessor> class TriaRawIterator;
 
+namespace internal
+{
+  namespace DoFCellAccessor
+  {
+    struct Implementation;
+  }
+
+  namespace DoFHandler
+  {
+    struct Implementation;
+  }
+
+  namespace hp
+  {
+    namespace DoFHandler
+    {
+      struct Implementation;
+    }
+  }
+}
+
 
 
 // note: the file dof_accessor.templates.h is included at the end of
@@ -66,7 +87,7 @@ namespace internal
 					  * See the full documentation for
 					  * more information.
 					  */
-	typedef TriaAccessor<celldim,dim,spacedim> BaseClass;
+	typedef dealii::TriaAccessor<celldim,dim,spacedim> BaseClass;
     };
 
 
@@ -693,6 +714,9 @@ class DoFAccessor : public internal::DoFAccessor::Inheritance<structdim, DH::dim
 				      */
     template <int dim, int spacedim> friend class DoFHandler;
     template <int dim, int spacedim> friend class hp::DoFHandler;
+
+    friend class internal::DoFHandler::Implementation;
+    friend class internal::hp::DoFHandler::Implementation;
 };
 
 
@@ -1198,16 +1222,6 @@ class DoFCellAccessor :  public DoFAccessor<DH::dimension,DH>
     
   private:
 				     /**
-				      * Forward declaration of a class
-				      * into which we put some
-				      * parts of the implementation.
-				      *
-				      * See the .cc file for more
-				      * information.
-				      */
-    struct Implementation;    
-    
-				     /**
 				      * Update the cache in which we
 				      * store the dof indices of this
 				      * cell.
@@ -1221,6 +1235,8 @@ class DoFCellAccessor :  public DoFAccessor<DH::dimension,DH>
 				      * function
 				      */
     template <int dim, int spacedim> friend class DoFHandler;
+
+    friend class internal::DoFCellAccessor::Implementation;
 };
 
 

@@ -2,7 +2,7 @@
 //    $Id$
 //    Version: $Name$
 //
-//    Copyright (C) 2006 by the deal.II authors
+//    Copyright (C) 2006, 2008 by the deal.II authors
 //
 //    This file is subject to QPL and may not be  distributed
 //    without copyright and license information. Please refer
@@ -110,22 +110,20 @@ namespace internal
     template<>
     class DoFFaces<2>
     {
-      private:
+      public:
 	internal::hp::DoFObjects<1> lines;
 
-      public:
 					 /**
                                           * Determine an estimate for the
                                           * memory consumption (in bytes)
                                           * of this object.
                                           */
         unsigned int memory_consumption () const;
-
-	template <int> friend class dealii::hp::DoFHandler;	
     };
 
 /**
- * Store the indices of degrees of freedom on faces in 3D, which are quads, additionaly also on lines.
+ * Store the indices of degrees of freedom on faces in 3D, which are
+ * quads, additionally also on lines.
  *
  * @ingroup hp
  * @author Tobias Leicht, 2006
@@ -133,19 +131,16 @@ namespace internal
     template<>
     class DoFFaces<3>
     {
-      private:
+      public:
 	internal::hp::DoFObjects<1> lines;
 	internal::hp::DoFObjects<2> quads;
 
-      public:
 					 /**
                                           * Determine an estimate for the
                                           * memory consumption (in bytes)
                                           * of this object.
                                           */
         unsigned int memory_consumption () const;
-
-	template <int> friend class dealii::hp::DoFHandler;	
     };
     
   } // namespace hp

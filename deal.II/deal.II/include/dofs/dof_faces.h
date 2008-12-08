@@ -2,7 +2,7 @@
 //    $Id$
 //    Version: $Name$
 //
-//    Copyright (C) 2006, 2007 by the deal.II authors
+//    Copyright (C) 2006, 2007, 2008 by the deal.II authors
 //
 //    This file is subject to QPL and may not be  distributed
 //    without copyright and license information. Please refer
@@ -100,29 +100,19 @@ namespace internal
     template<>
     class DoFFaces<2>
     {
-      private:
+      public:
 					 /**
-					  * The object containing the data of DoFs on lines.
+					  * The object containing the
+					  * data of DoFs on lines.
 					  */
 	internal::DoFHandler::DoFObjects<1> lines;
 
-      public:
 					 /**
                                           * Determine an estimate for the
                                           * memory consumption (in bytes)
                                           * of this object.
                                           */
         unsigned int memory_consumption () const;
-
-                                         /**
-                                          * Make the DoFHandler and
-                                          * MGDoFHandler classes a
-                                          * friend, so that it can
-                                          * resize arrays as
-                                          * necessary.
-                                          */
-    	template <int> friend class dealii::DoFHandler;	
-	template <int> friend class dealii::MGDoFHandler;
     };
 
 /**
@@ -134,33 +124,25 @@ namespace internal
     template<>
     class DoFFaces<3>
     {
-      private:
+      public:
 					 /**
-					  * The object containing the data of DoFs on lines.
+					  * The object containing the
+					  * data of DoFs on lines.
 					  */
 	internal::DoFHandler::DoFObjects<1> lines;
+
 					 /**
-					  * The object containing the data of DoFs on quads.
+					  * The object containing the
+					  * data of DoFs on quads.
 					  */
 	internal::DoFHandler::DoFObjects<2> quads;
 
-      public:
 					 /**
                                           * Determine an estimate for the
                                           * memory consumption (in bytes)
                                           * of this object.
                                           */
         unsigned int memory_consumption () const;
-
-                                         /**
-                                          * Make the DoFHandler and
-                                          * MGDoFHandler classes a
-                                          * friend, so that it can
-                                          * resize arrays as
-                                          * necessary.
-                                          */
-	template <int> friend class dealii::DoFHandler;	
-	template <int> friend class dealii::MGDoFHandler;
     };
 
   }

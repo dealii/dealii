@@ -2,7 +2,7 @@
 //    $Id$
 //    Version: $Name$
 //
-//    Copyright (C) 2003, 2006 by the deal.II authors
+//    Copyright (C) 2003, 2006, 2008 by the deal.II authors
 //
 //    This file is subject to QPL and may not be  distributed
 //    without copyright and license information. Please refer
@@ -160,27 +160,19 @@ namespace internal
     template <>
     class DoFLevel<1> : public DoFLevel<0>
     {
-	private:
+      public:
 					 /**
 					  *  store the dof-indices and related functions of
 					  *  lines
 					  */
 	internal::hp::DoFObjects<1> lines;
 
-      public:
 					 /**
 					  * Determine an estimate for the
                                           * memory consumption (in bytes)
                                           * of this object.
                                           */
         unsigned int memory_consumption () const;
-					 /**
-                                          * Make the DoFHandler class
-                                          * a friend, so that it can
-                                          * resize arrays as
-                                          * necessary.
-                                          */
-        template <int, int> friend class dealii::hp::DoFHandler;
     };
 
 
@@ -194,27 +186,19 @@ namespace internal
     template <>
     class DoFLevel<2> : public DoFLevel<0>
     {
-	public:
+      public:
 					 /**
 					  *  store the dof-indices and related functions of
 					  *  quads
 					  */
 	internal::hp::DoFObjects<2> quads;
 
-      public:
 					 /**
                                           * Determine an estimate for the
                                           * memory consumption (in bytes)
                                           * of this object.
                                           */
         unsigned int memory_consumption () const;
-                                         /**
-                                          * Make the DoFHandler class
-                                          * a friend, so that it can
-                                          * resize arrays as
-                                          * necessary.
-                                          */
-        template <int, int> friend class dealii::hp::DoFHandler;
     };
 
 
@@ -229,27 +213,19 @@ namespace internal
     template <>
     class DoFLevel<3> : public DoFLevel<0>
     {
-	private:
+      public:
 					 /**
 					  *  store the dof-indices and related functions of
 					  *  hexes
 					  */
 	internal::hp::DoFObjects<3> hexes;
 
-      public:
 					 /**
                                           * Determine an estimate for the
                                           * memory consumption (in bytes)
                                           * of this object.
                                           */
         unsigned int memory_consumption () const;
-                                         /**
-                                          * Make the DoFHandler class
-                                          * a friend, so that it can
-                                          * resize arrays as
-                                          * necessary.
-                                          */
-        template <int, int> friend class dealii::hp::DoFHandler;
     };
 
   } // namespace hp

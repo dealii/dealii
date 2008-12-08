@@ -38,8 +38,23 @@ namespace internal
   {
     template <int dim> class TriaLevel;
     template <int dim> class TriaFaces;
+
+				     /**
+				      * Forward declaration of a class into
+				      * which we put much of the
+				      * implementation of the Triangulation
+				      * class. See the .cc file for more
+				      * information.
+				      */
+    struct Implementation;
+  }
+
+  namespace TriaAccessor
+  {
+    struct Implementation;
   }
 }
+
 template <int dim, int spacedim> class DoFHandler;
 namespace hp
 {
@@ -2908,35 +2923,6 @@ class Triangulation : public Subscriptor
 		    << "The given level " << arg1
 		    << " is not in the valid range!");
 				     /**
-				      *  Exception
-				      * @ingroup Exceptions
-				      */
-    DeclException0 (ExcCellShouldBeUnused);
-				     /**
-				      *  Exception
-				      * @ingroup Exceptions
-				      */
-    DeclException0 (ExcTooFewVerticesAllocated);
-				     /**
-				      *  Exception
-				      * @ingroup Exceptions
-				      */
-    DeclException0 (ExcUncaughtState);
-				     /**
-				      * Exception
-				      * @ingroup Exceptions
-				      */
-    DeclException2 (ExcGridsDoNotMatch,
-		    int, int,
-		    << "The present grid has " << arg1 << " active cells, "
-		    << "but the one in the file had " << arg2);
-				     /**
-				      * Trying to re-read a grid, an error occured.
-				      *
-				      * @ingroup Exceptions
-				      */
-    DeclException0 (ExcGridReadError);
-				     /**
 				      * The function raising this
 				      * exception can only operate on
 				      * an empty Triangulation, i.e.,
@@ -2947,92 +2933,16 @@ class Triangulation : public Subscriptor
 				      */
     DeclException0 (ExcTriangulationNotEmpty);
 				     /**
-				      * Exception
-				      * @ingroup Exceptions
-				      */
-    DeclException1 (ExcGridHasInvalidCell,
-		    int,
-		    << "Something went wrong when making cell " << arg1
-		    << ". Read the docs and the source code "
-		    << "for more information.");
-				     /**
-				      * Exception
-				      * @ingroup Exceptions
-				      */
-    DeclException0 (ExcGridHasInvalidVertices);
-				     /**
-				      * Exception
-				      * @ingroup Exceptions
-				      */
-    DeclException1 (ExcInternalErrorOnCell,
-		    int,
-		    << "Something went wrong upon construction of cell "
-		    << arg1);
-				     /**
-				      * A cell was entered which has
-				      * negative measure. In most
-				      * cases, this is due to a wrong
-				      * order of the vertices of the
-				      * cell.
+				      * Trying to re-read a grid, an error occured.
 				      *
 				      * @ingroup Exceptions
 				      */
-    DeclException1 (ExcCellHasNegativeMeasure,
-		    int,
-		    << "Cell " << arg1 << " has negative measure.");
-				     /**
-				      * A cell is created with a
-				      * vertex number exceeding the
-				      * vertex array.
-				      *
-				      * @ingroup Exceptions
-				      */
-    DeclException3 (ExcInvalidVertexIndex,
-		    int, int, int,
-		    << "Error while creating cell " << arg1
-		    << ": the vertex index " << arg2 << " must be between 0 and "
-		    << arg3 << ".");
-				     /**
-				      * Exception
-				      * @ingroup Exceptions
-				      */
-    DeclException2 (ExcLineInexistant,
-		    int, int,
-		    << "When trying to give a boundary indicator to a line: "
-		    << "the line with end vertices " << arg1 << " and "
-		    << arg2 << " does not exist.");
-				     /**
-				      * Exception
-				      * @ingroup Exceptions
-				      */
-    DeclException4 (ExcQuadInexistant,
-                    int, int, int, int,
-		    << "When trying to give a boundary indicator to a quad: "
-		    << "the quad with bounding lines " << arg1 << ", " << arg2
-		    << ", " << arg3 << ", " << arg4 << " does not exist.");
-		                     /**
-				      * Exception
-				      * @ingroup Exceptions
-				      */				      
-    DeclException0 (ExcInteriorLineCantBeBoundary);
-				     /**
-				      * Exception
-				      * @ingroup Exceptions
-				      */
-    DeclException0 (ExcInteriorQuadCantBeBoundary);
+    DeclException0 (ExcGridReadError);
 				     /**
 				      * Exception
 				      * @ingroup Exceptions
 				      */
     DeclException0 (ExcFacesHaveNoLevel);
-    				     /**
-				      * Exception
-				      * @ingroup Exceptions
-				      */
-    DeclException2 (ExcMultiplySetLineInfoOfLine,
-		    int, int,
-		    << "In SubCellData the line info of the line with vertex indices "
-		    << arg1 << " and " << arg2 << " is multiply set.");
 				     /**
 				      * The triangulation level you
 				      * accessed is empty.
@@ -3236,41 +3146,17 @@ class Triangulation : public Subscriptor
 				      */    
     mutable std::list<RefinementListener *> refinement_listeners;
 
-				     /**
-				      * Forward declaration of a class
-				      * into which we put significant
-				      * parts of the implementation.
-				      *
-				      * See the .cc file for more
-				      * information.
-				      */
-    struct Implementation;
-    
 				     // make a couple of classes
 				     // friends
     template <int,int,int> friend class TriaAccessorBase;
     template <int,int,int> friend class TriaAccessor;
-
-    template <int dim1, int dim2, int dim3>
-    friend class TriaAccessor;
-    
     friend class CellAccessor<dim, spacedim>;
-    
-    friend class TriaRawIterator<TriaAccessor<1, 1, 1> >;
-    friend class TriaRawIterator<CellAccessor<1, 1> >;
 
-    friend class TriaRawIterator<TriaAccessor<1, 2, 2> >;
-    friend class TriaRawIterator<TriaAccessor<2, 2, 2> >;
-    friend class TriaRawIterator<CellAccessor<2, 2> >;
-
-    friend class TriaRawIterator<TriaAccessor<1, 3, 3> >;
-    friend class TriaRawIterator<TriaAccessor<2, 3, 3> >;
-    friend class TriaRawIterator<TriaAccessor<3, 3, 3> >;
-    friend class TriaRawIterator<CellAccessor<3, 3> >;
+    friend class internal::TriaAccessor::Implementation;    
     
     friend class hp::DoFHandler<dim,spacedim>;
 
-    friend class Triangulation<dim,spacedim>::Implementation;
+    friend class internal::Triangulation::Implementation;
 };
 
 

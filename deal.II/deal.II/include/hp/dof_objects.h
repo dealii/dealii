@@ -2,7 +2,7 @@
 //    $Id$
 //    Version: $Name$
 //
-//    Copyright (C) 2006 by the deal.II authors
+//    Copyright (C) 2006, 2008 by the deal.II authors
 //
 //    This file is subject to QPL and may not be  distributed
 //    without copyright and license information. Please refer
@@ -96,9 +96,7 @@ namespace internal
     template <int dim>
     class DoFObjects
     {
-
-      private:
-
+      public:
                                          /**
                                           * Store the start index for
                                           * the degrees of freedom of each
@@ -114,8 +112,6 @@ namespace internal
                                           */
         std::vector<unsigned int> dofs;
 
-      public:
-        
                                          /**
                                           * Set the global index of
                                           * the @p local_index-th
@@ -240,14 +236,6 @@ namespace internal
                                           * of this object.
                                           */
         unsigned int memory_consumption () const;
-
-                                         /**
-                                          * Make the DoFHandler class
-                                          * a friend, so that it can
-                                          * resize arrays as
-                                          * necessary.
-                                          */
-        template <int> friend class dealii::hp::DoFHandler;
     };
 
 

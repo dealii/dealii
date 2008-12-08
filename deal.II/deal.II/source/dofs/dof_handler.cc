@@ -62,803 +62,818 @@ namespace internal
 
 
 
+namespace internal
+{
+  namespace DoFHandler
+  {
+				     // access class
+				     // dealii::DoFHandler instead of
+				     // namespace internal::DoFHandler
+    using dealii::DoFHandler;
+    
 /**
  * A class with the same purpose as the similarly named class of the
  * Triangulation class. See there for more information.
  */
-template <int x_dim, int x_spacedim>
-struct DoFHandler<x_dim,x_spacedim>::Implementation
-{
-				     /**
-				      * Distribute dofs on the given cell,
-				      * with new dofs starting with index
-				      * @p next_free_dof. Return the next
-				      * unused index number. The finite
-				      * element used is the one given to
-				      * @p distribute_dofs, which is copied
-				      * to @p selected_fe.
-				      *
-				      * This function is excluded from the
-				      * @p distribute_dofs function since
-				      * it can not be implemented dimension
-				      * independent.
-				      */
-    template <int spacedim>
-    static
-    unsigned int
-    distribute_dofs_on_cell (const DoFHandler<1,spacedim> &dof_handler,
-			     active_cell_iterator &cell,
-			     unsigned int          next_free_dof)
-      {
-
-					 // distribute dofs of vertices
-	for (unsigned int v=0; v<GeometryInfo<1>::vertices_per_cell; ++v)
+    struct Implementation
+    {
+					 /**
+					  * Distribute dofs on the given cell,
+					  * with new dofs starting with index
+					  * @p next_free_dof. Return the next
+					  * unused index number. The finite
+					  * element used is the one given to
+					  * @p distribute_dofs, which is copied
+					  * to @p selected_fe.
+					  *
+					  * This function is excluded from the
+					  * @p distribute_dofs function since
+					  * it can not be implemented dimension
+					  * independent.
+					  */
+	template <int spacedim>
+	static
+	unsigned int
+	distribute_dofs_on_cell (const DoFHandler<1,spacedim> &dof_handler,
+				 typename DoFHandler<1,spacedim>::active_cell_iterator &cell,
+				 unsigned int          next_free_dof)
 	  {
-	    cell_iterator neighbor = cell->neighbor(v);
 
-	    if (neighbor.state() == IteratorState::valid)
+					     // distribute dofs of vertices
+	    for (unsigned int v=0; v<GeometryInfo<1>::vertices_per_cell; ++v)
 	      {
-						 // find true neighbor; may be its
-						 // a child of @p{neighbor}
-		while (neighbor->has_children())
-		  neighbor = neighbor->child(v==0 ? 1 : 0);
+		typename DoFHandler<1,spacedim>::cell_iterator
+		  neighbor = cell->neighbor(v);
 
-						 // has neighbor already been processed?
-		if (neighbor->user_flag_set())
-						   // copy dofs
+		if (neighbor.state() == IteratorState::valid)
 		  {
-		    if (v==0) 
-		      for (unsigned int d=0;
-			   d<dof_handler.selected_fe->dofs_per_vertex; ++d)
-			cell->set_vertex_dof_index (0, d,
-						    neighbor->vertex_dof_index (1, d));
-		    else
-		      for (unsigned int d=0;
-			   d<dof_handler.selected_fe->dofs_per_vertex; ++d)
-			cell->set_vertex_dof_index (1, d,
-						    neighbor->vertex_dof_index (0, d));
+						     // find true neighbor; may be its
+						     // a child of @p{neighbor}
+		    while (neighbor->has_children())
+		      neighbor = neighbor->child(v==0 ? 1 : 0);
 
-						     // next neighbor
-		    continue;
+						     // has neighbor already been processed?
+		    if (neighbor->user_flag_set())
+						       // copy dofs
+		      {
+			if (v==0) 
+			  for (unsigned int d=0;
+			       d<dof_handler.selected_fe->dofs_per_vertex; ++d)
+			    cell->set_vertex_dof_index (0, d,
+							neighbor->vertex_dof_index (1, d));
+			else
+			  for (unsigned int d=0;
+			       d<dof_handler.selected_fe->dofs_per_vertex; ++d)
+			    cell->set_vertex_dof_index (1, d,
+							neighbor->vertex_dof_index (0, d));
+
+							 // next neighbor
+			continue;
+		      }
 		  }
-	      }
             
-					     // otherwise: create dofs newly
+						 // otherwise: create dofs newly
+		for (unsigned int d=0;
+		     d<dof_handler.selected_fe->dofs_per_vertex; ++d)
+		  cell->set_vertex_dof_index (v, d, next_free_dof++);
+	      }
+  
+					     // dofs of line
 	    for (unsigned int d=0;
-		 d<dof_handler.selected_fe->dofs_per_vertex; ++d)
-	      cell->set_vertex_dof_index (v, d, next_free_dof++);
+		 d<dof_handler.selected_fe->dofs_per_line; ++d)
+	      cell->set_dof_index (d, next_free_dof++);
+
+					     // note that this cell has been
+					     // processed
+	    cell->set_user_flag ();
+  
+	    return next_free_dof;
 	  }
-  
-					 // dofs of line
-	for (unsigned int d=0;
-	     d<dof_handler.selected_fe->dofs_per_line; ++d)
-	  cell->set_dof_index (d, next_free_dof++);
-
-					 // note that this cell has been
-					 // processed
-	cell->set_user_flag ();
-  
-	return next_free_dof;
-      }
 
 
 
-    template <int spacedim>
-    static
-    unsigned int
-    distribute_dofs_on_cell (const DoFHandler<2,spacedim> &dof_handler,
-			     active_cell_iterator &cell,
-			     unsigned int          next_free_dof)
-      {
-	if (dof_handler.selected_fe->dofs_per_vertex > 0)
-					   // number dofs on vertices
-	  for (unsigned int vertex=0; vertex<GeometryInfo<2>::vertices_per_cell; ++vertex)
-					     // check whether dofs for this
-					     // vertex have been distributed
-					     // (only check the first dof)
-	    if (cell->vertex_dof_index(vertex, 0) == invalid_dof_index)
-	      for (unsigned int d=0; d<dof_handler.selected_fe->dofs_per_vertex; ++d)
-		cell->set_vertex_dof_index (vertex, d, next_free_dof++);
-    
-					 // for the four sides
-	if (dof_handler.selected_fe->dofs_per_line > 0)
-	  for (unsigned int side=0; side<GeometryInfo<2>::faces_per_cell; ++side)
-	    {
-	      line_iterator line = cell->line(side);
-	
-					       // distribute dofs if necessary:
-					       // check whether line dof is already
-					       // numbered (check only first dof)
-	      if (line->dof_index(0) == invalid_dof_index)
-						 // if not: distribute dofs
-		for (unsigned int d=0; d<dof_handler.selected_fe->dofs_per_line; ++d)
-		  line->set_dof_index (d, next_free_dof++);	    
-	    }
-
-
-					 // dofs of quad
-	if (dof_handler.selected_fe->dofs_per_quad > 0)
-	  for (unsigned int d=0; d<dof_handler.selected_fe->dofs_per_quad; ++d)
-	    cell->set_dof_index (d, next_free_dof++);
-
-
-					 // note that this cell has been processed
-	cell->set_user_flag ();
-  
-	return next_free_dof;
-      }
-    
-
-    template <int spacedim>
-    static
-    unsigned int
-    distribute_dofs_on_cell (const DoFHandler<3,spacedim> &dof_handler,
-			     active_cell_iterator &cell,
-			     unsigned int          next_free_dof)
-      {
-	if (dof_handler.selected_fe->dofs_per_vertex > 0)
-					   // number dofs on vertices
-	  for (unsigned int vertex=0; vertex<GeometryInfo<3>::vertices_per_cell; ++vertex)
-					     // check whether dofs for this
-					     // vertex have been distributed
-					     // (only check the first dof)
-	    if (cell->vertex_dof_index(vertex, 0) == invalid_dof_index)
-	      for (unsigned int d=0; d<dof_handler.selected_fe->dofs_per_vertex; ++d)
-		cell->set_vertex_dof_index (vertex, d, next_free_dof++);
-    
-					 // for the lines
-	if (dof_handler.selected_fe->dofs_per_line > 0)
-	  for (unsigned int l=0; l<GeometryInfo<3>::lines_per_cell; ++l)
-	    {
-	      line_iterator line = cell->line(l);
-	
-					       // distribute dofs if necessary:
-					       // check whether line dof is already
-					       // numbered (check only first dof)
-	      if (line->dof_index(0) == invalid_dof_index)
-						 // if not: distribute dofs
-		for (unsigned int d=0; d<dof_handler.selected_fe->dofs_per_line; ++d)
-		  line->set_dof_index (d, next_free_dof++);	    
-	    }
-
-					 // for the quads
-	if (dof_handler.selected_fe->dofs_per_quad > 0)
-	  for (unsigned int q=0; q<GeometryInfo<3>::quads_per_cell; ++q)
-	    {
-	      quad_iterator quad = cell->quad(q);
-	
-					       // distribute dofs if necessary:
-					       // check whether quad dof is already
-					       // numbered (check only first dof)
-	      if (quad->dof_index(0) == invalid_dof_index)
-						 // if not: distribute dofs
-		for (unsigned int d=0; d<dof_handler.selected_fe->dofs_per_quad; ++d)
-		  quad->set_dof_index (d, next_free_dof++);	    
-	    }
-
-
-					 // dofs of hex
-	if (dof_handler.selected_fe->dofs_per_hex > 0)
-	  for (unsigned int d=0; d<dof_handler.selected_fe->dofs_per_hex; ++d)
-	    cell->set_dof_index (d, next_free_dof++);
-
-
-					 // note that this cell has been
-					 // processed
-	cell->set_user_flag ();
-  
-	return next_free_dof;
-      }
-
-
-				     /**
-				      * Implementation of the general template
-				      * of same name.
-				      */
-    template <int spacedim>
-    static
-    void renumber_dofs (const std::vector<unsigned int> &new_numbers,
-			DoFHandler<1,spacedim>          &dof_handler)
-      {
-					 // note that we can not use cell
-					 // iterators in this function since
-					 // then we would renumber the dofs on
-					 // the interface of two cells more
-					 // than once. Anyway, this way it's
-					 // not only more correct but also
-					 // faster; note, however, that dof
-					 // numbers may be invalid_dof_index,
-					 // namely when the appropriate
-					 // vertex/line/etc is unused
-	for (std::vector<unsigned int>::iterator
-	       i=dof_handler.vertex_dofs.begin();
-	     i!=dof_handler.vertex_dofs.end(); ++i)
-	  if (*i != invalid_dof_index)
-	    *i = new_numbers[*i];
-	  else
-					     // if index is invalid_dof_index:
-					     // check if this one really is
-					     // unused
-	    Assert (dof_handler.tria
-		    ->vertex_used((i-dof_handler.vertex_dofs.begin()) /
-				  dof_handler.selected_fe->dofs_per_vertex)
-		    == false,
-		    ExcInternalError ());
-  
-	for (unsigned int level=0; level<dof_handler.levels.size(); ++level) 
-	  for (std::vector<unsigned int>::iterator
-		 i=dof_handler.levels[level]->lines.dofs.begin();
-	       i!=dof_handler.levels[level]->lines.dofs.end(); ++i)
-	    if (*i != invalid_dof_index)
-	      *i = new_numbers[*i];
-      }
-    
-
-
-    template <int spacedim>
-    static
-    void renumber_dofs (const std::vector<unsigned int> &new_numbers,
-			DoFHandler<2,spacedim>          &dof_handler)
-      {
-					 // note that we can not use cell
-					 // iterators in this function since
-					 // then we would renumber the dofs on
-					 // the interface of two cells more
-					 // than once. Anyway, this way it's
-					 // not only more correct but also
-					 // faster; note, however, that dof
-					 // numbers may be invalid_dof_index,
-					 // namely when the appropriate
-					 // vertex/line/etc is unused
-	for (std::vector<unsigned int>::iterator
-	       i=dof_handler.vertex_dofs.begin();
-	     i!=dof_handler.vertex_dofs.end(); ++i)
-	  if (*i != invalid_dof_index)
-	    *i = new_numbers[*i];
-	  else
-					     // if index is invalid_dof_index:
-					     // check if this one really is
-					     // unused
-	    Assert (dof_handler.tria
-		    ->vertex_used((i-dof_handler.vertex_dofs.begin()) /
-				  dof_handler.selected_fe->dofs_per_vertex)
-		    == false,
-		    ExcInternalError ());
-  
-	for (std::vector<unsigned int>::iterator
-	       i=dof_handler.faces->lines.dofs.begin();
-	     i!=dof_handler.faces->lines.dofs.end(); ++i)
-	  if (*i != invalid_dof_index)
-	    *i = new_numbers[*i];
-
-	for (unsigned int level=0; level<dof_handler.levels.size(); ++level) 
+	template <int spacedim>
+	static
+	unsigned int
+	distribute_dofs_on_cell (const DoFHandler<2,spacedim> &dof_handler,
+				 typename DoFHandler<2,spacedim>::active_cell_iterator &cell,
+				 unsigned int          next_free_dof)
 	  {
+	    if (dof_handler.selected_fe->dofs_per_vertex > 0)
+					       // number dofs on vertices
+	      for (unsigned int vertex=0; vertex<GeometryInfo<2>::vertices_per_cell; ++vertex)
+						 // check whether dofs for this
+						 // vertex have been distributed
+						 // (only check the first dof)
+		if (cell->vertex_dof_index(vertex, 0) == DoFHandler<2,spacedim>::invalid_dof_index)
+		  for (unsigned int d=0; d<dof_handler.selected_fe->dofs_per_vertex; ++d)
+		    cell->set_vertex_dof_index (vertex, d, next_free_dof++);
+    
+					     // for the four sides
+	    if (dof_handler.selected_fe->dofs_per_line > 0)
+	      for (unsigned int side=0; side<GeometryInfo<2>::faces_per_cell; ++side)
+		{
+		  typename DoFHandler<2,spacedim>::line_iterator
+		    line = cell->line(side);
+	
+						   // distribute dofs if necessary:
+						   // check whether line dof is already
+						   // numbered (check only first dof)
+		  if (line->dof_index(0) == DoFHandler<2,spacedim>::invalid_dof_index)
+						     // if not: distribute dofs
+		    for (unsigned int d=0; d<dof_handler.selected_fe->dofs_per_line; ++d)
+		      line->set_dof_index (d, next_free_dof++);	    
+		}
+
+
+					     // dofs of quad
+	    if (dof_handler.selected_fe->dofs_per_quad > 0)
+	      for (unsigned int d=0; d<dof_handler.selected_fe->dofs_per_quad; ++d)
+		cell->set_dof_index (d, next_free_dof++);
+
+
+					     // note that this cell has been processed
+	    cell->set_user_flag ();
+  
+	    return next_free_dof;
+	  }
+    
+
+	template <int spacedim>
+	static
+	unsigned int
+	distribute_dofs_on_cell (const DoFHandler<3,spacedim> &dof_handler,
+				 typename DoFHandler<3,spacedim>::active_cell_iterator &cell,
+				 unsigned int          next_free_dof)
+	  {
+	    if (dof_handler.selected_fe->dofs_per_vertex > 0)
+					       // number dofs on vertices
+	      for (unsigned int vertex=0; vertex<GeometryInfo<3>::vertices_per_cell; ++vertex)
+						 // check whether dofs for this
+						 // vertex have been distributed
+						 // (only check the first dof)
+		if (cell->vertex_dof_index(vertex, 0) == DoFHandler<3,spacedim>::invalid_dof_index)
+		  for (unsigned int d=0; d<dof_handler.selected_fe->dofs_per_vertex; ++d)
+		    cell->set_vertex_dof_index (vertex, d, next_free_dof++);
+    
+					     // for the lines
+	    if (dof_handler.selected_fe->dofs_per_line > 0)
+	      for (unsigned int l=0; l<GeometryInfo<3>::lines_per_cell; ++l)
+		{
+		  typename DoFHandler<3,spacedim>::line_iterator
+		    line = cell->line(l);
+	
+						   // distribute dofs if necessary:
+						   // check whether line dof is already
+						   // numbered (check only first dof)
+		  if (line->dof_index(0) == DoFHandler<3,spacedim>::invalid_dof_index)
+						     // if not: distribute dofs
+		    for (unsigned int d=0; d<dof_handler.selected_fe->dofs_per_line; ++d)
+		      line->set_dof_index (d, next_free_dof++);	    
+		}
+
+					     // for the quads
+	    if (dof_handler.selected_fe->dofs_per_quad > 0)
+	      for (unsigned int q=0; q<GeometryInfo<3>::quads_per_cell; ++q)
+		{
+		  typename DoFHandler<3,spacedim>::quad_iterator
+		    quad = cell->quad(q);
+	
+						   // distribute dofs if necessary:
+						   // check whether quad dof is already
+						   // numbered (check only first dof)
+		  if (quad->dof_index(0) == DoFHandler<3,spacedim>::invalid_dof_index)
+						     // if not: distribute dofs
+		    for (unsigned int d=0; d<dof_handler.selected_fe->dofs_per_quad; ++d)
+		      quad->set_dof_index (d, next_free_dof++);	    
+		}
+
+
+					     // dofs of hex
+	    if (dof_handler.selected_fe->dofs_per_hex > 0)
+	      for (unsigned int d=0; d<dof_handler.selected_fe->dofs_per_hex; ++d)
+		cell->set_dof_index (d, next_free_dof++);
+
+
+					     // note that this cell has been
+					     // processed
+	    cell->set_user_flag ();
+  
+	    return next_free_dof;
+	  }
+
+
+					 /**
+					  * Implementation of the general template
+					  * of same name.
+					  */
+	template <int spacedim>
+	static
+	void renumber_dofs (const std::vector<unsigned int> &new_numbers,
+			    DoFHandler<1,spacedim>          &dof_handler)
+	  {
+					     // note that we can not use cell
+					     // iterators in this function since
+					     // then we would renumber the dofs on
+					     // the interface of two cells more
+					     // than once. Anyway, this way it's
+					     // not only more correct but also
+					     // faster; note, however, that dof
+					     // numbers may be invalid_dof_index,
+					     // namely when the appropriate
+					     // vertex/line/etc is unused
 	    for (std::vector<unsigned int>::iterator
-		   i=dof_handler.levels[level]->quads.dofs.begin();
-		 i!=dof_handler.levels[level]->quads.dofs.end(); ++i)
-	      if (*i != invalid_dof_index)
+		   i=dof_handler.vertex_dofs.begin();
+		 i!=dof_handler.vertex_dofs.end(); ++i)
+	      if (*i != DoFHandler<1,spacedim>::invalid_dof_index)
 		*i = new_numbers[*i];
+	      else
+						 // if index is
+						 // invalid_dof_index:
+						 // check if this one
+						 // really is unused
+		Assert (dof_handler.tria
+			->vertex_used((i-dof_handler.vertex_dofs.begin()) /
+				      dof_handler.selected_fe->dofs_per_vertex)
+			== false,
+			ExcInternalError ());
+  
+	    for (unsigned int level=0; level<dof_handler.levels.size(); ++level) 
+	      for (std::vector<unsigned int>::iterator
+		     i=dof_handler.levels[level]->lines.dofs.begin();
+		   i!=dof_handler.levels[level]->lines.dofs.end(); ++i)
+		if (*i != DoFHandler<1,spacedim>::invalid_dof_index)
+		  *i = new_numbers[*i];
 	  }
-      }
+    
 
 
-    template <int spacedim>
-    static
-    void renumber_dofs (const std::vector<unsigned int> &new_numbers,
-			DoFHandler<3,spacedim>          &dof_handler)
-      {
-					 // note that we can not use cell
-					 // iterators in this function since
-					 // then we would renumber the dofs on
-					 // the interface of two cells more
-					 // than once. Anyway, this way it's
-					 // not only more correct but also
-					 // faster; note, however, that dof
-					 // numbers may be invalid_dof_index,
-					 // namely when the appropriate
-					 // vertex/line/etc is unused
-	for (std::vector<unsigned int>::iterator
-	       i=dof_handler.vertex_dofs.begin();
-	     i!=dof_handler.vertex_dofs.end(); ++i)
-	  if (*i != invalid_dof_index)
-	    *i = new_numbers[*i];
-	  else
-					     // if index is invalid_dof_index:
-					     // check if this one really is
-					     // unused
-	    Assert (dof_handler.tria
-		    ->vertex_used((i-dof_handler.vertex_dofs.begin()) /
-				  dof_handler.selected_fe->dofs_per_vertex)
-		    == false,
-		    ExcInternalError ());
-  
-	for (std::vector<unsigned int>::iterator
-	       i=dof_handler.faces->lines.dofs.begin();
-	     i!=dof_handler.faces->lines.dofs.end(); ++i)
-	  if (*i != invalid_dof_index)
-	    *i = new_numbers[*i];
-	for (std::vector<unsigned int>::iterator
-	       i=dof_handler.faces->quads.dofs.begin();
-	     i!=dof_handler.faces->quads.dofs.end(); ++i)
-	  if (*i != invalid_dof_index)
-	    *i = new_numbers[*i];
-  
-	for (unsigned int level=0; level<dof_handler.levels.size(); ++level) 
+	template <int spacedim>
+	static
+	void renumber_dofs (const std::vector<unsigned int> &new_numbers,
+			    DoFHandler<2,spacedim>          &dof_handler)
 	  {
+					     // note that we can not use cell
+					     // iterators in this function since
+					     // then we would renumber the dofs on
+					     // the interface of two cells more
+					     // than once. Anyway, this way it's
+					     // not only more correct but also
+					     // faster; note, however, that dof
+					     // numbers may be invalid_dof_index,
+					     // namely when the appropriate
+					     // vertex/line/etc is unused
 	    for (std::vector<unsigned int>::iterator
-		   i=dof_handler.levels[level]->hexes.dofs.begin();
-		 i!=dof_handler.levels[level]->hexes.dofs.end(); ++i)
-	      if (*i != invalid_dof_index)
+		   i=dof_handler.vertex_dofs.begin();
+		 i!=dof_handler.vertex_dofs.end(); ++i)
+	      if (*i != DoFHandler<2,spacedim>::invalid_dof_index)
 		*i = new_numbers[*i];
+	      else
+						 // if index is invalid_dof_index:
+						 // check if this one really is
+						 // unused
+		Assert (dof_handler.tria
+			->vertex_used((i-dof_handler.vertex_dofs.begin()) /
+				      dof_handler.selected_fe->dofs_per_vertex)
+			== false,
+			ExcInternalError ());
+  
+	    for (std::vector<unsigned int>::iterator
+		   i=dof_handler.faces->lines.dofs.begin();
+		 i!=dof_handler.faces->lines.dofs.end(); ++i)
+	      if (*i != DoFHandler<2,spacedim>::invalid_dof_index)
+		*i = new_numbers[*i];
+
+	    for (unsigned int level=0; level<dof_handler.levels.size(); ++level) 
+	      {
+		for (std::vector<unsigned int>::iterator
+		       i=dof_handler.levels[level]->quads.dofs.begin();
+		     i!=dof_handler.levels[level]->quads.dofs.end(); ++i)
+		  if (*i != DoFHandler<2,spacedim>::invalid_dof_index)
+		    *i = new_numbers[*i];
+	      }
 	  }
-      }
 
 
-
-				     /**
-				      * Implement the function of same name in
-				      * the mother class.
-				      */
-    template <int spacedim>
-    static
-    unsigned int
-    max_couplings_between_dofs (const DoFHandler<1,spacedim> &dof_handler)
-      {
-	return std::min(3*dof_handler.selected_fe->dofs_per_vertex +
-			2*dof_handler.selected_fe->dofs_per_line,
-			dof_handler.n_dofs());
-      }
-
-
-
-    template <int spacedim>
-    static
-    unsigned int
-    max_couplings_between_dofs (const DoFHandler<2,spacedim> &dof_handler)
-      {
-
-					 // get these numbers by drawing pictures
-					 // and counting...
-					 // example:
-					 //   |     |     |
-					 // --x-----x--x--X--
-					 //   |     |  |  |
-					 //   |     x--x--x
-					 //   |     |  |  |
-					 // --x--x--*--x--x--
-					 //   |  |  |     |
-					 //   x--x--x     |
-					 //   |  |  |     |
-					 // --X--x--x-----x--
-					 //   |     |     |
-					 // x = vertices connected with center vertex *;
-					 //   = total of 19
-					 // (the X vertices are connected with * if
-					 // the vertices adjacent to X are hanging
-					 // nodes)
-					 // count lines -> 28 (don't forget to count
-					 // mother and children separately!)
-	unsigned int max_couplings;
-	switch (dof_handler.tria->max_adjacent_cells())
+	template <int spacedim>
+	static
+	void renumber_dofs (const std::vector<unsigned int> &new_numbers,
+			    DoFHandler<3,spacedim>          &dof_handler)
 	  {
-	    case 4:
-		  max_couplings=19*dof_handler.selected_fe->dofs_per_vertex +
-				28*dof_handler.selected_fe->dofs_per_line +
-				8*dof_handler.selected_fe->dofs_per_quad;
-		  break;
-	    case 5:
-		  max_couplings=21*dof_handler.selected_fe->dofs_per_vertex +
-				31*dof_handler.selected_fe->dofs_per_line +
-				9*dof_handler.selected_fe->dofs_per_quad;
-		  break;
-	    case 6:
-		  max_couplings=28*dof_handler.selected_fe->dofs_per_vertex +
-				42*dof_handler.selected_fe->dofs_per_line +
-				12*dof_handler.selected_fe->dofs_per_quad;
-		  break;
-	    case 7:
-		  max_couplings=30*dof_handler.selected_fe->dofs_per_vertex +
-				45*dof_handler.selected_fe->dofs_per_line +
-				13*dof_handler.selected_fe->dofs_per_quad;
-		  break;
-	    case 8:
-		  max_couplings=37*dof_handler.selected_fe->dofs_per_vertex +
-				56*dof_handler.selected_fe->dofs_per_line +
-				16*dof_handler.selected_fe->dofs_per_quad;
-		  break;
-	    default:
-		  Assert (false, ExcNotImplemented());
-		  max_couplings=0;
+					     // note that we can not use cell
+					     // iterators in this function since
+					     // then we would renumber the dofs on
+					     // the interface of two cells more
+					     // than once. Anyway, this way it's
+					     // not only more correct but also
+					     // faster; note, however, that dof
+					     // numbers may be invalid_dof_index,
+					     // namely when the appropriate
+					     // vertex/line/etc is unused
+	    for (std::vector<unsigned int>::iterator
+		   i=dof_handler.vertex_dofs.begin();
+		 i!=dof_handler.vertex_dofs.end(); ++i)
+	      if (*i != DoFHandler<3,spacedim>::invalid_dof_index)
+		*i = new_numbers[*i];
+	      else
+						 // if index is invalid_dof_index:
+						 // check if this one really is
+						 // unused
+		Assert (dof_handler.tria
+			->vertex_used((i-dof_handler.vertex_dofs.begin()) /
+				      dof_handler.selected_fe->dofs_per_vertex)
+			== false,
+			ExcInternalError ());
+  
+	    for (std::vector<unsigned int>::iterator
+		   i=dof_handler.faces->lines.dofs.begin();
+		 i!=dof_handler.faces->lines.dofs.end(); ++i)
+	      if (*i != DoFHandler<3,spacedim>::invalid_dof_index)
+		*i = new_numbers[*i];
+	    for (std::vector<unsigned int>::iterator
+		   i=dof_handler.faces->quads.dofs.begin();
+		 i!=dof_handler.faces->quads.dofs.end(); ++i)
+	      if (*i != DoFHandler<3,spacedim>::invalid_dof_index)
+		*i = new_numbers[*i];
+  
+	    for (unsigned int level=0; level<dof_handler.levels.size(); ++level) 
+	      {
+		for (std::vector<unsigned int>::iterator
+		       i=dof_handler.levels[level]->hexes.dofs.begin();
+		     i!=dof_handler.levels[level]->hexes.dofs.end(); ++i)
+		  if (*i != DoFHandler<3,spacedim>::invalid_dof_index)
+		    *i = new_numbers[*i];
+	      }
 	  }
-	return std::min(max_couplings,dof_handler.n_dofs());
-      }
 
 
-    template <int spacedim>
-    static
-    unsigned int
-    max_couplings_between_dofs (const DoFHandler<3,spacedim> &dof_handler)
-      {
+
+					 /**
+					  * Implement the function of same name in
+					  * the mother class.
+					  */
+	template <int spacedim>
+	static
+	unsigned int
+	max_couplings_between_dofs (const DoFHandler<1,spacedim> &dof_handler)
+	  {
+	    return std::min(3*dof_handler.selected_fe->dofs_per_vertex +
+			    2*dof_handler.selected_fe->dofs_per_line,
+			    dof_handler.n_dofs());
+	  }
+
+
+
+	template <int spacedim>
+	static
+	unsigned int
+	max_couplings_between_dofs (const DoFHandler<2,spacedim> &dof_handler)
+	  {
+
+					     // get these numbers by drawing pictures
+					     // and counting...
+					     // example:
+					     //   |     |     |
+					     // --x-----x--x--X--
+					     //   |     |  |  |
+					     //   |     x--x--x
+					     //   |     |  |  |
+					     // --x--x--*--x--x--
+					     //   |  |  |     |
+					     //   x--x--x     |
+					     //   |  |  |     |
+					     // --X--x--x-----x--
+					     //   |     |     |
+					     // x = vertices connected with center vertex *;
+					     //   = total of 19
+					     // (the X vertices are connected with * if
+					     // the vertices adjacent to X are hanging
+					     // nodes)
+					     // count lines -> 28 (don't forget to count
+					     // mother and children separately!)
+	    unsigned int max_couplings;
+	    switch (dof_handler.tria->max_adjacent_cells())
+	      {
+		case 4:
+		      max_couplings=19*dof_handler.selected_fe->dofs_per_vertex +
+				    28*dof_handler.selected_fe->dofs_per_line +
+				    8*dof_handler.selected_fe->dofs_per_quad;
+		      break;
+		case 5:
+		      max_couplings=21*dof_handler.selected_fe->dofs_per_vertex +
+				    31*dof_handler.selected_fe->dofs_per_line +
+				    9*dof_handler.selected_fe->dofs_per_quad;
+		      break;
+		case 6:
+		      max_couplings=28*dof_handler.selected_fe->dofs_per_vertex +
+				    42*dof_handler.selected_fe->dofs_per_line +
+				    12*dof_handler.selected_fe->dofs_per_quad;
+		      break;
+		case 7:
+		      max_couplings=30*dof_handler.selected_fe->dofs_per_vertex +
+				    45*dof_handler.selected_fe->dofs_per_line +
+				    13*dof_handler.selected_fe->dofs_per_quad;
+		      break;
+		case 8:
+		      max_couplings=37*dof_handler.selected_fe->dofs_per_vertex +
+				    56*dof_handler.selected_fe->dofs_per_line +
+				    16*dof_handler.selected_fe->dofs_per_quad;
+		      break;
+		default:
+		      Assert (false, ExcNotImplemented());
+		      max_couplings=0;
+	      }
+	    return std::min(max_couplings,dof_handler.n_dofs());
+	  }
+
+
+	template <int spacedim>
+	static
+	unsigned int
+	max_couplings_between_dofs (const DoFHandler<3,spacedim> &dof_handler)
+	  {
 //TODO:[?] Invent significantly better estimates than the ones in this function  
 
-					 // doing the same thing here is a
-					 // rather complicated thing, compared
-					 // to the 2d case, since it is hard
-					 // to draw pictures with several
-					 // refined hexahedra :-) so I
-					 // presently only give a coarse
-					 // estimate for the case that at most
-					 // 8 hexes meet at each vertex
-					 //
-					 // can anyone give better estimate
-					 // here?
-	const unsigned int max_adjacent_cells
-	  = dof_handler.tria->max_adjacent_cells();
+					     // doing the same thing here is a
+					     // rather complicated thing, compared
+					     // to the 2d case, since it is hard
+					     // to draw pictures with several
+					     // refined hexahedra :-) so I
+					     // presently only give a coarse
+					     // estimate for the case that at most
+					     // 8 hexes meet at each vertex
+					     //
+					     // can anyone give better estimate
+					     // here?
+	    const unsigned int max_adjacent_cells
+	      = dof_handler.tria->max_adjacent_cells();
 
-	unsigned int max_couplings;
-	if (max_adjacent_cells <= 8)
-	  max_couplings=7*7*7*dof_handler.selected_fe->dofs_per_vertex +
-			7*6*7*3*dof_handler.selected_fe->dofs_per_line +
-			9*4*7*3*dof_handler.selected_fe->dofs_per_quad +
-			27*dof_handler.selected_fe->dofs_per_hex;
-	else
-	  {
-	    Assert (false, ExcNotImplemented());
-	    max_couplings=0;
-	  }
+	    unsigned int max_couplings;
+	    if (max_adjacent_cells <= 8)
+	      max_couplings=7*7*7*dof_handler.selected_fe->dofs_per_vertex +
+			    7*6*7*3*dof_handler.selected_fe->dofs_per_line +
+			    9*4*7*3*dof_handler.selected_fe->dofs_per_quad +
+			    27*dof_handler.selected_fe->dofs_per_hex;
+	    else
+	      {
+		Assert (false, ExcNotImplemented());
+		max_couplings=0;
+	      }
   
-	return std::min(max_couplings,dof_handler.n_dofs());
-      }
+	    return std::min(max_couplings,dof_handler.n_dofs());
+	  }
 
 
- 				     /**
-				      * Reserve enough space in the 
-				      * <tt>levels[]</tt> objects to store the
-				      * numbers of the degrees of freedom
-				      * needed for the given element. The
-				      * given element is that one which
-				      * was selected when calling
-				      * @p distribute_dofs the last time.
-				      */
-    template <int spacedim>
-    static
-    void reserve_space (DoFHandler<1,spacedim> &dof_handler)
-      {  
-	dof_handler.vertex_dofs
-	  .resize(dof_handler.tria->n_vertices() *
-		  dof_handler.selected_fe->dofs_per_vertex,
-		  invalid_dof_index);
+					 /**
+					  * Reserve enough space in the 
+					  * <tt>levels[]</tt> objects to store the
+					  * numbers of the degrees of freedom
+					  * needed for the given element. The
+					  * given element is that one which
+					  * was selected when calling
+					  * @p distribute_dofs the last time.
+					  */
+	template <int spacedim>
+	static
+	void reserve_space (DoFHandler<1,spacedim> &dof_handler)
+	  {  
+	    dof_handler.vertex_dofs
+	      .resize(dof_handler.tria->n_vertices() *
+		      dof_handler.selected_fe->dofs_per_vertex,
+		      DoFHandler<1,spacedim>::invalid_dof_index);
     
-	for (unsigned int i=0; i<dof_handler.tria->n_levels(); ++i) 
-	  {
-	    dof_handler.levels
-	      .push_back (new internal::DoFHandler::DoFLevel<1>);
+	    for (unsigned int i=0; i<dof_handler.tria->n_levels(); ++i) 
+	      {
+		dof_handler.levels
+		  .push_back (new internal::DoFHandler::DoFLevel<1>);
 
-	    dof_handler.levels.back()->lines.dofs
-	      .resize (dof_handler.tria->n_raw_lines(i) *
+		dof_handler.levels.back()->lines.dofs
+		  .resize (dof_handler.tria->n_raw_lines(i) *
+			   dof_handler.selected_fe->dofs_per_line,
+			   DoFHandler<1,spacedim>::invalid_dof_index);
+
+		dof_handler.levels.back()->cell_dof_indices_cache
+		  .resize (dof_handler.tria->n_raw_lines(i) *
+			   dof_handler.selected_fe->dofs_per_cell,
+			   DoFHandler<1,spacedim>::invalid_dof_index);
+	      }
+	  }
+
+    
+	template <int spacedim>
+	static
+	void reserve_space (DoFHandler<2,spacedim> &dof_handler)
+	  {
+	    dof_handler.vertex_dofs
+	      .resize(dof_handler.tria->n_vertices() *
+		      dof_handler.selected_fe->dofs_per_vertex,
+		      DoFHandler<2,spacedim>::invalid_dof_index);
+
+	    for (unsigned int i=0; i<dof_handler.tria->n_levels(); ++i) 
+	      {
+		dof_handler.levels.push_back (new internal::DoFHandler::DoFLevel<2>);
+
+		dof_handler.levels.back()->quads.dofs
+		  .resize (dof_handler.tria->n_raw_quads(i) *
+			   dof_handler.selected_fe->dofs_per_quad,
+			   DoFHandler<2,spacedim>::invalid_dof_index);
+
+		dof_handler.levels.back()->cell_dof_indices_cache
+		  .resize (dof_handler.tria->n_raw_quads(i) *
+			   dof_handler.selected_fe->dofs_per_cell,
+			   DoFHandler<2,spacedim>::invalid_dof_index);
+	      }
+
+	    dof_handler.faces = new internal::DoFHandler::DoFFaces<2>;
+	    dof_handler.faces->lines.dofs
+	      .resize (dof_handler.tria->n_raw_lines() *
 		       dof_handler.selected_fe->dofs_per_line,
-		       invalid_dof_index);
-
-	    dof_handler.levels.back()->cell_dof_indices_cache
-	      .resize (dof_handler.tria->n_raw_lines(i) *
-		       dof_handler.selected_fe->dofs_per_cell,
-		       invalid_dof_index);
+		       DoFHandler<2,spacedim>::invalid_dof_index);
 	  }
-      }
 
     
-    template <int spacedim>
-    static
-    void reserve_space (DoFHandler<2,spacedim> &dof_handler)
-      {
-	dof_handler.vertex_dofs
-	  .resize(dof_handler.tria->n_vertices() *
-		  dof_handler.selected_fe->dofs_per_vertex,
-		  invalid_dof_index);
-
-	for (unsigned int i=0; i<dof_handler.tria->n_levels(); ++i) 
+	template <int spacedim>
+	static
+	void reserve_space (DoFHandler<3,spacedim> &dof_handler)
 	  {
-	    dof_handler.levels.push_back (new internal::DoFHandler::DoFLevel<2>);
+	    dof_handler.vertex_dofs
+	      .resize(dof_handler.tria->n_vertices() *
+		      dof_handler.selected_fe->dofs_per_vertex,
+		      DoFHandler<3,spacedim>::invalid_dof_index);
 
-	    dof_handler.levels.back()->quads.dofs
-	      .resize (dof_handler.tria->n_raw_quads(i) *
-		       dof_handler.selected_fe->dofs_per_quad,
-		       invalid_dof_index);
+	    for (unsigned int i=0; i<dof_handler.tria->n_levels(); ++i) 
+	      {
+		dof_handler.levels.push_back (new internal::DoFHandler::DoFLevel<3>);
 
-	    dof_handler.levels.back()->cell_dof_indices_cache
-	      .resize (dof_handler.tria->n_raw_quads(i) *
-		       dof_handler.selected_fe->dofs_per_cell,
-		       invalid_dof_index);
-	  }
+		dof_handler.levels.back()->hexes.dofs
+		  .resize (dof_handler.tria->n_raw_hexs(i) *
+			   dof_handler.selected_fe->dofs_per_hex,
+			   DoFHandler<3,spacedim>::invalid_dof_index);
 
-	dof_handler.faces = new internal::DoFHandler::DoFFaces<2>;
-	dof_handler.faces->lines.dofs
-	  .resize (dof_handler.tria->n_raw_lines() *
-		   dof_handler.selected_fe->dofs_per_line,
-		   invalid_dof_index);
-      }
-
-    
-    template <int spacedim>
-    static
-    void reserve_space (DoFHandler<3,spacedim> &dof_handler)
-      {
-	dof_handler.vertex_dofs
-	  .resize(dof_handler.tria->n_vertices() *
-		  dof_handler.selected_fe->dofs_per_vertex,
-		  invalid_dof_index);
-
-	for (unsigned int i=0; i<dof_handler.tria->n_levels(); ++i) 
-	  {
-	    dof_handler.levels.push_back (new internal::DoFHandler::DoFLevel<3>);
-
-	    dof_handler.levels.back()->hexes.dofs
-	      .resize (dof_handler.tria->n_raw_hexs(i) *
-		       dof_handler.selected_fe->dofs_per_hex,
-		       invalid_dof_index);
-
-	    dof_handler.levels.back()->cell_dof_indices_cache
-	      .resize (dof_handler.tria->n_raw_hexs(i) *
-		       dof_handler.selected_fe->dofs_per_cell,
-		       invalid_dof_index);
-	  }
-	dof_handler.faces = new internal::DoFHandler::DoFFaces<3>;
+		dof_handler.levels.back()->cell_dof_indices_cache
+		  .resize (dof_handler.tria->n_raw_hexs(i) *
+			   dof_handler.selected_fe->dofs_per_cell,
+			   DoFHandler<3,spacedim>::invalid_dof_index);
+	      }
+	    dof_handler.faces = new internal::DoFHandler::DoFFaces<3>;
   
-	dof_handler.faces->lines.dofs
-	  .resize (dof_handler.tria->n_raw_lines() *
-		   dof_handler.selected_fe->dofs_per_line,
-		   invalid_dof_index);
-	dof_handler.faces->quads.dofs
-	  .resize (dof_handler.tria->n_raw_quads() *
-		   dof_handler.selected_fe->dofs_per_quad,
-		   invalid_dof_index);
-      }
+	    dof_handler.faces->lines.dofs
+	      .resize (dof_handler.tria->n_raw_lines() *
+		       dof_handler.selected_fe->dofs_per_line,
+		       DoFHandler<3,spacedim>::invalid_dof_index);
+	    dof_handler.faces->quads.dofs
+	      .resize (dof_handler.tria->n_raw_quads() *
+		       dof_handler.selected_fe->dofs_per_quad,
+		       DoFHandler<3,spacedim>::invalid_dof_index);
+	  }
 
-				     /**
-				      * Implementations of the
-				      * get_dof_index/set_dof_index functions.
-				      */
-    template <int spacedim>
-    static
-    unsigned int
-    get_dof_index (const DoFHandler<1,spacedim>   &dof_handler,
-		   const unsigned int              obj_level,
-		   const unsigned int              obj_index,
-		   const unsigned int              fe_index,
-		   const unsigned int              local_index,
-		   internal::int2type<1>)
-      {
-	return dof_handler.levels[obj_level]->lines.
-	  get_dof_index (dof_handler,
-			 obj_index,
-			 fe_index,
-			 local_index);
-      }
+					 /**
+					  * Implementations of the
+					  * get_dof_index/set_dof_index functions.
+					  */
+	template <int spacedim>
+	static
+	unsigned int
+	get_dof_index (const DoFHandler<1,spacedim>   &dof_handler,
+		       const unsigned int              obj_level,
+		       const unsigned int              obj_index,
+		       const unsigned int              fe_index,
+		       const unsigned int              local_index,
+		       internal::int2type<1>)
+	  {
+	    return dof_handler.levels[obj_level]->lines.
+	      get_dof_index (dof_handler,
+			     obj_index,
+			     fe_index,
+			     local_index);
+	  }
 
 
-    template <int spacedim>
-    static
-    void
-    set_dof_index (const DoFHandler<1,spacedim>   &dof_handler,
-		   const unsigned int              obj_level,
-		   const unsigned int              obj_index,
-		   const unsigned int              fe_index,
-		   const unsigned int              local_index,
-		   internal::int2type<1>,
-		   const unsigned int              global_index)
-      {
-	dof_handler.levels[obj_level]->lines.
-	  set_dof_index (dof_handler,
-			 obj_index,
-			 fe_index,
-			 local_index,
-			 global_index);
-      }
+	template <int spacedim>
+	static
+	void
+	set_dof_index (const DoFHandler<1,spacedim>   &dof_handler,
+		       const unsigned int              obj_level,
+		       const unsigned int              obj_index,
+		       const unsigned int              fe_index,
+		       const unsigned int              local_index,
+		       internal::int2type<1>,
+		       const unsigned int              global_index)
+	  {
+	    dof_handler.levels[obj_level]->lines.
+	      set_dof_index (dof_handler,
+			     obj_index,
+			     fe_index,
+			     local_index,
+			     global_index);
+	  }
     
 
-    template <int spacedim>
-    static
-    unsigned int
-    get_dof_index (const DoFHandler<2,spacedim>   &dof_handler,
-		   const unsigned int              obj_level,
-		   const unsigned int              obj_index,
-		   const unsigned int              fe_index,
-		   const unsigned int              local_index,
-		   internal::int2type<1>)
-      {
-					 // faces have no levels
-	Assert (obj_level == 0, ExcInternalError());
-	return dof_handler.faces->lines.
-	  get_dof_index (dof_handler,
-			 obj_index,
-			 fe_index,
-			 local_index);
-      }
+	template <int spacedim>
+	static
+	unsigned int
+	get_dof_index (const DoFHandler<2,spacedim>   &dof_handler,
+		       const unsigned int              obj_level,
+		       const unsigned int              obj_index,
+		       const unsigned int              fe_index,
+		       const unsigned int              local_index,
+		       internal::int2type<1>)
+	  {
+					     // faces have no levels
+	    Assert (obj_level == 0, ExcInternalError());
+	    return dof_handler.faces->lines.
+	      get_dof_index (dof_handler,
+			     obj_index,
+			     fe_index,
+			     local_index);
+	  }
 
 
-    template <int spacedim>
-    static
-    void
-    set_dof_index (const DoFHandler<2,spacedim>   &dof_handler,
-		   const unsigned int              obj_level,
-		   const unsigned int              obj_index,
-		   const unsigned int              fe_index,
-		   const unsigned int              local_index,
-		   internal::int2type<1>,
-		   const unsigned int              global_index)
-      {
-					 // faces have no levels
-	Assert (obj_level == 0, ExcInternalError());
-	dof_handler.faces->lines.
-	  set_dof_index (dof_handler,
-			 obj_index,
-			 fe_index,
-			 local_index,
-			 global_index);
-      }
+	template <int spacedim>
+	static
+	void
+	set_dof_index (const DoFHandler<2,spacedim>   &dof_handler,
+		       const unsigned int              obj_level,
+		       const unsigned int              obj_index,
+		       const unsigned int              fe_index,
+		       const unsigned int              local_index,
+		       internal::int2type<1>,
+		       const unsigned int              global_index)
+	  {
+					     // faces have no levels
+	    Assert (obj_level == 0, ExcInternalError());
+	    dof_handler.faces->lines.
+	      set_dof_index (dof_handler,
+			     obj_index,
+			     fe_index,
+			     local_index,
+			     global_index);
+	  }
     
     
-    template <int spacedim>
-    static
-    unsigned int
-    get_dof_index (const DoFHandler<2,spacedim>   &dof_handler,
-		   const unsigned int              obj_level,
-		   const unsigned int              obj_index,
-		   const unsigned int              fe_index,
-		   const unsigned int              local_index,
-		   internal::int2type<2>)
-      {
-	return dof_handler.levels[obj_level]->quads.
-	  get_dof_index (dof_handler,
-			 obj_index,
-			 fe_index,
-			 local_index);
-      }
+	template <int spacedim>
+	static
+	unsigned int
+	get_dof_index (const DoFHandler<2,spacedim>   &dof_handler,
+		       const unsigned int              obj_level,
+		       const unsigned int              obj_index,
+		       const unsigned int              fe_index,
+		       const unsigned int              local_index,
+		       internal::int2type<2>)
+	  {
+	    return dof_handler.levels[obj_level]->quads.
+	      get_dof_index (dof_handler,
+			     obj_index,
+			     fe_index,
+			     local_index);
+	  }
 
 
-    template <int spacedim>
-    static
-    void
-    set_dof_index (const DoFHandler<2,spacedim>   &dof_handler,
-		   const unsigned int              obj_level,
-		   const unsigned int              obj_index,
-		   const unsigned int              fe_index,
-		   const unsigned int              local_index,
-		   internal::int2type<2>,
-		   const unsigned int              global_index)
-      {
-	dof_handler.levels[obj_level]->quads.
-	  set_dof_index (dof_handler,
-			 obj_index,
-			 fe_index,
-			 local_index,
-			 global_index);
-      }
+	template <int spacedim>
+	static
+	void
+	set_dof_index (const DoFHandler<2,spacedim>   &dof_handler,
+		       const unsigned int              obj_level,
+		       const unsigned int              obj_index,
+		       const unsigned int              fe_index,
+		       const unsigned int              local_index,
+		       internal::int2type<2>,
+		       const unsigned int              global_index)
+	  {
+	    dof_handler.levels[obj_level]->quads.
+	      set_dof_index (dof_handler,
+			     obj_index,
+			     fe_index,
+			     local_index,
+			     global_index);
+	  }
 
 
-    template <int spacedim>
-    static
-    unsigned int
-    get_dof_index (const DoFHandler<3,spacedim>   &dof_handler,
-		   const unsigned int              obj_level,
-		   const unsigned int              obj_index,
-		   const unsigned int              fe_index,
-		   const unsigned int              local_index,
-		   internal::int2type<1>)
-      {
-					 // faces have no levels
-	Assert (obj_level == 0, ExcInternalError());
-	return dof_handler.faces->lines.
-	  get_dof_index (dof_handler,
-			 obj_index,
-			 fe_index,
-			 local_index);
-      }
+	template <int spacedim>
+	static
+	unsigned int
+	get_dof_index (const DoFHandler<3,spacedim>   &dof_handler,
+		       const unsigned int              obj_level,
+		       const unsigned int              obj_index,
+		       const unsigned int              fe_index,
+		       const unsigned int              local_index,
+		       internal::int2type<1>)
+	  {
+					     // faces have no levels
+	    Assert (obj_level == 0, ExcInternalError());
+	    return dof_handler.faces->lines.
+	      get_dof_index (dof_handler,
+			     obj_index,
+			     fe_index,
+			     local_index);
+	  }
 
 
-    template <int spacedim>
-    static
-    void
-    set_dof_index (const DoFHandler<3,spacedim>   &dof_handler,
-		   const unsigned int              obj_level,
-		   const unsigned int              obj_index,
-		   const unsigned int              fe_index,
-		   const unsigned int              local_index,
-		   internal::int2type<1>,
-		   const unsigned int              global_index)
-      {
-					 // faces have no levels
-	Assert (obj_level == 0, ExcInternalError());
-	dof_handler.faces->lines.
-	  set_dof_index (dof_handler,
-			 obj_index,
-			 fe_index,
-			 local_index,
-			 global_index);
-      }
-
-
-
-    template <int spacedim>
-    static
-    unsigned int
-    get_dof_index (const DoFHandler<3,spacedim>   &dof_handler,
-		   const unsigned int              obj_level,
-		   const unsigned int              obj_index,
-		   const unsigned int              fe_index,
-		   const unsigned int              local_index,
-		   internal::int2type<2>)
-      {
-					 // faces have no levels
-	Assert (obj_level == 0, ExcInternalError());
-	return dof_handler.faces->quads.
-	  get_dof_index (dof_handler,
-			 obj_index,
-			 fe_index,
-			 local_index);
-      }
-
-
-    template <int spacedim>
-    static
-    void
-    set_dof_index (const DoFHandler<3,spacedim>   &dof_handler,
-		   const unsigned int              obj_level,
-		   const unsigned int              obj_index,
-		   const unsigned int              fe_index,
-		   const unsigned int              local_index,
-		   internal::int2type<2>,
-		   const unsigned int              global_index)
-      {
-					 // faces have no levels
-	Assert (obj_level == 0, ExcInternalError());
-	dof_handler.faces->quads.
-	  set_dof_index (dof_handler,
-			 obj_index,
-			 fe_index,
-			 local_index,
-			 global_index);
-      }
+	template <int spacedim>
+	static
+	void
+	set_dof_index (const DoFHandler<3,spacedim>   &dof_handler,
+		       const unsigned int              obj_level,
+		       const unsigned int              obj_index,
+		       const unsigned int              fe_index,
+		       const unsigned int              local_index,
+		       internal::int2type<1>,
+		       const unsigned int              global_index)
+	  {
+					     // faces have no levels
+	    Assert (obj_level == 0, ExcInternalError());
+	    dof_handler.faces->lines.
+	      set_dof_index (dof_handler,
+			     obj_index,
+			     fe_index,
+			     local_index,
+			     global_index);
+	  }
 
 
 
-    template <int spacedim>
-    static
-    unsigned int
-    get_dof_index (const DoFHandler<3,spacedim>   &dof_handler,
-		   const unsigned int              obj_level,
-		   const unsigned int              obj_index,
-		   const unsigned int              fe_index,
-		   const unsigned int              local_index,
-		   internal::int2type<3>)
-      {
-	return dof_handler.levels[obj_level]->hexes.
-	  get_dof_index (dof_handler,
-			 obj_index,
-			 fe_index,
-			 local_index);	
-      }
+	template <int spacedim>
+	static
+	unsigned int
+	get_dof_index (const DoFHandler<3,spacedim>   &dof_handler,
+		       const unsigned int              obj_level,
+		       const unsigned int              obj_index,
+		       const unsigned int              fe_index,
+		       const unsigned int              local_index,
+		       internal::int2type<2>)
+	  {
+					     // faces have no levels
+	    Assert (obj_level == 0, ExcInternalError());
+	    return dof_handler.faces->quads.
+	      get_dof_index (dof_handler,
+			     obj_index,
+			     fe_index,
+			     local_index);
+	  }
 
 
-    template <int spacedim>
-    static
-    void
-    set_dof_index (const DoFHandler<3,spacedim>   &dof_handler,
-		   const unsigned int              obj_level,
-		   const unsigned int              obj_index,
-		   const unsigned int              fe_index,
-		   const unsigned int              local_index,
-		   internal::int2type<3>,
-		   const unsigned int              global_index)
-      {
-	dof_handler.levels[obj_level]->hexes.
-	  set_dof_index (dof_handler,
-			 obj_index,
-			 fe_index,
-			 local_index,
-			 global_index);
-      }
-};
+	template <int spacedim>
+	static
+	void
+	set_dof_index (const DoFHandler<3,spacedim>   &dof_handler,
+		       const unsigned int              obj_level,
+		       const unsigned int              obj_index,
+		       const unsigned int              fe_index,
+		       const unsigned int              local_index,
+		       internal::int2type<2>,
+		       const unsigned int              global_index)
+	  {
+					     // faces have no levels
+	    Assert (obj_level == 0, ExcInternalError());
+	    dof_handler.faces->quads.
+	      set_dof_index (dof_handler,
+			     obj_index,
+			     fe_index,
+			     local_index,
+			     global_index);
+	  }
+
+
+
+	template <int spacedim>
+	static
+	unsigned int
+	get_dof_index (const DoFHandler<3,spacedim>   &dof_handler,
+		       const unsigned int              obj_level,
+		       const unsigned int              obj_index,
+		       const unsigned int              fe_index,
+		       const unsigned int              local_index,
+		       internal::int2type<3>)
+	  {
+	    return dof_handler.levels[obj_level]->hexes.
+	      get_dof_index (dof_handler,
+			     obj_index,
+			     fe_index,
+			     local_index);	
+	  }
+
+
+	template <int spacedim>
+	static
+	void
+	set_dof_index (const DoFHandler<3,spacedim>   &dof_handler,
+		       const unsigned int              obj_level,
+		       const unsigned int              obj_index,
+		       const unsigned int              fe_index,
+		       const unsigned int              local_index,
+		       internal::int2type<3>,
+		       const unsigned int              global_index)
+	  {
+	    dof_handler.levels[obj_level]->hexes.
+	      set_dof_index (dof_handler,
+			     obj_index,
+			     fe_index,
+			     local_index,
+			     global_index);
+	  }
+    };
+  }
+}
 
 
 
@@ -1930,7 +1945,7 @@ DoFHandler<dim,spacedim>::get_dof_index (const unsigned int       obj_level,
 					 const unsigned int       local_index) const
 {
   return 
-    Implementation::get_dof_index (*this,
+    internal::DoFHandler::Implementation::get_dof_index (*this,
 				   obj_level, obj_index,
 				   fe_index, local_index,
 				   internal::int2type<structdim>());
@@ -1947,7 +1962,7 @@ DoFHandler<dim,spacedim>::set_dof_index (const unsigned int       obj_level,
 					 const unsigned int       local_index,
 					 const unsigned int       global_index) const
 {
-  Implementation::set_dof_index (*this,
+  internal::DoFHandler::Implementation::set_dof_index (*this,
 				 obj_level, obj_index,
 				 fe_index, local_index,
 				 internal::int2type<structdim>(),
@@ -2170,7 +2185,7 @@ void DoFHandler<dim,spacedim>::distribute_dofs (const FiniteElement<dim,spacedim
                                    // troublesome if you want to change
                                    // their size
   clear_space ();
-  Implementation::reserve_space (*this);
+  internal::DoFHandler::Implementation::reserve_space (*this);
 
 				   // Clear user flags because we will
 				   // need them. But first we save
@@ -2190,7 +2205,7 @@ void DoFHandler<dim,spacedim>::distribute_dofs (const FiniteElement<dim,spacedim
 
   for (; cell != endc; ++cell) 
     next_free_dof
-      = Implementation::distribute_dofs_on_cell (*this, cell, next_free_dof);
+      = internal::DoFHandler::Implementation::distribute_dofs_on_cell (*this, cell, next_free_dof);
 
   used_dofs = next_free_dof;
 
@@ -2239,7 +2254,7 @@ renumber_dofs (const std::vector<unsigned int> &new_numbers)
 #endif
 
   
-  Implementation::renumber_dofs (new_numbers, *this);
+  internal::DoFHandler::Implementation::renumber_dofs (new_numbers, *this);
 
 				   // update the cache used for cell dof
 				   // indices
@@ -2256,7 +2271,7 @@ DoFHandler<dim,spacedim>::max_couplings_between_dofs () const
 {
   Assert (selected_fe != 0, ExcNoFESelected());
 
-  return Implementation::max_couplings_between_dofs (*this);
+  return internal::DoFHandler::Implementation::max_couplings_between_dofs (*this);
 }
 
 

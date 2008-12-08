@@ -36,6 +36,19 @@ namespace internal
     template <int> class DoFLevel;
     template <int> class DoFFaces;
     template <int> class DoFObjects;
+
+    namespace DoFHandler
+    {
+      struct Implementation;
+    }
+  }
+}
+
+namespace internal
+{
+  namespace DoFCellAccessor
+  {
+    struct Implementation;
   }
 }
 
@@ -1253,25 +1266,12 @@ namespace hp
                                         */
       std::vector<std::vector<bool> *> has_children;
 
-				       /**
-					* Forward declaration of a class
-					* into which we put significant
-					* parts of the implementation.
-					*
-					* See the .cc file for more
-					* information.
-					*/
-      struct Implementation;
-      
                                        /**
                                         * Make accessor objects friends.
                                         */
-      template <int structdim, class DH> friend class dealii::DoFAccessor;
-
-                                       /**
-                                        * Make accessor objects friends.
-                                        */
-      template <class DH> friend class dealii::DoFCellAccessor;
+      template <int, class> friend class dealii::DoFAccessor;
+      template <class> friend class dealii::DoFCellAccessor;
+      friend class internal::DoFCellAccessor::Implementation;
 
                                        /**
                                         * Likewise for DoFLevel
@@ -1283,7 +1283,7 @@ namespace hp
       template <int> friend class internal::hp::DoFLevel;
       template <int> friend class internal::hp::DoFObjects;
 
-      friend class Triangulation<dim,spacedim>::Implementation;
+      friend class internal::hp::DoFHandler::Implementation;
   };
 
 
