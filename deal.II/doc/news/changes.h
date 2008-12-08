@@ -143,6 +143,16 @@ inconvenience this causes.
 
 <ol>
   <li>
+  <p>
+  Updated: The version of the <a href="http://www.boost.org/">BOOST</a>
+  library that is in the <code>contrib/</code> directory and is used in
+  various places of the library has been upgraded to 1.37.
+  <br>
+  (WB 2008/12/07)
+  </p>
+  </li>
+
+  <li>
   New: Based on work by Cataldo Manigrasso and Luca Heltai
   developed over the last few months on a branch, deal.II now
   supports meshes that are embedded in higher space
@@ -263,6 +273,16 @@ inconvenience this causes.
   different components of a vector-valued solution.
   <br>
   (Yaqi Wang 2008/09/10)
+  </p>
+  </li>
+
+  <li>
+  <p>
+  New: Contributed by Tobias Leicht as well as Ralf Hartmann, deal.II
+  now supports anisotropic refinement of meshes. This functionality
+  is explained in the @ref step_30 "step-30" tutorial program.
+  <br>
+  (Tobias Leicht, RH 2008/07/08)
   </p>
   </li>
 
