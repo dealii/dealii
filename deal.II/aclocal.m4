@@ -5737,9 +5737,9 @@ AC_DEFUN(DEAL_II_CONFIGURE_TRILINOS, dnl
      ],
      [
         dnl Take something from the environment variables, if it is there
-        if test "x$TRILINOS_DIR" != "x" ; then
+        if test "x$TRILINOS_LIBDIR" != "x" ; then
   	  USE_CONTRIB_TRILINOS=yes
-	  DEAL_II_TRILINOS_LIBDIR="$TRILINOS_DIR"
+	  DEAL_II_TRILINOS_LIBDIR="$TRILINOS_LIBDIR"
 	  AC_MSG_RESULT($DEAL_II_TRILINOS_LIBDIR)
 
           dnl Make sure that what this is actually correct
@@ -5749,7 +5749,7 @@ AC_DEFUN(DEAL_II_CONFIGURE_TRILINOS, dnl
  			  point to a complete Trilinos installation])
 	  fi
         else
-          dnl --with-trilinos-include not explicitly specified. do
+          dnl --with-trilinos-libs not explicitly specified. do
 	  dnl nothing if --with-trilinos has previously been specified,
 	  dnl otherwise say no to trilinos
           if test "x${USE_CONTRIB_TRILINOS}" != "xyes" ; then
