@@ -1070,36 +1070,6 @@ namespace hp
 			      const unsigned int fe_index) const;      
       
 				       /**
-					* Number of active fe-indices,
-					* calls the respective
-					* function in DoFObjects
-					*/
-      template <int structdim>
-      unsigned int n_active_fe_indices (const unsigned int obj_level,
-					const unsigned int obj_index) const;
-      
-				       /**
-					* Return the fe index of the
-					* n-th active finite element on
-					* this object.
-					*/
-      template <int structdim>
-      unsigned int nth_active_fe_index (const unsigned int obj_level,
-					const unsigned int obj_index,
-					const unsigned int n) const;
-
-				       /**
-					* Return whether fe-index is
-					* an active fe, calls the
-					* respective function in
-					* DoFObjects
-					*/
-      template <int structdim>
-      bool fe_index_is_active (const unsigned int obj_level,
-			       const unsigned int obj_index,
-			       const unsigned int fe_index) const;
-
-				       /**
 					* Compute identities between
 					* DoFs located on
 					* vertices. Called from
@@ -1263,7 +1233,6 @@ namespace hp
                                         */
       template <int> friend class internal::hp::DoFLevel;
       template <int> friend class internal::hp::DoFObjects;
-
       friend class internal::hp::DoFHandler::Implementation;
   };
 

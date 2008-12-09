@@ -1120,43 +1120,6 @@ class DoFHandler  :  public Subscriptor
     get_vertex_dof_index (const unsigned int vertex_index,
 			  const unsigned int fe_index,
 			  const unsigned int local_index) const;
-
-				     /**
-				      * Return the number of active
-				      * fe-indices on the given
-				      * object. Since we have a non-hp
-				      * handler here, this function
-				      * always returns 1.
-				      */
-    template <int structdim>
-    unsigned int n_active_fe_indices (const unsigned int obj_level,
-				      const unsigned int obj_index) const;
-
-				     /**
-				      * Return the fe index of the
-				      * n-th active finite element on
-				      * this object. Since this is a
-				      * non-hp object, there is
-				      * exactly one active fe index;
-				      * the function therefore asserts
-				      * that @p n equals zero, and the
-				      * returns default_fe_index.
-				      */
-    template <int structdim>
-    unsigned int nth_active_fe_index (const unsigned int obj_level,
-				      const unsigned int obj_index,
-				      const unsigned int n) const;
-    
-				     /**
-				      * Return, wether fe-index is an
-				      * active fe, calls the
-				      * respective function in
-				      * DoFObjects
-				      */
-    template <int structdim>
-    bool fe_index_is_active (const unsigned int obj_level,
-			     const unsigned int obj_index,
-			     const unsigned int fe_index) const;
            
 				     /**
 				      * Space to store the DoF numbers
@@ -1287,103 +1250,8 @@ set_vertex_dof_index (const unsigned int vertex_index,
 			selected_fe->dofs_per_vertex));
 
   vertex_dofs[vertex_index * selected_fe->dofs_per_vertex + local_index] = global_index;
-}  
-
-
-
-template <int dim, int spacedim>
-template <int structdim>
-inline
-bool
-DoFHandler<dim,spacedim>::fe_index_is_active (const unsigned int,
-				     const unsigned int,
-				     const unsigned int fe_index) const
-{
-  return (fe_index == 0);
 }
 
-
-
-template <int dim, int spacedim>
-template <int structdim>
-inline
-unsigned int
-DoFHandler<dim,spacedim>::n_active_fe_indices (const unsigned int obj_level,
-				      const unsigned int obj_index) const
-{
-				   // check that the object we look at is in
-				   // fact active. the problem is that we have
-				   // templatized on the dimensionality of the
-				   // object, so it may be a cell, a face, or
-				   // a line. we have a bit of trouble doing
-				   // this all in the generic case, so only
-				   // check if it is either a cell or a
-				   // line. the only case this leaves out is
-				   // faces in 3d -- let's hope that this
-				   // never is a problem
-  Assert ((dim==structdim
-	   ?
-	   raw_cell_iterator (tria,
-			      obj_level,
-			      obj_index,
-			      this)->used()
-	   :
-	   (structdim==1
-	    ?
-	    raw_line_iterator (tria,
-			       obj_level,
-			       obj_index,
-			       this)->used()
-	    :
-	    true))
-	  == true,
-	  ExcMessage ("This cell is not active and therefore can't be "
-		      "queried for the number of active FE indices"));
-  return 1;
-}
-
-
-
-template <int dim, int spacedim>
-template <int structdim>
-inline
-unsigned int
-DoFHandler<dim,spacedim>::nth_active_fe_index (const unsigned int obj_level,
-				      const unsigned int obj_index,
-				      const unsigned int n) const
-{
-				   // check that the object we look at is in
-				   // fact active. the problem is that we have
-				   // templatized on the dimensionality of the
-				   // object, so it may be a cell, a face, or
-				   // a line. we have a bit of trouble doing
-				   // this all in the generic case, so only
-				   // check if it is either a cell or a
-				   // line. the only case this leaves out is
-				   // faces in 3d -- let's hope that this
-				   // never is a problem
-  Assert ((dim==structdim
-	   ?
-	   raw_cell_iterator (tria,
-			      obj_level,
-			      obj_index,
-			      this)->used()
-	   :
-	   (structdim==1
-	    ?
-	    raw_line_iterator (tria,
-			       obj_level,
-			       obj_index,
-			       this)->used()
-	    :
-	    true))
-	  == true,
-	  ExcMessage ("This cell is not active and therefore can't be "
-		      "queried for its active FE indices"));
-  Assert (n == 0, ExcIndexRange (n, 0, 1));
-  
-  return default_fe_index;
-}
 
 
 #endif // DOXYGEN

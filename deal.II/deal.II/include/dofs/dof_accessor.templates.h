@@ -697,6 +697,398 @@ namespace internal
 			     global_index,
 			     obj_level);  
 	  }
+
+
+	template <int structdim, int dim, int spacedim>
+	static
+	bool
+	fe_index_is_active (const dealii::DoFHandler<dim,spacedim> &,
+			    const unsigned int,
+			    const unsigned int,
+			    const unsigned int fe_index,
+			    const internal::int2type<structdim> &)
+	  {
+	    return (fe_index == 0);
+	  }
+
+
+
+	template <int structdim, int dim, int spacedim>
+	static
+	unsigned int
+	n_active_fe_indices (const dealii::DoFHandler<dim,spacedim> &dof_handler,
+			     const unsigned int obj_level,
+			     const unsigned int obj_index,
+			     const internal::int2type<structdim> &)
+	  {
+					     // check that the object we look
+					     // at is in fact active. the
+					     // problem is that we have
+					     // templatized on the
+					     // dimensionality of the object,
+					     // so it may be a cell, a face,
+					     // or a line. we have a bit of
+					     // trouble doing this all in the
+					     // generic case, so only check if
+					     // it is either a cell or a
+					     // line. the only case this
+					     // leaves out is faces in 3d --
+					     // let's hope that this never is
+					     // a problem
+	    Assert ((dim==structdim
+		     ?
+		     typename
+		     dealii::DoFHandler<dim,spacedim>::
+		     raw_cell_iterator (&dof_handler.get_tria(),
+					obj_level,
+					obj_index,
+					&dof_handler)->used()
+		     :
+		     (structdim==1
+		      ?
+		      typename
+		      dealii::DoFHandler<dim,spacedim>::
+		      raw_line_iterator (&dof_handler.get_tria(),
+					 obj_level,
+					 obj_index,
+					 &dof_handler)->used()
+		      :
+		      true))
+		    == true,
+		    ExcMessage ("This cell is not active and therefore can't be "
+				"queried for its active FE indices"));
+	    return 1;
+	  }
+
+
+
+	template <int structdim, int dim, int spacedim>
+	static
+	unsigned int
+	nth_active_fe_index (const dealii::DoFHandler<dim,spacedim> &dof_handler,
+			     const unsigned int obj_level,
+			     const unsigned int obj_index,
+			     const unsigned int n,
+			     const internal::int2type<structdim> &)
+	  {
+					     // check that the object we look
+					     // at is in fact active. the
+					     // problem is that we have
+					     // templatized on the
+					     // dimensionality of the object,
+					     // so it may be a cell, a face,
+					     // or a line. we have a bit of
+					     // trouble doing this all in the
+					     // generic case, so only check if
+					     // it is either a cell or a
+					     // line. the only case this
+					     // leaves out is faces in 3d --
+					     // let's hope that this never is
+					     // a problem
+	    Assert ((dim==structdim
+		     ?
+		     typename
+		     dealii::DoFHandler<dim,spacedim>::
+		     raw_cell_iterator (&dof_handler.get_tria(),
+					obj_level,
+					obj_index,
+					&dof_handler)->used()
+		     :
+		     (structdim==1
+		      ?
+		      typename
+		      dealii::DoFHandler<dim,spacedim>::
+		      raw_line_iterator (&dof_handler.get_tria(),
+					 obj_level,
+					 obj_index,
+					 &dof_handler)->used()
+		      :
+		      true))
+		    == true,
+		    ExcMessage ("This cell is not active and therefore can't be "
+				"queried for its active FE indices"));
+	    Assert (n == 0, ExcIndexRange (n, 0, 1));
+  
+	    return dealii::DoFHandler<dim,spacedim>::default_fe_index;
+	  }
+	
+
+	template <int spacedim>
+	static
+	bool
+	fe_index_is_active (const dealii::hp::DoFHandler<1,spacedim> &dof_handler,
+			    const unsigned int obj_level,
+			    const unsigned int obj_index,
+			    const unsigned int fe_index,
+			    const internal::int2type<1> &)
+	  {
+	    return dof_handler.levels[obj_level]->lines.fe_index_is_active(dof_handler,
+									   obj_index,
+									   fe_index,
+									   obj_level);
+	  }
+
+
+	template <int spacedim>
+	static
+	unsigned int
+	n_active_fe_indices (const dealii::hp::DoFHandler<1,spacedim> &dof_handler,
+			     const unsigned int obj_level,
+			     const unsigned int obj_index,
+			     const internal::int2type<1> &)
+	  {
+	    return dof_handler.levels[obj_level]->lines.n_active_fe_indices (dof_handler,
+									     obj_index);
+	  }
+
+
+
+	template <int spacedim>
+	static
+	unsigned int
+	nth_active_fe_index (const dealii::hp::DoFHandler<1,spacedim> &dof_handler,
+			     const unsigned int obj_level,
+			     const unsigned int obj_index,
+			     const unsigned int n,
+			     const internal::int2type<1> &)
+	  {
+	    return dof_handler.levels[obj_level]->lines.nth_active_fe_index (dof_handler,
+									     obj_level,
+									     obj_index,
+									     n);
+	  }
+
+
+	template <int spacedim>
+	static
+	bool
+	fe_index_is_active (const dealii::hp::DoFHandler<2,spacedim> &dof_handler,
+			    const unsigned int obj_level,
+			    const unsigned int obj_index,
+			    const unsigned int fe_index,
+			    const internal::int2type<1> &)
+	  {
+	    return dof_handler.faces->lines.fe_index_is_active(dof_handler,
+							       obj_index,
+							       fe_index,
+							       obj_level);
+	  }
+
+
+	template <int spacedim>
+	static
+	unsigned int
+	n_active_fe_indices (const dealii::hp::DoFHandler<2,spacedim> &dof_handler,
+			     const unsigned int ,
+			     const unsigned int obj_index,
+			     const internal::int2type<1> &)
+	  {
+	    return dof_handler.faces->lines.n_active_fe_indices (dof_handler,
+								 obj_index);
+	  }
+
+
+	template <int spacedim>
+	static
+	unsigned int
+	nth_active_fe_index (const dealii::hp::DoFHandler<2,spacedim> &dof_handler,
+			     const unsigned int obj_level,
+			     const unsigned int obj_index,
+			     const unsigned int n,
+			     const internal::int2type<1> &)
+	  {
+	    return dof_handler.faces->lines.nth_active_fe_index (dof_handler,
+								 obj_level,
+								 obj_index,
+								 n);
+	  }
+
+  
+
+	template <int spacedim>
+	static
+	bool
+	fe_index_is_active (const dealii::hp::DoFHandler<2,spacedim> &dof_handler,
+			    const unsigned int obj_level,
+			    const unsigned int obj_index,
+			    const unsigned int fe_index,
+			    const internal::int2type<2> &)
+	  {
+	    return dof_handler.levels[obj_level]->quads.fe_index_is_active(dof_handler,
+									   obj_index,
+									   fe_index,
+									   obj_level);
+	  }
+
+
+	template <int spacedim>
+	static
+	unsigned int
+	n_active_fe_indices (const dealii::hp::DoFHandler<2,spacedim> &dof_handler,
+			     const unsigned int obj_level,
+			     const unsigned int obj_index,
+			     const internal::int2type<2> &)
+	  {
+	    return dof_handler.levels[obj_level]->quads.n_active_fe_indices (dof_handler,
+									     obj_index);
+	  }
+
+
+
+	template <int spacedim>
+	static
+	unsigned int
+	nth_active_fe_index (const dealii::hp::DoFHandler<2,spacedim> &dof_handler,
+			     const unsigned int obj_level,
+			     const unsigned int obj_index,
+			     const unsigned int n,
+			     const internal::int2type<2> &)
+	  {
+	    return dof_handler.levels[obj_level]->quads.nth_active_fe_index (dof_handler,
+									     obj_level,
+									     obj_index,
+									     n);
+	  }
+
+
+
+	template <int spacedim>
+	static
+	bool
+	fe_index_is_active (const dealii::hp::DoFHandler<3,spacedim> &dof_handler,
+			    const unsigned int obj_level,
+			    const unsigned int obj_index,
+			    const unsigned int fe_index,
+			    const internal::int2type<1> &)
+	  {
+	    return dof_handler.faces->lines.fe_index_is_active(dof_handler,
+							       obj_index,
+							       fe_index,
+							       obj_level);
+	  }
+
+
+	template <int spacedim>
+	static
+	unsigned int
+	n_active_fe_indices (const dealii::hp::DoFHandler<3,spacedim> &dof_handler,
+			     const unsigned int,
+			     const unsigned int obj_index,
+			     const internal::int2type<1> &)
+	  {
+	    return dof_handler.faces->lines.n_active_fe_indices (dof_handler,
+								 obj_index);
+	  }
+
+
+
+	template <int spacedim>
+	static
+	unsigned int
+	nth_active_fe_index (const dealii::hp::DoFHandler<3,spacedim> &dof_handler,
+			     const unsigned int obj_level,
+			     const unsigned int obj_index,
+			     const unsigned int n,
+			     const internal::int2type<1> &)
+	  {
+	    return dof_handler.faces->lines.nth_active_fe_index (dof_handler,
+								 obj_level,
+								 obj_index,
+								 n);
+	  }
+
+
+
+	template <int spacedim>
+	static
+	bool
+	fe_index_is_active (const dealii::hp::DoFHandler<3,spacedim> &dof_handler,
+			    const unsigned int obj_level,
+			    const unsigned int obj_index,
+			    const unsigned int fe_index,
+			    const internal::int2type<2> &)
+	  {
+	    return dof_handler.faces->quads.fe_index_is_active(dof_handler,
+							       obj_index,
+							       fe_index,
+							       obj_level);
+	  }
+
+	template <int spacedim>
+	static
+	bool
+	fe_index_is_active (const dealii::hp::DoFHandler<3,spacedim> &dof_handler,
+			    const unsigned int obj_level,
+			    const unsigned int obj_index,
+			    const unsigned int fe_index,
+			    const internal::int2type<3> &)
+	  {
+	    return dof_handler.levels[obj_level]->hexes.fe_index_is_active(dof_handler,
+									   obj_index,
+									   fe_index,
+									   obj_level);
+	  }
+
+
+	template <int spacedim>
+	static
+	unsigned int
+	n_active_fe_indices (const dealii::hp::DoFHandler<3,spacedim> &dof_handler,
+			     const unsigned int ,
+			     const unsigned int obj_index,
+			     const internal::int2type<2> &)
+	  {
+	    return dof_handler.faces->quads.n_active_fe_indices (dof_handler,
+								 obj_index);
+	  }
+
+
+
+	template <int spacedim>
+	static
+	unsigned int
+	nth_active_fe_index (const dealii::hp::DoFHandler<3,spacedim> &dof_handler,
+			     const unsigned int obj_level,
+			     const unsigned int obj_index,
+			     const unsigned int n,
+			     const internal::int2type<2> &)
+	  {
+	    return dof_handler.faces->quads.nth_active_fe_index (dof_handler,
+								 obj_level,
+								 obj_index,
+								 n);
+	  }
+
+
+
+	template <int spacedim>
+	static
+	unsigned int
+	n_active_fe_indices (const dealii::hp::DoFHandler<3,spacedim> &dof_handler,
+			     const unsigned int obj_level,
+			     const unsigned int obj_index,
+			     const internal::int2type<3> &)
+	  {
+	    return dof_handler.levels[obj_level]->hexes.n_active_fe_indices (dof_handler,
+									     obj_index);
+	  }
+
+
+
+	template <int spacedim>
+	static
+	unsigned int
+	nth_active_fe_index (const dealii::hp::DoFHandler<3,spacedim> &dof_handler,
+			     const unsigned int obj_level,
+			     const unsigned int obj_index,
+			     const unsigned int n,
+			     const internal::int2type<3> &)
+	  {
+	    return dof_handler.levels[obj_level]->hexes.nth_active_fe_index (dof_handler,
+									     obj_level,
+									     obj_index,
+									     n);
+	  }
     };
   }
 }
@@ -745,9 +1137,12 @@ unsigned int
 DoFAccessor<dim,DH>::n_active_fe_indices () const
 {
 				   // access the respective DoF
-  return this->dof_handler
-    ->template n_active_fe_indices<dim> (this->level(),
-					 this->present_index);
+  return
+    internal::DoFAccessor::Implementation::
+    n_active_fe_indices (*this->dof_handler,
+			      this->level(),
+			      this->present_index,
+			      internal::int2type<dim>());
 }
 
 
@@ -758,10 +1153,13 @@ unsigned int
 DoFAccessor<dim,DH>::nth_active_fe_index (const unsigned int n) const
 {
 				   // access the respective DoF
-  return this->dof_handler
-    ->template nth_active_fe_index<dim> (this->level(),
-					 this->present_index,
-					 n);
+  return
+    internal::DoFAccessor::Implementation::
+    nth_active_fe_index (*this->dof_handler,
+			      this->level(),
+			      this->present_index,
+			      n,
+			      internal::int2type<dim>());
 }
 
 
@@ -772,10 +1170,13 @@ bool
 DoFAccessor<dim,DH>::fe_index_is_active (const unsigned int fe_index) const
 {
 				   // access the respective DoF
-  return this->dof_handler
-    ->template fe_index_is_active<dim> (this->level(),
-					this->present_index,
-					fe_index);
+  return
+    internal::DoFAccessor::Implementation::
+    fe_index_is_active (*this->dof_handler,
+			this->level(),
+			this->present_index,
+			fe_index,
+			internal::int2type<dim>());
 }
 
 
