@@ -648,7 +648,11 @@ void FEValuesBase<dim,spacedim>::get_function_values (
 
       if (fe->is_primitive(shape_func))
 	{
-	  const double *shape_value_ptr = &this->shape_values(shape_func, 0);
+	  const unsigned int 
+	    row = fe->is_primitive() ? 
+	          shape_func : this->shape_function_to_row_table[shape_func];
+
+	  const double *shape_value_ptr = &this->shape_values(row, 0);
 	  const unsigned int comp = fe->system_to_component_index(shape_func).first;
 	  for (unsigned int point=0; point<n_quadrature_points; ++point)
 	    values[point](comp) += value * *shape_value_ptr++;
@@ -732,7 +736,11 @@ void FEValuesBase<dim,spacedim>::get_function_values (
 
 	if (fe->is_primitive(shape_func))
 	  {
-	    const double *shape_value_ptr = &this->shape_values(shape_func, 0);
+	    const unsigned int 
+	      row = fe->is_primitive() ? 
+	            shape_func : this->shape_function_to_row_table[shape_func];
+
+	    const double *shape_value_ptr = &this->shape_values(row, 0);
 	    const unsigned int comp = fe->system_to_component_index(shape_func).first 
 	                               + mc * n_components;
 	    for (unsigned int point=0; point<n_quadrature_points; ++point)
@@ -830,7 +838,11 @@ void FEValuesBase<dim,spacedim>::get_function_values (
 
 	if (fe->is_primitive(shape_func))
 	  {
-	    const double *shape_value_ptr = &this->shape_values(shape_func, 0);
+	    const unsigned int 
+	      row = fe->is_primitive() ? 
+	            shape_func : this->shape_function_to_row_table[shape_func];
+
+	    const double *shape_value_ptr = &this->shape_values(row, 0);
 	    const unsigned int comp = fe->system_to_component_index(shape_func).first 
 	                               + mc * n_components;
 	    if (quadrature_points_fastest)
@@ -996,8 +1008,11 @@ FEValuesBase<dim,spacedim>::get_function_gradients (
 
       if (fe->is_primitive(shape_func))
 	{
+	  const unsigned int 
+	    row = fe->is_primitive() ? 
+	          shape_func : this->shape_function_to_row_table[shape_func];
 	  const Tensor<1,spacedim> *shape_gradient_ptr 
-	    = &this->shape_gradients[shape_func][0];
+	    = &this->shape_gradients[row][0];
 	  const unsigned int comp = fe->system_to_component_index(shape_func).first;
 	  for (unsigned int point=0; point<n_quadrature_points; ++point)
 	    gradients[point][comp] += value * *shape_gradient_ptr++;
@@ -1094,8 +1109,11 @@ void FEValuesBase<dim,spacedim>::get_function_gradients (
 
 	if (fe->is_primitive(shape_func))
 	  {
+	    const unsigned int 
+	      row = fe->is_primitive() ? 
+	            shape_func : this->shape_function_to_row_table[shape_func];
 	    const Tensor<1,spacedim> *shape_gradient_ptr 
-	      = &this->shape_gradients[shape_func][0];
+	      = &this->shape_gradients[row][0];
 	    const unsigned int comp = fe->system_to_component_index(shape_func).first
 	                               + mc * n_components;
 
@@ -1259,8 +1277,12 @@ get_function_hessians (const InputVector                         &fe_function,
 
       if (fe->is_primitive(shape_func))
 	{
+	  const unsigned int 
+	    row = fe->is_primitive() ? 
+	          shape_func : this->shape_function_to_row_table[shape_func];
+
 	  const Tensor<2,spacedim> *shape_hessian_ptr 
-	    = &this->shape_hessians[shape_func][0];
+	    = &this->shape_hessians[row][0];
 	  const unsigned int comp = fe->system_to_component_index(shape_func).first;
 
 	  if (quadrature_points_fastest)
@@ -1366,8 +1388,12 @@ void FEValuesBase<dim, spacedim>::get_function_hessians (
 
 	if (fe->is_primitive(shape_func))
 	  {
+	    const unsigned int 
+	      row = fe->is_primitive() ? 
+	            shape_func : this->shape_function_to_row_table[shape_func];
+
 	    const Tensor<2,spacedim> *shape_hessian_ptr 
-	      = &this->shape_hessians[shape_func][0];
+	      = &this->shape_hessians[row][0];
 	    const unsigned int comp = fe->system_to_component_index(shape_func).first
 	                               + mc * n_components;
 
