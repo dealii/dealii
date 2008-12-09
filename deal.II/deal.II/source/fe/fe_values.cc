@@ -755,7 +755,7 @@ void FEValuesBase<dim,spacedim>::get_function_values (
 	      const unsigned int comp = c + mc * n_components;
 	    
 	      for (unsigned int point=0; point<n_quadrature_points; ++point)
-		values[point](c) += value * *shape_value_ptr++;
+		values[point](comp) += value * *shape_value_ptr++;
 	    }
       }
 }
