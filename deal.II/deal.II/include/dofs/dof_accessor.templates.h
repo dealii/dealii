@@ -172,36 +172,6 @@ DoFAccessor<structdim,DH>::child (const unsigned int i) const
 
 
 
-template <int structdim, class DH>
-inline
-unsigned int
-DoFAccessor<structdim, DH>::vertex_dof_index (const unsigned int vertex,
-					      const unsigned int i,
-					      const unsigned int fe_index) const
-{
-  return this->dof_handler->get_vertex_dof_index (this->vertex_index(vertex),
-						  fe_index,
-						  i);
-}
-
-
-
-template <int structdim, class DH>
-inline
-void
-DoFAccessor<structdim, DH>::set_vertex_dof_index (const unsigned int vertex,
-						  const unsigned int i,
-						  const unsigned int index,
-						  const unsigned int fe_index) const
-{
-  this->dof_handler->set_vertex_dof_index (this->vertex_index(vertex),
-					   fe_index,
-					   i,
-					   index);
-}
-
-
-
 namespace internal
 {
   namespace DoFAccessor
@@ -1089,6 +1059,344 @@ namespace internal
 									     obj_index,
 									     n);
 	  }
+
+					 /**
+					  * Set the @p local_index-th
+					  * degree of freedom
+					  * corresponding to the finite
+					  * element specified by @p
+					  * fe_index on the vertex with
+					  * global number @p
+					  * vertex_index to @p
+					  * global_index.
+					  */
+	template <int dim, int spacedim>
+	static
+	void
+	set_vertex_dof_index (dealii::DoFHandler<dim,spacedim> &dof_handler,
+			      const unsigned int vertex_index,
+			      const unsigned int fe_index,
+			      const unsigned int local_index,
+			      const unsigned int global_index)
+	  {
+	    Assert ((fe_index == dealii::DoFHandler<dim,spacedim>::default_fe_index),
+		    ExcMessage ("Only the default FE index is allowed for non-hp DoFHandler objects"));
+	    Assert (dof_handler.selected_fe != 0,
+		    ExcMessage ("No finite element collection is associated with "
+				"this DoFHandler"));
+	    Assert (local_index < dof_handler.selected_fe->dofs_per_vertex,
+		    ExcIndexRange(local_index, 0,
+				  dof_handler.selected_fe->dofs_per_vertex));
+
+	    dof_handler.vertex_dofs[vertex_index *
+				    dof_handler.selected_fe->dofs_per_vertex
+				    + local_index]
+	      = global_index;
+	  }
+
+
+	template <int dim, int spacedim>
+	static
+	void
+	set_vertex_dof_index (dealii::hp::DoFHandler<dim,spacedim> &dof_handler,
+			      const unsigned int vertex_index,
+			      const unsigned int fe_index,
+			      const unsigned int local_index,
+			      const unsigned int global_index)
+	  {
+	    Assert ( (fe_index != dealii::hp::DoFHandler<dim,spacedim>::default_fe_index),
+		     ExcMessage ("You need to specify a FE index when working "
+				 "with hp DoFHandlers"));
+	    Assert (dof_handler.finite_elements != 0,
+		    ExcMessage ("No finite element collection is associated with "
+				"this DoFHandler"));
+	    Assert (local_index < (*dof_handler.finite_elements)[fe_index].dofs_per_vertex,
+		    ExcIndexRange(local_index, 0,
+				  (*dof_handler.finite_elements)[fe_index].dofs_per_vertex));
+	    Assert (fe_index < dof_handler.finite_elements->size(),
+		    ExcInternalError());
+	    Assert (dof_handler.vertex_dofs_offsets[vertex_index] !=
+		    numbers::invalid_unsigned_int,
+		    ExcMessage ("This vertex is unused and has no DoFs associated with it"));
+
+					     // hop along the list of index
+					     // sets until we find the one
+					     // with the correct fe_index, and
+					     // then poke into that
+					     // part. trigger an exception if
+					     // we can't find a set for this
+					     // particular fe_index
+	    const unsigned int starting_offset = dof_handler.vertex_dofs_offsets[vertex_index];
+	    unsigned int *pointer              = &dof_handler.vertex_dofs[starting_offset];
+	    while (true)
+	      {
+		Assert (pointer <= &dof_handler.vertex_dofs.back(), ExcInternalError());
+
+		const unsigned int this_fe_index = *pointer;
+	
+		Assert (this_fe_index != numbers::invalid_unsigned_int,
+			ExcInternalError());
+		Assert (this_fe_index < dof_handler.finite_elements->size(),
+			ExcInternalError());
+
+		if (this_fe_index == fe_index)
+		  {
+		    *(pointer + 1 + local_index) = global_index;
+		    return;
+		  }
+		else
+		  pointer += (*dof_handler.finite_elements)[this_fe_index].dofs_per_vertex + 1;
+	      }
+	  }
+	
+	
+					 /**
+					  * Get the @p local_index-th
+					  * degree of freedom
+					  * corresponding to the finite
+					  * element specified by @p
+					  * fe_index on the vertex with
+					  * global number @p
+					  * vertex_index to @p
+					  * global_index.
+					  */
+
+	template <int dim, int spacedim>
+	static
+	unsigned int
+	get_vertex_dof_index (const dealii::DoFHandler<dim,spacedim> &dof_handler,
+			      const unsigned int vertex_index,
+			      const unsigned int fe_index,
+			      const unsigned int local_index)
+	  {
+	    Assert ((fe_index == dealii::DoFHandler<dim,spacedim>::default_fe_index),
+		    ExcMessage ("Only the default FE index is allowed for non-hp DoFHandler objects"));
+	    Assert (dof_handler.selected_fe != 0,
+		    ExcMessage ("No finite element collection is associated with "
+				"this DoFHandler"));
+	    Assert (local_index < dof_handler.selected_fe->dofs_per_vertex,
+		    ExcIndexRange(local_index, 0,
+				  dof_handler.selected_fe->dofs_per_vertex));
+
+	    return
+	      dof_handler.vertex_dofs[vertex_index *
+				      dof_handler.selected_fe->dofs_per_vertex
+				      + local_index];
+	  }  
+
+
+	template<int dim, int spacedim>
+	static
+	unsigned int
+	get_vertex_dof_index (const dealii::hp::DoFHandler<dim,spacedim> &dof_handler,
+			      const unsigned int vertex_index,
+			      const unsigned int fe_index,
+			      const unsigned int local_index)
+	  {
+	    Assert ( (fe_index != dealii::hp::DoFHandler<dim,spacedim>::default_fe_index),
+		     ExcMessage ("You need to specify a FE index when working "
+				 "with hp DoFHandlers"));
+	    Assert (dof_handler.finite_elements != 0,
+		    ExcMessage ("No finite element collection is associated with "
+				"this DoFHandler"));
+	    Assert (local_index < (*dof_handler.finite_elements)[fe_index].dofs_per_vertex,
+		    ExcIndexRange(local_index, 0,
+				  (*dof_handler.finite_elements)[fe_index].dofs_per_vertex));
+	    Assert (vertex_index < dof_handler.vertex_dofs_offsets.size(),
+		    ExcIndexRange (vertex_index, 0,
+				   dof_handler.vertex_dofs_offsets.size()));
+	    Assert (dof_handler.vertex_dofs_offsets[vertex_index] !=
+		    numbers::invalid_unsigned_int,
+		    ExcMessage ("This vertex is unused and has no DoFs associated with it"));
+
+					     // hop along the list of index
+					     // sets until we find the one
+					     // with the correct fe_index, and
+					     // then poke into that
+					     // part. trigger an exception if
+					     // we can't find a set for this
+					     // particular fe_index
+	    const unsigned int starting_offset = dof_handler.vertex_dofs_offsets[vertex_index];
+	    const unsigned int *pointer        = &dof_handler.vertex_dofs[starting_offset];
+	    while (true)
+	      {
+		Assert (pointer <= &dof_handler.vertex_dofs.back(), ExcInternalError());
+
+		const unsigned int this_fe_index = *pointer;
+	
+		Assert (this_fe_index != numbers::invalid_unsigned_int,
+			ExcInternalError());
+		Assert (this_fe_index < dof_handler.finite_elements->size(),
+			ExcInternalError());
+
+		if (this_fe_index == fe_index)
+		  return *(pointer + 1 + local_index);
+		else
+		  pointer += (*dof_handler.finite_elements)[this_fe_index].dofs_per_vertex + 1;
+	      }
+	  }
+
+
+					 /**
+					  * Return the number of
+					  * different finite elements
+					  * that are active on a given
+					  * vertex.
+					  */
+	template<int dim, int spacedim>
+	static
+	unsigned int
+	n_active_vertex_fe_indices (const dealii::hp::DoFHandler<dim,spacedim> &dof_handler,
+				    const unsigned int vertex_index)
+	  {
+	    Assert (dof_handler.finite_elements != 0,
+		    ExcMessage ("No finite element collection is associated with "
+				"this DoFHandler"));
+
+					     // if this vertex is unused, return 0
+	    if (dof_handler.vertex_dofs_offsets[vertex_index] == numbers::invalid_unsigned_int)
+	      return 0;
+
+					     // hop along the list of index
+					     // sets and count the number of
+					     // hops
+	    const unsigned int starting_offset = dof_handler.vertex_dofs_offsets[vertex_index];
+	    const unsigned int *pointer        = &dof_handler.vertex_dofs[starting_offset];
+
+	    Assert (*pointer != numbers::invalid_unsigned_int,
+		    ExcInternalError());
+    
+	    unsigned int counter = 0;
+	    while (true)
+	      {
+		Assert (pointer <= &dof_handler.vertex_dofs.back(), ExcInternalError());
+
+		const unsigned int this_fe_index = *pointer;
+	
+		if (this_fe_index == numbers::invalid_unsigned_int)
+		  return counter;
+		else
+		  {
+		    pointer += (*dof_handler.finite_elements)[this_fe_index].dofs_per_vertex + 1;
+		    ++counter;
+		  }
+	      }
+	  }
+
+
+
+					 /**
+					  * Return the fe index of the
+					  * n-th finite element active
+					  * on a given vertex.
+					  */
+	template<int dim, int spacedim>
+	static
+	unsigned int
+	nth_active_vertex_fe_index (const dealii::hp::DoFHandler<dim,spacedim> &dof_handler,
+				    const unsigned int vertex_index,
+				    const unsigned int n)
+	  {
+	    Assert (dof_handler.finite_elements != 0,
+		    ExcMessage ("No finite element collection is associated with "
+				"this DoFHandler"));
+	    Assert (n < n_active_vertex_fe_indices(dof_handler, vertex_index),
+		    ExcIndexRange (n, 0, n_active_vertex_fe_indices(dof_handler,
+								    vertex_index)));
+					     // make sure we don't ask on
+					     // unused vertices
+	    Assert (dof_handler.vertex_dofs_offsets[vertex_index] !=
+		    numbers::invalid_unsigned_int,
+		    ExcInternalError());
+
+					     // hop along the list of index
+					     // sets and count the number of
+					     // hops
+	    const unsigned int starting_offset = dof_handler.vertex_dofs_offsets[vertex_index];
+	    const unsigned int *pointer        = &dof_handler.vertex_dofs[starting_offset];
+
+	    Assert (*pointer != numbers::invalid_unsigned_int,
+		    ExcInternalError());
+    
+	    unsigned int counter = 0;
+	    while (true)
+	      {
+		Assert (pointer <= &dof_handler.vertex_dofs.back(), ExcInternalError());
+
+		const unsigned int this_fe_index = *pointer;
+	
+		Assert (this_fe_index < dof_handler.finite_elements->size(),
+			ExcInternalError());
+
+		if (counter == n)
+		  return this_fe_index;
+
+		Assert (this_fe_index != numbers::invalid_unsigned_int,
+			ExcInternalError());
+	
+		pointer += (*dof_handler.finite_elements)[this_fe_index].dofs_per_vertex + 1;
+		++counter;	
+	      }
+	  }
+  
+
+
+					 /**
+					  * Return whether a particular
+					  * finite element index is
+					  * active on the specified
+					  * vertex.
+					  */
+	template<int dim, int spacedim>
+	static
+	bool
+	fe_is_active_on_vertex (const dealii::hp::DoFHandler<dim,spacedim> &dof_handler,
+				const unsigned int vertex_index,
+				const unsigned int fe_index)
+	  {
+	    Assert ( (fe_index != dealii::hp::DoFHandler<dim,spacedim>::default_fe_index),
+		     ExcMessage ("You need to specify a FE index when working "
+				 "with hp DoFHandlers"));
+	    Assert (dof_handler.finite_elements != 0,
+		    ExcMessage ("No finite element collection is associated with "
+				"this DoFHandler"));
+	    Assert (fe_index < dof_handler.finite_elements->size(),
+		    ExcInternalError());
+
+					     // make sure we don't ask on
+					     // unused vertices
+	    Assert (dof_handler.vertex_dofs_offsets[vertex_index] !=
+		    numbers::invalid_unsigned_int,
+		    ExcInternalError());
+
+					     // hop along the list of index
+					     // sets and see whether we find
+					     // the given index
+	    const unsigned int starting_offset = dof_handler.vertex_dofs_offsets[vertex_index];
+	    const unsigned int *pointer        = &dof_handler.vertex_dofs[starting_offset];
+
+	    Assert (*pointer != numbers::invalid_unsigned_int,
+		    ExcInternalError());
+    
+	    while (true)
+	      {
+		Assert (pointer <= &dof_handler.vertex_dofs.back(), ExcInternalError());
+
+		const unsigned int this_fe_index = *pointer;
+	
+		Assert (this_fe_index < dof_handler.finite_elements->size(),
+			ExcInternalError());
+
+		if (this_fe_index == numbers::invalid_unsigned_int)
+		  return false;
+		else
+		  if (this_fe_index == fe_index)
+		    return true;
+		  else
+		    pointer += (*dof_handler.finite_elements)[this_fe_index].dofs_per_vertex + 1;
+	      }
+	  }
+  
     };
   }
 }
@@ -1178,6 +1486,44 @@ DoFAccessor<dim,DH>::fe_index_is_active (const unsigned int fe_index) const
 			fe_index,
 			internal::int2type<dim>());
 }
+
+
+
+template <int structdim, class DH>
+inline
+unsigned int
+DoFAccessor<structdim, DH>::vertex_dof_index (const unsigned int vertex,
+					      const unsigned int i,
+					      const unsigned int fe_index) const
+{
+  return
+    internal::DoFAccessor::Implementation::get_vertex_dof_index
+    (*this->dof_handler,
+     this->vertex_index(vertex),
+     fe_index,
+     i);
+}
+
+
+
+template <int structdim, class DH>
+inline
+void
+DoFAccessor<structdim, DH>::set_vertex_dof_index (const unsigned int vertex,
+						  const unsigned int i,
+						  const unsigned int index,
+						  const unsigned int fe_index) const
+{
+  internal::DoFAccessor::Implementation::set_vertex_dof_index
+    (*this->dof_handler,
+     this->vertex_index(vertex),
+     fe_index,
+     i,
+     index);
+}
+
+
+
 
 
 

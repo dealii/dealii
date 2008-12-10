@@ -2959,11 +2959,14 @@ namespace hp
 	 ++vertex_index)
       {
 	const unsigned int n_active_fe_indices
-	  = n_active_vertex_fe_indices (vertex_index);
+	  = internal::DoFAccessor::Implementation::
+	  n_active_vertex_fe_indices (*this, vertex_index);
 	if (n_active_fe_indices > 1)
 	  {
 	    const unsigned int
-	      first_fe_index = nth_active_vertex_fe_index (vertex_index, 0);
+	      first_fe_index
+	      = internal::DoFAccessor::Implementation::
+	      nth_active_vertex_fe_index (*this, vertex_index, 0);
 
 					     // loop over all the
 					     // other FEs with which
@@ -2973,7 +2976,9 @@ namespace hp
 	    for (unsigned int f=1; f<n_active_fe_indices; ++f)
 	      {
 		const unsigned int
-		  other_fe_index = nth_active_vertex_fe_index (vertex_index, f);
+		  other_fe_index
+		  = internal::DoFAccessor::Implementation::
+		  nth_active_vertex_fe_index (*this, vertex_index, f);
 
 						 // make sure the
 						 // entry in the
@@ -3013,13 +3018,17 @@ namespace hp
 		for (unsigned int i=0; i<identities.size(); ++i)
 		  {
 		    const unsigned int lower_dof_index
-		      = get_vertex_dof_index (vertex_index,
-					      first_fe_index,
-					      identities[i].first);
+		      = internal::DoFAccessor::Implementation::
+		      get_vertex_dof_index (*this,
+					    vertex_index,
+					    first_fe_index,
+					    identities[i].first);
 		    const unsigned int higher_dof_index
-		      = get_vertex_dof_index (vertex_index,
-					      other_fe_index,
-					      identities[i].second);
+		      = internal::DoFAccessor::Implementation::
+		      get_vertex_dof_index (*this,
+					    vertex_index,
+					    other_fe_index,
+					    identities[i].second);
 
 		    Assert ((new_dof_indices[higher_dof_index] ==
 			     numbers::invalid_unsigned_int)
@@ -3547,20 +3556,30 @@ namespace hp
 	 ++vertex_index)
       {
 	const unsigned int n_active_fe_indices
-	  = n_active_vertex_fe_indices (vertex_index);
+	  = internal::DoFAccessor::Implementation::
+	  n_active_vertex_fe_indices (*this, vertex_index);
 
 	for (unsigned int f=0; f<n_active_fe_indices; ++f)
 	  {
 	    const unsigned int fe_index
-	      = nth_active_vertex_fe_index (vertex_index, f);
+	      = internal::DoFAccessor::Implementation::
+	      nth_active_vertex_fe_index (*this, vertex_index, f);
 
 	    for (unsigned int d=0; d<(*finite_elements)[fe_index].dofs_per_vertex; ++d)
-	      set_vertex_dof_index (vertex_index,
-				    fe_index,
-				    d,
-				    new_numbers[get_vertex_dof_index(vertex_index,
-								     fe_index,
-								     d)]);
+	      {
+		const unsigned int vertex_dof_index
+		  = internal::DoFAccessor::Implementation::
+		  get_vertex_dof_index(*this,
+				       vertex_index,
+				       fe_index,
+				       d);
+		internal::DoFAccessor::Implementation::
+		  set_vertex_dof_index (*this,
+					vertex_index,
+					fe_index,
+					d,
+					new_numbers[vertex_dof_index]);
+	      }
 	  }
       }
   }
