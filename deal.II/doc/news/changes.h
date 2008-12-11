@@ -600,7 +600,24 @@ inconvenience this causes.
 <ol>
   <li>
   <p>
-  Upgraded: The FunctionParser classes now use version 2.83. 
+  Improved: The FEValuesViews objects that one gets when writing things
+  like <code>fe_values[velocities]</code> (see @ref vector_valued) have
+  become a lot smarter. They now compute a significant amount of data
+  at creation time, rather than on the fly. This means that creating such
+  objects becomes more expensive but using them is cheaper. To offset this
+  cost, FEValuesBase objects now create all possible FEValuesViews objects
+  at creation time, rather than whenever you do things like
+  <code>fe_values[velocities]</code>, and simply return a reference to a
+  pre-generated object. This turns an $O(N)$ effort into an $O(1)$
+  effort, where $N$ is the number of cells.
+  <br>
+  (Luca Heltai 2008/12/08)
+  </p>
+
+  <li>
+  <p>
+  Upgraded: The FunctionParser classes now use version 2.83 of the fparser
+  library. 
   <br>
   (Luca Heltai 2008/12/08)
   </p>
