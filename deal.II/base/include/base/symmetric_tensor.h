@@ -2452,27 +2452,61 @@ outer_product (const SymmetricTensor<2,dim> &t1,
 
 
 /**
- * Return the symmetrized version of the full rank-2 tensor,
- * i.e. (t+transpose(t))/2, as a symmetric rank-2 tensor.
+ * Return the symmetrized version of a full rank-2 tensor,
+ * i.e. (t+transpose(t))/2, as a symmetric rank-2 tensor. This is the version
+ * for dim==1.
  *
  * @relates SymmetricTensor
  * @author Wolfgang Bangerth, 2005
  */
-template <int dim>
 inline
-SymmetricTensor<2,dim>
-symmetrize (const Tensor<2,dim> &t)
+SymmetricTensor<2,1>
+symmetrize (const Tensor<2,1> &t)
 {
-  SymmetricTensor<2,dim> s;
-  for (unsigned int i=0; i<dim; ++i)
-    {
-      s(TableIndices<2>(i,i)) = t[i][i];
-  
-      for (unsigned int j=i+1; j<dim; ++j)
-	s(TableIndices<2>(i,j))
-	  = (t[i][j] + t[j][i])/2;
-    }
-  return s;
+  const double array[1]
+    = { t[0][0] };
+  return SymmetricTensor<2,1>(array);
+}
+
+
+
+/**
+ * Return the symmetrized version of a full rank-2 tensor,
+ * i.e. (t+transpose(t))/2, as a symmetric rank-2 tensor. This is the version
+ * for dim==2.
+ *
+ * @relates SymmetricTensor
+ * @author Wolfgang Bangerth, 2005
+ */
+inline
+SymmetricTensor<2,2>
+symmetrize (const Tensor<2,2> &t)
+{
+  const double array[3]
+    = { t[0][0], t[1][1], (t[0][1] + t[1][0])/2 };
+  return SymmetricTensor<2,2>(array);
+}
+
+
+
+/**
+ * Return the symmetrized version of a full rank-2 tensor,
+ * i.e. (t+transpose(t))/2, as a symmetric rank-2 tensor. This is the version
+ * for dim==3.
+ *
+ * @relates SymmetricTensor
+ * @author Wolfgang Bangerth, 2005
+ */
+inline
+SymmetricTensor<2,3>
+symmetrize (const Tensor<2,3> &t)
+{
+  const double array[6]
+    = { t[0][0], t[1][1], t[2][2],
+	(t[0][1] + t[1][0])/2,
+	(t[0][2] + t[2][0])/2,
+	(t[1][2] + t[2][1])/2 };
+  return SymmetricTensor<2,3>(array);
 }
 
 
