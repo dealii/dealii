@@ -258,12 +258,6 @@ namespace FEValuesViews
 
 				       /**
 					* For each shape function, store
-					* whether it is primitive.
-					*/
-      std::vector<bool> is_primitive;
-
-				       /**
-					* For each shape function, store
 					* whether the selected vector
 					* component may be nonzero. For
 					* primitive shape functions we know
