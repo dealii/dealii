@@ -3581,15 +3581,11 @@ namespace FEValuesViews
     if (snc == -2)
       return divergence_type();
     else if (snc != -1)
-      {
-	divergence_type return_value;
-	return_value
-	  = fe_values.shape_gradients[snc][q_point][single_nonzero_component_index[shape_function]];
-	return return_value;
-      }
+      return
+	fe_values.shape_gradients[snc][q_point][single_nonzero_component_index[shape_function]];
     else
       {
-	divergence_type return_value;
+	divergence_type return_value = 0;
 	for (unsigned int d=0; d<dim; ++d)    
 	  if (is_nonzero_shape_function_component(shape_function,d))
 	    return_value
