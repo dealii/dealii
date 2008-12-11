@@ -3457,9 +3457,10 @@ namespace FEValuesViews
 				     // component as fixed and we have
 				     // pre-computed and cached a bunch of
 				     // information. see the comments there
-    if (shape_function_data[shape_function].is_nonzero_shape_function_component)
-      return fe_values.shape_values(shape_function_data[shape_function]
-				    .row_index,
+    const ShapeFunctionData &this_shape_function
+      = shape_function_data[shape_function];
+    if (this_shape_function.is_nonzero_shape_function_component)
+      return fe_values.shape_values(this_shape_function.row_index,
 				    q_point);
     else
       return 0;
@@ -3486,9 +3487,10 @@ namespace FEValuesViews
 				     // component as fixed and we have
 				     // pre-computed and cached a bunch of
 				     // information. see the comments there
-    if (shape_function_data[shape_function].is_nonzero_shape_function_component)
-      return fe_values.shape_gradients[shape_function_data[shape_function]
-				       .row_index][q_point];
+    const ShapeFunctionData &this_shape_function
+      = shape_function_data[shape_function];
+    if (this_shape_function.is_nonzero_shape_function_component)
+      return fe_values.shape_gradients[this_shape_function.row_index][q_point];
     else
       return gradient_type();
   }
@@ -3513,8 +3515,10 @@ namespace FEValuesViews
 				     // component as fixed and we have
 				     // pre-computed and cached a bunch of
 				     // information. see the comments there
-    if (shape_function_data[shape_function].is_nonzero_shape_function_component)
-      return fe_values.shape_hessians[shape_function_data[shape_function].row_index][q_point];
+    const ShapeFunctionData &this_shape_function
+      = shape_function_data[shape_function];
+    if (this_shape_function.is_nonzero_shape_function_component)
+      return fe_values.shape_hessians[this_shape_function.row_index][q_point];
     else
       return hessian_type();
   }
@@ -3535,13 +3539,15 @@ namespace FEValuesViews
 
 				     // same as for the scalar case except
 				     // that we have one more index
-    const int snc = shape_function_data[shape_function].single_nonzero_component;
+    const ShapeFunctionData &this_shape_function
+      = shape_function_data[shape_function];
+    const int snc = this_shape_function.single_nonzero_component;
     if (snc == -2)
       return value_type();
     else if (snc != -1)
       {
 	value_type return_value;
-	return_value[shape_function_data[shape_function].single_nonzero_component_index]
+	return_value[this_shape_function.single_nonzero_component_index]
 	  = fe_values.shape_values(snc,q_point);
 	return return_value;
       }
@@ -3549,9 +3555,10 @@ namespace FEValuesViews
       {
 	value_type return_value;
 	for (unsigned int d=0; d<dim; ++d)    
-	  if (shape_function_data[shape_function].is_nonzero_shape_function_component[d])
+	  if (this_shape_function.is_nonzero_shape_function_component[d])
 	    return_value[d]
-	      = fe_values.shape_values(shape_function_data[shape_function].row_index[d],q_point);
+	      = fe_values.shape_values(this_shape_function.row_index[d],
+				       q_point);
 	
 	return return_value;
       }
@@ -3573,13 +3580,15 @@ namespace FEValuesViews
 
 				     // same as for the scalar case except
 				     // that we have one more index
-    const int snc = shape_function_data[shape_function].single_nonzero_component;
+    const ShapeFunctionData &this_shape_function
+      = shape_function_data[shape_function];
+    const int snc = this_shape_function.single_nonzero_component;
     if (snc == -2)
       return gradient_type();
     else if (snc != -1)
       {
 	gradient_type return_value;
-	return_value[shape_function_data[shape_function].single_nonzero_component_index]
+	return_value[this_shape_function.single_nonzero_component_index]
 	  = fe_values.shape_gradients[snc][q_point];
 	return return_value;
       }
@@ -3587,9 +3596,9 @@ namespace FEValuesViews
       {
 	gradient_type return_value;
 	for (unsigned int d=0; d<dim; ++d)    
-	  if (shape_function_data[shape_function].is_nonzero_shape_function_component[d])
+	  if (this_shape_function.is_nonzero_shape_function_component[d])
 	    return_value[d]
-	      = fe_values.shape_gradients[shape_function_data[shape_function].row_index[d]][q_point];
+	      = fe_values.shape_gradients[this_shape_function.row_index[d]][q_point];
 
 	return return_value;
       }
@@ -3613,19 +3622,21 @@ namespace FEValuesViews
 
 				     // same as for the scalar case except
 				     // that we have one more index
-    const int snc = shape_function_data[shape_function].single_nonzero_component;
+    const ShapeFunctionData &this_shape_function
+      = shape_function_data[shape_function];
+    const int snc = this_shape_function.single_nonzero_component;
     if (snc == -2)
       return divergence_type();
     else if (snc != -1)
       return
-	fe_values.shape_gradients[snc][q_point][shape_function_data[shape_function].single_nonzero_component_index];
+	fe_values.shape_gradients[snc][q_point][this_shape_function.single_nonzero_component_index];
     else
       {
 	divergence_type return_value = 0;
 	for (unsigned int d=0; d<dim; ++d)    
-	  if (shape_function_data[shape_function].is_nonzero_shape_function_component[d])
+	  if (this_shape_function.is_nonzero_shape_function_component[d])
 	    return_value
-	      += fe_values.shape_gradients[shape_function_data[shape_function].row_index[d]][q_point][d];
+	      += fe_values.shape_gradients[this_shape_function.row_index[d]][q_point][d];
 
 	return return_value;
       }
@@ -3649,13 +3660,15 @@ namespace FEValuesViews
 
 				     // same as for the scalar case except
 				     // that we have one more index
-    const int snc = shape_function_data[shape_function].single_nonzero_component;
+    const ShapeFunctionData &this_shape_function
+      = shape_function_data[shape_function];
+    const int snc = this_shape_function.single_nonzero_component;
     if (snc == -2)
       return hessian_type();
     else if (snc != -1)
       {
 	hessian_type return_value;
-	return_value[shape_function_data[shape_function].single_nonzero_component_index]
+	return_value[this_shape_function.single_nonzero_component_index]
 	  = fe_values.shape_hessians[snc][q_point];
 	return return_value;
       }
@@ -3663,9 +3676,9 @@ namespace FEValuesViews
       {
 	hessian_type return_value;
 	for (unsigned int d=0; d<dim; ++d)    
-	  if (shape_function_data[shape_function].is_nonzero_shape_function_component[d])
+	  if (this_shape_function.is_nonzero_shape_function_component[d])
 	    return_value[d]
-	      = fe_values.shape_hessians[shape_function_data[shape_function].row_index[d]][q_point];
+	      = fe_values.shape_hessians[this_shape_function.row_index[d]][q_point];
 
 	return return_value;
       }
@@ -3686,13 +3699,15 @@ namespace FEValuesViews
 
 				     // same as for the scalar case except
 				     // that we have one more index
-    const int snc = shape_function_data[shape_function].single_nonzero_component;
+    const ShapeFunctionData &this_shape_function
+      = shape_function_data[shape_function];
+    const int snc = this_shape_function.single_nonzero_component;
     if (snc == -2)
       return symmetric_gradient_type();
     else if (snc != -1)
       {
 	gradient_type return_value;
-	return_value[shape_function_data[shape_function].single_nonzero_component_index]
+	return_value[this_shape_function.single_nonzero_component_index]
 	  = fe_values.shape_gradients[snc][q_point];
 	return symmetrize(return_value);
       }
@@ -3700,9 +3715,9 @@ namespace FEValuesViews
       {
 	gradient_type return_value;
 	for (unsigned int d=0; d<dim; ++d)    
-	  if (shape_function_data[shape_function].is_nonzero_shape_function_component[d])
+	  if (this_shape_function.is_nonzero_shape_function_component[d])
 	    return_value[d]
-	      = fe_values.shape_gradients[shape_function_data[shape_function].row_index[d]][q_point];
+	      = fe_values.shape_gradients[this_shape_function.row_index[d]][q_point];
 
 	return symmetrize(return_value);
       }
