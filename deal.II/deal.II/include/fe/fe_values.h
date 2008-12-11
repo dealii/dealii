@@ -185,6 +185,12 @@ namespace FEValuesViews
       typedef Tensor<2,spacedim> hessian_type;
 
 				       /**
+					* Default constructor. Creates an
+					* invalid object.
+					*/
+      Scalar ();
+      
+				       /**
 					* Constructor for an object that
 					* represents a single scalar component
 					* of a FEValuesBase object (or of one
@@ -194,6 +200,14 @@ namespace FEValuesViews
       Scalar (const FEValuesBase<dim,spacedim> &fe_values_base,
 	      const unsigned int       component);
 
+				       /**
+					* Copy operator. This is not a
+					* lightweight object so we don't allow
+					* copying and generate an exception if
+					* this function is called.
+					*/
+      Scalar & operator= (const Scalar<dim,spacedim> &);
+      
 				       /**
 					* Return the value of the vector
 					* component selected by this view, for
@@ -241,6 +255,42 @@ namespace FEValuesViews
 					* object.
 					*/
       const unsigned int component;
+
+				       /**
+					* For each shape function, store
+					* whether it is primitive.
+					*/
+      std::vector<bool> is_primitive;
+
+				       /**
+					* For each shape function, store
+					* whether the selected vector
+					* component may be nonzero. For
+					* primitive shape functions we know
+					* for sure whether a certain scalar
+					* component of a given shape function
+					* is nonzero, whereas for
+					* non-primitive shape functions this
+					* may not be entirely clear (e.g. for
+					* RT elements it depends on the shape
+					* of a cell).
+					*/
+      Table<1,bool> is_nonzero_shape_function_component;
+
+				       /**
+					* For each shape function, store the
+					* row index within the shape_values,
+					* shape_gradients, and shape_hessians
+					* tables (the column index is the
+					* quadrature point index). If the
+					* shape function is primitive, then we
+					* can get this information from the
+					* shape_function_to_row_table of the
+					* FEValues object; otherwise, we have
+					* to work a bit harder to compute this
+					* information.
+					*/
+      Table<1,unsigned int> row_index;
   };
   
 
@@ -309,6 +359,12 @@ namespace FEValuesViews
       typedef Tensor<3,dim>          hessian_type;
 
 				       /**
+					* Default constructor. Creates an
+					* invalid object.
+					*/
+      Vector ();
+
+				       /**
 					* Constructor for an object that
 					* represents dim components of a
 					* FEValuesBase object (or of one of
@@ -322,7 +378,15 @@ namespace FEValuesViews
 					*/
       Vector (const FEValuesBase<dim,spacedim> &fe_values_base,
 	      const unsigned int first_vector_component);
-	      
+
+				       /**
+					* Copy operator. This is not a
+					* lightweight object so we don't allow
+					* copying and generate an exception if
+					* this function is called.
+					*/
+      Vector & operator= (const Vector<dim,spacedim> &);
+
 				       /**
 					* Return the value of the vector
 					* components selected by this view,
@@ -407,7 +471,74 @@ namespace FEValuesViews
 					* FEValuesBase object.
 					*/
       const unsigned int first_vector_component;
+
+				       /**
+					* For each pair (shape
+					* function,component within vector),
+					* store whether the selected vector
+					* component may be nonzero. For
+					* primitive shape functions we know
+					* for sure whether a certain scalar
+					* component of a given shape function
+					* is nonzero, whereas for
+					* non-primitive shape functions this
+					* may not be entirely clear (e.g. for
+					* RT elements it depends on the shape
+					* of a cell).
+					*/
+      Table<2,bool> is_nonzero_shape_function_component;
+
+				       /**
+					* For each pair (shape function,
+					* component within vector), store the
+					* row index within the shape_values,
+					* shape_gradients, and shape_hessians
+					* tables (the column index is the
+					* quadrature point index). If the
+					* shape function is primitive, then we
+					* can get this information from the
+					* shape_function_to_row_table of the
+					* FEValues object; otherwise, we have
+					* to work a bit harder to compute this
+					* information.
+					*/
+      Table<2,unsigned int> row_index;
   };
+}
+
+
+namespace internal
+{
+  namespace FEValuesViews
+  {
+				     /**
+				      * A class objects of which store a
+				      * collection of FEValuesViews::Scalar,
+				      * FEValuesViews::Vector, etc object. The
+				      * FEValuesBase class uses it to generate
+				      * all possible Views classes upon
+				      * construction time; we do this at
+				      * construction time since the Views
+				      * classes cache some information and are
+				      * therefore relatively expensive to
+				      * create.
+				      */
+    template <int dim, int spacedim>
+    struct Cache
+    {
+					 /**
+					  * Caches for scalar and
+					  * vector-valued views.
+					  */
+	std::vector<dealii::FEValuesViews::Scalar<dim,spacedim> > scalars;
+	std::vector<dealii::FEValuesViews::Vector<dim,spacedim> > vectors;
+
+					 /**
+					  * Constructor.
+					  */
+	Cache (const FEValuesBase<dim,spacedim> &fe_values);
+    };
+  }
 }
 
 
@@ -866,7 +997,7 @@ template <int dim, int spacedim>
 				      * FEValuesViews and in particular
 				      * in the @ref vector_valued module.
 				      */
-    FEValuesViews::Scalar<dim,spacedim>
+    const FEValuesViews::Scalar<dim,spacedim> &
     operator[] (const FEValuesExtractors::Scalar &scalar) const;
 
 				     /**
@@ -879,7 +1010,7 @@ template <int dim, int spacedim>
 				      * the namespace FEValuesViews and in particular
 				      * in the @ref vector_valued module.
 				      */
-    FEValuesViews::Vector<dim,spacedim>
+    const FEValuesViews::Vector<dim,spacedim> &
     operator[] (const FEValuesExtractors::Vector &vector) const;
 
     				     //@}
@@ -2202,7 +2333,7 @@ template <int dim, int spacedim>
                                           */
         const CI cell;
     };
-
+    
 
                                      /**
                                       * Implementation of a derived
@@ -2512,6 +2643,12 @@ template <int dim, int spacedim>
     FEValuesBase & operator= (const FEValuesBase &);
 
 				     /**
+				      * A cache for all possible FEValuesViews
+				      * objects.
+				      */
+    internal::FEValuesViews::Cache<dim,spacedim> fe_values_views_cache;
+    
+				     /**
 				      * Make the view classes friends of this
 				      * class, since they access internal
 				      * data.
@@ -2532,7 +2669,7 @@ template <int dim, int spacedim>
  * @author Wolfgang Bangerth, 1998, Guido Kanschat, 2001
  */
 template <int dim, int spacedim=dim>
-  class FEValues : public FEValuesBase<dim,spacedim>
+class FEValues : public FEValuesBase<dim,spacedim>
 {
   public:
                                      /**
@@ -3254,20 +3391,6 @@ namespace FEValuesViews
 {
   template <int dim, int spacedim>  
   inline
-  Scalar<dim,spacedim>::Scalar (const FEValuesBase<dim,spacedim> &fe_values,
-		       const unsigned int       component)
-		  :
-		  fe_values (fe_values),
-		  component (component)
-  {
-    Assert (component < fe_values.fe->n_components(),
-	    ExcIndexRange(component, 0, fe_values.fe->n_components()));
-  }
-
-
-
-  template <int dim, int spacedim>  
-  inline
   typename Scalar<dim,spacedim>::value_type
   Scalar<dim,spacedim>::value (const unsigned int shape_function,
 		      const unsigned int q_point) const
@@ -3281,37 +3404,15 @@ namespace FEValuesViews
 				     // an adaptation of the
 				     // FEValuesBase::shape_value_component
 				     // function except that here we know the
-				     // component as fixed. see the
-				     // comments there
-				     //
-				     // we can do away with some of the
-				     // assertions since they are already
-				     // taken care of in the constructor of
-				     // this class
-    if (fe_values.fe->is_primitive() ||
-	fe_values.fe->is_primitive(shape_function))
-      {
-	if (component ==
-	    fe_values.fe->system_to_component_index(shape_function).first)
-	  return fe_values.shape_values(fe_values.shape_function_to_row_table[shape_function],q_point);
-	else
-	  return 0;
-      }
+				     // component as fixed and we have
+				     // pre-computed and cached a bunch of
+				     // information. see the comments there
+    if (is_nonzero_shape_function_component[shape_function])
+      return fe_values.shape_values(row_index[shape_function],q_point);
     else
-      {
-	if (fe_values.fe->get_nonzero_components(shape_function)[component] == false)
-	  return 0;
-
-	const unsigned int
-	  row = (fe_values.shape_function_to_row_table[shape_function]
-		 +
-		 std::count (fe_values.fe->get_nonzero_components(shape_function).begin(),
-			     fe_values.fe->get_nonzero_components(shape_function).begin()+
-			     component,
-			     true));
-	return fe_values.shape_values(row, q_point);
-      }
+      return 0;
   }
+  
 
 
 
@@ -3330,36 +3431,13 @@ namespace FEValuesViews
 				     // an adaptation of the
 				     // FEValuesBase::shape_grad_component
 				     // function except that here we know the
-				     // component as fixed. see the
-				     // comments there
-				     //
-				     // we can do away with the assertions
-				     // since they are already taken care of
-				     // in the constructor of this class
-    if (fe_values.fe->is_primitive() ||
-	fe_values.fe->is_primitive(shape_function))
-      {
-	if (component ==
-	    fe_values.fe->system_to_component_index(shape_function).first)
-	  return fe_values.shape_gradients[fe_values.
-					    shape_function_to_row_table[shape_function]][q_point];
-	else
-	  return gradient_type();
-      }
+				     // component as fixed and we have
+				     // pre-computed and cached a bunch of
+				     // information. see the comments there
+    if (is_nonzero_shape_function_component[shape_function])
+      return fe_values.shape_gradients[row_index[shape_function]][q_point];
     else
-      {
-	if (fe_values.fe->get_nonzero_components(shape_function)[component] == false)
-	  return gradient_type();
-
-	const unsigned int
-	  row = (fe_values.shape_function_to_row_table[shape_function]
-		 +
-		 std::count (fe_values.fe->get_nonzero_components(shape_function).begin(),
-			     fe_values.fe->get_nonzero_components(shape_function).begin()+
-			     component,
-			     true));
-	return fe_values.shape_gradients[row][q_point];
-      }
+      return gradient_type();
   }
 
 
@@ -3379,51 +3457,13 @@ namespace FEValuesViews
 				     // an adaptation of the
 				     // FEValuesBase::shape_grad_component
 				     // function except that here we know the
-				     // component as fixed. see the
-				     // comments there
-				     //
-				     // we can do away with the assertions
-				     // since they are already taken care of
-				     // in the constructor of this class
-    if (fe_values.fe->is_primitive() ||
-	fe_values.fe->is_primitive(shape_function))
-      {
-	if (component ==
-	    fe_values.fe->system_to_component_index(shape_function).first)
-	  return fe_values.shape_hessians[fe_values.
-					   shape_function_to_row_table[shape_function]][q_point];
-	else
-	  return hessian_type();
-      }
+				     // component as fixed and we have
+				     // pre-computed and cached a bunch of
+				     // information. see the comments there
+    if (is_nonzero_shape_function_component[shape_function])
+      return fe_values.shape_hessians[row_index[shape_function]][q_point];
     else
-      {
-	if (fe_values.fe->get_nonzero_components(shape_function)[component] == false)
-	  return hessian_type();
-
-	const unsigned int
-	  row = (fe_values.shape_function_to_row_table[shape_function]
-		 +
-		 std::count (fe_values.fe->get_nonzero_components(shape_function).begin(),
-			     fe_values.fe->get_nonzero_components(shape_function).begin()+
-			     component,
-			     true));
-	return fe_values.shape_hessians[row][q_point];
-      }
-  }
-
-
-
-  template <int dim, int spacedim>  
-  inline
-  Vector<dim,spacedim>::Vector (const FEValuesBase<dim,spacedim> &fe_values,
-		       const unsigned int       first_vector_component)
-		  :
-		  fe_values (fe_values),
-		  first_vector_component (first_vector_component)
-  {
-    Assert (first_vector_component+dim-1 < this->fe_values.fe->n_components(),
-	    ExcIndexRange(first_vector_component+dim-1, 0,
-			  this->fe_values.fe->n_components()));
+      return hessian_type();
   }
 
 
@@ -3440,53 +3480,19 @@ namespace FEValuesViews
     Assert (fe_values.update_flags & update_values,
 	    typename FVB::ExcAccessToUninitializedField());    
 
-				     // compared to the scalar case above, we
-				     // can save some work here because we
-				     // know that we are querying a contiguous
-				     // range of components
+				     // same as for the scalar case except
+				     // that we have one more index
+				     //
+				     // for primitive elements we could
+				     // probably do even better than the loop
+				     // below because we then know that only
+				     // for one value of 'd' the
+				     // 'if'-condition is true
     value_type return_value;
-    
-    if (fe_values.fe->is_primitive() ||
-	fe_values.fe->is_primitive(shape_function))
-      {
-					 // if this is a primitive shape
-					 // function then at most one element
-					 // of the output vector is
-					 // nonzero. find out if indeed one is
-	const unsigned int
-	  nonzero_component
-	  = fe_values.fe->system_to_component_index(shape_function).first;
-	
-	if ((nonzero_component >= first_vector_component)
-	    &&
-	    (nonzero_component < first_vector_component + dim))
-	  return_value[nonzero_component - first_vector_component]
-	    = fe_values.shape_values(fe_values.
-				      shape_function_to_row_table[shape_function],
-				      q_point);
-      }
-    else
-      {
-	unsigned int
-	  row = (fe_values.shape_function_to_row_table[shape_function]
-		 +
-		 std::count (fe_values.fe->get_nonzero_components(shape_function).begin(),
-			     fe_values.fe->get_nonzero_components(shape_function).begin() +
-			     first_vector_component,
-			     true));
-	for (unsigned int d=0; d<dim; ++d)
-	  if (fe_values.fe->get_nonzero_components(shape_function)[first_vector_component+d] ==
-	      true)
-	    {
-	      return_value[d] = fe_values.shape_values(row, q_point);
-
-	      if ((d != dim-1)
-		  &&
-		  (fe_values.fe->get_nonzero_components(shape_function)[first_vector_component+d]
-		   == true))
-		++row;
-	    }
-      }
+    for (unsigned int d=0; d<dim; ++d)    
+      if (is_nonzero_shape_function_component(shape_function,d))
+	return_value[d]
+	  = fe_values.shape_values(row_index(shape_function,d),q_point);
 
     return return_value;
   }
@@ -3508,44 +3514,19 @@ namespace FEValuesViews
     Assert (fe_values.update_flags & update_gradients,
 	    typename FVB::ExcAccessToUninitializedField());    
 
+				     // same as for the scalar case except
+				     // that we have one more index
+				     //
+				     // for primitive elements we could
+				     // probably do even better than the loop
+				     // below because we then know that only
+				     // for one value of 'd' the
+				     // 'if'-condition is true
     gradient_type return_value;
-    
-    if (fe_values.fe->is_primitive() ||
-	fe_values.fe->is_primitive(shape_function))
-      {
-	const unsigned int
-	  nonzero_component
-	  = fe_values.fe->system_to_component_index(shape_function).first;
-	
-	if ((nonzero_component >= first_vector_component)
-	    &&
-	    (nonzero_component < first_vector_component + dim))
-	  return_value[nonzero_component - first_vector_component]
-	    = fe_values.shape_gradients[fe_values.
-					 shape_function_to_row_table[shape_function]][q_point];
-      }
-    else
-      {
-	unsigned int
-	  row = (fe_values.shape_function_to_row_table[shape_function]
-		 +
-		 std::count (fe_values.fe->get_nonzero_components(shape_function).begin(),
-			     fe_values.fe->get_nonzero_components(shape_function).begin() +
-			     first_vector_component,
-			     true));
-	for (unsigned int d=0; d<dim; ++d)
-	  if (fe_values.fe->get_nonzero_components(shape_function)[first_vector_component+d] ==
-	      true)
-	    {
-	      return_value[d] = fe_values.shape_gradients[row][q_point];
-
-	      if ((d != dim-1)
-		  &&
-		  (fe_values.fe->get_nonzero_components(shape_function)[first_vector_component+d]
-		   == true))
-		++row;
-	    }
-      }
+    for (unsigned int d=0; d<dim; ++d)    
+      if (is_nonzero_shape_function_component(shape_function,d))
+	return_value[d]
+	  = fe_values.shape_gradients[row_index(shape_function,d)][q_point];
 
     return return_value;
   }
@@ -3567,48 +3548,21 @@ namespace FEValuesViews
     Assert (fe_values.update_flags & update_gradients,
 	    typename FVB::ExcAccessToUninitializedField());    
 
-    if (fe_values.fe->is_primitive() ||
-	fe_values.fe->is_primitive(shape_function))
-      {
-	const unsigned int
-	  nonzero_component
-	  = fe_values.fe->system_to_component_index(shape_function).first;
-	
-	if ((nonzero_component >= first_vector_component)
-	    &&
-	    (nonzero_component < first_vector_component + dim))
-	  return
-	    fe_values.shape_gradients[fe_values.
-				       shape_function_to_row_table[shape_function]][q_point]
-	    [nonzero_component - first_vector_component];
-	else
-	  return 0;
-      }
-    else
-      {
-	unsigned int
-	  row = (fe_values.shape_function_to_row_table[shape_function]
-		 +
-		 std::count (fe_values.fe->get_nonzero_components(shape_function).begin(),
-			     fe_values.fe->get_nonzero_components(shape_function).begin() +
-			     first_vector_component,
-			     true));
+				     // same as for the scalar case except
+				     // that we have one more index
+				     //
+				     // for primitive elements we could
+				     // probably do even better than the loop
+				     // below because we then know that only
+				     // for one value of 'd' the
+				     // 'if'-condition is true
+    divergence_type return_value = 0;
+    for (unsigned int d=0; d<dim; ++d)    
+      if (is_nonzero_shape_function_component(shape_function,d))
+	return_value
+	  += fe_values.shape_gradients[row_index(shape_function,d)][q_point][d];
 
-	double div = 0;
-	for (unsigned int d=0; d<dim; ++d)
-	  if (fe_values.fe->get_nonzero_components(shape_function)[first_vector_component+d] ==
-	      true)
-	    {
-	      div += fe_values.shape_gradients[row][q_point][d];
-
-	      if ((d != dim-1)
-		  &&
-		  (fe_values.fe->get_nonzero_components(shape_function)[first_vector_component+d]
-		   == true))
-		++row;
-	    }
-	return div;
-      }
+    return return_value;
   }
   
 
@@ -3627,285 +3581,31 @@ namespace FEValuesViews
     Assert (fe_values.update_flags & update_hessians,
 	    typename FVB::ExcAccessToUninitializedField());    
 
+				     // same as for the scalar case except
+				     // that we have one more index
+				     //
+				     // for primitive elements we could
+				     // probably do even better than the loop
+				     // below because we then know that only
+				     // for one value of 'd' the
+				     // 'if'-condition is true
     hessian_type return_value;
-    
-    if (fe_values.fe->is_primitive() ||
-	fe_values.fe->is_primitive(shape_function))
-      {
-	const unsigned int
-	  nonzero_component
-	  = fe_values.fe->system_to_component_index(shape_function).first;
-	
-	if ((nonzero_component >= first_vector_component)
-	    &&
-	    (nonzero_component < first_vector_component + dim))
-	  return_value[nonzero_component - first_vector_component]
-	    = fe_values.shape_hessians[fe_values.
-					shape_function_to_row_table[shape_function]][q_point];
-      }
-    else
-      {
-	unsigned int
-	  row = (fe_values.shape_function_to_row_table[shape_function]
-		 +
-		 std::count (fe_values.fe->get_nonzero_components(shape_function).begin(),
-			     fe_values.fe->get_nonzero_components(shape_function).begin() +
-			     first_vector_component,
-			     true));
-	for (unsigned int d=0; d<dim; ++d)
-	  if (fe_values.fe->get_nonzero_components(shape_function)[first_vector_component+d] ==
-	      true)
-	    {
-	      return_value[d] = fe_values.shape_hessians[row][q_point];
-
-	      if ((d != dim-1)
-		  &&
-		  (fe_values.fe->get_nonzero_components(shape_function)[first_vector_component+d]
-		   == true))
-		++row;
-	    }
-      }
+    for (unsigned int d=0; d<dim; ++d)    
+      if (is_nonzero_shape_function_component(shape_function,d))
+	return_value[d]
+	  = fe_values.shape_hessians[row_index(shape_function,d)][q_point];
 
     return return_value;
   }
 
 
-
-				   // we duplicate the following function for
-				   // each dimension since we need to
-				   // initialize a few arrays of dimension
-				   // dependent size. even though this happens
-				   // in a switch(dim) clause, we get warnings
-				   // from the compiler if we don't separate
-				   // things into different functions
-  template <>
+  template <int dim, int spacedim>
   inline
-  Vector<1>::symmetric_gradient_type
-  Vector<1>::symmetric_gradient (const unsigned int shape_function,
-				 const unsigned int q_point) const
+  typename Vector<dim,spacedim>::symmetric_gradient_type
+  Vector<dim,spacedim>::symmetric_gradient (const unsigned int shape_function,
+					    const unsigned int q_point) const
   {
-				     // this function works like in the case
-				     // above    
-    Assert (shape_function < fe_values.fe->dofs_per_cell,
-	    ExcIndexRange (shape_function, 0, fe_values.fe->dofs_per_cell));
-    Assert (fe_values.update_flags & update_gradients,
-	    FEValuesBase<1>::ExcAccessToUninitializedField());    
-
-    if (fe_values.fe->is_primitive() ||
-	fe_values.fe->is_primitive(shape_function))
-      {
-	const unsigned int
-	  nonzero_component
-	  = fe_values.fe->system_to_component_index(shape_function).first;
-	
-	if (nonzero_component == first_vector_component)
-	  {
-					     // first get the one component of
-					     // the nonsymmetrized gradient
-					     // that is not zero
-	    const Tensor<1,1> grad
-	      = fe_values.shape_gradients[fe_values.
-					   shape_function_to_row_table[shape_function]][q_point];
-
-					     // then form a symmetric tensor
-					     // out of it. note that access to
-					     // individual elements of a
-					     // SymmetricTensor object is
-					     // fairly slow. if we implemented
-					     // the following in the naive
-					     // way, we would therefore incur
-					     // a very significant penalty: a
-					     // preliminary version of the
-					     // Stokes tutorial program would
-					     // slow down from 17 to 23
-					     // seconds because of this single
-					     // function!
-					     //
-					     // consequently, we try to be a
-					     // bit smarter by already laying
-					     // out the data in the right
-					     // format and creating a
-					     // symmetric tensor of it
-	    const double array[symmetric_gradient_type::n_independent_components]
-	      = { grad[0] };
-	    return symmetric_gradient_type(array);
-	  }
-	else
-	  return symmetric_gradient_type();
-      }
-    else
-      {
-	return symmetrize (gradient(shape_function, q_point));
-      }
-  }
-
-
-
-  template <>
-  inline
-  Vector<2>::symmetric_gradient_type
-  Vector<2>::symmetric_gradient (const unsigned int shape_function,
-				 const unsigned int q_point) const
-  {
-				     // this function works like in the case
-				     // above    
-    Assert (shape_function < fe_values.fe->dofs_per_cell,
-	    ExcIndexRange (shape_function, 0, fe_values.fe->dofs_per_cell));
-    Assert (fe_values.update_flags & update_gradients,
-	    FEValuesBase<2>::ExcAccessToUninitializedField());    
-
-    if (fe_values.fe->is_primitive() ||
-	fe_values.fe->is_primitive(shape_function))
-      {
-	const unsigned int
-	  nonzero_component
-	  = fe_values.fe->system_to_component_index(shape_function).first;
-	
-					 // first get the one component of
-					 // the nonsymmetrized gradient
-					 // that is not zero
-	const Tensor<1,2> &grad
-	  = fe_values.shape_gradients[fe_values.
-				       shape_function_to_row_table[shape_function]][q_point];
-
-					 // then form a symmetric tensor
-					 // out of it. note that access to
-					 // individual elements of a
-					 // SymmetricTensor object is
-					 // fairly slow. if we implemented
-					 // the following in the naive
-					 // way, we would therefore incur
-					 // a very significant penalty: a
-					 // preliminary version of the
-					 // Stokes tutorial program would
-					 // slow down from 17 to 23
-					 // seconds because of this single
-					 // function!
-					 //
-					 // consequently, we try to be a
-					 // bit smarter by already laying
-					 // out the data in the right
-					 // format and creating a
-					 // symmetric tensor of it
-	switch (nonzero_component - first_vector_component)
-	  {
-	    case 0:
-	    {
-	      const double array[symmetric_gradient_type::n_independent_components]
-		= { grad[0], 0, grad[1]/2 };
-	      return symmetric_gradient_type(array);
-	    }
-
-	    case 1:
-	    {
-	      const double array[symmetric_gradient_type::n_independent_components]
-		= { 0, grad[1], grad[0]/2 };
-	      return symmetric_gradient_type(array);
-	    }
-
-	    default:
-						   // not a shape
-						   // function that
-						   // shared in the
-						   // components of
-						   // the selected
-						   // vector
-		  return symmetric_gradient_type();
-	  }
-      }
-    else
-      {
-	return symmetrize (gradient(shape_function, q_point));
-      }
-  }
-
-
-
-  template <>
-  inline
-  Vector<3>::symmetric_gradient_type
-  Vector<3>::symmetric_gradient (const unsigned int shape_function,
-				 const unsigned int q_point) const
-  {
-				     // this function works like in the case
-				     // above    
-    Assert (shape_function < fe_values.fe->dofs_per_cell,
-	    ExcIndexRange (shape_function, 0, fe_values.fe->dofs_per_cell));
-    Assert (fe_values.update_flags & update_gradients,
-	    FEValuesBase<3>::ExcAccessToUninitializedField());    
-
-    if (fe_values.fe->is_primitive() ||
-	fe_values.fe->is_primitive(shape_function))
-      {
-	const unsigned int
-	  nonzero_component
-	  = fe_values.fe->system_to_component_index(shape_function).first;
-	
-					 // first get the one component of
-					 // the nonsymmetrized gradient
-					 // that is not zero
-	const Tensor<1,3> &grad
-	  = fe_values.shape_gradients[fe_values.
-				       shape_function_to_row_table[shape_function]][q_point];
-
-					 // then form a symmetric
-					 // tensor out of it. note
-					 // that access to individual
-					 // elements of a
-					 // SymmetricTensor object is
-					 // fairly slow. if we
-					 // implemented the following
-					 // in the naive way, we would
-					 // therefore incur a very
-					 // significant penalty: a
-					 // preliminary version of the
-					 // Stokes tutorial program
-					 // would slow down from 17 to
-					 // 23 seconds because of this
-					 // single function!
-					 //
-					 // consequently, we try to be
-					 // a bit smarter by already
-					 // laying out the data in the
-					 // right format and creating
-					 // a symmetric tensor of it
-	switch (nonzero_component-first_vector_component)
-	  {
-	    case 0:
-	    {
-	      const double array[symmetric_gradient_type::n_independent_components]
-		= { grad[0], 0, 0, grad[1]/2 , grad[2]/2, 0};
-	      return symmetric_gradient_type(array);
-	    }
-
-	    case 1:
-	    {
-	      const double array[symmetric_gradient_type::n_independent_components]
-		= { 0, grad[1], 0, grad[0]/2, 0, grad[2]/2 };
-	      return symmetric_gradient_type(array);
-	    }
-
-	    case 2:
-	    {
-	      const double array[symmetric_gradient_type::n_independent_components]
-		= { 0, 0, grad[2], 0, grad[0]/2, grad[1]/2 };
-	      return symmetric_gradient_type(array);
-	    }
-
-	    default:
-						   // not a shape
-						   // function that
-						   // shared in the
-						   // components of
-						   // the selected
-						   // vector
-		  return symmetric_gradient_type();
-	  }
-      }
-    else
-      {
-	return symmetrize (gradient(shape_function, q_point));
-      }
+    return symmetrize (gradient(shape_function, q_point));
   }
 }
 
@@ -3922,23 +3622,31 @@ namespace FEValuesViews
 
 template <int dim, int spacedim>
 inline
-FEValuesViews::Scalar<dim,spacedim>
+const FEValuesViews::Scalar<dim,spacedim> &
 FEValuesBase<dim,spacedim>::
 operator[] (const FEValuesExtractors::Scalar &scalar) const
 {
-  return FEValuesViews::Scalar<dim,spacedim> (*this, scalar.component);
+  Assert (scalar.component < fe_values_views_cache.scalars.size(),
+	  ExcIndexRange (scalar.component,
+			 0, fe_values_views_cache.scalars.size()));
+  
+  return fe_values_views_cache.scalars[scalar.component];
 }
 
 
 
 template <int dim, int spacedim>  
 inline
-FEValuesViews::Vector<dim,spacedim>
+const FEValuesViews::Vector<dim,spacedim> &
 FEValuesBase<dim,spacedim>::
 operator[] (const FEValuesExtractors::Vector &vector) const
 {
-  return
-    FEValuesViews::Vector<dim,spacedim> (*this, vector.first_vector_component);
+  Assert (vector.first_vector_component <
+	  fe_values_views_cache.vectors.size(),
+	  ExcIndexRange (vector.first_vector_component,
+			 0, fe_values_views_cache.vectors.size()));
+  
+  return fe_values_views_cache.vectors[vector.first_vector_component];
 }
 
 

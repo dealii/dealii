@@ -31,6 +31,217 @@
 
 DEAL_II_NAMESPACE_OPEN
 
+
+namespace
+{
+  template <int dim, int spacedim>
+  inline
+  std::vector<unsigned int>
+  make_shape_function_to_row_table (const FiniteElement<dim,spacedim> &fe)
+  {
+    std::vector<unsigned int> shape_function_to_row_table (fe.dofs_per_cell);
+    unsigned int row = 0;
+    for (unsigned int i=0; i<fe.dofs_per_cell; ++i)
+      {
+	shape_function_to_row_table[i] = row;
+	row += fe.n_nonzero_components (i);
+      }
+
+    return shape_function_to_row_table;
+  }
+}
+
+
+
+namespace FEValuesViews
+{
+  template <int dim, int spacedim>  
+  Scalar<dim,spacedim>::Scalar (const FEValuesBase<dim,spacedim> &fe_values,
+		       const unsigned int       component)
+		  :
+		  fe_values (fe_values),
+		  component (component),
+		  is_nonzero_shape_function_component (fe_values.fe->dofs_per_cell),
+		  row_index (fe_values.fe->dofs_per_cell)
+  {
+    Assert (component < fe_values.fe->n_components(),
+	    ExcIndexRange(component, 0, fe_values.fe->n_components()));
+
+    const std::vector<unsigned int> shape_function_to_row_table
+      = make_shape_function_to_row_table (*fe_values.fe);
+    
+    for (unsigned int i=0; i<fe_values.fe->dofs_per_cell; ++i)
+      {
+	const bool is_primitive = (fe_values.fe->is_primitive() ||
+				   fe_values.fe->is_primitive(i));
+
+	if (is_primitive == true)
+	  is_nonzero_shape_function_component[i]
+	    = (component ==
+	       fe_values.fe->system_to_component_index(i).first);
+	else
+	  is_nonzero_shape_function_component[i]
+	    = (fe_values.fe->get_nonzero_components(i)[component]
+	       == true);
+
+	if (is_nonzero_shape_function_component[i] == true)
+	  {
+	    if (is_primitive == true)
+	      row_index[i] = shape_function_to_row_table[i];
+	    else
+	      row_index[i] = (shape_function_to_row_table[i]
+			      +
+			      std::count (fe_values.fe->get_nonzero_components(i).begin(),
+					  fe_values.fe->get_nonzero_components(i).begin()+
+					  component,
+					  true));
+	  }
+	else
+	  row_index[i] = numbers::invalid_unsigned_int;
+      }
+  }
+
+
+
+  template <int dim, int spacedim>
+  Scalar<dim,spacedim>::Scalar ()
+		  :
+		  fe_values (*static_cast<dealii::FEValuesBase<dim,spacedim>*>(0)),
+		  component (numbers::invalid_unsigned_int)
+  {}
+
+
+  template <int dim, int spacedim>
+  Scalar<dim,spacedim> &
+  Scalar<dim,spacedim>::operator= (const Scalar<dim,spacedim> &)
+  {
+				     // we shouldn't be copying these objects
+    Assert (false, ExcInternalError());
+    return *this;
+  }
+  
+
+
+  template <int dim, int spacedim>  
+  Vector<dim,spacedim>::Vector (const FEValuesBase<dim,spacedim> &fe_values,
+				const unsigned int       first_vector_component)
+		  :
+		  fe_values (fe_values),
+		  first_vector_component (first_vector_component),
+		  is_nonzero_shape_function_component (fe_values.fe->dofs_per_cell,
+						       dim),
+		  row_index (fe_values.fe->dofs_per_cell,
+			     dim)
+  {
+    Assert (first_vector_component+dim-1 < fe_values.fe->n_components(),
+	    ExcIndexRange(first_vector_component+dim-1, 0,
+			  fe_values.fe->n_components()));
+
+    const std::vector<unsigned int> shape_function_to_row_table
+      = make_shape_function_to_row_table (*fe_values.fe);
+    
+    for (unsigned int d=0; d<dim; ++d)
+      {
+	const unsigned int component = first_vector_component + d;
+	
+	for (unsigned int i=0; i<fe_values.fe->dofs_per_cell; ++i)
+	  {
+	    const bool is_primitive = (fe_values.fe->is_primitive() ||
+				       fe_values.fe->is_primitive(i));
+
+	    if (is_primitive == true)
+	      is_nonzero_shape_function_component[i][d]
+		= (component ==
+		   fe_values.fe->system_to_component_index(i).first);
+	    else
+	      is_nonzero_shape_function_component[i][d]
+		= (fe_values.fe->get_nonzero_components(i)[component]
+		   == true);
+
+	    if (is_nonzero_shape_function_component[i][d] == true)
+	      {
+		if (is_primitive == true)
+		  row_index[i][d] = shape_function_to_row_table[i];
+		else
+		  row_index[i][d] = (shape_function_to_row_table[i]
+				     +
+				     std::count (fe_values.fe->get_nonzero_components(i).begin(),
+						 fe_values.fe->get_nonzero_components(i).begin()+
+						 component,
+						 true));
+	      }
+	    else
+	      row_index[i][d] = numbers::invalid_unsigned_int;
+	  }
+      }
+  }
+  
+
+  template <int dim, int spacedim>
+  Vector<dim,spacedim>::Vector ()
+		  :
+		  fe_values (*static_cast<dealii::FEValuesBase<dim,spacedim>*>(0)),
+		  first_vector_component (numbers::invalid_unsigned_int)
+  {}
+
+
+
+  template <int dim, int spacedim>
+  Vector<dim,spacedim> &
+  Vector<dim,spacedim>::operator= (const Vector<dim,spacedim> &)
+  {
+				     // we shouldn't be copying these objects
+    Assert (false, ExcInternalError());
+    return *this;
+  }
+}
+
+
+namespace internal
+{
+  namespace FEValuesViews
+  {
+    template <int dim, int spacedim>
+    Cache<dim,spacedim>::Cache (const FEValuesBase<dim,spacedim> &fe_values)
+    {
+      const FiniteElement<dim,spacedim> &fe = fe_values.get_fe();
+
+				       // create the views objects. allocate a
+				       // bunch of default-constructed ones
+				       // then destroy them again and do
+				       // in-place construction of those we
+				       // actually want to use (copying stuff
+				       // is wasteful and we can't do that
+				       // anyway because the class has
+				       // reference members)
+      const unsigned int n_scalars = fe.n_components();
+      scalars.resize (n_scalars);
+      for (unsigned int component=0; component<n_scalars; ++component)
+	{
+	  scalars[component].
+	    dealii::FEValuesViews::Scalar<dim,spacedim>::~Scalar ();
+	  new (&scalars[component])
+	    dealii::FEValuesViews::Scalar<dim,spacedim>(fe_values,
+							component);
+	}
+      
+      const unsigned int n_vectors = (fe.n_components() >= dim ?
+				      fe.n_components()-dim+1 :
+				      0);
+      vectors.resize (n_vectors);
+      for (unsigned int component=0; component<n_vectors; ++component)
+	{
+	  vectors[component].
+	    dealii::FEValuesViews::Vector<dim,spacedim>::~Vector ();
+	  new (&vectors[component])
+	    dealii::FEValuesViews::Vector<dim,spacedim>(fe_values,
+							component);
+	}	
+    }
+  }
+}
+
+
 /* ---------------- FEValuesBase<dim,spacedim>::CellIteratorBase --------- */
 
 template <int dim, int spacedim>
@@ -407,19 +618,16 @@ FEValuesData<dim,spacedim>::initialize (const unsigned int        n_quadrature_p
 				   // from shape function number to
 				   // the rows in the tables denoting
 				   // its first non-zero
-				   // component. with this also count
-				   // the total number of non-zero
-				   // components accumulated over all
-				   // shape functions
-  this->shape_function_to_row_table.resize (fe.dofs_per_cell);
-  unsigned int row = 0;
+				   // component
+  this->shape_function_to_row_table
+    = make_shape_function_to_row_table (fe);
+
+				   // count the total number of non-zero
+				   // components accumulated over all shape
+				   // functions
+  unsigned int n_nonzero_shape_components = 0;
   for (unsigned int i=0; i<fe.dofs_per_cell; ++i)
-    {
-      this->shape_function_to_row_table[i] = row;
-      row += fe.n_nonzero_components (i);
-    };
-	 
-  const unsigned int n_nonzero_shape_components = row;
+    n_nonzero_shape_components += fe.n_nonzero_components (i);	 
   Assert (n_nonzero_shape_components >= fe.dofs_per_cell,
 	  ExcInternalError());
 
@@ -483,7 +691,8 @@ FEValuesBase<dim,spacedim>::FEValuesBase (const unsigned int n_q_points,
 		mapping(&mapping),
 		fe(&fe),
 		mapping_data(0),
-		fe_data(0)
+		fe_data(0),
+		fe_values_views_cache (*this)
 {
   this->update_flags = flags;
 }
@@ -1514,11 +1723,11 @@ FEValues<dim,spacedim>::FEValues (const Mapping<dim,spacedim>       &mapping,
 			 const UpdateFlags         update_flags)
 		:
 		FEValuesBase<dim,spacedim> (q.size(),
-				   fe.dofs_per_cell,
-				   update_default,
-				   mapping,
-				   fe),
-  quadrature (q)
+					    fe.dofs_per_cell,
+					    update_default,
+					    mapping,
+					    fe),
+		quadrature (q)
 {
   initialize (update_flags);
 }
