@@ -131,7 +131,9 @@ namespace FEValuesViews
 		  is_nonzero_shape_function_component (fe_values.fe->dofs_per_cell,
 						       dim),
 		  row_index (fe_values.fe->dofs_per_cell,
-			     dim)
+			     dim),
+		  single_nonzero_component (fe_values.fe->dofs_per_cell),
+		  single_nonzero_component_index (fe_values.fe->dofs_per_cell)
   {
     Assert (first_vector_component+dim-1 < fe_values.fe->n_components(),
 	    ExcIndexRange(first_vector_component+dim-1, 0,
@@ -172,6 +174,29 @@ namespace FEValuesViews
 	      }
 	    else
 	      row_index[i][d] = numbers::invalid_unsigned_int;
+	  }
+      }
+
+    for (unsigned int i=0; i<fe_values.fe->dofs_per_cell; ++i)
+      {
+	unsigned int n_nonzero_components = 0;
+	for (unsigned int d=0; d<dim; ++d)
+	  if (is_nonzero_shape_function_component(i,d) == true)
+	    ++n_nonzero_components;
+
+	if (n_nonzero_components == 0)
+	  single_nonzero_component(i) = -2;
+	else if (n_nonzero_components > 1)
+	  single_nonzero_component(i) = -1;
+	else
+	  {
+	    for (unsigned int d=0; d<dim; ++d)
+	      if (is_nonzero_shape_function_component(i,d) == true)
+		{
+		  single_nonzero_component(i) = row_index(i,d);
+		  single_nonzero_component_index(i) = d;
+		  break;
+		}
 	  }
       }
   }

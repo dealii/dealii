@@ -503,6 +503,23 @@ namespace FEValuesViews
 					* information.
 					*/
       Table<2,unsigned int> row_index;
+
+				       /**
+					* For each shape function say the
+					* following: if only a single entry in
+					* is_nonzero_shape_function_component
+					* for this shape function is nonzero,
+					* then store the corresponding value
+					* of row_index and
+					* single_nonzero_component_index
+					* represents the index between 0 and
+					* dim for which it is attained. If
+					* multiple components are nonzero,
+					* then store -1. If no components are
+					* nonzero then store -2.
+					*/
+      Table<1,int>          single_nonzero_component;
+      Table<1,unsigned int> single_nonzero_component_index;
   };
 }
 
@@ -3482,19 +3499,26 @@ namespace FEValuesViews
 
 				     // same as for the scalar case except
 				     // that we have one more index
-				     //
-				     // for primitive elements we could
-				     // probably do even better than the loop
-				     // below because we then know that only
-				     // for one value of 'd' the
-				     // 'if'-condition is true
-    value_type return_value;
-    for (unsigned int d=0; d<dim; ++d)    
-      if (is_nonzero_shape_function_component(shape_function,d))
-	return_value[d]
-	  = fe_values.shape_values(row_index(shape_function,d),q_point);
-
-    return return_value;
+    const int snc = single_nonzero_component(shape_function);
+    if (snc == -2)
+      return value_type();
+    else if (snc != -1)
+      {
+	value_type return_value;
+	return_value[single_nonzero_component_index[shape_function]]
+	  = fe_values.shape_values(snc,q_point);
+	return return_value;
+      }
+    else
+      {
+	value_type return_value;
+	for (unsigned int d=0; d<dim; ++d)    
+	  if (is_nonzero_shape_function_component(shape_function,d))
+	    return_value[d]
+	      = fe_values.shape_values(row_index(shape_function,d),q_point);
+	
+	return return_value;
+      }
   }
 
   
@@ -3505,9 +3529,6 @@ namespace FEValuesViews
   Vector<dim,spacedim>::gradient (const unsigned int shape_function,
 			 const unsigned int q_point) const
   {
-				     // this function works like in
-				     // the case above
-				
     typedef FEValuesBase<dim,spacedim> FVB;    
     Assert (shape_function < fe_values.fe->dofs_per_cell,
 	    ExcIndexRange (shape_function, 0, fe_values.fe->dofs_per_cell));
@@ -3516,19 +3537,26 @@ namespace FEValuesViews
 
 				     // same as for the scalar case except
 				     // that we have one more index
-				     //
-				     // for primitive elements we could
-				     // probably do even better than the loop
-				     // below because we then know that only
-				     // for one value of 'd' the
-				     // 'if'-condition is true
-    gradient_type return_value;
-    for (unsigned int d=0; d<dim; ++d)    
-      if (is_nonzero_shape_function_component(shape_function,d))
-	return_value[d]
-	  = fe_values.shape_gradients[row_index(shape_function,d)][q_point];
+    const int snc = single_nonzero_component(shape_function);
+    if (snc == -2)
+      return gradient_type();
+    else if (snc != -1)
+      {
+	gradient_type return_value;
+	return_value[single_nonzero_component_index[shape_function]]
+	  = fe_values.shape_gradients[snc][q_point];
+	return return_value;
+      }
+    else
+      {
+	gradient_type return_value;
+	for (unsigned int d=0; d<dim; ++d)    
+	  if (is_nonzero_shape_function_component(shape_function,d))
+	    return_value[d]
+	      = fe_values.shape_gradients[row_index(shape_function,d)][q_point];
 
-    return return_value;
+	return return_value;
+      }
   }
 
 
@@ -3541,7 +3569,6 @@ namespace FEValuesViews
   {
 				     // this function works like in
 				     // the case above
-				
     typedef FEValuesBase<dim,spacedim> FVB; 
     Assert (shape_function < fe_values.fe->dofs_per_cell,
 	    ExcIndexRange (shape_function, 0, fe_values.fe->dofs_per_cell));
@@ -3550,19 +3577,26 @@ namespace FEValuesViews
 
 				     // same as for the scalar case except
 				     // that we have one more index
-				     //
-				     // for primitive elements we could
-				     // probably do even better than the loop
-				     // below because we then know that only
-				     // for one value of 'd' the
-				     // 'if'-condition is true
-    divergence_type return_value = 0;
-    for (unsigned int d=0; d<dim; ++d)    
-      if (is_nonzero_shape_function_component(shape_function,d))
+    const int snc = single_nonzero_component(shape_function);
+    if (snc == -2)
+      return divergence_type();
+    else if (snc != -1)
+      {
+	divergence_type return_value;
 	return_value
-	  += fe_values.shape_gradients[row_index(shape_function,d)][q_point][d];
+	  = fe_values.shape_gradients[snc][q_point][single_nonzero_component_index[shape_function]];
+	return return_value;
+      }
+    else
+      {
+	divergence_type return_value;
+	for (unsigned int d=0; d<dim; ++d)    
+	  if (is_nonzero_shape_function_component(shape_function,d))
+	    return_value
+	      += fe_values.shape_gradients[row_index(shape_function,d)][q_point][d];
 
-    return return_value;
+	return return_value;
+      }
   }
   
 
@@ -3583,19 +3617,26 @@ namespace FEValuesViews
 
 				     // same as for the scalar case except
 				     // that we have one more index
-				     //
-				     // for primitive elements we could
-				     // probably do even better than the loop
-				     // below because we then know that only
-				     // for one value of 'd' the
-				     // 'if'-condition is true
-    hessian_type return_value;
-    for (unsigned int d=0; d<dim; ++d)    
-      if (is_nonzero_shape_function_component(shape_function,d))
-	return_value[d]
-	  = fe_values.shape_hessians[row_index(shape_function,d)][q_point];
+    const int snc = single_nonzero_component(shape_function);
+    if (snc == -2)
+      return hessian_type();
+    else if (snc != -1)
+      {
+	hessian_type return_value;
+	return_value[single_nonzero_component_index[shape_function]]
+	  = fe_values.shape_hessians[snc][q_point];
+	return return_value;
+      }
+    else
+      {
+	hessian_type return_value;
+	for (unsigned int d=0; d<dim; ++d)    
+	  if (is_nonzero_shape_function_component(shape_function,d))
+	    return_value[d]
+	      = fe_values.shape_hessians[row_index(shape_function,d)][q_point];
 
-    return return_value;
+	return return_value;
+      }
   }
 
 
@@ -3605,7 +3646,34 @@ namespace FEValuesViews
   Vector<dim,spacedim>::symmetric_gradient (const unsigned int shape_function,
 					    const unsigned int q_point) const
   {
-    return symmetrize (gradient(shape_function, q_point));
+    typedef FEValuesBase<dim,spacedim> FVB;    
+    Assert (shape_function < fe_values.fe->dofs_per_cell,
+	    ExcIndexRange (shape_function, 0, fe_values.fe->dofs_per_cell));
+    Assert (fe_values.update_flags & update_gradients,
+	    typename FVB::ExcAccessToUninitializedField());    
+
+				     // same as for the scalar case except
+				     // that we have one more index
+    const int snc = single_nonzero_component(shape_function);
+    if (snc == -2)
+      return symmetric_gradient_type();
+    else if (snc != -1)
+      {
+	gradient_type return_value;
+	return_value[single_nonzero_component_index[shape_function]]
+	  = fe_values.shape_gradients[snc][q_point];
+	return symmetrize(return_value);
+      }
+    else
+      {
+	gradient_type return_value;
+	for (unsigned int d=0; d<dim; ++d)    
+	  if (is_nonzero_shape_function_component(shape_function,d))
+	    return_value[d]
+	      = fe_values.shape_gradients[row_index(shape_function,d)][q_point];
+
+	return symmetrize(return_value);
+      }
   }
 }
 
