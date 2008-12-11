@@ -61,8 +61,7 @@ namespace FEValuesViews
 		  :
 		  fe_values (fe_values),
 		  component (component),
-		  is_nonzero_shape_function_component (fe_values.fe->dofs_per_cell),
-		  row_index (fe_values.fe->dofs_per_cell)
+		  shape_function_data (fe_values.fe->dofs_per_cell)
   {
     Assert (component < fe_values.fe->n_components(),
 	    ExcIndexRange(component, 0, fe_values.fe->n_components()));
@@ -76,28 +75,29 @@ namespace FEValuesViews
 				   fe_values.fe->is_primitive(i));
 
 	if (is_primitive == true)
-	  is_nonzero_shape_function_component[i]
+	  shape_function_data[i].is_nonzero_shape_function_component
 	    = (component ==
 	       fe_values.fe->system_to_component_index(i).first);
 	else
-	  is_nonzero_shape_function_component[i]
+	  shape_function_data[i].is_nonzero_shape_function_component
 	    = (fe_values.fe->get_nonzero_components(i)[component]
 	       == true);
 
-	if (is_nonzero_shape_function_component[i] == true)
+	if (shape_function_data[i].is_nonzero_shape_function_component == true)
 	  {
 	    if (is_primitive == true)
-	      row_index[i] = shape_function_to_row_table[i];
+	      shape_function_data[i].row_index = shape_function_to_row_table[i];
 	    else
-	      row_index[i] = (shape_function_to_row_table[i]
-			      +
-			      std::count (fe_values.fe->get_nonzero_components(i).begin(),
-					  fe_values.fe->get_nonzero_components(i).begin()+
-					  component,
-					  true));
+	      shape_function_data[i].row_index
+		= (shape_function_to_row_table[i]
+		   +
+		   std::count (fe_values.fe->get_nonzero_components(i).begin(),
+			       fe_values.fe->get_nonzero_components(i).begin()+
+			       component,
+			       true));
 	  }
 	else
-	  row_index[i] = numbers::invalid_unsigned_int;
+	  shape_function_data[i].row_index = numbers::invalid_unsigned_int;
       }
   }
 
@@ -128,12 +128,7 @@ namespace FEValuesViews
 		  :
 		  fe_values (fe_values),
 		  first_vector_component (first_vector_component),
-		  is_nonzero_shape_function_component (fe_values.fe->dofs_per_cell,
-						       dim),
-		  row_index (fe_values.fe->dofs_per_cell,
-			     dim),
-		  single_nonzero_component (fe_values.fe->dofs_per_cell),
-		  single_nonzero_component_index (fe_values.fe->dofs_per_cell)
+		  shape_function_data (fe_values.fe->dofs_per_cell)
   {
     Assert (first_vector_component+dim-1 < fe_values.fe->n_components(),
 	    ExcIndexRange(first_vector_component+dim-1, 0,
@@ -152,28 +147,32 @@ namespace FEValuesViews
 				       fe_values.fe->is_primitive(i));
 
 	    if (is_primitive == true)
-	      is_nonzero_shape_function_component[i][d]
+	      shape_function_data[i].is_nonzero_shape_function_component[d]
 		= (component ==
 		   fe_values.fe->system_to_component_index(i).first);
 	    else
-	      is_nonzero_shape_function_component[i][d]
+	      shape_function_data[i].is_nonzero_shape_function_component[d]
 		= (fe_values.fe->get_nonzero_components(i)[component]
 		   == true);
 
-	    if (is_nonzero_shape_function_component[i][d] == true)
+	    if (shape_function_data[i].is_nonzero_shape_function_component[d]
+		== true)
 	      {
 		if (is_primitive == true)
-		  row_index[i][d] = shape_function_to_row_table[i];
+		  shape_function_data[i].row_index[d]
+		    = shape_function_to_row_table[i];
 		else
-		  row_index[i][d] = (shape_function_to_row_table[i]
-				     +
-				     std::count (fe_values.fe->get_nonzero_components(i).begin(),
-						 fe_values.fe->get_nonzero_components(i).begin()+
-						 component,
-						 true));
+		  shape_function_data[i].row_index[d]
+		    = (shape_function_to_row_table[i]
+		       +
+		       std::count (fe_values.fe->get_nonzero_components(i).begin(),
+				   fe_values.fe->get_nonzero_components(i).begin()+
+				   component,
+				   true));
 	      }
 	    else
-	      row_index[i][d] = numbers::invalid_unsigned_int;
+	      shape_function_data[i].row_index[d]
+		= numbers::invalid_unsigned_int;
 	  }
       }
 
@@ -181,20 +180,24 @@ namespace FEValuesViews
       {
 	unsigned int n_nonzero_components = 0;
 	for (unsigned int d=0; d<dim; ++d)
-	  if (is_nonzero_shape_function_component(i,d) == true)
+	  if (shape_function_data[i].is_nonzero_shape_function_component[d]
+	      == true)
 	    ++n_nonzero_components;
 
 	if (n_nonzero_components == 0)
-	  single_nonzero_component(i) = -2;
+	  shape_function_data[i].single_nonzero_component = -2;
 	else if (n_nonzero_components > 1)
-	  single_nonzero_component(i) = -1;
+	  shape_function_data[i].single_nonzero_component = -1;
 	else
 	  {
 	    for (unsigned int d=0; d<dim; ++d)
-	      if (is_nonzero_shape_function_component(i,d) == true)
+	      if (shape_function_data[i].is_nonzero_shape_function_component[d]
+		  == true)
 		{
-		  single_nonzero_component(i) = row_index(i,d);
-		  single_nonzero_component_index(i) = d;
+		  shape_function_data[i].single_nonzero_component
+		    = shape_function_data[i].row_index[d];
+		  shape_function_data[i].single_nonzero_component_index
+		    = d;
 		  break;
 		}
 	  }

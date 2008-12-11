@@ -257,34 +257,52 @@ namespace FEValuesViews
       const unsigned int component;
 
 				       /**
-					* For each shape function, store
-					* whether the selected vector
-					* component may be nonzero. For
-					* primitive shape functions we know
-					* for sure whether a certain scalar
-					* component of a given shape function
-					* is nonzero, whereas for
-					* non-primitive shape functions this
-					* may not be entirely clear (e.g. for
-					* RT elements it depends on the shape
-					* of a cell).
+					* A structure where for each shape
+					* function we pre-compute a bunch of
+					* data that will make later accesses
+					* much cheaper.
 					*/
-      Table<1,bool> is_nonzero_shape_function_component;
+      struct ShapeFunctionData
+      {
+					   /**
+					    * For each shape function, store
+					    * whether the selected vector
+					    * component may be nonzero. For
+					    * primitive shape functions we
+					    * know for sure whether a certain
+					    * scalar component of a given
+					    * shape function is nonzero,
+					    * whereas for non-primitive shape
+					    * functions this may not be
+					    * entirely clear (e.g. for RT
+					    * elements it depends on the shape
+					    * of a cell).
+					    */
+	  bool is_nonzero_shape_function_component;
+
+					   /**
+					    * For each shape function, store
+					    * the row index within the
+					    * shape_values, shape_gradients,
+					    * and shape_hessians tables (the
+					    * column index is the quadrature
+					    * point index). If the shape
+					    * function is primitive, then we
+					    * can get this information from
+					    * the shape_function_to_row_table
+					    * of the FEValues object;
+					    * otherwise, we have to work a bit
+					    * harder to compute this
+					    * information.
+					    */
+	  unsigned int row_index;
+      };
 
 				       /**
-					* For each shape function, store the
-					* row index within the shape_values,
-					* shape_gradients, and shape_hessians
-					* tables (the column index is the
-					* quadrature point index). If the
-					* shape function is primitive, then we
-					* can get this information from the
-					* shape_function_to_row_table of the
-					* FEValues object; otherwise, we have
-					* to work a bit harder to compute this
-					* information.
+					* Store the data about shape
+					* functions.
 					*/
-      Table<1,unsigned int> row_index;
+      std::vector<ShapeFunctionData> shape_function_data;
   };
   
 
@@ -467,53 +485,74 @@ namespace FEValuesViews
       const unsigned int first_vector_component;
 
 				       /**
-					* For each pair (shape
-					* function,component within vector),
-					* store whether the selected vector
-					* component may be nonzero. For
-					* primitive shape functions we know
-					* for sure whether a certain scalar
-					* component of a given shape function
-					* is nonzero, whereas for
-					* non-primitive shape functions this
-					* may not be entirely clear (e.g. for
-					* RT elements it depends on the shape
-					* of a cell).
+					* A structure where for each shape
+					* function we pre-compute a bunch of
+					* data that will make later accesses
+					* much cheaper.
 					*/
-      Table<2,bool> is_nonzero_shape_function_component;
+      struct ShapeFunctionData
+      {      
+					   /**
+					    * For each pair (shape
+					    * function,component within
+					    * vector), store whether the
+					    * selected vector component may be
+					    * nonzero. For primitive shape
+					    * functions we know for sure
+					    * whether a certain scalar
+					    * component of a given shape
+					    * function is nonzero, whereas for
+					    * non-primitive shape functions
+					    * this may not be entirely clear
+					    * (e.g. for RT elements it depends
+					    * on the shape of a cell).
+					    */
+	  bool is_nonzero_shape_function_component[dim];
+
+					   /**
+					    * For each pair (shape function,
+					    * component within vector), store
+					    * the row index within the
+					    * shape_values, shape_gradients,
+					    * and shape_hessians tables (the
+					    * column index is the quadrature
+					    * point index). If the shape
+					    * function is primitive, then we
+					    * can get this information from
+					    * the shape_function_to_row_table
+					    * of the FEValues object;
+					    * otherwise, we have to work a bit
+					    * harder to compute this
+					    * information.
+					    */
+	  unsigned int row_index[dim];
+
+					   /**
+					    * For each shape function say the
+					    * following: if only a single
+					    * entry in
+					    * is_nonzero_shape_function_component
+					    * for this shape function is
+					    * nonzero, then store the
+					    * corresponding value of row_index
+					    * and
+					    * single_nonzero_component_index
+					    * represents the index between 0
+					    * and dim for which it is
+					    * attained. If multiple components
+					    * are nonzero, then store -1. If
+					    * no components are nonzero then
+					    * store -2.
+					    */
+	  int          single_nonzero_component;
+	  unsigned int single_nonzero_component_index;
+      };
 
 				       /**
-					* For each pair (shape function,
-					* component within vector), store the
-					* row index within the shape_values,
-					* shape_gradients, and shape_hessians
-					* tables (the column index is the
-					* quadrature point index). If the
-					* shape function is primitive, then we
-					* can get this information from the
-					* shape_function_to_row_table of the
-					* FEValues object; otherwise, we have
-					* to work a bit harder to compute this
-					* information.
+					* Store the data about shape
+					* functions.
 					*/
-      Table<2,unsigned int> row_index;
-
-				       /**
-					* For each shape function say the
-					* following: if only a single entry in
-					* is_nonzero_shape_function_component
-					* for this shape function is nonzero,
-					* then store the corresponding value
-					* of row_index and
-					* single_nonzero_component_index
-					* represents the index between 0 and
-					* dim for which it is attained. If
-					* multiple components are nonzero,
-					* then store -1. If no components are
-					* nonzero then store -2.
-					*/
-      Table<1,int>          single_nonzero_component;
-      Table<1,unsigned int> single_nonzero_component_index;
+      std::vector<ShapeFunctionData> shape_function_data;
   };
 }
 
@@ -3418,8 +3457,10 @@ namespace FEValuesViews
 				     // component as fixed and we have
 				     // pre-computed and cached a bunch of
 				     // information. see the comments there
-    if (is_nonzero_shape_function_component[shape_function])
-      return fe_values.shape_values(row_index[shape_function],q_point);
+    if (shape_function_data[shape_function].is_nonzero_shape_function_component)
+      return fe_values.shape_values(shape_function_data[shape_function]
+				    .row_index,
+				    q_point);
     else
       return 0;
   }
@@ -3445,8 +3486,9 @@ namespace FEValuesViews
 				     // component as fixed and we have
 				     // pre-computed and cached a bunch of
 				     // information. see the comments there
-    if (is_nonzero_shape_function_component[shape_function])
-      return fe_values.shape_gradients[row_index[shape_function]][q_point];
+    if (shape_function_data[shape_function].is_nonzero_shape_function_component)
+      return fe_values.shape_gradients[shape_function_data[shape_function]
+				       .row_index][q_point];
     else
       return gradient_type();
   }
@@ -3471,8 +3513,8 @@ namespace FEValuesViews
 				     // component as fixed and we have
 				     // pre-computed and cached a bunch of
 				     // information. see the comments there
-    if (is_nonzero_shape_function_component[shape_function])
-      return fe_values.shape_hessians[row_index[shape_function]][q_point];
+    if (shape_function_data[shape_function].is_nonzero_shape_function_component)
+      return fe_values.shape_hessians[shape_function_data[shape_function].row_index][q_point];
     else
       return hessian_type();
   }
@@ -3493,13 +3535,13 @@ namespace FEValuesViews
 
 				     // same as for the scalar case except
 				     // that we have one more index
-    const int snc = single_nonzero_component(shape_function);
+    const int snc = shape_function_data[shape_function].single_nonzero_component;
     if (snc == -2)
       return value_type();
     else if (snc != -1)
       {
 	value_type return_value;
-	return_value[single_nonzero_component_index[shape_function]]
+	return_value[shape_function_data[shape_function].single_nonzero_component_index]
 	  = fe_values.shape_values(snc,q_point);
 	return return_value;
       }
@@ -3507,9 +3549,9 @@ namespace FEValuesViews
       {
 	value_type return_value;
 	for (unsigned int d=0; d<dim; ++d)    
-	  if (is_nonzero_shape_function_component(shape_function,d))
+	  if (shape_function_data[shape_function].is_nonzero_shape_function_component[d])
 	    return_value[d]
-	      = fe_values.shape_values(row_index(shape_function,d),q_point);
+	      = fe_values.shape_values(shape_function_data[shape_function].row_index[d],q_point);
 	
 	return return_value;
       }
@@ -3531,13 +3573,13 @@ namespace FEValuesViews
 
 				     // same as for the scalar case except
 				     // that we have one more index
-    const int snc = single_nonzero_component(shape_function);
+    const int snc = shape_function_data[shape_function].single_nonzero_component;
     if (snc == -2)
       return gradient_type();
     else if (snc != -1)
       {
 	gradient_type return_value;
-	return_value[single_nonzero_component_index[shape_function]]
+	return_value[shape_function_data[shape_function].single_nonzero_component_index]
 	  = fe_values.shape_gradients[snc][q_point];
 	return return_value;
       }
@@ -3545,9 +3587,9 @@ namespace FEValuesViews
       {
 	gradient_type return_value;
 	for (unsigned int d=0; d<dim; ++d)    
-	  if (is_nonzero_shape_function_component(shape_function,d))
+	  if (shape_function_data[shape_function].is_nonzero_shape_function_component[d])
 	    return_value[d]
-	      = fe_values.shape_gradients[row_index(shape_function,d)][q_point];
+	      = fe_values.shape_gradients[shape_function_data[shape_function].row_index[d]][q_point];
 
 	return return_value;
       }
@@ -3571,19 +3613,19 @@ namespace FEValuesViews
 
 				     // same as for the scalar case except
 				     // that we have one more index
-    const int snc = single_nonzero_component(shape_function);
+    const int snc = shape_function_data[shape_function].single_nonzero_component;
     if (snc == -2)
       return divergence_type();
     else if (snc != -1)
       return
-	fe_values.shape_gradients[snc][q_point][single_nonzero_component_index[shape_function]];
+	fe_values.shape_gradients[snc][q_point][shape_function_data[shape_function].single_nonzero_component_index];
     else
       {
 	divergence_type return_value = 0;
 	for (unsigned int d=0; d<dim; ++d)    
-	  if (is_nonzero_shape_function_component(shape_function,d))
+	  if (shape_function_data[shape_function].is_nonzero_shape_function_component[d])
 	    return_value
-	      += fe_values.shape_gradients[row_index(shape_function,d)][q_point][d];
+	      += fe_values.shape_gradients[shape_function_data[shape_function].row_index[d]][q_point][d];
 
 	return return_value;
       }
@@ -3607,13 +3649,13 @@ namespace FEValuesViews
 
 				     // same as for the scalar case except
 				     // that we have one more index
-    const int snc = single_nonzero_component(shape_function);
+    const int snc = shape_function_data[shape_function].single_nonzero_component;
     if (snc == -2)
       return hessian_type();
     else if (snc != -1)
       {
 	hessian_type return_value;
-	return_value[single_nonzero_component_index[shape_function]]
+	return_value[shape_function_data[shape_function].single_nonzero_component_index]
 	  = fe_values.shape_hessians[snc][q_point];
 	return return_value;
       }
@@ -3621,9 +3663,9 @@ namespace FEValuesViews
       {
 	hessian_type return_value;
 	for (unsigned int d=0; d<dim; ++d)    
-	  if (is_nonzero_shape_function_component(shape_function,d))
+	  if (shape_function_data[shape_function].is_nonzero_shape_function_component[d])
 	    return_value[d]
-	      = fe_values.shape_hessians[row_index(shape_function,d)][q_point];
+	      = fe_values.shape_hessians[shape_function_data[shape_function].row_index[d]][q_point];
 
 	return return_value;
       }
@@ -3644,13 +3686,13 @@ namespace FEValuesViews
 
 				     // same as for the scalar case except
 				     // that we have one more index
-    const int snc = single_nonzero_component(shape_function);
+    const int snc = shape_function_data[shape_function].single_nonzero_component;
     if (snc == -2)
       return symmetric_gradient_type();
     else if (snc != -1)
       {
 	gradient_type return_value;
-	return_value[single_nonzero_component_index[shape_function]]
+	return_value[shape_function_data[shape_function].single_nonzero_component_index]
 	  = fe_values.shape_gradients[snc][q_point];
 	return symmetrize(return_value);
       }
@@ -3658,9 +3700,9 @@ namespace FEValuesViews
       {
 	gradient_type return_value;
 	for (unsigned int d=0; d<dim; ++d)    
-	  if (is_nonzero_shape_function_component(shape_function,d))
+	  if (shape_function_data[shape_function].is_nonzero_shape_function_component[d])
 	    return_value[d]
-	      = fe_values.shape_gradients[row_index(shape_function,d)][q_point];
+	      = fe_values.shape_gradients[shape_function_data[shape_function].row_index[d]][q_point];
 
 	return symmetrize(return_value);
       }
