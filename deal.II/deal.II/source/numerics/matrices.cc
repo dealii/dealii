@@ -1023,6 +1023,7 @@ MatrixCreator::create_boundary_mass_matrix (const Mapping<dim, spacedim>  &mappi
 }
 
 
+#if deal_II_dimension == 2
 
 template <>
 void
@@ -1041,6 +1042,8 @@ create_boundary_mass_matrix_1<2,3> (boost::tuple<const Mapping<2,3> &,
 {
   Assert(false,ExcNotImplemented());
 }
+
+#endif
 
 
 template <int dim, int spacedim>
