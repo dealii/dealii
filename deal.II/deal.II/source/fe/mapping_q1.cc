@@ -1194,6 +1194,8 @@ MappingQ1<dim,spacedim>::transform_covariant (
 }
 
 
+#if deal_II_dimension == 1
+
 template<>
 void
 MappingQ1<1,2>::transform_covariant (
@@ -1220,6 +1222,10 @@ MappingQ1<1,2>::transform_covariant (
     contract (output[i], auxiliary, data.covariant[i]);
   }
 }
+
+#endif
+
+#if deal_II_dimension == 2
 
 template<>
 void
@@ -1249,6 +1255,9 @@ MappingQ1<2,3>::transform_covariant (
   }
 }
 
+#endif
+
+
 template <int dim, int spacedim>
 void
 MappingQ1<dim, spacedim>::transform_covariant (
@@ -1270,6 +1279,8 @@ MappingQ1<dim, spacedim>::transform_covariant (
 	contract (output[i], input[i+offset], data.covariant[i]);
 }
 
+#if deal_II_dimension == 1
+
 template <>
 void
 MappingQ1<1, 2>::transform_covariant (
@@ -1281,6 +1292,10 @@ MappingQ1<1, 2>::transform_covariant (
     Assert(false, ExcNotImplemented());
 }
 
+#endif
+
+#if deal_II_dimension == 2
+
 template <>
 void
 MappingQ1<2, 3>::transform_covariant (
@@ -1291,6 +1306,8 @@ MappingQ1<2, 3>::transform_covariant (
 {
     Assert(false, ExcNotImplemented());
 }
+
+#endif
 
 
 template<int dim, int spacedim>
@@ -1423,6 +1440,9 @@ transform_real_to_unit_cell (const typename Triangulation<dim,spacedim>::cell_it
   return p_unit;
 }
 
+
+#if deal_II_dimension == 1
+
 template<>
 void
 MappingQ1<1,2>::
@@ -1434,6 +1454,11 @@ transform_real_to_unit_cell_internal
 {
 	Assert(false, ExcNotImplemented());
 }
+
+#endif
+
+#if deal_II_dimension == 2
+
 template<>
 void
 MappingQ1<2,3>::
@@ -1445,6 +1470,8 @@ transform_real_to_unit_cell_internal
 {
 	Assert(false, ExcNotImplemented());
 }
+
+#endif
 
 
 template<int dim, int spacedim>
