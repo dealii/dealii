@@ -2887,6 +2887,8 @@ namespace hp
   }
 
 
+#if deal_II_dimension == 2  
+  
   template <>
   unsigned int DoFHandler<2,3>::n_boundary_dofs () const
   {
@@ -2908,7 +2910,7 @@ namespace hp
     return 0;
   }
 
-
+#endif
 
 
 
