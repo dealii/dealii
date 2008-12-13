@@ -1392,8 +1392,19 @@ TriaAccessor<structdim, dim, spacedim>::refinement_case() const
 	    return (static_cast<RefinementCase<structdim> >
 		    (this->objects().children[this->present_index] != -1
 		     ?
-		     RefinementCase<1>::cut_x :
-		     RefinementCase<1>::no_refinement));
+						      // cast the branches
+						      // here first to uchar
+						      // and then (above) to
+						      // RefinementCase<structdim>
+						      // so that the
+						      // conversion is valid
+						      // even for the case
+						      // structdim>1 (for
+						      // which this part of
+						      // the code is dead
+						      // anyway)
+		     static_cast<unsigned char>(RefinementCase<1>::cut_x) :
+		     static_cast<unsigned char>(RefinementCase<1>::no_refinement)));
 
       default:
 	    Assert (static_cast<unsigned int> (this->present_index) <
