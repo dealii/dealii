@@ -765,26 +765,21 @@ double BoussinesqFlowProblem<dim>::get_maximal_velocity () const
   const unsigned int n_q_points = quadrature_formula.size();
 
   FEValues<dim> fe_values (stokes_fe, quadrature_formula, update_values);
-  std::vector<Vector<double> > stokes_values(n_q_points,
-					     Vector<double>(dim+1));
+  std::vector<Tensor<1,dim> > velocity_values(n_q_points);
   double max_velocity = 0;
 
+  const FEValuesExtractors::Vector velocities (0);
+  
   typename DoFHandler<dim>::active_cell_iterator
     cell = stokes_dof_handler.begin_active(),
     endc = stokes_dof_handler.end();
   for (; cell!=endc; ++cell)
     {
       fe_values.reinit (cell);
-      fe_values.get_function_values (stokes_solution, stokes_values);
+      fe_values[velocities].get_function_values (stokes_solution, velocity_values);
 
       for (unsigned int q=0; q<n_q_points; ++q)
-        {
-          Tensor<1,dim> velocity;
-          for (unsigned int i=0; i<dim; ++i)
-            velocity[i] = stokes_values[q](i);
-
-          max_velocity = std::max (max_velocity, velocity.norm());
-        }
+	max_velocity = std::max (max_velocity, velocity_values[q].norm());
     }
 
   return max_velocity;
