@@ -950,6 +950,9 @@ FiniteElement<dim,spacedim>::memory_consumption () const
 	  MemoryConsumption::memory_consumption (n_nonzero_components_table));
 }
 
+
+#if deal_II_dimension == 1
+
 template<>
 void
 FiniteElement<1,2>::compute_2nd (
@@ -963,6 +966,10 @@ FiniteElement<1,2>::compute_2nd (
 
 	Assert(false, ExcNotImplemented());
 }
+
+#endif
+
+#if deal_II_dimension == 2
 
 template<>
 void
@@ -978,6 +985,7 @@ FiniteElement<2,3>::compute_2nd (
 	Assert(false, ExcNotImplemented());
 }
 
+#endif
 
 template <int dim, int spacedim>  
 void
