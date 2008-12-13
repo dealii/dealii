@@ -3851,6 +3851,85 @@ namespace FEValuesViews
   }
 
 
+  namespace
+  {
+				     /**
+				      * Return the symmetrized version of a
+				      * tensor whose n'th row equals the
+				      * second argument, with all other rows
+				      * equal to zero.
+				      */
+    inline
+    SymmetricTensor<2,1>
+    symmetrize_single_row (const unsigned int n,
+			   const Tensor<1,1> &t)
+    {
+      const unsigned int dim = 1;
+      Assert (n < dim, ExcIndexRange (n, 0, dim));
+      
+      const double array[1] = { t[0] };
+      return SymmetricTensor<2,1>(array);
+    }
+
+
+    inline
+    SymmetricTensor<2,2>
+    symmetrize_single_row (const unsigned int n,
+			   const Tensor<1,2> &t)
+    {
+      switch (n)
+	{
+	  case 0:
+	  {
+	    const double array[3] = { t[0], 0, t[1]/2 };
+	    return SymmetricTensor<2,2>(array);
+	  }
+	  case 1:
+	  {
+	    const double array[3] = { 0, t[1], t[0]/2 };
+	    return SymmetricTensor<2,2>(array);
+	  }
+	  default:
+	  {
+	    Assert (false, ExcIndexRange (n, 0, 2));
+	    return SymmetricTensor<2,2>();
+	  }
+	}
+    }
+
+
+    inline
+    SymmetricTensor<2,3>
+    symmetrize_single_row (const unsigned int n,
+			   const Tensor<1,3> &t)
+    {
+      switch (n)
+	{
+	  case 0:
+	  {
+	    const double array[6] = { t[0], 0, 0, t[1]/2, t[2]/2, 0 };
+	    return SymmetricTensor<2,3>(array);
+	  }
+	  case 1:
+	  {
+	    const double array[6] = { 0, t[1], 0, t[0]/2, 0, t[2]/2 };
+	    return SymmetricTensor<2,3>(array);
+	  }
+	  case 2:
+	  {
+	    const double array[6] = { 0, 0, t[2], 0, t[0]/2, t[1]/2 };
+	    return SymmetricTensor<2,3>(array);
+	  }
+	  default:
+	  {
+	    Assert (false, ExcIndexRange (n, 0, 3));
+	    return SymmetricTensor<2,3>();
+	  }
+	}
+    }
+  }
+  
+
   template <int dim, int spacedim>
   inline
   typename Vector<dim,spacedim>::symmetric_gradient_type
@@ -3869,12 +3948,8 @@ namespace FEValuesViews
     if (snc == -2)
       return symmetric_gradient_type();
     else if (snc != -1)
-      {
-	gradient_type return_value;
-	return_value[shape_function_data[shape_function].single_nonzero_component_index]
-	  = fe_values.shape_gradients[snc][q_point];
-	return symmetrize(return_value);
-      }
+      return symmetrize_single_row (shape_function_data[shape_function].single_nonzero_component_index,
+				    fe_values.shape_gradients[snc][q_point]);
     else
       {
 	gradient_type return_value;
