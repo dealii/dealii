@@ -856,6 +856,8 @@ MappingQ1<dim,spacedim>::fill_fe_values (const typename Triangulation<dim,spaced
 }
 
 
+#if deal_II_dimension == 2
+
 template<>
 void
 MappingQ1<2,3>::compute_fill_face (const Triangulation<2,3>::cell_iterator &,
@@ -874,6 +876,7 @@ MappingQ1<2,3>::compute_fill_face (const Triangulation<2,3>::cell_iterator &,
 	Assert(false, ExcNotImplemented());
 }
 
+#endif
 
 template<int dim, int spacedim>
 void
