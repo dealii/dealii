@@ -76,8 +76,10 @@ void test (const Triangulation<dim>& tr,
 	  for (unsigned int d=0; d<dim; ++d)
 	    {
 	      deallog << selected_vector_values[q][d] << std::endl;
-	      Assert (std::fabs (selected_vector_values[q][d] - vector_values[q](c+d))
-		      <= 1e-12 * std::fabs (selected_vector_values[q][d]),
+	      Assert ((std::fabs (selected_vector_values[q][d] - vector_values[q](c+d))
+		       <= 1e-12 * selected_vector_values[q].norm())
+		      ||
+		      (selected_vector_values[q].norm() < 1e-12),
 		      ExcInternalError());
 	    }
       }
