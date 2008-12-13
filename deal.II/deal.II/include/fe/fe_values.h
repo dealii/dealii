@@ -275,7 +275,7 @@ namespace FEValuesViews
 					*
 					* This function is the equivalent of
 					* the
-					* FEValuesBase::get_function_values
+					* FEValuesBase::get_function_gradients
 					* function but it only works on the
 					* selected scalar component.
 					*/
@@ -296,7 +296,7 @@ namespace FEValuesViews
 					*
 					* This function is the equivalent of
 					* the
-					* FEValuesBase::get_function_values
+					* FEValuesBase::get_function_hessians
 					* function but it only works on the
 					* selected scalar component.
 					*/
@@ -532,6 +532,69 @@ namespace FEValuesViews
       hessian_type
       hessian (const unsigned int shape_function,
 	       const unsigned int q_point) const;
+
+				       /**
+					* Return the values of the selected
+					* vector components of the finite
+					* element function characterized by
+					* <tt>fe_function</tt> at the
+					* quadrature points of the cell, face
+					* or subface selected the last time
+					* the <tt>reinit</tt> function of the
+					* FEValues object was called, at the
+					* quadrature points.
+					*
+					* This function is the equivalent of
+					* the
+					* FEValuesBase::get_function_values
+					* function but it only works on the
+					* selected vector components.
+					*/
+      template <class InputVector>
+      void get_function_values (const InputVector& fe_function,
+				std::vector<value_type>& values) const;
+
+				       /**
+					* Return the gradients of the selected
+					* vector components of the finite
+					* element function characterized by
+					* <tt>fe_function</tt> at the
+					* quadrature points of the cell, face
+					* or subface selected the last time
+					* the <tt>reinit</tt> function of the
+					* FEValues object was called, at the
+					* quadrature points.
+					*
+					* This function is the equivalent of
+					* the
+					* FEValuesBase::get_function_gradients
+					* function but it only works on the
+					* selected vector components.
+					*/
+      template <class InputVector>
+      void get_function_gradients (const InputVector& fe_function,
+				   std::vector<gradient_type>& values) const;
+
+				       /**
+					* Return the Hessians of the selected
+					* vector components of the finite
+					* element function characterized by
+					* <tt>fe_function</tt> at the
+					* quadrature points of the cell, face
+					* or subface selected the last time
+					* the <tt>reinit</tt> function of the
+					* FEValues object was called, at the
+					* quadrature points.
+					*
+					* This function is the equivalent of
+					* the
+					* FEValuesBase::get_function_hessians
+					* function but it only works on the
+					* selected vector components.
+					*/
+      template <class InputVector>
+      void get_function_hessians (const InputVector& fe_function,
+				  std::vector<hessian_type>& values) const;
       
     private:
 				       /**
@@ -3222,7 +3285,7 @@ namespace FEValuesViews
     dealii::Vector<typename InputVector::value_type> dof_values (fe_values.dofs_per_cell);
     fe_values.present_cell->get_interpolated_dof_values(fe_function, dof_values);
 
-    std::fill (values.begin(), values.end(), value_type());
+    std::fill (values.begin(), values.end(), gradient_type());
   
     for (unsigned int shape_function=0;
 	 shape_function<fe_values.fe->dofs_per_cell; ++shape_function)
@@ -3260,7 +3323,7 @@ namespace FEValuesViews
     dealii::Vector<typename InputVector::value_type> dof_values (fe_values.dofs_per_cell);
     fe_values.present_cell->get_interpolated_dof_values(fe_function, dof_values);
 
-    std::fill (values.begin(), values.end(), value_type());
+    std::fill (values.begin(), values.end(), hessian_type());
 
     for (unsigned int shape_function=0;
 	 shape_function<fe_values.fe->dofs_per_cell; ++shape_function)
@@ -3535,16 +3598,120 @@ namespace FEValuesViews
 	return symmetrize(return_value);
       }
   }
+
+
+
+  template <int dim, int spacedim>
+  template <class InputVector>
+  inline
+  void
+  Vector<dim,spacedim>::
+  get_function_values (const InputVector &fe_function, 
+		       std::vector<value_type> &values) const
+  {
+    typedef FEValuesBase<dim,spacedim> FVB;
+    Assert (fe_values.update_flags & update_values,
+	    typename FVB::ExcAccessToUninitializedField());    
+    Assert (values.size() == fe_values.n_quadrature_points,
+	    ExcDimensionMismatch(values.size(), fe_values.n_quadrature_points));
+    Assert (fe_values.present_cell.get() != 0,
+	    ExcMessage ("FEValues object is not reinit'ed to any cell"));
+    Assert (fe_function.size() == fe_values.present_cell->n_dofs_for_dof_handler(),
+	    ExcDimensionMismatch(fe_function.size(),
+				 fe_values.present_cell->n_dofs_for_dof_handler()));
+
+				     // get function values of dofs
+				     // on this cell
+    dealii::Vector<typename InputVector::value_type> dof_values (fe_values.dofs_per_cell);
+    fe_values.present_cell->get_interpolated_dof_values(fe_function, dof_values);
+
+    std::fill (values.begin(), values.end(), value_type());
+
+    for (unsigned int shape_function=0;
+	 shape_function<fe_values.fe->dofs_per_cell; ++shape_function)
+      for (unsigned int q_point=0; q_point<fe_values.n_quadrature_points; ++q_point)
+	values[q_point] +=
+	  dof_values(shape_function) *
+	  value (shape_function, q_point);
+  }
+  
+
+
+
+  template <int dim, int spacedim>  
+  template <class InputVector>
+  inline
+  void
+  Vector<dim,spacedim>::
+  get_function_gradients (const InputVector &fe_function, 
+			  std::vector<gradient_type> &values) const
+  {
+    typedef FEValuesBase<dim,spacedim> FVB;
+    Assert (fe_values.update_flags & update_gradients,
+	    typename FVB::ExcAccessToUninitializedField());    
+    Assert (values.size() == fe_values.n_quadrature_points,
+	    ExcDimensionMismatch(values.size(), fe_values.n_quadrature_points));
+    Assert (fe_values.present_cell.get() != 0,
+	    ExcMessage ("FEValues object is not reinit'ed to any cell"));
+    Assert (fe_function.size() == fe_values.present_cell->n_dofs_for_dof_handler(),
+	    ExcDimensionMismatch(fe_function.size(),
+				 fe_values.present_cell->n_dofs_for_dof_handler()));
+
+				     // get function values of dofs
+				     // on this cell
+    dealii::Vector<typename InputVector::value_type> dof_values (fe_values.dofs_per_cell);
+    fe_values.present_cell->get_interpolated_dof_values(fe_function, dof_values);
+
+    std::fill (values.begin(), values.end(), gradient_type());
+  
+    for (unsigned int shape_function=0;
+	 shape_function<fe_values.fe->dofs_per_cell; ++shape_function)
+      for (unsigned int q_point=0; q_point<fe_values.n_quadrature_points; ++q_point)
+	values[q_point] +=
+	  dof_values(shape_function) *
+	  gradient (shape_function, q_point);
+  }
+
+
+
+  template <int dim, int spacedim>  
+  template <class InputVector>
+  inline
+  void
+  Vector<dim,spacedim>::
+  get_function_hessians (const InputVector &fe_function, 
+			 std::vector<hessian_type> &values) const
+  {
+    typedef FEValuesBase<dim,spacedim> FVB;
+    Assert (fe_values.update_flags & update_hessians,
+	    typename FVB::ExcAccessToUninitializedField());
+    Assert (values.size() == fe_values.n_quadrature_points,
+	    ExcDimensionMismatch(values.size(), fe_values.n_quadrature_points));
+    Assert (fe_values.present_cell.get() != 0,
+	    ExcMessage ("FEValues object is not reinit'ed to any cell"));
+    Assert (fe_function.size() == fe_values.present_cell->n_dofs_for_dof_handler(),
+	    ExcDimensionMismatch(fe_function.size(),
+				 fe_values.present_cell->n_dofs_for_dof_handler()));
+    
+				     // get function values of dofs
+				     // on this cell
+    dealii::Vector<typename InputVector::value_type> dof_values (fe_values.dofs_per_cell);
+    fe_values.present_cell->get_interpolated_dof_values(fe_function, dof_values);
+
+    std::fill (values.begin(), values.end(), hessian_type());
+
+    for (unsigned int shape_function=0;
+	 shape_function<fe_values.fe->dofs_per_cell; ++shape_function)
+      for (unsigned int q_point=0; q_point<fe_values.n_quadrature_points; ++q_point)
+	values[q_point] +=
+	  dof_values(shape_function) *
+	  hessian (shape_function, q_point);
+  }
 }
 
 
 
-
-
-
 /*------------------------ Inline functions: FEValuesBase ------------------------*/
-
-
 
 
 
