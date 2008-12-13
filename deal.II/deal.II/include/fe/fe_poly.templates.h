@@ -235,8 +235,8 @@ FE_Poly<POLY,dim,spacedim>::get_data (const UpdateFlags      update_flags,
 //---------------------------------------------------------------------------
 
 
-//codimension 1
 template <>
+inline
 void
 FE_Poly<TensorProductPolynomials<1>,1,2>::fill_fe_values (const Mapping<1,2> &mapping,
 				   const Triangulation<1,2>::cell_iterator   &/*cell*/,
@@ -282,6 +282,7 @@ FE_Poly<TensorProductPolynomials<1>,1,2>::fill_fe_values (const Mapping<1,2> &ma
 
 
 template <>
+inline
 void
 FE_Poly<TensorProductPolynomials<2>,2,3>::fill_fe_values (const Mapping<2,3> &mapping,
 				   const Triangulation<2,3>::cell_iterator &/* cell */,
@@ -324,6 +325,7 @@ FE_Poly<TensorProductPolynomials<2>,2,3>::fill_fe_values (const Mapping<2,3> &ma
 
 
 template <>
+inline
 void
 FE_Poly<PolynomialSpace<1>,1,2>::fill_fe_values (const Mapping<1,2> &/* mapping */,
 				   const Triangulation<1,2>::cell_iterator   &/* cell */,
@@ -371,6 +373,7 @@ FE_Poly<PolynomialSpace<1>,1,2>::fill_fe_values (const Mapping<1,2> &/* mapping 
 
 
 template <>
+inline
 void
 FE_Poly<PolynomialSpace<2>,2,3>::fill_fe_values (const Mapping<2,3> &/* mapping */,
 				   const Triangulation<2,3>::cell_iterator &/* cell */,
@@ -456,9 +459,10 @@ FE_Poly<POLY,dim,spacedim>::fill_fe_values (const Mapping<dim,spacedim>         
 		       mapping_data, fe_data, data);
 }
 
-//codimension 1
+
 
 template <>
+inline
 void
 FE_Poly<TensorProductPolynomials<1>,1,2>::fill_fe_face_values (const Mapping<1,2> &,
 							       const Triangulation<1,2>::cell_iterator &,
@@ -474,6 +478,7 @@ FE_Poly<TensorProductPolynomials<1>,1,2>::fill_fe_face_values (const Mapping<1,2
 
  
 template <>
+inline
 void
 FE_Poly<TensorProductPolynomials<2>,2,3>::fill_fe_face_values (const Mapping<2,3> &,
 							       const Triangulation<2,3>::cell_iterator &,
@@ -489,6 +494,7 @@ FE_Poly<TensorProductPolynomials<2>,2,3>::fill_fe_face_values (const Mapping<2,3
 
 
 template <>
+inline
 void
 FE_Poly<PolynomialSpace<1>,1,2>::fill_fe_face_values (const Mapping<1,2> &,
 							       const Triangulation<1,2>::cell_iterator &,
@@ -504,6 +510,7 @@ FE_Poly<PolynomialSpace<1>,1,2>::fill_fe_face_values (const Mapping<1,2> &,
 
  
 template <>
+inline
 void
 FE_Poly<PolynomialSpace<2>,2,3>::fill_fe_face_values (const Mapping<2,3> &,
 							       const Triangulation<2,3>::cell_iterator &,
@@ -571,6 +578,7 @@ FE_Poly<POLY,dim,spacedim>::fill_fe_face_values (const Mapping<dim,spacedim>    
 
 //codimension 1
 template <>
+inline
 void
 FE_Poly<TensorProductPolynomials<1>,1,2>::fill_fe_subface_values (const Mapping<1,2> &,
 							       const Triangulation<1,2>::cell_iterator &,
@@ -586,6 +594,7 @@ FE_Poly<TensorProductPolynomials<1>,1,2>::fill_fe_subface_values (const Mapping<
 
 
 template <>
+inline
 void
 FE_Poly<TensorProductPolynomials<2>,2,3>::fill_fe_subface_values (const Mapping<2,3> &,
 							       const Triangulation<2,3>::cell_iterator &,
@@ -601,6 +610,7 @@ FE_Poly<TensorProductPolynomials<2>,2,3>::fill_fe_subface_values (const Mapping<
 
 
 template <>
+inline
 void
 FE_Poly<PolynomialSpace<1>,1,2>::fill_fe_subface_values (const Mapping<1,2> &,
 							       const Triangulation<1,2>::cell_iterator &,
@@ -616,6 +626,7 @@ FE_Poly<PolynomialSpace<1>,1,2>::fill_fe_subface_values (const Mapping<1,2> &,
 
 
 template <>
+inline
 void
 FE_Poly<PolynomialSpace<2>,2,3>::fill_fe_subface_values (const Mapping<2,3> &,
 							       const Triangulation<2,3>::cell_iterator &,
