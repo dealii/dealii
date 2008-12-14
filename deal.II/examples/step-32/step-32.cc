@@ -286,7 +286,7 @@ class BoussinesqFlowProblem
 		      const std::vector<Tensor<1,dim> >  &old_old_temperature_grads,
 		      const std::vector<Tensor<2,dim> >  &old_temperature_hessians,
 		      const std::vector<Tensor<2,dim> >  &old_old_temperature_hessians,
-		      const std::vector<Vector<double> > &present_stokes_values,
+		      const std::vector<Tensor<1,dim> >  &present_velocity_values,
 		      const std::vector<double>          &gamma_values,
 		      const double                        global_u_infty,
 		      const double                        global_T_variation,
@@ -386,8 +386,10 @@ double BoussinesqFlowProblem<dim>::get_maximal_velocity () const
   BlockVector<double> localized_stokes_solution (stokes_solution);
 
   FEValues<dim> fe_values (stokes_fe, quadrature_formula, update_values);
-  std::vector<Vector<double> > stokes_values(n_q_points,
-					     Vector<double>(dim+1));
+  std::vector<Tensor<1,dim> > velocity_values(n_q_points);
+
+  const FEValuesExtractors::Vector velocities (0);
+  
   double max_local_velocity = 0, max_velocity = 0;
 
   typename DoFHandler<dim>::active_cell_iterator
@@ -397,16 +399,12 @@ double BoussinesqFlowProblem<dim>::get_maximal_velocity () const
     if (cell->subdomain_id() == Utilities::Trilinos::get_this_mpi_process(trilinos_communicator))
       {
 	fe_values.reinit (cell);
-	fe_values.get_function_values (localized_stokes_solution, stokes_values);
+	fe_values[velocities].get_function_values (localized_stokes_solution,
+						   velocity_values);
 
 	for (unsigned int q=0; q<n_q_points; ++q)
-	  {
-	    Tensor<1,dim> velocity;
-	    for (unsigned int i=0; i<dim; ++i)
-	      velocity[i] = stokes_values[q](i);
-
-	    max_local_velocity = std::max (max_local_velocity, velocity.norm());
-	  }
+	  max_local_velocity = std::max (max_local_velocity,
+					 velocity_values[q].norm());
       }
 
   trilinos_communicator.MaxAll(&max_local_velocity, &max_velocity, 1);
@@ -516,7 +514,7 @@ compute_viscosity(const std::vector<double>          &old_temperature,
 		  const std::vector<Tensor<1,dim> >  &old_old_temperature_grads,
 		  const std::vector<Tensor<2,dim> >  &old_temperature_hessians,
 		  const std::vector<Tensor<2,dim> >  &old_old_temperature_hessians,
-		  const std::vector<Vector<double> > &present_stokes_values,
+		  const std::vector<Tensor<1,dim> >  &present_velocity_values,
 		  const std::vector<double>          &gamma_values,
 		  const double                        global_u_infty,
 		  const double                        global_T_variation,
@@ -538,9 +536,7 @@ compute_viscosity(const std::vector<double>          &old_temperature,
   
   for (unsigned int q=0; q < n_q_points; ++q)
     {
-      Tensor<1,dim> u;
-      for (unsigned int d=0; d<dim; ++d)
-	u[d] = present_stokes_values[q](d);
+      const Tensor<1,dim> u = present_velocity_values[q];
       
       const double dT_dt = (old_temperature[q] - old_old_temperature[q])
 			   / old_time_step;
@@ -1066,8 +1062,7 @@ void BoussinesqFlowProblem<dim>::assemble_temperature_system ()
 
   std::vector<unsigned int> local_dof_indices (dofs_per_cell);
 
-  std::vector<Vector<double> > present_stokes_values (n_q_points, 
-						      Vector<double>(dim+1));
+  std::vector<Tensor<1,dim> > present_velocity_values (n_q_points);
 
   
   std::vector<double>         old_temperature_values (n_q_points);
@@ -1091,6 +1086,8 @@ void BoussinesqFlowProblem<dim>::assemble_temperature_system ()
 
   const TrilinosWrappers::BlockVector localized_stokes_solution (stokes_solution);
 
+  const FEValuesExtractors::Vector velocities (0);
+  
   typename DoFHandler<dim>::active_cell_iterator
     cell = temperature_dof_handler.begin_active(),
     endc = temperature_dof_handler.end();
@@ -1123,8 +1120,8 @@ void BoussinesqFlowProblem<dim>::assemble_temperature_system ()
 	temperature_right_hand_side.value_list (temperature_fe_values.get_quadrature_points(),
 						gamma_values);
   
-	stokes_fe_values.get_function_values (localized_stokes_solution,
-					      present_stokes_values);
+	stokes_fe_values[velocities].get_function_values (localized_stokes_solution,
+							  present_velocity_values);
 	
 	const double nu
 	  = compute_viscosity (old_temperature_values,
@@ -1133,7 +1130,7 @@ void BoussinesqFlowProblem<dim>::assemble_temperature_system ()
 			       old_old_temperature_grads,
 			       old_temperature_hessians,
 			       old_old_temperature_hessians,
-			       present_stokes_values,
+			       present_velocity_values,
 			       gamma_values,
 			       global_u_infty,
 			       global_T_range.second - global_T_range.first,
@@ -1155,9 +1152,7 @@ void BoussinesqFlowProblem<dim>::assemble_temperature_system ()
 	    const Tensor<1,dim> old_old_grad_T = old_old_temperature_grads[q];
   
 	    
-	    Tensor<1,dim> present_u;
-	    for (unsigned int d=0; d<dim; ++d)
-	      present_u[d] = present_stokes_values[q](d);
+	    const Tensor<1,dim> present_u = present_velocity_values[q];
   
 	    if (use_bdf2_scheme == true)
 	      {
