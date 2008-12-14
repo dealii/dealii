@@ -986,7 +986,7 @@ compute_viscosity (const std::vector<double>          &old_temperature,
   for (unsigned int q=0; q < n_q_points; ++q)
     {
       const Tensor<1,dim> u = (old_velocity_values[q] +
-			       old_old_velocity_values[q](d)) / 2;
+			       old_old_velocity_values[q]) / 2;
       
       const double dT_dt = (old_temperature[q] - old_old_temperature[q])
 			   / old_time_step;
@@ -2000,6 +2000,8 @@ void BoussinesqFlowProblem<dim>::assemble_temperature_system ()
   const std::pair<double,double>
     global_T_range = get_extrapolated_temperature_range();
 
+  const FEValuesExtractors::Vector velocities (0);
+  
 				   // Now, let's start the loop over all
 				   // cells in the triangulation. Again, we
 				   // need two cell iterators that walk in
@@ -2120,7 +2122,7 @@ void BoussinesqFlowProblem<dim>::assemble_temperature_system ()
 	       (old_velocity_values[q] * (1+time_step/old_time_step) - 
 		old_old_velocity_values[q] * time_step/old_time_step)
 	       :
-	       old_stokes_values[q]);
+	       old_velocity_values[q]);
 
 	  for (unsigned int i=0; i<dofs_per_cell; ++i)
 	    local_rhs(i) += (old_Ts * phi_T[i]
