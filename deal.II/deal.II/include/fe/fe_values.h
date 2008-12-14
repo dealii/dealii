@@ -576,6 +576,53 @@ namespace FEValuesViews
 				   std::vector<gradient_type>& values) const;
 
 				       /**
+					* Return the symmetrized gradients of
+					* the selected vector components of
+					* the finite element function
+					* characterized by
+					* <tt>fe_function</tt> at the
+					* quadrature points of the cell, face
+					* or subface selected the last time
+					* the <tt>reinit</tt> function of the
+					* FEValues object was called, at the
+					* quadrature points.
+					*
+					* There is no equivalent function such
+					* as
+					* FEValuesBase::get_function_gradients
+					* in the FEValues classes but the
+					* information can be obtained from
+					* FEValuesBase::get_function_gradients,
+					* of course.
+					*/
+      template <class InputVector>
+      void get_function_symmetric_gradients (const InputVector& fe_function,
+					     std::vector<symmetric_gradient_type>& values) const;
+      
+				       /**
+					* Return the divergence of the selected
+					* vector components of the finite
+					* element function characterized by
+					* <tt>fe_function</tt> at the
+					* quadrature points of the cell, face
+					* or subface selected the last time
+					* the <tt>reinit</tt> function of the
+					* FEValues object was called, at the
+					* quadrature points.
+					*
+					* There is no equivalent function such
+					* as
+					* FEValuesBase::get_function_gradients
+					* in the FEValues classes but the
+					* information can be obtained from
+					* FEValuesBase::get_function_gradients,
+					* of course.
+					*/
+      template <class InputVector>
+      void get_function_divergences (const InputVector& fe_function,
+				     std::vector<divergence_type>& values) const;
+      
+				       /**
 					* Return the Hessians of the selected
 					* vector components of the finite
 					* element function characterized by
@@ -3702,6 +3749,116 @@ namespace FEValuesViews
       }
   }
 
+
+
+  template <int dim, int spacedim>  
+  template <class InputVector>
+  inline
+  void
+  Vector<dim,spacedim>::
+  get_function_symmetric_gradients (const InputVector &fe_function, 
+				    std::vector<symmetric_gradient_type> &values) const
+  {
+    typedef FEValuesBase<dim,spacedim> FVB;
+    Assert (fe_values.update_flags & update_gradients,
+	    typename FVB::ExcAccessToUninitializedField());    
+    Assert (values.size() == fe_values.n_quadrature_points,
+	    ExcDimensionMismatch(values.size(), fe_values.n_quadrature_points));
+    Assert (fe_values.present_cell.get() != 0,
+	    ExcMessage ("FEValues object is not reinit'ed to any cell"));
+    Assert (fe_function.size() == fe_values.present_cell->n_dofs_for_dof_handler(),
+	    ExcDimensionMismatch(fe_function.size(),
+				 fe_values.present_cell->n_dofs_for_dof_handler()));
+
+				     // get function values of dofs
+				     // on this cell
+    dealii::Vector<typename InputVector::value_type> dof_values (fe_values.dofs_per_cell);
+    fe_values.present_cell->get_interpolated_dof_values(fe_function, dof_values);
+
+    std::fill (values.begin(), values.end(), symmetric_gradient_type());
+  
+    for (unsigned int shape_function=0;
+	 shape_function<fe_values.fe->dofs_per_cell; ++shape_function)
+      {
+	const int snc = shape_function_data[shape_function].single_nonzero_component;
+	
+	if (snc == -2)
+					   // shape function is zero for the
+					   // selected components
+	  continue;
+	else if (snc != -1)
+	  for (unsigned int q_point=0; q_point<fe_values.n_quadrature_points; ++q_point)
+	    values[q_point]
+	      += dof_values(shape_function) *
+	      symmetrize_single_row (shape_function_data[shape_function].single_nonzero_component_index,
+				     fe_values.shape_gradients[snc][q_point]);
+	else
+	  for (unsigned int q_point=0; q_point<fe_values.n_quadrature_points; ++q_point)
+	    {
+	      gradient_type grad;
+	      for (unsigned int d=0; d<dim; ++d)    
+		if (shape_function_data[shape_function].is_nonzero_shape_function_component[d])
+		  grad[d] = (dof_values(shape_function) *
+			     fe_values.shape_gradients[shape_function_data[shape_function].row_index[d]][q_point]);
+	      values[q_point] += symmetrize(grad);
+	    }
+      }
+  }
+
+
+
+  template <int dim, int spacedim>  
+  template <class InputVector>
+  inline
+  void
+  Vector<dim,spacedim>::
+  get_function_divergences (const InputVector &fe_function, 
+			    std::vector<divergence_type> &values) const
+  {
+    typedef FEValuesBase<dim,spacedim> FVB;
+    Assert (fe_values.update_flags & update_gradients,
+	    typename FVB::ExcAccessToUninitializedField());    
+    Assert (values.size() == fe_values.n_quadrature_points,
+	    ExcDimensionMismatch(values.size(), fe_values.n_quadrature_points));
+    Assert (fe_values.present_cell.get() != 0,
+	    ExcMessage ("FEValues object is not reinit'ed to any cell"));
+    Assert (fe_function.size() == fe_values.present_cell->n_dofs_for_dof_handler(),
+	    ExcDimensionMismatch(fe_function.size(),
+				 fe_values.present_cell->n_dofs_for_dof_handler()));
+
+				     // get function values of dofs
+				     // on this cell
+    dealii::Vector<typename InputVector::value_type> dof_values (fe_values.dofs_per_cell);
+    fe_values.present_cell->get_interpolated_dof_values(fe_function, dof_values);
+
+    std::fill (values.begin(), values.end(), divergence_type());
+  
+    for (unsigned int shape_function=0;
+	 shape_function<fe_values.fe->dofs_per_cell; ++shape_function)
+      {
+	const int snc = shape_function_data[shape_function].single_nonzero_component;
+	
+	if (snc == -2)
+					   // shape function is zero for the
+					   // selected components
+	  continue;
+	else if (snc != -1)
+	  for (unsigned int q_point=0; q_point<fe_values.n_quadrature_points; ++q_point)
+	    values[q_point]
+	      += dof_values(shape_function) *
+	      fe_values.shape_gradients[snc][q_point][shape_function_data[shape_function].single_nonzero_component_index];
+	else
+	  for (unsigned int q_point=0; q_point<fe_values.n_quadrature_points; ++q_point)
+	    {
+	      for (unsigned int d=0; d<dim; ++d)    
+		if (shape_function_data[shape_function].is_nonzero_shape_function_component[d])
+		  values[q_point] +=
+		    dof_values(shape_function) *
+		    fe_values.shape_gradients[shape_function_data[shape_function].row_index[d]][q_point][d];
+	    }
+      }
+  }
+  
 
 
   template <int dim, int spacedim>  
