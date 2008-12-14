@@ -601,6 +601,20 @@ inconvenience this causes.
   <li>
   <p>
   Improved: The FEValuesViews objects that one gets when writing things
+  like <code>fe_values[velocities]</code> have acquired the ability to
+  extract individual components of solutions at quadrature points by
+  writing code like
+  <code>fe_values[velocities].get_function_values (global_solution,
+  local_velocity_values)</code>. See the new section at the end of the
+  @ref vector_valued module for an overview of this facility. The
+  @ref step_31 "step-31" program has also been updated to use this.
+  <br>
+  (WB 2008/12/13)
+  </p>
+
+  <li>
+  <p>
+  Improved: The FEValuesViews objects that one gets when writing things
   like <code>fe_values[velocities]</code> (see @ref vector_valued) have
   become a lot smarter. They now compute a significant amount of data
   at creation time, rather than on the fly. This means that creating such
@@ -611,7 +625,7 @@ inconvenience this causes.
   pre-generated object. This turns an $O(N)$ effort into an $O(1)$
   effort, where $N$ is the number of cells.
   <br>
-  (Luca Heltai 2008/12/08)
+  (WB 2008/12/10)
   </p>
 
   <li>

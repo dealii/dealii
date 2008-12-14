@@ -47,6 +47,7 @@
  *  <li> @ref VVAssembling "Assembling linear systems"
  *  <li> @ref VVAlternative "An alternative approach"
  *  <li> @ref VVBlockSolvers "Block solvers"
+ *  <li> @ref VVExtracting "Extracting data from solutions"
  * </ol> </td> </tr> </table>
  *
  *
@@ -223,16 +224,23 @@
  * copy of the element used for the pressure $p$.
  *
  * In this manner, we can combine the whole vector-valued element from its
- * individual components. On a sidenote it may also be worth mentioning why we
- * want to also mirror our logical construction of the weak form in our
- * program: by creating a finite element object as shown above and then
- * handing it off to a DoFHandler object, we get an enumeration of <i>all</i>
- * degrees of freedom at once, whether velocity or pressure. Initially, they
- * are enumerated in a rather random order, but they can be arranged such that
- * first all velocity components are enumerated and then all pressures by, for
- * example, calling DoFRenumbering::component_wise . By and large, many things
- * become much simpler if we can rely on the fact that there is only a single
- * DoFHandler that describes everything.
+ * individual components. However, it is worth pointing out that whichever
+ * way you construct your finite element object, this object doesn't really
+ * know what it represents. For example, for
+ * @code
+ *   FESystem<dim> finite_element (FE_Q<dim>(1), dim,
+ *                                 FE_Q<dim>(1), 1);
+ * @endcode
+ * the constructed object really only knows that it has <code>dim+1</code>
+ * vector components. It has no notion, however, which of these components
+ * represent scalar fields (e.g. temperature, pressure, concentration) and/or
+ * if any of its components are parts of vector fields (velocities,
+ * displacements) or tensors (e.g. stresses). As a consequence, the FEValues
+ * objects we use below to evaluate finite element shape functions at
+ * quadrature points only knows that it has a finite element with a number
+ * of vector components, but doesn't know how to group them. We will show
+ * how to give these components a logical connection using the
+ * FEValuesExtractors classes.
  *
  *
  * @anchor VVAssembling
@@ -737,6 +745,129 @@ scalar_product (const Tensor<2,dim> &u,
  * global matrix, i.e. $M$. Using block vectors and matrices in this way
  * therefore allows us to quite easily write rather complicated solvers making
  * use of the block structure of a linear system.
+ *
+ *
+ *
+ * @anchor VVExtracting
+ * <h3>Extracting data from solutions</h3>
+ *
+ * Once one has computed a solution, it is often necessary to evaluate it at
+ * quadrature points, for example to evaluate nonlinear residuals for the next
+ * Newton iteration, to evaluate the finite element residual for error
+ * estimators, or to compute the right hand side for the next time step in
+ * a time dependent problem.
+ *
+ * The way this is done us to again use an FEValues object to evaluate
+ * the shape functions at quadrature points, and with those also the
+ * values of a finite element function. For the example of the mixed
+ * Laplace problem above, consider the following code after solving:
+ * @code
+  std::vector<Vector<double> > local_solution_values (n_q_points,
+                                                      Vector<double> (dim+1));
+ 
+  typename DoFHandler<dim>::active_cell_iterator
+    cell = dof_handler.begin_active(),
+    endc = dof_handler.end();
+  for (; cell!=endc; ++cell)
+    {
+      fe_values.reinit (cell);
+
+      fe_values.get_function_values (solution,
+                                     local_solution_values);
+ * @endcode
+ *
+ * After this, the variable <code>local_solution_values</code> is a list
+ * of vectors of a length equal to the number of quadrature points we
+ * have initialized the FEValues object with; each of these vectors
+ * has <code>dim+1</code> elements containing the values of the
+ * <code>dim</code> velocities and the one pressure at a quadrature point.
+ *
+ * We can use these values to then construct other things like residuals.
+ * However, the construct is a bit awkward. First, we have a
+ * <code>std::vector</code> of <code>dealii::Vector</code>s, which always
+ * looks strange. It is also inefficient because it implies dynamic memory
+ * allocation for the outer vector as well as for all the inner vectors.
+ * Secondly, maybe we are only interested in the velocities,
+ * for example to solve an advection problem in a second stage (as, for
+ * example, in @ref step_21 "step-21" or @ref step_31 "step-31"). In that
+ * case, one would have to hand-extract these values like so:
+ * @code
+   for (unsigned int q=0; q<n_q_points; ++q)
+     {
+       Tensor<1,dim> velocity;
+       for (unsigned int d=0; d<dim; ++d)
+         velocity[d] = local_solution_values[q](d);
+	 
+       ... do something with this velocity ...				  
+ * @endcode
+ * Note how we convert from a dealii::Vector (which is simply a collection
+ * of vector elements) into a <code>Tensor@<1,dim@></code> because the
+ * velocity is a quantity characterized by <code>dim</code> elements that
+ * have certain transformation properties under rotations of the coordinate
+ * system.
+ *
+ * This code can be written more elegantly and efficiently using code like
+ * the following:
+ * @code
+  std::vector<Tensor<1,dim> > local_velocity_values (n_q_points);
+
+  const FEValuesExtractors::Vector velocities (0);
+  
+  typename DoFHandler<dim>::active_cell_iterator
+    cell = dof_handler.begin_active(),
+    endc = dof_handler.end();
+  for (; cell!=endc; ++cell)
+    {
+      fe_values.reinit (cell);
+
+      fe_values[velocities].get_function_values (solution,
+                                                 local_velocity_values);
+ * @endcode
+ *
+ * As a result, we here get the velocities right away, and in the
+ * right data type (because we have described, using the extractor,
+ * that the first <code>dim</code> components of the finite element
+ * belong together, forming a tensor). The code is also more efficient:
+ * it requires less dynamic memory allocation because the Tensor
+ * class allocates its components as member variables rather than on
+ * the heap, and we save cycles because we don't even bother computing
+ * the values of the pressure variable at the quadrature points. On
+ * the other hand, if we had been interested in only the pressure and
+ * not the velocities, then the following code extracting scalar
+ * values would have done:
+ * @code
+  std::vector<double> local_pressure_values (n_q_points);
+
+  const FEValuesExtractors::Scalar pressure (dim);
+  
+  typename DoFHandler<dim>::active_cell_iterator
+    cell = dof_handler.begin_active(),
+    endc = dof_handler.end();
+  for (; cell!=endc; ++cell)
+    {
+      fe_values.reinit (cell);
+
+      fe_values[pressure].get_function_values (solution,
+                                               local_pressure_values);
+ * @endcode
+ *
+ * In similar cases, one sometimes needs the gradients or second
+ * derivatives of the solution, or of individual scalar or vector
+ * components. To get at those of all components of the solution,
+ * the functions FEValuesBase::get_function_gradients and
+ * FEValuesBase::get_function_hessians are the equivalent of the
+ * function FEValuesBase::get_function_values used above.
+ *
+ * Likewise, to extract the gradients of scalar components,
+ * FEValuesViews::Scalar::get_function_gradients and
+ * FEValuesViews::Scalar::get_function_hessians do the job.
+ * For vector-(tensor-)valued quantities, there are functions
+ * FEValuesViews::Vector::get_function_gradients and
+ * FEValuesViews::Vector::get_function_hessians, and in
+ * addition
+ * FEValuesViews::Vector::get_function_symmetric_gradients and
+ * FEValuesViews::Vector::get_function_divergences.
+ *
  *
  * @ingroup feall feaccess
  */
