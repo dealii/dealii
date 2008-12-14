@@ -3629,10 +3629,25 @@ namespace FEValuesViews
 
     for (unsigned int shape_function=0;
 	 shape_function<fe_values.fe->dofs_per_cell; ++shape_function)
-      for (unsigned int q_point=0; q_point<fe_values.n_quadrature_points; ++q_point)
-	values[q_point] +=
-	  dof_values(shape_function) *
-	  value (shape_function, q_point);
+      {
+	const int snc = shape_function_data[shape_function].single_nonzero_component;
+	
+	if (snc == -2)
+					   // shape function is zero for the
+					   // selected components
+	  continue;
+	else if (snc != -1)
+	  for (unsigned int q_point=0; q_point<fe_values.n_quadrature_points; ++q_point)
+	    values[q_point][shape_function_data[shape_function].single_nonzero_component_index]
+	      += dof_values(shape_function) * fe_values.shape_values(snc,q_point);
+	else
+	  for (unsigned int q_point=0; q_point<fe_values.n_quadrature_points; ++q_point)
+	    for (unsigned int d=0; d<dim; ++d)    
+	      if (shape_function_data[shape_function].is_nonzero_shape_function_component[d])
+		values[q_point][d]
+		  += (dof_values(shape_function) *
+		      fe_values.shape_values(shape_function_data[shape_function].row_index[d],q_point));
+      }
   }
   
 
