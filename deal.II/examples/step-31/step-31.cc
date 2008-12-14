@@ -599,8 +599,8 @@ class BoussinesqFlowProblem
 		      const std::vector<Tensor<1,dim> >  &old_old_temperature_grads,
 		      const std::vector<Tensor<2,dim> >  &old_temperature_hessians,
 		      const std::vector<Tensor<2,dim> >  &old_old_temperature_hessians,
-		      const std::vector<Vector<double> > &old_stokes_values,
-		      const std::vector<Vector<double> > &old_old_stokes_values,
+		      const std::vector<Tensor<1,dim> >  &old_velocity_values,
+		      const std::vector<Tensor<1,dim> >  &old_old_velocity_values,
 		      const std::vector<double>          &gamma_values,
 		      const double                        global_u_infty,
 		      const double                        global_T_variation,
@@ -965,8 +965,8 @@ compute_viscosity (const std::vector<double>          &old_temperature,
 		   const std::vector<Tensor<1,dim> >  &old_old_temperature_grads,
 		   const std::vector<Tensor<2,dim> >  &old_temperature_hessians,
 		   const std::vector<Tensor<2,dim> >  &old_old_temperature_hessians,
-		   const std::vector<Vector<double> > &old_stokes_values,
-		   const std::vector<Vector<double> > &old_old_stokes_values,
+		   const std::vector<Tensor<1,dim> >  &old_velocity_values,
+		   const std::vector<Tensor<1,dim> >  &old_old_velocity_values,
 		   const std::vector<double>          &gamma_values,
 		   const double                        global_u_infty,
 		   const double                        global_T_variation,
@@ -985,9 +985,8 @@ compute_viscosity (const std::vector<double>          &old_temperature,
   
   for (unsigned int q=0; q < n_q_points; ++q)
     {
-      Tensor<1,dim> u;
-      for (unsigned int d=0; d<dim; ++d)
-	u[d] = (old_stokes_values[q](d) + old_old_stokes_values[q](d)) / 2;
+      const Tensor<1,dim> u = (old_velocity_values[q] +
+			       old_old_velocity_values[q](d)) / 2;
       
       const double dT_dt = (old_temperature[q] - old_old_temperature[q])
 			   / old_time_step;
@@ -1982,10 +1981,8 @@ void BoussinesqFlowProblem<dim>::assemble_temperature_system ()
 				   // domain which will be used for the
 				   // definition of the stabilization
 				   // parameter.
-  std::vector<Vector<double> > old_stokes_values (n_q_points, 
-						  Vector<double>(dim+1));
-  std::vector<Vector<double> > old_old_stokes_values (n_q_points, 
-						      Vector<double>(dim+1));
+  std::vector<Tensor<1,dim> > old_velocity_values (n_q_points);
+  std::vector<Tensor<1,dim> > old_old_velocity_values (n_q_points);
   std::vector<double>         old_temperature_values (n_q_points);
   std::vector<double>         old_old_temperature_values(n_q_points);
   std::vector<Tensor<1,dim> > old_temperature_grads(n_q_points);
@@ -2048,10 +2045,10 @@ void BoussinesqFlowProblem<dim>::assemble_temperature_system ()
       temperature_right_hand_side.value_list (temperature_fe_values.get_quadrature_points(),
 					      gamma_values);
 
-      stokes_fe_values.get_function_values (stokes_solution,
-					    old_stokes_values);
-      stokes_fe_values.get_function_values (old_stokes_solution,
-					    old_old_stokes_values);
+      stokes_fe_values[velocities].get_function_values (stokes_solution,
+							old_velocity_values);
+      stokes_fe_values[velocities].get_function_values (old_stokes_solution,
+							old_old_velocity_values);
 
 				       // Next, we calculate the artificial
 				       // viscosity for stabilization
@@ -2082,8 +2079,8 @@ void BoussinesqFlowProblem<dim>::assemble_temperature_system ()
 			     old_old_temperature_grads,
 			     old_temperature_hessians,
 			     old_old_temperature_hessians,
-			     old_stokes_values,
-			     old_old_stokes_values,
+			     old_velocity_values,
+			     old_old_velocity_values,
 			     gamma_values,
 			     global_u_infty,
 			     global_T_range.second - global_T_range.first,
@@ -2097,35 +2094,33 @@ void BoussinesqFlowProblem<dim>::assemble_temperature_system ()
 	      phi_T[k]      = temperature_fe_values.shape_value (k, q);
 	    }
 
-	  const double old_Ts = use_bdf2_scheme ?
-	                         (old_temperature_values[q] *
-	                          (time_step + old_time_step) / old_time_step
-                                  -
-				  old_old_temperature_values[q] *
-                                  (time_step * time_step) /
-                                  (old_time_step * (time_step + old_time_step)))
-	                        :
-	                        old_temperature_values[q];
+	  const double old_Ts
+	    = (use_bdf2_scheme ?
+	       (old_temperature_values[q] *
+		(time_step + old_time_step) / old_time_step
+		-
+		old_old_temperature_values[q] *
+		(time_step * time_step) /
+		(old_time_step * (time_step + old_time_step)))
+	       :
+	       old_temperature_values[q]);
 
-	  const Tensor<1,dim> ext_grad_T = use_bdf2_scheme ? 
-					    (old_temperature_grads[q] *
-					     (1+time_step/old_time_step) 
-					     -
-					     old_old_temperature_grads[q] *
-					     time_step / old_time_step) 
-					    :
-					    old_temperature_grads[q];
+	  const Tensor<1,dim> ext_grad_T
+	    = (use_bdf2_scheme ? 
+	       (old_temperature_grads[q] *
+		(1+time_step/old_time_step) 
+		-
+		old_old_temperature_grads[q] *
+		time_step / old_time_step) 
+	       :
+	       old_temperature_grads[q]);
 	  
-	  Tensor<1,dim> extrapolated_u;
-	  for (unsigned int d=0; d<dim; ++d)
-	    {
-	      if (use_bdf2_scheme == true)
-		extrapolated_u[d] = 
-		  old_stokes_values[q](d) * (1+time_step/old_time_step) - 
-		  old_old_stokes_values[q](d) * time_step/old_time_step;
-	      else
-		extrapolated_u[d] = old_stokes_values[q](d);
-	    }
+	  const Tensor<1,dim> extrapolated_u
+	    = (use_bdf2_scheme ? 
+	       (old_velocity_values[q] * (1+time_step/old_time_step) - 
+		old_old_velocity_values[q] * time_step/old_time_step)
+	       :
+	       old_stokes_values[q]);
 
 	  for (unsigned int i=0; i<dofs_per_cell; ++i)
 	    local_rhs(i) += (old_Ts * phi_T[i]
