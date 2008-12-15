@@ -23,7 +23,7 @@ dnl clearing the cache
 define([AC_CACHE_LOAD], )dnl
 define([AC_CACHE_SAVE], )dnl
 
-AC_INIT(projekt, 6.2.pre, tyoung@ippt.gov.pl, projekt)
+AC_INIT(deal.II, 6.2.pre, dealii@dealii.org, deal.II)
 
 AC_REVISION($Revision$)
 AC_PREREQ(2.61)
