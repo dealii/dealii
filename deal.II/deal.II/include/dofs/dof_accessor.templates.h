@@ -2461,7 +2461,7 @@ distribute_local_to_global (const Vector<number> &local_source,
 
   const unsigned int n_dofs = local_source.size();
 
-//TODO[WB]: This function could me made more efficient. First, it allocates memory, which could be avoided by passing in another argument as a scratch array. second, the elementwise access is really slow if we use PETSc vectors/matrices. This should be fixed eventually
+//TODO[WB]: This function could me made more efficient. First, it allocates memory, which could be avoided by passing in another argument as a scratch array (or by using the dof_indices cache for non-hp DoFHandlers, see the functions in the Implementation class above). second, the elementwise access is really slow if we use PETSc vectors/matrices. This should be fixed eventually
   
 				   // get indices of dofs
   std::vector<unsigned int> dofs (n_dofs);
@@ -2497,7 +2497,7 @@ distribute_local_to_global (const FullMatrix<number> &local_source,
 
   const unsigned int n_dofs = local_source.m();
 
-//TODO[WB]: This function could me made more efficient. First, it allocates memory, which could be avoided by passing in another argument as a scratch array. second, the elementwise access is really slow if we use PETSc vectors/matrices. This should be fixed eventually
+//TODO[WB]: This function could me made more efficient. First, it allocates memory, which could be avoided by passing in another argument as a scratch array (or by using the dof_indices cache for non-hp DoFHandlers, see the functions in the Implementation class above). second, the elementwise access is really slow if we use PETSc vectors/matrices. This should be fixed eventually
 
 				   // get indices of dofs
   std::vector<unsigned int> dofs (n_dofs);
