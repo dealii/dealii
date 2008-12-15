@@ -73,45 +73,6 @@ DoFCellAccessor<DH>::neighbor_child_on_subface (const unsigned int face,
 template <class DH>
 template <class InputVector, typename number>
 void
-DoFCellAccessor<DH>::get_dof_values (const InputVector &values,
-				     Vector<number>    &local_values) const
-{
-//TODO[WB]: this function can be made more efficient using the fact that we have cached the result of get_dof_indices; we should therefore be able to get away without having to allocate memory
-  
-  const unsigned int dofs_per_cell = this->get_fe().dofs_per_cell;
-  
-  std::vector<unsigned int> local_dof_indices (dofs_per_cell);
-  this->get_dof_indices (local_dof_indices);
-
-  for (unsigned int i=0; i<dofs_per_cell; ++i)
-    local_values(i) = values(local_dof_indices[i]);
-}
-
-
-
-template <class DH>
-template <class OutputVector, typename number>
-void
-DoFCellAccessor<DH>::set_dof_values (const Vector<number> &local_values,
-				     OutputVector         &values) const
-{
-//TODO[WB]: this function can be made more efficient using the fact that we have cached the result of get_dof_indices; we should therefore be able to get away without having to allocate memory
-
-  const unsigned int dofs_per_cell = this->get_fe().dofs_per_cell;
-  
-  std::vector<unsigned int> local_dof_indices (dofs_per_cell);
-  this->get_dof_indices (local_dof_indices);
-
-  for (unsigned int i=0; i<dofs_per_cell; ++i)
-    values(local_dof_indices[i]) = local_values(i);
-}
-
-
-
-
-template <class DH>
-template <class InputVector, typename number>
-void
 DoFCellAccessor<DH>::
 get_interpolated_dof_values (const InputVector &values,
 			     Vector<number>    &interpolated_values) const

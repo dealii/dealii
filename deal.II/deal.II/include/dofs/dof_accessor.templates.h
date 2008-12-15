@@ -2064,6 +2064,125 @@ namespace internal
 
 
 					 /**
+					  * A function that collects the
+					  * values of degrees of freedom. This
+					  * function works for ::DoFHandler
+					  * and all template arguments and
+					  * uses the data from the cache of
+					  * indices that we hold for each
+					  * cell.
+					  */
+	template <int dim, int spacedim, class InputVector, typename number>
+	static
+	void
+	get_dof_values (const DoFCellAccessor<DoFHandler<dim,spacedim> > &accessor,
+			const InputVector &values,
+			Vector<number>    &local_values)
+	  {
+	    typedef
+	      dealii::DoFAccessor<dim,DoFHandler<dim,spacedim> >
+	      BaseClass;
+	    Assert (local_values.size() == accessor.get_fe().dofs_per_cell,
+		    typename BaseClass::ExcVectorDoesNotMatch());
+	    Assert (values.size() == accessor.get_dof_handler().n_dofs(),
+		    typename BaseClass::ExcVectorDoesNotMatch());
+
+					     // check as in documentation that
+					     // cell is either active, or dofs
+					     // are only in vertices
+	    Assert (!accessor.has_children()
+		    ||
+		    (accessor.get_fe().dofs_per_cell ==
+		     accessor.get_fe().dofs_per_vertex * GeometryInfo<dim>::vertices_per_cell),
+		    ExcMessage ("Cell must either be active, or all DoFs must be in vertices"));
+  
+	    unsigned int *cache = &accessor.dof_handler->levels[accessor.level()]
+				  ->cell_dof_indices_cache[accessor.present_index * accessor.get_fe().dofs_per_cell]; 
+	    for (unsigned int i=0; i<accessor.get_fe().dofs_per_cell; ++i, ++cache)
+	      local_values(i) = values(*cache);
+	  }      
+
+					 /**
+					  * Same function as above except
+					  * that it works for
+					  * hp::DoFHandler objects that do
+					  * not have a cache for the local
+					  * DoF indices.
+					  */
+	template <int dim, int spacedim, class InputVector, typename number>
+	static
+	void
+	get_dof_values (const DoFCellAccessor<dealii::hp::DoFHandler<dim,spacedim> > &accessor,
+			const InputVector &values,
+			Vector<number>    &local_values)
+	  {
+					     // no caching for hp::DoFHandler
+					     // implemented
+	    const unsigned int dofs_per_cell = accessor.get_fe().dofs_per_cell;
+  
+	    std::vector<unsigned int> local_dof_indices (dofs_per_cell);
+	    get_dof_indices (accessor, local_dof_indices);
+
+	    for (unsigned int i=0; i<dofs_per_cell; ++i)
+	      local_values(i) = values(local_dof_indices[i]);
+	  }
+
+
+					 /**
+					  * Same set of functions as above
+					  * except that it sets rather than
+					  * gets values
+					  */
+	template <int dim, int spacedim, class OutputVector, typename number>
+	static
+	void
+	set_dof_values (const DoFCellAccessor<DoFHandler<dim,spacedim> > &accessor,
+			const Vector<number> &local_values,
+			OutputVector &values)
+	  {
+	    typedef
+	      dealii::DoFAccessor<dim,DoFHandler<dim,spacedim> >
+	      BaseClass;
+	    Assert (local_values.size() == accessor.get_fe().dofs_per_cell,
+		    typename BaseClass::ExcVectorDoesNotMatch());
+	    Assert (values.size() == accessor.get_dof_handler().n_dofs(),
+		    typename BaseClass::ExcVectorDoesNotMatch());
+
+					     // check as in documentation that
+					     // cell is either active, or dofs
+					     // are only in vertices
+	    Assert (!accessor.has_children()
+		    ||
+		    (accessor.get_fe().dofs_per_cell ==
+		     accessor.get_fe().dofs_per_vertex * GeometryInfo<dim>::vertices_per_cell),
+		    ExcMessage ("Cell must either be active, or all DoFs must be in vertices"));
+  
+	    unsigned int *cache = &accessor.dof_handler->levels[accessor.level()]
+				  ->cell_dof_indices_cache[accessor.present_index * accessor.get_fe().dofs_per_cell]; 
+	    for (unsigned int i=0; i<accessor.get_fe().dofs_per_cell; ++i, ++cache)
+	      values(*cache) = local_values(i);
+	  }      
+
+	template <int dim, int spacedim, class OutputVector, typename number>
+	static
+	void
+	set_dof_values (const DoFCellAccessor<dealii::hp::DoFHandler<dim,spacedim> > &accessor,
+			const Vector<number> &local_values,
+			OutputVector &values)
+	  {
+					     // no caching for hp::DoFHandler
+					     // implemented
+	    const unsigned int dofs_per_cell = accessor.get_fe().dofs_per_cell;
+  
+	    std::vector<unsigned int> local_dof_indices (dofs_per_cell);
+	    get_dof_indices (accessor, local_dof_indices);
+
+	    for (unsigned int i=0; i<dofs_per_cell; ++i)
+	      values(local_dof_indices[i]) = local_values(i);
+	  }
+	
+
+					 /**
 					  * Do what the active_fe_index
 					  * function in the parent class
 					  * is supposed to do.
@@ -2264,6 +2383,30 @@ DoFCellAccessor<DH>::
 get_dof_indices (std::vector<unsigned int> &dof_indices) const
 {
   internal::DoFCellAccessor::Implementation::get_dof_indices (*this, dof_indices);
+}
+
+
+
+template <class DH>
+template <class InputVector, typename number>
+void
+DoFCellAccessor<DH>::get_dof_values (const InputVector &values,
+				     Vector<number>    &local_values) const
+{
+  internal::DoFCellAccessor::Implementation
+    ::get_dof_values (*this, values, local_values);
+}
+
+
+
+template <class DH>
+template <class OutputVector, typename number>
+void
+DoFCellAccessor<DH>::set_dof_values (const Vector<number> &local_values,
+				     OutputVector         &values) const
+{
+  internal::DoFCellAccessor::Implementation
+    ::set_dof_values (*this, local_values, values);
 }
 
 

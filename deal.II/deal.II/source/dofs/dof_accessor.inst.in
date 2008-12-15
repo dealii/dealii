@@ -16,15 +16,6 @@ for (VEC : SERIAL_VECTORS; SCALAR : REAL_SCALARS)
   {  
     template
       void
-      DoFCellAccessor<DoFHandler<deal_II_dimension> >::get_dof_values
-      (const VEC&, Vector<SCALAR>&) const;
-    template
-      void
-      DoFCellAccessor<DoFHandler<deal_II_dimension> >::set_dof_values
-      (const Vector<SCALAR>&, VEC&) const;
-
-    template
-      void
       DoFCellAccessor<DoFHandler<deal_II_dimension> >::get_interpolated_dof_values
       (const VEC&, Vector<SCALAR>&) const;
     template
@@ -33,15 +24,6 @@ for (VEC : SERIAL_VECTORS; SCALAR : REAL_SCALARS)
       (const Vector<SCALAR>&, VEC&) const;
 
 #if deal_II_dimension != 3
-
-    template
-      void
-      DoFCellAccessor<DoFHandler<deal_II_dimension,deal_II_dimension+1> >::get_dof_values
-      (const VEC&, Vector<SCALAR>&) const;
-    template
-      void
-      DoFCellAccessor<DoFHandler<deal_II_dimension,deal_II_dimension+1> >::set_dof_values
-      (const Vector<SCALAR>&, VEC&) const;
 
     template
       void
@@ -61,15 +43,6 @@ for (VEC : SERIAL_VECTORS; SCALAR : REAL_SCALARS)
   {  
     template
       void
-      DoFCellAccessor<hp::DoFHandler<deal_II_dimension> >::get_dof_values
-      (const VEC&, Vector<SCALAR>&) const;
-    template
-      void
-      DoFCellAccessor<hp::DoFHandler<deal_II_dimension> >::set_dof_values
-      (const Vector<SCALAR>&, VEC&) const;
-
-    template
-      void
       DoFCellAccessor<hp::DoFHandler<deal_II_dimension> >::get_interpolated_dof_values
       (const VEC&, Vector<SCALAR>&) const;
     template
@@ -78,14 +51,6 @@ for (VEC : SERIAL_VECTORS; SCALAR : REAL_SCALARS)
       (const Vector<SCALAR>&, VEC&) const;
 
 #if deal_II_dimension != 3
-    template
-      void
-      DoFCellAccessor<hp::DoFHandler<deal_II_dimension,deal_II_dimension+1> >::get_dof_values
-      (const VEC&, Vector<SCALAR>&) const;
-    template
-      void
-      DoFCellAccessor<hp::DoFHandler<deal_II_dimension,deal_II_dimension+1> >::set_dof_values
-      (const Vector<SCALAR>&, VEC&) const;
 
     template
       void
