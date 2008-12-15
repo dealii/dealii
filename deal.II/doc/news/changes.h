@@ -600,6 +600,16 @@ inconvenience this causes.
 <ol>
   <li>
   <p>
+  New: FEValues objects can now directly calculate the Laplacians of
+  solution functions at quadrature points. This is equivalent to the 
+  trace of the Hessians, but faster and more convenient in user code.
+  @ref step_31 "step-31" program has also been updated to use this.
+  <br>
+  (Martin Kronbichler 2008/12/15)
+  </p>
+
+  <li>
+  <p>
   Improved: The FEValuesViews objects that one gets when writing things
   like <code>fe_values[velocities]</code> have acquired the ability to
   extract individual components of solutions at quadrature points by

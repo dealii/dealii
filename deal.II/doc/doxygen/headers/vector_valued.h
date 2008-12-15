@@ -868,6 +868,11 @@ scalar_product (const Tensor<2,dim> &u,
  * FEValuesViews::Vector::get_function_symmetric_gradients and
  * FEValuesViews::Vector::get_function_divergences.
  *
+ * Moreover, there is a shortcut available in case when only the
+ * Laplacians of the solution (which is the trace of the hessians) is
+ * needed, usable for both scalar and vector-valued problems as
+ * FEValuesViews::Scalar::get_function_laplacians and
+ * FEValuesViews::Vector::get_function_laplacians.
  *
  * @ingroup feall feaccess
  */

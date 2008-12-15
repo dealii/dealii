@@ -597,8 +597,8 @@ class BoussinesqFlowProblem
 		      const std::vector<double>          &old_old_temperature,
 		      const std::vector<Tensor<1,dim> >  &old_temperature_grads,
 		      const std::vector<Tensor<1,dim> >  &old_old_temperature_grads,
-		      const std::vector<Tensor<2,dim> >  &old_temperature_hessians,
-		      const std::vector<Tensor<2,dim> >  &old_old_temperature_hessians,
+		      const std::vector<double>          &old_temperature_laplacians,
+		      const std::vector<double>          &old_old_temperature_laplacians,
 		      const std::vector<Tensor<1,dim> >  &old_velocity_values,
 		      const std::vector<Tensor<1,dim> >  &old_old_velocity_values,
 		      const std::vector<double>          &gamma_values,
@@ -963,8 +963,8 @@ compute_viscosity (const std::vector<double>          &old_temperature,
 		   const std::vector<double>          &old_old_temperature,
 		   const std::vector<Tensor<1,dim> >  &old_temperature_grads,
 		   const std::vector<Tensor<1,dim> >  &old_old_temperature_grads,
-		   const std::vector<Tensor<2,dim> >  &old_temperature_hessians,
-		   const std::vector<Tensor<2,dim> >  &old_old_temperature_hessians,
+		   const std::vector<double>          &old_temperature_laplacians,
+		   const std::vector<double>          &old_old_temperature_laplacians,
 		   const std::vector<Tensor<1,dim> >  &old_velocity_values,
 		   const std::vector<Tensor<1,dim> >  &old_old_velocity_values,
 		   const std::vector<double>          &gamma_values,
@@ -994,8 +994,8 @@ compute_viscosity (const std::vector<double>          &old_temperature,
 				   old_old_temperature_grads[q]) / 2;
       
       const double kappa_Delta_T = EquationData::kappa
-				   * (trace(old_temperature_hessians[q]) +
-				      trace(old_old_temperature_hessians[q])) / 2;
+				   * (old_temperature_laplacians[q] +
+				      old_old_temperature_laplacians[q]) / 2;
 
       const double residual
 	= std::abs((dT_dt + u_grad_T - kappa_Delta_T - gamma_values[q]) *
@@ -1987,8 +1987,8 @@ void BoussinesqFlowProblem<dim>::assemble_temperature_system ()
   std::vector<double>         old_old_temperature_values(n_q_points);
   std::vector<Tensor<1,dim> > old_temperature_grads(n_q_points);
   std::vector<Tensor<1,dim> > old_old_temperature_grads(n_q_points);
-  std::vector<Tensor<2,dim> > old_temperature_hessians(n_q_points);
-  std::vector<Tensor<2,dim> > old_old_temperature_hessians(n_q_points);
+  std::vector<double>         old_temperature_laplacians(n_q_points);
+  std::vector<double>         old_old_temperature_laplacians(n_q_points);
 
   EquationData::TemperatureRightHandSide<dim>  temperature_right_hand_side;
   std::vector<double> gamma_values (n_q_points);
@@ -2039,10 +2039,10 @@ void BoussinesqFlowProblem<dim>::assemble_temperature_system ()
       temperature_fe_values.get_function_gradients (old_old_temperature_solution,
 						    old_old_temperature_grads);
       
-      temperature_fe_values.get_function_hessians (old_temperature_solution,
-						   old_temperature_hessians);
-      temperature_fe_values.get_function_hessians (old_old_temperature_solution,
-						   old_old_temperature_hessians);
+      temperature_fe_values.get_function_laplacians (old_temperature_solution,
+						     old_temperature_laplacians);
+      temperature_fe_values.get_function_laplacians (old_old_temperature_solution,
+						   old_old_temperature_laplacians);
       
       temperature_right_hand_side.value_list (temperature_fe_values.get_quadrature_points(),
 					      gamma_values);
@@ -2079,8 +2079,8 @@ void BoussinesqFlowProblem<dim>::assemble_temperature_system ()
 			     old_old_temperature_values,
 			     old_temperature_grads,
 			     old_old_temperature_grads,
-			     old_temperature_hessians,
-			     old_old_temperature_hessians,
+			     old_temperature_laplacians,
+			     old_old_temperature_laplacians,
 			     old_velocity_values,
 			     old_old_velocity_values,
 			     gamma_values,
