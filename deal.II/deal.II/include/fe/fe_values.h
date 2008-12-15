@@ -972,12 +972,12 @@ class FEValuesData
 				      */
     std::vector<Point<spacedim> >  normal_vectors;
 
-                                      /** 
-				       * List of outward vectors normal to the cell  
-                                       * surface (line) at the quadrature points
-				       * for the codimension 1 case,
-				       * when spacedim=3 (=2).
-				       */
+				     /** 
+				      * List of outward vectors normal to the cell  
+				      * surface (line) at the quadrature points
+				      * for the codimension 1 case,
+				      * when spacedim=3 (=2).
+				      */
     std::vector<Point<spacedim> >  cell_normal_vectors;
 
                                      /**
@@ -1440,8 +1440,8 @@ class FEValuesBase : protected FEValuesData<dim,spacedim>,
 				      */
     Tensor<2,spacedim>
     shape_hessian_component (const unsigned int function_no,
-				    const unsigned int point_no,
-				    const unsigned int component) const;
+			     const unsigned int point_no,
+			     const unsigned int component) const;
     
 				     /**
 				      * @deprecated Wrapper for shape_hessian_component()
@@ -1719,7 +1719,7 @@ class FEValuesBase : protected FEValuesData<dim,spacedim>,
 				      */
     template <class InputVector>
     void get_function_gradients (const InputVector      &fe_function,
-			     std::vector<Tensor<1,spacedim> > &gradients) const;
+				 std::vector<Tensor<1,spacedim> > &gradients) const;
 
 				     /**
 				      * @deprecated Use
@@ -1769,7 +1769,7 @@ class FEValuesBase : protected FEValuesData<dim,spacedim>,
 				      */
     template <class InputVector>
     void get_function_gradients (const InputVector               &fe_function,
-			     std::vector<std::vector<Tensor<1,spacedim> > > &gradients) const;
+				 std::vector<std::vector<Tensor<1,spacedim> > > &gradients) const;
 
     
 				     /**
@@ -2374,11 +2374,12 @@ class FEValuesBase : protected FEValuesData<dim,spacedim>,
     class TriaCellIterator;
     
 				     /**
-				      * Store the cell selected last time
-				      * the reinit() function was called
-				      * to make access
-				      * to the <tt>get_function_*</tt> functions
-				      * safer.
+				      * Store the cell selected last time the
+				      * reinit() function was called.  This is
+				      * necessary for the
+				      * <tt>get_function_*</tt> functions as
+				      * well as the functions of same name in
+				      * the extractor classes.
 				      */
     std::auto_ptr<const CellIteratorBase> present_cell;
     
@@ -3190,7 +3191,7 @@ namespace FEValuesViews
   inline
   typename Scalar<dim,spacedim>::value_type
   Scalar<dim,spacedim>::value (const unsigned int shape_function,
-		      const unsigned int q_point) const
+			       const unsigned int q_point) const
   {
     typedef FEValuesBase<dim,spacedim> FVB;
     Assert (shape_function < fe_values.fe->dofs_per_cell,
@@ -3219,7 +3220,7 @@ namespace FEValuesViews
   inline
   typename Scalar<dim,spacedim>::gradient_type
   Scalar<dim,spacedim>::gradient (const unsigned int shape_function,
-			 const unsigned int q_point) const
+				  const unsigned int q_point) const
   {
     typedef FEValuesBase<dim,spacedim> FVB;
     Assert (shape_function < fe_values.fe->dofs_per_cell,
@@ -3246,7 +3247,7 @@ namespace FEValuesViews
   inline
   typename Scalar<dim,spacedim>::hessian_type
   Scalar<dim,spacedim>::hessian (const unsigned int shape_function,
-			const unsigned int q_point) const
+				 const unsigned int q_point) const
   {
     typedef FEValuesBase<dim,spacedim> FVB;
     Assert (shape_function < fe_values.fe->dofs_per_cell,
@@ -3388,7 +3389,7 @@ namespace FEValuesViews
   inline
   typename Vector<dim,spacedim>::value_type
   Vector<dim,spacedim>::value (const unsigned int shape_function,
-		      const unsigned int q_point) const
+			       const unsigned int q_point) const
   {
     typedef FEValuesBase<dim,spacedim> FVB;
     Assert (shape_function < fe_values.fe->dofs_per_cell,
@@ -3426,7 +3427,7 @@ namespace FEValuesViews
   inline
   typename Vector<dim,spacedim>::gradient_type
   Vector<dim,spacedim>::gradient (const unsigned int shape_function,
-			 const unsigned int q_point) const
+				  const unsigned int q_point) const
   {
     typedef FEValuesBase<dim,spacedim> FVB;    
     Assert (shape_function < fe_values.fe->dofs_per_cell,
@@ -3464,7 +3465,7 @@ namespace FEValuesViews
   inline
   typename Vector<dim,spacedim>::divergence_type
   Vector<dim,spacedim>::divergence (const unsigned int shape_function,
-			   const unsigned int q_point) const
+				    const unsigned int q_point) const
   {
 				     // this function works like in
 				     // the case above
@@ -3500,7 +3501,7 @@ namespace FEValuesViews
   inline
   typename Vector<dim,spacedim>::hessian_type
   Vector<dim,spacedim>::hessian (const unsigned int shape_function,
-			const unsigned int q_point) const
+				 const unsigned int q_point) const
   {
 				     // this function works like in
 				     // the case above				
@@ -3952,7 +3953,7 @@ template <int dim, int spacedim>
 inline
 double
 FEValuesBase<dim,spacedim>::shape_value (const unsigned int i,
-				const unsigned int j) const
+					 const unsigned int j) const
 {
   Assert (i < fe->dofs_per_cell,
 	  ExcIndexRange (i, 0, fe->dofs_per_cell));
@@ -3984,8 +3985,8 @@ template <int dim, int spacedim>
 inline
 double
 FEValuesBase<dim,spacedim>::shape_value_component (const unsigned int i,
-					  const unsigned int j,
-					  const unsigned int component) const
+						   const unsigned int j,
+						   const unsigned int component) const
 {
   Assert (i < fe->dofs_per_cell,
 	  ExcIndexRange (i, 0, fe->dofs_per_cell));
@@ -4048,7 +4049,7 @@ template <int dim, int spacedim>
 inline
 const Tensor<1,spacedim> &
 FEValuesBase<dim,spacedim>::shape_grad (const unsigned int i,
-			       const unsigned int j) const
+					const unsigned int j) const
 {
   Assert (i < fe->dofs_per_cell,
 	  ExcIndexRange (i, 0, fe->dofs_per_cell));
@@ -4084,8 +4085,8 @@ template <int dim, int spacedim>
 inline
 Tensor<1,spacedim>
 FEValuesBase<dim,spacedim>::shape_grad_component (const unsigned int i,
-					 const unsigned int j,
-					 const unsigned int component) const
+						  const unsigned int j,
+						  const unsigned int component) const
 {
   Assert (i < fe->dofs_per_cell,
 	  ExcIndexRange (i, 0, fe->dofs_per_cell));
@@ -4148,7 +4149,7 @@ template <int dim, int spacedim>
 inline
 const Tensor<2,spacedim> &
 FEValuesBase<dim,spacedim>::shape_hessian (const unsigned int i,
-				  const unsigned int j) const
+					   const unsigned int j) const
 {
   Assert (i < fe->dofs_per_cell,
 	  ExcIndexRange (i, 0, fe->dofs_per_cell));
@@ -4184,7 +4185,7 @@ template <int dim, int spacedim>
 inline
 const Tensor<2,spacedim> &
 FEValuesBase<dim,spacedim>::shape_2nd_derivative (const unsigned int i,
-					 const unsigned int j) const
+						  const unsigned int j) const
 {
   return shape_hessian(i,j);
 }
@@ -4195,8 +4196,8 @@ template <int dim, int spacedim>
 inline
 Tensor<2,spacedim>
 FEValuesBase<dim,spacedim>::shape_hessian_component (const unsigned int i,
-					    const unsigned int j,
-					    const unsigned int component) const
+						     const unsigned int j,
+						     const unsigned int component) const
 {
   Assert (i < fe->dofs_per_cell,
 	  ExcIndexRange (i, 0, fe->dofs_per_cell));
@@ -4259,8 +4260,8 @@ template <int dim, int spacedim>
 inline
 Tensor<2,spacedim>
 FEValuesBase<dim,spacedim>::shape_2nd_derivative_component (const unsigned int i,
-						   const unsigned int j,
-						   const unsigned int component) const
+							    const unsigned int j,
+							    const unsigned int component) const
 {
   return shape_hessian_component(i,j,component);
 }
@@ -4420,7 +4421,7 @@ template <class InputVector>
 inline
 void
 FEValuesBase<dim,spacedim>::get_function_grads (const InputVector           &fe_function,
-				       std::vector<Tensor<1,spacedim> > &gradients) const
+						std::vector<Tensor<1,spacedim> > &gradients) const
 {
   get_function_gradients(fe_function, gradients);
 }
