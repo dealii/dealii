@@ -9972,9 +9972,9 @@ void Triangulation<dim, spacedim>::load_refine_flags (const std::vector<bool> &v
 	cell->set_refine_flag(RefinementCase<dim>(ref_case));
       else
 	cell->clear_refine_flag();
-
-      Assert (i == v.end(), ExcInternalError());      
     }
+
+  Assert (i == v.end(), ExcInternalError());      
 }
 
 
