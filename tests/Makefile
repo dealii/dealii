@@ -22,7 +22,10 @@ nofail-dirs = base      \
                 then echo umfpack ; fi)
 
 # now define the targets that actually do something
-all: $(addprefix do-,$(nofail-dirs) fail)
+all: nofail do-fail
+
+nofail: $(addprefix do-,$(nofail-dirs))
+
 do-%:
 	cd $(@:do-%=%) && $(MAKE)
 
