@@ -705,7 +705,20 @@ BoussinesqFlowProblem<dim>::BoussinesqFlowProblem ()
 				 // domain (at the quadrature points, in
 				 // fact). How it works should be relatively
 				 // obvious to all who have gotten to this
-				 // point of the tutorial.
+				 // point of the tutorial. Note that since we
+				 // are only interested in the velocity,
+				 // rather than using
+				 // <code>stokes_fe_values.get_function_values</code>
+				 // to get the values of the entire Stokes
+				 // solution (velocities and pressures) we use
+				 // <code>stokes_fe_values[velocities].get_function_values</code>
+				 // to extract only the velocities part. This
+				 // has the additional benefit that we get it
+				 // as a Tensor<1,dim>, rather than some
+				 // components in a Vector<double>, allowing
+				 // us to process it right away using the
+				 // <code>norm()</code> function to get the
+				 // magnitude of the velocity.
 				 //
 				 // The only point worth thinking about a bit
 				 // is how to choose the quadrature points we
@@ -776,7 +789,8 @@ double BoussinesqFlowProblem<dim>::get_maximal_velocity () const
   for (; cell!=endc; ++cell)
     {
       fe_values.reinit (cell);
-      fe_values[velocities].get_function_values (stokes_solution, velocity_values);
+      fe_values[velocities].get_function_values (stokes_solution,
+						 velocity_values);
 
       for (unsigned int q=0; q<n_q_points; ++q)
 	max_velocity = std::max (max_velocity, velocity_values[q].norm());
@@ -2002,20 +2016,29 @@ void BoussinesqFlowProblem<dim>::assemble_temperature_system ()
 
   const FEValuesExtractors::Vector velocities (0);
   
-				   // Now, let's start the loop over all
-				   // cells in the triangulation. Again, we
-				   // need two cell iterators that walk in
-				   // parallel through the cells of the two
-				   // involved DoFHandler objects for the
-				   // Stokes and temperature part. Within
-				   // the loop, we first set the local rhs
-				   // to zero, and then get the values and
-				   // derivatives of the old solution
-				   // functions at the quadrature points,
-				   // since they are going to be needed for
-				   // the definition of the stabilization
-				   // parameters and as coefficients in the
-				   // equation, respectively.
+				   // Now, let's start the loop over all cells
+				   // in the triangulation. Again, we need two
+				   // cell iterators that walk in parallel
+				   // through the cells of the two involved
+				   // DoFHandler objects for the Stokes and
+				   // temperature part. Within the loop, we
+				   // first set the local rhs to zero, and
+				   // then get the values and derivatives of
+				   // the old solution functions at the
+				   // quadrature points, since they are going
+				   // to be needed for the definition of the
+				   // stabilization parameters and as
+				   // coefficients in the equation,
+				   // respectively. Note that since the
+				   // temperature has its own DoFHandler and
+				   // FEValues object we get the entire
+				   // solution at the quadrature point (which
+				   // is the scalar temperature field only
+				   // anyway) whereas for the Stokes part we
+				   // restrict ourselves to extracting the
+				   // velocity part (and ignoring the pressure
+				   // part) by using
+				   // <code>stokes_fe_values[velocities].get_function_values</code>.
   typename DoFHandler<dim>::active_cell_iterator
     cell = temperature_dof_handler.begin_active(),
     endc = temperature_dof_handler.end();
