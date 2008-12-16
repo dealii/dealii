@@ -4698,11 +4698,11 @@ operator << (std::ostream                           &out,
 				   // then write all the data that is
 				   // in this patch
   for (unsigned int i=0; i<GeometryInfo<dim>::vertices_per_cell; ++i)
-    out << patch.vertices[GeometryInfo<dim>::ucd_to_deal[i]] << " ";
+    out << patch.vertices[GeometryInfo<dim>::ucd_to_deal[i]] << ' ';
   out << '\n';
 
   for (unsigned int i=0; i<GeometryInfo<dim>::faces_per_cell; ++i)
-    out << patch.neighbors[i] << " ";
+    out << patch.neighbors[i] << ' ';
   out << '\n';
 
   out << patch.patch_index << ' ' << patch.n_subdivisions
