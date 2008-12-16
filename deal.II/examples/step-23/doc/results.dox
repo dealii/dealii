@@ -98,7 +98,7 @@ If you want to explore a bit, try out some of the following things:
      \nabla \cdot
      a(x) \nabla u = f,
   @f]
-  where $\rho(x)$ is the density of the material, and $a(x)$ related to the
+  where $\rho(x)$ is the density of the material, and $a(x)$ is related to the
   stiffness coefficient. The wave speed is then $c=\sqrt{a/\rho}$.
 
   To make such a change, we would have to compute the mass and Laplace
