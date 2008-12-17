@@ -313,7 +313,7 @@ FiniteElement<dim,spacedim>::reinit_restriction_and_prolongation_matrices (
   const bool isotropic_prolongation_only)
 {
   for (unsigned int ref_case=RefinementCase<dim>::cut_x;
-       ref_case<RefinementCase<dim>::isotropic_refinement+1; ++ref_case)
+       ref_case <= RefinementCase<dim>::isotropic_refinement; ++ref_case)
     {
       const unsigned int nc = GeometryInfo<dim>::n_children(RefinementCase<dim>(ref_case));
       

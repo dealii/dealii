@@ -358,10 +358,12 @@ class FETools
 				      * FiniteElement::prolongation
 				      * matrices.
 				      *
-				      * @param fe The finite element
+				      * @param <tt>fe</tt> The finite element
 				      * class for which we compute the
-				      * embedding matrices.  @param
-				      * matrices A reference to
+				      * embedding matrices.
+				      *
+				      * @param
+				      * <tt>matrices</tt> A reference to
 				      * <tt>RefinementCase<dim>::isotropic_refinement</tt>
 				      * vectors of FullMatrix
 				      * objects. Each vector
@@ -373,10 +375,17 @@ class FETools
 				      * is the format used in
 				      * FiniteElement, where we want
 				      * to use this function mostly.
+				      *
+				      * @param
+				      * <tt>isotropic_only</tt>: set
+				      * this <tt>true</tt> if you only
+				      * want to compute matrices for
+				      * isotropic refinement.
 				      */
     template <int dim, typename number, int spacedim>
     static void compute_embedding_matrices(const FiniteElement<dim,spacedim> &fe,
-					   std::vector<std::vector<FullMatrix<number> > >& matrices);
+					   std::vector<std::vector<FullMatrix<number> > >& matrices,
+					   const bool isotropic_only = false);
 
 				     /**
 				      * Compute the embedding matrices
