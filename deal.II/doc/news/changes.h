@@ -600,6 +600,14 @@ inconvenience this causes.
 <ol>
   <li>
   <p>
+  Fixed: The FEValuesExtractors classes were not copyable though there
+  are legitimate reasons to do so. This is now fixed.
+  <br>
+  (WB 2008/12/17)
+  </p>
+
+  <li>
+  <p>
   Fixed: The MappingQEulerian function was not thread-safe. This is now fixed.
   <br>
   (WB 2008/12/16)

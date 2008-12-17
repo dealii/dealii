@@ -81,7 +81,7 @@ namespace FEValuesExtractors
 					* The selected scalar component of the
 					* vector.
 					*/
-      const unsigned int component;
+      unsigned int component;
 
 				       /**
 					* Constructor. Take the selected
@@ -110,9 +110,10 @@ namespace FEValuesExtractors
   struct Vector
   {
 				       /**
-					* The first component of the vector view.
+					* The first component of the vector
+					* view.
 					*/
-      const unsigned int first_vector_component;
+      unsigned int first_vector_component;
 
 				       /**
 					* Constructor. Take the first
