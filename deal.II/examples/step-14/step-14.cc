@@ -2447,7 +2447,7 @@ namespace LaplaceSolver
 	  std::vector<double> cell_residual;
 	  std::vector<double> rhs_values;	  
 	  std::vector<double> dual_weights;	  
-	  typename std::vector<Tensor<2,dim> > cell_grad_grads;
+	  std::vector<double> cell_laplacians;
 	  CellData (const FiniteElement<dim> &fe,
 		    const Quadrature<dim>    &quadrature,
 		    const Function<dim>      &right_hand_side);
@@ -2541,20 +2541,16 @@ namespace LaplaceSolver
 	    const Function<dim>      &right_hand_side)
 		  :
 		  fe_values (fe, quadrature,
-			     update_values             |
+			     update_values   |
 			     update_hessians |
-			     update_quadrature_points           |
+			     update_quadrature_points |
 			     update_JxW_values),
-		  right_hand_side (&right_hand_side)
-  {  
-    const unsigned int n_q_points
-      = quadrature.size();
-  
-    cell_residual.resize(n_q_points);
-    rhs_values.resize(n_q_points);    
-    dual_weights.resize(n_q_points);    
-    cell_grad_grads.resize(n_q_points);
-  }
+		  right_hand_side (&right_hand_side),
+		  cell_residual (quadrature.size()),
+		  rhs_values (quadrature.size()),
+		  dual_weights (quadrature.size()),
+		  cell_laplacians (quadrature.size())
+  {}
   
   
 
@@ -3284,8 +3280,8 @@ namespace LaplaceSolver
 				     // The tasks to be done are what
 				     // appears natural from looking
 				     // at the error estimation
-				     // formula: first compute the the
-				     // right hand side and the
+				     // formula: first get the
+				     // right hand side and
 				     // Laplacian of the numerical
 				     // solution at the quadrature
 				     // points for the cell residual,
@@ -3293,8 +3289,8 @@ namespace LaplaceSolver
     cell_data.right_hand_side
       ->value_list (cell_data.fe_values.get_quadrature_points(),
 		    cell_data.rhs_values);
-    cell_data.fe_values.get_function_2nd_derivatives (primal_solution,
-						      cell_data.cell_grad_grads);
+    cell_data.fe_values.get_function_laplacians (primal_solution,
+						 cell_data.cell_laplacians);
 
 				     // ...then get the dual weights...
     cell_data.fe_values.get_function_values (dual_weights,
@@ -3306,7 +3302,7 @@ namespace LaplaceSolver
 				     // cell:
     double sum = 0;
     for (unsigned int p=0; p<cell_data.fe_values.n_quadrature_points; ++p)
-      sum += ((cell_data.rhs_values[p]+trace(cell_data.cell_grad_grads[p])) *
+      sum += ((cell_data.rhs_values[p]+cell_data.cell_laplacians[p]) *
 	      cell_data.dual_weights[p] *
 	      cell_data.fe_values.JxW (p));
     error_indicators(cell_index) += sum;
