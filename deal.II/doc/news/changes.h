@@ -600,7 +600,7 @@ inconvenience this causes.
 <ol>
   <li>
   <p>
-  New: The MappingQEulerian function was not thread-safe. This is now fixed.
+  Fixed: The MappingQEulerian function was not thread-safe. This is now fixed.
   <br>
   (WB 2008/12/16)
   </p>
