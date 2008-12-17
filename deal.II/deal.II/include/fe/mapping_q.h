@@ -522,7 +522,7 @@ class MappingQ : public MappingQ1<dim,spacedim>
 				      * mapping of cells at the
 				      * boundary.
 				      */
-    TensorProductPolynomials<dim> *tensor_pols;
+    const TensorProductPolynomials<dim> *tensor_pols;
     
     				     /**
 				      * Number of the Qp tensor
@@ -536,7 +536,7 @@ class MappingQ : public MappingQ1<dim,spacedim>
 				      * numbering. Its size is
 				      * @p dofs_per_cell.
 				      */
-    std::vector<unsigned int> renumber;
+    const std::vector<unsigned int> renumber;
 
 				     /**
 				      * If this flag is set @p true

@@ -97,6 +97,22 @@ MappingQ<1>::~MappingQ ()
 
 
 
+namespace
+{
+  template <int dim>
+  std::vector<unsigned int>
+  get_dpo_vector (const unsigned int degree)
+  {
+    std::vector<unsigned int> dpo(dim+1, 1U);
+    for (unsigned int i=1; i<dpo.size(); ++i)
+      dpo[i]=dpo[i-1]*(degree-1);
+    return dpo;
+  }
+}
+
+
+
+
 template<int dim, int spacedim>
 MappingQ<dim,spacedim>::MappingQ (const unsigned int p,
 			 const bool use_mapping_q_on_all_cells)
@@ -107,7 +123,10 @@ MappingQ<dim,spacedim>::MappingQ (const unsigned int p,
 			:8+12*(degree-1)+6*(degree-1)*(degree-1)),
 		tensor_pols(0),
 		n_shape_functions(Utilities::fixed_power<dim>(degree+1)),
-		renumber(0),
+		renumber(FETools::
+			 lexicographic_to_hierarchic_numbering (
+			   FiniteElementData<dim> (get_dpo_vector<dim>(degree), 1,
+						   degree))),
 		use_mapping_q_on_all_cells (use_mapping_q_on_all_cells),
 		feq(degree)
 {
@@ -124,25 +143,6 @@ MappingQ<dim,spacedim>::MappingQ (const unsigned int p,
 	  ExcInternalError());
   Assert(n_inner+n_outer==n_shape_functions, ExcInternalError());
   
-				   // build the renumbering of the
-				   // shape functions of the Qp
-				   // mapping.
-  renumber.resize(n_shape_functions,0);
-				   // instead of creating a full FE_Q
-				   // object to be passed to the
-				   // lexicographic_to_hierarchic_numbering
-				   // function we only create the
-				   // underlying FiniteElementData
-				   // object. We can't access
-				   // FE_Q::get_dpo_vector as MappingQ
-				   // is not friend of FE_Q. Create
-				   // the dpo vector ourselve.
-  std::vector<unsigned int> dpo(dim+1, 1U);
-  for (unsigned int i=1; i<dpo.size(); ++i)
-    dpo[i]=dpo[i-1]*(degree-1);
-  FETools::lexicographic_to_hierarchic_numbering (
-    FiniteElementData<dim> (dpo, 1, degree), renumber);
-
 				   // build laplace_on_quad_vector
   if (degree>1)
     {
