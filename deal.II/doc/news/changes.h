@@ -600,6 +600,13 @@ inconvenience this causes.
 <ol>
   <li>
   <p>
+  New: The MappingQEulerian function was not thread-safe. This is now fixed.
+  <br>
+  (WB 2008/12/16)
+  </p>
+
+  <li>
+  <p>
   New: The functions FETools::lexicographic_to_hierarchic_numbering and
   FETools::hierarchic_to_lexicographic_numbering now also exist in variants
   returning their result by value, rather than through their last argument.

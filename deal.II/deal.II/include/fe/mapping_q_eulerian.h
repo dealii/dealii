@@ -15,6 +15,7 @@
 #define __deal2__mapping_q_eulerian_h
 
 #include <base/smartpointer.h>
+#include <base/thread_management.h>
 #include <grid/tria_iterator.h>
 #include <dofs/dof_handler.h>
 #include <dofs/dof_accessor.h>
@@ -203,6 +204,12 @@ class MappingQEulerian : public MappingQ<dim, spacedim>
                                       */
     mutable FEValues<dim> fe_values;
 
+				     /**
+				      * A variable to guard access to
+				      * the fe_values variable.
+				      */
+    mutable Threads::ThreadMutex fe_values_mutex;
+    
                                      /**
                                       * Compute the positions of the
                                       * support points in the current
