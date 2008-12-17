@@ -2,7 +2,7 @@
 //    $Id$
 //    Version: $Name$
 //
-//    Copyright (C) 2005, 2006 by the deal.II authors
+//    Copyright (C) 2005, 2006, 2008 by the deal.II authors
 //
 //    This file is subject to QPL and may not be  distributed
 //    without copyright and license information. Please refer
@@ -307,26 +307,32 @@ BlockTrianglePrecondition<number>::do_row (
     m = this->entries.begin();
   typename std::vector<typename BlockMatrixArray<number>::Entry>::const_iterator
     end = this->entries.end();
-  typename std::vector<typename BlockMatrixArray<number>::Entry>::const_iterator
-    diagonal = end;  
+  std::vector<typename std::vector<typename BlockMatrixArray<number>::Entry>::const_iterator>
+    diagonals;
   
   Vector<number>* p_aux = this->mem->alloc();
   Vector<number>& aux = *p_aux;
   
   aux.reinit(dst.block(row_num), true);
-
+  
+				   // Loop over all entries, since
+				   // they are not ordered by rows.
   for (; m != end ; ++m)
     {
       const unsigned int i=m->row;
+				       // Ignore everything not in
+				       // this row
       if (i != row_num)
 	continue;
       const unsigned int j=m->col;
+				       // Only use the lower (upper)
+				       // triangle for forward
+				       // (backward) substitution
       if (((j > i) && !backward) || ((j < i) && backward))
 	continue;
       if (j == i)
 	{
-	  Assert (diagonal == end, ExcMultipleDiagonal(j));
-	  diagonal = m;
+	  diagonals.push_back(m);
 	} else {
 	  if (m->transpose)
 	    m->matrix->Tvmult(aux, dst.block(j));
@@ -335,13 +341,37 @@ BlockTrianglePrecondition<number>::do_row (
 	  dst.block(i).add (-1 * m->prefix, aux);
 	}
     }
-  Assert (diagonal != end, ExcNoDiagonal(row_num));
-  
-  if (diagonal->transpose)
-    diagonal->matrix->Tvmult(aux, dst.block(row_num));
+  Assert (diagonals.size() != 0, ExcNoDiagonal(row_num));
+
+				   // Inverting the diagonal block is
+				   // simple, if there is only one
+				   // matrix
+  if (diagonals.size() == 1)
+    {
+      if (diagonals[0]->transpose)
+	diagonals[0]->matrix->Tvmult(aux, dst.block(row_num));
+      else
+	diagonals[0]->matrix->vmult(aux, dst.block(row_num));
+      dst.block(row_num).equ (diagonals[0]->prefix, aux);
+    }
   else
-    diagonal->matrix->vmult(aux, dst.block(row_num));
-  dst.block(row_num).equ (diagonal->prefix, aux);
+    {
+      aux = 0.;
+      for (unsigned int i=0;i<diagonals.size();++i)
+	{
+	  m = diagonals[i];
+					   // First, divide by the current
+					   // factor, such that we can
+					   // multiply by it later.
+	  aux.scale(1./m->prefix);
+	  if (m->transpose)
+	    m->matrix->Tvmult_add(aux, dst.block(row_num));
+	  else
+	    m->matrix->vmult_add(aux, dst.block(row_num));
+	  aux.scale(m->prefix);
+	}
+      dst.block(row_num) = aux;
+    }
   
   this->mem->free(p_aux);
 }

@@ -399,10 +399,6 @@ class BlockMatrixArray : public Subscriptor
 
 /*@}*/
 
-/*! @addtogroup Preconditioners
- *@{
- */
-
 
 /**
  * Inversion of a block-triangular matrix.
@@ -416,9 +412,10 @@ class BlockMatrixArray : public Subscriptor
  * performed by the vmult() member function.
  *
  * @note While block indices may be duplicated (see BlockMatrixArray)
- * to add blocks, this is not allowed for diagonal blocks, since
+ * to add blocks, this has to be used with caution, since
  * summing up the inverse of two blocks does not yield the inverse of
- * the sum.
+ * the sum. While the latter would be desirable, we can only perform
+ * the first.
  *
  * The implementation may be a little clumsy, but it should be
  * sufficient as long as the block sizes are much larger than the
@@ -456,6 +453,8 @@ class BlockMatrixArray : public Subscriptor
  * method for solving.
  * @until Error
  *
+ *
+ * @ingroup Preconditioners
  * @author Guido Kanschat, 2001, 2005
  */
 template <typename number = double>
@@ -614,7 +613,6 @@ class BlockTrianglePrecondition
     bool backward;
 };
 
-/*@}*/
 
 #ifndef DOXYGEN
 //---------------------------------------------------------------------------
