@@ -2,7 +2,7 @@
 //    $Id$
 //    Version: $Name$
 //
-//    Copyright (C) 2005, 2006 by the deal.II authors
+//    Copyright (C) 2005, 2006, 2008 by the deal.II authors
 //
 //    This file is subject to QPL and may not be  distributed
 //    without copyright and license information. Please refer
@@ -12,6 +12,7 @@
 //---------------------------------------------------------------------------
 
 
+#include <base/utilities.h>
 #include <fe/fe.h>
 #include <fe/fe_tools.h>
 
@@ -23,10 +24,21 @@ void
 FETools::hierarchic_to_lexicographic_numbering (const FiniteElementData<dim> &fe,
 						std::vector<unsigned int> &h2l)
 {
-  Assert (fe.n_components() == 1, ExcInvalidFE());
   Assert (h2l.size() == fe.dofs_per_cell,
 	  ExcDimensionMismatch (h2l.size(), fe.dofs_per_cell));
+  h2l = hierarchic_to_lexicographic_numbering (fe);
+}
 
+
+
+template <int dim>
+std::vector<unsigned int>
+FETools::hierarchic_to_lexicographic_numbering (const FiniteElementData<dim> &fe)
+{
+  Assert (fe.n_components() == 1, ExcInvalidFE());
+
+  std::vector<unsigned int> h2l (fe.dofs_per_cell);
+  
   const unsigned int dofs_per_cell = fe.dofs_per_cell;
 				   // polynomial degree
   const unsigned int degree = fe.dofs_per_line+1;
@@ -192,6 +204,8 @@ FETools::hierarchic_to_lexicographic_numbering (const FiniteElementData<dim> &fe
       default:
 	    Assert (false, ExcNotImplemented());
     }
+
+  return h2l;
 }
 
 
@@ -201,10 +215,16 @@ void
 FETools::lexicographic_to_hierarchic_numbering (const FiniteElementData<dim> &fe,
 						std::vector<unsigned int>    &l2h)
 {
-  std::vector<unsigned int> tmp(l2h.size());
-  FETools::hierarchic_to_lexicographic_numbering(fe,tmp);
-  for (unsigned int i=0; i<l2h.size(); ++i)
-    l2h[tmp[i]]=i;  
+  l2h = lexicographic_to_hierarchic_numbering (fe);
+}
+
+
+
+template <int dim>
+std::vector<unsigned int>
+FETools::lexicographic_to_hierarchic_numbering (const FiniteElementData<dim> &fe)
+{
+  return Utilities::invert_permutation(hierarchic_to_lexicographic_numbering (fe));
 }
 
 
@@ -242,5 +262,36 @@ void
 FETools::lexicographic_to_hierarchic_numbering<3>
 (const FiniteElementData<3> &fe,
  std::vector<unsigned int> &l2h);
+
+
+
+template
+std::vector<unsigned int>
+FETools::hierarchic_to_lexicographic_numbering<1>
+(const FiniteElementData<1> &fe);
+template
+std::vector<unsigned int>
+FETools::hierarchic_to_lexicographic_numbering<2>
+(const FiniteElementData<2> &fe);
+template
+std::vector<unsigned int>
+FETools::hierarchic_to_lexicographic_numbering<3>
+(const FiniteElementData<3> &fe);
+
+
+template
+std::vector<unsigned int>
+FETools::lexicographic_to_hierarchic_numbering<1>
+(const FiniteElementData<1> &fe);
+template
+std::vector<unsigned int>
+FETools::lexicographic_to_hierarchic_numbering<2>
+(const FiniteElementData<2> &fe);
+template
+std::vector<unsigned int>
+FETools::lexicographic_to_hierarchic_numbering<3>
+(const FiniteElementData<3> &fe);
+
+
 
 DEAL_II_NAMESPACE_CLOSE

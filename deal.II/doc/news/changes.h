@@ -600,6 +600,15 @@ inconvenience this causes.
 <ol>
   <li>
   <p>
+  New: The functions FETools::lexicographic_to_hierarchic_numbering and
+  FETools::hierarchic_to_lexicographic_numbering now also exist in variants
+  returning their result by value, rather than through their last argument.
+  <br>
+  (WB 2008/12/16)
+  </p>
+
+  <li>
+  <p>
   New: FEValues objects can now directly calculate the Laplacians of
   solution functions at quadrature points. This is equivalent to the 
   trace of the Hessians, but faster and more convenient in user code.

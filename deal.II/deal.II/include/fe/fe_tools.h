@@ -1030,6 +1030,17 @@ class FETools
 					   std::vector<unsigned int>    &h2l);
 
 				     /**
+				      * Like the previous function but
+				      * instead of returning its
+				      * result through the last
+				      * argument return it as a value.
+				      */
+    template <int dim>
+    static
+    std::vector<unsigned int>
+    hierarchic_to_lexicographic_numbering (const FiniteElementData<dim> &fe_data);    
+    
+				     /**
 				      * This is the reverse function
 				      * to the above one, generating
 				      * the map from the lexicographic
@@ -1043,6 +1054,17 @@ class FETools
     lexicographic_to_hierarchic_numbering (const FiniteElementData<dim> &fe_data,
 					   std::vector<unsigned int>    &l2h);
 
+				     /**
+				      * Like the previous function but
+				      * instead of returning its
+				      * result through the last
+				      * argument return it as a value.
+				      */
+    template <int dim>
+    static
+    std::vector<unsigned int>
+    lexicographic_to_hierarchic_numbering (const FiniteElementData<dim> &fe_data);
+    
 				     /**
 				      * Parse the name of a finite
 				      * element and generate a finite
