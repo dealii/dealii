@@ -1747,9 +1747,10 @@ DataOutBase::write_data (
 	      (patch->data.n_rows() == n_data_sets+spacedim && patch->points_are_available),
 	      ExcDimensionMismatch (patch->points_are_available
 				    ?
-				    (patch->data.n_rows() + spacedim)
+				    (n_data_sets + spacedim)
 				    :
-				    patch->data.n_rows(), n_data_sets));
+				    n_data_sets,
+				    patch->data.n_rows()));
       Assert (patch->data.n_cols() == Utilities::fixed_power<dim>(n),
 	      ExcInvalidDatasetSize (patch->data.n_cols(), n));
       
@@ -2198,9 +2199,10 @@ void DataOutBase::write_gnuplot (const std::vector<Patch<dim,spacedim> > &patche
 	      (patch->data.n_rows() == n_data_sets+spacedim && patch->points_are_available),
 	      ExcDimensionMismatch (patch->points_are_available
 				    ?
-				    (patch->data.n_rows() + spacedim)
+				    (n_data_sets + spacedim)
 				    :
-				    patch->data.n_rows(), n_data_sets));
+				    n_data_sets,
+				    patch->data.n_rows()));
       Assert (patch->data.n_cols() == Utilities::fixed_power<dim>(n),
 	      ExcInvalidDatasetSize (patch->data.n_cols(), n_subdivisions+1));
 
@@ -2419,7 +2421,12 @@ void DataOutBase::write_povray (const std::vector<Patch<dim,spacedim> > &patches
       
       Assert ((patch->data.n_rows() == n_data_sets && !patch->points_are_available) ||
 	      (patch->data.n_rows() == n_data_sets+spacedim && patch->points_are_available),
-	      ExcDimensionMismatch (patch->points_are_available ? (patch->data.n_rows() + spacedim) : patch->data.n_rows(), n_data_sets));
+	      ExcDimensionMismatch (patch->points_are_available
+				    ?
+				    (n_data_sets + spacedim)
+				    :
+				    n_data_sets,
+				    patch->data.n_rows()));
       Assert (patch->data.n_cols() == Utilities::fixed_power<dim>(n_subdivisions+1),
 	      ExcInvalidDatasetSize (patch->data.n_cols(), n_subdivisions+1));
       
@@ -2469,7 +2476,12 @@ void DataOutBase::write_povray (const std::vector<Patch<dim,spacedim> > &patches
       
       Assert ((patch->data.n_rows() == n_data_sets && !patch->points_are_available) ||
 	      (patch->data.n_rows() == n_data_sets+spacedim && patch->points_are_available),
-	      ExcDimensionMismatch (patch->points_are_available ? (patch->data.n_rows() + spacedim) : patch->data.n_rows(), n_data_sets));
+	      ExcDimensionMismatch (patch->points_are_available
+				    ?
+				    (n_data_sets + spacedim)
+				    :
+				    n_data_sets,
+				    patch->data.n_rows()));
       Assert (patch->data.n_cols() == Utilities::fixed_power<dim>(n),
 	      ExcInvalidDatasetSize (patch->data.n_cols(), n_subdivisions+1));
 
@@ -3055,8 +3067,12 @@ void DataOutBase::write_gmv (const std::vector<Patch<dim,spacedim> > &patches,
 				   // write_gmv_reorder_data_vectors
   Assert ((patches[0].data.n_rows() == n_data_sets && !patches[0].points_are_available) ||
 	  (patches[0].data.n_rows() == n_data_sets+spacedim && patches[0].points_are_available),
-	  ExcDimensionMismatch (patches[0].points_are_available ? (patches[0].data.n_rows() + spacedim) : patches[0].data.n_rows(), n_data_sets));
-  
+	  ExcDimensionMismatch (patches[0].points_are_available
+				?
+				(n_data_sets + spacedim)
+				:
+				n_data_sets,
+				patches[0].data.n_rows()));  
   
 				   ///////////////////////
 				   // preamble
@@ -3188,9 +3204,12 @@ void DataOutBase::write_tecplot (const std::vector<Patch<dim,spacedim> > &patche
 				   // write_gmv_reorder_data_vectors
   Assert ((patches[0].data.n_rows() == n_data_sets && !patches[0].points_are_available) ||
 	  (patches[0].data.n_rows() == n_data_sets+spacedim && patches[0].points_are_available),
-	  ExcDimensionMismatch (patches[0].points_are_available ? (patches[0].data.n_rows() + spacedim) : patches[0].data.n_rows(), n_data_sets));
-
-  
+	  ExcDimensionMismatch (patches[0].points_are_available
+				?
+				(n_data_sets + spacedim)
+				:
+				n_data_sets,
+				patches[0].data.n_rows()));
 
 				   // first count the number of cells
 				   // and cells for later use
@@ -3454,11 +3473,14 @@ void DataOutBase::write_tecplot_binary (const std::vector<Patch<dim,spacedim> > 
 				   // first patch. checks against all
 				   // other patches are made in
 				   // write_gmv_reorder_data_vectors
-  Assert ((patches[0].data.n_rows() == n_data_sets && !patches[0].points_are_available) ||
-	  (patches[0].data.n_rows() == n_data_sets+spacedim && patches[0].points_are_available),
-	  ExcDimensionMismatch (patches[0].points_are_available ? (patches[0].data.n_rows() + spacedim) : patches[0].data.n_rows(), n_data_sets));
-
-  
+  Assert ((patch->data.n_rows() == n_data_sets && !patches[0].points_are_available) ||
+	  (patch->data.n_rows() == n_data_sets+spacedim && patches[0].points_are_available),
+	  ExcDimensionMismatch (patches[0].points_are_available
+				?
+				(n_data_sets + spacedim)
+				:
+				n_data_sets,
+				patch->data.n_rows()));  
 
 				   // first count the number of cells
 				   // and cells for later use
@@ -3750,10 +3772,10 @@ DataOutBase::write_vtk (const std::vector<Patch<dim,spacedim> > &patches,
 	  (patches[0].data.n_rows() == n_data_sets+spacedim && patches[0].points_are_available),
 	  ExcDimensionMismatch (patches[0].points_are_available
 				?
-				(patches[0].data.n_rows() + spacedim)
+				(n_data_sets + spacedim)
 				:
-				patches[0].data.n_rows(), n_data_sets));
-  
+				n_data_sets,
+				patches[0].data.n_rows()));  
   
 				   ///////////////////////
 				   // preamble
@@ -4052,7 +4074,12 @@ DataOutBase::write_gmv_reorder_data_vectors (const std::vector<Patch<dim,spacedi
       
       Assert ((patch->data.n_rows() == n_data_sets && !patch->points_are_available) ||
 	      (patch->data.n_rows() == n_data_sets+spacedim && patch->points_are_available),
-	      ExcDimensionMismatch (patch->points_are_available ? (patch->data.n_rows() + spacedim) : patch->data.n_rows(), n_data_sets));
+	      ExcDimensionMismatch (patch->points_are_available
+				    ?
+				    (n_data_sets + spacedim)
+				    :
+				    n_data_sets,
+				    patch->data.n_rows()));
       Assert (patch->data.n_cols() == Utilities::fixed_power<dim>(n_subdivisions+1),
 	      ExcInvalidDatasetSize (patch->data.n_cols(), n_subdivisions+1));
       
