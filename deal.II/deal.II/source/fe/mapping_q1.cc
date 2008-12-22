@@ -613,9 +613,16 @@ MappingQ1<dim,spacedim>::compute_fill (const typename Triangulation<dim,spacedim
     {
       Assert (quadrature_points.size() == n_q_points,
 	      ExcDimensionMismatch(quadrature_points.size(), n_q_points));
-      std::fill(quadrature_points.begin(),
-		quadrature_points.end(),
+      std::fill(quadrature_points.begin(), quadrature_points.end(),
 		Point<spacedim>());
+    }
+
+  if (update_flags & update_contravariant_transformation)
+    {
+      Assert (data.contravariant.size() == n_q_points,
+	      ExcDimensionMismatch(data.contravariant.size(), n_q_points));
+      std::fill(data.contravariant.begin(), data.contravariant.end(),
+		Tensor<2,spacedim>());
     }
 
   if (update_flags & update_covariant_transformation)
@@ -623,16 +630,6 @@ MappingQ1<dim,spacedim>::compute_fill (const typename Triangulation<dim,spacedim
       Assert (data.covariant.size() == n_q_points,
 	      ExcDimensionMismatch(data.covariant.size(), n_q_points));
     }
-  
-  if (update_flags & update_contravariant_transformation)
-    {
-      Assert (data.contravariant.size() == n_q_points,
-	      ExcDimensionMismatch(data.contravariant.size(), n_q_points));
-      std::fill(data.contravariant.begin(),
-		data.contravariant.end(),
-		Tensor<2,spacedim>());
-    }
-
 				   // if necessary, recompute the
 				   // support points of the
 				   // transformation of this cell
@@ -657,62 +654,55 @@ MappingQ1<dim,spacedim>::compute_fill (const typename Triangulation<dim,spacedim
   if (update_flags & update_quadrature_points)
     for (unsigned int point=0; point<n_q_points; ++point)
       for (unsigned int k=0; k<data.n_shape_functions; ++k)
-        quadrature_points[point]
-          += data.shape(point+data_set,k)
-             * data.mapping_support_points[k];
+	quadrature_points[point] 
+	  += data.shape(point+data_set,k) * data.mapping_support_points[k];
   
                                    // then Jacobians
   if (update_flags & update_contravariant_transformation)
     for (unsigned int point=0; point<n_q_points; ++point)
       for (unsigned int k=0; k<data.n_shape_functions; ++k)
-	if (dim==spacedim)
-	  {
-	    for (unsigned int i=0; i<dim; ++i)
-	      for (unsigned int j=0; j<dim; ++j)
-		data.contravariant[point][i][j]
-		  += (data.derivative(point+data_set, k)[j]
-		      *
-		      data.mapping_support_points[k][i]);
-	  }
-  
-				    // CODIMENSION 1 
-				    // Jacobians are rectangular
-				    // matrices
-	else if (dim==spacedim-1)
-	  {   
-	    for (unsigned int i=0; i<spacedim; ++i)
-	      for (unsigned int j=0; j<dim; ++j)
-		data.contravariant[point][i][j]
-		  += (data.derivative(point+data_set, k)[j]
-		      *
-		      data.mapping_support_points[k][i]);
-	  }    
+	{
+				   // some compilers seem to have problems
+				   // to detected that the two innermost
+				   // loops just use the data of the same
+				   // tensors, so get a reference to them by
+				   // hand
+	  const Tensor<1,dim> &data_derv = data.derivative(point+data_set, k);
+	  const Tensor<1,spacedim> &supp_pts = data.mapping_support_points[k];
+
+	  for (unsigned int i=0; i<spacedim; ++i)
+	    for (unsigned int j=0; j<dim; ++j)
+	      data.contravariant[point][i][j] += data_derv[j] * supp_pts[i];
+	}
 
 
-  FullMatrix<double> contravariant_matrix(spacedim,dim);
-  FullMatrix<double> covariant_matrix(dim,spacedim);
 				    // invert contravariant for
 			            // covariant transformation
 				    // matrices
   if ((update_flags & update_covariant_transformation)&&(dim==spacedim))
     for (unsigned int point=0; point<n_q_points; ++point)
       data.covariant[point] = invert(data.contravariant[point]);
+
 				    // CODIMENSION 1 
 				    // calculate left-inversion of the
 				    // contravariant matrices to obtain
 				    // covariant ones (auxiliary
 				    // rectangular fullmatrices are used)
   else if ((update_flags & update_covariant_transformation)&&(dim==spacedim-1))
-    for (unsigned int point=0; point<n_q_points; ++point)
-     {
-       contravariant_matrix.
-	 copy_from(data.contravariant[point],0,spacedim-1,0,dim-1);  
-       covariant_matrix.
-	 left_invert(contravariant_matrix);
-       covariant_matrix.
-	 copy_to(data.covariant[point],0,dim-1,0,spacedim-1);
-     }
+    {
+      FullMatrix<double> contravariant_matrix(spacedim,dim);
+      FullMatrix<double> covariant_matrix(dim,spacedim);
 
+      for (unsigned int point=0; point<n_q_points; ++point)
+	{
+	  contravariant_matrix.
+	    copy_from(data.contravariant[point],0,spacedim-1,0,dim-1);  
+	  covariant_matrix.
+	    left_invert(contravariant_matrix);
+	  covariant_matrix.
+	    copy_to(data.covariant[point],0,dim-1,0,spacedim-1);
+	}
+    }
 
   
 }
@@ -742,9 +732,10 @@ MappingQ1<dim,spacedim>::fill_fe_values (const typename Triangulation<dim,spaced
 				std::vector<Tensor<2,spacedim> >          &inverse_jacobians,
 				std::vector<Point<spacedim> >             &cell_normal_vectors) const
 {
-  InternalData *data_ptr = dynamic_cast<InternalData *> (&mapping_data);
-  Assert(data_ptr!=0, ExcInternalError());
-  InternalData &data=*data_ptr;
+  // ensure that the following cast is really correct:
+  Assert (dynamic_cast<InternalData *>(&mapping_data) != 0, 
+	  ExcInternalError());
+  InternalData &data = static_cast<InternalData&>(mapping_data);
 
   const unsigned int n_q_points=q.size();
 
@@ -1003,9 +994,10 @@ MappingQ1<dim,spacedim>::fill_fe_face_values (const typename Triangulation<dim,s
 				     std::vector<Point<spacedim> >                    &normal_vectors,
 				     std::vector<double>                              &cell_JxW_values) const
 {
-  InternalData *data_ptr = dynamic_cast<InternalData *> (&mapping_data);
-  Assert(data_ptr!=0, ExcInternalError());
-  InternalData &data=*data_ptr;
+  // ensure that the following cast is really correct:
+  Assert (dynamic_cast<InternalData *>(&mapping_data) != 0, 
+	  ExcInternalError());
+  InternalData &data = static_cast<InternalData&>(mapping_data);
 
   const unsigned int n_q_points = q.size();
   
@@ -1039,9 +1031,10 @@ MappingQ1<dim,spacedim>::fill_fe_subface_values (const typename Triangulation<di
 					std::vector<Point<spacedim> >     &normal_vectors,
 					std::vector<double>          &cell_JxW_values) const
 {
-  InternalData *data_ptr = dynamic_cast<InternalData *> (&mapping_data);
-  Assert(data_ptr!=0, ExcInternalError());
-  InternalData &data=*data_ptr;
+  // ensure that the following cast is really correct:
+  Assert (dynamic_cast<InternalData *>(&mapping_data) != 0, 
+	  ExcInternalError());
+  InternalData &data = static_cast<InternalData&>(mapping_data);
 
   const unsigned int n_q_points = q.size();
   
@@ -1180,9 +1173,10 @@ MappingQ1<dim,spacedim>::transform_covariant (
   VectorSlice<std::vector<Tensor<1,spacedim> > > output,
   const typename Mapping<dim,spacedim>::InternalDataBase &mapping_data) const
 {
-  const InternalData *data_ptr = dynamic_cast<const InternalData *> (&mapping_data);
-  Assert(data_ptr!=0, ExcInternalError());
-  const InternalData &data=*data_ptr;
+  // ensure that the following cast is really correct:
+  Assert (dynamic_cast<const InternalData *>(&mapping_data) != 0, 
+	  ExcInternalError());
+  const InternalData &data = static_cast<const InternalData&>(mapping_data);
 
   Assert (data.update_flags & update_covariant_transformation,
 	  typename FEValuesBase<dim>::ExcAccessToUninitializedField());
@@ -1204,9 +1198,10 @@ MappingQ1<1,2>::transform_covariant (
   VectorSlice<std::vector<Tensor<1,2> > > output,
   const Mapping<1,2>::InternalDataBase &mapping_data) const
 {
-  const InternalData *data_ptr = dynamic_cast<const InternalData *> (&mapping_data);
-  Assert(data_ptr!=0, ExcInternalError());
-  const InternalData &data=*data_ptr;
+  // ensure that the following cast is really correct:
+  Assert (dynamic_cast<const InternalData *>(&mapping_data) != 0, 
+	  ExcInternalError());
+  const InternalData &data = static_cast<const InternalData&>(mapping_data);
 
   Assert (data.update_flags & update_covariant_transformation,
 	  FEValuesBase<1>::ExcAccessToUninitializedField());
@@ -1235,9 +1230,10 @@ MappingQ1<2,3>::transform_covariant (
   VectorSlice<std::vector<Tensor<1,3> > > output,
   const Mapping<2,3>::InternalDataBase &mapping_data) const
 {
-  const InternalData *data_ptr = dynamic_cast<const InternalData *> (&mapping_data);
-  Assert(data_ptr!=0, ExcInternalError());
-  const InternalData &data=*data_ptr;
+  // ensure that the following cast is really correct:
+  Assert (dynamic_cast<const InternalData *>(&mapping_data) != 0, 
+	  ExcInternalError());
+  const InternalData &data = static_cast<const InternalData&>(mapping_data);
 
   Assert (data.update_flags & update_covariant_transformation,
 	  FEValuesBase<2>::ExcAccessToUninitializedField());
@@ -1266,17 +1262,18 @@ MappingQ1<dim, spacedim>::transform_covariant (
     VectorSlice<std::vector<Tensor<2,spacedim> > > output,
     const typename Mapping<dim,spacedim>::InternalDataBase &mapping_data) const
 {
-    const InternalData *data_ptr = dynamic_cast<const InternalData *> (&mapping_data);
-    Assert(data_ptr!=0, ExcInternalError());
-    const InternalData &data=*data_ptr;
+  // ensure that the following cast is really correct:
+  Assert (dynamic_cast<const InternalData *>(&mapping_data) != 0, 
+	  ExcInternalError());
+  const InternalData &data = static_cast<const InternalData&>(mapping_data);
 
-    Assert (data.update_flags & update_covariant_transformation,
-	    typename FEValuesBase<dim>::ExcAccessToUninitializedField());
+  Assert (data.update_flags & update_covariant_transformation,
+	  typename FEValuesBase<dim>::ExcAccessToUninitializedField());
 
-    Assert (output.size() + offset <= input.size(), ExcInternalError());
+  Assert (output.size() + offset <= input.size(), ExcInternalError());
 
-    for (unsigned int i=0; i<output.size(); ++i)
-	contract (output[i], input[i+offset], data.covariant[i]);
+  for (unsigned int i=0; i<output.size(); ++i)
+    contract (output[i], input[i+offset], data.covariant[i]);
 }
 
 #if deal_II_dimension == 1
@@ -1319,9 +1316,10 @@ transform_contravariant (
   VectorSlice<std::vector<Tensor<1,spacedim> > > output,
   const typename Mapping<dim,spacedim>::InternalDataBase &mapping_data) const
 {
-  const InternalData* data_ptr = dynamic_cast<const InternalData *> (&mapping_data);
-  Assert(data_ptr!=0, ExcInternalError());
-  const InternalData &data=*data_ptr;
+  // ensure that the following cast is really correct:
+  Assert (dynamic_cast<const InternalData *>(&mapping_data) != 0, 
+	  ExcInternalError());
+  const InternalData &data = static_cast<const InternalData&>(mapping_data);
 
   Assert (data.update_flags & update_contravariant_transformation,
 	  typename FEValuesBase<dim>::ExcAccessToUninitializedField());
@@ -1342,9 +1340,10 @@ MappingQ1<dim,spacedim>::transform_contravariant (
   VectorSlice<std::vector<Tensor<2,spacedim> > > output,
   const typename Mapping<dim,spacedim>::InternalDataBase &mapping_data) const
 {
-  const InternalData* data_ptr = dynamic_cast<const InternalData *> (&mapping_data);
-  Assert(data_ptr!=0, ExcInternalError());
-  const InternalData &data=*data_ptr;
+  // ensure that the following cast is really correct:
+  Assert (dynamic_cast<const InternalData *>(&mapping_data) != 0, 
+	  ExcInternalError());
+  const InternalData &data = static_cast<const InternalData&>(mapping_data);
 
   Assert (data.update_flags & update_contravariant_transformation,
 	  typename FEValuesBase<dim>::ExcAccessToUninitializedField());
