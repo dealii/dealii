@@ -2,7 +2,7 @@
 //    $Id$
 //    Version: $Name$ 
 //
-//    Copyright (C) 2003, 2004, 2005 by the deal.II authors
+//    Copyright (C) 2003, 2004, 2005, 2008 by the deal.II authors
 //
 //    This file is subject to QPL and may not be  distributed
 //    without copyright and license information. Please refer
@@ -49,29 +49,36 @@ void test ()
   
   Point<dim> p;
 
-				   // generate N random points in
-				   // [-2:2]^d, and transform them
-				   // back and forth between mother
-				   // and child cell
-  const unsigned int N = 7;
-  for (unsigned int i=0; i<N; ++i)
+  for (unsigned int ref_case_no=1;
+       ref_case_no<=RefinementPossibilities<dim>::isotropic_refinement; ++ref_case_no)
     {
-      for (unsigned int d=0; d<dim; ++d)
-	p[d] = rand_2();
-
-      deallog << i << ' ' << p << ' '
-	      << GeometryInfo<dim>::is_inside_unit_cell (p) << std::endl;
-      for (unsigned int c=0; c<GeometryInfo<dim>::max_children_per_cell; ++c)
+      RefinementCase<dim> ref_case(ref_case_no);
+      
+      deallog << "RefinementCase=" << static_cast<unsigned int> (ref_case) << std::endl;
+      // generate N random points in
+      // [-2:2]^d, and transform them
+      // back and forth between mother
+      // and child cell
+      const unsigned int N = 7;
+      for (unsigned int i=0; i<N; ++i)
 	{
-	  const Point<dim> q = GeometryInfo<dim>::cell_to_child_coordinates(p,c);
-	  const Point<dim> pp = GeometryInfo<dim>::child_to_cell_coordinates(q,c);
+	  for (unsigned int d=0; d<dim; ++d)
+	    p[d] = rand_2();
 	  
-	  deallog << "    " << c << " [" << q << "] [" << pp << ']'
-		  << std::endl;
-	  Assert ((p-pp).square() < 1e-15*1e-15, ExcInternalError());
-	  Assert (GeometryInfo<dim>::is_inside_unit_cell (p) ==
-		  GeometryInfo<dim>::is_inside_unit_cell (pp),
-		  ExcInternalError());
+	  deallog << i << ' ' << p << ' '
+		  << GeometryInfo<dim>::is_inside_unit_cell (p) << std::endl;
+	  for (unsigned int c=0; c<GeometryInfo<dim>::n_children(ref_case); ++c)
+	    {
+	      const Point<dim> q = GeometryInfo<dim>::cell_to_child_coordinates(p,c);
+	      const Point<dim> pp = GeometryInfo<dim>::child_to_cell_coordinates(q,c);
+	      
+	      deallog << "    " << c << " [" << q << "] [" << pp << ']'
+		      << std::endl;
+	      Assert ((p-pp).square() < 1e-15*1e-15, ExcInternalError());
+	      Assert (GeometryInfo<dim>::is_inside_unit_cell (p) ==
+		      GeometryInfo<dim>::is_inside_unit_cell (pp),
+		      ExcInternalError());
+	    }
 	}
     }
 }
