@@ -5808,7 +5808,7 @@ namespace internal
 			new_quads[0]->set_line_orientation(0,quad->line_orientation(0));
 			new_quads[0]->set_line_orientation(2,quad->line_orientation(2));
 			new_quads[1]->set_line_orientation(1,quad->line_orientation(1));
-			new_quads[1]->set_line_orientation(2,quad->line_orientation(3));
+			new_quads[1]->set_line_orientation(3,quad->line_orientation(3));
 			if (aniso_quad_ref_case==RefinementCase<dim-1>::cut_x)
 			  {
 			    new_quads[0]->set_line_orientation(3,quad->line_orientation(3));
