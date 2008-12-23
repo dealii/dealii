@@ -600,6 +600,30 @@ inconvenience this causes.
 <ol>
   <li>
   <p>
+  New: The restriction and embedding matrices for FE_Q are now implemented.
+  <br>
+  (Tobias Leicht, RH, 2008/12/23)
+  </p>
+
+  <li>
+  <p>
+  Improved: The GeometryInfo::cell_to_child_coordinates and
+  GeometryInfo::child_to_cell_coordinates functions are extended to
+  anisotropic refinement.
+  <br>
+  (Tobias Leicht, RH, 2008/12/23)
+  </p>
+
+  <li>
+  <p>
+  Fixed: There were cases with both anisotropic refinement and non-standard
+  line orientation where we created wrong meshes in 3d. This is now fixed.
+  <br>
+  (Tobias Leicht, RH, 2008/12/23)
+  </p>
+
+  <li>
+  <p>
   Fixed: The FEValuesExtractors classes were not copyable though there
   are legitimate reasons to do so. This is now fixed.
   <br>
