@@ -173,7 +173,17 @@ void test ()
                                             FESystem<dim>(FE_DGQ<dim>(0),
                                                           3),
                                             1), 2,
-                             FE_DGQ<dim>(0), 1)
+                             FE_DGQ<dim>(0), 1),
+	  
+					   // some continuous FEs
+	  new FE_Q<dim>(1),
+	  new FE_Q<dim>(2),
+	  new FESystem<dim> (FE_Q<dim>(1), 2),
+	  new FESystem<dim> (FE_DGQ<dim>(1), 2,
+			     FESystem<dim> (FE_Q<dim>(1), 2,
+					    FE_Q<dim>(2), 1,
+					    FE_DGP<dim>(2), 1), 2,
+			     FE_Q<dim>(3),1)
     };
 
   for (unsigned int j=0; j<n_ref_cases_for_dim[dim]; ++j)
