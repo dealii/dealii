@@ -560,7 +560,7 @@ FETools::compute_node_matrix(
     }
 }
 
-#if deal_II_dimension != 3
+#if deal_II_dimension == 1
 template<>
 void
 FETools::compute_embedding_matrices(const FiniteElement<1,2> &,
@@ -570,6 +570,7 @@ FETools::compute_embedding_matrices(const FiniteElement<1,2> &,
   Assert(false, ExcNotImplemented());
 }
 
+#elif deal_II_dimension == 2
 template<>
 void
 FETools::compute_embedding_matrices(const FiniteElement<2,3>&,
@@ -873,7 +874,7 @@ FETools::compute_face_embedding_matrices(const FiniteElement<dim,spacedim>& fe,
     }
 }
 
-#if deal_II_dimension != 3
+#if deal_II_dimension == 1
 template <>
 void
 FETools::compute_projection_matrices(const FiniteElement<1,2>&,
@@ -882,6 +883,7 @@ FETools::compute_projection_matrices(const FiniteElement<1,2>&,
   Assert(false, ExcNotImplemented());
 }
 
+#elif deal_II_dimension == 2
 template <>
 void
 FETools::compute_projection_matrices(const FiniteElement<2,3>&,
