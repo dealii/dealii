@@ -2924,7 +2924,9 @@ namespace hp
                         MemoryConsumption::memory_consumption (levels) +
                         MemoryConsumption::memory_consumption (*faces) +
                         MemoryConsumption::memory_consumption (used_dofs) +
-                        MemoryConsumption::memory_consumption (vertex_dofs));
+                        MemoryConsumption::memory_consumption (vertex_dofs) +
+                        MemoryConsumption::memory_consumption (vertex_dofs_offsets) +
+                        MemoryConsumption::memory_consumption (has_children));
     for (unsigned int i=0; i<levels.size(); ++i)
       mem += MemoryConsumption::memory_consumption (*levels[i]);
     mem += MemoryConsumption::memory_consumption (*faces);
