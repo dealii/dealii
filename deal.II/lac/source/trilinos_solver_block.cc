@@ -276,7 +276,7 @@ namespace TrilinosWrappers
 	  break;
         case gmres:
 	  aztecBlockParams->sublist("Forward Solve")
-	    .sublist("AztecOO Settings").set("Aztec Solver", "GMRES");
+	    .sublist("AztecOO Settings").set("Aztec Solver", "MinRes");
 	  aztecBlockParams->sublist("Forward Solve")
 	    .sublist("AztecOO Settings").set("Size of Krylov Subspace", 
 					     (int)additional_data.gmres_restart_parameter);

@@ -2090,16 +2090,23 @@ add_entries_local_to_global<CompressedSetSparsityPattern> (const std::vector<uns
 					      CompressedSetSparsityPattern       &,
 					      const bool,
 					      const Table<2,bool> &) const;
-
 template void ConstraintMatrix::
 add_entries_local_to_global<CompressedSimpleSparsityPattern> (const std::vector<unsigned int> &,
 					      CompressedSimpleSparsityPattern       &,
 					      const bool,
 					      const Table<2,bool> &) const;
+#ifdef DEAL_II_USE_TRILINOS
+template void ConstraintMatrix::
+add_entries_local_to_global<TrilinosWrappers::SparsityPattern>
+                                             (const std::vector<unsigned int> &,
+					      TrilinosWrappers::SparsityPattern &,
+					      const bool,
+					      const Table<2,bool> &) const;
+#endif
 
 template void ConstraintMatrix::
 add_entries_local_to_global<BlockSparsityPattern> (const std::vector<unsigned int> &,
-					      BlockSparsityPattern       &,
+					      BlockSparsityPattern &,
 					      const bool,
 					      const Table<2,bool> &) const;
 template void ConstraintMatrix::
@@ -2109,14 +2116,21 @@ add_entries_local_to_global<BlockCompressedSparsityPattern> (const std::vector<u
 					      const Table<2,bool> &) const;
 template void ConstraintMatrix::
 add_entries_local_to_global<BlockCompressedSetSparsityPattern> (const std::vector<unsigned int> &,
-					      BlockCompressedSetSparsityPattern       &,
+					      BlockCompressedSetSparsityPattern &,
 					      const bool,
 					      const Table<2,bool> &) const;
-
 template void ConstraintMatrix::
 add_entries_local_to_global<BlockCompressedSimpleSparsityPattern> (const std::vector<unsigned int> &,
-                                              BlockCompressedSimpleSparsityPattern       &,
+                                              BlockCompressedSimpleSparsityPattern &,
                                               const bool,
 					      const Table<2,bool> &) const;
+#ifdef DEAL_II_USE_TRILINOS
+template void ConstraintMatrix::
+add_entries_local_to_global<TrilinosWrappers::BlockSparsityPattern> 
+                                             (const std::vector<unsigned int> &,
+					      TrilinosWrappers::BlockSparsityPattern &,
+					      const bool,
+					      const Table<2,bool> &) const;
+#endif
 
 DEAL_II_NAMESPACE_CLOSE

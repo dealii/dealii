@@ -20,6 +20,7 @@
 #include <base/subscriptor.h>
 #include <base/smartpointer.h>
 #include <lac/sparsity_pattern.h>
+#include <lac/trilinos_sparsity_pattern.h>
 #include <lac/compressed_sparsity_pattern.h>
 #include <lac/compressed_set_sparsity_pattern.h>
 #include <lac/compressed_simple_sparsity_pattern.h>
@@ -33,6 +34,12 @@ class BlockSparsityPattern;
 class BlockCompressedSparsityPattern;
 class BlockCompressedSimpleSparsityPattern;
 class BlockCompressedSetSparsityPattern;
+#ifdef DEAL_II_USE_TRILINOS
+namespace TrilinosWrappers
+{
+  class BlockSparsityPattern;
+}
+#endif
 
 /*! @addtogroup Sparsity
  *@{
@@ -687,8 +694,6 @@ typedef BlockCompressedSparsityPattern CompressedBlockSparsityPattern;
  * There are several, exchangeable variations of this class, see @ref Sparsity,
  * section 'Dynamic block sparsity patterns' for more information.
  *
- * This class is used in @ref step_22 "step-22".
- *
  * @author Wolfgang Bangerth, 2007
  */
 class BlockCompressedSetSparsityPattern : public BlockSparsityPatternBase<CompressedSetSparsityPattern>
@@ -776,6 +781,8 @@ class BlockCompressedSetSparsityPattern : public BlockSparsityPatternBase<Compre
  * There are several, exchangeable variations of this class, see @ref Sparsity,
  * section 'Dynamic block sparsity patterns' for more information.
  *
+ * This class is used in @ref step_22 "step-22" and @ref step_31 "step-31".
+ *
  * @author Timo Heister, 2008
  */
 class BlockCompressedSimpleSparsityPattern : public BlockSparsityPatternBase<CompressedSimpleSparsityPattern>
@@ -803,7 +810,7 @@ class BlockCompressedSimpleSparsityPattern : public BlockSparsityPatternBase<Com
 				      * you assign them sizes.
 				      */
     BlockCompressedSimpleSparsityPattern (const unsigned int n_rows,
-				    const unsigned int n_columns);
+					  const unsigned int n_columns);
 
     				     /**
 				      * Initialize the pattern with
@@ -845,6 +852,129 @@ class BlockCompressedSimpleSparsityPattern : public BlockSparsityPatternBase<Com
     using BlockSparsityPatternBase<CompressedSimpleSparsityPattern>::reinit;
 };
 
+
+
+
+#ifdef DEAL_II_USE_TRILINOS
+
+
+/**
+ * This class extends the base class to implement an array of Trilinos
+ * sparsity patterns that can be used to initialize Trilinos block sparse
+ * matrices that can be distributed among different processors. It is used
+ * in the same way as the BlockSparsityPattern except that it builds upon
+ * the TrilinosWrappers::SparsityPattern instead of the
+ * dealii::SparsityPattern. See the documentation of the
+ * BlockSparsityPattern for examples.
+ *
+ * This class is has properties of the "dynamic" type of @ref Sparsity (in
+ * the sense that it can extend the memory if too little elements were
+ * allocated), but otherwise is more like the basic deal.II SparsityPattern
+ * (in the sense that the method compress() needs to be called before the
+ * pattern can be used).
+ *
+ * This class is used in @ref step_32 "step-32".
+ *
+ * @author Martin Kronbichler, 2008
+ */
+namespace TrilinosWrappers
+{
+  class BlockSparsityPattern : 
+    public dealii::BlockSparsityPatternBase<SparsityPattern>
+  {
+    public:
+
+				     /**
+				      * Initialize the matrix empty,
+				      * that is with no memory
+				      * allocated. This is useful if
+				      * you want such objects as
+				      * member variables in other
+				      * classes. You can make the
+				      * structure usable by calling
+				      * the reinit() function.
+				      */
+      BlockSparsityPattern ();
+
+				     /**
+				      * Initialize the matrix with the
+				      * given number of block rows and
+				      * columns. The blocks themselves
+				      * are still empty, and you have
+				      * to call collect_sizes() after
+				      * you assign them sizes.
+				      */
+      BlockSparsityPattern (const unsigned int n_rows,
+			    const unsigned int n_columns);
+
+    				     /**
+				      * Initialize the pattern with
+				      * two BlockIndices for the block
+				      * structures of matrix rows and
+				      * columns. This function is
+				      * equivalent to calling the
+				      * previous constructor with the
+				      * length of the two index vector
+				      * and then entering the index
+				      * values.
+				      */
+      BlockSparsityPattern (const std::vector<unsigned int>& row_block_sizes,
+			    const std::vector<unsigned int>& col_block_sizes);
+
+    				     /**
+				      * Initialize the pattern with an array
+				      * Epetra_Map that specifies both rows
+				      * and columns of the matrix (so the
+				      * final matrix will be a square
+				      * matrix), where the Epetra_Map
+				      * specifies the parallel distribution
+				      * of the degrees of freedom on the
+				      * individual block.  This function is
+				      * equivalent to calling the second
+				      * constructor with the length of the
+				      * mapping vector and then entering the
+				      * index values.
+				      */
+      BlockSparsityPattern (const std::vector<Epetra_Map>& input_maps);
+
+				     /**
+				      * Resize the matrix to a tensor
+				      * product of matrices with
+				      * dimensions defined by the
+				      * arguments.
+				      *
+				      * The matrix will have as many
+				      * block rows and columns as
+				      * there are entries in the two
+				      * arguments. The block at
+				      * position (<i>i,j</i>) will
+				      * have the dimensions
+				      * <tt>row_block_sizes[i]</tt>
+				      * times <tt>col_block_sizes[j]</tt>.
+				      */
+      void reinit (const std::vector< unsigned int > &row_block_sizes,
+		   const std::vector< unsigned int > &col_block_sizes);
+
+				     /**
+				      * Resize the matrix to a square tensor
+				      * product of matrices with parallel
+				      * distribution according to the
+				      * specifications in the array of
+				      * Epetra_Maps.
+				      */
+      void reinit (const std::vector<Epetra_Map>& input_maps);
+
+
+				     /**
+				      * Allow the use of the reinit
+				      * functions of the base class as
+				      * well.
+				      */
+    using BlockSparsityPatternBase<SparsityPattern>::reinit;
+  };
+}
+
+#endif
 
 
 /*@}*/

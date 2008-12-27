@@ -309,7 +309,9 @@ template class BlockSparsityPatternBase<SparsityPattern>;
 template class BlockSparsityPatternBase<CompressedSparsityPattern>;
 template class BlockSparsityPatternBase<CompressedSimpleSparsityPattern>;
 template class BlockSparsityPatternBase<CompressedSetSparsityPattern>;
-
+#ifdef DEAL_II_USE_TRILINOS
+template class BlockSparsityPatternBase<TrilinosWrappers::SparsityPattern>;
+#endif
 
 
 
@@ -473,46 +475,6 @@ BlockCompressedSparsityPattern::reinit (
   this->collect_sizes();  
 }
 
-BlockCompressedSimpleSparsityPattern::BlockCompressedSimpleSparsityPattern ()
-{}
-
-
-
-BlockCompressedSimpleSparsityPattern::
-BlockCompressedSimpleSparsityPattern (const unsigned int n_rows,
-				const unsigned int n_columns)
-		:
-		BlockSparsityPatternBase<CompressedSimpleSparsityPattern>(n_rows,
-								    n_columns)
-{}
-
-
-BlockCompressedSimpleSparsityPattern::
-BlockCompressedSimpleSparsityPattern (const std::vector<unsigned int>& row_indices,
-				const std::vector<unsigned int>& col_indices)
-		:
-		BlockSparsityPatternBase<CompressedSimpleSparsityPattern>(row_indices.size(),
-								    col_indices.size())
-{
-  for (unsigned int i=0;i<row_indices.size();++i)
-    for (unsigned int j=0;j<col_indices.size();++j)
-      this->block(i,j).reinit(row_indices[i],col_indices[j]);
-  this->collect_sizes();
-}
-
-
-void
-BlockCompressedSimpleSparsityPattern::reinit (
-  const std::vector< unsigned int > &row_block_sizes,
-  const std::vector< unsigned int > &col_block_sizes)
-{
-  BlockSparsityPatternBase<CompressedSimpleSparsityPattern>::reinit(row_block_sizes.size(), col_block_sizes.size());
-  for (unsigned int i=0;i<row_block_sizes.size();++i)
-    for (unsigned int j=0;j<col_block_sizes.size();++j)
-      this->block(i,j).reinit(row_block_sizes[i],col_block_sizes[j]);
-  this->collect_sizes();  
-}
-
 
 
 BlockCompressedSetSparsityPattern::BlockCompressedSetSparsityPattern ()
@@ -557,6 +519,125 @@ BlockCompressedSetSparsityPattern::reinit (
 
 
 
+BlockCompressedSimpleSparsityPattern::BlockCompressedSimpleSparsityPattern ()
+{}
+
+
+
+BlockCompressedSimpleSparsityPattern::
+BlockCompressedSimpleSparsityPattern (const unsigned int n_rows,
+				const unsigned int n_columns)
+		:
+		BlockSparsityPatternBase<CompressedSimpleSparsityPattern>(n_rows,
+								    n_columns)
+{}
+
+
+
+BlockCompressedSimpleSparsityPattern::
+BlockCompressedSimpleSparsityPattern (const std::vector<unsigned int>& row_indices,
+				const std::vector<unsigned int>& col_indices)
+		:
+		BlockSparsityPatternBase<CompressedSimpleSparsityPattern>(row_indices.size(),
+								    col_indices.size())
+{
+  for (unsigned int i=0;i<row_indices.size();++i)
+    for (unsigned int j=0;j<col_indices.size();++j)
+      this->block(i,j).reinit(row_indices[i],col_indices[j]);
+  this->collect_sizes();
+}
+
+
+
+void
+BlockCompressedSimpleSparsityPattern::reinit (
+  const std::vector< unsigned int > &row_block_sizes,
+  const std::vector< unsigned int > &col_block_sizes)
+{
+  BlockSparsityPatternBase<CompressedSimpleSparsityPattern>::reinit(row_block_sizes.size(), col_block_sizes.size());
+  for (unsigned int i=0;i<row_block_sizes.size();++i)
+    for (unsigned int j=0;j<col_block_sizes.size();++j)
+      this->block(i,j).reinit(row_block_sizes[i],col_block_sizes[j]);
+  this->collect_sizes();  
+}
+
+
+
+#ifdef DEAL_II_USE_TRILINOS
+namespace TrilinosWrappers
+{
+
+  BlockSparsityPattern::BlockSparsityPattern ()
+  {}
+
+
+
+  BlockSparsityPattern::
+  BlockSparsityPattern (const unsigned int n_rows,
+			const unsigned int n_columns)
+                :
+                dealii::BlockSparsityPatternBase<SparsityPattern>(n_rows,
+								  n_columns)
+  {}
+
+
+
+  BlockSparsityPattern::
+  BlockSparsityPattern (const std::vector<unsigned int>& row_indices,
+			const std::vector<unsigned int>& col_indices)
+		:
+		BlockSparsityPatternBase<SparsityPattern>(row_indices.size(),
+							  col_indices.size())
+  {
+    for (unsigned int i=0;i<row_indices.size();++i)
+      for (unsigned int j=0;j<col_indices.size();++j)
+	this->block(i,j).reinit(row_indices[i],col_indices[j]);
+    this->collect_sizes();
+  }
+
+
+
+  BlockSparsityPattern::
+  BlockSparsityPattern (const std::vector<Epetra_Map>& input_maps)
+		:
+		BlockSparsityPatternBase<SparsityPattern>(input_maps.size(),
+							  input_maps.size())
+  {
+    for (unsigned int i=0;i<input_maps.size();++i)
+      for (unsigned int j=0;j<input_maps.size();++j)
+	this->block(i,j).reinit(input_maps[i],input_maps[j]);
+    this->collect_sizes();
+  }
+
+
+
+  void
+  BlockSparsityPattern::reinit (const std::vector<unsigned int> &row_block_sizes,
+				const std::vector<unsigned int> &col_block_sizes)
+  {
+    dealii::BlockSparsityPatternBase<SparsityPattern>::reinit(row_block_sizes.size(), col_block_sizes.size());
+    for (unsigned int i=0;i<row_block_sizes.size();++i)
+      for (unsigned int j=0;j<col_block_sizes.size();++j)
+	this->block(i,j).reinit(row_block_sizes[i],col_block_sizes[j]);
+    this->collect_sizes();  
+  }
+
+
+
+  void
+  BlockSparsityPattern::reinit (const std::vector<Epetra_Map> &input_maps)
+  {
+    dealii::BlockSparsityPatternBase<SparsityPattern>::reinit(input_maps.size(), 
+							      input_maps.size());
+    for (unsigned int i=0;i<input_maps.size();++i)
+      for (unsigned int j=0;j<input_maps.size();++j)
+	this->block(i,j).reinit(input_maps[i],input_maps[j]);
+    this->collect_sizes();  
+  }
+
+}
+
+#endif
 
 // Remark: The explicit instantiations for "BlockSparsityPatternBase" were moved
 // to the top of this source file. The reason is a slightly buggy version

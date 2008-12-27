@@ -17,6 +17,7 @@
 #include <base/quadrature_lib.h>
 #include <base/table.h>
 #include <base/template_constraints.h>
+#include <base/utilities.h>
 #include <grid/tria.h>
 #include <grid/tria_iterator.h>
 #include <grid/intergrid_map.h>
@@ -33,6 +34,7 @@
 #include <lac/compressed_sparsity_pattern.h>
 #include <lac/compressed_set_sparsity_pattern.h>
 #include <lac/compressed_simple_sparsity_pattern.h>
+#include <lac/trilinos_sparsity_pattern.h>
 #include <lac/block_sparsity_pattern.h>
 #include <lac/vector.h>
 #include <numerics/vectors.h>
@@ -66,7 +68,24 @@ DoFTools::make_sparsity_pattern (const DH               &dof,
   dofs_on_this_cell.reserve (max_dofs_per_cell(dof));
   typename DH::active_cell_iterator cell = dof.begin_active(),
 				    endc = dof.end();
+
+				   // In case we work with a distributed
+				   // sparsity pattern of Trilinos type, we
+				   // only have to do the work if the
+				   // current cell is owned by the calling
+				   // processor. Otherwise, just continue.
   for (; cell!=endc; ++cell) 
+#ifdef DEAL_II_USE_TRILINOS
+    if ((types_are_equal<SparsityPattern,TrilinosWrappers::SparsityPattern>::value
+	 ||
+	 types_are_equal<SparsityPattern,TrilinosWrappers::BlockSparsityPattern>::value)
+	&&
+	cell->subdomain_id() != 
+	Utilities::Trilinos::get_this_mpi_process(Utilities::Trilinos::comm_world()))
+      continue;
+    else
+	 
+#endif
     {
       const unsigned int dofs_per_cell = cell->get_fe().dofs_per_cell;
       dofs_on_this_cell.resize (dofs_per_cell);
@@ -156,7 +175,24 @@ DoFTools::make_sparsity_pattern (
   std::vector<unsigned int> dofs_on_this_cell(fe_collection.max_dofs_per_cell());
   typename DH::active_cell_iterator cell = dof.begin_active(),
 				    endc = dof.end();
-  for (; cell!=endc; ++cell) 
+
+				   // In case we work with a distributed
+				   // sparsity pattern of Trilinos type, we
+				   // only have to do the work if the
+				   // current cell is owned by the calling
+				   // processor. Otherwise, just continue.
+  for (; cell!=endc; ++cell)
+#ifdef DEAL_II_USE_TRILINOS
+    if ((types_are_equal<SparsityPattern,TrilinosWrappers::SparsityPattern>::value
+	 ||
+	 types_are_equal<SparsityPattern,TrilinosWrappers::BlockSparsityPattern>::value)
+	&&
+	cell->subdomain_id() != 
+	Utilities::Trilinos::get_this_mpi_process(Utilities::Trilinos::comm_world()))
+      continue;
+    else
+	 
+#endif
     {
       const unsigned int fe_index
 	= cell->active_fe_index();
@@ -5394,6 +5430,16 @@ DoFTools::make_sparsity_pattern<DoFHandler<deal_II_dimension>,
  CompressedSimpleSparsityPattern &sparsity,
  const ConstraintMatrix &,
  const bool);
+#ifdef DEAL_II_USE_TRILINOS
+template void
+DoFTools::make_sparsity_pattern<DoFHandler<deal_II_dimension>,
+				TrilinosWrappers::SparsityPattern>
+(const DoFHandler<deal_II_dimension> &dof,
+ TrilinosWrappers::SparsityPattern    &sparsity,
+ const ConstraintMatrix &,
+ const bool);
+#endif
+
 template void
 DoFTools::make_sparsity_pattern<DoFHandler<deal_II_dimension>,
 				BlockSparsityPattern>
@@ -5422,6 +5468,15 @@ DoFTools::make_sparsity_pattern<DoFHandler<deal_II_dimension>,
  BlockCompressedSimpleSparsityPattern      &sparsity,
  const ConstraintMatrix &,
  const bool);
+#ifdef DEAL_II_USE_TRILINOS
+template void
+DoFTools::make_sparsity_pattern<DoFHandler<deal_II_dimension>,
+				TrilinosWrappers::BlockSparsityPattern>
+(const DoFHandler<deal_II_dimension> &dof,
+ TrilinosWrappers::BlockSparsityPattern                &sparsity,
+ const ConstraintMatrix &,
+ const bool);
+#endif
 
 template void
 DoFTools::make_sparsity_pattern<hp::DoFHandler<deal_II_dimension>,
@@ -5430,8 +5485,6 @@ DoFTools::make_sparsity_pattern<hp::DoFHandler<deal_II_dimension>,
  SparsityPattern    &sparsity,
  const ConstraintMatrix &,
  const bool);
-
-
 template void
 DoFTools::make_sparsity_pattern<hp::DoFHandler<deal_II_dimension>,
 				CompressedSparsityPattern>
@@ -5439,7 +5492,6 @@ DoFTools::make_sparsity_pattern<hp::DoFHandler<deal_II_dimension>,
  CompressedSparsityPattern    &sparsity,
  const ConstraintMatrix &,
  const bool);
-
 template void
 DoFTools::make_sparsity_pattern<hp::DoFHandler<deal_II_dimension>,
 				CompressedSetSparsityPattern>
@@ -5447,7 +5499,6 @@ DoFTools::make_sparsity_pattern<hp::DoFHandler<deal_II_dimension>,
  CompressedSetSparsityPattern    &sparsity,
  const ConstraintMatrix &,
  const bool);
-
 template void
 DoFTools::make_sparsity_pattern<hp::DoFHandler<deal_II_dimension>,
 				CompressedSimpleSparsityPattern>
@@ -5455,7 +5506,15 @@ DoFTools::make_sparsity_pattern<hp::DoFHandler<deal_II_dimension>,
  CompressedSimpleSparsityPattern    &sparsity,
  const ConstraintMatrix &,
  const bool);
-
+#ifdef DEAL_II_USE_TRILINOS
+template void
+DoFTools::make_sparsity_pattern<hp::DoFHandler<deal_II_dimension>,
+				TrilinosWrappers::SparsityPattern>
+(const hp::DoFHandler<deal_II_dimension> &dof,
+ TrilinosWrappers::SparsityPattern    &sparsity,
+ const ConstraintMatrix &,
+ const bool);
+#endif
 
 template void
 DoFTools::make_sparsity_pattern<hp::DoFHandler<deal_II_dimension>,
@@ -5485,6 +5544,16 @@ DoFTools::make_sparsity_pattern<hp::DoFHandler<deal_II_dimension>,
  BlockCompressedSimpleSparsityPattern      &sparsity,
  const ConstraintMatrix &,
  const bool);
+#ifdef DEAL_II_USE_TRILINOS
+template void
+DoFTools::make_sparsity_pattern<hp::DoFHandler<deal_II_dimension>,
+				TrilinosWrappers::BlockSparsityPattern>
+(const hp::DoFHandler<deal_II_dimension> &dof,
+ TrilinosWrappers::BlockSparsityPattern  &sparsity,
+ const ConstraintMatrix &,
+ const bool);
+#endif
+
 
 
 template void 
@@ -5519,6 +5588,17 @@ DoFTools::make_sparsity_pattern<DoFHandler<deal_II_dimension>,
  CompressedSimpleSparsityPattern&,
  const ConstraintMatrix &,
  const bool);
+#ifdef DEAL_II_USE_TRILINOS
+template void 
+DoFTools::make_sparsity_pattern<DoFHandler<deal_II_dimension>,
+				TrilinosWrappers::SparsityPattern>
+(const DoFHandler<deal_II_dimension>&,
+ const Table<2,Coupling>&,
+ TrilinosWrappers::SparsityPattern&,
+ const ConstraintMatrix &,
+ const bool);
+#endif
+
 template void
 DoFTools::make_sparsity_pattern<DoFHandler<deal_II_dimension>,
 				BlockSparsityPattern>
@@ -5551,6 +5631,16 @@ DoFTools::make_sparsity_pattern<DoFHandler<deal_II_dimension>,
  BlockCompressedSimpleSparsityPattern&,
  const ConstraintMatrix &,
  const bool);
+#ifdef DEAL_II_USE_TRILINOS
+template void
+DoFTools::make_sparsity_pattern<DoFHandler<deal_II_dimension>,
+				TrilinosWrappers::BlockSparsityPattern>
+(const DoFHandler<deal_II_dimension>&,
+ const Table<2,Coupling>&,
+ TrilinosWrappers::BlockSparsityPattern&,
+ const ConstraintMatrix &,
+ const bool);
+#endif
 
 template void 
 DoFTools::make_sparsity_pattern<hp::DoFHandler<deal_II_dimension>,
@@ -5584,6 +5674,17 @@ DoFTools::make_sparsity_pattern<hp::DoFHandler<deal_II_dimension>,
  CompressedSimpleSparsityPattern&,
  const ConstraintMatrix &,
  const bool);
+#ifdef DEAL_II_USE_TRILINOS
+template void 
+DoFTools::make_sparsity_pattern<hp::DoFHandler<deal_II_dimension>,
+				TrilinosWrappers::SparsityPattern>
+(const hp::DoFHandler<deal_II_dimension>&,
+ const Table<2,Coupling>&,
+ TrilinosWrappers::SparsityPattern&,
+ const ConstraintMatrix &,
+ const bool);
+#endif
+
 template void
 DoFTools::make_sparsity_pattern<hp::DoFHandler<deal_II_dimension>,
 				BlockSparsityPattern>
@@ -5616,6 +5717,17 @@ DoFTools::make_sparsity_pattern<hp::DoFHandler<deal_II_dimension>,
  BlockCompressedSimpleSparsityPattern&,
  const ConstraintMatrix &,
  const bool);
+#ifdef DEAL_II_USE_TRILINOS
+template void
+DoFTools::make_sparsity_pattern<hp::DoFHandler<deal_II_dimension>,
+				TrilinosWrappers::BlockSparsityPattern>
+(const hp::DoFHandler<deal_II_dimension>&,
+ const Table<2,Coupling>&,
+ TrilinosWrappers::BlockSparsityPattern&,
+ const ConstraintMatrix &,
+ const bool);
+#endif
+
 
 
 template void

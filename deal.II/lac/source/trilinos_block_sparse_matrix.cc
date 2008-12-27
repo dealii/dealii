@@ -164,6 +164,31 @@ namespace TrilinosWrappers
 
 
 
+  template <>  
+  void
+  BlockSparseMatrix::
+  reinit (const BlockSparsityPattern    &block_sparsity_pattern)
+  {
+  
+				     // Call the other basic reinit function, ...
+    reinit (block_sparsity_pattern.n_block_rows(),
+	    block_sparsity_pattern.n_block_cols());
+
+				     // ... set the correct sizes, ...
+    this->row_block_indices    = block_sparsity_pattern.get_row_indices();
+    this->column_block_indices = block_sparsity_pattern.get_column_indices();
+	
+				     // ... and then assign the correct
+				     // data to the blocks.
+    for (unsigned int r=0; r<this->n_block_rows(); ++r)
+      for (unsigned int c=0; c<this->n_block_cols(); ++c)
+        {
+	  this->sub_objects[r][c]->reinit (block_sparsity_pattern.block(r,c));
+        }
+  }
+
+
+
   void
   BlockSparseMatrix::
   reinit (const std::vector<Epetra_Map>             &input_maps,
@@ -369,7 +394,7 @@ namespace TrilinosWrappers
   // -------------------- explicit instantiations -----------------------
   //
   template void
-  BlockSparseMatrix::reinit (const BlockSparsityPattern &);
+  BlockSparseMatrix::reinit (const dealii::BlockSparsityPattern &);
   template void
   BlockSparseMatrix::reinit (const BlockCompressedSparsityPattern &);
   template void
@@ -380,7 +405,7 @@ namespace TrilinosWrappers
 
   template void
   BlockSparseMatrix::reinit (const std::vector<Epetra_Map> &,
-			     const BlockSparsityPattern    &);
+			     const dealii::BlockSparsityPattern    &);
   template void
   BlockSparseMatrix::reinit (const std::vector<Epetra_Map> &,
 			     const BlockCompressedSparsityPattern &);

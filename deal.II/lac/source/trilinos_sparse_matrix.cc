@@ -13,6 +13,7 @@
 
 #include <lac/trilinos_sparse_matrix.h>
 
+#include <lac/trilinos_sparsity_pattern.h>
 #include <lac/sparsity_pattern.h>
 #include <lac/compressed_sparsity_pattern.h>
 #include <lac/compressed_set_sparsity_pattern.h>
@@ -97,6 +98,8 @@ namespace TrilinosWrappers
     matrix->FillComplete();
   }
 
+
+
   SparseMatrix::SparseMatrix (const Epetra_Map  &InputMap,
 			      const unsigned int n_max_entries_per_row)
 		  :
@@ -108,6 +111,8 @@ namespace TrilinosWrappers
 				(new Epetra_FECrsMatrix(Copy, row_map, 
 					int(n_max_entries_per_row), false)))
   {}
+
+
 
   SparseMatrix::SparseMatrix (const Epetra_Map                &InputMap,
 			      const std::vector<unsigned int> &n_entries_per_row)
@@ -122,6 +127,8 @@ namespace TrilinosWrappers
 					    false)))
   {}
 
+
+
   SparseMatrix::SparseMatrix (const Epetra_Map  &InputRowMap,
 			      const Epetra_Map  &InputColMap,
 			      const unsigned int n_max_entries_per_row)
@@ -134,6 +141,8 @@ namespace TrilinosWrappers
 				(new Epetra_FECrsMatrix(Copy, row_map, 
 					int(n_max_entries_per_row), false)))
   {}
+
+
 
   SparseMatrix::SparseMatrix (const Epetra_Map                &InputRowMap,
 			      const Epetra_Map                &InputColMap,
@@ -148,6 +157,8 @@ namespace TrilinosWrappers
 		      (int*)const_cast<unsigned int*>(&(n_entries_per_row[0])),
 					    false)))
   {}
+
+
 
   SparseMatrix::SparseMatrix (const unsigned int m,
 			      const unsigned int n,
@@ -167,6 +178,8 @@ namespace TrilinosWrappers
 					int(n_max_entries_per_row), false)))
   {}
 
+
+
   SparseMatrix::SparseMatrix (const unsigned int               m,
 			      const unsigned int               n,
 			      const std::vector<unsigned int> &n_entries_per_row)
@@ -185,6 +198,25 @@ namespace TrilinosWrappers
 			(int*)const_cast<unsigned int*>(&(n_entries_per_row[0])), 
 					     false)))
   {}
+
+
+
+  SparseMatrix::SparseMatrix (const SparsityPattern &InputSP)
+		  :
+                  Subscriptor(),
+                  row_map (InputSP.row_map),
+		  col_map (InputSP.col_map),
+		  last_action (Zero),
+		  compressed (true),
+		  matrix (std::auto_ptr<Epetra_FECrsMatrix>
+			  (new Epetra_FECrsMatrix(Copy, *InputSP.graph, false)))
+  {
+    Assert(InputSP.graph->Filled() == true,
+	   ExcMessage("The Trilinos sparsity pattern has not been compressed."));
+    compress();
+  }
+
+
 
   SparseMatrix::SparseMatrix (const SparseMatrix &InputMatrix)
 		  :
@@ -475,6 +507,25 @@ namespace TrilinosWrappers
 
 
   void
+  SparseMatrix::reinit (const SparsityPattern &sparsity_pattern)
+  {
+    matrix.reset();
+
+    row_map = sparsity_pattern.row_map;
+    col_map = sparsity_pattern.col_map;
+
+    Assert (sparsity_pattern.graph->Filled() == true,
+	    ExcMessage("The Trilinos sparsity pattern has not been compressed"));
+
+    matrix = std::auto_ptr<Epetra_FECrsMatrix>
+      (new Epetra_FECrsMatrix(Copy, *sparsity_pattern.graph, false));
+
+    compress();
+  }
+
+
+
+  void
   SparseMatrix::reinit (const SparseMatrix &sparse_matrix)
   {
     matrix.reset();
@@ -748,20 +799,20 @@ namespace TrilinosWrappers
 
 				      // If the data is not on the
 				      // present processor, we throw
-				      // an exception. This is on of
+				      // an exception. This is one of
 				      // the two tiny differences to
 				      // the el(i,j) call, which does
 				      // not throw any assertions.
-    if ((trilinos_i == -1 ) || (trilinos_j == -1))
+    if (trilinos_i == -1)
       {
 	Assert (false, ExcAccessToNonLocalElement(i, j, local_range().first,
 						  local_range().second));
       }
     else
       {
-				      // Check whether the matrix 
-				      // already is transformed to
-				      // local indices.
+				      // Check whether the matrix has
+				      // already been transformed to local
+				      // indices.
 	if (matrix->Filled() == false)
 	  matrix->GlobalAssemble(col_map, row_map, true);
 
@@ -914,7 +965,7 @@ namespace TrilinosWrappers
   unsigned int
   SparseMatrix::n () const
   {
-    int n_cols = matrix -> NumGlobalCols();
+    unsigned int n_cols = matrix -> NumGlobalCols();
     return n_cols;
   }
 
@@ -923,7 +974,7 @@ namespace TrilinosWrappers
   unsigned int
   SparseMatrix::local_size () const
   {
-    int n_rows = matrix -> NumMyRows();
+    unsigned int n_rows = matrix -> NumMyRows();
 
     return n_rows;
   }
@@ -933,7 +984,7 @@ namespace TrilinosWrappers
   std::pair<unsigned int, unsigned int>
   SparseMatrix::local_range () const
   {
-    int begin, end;
+    unsigned int begin, end;
     begin = matrix -> RowMap().MinMyGID();
     end = matrix -> RowMap().MaxMyGID()+1;
     
@@ -945,9 +996,9 @@ namespace TrilinosWrappers
   unsigned int
   SparseMatrix::n_nonzero_elements () const
   {
-    int nnz = matrix->NumGlobalNonzeros();
+    unsigned int nnz = matrix->NumGlobalNonzeros();
 
-    return static_cast<unsigned int>(nnz);
+    return nnz;
   }
 
 
@@ -960,7 +1011,7 @@ namespace TrilinosWrappers
 				  // get a representation of the
 				  // present row
     int ncols = -1;
-    int local_row = matrix->RowMap().LID(row);
+    int local_row = matrix->LRID(row);
 
 				  // on the processor who owns this
 				  // row, we'll have a non-negative
@@ -973,6 +1024,7 @@ namespace TrilinosWrappers
 
     return ncols;
   }
+
 
 
   TrilinosScalar
@@ -1374,7 +1426,7 @@ namespace TrilinosWrappers
   // explicit instantiations
   //
   template void
-  SparseMatrix::reinit (const SparsityPattern &);
+  SparseMatrix::reinit (const dealii::SparsityPattern &);
   template void
   SparseMatrix::reinit (const CompressedSparsityPattern &);
   template void
@@ -1385,7 +1437,7 @@ namespace TrilinosWrappers
 
   template void
   SparseMatrix::reinit (const Epetra_Map &,
-			const SparsityPattern &);
+			const dealii::SparsityPattern &);
   template void
   SparseMatrix::reinit (const Epetra_Map &,
 			const CompressedSparsityPattern &);
@@ -1400,7 +1452,7 @@ namespace TrilinosWrappers
   template void
   SparseMatrix::reinit (const Epetra_Map &,
 			const Epetra_Map &,
-			const SparsityPattern &);
+			const dealii::SparsityPattern &);
   template void
   SparseMatrix::reinit (const Epetra_Map &,
 			const Epetra_Map &,
