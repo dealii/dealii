@@ -1389,7 +1389,7 @@ TriaAccessor<structdim, dim, spacedim>::refinement_case() const
   switch (structdim)
     {
       case 1:
-	    return (static_cast<RefinementCase<structdim> >
+	    return (RefinementCase<structdim>
 		    (this->objects().children[this->present_index] != -1
 		     ?
 						      // cast the branches
