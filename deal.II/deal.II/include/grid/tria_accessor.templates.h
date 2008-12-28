@@ -1350,8 +1350,8 @@ isotropic_child_index (const unsigned int i) const
 	    return child_index (i);
       case 2:
       {
-	const RefinementCase<2> this_refinement_case =
-	  static_cast<RefinementCase<2> >(refinement_case());
+	const RefinementCase<2>
+	  this_refinement_case (static_cast<unsigned char>(refinement_case()));
 
 	Assert (this_refinement_case != RefinementCase<2>::no_refinement,
 		TriaAccessorExceptions::ExcCellHasNoChildren());
@@ -1456,8 +1456,8 @@ isotropic_child (const unsigned int i) const
 
       case 2:
       {
-	const RefinementCase<2> this_refinement_case =
-	  static_cast<RefinementCase<2> >(refinement_case());
+	const RefinementCase<2>
+	  this_refinement_case (static_cast<unsigned char>(refinement_case()));
 
 	Assert (this_refinement_case != RefinementCase<2>::no_refinement,
 		TriaAccessorExceptions::ExcCellHasNoChildren());
