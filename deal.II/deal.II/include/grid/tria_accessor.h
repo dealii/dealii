@@ -1565,6 +1565,28 @@ class TriaAccessor<0, dim, spacedim> : public TriaAccessorBase<0,dim, spacedim>
       }
 
 				     /**
+				      * Constructor. Should never be
+				      * called and thus produces an
+				      * error.
+				      */
+    template <int structdim2, int dim2, int spacedim2>
+    TriaAccessor (const TriaAccessor<structdim2,dim2,spacedim2> &)
+      {
+	Assert (false, ExcInternalError());
+      }
+
+				     /**
+				      * Constructor. Should never be
+				      * called and thus produces an
+				      * error.
+				      */
+    template <int structdim2, int dim2, int spacedim2>
+    TriaAccessor (const InvalidAccessor<structdim2,dim2,spacedim2> &)
+      {
+	Assert (false, ExcInternalError());
+      }
+    
+				     /**
     				      * Boundary indicator of this
 				      * object.
 				      */

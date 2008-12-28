@@ -1922,98 +1922,54 @@ CellAccessor (const CellAccessor &cell_accessor)
 
 
 
-template <>
+template <int dim, int spacedim>
 inline
-TriaIterator<TriaAccessor<0, 1, 1> >
-CellAccessor<1,1>::face (const unsigned int) const 
+TriaIterator<TriaAccessor<dim-1, dim, spacedim> >
+CellAccessor<dim,spacedim>::face (const unsigned int i) const 
 {
-  Assert (false, ExcImpossibleInDim(1));
-  return TriaIterator<TriaAccessor<0, 1, 1> >();
+  switch (dim)
+    {
+      case 1:
+      {
+	Assert (false, ExcImpossibleInDim(1));
+	return TriaIterator<InvalidAccessor<dim-1,dim,spacedim> >();
+      }
+
+      case 2:
+	    return this->line(i);
+
+      case 3:
+	    return this->quad(i);
+
+      default:
+	    return TriaIterator<TriaAccessor<dim-1,dim,dim> >();
+    }
 }
 
 
 
-template <>
-inline
-TriaIterator<TriaAccessor<0, 1, 2> >
-CellAccessor<1,2>::face (const unsigned int) const 
-{
-  Assert (false, ExcImpossibleInDim(1));
-  return TriaIterator<TriaAccessor<0, 1, 2> >();
-}
-
-
-template <>
-inline
-Triangulation<2,2>::face_iterator
-CellAccessor<2,2>::face (const unsigned int i) const 
-{
-  return this->line(i);
-}
-
-template <>
-inline
-Triangulation<2,3>::face_iterator
-CellAccessor<2,3>::face (const unsigned int i) const 
-{
-  return this->line(i);
-}
-
-
-
-template <>
-inline
-Triangulation<3>::face_iterator
-CellAccessor<3,3>::face (const unsigned int i) const 
-{
-  return this->quad(i);
-}
-
-
-
-template <>
+template <int dim, int spacedim>
 inline
 unsigned int
-CellAccessor<1,1>::face_index (const unsigned int) const 
+CellAccessor<dim,spacedim>::face_index (const unsigned int i) const 
 {
-  Assert (false, ExcImpossibleInDim(1));
-  return numbers::invalid_unsigned_int;
-}
+  switch (dim)
+    {
+      case 1:
+      {
+	Assert (false, ExcImpossibleInDim(1));
+	return numbers::invalid_unsigned_int;
+      }
 
-template <>
-inline
-unsigned int
-CellAccessor<1,2>::face_index (const unsigned int) const 
-{
-  Assert (false, ExcImpossibleInDim(1));
-  return numbers::invalid_unsigned_int;
-}
-
-template <>
-inline
-unsigned int
-CellAccessor<2,2>::face_index (const unsigned int i) const 
-{
-  return this->line_index(i);
-}
-
-
-template <>
-inline
-unsigned int
-CellAccessor<2,3>::face_index (const unsigned int i) const 
-{
-  return this->line_index(i);
-}
-
-
-
-template <>
-inline
-unsigned int
-CellAccessor<3,3>::face_index (const unsigned int i) const 
-{
-  return this->quad_index(i);
+      case 2:
+	    return this->line_index(i);
+	    
+      case 3:
+	    return this->quad_index(i);
+	    
+      default:
+	    return numbers::invalid_unsigned_int;
+    }
 }
 
 
