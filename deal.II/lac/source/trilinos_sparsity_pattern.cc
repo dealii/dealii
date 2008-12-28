@@ -90,7 +90,10 @@ namespace TrilinosWrappers
 		  col_map (row_map),
 		  compressed (true),
 		  graph (std::auto_ptr<Epetra_FECrsGraph>
-				  (new Epetra_FECrsGraph(View, row_map, 0)))
+			 (new Epetra_FECrsGraph(View, row_map, 0))),
+		  cached_row_indices (1),
+		  n_cached_elements (0),
+		  row_in_cache (0)
   {
     graph->FillComplete();
   }
@@ -103,7 +106,10 @@ namespace TrilinosWrappers
 		  compressed (false),
 		  graph (std::auto_ptr<Epetra_FECrsGraph>
 				  (new Epetra_FECrsGraph(Copy, row_map, 
-					int(n_entries_per_row), false)))
+					int(n_entries_per_row), false))),
+		  cached_row_indices (1),
+		  n_cached_elements (0),
+		  row_in_cache (0)
   {}
 
   SparsityPattern::SparsityPattern (const Epetra_Map                &InputMap,
@@ -115,7 +121,10 @@ namespace TrilinosWrappers
 		  graph (std::auto_ptr<Epetra_FECrsGraph>
 		    (new Epetra_FECrsGraph(Copy, row_map, 
 		      (int*)const_cast<unsigned int*>(&(n_entries_per_row[0])),
-					    false)))
+					    false))),
+		  cached_row_indices (1),
+		  n_cached_elements (0),
+		  row_in_cache (0)
   {}
 
   SparsityPattern::SparsityPattern (const Epetra_Map  &InputRowMap,
@@ -127,7 +136,10 @@ namespace TrilinosWrappers
 		  compressed (false),
 		  graph (std::auto_ptr<Epetra_FECrsGraph>
 			          (new Epetra_FECrsGraph(Copy, row_map, 
-					int(n_entries_per_row), false)))
+					int(n_entries_per_row), false))),
+		  cached_row_indices (1),
+		  n_cached_elements (0),
+		  row_in_cache (0)
   {}
 
   SparsityPattern::SparsityPattern (const Epetra_Map                &InputRowMap,
@@ -140,7 +152,10 @@ namespace TrilinosWrappers
 		  graph (std::auto_ptr<Epetra_FECrsGraph>
 		    (new Epetra_FECrsGraph(Copy, row_map, 
 		      (int*)const_cast<unsigned int*>(&(n_entries_per_row[0])),
-					    false)))
+					    false))),
+		  cached_row_indices (1),
+		  n_cached_elements (0),
+		  row_in_cache (0)
   {}
 
   SparsityPattern::SparsityPattern (const unsigned int m,
@@ -157,7 +172,10 @@ namespace TrilinosWrappers
 		  compressed (false),
 		  graph (std::auto_ptr<Epetra_FECrsGraph>
 				(new Epetra_FECrsGraph(Copy, row_map, 
-					int(n_entries_per_row), false)))
+					int(n_entries_per_row), false))),
+		  cached_row_indices (1),
+		  n_cached_elements (0),
+		  row_in_cache (0)
   {}
 
   SparsityPattern::SparsityPattern (const unsigned int               m,
@@ -175,7 +193,10 @@ namespace TrilinosWrappers
 		  graph (std::auto_ptr<Epetra_FECrsGraph>
 		     (new Epetra_FECrsGraph(Copy, row_map, 
 			(int*)const_cast<unsigned int*>(&(n_entries_per_row[0])), 
-					     false)))
+					     false))),
+		  cached_row_indices (1),
+		  n_cached_elements (0),
+		  row_in_cache (0)
   {}
 
 				   // Copy function is currently not working
@@ -190,7 +211,10 @@ namespace TrilinosWrappers
  		  col_map (InputSP.col_map),
   		  compressed (false),
   		  graph (std::auto_ptr<Epetra_FECrsGraph>
-  			  (new Epetra_FECrsGraph(*InputSP.graph)))
+  			  (new Epetra_FECrsGraph(*InputSP.graph))),
+		  cached_row_indices (1),
+		  n_cached_elements (0),
+		  row_in_cache (0)
   {}
   */
 
@@ -239,6 +263,9 @@ namespace TrilinosWrappers
 
     graph = std::auto_ptr<Epetra_FECrsGraph>
       (new Epetra_FECrsGraph(Copy, row_map, n_entries_per_row, false));
+
+    n_cached_elements = 0;
+    row_in_cache = 0;
   }
 
 
@@ -289,6 +316,9 @@ namespace TrilinosWrappers
       (new Epetra_FECrsGraph(Copy, row_map, 
 			     n_entries_per_row[input_row_map.MinMyGID()], 
 			     false));
+
+    n_cached_elements = 0;
+    row_in_cache = 0;
   }
 
 
@@ -473,6 +503,9 @@ namespace TrilinosWrappers
 
     graph->FillComplete();
 
+    n_cached_elements = 0;
+    row_in_cache = 0;
+
     compressed = true;
   }
 
@@ -482,6 +515,13 @@ namespace TrilinosWrappers
   SparsityPattern::compress ()
   {
 				  // flush buffers
+    if (n_cached_elements > 0)
+      {
+	add (row_in_cache, n_cached_elements, &cached_row_indices[0]);
+	n_cached_elements = 0;
+	row_in_cache = 0;
+      }
+
     int ierr;
     ierr = graph->GlobalAssemble (col_map, row_map, true);
     
@@ -630,7 +670,7 @@ namespace TrilinosWrappers
   unsigned int
   SparsityPattern::max_entries_per_row () const
   {
-    int nnz = graph->MaxRowDim();
+    int nnz = graph->MaxNumIndices();
 
     return static_cast<unsigned int>(nnz);
   }

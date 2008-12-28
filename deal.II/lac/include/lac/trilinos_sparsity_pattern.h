@@ -957,6 +957,28 @@ namespace TrilinosWrappers
                                         */
       std::auto_ptr<Epetra_FECrsGraph> graph;
 
+                                       /**
+					* Scratch array that holds several
+					* indices that should be written
+					* into the same row of the sparsity
+					* pattern. This is to increase the
+					* speed of this function.
+					*/
+      std::vector<unsigned int> cached_row_indices;
+
+				       /**
+					* A number that tells how many
+					* indices currently are active in
+					* the cache.
+					*/
+      unsigned int n_cached_elements;
+
+				       /**
+					* The row that is currently in the
+					* cache.
+					*/
+      unsigned int row_in_cache;
+
       friend class SparseMatrix;
       friend class SparsityPatternIterators::const_iterator;
   };
@@ -1205,10 +1227,32 @@ namespace TrilinosWrappers
 
   inline
   void
-  SparsityPattern::add (const unsigned int   i,
-			const unsigned int   j)
+  SparsityPattern::add (const unsigned int i,
+			const unsigned int j)
   {
-    add (i, 1, &j);
+				   // if we want to write an element to the
+				   // row the cache is currently pointed to,
+				   // we just append the data to the cache
+    if (i == row_in_cache)
+      {
+				   // if the size is too small, extend the
+				   // cache by 10 elements
+	if (n_cached_elements > cached_row_indices.size())
+	  cached_row_indices.resize(cached_row_indices.size() + 10);
+
+	cached_row_indices[n_cached_elements] = j;
+	++n_cached_elements;
+	return;
+      }
+
+				   // if we are to write another row data,
+				   // we write the cache data into the
+				   // sparsity pattern, and then call this
+				   // function again
+    add (row_in_cache, n_cached_elements, &cached_row_indices[0]);
+    row_in_cache = i;
+    n_cached_elements = 0;
+    add (i,j);
   }
 
 
@@ -1219,6 +1263,9 @@ namespace TrilinosWrappers
 			const unsigned int    n_cols,
 			const unsigned int   *col_indices)
   {
+    if (n_cols == 0)
+      return;
+
     int * col_index_ptr = (int*)col_indices;
     compressed = false;
 
