@@ -213,6 +213,8 @@ void test ()
 	      ==
 	      cell->face(face_no)->at_boundary(),
 	      ExcInternalError());
+
+  deallog << "OK" << std::endl;
 }
 
 
