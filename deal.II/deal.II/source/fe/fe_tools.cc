@@ -1550,6 +1550,242 @@ FETools::add_fe_name(const std::string& parameter_name,
 }
 
 
+namespace internal
+{
+  namespace
+  {
+    template <int dim, int spacedim>
+    FiniteElement<dim,spacedim>*
+    get_fe_from_name (std::string &name)
+    {
+				       // Extract the name of the
+				       // finite element class, which only
+				       // contains characters, numbers and
+				       // underscores.
+      unsigned int name_end =
+	name.find_first_not_of(std::string("abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789_"));
+      const std::string name_part(name, 0, name_end);
+      name.erase(0, name_part.size());
+  
+				       // now things get a little more
+				       // complicated: FESystem. it's
+				       // more complicated, since we
+				       // have to figure out what the
+				       // base elements are. this can
+				       // only be done recursively
+      if (name_part == "FESystem")
+	{
+					   // next we have to get at the
+					   // base elements. start with
+					   // the first. wrap the whole
+					   // block into try-catch to
+					   // make sure we destroy the
+					   // pointers we got from
+					   // recursive calls if one of
+					   // these calls should throw
+					   // an exception
+	  std::vector<FiniteElement<dim,spacedim>*> base_fes;
+	  std::vector<unsigned int>        base_multiplicities;
+	  try
+	    {
+					       // Now, just the [...]
+					       // part should be left.
+	      if (name.size() == 0 || name[0] != '[')
+		throw (std::string("Invalid first character in ") + name);
+	      do
+		{
+						   // Erase the
+						   // leading '[' or '-'
+		  name.erase(0,1);
+						   // Now, the name of the
+						   // first base element is
+						   // first... Let's get it
+		  base_fes.push_back (get_fe_from_name<dim,spacedim> (name));
+						   // next check whether
+						   // FESystem placed a
+						   // multiplicity after
+						   // the element name
+		  if (name[0] == '^')
+		    {
+						       // yes. Delete the '^'
+						       // and read this
+						       // multiplicity
+		      name.erase(0,1);
+		  
+		      const std::pair<int,unsigned int> tmp
+			= Utilities::get_integer_at_position (name, 0);
+		      name.erase(0, tmp.second);
+						       // add to length,
+						       // including the '^'
+		      base_multiplicities.push_back (tmp.first);
+		    }
+		  else
+						     // no, so
+						     // multiplicity is
+						     // 1
+		    base_multiplicities.push_back (1);
+	      
+						   // so that's it for
+						   // this base
+						   // element. base
+						   // elements are
+						   // separated by '-',
+						   // and the list is
+						   // terminated by ']',
+						   // so loop while the
+						   // next character is
+						   // '-'
+		}
+	      while (name[0] == '-');
+	  
+					       // so we got to the end
+					       // of the '-' separated
+					       // list. make sure that
+					       // we actually had a ']'
+					       // there
+	      if (name.size() == 0 || name[0] != ']')
+		throw (std::string("Invalid first character in ") + name);
+	      name.erase(0,1);
+					       // just one more sanity check
+	      Assert ((base_fes.size() == base_multiplicities.size())
+		      &&
+		      (base_fes.size() > 0),
+		      ExcInternalError());
+	    
+					       // ok, apparently
+					       // everything went ok. so
+					       // generate the composed
+					       // element
+	      FiniteElement<dim,spacedim> *system_element = 0;
+	      switch (base_fes.size())
+		{
+		  case 1:
+		  {
+		    system_element = new FESystem<dim>(*base_fes[0],
+						       base_multiplicities[0]);
+		    break;
+		  }
+
+		  case 2:
+		  {
+		    system_element = new FESystem<dim>(*base_fes[0],
+						       base_multiplicities[0],
+						       *base_fes[1],
+						       base_multiplicities[1]);
+		    break;
+		  }
+		
+		  case 3:
+		  {
+		    system_element = new FESystem<dim>(*base_fes[0],
+						       base_multiplicities[0],
+						       *base_fes[1],
+						       base_multiplicities[1],
+						       *base_fes[2],
+						       base_multiplicities[2]);
+		    break;
+		  }
+
+		  default:
+			AssertThrow (false, ExcNotImplemented());
+		}
+
+					       // now we don't need the
+					       // list of base elements
+					       // any more
+	      for (unsigned int i=0; i<base_fes.size(); ++i)
+		delete base_fes[i];
+	    
+					       // finally return our
+					       // findings
+					       // Add the closing ']' to
+					       // the length
+	      return system_element;
+	    
+	    }
+	  catch (...)
+	    {
+					       // ups, some exception
+					       // was thrown. prevent a
+					       // memory leak, and then
+					       // pass on the exception
+					       // to the caller
+	      for (unsigned int i=0; i<base_fes.size(); ++i)
+		delete base_fes[i];
+	      throw;
+	    }
+
+					   // this is a place where we
+					   // should really never get,
+					   // since above we have either
+					   // returned from the
+					   // try-clause, or have
+					   // re-thrown in the catch
+					   // clause. check that we
+					   // never get here
+	  Assert (false, ExcInternalError());
+	}
+      else
+	{
+					   // Make sure no other thread
+					   // is just adding an element
+	  Threads::ThreadMutex::ScopedLock lock (fe_name_map_lock);
+	
+	  AssertThrow (fe_name_map.find(name_part) != fe_name_map.end(),
+		       FETools::ExcInvalidFEName(name));
+					   // Now, just the (degree)
+					   // or (Quadrature<1>(degree+1))
+					   // part should be left.
+	  if (name.size() == 0 || name[0] != '(')
+	    throw (std::string("Invalid first character in ") + name);
+	  name.erase(0,1);
+	  if (name[0] != 'Q')
+	    {
+	      const std::pair<int,unsigned int> tmp
+		= Utilities::get_integer_at_position (name, 0);
+	      name.erase(0, tmp.second+1);
+	      return fe_name_map.find(name_part)->second->get(tmp.first);
+	    }
+	  else
+	    {
+	      unsigned int position = name.find('(');
+	      const std::string quadrature_name(name, 0, position-1);
+	      name.erase(0,position);
+	      if (quadrature_name.compare("QGaussLobatto") == 0)		
+		{
+		  const std::pair<int,unsigned int> tmp
+		    = Utilities::get_integer_at_position (name, 0);
+		  name.erase(0, tmp.second+1);
+//TODO: Implement a get function taking Quadrature<1> in fe_tools.h.
+//return fe_name_map.find(name_part)->second->get(QGaussLobatto<1>(tmp.first));
+		  AssertThrow (false, ExcNotImplemented());
+		}
+	      else 
+		{
+		  AssertThrow (false,ExcNotImplemented());
+		}
+	    }
+	}
+  
+    
+				       // hm, if we have come thus far, we
+				       // didn't know what to do with the
+				       // string we got. so do as the docs
+				       // say: raise an exception
+      AssertThrow (false, FETools::ExcInvalidFEName(name));
+
+				       // make some compilers happy that
+				       // do not realize that we can't get
+				       // here after throwing
+      return 0;
+    }
+  }
+}
+
+
+
+    
+
 template <int dim>
 FiniteElement<dim, dim> *
 FETools::get_fe_from_name (const std::string &parameter_name)
@@ -1601,7 +1837,7 @@ FETools::get_fe_from_name (const std::string &parameter_name)
   
   try
     {    
-      FiniteElement<dim,dim> *fe = get_fe_from_name_aux<dim,dim> (name);
+      FiniteElement<dim,dim> *fe = internal::get_fe_from_name<dim,dim> (name);
 
                                        // Make sure the auxiliary function
                                        // ate up all characters of the name.
@@ -1625,236 +1861,8 @@ FETools::get_fe_from_name (const std::string &parameter_name)
 // FiniteElement<dim> *
 // FETools::get_fe_from_name (const std::string &parameter_name)
 // {
-//     return get_fe_from_name<dim,dim>(parameter_name);
+//     return internal::get_fe_from_name<dim,dim>(parameter_name);
 // }
-
-
-template <int dim, int spacedim>
-FiniteElement<dim,spacedim>*
-FETools::get_fe_from_name_aux (std::string &name)
-{
-				   // Extract the name of the
-				   // finite element class, which only
-				   // contains characters, numbers and
-				   // underscores.
-  unsigned int name_end =
-    name.find_first_not_of(std::string("abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789_"));
-  const std::string name_part(name, 0, name_end);
-  name.erase(0, name_part.size());
-  
-				   // now things get a little more
-				   // complicated: FESystem. it's
-				   // more complicated, since we
-				   // have to figure out what the
-				   // base elements are. this can
-				   // only be done recursively
-  if (name_part == "FESystem")
-    {
-				       // next we have to get at the
-				       // base elements. start with
-				       // the first. wrap the whole
-				       // block into try-catch to
-				       // make sure we destroy the
-				       // pointers we got from
-				       // recursive calls if one of
-				       // these calls should throw
-				       // an exception
-      std::vector<FiniteElement<dim,spacedim>*> base_fes;
-      std::vector<unsigned int>        base_multiplicities;
-      try
-	{
-					   // Now, just the [...]
-					   // part should be left.
-	  if (name.size() == 0 || name[0] != '[')
-	    throw (std::string("Invalid first character in ") + name);
-	  do
-	    {
-					       // Erase the
-					       // leading '[' or '-'
-	      name.erase(0,1);
-					       // Now, the name of the
-					       // first base element is
-					       // first... Let's get it
-	      base_fes.push_back (get_fe_from_name_aux<dim,spacedim> (name));
-					       // next check whether
-					       // FESystem placed a
-					       // multiplicity after
-					       // the element name
-	      if (name[0] == '^')
-		{
-						   // yes. Delete the '^'
-						   // and read this
-						   // multiplicity
-		  name.erase(0,1);
-		  
-		  const std::pair<int,unsigned int> tmp
-		    = Utilities::get_integer_at_position (name, 0);
-		  name.erase(0, tmp.second);
-						   // add to length,
-						   // including the '^'
-		  base_multiplicities.push_back (tmp.first);
-		}
-	      else
-						 // no, so
-						 // multiplicity is
-						 // 1
-		base_multiplicities.push_back (1);
-	      
-					       // so that's it for
-					       // this base
-					       // element. base
-					       // elements are
-					       // separated by '-',
-					       // and the list is
-					       // terminated by ']',
-					       // so loop while the
-					       // next character is
-					       // '-'
-	    }
-	  while (name[0] == '-');
-	  
-					   // so we got to the end
-					   // of the '-' separated
-					   // list. make sure that
-					   // we actually had a ']'
-					   // there
-	  if (name.size() == 0 || name[0] != ']')
-	    throw (std::string("Invalid first character in ") + name);
-	  name.erase(0,1);
-					   // just one more sanity check
-	  Assert ((base_fes.size() == base_multiplicities.size())
-		    &&
-		    (base_fes.size() > 0),
-		    ExcInternalError());
-	    
-					     // ok, apparently
-					     // everything went ok. so
-					     // generate the composed
-					     // element
-	    FiniteElement<dim,spacedim> *system_element = 0;
-	    switch (base_fes.size())
-	      {
-		case 1:
-		{
-		  system_element = new FESystem<dim>(*base_fes[0],
-						     base_multiplicities[0]);
-		  break;
-		}
-
-		case 2:
-		{
-		  system_element = new FESystem<dim>(*base_fes[0],
-						     base_multiplicities[0],
-						     *base_fes[1],
-						     base_multiplicities[1]);
-		  break;
-		}
-		
-		case 3:
-		{
-		  system_element = new FESystem<dim>(*base_fes[0],
-						     base_multiplicities[0],
-						     *base_fes[1],
-						     base_multiplicities[1],
-						     *base_fes[2],
-						     base_multiplicities[2]);
-		  break;
-		}
-
-		default:
-		      AssertThrow (false, ExcNotImplemented());
-	      }
-
-					     // now we don't need the
-					     // list of base elements
-					     // any more
-	    for (unsigned int i=0; i<base_fes.size(); ++i)
-	      delete base_fes[i];
-	    
-					     // finally return our
-					     // findings
-					     // Add the closing ']' to
-					     // the length
-	    return system_element;
-	    
-	  }
-	catch (...)
-	  {
-					     // ups, some exception
-					     // was thrown. prevent a
-					     // memory leak, and then
-					     // pass on the exception
-					     // to the caller
-	    for (unsigned int i=0; i<base_fes.size(); ++i)
-	      delete base_fes[i];
-	    throw;
-	  }
-
-					 // this is a place where we
-					 // should really never get,
-					 // since above we have either
-					 // returned from the
-					 // try-clause, or have
-					 // re-thrown in the catch
-					 // clause. check that we
-					 // never get here
-	Assert (false, ExcInternalError());
-      }
-    else
-      {
-					 // Make sure no other thread
-					 // is just adding an element
-	Threads::ThreadMutex::ScopedLock lock (fe_name_map_lock);
-	
-	AssertThrow (fe_name_map.find(name_part) != fe_name_map.end(),
-                     ExcInvalidFEName(name));
-					 // Now, just the (degree)
-					 // or (Quadrature<1>(degree+1))
-					 // part should be left.
-	if (name.size() == 0 || name[0] != '(')
-	  throw (std::string("Invalid first character in ") + name);
-	name.erase(0,1);
-	if (name[0] != 'Q')
-	  {
-	    const std::pair<int,unsigned int> tmp
-	      = Utilities::get_integer_at_position (name, 0);
-	    name.erase(0, tmp.second+1);
-	    return fe_name_map.find(name_part)->second->get(tmp.first);
-	  }
-	 else
-	   {
-	     unsigned int position = name.find('(');
-	     const std::string quadrature_name(name, 0, position-1);
-	     name.erase(0,position);
-	     if (quadrature_name.compare("QGaussLobatto") == 0)		
-	       {
-	     	 const std::pair<int,unsigned int> tmp
-	           = Utilities::get_integer_at_position (name, 0);
-	         name.erase(0, tmp.second+1);
-//TODO: Implement a get function taking Quadrature<1> in fe_tools.h.
-	         //return fe_name_map.find(name_part)->second->get(QGaussLobatto<1>(tmp.first));
-		 AssertThrow (false, ExcNotImplemented());
-	       }
-	     else 
-	       {
-		 AssertThrow (false,ExcNotImplemented());
-	       }
-	   }
-      }
-  
-    
-				   // hm, if we have come thus far, we
-				   // didn't know what to do with the
-				   // string we got. so do as the docs
-				   // say: raise an exception
-  AssertThrow (false, ExcInvalidFEName(name));
-
-				   // make some compilers happy that
-				   // do not realize that we can't get
-				   // here after throwing
-  return 0;
-}
-
 
 
 template <int dim, int spacedim>

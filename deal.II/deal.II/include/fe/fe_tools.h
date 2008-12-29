@@ -358,27 +358,25 @@ class FETools
 				      * FiniteElement::prolongation
 				      * matrices.
 				      *
-				      * @param <tt>fe</tt> The finite element
+				      * @param fe The finite element
 				      * class for which we compute the
 				      * embedding matrices.
 				      *
-				      * @param
-				      * <tt>matrices</tt> A reference to
-				      * <tt>RefinementCase<dim>::isotropic_refinement</tt>
+				      * @param matrices A reference to
+				      * RefinementCase<dim>::isotropic_refinement
 				      * vectors of FullMatrix
 				      * objects. Each vector
 				      * corresponds to one
 				      * RefinementCase @p
 				      * refinement_case and is of the
 				      * vector size
-				      * <tt>GeometryInfo<dim>::n_children(refinement_case)</tt>. This
+				      * GeometryInfo<dim>::n_children(refinement_case). This
 				      * is the format used in
 				      * FiniteElement, where we want
 				      * to use this function mostly.
 				      *
-				      * @param
-				      * <tt>isotropic_only</tt>: set
-				      * this <tt>true</tt> if you only
+				      * @param isotropic_only Set
+				      * to <code>true</code> if you only
 				      * want to compute matrices for
 				      * isotropic refinement.
 				      */
@@ -848,14 +846,14 @@ class FETools
 				  OutVector&              u1_interpolated);
 
 				     /**
-				      * Gives $(Id-I_h)z1$ for a given
-				      * @p dof1-function @p z1, where $I_h$
+				      * Gives $(Id-I_h)z_1$ for a given
+				      * @p dof1-function $z_1$, where $I_h$
 				      * is the interpolation from @p fe1
-				      * to @p fe2. $(Id-I_h)z1$ is
-				      * denoted by @p z1_difference.
+				      * to @p fe2. The result $(Id-I_h)z_1$ is
+				      * written into @p z1_difference.
 				      *
 				      * Note, that this function does
-				      * not work on continuous
+				      * not work for continuous
 				      * elements at hanging nodes. For
 				      * that case use the
 				      * @p interpolation_difference
@@ -870,11 +868,11 @@ class FETools
 					 OutVector &z1_difference);    
     
 				     /**
-				      * Gives $(Id-I_h)z1$ for a given
-				      * @p dof1-function @p z1, where $I_h$
+				      * Gives $(Id-I_h)z_1$ for a given
+				      * @p dof1-function $z_1$, where $I_h$
 				      * is the interpolation from @p fe1
-				      * to @p fe2. $(Id-I_h)z1$ is
-				      * denoted by @p z1_difference.
+				      * to @p fe2. The result $(Id-I_h)z_1$ is
+				      * written into @p z1_difference.
 				      * @p constraints1 and
 				      * @p constraints2 are the
 				      * hanging node constraints
@@ -938,7 +936,7 @@ class FETools
 				      * nodes, please use the
 				      * @p extrapolate function with
 				      * an additional
-				      * @p ConstraintMatrix argument,
+				      * ConstraintMatrix argument,
 				      * see below.
 				      *
 				      * Since this function operates
@@ -1081,7 +1079,7 @@ class FETools
 				      *
 				      * The name must be in the form which
 				      * is returned by the
-				      * @p FiniteElement::get_name
+				      * FiniteElement::get_name
 				      * function, where a few
 				      * modifications are allowed:
 				      *
