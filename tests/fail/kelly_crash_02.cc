@@ -16,6 +16,14 @@
 // cell->face(f)->at_boundary() and cell->at_boundary(f) did not always return
 // the same thing, although they of course should. as a result, the
 // KellyErrorEstimator forgot to work on certain faces
+//
+// the problem turned out to be that we were setting a boundary indicator for
+// an interior face. while cell->face(f)->at_boundary() checks for a boundary
+// indicator != 255, cell->at_boundary(f) checks whether the cell has no
+// neighbor in position f. The latter was false (there was a neighbor) but the
+// former true, thus the discrepancy.
+//
+// the problem was fixed by fixing the code
 
 char logname[] = "kelly_crash_02/output";
 
@@ -199,7 +207,9 @@ void test ()
     for (unsigned int f=0; f<GeometryInfo<dim>::faces_per_cell; ++f)
       if ((cell->face(f)->center()[2] != -4)
 	  &&
-	  (cell->face(f)->center()[2] != 7))
+	  (cell->face(f)->center()[2] != 7)
+	  &&
+	  (cell->face(f)->at_boundary()))
 	cell->face(f)->set_boundary_indicator (1);
   
   triangulation.refine_global (1);
