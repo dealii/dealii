@@ -456,6 +456,17 @@ inconvenience this causes.
 <ol>
   <li>
   <p>
+  New: There is now a class TrilinosWrappers::SparsityPattern that allows to 
+  construct distributed sparsity patterns that can be used for initializing 
+  Trilinos sparse matrices. This means that for large problems on several 
+  MPI processors the memory requirements are reduced and the initialization 
+  speed is increased.
+  <br>
+  (Martin Kronbichler 2008/12/29)
+  </p>
+
+  <li>
+  <p>
   New: All SparseMatrix classes (SparseMatrix<number>, PETSc sparse
   matrices, Trilinos sparse matrices, block sparse matrices) can now
   directly add and set a FullMatrix and some other arrays into their value
