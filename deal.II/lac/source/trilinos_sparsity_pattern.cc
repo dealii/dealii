@@ -619,8 +619,7 @@ namespace TrilinosWrappers
   unsigned int
   SparsityPattern::n_rows () const
   {
-    int n_rows = graph -> NumGlobalRows();
-
+    const int n_rows = graph -> NumGlobalRows();
     return n_rows;
   }
 
@@ -629,7 +628,12 @@ namespace TrilinosWrappers
   unsigned int
   SparsityPattern::n_cols () const
   {
-    int n_cols = graph -> NumGlobalCols();
+    int n_cols;
+    if (graph->Filled() == true)
+      n_cols = graph -> NumGlobalCols();
+    else
+      n_cols = col_map.NumGlobalElements();
+
     return n_cols;
   }
 

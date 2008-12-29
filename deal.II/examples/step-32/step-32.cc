@@ -396,7 +396,8 @@ double BoussinesqFlowProblem<dim>::get_maximal_velocity () const
     cell = stokes_dof_handler.begin_active(),
     endc = stokes_dof_handler.end();
   for (; cell!=endc; ++cell)
-    if (cell->subdomain_id() == Utilities::Trilinos::get_this_mpi_process(trilinos_communicator))
+    if (cell->subdomain_id() == 
+	Utilities::Trilinos::get_this_mpi_process(trilinos_communicator))
       {
 	fe_values.reinit (cell);
 	fe_values[velocities].get_function_values (localized_stokes_solution,
@@ -442,25 +443,27 @@ BoussinesqFlowProblem<dim>::get_extrapolated_temperature_range () const
 	cell = temperature_dof_handler.begin_active(),
 	endc = temperature_dof_handler.end();
       for (; cell!=endc; ++cell)
-	{
-	  fe_values.reinit (cell);
-	  fe_values.get_function_values (old_temperature_solution,
-					 old_temperature_values);
-	  fe_values.get_function_values (old_old_temperature_solution,
-					 old_old_temperature_values);
+	if (cell->subdomain_id() == 
+	    Utilities::Trilinos::get_this_mpi_process(trilinos_communicator))
+	  {
+	    fe_values.reinit (cell);
+	    fe_values.get_function_values (old_temperature_solution,
+					   old_temperature_values);
+	    fe_values.get_function_values (old_old_temperature_solution,
+					   old_old_temperature_values);
 
-	  for (unsigned int q=0; q<n_q_points; ++q)
-	    {
-	      const double temperature = 
-		(1. + time_step/old_time_step) * old_temperature_values[q]-
-		time_step/old_time_step * old_old_temperature_values[q];
+	    for (unsigned int q=0; q<n_q_points; ++q)
+	      {
+		const double temperature = 
+		  (1. + time_step/old_time_step) * old_temperature_values[q]-
+		  time_step/old_time_step * old_old_temperature_values[q];
 
-	      min_local_temperature = std::min (min_local_temperature, 
-						temperature);
-	      max_local_temperature = std::max (max_local_temperature, 
-						temperature);
-	    }
-	}
+		min_local_temperature = std::min (min_local_temperature, 
+						  temperature);
+		max_local_temperature = std::max (max_local_temperature, 
+						  temperature);
+	      }
+	  }
 
       double min_temperature, max_temperature;
 
@@ -478,21 +481,23 @@ BoussinesqFlowProblem<dim>::get_extrapolated_temperature_range () const
 	cell = temperature_dof_handler.begin_active(),
 	endc = temperature_dof_handler.end();
       for (; cell!=endc; ++cell)
-	{
-	  fe_values.reinit (cell);
-	  fe_values.get_function_values (old_temperature_solution,
-					 old_temperature_values);
+	if (cell->subdomain_id() == 
+	    Utilities::Trilinos::get_this_mpi_process(trilinos_communicator))
+	  {
+	    fe_values.reinit (cell);
+	    fe_values.get_function_values (old_temperature_solution,
+					   old_temperature_values);
 
-	  for (unsigned int q=0; q<n_q_points; ++q)
-	    {
-	      const double temperature = old_temperature_values[q];
+	    for (unsigned int q=0; q<n_q_points; ++q)
+	      {
+		const double temperature = old_temperature_values[q];
 
-	      min_local_temperature = std::min (min_local_temperature, 
-						temperature);
-	      max_local_temperature = std::max (max_local_temperature, 
-						temperature);
-	    }
-	}
+		min_local_temperature = std::min (min_local_temperature, 
+						  temperature);
+		max_local_temperature = std::max (max_local_temperature, 
+						  temperature);
+	      }
+	  }
   
       double min_temperature, max_temperature;
 
@@ -513,7 +518,7 @@ compute_viscosity(const std::vector<double>          &old_temperature,
 		  const std::vector<Tensor<1,dim> >  &old_temperature_grads,
 		  const std::vector<Tensor<1,dim> >  &old_old_temperature_grads,
 		  const std::vector<double>          &old_temperature_laplacians,
-		  const std::vector<double>          &old_old_temperature_laplaceians,
+		  const std::vector<double>          &old_old_temperature_laplacians,
 		  const std::vector<Tensor<1,dim> >  &present_velocity_values,
 		  const std::vector<double>          &gamma_values,
 		  const double                        global_u_infty,
@@ -643,14 +648,7 @@ void BoussinesqFlowProblem<dim>::setup_dofs ()
   {
     stokes_matrix.clear ();
 
-    BlockCompressedSimpleSparsityPattern csp (2,2);
-
-    csp.block(0,0).reinit (n_u, n_u);
-    csp.block(0,1).reinit (n_u, n_p);
-    csp.block(1,0).reinit (n_p, n_u);
-    csp.block(1,1).reinit (n_p, n_p);
-
-    csp.collect_sizes ();
+    TrilinosWrappers::BlockSparsityPattern sp (stokes_partitioner);
 
     Table<2,DoFTools::Coupling> coupling (dim+1, dim+1);
 
@@ -661,10 +659,11 @@ void BoussinesqFlowProblem<dim>::setup_dofs ()
 	else
 	  coupling[c][d] = DoFTools::none;
 
-    DoFTools::make_sparsity_pattern (stokes_dof_handler, coupling, csp,
+    DoFTools::make_sparsity_pattern (stokes_dof_handler, coupling, sp,
 				     stokes_constraints, false);
+    sp.compress();
 
-    stokes_matrix.reinit (stokes_partitioner, csp);
+    stokes_matrix.reinit (sp);
   }
 
   {
@@ -672,14 +671,7 @@ void BoussinesqFlowProblem<dim>::setup_dofs ()
     Mp_preconditioner.reset ();
     stokes_preconditioner_matrix.clear ();
 
-    BlockCompressedSimpleSparsityPattern csp (2,2);
-
-    csp.block(0,0).reinit (n_u, n_u);
-    csp.block(0,1).reinit (n_u, n_p);
-    csp.block(1,0).reinit (n_p, n_u);
-    csp.block(1,1).reinit (n_p, n_p);
-  
-    csp.collect_sizes ();
+    TrilinosWrappers::BlockSparsityPattern sp (stokes_partitioner);
 
     Table<2,DoFTools::Coupling> coupling (dim+1, dim+1);
     for (unsigned int c=0; c<dim+1; ++c)
@@ -689,10 +681,11 @@ void BoussinesqFlowProblem<dim>::setup_dofs ()
 	else
 	  coupling[c][d] = DoFTools::none;
 
-    DoFTools::make_sparsity_pattern (stokes_dof_handler, coupling, csp,
+    DoFTools::make_sparsity_pattern (stokes_dof_handler, coupling, sp,
 				     stokes_constraints, false);
+    sp.compress();
 
-    stokes_preconditioner_matrix.reinit (stokes_partitioner, csp);
+    stokes_preconditioner_matrix.reinit (sp);
   }
 
   temperature_partitioner
@@ -707,13 +700,14 @@ void BoussinesqFlowProblem<dim>::setup_dofs ()
     temperature_stiffness_matrix.clear ();
     temperature_matrix.clear ();
 
-    CompressedSimpleSparsityPattern csp (n_T, n_T);
-    DoFTools::make_sparsity_pattern (temperature_dof_handler, csp,
+    TrilinosWrappers::SparsityPattern sp (temperature_partitioner);
+    DoFTools::make_sparsity_pattern (temperature_dof_handler, sp,
 				     temperature_constraints, false);
+    sp.compress();
 
-    temperature_matrix.reinit (temperature_partitioner, csp);
-    temperature_mass_matrix.reinit (temperature_partitioner, csp);
-    temperature_stiffness_matrix.reinit (temperature_partitioner, csp);
+    temperature_matrix.reinit (sp);
+    temperature_mass_matrix.reinit (sp);
+    temperature_stiffness_matrix.reinit (sp);
   }
 
   stokes_solution.reinit (stokes_partitioner);
@@ -755,7 +749,8 @@ BoussinesqFlowProblem<dim>::assemble_stokes_preconditioner ()
     cell = stokes_dof_handler.begin_active(),
     endc = stokes_dof_handler.end();
   for (; cell!=endc; ++cell)
-    if (cell->subdomain_id() == Utilities::Trilinos::get_this_mpi_process(trilinos_communicator))
+    if (cell->subdomain_id() == 
+	Utilities::Trilinos::get_this_mpi_process(trilinos_communicator))
       {
 	stokes_fe_values.reinit (cell);
 	local_matrix = 0;
@@ -876,7 +871,8 @@ void BoussinesqFlowProblem<dim>::assemble_stokes_system ()
     temperature_cell = temperature_dof_handler.begin_active();
   
   for (; cell!=endc; ++cell, ++temperature_cell)
-    if (cell->subdomain_id() == Utilities::Trilinos::get_this_mpi_process(trilinos_communicator))
+    if (cell->subdomain_id() == 
+	Utilities::Trilinos::get_this_mpi_process(trilinos_communicator))
       {
 	stokes_fe_values.reinit (cell);
 	temperature_fe_values.reinit (temperature_cell);
@@ -975,7 +971,8 @@ void BoussinesqFlowProblem<dim>::assemble_temperature_matrix ()
     cell = temperature_dof_handler.begin_active(),
     endc = temperature_dof_handler.end();
   for (; cell!=endc; ++cell)
-    if (cell->subdomain_id() == Utilities::Trilinos::get_this_mpi_process(trilinos_communicator))
+    if (cell->subdomain_id() == 
+	Utilities::Trilinos::get_this_mpi_process(trilinos_communicator) )
       {
 	local_mass_matrix = 0;
 	local_stiffness_matrix = 0;
@@ -1095,7 +1092,8 @@ void BoussinesqFlowProblem<dim>::assemble_temperature_system ()
     stokes_cell = stokes_dof_handler.begin_active();
 
   for (; cell!=endc; ++cell, ++stokes_cell)
-    if (cell->subdomain_id() == Utilities::Trilinos::get_this_mpi_process(trilinos_communicator) )
+    if (cell->subdomain_id() == 
+	Utilities::Trilinos::get_this_mpi_process(trilinos_communicator) )
       {
 	local_rhs = 0;
   
@@ -1112,10 +1110,10 @@ void BoussinesqFlowProblem<dim>::assemble_temperature_system ()
 	temperature_fe_values.get_function_gradients (old_old_temperature_solution,
 						      old_old_temperature_grads);
 	
-	temperature_fe_values.get_function_hessians (old_temperature_solution,
-						     old_temperature_laplacians);
-	temperature_fe_values.get_function_hessians (old_old_temperature_solution,
-						     old_old_temperature_laplacians);
+	temperature_fe_values.get_function_laplacians (old_temperature_solution,
+						       old_temperature_laplacians);
+	temperature_fe_values.get_function_laplacians (old_old_temperature_solution,
+						       old_old_temperature_laplacians);
 	
 	temperature_right_hand_side.value_list (temperature_fe_values.get_quadrature_points(),
 						gamma_values);

@@ -605,7 +605,7 @@ namespace TrilinosWrappers
   {
     for (unsigned int i=0;i<input_maps.size();++i)
       for (unsigned int j=0;j<input_maps.size();++j)
-	this->block(i,j).reinit(input_maps[i],input_maps[j]);
+	this->block(i,j).reinit(input_maps[i], input_maps[j]);
     this->collect_sizes();
   }
 

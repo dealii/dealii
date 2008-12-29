@@ -1237,7 +1237,7 @@ namespace TrilinosWrappers
       {
 				   // if the size is too small, extend the
 				   // cache by 10 elements
-	if (n_cached_elements > cached_row_indices.size())
+	if (n_cached_elements >= cached_row_indices.size())
 	  cached_row_indices.resize(cached_row_indices.size() + 10);
 
 	cached_row_indices[n_cached_elements] = j;
