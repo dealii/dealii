@@ -1,6 +1,3 @@
-//TODO: remove direct (non-eigenvalue) problem possibility (remove
-//         ExtraneousSource and some stuff in run(), see isour)
-
 /*    $Id$       */
 /*    Version: $Name:  $                                          */
 /*                                                                */
@@ -2186,12 +2183,7 @@ void NeutronDiffusionProblem<dim>::run ()
 
       double max_old = 0;
 
-                                       // indicate this is a eigenvalue problem
-      unsigned int isour = 0;
-                                       // store relative error between two
-                                       // successive power iterations
       double error;
-
       unsigned int iteration = 1;
       do
 	{
@@ -2205,34 +2197,17 @@ void NeutronDiffusionProblem<dim>::run ()
 	      energy_groups[group]->solve ();
 	    }
 
-	  if (isour==1)
+	  k_eff = get_total_fission_source();
+	  error = fabs(k_eff-k_eff_old)/fabs(k_eff);
+	  std::cout << "   Iteration " << iteration
+		    << ": k_eff=" << k_eff
+		    << std::endl;
+	  k_eff_old=k_eff;
+
+	  for (unsigned int group=0; group<parameters.n_groups; ++group)
 	    {
-	      double max_current = 0;
-              for (unsigned int group=0; group<parameters.n_groups; ++group)
-		{	      
-		  max_current = std::max (max_current,
-					  energy_groups[group]->solution.linfty_norm());
-		  
-		  energy_groups[group]->solution_old = energy_groups[group]->solution;
-		}
-
-	      error = fabs(max_current-max_old)/max_current;
-	      max_old = max_current;
-	    }
-	  else
-	    { 
-	      k_eff = get_total_fission_source();
-	      error = fabs(k_eff-k_eff_old)/fabs(k_eff);
-	      std::cout << "   Iteration " << iteration
-			<< ": k_eff=" << k_eff
-			<< std::endl;
-	      k_eff_old=k_eff;
-
-              for (unsigned int group=0; group<parameters.n_groups; ++group)
-                {
-                  energy_groups[group]->solution_old = energy_groups[group]->solution;
-                  energy_groups[group]->solution_old /= k_eff;
-                }
+	      energy_groups[group]->solution_old = energy_groups[group]->solution;
+	      energy_groups[group]->solution_old /= k_eff;
 	    }
 
 	  ++iteration;
