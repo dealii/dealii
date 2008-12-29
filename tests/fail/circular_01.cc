@@ -1,4 +1,4 @@
-//----------------------------  kelly_crash_01.cc  ---------------------------
+//----------------------------  circular_01.cc  ---------------------------
 //    $Id$
 //    Version: $Name$ 
 //
@@ -9,12 +9,12 @@
 //    to the file deal.II/doc/license.html for the  text  and
 //    further information on this license.
 //
-//----------------------------  kelly_crash_01.cc  ---------------------------
+//----------------------------  circular_01.cc  ---------------------------
 
 
 // a modified version of step-27 that crashes due to circular constraints
 
-char logname[] = "kelly_crash_01/output";
+char logname[] = "circular_01/output";
 
 
 #include "../tests.h"
