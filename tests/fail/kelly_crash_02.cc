@@ -12,10 +12,11 @@
 //----------------------------  kelly_crash_02.cc  ---------------------------
 
 
-// like kelly_crash_01 but much reduced. it turned out that
-// cell->face(f)->at_boundary() and cell->at_boundary(f) did not always return
-// the same thing, although they of course should. as a result, the
-// KellyErrorEstimator forgot to work on certain faces
+// like kelly_crash_01 (which has since been renamed circular_01 because it
+// continued to fail, though for other reasons) but much reduced. it turned
+// out that cell->face(f)->at_boundary() and cell->at_boundary(f) did not
+// always return the same thing, although they of course should. as a result,
+// the KellyErrorEstimator forgot to work on certain faces
 //
 // the problem turned out to be that we were setting a boundary indicator for
 // an interior face. while cell->face(f)->at_boundary() checks for a boundary

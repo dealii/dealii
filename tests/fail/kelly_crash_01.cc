@@ -2,7 +2,7 @@
 //    $Id$
 //    Version: $Name$ 
 //
-//    Copyright (C) 2006, 2007 by the deal.II authors
+//    Copyright (C) 2006, 2007, 2008 by the deal.II authors
 //
 //    This file is subject to QPL and may not be  distributed
 //    without copyright and license information. Please refer
@@ -12,7 +12,7 @@
 //----------------------------  kelly_crash_01.cc  ---------------------------
 
 
-// a modified version of step-27 that crashes because of circular constraints.
+// a modified version of step-27 that crashes due to circular constraints
 
 char logname[] = "kelly_crash_01/output";
 
@@ -808,7 +808,9 @@ void LaplaceProblem<3>::create_coarse_grid ()
     for (unsigned int f=0; f<GeometryInfo<dim>::faces_per_cell; ++f)
       if ((cell->face(f)->center()[2] != -4)
 	  &&
-	  (cell->face(f)->center()[2] != 7))
+	  (cell->face(f)->center()[2] != 7)
+	  &&
+	  (cell->face(f)->at_boundary()))
 	cell->face(f)->set_boundary_indicator (1);
   
   triangulation.refine_global (1);
