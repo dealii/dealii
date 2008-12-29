@@ -1110,16 +1110,23 @@ class TriaAccessor : public TriaAccessorBase<structdim, dim, spacedim>
 				      * set_all_boundary_indicators()
 				      * function.
 				      *
-				      * Caution: Never set the
-				      * boundary indicator to 255,
-				      * unless you exactly know what
-				      * you are doing!  This value is
-				      * reserved for another purpose
-				      * and algorithms may not work if
-				      * boundary cells have this
-				      * boundary indicator or if
-				      * interior cells have boundary
-				      * indicators other than 255.
+				      * Caution: You should never set the
+				      * boundary indicator of an interior face
+				      * (a face not at the boundary of the
+				      * domain), or set set the boundary
+				      * indicator of an exterior face to 255
+				      * (this value is reserved for another
+				      * purpose). Algorithms may not work or
+				      * produce very confusing results if
+				      * boundary cells have this boundary
+				      * indicator or if interior cells have
+				      * boundary indicators other than
+				      * 255. Unfortunately, the current object
+				      * has no means of finding out whether it
+				      * really is at the boundary of the
+				      * domain and so cannot determine whether
+				      * the value you are trying to set makes
+				      * sense under the current circumstances.
 				      */
     void set_boundary_indicator (const unsigned char) const;
 
